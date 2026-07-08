@@ -1,1 +1,1 @@
-return game:DefineFastFlag("VoiceRewarmTelemetry", false)
+return game:DefineFastFlag("VoiceRewarmTelemetryV2", false)

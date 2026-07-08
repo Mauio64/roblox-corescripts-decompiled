@@ -1,3 +1,3 @@
 return {
-    starterScript = require(script.starterScript)
-};
+	starterScript = require(script.starterScript)
+}

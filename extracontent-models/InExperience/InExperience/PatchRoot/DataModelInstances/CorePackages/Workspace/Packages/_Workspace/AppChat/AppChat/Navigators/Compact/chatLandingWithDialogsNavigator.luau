@@ -4,7 +4,6 @@ local React = require(AppChatParent.React)
 local Roact = require(AppChatParent.Roact)
 local RoactNavigation = require(AppChatParent.RoactNavigation)
 local EnumScreens = require(AppChat.EnumScreens)
-local Squads = require(AppChatParent.Squads)
 local SharedFlags = require(AppChatParent.SharedFlags)
 local AppNavBar = require(AppChatParent.AppNavBar)
 local memoize = require(AppChatParent.AppCommonLib).memoize
@@ -15,12 +14,10 @@ local LeaveGroupDialogScreen = require(ChatDetails.LeaveGroupDialog.LeaveGroupDi
 local ParticipantDialogScreenDeprecated = require(ChatDetails.ParticipantDialog.ParticipantDialogScreenDeprecated)
 local RemoveUserDialogScreen = require(ChatDetails.RemoveUserDialog.RemoveUserDialogScreen)
 local AbuseReportScreen = require(AppChat.Components.ChatAbuseReport.AbuseReportScreen)
-local TrustedContacts = require(AppChatParent.TrustedContacts)
-local FFlagTCUnifyNavigationEntry = SharedFlags.FFlagTCUnifyNavigationEntry
 local FFlagAppChatEnableTrustedFriendEntryPoint = require(AppChat.Flags.FFlagAppChatEnableTrustedFriendEntryPoint)
-local v21 = if not FFlagTCUnifyNavigationEntry then TrustedContacts.TrustedContactsModal.Screen else require(AppChat.Components.TrustedContactsModal.TrustedContactsModalScreen)
+local TrustedContactsModalScreen = require(AppChat.Components.TrustedContactsModal.TrustedContactsModalScreen)
 local MessageContextMenuScreen = require(AppChat.Components.ChatConversation.MessageInteraction.MessageContextMenuScreen)
-local SquadVoiceChangerOverlay = Squads.SquadVoiceChangerOverlay
+local SquadVoiceChangerOverlay = require(AppChatParent.Squads.SquadVoiceChangerOverlay)
 local ChatLandingTelemetryLayer = require(AppChat.Telemetry.Layers.ChatLandingTelemetryLayer)
 local ChatLandingTelemetryState = require(AppChat.Contexts.TelemetryState.ChatLandingTelemetryState)
 local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
@@ -35,13 +32,13 @@ local ConversationOverlayScreen = require(ChatConversation.PartialModal.Conversa
 local makeDialogScreenTelemetryWrapper = require(AppChat.Navigators.makeDialogScreenTelemetryWrapper)
 local configureTopBarWithNavigationOptions = require(AppChat.configureTopBarWithNavigationOptions)
 local getChatLandingStackNavigator = require(script.Parent.getChatLandingStackNavigator)
+local SquadVoiceAbuseReportScreen = require(AppChatParent.Squads.SquadVoiceAbuseReportScreen)
 local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
 local SystemMenuTopBar = require(AppChat.Components.TopBar.SystemMenuTopBar)
 local ChatConversationTopBar = require(AppChat.Components.TopBar.ChatConversationTopBar)
 local ChatLandingTopBar = require(AppChat.Components.TopBar.ChatLandingTopBar)
 local ChatTopBarBase = require(AppChat.Components.TopBar.ChatTopBarBase)
 local SquadAddFriendsIconButton = require(AppChat.Components.Squads.SquadAddFriendsIconButton)
-local SquadVoiceAbuseReportScreen = Squads.SquadVoiceAbuseReportScreen
 local Provider = require(AppChat.Contexts.ChatPagePadding.Provider)
 local ChatDetailsTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDetailsTelemetryLayer)
 local ChatDetailsTelemetryState = require(AppChat.Contexts.TelemetryState.ChatDetailsTelemetryState)
@@ -52,96 +49,94 @@ local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local GetFFlagIsSquadEnabled = SharedFlags.GetFFlagIsSquadEnabled
 local FFlagAppIaScrollAway = SharedFlags.FFlagAppIaScrollAway
 local FFlagAppIaScrollAwayFixSocial = SharedFlags.FFlagAppIaScrollAwayFixSocial
-local getFFlagAppChatEnableRepliesUI = require(AppChat.Flags.getFFlagAppChatEnableRepliesUI)
 local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
 local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
-local FFlagAppChatEnableGroupOSA = require(AppChatParent.SharedFlags).FFlagAppChatEnableGroupOSA
 local FFlagAppChatDisableAbsorbInputSelectable = require(AppChat.Flags.FFlagAppChatDisableAbsorbInputSelectable)
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
-local function AppChatNavigatorTelemetryProviders(t1: {[any]: any}) -- line: 77
+local function AppChatNavigatorTelemetryProviders(t1: {[any]: any}) -- line: 71
 	-- upvalues: useGetAndSetRef (copy), React (copy), ChatDetailsTelemetryState (copy), ChatDetailsTelemetryLayer (copy), ChatLandingTelemetryState (copy), ChatLandingTelemetryLayer (copy), ChatConversationTelemetryState (copy), ChatConversationTelemetryLayer (copy)
-	local v65, v66 = useGetAndSetRef({})
-	local v67 = React.useCallback(function() -- line: 80
-		-- upvalues: v65 (copy)
-		local v93 = v65()
+	local v61, v62 = useGetAndSetRef({})
+	local v63 = React.useCallback(function() -- line: 74
+		-- upvalues: v61 (copy)
+		local v89 = v61()
 
 		return {
-			chatLandingListCount = v93.chatLandingListCount,
-			pendingConversationCount = v93.pendingConversationCount,
-			unfilteredConversationCount = v93.unfilteredConversationCount
+			chatLandingListCount = v89.chatLandingListCount,
+			pendingConversationCount = v89.pendingConversationCount,
+			unfilteredConversationCount = v89.unfilteredConversationCount
 		}
-	end, { v65 })
-	local v68, v69 = useGetAndSetRef({})
-	local v70 = React.useCallback(function() -- line: 90
-		-- upvalues: v68 (copy)
-		local v94 = v68()
+	end, { v61 })
+	local v64, v65 = useGetAndSetRef({})
+	local v66 = React.useCallback(function() -- line: 84
+		-- upvalues: v64 (copy)
+		local v90 = v64()
 
 		return {
-			conversationId = v94.conversationId,
-			moderationType = v94.moderationType,
-			userPendingStatus = v94.userPendingStatus
+			conversationId = v90.conversationId,
+			moderationType = v90.moderationType,
+			userPendingStatus = v90.userPendingStatus
 		}
-	end, { v68 })
+	end, { v64 })
 	local _ = t1.children
-	local v72, v73 = useGetAndSetRef({})
-	local v74 = React.useCallback(function() -- line: 102
-		-- upvalues: v72 (copy)
-		local v95 = v72()
+	local v68, v69 = useGetAndSetRef({})
+	local v70 = React.useCallback(function() -- line: 96
+		-- upvalues: v68 (copy)
+		local v91 = v68()
 
 		return {
-			participantsCount = v95.participantsCount,
-			isGroupOwner = v95.isGroupOwner
+			participantsCount = v91.participantsCount,
+			isGroupOwner = v91.isGroupOwner
 		}
 	end, {
-		v72,
-		v68
+		v68,
+		v64
 	})
-	local v75 = React.createElement(ChatDetailsTelemetryState.Provider, {
-		value = {
-			get = v72,
-			set = v73
-		}
-	}, React.createElement(ChatDetailsTelemetryLayer.Provider, {
-		value = v74
-	}, t1.children))
-
-	return React.createElement(ChatLandingTelemetryState.Provider, {
-		value = {
-			get = v65,
-			set = v66
-		}
-	}, { React.createElement(ChatLandingTelemetryLayer.Provider, {
-		value = v67
-	}, { React.createElement(ChatConversationTelemetryState.Provider, {
+	local v71 = React.createElement(ChatDetailsTelemetryState.Provider, {
 		value = {
 			get = v68,
 			set = v69
 		}
-	}, { React.createElement(ChatConversationTelemetryLayer.Provider, {
+	}, React.createElement(ChatDetailsTelemetryLayer.Provider, {
 		value = v70
-	}, v75) }) }) })
+	}, t1.children))
+
+	return React.createElement(ChatLandingTelemetryState.Provider, {
+		value = {
+			get = v61,
+			set = v62
+		}
+	}, { React.createElement(ChatLandingTelemetryLayer.Provider, {
+		value = v63
+	}, { React.createElement(ChatConversationTelemetryState.Provider, {
+		value = {
+			get = v64,
+			set = v65
+		}
+	}, { React.createElement(ChatConversationTelemetryLayer.Provider, {
+		value = v66
+	}, v71) }) }) })
 end
 
-local v62 = Roact.Component:extend("ChatLandingStackNavigatorConnector")
+local v57 = Roact.Component:extend("ChatLandingStackNavigatorConnector")
 
-v62.router = getChatLandingStackNavigator(UserGameSettings.ReducedMotion).router
+v57.router = getChatLandingStackNavigator(UserGameSettings.ReducedMotion).router
 
-function v62.init(p1) -- line: 149
-	-- upvalues: UserGameSettings (copy), memoize (copy), getChatLandingStackNavigator (copy), v62 (copy)
+function v57.init(p1) -- line: 143
+	-- upvalues: UserGameSettings (copy), memoize (copy), getChatLandingStackNavigator (copy), v57 (copy)
 	p1.state = {
 		shouldReduceMotion = UserGameSettings.ReducedMotion
 	}
-	p1.getNavigator = memoize(function(p2) -- line: 154
-		-- upvalues: getChatLandingStackNavigator (copy), v62 (copy)
-		local v97 = getChatLandingStackNavigator(p2)
+	p1.getNavigator = memoize(function(p2) -- line: 148
+		-- upvalues: getChatLandingStackNavigator (copy), v57 (copy)
+		local v93 = getChatLandingStackNavigator(p2)
 
-		v62.router = v97.router
+		v57.router = v93.router
 
-		return v97
+		return v93
 	end)
 
-	function p1.updateSettings() -- line: 161
+	function p1.updateSettings() -- line: 155
 		-- upvalues: p1 (copy), UserGameSettings (copy)
 		p1:setState({
 			shouldReduceMotion = UserGameSettings.ReducedMotion
@@ -150,131 +145,154 @@ function v62.init(p1) -- line: 149
 
 	p1.reducedMotionConnection = UserGameSettings:GetPropertyChangedSignal("ReducedMotion"):Connect(p1.updateSettings)
 end
-function v62.willUnmount(p3) -- line: 170
+function v57.willUnmount(p3) -- line: 164
 	if p3.reducedMotionConnection then
 		p3.reducedMotionConnection:Disconnect()
 	end
 end
-function v62.render(p4) -- line: 193
-	-- upvalues: FFlagAppIaScrollAway (copy), AppNavBar (copy), FFlagAppIaScrollAwayFixSocial (copy), RoactNavigation (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), EnumScreens (copy), Roact (copy), SystemMenuTopBar (copy), ChatConversationTopBar (copy), ChatLandingTopBar (copy), ChatTopBarBase (copy), React (copy), SquadAddFriendsIconButton (copy), configureTopBarWithNavigationOptions (copy), AppChatNavigatorTelemetryProviders (copy), Provider (copy)
-	local v83 = if not FFlagAppIaScrollAway then nil else p4.props.navigation.getScreenProps("isInExperience", false)
-	local v84 = FFlagAppIaScrollAway and (not v83 and AppNavBar.getScrollAwayEnabled())
 
-	if FFlagAppIaScrollAwayFixSocial then
-		local v85 = RoactNavigation.getActiveChildNavigationOptions(p4.props.navigation)
+local function getActiveRouteName(p4) -- line: 170
+	local v75 = p4 and p4.state
 
-		v84 = v84 and v85.tabBarVisible
+	if not v75 or (not v75.routes or not v75.index) then
+		return nil
 	end
 
-	local v86 = nil
+	local v76 = v75.routes[v75.index]
+
+	if not v76 then
+		return nil
+	end
+
+	if v76.routes and v76.index then
+		local v77 = v76.routes[v76.index]
+
+		return v77 and v77.routeName or v76.routeName
+	end
+
+	return v76.routeName
+end
+
+function v57.render(p5) -- line: 187
+	-- upvalues: FFlagAppIaScrollAway (copy), AppNavBar (copy), FFlagAppIaScrollAwayFixSocial (copy), RoactNavigation (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), EnumScreens (copy), Roact (copy), SystemMenuTopBar (copy), ChatConversationTopBar (copy), ChatLandingTopBar (copy), ChatTopBarBase (copy), React (copy), SquadAddFriendsIconButton (copy), configureTopBarWithNavigationOptions (copy), AppChatNavigatorTelemetryProviders (copy), Provider (copy)
+	local v79 = if not FFlagAppIaScrollAway then nil else p5.props.navigation.getScreenProps("isInExperience", false)
+	local v80 = FFlagAppIaScrollAway and (not v79 and AppNavBar.getScrollAwayEnabled())
+
+	if FFlagAppIaScrollAwayFixSocial then
+		local v81 = RoactNavigation.getActiveChildNavigationOptions(p5.props.navigation)
+
+		v80 = v80 and v81.tabBarVisible
+	end
+
+	local v82 = nil
 
 	if FFlagAppChatTopBarConfigDriven() then
 		if FFlagAppChatPerfTracking then
 			AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
 		end
 
-		local navigation = p4.props.navigation
-		local v88 = navigation and navigation.state
-		local v89
+		local navigation = p5.props.navigation
+		local v84 = navigation and navigation.state
+		local v85
 
-		if not v88 or not v88.routes or not v88.index then
-			v89 = nil
+		if not v84 or not v84.routes or not v84.index then
+			v85 = nil
 		else
-			local v90 = v88.routes[v88.index]
+			local v86 = v84.routes[v84.index]
 
-			if not v90 then
-				v89 = nil
-			elseif v90.routes and v90.index then
-				local v91 = v90.routes[v90.index]
+			if not v86 then
+				v85 = nil
+			elseif v86.routes and v86.index then
+				local v87 = v86.routes[v86.index]
 
-				v89 = v91 and v91.routeName or v90.routeName
+				v85 = v87 and v87.routeName or v86.routeName
 			else
-				v89 = v90.routeName
+				v85 = v86.routeName
 			end
 		end
 
-		if v89 == EnumScreens.CreateNewChat or v89 == EnumScreens.EditChatMembers then
-			v86 = Roact.createElement(SystemMenuTopBar, {
-				screenName = v89,
-				navigation = p4.props.navigation
+		if v85 == EnumScreens.CreateNewChat or v85 == EnumScreens.EditChatMembers then
+			v82 = Roact.createElement(SystemMenuTopBar, {
+				screenName = v85,
+				navigation = p5.props.navigation
 			})
-		elseif v89 == EnumScreens.ChatConversation then
-			v86 = Roact.createElement(ChatConversationTopBar, {
+		elseif v85 == EnumScreens.ChatConversation then
+			v82 = Roact.createElement(ChatConversationTopBar, {
 				screenName = EnumScreens.ChatConversation,
-				navigation = p4.props.navigation
+				navigation = p5.props.navigation
 			})
-		elseif v89 == EnumScreens.ChatLanding then
-			v86 = Roact.createElement(ChatLandingTopBar, {
+		elseif v85 == EnumScreens.ChatLanding then
+			v82 = Roact.createElement(ChatLandingTopBar, {
 				screenName = EnumScreens.ChatLanding,
-				navigation = p4.props.navigation
+				navigation = p5.props.navigation
 			})
-		elseif v89 == EnumScreens.ChatDetails then
-			v86 = Roact.createElement(ChatTopBarBase, {
+		elseif v85 == EnumScreens.ChatDetails then
+			v82 = Roact.createElement(ChatTopBarBase, {
 				screenName = EnumScreens.ChatDetails,
-				navigation = p4.props.navigation
+				navigation = p5.props.navigation
 			})
-		elseif v89 == EnumScreens.SquadLobby then
-			v86 = Roact.createElement(ChatTopBarBase, {
+		elseif v85 == EnumScreens.SquadLobby then
+			v82 = Roact.createElement(ChatTopBarBase, {
 				screenName = EnumScreens.SquadLobby,
-				navigation = p4.props.navigation,
-				renderRight = function() --[[ renderRight ]] -- line: 233
-					-- upvalues: React (copy), SquadAddFriendsIconButton (copy), p4 (copy)
+				navigation = p5.props.navigation,
+				renderRight = function() -- line: 227
+					-- upvalues: React (copy), SquadAddFriendsIconButton (copy), p5 (copy)
 					return React.createElement(SquadAddFriendsIconButton, {
-						navigation = p4.props.navigation
+						navigation = p5.props.navigation
 					})
 				end
 			})
-		elseif v89 == EnumScreens.SquadInviteFriends then
-			v86 = Roact.createElement(ChatTopBarBase, {
+		elseif v85 == EnumScreens.SquadInviteFriends then
+			v82 = Roact.createElement(ChatTopBarBase, {
 				screenName = EnumScreens.SquadInviteFriends,
-				navigation = p4.props.navigation
+				navigation = p5.props.navigation
 			})
-		elseif v89 == EnumScreens.QuickStartSquadInviteFriends then
-			v86 = Roact.createElement(ChatTopBarBase, {
+		elseif v85 == EnumScreens.QuickStartSquadInviteFriends then
+			v82 = Roact.createElement(ChatTopBarBase, {
 				screenName = EnumScreens.QuickStartSquadInviteFriends,
-				navigation = p4.props.navigation
+				navigation = p5.props.navigation
 			})
 		end
 	end
 
-	if not v86 then
-		v86 = configureTopBarWithNavigationOptions(p4.props.navigation)
+	if not v82 then
+		v82 = configureTopBarWithNavigationOptions(p5.props.navigation)
 	end
 
-	local v92 = Roact.createElement(AppChatNavigatorTelemetryProviders, {}, {
-		layout = if not FFlagAppIaScrollAway or not v84 then Roact.createElement("UIListLayout", {
+	local v88 = Roact.createElement(AppChatNavigatorTelemetryProviders, {}, {
+		layout = if not FFlagAppIaScrollAway or not v80 then Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder
 		}) else nil,
-		topBar = v86,
+		topBar = v82,
 		content = Roact.createElement(Provider, {
 			value = {
-				left = p4.props.navigation.getScreenProps("appChatOuterPadding", 12),
-				right = p4.props.navigation.getScreenProps("appChatOuterPadding", 12)
+				left = p5.props.navigation.getScreenProps("appChatOuterPadding", 12),
+				right = p5.props.navigation.getScreenProps("appChatOuterPadding", 12)
 			}
 		}, {
 			navigatorFrame = Roact.createElement("Frame", {
-				Size = if not FFlagAppIaScrollAway or not v84 then UDim2.new(1, 0, 1, -p4.props.navigation.getScreenProps("topBarHeight", 0)) else UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
-				BorderSizePixel = 0
+				BorderSizePixel = 0,
+				Size = if not FFlagAppIaScrollAway or not v80 then UDim2.new(1, 0, 1, -p5.props.navigation.getScreenProps("topBarHeight", 0)) else UDim2.fromScale(1, 1)
 			}, {
-				navigator = Roact.createElement(p4.getNavigator(p4.state.shouldReduceMotion), p4.props)
+				navigator = Roact.createElement(p5.getNavigator(p5.state.shouldReduceMotion), p5.props)
 			})
 		})
 	})
 
 	return Roact.createElement("Frame", {
-		Size = UDim2.new(1, 0, 1, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		ClipsDescendants = true
+		ClipsDescendants = true,
+		Size = UDim2.new(1, 0, 1, 0)
 	}, {
-		ChatLandingStackNavigator = v92
+		ChatLandingStackNavigator = v88
 	})
 end
 
 local t2 = {
 	{
-		[EnumScreens.ChatLandingStack] = v62
+		[EnumScreens.ChatLandingStack] = v57
 	},
 	{
 		[GenericDialogType.EditChatGroupNameDialog] = {
@@ -345,7 +363,7 @@ table.insert(t2, {
 if FFlagAppChatEnableTrustedFriendEntryPoint then
 	table.insert(t2, {
 		[EnumScreens.AppChatTrustedContactsModal] = {
-			screen = v21,
+			screen = TrustedContactsModalScreen,
 			navigationOptions = {
 				backButtonEnabled = true,
 				overlayEnabled = true
@@ -363,18 +381,15 @@ table.insert(t2, {
 		}
 	}
 })
-
-if getFFlagAppChatEnableRepliesUI() then
-	table.insert(t2, {
-		[EnumScreens.MessageContextMenu] = {
-			screen = MessageContextMenuScreen,
-			navigationOptions = {
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+table.insert(t2, {
+	[EnumScreens.MessageContextMenu] = {
+		screen = MessageContextMenuScreen,
+		navigationOptions = {
+			backButtonEnabled = true,
+			overlayEnabled = true
 		}
-	})
-end
+	}
+})
 
 if GetFFlagIsSquadEnabled() and GetFFlagEnableCrossExpVoice() then
 	table.insert(t2, {
@@ -414,19 +429,17 @@ if FFlagAppChatEnableDoubleOptIn then
 	})
 end
 
-if FFlagAppChatEnableGroupOSA then
-	table.insert(t2, {
-		[EnumScreens.GroupOSADialog] = {
-			screen = GroupOSADialogScreen,
-			navigationOptions = {
-				transparent = true,
-				overlayTransparency = 0.5,
-				backButtonEnabled = true,
-				overlayEnabled = true
-			}
+table.insert(t2, {
+	[EnumScreens.GroupOSADialog] = {
+		screen = GroupOSADialogScreen,
+		navigationOptions = {
+			transparent = true,
+			overlayTransparency = 0.5,
+			backButtonEnabled = true,
+			overlayEnabled = true
 		}
-	})
-end
+	}
+})
 
 if FFlagEnablePartyVoiceChangersInLua then
 	table.insert(t2, {

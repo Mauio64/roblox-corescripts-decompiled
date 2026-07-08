@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixControlBarSubMenuOverlap2", false);
+return game:DefineFastFlag("AXFixControlBarSubMenuOverlap2", false)

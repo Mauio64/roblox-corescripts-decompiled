@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-return require(l_Parent_0.CapturesCommon).Enums.CaptureType;
+local ParentParent = script.Parent.Parent.Parent
+
+return require(ParentParent.CapturesCommon).Enums.CaptureType

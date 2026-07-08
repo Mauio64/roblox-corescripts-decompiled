@@ -1,1 +1,1 @@
-return require(script.Parent.makeAppOneKnobSlider)("SystemPrimaryDefault");
+return require(script.Parent.makeAppOneKnobSlider)("SystemPrimaryDefault")

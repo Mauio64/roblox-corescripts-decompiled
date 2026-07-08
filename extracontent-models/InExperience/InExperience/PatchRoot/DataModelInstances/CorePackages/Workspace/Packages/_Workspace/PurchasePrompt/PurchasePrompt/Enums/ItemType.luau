@@ -1,6 +1,6 @@
 return (require(script.Parent.createEnum)("ItemType", {
-    "Asset", 
-    "GamePass", 
-    "Product", 
-    "Bundle"
-}));
+	"Asset",
+	"GamePass",
+	"Product",
+	"Bundle"
+}))

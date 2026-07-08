@@ -1,4 +1,4 @@
 return {
-    Fit = "Fit", 
-    Fill = "Fill"
-};
+	Fit = "Fit",
+	Fill = "Fill"
+}

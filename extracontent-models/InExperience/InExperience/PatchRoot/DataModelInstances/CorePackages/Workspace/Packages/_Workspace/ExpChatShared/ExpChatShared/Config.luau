@@ -1,6 +1,6 @@
 return {
-    DefaultChannelNames = {
-        RBXGeneral = true, 
-        RBXSystem = true
-    }
-};
+	DefaultChannelNames = {
+		RBXGeneral = true,
+		RBXSystem = true
+	}
+}

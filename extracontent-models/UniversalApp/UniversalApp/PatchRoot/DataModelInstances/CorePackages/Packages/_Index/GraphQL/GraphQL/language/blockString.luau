@@ -1,96 +1,107 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_String_0 = v1.String;
-local v4 = nil;
-local v5 = nil;
-local _ = nil;
-v5 = function(v7) --[[ Line: 22 ]] --[[ Name: dedentBlockStringValue ]]
-    -- upvalues: l_String_0 (copy), v4 (ref), l_Array_0 (copy)
-    local v8 = l_String_0.split(v7, {
-        "\r\n", 
-        "\n", 
-        "\r"
-    });
-    local v9 = v4(v7);
-    if v9 ~= 0 then
-        for v10 = 2, #v8 do
-            v8[v10] = l_String_0.slice(v8[v10], v9 + 1);
-        end;
-    end;
-    local v11 = 0;
-    while v11 < #v8 and isBlank(v8[v11 + 1]) do
-        v11 = v11 + 1;
-    end;
-    local v12 = #v8;
-    while v11 < v12 and isBlank(v8[v12 - 1 + 1]) do
-        v12 = v12 - 1;
-    end;
-    return l_Array_0.join(l_Array_0.slice(v8, v11 + 1, v12 + 1), "\n");
-end;
-isBlank = function(v13) --[[ Line: 51 ]] --[[ Name: isBlank ]]
-    for v14 = 1, #v13 do
-        local v15 = string.sub(v13, v14, v14);
-        if v15 ~= " " and v15 ~= "\t" then
-            return false;
-        end;
-    end;
-    return true;
-end;
-v4 = function(v16) --[[ Line: 62 ]] --[[ Name: getBlockStringIndentation ]]
-    -- upvalues: l_String_0 (copy)
-    local v17 = true;
-    local v18 = true;
-    local v19 = 0;
-    local v20 = nil;
-    local v21 = 1;
-    local v22 = string.len(v16);
-    while v21 <= v22 do
-        local v23 = l_String_0.charCodeAt(v16, v21);
-        if v23 == 13 and l_String_0.charCodeAt(v16, v21 + 1) == 10 then
-            v21 = v21 + 1;
-        end;
-        if v23 == 10 then
-            v17 = false;
-            v18 = true;
-            v19 = 0;
-        elseif v23 == 9 or v23 == 32 then
-            v19 = v19 + 1;
-        else
-            if v18 and v17 ~= true and (v20 == nil or v19 < v20) then
-                v20 = v19;
-            end;
-            v18 = false;
-        end;
-        v21 = v21 + 1;
-    end;
-    return v20 and v20 or 0;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local String = LuauPolyfill.String
+local getBlockStringIndentation = nil
+
+function isBlank(s1: string) -- line: 51
+	for i = 1, #s1 do
+		local v14 = string.sub(s1, i, i)
+
+		if v14 ~= " " and v14 ~= "\t" then
+			return false
+		end
+	end
+
+	return true
+end
+function getBlockStringIndentation(s2: string) -- line: 62
+	-- upvalues: String (copy)
+	local v16 = true
+	local v17 = true
+	local n1 = 0
+	local v19 = nil
+	local n2 = 1
+	local v21 = string.len(s2)
+
+	while n2 <= v21 do
+		local v22 = String.charCodeAt(s2, n2)
+
+		if v22 == 13 and String.charCodeAt(s2, n2 + 1) == 10 then
+			n2 += 1
+		end
+
+		if v22 == 10 then
+			v16 = false
+			v17 = true
+			n1 = 0
+		elseif v22 == 9 or v22 == 32 then
+			n1 += 1
+		else
+			if v17 and v16 ~= true and (v19 == nil or n1 < v19) then
+				v19 = n1
+			end
+
+			v17 = false
+		end
+
+		n2 += 1
+	end
+
+	return v19 and v19 or 0
+end
+
 return {
-    getBlockStringIndentation = v4, 
-    dedentBlockStringValue = v5, 
-    printBlockString = function(v24, v25, v26) --[[ Line: 102 ]] --[[ Name: printBlockString ]]
-        local v27 = v25 or "";
-        local v28 = v26 ~= nil and v26;
-        local v29 = string.find(v24, "\n") == nil;
-        local v30 = true;
-        if string.sub(v24, 1, 1) ~= " " then
-            v30 = string.sub(v24, 1, 1) == "\t";
-        end;
-        local v31 = string.sub(v24, #v24, #v24) == "\"";
-        local v32 = string.sub(v24, #v24, #v24) == "\\";
-        local v33 = true;
-        if v29 == true then
-            v33 = v31 or v32 or v28;
-        end;
-        local v34 = "";
-        if v33 and (v29 and v30) ~= true then
-            v34 = v34 .. "\n" .. v27;
-        end;
-        v34 = v34 .. (v27 ~= "" and string.gsub(v24, "\n", "\n" .. v27) or v24);
-        if v33 then
-            v34 = v34 .. "\n";
-        end;
-        return "\"\"\"" .. string.gsub(v34, "\"\"\"", "\\\"\"\"") .. "\"\"\"";
-    end
-};
+	getBlockStringIndentation = getBlockStringIndentation,
+	dedentBlockStringValue = function(s3: string) -- line: 22
+		-- upvalues: String (copy), getBlockStringIndentation (ref), Array (copy)
+		local v7 = String.split(s3, {
+			"\r\n",
+			"\n",
+			"\r"
+		})
+		local v8 = getBlockStringIndentation(s3)
+
+		if v8 ~= 0 then
+			for i = 2, #v7 do
+				v7[i] = String.slice(v7[i], v8 + 1)
+			end
+		end
+
+		local n3 = 0
+
+		while n3 < #v7 and isBlank(v7[n3 + 1]) do
+			n3 += 1
+		end
+
+		local v11 = #v7
+
+		while n3 < v11 and isBlank(v7[v11 - 1 + 1]) do
+			v11 -= 1
+		end
+
+		return Array.join(Array.slice(v7, n3 + 1, v11 + 1), "\n")
+	end,
+	printBlockString = function(s4: string, s5: string?, b1: boolean?) -- line: 102
+		local v26 = s5 or ""
+		local v27 = b1 ~= nil and b1
+		local v28 = string.find(s4, "\n") == nil
+		local v29 = string.sub(s4, 1, 1) == " " or string.sub(s4, 1, 1) == "\t"
+		local v30 = string.sub(s4, #s4, #s4) == "\""
+		local v31 = string.sub(s4, #s4, #s4) == "\\"
+		local v32 = v28 ~= true or (v30 or (v31 or v27))
+		local s6 = ""
+
+		if v32 and (v28 and v29) ~= true then
+			s6 ..= "\n" .. v26
+		end
+
+		local v34 = s6 .. (v26 ~= "" and string.gsub(s4, "\n", "\n" .. v26) or s4)
+
+		if v32 then
+			v34 ..= "\n"
+		end
+
+		return "\"\"\"" .. string.gsub(v34, "\"\"\"", "\\\"\"\"") .. "\"\"\""
+	end
+}

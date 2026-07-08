@@ -1,49 +1,53 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize);
-local v5 = {
-    isIncoming = false, 
-    hasTail = false, 
-    isPending = false, 
-    isRepliedTo = false, 
-    isPressed = false, 
-    innerPadding = 0, 
-    maxWidth = 180, 
-    LayoutOrder = 0, 
-    isLastMessageInMessageGroup = false
-};
-return function(v6) --[[ Line: 38 ]] --[[ Name: HiddenMessage ]]
-    -- upvalues: v2 (copy), v5 (copy), v3 (copy), v1 (copy), v4 (copy)
-    local v7 = v2.Dictionary.union(v5, v6);
-    local v8 = v3.Hooks.useTokens();
-    return v1.createElement(v4, {
-        isIncoming = v7.isIncoming, 
-        hasTail = v7.hasTail, 
-        isPending = v7.isPending, 
-        isUnfiltered = false, 
-        padding = {
-            top = UDim.new(0, v8.Padding.Small), 
-            bottom = UDim.new(0, v8.Padding.Small), 
-            left = UDim.new(0, v8.Padding.Medium), 
-            right = UDim.new(0, v8.Padding.Medium)
-        }, 
-        LayoutOrder = v7.LayoutOrder, 
-        isRepliedTo = v7.isRepliedTo, 
-        isPressed = v7.isPressed, 
-        isLastMessageInMessageGroup = v7.isLastMessageInMessageGroup, 
-        [v1.Change.AbsoluteSize] = v7[v1.Change.AbsoluteSize]
-    }, {
-        IconContainer = v1.createElement(v3.View, {
-            tag = "row align-x-center align-y-center content-muted", 
-            Size = UDim2.fromOffset(180 - v8.Padding.Medium * 2, 40 - v8.Padding.Small * 2)
-        }, {
-            LockIcon = v1.createElement(v3.Icon, {
-                name = v3.Enums.IconName.LockClosed, 
-                size = v3.Enums.IconSize.Medium, 
-                variant = v3.Enums.IconVariant.Regular
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local Foundation = require(Parent.Foundation)
+local ChatBubbleContainerAutomaticSize = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize)
+local t1 = {
+	isIncoming = false,
+	hasTail = false,
+	isPending = false,
+	isRepliedTo = false,
+	isPressed = false,
+	innerPadding = 0,
+	maxWidth = 180,
+	LayoutOrder = 0,
+	isLastMessageInMessageGroup = false
+}
+
+local function HiddenMessage(t2: {[any]: any}) -- line: 38
+	-- upvalues: Cryo (copy), t1 (copy), Foundation (copy), React (copy), ChatBubbleContainerAutomaticSize (copy)
+	local v9 = Cryo.Dictionary.union(t1, t2)
+	local v10 = Foundation.Hooks.useTokens()
+
+	return React.createElement(ChatBubbleContainerAutomaticSize, {
+		isIncoming = v9.isIncoming,
+		hasTail = v9.hasTail,
+		isPending = v9.isPending,
+		isUnfiltered = false,
+		padding = {
+			top = UDim.new(0, v10.Padding.Small),
+			bottom = UDim.new(0, v10.Padding.Small),
+			left = UDim.new(0, v10.Padding.Medium),
+			right = UDim.new(0, v10.Padding.Medium)
+		},
+		LayoutOrder = v9.LayoutOrder,
+		isRepliedTo = v9.isRepliedTo,
+		isPressed = v9.isPressed,
+		isLastMessageInMessageGroup = v9.isLastMessageInMessageGroup,
+		[React.Change.AbsoluteSize] = v9[React.Change.AbsoluteSize]
+	}, {
+		IconContainer = React.createElement(Foundation.View, {
+			tag = "row align-x-center align-y-center content-muted",
+			Size = UDim2.fromOffset(180 - v10.Padding.Medium * 2, 40 - v10.Padding.Small * 2)
+		}, {
+			LockIcon = React.createElement(Foundation.Icon, {
+				name = Foundation.Enums.IconName.LockClosed,
+				size = Foundation.Enums.IconSize.Medium,
+				variant = Foundation.Enums.IconVariant.Regular
+			})
+		})
+	})
+end
+
+return HiddenMessage

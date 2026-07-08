@@ -1,109 +1,117 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Signals);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.SduiCoreSystem);
-local l_calculateItemWidth_0 = require(l_Parent_0.CollectionViews).calculateItemWidth;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_getSduiServiceDependenciesStore_0 = v4.getSduiServiceDependenciesStore;
-local function _(v9, v10, v11, v12, v13) --[[ Line: 24 ]] --[[ Name: computePeekFraction ]]
-    local v14 = v13 - v12;
-    if v14 <= 0 then
-        return 0;
-    else
-        local v15 = v9 - v10 - (v11 - 1) * v12 - v13;
-        if v15 <= 0 then
-            return 0;
-        else
-            return (math.clamp(v11 * v14 / v15, 0, 0.5));
-        end;
-    end;
-end;
-return function(v17) --[[ Line: 50 ]] --[[ Name: useProfileCompletionSduiContext ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_calculateItemWidth_0 (copy), v2 (copy), l_AppPage_0 (copy), l_getSduiServiceDependenciesStore_0 (copy)
-    local v18 = l_useTokens_0();
-    local l_Medium_0 = v18.Gap.Medium;
-    local l_Size_1500_0 = v18.Size.Size_1500;
-    local v27 = v1.useMemo(function() --[[ Line: 55 ]]
-        -- upvalues: v17 (copy), l_Medium_0 (copy), l_Size_1500_0 (copy)
-        local l_containerWidth_0 = v17.containerWidth;
-        local l_sideMargin_0 = v17.sideMargin;
-        local l_l_Medium_0_0 = l_Medium_0;
-        local l_l_Size_1500_0_0 = l_Size_1500_0;
-        local v25 = l_l_Size_1500_0_0 - l_l_Medium_0_0;
-        if v25 <= 0 then
-            return 0;
-        else
-            local v26 = l_containerWidth_0 - l_sideMargin_0 - l_l_Medium_0_0 * 0 - l_l_Size_1500_0_0;
-            if v26 <= 0 then
-                return 0;
-            else
-                return (math.clamp(v25 * 1 / v26, 0, 0.5));
-            end;
-        end;
-    end, {
-        v17.containerWidth, 
-        v17.sideMargin, 
-        l_Medium_0, 
-        l_Size_1500_0
-    });
-    local v28 = v1.useMemo(function() --[[ Line: 59 ]]
-        -- upvalues: l_calculateItemWidth_0 (ref), l_Medium_0 (copy), v17 (copy), v27 (copy)
-        return l_calculateItemWidth_0(1, l_Medium_0, v17.sideMargin, v17.containerWidth, v27);
-    end, {
-        l_Medium_0, 
-        v17.sideMargin, 
-        v17.containerWidth, 
-        v27
-    });
-    local v29, v30 = v1.useMemo(function() --[[ Line: 63 ]]
-        -- upvalues: v2 (ref), v27 (copy), l_Medium_0 (copy), v17 (copy), v28 (copy)
-        return v2.createSignal({
-            numColumns = 1, 
-            fractionalItemAmount = v27, 
-            columnGap = l_Medium_0, 
-            sideMargin = v17.sideMargin, 
-            verticalPadding = 0, 
-            itemWidth = v28
-        });
-    end, {});
-    v1.useEffect(function() --[[ Line: 74 ]]
-        -- upvalues: v30 (copy), v27 (copy), l_Medium_0 (copy), v17 (copy), v28 (copy)
-        v30({
-            numColumns = 1, 
-            fractionalItemAmount = v27, 
-            columnGap = l_Medium_0, 
-            sideMargin = v17.sideMargin, 
-            verticalPadding = 0, 
-            itemWidth = v28
-        });
-    end, {
-        v27, 
-        l_Medium_0, 
-        v17.sideMargin, 
-        v28, 
-        v30
-    });
-    local v33 = v1.useCallback(function(_) --[[ Line: 85 ]]
-        -- upvalues: v2 (ref), v29 (copy)
-        return v2.createComputed(function(v32) --[[ Line: 86 ]]
-            -- upvalues: v29 (ref)
-            return v29(v32);
-        end);
-    end, {
-        v29
-    });
-    local l_ProfilePlatform_0 = l_AppPage_0.ProfilePlatform;
-    return (v1.useMemo(function() --[[ Line: 92 ]]
-        -- upvalues: l_getSduiServiceDependenciesStore_0 (ref), l_ProfilePlatform_0 (copy), v33 (copy)
-        return {
-            dependencies = l_getSduiServiceDependenciesStore_0().getDependencies(l_ProfilePlatform_0), 
-            appPage = l_ProfilePlatform_0, 
-            getPageLayoutConfig = v33
-        };
-    end, {
-        l_ProfilePlatform_0, 
-        v33
-    }));
-end;
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(Parent.React)
+local Signals = require(Parent.Signals)
+local Foundation = require(Parent.Foundation)
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local calculateItemWidth = require(Parent.CollectionViews).calculateItemWidth
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local useTokens = Foundation.Hooks.useTokens
+local getSduiServiceDependenciesStore = SduiCoreSystem.getSduiServiceDependenciesStore
+
+local function computePeekFraction(n1: number, n2: number, n3: number, n4: number, n5: number) -- line: 24
+	local v17 = n5 - n4
+
+	if v17 <= 0 then
+		return 0
+	end
+
+	local v18 = n1 - n2 - (n3 - 1) * n4 - n5
+
+	if v18 <= 0 then
+		return 0
+	end
+
+	return (math.clamp(n3 * v17 / v18, 0, 0.5))
+end
+local function useProfileCompletionSduiContext(t1: {[any]: any}) -- line: 50
+	-- upvalues: useTokens (copy), React (copy), calculateItemWidth (copy), Signals (copy), AppPage (copy), getSduiServiceDependenciesStore (copy)
+	local v20 = useTokens()
+	local Medium = v20.Gap.Medium
+	local Size_1500 = v20.Size.Size_1500
+	local v23 = React.useMemo(function() -- line: 55
+		-- upvalues: t1 (copy), Medium (copy), Size_1500 (copy)
+		local containerWidth = t1.containerWidth
+		local sideMargin = t1.sideMargin
+		local v31 = Medium
+		local v32 = Size_1500
+		local v33 = v32 - v31
+
+		if v33 <= 0 then
+			return 0
+		end
+
+		local v34 = containerWidth - sideMargin - v31 * 0 - v32
+
+		if v34 <= 0 then
+			return 0
+		end
+
+		return (math.clamp(v33 * 1 / v34, 0, 0.5))
+	end, {
+		t1.containerWidth,
+		t1.sideMargin,
+		Medium,
+		Size_1500
+	})
+	local v24 = React.useMemo(function() -- line: 59
+		-- upvalues: calculateItemWidth (copy), Medium (copy), t1 (copy), v23 (copy)
+		return calculateItemWidth(1, Medium, t1.sideMargin, t1.containerWidth, v23)
+	end, {
+		Medium,
+		t1.sideMargin,
+		t1.containerWidth,
+		v23
+	})
+	local v25, v26 = React.useMemo(function() -- line: 63
+		-- upvalues: Signals (copy), v23 (copy), Medium (copy), t1 (copy), v24 (copy)
+		return Signals.createSignal({
+			numColumns = 1,
+			verticalPadding = 0,
+			fractionalItemAmount = v23,
+			columnGap = Medium,
+			sideMargin = t1.sideMargin,
+			itemWidth = v24
+		})
+	end, {})
+
+	React.useEffect(function() -- line: 74
+		-- upvalues: v26 (copy), v23 (copy), Medium (copy), t1 (copy), v24 (copy)
+		v26({
+			numColumns = 1,
+			verticalPadding = 0,
+			fractionalItemAmount = v23,
+			columnGap = Medium,
+			sideMargin = t1.sideMargin,
+			itemWidth = v24
+		})
+	end, {
+		v23,
+		Medium,
+		t1.sideMargin,
+		v24,
+		v26
+	})
+
+	local v27 = React.useCallback(function(_) -- line: 85
+		-- upvalues: Signals (copy), v25 (copy)
+		return Signals.createComputed(function(p2) -- line: 86
+			-- upvalues: v25 (copy)
+			return v25(p2)
+		end)
+	end, { v25 })
+	local ProfilePlatform = AppPage.ProfilePlatform
+
+	return (React.useMemo(function() -- line: 92
+		-- upvalues: getSduiServiceDependenciesStore (copy), ProfilePlatform (copy), v27 (copy)
+		return {
+			dependencies = getSduiServiceDependenciesStore().getDependencies(ProfilePlatform),
+			appPage = ProfilePlatform,
+			getPageLayoutConfig = v27
+		}
+	end, {
+		ProfilePlatform,
+		v27
+	}))
+end
+
+return useProfileCompletionSduiContext

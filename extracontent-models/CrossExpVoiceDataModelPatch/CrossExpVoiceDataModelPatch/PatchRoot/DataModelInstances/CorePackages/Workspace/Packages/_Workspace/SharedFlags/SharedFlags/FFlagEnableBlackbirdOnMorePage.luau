@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableBlackbirdOnMorePage", false);
+return game:DefineFastFlag("EnableBlackbirdOnMorePage2", false)

@@ -1,10 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local v2 = game:DefineFastInt("ProfileCTAHttpRetryCount", 3);
-return (v1.config({
-    requestFunction = function(v3, v4, v5) --[[ Line: 7 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v1 (copy)
-        return v1.requestFunctions.RequestInternal(v3, v4, v5);
-    end, 
-    maxRetryCount = v2
-}));
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+local v3 = game:DefineFastInt("ProfileCTAHttpRetryCount", 3)
+
+return (HttpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 7
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+	end,
+	maxRetryCount = v3
+}))

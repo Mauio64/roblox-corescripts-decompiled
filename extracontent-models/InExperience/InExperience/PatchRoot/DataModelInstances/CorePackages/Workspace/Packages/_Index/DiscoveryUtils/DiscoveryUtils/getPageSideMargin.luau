@@ -1,9 +1,13 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getPageSideMargin ]]
-    if v0 > 600 then
-        return 48;
-    elseif v0 > 320 then
-        return 24;
-    else
-        return 12;
-    end;
-end;
+local function getPageSideMargin(p1) -- line: 1
+	if p1 > 600 then
+		return 48
+	end
+
+	if p1 > 320 then
+		return 24
+	end
+
+	return 12
+end
+
+return getPageSideMargin

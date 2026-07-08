@@ -1,124 +1,129 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("MediaPlayback");
-local v1 = require(l_script_FirstAncestor_0.Parent.Signals);
-local v2 = require(l_script_FirstAncestor_0.Parent.SignalsExperimental);
-local v3 = require(l_script_FirstAncestor_0.Common.enableAudioPlaybackInApp);
-local v4 = require(l_script_FirstAncestor_0.Stores.getAudioPlaybackStore.createAudioSystem);
-local v5 = require(l_script_FirstAncestor_0.Stores.getAudioPlaybackStore.createVolumeStore);
-local _ = require(l_script_FirstAncestor_0.Stores.getAudioPlaybackStore.types);
-local l_createSignal_0 = v1.createSignal;
-local l_createEffect_0 = v1.createEffect;
-local l_onDisposed_0 = v2.onDisposed;
-return function(v10) --[[ Line: 17 ]] --[[ Name: createAudioStore ]]
-    -- upvalues: l_createSignal_0 (copy), v5 (copy), v3 (copy), v4 (copy), l_createEffect_0 (copy), l_onDisposed_0 (copy)
-    local v11, v12 = l_createSignal_0(0);
-    local v13, v14 = l_createSignal_0(0);
-    local v15, v16 = l_createSignal_0(false);
-    local v17, v18 = l_createSignal_0(false);
-    local v19, v20 = l_createSignal_0(false);
-    local v21, v22 = l_createSignal_0(false);
-    local v23 = {};
-    local v24 = v5();
-    v3();
-    local v25 = v4(v10);
-    local l_audioPlayer_0 = v25.audioPlayer;
-    local function v27() --[[ Line: 34 ]] --[[ Name: play ]]
-        -- upvalues: v16 (copy), v18 (copy), l_audioPlayer_0 (copy)
-        v16(true);
-        v18(false);
-        l_audioPlayer_0.PlaybackSpeed = 1;
-    end;
-    local function v28() --[[ Line: 40 ]] --[[ Name: pause ]]
-        -- upvalues: v16 (copy), l_audioPlayer_0 (copy)
-        v16(false);
-        l_audioPlayer_0.PlaybackSpeed = 0;
-    end;
-    local function v29() --[[ Line: 45 ]] --[[ Name: stop ]]
-        -- upvalues: v16 (copy), l_audioPlayer_0 (copy), v14 (copy)
-        v16(false);
-        l_audioPlayer_0.PlaybackSpeed = 0;
-        l_audioPlayer_0.TimePosition = 0;
-        v14(0);
-    end;
-    local function v32(v30) --[[ Line: 51 ]] --[[ Name: seek ]]
-        -- upvalues: l_audioPlayer_0 (copy), v14 (copy)
-        local v31 = math.clamp(v30, 0, l_audioPlayer_0.TimeLength);
-        l_audioPlayer_0.TimePosition = v31;
-        v14(v31);
-    end;
-    l_audioPlayer_0:GetPropertyChangedSignal("TimeLength"):Connect(function() --[[ Line: 57 ]]
-        -- upvalues: v12 (copy), l_audioPlayer_0 (copy)
-        v12(l_audioPlayer_0.TimeLength);
-    end);
-    v12(l_audioPlayer_0.TimeLength);
-    l_audioPlayer_0:GetPropertyChangedSignal("IsReady"):Connect(function() --[[ Line: 62 ]]
-        -- upvalues: v22 (copy), l_audioPlayer_0 (copy)
-        v22(l_audioPlayer_0.IsReady);
-    end);
-    v22(l_audioPlayer_0.IsReady);
-    table.insert(v23, l_createEffect_0(function(v33) --[[ Line: 69 ]]
-        -- upvalues: v15 (copy), l_audioPlayer_0 (copy), v18 (copy), v16 (copy), v14 (copy), l_onDisposed_0 (ref)
-        if v15(v33) then
-            if not l_audioPlayer_0.IsPlaying then
-                l_audioPlayer_0:Play();
-            end;
-            local v34 = true;
-            do
-                local l_v34_0 = v34;
-                task.spawn(function() --[[ Line: 79 ]]
-                    -- upvalues: l_v34_0 (ref), l_audioPlayer_0 (ref), v18 (ref), v16 (ref), v14 (ref)
-                    while true do
-                        if l_v34_0 then
-                            if not l_audioPlayer_0.IsPlaying then
-                                v18(true);
-                                v16(false);
-                                l_audioPlayer_0.PlaybackSpeed = 0;
-                                l_audioPlayer_0.TimePosition = 0;
-                                v14(0);
-                                return;
-                            else
-                                v14(l_audioPlayer_0.TimePosition);
-                                task.wait(0.0625);
-                            end;
-                        else
-                            return;
-                        end;
-                    end;
-                end);
-                l_onDisposed_0(v33, function() --[[ Line: 92 ]]
-                    -- upvalues: l_v34_0 (ref)
-                    l_v34_0 = false;
-                end);
-            end;
-        end;
-    end));
-    table.insert(v23, l_createEffect_0(function(v36) --[[ Line: 101 ]]
-        -- upvalues: l_audioPlayer_0 (copy), v24 (copy)
-        l_audioPlayer_0.Volume = v24.getVolume(v36);
-    end));
-    return {
-        assetId = v10, 
-        getDuration = v11, 
-        getElapsed = v13, 
-        getIsPlaying = v15, 
-        getIsElapsed = v17, 
-        getIsDestroyed = v19, 
-        getIsLoaded = v21, 
-        destroy = function() --[[ Line: 106 ]] --[[ Name: destroy ]]
-            -- upvalues: v25 (copy), v23 (copy), v20 (copy)
-            v25.destroy();
-            for _, v38 in v23 do
-                v38();
-            end;
-            v20(true);
-        end, 
-        play = v27, 
-        pause = v28, 
-        stop = v29, 
-        seek = v32, 
-        getIsMuted = v24.getIsMuted, 
-        getVolume = v24.getVolume, 
-        mute = v24.mute, 
-        setVolume = v24.setVolume, 
-        unmute = v24.unmute
-    };
-end;
+local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+local Signals = require(MediaPlayback.Parent.Signals)
+local SignalsExperimental = require(MediaPlayback.Parent.SignalsExperimental)
+local enableAudioPlaybackInApp = require(MediaPlayback.Common.enableAudioPlaybackInApp)
+local createAudioSystem = require(MediaPlayback.Stores.getAudioPlaybackStore.createAudioSystem)
+local createVolumeStore = require(MediaPlayback.Stores.getAudioPlaybackStore.createVolumeStore)
+
+require(MediaPlayback.Stores.getAudioPlaybackStore.types)
+
+local createSignal = Signals.createSignal
+local createEffect = Signals.createEffect
+local onDisposed = SignalsExperimental.onDisposed
+
+local function createAudioStore(p1, b1: boolean?) -- line: 17
+	-- upvalues: createSignal (copy), createVolumeStore (copy), enableAudioPlaybackInApp (copy), createAudioSystem (copy), createEffect (copy), onDisposed (copy)
+	local v13, v14 = createSignal(0)
+	local v15, v16 = createSignal(0)
+	local v17, v18 = createSignal(false)
+	local v19, v20 = createSignal(false)
+	local v21, v22 = createSignal(false)
+	local v23, v24 = createSignal(false)
+	local t1 = {}
+	local v26 = createVolumeStore()
+
+	enableAudioPlaybackInApp()
+
+	local v27 = createAudioSystem(p1, b1)
+	local audioPlayer = v27.audioPlayer
+
+	audioPlayer:GetPropertyChangedSignal("TimeLength"):Connect(function() -- line: 57
+		-- upvalues: v14 (copy), audioPlayer (copy)
+		v14(audioPlayer.TimeLength)
+	end)
+	v14(audioPlayer.TimeLength)
+	audioPlayer:GetPropertyChangedSignal("IsReady"):Connect(function() -- line: 62
+		-- upvalues: v24 (copy), audioPlayer (copy)
+		v24(audioPlayer.IsReady)
+	end)
+	v24(audioPlayer.IsReady)
+	table.insert(t1, createEffect(function(p2) -- line: 69
+		-- upvalues: v17 (copy), audioPlayer (copy), v20 (copy), v18 (copy), v16 (copy), onDisposed (copy)
+		if v17(p2) then
+			if not audioPlayer.IsPlaying then
+				audioPlayer:Play()
+			end
+
+			local u32 = true
+
+			task.spawn(function() -- line: 79
+				-- upvalues: u32 (ref), audioPlayer (copy), v20 (copy), v18 (copy), v16 (copy)
+				while u32 do
+					if not audioPlayer.IsPlaying then
+						v20(true)
+						v18(false)
+						audioPlayer.PlaybackSpeed = 0
+						audioPlayer.TimePosition = 0
+						v16(0)
+
+						return
+					end
+
+					v16(audioPlayer.TimePosition)
+					task.wait(0.0625)
+				end
+			end)
+			onDisposed(p2, function() -- line: 92
+				-- upvalues: u32 (ref)
+				u32 = false
+			end)
+		end
+	end))
+	table.insert(t1, createEffect(function(p3) -- line: 101
+		-- upvalues: audioPlayer (copy), v26 (copy)
+		audioPlayer.Volume = v26.getVolume(p3)
+	end))
+
+	return {
+		assetId = p1,
+		usePreview = b1,
+		getDuration = v13,
+		getElapsed = v15,
+		getIsPlaying = v17,
+		getIsElapsed = v19,
+		getIsDestroyed = v21,
+		getIsLoaded = v23,
+		destroy = function() -- line: 106
+			-- upvalues: v27 (copy), t1 (copy), v22 (copy)
+			v27.destroy()
+
+			for _, v35 in t1 do
+				v35()
+			end
+
+			v22(true)
+		end,
+		play = function() -- line: 34
+			-- upvalues: v18 (copy), v20 (copy), audioPlayer (copy)
+			v18(true)
+			v20(false)
+			audioPlayer.PlaybackSpeed = 1
+		end,
+		pause = function() -- line: 40
+			-- upvalues: v18 (copy), audioPlayer (copy)
+			v18(false)
+			audioPlayer.PlaybackSpeed = 0
+		end,
+		stop = function() -- line: 45
+			-- upvalues: v18 (copy), audioPlayer (copy), v16 (copy)
+			v18(false)
+			audioPlayer.PlaybackSpeed = 0
+			audioPlayer.TimePosition = 0
+			v16(0)
+		end,
+		seek = function(n1: number) -- line: 51
+			-- upvalues: audioPlayer (copy), v16 (copy)
+			local v30 = math.clamp(n1, 0, audioPlayer.TimeLength)
+
+			audioPlayer.TimePosition = v30
+			v16(v30)
+		end,
+		getIsMuted = v26.getIsMuted,
+		getVolume = v26.getVolume,
+		mute = v26.mute,
+		setVolume = v26.setVolume,
+		unmute = v26.unmute
+	}
+end
+
+return createAudioStore

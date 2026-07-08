@@ -1,4 +1,5 @@
-game:DefineFastFlag("ChatWindowUseCallbackOptimizations", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ChatWindowUseCallbackOptimizations");
-end;
+game:DefineFastFlag("ChatWindowUseCallbackOptimizations", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ChatWindowUseCallbackOptimizations")
+end

@@ -1,16 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryAnalytics").Parent;
-local v1 = require(l_Parent_0.t);
-local l_flaggedMutedError_0 = require(l_Parent_0.Loggers).flaggedMutedError;
-local v3 = v1.strictInterface({
-    universeId = v1.string, 
-    upsellName = v1.string, 
-    playabilityStatus = v1.optional(v1.string)
-});
-return function(v4, v5) --[[ Line: 13 ]]
-    -- upvalues: v3 (copy), l_flaggedMutedError_0 (copy)
-    local v6, v7 = v3(v5);
-    if not v6 then
-        l_flaggedMutedError_0("UnlockPlayIntentEventInterface", v7);
-    end;
-    v4:sendEventDeferred("PlayButton", "unlockPlayIntent", v5);
-end;
+local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(Parent.t)
+local flaggedMutedError = require(Parent.Loggers).flaggedMutedError
+local FFlagLuaAppLogPageContextUnlockPlayIntent = require(Parent.SharedFlags).FFlagLuaAppLogPageContextUnlockPlayIntent
+local v5 = t.strictInterface({
+	universeId = t.string,
+	upsellName = t.string,
+	playabilityStatus = t.optional(t.string),
+	pageName = if not FFlagLuaAppLogPageContextUnlockPlayIntent then nil else t.optional(t.string)
+})
+
+return function(p1, p2) -- line: 17
+	-- upvalues: v5 (copy), flaggedMutedError (copy)
+	local v8, v9 = v5(p2)
+
+	if not v8 then
+		flaggedMutedError("UnlockPlayIntentEventInterface", v9)
+	end
+
+	p1:sendEventDeferred("PlayButton", "unlockPlayIntent", p2)
+end

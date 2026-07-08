@@ -1,3 +1,3 @@
 return {
-    FriendsCommonPresenceUpdateSignal = require(script.FriendsCommonPresenceUpdateSignal)()
-};
+	FriendsCommonPresenceUpdateSignal = require(script.FriendsCommonPresenceUpdateSignal)()
+}

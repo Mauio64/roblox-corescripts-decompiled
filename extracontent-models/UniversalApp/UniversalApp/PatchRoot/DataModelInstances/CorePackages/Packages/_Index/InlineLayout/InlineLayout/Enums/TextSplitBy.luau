@@ -1,4 +1,4 @@
 return {
-    Word = "Word", 
-    Symbol = "Symbol"
-};
+	Word = "Word",
+	Symbol = "Symbol"
+}

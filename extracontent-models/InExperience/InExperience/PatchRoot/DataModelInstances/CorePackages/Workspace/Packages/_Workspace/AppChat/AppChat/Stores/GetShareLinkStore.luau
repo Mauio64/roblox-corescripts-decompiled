@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createShareLinkStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Signals = require(Parent.Signals)
+local createShareLinkStore = require(script.createShareLinkStore)
+
+return Signals.createComputed(createShareLinkStore)

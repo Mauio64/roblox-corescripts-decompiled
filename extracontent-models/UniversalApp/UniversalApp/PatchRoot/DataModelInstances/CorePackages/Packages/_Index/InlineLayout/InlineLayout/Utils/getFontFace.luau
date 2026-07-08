@@ -1,8 +1,11 @@
-return function(v0) --[[ Line: 9 ]] --[[ Name: getFontFace ]]
-    local v1 = v0 and v0.Font;
-    if typeof(v1) == "EnumItem" and v1:IsA("Font") then
-        return Font.fromEnum(v1);
-    else
-        return v1;
-    end;
-end;
+local function getFontFace(t1: {[any]: any}?) -- line: 9
+	local v3 = t1 and t1.Font
+
+	if typeof(v3) == "EnumItem" and v3:IsA("Font") then
+		return Font.fromEnum(v3)
+	end
+
+	return v3
+end
+
+return getFontFace

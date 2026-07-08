@@ -1,33 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_SduiConditionKey_0 = require(l_script_FirstAncestor_0.ConditionalProps.SduiConditionalPropTypes).SduiConditionKey;
-return function(v2, v3) --[[ Line: 6 ]] --[[ Name: checkPresenceConditions ]]
-    -- upvalues: l_SduiConditionKey_0 (copy)
-    local v4 = {};
-    if not v2 then
-        return v4;
-    else
-        assert(v2, "allConditionalProps must exist");
-        for v5, v6 in v2 do
-            local v7 = nil;
-            if v6.conditions then
-                for v8, v9 in v6.conditions do
-                    if v8 == l_SduiConditionKey_0.friendInGame then
-                        v7 = true;
-                        local v10 = v3[tostring(v9)];
-                        if v10 then
-                            for _ in v10 do
-                                v7 = false;
-                                break;
-                            end;
-                        end;
-                        if v7 then
-                            break;
-                        end;
-                    end;
-                end;
-            end;
-            v4[v5] = v7;
-        end;
-        return v4;
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiConditionKey = require(SduiCoreSystem.ConditionalProps.SduiConditionalPropTypes).SduiConditionKey
+
+local function checkPresenceConditions(t1: {[any]: any}?, t2: {[any]: any}) -- line: 10
+	-- upvalues: SduiConditionKey (copy)
+	local t3 = {}
+
+	if not t1 then
+		return t3
+	end
+
+	assert(t1, "allConditionalProps must exist")
+
+	for v7, v8 in t1 do
+		local v9 = nil
+
+		if v8.conditions then
+			for v10, v11 in v8.conditions do
+				if v10 == SduiConditionKey.friendInGame then
+					v9 = true
+
+					local v12 = t2[tostring(v11)]
+
+					if v12 then
+						for _ in v12 do
+							v9 = false
+
+							break
+						end
+					end
+
+					if v9 then
+						break
+					end
+				end
+			end
+		end
+
+		t3[v7] = v9
+	end
+
+	return t3
+end
+
+return checkPresenceConditions

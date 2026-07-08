@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableVerifiedBadgeStore", false);
+return game:DefineFastFlag("EnableVerifiedBadgeStore", false)

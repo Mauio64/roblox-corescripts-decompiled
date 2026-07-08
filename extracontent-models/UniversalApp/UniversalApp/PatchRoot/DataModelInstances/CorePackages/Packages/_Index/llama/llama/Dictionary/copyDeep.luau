@@ -1,15 +1,20 @@
-local function v0(v1) --[[ Line: 2 ]] --[[ Name: copyDeep ]]
-    -- upvalues: v0 (copy)
-    local v2 = type(v1);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    local v3 = {};
-    for v4, v5 in pairs(v1) do
-        if type(v5) == "table" then
-            v3[v4] = v0(v5);
-        else
-            v3[v4] = v5;
-        end;
-    end;
-    return v3;
-end;
-return v0;
+local function copyDeep(p1) -- line: 2
+	-- upvalues: copyDeep (copy)
+	local v3 = type(p1)
+
+	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		if type(v) == "table" then
+			t1[k] = copyDeep(v)
+		else
+			t1[k] = v
+		end
+	end
+
+	return t1
+end
+
+return copyDeep

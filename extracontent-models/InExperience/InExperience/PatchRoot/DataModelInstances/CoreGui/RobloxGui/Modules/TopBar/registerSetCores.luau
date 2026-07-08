@@ -1,27 +1,29 @@
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagTopBarSignalizeSetCores_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceTopBar).Flags.FFlagTopBarSignalizeSetCores;
-local l_Parent_0 = script.Parent;
-local v4 = require(l_Parent_0.Actions.SetTopBarEnabled);
-local function v7(v5) --[[ Line: 12 ]] --[[ Name: registerSetCores ]]
-    -- upvalues: l_StarterGui_0 (copy), v4 (copy)
-    l_StarterGui_0:RegisterSetCore("TopbarEnabled", function(v6) --[[ Line: 13 ]]
-        -- upvalues: v5 (copy), v4 (ref)
-        if type(v6) == "boolean" then
-            v5:dispatch(v4(v6));
-            return;
-        else
-            error("SetCore TopbarEnabled argument must be a boolean", 2);
-            return;
-        end;
-    end);
-    l_StarterGui_0:RegisterGetCore("TopbarEnabled", function() --[[ Line: 21 ]]
-        -- upvalues: v5 (copy)
-        return v5:getState().displayOptions.topbarEnabled;
-    end);
-end;
-if l_FFlagTopBarSignalizeSetCores_0 then
-    return nil;
-else
-    return v7;
-end;
+local StarterGui = game:GetService("StarterGui")
+local CorePackages = game:GetService("CorePackages")
+local FFlagTopBarSignalizeSetCores = require(CorePackages.Workspace.Packages.InExperienceTopBar).Flags.FFlagTopBarSignalizeSetCores
+local scriptParent = script.Parent
+local SetTopBarEnabled = require(scriptParent.Actions.SetTopBarEnabled)
+
+local function registerSetCores(p1) -- line: 12
+	-- upvalues: StarterGui (copy), SetTopBarEnabled (copy)
+	StarterGui:RegisterSetCore("TopbarEnabled", function(p2) -- line: 13
+		-- upvalues: p1 (copy), SetTopBarEnabled (copy)
+		if type(p2) == "boolean" then
+			p1:dispatch(SetTopBarEnabled(p2))
+
+			return
+		end
+
+		error("SetCore TopbarEnabled argument must be a boolean", 2)
+	end)
+	StarterGui:RegisterGetCore("TopbarEnabled", function() -- line: 21
+		-- upvalues: p1 (copy)
+		return p1:getState().displayOptions.topbarEnabled
+	end)
+end
+
+if FFlagTopBarSignalizeSetCores then
+	return nil
+end
+
+return registerSetCores

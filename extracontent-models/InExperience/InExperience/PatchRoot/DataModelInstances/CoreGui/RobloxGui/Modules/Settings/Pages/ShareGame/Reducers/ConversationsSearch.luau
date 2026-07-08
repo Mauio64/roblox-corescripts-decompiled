@@ -1,25 +1,30 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ShareGame_0 = l_CoreGui_0.RobloxGui.Modules.Settings.Pages.ShareGame;
-local l_Immutable_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Immutable;
-local v4 = require(l_ShareGame_0.Actions.ClosePage);
-local v5 = require(l_ShareGame_0.Actions.SetSearchAreaActive);
-local v6 = require(l_ShareGame_0.Actions.SetSearchText);
-local v7 = {
-    SearchAreaActive = false, 
-    SearchText = ""
-};
-return function(v8, v9) --[[ Line: 19 ]]
-    -- upvalues: v7 (copy), v5 (copy), l_Immutable_0 (copy), v6 (copy), v4 (copy)
-    v8 = v8 or v7;
-    if v9.type == v5.name then
-        return (l_Immutable_0.Set(v8, "SearchAreaActive", v9.isActive));
-    elseif v9.type == v6.name then
-        return (l_Immutable_0.Set(v8, "SearchText", v9.searchText));
-    else
-        if v9.type == v4.name then
-            v8 = v7;
-        end;
-        return v8;
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local ShareGame = CoreGui.RobloxGui.Modules.Settings.Pages.ShareGame
+local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+local ClosePage = require(ShareGame.Actions.ClosePage)
+local SetSearchAreaActive = require(ShareGame.Actions.SetSearchAreaActive)
+local SetSearchText = require(ShareGame.Actions.SetSearchText)
+local t1 = {
+	SearchAreaActive = false,
+	SearchText = ""
+}
+
+return function(p1, p2) -- line: 19
+	-- upvalues: t1 (copy), SetSearchAreaActive (copy), Immutable (copy), SetSearchText (copy), ClosePage (copy)
+	local v11 = p1 or t1
+
+	if p2.type == SetSearchAreaActive.name then
+		return (Immutable.Set(v11, "SearchAreaActive", p2.isActive))
+	end
+
+	if p2.type == SetSearchText.name then
+		return (Immutable.Set(v11, "SearchText", p2.searchText))
+	end
+
+	if p2.type == ClosePage.name then
+		v11 = t1
+	end
+
+	return v11
+end

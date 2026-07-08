@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfileStoreQueryRefetch", false);
+return game:DefineFastFlag("UserProfileStoreQueryRefetch", false)

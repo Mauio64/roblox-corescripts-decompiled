@@ -1,1 +1,1 @@
-return require(script.escapeRichText);
+return require(script.escapeRichText)

@@ -1,71 +1,74 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withTooltip_0 = v5.App.Dialog.TooltipV2.withTooltip;
-local l_TooltipOrientation_0 = v5.App.Dialog.Enum.TooltipOrientation;
-local v8 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v9 = require(l_CorePackages_0.Packages.Promise);
-return function(v10) --[[ Line: 15 ]]
-    -- upvalues: v4 (copy), v8 (copy), l_CoreGui_0 (copy), l_TooltipOrientation_0 (copy), l_UserInputService_0 (copy), v9 (copy), l_withTooltip_0 (copy)
-    local v11, v12 = v4.useState(true);
-    local l_fallbackText_0 = v10.fallbackText;
-    pcall(function() --[[ Line: 19 ]]
-        -- upvalues: l_fallbackText_0 (ref), v8 (ref), v10 (copy)
-        l_fallbackText_0 = v8:FormatByKey(v10.translationKey);
-    end);
-    local v14 = {
-        textAlignment = Enum.TextXAlignment.Left, 
-        bodyText = l_fallbackText_0
-    };
-    local v15 = {
-        active = v11, 
-        guiTarget = l_CoreGui_0, 
-        DisplayOrder = 10, 
-        preferredOrientation = l_TooltipOrientation_0.Left
-    };
-    local v16 = nil;
-    local function _() --[[ Line: 35 ]]
-        -- upvalues: v12 (copy), v16 (ref)
-        v12(false);
-        if v16 then
-            v16:Disconnect();
-            v16 = nil;
-        end;
-    end;
-    v16 = l_UserInputService_0.InputBegan:Connect(function(v18) --[[ Line: 44 ]]
-        -- upvalues: v12 (copy), v16 (ref)
-        local l_UserInputType_0 = v18.UserInputType;
-        if l_UserInputType_0 == Enum.UserInputType.MouseButton1 or l_UserInputType_0 == Enum.UserInputType.Touch then
-            v12(false);
-            if v16 then
-                v16:Disconnect();
-                v16 = nil;
-            end;
-        end;
-    end);
-    v9.delay(v10.tooltipLifetime):andThen(function() --[[ Line: 50 ]]
-        -- upvalues: v12 (copy), v16 (ref)
-        v12(false);
-        if v16 then
-            v16:Disconnect();
-            v16 = nil;
-        end;
-    end);
-    return l_withTooltip_0(v14, v15, function(v20) --[[ Line: 54 ]]
-        -- upvalues: v4 (ref)
-        local function v22(v21) --[[ Line: 55 ]]
-            -- upvalues: v20 (copy)
-            v20(v21);
-        end;
-        return v4.createElement("Frame", {
-            Visible = false, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            [v4.Change.AbsoluteSize] = v22, 
-            [v4.Change.AbsolutePosition] = v22
-        });
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+CoreGui:WaitForChild("RobloxGui")
+
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
+local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local Promise = require(CorePackages.Packages.Promise)
+
+return function(p1) -- line: 15
+	-- upvalues: React (copy), RobloxTranslator (copy), CoreGui (copy), TooltipOrientation (copy), UserInputService (copy), Promise (copy), withTooltip (copy)
+	local v11, v12 = React.useState(true)
+	local fallbackText = p1.fallbackText
+
+	pcall(function() -- line: 19
+		-- upvalues: fallbackText (ref), RobloxTranslator (copy), p1 (copy)
+		fallbackText = RobloxTranslator:FormatByKey(p1.translationKey)
+	end)
+
+	local t1 = {
+		textAlignment = Enum.TextXAlignment.Left,
+		bodyText = fallbackText
+	}
+	local t2 = {
+		DisplayOrder = 10,
+		active = v11,
+		guiTarget = CoreGui,
+		preferredOrientation = TooltipOrientation.Left
+	}
+	local u16 = nil
+
+	u16 = UserInputService.InputBegan:Connect(function(input) -- line: 44
+		-- upvalues: v12 (copy), u16 (ref)
+		local UserInputType = input.UserInputType
+
+		if UserInputType == Enum.UserInputType.MouseButton1 or UserInputType == Enum.UserInputType.Touch then
+			v12(false)
+
+			if u16 then
+				u16:Disconnect()
+				u16 = nil
+			end
+		end
+	end)
+	Promise.delay(p1.tooltipLifetime):andThen(function() -- line: 50
+		-- upvalues: v12 (copy), u16 (ref)
+		v12(false)
+
+		if u16 then
+			u16:Disconnect()
+			u16 = nil
+		end
+	end)
+
+	return withTooltip(t1, t2, function(p2) -- line: 54
+		-- upvalues: React (copy)
+		local function v20(p3) -- line: 55
+			-- upvalues: p2 (copy)
+			p2(p3)
+		end
+
+		return React.createElement("Frame", {
+			Visible = false,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			[React.Change.AbsoluteSize] = v20,
+			[React.Change.AbsolutePosition] = v20
+		})
+	end)
+end

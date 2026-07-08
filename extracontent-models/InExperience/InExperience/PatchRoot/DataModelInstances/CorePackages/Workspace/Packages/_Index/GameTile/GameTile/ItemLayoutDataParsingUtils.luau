@@ -1,11 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local _ = require(l_script_FirstAncestor_0.GameTileTypes);
+local GameTile = script:FindFirstAncestor("GameTile")
+
+require(GameTile.GameTileTypes)
+
 return {
-    getWideImageAssetId = function(v2) --[[ Line: 9 ]] --[[ Name: getWideImageAssetId ]]
-        if v2 and v2.primaryMediaAsset and v2.primaryMediaAsset.wideImageAssetId and v2.primaryMediaAsset.wideImageAssetId ~= "" then
-            return v2.primaryMediaAsset.wideImageAssetId;
-        else
-            return nil;
-        end;
-    end
-};
+	getWideImageAssetId = function(p1) -- line: 9
+		if p1 and (p1.primaryMediaAsset and p1.primaryMediaAsset.wideImageAssetId and p1.primaryMediaAsset.wideImageAssetId ~= "") then
+			return p1.primaryMediaAsset.wideImageAssetId
+		end
+
+		return nil
+	end
+}

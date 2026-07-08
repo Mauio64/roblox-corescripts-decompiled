@@ -1,3 +1,4 @@
 return {
-    UserInputService = game:GetService("UserInputService")
-};
+	UserInputService = game:GetService("UserInputService"),
+	GuiService = game:GetService("GuiService")
+}

@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createTransparencyStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(Parent.Signals)
+local createTransparencyStore = require(script.createTransparencyStore)
+
+return Signals.createComputed(createTransparencyStore)

@@ -1,12 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("Style").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(script.Parent.DesignTokenContext);
-return function(v5) --[[ Line: 11 ]] --[[ Name: useDesignTokens ]]
-    -- upvalues: v3 (copy), v4 (copy), v2 (copy), v1 (copy)
-    local v6 = v3.useContext(v4);
-    local v7 = v5 or v2.identity;
-    v1.assert(v6, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.");
-    return v7(v6);
-end;
+local Parent = script:FindFirstAncestor("Style").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local Dash = require(Parent.Dash)
+local React = require(Parent.React)
+local DesignTokenContext = require(script.Parent.DesignTokenContext)
+
+local function useDesignTokens(p1: ((...any) -> ...any)?) -- line: 11
+	-- upvalues: React (copy), DesignTokenContext (copy), Dash (copy), ArgCheck (copy)
+	local v8 = React.useContext(DesignTokenContext)
+	local v9 = p1 or Dash.identity
+
+	ArgCheck.assert(v8, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.")
+
+	return v9(v8)
+end
+
+return useDesignTokens

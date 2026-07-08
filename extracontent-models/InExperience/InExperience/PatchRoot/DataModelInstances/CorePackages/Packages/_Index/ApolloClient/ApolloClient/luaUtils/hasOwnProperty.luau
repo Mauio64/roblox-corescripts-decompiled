@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 7 ]] --[[ Name: hasOwnProperty ]]
-    return v0[v1] ~= nil;
-end;
+local function hasOwnProperty(t1: {[any]: any}, p1) -- line: 7
+	return t1[p1] ~= nil
+end
+
+return hasOwnProperty

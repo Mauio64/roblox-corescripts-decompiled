@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableUIManagerPackgify8", false);
+return game:DefineFastFlag("EnableUIManagerPackgify8", false)

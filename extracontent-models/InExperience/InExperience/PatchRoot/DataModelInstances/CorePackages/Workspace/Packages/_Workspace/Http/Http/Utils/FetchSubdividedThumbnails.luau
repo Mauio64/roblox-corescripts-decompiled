@@ -1,133 +1,155 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Http");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Thumbnail_0 = require(l_script_FirstAncestor_0.Models).Thumbnail;
-local v3 = require(l_script_FirstAncestor_0.PerformFetch);
-local v4 = require(l_Parent_0.ArgCheck);
-local v5 = require(l_Parent_0.Promise);
-local v6 = require(l_Parent_0.Result);
-local v7 = require(l_Parent_0.tutils);
-local v8 = math.max(0, tonumber(settings():GetFVariable("LuaAppNonFinalThumbnailMaxRetries")) or 0);
-local v9 = math.max(0, tonumber(settings():GetFVariable("LuaAppThumbnailsApiRetryTimeMultiplier")) or 0);
-local v35 = {
-    _fetchIcons = function(v10, v11, v12, v13, v14, v15, v16, v17) --[[ Line: 20 ]] --[[ Name: _fetchIcons ]]
-        -- upvalues: v6 (copy), l_Thumbnail_0 (copy), v5 (copy)
-        local function _(v18) --[[ Line: 30 ]] --[[ Name: keyMapperForCurrentRequestNameAndSize ]]
-            -- upvalues: v14 (copy), v15 (copy), v13 (copy)
-            return v14({
-                targetId = v18, 
-                requestName = v15, 
-                iconSize = v13
-            });
-        end;
-        local function v24(v20) --[[ Line: 38 ]] --[[ Name: getTableOfFailedResults ]]
-            -- upvalues: v14 (copy), v15 (copy), v13 (copy), v6 (ref)
-            local v21 = {};
-            for _, v23 in pairs(v20) do
-                v21[v14({
-                    targetId = v23, 
-                    requestName = v15, 
-                    iconSize = v13
-                })] = v6.new(false, {
-                    targetId = v23
-                });
-            end;
-            return v21;
-        end;
-        return v16(v11, v12, v13):andThen(function(v25) --[[ Line: 49 ]]
-            -- upvalues: v24 (copy), v12 (copy), l_Thumbnail_0 (ref), v13 (copy), v14 (copy), v15 (copy), v6 (ref), v10 (copy), v17 (copy), v5 (ref)
-            local v26 = v24(v12);
-            local v27 = {};
-            local v28 = v25 and v25.responseBody and v25.responseBody.data;
-            if typeof(v28) == "table" then
-                for _, v30 in pairs(v28) do
-                    if l_Thumbnail_0.isCompleteThumbnailData(v30) then
-                        local v31 = tostring(v30.targetId);
-                        local v32 = false;
-                        if l_Thumbnail_0.checkStateIsFinal(v30.state) then
-                            v27[v31] = l_Thumbnail_0.fromThumbnailData(v30, v13);
-                            v32 = true;
-                        end;
-                        v26[v14({
-                            targetId = v31, 
-                            requestName = v15, 
-                            iconSize = v13
-                        })] = v6.new(v32, v30);
-                    end;
-                end;
-            end;
-            v10:dispatch(v17(v27));
-            return v5.resolve(v26);
-        end, function(_) --[[ Line: 69 ]]
-            -- upvalues: v24 (copy), v12 (copy), v5 (ref)
-            local v34 = v24(v12);
-            return v5.resolve(v34);
-        end);
-    end
-};
-v35._fetch = function(v36, v37, v38, v39, v40, v41, v42, v43) --[[ Line: 75 ]] --[[ Name: _fetch ]]
-    -- upvalues: v35 (copy), v8 (ref), v9 (ref), l_Thumbnail_0 (copy), v7 (copy), v5 (copy)
-    return v35._fetchIcons(v36, v37, v38, v39, v40, v41, v42, v43):andThen(function(v44) --[[ Line: 95 ]]
-        -- upvalues: v8 (ref), v9 (ref), l_Thumbnail_0 (ref), v7 (ref), v5 (ref), v35 (ref), v36 (copy), v37 (copy), v38 (copy), v39 (copy), v40 (copy), v41 (copy), v42 (copy), v43 (copy)
-        local v45 = {};
-        local l_v44_0 = v44;
-        if _G.__TESTEZ_RUNNING_TEST__ then
-            v8 = 1;
-            v9 = 0.001;
-        end;
-        local function v47(v48) --[[ Line: 104 ]] --[[ Name: retry ]]
-            -- upvalues: l_v44_0 (ref), l_Thumbnail_0 (ref), v45 (copy), v7 (ref), v5 (ref), v9 (ref), v35 (ref), v36 (ref), v37 (ref), v38 (ref), v39 (ref), v40 (ref), v41 (ref), v42 (ref), v43 (ref), v47 (copy)
-            local v49 = {};
-            for v50, v51 in pairs(l_v44_0) do
-                local v52, v53 = v51:unwrap();
-                if v52 and l_Thumbnail_0.checkStateIsFinal(v53.state) then
-                    v45[v50] = v51;
-                else
-                    table.insert(v49, v53);
-                end;
-            end;
-            if v7.fieldCount(v49) == 0 then
-                return v5.resolve(v45);
-            else
-                return v5.new(function(v54, _) --[[ Line: 122 ]]
-                    -- upvalues: v9 (ref), v48 (copy)
-                    coroutine.wrap(function() --[[ Line: 123 ]]
-                        -- upvalues: v9 (ref), v48 (ref), v54 (copy)
-                        wait(v9 * math.pow(2, v48 - 1));
-                        v54();
-                    end)();
-                end):andThen(function() --[[ Line: 130 ]]
-                    -- upvalues: v35 (ref), v36 (ref), v37 (ref), v38 (ref), v39 (ref), v40 (ref), v41 (ref), v42 (ref), v43 (ref)
-                    return v35._fetchIcons(v36, v37, v38, v39, v40, v41, v42, v43);
-                end):andThen(function(v56) --[[ Line: 142 ]]
-                    -- upvalues: l_v44_0 (ref), v48 (copy), v47 (ref), v5 (ref), v45 (ref)
-                    l_v44_0 = v56;
-                    if v48 > 1 then
-                        return v47(v48 - 1);
-                    else
-                        return v5.resolve(v45);
-                    end;
-                end);
-            end;
-        end;
-        return v47(v8);
-    end);
-end;
-v35.Fetch = function(v57, v58, v59, v60, v61, v62) --[[ Line: 156 ]] --[[ Name: Fetch ]]
-    -- upvalues: v4 (copy), v35 (copy), v3 (copy)
-    v4.isType(v58, "table", "requests");
-    v4.isType(v60, "string", "requestName");
-    v4.isNonNegativeNumber(#v58, "requests count");
-    v35.KeyMapper = v59;
-    return v3.Batch(v58, v59, function(v63, v64) --[[ Line: 162 ]]
-        -- upvalues: v35 (ref), v57 (copy), v59 (copy), v60 (copy), v61 (copy), v62 (copy)
-        local v65 = {};
-        local v66 = nil;
-        for _, v68 in ipairs(v64) do
-            local l_targetId_0 = v68.targetId;
-            v66 = v68.iconSize;
-            table.insert(v65, l_targetId_0);
-        end;
-        return v35._fetch(v63, v57, v65, v66, v59, v60, v61, v62);
-    end);
-end;
-return v35;
+local Http = script:FindFirstAncestor("Http")
+local HttpParent = Http.Parent
+local Thumbnail = require(Http.Models).Thumbnail
+local PerformFetch = require(Http.PerformFetch)
+local ArgCheck = require(HttpParent.ArgCheck)
+local Promise = require(HttpParent.Promise)
+local Result = require(HttpParent.Result)
+local tutils = require(HttpParent.tutils)
+local u9 = math.max(0, tonumber(settings():GetFVariable("LuaAppNonFinalThumbnailMaxRetries")) or 0)
+local u10 = math.max(0, tonumber(settings():GetFVariable("LuaAppThumbnailsApiRetryTimeMultiplier")) or 0)
+local t3 = {
+	_fetchIcons = function(p1, p2, p3, p4, p5, p6, p7, p8) -- line: 20
+		-- upvalues: Result (copy), Thumbnail (copy), Promise (copy)
+		local function keyMapperForCurrentRequestNameAndSize(p9) -- line: 30
+			-- upvalues: p5 (copy), p6 (copy), p4 (copy)
+			return p5({
+				targetId = p9,
+				requestName = p6,
+				iconSize = p4
+			})
+		end
+		local function getTableOfFailedResults(p10) -- line: 38
+			-- upvalues: p5 (copy), p6 (copy), p4 (copy), Result (copy)
+			local t1 = {}
+
+			for _, v in pairs(p10) do
+				t1[p5({
+					targetId = v,
+					requestName = p6,
+					iconSize = p4
+				})] = Result.new(false, {
+					targetId = v
+				})
+			end
+
+			return t1
+		end
+
+		return p7(p2, p3, p4):andThen(function(p11) -- line: 49
+			-- upvalues: getTableOfFailedResults (copy), p3 (copy), Thumbnail (copy), p4 (copy), p5 (copy), p6 (copy), Result (copy), p1 (copy), p8 (copy), Promise (copy)
+			local v42 = getTableOfFailedResults(p3)
+			local t2 = {}
+			local v44 = p11 and (p11.responseBody and p11.responseBody.data)
+
+			if typeof(v44) == "table" then
+				for _, v in pairs(v44) do
+					if Thumbnail.isCompleteThumbnailData(v) then
+						local str = tostring(v.targetId)
+						local v48 = false
+
+						if Thumbnail.checkStateIsFinal(v.state) then
+							t2[str] = Thumbnail.fromThumbnailData(v, p4)
+							v48 = true
+						end
+
+						v42[p5({
+							targetId = str,
+							requestName = p6,
+							iconSize = p4
+						})] = Result.new(v48, v)
+					end
+				end
+			end
+
+			p1:dispatch(p8(t2))
+
+			return Promise.resolve(v42)
+		end, function(_) -- line: 69
+			-- upvalues: getTableOfFailedResults (copy), p3 (copy), Promise (copy)
+			local v50 = getTableOfFailedResults(p3)
+
+			return Promise.resolve(v50)
+		end)
+	end
+}
+
+function t3._fetch(p13, p14, p15, p16, p17, p18, p19, p20) -- line: 75
+	-- upvalues: t3 (copy), u9 (ref), u10 (ref), Thumbnail (copy), tutils (copy), Promise (copy)
+	return t3._fetchIcons(p13, p14, p15, p16, p17, p18, p19, p20):andThen(function(p21) -- line: 95
+		-- upvalues: u9 (ref), u10 (ref), Thumbnail (copy), tutils (copy), Promise (copy), t3 (copy), p13 (copy), p14 (copy), p15 (copy), p16 (copy), p17 (copy), p18 (copy), p19 (copy), p20 (copy)
+		local t4 = {}
+		local u53 = p21
+
+		if _G.__TESTEZ_RUNNING_TEST__ then
+			u9 = 1
+			u10 = 0.001
+		end
+
+		local function retry(p22) -- line: 104
+			-- upvalues: u53 (ref), Thumbnail (copy), t4 (copy), tutils (copy), Promise (copy), u10 (ref), t3 (copy), p13 (copy), p14 (copy), p15 (copy), p16 (copy), p17 (copy), p18 (copy), p19 (copy), p20 (copy), retry (copy)
+			local t5 = {}
+
+			for k, v in pairs(u53) do
+				local v66, v67 = v:unwrap()
+
+				if v66 and Thumbnail.checkStateIsFinal(v67.state) then
+					t4[k] = v
+				else
+					table.insert(t5, v67)
+				end
+			end
+
+			if tutils.fieldCount(t5) == 0 then
+				return Promise.resolve(t4)
+			end
+
+			return Promise.new(function(resolve, _) -- line: 122
+				-- upvalues: u10 (ref), p22 (copy)
+				coroutine.wrap(function() -- line: 123
+					-- upvalues: u10 (ref), p22 (copy), resolve (copy)
+					wait(u10 * math.pow(2, p22 - 1))
+					resolve()
+				end)()
+			end):andThen(function() -- line: 130
+				-- upvalues: t3 (copy), p13 (copy), p14 (copy), p15 (copy), p16 (copy), p17 (copy), p18 (copy), p19 (copy), p20 (copy)
+				return t3._fetchIcons(p13, p14, p15, p16, p17, p18, p19, p20)
+			end):andThen(function(p24) -- line: 142
+				-- upvalues: u53 (ref), p22 (copy), retry (copy), Promise (copy), t4 (copy)
+				u53 = p24
+
+				if p22 > 1 then
+					return retry(p22 - 1)
+				end
+
+				return Promise.resolve(t4)
+			end)
+		end
+
+		return retry(u9)
+	end)
+end
+function t3.Fetch(p25, p26, p27, p28, p29, p30) -- line: 156
+	-- upvalues: ArgCheck (copy), t3 (copy), PerformFetch (copy)
+	ArgCheck.isType(p26, "table", "requests")
+	ArgCheck.isType(p28, "string", "requestName")
+	ArgCheck.isNonNegativeNumber(#p26, "requests count")
+	t3.KeyMapper = p27
+
+	return PerformFetch.Batch(p26, p27, function(p31, p32) -- line: 162
+		-- upvalues: t3 (copy), p25 (copy), p27 (copy), p28 (copy), p29 (copy), p30 (copy)
+		local t6 = {}
+		local iconSize = nil
+
+		for _, v in ipairs(p32) do
+			local targetId = v.targetId
+
+			iconSize = v.iconSize
+			table.insert(t6, targetId)
+		end
+
+		return t3._fetch(p31, p25, t6, iconSize, p27, p28, p29, p30)
+	end)
+end
+
+return t3

@@ -1,105 +1,116 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("CoreGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RunService_0 = game:GetService("RunService");
-local l_VRService_0 = game:GetService("VRService");
-local v5 = require(l_CorePackages_0.Packages.Roact);
-local v6 = require(l_CorePackages_0.Packages.RoactRodux);
-local v7 = require(l_CorePackages_0.Packages.t);
-local v8 = require(l_CorePackages_0.Packages.Signals);
-local v9 = require(l_CorePackages_0.Workspace.Packages.Display);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v11 = require(l_Parent_0.Parent.Common.EventConnection);
-local l_isSubjectToDesktopPolicies_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).isSubjectToDesktopPolicies;
-local l_FFlagTopBarSignalizeScreenSize_0 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize;
-local v14 = require(script.DisconnectedDialog);
-local v15 = v5.PureComponent:extend("HeadsetMenu");
-v15.validateProps = v7.strictInterface({
-    screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v7.Vector2, 
-    vrService = v7.optional(v7.union(v7.instanceOf("VRService"), v7.table)), 
-    guiService = v7.optional(v7.union(v7.instanceOf("GuiService"), v7.table))
-});
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("CoreGui")
+
+local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
+local VRService = game:GetService("VRService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local Signals = require(CorePackages.Packages.Signals)
+local Display = require(CorePackages.Workspace.Packages.Display)
+local ParentParent = script.Parent.Parent.Parent
+local EventConnection = require(ParentParent.Parent.Common.EventConnection)
+local isSubjectToDesktopPolicies = require(CorePackages.Workspace.Packages.SharedFlags).isSubjectToDesktopPolicies
+local FFlagTopBarSignalizeScreenSize = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize
+local DisconnectedDialog = require(script.DisconnectedDialog)
+local v15 = Roact.PureComponent:extend("HeadsetMenu")
+
+v15.validateProps = t.strictInterface({
+	screenSize = if not FFlagTopBarSignalizeScreenSize then t.Vector2 else nil,
+	vrService = t.optional(t.union(t.instanceOf("VRService"), t.table)),
+	guiService = t.optional(t.union(t.instanceOf("GuiService"), t.table))
+})
 v15.defaultProps = {
-    vrService = l_VRService_0, 
-    guiService = l_GuiService_0
-};
-v15.init = function(v16) --[[ Line: 37 ]] --[[ Name: init ]]
-    -- upvalues: l_isSubjectToDesktopPolicies_0 (copy), l_RunService_0 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), v9 (copy), v8 (copy)
-    v16.state = {
-        vrDeviceAvailable = false, 
-        shouldShowDisconnectDialog = false
-    };
-    v16.restartApp = function() --[[ Line: 43 ]]
-        -- upvalues: v16 (copy), l_isSubjectToDesktopPolicies_0 (ref), l_RunService_0 (ref)
-        local l_NotificationTypeList_0 = v16.props.guiService:GetNotificationTypeList();
-        if l_isSubjectToDesktopPolicies_0() then
-            if game:GetEngineFeature("EnableLuaControlsRestartApp") then
-                v16.props.guiService:BroadcastNotification("", l_NotificationTypeList_0.RESTART_APP);
-            else
-                v16.props.guiService:BroadcastNotification("", l_NotificationTypeList_0.NATIVE_EXIT);
-            end;
-        else
-            l_RunService_0.Heartbeat:Wait();
-            game:Shutdown();
-        end;
-        v16:setState({
-            shouldShowDisconnectDialog = false
-        });
-    end;
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        local l_getViewportSize_0 = v9.GetDisplayStore(false).getViewportSize;
-        v16.disposeScreenSize = v8.createEffect(function(v19) --[[ Line: 65 ]]
-            -- upvalues: v16 (copy), l_getViewportSize_0 (copy)
-            v16:setState({
-                screenSize = l_getViewportSize_0(v19)
-            });
-        end);
-    end;
-end;
-v15.render = function(v20) --[[ Line: 73 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v11 (copy), v14 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    return v5.createFragment({
-        HeadsetConnection = v5.createElement(v11, {
-            event = v20.props.vrService:GetPropertyChangedSignal("VRDeviceAvailable"), 
-            callback = function() --[[ Line: 77 ]] --[[ Name: callback ]]
-                -- upvalues: v20 (copy)
-                v20:setState({
-                    vrDeviceAvailable = v20.props.vrService.VRDeviceAvailable
-                });
-            end
-        }, {
-            HeadsetDisconnectedDialog = v5.createElement(v14, {
-                visible = v20.state.shouldShowDisconnectDialog, 
-                screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then v20.state.screenSize else v20.props.screenSize, 
-                onConfirm = v20.restartApp, 
-                guiService = v20.props.guiService
-            })
-        })
-    });
-end;
-v15.didMount = function(v21) --[[ Line: 93 ]] --[[ Name: didMount ]]
-    v21:setState({
-        vrDeviceAvailable = v21.props.vrService.VRDeviceAvailable
-    });
-end;
-v15.willUnmount = function(v22) --[[ Line: 99 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        v22.disposeScreenSize();
-    end;
-end;
-v15.didUpdate = function(v23, _, v25) --[[ Line: 105 ]] --[[ Name: didUpdate ]]
-    if v23.state.vrDeviceAvailable ~= v25.vrDeviceAvailable and not v23.state.vrDeviceAvailable then
-        v23:setState({
-            shouldShowDisconnectDialog = true
-        });
-    end;
-end;
-if not l_FFlagTopBarSignalizeScreenSize_0 then
-    v15 = v6.connect(function(v26) --[[ Line: 116 ]]
-        return {
-            screenSize = v26.displayOptions.screenSize
-        };
-    end)(v15);
-end;
-return v15;
+	vrService = VRService,
+	guiService = GuiService
+}
+
+function v15.init(p1) -- line: 37
+	-- upvalues: isSubjectToDesktopPolicies (copy), RunService (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), Signals (copy)
+	p1.state = {
+		vrDeviceAvailable = false,
+		shouldShowDisconnectDialog = false
+	}
+
+	function p1.restartApp() -- line: 43
+		-- upvalues: p1 (copy), isSubjectToDesktopPolicies (copy), RunService (copy)
+		local NotificationTypeList = p1.props.guiService:GetNotificationTypeList()
+
+		if isSubjectToDesktopPolicies() then
+			if game:GetEngineFeature("EnableLuaControlsRestartApp") then
+				p1.props.guiService:BroadcastNotification("", NotificationTypeList.RESTART_APP)
+			else
+				p1.props.guiService:BroadcastNotification("", NotificationTypeList.NATIVE_EXIT)
+			end
+		else
+			RunService.Heartbeat:Wait()
+			game:Shutdown()
+		end
+
+		p1:setState({
+			shouldShowDisconnectDialog = false
+		})
+	end
+
+	if FFlagTopBarSignalizeScreenSize then
+		local getViewportSize = Display.GetDisplayStore(false).getViewportSize
+
+		p1.disposeScreenSize = Signals.createEffect(function(p2) -- line: 65
+			-- upvalues: p1 (copy), getViewportSize (copy)
+			p1:setState({
+				screenSize = getViewportSize(p2)
+			})
+		end)
+	end
+end
+function v15.render(p3) -- line: 73
+	-- upvalues: Roact (copy), EventConnection (copy), DisconnectedDialog (copy), FFlagTopBarSignalizeScreenSize (copy)
+	return Roact.createFragment({
+		HeadsetConnection = Roact.createElement(EventConnection, {
+			event = p3.props.vrService:GetPropertyChangedSignal("VRDeviceAvailable"),
+			callback = function() -- line: 77
+				-- upvalues: p3 (copy)
+				p3:setState({
+					vrDeviceAvailable = p3.props.vrService.VRDeviceAvailable
+				})
+			end
+		}, {
+			HeadsetDisconnectedDialog = Roact.createElement(DisconnectedDialog, {
+				visible = p3.state.shouldShowDisconnectDialog,
+				screenSize = if not FFlagTopBarSignalizeScreenSize then p3.props.screenSize else p3.state.screenSize,
+				onConfirm = p3.restartApp,
+				guiService = p3.props.guiService
+			})
+		})
+	})
+end
+function v15.didMount(p4) -- line: 93
+	p4:setState({
+		vrDeviceAvailable = p4.props.vrService.VRDeviceAvailable
+	})
+end
+function v15.willUnmount(p5) -- line: 99
+	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
+	if FFlagTopBarSignalizeScreenSize then
+		p5.disposeScreenSize()
+	end
+end
+function v15.didUpdate(p6, _, p8) -- line: 105
+	if p6.state.vrDeviceAvailable ~= p8.vrDeviceAvailable and not p6.state.vrDeviceAvailable then
+		p6:setState({
+			shouldShowDisconnectDialog = true
+		})
+	end
+end
+
+if not FFlagTopBarSignalizeScreenSize then
+	v15 = RoactRodux.connect(function(p9) -- line: 116
+		return {
+			screenSize = p9.displayOptions.screenSize
+		}
+	end)(v15)
+end
+
+return v15

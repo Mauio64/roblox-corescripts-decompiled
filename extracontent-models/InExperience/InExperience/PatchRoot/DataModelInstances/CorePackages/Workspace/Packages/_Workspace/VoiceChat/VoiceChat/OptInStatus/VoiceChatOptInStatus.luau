@@ -1,14 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VoiceChat");
-local v1 = require(l_script_FirstAncestor_0.OptInStatus.SetVoiceChatOptInStatus);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Cryo);
-return function(v4, v5) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    v4 = v4 or {};
-    if v5.type == v1.name then
-        v4 = v3.Dictionary.join(v4, {
-            isUserOptIn = v5.isUserOptIn
-        });
-    end;
-    return v4;
-end;
+local VoiceChat = script:FindFirstAncestor("VoiceChat")
+local SetVoiceChatOptInStatus = require(VoiceChat.OptInStatus.SetVoiceChatOptInStatus)
+local VoiceChatParent = VoiceChat.Parent
+local Cryo = require(VoiceChatParent.Cryo)
+
+return function(p1, p2) -- line: 6
+	-- upvalues: SetVoiceChatOptInStatus (copy), Cryo (copy)
+	local v7 = p1 or {}
+
+	if p2.type == SetVoiceChatOptInStatus.name then
+		v7 = Cryo.Dictionary.join(v7, {
+			isUserOptIn = p2.isUserOptIn
+		})
+	end
+
+	return v7
+end

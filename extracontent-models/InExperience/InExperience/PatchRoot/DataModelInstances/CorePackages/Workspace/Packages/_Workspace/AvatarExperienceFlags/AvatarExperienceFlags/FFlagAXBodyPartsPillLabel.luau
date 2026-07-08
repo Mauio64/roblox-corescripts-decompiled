@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXBodyPartsPillLabel", true);
+return game:DefineFastFlag("AXBodyPartsPillLabel", true)

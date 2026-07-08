@@ -1,108 +1,128 @@
-local l_Parent_0 = script:FindFirstAncestor("UserProfiles").Parent;
-local l_createSignal_0 = require(l_Parent_0.Signals).createSignal;
-local v2 = require(l_Parent_0.SharedFlags);
-local l_FFlagEnableVerifiedBadgeStore_0 = v2.FFlagEnableVerifiedBadgeStore;
-local l_FFlagEnableBlackbirdCheckDev_0 = v2.FFlagEnableBlackbirdCheckDev;
+local Parent = script:FindFirstAncestor("UserProfiles").Parent
+local createSignal = require(Parent.Signals).createSignal
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagEnableVerifiedBadgeStore = SharedFlags.FFlagEnableVerifiedBadgeStore
+local FFlagEnableBlackbirdCheck = SharedFlags.FFlagEnableBlackbirdCheck
+
 return {
-    update = function(v5, v6) --[[ Line: 53 ]] --[[ Name: update ]]
-        -- upvalues: l_FFlagEnableVerifiedBadgeStore_0 (copy), l_FFlagEnableBlackbirdCheckDev_0 (copy)
-        if not v6 or type(v6) ~= "table" then
-            return;
-        else
-            local l_names_0 = v6.names;
-            if l_names_0 and type(l_names_0) == "table" then
-                local l_username_0 = l_names_0.username;
-                if l_username_0 and type(l_username_0) == "string" then
-                    v5.names.setUsername(l_username_0);
-                end;
-                local l_displayName_0 = l_names_0.displayName;
-                if l_displayName_0 and type(l_displayName_0) == "string" then
-                    v5.names.setDisplayName(l_displayName_0);
-                end;
-                local l_combinedName_0 = l_names_0.combinedName;
-                if l_combinedName_0 and type(l_combinedName_0) == "string" then
-                    v5.names.setCombinedName(l_combinedName_0);
-                end;
-                local l_inExperienceCombinedName_0 = l_names_0.inExperienceCombinedName;
-                if l_inExperienceCombinedName_0 and type(l_inExperienceCombinedName_0) == "string" then
-                    v5.names.setInExperienceCombinedName(l_inExperienceCombinedName_0);
-                end;
-                local l_platformName_0 = l_names_0.platformName;
-                if l_platformName_0 and type(l_platformName_0) == "string" then
-                    v5.names.setPlatformName(l_platformName_0);
-                end;
-                local l_contactName_0 = l_names_0.contactName;
-                if l_contactName_0 and type(l_contactName_0) == "string" then
-                    v5.names.setContactName(l_contactName_0);
-                end;
-                local l_alias_0 = l_names_0.alias;
-                if l_alias_0 and type(l_alias_0) == "string" then
-                    v5.names.setAlias(l_alias_0);
-                end;
-            end;
-            local l_platformProfileId_0 = v6.platformProfileId;
-            if l_platformProfileId_0 and type(l_platformProfileId_0) == "string" then
-                v5.setPlatformProfileId(l_platformProfileId_0);
-            end;
-            local v16 = if l_FFlagEnableVerifiedBadgeStore_0 then v6.isVerified else nil;
-            if v16 ~= nil and type(v16) == "boolean" then
-                v5.setIsVerified(v16);
-            end;
-            local v17 = if l_FFlagEnableBlackbirdCheckDev_0 then v6.hasRobloxSubscription else nil;
-            if v17 ~= nil and type(v17) == "boolean" then
-                v5.setHasRobloxSubscription(v17);
-            end;
-            return;
-        end;
-    end, 
-    create = function(v18) --[[ Line: 106 ]] --[[ Name: create ]]
-        -- upvalues: l_createSignal_0 (copy), l_FFlagEnableVerifiedBadgeStore_0 (copy), l_FFlagEnableBlackbirdCheckDev_0 (copy)
-        local v19, v20 = l_createSignal_0("");
-        local v21, v22 = l_createSignal_0("");
-        local v23, v24 = l_createSignal_0("");
-        local v25, v26 = l_createSignal_0("");
-        local v27, v28 = l_createSignal_0("");
-        local v29, v30 = l_createSignal_0("");
-        local v31, v32 = l_createSignal_0("");
-        local v33, v34 = l_createSignal_0("");
-        local v35 = nil;
-        local v36 = nil;
-        if l_FFlagEnableVerifiedBadgeStore_0 then
-            local v37, v38 = l_createSignal_0(false);
-            v35 = v37;
-            v36 = v38;
-        end;
-        local v39 = nil;
-        local v40 = nil;
-        if l_FFlagEnableBlackbirdCheckDev_0 then
-            local v41, v42 = l_createSignal_0(false);
-            v39 = v41;
-            v40 = v42;
-        end;
-        return {
-            userId = v18, 
-            names = {
-                getUsername = v19, 
-                setUsername = v20, 
-                getDisplayName = v21, 
-                setDisplayName = v22, 
-                getCombinedName = v23, 
-                setCombinedName = v24, 
-                getInExperienceCombinedName = v25, 
-                setInExperienceCombinedName = v26, 
-                getPlatformName = v27, 
-                setPlatformName = v28, 
-                getContactName = v29, 
-                setContactName = v30, 
-                getAlias = v31, 
-                setAlias = v32
-            }, 
-            getPlatformProfileId = v33, 
-            setPlatformProfileId = v34, 
-            getIsVerified = if l_FFlagEnableVerifiedBadgeStore_0 then v35 else nil, 
-            setIsVerified = if l_FFlagEnableVerifiedBadgeStore_0 then v36 else nil, 
-            getHasRobloxSubscription = if l_FFlagEnableBlackbirdCheckDev_0 then v39 else nil, 
-            setHasRobloxSubscription = if l_FFlagEnableBlackbirdCheckDev_0 then v40 else nil
-        };
-    end
-};
+	update = function(t1: {[any]: any}, p1) -- line: 61
+		-- upvalues: FFlagEnableVerifiedBadgeStore (copy), FFlagEnableBlackbirdCheck (copy)
+		if not p1 or type(p1) ~= "table" then
+			return
+		end
+
+		local names = p1.names
+
+		if names and type(names) == "table" then
+			local username = names.username
+
+			if username and type(username) == "string" then
+				t1.names.setUsername(username)
+			end
+
+			local displayName = names.displayName
+
+			if displayName and type(displayName) == "string" then
+				t1.names.setDisplayName(displayName)
+			end
+
+			local combinedName = names.combinedName
+
+			if combinedName and type(combinedName) == "string" then
+				t1.names.setCombinedName(combinedName)
+			end
+
+			local inExperienceCombinedName = names.inExperienceCombinedName
+
+			if inExperienceCombinedName and type(inExperienceCombinedName) == "string" then
+				t1.names.setInExperienceCombinedName(inExperienceCombinedName)
+			end
+
+			local platformName = names.platformName
+
+			if platformName and type(platformName) == "string" then
+				t1.names.setPlatformName(platformName)
+			end
+
+			local contactName = names.contactName
+
+			if contactName and type(contactName) == "string" then
+				t1.names.setContactName(contactName)
+			end
+
+			local alias = names.alias
+
+			if alias and type(alias) == "string" then
+				t1.names.setAlias(alias)
+			end
+		end
+
+		local platformProfileId = p1.platformProfileId
+
+		if platformProfileId and type(platformProfileId) == "string" then
+			t1.setPlatformProfileId(platformProfileId)
+		end
+
+		local v17 = if not FFlagEnableVerifiedBadgeStore then nil else p1.isVerified
+
+		if v17 ~= nil and type(v17) == "boolean" then
+			t1.setIsVerified(v17)
+		end
+
+		local v18 = if not FFlagEnableBlackbirdCheck then nil else p1.hasRobloxSubscription
+
+		if v18 ~= nil and type(v18) == "boolean" then
+			t1.setHasRobloxSubscription(v18)
+		end
+	end,
+	create = function(s1: string) -- line: 114
+		-- upvalues: createSignal (copy), FFlagEnableVerifiedBadgeStore (copy), FFlagEnableBlackbirdCheck (copy)
+		local v20, v21 = createSignal("")
+		local v22, v23 = createSignal("")
+		local v24, v25 = createSignal("")
+		local v26, v27 = createSignal("")
+		local v28, v29 = createSignal("")
+		local v30, v31 = createSignal("")
+		local v32, v33 = createSignal("")
+		local v34, v35 = createSignal("")
+		local v36 = nil
+		local v37 = nil
+
+		if FFlagEnableVerifiedBadgeStore then
+			v36, v37 = createSignal(false)
+		end
+
+		local v38 = nil
+		local v39 = nil
+
+		if FFlagEnableBlackbirdCheck then
+			v38, v39 = createSignal(false)
+		end
+
+		return {
+			userId = s1,
+			names = {
+				getUsername = v20,
+				setUsername = v21,
+				getDisplayName = v22,
+				setDisplayName = v23,
+				getCombinedName = v24,
+				setCombinedName = v25,
+				getInExperienceCombinedName = v26,
+				setInExperienceCombinedName = v27,
+				getPlatformName = v28,
+				setPlatformName = v29,
+				getContactName = v30,
+				setContactName = v31,
+				getAlias = v32,
+				setAlias = v33
+			},
+			getPlatformProfileId = v34,
+			setPlatformProfileId = v35,
+			getIsVerified = if not FFlagEnableVerifiedBadgeStore then nil else v36,
+			setIsVerified = if not FFlagEnableVerifiedBadgeStore then nil else v37,
+			getHasRobloxSubscription = if not FFlagEnableBlackbirdCheck then nil else v38,
+			setHasRobloxSubscription = if not FFlagEnableBlackbirdCheck then nil else v39
+		}
+	end
+}

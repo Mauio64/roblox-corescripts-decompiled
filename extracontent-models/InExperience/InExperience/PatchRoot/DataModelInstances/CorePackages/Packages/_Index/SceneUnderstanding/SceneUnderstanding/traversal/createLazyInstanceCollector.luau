@@ -1,177 +1,205 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SceneUnderstanding");
-local v1 = require(l_script_FirstAncestor_0.options.DataModelTraversalOptions);
-return function(v2, v3, v4) --[[ Line: 9 ]] --[[ Name: createLazyInstanceCollector ]]
-    -- upvalues: v1 (copy)
-    local v5 = v1.new(v4);
-    local v6 = false;
-    local v7 = {};
-    local v8 = 0;
-    local v9 = {};
-    local v10 = nil;
-    local v11 = {};
-    local v12 = {};
-    local function _() --[[ Line: 24 ]] --[[ Name: getBatchCount ]]
-        -- upvalues: v11 (copy), v5 (copy)
-        return (math.min(#v11, v5.instanceProcessingLimit));
-    end;
-    local function v16(v14) --[[ Line: 28 ]] --[[ Name: onAncestryChanged ]]
-        -- upvalues: v7 (copy)
-        if v14.Parent == nil then
-            local v15 = table.find(v7, v14);
-            if v15 then
-                table.remove(v7, v15);
-            end;
-        end;
-    end;
-    local function v23() --[[ Line: 37 ]] --[[ Name: processStack ]]
-        -- upvalues: v11 (copy), v5 (copy), v3 (copy), v7 (copy), v9 (copy), v16 (copy), v8 (ref), v12 (ref), v6 (ref)
-        local v17 = math.min(#v11, v5.instanceProcessingLimit);
-        for _ = 1, v17 do
-            local v19 = table.remove(v11, #v11);
-            if v19 then
-                if not v3 or v3(v19) then
-                    table.insert(v7, v19);
-                    table.insert(v9, v19.AncestryChanged:Connect(v16));
-                end;
-                for _, v21 in v19:GetChildren() do
-                    table.insert(v11, v21);
-                end;
-            end;
-        end;
-        v8 = v8 + v17;
-        for v22 in v12 do
-            task.spawn(function() --[[ Line: 58 ]]
-                -- upvalues: v22 (copy), v7 (ref)
-                v22(v7);
-            end);
-        end;
-        if #v11 == 0 then
-            v6 = false;
-            return false;
-        elseif v8 >= v5.instanceProcessingLimit then
-            v8 = 0;
-            return true;
-        else
-            return false;
-        end;
-    end;
-    local function _() --[[ Line: 80 ]] --[[ Name: startProcessingLoop ]]
-        -- upvalues: v6 (ref), v11 (copy), v5 (copy), v23 (copy), v10 (ref)
-        if v6 or math.min(#v11, v5.instanceProcessingLimit) == 0 then
-            return;
-        else
-            v6 = true;
-            v23();
-            v10 = task.spawn(function() --[[ Line: 89 ]]
-                -- upvalues: v6 (ref), v23 (ref)
-                task.wait();
-                while v6 do
-                    local v24 = v23();
-                    if v6 and v24 then
-                        task.wait();
-                    end;
-                end;
-            end);
-            return;
-        end;
-    end;
-    local function v28(v26) --[[ Line: 102 ]] --[[ Name: onDescendantAdded ]]
-        -- upvalues: v11 (copy), v6 (ref), v5 (copy), v23 (copy), v10 (ref)
-        table.insert(v11, v26);
-        if not v6 and not v6 then
-            if math.min(#v11, v5.instanceProcessingLimit) == 0 then
-                return;
-            else
-                v6 = true;
-                v23();
-                v10 = task.spawn(function() --[[ Line: 89 ]]
-                    -- upvalues: v6 (ref), v23 (ref)
-                    task.wait();
-                    while v6 do
-                        local v27 = v23();
-                        if v6 and v27 then
-                            task.wait();
-                        end;
-                    end;
-                end);
-            end;
-        end;
-    end;
-    local function v34() --[[ Line: 110 ]] --[[ Name: listen ]]
-        -- upvalues: v2 (copy), v9 (copy), v28 (copy), v11 (copy), v6 (ref), v5 (copy), v23 (copy), v10 (ref)
-        for _, v30 in v2 do
-            table.insert(v9, v30.DescendantAdded:Connect(v28));
-            for _, v32 in v30:GetChildren() do
-                table.insert(v11, v32);
-            end;
-        end;
-        if not v6 then
-            if math.min(#v11, v5.instanceProcessingLimit) == 0 then
-                return;
-            else
-                v6 = true;
-                v23();
-                v10 = task.spawn(function() --[[ Line: 89 ]]
-                    -- upvalues: v6 (ref), v23 (ref)
-                    task.wait();
-                    while v6 do
-                        local v33 = v23();
-                        if v6 and v33 then
-                            task.wait();
-                        end;
-                    end;
-                end);
-            end;
-        end;
-    end;
-    local function v36(v35) --[[ Line: 122 ]] --[[ Name: onStepped ]]
-        -- upvalues: v12 (ref)
-        v12[v35] = true;
-        return function() --[[ Line: 124 ]]
-            -- upvalues: v12 (ref), v35 (copy)
-            v12[v35] = nil;
-        end;
-    end;
-    local function v39() --[[ Line: 129 ]] --[[ Name: destroy ]]
-        -- upvalues: v6 (ref), v9 (copy), v12 (ref), v10 (ref)
-        v6 = false;
-        for _, v38 in v9 do
-            v38:Disconnect();
-        end;
-        v12 = {};
-        if v10 then
-            task.cancel(v10);
-        end;
-    end;
-    return {
-        setInstancesProcessedPerFrame = function(v40) --[[ Line: 143 ]] --[[ Name: setInstancesProcessedPerFrame ]]
-            -- upvalues: v5 (copy), v6 (ref), v11 (copy), v23 (copy), v10 (ref)
-            v5.instanceProcessingLimit = math.clamp(v40, 0, 1e999);
-            if not v6 then
-                if math.min(#v11, v5.instanceProcessingLimit) == 0 then
-                    return;
-                else
-                    v6 = true;
-                    v23();
-                    v10 = task.spawn(function() --[[ Line: 89 ]]
-                        -- upvalues: v6 (ref), v23 (ref)
-                        task.wait();
-                        while v6 do
-                            local v41 = v23();
-                            if v6 and v41 then
-                                task.wait();
-                            end;
-                        end;
-                    end);
-                end;
-            end;
-        end, 
-        listen = v34, 
-        get = function() --[[ Line: 148 ]] --[[ Name: get ]]
-            -- upvalues: v7 (copy)
-            return v7;
-        end, 
-        destroy = v39, 
-        onStepped = v36
-    };
-end;
+local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+local DataModelTraversalOptions = require(SceneUnderstanding.options.DataModelTraversalOptions)
+
+local function createLazyInstanceCollector(t1: {[any]: any}, p1: ((...any) -> ...any)?, p2) -- line: 9
+	-- upvalues: DataModelTraversalOptions (copy)
+	local v7 = DataModelTraversalOptions.new(p2)
+	local u8 = false
+	local t2 = {}
+	local n1 = 0
+	local t3 = {}
+	local thread = nil
+	local t4 = {}
+	local t5 = {}
+
+	local function getBatchCount() -- line: 24
+		-- upvalues: t4 (copy), v7 (copy)
+		return (math.min(#t4, v7.instanceProcessingLimit))
+	end
+	local function onAncestryChanged(p3) -- line: 28
+		-- upvalues: t2 (copy)
+		if p3.Parent == nil then
+			local v21 = table.find(t2, p3)
+
+			if v21 then
+				table.remove(t2, v21)
+			end
+		end
+	end
+	local function processStack() -- line: 37
+		-- upvalues: t4 (copy), v7 (copy), p1 (copy), t2 (copy), t3 (copy), onAncestryChanged (copy), n1 (ref), t5 (ref), u8 (ref)
+		local v22 = math.min(#t4, v7.instanceProcessingLimit)
+
+		for _ = 1, v22 do
+			local v24 = table.remove(t4, #t4)
+
+			if v24 then
+				if not p1 or p1(v24) then
+					table.insert(t2, v24)
+					table.insert(t3, v24.AncestryChanged:Connect(onAncestryChanged))
+				end
+
+				for _, child in v24:GetChildren() do
+					table.insert(t4, child)
+				end
+			end
+		end
+
+		n1 += v22
+
+		for v27 in t5 do
+			task.spawn(function() -- line: 58
+				-- upvalues: v27 (copy), t2 (copy)
+				v27(t2)
+			end)
+		end
+
+		if #t4 == 0 then
+			u8 = false
+
+			return false
+		end
+
+		if n1 >= v7.instanceProcessingLimit then
+			n1 = 0
+
+			return true
+		end
+
+		return false
+	end
+	local function startProcessingLoop() -- line: 80
+		-- upvalues: u8 (ref), t4 (copy), v7 (copy), processStack (copy), thread (ref)
+		if u8 or math.min(#t4, v7.instanceProcessingLimit) == 0 then
+			return
+		end
+
+		u8 = true
+		processStack()
+		thread = task.spawn(function() -- line: 89
+			-- upvalues: u8 (ref), processStack (copy)
+			task.wait()
+
+			while u8 do
+				local v37 = processStack()
+
+				if u8 and v37 then
+					task.wait()
+				end
+			end
+		end)
+	end
+	local function onDescendantAdded(p4) -- line: 102
+		-- upvalues: t4 (copy), u8 (ref), v7 (copy), processStack (copy), thread (ref)
+		table.insert(t4, p4)
+
+		if not u8 and not u8 then
+			if math.min(#t4, v7.instanceProcessingLimit) == 0 then
+				return
+			end
+
+			u8 = true
+			processStack()
+			thread = task.spawn(function() -- line: 89
+				-- upvalues: u8 (ref), processStack (copy)
+				task.wait()
+
+				while u8 do
+					local v38 = processStack()
+
+					if u8 and v38 then
+						task.wait()
+					end
+				end
+			end)
+		end
+	end
+
+	return {
+		setInstancesProcessedPerFrame = function(n2: number) -- line: 143
+			-- upvalues: v7 (copy), u8 (ref), t4 (copy), processStack (copy), thread (ref)
+			v7.instanceProcessingLimit = math.clamp(n2, 0, 1e999)
+
+			if not u8 then
+				if math.min(#t4, v7.instanceProcessingLimit) == 0 then
+					return
+				end
+
+				u8 = true
+				processStack()
+				thread = task.spawn(function() -- line: 89
+					-- upvalues: u8 (ref), processStack (copy)
+					task.wait()
+
+					while u8 do
+						local v40 = processStack()
+
+						if u8 and v40 then
+							task.wait()
+						end
+					end
+				end)
+			end
+		end,
+		listen = function() -- line: 110
+			-- upvalues: t1 (copy), t3 (copy), onDescendantAdded (copy), t4 (copy), u8 (ref), v7 (copy), processStack (copy), thread (ref)
+			for _, v30 in t1 do
+				table.insert(t3, v30.DescendantAdded:Connect(onDescendantAdded))
+
+				for _, child in v30:GetChildren() do
+					table.insert(t4, child)
+				end
+			end
+
+			if not u8 then
+				if math.min(#t4, v7.instanceProcessingLimit) == 0 then
+					return
+				end
+
+				u8 = true
+				processStack()
+				thread = task.spawn(function() -- line: 89
+					-- upvalues: u8 (ref), processStack (copy)
+					task.wait()
+
+					while u8 do
+						local v39 = processStack()
+
+						if u8 and v39 then
+							task.wait()
+						end
+					end
+				end)
+			end
+		end,
+		get = function() -- line: 148
+			-- upvalues: t2 (copy)
+			return t2
+		end,
+		destroy = function() -- line: 129
+			-- upvalues: u8 (ref), t3 (copy), t5 (ref), thread (ref)
+			u8 = false
+
+			for _, v35 in t3 do
+				v35:Disconnect()
+			end
+
+			t5 = {}
+
+			if thread then
+				task.cancel(thread)
+			end
+		end,
+		onStepped = function(p5: ((...any) -> ...any)) -- line: 122
+			-- upvalues: t5 (ref)
+			t5[p5] = true
+
+			return function() -- line: 124
+				-- upvalues: t5 (ref), p5 (copy)
+				t5[p5] = nil
+			end
+		end
+	}
+end
+
+return createLazyInstanceCollector

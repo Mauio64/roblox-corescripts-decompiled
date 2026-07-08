@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("NavigationRodux").Parent;
-local _ = require(l_Parent_0.Navigation);
-return nil;
+local Parent = script:FindFirstAncestor("NavigationRodux").Parent
+
+require(Parent.Navigation)
+
+return nil

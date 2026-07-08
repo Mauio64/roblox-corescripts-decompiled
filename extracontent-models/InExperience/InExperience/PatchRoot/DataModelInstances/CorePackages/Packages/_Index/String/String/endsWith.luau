@@ -1,18 +1,24 @@
-return function(v0, v1, v2) --[[ Line: 16 ]] --[[ Name: endsWith ]]
-    local v3 = v1:len();
-    if v3 == 0 then
-        return true;
-    else
-        local v4 = v0:len();
-        local v5 = v2 or v4;
-        if v4 < v5 then
-            v5 = v4;
-        end;
-        if v5 < 1 then
-            return false;
-        else
-            local v6 = v5 - v3 + 1;
-            return v0:find(v1, v6, true) == v6;
-        end;
-    end;
-end;
+local function endsWith(s1: string, s2: string, n1: number?) -- line: 16
+	local v5 = s2:len()
+
+	if v5 == 0 then
+		return true
+	end
+
+	local v6 = s1:len()
+	local v7 = n1 or v6
+
+	if v6 < v7 then
+		v7 = v6
+	end
+
+	if v7 < 1 then
+		return false
+	end
+
+	local v8 = v7 - v5 + 1
+
+	return v8 == s1:find(s2, v8, true)
+end
+
+return endsWith

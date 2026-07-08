@@ -1,26 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.InputHandlers);
-local v2 = require(l_Parent_0.ReactFocusNavigation);
-local l_FocusNavigationEventNameEnum_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigationEventNameEnum;
-local v4 = require(l_Parent_0.React);
-local v5 = {
-    [Enum.KeyCode.ButtonB] = l_FocusNavigationEventNameEnum_0.NavigateBack, 
-    [Enum.KeyCode.Escape] = l_FocusNavigationEventNameEnum_0.NavigateBack
-};
-return function(v6, v7) --[[ Line: 15 ]] --[[ Name: useCloseWithBackButton ]]
-    -- upvalues: v4 (copy), v1 (copy), v2 (copy), v5 (copy), l_FocusNavigationEventNameEnum_0 (copy)
-    local v9 = v4.useMemo(function() --[[ Line: 16 ]]
-        -- upvalues: v1 (ref), v7 (copy)
-        return v1.onRelease(function(v8) --[[ Line: 17 ]]
-            -- upvalues: v7 (ref)
-            if v7 then
-                v7();
-                v8:cancel();
-            end;
-        end);
-    end, {
-        v7
-    });
-    local v10 = v2.useEventMap(v5, v6);
-    return (v2.useEventHandler(l_FocusNavigationEventNameEnum_0.NavigateBack, v9, nil, v10));
-end;
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local InputHandlers = require(Parent.InputHandlers)
+local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
+local FocusNavigationEventNameEnum = require(Parent.FocusNavigationUtils).FocusNavigationEventNameEnum
+local React = require(Parent.React)
+local t1 = {
+	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
+}
+
+local function useCloseWithBackButton(p1, p2: ((...any) -> ...any)?) -- line: 15
+	-- upvalues: React (copy), InputHandlers (copy), ReactFocusNavigation (copy), t1 (copy), FocusNavigationEventNameEnum (copy)
+	local v10 = React.useMemo(function() -- line: 16
+		-- upvalues: InputHandlers (copy), p2 (copy)
+		return InputHandlers.onRelease(function(p3) -- line: 17
+			-- upvalues: p2 (copy)
+			if p2 then
+				p2()
+				p3:cancel()
+			end
+		end)
+	end, { p2 })
+	local v11 = ReactFocusNavigation.useEventMap(t1, p1)
+
+	return (ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.NavigateBack, v10, nil, v11))
+end
+
+return useCloseWithBackButton

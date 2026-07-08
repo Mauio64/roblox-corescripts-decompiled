@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DisableMemStorageServicePasswordEvent", false);
+return game:DefineFastFlag("DisableMemStorageServicePasswordEvent", false)

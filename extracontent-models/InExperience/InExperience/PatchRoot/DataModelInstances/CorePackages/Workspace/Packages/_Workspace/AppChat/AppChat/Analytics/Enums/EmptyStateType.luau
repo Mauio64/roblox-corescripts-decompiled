@@ -1,6 +1,6 @@
 return {
-    EmptyConversationList = "EmptyConversationList", 
-    NoFriendsView = "NoFriendsView", 
-    ChatSettingsDisabledView = "ChatSettingsDisabledView", 
-    ChatUnavailableRegionView = "ChatUnavailableRegionView"
-};
+	EmptyConversationList = "EmptyConversationList",
+	NoFriendsView = "NoFriendsView",
+	ChatSettingsDisabledView = "ChatSettingsDisabledView",
+	ChatUnavailableRegionView = "ChatUnavailableRegionView"
+}

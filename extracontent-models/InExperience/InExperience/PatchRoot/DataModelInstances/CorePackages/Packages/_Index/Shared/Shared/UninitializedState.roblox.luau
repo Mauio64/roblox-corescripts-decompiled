@@ -1,25 +1,29 @@
-local v0 = require(script.Parent.console);
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.ReactGlobals);
-local v3 = {};
-setmetatable(v3, {
-    __index = function(_, _) --[[ Line: 26 ]] --[[ Name: __index ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        if v2.__DEV__ then
-            v0.warn("Attempted to access uninitialized state. Use setState to initialize state");
-        end;
-        return nil;
-    end, 
-    __newindex = function(_, _) --[[ Line: 34 ]] --[[ Name: __newindex ]]
-        -- upvalues: v2 (copy), v0 (copy)
-        if v2.__DEV__ then
-            v0.error("Attempted to directly mutate state. Use setState to assign new values to state.");
-        end;
-        return nil;
-    end, 
-    __tostring = function(_) --[[ Line: 42 ]] --[[ Name: __tostring ]]
-        return "<uninitialized component state>";
-    end, 
-    __metatable = "UninitializedState"
-});
-return v3;
+local console = require(script.Parent.console)
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local t1 = {}
+
+setmetatable(t1, {
+	__metatable = "UninitializedState",
+	__index = function(_, _) -- line: 26
+		-- upvalues: ReactGlobals (copy), console (copy)
+		if ReactGlobals.__DEV__ then
+			console.warn("Attempted to access uninitialized state. Use setState to initialize state")
+		end
+
+		return nil
+	end,
+	__newindex = function(_, _) -- line: 34
+		-- upvalues: ReactGlobals (copy), console (copy)
+		if ReactGlobals.__DEV__ then
+			console.error("Attempted to directly mutate state. Use setState to assign new values to state.")
+		end
+
+		return nil
+	end,
+	__tostring = function(_) -- line: 42
+		return "<uninitialized component state>"
+	end
+})
+
+return t1

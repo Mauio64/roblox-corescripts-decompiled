@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableNotApprovedForeshadowingConsequenceABTest", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableNotApprovedForeshadowingConsequenceABTest");
-end;
+game:DefineFastFlag("EnableNotApprovedForeshadowingConsequenceABTest", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableNotApprovedForeshadowingConsequenceABTest")
+end

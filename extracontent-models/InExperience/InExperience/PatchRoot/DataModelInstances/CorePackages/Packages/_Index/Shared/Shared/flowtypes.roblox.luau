@@ -1,3 +1,5 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-return {};
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+
+return {}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXHideCatalogShortcutsInFullView", false);
+return game:DefineFastFlag("AXHideCatalogShortcutsInFullView", false)

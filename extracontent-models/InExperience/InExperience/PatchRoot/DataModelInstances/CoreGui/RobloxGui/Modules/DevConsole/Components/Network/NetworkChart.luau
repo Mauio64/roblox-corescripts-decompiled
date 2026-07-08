@@ -1,238 +1,256 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TextService_0 = game:GetService("TextService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.Parent.Parent.Constants);
-local l_ChartHeaderNames_0 = v3.NetworkFormatting.ChartHeaderNames;
-local l_ChartCellWidths_0 = v3.NetworkFormatting.ChartCellWidths;
-local l_CellPadding_0 = v3.NetworkFormatting.CellPadding;
-local l_HeaderFrameHeight_0 = v3.NetworkFormatting.HeaderFrameHeight;
-local l_EntryFrameHeight_0 = v3.NetworkFormatting.EntryFrameHeight;
-local l_LineWidth_0 = v3.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v3.GeneralFormatting.LineColor;
-local l_MainWindow_0 = v3.DefaultFontSize.MainWindow;
-local l_MainWindow_1 = v3.Font.MainWindow;
-local l_ResponseStrHeight_0 = v3.NetworkFormatting.ResponseStrHeight;
-local l_ResponseWidthRatio_0 = v3.NetworkFormatting.ResponseWidthRatio;
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v16 = require(l_Components_0.HeaderButton);
-local v17 = require(script.Parent.NetworkChartEntry);
-local v18 = 0;
-for _, v20 in pairs(l_ChartCellWidths_0) do
-    v18 = v18 + v20;
-end;
-local v21 = 0;
-local v22 = {};
-local v23 = {};
-local v24 = {};
-for _, v26 in ipairs(l_ChartCellWidths_0) do
-    table.insert(v22, UDim2.new(0, v21 + l_CellPadding_0, 0, 0));
-    table.insert(v23, UDim2.new(0, v26 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-    table.insert(v24, UDim2.new(0, v26 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-    v21 = v21 + v26;
-end;
-table.insert(v22, UDim2.new(0, v21 + l_CellPadding_0, 0, 0));
-table.insert(v23, UDim2.new(1, -v18 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-table.insert(v24, UDim2.new(1, -v18 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-local v27 = {};
-for v28, v29 in ipairs(v22) do
-    v27[v28] = UDim2.new(v29.X.Scale, v29.X.Offset - l_CellPadding_0, v29.Y.Scale, v29.Y.Offset);
-end;
-local v30 = v2.Component:extend("NetworkChart");
-v30.init = function(v31) --[[ Line: 57 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    v31.getOnExpandEntry = function(v32) --[[ Line: 58 ]]
-        -- upvalues: v31 (copy)
-        return function(_, _) --[[ Line: 59 ]]
-            -- upvalues: v31 (ref), v32 (copy)
-            local l_v31_0 = v31;
-            local v36 = {};
-            local v37 = false;
-            if v31.state.expandIndex ~= v32 then
-                v37 = v32;
-            end;
-            v36.expandIndex = v37;
-            l_v31_0:setState(v36);
-        end;
-    end;
-    v31.onCanvasPosChanged = function() --[[ Line: 66 ]]
-        -- upvalues: v31 (copy)
-        local l_CanvasPosition_0 = v31.scrollingRef.current.CanvasPosition;
-        if v31.state.canvasPos ~= l_CanvasPosition_0 then
-            v31:setState({
-                absScrollSize = v31.scrollingRef.current.AbsoluteSize, 
-                canvasPos = l_CanvasPosition_0
-            });
-        end;
-    end;
-    v31.ref = v2.createRef();
-    v31.scrollingRef = v2.createRef();
-    v31.state = {
-        expandIndex = false
-    };
-end;
-v30.willUpdate = function(v39) --[[ Line: 84 ]] --[[ Name: willUpdate ]]
-    if v39.canvasPosConnector then
-        v39.canvasPosConnector:Disconnect();
-    end;
-end;
-v30.didUpdate = function(v40) --[[ Line: 90 ]] --[[ Name: didUpdate ]]
-    if v40.scrollingRef.current then
-        v40.canvasPosConnector = v40.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v40.onCanvasPosChanged);
-        local l_AbsoluteSize_0 = v40.scrollingRef.current.AbsoluteSize;
-        if v40.state.absScrollSize ~= l_AbsoluteSize_0 then
-            v40:setState({
-                absScrollSize = l_AbsoluteSize_0
-            });
-        end;
-    end;
-end;
-v30.didMount = function(v42) --[[ Line: 104 ]] --[[ Name: didMount ]]
-    if v42.scrollingRef.current then
-        v42.canvasPosConnector = v42.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v42.onCanvasPosChanged);
-        v42:setState({
-            absScrollSize = v42.scrollingRef.current.AbsoluteSize, 
-            canvasPos = v42.scrollingRef.current.CanvasPosition
-        });
-    end;
-end;
-v30.render = function(v43) --[[ Line: 116 ]] --[[ Name: render ]]
-    -- upvalues: l_ChartHeaderNames_0 (copy), v2 (copy), v16 (copy), v23 (copy), v22 (copy), v27 (copy), l_LineWidth_0 (copy), l_HeaderFrameHeight_0 (copy), l_LineColor_0 (copy), l_EntryFrameHeight_0 (copy), l_ResponseStrHeight_0 (copy), l_ResponseWidthRatio_0 (copy), l_TextService_0 (copy), l_MainWindow_0 (copy), l_MainWindow_1 (copy), v17 (copy), v24 (copy), v3 (copy)
-    local v44 = v43.props.httpEntryList or {};
-    local l_chartHeight_0 = v43.props.chartHeight;
-    local l_width_0 = v43.props.width;
-    local l_searchTerm_0 = v43.props.searchTerm;
-    local l_layoutOrder_0 = v43.props.layoutOrder;
-    local l_reverseSort_0 = v43.props.reverseSort;
-    local l_onSortChanged_0 = v43.props.onSortChanged;
-    local l_expandIndex_0 = v43.state.expandIndex;
-    local l_absScrollSize_0 = v43.state.absScrollSize;
-    local l_canvasPos_0 = v43.state.canvasPos;
-    local v54 = {};
-    for v55, v56 in ipairs(l_ChartHeaderNames_0) do
-        v54[v56] = v2.createElement(v16, {
-            text = v56, 
-            size = v23[v55], 
-            pos = v22[v55], 
-            sortfunction = l_onSortChanged_0
-        });
-    end;
-    for v57 = 2, #v27 do
-        v54[string.format("VerticalLine_%d", v57)] = v2.createElement("Frame", {
-            Size = UDim2.new(0, l_LineWidth_0, 0, l_HeaderFrameHeight_0), 
-            Position = v27[v57], 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-    end;
-    local v58 = {};
-    local v59 = 0;
-    local v60 = -1;
-    local v61 = 0;
-    local v62 = #v44;
-    local v63 = 0;
-    v58.UIListLayout = v2.createElement("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Top, 
-        SortOrder = Enum.SortOrder.LayoutOrder
-    });
-    if l_canvasPos_0 and l_absScrollSize_0 then
-        for v64, v65 in ipairs(v44) do
-            local v66 = true;
-            if l_searchTerm_0 ~= "" then
-                local v67 = true;
-                if string.find(v65.RequestType:lower(), l_searchTerm_0:lower()) == nil then
-                    v67 = string.find(v65.Url:lower(), l_searchTerm_0:lower()) ~= nil;
-                end;
-                v66 = v67;
-            end;
-            if v65.RequestType ~= "Default" and v66 then
-                v63 = v63 + 1;
-                local v68 = l_expandIndex_0 == v65.Num;
-                local l_l_EntryFrameHeight_0_0 = l_EntryFrameHeight_0;
-                local v70 = 0;
-                if v68 then
-                    l_l_EntryFrameHeight_0_0 = l_l_EntryFrameHeight_0_0 + l_ResponseStrHeight_0;
-                    if v43.ref.current then
-                        local v71 = Vector2.new(v43.ref.current.AbsoluteSize.X * l_ResponseWidthRatio_0, 100000000);
-                        local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v65.Response, l_MainWindow_0, l_MainWindow_1, v71);
-                        v70 = l_ResponseStrHeight_0 + l_l_TextService_0_TextSize_0.Y;
-                        l_l_EntryFrameHeight_0_0 = l_l_EntryFrameHeight_0_0 + v70;
-                    end;
-                end;
-                if v59 + l_l_EntryFrameHeight_0_0 >= l_canvasPos_0.Y then
-                    if v61 < l_absScrollSize_0.Y then
-                        local v73 = l_reverseSort_0 and v62 - v64 or v64;
-                        v58[v64] = v2.createElement(v17, {
-                            size = UDim2.new(1, 0, 0, l_l_EntryFrameHeight_0_0), 
-                            entry = v65, 
-                            entryCellSize = v24, 
-                            cellOffset = v22, 
-                            verticalOffsets = v27, 
-                            showResponse = v68, 
-                            responseBodyHeight = v70, 
-                            layoutOrder = v73 + 1, 
-                            onButtonPress = v43.getOnExpandEntry(v65.Num)
-                        });
-                    end;
-                    if v60 < 0 then
-                        v60 = v59;
-                    else
-                        v61 = v61 + l_l_EntryFrameHeight_0_0;
-                    end;
-                end;
-                v59 = v59 + l_l_EntryFrameHeight_0_0;
-            end;
-        end;
-        if v63 > 0 then
-            v58.WindowingPadding = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v60), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            });
-        end;
-    end;
-    if v62 == 0 or v63 == 0 then
-        v58["NONE FOUND"] = v2.createElement("TextLabel", {
-            Size = UDim2.new(1, 0, 0, l_chartHeight_0), 
-            Text = "No Network Entries Found", 
-            TextColor3 = v3.Color.Text, 
-            BackgroundTransparency = 1
-        });
-    end;
-    return v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_chartHeight_0), 
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true, 
-        LayoutOrder = l_layoutOrder_0, 
-        [v2.Ref] = v43.ref
-    }, {
-        Layout = v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        Header = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_HeaderFrameHeight_0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1
-        }, v54), 
-        HorizontalLine_1 = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 0, 
-            LayoutOrder = 2
-        }), 
-        scrollingFrameEntries = v2.createElement("ScrollingFrame", {
-            Size = UDim2.new(1, 0, 1, -l_HeaderFrameHeight_0), 
-            CanvasSize = UDim2.new(0, l_width_0, 0, v59), 
-            ScrollBarThickness = 6, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 3, 
-            [v2.Ref] = v43.scrollingRef
-        }, v58)
-    });
-end;
-return v30;
+local CorePackages = game:GetService("CorePackages")
+local TextService = game:GetService("TextService")
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local ChartHeaderNames = Constants.NetworkFormatting.ChartHeaderNames
+local ChartCellWidths = Constants.NetworkFormatting.ChartCellWidths
+local CellPadding = Constants.NetworkFormatting.CellPadding
+local HeaderFrameHeight = Constants.NetworkFormatting.HeaderFrameHeight
+local EntryFrameHeight = Constants.NetworkFormatting.EntryFrameHeight
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local MainWindow = Constants.DefaultFontSize.MainWindow
+local MainWindow2 = Constants.Font.MainWindow
+local ResponseStrHeight = Constants.NetworkFormatting.ResponseStrHeight
+local ResponseWidthRatio = Constants.NetworkFormatting.ResponseWidthRatio
+local Components = script.Parent.Parent.Parent.Components
+local HeaderButton = require(Components.HeaderButton)
+local NetworkChartEntry = require(script.Parent.NetworkChartEntry)
+local n1 = 0
+
+for _, v in pairs(ChartCellWidths) do
+	n1 += v
+end
+
+local n2 = 0
+local t1 = {}
+local t2 = {}
+local t3 = {}
+
+for _, v in ipairs(ChartCellWidths) do
+	table.insert(t1, UDim2.new(0, n2 + CellPadding, 0, 0))
+	table.insert(t2, UDim2.new(0, v - CellPadding, 0, HeaderFrameHeight))
+	table.insert(t3, UDim2.new(0, v - CellPadding, 0, EntryFrameHeight))
+	n2 += v
+end
+
+table.insert(t1, UDim2.new(0, n2 + CellPadding, 0, 0))
+table.insert(t2, UDim2.new(1, -n1 - CellPadding, 0, HeaderFrameHeight))
+table.insert(t3, UDim2.new(1, -n1 - CellPadding, 0, EntryFrameHeight))
+
+local t4 = {}
+
+for i, v in ipairs(t1) do
+	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+end
+
+local v31 = Roact.Component:extend("NetworkChart")
+
+function v31.init(p1) -- line: 57
+	-- upvalues: Roact (copy)
+	function p1.getOnExpandEntry(p2) -- line: 58
+		-- upvalues: p1 (copy)
+		return function(_, _) -- line: 59
+			-- upvalues: p1 (copy), p2 (copy)
+			p1:setState({
+				expandIndex = p1.state.expandIndex ~= p2 and p2
+			})
+		end
+	end
+	function p1.onCanvasPosChanged() -- line: 66
+		-- upvalues: p1 (copy)
+		local CanvasPosition = p1.scrollingRef.current.CanvasPosition
+
+		if CanvasPosition ~= p1.state.canvasPos then
+			p1:setState({
+				absScrollSize = p1.scrollingRef.current.AbsoluteSize,
+				canvasPos = CanvasPosition
+			})
+		end
+	end
+
+	p1.ref = Roact.createRef()
+	p1.scrollingRef = Roact.createRef()
+	p1.state = {
+		expandIndex = false
+	}
+end
+function v31.willUpdate(p5) -- line: 84
+	if p5.canvasPosConnector then
+		p5.canvasPosConnector:Disconnect()
+	end
+end
+function v31.didUpdate(p6) -- line: 90
+	if p6.scrollingRef.current then
+		p6.canvasPosConnector = p6.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p6.onCanvasPosChanged)
+
+		local AbsoluteSize = p6.scrollingRef.current.AbsoluteSize
+
+		if AbsoluteSize ~= p6.state.absScrollSize then
+			p6:setState({
+				absScrollSize = AbsoluteSize
+			})
+		end
+	end
+end
+function v31.didMount(p7) -- line: 104
+	if p7.scrollingRef.current then
+		p7.canvasPosConnector = p7.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p7.onCanvasPosChanged)
+		p7:setState({
+			absScrollSize = p7.scrollingRef.current.AbsoluteSize,
+			canvasPos = p7.scrollingRef.current.CanvasPosition
+		})
+	end
+end
+function v31.render(p8) -- line: 116
+	-- upvalues: ChartHeaderNames (copy), Roact (copy), HeaderButton (copy), t2 (copy), t1 (copy), t4 (copy), LineWidth (copy), HeaderFrameHeight (copy), LineColor (copy), EntryFrameHeight (copy), ResponseStrHeight (copy), ResponseWidthRatio (copy), TextService (copy), MainWindow (copy), MainWindow2 (copy), NetworkChartEntry (copy), t3 (copy), Constants (copy)
+	local v38 = p8.props.httpEntryList or {}
+	local chartHeight = p8.props.chartHeight
+	local width = p8.props.width
+	local searchTerm = p8.props.searchTerm
+	local layoutOrder = p8.props.layoutOrder
+	local reverseSort = p8.props.reverseSort
+	local onSortChanged = p8.props.onSortChanged
+	local expandIndex = p8.state.expandIndex
+	local absScrollSize = p8.state.absScrollSize
+	local canvasPos = p8.state.canvasPos
+	local t5 = {}
+
+	for i, v in ipairs(ChartHeaderNames) do
+		t5[v] = Roact.createElement(HeaderButton, {
+			text = v,
+			size = t2[i],
+			pos = t1[i],
+			sortfunction = onSortChanged
+		})
+	end
+
+	for i = 2, #t4 do
+		t5[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, LineWidth, 0, HeaderFrameHeight),
+			Position = t4[i],
+			BackgroundColor3 = LineColor
+		})
+	end
+
+	local t6 = {}
+	local n3 = 0
+	local n4 = -1
+	local n5 = 0
+	local v56 = #v38
+	local n6 = 0
+
+	t6.UIListLayout = Roact.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	if canvasPos and absScrollSize then
+		for i, v in ipairs(v38) do
+			local v60 = searchTerm == "" or (string.find(v.RequestType:lower(), searchTerm:lower()) ~= nil or string.find(v.Url:lower(), searchTerm:lower()) ~= nil)
+
+			if v.RequestType ~= "Default" and v60 then
+				n6 += 1
+
+				local v61 = expandIndex == v.Num
+				local v62 = EntryFrameHeight
+				local n7 = 0
+
+				if v61 then
+					v62 += ResponseStrHeight
+
+					if p8.ref.current then
+						local vector2 = Vector2.new(p8.ref.current.AbsoluteSize.X * ResponseWidthRatio, 100000000)
+						local TextSize = TextService:GetTextSize(v.Response, MainWindow, MainWindow2, vector2)
+
+						n7 = ResponseStrHeight + TextSize.Y
+						v62 += n7
+					end
+				end
+
+				if n3 + v62 >= canvasPos.Y then
+					if n5 < absScrollSize.Y then
+						local v66 = reverseSort and v56 - i or i
+
+						t6[i] = Roact.createElement(NetworkChartEntry, {
+							size = UDim2.new(1, 0, 0, v62),
+							entry = v,
+							entryCellSize = t3,
+							cellOffset = t1,
+							verticalOffsets = t4,
+							showResponse = v61,
+							responseBodyHeight = n7,
+							layoutOrder = v66 + 1,
+							onButtonPress = p8.getOnExpandEntry(v.Num)
+						})
+					end
+
+					if n4 < 0 then
+						n4 = n3
+					else
+						n5 += v62
+					end
+				end
+
+				n3 += v62
+			end
+		end
+
+		if n6 > 0 then
+			t6.WindowingPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, n4)
+			})
+		end
+	end
+
+	if v56 == 0 or n6 == 0 then
+		t6["NONE FOUND"] = Roact.createElement("TextLabel", {
+			Text = "No Network Entries Found",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, chartHeight),
+			TextColor3 = Constants.Color.Text
+		})
+	end
+
+	return Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, chartHeight),
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		LayoutOrder = layoutOrder,
+		[Roact.Ref] = p8.ref
+	}, {
+		Layout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Header = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, HeaderFrameHeight)
+		}, t5),
+		HorizontalLine_1 = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, LineWidth),
+			BackgroundColor3 = LineColor
+		}),
+		scrollingFrameEntries = Roact.createElement("ScrollingFrame", {
+			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
+			CanvasSize = UDim2.new(0, width, 0, n3),
+			ScrollBarThickness = 6,
+			BackgroundTransparency = 1,
+			LayoutOrder = 3,
+			[Roact.Ref] = p8.scrollingRef
+		}, t6)
+	})
+end
+
+return v31

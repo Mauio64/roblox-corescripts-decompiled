@@ -1,24 +1,28 @@
-local l_Packages_0 = game:GetService("CorePackages").Packages;
-local v1 = require(l_Packages_0.React);
-local v2 = require(l_Packages_0.UIBlox);
-local l_Images_0 = v2.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local v5 = require(script.Parent.Parent.Hooks.useCameraOn);
-local v6 = UDim2.fromScale(1, 1);
-return function(v7) --[[ Line: 18 ]] --[[ Name: CameraStatusIcon ]]
-    -- upvalues: v5 (copy), v1 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), v6 (copy)
-    local v8 = v5();
-    return v1.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.fromScale(1, 1)
-    }, {
-        Icon = v1.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            Image = v8 and l_Images_0["icons/controls/video"] or l_Images_0["icons/controls/videoOff"], 
-            Size = v7.iconSize or v6, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            ImageTransparency = v7.transparency or 0
-        })
-    });
-end;
+local Packages = game:GetService("CorePackages").Packages
+local React = require(Packages.React)
+local UIBlox = require(Packages.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local useCameraOn = require(script.Parent.Parent.Hooks.useCameraOn)
+local uDim2 = UDim2.fromScale(1, 1)
+
+local function CameraStatusIcon(t1: {[any]: any}) -- line: 18
+	-- upvalues: useCameraOn (copy), React (copy), ImageSetLabel (copy), Images (copy), uDim2 (copy)
+	local v10 = useCameraOn()
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1)
+	}, {
+		Icon = React.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Image = v10 and Images["icons/controls/video"] or Images["icons/controls/videoOff"],
+			Size = t1.iconSize or uDim2,
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ImageTransparency = t1.transparency or 0
+		})
+	})
+end
+
+return CameraStatusIcon

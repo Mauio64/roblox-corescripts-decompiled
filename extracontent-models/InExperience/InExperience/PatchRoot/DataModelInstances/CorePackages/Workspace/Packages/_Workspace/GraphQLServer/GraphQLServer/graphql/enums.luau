@@ -1,4 +1,4 @@
 return {
-    UserProfileNestedFields = require(script.UserProfileNestedFields), 
-    UserProfileNameFields = require(script.UserProfileNameFields)
-};
+	UserProfileNestedFields = require(script.UserProfileNestedFields),
+	UserProfileNameFields = require(script.UserProfileNameFields)
+}

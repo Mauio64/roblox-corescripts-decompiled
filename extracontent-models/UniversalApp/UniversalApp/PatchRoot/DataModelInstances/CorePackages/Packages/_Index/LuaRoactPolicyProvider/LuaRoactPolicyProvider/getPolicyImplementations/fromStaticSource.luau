@@ -1,21 +1,23 @@
-local function v0() --[[ Line: 1 ]] --[[ Name: noOpt ]]
+local function noOpt() -- line: 1
+end
 
-end;
-return function() --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return function(v1) --[[ Line: 4 ]]
-        -- upvalues: v0 (ref)
-        assert(v1, "expected externalPolicy");
-        return {
-            read = function() --[[ Line: 8 ]] --[[ Name: read ]]
-                -- upvalues: v1 (copy)
-                return v1;
-            end, 
-            onPolicyChanged = function(v2) --[[ Line: 12 ]] --[[ Name: onPolicyChanged ]]
-                -- upvalues: v0 (ref)
-                local v3 = v2 or v0;
-                return Instance.new("BindableEvent").Event:Connect(v3);
-            end
-        };
-    end;
-end;
+return function() -- line: 3
+	-- upvalues: noOpt (copy)
+	return function(p1) -- line: 4
+		-- upvalues: noOpt (copy)
+		assert(p1, "expected externalPolicy")
+
+		return {
+			read = function() -- line: 8
+				-- upvalues: p1 (copy)
+				return p1
+			end,
+			onPolicyChanged = function(p2) -- line: 12
+				-- upvalues: noOpt (copy)
+				local v4 = p2 or noOpt
+
+				return Instance.new("BindableEvent").Event:Connect(v4)
+			end
+		}
+	end
+end

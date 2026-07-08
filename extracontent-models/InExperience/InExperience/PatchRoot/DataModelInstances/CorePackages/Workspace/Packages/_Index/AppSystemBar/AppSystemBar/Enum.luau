@@ -1,3 +1,3 @@
 return {
-    Placements = require(script.AppSystemBarPlacements)
-};
+	Placements = require(script.AppSystemBarPlacements)
+}

@@ -1,42 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v5 = require(l_script_FirstAncestor_0.Components.ChatLanding.SearchTopBar);
-local v6 = {
-    paddingTop = 0, 
-    paddingBottom = 6, 
-    paddingLeft = 12, 
-    paddingRight = 12, 
-    layoutOrder = -1
-};
-return function(v7) --[[ Line: 32 ]]
-    -- upvalues: v2 (copy), v6 (copy), l_useLocalization_0 (copy), v3 (copy), v5 (copy)
-    local v8 = v2.Dictionary.union(v6, v7);
-    local v9 = l_useLocalization_0({
-        searchPlaceholderText = "Feature.Chat.Label.SearchWord", 
-        cancelText = "Feature.Chat.Action.Cancel"
-    });
-    return v3.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, v8.height - v8.paddingBottom - v8.paddingTop), 
-        LayoutOrder = v8.layoutOrder, 
-        BackgroundTransparency = 1
-    }, {
-        filterBox = v3.createElement(v5, {
-            initialInputText = v8.initialText or "", 
-            cancelText = v9.cancelText, 
-            searchPlaceholderText = v9.searchPlaceholderText, 
-            shouldShowCancel = false, 
-            captureFocusOnMount = false, 
-            filterBoxPaddingTop = v8.paddingTop, 
-            filterBoxPaddingBottom = v8.paddingBottom, 
-            filterBoxPaddingLeft = v8.paddingLeft, 
-            filterBoxPaddingRight = v8.paddingRight, 
-            textChangedCallback = v8.onFilter
-        }), 
-        heightFlexOverride = v3.createElement("UIFlexItem", {
-            FlexMode = Enum.UIFlexMode.None
-        })
-    });
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local SearchTopBar = require(AppChat.Components.ChatLanding.SearchTopBar)
+local t1 = {
+	paddingTop = 0,
+	paddingBottom = 6,
+	paddingLeft = 12,
+	paddingRight = 12,
+	layoutOrder = -1
+}
+
+local function v8() -- line: 32
+end
+
+return function(t2: {[any]: any}) -- line: 34
+	-- upvalues: Cryo (copy), t1 (copy), useLocalization (copy), React (copy), SearchTopBar (copy), v8 (copy)
+	local v10 = Cryo.Dictionary.union(t1, t2)
+	local v11 = useLocalization({
+		searchPlaceholderText = "Feature.Chat.Label.SearchWord",
+		cancelText = "Feature.Chat.Action.Cancel"
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, v10.height - v10.paddingBottom - v10.paddingTop),
+		LayoutOrder = v10.layoutOrder
+	}, {
+		filterBox = React.createElement(SearchTopBar, {
+			shouldShowCancel = false,
+			captureFocusOnMount = false,
+			initialInputText = v10.initialText or "",
+			cancelText = v11.cancelText,
+			searchPlaceholderText = v11.searchPlaceholderText,
+			cancelCallback = v8,
+			filterBoxPaddingTop = v10.paddingTop,
+			filterBoxPaddingBottom = v10.paddingBottom,
+			filterBoxPaddingLeft = v10.paddingLeft,
+			filterBoxPaddingRight = v10.paddingRight,
+			textChangedCallback = v10.onFilter
+		}),
+		heightFlexOverride = React.createElement("UIFlexItem", {
+			FlexMode = Enum.UIFlexMode.None
+		})
+	})
+end

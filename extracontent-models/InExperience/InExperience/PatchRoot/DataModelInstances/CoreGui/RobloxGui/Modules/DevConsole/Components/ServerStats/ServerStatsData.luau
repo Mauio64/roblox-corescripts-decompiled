@@ -1,110 +1,128 @@
-local v0 = require(script.Parent.Parent.Parent.CircularBuffer);
-local v1 = require(script.Parent.Parent.Parent.Signal);
-local v2 = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"));
-local v3 = require(script.Parent.Parent.Parent.Util.getClientReplicator);
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 14 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v1 (copy)
-    local v5 = {};
-    setmetatable(v5, v4);
-    v5._serverStatsUpdated = v1.new();
-    v5._serverStatsPing = v1.new();
-    v5._serverStatsData = {};
-    v5._serverStatsDataCount = 0;
-    v5._lastUpdateTime = 0;
-    v5._isRunning = false;
-    return v5;
-end;
-v4.avgPing = function(v6) --[[ Line: 27 ]] --[[ Name: avgPing ]]
-    return v6._serverStatsPing;
-end;
-v4.Signal = function(v7) --[[ Line: 31 ]] --[[ Name: Signal ]]
-    return v7._serverStatsUpdated;
-end;
-v4.getCurrentData = function(v8) --[[ Line: 35 ]] --[[ Name: getCurrentData ]]
-    return v8._serverStatsData;
-end;
-v4.updateValue = function(v9, v10, v11) --[[ Line: 39 ]] --[[ Name: updateValue ]]
-    -- upvalues: v0 (copy), v2 (copy)
-    if not v9._serverStatsData[v10] then
-        local v12 = v0.new(v2);
-        v12:push_back({
-            value = v11, 
-            time = v9._lastUpdateTime
-        });
-        v9._serverStatsData[v10] = {
-            max = v11, 
-            min = v11, 
-            dataSet = v12
-        };
-        return;
-    else
-        local v13 = v9._serverStatsData[v10];
-        local l_max_0 = v13.max;
-        local l_min_0 = v13.min;
-        local v16 = {
-            value = v11, 
-            time = v9._lastUpdateTime
-        };
-        local v17 = v9._serverStatsData[v10].dataSet:push_back(v16);
-        if v17 then
-            local v18 = v9._serverStatsData[v10].dataSet:iterator();
-            local v19 = v18:next();
-            if l_max_0 == v17.value then
-                l_max_0 = l_min_0;
-                while v19 do
-                    l_max_0 = v19.value < l_max_0 and l_max_0 or v19.value;
-                    v19 = v18:next();
-                end;
-            end;
-            if l_min_0 == v17.value then
-                l_min_0 = l_max_0;
-                while v19 do
-                    l_min_0 = l_min_0 < v19.value and l_min_0 or v19.value;
-                    v19 = v18:next();
-                end;
-            end;
-        end;
-        v9._serverStatsData[v10].max = l_max_0 < v11 and v11 or l_max_0;
-        v9._serverStatsData[v10].min = l_min_0 < v11 and l_min_0 or v11;
-        return;
-    end;
-end;
-v4.isRunning = function(v20) --[[ Line: 87 ]] --[[ Name: isRunning ]]
-    return v20._isRunning;
-end;
-v4.start = function(v21) --[[ Line: 91 ]] --[[ Name: start ]]
-    -- upvalues: v3 (copy)
-    local v22 = v3();
-    if v22 and not v21._statsListenerConnection then
-        v21._statsListenerConnection = v22.StatsReceived:connect(function(v23) --[[ Line: 94 ]]
-            -- upvalues: v21 (copy)
-            if v23 then
-                v21._lastUpdateTime = os.time();
-                local v24 = 0;
-                for v25, v26 in pairs(v23) do
-                    if type(v26) == "number" then
-                        v21:updateValue(v25, v26);
-                        v24 = v24 + 1;
-                    end;
-                end;
-                v21._serverStatsDataCount = v24;
-                v21._serverStatsUpdated:Fire(v21._serverStatsData);
-                if v21._serverStatsData["Avg Data Ping ms"] then
-                    v21._serverStatsPing:Fire(v21._serverStatsData["Avg Data Ping ms"].dataSet:back().value);
-                end;
-            end;
-        end);
-        v22:RequestServerStats(true);
-        v21._isRunning = true;
-    end;
-end;
-v4.stop = function(v27) --[[ Line: 117 ]] --[[ Name: stop ]]
-    if v27._statsListenerConnection then
-        v27._statsListenerConnection:Disconnect();
-        v27._statsListenerConnection = nil;
-    end;
-    v27._isRunning = false;
-end;
-return v4;
+local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local num = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 14
+	-- upvalues: t1 (copy), Signal (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._serverStatsUpdated = Signal.new()
+	t2._serverStatsPing = Signal.new()
+	t2._serverStatsData = {}
+	t2._serverStatsDataCount = 0
+	t2._lastUpdateTime = 0
+	t2._isRunning = false
+
+	return t2
+end
+function t1.avgPing(p1) -- line: 27
+	return p1._serverStatsPing
+end
+function t1.Signal(p2) -- line: 31
+	return p2._serverStatsUpdated
+end
+function t1.getCurrentData(p3) -- line: 35
+	return p3._serverStatsData
+end
+function t1.updateValue(p4, p5, p6) -- line: 39
+	-- upvalues: CircularBuffer (copy), num (copy)
+	if not p4._serverStatsData[p5] then
+		local v13 = CircularBuffer.new(num)
+
+		v13:push_back({
+			value = p6,
+			time = p4._lastUpdateTime
+		})
+		p4._serverStatsData[p5] = {
+			max = p6,
+			min = p6,
+			dataSet = v13
+		}
+
+		return
+	end
+
+	local v14 = p4._serverStatsData[p5]
+	local max = v14.max
+	local min = v14.min
+	local t3 = {
+		value = p6,
+		time = p4._lastUpdateTime
+	}
+	local v18 = p4._serverStatsData[p5].dataSet:push_back(t3)
+
+	if v18 then
+		local v19 = p4._serverStatsData[p5].dataSet:iterator()
+		local v20 = v19:next()
+
+		if max == v18.value then
+			max = min
+
+			while v20 do
+				max = max > v20.value and max or v20.value
+				v20 = v19:next()
+			end
+		end
+
+		if min == v18.value then
+			min = max
+
+			while v20 do
+				min = min < v20.value and min or v20.value
+				v20 = v19:next()
+			end
+		end
+	end
+
+	p4._serverStatsData[p5].max = max < p6 and p6 or max
+	p4._serverStatsData[p5].min = min < p6 and min or p6
+end
+function t1.isRunning(p7) -- line: 87
+	return p7._isRunning
+end
+function t1.start(p8) -- line: 91
+	-- upvalues: getClientReplicator (copy)
+	local v23 = getClientReplicator()
+
+	if v23 and not p8._statsListenerConnection then
+		p8._statsListenerConnection = v23.StatsReceived:connect(function(p9) -- line: 94
+			-- upvalues: p8 (copy)
+			if p9 then
+				p8._lastUpdateTime = os.time()
+
+				local n1 = 0
+
+				for k, v in pairs(p9) do
+					if type(v) == "number" then
+						p8:updateValue(k, v)
+						n1 += 1
+					end
+				end
+
+				p8._serverStatsDataCount = n1
+				p8._serverStatsUpdated:Fire(p8._serverStatsData)
+
+				if p8._serverStatsData["Avg Data Ping ms"] then
+					p8._serverStatsPing:Fire(p8._serverStatsData["Avg Data Ping ms"].dataSet:back().value)
+				end
+			end
+		end)
+		v23:RequestServerStats(true)
+		p8._isRunning = true
+	end
+end
+function t1.stop(p10) -- line: 117
+	if p10._statsListenerConnection then
+		p10._statsListenerConnection:Disconnect()
+		p10._statsListenerConnection = nil
+	end
+
+	p10._isRunning = false
+end
+
+return t1

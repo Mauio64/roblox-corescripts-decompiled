@@ -1,275 +1,319 @@
-local l_Parent_0 = script:FindFirstAncestor("VrCommon").Parent;
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Players_0 = game:GetService("Players");
-local l_VRService_0 = game:GetService("VRService");
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local v5 = {};
-v5.__index = v5;
-local l_Create_0 = require(l_Parent_0.AppCommonLib).Create;
-local v7 = require(script.Parent.FIntSafetyBubbleRadius);
-local v8 = require(script.Parent.FIntSafetyBubbleTransparencyPercent) * 0.01;
-v5.new = function() --[[ Line: 26 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy), l_UserGameSettings_0 (copy), l_Create_0 (copy), l_RbxAnalyticsService_0 (copy)
-    local v9 = setmetatable({}, v5);
-    v9.subjects = {};
-    v9.mode = l_UserGameSettings_0.VRSafetyBubbleMode;
-    v9.enabled = v9.mode ~= Enum.VRSafetyBubbleMode.Anyone;
-    v9.updateCadence = 0.2;
-    v9.Toggled = l_Create_0("BindableEvent")({
-        Name = "SafetyBubbleToggled"
-    });
-    l_UserGameSettings_0:GetPropertyChangedSignal("VRSafetyBubbleMode"):Connect(function() --[[ Line: 39 ]]
-        -- upvalues: v9 (copy), l_UserGameSettings_0 (ref), l_RbxAnalyticsService_0 (ref)
-        v9.mode = l_UserGameSettings_0.VRSafetyBubbleMode;
-        local v10 = v9.mode ~= Enum.VRSafetyBubbleMode.Anyone;
-        if v9.enabled ~= v10 then
-            v9.enabled = v10;
-            v9.Toggled:Fire();
-            local v11 = v10 and "On" or "Off";
-            l_RbxAnalyticsService_0:ReportCounter("VR-SafetyBubble-" .. v11);
-        end;
-    end);
-    return v9;
-end;
-v5.ToggleEnabled = function(v12) --[[ Line: 54 ]] --[[ Name: ToggleEnabled ]]
-    -- upvalues: l_UserGameSettings_0 (copy)
-    l_UserGameSettings_0.VRSafetyBubbleMode = v12.enabled and Enum.VRSafetyBubbleMode.Anyone or Enum.VRSafetyBubbleMode.NoOne;
-end;
-v5.HasToolAncestor = function(v13, v14) --[[ Line: 59 ]] --[[ Name: HasToolAncestor ]]
-    if v14 == nil or v14.Parent == nil then
-        return false;
-    else
-        return v14.Parent:IsA("Tool") or v13:HasToolAncestor(v14.Parent);
-    end;
-end;
-v5.IsValidPartToModify = function(v15, v16) --[[ Line: 66 ]] --[[ Name: IsValidPartToModify ]]
-    if v16:IsA("BasePart") or v16:IsA("Decal") then
-        return not v15:HasToolAncestor(v16);
-    else
-        return false;
-    end;
-end;
-v5.CachePartsRecursive = function(v17, v18, v19) --[[ Line: 73 ]] --[[ Name: CachePartsRecursive ]]
-    if v18 then
-        if v17:IsValidPartToModify(v18) then
-            v17.subjects[v19].cachedParts[v18] = true;
-            v17.subjects[v19].transparencyDirty = true;
-        end;
-        for _, v21 in pairs(v18:GetChildren()) do
-            v17:CachePartsRecursive(v21, v19);
-        end;
-    end;
-end;
-v5.TeardownTransparency = function(v22, v23) --[[ Line: 85 ]] --[[ Name: TeardownTransparency ]]
-    for v24, _ in pairs(v22.subjects[v23].cachedParts) do
-        v24.LocalTransparencyModifier = 0;
-    end;
-    v22.subjects[v23].cachedParts = {};
-    v22.subjects[v23].transparencyDirty = true;
-    v22.subjects[v23].lastTransparency = nil;
-    if v22.subjects[v23].descendantAddedConn then
-        v22.subjects[v23].descendantAddedConn:disconnect();
-        v22.subjects[v23].descendantAddedConn = nil;
-    end;
-    if v22.subjects[v23].descendantRemovingConn then
-        v22.subjects[v23].descendantRemovingConn:disconnect();
-        v22.subjects[v23].descendantRemovingConn = nil;
-    end;
-    for v26, v27 in pairs(v22.subjects[v23].toolDescendantAddedConns) do
-        v27:Disconnect();
-        v22.subjects[v23].toolDescendantAddedConns[v26] = nil;
-    end;
-    for v28, v29 in pairs(v22.subjects[v23].toolDescendantRemovingConns) do
-        v29:Disconnect();
-        v22.subjects[v23].toolDescendantRemovingConns[v28] = nil;
-    end;
-end;
-v5.GetSubjectIndex = function(v30, v31) --[[ Line: 111 ]] --[[ Name: GetSubjectIndex ]]
-    local v32 = #v30.subjects;
-    local v33 = 1;
-    while true do
-        if v33 <= v32 then
-            if v30.subjects[v33].character == v31 then
-                return v33;
-            else
-                v33 = v33 + 1;
-            end;
-        else
-            return 0;
-        end;
-    end;
-end;
-v5.SubjectExists = function(v34, v35) --[[ Line: 125 ]] --[[ Name: SubjectExists ]]
-    return v34:GetSubjectIndex(v35) > 0;
-end;
-v5.SetupTransparency = function(v36, v37) --[[ Line: 131 ]] --[[ Name: SetupTransparency ]]
-    local l_v36_SubjectIndex_0 = v36:GetSubjectIndex(v37);
-    if l_v36_SubjectIndex_0 == 0 then
-        return;
-    else
-        if v36.subjects[l_v36_SubjectIndex_0].descendantAddedConn then
-            v36.subjects[l_v36_SubjectIndex_0].descendantAddedConn:disconnect();
-        end;
-        v36.subjects[l_v36_SubjectIndex_0].descendantAddedConn = v37.DescendantAdded:Connect(function(v39) --[[ Line: 140 ]]
-            -- upvalues: l_v36_SubjectIndex_0 (ref), v36 (copy), v37 (copy)
-            l_v36_SubjectIndex_0 = v36:GetSubjectIndex(v37);
-            if l_v36_SubjectIndex_0 == 0 then
-                return;
-            else
-                if v36:IsValidPartToModify(v39) then
-                    v36.subjects[l_v36_SubjectIndex_0].cachedParts[v39] = true;
-                    v36.subjects[l_v36_SubjectIndex_0].transparencyDirty = true;
-                end;
-                return;
-            end;
-        end);
-        if v36.descendantRemovingConn then
-            v36.descendantRemovingConn:disconnect();
-        end;
-        v36.descendantRemovingConn = v37.DescendantRemoving:connect(function(v40) --[[ Line: 156 ]]
-            -- upvalues: l_v36_SubjectIndex_0 (ref), v36 (copy), v37 (copy)
-            l_v36_SubjectIndex_0 = v36:GetSubjectIndex(v37);
-            if l_v36_SubjectIndex_0 == 0 then
-                return;
-            else
-                if v36.subjects[l_v36_SubjectIndex_0] and v36.subjects[l_v36_SubjectIndex_0].cachedParts[v40] then
-                    v36.subjects[l_v36_SubjectIndex_0].cachedParts[v40] = nil;
-                    v40.LocalTransparencyModifier = 0;
-                end;
-                return;
-            end;
-        end);
-        v36:CachePartsRecursive(v37, l_v36_SubjectIndex_0);
-        return;
-    end;
-end;
-v5.AddSubject = function(v41, v42) --[[ Line: 172 ]] --[[ Name: AddSubject ]]
-    local v43 = #v41.subjects;
-    local v44 = 1;
-    while true do
-        if v44 <= v43 then
-            if v41.subjects[v44].character == v42 then
-                return;
-            else
-                v44 = v44 + 1;
-            end;
-        else
-            local v45 = {
-                transparencyDirty = false, 
-                lastTransparency = nil, 
-                descendantAddedConn = nil, 
-                descendantRemovingConn = nil, 
-                toolDescendantAddedConns = {}, 
-                toolDescendantRemovingConns = {}, 
-                cachedParts = {}, 
-                character = nil
-            };
-            table.insert(v41.subjects, v45);
-            v41.subjects[v44].character = v42;
-            v41:SetupTransparency(v42);
-            return;
-        end;
-    end;
-end;
-v5.update = function(v46, v47) --[[ Line: 202 ]] --[[ Name: update ]]
-    -- upvalues: v7 (copy), l_VRService_0 (copy), l_Players_0 (copy), v8 (copy)
-    local l_CurrentCamera_0 = workspace.CurrentCamera;
-    if not l_CurrentCamera_0 then
-        return;
-    elseif not v46.enabled then
-        if v46.subjects and #v46.subjects > 0 then
-            for v49 = 1, #v46.subjects do
-                v46:TeardownTransparency(v49);
-            end;
-            v46.subjects = {};
-        end;
-        return;
-    else
-        local v50 = math.max(v7 * l_CurrentCamera_0.HeadScale, 0.1);
-        local v51 = nil;
-        local v52 = v50 + 3;
-        local l_l_VRService_0_UserCFrame_0 = l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head);
-        local v54 = l_CurrentCamera_0.CFrame * l_l_VRService_0_UserCFrame_0;
-        v46.updateCadence = v46.updateCadence - v47;
-        if v46.updateCadence <= 0 then
-            v46.updateCadence = 0.2;
-            for _, v56 in pairs(l_Players_0:GetPlayers()) do
-                if v56.Character and v56 ~= l_Players_0.LocalPlayer then
-                    if v46.mode == Enum.VRSafetyBubbleMode.OnlyFriends and if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_Players_0.LocalPlayer:IsFriendsWithAsync(v56.UserId) else l_Players_0.LocalPlayer:IsFriendsWith(v56.UserId) then
-                        local l_v46_SubjectIndex_0 = v46:GetSubjectIndex(v56.Character);
-                        if l_v46_SubjectIndex_0 > 0 then
-                            v46:TeardownTransparency(l_v46_SubjectIndex_0);
-                            table.remove(v46.subjects, l_v46_SubjectIndex_0);
-                        end;
-                    elseif not v46:SubjectExists(v56.Character) and v56.Character then
-                        local l_BoundingBox_0, v59 = v56.Character:GetBoundingBox();
-                        local v60 = (l_BoundingBox_0.Position - v54.Position).Magnitude - v59.Z;
-                        if v60 < v52 then
-                            v52 = v60;
-                            v51 = v56.Character;
-                        end;
-                    end;
-                end;
-            end;
-            if v51 then
-                v46:AddSubject(v51);
-            end;
-        end;
-        if not v46.subjects or #v46.subjects == 0 then
-            return;
-        else
-            local v61 = #v46.subjects;
-            while v61 > 0 do
-                local l_BoundingBox_1, v63 = v46.subjects[v61].character:GetBoundingBox();
-                if (l_BoundingBox_1.Position - v54.Position).Magnitude - v63.Z > v50 * 2 then
-                    v46:TeardownTransparency(v61);
-                    table.remove(v46.subjects, v61);
-                end;
-                v61 = v61 - 1;
-            end;
-            local v64 = #v46.subjects;
-            v61 = 1;
-            while v61 <= v64 do
-                local v65 = 0;
-                local l_character_0 = v46.subjects[v61].character;
-                local v67 = 0;
-                if l_character_0.PrimaryPart then
-                    v67 = (Vector3.new(l_character_0:GetPrimaryPartCFrame().p.x, v54.Position.Y, l_character_0:GetPrimaryPartCFrame().p.z) - v54.Position).Magnitude;
-                else
-                    local l_l_character_0_BoundingBox_0, v69 = l_character_0:GetBoundingBox();
-                    v67 = (l_l_character_0_BoundingBox_0.Position - v54.Position).Magnitude - v69.Z;
-                end;
-                if v67 < v50 then
-                    if v64 > 3 then
-                        v65 = 1;
-                    else
-                        local v70 = v50 * 0.75;
-                        v65 = if v67 < v70 then v8 else (1 - (v67 - v70) / (v50 - v70)) * v8;
-                    end;
-                end;
-                if not v46.subjects[v61].lastTransparency then
-                    v46.subjects[v61].transparencyDirty = true;
-                end;
-                v65 = math.clamp(v65, 0, 1);
-                if v46.subjects[v61].transparencyDirty or v46.subjects[v61].lastTransparency ~= v65 then
-                    for v71, _ in pairs(v46.subjects[v61].cachedParts) do
-                        v71.LocalTransparencyModifier = v65;
-                    end;
-                    v46.subjects[v61].transparencyDirty = false;
-                    v46.subjects[v61].lastTransparency = v65;
-                end;
-                local l_Tool_0 = l_character_0:FindFirstChildOfClass("Tool");
-                if l_Tool_0 then
-                    for _, v75 in pairs(l_Tool_0:GetChildren()) do
-                        if v75:IsA("BasePart") then
-                            v75.LocalTransparencyModifier = v65;
-                        end;
-                    end;
-                end;
-                v61 = v61 + 1;
-            end;
-            return;
-        end;
-    end;
-end;
-return v5;
+local Parent = script:FindFirstAncestor("VrCommon").Parent
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Players = game:GetService("Players")
+local VRService = game:GetService("VRService")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local t1 = {}
+
+t1.__index = t1
+
+local Create = require(Parent.AppCommonLib).Create
+local FIntSafetyBubbleRadius = require(script.Parent.FIntSafetyBubbleRadius)
+local v9 = require(script.Parent.FIntSafetyBubbleTransparencyPercent) * 0.01
+
+function t1.new() -- line: 26
+	-- upvalues: t1 (copy), UserGameSettings (copy), Create (copy), RbxAnalyticsService (copy)
+	local self = setmetatable({}, t1)
+
+	self.subjects = {}
+	self.mode = UserGameSettings.VRSafetyBubbleMode
+	self.enabled = self.mode ~= Enum.VRSafetyBubbleMode.Anyone
+	self.updateCadence = 0.2
+	self.Toggled = Create("BindableEvent")({
+		Name = "SafetyBubbleToggled"
+	})
+	UserGameSettings:GetPropertyChangedSignal("VRSafetyBubbleMode"):Connect(function() -- line: 39
+		-- upvalues: self (copy), UserGameSettings (copy), RbxAnalyticsService (copy)
+		self.mode = UserGameSettings.VRSafetyBubbleMode
+
+		local v75 = self.mode ~= Enum.VRSafetyBubbleMode.Anyone
+
+		if v75 ~= self.enabled then
+			self.enabled = v75
+			self.Toggled:Fire()
+
+			local v76 = not v75 and "Off" or "On"
+
+			RbxAnalyticsService:ReportCounter("VR-SafetyBubble-" .. v76)
+		end
+	end)
+
+	return self
+end
+function t1.ToggleEnabled(p1) -- line: 54
+	-- upvalues: UserGameSettings (copy)
+	UserGameSettings.VRSafetyBubbleMode = p1.enabled and Enum.VRSafetyBubbleMode.Anyone or Enum.VRSafetyBubbleMode.NoOne
+end
+function t1.HasToolAncestor(p2, p3) -- line: 59
+	if p3 == nil or p3.Parent == nil then
+		return false
+	end
+
+	return p3.Parent:IsA("Tool") or p2:HasToolAncestor(p3.Parent)
+end
+function t1.IsValidPartToModify(t2: {[any]: any}, p4) -- line: 66
+	if p4:IsA("BasePart") or p4:IsA("Decal") then
+		return not t2:HasToolAncestor(p4)
+	end
+
+	return false
+end
+function t1.CachePartsRecursive(p5, p6, p7) -- line: 73
+	if p6 then
+		if p5:IsValidPartToModify(p6) then
+			p5.subjects[p7].cachedParts[p6] = true
+			p5.subjects[p7].transparencyDirty = true
+		end
+
+		for _, child in pairs(p6:GetChildren()) do
+			p5:CachePartsRecursive(child, p7)
+		end
+	end
+end
+function t1.TeardownTransparency(p8, p9) -- line: 85
+	for k, _ in pairs(p8.subjects[p9].cachedParts) do
+		k.LocalTransparencyModifier = 0
+	end
+
+	p8.subjects[p9].cachedParts = {}
+	p8.subjects[p9].transparencyDirty = true
+	p8.subjects[p9].lastTransparency = nil
+
+	if p8.subjects[p9].descendantAddedConn then
+		p8.subjects[p9].descendantAddedConn:disconnect()
+		p8.subjects[p9].descendantAddedConn = nil
+	end
+
+	if p8.subjects[p9].descendantRemovingConn then
+		p8.subjects[p9].descendantRemovingConn:disconnect()
+		p8.subjects[p9].descendantRemovingConn = nil
+	end
+
+	for k, v in pairs(p8.subjects[p9].toolDescendantAddedConns) do
+		v:Disconnect()
+		p8.subjects[p9].toolDescendantAddedConns[k] = nil
+	end
+
+	for k, v in pairs(p8.subjects[p9].toolDescendantRemovingConns) do
+		v:Disconnect()
+		p8.subjects[p9].toolDescendantRemovingConns[k] = nil
+	end
+end
+function t1.GetSubjectIndex(p10, p11) -- line: 111
+	local v31 = #p10.subjects
+	local n1 = 1
+
+	while n1 <= v31 do
+		if p11 == p10.subjects[n1].character then
+			return n1
+		end
+
+		n1 += 1
+	end
+
+	return 0
+end
+function t1.SubjectExists(p12, p13) -- line: 125
+	return p12:GetSubjectIndex(p13) > 0
+end
+function t1.SetupTransparency(p14, p15) -- line: 131
+	local SubjectIndex = p14:GetSubjectIndex(p15)
+
+	if SubjectIndex == 0 then
+		return
+	end
+
+	if p14.subjects[SubjectIndex].descendantAddedConn then
+		p14.subjects[SubjectIndex].descendantAddedConn:disconnect()
+	end
+
+	p14.subjects[SubjectIndex].descendantAddedConn = p15.DescendantAdded:Connect(function(descendant) -- line: 140
+		-- upvalues: SubjectIndex (ref), p14 (copy), p15 (copy)
+		SubjectIndex = p14:GetSubjectIndex(p15)
+
+		if SubjectIndex == 0 then
+			return
+		end
+
+		if p14:IsValidPartToModify(descendant) then
+			p14.subjects[SubjectIndex].cachedParts[descendant] = true
+			p14.subjects[SubjectIndex].transparencyDirty = true
+		end
+	end)
+
+	if p14.descendantRemovingConn then
+		p14.descendantRemovingConn:disconnect()
+	end
+
+	p14.descendantRemovingConn = p15.DescendantRemoving:connect(function(p16) -- line: 156
+		-- upvalues: SubjectIndex (ref), p14 (copy), p15 (copy)
+		SubjectIndex = p14:GetSubjectIndex(p15)
+
+		if SubjectIndex == 0 then
+			return
+		end
+
+		if p14.subjects[SubjectIndex] and p14.subjects[SubjectIndex].cachedParts[p16] then
+			p14.subjects[SubjectIndex].cachedParts[p16] = nil
+			p16.LocalTransparencyModifier = 0
+		end
+	end)
+	p14:CachePartsRecursive(p15, SubjectIndex)
+end
+function t1.AddSubject(p17, p18) -- line: 172
+	local v40 = #p17.subjects
+	local n2 = 1
+
+	while n2 <= v40 do
+		if p18 == p17.subjects[n2].character then
+			return
+		end
+
+		n2 += 1
+	end
+
+	local t3 = {
+		transparencyDirty = false,
+		lastTransparency = nil,
+		descendantAddedConn = nil,
+		descendantRemovingConn = nil,
+		character = nil,
+		toolDescendantAddedConns = {},
+		toolDescendantRemovingConns = {},
+		cachedParts = {}
+	}
+
+	table.insert(p17.subjects, t3)
+	p17.subjects[n2].character = p18
+	p17:SetupTransparency(p18)
+end
+function t1.update(p19, p20) -- line: 202
+	-- upvalues: FIntSafetyBubbleRadius (copy), VRService (copy), Players (copy), v9 (copy)
+	local CurrentCamera = workspace.CurrentCamera
+
+	if not CurrentCamera then
+		return
+	end
+
+	if not p19.enabled then
+		if p19.subjects and #p19.subjects > 0 then
+			for i = 1, #p19.subjects do
+				p19:TeardownTransparency(i)
+			end
+
+			p19.subjects = {}
+		end
+
+		return
+	end
+
+	local v47 = math.max(FIntSafetyBubbleRadius * CurrentCamera.HeadScale, 0.1)
+	local Character = nil
+	local v49 = v47 + 3
+	local UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
+	local v51 = CurrentCamera.CFrame * UserCFrame
+
+	p19.updateCadence = p19.updateCadence - p20
+
+	if p19.updateCadence <= 0 then
+		p19.updateCadence = 0.2
+
+		for _, player in pairs(Players:GetPlayers()) do
+			if player.Character and player ~= Players.LocalPlayer then
+				if p19.mode == Enum.VRSafetyBubbleMode.OnlyFriends and if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then Players.LocalPlayer:IsFriendsWith(player.UserId) else Players.LocalPlayer:IsFriendsWithAsync(player.UserId) then
+					local SubjectIndex = p19:GetSubjectIndex(player.Character)
+
+					if SubjectIndex > 0 then
+						p19:TeardownTransparency(SubjectIndex)
+						table.remove(p19.subjects, SubjectIndex)
+					end
+				elseif not p19:SubjectExists(player.Character) and player.Character then
+					local v55, v56 = player.Character:GetBoundingBox()
+					local v57 = (v55.Position - v51.Position).Magnitude - v56.Z
+
+					if v57 < v49 then
+						v49 = v57
+						Character = player.Character
+					end
+				end
+			end
+		end
+
+		if Character then
+			p19:AddSubject(Character)
+		end
+	end
+
+	if not p19.subjects or #p19.subjects == 0 then
+		return
+	end
+
+	local v58 = #p19.subjects
+
+	while v58 > 0 do
+		local v59, v60 = p19.subjects[v58].character:GetBoundingBox()
+
+		if (v59.Position - v51.Position).Magnitude - v60.Z > v47 * 2 then
+			p19:TeardownTransparency(v58)
+			table.remove(p19.subjects, v58)
+		end
+
+		v58 -= 1
+	end
+
+	local v61 = #p19.subjects
+	local n3 = 1
+
+	while n3 <= v61 do
+		local n4 = 0
+		local character = p19.subjects[n3].character
+		local Magnitude
+
+		if character.PrimaryPart then
+			Magnitude = (Vector3.new(character:GetPrimaryPartCFrame().p.x, v51.Position.Y, character:GetPrimaryPartCFrame().p.z) - v51.Position).Magnitude
+		else
+			local v66, v67 = character:GetBoundingBox()
+
+			Magnitude = (v66.Position - v51.Position).Magnitude - v67.Z
+		end
+
+		if Magnitude < v47 then
+			if v61 > 3 then
+				n4 = 1
+			else
+				local v68 = v47 * 0.75
+
+				n4 = if not (Magnitude < v68) then (1 - (Magnitude - v68) / (v47 - v68)) * v9 else v9
+			end
+		end
+
+		if not p19.subjects[n3].lastTransparency then
+			p19.subjects[n3].transparencyDirty = true
+		end
+
+		local v69 = math.clamp(n4, 0, 1)
+
+		if p19.subjects[n3].transparencyDirty or v69 ~= p19.subjects[n3].lastTransparency then
+			for k, _ in pairs(p19.subjects[n3].cachedParts) do
+				k.LocalTransparencyModifier = v69
+			end
+
+			p19.subjects[n3].transparencyDirty = false
+			p19.subjects[n3].lastTransparency = v69
+		end
+
+		local Tool = character:FindFirstChildOfClass("Tool")
+
+		if Tool then
+			for _, child in pairs(Tool:GetChildren()) do
+				if child:IsA("BasePart") then
+					child.LocalTransparencyModifier = v69
+				end
+			end
+		end
+
+		n3 += 1
+	end
+end
+
+return t1

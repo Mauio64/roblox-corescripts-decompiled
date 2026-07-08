@@ -1,11 +1,16 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceNavigation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ArgCheck);
-local v4 = require(l_script_FirstAncestor_0.AvatarRoute.Context.AvatarRouteContext);
-local _ = require(l_script_FirstAncestor_0.AvatarRoute.Types);
-return function() --[[ Line: 16 ]] --[[ Name: useAvatarRoute ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    local v6 = v2.useContext(v4);
-    return v3.isNotNil(v6, "AvatarRouteContext");
-end;
+local AvatarExperienceNavigation = script:FindFirstAncestor("AvatarExperienceNavigation")
+local AvatarExperienceNavigationParent = AvatarExperienceNavigation.Parent
+local React = require(AvatarExperienceNavigationParent.React)
+local ArgCheck = require(AvatarExperienceNavigationParent.ArgCheck)
+local AvatarRouteContext = require(AvatarExperienceNavigation.AvatarRoute.Context.AvatarRouteContext)
+
+require(AvatarExperienceNavigation.AvatarRoute.Types)
+
+local function useAvatarRoute() -- line: 16
+	-- upvalues: React (copy), AvatarRouteContext (copy), ArgCheck (copy)
+	local v7 = React.useContext(AvatarRouteContext)
+
+	return ArgCheck.isNotNil(v7, "AvatarRouteContext")
+end
+
+return useAvatarRoute

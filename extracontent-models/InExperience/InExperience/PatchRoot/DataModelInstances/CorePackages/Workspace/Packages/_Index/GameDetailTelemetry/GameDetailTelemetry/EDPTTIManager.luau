@@ -1,56 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetailTelemetry").Parent;
-local l_TimeToInteractiveTracker_0 = require(l_Parent_0.TimeToInteractiveTracker).TimeToInteractiveTracker;
-local l_Milestone_0 = l_TimeToInteractiveTracker_0.Milestone;
-local v3 = require(script.Parent.EDPTTIConstants);
-local v4 = game:DefineFastFlag("EnableEDPTTIManagerColdWarmDetection", false);
-local l_EDP_TTI_EVENT_NAME_0 = v3.EDP_TTI_EVENT_NAME;
-local v6 = false;
-local v7 = false;
+local Parent = script:FindFirstAncestor("GameDetailTelemetry").Parent
+local TimeToInteractiveTracker = require(Parent.TimeToInteractiveTracker).TimeToInteractiveTracker
+local Milestone = TimeToInteractiveTracker.Milestone
+local EDPTTIConstants = require(script.Parent.EDPTTIConstants)
+local v5 = game:DefineFastFlag("EnableEDPTTIManagerColdWarmDetection", false)
+local EDP_TTI_EVENT_NAME = EDPTTIConstants.EDP_TTI_EVENT_NAME
+local u7 = false
+local u8 = false
+
 return {
-    startTracking = function(v8) --[[ Line: 18 ]] --[[ Name: startTracking ]]
-        -- upvalues: v6 (ref), v7 (ref), l_TimeToInteractiveTracker_0 (copy), l_EDP_TTI_EVENT_NAME_0 (copy), v4 (copy)
-        v6 = false;
-        v7 = false;
-        local v9 = l_TimeToInteractiveTracker_0.getEvents(false)[l_EDP_TTI_EVENT_NAME_0];
-        if not v9 or not v9.startTime then
-            l_TimeToInteractiveTracker_0.trackStart(l_EDP_TTI_EVENT_NAME_0, v4 and true or nil);
-            l_TimeToInteractiveTracker_0.updateMetadata(l_EDP_TTI_EVENT_NAME_0, {
-                entryPath = v8
-            });
-        end;
-    end, 
-    setImplementation = function(v10) --[[ Line: 35 ]] --[[ Name: setImplementation ]]
-        -- upvalues: l_TimeToInteractiveTracker_0 (copy), l_EDP_TTI_EVENT_NAME_0 (copy)
-        l_TimeToInteractiveTracker_0.updateMetadata(l_EDP_TTI_EVENT_NAME_0, {
-            implementation = v10
-        });
-    end, 
-    trackFunctionallyReady = function() --[[ Line: 41 ]] --[[ Name: trackFunctionallyReady ]]
-        -- upvalues: v6 (ref), l_TimeToInteractiveTracker_0 (copy), l_EDP_TTI_EVENT_NAME_0 (copy), l_Milestone_0 (copy)
-        if v6 then
-            return;
-        else
-            v6 = true;
-            if l_TimeToInteractiveTracker_0.trackMilestone then
-                l_TimeToInteractiveTracker_0.trackMilestone(l_EDP_TTI_EVENT_NAME_0, l_Milestone_0.FunctionallyReady);
-            end;
-            return;
-        end;
-    end, 
-    trackSurfaceReady = function(v11) --[[ Line: 52 ]] --[[ Name: trackSurfaceReady ]]
-        -- upvalues: v7 (ref), l_TimeToInteractiveTracker_0 (copy), l_EDP_TTI_EVENT_NAME_0 (copy), l_Milestone_0 (copy)
-        if v7 then
-            return;
-        else
-            v7 = true;
-            if v11 then
-                l_TimeToInteractiveTracker_0.updateMetadata(l_EDP_TTI_EVENT_NAME_0, v11);
-            end;
-            if l_TimeToInteractiveTracker_0.trackMilestone then
-                l_TimeToInteractiveTracker_0.trackMilestone(l_EDP_TTI_EVENT_NAME_0, l_Milestone_0.SurfaceReady);
-            end;
-            l_TimeToInteractiveTracker_0.trackEnd(l_EDP_TTI_EVENT_NAME_0);
-            return;
-        end;
-    end
-};
+	startTracking = function(s1: string) -- line: 18
+		-- upvalues: u7 (ref), u8 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), v5 (copy)
+		u7 = false
+		u8 = false
+
+		local v10 = TimeToInteractiveTracker.getEvents(false)[EDP_TTI_EVENT_NAME]
+
+		if not v10 or not v10.startTime then
+			TimeToInteractiveTracker.trackStart(EDP_TTI_EVENT_NAME, not not v5 or nil)
+			TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, {
+				page = s1
+			})
+		end
+	end,
+	setImplementation = function(s2: string) -- line: 35
+		-- upvalues: TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy)
+		TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, {
+			category = s2
+		})
+	end,
+	trackFunctionallyReady = function() -- line: 41
+		-- upvalues: u7 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), Milestone (copy)
+		if u7 then
+			return
+		end
+
+		u7 = true
+
+		if TimeToInteractiveTracker.trackMilestone then
+			TimeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.FunctionallyReady)
+		end
+	end,
+	trackSurfaceReady = function(t1: {[any]: any}?) -- line: 52
+		-- upvalues: u8 (ref), TimeToInteractiveTracker (copy), EDP_TTI_EVENT_NAME (copy), Milestone (copy)
+		if u8 then
+			return
+		end
+
+		u8 = true
+
+		if t1 then
+			TimeToInteractiveTracker.updateMetadata(EDP_TTI_EVENT_NAME, t1)
+		end
+
+		if TimeToInteractiveTracker.trackMilestone then
+			TimeToInteractiveTracker.trackMilestone(EDP_TTI_EVENT_NAME, Milestone.SurfaceReady)
+		end
+
+		TimeToInteractiveTracker.trackEnd(EDP_TTI_EVENT_NAME)
+	end
+}

@@ -1,16 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local v1 = require(l_script_FirstAncestor_0.DispatchBindableEvent);
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local DispatchBindableEvent = require(ExpChat.DispatchBindableEvent)
+
 return {
-    queue = {}, 
-    add = function(v2, v3) --[[ Line: 8 ]] --[[ Name: add ]]
-        v2.queue[#v2.queue + 1] = v3;
-    end, 
-    flush = function(v4) --[[ Line: 12 ]] --[[ Name: flush ]]
-        -- upvalues: v1 (copy)
-        if #v4.queue then
-            for _, v6 in pairs(v4.queue) do
-                v1:Fire(v6);
-            end;
-        end;
-    end
-};
+	queue = {},
+	add = function(p1, p2) -- line: 8
+		p1.queue[#p1.queue + 1] = p2
+	end,
+	flush = function(p3) -- line: 12
+		-- upvalues: DispatchBindableEvent (copy)
+		if #p3.queue then
+			for _, v in pairs(p3.queue) do
+				DispatchBindableEvent:Fire(v)
+			end
+		end
+	end
+}

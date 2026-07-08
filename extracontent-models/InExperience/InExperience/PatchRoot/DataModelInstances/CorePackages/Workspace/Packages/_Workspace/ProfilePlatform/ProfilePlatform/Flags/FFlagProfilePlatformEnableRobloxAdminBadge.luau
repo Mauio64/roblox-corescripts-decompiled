@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableRobloxAdminBadge", false);
+return game:DefineFastFlag("ProfilePlatformEnableRobloxAdminBadge", false)

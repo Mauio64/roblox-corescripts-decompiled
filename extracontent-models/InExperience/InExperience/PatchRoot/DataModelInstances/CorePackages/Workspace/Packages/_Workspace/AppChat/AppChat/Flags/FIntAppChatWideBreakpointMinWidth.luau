@@ -1,1 +1,1 @@
-return game:DefineFastInt("AppChatWideBreakpointMinWidth", 800);
+return game:DefineFastInt("AppChatWideBreakpointMinWidth", 800)

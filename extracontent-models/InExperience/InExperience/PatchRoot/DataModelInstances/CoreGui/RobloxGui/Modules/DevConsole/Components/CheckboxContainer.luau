@@ -1,127 +1,141 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TextService_0 = game:GetService("TextService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Components;
-local v4 = require(l_Components_0.LabeledCheckbox);
-local v5 = require(l_Components_0.CheckboxDropdown);
-local v6 = require(script.Parent.Parent.Constants);
-local l_CheckboxHeight_0 = v6.UtilityBarFormatting.CheckboxHeight;
-local v8 = v6.UtilityBarFormatting.CheckboxInnerPadding * 2;
-local l_FilterUnfilled_0 = v6.Image.FilterUnfilled;
-local l_FilterFilled_0 = v6.Image.FilterFilled;
-local v11 = v2.PureComponent:extend("CheckboxContainer");
-v11.init = function(v12) --[[ Line: 20 ]] --[[ Name: init ]]
-    -- upvalues: l_TextService_0 (copy), v6 (copy), l_CheckboxHeight_0 (copy), v8 (copy), v2 (copy)
-    v12.onCheckboxClicked = function(v13, v14) --[[ Line: 21 ]]
-        -- upvalues: v12 (copy)
-        v12.props.onCheckboxChanged(v13, v14);
-    end;
-    v12.onCheckboxExpanded = function(_, v16) --[[ Line: 27 ]]
-        -- upvalues: v12 (copy)
-        if v16.UserInputType == Enum.UserInputType.MouseButton1 or v16.UserInputType == Enum.UserInputType.Touch and v16.UserInputState == Enum.UserInputState.End then
-            v12:setState({
-                expanded = true
-            });
-        end;
-    end;
-    v12.onCloseCheckbox = function(_, v18) --[[ Line: 39 ]]
-        -- upvalues: v12 (copy)
-        if v18.UserInputType == Enum.UserInputType.MouseButton1 or v18.UserInputType == Enum.UserInputType.Touch and v18.UserInputState == Enum.UserInputState.End then
-            v12:setState({
-                expanded = false
-            });
-        end;
-    end;
-    if not v12.props.orderedCheckboxState then
-        warn("CheckboxContainer must be passed a list of Box Names or else it only creates an empty frame");
-    end;
-    local v19 = {};
-    local v20 = 0;
-    local v21 = 0;
-    for v22, v23 in ipairs(v12.props.orderedCheckboxState) do
-        local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v23.name, v6.DefaultFontSize.UtilBar, v6.Font.UtilBar, Vector2.new(0, 0));
-        v19[v22] = l_l_TextService_0_TextSize_0.X;
-        v20 = v20 + l_l_TextService_0_TextSize_0.X + l_CheckboxHeight_0 + v8;
-        v21 = v21 + 1;
-    end;
-    v12.ref = v2.createRef();
-    v12.state = {
-        expanded = false, 
-        textWidths = v19, 
-        numCheckboxes = v21, 
-        minFullLength = v20
-    };
-end;
-v11.render = function(v25) --[[ Line: 79 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v4 (copy), v6 (copy), l_CheckboxHeight_0 (copy), l_FilterFilled_0 (copy), l_FilterUnfilled_0 (copy), v5 (copy)
-    local v26 = {};
-    local l_frameWidth_0 = v25.props.frameWidth;
-    local l_frameHeight_0 = v25.props.frameHeight;
-    local l_pos_0 = v25.props.pos;
-    local l_layoutOrder_0 = v25.props.layoutOrder;
-    local l_orderedCheckboxState_0 = v25.props.orderedCheckboxState;
-    local l_minFullLength_0 = v25.state.minFullLength;
-    local l_expanded_0 = v25.state.expanded;
-    local l_numCheckboxes_0 = v25.state.numCheckboxes;
-    local v35 = false;
-    for v36, v37 in ipairs(l_orderedCheckboxState_0) do
-        v26[v37.name] = v2.createElement(v4, {
-            name = v37.name, 
-            font = v6.Font.UtilBar, 
-            fontSize = v6.DefaultFontSize.UtilBar, 
-            checkboxHeight = l_CheckboxHeight_0, 
-            frameHeight = l_frameHeight_0, 
-            layoutOrder = v36, 
-            isSelected = v37.state, 
-            selectedColor = v6.Color.SelectedBlue, 
-            unselectedColor = v6.Color.UnselectedGray, 
-            onCheckboxClicked = v25.onCheckboxClicked
-        });
-        v35 = v35 or v37.state;
-    end;
-    if l_frameWidth_0 < l_minFullLength_0 then
-        v26.CheckboxLayout = v2.createElement("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            FillDirection = Enum.FillDirection.Vertical
-        });
-        local v38 = v25.ref.current and l_expanded_0;
-        local v39 = nil;
-        if v38 then
-            local l_AbsolutePosition_0 = v25.ref.current.AbsolutePosition;
-            v39 = UDim2.new(0, l_AbsolutePosition_0.X, 0, l_AbsolutePosition_0.Y + l_frameHeight_0 + 3);
-        end;
-        return v2.createElement("ImageButton", {
-            Size = UDim2.new(0, l_frameHeight_0, 0, l_frameHeight_0), 
-            LayoutOrder = l_layoutOrder_0, 
-            Image = v38 and l_FilterFilled_0 or l_FilterUnfilled_0, 
-            BackgroundTransparency = 1, 
-            BorderColor3 = v6.Color.Text, 
-            [v2.Event.InputEnded] = v25.onCheckboxExpanded, 
-            [v2.Ref] = v25.ref
-        }, {
-            DropDown = v38 and v2.createElement(v5, {
-                absolutePosition = v39, 
-                frameWidth = l_frameWidth_0, 
-                elementHeight = l_frameHeight_0, 
-                numElements = l_numCheckboxes_0, 
-                onCloseCheckbox = v25.onCloseCheckbox
-            }, v26)
-        });
-    else
-        v26.CheckboxLayout = v2.createElement("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            FillDirection = Enum.FillDirection.Horizontal
-        });
-        return v2.createElement("Frame", {
-            Size = UDim2.new(0, l_frameWidth_0, 0, l_frameHeight_0), 
-            Position = l_pos_0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0
-        }, v26);
-    end;
-end;
-return v11;
+local CorePackages = game:GetService("CorePackages")
+local TextService = game:GetService("TextService")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Components
+local LabeledCheckbox = require(Components.LabeledCheckbox)
+local CheckboxDropdown = require(Components.CheckboxDropdown)
+local Constants = require(script.Parent.Parent.Constants)
+local CheckboxHeight = Constants.UtilityBarFormatting.CheckboxHeight
+local v9 = Constants.UtilityBarFormatting.CheckboxInnerPadding * 2
+local FilterUnfilled = Constants.Image.FilterUnfilled
+local FilterFilled = Constants.Image.FilterFilled
+local v12 = Roact.PureComponent:extend("CheckboxContainer")
+
+function v12.init(p1) -- line: 20
+	-- upvalues: TextService (copy), Constants (copy), CheckboxHeight (copy), v9 (copy), Roact (copy)
+	function p1.onCheckboxClicked(p2, p3) -- line: 21
+		-- upvalues: p1 (copy)
+		p1.props.onCheckboxChanged(p2, p3)
+	end
+	function p1.onCheckboxExpanded(_, p5) -- line: 27
+		-- upvalues: p1 (copy)
+		if p5.UserInputType == Enum.UserInputType.MouseButton1 or p5.UserInputType == Enum.UserInputType.Touch and p5.UserInputState == Enum.UserInputState.End then
+			p1:setState({
+				expanded = true
+			})
+		end
+	end
+	function p1.onCloseCheckbox(_, p7) -- line: 39
+		-- upvalues: p1 (copy)
+		if p7.UserInputType == Enum.UserInputType.MouseButton1 or p7.UserInputType == Enum.UserInputType.Touch and p7.UserInputState == Enum.UserInputState.End then
+			p1:setState({
+				expanded = false
+			})
+		end
+	end
+
+	if not p1.props.orderedCheckboxState then
+		warn("CheckboxContainer must be passed a list of Box Names or else it only creates an empty frame")
+	end
+
+	local t1 = {}
+	local n1 = 0
+	local n2 = 0
+
+	for i, v in ipairs(p1.props.orderedCheckboxState) do
+		local TextSize = TextService:GetTextSize(v.name, Constants.DefaultFontSize.UtilBar, Constants.Font.UtilBar, Vector2.new(0, 0))
+
+		t1[i] = TextSize.X
+		n1 = n1 + TextSize.X + CheckboxHeight + v9
+		n2 += 1
+	end
+
+	p1.ref = Roact.createRef()
+	p1.state = {
+		expanded = false,
+		textWidths = t1,
+		numCheckboxes = n2,
+		minFullLength = n1
+	}
+end
+function v12.render(p8) -- line: 79
+	-- upvalues: Roact (copy), LabeledCheckbox (copy), Constants (copy), CheckboxHeight (copy), FilterFilled (copy), FilterUnfilled (copy), CheckboxDropdown (copy)
+	local t2 = {}
+	local frameWidth = p8.props.frameWidth
+	local frameHeight = p8.props.frameHeight
+	local pos = p8.props.pos
+	local layoutOrder = p8.props.layoutOrder
+	local orderedCheckboxState = p8.props.orderedCheckboxState
+	local minFullLength = p8.state.minFullLength
+	local expanded = p8.state.expanded
+	local numCheckboxes = p8.state.numCheckboxes
+	local v30 = false
+
+	for i, v in ipairs(orderedCheckboxState) do
+		t2[v.name] = Roact.createElement(LabeledCheckbox, {
+			name = v.name,
+			font = Constants.Font.UtilBar,
+			fontSize = Constants.DefaultFontSize.UtilBar,
+			checkboxHeight = CheckboxHeight,
+			frameHeight = frameHeight,
+			layoutOrder = i,
+			isSelected = v.state,
+			selectedColor = Constants.Color.SelectedBlue,
+			unselectedColor = Constants.Color.UnselectedGray,
+			onCheckboxClicked = p8.onCheckboxClicked
+		})
+		v30 = v30 or v.state
+	end
+
+	if frameWidth < minFullLength then
+		t2.CheckboxLayout = Roact.createElement("UIListLayout", {
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			FillDirection = Enum.FillDirection.Vertical
+		})
+
+		local v33 = p8.ref.current and expanded
+		local uDim2 = nil
+
+		if v33 then
+			local AbsolutePosition = p8.ref.current.AbsolutePosition
+
+			uDim2 = UDim2.new(0, AbsolutePosition.X, 0, AbsolutePosition.Y + frameHeight + 3)
+		end
+
+		return Roact.createElement("ImageButton", {
+			Size = UDim2.new(0, frameHeight, 0, frameHeight),
+			LayoutOrder = layoutOrder,
+			Image = v33 and FilterFilled or FilterUnfilled,
+			BackgroundTransparency = 1,
+			BorderColor3 = Constants.Color.Text,
+			[Roact.Event.InputEnded] = p8.onCheckboxExpanded,
+			[Roact.Ref] = p8.ref
+		}, {
+			DropDown = v33 and Roact.createElement(CheckboxDropdown, {
+				absolutePosition = uDim2,
+				frameWidth = frameWidth,
+				elementHeight = frameHeight,
+				numElements = numCheckboxes,
+				onCloseCheckbox = p8.onCloseCheckbox
+			}, t2)
+		})
+	end
+
+	t2.CheckboxLayout = Roact.createElement("UIListLayout", {
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		FillDirection = Enum.FillDirection.Horizontal
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, frameWidth, 0, frameHeight),
+		Position = pos,
+		LayoutOrder = layoutOrder
+	}, t2)
+end
+
+return v12

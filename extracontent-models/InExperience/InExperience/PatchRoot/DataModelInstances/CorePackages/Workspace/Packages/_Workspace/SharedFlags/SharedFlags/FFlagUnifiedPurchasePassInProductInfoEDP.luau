@@ -1,2 +1,3 @@
-local v0 = require(script.Parent.FFlagAddFetchProductInfoAsACallback);
-return game:DefineFastFlag("UnifiedPurchasePassInProductInfoEDP", false) and v0;
+local FFlagAddFetchProductInfoAsACallback = require(script.Parent.FFlagAddFetchProductInfoAsACallback)
+
+return game:DefineFastFlag("UnifiedPurchasePassInProductInfoEDP2", false) and FFlagAddFetchProductInfoAsACallback

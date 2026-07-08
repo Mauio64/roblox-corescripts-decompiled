@@ -1,3 +1,3 @@
 return {
-    LaunchContext = require(script.LaunchContext)
-};
+	LaunchContext = require(script.LaunchContext)
+}

@@ -1,4 +1,4 @@
 return {
-    Newest = "Newest", 
-    RecentlyWorn = "RecentlyWorn"
-};
+	Newest = "Newest",
+	RecentlyWorn = "RecentlyWorn"
+}

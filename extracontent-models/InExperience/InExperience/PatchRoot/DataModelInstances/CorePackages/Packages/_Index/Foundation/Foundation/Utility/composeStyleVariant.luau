@@ -1,58 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local function _(v4) --[[ Line: 11 ]] --[[ Name: tagToTable ]]
-    if type(v4) == "string" then
-        return {
-            [v4] = true
-        };
-    else
-        return v4;
-    end;
-end;
-local function v10(v6, v7) --[[ Line: 20 ]] --[[ Name: mergeTags ]]
-    -- upvalues: v2 (copy)
-    if not v6 then
-        return v7;
-    elseif not v7 then
-        return v6;
-    elseif type(v6) == "table" or type(v7) == "table" then
-        local v8 = if type(v6) == "string" then {
-            [v6] = true
-        } else v6;
-        local v9 = if type(v7) == "string" then {
-            [v7] = true
-        } else v7;
-        return v2.join(v8, v9);
-    else
-        return (("%* %*"):format(v6, v7));
-    end;
-end;
-local function _(v11, v12) --[[ Line: 40 ]] --[[ Name: mergeProps ]]
-    -- upvalues: v2 (copy), v10 (copy)
-    local v13 = v2.join(v11, v12);
-    v13.tag = v10(v11.tag, v12.tag);
-    return v13;
-end;
-composeStyleVariant = function(v15, ...) --[[ Line: 48 ]] --[[ Name: composeStyleVariant ]]
-    -- upvalues: v2 (copy), v10 (copy)
-    local v16 = v2.copy(v15);
-    v2.forEachArgs(function(v17) --[[ Line: 50 ]]
-        -- upvalues: v16 (copy), v2 (ref), v10 (ref)
-        if v17 == nil then
-            return;
-        else
-            for v18, v19 in v17 do
-                local l_v16_0 = v16;
-                local v21 = v16[v18] or {};
-                local v22 = v2.join(v21, v19);
-                v22.tag = v10(v21.tag, v19.tag);
-                l_v16_0[v18] = v22;
-            end;
-            return;
-        end;
-    end, ...);
-    return v16;
-end;
-return composeStyleVariant;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+
+require(Foundation.Components.Types)
+
+local function tagToTable(p1) -- line: 11
+	if type(p1) == "string" then
+		return {
+			[p1] = true
+		}
+	end
+
+	return p1
+end
+local function mergeTags(p2, p3) -- line: 20
+	-- upvalues: Dash (copy)
+	if not p2 then
+		return p3
+	end
+
+	if not p3 then
+		return p2
+	end
+
+	if type(p2) == "table" or type(p3) == "table" then
+		local v10 = if type(p2) ~= "string" then p2 else {
+			[p2] = true
+		}
+		local v11 = if type(p3) ~= "string" then p3 else {
+			[p3] = true
+		}
+
+		return Dash.join(v10, v11)
+	end
+
+	return `{ p2 } { p3 }`
+end
+local function mergeProps(t1: {[any]: any}, t2: {[any]: any}) -- line: 40
+	-- upvalues: Dash (copy), mergeTags (copy)
+	local v14 = Dash.join(t1, t2)
+
+	v14.tag = mergeTags(t1.tag, t2.tag)
+
+	return v14
+end
+
+function composeStyleVariant(t3: {[any]: any}, ...) -- line: 48
+	-- upvalues: Dash (copy), mergeTags (copy)
+	local v16 = Dash.copy(t3)
+
+	Dash.forEachArgs(function(p4) -- line: 50
+		-- upvalues: v16 (copy), Dash (copy), mergeTags (copy)
+		if p4 == nil then
+			return
+		end
+
+		for v18, v19 in p4 do
+			local v20 = v16
+			local v21 = v16[v18] or {}
+			local v22 = Dash.join(v21, v19)
+
+			v22.tag = mergeTags(v21.tag, v19.tag)
+			v20[v18] = v22
+		end
+	end, ...)
+
+	return v16
+end
+
+return composeStyleVariant

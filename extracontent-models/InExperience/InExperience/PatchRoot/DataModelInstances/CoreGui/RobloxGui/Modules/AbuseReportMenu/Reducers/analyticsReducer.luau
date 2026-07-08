@@ -1,75 +1,128 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v3 = require(l_script_FirstAncestor_0.Components.Constants);
-local v4 = require(l_CorePackages_0.Packages.Cryo);
-local l_AnalyticsActions_0 = v3.AnalyticsActions;
-local l_FFlagInGameMenuAddChatLineReporting_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagInGameMenuAddChatLineReporting;
-local l_FFlagAddPreselectedAbuseTypeAnalytics_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagAddPreselectedAbuseTypeAnalytics;
-local v8 = {
-    typeofabuseSelection = v4.None, 
-    reasonSelection = v4.None
-};
-return function(v9, v10) --[[ Line: 20 ]] --[[ Name: analyticsReducer ]]
-    -- upvalues: l_AnalyticsActions_0 (copy), v3 (copy), l_FFlagInGameMenuAddChatLineReporting_0 (copy), l_FFlagAddPreselectedAbuseTypeAnalytics_0 (copy), v4 (copy), v8 (copy)
-    local v11 = table.clone(v9);
-    local l_type_0 = v10.type;
-    if l_type_0 == l_AnalyticsActions_0.Reset then
-        local l_menuEverShown_0 = v11.menuEverShown;
-        v11 = v3.AnalyticsInitialState;
-        v11.menuEverShown = l_menuEverShown_0;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetMenuOpenedTimestamp then
-        v11.menuEverShown = true;
-        v11.menuOpenedUnixTimestampMilliseconds = v10.timestamp;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementExperiencePersonChanged then
-        v11.experiencePersonChangeCount = v11.experiencePersonChangeCount + 1;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementTypeofabuseChanged then
-        v11.typeofabuseChangeCount = v11.typeofabuseChangeCount + 1;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementPersonChanged then
-        v11.personChangeCount = v11.personChangeCount + 1;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementReasonChanged then
-        v11.reasonChangeCount = v11.reasonChangeCount + 1;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementCaptureScene then
-        v11.captureSceneCount = v11.captureSceneCount + 1;
-        return v11;
-    elseif l_FFlagInGameMenuAddChatLineReporting_0 and l_type_0 == l_AnalyticsActions_0.IncrementChatLineChanged then
-        v11.chatLineChangeCount = v11.chatLineChangeCount + 1;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetViewportInformation then
-        v11.viewportSizeX = v10.viewportSizeX;
-        v11.viewportSizeY = v10.viewportSizeY;
-        v11.isPortraitMode = v10.viewportSizeX < v10.viewportSizeY;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetMemoryRequirementMet then
-        v11.memoryRequirementMet = v10.memoryRequirementMet;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetSubmissionCompleted then
-        v11.isSubmissionCompleted = true;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetTypeOfAbuseSelection then
-        v11.typeofabuseSelection = v10.selection;
-        return v11;
-    elseif l_FFlagAddPreselectedAbuseTypeAnalytics_0 and l_type_0 == l_AnalyticsActions_0.SetPreselectedAbuseSelection then
-        v11.preselectedAbuseSelection = v10.selection;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetReasonSelection then
-        v11.reasonSelection = v10.selection;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SetCommentAdded then
-        v11.commentAdded = v10.commentAdded;
-        return v11;
-    elseif l_type_0 == l_AnalyticsActions_0.SwitchToExperienceInitialSelections then
-        return (v4.Dictionary.join(v11, v8, v3.AnalyticsExpeirenceInitialSelections));
-    else
-        if l_type_0 == l_AnalyticsActions_0.SwitchToPersonInitialSelections then
-            v11 = v4.Dictionary.join(v11, v8, v3.AnalyticsPersonInitialSelections);
-        end;
-        return v11;
-    end;
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+local Cryo = require(CorePackages.Packages.Cryo)
+local AnalyticsActions = Constants.AnalyticsActions
+local FFlagInGameMenuAddChatLineReporting = require(CorePackages.Workspace.Packages.SharedFlags).FFlagInGameMenuAddChatLineReporting
+local FFlagAddPreselectedAbuseTypeAnalytics = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAddPreselectedAbuseTypeAnalytics
+local t1 = {
+	typeofabuseSelection = Cryo.None,
+	reasonSelection = Cryo.None
+}
+
+local function analyticsReducer(p1, p2) -- line: 20
+	-- upvalues: AnalyticsActions (copy), Constants (copy), FFlagInGameMenuAddChatLineReporting (copy), FFlagAddPreselectedAbuseTypeAnalytics (copy), Cryo (copy), t1 (copy)
+	local v12 = table.clone(p1)
+	local type = p2.type
+
+	if type == AnalyticsActions.Reset then
+		local menuEverShown = v12.menuEverShown
+		local AnalyticsInitialState = Constants.AnalyticsInitialState
+
+		AnalyticsInitialState.menuEverShown = menuEverShown
+
+		return AnalyticsInitialState
+	end
+
+	if type == AnalyticsActions.SetMenuOpenedTimestamp then
+		v12.menuEverShown = true
+		v12.menuOpenedUnixTimestampMilliseconds = p2.timestamp
+
+		return v12
+	end
+
+	if type == AnalyticsActions.IncrementExperiencePersonChanged then
+		v12.experiencePersonChangeCount = v12.experiencePersonChangeCount + 1
+
+		return v12
+	end
+
+	if type == AnalyticsActions.IncrementTypeofabuseChanged then
+		v12.typeofabuseChangeCount = v12.typeofabuseChangeCount + 1
+
+		return v12
+	end
+
+	if type == AnalyticsActions.IncrementPersonChanged then
+		v12.personChangeCount = v12.personChangeCount + 1
+
+		return v12
+	end
+
+	if type == AnalyticsActions.IncrementReasonChanged then
+		v12.reasonChangeCount = v12.reasonChangeCount + 1
+
+		return v12
+	end
+
+	if type == AnalyticsActions.IncrementCaptureScene then
+		v12.captureSceneCount = v12.captureSceneCount + 1
+
+		return v12
+	end
+
+	if FFlagInGameMenuAddChatLineReporting and type == AnalyticsActions.IncrementChatLineChanged then
+		v12.chatLineChangeCount = v12.chatLineChangeCount + 1
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetViewportInformation then
+		v12.viewportSizeX = p2.viewportSizeX
+		v12.viewportSizeY = p2.viewportSizeY
+		v12.isPortraitMode = p2.viewportSizeX < p2.viewportSizeY
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetMemoryRequirementMet then
+		v12.memoryRequirementMet = p2.memoryRequirementMet
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetSubmissionCompleted then
+		v12.isSubmissionCompleted = true
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetTypeOfAbuseSelection then
+		v12.typeofabuseSelection = p2.selection
+
+		return v12
+	end
+
+	if FFlagAddPreselectedAbuseTypeAnalytics and type == AnalyticsActions.SetPreselectedAbuseSelection then
+		v12.preselectedAbuseSelection = p2.selection
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetReasonSelection then
+		v12.reasonSelection = p2.selection
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SetCommentAdded then
+		v12.commentAdded = p2.commentAdded
+
+		return v12
+	end
+
+	if type == AnalyticsActions.SwitchToExperienceInitialSelections then
+		return (Cryo.Dictionary.join(v12, t1, Constants.AnalyticsExpeirenceInitialSelections))
+	end
+
+	if type == AnalyticsActions.SwitchToPersonInitialSelections then
+		v12 = Cryo.Dictionary.join(v12, t1, Constants.AnalyticsPersonInitialSelections)
+	end
+
+	return v12
+end
+
+return analyticsReducer

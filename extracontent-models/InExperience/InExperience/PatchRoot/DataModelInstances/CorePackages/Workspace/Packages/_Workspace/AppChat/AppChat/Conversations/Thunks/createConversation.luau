@@ -1,15 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AppChatNetworking);
-local _ = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local v4 = require(script.Parent.Parent.parseNewConversationResponse);
-return function(v5, v6, v7, v8) --[[ Line: 16 ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    return function(v9) --[[ Line: 22 ]]
-        -- upvalues: v2 (ref), v5 (copy), v6 (copy), v4 (ref), v7 (copy), v8 (copy)
-        return v9:dispatch(v2.rodux.CreateConversation.API(v5, v6)):andThen(function(v10) --[[ Line: 25 ]]
-            -- upvalues: v4 (ref), v7 (ref), v8 (ref)
-            return v4(v10.responseBody.conversations and v10.responseBody.conversations[1], v7, v8);
-        end);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+
+require(AppChat.Models.ConversationChannels)
+
+local parseNewConversationResponse = require(script.Parent.Parent.parseNewConversationResponse)
+
+return function(p1, t1: {[any]: any}, p2, s1: string?) -- line: 16
+	-- upvalues: AppChatNetworking (copy), parseNewConversationResponse (copy)
+	return function(p3) -- line: 22
+		-- upvalues: AppChatNetworking (copy), p1 (copy), t1 (copy), parseNewConversationResponse (copy), p2 (copy), s1 (copy)
+		return p3:dispatch(AppChatNetworking.rodux.CreateConversation.API(p1, t1)):andThen(function(p4) -- line: 25
+			-- upvalues: parseNewConversationResponse (copy), p2 (copy), s1 (copy)
+			return parseNewConversationResponse(p4.responseBody.conversations and p4.responseBody.conversations[1], p2, s1)
+		end)
+	end
+end

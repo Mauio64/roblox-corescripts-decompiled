@@ -1,16 +1,18 @@
-local v0 = require(script.Parent.Parent.invariant);
-local function v1(...) --[[ Line: 16 ]] --[[ Name: shim ]]
-    -- upvalues: v0 (copy)
-    v0(false, "The current renderer does not support persistence. This error is likely caused by a bug in React. Please file an issue.");
-end;
+local invariant = require(script.Parent.Parent.invariant)
+
+local function shim(...) -- line: 16
+	-- upvalues: invariant (copy)
+	invariant(false, "The current renderer does not support persistence. This error is likely caused by a bug in React. Please file an issue.")
+end
+
 return {
-    supportsPersistence = false, 
-    cloneInstance = v1, 
-    cloneFundamentalInstance = v1, 
-    createContainerChildSet = v1, 
-    appendChildToContainerChildSet = v1, 
-    finalizeContainerChildren = v1, 
-    replaceContainerChildren = v1, 
-    cloneHiddenInstance = v1, 
-    cloneHiddenTextInstance = v1
-};
+	supportsPersistence = false,
+	cloneInstance = shim,
+	cloneFundamentalInstance = shim,
+	createContainerChildSet = shim,
+	appendChildToContainerChildSet = shim,
+	finalizeContainerChildren = shim,
+	replaceContainerChildren = shim,
+	cloneHiddenInstance = shim,
+	cloneHiddenTextInstance = shim
+}

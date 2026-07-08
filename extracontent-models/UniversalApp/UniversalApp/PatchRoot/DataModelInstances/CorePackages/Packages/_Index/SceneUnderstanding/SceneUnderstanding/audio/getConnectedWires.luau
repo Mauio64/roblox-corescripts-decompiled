@@ -1,11 +1,14 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getConnectedWires ]]
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 2 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        return v0:GetConnectedWires(v1);
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return {};
-    end;
-end;
+local function getConnectedWires(p1, s1: string) -- line: 1
+	local ok, result = pcall(function() -- line: 2
+		-- upvalues: p1 (copy), s1 (copy)
+		return p1:GetConnectedWires(s1)
+	end)
+
+	if ok then
+		return result
+	end
+
+	return {}
+end
+
+return getConnectedWires

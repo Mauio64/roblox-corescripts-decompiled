@@ -1,31 +1,29 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v4 = require(l_Parent_0.util.R15plusUtils);
-local v5 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local R15plusUtils = require(ParentParent.util.R15plusUtils)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+
 return {
-    fflag = require(l_Parent_0.flags.getFFlagUGCValidationEnableR15plusSkinning), 
-    categories = {
-        v3.UploadCategory.TORSO_AND_LIMBS
-    }, 
-    requiredData = {
-        v3.SharedDataMember.renderMeshesData
-    }, 
-    run = function(v6, v7) --[[ Line: 13 ]]
-        -- upvalues: v4 (copy), l_UGCValidationService_0 (copy), v5 (copy)
-        local v8 = v4.getJointNameWhitelist();
-        for v9, v10 in v7.renderMeshesData do
-            for _, v12 in {
-                l_UGCValidationService_0:GetSkinnedJointNamesFromEditableMesh(v10.editable)
-            } do
-                if not v8[v12] then
-                    v6:fail(v5.Keys.UnallowedJointSkinned, {
-                        partName = v9, 
-                        jointName = v12
-                    });
-                end;
-            end;
-        end;
-    end
-};
+	fflag = require(ParentParent.flags.getFFlagUGCValidationEnableR15plusSkinning),
+	categories = { ValidationEnums.UploadCategory.TORSO_AND_LIMBS },
+	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
+	run = function(p1, p2) -- line: 13
+		-- upvalues: R15plusUtils (copy), UGCValidationService (copy), ErrorSourceStrings (copy)
+		local v8 = R15plusUtils.getJointNameWhitelist()
+
+		for v9, v10 in p2.renderMeshesData do
+			for _, v12 in { UGCValidationService:GetSkinnedJointNamesFromEditableMesh(v10.editable) } do
+				if not v8[v12] then
+					p1:fail(ErrorSourceStrings.Keys.UnallowedJointSkinned, {
+						partName = v9,
+						jointName = v12
+					})
+				end
+			end
+		end
+	end
+}

@@ -1,20 +1,21 @@
-local v0 = require(script.Parent.InputTypeConstants);
+local InputTypeConstants = require(script.Parent.InputTypeConstants)
+
 return {
-    [Enum.UserInputType.MouseButton1] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.MouseButton2] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.MouseButton3] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.MouseWheel] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.MouseMovement] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.Keyboard] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.TextInput] = v0.MouseAndKeyboard, 
-    [Enum.UserInputType.Gamepad1] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad2] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad3] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad4] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad5] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad6] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad7] = v0.Gamepad, 
-    [Enum.UserInputType.Gamepad8] = v0.Gamepad, 
-    [Enum.UserInputType.Touch] = v0.Touch, 
-    [Enum.UserInputType.None] = v0.None
-};
+	[Enum.UserInputType.MouseButton1] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.MouseButton2] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.MouseButton3] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.MouseWheel] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.MouseMovement] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.Keyboard] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.TextInput] = InputTypeConstants.MouseAndKeyboard,
+	[Enum.UserInputType.Gamepad1] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad2] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad3] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad4] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad5] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad6] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad7] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Gamepad8] = InputTypeConstants.Gamepad,
+	[Enum.UserInputType.Touch] = InputTypeConstants.Touch,
+	[Enum.UserInputType.None] = InputTypeConstants.None
+}

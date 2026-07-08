@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableMorePageProfileLink", false);
+return game:DefineFastFlag("LuaAppEnableMorePageProfileLink", false)

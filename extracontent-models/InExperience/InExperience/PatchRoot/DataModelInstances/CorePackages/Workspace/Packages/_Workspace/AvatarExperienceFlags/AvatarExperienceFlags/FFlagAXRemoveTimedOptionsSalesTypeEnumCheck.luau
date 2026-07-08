@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXRemoveTimedOptionsSalesTypeEnumCheck", false);
+return game:DefineFastFlag("AXRemoveTimedOptionsSalesTypeEnumCheck", false)

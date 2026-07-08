@@ -1,70 +1,84 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.Localization);
-local v5 = require(l_script_FirstAncestor_0.Common.Enums);
-local v6 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local l_useLocalization_0 = v4.Hooks.useLocalization;
-local l_abbreviateCount_0 = v4.abbreviateCount;
-local v9 = require(script.Parent.Parent.config.SocialCountsConfig);
-return function(_, v11, v12, v13) --[[ Line: 25 ]] --[[ Name: useSocialCountsData ]]
-    -- upvalues: v6 (copy), v5 (copy), v2 (copy), v3 (copy), v9 (copy), l_useLocalization_0 (copy), l_abbreviateCount_0 (copy)
-    local l_counts_0 = v6(v5.Components.UserProfileHeader).counts;
-    local v16 = v2.useMemo(function() --[[ Line: 33 ]]
-        -- upvalues: v3 (ref), v9 (ref)
-        return v3.Dictionary.map(v9.RowConfig, function(v15) --[[ Line: 34 ]]
-            return v15.textKey;
-        end);
-    end, {});
-    local v17 = l_useLocalization_0(v16);
-    local v19 = v2.useMemo(function() --[[ Line: 41 ]]
-        -- upvalues: v3 (ref), v9 (ref)
-        return v3.Dictionary.map(v9.RowConfig, function(v18) --[[ Line: 42 ]]
-            return v18.singleTextKey;
-        end);
-    end, {});
-    local v20 = l_useLocalization_0(v19);
-    return v2.useMemo(function() --[[ Line: 49 ]]
-        -- upvalues: l_counts_0 (copy), v9 (ref), v17 (copy), v20 (copy), v13 (copy), l_abbreviateCount_0 (ref), v12 (copy), v11 (copy)
-        local v21 = {};
-        for v22, v23 in l_counts_0 do
-            local v24 = v9.RowConfig[v22];
-            if v24 then
-                local v25 = l_counts_0[v24.enabledKey];
-                if v25 == nil then
-                    v25 = true;
-                end;
-                local v26 = v17[v22];
-                if v23 == 1 and v20[v22] then
-                    v26 = v20[v22];
-                end;
-                local v27 = nil;
-                if v24.getLeading and v13 then
-                    v27 = v24.getLeading({
-                        mutualFriendIds = v13
-                    });
-                end;
-                table.insert(v21, {
-                    fieldName = v22, 
-                    count = l_abbreviateCount_0(v23), 
-                    text = v26, 
-                    layoutOrder = v24.layoutOrder, 
-                    leading = v27, 
-                    isDisabled = v24.getIsDisabled(v12, v11, v25)
-                });
-            end;
-        end;
-        table.sort(v21, function(v28, v29) --[[ Line: 89 ]]
-            return v28.layoutOrder < v29.layoutOrder;
-        end);
-        return v21;
-    end, {
-        l_counts_0, 
-        v17, 
-        v20, 
-        v12, 
-        v11, 
-        v13
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local Cryo = require(ProfilePlatformParent.Cryo)
+local Localization = require(ProfilePlatformParent.Localization)
+local Enums = require(ProfilePlatform.Common.Enums)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useLocalization = Localization.Hooks.useLocalization
+local abbreviateCount = Localization.abbreviateCount
+local SocialCountsConfig = require(script.Parent.Parent.config.SocialCountsConfig)
+
+local function useSocialCountsData(_: string, b1: boolean, b2: boolean, t1: {[any]: any}?) -- line: 25
+	-- upvalues: useProfileJsonComponent (copy), Enums (copy), React (copy), Cryo (copy), SocialCountsConfig (copy), useLocalization (copy), abbreviateCount (copy)
+	local counts = useProfileJsonComponent(Enums.Components.UserProfileHeader).counts
+	local v17 = React.useMemo(function() -- line: 33
+		-- upvalues: Cryo (copy), SocialCountsConfig (copy)
+		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p1) -- line: 34
+			return p1.textKey
+		end)
+	end, {})
+	local v18 = useLocalization(v17)
+	local v19 = React.useMemo(function() -- line: 41
+		-- upvalues: Cryo (copy), SocialCountsConfig (copy)
+		return Cryo.Dictionary.map(SocialCountsConfig.RowConfig, function(p2) -- line: 42
+			return p2.singleTextKey
+		end)
+	end, {})
+	local v20 = useLocalization(v19)
+
+	return React.useMemo(function() -- line: 49
+		-- upvalues: counts (copy), SocialCountsConfig (copy), v18 (copy), v20 (copy), t1 (copy), abbreviateCount (copy), b2 (copy), b1 (copy)
+		local t2 = {}
+
+		for v22, v23 in counts do
+			local v24 = SocialCountsConfig.RowConfig[v22]
+
+			if v24 then
+				local v25 = counts[v24.enabledKey]
+
+				if v25 == nil then
+					v25 = true
+				end
+
+				local v26 = v18[v22]
+
+				if v23 == 1 and v20[v22] then
+					v26 = v20[v22]
+				end
+
+				local v27 = nil
+
+				if v24.getLeading and t1 then
+					v27 = v24.getLeading({
+						mutualFriendIds = t1
+					})
+				end
+
+				table.insert(t2, {
+					fieldName = v22,
+					count = abbreviateCount(v23),
+					text = v26,
+					layoutOrder = v24.layoutOrder,
+					leading = v27,
+					isDisabled = v24.getIsDisabled(b2, b1, v25)
+				})
+			end
+		end
+
+		table.sort(t2, function(p3, p4) -- line: 89
+			return p3.layoutOrder < p4.layoutOrder
+		end)
+
+		return t2
+	end, {
+		counts,
+		v18,
+		v20,
+		b2,
+		b1,
+		t1
+	})
+end
+
+return useSocialCountsData

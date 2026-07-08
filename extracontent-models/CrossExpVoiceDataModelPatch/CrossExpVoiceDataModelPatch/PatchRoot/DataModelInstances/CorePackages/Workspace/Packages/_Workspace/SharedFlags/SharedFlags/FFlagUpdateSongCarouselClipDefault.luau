@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UpdateSongCarouselClipDefault", false);
+return game:DefineFastFlag("UpdateSongCarouselClipDefault", false)

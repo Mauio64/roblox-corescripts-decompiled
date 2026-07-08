@@ -1,26 +1,30 @@
-local l_Parent_0 = script:FindFirstAncestor("InputUi").Parent;
-local v1 = require(l_Parent_0.React);
-local l_MemStorageService_0 = game:GetService("MemStorageService");
-return function(v3, v4) --[[ Line: 12 ]] --[[ Name: useGamepadConnectedEvent ]]
-    -- upvalues: v1 (copy), l_MemStorageService_0 (copy)
-    v1.useEffect(function() --[[ Line: 13 ]]
-        -- upvalues: l_MemStorageService_0 (ref), v4 (copy), v3 (copy)
-        local v6 = l_MemStorageService_0:BindAndFire("ActiveGamepadConnected", function(v5) --[[ Line: 14 ]]
-            -- upvalues: v4 (ref), v3 (ref)
-            if v5 == "false" then
-                v4();
-                return;
-            else
-                v3();
-                return;
-            end;
-        end);
-        return function() --[[ Line: 22 ]]
-            -- upvalues: v6 (copy)
-            v6:Disconnect();
-        end;
-    end, {
-        v3, 
-        v4
-    });
-end;
+local Parent = script:FindFirstAncestor("InputUi").Parent
+local React = require(Parent.React)
+local MemStorageService = game:GetService("MemStorageService")
+
+local function useGamepadConnectedEvent(p1: ((...any) -> ...any), p2: ((...any) -> ...any)) -- line: 12
+	-- upvalues: React (copy), MemStorageService (copy)
+	React.useEffect(function() -- line: 13
+		-- upvalues: MemStorageService (copy), p2 (copy), p1 (copy)
+		local v7 = MemStorageService:BindAndFire("ActiveGamepadConnected", function(p3) -- line: 14
+			-- upvalues: p2 (copy), p1 (copy)
+			if p3 == "false" then
+				p2()
+
+				return
+			end
+
+			p1()
+		end)
+
+		return function() -- line: 22
+			-- upvalues: v7 (copy)
+			v7:Disconnect()
+		end
+	end, {
+		p1,
+		p2
+	})
+end
+
+return useGamepadConnectedEvent

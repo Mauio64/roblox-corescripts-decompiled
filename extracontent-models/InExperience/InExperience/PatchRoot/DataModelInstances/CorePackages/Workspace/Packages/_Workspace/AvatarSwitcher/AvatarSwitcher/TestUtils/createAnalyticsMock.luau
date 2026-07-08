@@ -1,18 +1,22 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarSwitcher").Parent;
-local l_jest_0 = require(l_Parent_0.Dev.JestGlobals).jest;
-return function() --[[ Line: 7 ]] --[[ Name: createAnalyticsMock ]]
-    -- upvalues: l_jest_0 (copy)
-    local v2 = l_jest_0.fn();
-    return {
-        addUnifiedEventLogging = v2, 
-        sendAXCounterV2 = l_jest_0.fn(), 
-        useUnifiedEventListener = {
-            useUnifiedEventListenerInExperience = l_jest_0.fn()
-        }, 
-        UnifiedEventLogEnums = {
-            MarketplaceUnifiedAction = {
-                UI_ELEMENT_CLICK = "UI_ELEMENT_CLICK"
-            }
-        }
-    }, v2;
-end;
+local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
+local jest = require(Parent.Dev.JestGlobals).jest
+
+local function createAnalyticsMock() -- line: 7
+	-- upvalues: jest (copy)
+	local v4 = jest.fn()
+
+	return {
+		addUnifiedEventLogging = v4,
+		sendAXCounterV2 = jest.fn(),
+		useUnifiedEventListener = {
+			useUnifiedEventListenerInExperience = jest.fn()
+		},
+		UnifiedEventLogEnums = {
+			MarketplaceUnifiedAction = {
+				UI_ELEMENT_CLICK = "UI_ELEMENT_CLICK"
+			}
+		}
+	}, v4
+end
+
+return createAnalyticsMock

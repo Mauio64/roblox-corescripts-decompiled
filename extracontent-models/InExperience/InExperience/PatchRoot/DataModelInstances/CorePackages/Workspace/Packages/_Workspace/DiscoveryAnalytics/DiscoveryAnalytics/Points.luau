@@ -1,4 +1,4 @@
 return {
-    joinGamePlayButton = require(script.joinGamePlayButton), 
-    reportWarning = require(script.reportWarning)
-};
+	joinGamePlayButton = require(script.joinGamePlayButton),
+	reportWarning = require(script.reportWarning)
+}

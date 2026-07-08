@@ -1,4 +1,4 @@
 return {
-    Component = require(script.ContactsSyncWarningMessage), 
-    useIsVisible = require(script.useIsVisibleContactsSyncWarningMessage)
-};
+	Component = require(script.ContactsSyncWarningMessage),
+	useIsVisible = require(script.useIsVisibleContactsSyncWarningMessage)
+}

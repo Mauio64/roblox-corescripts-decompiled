@@ -1,89 +1,85 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserList");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactRoblox);
-local v4 = require(l_Parent_0.RoactRodux);
-local v5 = require(l_Parent_0.Rodux);
-local v6 = require(l_Parent_0.Style);
-local v7 = require(l_Parent_0.Foundation);
-local v8 = require(l_Parent_0.RoactNavigation);
-local l_FoundationProvider_0 = v7.FoundationProvider;
-local l_StyleProviderWithDefaultTheme_0 = v6.StyleProviderWithDefaultTheme;
-local l_DesignTokenProvider_0 = v6.DesignTokenProvider;
-local function v13(_) --[[ Line: 18 ]] --[[ Name: createStore ]]
-    -- upvalues: v5 (copy)
-    return v5.Store.new(function() --[[ Line: 19 ]]
-        return {
-            ScreenSize = Vector2.new(600, 600), 
-            TopBar = {
-                topBarHeight = 100
-            }, 
-            GlobalGuiInset = {
-                left = 0, 
-                top = 0, 
-                right = 0, 
-                bottom = 34
-            }
-        };
-    end, {}, {
-        v5.thunkMiddleware
-    });
-end;
-local function v17(v14) --[[ Line: 35 ]] --[[ Name: mockNavigation ]]
-    -- upvalues: v2 (copy), v8 (copy)
-    return v2.createElement(v8.Provider, {
-        value = {
-            state = {
-                routeName = "appPage"
-            }, 
-            isFocused = function() --[[ Line: 41 ]] --[[ Name: isFocused ]]
-                return true;
-            end, 
-            addListener = function() --[[ Line: 44 ]] --[[ Name: addListener ]]
-                return {
-                    remove = function() --[[ Line: 46 ]] --[[ Name: remove ]]
+local UserList = script:FindFirstAncestor("UserList")
+local UserListParent = UserList.Parent
+local React = require(UserListParent.React)
+local ReactRoblox = require(UserListParent.ReactRoblox)
+local RoactRodux = require(UserListParent.RoactRodux)
+local Rodux = require(UserListParent.Rodux)
+local Style = require(UserListParent.Style)
+local Foundation = require(UserListParent.Foundation)
+local RoactNavigation = require(UserListParent.RoactNavigation)
+local FoundationProvider = Foundation.FoundationProvider
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local DesignTokenProvider = Style.DesignTokenProvider
 
-                    end
-                };
-            end, 
-            getParam = function(_, v16) --[[ Line: 49 ]] --[[ Name: getParam ]]
-                return v16;
-            end, 
-            navigate = function() --[[ Line: 52 ]] --[[ Name: navigate ]]
+local function createStore(_) -- line: 18
+	-- upvalues: Rodux (copy)
+	return Rodux.Store.new(function() -- line: 19
+		return {
+			ScreenSize = Vector2.new(600, 600),
+			TopBar = {
+				topBarHeight = 100
+			},
+			GlobalGuiInset = {
+				left = 0,
+				top = 0,
+				right = 0,
+				bottom = 34
+			}
+		}
+	end, {}, { Rodux.thunkMiddleware })
+end
+local function mockNavigation(p2) -- line: 35
+	-- upvalues: React (copy), RoactNavigation (copy)
+	return React.createElement(RoactNavigation.Provider, {
+		value = {
+			state = {
+				routeName = "appPage"
+			},
+			isFocused = function() -- line: 41
+				return true
+			end,
+			addListener = function() -- line: 44
+				return {
+					remove = function() -- line: 46
+					end
+				}
+			end,
+			getParam = function(_, p4) -- line: 49
+				return p4
+			end,
+			navigate = function() -- line: 52
+			end
+		}
+	}, {
+		Child = p2
+	})
+end
 
-            end
-        }
-    }, {
-        Child = v14
-    });
-end;
 return {
-    name = "UserList", 
-    storyRoot = l_script_FirstAncestor_0, 
-    roact = v2, 
-    reactRoblox = v3, 
-    mapStory = function(v18) --[[ Line: 64 ]] --[[ Name: mapStory ]]
-        -- upvalues: v2 (copy), l_StyleProviderWithDefaultTheme_0 (copy), v4 (copy), v13 (copy), v17 (copy), l_FoundationProvider_0 (copy), v7 (copy), l_DesignTokenProvider_0 (copy)
-        return function(v19) --[[ Line: 65 ]]
-            -- upvalues: v2 (ref), l_StyleProviderWithDefaultTheme_0 (ref), v4 (ref), v13 (ref), v17 (ref), l_FoundationProvider_0 (ref), v7 (ref), l_DesignTokenProvider_0 (ref), v18 (copy)
-            return v2.createElement(l_StyleProviderWithDefaultTheme_0, {
-                withDarkTheme = true, 
-                withUiModeSupport = false
-            }, {
-                v2.createElement(v4.StoreProvider, {
-                    store = v13(nil)
-                }, {
-                    navigationProvider = v17(v2.createElement(l_FoundationProvider_0, {
-                        theme = v7.Enums.Theme.Light
-                    }, {
-                        designTokenProvider = v2.createElement(l_DesignTokenProvider_0, {
-                            tokenMappers = {}
-                        }, {
-                            Child = v18(v19)
-                        })
-                    }))
-                })
-            });
-        end;
-    end
-};
+	name = "UserList",
+	storyRoot = UserList,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = function(p5) -- line: 64
+		-- upvalues: React (copy), StyleProviderWithDefaultTheme (copy), RoactRodux (copy), createStore (copy), mockNavigation (copy), FoundationProvider (copy), Foundation (copy), DesignTokenProvider (copy)
+		return function(p6) -- line: 65
+			-- upvalues: React (copy), StyleProviderWithDefaultTheme (copy), RoactRodux (copy), createStore (copy), mockNavigation (copy), FoundationProvider (copy), Foundation (copy), DesignTokenProvider (copy), p5 (copy)
+			return React.createElement(StyleProviderWithDefaultTheme, {
+				withDarkTheme = true,
+				withUiModeSupport = false
+			}, { React.createElement(RoactRodux.StoreProvider, {
+				store = createStore(nil)
+			}, {
+				navigationProvider = mockNavigation(React.createElement(FoundationProvider, {
+					theme = Foundation.Enums.Theme.Light
+				}, {
+					designTokenProvider = React.createElement(DesignTokenProvider, {
+						tokenMappers = {}
+					}, {
+						Child = p5(p6)
+					})
+				}))
+			}) })
+		end
+	end
+}

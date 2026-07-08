@@ -1,68 +1,74 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxUsers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_Parent_0.Cryo);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local l_Models_0 = l_script_FirstAncestor_0.Models;
-local v6 = require(l_Actions_0.UserRemoved);
-local v7 = require(l_Actions_0.UserUpdated);
-local v8 = require(l_Models_0.UserModel);
-local v9 = {};
-local function v16(v10, v11) --[[ Line: 14 ]]
-    -- upvalues: v8 (copy), v3 (copy)
-    local v12 = {};
-    for _, v14 in ipairs(v11) do
-        local v15 = tostring(v14.id);
-        v12[v15] = v8.new({
-            id = v15, 
-            username = v14.name or "", 
-            displayName = v14.displayName or "", 
-            hasVerifiedBadge = v14.hasVerifiedBadge, 
-            created = v14.created
-        });
-    end;
-    return v3.Dictionary.join(v10, v12);
-end;
-return function(v17) --[[ Line: 32 ]]
-    -- upvalues: v2 (copy), v9 (copy), v16 (copy), v7 (copy), v8 (copy), v3 (copy), v6 (copy)
-    local l_usersNetworking_0 = v17.usersNetworking;
-    local l_friendsNetworking_0 = v17.friendsNetworking;
-    return v2.createReducer(v9, {
-        [l_usersNetworking_0.GetUserV2FromUserId.Succeeded.name] = function(v20, v21) --[[ Line: 37 ]]
-            -- upvalues: v16 (ref)
-            return v16(v20, {
-                v21.responseBody
-            });
-        end, 
-        [l_usersNetworking_0.GetSkinnyUsersFromUserIds.Succeeded.name] = function(v22, v23) --[[ Line: 41 ]]
-            -- upvalues: v16 (ref)
-            return v16(v22, v23.responseBody.data);
-        end, 
-        [l_friendsNetworking_0.GetFriendsFromUserId.Succeeded.name] = function(v24, v25) --[[ Line: 45 ]]
-            -- upvalues: v16 (ref)
-            return v16(v24, v25.responseBody.data);
-        end, 
-        [l_friendsNetworking_0.GetFriendRequests.Succeeded.name] = function(v26, v27) --[[ Line: 49 ]]
-            -- upvalues: v16 (ref)
-            return v16(v26, v27.responseBody.data);
-        end, 
-        [l_friendsNetworking_0.GetFriendRecommendationsFromUserId.Succeeded.name] = function(v28, v29) --[[ Line: 53 ]]
-            -- upvalues: v16 (ref)
-            return v16(v28, v29.responseBody.data);
-        end, 
-        [v7.name] = function(v30, v31) --[[ Line: 57 ]]
-            -- upvalues: v8 (ref), v3 (ref)
-            assert(v8.isValid(v31.payload));
-            return v3.Dictionary.join(v30, {
-                [v31.payload.id] = v31.payload
-            });
-        end, 
-        [v6.name] = function(v32, v33) --[[ Line: 65 ]]
-            -- upvalues: v3 (ref)
-            assert(type(v33.payload.id) == "string", "Expected id to be a string");
-            return v3.Dictionary.join(v32, {
-                [v33.payload.id] = v3.None
-            });
-        end
-    });
-end;
+local RoduxUsers = script:FindFirstAncestor("RoduxUsers")
+local RoduxUsersParent = RoduxUsers.Parent
+local Rodux = require(RoduxUsersParent.Rodux)
+local Cryo = require(RoduxUsersParent.Cryo)
+local Actions = RoduxUsers.Actions
+local Models = RoduxUsers.Models
+local UserRemoved = require(Actions.UserRemoved)
+local UserUpdated = require(Actions.UserUpdated)
+local UserModel = require(Models.UserModel)
+local t1 = {}
+
+local function v11(p1, p2) -- line: 14
+	-- upvalues: UserModel (copy), Cryo (copy)
+	local t2 = {}
+
+	for _, v in ipairs(p2) do
+		local str = tostring(v.id)
+
+		t2[str] = UserModel.new({
+			id = str,
+			username = v.name or "",
+			displayName = v.displayName or "",
+			hasVerifiedBadge = v.hasVerifiedBadge,
+			created = v.created
+		})
+	end
+
+	return Cryo.Dictionary.join(p1, t2)
+end
+
+return function(p3) -- line: 32
+	-- upvalues: Rodux (copy), t1 (copy), v11 (copy), UserUpdated (copy), UserModel (copy), Cryo (copy), UserRemoved (copy)
+	local usersNetworking = p3.usersNetworking
+	local friendsNetworking = p3.friendsNetworking
+
+	return Rodux.createReducer(t1, {
+		[usersNetworking.GetUserV2FromUserId.Succeeded.name] = function(p4, p5) -- line: 37
+			-- upvalues: v11 (copy)
+			return v11(p4, { p5.responseBody })
+		end,
+		[usersNetworking.GetSkinnyUsersFromUserIds.Succeeded.name] = function(p6, p7) -- line: 41
+			-- upvalues: v11 (copy)
+			return v11(p6, p7.responseBody.data)
+		end,
+		[friendsNetworking.GetFriendsFromUserId.Succeeded.name] = function(p8, p9) -- line: 45
+			-- upvalues: v11 (copy)
+			return v11(p8, p9.responseBody.data)
+		end,
+		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(p10, p11) -- line: 49
+			-- upvalues: v11 (copy)
+			return v11(p10, p11.responseBody.data)
+		end,
+		[friendsNetworking.GetFriendRecommendationsFromUserId.Succeeded.name] = function(p12, p13) -- line: 53
+			-- upvalues: v11 (copy)
+			return v11(p12, p13.responseBody.data)
+		end,
+		[UserUpdated.name] = function(p14, p15) -- line: 57
+			-- upvalues: UserModel (copy), Cryo (copy)
+			assert(UserModel.isValid(p15.payload))
+
+			return Cryo.Dictionary.join(p14, {
+				[p15.payload.id] = p15.payload
+			})
+		end,
+		[UserRemoved.name] = function(p16, p17) -- line: 65
+			-- upvalues: Cryo (copy)
+			assert(type(p17.payload.id) == "string", "Expected id to be a string")
+
+			return Cryo.Dictionary.join(p16, {
+				[p17.payload.id] = Cryo.None
+			})
+		end
+	})
+end

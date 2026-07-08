@@ -1,35 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactIs);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v5, v6) --[[ Line: 11 ]] --[[ Name: getOriginalBackgroundStyle ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    if v3.isBinding(v5) and v3.isBinding(v6) then
-        return v2.joinBindings({
-            Color3 = v5, 
-            Transparency = v6
-        });
-    elseif v3.isBinding(v5) then
-        return v5:map(function(v7) --[[ Line: 21 ]]
-            -- upvalues: v6 (copy)
-            return {
-                Color3 = v7, 
-                Transparency = v6
-            };
-        end);
-    elseif v3.isBinding(v6) then
-        return v6:map(function(v8) --[[ Line: 25 ]]
-            -- upvalues: v5 (copy)
-            return {
-                Color3 = v5, 
-                Transparency = v8
-            };
-        end);
-    else
-        return {
-            Color3 = v5, 
-            Transparency = v6
-        };
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ReactIs = require(FoundationParent.ReactIs)
+
+require(Foundation.Components.Types)
+
+local function getOriginalBackgroundStyle(p1, p2) -- line: 11
+	-- upvalues: ReactIs (copy), React (copy)
+	if ReactIs.isBinding(p1) and ReactIs.isBinding(p2) then
+		return React.joinBindings({
+			Color3 = p1,
+			Transparency = p2
+		})
+	end
+
+	if ReactIs.isBinding(p1) then
+		return p1:map(function(p3) -- line: 21
+			-- upvalues: p2 (copy)
+			return {
+				Color3 = p3,
+				Transparency = p2
+			}
+		end)
+	end
+
+	if ReactIs.isBinding(p2) then
+		return p2:map(function(p4) -- line: 25
+			-- upvalues: p1 (copy)
+			return {
+				Color3 = p1,
+				Transparency = p4
+			}
+		end)
+	end
+
+	return {
+		Color3 = p1,
+		Transparency = p2
+	}
+end
+
+return getOriginalBackgroundStyle

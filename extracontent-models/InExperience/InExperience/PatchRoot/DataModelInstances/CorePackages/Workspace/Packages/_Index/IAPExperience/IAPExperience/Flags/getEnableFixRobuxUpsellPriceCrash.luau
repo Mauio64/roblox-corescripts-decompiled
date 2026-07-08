@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableFixRobuxUpsellPriceCrash", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableFixRobuxUpsellPriceCrash");
-end;
+game:DefineFastFlag("EnableFixRobuxUpsellPriceCrash", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableFixRobuxUpsellPriceCrash")
+end

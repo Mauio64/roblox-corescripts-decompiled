@@ -1,44 +1,45 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryAnalytics").Parent;
-local v2 = require(l_Parent_0.t);
-local l_DiscoveryEventErrorLogger_0 = require(l_Parent_0.DiscoveryUtils).DiscoveryEventErrorLogger;
-local v4 = game:DefineFastInt("GameTileOverflowMenuActionThrottleHundrethsPercent", 0);
-local l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppFixExplicitFeedbackTelemetry;
-local v6 = v2.strictInterface({
-    ctx = if l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 then nil else v2.string, 
-    universeId = v2.string, 
-    sortId = v2.optional(v2.string), 
-    actionType = v2.string, 
-    menuItem = v2.optional(v2.string), 
-    availableMenuItems = v2.optional(v2.string)
-});
-return function(v7, v8) --[[ Line: 22 ]]
-    -- upvalues: l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 (copy), l_DiscoveryEventErrorLogger_0 (copy), v6 (copy), v4 (copy), l_TelemetryService_0 (copy)
-    if l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 and not v8 then
-        l_DiscoveryEventErrorLogger_0.reportError("GameTileOverflowMenuActionInvalidInterface", "event is missing context");
-    end;
-    local v9, v10 = v6(v7);
-    if not v9 then
-        l_DiscoveryEventErrorLogger_0.reportError("GameTileOverflowMenuActionInvalidInterface", v10);
-    end;
-    local v11 = {
-        eventName = "gameTileOverflowMenuAction", 
-        backends = {
-            "EventIngest"
-        }, 
-        throttlingPercentage = v4, 
-        lastUpdated = {
-            25, 
-            10, 
-            15
-        }, 
-        description = "User has taken an action with the Game Tile Overflow Menu"
-    };
-    l_TelemetryService_0:LogEvent(v11, {
-        eventContext = if l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 then v8 else nil, 
-        standardizedFields = {
-            "addSessionInfo"
-        }, 
-        customFields = v7
-    });
-end;
+local TelemetryService = game:GetService("TelemetryService")
+local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(Parent.t)
+local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
+local v5 = game:DefineFastInt("GameTileOverflowMenuActionThrottleHundrethsPercent", 0)
+local FFlagLuaAppFixExplicitFeedbackTelemetry = require(Parent.SharedFlags).FFlagLuaAppFixExplicitFeedbackTelemetry
+local v7 = t.strictInterface({
+	ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then t.string else nil,
+	universeId = t.string,
+	sortId = t.optional(t.string),
+	actionType = t.string,
+	menuItem = t.optional(t.string),
+	availableMenuItems = t.optional(t.string)
+})
+
+return function(p1, s1: string) -- line: 22
+	-- upvalues: FFlagLuaAppFixExplicitFeedbackTelemetry (copy), DiscoveryEventErrorLogger (copy), v7 (copy), v5 (copy), TelemetryService (copy)
+	if FFlagLuaAppFixExplicitFeedbackTelemetry and not s1 then
+		DiscoveryEventErrorLogger.reportError("GameTileOverflowMenuActionInvalidInterface", "event is missing context")
+	end
+
+	local v10, v11 = v7(p1)
+
+	if not v10 then
+		DiscoveryEventErrorLogger.reportError("GameTileOverflowMenuActionInvalidInterface", v11)
+	end
+
+	local t1 = {
+		eventName = "gameTileOverflowMenuAction",
+		description = "User has taken an action with the Game Tile Overflow Menu",
+		backends = { "EventIngest" },
+		throttlingPercentage = v5,
+		lastUpdated = {
+			25,
+			10,
+			15
+		}
+	}
+
+	TelemetryService:LogEvent(t1, {
+		eventContext = if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else s1,
+		standardizedFields = { "addSessionInfo" },
+		customFields = p1
+	})
+end

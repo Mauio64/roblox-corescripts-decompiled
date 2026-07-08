@@ -1,177 +1,171 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_ColorSystem_0 = v3.Common.Style.ColorSystem;
-local v5 = require(l_Parent_0.Cryo);
-local l_Constants_0 = v3.App.Style.Constants;
-local v7 = require(script.Parent.ChatBubbleEnum);
-local v8 = require(script.Parent.ChatBubbleGroupable);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_useSelectedTheme_0 = require(l_Parent_0.RoactUtils).Hooks.useSelectedTheme;
-local v11 = require(script.Parent.RepliedToMarker);
-local v12 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v12.Hooks.useTokens;
-local l_useCursor_0 = v12.Hooks.useCursor;
-local l_FFlagEnableAppChatFocusableFixes_0 = require(l_Parent_0.SharedFlags).FFlagEnableAppChatFocusableFixes;
-local v16 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatEnableRepliesUI);
-local v17 = require(l_script_FirstAncestor_0.Flags.unfilteredMessageColorConfig);
-local l_BUBBLE_VARIANTS_0 = v7.BUBBLE_VARIANTS;
-local v20 = {
-    isIncoming = false, 
-    hasTail = false, 
-    padding = 12, 
-    LayoutOrder = 0, 
-    isPending = false, 
-    isUnfiltered = false, 
-    isAssetCard = false, 
-    isRepliedTo = false, 
-    isPressed = false, 
-    isLastMessageInMessageGroup = false, 
-    [v2.Change.AbsoluteSize] = function(_) --[[ Line: 51 ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local UIBlox = require(AppChatParent.UIBlox)
+local ColorSystem = UIBlox.Common.Style.ColorSystem
+local Cryo = require(AppChatParent.Cryo)
+local Constants = UIBlox.App.Style.Constants
+local ChatBubbleEnum = require(script.Parent.ChatBubbleEnum)
+local ChatBubbleGroupable = require(script.Parent.ChatBubbleGroupable)
+local useStyle = UIBlox.Core.Style.useStyle
+local useSelectedTheme = require(AppChatParent.RoactUtils).Hooks.useSelectedTheme
+local RepliedToMarker = require(script.Parent.RepliedToMarker)
+local Foundation = require(AppChatParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local useCursor = Foundation.Hooks.useCursor
+local unfilteredMessageColorConfig = require(AppChat.Flags.unfilteredMessageColorConfig)
+local BUBBLE_VARIANTS = ChatBubbleEnum.BUBBLE_VARIANTS
+local t1 = {
+	isIncoming = false,
+	hasTail = false,
+	padding = 12,
+	LayoutOrder = 0,
+	isPending = false,
+	isUnfiltered = false,
+	isAssetCard = false,
+	isRepliedTo = false,
+	isPressed = false,
+	isLastMessageInMessageGroup = false,
+	[React.Change.AbsoluteSize] = function(_) -- line: 48
+	end
+}
 
-    end
-};
-return v2.memo(function(v21) --[[ Line: 54 ]] --[[ Name: ChatBubbleContainer ]]
-    -- upvalues: v5 (copy), v20 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy), l_useCursor_0 (copy), v12 (copy), l_useTokens_0 (copy), l_useStyle_0 (copy), l_useSelectedTheme_0 (copy), v16 (copy), v2 (copy), l_Constants_0 (copy), l_ColorSystem_0 (copy), v17 (copy), l_BUBBLE_VARIANTS_0 (copy), v7 (copy), v8 (copy), v11 (copy)
-    local v22 = v5.Dictionary.join(v20, v21);
-    local v23 = if l_FFlagEnableAppChatFocusableFixes_0 then l_useCursor_0(v12.Enums.CursorType.RoundedSlot) else nil;
-    local v24 = l_useTokens_0();
-    local v25 = l_useStyle_0();
-    local v26 = v22.children or {};
-    local l_isIncoming_0 = v22.isIncoming;
-    local l_isPending_0 = v22.isPending;
-    local l_isUnfiltered_0 = v22.isUnfiltered;
-    local v30 = nil;
-    local v31 = nil;
-    local v32 = l_useSelectedTheme_0();
-    local v33 = nil;
-    local v34 = nil;
-    if v16() then
-        local v35, v36 = v2.useState(v25.Theme.UIDefault);
-        v33 = v35;
-        v34 = v36;
-    end;
-    local function v38() --[[ Line: 77 ]] --[[ Name: setBubbleStyle ]]
-        -- upvalues: v16 (ref), v22 (copy), v32 (copy), l_Constants_0 (ref), l_ColorSystem_0 (ref), v24 (copy), l_isIncoming_0 (copy), l_isUnfiltered_0 (copy), v30 (ref), v31 (ref), v34 (ref)
-        local v37 = nil;
-        v37 = if v16() and v22.isRepliedTo then {
-            Color = if v32 == string.lower(l_Constants_0.ThemeName.Light) then l_ColorSystem_0.Gray[30] else l_ColorSystem_0.Gray[90], 
-            Transparency = 0
-        } else if v22.isAssetCard then {
-            Color = v24.Color.Shift.Shift_400.Color3, 
-            Transparency = v24.Color.Shift.Shift_400.Transparency
-        } else if l_isIncoming_0 then {
-            Color = v24.Color.Shift.Shift_400.Color3, 
-            Transparency = v24.Color.Shift.Shift_400.Transparency
-        } else if l_isUnfiltered_0 then {
-            Color = v24.Color.System.Emphasis.Color3, 
-            Transparency = v24.Color.System.Emphasis.Transparency
-        } else {
-            Color = v24.Color.Extended.Gray.Gray_600.Color3, 
-            Transparency = v24.Color.Extended.Gray.Gray_600.Transparency
-        };
-        v30 = v37.Color;
-        v31 = v37.Transparency;
-        if v16() then
-            v34(v37);
-        end;
-    end;
-    local function v40() --[[ Line: 120 ]] --[[ Name: setPressedBubbleStyle ]]
-        -- upvalues: v16 (ref), v22 (copy), l_isIncoming_0 (copy), v32 (copy), l_Constants_0 (ref), l_ColorSystem_0 (ref), l_isUnfiltered_0 (copy), v17 (ref), v34 (ref)
-        if not v16() or v22.isRepliedTo or v22.isPending then
-            return;
-        else
-            local v39 = nil;
-            v39 = if l_isIncoming_0 then {
-                Color = if v32 == string.lower(l_Constants_0.ThemeName.Light) then l_ColorSystem_0.Gray[50] else l_ColorSystem_0.Gray[70], 
-                Transparency = 0.35
-            } else if not l_isUnfiltered_0 or v22.isAssetCard then {
-                Color = if v32 == string.lower(l_Constants_0.ThemeName.Light) then l_ColorSystem_0.Gray[50] else l_ColorSystem_0.Gray[70], 
-                Transparency = 0.4
-            } else {
-                Color = if v32 == l_Constants_0.ThemeName.Light then v17.UnfilteredMessagePressedLightColor3 else v17.UnfilteredMessagePressedDarkColor3, 
-                Transparency = v17.UnfilteredMessageTransparency
-            };
-            v34(v39);
-            return;
-        end;
-    end;
-    if v16() then
-        v2.useLayoutEffect(function() --[[ Line: 156 ]]
-            -- upvalues: v22 (copy), v40 (copy), v38 (copy)
-            if v22.isPressed then
-                v40();
-                return;
-            else
-                v38();
-                return;
-            end;
-        end, {
-            v22.isPressed, 
-            v22.isRepliedTo, 
-            v32, 
-            l_isIncoming_0, 
-            l_isPending_0, 
-            l_isUnfiltered_0, 
-            v22.isAssetCard
-        });
-    else
-        v38();
-    end;
-    local function _(v41, v42, v43) --[[ Line: 177 ]] --[[ Name: getBubbleVariant ]]
-        -- upvalues: l_BUBBLE_VARIANTS_0 (ref)
-        if v41 and v42 or v43 then
-            return l_BUBBLE_VARIANTS_0.SINGLE;
-        elseif v41 then
-            return l_BUBBLE_VARIANTS_0.TOP;
-        elseif v42 then
-            return l_BUBBLE_VARIANTS_0.BOTTOM;
-        else
-            return l_BUBBLE_VARIANTS_0.MIDDLE;
-        end;
-    end;
-    return (function() --[[ Line: 193 ]] --[[ Name: renderGroupedBubbleUI ]]
-        -- upvalues: v2 (ref), v12 (ref), v22 (copy), l_FFlagEnableAppChatFocusableFixes_0 (ref), v23 (copy), l_isIncoming_0 (copy), v7 (ref), v8 (ref), v26 (copy), v16 (ref), v33 (ref), v30 (ref), v31 (ref), l_BUBBLE_VARIANTS_0 (ref), v11 (ref)
-        local l_createElement_0 = v2.createElement;
-        local l_View_0 = v12.View;
-        local v47 = {
-            tag = "auto-xy size-0-0", 
-            AutomaticSize = Enum.AutomaticSize.XY, 
-            LayoutOrder = v22.LayoutOrder, 
-            BackgroundTransparency = 1, 
-            selection = if l_FFlagEnableAppChatFocusableFixes_0 then {
-                Selectable = true, 
-                SelectionImageObject = v23
-            } else nil, 
-            layout = {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = l_isIncoming_0 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Right, 
-                Padding = UDim.new(0, v7.REPLIED_TO_MARKER_GAP)
-            }
-        };
-        local v48 = {};
-        local l_createElement_1 = v2.createElement;
-        local l_v8_0 = v8;
-        local v51 = {
-            alignment = l_isIncoming_0 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Right, 
-            children = v26, 
-            imageStyle = {
-                Color3 = if v16() then v33.Color else v30, 
-                Transparency = if v16() then v33.Transparency else v31
-            }, 
-            layoutOrder = 1, 
-            padding = v22.padding
-        };
-        local l_hasTail_0 = v22.hasTail;
-        local l_isLastMessageInMessageGroup_0 = v22.isLastMessageInMessageGroup;
-        local l_isRepliedTo_0 = v22.isRepliedTo;
-        v51.variant = if l_hasTail_0 and l_isLastMessageInMessageGroup_0 or l_isRepliedTo_0 then l_BUBBLE_VARIANTS_0.SINGLE else if l_hasTail_0 then l_BUBBLE_VARIANTS_0.TOP else if l_isLastMessageInMessageGroup_0 then l_BUBBLE_VARIANTS_0.BOTTOM else l_BUBBLE_VARIANTS_0.MIDDLE;
-        v48.bubble = l_createElement_1(l_v8_0, v51);
-        v48.repliedToMarker = if v16() and v22.isRepliedTo then v2.createElement(v11, {
-            isIncoming = l_isIncoming_0, 
-            layoutOrder = v22.isIncoming and 0 or 2
-        }) else nil;
-        return l_createElement_0(l_View_0, v47, v48);
-    end)();
-end);
+local function ChatBubbleContainer(t2: {[any]: any}) -- line: 51
+	-- upvalues: Cryo (copy), t1 (copy), useCursor (copy), Foundation (copy), useTokens (copy), useStyle (copy), useSelectedTheme (copy), React (copy), Constants (copy), ColorSystem (copy), unfilteredMessageColorConfig (copy), BUBBLE_VARIANTS (copy), ChatBubbleEnum (copy), ChatBubbleGroupable (copy), RepliedToMarker (copy)
+	local v22 = Cryo.Dictionary.join(t1, t2)
+	local v23 = useCursor(Foundation.Enums.CursorType.RoundedSlot)
+	local v24 = useTokens()
+	local v25 = useStyle()
+	local v26 = v22.children or {}
+	local isIncoming = v22.isIncoming
+	local isPending = v22.isPending
+	local isUnfiltered = v22.isUnfiltered
+	local v30 = useSelectedTheme()
+	local v31, v32 = React.useState(v25.Theme.UIDefault)
+
+	local function setBubbleStyle() -- line: 66
+		-- upvalues: v22 (copy), v30 (copy), Constants (copy), ColorSystem (copy), v24 (copy), isIncoming (copy), isUnfiltered (copy), v32 (copy)
+		local v37 = if not v22.isRepliedTo then if not v22.isAssetCard then if not isIncoming then if not isUnfiltered then {
+			Color = v24.Color.Extended.Gray.Gray_600.Color3,
+			Transparency = v24.Color.Extended.Gray.Gray_600.Transparency
+		} else {
+			Color = v24.Color.System.Emphasis.Color3,
+			Transparency = v24.Color.System.Emphasis.Transparency
+		} else {
+			Color = v24.Color.Shift.Shift_400.Color3,
+			Transparency = v24.Color.Shift.Shift_400.Transparency
+		} else {
+			Color = v24.Color.Shift.Shift_400.Color3,
+			Transparency = v24.Color.Shift.Shift_400.Transparency
+		} else {
+			Transparency = 0,
+			Color = if v30 ~= string.lower(Constants.ThemeName.Light) then ColorSystem.Gray[90] else ColorSystem.Gray[30]
+		}
+
+		v32(v37)
+	end
+	local function setPressedBubbleStyle() -- line: 104
+		-- upvalues: v22 (copy), isIncoming (copy), v30 (copy), Constants (copy), ColorSystem (copy), isUnfiltered (copy), unfilteredMessageColorConfig (copy), v32 (copy)
+		if v22.isRepliedTo or v22.isPending then
+			return
+		end
+
+		local v38 = if not isIncoming then if not isUnfiltered or v22.isAssetCard then {
+			Transparency = 0.4,
+			Color = if v30 ~= string.lower(Constants.ThemeName.Light) then ColorSystem.Gray[70] else ColorSystem.Gray[50]
+		} else {
+			Color = if v30 ~= Constants.ThemeName.Light then unfilteredMessageColorConfig.UnfilteredMessagePressedDarkColor3 else unfilteredMessageColorConfig.UnfilteredMessagePressedLightColor3,
+			Transparency = unfilteredMessageColorConfig.UnfilteredMessageTransparency
+		} else {
+			Transparency = 0.35,
+			Color = if v30 ~= string.lower(Constants.ThemeName.Light) then ColorSystem.Gray[70] else ColorSystem.Gray[50]
+		}
+
+		v32(v38)
+	end
+
+	React.useLayoutEffect(function() -- line: 139
+		-- upvalues: v22 (copy), setPressedBubbleStyle (copy), setBubbleStyle (copy)
+		if v22.isPressed then
+			setPressedBubbleStyle()
+
+			return
+		end
+
+		setBubbleStyle()
+	end, {
+		v22.isPressed,
+		v22.isRepliedTo,
+		v30,
+		isIncoming,
+		isPending,
+		isUnfiltered,
+		v22.isAssetCard
+	})
+
+	local function getBubbleVariant(p2, p3, p4) -- line: 157
+		-- upvalues: BUBBLE_VARIANTS (copy)
+		if p2 and p3 or p4 then
+			return BUBBLE_VARIANTS.SINGLE
+		end
+
+		if p2 then
+			return BUBBLE_VARIANTS.TOP
+		end
+
+		if p3 then
+			return BUBBLE_VARIANTS.BOTTOM
+		end
+
+		return BUBBLE_VARIANTS.MIDDLE
+	end
+	local function renderGroupedBubbleUI() -- line: 173
+		-- upvalues: React (copy), Foundation (copy), v22 (copy), v23 (copy), isIncoming (copy), ChatBubbleEnum (copy), ChatBubbleGroupable (copy), v26 (copy), v31 (copy), BUBBLE_VARIANTS (copy), RepliedToMarker (copy)
+		local createElement = React.createElement
+		local View = Foundation.View
+		local t3 = {
+			tag = "auto-xy size-0-0",
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			LayoutOrder = v22.LayoutOrder,
+			selection = {
+				Selectable = true,
+				SelectionImageObject = v23
+			},
+			layout = {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = isIncoming and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Right,
+				Padding = UDim.new(0, ChatBubbleEnum.REPLIED_TO_MARKER_GAP)
+			}
+		}
+		local t4 = {}
+		local createElement2 = React.createElement
+		local v47 = ChatBubbleGroupable
+		local t5 = {
+			layoutOrder = 1,
+			alignment = isIncoming and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Right,
+			children = v26,
+			imageStyle = {
+				Color3 = v31.Color,
+				Transparency = v31.Transparency
+			},
+			padding = v22.padding
+		}
+		local hasTail = v22.hasTail
+		local isLastMessageInMessageGroup = v22.isLastMessageInMessageGroup
+		local isRepliedTo = v22.isRepliedTo
+
+		t5.variant = if not (not not hasTail and isLastMessageInMessageGroup) and not isRepliedTo then if not hasTail then if not isLastMessageInMessageGroup then BUBBLE_VARIANTS.MIDDLE else BUBBLE_VARIANTS.BOTTOM else BUBBLE_VARIANTS.TOP else BUBBLE_VARIANTS.SINGLE
+		t4.bubble = createElement2(v47, t5)
+		t4.repliedToMarker = if not v22.isRepliedTo then nil else React.createElement(RepliedToMarker, {
+			isIncoming = isIncoming,
+			layoutOrder = not v22.isIncoming and 2 or 0
+		})
+
+		return createElement(View, t3, t4)
+	end
+
+	return renderGroupedBubbleUI()
+end
+
+return React.memo(ChatBubbleContainer)

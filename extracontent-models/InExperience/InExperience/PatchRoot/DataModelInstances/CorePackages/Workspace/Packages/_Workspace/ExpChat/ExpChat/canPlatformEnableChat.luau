@@ -1,48 +1,56 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_AvatarChatService_0 = game:GetService("AvatarChatService");
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v3 = require(l_Parent_0.SocialExperiments);
-local l_FFlagTestDeviceForFAEUpsell_0 = v3.FFlagTestDeviceForFAEUpsell;
-local l_deviceMeetsRequirementsForFAE_0 = v3.deviceMeetsRequirementsForFAE;
-local l_FFlagAEGIS2UseGuacToShowFAEUpsell_0 = require(l_Parent_0.SharedFlags).FFlagAEGIS2UseGuacToShowFAEUpsell;
-local v7 = nil;
-if l_FFlagAEGIS2UseGuacToShowFAEUpsell_0 then
-    v7 = require(l_Parent_0.UniversalAppPolicy);
-end;
-return function() --[[ Line: 21 ]]
-    -- upvalues: l_FFlagAEGIS2UseGuacToShowFAEUpsell_0 (copy), l_UserInputService_0 (copy), l_AvatarChatService_0 (copy), l_FFlagTestDeviceForFAEUpsell_0 (copy), l_deviceMeetsRequirementsForFAE_0 (copy), v7 (ref)
-    local v8 = false;
-    if not l_FFlagAEGIS2UseGuacToShowFAEUpsell_0 then
-        local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-        local v10;
-        if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.IOS and l_l_UserInputService_0_Platform_0 ~= Enum.Platform.Android and l_l_UserInputService_0_Platform_0 ~= Enum.Platform.Windows then
-            v10 = false;
-            v8 = l_l_UserInputService_0_Platform_0 ~= Enum.Platform.OSX;
-        end;
-        if not v8 then
-            v10 = l_AvatarChatService_0:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE);
-            if v10 then
-                if l_FFlagTestDeviceForFAEUpsell_0 then
-                    return (l_deviceMeetsRequirementsForFAE_0());
-                else
-                    v10 = true;
-                end;
-            end;
-        end;
-        v8 = false;
-        return v10;
-    else
-        local v11 = v7.getAppFeaturePolicies().getShowInExpFAEUpsell();
-        if v11 then
-            v11 = l_AvatarChatService_0:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE);
-            if v11 then
-                if l_FFlagTestDeviceForFAEUpsell_0 then
-                    return (l_deviceMeetsRequirementsForFAE_0());
-                else
-                    v11 = true;
-                end;
-            end;
-        end;
-        return v11;
-    end;
-end;
+local UserInputService = game:GetService("UserInputService")
+local AvatarChatService = game:GetService("AvatarChatService")
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local SocialExperiments = require(Parent.SocialExperiments)
+local FFlagTestDeviceForFAEUpsell = SocialExperiments.FFlagTestDeviceForFAEUpsell
+local deviceMeetsRequirementsForFAE = SocialExperiments.deviceMeetsRequirementsForFAE
+local FFlagAEGIS2UseGuacToShowFAEUpsell = require(Parent.SharedFlags).FFlagAEGIS2UseGuacToShowFAEUpsell
+local UniversalAppPolicy = nil
+
+if FFlagAEGIS2UseGuacToShowFAEUpsell then
+	UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+end
+
+return function() -- line: 21
+	-- upvalues: FFlagAEGIS2UseGuacToShowFAEUpsell (copy), UserInputService (copy), AvatarChatService (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), UniversalAppPolicy (ref)
+	if FFlagAEGIS2UseGuacToShowFAEUpsell then
+		local v9 = UniversalAppPolicy.getAppFeaturePolicies().getShowInExpFAEUpsell()
+
+		if v9 then
+			v9 = AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
+
+			if v9 then
+				if FFlagTestDeviceForFAEUpsell then
+					return (deviceMeetsRequirementsForFAE())
+				end
+
+				v9 = true
+			end
+		end
+
+		return v9
+	end
+
+	local Platform = UserInputService:GetPlatform()
+	local v11
+
+	if Platform ~= Enum.Platform.IOS and Platform ~= Enum.Platform.Android and Platform ~= Enum.Platform.Windows then
+		v11 = false
+
+		if Platform ~= Enum.Platform.OSX then
+			return v11
+		end
+	end
+
+	v11 = AvatarChatService:deviceMeetsRequirementsForFeature(Enum.DeviceFeatureType.InExperienceFAE)
+
+	if v11 then
+		if FFlagTestDeviceForFAEUpsell then
+			return (deviceMeetsRequirementsForFAE())
+		end
+
+		v11 = true
+	end
+
+	return v11
+end

@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxAppNavigation").Parent;
-return require(l_Parent_0.React).createContext({
-    render = function(v1) --[[ Line: 9 ]] --[[ Name: render ]]
-        return v1;
-    end
-});
+local Parent = script:FindFirstAncestor("RobloxAppNavigation").Parent
+
+return require(Parent.React).createContext({
+	render = function(p1) -- line: 9
+		return p1
+	end
+})

@@ -1,327 +1,361 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local _ = require(script.Parent.ProfilerDataFormatV2);
-local v4 = require(script.Parent.ProfilerUtil);
-local l_getDurations_0 = v4.getDurations;
-local l_getNativeFlag_0 = v4.getNativeFlag;
-local l_getPluginFlag_0 = v4.getPluginFlag;
-local l_standardizeChildren_0 = v4.standardizeChildren;
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v10 = require(l_Components_0.CellLabel);
-local v11 = require(l_Components_0.BannerButton);
-local v12 = require(l_Components_0.Tooltip);
-local l_Actions_0 = script.Parent.Parent.Parent.Actions;
-local v14 = require(l_Actions_0.SetScriptProfilerRoot);
-local v15 = require(script.Parent.Parent.Parent.Constants);
-local l_LineWidth_0 = v15.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v15.GeneralFormatting.LineColor;
-local l_EntryFrameHeight_0 = v15.GeneralFormatting.EntryFrameHeight;
-local l_DepthIndent_0 = v15.ScriptProfilerFormatting.DepthIndent;
-local l_ValueCellWidth_0 = v15.ScriptProfilerFormatting.ValueCellWidth;
-local l_CellPadding_0 = v15.ScriptProfilerFormatting.CellPadding;
-local l_ValuePadding_0 = v15.ScriptProfilerFormatting.ValuePadding;
-local v23 = v1.PureComponent:extend("ProfilerViewEntry");
-local v28 = v2.UNSTABLE_connect2(nil, function(v24) --[[ Line: 39 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v14 (copy)
-    return {
-        dispatchSetScriptProfilerRoot = function(v25, v26, v27) --[[ Line: 41 ]] --[[ Name: dispatchSetScriptProfilerRoot ]]
-            -- upvalues: v24 (copy), v14 (ref)
-            v24(v14(v25, v26, v27));
-        end
-    };
-end)(v23);
-local function v30(v29) --[[ Line: 59 ]] --[[ Name: BorderedCellLabel ]]
-    -- upvalues: v1 (copy), v10 (copy), l_LineWidth_0 (copy), l_ValuePadding_0 (copy), l_LineColor_0 (copy)
-    return v1.createFragment({
-        Label = v1.createElement(v10, {
-            text = v29.text, 
-            size = v29.size, 
-            pos = v29.pos
-        }), 
-        LeftBorder = v1.createElement("Frame", {
-            Size = UDim2.new(UDim.new(0, l_LineWidth_0), v29.size.Y), 
-            Position = UDim2.fromOffset(-l_ValuePadding_0, 0) + v29.pos, 
-            AnchorPoint = Vector2.new(0, 0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        })
-    });
-end;
-local _ = function(v31) --[[ Line: 76 ]] --[[ Name: getNodeName ]]
-    local l_depth_0 = v31.depth;
-    local l_data_0 = v31.data;
-    local l_functionId_0 = v31.functionId;
-    local _ = l_data_0.Functions[l_functionId_0];
-    local v36 = l_depth_0 == 0 and l_functionId_0 == 0 and "<root>" or "<anonymous>";
-    local l_nodeName_0 = v31.nodeName;
-    if not l_nodeName_0 or #l_nodeName_0 == 0 then
-        return v36;
-    else
-        return l_nodeName_0;
-    end;
-end;
-v23.init = function(v39) --[[ Line: 90 ]] --[[ Name: init ]]
-    local v40 = {};
-    local v41 = true;
-    if v39.props.depth ~= 0 then
-        v41 = v39.props.expandedNodes[v39.props.nodeId];
-    end;
-    v40.expanded = v41;
-    v40.showTooltip = false;
-    v40.tooltipPos = UDim2.fromOffset(0, 0);
-    v39.state = v40;
-    v39.onButtonPress = function() --[[ Line: 97 ]]
-        -- upvalues: v39 (copy)
-        v39.props.expandedNodes[v39.props.nodeId] = not v39.state.expanded;
-        v39:setState(function(_) --[[ Line: 100 ]]
-            -- upvalues: v39 (ref)
-            return {
-                expanded = not v39.state.expanded
-            };
-        end);
-    end;
-    v39.onMouseEnter = function(_, v44, v45) --[[ Line: 107 ]]
-        -- upvalues: v39 (copy)
-        v39:setState({
-            showTooltip = true, 
-            tooltipPos = UDim2.fromOffset(v44, v45)
-        });
-    end;
-    v39.onMouseMove = function(_, v47, v48) --[[ Line: 114 ]]
-        -- upvalues: v39 (copy)
-        v39:setState({
-            showTooltip = true, 
-            tooltipPos = UDim2.fromOffset(v47, v48)
-        });
-    end;
-    v39.onMouseLeave = function() --[[ Line: 121 ]]
-        -- upvalues: v39 (copy)
-        v39:setState({
-            showTooltip = false
-        });
-    end;
-    v39.onMouse2Click = function() --[[ Line: 127 ]]
-        -- upvalues: v39 (copy)
-        local l_dispatchSetScriptProfilerRoot_0 = v39.props.dispatchSetScriptProfilerRoot;
-        local l_nodeId_0 = v39.props.nodeId;
-        local l_functionId_1 = v39.props.functionId;
-        local l_props_0 = v39.props;
-        local l_depth_1 = l_props_0.depth;
-        local l_data_1 = l_props_0.data;
-        local l_functionId_2 = l_props_0.functionId;
-        local _ = l_data_1.Functions[l_functionId_2];
-        local v57 = l_depth_1 == 0 and l_functionId_2 == 0 and "<root>" or "<anonymous>";
-        local l_nodeName_1 = l_props_0.nodeName;
-        if not l_nodeName_1 or #l_nodeName_1 == 0 then
-            l_nodeName_1 = v57;
-        end;
-        l_dispatchSetScriptProfilerRoot_0(l_nodeId_0, l_functionId_1, l_nodeName_1);
-    end;
-end;
-v23.renderChildren = function(v59, v60) --[[ Line: 132 ]] --[[ Name: renderChildren ]]
-    -- upvalues: l_getDurations_0 (copy), l_getPluginFlag_0 (copy), v1 (copy), v28 (copy)
-    local v61 = {};
-    if v59.state.expanded then
-        local l_percentageRatio_0 = v59.props.percentageRatio;
-        local v63 = l_getDurations_0(v59.props.data, v59.props.nodeId);
-        local v64 = v59.props.depth + 1;
-        local l_average_0 = v59.props.average;
-        local l_searchTerm_0 = v59.props.searchTerm;
-        local l_searchFilter_0 = v59.props.searchFilter;
-        local l_showPlugins_0 = v59.props.showPlugins;
-        local l_showGC_0 = v59.props.showGC;
-        local l_gcNodeOffsets_0 = v59.props.gcNodeOffsets;
-        local l_expandedNodes_0 = v59.props.expandedNodes;
-        local l_data_2 = v59.props.data;
-        local l_GCFuncId_0 = l_data_2.GCFuncId;
-        if v60 then
-            for v74, v75 in pairs(v60) do
-                if (#l_searchFilter_0 <= 0 or l_searchFilter_0[v75]) and (l_showGC_0 or v74 ~= l_GCFuncId_0) then
-                    local _ = l_data_2.Nodes[v75];
-                    local v77 = l_data_2.Functions[v74];
-                    if l_showPlugins_0 or not l_getPluginFlag_0(l_data_2, v77) then
-                        local v78 = l_getDurations_0(l_data_2, v75);
-                        v61[v74] = v1.createElement(v28, {
-                            layoutOrder = (v63 - v78) * 1000000, 
-                            depth = v64, 
-                            data = l_data_2, 
-                            nodeId = v75, 
-                            functionId = v74, 
-                            nodeName = v77.Name, 
-                            average = l_average_0, 
-                            percentageRatio = l_percentageRatio_0, 
-                            searchTerm = l_searchTerm_0, 
-                            searchFilter = l_searchFilter_0, 
-                            showPlugins = l_showPlugins_0, 
-                            showGC = l_showGC_0, 
-                            gcNodeOffsets = l_gcNodeOffsets_0, 
-                            expandedNodes = l_expandedNodes_0
-                        });
-                    end;
-                end;
-            end;
-            return v61;
-        elseif v59.props.nodeId == 0 then
-            assert(v60 == nil);
-            for v79, v80 in l_data_2.Categories do
-                if #l_searchFilter_0 <= 0 or l_searchFilter_0[v80.NodeId] then
-                    local _ = l_data_2.Nodes[v80.NodeId];
-                    local v82 = l_getDurations_0(l_data_2, v80.NodeId);
-                    local v83 = v59.props.pluginOffsets[v79];
-                    local v84 = v59.props.pluginGCOffsets[v79];
-                    if not l_showPlugins_0 then
-                        v82 = v82 - v83;
-                        if l_showGC_0 then
-                            v82 = v82 - v84;
-                        end;
-                    end;
-                    v61[v79] = v1.createElement(v28, {
-                        layoutOrder = (v63 - v82) * 1000000, 
-                        depth = v64, 
-                        data = l_data_2, 
-                        nodeId = v80.NodeId, 
-                        functionId = nil, 
-                        nodeName = v80.Name, 
-                        average = l_average_0, 
-                        percentageRatio = l_percentageRatio_0, 
-                        searchTerm = l_searchTerm_0, 
-                        searchFilter = l_searchFilter_0, 
-                        showPlugins = l_showPlugins_0, 
-                        pluginOffset = v83, 
-                        pluginGCOffset = v84, 
-                        showGC = l_showGC_0, 
-                        gcNodeOffsets = l_gcNodeOffsets_0, 
-                        expandedNodes = l_expandedNodes_0
-                    });
-                end;
-            end;
-        end;
-    end;
-    return v61;
-end;
-v23.renderValues = function(_, v86) --[[ Line: 231 ]] --[[ Name: renderValues ]]
-    -- upvalues: l_ValueCellWidth_0 (copy), l_ValuePadding_0 (copy), l_EntryFrameHeight_0 (copy), v1 (copy), v30 (copy)
-    local v87 = {};
-    local v88 = UDim2.new(l_ValueCellWidth_0, -l_ValuePadding_0, 0, l_EntryFrameHeight_0);
-    local v89 = UDim2.new(1 - l_ValueCellWidth_0 * #v86, l_ValuePadding_0, 0, 0);
-    for v90, v91 in ipairs(v86) do
-        v87[tostring(v90)] = v1.createElement(v30, {
-            text = tostring(v91), 
-            size = v88, 
-            pos = v89 + UDim2.fromScale(l_ValueCellWidth_0 * (v90 - 1), 0)
-        });
-    end;
-    return v87;
-end;
-v23.render = function(v92) --[[ Line: 246 ]] --[[ Name: render ]]
-    -- upvalues: l_EntryFrameHeight_0 (copy), l_DepthIndent_0 (copy), l_getDurations_0 (copy), l_standardizeChildren_0 (copy), v4 (copy), l_getNativeFlag_0 (copy), l_getPluginFlag_0 (copy), l_ValueCellWidth_0 (copy), v1 (copy), v12 (copy), v11 (copy), v10 (copy), l_CellPadding_0 (copy)
-    local l_props_1 = v92.props;
-    local v94 = l_props_1.size or UDim2.new(1, 0, 0, l_EntryFrameHeight_0);
-    local l_depth_2 = l_props_1.depth;
-    local v96 = l_props_1.layoutOrder or 0;
-    local v97 = l_depth_2 * l_DepthIndent_0;
-    local l_percentageRatio_1 = l_props_1.percentageRatio;
-    local l_data_3 = l_props_1.data;
-    local l_showPlugins_1 = l_props_1.showPlugins;
-    local l_showGC_1 = l_props_1.showGC;
-    local l_nodeId_1 = l_props_1.nodeId;
-    local l_functionId_3 = l_props_1.functionId;
-    local v104 = l_data_3.Functions[l_functionId_3];
-    local v105 = l_data_3.Nodes[l_nodeId_1];
-    local v106, v107 = l_getDurations_0(l_data_3, l_nodeId_1);
-    v106 = v106 / v92.props.average;
-    v107 = v107 / v92.props.average;
-    local v108 = l_standardizeChildren_0(l_data_3, v105);
-    if not l_showPlugins_1 then
-        if l_nodeId_1 == 0 then
-            v106 = v106 - (v92.props.pluginOffsets.Total or 0);
-            if l_showGC_1 then
-                v106 = v106 - (v92.props.pluginGCOffsets.Total or 0);
-            end;
-        else
-            v106 = v106 - (v92.props.pluginOffset or 0);
-            if l_showGC_1 then
-                v106 = v106 - (v92.props.pluginGCOffset or 0);
-            end;
-        end;
-    end;
-    if not l_showGC_1 then
-        local l_gcNodeOffsets_1 = l_props_1.gcNodeOffsets;
-        v106 = if l_nodeId_1 == 0 then v106 - (l_gcNodeOffsets_1.Total or 0) else v106 - (l_gcNodeOffsets_1[l_nodeId_1] or 0);
-    end;
-    local v110 = nil;
-    local v111 = nil;
-    if l_percentageRatio_1 then
-        if l_percentageRatio_1 == 0 then
-            v110 = "N/A";
-            v111 = "N/A";
-        else
-            v110 = string.format("%.3f%%", v106 / l_percentageRatio_1);
-            v111 = string.format("%.3f%%", v107 / l_percentageRatio_1);
-        end;
-    else
-        v110 = string.format("%.3f", v106 * 1000);
-        v111 = string.format("%.3f", v107 * 1000);
-    end;
-    local v112 = {
-        v110, 
-        v111
-    };
-    local l_depth_3 = l_props_1.depth;
-    local l_data_4 = l_props_1.data;
-    local l_functionId_4 = l_props_1.functionId;
-    local v116 = l_data_4.Functions[l_functionId_4];
-    local v117 = l_depth_3 == 0 and l_functionId_4 == 0 and "<root>" or "<anonymous>";
-    local l_nodeName_2 = l_props_1.nodeName;
-    if not l_nodeName_2 or #l_nodeName_2 == 0 then
-        l_nodeName_2 = v117;
-    end;
-    local l_l_nodeName_2_0 = l_nodeName_2;
-    l_depth_3 = v4.getSourceLocationString(l_data_3, v104, l_l_nodeName_2_0);
-    l_data_4 = l_getNativeFlag_0(l_data_3, v104);
-    if l_getPluginFlag_0(l_data_3, v104) then
-        l_l_nodeName_2_0 = l_l_nodeName_2_0 .. " <plugin>";
-    end;
-    if l_data_4 then
-        l_l_nodeName_2_0 = l_l_nodeName_2_0 .. " <native>";
-    end;
-    v116 = UDim.new(1 - l_ValueCellWidth_0 * #v112, -v97);
-    return v1.createElement("Frame", {
-        Size = v94, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v96, 
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, {
-        tooltip = if v92.state.showTooltip then v1.createElement(v12, {
-            text = l_depth_3, 
-            pos = v92.state.tooltipPos
-        }) else nil, 
-        layout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        button = v1.createElement(v11, {
-            size = UDim2.new(1, 0, 0, l_EntryFrameHeight_0), 
-            inset = v97, 
-            isExpanded = v92.state.expanded, 
-            isExpandable = v108 and next(v108) ~= nil or l_depth_2 == 0, 
-            onButtonPress = v92.onButtonPress, 
-            onMouseEnter = v92.onMouseEnter, 
-            onMouseLeave = v92.onMouseLeave, 
-            onMouseMove = v92.onMouseMove, 
-            onMouse2Click = v92.onMouse2Click, 
-            layoutOrder = -1
-        }, {
-            name = v1.createElement(v10, {
-                text = l_l_nodeName_2_0, 
-                size = UDim2.new(v116, UDim.new(1, 0)), 
-                pos = UDim2.new(0, l_CellPadding_0 + v97, 0, 0)
-            }), 
-            values = v1.createFragment(v92:renderValues(v112))
-        }), 
-        children = v1.createFragment(v92:renderChildren(v108))
-    });
-end;
-return v28;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
+require(script.Parent.ProfilerDataFormatV2)
+
+local ProfilerUtil = require(script.Parent.ProfilerUtil)
+local getDurations = ProfilerUtil.getDurations
+local getNativeFlag = ProfilerUtil.getNativeFlag
+local getPluginFlag = ProfilerUtil.getPluginFlag
+local standardizeChildren = ProfilerUtil.standardizeChildren
+local Components = script.Parent.Parent.Parent.Components
+local CellLabel = require(Components.CellLabel)
+local BannerButton = require(Components.BannerButton)
+local Tooltip = require(Components.Tooltip)
+local Actions = script.Parent.Parent.Parent.Actions
+local SetScriptProfilerRoot = require(Actions.SetScriptProfilerRoot)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local EntryFrameHeight = Constants.GeneralFormatting.EntryFrameHeight
+local DepthIndent = Constants.ScriptProfilerFormatting.DepthIndent
+local ValueCellWidth = Constants.ScriptProfilerFormatting.ValueCellWidth
+local CellPadding = Constants.ScriptProfilerFormatting.CellPadding
+local ValuePadding = Constants.ScriptProfilerFormatting.ValuePadding
+local v23 = Roact.PureComponent:extend("ProfilerViewEntry")
+
+local function mapDispatchToProps(p1) -- line: 39
+	-- upvalues: SetScriptProfilerRoot (copy)
+	return {
+		dispatchSetScriptProfilerRoot = function(p2, p3, s1: string?) -- line: 41
+			-- upvalues: p1 (copy), SetScriptProfilerRoot (copy)
+			p1(SetScriptProfilerRoot(p2, p3, s1))
+		end
+	}
+end
+
+local v25 = RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v23)
+
+local function BorderedCellLabel(t1: {[any]: any}) -- line: 59
+	-- upvalues: Roact (copy), CellLabel (copy), LineWidth (copy), ValuePadding (copy), LineColor (copy)
+	return Roact.createFragment({
+		Label = Roact.createElement(CellLabel, {
+			text = t1.text,
+			size = t1.size,
+			pos = t1.pos
+		}),
+		LeftBorder = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(UDim.new(0, LineWidth), t1.size.Y),
+			Position = UDim2.fromOffset(-ValuePadding, 0) + t1.pos,
+			AnchorPoint = Vector2.new(0, 0),
+			BackgroundColor3 = LineColor
+		})
+	})
+end
+local function getNodeName(p4) -- line: 76
+	local depth = p4.depth
+	local data = p4.data
+	local functionId = p4.functionId
+	local _ = data.Functions[functionId]
+	local v35 = (depth ~= 0 or functionId ~= 0) and "<anonymous>" or "<root>"
+	local nodeName = p4.nodeName
+
+	if not nodeName or #nodeName == 0 then
+		return v35
+	end
+
+	return nodeName
+end
+
+function v23.init(p5) -- line: 90
+	p5.state = {
+		showTooltip = false,
+		expanded = p5.props.depth == 0 or p5.props.expandedNodes[p5.props.nodeId],
+		tooltipPos = UDim2.fromOffset(0, 0)
+	}
+
+	function p5.onButtonPress() -- line: 97
+		-- upvalues: p5 (copy)
+		p5.props.expandedNodes[p5.props.nodeId] = not p5.state.expanded
+		p5:setState(function(_) -- line: 100
+			-- upvalues: p5 (copy)
+			return {
+				expanded = not p5.state.expanded
+			}
+		end)
+	end
+	function p5.onMouseEnter(_, p8, p9) -- line: 107
+		-- upvalues: p5 (copy)
+		p5:setState({
+			showTooltip = true,
+			tooltipPos = UDim2.fromOffset(p8, p9)
+		})
+	end
+	function p5.onMouseMove(_, p11, p12) -- line: 114
+		-- upvalues: p5 (copy)
+		p5:setState({
+			showTooltip = true,
+			tooltipPos = UDim2.fromOffset(p11, p12)
+		})
+	end
+	function p5.onMouseLeave() -- line: 121
+		-- upvalues: p5 (copy)
+		p5:setState({
+			showTooltip = false
+		})
+	end
+	function p5.onMouse2Click() -- line: 127
+		-- upvalues: p5 (copy)
+		local dispatchSetScriptProfilerRoot = p5.props.dispatchSetScriptProfilerRoot
+		local nodeId = p5.props.nodeId
+		local functionId = p5.props.functionId
+		local props = p5.props
+		local depth = props.depth
+		local data = props.data
+		local functionId2 = props.functionId
+		local _ = data.Functions[functionId2]
+		local v120 = (depth ~= 0 or functionId2 ~= 0) and "<anonymous>" or "<root>"
+		local nodeName = props.nodeName
+
+		if not nodeName or #nodeName == 0 then
+			nodeName = v120
+		end
+
+		dispatchSetScriptProfilerRoot(nodeId, functionId, nodeName)
+	end
+end
+function v23.renderChildren(p13, p14) -- line: 132
+	-- upvalues: getDurations (copy), getPluginFlag (copy), Roact (copy), v25 (copy)
+	local t2 = {}
+
+	if p13.state.expanded then
+		local percentageRatio = p13.props.percentageRatio
+		local v42 = getDurations(p13.props.data, p13.props.nodeId)
+		local v43 = p13.props.depth + 1
+		local average = p13.props.average
+		local searchTerm = p13.props.searchTerm
+		local searchFilter = p13.props.searchFilter
+		local showPlugins = p13.props.showPlugins
+		local showGC = p13.props.showGC
+		local gcNodeOffsets = p13.props.gcNodeOffsets
+		local expandedNodes = p13.props.expandedNodes
+		local data = p13.props.data
+		local GCFuncId = data.GCFuncId
+
+		if p14 then
+			for k, v in pairs(p14) do
+				if (not (#searchFilter > 0) or searchFilter[v]) and (showGC or k ~= GCFuncId) then
+					local _ = data.Nodes[v]
+					local v56 = data.Functions[k]
+
+					if showPlugins or not getPluginFlag(data, v56) then
+						local v57 = getDurations(data, v)
+
+						t2[k] = Roact.createElement(v25, {
+							layoutOrder = (v42 - v57) * 1000000,
+							depth = v43,
+							data = data,
+							nodeId = v,
+							functionId = k,
+							nodeName = v56.Name,
+							average = average,
+							percentageRatio = percentageRatio,
+							searchTerm = searchTerm,
+							searchFilter = searchFilter,
+							showPlugins = showPlugins,
+							showGC = showGC,
+							gcNodeOffsets = gcNodeOffsets,
+							expandedNodes = expandedNodes
+						})
+					end
+				end
+			end
+
+			return t2
+		end
+
+		if p13.props.nodeId == 0 then
+			assert(p14 == nil)
+
+			for v58, v59 in data.Categories do
+				if not (#searchFilter > 0) or searchFilter[v59.NodeId] then
+					local _ = data.Nodes[v59.NodeId]
+					local v61 = getDurations(data, v59.NodeId)
+					local v62 = p13.props.pluginOffsets[v58]
+					local v63 = p13.props.pluginGCOffsets[v58]
+
+					if not showPlugins then
+						v61 -= v62
+
+						if showGC then
+							v61 -= v63
+						end
+					end
+
+					t2[v58] = Roact.createElement(v25, {
+						functionId = nil,
+						layoutOrder = (v42 - v61) * 1000000,
+						depth = v43,
+						data = data,
+						nodeId = v59.NodeId,
+						nodeName = v59.Name,
+						average = average,
+						percentageRatio = percentageRatio,
+						searchTerm = searchTerm,
+						searchFilter = searchFilter,
+						showPlugins = showPlugins,
+						pluginOffset = v62,
+						pluginGCOffset = v63,
+						showGC = showGC,
+						gcNodeOffsets = gcNodeOffsets,
+						expandedNodes = expandedNodes
+					})
+				end
+			end
+		end
+	end
+
+	return t2
+end
+function v23.renderValues(_, p16) -- line: 231
+	-- upvalues: ValueCellWidth (copy), ValuePadding (copy), EntryFrameHeight (copy), Roact (copy), BorderedCellLabel (copy)
+	local t3 = {}
+	local uDim2 = UDim2.new(ValueCellWidth, -ValuePadding, 0, EntryFrameHeight)
+	local uDim2_2 = UDim2.new(1 - ValueCellWidth * #p16, ValuePadding, 0, 0)
+
+	for i, v in ipairs(p16) do
+		t3[tostring(i)] = Roact.createElement(BorderedCellLabel, {
+			text = tostring(v),
+			size = uDim2,
+			pos = uDim2_2 + UDim2.fromScale(ValueCellWidth * (i - 1), 0)
+		})
+	end
+
+	return t3
+end
+function v23.render(p17) -- line: 246
+	-- upvalues: EntryFrameHeight (copy), DepthIndent (copy), getDurations (copy), standardizeChildren (copy), ProfilerUtil (copy), getNativeFlag (copy), getPluginFlag (copy), ValueCellWidth (copy), Roact (copy), Tooltip (copy), BannerButton (copy), CellLabel (copy), CellPadding (copy)
+	local props = p17.props
+	local v73 = props.size or UDim2.new(1, 0, 0, EntryFrameHeight)
+	local depth = props.depth
+	local v75 = props.layoutOrder or 0
+	local v76 = depth * DepthIndent
+	local percentageRatio = props.percentageRatio
+	local data = props.data
+	local showPlugins = props.showPlugins
+	local showGC = props.showGC
+	local nodeId = props.nodeId
+	local functionId = props.functionId
+	local v83 = data.Functions[functionId]
+	local v84 = data.Nodes[nodeId]
+	local v85, v86 = getDurations(data, nodeId)
+	local v87 = v85 / p17.props.average
+	local v88 = v86 / p17.props.average
+	local v89 = standardizeChildren(data, v84)
+
+	if not showPlugins then
+		if nodeId == 0 then
+			v87 -= p17.props.pluginOffsets.Total or 0
+
+			if showGC then
+				v87 -= p17.props.pluginGCOffsets.Total or 0
+			end
+		else
+			v87 -= p17.props.pluginOffset or 0
+
+			if showGC then
+				v87 -= p17.props.pluginGCOffset or 0
+			end
+		end
+	end
+
+	if not showGC then
+		local gcNodeOffsets = props.gcNodeOffsets
+
+		v87 = if nodeId ~= 0 then v87 - (gcNodeOffsets[nodeId] or 0) else v87 - (gcNodeOffsets.Total or 0)
+	end
+
+	local s2, s3
+
+	if percentageRatio then
+		if percentageRatio == 0 then
+			s2 = "N/A"
+			s3 = "N/A"
+		else
+			s2 = string.format("%.3f%%", v87 / percentageRatio)
+			s3 = string.format("%.3f%%", v88 / percentageRatio)
+		end
+	else
+		s2 = string.format("%.3f", v87 * 1000)
+		s3 = string.format("%.3f", v88 * 1000)
+	end
+
+	local t4 = {
+		s2,
+		s3
+	}
+	local depth2 = props.depth
+	local data2 = props.data
+	local functionId3 = props.functionId
+	local _ = data2.Functions[functionId3]
+	local v98 = (depth2 ~= 0 or functionId3 ~= 0) and "<anonymous>" or "<root>"
+	local nodeName = props.nodeName
+
+	if not nodeName or #nodeName == 0 then
+		nodeName = v98
+	end
+
+	local v100 = ProfilerUtil.getSourceLocationString(data, v83, nodeName)
+	local v101 = getNativeFlag(data, v83)
+
+	if getPluginFlag(data, v83) then
+		nodeName ..= " <plugin>"
+	end
+
+	if v101 then
+		nodeName ..= " <native>"
+	end
+
+	local uDim = UDim.new(1 - ValueCellWidth * #t4, -v76)
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = v73,
+		LayoutOrder = v75,
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, {
+		tooltip = if not p17.state.showTooltip then nil else Roact.createElement(Tooltip, {
+			text = v100,
+			pos = p17.state.tooltipPos
+		}),
+		layout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		button = Roact.createElement(BannerButton, {
+			layoutOrder = -1,
+			size = UDim2.new(1, 0, 0, EntryFrameHeight),
+			inset = v76,
+			isExpanded = p17.state.expanded,
+			isExpandable = v89 and next(v89) ~= nil or depth == 0,
+			onButtonPress = p17.onButtonPress,
+			onMouseEnter = p17.onMouseEnter,
+			onMouseLeave = p17.onMouseLeave,
+			onMouseMove = p17.onMouseMove,
+			onMouse2Click = p17.onMouse2Click
+		}, {
+			name = Roact.createElement(CellLabel, {
+				text = nodeName,
+				size = UDim2.new(uDim, UDim.new(1, 0)),
+				pos = UDim2.new(0, CellPadding + v76, 0, 0)
+			}),
+			values = Roact.createFragment(p17:renderValues(t4))
+		}),
+		children = Roact.createFragment(p17:renderChildren(v89))
+	})
+end
+
+return v25

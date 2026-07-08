@@ -1,43 +1,54 @@
-local l_Parent_0 = script:FindFirstAncestor("ExperimentLayers").Parent;
-local v1 = require(l_Parent_0.Dash);
-local v2 = require(script.Parent.AppUserLayers);
-local v3 = game:DefineFastString("IxpNewLayersForRegistration", "");
-local function v8(v4, v5) --[[ Line: 21 ]] --[[ Name: findNextKey ]]
-    if not v4[v5] then
-        v4[v5] = true;
-        return v5;
-    else
-        for v6 = 2, 100 do
-            local v7 = v5 .. "_" .. v6;
-            if not v4[v7] then
-                v4[v7] = true;
-                return v7;
-            end;
-        end;
-        error("Exceeded max index for next key search: " .. v5);
-        return;
-    end;
-end;
-return function(v9) --[[ Line: 37 ]] --[[ Name: getAllAppUserLayers ]]
-    -- upvalues: v3 (copy), v2 (copy), v1 (copy), v8 (copy)
-    local v10 = v9 or v3;
-    if #v10 == 0 then
-        return v2;
-    else
-        local v11 = v1.copy(v2);
-        local v12 = {};
-        local v13 = {};
-        for v14, v15 in v11 do
-            v12[v14] = true;
-            v13[v15] = true;
-        end;
-        local v16 = string.split(v10, ",");
-        for _, v18 in (v1.map(v16, v1.trim)) do
-            if not v13[v18] then
-                v13[v18] = true;
-                v11[v8(v12, v18)] = v18;
-            end;
-        end;
-        return v11;
-    end;
-end;
+local Parent = script:FindFirstAncestor("ExperimentLayers").Parent
+local Dash = require(Parent.Dash)
+local AppUserLayers = require(script.Parent.AppUserLayers)
+local v4 = game:DefineFastString("IxpNewLayersForRegistration", "")
+
+local function findNextKey(t1: {[any]: any}, s1: string) -- line: 21
+	if not t1[s1] then
+		t1[s1] = true
+
+		return s1
+	end
+
+	for i = 2, 100 do
+		local v10 = s1 .. "_" .. i
+
+		if not t1[v10] then
+			t1[v10] = true
+
+			return v10
+		end
+	end
+
+	error("Exceeded max index for next key search: " .. s1)
+end
+local function getAllAppUserLayers(s2: string?) -- line: 37
+	-- upvalues: v4 (copy), AppUserLayers (copy), Dash (copy), findNextKey (copy)
+	local v12 = s2 or v4
+
+	if #v12 == 0 then
+		return AppUserLayers
+	end
+
+	local v13 = Dash.copy(AppUserLayers)
+	local t2 = {}
+	local t3 = {}
+
+	for v16, v17 in v13 do
+		t2[v16] = true
+		t3[v17] = true
+	end
+
+	local parts = string.split(v12, ",")
+
+	for _, v20 in (Dash.map(parts, Dash.trim)) do
+		if not t3[v20] then
+			t3[v20] = true
+			v13[findNextKey(t2, v20)] = v20
+		end
+	end
+
+	return v13
+end
+
+return getAllAppUserLayers

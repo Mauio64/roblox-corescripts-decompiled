@@ -1,43 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("AppStartup").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_ThirdPartyUserService_0 = game:GetService("ThirdPartyUserService");
-local l_default_0 = require(l_Parent_0.LoggingProtocol).default;
-local l_useProperty_0 = require(l_Parent_0.GuiObjectUtils).useProperty;
-if l_ThirdPartyUserService_0 and l_ThirdPartyUserService_0.IsSingleSignOnSupported and l_ThirdPartyUserService_0:IsSingleSignOnSupported() then
-    return function(_) --[[ Line: 17 ]]
-        -- upvalues: l_useNavigation_0 (copy), l_useProperty_0 (copy), l_ThirdPartyUserService_0 (copy), v1 (copy), l_default_0 (copy), l_AppPage_0 (copy)
-        local v8 = l_useNavigation_0();
-        local v9 = l_useProperty_0(l_ThirdPartyUserService_0, "HasActiveUser");
-        v1.useEffect(function() --[[ Line: 21 ]]
-            -- upvalues: l_default_0 (ref)
-            l_default_0:logEventOnce("platform_account_router_page_did_mount");
-        end, {});
-        v1.useEffect(function() --[[ Line: 25 ]]
-            -- upvalues: v9 (copy), l_default_0 (ref), v8 (copy), l_AppPage_0 (ref)
-            if v9 then
-                l_default_0:logEventOnce("platform_account_router_page_did_continue");
-                v8.replace(l_AppPage_0.SingleSignOnContainer);
-            end;
-        end, {
-            v9, 
-            v8
-        });
-        return nil;
-    end;
-else
-    return function(_) --[[ Line: 34 ]]
-        -- upvalues: l_useNavigation_0 (copy), v1 (copy), l_default_0 (copy), l_AppPage_0 (copy)
-        local v11 = l_useNavigation_0();
-        v1.useEffect(function() --[[ Line: 36 ]]
-            -- upvalues: l_default_0 (ref), v11 (copy), l_AppPage_0 (ref)
-            l_default_0:logEventOnce("platform_account_router_page_did_mount");
-            l_default_0:logEventOnce("platform_account_router_page_did_continue");
-            v11.replace(l_AppPage_0.Startup);
-        end, {
-            v11
-        });
-        return nil;
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppStartup").Parent
+local React = require(Parent.React)
+local useNavigation = require(Parent.Navigation).useNavigation
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local ThirdPartyUserService = game:GetService("ThirdPartyUserService")
+local default = require(Parent.LoggingProtocol).default
+local useProperty = require(Parent.GuiObjectUtils).useProperty
+
+if ThirdPartyUserService and (ThirdPartyUserService.IsSingleSignOnSupported and ThirdPartyUserService:IsSingleSignOnSupported()) then
+	return function(_: {[any]: any}) -- line: 17
+		-- upvalues: useNavigation (copy), useProperty (copy), ThirdPartyUserService (copy), React (copy), default (copy), AppPage (copy)
+		local v9 = useNavigation()
+		local v10 = useProperty(ThirdPartyUserService, "HasActiveUser")
+
+		React.useEffect(function() -- line: 21
+			-- upvalues: default (copy)
+			default:logEventOnce("platform_account_router_page_did_mount")
+		end, {})
+		React.useEffect(function() -- line: 25
+			-- upvalues: v10 (copy), default (copy), v9 (copy), AppPage (copy)
+			if v10 then
+				default:logEventOnce("platform_account_router_page_did_continue")
+				v9.replace(AppPage.SingleSignOnContainer)
+			end
+		end, {
+			v10,
+			v9
+		})
+
+		return nil
+	end
+end
+
+return function(_: {[any]: any}) -- line: 34
+	-- upvalues: useNavigation (copy), React (copy), default (copy), AppPage (copy)
+	local v12 = useNavigation()
+
+	React.useEffect(function() -- line: 36
+		-- upvalues: default (copy), v12 (copy), AppPage (copy)
+		default:logEventOnce("platform_account_router_page_did_mount")
+		default:logEventOnce("platform_account_router_page_did_continue")
+		v12.replace(AppPage.Startup)
+	end, { v12 })
+
+	return nil
+end

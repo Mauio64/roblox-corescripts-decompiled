@@ -1,21 +1,25 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function() --[[ Line: 23 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    return (setmetatable({
-        _weakMap = setmetatable({}, {
-            __mode = "k"
-        })
-    }, v0));
-end;
-v0.get = function(v1, v2) --[[ Line: 28 ]] --[[ Name: get ]]
-    return v1._weakMap[v2];
-end;
-v0.set = function(v3, v4, v5) --[[ Line: 32 ]] --[[ Name: set ]]
-    v3._weakMap[v4] = v5;
-    return v3;
-end;
-v0.has = function(v6, v7) --[[ Line: 37 ]] --[[ Name: has ]]
-    return v6._weakMap[v7] ~= nil;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 23
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		_weakMap = setmetatable({}, {
+			__mode = "k"
+		})
+	}, t1))
+end
+function t1.get(p1, p2) -- line: 28
+	return p1._weakMap[p2]
+end
+function t1.set(p3, p4, p5) -- line: 32
+	p3._weakMap[p4] = p5
+
+	return p3
+end
+function t1.has(p6, p7) -- line: 37
+	return p6._weakMap[p7] ~= nil
+end
+
+return t1

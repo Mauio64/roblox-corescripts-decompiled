@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableRecolorableBodiesDuringTryOn", false);
+return game:DefineFastFlag("AXEnableRecolorableBodiesDuringTryOn", false)

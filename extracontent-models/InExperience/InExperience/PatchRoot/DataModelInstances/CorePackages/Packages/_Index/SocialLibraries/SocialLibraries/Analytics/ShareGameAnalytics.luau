@@ -1,75 +1,85 @@
-local v0 = {};
-v0.__index = v0;
-v0.ButtonName = {
-    LuaChatInputBar = "luaChatInputBar", 
-    LuaGameDetails = "luaGameDetails"
-};
-v0.EventName = {
-    InviteSent = "inputShareGameInviteSent", 
-    EntryPoint = "inputShareGameEntryPoint"
-};
-v0.DiagCounters = {
-    EntryPoint = {
-        [v0.ButtonName.LuaChatInputBar] = game:DefineFastString("LuaShareGameLuaChatInputBarEntryCounter", "LuaShareGameLuaChatInputBarEntryCounter"), 
-        [v0.ButtonName.LuaGameDetails] = game:DefineFastString("LuaShareGameLuaGameDetailsEntryCounter", "LuaShareGameLuaGameDetailsEntryCounter")
-    }, 
-    InviteSent = {
-        [v0.ButtonName.LuaChatInputBar] = game:DefineFastString("LuaShareGameLuaChatInputBarInviteCounter", "LuaShareGameLuaChatInputBarInviteCounter"), 
-        [v0.ButtonName.LuaGameDetails] = game:DefineFastString("LuaShareGameLuaGameDetailsInviteCounter", "LuaShareGameLuaGameDetailsInviteCounter")
-    }
-};
-v0.new = function(v1, v2, v3) --[[ Line: 38 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    assert(v1, "EventStream implementation not found.");
-    assert(v2, "Diag implementation not found.");
-    assert(v3, "ButtonName not found.");
-    return (setmetatable({
-        _eventStreamImpl = v1, 
-        _diagImpl = v2, 
-        _buttonName = v3
-    }, v0));
-end;
-v0.onActivatedInviteSent = function(v4, v5, v6, v7, v8, v9) --[[ Line: 50 ]] --[[ Name: onActivatedInviteSent ]]
-    -- upvalues: v0 (copy)
-    local v10 = v4:_getButtonName();
-    local l_InviteSent_0 = v0.EventName.InviteSent;
-    local v12 = table.concat(v9, ",");
-    local v13 = {
-        btn = v10, 
-        placeId = tostring(v5), 
-        gameId = tostring(v6), 
-        senderId = v7, 
-        conversationId = tostring(v8), 
-        participants = v12
-    };
-    v4:_getEventStream():setRBXEventStream("touch", l_InviteSent_0, v13);
-    local v14 = v0.DiagCounters.InviteSent[v4:_getButtonName()];
-    if v14 then
-        v4:_getDiag():reportCounter(v14, 1);
-    end;
-end;
-v0.inputShareGameEntryPoint = function(v15, v16, v17) --[[ Line: 71 ]] --[[ Name: inputShareGameEntryPoint ]]
-    -- upvalues: v0 (copy)
-    local v18 = v15:_getButtonName();
-    local l_EntryPoint_0 = v0.EventName.EntryPoint;
-    local v20 = {
-        btn = v18, 
-        placeId = v16 and tostring(v16), 
-        gameId = v17 and tostring(v17)
-    };
-    v15:_getEventStream():setRBXEventStream("touch", l_EntryPoint_0, v20);
-    local v21 = v0.DiagCounters.EntryPoint[v15:_getButtonName()];
-    if v21 then
-        v15:_getDiag():reportCounter(v21, 1);
-    end;
-end;
-v0._getEventStream = function(v22) --[[ Line: 89 ]] --[[ Name: _getEventStream ]]
-    return v22._eventStreamImpl;
-end;
-v0._getDiag = function(v23) --[[ Line: 93 ]] --[[ Name: _getDiag ]]
-    return v23._diagImpl;
-end;
-v0._getButtonName = function(v24) --[[ Line: 97 ]] --[[ Name: _getButtonName ]]
-    return v24._buttonName;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+t1.ButtonName = {
+	LuaChatInputBar = "luaChatInputBar",
+	LuaGameDetails = "luaGameDetails"
+}
+t1.EventName = {
+	InviteSent = "inputShareGameInviteSent",
+	EntryPoint = "inputShareGameEntryPoint"
+}
+t1.DiagCounters = {
+	EntryPoint = {
+		[t1.ButtonName.LuaChatInputBar] = game:DefineFastString("LuaShareGameLuaChatInputBarEntryCounter", "LuaShareGameLuaChatInputBarEntryCounter"),
+		[t1.ButtonName.LuaGameDetails] = game:DefineFastString("LuaShareGameLuaGameDetailsEntryCounter", "LuaShareGameLuaGameDetailsEntryCounter")
+	},
+	InviteSent = {
+		[t1.ButtonName.LuaChatInputBar] = game:DefineFastString("LuaShareGameLuaChatInputBarInviteCounter", "LuaShareGameLuaChatInputBarInviteCounter"),
+		[t1.ButtonName.LuaGameDetails] = game:DefineFastString("LuaShareGameLuaGameDetailsInviteCounter", "LuaShareGameLuaGameDetailsInviteCounter")
+	}
+}
+
+function t1.new(p1, p2, p3) -- line: 38
+	-- upvalues: t1 (copy)
+	assert(p1, "EventStream implementation not found.")
+	assert(p2, "Diag implementation not found.")
+	assert(p3, "ButtonName not found.")
+
+	return (setmetatable({
+		_eventStreamImpl = p1,
+		_diagImpl = p2,
+		_buttonName = p3
+	}, t1))
+end
+function t1.onActivatedInviteSent(p4, p5, p6, p7, p8, p9) -- line: 50
+	-- upvalues: t1 (copy)
+	local v11 = p4:_getButtonName()
+	local InviteSent = t1.EventName.InviteSent
+	local v13 = table.concat(p9, ",")
+	local t2 = {
+		btn = v11,
+		placeId = tostring(p5),
+		gameId = tostring(p6),
+		senderId = p7,
+		conversationId = tostring(p8),
+		participants = v13
+	}
+
+	p4:_getEventStream():setRBXEventStream("touch", InviteSent, t2)
+
+	local v15 = t1.DiagCounters.InviteSent[p4:_getButtonName()]
+
+	if v15 then
+		p4:_getDiag():reportCounter(v15, 1)
+	end
+end
+function t1.inputShareGameEntryPoint(p10, p11, p12) -- line: 71
+	-- upvalues: t1 (copy)
+	local v19 = p10:_getButtonName()
+	local EntryPoint = t1.EventName.EntryPoint
+	local t3 = {
+		btn = v19,
+		placeId = p11 and tostring(p11),
+		gameId = p12 and tostring(p12)
+	}
+
+	p10:_getEventStream():setRBXEventStream("touch", EntryPoint, t3)
+
+	local v22 = t1.DiagCounters.EntryPoint[p10:_getButtonName()]
+
+	if v22 then
+		p10:_getDiag():reportCounter(v22, 1)
+	end
+end
+function t1._getEventStream(p13) -- line: 89
+	return p13._eventStreamImpl
+end
+function t1._getDiag(p14) -- line: 93
+	return p14._diagImpl
+end
+function t1._getButtonName(p15) -- line: 97
+	return p15._buttonName
+end
+
+return t1

@@ -1,29 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local l_createNextOrder_0 = require(l_script_FirstAncestor_0.Parent.ReactUtils).createNextOrder;
-return function() --[[ Line: 10 ]] --[[ Name: MusicIcon ]]
-    -- upvalues: l_createNextOrder_0 (copy), v1 (copy), v2 (copy)
-    local v4 = l_createNextOrder_0();
-    local v5 = v1.Hooks.useTokens();
-    local v6 = v5.Semantic.Icon.Size[v1.Enums.IconSize.Medium];
-    return v2.createElement(v1.View, {
-        Size = UDim2.fromOffset(v6, v6), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        backgroundStyle = {
-            Color3 = Color3.fromRGB(43, 45, 50), 
-            Transparency = 0
-        }, 
-        cornerRadius = UDim.new(0, v5.Radius.Medium), 
-        ZIndex = v4()
-    }, {
-        Icon = v2.createElement(v1.Icon, {
-            name = "icons/common/music", 
-            size = v1.Enums.IconSize.Medium, 
-            Position = UDim2.new(0.5, -1, 0.5, 0), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            ZIndex = v4()
-        })
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local Foundation = require(Songbird.Parent.Foundation)
+local React = require(Songbird.Parent.React)
+local createNextOrder = require(Songbird.Parent.ReactUtils).createNextOrder
+local getFFlagSongbirdMusicIconThumbnail = require(Songbird.Flags.getFFlagSongbirdMusicIconThumbnail)
+
+local function MusicIcon(t1: {[any]: any}) -- line: 17
+	-- upvalues: createNextOrder (copy), Foundation (copy), getFFlagSongbirdMusicIconThumbnail (copy), React (copy)
+	local v8 = createNextOrder()
+	local v9 = Foundation.Hooks.useTokens()
+	local Size_900 = v9.Size.Size_900
+	local v11 = getFFlagSongbirdMusicIconThumbnail() and t1.thumbnailUrl
+
+	return React.createElement(Foundation.View, {
+		Size = UDim2.fromOffset(Size_900, Size_900),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		ClipsDescendants = not not v11 or nil,
+		backgroundStyle = if v11 then nil else {
+			Transparency = 0,
+			Color3 = Color3.fromRGB(43, 45, 50)
+		},
+		cornerRadius = UDim.new(0, v9.Radius.Medium),
+		LayoutOrder = if not getFFlagSongbirdMusicIconThumbnail() then nil else t1.layoutOrder,
+		ZIndex = v8()
+	}, {
+		Thumbnail = if not v11 then nil else React.createElement(Foundation.Image, {
+			tag = "size-full",
+			Image = t1.thumbnailUrl,
+			ZIndex = v8()
+		}),
+		Icon = if v11 then nil else React.createElement(Foundation.Icon, {
+			name = "icons/common/music",
+			size = Foundation.Enums.IconSize.Medium,
+			Position = UDim2.new(0.5, -1, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ZIndex = v8()
+		})
+	})
+end
+
+return MusicIcon

@@ -1,23 +1,26 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local _ = require(script.Parent.Parent.Enums.Pages);
-local v4 = require(script.Parent.Parent.Actions.SetCurrentPage);
-local v5 = require(script.Parent.Parent.Actions.SetCurrentTag);
-return v2.createReducer({
-    currentPage = nil, 
-    currentTag = ""
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+
+require(script.Parent.Parent.Enums.Pages)
+
+local SetCurrentPage = require(script.Parent.Parent.Actions.SetCurrentPage)
+local SetCurrentTag = require(script.Parent.Parent.Actions.SetCurrentTag)
+
+return Rodux.createReducer({
+	currentPage = nil,
+	currentTag = ""
 }, {
-    [v4.name] = function(v6, v7) --[[ Line: 16 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v6, {
-            currentPage = if v7.page == nil then v1.None else v7.page
-        });
-    end, 
-    [v5.name] = function(v8, v9) --[[ Line: 21 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v8, {
-            currentTag = v9.tag
-        });
-    end
-});
+	[SetCurrentPage.name] = function(p1, p2) -- line: 16
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			currentPage = if p2.page ~= nil then p2.page else Cryo.None
+		})
+	end,
+	[SetCurrentTag.name] = function(p3, p4) -- line: 21
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			currentTag = p4.tag
+		})
+	end
+})

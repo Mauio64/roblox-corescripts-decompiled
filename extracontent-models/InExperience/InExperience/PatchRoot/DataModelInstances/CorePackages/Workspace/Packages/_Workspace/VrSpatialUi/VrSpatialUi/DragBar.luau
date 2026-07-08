@@ -1,90 +1,98 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VrSpatialUi");
-local v1 = require(l_script_FirstAncestor_0.Utils);
-local v2 = {
-    Hovering = "Hovering", 
-    Dragging = "Dragging", 
-    Idle = "Idle"
-};
-local v3 = {};
-v3.__index = v3;
-v3.getCFrame = function(v4) --[[ Line: 34 ]] --[[ Name: getCFrame ]]
-    return v4.part.CFrame;
-end;
-v3.setCFrame = function(v5, v6) --[[ Line: 38 ]] --[[ Name: setCFrame ]]
-    v5.part.CFrame = v6;
-end;
-v3.updateTransparency = function(v7) --[[ Line: 42 ]] --[[ Name: updateTransparency ]]
-    -- upvalues: v2 (copy)
-    if v7.dragBarState == v2.Hovering then
-        v7.dragBarImage.ImageTransparency = 0.2;
-        return;
-    elseif v7.dragBarState == v2.Dragging then
-        v7.dragBarImage.ImageTransparency = 0;
-        return;
-    else
-        v7.dragBarImage.ImageTransparency = 0.6;
-        return;
-    end;
-end;
-v3.updateState = function(v8) --[[ Line: 52 ]] --[[ Name: updateState ]]
-    -- upvalues: v2 (copy)
-    if v8.dragging then
-        v8.dragBarState = v2.Dragging;
-    elseif v8.hovering and not v8.dragging then
-        v8.dragBarState = v2.Hovering;
-    else
-        v8.dragBarState = v2.Idle;
-    end;
-    v8:updateTransparency();
-end;
-v3.startDrag = function(v9, v10) --[[ Line: 63 ]] --[[ Name: startDrag ]]
-    v9.everDragged = true;
-    v9.dragging = true;
-    v9.uiGroupOffSet = v10;
-    v9:updateState();
-end;
-v3.isEverDragged = function(v11) --[[ Line: 70 ]] --[[ Name: isEverDragged ]]
-    return v11.everDragged;
-end;
-v3.dragEnd = function(v12) --[[ Line: 74 ]] --[[ Name: dragEnd ]]
-    v12.dragging = false;
-    v12:updateState();
-end;
-v3.startHover = function(v13) --[[ Line: 79 ]] --[[ Name: startHover ]]
-    v13.hovering = true;
-    v13:updateState();
-end;
-v3.hoverEnd = function(v14) --[[ Line: 84 ]] --[[ Name: hoverEnd ]]
-    v14.hovering = false;
-    v14:updateState();
-end;
-v3.show = function(v15) --[[ Line: 89 ]] --[[ Name: show ]]
-    v15.part.Parent = v15.partsParent;
-end;
-v3.hide = function(v16) --[[ Line: 93 ]] --[[ Name: hide ]]
-    v16.part.Parent = nil;
-end;
-v3.rescale = function(v17, v18) --[[ Line: 97 ]] --[[ Name: rescale ]]
-    -- upvalues: v1 (copy)
-    v17.part.Size = v17.part.Size * v18;
-    if v17.uiGroupOffSet then
-        v17.uiGroupOffSet = v1.rescaleCFramePosition(v17.uiGroupOffSet, v18);
-    end;
-end;
-v3.new = function(v19, v20) --[[ Line: 104 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v21 = {
-        part = v19, 
-        dragBarImage = v20, 
-        hovering = false, 
-        dragging = false, 
-        everDragged = false, 
-        dragBarState = v2.Idle, 
-        partsParent = v19.Parent, 
-        uiGroupOffSet = nil
-    };
-    setmetatable(v21, v3);
-    v21.dragBarImage.ImageTransparency = 0.6;
-    return v21;
-end;
-return v3;
+local VrSpatialUi = script:FindFirstAncestor("VrSpatialUi")
+local Utils = require(VrSpatialUi.Utils)
+local _ = {
+	Hovering = "Hovering",
+	Dragging = "Dragging",
+	Idle = "Idle"
+}
+local t1 = {}
+
+t1.__index = t1
+
+function t1.getCFrame(p1) -- line: 34
+	return p1.part.CFrame
+end
+function t1.setCFrame(p2, cFrame: CFrame) -- line: 38
+	p2.part.CFrame = cFrame
+end
+function t1.updateTransparency(p3) -- line: 42
+	if p3.dragBarState == "Hovering" then
+		p3.dragBarImage.ImageTransparency = 0.2
+
+		return
+	end
+
+	if p3.dragBarState == "Dragging" then
+		p3.dragBarImage.ImageTransparency = 0
+
+		return
+	end
+
+	p3.dragBarImage.ImageTransparency = 0.6
+end
+function t1.updateState(p4) -- line: 52
+	if p4.dragging then
+		p4.dragBarState = "Dragging"
+	elseif p4.hovering and not p4.dragging then
+		p4.dragBarState = "Hovering"
+	else
+		p4.dragBarState = "Idle"
+	end
+
+	p4:updateTransparency()
+end
+function t1.startDrag(p5, cFrame: CFrame) -- line: 63
+	p5.everDragged = true
+	p5.dragging = true
+	p5.uiGroupOffSet = cFrame
+	p5:updateState()
+end
+function t1.isEverDragged(p6) -- line: 70
+	return p6.everDragged
+end
+function t1.dragEnd(p7) -- line: 74
+	p7.dragging = false
+	p7:updateState()
+end
+function t1.startHover(p8) -- line: 79
+	p8.hovering = true
+	p8:updateState()
+end
+function t1.hoverEnd(p9) -- line: 84
+	p9.hovering = false
+	p9:updateState()
+end
+function t1.show(p10) -- line: 89
+	p10.part.Parent = p10.partsParent
+end
+function t1.hide(p11) -- line: 93
+	p11.part.Parent = nil
+end
+function t1.rescale(p12, n1: number) -- line: 97
+	-- upvalues: Utils (copy)
+	p12.part.Size = p12.part.Size * n1
+
+	if p12.uiGroupOffSet then
+		p12.uiGroupOffSet = Utils.rescaleCFramePosition(p12.uiGroupOffSet, n1)
+	end
+end
+function t1.new(p13, p14) -- line: 104
+	-- upvalues: t1 (copy)
+	local t2 = {
+		hovering = false,
+		dragging = false,
+		everDragged = false,
+		dragBarState = "Idle",
+		uiGroupOffSet = nil,
+		part = p13,
+		dragBarImage = p14,
+		partsParent = p13.Parent
+	}
+
+	setmetatable(t2, t1)
+	t2.dragBarImage.ImageTransparency = 0.6
+
+	return t2
+end
+
+return t1

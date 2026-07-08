@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableBacktraceSessionInfo", false);
+return game:DefineFastFlag("LuaAppEnableBacktraceSessionInfo", false)

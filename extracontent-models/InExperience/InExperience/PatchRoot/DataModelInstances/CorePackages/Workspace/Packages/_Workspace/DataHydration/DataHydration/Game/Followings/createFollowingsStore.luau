@@ -1,181 +1,193 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local v3 = require(l_script_FirstAncestor_0.createDataCache);
-local v4 = require(l_script_FirstAncestor_0.createDataResolver);
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local v6 = require(l_Parent_0.DiscoveryUtils);
-local _ = require(l_Parent_0.LuauPolyfill);
-local l_logResponseError_0 = v6.logResponseError;
-local l_DiscoveryEventErrorLogger_0 = v6.DiscoveryEventErrorLogger;
-local v10 = require(script.Parent.fetchFollowing);
-local v11 = require(script.Parent.requestUpdateFollowing);
-local v12 = require(script.Parent.FollowingsStoreTypes);
-local v13 = require(script.Parent.FollowingsUrlBuilder);
-local l_FFlagLuaAppDataHydrationUpdateItem_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDataHydrationUpdateItem;
-return function() --[[ Line: 22 ]] --[[ Name: createFollowingsStore ]]
-    -- upvalues: v3 (copy), v4 (copy), l_logResponseError_0 (copy), v13 (copy), v10 (copy), v12 (copy), l_DiscoveryEventErrorLogger_0 (copy), v2 (copy), v11 (copy), l_FFlagLuaAppDataHydrationUpdateItem_0 (copy)
-    local v15 = v3();
-    local v16 = nil;
-    local v25 = v4({
-        cache = v15, 
-        supportsMultiGet = false, 
-        logError = function(v17) --[[ Line: 30 ]] --[[ Name: logError ]]
-            -- upvalues: l_logResponseError_0 (ref), v13 (ref)
-            l_logResponseError_0(v13.FOLLOWING_STATUS_URL, v17);
-        end, 
-        onClear = function() --[[ Line: 34 ]] --[[ Name: onClear ]]
-            -- upvalues: v16 (ref)
-            v16 = nil;
-        end, 
-        fetchFn = function(v18, _) --[[ Line: 38 ]] --[[ Name: fetchFn ]]
-            -- upvalues: v10 (ref), v12 (ref), l_DiscoveryEventErrorLogger_0 (ref), v16 (ref)
-            return v10(v18):andThen(function(v20) --[[ Line: 43 ]]
-                -- upvalues: v12 (ref), l_DiscoveryEventErrorLogger_0 (ref), v16 (ref)
-                local l_responseBody_0 = v20.responseBody;
-                if not v12.followingResponseValidator(l_responseBody_0) then
-                    l_DiscoveryEventErrorLogger_0.reportError("createFollowingsStore", "Invalid following response", {
-                        universeId = l_responseBody_0.UniverseId, 
-                        isFollowing = l_responseBody_0.IsFollowing, 
-                        userId = l_responseBody_0.UserId, 
-                        canFollow = l_responseBody_0.CanFollow
-                    });
-                    error({
-                        StatusCode = v20.responseCode
-                    });
-                end;
-                if l_responseBody_0.FollowingCountByType and l_responseBody_0.FollowingLimitByType then
-                    v16 = {
-                        followingCountByType = l_responseBody_0.FollowingCountByType, 
-                        followingLimitByType = l_responseBody_0.FollowingLimitByType
-                    };
-                end;
-                return {
-                    universeId = tostring(l_responseBody_0.UniverseId), 
-                    userId = tostring(l_responseBody_0.UserId), 
-                    canFollow = l_responseBody_0.CanFollow, 
-                    isFollowing = l_responseBody_0.IsFollowing
-                };
-            end):catch(function(v22) --[[ Line: 74 ]]
-                -- upvalues: l_DiscoveryEventErrorLogger_0 (ref), v18 (copy)
-                local v23 = false;
-                if type(v22) == "table" then
-                    v23 = v22.ClientError ~= nil;
-                end;
-                if v23 then
-                    local v24 = v22.message or v22.ClientError;
-                    l_DiscoveryEventErrorLogger_0.reportError("createFollowingsStore", "Client validation error fetching following", {
-                        universeId = v18, 
-                        clientError = v24
-                    });
-                    return;
-                else
-                    error(v22);
-                    return;
-                end;
-            end);
-        end
-    });
-    local function v41(v26, v27) --[[ Line: 95 ]] --[[ Name: updateFollowing ]]
-        -- upvalues: v2 (ref), v15 (copy), v16 (ref), v11 (ref), l_DiscoveryEventErrorLogger_0 (ref), l_logResponseError_0 (ref), v13 (ref)
-        local v28, v29 = v2.createSignal(nil);
-        local v30 = v15.getItem(v26);
-        local v31 = v30 and v30.data(false);
-        local v32 = if v31 then v31.isFollowing else nil;
-        local l_v16_0 = v16;
-        if v27 and l_v16_0 and l_v16_0.followingCountByType >= l_v16_0.followingLimitByType then
-            v29({
-                type = "error", 
-                errorType = "LimitReached", 
-                statusCode = nil, 
-                statusMessage = nil
-            });
-            return v28;
-        else
-            v15.updateItem(v26, {
-                isFollowing = v27
-            });
-            if l_v16_0 then
-                local v34 = v27 and 1 or -1;
-                v16 = {
-                    followingCountByType = (l_v16_0 and l_v16_0.followingCountByType or 0) + v34, 
-                    followingLimitByType = l_v16_0.followingLimitByType
-                };
-            end;
-            v11(v26, v27):andThen(function() --[[ Line: 143 ]]
-                -- upvalues: v29 (copy), v27 (copy)
-                v29({
-                    type = "success", 
-                    isFollowing = v27
-                });
-            end):catch(function(v35) --[[ Line: 149 ]]
-                -- upvalues: v15 (ref), v26 (copy), v32 (copy), l_v16_0 (copy), v16 (ref), v29 (copy), l_DiscoveryEventErrorLogger_0 (ref), v27 (copy), l_logResponseError_0 (ref), v13 (ref)
-                v15.updateItem(v26, {
-                    isFollowing = v32
-                });
-                if l_v16_0 then
-                    v16 = l_v16_0;
-                end;
-                local v36 = false;
-                if type(v35) == "table" then
-                    v36 = v35.ClientError ~= nil;
-                end;
-                local v37 = if v36 then v35.message or v35.ClientError else nil;
-                local v38 = if type(v35) == "table" and v35.StatusCode then v35.StatusCode else nil;
-                local v39 = if type(v35) == "table" and v35.StatusMessage then v35.StatusMessage else nil;
-                local v40 = nil;
-                v40 = v36 and "ClientError" or v38 == 400 and "LimitReached" or "NetworkError";
-                v29({
-                    type = "error", 
-                    errorType = v40, 
-                    statusCode = v38, 
-                    statusMessage = v37 or v39
-                });
-                if v36 then
-                    l_DiscoveryEventErrorLogger_0.reportError("updateFollowing", "Client validation error updating following", {
-                        universeId = v26, 
-                        method = v27 and "POST" or "DELETE", 
-                        clientError = v37
-                    });
-                    return;
-                else
-                    l_logResponseError_0(v13.FOLLOWING_UPDATE_URL, {
-                        StatusCode = v38
-                    });
-                    l_DiscoveryEventErrorLogger_0.reportError("updateFollowing", "Error updating following", {
-                        universeId = v26, 
-                        statusCode = v38, 
-                        method = v27 and "POST" or "DELETE", 
-                        statusMessage = v39
-                    });
-                    return;
-                end;
-            end);
-            return v28;
-        end;
-    end;
-    local function v42() --[[ Line: 212 ]] --[[ Name: clear ]]
-        -- upvalues: v16 (ref), v25 (copy)
-        v16 = nil;
-        v25.clear();
-    end;
-    return {
-        fetchFollowing = v25.fetchItem, 
-        fetchFollowings = v25.fetchItems, 
-        getFollowing = v25.getCachedItem, 
-        getFollowings = v25.getCachedItems, 
-        getAndFetchFollowing = v25.getAndFetchItem, 
-        getAndFetchFollowings = v25.getAndFetchItems, 
-        updateFollowing = v41, 
-        updateItem = if l_FFlagLuaAppDataHydrationUpdateItem_0 then v15.updateItem else nil, 
-        updateUserFollowingLimits = l_FFlagLuaAppDataHydrationUpdateItem_0 and function(v43) --[[ Line: 234 ]]
-            -- upvalues: v16 (ref)
-            v16 = v43;
-        end or nil, 
-        clear = v42, 
-        dispose = function() --[[ Line: 217 ]] --[[ Name: dispose ]]
-            -- upvalues: v25 (copy)
-            v25.dispose();
-        end
-    };
-end;
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local Signals = require(DataHydrationParent.Signals)
+local createDataCache = require(DataHydration.createDataCache)
+local createDataResolver = require(DataHydration.createDataResolver)
+
+require(DataHydration.DataHydrationTypes)
+
+local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+
+require(DataHydrationParent.LuauPolyfill)
+
+local logResponseError = DiscoveryUtils.logResponseError
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local fetchFollowing = require(script.Parent.fetchFollowing)
+local requestUpdateFollowing = require(script.Parent.requestUpdateFollowing)
+local FollowingsStoreTypes = require(script.Parent.FollowingsStoreTypes)
+local FollowingsUrlBuilder = require(script.Parent.FollowingsUrlBuilder)
+local FFlagLuaAppDataHydrationUpdateItem = require(DataHydrationParent.SharedFlags).FFlagLuaAppDataHydrationUpdateItem
+
+local function createFollowingsStore() -- line: 22
+	-- upvalues: createDataCache (copy), createDataResolver (copy), logResponseError (copy), FollowingsUrlBuilder (copy), fetchFollowing (copy), FollowingsStoreTypes (copy), DiscoveryEventErrorLogger (copy), Signals (copy), requestUpdateFollowing (copy), FFlagLuaAppDataHydrationUpdateItem (copy)
+	local v15 = createDataCache()
+	local u16 = nil
+	local v17 = createDataResolver({
+		supportsMultiGet = false,
+		cache = v15,
+		logError = function(p1) -- line: 30
+			-- upvalues: logResponseError (copy), FollowingsUrlBuilder (copy)
+			logResponseError(FollowingsUrlBuilder.FOLLOWING_STATUS_URL, p1)
+		end,
+		onClear = function() -- line: 34
+			-- upvalues: u16 (ref)
+			u16 = nil
+		end,
+		fetchFn = function(s1: string, _) -- line: 38
+			-- upvalues: fetchFollowing (copy), FollowingsStoreTypes (copy), DiscoveryEventErrorLogger (copy), u16 (ref)
+			return fetchFollowing(s1):andThen(function(p3) -- line: 43
+				-- upvalues: FollowingsStoreTypes (copy), DiscoveryEventErrorLogger (copy), u16 (ref)
+				local responseBody = p3.responseBody
+
+				if not FollowingsStoreTypes.followingResponseValidator(responseBody) then
+					DiscoveryEventErrorLogger.reportError("createFollowingsStore", "Invalid following response", {
+						universeId = responseBody.UniverseId,
+						isFollowing = responseBody.IsFollowing,
+						userId = responseBody.UserId,
+						canFollow = responseBody.CanFollow
+					})
+					error({
+						StatusCode = p3.responseCode
+					})
+				end
+
+				if responseBody.FollowingCountByType and responseBody.FollowingLimitByType then
+					u16 = {
+						followingCountByType = responseBody.FollowingCountByType,
+						followingLimitByType = responseBody.FollowingLimitByType
+					}
+				end
+
+				return {
+					universeId = tostring(responseBody.UniverseId),
+					userId = tostring(responseBody.UserId),
+					canFollow = responseBody.CanFollow,
+					isFollowing = responseBody.IsFollowing
+				}
+			end):catch(function(p4) -- line: 74
+				-- upvalues: DiscoveryEventErrorLogger (copy), s1 (copy)
+				if type(p4) == "table" and p4.ClientError ~= nil then
+					local v34 = p4.message or p4.ClientError
+
+					DiscoveryEventErrorLogger.reportError("createFollowingsStore", "Client validation error fetching following", {
+						universeId = s1,
+						clientError = v34
+					})
+
+					return
+				end
+
+				error(p4)
+			end)
+		end
+	})
+
+	return {
+		fetchFollowing = v17.fetchItem,
+		fetchFollowings = v17.fetchItems,
+		getFollowing = v17.getCachedItem,
+		getFollowings = v17.getCachedItems,
+		getAndFetchFollowing = v17.getAndFetchItem,
+		getAndFetchFollowings = v17.getAndFetchItems,
+		updateFollowing = function(s2: string, b1: boolean) -- line: 95
+			-- upvalues: Signals (copy), v15 (copy), u16 (ref), requestUpdateFollowing (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy), FollowingsUrlBuilder (copy)
+			local v23, v24 = Signals.createSignal(nil)
+			local v25 = v15.getItem(s2)
+			local v26 = v25 and v25.data(false)
+			local v27 = if not v26 then nil else v26.isFollowing
+			local v28 = u16
+
+			if b1 and (v28 and v28.followingCountByType >= v28.followingLimitByType) then
+				v24({
+					type = "error",
+					errorType = "LimitReached",
+					statusCode = nil,
+					statusMessage = nil
+				})
+
+				return v23
+			end
+
+			v15.updateItem(s2, {
+				isFollowing = b1
+			})
+
+			if v28 then
+				local v29 = not b1 and -1 or 1
+
+				u16 = {
+					followingCountByType = (v28 and v28.followingCountByType or 0) + v29,
+					followingLimitByType = v28.followingLimitByType
+				}
+			end
+
+			requestUpdateFollowing(s2, b1):andThen(function() -- line: 143
+				-- upvalues: v24 (copy), b1 (copy)
+				v24({
+					type = "success",
+					isFollowing = b1
+				})
+			end):catch(function(p5) -- line: 149
+				-- upvalues: v15 (copy), s2 (copy), v27 (copy), v28 (copy), u16 (ref), v24 (copy), DiscoveryEventErrorLogger (copy), b1 (copy), logResponseError (copy), FollowingsUrlBuilder (copy)
+				v15.updateItem(s2, {
+					isFollowing = v27
+				})
+
+				if v28 then
+					u16 = v28
+				end
+
+				local v36 = type(p5) == "table" and p5.ClientError ~= nil
+				local v37 = if not v36 then nil else p5.message or p5.ClientError
+				local v38 = if type(p5) ~= "table" or not p5.StatusCode then nil else p5.StatusCode
+				local v39 = if type(p5) ~= "table" or not p5.StatusMessage then nil else p5.StatusMessage
+				local v40 = if not v36 then v38 ~= 400 and "NetworkError" or "LimitReached" else "ClientError"
+
+				v24({
+					type = "error",
+					errorType = v40,
+					statusCode = v38,
+					statusMessage = v37 or v39
+				})
+
+				if v36 then
+					DiscoveryEventErrorLogger.reportError("updateFollowing", "Client validation error updating following", {
+						universeId = s2,
+						method = not b1 and "DELETE" or "POST",
+						clientError = v37
+					})
+
+					return
+				end
+
+				logResponseError(FollowingsUrlBuilder.FOLLOWING_UPDATE_URL, {
+					StatusCode = v38
+				})
+				DiscoveryEventErrorLogger.reportError("updateFollowing", "Error updating following", {
+					universeId = s2,
+					statusCode = v38,
+					method = not b1 and "DELETE" or "POST",
+					statusMessage = v39
+				})
+			end)
+
+			return v23
+		end,
+		updateItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else v15.updateItem,
+		updateUserFollowingLimits = if not FFlagLuaAppDataHydrationUpdateItem then nil else function(p6) -- line: 234
+			-- upvalues: u16 (ref)
+			u16 = p6
+		end,
+		clear = function() -- line: 212
+			-- upvalues: u16 (ref), v17 (copy)
+			u16 = nil
+			v17.clear()
+		end,
+		dispose = function() -- line: 217
+			-- upvalues: v17 (copy)
+			v17.dispose()
+		end
+	}
+end
+
+return createFollowingsStore

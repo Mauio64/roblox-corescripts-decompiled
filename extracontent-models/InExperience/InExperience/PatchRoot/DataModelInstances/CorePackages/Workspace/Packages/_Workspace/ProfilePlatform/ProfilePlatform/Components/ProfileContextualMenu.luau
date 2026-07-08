@@ -1,1 +1,1 @@
-return require(script.ProfileContextualMenuContainer);
+return require(script.ProfileContextualMenuContainer)

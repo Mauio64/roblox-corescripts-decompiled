@@ -1,124 +1,110 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v2 = require(l_script_FirstAncestor_0.Enums.ChipSize);
-local v3 = require(l_script_FirstAncestor_0.Enums.ChipVariant);
-local v4 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v6 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local function v13(v7) --[[ Line: 19 ]] --[[ Name: variantsFactory ]]
-    -- upvalues: v2 (copy), v1 (copy), v3 (copy)
-    local v8 = {
-        [v2.Small] = UDim.new(0, v7.Padding.Small), 
-        [v2.Medium] = UDim.new(0, v7.Padding.Medium), 
-        [v2.Large] = UDim.new(0, v7.Padding.Large)
-    };
-    local v9 = {
-        chip = {
-            tag = "row auto-x align-y-center align-x-center clip radius-circle"
-        }, 
-        text = {
-            tag = "auto-x size-0-full shrink text-truncate-end"
-        }
-    };
-    local v10 = {
-        [v2.Small] = {
-            chip = {
-                tag = "size-0-600"
-            }, 
-            text = {
-                tag = "text-label-small"
-            }
-        }, 
-        [v2.Medium] = {
-            chip = {
-                tag = "size-0-800"
-            }, 
-            text = {
-                tag = "text-label-medium"
-            }
-        }, 
-        [v2.Large] = {
-            chip = {
-                tag = "size-0-1000"
-            }, 
-            text = {
-                tag = "text-label-medium"
-            }
-        }
-    };
-    local v11 = if v1.FoundationAddUtilityVariantToChip then {
-        [v3.Utility] = {
-            [true] = {
-                chip = {
-                    backgroundStyle = v7.Inverse.Surface.Surface_0
-                }, 
-                text = {
-                    contentStyle = v7.Inverse.Content.Emphasis
-                }
-            }, 
-            [false] = {
-                chip = {
-                    backgroundStyle = v7.Color.ActionUtility.Background
-                }, 
-                text = {
-                    contentStyle = v7.Color.ActionUtility.Foreground
-                }
-            }
-        }, 
-        [v3.Standard] = {
-            [true] = {
-                chip = {
-                    backgroundStyle = v7.Inverse.Surface.Surface_0
-                }, 
-                text = {
-                    contentStyle = v7.Inverse.Content.Emphasis
-                }
-            }, 
-            [false] = {
-                chip = {
-                    backgroundStyle = v7.Color.ActionStandard.Background
-                }, 
-                text = {
-                    contentStyle = v7.Color.ActionStandard.Foreground
-                }
-            }
-        }
-    } else nil;
-    local v12 = if v1.FoundationAddUtilityVariantToChip then nil else {
-        [true] = {
-            chip = {
-                backgroundStyle = v7.Inverse.Surface.Surface_0
-            }, 
-            text = {
-                contentStyle = v7.Inverse.Content.Emphasis
-            }
-        }, 
-        [false] = {
-            chip = {
-                backgroundStyle = v7.Color.ActionStandard.Background
-            }, 
-            text = {
-                contentStyle = v7.Color.ActionStandard.Foreground
-            }
-        }
-    };
-    return {
-        common = v9, 
-        sizes = v10, 
-        types = v11, 
-        isChecked = v12, 
-        textSpacing = v8
-    };
-end;
-return function(v14, v15, v16, v17, v18, v19) --[[ Line: 93 ]]
-    -- upvalues: v6 (copy), v13 (copy), v4 (copy), v1 (copy)
-    local v20 = v6.useVariants("Chip", v13, v14);
-    return v4(v20.common, v20.sizes[v15], if v1.FoundationAddUtilityVariantToChip then v20.types[v16][v17] else nil, {
-        text = {
-            padding = {
-                left = if v18 then nil else v20.textSpacing[v15], 
-                right = if v19 then nil else v20.textSpacing[v15]
-            }
-        }
-    }, if v1.FoundationAddUtilityVariantToChip then nil else v20.isChecked[v17]);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local ChipSize = require(Foundation.Enums.ChipSize)
+local ChipVariant = require(Foundation.Enums.ChipVariant)
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+
+require(Foundation.Providers.Style.Tokens)
+
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+
+local function variantsFactory(p1) -- line: 17
+	-- upvalues: ChipSize (copy), ChipVariant (copy)
+	local t1 = {
+		[ChipSize.Small] = UDim.new(0, p1.Padding.Small),
+		[ChipSize.Medium] = UDim.new(0, p1.Padding.Medium),
+		[ChipSize.Large] = UDim.new(0, p1.Padding.Large)
+	}
+	local t2 = {
+		chip = {
+			tag = "row align-x-center align-y-center auto-x radius-circle clip"
+		},
+		text = {
+			tag = "shrink size-0-full auto-x text-truncate-end"
+		}
+	}
+	local t3 = {
+		[ChipSize.Small] = {
+			chip = {
+				tag = "size-0-600"
+			},
+			text = {
+				tag = "text-label-small"
+			}
+		},
+		[ChipSize.Medium] = {
+			chip = {
+				tag = "size-0-800"
+			},
+			text = {
+				tag = "text-label-medium"
+			}
+		},
+		[ChipSize.Large] = {
+			chip = {
+				tag = "size-0-1000"
+			},
+			text = {
+				tag = "text-label-medium"
+			}
+		}
+	}
+	local t4 = {
+		[ChipVariant.Utility] = {
+			[true] = {
+				chip = {
+					backgroundStyle = p1.Inverse.Surface.Surface_0
+				},
+				text = {
+					contentStyle = p1.Inverse.Content.Emphasis
+				}
+			},
+			[false] = {
+				chip = {
+					backgroundStyle = p1.Color.ActionUtility.Background
+				},
+				text = {
+					contentStyle = p1.Color.ActionUtility.Foreground
+				}
+			}
+		},
+		[ChipVariant.Standard] = {
+			[true] = {
+				chip = {
+					backgroundStyle = p1.Inverse.Surface.Surface_0
+				},
+				text = {
+					contentStyle = p1.Inverse.Content.Emphasis
+				}
+			},
+			[false] = {
+				chip = {
+					backgroundStyle = p1.Color.ActionStandard.Background
+				},
+				text = {
+					contentStyle = p1.Color.ActionStandard.Foreground
+				}
+			}
+		}
+	}
+
+	return {
+		common = t2,
+		sizes = t3,
+		types = t4,
+		textSpacing = t1
+	}
+end
+
+return function(p2, p3, p4, b1: boolean, b2: boolean, b3: boolean) -- line: 75
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+	local v18 = VariantsContext.useVariants("Chip", variantsFactory, p2)
+
+	return composeStyleVariant(v18.common, v18.sizes[p3], v18.types[p4][b1], {
+		text = {
+			padding = {
+				left = if not b2 then v18.textSpacing[p3] else nil,
+				right = if not b3 then v18.textSpacing[p3] else nil
+			}
+		}
+	})
+end

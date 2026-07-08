@@ -1,20 +1,22 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: AvatarPolicies ]]
-    return {
-        getAvatarHeaderIcon = function() --[[ Line: 3 ]] --[[ Name: getAvatarHeaderIcon ]]
-            -- upvalues: v0 (copy)
-            return v0.AvatarHeaderIcon or "LuaApp/icons/ic-back";
-        end, 
-        getAvatarEditorShowBuyRobuxOnTopBar = function() --[[ Line: 6 ]] --[[ Name: getAvatarEditorShowBuyRobuxOnTopBar ]]
-            -- upvalues: v0 (copy)
-            return v0.AvatarEditorShowBuyRobuxOnTopBar or false;
-        end, 
-        getCustomOutfitNames = function() --[[ Line: 9 ]] --[[ Name: getCustomOutfitNames ]]
-            -- upvalues: v0 (copy)
-            if v0.CustomCostumeNames ~= nil then
-                return v0.CustomCostumeNames;
-            else
-                return true;
-            end;
-        end
-    };
-end;
+local function AvatarPolicies(p1) -- line: 1
+	return {
+		getAvatarHeaderIcon = function() -- line: 3
+			-- upvalues: p1 (copy)
+			return p1.AvatarHeaderIcon or "LuaApp/icons/ic-back"
+		end,
+		getAvatarEditorShowBuyRobuxOnTopBar = function() -- line: 6
+			-- upvalues: p1 (copy)
+			return p1.AvatarEditorShowBuyRobuxOnTopBar or false
+		end,
+		getCustomOutfitNames = function() -- line: 9
+			-- upvalues: p1 (copy)
+			if p1.CustomCostumeNames ~= nil then
+				return p1.CustomCostumeNames
+			end
+
+			return true
+		end
+	}
+end
+
+return AvatarPolicies

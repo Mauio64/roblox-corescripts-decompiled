@@ -1,11 +1,12 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-math.randomseed(tick());
-return function(v1, v2, v3, v4) --[[ Line: 5 ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy)
-    if v4 < 100 * math.random() then
-        return;
-    else
-        l_RbxAnalyticsService_0:ReportToDiagByCountryCode(v1, v2, v3);
-        return;
-    end;
-end;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
+math.randomseed(tick())
+
+return function(p1, p2, p3, p4) -- line: 5
+	-- upvalues: RbxAnalyticsService (copy)
+	if p4 < 100 * math.random() then
+		return
+	end
+
+	RbxAnalyticsService:ReportToDiagByCountryCode(p1, p2, p3)
+end

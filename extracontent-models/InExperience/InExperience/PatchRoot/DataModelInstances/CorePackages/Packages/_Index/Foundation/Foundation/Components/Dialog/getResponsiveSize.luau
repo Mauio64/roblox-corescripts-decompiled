@@ -1,20 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Enums.DialogSize);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local l_DIALOG_SIZES_0 = require(script.Parent.useDialogVariants).DIALOG_SIZES;
-return function(v4, v5, v6) --[[ Line: 11 ]] --[[ Name: getResponsiveSize ]]
-    -- upvalues: v1 (copy), l_DIALOG_SIZES_0 (copy)
-    local v7 = ({
-        [v1.Small] = v6.Padding.Large, 
-        [v1.Medium] = v6.Padding.XLarge, 
-        [v1.Large] = v6.Padding.XLarge
-    })[v5] * 2;
-    local l_Scale_0 = v6.Config.UI.Scale;
-    if v4 <= l_DIALOG_SIZES_0[v1.Medium] * l_Scale_0 + v7 and v5 ~= v1.Small then
-        return v1.Small;
-    elseif v4 <= l_DIALOG_SIZES_0[v1.Large] * l_Scale_0 + v7 and v5 == v1.Large then
-        return v1.Medium;
-    else
-        return v5;
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local DialogSize = require(Foundation.Enums.DialogSize)
+
+require(Foundation.Providers.Style.Tokens)
+
+local DIALOG_SIZES = require(script.Parent.useDialogVariants).DIALOG_SIZES
+
+local function getResponsiveSize(n1: number, p1, p2) -- line: 11
+	-- upvalues: DialogSize (copy), DIALOG_SIZES (copy)
+	local v8 = ({
+		[DialogSize.Small] = p2.Padding.Large,
+		[DialogSize.Medium] = p2.Padding.XLarge,
+		[DialogSize.Large] = p2.Padding.XLarge
+	})[p1] * 2
+	local UIScale = p2.Config.UI.Scale
+
+	if n1 <= DIALOG_SIZES[DialogSize.Medium] * UIScale + v8 and p1 ~= DialogSize.Small then
+		return DialogSize.Small
+	end
+
+	if n1 <= DIALOG_SIZES[DialogSize.Large] * UIScale + v8 and p1 == DialogSize.Large then
+		return DialogSize.Medium
+	end
+
+	return p1
+end
+
+return getResponsiveSize

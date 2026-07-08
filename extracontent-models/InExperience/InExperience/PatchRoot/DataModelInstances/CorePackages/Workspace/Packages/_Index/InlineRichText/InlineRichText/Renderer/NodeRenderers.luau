@@ -1,3 +1,3 @@
 return {
-    InlineCustomRenderer = require(script.InlineCustomRenderer)
-};
+	InlineCustomRenderer = require(script.InlineCustomRenderer)
+}

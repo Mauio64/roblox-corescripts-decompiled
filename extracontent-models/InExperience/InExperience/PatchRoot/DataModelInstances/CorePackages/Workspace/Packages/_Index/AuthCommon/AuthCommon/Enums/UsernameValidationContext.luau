@@ -1,5 +1,5 @@
 return {
-    Unknown = "Unknown", 
-    Signup = "Signup", 
-    UsernameChange = "UsernameChange"
-};
+	Unknown = "Unknown",
+	Signup = "Signup",
+	UsernameChange = "UsernameChange"
+}

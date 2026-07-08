@@ -1,10 +1,13 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getUserIdsFromString ]]
-    local v1 = string.split(v0, ",");
-    local v2 = {};
-    for _, v4 in v1 do
-        if tonumber(v4) then
-            v2[v4] = true;
-        end;
-    end;
-    return v2;
-end;
+local function getUserIdsFromString(s1: string) -- line: 1
+	local t1 = {}
+
+	for _, v5 in (string.split(s1, ",")) do
+		if tonumber(v5) then
+			t1[v5] = true
+		end
+	end
+
+	return t1
+end
+
+return getUserIdsFromString

@@ -1,12 +1,17 @@
-return function(...) --[[ Line: 1 ]] --[[ Name: join ]]
-    local v0 = {};
-    for v1 = 1, select("#", ...) do
-        local v2 = select(v1, ...);
-        if v2 ~= nil then
-            for v3, v4 in pairs(v2) do
-                v0[v3] = v4;
-            end;
-        end;
-    end;
-    return v0;
-end;
+local function join(...) -- line: 1
+	local t1 = {}
+
+	for i = 1, select("#", ...) do
+		local v4 = select(i, ...)
+
+		if v4 ~= nil then
+			for k, v in pairs(v4) do
+				t1[k] = v
+			end
+		end
+	end
+
+	return t1
+end
+
+return join

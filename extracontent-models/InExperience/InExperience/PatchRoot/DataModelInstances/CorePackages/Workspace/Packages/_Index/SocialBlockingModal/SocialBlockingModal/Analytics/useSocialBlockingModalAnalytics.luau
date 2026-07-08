@@ -1,14 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialBlockingModal").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.AnalyticsSetup);
-return function(v3) --[[ Line: 12 ]] --[[ Name: useSocialBlockingModalAnalytics ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return (v1.useMemo(function() --[[ Line: 13 ]]
-        -- upvalues: v2 (ref), v3 (copy)
-        return v2({
-            infoForAllEvents = v3
-        });
-    end, {
-        v3
-    }));
-end;
+local Parent = script:FindFirstAncestor("SocialBlockingModal").Parent
+local React = require(Parent.React)
+local AnalyticsSetup = require(script.Parent.AnalyticsSetup)
+
+local function useSocialBlockingModalAnalytics(t1: {[any]: any}?) -- line: 12
+	-- upvalues: React (copy), AnalyticsSetup (copy)
+	return (React.useMemo(function() -- line: 13
+		-- upvalues: AnalyticsSetup (copy), t1 (copy)
+		return AnalyticsSetup({
+			infoForAllEvents = t1
+		})
+	end, { t1 }))
+end
+
+return useSocialBlockingModalAnalytics

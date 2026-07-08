@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SearchTopResultsTabEnabledForAll", false);
+return game:DefineFastFlag("SearchTopResultsTabEnabledForAll", false)

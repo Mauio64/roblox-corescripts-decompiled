@@ -1,236 +1,271 @@
-local l_TextService_0 = game:GetService("TextService");
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.UIBlox);
-local v5 = require(l_Parent_1.Cryo);
-local l_useStyle_0 = v4.Core.Style.useStyle;
-local l_HeaderBar_0 = v4.App.Bar.HeaderBar;
-local l_UtilityActionIcon_0 = v4.App.Button.UtilityActionIcon;
-local _ = require(l_Parent_0.Types);
-local v10 = {
-    automaticHeight = false, 
-    hasDivider = false, 
-    onMedia = false, 
-    isTitleCentered = false, 
-    utilitiesGap = UDim.new(0, 0)
-};
-local function v19(v11) --[[ Line: 33 ]] --[[ Name: BarTitle ]]
-    -- upvalues: l_useStyle_0 (copy), v3 (copy), l_TextService_0 (copy), v5 (copy)
-    local l_Tokens_0 = l_useStyle_0().Tokens;
-    local l_layoutOrder_0 = v11.layoutOrder;
-    local l_title_0 = v11.title;
-    local v15 = v11.titleFont or l_Tokens_0.Semantic.Typography.Title;
-    local v16 = if v11.onMedia then l_Tokens_0.Global.Color.White else l_Tokens_0.Semantic.Color.Text.Emphasis;
-    local v18 = v3.useMemo(function() --[[ Line: 43 ]]
-        -- upvalues: l_TextService_0 (ref), l_title_0 (copy), v15 (copy), l_Tokens_0 (copy)
-        local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(l_title_0, v15.FontSize, v15.Font, Vector2.new(1e999, 1e999));
-        return UDim2.fromOffset(l_l_TextService_0_TextSize_0.X + 2, l_l_TextService_0_TextSize_0.Y + l_Tokens_0.Global.Space_25 * 2);
-    end, {
-        l_title_0, 
-        v15.FontSize, 
-        v15.Font, 
-        l_Tokens_0
-    });
-    return v3.createElement("TextLabel", {
-        LayoutOrder = l_layoutOrder_0, 
-        Size = v18, 
-        BackgroundTransparency = 1, 
-        Text = l_title_0, 
-        Font = v15.Font, 
-        TextSize = v15.FontSize, 
-        LineHeight = v15.LineHeight, 
-        TextColor3 = v16.Color3, 
-        TextTransparency = v16.Transparency, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        TextWrapped = true
-    }, v5.Dictionary.join(v11.children or {}, {
-        Padding = v3.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, l_Tokens_0.Global.Space_25), 
-            PaddingBottom = UDim.new(0, l_Tokens_0.Global.Space_25)
-        })
-    }));
-end;
-local function v28(v20) --[[ Line: 73 ]] --[[ Name: useRenderLeft ]]
-    -- upvalues: v3 (copy), v19 (copy)
-    local l_renderNavigation_0 = v20.renderNavigation;
-    local l_title_1 = v20.title;
-    local l_onMedia_0 = v20.onMedia;
-    local l_titleFontStyle_0 = v20.titleFontStyle;
-    local l_isTitleCentered_0 = v20.isTitleCentered;
-    local l_groupTransparencyLeft_0 = v20.groupTransparencyLeft;
-    return v3.useCallback(function(v27) --[[ Line: 81 ]]
-        -- upvalues: v3 (ref), l_groupTransparencyLeft_0 (copy), l_renderNavigation_0 (copy), l_title_1 (copy), l_isTitleCentered_0 (copy), v19 (ref), l_titleFontStyle_0 (copy), l_onMedia_0 (copy)
-        return v3.createElement(l_groupTransparencyLeft_0 and "CanvasGroup" or "Frame", {
-            BackgroundTransparency = 1, 
-            GroupTransparency = if l_groupTransparencyLeft_0 then l_groupTransparencyLeft_0.transparency else nil, 
-            ref = if l_groupTransparencyLeft_0 then l_groupTransparencyLeft_0.guiObjectRef else nil, 
-            BorderSizePixel = 0, 
-            AutomaticSize = Enum.AutomaticSize.XY
-        }, {
-            ListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            Navigation = if l_renderNavigation_0 then l_renderNavigation_0({
-                layoutOrder = 1
-            }) else nil, 
-            Title = if not l_title_1 or l_isTitleCentered_0 then nil else v3.createElement(v19, {
-                layoutOrder = 2, 
-                title = l_title_1, 
-                titleFont = l_titleFontStyle_0, 
-                onMedia = l_onMedia_0
-            }, if v27 then v27.children else nil)
-        });
-    end, {
-        l_renderNavigation_0, 
-        l_title_1, 
-        l_titleFontStyle_0, 
-        l_groupTransparencyLeft_0, 
-        l_onMedia_0, 
-        l_isTitleCentered_0
-    });
-end;
-local function v35(v29) --[[ Line: 112 ]] --[[ Name: useRenderCenter ]]
-    -- upvalues: v3 (copy), v19 (copy)
-    local l_renderCenter_0 = v29.renderCenter;
-    local l_title_2 = v29.title;
-    local l_onMedia_1 = v29.onMedia;
-    local l_titleFontStyle_1 = v29.titleFontStyle;
-    local l_isTitleCentered_1 = v29.isTitleCentered;
-    return v3.useCallback(function() --[[ Line: 119 ]]
-        -- upvalues: l_renderCenter_0 (copy), l_title_2 (copy), l_isTitleCentered_1 (copy), v3 (ref), v19 (ref), l_titleFontStyle_1 (copy), l_onMedia_1 (copy)
-        if l_renderCenter_0 then
-            return l_renderCenter_0();
-        elseif l_title_2 and l_isTitleCentered_1 then
-            return v3.createElement(v19, {
-                title = l_title_2, 
-                titleFont = l_titleFontStyle_1, 
-                onMedia = l_onMedia_1
-            });
-        else
-            return nil;
-        end;
-    end, {
-        l_renderCenter_0, 
-        l_title_2, 
-        l_titleFontStyle_1, 
-        l_isTitleCentered_1, 
-        l_onMedia_1
-    });
-end;
-local function v43(v36) --[[ Line: 134 ]] --[[ Name: useRenderRight ]]
-    -- upvalues: v3 (copy), l_UtilityActionIcon_0 (copy)
-    local l_renderUserInfo_0 = v36.renderUserInfo;
-    local l_avatarActionIcon_0 = v36.avatarActionIcon;
-    local l_searchActionIcon_0 = v36.searchActionIcon;
-    local l_renderUtilities_0 = v36.renderUtilities;
-    local l_utilitiesGap_0 = v36.utilitiesGap;
-    local l_groupTransparencyRight_0 = v36.groupTransparencyRight;
-    return v3.useCallback(function() --[[ Line: 143 ]]
-        -- upvalues: v3 (ref), l_groupTransparencyRight_0 (copy), l_utilitiesGap_0 (copy), l_renderUserInfo_0 (copy), l_avatarActionIcon_0 (copy), l_UtilityActionIcon_0 (ref), l_searchActionIcon_0 (copy), l_renderUtilities_0 (copy)
-        return v3.createElement(l_groupTransparencyRight_0 and "CanvasGroup" or "Frame", {
-            Size = UDim2.fromScale(0, 1), 
-            BackgroundTransparency = 1, 
-            GroupTransparency = if l_groupTransparencyRight_0 then l_groupTransparencyRight_0.transparency else nil, 
-            ref = if l_groupTransparencyRight_0 then l_groupTransparencyRight_0.guiObjectRef else nil, 
-            BorderSizePixel = 0, 
-            AutomaticSize = Enum.AutomaticSize.X
-        }, {
-            ListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                Padding = l_utilitiesGap_0
-            }), 
-            UserInfo = if l_renderUserInfo_0 then l_renderUserInfo_0({
-                layoutOrder = 1, 
-                itemsGap = l_utilitiesGap_0
-            }) else nil, 
-            Avatar = if l_avatarActionIcon_0 then v3.createElement(l_UtilityActionIcon_0, {
-                layoutOrder = 2, 
-                icon = l_avatarActionIcon_0.icon, 
-                iconColor = {}, 
-                onActivated = l_avatarActionIcon_0.onActivated
-            }) else nil, 
-            SearchIcon = if l_searchActionIcon_0 then v3.createElement(l_UtilityActionIcon_0, {
-                layoutOrder = 3, 
-                icon = l_searchActionIcon_0.icon, 
-                onActivated = l_searchActionIcon_0.onActivated
-            }) else nil, 
-            Utilities = if l_renderUtilities_0 then l_renderUtilities_0({
-                layoutOrder = 4, 
-                itemsGap = l_utilitiesGap_0
-            }) else nil
-        });
-    end, {
-        l_renderUserInfo_0, 
-        l_avatarActionIcon_0, 
-        l_searchActionIcon_0, 
-        l_renderUtilities_0, 
-        l_utilitiesGap_0, 
-        l_groupTransparencyRight_0
-    });
-end;
-local function _(v44) --[[ Line: 191 ]] --[[ Name: shouldRenderRight ]]
-    local l_renderUserInfo_1 = v44.renderUserInfo;
-    local l_avatarActionIcon_1 = v44.avatarActionIcon;
-    local l_searchActionIcon_1 = v44.searchActionIcon;
-    local l_renderUtilities_1 = v44.renderUtilities;
-    if l_renderUserInfo_1 or l_avatarActionIcon_1 or l_searchActionIcon_1 or l_renderUtilities_1 then
-        return true;
-    else
-        return false;
-    end;
-end;
-return function(v50) --[[ Line: 203 ]] --[[ Name: AppHeaderBarComponent ]]
-    -- upvalues: v5 (copy), v10 (copy), v28 (copy), v35 (copy), v43 (copy), v3 (copy), l_HeaderBar_0 (copy)
-    local v51 = v5.Dictionary.join(v10, v50);
-    local l_barHeight_0 = v51.barHeight;
-    local l_zIndex_0 = v51.zIndex;
-    local l_automaticHeight_0 = v51.automaticHeight;
-    local l_groupTransparency_0 = v51.groupTransparency;
-    local l_backgroundStyle_0 = v51.backgroundStyle;
-    local l_hasDivider_0 = v51.hasDivider;
-    local l_onMedia_2 = v51.onMedia;
-    local l_onHeaderActivated_0 = v51.onHeaderActivated;
-    local l_paddingLeft_0 = v51.paddingLeft;
-    local l_paddingTop_0 = v51.paddingTop;
-    local l_paddingRight_0 = v51.paddingRight;
-    local l_paddingBottom_0 = v51.paddingBottom;
-    local v64 = v28(v51);
-    local v65 = v35(v51);
-    local v66 = v43(v51);
-    local l_renderUserInfo_2 = v51.renderUserInfo;
-    local l_avatarActionIcon_2 = v51.avatarActionIcon;
-    local l_searchActionIcon_2 = v51.searchActionIcon;
-    local l_renderUtilities_2 = v51.renderUtilities;
-    local v71 = not not l_renderUserInfo_2 or (l_avatarActionIcon_2 or l_searchActionIcon_2 or l_renderUtilities_2) and true or false;
-    return v3.createElement(l_groupTransparency_0 and "CanvasGroup" or "Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        GroupTransparency = if l_groupTransparency_0 then l_groupTransparency_0.transparency else nil, 
-        ref = if l_groupTransparency_0 then l_groupTransparency_0.guiObjectRef else nil, 
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, {
-        Bar = v3.createElement(l_HeaderBar_0, {
-            barHeight = l_barHeight_0, 
-            renderLeft = v64, 
-            renderCenter = v65, 
-            renderRight = if v71 then v66 else nil, 
-            onHeaderActivated = l_onHeaderActivated_0, 
-            backgroundStyle = l_backgroundStyle_0, 
-            isOnMedia = l_onMedia_2, 
-            automaticHeight = l_automaticHeight_0, 
-            paddingLeft = l_paddingLeft_0, 
-            paddingTop = l_paddingTop_0, 
-            paddingRight = l_paddingRight_0, 
-            paddingBottom = l_paddingBottom_0, 
-            zIndex = l_zIndex_0, 
-            hasDivider = l_hasDivider_0
-        })
-    });
-end;
+local TextService = game:GetService("TextService")
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local UIBlox = require(ParentParentParent.UIBlox)
+local Cryo = require(ParentParentParent.Cryo)
+local useStyle = UIBlox.Core.Style.useStyle
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local UtilityActionIcon = UIBlox.App.Button.UtilityActionIcon
+local SharedFlags = require(ParentParentParent.SharedFlags)
+local FFlagEnableConsoleRobloxLogo = SharedFlags.FFlagEnableConsoleRobloxLogo
+local FFlagLuaAppCompositionTopBarFullBleed = SharedFlags.FFlagLuaAppCompositionTopBarFullBleed
+local v13 = game:DefineFastFlag("AppHeaderBarUseSizeFull", false)
+
+require(ParentParent.Types)
+
+local t1 = {
+	automaticHeight = false,
+	hasDivider = false,
+	onMedia = false,
+	isTitleCentered = false,
+	utilitiesGap = UDim.new(0, 0)
+}
+
+local function BarTitle(t2: {[any]: any}) -- line: 39
+	-- upvalues: useStyle (copy), React (copy), TextService (copy), Cryo (copy)
+	local Tokens = useStyle().Tokens
+	local layoutOrder = t2.layoutOrder
+	local title = t2.title
+	local v25 = t2.titleFont or Tokens.Typography.HeadingLarge
+	local v26 = if not t2.onMedia then Tokens.Color.Content.Emphasis else Tokens.Color.Extended.White.White_100
+	local v27 = React.useMemo(function() -- line: 49
+		-- upvalues: TextService (copy), title (copy), v25 (copy), Tokens (copy)
+		local TextSize = TextService:GetTextSize(title, v25.FontSize, v25.Font, Vector2.new(1e999, 1e999))
+
+		return UDim2.fromOffset(TextSize.X + 2, TextSize.Y + Tokens.Size.Size_50 * 2)
+	end, {
+		title,
+		v25.FontSize,
+		v25.Font,
+		Tokens
+	})
+
+	return React.createElement("TextLabel", {
+		BackgroundTransparency = 1,
+		TextWrapped = true,
+		LayoutOrder = layoutOrder,
+		Size = v27,
+		Text = title,
+		Font = v25.Font,
+		TextSize = v25.FontSize,
+		LineHeight = v25.LineHeight,
+		TextColor3 = v26.Color3,
+		TextTransparency = v26.Transparency,
+		TextXAlignment = Enum.TextXAlignment.Left
+	}, Cryo.Dictionary.join(t2.children or {}, {
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, Tokens.Size.Size_50),
+			PaddingBottom = UDim.new(0, Tokens.Size.Size_50)
+		})
+	}))
+end
+local function useRenderLeft(p1) -- line: 79
+	-- upvalues: React (copy), BarTitle (copy)
+	local renderNavigation = p1.renderNavigation
+	local title = p1.title
+	local onMedia = p1.onMedia
+	local titleFontStyle = p1.titleFontStyle
+	local isTitleCentered = p1.isTitleCentered
+	local groupTransparencyLeft = p1.groupTransparencyLeft
+
+	return React.useCallback(function(p2) -- line: 87
+		-- upvalues: React (copy), groupTransparencyLeft (copy), renderNavigation (copy), title (copy), isTitleCentered (copy), BarTitle (copy), titleFontStyle (copy), onMedia (copy)
+		return React.createElement(not groupTransparencyLeft and "Frame" or "CanvasGroup", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			GroupTransparency = if not groupTransparencyLeft then nil else groupTransparencyLeft.transparency,
+			ref = if not groupTransparencyLeft then nil else groupTransparencyLeft.guiObjectRef,
+			AutomaticSize = Enum.AutomaticSize.XY
+		}, {
+			ListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			Navigation = if not renderNavigation then nil else renderNavigation({
+				layoutOrder = 1
+			}),
+			Title = if not title or isTitleCentered then nil else React.createElement(BarTitle, {
+				layoutOrder = 2,
+				title = title,
+				titleFont = titleFontStyle,
+				onMedia = onMedia
+			}, if not p2 then nil else p2.children)
+		})
+	end, {
+		renderNavigation,
+		title,
+		titleFontStyle,
+		groupTransparencyLeft,
+		onMedia,
+		isTitleCentered
+	})
+end
+local function useRenderCenter(p3) -- line: 118
+	-- upvalues: FFlagEnableConsoleRobloxLogo (copy), React (copy), v13 (copy), BarTitle (copy)
+	local renderCenter = p3.renderCenter
+	local title = p3.title
+	local onMedia = p3.onMedia
+	local titleFontStyle = p3.titleFontStyle
+	local isTitleCentered = p3.isTitleCentered
+	local v41 = if not FFlagEnableConsoleRobloxLogo then nil else p3.groupTransparencyCenter
+
+	return React.useCallback(function() -- line: 126
+		-- upvalues: renderCenter (copy), FFlagEnableConsoleRobloxLogo (copy), React (copy), v41 (copy), v13 (copy), title (copy), isTitleCentered (copy), BarTitle (copy), titleFontStyle (copy), onMedia (copy)
+		if renderCenter then
+			if FFlagEnableConsoleRobloxLogo then
+				return React.createElement(not v41 and "Frame" or "CanvasGroup", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					GroupTransparency = if not v41 then nil else v41.transparency,
+					ref = if not v41 then nil else v41.guiObjectRef,
+					Size = if not v13 then nil else UDim2.fromScale(1, 1),
+					AutomaticSize = if not v13 then Enum.AutomaticSize.XY else nil
+				}, {
+					CenterContent = renderCenter()
+				})
+			end
+
+			return renderCenter()
+		end
+
+		if title and isTitleCentered then
+			return React.createElement(BarTitle, {
+				title = title,
+				titleFont = titleFontStyle,
+				onMedia = onMedia
+			})
+		end
+
+		return nil
+	end, {
+		renderCenter,
+		title,
+		titleFontStyle,
+		isTitleCentered,
+		onMedia,
+		v41
+	})
+end
+local function useRenderRight(p4) -- line: 154
+	-- upvalues: React (copy), UtilityActionIcon (copy)
+	local renderUserInfo = p4.renderUserInfo
+	local avatarActionIcon = p4.avatarActionIcon
+	local searchActionIcon = p4.searchActionIcon
+	local renderUtilities = p4.renderUtilities
+	local utilitiesGap = p4.utilitiesGap
+	local groupTransparencyRight = p4.groupTransparencyRight
+
+	return React.useCallback(function() -- line: 163
+		-- upvalues: React (copy), groupTransparencyRight (copy), utilitiesGap (copy), renderUserInfo (copy), avatarActionIcon (copy), UtilityActionIcon (copy), searchActionIcon (copy), renderUtilities (copy)
+		return React.createElement(not groupTransparencyRight and "Frame" or "CanvasGroup", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.fromScale(0, 1),
+			GroupTransparency = if not groupTransparencyRight then nil else groupTransparencyRight.transparency,
+			ref = if not groupTransparencyRight then nil else groupTransparencyRight.guiObjectRef,
+			AutomaticSize = Enum.AutomaticSize.X
+		}, {
+			ListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = utilitiesGap
+			}),
+			UserInfo = if not renderUserInfo then nil else renderUserInfo({
+				layoutOrder = 1,
+				itemsGap = utilitiesGap
+			}),
+			Avatar = if not avatarActionIcon then nil else React.createElement(UtilityActionIcon, {
+				layoutOrder = 2,
+				icon = avatarActionIcon.icon,
+				iconColor = {},
+				onActivated = avatarActionIcon.onActivated
+			}),
+			SearchIcon = if not searchActionIcon then nil else React.createElement(UtilityActionIcon, {
+				layoutOrder = 3,
+				icon = searchActionIcon.icon,
+				onActivated = searchActionIcon.onActivated
+			}),
+			Utilities = if not renderUtilities then nil else renderUtilities({
+				layoutOrder = 4,
+				itemsGap = utilitiesGap
+			})
+		})
+	end, {
+		renderUserInfo,
+		avatarActionIcon,
+		searchActionIcon,
+		renderUtilities,
+		utilitiesGap,
+		groupTransparencyRight
+	})
+end
+local function shouldRenderRight(p5) -- line: 211
+	local renderUserInfo = p5.renderUserInfo
+	local avatarActionIcon = p5.avatarActionIcon
+	local searchActionIcon = p5.searchActionIcon
+	local renderUtilities = p5.renderUtilities
+
+	if renderUserInfo or (avatarActionIcon or searchActionIcon or renderUtilities) then
+		return true
+	end
+
+	return false
+end
+local function AppHeaderBarComponent(p6) -- line: 223
+	-- upvalues: Cryo (copy), t1 (copy), useRenderLeft (copy), useRenderCenter (copy), useRenderRight (copy), React (copy), FFlagLuaAppCompositionTopBarFullBleed (copy), HeaderBar (copy)
+	local v55 = Cryo.Dictionary.join(t1, p6)
+	local barHeight = v55.barHeight
+	local zIndex = v55.zIndex
+	local automaticHeight = v55.automaticHeight
+	local groupTransparency = v55.groupTransparency
+	local backgroundStyle = v55.backgroundStyle
+	local hasDivider = v55.hasDivider
+	local onMedia = v55.onMedia
+	local onHeaderActivated = v55.onHeaderActivated
+	local paddingLeft = v55.paddingLeft
+	local paddingTop = v55.paddingTop
+	local paddingRight = v55.paddingRight
+	local paddingBottom = v55.paddingBottom
+	local tag = v55.tag
+	local v69 = useRenderLeft(v55)
+	local v70 = useRenderCenter(v55)
+	local v71 = useRenderRight(v55)
+	local renderUserInfo = v55.renderUserInfo
+	local avatarActionIcon = v55.avatarActionIcon
+	local searchActionIcon = v55.searchActionIcon
+	local renderUtilities = v55.renderUtilities
+	local v76 = (renderUserInfo or (avatarActionIcon or searchActionIcon)) and true or not not renderUtilities
+
+	return React.createElement(not groupTransparency and "Frame" or "CanvasGroup", {
+		Size = UDim2.fromScale(1, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		GroupTransparency = if not groupTransparency then nil else groupTransparency.transparency,
+		ref = if not groupTransparency then nil else groupTransparency.guiObjectRef,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		[React.Tag] = if not FFlagLuaAppCompositionTopBarFullBleed then nil else tag
+	}, {
+		Bar = React.createElement(HeaderBar, {
+			barHeight = barHeight,
+			renderLeft = v69,
+			renderCenter = v70,
+			renderRight = if not v76 then nil else v71,
+			onHeaderActivated = onHeaderActivated,
+			backgroundStyle = backgroundStyle,
+			isOnMedia = onMedia,
+			automaticHeight = automaticHeight,
+			paddingLeft = paddingLeft,
+			paddingTop = paddingTop,
+			paddingRight = paddingRight,
+			paddingBottom = paddingBottom,
+			zIndex = zIndex,
+			hasDivider = hasDivider
+		})
+	})
+end
+
+return AppHeaderBarComponent

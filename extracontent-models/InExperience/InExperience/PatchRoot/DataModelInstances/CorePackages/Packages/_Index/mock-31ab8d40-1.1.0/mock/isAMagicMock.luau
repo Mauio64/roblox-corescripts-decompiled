@@ -1,10 +1,12 @@
-local v0 = require(script.Parent.symbols);
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    local v2 = getmetatable(v1);
-    if v2 then
-        return v2[v0.isMagicMock] ~= nil;
-    else
-        return false;
-    end;
-end;
+local symbols = require(script.Parent.symbols)
+
+return function(p1) -- line: 3
+	-- upvalues: symbols (copy)
+	local mt = getmetatable(p1)
+
+	if mt then
+		return mt[symbols.isMagicMock] ~= nil
+	end
+
+	return false
+end

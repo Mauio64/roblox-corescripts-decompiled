@@ -1,241 +1,370 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("TrustedContacts");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_PartialPageModal_0 = v3.App.Dialog.Modal.PartialPageModal;
-local l_FullPageModal_0 = v3.App.Dialog.Modal.FullPageModal;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local l_useLayerCollector_0 = v3.Core.Layout.LayerCollector.useLayerCollector;
-local l_LoadingSpinner_0 = v3.App.Loading.LoadingSpinner;
-local l_useScreenSize_0 = require(l_Parent_0.RobloxAppHooks).useScreenSize;
-local v10 = require(l_Parent_0.Responsive);
-local v11 = require(l_Parent_0.Foundation);
-local l_Text_0 = v11.Text;
-local l_useTokens_0 = v11.Hooks.useTokens;
-local l_View_0 = v11.View;
-local l_ScrollView_0 = v11.ScrollView;
-local l_ButtonVariant_0 = v11.Enums.ButtonVariant;
-local l_Dialog_0 = v11.Dialog;
-local l_DialogSize_0 = v11.Enums.DialogSize;
-local l_Sources_0 = require(l_Parent_0.SocialLuaAnalytics).Analytics.Enums.Sources;
-local v20 = require(l_script_FirstAncestor_0.Components.SocialMetadataSection);
-local v21 = game:DefineFastInt("TCMountMinLoadingTimeMs", 0);
-local l_FFlagTCShareLinkSenderUI_0 = require(l_Parent_0.SharedFlags).FFlagTCShareLinkSenderUI;
-local v23 = game:DefineFastFlag("TCFixNotifBackground", false);
-local v24 = game:DefineFastFlag("TCDialogCloseBtn", false);
-local v25 = require(l_script_FirstAncestor_0.Flags.FFlagTCLearnMoreLink);
-return function(v26) --[[ Line: 55 ]]
-    -- upvalues: l_useLayerCollector_0 (copy), l_useScreenSize_0 (copy), v10 (copy), v2 (copy), v21 (copy), l_useTokens_0 (copy), l_LoadingSpinner_0 (copy), l_Dialog_0 (copy), l_DialogSize_0 (copy), v24 (copy), v25 (copy), l_View_0 (copy), l_Text_0 (copy), v20 (copy), l_ButtonVariant_0 (copy), l_FFlagTCShareLinkSenderUI_0 (copy), l_FullPageModal_0 (copy), l_PartialPageModal_0 (copy), l_ButtonType_0 (copy), l_ScrollView_0 (copy), v11 (copy), l_Sources_0 (copy), v23 (copy)
-    local l_isVerticallyConstrained_0 = v26.isVerticallyConstrained;
-    local v28 = l_useLayerCollector_0();
-    local v29 = l_useScreenSize_0();
-    local v30 = v10.useOrientation();
-    local v31 = v30 == v10.DefaultKey;
-    local v32, v33 = v2.useState(v31);
-    local v34 = v2.useRef(os.clock());
-    v2.useEffect(function() --[[ Line: 65 ]]
-        -- upvalues: v31 (copy), v34 (copy), v21 (ref), v33 (copy)
-        if not v31 then
-            local v35 = os.clock() - v34.current;
-            local v36 = v21 / 1000;
-            if v35 < v36 then
-                delay(v36 - v35, function() --[[ Line: 71 ]]
-                    -- upvalues: v33 (ref)
-                    v33(false);
-                end);
-                return;
-            else
-                v33(false);
-            end;
-        end;
-    end, {
-        v31, 
-        v33
-    });
-    if v28 and v28.absoluteSize and v28.absoluteSize ~= Vector2.new(0, 0) then
-        v29 = v28.absoluteSize;
-    end;
-    local v37 = v30 == v10.BreakpointConfig.Enum.Landscape;
-    local v38 = l_useTokens_0();
-    if v32 then
-        return v2.createElement(l_LoadingSpinner_0, {
-            size = UDim2.fromOffset(50, 50), 
-            anchorPoint = Vector2.new(0.5, 0.5), 
-            position = UDim2.fromScale(0.5, 0.5)
-        });
-    else
-        local v39 = if v37 then v2.createElement(l_Dialog_0.Root, {
-            size = l_DialogSize_0.Medium, 
-            onClose = if v24 then v26.onCloseModal else nil
-        }, {
-            Title = v2.createElement(l_Dialog_0.Title, {
-                LayoutOrder = 1, 
-                text = v26.headerText
-            }), 
-            Contents = v2.createElement("ScrollingFrame", {
-                LayoutOrder = 2, 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1, 
-                Size = l_isVerticallyConstrained_0 and UDim2.new(1, -4, 0.3, 0) or UDim2.fromScale(1, 0), 
-                AutomaticSize = not l_isVerticallyConstrained_0 and Enum.AutomaticSize.Y or nil, 
-                VerticalScrollBarInset = Enum.ScrollBarInset.None, 
-                AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                CanvasSize = UDim2.fromScale(0, 0), 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                ScrollingEnabled = l_isVerticallyConstrained_0
-            }, {
-                UIListLayout = v2.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                TextIntro = if v25 then v2.createElement(l_View_0, {
-                    LayoutOrder = 1, 
-                    tag = "auto-y size-full-0 padding-bottom-large col"
-                }, {
-                    v2.createElement(l_Text_0, {
-                        LayoutOrder = 1, 
-                        tag = "auto-y size-full-0 text-align-x-left text-wrap", 
-                        Text = v26.descriptionText
-                    }); 
-                    LearnMore = v2.createElement(l_Text_0, {
-                        LayoutOrder = 2, 
-                        tag = "auto-xy size-0 text-align-x-left text-wrap", 
-                        Text = ("<u>%*</u>"):format(v26.learnMoreText), 
-                        onActivated = v26.onLearnMoreClick, 
-                        RichText = true
-                    })
-                }) else v2.createElement(l_Text_0, {
-                    LayoutOrder = 1, 
-                    tag = "auto-y size-full-0 text-align-x-left text-wrap padding-bottom-large", 
-                    Text = v26.descriptionText
-                }), 
-                Insights = v2.createElement(v20, {
-                    userId = v26.userId, 
-                    layoutOrder = 2
-                })
-            }), 
-            DialogActions = v2.createElement(l_Dialog_0.Actions, {
-                LayoutOrder = 4, 
-                actions = {
-                    {
-                        text = v26.primaryButtonText, 
-                        variant = l_ButtonVariant_0.Emphasis, 
-                        onActivated = v26.onPrimaryButtonPress
-                    }, 
-                    if l_FFlagTCShareLinkSenderUI_0 then if v26.secondaryButtonText then {
-                        text = v26.secondaryButtonText, 
-                        variant = l_ButtonVariant_0.Standard, 
-                        onActivated = v26.onSecondaryButtonPress
-                    } else nil else {
-                        text = v26.secondaryButtonText, 
-                        variant = l_ButtonVariant_0.Standard, 
-                        onActivated = v26.onSecondaryButtonPress
-                    }
-                }
-            })
-        }) else v2.createElement(l_isVerticallyConstrained_0 and l_FullPageModal_0 or l_PartialPageModal_0, {
-            title = v26.headerText, 
-            screenSize = v29, 
-            onCloseClicked = v26.onCloseModal, 
-            buttonStackProps = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimaryContextual, 
-                        props = {
-                            onActivated = v26.onPrimaryButtonPress, 
-                            text = v26.primaryButtonText
-                        }
-                    }, 
-                    if l_FFlagTCShareLinkSenderUI_0 then if v26.secondaryButtonText then {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = {
-                            onActivated = v26.onSecondaryButtonPress, 
-                            text = v26.secondaryButtonText
-                        }
-                    } else nil else {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = {
-                            onActivated = v26.onSecondaryButtonPress, 
-                            text = v26.secondaryButtonText
-                        }
-                    }
-                }, 
-                forcedFillDirection = Enum.FillDirection.Horizontal
-            }
-        }, {
-            Contents = v2.createElement(l_isVerticallyConstrained_0 and l_ScrollView_0 or l_View_0, {
-                tag = {
-                    ["col size-full-0 auto-y align-x-center"] = true, 
-                    ["gap-medium shrink"] = l_isVerticallyConstrained_0, 
-                    ["gap-large"] = not l_isVerticallyConstrained_0
-                }, 
-                scroll = l_isVerticallyConstrained_0 and {
-                    scrollBarVisibility = v11.Enums.ScrollBarVisibility.Always, 
-                    ScrollingDirection = Enum.ScrollingDirection.Y
-                }
-            }, {
-                UIListLayout = if v25 then v2.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }) else nil, 
-                OuterPadding = v2.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, l_isVerticallyConstrained_0 and v38.Padding.XSmall or v38.Padding.Large), 
-                    PaddingBottom = UDim.new(0, l_isVerticallyConstrained_0 and v38.Padding.Small or v38.Padding.XXLarge)
-                }), 
-                TextIntro = if v25 then v2.createElement(l_View_0, {
-                    LayoutOrder = 1, 
-                    tag = "auto-y size-full-0", 
-                    grow = not l_isVerticallyConstrained_0
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder
-                    }), 
-                    Text = v2.createElement(l_Text_0, {
-                        LayoutOrder = 1, 
-                        tag = {
-                            ["auto-y size-full-0 text-align-x-left text-wrap"] = true, 
-                            grow = not l_isVerticallyConstrained_0
-                        }, 
-                        Text = v26.descriptionText
-                    }), 
-                    LearnMore = v2.createElement(l_Text_0, {
-                        LayoutOrder = 2, 
-                        tag = "auto-xy size-0 text-align-x-left text-wrap", 
-                        Text = ("<u>%*</u>"):format(v26.learnMoreText), 
-                        onActivated = v26.onLearnMoreClick, 
-                        RichText = true
-                    })
-                }) else v2.createElement(l_Text_0, {
-                    LayoutOrder = 1, 
-                    tag = {
-                        ["auto-y size-full-0 text-align-x-left text-wrap"] = true, 
-                        grow = not l_isVerticallyConstrained_0
-                    }, 
-                    Text = v26.descriptionText
-                }), 
-                Insights = v2.createElement(v20, {
-                    userId = v26.userId, 
-                    layoutOrder = 2, 
-                    isVerticallyConstrained = l_isVerticallyConstrained_0
-                })
-            })
-        });
-        if v26.source == l_Sources_0.StreamNotification then
-            return v2.createElement("TextButton", {
-                Selectable = false, 
-                AutoButtonColor = false, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                Position = UDim2.new(0.5, 0, 0.5, 0), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundColor3 = v38.Color.Common.Scrim.Color3, 
-                BackgroundTransparency = v38.Color.Common.Scrim.Transparency, 
-                Text = v23 and "" or nil
-            }, {
-                TrustedContactModalComponent = v39
-            });
-        else
-            return v39;
-        end;
-    end;
-end;
+local TrustedContacts = script:FindFirstAncestor("TrustedContacts")
+local TrustedContactsParent = TrustedContacts.Parent
+local React = require(TrustedContactsParent.React)
+local UIBlox = require(TrustedContactsParent.UIBlox)
+local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
+local FullPageModal = UIBlox.App.Dialog.Modal.FullPageModal
+local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
+local useScreenSize = require(TrustedContactsParent.RobloxAppHooks).useScreenSize
+local FocusNavigationUtils = require(TrustedContactsParent.FocusNavigationUtils)
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local useFocusOnMount = FocusNavigationUtils.useFocusOnMount
+local InputHandlers = require(TrustedContactsParent.InputHandlers)
+
+require(TrustedContactsParent.ReactFocusNavigation)
+
+local Responsive = require(TrustedContactsParent.Responsive)
+local Foundation = require(TrustedContactsParent.Foundation)
+local IconSize = Foundation.Enums.IconSize
+local Loading = Foundation.Loading
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local useTokens = Foundation.Hooks.useTokens
+local View = Foundation.View
+local ScrollView = Foundation.ScrollView
+local Sheet = Foundation.Sheet
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local Dialog = Foundation.Dialog
+local DialogSize = Foundation.Enums.DialogSize
+local OnCloseCallbackReason = Foundation.Enums.OnCloseCallbackReason
+local Sources = require(TrustedContactsParent.SocialLuaAnalytics).Analytics.Enums.Sources
+local SocialMetadataSection = require(TrustedContacts.Components.SocialMetadataSection)
+local v32 = game:DefineFastInt("TCMountMinLoadingTimeMs", 0)
+local v33 = game:DefineFastFlag("TCDialogCloseBtn", false)
+local FFlagTCLearnMoreLink = require(TrustedContacts.Flags.FFlagTCLearnMoreLink)
+local FFlagTrustedContactsModalFixFocusNavigation = require(TrustedContacts.Flags.FFlagTrustedContactsModalFixFocusNavigation)
+local FFlagTCModalUseFoundationOverlay = require(TrustedContactsParent.SharedFlags).FFlagTCModalUseFoundationOverlay
+local FFlagTrustedFriendsUseEnumCTA = require(TrustedContactsParent.SharedFlags).FFlagTrustedFriendsUseEnumCTA
+local FFlagTrustedFriendsUseFoundationSheet = require(TrustedContactsParent.SharedFlags).FFlagTrustedFriendsUseFoundationSheet
+
+require(script.Parent.useModalButtonActions)
+
+return function(t1: {[any]: any}) -- line: 68
+	-- upvalues: useLayerCollector (copy), useScreenSize (copy), Responsive (copy), FFlagTrustedContactsModalFixFocusNavigation (copy), React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useFocusOnMount (copy), v32 (copy), useTokens (copy), Loading (copy), IconSize (copy), FFlagTrustedFriendsUseFoundationSheet (copy), Sheet (copy), FoundationText (copy), FFlagTCLearnMoreLink (copy), View (copy), SocialMetadataSection (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy), FFlagTrustedFriendsUseEnumCTA (copy), Dialog (copy), DialogSize (copy), FFlagTCModalUseFoundationOverlay (copy), OnCloseCallbackReason (copy), v33 (copy), FullPageModal (copy), PartialPageModal (copy), ScrollView (copy), Foundation (copy), Sources (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local isVerticallyConstrained = t1.isVerticallyConstrained
+	local v41 = useLayerCollector()
+	local v42 = useScreenSize()
+	local v43 = Responsive.useOrientation()
+	local onCloseModal = t1.onCloseModal
+	local v45 = if not FFlagTrustedContactsModalFixFocusNavigation then nil else React.useMemo(function() -- line: 76
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), onCloseModal (copy)
+		return {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(p1) -- line: 79
+					-- upvalues: onCloseModal (copy)
+					onCloseModal()
+					p1:cancel()
+				end)
+			}
+		}
+	end, { onCloseModal })
+	local v46 = if not FFlagTrustedContactsModalFixFocusNavigation then nil else useFocusOnMount()
+	local v47 = v43 == Responsive.DefaultKey
+	local v48, v49 = React.useState(v47)
+	local v50 = React.useRef(os.clock())
+
+	React.useEffect(function() -- line: 96
+		-- upvalues: v47 (copy), v50 (copy), v32 (copy), v49 (copy)
+		if not v47 then
+			local v58 = os.clock() - v50.current
+			local v59 = v32 / 1000
+
+			if v58 < v59 then
+				delay(v59 - v58, function() -- line: 102
+					-- upvalues: v49 (copy)
+					v49(false)
+				end)
+
+				return
+			end
+
+			v49(false)
+		end
+	end, {
+		v47,
+		v49
+	})
+
+	if v41 and (v41.absoluteSize and v41.absoluteSize ~= Vector2.new(0, 0)) then
+		v42 = v41.absoluteSize
+	end
+
+	local v51 = v43 == Responsive.BreakpointConfig.Enum.Landscape
+	local v52 = useTokens()
+
+	if v48 then
+		return React.createElement(Loading, {
+			size = IconSize.Large,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5)
+		})
+	end
+
+	local v53 = t1.modalButtonActions and t1.modalButtonActions[1] or nil
+	local v54 = t1.modalButtonActions and t1.modalButtonActions[2] or nil
+	local v55 = if not FFlagTrustedFriendsUseFoundationSheet then if not v51 then React.createElement(isVerticallyConstrained and FullPageModal or PartialPageModal, {
+		title = t1.headerText,
+		screenSize = v42,
+		onCloseClicked = t1.onCloseModal
+	}, {
+		Contents = React.createElement(isVerticallyConstrained and ScrollView or View, {
+			tag = {
+				["col align-x-center size-full-0 auto-y"] = true,
+				["shrink gap-medium"] = isVerticallyConstrained,
+				["gap-large"] = not isVerticallyConstrained
+			},
+			scroll = isVerticallyConstrained and {
+				scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.Always,
+				ScrollingDirection = Enum.ScrollingDirection.Y
+			}
+		}, {
+			UIListLayout = if not FFlagTCLearnMoreLink then nil else React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			OuterPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, isVerticallyConstrained and v52.Padding.XSmall or v52.Padding.Large),
+				PaddingBottom = UDim.new(0, isVerticallyConstrained and v52.Padding.Small or 0)
+			}),
+			TextIntro = if not FFlagTCLearnMoreLink then React.createElement(FoundationText, {
+				LayoutOrder = 1,
+				tag = {
+					["size-full-0 auto-y text-wrap text-align-x-left"] = true,
+					grow = not isVerticallyConstrained
+				},
+				Text = t1.descriptionText
+			}) else React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y",
+				grow = not isVerticallyConstrained
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Text = React.createElement(FoundationText, {
+					LayoutOrder = 1,
+					tag = {
+						["size-full-0 auto-y text-wrap text-align-x-left"] = true,
+						grow = not isVerticallyConstrained
+					},
+					Text = t1.descriptionText
+				}),
+				LearnMore = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					tag = "size-0 auto-xy text-wrap text-align-x-left",
+					RichText = true,
+					Text = `<u>{ t1.learnMoreText }</u>`,
+					onActivated = t1.onLearnMoreClick
+				})
+			}),
+			Insights = React.createElement(SocialMetadataSection, {
+				layoutOrder = 2,
+				userId = t1.userId,
+				isVerticallyConstrained = isVerticallyConstrained
+			}),
+			ActionButtons = if not v53 and not v54 then nil else React.createElement(View, {
+				LayoutOrder = 3,
+				tag = "row gap-small size-full-0 auto-y padding-top-small"
+			}, {
+				First = v53 and React.createElement(Button, {
+					LayoutOrder = 1,
+					text = v53.text or "",
+					onActivated = v53.onActivated,
+					icon = v53.icon,
+					isLoading = v53.isLoading,
+					variant = ButtonVariant.Emphasis,
+					fillBehavior = FillBehavior.Fill,
+					ref = v46,
+					isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v53.isDisabled
+				}) or nil,
+				Second = v54 and React.createElement(Button, {
+					LayoutOrder = 2,
+					text = v54.text or "",
+					onActivated = v54.onActivated,
+					icon = v54.icon,
+					isLoading = v54.isLoading,
+					variant = ButtonVariant.Standard,
+					fillBehavior = FillBehavior.Fill,
+					isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v54.isDisabled
+				}) or nil
+			})
+		})
+	}) else React.createElement(Dialog.Root, {
+		size = DialogSize.Medium,
+		onClose = if not FFlagTCModalUseFoundationOverlay then if not v33 then nil else t1.onCloseModal else function(p2) -- line: 205
+			-- upvalues: OnCloseCallbackReason (copy), t1 (copy)
+			if p2 == OnCloseCallbackReason.BackdropClick then
+				return
+			end
+
+			t1.onCloseModal()
+		end,
+		hasBackdrop = not not FFlagTCModalUseFoundationOverlay or nil
+	}, {
+		Title = React.createElement(Dialog.Title, {
+			LayoutOrder = 1,
+			text = t1.headerText
+		}),
+		Contents = React.createElement("ScrollingFrame", {
+			LayoutOrder = 2,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = isVerticallyConstrained and UDim2.new(1, -4, 0.3, 0) or UDim2.fromScale(1, 0),
+			AutomaticSize = not isVerticallyConstrained and Enum.AutomaticSize.Y or nil,
+			VerticalScrollBarInset = Enum.ScrollBarInset.None,
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.fromScale(0, 0),
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ScrollingEnabled = isVerticallyConstrained,
+			ScrollBarThickness = if not FFlagTCModalUseFoundationOverlay or isVerticallyConstrained then nil else 0
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			TextIntro = if not FFlagTCLearnMoreLink then React.createElement(FoundationText, {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y padding-bottom-large text-wrap text-align-x-left",
+				Text = t1.descriptionText
+			}) else React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "col size-full-0 auto-y padding-bottom-large"
+			}, {
+				React.createElement(FoundationText, {
+					LayoutOrder = 1,
+					tag = "size-full-0 auto-y text-wrap text-align-x-left",
+					Text = t1.descriptionText
+				}),
+				LearnMore = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					tag = "size-0 auto-xy text-wrap text-align-x-left",
+					RichText = true,
+					Text = `<u>{ t1.learnMoreText }</u>`,
+					onActivated = t1.onLearnMoreClick
+				})
+			}),
+			Insights = React.createElement(SocialMetadataSection, {
+				layoutOrder = 2,
+				userId = t1.userId
+			})
+		}),
+		DialogActions = React.createElement(Dialog.Actions, {
+			LayoutOrder = 4,
+			actions = {
+				if not v53 then nil else {
+					variant = ButtonVariant.Emphasis,
+					text = v53.text,
+					onActivated = v53.onActivated,
+					icon = v53.icon,
+					isLoading = v53.isLoading,
+					ref = v46,
+					isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v53.isDisabled
+				},
+				if not v54 then nil else {
+					variant = ButtonVariant.Standard,
+					text = v54.text,
+					onActivated = v54.onActivated,
+					icon = v54.icon,
+					isLoading = v54.isLoading,
+					isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v54.isDisabled
+				}
+			}
+		})
+	}) else React.createElement(Sheet.Root, {
+		preferCenterSheet = true,
+		onClose = t1.onCloseModal
+	}, {
+		Header = React.createElement(Sheet.Header, nil, {
+			Title = React.createElement(FoundationText, {
+				tag = "auto-xy text-heading-small text-align-x-left content-default",
+				Text = t1.headerText
+			})
+		}),
+		Content = React.createElement(Sheet.Content, {
+			LayoutOrder = 2
+		}, {
+			TextIntro = if not FFlagTCLearnMoreLink then React.createElement(FoundationText, {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y text-wrap text-align-x-left",
+				Text = t1.descriptionText
+			}) else React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "col gap-small size-full-0 auto-y"
+			}, {
+				Text = React.createElement(FoundationText, {
+					LayoutOrder = 1,
+					tag = "size-full-0 auto-y text-wrap text-align-x-left",
+					Text = t1.descriptionText
+				}),
+				LearnMore = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					tag = "size-0 auto-xy text-wrap text-align-x-left",
+					RichText = true,
+					Text = `<u>{ t1.learnMoreText }</u>`,
+					onActivated = t1.onLearnMoreClick
+				})
+			}),
+			Insights = React.createElement(SocialMetadataSection, {
+				layoutOrder = 2,
+				userId = t1.userId,
+				isVerticallyConstrained = isVerticallyConstrained
+			})
+		}),
+		Actions = if not v53 and not v54 then nil else React.createElement(Sheet.Actions, nil, {
+			First = v53 and React.createElement(Button, {
+				LayoutOrder = 1,
+				text = v53.text or "",
+				onActivated = v53.onActivated,
+				icon = v53.icon,
+				isLoading = v53.isLoading,
+				variant = ButtonVariant.Emphasis,
+				fillBehavior = FillBehavior.Fill,
+				width = UDim.new(1, 0),
+				ref = v46,
+				isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v53.isDisabled
+			}) or nil,
+			Second = v54 and React.createElement(Button, {
+				LayoutOrder = 2,
+				text = v54.text or "",
+				onActivated = v54.onActivated,
+				icon = v54.icon,
+				isLoading = v54.isLoading,
+				variant = ButtonVariant.Standard,
+				fillBehavior = FillBehavior.Fill,
+				width = UDim.new(1, 0),
+				isDisabled = if not FFlagTrustedFriendsUseEnumCTA then nil else v54.isDisabled
+			}) or nil
+		})
+	})
+	local v56 = FFlagTCModalUseFoundationOverlay and v51
+	local v57 = if FFlagTrustedFriendsUseFoundationSheet or not FFlagTCModalUseFoundationOverlay and t1.source ~= Sources.StreamNotification then v55 else React.createElement("TextButton", {
+		Selectable = false,
+		AutoButtonColor = false,
+		Text = "",
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundColor3 = v52.Color.Common.Scrim.Color3,
+		BackgroundTransparency = if not v56 then v52.Color.Common.Scrim.Transparency else 1,
+		ZIndex = if not FFlagTCModalUseFoundationOverlay then nil else 300
+	}, {
+		TrustedContactModalComponent = v55
+	})
+
+	if FFlagTrustedContactsModalFixFocusNavigation then
+		return React.createElement(FocusRoot, {
+			isAutoFocusRoot = true,
+			isIsolated = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+			eventHandlers = v45
+		}, {
+			Modal = v57
+		})
+	end
+
+	return v57
+end

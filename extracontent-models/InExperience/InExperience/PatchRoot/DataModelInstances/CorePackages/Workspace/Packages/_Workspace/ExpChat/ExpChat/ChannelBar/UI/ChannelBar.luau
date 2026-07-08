@@ -1,1 +1,1 @@
-return require(script.ChannelBar);
+return require(script.ChannelBar)

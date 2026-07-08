@@ -1,177 +1,166 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableAuditSystem);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_useState_0 = v2.useState;
-local l_useMemo_0 = v2.useMemo;
-local l_useContext_0 = v2.useContext;
-local l_useCallback_0 = v2.useCallback;
-local l_useEffect_0 = v2.useEffect;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v12 = v2.createContext({
-    capturedAuditContent = {}, 
-    additionalAuditContent = {}, 
-    setCapturedAuditContentItem = function() --[[ Line: 52 ]] --[[ Name: setCapturedAuditContentItem ]]
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local React = require(AuthCommonParent.React)
+local Cryo = require(AuthCommonParent.Cryo)
+local GetFFlagEnableAuditSystem = require(AuthCommon.Flags.GetFFlagEnableAuditSystem)
+local useState = React.useState
+local useMemo = React.useMemo
+local useContext = React.useContext
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local v11 = React.createContext({
+	capturedAuditContent = {},
+	additionalAuditContent = {},
+	setCapturedAuditContentItem = function() -- line: 49
+	end,
+	removeCapturedAuditContentItem = function() -- line: 50
+	end,
+	setAdditionalAuditContentItem = function() -- line: 51
+	end,
+	removeAdditionalAuditContentItem = function() -- line: 52
+	end
+})
 
-    end, 
-    removeCapturedAuditContentItem = function() --[[ Line: 53 ]] --[[ Name: removeCapturedAuditContentItem ]]
+local function AuditContentProvider(t1: {[any]: any}) -- line: 58
+	-- upvalues: useState (copy), useCallback (copy), Cryo (copy), useMemo (copy), React (copy), v11 (copy)
+	local v14, v15 = useState({})
+	local v16, v17 = useState({})
+	local v18 = useCallback(function(s1: string, t2: {[any]: any}) -- line: 62
+		-- upvalues: v15 (copy), Cryo (copy)
+		v15(function(p1) -- line: 63
+			-- upvalues: Cryo (copy), s1 (copy), t2 (copy)
+			return (Cryo.Dictionary.join(p1, {
+				[s1] = t2
+			}))
+		end)
+	end, { v15 })
+	local v19 = useCallback(function(s2: string) -- line: 71
+		-- upvalues: v15 (copy), Cryo (copy)
+		v15(function(p2) -- line: 72
+			-- upvalues: Cryo (copy), s2 (copy)
+			return (Cryo.Dictionary.join(p2, {
+				[s2] = Cryo.None
+			}))
+		end)
+	end, { v15 })
+	local v20 = useCallback(function(s3: string, s4: string) -- line: 80
+		-- upvalues: v17 (copy), Cryo (copy)
+		v17(function(p3) -- line: 81
+			-- upvalues: Cryo (copy), s3 (copy), s4 (copy)
+			return Cryo.Dictionary.join(p3, {
+				[s3] = s4
+			})
+		end)
+	end, { v17 })
+	local v21 = useCallback(function(s5: string) -- line: 88
+		-- upvalues: v17 (copy), Cryo (copy)
+		v17(function(p4) -- line: 89
+			-- upvalues: Cryo (copy), s5 (copy)
+			return Cryo.Dictionary.join(p4, {
+				[s5] = Cryo.None
+			})
+		end)
+	end, { v17 })
+	local v22 = useMemo(function() -- line: 96
+		-- upvalues: v14 (copy), v16 (copy), v18 (copy), v19 (copy), v20 (copy), v21 (copy)
+		return {
+			capturedAuditContent = v14,
+			additionalAuditContent = v16,
+			setCapturedAuditContentItem = v18,
+			removeCapturedAuditContentItem = v19,
+			setAdditionalAuditContentItem = v20,
+			removeAdditionalAuditContentItem = v21
+		}
+	end, {
+		v14,
+		v16
+	})
 
-    end, 
-    setAdditionalAuditContentItem = function() --[[ Line: 54 ]] --[[ Name: setAdditionalAuditContentItem ]]
+	return React.createElement(v11.Provider, {
+		value = v22
+	}, t1.children)
+end
 
-    end, 
-    removeAdditionalAuditContentItem = function() --[[ Line: 55 ]] --[[ Name: removeAdditionalAuditContentItem ]]
-
-    end
-});
 return {
-    Context = v12, 
-    Provider = function(v13) --[[ Line: 61 ]] --[[ Name: AuditContentProvider ]]
-        -- upvalues: l_useState_0 (copy), l_useCallback_0 (copy), v3 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_useMemo_0 (copy), v2 (copy), v12 (copy)
-        local v14, v15 = l_useState_0({});
-        local v16, v17 = l_useState_0({});
-        local v21 = l_useCallback_0(function(v18, v19) --[[ Line: 66 ]]
-            -- upvalues: v15 (copy), v3 (ref)
-            v15(function(v20) --[[ Line: 67 ]]
-                -- upvalues: v3 (ref), v18 (copy), v19 (copy)
-                return (v3.Dictionary.join(v20, {
-                    [v18] = v19
-                }));
-            end);
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v15
-        } else l_dependencyArray_0(v15));
-        local v24 = l_useCallback_0(function(v22) --[[ Line: 80 ]]
-            -- upvalues: v15 (copy), v3 (ref)
-            v15(function(v23) --[[ Line: 81 ]]
-                -- upvalues: v3 (ref), v22 (copy)
-                return (v3.Dictionary.join(v23, {
-                    [v22] = v3.None
-                }));
-            end);
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v15
-        } else l_dependencyArray_0(v15));
-        local v28 = l_useCallback_0(function(v25, v26) --[[ Line: 94 ]]
-            -- upvalues: v17 (copy), v3 (ref)
-            v17(function(v27) --[[ Line: 95 ]]
-                -- upvalues: v3 (ref), v25 (copy), v26 (copy)
-                return v3.Dictionary.join(v27, {
-                    [v25] = v26
-                });
-            end);
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v17
-        } else l_dependencyArray_0(v17));
-        local v31 = l_useCallback_0(function(v29) --[[ Line: 107 ]]
-            -- upvalues: v17 (copy), v3 (ref)
-            v17(function(v30) --[[ Line: 108 ]]
-                -- upvalues: v3 (ref), v29 (copy)
-                return v3.Dictionary.join(v30, {
-                    [v29] = v3.None
-                });
-            end);
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v17
-        } else l_dependencyArray_0(v17));
-        local v32 = l_useMemo_0(function() --[[ Line: 120 ]]
-            -- upvalues: v14 (copy), v16 (copy), v21 (copy), v24 (copy), v28 (copy), v31 (copy)
-            return {
-                capturedAuditContent = v14, 
-                additionalAuditContent = v16, 
-                setCapturedAuditContentItem = v21, 
-                removeCapturedAuditContentItem = v24, 
-                setAdditionalAuditContentItem = v28, 
-                removeAdditionalAuditContentItem = v31
-            };
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v14, 
-            v16
-        } else l_dependencyArray_0(v14, v16));
-        return v2.createElement(v12.Provider, {
-            value = v32
-        }, v13.children);
-    end, 
-    useCapturedAuditContent = function(v33, v34) --[[ Line: 147 ]] --[[ Name: useCapturedAuditContent ]]
-        -- upvalues: l_useContext_0 (copy), v12 (copy), l_useEffect_0 (copy), v4 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy)
-        local v35 = l_useContext_0(v12);
-        l_useEffect_0(function() --[[ Line: 151 ]]
-            -- upvalues: v4 (ref), v33 (copy), v34 (copy), v35 (copy)
-            if not v4() then
-                return;
-            elseif not v33 or not v34 then
-                return;
-            else
-                v35.setCapturedAuditContentItem(v33, v34);
-                return;
-            end;
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v33, 
-            v34
-        } else l_dependencyArray_0(v33, v34));
-        l_useEffect_0(function() --[[ Line: 164 ]]
-            -- upvalues: v4 (ref), v33 (copy), v35 (copy)
-            return function() --[[ Line: 165 ]]
-                -- upvalues: v4 (ref), v33 (ref), v35 (ref)
-                if not v4() then
-                    return;
-                else
-                    if v33 then
-                        v35.removeCapturedAuditContentItem(v33);
-                    end;
-                    return;
-                end;
-            end;
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v33
-        } else l_dependencyArray_0(v33));
-    end, 
-    useAdditionalAuditContent = function(v36, v37) --[[ Line: 184 ]] --[[ Name: useAdditionalAuditContent ]]
-        -- upvalues: l_useContext_0 (copy), v12 (copy), l_useEffect_0 (copy), v4 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy)
-        local v38 = l_useContext_0(v12);
-        l_useEffect_0(function() --[[ Line: 188 ]]
-            -- upvalues: v4 (ref), v36 (copy), v37 (copy), v38 (copy)
-            if not v4() then
-                return;
-            elseif not v36 or not v37 then
-                return;
-            else
-                v38.setAdditionalAuditContentItem(v36, v37);
-                return;
-            end;
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v36, 
-            v37
-        } else l_dependencyArray_0(v36, v37));
-        l_useEffect_0(function() --[[ Line: 201 ]]
-            -- upvalues: v4 (ref), v36 (copy), v38 (copy)
-            return function() --[[ Line: 202 ]]
-                -- upvalues: v4 (ref), v36 (ref), v38 (ref)
-                if not v4() then
-                    return;
-                else
-                    if v36 then
-                        v38.removeAdditionalAuditContentItem(v36);
-                    end;
-                    return;
-                end;
-            end;
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v36
-        } else l_dependencyArray_0(v36));
-    end, 
-    useAuditContentContext = function() --[[ Line: 217 ]] --[[ Name: useAuditContentContext ]]
-        -- upvalues: l_useContext_0 (copy), v12 (copy)
-        local v39 = l_useContext_0(v12);
-        return {
-            capturedAuditContent = v39.capturedAuditContent, 
-            additionalAuditContent = v39.additionalAuditContent, 
-            setCapturedAuditContentItem = v39.setCapturedAuditContentItem, 
-            removeCapturedAuditContentItem = v39.removeCapturedAuditContentItem, 
-            setAdditionalAuditContentItem = v39.setAdditionalAuditContentItem, 
-            removeAdditionalAuditContentItem = v39.removeAdditionalAuditContentItem
-        };
-    end
-};
+	Context = v11,
+	Provider = AuditContentProvider,
+	useCapturedAuditContent = function(s6: string?, t3: {[any]: any}?) -- line: 119
+		-- upvalues: useContext (copy), v11 (copy), useEffect (copy), GetFFlagEnableAuditSystem (copy)
+		local v25 = useContext(v11)
+
+		useEffect(function() -- line: 123
+			-- upvalues: GetFFlagEnableAuditSystem (copy), s6 (copy), t3 (copy), v25 (copy)
+			if not GetFFlagEnableAuditSystem() then
+				return
+			end
+
+			if not s6 or not t3 then
+				return
+			end
+
+			v25.setCapturedAuditContentItem(s6, t3)
+		end, {
+			s6,
+			t3
+		})
+		useEffect(function() -- line: 136
+			-- upvalues: GetFFlagEnableAuditSystem (copy), s6 (copy), v25 (copy)
+			return function() -- line: 137
+				-- upvalues: GetFFlagEnableAuditSystem (copy), s6 (copy), v25 (copy)
+				if not GetFFlagEnableAuditSystem() then
+					return
+				end
+
+				if s6 then
+					v25.removeCapturedAuditContentItem(s6)
+				end
+			end
+		end, { s6 })
+	end,
+	useAdditionalAuditContent = function(s7: string?, s8: string?) -- line: 156
+		-- upvalues: useContext (copy), v11 (copy), useEffect (copy), GetFFlagEnableAuditSystem (copy)
+		local v28 = useContext(v11)
+
+		useEffect(function() -- line: 160
+			-- upvalues: GetFFlagEnableAuditSystem (copy), s7 (copy), s8 (copy), v28 (copy)
+			if not GetFFlagEnableAuditSystem() then
+				return
+			end
+
+			if not s7 or not s8 then
+				return
+			end
+
+			v28.setAdditionalAuditContentItem(s7, s8)
+		end, {
+			s7,
+			s8
+		})
+		useEffect(function() -- line: 173
+			-- upvalues: GetFFlagEnableAuditSystem (copy), s7 (copy), v28 (copy)
+			return function() -- line: 174
+				-- upvalues: GetFFlagEnableAuditSystem (copy), s7 (copy), v28 (copy)
+				if not GetFFlagEnableAuditSystem() then
+					return
+				end
+
+				if s7 then
+					v28.removeAdditionalAuditContentItem(s7)
+				end
+			end
+		end, { s7 })
+	end,
+	useAuditContentContext = function() -- line: 189
+		-- upvalues: useContext (copy), v11 (copy)
+		local v29 = useContext(v11)
+
+		return {
+			capturedAuditContent = v29.capturedAuditContent,
+			additionalAuditContent = v29.additionalAuditContent,
+			setCapturedAuditContentItem = v29.setCapturedAuditContentItem,
+			removeCapturedAuditContentItem = v29.removeCapturedAuditContentItem,
+			setAdditionalAuditContentItem = v29.setAdditionalAuditContentItem,
+			removeAdditionalAuditContentItem = v29.removeAdditionalAuditContentItem
+		}
+	end
+}

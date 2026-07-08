@@ -1,16 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SceneUnderstanding");
-local v1 = require(l_script_FirstAncestor_0.findSourceAssetsFromDescendant);
-local v2 = require(l_script_FirstAncestor_0.getSourceAssetsFromDescendants);
-local v3 = require(l_script_FirstAncestor_0.isSourceAsset);
-local v4 = require(l_script_FirstAncestor_0.options.RangeQueryOptions);
-return function(v5, v6) --[[ Line: 30 ]] --[[ Name: getSourceAssetsInRange ]]
-    -- upvalues: v4 (copy), v3 (copy), v1 (copy), v2 (copy)
-    local v7 = {};
-    local v8 = v4.new(v6);
-    for _, v10 in workspace:GetPartBoundsInRadius(v5, v8.maxDistance) do
-        if v3(v10) or #v1(v10) > 0 then
-            table.insert(v7, v10);
-        end;
-    end;
-    return v2(v7);
-end;
+local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+local findSourceAssetsFromDescendant = require(SceneUnderstanding.findSourceAssetsFromDescendant)
+local getSourceAssetsFromDescendants = require(SceneUnderstanding.getSourceAssetsFromDescendants)
+local isSourceAsset = require(SceneUnderstanding.isSourceAsset)
+local RangeQueryOptions = require(SceneUnderstanding.options.RangeQueryOptions)
+
+local function getSourceAssetsInRange(vector3: Vector3, p1) -- line: 30
+	-- upvalues: RangeQueryOptions (copy), isSourceAsset (copy), findSourceAssetsFromDescendant (copy), getSourceAssetsFromDescendants (copy)
+	local t1 = {}
+	local v10 = RangeQueryOptions.new(p1)
+
+	for _, v12 in workspace:GetPartBoundsInRadius(vector3, v10.maxDistance) do
+		if isSourceAsset(v12) or #findSourceAssetsFromDescendant(v12) > 0 then
+			table.insert(t1, v12)
+		end
+	end
+
+	return getSourceAssetsFromDescendants(t1)
+end
+
+return getSourceAssetsInRange

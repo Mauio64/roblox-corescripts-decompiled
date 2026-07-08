@@ -1,308 +1,304 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_script_FirstAncestor_0.Components.ItemDetails.BundleAssetsList);
-local l_Enums_0 = v4.Enums;
-local v7 = require(l_script_FirstAncestor_0.Components.Common.ItemHeader);
-local v8 = require(l_script_FirstAncestor_0.Hooks.useConvertedItemData);
-local v9 = require(l_script_FirstAncestor_0.Hooks.useItemExperienceInfo);
-local v10 = require(l_script_FirstAncestor_0.Components.ItemDetails.ControlBar);
-local v11 = require(l_script_FirstAncestor_0.Components.ItemDetails.ResellableInstancesLabel);
-local v12 = require(l_script_FirstAncestor_0.Components.ItemDetails.ItemInfoLabels);
-local l_NumberLocalization_0 = require(l_Parent_0.Localization).NumberLocalization;
-local v14 = require(l_script_FirstAncestor_0.Hooks.useItemStatusLocalization);
-local v15 = require(l_script_FirstAncestor_0.Utils.itemDetailsUtils);
-local l_isCollectible_0 = v15.isCollectible;
-local l_isInExperienceCreationPlayable_0 = v15.isInExperienceCreationPlayable;
-local l_isTradeable_0 = v15.isTradeable;
-local l_getCreatorName_0 = v15.getCreatorName;
-local l_getOriginalPrice_0 = v15.getOriginalPrice;
-local l_getQuantitySold_0 = v15.getQuantitySold;
-local v22 = require(l_script_FirstAncestor_0.Components.ItemsView.ViewportLayout);
-local v23 = require(l_script_FirstAncestor_0.Utils.getItemThumbnailUrl);
-local v24 = require(l_script_FirstAncestor_0.Components.Common.SubheaderLabelPrice);
-local v25 = require(l_script_FirstAncestor_0.Utils.getPriceStatus);
-local l_getPriceInRobux_0 = v15.getPriceInRobux;
-local v27 = require(l_script_FirstAncestor_0.Utils.isItemAvailableForTryOn);
-local v28 = require(l_script_FirstAncestor_0.Components.Common.BackButton);
-local v29 = require(l_script_FirstAncestor_0.Utils.formatNumber);
-local v30 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXFormatPDPPriceLabel_0 = v30.FFlagAXFormatPDPPriceLabel;
-local l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 = v30.FFlagAXHideInspectAndBuyPriceIfUnavailable;
-local _ = require(l_script_FirstAncestor_0.Types);
-local v34 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local l_useTokens_0 = v4.Hooks.useTokens;
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local _ = require(l_script_FirstAncestor_0.Enums.PriceStatus);
-local l_FFlagIBV2Attribution_0 = require(l_Parent_0.SharedFlags).FFlagIBV2Attribution;
-local function v41(v39, v40) --[[ Line: 75 ]]
-    -- upvalues: v34 (copy)
-    if v39 == v34.WideLandscape then
-        return {
-            PaddingTop = UDim.new(0, v40.Padding.XSmall), 
-            PaddingLeft = UDim.new(0, v40.Padding.Medium), 
-            PaddingRight = UDim.new(0, v40.Padding.Medium), 
-            PaddingBottom = UDim.new(0, v40.Padding.XXLarge)
-        };
-    elseif v39 == v34.Wide then
-        return {
-            PaddingTop = UDim.new(0, v40.Padding.XSmall), 
-            PaddingBottom = UDim.new(0, v40.Padding.XLarge), 
-            PaddingLeft = UDim.new(0, v40.Margin.Large * 2), 
-            PaddingRight = UDim.new(0, v40.Margin.Large * 2)
-        };
-    else
-        return {
-            PaddingTop = UDim.new(0, v40.Padding.XSmall), 
-            PaddingBottom = UDim.new(0, v40.Padding.XLarge), 
-            PaddingLeft = UDim.new(0, v40.Padding.XXLarge), 
-            PaddingRight = UDim.new(0, v40.Padding.XXLarge)
-        };
-    end;
-end;
-local function v44(v42, v43) --[[ Line: 105 ]]
-    -- upvalues: v34 (copy)
-    if v42 == v34.WideLandscape then
-        return {
-            left = UDim.new(0, v43.Padding.Large), 
-            right = UDim.new(0, v43.Padding.Large), 
-            bottom = UDim.new(0, v43.Padding.XXLarge)
-        };
-    else
-        return {
-            bottom = UDim.new(0, v43.Padding.XXLarge)
-        };
-    end;
-end;
-local function v48(v45, v46, v47) --[[ Line: 125 ]]
-    -- upvalues: v34 (copy)
-    if v45 == v34.Compact then
-        return UDim2.new(1, 0, 1, -v46.buyActionBarOffset - v46.backButtonOffset - v47.Padding.Small);
-    else
-        return UDim2.new(1, 0, 1, -v46.backButtonOffset - v47.Padding.Small);
-    end;
-end;
-local function _(v49) --[[ Line: 138 ]]
-    -- upvalues: v34 (copy)
-    if v49 == v34.Wide then
-        return 2.5;
-    else
-        return 2;
-    end;
-end;
-return function(v51) --[[ Line: 145 ]] --[[ Name: ItemDetailsView ]]
-    -- upvalues: l_useTokens_0 (copy), v8 (copy), l_FFlagIBV2Attribution_0 (copy), v9 (copy), v25 (copy), v34 (copy), v14 (copy), v41 (copy), l_isCollectible_0 (copy), l_getQuantitySold_0 (copy), l_getOriginalPrice_0 (copy), l_isTradeable_0 (copy), l_isInExperienceCreationPlayable_0 (copy), v3 (copy), v4 (copy), l_Enums_0 (copy), v28 (copy), v48 (copy), v22 (copy), v23 (copy), v7 (copy), v44 (copy), v24 (copy), l_getCreatorName_0 (copy), l_FFlagAXFormatPDPPriceLabel_0 (copy), v29 (copy), l_getPriceInRobux_0 (copy), l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 (copy), v10 (copy), l_NumberLocalization_0 (copy), l_LocalizationService_0 (copy), v27 (copy), v11 (copy), v12 (copy), v5 (copy)
-    local v52 = l_useTokens_0();
-    local v53 = v8(v51.item);
-    local v54 = if l_FFlagIBV2Attribution_0 and v53 then v53.creatingUniverseId else nil;
-    local v55 = if l_FFlagIBV2Attribution_0 then v9(v54) else nil;
-    local v56 = v25(v53);
-    local v57 = v51.view == v34.WideLandscape;
-    local v58 = v51.view == v34.Compact;
-    local v59 = v51.view == v34.Wide;
-    local v60 = v14(v53);
-    local v61 = v41(v51.view, v52);
-    local v62 = v51.buyActionBarOffset or 0;
-    local l_Size_1000_0 = v52.Size.Size_1000;
-    local v64 = {
-        {
-            key = "Category", 
-            isVisible = true, 
-            labelProps = {
-                leftLabel = v60.category, 
-                rightLabel = if v53 then v60[v53.itemSubType] else ""
-            }
-        }, 
-        {
-            key = "QuantitySold", 
-            isVisible = l_isCollectible_0(v53), 
-            labelProps = {
-                leftLabel = v60.quantitySold, 
-                rightLabel = l_getQuantitySold_0(v53, v51.formatNumber)
-            }
-        }, 
-        {
-            key = "OriginalPrice", 
-            isVisible = l_isCollectible_0(v53), 
-            labelProps = {
-                leftLabel = v60.originalPrice, 
-                rightLabel = l_getOriginalPrice_0(v53, v60.na, v51.formatNumber)
-            }
-        }, 
-        {
-            key = "Tradeable", 
-            isVisible = l_isCollectible_0(v53), 
-            labelProps = {
-                leftLabel = v60.tradeable, 
-                rightLabel = if l_isTradeable_0(v53) then v60.yes else v60.no
-            }
-        }
-    };
-    if l_FFlagIBV2Attribution_0 then
-        table.insert(v64, {
-            key = "MadeIn", 
-            isVisible = l_isInExperienceCreationPlayable_0(v55), 
-            labelProps = {
-                leftLabel = v60.madein, 
-                rightLabel = v3.createElement(v4.View, {
-                    LayoutOrder = 2, 
-                    tag = "auto-xy", 
-                    onActivated = function() --[[ Line: 203 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v51 (copy), v55 (copy)
-                        if v51.openAttributionOverlay then
-                            v51.openAttributionOverlay(v55);
-                        end;
-                    end
-                }, {
-                    AttributionLabel = v3.createElement(v4.View, {
-                        tag = "auto-xy row gap-small align-y-center"
-                    }, {
-                        ExperienceName = v55 and v3.createElement(v4.Text, {
-                            LayoutOrder = 1, 
-                            tag = "auto-xy text-title-medium content-default", 
-                            Text = v55.name
-                        }) or nil, 
-                        ArrowIcon = v55 and v3.createElement(v4.Icon, {
-                            LayoutOrder = 2, 
-                            name = l_Enums_0.IconName.ArrowSmallRight, 
-                            variant = l_Enums_0.IconVariant.Filled, 
-                            size = l_Enums_0.IconSize.Medium, 
-                            style = v52.Color.Content.Default
-                        }) or nil
-                    })
-                })
-            }
-        });
-    end;
-    return v3.createElement(v4.View, {
-        tag = "size-full"
-    }, {
-        ButtonContainer = v3.createElement(v4.View, {}, {
-            BackButton = v3.createElement(v28, {
-                onBackButtonClick = v51.onItemDetailsClosed, 
-                Size = UDim2.new(0, l_Size_1000_0, 1, 0), 
-                Position = UDim2.new(0, v52.Padding.Small, 0, v52.Padding.Small)
-            })
-        }), 
-        ScrollingFrame = v3.createElement("ScrollingFrame", {
-            Size = v48(v51.view, {
-                buyActionBarOffset = v62, 
-                backButtonOffset = l_Size_1000_0
-            }, v52), 
-            Position = UDim2.new(0, 0, 0, l_Size_1000_0 + v52.Padding.Medium), 
-            CanvasSize = UDim2.new(1, 0, 0, 0), 
-            BackgroundTransparency = 1, 
-            AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-            ScrollingDirection = Enum.ScrollingDirection.Y, 
-            ScrollBarThickness = 0, 
-            BorderSizePixel = 0
-        }, {
-            UIPadding = v3.createElement("UIPadding", v61), 
-            UIListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                Padding = UDim.new(0, v52.Padding.Small)
-            }), 
-            ViewportLayout = if not not v58 or v59 then v3.createElement(v22, {
-                view = v51.view, 
-                LayoutOrder = 1, 
-                thumbnailUrl = v23(v51.item) or "", 
-                viewportProps = {
-                    Size = UDim2.new(0, v52.Size.Size_3000 * (v51.view == v34.Wide and 2.5 or 2), 0, v52.Size.Size_3000 * (v51.view == v34.Wide and 2.5 or 2))
-                }, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                renderTryOnViewport = v51.renderTryOnViewport, 
-                tryOnState = v51.tryOnState
-            }) else nil, 
-            Header = v3.createElement(v7, {
-                LayoutOrder = 1, 
-                headerHeight = v52.Size.Size_1300, 
-                purchaseButtonProps = v51.purchaseButtonProps, 
-                padding = v44(v51.view, v52), 
-                header = v3.createElement(v4.Text, {
-                    LayoutOrder = 1, 
-                    tag = "auto-xy text-heading-small content-emphasis text-truncate-end", 
-                    Text = v53 and v53.name or ""
-                }), 
-                subheader = if v59 then v3.createElement(v24, {
-                    subheaderText = {
-                        leftSlotLabel = l_getCreatorName_0(v53), 
-                        rightSlotPrice = if l_FFlagAXFormatPDPPriceLabel_0 then v29(l_getPriceInRobux_0(v53, v56)) else tostring(l_getPriceInRobux_0(v53, v56))
-                    }, 
-                    priceStatus = if l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 then v56 else nil, 
-                    LayoutOrder = 2
-                }) else v3.createElement(v4.Text, {
-                    LayoutOrder = 2, 
-                    tag = "auto-xy text-body-large content-emphasis text-truncate-end", 
-                    Text = l_getCreatorName_0(v53)
-                })
-            }), 
-            DetailsContainer = v3.createElement(v4.View, {
-                tag = "auto-xy col align-x-left align-y-top gap-small", 
-                LayoutOrder = 2
-            }, {
-                UIPadding = if v57 then v3.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, v52.Padding.Large), 
-                    PaddingRight = UDim.new(0, v52.Padding.Large)
-                }) else nil, 
-                ControlBar = v3.createElement(v10, {
-                    LayoutOrder = 1, 
-                    favoritesBadge = {
-                        text = if v53 and v53.favoritesDetails and v53.favoritesDetails.numFavorites then l_NumberLocalization_0.abbreviate(v53.favoritesDetails.numFavorites, l_LocalizationService_0.RobloxLocaleId) else nil, 
-                        iconVariant = if v53 and v53.favoritesDetails and v53.favoritesDetails.isFavorited then l_Enums_0.IconVariant.Filled else l_Enums_0.IconVariant.Regular, 
-                        onActivated = function() --[[ Line: 334 ]] --[[ Name: onActivated ]]
-                            -- upvalues: v53 (copy), v51 (copy)
-                            if v53 and v53.favoritesDetails then
-                                v51.onToggleFavorite(v51.item, v53.favoritesDetails.isFavorited or false);
-                            end;
-                        end, 
-                        LayoutOrder = 1
-                    }, 
-                    tryOnBadge = if v53 and v27(v51.localPlayerModel, v53) then {
-                        text = v60.tryOn, 
-                        iconVariant = if v51.tryOnState.isTryOnEnabled then l_Enums_0.IconVariant.Filled else l_Enums_0.IconVariant.Regular, 
-                        onActivated = function() --[[ Line: 347 ]] --[[ Name: onActivated ]]
-                            -- upvalues: v53 (copy), v51 (copy)
-                            if v53 then
-                                v51.onToggleTryOn({
-                                    itemId = v53.id, 
-                                    itemType = v53.itemType, 
-                                    itemSubType = v53.itemSubType, 
-                                    assetsInBundle = v53.assetsInBundle
-                                });
-                            end;
-                        end, 
-                        LayoutOrder = 2
-                    } else nil
-                }), 
-                DescriptionLabel = v3.createElement(v4.Text, {
-                    LayoutOrder = 3, 
-                    tag = "auto-xy text-body-medium content-emphasis text-truncate-end text-align-x-left text-wrap padding-bottom-large padding-top-large", 
-                    Text = if v53 then v53.description else ""
-                }), 
-                ResellableInstancesLabel = if l_isCollectible_0(v53) and v53 and v53.collectibleItemDetails and v53.collectibleItemDetails.resellableCount > 0 then v3.createElement(v11, {
-                    ownedItemsLabel = v60.ownedItems, 
-                    padding = {
-                        top = UDim.new(0, v52.Padding.Large)
-                    }, 
-                    LayoutOrder = 3
-                }) else nil, 
-                ItemInfoLabels = v3.createElement(v12, {
-                    LayoutOrder = 5, 
-                    itemInfoLabels = v64
-                }), 
-                BundleAssetsList = if v53 and v53.assetsInBundle and #v53.assetsInBundle > 0 then v3.createElement(v5, {
-                    itemData = v53, 
-                    headerLabel = v60.includedParts, 
-                    view = v51.view, 
-                    LayoutOrder = 6
-                }) else nil
-            })
-        })
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local LocalizationService = game:GetService("LocalizationService")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local BundleAssetsList = require(AvatarExperienceInspectAndBuy.Components.ItemDetails.BundleAssetsList)
+local Enums = Foundation.Enums
+local ItemHeader = require(AvatarExperienceInspectAndBuy.Components.Common.ItemHeader)
+local useConvertedItemData = require(AvatarExperienceInspectAndBuy.Hooks.useConvertedItemData)
+local useItemExperienceInfo = require(AvatarExperienceInspectAndBuy.Hooks.useItemExperienceInfo)
+local ControlBar = require(AvatarExperienceInspectAndBuy.Components.ItemDetails.ControlBar)
+local ResellableInstancesLabel = require(AvatarExperienceInspectAndBuy.Components.ItemDetails.ResellableInstancesLabel)
+local ItemInfoLabels = require(AvatarExperienceInspectAndBuy.Components.ItemDetails.ItemInfoLabels)
+local NumberLocalization = require(AvatarExperienceInspectAndBuyParent.Localization).NumberLocalization
+local useItemStatusLocalization = require(AvatarExperienceInspectAndBuy.Hooks.useItemStatusLocalization)
+local itemDetailsUtils = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils)
+local isCollectible = itemDetailsUtils.isCollectible
+local isInExperienceCreationPlayable = itemDetailsUtils.isInExperienceCreationPlayable
+local isTradeable = itemDetailsUtils.isTradeable
+local getCreatorName = itemDetailsUtils.getCreatorName
+local getOriginalPrice = itemDetailsUtils.getOriginalPrice
+local getQuantitySold = itemDetailsUtils.getQuantitySold
+local ViewportLayout = require(AvatarExperienceInspectAndBuy.Components.ItemsView.ViewportLayout)
+local getItemThumbnailUrl = require(AvatarExperienceInspectAndBuy.Utils.getItemThumbnailUrl)
+local SubheaderLabelPrice = require(AvatarExperienceInspectAndBuy.Components.Common.SubheaderLabelPrice)
+local getPriceStatus = require(AvatarExperienceInspectAndBuy.Utils.getPriceStatus)
+local getPriceInRobux = itemDetailsUtils.getPriceInRobux
+local isItemAvailableForTryOn = require(AvatarExperienceInspectAndBuy.Utils.isItemAvailableForTryOn)
+local BackButton = require(AvatarExperienceInspectAndBuy.Components.Common.BackButton)
+local formatNumber = require(AvatarExperienceInspectAndBuy.Utils.formatNumber)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+local useTokens = Foundation.Hooks.useTokens
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
+
+local function v33(p1, p2) -- line: 70
+	-- upvalues: ViewType (copy)
+	if p1 == ViewType.WideLandscape then
+		return {
+			PaddingTop = UDim.new(0, p2.Padding.XSmall),
+			PaddingLeft = UDim.new(0, p2.Padding.Medium),
+			PaddingRight = UDim.new(0, p2.Padding.Medium),
+			PaddingBottom = UDim.new(0, p2.Padding.XXLarge)
+		}
+	end
+
+	if p1 == ViewType.Wide then
+		return {
+			PaddingTop = UDim.new(0, p2.Padding.XSmall),
+			PaddingBottom = UDim.new(0, p2.Padding.XLarge),
+			PaddingLeft = UDim.new(0, p2.Margin.Large * 2),
+			PaddingRight = UDim.new(0, p2.Margin.Large * 2)
+		}
+	end
+
+	return {
+		PaddingTop = UDim.new(0, p2.Padding.XSmall),
+		PaddingBottom = UDim.new(0, p2.Padding.XLarge),
+		PaddingLeft = UDim.new(0, p2.Padding.XXLarge),
+		PaddingRight = UDim.new(0, p2.Padding.XXLarge)
+	}
+end
+local function v34(p3, p4) -- line: 100
+	-- upvalues: ViewType (copy)
+	if p3 == ViewType.WideLandscape then
+		return {
+			left = UDim.new(0, p4.Padding.Large),
+			right = UDim.new(0, p4.Padding.Large),
+			bottom = UDim.new(0, p4.Padding.XXLarge)
+		}
+	end
+
+	return {
+		bottom = UDim.new(0, p4.Padding.XXLarge)
+	}
+end
+local function v35(p5, t1: {[any]: any}, p6) -- line: 120
+	-- upvalues: ViewType (copy)
+	if p5 == ViewType.Compact then
+		return UDim2.new(1, 0, 1, -t1.buyActionBarOffset - t1.backButtonOffset - p6.Padding.Small)
+	end
+
+	return UDim2.new(1, 0, 1, -t1.backButtonOffset - p6.Padding.Small)
+end
+local function ItemDetailsView(t2: {[any]: any}) -- line: 140
+	-- upvalues: useTokens (copy), useConvertedItemData (copy), useItemExperienceInfo (copy), getPriceStatus (copy), ViewType (copy), useItemStatusLocalization (copy), v33 (copy), isCollectible (copy), getQuantitySold (copy), getOriginalPrice (copy), isTradeable (copy), isInExperienceCreationPlayable (copy), React (copy), Foundation (copy), Enums (copy), BackButton (copy), v35 (copy), ViewportLayout (copy), getItemThumbnailUrl (copy), ItemHeader (copy), v34 (copy), SubheaderLabelPrice (copy), getCreatorName (copy), formatNumber (copy), getPriceInRobux (copy), ControlBar (copy), NumberLocalization (copy), LocalizationService (copy), isItemAvailableForTryOn (copy), ResellableInstancesLabel (copy), ItemInfoLabels (copy), BundleAssetsList (copy)
+	local v46 = useTokens()
+	local v47 = useConvertedItemData(t2.item)
+	local v48 = if not v47 then nil else v47.creatingUniverseId
+	local v49 = useItemExperienceInfo(v48)
+	local v50 = getPriceStatus(v47)
+	local v51 = t2.view == ViewType.WideLandscape
+	local v52 = t2.view == ViewType.Compact
+	local v53 = t2.view == ViewType.Wide
+	local v54 = useItemStatusLocalization(v47)
+	local v55 = v33(t2.view, v46)
+	local v56 = t2.buyActionBarOffset or 0
+	local Size_1000 = v46.Size.Size_1000
+	local t3 = {
+		{
+			key = "Category",
+			isVisible = true,
+			labelProps = {
+				leftLabel = v54.category,
+				rightLabel = not v47 and "" or v54[v47.itemSubType]
+			}
+		},
+		{
+			key = "QuantitySold",
+			isVisible = isCollectible(v47),
+			labelProps = {
+				leftLabel = v54.quantitySold,
+				rightLabel = getQuantitySold(v47, t2.formatNumber)
+			}
+		},
+		{
+			key = "OriginalPrice",
+			isVisible = isCollectible(v47),
+			labelProps = {
+				leftLabel = v54.originalPrice,
+				rightLabel = getOriginalPrice(v47, v54.na, t2.formatNumber)
+			}
+		},
+		{
+			key = "Tradeable",
+			isVisible = isCollectible(v47),
+			labelProps = {
+				leftLabel = v54.tradeable,
+				rightLabel = if not isTradeable(v47) then v54.no else v54.yes
+			}
+		}
+	}
+
+	table.insert(t3, {
+		key = "MadeIn",
+		isVisible = isInExperienceCreationPlayable(v49),
+		labelProps = {
+			leftLabel = v54.madein,
+			rightLabel = React.createElement(Foundation.View, {
+				LayoutOrder = 2,
+				tag = "auto-xy",
+				onActivated = function() -- line: 197
+					-- upvalues: t2 (copy), v49 (copy)
+					if t2.openAttributionOverlay then
+						t2.openAttributionOverlay(v49)
+					end
+				end
+			}, {
+				AttributionLabel = React.createElement(Foundation.View, {
+					tag = "auto-xy row gap-small align-y-center"
+				}, {
+					ExperienceName = v49 and React.createElement(Foundation.Text, {
+						LayoutOrder = 1,
+						tag = "auto-xy text-title-medium content-default",
+						Text = v49.name
+					}) or nil,
+					ArrowIcon = v49 and React.createElement(Foundation.Icon, {
+						LayoutOrder = 2,
+						name = Enums.IconName.ArrowSmallRight,
+						variant = Enums.IconVariant.Filled,
+						size = Enums.IconSize.Medium,
+						style = v46.Color.Content.Default
+					}) or nil
+				})
+			})
+		}
+	})
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full"
+	}, {
+		ButtonContainer = React.createElement(Foundation.View, {}, {
+			BackButton = React.createElement(BackButton, {
+				onBackButtonClick = t2.onItemDetailsClosed,
+				Size = UDim2.new(0, Size_1000, 1, 0),
+				Position = UDim2.new(0, v46.Padding.Small, 0, v46.Padding.Small)
+			})
+		}),
+		ScrollingFrame = React.createElement("ScrollingFrame", {
+			BackgroundTransparency = 1,
+			ScrollBarThickness = 0,
+			BorderSizePixel = 0,
+			Size = v35(t2.view, {
+				buyActionBarOffset = v56,
+				backButtonOffset = Size_1000
+			}, v46),
+			Position = UDim2.new(0, 0, 0, Size_1000 + v46.Padding.Medium),
+			CanvasSize = UDim2.new(1, 0, 0, 0),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			ScrollingDirection = Enum.ScrollingDirection.Y
+		}, {
+			UIPadding = React.createElement("UIPadding", v55),
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				Padding = UDim.new(0, v46.Padding.Small)
+			}),
+			ViewportLayout = if not v52 and not v53 then nil else React.createElement(ViewportLayout, {
+				LayoutOrder = 1,
+				view = t2.view,
+				thumbnailUrl = getItemThumbnailUrl(t2.item) or "",
+				viewportProps = {
+					Size = UDim2.new(0, v46.Size.Size_3000 * (t2.view ~= ViewType.Wide and 2 or 2.5), 0, v46.Size.Size_3000 * (t2.view ~= ViewType.Wide and 2 or 2.5))
+				},
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				renderTryOnViewport = t2.renderTryOnViewport,
+				tryOnState = t2.tryOnState
+			}),
+			Header = React.createElement(ItemHeader, {
+				LayoutOrder = 1,
+				headerHeight = v46.Size.Size_1300,
+				purchaseButtonProps = t2.purchaseButtonProps,
+				padding = v34(t2.view, v46),
+				header = React.createElement(Foundation.Text, {
+					LayoutOrder = 1,
+					tag = "auto-xy text-heading-small content-emphasis text-truncate-end",
+					Text = v47 and v47.name or ""
+				}),
+				subheader = if not v53 then React.createElement(Foundation.Text, {
+					LayoutOrder = 2,
+					tag = "auto-xy text-body-large content-emphasis text-truncate-end",
+					Text = getCreatorName(v47)
+				}) else React.createElement(SubheaderLabelPrice, {
+					LayoutOrder = 2,
+					subheaderText = {
+						leftSlotLabel = getCreatorName(v47),
+						rightSlotPrice = formatNumber(getPriceInRobux(v47, v50))
+					},
+					priceStatus = v50
+				})
+			}),
+			DetailsContainer = React.createElement(Foundation.View, {
+				tag = "auto-xy col align-x-left align-y-top gap-small",
+				LayoutOrder = 2
+			}, {
+				UIPadding = if not v51 then nil else React.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, v46.Padding.Large),
+					PaddingRight = UDim.new(0, v46.Padding.Large)
+				}),
+				ControlBar = React.createElement(ControlBar, {
+					LayoutOrder = 1,
+					favoritesBadge = {
+						LayoutOrder = 1,
+						text = if not v47 or (not v47.favoritesDetails or not v47.favoritesDetails.numFavorites) then nil else NumberLocalization.abbreviate(v47.favoritesDetails.numFavorites, LocalizationService.RobloxLocaleId),
+						iconVariant = if not v47 or (not v47.favoritesDetails or not v47.favoritesDetails.isFavorited) then Enums.IconVariant.Regular else Enums.IconVariant.Filled,
+						onActivated = function() -- line: 325
+							-- upvalues: v47 (copy), t2 (copy)
+							if v47 and v47.favoritesDetails then
+								t2.onToggleFavorite(t2.item, v47.favoritesDetails.isFavorited or false)
+							end
+						end
+					},
+					tryOnBadge = if not v47 or not isItemAvailableForTryOn(t2.localPlayerModel, v47) then nil else {
+						LayoutOrder = 2,
+						text = v54.tryOn,
+						iconVariant = if not t2.tryOnState.isTryOnEnabled then Enums.IconVariant.Regular else Enums.IconVariant.Filled,
+						onActivated = function() -- line: 338
+							-- upvalues: v47 (copy), t2 (copy)
+							if v47 then
+								t2.onToggleTryOn({
+									itemId = v47.id,
+									itemType = v47.itemType,
+									itemSubType = v47.itemSubType,
+									assetsInBundle = v47.assetsInBundle
+								})
+							end
+						end
+					}
+				}),
+				DescriptionLabel = React.createElement(Foundation.Text, {
+					LayoutOrder = 3,
+					tag = "auto-xy text-body-medium content-emphasis text-truncate-end text-align-x-left text-wrap padding-bottom-large padding-top-large",
+					Text = not v47 and "" or v47.description
+				}),
+				ResellableInstancesLabel = if not isCollectible(v47) or (not v47 or (not v47.collectibleItemDetails or not (v47.collectibleItemDetails.resellableCount > 0))) then nil else React.createElement(ResellableInstancesLabel, {
+					LayoutOrder = 3,
+					ownedItemsLabel = v54.ownedItems,
+					padding = {
+						top = UDim.new(0, v46.Padding.Large)
+					}
+				}),
+				ItemInfoLabels = React.createElement(ItemInfoLabels, {
+					LayoutOrder = 5,
+					itemInfoLabels = t3
+				}),
+				BundleAssetsList = if not v47 or (not v47.assetsInBundle or not (#v47.assetsInBundle > 0)) then nil else React.createElement(BundleAssetsList, {
+					LayoutOrder = 6,
+					itemData = v47,
+					headerLabel = v54.includedParts,
+					view = t2.view
+				})
+			})
+		})
+	})
+end
+
+return ItemDetailsView

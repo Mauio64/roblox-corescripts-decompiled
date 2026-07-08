@@ -1,39 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v2 = require(l_script_FirstAncestor_0.Components.Constants);
-local v3 = require(l_script_FirstAncestor_0.IXP.TnSIXPWrapper);
-local v4 = require(l_script_FirstAncestor_0.ReportAnything.Components.AnnotationModal);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+local TnSIXPWrapper = require(AbuseReportMenu.IXP.TnSIXPWrapper)
+local AnnotationModal = require(AbuseReportMenu.ReportAnything.Components.AnnotationModal)
+
 return {
-    componentType = "button", 
-    getIsVisible = function(v5) --[[ Line: 11 ]] --[[ Name: getIsVisible ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        return v3.getReportAnythingAvatarEnabled() and (v5.methodOfAbuse == v2.AbuseMethods.Other or v5.methodOfAbuse == v2.AbuseMethods.Avatar);
-    end, 
-    getIsDisabled = function(_, v7) --[[ Line: 18 ]] --[[ Name: getIsDisabled ]]
-        return v7.reportAnythingState.attachCompleted;
-    end, 
-    variant = "secondary", 
-    getIconSrc = function(v8) --[[ Line: 22 ]] --[[ Name: getIconSrc ]]
-        if v8.reportAnythingState.attachCompleted then
-            return "icons/actions/accept";
-        else
-            return "icons/controls/screenshot";
-        end;
-    end, 
-    getButtonLabel = function(v9) --[[ Line: 27 ]] --[[ Name: getButtonLabel ]]
-        if v9.reportAnythingState.attachCompleted then
-            return "SceneCaptured";
-        else
-            return "CaptureScene";
-        end;
-    end, 
-    onClick = function(_, _, v12) --[[ Line: 30 ]] --[[ Name: onClick ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        v12.analyticsDispatch({
-            type = v2.AnalyticsActions.IncrementCaptureScene
-        });
-        v4.mountAnnotationPage(v2.ReportTypes.Person, v12.hideReportTab, v12.reportAnythingAnalytics, v12.reportAnythingState, v12.reportAnythingDispatch);
-    end, 
-    fieldLabel = "AttachScreenshot", 
-    componentName = "OptionalScreenshot"
-};
+	componentType = "button",
+	variant = "secondary",
+	fieldLabel = "AttachScreenshot",
+	componentName = "OptionalScreenshot",
+	getIsVisible = function(p1) -- line: 11
+		-- upvalues: TnSIXPWrapper (copy), Constants (copy)
+		return TnSIXPWrapper.getReportAnythingAvatarEnabled() and (p1.methodOfAbuse == Constants.AbuseMethods.Other or p1.methodOfAbuse == Constants.AbuseMethods.Avatar)
+	end,
+	getIsDisabled = function(_, p3) -- line: 18
+		return p3.reportAnythingState.attachCompleted
+	end,
+	getIconSrc = function(p4) -- line: 22
+		if p4.reportAnythingState.attachCompleted then
+			return "icons/actions/accept"
+		end
+
+		return "icons/controls/screenshot"
+	end,
+	getButtonLabel = function(p5) -- line: 27
+		if p5.reportAnythingState.attachCompleted then
+			return "SceneCaptured"
+		end
+
+		return "CaptureScene"
+	end,
+	onClick = function(_, _, p8) -- line: 30
+		-- upvalues: Constants (copy), AnnotationModal (copy)
+		p8.analyticsDispatch({
+			type = Constants.AnalyticsActions.IncrementCaptureScene
+		})
+		AnnotationModal.mountAnnotationPage(Constants.ReportTypes.Person, p8.hideReportTab, p8.reportAnythingAnalytics, p8.reportAnythingState, p8.reportAnythingDispatch)
+	end
+}

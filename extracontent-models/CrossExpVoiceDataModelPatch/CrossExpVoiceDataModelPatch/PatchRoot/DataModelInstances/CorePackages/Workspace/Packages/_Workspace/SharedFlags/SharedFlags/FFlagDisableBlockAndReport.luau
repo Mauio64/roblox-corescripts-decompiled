@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DisableBlockAndReport", false);
+return game:DefineFastFlag("DisableBlockAndReport", false)

@@ -1,98 +1,116 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GamePlayButton");
-local _ = require(l_script_FirstAncestor_0.PlayButtonTypes);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_AppEventIngestService_0 = require(l_Parent_0.RoactServiceTags).AppEventIngestService;
-local l_unlockPlayIntent_0 = require(l_Parent_0.DiscoveryAnalytics).Events.unlockPlayIntent;
-local l_OpenUpsellModal_0 = require(l_Parent_0.DiscoveryRouting).OpenUpsellModal;
-local l_OpenPlayButtonUpsellDialog_0 = require(l_Parent_0.DiscoveryRouting).OpenPlayButtonUpsellDialog;
-local l_CloseCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Thunks.CloseCentralOverlay;
-local l_flaggedMutedError_0 = require(l_Parent_0.Loggers).flaggedMutedError;
-local v12 = require(l_Parent_0.DiscoveryTypes);
-local l_PlayableUxTreatmentEnum_0 = v12.PlayableUxTreatmentEnum;
-local l_PlayabilityStatusEnum_0 = v12.PlayabilityStatusEnum;
-local _ = require(l_Parent_0.PlayabilityRodux);
-local l_FFlagLuaAppPlayButtonUpsellLinking_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppPlayButtonUpsellLinking;
-local function _(v17) --[[ Line: 21 ]] --[[ Name: asReconfirmLaunchModalData ]]
-    if not v17 then
-        return nil;
-    elseif type(v17.titleText) ~= "string" or type(v17.bodyText) ~= "string" or type(v17.primaryActionText) ~= "string" or type(v17.secondaryActionText) ~= "string" then
-        return nil;
-    else
-        return v17;
-    end;
-end;
-return function(v19, v20, v21) --[[ Line: 45 ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppEventIngestService_0 (copy), l_useDispatch_0 (copy), v3 (copy), l_unlockPlayIntent_0 (copy), l_PlayabilityStatusEnum_0 (copy), l_PlayableUxTreatmentEnum_0 (copy), l_flaggedMutedError_0 (copy), l_FFlagLuaAppPlayButtonUpsellLinking_0 (copy), l_OpenPlayButtonUpsellDialog_0 (copy), l_CloseCentralOverlay_0 (copy), l_OpenUpsellModal_0 (copy)
-    local v22 = l_useRoactService_0(l_AppEventIngestService_0);
-    local v23 = l_useDispatch_0();
-    local v25 = v3.useCallback(function(v24) --[[ Line: 53 ]]
-        -- upvalues: l_unlockPlayIntent_0 (ref), v22 (copy), v20 (copy), v19 (copy)
-        l_unlockPlayIntent_0(v22, {
-            universeId = v20, 
-            upsellName = v24, 
-            playabilityStatus = v19 and v19.playabilityStatus or nil
-        });
-    end, {
-        v22, 
-        v20, 
-        v19
-    });
-    return v3.useCallback(function(v26) --[[ Line: 62 ]]
-        -- upvalues: v19 (copy), l_PlayabilityStatusEnum_0 (ref), v21 (copy), l_PlayableUxTreatmentEnum_0 (ref), l_flaggedMutedError_0 (ref), v20 (copy), v25 (copy), l_FFlagLuaAppPlayButtonUpsellLinking_0 (ref), v23 (copy), l_OpenPlayButtonUpsellDialog_0 (ref), l_CloseCentralOverlay_0 (ref), l_OpenUpsellModal_0 (ref)
-        if not v19 or not v19.playableUxTreatment or not v19.playableUxTreatment.treatment or v19.playabilityStatus ~= l_PlayabilityStatusEnum_0.Playable then
-            v21(v26);
-            return;
-        elseif v19.playableUxTreatment.treatment == l_PlayableUxTreatmentEnum_0.ReconfirmLaunchModal then
-            local l_data_0 = v19.playableUxTreatment.data;
-            local v28 = if not l_data_0 then nil else if not (type(l_data_0.titleText) == "string" and type(l_data_0.bodyText) == "string" and type(l_data_0.primaryActionText) == "string") or type(l_data_0.secondaryActionText) ~= "string" then nil else l_data_0;
-            if not v28 then
-                l_flaggedMutedError_0("PlayableUxTreatmentMissingData", (("playableUxTreatment data is missing for treatment %* on universeId %*"):format(l_PlayableUxTreatmentEnum_0.ReconfirmLaunchModal, v20)));
-                v21(v26);
-                v25("GameLaunch");
-                return;
-            else
-                if l_FFlagLuaAppPlayButtonUpsellLinking_0 then
-                    v23(l_OpenPlayButtonUpsellDialog_0(v28.titleText, v28.bodyText, v28.primaryActionText, v28.secondaryActionText, function() --[[ Line: 94 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref), v21 (ref), v26 (copy)
-                        v23(l_CloseCentralOverlay_0());
-                        v21(v26);
-                    end, function() --[[ Line: 98 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref)
-                        v23(l_CloseCentralOverlay_0());
-                    end, function() --[[ Line: 101 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref)
-                        v23(l_CloseCentralOverlay_0());
-                    end));
-                else
-                    v23(l_OpenUpsellModal_0(v28.titleText, v28.bodyText, v28.primaryActionText, v28.secondaryActionText, function() --[[ Line: 113 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref), v21 (ref), v26 (copy)
-                        v23(l_CloseCentralOverlay_0());
-                        v21(v26);
-                    end, function() --[[ Line: 117 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref)
-                        v23(l_CloseCentralOverlay_0());
-                    end, function() --[[ Line: 120 ]]
-                        -- upvalues: v23 (ref), l_CloseCentralOverlay_0 (ref)
-                        v23(l_CloseCentralOverlay_0());
-                    end));
-                end;
-                v25("ReconfirmLaunchModal");
-                return;
-            end;
-        else
-            l_flaggedMutedError_0("PlayableUxTreatmentUnsupported", (("playableUxTreatment treatment %* is unsupported for universeId %*"):format(v19.playableUxTreatment.treatment, v20)));
-            v21(v26);
-            v25("GameLaunch");
-            return;
-        end;
-    end, {
-        v19, 
-        v20, 
-        v21, 
-        v25, 
-        v23
-    });
-end;
+local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
+
+require(GamePlayButton.PlayButtonTypes)
+
+local GamePlayButtonParent = GamePlayButton.Parent
+local React = require(GamePlayButtonParent.React)
+local useDispatch = require(GamePlayButtonParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useRoactService = require(GamePlayButtonParent.RobloxAppHooks).useRoactService
+local AppEventIngestService = require(GamePlayButtonParent.RoactServiceTags).AppEventIngestService
+local unlockPlayIntent = require(GamePlayButtonParent.DiscoveryAnalytics).Events.unlockPlayIntent
+local OpenUpsellModal = require(GamePlayButtonParent.DiscoveryRouting).OpenUpsellModal
+local OpenPlayButtonUpsellDialog = require(GamePlayButtonParent.DiscoveryRouting).OpenPlayButtonUpsellDialog
+local CloseCentralOverlay = require(GamePlayButtonParent.CentralOverlay).Thunks.CloseCentralOverlay
+local flaggedMutedError = require(GamePlayButtonParent.Loggers).flaggedMutedError
+local DiscoveryTypes = require(GamePlayButtonParent.DiscoveryTypes)
+local PlayableUxTreatmentEnum = DiscoveryTypes.PlayableUxTreatmentEnum
+local PlayabilityStatusEnum = DiscoveryTypes.PlayabilityStatusEnum
+
+require(GamePlayButtonParent.PlayabilityRodux)
+
+local FFlagLuaAppPlayButtonUpsellLinking = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppPlayButtonUpsellLinking
+local FFlagLuaAppLogPageContextUnlockPlayIntent = require(GamePlayButtonParent.SharedFlags).FFlagLuaAppLogPageContextUnlockPlayIntent
+
+local function asReconfirmLaunchModalData(t1: {[any]: any}?) -- line: 23
+	if not t1 then
+		return nil
+	end
+
+	if type(t1.titleText) ~= "string" or type(t1.bodyText) ~= "string" or type(t1.primaryActionText) ~= "string" or type(t1.secondaryActionText) ~= "string" then
+		return nil
+	end
+
+	return t1
+end
+
+return function(p1, p2, p3, s1: string?) -- line: 47
+	-- upvalues: useRoactService (copy), AppEventIngestService (copy), useDispatch (copy), React (copy), unlockPlayIntent (copy), FFlagLuaAppLogPageContextUnlockPlayIntent (copy), PlayabilityStatusEnum (copy), PlayableUxTreatmentEnum (copy), flaggedMutedError (copy), FFlagLuaAppPlayButtonUpsellLinking (copy), OpenPlayButtonUpsellDialog (copy), CloseCentralOverlay (copy), OpenUpsellModal (copy)
+	local v23 = useRoactService(AppEventIngestService)
+	local v24 = useDispatch()
+	local v25 = React.useCallback(function(p4) -- line: 56
+		-- upvalues: unlockPlayIntent (copy), v23 (copy), p2 (copy), p1 (copy), FFlagLuaAppLogPageContextUnlockPlayIntent (copy), s1 (copy)
+		unlockPlayIntent(v23, {
+			universeId = p2,
+			upsellName = p4,
+			playabilityStatus = p1 and p1.playabilityStatus or nil,
+			pageName = if not FFlagLuaAppLogPageContextUnlockPlayIntent then nil else s1
+		})
+	end, {
+		v23,
+		p2,
+		p1,
+		if not FFlagLuaAppLogPageContextUnlockPlayIntent then nil else s1
+	})
+
+	return React.useCallback(function(p5) -- line: 71
+		-- upvalues: p1 (copy), PlayabilityStatusEnum (copy), p3 (copy), PlayableUxTreatmentEnum (copy), flaggedMutedError (copy), p2 (copy), v25 (copy), FFlagLuaAppPlayButtonUpsellLinking (copy), v24 (copy), OpenPlayButtonUpsellDialog (copy), CloseCentralOverlay (copy), OpenUpsellModal (copy)
+		if not p1 or (not p1.playableUxTreatment or not p1.playableUxTreatment.treatment or p1.playabilityStatus ~= PlayabilityStatusEnum.Playable) then
+			p3(p5)
+
+			return
+		end
+
+		if p1.playableUxTreatment.treatment == PlayableUxTreatmentEnum.ReconfirmLaunchModal then
+			local data = p1.playableUxTreatment.data
+			local v29 = if data then if type(data.titleText) == "string" and (type(data.bodyText) == "string" and (type(data.primaryActionText) == "string" and type(data.secondaryActionText) == "string")) then data else nil else nil
+
+			if not v29 then
+				flaggedMutedError("PlayableUxTreatmentMissingData", `playableUxTreatment data is missing for treatment { PlayableUxTreatmentEnum.ReconfirmLaunchModal } on universeId { p2 }`)
+				p3(p5)
+				v25("GameLaunch")
+
+				return
+			end
+
+			if FFlagLuaAppPlayButtonUpsellLinking then
+				v24(OpenPlayButtonUpsellDialog(v29.titleText, v29.bodyText, v29.primaryActionText, v29.secondaryActionText, function() -- line: 103
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy), p3 (copy), p5 (copy)
+					v24(CloseCentralOverlay())
+					p3(p5)
+				end, function() -- line: 107
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy)
+					v24(CloseCentralOverlay())
+				end, function() -- line: 110
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy)
+					v24(CloseCentralOverlay())
+				end))
+			else
+				v24(OpenUpsellModal(v29.titleText, v29.bodyText, v29.primaryActionText, v29.secondaryActionText, function() -- line: 122
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy), p3 (copy), p5 (copy)
+					v24(CloseCentralOverlay())
+					p3(p5)
+				end, function() -- line: 126
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy)
+					v24(CloseCentralOverlay())
+				end, function() -- line: 129
+					-- upvalues: v24 (copy), CloseCentralOverlay (copy)
+					v24(CloseCentralOverlay())
+				end))
+			end
+
+			v25("ReconfirmLaunchModal")
+
+			return
+		end
+
+		flaggedMutedError("PlayableUxTreatmentUnsupported", `playableUxTreatment treatment { p1.playableUxTreatment.treatment } is unsupported for universeId { p2 }`)
+		p3(p5)
+		v25("GameLaunch")
+	end, {
+		p1,
+		p2,
+		p3,
+		v25,
+		v24
+	})
+end

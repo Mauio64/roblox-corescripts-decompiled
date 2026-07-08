@@ -1,10 +1,14 @@
-return function(v0) --[[ Line: 7 ]] --[[ Name: createInspectAndBuyKeyMapper ]]
-    return function(v1, ...) --[[ Line: 9 ]]
-        -- upvalues: v0 (copy)
-        local v2 = "inspectAndBuy." .. v1 .. "." .. v0;
-        for v3 = 1, select("#", ...) do
-            v2 = v2 .. "." .. tostring(select(v3, ...));
-        end;
-        return v2;
-    end;
-end;
+local function createInspectAndBuyKeyMapper(p1) -- line: 7
+	return function(p2, ...) -- line: 9
+		-- upvalues: p1 (copy)
+		local v4 = "inspectAndBuy." .. p2 .. "." .. p1
+
+		for i = 1, select("#", ...) do
+			v4 ..= "." .. tostring(select(i, ...))
+		end
+
+		return v4
+	end
+end
+
+return createInspectAndBuyKeyMapper

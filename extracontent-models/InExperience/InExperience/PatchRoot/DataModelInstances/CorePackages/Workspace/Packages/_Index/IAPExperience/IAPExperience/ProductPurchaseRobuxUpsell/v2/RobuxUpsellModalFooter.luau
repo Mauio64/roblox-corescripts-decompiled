@@ -1,22 +1,26 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Text_0 = v2.Text;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function() --[[ Line: 16 ]] --[[ Name: RobuxUpsellModalFooter ]]
-    -- upvalues: l_useLocalization_0 (copy), l_useTokens_0 (copy), v1 (copy), l_Text_0 (copy)
-    local v6 = l_useLocalization_0({
-        DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment", 
-        DisclosureTerms = "IAPExperience.RobuxUpsell.Text.DisclosureTerms"
-    });
-    local v7 = l_useTokens_0();
-    return v1.createElement(l_Text_0, {
-        Text = v6.DisclosurePayment .. " " .. v6.DisclosureTerms, 
-        tag = "content-muted text-caption-small size-full align-x-center padding-top-small"
-    }, {
-        UITextSizeConstraint = v1.createElement("UITextSizeConstraint", {
-            MaxTextSize = v7.Typography.CaptionSmall.FontSize
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local Foundation = require(ParentParent.Foundation)
+local FoundationText = Foundation.Text
+local useTokens = Foundation.Hooks.useTokens
+local useLocalization = require(ParentParent.Localization).Hooks.useLocalization
+
+local function RobuxUpsellModalFooter() -- line: 16
+	-- upvalues: useLocalization (copy), useTokens (copy), React (copy), FoundationText (copy)
+	local v8 = useLocalization({
+		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		DisclosureTerms = "IAPExperience.RobuxUpsell.Text.DisclosureTerms"
+	})
+	local v9 = useTokens()
+
+	return React.createElement(FoundationText, {
+		tag = "content-muted text-caption-small size-full align-x-center padding-top-small",
+		Text = v8.DisclosurePayment .. " " .. v8.DisclosureTerms
+	}, {
+		UITextSizeConstraint = React.createElement("UITextSizeConstraint", {
+			MaxTextSize = v9.Typography.CaptionSmall.FontSize
+		})
+	})
+end
+
+return RobuxUpsellModalFooter

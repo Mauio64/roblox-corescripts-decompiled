@@ -1,35 +1,39 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.SduiCompat);
-return v1.memo(function(v4) --[[ Line: 46 ]] --[[ Name: SduiView ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.View, {
-        AnchorPoint = v4.anchorPoint, 
-        AutomaticSize = v4.automaticSize, 
-        ClipsDescendants = v4.clipsDescendants, 
-        GroupTransparency = v4.groupTransparency, 
-        LayoutOrder = v4.layoutOrder, 
-        Position = v4.position, 
-        Rotation = v4.rotation, 
-        Size = v4.size, 
-        SizeConstraint = v4.sizeConstraint, 
-        Visible = v4.visible, 
-        ZIndex = v4.zIndex, 
-        aspectRatio = v4.aspectRatio, 
-        backgroundStyle = v4.backgroundStyle, 
-        cornerRadius = v4.cornerRadius, 
-        cursor = v4.cursorType, 
-        isDisabled = v4.isDisabled, 
-        onActivated = v4.onActivated, 
-        onSecondaryActivated = v4.onSecondaryActivated, 
-        padding = v4.padding, 
-        scale = v4.scale, 
-        selection = if v4.selectable ~= nil then {
-            Selectable = v4.selectable
-        } else nil, 
-        selectionGroup = v4.selectionGroup, 
-        tag = v4.tag, 
-        testId = v4.testId
-    }, v4.children);
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+require(Parent.SduiCompat)
+
+local function SduiView(t1: {[any]: any}) -- line: 46
+	-- upvalues: React (copy), Foundation (copy)
+	return React.createElement(Foundation.View, {
+		AnchorPoint = t1.anchorPoint,
+		AutomaticSize = t1.automaticSize,
+		ClipsDescendants = t1.clipsDescendants,
+		GroupTransparency = t1.groupTransparency,
+		LayoutOrder = t1.layoutOrder,
+		Position = t1.position,
+		Rotation = t1.rotation,
+		Size = t1.size,
+		SizeConstraint = t1.sizeConstraint,
+		Visible = t1.visible,
+		ZIndex = t1.zIndex,
+		aspectRatio = t1.aspectRatio,
+		backgroundStyle = t1.backgroundStyle,
+		cornerRadius = t1.cornerRadius,
+		cursor = t1.cursorType,
+		isDisabled = t1.isDisabled,
+		onActivated = t1.onActivated,
+		onSecondaryActivated = t1.onSecondaryActivated,
+		padding = t1.padding,
+		scale = t1.scale,
+		selection = if t1.selectable == nil then nil else {
+			Selectable = t1.selectable
+		},
+		selectionGroup = t1.selectionGroup,
+		tag = t1.tag,
+		testId = t1.testId
+	}, t1.children)
+end
+
+return React.memo(SduiView)

@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAvatarEditorPageInputBindings) and game:DefineFastFlag("AXMigrateProfilePictureEditorEmotesPageToFocusNavigation", false);
+return require(script.Parent.FFlagAXMigrateAvatarEditorPageInputBindings) and game:DefineFastFlag("AXMigrateProfilePictureEditorEmotesPageToFocusNavigation", false)

@@ -1,9 +1,14 @@
-local l_insert_0 = table.insert;
-return function(v1) --[[ Line: 12 ]] --[[ Name: keys ]]
-    -- upvalues: l_insert_0 (copy)
-    local v2 = {};
-    for v3, _ in v1 do
-        l_insert_0(v2, v3);
-    end;
-    return v2;
-end;
+local insert = table.insert
+
+local function keys(t1: {[any]: any}) -- line: 12
+	-- upvalues: insert (copy)
+	local t2 = {}
+
+	for v5, _ in t1 do
+		insert(t2, v5)
+	end
+
+	return t2
+end
+
+return keys

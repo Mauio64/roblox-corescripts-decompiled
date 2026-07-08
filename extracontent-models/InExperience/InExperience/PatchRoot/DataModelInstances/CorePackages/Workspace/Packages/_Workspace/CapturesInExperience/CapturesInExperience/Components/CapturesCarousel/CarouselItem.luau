@@ -1,363 +1,366 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.AppCommonLib);
-local v3 = require(l_Parent_1.CapturesCommon);
-local v4 = require(l_Parent_1.React);
-local v5 = require(l_Parent_1.RobloxAppHooks);
-local v6 = require(l_Parent_1.UIBlox);
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_memoize_0 = v2.memoize;
-local l_useScreenSize_0 = v5.useScreenSize;
-local l_useStyle_0 = v6.Core.Style.useStyle;
-local v11 = require(l_Parent_0.Enums.CaptureType);
-local l_getContentFromObject_0 = v3.Utils.getContentFromObject;
-local v13 = require(l_Parent_0.Utils.getCaptureSize);
-local l_MediaPlayer_0 = v3.Components.MediaPlayer;
-local _ = require(l_Parent_0.Types);
-local l_FFlagUseMediaPlayerInCarousel_0 = require(l_Parent_1.SharedFlags).FFlagUseMediaPlayerInCarousel;
-local v17 = require(l_Parent_0.Flags.FFlagUseRbxstorageInGallery);
-local v18 = require(l_Parent_0.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript);
-local v24 = l_memoize_0(function(v19, v20) --[[ Line: 33 ]]
-    local v21 = v19.X / v19.Y;
-    local l_X_0 = v20.X;
-    local v23 = math.floor(l_X_0 / v21);
-    if v20.Y < v23 then
-        v23 = v20.Y;
-        l_X_0 = math.floor(v23 * v21);
-    end;
-    return Vector2.new(l_X_0, v23);
-end);
-local function _(v25) --[[ Line: 47 ]] --[[ Name: getDeleteTransitionSize ]]
-    return UDim2.fromScale(v25, v25);
-end;
-local function v28(v27) --[[ Line: 51 ]] --[[ Name: getDeleteTransitionTransparency ]]
-    -- upvalues: l_UserGameSettings_0 (copy)
-    if l_UserGameSettings_0.ReducedMotion then
-        return v27;
-    else
-        return 1;
-    end;
-end;
-local function v30(v29) --[[ Line: 55 ]] --[[ Name: getCapturesItemSize ]]
-    -- upvalues: l_UserGameSettings_0 (copy)
-    if l_UserGameSettings_0.ReducedMotion then
-        return (UDim2.fromScale(1, 1));
-    else
-        return (UDim2.fromScale(v29, v29));
-    end;
-end;
-local function _(v31, v32) --[[ Line: 59 ]] --[[ Name: getFullScreenSize ]]
-    local v33 = v31.X / v31.Y;
-    local v34 = v32.X / v33;
-    if v34 <= v32.Y then
-        return UDim2.fromOffset(v32.X, v34);
-    else
-        local v35 = v32.Y * v33;
-        return UDim2.fromOffset(v35, v32.Y);
-    end;
-end;
-return function(v37) --[[ Line: 85 ]]
-    -- upvalues: l_useStyle_0 (copy), v4 (copy), l_useScreenSize_0 (copy), v18 (copy), v11 (copy), v13 (copy), v24 (copy), l_UserGameSettings_0 (copy), l_getContentFromObject_0 (copy), v30 (copy), l_FFlagUseMediaPlayerInCarousel_0 (copy), l_MediaPlayer_0 (copy), v17 (copy), v28 (copy)
-    local v38 = l_useStyle_0();
-    local l_itemSize_0 = v37.itemSize;
-    local v40, v41 = v4.useBinding(0);
-    local v42, v43 = v4.useState(Vector2.new(0, 0));
-    local v44 = l_useScreenSize_0();
-    local v45 = v4.useRef(nil);
-    local v46 = v4.useRef(nil);
-    local v47, v48 = v4.useState(false);
-    local l_imagePadding_0 = v37.imagePadding;
-    local l_itemIndex_0 = v37.itemIndex;
-    local v52 = v4.useCallback(function(v51) --[[ Line: 99 ]]
-        -- upvalues: v41 (copy)
-        v41(v51.AbsolutePosition.X);
-    end, {
-        v41
-    });
-    v4.useEffect(function() --[[ Line: 103 ]]
-        -- upvalues: v46 (copy)
-        return function() --[[ Line: 104 ]]
-            -- upvalues: v46 (ref)
-            if v46.current then
-                v46.current.Video = "";
-            end;
-        end;
-    end, {});
-    v4.useEffect(function() --[[ Line: 111 ]]
-        -- upvalues: v18 (ref), v37 (copy), v43 (copy), l_itemSize_0 (copy), v11 (ref), v13 (ref)
-        if v18 then
-            if v37.capture.CaptureType == Enum.CaptureType.Screenshot then
-                v43(l_itemSize_0);
-            end;
-            return;
-        elseif v37.capture.type == v11.Video then
-            return;
-        else
-            task.spawn(function() --[[ Line: 123 ]]
-                -- upvalues: v13 (ref), v37 (ref), v43 (ref), l_itemSize_0 (ref)
-                local v53 = v13(v37.capture.contentId);
-                if v53 then
-                    v43(v53);
-                    return;
-                else
-                    v43(l_itemSize_0);
-                    return;
-                end;
-            end);
-            return;
-        end;
-    end, {
-        l_itemSize_0, 
-        v37.capture
-    });
-    local v56 = v4.useCallback(function(v54) --[[ Line: 134 ]]
-        -- upvalues: v46 (copy), v43 (copy)
-        v46.current = v54;
-        local l_Resolution_0 = v54.Resolution;
-        v43(Vector2.new(l_Resolution_0.X, l_Resolution_0.Y));
-    end, {});
-    local v62 = v4.useCallback(function(v57) --[[ Line: 140 ]]
-        -- upvalues: l_itemSize_0 (copy), v44 (copy)
-        local v58 = l_itemSize_0.X / 2;
-        local v59 = v44.X / 2;
-        local v60 = v57 + v58;
-        local v61 = math.abs(v59 - v60);
-        v61 = v61 < 25 and 0 or v61 - 25;
-        return math.sign(v59 - v60), (math.min(1, v61 / (l_itemSize_0.X - 25)));
-    end, {
-        l_itemSize_0, 
-        l_itemIndex_0, 
-        v44
-    });
-    local v70 = v4.useCallback(function(v63) --[[ Line: 158 ]]
-        -- upvalues: v62 (copy), v24 (ref), v42 (copy), l_itemSize_0 (copy), v37 (copy)
-        local _, v65 = v62(v63);
-        local v66 = v24(v42, l_itemSize_0);
-        if v65 == 0 then
-            return UDim2.fromOffset(v66.X, v66.Y);
-        else
-            local v67 = 1 - v65 * (1 - v37.unfocusedSizeMultiplier);
-            local v68 = v66.Y * v67;
-            local v69 = v66.X * v67;
-            v68 = math.floor(v68);
-            v69 = math.floor(v69);
-            return UDim2.fromOffset(v69, v68);
-        end;
-    end, {
-        v42, 
-        l_itemSize_0, 
-        v37.unfocusedSizeMultiplier, 
-        v62
-    });
-    local v76 = v4.useCallback(function(v71) --[[ Line: 177 ]]
-        -- upvalues: v62 (copy), v70 (copy), l_itemSize_0 (copy), l_imagePadding_0 (copy)
-        local v72, v73 = v62(v71);
-        if v73 == 0 then
-            return UDim2.fromScale(0.5, 0.5);
-        else
-            local l_Offset_0 = v70(v71).X.Offset;
-            local v75 = (l_itemSize_0.X / 2 - l_imagePadding_0 - l_Offset_0 / 2) * v73;
-            return UDim2.new(0.5, v75 * v72, 0.5, 0);
-        end;
-    end, {
-        v42, 
-        l_imagePadding_0, 
-        l_itemSize_0, 
-        v44, 
-        v62, 
-        v70
-    });
-    local l_Transparency_0 = v38.Theme.Overlay.Transparency;
-    local v81 = v4.useCallback(function(v78) --[[ Line: 198 ]]
-        -- upvalues: v62 (copy), l_Transparency_0 (copy)
-        local _, v80 = v62(v78);
-        return 1 - (1 - l_Transparency_0) * v80;
-    end, {
-        l_Transparency_0, 
-        v62
-    });
-    local v85 = v4.useCallback(function(v82) --[[ Line: 203 ]]
-        -- upvalues: l_UserGameSettings_0 (ref), v81 (copy)
-        local l_absoluteXPosition_0 = v82.absoluteXPosition;
-        local l_fadeOutBinding_0 = v82.fadeOutBinding;
-        if l_UserGameSettings_0.ReducedMotion and l_fadeOutBinding_0 then
-            return 1;
-        elseif l_fadeOutBinding_0 then
-            return (math.min(v81(l_absoluteXPosition_0), l_fadeOutBinding_0));
-        else
-            return v81(l_absoluteXPosition_0);
-        end;
-    end, {
-        v81
-    });
-    local v86 = v4.useCallback(function() --[[ Line: 217 ]]
-        -- upvalues: v37 (copy), v48 (copy), v47 (copy)
-        if v37.onExpandCallback then
-            v37.onExpandCallback(v37.itemIndex);
-        end;
-        v48(not v47);
-    end, {
-        v47, 
-        v37.onExpandCallback, 
-        v37.itemIndex
-    });
-    local v87 = v4.useCallback(function() --[[ Line: 224 ]]
-        -- upvalues: v37 (copy)
-        if v37.onMuteCallback then
-            v37.onMuteCallback();
-        end;
-    end, {
-        v37.onMuteCallback
-    });
-    local v88 = v4.useCallback(function() --[[ Line: 230 ]]
-        -- upvalues: v4 (ref)
-        return (v4.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1)
-        }));
-    end, {});
-    local v89 = if v18 then v37.capture.CaptureType == Enum.CaptureType.Screenshot else v37.capture.type == v11.Screenshot;
-    local v90 = if v18 then v37.capture.CaptureType == Enum.CaptureType.Video else v37.capture.type == v11.Video;
-    local v91 = if v18 then l_getContentFromObject_0(v37.capture) else v37.capture.contentId;
-    local v92 = if v18 then v37.capture else v37.capture.videoCapture;
-    local l_createElement_0 = v4.createElement;
-    local v94 = "Frame";
-    local v95 = {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundTransparency = 1, 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromScale(1, 1), 
-        [v4.Change.AbsolutePosition] = v52
-    };
-    local v96 = {
-        FullScreenOffset = v4.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, v47 and 16 or 0)
-        })
-    };
-    local l_createElement_1 = v4.createElement;
-    local v98 = "Frame";
-    local v99 = {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundTransparency = 1, 
-        Position = if v47 then UDim2.fromScale(0.5, 0.5) else v40:map(v76)
-    };
-    local v100;
-    if v47 then
-        local v101 = v42.X / v42.Y;
-        local v102 = v44.X / v101;
-        if v102 <= v44.Y then
-            v100 = UDim2.fromOffset(v44.X, v102);
-        else
-            local v103 = v44.Y * v101;
-            v100 = UDim2.fromOffset(v103, v44.Y);
-        end;
-    else
-        v100 = v40:map(v70);
-    end;
-    v99.Size = v100;
-    v100 = {
-        CaptureImage = if v89 then v4.createElement("ImageLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundColor3 = v38.Theme.BackgroundContrast.Color, 
-            BackgroundTransparency = v18 and 0 or 1, 
-            BorderSizePixel = 0, 
-            Image = if v18 then nil else v91, 
-            ImageContent = if v18 then v91 else nil, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            ScaleType = if v18 then Enum.ScaleType.Fit else Enum.ScaleType.Crop, 
-            Size = if v37.fadeOutBinding then v37.fadeOutBinding:map(v30) else UDim2.fromScale(1, 1), 
-            Visible = v42 ~= Vector2.new(0, 0), 
-            ZIndex = 1
-        }) else nil
-    };
-    local v104;
-    if v90 then
-        if l_FFlagUseMediaPlayerInCarousel_0 then
-            v104 = v4.createElement;
-            local l_l_MediaPlayer_0_0 = l_MediaPlayer_0;
-            local v106 = {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundColor3 = v38.Theme.BackgroundContrast.Color, 
-                BackgroundTransparency = v18 and 0 or 1, 
-                BorderSizePixel = 0, 
-                isOverlayDisabled = not v37.isSelected or v37.isDisabled
-            };
-            local v107 = false;
-            if v44.X > v44.Y then
-                v107 = false;
-                if v42.Y > v42.X then
-                    v107 = not v47;
-                end;
-            end;
-            v106.isTimeHidden = v107;
-            v106.Looped = true;
-            v106.onExpandCallback = v86;
-            v106.onMuteCallback = v87;
-            v106.onLoaded = v56;
-            v106.Playing = v37.isSelected and v40:map(function(v108) --[[ Line: 305 ]]
-                -- upvalues: v62 (copy)
-                local _, v110 = v62(v108);
-                return v110 < 0.5;
-            end);
-            v106.Position = UDim2.fromScale(0.5, 0.5);
-            v106.renderOnFailed = v88;
-            v106.Size = if v37.fadeOutBinding then v37.fadeOutBinding:map(v30) else UDim2.fromScale(1, 1);
-            v106.VideoContent = l_getContentFromObject_0(v92);
-            v106.videoRef = v45;
-            v106.ZIndex = v47 and 5 or 1;
-            v104 = v104(l_l_MediaPlayer_0_0, v106);
-        else
-            v104 = v4.createElement("VideoFrame", {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundTransparency = 1, 
-                Playing = v40:map(function(v111) --[[ Line: 321 ]]
-                    -- upvalues: v62 (copy)
-                    local _, v113 = v62(v111);
-                    return v113 < 0.5;
-                end), 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                Looped = true, 
-                Size = if v37.fadeOutBinding then v37.fadeOutBinding:map(v30) else UDim2.fromScale(1, 1), 
-                Video = if not v17 then v37.capture.contentId else nil, 
-                VideoContent = if v17 then l_getContentFromObject_0(v37.capture.videoCapture) else nil, 
-                Volume = 0, 
-                ZIndex = 1, 
-                [v4.Event.Loaded] = v56
-            });
-        end;
-    else
-        v104 = nil;
-    end;
-    v100.CaptureVideo = v104;
-    v100.Overlay = v4.createElement("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = v38.Theme.Overlay.Color, 
-        BackgroundTransparency = v4.joinBindings({
-            absoluteXPosition = v40, 
-            fadeOutBinding = v37.fadeOutBinding
-        }):map(v85), 
-        BorderSizePixel = 0, 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = if v37.fadeOutBinding then v37.fadeOutBinding:map(v30) else UDim2.fromScale(1, 1), 
-        ZIndex = 2
-    });
-    v100.TransitionOverlay = v4.createElement("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = v38.Theme.BackgroundContrast.Color, 
-        BackgroundTransparency = if v37.transitionBinding then v37.transitionBinding:map(v28) else 1, 
-        BorderSizePixel = 0, 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromScale(1, 1), 
-        ZIndex = 3
-    });
-    v100.FullScreenBackground = if l_FFlagUseMediaPlayerInCarousel_0 and v47 then v4.createElement("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = v38.Theme.BackgroundContrast.Color, 
-        BackgroundTransparency = 0, 
-        BorderSizePixel = 0, 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromOffset(v44.X, v44.Y), 
-        ZIndex = 4
-    }) else nil;
-    v96.CaptureContainer = l_createElement_1(v98, v99, v100);
-    return l_createElement_0(v94, v95, v96);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local AppCommonLib = require(ParentParentParent.AppCommonLib)
+local CapturesCommon = require(ParentParentParent.CapturesCommon)
+local React = require(ParentParentParent.React)
+local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
+local UIBlox = require(ParentParentParent.UIBlox)
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local memoize = AppCommonLib.memoize
+local useScreenSize = RobloxAppHooks.useScreenSize
+local useStyle = UIBlox.Core.Style.useStyle
+local CaptureType = require(ParentParent.Enums.CaptureType)
+local getContentFromObject = CapturesCommon.Utils.getContentFromObject
+local getCaptureSize = require(ParentParent.Utils.getCaptureSize)
+local MediaPlayer = CapturesCommon.Components.MediaPlayer
+
+require(ParentParent.Types)
+
+local FFlagUseMediaPlayerInCarousel = require(ParentParentParent.SharedFlags).FFlagUseMediaPlayerInCarousel
+local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local v19 = memoize(function(vector2: Vector2, vector2_2: Vector2) -- line: 33
+	local v26 = vector2.X / vector2.Y
+	local vector2_2X = vector2_2.X
+	local v28 = math.floor(vector2_2X / v26)
+
+	if v28 > vector2_2.Y then
+		v28 = vector2_2.Y
+		vector2_2X = math.floor(v28 * v26)
+	end
+
+	return Vector2.new(vector2_2X, v28)
+end)
+
+local function getDeleteTransitionSize(p1) -- line: 47
+	return UDim2.fromScale(p1, p1)
+end
+local function getDeleteTransitionTransparency(p2) -- line: 51
+	-- upvalues: UserGameSettings (copy)
+	if UserGameSettings.ReducedMotion then
+		return p2
+	end
+
+	return 1
+end
+local function getCapturesItemSize(p3) -- line: 55
+	-- upvalues: UserGameSettings (copy)
+	if UserGameSettings.ReducedMotion then
+		return (UDim2.fromScale(1, 1))
+	end
+
+	return (UDim2.fromScale(p3, p3))
+end
+local function getFullScreenSize(p4, p5) -- line: 59
+	local v34 = p4.X / p4.Y
+	local v35 = p5.X / v34
+
+	if v35 <= p5.Y then
+		return UDim2.fromOffset(p5.X, v35)
+	end
+
+	local v36 = p5.Y * v34
+
+	return UDim2.fromOffset(v36, p5.Y)
+end
+
+return function(t1: {[any]: any}) -- line: 85
+	-- upvalues: useStyle (copy), React (copy), useScreenSize (copy), FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), getCaptureSize (copy), v19 (copy), UserGameSettings (copy), getContentFromObject (copy), getCapturesItemSize (copy), FFlagUseMediaPlayerInCarousel (copy), MediaPlayer (copy), FFlagUseRbxstorageInGallery (copy), getDeleteTransitionTransparency (copy)
+	local v38 = useStyle()
+	local itemSize = t1.itemSize
+	local v40, v41 = React.useBinding(0)
+	local v42, v43 = React.useState(Vector2.new(0, 0))
+	local v44 = useScreenSize()
+	local v45 = React.useRef(nil)
+	local v46 = React.useRef(nil)
+	local v47, v48 = React.useState(false)
+	local imagePadding = t1.imagePadding
+	local itemIndex = t1.itemIndex
+	local v51 = React.useCallback(function(p6) -- line: 99
+		-- upvalues: v41 (copy)
+		v41(p6.AbsolutePosition.X)
+	end, { v41 })
+
+	React.useEffect(function() -- line: 103
+		-- upvalues: v46 (copy)
+		return function() -- line: 104
+			-- upvalues: v46 (copy)
+			if v46.current then
+				v46.current.Video = ""
+			end
+		end
+	end, {})
+	React.useEffect(function() -- line: 111
+		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), t1 (copy), v43 (copy), itemSize (copy), CaptureType (copy), getCaptureSize (copy)
+		if FFlagEnableCapturesGalleryRetrievalCoreScript then
+			if t1.capture.CaptureType == Enum.CaptureType.Screenshot then
+				v43(itemSize)
+			end
+
+			return
+		end
+
+		if t1.capture.type == CaptureType.Video then
+			return
+		end
+
+		task.spawn(function() -- line: 123
+			-- upvalues: getCaptureSize (copy), t1 (copy), v43 (copy), itemSize (copy)
+			local v110 = getCaptureSize(t1.capture.contentId)
+
+			if v110 then
+				v43(v110)
+
+				return
+			end
+
+			v43(itemSize)
+		end)
+	end, {
+		itemSize,
+		t1.capture
+	})
+
+	local v52 = React.useCallback(function(p7) -- line: 134
+		-- upvalues: v46 (copy), v43 (copy)
+		v46.current = p7
+
+		local Resolution = p7.Resolution
+
+		v43(Vector2.new(Resolution.X, Resolution.Y))
+	end, {})
+	local v53 = React.useCallback(function(n1: number) -- line: 140
+		-- upvalues: itemSize (copy), v44 (copy)
+		local v79 = itemSize.X / 2
+		local v80 = v44.X / 2
+		local v81 = n1 + v79
+		local v82 = math.abs(v80 - v81)
+		local v83 = if not (v82 < 25) then v82 - 25 else 0
+
+		return math.sign(v80 - v81), (math.min(1, v83 / (itemSize.X - 25)))
+	end, {
+		itemSize,
+		itemIndex,
+		v44
+	})
+	local v54 = React.useCallback(function(n2: number) -- line: 158
+		-- upvalues: v53 (copy), v19 (copy), v42 (copy), itemSize (copy), t1 (copy)
+		local _, v86 = v53(n2)
+		local v87 = v19(v42, itemSize)
+
+		if v86 == 0 then
+			return UDim2.fromOffset(v87.X, v87.Y)
+		end
+
+		local v88 = 1 - v86 * (1 - t1.unfocusedSizeMultiplier)
+		local v89 = v87.Y * v88
+		local v90 = v87.X * v88
+		local v91 = math.floor(v89)
+		local v92 = math.floor(v90)
+
+		return UDim2.fromOffset(v92, v91)
+	end, {
+		v42,
+		itemSize,
+		t1.unfocusedSizeMultiplier,
+		v53
+	})
+	local v55 = React.useCallback(function(n3: number) -- line: 177
+		-- upvalues: v53 (copy), v54 (copy), itemSize (copy), imagePadding (copy)
+		local v94, v95 = v53(n3)
+
+		if v95 == 0 then
+			return UDim2.fromScale(0.5, 0.5)
+		end
+
+		local XOffset = v54(n3).X.Offset
+		local v97 = (itemSize.X / 2 - imagePadding - XOffset / 2) * v95
+
+		return UDim2.new(0.5, v97 * v94, 0.5, 0)
+	end, {
+		v42,
+		imagePadding,
+		itemSize,
+		v44,
+		v53,
+		v54
+	})
+	local OverlayTransparency = v38.Theme.Overlay.Transparency
+	local v57 = React.useCallback(function(n4: number) -- line: 198
+		-- upvalues: v53 (copy), OverlayTransparency (copy)
+		local _, v100 = v53(n4)
+
+		return 1 - (1 - OverlayTransparency) * v100
+	end, {
+		OverlayTransparency,
+		v53
+	})
+	local v58 = React.useCallback(function(p8) -- line: 203
+		-- upvalues: UserGameSettings (copy), v57 (copy)
+		local absoluteXPosition = p8.absoluteXPosition
+		local fadeOutBinding = p8.fadeOutBinding
+
+		if UserGameSettings.ReducedMotion and fadeOutBinding then
+			return 1
+		end
+
+		if fadeOutBinding then
+			return (math.min(v57(absoluteXPosition), fadeOutBinding))
+		end
+
+		return v57(absoluteXPosition)
+	end, { v57 })
+	local v59 = React.useCallback(function() -- line: 217
+		-- upvalues: t1 (copy), v48 (copy), v47 (copy)
+		if t1.onExpandCallback then
+			t1.onExpandCallback(t1.itemIndex)
+		end
+
+		v48(not v47)
+	end, {
+		v47,
+		t1.onExpandCallback,
+		t1.itemIndex
+	})
+	local v60 = React.useCallback(function() -- line: 224
+		-- upvalues: t1 (copy)
+		if t1.onMuteCallback then
+			t1.onMuteCallback()
+		end
+	end, { t1.onMuteCallback })
+	local v61 = React.useCallback(function() -- line: 230
+		-- upvalues: React (copy)
+		return (React.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1)
+		}))
+	end, {})
+	local v62 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.type == CaptureType.Screenshot else t1.capture.CaptureType == Enum.CaptureType.Screenshot
+	local v63 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.type == CaptureType.Video else t1.capture.CaptureType == Enum.CaptureType.Video
+	local v64 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.contentId else getContentFromObject(t1.capture)
+	local v65 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then t1.capture.videoCapture else t1.capture
+	local createElement = React.createElement
+	local t2 = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0.5, 0.5),
+		Size = UDim2.fromScale(1, 1),
+		[React.Change.AbsolutePosition] = v51
+	}
+	local t3 = {
+		FullScreenOffset = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, not v47 and 0 or 16)
+		})
+	}
+	local createElement2 = React.createElement
+	local t4 = {
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = if not v47 then v40:map(v55) else UDim2.fromScale(0.5, 0.5)
+	}
+	local uDim2
+
+	if v47 then
+		local v71 = v42.X / v42.Y
+		local v72 = v44.X / v71
+
+		if v72 <= v44.Y then
+			uDim2 = UDim2.fromOffset(v44.X, v72)
+		else
+			local v74 = v44.Y * v71
+
+			uDim2 = UDim2.fromOffset(v74, v44.Y)
+		end
+	else
+		uDim2 = v40:map(v54)
+	end
+
+	t4.Size = uDim2
+	t3.CaptureContainer = createElement2("Frame", t4, {
+		CaptureImage = if not v62 then nil else React.createElement("ImageLabel", {
+			BorderSizePixel = 0,
+			ZIndex = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = not FFlagEnableCapturesGalleryRetrievalCoreScript and 1 or 0,
+			Image = if not FFlagEnableCapturesGalleryRetrievalCoreScript then v64 else nil,
+			ImageContent = if not FFlagEnableCapturesGalleryRetrievalCoreScript then nil else v64,
+			Position = UDim2.fromScale(0.5, 0.5),
+			ScaleType = if not FFlagEnableCapturesGalleryRetrievalCoreScript then Enum.ScaleType.Crop else Enum.ScaleType.Fit,
+			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
+			Visible = v42 ~= Vector2.new(0, 0)
+		}),
+		CaptureVideo = if not v63 then nil else if not FFlagUseMediaPlayerInCarousel then React.createElement("VideoFrame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Playing = v40:map(function(p9) -- line: 321
+				-- upvalues: v53 (copy)
+				local _, v109 = v53(p9)
+
+				return v109 < 0.5
+			end),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Looped = true,
+			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
+			Video = if FFlagUseRbxstorageInGallery then nil else t1.capture.contentId,
+			VideoContent = if not FFlagUseRbxstorageInGallery then nil else getContentFromObject(t1.capture.videoCapture),
+			Volume = 0,
+			ZIndex = 1,
+			[React.Event.Loaded] = v52
+		}) else React.createElement(MediaPlayer, {
+			BorderSizePixel = 0,
+			Looped = true,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = not FFlagEnableCapturesGalleryRetrievalCoreScript and 1 or 0,
+			isOverlayDisabled = not t1.isSelected or t1.isDisabled,
+			isTimeHidden = v44.X > v44.Y and (v42.Y > v42.X and not v47),
+			onExpandCallback = v59,
+			onMuteCallback = v60,
+			onLoaded = v52,
+			Playing = t1.isSelected and v40:map(function(p10) -- line: 305
+				-- upvalues: v53 (copy)
+				local _, v106 = v53(p10)
+
+				return v106 < 0.5
+			end),
+			Position = UDim2.fromScale(0.5, 0.5),
+			renderOnFailed = v61,
+			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize),
+			VideoContent = getContentFromObject(v65),
+			videoRef = v45,
+			ZIndex = not v47 and 1 or 5
+		}),
+		Overlay = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 2,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v38.Theme.Overlay.Color,
+			BackgroundTransparency = React.joinBindings({
+				absoluteXPosition = v40,
+				fadeOutBinding = t1.fadeOutBinding
+			}):map(v58),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = if not t1.fadeOutBinding then UDim2.fromScale(1, 1) else t1.fadeOutBinding:map(getCapturesItemSize)
+		}),
+		TransitionOverlay = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
+			BackgroundTransparency = not t1.transitionBinding and 1 or t1.transitionBinding:map(getDeleteTransitionTransparency),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromScale(1, 1)
+		}),
+		FullScreenBackground = if not FFlagUseMediaPlayerInCarousel or not v47 then nil else React.createElement("Frame", {
+			BackgroundTransparency = 0,
+			BorderSizePixel = 0,
+			ZIndex = 4,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = v38.Theme.BackgroundContrast.Color,
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(v44.X, v44.Y)
+		})
+	})
+
+	return createElement("Frame", t2, t3)
+end

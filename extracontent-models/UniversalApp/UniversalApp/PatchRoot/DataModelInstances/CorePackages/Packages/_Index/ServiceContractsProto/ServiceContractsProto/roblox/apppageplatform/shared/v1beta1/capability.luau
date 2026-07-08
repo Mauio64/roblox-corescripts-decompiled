@@ -1,29 +1,54 @@
-local _ = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local _ = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
+require(script.Parent.Parent.Parent.Parent.Parent.proto)
+require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+
 return {
-    Capability = ({
-        Capability = {
-            fromNumber = function(v2) --[[ Line: 18 ]] --[[ Name: fromNumber ]]
-                if v2 == 0 then
-                    return "CAPABILITY_INVALID";
-                else
-                    return nil;
-                end;
-            end, 
-            toNumber = function(v3) --[[ Line: 26 ]] --[[ Name: toNumber ]]
-                if v3 == "CAPABILITY_INVALID" then
-                    return 0;
-                else
-                    return v3;
-                end;
-            end, 
-            fromName = function(v4) --[[ Line: 34 ]] --[[ Name: fromName ]]
-                if v4 == "CAPABILITY_INVALID" then
-                    return "CAPABILITY_INVALID";
-                else
-                    return nil;
-                end;
-            end
-        }
-    }).Capability
-};
+	Capability = ({
+		Capability = {
+			fromNumber = function(n1: number) -- line: 22
+				if n1 == 0 then
+					return "CAPABILITY_INVALID"
+				end
+
+				if n1 == 2000 then
+					return "CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON"
+				end
+
+				if n1 == 3000 then
+					return "CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION"
+				end
+
+				return nil
+			end,
+			toNumber = function(p1) -- line: 34
+				if p1 == "CAPABILITY_INVALID" then
+					return 0
+				end
+
+				if p1 == "CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON" then
+					return 2000
+				end
+
+				if p1 == "CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION" then
+					return 3000
+				end
+
+				return p1
+			end,
+			fromName = function(s1: string) -- line: 46
+				if s1 == "CAPABILITY_INVALID" then
+					return "CAPABILITY_INVALID"
+				end
+
+				if s1 == "CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON" then
+					return "CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON"
+				end
+
+				if s1 == "CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION" then
+					return "CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION"
+				end
+
+				return nil
+			end
+		}
+	}).Capability
+}

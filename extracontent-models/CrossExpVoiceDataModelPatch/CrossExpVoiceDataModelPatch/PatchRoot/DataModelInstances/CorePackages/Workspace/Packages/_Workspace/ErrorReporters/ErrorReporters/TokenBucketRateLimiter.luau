@@ -1,60 +1,74 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 36 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = setmetatable({}, v0);
-    v2.maxTokens = v1.maxTokens;
-    v2.refillRate = v1.refillRate;
-    v2.refillIntervalSeconds = v1.refillIntervalSeconds;
-    v2.currentTokens = v1.initialTokens or v1.maxTokens;
-    v2.lastRefillTime = tick();
-    if v2.currentTokens > v2.maxTokens then
-        v2.currentTokens = v2.maxTokens;
-    end;
-    return v2;
-end;
-v0.refill = function(v3) --[[ Line: 58 ]] --[[ Name: refill ]]
-    local v4 = tick();
-    local v5 = v4 - v3.lastRefillTime;
-    if v5 < 0 then
-        v3.lastRefillTime = v4;
-        return;
-    else
-        local v6 = math.floor(v5 / v3.refillIntervalSeconds);
-        if v6 > 0 then
-            local v7 = v6 * v3.refillRate;
-            v3.currentTokens = math.min(v3.maxTokens, v3.currentTokens + v7);
-            v3.lastRefillTime = v3.lastRefillTime + v6 * v3.refillIntervalSeconds;
-        end;
-        return;
-    end;
-end;
-v0.consume = function(v8, v9) --[[ Line: 93 ]] --[[ Name: consume ]]
-    local v10 = v9 or 1;
-    v8:refill();
-    if v10 <= v8.currentTokens then
-        v8.currentTokens = v8.currentTokens - v10;
-        return true;
-    else
-        return false;
-    end;
-end;
-v0.getAvailableTokens = function(v11) --[[ Line: 113 ]] --[[ Name: getAvailableTokens ]]
-    v11:refill();
-    return v11.currentTokens;
-end;
-v0.getMaxTokens = function(v12) --[[ Line: 123 ]] --[[ Name: getMaxTokens ]]
-    return v12.maxTokens;
-end;
-v0.hasTokensAvailable = function(v13) --[[ Line: 132 ]] --[[ Name: hasTokensAvailable ]]
-    return v13:getAvailableTokens() > 0;
-end;
-v0.reset = function(v14) --[[ Line: 139 ]] --[[ Name: reset ]]
-    v14.currentTokens = v14.maxTokens;
-    v14.lastRefillTime = tick();
-end;
-v0.toString = function(v15) --[[ Line: 149 ]] --[[ Name: toString ]]
-    v15:refill();
-    return string.format("TokenBucketRateLimiter{tokens=%d/%d, refillRate=%d/%ds, nextRefillIn=%.1fs}", v15.currentTokens, v15.maxTokens, v15.refillRate, v15.refillIntervalSeconds, v15.refillIntervalSeconds - (tick() - v15.lastRefillTime) % v15.refillIntervalSeconds);
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(t2: {[any]: any}) -- line: 36
+	-- upvalues: t1 (copy)
+	local self = setmetatable({}, t1)
+
+	self.maxTokens = t2.maxTokens
+	self.refillRate = t2.refillRate
+	self.refillIntervalSeconds = t2.refillIntervalSeconds
+	self.currentTokens = t2.initialTokens or t2.maxTokens
+	self.lastRefillTime = tick()
+
+	if self.currentTokens > self.maxTokens then
+		self.currentTokens = self.maxTokens
+	end
+
+	return self
+end
+function t1.refill(p1) -- line: 58
+	local timestamp = tick()
+	local v6 = timestamp - p1.lastRefillTime
+
+	if v6 < 0 then
+		p1.lastRefillTime = timestamp
+
+		return
+	end
+
+	local v7 = math.floor(v6 / p1.refillIntervalSeconds)
+
+	if v7 > 0 then
+		local v8 = v7 * p1.refillRate
+
+		p1.currentTokens = math.min(p1.maxTokens, p1.currentTokens + v8)
+		p1.lastRefillTime = p1.lastRefillTime + v7 * p1.refillIntervalSeconds
+	end
+end
+function t1.consume(t3: {[any]: any}, n1: number?) -- line: 93
+	local v11 = n1 or 1
+
+	t3:refill()
+
+	if v11 <= t3.currentTokens then
+		t3.currentTokens = t3.currentTokens - v11
+
+		return true
+	end
+
+	return false
+end
+function t1.getAvailableTokens(p2) -- line: 113
+	p2:refill()
+
+	return p2.currentTokens
+end
+function t1.getMaxTokens(p3) -- line: 123
+	return p3.maxTokens
+end
+function t1.hasTokensAvailable(p4) -- line: 132
+	return p4:getAvailableTokens() > 0
+end
+function t1.reset(p5) -- line: 139
+	p5.currentTokens = p5.maxTokens
+	p5.lastRefillTime = tick()
+end
+function t1.toString(p6) -- line: 149
+	p6:refill()
+
+	return string.format("TokenBucketRateLimiter{tokens=%d/%d, refillRate=%d/%ds, nextRefillIn=%.1fs}", p6.currentTokens, p6.maxTokens, p6.refillRate, p6.refillIntervalSeconds, p6.refillIntervalSeconds - (tick() - p6.lastRefillTime) % p6.refillIntervalSeconds)
+end
+
+return t1

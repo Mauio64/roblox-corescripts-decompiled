@@ -25,56 +25,56 @@ local v18 = AppFonts.default:getDefault()
 local v19 = t1[Enum.FontSize.Size24]
 local t2 = {
 	MenuContainer = {
-		Color = Color3.new(0, 0, 0),
-		Transparency = 0.2
+		Transparency = 0.2,
+		Color = Color3.new(0, 0, 0)
 	},
 	IGM_TabSelection = {
-		Color = Color3.new(1, 1, 1),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.new(1, 1, 1)
 	},
 	White = {
-		Color = Color3.new(1, 1, 1),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.new(1, 1, 1)
 	},
 	IGM_Background = {
-		Color = Color3.fromRGB(0, 0, 0),
-		Transparency = 1
+		Transparency = 1,
+		Color = Color3.fromRGB(0, 0, 0)
 	},
 	IGM_Button = {
-		Color = Color3.fromRGB(0, 0, 0),
-		Transparency = 1
+		Transparency = 1,
+		Color = Color3.fromRGB(0, 0, 0)
 	},
 	IGM_ButtonNonInteractable = {
-		Color = Color3.fromRGB(100, 100, 100),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.fromRGB(100, 100, 100)
 	},
 	IGM_ButtonHover = {
-		Color = Color3.fromRGB(56, 57, 59),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.fromRGB(56, 57, 59)
 	},
 	IGM_Stroke = {
-		Color = Color3.new(0.776, 0.776, 0.776),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.new(0.776, 0.776, 0.776)
 	},
 	IGM_Selected = {
-		Color = Color3.fromRGB(217, 217, 217),
-		Transparency = 0
+		Transparency = 0,
+		Color = Color3.fromRGB(217, 217, 217)
 	},
 	Player_RowSelection = {
-		Color = Color3.new(0.396, 0.4, 0.408),
-		Transparency = 0.9
+		Transparency = 0.9,
+		Color = Color3.new(0.396, 0.4, 0.408)
 	}
 }
 local t3 = {
 	Confirmation_Font = {
+		TextSize = 28.584000000000003,
 		Font = AppFonts.default:getBold(),
-		RelativeSize = t1[Enum.FontSize.Size36],
-		TextSize = 28.584000000000003
+		RelativeSize = t1[Enum.FontSize.Size36]
 	},
 	Button_Font = {
+		TextSize = 17.468,
 		Font = AppFonts.default:getMedium(),
-		RelativeSize = t1[Enum.FontSize.Size24],
-		TextSize = 17.468
+		RelativeSize = t1[Enum.FontSize.Size24]
 	},
 	Username = {
 		RelativeSize = if not v4 then t1[Enum.FontSize.Size18] else t1[Enum.FontSize.Size24]
@@ -91,9 +91,9 @@ local t3 = {
 		RelativeSize = t1[Enum.FontSize.Size18]
 	},
 	Help_Text_Font = {
+		TextSize = 14.292000000000002,
 		Font = AppFonts.default:getDefault(),
-		RelativeSize = t1[Enum.FontSize.Size18],
-		TextSize = 14.292000000000002
+		RelativeSize = t1[Enum.FontSize.Size18]
 	},
 	Help_Gamepad_Font = {
 		Font = AppFonts.default:getMedium()
@@ -107,28 +107,28 @@ local t3 = {
 		RelativeSize = t1[Enum.FontSize.Size24]
 	},
 	Conversation_Details_Font = {
-		Font = AppFonts.default:getDefault(),
-		TextSize = 12.704
+		TextSize = 12.704,
+		Font = AppFonts.default:getDefault()
 	},
 	Utility_Text_Font = {
-		Font = AppFonts.default:getDefault(),
-		TextSize = 17.468
+		TextSize = 17.468,
+		Font = AppFonts.default:getDefault()
 	},
 	Utility_Text_Small_Font = {
-		Font = AppFonts.default:getDefault(),
-		TextSize = 12.704
+		TextSize = 12.704,
+		Font = AppFonts.default:getDefault()
 	},
 	Utility_Row_Small_Font = {
-		Font = AppFonts.default:getDefault(),
-		TextSize = 12.704
+		TextSize = 12.704,
+		Font = AppFonts.default:getDefault()
 	},
 	Utility_Row_Font = {
 		Font = AppFonts.default:getMedium(),
 		TextSize = (not v12 or not v4) and 12.704 or 19.056
 	},
 	Back_Button_Font = {
-		Font = AppFonts.default:getSemibold(),
-		TextSize = 19.056
+		TextSize = 19.056,
+		Font = AppFonts.default:getSemibold()
 	},
 	Semibold_Font = {
 		Font = AppFonts.default:getSemibold()
@@ -139,7 +139,7 @@ local t3 = {
 }
 
 setmetatable(t2, {
-	__index = function(_, p2) --[[ __index ]] -- line: 163
+	__index = function(_, p2) -- line: 163
 		-- upvalues: DarkTheme (copy)
 		return DarkTheme[p2]
 	end
@@ -241,20 +241,25 @@ local t8 = {
 
 return {
 	DefaultScrollBarThickness = 1,
+	DefaultStokeThickness = 1,
+	TabHeaderIconPadding = 5,
+	ExtraHubBottomPaddingMobile = 12,
+	ExtraPageBottomPaddingMobile = 48,
+	ButtonHeight = 36,
+	LargeButtonHeight = 48,
+	SelectorArrowButtonWidth = 32,
+	platformNameTextSize = 18,
 	DefaultCornerRadius = UDim.new(0, 8),
 	MenuContainerCornerRadius = UDim.new(0, 10),
-	DefaultStokeThickness = 1,
-	AlwaysShowBottomBar = function() --[[ AlwaysShowBottomBar ]] -- line: 292
+	AlwaysShowBottomBar = function() -- line: 292
 		-- upvalues: u25 (ref)
 		return not u25
 	end,
-	TabHeaderIconPadding = 5,
-	UseInspectAndBuyPanel = function() --[[ UseInspectAndBuyPanel ]] -- line: 296
+	UseInspectAndBuyPanel = function() -- line: 296
 		-- upvalues: u25 (ref)
 		return u25
 	end,
-	ExtraHubBottomPaddingMobile = 12,
-	HubPadding = function() --[[ HubPadding ]] -- line: 300
+	HubPadding = function() -- line: 300
 		-- upvalues: FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), getViewportSize (copy), UserInputService (copy), t6 (copy), t5 (copy), u25 (ref)
 		if FFlagRelocateMobileMenuButtons and FIntRelocateMobileMenuButtonsVariant ~= 0 then
 			local v32 = getViewportSize()
@@ -272,7 +277,7 @@ return {
 
 		return t5
 	end,
-	MenuContainerPosition = function(p3) --[[ MenuContainerPosition ]] -- line: 323
+	MenuContainerPosition = function(p3) -- line: 323
 		-- upvalues: isInExperienceUIVREnabled (copy), u25 (ref), t8 (copy), t7 (copy)
 		if isInExperienceUIVREnabled and p3 then
 			local v34 = p3:getMenuContainerPositionOverride()
@@ -288,20 +293,16 @@ return {
 
 		return t7
 	end,
-	ExtraPageBottomPaddingMobile = 48,
-	ButtonHeight = 36,
-	LargeButtonHeight = 48,
-	SelectorArrowButtonWidth = 32,
 	Images = Images,
 	getIconSize = getIconSize,
 	IconSize = IconSize,
 	SHIELD_INACTIVE_POSITION = UDim2.new(0, 0, 1, 36),
-	viewportResized = function() --[[ viewportResized ]] -- line: 344
+	viewportResized = function() -- line: 344
 		-- upvalues: u24 (ref), getViewportSize (copy), u25 (ref), UserInputService (copy)
 		u24 = getViewportSize()
 		u25 = u24 and (UserInputService.TouchEnabled and (u24.Y < 500 or u24.X < 700))
 	end,
-	color = function(s1: string, color3_2: Color3?) --[[ color ]] -- line: 350
+	color = function(s1: string, color3_2: Color3?) -- line: 350
 		-- upvalues: t4 (copy), t2 (copy), color3 (copy)
 		local v37 = t4[s1] or s1
 
@@ -311,7 +312,7 @@ return {
 
 		return color3_2 or color3
 	end,
-	transparency = function(s2: string, n1: number?) --[[ transparency ]] -- line: 354
+	transparency = function(s2: string, n1: number?) -- line: 354
 		-- upvalues: t4 (copy), t2 (copy)
 		local v40 = t4[s2] or s2
 
@@ -321,7 +322,7 @@ return {
 
 		return n1 or 0
 	end,
-	font = function(p4, s3: string?) --[[ font ]] -- line: 358
+	font = function(p4, s3: string?) -- line: 358
 		-- upvalues: v18 (copy), t4 (copy), t3 (copy)
 		if not s3 then
 			return v18
@@ -335,7 +336,7 @@ return {
 
 		return p4 or v18
 	end,
-	fontSize = function(p5, s4: string?) --[[ fontSize ]] -- line: 365
+	fontSize = function(p5, s4: string?) -- line: 365
 		-- upvalues: t1 (copy), t4 (copy), t3 (copy), v19 (copy)
 		if not s4 then
 			return t1[p5]
@@ -349,7 +350,7 @@ return {
 
 		return p5 or v19
 	end,
-	textSize = function(n2: number, s5: string?) --[[ textSize ]] -- line: 372
+	textSize = function(n2: number, s5: string?) -- line: 372
 		-- upvalues: getUIScale (copy), u25 (ref), t4 (copy), t3 (copy)
 		local v49 = getUIScale(false)
 
@@ -379,7 +380,7 @@ return {
 
 		return n2 * 0.794 or 19
 	end,
-	hydrateLabel = function(p6, s6: string, s7: string) --[[ hydrateLabel ]] -- line: 393
+	hydrateLabel = function(p6, s6: string, s7: string) -- line: 393
 		-- upvalues: t4 (copy), t2 (copy), t3 (copy)
 		local v54 = t4[s6] or s6
 
@@ -397,7 +398,6 @@ return {
 			p6.TextSize = v56.TextSize
 		end
 	end,
-	platformNameTextSize = 18,
 	platformNameIconSize = UDim2.fromOffset(36, 36),
 	selectionCursor = t2.SelectionCursor
 }

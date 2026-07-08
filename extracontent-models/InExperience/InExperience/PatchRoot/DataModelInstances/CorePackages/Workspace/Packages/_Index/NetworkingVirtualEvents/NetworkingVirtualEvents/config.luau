@@ -1,28 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NetworkingVirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.requests.createCreateVirtualEvent);
-local v2 = require(l_script_FirstAncestor_0.requests.createUpdateVirtualEvent);
-local v3 = require(l_script_FirstAncestor_0.requests.createDeleteVirtualEvent);
-local v4 = require(l_script_FirstAncestor_0.requests.createGetVirtualEvent);
-local v5 = require(l_script_FirstAncestor_0.requests.createGetMyVirtualEvents);
-local v6 = require(l_script_FirstAncestor_0.requests.createGetActiveVirtualEvents);
-local v7 = require(l_script_FirstAncestor_0.requests.createGetVirtualEventRsvps);
-local v8 = require(l_script_FirstAncestor_0.requests.createUpdateMyRsvpStatus);
-local v9 = require(l_script_FirstAncestor_0.requests.createGetVirtualEventRsvpCounts);
-local _ = require(l_script_FirstAncestor_0.types);
-return function(v11) --[[ Line: 14 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy), l_script_FirstAncestor_0 (copy)
-    local l_roduxNetworking_0 = v11.roduxNetworking;
-    return {
-        CreateVirtualEvent = v1(l_roduxNetworking_0), 
-        UpdateVirtualEvent = v2(l_roduxNetworking_0), 
-        DeleteVirtualEvent = v3(l_roduxNetworking_0), 
-        GetVirtualEvent = v4(l_roduxNetworking_0), 
-        GetMyVirtualEvents = v5(l_roduxNetworking_0), 
-        GetActiveVirtualEvents = v6(l_roduxNetworking_0), 
-        GetVirtualEventRsvps = v7(l_roduxNetworking_0), 
-        UpdateMyRsvpStatus = v8(l_roduxNetworking_0), 
-        GetVirtualEventRsvpCounts = v9(l_roduxNetworking_0), 
-        VirtualEventModel = require(l_script_FirstAncestor_0.models.VirtualEventModel), 
-        createMockVirtualEventResponse = require(l_script_FirstAncestor_0.createMockVirtualEventResponse)
-    };
-end;
+local NetworkingVirtualEvents = script:FindFirstAncestor("NetworkingVirtualEvents")
+local createCreateVirtualEvent = require(NetworkingVirtualEvents.requests.createCreateVirtualEvent)
+local createUpdateVirtualEvent = require(NetworkingVirtualEvents.requests.createUpdateVirtualEvent)
+local createDeleteVirtualEvent = require(NetworkingVirtualEvents.requests.createDeleteVirtualEvent)
+local createGetVirtualEvent = require(NetworkingVirtualEvents.requests.createGetVirtualEvent)
+local createGetMyVirtualEvents = require(NetworkingVirtualEvents.requests.createGetMyVirtualEvents)
+local createGetActiveVirtualEvents = require(NetworkingVirtualEvents.requests.createGetActiveVirtualEvents)
+local createGetVirtualEventRsvps = require(NetworkingVirtualEvents.requests.createGetVirtualEventRsvps)
+local createUpdateMyRsvpStatus = require(NetworkingVirtualEvents.requests.createUpdateMyRsvpStatus)
+local createGetVirtualEventRsvpCounts = require(NetworkingVirtualEvents.requests.createGetVirtualEventRsvpCounts)
+
+require(NetworkingVirtualEvents.types)
+
+return function(p1) -- line: 14
+	-- upvalues: createCreateVirtualEvent (copy), createUpdateVirtualEvent (copy), createDeleteVirtualEvent (copy), createGetVirtualEvent (copy), createGetMyVirtualEvents (copy), createGetActiveVirtualEvents (copy), createGetVirtualEventRsvps (copy), createUpdateMyRsvpStatus (copy), createGetVirtualEventRsvpCounts (copy), NetworkingVirtualEvents (copy)
+	local roduxNetworking = p1.roduxNetworking
+
+	return {
+		CreateVirtualEvent = createCreateVirtualEvent(roduxNetworking),
+		UpdateVirtualEvent = createUpdateVirtualEvent(roduxNetworking),
+		DeleteVirtualEvent = createDeleteVirtualEvent(roduxNetworking),
+		GetVirtualEvent = createGetVirtualEvent(roduxNetworking),
+		GetMyVirtualEvents = createGetMyVirtualEvents(roduxNetworking),
+		GetActiveVirtualEvents = createGetActiveVirtualEvents(roduxNetworking),
+		GetVirtualEventRsvps = createGetVirtualEventRsvps(roduxNetworking),
+		UpdateMyRsvpStatus = createUpdateMyRsvpStatus(roduxNetworking),
+		GetVirtualEventRsvpCounts = createGetVirtualEventRsvpCounts(roduxNetworking),
+		VirtualEventModel = require(NetworkingVirtualEvents.models.VirtualEventModel),
+		createMockVirtualEventResponse = require(NetworkingVirtualEvents.createMockVirtualEventResponse)
+	}
+end

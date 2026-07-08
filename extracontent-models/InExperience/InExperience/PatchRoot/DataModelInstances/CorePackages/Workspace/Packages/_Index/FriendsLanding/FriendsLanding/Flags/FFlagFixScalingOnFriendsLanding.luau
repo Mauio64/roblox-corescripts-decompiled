@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixScalingOnFriendsLanding", false);
+return game:DefineFastFlag("FixScalingOnFriendsLanding", false)

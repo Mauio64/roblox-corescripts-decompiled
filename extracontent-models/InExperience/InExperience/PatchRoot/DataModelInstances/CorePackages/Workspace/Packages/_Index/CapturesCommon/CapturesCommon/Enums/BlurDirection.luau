@@ -1,6 +1,6 @@
 return {
-    Down = "Down", 
-    Left = "Left", 
-    Right = "Right", 
-    Up = "Up"
-};
+	Down = "Down",
+	Left = "Left",
+	Right = "Right",
+	Up = "Up"
+}

@@ -1,74 +1,89 @@
-local v0 = require(script.Parent.symbols);
-local v1 = require(script.Parent.Spy);
-local v2 = {};
-local v16 = {
-    __index = function(v3, v4) --[[ Line: 7 ]] --[[ Name: __index ]]
-        -- upvalues: v0 (copy), v2 (copy)
-        local v5 = getmetatable(v3);
-        local v6 = v5[v0.Children][v4];
-        if v6 == nil then
-            v6 = v2.new();
-            v5[v0.Children][v4] = v6;
-            return v6;
-        elseif v6 == v0.None then
-            return nil;
-        else
-            return v6;
-        end;
-    end, 
-    __newindex = function(v7, v8, v9) --[[ Line: 22 ]] --[[ Name: __newindex ]]
-        -- upvalues: v1 (copy), v0 (copy)
-        local v10 = getmetatable(v7);
-        if type(v9) == "function" then
-            local _, v12 = v1.new(v9);
-            v9 = v12;
-        elseif v9 == nil then
-            v9 = v0.None;
-        end;
-        if v8 == v0.ReturnValue then
-            v10[v0.ReturnValue] = {
-                v9; 
-                n = 1
-            };
-            return;
-        else
-            v10[v0.Children][v8] = v9;
-            return;
-        end;
-    end, 
-    __call = function(v13, ...) --[[ Line: 39 ]] --[[ Name: __call ]]
-        -- upvalues: v0 (copy), v2 (copy)
-        local v14 = getmetatable(v13);
-        local v15 = {
-            args = table.pack(...), 
-            result = v14[v0.ReturnValue]
-        };
-        if v15.result == nil then
-            v15.result = {
-                v2.new(); 
-                n = 1
-            };
-            v14[v0.ReturnValue] = v15.result;
-        elseif v15.result == v0.None then
-            v15.result = {
-                n = 1
-            };
-        end;
-        table.insert(v14[v0.Calls], v15);
-        return table.unpack(v15.result);
-    end
-};
-v2.new = function(v17) --[[ Line: 60 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v16 (copy)
-    local v18 = {
-        [v0.Calls] = {}, 
-        [v0.Children] = {}, 
-        [v0.Lock] = v17, 
-        [v0.ReturnValue] = nil
-    };
-    for v19, v20 in pairs(v16) do
-        v18[v19] = v20;
-    end;
-    return (setmetatable({}, v18));
-end;
-return v2;
+local symbols = require(script.Parent.symbols)
+local Spy = require(script.Parent.Spy)
+local t1 = {}
+local t3 = {
+	__index = function(p1, p2) -- line: 7
+		-- upvalues: symbols (copy), t1 (copy)
+		local mt = getmetatable(p1)
+		local v8 = mt[symbols.Children][p2]
+
+		if v8 == nil then
+			local v9 = t1.new()
+
+			mt[symbols.Children][p2] = v9
+
+			return v9
+		end
+
+		if v8 == symbols.None then
+			return nil
+		end
+
+		return v8
+	end,
+	__newindex = function(p3, p4, p5) -- line: 22
+		-- upvalues: Spy (copy), symbols (copy)
+		local mt = getmetatable(p3)
+
+		if type(p5) == "function" then
+			local v14
+
+			v14, p5 = Spy.new(p5)
+		elseif p5 == nil then
+			p5 = symbols.None
+		end
+
+		if p4 == symbols.ReturnValue then
+			mt[symbols.ReturnValue] = {
+				p5,
+				n = 1
+			}
+
+			return
+		end
+
+		mt[symbols.Children][p4] = p5
+	end,
+	__call = function(p6, ...) -- line: 39
+		-- upvalues: symbols (copy), t1 (copy)
+		local mt = getmetatable(p6)
+		local t2 = {
+			args = table.pack(...),
+			result = mt[symbols.ReturnValue]
+		}
+
+		if t2.result == nil then
+			t2.result = {
+				t1.new(),
+				n = 1
+			}
+			mt[symbols.ReturnValue] = t2.result
+		elseif t2.result == symbols.None then
+			t2.result = {
+				n = 1
+			}
+		end
+
+		table.insert(mt[symbols.Calls], t2)
+
+		return table.unpack(t2.result)
+	end
+}
+
+function t1.new(p7) -- line: 60
+	-- upvalues: symbols (copy), t3 (copy)
+	local t4 = {
+		[symbols.Calls] = {},
+		[symbols.Children] = {},
+		[symbols.Lock] = p7,
+		[symbols.ReturnValue] = nil
+	}
+
+	for k, v in pairs(t3) do
+		t4[k] = v
+	end
+
+	return (setmetatable({}, t4))
+end
+
+return t1

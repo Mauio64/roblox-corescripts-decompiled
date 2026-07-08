@@ -1,3 +1,3 @@
 return {
-    RecommendationContextType = require(script.RecommendationContextType)
-};
+	RecommendationContextType = require(script.RecommendationContextType)
+}

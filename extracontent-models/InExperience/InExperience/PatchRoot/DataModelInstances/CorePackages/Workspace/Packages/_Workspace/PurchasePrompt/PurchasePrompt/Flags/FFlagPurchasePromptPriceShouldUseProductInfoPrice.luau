@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PurchasePromptPriceShouldUseProductInfoPrice4", false);
+return game:DefineFastFlag("PurchasePromptPriceShouldUseProductInfoPrice4", false)

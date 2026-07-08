@@ -1,5 +1,5 @@
 return {
-    Unvalidated = "Unvalidated", 
-    Valid = "Valid", 
-    Invalid = "Invalid"
-};
+	Unvalidated = "Unvalidated",
+	Valid = "Valid",
+	Invalid = "Invalid"
+}

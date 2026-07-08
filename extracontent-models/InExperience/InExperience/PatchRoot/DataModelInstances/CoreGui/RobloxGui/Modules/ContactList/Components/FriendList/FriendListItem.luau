@@ -1,274 +1,279 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v3 = require(l_CorePackages_0.Packages.React);
-local l_Sounds_0 = require(l_CorePackages_0.Workspace.Packages.SoundManager).Sounds;
-local l_SoundGroups_0 = require(l_CorePackages_0.Workspace.Packages.SoundManager).SoundGroups;
-local l_SoundManager_0 = require(l_CorePackages_0.Workspace.Packages.SoundManager).SoundManager;
-local v7 = require(l_CorePackages_0.Workspace.Packages.UserProfiles);
-local l_ContactList_0 = l_RobloxGui_0.Modules.ContactList;
-local v9 = require(l_ContactList_0.dependencies);
-local l_dependencyArray_0 = v9.Hooks.dependencyArray;
-local l_useDispatch_0 = v9.Hooks.useDispatch;
-local l_useSelector_0 = v9.Hooks.useSelector;
-local l_getStandardSizeAvatarHeadShotRbxthumb_0 = v9.getStandardSizeAvatarHeadShotRbxthumb;
-local l_GetPresencesFromUserIds_0 = v9.NetworkingPresence.GetPresencesFromUserIds;
-local l_useLocalization_0 = v9.Hooks.useLocalization;
-local l_PresenceType_0 = v9.RoduxPresence.Enums.PresenceType;
-local l_UIBlox_0 = v9.UIBlox;
-local l_ControlState_0 = l_UIBlox_0.Core.Control.Enum.ControlState;
-local l_PlayerContext_0 = l_UIBlox_0.App.Indicator.PlayerContext;
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local l_Interactable_0 = l_UIBlox_0.Core.Control.Interactable;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local l_useStyle_0 = l_UIBlox_0.Core.Style.useStyle;
-local v24 = require(l_ContactList_0.Actions.OpenOrUpdateCFM);
-local v25 = require(l_ContactList_0.Analytics.useAnalytics);
-local v26 = require(l_ContactList_0.Analytics.EventNamesEnum);
-local v27 = require(l_ContactList_0.Hooks.useStartCallCallback);
-local v28 = require(l_ContactList_0.Enums.Pages);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v30 = Random.new();
-local v31 = Vector2.new(24, 12);
-return function(v32) --[[ Line: 65 ]] --[[ Name: FriendListItem ]]
-    -- upvalues: v25 (copy), l_useStyle_0 (copy), l_useDispatch_0 (copy), l_useLocalization_0 (copy), v3 (copy), l_GetPresencesFromUserIds_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_useSelector_0 (copy), l_ControlState_0 (copy), l_SoundManager_0 (copy), l_Sounds_0 (copy), v30 (copy), l_SoundGroups_0 (copy), l_getStandardSizeAvatarHeadShotRbxthumb_0 (copy), v27 (copy), l_Images_0 (copy), l_PresenceType_0 (copy), l_PlayerContext_0 (copy), v26 (copy), v28 (copy), v24 (copy), l_Interactable_0 (copy), v31 (copy), v7 (copy), l_ImageSetLabel_0 (copy)
-    local v33 = v25();
-    local v34 = l_useStyle_0();
-    local l_Theme_0 = v34.Theme;
-    local l_Font_0 = v34.Font;
-    local v37 = l_useDispatch_0();
-    local v38 = {
-        userId = v32.userId, 
-        userName = v32.userName, 
-        combinedName = v32.combinedName
-    };
-    local v39 = l_useLocalization_0({
-        offlineStatusLabel = "InGame.Presence.Label.Offline", 
-        onlineStatusLabel = "InGame.Presence.Label.Online", 
-        studioStatusLabel = "InGame.Presence.Label.RobloxStudio"
-    });
-    v3.useEffect(function() --[[ Line: 86 ]]
-        -- upvalues: v32 (copy), v37 (copy), l_GetPresencesFromUserIds_0 (ref)
-        if v32.userPresenceType == nil then
-            v37(l_GetPresencesFromUserIds_0.API({
-                v32.userId
-            }));
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v32.userId, 
-        v32.userPresenceType
-    } else l_dependencyArray_0(v32.userId, v32.userPresenceType));
-    local v41 = v3.useCallback(function(v40) --[[ Line: 96 ]]
-        -- upvalues: v32 (copy)
-        return v40.Presence.byUserId[tostring(v32.userId)];
-    end, {
-        v32.userId
-    });
-    local v42 = l_useSelector_0(v41);
-    local v44 = v3.useCallback(function(v43) --[[ Line: 101 ]]
-        return v43.Navigation.currentTag;
-    end, {});
-    local v45 = l_useSelector_0(v44);
-    local v47 = v3.useCallback(function(v46) --[[ Line: 106 ]]
-        return v46.Navigation.currentPage;
-    end, {});
-    local v48 = l_useSelector_0(v47);
-    local v49, v50 = v3.useState("BackgroundDefault");
-    local v53 = v3.useCallback(function(_, v52) --[[ Line: 112 ]]
-        -- upvalues: l_ControlState_0 (ref), v50 (copy), l_SoundManager_0 (ref), l_Sounds_0 (ref), v30 (ref), l_SoundGroups_0 (ref)
-        if v52 == l_ControlState_0.Pressed then
-            v50("BackgroundOnPress");
-            return;
-        elseif v52 == l_ControlState_0.Hover then
-            v50("BackgroundOnHover");
-            l_SoundManager_0:PlaySound(l_Sounds_0.Hover.Name, {
-                Volume = 0.5 + v30:NextNumber(-0.25, 0.25), 
-                PlaybackSpeed = 1 + v30:NextNumber(-0.5, 0.5)
-            }, l_SoundGroups_0.Iris);
-            return;
-        else
-            v50("BackgroundDefault");
-            return;
-        end;
-    end, {});
-    local v54 = l_getStandardSizeAvatarHeadShotRbxthumb_0((tostring(v32.userId)));
-    local v55 = {
-        searchQueryString = v32.searchQueryString, 
-        itemListIndex = v32.itemListIndex, 
-        isSuggestedUser = v32.isSuggestedUser, 
-        page = v48
-    };
-    local v56 = v27(v45, v32.userId, v32.combinedName, v32.dismissCallback, v55);
-    local v65 = v3.useMemo(function() --[[ Line: 136 ]]
-        -- upvalues: l_Images_0 (ref), v34 (copy), v39 (copy), v42 (copy), v32 (copy), l_PresenceType_0 (ref), l_Theme_0 (copy), v3 (ref), l_PlayerContext_0 (ref), v56 (copy)
-        local v57 = l_Images_0["component_assets/circle_26_stroke_3"];
-        local l_Color_0 = v34.Theme.OfflineStatus.Color;
-        local l_Transparency_0 = v34.Theme.OfflineStatus.Transparency;
-        local v60 = 12;
-        local l_offlineStatusLabel_0 = v39.offlineStatusLabel;
-        local l_TextMuted_0 = v34.Theme.TextMuted;
-        local v63 = nil;
-        local v64 = nil;
-        if v42 then
-            v63 = v42.userPresenceType;
-            v64 = v42.lastLocation;
-        else
-            v63 = if v32.userPresenceType then l_PresenceType_0[v32.userPresenceType] else l_PresenceType_0.Offline;
-            v64 = v32.lastLocation or "";
-        end;
-        if v63 == l_PresenceType_0.Online then
-            v57 = l_Images_0["component_assets/circle_16"];
-            l_Color_0 = v34.Theme.OnlineStatus.Color;
-            l_Transparency_0 = v34.Theme.OnlineStatus.Transparency;
-            l_offlineStatusLabel_0 = v39.onlineStatusLabel;
-            l_TextMuted_0 = v34.Theme.TextMuted;
-            v60 = 12;
-        elseif v63 == l_PresenceType_0.InGame then
-            v57 = l_Images_0["icons/menu/games_small"];
-            l_Color_0 = v34.Theme.IconEmphasis.Color;
-            l_Transparency_0 = v34.Theme.IconEmphasis.Transparency;
-            l_offlineStatusLabel_0 = v64;
-            l_TextMuted_0 = l_Theme_0.TextEmphasis;
-            v60 = 16;
-        elseif v63 == l_PresenceType_0.InStudio then
-            v57 = l_Images_0["icons/logo/studiologo_small"];
-            l_Color_0 = v34.Theme.TextDefault.Color;
-            l_Transparency_0 = v34.Theme.TextDefault.Transparency;
-            l_offlineStatusLabel_0 = v39.studioStatusLabel;
-            l_TextMuted_0 = v34.Theme.TextMuted;
-            v60 = 16;
-        end;
-        return v3.createElement(l_PlayerContext_0, {
-            fontStyle = v34.Font.CaptionBody, 
-            icon = v57, 
-            iconColor = l_Color_0, 
-            iconSize = UDim2.fromOffset(v60, v60), 
-            iconTransparency = l_Transparency_0, 
-            layoutOrder = 2, 
-            onActivated = v56, 
-            text = l_offlineStatusLabel_0, 
-            textColorStyle = l_TextMuted_0, 
-            textHeight = 24
-        });
-    end, {
-        v42, 
-        v34, 
-        v39.offlineStatusLabel, 
-        v39.onlineStatusLabel, 
-        v39.studioStatusLabel
-    });
-    local v66 = v3.useCallback(function() --[[ Line: 194 ]]
-        -- upvalues: v33 (copy), v26 (ref), v38 (copy), v32 (copy), v28 (ref), v37 (copy), v24 (ref)
-        v33.fireEvent(v26.PhoneBookPlayerMenuOpened, {
-            eventTimestampMs = os.time() * 1000, 
-            friendUserId = v38.userId, 
-            searchQueryString = v32.searchQueryString, 
-            itemListIndex = v32.itemListIndex, 
-            isSuggestedUser = v32.isSuggestedUser, 
-            page = v28.FriendList
-        });
-        v37(v24(v38));
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v38.userId, 
-        v32.searchQueryString, 
-        v32.itemListIndex, 
-        v32.isSuggestedUser
-    } else l_dependencyArray_0(v38.userId, v32.searchQueryString, v32.itemListIndex, v32.isSuggestedUser));
-    return v3.createElement(l_Interactable_0, {
-        Position = UDim2.fromOffset(0, 0), 
-        Size = UDim2.new(1, 0, 0, 68 + v31.Y * 2), 
-        BackgroundColor3 = l_Theme_0[v49].Color, 
-        BackgroundTransparency = l_Theme_0[v49].Transparency, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v32.layoutOrder, 
-        onStateChanged = v53, 
-        AutoButtonColor = false, 
-        [v3.Event.Activated] = v56
-    }, {
-        UIPadding = v3.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v31.X), 
-            PaddingTop = UDim.new(0, v31.Y)
-        }), 
-        ProfileImage = v3.createElement("ImageButton", {
-            Size = UDim2.fromOffset(68, 68), 
-            Image = v54, 
-            [v3.Event.MouseButton2Up] = v66, 
-            [v3.Event.TouchTap] = v66, 
-            AutoButtonColor = false
-        }, {
-            UICorner = v3.createElement("UICorner", {
-                CornerRadius = UDim.new(1, 0)
-            })
-        }), 
-        Content = v3.createElement("Frame", {
-            Position = UDim2.new(0, 80, 0, 0), 
-            Size = UDim2.new(1, -(116 + v31.X), 1, -v31.Y), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, {
-            UIListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            NameContent = v3.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 1
-            }, {
-                UIListLayout = v3.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    Padding = UDim.new(0, 4), 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                UIPadding = v3.createElement("UIPadding", {
-                    PaddingBottom = UDim.new(0, 6)
-                }), 
-                CombinedName = v3.createElement("TextLabel", {
-                    Size = UDim2.new(1, 0, 0, 20), 
-                    BackgroundTransparency = 1, 
-                    BorderSizePixel = 0, 
-                    Font = l_Font_0.Header2.Font, 
-                    LayoutOrder = 1, 
-                    Text = v32.combinedName, 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextSize = l_Font_0.BaseSize * l_Font_0.Header2.RelativeSize, 
-                    TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                    TextTruncate = Enum.TextTruncate.AtEnd, 
-                    TextXAlignment = Enum.TextXAlignment.Left
-                }), 
-                Username = v3.createElement("TextLabel", {
-                    Size = UDim2.new(1, 0, 0, 14), 
-                    BackgroundTransparency = 1, 
-                    BorderSizePixel = 0, 
-                    Font = l_Font_0.CaptionBody.Font, 
-                    LayoutOrder = 2, 
-                    Text = v7.Formatters.formatUsername(v32.userName), 
-                    TextColor3 = l_Theme_0.TextDefault.Color, 
-                    TextSize = l_Font_0.BaseSize * l_Font_0.CaptionBody.RelativeSize, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency, 
-                    TextTruncate = Enum.TextTruncate.AtEnd, 
-                    TextXAlignment = Enum.TextXAlignment.Left
-                })
-            }), 
-            PlayerContext = v65
-        }), 
-        CallIcon = v3.createElement(l_ImageSetLabel_0, {
-            Position = UDim2.new(1, -v31.X - 4, 0.5, -v31.Y / 2), 
-            Size = UDim2.fromOffset(24, 24), 
-            AnchorPoint = Vector2.new(1, 0.5), 
-            BackgroundTransparency = 1, 
-            Image = "rbxassetid://15239343417", 
-            ImageColor3 = l_Theme_0.ContextualPrimaryDefault.Color, 
-            ImageTransparency = l_Theme_0.ContextualPrimaryDefault.Transparency
-        }), 
-        Divider = v32.showDivider and v3.createElement("Frame", {
-            Position = UDim2.new(0, 0, 1, -1), 
-            Size = UDim2.new(1, 0, 0, 1), 
-            BackgroundColor3 = l_Theme_0.Divider.Color, 
-            BackgroundTransparency = l_Theme_0.Divider.Transparency, 
-            BorderSizePixel = 0
-        }) or nil
-    });
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local React = require(CorePackages.Packages.React)
+local Sounds = require(CorePackages.Workspace.Packages.SoundManager).Sounds
+local SoundGroups = require(CorePackages.Workspace.Packages.SoundManager).SoundGroups
+local SoundManager = require(CorePackages.Workspace.Packages.SoundManager).SoundManager
+local UserProfiles = require(CorePackages.Workspace.Packages.UserProfiles)
+local ContactList = RobloxGui.Modules.ContactList
+local dependencies = require(ContactList.dependencies)
+local useDispatch = dependencies.Hooks.useDispatch
+local useSelector = dependencies.Hooks.useSelector
+local getStandardSizeAvatarHeadShotRbxthumb = dependencies.getStandardSizeAvatarHeadShotRbxthumb
+local GetPresencesFromUserIds = dependencies.NetworkingPresence.GetPresencesFromUserIds
+local useLocalization = dependencies.Hooks.useLocalization
+local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
+local UIBlox = dependencies.UIBlox
+local ControlState = UIBlox.Core.Control.Enum.ControlState
+local PlayerContext = UIBlox.App.Indicator.PlayerContext
+local Images = UIBlox.App.ImageSet.Images
+local Interactable = UIBlox.Core.Control.Interactable
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local useStyle = UIBlox.Core.Style.useStyle
+local OpenOrUpdateCFM = require(ContactList.Actions.OpenOrUpdateCFM)
+local useAnalytics = require(ContactList.Analytics.useAnalytics)
+local EventNamesEnum = require(ContactList.Analytics.EventNamesEnum)
+local useStartCallCallback = require(ContactList.Hooks.useStartCallCallback)
+local Pages = require(ContactList.Enums.Pages)
+local random = Random.new()
+local vector2 = Vector2.new(24, 12)
+
+local function FriendListItem(t1: {[any]: any}) -- line: 61
+	-- upvalues: useAnalytics (copy), useStyle (copy), useDispatch (copy), useLocalization (copy), React (copy), GetPresencesFromUserIds (copy), useSelector (copy), ControlState (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), useStartCallCallback (copy), Images (copy), PresenceType (copy), PlayerContext (copy), EventNamesEnum (copy), Pages (copy), OpenOrUpdateCFM (copy), Interactable (copy), vector2 (copy), UserProfiles (copy), ImageSetLabel (copy)
+	local v33 = useAnalytics()
+	local v34 = useStyle()
+	local Theme = v34.Theme
+	local Font = v34.Font
+	local v37 = useDispatch()
+	local t2 = {
+		userId = t1.userId,
+		userName = t1.userName,
+		combinedName = t1.combinedName
+	}
+	local v39 = useLocalization({
+		offlineStatusLabel = "InGame.Presence.Label.Offline",
+		onlineStatusLabel = "InGame.Presence.Label.Online",
+		studioStatusLabel = "InGame.Presence.Label.RobloxStudio"
+	})
+
+	React.useEffect(function() -- line: 81
+		-- upvalues: t1 (copy), v37 (copy), GetPresencesFromUserIds (copy)
+		if t1.userPresenceType == nil then
+			v37(GetPresencesFromUserIds.API({ t1.userId }))
+		end
+	end, {
+		t1.userId,
+		t1.userPresenceType
+	})
+
+	local v40 = React.useCallback(function(p1) -- line: 87
+		-- upvalues: t1 (copy)
+		return p1.Presence.byUserId[tostring(t1.userId)]
+	end, { t1.userId })
+	local v41 = useSelector(v40)
+	local v42 = React.useCallback(function(p2) -- line: 92
+		return p2.Navigation.currentTag
+	end, {})
+	local v43 = useSelector(v42)
+	local v44 = React.useCallback(function(p3) -- line: 97
+		return p3.Navigation.currentPage
+	end, {})
+	local v45 = useSelector(v44)
+	local v46, v47 = React.useState("BackgroundDefault")
+	local v48 = React.useCallback(function(_, p5) -- line: 103
+		-- upvalues: ControlState (copy), v47 (copy), SoundManager (copy), Sounds (copy), random (copy), SoundGroups (copy)
+		if p5 == ControlState.Pressed then
+			v47("BackgroundOnPress")
+
+			return
+		end
+
+		if p5 == ControlState.Hover then
+			v47("BackgroundOnHover")
+			SoundManager:PlaySound(Sounds.Hover.Name, {
+				Volume = 0.5 + random:NextNumber(-0.25, 0.25),
+				PlaybackSpeed = 1 + random:NextNumber(-0.5, 0.5)
+			}, SoundGroups.Iris)
+
+			return
+		end
+
+		v47("BackgroundDefault")
+	end, {})
+	local v49 = getStandardSizeAvatarHeadShotRbxthumb((tostring(t1.userId)))
+	local t3 = {
+		searchQueryString = t1.searchQueryString,
+		itemListIndex = t1.itemListIndex,
+		isSuggestedUser = t1.isSuggestedUser,
+		page = v45
+	}
+	local v51 = useStartCallCallback(v43, t1.userId, t1.combinedName, t1.dismissCallback, t3)
+	local v52 = React.useMemo(function() -- line: 127
+		-- upvalues: Images (copy), v34 (copy), v39 (copy), v41 (copy), t1 (copy), PresenceType (copy), Theme (copy), React (copy), PlayerContext (copy), v51 (copy)
+		local v59 = Images["component_assets/circle_26_stroke_3"]
+		local OfflineStatusColor = v34.Theme.OfflineStatus.Color
+		local OfflineStatusTransparency = v34.Theme.OfflineStatus.Transparency
+		local n1 = 12
+		local offlineStatusLabel = v39.offlineStatusLabel
+		local TextMuted = v34.Theme.TextMuted
+		local userPresenceType, lastLocation
+
+		if v41 then
+			userPresenceType = v41.userPresenceType
+			lastLocation = v41.lastLocation
+		else
+			userPresenceType = if not t1.userPresenceType then PresenceType.Offline else PresenceType[t1.userPresenceType]
+			lastLocation = t1.lastLocation or ""
+		end
+
+		if userPresenceType == PresenceType.Online then
+			v59 = Images["component_assets/circle_16"]
+			OfflineStatusColor = v34.Theme.OnlineStatus.Color
+			OfflineStatusTransparency = v34.Theme.OnlineStatus.Transparency
+			offlineStatusLabel = v39.onlineStatusLabel
+			TextMuted = v34.Theme.TextMuted
+			n1 = 12
+		elseif userPresenceType == PresenceType.InGame then
+			v59 = Images["icons/menu/games_small"]
+			OfflineStatusColor = v34.Theme.IconEmphasis.Color
+			OfflineStatusTransparency = v34.Theme.IconEmphasis.Transparency
+			offlineStatusLabel = lastLocation
+			TextMuted = Theme.TextEmphasis
+			n1 = 16
+		elseif userPresenceType == PresenceType.InStudio then
+			v59 = Images["icons/logo/studiologo_small"]
+			OfflineStatusColor = v34.Theme.TextDefault.Color
+			OfflineStatusTransparency = v34.Theme.TextDefault.Transparency
+			offlineStatusLabel = v39.studioStatusLabel
+			TextMuted = v34.Theme.TextMuted
+			n1 = 16
+		end
+
+		return React.createElement(PlayerContext, {
+			layoutOrder = 2,
+			textHeight = 24,
+			fontStyle = v34.Font.CaptionBody,
+			icon = v59,
+			iconColor = OfflineStatusColor,
+			iconSize = UDim2.fromOffset(n1, n1),
+			iconTransparency = OfflineStatusTransparency,
+			onActivated = v51,
+			text = offlineStatusLabel,
+			textColorStyle = TextMuted
+		})
+	end, {
+		v41,
+		v34,
+		v39.offlineStatusLabel,
+		v39.onlineStatusLabel,
+		v39.studioStatusLabel
+	})
+	local v53 = React.useCallback(function() -- line: 184
+		-- upvalues: v33 (copy), EventNamesEnum (copy), t2 (copy), t1 (copy), Pages (copy), v37 (copy), OpenOrUpdateCFM (copy)
+		v33.fireEvent(EventNamesEnum.PhoneBookPlayerMenuOpened, {
+			eventTimestampMs = os.time() * 1000,
+			friendUserId = t2.userId,
+			searchQueryString = t1.searchQueryString,
+			itemListIndex = t1.itemListIndex,
+			isSuggestedUser = t1.isSuggestedUser,
+			page = Pages.FriendList
+		})
+		v37(OpenOrUpdateCFM(t2))
+	end, {
+		t2.userId,
+		t1.searchQueryString,
+		t1.itemListIndex,
+		t1.isSuggestedUser
+	})
+
+	return React.createElement(Interactable, {
+		Position = UDim2.fromOffset(0, 0),
+		Size = UDim2.new(1, 0, 0, 68 + vector2.Y * 2),
+		BackgroundColor3 = Theme[v46].Color,
+		BackgroundTransparency = Theme[v46].Transparency,
+		BorderSizePixel = 0,
+		LayoutOrder = t1.layoutOrder,
+		onStateChanged = v48,
+		AutoButtonColor = false,
+		[React.Event.Activated] = v51
+	}, {
+		UIPadding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, vector2.X),
+			PaddingTop = UDim.new(0, vector2.Y)
+		}),
+		ProfileImage = React.createElement("ImageButton", {
+			Size = UDim2.fromOffset(68, 68),
+			Image = v49,
+			[React.Event.MouseButton2Up] = v53,
+			[React.Event.TouchTap] = v53,
+			AutoButtonColor = false
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(1, 0)
+			})
+		}),
+		Content = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Position = UDim2.new(0, 80, 0, 0),
+			Size = UDim2.new(1, -(116 + vector2.X), 1, -vector2.Y)
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			NameContent = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					Padding = UDim.new(0, 4),
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				UIPadding = React.createElement("UIPadding", {
+					PaddingBottom = UDim.new(0, 6)
+				}),
+				CombinedName = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 20),
+					Font = Font.Header2.Font,
+					Text = t1.combinedName,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextSize = Font.BaseSize * Font.Header2.RelativeSize,
+					TextTransparency = Theme.TextEmphasis.Transparency,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}),
+				Username = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, 14),
+					Font = Font.CaptionBody.Font,
+					Text = UserProfiles.Formatters.formatUsername(t1.userName),
+					TextColor3 = Theme.TextDefault.Color,
+					TextSize = Font.BaseSize * Font.CaptionBody.RelativeSize,
+					TextTransparency = Theme.TextDefault.Transparency,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			}),
+			PlayerContext = v52
+		}),
+		CallIcon = React.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Image = "rbxassetid://15239343417",
+			Position = UDim2.new(1, -vector2.X - 4, 0.5, -vector2.Y / 2),
+			Size = UDim2.fromOffset(24, 24),
+			AnchorPoint = Vector2.new(1, 0.5),
+			ImageColor3 = Theme.ContextualPrimaryDefault.Color,
+			ImageTransparency = Theme.ContextualPrimaryDefault.Transparency
+		}),
+		Divider = t1.showDivider and React.createElement("Frame", {
+			BorderSizePixel = 0,
+			Position = UDim2.new(0, 0, 1, -1),
+			Size = UDim2.new(1, 0, 0, 1),
+			BackgroundColor3 = Theme.Divider.Color,
+			BackgroundTransparency = Theme.Divider.Transparency
+		}) or nil
+	})
+end
+
+return FriendListItem

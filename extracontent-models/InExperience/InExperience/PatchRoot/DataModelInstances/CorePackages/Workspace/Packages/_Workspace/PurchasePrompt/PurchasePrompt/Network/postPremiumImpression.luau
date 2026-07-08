@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: postPremiumImpression ]]
-    return v0.postPremiumImpression();
-end;
+local function postPremiumImpression(p1) -- line: 1
+	return p1.postPremiumImpression()
+end
+
+return postPremiumImpression

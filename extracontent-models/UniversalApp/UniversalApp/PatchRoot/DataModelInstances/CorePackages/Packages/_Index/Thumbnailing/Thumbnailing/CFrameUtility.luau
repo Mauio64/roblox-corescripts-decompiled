@@ -1,18 +1,22 @@
-local v6 = {
-    CalculateTargetCFrame = function(v0) --[[ Line: 9 ]]
-        local v1 = nil;
-        v1 = if math.abs(v0.LookVector.Y) > 0.9 then v0.UpVector else v0.LookVector;
-        v1 = Vector3.new(v1.X, 0, v1.Z).Unit;
-        return CFrame.lookAt(v0.Position, v0.Position + v1);
-    end, 
-    AdjustTargetCFrameWithExtents = function(v2, v3, v4) --[[ Line: 24 ]]
-        local v5 = (v3 + v4) / 2;
-        return v2 + (v2 - v2.Position) * v5;
-    end
-};
-v6.CalculateTargetCFrameWithExtents = function(v7, v8, v9) --[[ Line: 47 ]]
-    -- upvalues: v6 (copy)
-    local v10 = v6.CalculateTargetCFrame(v7);
-    return v6.AdjustTargetCFrameWithExtents(v10, v8, v9);
-end;
-return v6;
+local t1 = {
+	CalculateTargetCFrame = function(cFrame: CFrame) -- line: 9
+		local v3 = if not (math.abs(cFrame.LookVector.Y) > 0.9) then cFrame.LookVector else cFrame.UpVector
+		local Unit = Vector3.new(v3.X, 0, v3.Z).Unit
+
+		return CFrame.lookAt(cFrame.Position, cFrame.Position + Unit)
+	end,
+	AdjustTargetCFrameWithExtents = function(cFrame: CFrame, vector3: Vector3, vector3_2: Vector3) -- line: 24
+		local v8 = (vector3 + vector3_2) / 2
+
+		return cFrame + (cFrame - cFrame.Position) * v8
+	end
+}
+
+function t1.CalculateTargetCFrameWithExtents(cFrame: CFrame, vector3: Vector3, vector3_3: Vector3) -- line: 47
+	-- upvalues: t1 (copy)
+	local v12 = t1.CalculateTargetCFrame(cFrame)
+
+	return t1.AdjustTargetCFrameWithExtents(v12, vector3, vector3_3)
+end
+
+return t1

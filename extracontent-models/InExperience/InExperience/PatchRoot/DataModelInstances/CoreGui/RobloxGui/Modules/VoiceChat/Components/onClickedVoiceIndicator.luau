@@ -1,28 +1,35 @@
-local l_Players_0 = game:GetService("Players");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Constants_0 = require(l_CorePackages_0.Workspace.Packages.VoiceChat).Constants;
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v6 = require(l_RobloxGui_0.Modules.SelfView.Analytics).new();
-return function(v7, v8, v9) --[[ Line: 11 ]]
-    -- upvalues: l_Players_0 (copy), l_Constants_0 (copy), l_default_0 (copy), v6 (copy)
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    if l_LocalPlayer_0 then
-        if v7 == tostring(l_LocalPlayer_0.UserId) then
-            if v8 == l_Constants_0.VOICE_STATE.ERROR then
-                l_default_0:RejoinPreviousChannel();
-                return;
-            elseif v8 == l_Constants_0.VOICE_STATE.CONNECTING then
-                l_default_0:ShowVoiceChatLoadingMessage();
-                return;
-            else
-                v6:setLastCtx("bubbleChatToggle");
-                l_default_0:ToggleMic(v9);
-                return;
-            end;
-        else
-            l_default_0:ToggleMutePlayer(tonumber(v7), v9);
-        end;
-    end;
-end;
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Constants = require(CorePackages.Workspace.Packages.VoiceChat).Constants
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local v7 = require(RobloxGui.Modules.SelfView.Analytics).new()
+
+return function(p1, p2, s1: string?) -- line: 11
+	-- upvalues: Players (copy), Constants (copy), default (copy), v7 (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if LocalPlayer then
+		if p1 == tostring(LocalPlayer.UserId) then
+			if p2 == Constants.VOICE_STATE.ERROR then
+				default:RejoinPreviousChannel()
+
+				return
+			end
+
+			if p2 == Constants.VOICE_STATE.CONNECTING then
+				default:ShowVoiceChatLoadingMessage()
+
+				return
+			end
+
+			v7:setLastCtx("bubbleChatToggle")
+			default:ToggleMic(s1)
+
+			return
+		end
+
+		default:ToggleMutePlayer(tonumber(p1), s1)
+	end
+end

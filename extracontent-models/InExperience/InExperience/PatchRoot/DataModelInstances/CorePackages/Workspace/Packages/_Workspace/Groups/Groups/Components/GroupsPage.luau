@@ -1,1 +1,1 @@
-return require(script.GroupsPage);
+return require(script.GroupsPage)

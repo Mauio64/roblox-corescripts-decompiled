@@ -1,7 +1,7 @@
 return {
-    Default = "Default", 
-    Heavy = "Heavy", 
-    Inset = "Inset", 
-    InsetLeft = "InsetLeft", 
-    InsetRight = "InsetRight"
-};
+	Default = "Default",
+	Heavy = "Heavy",
+	Inset = "Inset",
+	InsetLeft = "InsetLeft",
+	InsetRight = "InsetRight"
+}

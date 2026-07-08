@@ -1,12 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_t_0 = require(l_script_FirstAncestor_0.dependencies).t;
-local v2 = l_t_0.interface({
-    width = l_t_0.number, 
-    itemSize = l_t_0.number, 
-    minimumItemsPerRow = l_t_0.optional(l_t_0.number)
-});
-return function(v3) --[[ Line: 13 ]]
-    -- upvalues: v2 (copy)
-    assert(v2(v3));
-    return (math.max(math.floor(v3.width / v3.itemSize), v3.minimumItemsPerRow or 2));
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local t = require(FriendsLanding.dependencies).t
+local v3 = t.interface({
+	width = t.number,
+	itemSize = t.number,
+	minimumItemsPerRow = t.optional(t.number)
+})
+
+return function(p1) -- line: 13
+	-- upvalues: v3 (copy)
+	assert(v3(p1))
+
+	return (math.max(math.floor(p1.width / p1.itemSize), p1.minimumItemsPerRow or 2))
+end

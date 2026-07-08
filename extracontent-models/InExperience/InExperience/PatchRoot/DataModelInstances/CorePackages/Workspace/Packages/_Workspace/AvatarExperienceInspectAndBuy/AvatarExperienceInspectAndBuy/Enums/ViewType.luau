@@ -1,5 +1,5 @@
 return {
-    Wide = "Wide", 
-    WideLandscape = "WideLandscape", 
-    Compact = "Compact"
-};
+	Wide = "Wide",
+	WideLandscape = "WideLandscape",
+	Compact = "Compact"
+}

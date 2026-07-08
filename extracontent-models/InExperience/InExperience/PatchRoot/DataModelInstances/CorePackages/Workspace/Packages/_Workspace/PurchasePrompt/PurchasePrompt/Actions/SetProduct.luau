@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "id", "infoType", "equipIfPurchased");
+return require(script.Parent.makeActionCreator)(script.Name, "id", "infoType", "equipIfPurchased")

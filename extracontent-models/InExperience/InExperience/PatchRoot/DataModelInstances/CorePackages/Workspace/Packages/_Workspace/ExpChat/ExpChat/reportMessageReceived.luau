@@ -1,50 +1,77 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Analytics_0 = require(l_script_FirstAncestor_0.Parent.ExpChatShared).Analytics;
-local function v5(v2) --[[ Line: 5 ]] --[[ Name: getCounterName ]]
-    if v2.Status == Enum.TextChatMessageStatus.Success then
-        local l_TextChannel_0 = v2.TextChannel;
-        if l_TextChannel_0 then
-            local l_Name_0 = l_TextChannel_0.Name;
-            if string.find(l_Name_0, "^RBX") == nil then
-                return "expChatMessageReceivedSuccessCustom";
-            elseif l_Name_0 == "RBXGeneral" then
-                return "expChatMessageReceivedSuccessGeneral";
-            elseif l_Name_0 == "RBXSystem" then
-                return "expChatMessageReceivedSuccessSystem";
-            elseif string.find(l_Name_0, "^RBXWhisper") then
-                return "expChatMessageReceivedSuccessWhisper";
-            elseif string.find(l_Name_0, "^RBXTeam") then
-                return "expChatMessageReceivedSuccessTeam";
-            else
-                return "expChatMessageReceivedSuccessCustom";
-            end;
-        end;
-    end;
-    if v2.Status == Enum.TextChatMessageStatus.Unknown then
-        return "expChatMessageReceivedUnknown";
-    elseif v2.Status == Enum.TextChatMessageStatus.InvalidTextChannelPermissions then
-        return "expChatMessageReceivedInvalidTextChannelPermissions";
-    elseif v2.Status == Enum.TextChatMessageStatus.InvalidPrivacySettings then
-        return "expChatMessageReceivedInvalidPrivacySettings";
-    elseif v2.Status == Enum.TextChatMessageStatus.TextFilterFailed then
-        return "expChatMessageReceivedTextFilterFailed";
-    elseif v2.Status == Enum.TextChatMessageStatus.Floodchecked then
-        return "expChatMessageReceivedFloodchecked";
-    elseif v2.Status == Enum.TextChatMessageStatus.MessageTooLong then
-        return "expChatMessageReceivedMessageTooLong";
-    elseif v2.Status == Enum.TextChatMessageStatus.ModerationTimeout then
-        return "expChatMessageReceivedModerationTimeout";
-    else
-        return nil;
-    end;
-end;
-return function(v6, v7) --[[ Line: 47 ]]
-    -- upvalues: v5 (copy), l_Analytics_0 (copy)
-    local l_TextSource_0 = v7.TextSource;
-    if l_TextSource_0 and v6 == l_TextSource_0.UserId then
-        local v9 = v5(v7);
-        if v9 then
-            l_Analytics_0.reportCounter(v9);
-        end;
-    end;
-end;
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local Analytics = require(ExpChat.Parent.ExpChatShared).Analytics
+
+local function getCounterName(p1) -- line: 5
+	if p1.Status == Enum.TextChatMessageStatus.Success then
+		local TextChannel = p1.TextChannel
+
+		if TextChannel then
+			local TextChannelName = TextChannel.Name
+
+			if string.find(TextChannelName, "^RBX") == nil then
+				return "expChatMessageReceivedSuccessCustom"
+			end
+
+			if TextChannelName == "RBXGeneral" then
+				return "expChatMessageReceivedSuccessGeneral"
+			end
+
+			if TextChannelName == "RBXSystem" then
+				return "expChatMessageReceivedSuccessSystem"
+			end
+
+			if string.find(TextChannelName, "^RBXWhisper") then
+				return "expChatMessageReceivedSuccessWhisper"
+			end
+
+			if string.find(TextChannelName, "^RBXTeam") then
+				return "expChatMessageReceivedSuccessTeam"
+			end
+
+			return "expChatMessageReceivedSuccessCustom"
+		end
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.Unknown then
+		return "expChatMessageReceivedUnknown"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.InvalidTextChannelPermissions then
+		return "expChatMessageReceivedInvalidTextChannelPermissions"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.InvalidPrivacySettings then
+		return "expChatMessageReceivedInvalidPrivacySettings"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.TextFilterFailed then
+		return "expChatMessageReceivedTextFilterFailed"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.Floodchecked then
+		return "expChatMessageReceivedFloodchecked"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.MessageTooLong then
+		return "expChatMessageReceivedMessageTooLong"
+	end
+
+	if p1.Status == Enum.TextChatMessageStatus.ModerationTimeout then
+		return "expChatMessageReceivedModerationTimeout"
+	end
+
+	return nil
+end
+
+return function(n1: number, p2) -- line: 47
+	-- upvalues: getCounterName (copy), Analytics (copy)
+	local TextSource = p2.TextSource
+
+	if TextSource and n1 == TextSource.UserId then
+		local v10 = getCounterName(p2)
+
+		if v10 then
+			Analytics.reportCounter(v10)
+		end
+	end
+end

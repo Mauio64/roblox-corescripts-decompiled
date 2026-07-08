@@ -1,6 +1,6 @@
 return {
-    NotPurchasable = "NotPurchasable", 
-    Generic = "Generic", 
-    DeviceNotSupported = "DeviceNotSupported", 
-    AccountNotSupported = "AccountNotSupported"
-};
+	NotPurchasable = "NotPurchasable",
+	Generic = "Generic",
+	DeviceNotSupported = "DeviceNotSupported",
+	AccountNotSupported = "AccountNotSupported"
+}

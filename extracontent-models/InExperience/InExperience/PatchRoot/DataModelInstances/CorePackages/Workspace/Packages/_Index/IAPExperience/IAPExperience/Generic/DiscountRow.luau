@@ -1,68 +1,111 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("IAPExperience");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_getIconRichText_0 = v3.Utility.getIconRichText;
-local l_IconName_0 = v3.Enums.IconName;
-local v6 = require(l_script_FirstAncestor_0.Utility.formatNumber);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v8 = require(l_script_FirstAncestor_0.Generic.Hooks.usePlaceholderLocalization);
-local v9 = require(l_script_FirstAncestor_0.Generic.PriceLineItem);
-local l_DiscountType_0 = require(l_script_FirstAncestor_0.ProductPurchase.PricingTypes).DiscountType;
-local v11 = l_getIconRichText_0(l_IconName_0.Robux);
-local function v18(v12) --[[ Line: 27 ]] --[[ Name: RobloxSubscriptionDiscountRow ]]
-    -- upvalues: l_LocalizationService_0 (copy), v2 (copy), v11 (copy), v6 (copy), v8 (copy), v9 (copy)
-    local l_discount_0 = v12.discount;
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    local v15 = v2.useMemo(function() --[[ Line: 31 ]]
-        -- upvalues: v11 (ref), v6 (ref), l_RobloxLocaleId_0 (copy), l_discount_0 (copy)
-        return string.format("- %s %s", v11, v6(l_RobloxLocaleId_0, l_discount_0.amountInRobux));
-    end, {
-        l_RobloxLocaleId_0, 
-        l_discount_0.amountInRobux
-    });
-    local v16 = l_discount_0.percent > 0;
-    local v17 = v8({
-        discountLabel = if v16 then {
-            "IAPExperience.PurchasePrompt.Label.BlackbirdDiscount"; 
-            discountPercentage = l_discount_0.percent
-        } else "IAPExperience.PurchasePrompt.Label.BlackbirdDiscountNoPercent"
-    });
-    return v2.createElement(v9, {
-        label = v17.discountLabel, 
-        amount = v15, 
-        LayoutOrder = v12.LayoutOrder
-    });
-end;
-local function v25(v19) --[[ Line: 51 ]] --[[ Name: GenericDiscountRow ]]
-    -- upvalues: l_LocalizationService_0 (copy), v2 (copy), v11 (copy), v6 (copy), v8 (copy), v9 (copy)
-    local l_discount_1 = v19.discount;
-    local l_RobloxLocaleId_1 = l_LocalizationService_0.RobloxLocaleId;
-    local v22 = v2.useMemo(function() --[[ Line: 55 ]]
-        -- upvalues: v11 (ref), v6 (ref), l_RobloxLocaleId_1 (copy), l_discount_1 (copy)
-        return string.format("- %s %s", v11, v6(l_RobloxLocaleId_1, l_discount_1.amountInRobux));
-    end, {
-        l_RobloxLocaleId_1, 
-        l_discount_1.amountInRobux
-    });
-    local v23 = l_discount_1.percent > 0;
-    local v24 = v8({
-        discountLabel = if v23 then {
-            "IAPExperience.PurchasePrompt.Label.GenericDiscount"; 
-            discountPercentage = l_discount_1.percent
-        } else "IAPExperience.PurchasePrompt.Label.GenericDiscountNoPercent"
-    });
-    return v2.createElement(v9, {
-        label = v24.discountLabel, 
-        amount = v22, 
-        LayoutOrder = v19.LayoutOrder
-    });
-end;
-local v26 = {
-    [l_DiscountType_0.BlackbirdSubscription] = v18
-};
-return function(v27) --[[ Line: 79 ]] --[[ Name: DiscountRow ]]
-    -- upvalues: v26 (copy), v25 (copy), v2 (copy)
-    local v28 = v26[v27.discount.type] or v25;
-    return v2.createElement(v28, v27);
-end;
+local IAPExperience = script:FindFirstAncestor("IAPExperience")
+local IAPExperienceParent = IAPExperience.Parent
+local React = require(IAPExperienceParent.React)
+local Foundation = require(IAPExperienceParent.Foundation)
+local getIconRichText = Foundation.Utility.getIconRichText
+local IconName = Foundation.Enums.IconName
+local formatNumber = require(IAPExperience.Utility.formatNumber)
+local LocalizationService = game:GetService("LocalizationService")
+local useLocalization = require(IAPExperienceParent.Localization).Hooks.useLocalization
+local PriceLineItem = require(IAPExperience.Generic.PriceLineItem)
+local DiscountType = require(IAPExperience.ProductPurchase.PricingTypes).DiscountType
+local FFlagPurchasePromptFetchCartPricing = require(IAPExperience.Parent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+local v13 = getIconRichText(IconName.Robux)
+
+local function resolveLabel(s1: string?, s2: string) -- line: 32
+	if s1 ~= nil and s1 ~= "" then
+		return s1
+	end
+
+	return s2
+end
+local function RobloxSubscriptionDiscountRow(t1: {[any]: any}) -- line: 39
+	-- upvalues: LocalizationService (copy), React (copy), v13 (copy), formatNumber (copy), useLocalization (copy), PriceLineItem (copy), FFlagPurchasePromptFetchCartPricing (copy)
+	local discount = t1.discount
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local v24 = React.useMemo(function() -- line: 43
+		-- upvalues: v13 (copy), formatNumber (copy), RobloxLocaleId (copy), discount (copy)
+		return string.format("- %s %s", v13, formatNumber(RobloxLocaleId, discount.amountInRobux))
+	end, {
+		RobloxLocaleId,
+		discount.amountInRobux
+	})
+	local v25 = discount.percent > 0
+	local v26 = useLocalization({
+		discountLabel = not v25 and "IAPExperience.PurchasePrompt.Label.BlackbirdDiscountNoPercent" or {
+			"IAPExperience.PurchasePrompt.Label.BlackbirdDiscount",
+			discountPercentage = discount.percent
+		}
+	})
+	local createElement = React.createElement
+	local v28 = PriceLineItem
+	local t2 = {}
+	local v32
+
+	if FFlagPurchasePromptFetchCartPricing then
+		local label = t1.label
+		local discountLabel = v26.discountLabel
+
+		v32 = if label == nil or label == "" then discountLabel else label
+	else
+		v32 = v26.discountLabel
+	end
+
+	t2.label = v32
+	t2.amount = v24
+	t2.LayoutOrder = t1.LayoutOrder
+
+	return createElement(v28, t2)
+end
+local function GenericDiscountRow(t3: {[any]: any}) -- line: 65
+	-- upvalues: LocalizationService (copy), React (copy), v13 (copy), formatNumber (copy), useLocalization (copy), PriceLineItem (copy), FFlagPurchasePromptFetchCartPricing (copy)
+	local discount = t3.discount
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local v36 = React.useMemo(function() -- line: 69
+		-- upvalues: v13 (copy), formatNumber (copy), RobloxLocaleId (copy), discount (copy)
+		return string.format("- %s %s", v13, formatNumber(RobloxLocaleId, discount.amountInRobux))
+	end, {
+		RobloxLocaleId,
+		discount.amountInRobux
+	})
+	local v37 = discount.percent > 0
+	local v38 = useLocalization({
+		discountLabel = not v37 and "IAPExperience.PurchasePrompt.Label.GenericDiscountNoPercent" or {
+			"IAPExperience.PurchasePrompt.Label.GenericDiscount",
+			discountPercentage = discount.percent
+		}
+	})
+	local createElement = React.createElement
+	local v40 = PriceLineItem
+	local t4 = {}
+	local v44
+
+	if FFlagPurchasePromptFetchCartPricing then
+		local label = t3.label
+		local discountLabel = v38.discountLabel
+
+		v44 = if label == nil or label == "" then discountLabel else label
+	else
+		v44 = v38.discountLabel
+	end
+
+	t4.label = v44
+	t4.amount = v36
+	t4.LayoutOrder = t3.LayoutOrder
+
+	return createElement(v40, t4)
+end
+
+local t5 = {
+	[DiscountType.BlackbirdSubscription] = RobloxSubscriptionDiscountRow,
+	[DiscountType.RobloxPlusSubscription] = RobloxSubscriptionDiscountRow
+}
+
+local function DiscountRow(t6: {[any]: any}) -- line: 96
+	-- upvalues: t5 (copy), GenericDiscountRow (copy), React (copy)
+	local v46 = t5[t6.discount.type] or GenericDiscountRow
+
+	return React.createElement(v46, t6)
+end
+
+return DiscountRow

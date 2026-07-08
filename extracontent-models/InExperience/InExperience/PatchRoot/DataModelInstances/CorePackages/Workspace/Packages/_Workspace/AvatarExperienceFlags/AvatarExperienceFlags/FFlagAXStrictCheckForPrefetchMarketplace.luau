@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXStrictCheckForPrefetchMarketplace", false);
+return game:DefineFastFlag("AXStrictCheckForPrefetchMarketplace", false)

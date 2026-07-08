@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixRecommendedItemCreatorType", false);
+return game:DefineFastFlag("AXFixRecommendedItemCreatorType", false)

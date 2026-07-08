@@ -1,3 +1,3 @@
 return {
-    APP_STORAGE_KEY = "ExperimentCache"
-};
+	APP_STORAGE_KEY = "ExperimentCache"
+}

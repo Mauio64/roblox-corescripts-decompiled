@@ -1,63 +1,68 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent;
-local v3 = require(l_Parent_0.Actions.OpenPrompt);
-local v4 = require(l_Parent_0.PromptType);
-local v5 = require(l_Parent_0.Thunks.OpenSetFavoritePrompt);
-local v6 = require(l_Parent_0.Thunks.OpenSaveAvatarPrompt);
-local v7 = require(l_Parent_0.Thunks.OpenDeleteOutfitPrompt);
-local v8 = require(l_Parent_0.Thunks.OpenRenameOutfitPrompt);
-local v9 = require(l_Parent_0.Thunks.OpenUpdateOutfitPrompt);
-local v10 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceCommon);
-local l_FFlagAXAvatarTimeoutFlowIE_0 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceFlags).FFlagAXAvatarTimeoutFlowIE;
-return function(v12) --[[ Line: 18 ]] --[[ Name: ConnectAvatarEditorServiceEvents ]]
-    -- upvalues: l_AvatarEditorService_0 (copy), l_FFlagAXAvatarTimeoutFlowIE_0 (copy), v10 (copy), v3 (copy), v4 (copy), v6 (copy), v5 (copy), v7 (copy), v8 (copy), v9 (copy)
-    local v13 = {};
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptSaveAvatar:Connect(function(v14, v15) --[[ Line: 21 ]]
-        -- upvalues: l_FFlagAXAvatarTimeoutFlowIE_0 (ref), v10 (ref), v12 (copy), v3 (ref), v4 (ref), v6 (ref)
-        if l_FFlagAXAvatarTimeoutFlowIE_0 then
-            v10.Stores.getTimeoutStatusStore().fetchStatusAsync():andThen(function(v16) --[[ Line: 24 ]]
-                -- upvalues: v12 (ref), v3 (ref), v4 (ref), v6 (ref), v14 (copy), v15 (copy)
-                if v16.isTimedOut then
-                    v12:dispatch(v3(v4.SaveAvatarTimeout, {}));
-                    return;
-                else
-                    v12:dispatch(v6(v14, v15));
-                    return;
-                end;
-            end);
-            return;
-        else
-            v12:dispatch(v6(v14, v15));
-            return;
-        end;
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenAllowInventoryReadAccess:Connect(function() --[[ Line: 36 ]]
-        -- upvalues: v12 (copy), v3 (ref), v4 (ref)
-        v12:dispatch(v3(v4.AllowInventoryReadAccess, {}));
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptCreateOufit:Connect(function(v17, v18) --[[ Line: 40 ]]
-        -- upvalues: v12 (copy), v3 (ref), v4 (ref)
-        v12:dispatch(v3(v4.CreateOutfit, {
-            humanoidDescription = v17, 
-            rigType = v18
-        }));
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptSetFavorite:Connect(function(v19, v20, v21) --[[ Line: 47 ]]
-        -- upvalues: v12 (copy), v5 (ref)
-        v12:dispatch(v5(v19, v20, v21));
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptDeleteOutfit:Connect(function(v22) --[[ Line: 51 ]]
-        -- upvalues: v12 (copy), v7 (ref)
-        v12:dispatch(v7(v22));
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptRenameOutfit:Connect(function(v23) --[[ Line: 55 ]]
-        -- upvalues: v12 (copy), v8 (ref)
-        v12:dispatch(v8(v23));
-    end));
-    table.insert(v13, l_AvatarEditorService_0.OpenPromptUpdateOutfit:Connect(function(v24, v25, v26) --[[ Line: 59 ]]
-        -- upvalues: v12 (copy), v9 (ref)
-        v12:dispatch(v9(v24, v25, v26));
-    end));
-    return v13;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local CorePackages = game:GetService("CorePackages")
+local scriptParent = script.Parent
+local OpenPrompt = require(scriptParent.Actions.OpenPrompt)
+local PromptType = require(scriptParent.PromptType)
+local OpenSetFavoritePrompt = require(scriptParent.Thunks.OpenSetFavoritePrompt)
+local OpenSaveAvatarPrompt = require(scriptParent.Thunks.OpenSaveAvatarPrompt)
+local OpenDeleteOutfitPrompt = require(scriptParent.Thunks.OpenDeleteOutfitPrompt)
+local OpenRenameOutfitPrompt = require(scriptParent.Thunks.OpenRenameOutfitPrompt)
+local OpenUpdateOutfitPrompt = require(scriptParent.Thunks.OpenUpdateOutfitPrompt)
+local AvatarExperienceCommon = require(CorePackages.Workspace.Packages.AvatarExperienceCommon)
+local FFlagAXAvatarTimeoutFlowIE = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXAvatarTimeoutFlowIE
+
+local function ConnectAvatarEditorServiceEvents(p1) -- line: 18
+	-- upvalues: AvatarEditorService (copy), FFlagAXAvatarTimeoutFlowIE (copy), AvatarExperienceCommon (copy), OpenPrompt (copy), PromptType (copy), OpenSaveAvatarPrompt (copy), OpenSetFavoritePrompt (copy), OpenDeleteOutfitPrompt (copy), OpenRenameOutfitPrompt (copy), OpenUpdateOutfitPrompt (copy)
+	local t1 = {}
+
+	table.insert(t1, AvatarEditorService.OpenPromptSaveAvatar:Connect(function(p2, p3) -- line: 21
+		-- upvalues: FFlagAXAvatarTimeoutFlowIE (copy), AvatarExperienceCommon (copy), p1 (copy), OpenPrompt (copy), PromptType (copy), OpenSaveAvatarPrompt (copy)
+		if FFlagAXAvatarTimeoutFlowIE then
+			AvatarExperienceCommon.Stores.getTimeoutStatusStore().fetchStatusAsync():andThen(function(p4) -- line: 24
+				-- upvalues: p1 (copy), OpenPrompt (copy), PromptType (copy), OpenSaveAvatarPrompt (copy), p2 (copy), p3 (copy)
+				if p4.isTimedOut then
+					p1:dispatch(OpenPrompt(PromptType.SaveAvatarTimeout, {}))
+
+					return
+				end
+
+				p1:dispatch(OpenSaveAvatarPrompt(p2, p3))
+			end)
+
+			return
+		end
+
+		p1:dispatch(OpenSaveAvatarPrompt(p2, p3))
+	end))
+	table.insert(t1, AvatarEditorService.OpenAllowInventoryReadAccess:Connect(function() -- line: 36
+		-- upvalues: p1 (copy), OpenPrompt (copy), PromptType (copy)
+		p1:dispatch(OpenPrompt(PromptType.AllowInventoryReadAccess, {}))
+	end))
+	table.insert(t1, AvatarEditorService.OpenPromptCreateOufit:Connect(function(p5, p6) -- line: 40
+		-- upvalues: p1 (copy), OpenPrompt (copy), PromptType (copy)
+		p1:dispatch(OpenPrompt(PromptType.CreateOutfit, {
+			humanoidDescription = p5,
+			rigType = p6
+		}))
+	end))
+	table.insert(t1, AvatarEditorService.OpenPromptSetFavorite:Connect(function(p7, p8, p9) -- line: 47
+		-- upvalues: p1 (copy), OpenSetFavoritePrompt (copy)
+		p1:dispatch(OpenSetFavoritePrompt(p7, p8, p9))
+	end))
+	table.insert(t1, AvatarEditorService.OpenPromptDeleteOutfit:Connect(function(p10) -- line: 51
+		-- upvalues: p1 (copy), OpenDeleteOutfitPrompt (copy)
+		p1:dispatch(OpenDeleteOutfitPrompt(p10))
+	end))
+	table.insert(t1, AvatarEditorService.OpenPromptRenameOutfit:Connect(function(p11) -- line: 55
+		-- upvalues: p1 (copy), OpenRenameOutfitPrompt (copy)
+		p1:dispatch(OpenRenameOutfitPrompt(p11))
+	end))
+	table.insert(t1, AvatarEditorService.OpenPromptUpdateOutfit:Connect(function(p12, p13, p14) -- line: 59
+		-- upvalues: p1 (copy), OpenUpdateOutfitPrompt (copy)
+		p1:dispatch(OpenUpdateOutfitPrompt(p12, p13, p14))
+	end))
+
+	return t1
+end
+
+return ConnectAvatarEditorServiceEvents

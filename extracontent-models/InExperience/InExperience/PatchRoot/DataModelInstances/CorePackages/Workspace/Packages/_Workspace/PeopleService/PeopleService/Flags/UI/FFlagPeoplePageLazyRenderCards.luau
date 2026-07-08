@@ -1,4 +1,5 @@
-game:DefineFastFlag("PeoplePageLazyRenderCards", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("PeoplePageLazyRenderCards");
-end;
+game:DefineFastFlag("PeoplePageLazyRenderCards", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("PeoplePageLazyRenderCards")
+end

@@ -1,6 +1,7 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)(script.Name, {
-    "notVoted", 
-    "votedDown", 
-    "votedUp"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)(script.Name, {
+	"notVoted",
+	"votedDown",
+	"votedUp"
+})

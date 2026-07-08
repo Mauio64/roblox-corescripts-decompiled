@@ -1,54 +1,60 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.types);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_script_FirstAncestor_0.Telemetry.useTelemetry);
-local v6 = require(l_script_FirstAncestor_0.Components.ChatDetails.ChatDetailsTelemetryEvents);
-local v7 = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatDetailsTelemetryLayer);
-local l_useEffectOnMount_0 = require(l_Parent_0.RoactUtils).Hooks.useEffectOnMount;
-local l_useStyle_0 = require(l_Parent_0.UIBlox).Core.Style.useStyle;
-local v10 = require(l_script_FirstAncestor_0.Components.Cells.FlexIconWithTextCell);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v12 = require(l_script_FirstAncestor_0.Hooks.useIsInExperience);
-local v13 = {
-    bodyText = "Placeholder body", 
-    subTitleText = "Placeholder subtitle", 
-    iconImage = nil, 
-    cellHeight = 48, 
-    onActivated = function() --[[ Line: 39 ]] --[[ Name: onActivated ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
 
-    end
-};
-return function(v14) --[[ Line: 44 ]] --[[ Name: CreateUnfilteredChatCell ]]
-    -- upvalues: v3 (copy), v13 (copy), l_useStyle_0 (copy), l_useTokens_0 (copy), v12 (copy), v5 (copy), v7 (copy), l_useEffectOnMount_0 (copy), v6 (copy), v4 (copy), v10 (copy)
-    local v15 = v3.Dictionary.join(v13, v14);
-    local v16 = l_useStyle_0();
-    local v17 = v15.style or v16;
-    local v18 = l_useTokens_0();
-    local v19 = v12();
-    local v20 = v5(v7.Context);
-    l_useEffectOnMount_0(function() --[[ Line: 52 ]]
-        -- upvalues: v20 (copy), v6 (ref)
-        v20.emit(v6.ChatDetailsCreateUnfilteredChatCellRendered, {});
-    end);
-    return v4.createElement("Frame", {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v15.layoutOrder, 
-        Size = UDim2.fromScale(1, 0)
-    }, {
-        CreateUnfilteredChatRow = v4.createElement(v10, {
-            LayoutOrder = v15.layoutOrder, 
-            onActivated = v15.onActivated, 
-            primaryIcon = v15.iconImage, 
-            showDivider = false, 
-            Size = UDim2.new(1, 0, 0, v15.cellHeight), 
-            style = v17, 
-            Text = v15.bodyText, 
-            SubTitleText = v15.subTitleText, 
-            isDisabled = v15.isLoading, 
-            BackgroundTransparency = if v19 then v18.Color.None.Transparency else nil
-        })
-    });
-end;
+require(AppChat.types)
+
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+local ChatDetailsTelemetryEvents = require(AppChat.Components.ChatDetails.ChatDetailsTelemetryEvents)
+local ChatDetailsTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDetailsTelemetryLayer)
+local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
+local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local FlexIconWithTextCell = require(AppChat.Components.Cells.FlexIconWithTextCell)
+local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
+local t1 = {
+	bodyText = "Placeholder body",
+	subTitleText = "Placeholder subtitle",
+	iconImage = nil,
+	cellHeight = 48,
+	onActivated = function() -- line: 39
+	end
+}
+
+local function CreateUnfilteredChatCell(t2: {[any]: any}) -- line: 44
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useTokens (copy), useIsInExperience (copy), useTelemetry (copy), ChatDetailsTelemetryLayer (copy), useEffectOnMount (copy), ChatDetailsTelemetryEvents (copy), React (copy), FlexIconWithTextCell (copy)
+	local v16 = Cryo.Dictionary.join(t1, t2)
+	local v17 = useStyle()
+	local v18 = v16.style or v17
+	local v19 = useTokens()
+	local v20 = useIsInExperience()
+	local v21 = useTelemetry(ChatDetailsTelemetryLayer.Context)
+
+	useEffectOnMount(function() -- line: 52
+		-- upvalues: v21 (copy), ChatDetailsTelemetryEvents (copy)
+		v21.emit(ChatDetailsTelemetryEvents.ChatDetailsCreateUnfilteredChatCellRendered, {})
+	end)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = v16.layoutOrder,
+		Size = UDim2.fromScale(1, 0)
+	}, {
+		CreateUnfilteredChatRow = React.createElement(FlexIconWithTextCell, {
+			showDivider = false,
+			LayoutOrder = v16.layoutOrder,
+			onActivated = v16.onActivated,
+			primaryIcon = v16.iconImage,
+			Size = UDim2.new(1, 0, 0, v16.cellHeight),
+			style = v18,
+			Text = v16.bodyText,
+			SubTitleText = v16.subTitleText,
+			isDisabled = v16.isLoading,
+			BackgroundTransparency = if not v20 then nil else v19.Color.None.Transparency
+		})
+	})
+end
+
+return CreateUnfilteredChatCell

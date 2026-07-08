@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ReactTelemetryEnabled", false);
+return game:DefineFastFlag("ReactTelemetryEnabled", false)

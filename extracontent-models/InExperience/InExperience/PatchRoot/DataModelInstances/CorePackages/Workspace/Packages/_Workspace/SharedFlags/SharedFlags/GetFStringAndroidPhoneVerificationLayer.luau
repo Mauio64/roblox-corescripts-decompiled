@@ -1,4 +1,5 @@
-game:DefineFastString("AndroidPhoneVerificationLayer", "PlayerApp.PhoneVerification.Android");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("AndroidPhoneVerificationLayer");
-end;
+game:DefineFastString("AndroidPhoneVerificationLayer", "PlayerApp.PhoneVerification.Android")
+
+return function() -- line: 3
+	return game:GetFastString("AndroidPhoneVerificationLayer")
+end

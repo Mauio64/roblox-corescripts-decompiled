@@ -1,130 +1,146 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Cryo);
-local v4 = require(l_Parent_2.React);
-local v5 = require(l_Parent_2.ReactOtter);
-local _ = require(l_Parent_0.Style.StyleTypes);
-local v7 = require(l_Parent_1.Core.Style.useStyle);
-local v8 = require(l_Parent_0.Navigation.Enum.NavigationBarAlignment);
-local v9 = {
-    visible = true, 
-    zIndex = 1, 
-    animated = false, 
-    maxWidth = 600, 
-    animationConfig = {
-        dampingRatio = 1, 
-        frequency = 3
-    }
-};
-return function(v10) --[[ Line: 68 ]] --[[ Name: NavigationBar ]]
-    -- upvalues: v3 (copy), v9 (copy), v7 (copy), v4 (copy), v8 (copy), v5 (copy)
-    assert(#v10.items > 0, "At least one item should be present!");
-    local v11 = v3.Dictionary.join(v9, v10);
-    local v12 = v7();
-    local v13, v14 = v4.useState(if v11.size then v11.size.Y.Offset else 0);
-    local v15 = if v11.paddings and v11.paddings.Top then v11.paddings.Top else v12.Tokens.Global.Space_75;
-    local v16 = if v11.paddings and v11.paddings.Bottom then v11.paddings.Bottom else v12.Tokens.Global.Space_75;
-    local v17 = if v11.paddings and v11.paddings.Left then v11.paddings.Left else v12.Tokens.Global.Space_75;
-    local v18 = if v11.paddings and v11.paddings.Right then v11.paddings.Right else v12.Tokens.Global.Space_75;
-    local v19 = nil;
-    local v20 = nil;
-    if v11.alignment == v8.Left then
-        v19 = Enum.HorizontalAlignment.Left;
-    elseif v11.alignment == v8.EvenlyDistributed then
-        v20 = Enum.UIFlexAlignment.SpaceAround;
-        v19 = Enum.HorizontalAlignment.Center;
-    else
-        error("NavigationBar Alignment type is incorrect!");
-    end;
-    local v22 = v4.useCallback(function(v21) --[[ Line: 96 ]]
-        -- upvalues: v11 (copy), v14 (copy)
-        if v11.visibility or v11.animated then
-            v14(v21.AbsoluteSize.Y);
-        end;
-    end, {
-        v11.visibility, 
-        v11.animated
-    });
-    local v23, v24 = v5.useAnimatedBinding(0);
-    v4.useEffect(function() --[[ Line: 102 ]]
-        -- upvalues: v11 (copy), v24 (copy), v5 (ref), v13 (copy)
-        if not v11.visibility and v11.animated then
-            if v11.isVisible then
-                v24(v5.spring(0, v11.animationConfig));
-            else
-                v24(v5.spring(v13, v11.animationConfig));
-            end;
-        end;
-        return nil;
-    end, {
-        v11.visibility, 
-        v11.animated, 
-        v11.isVisible, 
-        v13, 
-        v11.animationConfig
-    });
-    local v25 = {
-        Constraint = if v11.maxWidth ~= nil then v4.createElement("UISizeConstraint", {
-            MaxSize = Vector2.new(v11.maxWidth, 1e999)
-        }) else nil, 
-        UIPadding = v4.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, v15), 
-            PaddingBottom = UDim.new(0, v16), 
-            PaddingLeft = UDim.new(0, v17), 
-            PaddingRight = UDim.new(0, v18)
-        }), 
-        Layout = v4.createElement("UIListLayout", {
-            Padding = v11.spacing, 
-            SortOrder = Enum.SortOrder.Name, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalFlex = v20, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left
-        })
-    };
-    for v26, v27 in ipairs(v11.items) do
-        local v28 = v26 == v11.selection;
-        v25[tostring(v26)] = v11.renderItem(v27, v28);
-    end;
-    local v32 = if v11.visibility then v11.visibility:map(function(v29) --[[ Line: 140 ]]
-        -- upvalues: v13 (copy)
-        local v30 = (1 - v29) * v13;
-        return UDim2.new(0, 0, 0, (math.floor(v30 + 0.5)));
-    end) else v23:map(function(v31) --[[ Line: 144 ]]
-        return UDim2.new(0, 0, 0, (math.floor(v31 + 0.5)));
-    end);
-    return v4.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        ClipsDescendants = v11.clipsDescendants, 
-        Size = v11.size, 
-        AutomaticSize = v11.automaticSize, 
-        Position = v11.position, 
-        Visible = v11.visible, 
-        [v4.Change.AbsoluteSize] = v22
-    }, {
-        AnimatedFrame = v4.createElement("Frame", {
-            Active = v11.active, 
-            Position = v32, 
-            BorderSizePixel = 0, 
-            Size = UDim2.fromScale(1, 1), 
-            AutomaticSize = v11.automaticSize, 
-            BackgroundColor3 = if v11.backgroundColor then v11.backgroundColor.Color else v12.Theme.NavigationBar.Color, 
-            BackgroundTransparency = if v11.backgroundColor then v11.backgroundColor.Transparency else v12.Theme.NavigationBar.Transparency, 
-            Selectable = false, 
-            Visible = v11.visible, 
-            ZIndex = v11.zIndex
-        }, {
-            Layout = v4.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                HorizontalAlignment = v19
-            }), 
-            InnerFrame = v4.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1), 
-                AutomaticSize = v11.automaticSize
-            }, v25)
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Cryo = require(ParentParentParentParent.Cryo)
+local React = require(ParentParentParentParent.React)
+local ReactOtter = require(ParentParentParentParent.ReactOtter)
+
+require(ParentParent.Style.StyleTypes)
+
+local useStyle = require(ParentParentParent.Core.Style.useStyle)
+local NavigationBarAlignment = require(ParentParent.Navigation.Enum.NavigationBarAlignment)
+local t1 = {
+	visible = true,
+	zIndex = 1,
+	animated = false,
+	maxWidth = 600,
+	animationConfig = {
+		dampingRatio = 1,
+		frequency = 3
+	}
+}
+
+local function NavigationBar(t2: {[any]: any}) -- line: 68
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), React (copy), NavigationBarAlignment (copy), ReactOtter (copy)
+	assert(#t2.items > 0, "At least one item should be present!")
+
+	local v12 = Cryo.Dictionary.join(t1, t2)
+	local v13 = useStyle()
+	local v14, v15 = React.useState(not v12.size and 0 or v12.size.Y.Offset)
+	local v16 = if not v12.paddings or not v12.paddings.Top then v13.Tokens.Global.Space_75 else v12.paddings.Top
+	local v17 = if not v12.paddings or not v12.paddings.Bottom then v13.Tokens.Global.Space_75 else v12.paddings.Bottom
+	local v18 = if not v12.paddings or not v12.paddings.Left then v13.Tokens.Global.Space_75 else v12.paddings.Left
+	local v19 = if not v12.paddings or not v12.paddings.Right then v13.Tokens.Global.Space_75 else v12.paddings.Right
+	local Left = nil
+	local SpaceAround = nil
+
+	if v12.alignment == NavigationBarAlignment.Left then
+		Left = Enum.HorizontalAlignment.Left
+	elseif v12.alignment == NavigationBarAlignment.EvenlyDistributed then
+		SpaceAround = Enum.UIFlexAlignment.SpaceAround
+		Left = Enum.HorizontalAlignment.Center
+	else
+		error("NavigationBar Alignment type is incorrect!")
+	end
+
+	local v22 = React.useCallback(function(p1) -- line: 96
+		-- upvalues: v12 (copy), v15 (copy)
+		if v12.visibility or v12.animated then
+			v15(p1.AbsoluteSize.Y)
+		end
+	end, {
+		v12.visibility,
+		v12.animated
+	})
+	local v23, v24 = ReactOtter.useAnimatedBinding(0)
+
+	React.useEffect(function() -- line: 102
+		-- upvalues: v12 (copy), v24 (copy), ReactOtter (copy), v14 (copy)
+		if not v12.visibility and v12.animated then
+			if v12.isVisible then
+				v24(ReactOtter.spring(0, v12.animationConfig))
+			else
+				v24(ReactOtter.spring(v14, v12.animationConfig))
+			end
+		end
+
+		return nil
+	end, {
+		v12.visibility,
+		v12.animated,
+		v12.isVisible,
+		v14,
+		v12.animationConfig
+	})
+
+	local t3 = {
+		Constraint = if v12.maxWidth == nil then nil else React.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(v12.maxWidth, 1e999)
+		}),
+		UIPadding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, v16),
+			PaddingBottom = UDim.new(0, v17),
+			PaddingLeft = UDim.new(0, v18),
+			PaddingRight = UDim.new(0, v19)
+		}),
+		Layout = React.createElement("UIListLayout", {
+			Padding = v12.spacing,
+			SortOrder = Enum.SortOrder.Name,
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalFlex = SpaceAround,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left
+		})
+	}
+
+	for i, v in ipairs(v12.items) do
+		local v28 = i == v12.selection
+
+		t3[tostring(i)] = v12.renderItem(v, v28)
+	end
+
+	local v29 = if not v12.visibility then v23:map(function(n1: number) -- line: 144
+		return UDim2.new(0, 0, 0, (math.floor(n1 + 0.5)))
+	end) else v12.visibility:map(function(n2: number) -- line: 140
+		-- upvalues: v14 (copy)
+		local v32 = (1 - n2) * v14
+
+		return UDim2.new(0, 0, 0, (math.floor(v32 + 0.5)))
+	end)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = v12.clipsDescendants,
+		Size = v12.size,
+		AutomaticSize = v12.automaticSize,
+		Position = v12.position,
+		Visible = v12.visible,
+		[React.Change.AbsoluteSize] = v22
+	}, {
+		AnimatedFrame = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			Selectable = false,
+			Active = v12.active,
+			Position = v29,
+			Size = UDim2.fromScale(1, 1),
+			AutomaticSize = v12.automaticSize,
+			BackgroundColor3 = if not v12.backgroundColor then v13.Theme.NavigationBar.Color else v12.backgroundColor.Color,
+			BackgroundTransparency = if not v12.backgroundColor then v13.Theme.NavigationBar.Transparency else v12.backgroundColor.Transparency,
+			Visible = v12.visible,
+			ZIndex = v12.zIndex
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				HorizontalAlignment = Left
+			}),
+			InnerFrame = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1),
+				AutomaticSize = v12.automaticSize
+			}, t3)
+		})
+	})
+end
+
+return NavigationBar

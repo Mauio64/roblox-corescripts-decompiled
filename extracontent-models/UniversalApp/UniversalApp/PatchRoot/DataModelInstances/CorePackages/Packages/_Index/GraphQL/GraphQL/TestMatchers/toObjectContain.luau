@@ -1,15 +1,20 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_inspect_0 = require(l_Parent_0.LuauPolyfill).util.inspect;
-local v2 = require(script.Parent.Parent.luaUtils.deepContains);
-return function(v3, v4) --[[ Line: 20 ]] --[[ Name: toObjectContain ]]
-    -- upvalues: v2 (copy), l_inspect_0 (copy)
-    local v5 = v2(v3, v4);
-    local v6 = "";
-    if not v5 then
-        v6 = "received tbl: " .. l_inspect_0(v4) .. " expected item to be in table: " .. l_inspect_0(v3);
-    end;
-    return {
-        pass = v5, 
-        message = v6
-    };
-end;
+local ParentParent = script.Parent.Parent.Parent
+local inspect = require(ParentParent.LuauPolyfill).util.inspect
+local deepContains = require(script.Parent.Parent.luaUtils.deepContains)
+
+local function toObjectContain(p1, p2) -- line: 20
+	-- upvalues: deepContains (copy), inspect (copy)
+	local v7 = deepContains(p1, p2)
+	local s1 = ""
+
+	if not v7 then
+		s1 = "received tbl: " .. inspect(p2) .. " expected item to be in table: " .. inspect(p1)
+	end
+
+	return {
+		pass = v7,
+		message = s1
+	}
+end
+
+return toObjectContain

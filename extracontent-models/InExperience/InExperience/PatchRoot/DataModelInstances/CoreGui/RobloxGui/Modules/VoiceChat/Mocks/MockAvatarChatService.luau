@@ -1,12 +1,15 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1, v2, v3, v4) --[[ Line: 4 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    return (setmetatable({
-        IsEnabled = v1, 
-        EnableVoice = v2, 
-        GetPropertyChangedSignal = v3, 
-        GetClientFeaturesAsync = v4
-    }, v0));
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, p3, p4) -- line: 4
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		IsEnabled = p1,
+		EnableVoice = p2,
+		GetPropertyChangedSignal = p3,
+		GetClientFeaturesAsync = p4
+	}, t1))
+end
+
+return t1

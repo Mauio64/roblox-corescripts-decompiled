@@ -1,4 +1,5 @@
-local v0 = require(script.Parent.FFlagAXRootRFYMigration);
-local v1 = require(script.Parent.FFlagAXUnifiedMarketplaceResultsFetcher);
-local v2 = require(script.Parent.FFlagAXResetFetchMarketplaceLogic);
-return v0 and v1 and v2 and game:DefineFastFlag("AXPassScreenSizeToWidgetApi5", false);
+local FFlagAXRootRFYMigration = require(script.Parent.FFlagAXRootRFYMigration)
+local FFlagAXUnifiedMarketplaceResultsFetcher = require(script.Parent.FFlagAXUnifiedMarketplaceResultsFetcher)
+local FFlagAXResetFetchMarketplaceLogic = require(script.Parent.FFlagAXResetFetchMarketplaceLogic)
+
+return FFlagAXRootRFYMigration and (FFlagAXUnifiedMarketplaceResultsFetcher and (FFlagAXResetFetchMarketplaceLogic and game:DefineFastFlag("AXPassScreenSizeToWidgetApi5", false)))

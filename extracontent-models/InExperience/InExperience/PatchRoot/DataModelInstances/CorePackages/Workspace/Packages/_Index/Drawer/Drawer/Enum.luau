@@ -1,3 +1,3 @@
 return {
-    DrawerPanelStatus = require(script.DrawerPanelStatus)
-};
+	DrawerPanelStatus = require(script.DrawerPanelStatus)
+}

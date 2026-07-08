@@ -1,27 +1,30 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxApolloClient").Parent;
-local v1 = require(l_Parent_0.ApolloClient);
-local v2 = require(l_Parent_0.ApolloLocalState);
-local l_GraphQLServer_0 = require(l_Parent_0.GraphQLServer).GraphQLServer;
-local l_ApolloClient_0 = v1.ApolloClient;
-local l_HttpLink_0 = v1.HttpLink;
-local l_InMemoryCache_0 = v1.InMemoryCache;
-local l_typePolicies_0 = v2.typePolicies;
-initalizeApolloClient = function(v8) --[[ Line: 14 ]] --[[ Name: initalizeApolloClient ]]
-    -- upvalues: l_GraphQLServer_0 (copy), l_HttpLink_0 (copy), l_InMemoryCache_0 (copy), l_typePolicies_0 (copy), l_ApolloClient_0 (copy)
-    local v9 = l_GraphQLServer_0.new(v8);
-    local v12 = l_HttpLink_0.new({
-        uri = "/api", 
-        fetch = function(_, v11) --[[ Line: 18 ]] --[[ Name: fetch ]]
-            -- upvalues: v9 (copy)
-            return v9:fetchLocal(v11);
-        end
-    });
-    local v13 = l_InMemoryCache_0.new({
-        typePolicies = l_typePolicies_0
-    });
-    return (l_ApolloClient_0.new({
-        link = v12, 
-        cache = v13
-    }));
-end;
-return initalizeApolloClient;
+local Parent = script:FindFirstAncestor("RobloxApolloClient").Parent
+local ApolloClient = require(Parent.ApolloClient)
+local ApolloLocalState = require(Parent.ApolloLocalState)
+local GraphQLServer = require(Parent.GraphQLServer).GraphQLServer
+local ApolloClient2 = ApolloClient.ApolloClient
+local HttpLink = ApolloClient.HttpLink
+local InMemoryCache = ApolloClient.InMemoryCache
+local typePolicies = ApolloLocalState.typePolicies
+
+function initalizeApolloClient(p1) -- line: 14
+	-- upvalues: GraphQLServer (copy), HttpLink (copy), InMemoryCache (copy), typePolicies (copy), ApolloClient2 (copy)
+	local v10 = GraphQLServer.new(p1)
+	local v11 = HttpLink.new({
+		uri = "/api",
+		fetch = function(_, p3) -- line: 18
+			-- upvalues: v10 (copy)
+			return v10:fetchLocal(p3)
+		end
+	})
+	local v12 = InMemoryCache.new({
+		typePolicies = typePolicies
+	})
+
+	return (ApolloClient2.new({
+		link = v11,
+		cache = v12
+	}))
+end
+
+return initalizeApolloClient

@@ -1,1 +1,1 @@
-return require(script.PlayerButtons);
+return require(script.PlayerButtons)

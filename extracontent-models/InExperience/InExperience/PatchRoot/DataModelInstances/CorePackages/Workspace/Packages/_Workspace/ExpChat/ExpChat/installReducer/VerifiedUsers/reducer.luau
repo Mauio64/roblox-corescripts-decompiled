@@ -1,26 +1,27 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local l_Actions_0 = require(l_Parent_0.ExpChatShared).Actions;
-local l_PlayerAdded_0 = l_Actions_0.PlayerAdded;
-local l_PlayerRemoved_0 = l_Actions_0.PlayerRemoved;
-return v1.createReducer({}, {
-    [l_PlayerAdded_0.name] = function(v6, v7) --[[ Line: 16 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        if not v7.hasVerifiedBadge then
-            return v6;
-        else
-            return l_Dictionary_0.join(v6, {
-                [v7.userId] = v7.hasVerifiedBadge
-            });
-        end;
-    end, 
-    [l_PlayerRemoved_0.name] = function(v8, v9) --[[ Line: 25 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        if v8[v9.userId] == nil then
-            return v8;
-        else
-            return l_Dictionary_0.removeKey(v8, v9.userId);
-        end;
-    end
-});
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(Parent.Rodux)
+local Dictionary = require(Parent.llama).Dictionary
+local Actions = require(Parent.ExpChatShared).Actions
+local PlayerAdded = Actions.PlayerAdded
+local PlayerRemoved = Actions.PlayerRemoved
+
+return Rodux.createReducer({}, {
+	[PlayerAdded.name] = function(t1: {[any]: any}, p1) -- line: 16
+		-- upvalues: Dictionary (copy)
+		if not p1.hasVerifiedBadge then
+			return t1
+		end
+
+		return Dictionary.join(t1, {
+			[p1.userId] = p1.hasVerifiedBadge
+		})
+	end,
+	[PlayerRemoved.name] = function(t2: {[any]: any}, p2) -- line: 25
+		-- upvalues: Dictionary (copy)
+		if t2[p2.userId] == nil then
+			return t2
+		end
+
+		return Dictionary.removeKey(t2, p2.userId)
+	end
+})

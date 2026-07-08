@@ -1,26 +1,35 @@
-local function v0(v1, v2) --[[ Line: 2 ]] --[[ Name: flatMap ]]
-    -- upvalues: v0 (copy)
-    local v3 = type(v1);
-    assert(v3 == "table", "expected a table for first argument, got " .. v3);
-    local v4 = type(v2);
-    assert(v4 == "function", "expected a function for second argument, got " .. v4);
-    local v5 = {};
-    local v6 = 1;
-    for v7 = 1, #v1 do
-        if type(v1[v7]) == "table" then
-            local v8 = v0(v1[v7], v2);
-            for v9 = 1, #v8 do
-                v5[v6] = v8[v9];
-                v6 = v6 + 1;
-            end;
-        else
-            local v10 = v2(v1[v7], v7);
-            if v10 ~= nil then
-                v5[v6] = v10;
-                v6 = v6 + 1;
-            end;
-        end;
-    end;
-    return v5;
-end;
-return v0;
+local function flatMap(p1, p2) -- line: 2
+	-- upvalues: flatMap (copy)
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	local v5 = type(p2)
+
+	assert(v5 == "function", "expected a function for second argument, got " .. v5)
+
+	local t1 = {}
+	local n1 = 1
+
+	for i = 1, #p1 do
+		if type(p1[i]) == "table" then
+			local v9 = flatMap(p1[i], p2)
+
+			for j = 1, #v9 do
+				t1[n1] = v9[j]
+				n1 += 1
+			end
+		else
+			local v11 = p2(p1[i], i)
+
+			if v11 ~= nil then
+				t1[n1] = v11
+				n1 += 1
+			end
+		end
+	end
+
+	return t1
+end
+
+return flatMap

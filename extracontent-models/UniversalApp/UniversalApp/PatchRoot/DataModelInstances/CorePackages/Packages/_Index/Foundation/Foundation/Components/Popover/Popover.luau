@@ -1,22 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v4 = require(script.Parent.PopoverContext);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = {
-    testId = "--foundation-popover"
-};
-return function(v7) --[[ Line: 23 ]] --[[ Name: Popover ]]
-    -- upvalues: v3 (copy), v6 (copy), v2 (copy), v4 (copy)
-    local v8 = v3(v7, v6);
-    local v9, v10 = v2.useState(nil);
-    return v2.createElement(v4.Provider, {
-        value = {
-            anchor = v9, 
-            setAnchor = v10, 
-            isOpen = v8.isOpen, 
-            testId = v8.testId
-        }
-    }, v8.children);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local PopoverContext = require(script.Parent.PopoverContext)
+
+require(Foundation.Utility.Plugin.StudioUri)
+require(Foundation.Components.Types)
+
+local t1 = {
+	testId = "--foundation-popover"
+}
+
+local function Popover(t2: {[any]: any}) -- line: 25
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), PopoverContext (copy)
+	local v9 = withDefaults(t2, t1)
+	local v10, v11 = React.useState(nil)
+	local v12, v13 = React.useState(nil)
+
+	return React.createElement(PopoverContext.Provider, {
+		value = {
+			anchor = v10,
+			setAnchor = v11,
+			anchorUri = v12,
+			setAnchorUri = v13,
+			isOpen = v9.isOpen,
+			testId = v9.testId
+		}
+	}, v9.children)
+end
+
+return Popover

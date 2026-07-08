@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserTileTextTCIndicator_V3", false);
+return game:DefineFastFlag("UserTileTextTCIndicator_V3", false)

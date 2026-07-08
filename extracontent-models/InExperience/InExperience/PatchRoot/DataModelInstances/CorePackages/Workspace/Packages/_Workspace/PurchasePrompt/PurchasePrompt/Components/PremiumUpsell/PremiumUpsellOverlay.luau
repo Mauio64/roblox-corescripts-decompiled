@@ -1,120 +1,141 @@
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.PurchasePromptDeps);
-local l_Roact_0 = v3.Roact;
-local l_IAPExperience_0 = v3.IAPExperience;
-local l_PremiumUpsellFlow_0 = l_IAPExperience_0.PurchaseFlow.PremiumUpsellFlow;
-local l_PremiumUpsellFlowState_0 = l_IAPExperience_0.PurchaseFlow.PremiumUpsellFlowState;
-local l_PurchaseErrorType_0 = l_IAPExperience_0.PurchaseFlow.PurchaseErrorType;
-local v9 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v10 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v11 = require(l_script_FirstAncestor_0.Enums.VPCModalType);
-local v12 = l_Roact_0.PureComponent:extend(script.Name);
-local v13 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableVpcForInExperiencePremiumUpsell);
-local _ = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-v12.init = function(v15) --[[ Line: 51 ]] --[[ Name: init ]]
-    -- upvalues: v9 (copy), v13 (copy)
-    v15.confirmButtonPressed = function() --[[ Line: 52 ]]
-        -- upvalues: v15 (copy), v9 (ref), v13 (ref)
-        local l_props_0 = v15.props;
-        local l_promptState_0 = l_props_0.promptState;
-        if l_promptState_0 == v9.PremiumUpsell then
-            if v13() then
-                l_props_0.dispatchPremiumPrecheck();
-                return;
-            else
-                l_props_0.promptPremiumPurchase();
-                return;
-            end;
-        elseif l_promptState_0 == v9.PurchaseComplete then
-            l_props_0.endPurchase();
-            return;
-        elseif l_promptState_0 == v9.Error then
-            l_props_0.endPurchase();
-            return;
-        else
-            return;
-        end;
-    end;
-    v15.cancelButtonPressed = function() --[[ Line: 72 ]]
-        -- upvalues: v15 (copy)
-        v15.props.endPurchase();
-    end;
-end;
-v12.didMount = function(v18) --[[ Line: 79 ]] --[[ Name: didMount ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:BindCoreAction("PremiumPurchaseConfirmButtonBind", function(_, v20, _) --[[ Line: 80 ]]
-        -- upvalues: v18 (copy)
-        if v20 == Enum.UserInputState.Begin then
-            v18.confirmButtonPressed();
-        end;
-    end, false, Enum.KeyCode.ButtonA);
-    l_ContextActionService_0:BindCoreAction("PremiumPurchaseCancelButtonBind", function(_, v23, _) --[[ Line: 85 ]]
-        -- upvalues: v18 (copy)
-        if v23 == Enum.UserInputState.Begin then
-            v18.cancelButtonPressed();
-        end;
-    end, false, Enum.KeyCode.ButtonB);
-end;
-v12.willUnmount = function(_) --[[ Line: 92 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("PremiumPurchaseConfirmButtonBind");
-    l_ContextActionService_0:UnbindCoreAction("PremiumPurchaseCancelButtonBind");
-end;
-v12.getFlowState = function(v26) --[[ Line: 97 ]] --[[ Name: getFlowState ]]
-    -- upvalues: v9 (copy), l_PremiumUpsellFlowState_0 (copy)
-    local l_promptState_1 = v26.props.promptState;
-    if l_promptState_1 == v9.PremiumUpsell then
-        return l_PremiumUpsellFlowState_0.PurchaseModal;
-    elseif l_promptState_1 == v9.Error then
-        return l_PremiumUpsellFlowState_0.Error;
-    elseif l_promptState_1 == v9.EnablePurchaseVPCModal then
-        return l_PremiumUpsellFlowState_0.PurchaseVPCModal;
-    else
-        return l_PremiumUpsellFlowState_0.None;
-    end;
-end;
-v12.getErrorType = function(v28) --[[ Line: 113 ]] --[[ Name: getErrorType ]]
-    -- upvalues: v10 (copy), l_PurchaseErrorType_0 (copy)
-    local l_props_1 = v28.props;
-    if l_props_1.purchaseError == v10.AlreadyPremium then
-        return l_PurchaseErrorType_0.AlreadyPremium;
-    elseif l_props_1.purchaseError == v10.PremiumUnavailablePlatform then
-        return l_PurchaseErrorType_0.PremiumPlatformUnavailable;
-    elseif l_props_1.purchaseError == v10.EconomicRestriction then
-        return l_PurchaseErrorType_0.EconomicRestriction;
-    else
-        return l_PurchaseErrorType_0.Unknown;
-    end;
-end;
-v12.getVPCModalType = function(v30) --[[ Line: 127 ]] --[[ Name: getVPCModalType ]]
-    -- upvalues: v9 (copy), v11 (copy)
-    if v30.props.promptState == v9.EnablePurchaseVPCModal then
-        return v11.toRawValue(v11.EnablePurchase);
-    else
-        return v11.toRawValue(v11.None);
-    end;
-end;
-v12.render = function(v31) --[[ Line: 137 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), l_PremiumUpsellFlow_0 (copy), v13 (copy)
-    local l_props_2 = v31.props;
-    return l_Roact_0.createElement(l_PremiumUpsellFlow_0, {
-        screenSize = l_props_2.screenSize, 
-        isCatalog = false, 
-        currencySymbol = l_props_2.currencySymbol, 
-        robuxPrice = l_props_2.robuxPrice, 
-        robuxAmount = l_props_2.robuxAmount, 
-        purchaseState = v31:getFlowState(), 
-        errorType = v31:getErrorType(), 
-        economicRestrictionError = l_props_2.economicRestrictionError, 
-        purchaseVPCType = v31:getVPCModalType(), 
-        acceptControllerIcon = l_props_2.isGamepadEnabled and "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png" or nil, 
-        purchasePremium = if v13() then l_props_2.dispatchPremiumPrecheck else l_props_2.promptPremiumPurchase, 
-        cancelPurchase = l_props_2.endPurchase, 
-        flowComplete = l_props_2.endPurchase, 
-        onAnalyticEvent = l_props_2.onAnalyticEvent, 
-        eventPrefix = "InGame"
-    });
-end;
-return v12;
+local ContextActionService = game:GetService("ContextActionService")
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(PurchasePromptParent.PurchasePromptDeps)
+local Roact = PurchasePromptDeps.Roact
+local IAPExperience = PurchasePromptDeps.IAPExperience
+local PremiumUpsellFlow = IAPExperience.PurchaseFlow.PremiumUpsellFlow
+local PremiumUpsellFlowState = IAPExperience.PurchaseFlow.PremiumUpsellFlowState
+local PurchaseErrorType = IAPExperience.PurchaseFlow.PurchaseErrorType
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local VPCModalType = require(PurchasePrompt.Enums.VPCModalType)
+local v13 = Roact.PureComponent:extend(script.Name)
+local GetFFlagEnableVpcForInExperiencePremiumUpsell = require(PurchasePrompt.Flags.GetFFlagEnableVpcForInExperiencePremiumUpsell)
+
+game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+function v13.init(p1) -- line: 51
+	-- upvalues: PromptState (copy), GetFFlagEnableVpcForInExperiencePremiumUpsell (copy)
+	function p1.confirmButtonPressed() -- line: 52
+		-- upvalues: p1 (copy), PromptState (copy), GetFFlagEnableVpcForInExperiencePremiumUpsell (copy)
+		local props = p1.props
+		local promptState = props.promptState
+
+		if promptState == PromptState.PremiumUpsell then
+			if GetFFlagEnableVpcForInExperiencePremiumUpsell() then
+				props.dispatchPremiumPrecheck()
+
+				return
+			end
+
+			props.promptPremiumPurchase()
+
+			return
+		end
+
+		if promptState == PromptState.PurchaseComplete then
+			props.endPurchase()
+
+			return
+		end
+
+		if promptState == PromptState.Error then
+			props.endPurchase()
+
+			return
+		end
+	end
+	function p1.cancelButtonPressed() -- line: 72
+		-- upvalues: p1 (copy)
+		p1.props.endPurchase()
+	end
+end
+function v13.didMount(p2) -- line: 79
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:BindCoreAction("PremiumPurchaseConfirmButtonBind", function(_, p4, _) -- line: 80
+		-- upvalues: p2 (copy)
+		if p4 == Enum.UserInputState.Begin then
+			p2.confirmButtonPressed()
+		end
+	end, false, Enum.KeyCode.ButtonA)
+	ContextActionService:BindCoreAction("PremiumPurchaseCancelButtonBind", function(_, p7, _) -- line: 85
+		-- upvalues: p2 (copy)
+		if p7 == Enum.UserInputState.Begin then
+			p2.cancelButtonPressed()
+		end
+	end, false, Enum.KeyCode.ButtonB)
+end
+function v13.willUnmount(_) -- line: 92
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("PremiumPurchaseConfirmButtonBind")
+	ContextActionService:UnbindCoreAction("PremiumPurchaseCancelButtonBind")
+end
+function v13.getFlowState(p10) -- line: 97
+	-- upvalues: PromptState (copy), PremiumUpsellFlowState (copy)
+	local promptState = p10.props.promptState
+
+	if promptState == PromptState.PremiumUpsell then
+		return PremiumUpsellFlowState.PurchaseModal
+	end
+
+	if promptState == PromptState.Error then
+		return PremiumUpsellFlowState.Error
+	end
+
+	if promptState == PromptState.EnablePurchaseVPCModal then
+		return PremiumUpsellFlowState.PurchaseVPCModal
+	end
+
+	return PremiumUpsellFlowState.None
+end
+function v13.getErrorType(p11) -- line: 113
+	-- upvalues: PurchaseError (copy), PurchaseErrorType (copy)
+	local props = p11.props
+
+	if props.purchaseError == PurchaseError.AlreadyPremium then
+		return PurchaseErrorType.AlreadyPremium
+	end
+
+	if props.purchaseError == PurchaseError.PremiumUnavailablePlatform then
+		return PurchaseErrorType.PremiumPlatformUnavailable
+	end
+
+	if props.purchaseError == PurchaseError.EconomicRestriction then
+		return PurchaseErrorType.EconomicRestriction
+	end
+
+	return PurchaseErrorType.Unknown
+end
+function v13.getVPCModalType(p12) -- line: 127
+	-- upvalues: PromptState (copy), VPCModalType (copy)
+	if p12.props.promptState == PromptState.EnablePurchaseVPCModal then
+		return VPCModalType.toRawValue(VPCModalType.EnablePurchase)
+	end
+
+	return VPCModalType.toRawValue(VPCModalType.None)
+end
+function v13.render(p13) -- line: 137
+	-- upvalues: Roact (copy), PremiumUpsellFlow (copy), GetFFlagEnableVpcForInExperiencePremiumUpsell (copy)
+	local props = p13.props
+
+	return Roact.createElement(PremiumUpsellFlow, {
+		isCatalog = false,
+		eventPrefix = "InGame",
+		screenSize = props.screenSize,
+		currencySymbol = props.currencySymbol,
+		robuxPrice = props.robuxPrice,
+		robuxAmount = props.robuxAmount,
+		purchaseState = p13:getFlowState(),
+		errorType = p13:getErrorType(),
+		economicRestrictionError = props.economicRestrictionError,
+		purchaseVPCType = p13:getVPCModalType(),
+		acceptControllerIcon = if not props.isGamepadEnabled then nil else "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png",
+		purchasePremium = if not GetFFlagEnableVpcForInExperiencePremiumUpsell() then props.promptPremiumPurchase else props.dispatchPremiumPrecheck,
+		cancelPurchase = props.endPurchase,
+		flowComplete = props.endPurchase,
+		onAnalyticEvent = props.onAnalyticEvent
+	})
+end
+
+return v13

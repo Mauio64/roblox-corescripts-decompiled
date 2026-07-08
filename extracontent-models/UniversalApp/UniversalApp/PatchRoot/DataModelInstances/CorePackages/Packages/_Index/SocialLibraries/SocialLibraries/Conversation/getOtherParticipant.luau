@@ -1,8 +1,9 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local l_LocalUserId_0 = v0.LocalUserId;
-    for _, v4 in ipairs(v1) do
-        if v4 ~= l_LocalUserId_0 then
-            return v4;
-        end;
-    end;
-end;
+return function(p1, p2) -- line: 1
+	local LocalUserId = p1.LocalUserId
+
+	for _, v in ipairs(p2) do
+		if v ~= LocalUserId then
+			return v
+		end
+	end
+end

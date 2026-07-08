@@ -1,36 +1,46 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+
 return {
-    getChildKey = function(v2) --[[ Line: 28 ]] --[[ Name: getChildKey ]]
-        if v2 == nil then
-            return nil;
-        elseif type(v2) ~= "table" then
-            return nil;
-        elseif v2.key ~= nil then
-            return v2.key;
-        elseif v2.props and v2.props.key ~= nil then
-            return v2.props.key;
-        else
-            return nil;
-        end;
-    end, 
-    onlyElements = function(v3) --[[ Line: 65 ]] --[[ Name: onlyElements ]]
-        -- upvalues: v1 (copy)
-        local v4 = {};
-        v1.Children.forEach(v3, function(v5) --[[ Line: 68 ]]
-            -- upvalues: v1 (ref), v4 (copy)
-            if v1.isValidElement(v5) then
-                table.insert(v4, v5);
-            end;
-        end);
-        return v4;
-    end, 
-    useIdFallback = function() --[[ Line: 53 ]] --[[ Name: useIdFallback ]]
-        local v6 = tostring(math.random(1000000));
-        if v6 == nil then
-            return "id-" .. v6;
-        else
-            return v6;
-        end;
-    end
-};
+	getChildKey = function(p1) -- line: 28
+		if p1 == nil then
+			return nil
+		end
+
+		if type(p1) ~= "table" then
+			return nil
+		end
+
+		if p1.key ~= nil then
+			return p1.key
+		end
+
+		if p1.props and p1.props.key ~= nil then
+			return p1.props.key
+		end
+
+		return nil
+	end,
+	onlyElements = function(p2) -- line: 65
+		-- upvalues: React (copy)
+		local t1 = {}
+
+		React.Children.forEach(p2, function(p3) -- line: 68
+			-- upvalues: React (copy), t1 (copy)
+			if React.isValidElement(p3) then
+				table.insert(t1, p3)
+			end
+		end)
+
+		return t1
+	end,
+	useIdFallback = function() -- line: 53
+		local str = tostring(math.random(1000000))
+
+		if str == nil then
+			return "id-" .. str
+		end
+
+		return str
+	end
+}

@@ -1,64 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.ReactOtter);
-local v5 = require(l_script_FirstAncestor_0.AnimationConstants);
-local function v15(v6, v7, v8) --[[ Line: 21 ]] --[[ Name: useCategoryPillAnimation ]]
-    -- upvalues: v4 (copy), v2 (copy), v5 (copy)
-    local v9 = v8 and not v7;
-    local v10 = v9 and 1 or 0;
-    local v11, v12 = v4.useAnimatedBinding(v6);
-    local v13, v14 = v4.useAnimatedBinding(v10);
-    v2.useEffect(function() --[[ Line: 31 ]]
-        -- upvalues: v12 (copy), v4 (ref), v6 (copy), v5 (ref)
-        v12(v4.spring(v6, {
-            frequency = v5.FIntAXCategoryPillPositionAnimationFrequency, 
-            dampingRatio = v5.FIntAXCategoryPillPositionAnimationDampingRatio
-        }));
-    end, {
-        v6, 
-        v12
-    });
-    v2.useEffect(function() --[[ Line: 38 ]]
-        -- upvalues: v10 (copy), v14 (copy), v4 (ref), v5 (ref)
-        if v10 == 1 then
-            v14(v4.instant(v10));
-            return;
-        else
-            v14((v4.spring(v10, {
-                frequency = v5.FIntAXCategoryPillTransparencyAnimationFrequency, 
-                dampingRatio = v5.FIntAXCategoryPillTransparencyAnimationDampingRatio
-            })));
-            return;
-        end;
-    end, {
-        v10
-    });
-    return v11, v13, v9;
-end;
-return function(v16) --[[ Line: 52 ]] --[[ Name: AnimatedCategoryPill ]]
-    -- upvalues: v15 (copy), v2 (copy), v3 (copy)
-    local l_catInfo_0 = v16.catInfo;
-    local l_pillIndex_0 = v16.pillIndex;
-    local l_isSelected_0 = v16.isSelected;
-    local l_shouldShowSubcategories_0 = v16.shouldShowSubcategories;
-    local l_targetX_0 = v16.targetX;
-    local l_renderCategoryPill_0 = v16.renderCategoryPill;
-    local l_onRef_0 = v16.onRef;
-    local v24, v25, v26 = v15(l_targetX_0, l_isSelected_0, l_shouldShowSubcategories_0);
-    local v27 = l_renderCategoryPill_0(l_catInfo_0, l_pillIndex_0, not v26);
-    local v29 = v24:map(function(v28) --[[ Line: 68 ]]
-        return UDim2.new(0, v28, 0.5, 0);
-    end);
-    return v2.createElement(v3.View, {
-        tag = "auto-xy anchor-center-left padding-x-xxsmall", 
-        Position = v29, 
-        BackgroundTransparency = 1, 
-        GroupTransparency = v25, 
-        Size = UDim2.new(0, 0, 1, 0), 
-        ref = l_onRef_0
-    }, {
-        Pill = v27
-    });
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local React = require(AvatarExperienceCommonParent.React)
+local Foundation = require(AvatarExperienceCommonParent.Foundation)
+local ReactOtter = require(AvatarExperienceCommonParent.ReactOtter)
+local AnimationConstants = require(AvatarExperienceCommon.AnimationConstants)
+
+local function useCategoryPillAnimation(n1: number, b1: boolean, b2: boolean) -- line: 21
+	-- upvalues: ReactOtter (copy), React (copy), AnimationConstants (copy)
+	local v12 = b2 and not b1
+	local v13 = not v12 and 0 or 1
+	local v14, v15 = ReactOtter.useAnimatedBinding(n1)
+	local v16, v17 = ReactOtter.useAnimatedBinding(v13)
+
+	React.useEffect(function() -- line: 31
+		-- upvalues: v15 (copy), ReactOtter (copy), n1 (copy), AnimationConstants (copy)
+		v15(ReactOtter.spring(n1, {
+			frequency = AnimationConstants.FIntAXCategoryPillPositionAnimationFrequency,
+			dampingRatio = AnimationConstants.FIntAXCategoryPillPositionAnimationDampingRatio
+		}))
+	end, {
+		n1,
+		v15
+	})
+	React.useEffect(function() -- line: 38
+		-- upvalues: v13 (copy), v17 (copy), ReactOtter (copy), AnimationConstants (copy)
+		if v13 == 1 then
+			v17(ReactOtter.instant(v13))
+
+			return
+		end
+
+		v17((ReactOtter.spring(v13, {
+			frequency = AnimationConstants.FIntAXCategoryPillTransparencyAnimationFrequency,
+			dampingRatio = AnimationConstants.FIntAXCategoryPillTransparencyAnimationDampingRatio
+		})))
+	end, { v13 })
+
+	return v14, v16, v12
+end
+local function AnimatedCategoryPill(t1: {[any]: any}) -- line: 52
+	-- upvalues: useCategoryPillAnimation (copy), React (copy), Foundation (copy)
+	local catInfo = t1.catInfo
+	local pillIndex = t1.pillIndex
+	local isSelected = t1.isSelected
+	local shouldShowSubcategories = t1.shouldShowSubcategories
+	local targetX = t1.targetX
+	local renderCategoryPill = t1.renderCategoryPill
+	local onRef = t1.onRef
+	local v26, v27, v28 = useCategoryPillAnimation(targetX, isSelected, shouldShowSubcategories)
+	local v29 = renderCategoryPill(catInfo, pillIndex, not v28)
+	local v30 = v26:map(function(p1) -- line: 68
+		return UDim2.new(0, p1, 0.5, 0)
+	end)
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy anchor-center-left padding-x-xxsmall",
+		BackgroundTransparency = 1,
+		Position = v30,
+		GroupTransparency = v27,
+		Size = UDim2.new(0, 0, 1, 0),
+		ref = onRef
+	}, {
+		Pill = v29
+	})
+end
+
+return AnimatedCategoryPill

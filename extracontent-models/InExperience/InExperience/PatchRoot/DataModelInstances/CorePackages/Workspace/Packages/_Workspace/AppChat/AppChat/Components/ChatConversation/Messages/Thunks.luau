@@ -1,3 +1,3 @@
 return {
-    getNewMessages = require(script.getNewMessages)
-};
+	getNewMessages = require(script.getNewMessages)
+}

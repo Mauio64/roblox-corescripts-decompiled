@@ -1,10 +1,11 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_ContextTypes_0 = require(l_Parent_0.Analytics.Enums).ContextTypes;
-return function(v2) --[[ Line: 6 ]]
-    -- upvalues: l_ContextTypes_0 (copy)
-    if v2 == nil then
-        return nil;
-    else
-        return l_ContextTypes_0[v2.rawValue()].rawValue();
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ContextTypes = require(ParentParent.Analytics.Enums).ContextTypes
+
+return function(p1) -- line: 6
+	-- upvalues: ContextTypes (copy)
+	if p1 == nil then
+		return nil
+	end
+
+	return ContextTypes[p1.rawValue()].rawValue()
+end

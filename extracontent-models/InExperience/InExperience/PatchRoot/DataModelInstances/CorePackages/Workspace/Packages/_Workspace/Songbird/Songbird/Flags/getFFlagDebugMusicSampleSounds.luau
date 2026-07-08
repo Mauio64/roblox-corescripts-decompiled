@@ -1,4 +1,5 @@
-game:DefineFastFlag("DebugMusicSampleSounds", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("DebugMusicSampleSounds");
-end;
+game:DefineFastFlag("DebugMusicSampleSounds", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("DebugMusicSampleSounds")
+end

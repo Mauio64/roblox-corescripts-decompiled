@@ -1,126 +1,139 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Object_0 = v2.Object;
-local l_Boolean_0 = v2.Boolean;
-local v5 = {};
-local _ = require(l_Parent_1.GraphQL);
-local l_wrap_0 = require(l_Parent_0.optimism).wrap;
-local l_getFragmentQueryDocument_0 = require(script.Parent.Parent.Parent.utilities).getFragmentQueryDocument;
-local _ = require(script.Parent.types.DataProxy);
-local _ = require(script.Parent.types.Cache);
-local v11 = {};
-v11.__index = v11;
-v11.new = function() --[[ Line: 207 ]] --[[ Name: new ]]
-    -- upvalues: v11 (copy), l_wrap_0 (copy), l_getFragmentQueryDocument_0 (copy)
-    local v12 = setmetatable({}, v11);
-    v12.getFragmentDoc = l_wrap_0(l_getFragmentQueryDocument_0);
-    return v12;
-end;
-v11.read = function(_, _) --[[ Line: 217 ]] --[[ Name: read ]]
-    error("not implemented abstract method");
-end;
-v11.write = function(_, _) --[[ Line: 220 ]] --[[ Name: write ]]
-    error("not implemented abstract method");
-end;
-v11.diff = function(_, _) --[[ Line: 223 ]] --[[ Name: diff ]]
-    error("not implemented abstract method");
-end;
-v11.watch = function(_, _) --[[ Line: 226 ]] --[[ Name: watch ]]
-    error("not implemented abstract method");
-end;
-v11.reset = function(_) --[[ Line: 229 ]] --[[ Name: reset ]]
-    error("not implemented abstract method");
-end;
-v11.evict = function(_, _) --[[ Line: 233 ]] --[[ Name: evict ]]
-    error("not implemented abstract method");
-end;
-v11.restore = function(_, _) --[[ Line: 237 ]] --[[ Name: restore ]]
-    error("not implemented abstract method");
-end;
-v11.extract = function(_, _) --[[ Line: 241 ]] --[[ Name: extract ]]
-    error("not implemented abstract method");
-end;
-v11.removeOptimistic = function(_, _) --[[ Line: 245 ]] --[[ Name: removeOptimistic ]]
-    error("not implemented abstract method");
-end;
-v11.batch = function(v30, v31) --[[ Line: 249 ]] --[[ Name: batch ]]
-    local v32 = nil;
-    v32 = if typeof(v31.optimistic) == "string" then v31.optimistic else if v31.optimistic == false then nil else nil;
-    v30:performTransaction(v31.update, v32);
-end;
-v11.performTransaction = function(_, _, _) --[[ Line: 263 ]] --[[ Name: performTransaction ]]
-    error("not implemented abstract method");
-end;
-v11.recordOptimisticTransaction = function(v36, v37, v38) --[[ Line: 277 ]] --[[ Name: recordOptimisticTransaction ]]
-    v36:performTransaction(v37, v38);
-end;
-v11.transformDocument = function(_, v40) --[[ Line: 281 ]] --[[ Name: transformDocument ]]
-    return v40;
-end;
-v11.identify = function(_, _) --[[ Line: 285 ]] --[[ Name: identify ]]
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Boolean = LuauPolyfill.Boolean
+local t1 = {}
 
-end;
-v11.gc = function(_) --[[ Line: 289 ]] --[[ Name: gc ]]
-    return {};
-end;
-v11.modify = function(_, _) --[[ Line: 293 ]] --[[ Name: modify ]]
-    return false;
-end;
-v11.transformForLink = function(_, v47) --[[ Line: 297 ]] --[[ Name: transformForLink ]]
-    return v47;
-end;
-v11.readQuery = function(v48, v49, v50) --[[ Line: 301 ]] --[[ Name: readQuery ]]
-    -- upvalues: l_Object_0 (copy), l_Boolean_0 (copy)
-    if v50 == nil then
-        v50 = not not v49.optimistic;
-    end;
-    return v48:read(l_Object_0.assign(table.clone(v49), {
-        rootId = l_Boolean_0.toJSBoolean(v49.id) and v49.id or "ROOT_QUERY", 
-        optimistic = v50
-    }));
-end;
-v11.readFragment = function(v51, v52, v53) --[[ Line: 320 ]] --[[ Name: readFragment ]]
-    -- upvalues: l_Object_0 (copy)
-    if v53 == nil then
-        v53 = not not v52.optimistic;
-    end;
-    return v51:read(l_Object_0.assign({}, v52, {
-        query = v51.getFragmentDoc(v52.fragment, v52.fragmentName), 
-        rootId = v52.id, 
-        optimistic = v53
-    }));
-end;
-v11.writeQuery = function(v54, v55) --[[ Line: 338 ]] --[[ Name: writeQuery ]]
-    -- upvalues: l_Object_0 (copy)
-    local l_id_0 = v55.id;
-    local l_data_0 = v55.data;
-    local v58 = l_Object_0.assign(table.clone(v55), {
-        id = l_Object_0.None, 
-        data = l_Object_0.None
-    });
-    return v54:write(l_Object_0.assign(v58, {
-        dataId = l_id_0 or "ROOT_QUERY", 
-        result = l_data_0
-    }));
-end;
-v11.writeFragment = function(v59, v60) --[[ Line: 350 ]] --[[ Name: writeFragment ]]
-    -- upvalues: l_Object_0 (copy)
-    local l_id_1 = v60.id;
-    local l_data_1 = v60.data;
-    local l_fragment_0 = v60.fragment;
-    local l_fragmentName_0 = v60.fragmentName;
-    local v65 = l_Object_0.assign(table.clone(v60), {
-        id = l_Object_0.None, 
-        data = l_Object_0.None, 
-        fragment = l_Object_0.None, 
-        fragmentName = l_Object_0.None
-    });
-    return v59:write(l_Object_0.assign(v65, {
-        query = v59.getFragmentDoc(l_fragment_0, l_fragmentName_0), 
-        dataId = l_id_1, 
-        result = l_data_1
-    }));
-end;
-v5.ApolloCache = v11;
-return v5;
+require(ParentParentParent.GraphQL)
+
+local wrap = require(ParentParent.optimism).wrap
+local getFragmentQueryDocument = require(script.Parent.Parent.Parent.utilities).getFragmentQueryDocument
+
+require(script.Parent.types.DataProxy)
+require(script.Parent.types.Cache)
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new() -- line: 207
+	-- upvalues: t2 (copy), wrap (copy), getFragmentQueryDocument (copy)
+	local self = setmetatable({}, t2)
+
+	self.getFragmentDoc = wrap(getFragmentQueryDocument)
+
+	return self
+end
+function t2.read(_, _) -- line: 217
+	error("not implemented abstract method")
+end
+function t2.write(_, _) -- line: 220
+	error("not implemented abstract method")
+end
+function t2.diff(_, _) -- line: 223
+	error("not implemented abstract method")
+end
+function t2.watch(_, _) -- line: 226
+	error("not implemented abstract method")
+end
+function t2.reset(_) -- line: 229
+	error("not implemented abstract method")
+end
+function t2.evict(_, _) -- line: 233
+	error("not implemented abstract method")
+end
+function t2.restore(_, _) -- line: 237
+	error("not implemented abstract method")
+end
+function t2.extract(_: {[any]: any}, _: boolean?) -- line: 241
+	error("not implemented abstract method")
+end
+function t2.removeOptimistic(_: {[any]: any}, _: string) -- line: 245
+	error("not implemented abstract method")
+end
+function t2.batch(p14, p15) -- line: 249
+	local v30 = if typeof(p15.optimistic) ~= "string" then if p15.optimistic ~= false then nil else nil else p15.optimistic
+
+	p14:performTransaction(p15.update, v30)
+end
+function t2.performTransaction(_: {[any]: any}, _: ((...any) -> ...any), _: string?) -- line: 263
+	error("not implemented abstract method")
+end
+function t2.recordOptimisticTransaction(t6: {[any]: any}, p17: ((...any) -> ...any), s3: string) -- line: 277
+	t6:performTransaction(p17, s3)
+end
+function t2.transformDocument(_, p19) -- line: 281
+	return p19
+end
+function t2.identify(_, _) -- line: 285
+end
+function t2.gc(_) -- line: 289
+	return {}
+end
+function t2.modify(_, _) -- line: 293
+	return false
+end
+function t2.transformForLink(_, p26) -- line: 297
+	return p26
+end
+function t2.readQuery(t7: {[any]: any}, p27, b2: boolean?) -- line: 301
+	-- upvalues: Object (copy), Boolean (copy)
+	if b2 == nil then
+		b2 = not not p27.optimistic
+	end
+
+	return t7:read(Object.assign(table.clone(p27), {
+		rootId = Boolean.toJSBoolean(p27.id) and p27.id or "ROOT_QUERY",
+		optimistic = b2
+	}))
+end
+function t2.readFragment(t8: {[any]: any}, p28, b3: boolean?) -- line: 320
+	-- upvalues: Object (copy)
+	if b3 == nil then
+		b3 = not not p28.optimistic
+	end
+
+	return t8:read(Object.assign({}, p28, {
+		query = t8.getFragmentDoc(p28.fragment, p28.fragmentName),
+		rootId = p28.id,
+		optimistic = b3
+	}))
+end
+function t2.writeQuery(p29, p30) -- line: 338
+	-- upvalues: Object (copy)
+	local id = p30.id
+	local data = p30.data
+	local v56 = Object.assign(table.clone(p30), {
+		id = Object.None,
+		data = Object.None
+	})
+
+	return p29:write(Object.assign(v56, {
+		dataId = id or "ROOT_QUERY",
+		result = data
+	}))
+end
+function t2.writeFragment(p31, p32) -- line: 350
+	-- upvalues: Object (copy)
+	local id = p32.id
+	local data = p32.data
+	local fragment = p32.fragment
+	local fragmentName = p32.fragmentName
+	local v63 = Object.assign(table.clone(p32), {
+		id = Object.None,
+		data = Object.None,
+		fragment = Object.None,
+		fragmentName = Object.None
+	})
+
+	return p31:write(Object.assign(v63, {
+		query = p31.getFragmentDoc(fragment, fragmentName),
+		dataId = id,
+		result = data
+	}))
+end
+
+t1.ApolloCache = t2
+
+return t1

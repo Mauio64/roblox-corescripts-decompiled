@@ -1,4 +1,5 @@
-game:DefineFastString("ProfileQRCodeFriendRequestAlertsLayer", "ProfileQRCodeFriendRequestAlertsLayer");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("ProfileQRCodeFriendRequestAlertsLayer");
-end;
+game:DefineFastString("ProfileQRCodeFriendRequestAlertsLayer", "ProfileQRCodeFriendRequestAlertsLayer")
+
+return function() -- line: 3
+	return game:GetFastString("ProfileQRCodeFriendRequestAlertsLayer")
+end

@@ -1,18 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Lumberyak).Logger.new(nil, "Logger");
-local v2 = game:DefineFastString("DebugLuaLogLevel", "");
-local v3 = v1.Levels.fromString(v2);
-local v4 = game:DefineFastString("DebugLuaLogPattern", "");
-v1:setContext({
-    prefix = "[{loggerName}] - "
-});
-v1:addSink({
-    maxLevel = v3, 
-    log = function(_, v6, _) --[[ Line: 14 ]] --[[ Name: log ]]
-        -- upvalues: v4 (copy)
-        if string.match(v6, v4) then
-            print(v6);
-        end;
-    end
-});
-return v1;
+local ParentParent = script.Parent.Parent
+local v2 = require(ParentParent.Lumberyak).Logger.new(nil, "Logger")
+local v3 = game:DefineFastString("DebugLuaLogLevel", "")
+local v4 = v2.Levels.fromString(v3)
+local v5 = game:DefineFastString("DebugLuaLogPattern", "")
+
+v2:setContext({
+	prefix = "[{loggerName}] - "
+})
+v2:addSink({
+	maxLevel = v4,
+	log = function(_, p2, _) -- line: 14
+		-- upvalues: v5 (copy)
+		if string.match(p2, v5) then
+			print(p2)
+		end
+	end
+})
+
+return v2

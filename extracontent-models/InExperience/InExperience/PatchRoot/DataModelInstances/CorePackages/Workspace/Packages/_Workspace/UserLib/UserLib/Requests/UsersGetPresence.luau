@@ -1,19 +1,24 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script:FindFirstAncestor("UserLib").Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v3, v4) --[[ Line: 9 ]]
-    -- upvalues: l_HttpService_0 (copy), l_Url_0 (copy)
-    local v5 = {};
-    for _, v7 in pairs(v4) do
-        local v8 = tonumber(v7);
-        if v8 then
-            table.insert(v5, v8);
-        end;
-    end;
-    local v9 = l_HttpService_0:JSONEncode({
-        userIds = v5
-    });
-    return v3(string.format("%s/presence/users", l_Url_0.PRESENCE_URL), "POST", {
-        postBody = v9
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local Parent = script:FindFirstAncestor("UserLib").Parent
+local Url = require(Parent.Http).Url
+
+return function(p1, p2) -- line: 9
+	-- upvalues: HttpService (copy), Url (copy)
+	local t1 = {}
+
+	for _, v in pairs(p2) do
+		local num = tonumber(v)
+
+		if num then
+			table.insert(t1, num)
+		end
+	end
+
+	local json = HttpService:JSONEncode({
+		userIds = t1
+	})
+
+	return p1(string.format("%s/presence/users", Url.PRESENCE_URL), "POST", {
+		postBody = json
+	})
+end

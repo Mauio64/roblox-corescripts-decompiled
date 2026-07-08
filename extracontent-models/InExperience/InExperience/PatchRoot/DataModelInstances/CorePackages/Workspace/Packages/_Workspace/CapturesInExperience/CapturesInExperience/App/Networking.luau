@@ -1,32 +1,39 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuaSocialLibrariesDeps);
-local v3 = require(l_Parent_1.Lumberyak);
-local v4 = require(l_Parent_1.ShareLinksNetworking);
-local v5 = require(l_Parent_1.ShareLinksRodux);
-local l_httpRequest_0 = v2.httpRequest;
-local l_RoduxNetworking_0 = v2.RoduxNetworking;
-local v8 = require(l_Parent_0.Constants);
-local v9 = v3.Logger.new(nil, v8.LoggerKey);
-local v13 = l_httpRequest_0.config({
-    requestFunction = function(v10, v11, v12) --[[ Line: 17 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v9 (copy), l_httpRequest_0 (copy)
-        v9:debug((("Request: [ requestMethod = %*, url = %* ]"):format(v11, v10)));
-        return l_httpRequest_0.requestFunctions.HttpRbxApi(v10, v11, v12);
-    end, 
-    maxRetryCount = game:DefineFastInt("CapturesMaxHttpRequestRetries", 2), 
-    maxWaitTime = game:DefineFastInt("CapturesMaxHttpRequestWaitTime", 8)
-});
-local v14 = l_RoduxNetworking_0.config({
-    keyPath = "NetworkStatus", 
-    networkImpl = v13
-});
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuaSocialLibrariesDeps = require(ParentParentParent.LuaSocialLibrariesDeps)
+local Lumberyak = require(ParentParentParent.Lumberyak)
+local ContentSharingNetworking = require(ParentParentParent.ContentSharingNetworking)
+local ShareLinksNetworking = require(ParentParentParent.ShareLinksNetworking)
+local ShareLinksRodux = require(ParentParentParent.ShareLinksRodux)
+local FFlagCreateMomentsToast = require(ParentParent.Flags.FFlagCreateMomentsToast)
+local httpRequest = LuaSocialLibrariesDeps.httpRequest
+local RoduxNetworking = LuaSocialLibrariesDeps.RoduxNetworking
+local Constants = require(ParentParent.Constants)
+local v12 = Lumberyak.Logger.new(nil, Constants.LoggerKey)
+local v13 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 19
+		-- upvalues: v12 (copy), httpRequest (copy)
+		v12:debug(`Request: [ requestMethod = { p2 }, url = { p1 } ]`)
+
+		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	maxRetryCount = game:DefineFastInt("CapturesMaxHttpRequestRetries", 2),
+	maxWaitTime = game:DefineFastInt("CapturesMaxHttpRequestWaitTime", 8)
+})
+local v14 = RoduxNetworking.config({
+	keyPath = "NetworkStatus",
+	networkImpl = v13
+})
+
 return {
-    RoduxNetworking = v14, 
-    ShareLinksNetworking = v4.config({
-        roduxNetworking = v14
-    }), 
-    ShareLinksRodux = v5.config({
-        keyPath = "ShareLinks"
-    })
-};
+	RoduxNetworking = v14,
+	ContentSharingNetworking = if not FFlagCreateMomentsToast then nil else ContentSharingNetworking.config({
+		roduxNetworking = v14
+	}),
+	ShareLinksNetworking = ShareLinksNetworking.config({
+		roduxNetworking = v14
+	}),
+	ShareLinksRodux = ShareLinksRodux.config({
+		keyPath = "ShareLinks"
+	})
+}

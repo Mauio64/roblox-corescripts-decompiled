@@ -1,34 +1,38 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v1.Roact;
-local l_t_0 = v1.t;
-local l_UIBlox_0 = v1.UIBlox;
-local l_Parent_0 = script.Parent.Parent;
-local v6 = require(l_Parent_0.Resources.Assets);
-local v7 = require(l_Parent_0.GlobalConfig);
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v9 = {
-    [Enum.UserInputType.MouseButton1] = v6.Images.Mouse1Press, 
-    [Enum.UserInputType.MouseButton2] = v6.Images.Mouse2Press, 
-    [Enum.UserInputType.MouseWheel] = v6.Images.MouseWheelScroll
-};
-local v10 = l_t_0.strictInterface({
-    input = l_t_0.enum(Enum.UserInputType), 
-    AnchorPoint = l_t_0.optional(l_t_0.Vector2), 
-    Position = l_t_0.optional(l_t_0.UDim2), 
-    LayoutOrder = l_t_0.optional(l_t_0.integer)
-});
-return function(v11) --[[ Line: 29 ]] --[[ Name: PointerLabel ]]
-    -- upvalues: v7 (copy), v10 (copy), l_Roact_0 (copy), l_ImageSetLabel_0 (copy), v9 (copy)
-    if v7.propValidation then
-        assert(v10(v11));
-    end;
-    return l_Roact_0.createElement(l_ImageSetLabel_0, {
-        BackgroundTransparency = 1, 
-        Image = v9[v11.input], 
-        Size = UDim2.new(0, 36, 0, 36), 
-        Position = v11.Position, 
-        AnchorPoint = v11.AnchorPoint, 
-        LayoutOrder = v11.LayoutOrder
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local UIBlox = InGameMenuDependencies.UIBlox
+local ParentParent = script.Parent.Parent
+local Assets = require(ParentParent.Resources.Assets)
+local GlobalConfig = require(ParentParent.GlobalConfig)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local t1 = {
+	[Enum.UserInputType.MouseButton1] = Assets.Images.Mouse1Press,
+	[Enum.UserInputType.MouseButton2] = Assets.Images.Mouse2Press,
+	[Enum.UserInputType.MouseWheel] = Assets.Images.MouseWheelScroll
+}
+local v11 = t.strictInterface({
+	input = t.enum(Enum.UserInputType),
+	AnchorPoint = t.optional(t.Vector2),
+	Position = t.optional(t.UDim2),
+	LayoutOrder = t.optional(t.integer)
+})
+
+local function PointerLabel(p1) -- line: 29
+	-- upvalues: GlobalConfig (copy), v11 (copy), Roact (copy), ImageSetLabel (copy), t1 (copy)
+	if GlobalConfig.propValidation then
+		assert(v11(p1))
+	end
+
+	return Roact.createElement(ImageSetLabel, {
+		BackgroundTransparency = 1,
+		Image = t1[p1.input],
+		Size = UDim2.new(0, 36, 0, 36),
+		Position = p1.Position,
+		AnchorPoint = p1.AnchorPoint,
+		LayoutOrder = p1.LayoutOrder
+	})
+end
+
+return PointerLabel

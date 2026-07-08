@@ -1,218 +1,252 @@
-local v0 = {};
-local v1 = 0;
-local v2 = nil;
-local v3 = nil;
-local v4 = -1;
-local v5 = nil;
-local v6 = -1;
-local v7 = false;
-local v8 = false;
-local v9 = false;
-local v10 = false;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local l_disabledLog_0 = require(l_Parent_0.Shared).ConsolePatchingDev.disabledLog;
-v0.requestHostCallback = function(v14) --[[ Line: 28 ]]
-    -- upvalues: v2 (ref)
-    v2 = v14;
-end;
-v0.cancelHostCallback = function() --[[ Line: 32 ]]
-    -- upvalues: v2 (ref)
-    v2 = nil;
-end;
-v0.requestHostTimeout = function(v15, v16) --[[ Line: 36 ]]
-    -- upvalues: v3 (ref), v4 (ref), v1 (ref)
-    v3 = v15;
-    v4 = v1 + v16;
-end;
-v0.cancelHostTimeout = function() --[[ Line: 41 ]]
-    -- upvalues: v3 (ref), v4 (ref)
-    v3 = nil;
-    v4 = -1;
-end;
-v0.shouldYieldToHost = function() --[[ Line: 46 ]]
-    -- upvalues: v5 (ref), v6 (ref), v10 (ref), v9 (ref), v7 (ref)
-    local l_v5_0 = v5;
-    if v6 ~= -1 and l_v5_0 ~= nil and #l_v5_0 >= v6 or v10 and v9 then
-        v7 = true;
-        return true;
-    else
-        return false;
-    end;
-end;
-v0.getCurrentTime = function() --[[ Line: 65 ]]
-    -- upvalues: v1 (ref)
-    return v1;
-end;
-v0.forceFrameRate = function() --[[ Line: 69 ]]
+local t1 = {}
+local n1 = 0
+local u3 = nil
+local u4 = nil
+local n2 = -1
+local u6 = nil
+local n3 = -1
+local u8 = false
+local u9 = false
+local u10 = false
+local u11 = false
+local ParentParent = script.Parent.Parent.Parent
+local console = require(ParentParent.Shared).console
+local disabledLog = require(ParentParent.Shared).ConsolePatchingDev.disabledLog
 
-end;
-v0.reset = function() --[[ Line: 73 ]]
-    -- upvalues: v8 (ref), v1 (ref), v2 (ref), v3 (ref), v4 (ref), v5 (ref), v6 (ref), v7 (ref), v9 (ref)
-    if v8 then
-        error("Cannot reset while already flushing work.");
-    end;
-    v1 = 0;
-    v2 = nil;
-    v3 = nil;
-    v4 = -1;
-    v5 = nil;
-    v6 = -1;
-    v7 = false;
-    v8 = false;
-    v9 = false;
-end;
-v0.unstable_flushNumberOfYields = function(v18) --[[ Line: 90 ]]
-    -- upvalues: v8 (ref), v2 (ref), v6 (ref), v1 (ref), v7 (ref)
-    if v8 then
-        error("Already flushing work.");
-    end;
-    if v2 ~= nil then
-        local l_v2_0 = v2;
-        v6 = v18;
-        v8 = true;
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 100 ]]
-            -- upvalues: l_v2_0 (copy), v1 (ref), v7 (ref), v2 (ref)
-            local v20 = true;
-            repeat
-                v20 = l_v2_0(true, v1);
-            until not v20 or v7;
-            if not v20 then
-                v2 = nil;
-            end;
-        end);
-        v6 = -1;
-        v7 = false;
-        v8 = false;
-        if not l_status_0 then
-            error(l_result_0);
-        end;
-    end;
-end;
-v0.unstable_flushUntilNextPaint = function() --[[ Line: 121 ]]
-    -- upvalues: v8 (ref), v2 (ref), v10 (ref), v9 (ref), v1 (ref), v7 (ref)
-    if v8 then
-        error("Already flushing work.");
-    end;
-    if v2 ~= nil then
-        local l_v2_1 = v2;
-        v10 = true;
-        v9 = false;
-        v8 = true;
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 132 ]]
-            -- upvalues: l_v2_1 (copy), v1 (ref), v7 (ref), v2 (ref)
-            local v24 = true;
-            repeat
-                v24 = l_v2_1(true, v1);
-            until not v24 or v7;
-            if not v24 then
-                v2 = nil;
-            end;
-        end);
-        v10 = false;
-        v7 = false;
-        v8 = false;
-        if not l_status_1 then
-            error(l_result_1);
-        end;
-    end;
-end;
-v0.unstable_flushExpired = function() --[[ Line: 154 ]]
-    -- upvalues: v8 (ref), v2 (ref), v1 (ref)
-    if v8 then
-        error("Already flushing work.");
-    end;
-    if v2 ~= nil then
-        v8 = true;
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 160 ]]
-            -- upvalues: v2 (ref), v1 (ref)
-            if not v2(false, v1) then
-                v2 = nil;
-            end;
-        end);
-        v8 = false;
-        if not l_status_2 then
-            error(l_result_2);
-        end;
-    end;
-end;
-v0.unstable_flushAllWithoutAsserting = function() --[[ Line: 178 ]]
-    -- upvalues: v8 (ref), v2 (ref), v1 (ref)
-    if v8 then
-        error("Already flushing work.");
-    end;
-    if v2 ~= nil then
-        local l_v2_2 = v2;
-        v8 = true;
-        local l_status_3, l_result_3 = pcall(function() --[[ Line: 186 ]]
-            -- upvalues: l_v2_2 (copy), v1 (ref), v2 (ref)
-            local v30 = true;
-            repeat
-                v30 = l_v2_2(true, v1);
-            until not v30;
-            if not v30 then
-                v2 = nil;
-            end;
-        end);
-        v8 = false;
-        if not l_status_3 then
-            error(l_result_3);
-        end;
-        return true;
-    else
-        return false;
-    end;
-end;
-v0.unstable_clearYields = function() --[[ Line: 209 ]]
-    -- upvalues: v5 (ref)
-    if v5 == nil then
-        return {};
-    else
-        local l_v5_1 = v5;
-        v5 = nil;
-        return l_v5_1;
-    end;
-end;
-v0.unstable_flushAll = function() --[[ Line: 218 ]]
-    -- upvalues: v5 (ref), v0 (copy)
-    if v5 ~= nil then
-        error("Log is not empty. Assert on the log of yielded values before flushing additional work.");
-    end;
-    v0.unstable_flushAllWithoutAsserting();
-    if v5 ~= nil then
-        error("While flushing work, something yielded a value. Use an assertion helper to assert on the log of yielded values, e.g. expect(Scheduler).toFlushAndYield([...])");
-    end;
-end;
-v0.unstable_yieldValue = function(v34) --[[ Line: 235 ]]
-    -- upvalues: l_console_0 (copy), l_disabledLog_0 (copy), v5 (ref)
-    if l_console_0.log == l_disabledLog_0 then
-        return;
-    elseif v5 == nil then
-        v5 = {
-            v34
-        };
-        return;
-    else
-        table.insert(v5, v34);
-        return;
-    end;
-end;
-v0.unstable_advanceTime = function(v35) --[[ Line: 252 ]]
-    -- upvalues: l_console_0 (copy), l_disabledLog_0 (copy), v1 (ref), v3 (ref), v4 (ref)
-    if l_console_0.log == l_disabledLog_0 then
-        return;
-    else
-        v1 = v1 + v35;
-        if v3 ~= nil and v4 <= v1 then
-            v3(v1);
-            v4 = -1;
-            v3 = nil;
-        end;
-        return;
-    end;
-end;
-v0.requestPaint = function() --[[ Line: 271 ]]
-    -- upvalues: v9 (ref)
-    v9 = true;
-end;
-return v0;
+function t1.requestHostCallback(p1: ((...any) -> ...any)) -- line: 28
+	-- upvalues: u3 (ref)
+	u3 = p1
+end
+function t1.cancelHostCallback() -- line: 32
+	-- upvalues: u3 (ref)
+	u3 = nil
+end
+function t1.requestHostTimeout(p2: ((...any) -> ...any), n4: number) -- line: 36
+	-- upvalues: u4 (ref), n2 (ref), n1 (ref)
+	u4 = p2
+	n2 = n1 + n4
+end
+function t1.cancelHostTimeout() -- line: 41
+	-- upvalues: u4 (ref), n2 (ref)
+	u4 = nil
+	n2 = -1
+end
+function t1.shouldYieldToHost() -- line: 46
+	-- upvalues: u6 (ref), n3 (ref), u11 (ref), u10 (ref), u8 (ref)
+	local v18 = u6
+
+	if n3 ~= -1 and (v18 ~= nil and #v18 >= n3) or u11 and u10 then
+		u8 = true
+
+		return true
+	end
+
+	return false
+end
+function t1.getCurrentTime() -- line: 65
+	-- upvalues: n1 (ref)
+	return n1
+end
+function t1.forceFrameRate() -- line: 69
+end
+function t1.reset() -- line: 73
+	-- upvalues: u9 (ref), n1 (ref), u3 (ref), u4 (ref), n2 (ref), u6 (ref), n3 (ref), u8 (ref), u10 (ref)
+	if u9 then
+		error("Cannot reset while already flushing work.")
+	end
+
+	n1 = 0
+	u3 = nil
+	u4 = nil
+	n2 = -1
+	u6 = nil
+	n3 = -1
+	u8 = false
+	u9 = false
+	u10 = false
+end
+function t1.unstable_flushNumberOfYields(n5: number) -- line: 90
+	-- upvalues: u9 (ref), u3 (ref), n3 (ref), n1 (ref), u8 (ref)
+	if u9 then
+		error("Already flushing work.")
+	end
+
+	if u3 ~= nil then
+		local v20 = u3
+
+		n3 = n5
+		u9 = true
+
+		local ok, result = pcall(function() -- line: 100
+			-- upvalues: v20 (copy), n1 (ref), u8 (ref), u3 (ref)
+			local v34
+
+			repeat
+				v34 = v20(true, n1)
+			until not v34 or u8
+
+			if not v34 then
+				u3 = nil
+			end
+		end)
+
+		n3 = -1
+		u8 = false
+		u9 = false
+
+		if not ok then
+			error(result)
+		end
+	end
+end
+function t1.unstable_flushUntilNextPaint() -- line: 121
+	-- upvalues: u9 (ref), u3 (ref), u11 (ref), u10 (ref), n1 (ref), u8 (ref)
+	if u9 then
+		error("Already flushing work.")
+	end
+
+	if u3 ~= nil then
+		local v23 = u3
+
+		u11 = true
+		u10 = false
+		u9 = true
+
+		local ok, result = pcall(function() -- line: 132
+			-- upvalues: v23 (copy), n1 (ref), u8 (ref), u3 (ref)
+			local v35
+
+			repeat
+				v35 = v23(true, n1)
+			until not v35 or u8
+
+			if not v35 then
+				u3 = nil
+			end
+		end)
+
+		u11 = false
+		u8 = false
+		u9 = false
+
+		if not ok then
+			error(result)
+		end
+	end
+end
+function t1.unstable_flushExpired() -- line: 154
+	-- upvalues: u9 (ref), u3 (ref), n1 (ref)
+	if u9 then
+		error("Already flushing work.")
+	end
+
+	if u3 ~= nil then
+		u9 = true
+
+		local ok, result = pcall(function() -- line: 160
+			-- upvalues: u3 (ref), n1 (ref)
+			if not u3(false, n1) then
+				u3 = nil
+			end
+		end)
+
+		u9 = false
+
+		if not ok then
+			error(result)
+		end
+	end
+end
+function t1.unstable_flushAllWithoutAsserting() -- line: 178
+	-- upvalues: u9 (ref), u3 (ref), n1 (ref)
+	if u9 then
+		error("Already flushing work.")
+	end
+
+	if u3 ~= nil then
+		local v28 = u3
+
+		u9 = true
+
+		local ok, result = pcall(function() -- line: 186
+			-- upvalues: v28 (copy), n1 (ref), u3 (ref)
+			local v36
+
+			repeat
+				v36 = v28(true, n1)
+			until not v36
+
+			if not v36 then
+				u3 = nil
+			end
+		end)
+
+		u9 = false
+
+		if not ok then
+			error(result)
+		end
+
+		return true
+	end
+
+	return false
+end
+function t1.unstable_clearYields() -- line: 209
+	-- upvalues: u6 (ref)
+	if u6 == nil then
+		return {}
+	end
+
+	local v31 = u6
+
+	u6 = nil
+
+	return v31
+end
+function t1.unstable_flushAll() -- line: 218
+	-- upvalues: u6 (ref), t1 (copy)
+	if u6 ~= nil then
+		error("Log is not empty. Assert on the log of yielded values before flushing additional work.")
+	end
+
+	t1.unstable_flushAllWithoutAsserting()
+
+	if u6 ~= nil then
+		error("While flushing work, something yielded a value. Use an assertion helper to assert on the log of yielded values, e.g. expect(Scheduler).toFlushAndYield([...])")
+	end
+end
+function t1.unstable_yieldValue(p3) -- line: 235
+	-- upvalues: console (copy), disabledLog (copy), u6 (ref)
+	if console.log == disabledLog then
+		return
+	end
+
+	if u6 == nil then
+		u6 = { p3 }
+
+		return
+	end
+
+	table.insert(u6, p3)
+end
+function t1.unstable_advanceTime(n6: number) -- line: 252
+	-- upvalues: console (copy), disabledLog (copy), n1 (ref), u4 (ref), n2 (ref)
+	if console.log == disabledLog then
+		return
+	end
+
+	n1 += n6
+
+	if u4 ~= nil and n2 <= n1 then
+		u4(n1)
+		n2 = -1
+		u4 = nil
+	end
+end
+function t1.requestPaint() -- line: 271
+	-- upvalues: u10 (ref)
+	u10 = true
+end
+
+return t1

@@ -1,159 +1,163 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_useTextSizeOffset_0 = v3.Core.Style.useTextSizeOffset;
-local v6 = require(l_script_FirstAncestor_0.Contexts.ChatPagePadding.useChatPagePadding);
-local v7 = require(l_Parent_0.Foundation);
-local v8 = require(script.Parent.Utils.getBoldTextTheme);
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v3.Core.ImageSet.ImageSetLabel;
-local l_IconSize_0 = v3.App.Constant.IconSize;
-local v12 = require(l_script_FirstAncestor_0.Flags.FFlagDebugAppChatEnableDomLocators);
-local v13 = l_Images_0["icons/navigation/pushRight"];
-CustomConversationListEntry = function(v14) --[[ Line: 31 ]] --[[ Name: CustomConversationListEntry ]]
-    -- upvalues: l_useStyle_0 (copy), v8 (copy), l_useTextSizeOffset_0 (copy), v6 (copy), l_IconSize_0 (copy), v7 (copy), v2 (copy), v12 (copy), l_ImageSetLabel_0 (copy), v13 (copy)
-    local v15 = l_useStyle_0();
-    local v16 = v8(v15);
-    local v17 = l_useTextSizeOffset_0();
-    local v18 = v6();
-    local l_onActivated_0 = v14.onActivated;
-    local l_titleText_0 = v14.titleText;
-    local l_Font_0 = v16.Font.Header2.Font;
-    local l_Transparency_0 = v16.Theme.TextEmphasis.Transparency;
-    local l_Color_0 = v16.Theme.TextEmphasis.Color;
-    local v24 = v16.Font.Header2.RelativeSize * v16.Font.BaseSize;
-    local v25 = v24 + v17;
-    local l_subTitleText_0 = v14.subTitleText;
-    local l_Font_1 = v15.Font.CaptionBody.Font;
-    local l_Transparency_1 = v15.Theme.TextDefault.Transparency;
-    local l_Color_1 = v15.Theme.TextDefault.Color;
-    local v30 = v15.Font.CaptionBody.RelativeSize * v15.Font.BaseSize;
-    local v31 = v30 + v17;
-    local v32 = l_IconSize_0.Regular + 12;
-    local v33 = 60 - (60 - l_IconSize_0.Regular) / 2;
-    local l_View_0 = v7.View;
-    return v2.createElement(l_View_0, {
-        Size = UDim2.new(1, 0, 0, v14.entryHeight), 
-        BackgroundColor3 = v15.Theme.BackgroundDefault.Color, 
-        BackgroundTransparency = v15.Theme.BackgroundDefault.Transparency, 
-        onActivated = l_onActivated_0, 
-        testId = if v12 then v14.testId else nil
-    }, {
-        leftAlign = v2.createElement("Frame", {
-            Size = UDim2.new(1, -v32, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            padding = v2.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v18.left)
-            }), 
-            layout = v2.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            iconHolder = v2.createElement("Frame", {
-                Size = UDim2.new(0, v33, 1, 0), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 0
-            }, {
-                layout = v2.createElement("UIListLayout", {
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left
-                }), 
-                icon = v2.createElement(l_ImageSetLabel_0, {
-                    BackgroundColor3 = v16.Theme.BackgroundUIDefault.Color, 
-                    BackgroundTransparency = v16.Theme.BackgroundUIDefault.Transparency, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.new(0, l_IconSize_0.Regular, 0, l_IconSize_0.Regular), 
-                    ScaleType = Enum.ScaleType.Stretch, 
-                    Image = v14.entryIcon, 
-                    ImageColor3 = v15.Theme.IconEmphasis.Color, 
-                    ImageTransparency = v15.Theme.IconEmphasis.Transparency
-                }, {
-                    corner = v2.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 8)
-                    })
-                })
-            }), 
-            centerContent = v2.createElement("Frame", {
-                Size = UDim2.new(1, -60, 1, 0), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }, {
-                layout = v2.createElement("UIListLayout", {
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, 2)
-                }), 
-                title = v2.createElement("TextLabel", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, v25), 
-                    TextSize = v24, 
-                    TextColor3 = l_Color_0, 
-                    TextTransparency = l_Transparency_0, 
-                    Font = l_Font_0, 
-                    Text = l_titleText_0 or "", 
-                    TextTruncate = Enum.TextTruncate.AtEnd, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    LayoutOrder = 1
-                }), 
-                subTitle = v2.createElement("TextLabel", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, v31), 
-                    TextSize = v30, 
-                    TextColor3 = l_Color_1, 
-                    TextTransparency = l_Transparency_1, 
-                    Font = l_Font_1, 
-                    Text = l_subTitleText_0, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextTruncate = Enum.TextTruncate.AtEnd, 
-                    LayoutOrder = 2
-                })
-            })
-        }), 
-        rightAlign = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            layout = v2.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            padding = v2.createElement("UIPadding", {
-                PaddingRight = UDim.new(0, v18.right)
-            }), 
-            icon = v2.createElement(l_ImageSetLabel_0, {
-                LayoutOrder = 0, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, l_IconSize_0.Regular, 0, l_IconSize_0.Regular), 
-                ScaleType = Enum.ScaleType.Stretch, 
-                Image = v13, 
-                ImageColor3 = v15.Theme.IconEmphasis.Color, 
-                ImageTransparency = v15.Theme.IconEmphasis.Transparency
-            })
-        }), 
-        divider = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            layout = v2.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right
-            }), 
-            divider = v2.createElement("Frame", {
-                BackgroundTransparency = v15.Theme.Divider.Transparency, 
-                BackgroundColor3 = v15.Theme.Divider.Color, 
-                BorderSizePixel = 0, 
-                Size = UDim2.new(1, -v33, 0, 1)
-            })
-        })
-    });
-end;
-return CustomConversationListEntry;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local UIBlox = require(AppChatParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
+local Foundation = require(AppChatParent.Foundation)
+local getBoldTextTheme = require(script.Parent.Utils.getBoldTextTheme)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local IconSize = UIBlox.App.Constant.IconSize
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+local FFlagAppChatRemoveConversationListDivider = require(AppChat.Flags.FFlagAppChatRemoveConversationListDivider)
+local v15 = Images["icons/navigation/pushRight"]
+
+function CustomConversationListEntry(t1: {[any]: any}) -- line: 32
+	-- upvalues: useStyle (copy), getBoldTextTheme (copy), useTextSizeOffset (copy), useChatPagePadding (copy), IconSize (copy), Foundation (copy), React (copy), FFlagDebugAppChatEnableDomLocators (copy), ImageSetLabel (copy), v15 (copy), FFlagAppChatRemoveConversationListDivider (copy)
+	local v17 = useStyle()
+	local v18 = getBoldTextTheme(v17)
+	local v19 = useTextSizeOffset()
+	local v20 = useChatPagePadding()
+	local onActivated = t1.onActivated
+	local titleText = t1.titleText
+	local Header2Font = v18.Font.Header2.Font
+	local TextEmphasisTransparency = v18.Theme.TextEmphasis.Transparency
+	local TextEmphasisColor = v18.Theme.TextEmphasis.Color
+	local v26 = v18.Font.Header2.RelativeSize * v18.Font.BaseSize
+	local v27 = v26 + v19
+	local subTitleText = t1.subTitleText
+	local CaptionBodyFont = v17.Font.CaptionBody.Font
+	local TextDefaultTransparency = v17.Theme.TextDefault.Transparency
+	local TextDefaultColor = v17.Theme.TextDefault.Color
+	local v32 = v17.Font.CaptionBody.RelativeSize * v17.Font.BaseSize
+	local v33 = v32 + v19
+	local v34 = IconSize.Regular + 12
+	local v35 = 60 - (60 - IconSize.Regular) / 2
+	local View = Foundation.View
+
+	return React.createElement(View, {
+		Size = UDim2.new(1, 0, 0, t1.entryHeight),
+		BackgroundColor3 = v17.Theme.BackgroundDefault.Color,
+		BackgroundTransparency = v17.Theme.BackgroundDefault.Transparency,
+		onActivated = onActivated,
+		testId = if not FFlagDebugAppChatEnableDomLocators then nil else t1.testId
+	}, {
+		leftAlign = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -v34, 1, 0)
+		}, {
+			padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v20.left)
+			}),
+			layout = React.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			iconHolder = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 0,
+				Size = UDim2.new(0, v35, 1, 0)
+			}, {
+				layout = React.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left
+				}),
+				icon = React.createElement(ImageSetLabel, {
+					BorderSizePixel = 0,
+					BackgroundColor3 = v18.Theme.BackgroundUIDefault.Color,
+					BackgroundTransparency = v18.Theme.BackgroundUIDefault.Transparency,
+					Size = UDim2.new(0, IconSize.Regular, 0, IconSize.Regular),
+					ScaleType = Enum.ScaleType.Stretch,
+					Image = t1.entryIcon,
+					ImageColor3 = v17.Theme.IconEmphasis.Color,
+					ImageTransparency = v17.Theme.IconEmphasis.Transparency
+				}, {
+					corner = React.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 8)
+					})
+				})
+			}),
+			centerContent = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, -60, 1, 0)
+			}, {
+				layout = React.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 2)
+				}),
+				title = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, v27),
+					TextSize = v26,
+					TextColor3 = TextEmphasisColor,
+					TextTransparency = TextEmphasisTransparency,
+					Font = Header2Font,
+					Text = titleText or "",
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}),
+				subTitle = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, v33),
+					TextSize = v32,
+					TextColor3 = TextDefaultColor,
+					TextTransparency = TextDefaultTransparency,
+					Font = CaptionBodyFont,
+					Text = subTitleText,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextTruncate = Enum.TextTruncate.AtEnd
+				})
+			})
+		}),
+		rightAlign = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			layout = React.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			padding = React.createElement("UIPadding", {
+				PaddingRight = UDim.new(0, v20.right)
+			}),
+			icon = React.createElement(ImageSetLabel, {
+				LayoutOrder = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, IconSize.Regular, 0, IconSize.Regular),
+				ScaleType = Enum.ScaleType.Stretch,
+				Image = v15,
+				ImageColor3 = v17.Theme.IconEmphasis.Color,
+				ImageTransparency = v17.Theme.IconEmphasis.Transparency
+			})
+		}),
+		divider = if FFlagAppChatRemoveConversationListDivider then nil else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			layout = React.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right
+			}),
+			divider = React.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = v17.Theme.Divider.Transparency,
+				BackgroundColor3 = v17.Theme.Divider.Color,
+				Size = UDim2.new(1, -v35, 0, 1)
+			})
+		})
+	})
+end
+
+return CustomConversationListEntry

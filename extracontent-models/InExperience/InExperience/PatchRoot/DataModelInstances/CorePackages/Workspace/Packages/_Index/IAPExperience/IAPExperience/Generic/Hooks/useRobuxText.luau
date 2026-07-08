@@ -1,20 +1,23 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Utility.formatNumber);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v5 = require(l_Parent_1.Foundation);
-local l_Enums_0 = v5.Enums;
-local l_getIconRichText_0 = v5.Utility.getIconRichText;
-useRobuxText = function(v8) --[[ Line: 10 ]] --[[ Name: useRobuxText ]]
-    -- upvalues: v2 (copy), v3 (copy), l_LocalizationService_0 (copy), l_getIconRichText_0 (copy), l_Enums_0 (copy)
-    return (v2.useMemo(function() --[[ Line: 11 ]]
-        -- upvalues: v3 (ref), l_LocalizationService_0 (ref), v8 (copy), l_getIconRichText_0 (ref), l_Enums_0 (ref)
-        local v9 = v3(l_LocalizationService_0.RobloxLocaleId, v8 or 0);
-        return (("%* %*"):format(l_getIconRichText_0(l_Enums_0.IconName.Robux), v9));
-    end, {
-        v8, 
-        l_LocalizationService_0.RobloxLocaleId
-    }));
-end;
-return useRobuxText;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local formatNumber = require(ParentParent.Utility.formatNumber)
+local LocalizationService = game:GetService("LocalizationService")
+local Foundation = require(ParentParentParent.Foundation)
+local Enums = Foundation.Enums
+local getIconRichText = Foundation.Utility.getIconRichText
+
+function useRobuxText(n1: number?) -- line: 10
+	-- upvalues: React (copy), formatNumber (copy), LocalizationService (copy), getIconRichText (copy), Enums (copy)
+	return (React.useMemo(function() -- line: 11
+		-- upvalues: formatNumber (copy), LocalizationService (copy), n1 (copy), getIconRichText (copy), Enums (copy)
+		local v10 = formatNumber(LocalizationService.RobloxLocaleId, n1 or 0)
+
+		return `{ getIconRichText(Enums.IconName.Robux) } { v10 }`
+	end, {
+		n1,
+		LocalizationService.RobloxLocaleId
+	}))
+end
+
+return useRobuxText

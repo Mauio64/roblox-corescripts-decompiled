@@ -1,361 +1,366 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Promise);
-local l_PlayabilityStatusEnum_0 = require(l_CorePackages_0.Workspace.Packages.DiscoveryTypes).PlayabilityStatusEnum;
-local v4 = {
-    [1] = {
-        id = 100425207, 
-        name = "Reinforced Wizard", 
-        assetType = {
-            id = 8, 
-            name = "Hat"
-        }
-    }, 
-    [2] = {
-        id = 2510238627, 
-        name = "Rthro Run", 
-        assetType = {
-            id = 53, 
-            name = "Run Animation"
-        }
-    }, 
-    [3] = {
-        id = 2807164805, 
-        name = "Mech Golem - Head", 
-        assetType = {
-            id = 17, 
-            name = "Head"
-        }
-    }
-};
-local v5 = {
-    data = {
-        [1] = {
-            id = 451, 
-            name = "test name", 
-            description = "test description", 
-            bundleType = "testBundleType", 
-            items = {
-                [1] = {
-                    owned = false, 
-                    id = 2510230574, 
-                    name = "test asset name"
-                }, 
-                [2] = {
-                    owned = false, 
-                    id = 2510233257, 
-                    name = "test asset name 2"
-                }, 
-                [3] = {
-                    owned = false, 
-                    type = "UserOutfit", 
-                    id = 2510233258, 
-                    name = "Outfit"
-                }
-            }, 
-            creator = {
-                id = 1, 
-                name = "test creator name"
-            }, 
-            product = {
-                id = 480872498, 
-                isForSale = true, 
-                priceInRobux = 250
-            }
-        }
-    }
-};
-local l_HumanoidDescription_0 = Instance.new("HumanoidDescription");
-l_HumanoidDescription_0.HatAccessory = 1;
-l_HumanoidDescription_0.LeftArm = 2;
-l_HumanoidDescription_0.ClimbAnimation = 3;
-l_HumanoidDescription_0.BodyTypeScale = 0.3;
-l_HumanoidDescription_0.LeftLegColor = Color3.new(0, 0, 0);
-l_HumanoidDescription_0.GraphicTShirt = 4;
-local l_HumanoidDescription_1 = Instance.new("HumanoidDescription");
-l_HumanoidDescription_1:SetEmotes({
-    Wave = {
-        1
-    }, 
-    Laugh = {
-        2
-    }, 
-    Cheer = {
-        3
-    }
-});
-local l_HumanoidDescription_2 = Instance.new("HumanoidDescription");
-local v9 = {
-    assetId = 123, 
-    userId = 401784814, 
-    created = ""
-};
-local v10 = {
-    Name = "test name", 
-    Description = "test description", 
-    PriceInRobux = 100, 
-    Creator = {
-        Id = 1, 
-        Name = "TEST CREATOR"
-    }, 
-    AssetId = 100425207, 
-    AssetTypeId = 8, 
-    ProductId = 18929548
-};
-local v11 = {
-    Owned = true, 
-    IsPurchasable = false, 
-    Id = 100425207, 
-    ItemType = "Asset"
-};
-local v12 = {
-    purchasable = false, 
-    reason = "InsufficientFunds", 
-    price = 200, 
-    assetId = 10
-};
-local v13 = {
-    playabilityStatus = l_PlayabilityStatusEnum_0.Playable, 
-    universeId = 13, 
-    isPlayable = true
-};
-local v14 = {
-    name = "fakename", 
-    id = 13, 
-    rootPlaceId = 17
-};
-local function v17(v15) --[[ Line: 145 ]] --[[ Name: getRobloxProductInfo ]]
-    -- upvalues: v1 (copy), v10 (copy), v2 (copy)
-    local v16 = v1.Dictionary.join(v10, {
-        AssetId = v15
-    });
-    return v2.resolve(v16);
-end;
-local function v20(v18) --[[ Line: 150 ]] --[[ Name: getProductInfo ]]
-    -- upvalues: v1 (copy), v10 (copy), v2 (copy)
-    local v19 = v1.Dictionary.join(v10, {
-        AssetId = v18
-    });
-    v19.Creator.Id = 2;
-    return v2.resolve(v19);
-end;
-local function v24(v21, v22) --[[ Line: 156 ]] --[[ Name: getItemDetails ]]
-    -- upvalues: v1 (copy), v11 (copy), v2 (copy)
-    local v23 = v1.Dictionary.join(v11, {
-        Id = v21, 
-        ItemType = v22
-    });
-    return v2.resolve(v23);
-end;
-local function v29(v25) --[[ Line: 161 ]] --[[ Name: getBatchItemDetails ]]
-    -- upvalues: v1 (copy), v11 (copy), v2 (copy)
-    local v26 = {};
-    for _, v28 in ipairs(v25) do
-        table.insert(v26, v1.Dictionary.join(v11, {
-            Id = v28
-        }));
-    end;
-    return v2.resolve(v26);
-end;
-local v30 = {
-    data = {
-        {
-            assetId = 17, 
-            creatingUniverseId = 13
-        }
-    }
-};
-local function v33(v31) --[[ Line: 183 ]] --[[ Name: getVersionInfo ]]
-    -- upvalues: v1 (copy), v30 (copy), v2 (copy)
-    local v32 = v1.Dictionary.join(v30, {
-        AssetId = v31
-    });
-    return v2.resolve(v32);
-end;
-local function v36(v34) --[[ Line: 188 ]] --[[ Name: getExperiencePlayability ]]
-    -- upvalues: v1 (copy), v13 (copy), v2 (copy)
-    local v35 = v1.Dictionary.join(v13, {
-        universeId = v34
-    });
-    return v2.resolve({
-        v35
-    });
-end;
-local function v39(v37) --[[ Line: 193 ]] --[[ Name: getExperienceInfo ]]
-    -- upvalues: v1 (copy), v14 (copy), v2 (copy)
-    local v38 = v1.Dictionary.join(v14, {
-        id = v37
-    });
-    return v2.resolve({
-        data = {
-            v38
-        }
-    });
-end;
-local function v41(_) --[[ Line: 198 ]] --[[ Name: getAssetBundles ]]
-    -- upvalues: v2 (copy), v5 (copy)
-    return v2.resolve(v5);
-end;
-local function v43(_) --[[ Line: 202 ]] --[[ Name: getPlayerName ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve("TEST");
-end;
-local function v45(_) --[[ Line: 206 ]] --[[ Name: createFavoriteForAsset ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve();
-end;
-local function v47(_) --[[ Line: 210 ]] --[[ Name: createFavoriteForBundle ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve();
-end;
-local function v49(_) --[[ Line: 214 ]] --[[ Name: deleteFavoriteForAsset ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve();
-end;
-local function v51(_) --[[ Line: 218 ]] --[[ Name: deleteFavoriteForBundle ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve();
-end;
-local function v53(_) --[[ Line: 222 ]] --[[ Name: getAssetFavoriteCount ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve(120);
-end;
-local function v55(_) --[[ Line: 226 ]] --[[ Name: getBundleFavoriteCount ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve(120);
-end;
-local function v57(v56) --[[ Line: 230 ]] --[[ Name: getFavoriteForAsset ]]
-    -- upvalues: v2 (copy), v9 (copy)
-    if v56 == "GetFavoriteModel" then
-        return v2.resolve(v9);
-    else
-        return v2.resolve("null");
-    end;
-end;
-local function v59(v58) --[[ Line: 238 ]] --[[ Name: getFavoriteForBundle ]]
-    -- upvalues: v2 (copy), v9 (copy)
-    if v58 == "GetFavoriteModel" then
-        return v2.resolve(v9);
-    else
-        return v2.resolve("null");
-    end;
-end;
-local function v61(_) --[[ Line: 246 ]] --[[ Name: getEconomyProductInfo ]]
-    -- upvalues: v2 (copy), v12 (copy)
-    return v2.resolve(v12);
-end;
-local function v63(_) --[[ Line: 250 ]] --[[ Name: getModelFromUserId ]]
-    -- upvalues: v2 (copy)
-    return v2.resolve();
-end;
-local function v66(_, _) --[[ Line: 254 ]] --[[ Name: networkFailure ]]
-    -- upvalues: v2 (copy)
-    return v2.reject("Failed to access network service");
-end;
-local v67 = {};
-v67.__index = v67;
-v67.new = function(v68, v69) --[[ Line: 261 ]] --[[ Name: new ]]
-    -- upvalues: v66 (copy), v20 (copy), v17 (copy), v43 (copy), v41 (copy), v45 (copy), v47 (copy), v49 (copy), v51 (copy), v53 (copy), v55 (copy), v57 (copy), v59 (copy), v61 (copy), v63 (copy), v33 (copy), v36 (copy), v39 (copy), v24 (copy), v29 (copy)
-    local v70 = nil;
-    v70 = if v68 then {
-        getProductInfo = v66, 
-        getPlayerName = v66, 
-        getAssetBundles = v66, 
-        createFavoriteForAsset = v66, 
-        createFavoriteForBundle = v66, 
-        deleteFavoriteForAsset = v66, 
-        deleteFavoriteForBundle = v66, 
-        getAssetFavoriteCount = v66, 
-        getBundleFavoriteCount = v66, 
-        getFavoriteForAsset = v66, 
-        getFavoriteForBundle = v66, 
-        getEconomyProductInfo = v66, 
-        getModelFromUserId = v66, 
-        getVersionInfo = v66, 
-        getExperiencePlayability = v66, 
-        getExperienceInfo = v66, 
-        getItemDetails = v66, 
-        getBatchItemDetails = v66
-    } else {
-        getProductInfo = v69 and v20 or v17, 
-        getPlayerName = v43, 
-        getAssetBundles = v41, 
-        createFavoriteForAsset = v45, 
-        createFavoriteForBundle = v47, 
-        deleteFavoriteForAsset = v49, 
-        deleteFavoriteForBundle = v51, 
-        getAssetFavoriteCount = v53, 
-        getBundleFavoriteCount = v55, 
-        getFavoriteForAsset = v57, 
-        getFavoriteForBundle = v59, 
-        getEconomyProductInfo = v61, 
-        getModelFromUserId = v63, 
-        getVersionInfo = v33, 
-        getExperiencePlayability = v36, 
-        getExperienceInfo = v39, 
-        getItemDetails = v24, 
-        getBatchItemDetails = v29
-    };
-    setmetatable(v70, {
-        __tostring = function() --[[ Line: 309 ]] --[[ Name: __tostring ]]
-            return "MockService(Network)";
-        end
-    });
-    return v70;
-end;
-v67.GetMockAssetData = function() --[[ Line: 317 ]] --[[ Name: GetMockAssetData ]]
-    -- upvalues: v4 (copy)
-    return v4;
-end;
-v67.GetMockHumanoidDescription = function() --[[ Line: 321 ]] --[[ Name: GetMockHumanoidDescription ]]
-    -- upvalues: l_HumanoidDescription_0 (copy)
-    return l_HumanoidDescription_0;
-end;
-v67.GetMockHumanoidDescriptionEmpty = function() --[[ Line: 325 ]] --[[ Name: GetMockHumanoidDescriptionEmpty ]]
-    -- upvalues: l_HumanoidDescription_2 (copy)
-    return l_HumanoidDescription_2;
-end;
-v67.GetMockPlayerName = function() --[[ Line: 329 ]] --[[ Name: GetMockPlayerName ]]
-    return "TEST";
-end;
-v67.GetMockAssetBundlesData = function() --[[ Line: 333 ]] --[[ Name: GetMockAssetBundlesData ]]
-    -- upvalues: v5 (copy)
-    return v5;
-end;
-v67.GetMockFavoriteCount = function() --[[ Line: 337 ]] --[[ Name: GetMockFavoriteCount ]]
-    return 120;
-end;
-v67.GetFavoriteModelId = function() --[[ Line: 341 ]] --[[ Name: GetFavoriteModelId ]]
-    return "GetFavoriteModel";
-end;
-v67.GetProductInfo = function() --[[ Line: 345 ]] --[[ Name: GetProductInfo ]]
-    -- upvalues: v10 (copy)
-    return v10;
-end;
-v67.GetEconomyProductInfo = function() --[[ Line: 349 ]] --[[ Name: GetEconomyProductInfo ]]
-    -- upvalues: v12 (copy)
-    return v12;
-end;
-v67.GetMockHumanoidDescriptionEmotes = function() --[[ Line: 353 ]] --[[ Name: GetMockHumanoidDescriptionEmotes ]]
-    -- upvalues: l_HumanoidDescription_1 (copy)
-    return l_HumanoidDescription_1;
-end;
-v67.GetVersionInfo = function() --[[ Line: 357 ]] --[[ Name: GetVersionInfo ]]
-    -- upvalues: v30 (copy)
-    return v30;
-end;
-v67.GetExperiencePlayability = function() --[[ Line: 361 ]] --[[ Name: GetExperiencePlayability ]]
-    -- upvalues: v13 (copy)
-    return {
-        v13
-    };
-end;
-v67.GetExperienceInfo = function() --[[ Line: 365 ]] --[[ Name: GetExperienceInfo ]]
-    -- upvalues: v14 (copy)
-    return {
-        data = {
-            v14
-        }
-    };
-end;
-return v67;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Promise = require(CorePackages.Packages.Promise)
+local PlayabilityStatusEnum = require(CorePackages.Workspace.Packages.DiscoveryTypes).PlayabilityStatusEnum
+local t1 = {
+	[1] = {
+		id = 100425207,
+		name = "Reinforced Wizard",
+		assetType = {
+			id = 8,
+			name = "Hat"
+		}
+	},
+	[2] = {
+		id = 2510238627,
+		name = "Rthro Run",
+		assetType = {
+			id = 53,
+			name = "Run Animation"
+		}
+	},
+	[3] = {
+		id = 2807164805,
+		name = "Mech Golem - Head",
+		assetType = {
+			id = 17,
+			name = "Head"
+		}
+	}
+}
+local t2 = {
+	data = {
+		[1] = {
+			id = 451,
+			name = "test name",
+			description = "test description",
+			bundleType = "testBundleType",
+			items = {
+				[1] = {
+					owned = false,
+					id = 2510230574,
+					name = "test asset name"
+				},
+				[2] = {
+					owned = false,
+					id = 2510233257,
+					name = "test asset name 2"
+				},
+				[3] = {
+					owned = false,
+					type = "UserOutfit",
+					id = 2510233258,
+					name = "Outfit"
+				}
+			},
+			creator = {
+				id = 1,
+				name = "test creator name"
+			},
+			product = {
+				id = 480872498,
+				isForSale = true,
+				priceInRobux = 250
+			}
+		}
+	}
+}
+local HumanoidDescription = Instance.new("HumanoidDescription")
+
+HumanoidDescription.HatAccessory = 1
+HumanoidDescription.LeftArm = 2
+HumanoidDescription.ClimbAnimation = 3
+HumanoidDescription.BodyTypeScale = 0.3
+HumanoidDescription.LeftLegColor = Color3.new(0, 0, 0)
+HumanoidDescription.GraphicTShirt = 4
+
+local HumanoidDescription2 = Instance.new("HumanoidDescription")
+
+HumanoidDescription2:SetEmotes({
+	Wave = { 1 },
+	Laugh = { 2 },
+	Cheer = { 3 }
+})
+
+local HumanoidDescription3 = Instance.new("HumanoidDescription")
+local t3 = {
+	assetId = 123,
+	userId = 401784814,
+	created = ""
+}
+local t4 = {
+	Name = "test name",
+	Description = "test description",
+	PriceInRobux = 100,
+	AssetId = 100425207,
+	AssetTypeId = 8,
+	ProductId = 18929548,
+	Creator = {
+		Id = 1,
+		Name = "TEST CREATOR"
+	}
+}
+local t5 = {
+	Owned = true,
+	IsPurchasable = false,
+	Id = 100425207,
+	ItemType = "Asset"
+}
+local t6 = {
+	purchasable = false,
+	reason = "InsufficientFunds",
+	price = 200,
+	assetId = 10
+}
+local t7 = {
+	universeId = 13,
+	isPlayable = true,
+	playabilityStatus = PlayabilityStatusEnum.Playable
+}
+local t8 = {
+	name = "fakename",
+	id = 13,
+	rootPlaceId = 17
+}
+
+local function getRobloxProductInfo(p1) -- line: 145
+	-- upvalues: Cryo (copy), t4 (copy), Promise (copy)
+	local v39 = Cryo.Dictionary.join(t4, {
+		AssetId = p1
+	})
+
+	return Promise.resolve(v39)
+end
+local function getProductInfo(p2) -- line: 150
+	-- upvalues: Cryo (copy), t4 (copy), Promise (copy)
+	local v41 = Cryo.Dictionary.join(t4, {
+		AssetId = p2
+	})
+
+	v41.Creator.Id = 2
+
+	return Promise.resolve(v41)
+end
+local function getItemDetails(p3, p4) -- line: 156
+	-- upvalues: Cryo (copy), t5 (copy), Promise (copy)
+	local v44 = Cryo.Dictionary.join(t5, {
+		Id = p3,
+		ItemType = p4
+	})
+
+	return Promise.resolve(v44)
+end
+local function getBatchItemDetails(p5) -- line: 161
+	-- upvalues: Cryo (copy), t5 (copy), Promise (copy)
+	local t9 = {}
+
+	for _, v in ipairs(p5) do
+		table.insert(t9, Cryo.Dictionary.join(t5, {
+			Id = v
+		}))
+	end
+
+	return Promise.resolve(t9)
+end
+
+local t10 = {
+	data = {{
+		assetId = 17,
+		creatingUniverseId = 13
+	}}
+}
+
+local function getVersionInfo(p6) -- line: 183
+	-- upvalues: Cryo (copy), t10 (copy), Promise (copy)
+	local v50 = Cryo.Dictionary.join(t10, {
+		AssetId = p6
+	})
+
+	return Promise.resolve(v50)
+end
+local function getExperiencePlayability(p7) -- line: 188
+	-- upvalues: Cryo (copy), t7 (copy), Promise (copy)
+	local v52 = Cryo.Dictionary.join(t7, {
+		universeId = p7
+	})
+
+	return Promise.resolve({ v52 })
+end
+local function getExperienceInfo(p8) -- line: 193
+	-- upvalues: Cryo (copy), t8 (copy), Promise (copy)
+	local v54 = Cryo.Dictionary.join(t8, {
+		id = p8
+	})
+
+	return Promise.resolve({
+		data = { v54 }
+	})
+end
+local function getAssetBundles(_) -- line: 198
+	-- upvalues: Promise (copy), t2 (copy)
+	return Promise.resolve(t2)
+end
+local function getPlayerName(_) -- line: 202
+	-- upvalues: Promise (copy)
+	return Promise.resolve("TEST")
+end
+local function createFavoriteForAsset(_) -- line: 206
+	-- upvalues: Promise (copy)
+	return Promise.resolve()
+end
+local function createFavoriteForBundle(_) -- line: 210
+	-- upvalues: Promise (copy)
+	return Promise.resolve()
+end
+local function deleteFavoriteForAsset(_) -- line: 214
+	-- upvalues: Promise (copy)
+	return Promise.resolve()
+end
+local function deleteFavoriteForBundle(_) -- line: 218
+	-- upvalues: Promise (copy)
+	return Promise.resolve()
+end
+local function getAssetFavoriteCount(_) -- line: 222
+	-- upvalues: Promise (copy)
+	return Promise.resolve(120)
+end
+local function getBundleFavoriteCount(_) -- line: 226
+	-- upvalues: Promise (copy)
+	return Promise.resolve(120)
+end
+local function getFavoriteForAsset(p17) -- line: 230
+	-- upvalues: Promise (copy), t3 (copy)
+	if p17 == "GetFavoriteModel" then
+		return Promise.resolve(t3)
+	end
+
+	return Promise.resolve("null")
+end
+local function getFavoriteForBundle(p18) -- line: 238
+	-- upvalues: Promise (copy), t3 (copy)
+	if p18 == "GetFavoriteModel" then
+		return Promise.resolve(t3)
+	end
+
+	return Promise.resolve("null")
+end
+local function getEconomyProductInfo(_) -- line: 246
+	-- upvalues: Promise (copy), t6 (copy)
+	return Promise.resolve(t6)
+end
+local function getModelFromUserId(_) -- line: 250
+	-- upvalues: Promise (copy)
+	return Promise.resolve()
+end
+local function networkFailure(_, _) -- line: 254
+	-- upvalues: Promise (copy)
+	return Promise.reject("Failed to access network service")
+end
+
+local t11 = {}
+
+t11.__index = t11
+
+function t11.new(p23, p24) -- line: 261
+	-- upvalues: networkFailure (copy), getProductInfo (copy), getRobloxProductInfo (copy), getPlayerName (copy), getAssetBundles (copy), createFavoriteForAsset (copy), createFavoriteForBundle (copy), deleteFavoriteForAsset (copy), deleteFavoriteForBundle (copy), getAssetFavoriteCount (copy), getBundleFavoriteCount (copy), getFavoriteForAsset (copy), getFavoriteForBundle (copy), getEconomyProductInfo (copy), getModelFromUserId (copy), getVersionInfo (copy), getExperiencePlayability (copy), getExperienceInfo (copy), getItemDetails (copy), getBatchItemDetails (copy)
+	local v71 = if not p23 then {
+		getProductInfo = p24 and getProductInfo or getRobloxProductInfo,
+		getPlayerName = getPlayerName,
+		getAssetBundles = getAssetBundles,
+		createFavoriteForAsset = createFavoriteForAsset,
+		createFavoriteForBundle = createFavoriteForBundle,
+		deleteFavoriteForAsset = deleteFavoriteForAsset,
+		deleteFavoriteForBundle = deleteFavoriteForBundle,
+		getAssetFavoriteCount = getAssetFavoriteCount,
+		getBundleFavoriteCount = getBundleFavoriteCount,
+		getFavoriteForAsset = getFavoriteForAsset,
+		getFavoriteForBundle = getFavoriteForBundle,
+		getEconomyProductInfo = getEconomyProductInfo,
+		getModelFromUserId = getModelFromUserId,
+		getVersionInfo = getVersionInfo,
+		getExperiencePlayability = getExperiencePlayability,
+		getExperienceInfo = getExperienceInfo,
+		getItemDetails = getItemDetails,
+		getBatchItemDetails = getBatchItemDetails
+	} else {
+		getProductInfo = networkFailure,
+		getPlayerName = networkFailure,
+		getAssetBundles = networkFailure,
+		createFavoriteForAsset = networkFailure,
+		createFavoriteForBundle = networkFailure,
+		deleteFavoriteForAsset = networkFailure,
+		deleteFavoriteForBundle = networkFailure,
+		getAssetFavoriteCount = networkFailure,
+		getBundleFavoriteCount = networkFailure,
+		getFavoriteForAsset = networkFailure,
+		getFavoriteForBundle = networkFailure,
+		getEconomyProductInfo = networkFailure,
+		getModelFromUserId = networkFailure,
+		getVersionInfo = networkFailure,
+		getExperiencePlayability = networkFailure,
+		getExperienceInfo = networkFailure,
+		getItemDetails = networkFailure,
+		getBatchItemDetails = networkFailure
+	}
+
+	setmetatable(v71, {
+		__tostring = function() -- line: 309
+			return "MockService(Network)"
+		end
+	})
+
+	return v71
+end
+function t11.GetMockAssetData() -- line: 317
+	-- upvalues: t1 (copy)
+	return t1
+end
+function t11.GetMockHumanoidDescription() -- line: 321
+	-- upvalues: HumanoidDescription (copy)
+	return HumanoidDescription
+end
+function t11.GetMockHumanoidDescriptionEmpty() -- line: 325
+	-- upvalues: HumanoidDescription3 (copy)
+	return HumanoidDescription3
+end
+function t11.GetMockPlayerName() -- line: 329
+	return "TEST"
+end
+function t11.GetMockAssetBundlesData() -- line: 333
+	-- upvalues: t2 (copy)
+	return t2
+end
+function t11.GetMockFavoriteCount() -- line: 337
+	return 120
+end
+function t11.GetFavoriteModelId() -- line: 341
+	return "GetFavoriteModel"
+end
+function t11.GetProductInfo() -- line: 345
+	-- upvalues: t4 (copy)
+	return t4
+end
+function t11.GetEconomyProductInfo() -- line: 349
+	-- upvalues: t6 (copy)
+	return t6
+end
+function t11.GetMockHumanoidDescriptionEmotes() -- line: 353
+	-- upvalues: HumanoidDescription2 (copy)
+	return HumanoidDescription2
+end
+function t11.GetVersionInfo() -- line: 357
+	-- upvalues: t10 (copy)
+	return t10
+end
+function t11.GetExperiencePlayability() -- line: 361
+	-- upvalues: t7 (copy)
+	return { t7 }
+end
+function t11.GetExperienceInfo() -- line: 365
+	-- upvalues: t8 (copy)
+	return {
+		data = { t8 }
+	}
+end
+
+return t11

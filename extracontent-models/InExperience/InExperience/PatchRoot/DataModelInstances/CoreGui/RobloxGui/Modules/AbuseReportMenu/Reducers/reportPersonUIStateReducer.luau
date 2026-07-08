@@ -1,51 +1,85 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_script_FirstAncestor_0.Components.Constants);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local l_PlayerMenuActions_0 = v2.PlayerMenuActions;
-local l_FFlagInGameMenuAddChatLineReporting_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagInGameMenuAddChatLineReporting;
-return function(v6, v7) --[[ Line: 11 ]] --[[ Name: reportPersonUIStateReducer ]]
-    -- upvalues: l_PlayerMenuActions_0 (copy), v2 (copy), l_FFlagInGameMenuAddChatLineReporting_0 (copy)
-    local v8 = table.clone(v6);
-    local l_type_0 = v7.type;
-    if l_type_0 == l_PlayerMenuActions_0.UpdateAbuseReason then
-        v8.abuseReason = v7.abuseReason;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.UpdateComment then
-        v8.comment = v7.comment;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.UpdateMethodOfAbuse then
-        v8.playerObjects = {};
-        v8.abuseReason = nil;
-        v8.methodOfAbuse = v7.methodOfAbuse;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.UpdateAbuser then
-        v8.allegedAbuserId = v7.abuseId;
-        v8.allegedAbuser = v7.abuser;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.UpdatePlayerNameMap then
-        v8.playerObjects = v7.playerObjects;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.SetVoiceEnabled then
-        v8.isVoiceEnabled = v7.enabled;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.SetMenuOpenTimestamp then
-        v8.menuOpenedUnixTimestampMilliseconds = v7.timestamp;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.ClearState then
-        return (table.clone(v2.InitPersonUIState));
-    elseif l_type_0 == l_PlayerMenuActions_0.SetShowModalSelector then
-        v8.isModalSelectorShown = v7.isShown;
-        v8.modalSelectorCellData = v7.cellData;
-        return v8;
-    elseif l_type_0 == l_PlayerMenuActions_0.SetPreselectedPlayer then
-        v8.preselectedPlayer = v7.player;
-        return v8;
-    else
-        if l_FFlagInGameMenuAddChatLineReporting_0 and l_type_0 == l_PlayerMenuActions_0.UpdatedSelectedChatAndOrderedMessages then
-            v8.selectedMessage = v7.selectedMessage;
-            v8.orderedMessages = v7.orderedMessages;
-        end;
-        return v8;
-    end;
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+require(AbuseReportMenu.Components.Types)
+
+local PlayerMenuActions = Constants.PlayerMenuActions
+local FFlagInGameMenuAddChatLineReporting = require(CorePackages.Workspace.Packages.SharedFlags).FFlagInGameMenuAddChatLineReporting
+
+local function reportPersonUIStateReducer(p1, p2) -- line: 11
+	-- upvalues: PlayerMenuActions (copy), Constants (copy), FFlagInGameMenuAddChatLineReporting (copy)
+	local v9 = table.clone(p1)
+	local type = p2.type
+
+	if type == PlayerMenuActions.UpdateAbuseReason then
+		v9.abuseReason = p2.abuseReason
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.UpdateComment then
+		v9.comment = p2.comment
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.UpdateMethodOfAbuse then
+		v9.playerObjects = {}
+		v9.abuseReason = nil
+		v9.methodOfAbuse = p2.methodOfAbuse
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.UpdateAbuser then
+		v9.allegedAbuserId = p2.abuseId
+		v9.allegedAbuser = p2.abuser
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.UpdatePlayerNameMap then
+		v9.playerObjects = p2.playerObjects
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.SetVoiceEnabled then
+		v9.isVoiceEnabled = p2.enabled
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.SetMenuOpenTimestamp then
+		v9.menuOpenedUnixTimestampMilliseconds = p2.timestamp
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.ClearState then
+		return (table.clone(Constants.InitPersonUIState))
+	end
+
+	if type == PlayerMenuActions.SetShowModalSelector then
+		v9.isModalSelectorShown = p2.isShown
+		v9.modalSelectorCellData = p2.cellData
+
+		return v9
+	end
+
+	if type == PlayerMenuActions.SetPreselectedPlayer then
+		v9.preselectedPlayer = p2.player
+
+		return v9
+	end
+
+	if FFlagInGameMenuAddChatLineReporting and type == PlayerMenuActions.UpdatedSelectedChatAndOrderedMessages then
+		v9.selectedMessage = p2.selectedMessage
+		v9.orderedMessages = p2.orderedMessages
+	end
+
+	return v9
+end
+
+return reportPersonUIStateReducer

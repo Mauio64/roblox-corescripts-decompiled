@@ -1,14 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Networking.createOrGetProfileShareUrl);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-return function() --[[ Line: 7 ]]
-    -- upvalues: l_useDispatch_0 (copy), v2 (copy)
-    local v4 = l_useDispatch_0();
-    return function() --[[ Line: 10 ]]
-        -- upvalues: v4 (copy), v2 (ref)
-        return v4(v2.API()):catch(function() --[[ Line: 11 ]]
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local createOrGetProfileShareUrl = require(ProfileQRCode.Networking.createOrGetProfileShareUrl)
+local useDispatch = require(ProfileQRCodeParent.RoactUtils).Hooks.RoactRodux.useDispatch
 
-        end);
-    end;
-end;
+return function() -- line: 7
+	-- upvalues: useDispatch (copy), createOrGetProfileShareUrl (copy)
+	local v5 = useDispatch()
+
+	return function() -- line: 10
+		-- upvalues: v5 (copy), createOrGetProfileShareUrl (copy)
+		return v5(createOrGetProfileShareUrl.API()):catch(function() -- line: 11
+		end)
+	end
+end

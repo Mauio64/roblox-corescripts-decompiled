@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagFriendsPageAlwaysOpenPPV) and game:DefineFastFlag("FriendsPageUserListEnabled_v2", false);
+return require(script.Parent.FFlagFriendsPageAlwaysOpenPPV) and game:DefineFastFlag("FriendsPageUserListEnabled_v2", false)

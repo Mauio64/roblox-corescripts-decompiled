@@ -1,16 +1,20 @@
-local v0 = {
-    new = function() --[[ Line: 4 ]] --[[ Name: new ]]
-        return {};
-    end
-};
-v0.fromJSON = function(v1) --[[ Line: 10 ]] --[[ Name: fromJSON ]]
-    -- upvalues: v0 (copy)
-    local v2 = v0.new();
-    v2.name = v1.name;
-    v2.code = v1.code;
-    v2.prefix = v1.prefix;
-    v2.localizedName = v1.localizedName;
-    v2.isDefault = v1.isDefault;
-    return v2;
-end;
-return v0;
+local t1 = {
+	new = function() -- line: 4
+		return {}
+	end
+}
+
+function t1.fromJSON(p1) -- line: 10
+	-- upvalues: t1 (copy)
+	local v3 = t1.new()
+
+	v3.name = p1.name
+	v3.code = p1.code
+	v3.prefix = p1.prefix
+	v3.localizedName = p1.localizedName
+	v3.isDefault = p1.isDefault
+
+	return v3
+end
+
+return t1

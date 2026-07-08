@@ -1,1 +1,1 @@
-return game:DefineFastInt("LuaAppEdpMediaGalleryItemVisiblePercent", 80);
+return game:DefineFastInt("LuaAppEdpMediaGalleryItemVisiblePercent", 80)

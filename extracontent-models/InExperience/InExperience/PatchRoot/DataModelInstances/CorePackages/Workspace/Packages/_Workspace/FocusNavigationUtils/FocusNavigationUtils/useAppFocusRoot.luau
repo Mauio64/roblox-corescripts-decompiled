@@ -1,28 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FocusNavigationUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.ReactFocusNavigation);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.Navigation);
-local v5 = require(l_script_FirstAncestor_0.useFocusRoot);
-local v6 = require(l_script_FirstAncestor_0.useDefaultAppEventHandlers);
-local v7 = require(l_script_FirstAncestor_0.FocusNavigationDefaultEventMap);
-local v8 = {};
-return function(v9) --[[ Line: 23 ]] --[[ Name: useAppFocusRoot ]]
-    -- upvalues: v8 (copy), v4 (copy), v6 (copy), v3 (copy), v7 (copy), v5 (copy)
-    local v10 = v9.customEventHandlers or v8;
-    local v11 = v9.customEventMap or v8;
-    local v12 = v4.useNavigationFocus();
-    local v13 = v6();
-    local v14 = v3.Dictionary.union(v13, v10);
-    local v15 = v3.Dictionary.union(v7, v11);
-    local v16 = (v9.isFocusable == nil or v9.isFocusable) and (v12 == nil or v12);
-    local v17 = v9.isAutoFocusRoot ~= nil and v9.isAutoFocusRoot;
-    local v18 = v3.Dictionary.union(v9, {
-        customEventHandlers = v3.None, 
-        eventHandlers = v14, 
-        eventMap = v15, 
-        isFocusable = v16, 
-        isAutoFocusRoot = v17
-    });
-    return v5(v18);
-end;
+local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
+local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+
+require(FocusNavigationUtilsParent.ReactFocusNavigation)
+
+local Cryo = require(FocusNavigationUtilsParent.Cryo)
+local Navigation = require(FocusNavigationUtilsParent.Navigation)
+local useFocusRoot = require(FocusNavigationUtils.useFocusRoot)
+local useDefaultAppEventHandlers = require(FocusNavigationUtils.useDefaultAppEventHandlers)
+local FocusNavigationDefaultEventMap = require(FocusNavigationUtils.FocusNavigationDefaultEventMap)
+local t1 = {}
+
+local function useAppFocusRoot(p1) -- line: 23
+	-- upvalues: t1 (copy), Navigation (copy), useDefaultAppEventHandlers (copy), Cryo (copy), FocusNavigationDefaultEventMap (copy), useFocusRoot (copy)
+	local v11 = p1.customEventHandlers or t1
+	local v12 = p1.customEventMap or t1
+	local v13 = Navigation.useNavigationFocus()
+	local v14 = useDefaultAppEventHandlers()
+	local v15 = Cryo.Dictionary.union(v14, v11)
+	local v16 = Cryo.Dictionary.union(FocusNavigationDefaultEventMap, v12)
+	local v17 = (p1.isFocusable == nil or p1.isFocusable) and (v13 == nil or v13)
+	local v18 = p1.isAutoFocusRoot ~= nil and p1.isAutoFocusRoot
+	local v19 = Cryo.Dictionary.union(p1, {
+		customEventHandlers = Cryo.None,
+		eventHandlers = v15,
+		eventMap = v16,
+		isFocusable = v17,
+		isAutoFocusRoot = v18
+	})
+
+	return useFocusRoot(v19)
+end
+
+return useAppFocusRoot

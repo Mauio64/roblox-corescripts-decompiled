@@ -1,7 +1,9 @@
 local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
 local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
 local React = require(AvatarExperienceCommonParent.React)
-local useTokens = require(AvatarExperienceCommonParent.Foundation).Hooks.useTokens
+local Foundation = require(AvatarExperienceCommonParent.Foundation)
+local BuilderIcons = require(AvatarExperienceCommonParent.BuilderIcons)
+local useTokens = Foundation.Hooks.useTokens
 local ItemCardComponents = require(AvatarExperienceCommonParent.AvatarExperienceUIKit).ItemCardComponents
 local ItemCardHeader = ItemCardComponents.ItemCardHeader
 local ItemCardBadge = ItemCardComponents.ItemCardBadge
@@ -14,6 +16,8 @@ local CatalogItemCardItemInfoEnum = require(script.Parent.Parent.CatalogItemCard
 local CatalogItemCardStatusIconTypeEnum = require(script.Parent.Parent.CatalogItemCard.Enums.CatalogItemCardStatusIconTypeEnum)
 local AvatarExperienceFlags = require(AvatarExperienceCommonParent.AvatarExperienceFlags)
 local FFlagAXDurablesForMIS = AvatarExperienceFlags.FFlagAXDurablesForMIS
+local FFlagAXDurables2Option = AvatarExperienceFlags.FFlagAXDurables2Option
+local FFlagAXModeratedItemIconUpdates = AvatarExperienceFlags.FFlagAXModeratedItemIconUpdates
 
 require(AvatarExperienceCommon.Types.TimedOptionType)
 
@@ -21,10 +25,10 @@ local FFlagAXEnableTimedOptionsForCatalogRowCard = AvatarExperienceFlags.FFlagAX
 local t1 = {
 	DYNAMIC_HEAD = "icons/menu/clothing/dynamicHead",
 	LIMITED = "icons/status/item/limited",
-	MODERATED = "icons/actions/info_small",
-	PENDING_MODERATION = "icons/status/pending_small",
-	UNAVAILABLE = "icons/status/warning_small",
-	DURABLE = "icons/status/pending_small"
+	MODERATED = not FFlagAXModeratedItemIconUpdates and "icons/actions/info_small" or BuilderIcons.Icon.CircleI,
+	PENDING_MODERATION = not FFlagAXModeratedItemIconUpdates and "icons/status/pending_small" or BuilderIcons.Icon.ClockDashed,
+	UNAVAILABLE = not FFlagAXModeratedItemIconUpdates and "icons/status/warning_small" or BuilderIcons.Icon.CircleI,
+	DURABLE = not FFlagAXModeratedItemIconUpdates and "icons/status/pending_small" or BuilderIcons.Icon.Clock
 }
 local t2 = {
 	[CatalogItemCardStatusIconTypeEnum.Moderated] = t1.MODERATED,
@@ -52,12 +56,12 @@ local t4 = {
 	[CatalogItemCardItemInfoEnum.DynamicHead] = t1.DYNAMIC_HEAD
 }
 
-return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 116
-	-- upvalues: useTokens (copy), t4 (copy), t3 (copy), t2 (copy), React (copy), ItemCardHeader (copy), ItemCardHeaderCornersOverlay (copy), ItemCardBadge (copy), ItemCardStatus (copy), ItemCardIcon (copy), CatalogRowItemCardFooter (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy)
-	local v24 = useTokens()
-	local v25 = if not t5.itemInfo then nil else t4[t5.itemInfo]
-	local v26 = if not t5.itemType then nil else t3[t5.itemType]
-	local v27 = if not t5.itemStatus or t5.itemStatus.type ~= "icon" then nil else t2[t5.itemStatus.iconType]
+return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 124
+	-- upvalues: useTokens (copy), t4 (copy), t3 (copy), t2 (copy), React (copy), ItemCardHeader (copy), ItemCardHeaderCornersOverlay (copy), ItemCardBadge (copy), ItemCardStatus (copy), ItemCardIcon (copy), CatalogRowItemCardFooter (copy), FFlagAXDurablesForMIS (copy), FFlagAXEnableTimedOptionsForCatalogRowCard (copy), FFlagAXDurables2Option (copy)
+	local v28 = useTokens()
+	local v29 = if not t5.itemInfo then nil else t4[t5.itemInfo]
+	local v30 = if not t5.itemType then nil else t3[t5.itemType]
+	local v31 = if not t5.itemStatus or t5.itemStatus.type ~= "icon" then nil else t2[t5.itemStatus.iconType]
 
 	return React.createElement("TextButton", {
 		Text = "",
@@ -77,15 +81,15 @@ return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 116
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
 			VerticalAlignment = Enum.VerticalAlignment.Top,
-			Padding = UDim.new(0, v24.Gap.Medium)
+			Padding = UDim.new(0, v28.Gap.Medium)
 		}),
 		Header = React.createElement(ItemCardHeader, {
 			LayoutOrder = 1,
 			aspectRatio = t5.headerAspectRatio,
 			Size = t5.headerSize,
 			overlaySlot = React.createElement(ItemCardHeaderCornersOverlay, {
-				topLeftSlot = if not t5.itemStatus or t5.itemStatus.type ~= "badge" then if not t5.itemStatus then nil else if t5.itemStatus.type ~= "text" then if not v27 then nil else React.createElement(ItemCardIcon, {
-					icon = v27
+				topLeftSlot = if not t5.itemStatus or t5.itemStatus.type ~= "badge" then if not t5.itemStatus then nil else if t5.itemStatus.type ~= "text" then if not v31 then nil else React.createElement(ItemCardIcon, {
+					icon = v31
 				}) else React.createElement(ItemCardStatus, {
 					text = t5.itemStatus.text
 				}) else React.createElement(ItemCardBadge, {
@@ -100,18 +104,19 @@ return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 116
 						}
 					}
 				}),
-				bottomLeftSlot = if not v26 then nil else React.createElement(ItemCardBadge, {
-					content = v26
+				bottomLeftSlot = if not v30 then nil else React.createElement(ItemCardBadge, {
+					content = v30
 				}),
-				bottomRightSlot = if not v25 then nil else React.createElement(ItemCardBadge, {
+				bottomRightSlot = if not v29 then nil else React.createElement(ItemCardBadge, {
 					content = {{
 						type = "icon",
-						icon = v25
+						icon = v29
 					}}
 				})
 			})
 		}, t5.presentationSlot),
 		Footer = React.createElement(CatalogRowItemCardFooter, {
+			LayoutOrder = 2,
 			title = t5.title,
 			creatorName = if not t5.creator then nil else t5.creator.name,
 			bundlePartsText = t5.bundlePartsText,
@@ -126,7 +131,8 @@ return (React.forwardRef(function(t5: {[any]: any}, p1) -- line: 116
 			setSelectedTimedOptionPrice = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.setSelectedTimedOptionPrice,
 			selectedTimedOptionIndexInReducer = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.selectedTimedOptionIndexInReducer,
 			wearTimeSelectedOptionInList = if not FFlagAXDurablesForMIS and not FFlagAXEnableTimedOptionsForCatalogRowCard then nil else t5.wearTimeSelectedOptionInList,
-			LayoutOrder = 2,
+			wearTimeOptionButton = if not FFlagAXDurables2Option then nil else t5.wearTimeOptionButton,
+			onRemove = if not FFlagAXDurables2Option then nil else t5.onRemove,
 			Size = t5.footerSize,
 			AutomaticSize = if not t5.footerAutomaticSize then Enum.AutomaticSize.Y else t5.footerAutomaticSize
 		})

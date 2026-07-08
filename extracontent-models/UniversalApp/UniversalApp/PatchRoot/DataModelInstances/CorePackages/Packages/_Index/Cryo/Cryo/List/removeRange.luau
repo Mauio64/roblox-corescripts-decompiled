@@ -1,14 +1,20 @@
-return function(v0, v1, v2) --[[ Line: 4 ]] --[[ Name: removeRange ]]
-    assert(v1 <= v2, "startIndex must be less than or equal to endIndex");
-    local v3 = {};
-    local v4 = 1;
-    for v5 = 1, math.min(#v0, v1 - 1) do
-        v3[v4] = v0[v5];
-        v4 = v4 + 1;
-    end;
-    for v6 = v2 + 1, #v0 do
-        v3[v4] = v0[v6];
-        v4 = v4 + 1;
-    end;
-    return v3;
-end;
+local function removeRange(p1, p2, p3) -- line: 4
+	assert(p2 <= p3, "startIndex must be less than or equal to endIndex")
+
+	local t1 = {}
+	local n1 = 1
+
+	for i = 1, math.min(#p1, p2 - 1) do
+		t1[n1] = p1[i]
+		n1 += 1
+	end
+
+	for i = p3 + 1, #p1 do
+		t1[n1] = p1[i]
+		n1 += 1
+	end
+
+	return t1
+end
+
+return removeRange

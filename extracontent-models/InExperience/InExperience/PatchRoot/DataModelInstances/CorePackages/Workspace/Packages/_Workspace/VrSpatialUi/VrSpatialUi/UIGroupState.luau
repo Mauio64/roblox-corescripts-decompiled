@@ -1,4 +1,4 @@
 return {
-    Default = "Default", 
-    GuiToggleAnimation = "GuiToggleAnimation"
-};
+	Default = "Default",
+	GuiToggleAnimation = "GuiToggleAnimation"
+}

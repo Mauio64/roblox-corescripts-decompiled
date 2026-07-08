@@ -1,8 +1,9 @@
-local v0 = require(script.useDispatch);
-local v1 = require(script.useSelector);
-local v2 = require(script.useStore);
+local useDispatch = require(script.useDispatch)
+local useSelector = require(script.useSelector)
+local useStore = require(script.useStore)
+
 return {
-    useDispatch = v0, 
-    useSelector = v1, 
-    useStore = v2
-};
+	useDispatch = useDispatch,
+	useSelector = useSelector,
+	useStore = useStore
+}

@@ -1,775 +1,891 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Object_0 = v3.Object;
-local l_Set_0 = v3.Set;
-local l_Map_0 = v3.Map;
-local v8 = require(l_Parent_0.luaUtils.isCallable);
-local v9 = require(l_Parent_0.luaUtils.objectKeysForEach);
-local v10 = require(l_Parent_1.LuauRegExp);
-local v11 = {};
-local v12 = nil;
-local v13 = nil;
-local v14 = nil;
-local v15 = nil;
-local v16 = nil;
-local v17 = nil;
-local _ = require(l_Parent_1.GraphQL);
-local l_Trie_0 = require(l_Parent_0.wry.trie).Trie;
-local v20 = require(l_Parent_0.jsutils.invariant);
-local l_invariant_0 = v20.invariant;
-local l_InvariantError_0 = v20.InvariantError;
-local v23 = require(script.Parent.Parent.Parent.utilities);
-local l_getFragmentFromSelection_0 = v23.getFragmentFromSelection;
-local l_isField_0 = v23.isField;
-local l_getTypenameFromResult_0 = v23.getTypenameFromResult;
-local l_storeKeyNameFromField_0 = v23.storeKeyNameFromField;
-local l_argumentsObjectFromField_0 = v23.argumentsObjectFromField;
-local l_isReference_0 = v23.isReference;
-local l_getStoreKeyName_0 = v23.getStoreKeyName;
-local l_canUseWeakMap_0 = v23.canUseWeakMap;
-local l_isNonNullObject_0 = v23.isNonNullObject;
-local l_stringifyForDisplay_0 = v23.stringifyForDisplay;
-local v34 = require(script.Parent.helpers);
-local v35 = require(l_Parent_0.luaUtils.hasOwnProperty);
-local l_fieldNameFromStoreName_0 = v34.fieldNameFromStoreName;
-local l_storeValueIsStoreObject_0 = v34.storeValueIsStoreObject;
-local l_selectionSetMatchesResult_0 = v34.selectionSetMatchesResult;
-local l_TypeOrFieldNameRegExp_0 = v34.TypeOrFieldNameRegExp;
-local l_cacheSlot_0 = require(script.Parent.reactiveVars).cacheSlot;
-local _ = require(script.Parent.Parent.core.types.common);
-local _ = require(script.Parent.writeToStore_types);
-l_getStoreKeyName_0:setStringify(require(script.Parent["object-canon"]).canonicalStringify);
-local _ = require(script.Parent.policies_types);
-local function _(v44) --[[ Line: 145 ]] --[[ Name: argsFromFieldSpecifier ]]
-    -- upvalues: l_argumentsObjectFromField_0 (copy)
-    if v44.args ~= nil then
-        return v44.args;
-    elseif v44.field then
-        return (l_argumentsObjectFromField_0(v44.field, v44.variables));
-    else
-        return nil;
-    end;
-end;
-local function v53(_, v47, v48) --[[ Line: 159 ]] --[[ Name: defaultDataIdFromObject ]]
-    -- upvalues: l_HttpService_0 (copy)
-    local l___typename_0 = v47.__typename;
-    local l_id_0 = v47.id;
-    local l__id_0 = v47._id;
-    if type(l___typename_0) == "string" then
-        if v48 then
-            if l_id_0 ~= nil then
-                v48.keyObject = {
-                    id = l_id_0
-                };
-            elseif l__id_0 ~= nil then
-                v48.keyObject = {
-                    _id = l__id_0
-                };
-            else
-                v48.keyObject = nil;
-            end;
-        end;
-        if l_id_0 == nil then
-            l_id_0 = l__id_0;
-        end;
-        if l_id_0 ~= nil then
-            local v52 = type(l_id_0);
-            return string.format("%s:%s", l___typename_0, if not (v52 ~= "number") or v52 == "string" then l_id_0 else l_HttpService_0:JSONEncode(l_id_0));
-        end;
-    end;
-    return nil;
-end;
-v11.defaultDataIdFromObject = v53;
-local function v55(_) --[[ Line: 191 ]] --[[ Name: nullKeyFieldsFn ]]
-    return nil;
-end;
-local function v58(_, v57) --[[ Line: 194 ]] --[[ Name: simpleKeyArgsFn ]]
-    return v57.fieldName;
-end;
-local v59 = nil;
-v59 = function(_, v61, v62, v63) --[[ Line: 201 ]] --[[ Name: mergeTrueFn ]]
-    return v63:mergeObjects(v61, v62);
-end;
-local v64 = nil;
-v64 = function(_, _, v67) --[[ Line: 205 ]] --[[ Name: mergeFalseFn ]]
-    return v67;
-end;
-local v68 = {};
-v68.__index = v68;
-v68.new = function(v69) --[[ Line: 312 ]] --[[ Name: new ]]
-    -- upvalues: v68 (copy), l_Map_0 (copy), l_Object_0 (copy), v53 (copy)
-    local v70 = setmetatable({}, v68);
-    v70.typePolicies = {};
-    v70.toBeAdded = {};
-    v70.supertypeMap = l_Map_0.new(nil);
-    v70.fuzzySubtypes = l_Map_0.new(nil);
-    v70.cache = nil;
-    v70.rootIdsByTypename = {};
-    v70.rootTypenamesById = {};
-    v70.usingPossibleTypes = false;
-    v70.config = v69;
-    v70.config = l_Object_0.assign({
-        dataIdFromObject = v53
-    }, v69);
-    v70.cache = v70.config.cache;
-    v70:setRootTypename("Query");
-    v70:setRootTypename("Mutation");
-    v70:setRootTypename("Subscription");
-    if v69.possibleTypes then
-        v70:addPossibleTypes(v69.possibleTypes);
-    end;
-    if v69.typePolicies then
-        v70:addTypePolicies(v69.typePolicies);
-    end;
-    return v70;
-end;
-v68.identify = function(v71, v72, v73, v74) --[[ Line: 353 ]] --[[ Name: identify ]]
-    -- upvalues: l_getTypenameFromResult_0 (copy), v15 (ref)
-    local v75 = nil;
-    v75 = if v73 and v74 then l_getTypenameFromResult_0(v72, v73, v74) else v72.__typename;
-    if v75 == v71.rootTypenamesById.ROOT_QUERY then
-        return {
-            "ROOT_QUERY"
-        };
-    else
-        local v76 = {
-            typename = v75, 
-            selectionSet = v73, 
-            fragmentMap = v74
-        };
-        local v77 = nil;
-        local v78 = nil;
-        v78 = v75 and v71:getTypePolicy(v75);
-        local v79 = nil;
-        v79 = if v78 and v78.keyFn then v78.keyFn else v71.config.dataIdFromObject;
-        while v79 do
-            local v80 = v79(v78, v72, v76);
-            if type(v80) == "table" then
-                v79 = v15(v80);
-            else
-                v77 = v80;
-                break;
-            end;
-        end;
-        v77 = if v77 then tostring(v77) else nil;
-        if v76.keyObject then
-            return {
-                v77, 
-                v76.keyObject
-            };
-        else
-            return {
-                v77
-            };
-        end;
-    end;
-end;
-v68.addTypePolicies = function(v81, v82) --[[ Line: 425 ]] --[[ Name: addTypePolicies ]]
-    -- upvalues: v9 (copy), l_Object_0 (copy), v35 (copy)
-    v9(v82, function(v83) --[[ Line: 427 ]]
-        -- upvalues: v82 (copy), l_Object_0 (ref), v81 (copy), v35 (ref)
-        local v84 = v82[v83];
-        local l_queryType_0 = v84.queryType;
-        local l_mutationType_0 = v84.mutationType;
-        local l_subscriptionType_0 = v84.subscriptionType;
-        local v88 = l_Object_0.assign({}, v84, {
-            queryType = l_Object_0.None, 
-            mutationType = l_Object_0.None, 
-            subscriptionType = l_Object_0.None
-        });
-        if l_queryType_0 then
-            v81:setRootTypename("Query", v83);
-        end;
-        if l_mutationType_0 then
-            v81:setRootTypename("Mutation", v83);
-        end;
-        if l_subscriptionType_0 then
-            v81:setRootTypename("Subscription", v83);
-        end;
-        if v35(v81.toBeAdded, v83) then
-            table.insert(v81.toBeAdded[v83], v88);
-            return;
-        else
-            v81.toBeAdded[v83] = {
-                v88
-            };
-            return;
-        end;
-    end);
-end;
-v68.updateTypePolicy = function(v89, v90, v91) --[[ Line: 471 ]] --[[ Name: updateTypePolicy ]]
-    -- upvalues: v8 (copy), v59 (ref), v64 (ref), v55 (copy), v15 (ref), v9 (copy), v58 (copy), v14 (ref)
-    local v92 = v89:getTypePolicy(v90);
-    local l_keyFields_0 = v91.keyFields;
-    local l_fields_0 = v91.fields;
-    local function _(v95, v96) --[[ Line: 475 ]] --[[ Name: setMerge ]]
-        -- upvalues: v8 (ref), v59 (ref), v64 (ref)
-        if v8(v96) then
-            v95.merge = v96;
-            return;
-        elseif v96 == true then
-            v95.merge = v59;
-            return;
-        elseif v96 == false then
-            v95.merge = v64;
-            return;
-        else
-            v95.merge = v95.merge;
-            return;
-        end;
-    end;
-    local l_merge_0 = v91.merge;
-    if v8(l_merge_0) then
-        v92.merge = l_merge_0;
-    elseif l_merge_0 == true then
-        v92.merge = v59;
-    elseif l_merge_0 == false then
-        v92.merge = v64;
-    else
-        v92.merge = v92.merge;
-    end;
-    if l_keyFields_0 == false then
-        v92.keyFn = v55;
-    else
-        l_merge_0 = type(l_keyFields_0);
-        if l_merge_0 == "table" then
-            v92.keyFn = v15(l_keyFields_0);
-        elseif l_merge_0 == "function" then
-            v92.keyFn = l_keyFields_0;
-        else
-            v92.keyFn = v92.keyFn;
-        end;
-    end;
-    if l_fields_0 then
-        v9(l_fields_0, function(v99) --[[ Line: 530 ]]
-            -- upvalues: v89 (copy), v90 (copy), l_fields_0 (copy), v58 (ref), v14 (ref), v8 (ref), v59 (ref), v64 (ref)
-            local v100 = v89:getFieldPolicy(v90, v99, true);
-            local v101 = l_fields_0[v99];
-            if type(v101) == "function" then
-                v100.read = v101;
-            else
-                local l_keyArgs_0 = v101.keyArgs;
-                local l_read_0 = v101.read;
-                local l_merge_1 = v101.merge;
-                if l_keyArgs_0 == false then
-                    v100.keyFn = v58;
-                else
-                    local v105 = type(l_keyArgs_0);
-                    if v105 == "table" then
-                        v100.keyFn = v14(l_keyArgs_0);
-                    elseif v105 == "function" then
-                        v100.keyFn = l_keyArgs_0;
-                    else
-                        v100.keyFn = v100.keyFn;
-                    end;
-                end;
-                if type(l_read_0) == "function" then
-                    v100.read = l_read_0;
-                end;
-                if v8(l_merge_1) then
-                    v100.merge = l_merge_1;
-                elseif l_merge_1 == true then
-                    v100.merge = v59;
-                elseif l_merge_1 == false then
-                    v100.merge = v64;
-                else
-                    v100.merge = v100.merge;
-                end;
-            end;
-            if v100.read and v100.merge then
-                v100.keyFn = v100.keyFn or v58;
-            end;
-        end);
-    end;
-end;
-v68.setRootTypename = function(v106, v107, v108) --[[ Line: 588 ]] --[[ Name: setRootTypename ]]
-    -- upvalues: l_invariant_0 (copy)
-    local l_v108_0 = v108;
-    if l_v108_0 == nil then
-        l_v108_0 = v107;
-    end;
-    local v110 = "ROOT_" .. string.upper(v107);
-    local v111 = v106.rootTypenamesById[v110];
-    if l_v108_0 ~= v111 then
-        local v112 = not v111 or v111 == v107;
-        if not v112 then
-            l_invariant_0(v112, ("Cannot change root %s __typename more than once"):format(v107));
-        end;
-        if v111 then
-            v106.rootIdsByTypename[v111] = nil;
-        end;
-        v106.rootIdsByTypename[l_v108_0] = v110;
-        v106.rootTypenamesById[v110] = l_v108_0;
-    end;
-end;
-v68.addPossibleTypes = function(v113, v114) --[[ Line: 617 ]] --[[ Name: addPossibleTypes ]]
-    -- upvalues: v9 (copy), l_Array_0 (copy), l_TypeOrFieldNameRegExp_0 (copy), v10 (copy)
-    v113.usingPossibleTypes = true;
-    v9(v114, function(v115) --[[ Line: 620 ]]
-        -- upvalues: v113 (copy), l_Array_0 (ref), v114 (copy), l_TypeOrFieldNameRegExp_0 (ref), v10 (ref)
-        v113:getSupertypeSet(v115, true);
-        l_Array_0.forEach(v114[v115], function(v116) --[[ Line: 627 ]]
-            -- upvalues: v113 (ref), v115 (copy), l_TypeOrFieldNameRegExp_0 (ref), v10 (ref)
-            v113:getSupertypeSet(v116, true):add(v115);
-            local v117 = l_TypeOrFieldNameRegExp_0:exec(v116);
-            if not v117 or v117[1] ~= v116 then
-                v113.fuzzySubtypes:set(v116, v10.new(v116));
-            end;
-        end);
-    end);
-end;
-v68.getTypePolicy = function(v118, v119) --[[ Line: 639 ]] --[[ Name: getTypePolicy ]]
-    -- upvalues: v35 (copy), l_Object_0 (copy), l_Array_0 (copy)
-    if not v35(v118.typePolicies, v119) then
-        v118.typePolicies[v119] = {};
-        local v120 = v118.typePolicies[v119];
-        v120.fields = {};
-        local v121 = v118.supertypeMap:get(v119);
-        if v121 and v121.size > 0 then
-            local l_v120_0 = v120 --[[ copy: 2 -> 4 ]];
-            v121:forEach(function(v123) --[[ Line: 673 ]]
-                -- upvalues: v118 (copy), l_Object_0 (ref), l_v120_0 (copy)
-                local v124 = v118:getTypePolicy(v123);
-                local l_fields_1 = v124.fields;
-                local v126 = l_Object_0.assign(table.clone(v124), {
-                    fields = l_Object_0.None
-                });
-                l_Object_0.assign(l_v120_0, v126);
-                l_Object_0.assign(l_v120_0.fields, l_fields_1);
-            end);
-        end;
-    end;
-    local v127 = v118.toBeAdded[v119];
-    if v127 and #v127 > 0 then
-        l_Array_0.forEach(l_Array_0.splice(v127, 1), function(v128) --[[ Line: 690 ]]
-            -- upvalues: v118 (copy), v119 (copy)
-            v118:updateTypePolicy(v119, v128);
-        end);
-    end;
-    return v118.typePolicies[v119];
-end;
-v68.getFieldPolicy = function(v129, v130, v131, v132) --[[ Line: 698 ]] --[[ Name: getFieldPolicy ]]
-    if v130 then
-        local l_fields_2 = v129:getTypePolicy(v130).fields;
-        if l_fields_2[v131] then
-            return l_fields_2[v131];
-        elseif v132 then
-            l_fields_2[v131] = {};
-            return l_fields_2[v131];
-        else
-            return nil;
-        end;
-    else
-        return nil;
-    end;
-end;
-v68.getSupertypeSet = function(v134, v135, v136) --[[ Line: 725 ]] --[[ Name: getSupertypeSet ]]
-    -- upvalues: l_Set_0 (copy)
-    local v137 = v134.supertypeMap:get(v135);
-    if not v137 and v136 then
-        v137 = l_Set_0.new();
-        v134.supertypeMap:set(v135, v137);
-    end;
-    return v137;
-end;
-v68.fragmentMatches = function(v138, v139, v140, v141, v142) --[[ Line: 736 ]] --[[ Name: fragmentMatches ]]
-    -- upvalues: l_Array_0 (copy), l_invariant_0 (copy), l_selectionSetMatchesResult_0 (copy)
-    if not v139.typeCondition then
-        return true;
-    elseif not v140 then
-        return false;
-    else
-        local l_value_0 = v139.typeCondition.name.value;
-        if v140 == l_value_0 then
-            return true;
-        else
-            if v138.usingPossibleTypes and v138.supertypeMap:has(l_value_0) then
-                local v144 = v138:getSupertypeSet(v140, true);
-                local v145 = {
-                    v144
-                };
-                local function v148(v146) --[[ Line: 767 ]] --[[ Name: maybeEnqueue ]]
-                    -- upvalues: v138 (copy), l_Array_0 (ref), v145 (copy)
-                    local v147 = v138:getSupertypeSet(v146, false);
-                    if v147 and v147.size > 0 and l_Array_0.indexOf(v145, v147) < 1 then
-                        table.insert(v145, v147);
-                    end;
-                end;
-                local v149 = false;
-                if v141 ~= nil then
-                    v149 = v138.fuzzySubtypes.size > 0;
-                end;
-                local v150 = false;
-                for v151, _ in v145 do
-                    local v153 = v145[v151];
-                    if v153:has(l_value_0) then
-                        if not v144:has(l_value_0) then
-                            if v150 then
-                                l_invariant_0.warn(("Inferring subtype %s of supertype %s"):format(v140, l_value_0));
-                            end;
-                            v144:add(l_value_0);
-                        end;
-                        return true;
-                    else
-                        v153:forEach(v148);
-                        if v149 and v151 == #v145 and l_selectionSetMatchesResult_0(v139.selectionSet, v141, v142) then
-                            v149 = false;
-                            v150 = true;
-                            l_Array_0.forEach(v138.fuzzySubtypes:entries(), function(v154) --[[ Line: 834 ]]
-                                -- upvalues: v140 (copy), v138 (copy), l_Array_0 (ref), v145 (copy)
-                                local v155 = v154[2];
-                                local v156 = v154[1];
-                                local v157 = v155:exec(v140);
-                                if v157 and v157[1] == v140 then
-                                    local v158 = v138:getSupertypeSet(v156, false);
-                                    if v158 and v158.size > 0 and l_Array_0.indexOf(v145, v158) < 1 then
-                                        table.insert(v145, v158);
-                                    end;
-                                end;
-                                return 1;
-                            end);
-                        end;
-                    end;
-                end;
-            end;
-            return false;
-        end;
-    end;
-end;
-v68.hasKeyArgs = function(v159, v160, v161) --[[ Line: 852 ]] --[[ Name: hasKeyArgs ]]
-    local v162 = v159:getFieldPolicy(v160, v161, false);
-    local v163 = false;
-    if v162 ~= nil then
-        v163 = v162.keyFn ~= nil;
-    end;
-    return v163;
-end;
-v68.getStoreFieldName = function(v164, v165) --[[ Line: 859 ]] --[[ Name: getStoreFieldName ]]
-    -- upvalues: l_argumentsObjectFromField_0 (copy), v14 (ref), l_storeKeyNameFromField_0 (copy), l_getStoreKeyName_0 (copy), l_fieldNameFromStoreName_0 (copy)
-    local l_typename_0 = v165.typename;
-    local l_fieldName_0 = v165.fieldName;
-    local v168 = v164:getFieldPolicy(l_typename_0, l_fieldName_0, false);
-    local v169 = nil;
-    local v170 = nil;
-    v170 = if v168 then v168.keyFn else nil;
-    if v170 and l_typename_0 then
-        local v171 = {
-            typename = l_typename_0, 
-            fieldName = l_fieldName_0, 
-            field = v165.field or nil, 
-            variables = v165.variables
-        };
-        local v172 = if v165.args ~= nil then v165.args else if v165.field then l_argumentsObjectFromField_0(v165.field, v165.variables) else nil;
-        while v170 do
-            local v173 = v170(v172, v171);
-            if type(v173) == "table" then
-                v170 = v14(v173);
-            else
-                v169 = v173 or l_fieldName_0;
-                break;
-            end;
-        end;
-    end;
-    if v169 == nil then
-        v169 = if v165.field then l_storeKeyNameFromField_0(v165.field, v165.variables) else l_getStoreKeyName_0(l_fieldName_0, if v165.args ~= nil then v165.args else if v165.field then l_argumentsObjectFromField_0(v165.field, v165.variables) else nil);
-    end;
-    if v169 == false then
-        return l_fieldName_0;
-    elseif l_fieldName_0 == l_fieldNameFromStoreName_0(v169) then
-        return v169;
-    else
-        return l_fieldName_0 .. ":" .. v169;
-    end;
-end;
-v68.readField = function(v174, v175, v176) --[[ Line: 930 ]] --[[ Name: readField ]]
-    -- upvalues: l_fieldNameFromStoreName_0 (copy), v12 (ref), l_cacheSlot_0 (copy)
-    local l_from_0 = v175.from;
-    if not l_from_0 then
-        return;
-    elseif not (v175.field or v175.fieldName) then
-        return;
-    else
-        if v175.typename == nil then
-            local v178 = v176.store:getFieldValue(l_from_0, "__typename");
-            if v178 then
-                v175.typename = v178;
-            end;
-        end;
-        local v179 = v174:getStoreFieldName(v175);
-        local v180 = l_fieldNameFromStoreName_0(v179);
-        local v181 = v176.store:getFieldValue(l_from_0, v179);
-        local v182 = v174:getFieldPolicy(v175.typename, v180, false);
-        local v183 = nil;
-        v183 = if v182 then v182.read else nil;
-        if v183 then
-            local v184 = v12(v174, l_from_0, v175, v176, v176.store:getStorage(if l_from_0.__ref then l_from_0.__ref else l_from_0, v179));
-            return (l_cacheSlot_0:withValue(v174.cache, v183, {
-                v181, 
-                v184
-            }));
-        else
-            return v181;
-        end;
-    end;
-end;
-v68.getMergeFunction = function(v185, v186, v187, v188) --[[ Line: 990 ]] --[[ Name: getMergeFunction ]]
-    local v189 = v185:getFieldPolicy(v186, v187, false);
-    local v190 = nil;
-    v190 = v189 and v189.merge;
-    if not v190 and v188 then
-        v189 = v185:getTypePolicy(v188);
-        if v189 then
-            return v189.merge;
-        else
-            v190 = v189;
-        end;
-    end;
-    return v190;
-end;
-v68.runMergeFunction = function(v191, v192, v193, v194, v195, v196) --[[ Line: 1021 ]] --[[ Name: runMergeFunction ]]
-    -- upvalues: v59 (ref), v13 (ref), v64 (ref), v12 (ref)
-    local l_field_0 = v194.field;
-    local l_typename_1 = v194.typename;
-    local l_merge_2 = v194.merge;
-    if l_merge_2 == v59 then
-        return v13(v195.store)(v194, v192, v193);
-    elseif l_merge_2 == v64 then
-        return v193;
-    else
-        if v195.overwrite then
-            v192 = nil;
-        end;
-        return l_merge_2(v194, v192, v193, v12(v191, nil, {
-            typename = l_typename_1, 
-            fieldName = l_field_0.name.value, 
-            field = l_field_0, 
-            variables = v195.variables
-        }, v195, v196 or {}));
-    end;
-end;
-v11.Policies = v68;
-v12 = function(v200, v201, v202, v203, v204) --[[ Line: 1081 ]] --[[ Name: makeFieldFunctionOptions ]]
-    -- upvalues: l_fieldNameFromStoreName_0 (copy), l_argumentsObjectFromField_0 (copy), l_isReference_0 (copy), l_Object_0 (copy), v35 (copy), l_invariant_0 (copy), l_stringifyForDisplay_0 (copy), l_Array_0 (copy), v13 (ref)
-    local v205 = v200:getStoreFieldName(v202);
-    local v206 = l_fieldNameFromStoreName_0(v205);
-    local v207 = v202.variables or v203.variables;
-    return {
-        args = if v202.args ~= nil then v202.args else if v202.field then l_argumentsObjectFromField_0(v202.field, v202.variables) else nil, 
-        field = v202.field or nil, 
-        fieldName = v206, 
-        storeFieldName = v205, 
-        variables = v207, 
-        isReference = function(_, ...) --[[ Line: 1101 ]] --[[ Name: isReference ]]
-            -- upvalues: l_isReference_0 (ref)
-            return l_isReference_0(...);
-        end, 
-        toReference = v203.store.toReference, 
-        storage = v204, 
-        cache = v200.cache, 
-        canRead = v203.store.canRead, 
-        readField = function(_, v210, ...) --[[ Line: 1108 ]] --[[ Name: readField ]]
-            -- upvalues: l_Object_0 (ref), v201 (copy), v35 (ref), l_invariant_0 (ref), l_stringifyForDisplay_0 (ref), l_Array_0 (ref), v207 (copy), v200 (copy), v203 (copy)
-            local v211 = type(v210);
-            local v212 = {
-                if v211 == "table" then l_Object_0.assign(table.clone(v210), if v210.from == l_Object_0.None then {
-                    from = "<Object.None>"
-                } else nil) else v210, 
-                select("#", ...) >= 1 and "<nil>" or nil
-            };
-            local v213 = nil;
-            if v211 == "string" then
-                v213 = {
-                    fieldName = v210, 
-                    from = if select("#", ...) >= 1 then ... else v201
-                };
-            elseif v211 == "table" then
-                v213 = l_Object_0.assign({}, v210);
-                if not v35(v210, "from") then
-                    v213.from = v201;
-                end;
-            else
-                l_invariant_0.warn(("Unexpected readField arguments: %s"):format(l_stringifyForDisplay_0(l_Array_0.from(v212))));
-                return;
-            end;
-            if _G.__DEV__ and v213.from == nil then
-                l_invariant_0.warn(("Undefined 'from' passed to readField with arguments %s"):format(l_stringifyForDisplay_0(l_Array_0.from(v212))));
-            end;
-            if v213.variables == nil then
-                v213.variables = v207;
-            end;
-            return v200:readField(v213, v203);
-        end, 
-        mergeObjects = v13(v203.store)
-    };
-end;
-v13 = function(v214) --[[ Line: 1175 ]] --[[ Name: makeMergeObjectsFunction ]]
-    -- upvalues: l_Array_0 (copy), l_InvariantError_0 (copy), l_isNonNullObject_0 (copy), l_isReference_0 (copy), l_storeValueIsStoreObject_0 (copy), l_Object_0 (copy)
-    return function(_, v216, v217) --[[ Line: 1176 ]]
-        -- upvalues: l_Array_0 (ref), l_InvariantError_0 (ref), l_isNonNullObject_0 (ref), v214 (copy), l_isReference_0 (ref), l_storeValueIsStoreObject_0 (ref), l_Object_0 (ref)
-        if l_Array_0.isArray(v216) or l_Array_0.isArray(v217) then
-            error(l_InvariantError_0.new("Cannot automatically merge arrays"));
-        end;
-        if l_isNonNullObject_0(v216) and l_isNonNullObject_0(v217) then
-            local v218 = v214:getFieldValue(v216, "__typename");
-            local v219 = v214:getFieldValue(v217, "__typename");
-            local v220 = false;
-            if v218 ~= nil then
-                v220 = false;
-                if v219 ~= nil then
-                    v220 = v218 ~= v219;
-                end;
-            end;
-            if v220 then
-                return v217;
-            elseif l_isReference_0(v216) and l_storeValueIsStoreObject_0(v217) then
-                v214:merge(v216.__ref, v217);
-                return v216;
-            elseif l_storeValueIsStoreObject_0(v216) and l_isReference_0(v217) then
-                v214:merge(v216, v217.__ref);
-                return v217;
-            elseif l_storeValueIsStoreObject_0(v216) and l_storeValueIsStoreObject_0(v217) then
-                return l_Object_0.assign({}, v216, v217);
-            end;
-        end;
-        return v217;
-    end;
-end;
-local function v221(v222, v223) --[[ Line: 1226 ]] --[[ Name: keyObjEncode ]]
-    -- upvalues: l_Array_0 (copy), v221 (copy), l_HttpService_0 (copy)
-    assert(typeof(v223) == "table", "specifier must be an array");
-    if not next(v223) then
-        return "[]";
-    else
-        return "{" .. l_Array_0.join(l_Array_0.filter(l_Array_0.map(v223, function(v224, v225) --[[ Line: 1236 ]]
-            -- upvalues: l_Array_0 (ref), v222 (copy), v223 (copy), v221 (ref), l_HttpService_0 (ref)
-            if l_Array_0.isArray(v224) then
-                return "";
-            else
-                local v226 = nil;
-                if not v222[v224] then
-                    return "";
-                elseif v225 < #v223 then
-                    v226 = if l_Array_0.isArray(v223[v225 + 1]) then v221(v222[v224], v223[v225 + 1]) else l_HttpService_0:JSONEncode(v222[v224]);
-                    return l_HttpService_0:JSONEncode(v224) .. ":" .. v226;
-                else
-                    return l_HttpService_0:JSONEncode(v224) .. ":" .. l_HttpService_0:JSONEncode(v222[v224]);
-                end;
-            end;
-        end), function(v227) --[[ Line: 1259 ]]
-            return v227 ~= "";
-        end), ",") .. "}";
-    end;
-end;
-v14 = function(v228) --[[ Line: 1268 ]] --[[ Name: keyArgsFnFromSpecifier ]]
-    -- upvalues: v221 (copy), v17 (ref)
-    return function(v229, v230) --[[ Line: 1269 ]]
-        -- upvalues: v221 (ref), v17 (ref), v228 (copy)
-        if v229 then
-            return ("%s:%s"):format(v230.fieldName, (v221(v17(v229, v228, false), v228)));
-        else
-            return v230.fieldName;
-        end;
-    end;
-end;
-v15 = function(v231) --[[ Line: 1281 ]] --[[ Name: keyFieldsFnFromSpecifier ]]
-    -- upvalues: l_Trie_0 (copy), l_canUseWeakMap_0 (copy), v16 (ref), v17 (ref), v221 (copy)
-    local v232 = l_Trie_0.new(l_canUseWeakMap_0);
-    return function(_, v234, v235) --[[ Line: 1283 ]]
-        -- upvalues: v232 (copy), v16 (ref), v17 (ref), v231 (copy), v221 (ref)
-        local v236 = nil;
-        if v235.selectionSet and v235.fragmentMap then
-            local v237 = v232:lookupArray({
-                v235.selectionSet, 
-                v235.fragmentMap
-            });
-            if v237.aliasMap then
-                v236 = v237.aliasMap;
-            else
-                v237.aliasMap = v16(v235.selectionSet, v235.fragmentMap);
-                v236 = v237.aliasMap;
-            end;
-        end;
-        v235.keyObject = v17(v234, v231, true, v236);
-        local l_keyObject_0 = v235.keyObject;
-        return ("%s:%s"):format(v235.typename or "null", (v221(l_keyObject_0, v231)));
-    end;
-end;
-v16 = function(v239, v240) --[[ Line: 1311 ]] --[[ Name: makeAliasMap ]]
-    -- upvalues: l_Set_0 (copy), l_Array_0 (copy), l_isField_0 (copy), v16 (ref), l_getFragmentFromSelection_0 (copy)
-    local v241 = {};
-    local v242 = l_Set_0.new({
-        v239
-    });
-    for _, v244 in v242 do
-        l_Array_0.forEach(v244.selections, function(v245) --[[ Line: 1316 ]]
-            -- upvalues: l_isField_0 (ref), v241 (copy), v16 (ref), v240 (copy), l_getFragmentFromSelection_0 (ref), v242 (copy)
-            if l_isField_0(v245) then
-                if v245.alias then
-                    local l_value_1 = v245.alias.value;
-                    local l_value_2 = v245.name.value;
-                    if l_value_2 ~= l_value_1 then
-                        local v248 = nil;
-                        if v241.aliases then
-                            v248 = v241.aliases;
-                        else
-                            v241.aliases = {};
-                            v248 = v241.aliases;
-                        end;
-                        v248[l_value_2] = l_value_1;
-                    end;
-                end;
-                if v245.selectionSet then
-                    local v249 = nil;
-                    if v241.subsets then
-                        v249 = v241.subsets;
-                    else
-                        v241.subsets = {};
-                        v249 = v241.subsets;
-                    end;
-                    v249[v245.name.value] = v16(v245.selectionSet, v240);
-                    return;
-                end;
-            else
-                local v250 = l_getFragmentFromSelection_0(v245, v240);
-                if v250 then
-                    v242:add(v250.selectionSet);
-                end;
-            end;
-        end);
-    end;
-    return v241;
-end;
-v17 = function(v251, v252, v253, v254) --[[ Line: 1361 ]] --[[ Name: computeKeyObject ]]
-    -- upvalues: v17 (ref), v35 (copy), l_invariant_0 (copy)
-    local v255 = {};
-    local v256 = nil;
-    for _, v258 in v252 do
-        if type(v258) == "table" then
-            if type(v256) == "string" then
-                local v259 = nil;
-                v259 = v254 and v254.subsets;
-                local v260 = nil;
-                v260 = v259 and v259[v256];
-                v255[v256] = v17(v251[v256], v258, v253, v260);
-            end;
-        else
-            local v261 = nil;
-            v261 = v254 and v254.aliases;
-            local v262 = nil;
-            v262 = if v261 and v261[v258] then v261[v258] else v258;
-            if v35(v251, v262) then
-                v256 = v258;
-                v255[v256] = v251[v262];
-            else
-                l_invariant_0(not v253, ("Missing field '%s' while computing key fields"):format(v262));
-                v256 = nil;
-            end;
-        end;
-    end;
-    return v255;
-end;
-v11.None = l_Object_0.None;
-return v11;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local HttpService = game:GetService("HttpService")
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local Set = LuauPolyfill.Set
+local Map = LuauPolyfill.Map
+local isCallable = require(ParentParent.luaUtils.isCallable)
+local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
+local LuauRegExp = require(ParentParentParent.LuauRegExp)
+local t1 = {}
+local makeFieldFunctionOptions = nil
+local makeMergeObjectsFunction = nil
+local keyArgsFnFromSpecifier = nil
+local keyFieldsFnFromSpecifier = nil
+local makeAliasMap = nil
+local computeKeyObject = nil
+
+require(ParentParentParent.GraphQL)
+
+local Trie = require(ParentParent.wry.trie).Trie
+local invariant = require(ParentParent.jsutils.invariant)
+local invariant2 = invariant.invariant
+local InvariantError = invariant.InvariantError
+local utilities = require(script.Parent.Parent.Parent.utilities)
+local getFragmentFromSelection = utilities.getFragmentFromSelection
+local isField = utilities.isField
+local getTypenameFromResult = utilities.getTypenameFromResult
+local storeKeyNameFromField = utilities.storeKeyNameFromField
+local argumentsObjectFromField = utilities.argumentsObjectFromField
+local isReference = utilities.isReference
+local getStoreKeyName = utilities.getStoreKeyName
+local canUseWeakMap = utilities.canUseWeakMap
+local isNonNullObject = utilities.isNonNullObject
+local stringifyForDisplay = utilities.stringifyForDisplay
+local helpers = require(script.Parent.helpers)
+local hasOwnProperty = require(ParentParent.luaUtils.hasOwnProperty)
+local fieldNameFromStoreName = helpers.fieldNameFromStoreName
+local storeValueIsStoreObject = helpers.storeValueIsStoreObject
+local selectionSetMatchesResult = helpers.selectionSetMatchesResult
+local TypeOrFieldNameRegExp = helpers.TypeOrFieldNameRegExp
+local cacheSlot = require(script.Parent.reactiveVars).cacheSlot
+
+require(script.Parent.Parent.core.types.common)
+require(script.Parent.writeToStore_types)
+getStoreKeyName:setStringify(require(script.Parent["object-canon"]).canonicalStringify)
+require(script.Parent.policies_types)
+
+local function argsFromFieldSpecifier(p1) -- line: 145
+	-- upvalues: argumentsObjectFromField (copy)
+	if p1.args ~= nil then
+		return p1.args
+	end
+
+	if p1.field then
+		return (argumentsObjectFromField(p1.field, p1.variables))
+	end
+
+	return nil
+end
+local function defaultDataIdFromObject(_, p3, p4) -- line: 159
+	-- upvalues: HttpService (copy)
+	local __typename = p3.__typename
+	local id = p3.id
+	local _id = p3._id
+
+	if type(__typename) == "string" then
+		if p4 then
+			if id ~= nil then
+				p4.keyObject = {
+					id = id
+				}
+			elseif _id ~= nil then
+				p4.keyObject = {
+					_id = _id
+				}
+			else
+				p4.keyObject = nil
+			end
+		end
+
+		if id == nil then
+			id = _id
+		end
+
+		if id ~= nil then
+			local v56 = type(id)
+
+			return string.format("%s:%s", __typename, if v56 ~= "number" and v56 ~= "string" then HttpService:JSONEncode(id) else id)
+		end
+	end
+
+	return nil
+end
+
+t1.defaultDataIdFromObject = defaultDataIdFromObject
+
+local function nullKeyFieldsFn(_) -- line: 191
+	return nil
+end
+local function simpleKeyArgsFn(_, p7) -- line: 194
+	return p7.fieldName
+end
+local function mergeTrueFn(_, p9, p10, p11) -- line: 201
+	return p11:mergeObjects(p9, p10)
+end
+local function mergeFalseFn(_, _, p14) -- line: 205
+	return p14
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}) -- line: 312
+	-- upvalues: t2 (copy), Map (copy), Object (copy), defaultDataIdFromObject (copy)
+	local self = setmetatable({}, t2)
+
+	self.typePolicies = {}
+	self.toBeAdded = {}
+	self.supertypeMap = Map.new(nil)
+	self.fuzzySubtypes = Map.new(nil)
+	self.cache = nil
+	self.rootIdsByTypename = {}
+	self.rootTypenamesById = {}
+	self.usingPossibleTypes = false
+	self.config = t3
+	self.config = Object.assign({
+		dataIdFromObject = defaultDataIdFromObject
+	}, t3)
+	self.cache = self.config.cache
+	self:setRootTypename("Query")
+	self:setRootTypename("Mutation")
+	self:setRootTypename("Subscription")
+
+	if t3.possibleTypes then
+		self:addPossibleTypes(t3.possibleTypes)
+	end
+
+	if t3.typePolicies then
+		self:addTypePolicies(t3.typePolicies)
+	end
+
+	return self
+end
+function t2.identify(p15, p16, p17, p18) -- line: 353
+	-- upvalues: getTypenameFromResult (copy), keyFieldsFnFromSpecifier (ref)
+	local v73 = if not p17 or not p18 then p16.__typename else getTypenameFromResult(p16, p17, p18)
+
+	if v73 == p15.rootTypenamesById.ROOT_QUERY then
+		return { "ROOT_QUERY" }
+	end
+
+	local t4 = {
+		typename = v73,
+		selectionSet = p17,
+		fragmentMap = p18
+	}
+	local v75 = nil
+	local v76 = v73 and p15:getTypePolicy(v73)
+	local v77 = if not v76 or not v76.keyFn then p15.config.dataIdFromObject else v76.keyFn
+
+	while v77 do
+		local v78 = v77(v76, p16, t4)
+
+		if type(v78) ~= "table" then
+			v75 = v78
+
+			break
+		end
+
+		v77 = keyFieldsFnFromSpecifier(v78)
+	end
+
+	local v79 = if not v75 then nil else tostring(v75)
+
+	if t4.keyObject then
+		return {
+			v79,
+			t4.keyObject
+		}
+	end
+
+	return { v79 }
+end
+function t2.addTypePolicies(p19, p20) -- line: 425
+	-- upvalues: objectKeysForEach (copy), Object (copy), hasOwnProperty (copy)
+	objectKeysForEach(p20, function(p21) -- line: 427
+		-- upvalues: p20 (copy), Object (copy), p19 (copy), hasOwnProperty (copy)
+		local v200 = p20[p21]
+		local queryType = v200.queryType
+		local mutationType = v200.mutationType
+		local subscriptionType = v200.subscriptionType
+		local v204 = Object.assign({}, v200, {
+			queryType = Object.None,
+			mutationType = Object.None,
+			subscriptionType = Object.None
+		})
+
+		if queryType then
+			p19:setRootTypename("Query", p21)
+		end
+
+		if mutationType then
+			p19:setRootTypename("Mutation", p21)
+		end
+
+		if subscriptionType then
+			p19:setRootTypename("Subscription", p21)
+		end
+
+		if hasOwnProperty(p19.toBeAdded, p21) then
+			table.insert(p19.toBeAdded[p21], v204)
+
+			return
+		end
+
+		p19.toBeAdded[p21] = { v204 }
+	end)
+end
+function t2.updateTypePolicy(t5: {[any]: any}, s1: string, p22) -- line: 471
+	-- upvalues: isCallable (copy), mergeTrueFn (ref), mergeFalseFn (ref), nullKeyFieldsFn (copy), keyFieldsFnFromSpecifier (ref), objectKeysForEach (copy), simpleKeyArgsFn (copy), keyArgsFnFromSpecifier (ref)
+	local v85 = t5:getTypePolicy(s1)
+	local keyFields = p22.keyFields
+	local fields = p22.fields
+
+	local function setMerge(t6: {[any]: any}, p23) -- line: 475
+		-- upvalues: isCallable (copy), mergeTrueFn (ref), mergeFalseFn (ref)
+		if isCallable(p23) then
+			t6.merge = p23
+
+			return
+		end
+
+		if p23 == true then
+			t6.merge = mergeTrueFn
+
+			return
+		end
+
+		if p23 == false then
+			t6.merge = mergeFalseFn
+
+			return
+		end
+
+		t6.merge = t6.merge
+	end
+
+	local merge = p22.merge
+
+	if isCallable(merge) then
+		v85.merge = merge
+	elseif merge == true then
+		v85.merge = mergeTrueFn
+	elseif merge == false then
+		v85.merge = mergeFalseFn
+	else
+		v85.merge = v85.merge
+	end
+
+	if keyFields == false then
+		v85.keyFn = nullKeyFieldsFn
+	else
+		local v90 = type(keyFields)
+
+		if v90 == "table" then
+			v85.keyFn = keyFieldsFnFromSpecifier(keyFields)
+		elseif v90 == "function" then
+			v85.keyFn = keyFields
+		else
+			v85.keyFn = v85.keyFn
+		end
+	end
+
+	if fields then
+		objectKeysForEach(fields, function(p24) -- line: 530
+			-- upvalues: t5 (copy), s1 (copy), fields (copy), simpleKeyArgsFn (copy), keyArgsFnFromSpecifier (ref), isCallable (copy), mergeTrueFn (ref), mergeFalseFn (ref)
+			local v208 = t5:getFieldPolicy(s1, p24, true)
+			local v209 = fields[p24]
+
+			if type(v209) == "function" then
+				v208.read = v209
+			else
+				local keyArgs = v209.keyArgs
+				local read = v209.read
+				local merge2 = v209.merge
+
+				if keyArgs == false then
+					v208.keyFn = simpleKeyArgsFn
+				else
+					local v213 = type(keyArgs)
+
+					if v213 == "table" then
+						v208.keyFn = keyArgsFnFromSpecifier(keyArgs)
+					elseif v213 == "function" then
+						v208.keyFn = keyArgs
+					else
+						v208.keyFn = v208.keyFn
+					end
+				end
+
+				if type(read) == "function" then
+					v208.read = read
+				end
+
+				if isCallable(merge2) then
+					v208.merge = merge2
+				elseif merge2 == true then
+					v208.merge = mergeTrueFn
+				elseif merge2 == false then
+					v208.merge = mergeFalseFn
+				else
+					v208.merge = v208.merge
+				end
+			end
+
+			if v208.read and v208.merge then
+				v208.keyFn = v208.keyFn or simpleKeyArgsFn
+			end
+		end)
+	end
+end
+function t2.setRootTypename(t7: {[any]: any}, s2: string, s3: string?) -- line: 588
+	-- upvalues: invariant2 (copy)
+	if s3 == nil then
+		s3 = s2
+	end
+
+	local v94 = "ROOT_" .. string.upper(s2)
+	local v95 = t7.rootTypenamesById[v94]
+
+	if s3 ~= v95 then
+		local v96 = not v95 or v95 == s2
+
+		if not v96 then
+			invariant2(v96, ("Cannot change root %s __typename more than once"):format(s2))
+		end
+
+		if v95 then
+			t7.rootIdsByTypename[v95] = nil
+		end
+
+		t7.rootIdsByTypename[s3] = v94
+		t7.rootTypenamesById[v94] = s3
+	end
+end
+function t2.addPossibleTypes(t8: {[any]: any}, t9: {[any]: any}) -- line: 617
+	-- upvalues: objectKeysForEach (copy), Array (copy), TypeOrFieldNameRegExp (copy), LuauRegExp (copy)
+	t8.usingPossibleTypes = true
+	objectKeysForEach(t9, function(p25) -- line: 620
+		-- upvalues: t8 (copy), Array (copy), t9 (copy), TypeOrFieldNameRegExp (copy), LuauRegExp (copy)
+		t8:getSupertypeSet(p25, true)
+		Array.forEach(t9[p25], function(p26) -- line: 627
+			-- upvalues: t8 (copy), p25 (copy), TypeOrFieldNameRegExp (copy), LuauRegExp (copy)
+			t8:getSupertypeSet(p26, true):add(p25)
+
+			local v257 = TypeOrFieldNameRegExp:exec(p26)
+
+			if not v257 or p26 ~= v257[1] then
+				t8.fuzzySubtypes:set(p26, LuauRegExp.new(p26))
+			end
+		end)
+	end)
+end
+function t2.getTypePolicy(t10: {[any]: any}, s4: string) -- line: 639
+	-- upvalues: hasOwnProperty (copy), Object (copy), Array (copy)
+	if not hasOwnProperty(t10.typePolicies, s4) then
+		t10.typePolicies[s4] = {}
+
+		local v101 = t10.typePolicies[s4]
+
+		v101.fields = {}
+
+		local v102 = t10.supertypeMap:get(s4)
+
+		if v102 and v102.size > 0 then
+			v102:forEach(function(p27) -- line: 673
+				-- upvalues: t10 (copy), Object (copy), v101 (copy)
+				local v216 = t10:getTypePolicy(p27)
+				local fields = v216.fields
+				local v218 = Object.assign(table.clone(v216), {
+					fields = Object.None
+				})
+
+				Object.assign(v101, v218)
+				Object.assign(v101.fields, fields)
+			end)
+		end
+	end
+
+	local v103 = t10.toBeAdded[s4]
+
+	if v103 and #v103 > 0 then
+		Array.forEach(Array.splice(v103, 1), function(p28) -- line: 690
+			-- upvalues: t10 (copy), s4 (copy)
+			t10:updateTypePolicy(s4, p28)
+		end)
+	end
+
+	return t10.typePolicies[s4]
+end
+function t2.getFieldPolicy(t11: {[any]: any}, s5: string?, s6: string, b1: boolean) -- line: 698
+	if s5 then
+		local fields = t11:getTypePolicy(s5).fields
+
+		if fields[s6] then
+			return fields[s6]
+		end
+
+		if b1 then
+			fields[s6] = {}
+
+			return fields[s6]
+		end
+
+		return nil
+	end
+
+	return nil
+end
+function t2.getSupertypeSet(t12: {[any]: any}, s7: string, b2: boolean) -- line: 725
+	-- upvalues: Set (copy)
+	local v112 = t12.supertypeMap:get(s7)
+
+	if not v112 and b2 then
+		v112 = Set.new()
+		t12.supertypeMap:set(s7, v112)
+	end
+
+	return v112
+end
+function t2.fragmentMatches(t13: {[any]: any}, p29, s8: string?, t14: {[any]: any}?, t15: {[any]: any}?) -- line: 736
+	-- upvalues: Array (copy), invariant2 (copy), selectionSetMatchesResult (copy)
+	if not p29.typeCondition then
+		return true
+	end
+
+	if not s8 then
+		return false
+	end
+
+	local value = p29.typeCondition.name.value
+
+	if s8 == value then
+		return true
+	end
+
+	if t13.usingPossibleTypes and t13.supertypeMap:has(value) then
+		local v119 = t13:getSupertypeSet(s8, true)
+		local t16 = { v119 }
+
+		local function maybeEnqueue(s9: string) -- line: 767
+			-- upvalues: t13 (copy), Array (copy), t16 (copy)
+			local v221 = t13:getSupertypeSet(s9, false)
+
+			if v221 and (v221.size > 0 and Array.indexOf(t16, v221) < 1) then
+				table.insert(t16, v221)
+			end
+		end
+
+		local v122 = t14 ~= nil and t13.fuzzySubtypes.size > 0
+		local v123 = false
+
+		for v124, _ in t16 do
+			local v126 = t16[v124]
+
+			if v126:has(value) then
+				if not v119:has(value) then
+					if v123 then
+						invariant2.warn(("Inferring subtype %s of supertype %s"):format(s8, value))
+					end
+
+					v119:add(value)
+				end
+
+				return true
+			end
+
+			v126:forEach(maybeEnqueue)
+
+			if v122 and v124 == #t16 and selectionSetMatchesResult(p29.selectionSet, t14, t15) then
+				v122 = false
+				v123 = true
+				Array.forEach(t13.fuzzySubtypes:entries(), function(p30) -- line: 834
+					-- upvalues: s8 (copy), t13 (copy), Array (copy), t16 (copy)
+					local v223 = p30[2]
+					local v224 = p30[1]
+					local v225 = v223:exec(s8)
+
+					if v225 and v225[1] == s8 then
+						local v226 = t13:getSupertypeSet(v224, false)
+
+						if v226 and v226.size > 0 and Array.indexOf(t16, v226) < 1 then
+							table.insert(t16, v226)
+						end
+					end
+
+					return 1
+				end)
+			end
+		end
+	end
+
+	return false
+end
+function t2.hasKeyArgs(t17: {[any]: any}, s10: string?, s11: string) -- line: 852
+	local v130 = t17:getFieldPolicy(s10, s11, false)
+
+	return v130 ~= nil and v130.keyFn ~= nil
+end
+function t2.getStoreFieldName(p31, p32) -- line: 859
+	-- upvalues: argumentsObjectFromField (copy), keyArgsFnFromSpecifier (ref), storeKeyNameFromField (copy), getStoreKeyName (copy), fieldNameFromStoreName (copy)
+	local typename = p32.typename
+	local fieldName = p32.fieldName
+	local v135 = p31:getFieldPolicy(typename, fieldName, false)
+	local v136 = nil
+	local v137 = if not v135 then nil else v135.keyFn
+
+	if v137 and typename then
+		local t18 = {
+			typename = typename,
+			fieldName = fieldName,
+			field = p32.field or nil,
+			variables = p32.variables
+		}
+		local v139 = if p32.args == nil then if not p32.field then nil else argumentsObjectFromField(p32.field, p32.variables) else p32.args
+
+		while v137 do
+			local v140 = v137(v139, t18)
+
+			if type(v140) ~= "table" then
+				v136 = v140 or fieldName
+
+				break
+			end
+
+			v137 = keyArgsFnFromSpecifier(v140)
+		end
+	end
+
+	if v136 == nil then
+		v136 = if not p32.field then getStoreKeyName(fieldName, if p32.args == nil then if not p32.field then nil else argumentsObjectFromField(p32.field, p32.variables) else p32.args) else storeKeyNameFromField(p32.field, p32.variables)
+	end
+
+	if v136 == false then
+		return fieldName
+	end
+
+	if fieldName == fieldNameFromStoreName(v136) then
+		return v136
+	end
+
+	return fieldName .. ":" .. v136
+end
+function t2.readField(t19: {[any]: any}, p33, t20: {[any]: any}) -- line: 930
+	-- upvalues: fieldNameFromStoreName (copy), makeFieldFunctionOptions (ref), cacheSlot (copy)
+	local from = p33.from
+
+	if not from then
+		return
+	end
+
+	if not p33.field and not p33.fieldName then
+		return
+	end
+
+	if p33.typename == nil then
+		local v145 = t20.store:getFieldValue(from, "__typename")
+
+		if v145 then
+			p33.typename = v145
+		end
+	end
+
+	local v146 = t19:getStoreFieldName(p33)
+	local v147 = fieldNameFromStoreName(v146)
+	local v148 = t20.store:getFieldValue(from, v146)
+	local v149 = t19:getFieldPolicy(p33.typename, v147, false)
+	local v150 = if not v149 then nil else v149.read
+
+	if v150 then
+		local v151 = makeFieldFunctionOptions(t19, from, p33, t20, t20.store:getStorage(if not from.__ref then from else from.__ref, v146))
+
+		return (cacheSlot:withValue(t19.cache, v150, {
+			v148,
+			v151
+		}))
+	end
+
+	return v148
+end
+function t2.getMergeFunction(t21: {[any]: any}, s12: string?, s13: string, s14: string?) -- line: 990
+	local v156 = t21:getFieldPolicy(s12, s13, false)
+	local v157 = v156 and v156.merge
+
+	if not v157 and s14 then
+		v157 = t21:getTypePolicy(s14)
+
+		if v157 then
+			return v157.merge
+		end
+	end
+
+	return v157
+end
+function t2.runMergeFunction(t22: {[any]: any}, p34, p35, t23: {[any]: any}, p36, p37) -- line: 1021
+	-- upvalues: mergeTrueFn (ref), makeMergeObjectsFunction (ref), mergeFalseFn (ref), makeFieldFunctionOptions (ref)
+	local field = t23.field
+	local typename = t23.typename
+	local merge = t23.merge
+
+	if merge == mergeTrueFn then
+		return makeMergeObjectsFunction(p36.store)(t23, p34, p35)
+	end
+
+	if merge == mergeFalseFn then
+		return p35
+	end
+
+	if p36.overwrite then
+		p34 = nil
+	end
+
+	return merge(t23, p34, p35, makeFieldFunctionOptions(t22, nil, {
+		typename = typename,
+		fieldName = field.name.value,
+		field = field,
+		variables = p36.variables
+	}, p36, p37 or {}))
+end
+
+t1.Policies = t2
+
+function makeFieldFunctionOptions(t24: {[any]: any}, p38, p39, t25: {[any]: any}, p40) -- line: 1081
+	-- upvalues: fieldNameFromStoreName (copy), argumentsObjectFromField (copy), isReference (copy), Object (copy), hasOwnProperty (copy), invariant2 (copy), stringifyForDisplay (copy), Array (copy), makeMergeObjectsFunction (ref)
+	local v172 = t24:getStoreFieldName(p39)
+	local v173 = fieldNameFromStoreName(v172)
+	local v174 = p39.variables or t25.variables
+
+	return {
+		args = if p39.args == nil then if not p39.field then nil else argumentsObjectFromField(p39.field, p39.variables) else p39.args,
+		field = p39.field or nil,
+		fieldName = v173,
+		storeFieldName = v172,
+		variables = v174,
+		isReference = function(_, ...) -- line: 1101
+			-- upvalues: isReference (copy)
+			return isReference(...)
+		end,
+		toReference = t25.store.toReference,
+		storage = p40,
+		cache = t24.cache,
+		canRead = t25.store.canRead,
+		readField = function(_, p43, ...) -- line: 1108
+			-- upvalues: Object (copy), p38 (copy), hasOwnProperty (copy), invariant2 (copy), stringifyForDisplay (copy), Array (copy), v174 (copy), t24 (copy), t25 (copy)
+			local v230 = type(p43)
+			local t26 = {
+				if v230 ~= "table" then p43 else Object.assign(table.clone(p43), if p43.from ~= Object.None then nil else {
+					from = "<Object.None>"
+				}),
+				if not (select("#", ...) >= 1) then nil else "<nil>"
+			}
+			local t27
+
+			if v230 == "string" then
+				t27 = {
+					fieldName = p43,
+					from = if not (select("#", ...) >= 1) then p38 else ...
+				}
+			else
+				if v230 ~= "table" then
+					invariant2.warn(("Unexpected readField arguments: %s"):format(stringifyForDisplay(Array.from(t26))))
+
+					return
+				end
+
+				t27 = Object.assign({}, p43)
+
+				if not hasOwnProperty(p43, "from") then
+					t27.from = p38
+				end
+			end
+
+			if _G.__DEV__ and t27.from == nil then
+				invariant2.warn(("Undefined 'from' passed to readField with arguments %s"):format(stringifyForDisplay(Array.from(t26))))
+			end
+
+			if t27.variables == nil then
+				t27.variables = v174
+			end
+
+			return t24:readField(t27, t25)
+		end,
+		mergeObjects = makeMergeObjectsFunction(t25.store)
+	}
+end
+function makeMergeObjectsFunction(t28: {[any]: any}) -- line: 1175
+	-- upvalues: Array (copy), InvariantError (copy), isNonNullObject (copy), isReference (copy), storeValueIsStoreObject (copy), Object (copy)
+	return function(_, p45, p46) -- line: 1176
+		-- upvalues: Array (copy), InvariantError (copy), isNonNullObject (copy), t28 (copy), isReference (copy), storeValueIsStoreObject (copy), Object (copy)
+		if Array.isArray(p45) or Array.isArray(p46) then
+			error(InvariantError.new("Cannot automatically merge arrays"))
+		end
+
+		if isNonNullObject(p45) and isNonNullObject(p46) then
+			local v236 = t28:getFieldValue(p45, "__typename")
+			local v237 = t28:getFieldValue(p46, "__typename")
+
+			if v236 ~= nil and (v237 ~= nil and v236 ~= v237) then
+				return p46
+			end
+
+			if isReference(p45) and storeValueIsStoreObject(p46) then
+				t28:merge(p45.__ref, p46)
+
+				return p45
+			end
+
+			if storeValueIsStoreObject(p45) and isReference(p46) then
+				t28:merge(p45, p46.__ref)
+
+				return p46
+			end
+
+			if storeValueIsStoreObject(p45) and storeValueIsStoreObject(p46) then
+				return Object.assign({}, p45, p46)
+			end
+		end
+
+		return p46
+	end
+end
+
+local function keyObjEncode(t29: {[any]: any}, t30: {[any]: any}) -- line: 1226
+	-- upvalues: Array (copy), keyObjEncode (copy), HttpService (copy)
+	assert(typeof(t30) == "table", "specifier must be an array")
+
+	if not next(t30) then
+		return "[]"
+	end
+
+	return "{" .. Array.join(Array.filter(Array.map(t30, function(p47, p48) -- line: 1236
+		-- upvalues: Array (copy), t29 (copy), t30 (copy), keyObjEncode (copy), HttpService (copy)
+		if Array.isArray(p47) then
+			return ""
+		end
+
+		if not t29[p47] then
+			return ""
+		end
+
+		if p48 < #t30 then
+			local v240 = if not Array.isArray(t30[p48 + 1]) then HttpService:JSONEncode(t29[p47]) else keyObjEncode(t29[p47], t30[p48 + 1])
+
+			return HttpService:JSONEncode(p47) .. ":" .. v240
+		end
+
+		return HttpService:JSONEncode(p47) .. ":" .. HttpService:JSONEncode(t29[p47])
+	end), function(p49) -- line: 1259
+		return p49 ~= ""
+	end), ",") .. "}"
+end
+
+function keyArgsFnFromSpecifier(p50) -- line: 1268
+	-- upvalues: keyObjEncode (copy), computeKeyObject (ref)
+	return function(p51, p52) -- line: 1269
+		-- upvalues: keyObjEncode (copy), computeKeyObject (ref), p50 (copy)
+		if p51 then
+			return ("%s:%s"):format(p52.fieldName, (keyObjEncode(computeKeyObject(p51, p50, false), p50)))
+		end
+
+		return p52.fieldName
+	end
+end
+function keyFieldsFnFromSpecifier(p53) -- line: 1281
+	-- upvalues: Trie (copy), canUseWeakMap (copy), makeAliasMap (ref), computeKeyObject (ref), keyObjEncode (copy)
+	local v180 = Trie.new(canUseWeakMap)
+
+	return function(_, p55, p56) -- line: 1283
+		-- upvalues: v180 (copy), makeAliasMap (ref), computeKeyObject (ref), p53 (copy), keyObjEncode (copy)
+		local aliasMap = nil
+
+		if p56.selectionSet and p56.fragmentMap then
+			local v248 = v180:lookupArray({
+				p56.selectionSet,
+				p56.fragmentMap
+			})
+
+			if v248.aliasMap then
+				aliasMap = v248.aliasMap
+			else
+				v248.aliasMap = makeAliasMap(p56.selectionSet, p56.fragmentMap)
+				aliasMap = v248.aliasMap
+			end
+		end
+
+		p56.keyObject = computeKeyObject(p55, p53, true, aliasMap)
+
+		local keyObject = p56.keyObject
+
+		return ("%s:%s"):format(p56.typename or "null", (keyObjEncode(keyObject, p53)))
+	end
+end
+function makeAliasMap(p57, p58) -- line: 1311
+	-- upvalues: Set (copy), Array (copy), isField (copy), makeAliasMap (ref), getFragmentFromSelection (copy)
+	local t31 = {}
+	local v184 = Set.new({ p57 })
+
+	for _, v186 in v184 do
+		Array.forEach(v186.selections, function(p59) -- line: 1316
+			-- upvalues: isField (copy), t31 (copy), makeAliasMap (ref), p58 (copy), getFragmentFromSelection (copy), v184 (copy)
+			if isField(p59) then
+				if p59.alias then
+					local value = p59.alias.value
+					local value2 = p59.name.value
+
+					if value2 ~= value then
+						local aliases
+
+						if t31.aliases then
+							aliases = t31.aliases
+						else
+							t31.aliases = {}
+							aliases = t31.aliases
+						end
+
+						aliases[value2] = value
+					end
+				end
+
+				if p59.selectionSet then
+					local subsets
+
+					if t31.subsets then
+						subsets = t31.subsets
+					else
+						t31.subsets = {}
+						subsets = t31.subsets
+					end
+
+					subsets[p59.name.value] = makeAliasMap(p59.selectionSet, p58)
+
+					return
+				end
+			else
+				local v255 = getFragmentFromSelection(p59, p58)
+
+				if v255 then
+					v184:add(v255.selectionSet)
+				end
+			end
+		end)
+	end
+
+	return t31
+end
+function computeKeyObject(t32: {[any]: any}, p60, b3: boolean, t33: {[any]: any}?) -- line: 1361
+	-- upvalues: computeKeyObject (ref), hasOwnProperty (copy), invariant2 (copy)
+	local t34 = {}
+	local v192 = nil
+
+	for _, v194 in p60 do
+		if type(v194) == "table" then
+			if type(v192) == "string" then
+				local v195 = t33 and t33.subsets
+				local v196 = v195 and v195[v192]
+
+				t34[v192] = computeKeyObject(t32[v192], v194, b3, v196)
+			end
+		else
+			local v197 = t33 and t33.aliases
+			local v198 = if not v197 or not v197[v194] then v194 else v197[v194]
+
+			if hasOwnProperty(t32, v198) then
+				v192 = v194
+				t34[v192] = t32[v198]
+			else
+				invariant2(not b3, ("Missing field '%s' while computing key fields"):format(v198))
+				v192 = nil
+			end
+		end
+	end
+
+	return t34
+end
+
+t1.None = Object.None
+
+return t1

@@ -1,25 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Roact_0 = v1.Roact;
-local v4 = require(l_script_FirstAncestor_0.Enums.LocalizedKeys);
-local v5 = require(l_script_FirstAncestor_0.Components.HeaderBarRightView);
-local l_FFlagConnectionsToFriendsRename_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsToFriendsRename;
-return function(v7) --[[ Line: 12 ]]
-    -- upvalues: l_FFlagConnectionsToFriendsRename_0 (copy), v4 (copy), l_Roact_0 (copy), v5 (copy)
-    return {
-        headerText = {
-            raw = if l_FFlagConnectionsToFriendsRename_0 then v4.FriendsHeader.rawValue() else v4.ConnectionsHeader.rawValue(), 
-            shouldLocalize = true
-        }, 
-        useSecondaryHeader = true, 
-        shouldExitNavigation = false, 
-        tabBarVisible = false, 
-        renderRight = function() --[[ Line: 23 ]] --[[ Name: renderRight ]]
-            -- upvalues: l_Roact_0 (ref), v5 (ref), v7 (copy)
-            return l_Roact_0.createElement(v5, v7);
-        end, 
-        transparent = true, 
-        absorbInputSelectable = false
-    };
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local FriendsLandingParent = FriendsLanding.Parent
+local Roact = dependencies.Roact
+local LocalizedKeys = require(FriendsLanding.Enums.LocalizedKeys)
+local HeaderBarRightView = require(FriendsLanding.Components.HeaderBarRightView)
+local FFlagConnectionsToFriendsRename = require(FriendsLandingParent.SharedFlags).FFlagConnectionsToFriendsRename
+
+return function(p1) -- line: 12
+	-- upvalues: FFlagConnectionsToFriendsRename (copy), LocalizedKeys (copy), Roact (copy), HeaderBarRightView (copy)
+	return {
+		useSecondaryHeader = true,
+		shouldExitNavigation = false,
+		tabBarVisible = false,
+		transparent = true,
+		absorbInputSelectable = false,
+		headerText = {
+			shouldLocalize = true,
+			raw = if not FFlagConnectionsToFriendsRename then LocalizedKeys.ConnectionsHeader.rawValue() else LocalizedKeys.FriendsHeader.rawValue()
+		},
+		renderRight = function() -- line: 23
+			-- upvalues: Roact (copy), HeaderBarRightView (copy), p1 (copy)
+			return Roact.createElement(HeaderBarRightView, p1)
+		end
+	}
+end

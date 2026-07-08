@@ -1,40 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v3 = require(l_Parent_0.UIBlox);
-local l_useSelectionCursor_0 = v3.App.SelectionImage.useSelectionCursor;
-local l_CursorKind_0 = v3.App.SelectionImage.CursorKind;
-local l_FFlagAXMigrateAXToGlobalAutofocus_0 = require(l_Parent_0.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus;
-local v7 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 = v7.FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark;
-local l_FFlagAXMISEnableMultiShopping_0 = v7.FFlagAXMISEnableMultiShopping;
-return (v1.forwardRef(function(v10, v11) --[[ Line: 27 ]]
-    -- upvalues: l_FFlagAXMigrateAXToGlobalAutofocus_0 (copy), l_useSelectionCursor_0 (copy), l_CursorKind_0 (copy), l_useTokens_0 (copy), v1 (copy), l_FFlagAXMISEnableMultiShopping_0 (copy), l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 (copy)
-    local v12 = if l_FFlagAXMigrateAXToGlobalAutofocus_0 then l_useSelectionCursor_0(l_CursorKind_0.RoundedRect) else nil;
-    local v13 = l_useTokens_0();
-    return v1.createElement("TextButton", {
-        Selectable = if l_FFlagAXMISEnableMultiShopping_0 then v10.Selectable else nil, 
-        SelectionImageObject = v12, 
-        Text = "", 
-        AutoButtonColor = false, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        [v1.Event.Activated] = if v10.isDisabled then nil else v10.onActivated, 
-        ref = v11, 
-        Size = v10.Size, 
-        AutomaticSize = v10.AutomaticSize, 
-        LayoutOrder = v10.LayoutOrder, 
-        SelectionGroup = true, 
-        ClipsDescendants = not l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 or nil, 
-        [v1.Tag] = v10.tag
-    }, {
-        ItemCardListLayout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            Padding = UDim.new(0, v13.Gap.Small)
-        }), 
-        ItemCardHeaderSlot = v10.headerSlot, 
-        ItemCardFooterSlot = v10.footerSlot
-    });
-end));
+local AvatarExperienceUIKit = script:FindFirstAncestor("AvatarExperienceUIKit")
+local AvatarExperienceUIKitParent = AvatarExperienceUIKit.Parent
+local React = require(AvatarExperienceUIKitParent.React)
+local Foundation = require(AvatarExperienceUIKitParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local View = Foundation.View
+local UIBlox = require(AvatarExperienceUIKitParent.UIBlox)
+local useSelectionCursor = UIBlox.App.SelectionImage.useSelectionCursor
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local FFlagAXMigrateAXToGlobalAutofocus = require(AvatarExperienceUIKitParent.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus
+
+require(AvatarExperienceUIKit.BackgroundLayers.BackgroundLayers)
+
+local ItemCardBackgroundsWrapper = require(script.Parent.ItemCardBackgroundsWrapper)
+local AvatarExperienceFlags = require(AvatarExperienceUIKitParent.AvatarExperienceFlags)
+local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
+local FFlagAXLookAndFeelBackgrounds = AvatarExperienceFlags.FFlagAXLookAndFeelBackgrounds
+local FFlagAXSelectedBorderWrapsBackground = AvatarExperienceFlags.FFlagAXSelectedBorderWrapsBackground
+
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 33
+	-- upvalues: FFlagAXMigrateAXToGlobalAutofocus (copy), useSelectionCursor (copy), CursorKind (copy), useTokens (copy), React (copy), FFlagAXMISEnableMultiShopping (copy), FFlagAXLookAndFeelBackgrounds (copy), ItemCardBackgroundsWrapper (copy), FFlagAXSelectedBorderWrapsBackground (copy), View (copy)
+	local v18 = if not FFlagAXMigrateAXToGlobalAutofocus then nil else useSelectionCursor(CursorKind.RoundedRect)
+	local v19 = useTokens()
+
+	return React.createElement("TextButton", {
+		Selectable = if not FFlagAXMISEnableMultiShopping then nil else t1.Selectable,
+		SelectionImageObject = v18,
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		[React.Event.Activated] = if not t1.isDisabled then t1.onActivated else nil,
+		ref = p1,
+		Size = t1.Size,
+		AutomaticSize = t1.AutomaticSize,
+		LayoutOrder = t1.LayoutOrder,
+		SelectionGroup = true,
+		[React.Tag] = t1.tag
+	}, if not FFlagAXLookAndFeelBackgrounds or (t1.backgroundLayers == nil or not (#t1.backgroundLayers > 0)) then {
+		ItemCardListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = UDim.new(0, v19.Gap.Small)
+		}),
+		ItemCardHeaderSlot = t1.headerSlot,
+		ItemCardFooterSlot = t1.footerSlot
+	} else {
+		BackgroundsWrapper = React.createElement(ItemCardBackgroundsWrapper, {
+			backgroundLayers = t1.backgroundLayers,
+			imageScaleType = t1.imageScaleType,
+			headerSlot = t1.headerSlot,
+			footerSlot = t1.footerSlot
+		}),
+		SelectedBorder = if not FFlagAXSelectedBorderWrapsBackground or not t1.showSelectionBorderWithBackground then nil else React.createElement(View, {
+			tag = "size-full stroke-standard stroke-system-contrast radius-medium",
+			testId = "card-selection-stroke",
+			ZIndex = 2
+		})
+	})
+end))

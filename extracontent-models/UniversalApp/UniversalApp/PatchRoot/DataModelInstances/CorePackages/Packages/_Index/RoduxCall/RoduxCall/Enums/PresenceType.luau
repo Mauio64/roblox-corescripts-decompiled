@@ -1,7 +1,7 @@
 return {
-    Offline = "Offline", 
-    Online = "Online", 
-    InGame = "InGame", 
-    InStudio = "InStudio", 
-    Invisible = "Invisible"
-};
+	Offline = "Offline",
+	Online = "Online",
+	InGame = "InGame",
+	InStudio = "InStudio",
+	Invisible = "Invisible"
+}

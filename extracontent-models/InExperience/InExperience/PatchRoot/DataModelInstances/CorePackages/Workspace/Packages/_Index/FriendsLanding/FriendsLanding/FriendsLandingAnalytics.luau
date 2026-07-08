@@ -1,14 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_Context_0 = require(l_script_FirstAncestor_0.dependencies).SocialLibraries.Context;
-local v2 = require(script.ButtonClickEvents);
-local v3 = require(script.ImpressionEvents);
-local v4 = require(script.AnalyticsContext);
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local Context = require(FriendsLanding.dependencies).SocialLibraries.Context
+local ButtonClickEvents = require(script.ButtonClickEvents)
+local ImpressionEvents = require(script.ImpressionEvents)
+local AnalyticsContext = require(script.AnalyticsContext)
+
 return {
-    Class = require(script.FriendsLandingAnalytics), 
-    Context = v4, 
-    connect = l_Context_0.getConnect(v4), 
-    with = l_Context_0.getWith(v4), 
-    ButtonClickEvents = v2, 
-    AddFriendsPageLoadAnalytics = require(script.AddFriendsPageLoadAnalytics), 
-    ImpressionEvents = v3
-};
+	Class = require(script.FriendsLandingAnalytics),
+	Context = AnalyticsContext,
+	connect = Context.getConnect(AnalyticsContext),
+	with = Context.getWith(AnalyticsContext),
+	ButtonClickEvents = ButtonClickEvents,
+	AddFriendsPageLoadAnalytics = require(script.AddFriendsPageLoadAnalytics),
+	ImpressionEvents = ImpressionEvents
+}

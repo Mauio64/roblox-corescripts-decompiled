@@ -1,86 +1,97 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.RoactRodux);
-local v6 = require(l_CorePackages_0.Packages.t);
-local v7 = require(l_CorePackages_0.Packages.Cryo);
-local v8 = require(script.Parent.Parent.Constants);
-local v9 = require(script.Parent.Parent.Logger)(script.Name);
-local v10 = require(script.Parent.BubbleChatBillboard);
-local v11 = require(l_RobloxGui_0.Modules.Flags.GetFFlagBubbleVoiceIndicatorSetting);
-local v12 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagAvatarChatCoreScriptSupport();
-local v13 = v4.Component:extend("ChatBillboards");
-v13.validateProps = v6.strictInterface({
-    userMessages = v6.map(v6.string, v6.array(v6.string)), 
-    bubbleChatEnabled = v6.boolean, 
-    voiceEnabled = v6.boolean, 
-    participants = v6.map(v6.string, v6.string)
-});
-v13.getDerivedStateFromProps = function(v14, v15) --[[ Line: 34 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: v7 (copy)
-    return {
-        userMessages = v7.Dictionary.join(v15.userMessages or {}, v14.userMessages)
-    };
-end;
-v13.init = function(v16) --[[ Line: 43 ]] --[[ Name: init ]]
-    -- upvalues: v9 (copy), v7 (copy)
-    v9:debug("Initializing");
-    v16:setState({
-        userMessages = {}
-    });
-    v16.onBillboardFadeOut = function(v17) --[[ Line: 49 ]]
-        -- upvalues: v16 (copy), v7 (ref)
-        v16:setState({
-            userMessages = v7.Dictionary.join(v16.state.userMessages, {
-                [v17] = v7.None
-            })
-        });
-    end;
-end;
-v13.render = function(v18) --[[ Line: 56 ]] --[[ Name: render ]]
-    -- upvalues: v12 (copy), v8 (copy), l_Players_0 (copy), v9 (copy), v4 (copy), v10 (copy)
-    if not v18.props.voiceEnabled and not v18.props.bubbleChatEnabled and not v12 then
-        return;
-    else
-        local v19 = {};
-        for v20, _ in pairs(v18.state.userMessages) do
-            v19[v20] = false;
-        end;
-        for v22, v23 in pairs(v18.props.participants) do
-            if v23 ~= v8.VOICE_STATE.HIDDEN then
-                v19[v22] = true;
-            end;
-        end;
-        if v12 then
-            v19[tostring(l_Players_0.LocalPlayer.UserId)] = true;
-        end;
-        local v24 = {};
-        for v25, v26 in pairs(v19) do
-            v9:trace("Rendering billboard for ...{}", (string.sub(tostring(v25), -4)));
-            v24["BubbleChat_" .. v25] = v4.createElement(v10, {
-                userId = v25, 
-                onFadeOut = v18.onBillboardFadeOut, 
-                voiceEnabled = v18.props.voiceEnabled and v26, 
-                bubbleChatEnabled = v18.props.bubbleChatEnabled
-            });
-        end;
-        return v4.createElement("ScreenGui", {
-            ResetOnSpawn = false
-        }, v24);
-    end;
-end;
-return v5.connect(function(v27) --[[ Line: 100 ]] --[[ Name: mapStateToProps ]]
-    -- upvalues: v11 (copy)
-    local l_voiceEnabled_0 = v27.components.voiceEnabled;
-    if v11() then
-        l_voiceEnabled_0 = v27.components.voiceEnabled and v27.chatSettings.Voice.ShowIndicator;
-    end;
-    return {
-        userMessages = v27.userMessages, 
-        voiceEnabled = l_voiceEnabled_0, 
-        bubbleChatEnabled = v27.components.bubbleChatEnabled, 
-        participants = v27.voiceState
-    };
-end)(v13);
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("Players")
+
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local Cryo = require(CorePackages.Packages.Cryo)
+local Constants = require(script.Parent.Parent.Constants)
+local v9 = require(script.Parent.Parent.Logger)(script.Name)
+local BubbleChatBillboard = require(script.Parent.BubbleChatBillboard)
+local GetFFlagBubbleVoiceIndicatorSetting = require(RobloxGui.Modules.Flags.GetFFlagBubbleVoiceIndicatorSetting)
+local v12 = Roact.Component:extend("ChatBillboards")
+
+v12.validateProps = t.strictInterface({
+	userMessages = t.map(t.string, t.array(t.string)),
+	bubbleChatEnabled = t.boolean,
+	voiceEnabled = t.boolean,
+	participants = t.map(t.string, t.string)
+})
+
+function v12.getDerivedStateFromProps(p1, p2) -- line: 33
+	-- upvalues: Cryo (copy)
+	return {
+		userMessages = Cryo.Dictionary.join(p2.userMessages or {}, p1.userMessages)
+	}
+end
+function v12.init(p3) -- line: 42
+	-- upvalues: v9 (copy), Cryo (copy)
+	v9:debug("Initializing")
+	p3:setState({
+		userMessages = {}
+	})
+
+	function p3.onBillboardFadeOut(p4) -- line: 48
+		-- upvalues: p3 (copy), Cryo (copy)
+		p3:setState({
+			userMessages = Cryo.Dictionary.join(p3.state.userMessages, {
+				[p4] = Cryo.None
+			})
+		})
+	end
+end
+function v12.render(p5) -- line: 55
+	-- upvalues: Constants (copy), v9 (copy), Roact (copy), BubbleChatBillboard (copy)
+	if not p5.props.voiceEnabled and not p5.props.bubbleChatEnabled then
+		return
+	end
+
+	local t1 = {}
+
+	for k, _ in pairs(p5.state.userMessages) do
+		t1[k] = false
+	end
+
+	for k, v in pairs(p5.props.participants) do
+		if v ~= Constants.VOICE_STATE.HIDDEN then
+			t1[k] = true
+		end
+	end
+
+	local t2 = {}
+
+	for k, v in pairs(t1) do
+		v9:trace("Rendering billboard for ...{}", (string.sub(tostring(k), -4)))
+		t2["BubbleChat_" .. k] = Roact.createElement(BubbleChatBillboard, {
+			userId = k,
+			onFadeOut = p5.onBillboardFadeOut,
+			voiceEnabled = p5.props.voiceEnabled and v,
+			bubbleChatEnabled = p5.props.bubbleChatEnabled
+		})
+	end
+
+	return Roact.createElement("ScreenGui", {
+		ResetOnSpawn = false
+	}, t2)
+end
+
+local function mapStateToProps(p6) -- line: 93
+	-- upvalues: GetFFlagBubbleVoiceIndicatorSetting (copy)
+	local voiceEnabled = p6.components.voiceEnabled
+
+	if GetFFlagBubbleVoiceIndicatorSetting() then
+		voiceEnabled = p6.components.voiceEnabled and p6.chatSettings.Voice.ShowIndicator
+	end
+
+	return {
+		userMessages = p6.userMessages,
+		voiceEnabled = voiceEnabled,
+		bubbleChatEnabled = p6.components.bubbleChatEnabled,
+		participants = p6.voiceState
+	}
+end
+
+return RoactRodux.connect(mapStateToProps)(v12)

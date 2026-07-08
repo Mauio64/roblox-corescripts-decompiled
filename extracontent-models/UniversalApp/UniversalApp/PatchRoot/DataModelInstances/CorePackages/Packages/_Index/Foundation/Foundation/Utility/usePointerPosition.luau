@@ -1,37 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Utility.Wrappers);
-local l_Signal_0 = v3.Signal;
-local l_Connection_0 = v3.Connection;
-return function(v6) --[[ Line: 10 ]] --[[ Name: usePointerPosition ]]
-    -- upvalues: v2 (copy), l_Signal_0 (copy), l_Connection_0 (copy)
-    local v7, v8 = v2.useBinding(Vector2.zero);
-    v2.useEffect(function() --[[ Line: 13 ]]
-        -- upvalues: v6 (copy), v8 (copy), l_Signal_0 (ref), l_Connection_0 (ref)
-        if not v6 then
-            return;
-        else
-            local function v10(v9) --[[ Line: 18 ]] --[[ Name: setPositionFromInput ]]
-                -- upvalues: v8 (ref)
-                if v9.Position.X > 0 or v9.Position.Y > 0 then
-                    v8(Vector2.new(v9.Position.X, v9.Position.Y));
-                end;
-            end;
-            local v11 = {
-                l_Signal_0.Connect(v6.InputBegan, v10), 
-                l_Signal_0.Connect(v6.InputChanged, v10), 
-                l_Signal_0.Connect(v6.InputEnded, v10)
-            };
-            return function() --[[ Line: 30 ]]
-                -- upvalues: v11 (copy), l_Connection_0 (ref)
-                for _, v13 in v11 do
-                    l_Connection_0.Disconnect(v13);
-                end;
-            end;
-        end;
-    end, {
-        v6
-    });
-    return v7;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Wrappers = require(Foundation.Utility.Wrappers)
+local Signal = Wrappers.Signal
+local Connection = Wrappers.Connection
+
+local function usePointerPosition(p1) -- line: 10
+	-- upvalues: React (copy), Signal (copy), Connection (copy)
+	local v9, v10 = React.useBinding(Vector2.zero)
+
+	React.useEffect(function() -- line: 13
+		-- upvalues: p1 (copy), v10 (copy), Signal (copy), Connection (copy)
+		if not p1 then
+			return
+		end
+
+		local function setPositionFromInput(p2) -- line: 18
+			-- upvalues: v10 (copy)
+			if p2.Position.X > 0 or p2.Position.Y > 0 then
+				v10(Vector2.new(p2.Position.X, p2.Position.Y))
+			end
+		end
+
+		local t1 = {
+			Signal.Connect(p1.InputBegan, setPositionFromInput),
+			Signal.Connect(p1.InputChanged, setPositionFromInput),
+			Signal.Connect(p1.InputEnded, setPositionFromInput)
+		}
+
+		return function() -- line: 30
+			-- upvalues: t1 (copy), Connection (copy)
+			for _, v15 in t1 do
+				Connection.Disconnect(v15)
+			end
+		end
+	end, { p1 })
+
+	return v9
+end
+
+return usePointerPosition

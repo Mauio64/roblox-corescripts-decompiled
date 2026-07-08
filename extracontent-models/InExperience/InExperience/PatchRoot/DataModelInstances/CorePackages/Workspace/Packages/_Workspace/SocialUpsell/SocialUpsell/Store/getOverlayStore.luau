@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialUpsell").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.Parent.createOverlayStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("SocialUpsell").Parent
+local Signals = require(Parent.Signals)
+local createOverlayStore = require(script.Parent.createOverlayStore)
+
+return Signals.createComputed(createOverlayStore)

@@ -1,34 +1,48 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Constants);
-return function(v2, v3) --[[ Line: 16 ]] --[[ Name: MaybeSendEmoteFailureAnalyticsFromPlayer ]]
-    -- upvalues: v1 (copy)
-    local l_Character_0 = v2.Character;
-    if not l_Character_0 then
-        v3(v1.ErrorTypes.TemporarilyUnavailable);
-        return true;
-    else
-        local v5 = l_Character_0 and l_Character_0:FindFirstChildOfClass("Humanoid") or nil;
-        if not v5 then
-            v3(v1.ErrorTypes.TemporarilyUnavailable);
-            return true;
-        elseif v5 and v5.RigType ~= Enum.HumanoidRigType.R15 then
-            v3(v1.ErrorTypes.SwitchToR15);
-            return true;
-        else
-            local v6 = l_Character_0 and l_Character_0:FindFirstChild("Animate") or nil;
-            local v7 = v5 and v5:FindFirstChildOfClass("HumanoidDescription") or nil;
-            if not v6 or not v7 then
-                v3(v1.ErrorTypes.NotSupported);
-                return true;
-            else
-                local v8 = v6 and v6:FindFirstChild("PlayEmote") or nil;
-                if not v8 or not v8:IsA("BindableFunction") then
-                    v3(v1.ErrorTypes.NotSupported);
-                    return true;
-                else
-                    return false;
-                end;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+
+local function MaybeSendEmoteFailureAnalyticsFromPlayer(p1, p2) -- line: 16
+	-- upvalues: Constants (copy)
+	local Character = p1.Character
+
+	if not Character then
+		p2(Constants.ErrorTypes.TemporarilyUnavailable)
+
+		return true
+	end
+
+	local v7 = Character and Character:FindFirstChildOfClass("Humanoid") or nil
+
+	if not v7 then
+		p2(Constants.ErrorTypes.TemporarilyUnavailable)
+
+		return true
+	end
+
+	if v7 and v7.RigType ~= Enum.HumanoidRigType.R15 then
+		p2(Constants.ErrorTypes.SwitchToR15)
+
+		return true
+	end
+
+	local v8 = Character and Character:FindFirstChild("Animate") or nil
+	local v9 = v7 and v7:FindFirstChildOfClass("HumanoidDescription") or nil
+
+	if not v8 or not v9 then
+		p2(Constants.ErrorTypes.NotSupported)
+
+		return true
+	end
+
+	local v10 = v8 and v8:FindFirstChild("PlayEmote") or nil
+
+	if not v10 or not v10:IsA("BindableFunction") then
+		p2(Constants.ErrorTypes.NotSupported)
+
+		return true
+	end
+
+	return false
+end
+
+return MaybeSendEmoteFailureAnalyticsFromPlayer

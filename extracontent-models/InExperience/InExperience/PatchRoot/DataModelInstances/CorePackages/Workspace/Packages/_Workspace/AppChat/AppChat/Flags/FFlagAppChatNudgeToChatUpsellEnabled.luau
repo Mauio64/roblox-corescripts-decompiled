@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatNudgeToChatUpsellEnabled", false);
+return game:DefineFastFlag("AppChatNudgeToChatUpsellEnabledV3", false)

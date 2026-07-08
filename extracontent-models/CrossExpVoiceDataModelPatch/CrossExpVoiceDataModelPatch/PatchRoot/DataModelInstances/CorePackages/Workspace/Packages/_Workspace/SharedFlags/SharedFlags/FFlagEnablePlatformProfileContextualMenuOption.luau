@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePlatformProfileContextualMenuOption", false);
+return game:DefineFastFlag("EnablePlatformProfileContextualMenuOption", false)

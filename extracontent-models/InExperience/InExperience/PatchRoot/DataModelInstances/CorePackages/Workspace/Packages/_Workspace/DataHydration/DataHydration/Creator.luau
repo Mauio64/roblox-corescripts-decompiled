@@ -1,5 +1,6 @@
-local _ = require(script.CreatorInfoStoreTypes);
+require(script.CreatorInfoStoreTypes)
+
 return {
-    createCreatorInfoStore = require(script.createCreatorInfoStore), 
-    getCreatorInfoStore = require(script.getCreatorInfoStore)
-};
+	createCreatorInfoStore = require(script.createCreatorInfoStore),
+	getCreatorInfoStore = require(script.getCreatorInfoStore)
+}

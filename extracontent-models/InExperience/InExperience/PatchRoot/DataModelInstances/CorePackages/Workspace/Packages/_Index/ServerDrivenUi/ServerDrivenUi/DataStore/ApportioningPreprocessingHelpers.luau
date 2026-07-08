@@ -1,52 +1,60 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local l_flaggedMutedError_0 = require(l_Parent_0.Loggers).flaggedMutedError;
-local function v6(v2, v3, v4, v5) --[[ Line: 7 ]]
-    v2[v3] = {
-        gridApportioningMetadata = {
-            {
-                sortIndex = v5, 
-                capacity = v4
-            }
-        }
-    };
-end;
-local function v12(v7, v8, v9) --[[ Line: 18 ]]
-    -- upvalues: l_flaggedMutedError_0 (copy)
-    for v10, v11 in v7.gridApportioningMetadata do
-        if v11.sortIndex == v9 then
-            l_flaggedMutedError_0("ApportioningSameSortIndex", (("Multiple collections at sort index %*"):format(v9)));
-        elseif v9 < v11.sortIndex then
-            table.insert(v7.gridApportioningMetadata, v10, {
-                sortIndex = v9, 
-                capacity = v8
-            });
-            return;
-        end;
-    end;
-    table.insert(v7.gridApportioningMetadata, {
-        sortIndex = v9, 
-        capacity = v8
-    });
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local flaggedMutedError = require(Parent.Loggers).flaggedMutedError
+
+local function v3(p1, p2, p3, p4) -- line: 11
+	p1[p2] = {
+		gridApportioningMetadata = {{
+			sortIndex = p4,
+			capacity = p3
+		}}
+	}
+end
+local function v4(p5, p6, p7) -- line: 22
+	-- upvalues: flaggedMutedError (copy)
+	for v12, v13 in p5.gridApportioningMetadata do
+		if p7 ~= v13.sortIndex then
+			if not (p7 < v13.sortIndex) then
+				continue
+			end
+
+			table.insert(p5.gridApportioningMetadata, v12, {
+				sortIndex = p7,
+				capacity = p6
+			})
+
+			return
+		end
+
+		flaggedMutedError("ApportioningSameSortIndex", `Multiple collections at sort index { p7 }`)
+	end
+
+	table.insert(p5.gridApportioningMetadata, {
+		sortIndex = p7,
+		capacity = p6
+	})
+end
+
 return {
-    addToApportioningData = function(v13, v14, v15, v16) --[[ Line: 39 ]] --[[ Name: addToApportioningData ]]
-        -- upvalues: v12 (copy), v6 (copy)
-        local v17 = v13[v14];
-        if v17 then
-            v12(v17, v15, v16);
-            return;
-        else
-            v6(v13, v14, v15, v16);
-            return;
-        end;
-    end, 
-    populateStartingItemIndices = function(v18) --[[ Line: 49 ]] --[[ Name: populateStartingItemIndices ]]
-        for _, v20 in v18 do
-            local v21 = 1;
-            for _, v23 in v20.gridApportioningMetadata do
-                v23.startingItemIndex = v21;
-                v21 = v21 + v23.capacity;
-            end;
-        end;
-    end
-};
+	addToApportioningData = function(p8, p9, p10, p11) -- line: 43
+		-- upvalues: v4 (copy), v3 (copy)
+		local v18 = p8[p9]
+
+		if v18 then
+			v4(v18, p10, p11)
+
+			return
+		end
+
+		v3(p8, p9, p10, p11)
+	end,
+	populateStartingItemIndices = function(p12) -- line: 53
+		for _, v21 in p12 do
+			local n1 = 1
+
+			for _, v24 in v21.gridApportioningMetadata do
+				v24.startingItemIndex = n1
+				n1 += v24.capacity
+			end
+		end
+	end
+}

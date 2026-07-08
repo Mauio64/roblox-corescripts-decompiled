@@ -1,4 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceControlBar").Parent;
-local _ = require(l_Parent_0.React);
-local _ = require(l_Parent_0.Foundation).Enums.Radius;
-return {};
+local Parent = script:FindFirstAncestor("AvatarExperienceControlBar").Parent
+
+require(Parent.React)
+
+local _ = require(Parent.Foundation).Enums.Radius
+
+return {}

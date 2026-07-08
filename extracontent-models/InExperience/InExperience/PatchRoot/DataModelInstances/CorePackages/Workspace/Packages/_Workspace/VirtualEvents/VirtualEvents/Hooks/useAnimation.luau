@@ -1,81 +1,97 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local l_TweenService_0 = game:GetService("TweenService");
-local v3 = {
-    linear = Enum.EasingStyle.Linear, 
-    quadratic = Enum.EasingStyle.Quad, 
-    cubic = Enum.EasingStyle.Cubic
-};
-local function _(v4) --[[ Line: 32 ]] --[[ Name: stopTween ]]
-    if v4.current then
-        v4.current:Cancel();
-        v4.current = nil;
-    end;
-end;
-local function _(v6, v7) --[[ Line: 40 ]] --[[ Name: isApproximatelyEqual ]]
-    return math.abs(v6 - v7) < 0.001;
-end;
-return function(v9) --[[ Line: 44 ]] --[[ Name: useAnimation ]]
-    -- upvalues: v1 (copy), v3 (copy), l_TweenService_0 (copy)
-    local v10 = v1.useRef(nil);
-    local v11 = v1.useRef(nil);
-    v1.useEffect(function() --[[ Line: 48 ]]
-        -- upvalues: v9 (copy), v11 (copy), v3 (ref), v10 (copy), l_TweenService_0 (ref)
-        local l_startOffset_0 = v9.startOffset;
-        local v13 = v9.endOffset or 0;
-        local v14 = v9.duration or 0.2;
-        local v15 = v9.easingStyle or "quadratic";
-        if math.abs(l_startOffset_0 - v13) < 0.001 then
-            return;
-        else
-            local l_NumberValue_0 = Instance.new("NumberValue");
-            l_NumberValue_0.Value = l_startOffset_0;
-            v11.current = l_startOffset_0;
-            local v17 = v3[v15] or v3.quadratic;
-            local v18 = TweenInfo.new(v14, v17, Enum.EasingDirection.Out);
-            local l_v10_0 = v10;
-            if l_v10_0.current then
-                l_v10_0.current:Cancel();
-                l_v10_0.current = nil;
-            end;
-            v10.current = l_TweenService_0:Create(l_NumberValue_0, v18, {
-                Value = v13
-            });
-            l_v10_0 = l_NumberValue_0:GetPropertyChangedSignal("Value"):Connect(function() --[[ Line: 75 ]]
-                -- upvalues: l_NumberValue_0 (copy), v11 (ref), v9 (ref)
-                local l_Value_0 = l_NumberValue_0.Value;
-                if v11.current == nil or not (math.abs(l_Value_0 - v11.current) < 0.001) then
-                    v11.current = l_Value_0;
-                    v9.setAnimationOffset(l_Value_0);
-                end;
-            end);
-            if v10.current then
-                v10.current.Completed:Connect(function() --[[ Line: 84 ]]
-                    -- upvalues: l_v10_0 (copy), l_NumberValue_0 (copy), v10 (ref), v11 (ref)
-                    l_v10_0:Disconnect();
-                    l_NumberValue_0:Destroy();
-                    v10.current = nil;
-                    v11.current = nil;
-                end);
-                v10.current:Play();
-            end;
-            return function() --[[ Line: 93 ]]
-                -- upvalues: l_v10_0 (copy), v10 (ref), l_NumberValue_0 (copy), v11 (ref)
-                l_v10_0:Disconnect();
-                local l_v10_1 = v10;
-                if l_v10_1.current then
-                    l_v10_1.current:Cancel();
-                    l_v10_1.current = nil;
-                end;
-                l_NumberValue_0:Destroy();
-                v11.current = nil;
-            end;
-        end;
-    end, {
-        v9.startOffset, 
-        v9.endOffset, 
-        v9.duration, 
-        v9.easingStyle, 
-        v9.setAnimationOffset
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local React = require(VirtualEvents.Parent.React)
+local TweenService = game:GetService("TweenService")
+local t1 = {
+	linear = Enum.EasingStyle.Linear,
+	quadratic = Enum.EasingStyle.Quad,
+	cubic = Enum.EasingStyle.Cubic
+}
+
+local function stopTween(t2: {[any]: any}) -- line: 32
+	if t2.current then
+		t2.current:Cancel()
+		t2.current = nil
+	end
+end
+local function isApproximatelyEqual(n1: number, n2: number) -- line: 40
+	return math.abs(n1 - n2) < 0.001
+end
+local function useAnimation(t3: {[any]: any}) -- line: 44
+	-- upvalues: React (copy), t1 (copy), TweenService (copy)
+	local v12 = React.useRef(nil)
+	local v13 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 48
+		-- upvalues: t3 (copy), v13 (copy), t1 (copy), v12 (copy), TweenService (copy)
+		local startOffset = t3.startOffset
+		local v15 = t3.endOffset or 0
+		local v16 = t3.duration or 0.2
+		local v17 = t3.easingStyle or "quadratic"
+
+		if math.abs(startOffset - v15) < 0.001 then
+			return
+		end
+
+		local NumberValue = Instance.new("NumberValue")
+
+		NumberValue.Value = startOffset
+		v13.current = startOffset
+
+		local v19 = t1[v17] or t1.quadratic
+		local tweenInfo = TweenInfo.new(v16, v19, Enum.EasingDirection.Out)
+		local v21 = v12
+
+		if v21.current then
+			v21.current:Cancel()
+			v21.current = nil
+		end
+
+		v12.current = TweenService:Create(NumberValue, tweenInfo, {
+			Value = v15
+		})
+
+		local connection = NumberValue:GetPropertyChangedSignal("Value"):Connect(function() -- line: 75
+			-- upvalues: NumberValue (copy), v13 (copy), t3 (copy)
+			local NumberValueValue = NumberValue.Value
+
+			if v13.current == nil or not (math.abs(NumberValueValue - v13.current) < 0.001) then
+				v13.current = NumberValueValue
+				t3.setAnimationOffset(NumberValueValue)
+			end
+		end)
+
+		if v12.current then
+			v12.current.Completed:Connect(function() -- line: 84
+				-- upvalues: connection (copy), NumberValue (copy), v12 (copy), v13 (copy)
+				connection:Disconnect()
+				NumberValue:Destroy()
+				v12.current = nil
+				v13.current = nil
+			end)
+			v12.current:Play()
+		end
+
+		return function() -- line: 93
+			-- upvalues: connection (copy), v12 (copy), NumberValue (copy), v13 (copy)
+			connection:Disconnect()
+
+			local v24 = v12
+
+			if v24.current then
+				v24.current:Cancel()
+				v24.current = nil
+			end
+
+			NumberValue:Destroy()
+			v13.current = nil
+		end
+	end, {
+		t3.startOffset,
+		t3.endOffset,
+		t3.duration,
+		t3.easingStyle,
+		t3.setAnimationOffset
+	})
+end
+
+return useAnimation

@@ -1,59 +1,66 @@
-local l_Parent_0 = script:FindFirstAncestor("InExperienceIntervention").Parent;
-local v1 = require(l_Parent_0.UIBlox);
-local v2 = require(l_Parent_0.Dev.RobloxAppUIBloxConfig);
-v1.init(v2);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Roact);
-local v5 = require(l_Parent_0.Cryo);
-local l_ProviderContainer_0 = require(l_Parent_0.RoactUtils).Components.ProviderContainer;
-local l_StyleProviderWithDefaultTheme_0 = require(l_Parent_0.Style).StyleProviderWithDefaultTheme;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_FoundationProvider_0 = require(l_Parent_0.Foundation).FoundationProvider;
-local l_LayerCollectorProvider_0 = v1.Core.Layout.LayerCollector.LayerCollectorProvider;
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-local function v16(v12) --[[ Line: 28 ]] --[[ Name: MockProviders ]]
-    -- upvalues: l_FoundationProvider_0 (copy), l_StyleProviderWithDefaultTheme_0 (copy), l_LocalizationProvider_0 (copy), l_Signal_0 (copy), l_LayerCollectorProvider_0 (copy), v3 (copy), l_ProviderContainer_0 (copy)
-    local v13 = {};
-    table.insert(v13, {
-        class = l_FoundationProvider_0, 
-        props = {}
-    });
-    table.insert(v13, {
-        class = l_StyleProviderWithDefaultTheme_0, 
-        props = {
-            withDarkTheme = true, 
-            withUiModeSupport = false
-        }
-    });
-    table.insert(v13, {
-        class = l_LocalizationProvider_0, 
-        props = {
-            localization = {
-                Format = function(_, v15) --[[ Line: 48 ]] --[[ Name: Format ]]
-                    return v15;
-                end, 
-                changed = l_Signal_0.new()
-            }
-        }
-    });
-    table.insert(v13, {
-        class = l_LayerCollectorProvider_0, 
-        props = {}
-    });
-    return v3.createElement(l_ProviderContainer_0, {
-        providers = v13
-    }, v12.children);
-end;
+local Parent = script:FindFirstAncestor("InExperienceIntervention").Parent
+local UIBlox = require(Parent.UIBlox)
+local RobloxAppUIBloxConfig = require(Parent.Dev.RobloxAppUIBloxConfig)
+
+UIBlox.init(RobloxAppUIBloxConfig)
+
+local React = require(Parent.React)
+local Roact = require(Parent.Roact)
+local Cryo = require(Parent.Cryo)
+local ProviderContainer = require(Parent.RoactUtils).Components.ProviderContainer
+local StyleProviderWithDefaultTheme = require(Parent.Style).StyleProviderWithDefaultTheme
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+local FoundationProvider = require(Parent.Foundation).FoundationProvider
+local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
+local Signal = require(Parent.AppCommonLib).Signal
+
+local function MockProviders(p1) -- line: 28
+	-- upvalues: FoundationProvider (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), Signal (copy), LayerCollectorProvider (copy), React (copy), ProviderContainer (copy)
+	local t1 = {}
+
+	table.insert(t1, {
+		class = FoundationProvider,
+		props = {}
+	})
+	table.insert(t1, {
+		class = StyleProviderWithDefaultTheme,
+		props = {
+			withDarkTheme = true,
+			withUiModeSupport = false
+		}
+	})
+	table.insert(t1, {
+		class = LocalizationProvider,
+		props = {
+			localization = {
+				Format = function(_, s1: string) -- line: 48
+					return s1
+				end,
+				changed = Signal.new()
+			}
+		}
+	})
+	table.insert(t1, {
+		class = LayerCollectorProvider,
+		props = {}
+	})
+
+	return React.createElement(ProviderContainer, {
+		providers = t1
+	}, p1.children)
+end
+
 return {
-    roact = v4, 
-    mapStory = function(v17) --[[ Line: 68 ]] --[[ Name: mapStory ]]
-        -- upvalues: v4 (copy), v16 (copy), v5 (copy)
-        return function(v18) --[[ Line: 69 ]]
-            -- upvalues: v4 (ref), v16 (ref), v17 (copy), v5 (ref)
-            local v19 = v18 and v18.definition and v18.definition.props or {};
-            return v4.createElement(v16, {}, {
-                story = v4.createElement(v17, v5.Dictionary.union(v19, v18))
-            });
-        end;
-    end
-};
+	roact = Roact,
+	mapStory = function(p3) -- line: 68
+		-- upvalues: Roact (copy), MockProviders (copy), Cryo (copy)
+		return function(p4) -- line: 69
+			-- upvalues: Roact (copy), MockProviders (copy), p3 (copy), Cryo (copy)
+			local v20 = p4 and (not not p4.definition and p4.definition.props) or {}
+
+			return Roact.createElement(MockProviders, {}, {
+				story = Roact.createElement(p3, Cryo.Dictionary.union(v20, p4))
+			})
+		end
+	end
+}

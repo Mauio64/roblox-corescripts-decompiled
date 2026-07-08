@@ -1,1 +1,1 @@
-return require(script.TrustedFriendsVPCPrologue);
+return require(script.TrustedFriendsVPCPrologue)

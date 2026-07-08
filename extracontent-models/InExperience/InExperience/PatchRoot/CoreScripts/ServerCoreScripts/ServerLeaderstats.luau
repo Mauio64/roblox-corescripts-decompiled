@@ -1,327 +1,375 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local v3 = {};
-local v4 = 0;
-local l_StringValue_0 = Instance.new("StringValue");
-l_StringValue_0.Name = "LeaderstatsOrder";
-l_StringValue_0.Parent = l_RobloxReplicatedStorage_0;
-updateStats = function() --[[ Line: 20 ]] --[[ Name: updateStats ]]
-    -- upvalues: l_StringValue_0 (copy), l_HttpService_0 (copy), v3 (copy)
-    l_StringValue_0.Value = l_HttpService_0:JSONEncode(v3);
-end;
-updateStats();
-local function _(v6) --[[ Line: 26 ]] --[[ Name: addLeaderstat ]]
-    -- upvalues: v3 (copy), v4 (ref)
-    if v3[v6] then
-        return;
-    else
-        v3[v6] = v4;
-        v4 = v4 + 1;
-        updateStats();
-        return;
-    end;
-end;
-local function v9(v8) --[[ Line: 35 ]] --[[ Name: isValidStat ]]
-    return v8:IsA("StringValue") or v8:IsA("IntValue") or v8:IsA("BoolValue") or v8:IsA("NumberValue") or v8:IsA("DoubleConstrainedValue") or v8:IsA("IntConstrainedValue");
-end;
-local function _(v10) --[[ Line: 44 ]] --[[ Name: isValidContainer ]]
-    return v10:IsA("ValueBase") or v10:IsA("Folder") or v10:IsA("Configuration") or v10:IsA("Model");
-end;
-local v12 = {};
-local function _(v13, v14) --[[ Line: 62 ]] --[[ Name: getLeaderstatConnections ]]
-    -- upvalues: v12 (copy)
-    if not v12[v13] then
-        return nil;
-    else
-        return v12[v13].leaderstats[v14];
-    end;
-end;
-local function v23(v16, v17, v18) --[[ Line: 70 ]] --[[ Name: leaderstatChildAdded ]]
-    -- upvalues: v9 (copy), v12 (copy), v3 (copy), v4 (ref)
-    if not v9(v18) then
-        return;
-    else
-        local v19 = if not v12[v16] then nil else v12[v16].leaderstats[v17];
-        if not v19 then
-            return;
-        else
-            assert(v19 ~= nil);
-            local v21 = v18:GetPropertyChangedSignal("Name"):Connect(function() --[[ Line: 80 ]]
-                -- upvalues: v18 (copy), v3 (ref), v4 (ref)
-                local l_Name_0 = v18.Name;
-                if v3[l_Name_0] then
-                    return;
-                else
-                    v3[l_Name_0] = v4;
-                    v4 = v4 + 1;
-                    updateStats();
-                    return;
-                end;
-            end);
-            v19.leaderStatNameChanged[v18] = v21;
-            local l_Name_1 = v18.Name;
-            if v3[l_Name_1] then
-                return;
-            else
-                v3[l_Name_1] = v4;
-                v4 = v4 + 1;
-                updateStats();
-                return;
-            end;
-        end;
-    end;
-end;
-local function _(v24, v25, v26) --[[ Line: 87 ]] --[[ Name: leaderstatChildRemoved ]]
-    -- upvalues: v12 (copy)
-    local v27 = if not v12[v24] then nil else v12[v24].leaderstats[v25];
-    if not v27 then
-        return;
-    else
-        assert(v27 ~= nil);
-        if not v27.leaderStatNameChanged[v26] then
-            return;
-        else
-            v27.leaderStatNameChanged[v26]:Disconnect();
-            v27.leaderStatNameChanged[v26] = nil;
-            return;
-        end;
-    end;
-end;
-local function v40(v29, v30) --[[ Line: 102 ]] --[[ Name: leaderstatsAdded ]]
-    -- upvalues: v12 (copy), v23 (copy)
-    if not v12[v29] then
-        return;
-    else
-        local v32 = v30.ChildAdded:Connect(function(v31) --[[ Line: 107 ]]
-            -- upvalues: v23 (ref), v29 (copy), v30 (copy)
-            v23(v29, v30, v31);
-        end);
-        local v37 = v30.ChildRemoved:Connect(function(v33) --[[ Line: 110 ]]
-            -- upvalues: v29 (copy), v30 (copy), v12 (ref)
-            local l_v29_0 = v29;
-            local l_v30_0 = v30;
-            local v36 = if not v12[l_v29_0] then nil else v12[l_v29_0].leaderstats[l_v30_0];
-            if not v36 then
-                return;
-            else
-                assert(v36 ~= nil);
-                if not v36.leaderStatNameChanged[v33] then
-                    return;
-                else
-                    v36.leaderStatNameChanged[v33]:Disconnect();
-                    v36.leaderStatNameChanged[v33] = nil;
-                    return;
-                end;
-            end;
-        end);
-        v12[v29].leaderstats[v30] = {
-            childAdded = v32, 
-            childRemoved = v37, 
-            leaderStatNameChanged = {}
-        };
-        for _, v39 in v30:GetChildren() do
-            v23(v29, v30, v39);
-        end;
-        return;
-    end;
-end;
-local _ = function(v41) --[[ Line: 125 ]] --[[ Name: disconnectTableOfConnections ]]
-    for _, v43 in v41 do
-        v43:Disconnect();
-    end;
-end;
-local _ = function(v45, v46) --[[ Line: 131 ]] --[[ Name: leaderstatsRemoved ]]
-    -- upvalues: v12 (copy)
-    if not v12[v45] then
-        return;
-    else
-        local v47 = v12[v45].leaderstats[v46];
-        if not v47 then
-            return;
-        else
-            v47.childAdded:Disconnect();
-            v47.childRemoved:Disconnect();
-            for _, v49 in v47.leaderStatNameChanged do
-                v49:Disconnect();
-            end;
-            v12[v45].leaderstats[v46] = nil;
-            return;
-        end;
-    end;
-end;
-local _ = function(v51, v52) --[[ Line: 147 ]] --[[ Name: playerChildNameChanged ]]
-    -- upvalues: v40 (copy), v12 (copy)
-    if v52.Name == "leaderstats" then
-        v40(v51, v52);
-        return;
-    elseif not v12[v51] then
-        return;
-    else
-        local v53 = v12[v51].leaderstats[v52];
-        if not v53 then
-            return;
-        else
-            v53.childAdded:Disconnect();
-            v53.childRemoved:Disconnect();
-            for _, v55 in v53.leaderStatNameChanged do
-                v55:Disconnect();
-            end;
-            v12[v51].leaderstats[v52] = nil;
-            return;
-        end;
-    end;
-end;
-local function v68(v57, v58) --[[ Line: 155 ]] --[[ Name: playerChildAdded ]]
-    -- upvalues: v12 (copy), v40 (copy)
-    if not (v58:IsA("ValueBase") or v58:IsA("Folder") or v58:IsA("Configuration") or v58:IsA("Model")) then
-        return;
-    elseif not v12[v57] then
-        return;
-    else
-        local v64 = v58:GetPropertyChangedSignal("Name"):Connect(function() --[[ Line: 163 ]]
-            -- upvalues: v57 (copy), v58 (copy), v40 (ref), v12 (ref)
-            local l_v57_0 = v57;
-            local l_v58_0 = v58;
-            if l_v58_0.Name == "leaderstats" then
-                v40(l_v57_0, l_v58_0);
-                return;
-            elseif not v12[l_v57_0] then
-                return;
-            else
-                local v61 = v12[l_v57_0].leaderstats[l_v58_0];
-                if not v61 then
-                    return;
-                else
-                    v61.childAdded:Disconnect();
-                    v61.childRemoved:Disconnect();
-                    for _, v63 in v61.leaderStatNameChanged do
-                        v63:Disconnect();
-                    end;
-                    v12[l_v57_0].leaderstats[l_v58_0] = nil;
-                    return;
-                end;
-            end;
-        end);
-        v12[v57].namedChanged[v58] = v64;
-        if v58.Name == "leaderstats" then
-            v40(v57, v58);
-            return;
-        elseif not v12[v57] then
-            return;
-        else
-            local v65 = v12[v57].leaderstats[v58];
-            if not v65 then
-                return;
-            else
-                v65.childAdded:Disconnect();
-                v65.childRemoved:Disconnect();
-                for _, v67 in v65.leaderStatNameChanged do
-                    v67:Disconnect();
-                end;
-                v12[v57].leaderstats[v58] = nil;
-                return;
-            end;
-        end;
-    end;
-end;
-local _ = function(v69, v70) --[[ Line: 171 ]] --[[ Name: playerChildRemoved ]]
-    -- upvalues: v12 (copy)
-    if not v12[v69] then
-        return;
-    else
-        if v12[v69].namedChanged[v70] then
-            v12[v69].namedChanged[v70]:Disconnect();
-            v12[v69].namedChanged[v70] = nil;
-        end;
-        if v70.Name == "leaderstats" then
-            if not v12[v69] then
-                return;
-            else
-                local v71 = v12[v69].leaderstats[v70];
-                if not v71 then
-                    return;
-                else
-                    v71.childAdded:Disconnect();
-                    v71.childRemoved:Disconnect();
-                    for _, v73 in v71.leaderStatNameChanged do
-                        v73:Disconnect();
-                    end;
-                    v12[v69].leaderstats[v70] = nil;
-                end;
-            end;
-        end;
-        return;
-    end;
-end;
-local function v85(v75) --[[ Line: 186 ]] --[[ Name: playerAdded ]]
-    -- upvalues: v12 (copy), v68 (copy)
-    local v81 = v75.ChildRemoved:Connect(function(v76) --[[ Line: 187 ]]
-        -- upvalues: v75 (copy), v12 (ref)
-        local l_v75_0 = v75;
-        if not v12[l_v75_0] then
-            return;
-        else
-            if v12[l_v75_0].namedChanged[v76] then
-                v12[l_v75_0].namedChanged[v76]:Disconnect();
-                v12[l_v75_0].namedChanged[v76] = nil;
-            end;
-            if v76.Name == "leaderstats" then
-                if not v12[l_v75_0] then
-                    return;
-                else
-                    local v78 = v12[l_v75_0].leaderstats[v76];
-                    if not v78 then
-                        return;
-                    else
-                        v78.childAdded:Disconnect();
-                        v78.childRemoved:Disconnect();
-                        for _, v80 in v78.leaderStatNameChanged do
-                            v80:Disconnect();
-                        end;
-                        v12[l_v75_0].leaderstats[v76] = nil;
-                    end;
-                end;
-            end;
-            return;
-        end;
-    end);
-    v12[v75] = {
-        childAdded = v75.ChildAdded:Connect(function(v82) --[[ Line: 190 ]]
-            -- upvalues: v68 (ref), v75 (copy)
-            v68(v75, v82);
-        end), 
-        childRemoved = v81, 
-        namedChanged = {}, 
-        leaderstats = {}
-    };
-    for _, v84 in v75:GetChildren() do
-        v68(v75, v84);
-    end;
-end;
-local function v93(v86) --[[ Line: 205 ]] --[[ Name: playerRemoving ]]
-    -- upvalues: v12 (copy)
-    if not v12[v86] then
-        return;
-    else
-        v12[v86].childAdded:Disconnect();
-        v12[v86].childRemoved:Disconnect();
-        for _, v88 in v12[v86].namedChanged do
-            v88:Disconnect();
-        end;
-        for _, v90 in v12[v86].leaderstats do
-            v90.childAdded:Disconnect();
-            v90.childRemoved:Disconnect();
-            for _, v92 in v90.leaderStatNameChanged do
-                v92:Disconnect();
-            end;
-        end;
-        v12[v86] = nil;
-        return;
-    end;
-end;
-l_Players_0.PlayerAdded:Connect(v85);
-l_Players_0.PlayerRemoving:Connect(v93);
-for _, v95 in l_Players_0:GetPlayers() do
-    v85(v95);
-end;
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local t1 = {}
+local n1 = 0
+local StringValue = Instance.new("StringValue")
+
+StringValue.Name = "LeaderstatsOrder"
+StringValue.Parent = RobloxReplicatedStorage
+
+function updateStats() -- line: 20
+	-- upvalues: StringValue (copy), HttpService (copy), t1 (copy)
+	StringValue.Value = HttpService:JSONEncode(t1)
+end
+
+updateStats()
+
+local function addLeaderstat(p1) -- line: 26
+	-- upvalues: t1 (copy), n1 (ref)
+	if t1[p1] then
+		return
+	end
+
+	t1[p1] = n1
+	n1 += 1
+	updateStats()
+end
+local function isValidStat(p2) -- line: 35
+	return p2:IsA("StringValue") or (p2:IsA("IntValue") or (p2:IsA("BoolValue") or (p2:IsA("NumberValue") or (p2:IsA("DoubleConstrainedValue") or p2:IsA("IntConstrainedValue")))))
+end
+local function isValidContainer(p3) -- line: 44
+	return p3:IsA("ValueBase") or (p3:IsA("Folder") or (p3:IsA("Configuration") or p3:IsA("Model")))
+end
+
+local t2 = {}
+
+local function getLeaderstatConnections(p4, p5) -- line: 62
+	-- upvalues: t2 (copy)
+	if not t2[p4] then
+		return nil
+	end
+
+	return t2[p4].leaderstats[p5]
+end
+local function leaderstatChildAdded(p6, p7, p8) -- line: 70
+	-- upvalues: isValidStat (copy), t2 (copy), t1 (copy), n1 (ref)
+	if not isValidStat(p8) then
+		return
+	end
+
+	local v32 = if t2[p6] then t2[p6].leaderstats[p7] else nil
+
+	if not v32 then
+		return
+	end
+
+	assert(v32 ~= nil)
+
+	local connection = p8:GetPropertyChangedSignal("Name"):Connect(function() -- line: 80
+		-- upvalues: p8 (copy), t1 (copy), n1 (ref)
+		local p8Name = p8.Name
+
+		if t1[p8Name] then
+			return
+		end
+
+		t1[p8Name] = n1
+		n1 += 1
+		updateStats()
+	end)
+
+	v32.leaderStatNameChanged[p8] = connection
+
+	local p8Name = p8.Name
+
+	if t1[p8Name] then
+		return
+	end
+
+	t1[p8Name] = n1
+	n1 += 1
+	updateStats()
+end
+local function leaderstatChildRemoved(p9, p10, p11) -- line: 87
+	-- upvalues: t2 (copy)
+	local v38 = if t2[p9] then t2[p9].leaderstats[p10] else nil
+
+	if not v38 then
+		return
+	end
+
+	assert(v38 ~= nil)
+
+	if not v38.leaderStatNameChanged[p11] then
+		return
+	end
+
+	v38.leaderStatNameChanged[p11]:Disconnect()
+	v38.leaderStatNameChanged[p11] = nil
+end
+local function leaderstatsAdded(p12, p13) -- line: 102
+	-- upvalues: t2 (copy), leaderstatChildAdded (copy)
+	if not t2[p12] then
+		return
+	end
+
+	local connection = p13.ChildAdded:Connect(function(child) -- line: 107
+		-- upvalues: leaderstatChildAdded (copy), p12 (copy), p13 (copy)
+		leaderstatChildAdded(p12, p13, child)
+	end)
+	local connection2 = p13.ChildRemoved:Connect(function(child) -- line: 110
+		-- upvalues: p12 (copy), p13 (copy), t2 (copy)
+		local v83 = p12
+		local v84 = p13
+		local v85 = if t2[v83] then t2[v83].leaderstats[v84] else nil
+
+		if not v85 then
+			return
+		end
+
+		assert(v85 ~= nil)
+
+		if not v85.leaderStatNameChanged[child] then
+			return
+		end
+
+		v85.leaderStatNameChanged[child]:Disconnect()
+		v85.leaderStatNameChanged[child] = nil
+	end)
+
+	t2[p12].leaderstats[p13] = {
+		childAdded = connection,
+		childRemoved = connection2,
+		leaderStatNameChanged = {}
+	}
+
+	for _, child in p13:GetChildren() do
+		leaderstatChildAdded(p12, p13, child)
+	end
+end
+local function disconnectTableOfConnections(t3: {[any]: any}) -- line: 125
+	for _, v47 in t3 do
+		v47:Disconnect()
+	end
+end
+local function leaderstatsRemoved(p14, p15) -- line: 131
+	-- upvalues: t2 (copy)
+	if not t2[p14] then
+		return
+	end
+
+	local v50 = t2[p14].leaderstats[p15]
+
+	if not v50 then
+		return
+	end
+
+	v50.childAdded:Disconnect()
+	v50.childRemoved:Disconnect()
+
+	for _, v52 in v50.leaderStatNameChanged do
+		v52:Disconnect()
+	end
+
+	t2[p14].leaderstats[p15] = nil
+end
+local function playerChildNameChanged(p16, p17) -- line: 147
+	-- upvalues: leaderstatsAdded (copy), t2 (copy)
+	if p17.Name == "leaderstats" then
+		leaderstatsAdded(p16, p17)
+
+		return
+	end
+
+	if not t2[p16] then
+		return
+	end
+
+	local v55 = t2[p16].leaderstats[p17]
+
+	if not v55 then
+		return
+	end
+
+	v55.childAdded:Disconnect()
+	v55.childRemoved:Disconnect()
+
+	for _, v57 in v55.leaderStatNameChanged do
+		v57:Disconnect()
+	end
+
+	t2[p16].leaderstats[p17] = nil
+end
+local function playerChildAdded(p18, p19) -- line: 155
+	-- upvalues: t2 (copy), leaderstatsAdded (copy)
+	if not p19:IsA("ValueBase") and (not p19:IsA("Folder") and (not p19:IsA("Configuration") and not p19:IsA("Model"))) then
+		return
+	end
+
+	if not t2[p18] then
+		return
+	end
+
+	local connection = p19:GetPropertyChangedSignal("Name"):Connect(function() -- line: 163
+		-- upvalues: p18 (copy), p19 (copy), leaderstatsAdded (copy), t2 (copy)
+		local v86 = p18
+		local v87 = p19
+
+		if v87.Name == "leaderstats" then
+			leaderstatsAdded(v86, v87)
+
+			return
+		end
+
+		if not t2[v86] then
+			return
+		end
+
+		local v88 = t2[v86].leaderstats[v87]
+
+		if not v88 then
+			return
+		end
+
+		v88.childAdded:Disconnect()
+		v88.childRemoved:Disconnect()
+
+		for _, v90 in v88.leaderStatNameChanged do
+			v90:Disconnect()
+		end
+
+		t2[v86].leaderstats[v87] = nil
+	end)
+
+	t2[p18].namedChanged[p19] = connection
+
+	if p19.Name == "leaderstats" then
+		leaderstatsAdded(p18, p19)
+
+		return
+	end
+
+	if not t2[p18] then
+		return
+	end
+
+	local v61 = t2[p18].leaderstats[p19]
+
+	if not v61 then
+		return
+	end
+
+	v61.childAdded:Disconnect()
+	v61.childRemoved:Disconnect()
+
+	for _, v63 in v61.leaderStatNameChanged do
+		v63:Disconnect()
+	end
+
+	t2[p18].leaderstats[p19] = nil
+end
+local function playerChildRemoved(p20, p21) -- line: 171
+	-- upvalues: t2 (copy)
+	if not t2[p20] then
+		return
+	end
+
+	if t2[p20].namedChanged[p21] then
+		t2[p20].namedChanged[p21]:Disconnect()
+		t2[p20].namedChanged[p21] = nil
+	end
+
+	if p21.Name == "leaderstats" then
+		if not t2[p20] then
+			return
+		end
+
+		local v66 = t2[p20].leaderstats[p21]
+
+		if not v66 then
+			return
+		end
+
+		v66.childAdded:Disconnect()
+		v66.childRemoved:Disconnect()
+
+		for _, v68 in v66.leaderStatNameChanged do
+			v68:Disconnect()
+		end
+
+		t2[p20].leaderstats[p21] = nil
+	end
+end
+local function playerAdded(p22) -- line: 186
+	-- upvalues: t2 (copy), playerChildAdded (copy)
+	local connection = p22.ChildRemoved:Connect(function(child) -- line: 187
+		-- upvalues: p22 (copy), t2 (copy)
+		local v92 = p22
+
+		if not t2[v92] then
+			return
+		end
+
+		if t2[v92].namedChanged[child] then
+			t2[v92].namedChanged[child]:Disconnect()
+			t2[v92].namedChanged[child] = nil
+		end
+
+		if child.Name == "leaderstats" then
+			if not t2[v92] then
+				return
+			end
+
+			local v93 = t2[v92].leaderstats[child]
+
+			if not v93 then
+				return
+			end
+
+			v93.childAdded:Disconnect()
+			v93.childRemoved:Disconnect()
+
+			for _, v95 in v93.leaderStatNameChanged do
+				v95:Disconnect()
+			end
+
+			t2[v92].leaderstats[child] = nil
+		end
+	end)
+
+	t2[p22] = {
+		childAdded = p22.ChildAdded:Connect(function(child) -- line: 190
+			-- upvalues: playerChildAdded (copy), p22 (copy)
+			playerChildAdded(p22, child)
+		end),
+		childRemoved = connection,
+		namedChanged = {},
+		leaderstats = {}
+	}
+
+	for _, child in p22:GetChildren() do
+		playerChildAdded(p22, child)
+	end
+end
+local function playerRemoving(p23) -- line: 205
+	-- upvalues: t2 (copy)
+	if not t2[p23] then
+		return
+	end
+
+	t2[p23].childAdded:Disconnect()
+	t2[p23].childRemoved:Disconnect()
+
+	for _, v75 in t2[p23].namedChanged do
+		v75:Disconnect()
+	end
+
+	for _, v77 in t2[p23].leaderstats do
+		v77.childAdded:Disconnect()
+		v77.childRemoved:Disconnect()
+
+		for _, v79 in v77.leaderStatNameChanged do
+			v79:Disconnect()
+		end
+	end
+
+	t2[p23] = nil
+end
+
+Players.PlayerAdded:Connect(playerAdded)
+Players.PlayerRemoving:Connect(playerRemoving)
+
+for _, player in Players:GetPlayers() do
+	playerAdded(player)
+end

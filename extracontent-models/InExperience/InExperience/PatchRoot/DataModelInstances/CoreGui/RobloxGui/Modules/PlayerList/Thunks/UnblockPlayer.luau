@@ -1,16 +1,19 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.BlockingUtility);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetPlayerIsBlocked);
-return function(v4) --[[ Line: 9 ]] --[[ Name: UnblockPlayer ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    return function(v5) --[[ Line: 10 ]]
-        -- upvalues: v1 (ref), v4 (copy), v3 (ref)
-        coroutine.wrap(function() --[[ Line: 11 ]]
-            -- upvalues: v1 (ref), v4 (ref), v5 (copy), v3 (ref)
-            if v1:UnblockPlayerAsync(v4) then
-                v5:dispatch(v3(v4, false));
-            end;
-        end)();
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
+local ParentParent = script.Parent.Parent
+local SetPlayerIsBlocked = require(ParentParent.Actions.SetPlayerIsBlocked)
+
+local function UnblockPlayer(p1) -- line: 9
+	-- upvalues: BlockingUtility (copy), SetPlayerIsBlocked (copy)
+	return function(p2) -- line: 10
+		-- upvalues: BlockingUtility (copy), p1 (copy), SetPlayerIsBlocked (copy)
+		coroutine.wrap(function() -- line: 11
+			-- upvalues: BlockingUtility (copy), p1 (copy), p2 (copy), SetPlayerIsBlocked (copy)
+			if BlockingUtility:UnblockPlayerAsync(p1) then
+				p2:dispatch(SetPlayerIsBlocked(p1, false))
+			end
+		end)()
+	end
+end
+
+return UnblockPlayer

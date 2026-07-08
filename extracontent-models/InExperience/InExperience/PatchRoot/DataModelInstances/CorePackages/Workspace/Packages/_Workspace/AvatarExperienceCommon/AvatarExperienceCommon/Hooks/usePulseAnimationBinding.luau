@@ -1,66 +1,72 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = require(l_Parent_0.Otter);
-local l_useAnimatedBinding_0 = v2.useAnimatedBinding;
-local v5 = {
-    easeIn = 1, 
-    easeOut = 10
-};
-local v6 = {
-    easeOut = 1, 
-    easeIn = 0
-};
-local v7 = {
-    frequency = 10, 
-    dampingRatio = 1
-};
-return function(v8) --[[ Line: 53 ]] --[[ Name: usePulseAnimationBinding ]]
-    -- upvalues: v1 (copy), v5 (copy), v3 (copy), v6 (copy), v7 (copy), l_useAnimatedBinding_0 (copy)
-    local v9 = v1.useRef(nil);
-    local v11 = v1.useCallback(function(v10) --[[ Line: 56 ]]
-        -- upvalues: v9 (copy), v8 (copy), v5 (ref), v3 (ref), v6 (ref), v7 (ref)
-        if v9.current and v8 then
-            if v10.thickness == v5.easeOut then
-                v9.current({
-                    thickness = v3.instant(v5.easeIn), 
-                    transparency = v3.instant(v6.easeIn)
-                });
-                return;
-            elseif v10.thickness == v5.easeIn then
-                v9.current({
-                    thickness = v3.ease(v5.easeOut, v7), 
-                    transparency = v3.ease(v6.easeOut, v7)
-                });
-            end;
-        end;
-    end, {
-        v8
-    });
-    local v12, v13 = l_useAnimatedBinding_0({
-        thickness = 0, 
-        transparency = 0
-    }, v11);
-    v1.useEffect(function() --[[ Line: 76 ]]
-        -- upvalues: v8 (copy), v9 (copy), v13 (copy), v3 (ref), v5 (ref), v7 (ref), v6 (ref)
-        if v8 then
-            if not v9.current then
-                v9.current = v13;
-            end;
-            v13({
-                thickness = v3.ease(v5.easeOut, v7), 
-                transparency = v3.ease(v6.easeOut, v7)
-            });
-        end;
-        return function() --[[ Line: 87 ]]
-            -- upvalues: v13 (ref), v3 (ref)
-            v13({
-                thickness = v3.instant(0), 
-                transparency = v3.instant(0)
-            });
-        end;
-    end, {
-        v8
-    });
-    return v12;
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+local Otter = require(Parent.Otter)
+local useAnimatedBinding = ReactOtter.useAnimatedBinding
+local _ = {
+	easeIn = 1,
+	easeOut = 10
+}
+local _ = {
+	easeOut = 1,
+	easeIn = 0
+}
+local t1 = {
+	frequency = 10,
+	dampingRatio = 1
+}
+
+local function usePulseAnimationBinding(b1: boolean?) -- line: 53
+	-- upvalues: React (copy), Otter (copy), t1 (copy), useAnimatedBinding (copy)
+	local v11 = React.useRef(nil)
+	local v12 = React.useCallback(function(t2: {[any]: any}) -- line: 56
+		-- upvalues: v11 (copy), b1 (copy), Otter (copy), t1 (copy)
+		if v11.current and b1 then
+			if t2.thickness == 10 then
+				v11.current({
+					thickness = Otter.instant(1),
+					transparency = Otter.instant(0)
+				})
+
+				return
+			end
+
+			if t2.thickness == 1 then
+				v11.current({
+					thickness = Otter.ease(10, t1),
+					transparency = Otter.ease(1, t1)
+				})
+			end
+		end
+	end, { b1 })
+	local v13, v14 = useAnimatedBinding({
+		thickness = 0,
+		transparency = 0
+	}, v12)
+
+	React.useEffect(function() -- line: 76
+		-- upvalues: b1 (copy), v11 (copy), v14 (copy), Otter (copy), t1 (copy)
+		if b1 then
+			if not v11.current then
+				v11.current = v14
+			end
+
+			v14({
+				thickness = Otter.ease(10, t1),
+				transparency = Otter.ease(1, t1)
+			})
+		end
+
+		return function() -- line: 87
+			-- upvalues: v14 (copy), Otter (copy)
+			v14({
+				thickness = Otter.instant(0),
+				transparency = Otter.instant(0)
+			})
+		end
+	end, { b1 })
+
+	return v13
+end
+
+return usePulseAnimationBinding

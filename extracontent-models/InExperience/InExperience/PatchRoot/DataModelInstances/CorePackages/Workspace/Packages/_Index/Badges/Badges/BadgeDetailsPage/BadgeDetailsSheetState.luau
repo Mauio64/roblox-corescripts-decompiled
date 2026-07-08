@@ -1,13 +1,12 @@
-local v0 = false;
-local function v1() --[[ Line: 3 ]] --[[ Name: getIsBadgeDetailsSheetOpen ]]
-    -- upvalues: v0 (ref)
-    return v0;
-end;
-local function v3(v2) --[[ Line: 7 ]] --[[ Name: setIsBadgeDetailsSheetOpen ]]
-    -- upvalues: v0 (ref)
-    v0 = v2;
-end;
+local u1 = false
+
 return {
-    getIsBadgeDetailsSheetOpen = v1, 
-    setIsBadgeDetailsSheetOpen = v3
-};
+	getIsBadgeDetailsSheetOpen = function() -- line: 3
+		-- upvalues: u1 (ref)
+		return u1
+	end,
+	setIsBadgeDetailsSheetOpen = function(b1: boolean) -- line: 7
+		-- upvalues: u1 (ref)
+		u1 = b1
+	end
+}

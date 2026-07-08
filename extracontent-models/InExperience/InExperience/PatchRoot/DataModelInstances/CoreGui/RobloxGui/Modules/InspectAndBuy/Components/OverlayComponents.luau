@@ -1,6 +1,7 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.Overlay);
-local v2 = require(l_Parent_0.Components.AttributionTraversal);
+local ParentParent = script.Parent.Parent
+local Overlay = require(ParentParent.Enums.Overlay)
+local AttributionTraversal = require(ParentParent.Components.AttributionTraversal)
+
 return {
-    [v1.AttributionTraversal] = v2
-};
+	[Overlay.AttributionTraversal] = AttributionTraversal
+}

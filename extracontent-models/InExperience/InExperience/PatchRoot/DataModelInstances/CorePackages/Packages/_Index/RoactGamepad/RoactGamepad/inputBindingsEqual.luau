@@ -1,39 +1,50 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: inputBindingsEqual ]]
-    if v0 == v1 then
-        return true;
-    else
-        for v2, v3 in pairs(v0) do
-            local v4 = v1[v2];
-            if v4 == nil then
-                return false;
-            elseif v3.kind ~= v4.kind or v3.keyCode ~= v4.keyCode or v3.action ~= v4.action then
-                return false;
-            else
-                local l_meta_0 = v3.meta;
-                local l_meta_1 = v4.meta;
-                if l_meta_0 ~= l_meta_1 then
-                    if typeof(l_meta_0) == "table" and typeof(l_meta_1) == "table" then
-                        for v7, v8 in pairs(l_meta_0) do
-                            if v8 ~= l_meta_1[v7] then
-                                return false;
-                            end;
-                        end;
-                        for v9 in pairs(l_meta_1) do
-                            if l_meta_0[v9] == nil then
-                                return false;
-                            end;
-                        end;
-                    else
-                        return false;
-                    end;
-                end;
-            end;
-        end;
-        for v10 in pairs(v1) do
-            if v0[v10] == nil then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
+local function inputBindingsEqual(p1, p2) -- line: 1
+	if p1 == p2 then
+		return true
+	end
+
+	for k, v in pairs(p1) do
+		local v6 = p2[k]
+
+		if v6 == nil then
+			return false
+		end
+
+		if v.kind ~= v6.kind or v.keyCode ~= v6.keyCode or v.action ~= v6.action then
+			return false
+		end
+
+		local meta = v.meta
+		local meta2 = v6.meta
+
+		if meta == meta2 then
+			continue
+		end
+
+		if typeof(meta) ~= "table" or typeof(meta2) ~= "table" then
+			return false
+		end
+
+		for k2, v2 in pairs(meta) do
+			if v2 ~= meta2[k2] then
+				return false
+			end
+		end
+
+		for k3 in pairs(meta2) do
+			if meta[k3] == nil then
+				return false
+			end
+		end
+	end
+
+	for k in pairs(p2) do
+		if p1[k] == nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+return inputBindingsEqual

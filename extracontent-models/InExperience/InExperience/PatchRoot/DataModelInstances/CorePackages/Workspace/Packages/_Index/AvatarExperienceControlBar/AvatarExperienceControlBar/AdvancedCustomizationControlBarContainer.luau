@@ -1,14 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.useAdvancedCustomizationControlBarProps);
-local v4 = require(l_script_FirstAncestor_0.BaseControlBarContainer);
-return v2.memo(function(v5) --[[ Line: 9 ]] --[[ Name: AdvancedCustomizationControlBarContainer ]]
-    -- upvalues: v3 (copy), v2 (copy), v4 (copy)
-    local v6 = v3(v5);
-    return v2.createElement(v4, {
-        config = v6.config, 
-        onActiveMenuItemChanged = v5.onActiveMenuItemChanged, 
-        LayoutOrder = v5.LayoutOrder
-    });
-end);
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local useAdvancedCustomizationControlBarProps = require(AvatarExperienceControlBar.useAdvancedCustomizationControlBarProps)
+local BaseControlBarContainer = require(AvatarExperienceControlBar.BaseControlBarContainer)
+
+local function AdvancedCustomizationControlBarContainer(p1) -- line: 9
+	-- upvalues: useAdvancedCustomizationControlBarProps (copy), React (copy), BaseControlBarContainer (copy)
+	local v8 = useAdvancedCustomizationControlBarProps(p1)
+
+	return React.createElement(BaseControlBarContainer, {
+		config = v8.config,
+		onActiveMenuItemChanged = p1.onActiveMenuItemChanged,
+		LayoutOrder = p1.LayoutOrder
+	})
+end
+
+return React.memo(AdvancedCustomizationControlBarContainer)

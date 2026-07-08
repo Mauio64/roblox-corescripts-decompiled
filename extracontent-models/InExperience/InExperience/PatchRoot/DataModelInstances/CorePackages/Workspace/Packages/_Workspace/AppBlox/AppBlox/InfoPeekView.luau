@@ -1,86 +1,86 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.Foundation);
-local v2 = require(l_Parent_0.PeekView);
-local l_PeekView_0 = v2.PeekView;
-local l_PeekViewState_0 = v2.PeekViewState;
-local v5 = require(l_Parent_0.React);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_useNavigationProps_0 = require(l_Parent_0.RobloxAppNavigation).useNavigationProps;
-local l_useTokens_0 = v1.Hooks.useTokens;
-return function(v11) --[[ Line: 27 ]] --[[ Name: InfoPeekView ]]
-    -- upvalues: l_useNavigationProps_0 (copy), v5 (copy), l_useNavigation_0 (copy), l_useTokens_0 (copy), l_PeekViewState_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_PeekView_0 (copy)
-    local v14 = l_useNavigationProps_0(function(_, v13) --[[ Line: 28 ]]
-        return {
-            title = v13.title, 
-            body = v13.body
-        };
-    end);
-    local v15 = v5.useRef(nil);
-    local v16 = l_useNavigation_0();
-    local v17 = l_useTokens_0();
-    local v18 = v11.title or v14.title;
-    local v19 = v11.body or v14.body;
-    local l_HeadingSmall_0 = v17.Typography.HeadingSmall;
-    local l_Emphasis_0 = v17.Color.Content.Emphasis;
-    local l_BodyLarge_0 = v17.Typography.BodyLarge;
-    local l_Default_0 = v17.Color.Content.Default;
-    local v26 = v5.useCallback(function(v24, _) --[[ Line: 48 ]]
-        -- upvalues: l_PeekViewState_0 (ref), v16 (copy)
-        if v24 == l_PeekViewState_0.Closed or v24 == l_PeekViewState_0.Hidden then
-            v16.goBack();
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v16
-    } else l_dependencyArray_0(v16));
-    return v5.createElement(l_PeekView_0, {
-        briefViewContentHeight = UDim.new(0, 0), 
-        contentFrameRef = v15, 
-        hasScrim = true, 
-        mountAsFullView = true, 
-        returnToFullView = true, 
-        showDraggerInClosedState = false, 
-        thumbstickScrollEnabled = true, 
-        viewStateChanged = v26
-    }, {
-        Layout = v5.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, v17.Padding.Medium)
-        }), 
-        ContentPadding = v5.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, v17.Padding.XXLarge), 
-            PaddingLeft = UDim.new(0, v17.Padding.XXLarge), 
-            PaddingRight = UDim.new(0, v17.Padding.XXLarge), 
-            PaddingBottom = UDim.new(0, v17.Padding.XXLarge)
-        }), 
-        TitleText = v5.createElement("TextLabel", {
-            BackgroundTransparency = 1, 
-            Text = v18, 
-            Font = l_HeadingSmall_0.Font, 
-            TextSize = l_HeadingSmall_0.FontSize, 
-            TextColor3 = l_Emphasis_0.Color3, 
-            TextTransparency = l_Emphasis_0.Transparency, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextWrapped = true, 
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            LayoutOrder = 1
-        }), 
-        BodyText = v5.createElement("TextLabel", {
-            BackgroundTransparency = 1, 
-            Text = v19, 
-            Font = l_BodyLarge_0.Font, 
-            TextSize = l_BodyLarge_0.FontSize, 
-            TextColor3 = l_Default_0.Color3, 
-            TextTransparency = l_Default_0.Transparency, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextWrapped = true, 
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            LayoutOrder = 2
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local Foundation = require(Parent.Foundation)
+local PeekView = require(Parent.PeekView)
+local PeekView2 = PeekView.PeekView
+local PeekViewState = PeekView.PeekViewState
+local React = require(Parent.React)
+local useNavigation = require(Parent.Navigation).useNavigation
+local useNavigationProps = require(Parent.RobloxAppNavigation).useNavigationProps
+local useTokens = Foundation.Hooks.useTokens
+
+local function InfoPeekView(t1: {[any]: any}) -- line: 24
+	-- upvalues: useNavigationProps (copy), React (copy), useNavigation (copy), useTokens (copy), PeekViewState (copy), PeekView2 (copy)
+	local v12 = useNavigationProps(function(_, p2) -- line: 25
+		return {
+			title = p2.title,
+			body = p2.body
+		}
+	end)
+	local v13 = React.useRef(nil)
+	local v14 = useNavigation()
+	local v15 = useTokens()
+	local v16 = t1.title or v12.title
+	local v17 = t1.body or v12.body
+	local HeadingSmall = v15.Typography.HeadingSmall
+	local Emphasis = v15.Color.Content.Emphasis
+	local BodyLarge = v15.Typography.BodyLarge
+	local Default = v15.Color.Content.Default
+	local v22 = React.useCallback(function(p3, _) -- line: 45
+		-- upvalues: PeekViewState (copy), v14 (copy)
+		if p3 == PeekViewState.Closed or p3 == PeekViewState.Hidden then
+			v14.goBack()
+		end
+	end, { v14 })
+
+	return React.createElement(PeekView2, {
+		hasScrim = true,
+		mountAsFullView = true,
+		returnToFullView = true,
+		showDraggerInClosedState = false,
+		thumbstickScrollEnabled = true,
+		briefViewContentHeight = UDim.new(0, 0),
+		contentFrameRef = v13,
+		viewStateChanged = v22
+	}, {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, v15.Padding.Medium)
+		}),
+		ContentPadding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, v15.Padding.XXLarge),
+			PaddingLeft = UDim.new(0, v15.Padding.XXLarge),
+			PaddingRight = UDim.new(0, v15.Padding.XXLarge),
+			PaddingBottom = UDim.new(0, v15.Padding.XXLarge)
+		}),
+		TitleText = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			LayoutOrder = 1,
+			Text = v16,
+			Font = HeadingSmall.Font,
+			TextSize = HeadingSmall.FontSize,
+			TextColor3 = Emphasis.Color3,
+			TextTransparency = Emphasis.Transparency,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}),
+		BodyText = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			LayoutOrder = 2,
+			Text = v17,
+			Font = BodyLarge.Font,
+			TextSize = BodyLarge.FontSize,
+			TextColor3 = Default.Color3,
+			TextTransparency = Default.Transparency,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		})
+	})
+end
+
+return InfoPeekView

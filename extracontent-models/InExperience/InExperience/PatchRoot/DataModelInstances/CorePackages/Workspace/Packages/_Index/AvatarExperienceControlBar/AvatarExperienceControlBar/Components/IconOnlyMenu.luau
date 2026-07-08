@@ -1,119 +1,134 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local v6 = require(l_script_FirstAncestor_0.Components.Items.IconItem);
-local v7 = require(l_script_FirstAncestor_0.Components.Items.ImageItem);
-local v8 = require(l_script_FirstAncestor_0.Components.Items.ColorItem);
-local l_FFlagAXAddToolTipToIconItemMenu_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXAddToolTipToIconItemMenu;
-local l_FFlagAXMigrateBuilderIcons_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons;
-local l_FFlagAXResetAvatarButton_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXResetAvatarButton;
-return v2.memo(v2.forwardRef(function(v12, v13) --[[ Line: 27 ]] --[[ Name: IconOnlyMenu ]]
-    -- upvalues: v4 (copy), v2 (copy), l_FFlagAXResetAvatarButton_0 (copy), v7 (copy), v6 (copy), l_FFlagAXMigrateBuilderIcons_0 (copy), l_FFlagAXAddToolTipToIconItemMenu_0 (copy), v8 (copy), v3 (copy)
-    local v14 = v4();
-    local v20 = v2.useCallback(function(v15) --[[ Line: 30 ]]
-        -- upvalues: l_FFlagAXResetAvatarButton_0 (ref), v2 (ref), v7 (ref), v6 (ref), l_FFlagAXMigrateBuilderIcons_0 (ref), l_FFlagAXAddToolTipToIconItemMenu_0 (ref), v12 (copy), v8 (ref), v3 (ref)
-        local l_item_0 = v15.item;
-        local l_isActive_0 = v15.isActive;
-        local l_onItemActivated_0 = v15.onItemActivated;
-        local v19 = if l_FFlagAXResetAvatarButton_0 and l_item_0.type == "divider" then nil else function() --[[ Line: 43 ]]
-            -- upvalues: l_onItemActivated_0 (copy), l_item_0 (copy)
-            if l_onItemActivated_0 then
-                l_onItemActivated_0(l_item_0.id);
-            end;
-            if l_item_0.onActivated then
-                l_item_0.onActivated();
-            end;
-        end;
-        if l_item_0.type == "image" then
-            return v2.createElement(v7, {
-                thumbnailUrl = l_item_0.thumbnailUrl, 
-                isActive = l_isActive_0, 
-                onActivated = v19, 
-                disabled = l_item_0.disabled, 
-                ref = l_item_0.ref, 
-                enableFocusAnimation = l_item_0.enableFocusAnimation, 
-                Visible = l_item_0.visible, 
-                LayoutOrder = v15.index, 
-                hideIndicator = l_item_0.hideIndicator
-            });
-        elseif l_item_0.type == "icon" then
-            return v2.createElement(v6, {
-                icon = l_item_0.icon, 
-                activeIcon = l_item_0.activeIcon, 
-                iconSize = l_item_0.iconSize, 
-                iconVariant = if l_FFlagAXMigrateBuilderIcons_0 then l_item_0.iconVariant else nil, 
-                activeIconVariant = if l_FFlagAXMigrateBuilderIcons_0 then l_item_0.activeIconVariant else nil, 
-                isActive = l_isActive_0, 
-                animate = not l_item_0.disableAnimation, 
-                onActivated = v19, 
-                disabled = l_item_0.disabled, 
-                toolTipConfig = if l_FFlagAXAddToolTipToIconItemMenu_0 and v12.activeItemId ~= "" and l_item_0.toolTipConfig then nil else l_item_0.toolTipConfig, 
-                ref = l_item_0.ref, 
-                Visible = l_item_0.visible, 
-                LayoutOrder = v15.index
-            });
-        elseif l_item_0.type == "color" then
-            return v2.createElement(v8, {
-                colors = l_item_0.colors, 
-                colorSize = l_item_0.colorSize, 
-                isActive = l_item_0.isActive, 
-                size = l_item_0.size, 
-                onActivated = v19, 
-                disabled = l_item_0.disabled, 
-                ref = l_item_0.ref, 
-                Visible = l_item_0.visible, 
-                LayoutOrder = v15.index, 
-                Selectable = l_item_0.Selectable
-            });
-        elseif l_FFlagAXResetAvatarButton_0 and l_item_0.type == "divider" then
-            return v2.createElement(v3.Divider, {
-                variant = l_item_0.variant, 
-                ref = l_item_0.ref, 
-                Visible = l_item_0.visible, 
-                LayoutOrder = v15.index
-            });
-        else
-            return nil;
-        end;
-    end, {
-        if l_FFlagAXAddToolTipToIconItemMenu_0 then v12.activeItemId else nil
-    });
-    local v25 = v2.useMemo(function() --[[ Line: 110 ]]
-        -- upvalues: v2 (ref), v12 (copy), v14 (copy), v20 (copy)
-        local v21 = {
-            IconOnlyMenuListLayout = v2.createElement("UIListLayout", {
-                FillDirection = if v12.direction == "horizontal" then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, v14.iconOnlyMenuItemGap)
-            })
-        };
-        for v22, v23 in v12.items do
-            local v24 = if v23.type == "divider" then nil else if v23.isActive ~= nil then v23.isActive else v23.id == v12.activeItemId;
-            v21[("MenuItem-%*"):format(v23.id)] = v20({
-                item = v23, 
-                isActive = v24, 
-                onItemActivated = v12.onItemActivated, 
-                index = v22
-            });
-        end;
-        return v21;
-    end, {
-        v12.items, 
-        v12.activeItemId, 
-        v12.onItemActivated, 
-        v12.direction, 
-        v20
-    });
-    return v2.createElement(v3.View, {
-        tag = "auto-xy radius-circle padding-xsmall", 
-        backgroundStyle = v14.menuBackgroundStyle, 
-        ref = v13, 
-        Visible = #v12.items > 0, 
-        LayoutOrder = v12.LayoutOrder, 
-        onAbsoluteSizeChanged = v12.onAbsoluteSizeChanged, 
-        Position = v12.Position
-    }, v25);
-end));
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local IconItem = require(AvatarExperienceControlBar.Components.Items.IconItem)
+local ImageItem = require(AvatarExperienceControlBar.Components.Items.ImageItem)
+local ColorItem = require(AvatarExperienceControlBar.Components.Items.ColorItem)
+local FFlagAXAddToolTipToIconItemMenu = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXAddToolTipToIconItemMenu
+local FFlagAXMigrateBuilderIcons = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
+local FFlagAXResetAvatarButton = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXResetAvatarButton
+
+local function IconOnlyMenu(t1: {[any]: any}, p1) -- line: 27
+	-- upvalues: useSemanticTokens (copy), React (copy), FFlagAXResetAvatarButton (copy), ImageItem (copy), IconItem (copy), FFlagAXMigrateBuilderIcons (copy), FFlagAXAddToolTipToIconItemMenu (copy), ColorItem (copy), Foundation (copy)
+	local v15 = useSemanticTokens()
+	local v16 = React.useCallback(function(t2: {[any]: any}) -- line: 30
+		-- upvalues: FFlagAXResetAvatarButton (copy), React (copy), ImageItem (copy), IconItem (copy), FFlagAXMigrateBuilderIcons (copy), FFlagAXAddToolTipToIconItemMenu (copy), t1 (copy), ColorItem (copy), Foundation (copy)
+		local item = t2.item
+		local isActive = t2.isActive
+		local onItemActivated = t2.onItemActivated
+		local v22 = (not FFlagAXResetAvatarButton or item.type ~= "divider") and function() -- line: 43
+			-- upvalues: onItemActivated (copy), item (copy)
+			if onItemActivated then
+				onItemActivated(item.id)
+			end
+
+			if item.onActivated then
+				item.onActivated()
+			end
+		end or nil
+
+		if item.type == "image" then
+			return React.createElement(ImageItem, {
+				thumbnailUrl = item.thumbnailUrl,
+				isActive = isActive,
+				onActivated = v22,
+				disabled = item.disabled,
+				ref = item.ref,
+				enableFocusAnimation = item.enableFocusAnimation,
+				Visible = item.visible,
+				LayoutOrder = t2.index,
+				hideIndicator = item.hideIndicator
+			})
+		end
+
+		if item.type == "icon" then
+			return React.createElement(IconItem, {
+				icon = item.icon,
+				activeIcon = item.activeIcon,
+				iconSize = item.iconSize,
+				iconVariant = if not FFlagAXMigrateBuilderIcons then nil else item.iconVariant,
+				activeIconVariant = if not FFlagAXMigrateBuilderIcons then nil else item.activeIconVariant,
+				isActive = isActive,
+				animate = not item.disableAnimation,
+				onActivated = v22,
+				disabled = item.disabled,
+				toolTipConfig = if not FFlagAXAddToolTipToIconItemMenu or (t1.activeItemId == "" or not item.toolTipConfig) then item.toolTipConfig else nil,
+				ref = item.ref,
+				Visible = item.visible,
+				LayoutOrder = t2.index
+			})
+		end
+
+		if item.type == "color" then
+			return React.createElement(ColorItem, {
+				colors = item.colors,
+				colorSize = item.colorSize,
+				isActive = item.isActive,
+				size = item.size,
+				onActivated = v22,
+				disabled = item.disabled,
+				ref = item.ref,
+				Visible = item.visible,
+				LayoutOrder = t2.index,
+				Selectable = item.Selectable
+			})
+		end
+
+		if FFlagAXResetAvatarButton and item.type == "divider" then
+			return React.createElement(Foundation.Divider, {
+				variant = item.variant,
+				ref = item.ref,
+				Visible = item.visible,
+				LayoutOrder = t2.index
+			})
+		end
+
+		return nil
+	end, { if not FFlagAXAddToolTipToIconItemMenu then nil else t1.activeItemId })
+	local v17 = React.useMemo(function() -- line: 110
+		-- upvalues: React (copy), t1 (copy), v15 (copy), v16 (copy)
+		local t3 = {
+			IconOnlyMenuListLayout = React.createElement("UIListLayout", {
+				FillDirection = if t1.direction ~= "horizontal" then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, v15.iconOnlyMenuItemGap)
+			})
+		}
+
+		for v24, v25 in t1.items do
+			local v26 = if v25.type ~= "divider" then if v25.isActive == nil then v25.id == t1.activeItemId else v25.isActive else nil
+
+			t3[`MenuItem-{ v25.id }`] = v16({
+				item = v25,
+				isActive = v26,
+				onItemActivated = t1.onItemActivated,
+				index = v24
+			})
+		end
+
+		return t3
+	end, {
+		t1.items,
+		t1.activeItemId,
+		t1.onItemActivated,
+		t1.direction,
+		v16
+	})
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy radius-circle padding-xsmall",
+		backgroundStyle = v15.menuBackgroundStyle,
+		ref = p1,
+		Visible = #t1.items > 0,
+		LayoutOrder = t1.LayoutOrder,
+		onAbsoluteSizeChanged = t1.onAbsoluteSizeChanged,
+		Position = t1.Position
+	}, v17)
+end
+
+return React.memo(React.forwardRef(IconOnlyMenu))

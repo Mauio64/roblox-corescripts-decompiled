@@ -1,13 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-return function(v2) --[[ Line: 7 ]] --[[ Name: selectRobuxSpent ]]
-    local v3 = 0;
-    if v2.itemData and v2.itemStatuses then
-        for _, v5 in v2.itemData do
-            if v2.itemStatuses[v5.id] == Enum.MarketplaceItemPurchaseStatus.Success then
-                v3 = v3 + v5.priceRobux;
-            end;
-        end;
-    end;
-    return v3;
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+
+require(BulkPurchaseApp.Store.Types)
+
+local function selectRobuxSpent(p1) -- line: 7
+	local n1 = 0
+
+	if p1.itemData and p1.itemStatuses then
+		for _, v6 in p1.itemData do
+			if p1.itemStatuses[v6.id] == Enum.MarketplaceItemPurchaseStatus.Success then
+				n1 += v6.priceRobux
+			end
+		end
+	end
+
+	return n1
+end
+
+return selectRobuxSpent

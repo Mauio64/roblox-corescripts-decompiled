@@ -1,29 +1,33 @@
-local l_Parent_0 = script:FindFirstAncestor("EditProfileBackground").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_HeaderBar_0 = require(l_Parent_0.UIBlox).App.Bar.HeaderBar;
-local l_makeBackButton_0 = require(l_Parent_0.AppHeaderBar).makeBackButton;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useLastInputMode_0 = require(l_Parent_0.FocusNavigationUtils).useLastInputMode;
-local l_View_0 = v2.View;
-return function(v8) --[[ Line: 22 ]] --[[ Name: EditProfileBackgroundTopBar ]]
-    -- upvalues: l_useLastInputMode_0 (copy), l_useLocalization_0 (copy), l_makeBackButton_0 (copy), v1 (copy), l_View_0 (copy), l_HeaderBar_0 (copy)
-    local v9 = l_useLastInputMode_0() == "Focus";
-    local v10 = l_useLocalization_0({
-        EditBackground = "Feature.Profile.Label.EditBackground"
-    });
-    local v11 = l_makeBackButton_0(v8.onClose);
-    return v1.createElement(l_View_0, {
-        tag = "size-full-1200", 
-        LayoutOrder = v8.layoutOrder, 
-        ZIndex = 2
-    }, {
-        headerBar = v1.createElement(l_HeaderBar_0, {
-            isSecondary = true, 
-            title = v10.EditBackground, 
-            backgroundTransparency = 1, 
-            barHeight = 48, 
-            renderLeft = if not v9 then v11 else nil
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("EditProfileBackground").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local HeaderBar = require(Parent.UIBlox).App.Bar.HeaderBar
+local makeBackButton = require(Parent.AppHeaderBar).makeBackButton
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local useLastInputMode = require(Parent.FocusNavigationUtils).useLastInputMode
+local View = Foundation.View
+
+local function EditProfileBackgroundTopBar(t1: {[any]: any}) -- line: 22
+	-- upvalues: useLastInputMode (copy), useLocalization (copy), makeBackButton (copy), React (copy), View (copy), HeaderBar (copy)
+	local v11 = useLastInputMode() == "Focus"
+	local v12 = useLocalization({
+		EditBackground = "Feature.Profile.Label.EditBackground"
+	})
+	local v13 = makeBackButton(t1.onClose)
+
+	return React.createElement(View, {
+		tag = "size-full-1200",
+		ZIndex = 2,
+		LayoutOrder = t1.layoutOrder
+	}, {
+		headerBar = React.createElement(HeaderBar, {
+			isSecondary = true,
+			backgroundTransparency = 1,
+			barHeight = 48,
+			title = v12.EditBackground,
+			renderLeft = if v11 then nil else v13
+		})
+	})
+end
+
+return EditProfileBackgroundTopBar

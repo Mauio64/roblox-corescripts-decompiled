@@ -1,40 +1,45 @@
-local _ = game:GetService("CoreGui");
-local v1 = nil;
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_AvatarIdentification_0 = require(l_CorePackages_0.Workspace.Packages.TnSAvatarIdentification).AvatarIdentification;
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script.Parent.Parent;
-local v6 = require(l_Parent_0.Actions.Hide);
-local v7 = require(l_Parent_0.Actions.Show);
-local v8 = require(l_Parent_0.Actions.SetIdentifiedAvatars);
-local v9 = require(l_Parent_0.Utility.ScreenshotHookManager);
-local l_getVisibleAvatars_0 = l_AvatarIdentification_0.getVisibleAvatars;
+game:GetService("CoreGui")
+
+local SafetyService = nil
+local CorePackages = game:GetService("CorePackages")
+local AvatarIdentification = require(CorePackages.Workspace.Packages.TnSAvatarIdentification).AvatarIdentification
+local RunService = game:GetService("RunService")
+local ParentParent = script.Parent.Parent
+local Hide = require(ParentParent.Actions.Hide)
+local Show = require(ParentParent.Actions.Show)
+local SetIdentifiedAvatars = require(ParentParent.Actions.SetIdentifiedAvatars)
+local ScreenshotHookManager = require(ParentParent.Utility.ScreenshotHookManager)
+local getVisibleAvatars = AvatarIdentification.getVisibleAvatars
+
 if game:GetEngineFeature("ReportAnythingScreenshot") then
-    v1 = game:GetService("SafetyService");
-end;
-return function() --[[ Line: 22 ]]
-    -- upvalues: v1 (ref), v9 (copy), v6 (copy), l_getVisibleAvatars_0 (copy), l_RunService_0 (copy), v7 (copy), v8 (copy)
-    return function(v11) --[[ Line: 23 ]]
-        -- upvalues: v1 (ref), v9 (ref), v6 (ref), l_getVisibleAvatars_0 (ref), l_RunService_0 (ref), v7 (ref), v8 (ref)
-        if v1 == nil then
-            return;
-        else
-            coroutine.wrap(function() --[[ Line: 29 ]]
-                -- upvalues: v9 (ref), v11 (copy), v6 (ref), v1 (ref), l_getVisibleAvatars_0 (ref), l_RunService_0 (ref), v7 (ref), v8 (ref)
-                v9.doPreScreenshot();
-                v11:dispatch(v6());
-                local _ = v1:TakeScreenshot({
-                    registerContent = 1
-                });
-                local v13, _ = l_getVisibleAvatars_0();
-                for _ = 1, 61 do
-                    l_RunService_0.RenderStepped:Wait();
-                end;
-                v11:dispatch(v7());
-                v9.doPostScreenshot();
-                v11:dispatch(v8(v13));
-            end)();
-            return;
-        end;
-    end;
-end;
+	SafetyService = game:GetService("SafetyService")
+end
+
+return function() -- line: 22
+	-- upvalues: SafetyService (ref), ScreenshotHookManager (copy), Hide (copy), getVisibleAvatars (copy), RunService (copy), Show (copy), SetIdentifiedAvatars (copy)
+	return function(p1) -- line: 23
+		-- upvalues: SafetyService (ref), ScreenshotHookManager (copy), Hide (copy), getVisibleAvatars (copy), RunService (copy), Show (copy), SetIdentifiedAvatars (copy)
+		if SafetyService == nil then
+			return
+		end
+
+		coroutine.wrap(function() -- line: 29
+			-- upvalues: ScreenshotHookManager (copy), p1 (copy), Hide (copy), SafetyService (ref), getVisibleAvatars (copy), RunService (copy), Show (copy), SetIdentifiedAvatars (copy)
+			ScreenshotHookManager.doPreScreenshot()
+			p1:dispatch(Hide())
+			SafetyService:TakeScreenshot({
+				registerContent = 1
+			})
+
+			local v12, _ = getVisibleAvatars()
+
+			for _ = 1, 61 do
+				RunService.RenderStepped:Wait()
+			end
+
+			p1:dispatch(Show())
+			ScreenshotHookManager.doPostScreenshot()
+			p1:dispatch(SetIdentifiedAvatars(v12))
+		end)()
+	end
+end

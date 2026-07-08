@@ -1,55 +1,58 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_PerformFetch_0 = require(l_CorePackages_0.Workspace.Packages.Http).PerformFetch;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Thunk);
-local v4 = require(l_Parent_0.Models.AssetInfo);
-local v5 = require(l_Parent_0.Models.BundleInfo);
-local v6 = require(l_Parent_0.Services.Network);
-local v7 = require(l_Parent_0.Actions.SetAssets);
-local v8 = require(l_Parent_0.Actions.SetBundles);
-local v9 = require(l_Parent_0.createInspectAndBuyKeyMapper);
-local v10 = require(l_Parent_0.Thunks.SendCounter);
-local v11 = require(l_Parent_0.Constants);
-local v12 = {
-    v6
-};
-local v13 = v9("getEconomyProductInfo");
-return function(v14, v15, v16) --[[ Line: 26 ]] --[[ Name: GetEconomyProductInfo ]]
-    -- upvalues: v3 (copy), v12 (copy), v6 (copy), v13 (copy), l_PerformFetch_0 (copy), v4 (copy), v7 (copy), v5 (copy), v8 (copy), v10 (copy), v11 (copy)
-    return v3.new(script.Name, v12, function(v17, v18) --[[ Line: 27 ]]
-        -- upvalues: v6 (ref), v13 (ref), v14 (copy), l_PerformFetch_0 (ref), v15 (copy), v4 (ref), v7 (ref), v5 (ref), v16 (copy), v8 (ref), v10 (ref), v11 (ref)
-        local v19 = v18[v6];
-        local v20 = v13(v17:getState().storeId, v14);
-        return l_PerformFetch_0.Single(v20, function() --[[ Line: 32 ]]
-            -- upvalues: v19 (copy), v14 (ref), v15 (ref), v4 (ref), v17 (copy), v7 (ref), v5 (ref), v16 (ref), v8 (ref), v10 (ref), v11 (ref)
-            return v19.getEconomyProductInfo(v14):andThen(function(v21) --[[ Line: 33 ]]
-                -- upvalues: v15 (ref), v4 (ref), v17 (ref), v7 (ref), v5 (ref), v16 (ref), v8 (ref), v10 (ref), v11 (ref)
-                local v22 = not v21.purchasable and (v21.reason == "AlreadyOwned" or false);
-                local v23 = v21.price or 0;
-                local l_purchasable_0 = v21.purchasable;
-                local l_premiumPricing_0 = v21.premiumPricing;
-                if not v21.purchasable and v21.reason == "InsufficientFunds" then
-                    l_purchasable_0 = true;
-                end;
-                if not v15 then
-                    local v26 = v4.fromGetEconomyProductInfo(v21, v22, v23, l_purchasable_0, l_premiumPricing_0);
-                    v17:dispatch(v7({
-                        v26
-                    }));
-                else
-                    local v27 = v5.fromGetEconomyProductInfo(v22, v16, v23, l_purchasable_0);
-                    v17:dispatch(v8({
-                        v27
-                    }));
-                end;
-                v17:dispatch(v10(v11.Counters.GetEconomyProductInfo .. v11.CounterSuffix.RequestSucceeded));
-            end, function(_) --[[ Line: 54 ]]
-                -- upvalues: v17 (ref), v10 (ref), v11 (ref)
-                v17:dispatch(v10(v11.Counters.GetEconomyProductInfo .. v11.CounterSuffix.RequestRejected));
-            end);
-        end)(v17):catch(function(_) --[[ Line: 59 ]]
-            -- upvalues: v17 (copy), v10 (ref), v11 (ref)
-            v17:dispatch(v10(v11.Counters.GetEconomyProductInfo .. v11.CounterSuffix.RequestFailed));
-        end);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local AssetInfo = require(ParentParent.Models.AssetInfo)
+local BundleInfo = require(ParentParent.Models.BundleInfo)
+local Network = require(ParentParent.Services.Network)
+local SetAssets = require(ParentParent.Actions.SetAssets)
+local SetBundles = require(ParentParent.Actions.SetBundles)
+local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local Constants = require(ParentParent.Constants)
+local t1 = { Network }
+local v14 = createInspectAndBuyKeyMapper("getEconomyProductInfo")
+
+local function GetEconomyProductInfo(p1, p2, p3) -- line: 26
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v14 (copy), PerformFetch (copy), AssetInfo (copy), SetAssets (copy), BundleInfo (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+	return Thunk.new(script.Name, t1, function(p4, p5) -- line: 27
+		-- upvalues: Network (copy), v14 (copy), p1 (copy), PerformFetch (copy), p2 (copy), AssetInfo (copy), SetAssets (copy), BundleInfo (copy), p3 (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+		local v21 = p5[Network]
+		local v22 = v14(p4:getState().storeId, p1)
+
+		return PerformFetch.Single(v22, function() -- line: 32
+			-- upvalues: v21 (copy), p1 (copy), p2 (copy), AssetInfo (copy), p4 (copy), SetAssets (copy), BundleInfo (copy), p3 (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+			return v21.getEconomyProductInfo(p1):andThen(function(p6) -- line: 33
+				-- upvalues: p2 (copy), AssetInfo (copy), p4 (copy), SetAssets (copy), BundleInfo (copy), p3 (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+				local v25 = not p6.purchasable and (p6.reason == "AlreadyOwned" or false)
+				local v26 = p6.price or 0
+				local purchasable = p6.purchasable
+				local premiumPricing = p6.premiumPricing
+
+				if not p6.purchasable and p6.reason == "InsufficientFunds" then
+					purchasable = true
+				end
+
+				if not p2 then
+					local v29 = AssetInfo.fromGetEconomyProductInfo(p6, v25, v26, purchasable, premiumPricing)
+
+					p4:dispatch(SetAssets({ v29 }))
+				else
+					local v30 = BundleInfo.fromGetEconomyProductInfo(v25, p3, v26, purchasable)
+
+					p4:dispatch(SetBundles({ v30 }))
+				end
+
+				p4:dispatch(SendCounter(Constants.Counters.GetEconomyProductInfo .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_) -- line: 54
+				-- upvalues: p4 (copy), SendCounter (copy), Constants (copy)
+				p4:dispatch(SendCounter(Constants.Counters.GetEconomyProductInfo .. Constants.CounterSuffix.RequestRejected))
+			end)
+		end)(p4):catch(function(_) -- line: 59
+			-- upvalues: p4 (copy), SendCounter (copy), Constants (copy)
+			p4:dispatch(SendCounter(Constants.Counters.GetEconomyProductInfo .. Constants.CounterSuffix.RequestFailed))
+		end)
+	end)
+end
+
+return GetEconomyProductInfo

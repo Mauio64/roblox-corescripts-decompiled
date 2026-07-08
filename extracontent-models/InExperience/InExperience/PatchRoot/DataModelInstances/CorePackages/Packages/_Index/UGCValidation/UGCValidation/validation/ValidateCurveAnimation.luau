@@ -1,1103 +1,1339 @@
-local l_CollectionService_0 = game:GetService("CollectionService");
-local l_Players_0 = game:GetService("Players");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Analytics);
-local v4 = require(l_Parent_0.Constants);
-local l_util_0 = l_Parent_0.util;
-local _ = require(l_util_0.Types);
-local v7 = require(l_util_0.FailureReasonsAccumulator);
-local v8 = require(l_util_0.AssetCalculator);
-local l_validation_0 = l_Parent_0.validation;
-local v10 = require(l_validation_0.validateAttributes);
-local v11 = require(l_validation_0.validateTags);
-local v12 = require(l_validation_0.ValidatePropertiesSensible);
-local l_flags_0 = l_Parent_0.flags;
-local v14 = require(l_flags_0.GetFStringUGCValidationMaxAnimationLength);
-local v15 = require(l_flags_0.GetFStringUGCValidationMaxAnimationBounds);
-local v16 = require(l_flags_0.GetFStringUGCValidationMaxAnimationDeltas);
-local v17 = require(l_flags_0.getFFlagUGCValidateAddObjectValueToAcceptableTypes);
-local v18 = require(l_flags_0.getFFlagUGCValidateDuplicatesInAnimation);
-local v19 = require(l_flags_0.getFFlagUGCValidateMaxTotalInstances);
-local v20 = require(l_flags_0.getFIntUGCValidateMaxAnimationFPS);
-local v21 = require(l_flags_0.getFIntUGCValidateMaxMarkerCurveValueLength);
-local v22 = require(l_flags_0.GetFStringUGCValidateMaxAnimationMovementPerPart);
-local v23 = require(l_flags_0.GetFStringUGCValidateFrameDeltaKeyTimeTol);
-local v24 = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidatePropertiesSensible);
-local v25 = require(l_flags_0.GetFStringUGCValidateAnimationHeightTol);
-local v26 = require(l_flags_0.getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage);
-local v27 = require(l_flags_0.getFFlagUGCValidateCurveAnimRotationSpeed);
-local v28 = require(l_flags_0.getFIntUGCValidationMaxAnimationRotationSpeedPerSecond);
-local v29 = require(l_flags_0.getFFlagUGCValidateCurveAnimFinalFrameBug);
-local v30 = require(l_flags_0.getFFlagUGCValidateCurveAnimMinTimeFix);
-local v31 = require(l_flags_0.GetFStringUGCValidateCurveAnimationMinLength);
-local v32 = require(l_flags_0.getFFlagUGCValidateCurveAnimTimeErrorMessageFix);
-local v33 = require(l_flags_0.getFFlagUGCValidateRestrictNumMarkerCurves);
-local v34 = require(l_flags_0.getFIntUGCValidateMaxTotalMarkerCurves);
-local v35 = require(l_flags_0.getFFlagUGCValidateRestrictNumFaceControls);
-local v36 = require(l_flags_0.getFIntUGCValidateMaxTotalFaceControls);
-local v37 = require(l_flags_0.getFFlagUGCValidateRestrictNumMarkersInsideMarkerCurves);
-local v38 = require(l_flags_0.getFIntUGCValidateMaxTotalInternalMarkers);
-local v39 = {};
-local function v43(v40, v41, v42) --[[ Line: 64 ]] --[[ Name: reportFailure ]]
-    -- upvalues: v3 (copy)
-    v3.reportFailure(v41, nil, v42);
-    return false, {
-        v40
-    };
-end;
-local v44 = nil;
-local function _() --[[ Line: 77 ]] --[[ Name: getBodyPartToParentMap ]]
-    -- upvalues: v44 (ref), v8 (copy)
-    if not v44 then
-        v44 = v8.getBodyPartsToParents();
-    end;
-    return v44;
-end;
-local function _(v46) --[[ Line: 85 ]] --[[ Name: isBodyPartFolderNameValid ]]
-    -- upvalues: v44 (ref), v8 (copy)
-    local v47 = true;
-    if not v44 then
-        v44 = v8.getBodyPartsToParents();
-    end;
-    if v44[v46] == nil then
-        v47 = v46 == "HumanoidRootPart";
-    end;
-    return v47;
-end;
-local function v57(v49, v50) --[[ Line: 89 ]] --[[ Name: areChildrenAcceptable ]]
-    if not v49 then
-        return true;
-    else
-        local function v54(v51) --[[ Line: 94 ]] --[[ Name: findAndRemoveMatching ]]
-            -- upvalues: v50 (copy)
-            for v52, v53 in v50 do
-                if v53.ClassName == v51.ClassName and v53.Name == v51.Name then
-                    table.remove(v50, v52);
-                    return true;
-                end;
-            end;
-            return false;
-        end;
-        for _, v56 in v49:GetChildren() do
-            if not v54(v56) then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
-local function v62(v58) --[[ Line: 114 ]] --[[ Name: calculateAcceptableChildBodyPartFolders ]]
-    -- upvalues: v44 (ref), v8 (copy)
-    local v59 = {};
-    if not v44 then
-        v44 = v8.getBodyPartsToParents();
-    end;
-    for v60, v61 in v44 do
-        if v61 == v58 then
-            table.insert(v59, {
-                ClassName = "Folder", 
-                Name = v60
-            });
-        end;
-    end;
-    return v59;
-end;
-local function v66(v63, v64) --[[ Line: 128 ]] --[[ Name: calculateAcceptableBodyPartFolderChildrenArray ]]
-    -- upvalues: v62 (copy)
-    local v65 = v62(v63.Name);
-    if v63.Name == "HumanoidRootPart" then
-        return v65;
-    else
-        table.insert(v65, {
-            ClassName = "Vector3Curve", 
-            Name = "Position"
-        });
-        table.insert(v65, {
-            ClassName = v64 and "EulerRotationCurve" or "RotationCurve", 
-            Name = "Rotation"
-        });
-        if v63.Name ~= "Head" then
-            return v65;
-        else
-            table.insert(v65, {
-                ClassName = "Folder", 
-                Name = "FaceControls"
-            });
-            return v65;
-        end;
-    end;
-end;
-local function v67() --[[ Line: 159 ]] --[[ Name: calculateAcceptableCurveChildrenArray ]]
-    return {
-        {
-            ClassName = "FloatCurve", 
-            Name = "X"
-        }, 
-        {
-            ClassName = "FloatCurve", 
-            Name = "Y"
-        }, 
-        {
-            ClassName = "FloatCurve", 
-            Name = "Z"
-        }
-    };
-end;
-local function _(v68) --[[ Line: 176 ]] --[[ Name: containsGrandChildren ]]
-    if not v68 then
-        return false;
-    else
-        return #v68:GetDescendants() > #v68:GetChildren();
-    end;
-end;
-local function v78(v70) --[[ Line: 183 ]] --[[ Name: validateBodyPartFolderChildren ]]
-    -- upvalues: v66 (copy), v57 (copy), v67 (copy), v35 (copy), v36 (copy)
-    local v71 = v66(v70, true);
-    if v57(v70, v71) then
-        local v72 = v67();
-        if not v57(v70:FindFirstChild("Position"), v72) then
-            return false;
-        else
-            v72 = v67();
-            if not v57(v70:FindFirstChild("Rotation"), v72) then
-                return false;
-            else
-                local l_FaceControls_0 = v70:FindFirstChild("FaceControls");
-                if l_FaceControls_0 then
-                    local l_l_FaceControls_0_Children_0 = l_FaceControls_0:GetChildren();
-                    if v35() and #l_l_FaceControls_0_Children_0 > v36() then
-                        return false;
-                    else
-                        for _, v76 in l_l_FaceControls_0_Children_0 do
-                            if not v76:IsA("FloatCurve") then
-                                return false;
-                            end;
-                        end;
-                    end;
-                end;
-                local l_Position_0 = v70:FindFirstChild("Position");
-                if not not l_Position_0 and #l_Position_0:GetDescendants() > #l_Position_0:GetChildren() then
-                    return false;
-                else
-                    l_Position_0 = v70:FindFirstChild("Rotation");
-                    if not not l_Position_0 and #l_Position_0:GetDescendants() > #l_Position_0:GetChildren() then
-                        return false;
-                    elseif not not l_FaceControls_0 and #l_FaceControls_0:GetDescendants() > #l_FaceControls_0:GetChildren() then
-                        return false;
-                    else
-                        return true;
-                    end;
-                end;
-            end;
-        end;
-    else
-        return false;
-    end;
-end;
-local _ = function(v79, v80) --[[ Line: 234 ]] --[[ Name: validateCurveAnimationBodyPartFolder ]]
-    -- upvalues: v18 (copy), v78 (copy), v43 (copy), v3 (copy), v44 (ref), v8 (copy)
-    local function v81(v82) --[[ Line: 238 ]] --[[ Name: validateBodyPartFolderInternal ]]
-        -- upvalues: v18 (ref), v78 (ref), v43 (ref), v3 (ref), v80 (copy), v81 (copy), v44 (ref), v8 (ref)
-        if v18() then
-            if not v78(v82) then
-                return v43(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", v82.Name), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v80);
-            else
-                for _, v84 in v82:GetChildren() do
-                    if v84:IsA("Folder") and v84.Name ~= "FaceControls" then
-                        local v85, v86 = v81(v84);
-                        if not v85 then
-                            return false, v86;
-                        end;
-                    end;
-                end;
-                return true;
-            end;
-        else
-            for _, v88 in v82:GetChildren() do
-                if v88:IsA("Folder") then
-                    if v88.Name == "HumanoidRootPart" then
-                        return false;
-                    else
-                        if not v44 then
-                            v44 = v8.getBodyPartsToParents();
-                        end;
-                        local v89 = v44[v88.Name];
-                        if v89 then
-                            if v89 ~= v82.Name then
-                                return false;
-                            else
-                                return v81(v88);
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-            return true;
-        end;
-    end;
-    local l_Name_0 = v79.Name;
-    local v91 = true;
-    if not v44 then
-        v44 = v8.getBodyPartsToParents();
-    end;
-    if v44[l_Name_0] == nil then
-        v91 = l_Name_0 == "HumanoidRootPart";
-    end;
-    if not v91 then
-        return true;
-    else
-        return v81(v79);
-    end;
-end;
-local function v100(v93, v94) --[[ Line: 287 ]] --[[ Name: validateSingleBodyRoot ]]
-    -- upvalues: v44 (ref), v8 (copy), v43 (copy), v3 (copy), v18 (copy)
-    local v95 = 0;
-    for _, v97 in v93:GetChildren() do
-        if v97:IsA("Folder") then
-            local l_Name_1 = v97.Name;
-            local v99 = true;
-            if not v44 then
-                v44 = v8.getBodyPartsToParents();
-            end;
-            if v44[l_Name_1] == nil then
-                v99 = l_Name_1 == "HumanoidRootPart";
-            end;
-            if v99 then
-                v95 = v95 + 1;
-                if v95 > 1 then
-                    return v43("CurveAnimation contains more than one body part or HumanoidRootPart Folder children. Please ensure there is only one child Folder named after a body part or HumanoidRootPart.", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v94);
-                end;
-            end;
-        end;
-    end;
-    if v18() and v95 == 0 then
-        return v43("CurveAnimation contains zero body part or HumanoidRootPart Folder children. Please ensure there is one (and only one) child Folder named after a body part or HumanoidRootPart.", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v94);
-    else
-        return true;
-    end;
-end;
-v39.validateMarkerCurves = function(v101, v102) --[[ Line: 317 ]] --[[ Name: validateMarkerCurves ]]
-    -- upvalues: v34 (copy), v43 (copy), v3 (copy)
-    local v103 = v34();
-    local v104 = 0;
-    for _, v106 in v101:GetDescendants() do
-        if v106:IsA("MarkerCurve") then
-            v104 = v104 + 1;
-            if v103 < v104 then
-                return v43(("CurveAnimation contains more than %* MarkerCurve(s). Please ensure there is no more than %* MarkerCurve descendant(s)."):format(v103, v103), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v102);
-            end;
-        end;
-    end;
-    return true;
-end;
-v39.validateSingleAnimationRigData = function(v107, v108) --[[ Line: 339 ]] --[[ Name: validateSingleAnimationRigData ]]
-    -- upvalues: v43 (copy), v3 (copy)
-    local v109 = 0;
-    for _, v111 in v107:GetChildren() do
-        if v111:IsA("AnimationRigData") then
-            v109 = v109 + 1;
-            if v109 > 1 then
-                return v43("CurveAnimation contains more than one AnimationRigData children. Please ensure there is only one AnimationRigData child.", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v108);
-            end;
-        end;
-    end;
-    if v109 == 0 then
-        return v43("CurveAnimation contains zero AnimationRigData children. Please ensure there is one (and only one) AnimationRigData children.", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v108);
-    else
-        return true;
-    end;
-end;
-v39.validateAnimationRigDataInternals = function(v112, v113) --[[ Line: 367 ]] --[[ Name: validateAnimationRigDataInternals ]]
-    -- upvalues: v43 (copy), v3 (copy)
-    for _, v115 in v112:GetChildren() do
-        if v115:IsA("AnimationRigData") and not v115:IsValidR15() then
-            return v43("AnimationRigData failed internal validation. Please ensure the AnimationRigData is set up correctly.", v3.ErrorType.validateCurveAnimation_IncorrectAnimationRigData, v113);
-        end;
-    end;
-    return true;
-end;
-local function _(v116, v117) --[[ Line: 387 ]] --[[ Name: validateAnimationRigData ]]
-    -- upvalues: v39 (copy)
-    local v118, v119 = v39.validateSingleAnimationRigData(v116, v117);
-    if not v118 then
-        return false, v119;
-    else
-        local v120, v121 = v39.validateAnimationRigDataInternals(v116, v117);
-        v118 = v120;
-        v119 = v121;
-        if not v118 then
-            return false, v119;
-        else
-            return true;
-        end;
-    end;
-end;
-local function v127(v123, v124) --[[ Line: 403 ]] --[[ Name: validateScripts ]]
-    -- upvalues: v43 (copy), v3 (copy)
-    for _, v126 in v123:GetDescendants() do
-        if v126:IsA("Script") or v126:IsA("ModuleScript") then
-            return v43("CurveAnimation hierarchy contains Scripts, LocalScripts, or ModuleScripts. Please remove them.", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v124);
-        end;
-    end;
-    return true;
-end;
-local v128 = {
-    "MarkerCurve", 
-    "AnimationRigData", 
-    "Folder", 
-    "Vector3Curve", 
-    "EulerRotationCurve", 
-    "FloatCurve"
-};
-if v17() then
-    table.insert(v128, "ObjectValue");
-end;
-local function v136(v129, v130) --[[ Line: 432 ]] --[[ Name: validateExtraInstances ]]
-    -- upvalues: v128 (copy), v43 (copy), v3 (copy)
-    for _, v132 in v129:GetDescendants() do
-        local v133 = false;
-        for _, v135 in v128 do
-            if v132:IsA(v135) then
-                v133 = true;
-                break;
-            end;
-        end;
-        if not v133 then
-            return v43(("CurveAnimation hierarchy can only contain %*. Please remove any other Instance types."):format((table.concat(v128, ", "))), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v130);
-        end;
-    end;
-    return true;
-end;
-v39.validateExtraInstancesUnitTest = function(v137, v138) --[[ Line: 456 ]] --[[ Name: validateExtraInstancesUnitTest ]]
-    -- upvalues: v136 (copy)
-    return v136(v137, v138);
-end;
-v39.validateScriptsUnitTest = function(v139, v140) --[[ Line: 463 ]] --[[ Name: validateScriptsUnitTest ]]
-    -- upvalues: v127 (copy)
-    return v127(v139, v140);
-end;
-local function v179(v141, v142) --[[ Line: 472 ]] --[[ Name: validateAnimationHierarchy ]]
-    -- upvalues: v3 (copy), v19 (copy), v43 (copy), v100 (copy), v39 (copy), v33 (copy), v18 (copy), v44 (ref), v8 (copy), v78 (copy), v7 (copy), v127 (copy), v136 (copy)
-    if not v141:IsA("CurveAnimation") then
-        v3.reportFailure(v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, nil, v142);
-        return false, {
-            "Referenced Animation is not a CurveAnimation. Please ensure the animation is uploaded correctly."
-        };
-    else
-        local v143 = #v141:GetDescendants();
-        if v19() < v143 then
-            return v43(("CurveAnimation has %* descendants. Maximum allowed is %*. Please reduce the number of descendants."):format(v143, (v19())), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-        else
-            local v144, v145 = v100(v141, v142);
-            if not v144 then
-                return false, v145;
-            else
-                local v146, v147 = v39.validateSingleAnimationRigData(v141, v142);
-                local v148, v149;
-                if not v146 then
-                    v148 = false;
-                    v149 = v147;
-                else
-                    local v150, v151 = v39.validateAnimationRigDataInternals(v141, v142);
-                    v146 = v150;
-                    v147 = v151;
-                    if not v146 then
-                        v148 = false;
-                        v149 = v147;
-                    else
-                        v148 = true;
-                        v149 = nil;
-                    end;
-                end;
-                v144 = v148;
-                v145 = v149;
-                if not v144 then
-                    return false, v145;
-                else
-                    if v33() then
-                        v148, v149 = v39.validateMarkerCurves(v141, v142);
-                        v144 = v148;
-                        v145 = v149;
-                        if not v144 then
-                            return false, v145;
-                        end;
-                    end;
-                    for _, v153 in v141:GetChildren() do
-                        if v153:IsA("MarkerCurve") or v153:IsA("AnimationRigData") then
-                            if v18() and #v153:GetChildren() > 0 then
-                                return v43("CurveAnimation child MarkerCurves and AnimationRigData cannot have children", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-                            end;
-                        elseif v153:IsA("Folder") then
-                            if v18() then
-                                local l_Name_2 = v153.Name;
-                                local v155 = true;
-                                if not v44 then
-                                    v44 = v8.getBodyPartsToParents();
-                                end;
-                                if v44[l_Name_2] == nil then
-                                    v155 = l_Name_2 == "HumanoidRootPart";
-                                end;
-                                if not v155 then
-                                    return v43("CurveAnimation contains unexpected child: " .. v153.Name, v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-                                else
-                                    local function v156(v157) --[[ Line: 238 ]] --[[ Name: validateBodyPartFolderInternal ]]
-                                        -- upvalues: v18 (ref), v78 (ref), v43 (ref), v3 (ref), v142 (copy), v156 (copy), v44 (ref), v8 (ref)
-                                        if v18() then
-                                            if not v78(v157) then
-                                                return v43(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", v157.Name), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-                                            else
-                                                for _, v159 in v157:GetChildren() do
-                                                    if v159:IsA("Folder") and v159.Name ~= "FaceControls" then
-                                                        local v160, v161 = v156(v159);
-                                                        if not v160 then
-                                                            return false, v161;
-                                                        end;
-                                                    end;
-                                                end;
-                                                return true;
-                                            end;
-                                        else
-                                            for _, v163 in v157:GetChildren() do
-                                                if v163:IsA("Folder") then
-                                                    if v163.Name == "HumanoidRootPart" then
-                                                        return false;
-                                                    else
-                                                        if not v44 then
-                                                            v44 = v8.getBodyPartsToParents();
-                                                        end;
-                                                        local v164 = v44[v163.Name];
-                                                        if v164 then
-                                                            if v164 ~= v157.Name then
-                                                                return false;
-                                                            else
-                                                                return v156(v163);
-                                                            end;
-                                                        end;
-                                                    end;
-                                                end;
-                                            end;
-                                            return true;
-                                        end;
-                                    end;
-                                    local l_Name_3 = v153.Name;
-                                    local v166 = true;
-                                    if not v44 then
-                                        v44 = v8.getBodyPartsToParents();
-                                    end;
-                                    if v44[l_Name_3] == nil then
-                                        v166 = l_Name_3 == "HumanoidRootPart";
-                                    end;
-                                    if not v166 then
-                                        v155 = true;
-                                        l_Name_2 = nil;
-                                    else
-                                        v166, l_Name_3 = v156(v153);
-                                        v155 = v166;
-                                        l_Name_2 = l_Name_3;
-                                    end;
-                                    v144 = v155;
-                                    v145 = l_Name_2;
-                                    if not v144 then
-                                        return false, v145;
-                                    end;
-                                end;
-                            else
-                                local v167 = nil;
-                                local l_v167_0 = v167 --[[ copy: 12 -> 15 ]];
-                                local function v169(v170) --[[ Line: 238 ]] --[[ Name: validateBodyPartFolderInternal ]]
-                                    -- upvalues: v18 (ref), v78 (ref), v43 (ref), v3 (ref), l_v167_0 (copy), v169 (copy), v44 (ref), v8 (ref)
-                                    if v18() then
-                                        if not v78(v170) then
-                                            return v43(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", v170.Name), v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, l_v167_0);
-                                        else
-                                            for _, v172 in v170:GetChildren() do
-                                                if v172:IsA("Folder") and v172.Name ~= "FaceControls" then
-                                                    local v173, v174 = v169(v172);
-                                                    if not v173 then
-                                                        return false, v174;
-                                                    end;
-                                                end;
-                                            end;
-                                            return true;
-                                        end;
-                                    else
-                                        for _, v176 in v170:GetChildren() do
-                                            if v176:IsA("Folder") then
-                                                if v176.Name == "HumanoidRootPart" then
-                                                    return false;
-                                                else
-                                                    if not v44 then
-                                                        v44 = v8.getBodyPartsToParents();
-                                                    end;
-                                                    local v177 = v44[v176.Name];
-                                                    if v177 then
-                                                        if v177 ~= v170.Name then
-                                                            return false;
-                                                        else
-                                                            return v169(v176);
-                                                        end;
-                                                    end;
-                                                end;
-                                            end;
-                                        end;
-                                        return true;
-                                    end;
-                                end;
-                                local l_Name_4 = v153.Name;
-                                v167 = true;
-                                if not v44 then
-                                    v44 = v8.getBodyPartsToParents();
-                                end;
-                                if v44[l_Name_4] == nil then
-                                    v167 = l_Name_4 == "HumanoidRootPart";
-                                end;
-                                if not (not v167 or v169(v153)) then
-                                    return v43("CurveAnimation contains child body part Folder " .. v153.Name .. " which has an invalid hierarchy", v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-                                end;
-                            end;
-                        else
-                            return v43("CurveAnimation contains unexpected child: " .. v153.Name, v3.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v142);
-                        end;
-                    end;
-                    v148 = v7.new();
-                    v148:updateReasons(v127(v141, v142));
-                    v148:updateReasons(v136(v141, v142));
-                    return v148:getFinalResults();
-                end;
-            end;
-        end;
-    end;
-end;
-local function v184(v180) --[[ Line: 570 ]] --[[ Name: createDefaultCharacter ]]
-    -- upvalues: l_Players_0 (copy)
-    local v181 = nil;
-    v181 = if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_Players_0:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15) else game.Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15);
-    for _, v183 in v181:GetDescendants() do
-        if v183:IsA("Decal") then
-            v183.Transparency = 1;
-        elseif v183:IsA("MeshPart") then
-            v183.Transparency = 1;
-            v183.CanCollide = false;
-        elseif v183:IsA("Motor6D") and v180 then
-            v183:Destroy();
-        end;
-    end;
-    return v181;
-end;
-local v185 = 1 / v20();
-local function v191(v186) --[[ Line: 604 ]] --[[ Name: getBodyPartFolderRoot ]]
-    -- upvalues: v44 (ref), v8 (copy)
-    for _, v188 in v186:GetChildren() do
-        if v188:IsA("Folder") then
-            local l_Name_5 = v188.Name;
-            local v190 = true;
-            if not v44 then
-                v44 = v8.getBodyPartsToParents();
-            end;
-            if v44[l_Name_5] == nil then
-                v190 = l_Name_5 == "HumanoidRootPart";
-            end;
-            if v190 then
-                return v188;
-            end;
-        end;
-    end;
-    return nil;
-end;
-local function v197(v192) --[[ Line: 613 ]] --[[ Name: hasFloatCurveKeys ]]
-    local l_X_0 = v192:FindFirstChild("X");
-    local l_Y_0 = v192:FindFirstChild("Y");
-    local l_Z_0 = v192:FindFirstChild("Z");
-    local v196 = if l_X_0 then l_X_0:IsA("FloatCurve") and #l_X_0:GetKeys() > 0 else false;
-    if not v196 then
-        v196 = if l_Y_0 then l_Y_0:IsA("FloatCurve") and #l_Y_0:GetKeys() > 0 else false;
-        if not v196 then
-            if l_Z_0 then
-                v196 = l_Z_0:IsA("FloatCurve");
-                if v196 then
-                    return #l_Z_0:GetKeys() > 0;
-                end;
-            else
-                v196 = false;
-            end;
-        end;
-    end;
-    return v196;
-end;
-local function _(v198) --[[ Line: 623 ]] --[[ Name: hasPositionKeys ]]
-    -- upvalues: v197 (copy)
-    if not v198 then
-        return false;
-    elseif not v198:IsA("Vector3Curve") then
-        return false;
-    else
-        return (v197(v198));
-    end;
-end;
-local function _(v200) --[[ Line: 634 ]] --[[ Name: hasRotationKeys ]]
-    -- upvalues: v197 (copy)
-    if not v200 then
-        return false;
-    elseif not v200:IsA("EulerRotationCurve") then
-        return false;
-    else
-        return (v197(v200));
-    end;
-end;
-local function v254(v202) --[[ Line: 646 ]] --[[ Name: calculateAnimFramesAtOriginManual ]]
-    -- upvalues: v18 (copy), v191 (copy), v44 (ref), v8 (copy), v197 (copy), v4 (copy), v184 (copy), v29 (copy), v185 (copy)
-    local function v210() --[[ Line: 649 ]] --[[ Name: getCurveTracks ]]
-        -- upvalues: v18 (ref), v191 (ref), v202 (copy), v44 (ref), v8 (ref), v197 (ref), v4 (ref)
-        local v203 = {};
-        local v204 = nil;
-        if v18() then
-            local v205 = v191(v202);
-            assert(v205, "ValidateCurveAnimation.validateStructure() ensures CurveAnimation has one and only one body part Folder child or HumanoidRootPart child.");
-            v204 = v205:GetDescendants();
-            table.insert(v204, v205);
-        else
-            v204 = v202:GetDescendants();
-        end;
-        for _, v207 in v204 do
-            if v207:IsA("Folder") then
-                if not v44 then
-                    v44 = v8.getBodyPartsToParents();
-                end;
-                if v44[v207.Name] then
-                    local l_Position_1 = v207:FindFirstChild("Position");
-                    local l_Rotation_0 = v207:FindFirstChild("Rotation");
-                    v203[v207.Name] = {
-                        pos = if not not l_Position_1 and if l_Position_1:IsA("Vector3Curve") then v197(l_Position_1) else false then l_Position_1 else nil, 
-                        rot = if not not l_Rotation_0 and if l_Rotation_0:IsA("EulerRotationCurve") then v197(l_Rotation_0) else false then l_Rotation_0 else nil, 
-                        faceControls = if v207.Name == v4.NAMED_R15_BODY_PARTS.Head then v207:FindFirstChild("FaceControls") else nil
-                    };
-                end;
-            end;
-        end;
-        return v203;
-    end;
-    local function v221(v211) --[[ Line: 682 ]] --[[ Name: calculateCurveAnimLength ]]
-        local v212 = -1;
-        local function v218(v213) --[[ Line: 685 ]] --[[ Name: getMaxTimeFromFloatCurveChildren ]]
-            -- upvalues: v212 (ref)
-            if not v213 then
-                return;
-            else
-                for _, v215 in v213:GetChildren() do
-                    if v215:IsA("FloatCurve") then
-                        for _, v217 in v215:GetKeys() do
-                            v212 = math.max(v212, v217.Time);
-                        end;
-                    end;
-                end;
-                return;
-            end;
-        end;
-        for _, v220 in v211 do
-            v218(v220.pos);
-            v218(v220.rot);
-            v218(v220.faceControls);
-        end;
-        return v212;
-    end;
-    local function v228(v222, v223) --[[ Line: 708 ]] --[[ Name: calculateTransformsAtTime ]]
-        local v224 = {};
-        for v225, v226 in v223 do
-            local v227 = if v226.pos then Vector3.new(unpack(v226.pos:GetValueAtTime(v222))) else Vector3.new(0, 0, 0, 0);
-            v224[v225] = (if v226.rot then v226.rot:GetRotationAtTime(v222) else CFrame.new()) + v227;
-        end;
-        return v224;
-    end;
-    local function v234(v229, v230) --[[ Line: 718 ]] --[[ Name: calculatePositionMagnitudeResultsAtTime ]]
-        local v231 = {};
-        for v232, v233 in v230 do
-            if v233.pos then
-                v231[v232] = Vector3.new(unpack(v233.pos:GetValueAtTime(v229))).Magnitude;
-            end;
-        end;
-        return v231;
-    end;
-    local v235 = v184(false);
-    local v236 = {};
-    for _, v238 in v235:GetChildren() do
-        local l_Name_6 = v238.Name;
-        local v240 = true;
-        if not v44 then
-            v44 = v8.getBodyPartsToParents();
-        end;
-        if v44[l_Name_6] == nil then
-            v240 = l_Name_6 == "HumanoidRootPart";
-        end;
-        if v240 then
-            v236[v238.Name] = v238;
-        end;
-    end;
-    local v241 = v210();
-    local v242 = v221(v241);
-    local v243 = {};
-    local v244 = {};
-    local function _(v245) --[[ Line: 744 ]] --[[ Name: addData ]]
-        -- upvalues: v228 (copy), v241 (copy), v8 (ref), v236 (copy), v243 (copy), v244 (copy), v234 (copy)
-        local v246 = v228(v245, v241);
-        local v247 = v8.calculateAllTransformsForFullBody(v236, v246);
-        table.insert(v243, v247);
-        table.insert(v244, (v234(v245, v241)));
-    end;
-    local v249 = 0;
-    while v249 <= v242 do
-        if v29() then
-            local l_v249_0 = v249;
-            local v251 = v228(l_v249_0, v241);
-            table.insert(v243, (v8.calculateAllTransformsForFullBody(v236, v251)));
-            table.insert(v244, (v234(l_v249_0, v241)));
-        else
-            local v252 = v228(v249, v241);
-            table.insert(v243, (v8.calculateAllTransformsForFullBody(v236, v252)));
-            table.insert(v244, (v234(v249, v241)));
-        end;
-        v249 = v249 + v185;
-    end;
-    if v29() and v242 >= 0 then
-        local v253 = v228(v242, v241);
-        table.insert(v243, (v8.calculateAllTransformsForFullBody(v236, v253)));
-        table.insert(v244, (v234(v242, v241)));
-    end;
-    v235:Destroy();
-    return v243, v242, v244, v241;
-end;
-v39.validateAnimationLength = function(v255, v256) --[[ Line: 777 ]] --[[ Name: validateAnimationLength ]]
-    -- upvalues: v30 (copy), v31 (copy), v14 (copy), v32 (copy), v43 (copy), v3 (copy)
-    local v257 = if v30() then v31.asNumber() else 0;
-    if v255 <= v257 or v14.asNumber() < v255 then
-        if v32() then
-            return v43(("CurveAnimation must be between %* and %* seconds long. Please fix the animation."):format(v257, (v14.asString())), v3.ErrorType.validateCurveAnimation_UnacceptableLength, v256);
-        else
-            return v43(("CurveAnimation must be between 0 and %* seconds long. Please fix the animation."):format((v14.asString())), v3.ErrorType.validateCurveAnimation_UnacceptableLength, v256);
-        end;
-    else
-        return true;
-    end;
-end;
-v39.validateBounds = function(v258, v259, v260) --[[ Line: 804 ]] --[[ Name: validateBounds ]]
-    -- upvalues: v32 (copy), v25 (copy), v15 (copy), v185 (copy), v43 (copy), v3 (copy), v7 (copy)
-    local v261 = 1e999;
-    local v262 = 0;
-    local v263 = nil;
-    local v264 = nil;
-    if v32() then
-        v263 = v25.asNumber();
-        v264 = v15.asNumber();
-    end;
-    for v265, v266 in v258 do
-        for v267, v268 in v266 do
-            if v32() then
-                if v268.Position.Y < v263 then
-                    local v269 = string.format("In CurveAnimation at time %.2f seconds, body part %s is at height %.2f studs from the HumanoidRootPart. Body parts cannot be lower than %s studs from the HumanoidRootPart. Please fix the animation.", math.min(v260, (v265 - 1) * v185), v267, v268.Position.Y, v25.asString());
-                    return v43(v269, v3.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, v259);
-                elseif v264 < v268.Position.Magnitude then
-                    local v270 = string.format("In CurveAnimation at time %.2f seconds, body part %s is %.2f studs from the HumanoidRootPart. Body parts cannot be more than %s studs from the HumanoidRootPart. Please fix the animation.", math.min(v260, (v265 - 1) * v185), v267, v268.Position.Magnitude, v15.asString());
-                    return v43(v270, v3.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, v259);
-                end;
-            else
-                v262 = math.max(v262, v268.Position.Magnitude);
-                v261 = math.min(v261, v268.Position.Y);
-            end;
-        end;
-    end;
-    if not v32() then
-        local v271 = v7.new();
-        v271:updateReasons(v25.asNumber() <= v261, {
-            (("Body parts in a CurveAnimation cannot be lower than %* studs from the HumanoidRootPart. Please fix the animation."):format((v25.asString())))
-        });
-        v271:updateReasons(v262 <= v15.asNumber(), {
-            (("Body parts in a CurveAnimation cannot get more than %* studs from the HumanoidRootPart. Please fix the animation."):format((v15.asString())))
-        });
-        if not v271:getFinalResults() then
-            v3.reportFailure(v3.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, nil, v259);
-        end;
-        return v271:getFinalResults();
-    else
-        return true;
-    end;
-end;
-v39.validateFrameDeltas = function(v272, v273) --[[ Line: 882 ]] --[[ Name: validateFrameDeltas ]]
-    -- upvalues: v185 (copy), v16 (copy), v26 (copy), v43 (copy), v3 (copy)
-    local v274 = v185 / 0.03333333333333333;
-    local v275 = v16.asNumber() * v274;
-    local v276 = nil;
-    if v26() then
-        v276 = v16.asNumber() * 30;
-    end;
-    local v277 = {};
-    for v278, v279 in v272 do
-        for v280, v281 in v279 do
-            local v282 = v277[v280];
-            if v282 then
-                local l_Magnitude_0 = (v281.Position - v282.Position).Magnitude;
-                if v275 < l_Magnitude_0 then
-                    if v26() then
-                        local v284 = (v278 - 1) * v185;
-                        local v285 = l_Magnitude_0 / v274 * 30;
-                        local v286 = string.format("In CurveAnimation at time %.2f seconds, body part %s is moving at a speed of %.2f studs/second. %.2f is the maximum studs/second speed. Please fix the animation.", v284, v280, v285, v276);
-                        return v43(v286, v3.ErrorType.validateCurveAnimation_UnacceptableFrameDelta, v273);
-                    else
-                        return v43(("Body part %* in CurveAnimation moves more than %* studs between frames. Please fix the animation."):format(v280, (v16.asString())), v3.ErrorType.validateCurveAnimation_UnacceptableFrameDelta, v273);
-                    end;
-                end;
-            end;
-        end;
-        v277 = v279;
-    end;
-    return true;
-end;
-v39.validateFrameRotationDeltas = function(v287, v288) --[[ Line: 940 ]] --[[ Name: validateFrameRotationDeltas ]]
-    -- upvalues: v185 (copy), v20 (copy), v28 (copy), v43 (copy), v3 (copy)
-    assert(math.abs(1 / v185 - v20()) < 1.0E-5, "frameDelta should be calculated as 1 / getFIntUGCValidateMaxAnimationFPS()");
-    local v289 = v28();
-    local v290 = v289 / v20();
-    local v291 = {};
-    for v292, v293 in v287 do
-        for v294, v295 in v293 do
-            local v296 = v291[v294];
-            if v296 then
-                local v297 = math.deg((math.abs((v295:AngleBetween(v296)))));
-                if v290 < v297 then
-                    local v298 = (v292 - 1) * v185;
-                    local v299 = v297 * v20();
-                    local v300 = string.format("In CurveAnimation at time %.2f seconds, body part %s is moving at a rotation speed of %.2f degrees/second. %.2f is the maximum degrees/second speed. Please fix the animation.", v298, v294, v299, v289);
-                    return v43(v300, v3.ErrorType.validateCurveAnimation_UnacceptableFrameRotationDelta, v288);
-                end;
-            end;
-        end;
-        v291 = v293;
-    end;
-    return true;
-end;
-v39.validateMinimumTransformations = function(v301, v302) --[[ Line: 989 ]] --[[ Name: validateMinimumTransformations ]]
-    -- upvalues: v43 (copy), v3 (copy)
-    for _, v304 in v301 do
-        if v304.pos or v304.rot then
-            return true;
-        end;
-    end;
-    return v43("CurveAnimation does not contain any joint manipulation.", v3.ErrorType.validateCurveAnimation_AnimationContainsNoJointManipulation, v302);
-end;
-v39.validateContainsJointManipulation = function(v305, v306) --[[ Line: 1006 ]] --[[ Name: validateContainsJointManipulation ]]
-    -- upvalues: v18 (copy), v191 (copy), v44 (ref), v8 (copy), v43 (copy), v3 (copy)
-    local v307 = nil;
-    if v18() then
-        local v308 = v191(v305);
-        assert(v308, "ValidateCurveAnimation.validateStructure() ensures CurveAnimation has one and only one body part Folder child or HumanoidRootPart child.");
-        v307 = v308:GetDescendants();
-        table.insert(v307, v308);
-    else
-        v307 = v305:GetDescendants();
-    end;
-    for _, v310 in v307 do
-        if v310:IsA("Folder") then
-            if not v44 then
-                v44 = v8.getBodyPartsToParents();
-            end;
-            if v44[v310.Name] then
-                local l_Position_2 = v310:FindFirstChild("Position");
-                local l_Rotation_1 = v310:FindFirstChild("Rotation");
-                if l_Position_2 and l_Position_2:IsA("Vector3Curve") and l_Rotation_1 and l_Rotation_1:IsA("EulerRotationCurve") then
-                    return true;
-                end;
-            end;
-        end;
-    end;
-    return v43("CurveAnimation does not contain any joint manipulation.", v3.ErrorType.validateCurveAnimation_AnimationContainsNoJointManipulation, v306);
-end;
-local function _(v313) --[[ Line: 1043 ]] --[[ Name: isTimeStamp ]]
-    if #v313 > 30 then
-        return false;
-    else
-        return string.match(v313, "^[0-9]+$") ~= nil;
-    end;
-end;
-v39.validateAllowedTags = function(v315, v316) --[[ Line: 1051 ]] --[[ Name: validateAllowedTags ]]
-    -- upvalues: v11 (copy), l_CollectionService_0 (copy), v43 (copy), v3 (copy)
-    local v317 = false;
-    for _, v319 in v315:GetChildren() do
-        local v320, v321 = v11(v319, v316);
-        if not v320 then
-            return v320, v321;
-        end;
-    end;
-    local l_l_CollectionService_0_Tags_0 = l_CollectionService_0:GetTags(v315);
-    local v323 = #l_l_CollectionService_0_Tags_0;
-    if v323 > 0 then
-        if v323 <= 1 then
-            local v324 = l_l_CollectionService_0_Tags_0[1];
-            v317 = #v324 <= 30 and string.match(v324, "^[0-9]+$") ~= nil;
-        end;
-        if not v317 then
-            return v43("CurveAnimation can only contain a single timestamp tag. Please remove all other tags.", v3.ErrorType.validateTags, v316);
-        end;
-    end;
-    v317 = false;
-    return true;
-end;
-v39.validateStructure = function(v325, v326) --[[ Line: 1078 ]] --[[ Name: validateStructure ]]
-    -- upvalues: v179 (copy)
-    return v179(v325, v326);
-end;
-local function v335(...) --[[ Line: 1085 ]] --[[ Name: areNumbersGood ]]
-    local function _(v327) --[[ Line: 1086 ]] --[[ Name: isNaN ]]
-        return v327 ~= v327;
-    end;
-    local function _(v329) --[[ Line: 1090 ]] --[[ Name: isInfinite ]]
-        local v330 = true;
-        if v329 ~= 1e999 then
-            v330 = v329 == -1e999;
-        end;
-        return v330;
-    end;
-    for _, v333 in {
-        ...
-    } do
-        if v333 ~= v333 then
-            return false;
-        else
-            local v334 = true;
-            if v333 ~= 1e999 then
-                v334 = v333 == -1e999;
-            end;
-            if v334 then
-                return false;
-            end;
-        end;
-    end;
-    return true;
-end;
-v39.validateData = function(v336, v337) --[[ Line: 1105 ]] --[[ Name: validateData ]]
-    -- upvalues: v185 (copy), v23 (copy), v14 (copy), v37 (copy), v38 (copy), v43 (copy), v3 (copy), v335 (copy), v21 (copy), v20 (copy)
-    local v338 = v185 * v23.asNumber();
-    local v339 = math.ceil(1 / v338 * v14.asNumber());
-    for _, v341 in v336:GetDescendants() do
-        if v341:IsA("MarkerCurve") then
-            local l_v341_Markers_0 = v341:GetMarkers();
-            if v37() then
-                local v343 = math.min(v38(), v339);
-                if v343 < #l_v341_Markers_0 then
-                    return v43(("CurveAnimation contains a MarkerCurve with %* Markers. %* is the maximum per MarkerCurve. Please fix the animation."):format(#l_v341_Markers_0, v343), v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-                end;
-            elseif v339 < #l_v341_Markers_0 then
-                return v43(("CurveAnimation contains MarkerCurve with too many markers. %* is the maximum per MarkerCurve. Please fix the animation."):format(v339), v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-            end;
-            for _, v345 in l_v341_Markers_0 do
-                if not v345.Time or not v335(v345.Time) or not v345.Value or #v345.Value > v21() then
-                    return v43("CurveAnimation contains MarkerCurves with invalid Time or Value, or Value is too long. Please fix the animation.", v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-                end;
-            end;
-        elseif v341:IsA("FloatCurve") then
-            local l_v341_Keys_0 = v341:GetKeys();
-            if v339 < #l_v341_Keys_0 then
-                return v43(("CurveAnimation contains Curves with too many keys. %* is the maximum per Curve. Please fix the animation."):format(v339), v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-            else
-                local v347 = nil;
-                for _, v349 in l_v341_Keys_0 do
-                    if not v349.Time or not v335(v349.Time) or not v349.Value or not v335(v349.Value) then
-                        return v43("CurveAnimation contains Curves with invalid Time or Value. Please fix the animation.", v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-                    else
-                        if v347 then
-                            if v347 + v338 > v349.Time then
-                                local v350 = if v341.Parent.Parent then v341.Parent.Parent.Name else "-";
-                                return v43(("CurveAnimation contains Curve %*.%*.%* with keys that are too close together in time for a maximum %* fps animation. Please fix the animation."):format(v350, v341.Parent.Name, v341.Name, (v20())), v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-                            end;
-                        elseif v349.Time < 0 then
-                            local v351 = if v341.Parent.Parent then v341.Parent.Parent.Name else "-";
-                            return v43(("CurveAnimation contains Curve %*.%*.%* with a key that has a negative time. Please fix the animation."):format(v351, v341.Parent.Name, v341.Name), v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v337);
-                        end;
-                        v347 = v349.Time;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    return true;
-end;
-v39.validateCalculatedData = function(v352, v353, v354) --[[ Line: 1199 ]] --[[ Name: validateCalculatedData ]]
-    -- upvalues: v335 (copy), v43 (copy), v3 (copy)
-    for _, v356 in v352 do
-        for _, v358 in v356 do
-            if not v335(v358:GetComponents()) then
-                return v43("CurveAnimation contains Curves with invalid numerical data. Please fix the animation.", v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v354);
-            end;
-        end;
-    end;
-    for _, v360 in v353 do
-        for _, v362 in v360 do
-            if not v335(v362) then
-                return v43("CurveAnimation contains Curves with invalid numerical data. Please fix the animation.", v3.ErrorType.validateCurveAnimation_IncorrectNumericalData, v354);
-            end;
-        end;
-    end;
-    return true;
-end;
-v39.calculateAnimFramesAtOrigin = function(v363) --[[ Line: 1230 ]] --[[ Name: calculateAnimFramesAtOrigin ]]
-    -- upvalues: v254 (copy)
-    return v254(v363);
-end;
-v39.validatePositionMagnitudes = function(v364, v365) --[[ Line: 1236 ]] --[[ Name: validatePositionMagnitudes ]]
-    -- upvalues: v4 (copy), v22 (copy), v43 (copy), v3 (copy)
-    local v366 = {};
-    for _, v368 in v364 do
-        for v369, v370 in v368 do
-            if v369 ~= v4.NAMED_R15_BODY_PARTS.LowerTorso then
-                if not v366[v369] then
-                    v366[v369] = v22.asNumber(v369);
-                end;
-                if v366[v369] < v370 then
-                    return v43(("CurveAnimation contains positional separation of body parts. Only LowerTorso can change position. All other body parts can only change their orientation. %* moves more than %* studs from its parent. Please fix the animation."):format(v369, v366[v369]), v3.ErrorType.validateCurveAnimation_PositionalMovement, v365);
-                end;
-            end;
-        end;
-    end;
-    return true;
-end;
-v39.validateFrames = function(v371, v372) --[[ Line: 1264 ]] --[[ Name: validateFrames ]]
-    -- upvalues: v39 (copy), v7 (copy), v27 (copy)
-    local v373, v374, v375, v376 = v39.calculateAnimFramesAtOrigin(v371);
-    local v377, v378 = v39.validateCalculatedData(v373, v375, v372);
-    if not v377 then
-        return v377, v378;
-    else
-        local v379 = v7.new();
-        v379:updateReasons(v39.validateMinimumTransformations(v376, v372));
-        v379:updateReasons(v39.validatePositionMagnitudes(v375, v372));
-        v379:updateReasons(v39.validateAnimationLength(v374, v372));
-        v379:updateReasons(v39.validateBounds(v373, v372, v374));
-        v379:updateReasons(v39.validateFrameDeltas(v373, v372));
-        if v27() then
-            v379:updateReasons(v39.validateFrameRotationDeltas(v373, v372));
-        end;
-        return v379:getFinalResults();
-    end;
-end;
-v39.validate = function(v380, v381) --[[ Line: 1295 ]] --[[ Name: validate ]]
-    -- upvalues: v39 (copy), v24 (copy), v12 (copy), v7 (copy), v10 (copy)
-    local v382, v383 = v39.validateStructure(v380, v381);
-    if not v382 then
-        return v382, v383;
-    else
-        if v24() then
-            local v384, v385 = v12.validate(v380, v381);
-            if not v384 then
-                return false, v385;
-            end;
-        end;
-        local v386, v387 = v39.validateData(v380, v381);
-        if not v386 then
-            return v386, v387;
-        else
-            v386 = v7.new();
-            v386:updateReasons(v10(v380, v381));
-            v386:updateReasons(v39.validateAllowedTags(v380, v381));
-            v386:updateReasons(v39.validateFrames(v380, v381));
-            return v386:getFinalResults();
-        end;
-    end;
-end;
-return v39;
+local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+local util = ParentParent.util
+
+require(util.Types)
+
+local FailureReasonsAccumulator = require(util.FailureReasonsAccumulator)
+local AssetCalculator = require(util.AssetCalculator)
+local validation = ParentParent.validation
+local validateAttributes = require(validation.validateAttributes)
+local validateTags = require(validation.validateTags)
+local ValidatePropertiesSensible = require(validation.ValidatePropertiesSensible)
+local flags = ParentParent.flags
+local GetFStringUGCValidationMaxAnimationLength = require(flags.GetFStringUGCValidationMaxAnimationLength)
+local GetFStringUGCValidationMaxAnimationBounds = require(flags.GetFStringUGCValidationMaxAnimationBounds)
+local GetFStringUGCValidationMaxAnimationDeltas = require(flags.GetFStringUGCValidationMaxAnimationDeltas)
+local getFFlagUGCValidateAddObjectValueToAcceptableTypes = require(flags.getFFlagUGCValidateAddObjectValueToAcceptableTypes)
+local getFFlagUGCValidateDuplicatesInAnimation = require(flags.getFFlagUGCValidateDuplicatesInAnimation)
+local getFFlagUGCValidateMaxTotalInstances = require(flags.getFFlagUGCValidateMaxTotalInstances)
+local getFIntUGCValidateMaxAnimationFPS = require(flags.getFIntUGCValidateMaxAnimationFPS)
+local getFIntUGCValidateMaxMarkerCurveValueLength = require(flags.getFIntUGCValidateMaxMarkerCurveValueLength)
+local GetFStringUGCValidateMaxAnimationMovementPerPart = require(flags.GetFStringUGCValidateMaxAnimationMovementPerPart)
+local GetFStringUGCValidateFrameDeltaKeyTimeTol = require(flags.GetFStringUGCValidateFrameDeltaKeyTimeTol)
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(ParentParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+local GetFStringUGCValidateAnimationHeightTol = require(flags.GetFStringUGCValidateAnimationHeightTol)
+local getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage = require(flags.getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage)
+local getFFlagUGCValidateCurveAnimRotationSpeed = require(flags.getFFlagUGCValidateCurveAnimRotationSpeed)
+local getFIntUGCValidationMaxAnimationRotationSpeedPerSecond = require(flags.getFIntUGCValidationMaxAnimationRotationSpeedPerSecond)
+local getFFlagUGCValidateCurveAnimFinalFrameBug = require(flags.getFFlagUGCValidateCurveAnimFinalFrameBug)
+local getFFlagUGCValidateCurveAnimMinTimeFix = require(flags.getFFlagUGCValidateCurveAnimMinTimeFix)
+local GetFStringUGCValidateCurveAnimationMinLength = require(flags.GetFStringUGCValidateCurveAnimationMinLength)
+local getFFlagUGCValidateCurveAnimTimeErrorMessageFix = require(flags.getFFlagUGCValidateCurveAnimTimeErrorMessageFix)
+local getFFlagUGCValidateRestrictNumMarkerCurves = require(flags.getFFlagUGCValidateRestrictNumMarkerCurves)
+local getFIntUGCValidateMaxTotalMarkerCurves = require(flags.getFIntUGCValidateMaxTotalMarkerCurves)
+local getFFlagUGCValidateRestrictNumFaceControls = require(flags.getFFlagUGCValidateRestrictNumFaceControls)
+local getFIntUGCValidateMaxTotalFaceControls = require(flags.getFIntUGCValidateMaxTotalFaceControls)
+local getFFlagUGCValidateRestrictNumMarkersInsideMarkerCurves = require(flags.getFFlagUGCValidateRestrictNumMarkersInsideMarkerCurves)
+local getFIntUGCValidateMaxTotalInternalMarkers = require(flags.getFIntUGCValidateMaxTotalInternalMarkers)
+local getFFlagUGCValidateMigrateSchemaProperties = require(flags.getFFlagUGCValidateMigrateSchemaProperties)
+local getFFlagUGCValidationCombineEntrypointResults = require(flags.getFFlagUGCValidationCombineEntrypointResults)
+local t1 = {}
+
+local function reportFailure(s1: string, s2: string, p1) -- line: 66
+	-- upvalues: Analytics (copy)
+	Analytics.reportFailure(s2, nil, p1)
+
+	return false, { s1 }
+end
+
+local u43 = nil
+
+local function getBodyPartToParentMap() -- line: 79
+	-- upvalues: u43 (ref), AssetCalculator (copy)
+	if not u43 then
+		u43 = AssetCalculator.getBodyPartsToParents()
+	end
+
+	return u43
+end
+local function isBodyPartFolderNameValid(s3: string) -- line: 87
+	-- upvalues: u43 (ref), AssetCalculator (copy)
+	local v72 = true
+
+	if not u43 then
+		u43 = AssetCalculator.getBodyPartsToParents()
+	end
+
+	if u43[s3] == nil then
+		v72 = s3 == "HumanoidRootPart"
+	end
+
+	return v72
+end
+local function areChildrenAcceptable(p2, t2: {[any]: any}) -- line: 91
+	if not p2 then
+		return true
+	end
+
+	local function findAndRemoveMatching(p3) -- line: 96
+		-- upvalues: t2 (copy)
+		for v333, v334 in t2 do
+			if v334.ClassName == p3.ClassName and v334.Name == p3.Name then
+				table.remove(t2, v333)
+
+				return true
+			end
+		end
+
+		return false
+	end
+
+	for _, child in p2:GetChildren() do
+		if not findAndRemoveMatching(child) then
+			return false
+		end
+	end
+
+	return true
+end
+local function calculateAcceptableChildBodyPartFolders(s4: string) -- line: 116
+	-- upvalues: u43 (ref), AssetCalculator (copy)
+	local t3 = {}
+
+	if not u43 then
+		u43 = AssetCalculator.getBodyPartsToParents()
+	end
+
+	for v80, v81 in u43 do
+		if v81 == s4 then
+			table.insert(t3, {
+				ClassName = "Folder",
+				Name = v80
+			})
+		end
+	end
+
+	return t3
+end
+local function calculateAcceptableBodyPartFolderChildrenArray(p4, b1: boolean) -- line: 130
+	-- upvalues: calculateAcceptableChildBodyPartFolders (copy)
+	local v84 = calculateAcceptableChildBodyPartFolders(p4.Name)
+
+	if p4.Name == "HumanoidRootPart" then
+		return v84
+	end
+
+	table.insert(v84, {
+		ClassName = "Vector3Curve",
+		Name = "Position"
+	})
+	table.insert(v84, {
+		Name = "Rotation",
+		ClassName = not b1 and "RotationCurve" or "EulerRotationCurve"
+	})
+
+	if p4.Name ~= "Head" then
+		return v84
+	end
+
+	table.insert(v84, {
+		ClassName = "Folder",
+		Name = "FaceControls"
+	})
+
+	return v84
+end
+local function calculateAcceptableCurveChildrenArray() -- line: 161
+	return {
+		{
+			ClassName = "FloatCurve",
+			Name = "X"
+		},
+		{
+			ClassName = "FloatCurve",
+			Name = "Y"
+		},
+		{
+			ClassName = "FloatCurve",
+			Name = "Z"
+		}
+	}
+end
+local function containsGrandChildren(p5) -- line: 178
+	if not p5 then
+		return false
+	end
+
+	return #p5:GetDescendants() > #p5:GetChildren()
+end
+local function validateBodyPartFolderChildren(p6) -- line: 185
+	-- upvalues: calculateAcceptableBodyPartFolderChildrenArray (copy), areChildrenAcceptable (copy), calculateAcceptableCurveChildrenArray (copy), getFFlagUGCValidateRestrictNumFaceControls (copy), getFIntUGCValidateMaxTotalFaceControls (copy)
+	local v87 = calculateAcceptableBodyPartFolderChildrenArray(p6, true)
+
+	if areChildrenAcceptable(p6, v87) then
+		local v88 = calculateAcceptableCurveChildrenArray()
+
+		if not areChildrenAcceptable(p6:FindFirstChild("Position"), v88) then
+			return false
+		end
+
+		local v89 = calculateAcceptableCurveChildrenArray()
+
+		if not areChildrenAcceptable(p6:FindFirstChild("Rotation"), v89) then
+			return false
+		end
+
+		local FaceControls = p6:FindFirstChild("FaceControls")
+
+		if FaceControls then
+			local children = FaceControls:GetChildren()
+
+			if getFFlagUGCValidateRestrictNumFaceControls() and #children > getFIntUGCValidateMaxTotalFaceControls() then
+				return false
+			end
+
+			for _, v93 in children do
+				if not v93:IsA("FloatCurve") then
+					return false
+				end
+			end
+		end
+
+		local Position = p6:FindFirstChild("Position")
+
+		if if Position then #Position:GetDescendants() > #Position:GetChildren() else false then
+			return false
+		end
+
+		local Rotation = p6:FindFirstChild("Rotation")
+
+		if if Rotation then #Rotation:GetDescendants() > #Rotation:GetChildren() else false then
+			return false
+		end
+
+		if if FaceControls then #FaceControls:GetDescendants() > #FaceControls:GetChildren() else false then
+			return false
+		end
+
+		return true
+	end
+
+	return false
+end
+local function validateCurveAnimationBodyPartFolder(p7, p8) -- line: 236
+	-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), validateBodyPartFolderChildren (copy), reportFailure (copy), Analytics (copy), u43 (ref), AssetCalculator (copy)
+	local function validateBodyPartFolderInternal(p9) -- line: 240
+		-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), validateBodyPartFolderChildren (copy), reportFailure (copy), Analytics (copy), p8 (copy), validateBodyPartFolderInternal (copy), u43 (ref), AssetCalculator (copy)
+		if getFFlagUGCValidateDuplicatesInAnimation() then
+			if not validateBodyPartFolderChildren(p9) then
+				return reportFailure(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", p9.Name), Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p8)
+			end
+
+			for _, child in p9:GetChildren() do
+				if not child:IsA("Folder") or child.Name == "FaceControls" then
+					continue
+				end
+
+				local v338, v339 = validateBodyPartFolderInternal(child)
+
+				if not v338 then
+					return false, v339
+				end
+			end
+
+			return true
+		end
+
+		for _, child in p9:GetChildren() do
+			if not child:IsA("Folder") then
+				continue
+			end
+
+			if child.Name == "HumanoidRootPart" then
+				return false
+			end
+
+			if not u43 then
+				u43 = AssetCalculator.getBodyPartsToParents()
+			end
+
+			local v342 = u43[child.Name]
+
+			if v342 then
+				if v342 ~= p9.Name then
+					return false
+				end
+
+				return validateBodyPartFolderInternal(child)
+			end
+		end
+
+		return true
+	end
+
+	local p7Name = p7.Name
+	local v100 = true
+
+	if not u43 then
+		u43 = AssetCalculator.getBodyPartsToParents()
+	end
+
+	if u43[p7Name] == nil then
+		v100 = p7Name == "HumanoidRootPart"
+	end
+
+	if not v100 then
+		return true
+	end
+
+	return validateBodyPartFolderInternal(p7)
+end
+local function validateSingleBodyRoot(p10, p11) -- line: 289
+	-- upvalues: u43 (ref), AssetCalculator (copy), reportFailure (copy), Analytics (copy), getFFlagUGCValidateDuplicatesInAnimation (copy)
+	local n1 = 0
+
+	for _, child in p10:GetChildren() do
+		if not child:IsA("Folder") then
+			continue
+		end
+
+		local childName = child.Name
+		local v107 = true
+
+		if not u43 then
+			u43 = AssetCalculator.getBodyPartsToParents()
+		end
+
+		if u43[childName] == nil then
+			v107 = childName == "HumanoidRootPart"
+		end
+
+		if not v107 then
+			continue
+		end
+
+		n1 += 1
+
+		if n1 > 1 then
+			return reportFailure("CurveAnimation contains more than one body part or HumanoidRootPart Folder children. Please ensure there is only one child Folder named after a body part or HumanoidRootPart.", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p11)
+		end
+	end
+
+	if getFFlagUGCValidateDuplicatesInAnimation() and n1 == 0 then
+		return reportFailure("CurveAnimation contains zero body part or HumanoidRootPart Folder children. Please ensure there is one (and only one) child Folder named after a body part or HumanoidRootPart.", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p11)
+	end
+
+	return true
+end
+
+function t1.validateMarkerCurves(p12, p13) -- line: 319
+	-- upvalues: getFIntUGCValidateMaxTotalMarkerCurves (copy), reportFailure (copy), Analytics (copy)
+	local v110 = getFIntUGCValidateMaxTotalMarkerCurves()
+	local n2 = 0
+
+	for _, descendant in p12:GetDescendants() do
+		if not descendant:IsA("MarkerCurve") then
+			continue
+		end
+
+		n2 += 1
+
+		if v110 < n2 then
+			return reportFailure(`CurveAnimation contains more than { v110 } MarkerCurve(s). Please ensure there is no more than { v110 } MarkerCurve descendant(s).`, Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p13)
+		end
+	end
+
+	return true
+end
+function t1.validateSingleAnimationRigData(p14, p15) -- line: 341
+	-- upvalues: reportFailure (copy), Analytics (copy)
+	local n3 = 0
+
+	for _, child in p14:GetChildren() do
+		if not child:IsA("AnimationRigData") then
+			continue
+		end
+
+		n3 += 1
+
+		if n3 > 1 then
+			return reportFailure("CurveAnimation contains more than one AnimationRigData children. Please ensure there is only one AnimationRigData child.", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p15)
+		end
+	end
+
+	if n3 == 0 then
+		return reportFailure("CurveAnimation contains zero AnimationRigData children. Please ensure there is one (and only one) AnimationRigData children.", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p15)
+	end
+
+	return true
+end
+function t1.validateAnimationRigDataInternals(p16, p17) -- line: 369
+	-- upvalues: reportFailure (copy), Analytics (copy)
+	for _, child in p16:GetChildren() do
+		if child:IsA("AnimationRigData") and not child:IsValidR15() then
+			return reportFailure("AnimationRigData failed internal validation. Please ensure the AnimationRigData is set up correctly.", Analytics.ErrorType.validateCurveAnimation_IncorrectAnimationRigData, p17)
+		end
+	end
+
+	return true
+end
+
+local function validateAnimationRigData(p18, p19) -- line: 389
+	-- upvalues: t1 (copy)
+	local v125, v126 = t1.validateSingleAnimationRigData(p18, p19)
+
+	if not v125 then
+		return false, v126
+	end
+
+	local v127, v128 = t1.validateAnimationRigDataInternals(p18, p19)
+
+	if not v127 then
+		return false, v128
+	end
+
+	return true
+end
+local function validateScripts(p20, p21) -- line: 405
+	-- upvalues: reportFailure (copy), Analytics (copy)
+	for _, descendant in p20:GetDescendants() do
+		if descendant:IsA("Script") or descendant:IsA("ModuleScript") then
+			return reportFailure("CurveAnimation hierarchy contains Scripts, LocalScripts, or ModuleScripts. Please remove them.", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p21)
+		end
+	end
+
+	return true
+end
+
+local t4 = {
+	"MarkerCurve",
+	"AnimationRigData",
+	"Folder",
+	"Vector3Curve",
+	"EulerRotationCurve",
+	"FloatCurve"
+}
+
+if getFFlagUGCValidateAddObjectValueToAcceptableTypes() then
+	table.insert(t4, "ObjectValue")
+end
+
+local function validateExtraInstances(p22, p23) -- line: 434
+	-- upvalues: t4 (copy), reportFailure (copy), Analytics (copy)
+	for _, descendant in p22:GetDescendants() do
+		local v137 = false
+
+		for _, v139 in t4 do
+			if descendant:IsA(v139) then
+				v137 = true
+
+				break
+			end
+		end
+
+		if not v137 then
+			return reportFailure(`CurveAnimation hierarchy can only contain { table.concat(t4, ", ") }. Please remove any other Instance types.`, Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p23)
+		end
+	end
+
+	return true
+end
+
+function t1.validateExtraInstancesUnitTest(p24, p25) -- line: 458
+	-- upvalues: validateExtraInstances (copy)
+	return validateExtraInstances(p24, p25)
+end
+function t1.validateScriptsUnitTest(p26, p27) -- line: 465
+	-- upvalues: validateScripts (copy)
+	return validateScripts(p26, p27)
+end
+
+local function validateAnimationHierarchy(p28, p29) -- line: 474
+	-- upvalues: Analytics (copy), getFFlagUGCValidateMaxTotalInstances (copy), reportFailure (copy), validateSingleBodyRoot (copy), t1 (copy), getFFlagUGCValidateRestrictNumMarkerCurves (copy), getFFlagUGCValidateDuplicatesInAnimation (copy), u43 (ref), AssetCalculator (copy), validateBodyPartFolderChildren (copy), FailureReasonsAccumulator (copy), validateScripts (copy), validateExtraInstances (copy)
+	if not p28:IsA("CurveAnimation") then
+		Analytics.reportFailure(Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, nil, p29)
+
+		return false, { "Referenced Animation is not a CurveAnimation. Please ensure the animation is uploaded correctly." }
+	end
+
+	local v146 = #p28:GetDescendants()
+
+	if v146 > getFFlagUGCValidateMaxTotalInstances() then
+		return reportFailure(`CurveAnimation has { v146 } descendants. Maximum allowed is { getFFlagUGCValidateMaxTotalInstances() }. Please reduce the number of descendants.`, Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+	end
+
+	local v147, v148 = validateSingleBodyRoot(p28, p29)
+
+	if not v147 then
+		return false, v148
+	end
+
+	local v149, v150 = t1.validateSingleAnimationRigData(p28, p29)
+	local v151
+
+	if not v149 then
+		v151 = false
+	else
+		local v152
+
+		v152, v150 = t1.validateAnimationRigDataInternals(p28, p29)
+
+		if not v152 then
+			v151 = false
+		else
+			v151 = true
+			v150 = nil
+		end
+	end
+
+	if not v151 then
+		return false, v150
+	end
+
+	if getFFlagUGCValidateRestrictNumMarkerCurves() then
+		local v153, v154 = t1.validateMarkerCurves(p28, p29)
+
+		if not v153 then
+			return false, v154
+		end
+	end
+
+	for _, child in p28:GetChildren() do
+		if not child:IsA("MarkerCurve") and not child:IsA("AnimationRigData") then
+			if not child:IsA("Folder") then
+				return reportFailure("CurveAnimation contains unexpected child: " .. child.Name, Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+			end
+
+			if not getFFlagUGCValidateDuplicatesInAnimation() then
+				local v157 = nil
+
+				local function validateBodyPartFolderInternal(p30) -- line: 240
+					-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), validateBodyPartFolderChildren (copy), reportFailure (copy), Analytics (copy), v157 (copy), validateBodyPartFolderInternal (copy), u43 (ref), AssetCalculator (copy)
+					if getFFlagUGCValidateDuplicatesInAnimation() then
+						if not validateBodyPartFolderChildren(p30) then
+							return reportFailure(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", p30.Name), Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, v157)
+						end
+
+						for _, child2 in p30:GetChildren() do
+							if not child2:IsA("Folder") or child2.Name == "FaceControls" then
+								continue
+							end
+
+							local v354, v355 = validateBodyPartFolderInternal(child2)
+
+							if not v354 then
+								return false, v355
+							end
+						end
+
+						return true
+					end
+
+					for _, child3 in p30:GetChildren() do
+						if not child3:IsA("Folder") then
+							continue
+						end
+
+						if child3.Name == "HumanoidRootPart" then
+							return false
+						end
+
+						if not u43 then
+							u43 = AssetCalculator.getBodyPartsToParents()
+						end
+
+						local v358 = u43[child3.Name]
+
+						if v358 then
+							if v358 ~= p30.Name then
+								return false
+							end
+
+							return validateBodyPartFolderInternal(child3)
+						end
+					end
+
+					return true
+				end
+
+				local childName = child.Name
+				local v160 = true
+
+				if not u43 then
+					u43 = AssetCalculator.getBodyPartsToParents()
+				end
+
+				if u43[childName] == nil then
+					v160 = childName == "HumanoidRootPart"
+				end
+
+				if not v160 or validateBodyPartFolderInternal(child) then
+					continue
+				end
+
+				return reportFailure("CurveAnimation contains child body part Folder " .. child.Name .. " which has an invalid hierarchy", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+			end
+
+			local childName = child.Name
+			local v162 = true
+
+			if not u43 then
+				u43 = AssetCalculator.getBodyPartsToParents()
+			end
+
+			if u43[childName] == nil then
+				v162 = childName == "HumanoidRootPart"
+			end
+
+			if not v162 then
+				return reportFailure("CurveAnimation contains unexpected child: " .. child.Name, Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+			end
+
+			local function validateBodyPartFolderInternal(p31) -- line: 240
+				-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), validateBodyPartFolderChildren (copy), reportFailure (copy), Analytics (copy), p29 (copy), validateBodyPartFolderInternal (copy), u43 (ref), AssetCalculator (copy)
+				if getFFlagUGCValidateDuplicatesInAnimation() then
+					if not validateBodyPartFolderChildren(p31) then
+						return reportFailure(string.format("CurveAnimation contains body part Folder %s which has an invalid hierarchy (it has children that are not allowed or set-up incorrectly)", p31.Name), Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+					end
+
+					for _, child4 in p31:GetChildren() do
+						if not child4:IsA("Folder") or child4.Name == "FaceControls" then
+							continue
+						end
+
+						local v346, v347 = validateBodyPartFolderInternal(child4)
+
+						if not v346 then
+							return false, v347
+						end
+					end
+
+					return true
+				end
+
+				for _, child5 in p31:GetChildren() do
+					if not child5:IsA("Folder") then
+						continue
+					end
+
+					if child5.Name == "HumanoidRootPart" then
+						return false
+					end
+
+					if not u43 then
+						u43 = AssetCalculator.getBodyPartsToParents()
+					end
+
+					local v350 = u43[child5.Name]
+
+					if v350 then
+						if v350 ~= p31.Name then
+							return false
+						end
+
+						return validateBodyPartFolderInternal(child5)
+					end
+				end
+
+				return true
+			end
+
+			local childName2 = child.Name
+			local v165 = true
+
+			if not u43 then
+				u43 = AssetCalculator.getBodyPartsToParents()
+			end
+
+			if u43[childName2] == nil then
+				v165 = childName2 == "HumanoidRootPart"
+			end
+
+			local v166, v167
+
+			if not v165 then
+				v166 = true
+				v167 = nil
+			else
+				v166, v167 = validateBodyPartFolderInternal(child)
+			end
+
+			if v166 then
+				continue
+			end
+
+			return false, v167
+		end
+
+		if getFFlagUGCValidateDuplicatesInAnimation() and #child:GetChildren() > 0 then
+			return reportFailure("CurveAnimation child MarkerCurves and AnimationRigData cannot have children", Analytics.ErrorType.validateCurveAnimation_AnimationHierarchyIsIncorrect, p29)
+		end
+	end
+
+	local v168 = FailureReasonsAccumulator.new()
+
+	v168:updateReasons(validateScripts(p28, p29))
+	v168:updateReasons(validateExtraInstances(p28, p29))
+
+	return v168:getFinalResults()
+end
+local function createDefaultCharacter(b2: boolean) -- line: 572
+	-- upvalues: Players (copy)
+	local v170 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then game.Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15) else Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
+
+	for _, descendant in v170:GetDescendants() do
+		if descendant:IsA("Decal") then
+			descendant.Transparency = 1
+		elseif descendant:IsA("MeshPart") then
+			descendant.Transparency = 1
+			descendant.CanCollide = false
+		elseif descendant:IsA("Motor6D") and b2 then
+			descendant:Destroy()
+		end
+	end
+
+	return v170
+end
+
+local v60 = 1 / getFIntUGCValidateMaxAnimationFPS()
+
+local function getBodyPartFolderRoot(p32) -- line: 606
+	-- upvalues: u43 (ref), AssetCalculator (copy)
+	for _, child in p32:GetChildren() do
+		if not child:IsA("Folder") then
+			continue
+		end
+
+		local childName = child.Name
+		local v177 = true
+
+		if not u43 then
+			u43 = AssetCalculator.getBodyPartsToParents()
+		end
+
+		if u43[childName] == nil then
+			v177 = childName == "HumanoidRootPart"
+		end
+
+		if v177 then
+			return child
+		end
+	end
+
+	return nil
+end
+local function hasFloatCurveKeys(p33) -- line: 615
+	local X = p33:FindFirstChild("X")
+	local Y = p33:FindFirstChild("Y")
+	local Z = p33:FindFirstChild("Z")
+	local v182 = not not X and (X:IsA("FloatCurve") and #X:GetKeys() > 0)
+
+	if not v182 then
+		v182 = not not Y and (Y:IsA("FloatCurve") and #Y:GetKeys() > 0)
+
+		if not v182 then
+			if Z then
+				v182 = Z:IsA("FloatCurve")
+
+				if v182 then
+					return #Z:GetKeys() > 0
+				end
+			else
+				v182 = false
+			end
+		end
+	end
+
+	return v182
+end
+local function hasPositionKeys(p34) -- line: 625
+	-- upvalues: hasFloatCurveKeys (copy)
+	if not p34 then
+		return false
+	end
+
+	if not p34:IsA("Vector3Curve") then
+		return false
+	end
+
+	return (hasFloatCurveKeys(p34))
+end
+local function hasRotationKeys(p35) -- line: 636
+	-- upvalues: hasFloatCurveKeys (copy)
+	if not p35 then
+		return false
+	end
+
+	if not p35:IsA("EulerRotationCurve") then
+		return false
+	end
+
+	return (hasFloatCurveKeys(p35))
+end
+local function calculateAnimFramesAtOriginManual(p36) -- line: 648
+	-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), getBodyPartFolderRoot (copy), u43 (ref), AssetCalculator (copy), hasFloatCurveKeys (copy), Constants (copy), createDefaultCharacter (copy), getFFlagUGCValidateCurveAnimFinalFrameBug (copy), v60 (copy)
+	local function getCurveTracks() -- line: 651
+		-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), getBodyPartFolderRoot (copy), p36 (copy), u43 (ref), AssetCalculator (copy), hasFloatCurveKeys (copy), Constants (copy)
+		local t5 = {}
+		local descendants
+
+		if getFFlagUGCValidateDuplicatesInAnimation() then
+			local v360 = getBodyPartFolderRoot(p36)
+
+			assert(v360, "ValidateCurveAnimation.validateStructure() ensures CurveAnimation has one and only one body part Folder child or HumanoidRootPart child.")
+			descendants = v360:GetDescendants()
+			table.insert(descendants, v360)
+		else
+			descendants = p36:GetDescendants()
+		end
+
+		for _, v363 in descendants do
+			if v363:IsA("Folder") then
+				if not u43 then
+					u43 = AssetCalculator.getBodyPartsToParents()
+				end
+
+				if u43[v363.Name] then
+					local Position = v363:FindFirstChild("Position")
+					local Rotation = v363:FindFirstChild("Rotation")
+
+					t5[v363.Name] = {
+						pos = if not if Position then if Position:IsA("Vector3Curve") then hasFloatCurveKeys(Position) else false else false then nil else Position,
+						rot = if not if Rotation then if Rotation:IsA("EulerRotationCurve") then hasFloatCurveKeys(Rotation) else false else false then nil else Rotation,
+						faceControls = if v363.Name ~= Constants.NAMED_R15_BODY_PARTS.Head then nil else v363:FindFirstChild("FaceControls")
+					}
+				end
+			end
+		end
+
+		return t5
+	end
+	local function calculateCurveAnimLength(p37) -- line: 684
+		local n4 = -1
+
+		local function getMaxTimeFromFloatCurveChildren(p38) -- line: 687
+			-- upvalues: n4 (ref)
+			if not p38 then
+				return
+			end
+
+			for _, child in p38:GetChildren() do
+				if child:IsA("FloatCurve") then
+					for _, v391 in child:GetKeys() do
+						n4 = math.max(n4, v391.Time)
+					end
+				end
+			end
+		end
+
+		for _, v370 in p37 do
+			getMaxTimeFromFloatCurveChildren(v370.pos)
+			getMaxTimeFromFloatCurveChildren(v370.rot)
+			getMaxTimeFromFloatCurveChildren(v370.faceControls)
+		end
+
+		return n4
+	end
+	local function calculateTransformsAtTime(n5: number, p39) -- line: 710
+		local t6 = {}
+
+		for v374, v375 in p39 do
+			local v376 = if not v375.pos then Vector3.new(0, 0, 0) else Vector3.new(unpack(v375.pos:GetValueAtTime(n5)))
+
+			t6[v374] = ((if not v375.rot then CFrame.new() else v375.rot:GetRotationAtTime(n5))) + v376
+		end
+
+		return t6
+	end
+	local function calculatePositionMagnitudeResultsAtTime(n6: number, p40) -- line: 720
+		local t7 = {}
+
+		for v380, v381 in p40 do
+			if v381.pos then
+				t7[v380] = Vector3.new(unpack(v381.pos:GetValueAtTime(n6))).Magnitude
+			end
+		end
+
+		return t7
+	end
+
+	local v190 = createDefaultCharacter(false)
+	local t8 = {}
+
+	for _, child in v190:GetChildren() do
+		local childName = child.Name
+		local v195 = true
+
+		if not u43 then
+			u43 = AssetCalculator.getBodyPartsToParents()
+		end
+
+		if u43[childName] == nil then
+			v195 = childName == "HumanoidRootPart"
+		end
+
+		if v195 then
+			t8[child.Name] = child
+		end
+	end
+
+	local v196 = getCurveTracks()
+	local v197 = calculateCurveAnimLength(v196)
+	local t9 = {}
+	local t10 = {}
+
+	local function addData(n7: number) -- line: 746
+		-- upvalues: calculateTransformsAtTime (copy), v196 (copy), AssetCalculator (copy), t8 (copy), t9 (copy), t10 (copy), calculatePositionMagnitudeResultsAtTime (copy)
+		local v383 = calculateTransformsAtTime(n7, v196)
+		local v384 = AssetCalculator.calculateAllTransformsForFullBody(t8, v383)
+
+		table.insert(t9, v384)
+		table.insert(t10, (calculatePositionMagnitudeResultsAtTime(n7, v196)))
+	end
+
+	local n8 = 0
+
+	while n8 <= v197 do
+		if getFFlagUGCValidateCurveAnimFinalFrameBug() then
+			local v202 = calculateTransformsAtTime(n8, v196)
+
+			table.insert(t9, (AssetCalculator.calculateAllTransformsForFullBody(t8, v202)))
+			table.insert(t10, (calculatePositionMagnitudeResultsAtTime(n8, v196)))
+		else
+			local v203 = calculateTransformsAtTime(n8, v196)
+
+			table.insert(t9, (AssetCalculator.calculateAllTransformsForFullBody(t8, v203)))
+			table.insert(t10, (calculatePositionMagnitudeResultsAtTime(n8, v196)))
+		end
+
+		n8 += v60
+	end
+
+	if getFFlagUGCValidateCurveAnimFinalFrameBug() and v197 >= 0 then
+		local v204 = calculateTransformsAtTime(v197, v196)
+
+		table.insert(t9, (AssetCalculator.calculateAllTransformsForFullBody(t8, v204)))
+		table.insert(t10, (calculatePositionMagnitudeResultsAtTime(v197, v196)))
+	end
+
+	v190:Destroy()
+
+	return t9, v197, t10, v196
+end
+
+function t1.validateAnimationLength(n9: number, p41) -- line: 779
+	-- upvalues: getFFlagUGCValidateCurveAnimMinTimeFix (copy), GetFStringUGCValidateCurveAnimationMinLength (copy), GetFStringUGCValidationMaxAnimationLength (copy), getFFlagUGCValidateCurveAnimTimeErrorMessageFix (copy), reportFailure (copy), Analytics (copy)
+	local v207 = not getFFlagUGCValidateCurveAnimMinTimeFix() and 0 or GetFStringUGCValidateCurveAnimationMinLength.asNumber()
+
+	if n9 <= v207 or n9 > GetFStringUGCValidationMaxAnimationLength.asNumber() then
+		if getFFlagUGCValidateCurveAnimTimeErrorMessageFix() then
+			return reportFailure(`CurveAnimation must be between { v207 } and { GetFStringUGCValidationMaxAnimationLength.asString() } seconds long. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_UnacceptableLength, p41)
+		end
+
+		return reportFailure(`CurveAnimation must be between 0 and { GetFStringUGCValidationMaxAnimationLength.asString() } seconds long. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_UnacceptableLength, p41)
+	end
+
+	return true
+end
+function t1.validateBounds(t11: {[any]: any}, p42, n10: number) -- line: 806
+	-- upvalues: getFFlagUGCValidateCurveAnimTimeErrorMessageFix (copy), GetFStringUGCValidateAnimationHeightTol (copy), GetFStringUGCValidationMaxAnimationBounds (copy), v60 (copy), reportFailure (copy), Analytics (copy), FailureReasonsAccumulator (copy)
+	local n11 = 1e999
+	local n12 = 0
+	local v213 = nil
+	local v214 = nil
+
+	if getFFlagUGCValidateCurveAnimTimeErrorMessageFix() then
+		v213 = GetFStringUGCValidateAnimationHeightTol.asNumber()
+		v214 = GetFStringUGCValidationMaxAnimationBounds.asNumber()
+	end
+
+	for v215, v216 in t11 do
+		for v217, v218 in v216 do
+			if getFFlagUGCValidateCurveAnimTimeErrorMessageFix() then
+				if v213 > v218.Position.Y then
+					local v219 = string.format("In CurveAnimation at time %.2f seconds, body part %s is at height %.2f studs from the HumanoidRootPart. Body parts cannot be lower than %s studs from the HumanoidRootPart. Please fix the animation.", math.min(n10, (v215 - 1) * v60), v217, v218.Position.Y, GetFStringUGCValidateAnimationHeightTol.asString())
+
+					return reportFailure(v219, Analytics.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, p42)
+				end
+
+				if not (v214 < v218.Position.Magnitude) then
+					continue
+				end
+
+				local v220 = string.format("In CurveAnimation at time %.2f seconds, body part %s is %.2f studs from the HumanoidRootPart. Body parts cannot be more than %s studs from the HumanoidRootPart. Please fix the animation.", math.min(n10, (v215 - 1) * v60), v217, v218.Position.Magnitude, GetFStringUGCValidationMaxAnimationBounds.asString())
+
+				return reportFailure(v220, Analytics.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, p42)
+			end
+
+			n12 = math.max(n12, v218.Position.Magnitude)
+			n11 = math.min(n11, v218.Position.Y)
+		end
+	end
+
+	if not getFFlagUGCValidateCurveAnimTimeErrorMessageFix() then
+		local v221 = FailureReasonsAccumulator.new()
+
+		v221:updateReasons(n11 >= GetFStringUGCValidateAnimationHeightTol.asNumber(), { `Body parts in a CurveAnimation cannot be lower than { GetFStringUGCValidateAnimationHeightTol.asString() } studs from the HumanoidRootPart. Please fix the animation.` })
+		v221:updateReasons(n12 <= GetFStringUGCValidationMaxAnimationBounds.asNumber(), { `Body parts in a CurveAnimation cannot get more than { GetFStringUGCValidationMaxAnimationBounds.asString() } studs from the HumanoidRootPart. Please fix the animation.` })
+
+		if not v221:getFinalResults() then
+			Analytics.reportFailure(Analytics.ErrorType.validateCurveAnimation_UnacceptableSizeBounds, nil, p42)
+		end
+
+		return v221:getFinalResults()
+	end
+
+	return true
+end
+function t1.validateFrameDeltas(t12: {[any]: any}, p43) -- line: 884
+	-- upvalues: v60 (copy), GetFStringUGCValidationMaxAnimationDeltas (copy), getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage (copy), reportFailure (copy), Analytics (copy)
+	local v224 = v60 / 0.03333333333333333
+	local v225 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * v224
+	local v226 = nil
+
+	if getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage() then
+		v226 = GetFStringUGCValidationMaxAnimationDeltas.asNumber() * 30
+	end
+
+	local t13 = {}
+
+	for v228, v229 in t12 do
+		for v230, v231 in v229 do
+			local v232 = t13[v230]
+
+			if not v232 then
+				continue
+			end
+
+			local Magnitude = (v231.Position - v232.Position).Magnitude
+
+			if v225 < Magnitude then
+				if getFFlagUGCValidateFixCurveAnimFrameTimeErrorMessage() then
+					local v234 = (v228 - 1) * v60
+					local v235 = Magnitude / v224 * 30
+					local v236 = string.format("In CurveAnimation at time %.2f seconds, body part %s is moving at a speed of %.2f studs/second. %.2f is the maximum studs/second speed. Please fix the animation.", v234, v230, v235, v226)
+
+					return reportFailure(v236, Analytics.ErrorType.validateCurveAnimation_UnacceptableFrameDelta, p43)
+				end
+
+				return reportFailure(`Body part { v230 } in CurveAnimation moves more than { GetFStringUGCValidationMaxAnimationDeltas.asString() } studs between frames. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_UnacceptableFrameDelta, p43)
+			end
+		end
+
+		t13 = v229
+	end
+
+	return true
+end
+function t1.validateFrameRotationDeltas(t14: {[any]: any}, p44) -- line: 942
+	-- upvalues: v60 (copy), getFIntUGCValidateMaxAnimationFPS (copy), getFIntUGCValidationMaxAnimationRotationSpeedPerSecond (copy), reportFailure (copy), Analytics (copy)
+	assert(math.abs(1 / v60 - getFIntUGCValidateMaxAnimationFPS()) < 1E-05, "frameDelta should be calculated as 1 / getFIntUGCValidateMaxAnimationFPS()")
+
+	local v239 = getFIntUGCValidationMaxAnimationRotationSpeedPerSecond()
+	local v240 = v239 / getFIntUGCValidateMaxAnimationFPS()
+	local t15 = {}
+
+	for v242, v243 in t14 do
+		for v244, v245 in v243 do
+			local v246 = t15[v244]
+
+			if not v246 then
+				continue
+			end
+
+			local v247 = math.deg((math.abs((v245:AngleBetween(v246)))))
+
+			if v240 < v247 then
+				local v248 = (v242 - 1) * v60
+				local v249 = v247 * getFIntUGCValidateMaxAnimationFPS()
+				local v250 = string.format("In CurveAnimation at time %.2f seconds, body part %s is moving at a rotation speed of %.2f degrees/second. %.2f is the maximum degrees/second speed. Please fix the animation.", v248, v244, v249, v239)
+
+				return reportFailure(v250, Analytics.ErrorType.validateCurveAnimation_UnacceptableFrameRotationDelta, p44)
+			end
+		end
+
+		t15 = v243
+	end
+
+	return true
+end
+function t1.validateMinimumTransformations(t16: {[any]: any}, p45) -- line: 991
+	-- upvalues: reportFailure (copy), Analytics (copy)
+	for _, v254 in t16 do
+		if v254.pos or v254.rot then
+			return true
+		end
+	end
+
+	return reportFailure("CurveAnimation does not contain any joint manipulation.", Analytics.ErrorType.validateCurveAnimation_AnimationContainsNoJointManipulation, p45)
+end
+function t1.validateContainsJointManipulation(p46, p47) -- line: 1008
+	-- upvalues: getFFlagUGCValidateDuplicatesInAnimation (copy), getBodyPartFolderRoot (copy), u43 (ref), AssetCalculator (copy), reportFailure (copy), Analytics (copy)
+	local descendants
+
+	if getFFlagUGCValidateDuplicatesInAnimation() then
+		local v257 = getBodyPartFolderRoot(p46)
+
+		assert(v257, "ValidateCurveAnimation.validateStructure() ensures CurveAnimation has one and only one body part Folder child or HumanoidRootPart child.")
+		descendants = v257:GetDescendants()
+		table.insert(descendants, v257)
+	else
+		descendants = p46:GetDescendants()
+	end
+
+	for _, v260 in descendants do
+		if not v260:IsA("Folder") then
+			continue
+		end
+
+		if not u43 then
+			u43 = AssetCalculator.getBodyPartsToParents()
+		end
+
+		if not u43[v260.Name] then
+			continue
+		end
+
+		local Position = v260:FindFirstChild("Position")
+		local Rotation = v260:FindFirstChild("Rotation")
+
+		if Position and Position:IsA("Vector3Curve") and Rotation and Rotation:IsA("EulerRotationCurve") then
+			return true
+		end
+	end
+
+	return reportFailure("CurveAnimation does not contain any joint manipulation.", Analytics.ErrorType.validateCurveAnimation_AnimationContainsNoJointManipulation, p47)
+end
+
+local function isTimeStamp(s5: string) -- line: 1045
+	if #s5 > 30 then
+		return false
+	end
+
+	return string.match(s5, "^[0-9]+$") ~= nil
+end
+
+function t1.validateAllowedTags(p48, p49) -- line: 1053
+	-- upvalues: validateTags (copy), CollectionService (copy), reportFailure (copy), Analytics (copy)
+	for _, child in p48:GetChildren() do
+		local v268, v269 = validateTags(child, p49)
+
+		if not v268 then
+			return v268, v269
+		end
+	end
+
+	local Tags = CollectionService:GetTags(p48)
+	local v271 = #Tags
+
+	if v271 > 0 then
+		if v271 > 1 then
+			return reportFailure("CurveAnimation can only contain a single timestamp tag. Please remove all other tags.", Analytics.ErrorType.validateTags, p49)
+		end
+
+		local v272 = Tags[1]
+
+		if #v272 > 30 or string.match(v272, "^[0-9]+$") == nil then
+			return reportFailure("CurveAnimation can only contain a single timestamp tag. Please remove all other tags.", Analytics.ErrorType.validateTags, p49)
+		end
+	end
+
+	return true
+end
+function t1.validateStructure(p50, p51) -- line: 1080
+	-- upvalues: validateAnimationHierarchy (copy)
+	return validateAnimationHierarchy(p50, p51)
+end
+
+local function areNumbersGood(...) -- line: 1087
+	local function isNaN(n13: number) -- line: 1088
+		return n13 ~= n13
+	end
+	local function isInfinite(n14: number) -- line: 1092
+		return n14 == 1e999 or n14 == -1e999
+	end
+
+	for _, v278 in { ... } do
+		if v278 ~= v278 then
+			return false
+		end
+
+		if v278 == 1e999 or v278 == -1e999 then
+			return false
+		end
+	end
+
+	return true
+end
+
+function t1.validateData(p52, p53) -- line: 1107
+	-- upvalues: v60 (copy), GetFStringUGCValidateFrameDeltaKeyTimeTol (copy), GetFStringUGCValidationMaxAnimationLength (copy), getFFlagUGCValidateRestrictNumMarkersInsideMarkerCurves (copy), getFIntUGCValidateMaxTotalInternalMarkers (copy), reportFailure (copy), Analytics (copy), areNumbersGood (copy), getFIntUGCValidateMaxMarkerCurveValueLength (copy), getFIntUGCValidateMaxAnimationFPS (copy)
+	local v281 = v60 * GetFStringUGCValidateFrameDeltaKeyTimeTol.asNumber()
+	local v282 = math.ceil(1 / v281 * GetFStringUGCValidationMaxAnimationLength.asNumber())
+
+	for _, descendant in p52:GetDescendants() do
+		if not descendant:IsA("MarkerCurve") then
+			if not descendant:IsA("FloatCurve") then
+				continue
+			end
+
+			local Keys = descendant:GetKeys()
+
+			if v282 < #Keys then
+				return reportFailure(`CurveAnimation contains Curves with too many keys. { v282 } is the maximum per Curve. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+			end
+
+			local Time = nil
+
+			for _, v288 in Keys do
+				if not v288.Time or not areNumbersGood(v288.Time) or not v288.Value or not areNumbersGood(v288.Value) then
+					return reportFailure("CurveAnimation contains Curves with invalid Time or Value. Please fix the animation.", Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+				end
+
+				if Time then
+					if Time + v281 > v288.Time then
+						local v289 = not descendant.Parent.Parent and "-" or descendant.Parent.Parent.Name
+
+						return reportFailure(`CurveAnimation contains Curve { v289 }.{ descendant.Parent.Name }.{ descendant.Name } with keys that are too close together in time for a maximum { getFIntUGCValidateMaxAnimationFPS() } fps animation. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+					end
+				elseif v288.Time < 0 then
+					local v290 = not descendant.Parent.Parent and "-" or descendant.Parent.Parent.Name
+
+					return reportFailure(`CurveAnimation contains Curve { v290 }.{ descendant.Parent.Name }.{ descendant.Name } with a key that has a negative time. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+				end
+
+				Time = v288.Time
+			end
+
+			continue
+		end
+
+		local Markers = descendant:GetMarkers()
+
+		if getFFlagUGCValidateRestrictNumMarkersInsideMarkerCurves() then
+			local v292 = math.min(getFIntUGCValidateMaxTotalInternalMarkers(), v282)
+
+			if v292 < #Markers then
+				return reportFailure(`CurveAnimation contains a MarkerCurve with { #Markers } Markers. { v292 } is the maximum per MarkerCurve. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+			end
+		elseif v282 < #Markers then
+			return reportFailure(`CurveAnimation contains MarkerCurve with too many markers. { v282 } is the maximum per MarkerCurve. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+		end
+
+		for _, v294 in Markers do
+			if not v294.Time or not areNumbersGood(v294.Time) or not v294.Value or #v294.Value > getFIntUGCValidateMaxMarkerCurveValueLength() then
+				return reportFailure("CurveAnimation contains MarkerCurves with invalid Time or Value, or Value is too long. Please fix the animation.", Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p53)
+			end
+		end
+	end
+
+	return true
+end
+function t1.validateCalculatedData(t17: {[any]: any}, t18: {[any]: any}, p54) -- line: 1201
+	-- upvalues: areNumbersGood (copy), reportFailure (copy), Analytics (copy)
+	for _, v299 in t17 do
+		for _, v301 in v299 do
+			if not areNumbersGood(v301:GetComponents()) then
+				return reportFailure("CurveAnimation contains Curves with invalid numerical data. Please fix the animation.", Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p54)
+			end
+		end
+	end
+
+	for _, v303 in t18 do
+		for _, v305 in v303 do
+			if not areNumbersGood(v305) then
+				return reportFailure("CurveAnimation contains Curves with invalid numerical data. Please fix the animation.", Analytics.ErrorType.validateCurveAnimation_IncorrectNumericalData, p54)
+			end
+		end
+	end
+
+	return true
+end
+function t1.calculateAnimFramesAtOrigin(p55) -- line: 1232
+	-- upvalues: calculateAnimFramesAtOriginManual (copy)
+	return calculateAnimFramesAtOriginManual(p55)
+end
+function t1.validatePositionMagnitudes(t19: {[any]: any}, p56) -- line: 1238
+	-- upvalues: Constants (copy), GetFStringUGCValidateMaxAnimationMovementPerPart (copy), reportFailure (copy), Analytics (copy)
+	local t20 = {}
+
+	for _, v311 in t19 do
+		for v312, v313 in v311 do
+			if v312 == Constants.NAMED_R15_BODY_PARTS.LowerTorso then
+				continue
+			end
+
+			if not t20[v312] then
+				t20[v312] = GetFStringUGCValidateMaxAnimationMovementPerPart.asNumber(v312)
+			end
+
+			if v313 > t20[v312] then
+				return reportFailure(`CurveAnimation contains positional separation of body parts. Only LowerTorso can change position. All other body parts can only change their orientation. { v312 } moves more than { t20[v312] } studs from its parent. Please fix the animation.`, Analytics.ErrorType.validateCurveAnimation_PositionalMovement, p56)
+			end
+		end
+	end
+
+	return true
+end
+function t1.validateFrames(p57, p58) -- line: 1266
+	-- upvalues: t1 (copy), FailureReasonsAccumulator (copy), getFFlagUGCValidateCurveAnimRotationSpeed (copy)
+	local v316, v317, v318, v319 = t1.calculateAnimFramesAtOrigin(p57)
+	local v320, v321 = t1.validateCalculatedData(v316, v318, p58)
+
+	if not v320 then
+		return v320, v321
+	end
+
+	local v322 = FailureReasonsAccumulator.new()
+
+	v322:updateReasons(t1.validateMinimumTransformations(v319, p58))
+	v322:updateReasons(t1.validatePositionMagnitudes(v318, p58))
+	v322:updateReasons(t1.validateAnimationLength(v317, p58))
+	v322:updateReasons(t1.validateBounds(v316, p58, v317))
+	v322:updateReasons(t1.validateFrameDeltas(v316, p58))
+
+	if getFFlagUGCValidateCurveAnimRotationSpeed() then
+		v322:updateReasons(t1.validateFrameRotationDeltas(v316, p58))
+	end
+
+	return v322:getFinalResults()
+end
+function t1.validate(p59, p60) -- line: 1297
+	-- upvalues: t1 (copy), getEngineFeatureEngineUGCValidatePropertiesSensible (copy), ValidatePropertiesSensible (copy), FailureReasonsAccumulator (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), getFFlagUGCValidationCombineEntrypointResults (copy), validateAttributes (copy)
+	local v325, v326 = t1.validateStructure(p59, p60)
+
+	if not v325 then
+		return v325, v326
+	end
+
+	if getEngineFeatureEngineUGCValidatePropertiesSensible() then
+		local v327, v328 = ValidatePropertiesSensible.validate(p59, p60)
+
+		if not v327 then
+			return false, v328
+		end
+	end
+
+	local v329, v330 = t1.validateData(p59, p60)
+
+	if not v329 then
+		return v329, v330
+	end
+
+	local v331 = FailureReasonsAccumulator.new()
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		v331:updateReasons(validateAttributes(p59, p60))
+	end
+
+	v331:updateReasons(t1.validateAllowedTags(p59, p60))
+	v331:updateReasons(t1.validateFrames(p59, p60))
+
+	return v331:getFinalResults()
+end
+
+return t1

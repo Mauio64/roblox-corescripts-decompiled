@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableDevSubsFastFollowFixes", false);
+return game:DefineFastFlag("EnableDevSubsFastFollowFixes", false)

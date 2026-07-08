@@ -1,90 +1,106 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local v4 = require(l_script_FirstAncestor_0.Utils.Humanoid.createHumanoidDescriptionAccessoryInfo);
-local v5 = require(l_script_FirstAncestor_0.Utils.Humanoid.setMakeupDescriptions);
-local v6 = require(l_script_FirstAncestor_0.Utils.isMakeupAssetType);
-local l_FFlagAXMakeupEquipping_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMakeupEquipping;
-local function v19(v8, v9) --[[ Line: 24 ]] --[[ Name: applyCurrentAssets ]]
-    -- upvalues: v3 (copy), v4 (copy), l_FFlagAXMakeupEquipping_0 (copy), v6 (copy), l_mutedError_0 (copy), v5 (copy)
-    if v9 then
-        local v10 = {};
-        for v11, v12 in v9 do
-            local v13 = {};
-            local v14 = v3.ASSET_TYPE_TO_ACCESSORY_TYPE[v11];
-            for v15, v16 in v12 do
-                if v14 then
-                    table.insert(v10, v4(v11, v15, v16));
-                else
-                    table.insert(v13, v15);
-                end;
-            end;
-            if v14 == nil and #v13 > 0 then
-                local v17 = v3.ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v11];
-                local v18 = table.concat(v13, ",");
-                if v17 then
-                    v8[v17] = v18;
-                elseif v11 ~= v3.ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not l_FFlagAXMakeupEquipping_0 or not v6(v11)) then
-                    l_mutedError_0(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v11))));
-                end;
-            end;
-        end;
-        v8:SetAccessories(v10, true);
-        if l_FFlagAXMakeupEquipping_0 then
-            v5(v8, v9);
-        end;
-    end;
-end;
-local function _(v20, v21) --[[ Line: 66 ]] --[[ Name: applyAvatarScales ]]
-    -- upvalues: v3 (copy)
-    if v21 then
-        for v22, v23 in v21 do
-            v20[v3.HUMANOID_DESCRIPTION_SCALE_TO_NAME[v22]] = v23;
-        end;
-    end;
-end;
-local function _(v25, v26) --[[ Line: 76 ]] --[[ Name: applyBodyColor3s ]]
-    -- upvalues: v3 (copy)
-    if v26 then
-        for v27, v28 in v26 do
-            v25[v3.BODY_PART_FOR_SKIN_COLORING_ID_TO_HUMANOID_DESCRIPTION[v27]] = v28;
-        end;
-    end;
-end;
-local function v36(v30, v31) --[[ Line: 87 ]] --[[ Name: applyEmotes ]]
-    if v31 then
-        local v32 = {};
-        local v33 = {};
-        for _, v35 in v31 do
-            v32[tostring(v35.assetId)] = {
-                (tonumber(v35.assetId))
-            };
-            table.insert(v33, {
-                Slot = v35.position, 
-                Name = tostring(v35.assetId)
-            });
-        end;
-        v30:SetEmotes(v32);
-        v30:SetEquippedEmotes(v33);
-    end;
-end;
-return function(v37) --[[ Line: 108 ]] --[[ Name: buildHumanoidDescription ]]
-    -- upvalues: v19 (copy), v3 (copy), v36 (copy)
-    local l_HumanoidDescription_0 = Instance.new("HumanoidDescription");
-    v19(l_HumanoidDescription_0, v37.currentAssets);
-    local l_avatarScales_0 = v37.avatarScales;
-    if l_avatarScales_0 then
-        for v40, v41 in l_avatarScales_0 do
-            l_HumanoidDescription_0[v3.HUMANOID_DESCRIPTION_SCALE_TO_NAME[v40]] = v41;
-        end;
-    end;
-    l_avatarScales_0 = v37.bodyColor3s;
-    if l_avatarScales_0 then
-        for v42, v43 in l_avatarScales_0 do
-            l_HumanoidDescription_0[v3.BODY_PART_FOR_SKIN_COLORING_ID_TO_HUMANOID_DESCRIPTION[v42]] = v43;
-        end;
-    end;
-    v36(l_HumanoidDescription_0, v37.emotesSlotInfo);
-    return l_HumanoidDescription_0;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local mutedError = require(AvatarExperienceCommonParent.Loggers).mutedError
+local Constants = require(AvatarExperienceCommon.Constants)
+local createHumanoidDescriptionAccessoryInfo = require(AvatarExperienceCommon.Utils.Humanoid.createHumanoidDescriptionAccessoryInfo)
+local setMakeupDescriptions = require(AvatarExperienceCommon.Utils.Humanoid.setMakeupDescriptions)
+local isMakeupAssetType = require(AvatarExperienceCommon.Utils.isMakeupAssetType)
+local FFlagAXMakeupEquipping = require(AvatarExperienceCommonParent.AvatarExperienceFlags).FFlagAXMakeupEquipping
+
+local function applyCurrentAssets(p1, t1: {[any]: any}?) -- line: 24
+	-- upvalues: Constants (copy), createHumanoidDescriptionAccessoryInfo (copy), FFlagAXMakeupEquipping (copy), isMakeupAssetType (copy), mutedError (copy), setMakeupDescriptions (copy)
+	if t1 then
+		local t2 = {}
+
+		for v17, v18 in t1 do
+			local t3 = {}
+			local v20 = Constants.ASSET_TYPE_TO_ACCESSORY_TYPE[v17]
+
+			for v21, v22 in v18 do
+				if v20 then
+					table.insert(t2, createHumanoidDescriptionAccessoryInfo(v17, v21, v22))
+				else
+					table.insert(t3, v21)
+				end
+			end
+
+			if v20 == nil and #t3 > 0 then
+				local v23 = Constants.ASSET_TYPE_ID_STRING_TO_HUMANOID_DESCRIPTION_PROP[v17]
+				local v24 = table.concat(t3, ",")
+
+				if v23 then
+					p1[v23] = v24
+				elseif v17 ~= Constants.ASSET_TYPE_NAME_TO_ID_STRING.Gear and (not FFlagAXMakeupEquipping or not isMakeupAssetType(v17)) then
+					mutedError(string.format("assetTypeId: %s not recognized as member of humanoidDescription", (tostring(v17))))
+				end
+			end
+		end
+
+		p1:SetAccessories(t2, true)
+
+		if FFlagAXMakeupEquipping then
+			setMakeupDescriptions(p1, t1)
+		end
+	end
+end
+local function applyAvatarScales(p2, t4: {[any]: any}?) -- line: 66
+	-- upvalues: Constants (copy)
+	if t4 then
+		for v27, v28 in t4 do
+			p2[Constants.HUMANOID_DESCRIPTION_SCALE_TO_NAME[v27]] = v28
+		end
+	end
+end
+local function applyBodyColor3s(p3, t5: {[any]: any}?) -- line: 76
+	-- upvalues: Constants (copy)
+	if t5 then
+		for v31, v32 in t5 do
+			p3[Constants.BODY_PART_FOR_SKIN_COLORING_ID_TO_HUMANOID_DESCRIPTION[v31]] = v32
+		end
+	end
+end
+local function applyEmotes(p4, t6: {[any]: any}?) -- line: 87
+	if t6 then
+		local t7 = {}
+		local t8 = {}
+
+		for _, v38 in t6 do
+			t7[tostring(v38.assetId)] = { (tonumber(v38.assetId)) }
+			table.insert(t8, {
+				Slot = v38.position,
+				Name = tostring(v38.assetId)
+			})
+		end
+
+		p4:SetEmotes(t7)
+		p4:SetEquippedEmotes(t8)
+	end
+end
+local function buildHumanoidDescription(t9: {[any]: any}) -- line: 108
+	-- upvalues: applyCurrentAssets (copy), Constants (copy), applyEmotes (copy)
+	local HumanoidDescription = Instance.new("HumanoidDescription")
+
+	applyCurrentAssets(HumanoidDescription, t9.currentAssets)
+
+	local avatarScales = t9.avatarScales
+
+	if avatarScales then
+		for v42, v43 in avatarScales do
+			HumanoidDescription[Constants.HUMANOID_DESCRIPTION_SCALE_TO_NAME[v42]] = v43
+		end
+	end
+
+	local bodyColor3s = t9.bodyColor3s
+
+	if bodyColor3s then
+		for v45, v46 in bodyColor3s do
+			HumanoidDescription[Constants.BODY_PART_FOR_SKIN_COLORING_ID_TO_HUMANOID_DESCRIPTION[v45]] = v46
+		end
+	end
+
+	applyEmotes(HumanoidDescription, t9.emotesSlotInfo)
+
+	return HumanoidDescription
+end
+
+return buildHumanoidDescription

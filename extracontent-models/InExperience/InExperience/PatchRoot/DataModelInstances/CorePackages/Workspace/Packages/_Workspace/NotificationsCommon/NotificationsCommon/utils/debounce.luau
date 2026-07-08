@@ -1,18 +1,19 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local v2 = nil;
-    local v3 = v1 or 0.5;
-    return function(...) --[[ Line: 5 ]]
-        -- upvalues: v2 (ref), v3 (copy), v0 (copy)
-        local v4 = {
-            ...
-        };
-        if v2 then
-            task.cancel(v2);
-        end;
-        v2 = task.delay(v3, function() --[[ Line: 12 ]]
-            -- upvalues: v0 (ref), v4 (copy), v2 (ref)
-            v0(unpack(v4));
-            v2 = nil;
-        end);
-    end;
-end;
+return function(p1, n1: number?) -- line: 1
+	local u3 = nil
+	local v4 = n1 or 0.5
+
+	return function(...) -- line: 5
+		-- upvalues: u3 (ref), v4 (copy), p1 (copy)
+		local t1 = { ... }
+
+		if u3 then
+			task.cancel(u3)
+		end
+
+		u3 = task.delay(v4, function() -- line: 12
+			-- upvalues: p1 (copy), t1 (copy), u3 (ref)
+			p1(unpack(t1))
+			u3 = nil
+		end)
+	end
+end

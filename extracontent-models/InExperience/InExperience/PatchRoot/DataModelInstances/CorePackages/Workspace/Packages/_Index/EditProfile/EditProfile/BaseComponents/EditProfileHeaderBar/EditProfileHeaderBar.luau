@@ -1,42 +1,44 @@
-local l_Parent_0 = script:FindFirstAncestor("EditProfile").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local l_IconButton_0 = v2.IconButton;
-local l_IconName_0 = v2.Enums.IconName;
-local l_IconSize_0 = v2.Enums.IconSize;
-local l_ButtonVariant_0 = v2.Enums.ButtonVariant;
-local v9 = game:DefineFastFlag("EditProfileHeaderBarTopPadding", false);
-return function(v10) --[[ Line: 24 ]] --[[ Name: EditProfileHeaderBar ]]
-    -- upvalues: v1 (copy), l_View_0 (copy), v9 (copy), l_IconButton_0 (copy), l_IconName_0 (copy), l_IconSize_0 (copy), l_ButtonVariant_0 (copy), l_Text_0 (copy)
-    return v1.createElement(l_View_0, {
-        tag = v9 and "row size-full-0 auto-y gap-small flex-between align-y-center padding-top-xxlarge padding-x-xlarge padding-bottom-xlarge bg-transparent" or "row size-full-0 auto-y gap-small flex-between align-y-center margin-small bg-transparent"
-    }, {
-        HeaderBar = v1.createElement(l_View_0, {
-            tag = "row align-y-center size-0-1800 auto-x gap-small"
-        }, {
-            BackButton = v1.createElement(l_IconButton_0, {
-                icon = l_IconName_0.ChevronLargeLeft, 
-                size = l_IconSize_0.Medium, 
-                variant = l_ButtonVariant_0.Utility, 
-                onActivated = v10.onClose, 
-                isCircular = true, 
-                LayoutOrder = 1
-            }), 
-            HeaderText = v1.createElement(l_Text_0, {
-                tag = "text-heading-small auto-xy", 
-                Text = v10.headerText, 
-                LayoutOrder = 2
-            })
-        }), 
-        SaveButton = if v10.onSave then v1.createElement(l_IconButton_0, {
-            icon = l_IconName_0.CheckLarge, 
-            size = l_IconSize_0.Medium, 
-            variant = l_ButtonVariant_0.Utility, 
-            onActivated = v10.onSave, 
-            isDisabled = v10.isLoading or v10.isDisabled == true, 
-            isCircular = true
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("EditProfile").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local IconButton = Foundation.IconButton
+local IconName = Foundation.Enums.IconName
+local IconSize = Foundation.Enums.IconSize
+local ButtonVariant = Foundation.Enums.ButtonVariant
+
+local function EditProfileHeaderBar(t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), View (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy)
+	return React.createElement(View, {
+		tag = "row flex-between align-y-center gap-small size-full-0 auto-y padding-x-xlarge padding-bottom-xlarge padding-top-xxlarge"
+	}, {
+		HeaderBar = React.createElement(View, {
+			tag = "row align-y-center size-0-1800 auto-x gap-small"
+		}, {
+			BackButton = React.createElement(IconButton, {
+				isCircular = true,
+				LayoutOrder = 1,
+				icon = IconName.ChevronLargeLeft,
+				size = IconSize.Medium,
+				variant = ButtonVariant.Utility,
+				onActivated = t1.onClose
+			}),
+			HeaderText = React.createElement(FoundationText, {
+				tag = "text-heading-small auto-xy",
+				LayoutOrder = 2,
+				Text = t1.headerText
+			})
+		}),
+		SaveButton = if not t1.onSave then nil else React.createElement(IconButton, {
+			isCircular = true,
+			icon = IconName.CheckLarge,
+			size = IconSize.Medium,
+			variant = ButtonVariant.Utility,
+			onActivated = t1.onSave,
+			isDisabled = t1.isLoading or t1.isDisabled == true
+		})
+	})
+end
+
+return EditProfileHeaderBar

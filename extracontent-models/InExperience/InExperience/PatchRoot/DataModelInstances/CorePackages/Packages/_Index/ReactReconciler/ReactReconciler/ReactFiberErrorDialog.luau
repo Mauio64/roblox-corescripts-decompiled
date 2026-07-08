@@ -1,5 +1,5 @@
 return {
-    showErrorDialog = function(_, _) --[[ Line: 17 ]]
-        return true;
-    end
-};
+	showErrorDialog = function(_, _) -- line: 17
+		return true
+	end
+}

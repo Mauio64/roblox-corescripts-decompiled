@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("PeopleReactView").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createVirtualizedGridStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("PeopleReactView").Parent
+local Signals = require(Parent.Signals)
+local createVirtualizedGridStore = require(script.createVirtualizedGridStore)
+
+return Signals.createComputed(createVirtualizedGridStore)

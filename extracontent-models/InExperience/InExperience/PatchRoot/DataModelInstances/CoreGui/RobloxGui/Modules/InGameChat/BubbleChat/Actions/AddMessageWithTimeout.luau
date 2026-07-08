@@ -1,32 +1,43 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(l_CorePackages_0.Packages.Cryo);
-local v3 = require(script.Parent.Parent.Types);
-local v4 = require(script.Parent.Parent.Helpers.maybeAssert);
-local v5 = require(script.Parent.AddMessage);
-local v6 = require(script.Parent.RemoveMessage);
-local v7 = require(script.Parent.Parent.Helpers.getSettingsForMessage);
-local v8 = game:DefineFastInt("BubbleChatAddMessageRolloutPercent", 100);
-return function(v9) --[[ Line: 13 ]] --[[ Name: addMessageWithTimeout ]]
-    -- upvalues: v4 (copy), v3 (copy), v5 (copy), v7 (copy), v6 (copy), l_RbxAnalyticsService_0 (copy), v8 (copy)
-    v4(v3.IMessage(v9));
-    return function(v10) --[[ Line: 16 ]]
-        -- upvalues: v5 (ref), v9 (copy), v7 (ref), v6 (ref), l_RbxAnalyticsService_0 (ref), v8 (ref)
-        v10:dispatch(v5(v9));
-        local v11 = v7(v10:getState().chatSettings, v9);
-        local v12 = v10:getState().userMessages[v9.userId];
-        local l_messages_0 = v10:getState().messages;
-        for v14 = 1, #v12 - v11.MaxBubbles do
-            v10:dispatch(v6(l_messages_0[v12[v14]]));
-        end;
-        l_RbxAnalyticsService_0:ReportCounter("RoactBubbleChat-MessagesSent");
-        if v8 >= math.random(1, 100) then
-            l_RbxAnalyticsService_0:SendEventDeferred("client", "bubbleChatMetric", "messageAdded", {
-                placeId = game.PlaceId, 
-                senderUserId = v9.userId
-            });
-        end;
-        wait(v11.BubbleDuration);
-        v10:dispatch(v6(v9));
-    end;
-end;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CorePackages = game:GetService("CorePackages")
+
+require(CorePackages.Packages.Cryo)
+
+local Types = require(script.Parent.Parent.Types)
+local maybeAssert = require(script.Parent.Parent.Helpers.maybeAssert)
+local AddMessage = require(script.Parent.AddMessage)
+local RemoveMessage = require(script.Parent.RemoveMessage)
+local getSettingsForMessage = require(script.Parent.Parent.Helpers.getSettingsForMessage)
+local v8 = game:DefineFastInt("BubbleChatAddMessageRolloutPercent", 100)
+
+local function addMessageWithTimeout(p1) -- line: 13
+	-- upvalues: maybeAssert (copy), Types (copy), AddMessage (copy), getSettingsForMessage (copy), RemoveMessage (copy), RbxAnalyticsService (copy), v8 (copy)
+	maybeAssert(Types.IMessage(p1))
+
+	return function(p2) -- line: 16
+		-- upvalues: AddMessage (copy), p1 (copy), getSettingsForMessage (copy), RemoveMessage (copy), RbxAnalyticsService (copy), v8 (copy)
+		p2:dispatch(AddMessage(p1))
+
+		local v12 = getSettingsForMessage(p2:getState().chatSettings, p1)
+		local v13 = p2:getState().userMessages[p1.userId]
+		local messages = p2:getState().messages
+
+		for i = 1, #v13 - v12.MaxBubbles do
+			p2:dispatch(RemoveMessage(messages[v13[i]]))
+		end
+
+		RbxAnalyticsService:ReportCounter("RoactBubbleChat-MessagesSent")
+
+		if v8 >= math.random(1, 100) then
+			RbxAnalyticsService:SendEventDeferred("client", "bubbleChatMetric", "messageAdded", {
+				placeId = game.PlaceId,
+				senderUserId = p1.userId
+			})
+		end
+
+		wait(v12.BubbleDuration)
+		p2:dispatch(RemoveMessage(p1))
+	end
+end
+
+return addMessageWithTimeout

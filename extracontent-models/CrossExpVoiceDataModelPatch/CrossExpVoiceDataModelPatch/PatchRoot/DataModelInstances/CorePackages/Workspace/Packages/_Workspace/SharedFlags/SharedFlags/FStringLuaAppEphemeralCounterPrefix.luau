@@ -1,1 +1,1 @@
-return game:DefineFastString("LuaAppEphemeralCounterPrefix", "");
+return game:DefineFastString("LuaAppEphemeralCounterPrefix", "")

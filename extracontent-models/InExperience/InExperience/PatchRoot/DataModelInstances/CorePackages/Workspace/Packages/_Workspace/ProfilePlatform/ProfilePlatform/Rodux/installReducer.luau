@@ -1,28 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Rodux.Games);
-local v4 = require(l_script_FirstAncestor_0.Rodux.ItemDetails);
-local v5 = require(l_script_FirstAncestor_0.Rodux.BundleDetails);
-local v6 = require(l_script_FirstAncestor_0.Rodux.AssetDetails);
-local v7 = require(l_script_FirstAncestor_0.Rodux.AssetData);
-local v8 = require(l_script_FirstAncestor_0.Networking.myRoduxNetworking);
-local v9 = require(l_script_FirstAncestor_0.Rodux.Presence);
-local v10 = game:DefineFastFlag("ProfilePlatformFixPresenceReducer", false);
-local v11 = if v10 then require(l_script_FirstAncestor_0.Rodux.PresenceReducer) else nil;
-local v12 = require(l_script_FirstAncestor_0.Rodux.Profiles);
-local l_FFlagEnableProfilePlatformCatalogNetworking_0 = require(l_Parent_0.SharedFlags).FFlagEnableProfilePlatformCatalogNetworking;
-local l_FFlagAddVideoToCommunityProfile_0 = require(l_Parent_0.SharedFlags).FFlagAddVideoToCommunityProfile;
-return function() --[[ Line: 26 ]]
-    -- upvalues: v2 (copy), v3 (copy), v4 (copy), l_FFlagEnableProfilePlatformCatalogNetworking_0 (copy), v5 (copy), v6 (copy), l_FFlagAddVideoToCommunityProfile_0 (copy), v7 (copy), v8 (copy), v10 (copy), v11 (copy), v9 (copy), v12 (copy)
-    return v2.combineReducers({
-        Games = v3.installReducer(), 
-        ItemAssets = v4, 
-        BundleDetails = if l_FFlagEnableProfilePlatformCatalogNetworking_0 then v5 else nil, 
-        AssetDetails = if l_FFlagEnableProfilePlatformCatalogNetworking_0 then v6 else nil, 
-        AssetData = if l_FFlagAddVideoToCommunityProfile_0 then v7 else nil, 
-        NetworkStatus = v8.installReducer(), 
-        Presence = if v10 then v11 else v9.installReducer(), 
-        Profiles = v12
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local Rodux = require(ProfilePlatformParent.Rodux)
+local Games = require(ProfilePlatform.Rodux.Games)
+local ItemDetails = require(ProfilePlatform.Rodux.ItemDetails)
+local BundleDetails = require(ProfilePlatform.Rodux.BundleDetails)
+local AssetDetails = require(ProfilePlatform.Rodux.AssetDetails)
+local AssetData = require(ProfilePlatform.Rodux.AssetData)
+local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
+local Presence = require(ProfilePlatform.Rodux.Presence)
+local v11 = game:DefineFastFlag("ProfilePlatformFixPresenceReducer", false)
+local v12 = if not v11 then nil else require(ProfilePlatform.Rodux.PresenceReducer)
+local Profiles = require(ProfilePlatform.Rodux.Profiles)
+local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
+
+return function() -- line: 23
+	-- upvalues: Rodux (copy), Games (copy), ItemDetails (copy), BundleDetails (copy), AssetDetails (copy), FFlagAddVideoToCommunityProfile (copy), AssetData (copy), myRoduxNetworking (copy), v11 (copy), v12 (copy), Presence (copy), Profiles (copy)
+	return Rodux.combineReducers({
+		Games = Games.installReducer(),
+		ItemAssets = ItemDetails,
+		BundleDetails = BundleDetails,
+		AssetDetails = AssetDetails,
+		AssetData = if not FFlagAddVideoToCommunityProfile then nil else AssetData,
+		NetworkStatus = myRoduxNetworking.installReducer(),
+		Presence = if not v11 then Presence.installReducer() else v12,
+		Profiles = Profiles
+	})
+end

@@ -1,27 +1,32 @@
-local v0 = require(script.Parent.Tracing);
-local v1 = require(script.Parent.TracingSubscriptions);
-local v2 = require(script.Parent.Scheduler);
-local v3 = require(script.Parent.forks["SchedulerHostConfig.mock"]);
-local v4 = v2(v3);
-local v5 = {
-    tracing = {}
-};
-for v6, v7 in v4 do
-    v5[v6] = v7;
-end;
-for v8, v9 in v0 do
-    v5.tracing[v8] = v9;
-end;
-for v10, v11 in v1 do
-    v5.tracing[v10] = v11;
-end;
-v5.unstable_flushAllWithoutAsserting = v3.unstable_flushAllWithoutAsserting;
-v5.unstable_flushNumberOfYields = v3.unstable_flushNumberOfYields;
-v5.unstable_flushExpired = v3.unstable_flushExpired;
-v5.unstable_clearYields = v3.unstable_clearYields;
-v5.unstable_flushUntilNextPaint = v3.unstable_flushUntilNextPaint;
-v5.unstable_flushAll = v3.unstable_flushAll;
-v5.unstable_yieldValue = v3.unstable_yieldValue;
-v5.unstable_advanceTime = v3.unstable_advanceTime;
-v5.unstable_Profiling = v4.unstable_Profiling;
-return v5;
+local Tracing = require(script.Parent.Tracing)
+local TracingSubscriptions = require(script.Parent.TracingSubscriptions)
+local Scheduler = require(script.Parent.Scheduler)
+local lib = require(script.Parent.forks["SchedulerHostConfig.mock"])
+local v5 = Scheduler(lib)
+local t1 = {
+	tracing = {}
+}
+
+for v7, v8 in v5 do
+	t1[v7] = v8
+end
+
+for v9, v10 in Tracing do
+	t1.tracing[v9] = v10
+end
+
+for v11, v12 in TracingSubscriptions do
+	t1.tracing[v11] = v12
+end
+
+t1.unstable_flushAllWithoutAsserting = lib.unstable_flushAllWithoutAsserting
+t1.unstable_flushNumberOfYields = lib.unstable_flushNumberOfYields
+t1.unstable_flushExpired = lib.unstable_flushExpired
+t1.unstable_clearYields = lib.unstable_clearYields
+t1.unstable_flushUntilNextPaint = lib.unstable_flushUntilNextPaint
+t1.unstable_flushAll = lib.unstable_flushAll
+t1.unstable_yieldValue = lib.unstable_yieldValue
+t1.unstable_advanceTime = lib.unstable_advanceTime
+t1.unstable_Profiling = v5.unstable_Profiling
+
+return t1

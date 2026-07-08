@@ -1,86 +1,128 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withStyle_0 = v3.Style.withStyle;
-local l_ImageSetLabel_0 = v3.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_Checkbox_0 = v3.App.InputButton.Checkbox;
-local v8 = v1.PureComponent:extend("CheckboxRow");
-v8.defaultProps = {
-    height = 28, 
-    image = "icons/controls/microphone", 
-    descriptionText = "Description Text", 
-    checkboxSelected = false, 
-    actionDisabled = false, 
-    onCheckboxActivated = function() --[[ Line: 22 ]] --[[ Name: onCheckboxActivated ]]
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Checkbox = Foundation.Checkbox
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local v11 = Roact.PureComponent:extend("CheckboxRow")
 
-    end, 
-    LayoutOrder = 1
-};
-v8.validateProps = v2.interface({
-    height = v2.number, 
-    image = v2.string, 
-    descriptionText = v2.string, 
-    checkboxSelected = v2.boolean, 
-    actionDisabled = v2.boolean, 
-    onCheckboxActivated = v2.callback, 
-    LayoutOrder = v2.optional(v2.number)
-});
-v8.render = function(v9) --[[ Line: 36 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), l_Checkbox_0 (copy)
-    return l_withStyle_0(function(v10) --[[ Line: 37 ]]
-        -- upvalues: v9 (copy), v1 (ref), l_ImageSetLabel_0 (ref), l_Images_0 (ref), l_Checkbox_0 (ref)
-        local l_BaseSize_0 = v10.Font.BaseSize;
-        local v12 = nil;
-        local v13 = nil;
-        if v9.props.actionDisabled then
-            v12 = v10.Theme.TextMuted;
-            v13 = v10.Theme.IconDefault;
-        else
-            v12 = v10.Theme.TextEmphasis;
-            v13 = v10.Theme.IconEmphasis;
-        end;
-        return v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v9.props.height), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v9.props.LayoutOrder
-        }, {
-            layout = v1.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 12), 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            image = v1.createElement(l_ImageSetLabel_0, {
-                Size = UDim2.fromOffset(v9.props.height, v9.props.height), 
-                Image = l_Images_0[v9.props.image], 
-                ImageColor3 = v13.Color, 
-                ImageTransparency = v13.Transparency, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }), 
-            text = v1.createElement("TextLabel", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, -(v9.props.height + 12) * 4, 1, 0), 
-                Text = v9.props.descriptionText, 
-                TextColor3 = v12.Color, 
-                TextTransparency = v12.Transparency, 
-                TextSize = v10.Font.Header2.RelativeSize * l_BaseSize_0, 
-                Font = v10.Font.Header2.Font, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                LayoutOrder = 2
-            }), 
-            checkbox = v1.createElement(l_Checkbox_0, {
-                size = UDim2.fromOffset(v9.props.height, v9.props.height), 
-                isDisabled = v9.props.actionDisabled, 
-                isSelected = v9.props.checkboxSelected, 
-                onActivated = v9.props.onCheckboxActivated, 
-                text = "", 
-                layoutOrder = 3
-            })
-        });
-    end);
-end;
-return v8;
+v11.defaultProps = {
+	height = 28,
+	image = "icons/controls/microphone",
+	descriptionText = "Description Text",
+	checkboxSelected = false,
+	actionDisabled = false,
+	LayoutOrder = 1,
+	onCheckboxActivated = function() -- line: 27
+	end
+}
+v11.validateProps = t.interface({
+	height = t.number,
+	image = t.string,
+	descriptionText = t.string,
+	checkboxSelected = t.boolean,
+	actionDisabled = t.boolean,
+	onCheckboxActivated = t.callback,
+	LayoutOrder = t.optional(t.number)
+})
+
+function v11.render(p1) -- line: 41
+	-- upvalues: withFoundationOrUIBloxStyle (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Foundation (copy), ImageSetLabel (copy), Images (copy), Checkbox (copy)
+	return withFoundationOrUIBloxStyle(function(p2) -- line: 42
+		return {
+			Theme = {
+				IconDefault = {
+					Color = p2.Color.Content.Default.Color3,
+					Transparency = p2.Color.Content.Default.Transparency
+				},
+				IconEmphasis = {
+					Color = p2.Color.Content.Emphasis.Color3,
+					Transparency = p2.Color.Content.Emphasis.Transparency
+				},
+				TextEmphasis = {
+					Color = p2.Color.Content.Emphasis.Color3,
+					Transparency = p2.Color.Content.Emphasis.Transparency
+				},
+				TextMuted = {
+					Color = p2.Color.Content.Muted.Color3,
+					Transparency = p2.Color.Content.Muted.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				Header2 = {
+					Font = p2.Typography.TitleLarge.Font,
+					RelativeSize = p2.Typography.TitleLarge.FontSize
+				}
+			}
+		}
+	end, function(p3) -- line: 70
+		-- upvalues: p1 (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Roact (copy), Foundation (copy), ImageSetLabel (copy), Images (copy), Checkbox (copy)
+		local BaseSize = p3.Font.BaseSize
+		local TextMuted, IconDefault
+
+		if p1.props.actionDisabled then
+			TextMuted = p3.Theme.TextMuted
+			IconDefault = p3.Theme.IconDefault
+		else
+			TextMuted = p3.Theme.TextEmphasis
+			IconDefault = p3.Theme.IconEmphasis
+		end
+
+		local v18 = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.fromOffset(p1.props.height, p1.props.height),
+			Image = Images[p1.props.image],
+			ImageColor3 = IconDefault.Color,
+			ImageTransparency = IconDefault.Transparency
+		}) else Roact.createElement(Foundation.Icon, {
+			LayoutOrder = 1,
+			name = p1.props.image,
+			size = Foundation.Enums.IconSize.Medium,
+			style = {
+				Color3 = IconDefault.Color,
+				Transparency = IconDefault.Transparency
+			}
+		})
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, p1.props.height),
+			LayoutOrder = p1.props.LayoutOrder
+		}, {
+			layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 12),
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			image = v18,
+			text = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, -(p1.props.height + 12) * 4, 1, 0),
+				Text = p1.props.descriptionText,
+				TextColor3 = TextMuted.Color,
+				TextTransparency = TextMuted.Transparency,
+				TextSize = p3.Font.Header2.RelativeSize * BaseSize,
+				Font = p3.Font.Header2.Font,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			checkbox = Roact.createElement(Checkbox, {
+				label = "",
+				LayoutOrder = 3,
+				isDisabled = p1.props.actionDisabled,
+				isChecked = p1.props.checkboxSelected,
+				onActivated = p1.props.onCheckboxActivated
+			})
+		})
+	end)
+end
+
+return v11

@@ -1,33 +1,37 @@
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Roact).Component:extend("ContextActionEvent");
-v2.render = function(_) --[[ Line: 29 ]] --[[ Name: render ]]
-    return nil;
-end;
-v2.didMount = function(v4) --[[ Line: 33 ]] --[[ Name: didMount ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    if v4.props.actionPriority then
-        l_ContextActionService_0:BindCoreActionAtPriority(v4.props.name, v4.props.callback, false, 2000 + v4.props.actionPriority, unpack(v4.props.binds));
-        return;
-    else
-        l_ContextActionService_0:BindCoreAction(v4.props.name, v4.props.callback, false, unpack(v4.props.binds));
-        return;
-    end;
-end;
-v2.didUpdate = function(v5, v6) --[[ Line: 41 ]] --[[ Name: didUpdate ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    if v5.props.callback ~= v6.callback or v5.props.name ~= v6.name then
-        l_ContextActionService_0:UnbindCoreAction(v6.name);
-        if v5.props.actionPriority then
-            l_ContextActionService_0:BindCoreActionAtPriority(v5.props.name, v5.props.callback, false, 2000 + v5.props.actionPriority, unpack(v5.props.binds));
-            return;
-        else
-            l_ContextActionService_0:BindCoreAction(v5.props.name, v5.props.callback, false, unpack(v5.props.binds));
-        end;
-    end;
-end;
-v2.willUnmount = function(v7) --[[ Line: 52 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction(v7.props.name);
-end;
-return v2;
+local ContextActionService = game:GetService("ContextActionService")
+local CorePackages = game:GetService("CorePackages")
+local v3 = require(CorePackages.Packages.Roact).Component:extend("ContextActionEvent")
+
+function v3.render(_) -- line: 29
+	return nil
+end
+function v3.didMount(p2) -- line: 33
+	-- upvalues: ContextActionService (copy)
+	if p2.props.actionPriority then
+		ContextActionService:BindCoreActionAtPriority(p2.props.name, p2.props.callback, false, 2000 + p2.props.actionPriority, unpack(p2.props.binds))
+
+		return
+	end
+
+	ContextActionService:BindCoreAction(p2.props.name, p2.props.callback, false, unpack(p2.props.binds))
+end
+function v3.didUpdate(p3, p4) -- line: 41
+	-- upvalues: ContextActionService (copy)
+	if p3.props.callback ~= p4.callback or p3.props.name ~= p4.name then
+		ContextActionService:UnbindCoreAction(p4.name)
+
+		if p3.props.actionPriority then
+			ContextActionService:BindCoreActionAtPriority(p3.props.name, p3.props.callback, false, 2000 + p3.props.actionPriority, unpack(p3.props.binds))
+
+			return
+		end
+
+		ContextActionService:BindCoreAction(p3.props.name, p3.props.callback, false, unpack(p3.props.binds))
+	end
+end
+function v3.willUnmount(p5) -- line: 52
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction(p5.props.name)
+end
+
+return v3

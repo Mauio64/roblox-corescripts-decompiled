@@ -1,10 +1,16 @@
-local l_Parent_0 = script.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v2 = {};
-local v3 = require(script["merge-resolvers"]);
-l_Object_0.assign(v2, v3);
-local v4 = require(script["typedefs-mergers"]);
-l_Object_0.assign(v2, v4);
-local v5 = require(script.extensions);
-l_Object_0.assign(v2, v5);
-return v2;
+local scriptParent = script.Parent
+local Object = require(scriptParent.LuauPolyfill).Object
+local t1 = {}
+local lib = require(script["merge-resolvers"])
+
+Object.assign(t1, lib)
+
+local lib2 = require(script["typedefs-mergers"])
+
+Object.assign(t1, lib2)
+
+local extensions = require(script.extensions)
+
+Object.assign(t1, extensions)
+
+return t1

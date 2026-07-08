@@ -1,23 +1,25 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v3 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
+
 return {
-    fflag = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning), 
-    categories = {
-        v2.UploadCategory.RIGID_ACCESSORY
-    }, 
-    requiredData = {
-        v2.SharedDataMember.renderMeshesData
-    }, 
-    run = function(v4, v5) --[[ Line: 11 ]]
-        -- upvalues: v3 (copy)
-        local l_Handle_0 = v5.renderMeshesData.Handle;
-        if l_Handle_0 == nil then
-            error("Schema should have ensured data exists for handle");
-        end;
-        if #l_Handle_0.editable:GetBones() > 0 then
-            v4:fail(v3.Keys.AccessorySkinning_RigidIsSkinned);
-        end;
-    end
-};
+	fflag = require(ParentParent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning),
+	categories = { ValidationEnums.UploadCategory.RIGID_ACCESSORY },
+	requiredData = { ValidationEnums.SharedDataMember.renderMeshesData },
+	run = function(p1, p2) -- line: 13
+		-- upvalues: ErrorSourceStrings (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy)
+		local Handle = p2.renderMeshesData.Handle
+
+		if Handle == nil then
+			error("Schema should have ensured data exists for handle")
+		end
+
+		if #Handle.editable:GetBones() > 0 then
+			p1:fail(ErrorSourceStrings.Keys.AccessorySkinning_RigidIsSkinned, nil, if not getEngineFeatureEngineUGCValidationExpandReturnSchema() then nil else p2.rootInstance:FindFirstChild("Handle"))
+		end
+	end
+}

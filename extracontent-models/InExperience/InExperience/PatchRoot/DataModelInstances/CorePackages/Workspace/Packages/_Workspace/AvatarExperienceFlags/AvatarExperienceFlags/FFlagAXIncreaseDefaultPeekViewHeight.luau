@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXIncreaseDefaultPeekViewHeight", false);
+return game:DefineFastFlag("AXIncreaseDefaultPeekViewHeight", false)

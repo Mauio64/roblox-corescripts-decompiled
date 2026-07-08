@@ -1,31 +1,33 @@
-local v0 = require(script.Reducers);
-local v1 = require(script.Actions);
-local v2 = require(script.Models);
-local l_Parent_0 = script.Parent;
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.RoduxNetworking);
-local v6 = require(l_Parent_0.FriendsNetworking);
-local v7 = require(l_Parent_0.UsersNetworking);
-local v8 = require(script.roduxUsersTypes);
+local Reducers = require(script.Reducers)
+local Actions = require(script.Actions)
+local Models = require(script.Models)
+local scriptParent = script.Parent
+local Cryo = require(scriptParent.Cryo)
+local RoduxNetworking = require(scriptParent.RoduxNetworking)
+local FriendsNetworking = require(scriptParent.FriendsNetworking)
+local UsersNetworking = require(scriptParent.UsersNetworking)
+local roduxUsersTypes = require(script.roduxUsersTypes)
+
 return {
-    config = function(v9) --[[ Line: 13 ]] --[[ Name: config ]]
-        -- upvalues: v4 (copy), v7 (copy), v5 (copy), v6 (copy), v0 (copy), v1 (copy), v2 (copy), v8 (copy)
-        v9 = v4.Dictionary.join(v9, {
-            usersNetworking = v7.config({
-                roduxNetworking = v5.mock()
-            }), 
-            friendsNetworking = v6.config({
-                roduxNetworking = v5.mock()
-            })
-        });
-        return {
-            installReducer = function() --[[ Line: 24 ]] --[[ Name: installReducer ]]
-                -- upvalues: v0 (ref), v9 (ref)
-                return v0(v9);
-            end, 
-            Actions = v1, 
-            Models = v2, 
-            roduxUsersTypes = v8
-        };
-    end
-};
+	config = function(p1) -- line: 13
+		-- upvalues: Cryo (copy), UsersNetworking (copy), RoduxNetworking (copy), FriendsNetworking (copy), Reducers (copy), Actions (copy), Models (copy), roduxUsersTypes (copy)
+		local u11 = Cryo.Dictionary.join(p1, {
+			usersNetworking = UsersNetworking.config({
+				roduxNetworking = RoduxNetworking.mock()
+			}),
+			friendsNetworking = FriendsNetworking.config({
+				roduxNetworking = RoduxNetworking.mock()
+			})
+		})
+
+		return {
+			installReducer = function() -- line: 24
+				-- upvalues: Reducers (copy), u11 (ref)
+				return Reducers(u11)
+			end,
+			Actions = Actions,
+			Models = Models,
+			roduxUsersTypes = roduxUsersTypes
+		}
+	end
+}

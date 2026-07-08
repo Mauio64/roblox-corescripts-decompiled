@@ -1,83 +1,88 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GamePlayButton");
-local l_IXPService_0 = game:GetService("IXPService");
-local _ = require(l_script_FirstAncestor_0.PlayButtonTypes);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.React);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local v7 = require(l_Parent_0.RoactUtils);
-local l_useDispatch_0 = v7.Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = v7.Hooks.RoactRodux.useSelector;
-local v10 = require(l_Parent_0.VoiceChat);
-local l_OpenCentralOverlayForVerifiedEnableVoice_0 = v10.AgeVerificationOverlay.OpenCentralOverlayForVerifiedEnableVoice;
-local l_ApiPostRecordUserSeenModal_0 = v10.AgeVerificationOverlay.ApiPostRecordUserSeenModal;
-local l_SetShowAgeVerificationOverlay_0 = v10.AgeVerificationOverlay.SetShowAgeVerificationOverlay;
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_GetFStringVoiceUpsellLayer_0 = require(l_Parent_0.SharedFlags).GetFStringVoiceUpsellLayer;
-local l_GetFFlagLogExposureForExperienceUpsell_0 = v10.Flags.GetFFlagLogExposureForExperienceUpsell;
-return function(v17, v18, v19) --[[ Line: 23 ]]
-    -- upvalues: l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), l_useDispatch_0 (copy), l_useAppPolicy_0 (copy), l_useSelector_0 (copy), v4 (copy), l_GetFFlagLogExposureForExperienceUpsell_0 (copy), l_GetFStringVoiceUpsellLayer_0 (copy), l_IXPService_0 (copy), l_OpenCentralOverlayForVerifiedEnableVoice_0 (copy), l_ApiPostRecordUserSeenModal_0 (copy), l_SetShowAgeVerificationOverlay_0 (copy)
-    local v20 = l_useRoactService_0(l_RoactNetworking_0);
-    local v21 = l_useDispatch_0();
-    local v23 = l_useAppPolicy_0(function(v22) --[[ Line: 30 ]]
-        return {
-            RequireExplicitVoiceConsent = v22.RequireExplicitVoiceConsent(), 
-            showVoiceOptInOverlayEnabled = v22.getShowVoiceUpsellV2()
-        };
-    end);
-    local v25 = l_useSelector_0(function(v24) --[[ Line: 37 ]]
-        -- upvalues: v17 (copy)
-        if v24.ShowAgeVerificationOverlay[v17] ~= nil then
-            return v24.ShowAgeVerificationOverlay[v17];
-        else
-            return {};
-        end;
-    end);
-    local l_isPlaceEnabledForVoice_0 = v25.isPlaceEnabledForVoice;
-    local l_isUniverseEnabledForVoice_0 = v25.isUniverseEnabledForVoice;
-    local l_showVoiceOptInOverlay_0 = v25.showVoiceOptInOverlay;
-    local l_elegibleToSeeVoiceUpsell_0 = v25.elegibleToSeeVoiceUpsell;
-    local l_isVoiceEnabled_0 = v25.isVoiceEnabled;
-    return (v4.useCallback(function(v31) --[[ Line: 50 ]]
-        -- upvalues: l_GetFFlagLogExposureForExperienceUpsell_0 (ref), l_isUniverseEnabledForVoice_0 (copy), l_elegibleToSeeVoiceUpsell_0 (copy), l_GetFStringVoiceUpsellLayer_0 (ref), l_IXPService_0 (ref), l_showVoiceOptInOverlay_0 (copy), v23 (copy), v21 (copy), l_OpenCentralOverlayForVerifiedEnableVoice_0 (ref), v18 (copy), l_ApiPostRecordUserSeenModal_0 (ref), v20 (copy), l_SetShowAgeVerificationOverlay_0 (ref), v17 (copy), l_isPlaceEnabledForVoice_0 (copy), v19 (copy)
-        if l_GetFFlagLogExposureForExperienceUpsell_0() and l_isUniverseEnabledForVoice_0 and l_elegibleToSeeVoiceUpsell_0 then
-            local v32 = l_GetFStringVoiceUpsellLayer_0();
-            if v32 ~= "" then
-                l_IXPService_0:LogUserLayerExposure(v32);
-            end;
-        end;
-        if l_showVoiceOptInOverlay_0 and v23.showVoiceOptInOverlayEnabled then
-            v21(l_OpenCentralOverlayForVerifiedEnableVoice_0({
-                launchGame = function() --[[ Line: 59 ]] --[[ Name: launchGame ]]
-                    -- upvalues: v18 (ref), v31 (copy)
-                    v18(v31);
-                end, 
-                RequireExplicitVoiceConsent = v23.RequireExplicitVoiceConsent, 
-                postUserSeenModal = function() --[[ Line: 63 ]] --[[ Name: postUserSeenModal ]]
-                    -- upvalues: v21 (ref), l_ApiPostRecordUserSeenModal_0 (ref), v20 (ref)
-                    return v21(l_ApiPostRecordUserSeenModal_0.Fetch(v20));
-                end, 
-                setShowVoiceOptIn = function(v33) --[[ Line: 66 ]] --[[ Name: setShowVoiceOptIn ]]
-                    -- upvalues: v21 (ref), l_SetShowAgeVerificationOverlay_0 (ref), v17 (ref), l_isPlaceEnabledForVoice_0 (ref), l_isUniverseEnabledForVoice_0 (ref)
-                    v21(l_SetShowAgeVerificationOverlay_0(v17, l_isPlaceEnabledForVoice_0, l_isUniverseEnabledForVoice_0, v33.voiceEnabled, v33.showVoiceOptInOverlay));
-                end
-            }));
-            return;
-        else
-            v19(v31);
-            return;
-        end;
-    end, {
-        v20, 
-        v17, 
-        l_isPlaceEnabledForVoice_0, 
-        l_isUniverseEnabledForVoice_0, 
-        l_showVoiceOptInOverlay_0, 
-        v23.showVoiceOptInOverlayEnabled, 
-        v23.RequireExplicitVoiceConsent, 
-        l_isVoiceEnabled_0, 
-        v18, 
-        v19, 
-        l_elegibleToSeeVoiceUpsell_0
-    }));
-end;
+local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
+local IXPService = game:GetService("IXPService")
+
+require(GamePlayButton.PlayButtonTypes)
+
+local GamePlayButtonParent = GamePlayButton.Parent
+local React = require(GamePlayButtonParent.React)
+local useRoactService = require(GamePlayButtonParent.RobloxAppHooks).useRoactService
+local RoactNetworking = require(GamePlayButtonParent.RoactServiceTags).RoactNetworking
+local RoactUtils = require(GamePlayButtonParent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local VoiceChat = require(GamePlayButtonParent.VoiceChat)
+local OpenCentralOverlayForVerifiedEnableVoice = VoiceChat.AgeVerificationOverlay.OpenCentralOverlayForVerifiedEnableVoice
+local ApiPostRecordUserSeenModal = VoiceChat.AgeVerificationOverlay.ApiPostRecordUserSeenModal
+local SetShowAgeVerificationOverlay = VoiceChat.AgeVerificationOverlay.SetShowAgeVerificationOverlay
+local useAppPolicy = require(GamePlayButtonParent.UniversalAppPolicy).useAppPolicy
+local GetFStringVoiceUpsellLayer = require(GamePlayButtonParent.SharedFlags).GetFStringVoiceUpsellLayer
+
+return function(p1, p2, p3) -- line: 22
+	-- upvalues: useRoactService (copy), RoactNetworking (copy), useDispatch (copy), useAppPolicy (copy), useSelector (copy), React (copy), GetFStringVoiceUpsellLayer (copy), IXPService (copy), OpenCentralOverlayForVerifiedEnableVoice (copy), ApiPostRecordUserSeenModal (copy), SetShowAgeVerificationOverlay (copy)
+	local v19 = useRoactService(RoactNetworking)
+	local v20 = useDispatch()
+	local v21 = useAppPolicy(function(p4) -- line: 29
+		return {
+			RequireExplicitVoiceConsent = p4.RequireExplicitVoiceConsent(),
+			showVoiceOptInOverlayEnabled = p4.getShowVoiceUpsellV2()
+		}
+	end)
+	local v22 = useSelector(function(p5) -- line: 36
+		-- upvalues: p1 (copy)
+		if p5.ShowAgeVerificationOverlay[p1] ~= nil then
+			return p5.ShowAgeVerificationOverlay[p1]
+		end
+
+		return {}
+	end)
+	local isPlaceEnabledForVoice = v22.isPlaceEnabledForVoice
+	local isUniverseEnabledForVoice = v22.isUniverseEnabledForVoice
+	local showVoiceOptInOverlay = v22.showVoiceOptInOverlay
+	local elegibleToSeeVoiceUpsell = v22.elegibleToSeeVoiceUpsell
+	local isVoiceEnabled = v22.isVoiceEnabled
+
+	return (React.useCallback(function(p6) -- line: 49
+		-- upvalues: isUniverseEnabledForVoice (copy), elegibleToSeeVoiceUpsell (copy), GetFStringVoiceUpsellLayer (copy), IXPService (copy), showVoiceOptInOverlay (copy), v21 (copy), v20 (copy), OpenCentralOverlayForVerifiedEnableVoice (copy), p2 (copy), ApiPostRecordUserSeenModal (copy), v19 (copy), SetShowAgeVerificationOverlay (copy), p1 (copy), isPlaceEnabledForVoice (copy), p3 (copy)
+		if isUniverseEnabledForVoice and elegibleToSeeVoiceUpsell then
+			local v31 = GetFStringVoiceUpsellLayer()
+
+			if v31 ~= "" then
+				IXPService:LogUserLayerExposure(v31)
+			end
+		end
+
+		if showVoiceOptInOverlay and v21.showVoiceOptInOverlayEnabled then
+			v20(OpenCentralOverlayForVerifiedEnableVoice({
+				launchGame = function() -- line: 58
+					-- upvalues: p2 (copy), p6 (copy)
+					p2(p6)
+				end,
+				RequireExplicitVoiceConsent = v21.RequireExplicitVoiceConsent,
+				postUserSeenModal = function() -- line: 62
+					-- upvalues: v20 (copy), ApiPostRecordUserSeenModal (copy), v19 (copy)
+					return v20(ApiPostRecordUserSeenModal.Fetch(v19))
+				end,
+				setShowVoiceOptIn = function(t1: {[any]: any}) -- line: 65
+					-- upvalues: v20 (copy), SetShowAgeVerificationOverlay (copy), p1 (copy), isPlaceEnabledForVoice (copy), isUniverseEnabledForVoice (copy)
+					v20(SetShowAgeVerificationOverlay(p1, isPlaceEnabledForVoice, isUniverseEnabledForVoice, t1.voiceEnabled, t1.showVoiceOptInOverlay))
+				end
+			}))
+
+			return
+		end
+
+		p3(p6)
+	end, {
+		v19,
+		p1,
+		isPlaceEnabledForVoice,
+		isUniverseEnabledForVoice,
+		showVoiceOptInOverlay,
+		v21.showVoiceOptInOverlayEnabled,
+		v21.RequireExplicitVoiceConsent,
+		isVoiceEnabled,
+		p2,
+		p3,
+		elegibleToSeeVoiceUpsell
+	}))
+end

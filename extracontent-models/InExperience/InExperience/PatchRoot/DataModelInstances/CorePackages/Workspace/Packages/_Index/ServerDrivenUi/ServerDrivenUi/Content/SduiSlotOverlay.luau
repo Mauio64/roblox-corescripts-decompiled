@@ -1,109 +1,101 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.React);
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-local v3 = {
-    topLeftSlot = {
-        AnchorPoint = Vector2.zero, 
-        Position = UDim2.fromScale(0, 0)
-    }, 
-    topMiddleSlot = {
-        AnchorPoint = Vector2.new(0.5, 0), 
-        Position = UDim2.fromScale(0.5, 0)
-    }, 
-    topRightSlot = {
-        AnchorPoint = Vector2.new(1, 0), 
-        Position = UDim2.fromScale(1, 0)
-    }, 
-    centerLeftSlot = {
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.fromScale(0, 0.5)
-    }, 
-    centerMiddleSlot = {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.fromScale(0.5, 0.5)
-    }, 
-    centerRightSlot = {
-        AnchorPoint = Vector2.new(1, 0.5), 
-        Position = UDim2.fromScale(1, 0.5)
-    }, 
-    bottomLeftSlot = {
-        AnchorPoint = Vector2.new(0, 1), 
-        Position = UDim2.fromScale(0, 1)
-    }, 
-    bottomMiddleSlot = {
-        AnchorPoint = Vector2.new(0.5, 1), 
-        Position = UDim2.fromScale(0.5, 1)
-    }, 
-    bottomRightSlot = {
-        AnchorPoint = Vector2.new(1, 1), 
-        Position = UDim2.fromScale(1, 1)
-    }
-};
-return v1.memo(function(v4) --[[ Line: 77 ]] --[[ Name: SduiSlotOverlay ]]
-    -- upvalues: l_FFlagSduiServerCompat_0 (copy), v1 (copy), v3 (copy)
-    local v5 = nil;
-    local v6 = nil;
-    local v7 = nil;
-    local v8 = nil;
-    local v9 = nil;
-    if l_FFlagSduiServerCompat_0 then
-        v5 = v4.layoutOrder;
-        v6 = v4.anchorPoint;
-        v7 = v4.automaticSize;
-        v8 = v4.size;
-        v9 = v4.position;
-    else
-        v5 = v4.LayoutOrder;
-        v6 = v4.AnchorPoint;
-        v7 = v4.AutomaticSize;
-        v8 = v4.Size;
-        v9 = v4.Position;
-    end;
-    local v10 = v4.padding or 0;
-    local v14 = v1.useMemo(function() --[[ Line: 99 ]]
-        -- upvalues: v1 (ref), v10 (copy), v3 (ref), v4 (copy)
-        local v11 = {
-            UIPadding = v1.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v10), 
-                PaddingTop = UDim.new(0, v10), 
-                PaddingRight = UDim.new(0, v10), 
-                PaddingBottom = UDim.new(0, v10)
-            })
-        };
-        for v12, v13 in v3 do
-            if v4[v12] ~= nil then
-                v11[v12] = v1.createElement("Frame", {
-                    AnchorPoint = v13.AnchorPoint, 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Position = v13.Position, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(0, 0, 0, 0), 
-                    [v1.Tag] = ("data-testid=--sdui-slot-%*"):format(v12)
-                }, {
-                    item = v4[v12]
-                });
-            end;
-        end;
-        return v11;
-    end, {
-        v4.topLeftSlot, 
-        v4.topMiddleSlot, 
-        v4.topRightSlot, 
-        v4.centerLeftSlot, 
-        v4.centerMiddleSlot, 
-        v4.centerRightSlot, 
-        v4.bottomLeftSlot, 
-        v4.bottomMiddleSlot, 
-        v4.bottomRightSlot, 
-        v10
-    });
-    return v1.createElement("Frame", {
-        LayoutOrder = v5, 
-        AnchorPoint = v6, 
-        AutomaticSize = v7, 
-        Size = v8 or UDim2.new(1, 0, 1, 0), 
-        Position = v9, 
-        BackgroundTransparency = 1, 
-        [v1.Tag] = "data-testid=--sdui-slot-overlay"
-    }, v14);
-end);
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local React = require(Parent.React)
+local t1 = {
+	topLeftSlot = {
+		AnchorPoint = Vector2.zero,
+		Position = UDim2.fromScale(0, 0)
+	},
+	topMiddleSlot = {
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.fromScale(0.5, 0)
+	},
+	topRightSlot = {
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.fromScale(1, 0)
+	},
+	centerLeftSlot = {
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.fromScale(0, 0.5)
+	},
+	centerMiddleSlot = {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5)
+	},
+	centerRightSlot = {
+		AnchorPoint = Vector2.new(1, 0.5),
+		Position = UDim2.fromScale(1, 0.5)
+	},
+	bottomLeftSlot = {
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1)
+	},
+	bottomMiddleSlot = {
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.fromScale(0.5, 1)
+	},
+	bottomRightSlot = {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.fromScale(1, 1)
+	}
+}
+
+local function SduiSlotOverlay(t2: {[any]: any}) -- line: 68
+	-- upvalues: React (copy), t1 (copy)
+	local layoutOrder = t2.layoutOrder
+	local anchorPoint = t2.anchorPoint
+	local automaticSize = t2.automaticSize
+	local size = t2.size
+	local position = t2.position
+	local v11 = t2.padding or 0
+	local v12 = React.useMemo(function() -- line: 77
+		-- upvalues: React (copy), v11 (copy), t1 (copy), t2 (copy)
+		local t3 = {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v11),
+				PaddingTop = UDim.new(0, v11),
+				PaddingRight = UDim.new(0, v11),
+				PaddingBottom = UDim.new(0, v11)
+			})
+		}
+
+		for v14, v15 in t1 do
+			if t2[v14] ~= nil then
+				t3[v14] = React.createElement("Frame", {
+					AnchorPoint = v15.AnchorPoint,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Position = v15.Position,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 0, 0, 0),
+					[React.Tag] = `data-testid=--sdui-slot-{ v14 }`
+				}, {
+					item = t2[v14]
+				})
+			end
+		end
+
+		return t3
+	end, {
+		t2.topLeftSlot,
+		t2.topMiddleSlot,
+		t2.topRightSlot,
+		t2.centerLeftSlot,
+		t2.centerMiddleSlot,
+		t2.centerRightSlot,
+		t2.bottomLeftSlot,
+		t2.bottomMiddleSlot,
+		t2.bottomRightSlot,
+		v11
+	})
+
+	return React.createElement("Frame", {
+		LayoutOrder = layoutOrder,
+		AnchorPoint = anchorPoint,
+		AutomaticSize = automaticSize,
+		Size = size or UDim2.new(1, 0, 1, 0),
+		Position = position,
+		BackgroundTransparency = 1,
+		[React.Tag] = "data-testid=--sdui-slot-overlay"
+	}, v12)
+end
+
+return React.memo(SduiSlotOverlay)

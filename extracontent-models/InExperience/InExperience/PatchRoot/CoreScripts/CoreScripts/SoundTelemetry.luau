@@ -1,238 +1,264 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_SoundService_0 = game:GetService("SoundService");
-local l_Modules_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules");
-local v5 = require(l_Modules_0.Flags.GetFFlagEnableSoundSessionTelemetry);
-local v6 = require(l_Modules_0.Flags.GetFIntSoundSessionTelemetryThrottle);
-local l_game_EngineFeature_0 = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId");
-local v8 = require(l_CorePackages_0.Workspace.Packages.LoggingProtocol);
-local l_default_0 = v8.default;
-local v10 = require(l_Modules_0.AggregatedData);
-local v11 = require(l_Modules_0.PlayingSounds);
-local v12 = {
-    eventName = "SoundSessionPlayback", 
-    backends = {
-        v8.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v6(), 
-    lastUpdated = {
-        23, 
-        13, 
-        6
-    }, 
-    description = " Aggregated session-end event of all music playback data ", 
-    links = "https://roblox.atlassian.net/wiki/spaces/MUS/pages/2065826132/Scaled+Analytics+Tech+Spec"
-};
-local v13 = {};
-local v14 = v10.new();
-local v15 = v11.new(v14);
-local function v22() --[[ Line: 39 ]] --[[ Name: logSessionEvent ]]
-    -- upvalues: v14 (copy), l_RbxAnalyticsService_0 (copy), l_game_EngineFeature_0 (copy), l_default_0 (copy), v12 (copy)
-    local v16 = {};
-    local v17 = {};
-    local v18 = {};
-    for v19, v20 in pairs(v14) do
-        table.insert(v16, v19);
-        table.insert(v17, v20.loopcount);
-        table.insert(v18, v20.playtime);
-    end;
-    local v21 = {
-        asset_ids = table.concat(v16, ","), 
-        loop_counts = table.concat(v17, ","), 
-        playback_seconds = table.concat(v18, ","), 
-        placeid = tostring(game.PlaceId), 
-        sessionid = l_RbxAnalyticsService_0:GetSessionId(), 
-        universeid = tostring(game.GameId)
-    };
-    if l_game_EngineFeature_0 then
-        v21.playsessionid = l_RbxAnalyticsService_0:GetPlaySessionId();
-    end;
-    l_default_0:logRobloxTelemetryEvent(v12, nil, v21);
-end;
-local function v27() --[[ Line: 67 ]] --[[ Name: aggregateEndSessionData ]]
-    -- upvalues: v15 (copy), v22 (copy)
-    for v23, v24 in pairs(v15.sounds) do
-        for v25, _ in pairs(v24.instances) do
-            v15:removeSound(v23, v25);
-        end;
-    end;
-    v22();
-end;
-local function _(v28) --[[ Line: 79 ]] --[[ Name: isAudible ]]
-    -- upvalues: l_UserGameSettings_0 (copy)
-    local l_MasterVolume_0 = l_UserGameSettings_0.MasterVolume;
-    local v30 = if v28.SoundGroup then v28.SoundGroup.Volume else 1;
-    local l_Volume_0 = v28.Volume;
-    local l_RollOffGain_0 = v28.RollOffGain;
-    return l_MasterVolume_0 * v30 * l_Volume_0 * l_RollOffGain_0 > 0.01;
-end;
-local function _(v34) --[[ Line: 91 ]] --[[ Name: onPlayed ]]
-    -- upvalues: v5 (copy), l_UserGameSettings_0 (copy), v15 (copy)
-    if v5() then
-        local l_MasterVolume_1 = l_UserGameSettings_0.MasterVolume;
-        local v36 = if v34.SoundGroup then v34.SoundGroup.Volume else 1;
-        local l_Volume_1 = v34.Volume;
-        local l_RollOffGain_1 = v34.RollOffGain;
-        if l_MasterVolume_1 * v36 * l_Volume_1 * l_RollOffGain_1 > 0.01 then
-            v15:addSound(v34.SoundId, v34:GetDebugId(10));
-        end;
-    end;
-end;
-local function _(v40) --[[ Line: 97 ]] --[[ Name: onPaused ]]
-    -- upvalues: v5 (copy), v15 (copy)
-    if v5() then
-        v15:removeSound(v40.SoundId, v40:GetDebugId(10));
-    end;
-end;
-local function _(v42) --[[ Line: 103 ]] --[[ Name: onStopped ]]
-    -- upvalues: v5 (copy), v15 (copy)
-    if v5() then
-        v15:removeSound(v42.SoundId, v42:GetDebugId(10));
-    end;
-end;
-local function _(v44) --[[ Line: 109 ]] --[[ Name: onEnded ]]
-    -- upvalues: v5 (copy), v15 (copy)
-    if v5() then
-        v15:removeSound(v44.SoundId, v44:GetDebugId(10));
-    end;
-end;
-local function _(v46) --[[ Line: 115 ]] --[[ Name: onResumed ]]
-    -- upvalues: v5 (copy), l_UserGameSettings_0 (copy), v15 (copy)
-    if v5() then
-        local l_MasterVolume_2 = l_UserGameSettings_0.MasterVolume;
-        local v48 = if v46.SoundGroup then v46.SoundGroup.Volume else 1;
-        local l_Volume_2 = v46.Volume;
-        local l_RollOffGain_2 = v46.RollOffGain;
-        if l_MasterVolume_2 * v48 * l_Volume_2 * l_RollOffGain_2 > 0.01 then
-            v15:addSound(v46.SoundId, v46:GetDebugId(10));
-        end;
-    end;
-end;
-local _ = function(v52, _) --[[ Line: 121 ]] --[[ Name: onLooped ]]
-    -- upvalues: v5 (copy), v15 (copy)
-    if v5() then
-        v15:loopSound(v52.SoundId, v52:GetDebugId(10));
-    end;
-end;
-local function v59(v55) --[[ Line: 127 ]] --[[ Name: unhookSoundEvents ]]
-    -- upvalues: v13 (copy), v5 (copy), v15 (copy)
-    local v56 = v13[v55];
-    if v56 ~= nil then
-        for _, v58 in v56 do
-            v58:Disconnect();
-        end;
-    end;
-    if v5() then
-        v15:removeSound(v55.SoundId, v55:GetDebugId(10));
-    end;
-    v13[v55] = nil;
-end;
-local function v89(v60) --[[ Line: 140 ]] --[[ Name: hookupSoundEvents ]]
-    -- upvalues: v5 (copy), l_UserGameSettings_0 (copy), v15 (copy), v59 (copy), v13 (copy)
-    if v60.Playing and v5() then
-        local l_MasterVolume_3 = l_UserGameSettings_0.MasterVolume;
-        local v62 = if v60.SoundGroup then v60.SoundGroup.Volume else 1;
-        local l_Volume_3 = v60.Volume;
-        local l_RollOffGain_3 = v60.RollOffGain;
-        if l_MasterVolume_3 * v62 * l_Volume_3 * l_RollOffGain_3 > 0.01 then
-            v15:addSound(v60.SoundId, v60:GetDebugId(10));
-        end;
-    end;
-    v13[v60] = {
-        v60.Played:Connect(function() --[[ Line: 146 ]]
-            -- upvalues: v60 (copy), v5 (ref), l_UserGameSettings_0 (ref), v15 (ref)
-            if v60.TimeLength == 0 or not v60.IsLoaded then
-                local v65 = nil;
-                v65 = v60.Loaded:Connect(function() --[[ Line: 150 ]]
-                    -- upvalues: v60 (ref), v5 (ref), l_UserGameSettings_0 (ref), v15 (ref), v65 (ref)
-                    local l_v60_0 = v60;
-                    if v5() then
-                        local l_MasterVolume_4 = l_UserGameSettings_0.MasterVolume;
-                        local v68 = if l_v60_0.SoundGroup then l_v60_0.SoundGroup.Volume else 1;
-                        local l_Volume_4 = l_v60_0.Volume;
-                        local l_RollOffGain_4 = l_v60_0.RollOffGain;
-                        if l_MasterVolume_4 * v68 * l_Volume_4 * l_RollOffGain_4 > 0.01 then
-                            v15:addSound(l_v60_0.SoundId, l_v60_0:GetDebugId(10));
-                        end;
-                    end;
-                    v65:Disconnect();
-                end);
-                return;
-            else
-                local l_v60_1 = v60;
-                if v5() then
-                    local l_MasterVolume_5 = l_UserGameSettings_0.MasterVolume;
-                    local v73 = if l_v60_1.SoundGroup then l_v60_1.SoundGroup.Volume else 1;
-                    local l_Volume_5 = l_v60_1.Volume;
-                    local l_RollOffGain_5 = l_v60_1.RollOffGain;
-                    if l_MasterVolume_5 * v73 * l_Volume_5 * l_RollOffGain_5 > 0.01 then
-                        v15:addSound(l_v60_1.SoundId, l_v60_1:GetDebugId(10));
-                    end;
-                end;
-                return;
-            end;
-        end), 
-        v60.Paused:Connect(function() --[[ Line: 159 ]]
-            -- upvalues: v60 (copy), v5 (ref), v15 (ref)
-            local l_v60_2 = v60;
-            if v5() then
-                v15:removeSound(l_v60_2.SoundId, l_v60_2:GetDebugId(10));
-            end;
-        end), 
-        v60.Stopped:Connect(function() --[[ Line: 163 ]]
-            -- upvalues: v60 (copy), v5 (ref), v15 (ref)
-            local l_v60_3 = v60;
-            if v5() then
-                v15:removeSound(l_v60_3.SoundId, l_v60_3:GetDebugId(10));
-            end;
-        end), 
-        v60.Ended:Connect(function() --[[ Line: 167 ]]
-            -- upvalues: v60 (copy), v5 (ref), v15 (ref)
-            local l_v60_4 = v60;
-            if v5() then
-                v15:removeSound(l_v60_4.SoundId, l_v60_4:GetDebugId(10));
-            end;
-        end), 
-        v60.Resumed:Connect(function() --[[ Line: 171 ]]
-            -- upvalues: v60 (copy), v5 (ref), l_UserGameSettings_0 (ref), v15 (ref)
-            local l_v60_5 = v60;
-            if v5() then
-                local l_MasterVolume_6 = l_UserGameSettings_0.MasterVolume;
-                local v81 = if l_v60_5.SoundGroup then l_v60_5.SoundGroup.Volume else 1;
-                local l_Volume_6 = l_v60_5.Volume;
-                local l_RollOffGain_6 = l_v60_5.RollOffGain;
-                if l_MasterVolume_6 * v81 * l_Volume_6 * l_RollOffGain_6 > 0.01 then
-                    v15:addSound(l_v60_5.SoundId, l_v60_5:GetDebugId(10));
-                end;
-            end;
-        end), 
-        v60.DidLoop:Connect(function(_, _) --[[ Line: 175 ]]
-            -- upvalues: v60 (copy), v5 (ref), v15 (ref)
-            local l_v60_6 = v60;
-            if v5() then
-                v15:loopSound(l_v60_6.SoundId, l_v60_6:GetDebugId(10));
-            end;
-        end), 
-        (v60.AncestryChanged:Connect(function(v87, _) --[[ Line: 179 ]]
-            -- upvalues: v59 (ref), v60 (copy)
-            if v87:FindFirstAncestorOfClass("DataModel") == nil then
-                v59(v60);
-            end;
-        end))
-    };
-end;
-if v5() then
-    if game:GetEngineFeature("AudioInstanceAddedApiEnabled") then
-        l_SoundService_0.AudioInstanceAdded:Connect(function(v90) --[[ Line: 192 ]]
-            -- upvalues: v13 (copy), v89 (copy)
-            if v90:IsA("Sound") and not v13[v90] then
-                v89(v90);
-            end;
-        end);
-    end;
-    game.Close:Connect(function() --[[ Line: 201 ]]
-        -- upvalues: v27 (copy)
-        v27();
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local SoundService = game:GetService("SoundService")
+local Modules = game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules")
+local GetFFlagEnableSoundSessionTelemetry = require(Modules.Flags.GetFFlagEnableSoundSessionTelemetry)
+local GetFIntSoundSessionTelemetryThrottle = require(Modules.Flags.GetFIntSoundSessionTelemetryThrottle)
+local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local LoggingProtocol = require(CorePackages.Workspace.Packages.LoggingProtocol)
+local default = LoggingProtocol.default
+local AggregatedData = require(Modules.AggregatedData)
+local PlayingSounds = require(Modules.PlayingSounds)
+local t1 = {
+	eventName = "SoundSessionPlayback",
+	description = " Aggregated session-end event of all music playback data ",
+	links = "https://roblox.atlassian.net/wiki/spaces/MUS/pages/2065826132/Scaled+Analytics+Tech+Spec",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = GetFIntSoundSessionTelemetryThrottle(),
+	lastUpdated = {
+		23,
+		13,
+		6
+	}
+}
+local t2 = {}
+local v15 = AggregatedData.new()
+local v16 = PlayingSounds.new(v15)
+
+local function logSessionEvent() -- line: 39
+	-- upvalues: v15 (copy), RbxAnalyticsService (copy), EngineFeature (copy), default (copy), t1 (copy)
+	local t3 = {}
+	local t4 = {}
+	local t5 = {}
+
+	for k, v in pairs(v15) do
+		table.insert(t3, k)
+		table.insert(t4, v.loopcount)
+		table.insert(t5, v.playtime)
+	end
+
+	local t6 = {
+		asset_ids = table.concat(t3, ","),
+		loop_counts = table.concat(t4, ","),
+		playback_seconds = table.concat(t5, ","),
+		placeid = tostring(game.PlaceId),
+		sessionid = RbxAnalyticsService:GetSessionId(),
+		universeid = tostring(game.GameId)
+	}
+
+	if EngineFeature then
+		t6.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	default:logRobloxTelemetryEvent(t1, nil, t6)
+end
+local function aggregateEndSessionData() -- line: 67
+	-- upvalues: v16 (copy), logSessionEvent (copy)
+	for k, v in pairs(v16.sounds) do
+		for k2, _ in pairs(v.instances) do
+			v16:removeSound(k, k2)
+		end
+	end
+
+	logSessionEvent()
+end
+local function isAudible(p1) -- line: 79
+	-- upvalues: UserGameSettings (copy)
+	local MasterVolume = UserGameSettings.MasterVolume
+	local v40 = not p1.SoundGroup and 1 or p1.SoundGroup.Volume
+	local p1Volume = p1.Volume
+	local RollOffGain = p1.RollOffGain
+
+	return MasterVolume * v40 * p1Volume * RollOffGain > 0.01
+end
+local function onPlayed(p2) -- line: 91
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		local MasterVolume = UserGameSettings.MasterVolume
+		local v45 = not p2.SoundGroup and 1 or p2.SoundGroup.Volume
+		local p2Volume = p2.Volume
+		local RollOffGain = p2.RollOffGain
+
+		if MasterVolume * v45 * p2Volume * RollOffGain > 0.01 then
+			v16:addSound(p2.SoundId, p2:GetDebugId(10))
+		end
+	end
+end
+local function onPaused(p3) -- line: 97
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		v16:removeSound(p3.SoundId, p3:GetDebugId(10))
+	end
+end
+local function onStopped(p4) -- line: 103
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		v16:removeSound(p4.SoundId, p4:GetDebugId(10))
+	end
+end
+local function onEnded(p5) -- line: 109
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		v16:removeSound(p5.SoundId, p5:GetDebugId(10))
+	end
+end
+local function onResumed(p6) -- line: 115
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		local MasterVolume = UserGameSettings.MasterVolume
+		local v53 = not p6.SoundGroup and 1 or p6.SoundGroup.Volume
+		local p6Volume = p6.Volume
+		local RollOffGain = p6.RollOffGain
+
+		if MasterVolume * v53 * p6Volume * RollOffGain > 0.01 then
+			v16:addSound(p6.SoundId, p6:GetDebugId(10))
+		end
+	end
+end
+local function onLooped(p7, _: number) -- line: 121
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+	if GetFFlagEnableSoundSessionTelemetry() then
+		v16:loopSound(p7.SoundId, p7:GetDebugId(10))
+	end
+end
+local function unhookSoundEvents(p8) -- line: 127
+	-- upvalues: t2 (copy), GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+	local v59 = t2[p8]
+
+	if v59 ~= nil then
+		for _, v61 in v59 do
+			v61:Disconnect()
+		end
+	end
+
+	if GetFFlagEnableSoundSessionTelemetry() then
+		v16:removeSound(p8.SoundId, p8:GetDebugId(10))
+	end
+
+	t2[p8] = nil
+end
+local function hookupSoundEvents(p9) -- line: 140
+	-- upvalues: GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy), unhookSoundEvents (copy), t2 (copy)
+	if p9.Playing and GetFFlagEnableSoundSessionTelemetry() then
+		local MasterVolume = UserGameSettings.MasterVolume
+		local v64 = not p9.SoundGroup and 1 or p9.SoundGroup.Volume
+		local p9Volume = p9.Volume
+		local RollOffGain = p9.RollOffGain
+
+		if MasterVolume * v64 * p9Volume * RollOffGain > 0.01 then
+			v16:addSound(p9.SoundId, p9:GetDebugId(10))
+		end
+	end
+
+	t2[p9] = {
+		p9.Played:Connect(function() -- line: 146
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy)
+			if p9.TimeLength == 0 or not p9.IsLoaded then
+				local connection = nil
+
+				connection = p9.Loaded:Connect(function() -- line: 150
+					-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy), connection (ref)
+					local v87 = p9
+
+					if GetFFlagEnableSoundSessionTelemetry() then
+						local MasterVolume = UserGameSettings.MasterVolume
+						local v89 = not v87.SoundGroup and 1 or v87.SoundGroup.Volume
+						local Volume = v87.Volume
+						local RollOffGain = v87.RollOffGain
+
+						if MasterVolume * v89 * Volume * RollOffGain > 0.01 then
+							v16:addSound(v87.SoundId, v87:GetDebugId(10))
+						end
+					end
+
+					connection:Disconnect()
+				end)
+
+				return
+			end
+
+			local v69 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				local MasterVolume = UserGameSettings.MasterVolume
+				local v71 = not v69.SoundGroup and 1 or v69.SoundGroup.Volume
+				local Volume = v69.Volume
+				local RollOffGain = v69.RollOffGain
+
+				if MasterVolume * v71 * Volume * RollOffGain > 0.01 then
+					v16:addSound(v69.SoundId, v69:GetDebugId(10))
+				end
+			end
+		end),
+		p9.Paused:Connect(function() -- line: 159
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+			local v74 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				v16:removeSound(v74.SoundId, v74:GetDebugId(10))
+			end
+		end),
+		p9.Stopped:Connect(function() -- line: 163
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+			local v75 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				v16:removeSound(v75.SoundId, v75:GetDebugId(10))
+			end
+		end),
+		p9.Ended:Connect(function() -- line: 167
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+			local v76 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				v16:removeSound(v76.SoundId, v76:GetDebugId(10))
+			end
+		end),
+		p9.Resumed:Connect(function() -- line: 171
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), UserGameSettings (copy), v16 (copy)
+			local v77 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				local MasterVolume = UserGameSettings.MasterVolume
+				local v79 = not v77.SoundGroup and 1 or v77.SoundGroup.Volume
+				local Volume = v77.Volume
+				local RollOffGain = v77.RollOffGain
+
+				if MasterVolume * v79 * Volume * RollOffGain > 0.01 then
+					v16:addSound(v77.SoundId, v77:GetDebugId(10))
+				end
+			end
+		end),
+		p9.DidLoop:Connect(function(_, _) -- line: 175
+			-- upvalues: p9 (copy), GetFFlagEnableSoundSessionTelemetry (copy), v16 (copy)
+			local v84 = p9
+
+			if GetFFlagEnableSoundSessionTelemetry() then
+				v16:loopSound(v84.SoundId, v84:GetDebugId(10))
+			end
+		end),
+		(p9.AncestryChanged:Connect(function(child, _) -- line: 179
+			-- upvalues: unhookSoundEvents (copy), p9 (copy)
+			if child:FindFirstAncestorOfClass("DataModel") == nil then
+				unhookSoundEvents(p9)
+			end
+		end))
+	}
+end
+
+if GetFFlagEnableSoundSessionTelemetry() then
+	if game:GetEngineFeature("AudioInstanceAddedApiEnabled") then
+		SoundService.AudioInstanceAdded:Connect(function(p13) -- line: 192
+			-- upvalues: t2 (copy), hookupSoundEvents (copy)
+			if p13:IsA("Sound") and not t2[p13] then
+				hookupSoundEvents(p13)
+			end
+		end)
+	end
+
+	game.Close:Connect(function() -- line: 201
+		-- upvalues: aggregateEndSessionData (copy)
+		aggregateEndSessionData()
+	end)
+end

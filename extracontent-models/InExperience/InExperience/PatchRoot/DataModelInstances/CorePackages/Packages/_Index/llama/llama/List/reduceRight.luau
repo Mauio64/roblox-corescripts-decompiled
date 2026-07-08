@@ -1,16 +1,24 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: reduceRight ]]
-    local v3 = type(v0);
-    assert(v3 == "table", "expected a table for first argument, got " .. v3);
-    local v4 = type(v1);
-    assert(v4 == "function", "expected a function for second argument, got " .. v4);
-    local v5 = #v0;
-    local l_v2_0 = v2;
-    if l_v2_0 == nil then
-        l_v2_0 = v0[v5];
-    end;
-    local v7 = v2 == nil and v5 - 1 or v5;
-    for v8 = v7, 1, -1 do
-        l_v2_0 = v1(l_v2_0, v0[v8], v8);
-    end;
-    return l_v2_0;
-end;
+local function reduceRight(p1, p2, p3) -- line: 2
+	local v5 = type(p1)
+
+	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+
+	local v6 = type(p2)
+
+	assert(v6 == "function", "expected a function for second argument, got " .. v6)
+
+	local v7 = #p1
+	local v8 = p3
+
+	if v8 == nil then
+		v8 = p1[v7]
+	end
+
+	for i = p3 == nil and v7 - 1 or v7, 1, -1 do
+		v8 = p2(v8, p1[i], i)
+	end
+
+	return v8
+end
+
+return reduceRight

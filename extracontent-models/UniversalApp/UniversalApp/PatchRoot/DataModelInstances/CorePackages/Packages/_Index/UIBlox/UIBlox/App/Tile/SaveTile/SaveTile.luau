@@ -1,60 +1,64 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.Cryo);
-local v5 = require(l_Parent_2.t);
-local v6 = require(l_Parent_1.App.ImageSet.Images);
-local v7 = require(l_Parent_0.BaseTile.Tile);
-local v8 = v3.PureComponent:extend("SaveTile");
-v8.validateProps = v5.strictInterface({
-    hasRoundedCorners = v5.optional(v5.boolean), 
-    onActivated = v5.optional(v5.callback), 
-    isDisabled = v5.optional(v5.boolean), 
-    thumbnail = v5.optional(v5.union(v5.string, v5.table)), 
-    thumbnailSize = v5.optional(v5.UDim2), 
-    thumbnailTransparency = v5.optional(v5.number), 
-    NextSelectionLeft = v5.optional(v5.table), 
-    NextSelectionRight = v5.optional(v5.table), 
-    NextSelectionUp = v5.optional(v5.table), 
-    NextSelectionDown = v5.optional(v5.table), 
-    thumbnailRef = v5.optional(v5.table), 
-    isRoactGamepadEnabled = v5.optional(v5.boolean)
-});
-v8.defaultProps = {
-    hasRoundedCorners = true, 
-    thumbnail = v6["icons/actions/edit/add"], 
-    thumbnailSize = UDim2.new(0, 36, 0, 36), 
-    thumbnailTransparency = 0, 
-    isRoactGamepadEnabled = true
-};
-v8.render = function(v9) --[[ Line: 54 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v7 (copy)
-    local l_hasRoundedCorners_0 = v9.props.hasRoundedCorners;
-    local l_onActivated_0 = v9.props.onActivated;
-    local l_isDisabled_0 = v9.props.isDisabled;
-    local l_thumbnail_0 = v9.props.thumbnail;
-    local l_thumbnailSize_0 = v9.props.thumbnailSize;
-    local l_thumbnailTransparency_0 = v9.props.thumbnailTransparency;
-    return v3.createElement(v7, {
-        hasRoundedCorners = l_hasRoundedCorners_0, 
-        name = "", 
-        onActivated = l_onActivated_0, 
-        isDisabled = l_isDisabled_0, 
-        thumbnail = l_thumbnail_0, 
-        thumbnailSize = l_thumbnailSize_0, 
-        thumbnailTransparency = l_thumbnailTransparency_0, 
-        isRoactGamepadEnabled = v9.props.isRoactGamepadEnabled, 
-        NextSelectionLeft = v9.props.NextSelectionLeft, 
-        NextSelectionRight = v9.props.NextSelectionRight, 
-        NextSelectionUp = v9.props.NextSelectionUp, 
-        NextSelectionDown = v9.props.NextSelectionDown, 
-        [v3.Ref] = v9.props.thumbnailRef
-    });
-end;
-return v3.forwardRef(function(v16, v17) --[[ Line: 79 ]]
-    -- upvalues: v3 (copy), v8 (copy), v4 (copy)
-    return v3.createElement(v8, v4.Dictionary.join(v16, {
-        thumbnailRef = v17
-    }));
-end);
+local ParentParent = script.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local ParentParent2Parent = ParentParent2.Parent
+local Roact = require(ParentParent2Parent.Roact)
+local Cryo = require(ParentParent2Parent.Cryo)
+local t = require(ParentParent2Parent.t)
+local Images = require(ParentParent2.App.ImageSet.Images)
+local Tile = require(ParentParent.BaseTile.Tile)
+local v9 = Roact.PureComponent:extend("SaveTile")
+
+v9.validateProps = t.strictInterface({
+	hasRoundedCorners = t.optional(t.boolean),
+	onActivated = t.optional(t.callback),
+	isDisabled = t.optional(t.boolean),
+	thumbnail = t.optional(t.union(t.string, t.table)),
+	thumbnailSize = t.optional(t.UDim2),
+	thumbnailTransparency = t.optional(t.number),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	thumbnailRef = t.optional(t.table),
+	isRoactGamepadEnabled = t.optional(t.boolean)
+})
+v9.defaultProps = {
+	hasRoundedCorners = true,
+	thumbnailTransparency = 0,
+	isRoactGamepadEnabled = true,
+	thumbnail = Images["icons/actions/edit/add"],
+	thumbnailSize = UDim2.new(0, 36, 0, 36)
+}
+
+function v9.render(p1) -- line: 54
+	-- upvalues: Roact (copy), Tile (copy)
+	local hasRoundedCorners = p1.props.hasRoundedCorners
+	local onActivated = p1.props.onActivated
+	local isDisabled = p1.props.isDisabled
+	local thumbnail = p1.props.thumbnail
+	local thumbnailSize = p1.props.thumbnailSize
+	local thumbnailTransparency = p1.props.thumbnailTransparency
+
+	return Roact.createElement(Tile, {
+		hasRoundedCorners = hasRoundedCorners,
+		name = "",
+		onActivated = onActivated,
+		isDisabled = isDisabled,
+		thumbnail = thumbnail,
+		thumbnailSize = thumbnailSize,
+		thumbnailTransparency = thumbnailTransparency,
+		isRoactGamepadEnabled = p1.props.isRoactGamepadEnabled,
+		NextSelectionLeft = p1.props.NextSelectionLeft,
+		NextSelectionRight = p1.props.NextSelectionRight,
+		NextSelectionUp = p1.props.NextSelectionUp,
+		NextSelectionDown = p1.props.NextSelectionDown,
+		[Roact.Ref] = p1.props.thumbnailRef
+	})
+end
+
+return Roact.forwardRef(function(p2, p3) -- line: 79
+	-- upvalues: Roact (copy), v9 (copy), Cryo (copy)
+	return Roact.createElement(v9, Cryo.Dictionary.join(p2, {
+		thumbnailRef = p3
+	}))
+end)

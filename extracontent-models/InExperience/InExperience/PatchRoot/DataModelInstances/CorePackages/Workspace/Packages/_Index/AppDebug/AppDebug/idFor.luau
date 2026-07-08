@@ -1,18 +1,23 @@
-local v0 = 1;
-local v1 = setmetatable({}, {
-    __mode = "k"
-});
-return function(v2) --[[ Line: 15 ]] --[[ Name: idFor ]]
-    -- upvalues: v1 (copy), v0 (ref)
-    if v2 == nil then
-        return 0;
-    else
-        local v3 = v1[v2];
-        if not v3 then
-            v3 = v0;
-            v0 = v0 + 1;
-            v1[v2] = v3;
-        end;
-        return v3;
-    end;
-end;
+local n1 = 1
+local self = setmetatable({}, {
+	__mode = "k"
+})
+
+local function idFor(p1) -- line: 15
+	-- upvalues: self (copy), n1 (ref)
+	if p1 == nil then
+		return 0
+	end
+
+	local v5 = self[p1]
+
+	if not v5 then
+		v5 = n1
+		n1 += 1
+		self[p1] = v5
+	end
+
+	return v5
+end
+
+return idFor

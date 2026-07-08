@@ -1,1 +1,1 @@
-return game:DefineFastString("PaginatedCarouselExperimentLayer", "PlayerApp.HomePage.UX");
+return game:DefineFastString("PaginatedCarouselExperimentLayer", "PlayerApp.HomePage.UX")

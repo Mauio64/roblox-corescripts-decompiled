@@ -1,27 +1,36 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.LuauPolyfill);
-local v3 = require(l_Parent_1.React);
-local l_getApolloContext_0 = require(script.Parent.ApolloContext).getApolloContext;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local _ = require(l_Parent_0.core.ApolloClient);
-ApolloProvider = function(v7) --[[ Line: 29 ]] --[[ Name: ApolloProvider ]]
-    -- upvalues: l_getApolloContext_0 (copy), v3 (copy), l_invariant_0 (copy)
-    local v8 = l_getApolloContext_0();
-    return v3.createElement(v8.Consumer, nil, function(v9) --[[ Line: 31 ]]
-        -- upvalues: v7 (copy), l_invariant_0 (ref), v3 (ref), v8 (copy)
-        if v9 == nil then
-            v9 = {};
-        end;
-        if v7.client and v9.client ~= v7.client then
-            v9.client = v7.client;
-        end;
-        l_invariant_0(v9.client, "ApolloProvider was not passed a client instance. Make sure you pass in your client via the \"client\" prop.");
-        return v3.createElement(v8.Provider, {
-            value = v9
-        }, v7.children);
-    end);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+
+require(ParentParentParent.LuauPolyfill)
+
+local React = require(ParentParentParent.React)
+local getApolloContext = require(script.Parent.ApolloContext).getApolloContext
+local invariant = require(ParentParent.jsutils.invariant).invariant
+
+require(ParentParent.core.ApolloClient)
+
+function ApolloProvider(t1: {[any]: any}) -- line: 29
+	-- upvalues: getApolloContext (copy), React (copy), invariant (copy)
+	local v7 = getApolloContext()
+
+	return React.createElement(v7.Consumer, nil, function(p1) -- line: 31
+		-- upvalues: t1 (copy), invariant (copy), React (copy), v7 (copy)
+		if p1 == nil then
+			p1 = {}
+		end
+
+		if t1.client and p1.client ~= t1.client then
+			p1.client = t1.client
+		end
+
+		invariant(p1.client, "ApolloProvider was not passed a client instance. Make sure you pass in your client via the \"client\" prop.")
+
+		return React.createElement(v7.Provider, {
+			value = p1
+		}, t1.children)
+	end)
+end
+
 return {
-    ApolloProvider = ApolloProvider
-};
+	ApolloProvider = ApolloProvider
+}

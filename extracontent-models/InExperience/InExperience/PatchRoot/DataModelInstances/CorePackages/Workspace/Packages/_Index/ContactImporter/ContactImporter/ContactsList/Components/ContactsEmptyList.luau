@@ -1,1 +1,1 @@
-return require(script.ContactsEmptyList);
+return require(script.ContactsEmptyList)

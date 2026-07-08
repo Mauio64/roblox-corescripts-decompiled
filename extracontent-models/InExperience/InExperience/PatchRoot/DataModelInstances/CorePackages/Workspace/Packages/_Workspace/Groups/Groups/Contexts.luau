@@ -1,4 +1,4 @@
 return {
-    GroupsWrapperContext = require(script.GroupsWrapperContext), 
-    useGroupsWrapperContext = require(script.useGroupsWrapperContext)
-};
+	GroupsWrapperContext = require(script.GroupsWrapperContext),
+	useGroupsWrapperContext = require(script.useGroupsWrapperContext)
+}

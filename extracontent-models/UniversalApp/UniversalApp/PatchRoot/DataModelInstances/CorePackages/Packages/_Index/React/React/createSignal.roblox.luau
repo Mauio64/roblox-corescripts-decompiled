@@ -1,34 +1,48 @@
-return function() --[[ Line: 36 ]] --[[ Name: createSignal ]]
-    local v0 = {};
-    local v1 = {};
-    local v2 = false;
-    return function(v3) --[[ Line: 41 ]] --[[ Name: subscribe ]]
-        -- upvalues: v2 (ref), v0 (copy), v1 (copy)
-        assert(typeof(v3) == "function", "Can only subscribe to signals with a function.");
-        local v4 = {
-            callback = v3, 
-            disconnected = false
-        };
-        if v2 and not v0[v3] then
-            v1[v3] = v4;
-        end;
-        v0[v3] = v4;
-        return function() --[[ Line: 60 ]] --[[ Name: disconnect ]]
-            -- upvalues: v4 (copy), v0 (ref), v3 (copy), v1 (ref)
-            assert(not v4.disconnected, "Listeners can only be disconnected once.");
-            v4.disconnected = true;
-            v0[v3] = nil;
-            v1[v3] = nil;
-        end;
-    end, function(...) --[[ Line: 74 ]] --[[ Name: fire ]]
-        -- upvalues: v2 (ref), v0 (copy), v1 (copy)
-        v2 = true;
-        for v5, v6 in v0 do
-            if not v6.disconnected and not v1[v5] then
-                v5(...);
-            end;
-        end;
-        v2 = false;
-        table.clear(v1);
-    end;
-end;
+local function createSignal() -- line: 36
+	local t1 = {}
+	local t2 = {}
+	local u4 = false
+
+	local function subscribe(p1) -- line: 41
+		-- upvalues: u4 (ref), t1 (copy), t2 (copy)
+		assert(typeof(p1) == "function", "Can only subscribe to signals with a function.")
+
+		local t3 = {
+			disconnected = false,
+			callback = p1
+		}
+
+		if u4 and not t1[p1] then
+			t2[p1] = t3
+		end
+
+		t1[p1] = t3
+
+		local function disconnect() -- line: 60
+			-- upvalues: t3 (copy), t1 (copy), p1 (copy), t2 (copy)
+			assert(not t3.disconnected, "Listeners can only be disconnected once.")
+			t3.disconnected = true
+			t1[p1] = nil
+			t2[p1] = nil
+		end
+
+		return disconnect
+	end
+	local function fire(...) -- line: 74
+		-- upvalues: u4 (ref), t1 (copy), t2 (copy)
+		u4 = true
+
+		for v10, v11 in t1 do
+			if not v11.disconnected and not t2[v10] then
+				v10(...)
+			end
+		end
+
+		u4 = false
+		table.clear(t2)
+	end
+
+	return subscribe, fire
+end
+
+return createSignal

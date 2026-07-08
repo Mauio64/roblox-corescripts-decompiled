@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddThumbnailSelectorReport6", false);
+return game:DefineFastFlag("AddThumbnailSelectorReport6", false)

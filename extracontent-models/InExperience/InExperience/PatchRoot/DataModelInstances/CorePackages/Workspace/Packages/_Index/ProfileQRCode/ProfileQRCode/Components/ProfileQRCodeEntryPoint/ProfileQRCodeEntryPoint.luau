@@ -1,29 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Analytics.AnalyticsService);
-local v3 = require(l_script_FirstAncestor_0.Analytics);
-local v4 = require(l_Parent_0.React);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v6 = require(l_script_FirstAncestor_0.Components.ProfileQRCodePage.ProfileQRCodePage);
-return function(v7) --[[ Line: 22 ]]
-    -- upvalues: v3 (copy), v2 (copy), l_useLocalUserId_0 (copy), v4 (copy), v6 (copy)
-    local v8 = v3.setupFireEvent({
-        analytics = if v7.analyticsService then v7.analyticsService else v2, 
-        infoForAllEvents = {
-            uid = l_useLocalUserId_0(), 
-            source = v7.source
-        }
-    });
-    return v4.createElement(v3.Context.Provider, {
-        value = {
-            fireEvent = v8
-        }
-    }, {
-        Window = v4.createElement(v6, {
-            appStorageService = v7.appStorageService, 
-            robloxEventReceiver = v7.robloxEventReceiver, 
-            onClose = v7.onClose, 
-            openQrCodeScanner = v7.openQrCodeScanner
-        })
-    });
-end;
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local AnalyticsService = require(ProfileQRCode.Analytics.AnalyticsService)
+local Analytics = require(ProfileQRCode.Analytics)
+local React = require(ProfileQRCodeParent.React)
+local useLocalUserId = require(ProfileQRCodeParent.RobloxAppHooks).useLocalUserId
+local ProfileQRCodePage = require(ProfileQRCode.Components.ProfileQRCodePage.ProfileQRCodePage)
+
+return function(t1: {[any]: any}) -- line: 22
+	-- upvalues: Analytics (copy), AnalyticsService (copy), useLocalUserId (copy), React (copy), ProfileQRCodePage (copy)
+	local v9 = Analytics.setupFireEvent({
+		analytics = if not t1.analyticsService then AnalyticsService else t1.analyticsService,
+		infoForAllEvents = {
+			uid = useLocalUserId(),
+			source = t1.source
+		}
+	})
+
+	return React.createElement(Analytics.Context.Provider, {
+		value = {
+			fireEvent = v9
+		}
+	}, {
+		Window = React.createElement(ProfileQRCodePage, {
+			appStorageService = t1.appStorageService,
+			robloxEventReceiver = t1.robloxEventReceiver,
+			onClose = t1.onClose,
+			openQrCodeScanner = t1.openQrCodeScanner
+		})
+	})
+end

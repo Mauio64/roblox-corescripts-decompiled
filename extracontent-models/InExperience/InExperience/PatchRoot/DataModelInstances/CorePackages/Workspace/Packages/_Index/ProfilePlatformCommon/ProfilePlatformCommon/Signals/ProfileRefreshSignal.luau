@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatformCommon").Parent;
-local v1, v2 = require(l_Parent_0.Signals).createSignal(0);
+local Parent = script:FindFirstAncestor("ProfilePlatformCommon").Parent
+local v2, v3 = require(Parent.Signals).createSignal(0)
+
 return {
-    notifyProfileRefresh = function() --[[ Line: 7 ]] --[[ Name: notifyProfileRefresh ]]
-        -- upvalues: v2 (copy)
-        v2(os.clock());
-    end, 
-    getProfileRefreshSignal = v1
-};
+	notifyProfileRefresh = function() -- line: 7
+		-- upvalues: v3 (copy)
+		v3(os.clock())
+	end,
+	getProfileRefreshSignal = v2
+}

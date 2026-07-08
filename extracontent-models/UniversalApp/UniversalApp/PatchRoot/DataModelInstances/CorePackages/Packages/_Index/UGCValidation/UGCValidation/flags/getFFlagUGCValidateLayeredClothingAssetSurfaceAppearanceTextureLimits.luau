@@ -1,7 +1,9 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.flags.getEngineUGCValidateAssetTextureLimits);
-game:DefineFastFlag("UGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits", false);
-return function() --[[ Line: 7 ]]
-    -- upvalues: v1 (copy)
-    return v1() and game:GetFastFlag("UGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits");
-end;
+local ParentParent = script.Parent.Parent
+local getEngineUGCValidateAssetTextureLimits = require(ParentParent.flags.getEngineUGCValidateAssetTextureLimits)
+
+game:DefineFastFlag("UGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits", false)
+
+return function() -- line: 7
+	-- upvalues: getEngineUGCValidateAssetTextureLimits (copy)
+	return getEngineUGCValidateAssetTextureLimits() and game:GetFastFlag("UGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits")
+end

@@ -1,3 +1,3 @@
 return {
-    writeNamesQuery = require(script.writeNamesQuery)
-};
+	writeNamesQuery = require(script.writeNamesQuery)
+}

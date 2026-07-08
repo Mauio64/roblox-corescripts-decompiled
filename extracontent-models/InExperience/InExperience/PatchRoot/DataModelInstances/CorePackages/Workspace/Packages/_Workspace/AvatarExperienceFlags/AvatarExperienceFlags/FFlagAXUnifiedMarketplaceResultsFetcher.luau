@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXUnifiedMarketplaceResultsFetcherV3", false);
+return game:DefineFastFlag("AXUnifiedMarketplaceResultsFetcherV3", false)

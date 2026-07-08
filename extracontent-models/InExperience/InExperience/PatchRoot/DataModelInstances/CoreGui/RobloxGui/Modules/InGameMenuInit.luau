@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent;
-return require(l_Parent_0.InGameMenu);
+local scriptParent = script.Parent
+
+return require(scriptParent.InGameMenu)

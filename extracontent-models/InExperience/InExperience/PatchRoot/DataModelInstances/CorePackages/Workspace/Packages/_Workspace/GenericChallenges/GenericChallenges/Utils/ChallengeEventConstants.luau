@@ -1,8 +1,9 @@
 return {
-    ChallengeLifecycleEventConstants = {
-        ChallengeInitialized = "challengeInitialized", 
-        ChallengeCompleted = "challengeCompleted", 
-        ChallengeInvalidated = "challengeInvalidated", 
-        ChallengeAbandoned = "challengeAbandoned"
-    }
-};
+	ChallengeLifecycleEventConstants = {
+		ChallengeInitialized = "challengeInitialized",
+		ChallengeDisplayed = "challengeDisplayed",
+		ChallengeCompleted = "challengeCompleted",
+		ChallengeInvalidated = "challengeInvalidated",
+		ChallengeAbandoned = "challengeAbandoned"
+	}
+}

@@ -4,13 +4,15 @@ local PurchasePromptParent = PurchasePrompt.Parent
 require(PurchasePromptParent.IAPExperience)
 
 local FFlagFixResaleDisplayPrice = require(PurchasePrompt.Flags.FFlagFixResaleDisplayPrice)
+local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
+local selectCartPricingOverride = require(script.Parent.selectCartPricingOverride)
 
-return function(t1: {[any]: any}) --[[ selectPrice ]] -- line: 22
-	-- upvalues: FFlagFixResaleDisplayPrice (copy)
+local function selectPrice(t1: {[any]: any}) -- line: 30
+	-- upvalues: FFlagFixResaleDisplayPrice (copy), FFlagPurchasePromptCartPricingEnabled (copy), selectCartPricingOverride (copy)
 	local productInfo = t1.productInfo
-	local v6 = productInfo.price or 0
-	local v7 = productInfo.basePrice or v6
-	local v8 = productInfo.priceDiscountDetails or {}
+	local v9 = productInfo.price or 0
+	local v10 = productInfo.basePrice or v9
+	local v11 = productInfo.priceDiscountDetails or {}
 
 	if FFlagFixResaleDisplayPrice and t1.promptRequest then
 		local collectibleItemInstanceId = t1.promptRequest.collectibleItemInstanceId
@@ -19,15 +21,29 @@ return function(t1: {[any]: any}) --[[ selectPrice ]] -- line: 22
 			local expectedPrice = t1.promptRequest.expectedPrice
 
 			if expectedPrice ~= nil then
-				v6 = expectedPrice
-				v7 = expectedPrice
+				v9 = expectedPrice
+				v10 = expectedPrice
+			end
+		end
+	end
+
+	if FFlagPurchasePromptCartPricingEnabled then
+		local v14 = selectCartPricingOverride(t1)
+
+		if v14 ~= nil then
+			v9 = v14.priceInRobux
+
+			if v14.basePriceInRobux ~= nil then
+				v10 = v14.basePriceInRobux
 			end
 		end
 	end
 
 	return {
-		priceInRobux = v6,
-		basePriceInRobux = v7,
-		discounts = v8
+		priceInRobux = v9,
+		basePriceInRobux = v10,
+		discounts = v11
 	}
 end
+
+return selectPrice

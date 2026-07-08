@@ -1,21 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.LuauPolyfill);
-local v3 = require(l_script_FirstAncestor_0.url.CHAT_PLATFORM_BASE_URL);
-local v4 = require(script.Parent.RoduxNetworking);
-local _ = require(l_script_FirstAncestor_0.responses.SharedTypes);
-return v4.POST(script.Name, function(v6, v7, v8, v9) --[[ Line: 15 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v11 = v2.Array.map(v8, function(v10) --[[ Line: 21 ]]
-        return (tonumber(v10));
-    end);
-    return v6(v3):path("v1"):path("create-conversations"):body({
-        conversations = {
-            {
-                type = v7, 
-                name = v9, 
-                participant_user_ids = v11
-            }
-        }
-    }):setStatusIds(v8);
-end);
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local AppChatNetworkingParent = AppChatNetworking.Parent
+local LuauPolyfill = require(AppChatNetworkingParent.LuauPolyfill)
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+require(AppChatNetworking.responses.SharedTypes)
+
+return RoduxNetworking.POST(script.Name, function(p1, p2, t1: {[any]: any}, s1: string?) -- line: 15
+	-- upvalues: LuauPolyfill (copy), CHAT_PLATFORM_BASE_URL (copy)
+	local v10 = LuauPolyfill.Array.map(t1, function(p3) -- line: 21
+		return (tonumber(p3))
+	end)
+
+	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("create-conversations"):body({
+		conversations = {{
+			type = p2,
+			name = s1,
+			participant_user_ids = v10
+		}}
+	}):setStatusIds(t1)
+end)

@@ -18,7 +18,6 @@ local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMoun
 local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
 local useNavigation = require(AppChatParent.Navigation).useNavigation
 local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
-local useChatPagePadding = require(AppChat.Contexts.ChatPagePadding.useChatPagePadding)
 local useState = React.useState
 local useRef = React.useRef
 local useIsGuiInChatVisible = require(AppChat.Hooks.useIsGuiInChatVisible)
@@ -29,35 +28,27 @@ local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
 local useTelemetry = require(AppChat.Telemetry.useTelemetry)
 local Enum2 = require(AppChatParent.UIBlox).App.Button.Enum
 local SocialUpsell = require(AppChatParent.SocialUpsell)
-local Foundation = require(AppChatParent.Foundation)
-local UpsellBanner = SocialUpsell.UpsellBanner
-local UpsellEntrySurfaceType = SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType
-local UpsellComponent = SocialUpsell.Analytics.Enum.UpsellComponent
-local FFlagEnableAEGIS1AppChatBanner = SocialUpsell.Flags.FFlagEnableAEGIS1AppChatBanner
-local useSocialUpsellOverlayController = SocialUpsell.Hooks.useSocialUpsellOverlayController
 local AccessResponseEnum = require(AppChatParent.AmpUpsell).AmpEnums.AccessResponseEnum
 local AppChatNetworking = require(AppChatParent.AppChatNetworking)
 local ChatLandingModalVariant = AppChatNetworking.Constants.ChatLandingModalVariant
 local AppPage = require(AppChatParent.RobloxAppEnums).AppPage
 local NavigateBack = require(AppChatParent.NavigationRodux).Thunks.NavigateBack
 local NavigateDown = require(AppChatParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(AppChatParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v35 = if not FFlagSignalsNavP3Dispatch then nil else require(AppChatParent.RobloxAppNavigation).NavigationCommands
 local refreshAllUnfilteredThreadsDetails = require(AppChat.Conversations.Thunks.refreshAllUnfilteredThreadsDetails)
 local UnfilteredThreadsAMPFeatureName = require(AppChat.Components.UnfilteredThreadsAMPFeatureName)
 local OpenTcLearnMoreLink = require(AppChat.Conversations.Thunks.OpenTcLearnMoreLink)
 local ModalConfiguration = require(AppChat.Models.ModalConfiguration)
-local createBannerConfigFromModalConfiguration = require(AppChat.Utils.createBannerConfigFromModalConfiguration)
 local AppChatFAEBanner = require(AppChat.Components.FaeBanner.AppChatFAEBanner)
 local FIntAppChatModalSeenImpressionDelayMs = require(AppChat.Flags.FIntAppChatModalSeenImpressionDelayMs)
 local FFlagDebugAppChatFae = require(AppChat.Flags.FFlagDebugAppChatFae)
 local FStringCanAccessTrustedContactsAmpFeature = require(AppChatParent.SharedFlags).FStringCanAccessTrustedContactsAmpFeature
 local FStringCanAccessTrustedContactsAmpNameSpace = require(AppChatParent.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace
-local FFlagEnableAEGIS2CommsFAEUpsell = require(AppChatParent.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
 local FFlagDebugAEGIS1AppChatBanner = require(AppChat.Flags.FFlagDebugAEGIS1AppChatBanner)
-local FFlagEnableAEGIS2AppChatBanner = require(AppChatParent.SharedFlags).FFlagEnableAEGIS2AppChatBanner
 local SocialExperiments = require(AppChatParent.SocialExperiments)
 local FFlagTestDeviceForFAEUpsell = require(AppChatParent.SocialExperiments).FFlagTestDeviceForFAEUpsell
 local deviceMeetsRequirementsForFAE = SocialExperiments.deviceMeetsRequirementsForFAE
-local startFacialAgeEstimation = SocialUpsell.Thunks.startFacialAgeEstimation
 local GetAgeVerifiedChangedSignal = SocialUpsell.Signals.GetAgeVerifiedChangedSignal
 local ChatLandingModal = require(script.Parent.ChatLandingModal)
 local t1 = {
@@ -71,102 +62,109 @@ local t2 = {
 	phone_verify = "ChatLandingPvUpsell"
 }
 
-return memo(function(_) --[[ ChatLandingModalContainer ]] -- line: 85
-	-- upvalues: useDispatch (copy), useAnalytics (copy), useContext (copy), LuaAppNavigationContext (copy), useNavigation (copy), useState (copy), useIsInExperience (copy), useSelector (copy), ModalConfiguration (copy), getDeepValue2 (copy), React (copy), ChatLandingModalVariant (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), t2 (copy), t1 (copy), FFlagEnableAEGIS1AppChatBanner (copy), FFlagEnableAEGIS2AppChatBanner (copy), useTelemetry (copy), ChatLandingTelemetryLayer (copy), useEffectOnMount (copy), useEffect (copy), ChatLandingModalTelemetry (copy), useCallback (copy), NavigateDown (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), HttpService (copy), FStringCanAccessTrustedContactsAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), ModalTelemetry (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy), OpenTcLearnMoreLink (copy), AppChatNetworking (copy), Cryo (copy), useChatPagePadding (copy), Foundation (copy), useSocialUpsellOverlayController (copy), startFacialAgeEstimation (copy), SocialUpsell (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy), useRef (copy), useIsGuiInChatVisible (copy), useRecordModalSeenWithDelay (copy), FIntAppChatModalSeenImpressionDelayMs (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), UpsellBanner (copy), createBannerConfigFromModalConfiguration (copy), AppChatFAEBanner (copy), ChatLandingModal (copy), Enum2 (copy), GetAgeVerifiedChangedSignal (copy)
-	local v63 = useDispatch()
-	local v64 = useAnalytics()
-	local v65 = useContext(LuaAppNavigationContext)
-	local v66 = useNavigation()
-	local v67, v68 = useState({})
-	local v69 = useIsInExperience()
-	local v70 = useSelector(function(p2) -- line: 94
+local function ChatLandingModalContainer(_) -- line: 77
+	-- upvalues: useDispatch (copy), useAnalytics (copy), useContext (copy), LuaAppNavigationContext (copy), useNavigation (copy), useState (copy), useIsInExperience (copy), useSelector (copy), ModalConfiguration (copy), getDeepValue2 (copy), t2 (copy), t1 (copy), ChatLandingModalVariant (copy), useTelemetry (copy), ChatLandingTelemetryLayer (copy), useEffectOnMount (copy), useEffect (copy), ChatLandingModalTelemetry (copy), useCallback (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), FFlagSignalsNavP3Dispatch (copy), v35 (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), NavigateDown (copy), HttpService (copy), FStringCanAccessTrustedContactsAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), ModalTelemetry (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy), OpenTcLearnMoreLink (copy), AppChatNetworking (copy), Cryo (copy), React (copy), useRef (copy), useIsGuiInChatVisible (copy), useRecordModalSeenWithDelay (copy), FIntAppChatModalSeenImpressionDelayMs (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), AppChatFAEBanner (copy), ChatLandingModal (copy), Enum2 (copy), GetAgeVerifiedChangedSignal (copy)
+	local v55 = useDispatch()
+	local v56 = useAnalytics()
+	local v57 = useContext(LuaAppNavigationContext)
+	local v58 = useNavigation()
+	local v59, v60 = useState({})
+	local v61 = useIsInExperience()
+	local v62 = useSelector(function(p2) -- line: 86
 		-- upvalues: ModalConfiguration (copy), getDeepValue2 (copy)
 		local default = ModalConfiguration.default
 
 		return getDeepValue2(p2, "ChatAppReducer.Modals.chatLandingModal") or default
 	end)
-	local v71 = React.useMemo(function() -- line: 99
-		-- upvalues: ChatLandingModalVariant (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), v69 (copy)
-		return {
-			[ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal] = FFlagEnableAEGIS2CommsFAEUpsell or not v69
-		}
-	end, { v69 })
-	local modal_variant = v70.modal_variant
-	local v73 = getDeepValue2(v70, "modal_layout.id")
-	local v74 = getDeepValue2(v70, "modal_layout.seen_record_action")
-	local v75 = getDeepValue2(v70, "modal_layout.dismissed_record_action")
-	local v76 = getDeepValue2(v70, "modal_layout.buttons")
-	local v77 = v76 and v76[1]
-	local v78 = t2[modal_variant]
-	local v79 = (t1[modal_variant] or (FFlagEnableAEGIS1AppChatBanner and v71[modal_variant] or FFlagEnableAEGIS2AppChatBanner and modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsUpsellModal)) and not v67[modal_variant]
-	local v80 = useTelemetry(ChatLandingTelemetryLayer.Context)
+	local modal_variant = v62.modal_variant
+	local v64 = getDeepValue2(v62, "modal_layout.id")
+	local v65 = getDeepValue2(v62, "modal_layout.seen_record_action")
+	local v66 = getDeepValue2(v62, "modal_layout.dismissed_record_action")
+	local v67 = getDeepValue2(v62, "modal_layout.buttons")
+	local v68 = v67 and v67[1]
+	local v69 = t2[modal_variant]
+	local v70 = (t1[modal_variant] or modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsUpsellModal) and not v59[modal_variant]
+	local v71 = useTelemetry(ChatLandingTelemetryLayer.Context)
 
-	useEffectOnMount(function() -- line: 123
-		-- upvalues: v64 (copy), v78 (copy), v79 (copy)
-		if v64 and (v78 and v79) then
-			v64.fireAnalyticsEvent(`{ v78 }Rendered`)
+	useEffectOnMount(function() -- line: 104
+		-- upvalues: v56 (copy), v69 (copy), v70 (copy)
+		if v56 and (v69 and v70) then
+			v56.fireAnalyticsEvent(`{ v69 }Rendered`)
 		end
 	end)
-	useEffect(function() -- line: 128
-		-- upvalues: v79 (copy), modal_variant (copy), ChatLandingModalVariant (copy), v80 (copy), ChatLandingModalTelemetry (copy)
-		if v79 and modal_variant == ChatLandingModalVariant.AgeAssuranceUpsell then
-			v80.emit(ChatLandingModalTelemetry.Events.FaeModalShown, {})
+	useEffect(function() -- line: 109
+		-- upvalues: v70 (copy), modal_variant (copy), ChatLandingModalVariant (copy), v71 (copy), ChatLandingModalTelemetry (copy)
+		if v70 and modal_variant == ChatLandingModalVariant.AgeAssuranceUpsell then
+			v71.emit(ChatLandingModalTelemetry.Events.FaeModalShown, {})
 		end
 
-		if v79 then
-			v80.emit(ChatLandingModalTelemetry.Events.ModalRendered, {
+		if v70 then
+			v71.emit(ChatLandingModalTelemetry.Events.ModalRendered, {
 				modalVariant = modal_variant
 			})
 		end
 	end, {
 		modal_variant,
-		v79
+		v70
 	})
 
-	local v81 = useCallback(function() -- line: 139
-		-- upvalues: v64 (copy), v78 (copy), v63 (copy), NavigateDown (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), v69 (copy)
-		if v64 and v78 then
-			v64.fireAnalyticsEvent(`{ v78 }ContinueClicked`)
+	local v72 = useCallback(function() -- line: 120
+		-- upvalues: v56 (copy), v69 (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), FFlagSignalsNavP3Dispatch (copy), v35 (copy), v55 (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), v61 (copy), NavigateDown (copy)
+		if v56 and v69 then
+			v56.fireAnalyticsEvent(`{ v69 }ContinueClicked`)
 		end
 
-		v63(NavigateDown({
+		local t3 = {
 			name = AppPage.AmpWizardContainer,
 			extraProps = {
 				featureName = UnfilteredThreadsAMPFeatureName,
-				completionCallback = function(p3, _) --[[ completionCallback ]] -- line: 147
-					-- upvalues: v63 (copy), NavigateBack (copy), AccessResponseEnum (copy), v64 (copy), v78 (copy), refreshAllUnfilteredThreadsDetails (copy), v69 (copy)
-					v63(NavigateBack(true))
+				completionCallback = function(p3, _) -- line: 128
+					-- upvalues: FFlagSignalsNavP3Dispatch (copy), v35 (copy), v55 (copy), NavigateBack (copy), AccessResponseEnum (copy), v56 (copy), v69 (copy), refreshAllUnfilteredThreadsDetails (copy), v61 (copy)
+					if FFlagSignalsNavP3Dispatch then
+						v35.back(true)
+					else
+						v55(NavigateBack(true))
+					end
 
 					if p3 == AccessResponseEnum.Granted then
-						if v64 and v78 then
-							v64.fireAnalyticsEvent(`{ v78 }Succeeded`)
+						if v56 and v69 then
+							v56.fireAnalyticsEvent(`{ v69 }Succeeded`)
 						end
 
-						v63(refreshAllUnfilteredThreadsDetails(nil, v69))
+						v55(refreshAllUnfilteredThreadsDetails(nil, v61))
 
 						return
 					end
 
-					if v64 and v78 then
-						v64.fireAnalyticsEvent(`{ v78 }Failed`)
+					if v56 and v69 then
+						v56.fireAnalyticsEvent(`{ v69 }Failed`)
 					end
 				end
 			}
-		}))
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v35.down(v35.fromLegacyPage(t3))
+
+			return
+		end
+
+		v55(NavigateDown(t3))
 	end, {
-		v63,
-		v64,
-		v78
+		v55,
+		v56,
+		v69
 	})
-	local v82 = useCallback(function() -- line: 165
-		-- upvalues: HttpService (copy), v80 (copy), ChatLandingModalTelemetry (copy), v63 (copy), NavigateDown (copy), AppPage (copy), FStringCanAccessTrustedContactsAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), NavigateBack (copy), AccessResponseEnum (copy), modal_variant (copy), ModalTelemetry (copy), refreshAllUnfilteredThreadsDetails (copy), v69 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy)
+	local v73 = useCallback(function() -- line: 155
+		-- upvalues: HttpService (copy), v71 (copy), ChatLandingModalTelemetry (copy), AppPage (copy), FStringCanAccessTrustedContactsAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), FFlagSignalsNavP3Dispatch (copy), v35 (copy), v55 (copy), NavigateBack (copy), AccessResponseEnum (copy), modal_variant (copy), ModalTelemetry (copy), refreshAllUnfilteredThreadsDetails (copy), v61 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy), NavigateDown (copy)
 		local guid = HttpService:GenerateGUID(false)
 
-		v80.emit(ChatLandingModalTelemetry.Events.TelemetryFaeButtonClick, {
+		v71.emit(ChatLandingModalTelemetry.Events.TelemetryFaeButtonClick, {
 			state = guid,
 			btn = ChatLandingModalTelemetry.Constants.ConfirmFaeBtn
 		})
-		v63(NavigateDown({
+
+		local t4 = {
 			name = AppPage.AmpWizardContainer,
 			extraProps = {
 				featureName = FStringCanAccessTrustedContactsAmpFeature,
@@ -175,19 +173,23 @@ return memo(function(_) --[[ ChatLandingModalContainer ]] -- line: 85
 					sessionId = guid
 				},
 				nameSpace = FStringCanAccessTrustedContactsAmpNameSpace,
-				completionCallback = function(p5, _) --[[ completionCallback ]] -- line: 180
-					-- upvalues: v63 (copy), NavigateBack (copy), AccessResponseEnum (copy), v80 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), refreshAllUnfilteredThreadsDetails (copy), v69 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy)
-					v63(NavigateBack(true))
+				completionCallback = function(p5, _) -- line: 170
+					-- upvalues: FFlagSignalsNavP3Dispatch (copy), v35 (copy), v55 (copy), NavigateBack (copy), AccessResponseEnum (copy), v71 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), refreshAllUnfilteredThreadsDetails (copy), v61 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy)
+					if FFlagSignalsNavP3Dispatch then
+						v35.back(true)
+					else
+						v55(NavigateBack(true))
+					end
 
 					if p5 == AccessResponseEnum.Granted then
-						v80.emit(ChatLandingModalTelemetry.Events.ModalActionResult, {
+						v71.emit(ChatLandingModalTelemetry.Events.ModalActionResult, {
 							modalVariant = modal_variant,
 							action = ModalTelemetry.Enums.ModalActions.PrimaryCta,
 							actionResult = ModalTelemetry.Enums.ModalActionResults.Success
 						})
-						v63(refreshAllUnfilteredThreadsDetails(nil, v69))
+						v55(refreshAllUnfilteredThreadsDetails(nil, v61))
 					else
-						v80.emit(ChatLandingModalTelemetry.Events.ModalActionResult, {
+						v71.emit(ChatLandingModalTelemetry.Events.ModalActionResult, {
 							modalVariant = modal_variant,
 							action = ModalTelemetry.Enums.ModalActions.PrimaryCta,
 							actionResult = ModalTelemetry.Enums.ModalActionResults.Failure
@@ -195,248 +197,197 @@ return memo(function(_) --[[ ChatLandingModalContainer ]] -- line: 85
 					end
 
 					if FFlagDebugAppChatFae or FFlagDebugAEGIS1AppChatBanner then
-						v63({
+						v55({
 							type = "DEBUG_DismissChatLandingModal"
 						})
 					end
 				end
 			}
-		}))
-	end, {
-		v63,
-		v69,
-		v80,
-		modal_variant
-	})
-	local v83 = useCallback(function() -- line: 214
-		-- upvalues: v64 (copy), v78 (copy), v66 (copy), v65 (copy)
-		if v64 and v78 then
-			v64.fireAnalyticsEvent(`{ v78 }LearnMoreClicked`)
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v35.down(v35.fromLegacyPage(t4))
+
+			return
 		end
 
-		local v104 = if not v66 then nil else v66.navigate
-
-		v65.navigateToUnfilteredThreadsLearnMore(v104)
+		v55(NavigateDown(t4))
 	end, {
-		v65,
-		v64,
-		v66,
-		v78
+		v55,
+		v61,
+		v71,
+		modal_variant
 	})
-	local v84 = useCallback(function() -- line: 228
-		-- upvalues: v63 (copy), OpenTcLearnMoreLink (copy)
-		v63(OpenTcLearnMoreLink())
-	end, { v63 })
-	local v85 = useCallback(function() -- line: 232
-		-- upvalues: v64 (copy), v78 (copy), modal_variant (copy), ChatLandingModalVariant (copy), v80 (copy), ChatLandingModalTelemetry (copy), HttpService (copy), ModalTelemetry (copy), v63 (copy), AppChatNetworking (copy), v75 (copy), v73 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy), v68 (copy), Cryo (copy), v67 (copy)
-		if v64 and v78 then
-			v64.fireAnalyticsEvent(`{ v78 }Dismissed`)
+	local v74 = useCallback(function() -- line: 213
+		-- upvalues: v56 (copy), v69 (copy), v58 (copy), v57 (copy)
+		if v56 and v69 then
+			v56.fireAnalyticsEvent(`{ v69 }LearnMoreClicked`)
+		end
+
+		local v92 = if not v58 then nil else v58.navigate
+
+		v57.navigateToUnfilteredThreadsLearnMore(v92)
+	end, {
+		v57,
+		v56,
+		v58,
+		v69
+	})
+	local v75 = useCallback(function() -- line: 227
+		-- upvalues: v55 (copy), OpenTcLearnMoreLink (copy)
+		v55(OpenTcLearnMoreLink())
+	end, { v55 })
+	local v76 = useCallback(function() -- line: 231
+		-- upvalues: v56 (copy), v69 (copy), modal_variant (copy), ChatLandingModalVariant (copy), v71 (copy), ChatLandingModalTelemetry (copy), HttpService (copy), ModalTelemetry (copy), v55 (copy), AppChatNetworking (copy), v66 (copy), v64 (copy), FFlagDebugAppChatFae (copy), FFlagDebugAEGIS1AppChatBanner (copy), v60 (copy), Cryo (copy), v59 (copy)
+		if v56 and v69 then
+			v56.fireAnalyticsEvent(`{ v69 }Dismissed`)
 		end
 
 		if modal_variant == ChatLandingModalVariant.AgeAssuranceUpsell then
-			v80.emit(ChatLandingModalTelemetry.Events.TelemetryFaeButtonClick, {
+			v71.emit(ChatLandingModalTelemetry.Events.TelemetryFaeButtonClick, {
 				state = HttpService:GenerateGUID(false),
 				btn = ChatLandingModalTelemetry.Constants.CancelFaeBtn
 			})
 		end
 
-		v80.emit(ChatLandingModalTelemetry.Events.ModalAction, {
+		v71.emit(ChatLandingModalTelemetry.Events.ModalAction, {
 			modalVariant = modal_variant,
 			action = ModalTelemetry.Enums.ModalActions.Dismiss
 		})
-		v63(AppChatNetworking.rodux.RecordModalSequenceResponse.API(v75, "chat_landing_modal", v73)):catch(function(p7) -- line: 252
+		v55(AppChatNetworking.rodux.RecordModalSequenceResponse.API(v66, "chat_landing_modal", v64)):catch(function(p7) -- line: 251
 			warn("Error in ChatLandingModalContainer -> RecordModalSequenceResponse dismissed: " .. tostring(p7), p7)
 		end)
 
 		if FFlagDebugAppChatFae and modal_variant == ChatLandingModalVariant.AgeAssuranceUpsell or FFlagDebugAEGIS1AppChatBanner and modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal then
-			v63({
+			v55({
 				type = "DEBUG_DismissChatLandingModal"
 			})
 
 			return
 		end
 
-		v68(Cryo.Dictionary.join(v67, {
+		v60(Cryo.Dictionary.join(v59, {
 			[modal_variant] = true
 		}))
 	end, {
-		v67,
-		v68,
-		v63,
-		v64,
-		v78,
-		v75,
+		v59,
+		v60,
+		v55,
+		v56,
+		v69,
+		v66,
 		modal_variant,
-		v73,
-		v80
+		v64,
+		v71
 	})
-	local v86 = nil
-	local v87 = nil
-	local v88 = nil
-	local v89 = nil
-
-	if FFlagEnableAEGIS1AppChatBanner then
-		v86 = useChatPagePadding()
-		v89 = Foundation.Hooks.useTokens()
-
-		local v90 = useSocialUpsellOverlayController(v69)
-
-		v87 = React.useCallback(function(_: string) -- line: 295
-			-- upvalues: modal_variant (copy), ChatLandingModalVariant (copy), v63 (copy), startFacialAgeEstimation (copy), SocialUpsell (copy), UpsellEntrySurfaceType (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), v69 (copy)
-			if modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal then
-				v63(startFacialAgeEstimation(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation .. UpsellEntrySurfaceType.PartyTab, nil, nil, UpsellEntrySurfaceType.PartyTab, if not FFlagEnableAEGIS2CommsFAEUpsell then nil else v69))
-			end
-		end, {
-			v63,
-			modal_variant,
-			v69
-		})
-		v88 = React.useCallback(function(s2: string) -- line: 308
-			-- upvalues: modal_variant (copy), ChatLandingModalVariant (copy), v90 (copy), SocialUpsell (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy)
-			if modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal then
-				v90.openSocialOverlay(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation, {
-					upsellEntrySurface = UpsellEntrySurfaceType.PartyTab,
-					upsellEntryComponent = UpsellComponent.Banner,
-					impressionId = s2
-				})
-			end
-		end, {
-			modal_variant,
-			v90.openSocialOverlay
-		})
-	end
-
-	local v91 = ({
-		[ChatLandingModalVariant.AgeAssuranceUpsell] = v84
+	local v77 = ({
+		[ChatLandingModalVariant.AgeAssuranceUpsell] = v75
 	})[modal_variant]
-	local v92 = useCallback(function(...) -- line: 324
-		-- upvalues: v80 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), v91 (copy)
-		v80.emit(ChatLandingModalTelemetry.Events.ModalAction, {
+	local v78 = useCallback(function(...) -- line: 291
+		-- upvalues: v71 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), v77 (copy)
+		v71.emit(ChatLandingModalTelemetry.Events.ModalAction, {
 			modalVariant = modal_variant,
 			action = ModalTelemetry.Enums.ModalActions.InlineCta
 		})
-		v91(...)
+		v77(...)
 	end, {
-		v91,
-		v80,
+		v77,
+		v71,
 		modal_variant
 	})
-	local v93 = v70 and (not not v70.modal_layout and (not not v70.modal_layout.body and v70.modal_layout.body.additional_content)) or {}
-	local v94 = React.useMemo(function() -- line: 337
-		-- upvalues: Cryo (copy), v93 (copy), AppChatNetworking (copy), v92 (copy)
-		return Cryo.List.map(v93, function(p8) -- line: 338
-			-- upvalues: AppChatNetworking (copy), v92 (copy)
-			local t3 = {
+	local v79 = v62 and (not not v62.modal_layout and (not not v62.modal_layout.body and v62.modal_layout.body.additional_content)) or {}
+	local v80 = React.useMemo(function() -- line: 304
+		-- upvalues: Cryo (copy), v79 (copy), AppChatNetworking (copy), v78 (copy)
+		return Cryo.List.map(v79, function(p8) -- line: 305
+			-- upvalues: AppChatNetworking (copy), v78 (copy)
+			local t5 = {
 				type = p8.type,
 				text = p8.text
 			}
 
 			if p8.type == AppChatNetworking.Constants.ModalContentType.Link then
-				t3.onActivated = v92
+				t5.onActivated = v78
 			end
 
-			return t3
+			return t5
 		end)
 	end, {
-		v93,
-		v91,
-		v92
+		v79,
+		v77,
+		v78
 	})
-	local v95 = ({
-		phone_verify = v81,
-		fully_eligible_ftux = v83,
-		[ChatLandingModalVariant.AgeAssuranceUpsell] = v82
+	local v81 = ({
+		phone_verify = v72,
+		fully_eligible_ftux = v74,
+		[ChatLandingModalVariant.AgeAssuranceUpsell] = v73
 	})[modal_variant]
-	local v96 = useCallback(function(...) -- line: 356
-		-- upvalues: v80 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), v95 (copy)
-		v80.emit(ChatLandingModalTelemetry.Events.ModalAction, {
+	local v82 = useCallback(function(...) -- line: 323
+		-- upvalues: v71 (copy), ChatLandingModalTelemetry (copy), modal_variant (copy), ModalTelemetry (copy), v81 (copy)
+		v71.emit(ChatLandingModalTelemetry.Events.ModalAction, {
 			modalVariant = modal_variant,
 			action = ModalTelemetry.Enums.ModalActions.PrimaryCta
 		})
-		v95(...)
+		v81(...)
 	end, {
-		v95,
-		v80,
+		v81,
+		v71,
 		modal_variant
 	})
-	local v97 = useRef(nil)
-	local v98 = useIsGuiInChatVisible(v97, {
-		v97.current,
-		v79
+	local v83 = useRef(nil)
+	local v84 = useIsGuiInChatVisible(v83, {
+		v83.current,
+		v70
 	})
 
 	useRecordModalSeenWithDelay({
 		modalSequence = "chat_landing_modal",
-		modalId = v73,
-		actionToRecord = v74,
+		modalId = v64,
+		actionToRecord = v65,
 		delayMs = FIntAppChatModalSeenImpressionDelayMs,
-		canRecordAction = v98 and v79
+		canRecordAction = v84 and v70
 	})
 
-	local v99 = not FFlagDebugAppChatFae and function() -- line: 380
-	end or React.useCallback(function() -- line: 375
-		-- upvalues: v63 (copy)
-		v63({
+	local v85 = not FFlagDebugAppChatFae and function() -- line: 347
+	end or React.useCallback(function() -- line: 342
+		-- upvalues: v55 (copy)
+		v55({
 			type = "DEBUG_ShowAppChatFaeUpsell"
 		})
-	end, { v63 })
-	local v100 = if not FFlagDebugAEGIS1AppChatBanner then nil else React.useCallback(function() -- line: 383
-		-- upvalues: v63 (copy)
-		v63({
+	end, { v55 })
+	local v86 = if not FFlagDebugAEGIS1AppChatBanner then nil else React.useCallback(function() -- line: 350
+		-- upvalues: v55 (copy)
+		v55({
 			type = "DEBUG_ShowChatLandingAgeVerifiedTimedModal"
 		})
-	end, { v63 })
+	end, { v55 })
 
 	if FFlagTestDeviceForFAEUpsell and not deviceMeetsRequirementsForFAE() then
 		return nil
 	end
 
-	if v79 then
-		if FFlagEnableAEGIS1AppChatBanner and v71[modal_variant] then
-			return React.createElement("Frame", {
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y
-			}, {
-				ContentPadding = React.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 1),
-					PaddingBottom = UDim.new(0, v89.Size.Size_400),
-					PaddingLeft = UDim.new(0, v86.left),
-					PaddingRight = UDim.new(0, v86.right)
-				}),
-				UpsellBanner = React.createElement(UpsellBanner, {
-					config = createBannerConfigFromModalConfiguration(v70),
-					onPrimaryAction = v87,
-					onSecondaryAction = v88,
-					onDismiss = v85,
-					upsellEntrySurface = UpsellEntrySurfaceType.PartyTab,
-					upsellEntryComponent = UpsellComponent.Banner
-				})
-			})
-		end
-
-		if FFlagEnableAEGIS2AppChatBanner and modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsUpsellModal then
+	if v70 then
+		if modal_variant == ChatLandingModalVariant.ChatLandingAgeVerifiedCommsUpsellModal then
 			return React.createElement(AppChatFAEBanner, {
-				modalConfiguration = v70,
-				onDismiss = v85
+				modalConfiguration = v62,
+				onDismiss = v76
 			})
 		end
 
 		return React.createElement(ChatLandingModal, {
-			titleLabelText = getDeepValue2(v70, "modal_layout.label.text"),
-			titleText = getDeepValue2(v70, "modal_layout.header.text"),
-			bodyText = getDeepValue2(v70, "modal_layout.body.text"),
-			additionalContent = v94,
-			actionText = v77 and v77.text,
+			titleLabelText = getDeepValue2(v62, "modal_layout.label.text"),
+			titleText = getDeepValue2(v62, "modal_layout.header.text"),
+			bodyText = getDeepValue2(v62, "modal_layout.body.text"),
+			additionalContent = v80,
+			actionText = v68 and v68.text,
 			buttonType = if modal_variant ~= "fully_eligible_ftux" then Enum2.ButtonType.PrimarySystem else Enum2.ButtonType.Secondary,
-			onActivated = v96,
-			onDismissed = v85,
-			hideActionButton = not v77 or not v95,
-			ref = v97
+			onActivated = v82,
+			onDismissed = v76,
+			hideActionButton = not v68 or not v81,
+			ref = v83
 		})
 	end
 
-	if modal_variant ~= "none" and modal_variant ~= nil and not t1[modal_variant] and (not FFlagEnableAEGIS1AppChatBanner or not v71[modal_variant]) then
+	if modal_variant ~= "none" and modal_variant ~= nil and not t1[modal_variant] then
 		warn("Unsupported ChatLandingModal variant: " .. modal_variant)
 	end
 
@@ -455,12 +406,12 @@ return memo(function(_) --[[ ChatLandingModalContainer ]] -- line: 85
 			Btn1 = React.createElement("TextButton", {
 				Text = "DEBUG Show Chat Landing Age Verfication Timed Modal",
 				Size = UDim2.new(0, 200, 0, 50),
-				[React.Event.Activated] = v100
+				[React.Event.Activated] = v86
 			}),
 			Btn2 = React.createElement("TextButton", {
 				Text = "DEBUG Fire Age Verified event",
 				Size = UDim2.new(0, 200, 0, 50),
-				[React.Event.Activated] = function() -- line: 472
+				[React.Event.Activated] = function() -- line: 409
 					-- upvalues: GetAgeVerifiedChangedSignal (copy)
 					GetAgeVerifiedChangedSignal():fire()
 				end
@@ -472,9 +423,11 @@ return memo(function(_) --[[ ChatLandingModalContainer ]] -- line: 85
 		return React.createElement("TextButton", {
 			Text = "DEBUG Show FAE Upsell",
 			Size = UDim2.new(0, 200, 0, 50),
-			[React.Event.Activated] = v99
+			[React.Event.Activated] = v85
 		})
 	end
 
 	return nil
-end)
+end
+
+return memo(ChatLandingModalContainer)

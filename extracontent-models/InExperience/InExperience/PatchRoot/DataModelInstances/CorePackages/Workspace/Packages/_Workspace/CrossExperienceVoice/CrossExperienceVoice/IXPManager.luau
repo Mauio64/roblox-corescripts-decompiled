@@ -1,53 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_SharedFlags_0 = v1.SharedFlags;
-local l_ExperimentCacheManager_0 = v1.ExperimentCacheManager.ExperimentCacheManager;
-local l_GetFFlagEnableCrossExpVoice_0 = l_SharedFlags_0.GetFFlagEnableCrossExpVoice;
-local v5 = game:DefineFastString("CrossExpVoiceIXPLayer", "Social.PartyVoice");
-local v6 = game:DefineFastString("DebugCrossExpVoiceIXPLayer", "");
-local l_game_EngineFeature_0 = game:GetEngineFeature("PartyVoiceVolume");
-local v8 = {};
-v8.__index = v8;
-local v9 = game:DefineFastFlag("PartyVoiceDisallowIXPLayerExposureOnInit", false);
-local v10 = {
-    CrossExpVoiceDebugVariant_0 = {
-        partyVoiceExp = false
-    }, 
-    CrossExpVoiceDebugVariant_1 = {
-        partyVoiceExp = true
-    }
-};
-v8.new = function() --[[ Line: 50 ]] --[[ Name: new ]]
-    -- upvalues: v8 (copy)
-    local v11 = {
-        initialized = false, 
-        variant = {}
-    };
-    setmetatable(v11, v8);
-    return v11;
-end;
-v8.initialize = function(v12) --[[ Line: 61 ]] --[[ Name: initialize ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v5 (copy), v6 (copy), v10 (copy), v9 (copy)
-    local v13 = l_ExperimentCacheManager_0.default:getLayerVariables(v5);
-    if v13 ~= nil then
-        v12.initialized = true;
-        v12.variant = table.clone(v13);
-    end;
-    if v6 ~= "None" then
-        v12.initialized = true;
-        v12.variant = v10[v6] or v12.variant;
-    end;
-    if v12.initialized and not v9 then
-        v12:logLayerExposure();
-    end;
-end;
-v8.logLayerExposure = function(_) --[[ Line: 81 ]] --[[ Name: logLayerExposure ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v5 (copy)
-    l_ExperimentCacheManager_0.default:logLayerExposure(v5);
-end;
-v8.getHasPartyVoiceVolume = function() --[[ Line: 85 ]] --[[ Name: getHasPartyVoiceVolume ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), v8 (copy)
-    return l_game_EngineFeature_0 and v8.default.variant.partyVoiceExp;
-end;
-v8.default = if l_GetFFlagEnableCrossExpVoice_0() then v8.new() else nil;
-return v8;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local SharedFlags = dependencies.SharedFlags
+local ExperimentCacheManager = dependencies.ExperimentCacheManager.ExperimentCacheManager
+local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
+local v6 = game:DefineFastString("CrossExpVoiceIXPLayer", "Social.PartyVoice")
+local v7 = game:DefineFastString("DebugCrossExpVoiceIXPLayer", "")
+local EngineFeature = game:GetEngineFeature("PartyVoiceVolume")
+local t1 = {}
+
+t1.__index = t1
+
+local v10 = game:DefineFastFlag("PartyVoiceDisallowIXPLayerExposureOnInit", false)
+local t2 = {
+	CrossExpVoiceDebugVariant_0 = {
+		partyVoiceExp = false
+	},
+	CrossExpVoiceDebugVariant_1 = {
+		partyVoiceExp = true
+	}
+}
+
+function t1.new() -- line: 50
+	-- upvalues: t1 (copy)
+	local t3 = {
+		initialized = false,
+		variant = {}
+	}
+
+	setmetatable(t3, t1)
+
+	return t3
+end
+function t1.initialize(p1) -- line: 61
+	-- upvalues: ExperimentCacheManager (copy), v6 (copy), v7 (copy), t2 (copy), v10 (copy)
+	local v14 = ExperimentCacheManager.default:getLayerVariables(v6)
+
+	if v14 ~= nil then
+		p1.initialized = true
+		p1.variant = table.clone(v14)
+	end
+
+	if v7 ~= "None" then
+		p1.initialized = true
+		p1.variant = t2[v7] or p1.variant
+	end
+
+	if p1.initialized and not v10 then
+		p1:logLayerExposure()
+	end
+end
+function t1.logLayerExposure(_) -- line: 81
+	-- upvalues: ExperimentCacheManager (copy), v6 (copy)
+	ExperimentCacheManager.default:logLayerExposure(v6)
+end
+function t1.getHasPartyVoiceVolume() -- line: 85
+	-- upvalues: EngineFeature (copy), t1 (copy)
+	return EngineFeature and t1.default.variant.partyVoiceExp
+end
+
+t1.default = if not GetFFlagEnableCrossExpVoice() then nil else t1.new()
+
+return t1

@@ -1,3 +1,3 @@
 return {
-    current = nil
-};
+	current = nil
+}

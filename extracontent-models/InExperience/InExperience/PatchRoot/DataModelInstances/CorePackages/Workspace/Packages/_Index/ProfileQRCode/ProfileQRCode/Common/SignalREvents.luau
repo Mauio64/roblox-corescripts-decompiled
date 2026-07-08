@@ -1,4 +1,5 @@
 return {
-    FriendshipNotifications = "FriendshipNotifications", 
-    FriendshipRequested = "FriendshipRequested"
-};
+	FriendshipNotifications = "FriendshipNotifications",
+	FriendshipRequested = "FriendshipRequested",
+	FriendshipCreated = "FriendshipCreated"
+}

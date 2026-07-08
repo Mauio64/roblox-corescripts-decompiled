@@ -1,31 +1,34 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.t);
-local v4 = require(l_Parent_0.Core.Style.Validator.validateFontInfo);
-local v5 = require(l_Parent_0.Core.Style.Validator.validateColorInfo);
-local v6 = require(l_Parent_0.Core.Text.GenericTextLabel.GenericTextLabel);
-local v7 = v2.PureComponent:extend("ToastText");
-v7.validateProps = v3.interface({
-    colorStyle = v5, 
-    fontStyle = v4, 
-    Size = v3.UDim2, 
-    Text = v3.string, 
-    AnchorPoint = v3.optional(v3.Vector2), 
-    fluidSizing = v3.optional(v3.boolean), 
-    LayoutOrder = v3.optional(v3.integer), 
-    maxSize = v3.optional(v3.Vector2), 
-    Position = v3.optional(v3.UDim2), 
-    TextTruncate = v3.optional(v3.EnumItem), 
-    TextXAlignment = v3.optional(v3.EnumItem), 
-    TextYAlignment = v3.optional(v3.EnumItem)
-});
-v7.defaultProps = {
-    TextXAlignment = Enum.TextXAlignment.Left, 
-    TextYAlignment = Enum.TextYAlignment.Center
-};
-v7.render = function(v8) --[[ Line: 39 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v6 (copy)
-    return v2.createElement(v6, v8.props);
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local t = require(ParentParentParent.t)
+local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
+local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
+local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
+local v8 = Roact.PureComponent:extend("ToastText")
+
+v8.validateProps = t.interface({
+	colorStyle = validateColorInfo,
+	fontStyle = validateFontInfo,
+	Size = t.UDim2,
+	Text = t.string,
+	AnchorPoint = t.optional(t.Vector2),
+	fluidSizing = t.optional(t.boolean),
+	LayoutOrder = t.optional(t.integer),
+	maxSize = t.optional(t.Vector2),
+	Position = t.optional(t.UDim2),
+	TextTruncate = t.optional(t.EnumItem),
+	TextXAlignment = t.optional(t.EnumItem),
+	TextYAlignment = t.optional(t.EnumItem)
+})
+v8.defaultProps = {
+	TextXAlignment = Enum.TextXAlignment.Left,
+	TextYAlignment = Enum.TextYAlignment.Center
+}
+
+function v8.render(p1) -- line: 39
+	-- upvalues: Roact (copy), GenericTextLabel (copy)
+	return Roact.createElement(GenericTextLabel, p1.props)
+end
+
+return v8

@@ -1,24 +1,32 @@
-local v0 = require(script.Parent.Parent.None);
-return function(...) --[[ Line: 4 ]] --[[ Name: zipAll ]]
-    -- upvalues: v0 (copy)
-    local v1 = {};
-    local v2 = select("#", ...);
-    local v3 = #select(1, ...);
-    for v4 = 2, v2 do
-        local v5 = #select(v4, ...);
-        if v3 < v5 then
-            v3 = v5;
-        end;
-    end;
-    for v6 = 1, v3 do
-        v1[v6] = {};
-        for v7 = 1, v2 do
-            if select(v7, ...)[v6] == nil then
-                v1[v6][v7] = v0;
-            else
-                v1[v6][v7] = select(v7, ...)[v6];
-            end;
-        end;
-    end;
-    return v1;
-end;
+local None = require(script.Parent.Parent.None)
+
+local function zipAll(...) -- line: 4
+	-- upvalues: None (copy)
+	local t1 = {}
+	local v4 = select("#", ...)
+	local v5 = #select(1, ...)
+
+	for i = 2, v4 do
+		local v7 = #select(i, ...)
+
+		if v5 < v7 then
+			v5 = v7
+		end
+	end
+
+	for i = 1, v5 do
+		t1[i] = {}
+
+		for j = 1, v4 do
+			if select(j, ...)[i] == nil then
+				t1[i][j] = None
+			else
+				t1[i][j] = select(j, ...)[i]
+			end
+		end
+	end
+
+	return t1
+end
+
+return zipAll

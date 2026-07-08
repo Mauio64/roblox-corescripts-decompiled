@@ -1,34 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local l_sendSocialLinkClickEvent_0 = require(l_Parent_0.DiscoveryAnalytics).Events.sendSocialLinkClickEvent;
-local v2 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiErrorType_0 = v2.SduiErrors.SduiErrorType;
-local l_getActionTelemetryFieldValue_0 = v2.getActionTelemetryFieldValue;
-local v5 = {
-    "profileId", 
-    "profileType", 
-    "socialLinkType", 
-    "socialLinkUrl", 
-    "socialLinkDisplayType"
-};
-return function(v6, v7, v8) --[[ Line: 17 ]]
-    -- upvalues: v5 (copy), l_getActionTelemetryFieldValue_0 (copy), l_SduiErrorType_0 (copy), l_sendSocialLinkClickEvent_0 (copy)
-    local v9 = {};
-    for _, v11 in v5 do
-        if l_getActionTelemetryFieldValue_0(v6, v7, v11) == nil then
-            table.insert(v9, v11);
-        end;
-    end;
-    if #v9 > 0 then
-        v8.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = "SocialLinkClickTelemetryHandler", 
-            message = ("Missing telemetry fields: %*"):format((table.concat(v9, ", ")))
-        }, v8.appPage);
-    end;
-    l_sendSocialLinkClickEvent_0({
-        assignment_id = tonumber(l_getActionTelemetryFieldValue_0(v6, v7, "profileId", 0)) or 0, 
-        assignment_type = l_getActionTelemetryFieldValue_0(v6, v7, "profileType", ""), 
-        social_link_type = l_getActionTelemetryFieldValue_0(v6, v7, "socialLinkType", ""), 
-        social_link_url = l_getActionTelemetryFieldValue_0(v6, v7, "socialLinkUrl", ""), 
-        social_link_display_type = l_getActionTelemetryFieldValue_0(v6, v7, "socialLinkDisplayType", "")
-    });
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local sendSocialLinkClickEvent = require(Parent.DiscoveryAnalytics).Events.sendSocialLinkClickEvent
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+local getActionTelemetryFieldValue = SduiCoreSystem.getActionTelemetryFieldValue
+local t1 = {
+	"profileId",
+	"profileType",
+	"socialLinkType",
+	"socialLinkUrl",
+	"socialLinkDisplayType"
+}
+
+return function(p1, p2, p3) -- line: 17
+	-- upvalues: t1 (copy), getActionTelemetryFieldValue (copy), SduiErrorType (copy), sendSocialLinkClickEvent (copy)
+	local t2 = {}
+
+	for _, v12 in t1 do
+		if getActionTelemetryFieldValue(p1, p2, v12) == nil then
+			table.insert(t2, v12)
+		end
+	end
+
+	if #t2 > 0 then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			name = "SocialLinkClickTelemetryHandler",
+			message = `Missing telemetry fields: { table.concat(t2, ", ") }`
+		}, p3.appPage)
+	end
+
+	sendSocialLinkClickEvent({
+		assignment_id = tonumber(getActionTelemetryFieldValue(p1, p2, "profileId", 0)) or 0,
+		assignment_type = getActionTelemetryFieldValue(p1, p2, "profileType", ""),
+		social_link_type = getActionTelemetryFieldValue(p1, p2, "socialLinkType", ""),
+		social_link_url = getActionTelemetryFieldValue(p1, p2, "socialLinkUrl", ""),
+		social_link_display_type = getActionTelemetryFieldValue(p1, p2, "socialLinkDisplayType", "")
+	})
+end

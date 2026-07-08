@@ -1,8 +1,17 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.StyleContext);
-local v3 = require(l_Parent_1.React);
-return function() --[[ Line: 13 ]] --[[ Name: useStyleMetadata ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    return v3.useContext(v2).styleMetadata;
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local StyleContext = require(scriptParent.StyleContext)
+local React = require(ParentParent.React)
+
+local function useStyleMetadata() -- line: 13
+	-- upvalues: React (copy), StyleContext (copy)
+	local v6 = React.useContext(StyleContext)
+
+	if not v6 then
+		return nil
+	end
+
+	return v6.styleMetadata
+end
+
+return useStyleMetadata

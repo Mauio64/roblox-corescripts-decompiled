@@ -1,7 +1,7 @@
-return function(v0) --[[ Line: 1 ]]
-    if not v0 then
-        return false;
-    else
-        return v0.getScreenProps("isVisible", false) or not v0.getScreenProps("wideMode", false);
-    end;
-end;
+return function(p1) -- line: 1
+	if not p1 then
+		return false
+	end
+
+	return p1.getScreenProps("isVisible", false) or not p1.getScreenProps("wideMode", false)
+end

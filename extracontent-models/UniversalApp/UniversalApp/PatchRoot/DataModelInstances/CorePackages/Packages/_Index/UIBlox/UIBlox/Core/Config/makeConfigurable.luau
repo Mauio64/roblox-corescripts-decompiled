@@ -1,70 +1,85 @@
-local v0 = require(script.Parent.Config);
-local function _(v1) --[[ Line: 4 ]] --[[ Name: trimTrailingNewline ]]
-    if v1:sub(-1, -1) == "\n" then
-        return v1:sub(1, -2);
-    else
-        return v1;
-    end;
-end;
-return function(v3, v4, v5) --[[ Line: 12 ]]
-    -- upvalues: v0 (copy)
-    if typeof(v4) ~= "string" then
-        error("Bad argument #2 - expected a string for the name of the library");
-    end;
-    if typeof(v5) ~= "table" then
-        error("Bad argument #3 - expected a default config table for the library");
-    end;
-    local v6 = {};
-    local v7 = v0.new(v5);
-    v6.init = function(v8) --[[ Line: 23 ]] --[[ Name: init ]]
-        -- upvalues: v6 (copy), v7 (copy), v3 (copy), v4 (copy)
-        setmetatable(v6, nil);
-        if v8 then
-            v7.set(v8);
-        end;
-        v6.Config = v7.get();
-        local v9 = v3(v6.Config);
-        for v10, v11 in pairs(v9) do
-            v6[v10] = v11;
-        end;
-        local v12 = debug.traceback();
-        local v13 = if v12:sub(-1, -1) == "\n" then v12:sub(1, -2) else v12;
-        v6.init = function(v14) --[[ Line: 38 ]]
-            -- upvalues: v8 (copy), v4 (ref), v13 (copy)
-            if v14 == v8 then
-                return;
-            else
-                local v15 = debug.traceback();
-                local v16 = if v15:sub(-1, -1) == "\n" then v15:sub(1, -2) else v15;
-                warn(string.format("%s has already been configured\nFirst init traceback:\n%s\nCurrent init traceback:\n%s", v4, v13, v16));
-                return;
-            end;
-        end;
-        if _G.__UIBLOX_TRACK_USAGE__ then
-            return (setmetatable(v6, (getmetatable(v9))));
-        else
-            return (setmetatable(v6, {
-                __index = function(_, v18) --[[ Line: 63 ]] --[[ Name: __index ]]
-                    -- upvalues: v4 (ref)
-                    local v19 = ("%q (%s) is not a valid member of %s"):format(tostring(v18), typeof(v18), v4);
-                    error(v19, 2);
-                end, 
-                __newindex = function(_, v21, _) --[[ Line: 69 ]] --[[ Name: __newindex ]]
-                    -- upvalues: v4 (ref)
-                    local v23 = ("%q (%s) is not a valid member of %s"):format(tostring(v21), typeof(v21), v4);
-                    error(v23, 2);
-                end
-            }));
-        end;
-    end;
-    return (setmetatable(v6, {
-        __index = function(_, _) --[[ Line: 78 ]] --[[ Name: __index ]]
-            -- upvalues: v4 (copy)
-            error(("You must call %s.init(config) before using it!"):format(v4), 2);
-        end, 
-        __newindex = function(_, _, _) --[[ Line: 82 ]] --[[ Name: __newindex ]]
-            -- upvalues: v4 (copy)
-            error(("You must call %s.init(config) before using it!"):format(v4), 2);
-        end
-    }));
-end;
+local Config = require(script.Parent.Config)
+
+local function trimTrailingNewline(p1) -- line: 4
+	if p1:sub(-1, -1) == "\n" then
+		return p1:sub(1, -2)
+	end
+
+	return p1
+end
+
+return function(p2, p3, p4) -- line: 12
+	-- upvalues: Config (copy)
+	if typeof(p3) ~= "string" then
+		error("Bad argument #2 - expected a string for the name of the library")
+	end
+
+	if typeof(p4) ~= "table" then
+		error("Bad argument #3 - expected a default config table for the library")
+	end
+
+	local t1 = {}
+	local v8 = Config.new(p4)
+
+	function t1.init(p5) -- line: 23
+		-- upvalues: t1 (copy), v8 (copy), p2 (copy), p3 (copy)
+		setmetatable(t1, nil)
+
+		if p5 then
+			v8.set(p5)
+		end
+
+		t1.Config = v8.get()
+
+		local v10 = p2(t1.Config)
+
+		for k, v in pairs(v10) do
+			t1[k] = v
+		end
+
+		local trace = debug.traceback()
+		local v14 = if trace:sub(-1, -1) ~= "\n" then trace else trace:sub(1, -2)
+
+		function t1.init(p6) -- line: 38
+			-- upvalues: p5 (copy), p3 (copy), v14 (copy)
+			if p6 == p5 then
+				return
+			end
+
+			local trace2 = debug.traceback()
+			local v22 = if trace2:sub(-1, -1) ~= "\n" then trace2 else trace2:sub(1, -2)
+
+			warn(string.format("%s has already been configured\nFirst init traceback:\n%s\nCurrent init traceback:\n%s", p3, v14, v22))
+		end
+
+		if _G.__UIBLOX_TRACK_USAGE__ then
+			return (setmetatable(t1, (getmetatable(v10))))
+		end
+
+		return (setmetatable(t1, {
+			__index = function(_, p8) -- line: 63
+				-- upvalues: p3 (copy)
+				local v25 = ("%q (%s) is not a valid member of %s"):format(tostring(p8), typeof(p8), p3)
+
+				error(v25, 2)
+			end,
+			__newindex = function(_, p10, _) -- line: 69
+				-- upvalues: p3 (copy)
+				local v29 = ("%q (%s) is not a valid member of %s"):format(tostring(p10), typeof(p10), p3)
+
+				error(v29, 2)
+			end
+		}))
+	end
+
+	return (setmetatable(t1, {
+		__index = function(_, _) -- line: 78
+			-- upvalues: p3 (copy)
+			error(("You must call %s.init(config) before using it!"):format(p3), 2)
+		end,
+		__newindex = function(_, _, _) -- line: 82
+			-- upvalues: p3 (copy)
+			error(("You must call %s.init(config) before using it!"):format(p3), 2)
+		end
+	}))
+end

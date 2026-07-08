@@ -8,6 +8,8 @@ local useLocalization = require(SocialBlockingModalParent.Localization).Hooks.us
 local useNavigation = require(SocialBlockingModalParent.Navigation).useNavigation
 local useDispatch = require(SocialBlockingModalParent.RoactUtils).Hooks.RoactRodux.useDispatch
 local NavigateDown = require(SocialBlockingModalParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(SocialBlockingModalParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v12 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialBlockingModalParent.RobloxAppNavigation).NavigationCommands
 local AppPage = require(SocialBlockingModalParent.RobloxAppEnums).AppPage
 local Url = require(SocialBlockingModalParent.Http).Url
 local UIBlox = require(SocialBlockingModalParent.UIBlox)
@@ -15,9 +17,8 @@ local ButtonType = UIBlox.App.Button.Enum.ButtonType
 local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
 local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
 local UserProfiles = require(SocialBlockingModalParent.UserProfiles)
-local GenericAbuseReporting = require(SocialBlockingModalParent.GenericAbuseReporting)
-local AbuseVector = GenericAbuseReporting.Enums.AbuseVector
-local OpenDynamicAbuseReport = GenericAbuseReporting.Thunks.OpenDynamicAbuseReport
+local AbuseVector = require(SocialBlockingModalParent.GenericAbuseReporting.AbuseVector)
+local OpenDynamicAbuseReport = require(SocialBlockingModalParent.GenericAbuseReporting.OpenDynamicAbuseReport)
 local CloseCentralOverlay = require(SocialBlockingModalParent.CentralOverlay).Thunks.CloseCentralOverlay
 local myUserBlockingNetworking = require(SocialBlockingModal.Networking.myUserBlockingNetworking)
 local useShowToastOnError = require(script.Parent.useShowToastOnError)
@@ -30,75 +31,75 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local FFlagEnableAbuseReportRevampFlow = require(SocialBlockingModalParent.SharedFlags).FFlagEnableAbuseReportRevampFlow
 local FFlagDisableBlockAndReport = require(SocialBlockingModalParent.SharedFlags).FFlagDisableBlockAndReport
 local FFlagConnectionsToFriendsRename = require(SocialBlockingModalParent.SharedFlags).FFlagConnectionsToFriendsRename
-local v33 = game:DefineFastFlag("SocialBlockingModalFocusNavSupport", false)
+local v34 = game:DefineFastFlag("SocialBlockingModalFocusNavSupport", false)
 
-return function() --[[ BlockingModal ]] -- line: 53
-	-- upvalues: useNavigation (copy), FFlagDisableBlockAndReport (copy), useLocalUserId (copy), useDispatch (copy), useScreenSize (copy), useLayerCollector (copy), React (copy), useSocialBlockingModalAnalytics (copy), EventNames (copy), useShowToastOnError (copy), myUserBlockingNetworking (copy), FFlagEnableAbuseReportRevampFlow (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), NavigateDown (copy), AppPage (copy), Url (copy), UserProfiles (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), ButtonType (copy), v33 (copy), InteractiveAlert (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v34 = useNavigation()
-	local v35 = v34.getParam("navProps")
-	local userId = v35.userId
-	local onBlockSuccess = v35.onBlockSuccess
-	local openReportUser = v35.openReportUser
-	local v39 = if not FFlagDisableBlockAndReport then nil else v35.disableReportOption
-	local v40 = useLocalUserId()
-	local v41 = useDispatch()
-	local v42 = useScreenSize()
-	local v43 = useLayerCollector()
+local function BlockingModal() -- line: 55
+	-- upvalues: useNavigation (copy), FFlagDisableBlockAndReport (copy), useLocalUserId (copy), useDispatch (copy), useScreenSize (copy), useLayerCollector (copy), React (copy), useSocialBlockingModalAnalytics (copy), EventNames (copy), useShowToastOnError (copy), myUserBlockingNetworking (copy), FFlagEnableAbuseReportRevampFlow (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), CloseCentralOverlay (copy), AppPage (copy), Url (copy), FFlagSignalsNavP3Dispatch (copy), v12 (copy), NavigateDown (copy), UserProfiles (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), ButtonType (copy), v34 (copy), InteractiveAlert (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v36 = useNavigation()
+	local v37 = v36.getParam("navProps")
+	local userId = v37.userId
+	local onBlockSuccess = v37.onBlockSuccess
+	local openReportUser = v37.openReportUser
+	local v41 = if not FFlagDisableBlockAndReport then nil else v37.disableReportOption
+	local v42 = useLocalUserId()
+	local v43 = useDispatch()
+	local v44 = useScreenSize()
+	local v45 = useLayerCollector()
 
-	if not v42 and (v43 and v43.absoluteSize) then
-		v42 = v43.absoluteSize
+	if not v44 and (v45 and v45.absoluteSize) then
+		v44 = v45.absoluteSize
 	end
 
-	local v44 = React.useCallback(function() -- line: 71
-		-- upvalues: v34 (copy)
-		v34.pop()
-	end, { v34 })
+	local v46 = React.useCallback(function() -- line: 73
+		-- upvalues: v36 (copy)
+		v36.pop()
+	end, { v36 })
 	local fireAnalyticsEvent = useSocialBlockingModalAnalytics({
 		userId = userId
 	}).fireAnalyticsEvent
 
-	React.useEffect(function() -- line: 77
+	React.useEffect(function() -- line: 79
 		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy)
 		fireAnalyticsEvent(EventNames.SocialBlockingModalSeen)
 	end, { userId })
 
-	local v46 = useShowToastOnError()
-	local v47 = React.useCallback(function() -- line: 83
-		-- upvalues: v41 (copy), myUserBlockingNetworking (copy), userId (copy), v40 (copy), onBlockSuccess (copy), v46 (copy), v44 (copy)
-		v41(myUserBlockingNetworking.BlockUserById.API({
+	local v48 = useShowToastOnError()
+	local v49 = React.useCallback(function() -- line: 85
+		-- upvalues: v43 (copy), myUserBlockingNetworking (copy), userId (copy), v42 (copy), onBlockSuccess (copy), v48 (copy), v46 (copy)
+		v43(myUserBlockingNetworking.BlockUserById.API({
 			userId = userId,
-			currentUserId = v40
-		})):andThen(function() -- line: 88
+			currentUserId = v42
+		})):andThen(function() -- line: 90
 			-- upvalues: onBlockSuccess (copy)
 			if onBlockSuccess then
 				onBlockSuccess()
 			end
-		end):catch(function(p1) -- line: 93
-			-- upvalues: v46 (copy)
-			v46(p1)
+		end):catch(function(p1) -- line: 95
+			-- upvalues: v48 (copy)
+			v48(p1)
 		end)
-		v44()
+		v46()
 	end, {
 		onBlockSuccess,
-		v44,
+		v46,
 		userId,
-		v40,
-		v41,
-		v46
+		v42,
+		v43,
+		v48
 	})
-	local v48 = React.useCallback(function() -- line: 100
-		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v47 (copy)
+	local v50 = React.useCallback(function() -- line: 102
+		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v49 (copy)
 		fireAnalyticsEvent(EventNames.SocialBlockingModalBlockPressed)
-		v47()
+		v49()
 	end, {
-		v47,
+		v49,
 		userId,
 		fireAnalyticsEvent
 	})
-	local v49 = React.useCallback(function() -- line: 106
-		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v47 (copy), openReportUser (copy), FFlagEnableAbuseReportRevampFlow (copy), v41 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), userId (copy), CloseCentralOverlay (copy), NavigateDown (copy), AppPage (copy), Url (copy)
+	local v51 = React.useCallback(function() -- line: 108
+		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v49 (copy), openReportUser (copy), FFlagEnableAbuseReportRevampFlow (copy), v43 (copy), OpenDynamicAbuseReport (copy), AbuseVector (copy), userId (copy), CloseCentralOverlay (copy), AppPage (copy), Url (copy), FFlagSignalsNavP3Dispatch (copy), v12 (copy), NavigateDown (copy)
 		fireAnalyticsEvent(EventNames.SocialBlockingModalBlockAndReportPressed)
-		v47()
+		v49()
 
 		if openReportUser then
 			openReportUser()
@@ -107,122 +108,132 @@ return function() --[[ BlockingModal ]] -- line: 53
 		end
 
 		if FFlagEnableAbuseReportRevampFlow then
-			v41(OpenDynamicAbuseReport({
+			v43(OpenDynamicAbuseReport({
 				abuseVector = AbuseVector.UserProfile,
 				targetId = userId,
-				onClose = function() --[[ onClose ]] -- line: 117
-					-- upvalues: v41 (copy), CloseCentralOverlay (copy)
-					v41(CloseCentralOverlay())
+				onClose = function() -- line: 119
+					-- upvalues: v43 (copy), CloseCentralOverlay (copy)
+					v43(CloseCentralOverlay())
 				end
 			}))
 
 			return
 		end
 
-		v41(NavigateDown({
+		local t1 = {
 			name = AppPage.GenericWebPage,
 			detail = `{ Url.BASE_URL }abusereport/userprofile?id={ userId }`,
 			extraProps = {
 				title = ""
 			}
-		}))
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v12.down(v12.fromLegacyPage(t1))
+
+			return
+		end
+
+		v43(NavigateDown(t1))
 	end, {
-		v47,
-		v41,
+		v49,
+		v43,
 		userId,
 		fireAnalyticsEvent,
 		openReportUser
 	})
-	local v50 = React.useCallback(function() -- line: 141
-		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v44 (copy)
+	local v52 = React.useCallback(function() -- line: 148
+		-- upvalues: fireAnalyticsEvent (copy), EventNames (copy), v46 (copy)
 		fireAnalyticsEvent(EventNames.SocialBlockingModalCancelPressed)
-		v44()
+		v46()
 	end, {
-		v44,
+		v46,
 		fireAnalyticsEvent
 	})
-	local v51 = UserProfiles.Hooks.useUserProfilesFetch({
+	local v53 = UserProfiles.Hooks.useUserProfilesFetch({
 		userIds = { userId },
 		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds
 	})
-	local v52 = if not v51.data then nil else UserProfiles.Selectors.getCombinedNameFromId(v51.data, userId)
-	local v53 = useLocalization({
-		title = {
-			"Feature.BlockingModal.Heading.BlockUser",
-			DisplayName = v52
-		},
-		bodyText = not FFlagConnectionsToFriendsRename and "Feature.BlockingModal.Message.BlockConfirmation" or "Feature.BlockingModal.Message.BlockConfirmation.FriendsRename",
+	local v54 = if not v53.data then nil else UserProfiles.Selectors.getCombinedNameFromId(v53.data, userId)
+	local v55 = useLocalization({
 		cancelBtnText = "Feature.BlockingModal.Action.Cancel",
 		blockBtnText = "Feature.BlockingModal.Action.Block",
-		blockAndReportBtnText = "Feature.BlockingModal.Action.BlockAndReport"
+		blockAndReportBtnText = "Feature.BlockingModal.Action.BlockAndReport",
+		title = {
+			"Feature.BlockingModal.Heading.BlockUser",
+			DisplayName = v54
+		},
+		bodyText = not FFlagConnectionsToFriendsRename and "Feature.BlockingModal.Message.BlockConfirmation" or "Feature.BlockingModal.Message.BlockConfirmation.FriendsRename"
 	})
-	local v54 = React.useMemo(function() -- line: 169
-		-- upvalues: ButtonType (copy), v53 (copy), v50 (copy), FFlagDisableBlockAndReport (copy), v39 (copy), v49 (copy), v48 (copy)
-		local t1 = {}
+	local v56 = React.useMemo(function() -- line: 176
+		-- upvalues: ButtonType (copy), v55 (copy), v52 (copy), FFlagDisableBlockAndReport (copy), v41 (copy), v51 (copy), v50 (copy)
+		local t2 = {}
 
-		table.insert(t1, {
+		table.insert(t2, {
 			buttonType = ButtonType.Secondary,
 			props = {
-				text = v53.cancelBtnText,
-				onActivated = v50
+				text = v55.cancelBtnText,
+				onActivated = v52
 			}
 		})
 
-		if not FFlagDisableBlockAndReport or not v39 then
-			table.insert(t1, {
+		if not FFlagDisableBlockAndReport or not v41 then
+			table.insert(t2, {
 				buttonType = ButtonType.Alert,
 				props = {
-					text = v53.blockAndReportBtnText,
-					onActivated = v49
+					text = v55.blockAndReportBtnText,
+					onActivated = v51
 				}
 			})
 		end
 
-		table.insert(t1, {
+		table.insert(t2, {
 			buttonType = ButtonType.Alert,
 			props = {
-				text = v53.blockBtnText,
-				onActivated = v48
+				text = v55.blockBtnText,
+				onActivated = v50
 			}
 		})
 
-		return t1
+		return t2
 	end, {
-		v53,
-		v50,
-		v49,
-		v39,
-		v48
+		v55,
+		v52,
+		v51,
+		v41,
+		v50
 	})
 
-	if v33 then
-		local v55 = React.createElement(InteractiveAlert, {
-			screenSize = v42,
-			title = v53.title,
-			bodyText = v53.bodyText,
+	if v34 then
+		local v57 = React.createElement(InteractiveAlert, {
 			richText = true,
 			isRoactGamepadEnabled = false,
+			screenSize = v44,
+			title = v55.title,
+			bodyText = v55.bodyText,
 			buttonStackInfo = {
-				buttons = v54 or {}
+				buttons = v56 or {}
 			}
 		})
 
 		return React.createElement(FocusRoot, {
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
 			isIsolated = true,
-			isAutoFocusRoot = true
+			isAutoFocusRoot = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
 		}, {
-			BlockingModalScreen = v55
+			BlockingModalScreen = v57
 		})
 	end
 
 	return React.createElement(InteractiveAlert, {
-		screenSize = v42,
-		title = v53.title,
-		bodyText = v53.bodyText,
 		richText = true,
+		screenSize = v44,
+		title = v55.title,
+		bodyText = v55.bodyText,
 		buttonStackInfo = {
-			buttons = v54 or {}
+			buttons = v56 or {}
 		}
 	})
 end
+
+return BlockingModal

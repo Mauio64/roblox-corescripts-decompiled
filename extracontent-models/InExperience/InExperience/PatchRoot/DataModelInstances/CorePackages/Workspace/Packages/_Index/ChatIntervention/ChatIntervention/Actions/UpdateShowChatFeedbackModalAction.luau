@@ -1,6 +1,7 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatIntervention");
-return require(l_script_FirstAncestor_0.Parent.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 9 ]]
-    return {
-        isShow = v1
-    };
-end);
+local ChatIntervention = script:FindFirstAncestor("ChatIntervention")
+
+return require(ChatIntervention.Parent.Rodux).makeActionCreator(script.Name, function(b1: boolean) -- line: 9
+	return {
+		isShow = b1
+	}
+end)

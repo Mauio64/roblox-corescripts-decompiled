@@ -1,8 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("InlineRichText").Parent;
-local _ = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.InlineLayout);
-local _ = require(script.Parent.Enums.TokenName);
-local _ = require(script.Parent.Enums.NodeType);
-local _ = require(script.Parent.Enums.LinkType);
-local _ = require(script.Parent.Enums.LinkBehavior);
-return {};
+local Parent = script:FindFirstAncestor("InlineRichText").Parent
+
+require(Parent.Foundation)
+require(Parent.InlineLayout)
+require(script.Parent.Enums.TokenName)
+require(script.Parent.Enums.NodeType)
+require(script.Parent.Enums.LinkType)
+require(script.Parent.Enums.LinkBehavior)
+
+return {}

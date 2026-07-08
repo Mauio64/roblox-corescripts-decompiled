@@ -5,37 +5,17 @@ require(script.Parent.SheetType)
 
 return React.createContext({
 	sheetHeightAvailable = nil,
-	setSheetHeightAvailable = function(_: number) --[[ setSheetHeightAvailable ]] -- line: 11
-		error("No SheetContext available")
-	end,
 	actionsHeight = nil,
-	setActionsHeight = function(_: number) --[[ setActionsHeight ]] -- line: 15
-		error("No SheetContext available")
-	end,
 	hasActionsDivider = nil,
-	setHasActionsDivider = function(_: boolean) --[[ setHasActionsDivider ]] -- line: 19
-		error("No SheetContext available")
-	end,
 	sheetContentHeight = nil,
-	setSheetContentHeight = function(_: number) --[[ setSheetContentHeight ]] -- line: 23
-		error("No SheetContext available")
-	end,
 	safeAreaPadding = nil,
 	bottomPadding = nil,
 	innerScrollingEnabled = nil,
 	innerScrollY = nil,
-	setInnerScrollY = function(_: number) --[[ setInnerScrollY ]] -- line: 30
-		error("No SheetContext available")
-	end,
+	innerScrollingRef = nil,
 	hasHeader = nil,
-	setHasHeader = function(_: boolean) --[[ setHasHeader ]] -- line: 34
-		error("No SheetContext available")
-	end,
 	hasFullBleed = false,
 	fullBleedHeight = nil,
-	setFullBleedHeight = function(_: number) --[[ setFullBleedHeight ]] -- line: 39
-		error("No SheetContext available")
-	end,
 	hasRadius = true,
 	closeSheet = nil,
 	sheetType = nil,
@@ -43,6 +23,27 @@ return React.createContext({
 	testId = nil,
 	closeAffordanceRef = nil,
 	contentStartRef = nil,
-	setContentStartRef = function(_) --[[ setContentStartRef ]] -- line: 49
+	setSheetHeightAvailable = function(_: number) -- line: 11
+		error("No SheetContext available")
+	end,
+	setActionsHeight = function(_: number) -- line: 15
+		error("No SheetContext available")
+	end,
+	setHasActionsDivider = function(_: boolean) -- line: 19
+		error("No SheetContext available")
+	end,
+	setSheetContentHeight = function(_: number) -- line: 23
+		error("No SheetContext available")
+	end,
+	setInnerScrollY = function(_: number) -- line: 31
+		error("No SheetContext available")
+	end,
+	setHasHeader = function(_: boolean) -- line: 35
+		error("No SheetContext available")
+	end,
+	setFullBleedHeight = function(_: number) -- line: 40
+		error("No SheetContext available")
+	end,
+	setContentStartRef = function(_) -- line: 50
 	end
 })

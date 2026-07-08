@@ -1,1 +1,1 @@
-return game:DefineFastFlag("InExperienceAddPhoneViewNewCopy", false);
+return game:DefineFastFlag("InExperienceAddPhoneViewNewCopy", false)

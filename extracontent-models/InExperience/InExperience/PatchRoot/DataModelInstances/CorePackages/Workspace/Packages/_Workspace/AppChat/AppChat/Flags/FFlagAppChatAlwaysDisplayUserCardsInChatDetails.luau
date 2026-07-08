@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatAlwaysDisplayUserCardsInChatDetails", false);
+return game:DefineFastFlag("AppChatAlwaysDisplayUserCardsInChatDetails", false)

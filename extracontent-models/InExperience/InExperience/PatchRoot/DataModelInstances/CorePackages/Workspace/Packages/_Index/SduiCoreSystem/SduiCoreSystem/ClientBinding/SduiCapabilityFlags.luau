@@ -1,0 +1,7 @@
+local Parent = script:FindFirstAncestor("SduiCoreSystem").Parent
+local SharedFlags = require(Parent.SharedFlags)
+
+return {
+	CAPABILITY_SUPPORTS_EDP_PERSISTENT_ACTION_BAR_PLAY_BUTTON = SharedFlags.FFlagSduiEdpPersistentActionBarPlayButton,
+	CAPABILITY_SUPPORTS_OPEN_EXPERIENCE_STORE_SEE_ALL_WITH_WEBVIEW_FALLBACK_ACTION = SharedFlags.FFlagSduiCapabilityDevStoreSeeAllWebviewFallback
+}

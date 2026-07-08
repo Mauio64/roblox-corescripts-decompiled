@@ -1,5 +1,6 @@
-local _ = require(script.SocialLinkInfoStoreTypes);
+require(script.SocialLinkInfoStoreTypes)
+
 return {
-    createSocialLinkInfoStore = require(script.createSocialLinkInfoStore), 
-    getSocialLinkInfoStore = require(script.getSocialLinkInfoStore)
-};
+	createSocialLinkInfoStore = require(script.createSocialLinkInfoStore),
+	getSocialLinkInfoStore = require(script.getSocialLinkInfoStore)
+}

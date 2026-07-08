@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "isUserEligibleForUnifiedPurchaseFlow");
+return require(script.Parent.makeActionCreator)(script.Name, "isUserEligibleForUnifiedPurchaseFlow")

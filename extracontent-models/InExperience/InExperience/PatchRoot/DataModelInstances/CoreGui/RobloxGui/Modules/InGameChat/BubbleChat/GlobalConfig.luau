@@ -1,3 +1,3 @@
 return {
-    actionValidation = false
-};
+	actionValidation = false
+}

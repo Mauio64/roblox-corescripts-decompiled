@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent.Parent.Parent._Index;
-return (require(l__Index_0.NetworkingSquads.NetworkingSquads));
+local _Index = script.Parent.Parent.Parent._Index
+
+return (require(_Index.NetworkingSquads.NetworkingSquads))

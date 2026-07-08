@@ -1,3 +1,3 @@
 return {
-    names = "names"
-};
+	names = "names"
+}

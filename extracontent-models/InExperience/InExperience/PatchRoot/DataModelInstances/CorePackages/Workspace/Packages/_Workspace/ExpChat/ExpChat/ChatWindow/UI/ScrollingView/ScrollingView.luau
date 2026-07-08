@@ -5,15 +5,16 @@ local Dictionary = require(ExpChatParent.llama).Dictionary
 local ExpChatShared = require(ExpChatParent.ExpChatShared)
 local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
 local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV2ChatWindow)
-local FFlagExpChatEnableNewBottomLockedScrollView = require(ExpChat.Flags.FFlagExpChatEnableNewBottomLockedScrollView)
+local FFlagExpChatWindowMessageSourceRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatWindowMessageSourceRefactor
+local FFlagExpChatChannelTabRefactor = require(ExpChatParent.SharedFlags).FFlagExpChatChannelTabRefactor
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
-local v10 = if not FFlagExpChatEnableNewBottomLockedScrollView then require(ExpChat.ChatWindow.UI.BottomLockedScrollView) else require(ExpChat.ChatWindow.UI.BottomLockedScrollViewV3)
-local v11 = Roact.PureComponent:extend("ScrollingView")
+local BottomLockedScrollViewV3 = require(ExpChat.ChatWindow.UI.BottomLockedScrollViewV3)
+local v12 = Roact.PureComponent:extend("ScrollingView")
 
-v11.defaultProps = {}
+v12.defaultProps = {}
 
-function v11.render(p1) -- line: 20
-	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), Roact (copy), FFlagExpChatEnableFocusNavigation (copy), v10 (copy), Dictionary (copy), FFlagExpChatEnableNewBottomLockedScrollView (copy)
+function v12.render(p1) -- line: 18
+	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatWindowMessageSourceRefactor (copy), Roact (copy), FFlagExpChatEnableFocusNavigation (copy), BottomLockedScrollViewV3 (copy), Dictionary (copy), FFlagExpChatChannelTabRefactor (copy)
 	local t1 = {}
 
 	if FFlagExpChatEnableV2ChatWindow then
@@ -29,18 +30,22 @@ function v11.render(p1) -- line: 20
 		}
 	end
 
+	if FFlagExpChatWindowMessageSourceRefactor then
+		t1.messageComponentsSignal = p1.props.messageComponentsSignal
+	end
+
 	return Roact.createElement("ImageButton", {
 		BackgroundTransparency = 1,
 		Selectable = not FFlagExpChatEnableFocusNavigation and nil,
 		Size = p1.props.size
 	}, {
-		bottomLockedScrollView = Roact.createElement(v10, Dictionary.join({
+		bottomLockedScrollView = Roact.createElement(BottomLockedScrollViewV3, Dictionary.join({
 			Size = UDim2.fromScale(1, 1),
-			messages = if not FFlagExpChatEnableNewBottomLockedScrollView then p1.props.messages else nil,
 			targetTextChannel = p1.props.targetTextChannel,
-			isChannelBarVisible = p1.props.isChannelBarVisible
-		}, t1), if not FFlagExpChatEnableV2ChatWindow then p1.props[Roact.Children] else nil)
+			isChannelBarVisible = p1.props.isChannelBarVisible,
+			scrollResetKey = if not FFlagExpChatChannelTabRefactor then nil else p1.props.scrollResetKey
+		}, t1), if not FFlagExpChatEnableV2ChatWindow and not FFlagExpChatWindowMessageSourceRefactor then p1.props[Roact.Children] else nil)
 	})
 end
 
-return v11
+return v12

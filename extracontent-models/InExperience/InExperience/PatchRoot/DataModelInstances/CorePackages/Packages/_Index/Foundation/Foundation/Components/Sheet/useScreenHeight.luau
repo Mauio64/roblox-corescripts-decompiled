@@ -1,29 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Providers.Overlay.useOverlay);
-return function() --[[ Line: 7 ]] --[[ Name: useScreenHeight ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v4 = v3();
-    local v5, v6 = v2.useState(v4 and v4.AbsoluteSize.Y or 0);
-    v2.useLayoutEffect(function() --[[ Line: 11 ]]
-        -- upvalues: v4 (copy), v6 (copy)
-        local v7 = nil;
-        if v4 then
-            v6(v4.AbsoluteSize.Y);
-            v7 = v4:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 16 ]]
-                -- upvalues: v6 (ref), v4 (ref)
-                v6(v4.AbsoluteSize.Y);
-            end);
-        end;
-        return function() --[[ Line: 21 ]]
-            -- upvalues: v7 (ref)
-            if v7 then
-                v7:Disconnect();
-            end;
-        end;
-    end, {
-        v4
-    });
-    return v5;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Flags = require(Foundation.Utility.Flags)
+local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
+local useScreen = require(Foundation.Providers.Overlay.useScreen)
+
+local function useScreenHeight() -- line: 9
+	-- upvalues: Flags (copy), useScreen (copy), useOverlay (copy), React (copy)
+	local v8 = if not Flags.FoundationOverlayKeyboardAwarenessHardened then useOverlay() else useScreen()
+	local v9, v10 = React.useState(v8 and v8.AbsoluteSize.Y or 0)
+
+	React.useLayoutEffect(function() -- line: 13
+		-- upvalues: v8 (copy), v10 (copy)
+		local connection = nil
+
+		if v8 then
+			v10(v8.AbsoluteSize.Y)
+			connection = v8:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 18
+				-- upvalues: v10 (copy), v8 (copy)
+				v10(v8.AbsoluteSize.Y)
+			end)
+		end
+
+		return function() -- line: 23
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v8 })
+
+	return v9
+end
+
+return useScreenHeight

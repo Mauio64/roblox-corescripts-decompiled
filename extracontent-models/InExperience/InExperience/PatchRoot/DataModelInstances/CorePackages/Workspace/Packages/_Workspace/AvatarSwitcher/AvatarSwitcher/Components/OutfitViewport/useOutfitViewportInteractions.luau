@@ -1,109 +1,111 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script:FindFirstAncestor("AvatarSwitcher").Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.ReactOtter);
-local function _(v5) --[[ Line: 21 ]] --[[ Name: swipeDistanceToRotationAngle ]]
-    return -v5.X * 1;
-end;
-return function(v7) --[[ Line: 30 ]] --[[ Name: useOutfitViewportInteractions ]]
-    -- upvalues: v3 (copy), v4 (copy), l_HttpService_0 (copy), l_RunService_0 (copy)
-    local v8 = v3.useRef(false);
-    local v9 = v3.useRef((Vector3.new()));
-    local v10, v11 = v4.useAnimatedBinding(0);
-    local v12 = v3.useRef(0);
-    local v13 = v3.useRef(0);
-    local v14 = v3.useRef(nil);
-    local v15, v16 = v3.useBinding(CFrame.new());
-    v3.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: l_HttpService_0 (ref), v14 (copy), l_RunService_0 (ref), v8 (copy), v11 (copy), v4 (ref), v10 (copy), v12 (copy), v13 (copy), v7 (copy), v16 (copy)
-        local v17 = 0;
-        local v18 = "OutfitVewportSpin_" .. l_HttpService_0:GenerateGUID(false);
-        local l_current_0 = v14.current;
-        l_RunService_0:BindToRenderStep(v18, Enum.RenderPriority.Camera.Value + 1, function(v20) --[[ Line: 45 ]]
-            -- upvalues: v8 (ref), v14 (ref), l_current_0 (ref), v11 (ref), v4 (ref), v17 (ref), v10 (ref), v12 (ref), v13 (ref), v7 (ref), v16 (ref)
-            if v8.current then
-                local v21 = if v14.current and l_current_0 then (v14.current - l_current_0) / v20 else Vector2.new(0, 0);
-                v11(v4.instant(-v21.X * 1));
-            else
-                v17 = v17 + v20 * v10:getValue();
-            end;
-            l_current_0 = v14.current;
-            local v22 = math.rad(v17) + math.rad(v12.current) + math.rad(v13.current);
-            local v23 = CFrame.Angles(0, v22, 0);
-            local l_current_1 = v7.defaultCameraDistanceRef.current;
-            v16(CFrame.lookAt(v23.LookVector * l_current_1, Vector3.new(0, 0, 0, 0), v23.UpVector));
-        end);
-        return function() --[[ Line: 68 ]]
-            -- upvalues: l_RunService_0 (ref), v18 (copy)
-            l_RunService_0:UnbindFromRenderStep(v18);
-        end;
-    end, {
-        v11, 
-        v7.defaultCameraDistanceRef, 
-        v16
-    });
-    local v27 = v3.useCallback(function(v25) --[[ Line: 73 ]]
-        -- upvalues: v12 (copy), v9 (copy), v8 (copy), v14 (copy), v13 (copy), v7 (copy), v11 (copy), v4 (ref)
-        local l_v12_0 = v12;
-        l_v12_0.current = l_v12_0.current + -(v25 - v9.current).X * 1;
-        v8.current = false;
-        v14.current = nil;
-        v13.current = 0;
-        if v7.onInteractionChanged then
-            v7.onInteractionChanged(false);
-        end;
-        v11((v4.spring(0, {
-            frequency = 1
-        })));
-    end, {
-        v7.onInteractionChanged, 
-        v11
-    });
-    local v31 = v3.useCallback(function(_, v29) --[[ Line: 86 ]]
-        -- upvalues: v8 (copy), v9 (copy), v14 (copy), v7 (copy)
-        local v30 = true;
-        if v29.UserInputType ~= Enum.UserInputType.MouseButton1 then
-            v30 = v29.UserInputType == Enum.UserInputType.Touch;
-        end;
-        if v30 and not v8.current then
-            v8.current = true;
-            v9.current = v29.Position;
-            v14.current = v29.Position;
-            if v7.onInteractionChanged then
-                v7.onInteractionChanged(true);
-            end;
-        end;
-    end, {
-        v7.onInteractionChanged
-    });
-    local v34 = v3.useCallback(function(v32) --[[ Line: 100 ]]
-        -- upvalues: v8 (copy), v13 (copy), v9 (copy), v14 (copy)
-        local v33 = true;
-        if v32.UserInputType ~= Enum.UserInputType.MouseMovement then
-            v33 = v32.UserInputType == Enum.UserInputType.Touch;
-        end;
-        if v8.current and v33 then
-            v13.current = -(v32.Position - v9.current).X * 1;
-            v14.current = v32.Position;
-        end;
-    end, {});
-    local v37 = v3.useCallback(function(v35) --[[ Line: 109 ]]
-        -- upvalues: v8 (copy), v27 (copy)
-        local v36 = true;
-        if v35.UserInputType ~= Enum.UserInputType.MouseButton1 then
-            v36 = v35.UserInputType == Enum.UserInputType.Touch;
-        end;
-        if v36 and v8.current then
-            v27(v35.Position);
-        end;
-    end, {
-        v27
-    });
-    return {
-        onInputBegan = v31, 
-        onInputChanged = v34, 
-        onInputEnded = v37, 
-        cameraCFrame = v15
-    };
-end;
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+
+local function swipeDistanceToRotationAngle(vector3: Vector3) -- line: 21
+	return -vector3.X * 1
+end
+local function useOutfitViewportInteractions(t1: {[any]: any}) -- line: 30
+	-- upvalues: React (copy), ReactOtter (copy), HttpService (copy), RunService (copy)
+	local v10 = React.useRef(false)
+	local v11 = React.useRef((Vector3.new()))
+	local v12, v13 = ReactOtter.useAnimatedBinding(0)
+	local v14 = React.useRef(0)
+	local v15 = React.useRef(0)
+	local v16 = React.useRef(nil)
+	local v17, v18 = React.useBinding(CFrame.new())
+
+	React.useEffect(function() -- line: 39
+		-- upvalues: HttpService (copy), v16 (copy), RunService (copy), v10 (copy), v13 (copy), ReactOtter (copy), v12 (copy), v14 (copy), v15 (copy), t1 (copy), v18 (copy)
+		local n1 = 0
+		local v24 = "OutfitVewportSpin_" .. HttpService:GenerateGUID(false)
+		local current = v16.current
+
+		RunService:BindToRenderStep(v24, Enum.RenderPriority.Camera.Value + 1, function(n2: number) -- line: 45
+			-- upvalues: v10 (copy), v16 (copy), current (ref), v13 (copy), ReactOtter (copy), n1 (ref), v12 (copy), v14 (copy), v15 (copy), t1 (copy), v18 (copy)
+			if v10.current then
+				local v34 = if not v16.current or not current then Vector2.new(0, 0) else (v16.current - current) / n2
+
+				v13(ReactOtter.instant(-v34.X * 1))
+			else
+				n1 += n2 * v12:getValue()
+			end
+
+			current = v16.current
+
+			local v35 = math.rad(n1) + math.rad(v14.current) + math.rad(v15.current)
+			local cFrame = CFrame.Angles(0, v35, 0)
+			local current2 = t1.defaultCameraDistanceRef.current
+
+			v18(CFrame.lookAt(cFrame.LookVector * current2, Vector3.new(0, 0, 0), cFrame.UpVector))
+		end)
+
+		return function() -- line: 68
+			-- upvalues: RunService (copy), v24 (copy)
+			RunService:UnbindFromRenderStep(v24)
+		end
+	end, {
+		v13,
+		t1.defaultCameraDistanceRef,
+		v18
+	})
+
+	local v19 = React.useCallback(function(vector3: Vector3) -- line: 73
+		-- upvalues: v14 (copy), v11 (copy), v10 (copy), v16 (copy), v15 (copy), t1 (copy), v13 (copy), ReactOtter (copy)
+		local v27 = v14
+
+		v27.current = v27.current + -(vector3 - v11.current).X * 1
+		v10.current = false
+		v16.current = nil
+		v15.current = 0
+
+		if t1.onInteractionChanged then
+			t1.onInteractionChanged(false)
+		end
+
+		v13((ReactOtter.spring(0, {
+			frequency = 1
+		})))
+	end, {
+		t1.onInteractionChanged,
+		v13
+	})
+	local v20 = React.useCallback(function(_, p2) -- line: 86
+		-- upvalues: v10 (copy), v11 (copy), v16 (copy), t1 (copy)
+		if (p2.UserInputType == Enum.UserInputType.MouseButton1 or p2.UserInputType == Enum.UserInputType.Touch) and not v10.current then
+			v10.current = true
+			v11.current = p2.Position
+			v16.current = p2.Position
+
+			if t1.onInteractionChanged then
+				t1.onInteractionChanged(true)
+			end
+		end
+	end, { t1.onInteractionChanged })
+	local v21 = React.useCallback(function(p3) -- line: 100
+		-- upvalues: v10 (copy), v15 (copy), v11 (copy), v16 (copy)
+		local v31 = p3.UserInputType == Enum.UserInputType.MouseMovement or p3.UserInputType == Enum.UserInputType.Touch
+
+		if v10.current and v31 then
+			v15.current = -(p3.Position - v11.current).X * 1
+			v16.current = p3.Position
+		end
+	end, {})
+	local v22 = React.useCallback(function(p4) -- line: 109
+		-- upvalues: v10 (copy), v19 (copy)
+		if (p4.UserInputType == Enum.UserInputType.MouseButton1 or p4.UserInputType == Enum.UserInputType.Touch) and v10.current then
+			v19(p4.Position)
+		end
+	end, { v19 })
+
+	return {
+		onInputBegan = v20,
+		onInputChanged = v21,
+		onInputEnded = v22,
+		cameraCFrame = v17
+	}
+end
+
+return useOutfitViewportInteractions

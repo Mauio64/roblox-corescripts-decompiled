@@ -1,3 +1,3 @@
 return {
-    ToastType = require(script.ToastType)
-};
+	ToastType = require(script.ToastType)
+}

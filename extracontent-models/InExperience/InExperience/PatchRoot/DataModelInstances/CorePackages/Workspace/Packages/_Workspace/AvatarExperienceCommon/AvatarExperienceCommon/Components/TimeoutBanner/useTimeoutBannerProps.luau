@@ -1,46 +1,50 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_AvatarScreen_0 = require(l_Parent_0.AvatarExperienceNavigation).Enums.AvatarScreen;
-local v7 = require(l_script_FirstAncestor_0.Stores.TimeoutStatusStore.getTimeoutStatusStore);
-local v8 = require(l_script_FirstAncestor_0.Utils.formatTimeoutEndTime);
-return function(v9) --[[ Line: 28 ]] --[[ Name: useTimeoutBannerProps ]]
-    -- upvalues: v7 (copy), l_useSignalState_0 (copy), l_useNavigation_0 (copy), v2 (copy), v8 (copy), l_useLocalization_0 (copy), l_AvatarScreen_0 (copy)
-    local v10 = if v9 then v9.shouldFetch ~= nil and v9.shouldFetch else false;
-    local v11 = not v9 or not (v9.shouldNavigateOnClick ~= nil) or v9.shouldNavigateOnClick;
-    local v12 = v7();
-    local v13 = l_useSignalState_0(v12.getStatus);
-    local v14 = l_useSignalState_0(v12.getIsTimedOut);
-    local v15 = l_useNavigation_0();
-    v2.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: v10 (copy), v12 (copy)
-        if v10 then
-            v12.fetchStatus();
-        end;
-    end, {
-        v10, 
-        v12
-    });
-    local v16 = v13.timeoutAction and v13.timeoutAction.endTime or v13.details and v13.details.endDate;
-    local v17 = v8(v16);
-    local v18 = l_useLocalization_0({
-        messageText = if v17 then {
-            "Feature.Timeout.WarningBanner.DisabledUntilMessage"; 
-            time = v17
-        } else "Feature.Timeout.WarningBanner.DisabledMessage"
-    });
-    local v19 = v2.useCallback(function() --[[ Line: 54 ]]
-        -- upvalues: v15 (copy), l_AvatarScreen_0 (ref)
-        v15.navigate(l_AvatarScreen_0.TimeoutStatusPrompt);
-    end, {
-        v15
-    });
-    return {
-        messageText = v18.messageText, 
-        onBannerActivated = if v11 then v19 else nil, 
-        shouldShow = v14
-    };
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local React = require(AvatarExperienceCommonParent.React)
+local useSignalState = require(AvatarExperienceCommonParent.SignalsReact).useSignalState
+local useLocalization = require(AvatarExperienceCommonParent.Localization).Hooks.useLocalization
+local useNavigation = require(AvatarExperienceCommonParent.Navigation).useNavigation
+local AvatarScreen = require(AvatarExperienceCommonParent.AvatarExperienceNavigation).Enums.AvatarScreen
+local getTimeoutStatusStore = require(AvatarExperienceCommon.Stores.TimeoutStatusStore.getTimeoutStatusStore)
+local formatTimeoutEndTime = require(AvatarExperienceCommon.Utils.formatTimeoutEndTime)
+
+local function useTimeoutBannerProps(t1: {[any]: any}?) -- line: 28
+	-- upvalues: getTimeoutStatusStore (copy), useSignalState (copy), useNavigation (copy), React (copy), formatTimeoutEndTime (copy), useLocalization (copy), AvatarScreen (copy)
+	local v12 = not not t1 and (t1.shouldFetch ~= nil and t1.shouldFetch)
+	local v13 = not t1 or (t1.shouldNavigateOnClick == nil or t1.shouldNavigateOnClick)
+	local v14 = getTimeoutStatusStore()
+	local v15 = useSignalState(v14.getStatus)
+	local v16 = useSignalState(v14.getIsTimedOut)
+	local v17 = useNavigation()
+
+	React.useEffect(function() -- line: 39
+		-- upvalues: v12 (copy), v14 (copy)
+		if v12 then
+			v14.fetchStatus()
+		end
+	end, {
+		v12,
+		v14
+	})
+
+	local v18 = v15.timeoutAction and v15.timeoutAction.endTime or v15.details and v15.details.endDate
+	local v19 = formatTimeoutEndTime(v18)
+	local v20 = useLocalization({
+		messageText = not v19 and "Feature.Timeout.WarningBanner.DisabledMessage" or {
+			"Feature.Timeout.WarningBanner.DisabledUntilMessage",
+			time = v19
+		}
+	})
+	local v21 = React.useCallback(function() -- line: 54
+		-- upvalues: v17 (copy), AvatarScreen (copy)
+		v17.navigate(AvatarScreen.TimeoutStatusPrompt)
+	end, { v17 })
+
+	return {
+		messageText = v20.messageText,
+		onBannerActivated = if not v13 then nil else v21,
+		shouldShow = v16
+	}
+end
+
+return useTimeoutBannerProps

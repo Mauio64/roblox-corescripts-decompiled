@@ -66,8 +66,8 @@ return function(p1, n1: number, _, p3: ((...any) -> ...any), n2: number) -- line
 
 			table.insert(v59, {
 				days = 0,
-				price = v58,
-				selected = true
+				selected = true,
+				price = v58
 			})
 			v44.setItemData(p1.id, {
 				timedOptions = v59

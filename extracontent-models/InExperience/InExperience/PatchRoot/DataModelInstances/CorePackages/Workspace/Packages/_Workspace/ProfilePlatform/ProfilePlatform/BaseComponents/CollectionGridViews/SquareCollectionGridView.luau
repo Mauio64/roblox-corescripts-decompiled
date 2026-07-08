@@ -1,101 +1,110 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.CollectionViews);
-local l_CollectionGrid_0 = v3.CollectionGrid;
-local l_CollectionItemSize_0 = v3.CollectionViewTypes.CollectionItemSize;
-local l_useCollectionLayoutParams_0 = v3.useCollectionLayoutParams;
-local l_useCollectionImpressionsSignal_0 = v3.useCollectionImpressionsSignal;
-local l_ScreenSizeImpressionsTracker_0 = require(l_Parent_0.Impressions).ScreenSizeImpressionsTracker;
-local v9 = require(l_script_FirstAncestor_0.Contexts.useProfileAnalyticsContext);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useDynamicSizeMargin);
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v12 = require(script.Parent.ProfileCollectionGridConfig);
-local l_FFlagProfilePlatformEnableImpressions_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableImpressions;
-return function(v14) --[[ Line: 28 ]] --[[ Name: SquareCollectionsGridView ]]
-    -- upvalues: v2 (copy), l_FFlagProfilePlatformEnableImpressions_0 (copy), v9 (copy), l_useCollectionImpressionsSignal_0 (copy), v12 (copy), v10 (copy), l_useCollectionLayoutParams_0 (copy), l_CollectionItemSize_0 (copy), l_CollectionGrid_0 (copy), l_ScreenSizeImpressionsTracker_0 (copy), l_AppPage_0 (copy)
-    local v15, v16 = v2.useState(nil);
-    local v17 = if l_FFlagProfilePlatformEnableImpressions_0 then v2.useRef(nil) else nil;
-    local v18 = if l_FFlagProfilePlatformEnableImpressions_0 then v9() else nil;
-    local v19 = nil;
-    local v20 = nil;
-    if l_FFlagProfilePlatformEnableImpressions_0 then
-        local v21, v22 = l_useCollectionImpressionsSignal_0(v18.scrollViewPositionChangedSignal);
-        v19 = v21;
-        v20 = v22;
-    end;
-    v2.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: v14 (copy), v15 (copy), l_FFlagProfilePlatformEnableImpressions_0 (ref), v17 (copy)
-        if v14.setForwardRef then
-            v14.setForwardRef(v15);
-        end;
-        if l_FFlagProfilePlatformEnableImpressions_0 then
-            v17.current = v15;
-        end;
-    end, {
-        v15
-    });
-    local v23 = v14.maxNumRows or v12.Constants.DEFAULT_MAX_NUM_ROWS;
-    local v24 = {
-        sideMargin = 0
-    };
-    local v25, v26 = v10();
-    local v27 = l_useCollectionLayoutParams_0(l_CollectionItemSize_0.Small, v15, false, v24);
-    local v29 = if l_FFlagProfilePlatformEnableImpressions_0 then v2.useCallback(function(v28) --[[ Line: 58 ]]
-        -- upvalues: v14 (copy), v20 (ref)
-        if v14.onContainerSizeChanged then
-            v14.onContainerSizeChanged(v28);
-        end;
-        v20();
-    end, {
-        v14.onContainerSizeChanged, 
-        v20
-    }) else nil;
-    local v32 = if l_FFlagProfilePlatformEnableImpressions_0 then v2.useCallback(function(v30, v31) --[[ Line: 67 ]]
-        -- upvalues: v14 (copy), v20 (ref)
-        if v14.onViewableItemsChanged then
-            v14.onViewableItemsChanged(v30, v31);
-        end;
-        v20();
-    end, {
-        v14.onViewableItemsChanged, 
-        v20
-    }) else nil;
-    return v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v14.layoutOrder, 
-        [v2.Change.AbsoluteSize] = v26
-    }, {
-        CollectionGrid = v2.createElement(l_CollectionGrid_0, {
-            columnGap = v27.columnGap, 
-            containerRef = v16, 
-            getItemHeight = v14.getItemHeight, 
-            headerButtonText = v14.headerButtonText, 
-            hideHeaderButton = v14.hideHeaderButton, 
-            items = v14.items, 
-            LayoutOrder = v14.layoutOrder, 
-            maxNumRows = v23, 
-            numColumns = v14.overrides and v14.overrides.numColumns or v27.numColumns, 
-            onActivateHeader = v14.onActivateHeader, 
-            onActivateInfoIcon = v14.onActivateInfoIcon, 
-            onContainerSizeChanged = if l_FFlagProfilePlatformEnableImpressions_0 then v29 else v14.onContainerSizeChanged, 
-            onViewableItemsChanged = if l_FFlagProfilePlatformEnableImpressions_0 then v32 else v14.onViewableItemsChanged, 
-            verticalScrollingFrameRef = v14.verticalScrollingFrameRef, 
-            renderItem = v14.renderItem, 
-            sideMargin = v25, 
-            subtitle = v14.subtitle, 
-            title = v14.title, 
-            tooltipInfoText = v14.tooltipInfoText, 
-            verticalPadding = v27.verticalPadding
-        }), 
-        ScreenSizeImpressionsTracker = if l_FFlagProfilePlatformEnableImpressions_0 and v14.impressionsTag and v14.sendImpressions then v2.createElement(l_ScreenSizeImpressionsTracker_0, {
-            pageContext = l_AppPage_0.ProfilePlatform, 
-            parentRef = v17, 
-            impressionsTag = v14.impressionsTag, 
-            scrollViewPositionChangedSignal = v19, 
-            sendImpressions = v14.sendImpressions
-        }) else nil
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local CollectionViews = require(ProfilePlatformParent.CollectionViews)
+local CollectionGrid = CollectionViews.CollectionGrid
+local CollectionItemSize = CollectionViews.CollectionViewTypes.CollectionItemSize
+local useCollectionLayoutParams = CollectionViews.useCollectionLayoutParams
+local useCollectionImpressionsSignal = CollectionViews.useCollectionImpressionsSignal
+local ScreenSizeImpressionsTracker = require(ProfilePlatformParent.Impressions).ScreenSizeImpressionsTracker
+local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
+local useDynamicSizeMargin = require(ProfilePlatform.Hooks.useDynamicSizeMargin)
+local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
+local ProfileCollectionGridConfig = require(script.Parent.ProfileCollectionGridConfig)
+local FFlagProfilePlatformEnableImpressions = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableImpressions
+
+local function SquareCollectionsGridView(p1) -- line: 28
+	-- upvalues: React (copy), FFlagProfilePlatformEnableImpressions (copy), useProfileAnalyticsContext (copy), useCollectionImpressionsSignal (copy), ProfileCollectionGridConfig (copy), useDynamicSizeMargin (copy), useCollectionLayoutParams (copy), CollectionItemSize (copy), CollectionGrid (copy), ScreenSizeImpressionsTracker (copy), AppPage (copy)
+	local v17, v18 = React.useState(nil)
+	local v19 = if not FFlagProfilePlatformEnableImpressions then nil else React.useRef(nil)
+	local v20 = if not FFlagProfilePlatformEnableImpressions then nil else useProfileAnalyticsContext()
+	local v21 = nil
+	local u22 = nil
+
+	if FFlagProfilePlatformEnableImpressions then
+		local v23
+
+		v21, v23 = useCollectionImpressionsSignal(v20.scrollViewPositionChangedSignal)
+		u22 = v23
+	end
+
+	React.useEffect(function() -- line: 39
+		-- upvalues: p1 (copy), v17 (copy), FFlagProfilePlatformEnableImpressions (copy), v19 (copy)
+		if p1.setForwardRef then
+			p1.setForwardRef(v17)
+		end
+
+		if FFlagProfilePlatformEnableImpressions then
+			v19.current = v17
+		end
+	end, { v17 })
+
+	local v24 = p1.maxNumRows or ProfileCollectionGridConfig.Constants.DEFAULT_MAX_NUM_ROWS
+	local t1 = {
+		sideMargin = 0
+	}
+	local v26, v27 = useDynamicSizeMargin()
+	local v28 = useCollectionLayoutParams(CollectionItemSize.Small, v17, false, t1)
+	local v29 = if not FFlagProfilePlatformEnableImpressions then nil else React.useCallback(function(vector2: Vector2) -- line: 58
+		-- upvalues: p1 (copy), u22 (ref)
+		if p1.onContainerSizeChanged then
+			p1.onContainerSizeChanged(vector2)
+		end
+
+		u22()
+	end, {
+		p1.onContainerSizeChanged,
+		u22
+	})
+	local v30 = if not FFlagProfilePlatformEnableImpressions then nil else React.useCallback(function(n1: number, n2: number) -- line: 67
+		-- upvalues: p1 (copy), u22 (ref)
+		if p1.onViewableItemsChanged then
+			p1.onViewableItemsChanged(n1, n2)
+		end
+
+		u22()
+	end, {
+		p1.onViewableItemsChanged,
+		u22
+	})
+
+	return React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		LayoutOrder = p1.layoutOrder,
+		[React.Change.AbsoluteSize] = v27
+	}, {
+		CollectionGrid = React.createElement(CollectionGrid, {
+			columnGap = v28.columnGap,
+			containerRef = v18,
+			getItemHeight = p1.getItemHeight,
+			headerButtonText = p1.headerButtonText,
+			hideHeaderButton = p1.hideHeaderButton,
+			items = p1.items,
+			LayoutOrder = p1.layoutOrder,
+			maxNumRows = v24,
+			numColumns = p1.overrides and p1.overrides.numColumns or v28.numColumns,
+			onActivateHeader = p1.onActivateHeader,
+			onActivateInfoIcon = p1.onActivateInfoIcon,
+			onContainerSizeChanged = if not FFlagProfilePlatformEnableImpressions then p1.onContainerSizeChanged else v29,
+			onViewableItemsChanged = if not FFlagProfilePlatformEnableImpressions then p1.onViewableItemsChanged else v30,
+			verticalScrollingFrameRef = p1.verticalScrollingFrameRef,
+			renderItem = p1.renderItem,
+			sideMargin = v26,
+			subtitle = p1.subtitle,
+			title = p1.title,
+			tooltipInfoText = p1.tooltipInfoText,
+			verticalPadding = v28.verticalPadding
+		}),
+		ScreenSizeImpressionsTracker = if not FFlagProfilePlatformEnableImpressions or (not p1.impressionsTag or not p1.sendImpressions) then nil else React.createElement(ScreenSizeImpressionsTracker, {
+			pageContext = AppPage.ProfilePlatform,
+			parentRef = v19,
+			impressionsTag = p1.impressionsTag,
+			scrollViewPositionChangedSignal = v21,
+			sendImpressions = p1.sendImpressions
+		})
+	})
+end
+
+return SquareCollectionsGridView

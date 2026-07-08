@@ -1,58 +1,72 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Resources.Constants);
-local l_game_EngineFeature_0 = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId");
-local l_InputTypeMap_0 = v3.InputTypeMap;
-return function(v6, v7, v8, v9, v10) --[[ Line: 11 ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), l_UserInputService_0 (copy), v3 (copy), l_InputTypeMap_0 (copy), l_game_EngineFeature_0 (copy)
-    if v10 == nil then
-        v10 = l_RbxAnalyticsService_0;
-    end;
-    local function v13() --[[ Line: 17 ]] --[[ Name: reportSettingsForAnalytics ]]
-        -- upvalues: l_UserInputService_0 (ref)
-        local l_GameSettings_0 = UserSettings().GameSettings;
-        local v12 = {};
-        if l_UserInputService_0.TouchEnabled then
-            v12.camera_mode_touch = tostring(l_GameSettings_0.TouchCameraMovementMode);
-        else
-            v12.camera_mode_desktop = tostring(l_GameSettings_0.ComputerCameraMovementMode);
-        end;
-        if l_UserInputService_0.TouchEnabled then
-            v12.movement_mode_touch = tostring(l_GameSettings_0.TouchMovementMode);
-        else
-            v12.movement_mode_desktop = tostring(l_GameSettings_0.ComputerMovementMode);
-        end;
-        if l_UserInputService_0.MouseEnabled then
-            v12.shift_lock_enabled = tostring(l_GameSettings_0.ControlMode == Enum.ControlMode.MouseLockSwitch);
-        end;
-        if l_UserInputService_0.GamepadEnabled and l_GameSettings_0.IsUsingGamepadCameraSensitivity then
-            v12.camera_sensitivity_gamepad = string.format("%.2f", l_GameSettings_0.GamepadCameraSensitivity);
-        end;
-        if l_UserInputService_0.MouseEnabled then
-            v12.camera_sensitivity_mouse = string.format("%.2f", l_GameSettings_0.MouseSensitivityFirstPerson.X);
-        end;
-        v12.camera_y_inverted = tostring(l_GameSettings_0.CameraYInverted);
-        v12.show_performance_stats = tostring(l_GameSettings_0.PerformanceStatsVisible);
-        v12.volume = tostring((math.floor(l_GameSettings_0.MasterVolume * 10 + 0.5)));
-        v12.gfx_quality_level = tostring(settings().Rendering.QualityLevel);
-        v12.fullscreen_enabled = tostring(l_GameSettings_0:InFullScreen());
-        v12.microprofiler_enabled = tostring(l_GameSettings_0.OnScreenProfilerEnabled);
-        v12.microprofiler_webserver_enabled = tostring(l_GameSettings_0.MicroProfilerWebServerEnabled);
-        return v12;
-    end;
-    if v9 == true then
-        v8 = v13();
-        v7 = v3.AnalyticsSettingsChangeName;
-        v6 = v3.AnalyticsInGameMenuName;
-    end;
-    if not v8 then
-        v8 = {};
-    end;
-    v8.universeid = tostring(game.GameId);
-    v8.inputDevice = tostring(l_InputTypeMap_0[l_UserInputService_0:GetLastInputType()] or l_UserInputService_0:GetLastInputType());
-    if v8.playsessionid == nil and l_game_EngineFeature_0 then
-        v8.playsessionid = l_RbxAnalyticsService_0:GetPlaySessionId();
-    end;
-    v10:SetRBXEventStream(v3.AnalyticsTargetName, v6, v7, v8);
-end;
+local UserInputService = game:GetService("UserInputService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Resources.Constants)
+local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local InputTypeMap = Constants.InputTypeMap
+
+return function(p1, p2, p3, p4, p5) -- line: 11
+	-- upvalues: RbxAnalyticsService (copy), UserInputService (copy), Constants (copy), InputTypeMap (copy), EngineFeature (copy)
+	if p5 == nil then
+		p5 = RbxAnalyticsService
+	end
+
+	local function reportSettingsForAnalytics() -- line: 17
+		-- upvalues: UserInputService (copy)
+		local GameSettings = UserSettings().GameSettings
+		local t1 = {}
+
+		if UserInputService.TouchEnabled then
+			t1.camera_mode_touch = tostring(GameSettings.TouchCameraMovementMode)
+		else
+			t1.camera_mode_desktop = tostring(GameSettings.ComputerCameraMovementMode)
+		end
+
+		if UserInputService.TouchEnabled then
+			t1.movement_mode_touch = tostring(GameSettings.TouchMovementMode)
+		else
+			t1.movement_mode_desktop = tostring(GameSettings.ComputerMovementMode)
+		end
+
+		if UserInputService.MouseEnabled then
+			t1.shift_lock_enabled = tostring(GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch)
+		end
+
+		if UserInputService.GamepadEnabled and GameSettings.IsUsingGamepadCameraSensitivity then
+			t1.camera_sensitivity_gamepad = string.format("%.2f", GameSettings.GamepadCameraSensitivity)
+		end
+
+		if UserInputService.MouseEnabled then
+			t1.camera_sensitivity_mouse = string.format("%.2f", GameSettings.MouseSensitivityFirstPerson.X)
+		end
+
+		t1.camera_y_inverted = tostring(GameSettings.CameraYInverted)
+		t1.show_performance_stats = tostring(GameSettings.PerformanceStatsVisible)
+		t1.volume = tostring((math.floor(GameSettings.MasterVolume * 10 + 0.5)))
+		t1.gfx_quality_level = tostring(settings().Rendering.QualityLevel)
+		t1.fullscreen_enabled = tostring(GameSettings:InFullScreen())
+		t1.microprofiler_enabled = tostring(GameSettings.OnScreenProfilerEnabled)
+		t1.microprofiler_webserver_enabled = tostring(GameSettings.MicroProfilerWebServerEnabled)
+
+		return t1
+	end
+
+	if p4 == true then
+		p3 = reportSettingsForAnalytics()
+		p2 = Constants.AnalyticsSettingsChangeName
+		p1 = Constants.AnalyticsInGameMenuName
+	end
+
+	if not p3 then
+		p3 = {}
+	end
+
+	p3.universeid = tostring(game.GameId)
+	p3.inputDevice = tostring(InputTypeMap[UserInputService:GetLastInputType()] or UserInputService:GetLastInputType())
+
+	if p3.playsessionid == nil and EngineFeature then
+		p3.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	p5:SetRBXEventStream(Constants.AnalyticsTargetName, p1, p2, p3)
+end

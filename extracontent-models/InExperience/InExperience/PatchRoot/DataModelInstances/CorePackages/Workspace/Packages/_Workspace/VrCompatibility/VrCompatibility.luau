@@ -1,11 +1,12 @@
-local v0 = require(script.VRReadyWrapper);
-local v1 = require(script.RoundedCornersFrame);
-local v2 = require(script.Constants);
-local v3 = require(script.VRPanelWidthIXP);
+local VRReadyWrapper = require(script.VRReadyWrapper)
+local RoundedCornersFrame = require(script.RoundedCornersFrame)
+local Constants = require(script.Constants)
+local VRPanelWidthIXP = require(script.VRPanelWidthIXP)
+
 return {
-    VRReadyWrapper = v0, 
-    VRConstants = v2, 
-    RoundedCornersFrame = v1, 
-    VRPanelWidthIXP = v3, 
-    ["jest.config"] = script["jest.config"]
-};
+	VRReadyWrapper = VRReadyWrapper,
+	VRConstants = Constants,
+	RoundedCornersFrame = RoundedCornersFrame,
+	VRPanelWidthIXP = VRPanelWidthIXP,
+	["jest.config"] = script["jest.config"]
+}

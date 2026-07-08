@@ -1,38 +1,60 @@
-local l_Parent_0 = script:FindFirstAncestor("AppStoreAgeSignalsManager").Parent;
-local v1 = require(l_Parent_0.Promise);
-local v2 = game:DefineFastFlag("EnableAppAgeSignalsService", false);
+local AppStoreAgeSignalsManager = script:FindFirstAncestor("AppStoreAgeSignalsManager")
+local AppStoreAgeSignalsManagerParent = AppStoreAgeSignalsManager.Parent
+local Promise = require(AppStoreAgeSignalsManagerParent.Promise)
+local AppAgeSignalsTelemetryConfigs = require(AppStoreAgeSignalsManager.Telemetry.AppAgeSignalsTelemetryConfigs)
+local v5 = game:DefineFastFlag("EnableAppAgeSignalsService", false)
+
 return {
-    isAvailable = function() --[[ Line: 9 ]] --[[ Name: isAvailable ]]
-        -- upvalues: v2 (copy)
-        if not v2 then
-            return false;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 13 ]]
-                return game:GetService("AppAgeSignalsService");
-            end);
-            if not l_status_0 or not l_result_0 then
-                return false;
-            else
-                return l_result_0:IsAvailable();
-            end;
-        end;
-    end, 
-    getAppAgeSignalsAsync = function() --[[ Line: 21 ]] --[[ Name: getAppAgeSignalsAsync ]]
-        -- upvalues: v1 (copy)
-        return v1.new(function(v5, v6) --[[ Line: 22 ]]
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 23 ]]
-                return game:GetService("AppAgeSignalsService"):GetAppAgeSignalsAsync();
-            end);
-            if not l_status_1 then
-                v6(l_result_1);
-                return;
-            elseif l_result_1.Error and l_result_1.Error ~= "" then
-                v6(l_result_1.Error);
-                return;
-            else
-                v5(l_result_1.PlatformPayload);
-                return;
-            end;
-        end);
-    end
-};
+	isAvailable = function() -- line: 10
+		-- upvalues: v5 (copy), AppAgeSignalsTelemetryConfigs (copy)
+		if not v5 then
+			return false
+		end
+
+		local ok, result = pcall(function() -- line: 14
+			return game:GetService("AppAgeSignalsService")
+		end)
+
+		if not ok or not result then
+			return false
+		end
+
+		local ok2, result2 = pcall(function() -- line: 20
+			-- upvalues: result (copy)
+			return result:IsAvailable()
+		end)
+
+		if not ok2 then
+			AppAgeSignalsTelemetryConfigs.reportError({
+				signalSource = "unknown",
+				error = "IsAvailable threw: " .. tostring(result2)
+			})
+
+			return false
+		end
+
+		return result2
+	end,
+	getAppAgeSignalsAsync = function() -- line: 32
+		-- upvalues: Promise (copy)
+		return Promise.new(function(resolve, reject) -- line: 33
+			local ok, result = pcall(function() -- line: 34
+				return game:GetService("AppAgeSignalsService"):GetAppAgeSignalsAsync()
+			end)
+
+			if not ok then
+				reject(result)
+
+				return
+			end
+
+			if result.Error and result.Error ~= "" then
+				reject(result.Error)
+
+				return
+			end
+
+			resolve(result.PlatformPayload)
+		end)
+	end
+}

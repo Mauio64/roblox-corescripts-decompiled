@@ -1,47 +1,40 @@
-local v0 = nil;
-local v1 = false;
-local function _() --[[ Line: 3 ]]
-    -- upvalues: v1 (ref), v0 (ref)
-    if not v1 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 5 ]]
-            return game:GetService("AudioFocusService");
-        end);
-        if l_status_0 and l_result_0 then
-            v0 = l_result_0;
-        end;
-        v1 = true;
-    end;
-    return v0;
-end;
-return function(v5) --[[ Line: 16 ]]
-    -- upvalues: v1 (ref), v0 (ref)
-    if not v1 then
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 5 ]]
-            return game:GetService("AudioFocusService");
-        end);
-        if l_status_1 and l_result_1 then
-            v0 = l_result_1;
-        end;
-        v1 = true;
-    end;
-    local l_v0_0 = v0;
-    if l_v0_0 then
-        local l_l_v0_0_FocusedContextId_0 = l_v0_0:GetFocusedContextId();
-        v5(l_l_v0_0_FocusedContextId_0);
-        do
-            local l_l_l_v0_0_FocusedContextId_0_0 = l_l_v0_0_FocusedContextId_0;
-            local function v12() --[[ Line: 21 ]]
-                -- upvalues: l_v0_0 (copy), l_l_l_v0_0_FocusedContextId_0_0 (ref), v5 (copy)
-                local l_l_v0_0_FocusedContextId_1 = l_v0_0:GetFocusedContextId();
-                if l_l_l_v0_0_FocusedContextId_0_0 ~= l_l_v0_0_FocusedContextId_1 then
-                    l_l_l_v0_0_FocusedContextId_0_0 = l_l_v0_0_FocusedContextId_1;
-                    v5(l_l_l_v0_0_FocusedContextId_0_0);
-                end;
-            end;
-            l_v0_0.OnContextRegistered:Connect(v12);
-            l_v0_0.OnContextUnregistered:Connect(v12);
-            l_v0_0.OnDeafenVoiceAudio:Connect(v12);
-            l_v0_0.OnUndeafenVoiceAudio:Connect(v12);
-        end;
-    end;
-end;
+local u1 = nil
+local u2 = false
+
+return function(p1: ((...any) -> ...any)) -- line: 16
+	-- upvalues: u2 (ref), u1 (ref)
+	if not u2 then
+		local ok, result = pcall(function() -- line: 5
+			return game:GetService("AudioFocusService")
+		end)
+
+		if ok and result then
+			u1 = result
+		end
+
+		u2 = true
+	end
+
+	local v8 = u1
+
+	if v8 then
+		local FocusedContextId = v8:GetFocusedContextId()
+
+		p1(FocusedContextId)
+
+		local function v10() -- line: 21
+			-- upvalues: v8 (copy), FocusedContextId (ref), p1 (copy)
+			local FocusedContextId2 = v8:GetFocusedContextId()
+
+			if FocusedContextId2 ~= FocusedContextId then
+				FocusedContextId = FocusedContextId2
+				p1(FocusedContextId)
+			end
+		end
+
+		v8.OnContextRegistered:Connect(v10)
+		v8.OnContextUnregistered:Connect(v10)
+		v8.OnDeafenVoiceAudio:Connect(v10)
+		v8.OnUndeafenVoiceAudio:Connect(v10)
+	end
+end

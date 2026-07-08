@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ForceGetGameIconsFromThumbnailsDeliveryApi", false);
+return game:DefineFastFlag("ForceGetGameIconsFromThumbnailsDeliveryApi", false)

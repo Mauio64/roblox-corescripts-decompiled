@@ -1,135 +1,155 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v4 = {};
-local l_GraphQLObjectType_0 = require(l_Parent_0.GraphQL).GraphQLObjectType;
-local l_MapperKind_0 = require(script.Parent.Interfaces).MapperKind;
-local v7 = require(script.Parent.mapSchema);
-local l_mapSchema_0 = v7.mapSchema;
-local l_correctASTNodes_0 = v7.correctASTNodes;
-local l_addTypes_0 = require(script.Parent.addTypes).addTypes;
-local l_Map_0 = v1.Map;
-v4.appendObjectFields = function(v12, v13, v14) --[[ Line: 41 ]] --[[ Name: appendObjectFields ]]
-    -- upvalues: l_addTypes_0 (copy), l_GraphQLObjectType_0 (copy), l_mapSchema_0 (copy), l_MapperKind_0 (copy), l_Map_0 (copy), l_correctASTNodes_0 (copy), l_Object_0 (copy)
-    if v12:getType(v13) == nil then
-        return l_addTypes_0(v12, {
-            l_GraphQLObjectType_0.new({
-                name = v13, 
-                fields = v14
-            })
-        });
-    else
-        return l_mapSchema_0(v12, {
-            [l_MapperKind_0.OBJECT_TYPE] = function(v15) --[[ Line: 54 ]]
-                -- upvalues: v13 (copy), l_Map_0 (ref), v14 (copy), l_correctASTNodes_0 (ref), l_GraphQLObjectType_0 (ref), l_Object_0 (ref)
-                if v15.name == v13 then
-                    local v16 = v15:toConfig();
-                    local l_fields_0 = v16.fields;
-                    local v18 = l_Map_0.new();
-                    for _, v20 in l_fields_0 do
-                        local v21 = v20[1];
-                        v18:set(v21, l_fields_0:get(v21));
-                    end;
-                    for _, v23 in v14 do
-                        local v24 = v23[1];
-                        v18:set(v24, v14:get(v24));
-                    end;
-                    return (l_correctASTNodes_0(l_GraphQLObjectType_0.new(l_Object_0.assign({}, v16, {
-                        fields = v18
-                    }))));
-                else
-                    return nil;
-                end;
-            end
-        });
-    end;
-end;
-v4.removeObjectFields = function(v25, v26, v27) --[[ Line: 100 ]] --[[ Name: removeObjectFields ]]
-    -- upvalues: l_Map_0 (copy), l_mapSchema_0 (copy), l_MapperKind_0 (copy), l_Boolean_0 (copy), l_correctASTNodes_0 (copy), l_GraphQLObjectType_0 (copy), l_Object_0 (copy)
-    local v28 = l_Map_0.new();
-    return {
-        l_mapSchema_0(v25, {
-            [l_MapperKind_0.OBJECT_TYPE] = function(v29) --[[ Line: 112 ]]
-                -- upvalues: v26 (copy), l_Map_0 (ref), l_Boolean_0 (ref), v27 (copy), v28 (copy), l_correctASTNodes_0 (ref), l_GraphQLObjectType_0 (ref), l_Object_0 (ref)
-                if v29.name == v26 then
-                    local v30 = v29:toConfig();
-                    local l_fields_1 = v30.fields;
-                    local v32 = l_Map_0.new();
-                    for _, v34 in l_fields_1 do
-                        local v35 = table.unpack(v34);
-                        local v36 = l_fields_1:get(v35);
-                        if l_Boolean_0.toJSBoolean(v27(v35, v36)) then
-                            v28:set(v35, v36);
-                        else
-                            v32:set(v35, v36);
-                        end;
-                    end;
-                    return (l_correctASTNodes_0(l_GraphQLObjectType_0.new(l_Object_0.assign({}, v30, {
-                        fields = v32
-                    }))));
-                else
-                    return nil;
-                end;
-            end
-        }), 
-        v28
-    };
-end;
-v4.selectObjectFields = function(v37, v38, v39) --[[ Line: 160 ]] --[[ Name: selectObjectFields ]]
-    -- upvalues: l_Map_0 (copy), l_mapSchema_0 (copy), l_MapperKind_0 (copy), l_Boolean_0 (copy)
-    local v40 = l_Map_0.new();
-    l_mapSchema_0(v37, {
-        [tostring(l_MapperKind_0.OBJECT_TYPE)] = function(v41) --[[ Line: 170 ]]
-            -- upvalues: v38 (copy), l_Boolean_0 (ref), v39 (copy), v40 (copy)
-            if v41.name == v38 then
-                local l_fields_2 = v41:toConfig().fields;
-                for _, v44 in l_fields_2 do
-                    local v45 = v44[1];
-                    local v46 = l_fields_2:get(v45);
-                    if l_Boolean_0.toJSBoolean(v39(v45, v46)) then
-                        v40:set(v45, v46);
-                    end;
-                end;
-            end;
-            return nil;
-        end
-    });
-    return v40;
-end;
-v4.modifyObjectFields = function(v47, v48, v49, v50) --[[ Line: 200 ]] --[[ Name: modifyObjectFields ]]
-    -- upvalues: l_Map_0 (copy), l_mapSchema_0 (copy), l_MapperKind_0 (copy), l_Boolean_0 (copy), l_correctASTNodes_0 (copy), l_GraphQLObjectType_0 (copy), l_Object_0 (copy)
-    local v51 = l_Map_0.new();
-    return {
-        l_mapSchema_0(v47, {
-            [l_MapperKind_0.OBJECT_TYPE] = function(v52) --[[ Line: 213 ]]
-                -- upvalues: v48 (copy), l_Map_0 (ref), l_Boolean_0 (ref), v49 (copy), v51 (copy), v50 (copy), l_correctASTNodes_0 (ref), l_GraphQLObjectType_0 (ref), l_Object_0 (ref)
-                if v52.name == v48 then
-                    local v53 = v52:toConfig();
-                    local l_fields_3 = v53.fields;
-                    local v55 = l_Map_0.new();
-                    for _, v57 in l_fields_3 do
-                        local v58 = v57[1];
-                        local v59 = l_fields_3:get(v58);
-                        if l_Boolean_0.toJSBoolean(v49(v58, v59)) then
-                            v51:set(v58, v59);
-                        else
-                            v55:set(v58, v59);
-                        end;
-                    end;
-                    for _, v61 in v50 do
-                        local v62 = v61[1];
-                        v55:set(v62, (v50:get(v62)));
-                    end;
-                    return (l_correctASTNodes_0(l_GraphQLObjectType_0.new(l_Object_0.assign({}, v53, {
-                        fields = v55
-                    }))));
-                else
-                    return nil;
-                end;
-            end
-        }), 
-        v51
-    };
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local GraphQLObjectType = require(ParentParent.GraphQL).GraphQLObjectType
+local MapperKind = require(script.Parent.Interfaces).MapperKind
+local mapSchema = require(script.Parent.mapSchema)
+local mapSchema2 = mapSchema.mapSchema
+local correctASTNodes = mapSchema.correctASTNodes
+local addTypes = require(script.Parent.addTypes).addTypes
+local Map = LuauPolyfill.Map
+
+function t1.appendObjectFields(p1, s1: string, p2) -- line: 41
+	-- upvalues: addTypes (copy), GraphQLObjectType (copy), mapSchema2 (copy), MapperKind (copy), Map (copy), correctASTNodes (copy), Object (copy)
+	if p1:getType(s1) == nil then
+		return addTypes(p1, { GraphQLObjectType.new({
+			name = s1,
+			fields = p2
+		}) })
+	end
+
+	return mapSchema2(p1, {
+		[MapperKind.OBJECT_TYPE] = function(p3) -- line: 54
+			-- upvalues: s1 (copy), Map (copy), p2 (copy), correctASTNodes (copy), GraphQLObjectType (copy), Object (copy)
+			if p3.name == s1 then
+				local v30 = p3:toConfig()
+				local fields = v30.fields
+				local v32 = Map.new()
+
+				for _, v34 in fields do
+					local v35 = v34[1]
+
+					v32:set(v35, fields:get(v35))
+				end
+
+				for _, v37 in p2 do
+					local v38 = v37[1]
+
+					v32:set(v38, p2:get(v38))
+				end
+
+				return (correctASTNodes(GraphQLObjectType.new(Object.assign({}, v30, {
+					fields = v32
+				}))))
+			end
+
+			return nil
+		end
+	})
+end
+function t1.removeObjectFields(p4, s2: string, p5: ((...any) -> ...any)) -- line: 100
+	-- upvalues: Map (copy), mapSchema2 (copy), MapperKind (copy), Boolean (copy), correctASTNodes (copy), GraphQLObjectType (copy), Object (copy)
+	local v19 = Map.new()
+
+	return {
+		mapSchema2(p4, {
+			[MapperKind.OBJECT_TYPE] = function(p6) -- line: 112
+				-- upvalues: s2 (copy), Map (copy), Boolean (copy), p5 (copy), v19 (copy), correctASTNodes (copy), GraphQLObjectType (copy), Object (copy)
+				if p6.name == s2 then
+					local v40 = p6:toConfig()
+					local fields = v40.fields
+					local v42 = Map.new()
+
+					for _, v44 in fields do
+						local v45 = table.unpack(v44)
+						local v46 = fields:get(v45)
+
+						if Boolean.toJSBoolean(p5(v45, v46)) then
+							v19:set(v45, v46)
+						else
+							v42:set(v45, v46)
+						end
+					end
+
+					return (correctASTNodes(GraphQLObjectType.new(Object.assign({}, v40, {
+						fields = v42
+					}))))
+				end
+
+				return nil
+			end
+		}),
+		v19
+	}
+end
+function t1.selectObjectFields(p7, s3: string, p8: ((...any) -> ...any)) -- line: 160
+	-- upvalues: Map (copy), mapSchema2 (copy), MapperKind (copy), Boolean (copy)
+	local v23 = Map.new()
+
+	mapSchema2(p7, {
+		[tostring(MapperKind.OBJECT_TYPE)] = function(p9) -- line: 170
+			-- upvalues: s3 (copy), Boolean (copy), p8 (copy), v23 (copy)
+			if p9.name == s3 then
+				local fields = p9:toConfig().fields
+
+				for _, v50 in fields do
+					local v51 = v50[1]
+					local v52 = fields:get(v51)
+
+					if Boolean.toJSBoolean(p8(v51, v52)) then
+						v23:set(v51, v52)
+					end
+				end
+			end
+
+			return nil
+		end
+	})
+
+	return v23
+end
+function t1.modifyObjectFields(p10, s4: string, p11: ((...any) -> ...any), p12) -- line: 200
+	-- upvalues: Map (copy), mapSchema2 (copy), MapperKind (copy), Boolean (copy), correctASTNodes (copy), GraphQLObjectType (copy), Object (copy)
+	local v28 = Map.new()
+
+	return {
+		mapSchema2(p10, {
+			[MapperKind.OBJECT_TYPE] = function(p13) -- line: 213
+				-- upvalues: s4 (copy), Map (copy), Boolean (copy), p11 (copy), v28 (copy), p12 (copy), correctASTNodes (copy), GraphQLObjectType (copy), Object (copy)
+				if p13.name == s4 then
+					local v54 = p13:toConfig()
+					local fields = v54.fields
+					local v56 = Map.new()
+
+					for _, v58 in fields do
+						local v59 = v58[1]
+						local v60 = fields:get(v59)
+
+						if Boolean.toJSBoolean(p11(v59, v60)) then
+							v28:set(v59, v60)
+						else
+							v56:set(v59, v60)
+						end
+					end
+
+					for _, v62 in p12 do
+						local v63 = v62[1]
+
+						v56:set(v63, (p12:get(v63)))
+					end
+
+					return (correctASTNodes(GraphQLObjectType.new(Object.assign({}, v54, {
+						fields = v56
+					}))))
+				end
+
+				return nil
+			end
+		}),
+		v28
+	}
+end
+
+return t1

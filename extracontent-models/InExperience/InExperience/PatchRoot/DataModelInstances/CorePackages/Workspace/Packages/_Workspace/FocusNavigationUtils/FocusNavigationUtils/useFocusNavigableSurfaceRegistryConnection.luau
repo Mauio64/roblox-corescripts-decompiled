@@ -1,32 +1,33 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FocusNavigationUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.FocusNavigableSurfaceRegistry);
-local l_useRegisterFocusNavigableSurface_0 = v3.useRegisterFocusNavigableSurface;
-local l_useDeRegisterFocusNavigableSurface_0 = v3.useDeRegisterFocusNavigableSurface;
-local _ = require(l_script_FirstAncestor_0.FocusNavigableSurfaceIdentifierEnum);
-return function(v7, v8, v9) --[[ Line: 17 ]]
-    -- upvalues: l_useRegisterFocusNavigableSurface_0 (copy), l_useDeRegisterFocusNavigableSurface_0 (copy), v2 (copy)
-    local v10 = l_useRegisterFocusNavigableSurface_0();
-    local v11 = l_useDeRegisterFocusNavigableSurface_0();
-    local v12 = false;
-    if v7 ~= nil then
-        v12 = v9 == nil or v9;
-    end;
-    v2.useEffect(function() --[[ Line: 26 ]]
-        -- upvalues: v12 (copy), v10 (copy), v8 (copy), v7 (copy), v11 (copy)
-        if v12 then
-            v10(v8, v7);
-        else
-            v11(v8, v7);
-        end;
-        return function() --[[ Line: 33 ]]
-            -- upvalues: v11 (ref), v8 (ref), v7 (ref)
-            v11(v8, v7);
-        end;
-    end, {
-        v12, 
-        v8, 
-        v7
-    });
-end;
+local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
+local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+local React = require(FocusNavigationUtilsParent.React)
+local FocusNavigableSurfaceRegistry = require(FocusNavigationUtils.FocusNavigableSurfaceRegistry)
+local useRegisterFocusNavigableSurface = FocusNavigableSurfaceRegistry.useRegisterFocusNavigableSurface
+local useDeRegisterFocusNavigableSurface = FocusNavigableSurfaceRegistry.useDeRegisterFocusNavigableSurface
+
+require(FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum)
+
+return function(p1, p2, b1: boolean?) -- line: 17
+	-- upvalues: useRegisterFocusNavigableSurface (copy), useDeRegisterFocusNavigableSurface (copy), React (copy)
+	local v10 = useRegisterFocusNavigableSurface()
+	local v11 = useDeRegisterFocusNavigableSurface()
+	local v12 = p1 ~= nil and (b1 == nil or b1)
+
+	React.useEffect(function() -- line: 26
+		-- upvalues: v12 (copy), v10 (copy), p2 (copy), p1 (copy), v11 (copy)
+		if v12 then
+			v10(p2, p1)
+		else
+			v11(p2, p1)
+		end
+
+		return function() -- line: 33
+			-- upvalues: v11 (copy), p2 (copy), p1 (copy)
+			v11(p2, p1)
+		end
+	end, {
+		v12,
+		p2,
+		p1
+	})
+end

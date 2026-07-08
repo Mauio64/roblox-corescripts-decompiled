@@ -1,57 +1,61 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local v2 = require(script.Parent.console);
-local v3 = 0;
-local v4 = nil;
-local v5 = nil;
-local v6 = nil;
-local v7 = nil;
-local v8 = nil;
-local v9 = nil;
-local v10 = nil;
-local function v11() --[[ Line: 34 ]]
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local console = require(script.Parent.console)
+local n1 = 0
+local log = nil
+local info = nil
+local warn = nil
+local error = nil
+local group = nil
+local groupCollapsed = nil
+local groupEnd = nil
 
-end;
+local function v12() -- line: 34
+end
+
 return {
-    disabledLog = v11, 
-    disableLogs = function() --[[ Line: 43 ]]
-        -- upvalues: v1 (copy), v3 (ref), v4 (ref), v2 (copy), v5 (ref), v6 (ref), v7 (ref), v8 (ref), v9 (ref), v10 (ref), v11 (copy)
-        if v1.__DEV__ then
-            if v3 == 0 then
-                v4 = v2.log;
-                v5 = v2.info;
-                v6 = v2.warn;
-                v7 = v2.error;
-                v8 = v2.group;
-                v9 = v2.groupCollapsed;
-                v10 = v2.groupEnd;
-                v2.info = v11;
-                v2.log = v11;
-                v2.warn = v11;
-                v2.error = v11;
-                v2.group = v11;
-                v2.groupCollapsed = v11;
-                v2.groupEnd = v11;
-            end;
-            v3 = v3 + 1;
-        end;
-    end, 
-    reenableLogs = function() --[[ Line: 67 ]]
-        -- upvalues: v1 (copy), v3 (ref), v2 (copy), v4 (ref), v5 (ref), v6 (ref), v7 (ref), v8 (ref), v9 (ref), v10 (ref)
-        if v1.__DEV__ then
-            v3 = v3 - 1;
-            if v3 == 0 then
-                v2.log = v4;
-                v2.info = v5;
-                v2.warn = v6;
-                v2.error = v7;
-                v2.group = v8;
-                v2.groupCollapsed = v9;
-                v2.groupEnd = v10;
-            end;
-            if v3 < 0 then
-                v2.error("disabledDepth fell below zero. This is a bug in React. Please file an issue.");
-            end;
-        end;
-    end
-};
+	disabledLog = v12,
+	disableLogs = function() -- line: 43
+		-- upvalues: ReactGlobals (copy), n1 (ref), log (ref), console (copy), info (ref), warn (ref), error (ref), group (ref), groupCollapsed (ref), groupEnd (ref), v12 (copy)
+		if ReactGlobals.__DEV__ then
+			if n1 == 0 then
+				log = console.log
+				info = console.info
+				warn = console.warn
+				error = console.error
+				group = console.group
+				groupCollapsed = console.groupCollapsed
+				groupEnd = console.groupEnd
+				console.info = v12
+				console.log = v12
+				console.warn = v12
+				console.error = v12
+				console.group = v12
+				console.groupCollapsed = v12
+				console.groupEnd = v12
+			end
+
+			n1 += 1
+		end
+	end,
+	reenableLogs = function() -- line: 67
+		-- upvalues: ReactGlobals (copy), n1 (ref), console (copy), log (ref), info (ref), warn (ref), error (ref), group (ref), groupCollapsed (ref), groupEnd (ref)
+		if ReactGlobals.__DEV__ then
+			n1 -= 1
+
+			if n1 == 0 then
+				console.log = log
+				console.info = info
+				console.warn = warn
+				console.error = error
+				console.group = group
+				console.groupCollapsed = groupCollapsed
+				console.groupEnd = groupEnd
+			end
+
+			if n1 < 0 then
+				console.error("disabledDepth fell below zero. This is a bug in React. Please file an issue.")
+			end
+		end
+	end
+}

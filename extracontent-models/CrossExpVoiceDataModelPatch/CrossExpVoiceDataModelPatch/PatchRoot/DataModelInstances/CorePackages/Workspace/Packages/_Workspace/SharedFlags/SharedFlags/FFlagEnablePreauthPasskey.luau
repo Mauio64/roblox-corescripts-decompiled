@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePreauthPasskey", false);
+return game:DefineFastFlag("EnablePreauthPasskey", false)

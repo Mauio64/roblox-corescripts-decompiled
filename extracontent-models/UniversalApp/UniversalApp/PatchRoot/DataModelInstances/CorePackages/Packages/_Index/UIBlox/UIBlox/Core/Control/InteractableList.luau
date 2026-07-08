@@ -1,144 +1,153 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.t);
-local v4 = require(l_Parent_1.Cryo);
-local v5 = require(l_Parent_0.Core.Utility.bindingValidator);
-local v6 = require(l_Parent_0.Core.Control.Enum.ControlState);
-local v7 = require(script.Parent.InteractableListItem);
-local v8 = require(script.Parent.Enum.SelectionMode);
-local v9 = v2.PureComponent:extend("InteractableList");
-v9.validateProps = v3.strictInterface({
-    itemList = v3.table, 
-    renderItem = v3.callback, 
-    renderList = v3.optional(v3.callback), 
-    selection = v3.optional(v3.table), 
-    selectionMode = v3.optional(v8.isEnumValue), 
-    onSelectionChanged = v3.optional(v3.callback), 
-    size = v3.optional(v3.UDim2), 
-    position = v3.optional(v3.UDim2), 
-    layoutOrder = v3.optional(v3.integer), 
-    padding = v3.optional(v3.UDim), 
-    fillDirection = v3.optional(v3.enum(Enum.FillDirection)), 
-    horizontalAlignment = v3.optional(v3.enum(Enum.HorizontalAlignment)), 
-    verticalAlignment = v3.optional(v3.enum(Enum.VerticalAlignment)), 
-    sortOrder = v3.optional(v3.enum(Enum.SortOrder)), 
-    automaticSize = v3.optional(v3.enum(Enum.AutomaticSize)), 
-    itemSize = v3.optional(v3.union(v3.UDim2, v5(v3.UDim2)))
-});
-v9.defaultProps = {
-    renderList = function(v10, v11, v12) --[[ Line: 60 ]] --[[ Name: renderList ]]
-        -- upvalues: v2 (copy)
-        local v13 = {
-            v2.createElement("UIListLayout", {
-                Padding = v12.padding, 
-                FillDirection = v12.fillDirection, 
-                HorizontalAlignment = v12.horizontalAlignment, 
-                VerticalAlignment = v12.verticalAlignment, 
-                SortOrder = v12.sortOrder, 
-                key = "$layout"
-            })
-        };
-        for v14 in pairs(v10) do
-            table.insert(v13, v11(v14));
-        end;
-        return v2.createElement("Frame", {
-            Size = v12.size, 
-            Position = v12.position, 
-            BackgroundTransparency = 1, 
-            AutomaticSize = v12.automaticSize, 
-            BorderSizePixel = 0
-        }, v13);
-    end, 
-    size = UDim2.fromScale(1, 1), 
-    itemSize = UDim2.fromScale(1, 1), 
-    selectionMode = v8.Single
-};
-v9.init = function(v15) --[[ Line: 88 ]] --[[ Name: init ]]
-    -- upvalues: v8 (copy), v4 (copy)
-    local v16 = {
-        interactable = {}, 
-        selection = {}
-    };
-    if v15.props.selectionMode == v8.Single then
-        local v17 = next(v15.props.itemList);
-        if v17 ~= nil then
-            v16.selection = {
-                v17
-            };
-        end;
-    end;
-    v15:setState(v16);
-    v15.setInteractableState = function(v18, v19) --[[ Line: 101 ]]
-        -- upvalues: v15 (copy), v4 (ref)
-        v15:setState(function(v20) --[[ Line: 102 ]]
-            -- upvalues: v4 (ref), v18 (copy), v19 (copy)
-            return {
-                interactable = v4.Dictionary.join(v20.interactable, {
-                    [v18] = v19
-                })
-            };
-        end);
-    end;
-    v15.setSelection = function(v21) --[[ Line: 110 ]]
-        -- upvalues: v15 (copy)
-        v15:setState({
-            selection = v21
-        });
-    end;
-end;
-v9.getSelection = function(v22) --[[ Line: 117 ]] --[[ Name: getSelection ]]
-    -- upvalues: v8 (copy), v4 (copy)
-    if v22.props.selection then
-        return v22.props.selection;
-    elseif v22.props.selectionMode == v8.None then
-        return {};
-    else
-        local v24 = v4.List.filter(v22.state.selection, function(v23) --[[ Line: 124 ]]
-            -- upvalues: v22 (copy)
-            return v22.props.itemList[v23] ~= nil;
-        end);
-        if v22.props.selectionMode == v8.Single then
-            local v25 = v24[#v24];
-            if v25 == nil then
-                v25 = next(v22.props.itemList);
-            end;
-            if v25 ~= nil then
-                return {
-                    v25
-                };
-            else
-                return {};
-            end;
-        else
-            return v24;
-        end;
-    end;
-end;
-v9.didMount = function(v26) --[[ Line: 142 ]] --[[ Name: didMount ]]
-    if v26.props.selection == nil and v26.props.onSelectionChanged then
-        v26.props.onSelectionChanged(v26:getSelection());
-    end;
-end;
-v9.render = function(v27) --[[ Line: 148 ]] --[[ Name: render ]]
-    -- upvalues: v6 (copy), v2 (copy), v7 (copy)
-    return v27.props.renderList(v27.props.itemList, function(v28) --[[ Line: 149 ]]
-        -- upvalues: v27 (copy), v6 (ref), v2 (ref), v7 (ref)
-        local v29 = v27.state.interactable[v28] or v6.Default;
-        local v30 = v27:getSelection();
-        return v2.createElement(v7, {
-            id = v28, 
-            item = v27.props.itemList[v28], 
-            interactableState = v29, 
-            selection = v30, 
-            renderItem = v27.props.renderItem, 
-            itemSize = v27.props.itemList[v28] and v27.props.itemList[v28].itemSize or v27.props.itemSize, 
-            selectionMode = v27.props.selectionMode, 
-            onSelectionChanged = v27.props.onSelectionChanged, 
-            setInteractableState = v27.setInteractableState, 
-            setSelection = v27.setSelection, 
-            key = tostring(v28)
-        });
-    end, v27.props);
-end;
-return v9;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local t = require(ParentParentParent.t)
+local Cryo = require(ParentParentParent.Cryo)
+local bindingValidator = require(ParentParent.Core.Utility.bindingValidator)
+local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
+local InteractableListItem = require(script.Parent.InteractableListItem)
+local SelectionMode = require(script.Parent.Enum.SelectionMode)
+local v10 = Roact.PureComponent:extend("InteractableList")
+
+v10.validateProps = t.strictInterface({
+	itemList = t.table,
+	renderItem = t.callback,
+	renderList = t.optional(t.callback),
+	selection = t.optional(t.table),
+	selectionMode = t.optional(SelectionMode.isEnumValue),
+	onSelectionChanged = t.optional(t.callback),
+	size = t.optional(t.UDim2),
+	position = t.optional(t.UDim2),
+	layoutOrder = t.optional(t.integer),
+	padding = t.optional(t.UDim),
+	fillDirection = t.optional(t.enum(Enum.FillDirection)),
+	horizontalAlignment = t.optional(t.enum(Enum.HorizontalAlignment)),
+	verticalAlignment = t.optional(t.enum(Enum.VerticalAlignment)),
+	sortOrder = t.optional(t.enum(Enum.SortOrder)),
+	automaticSize = t.optional(t.enum(Enum.AutomaticSize)),
+	itemSize = t.optional(t.union(t.UDim2, bindingValidator(t.UDim2)))
+})
+v10.defaultProps = {
+	renderList = function(p1, p2, p3) -- line: 60
+		-- upvalues: Roact (copy)
+		local t1 = { Roact.createElement("UIListLayout", {
+			key = "$layout",
+			Padding = p3.padding,
+			FillDirection = p3.fillDirection,
+			HorizontalAlignment = p3.horizontalAlignment,
+			VerticalAlignment = p3.verticalAlignment,
+			SortOrder = p3.sortOrder
+		}) }
+
+		for k in pairs(p1) do
+			table.insert(t1, p2(k))
+		end
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = p3.size,
+			Position = p3.position,
+			AutomaticSize = p3.automaticSize
+		}, t1)
+	end,
+	size = UDim2.fromScale(1, 1),
+	itemSize = UDim2.fromScale(1, 1),
+	selectionMode = SelectionMode.Single
+}
+
+function v10.init(p4) -- line: 88
+	-- upvalues: SelectionMode (copy), Cryo (copy)
+	local t2 = {
+		interactable = {},
+		selection = {}
+	}
+
+	if p4.props.selectionMode == SelectionMode.Single then
+		local v18 = next(p4.props.itemList)
+
+		if v18 ~= nil then
+			t2.selection = { v18 }
+		end
+	end
+
+	p4:setState(t2)
+
+	function p4.setInteractableState(p5, p6) -- line: 101
+		-- upvalues: p4 (copy), Cryo (copy)
+		p4:setState(function(p7) -- line: 102
+			-- upvalues: Cryo (copy), p5 (copy), p6 (copy)
+			return {
+				interactable = Cryo.Dictionary.join(p7.interactable, {
+					[p5] = p6
+				})
+			}
+		end)
+	end
+	function p4.setSelection(p8) -- line: 110
+		-- upvalues: p4 (copy)
+		p4:setState({
+			selection = p8
+		})
+	end
+end
+function v10.getSelection(p9) -- line: 117
+	-- upvalues: SelectionMode (copy), Cryo (copy)
+	if p9.props.selection then
+		return p9.props.selection
+	end
+
+	if p9.props.selectionMode == SelectionMode.None then
+		return {}
+	end
+
+	local v20 = Cryo.List.filter(p9.state.selection, function(p10) -- line: 124
+		-- upvalues: p9 (copy)
+		return p9.props.itemList[p10] ~= nil
+	end)
+
+	if p9.props.selectionMode == SelectionMode.Single then
+		local v21 = v20[#v20]
+
+		if v21 == nil then
+			v21 = next(p9.props.itemList)
+		end
+
+		if v21 ~= nil then
+			return { v21 }
+		end
+
+		return {}
+	end
+
+	return v20
+end
+function v10.didMount(p11) -- line: 142
+	if p11.props.selection == nil and p11.props.onSelectionChanged then
+		p11.props.onSelectionChanged(p11:getSelection())
+	end
+end
+function v10.render(p12) -- line: 148
+	-- upvalues: ControlState (copy), Roact (copy), InteractableListItem (copy)
+	return p12.props.renderList(p12.props.itemList, function(p13) -- line: 149
+		-- upvalues: p12 (copy), ControlState (copy), Roact (copy), InteractableListItem (copy)
+		local v29 = p12.state.interactable[p13] or ControlState.Default
+		local v30 = p12:getSelection()
+
+		return Roact.createElement(InteractableListItem, {
+			id = p13,
+			item = p12.props.itemList[p13],
+			interactableState = v29,
+			selection = v30,
+			renderItem = p12.props.renderItem,
+			itemSize = p12.props.itemList[p13] and p12.props.itemList[p13].itemSize or p12.props.itemSize,
+			selectionMode = p12.props.selectionMode,
+			onSelectionChanged = p12.props.onSelectionChanged,
+			setInteractableState = p12.setInteractableState,
+			setSelection = p12.setSelection,
+			key = tostring(p13)
+		})
+	end, p12.props)
+end
+
+return v10

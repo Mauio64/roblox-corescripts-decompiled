@@ -1,4 +1,5 @@
-game:DefineFastString("IOSPhoneVerificationLayer", "PlayerApp.PhoneVerification.iOS");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("IOSPhoneVerificationLayer");
-end;
+game:DefineFastString("IOSPhoneVerificationLayer", "PlayerApp.PhoneVerification.iOS")
+
+return function() -- line: 3
+	return game:GetFastString("IOSPhoneVerificationLayer")
+end

@@ -1,28 +1,36 @@
-local l_Parent_0 = script:FindFirstAncestor("InteractionFeedback").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.SharedFlags);
-local _ = require(script.Parent.InteractionFeedbackContext);
-local v4 = require(script.Parent.sendHapticAnalytics);
-local l_FFlagLuaAppHapticTriggeredTelemetry_0 = v2.FFlagLuaAppHapticTriggeredTelemetry;
-local l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 = v2.FFlagLuaAppFixExplicitFeedbackTelemetry;
-local v7 = {};
-return function(v8, v9, v10, v11, v12, v13, v14) --[[ Line: 16 ]] --[[ Name: triggerHaptic ]]
-    -- upvalues: v7 (copy), l_FFlagLuaAppHapticTriggeredTelemetry_0 (copy), v1 (copy), l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 (copy), v4 (copy)
-    if not v7[v8] then
-        v7[v8] = Instance.new("HapticEffect");
-        v7[v8].Parent = workspace;
-        v7[v8].Type = v8;
-    end;
-    v7[v8].Position = v9;
-    v7[v8].Radius = v10;
-    v7[v8]:Play();
-    if l_FFlagLuaAppHapticTriggeredTelemetry_0 and v13 then
-        local v15 = v1.Dictionary.join({
-            hapticType = v8.Name, 
-            contextKey = v11, 
-            interactionType = v12, 
-            ctx = if l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 then nil else v13
-        }, v14 or {});
-        v4(v15, if l_FFlagLuaAppFixExplicitFeedbackTelemetry_0 then v13 else nil);
-    end;
-end;
+local Parent = script:FindFirstAncestor("InteractionFeedback").Parent
+local Cryo = require(Parent.Cryo)
+local SharedFlags = require(Parent.SharedFlags)
+
+require(script.Parent.InteractionFeedbackContext)
+
+local sendHapticAnalytics = require(script.Parent.sendHapticAnalytics)
+local FFlagLuaAppHapticTriggeredTelemetry = SharedFlags.FFlagLuaAppHapticTriggeredTelemetry
+local FFlagLuaAppFixExplicitFeedbackTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackTelemetry
+local t1 = {}
+
+local function triggerHaptic(p1, vector3: Vector3, n1: number, s1: string?, p2, s2: string?, t2: {[any]: any}?) -- line: 16
+	-- upvalues: t1 (copy), FFlagLuaAppHapticTriggeredTelemetry (copy), Cryo (copy), FFlagLuaAppFixExplicitFeedbackTelemetry (copy), sendHapticAnalytics (copy)
+	if not t1[p1] then
+		t1[p1] = Instance.new("HapticEffect")
+		t1[p1].Parent = workspace
+		t1[p1].Type = p1
+	end
+
+	t1[p1].Position = vector3
+	t1[p1].Radius = n1
+	t1[p1]:Play()
+
+	if FFlagLuaAppHapticTriggeredTelemetry and s2 then
+		local v16 = Cryo.Dictionary.join({
+			hapticType = p1.Name,
+			contextKey = s1,
+			interactionType = p2,
+			ctx = if not FFlagLuaAppFixExplicitFeedbackTelemetry then s2 else nil
+		}, t2 or {})
+
+		sendHapticAnalytics(v16, if not FFlagLuaAppFixExplicitFeedbackTelemetry then nil else s2)
+	end
+end
+
+return triggerHaptic

@@ -1,41 +1,42 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_game_EngineFeature_0 = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled");
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local TelemetryService = game:GetService("TelemetryService")
+local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+
 return {
-    sendEventToTelemetryV2 = function(v3) --[[ Line: 12 ]] --[[ Name: sendEventToTelemetryV2 ]]
-        -- upvalues: l_game_EngineFeature_0 (copy), l_RbxAnalyticsService_0 (copy), l_TelemetryService_0 (copy)
-        local v4 = {
-            eventName = "coreui_vr_bottom_bar_action", 
-            backends = {
-                "EventIngest"
-            }, 
-            throttlingPercentage = game:DefineFastInt("VRBottomBarActionEventThrottleHunderedthsPercent", 0), 
-            lastUpdated = {
-                2025, 
-                5, 
-                12
-            }, 
-            description = "Event fired from the client every time VRBottomBar buttons are clicked", 
-            links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803"
-        };
-        local v5 = {
-            "addPlaceId", 
-            "addUniverseId", 
-            "addSessionInfo"
-        };
-        local v6 = {
-            integration_id = v3.integrationId, 
-            is_toggle_on = tostring(v3.isToggleOn), 
-            source = v3.source
-        };
-        if l_game_EngineFeature_0 then
-            table.insert(v5, "addPlaySessionId");
-        else
-            v6.playsessionid = l_RbxAnalyticsService_0:GetPlaySessionId();
-        end;
-        l_TelemetryService_0:LogEvent(v4, {
-            standardizedFields = v5, 
-            customFields = v6
-        });
-    end
-};
+	sendEventToTelemetryV2 = function(t1: {[any]: any}) -- line: 12
+		-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy)
+		local t2 = {
+			eventName = "coreui_vr_bottom_bar_action",
+			description = "Event fired from the client every time VRBottomBar buttons are clicked",
+			links = "https://github.rbx.com/Roblox/proto-schemas/pull/5803",
+			backends = { "EventIngest" },
+			throttlingPercentage = game:DefineFastInt("VRBottomBarActionEventThrottleHunderedthsPercent", 0),
+			lastUpdated = {
+				2025,
+				5,
+				12
+			}
+		}
+		local t3 = {
+			"addPlaceId",
+			"addUniverseId",
+			"addSessionInfo"
+		}
+		local t4 = {
+			integration_id = t1.integrationId,
+			is_toggle_on = tostring(t1.isToggleOn),
+			source = t1.source
+		}
+
+		if EngineFeature then
+			table.insert(t3, "addPlaySessionId")
+		else
+			t4.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+		end
+
+		TelemetryService:LogEvent(t2, {
+			standardizedFields = t3,
+			customFields = t4
+		})
+	end
+}

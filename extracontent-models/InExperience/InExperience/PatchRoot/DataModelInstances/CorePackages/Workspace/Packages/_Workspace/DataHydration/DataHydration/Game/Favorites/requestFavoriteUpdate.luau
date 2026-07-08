@@ -1,19 +1,23 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(script.Parent.FavoritesUrlBuilder);
-return function(v4, v5) --[[ Line: 10 ]] --[[ Name: requestUpdateFavorite ]]
-    -- upvalues: v3 (copy), l_HttpService_0 (copy), v1 (copy)
-    local v6 = v3.buildFavoriteUpdateUrl(v4);
-    local v7 = l_HttpService_0:JSONEncode({
-        isFavorited = v5
-    });
-    return v1.config({
-        requestFunction = function(v8, v9, v10) --[[ Line: 18 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v1 (ref)
-            return v1.requestFunctions.HttpRbxApi(v8, v9, v10);
-        end
-    })(v6, "POST", {
-        postBody = v7
-    });
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+local HttpService = game:GetService("HttpService")
+local FavoritesUrlBuilder = require(script.Parent.FavoritesUrlBuilder)
+
+local function requestUpdateFavorite(s1: string, b1: boolean) -- line: 10
+	-- upvalues: FavoritesUrlBuilder (copy), HttpService (copy), HttpRequest (copy)
+	local v8 = FavoritesUrlBuilder.buildFavoriteUpdateUrl(s1)
+	local json = HttpService:JSONEncode({
+		isFavorited = b1
+	})
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 18
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		end
+	})(v8, "POST", {
+		postBody = json
+	})
+end
+
+return requestUpdateFavorite

@@ -1,26 +1,28 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(script.Parent.Flags);
-local v3 = v2.GetFStringAdGuiLivePreviewWatermark();
-local v4 = v2.GetFStringAdGuiLivePreviewWatermarkV2();
-local v5 = v2.GetFStringLivePreviewPlaceId();
-local v6 = v2.GetFFlagUseV2LivePreviewWatermark();
-local v7 = v1.PureComponent:extend("LivePreviewWatermark");
-v7.init = function(v8) --[[ Line: 13 ]] --[[ Name: init ]]
-    v8.placeId = tostring(game.PlaceId);
-end;
-v7.render = function(v9) --[[ Line: 17 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v1 (copy), v6 (copy), v4 (copy), v3 (copy)
-    return v5 == v9.placeId and v9.props.IsVisible and v1.createElement("ImageLabel", {
-        Image = v6 and v4 or v3, 
-        Size = v6 and UDim2.new(1, 0, 1, 0) or UDim2.new(0.5, 0, 0.5, 0), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        ScaleType = Enum.ScaleType.Fit, 
-        ZIndex = -999, 
-        Transparency = 1, 
-        ImageTransparency = v6 and 0 or 0.7, 
-        Rotation = v6 and 0 or 15
-    }) or nil;
-end;
-return v7;
+local ParentParent = script.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local Flags = require(script.Parent.Flags)
+local v4 = Flags.GetFStringAdGuiLivePreviewWatermark()
+local v5 = Flags.GetFStringAdGuiLivePreviewWatermarkV2()
+local v6 = Flags.GetFStringLivePreviewPlaceId()
+local v7 = Flags.GetFFlagUseV2LivePreviewWatermark()
+local v8 = Roact.PureComponent:extend("LivePreviewWatermark")
+
+function v8.init(p1) -- line: 13
+	p1.placeId = tostring(game.PlaceId)
+end
+function v8.render(p2) -- line: 17
+	-- upvalues: v6 (copy), Roact (copy), v7 (copy), v5 (copy), v4 (copy)
+	return v6 == p2.placeId and p2.props.IsVisible and Roact.createElement("ImageLabel", {
+		ZIndex = -999,
+		Transparency = 1,
+		Image = v7 and v5 or v4,
+		Size = v7 and UDim2.new(1, 0, 1, 0) or UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		ScaleType = Enum.ScaleType.Fit,
+		ImageTransparency = not v7 and 0.7 or 0,
+		Rotation = not v7 and 15 or 0
+	}) or nil
+end
+
+return v8

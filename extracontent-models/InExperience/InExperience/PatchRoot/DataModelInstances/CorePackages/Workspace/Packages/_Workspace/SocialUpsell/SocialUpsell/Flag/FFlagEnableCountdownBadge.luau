@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAccountCountdownLabel", false);
+return game:DefineFastFlag("EnableAccountCountdownLabel", false)

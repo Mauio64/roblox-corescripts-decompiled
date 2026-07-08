@@ -1,1 +1,1 @@
-return require(script.Parent.buildApiSiteUrl)("games");
+return require(script.Parent.buildApiSiteUrl)("games")

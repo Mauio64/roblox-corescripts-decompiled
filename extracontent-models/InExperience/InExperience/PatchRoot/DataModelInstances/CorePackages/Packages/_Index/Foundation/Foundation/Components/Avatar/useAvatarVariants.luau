@@ -1,96 +1,104 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v3 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local v4 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v5 = require(l_script_FirstAncestor_0.Enums.UserPresence);
-local v6 = require(l_script_FirstAncestor_0.Enums.IndicatorVariant);
-local v7 = require(l_script_FirstAncestor_0.Enums.IndicatorShape);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v9 = require(l_script_FirstAncestor_0.Utility.indexBindable);
-local function v15(v10) --[[ Line: 45 ]] --[[ Name: variantsFactory ]]
-    -- upvalues: v4 (copy), v5 (copy), v7 (copy), v6 (copy)
-    local v11 = {
-        container = {
-            tag = "radius-circle"
-        }, 
-        avatar = {
-            tag = "radius-circle size-full"
-        }, 
-        indicatorBackplate = {
-            ZIndex = 2, 
-            tag = "bg-surface-0 anchor-bottom-right radius-circle auto-xy position-bottom-right", 
-            padding = UDim2.fromOffset(3, 3)
-        }
-    };
-    local v12 = {
-        [v4.XSmall] = {
-            indicator = {
-                size = v10.Size.Size_150
-            }
-        }, 
-        [v4.Small] = {
-            indicator = {
-                size = v10.Size.Size_150
-            }
-        }, 
-        [v4.Medium] = {
-            indicator = {
-                size = v10.Size.Size_200
-            }
-        }, 
-        [v4.Large] = {
-            indicator = {
-                size = v10.Size.Size_200
-            }
-        }
-    };
-    local v13 = {
-        [v5.InExperience] = {}, 
-        [v5.Away] = {
-            indicator = {
-                shape = v7.Ring, 
-                variant = v6.Neutral
-            }
-        }, 
-        [v5.Active] = {
-            indicator = {
-                shape = v7.Circle, 
-                variant = v6.Success
-            }
-        }, 
-        [v5.None] = {}
-    };
-    local v14 = {
-        [v4.XSmall] = v10.Stroke.Standard, 
-        [v4.Small] = v10.Stroke.Thick, 
-        [v4.Medium] = v10.Stroke.Thick, 
-        [v4.Large] = v10.Stroke.Thicker
-    };
-    return {
-        common = v11, 
-        sizes = v12, 
-        presence = v13, 
-        iconSizeStrokes = v14
-    };
-end;
-return function(v16, v17, v18, v19, v20) --[[ Line: 85 ]]
-    -- upvalues: v3 (copy), v15 (copy), v5 (copy), v1 (copy), v9 (copy)
-    local v21 = v3.useVariants("Avatar", v15, v16);
-    local v22 = not v20 and (v18 == v5.Active or v18 == v5.Away);
-    local v23 = if not v20 and v18 == v5.InExperience then v16.Color.System.Emphasis else v19;
-    local v24 = if not v20 then v16.Stroke.Thicker else v21.iconSizeStrokes[v17];
-    return v1(v21.common, v21.sizes[v17], v21.presence[v18], {
-        container = {
-            stroke = if v23 then {
-                Color = v9(v23, "Color3"), 
-                Transparency = v9(v23, "Transparency"), 
-                Thickness = v24
-            } else nil, 
-            backgroundStyle = v19
-        }, 
-        indicator = {
-            isVisible = v22
-        }
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+
+require(Foundation.Providers.Style.Tokens)
+
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+local InputSize = require(Foundation.Enums.InputSize)
+local UserPresence = require(Foundation.Enums.UserPresence)
+local IndicatorVariant = require(Foundation.Enums.IndicatorVariant)
+local IndicatorShape = require(Foundation.Enums.IndicatorShape)
+
+require(Foundation.Components.Types)
+
+local indexBindable = require(Foundation.Utility.indexBindable)
+
+local function variantsFactory(p1) -- line: 45
+	-- upvalues: InputSize (copy), UserPresence (copy), IndicatorShape (copy), IndicatorVariant (copy)
+	local t1 = {
+		container = {
+			tag = "radius-circle"
+		},
+		avatar = {
+			tag = "size-full radius-circle"
+		},
+		indicatorBackplate = {
+			ZIndex = 2,
+			tag = "position-bottom-right anchor-bottom-right auto-xy radius-circle bg-surface-0",
+			padding = UDim2.fromOffset(3, 3)
+		}
+	}
+	local t2 = {
+		[InputSize.XSmall] = {
+			indicator = {
+				size = p1.Size.Size_150
+			}
+		},
+		[InputSize.Small] = {
+			indicator = {
+				size = p1.Size.Size_150
+			}
+		},
+		[InputSize.Medium] = {
+			indicator = {
+				size = p1.Size.Size_200
+			}
+		},
+		[InputSize.Large] = {
+			indicator = {
+				size = p1.Size.Size_200
+			}
+		}
+	}
+	local t3 = {
+		[UserPresence.InExperience] = {},
+		[UserPresence.Away] = {
+			indicator = {
+				shape = IndicatorShape.Ring,
+				variant = IndicatorVariant.Neutral
+			}
+		},
+		[UserPresence.Active] = {
+			indicator = {
+				shape = IndicatorShape.Circle,
+				variant = IndicatorVariant.Success
+			}
+		},
+		[UserPresence.None] = {}
+	}
+	local t4 = {
+		[InputSize.XSmall] = p1.Stroke.Standard,
+		[InputSize.Small] = p1.Stroke.Thick,
+		[InputSize.Medium] = p1.Stroke.Thick,
+		[InputSize.Large] = p1.Stroke.Thicker
+	}
+
+	return {
+		common = t1,
+		sizes = t2,
+		presence = t3,
+		iconSizeStrokes = t4
+	}
+end
+
+return function(p2, p3, p4, p5, b1: boolean) -- line: 85
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), UserPresence (copy), composeStyleVariant (copy), indexBindable (copy)
+	local v20 = VariantsContext.useVariants("Avatar", variantsFactory, p2)
+	local v21 = not b1 and (p4 == UserPresence.Active or p4 == UserPresence.Away)
+	local v22 = if b1 or p4 ~= UserPresence.InExperience then p5 else p2.Color.System.Emphasis
+	local v23 = if b1 then v20.iconSizeStrokes[p3] else p2.Stroke.Thicker
+
+	return composeStyleVariant(v20.common, v20.sizes[p3], v20.presence[p4], {
+		container = {
+			stroke = if not v22 then nil else {
+				Color = indexBindable(v22, "Color3"),
+				Transparency = indexBindable(v22, "Transparency"),
+				Thickness = v23
+			},
+			backgroundStyle = p5
+		},
+		indicator = {
+			isVisible = v21
+		}
+	})
+end

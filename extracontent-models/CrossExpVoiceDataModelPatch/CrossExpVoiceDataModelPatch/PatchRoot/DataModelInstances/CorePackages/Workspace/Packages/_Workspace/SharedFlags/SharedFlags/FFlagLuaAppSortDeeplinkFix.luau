@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppSortDeeplinkFix", false);
+return game:DefineFastFlag("LuaAppSortDeeplinkFix", false)

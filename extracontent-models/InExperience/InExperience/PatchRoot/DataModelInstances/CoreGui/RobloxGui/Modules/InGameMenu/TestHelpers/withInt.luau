@@ -1,6 +1,9 @@
-return function(v0, v1, v2) --[[ Line: 4 ]] --[[ Name: withInt ]]
-    local v3 = game:SetFastIntForTesting(v0, v1);
-    local l_status_0, l_result_0 = pcall(v2);
-    game:SetFastIntForTesting(v0, v3);
-    assert(l_status_0, l_result_0);
-end;
+local function withInt(p1, p2, p3) -- line: 4
+	local v5 = game:SetFastIntForTesting(p1, p2)
+	local ok, result = pcall(p3)
+
+	game:SetFastIntForTesting(p1, v5)
+	assert(ok, result)
+end
+
+return withInt

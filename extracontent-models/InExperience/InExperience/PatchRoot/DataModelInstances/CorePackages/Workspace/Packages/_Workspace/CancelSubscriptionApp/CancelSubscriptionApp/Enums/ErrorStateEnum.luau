@@ -1,5 +1,5 @@
 return {
-    Expiring = "Expiring", 
-    Unsubscribed = "Unsubscribed", 
-    ErrorCancelling = "ErrorCancelling"
-};
+	Expiring = "Expiring",
+	Unsubscribed = "Unsubscribed",
+	ErrorCancelling = "ErrorCancelling"
+}

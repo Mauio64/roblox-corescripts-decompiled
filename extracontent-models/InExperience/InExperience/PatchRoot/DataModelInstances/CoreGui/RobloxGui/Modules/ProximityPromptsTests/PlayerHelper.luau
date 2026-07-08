@@ -1,138 +1,158 @@
-local l_Players_0 = game:GetService("Players");
-local l_RunService_0 = game:GetService("RunService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = {
-    initStarted = false, 
-    TestModel = nil, 
-    hrp = nil, 
-    humanoid = nil, 
-    player = nil
-};
-v3.Init = function() --[[ Line: 15 ]] --[[ Name: Init ]]
-    -- upvalues: v3 (copy), l_Players_0 (copy), l_RunService_0 (copy)
-    if v3.initStarted then
-        return;
-    else
-        v3.initStarted = true;
-        local v4 = v3.WaitForExpression(function() --[[ Line: 23 ]]
-            -- upvalues: l_Players_0 (ref)
-            return l_Players_0.LocalPlayer;
-        end, 10, "Players.LocalPlayer not found");
-        v3.player = v4;
-        if v4.Character == nil and l_RunService_0:IsServer() then
-            if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                v4:LoadCharacterAsync();
-            else
-                v4:LoadCharacter();
-            end;
-        end;
-        v3.WaitForExpression(function() --[[ Line: 37 ]]
-            -- upvalues: v4 (copy)
-            return v4.Character;
-        end, 10, "LocalPlayer.Character not found");
-        v3.hrp = v4.Character:WaitForChild("HumanoidRootPart");
-        v3.humanoid = v4.Character:WaitForChild("Humanoid");
-        if v3.TestModel == nil then
-            v3.TestModel = Instance.new("Model");
-            v3.TestModel.Name = "_TestContainer";
-            v3.TestModel.Parent = workspace;
-        end;
-        v3.PlayerGui = l_Players_0.LocalPlayer:WaitForChild("PlayerGui");
-        return;
-    end;
-end;
-v3.AddInstance = function(v5) --[[ Line: 54 ]] --[[ Name: AddInstance ]]
-    -- upvalues: v3 (copy)
-    local v6 = Instance.new(v5);
-    v6.Parent = v3.TestModel;
-    return v6;
-end;
-v3.CleanUpAfterTest = function() --[[ Line: 61 ]] --[[ Name: CleanUpAfterTest ]]
-    -- upvalues: v3 (copy)
-    v3.TestModel:ClearAllChildren();
-end;
-v3.SetCameraFOV = function(v7) --[[ Line: 65 ]] --[[ Name: SetCameraFOV ]]
-    workspace.CurrentCamera.FieldOfView = v7;
-end;
-v3.IsPartOnscreen = function(v8) --[[ Line: 69 ]] --[[ Name: IsPartOnscreen ]]
-    local _, v10 = workspace.CurrentCamera:WorldToViewportPoint(v8.Position);
-    return v10;
-end;
-v3.GetPartViewportPixelPosition = function(v11) --[[ Line: 75 ]] --[[ Name: GetPartViewportPixelPosition ]]
-    local v12, _ = workspace.CurrentCamera:WorldToViewportPoint(v11.Position);
-    return Vector2.new(v12.x, v12.y);
-end;
-v3.MovePlayerToPosition = function(v14) --[[ Line: 82 ]] --[[ Name: MovePlayerToPosition ]]
-    -- upvalues: v3 (copy)
-    if v3.hrp ~= nil then
-        local v15 = CFrame.new() + v14 + Vector3.new(0, 1 + v3.humanoid.HipHeight, 0);
-        v3.hrp.CFrame = v15;
-    end;
-end;
-v3.SetPlayerCamera = function(v16, v17) --[[ Line: 91 ]] --[[ Name: SetPlayerCamera ]]
-    -- upvalues: v3 (copy)
-    local v18 = v3.player.Character:WaitForChild("Head", 10);
-    local v19 = CFrame.new(Vector3.new(), v16) + v18.Position - v17 * v16.Unit;
-    local l_CurrentCamera_0 = workspace.CurrentCamera;
-    l_CurrentCamera_0.CameraType = Enum.CameraType.Scriptable;
-    l_CurrentCamera_0.CFrame = v19;
-end;
-v3.WaitNFrames = function(v21) --[[ Line: 102 ]] --[[ Name: WaitNFrames ]]
-    -- upvalues: l_RunService_0 (copy)
-    for _ = 1, v21 do
-        l_RunService_0.RenderStepped:Wait();
-    end;
-end;
-v3.WaitWallTime = function(v23) --[[ Line: 111 ]] --[[ Name: WaitWallTime ]]
-    -- upvalues: v3 (copy)
-    local v24 = tick();
-    if v23 > 2 then
-        warn("Requested wait time too long, waiting 2s");
-        v23 = 2;
-    end;
-    while v23 >= tick() - v24 do
-        v3.WaitNFrames(1);
-    end;
-end;
-v3.WaitGameTime = function(v25) --[[ Line: 129 ]] --[[ Name: WaitGameTime ]]
-    -- upvalues: l_RunService_0 (copy)
-    local v26, v27 = l_RunService_0.Stepped:Wait();
-    local l_v26_0 = v26;
-    while l_v26_0 - v26 < v25 do
-        local v29, v30 = l_RunService_0.Stepped:Wait();
-        l_v26_0 = v29;
-        v27 = v30;
-    end;
-end;
-v3.WaitForExpression = function(v31, v32, v33) --[[ Line: 138 ]] --[[ Name: WaitForExpression ]]
-    -- upvalues: v3 (copy)
-    local v34 = tick();
-    local v35 = v31();
-    while not v35 and tick() - v34 < v32 do
-        v3.WaitNFrames(1);
-        v35 = v31();
-    end;
-    if not v35 then
-        error(v33);
-    end;
-    return v35;
-end;
-v3.GetCornersOfBillboardGui = function(v36) --[[ Line: 156 ]] --[[ Name: GetCornersOfBillboardGui ]]
-    -- upvalues: v3 (copy), l_GuiService_0 (copy)
-    local v37 = v3.GetPartViewportPixelPosition(v36.Adornee);
-    local v38 = Vector2.new(v36.SizeOffset.x * v36.AbsoluteSize.x, v36.SizeOffset.y * v36.AbsoluteSize.y);
-    local v39 = v37 - l_GuiService_0:GetGuiInset() + v38;
-    local l_AbsoluteSize_0 = v36.AbsoluteSize;
-    local v41 = v39 - l_AbsoluteSize_0 / 2 + Vector2.new(1, 1);
-    local v42 = v39 + Vector2.new(l_AbsoluteSize_0.x / 2 - 1, -l_AbsoluteSize_0.y / 2 + 1);
-    local v43 = v39 + Vector2.new(l_AbsoluteSize_0.x / 2 - 1, l_AbsoluteSize_0.y / 2 - 1);
-    local v44 = v39 + Vector2.new(-l_AbsoluteSize_0.x / 2 + 1, l_AbsoluteSize_0.y / 2 - 1);
-    return {
-        center = v39, 
-        topLeft = v41, 
-        topRight = v42, 
-        bottomRight = v43, 
-        bottomLeft = v44
-    };
-end;
-return v3;
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local GuiService = game:GetService("GuiService")
+local t1 = {
+	initStarted = false,
+	TestModel = nil,
+	hrp = nil,
+	humanoid = nil,
+	player = nil
+}
+
+function t1.Init() -- line: 15
+	-- upvalues: t1 (copy), Players (copy), RunService (copy)
+	if t1.initStarted then
+		return
+	end
+
+	t1.initStarted = true
+
+	local v5 = t1.WaitForExpression(function() -- line: 23
+		-- upvalues: Players (copy)
+		return Players.LocalPlayer
+	end, 10, "Players.LocalPlayer not found")
+
+	t1.player = v5
+
+	if v5.Character == nil and RunService:IsServer() then
+		if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+			v5:LoadCharacterAsync()
+		else
+			v5:LoadCharacter()
+		end
+	end
+
+	t1.WaitForExpression(function() -- line: 37
+		-- upvalues: v5 (copy)
+		return v5.Character
+	end, 10, "LocalPlayer.Character not found")
+	t1.hrp = v5.Character:WaitForChild("HumanoidRootPart")
+	t1.humanoid = v5.Character:WaitForChild("Humanoid")
+
+	if t1.TestModel == nil then
+		t1.TestModel = Instance.new("Model")
+		t1.TestModel.Name = "_TestContainer"
+		t1.TestModel.Parent = workspace
+	end
+
+	t1.PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+end
+function t1.AddInstance(p1) -- line: 54
+	-- upvalues: t1 (copy)
+	local v7 = Instance.new(p1)
+
+	v7.Parent = t1.TestModel
+
+	return v7
+end
+function t1.CleanUpAfterTest() -- line: 61
+	-- upvalues: t1 (copy)
+	t1.TestModel:ClearAllChildren()
+end
+function t1.SetCameraFOV(p2) -- line: 65
+	workspace.CurrentCamera.FieldOfView = p2
+end
+function t1.IsPartOnscreen(p3) -- line: 69
+	local _, v11 = workspace.CurrentCamera:WorldToViewportPoint(p3.Position)
+
+	return v11
+end
+function t1.GetPartViewportPixelPosition(p4) -- line: 75
+	local v13, _ = workspace.CurrentCamera:WorldToViewportPoint(p4.Position)
+
+	return Vector2.new(v13.x, v13.y)
+end
+function t1.MovePlayerToPosition(p5) -- line: 82
+	-- upvalues: t1 (copy)
+	if t1.hrp ~= nil then
+		local v16 = CFrame.new() + p5 + Vector3.new(0, 1 + t1.humanoid.HipHeight, 0)
+
+		t1.hrp.CFrame = v16
+	end
+end
+function t1.SetPlayerCamera(p6, p7) -- line: 91
+	-- upvalues: t1 (copy)
+	local Head = t1.player.Character:WaitForChild("Head", 10)
+	local v20 = CFrame.new(Vector3.new(), p6) + Head.Position - p7 * p6.Unit
+	local CurrentCamera = workspace.CurrentCamera
+
+	CurrentCamera.CameraType = Enum.CameraType.Scriptable
+	CurrentCamera.CFrame = v20
+end
+function t1.WaitNFrames(p8) -- line: 102
+	-- upvalues: RunService (copy)
+	for _ = 1, p8 do
+		RunService.RenderStepped:Wait()
+	end
+end
+function t1.WaitWallTime(p9) -- line: 111
+	-- upvalues: t1 (copy)
+	local timestamp = tick()
+
+	if p9 > 2 then
+		warn("Requested wait time too long, waiting 2s")
+		p9 = 2
+	end
+
+	while not (p9 < tick() - timestamp) do
+		t1.WaitNFrames(1)
+	end
+end
+function t1.WaitGameTime(p10) -- line: 129
+	-- upvalues: RunService (copy)
+	local time, _ = RunService.Stepped:Wait()
+	local v29 = time
+
+	while p10 > v29 - time do
+		local dt
+
+		v29, dt = RunService.Stepped:Wait()
+	end
+end
+function t1.WaitForExpression(p11, p12, p13) -- line: 138
+	-- upvalues: t1 (copy)
+	local timestamp = tick()
+	local v35 = p11()
+
+	while not v35 and p12 > tick() - timestamp do
+		t1.WaitNFrames(1)
+		v35 = p11()
+	end
+
+	if not v35 then
+		error(p13)
+	end
+
+	return v35
+end
+function t1.GetCornersOfBillboardGui(p14) -- line: 156
+	-- upvalues: t1 (copy), GuiService (copy)
+	local v37 = t1.GetPartViewportPixelPosition(p14.Adornee)
+	local vector2 = Vector2.new(p14.SizeOffset.x * p14.AbsoluteSize.x, p14.SizeOffset.y * p14.AbsoluteSize.y)
+	local v39 = v37 - GuiService:GetGuiInset() + vector2
+	local AbsoluteSize = p14.AbsoluteSize
+	local v41 = v39 - AbsoluteSize / 2 + Vector2.new(1, 1)
+	local v42 = v39 + Vector2.new(AbsoluteSize.x / 2 - 1, -AbsoluteSize.y / 2 + 1)
+	local v43 = v39 + Vector2.new(AbsoluteSize.x / 2 - 1, AbsoluteSize.y / 2 - 1)
+	local v44 = v39 + Vector2.new(-AbsoluteSize.x / 2 + 1, AbsoluteSize.y / 2 - 1)
+
+	return {
+		center = v39,
+		topLeft = v41,
+		topRight = v42,
+		bottomRight = v43,
+		bottomLeft = v44
+	}
+end
+
+return t1

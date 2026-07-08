@@ -1,1 +1,1 @@
-return require(script.Gradient);
+return require(script.Gradient)

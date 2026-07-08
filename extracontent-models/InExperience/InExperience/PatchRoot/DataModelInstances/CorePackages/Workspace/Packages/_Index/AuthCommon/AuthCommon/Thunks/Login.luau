@@ -1,20 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local v1 = require(l_script_FirstAncestor_0.Thunks.LoginByEmail);
-local v2 = require(l_script_FirstAncestor_0.Thunks.LoginByPhone);
-local v3 = require(l_script_FirstAncestor_0.Thunks.LoginByUsername);
-local v4 = require(l_script_FirstAncestor_0.Utils.isStringEmail);
-local v5 = require(l_script_FirstAncestor_0.Utils.isStringPhone);
-local v6 = game:GetService("GuiService"):IsTenFootInterface();
-return function(v7, v8, v9, v10, v11, v12, v13, v14, v15) --[[ Line: 14 ]]
-    -- upvalues: v4 (copy), v6 (copy), v1 (copy), v5 (copy), v2 (copy), v3 (copy)
-    return function(v16) --[[ Line: 25 ]]
-        -- upvalues: v4 (ref), v8 (copy), v15 (copy), v6 (ref), v1 (ref), v7 (copy), v9 (copy), v10 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v5 (ref), v2 (ref), v3 (ref)
-        if v4(v8) and not v15 and not v6 then
-            return v16:dispatch(v1(v7, v8, v9, v10, v11, v12, v13, v14));
-        elseif v5(v8) and not v15 and not v6 then
-            return v16:dispatch(v2(v7, v8, v9, v10, v11, v12, v13, v14));
-        else
-            return v16:dispatch(v3(v7, v8, v9, v10, v11, v12, v13));
-        end;
-    end;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local LoginByEmail = require(AuthCommon.Thunks.LoginByEmail)
+local LoginByPhone = require(AuthCommon.Thunks.LoginByPhone)
+local LoginByUsername = require(AuthCommon.Thunks.LoginByUsername)
+local isStringEmail = require(AuthCommon.Utils.isStringEmail)
+local isStringPhone = require(AuthCommon.Utils.isStringPhone)
+local v7 = game:GetService("GuiService"):IsTenFootInterface()
+
+return function(p1, p2, p3, p4, p5, p6, p7, p8, p9) -- line: 14
+	-- upvalues: isStringEmail (copy), v7 (copy), LoginByEmail (copy), isStringPhone (copy), LoginByPhone (copy), LoginByUsername (copy)
+	return function(p10) -- line: 25
+		-- upvalues: isStringEmail (copy), p2 (copy), p9 (copy), v7 (copy), LoginByEmail (copy), p1 (copy), p3 (copy), p4 (copy), p5 (copy), p6 (copy), p7 (copy), p8 (copy), isStringPhone (copy), LoginByPhone (copy), LoginByUsername (copy)
+		if isStringEmail(p2) and (not p9 and not v7) then
+			return p10:dispatch(LoginByEmail(p1, p2, p3, p4, p5, p6, p7, p8))
+		end
+
+		if isStringPhone(p2) and not p9 and not v7 then
+			return p10:dispatch(LoginByPhone(p1, p2, p3, p4, p5, p6, p7, p8))
+		end
+
+		return p10:dispatch(LoginByUsername(p1, p2, p3, p4, p5, p6, p7))
+	end
+end

@@ -1,194 +1,214 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Stats_0 = game:GetService("Stats");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v5 = require(l_Components_0.Memory.ClientMemory);
-local v6 = require(l_Components_0.Memory.ServerMemory);
-local v7 = require(l_Components_0.UtilAndTab);
-local v8 = require(l_Components_0.DataConsumer);
-local l_Actions_0 = script.Parent.Parent.Parent.Actions;
-local v10 = require(l_Actions_0.ClientMemoryUpdateSearchFilter);
-local v11 = require(l_Actions_0.ServerMemoryUpdateSearchFilter);
-local v12 = require(script.Parent.Parent.Parent.Constants);
-local l_MainRowPadding_0 = v12.GeneralFormatting.MainRowPadding;
-local v14 = game:DefineFastFlag("DevConsoleMemoryTrackingAlert", false);
-local v15 = v2.Component:extend("LogButton");
-v15.init = function(v16) --[[ Line: 25 ]] --[[ Name: init ]]
-    v16.onAction = function() --[[ Line: 26 ]]
-        -- upvalues: v16 (copy)
-        local v17 = v16.props.isClientView and v16.props.ClientMemoryData or v16.props.ServerMemoryData;
-        local v18 = "\n";
-        local function _(v19) --[[ Line: 29 ]] --[[ Name: line ]]
-            -- upvalues: v18 (ref)
-            v18 = v18 .. v19 .. "\n";
-        end;
-        v18 = v18 .. "Name                                       Min   Max" .. "\n";
-        v18 = v18 .. "----------------------------------------   ---   ---" .. "\n";
-        local function v21(v22, v23, v24) --[[ Line: 36 ]] --[[ Name: recurseMemoryTree ]]
-            -- upvalues: v18 (ref), v21 (copy)
-            local v25 = string.format("%s %s %s %3d   %3d", string.rep(" ", v24), v22, string.rep(" ", 40 - v24 - #v22), v23.min, v23.max);
-            v18 = v18 .. v25 .. "\n";
-            if v23.children then
-                for v26, v27 in pairs(v23.children) do
-                    v21(v26, v27, v24 + 2);
-                end;
-            end;
-        end;
-        v21("Memory", v17._memoryData.Memory, 0);
-        print(v18);
-    end;
-end;
-v15.render = function(v28) --[[ Line: 58 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v12 (copy)
-    return v2.createElement("TextButton", {
-        Text = "Log", 
-        Visible = true, 
-        BorderSizePixel = 1, 
-        BackgroundColor3 = v12.Color.UnselectedGray, 
-        TextColor3 = v12.Color.Text, 
-        [v2.Event.Activated] = v28.onAction
-    });
-end;
-v15 = v8(v15, "ClientMemoryData", "ServerMemoryData");
-local v29 = v2.Component:extend("MainViewMemory");
-v29.init = function(v30) --[[ Line: 71 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    v30.onUtilTabHeightChanged = function(v31) --[[ Line: 72 ]]
-        -- upvalues: v30 (copy)
-        v30:setState({
-            utilTabHeight = v31
-        });
-    end;
-    v30.onClientButton = function() --[[ Line: 78 ]]
-        -- upvalues: v30 (copy)
-        v30:setState({
-            isClientView = true
-        });
-    end;
-    v30.onServerButton = function() --[[ Line: 82 ]]
-        -- upvalues: v30 (copy)
-        v30:setState({
-            isClientView = false
-        });
-    end;
-    v30.onSearchTermChanged = function(v32) --[[ Line: 86 ]]
-        -- upvalues: v30 (copy)
-        if v30.state.isClientView then
-            v30.props.dispatchClientMemoryUpdateSearchFilter(v32, {});
-            return;
-        else
-            v30.props.dispatchServerMemoryUpdateSearchFilter(v32, {});
-            return;
-        end;
-    end;
-    v30.utilRef = v2.createRef();
-    v30.state = {
-        utilTabHeight = 0, 
-        isClientView = true
-    };
-end;
-v29.didMount = function(v33) --[[ Line: 102 ]] --[[ Name: didMount ]]
-    v33:setState({
-        utilTabHeight = v33.utilRef.current.Size.Y.Offset
-    });
-end;
-v29.didUpdate = function(v34) --[[ Line: 109 ]] --[[ Name: didUpdate ]]
-    local l_Offset_0 = v34.utilRef.current.Size.Y.Offset;
-    if l_Offset_0 ~= v34.state.utilTabHeight then
-        v34:setState({
-            utilTabHeight = l_Offset_0
-        });
-    end;
-end;
-local function _() --[[ Line: 120 ]] --[[ Name: shouldDisplayMemoryWarning ]]
-    -- upvalues: l_Stats_0 (copy)
-    return not l_Stats_0.MemoryTrackingEnabled;
-end;
-v29.render = function(v37) --[[ Line: 124 ]] --[[ Name: render ]]
-    -- upvalues: v14 (copy), l_Stats_0 (copy), v2 (copy), l_MainRowPadding_0 (copy), v7 (copy), v15 (ref), v12 (copy), v5 (copy), v6 (copy)
-    local v38 = {};
-    local l_size_0 = v37.props.size;
-    local l_isDeveloperView_0 = v37.props.isDeveloperView;
-    local l_formFactor_0 = v37.props.formFactor;
-    local l_tabList_0 = v37.props.tabList;
-    local l_utilTabHeight_0 = v37.state.utilTabHeight;
-    local l_isClientView_0 = v37.state.isClientView;
-    local v45 = l_isClientView_0 and v37.props.clientSearchTerm or v37.props.serverSearchTerm;
-    local v46 = false;
-    if v14 then
-        v46 = not l_Stats_0.MemoryTrackingEnabled;
-    end;
-    v38.UIListLayout = v2.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        Padding = UDim.new(0, l_MainRowPadding_0)
-    });
-    v38.UtilAndTab = v2.createElement(v7, {
-        windowWidth = l_size_0.X.Offset, 
-        formFactor = l_formFactor_0, 
-        tabList = l_tabList_0, 
-        isClientView = l_isClientView_0, 
-        searchTerm = v45, 
-        layoutOrder = 1, 
-        refForParent = v37.utilRef, 
-        onHeightChanged = v37.onUtilTabHeightChanged, 
-        onClientButton = l_isDeveloperView_0 and v37.onClientButton, 
-        onServerButton = l_isDeveloperView_0 and v37.onServerButton, 
-        onSearchTermChanged = v37.onSearchTermChanged
-    }, {
-        v15 and v2.createElement(v15, {
-            isClientView = l_isClientView_0
-        })
-    });
-    if v46 then
-        v38.MemoryHeader = v2.createElement("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 20), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            Text = "Memory category counters are disabled. Restart the client with the MicroProfiler on to guarantee counters are enabled.", 
-            TextColor3 = v12.Color.Text, 
-            BackgroundColor3 = Color3.new(1, 0, 0), 
-            LayoutOrder = 2
-        });
-    end;
-    if l_utilTabHeight_0 > 0 then
-        if l_isClientView_0 then
-            v38.ClientMemory = v2.createElement(v5, {
-                size = UDim2.new(1, 0, 1, -l_utilTabHeight_0), 
-                searchTerm = v45, 
-                layoutOrder = 3
-            });
-        else
-            v38.ServerMemory = v2.createElement(v6, {
-                size = UDim2.new(1, 0, 1, -l_utilTabHeight_0), 
-                searchTerm = v45, 
-                layoutOrder = 3
-            });
-        end;
-    end;
-    return v2.createElement("Frame", {
-        Size = l_size_0, 
-        BackgroundColor3 = v12.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 4
-    }, v38);
-end;
-return v3.UNSTABLE_connect2(function(v47, _) --[[ Line: 198 ]] --[[ Name: mapStateToProps ]]
-    return {
-        clientSearchTerm = v47.MemoryData.clientSearchTerm, 
-        clientTypeFilters = v47.MemoryData.clientTypeFilters, 
-        serverSearchTerm = v47.MemoryData.serverSearchTerm, 
-        serverTypeFilters = v47.MemoryData.serverTypeFilters
-    };
-end, function(v49) --[[ Line: 207 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v10 (copy), v11 (copy)
-    return {
-        dispatchClientMemoryUpdateSearchFilter = function(v50, v51) --[[ Line: 209 ]] --[[ Name: dispatchClientMemoryUpdateSearchFilter ]]
-            -- upvalues: v49 (copy), v10 (ref)
-            v49(v10(v50, v51));
-        end, 
-        dispatchServerMemoryUpdateSearchFilter = function(v52, v53) --[[ Line: 213 ]] --[[ Name: dispatchServerMemoryUpdateSearchFilter ]]
-            -- upvalues: v49 (copy), v11 (ref)
-            v49(v11(v52, v53));
-        end
-    };
-end)(v29);
+local CorePackages = game:GetService("CorePackages")
+local Stats = game:GetService("Stats")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local Components = script.Parent.Parent.Parent.Components
+local ClientMemory = require(Components.Memory.ClientMemory)
+local ServerMemory = require(Components.Memory.ServerMemory)
+local UtilAndTab = require(Components.UtilAndTab)
+local DataConsumer = require(Components.DataConsumer)
+local Actions = script.Parent.Parent.Parent.Actions
+local ClientMemoryUpdateSearchFilter = require(Actions.ClientMemoryUpdateSearchFilter)
+local ServerMemoryUpdateSearchFilter = require(Actions.ServerMemoryUpdateSearchFilter)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+local v15 = game:DefineFastFlag("DevConsoleMemoryTrackingAlert", false)
+local v16 = Roact.Component:extend("LogButton")
+
+function v16.init(p1) -- line: 25
+	function p1.onAction() -- line: 26
+		-- upvalues: p1 (copy)
+		local v41 = p1.props.isClientView and p1.props.ClientMemoryData or p1.props.ServerMemoryData
+		local s1 = "\n"
+
+		local function line(p2) -- line: 29
+			-- upvalues: s1 (ref)
+			s1 ..= p2 .. "\n"
+		end
+
+		s1 ..= "Name                                       Min   Max" .. "\n"
+		s1 ..= "----------------------------------------   ---   ---" .. "\n"
+
+		local function recurseMemoryTree(p3, p4, p5) -- line: 36
+			-- upvalues: s1 (ref), recurseMemoryTree (copy)
+			local v55 = string.format("%s %s %s %3d   %3d", string.rep(" ", p5), p3, string.rep(" ", 40 - p5 - #p3), p4.min, p4.max)
+
+			s1 ..= v55 .. "\n"
+
+			if p4.children then
+				for k, v in pairs(p4.children) do
+					recurseMemoryTree(k, v, p5 + 2)
+				end
+			end
+		end
+
+		recurseMemoryTree("Memory", v41._memoryData.Memory, 0)
+		print(s1)
+	end
+end
+function v16.render(p6) -- line: 58
+	-- upvalues: Roact (copy), Constants (copy)
+	return Roact.createElement("TextButton", {
+		Text = "Log",
+		Visible = true,
+		BorderSizePixel = 1,
+		BackgroundColor3 = Constants.Color.UnselectedGray,
+		TextColor3 = Constants.Color.Text,
+		[Roact.Event.Activated] = p6.onAction
+	})
+end
+
+local u17 = DataConsumer(v16, "ClientMemoryData", "ServerMemoryData")
+local v18 = Roact.Component:extend("MainViewMemory")
+
+function v18.init(p7) -- line: 71
+	-- upvalues: Roact (copy)
+	function p7.onUtilTabHeightChanged(p8) -- line: 72
+		-- upvalues: p7 (copy)
+		p7:setState({
+			utilTabHeight = p8
+		})
+	end
+	function p7.onClientButton() -- line: 78
+		-- upvalues: p7 (copy)
+		p7:setState({
+			isClientView = true
+		})
+	end
+	function p7.onServerButton() -- line: 82
+		-- upvalues: p7 (copy)
+		p7:setState({
+			isClientView = false
+		})
+	end
+	function p7.onSearchTermChanged(p9) -- line: 86
+		-- upvalues: p7 (copy)
+		if p7.state.isClientView then
+			p7.props.dispatchClientMemoryUpdateSearchFilter(p9, {})
+
+			return
+		end
+
+		p7.props.dispatchServerMemoryUpdateSearchFilter(p9, {})
+	end
+
+	p7.utilRef = Roact.createRef()
+	p7.state = {
+		utilTabHeight = 0,
+		isClientView = true
+	}
+end
+function v18.didMount(p10) -- line: 102
+	p10:setState({
+		utilTabHeight = p10.utilRef.current.Size.Y.Offset
+	})
+end
+function v18.didUpdate(p11) -- line: 109
+	local YOffset = p11.utilRef.current.Size.Y.Offset
+
+	if YOffset ~= p11.state.utilTabHeight then
+		p11:setState({
+			utilTabHeight = YOffset
+		})
+	end
+end
+
+local function shouldDisplayMemoryWarning() -- line: 120
+	-- upvalues: Stats (copy)
+	return not Stats.MemoryTrackingEnabled
+end
+
+function v18.render(p12) -- line: 124
+	-- upvalues: v15 (copy), Stats (copy), Roact (copy), MainRowPadding (copy), UtilAndTab (copy), u17 (ref), Constants (copy), ClientMemory (copy), ServerMemory (copy)
+	local t1 = {}
+	local size = p12.props.size
+	local isDeveloperView = p12.props.isDeveloperView
+	local formFactor = p12.props.formFactor
+	local tabList = p12.props.tabList
+	local utilTabHeight = p12.state.utilTabHeight
+	local isClientView = p12.state.isClientView
+	local v36 = isClientView and p12.props.clientSearchTerm or p12.props.serverSearchTerm
+	local v37 = false
+
+	if v15 then
+		v37 = not Stats.MemoryTrackingEnabled
+	end
+
+	t1.UIListLayout = Roact.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, MainRowPadding)
+	})
+	t1.UtilAndTab = Roact.createElement(UtilAndTab, {
+		layoutOrder = 1,
+		windowWidth = size.X.Offset,
+		formFactor = formFactor,
+		tabList = tabList,
+		isClientView = isClientView,
+		searchTerm = v36,
+		refForParent = p12.utilRef,
+		onHeightChanged = p12.onUtilTabHeightChanged,
+		onClientButton = isDeveloperView and p12.onClientButton,
+		onServerButton = isDeveloperView and p12.onServerButton,
+		onSearchTermChanged = p12.onSearchTermChanged
+	}, { u17 and Roact.createElement(u17, {
+		isClientView = isClientView
+	}) })
+
+	if v37 then
+		t1.MemoryHeader = Roact.createElement("TextLabel", {
+			Text = "Memory category counters are disabled. Restart the client with the MicroProfiler on to guarantee counters are enabled.",
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, 20),
+			Position = UDim2.new(0, 0, 0, 0),
+			TextColor3 = Constants.Color.Text,
+			BackgroundColor3 = Color3.new(1, 0, 0)
+		})
+	end
+
+	if utilTabHeight > 0 then
+		if isClientView then
+			t1.ClientMemory = Roact.createElement(ClientMemory, {
+				layoutOrder = 3,
+				size = UDim2.new(1, 0, 1, -utilTabHeight),
+				searchTerm = v36
+			})
+		else
+			t1.ServerMemory = Roact.createElement(ServerMemory, {
+				layoutOrder = 3,
+				size = UDim2.new(1, 0, 1, -utilTabHeight),
+				searchTerm = v36
+			})
+		end
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 4,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, t1)
+end
+
+local function mapStateToProps(p13, _) -- line: 198
+	return {
+		clientSearchTerm = p13.MemoryData.clientSearchTerm,
+		clientTypeFilters = p13.MemoryData.clientTypeFilters,
+		serverSearchTerm = p13.MemoryData.serverSearchTerm,
+		serverTypeFilters = p13.MemoryData.serverTypeFilters
+	}
+end
+local function mapDispatchToProps(p15) -- line: 207
+	-- upvalues: ClientMemoryUpdateSearchFilter (copy), ServerMemoryUpdateSearchFilter (copy)
+	return {
+		dispatchClientMemoryUpdateSearchFilter = function(p16, p17) -- line: 209
+			-- upvalues: p15 (copy), ClientMemoryUpdateSearchFilter (copy)
+			p15(ClientMemoryUpdateSearchFilter(p16, p17))
+		end,
+		dispatchServerMemoryUpdateSearchFilter = function(p18, p19) -- line: 213
+			-- upvalues: p15 (copy), ServerMemoryUpdateSearchFilter (copy)
+			p15(ServerMemoryUpdateSearchFilter(p18, p19))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v18)

@@ -5,122 +5,122 @@ local Foundation = require(AppChatParent.Foundation)
 local useCursor = Foundation.Hooks.useCursor
 local React = require(AppChatParent.React)
 local useState = React.useState
-local dependencyArray = require(AppChatParent.RoactUtils).Hooks.dependencyArray
 local memo = React.memo
 local useMemo = React.useMemo
 local UIBlox = require(AppChatParent.UIBlox)
 local ControlState = UIBlox.Core.Control.Enum.ControlState
-local v13 = memo(UIBlox.Core.Control.Interactable)
+local v12 = memo(UIBlox.Core.Control.Interactable)
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 
 require(AppChat.types)
 
-local FFlagRemoveDependencyArrayAntipattern = require(AppChatParent.SharedFlags).FFlagRemoveDependencyArrayAntipattern
 local t1 = {
-	Size = UDim2.new(1, 0, 0, 48),
-	BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 	BackgroundTransparency = 0,
-	onPressedBackgroundColor3 = Color3.fromRGB(242, 242, 242),
 	onPressedBackgroundTransparency = 1,
 	LayoutOrder = 0,
 	isDisabled = false,
-	onActivated = function() --[[ onActivated ]] -- line: 54
-		print("BaseCell onActivated")
-	end,
 	showDivider = true,
 	dividerTransparency = 0,
-	dividerColor3 = Color3.fromRGB(227, 227, 227),
-	avatarCircleCellWidth = 60
+	avatarCircleCellWidth = 60,
+	Size = UDim2.new(1, 0, 0, 48),
+	BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+	onPressedBackgroundColor3 = Color3.fromRGB(242, 242, 242),
+	onActivated = function() -- line: 51
+		print("BaseCell onActivated")
+	end,
+	dividerColor3 = Color3.fromRGB(227, 227, 227)
 }
 
-return memo(function(t2: {[any]: any}) --[[ BaseCell ]] -- line: 64
-	-- upvalues: Cryo (copy), t1 (copy), useState (copy), ControlState (copy), React (copy), useMemo (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), useCursor (copy), Foundation (copy), v13 (copy), FFlagDebugAppChatEnableDomLocators (copy)
-	local v18 = Cryo.Dictionary.join(t1, t2)
-	local v19, v20 = useState(ControlState.Initialize)
-	local v21 = React.useCallback(function(_, p2) -- line: 68
-		-- upvalues: v18 (copy), v20 (copy)
-		if not v18.isDisabled then
-			v20(p2)
+local function BaseCell(t2: {[any]: any}) -- line: 61
+	-- upvalues: Cryo (copy), t1 (copy), useState (copy), ControlState (copy), React (copy), useMemo (copy), useCursor (copy), Foundation (copy), v12 (copy), FFlagDebugAppChatEnableDomLocators (copy)
+	local v17 = Cryo.Dictionary.join(t1, t2)
+	local v18, v19 = useState(ControlState.Initialize)
+	local v20 = React.useCallback(function(_, p2) -- line: 65
+		-- upvalues: v17 (copy), v19 (copy)
+		if not v17.isDisabled then
+			v19(p2)
 		end
-	end, { v18.isDisabled })
-	local v22 = React.useCallback(function() -- line: 74
-		-- upvalues: v18 (copy)
-		if not v18.isDisabled then
-			v18.onActivated()
+	end, { v17.isDisabled })
+	local v21 = React.useCallback(function() -- line: 71
+		-- upvalues: v17 (copy)
+		if not v17.isDisabled then
+			v17.onActivated()
 		end
 	end, {
-		v18.isDisabled,
-		v18.onActivated
+		v17.isDisabled,
+		v17.onActivated
 	})
-	local v23 = useMemo(function() -- line: 81
-		-- upvalues: v19 (copy), ControlState (copy), React (copy), v18 (copy)
-		if v19 == ControlState.Pressed then
+	local v22 = useMemo(function() -- line: 77
+		-- upvalues: v18 (copy), ControlState (copy), React (copy), v17 (copy)
+		if v18 == ControlState.Pressed then
 			return (React.createElement("ImageLabel", {
+				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundTransparency = v18.onPressedBackgroundTransparency,
-				BackgroundColor3 = v18.onPressedBackground3,
-				BorderSizePixel = 0
+				BackgroundTransparency = v17.onPressedBackgroundTransparency,
+				BackgroundColor3 = v17.onPressedBackground3
 			}))
 		end
 
 		return nil
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v19, v18.onPressedBackground3, v18.onPressedBackgroundTransparency) else {
-		v19,
-		v18.onPressedBackground3,
-		v18.onPressedBackgroundTransparency
+	end, {
+		v18,
+		v17.onPressedBackground3,
+		v17.onPressedBackgroundTransparency
 	})
-	local v24 = useMemo(function() -- line: 96
-		-- upvalues: v18 (copy), React (copy)
-		if v18.showDivider then
+	local v23 = useMemo(function() -- line: 87
+		-- upvalues: v17 (copy), React (copy)
+		if v17.showDivider then
 			return (React.createElement("Frame", {
-				Size = UDim2.new(1, 0, 1, 0),
-				BackgroundTransparency = 1
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0)
 			}, {
 				layout = React.createElement("UIListLayout", {
 					VerticalAlignment = Enum.VerticalAlignment.Bottom,
 					HorizontalAlignment = Enum.HorizontalAlignment.Right
 				}),
 				divider = React.createElement("Frame", {
-					BackgroundTransparency = v18.dividerTransparency,
-					BackgroundColor3 = v18.dividerColor3,
 					BorderSizePixel = 0,
-					Size = UDim2.new(1, -v18.avatarCircleCellWidth, 0, 1)
+					BackgroundTransparency = v17.dividerTransparency,
+					BackgroundColor3 = v17.dividerColor3,
+					Size = UDim2.new(1, -v17.avatarCircleCellWidth, 0, 1)
 				})
 			}))
 		end
 
 		return nil
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v18.showDivider, v18.dividerTransparency, v18.dividerColor3, v18.avatarCircleCellWidth) else {
-		v18.showDivider,
-		v18.dividerTransparency,
-		v18.dividerColor3,
-		v18.avatarCircleCellWidth
+	end, {
+		v17.showDivider,
+		v17.dividerTransparency,
+		v17.dividerColor3,
+		v17.avatarCircleCellWidth
 	})
-	local v25 = useMemo(function() -- line: 132
-		-- upvalues: Cryo (copy), v18 (copy), v23 (copy), v24 (copy)
-		return Cryo.Dictionary.join(v18.children or {}, {
-			overlay = v23,
-			divider = v24
+	local v24 = useMemo(function() -- line: 113
+		-- upvalues: Cryo (copy), v17 (copy), v22 (copy), v23 (copy)
+		return Cryo.Dictionary.join(v17.children or {}, {
+			overlay = v22,
+			divider = v23
 		})
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v18.children, v23, v24) else {
-		v18.children,
-		v23,
-		v24
+	end, {
+		v17.children,
+		v22,
+		v23
 	})
-	local v26 = useCursor(Foundation.Enums.CursorType.RoundedSlot)
+	local v25 = useCursor(Foundation.Enums.CursorType.RoundedSlot)
 
-	return React.createElement(v13, {
-		onStateChanged = v21,
-		[React.Event.Activated] = v22,
-		[React.Tag] = if not FFlagDebugAppChatEnableDomLocators or v18.testId == nil then nil else `data-testid={ v18.testId }`,
+	return React.createElement(v12, {
+		onStateChanged = v20,
+		[React.Event.Activated] = v21,
+		[React.Tag] = if not FFlagDebugAppChatEnableDomLocators or v17.testId == nil then nil else `data-testid={ v17.testId }`,
 		AutoButtonColor = false,
-		Selectable = v18.Selectable,
-		SelectionImageObject = v26,
-		Size = v18.Size,
-		AutomaticSize = v18.AutomaticSize,
-		BackgroundColor3 = v18.BackgroundColor3,
-		BackgroundTransparency = v18.BackgroundTransparency,
-		LayoutOrder = v18.LayoutOrder,
+		Selectable = v17.Selectable,
+		SelectionImageObject = v25,
+		Size = v17.Size,
+		AutomaticSize = v17.AutomaticSize,
+		BackgroundColor3 = v17.BackgroundColor3,
+		BackgroundTransparency = v17.BackgroundTransparency,
+		LayoutOrder = v17.LayoutOrder,
 		BorderSizePixel = 0
-	}, v25)
-end)
+	}, v24)
+end
+
+return memo(BaseCell)

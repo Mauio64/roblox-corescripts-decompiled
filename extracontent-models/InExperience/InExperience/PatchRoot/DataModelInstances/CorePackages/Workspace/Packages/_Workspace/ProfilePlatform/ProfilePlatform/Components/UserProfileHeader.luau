@@ -1,1 +1,1 @@
-return require(script.UserProfileHeaderContainer);
+return require(script.UserProfileHeaderContainer)

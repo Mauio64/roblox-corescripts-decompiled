@@ -1,3 +1,3 @@
 return {
-    SetTabBarVisible = require(script.SetTabBarVisible)
-};
+	SetTabBarVisible = require(script.SetTabBarVisible)
+}

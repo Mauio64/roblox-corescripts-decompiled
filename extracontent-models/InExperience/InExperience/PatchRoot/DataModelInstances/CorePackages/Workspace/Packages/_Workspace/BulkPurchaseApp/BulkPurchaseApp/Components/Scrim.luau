@@ -1,15 +1,18 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return (v1.forwardRef(function(v3, v4) --[[ Line: 9 ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy)
-    local v5 = l_useDesignTokens_0();
-    return v1.createElement("Frame", {
-        ref = v4, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = v5.Semantic.Color.Common.Overlay.Transparency, 
-        BackgroundColor3 = v5.Semantic.Color.Common.Overlay.Color3, 
-        ClipsDescendants = false, 
-        Active = true
-    }, v3.children);
-end));
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local useDesignTokens = require(Parent.Style).useDesignTokens
+
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 12
+	-- upvalues: useDesignTokens (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
+	local v7 = useDesignTokens()
+
+	return React.createElement("Frame", {
+		ClipsDescendants = false,
+		Active = true,
+		ref = p1,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v7.Semantic.Color.Common.Overlay else v7.Color.Common.Scrim)).Transparency,
+		BackgroundColor3 = ((if not FFlagRenameDeprecatedUIBloxTokens then v7.Semantic.Color.Common.Overlay else v7.Color.Common.Scrim)).Color3
+	}, t1.children)
+end))

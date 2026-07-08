@@ -1,10 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("VirtualEvents").Parent;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-return function(v2) --[[ Line: 6 ]] --[[ Name: getEventDetailsPageKey ]]
-    -- upvalues: l_AppPage_0 (copy)
-    if v2 == nil then
-        return l_AppPage_0.EventDetails .. "-Unknown";
-    else
-        return l_AppPage_0.EventDetails .. "-" .. v2;
-    end;
-end;
+local Parent = script:FindFirstAncestor("VirtualEvents").Parent
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+
+local function getEventDetailsPageKey(s1: string?) -- line: 6
+	-- upvalues: AppPage (copy)
+	if s1 == nil then
+		return AppPage.EventDetails .. "-Unknown"
+	end
+
+	return AppPage.EventDetails .. "-" .. s1
+end
+
+return getEventDetailsPageKey

@@ -1,3 +1,5 @@
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+
 return {
-    createScrollIntervalTracker = require(script.createScrollIntervalTracker)
-};
+	createScrollIntervalTracker = require(Parent.ScrollIntervalTracker).createScrollIntervalTracker
+}

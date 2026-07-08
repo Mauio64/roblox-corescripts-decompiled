@@ -1,159 +1,147 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.ArgCheck);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v6 = require(l_Parent_0.t);
-local l_validateProps_0 = require(l_Parent_0.DiscoveryUtils).validateProps;
-local v8 = require(l_script_FirstAncestor_0.useCollectionSizeBindings);
-local v9 = require(l_script_FirstAncestor_0.CollectionHeader);
-local v10 = require(l_script_FirstAncestor_0.Grid.GridOfCollectionItems);
-local _ = require(l_script_FirstAncestor_0.CollectionViewTypes);
-local v12 = require(l_script_FirstAncestor_0.CollectionLayoutStore.useCollectionLayout);
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local v14 = v6.strictInterface({
-    testId = v6.optional(v6.string), 
-    Position = v6.optional(v6.UDim2), 
-    LayoutOrder = v6.optional(v6.number), 
-    containerRef = v6.optional(v6.union(v6.table, v6.callback)), 
-    verticalPadding = v6.optional(v6.number), 
-    maxNumRows = v6.optional(v6.number), 
-    verticalScrollingFrameRef = v6.optional(v6.table), 
-    collectionItemSize = if l_FFlagLuaAppCompositionSupport_0 then v6.optional(v6.string) else nil, 
-    numColumns = if l_FFlagLuaAppCompositionSupport_0 then v6.optional(v6.number) else v6.number, 
-    items = v6.table, 
-    renderItem = v6.callback, 
-    getItemHeight = v6.callback, 
-    columnGap = v6.optional(v6.number), 
-    sideMargin = v6.optional(v6.number), 
-    title = v6.optional(v6.union(v6.string, v6.callback)), 
-    subtitle = v6.optional(v6.string), 
-    tooltipInfoText = v6.optional(v6.string), 
-    onActivateInfoIcon = v6.optional(v6.callback), 
-    tooltipSupportsVR = v6.optional(v6.boolean), 
-    tooltipSupportsTenFootUi = v6.optional(v6.boolean), 
-    onActivateHeader = v6.optional(v6.callback), 
-    headerButtonText = v6.optional(v6.string), 
-    onViewableItemsChanged = v6.optional(v6.callback), 
-    onContainerSizeChanged = v6.optional(v6.callback), 
-    hideHeaderButton = v6.optional(v6.boolean), 
-    bufferRowsBelowScreen = v6.optional(v6.number), 
-    bufferRowsAboveScreen = v6.optional(v6.number), 
-    disableRelativeGap = v6.optional(v6.boolean), 
-    headerComponent = v6.optional(v6.table), 
-    thresholdRowsFromBottom = v6.optional(v6.number), 
-    onReachedThresholdFromEnd = v6.optional(v6.union(v6.table, v6.callback))
-});
-local v15 = {
-    numColumns = 0, 
-    columnGap = 0, 
-    sideMargin = 0, 
-    verticalPadding = 0
-};
-return (v2.memo(function(v16) --[[ Line: 166 ]] --[[ Name: CollectionGrid ]]
-    -- upvalues: l_validateProps_0 (copy), v14 (copy), v3 (copy), v15 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), v12 (copy), v4 (copy), l_useDesignTokens_0 (copy), v8 (copy), v2 (copy), v9 (copy), v10 (copy)
-    l_validateProps_0(v14, v16);
-    local v17 = v3.Dictionary.join(v15, v16);
-    local l_sideMargin_0 = v17.sideMargin;
-    local v19 = nil;
-    local v20 = nil;
-    local v21 = nil;
-    if l_FFlagLuaAppCompositionSupport_0 then
-        local v22 = v12(v17.collectionItemSize);
-        v19 = v16.numColumns or v22.itemsPerRow;
-        v20 = v16.columnGap or v22.gutter;
-        v21 = v16.verticalPadding or v22.verticalGap;
-    else
-        v19 = v17.numColumns;
-        v20 = v17.columnGap;
-        v21 = v17.verticalPadding;
-    end;
-    v4.assert(v19 >= 1);
-    v4.assert(l_sideMargin_0 >= 0);
-    v4.assert(v21 >= 0);
-    v4.assert(v20 >= 0);
-    local l_Size_200_0 = l_useDesignTokens_0().Global.Size_200;
-    local v24, _, v26, v27 = v8(v19, v20, l_sideMargin_0, 0, v17.getItemHeight, v17.onContainerSizeChanged);
-    local v28 = v17.title and v17.title ~= "";
-    local l_createElement_0 = v2.createElement;
-    local v30 = "Frame";
-    local v31 = {
-        ref = v17.containerRef, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Position = v17.Position, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v17.LayoutOrder, 
-        [v2.Tag] = if v17.testId then ("data-testid=%*"):format(v17.testId) else nil
-    };
-    local v32 = {};
-    local l_createElement_1 = v2.createElement;
-    local v34 = "Frame";
-    local v35 = {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        [v2.Change.AbsoluteSize] = v26, 
-        ref = v27
-    };
-    local v36 = {
-        UIPadding = if not l_FFlagLuaAppCompositionSupport_0 or l_sideMargin_0 > 0 then v2.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, l_sideMargin_0), 
-            PaddingRight = UDim.new(0, l_sideMargin_0)
-        }) else nil, 
-        UIListLayout = v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, if not not v28 or v17.headerComponent then l_Size_200_0 else nil)
-        })
-    };
-    local v37;
-    if v17.headerComponent then
-        v37 = v17.headerComponent;
-    else
-        v37 = v2.createElement;
-        local l_v9_0 = v9;
-        local v39 = {
-            LayoutOrder = 1, 
-            title = v17.title, 
-            subtitle = v17.subtitle, 
-            tooltipInfoText = v17.tooltipInfoText, 
-            onActivateInfoIcon = v17.onActivateInfoIcon, 
-            tooltipSupportsVR = v17.tooltipSupportsVR, 
-            tooltipSupportsTenFootUi = v17.tooltipSupportsTenFootUi
-        };
-        local v40 = true;
-        if #v17.items >= 1 then
-            v40 = v17.hideHeaderButton or not v28;
-        end;
-        v39.hideButton = v40;
-        v39.onActivate = v17.onActivateHeader;
-        v39.buttonText = v17.headerButtonText;
-        v37 = v37(l_v9_0, v39);
-    end;
-    v36.Header = v37;
-    v36.GridOfItems = v2.createElement(v10, {
-        verticalScrollingFrameRef = v17.verticalScrollingFrameRef, 
-        onViewableItemsChanged = v17.onViewableItemsChanged, 
-        itemSizeBinding = v24, 
-        maxNumRows = v17.maxNumRows, 
-        numColumns = v19, 
-        items = v17.items, 
-        renderItem = v17.renderItem, 
-        columnGap = v20, 
-        sideMargin = l_sideMargin_0, 
-        verticalPadding = v21, 
-        bufferRowsBelowScreen = v17.bufferRowsBelowScreen, 
-        bufferRowsAboveScreen = v17.bufferRowsAboveScreen, 
-        LayoutOrder = 2, 
-        disableRelativeGap = v17.disableRelativeGap, 
-        thresholdRowsFromBottom = v17.thresholdRowsFromBottom, 
-        onReachedThresholdFromEnd = v17.onReachedThresholdFromEnd
-    });
-    v32.CollectionContent = l_createElement_1(v34, v35, v36);
-    return l_createElement_0(v30, v31, v32);
-end));
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local Cryo = require(CollectionViewsParent.Cryo)
+local ArgCheck = require(CollectionViewsParent.ArgCheck)
+local useDesignTokens = require(CollectionViewsParent.Style).useDesignTokens
+local t = require(CollectionViewsParent.t)
+local validateProps = require(CollectionViewsParent.DiscoveryUtils).validateProps
+local useCollectionSizeBindings = require(CollectionViews.useCollectionSizeBindings)
+local CollectionHeader = require(CollectionViews.CollectionHeader)
+local GridOfCollectionItems = require(CollectionViews.Grid.GridOfCollectionItems)
+
+require(CollectionViews.CollectionViewTypes)
+
+local useCollectionLayout = require(CollectionViews.CollectionLayoutStore.useCollectionLayout)
+local SharedFlags = require(CollectionViewsParent.SharedFlags)
+local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
+local FFlagLuaAppRfyRevealRows = SharedFlags.FFlagLuaAppRfyRevealRows
+local FFlagLuaAppSortHeaderAnchorTag = SharedFlags.FFlagLuaAppSortHeaderAnchorTag
+local v17 = t.strictInterface({
+	testId = t.optional(t.string),
+	Position = t.optional(t.UDim2),
+	LayoutOrder = t.optional(t.number),
+	ZIndex = if not FFlagLuaAppRfyRevealRows then nil else t.optional(t.number),
+	containerRef = t.optional(t.union(t.table, t.callback)),
+	verticalPadding = t.optional(t.number),
+	maxNumRows = t.optional(t.number),
+	verticalScrollingFrameRef = t.optional(t.table),
+	collectionItemSize = t.optional(t.string),
+	numColumns = t.optional(t.number),
+	items = t.table,
+	renderItem = t.callback,
+	getItemHeight = t.callback,
+	columnGap = t.optional(t.number),
+	sideMargin = t.optional(t.number),
+	title = t.optional(t.union(t.string, t.callback)),
+	subtitle = t.optional(t.string),
+	tooltipInfoText = t.optional(t.string),
+	onActivateInfoIcon = t.optional(t.callback),
+	tooltipSupportsVR = t.optional(t.boolean),
+	tooltipSupportsTenFootUi = t.optional(t.boolean),
+	onActivateHeader = t.optional(t.callback),
+	headerButtonText = t.optional(t.string),
+	headerTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else t.optional(t.string),
+	onViewableItemsChanged = t.optional(t.callback),
+	onContainerSizeChanged = t.optional(t.callback),
+	hideHeaderButton = t.optional(t.boolean),
+	bufferRowsBelowScreen = t.optional(t.number),
+	bufferRowsAboveScreen = t.optional(t.number),
+	disableRelativeGap = t.optional(t.boolean),
+	headerComponent = t.optional(t.table),
+	thresholdRowsFromBottom = t.optional(t.number),
+	onReachedThresholdFromEnd = t.optional(t.union(t.table, t.callback))
+})
+local t1 = {
+	numColumns = 0,
+	columnGap = 0,
+	sideMargin = 0,
+	verticalPadding = 0
+}
+
+local function CollectionGrid(t2: {[any]: any}) -- line: 173
+	-- upvalues: validateProps (copy), v17 (copy), Cryo (copy), t1 (copy), useCollectionLayout (copy), ArgCheck (copy), useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), useCollectionSizeBindings (copy), React (copy), FFlagLuaAppRfyRevealRows (copy), CollectionHeader (copy), FFlagLuaAppSortHeaderAnchorTag (copy), GridOfCollectionItems (copy)
+	validateProps(v17, t2)
+
+	local v21 = Cryo.Dictionary.join(t1, t2)
+	local sideMargin = v21.sideMargin
+	local v23 = useCollectionLayout(v21.collectionItemSize)
+	local v24 = t2.numColumns or v23.itemsPerRow
+	local v25 = t2.columnGap or v23.gutter
+	local v26 = t2.verticalPadding or v23.verticalGap
+
+	ArgCheck.assert(v24 >= 1)
+	ArgCheck.assert(sideMargin >= 0)
+	ArgCheck.assert(v26 >= 0)
+	ArgCheck.assert(v25 >= 0)
+
+	local v27 = useDesignTokens()
+	local v28 = if not FFlagRenameDeprecatedUIBloxTokens then v27.Global.Size_200 else v27.Size.Size_400
+	local v29, _, v31, v32 = useCollectionSizeBindings(v24, v25, sideMargin, 0, v21.getItemHeight, v21.onContainerSizeChanged)
+	local v33 = v21.title and v21.title ~= ""
+
+	return React.createElement("Frame", {
+		ref = v21.containerRef,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = v21.Position,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = v21.LayoutOrder,
+		ZIndex = if not FFlagLuaAppRfyRevealRows then nil else v21.ZIndex,
+		[React.Tag] = if not v21.testId then nil else `data-testid={ v21.testId }`
+	}, {
+		CollectionContent = React.createElement("Frame", {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			[React.Change.AbsoluteSize] = v31,
+			ref = v32
+		}, {
+			UIPadding = if not (sideMargin > 0) then nil else React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, sideMargin),
+				PaddingRight = UDim.new(0, sideMargin)
+			}),
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, if not v33 and not v21.headerComponent then nil else v28)
+			}),
+			Header = if not v21.headerComponent then React.createElement(CollectionHeader, {
+				LayoutOrder = 1,
+				title = v21.title,
+				subtitle = v21.subtitle,
+				tooltipInfoText = v21.tooltipInfoText,
+				onActivateInfoIcon = v21.onActivateInfoIcon,
+				tooltipSupportsVR = v21.tooltipSupportsVR,
+				tooltipSupportsTenFootUi = v21.tooltipSupportsTenFootUi,
+				hideButton = #v21.items < 1 or (v21.hideHeaderButton or not v33),
+				onActivate = v21.onActivateHeader,
+				buttonText = v21.headerButtonText,
+				headerTag = if not FFlagLuaAppSortHeaderAnchorTag then nil else v21.headerTag
+			}) else v21.headerComponent,
+			GridOfItems = React.createElement(GridOfCollectionItems, {
+				LayoutOrder = 2,
+				verticalScrollingFrameRef = v21.verticalScrollingFrameRef,
+				onViewableItemsChanged = v21.onViewableItemsChanged,
+				itemSizeBinding = v29,
+				maxNumRows = v21.maxNumRows,
+				numColumns = v24,
+				items = v21.items,
+				renderItem = v21.renderItem,
+				columnGap = v25,
+				sideMargin = sideMargin,
+				verticalPadding = v26,
+				bufferRowsBelowScreen = v21.bufferRowsBelowScreen,
+				bufferRowsAboveScreen = v21.bufferRowsAboveScreen,
+				disableRelativeGap = v21.disableRelativeGap,
+				thresholdRowsFromBottom = v21.thresholdRowsFromBottom,
+				onReachedThresholdFromEnd = v21.onReachedThresholdFromEnd
+			})
+		})
+	})
+end
+
+return (React.memo(CollectionGrid))

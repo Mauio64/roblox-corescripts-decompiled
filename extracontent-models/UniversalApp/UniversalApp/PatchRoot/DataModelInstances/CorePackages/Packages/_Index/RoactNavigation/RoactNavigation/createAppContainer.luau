@@ -1,342 +1,394 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_console_0 = v3.console;
-local l_Object_0 = v3.Object;
-local v6 = require(l_Parent_0.NavigationActions);
-local v7 = require(l_Parent_0.Events);
-local v8 = require(l_Parent_0.views.NavigationContext);
-local v9 = require(l_Parent_0.getNavigation);
-local l_assert_0 = assert;
-local l_urlToPathAndParams_0 = require(l_Parent_0.routers.pathUtils).urlToPathAndParams;
-local function _(v12) --[[ Line: 20 ]] --[[ Name: isStateful ]]
-    return not v12.navigation;
-end;
-local function v18(v14) --[[ Line: 24 ]] --[[ Name: validateProps ]]
-    -- upvalues: l_Object_0 (copy), l_assert_0 (copy)
-    if v14.persistenceKey then
-        warn("You passed persistenceKey prop to a navigator. The persistenceKey prop was replaced by a more flexible persistence mechanism, please see the navigation state persistence docs for more information. Passing the persistenceKey prop is a no-op.");
-    end;
-    if not v14.navigation then
-        return;
-    else
-        local v15 = l_Object_0.assign(table.clone(v14), {
-            navigation = l_Object_0.None, 
-            screenProps = l_Object_0.None, 
-            persistNavigationState = l_Object_0.None, 
-            loadNavigationState = l_Object_0.None, 
-            externalDispatchConnector = l_Object_0.None
-        });
-        if next(v15) ~= nil then
-            error("This navigator has both navigation and container props, so it is " .. ("unclear if it should own its own state. Remove props: %q "):format(table.concat(l_Object_0.keys(v15), ", ")) .. "if the navigator should get its state from the navigation prop. If the " .. "navigator should maintain its own state, do not pass a navigation prop.");
-        end;
-        local l_persistNavigationState_0 = v14.persistNavigationState;
-        local l_loadNavigationState_0 = v14.loadNavigationState;
-        l_assert_0(l_persistNavigationState_0 == nil and l_loadNavigationState_0 == nil or type(l_persistNavigationState_0) == "function" and type(l_loadNavigationState_0) == "function", "both persistNavigationState and loadNavigationState must either be undefined, or be functions");
-        return;
-    end;
-end;
-local v19 = 0;
-local function v20() --[[ Line: 72 ]] --[[ Name: _TESTING_ONLY_reset_container_count ]]
-    -- upvalues: v19 (ref)
-    v19 = 0;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local React = require(scriptParentParent.React)
+local LuauPolyfill = require(scriptParentParent.LuauPolyfill)
+local console = LuauPolyfill.console
+local Object = LuauPolyfill.Object
+local NavigationActions = require(scriptParent.NavigationActions)
+local Events = require(scriptParent.Events)
+local NavigationContext = require(scriptParent.views.NavigationContext)
+local getNavigation = require(scriptParent.getNavigation)
+local _assert = assert
+local urlToPathAndParams = require(scriptParent.routers.pathUtils).urlToPathAndParams
+
+local function isStateful(p1) -- line: 20
+	return not p1.navigation
+end
+local function validateProps(p2) -- line: 24
+	-- upvalues: Object (copy), _assert (copy)
+	if p2.persistenceKey then
+		warn("You passed persistenceKey prop to a navigator. The persistenceKey prop was replaced by a more flexible persistence mechanism, please see the navigation state persistence docs for more information. Passing the persistenceKey prop is a no-op.")
+	end
+
+	if not p2.navigation then
+		return
+	end
+
+	local v18 = Object.assign(table.clone(p2), {
+		navigation = Object.None,
+		screenProps = Object.None,
+		persistNavigationState = Object.None,
+		loadNavigationState = Object.None,
+		externalDispatchConnector = Object.None
+	})
+
+	if next(v18) ~= nil then
+		error("This navigator has both navigation and container props, so it is " .. ("unclear if it should own its own state. Remove props: %q "):format(table.concat(Object.keys(v18), ", ")) .. "if the navigator should get its state from the navigation prop. If the " .. "navigator should maintain its own state, do not pass a navigation prop.")
+	end
+
+	local persistNavigationState = p2.persistNavigationState
+	local loadNavigationState = p2.loadNavigationState
+
+	_assert(persistNavigationState == nil and loadNavigationState == nil or type(persistNavigationState) == "function" and type(loadNavigationState) == "function", "both persistNavigationState and loadNavigationState must either be undefined, or be functions")
+end
+
+local n1 = 0
+
 return {
-    createAppContainer = function(v21, v22) --[[ Line: 117 ]] --[[ Name: createAppContainer ]]
-        -- upvalues: l_assert_0 (copy), v2 (copy), v18 (copy), v6 (copy), l_urlToPathAndParams_0 (copy), l_console_0 (copy), v19 (ref), v7 (copy), v9 (copy), v8 (copy), l_Object_0 (copy)
-        local v23 = false;
-        if type(v21) == "table" then
-            v23 = v21.router ~= nil;
-        end;
-        l_assert_0(v23, "AppComponent must be a navigator or a stateful Roact component with a 'router' field");
-        local v24 = string.format("NavigationContainer(%s)", (tostring(v21)));
-        v23 = v2.Component:extend(v24);
-        v23.router = v21.router;
-        v23.getDerivedStateFromProps = function(v25) --[[ Line: 128 ]] --[[ Name: getDerivedStateFromProps ]]
-            -- upvalues: v18 (ref)
-            v18(v25);
-            return nil;
-        end;
-        v23.init = function(v26) --[[ Line: 133 ]] --[[ Name: init ]]
-            -- upvalues: v18 (ref), v6 (ref), v21 (copy)
-            v18(v26.props);
-            v26._actionEventSubscribers = {};
-            v26._initialAction = v6.init();
-            local v27 = nil;
-            if v26:_isStateful() and not v26.props.loadNavigationState then
-                v27 = v21.router.getStateForAction(v26._initialAction);
-            end;
-            v26.state = {
-                nav = v27
-            };
-        end;
-        v23._updateExternalDispatchConnector = function(v28) --[[ Line: 155 ]] --[[ Name: _updateExternalDispatchConnector ]]
-            if v28._disconnectExternalDispatch then
-                v28._disconnectExternalDispatch();
-                v28._disconnectExternalDispatch = nil;
-            end;
-            local l_externalDispatchConnector_0 = v28.props.externalDispatchConnector;
-            if l_externalDispatchConnector_0 ~= nil then
-                v28._disconnectExternalDispatch = l_externalDispatchConnector_0(function(...) --[[ Line: 163 ]]
-                    -- upvalues: v28 (copy)
-                    if v28._isMounted then
-                        return v28:dispatch(...);
-                    else
-                        return false;
-                    end;
-                end);
-            end;
-        end;
-        v23._renderLoading = function(v30) --[[ Line: 174 ]] --[[ Name: _renderLoading ]]
-            return v30.props.renderLoading and v30.props.renderLoading();
-        end;
-        v23._isStateful = function(v31) --[[ Line: 178 ]] --[[ Name: _isStateful ]]
-            return not v31.props.navigation;
-        end;
-        v23._handleOpenURL = function(v32, v33) --[[ Line: 182 ]] --[[ Name: _handleOpenURL ]]
-            -- upvalues: l_urlToPathAndParams_0 (ref), v21 (copy)
-            local l_url_0 = v33.url;
-            local l_enableURLHandling_0 = v32.props.enableURLHandling;
-            local l_uriPrefix_0 = v32.props.uriPrefix;
-            if l_enableURLHandling_0 == false then
-                return;
-            else
-                local v37 = l_urlToPathAndParams_0(l_url_0, l_uriPrefix_0);
-                if v37 then
-                    local l_path_0 = v37.path;
-                    local l_params_0 = v37.params;
-                    local v40 = v21.router.getActionForPathAndParams(l_path_0, l_params_0);
-                    if v40 then
-                        v32:dispatch(v40);
-                    end;
-                end;
-                return;
-            end;
-        end;
-        v23._onNavigationStateChange = function(v41, v42, v43, v44) --[[ Line: 201 ]] --[[ Name: _onNavigationStateChange ]]
-            -- upvalues: l_console_0 (ref)
-            local l_onNavigationStateChange_0 = v41.props.onNavigationStateChange;
-            if l_onNavigationStateChange_0 == nil and v41:_isStateful() and _G.REACT_NAV_LOGGING then
-                l_console_0.group("Navigation Dispatch: ");
-                l_console_0.log("Action: ", v44);
-                l_console_0.log("New State: ", v43);
-                l_console_0.log("Last State: ", v42);
-                l_console_0.groupEnd();
-                return;
-            else
-                if type(l_onNavigationStateChange_0) == "function" then
-                    l_onNavigationStateChange_0(v42, v43, v44);
-                end;
-                return;
-            end;
-        end;
-        v23.didUpdate = function(v46, v47) --[[ Line: 218 ]] --[[ Name: didUpdate ]]
-            if v46._navState == v46.state.nav then
-                v46._navState = nil;
-            end;
-            if v46.props.externalDispatchConnector ~= v47.externalDispatchConnector then
-                v46:_updateExternalDispatchConnector();
-            end;
-        end;
-        v23.didMount = function(v48) --[[ Line: 231 ]] --[[ Name: didMount ]]
-            -- upvalues: v19 (ref), l_console_0 (ref), v22 (copy), v21 (copy), v7 (ref)
-            v48._isMounted = true;
-            v48:_updateExternalDispatchConnector();
-            if not v48:_isStateful() then
-                return;
-            else
-                if _G.__DEV__ and not v48.props.detached and v19 > 0 then
-                    l_console_0.warn("You should only render one navigator explicitly in your app, and other navigators should be rendered by including them in that navigator. Full details at: https://reactnavigation.org/docs/4.x/common-mistakes#explicitly-rendering-more-than-one-navigator");
-                end;
-                v19 = v19 + 1;
-                if v22 then
-                    v22:listenForLuaURLs(function(v49) --[[ Line: 256 ]]
-                        -- upvalues: v48 (copy)
-                        v48:_handleOpenURL({
-                            url = v49
-                        });
-                    end, false);
-                end;
-                local v50 = nil;
-                local v51 = nil;
-                if v48.props.enableURLHandling ~= false then
-                    local v52 = v48:getStartupParams();
-                    v50 = v52.parsedUrl;
-                    v51 = v52.userProvidedStartupState;
-                end;
-                local l__initialAction_0 = v48._initialAction;
-                local v54 = v48.state.nav or v21.router.getStateForAction(l__initialAction_0);
-                if v51 then
-                    v54 = v51;
-                end;
-                if v50 then
-                    local l_path_1 = v50.path;
-                    local l_params_1 = v50.params;
-                    local v57 = v21.router.getActionForPathAndParams(l_path_1, l_params_1);
-                    if v57 then
-                        l__initialAction_0 = v57;
-                        v54 = v21.router.getStateForAction(v57, v54);
-                    end;
-                end;
-                local function v59() --[[ Line: 300 ]] --[[ Name: dispatchAction ]]
-                    -- upvalues: v48 (copy), v7 (ref), l__initialAction_0 (ref)
-                    for v58 in v48._actionEventSubscribers do
-                        v58({
-                            type = v7.Action, 
-                            action = l__initialAction_0, 
-                            state = v48.state.nav, 
-                            lastState = nil
-                        });
-                    end;
-                end;
-                if v54 == v48.state.nav then
-                    spawn(v59);
-                    return;
-                else
-                    v48:setState({
-                        nav = v54
-                    }, v59);
-                    return;
-                end;
-            end;
-        end;
-        v23.getStartupParams = function(v60) --[[ Line: 326 ]] --[[ Name: getStartupParams ]]
-            -- upvalues: v22 (copy), l_urlToPathAndParams_0 (ref)
-            local l_props_0 = v60.props;
-            local l_uriPrefix_1 = l_props_0.uriPrefix;
-            local l_loadNavigationState_1 = l_props_0.loadNavigationState;
-            local v64 = nil;
-            local v65 = nil;
-            if v22 then
-                pcall(function() --[[ Line: 334 ]]
-                    -- upvalues: v64 (ref), v22 (ref)
-                    v64 = v22:getLastLuaURL();
-                end);
-            end;
-            if l_loadNavigationState_1 then
-                pcall(function() --[[ Line: 340 ]]
-                    -- upvalues: v65 (ref), l_loadNavigationState_1 (copy)
-                    v65 = l_loadNavigationState_1();
-                end);
-            end;
-            return {
-                parsedUrl = v64 and l_urlToPathAndParams_0(v64, l_uriPrefix_1), 
-                userProvidedStartupState = v65
-            };
-        end;
-        v23._persistNavigationState = function(v66, v67) --[[ Line: 353 ]] --[[ Name: _persistNavigationState ]]
-            local l_persistNavigationState_1 = v66.props.persistNavigationState;
-            if l_persistNavigationState_1 then
-                local l_status_0, l_result_0 = pcall(l_persistNavigationState_1, v67);
-                if not l_status_0 then
-                    warn("Uncaught error while calling persistNavigationState()! " .. "You should handle exceptions thrown from persistNavigationState(), " .. "ignoring them may result in undefined behavior.\n" .. l_result_0);
-                end;
-            end;
-        end;
-        v23.willUnmount = function(v71) --[[ Line: 369 ]] --[[ Name: willUnmount ]]
-            -- upvalues: v22 (copy), v19 (ref)
-            v71._isMounted = false;
-            if v22 then
-                v22:stopListeningForLuaURLs();
-            end;
-            if v71._disconnectExternalDispatch then
-                v71._disconnectExternalDispatch();
-                v71._disconnectExternalDispatch = nil;
-            end;
-            if v71:_isStateful() then
-                v19 = v19 - 1;
-            end;
-        end;
-        v23.dispatch = function(v72, v73) --[[ Line: 395 ]] --[[ Name: dispatch ]]
-            -- upvalues: l_assert_0 (ref), v21 (copy), v7 (ref)
-            if v72.props.navigation then
-                return v72.props.navigation.dispatch(v73);
-            else
-                v72._navState = v72._navState or v72.state.nav;
-                local l__navState_0 = v72._navState;
-                l_assert_0(l__navState_0 ~= nil, "should be set in constructor if stateful");
-                local v75 = v21.router.getStateForAction(v73, l__navState_0);
-                local l_v75_0 = v75;
-                if v75 == nil then
-                    l_v75_0 = l__navState_0;
-                end;
-                local function v78() --[[ Line: 411 ]] --[[ Name: dispatchActionEvents ]]
-                    -- upvalues: v72 (copy), v7 (ref), v73 (copy), l_v75_0 (ref), l__navState_0 (copy)
-                    for v77 in v72._actionEventSubscribers do
-                        v77({
-                            type = v7.Action, 
-                            action = v73, 
-                            state = l_v75_0, 
-                            lastState = l__navState_0
-                        });
-                    end;
-                end;
-                if v75 == nil then
-                    v78();
-                    return true;
-                elseif l_v75_0 ~= l__navState_0 then
-                    v72._navState = l_v75_0;
-                    v72:setState({
-                        nav = l_v75_0
-                    }, function() --[[ Line: 436 ]]
-                        -- upvalues: v72 (copy), l__navState_0 (copy), l_v75_0 (ref), v73 (copy), v78 (copy)
-                        v72:_onNavigationStateChange(l__navState_0, l_v75_0, v73);
-                        task.defer(v78);
-                        v72:_persistNavigationState(l_v75_0);
-                    end);
-                    return true;
-                else
-                    v78();
-                    return false;
-                end;
-            end;
-        end;
-        v23._getScreenProps = function(v79, v80, v81) --[[ Line: 450 ]] --[[ Name: _getScreenProps ]]
-            if v80 == nil then
-                return v79.props.screenProps;
-            else
-                local l_screenProps_0 = v79.props.screenProps;
-                if l_screenProps_0 == nil or l_screenProps_0[v80] == nil then
-                    return v81;
-                else
-                    return l_screenProps_0[v80];
-                end;
-            end;
-        end;
-        v23.render = function(v83) --[[ Line: 465 ]] --[[ Name: render ]]
-            -- upvalues: v9 (ref), v21 (copy), l_assert_0 (ref), v2 (ref), v8 (ref), l_Object_0 (ref)
-            local l_navigation_0 = v83.props.navigation;
-            if v83:_isStateful() then
-                local l_nav_0 = v83.state.nav;
-                if not l_nav_0 then
-                    return v83:_renderLoading();
-                else
-                    if not v83._navigation or v83._navigation.state ~= l_nav_0 then
-                        v83._navigation = v9(v21.router, l_nav_0, function(...) --[[ Line: 478 ]]
-                            -- upvalues: v83 (copy)
-                            return v83:dispatch(...);
-                        end, v83._actionEventSubscribers, function(...) --[[ Line: 482 ]]
-                            -- upvalues: v83 (copy)
-                            return v83:_getScreenProps(...);
-                        end, function() --[[ Line: 485 ]]
-                            -- upvalues: v83 (copy)
-                            return v83._navigation;
-                        end);
-                    end;
-                    l_navigation_0 = v83._navigation;
-                end;
-            end;
-            l_assert_0(l_navigation_0 ~= nil, "failed to get navigation");
-            return v2.createElement(v8.Provider, {
-                value = l_navigation_0
-            }, {
-                AppComponent = v2.createElement(v21, l_Object_0.assign(table.clone(v83.props), {
-                    navigation = l_navigation_0
-                }))
-            });
-        end;
-        return v23;
-    end, 
-    _TESTING_ONLY_reset_container_count = v20
-};
+	createAppContainer = function(p3, p4) -- line: 117
+		-- upvalues: _assert (copy), React (copy), validateProps (copy), NavigationActions (copy), urlToPathAndParams (copy), console (copy), n1 (ref), Events (copy), getNavigation (copy), NavigationContext (copy), Object (copy)
+		_assert(type(p3) == "table" and p3.router ~= nil, "AppComponent must be a navigator or a stateful Roact component with a 'router' field")
+
+		local v23 = string.format("NavigationContainer(%s)", (tostring(p3)))
+		local v24 = React.Component:extend(v23)
+
+		v24.router = p3.router
+
+		function v24.getDerivedStateFromProps(p5) -- line: 128
+			-- upvalues: validateProps (copy)
+			validateProps(p5)
+
+			return nil
+		end
+		function v24.init(p6) -- line: 133
+			-- upvalues: validateProps (copy), NavigationActions (copy), p3 (copy)
+			validateProps(p6.props)
+			p6._actionEventSubscribers = {}
+			p6._initialAction = NavigationActions.init()
+
+			local v27 = nil
+
+			if p6:_isStateful() and not p6.props.loadNavigationState then
+				v27 = p3.router.getStateForAction(p6._initialAction)
+			end
+
+			p6.state = {
+				nav = v27
+			}
+		end
+		function v24._updateExternalDispatchConnector(p7) -- line: 155
+			if p7._disconnectExternalDispatch then
+				p7._disconnectExternalDispatch()
+				p7._disconnectExternalDispatch = nil
+			end
+
+			local externalDispatchConnector = p7.props.externalDispatchConnector
+
+			if externalDispatchConnector ~= nil then
+				p7._disconnectExternalDispatch = externalDispatchConnector(function(...) -- line: 163
+					-- upvalues: p7 (copy)
+					if p7._isMounted then
+						return p7:dispatch(...)
+					end
+
+					return false
+				end)
+			end
+		end
+		function v24._renderLoading(p8) -- line: 174
+			return p8.props.renderLoading and p8.props.renderLoading()
+		end
+		function v24._isStateful(p9) -- line: 178
+			return not p9.props.navigation
+		end
+		function v24._handleOpenURL(p10, p11) -- line: 182
+			-- upvalues: urlToPathAndParams (copy), p3 (copy)
+			local url = p11.url
+			local enableURLHandling = p10.props.enableURLHandling
+			local uriPrefix = p10.props.uriPrefix
+
+			if enableURLHandling == false then
+				return
+			end
+
+			local v37 = urlToPathAndParams(url, uriPrefix)
+
+			if v37 then
+				local path = v37.path
+				local params = v37.params
+				local v40 = p3.router.getActionForPathAndParams(path, params)
+
+				if v40 then
+					p10:dispatch(v40)
+				end
+			end
+		end
+		function v24._onNavigationStateChange(p12, p13, p14, p15) -- line: 201
+			-- upvalues: console (copy)
+			local onNavigationStateChange = p12.props.onNavigationStateChange
+
+			if onNavigationStateChange == nil and (p12:_isStateful() and _G.REACT_NAV_LOGGING) then
+				console.group("Navigation Dispatch: ")
+				console.log("Action: ", p15)
+				console.log("New State: ", p14)
+				console.log("Last State: ", p13)
+				console.groupEnd()
+
+				return
+			end
+
+			if type(onNavigationStateChange) == "function" then
+				onNavigationStateChange(p13, p14, p15)
+			end
+		end
+		function v24.didUpdate(p16, p17) -- line: 218
+			if p16._navState == p16.state.nav then
+				p16._navState = nil
+			end
+
+			if p16.props.externalDispatchConnector ~= p17.externalDispatchConnector then
+				p16:_updateExternalDispatchConnector()
+			end
+		end
+		function v24.didMount(p18) -- line: 231
+			-- upvalues: n1 (ref), console (copy), p4 (copy), p3 (copy), Events (copy)
+			p18._isMounted = true
+			p18:_updateExternalDispatchConnector()
+
+			if not p18:_isStateful() then
+				return
+			end
+
+			if _G.__DEV__ and not p18.props.detached and n1 > 0 then
+				console.warn("You should only render one navigator explicitly in your app, and other navigators should be rendered by including them in that navigator. Full details at: https://reactnavigation.org/docs/4.x/common-mistakes#explicitly-rendering-more-than-one-navigator")
+			end
+
+			n1 += 1
+
+			if p4 then
+				p4:listenForLuaURLs(function(p19) -- line: 256
+					-- upvalues: p18 (copy)
+					p18:_handleOpenURL({
+						url = p19
+					})
+				end, false)
+			end
+
+			local parsedUrl = nil
+			local userProvidedStartupState = nil
+
+			if p18.props.enableURLHandling ~= false then
+				local v51 = p18:getStartupParams()
+
+				parsedUrl = v51.parsedUrl
+				userProvidedStartupState = v51.userProvidedStartupState
+			end
+
+			local _initialAction = p18._initialAction
+			local v53 = p18.state.nav or p3.router.getStateForAction(_initialAction)
+
+			if userProvidedStartupState then
+				v53 = userProvidedStartupState
+			end
+
+			if parsedUrl then
+				local path = parsedUrl.path
+				local params = parsedUrl.params
+				local v56 = p3.router.getActionForPathAndParams(path, params)
+
+				if v56 then
+					_initialAction = v56
+					v53 = p3.router.getStateForAction(v56, v53)
+				end
+			end
+
+			local function dispatchAction() -- line: 300
+				-- upvalues: p18 (copy), Events (copy), _initialAction (ref)
+				for v84 in p18._actionEventSubscribers do
+					v84({
+						lastState = nil,
+						type = Events.Action,
+						action = _initialAction,
+						state = p18.state.nav
+					})
+				end
+			end
+
+			if v53 == p18.state.nav then
+				spawn(dispatchAction)
+
+				return
+			end
+
+			p18:setState({
+				nav = v53
+			}, dispatchAction)
+		end
+		function v24.getStartupParams(p20) -- line: 326
+			-- upvalues: p4 (copy), urlToPathAndParams (copy)
+			local props = p20.props
+			local uriPrefix = props.uriPrefix
+			local loadNavigationState = props.loadNavigationState
+			local u62 = nil
+			local u63 = nil
+
+			if p4 then
+				pcall(function() -- line: 334
+					-- upvalues: u62 (ref), p4 (copy)
+					u62 = p4:getLastLuaURL()
+				end)
+			end
+
+			if loadNavigationState then
+				pcall(function() -- line: 340
+					-- upvalues: u63 (ref), loadNavigationState (copy)
+					u63 = loadNavigationState()
+				end)
+			end
+
+			return {
+				parsedUrl = u62 and urlToPathAndParams(u62, uriPrefix),
+				userProvidedStartupState = u63
+			}
+		end
+		function v24._persistNavigationState(p21, p22) -- line: 353
+			local persistNavigationState = p21.props.persistNavigationState
+
+			if persistNavigationState then
+				local ok, result = pcall(persistNavigationState, p22)
+
+				if not ok then
+					warn("Uncaught error while calling persistNavigationState()! " .. "You should handle exceptions thrown from persistNavigationState(), " .. "ignoring them may result in undefined behavior.\n" .. result)
+				end
+			end
+		end
+		function v24.willUnmount(p23) -- line: 369
+			-- upvalues: p4 (copy), n1 (ref)
+			p23._isMounted = false
+
+			if p4 then
+				p4:stopListeningForLuaURLs()
+			end
+
+			if p23._disconnectExternalDispatch then
+				p23._disconnectExternalDispatch()
+				p23._disconnectExternalDispatch = nil
+			end
+
+			if p23:_isStateful() then
+				n1 -= 1
+			end
+		end
+		function v24.dispatch(p24, p25) -- line: 395
+			-- upvalues: _assert (copy), p3 (copy), Events (copy)
+			if p24.props.navigation then
+				return p24.props.navigation.dispatch(p25)
+			end
+
+			p24._navState = p24._navState or p24.state.nav
+
+			local _navState = p24._navState
+
+			_assert(_navState ~= nil, "should be set in constructor if stateful")
+
+			local v73 = p3.router.getStateForAction(p25, _navState)
+			local u74 = v73
+
+			if v73 == nil then
+				u74 = _navState
+			end
+
+			local function dispatchActionEvents() -- line: 411
+				-- upvalues: p24 (copy), Events (copy), p25 (copy), u74 (ref), _navState (copy)
+				for v85 in p24._actionEventSubscribers do
+					v85({
+						type = Events.Action,
+						action = p25,
+						state = u74,
+						lastState = _navState
+					})
+				end
+			end
+
+			if v73 == nil then
+				dispatchActionEvents()
+
+				return true
+			end
+
+			if _navState ~= u74 then
+				p24._navState = u74
+				p24:setState({
+					nav = u74
+				}, function() -- line: 436
+					-- upvalues: p24 (copy), _navState (copy), u74 (ref), p25 (copy), dispatchActionEvents (copy)
+					p24:_onNavigationStateChange(_navState, u74, p25)
+					task.defer(dispatchActionEvents)
+					p24:_persistNavigationState(u74)
+				end)
+
+				return true
+			end
+
+			dispatchActionEvents()
+
+			return false
+		end
+		function v24._getScreenProps(p26, p27, p28) -- line: 450
+			if p27 == nil then
+				return p26.props.screenProps
+			end
+
+			local screenProps = p26.props.screenProps
+
+			if screenProps == nil or screenProps[p27] == nil then
+				return p28
+			end
+
+			return screenProps[p27]
+		end
+		function v24.render(p29) -- line: 465
+			-- upvalues: getNavigation (copy), p3 (copy), _assert (copy), React (copy), NavigationContext (copy), Object (copy)
+			local navigation = p29.props.navigation
+
+			if p29:_isStateful() then
+				local nav = p29.state.nav
+
+				if not nav then
+					return p29:_renderLoading()
+				end
+
+				if not p29._navigation or nav ~= p29._navigation.state then
+					p29._navigation = getNavigation(p3.router, nav, function(...) -- line: 478
+						-- upvalues: p29 (copy)
+						return p29:dispatch(...)
+					end, p29._actionEventSubscribers, function(...) -- line: 482
+						-- upvalues: p29 (copy)
+						return p29:_getScreenProps(...)
+					end, function() -- line: 485
+						-- upvalues: p29 (copy)
+						return p29._navigation
+					end)
+				end
+
+				navigation = p29._navigation
+			end
+
+			_assert(navigation ~= nil, "failed to get navigation")
+
+			return React.createElement(NavigationContext.Provider, {
+				value = navigation
+			}, {
+				AppComponent = React.createElement(p3, Object.assign(table.clone(p29.props), {
+					navigation = navigation
+				}))
+			})
+		end
+
+		return v24
+	end,
+	_TESTING_ONLY_reset_container_count = function() -- line: 72
+		-- upvalues: n1 (ref)
+		n1 = 0
+	end
+}

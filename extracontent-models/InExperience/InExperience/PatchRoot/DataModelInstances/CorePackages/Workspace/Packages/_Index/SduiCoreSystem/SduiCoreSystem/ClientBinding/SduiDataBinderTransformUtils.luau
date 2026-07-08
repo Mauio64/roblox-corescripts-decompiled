@@ -1,18 +1,21 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
+local LocalizationService = game:GetService("LocalizationService")
+
 return {
-    snakeToCamel = function(v1) --[[ Line: 16 ]] --[[ Name: snakeToCamel ]]
-        return v1:gsub("_(%l)", function(v2) --[[ Line: 17 ]]
-            return v2:upper();
-        end);
-    end, 
-    protobufTimestampToLocalTimeString = function(v3) --[[ Line: 25 ]] --[[ Name: protobufTimestampToLocalTimeString ]]
-        -- upvalues: l_LocalizationService_0 (copy)
-        if v3 == nil then
-            return nil;
-        elseif v3.seconds then
-            return DateTime.fromUnixTimestamp(v3.seconds):FormatLocalTime("ll", l_LocalizationService_0.RobloxLocaleId);
-        else
-            return (tostring(v3));
-        end;
-    end
-};
+	snakeToCamel = function(s1: string) -- line: 16
+		return s1:gsub("_(%l)", function(p1) -- line: 17
+			return p1:upper()
+		end)
+	end,
+	protobufTimestampToLocalTimeString = function(t1: {[any]: any}?) -- line: 25
+		-- upvalues: LocalizationService (copy)
+		if t1 == nil then
+			return nil
+		end
+
+		if t1.seconds then
+			return DateTime.fromUnixTimestamp(t1.seconds):FormatLocalTime("ll", LocalizationService.RobloxLocaleId)
+		end
+
+		return (tostring(t1))
+	end
+}

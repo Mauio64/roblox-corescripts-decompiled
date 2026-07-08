@@ -1,85 +1,83 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.CapturesCommon);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local l_Checkbox_0 = v2.Checkbox;
-local l_View_0 = v2.View;
-local l_getCropSize_0 = v1.Utils.getCropSize;
-return function(v7) --[[ Line: 20 ]]
-    -- upvalues: v3 (copy), l_View_0 (copy), v2 (copy), l_Checkbox_0 (copy), l_getCropSize_0 (copy)
-    local v8, v9 = v3.useState(Vector2.new(0, 0));
-    local v10 = v3.useRef(nil);
-    local v11, v12 = v3.useState(Vector2.new(0, 0));
-    local v13 = v3.useCallback(function() --[[ Line: 25 ]]
-        -- upvalues: v7 (copy)
-        v7.updateSelected(not v7.isSelected);
-    end, {
-        v7.isSelected, 
-        v7.updateSelected
-    });
-    local v15 = v3.useCallback(function(v14) --[[ Line: 29 ]]
-        -- upvalues: v9 (copy)
-        v9(v14.AbsoluteSize);
-    end, {});
-    local v17 = v3.useCallback(function(v16) --[[ Line: 33 ]]
-        -- upvalues: v10 (copy), v12 (copy)
-        v10.current = v16;
-        v12(v16.Resolution);
-    end, {});
-    v3.useEffect(function() --[[ Line: 38 ]]
-        -- upvalues: v10 (copy)
-        return function() --[[ Line: 39 ]]
-            -- upvalues: v10 (ref)
-            if v10.current then
-                v10.current.Video = "";
-            end;
-        end;
-    end, {});
-    local v18 = false;
-    if typeof(v7.content) == "Content" then
-        v18 = false;
-        if v7.content.Object ~= nil then
-            v18 = v7.content.Object:IsA("VideoCapture");
-        end;
-    end;
-    return v3.createElement(l_View_0, {
-        tag = "clip size-full", 
-        onAbsoluteSizeChanged = v15
-    }, {
-        CheckboxOverlay = if v7.showCheckbox then v3.createElement(l_View_0, {
-            tag = "size-full padding-small", 
-            onActivated = v13, 
-            stateLayer = {
-                affordance = v2.Enums.StateLayerAffordance.None
-            }, 
-            ZIndex = 2
-        }, {
-            Checkbox = v3.createElement(l_Checkbox_0, {
-                AnchorPoint = Vector2.new(1, 0), 
-                isChecked = v7.isSelected, 
-                label = "", 
-                onActivated = v13, 
-                Position = UDim2.fromScale(1, 0)
-            })
-        }) else nil, 
-        Image = if not v18 then v3.createElement("ImageLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ImageContent = v7.content, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            ScaleType = Enum.ScaleType.Crop, 
-            Size = UDim2.fromScale(1, 1)
-        }) else nil, 
-        Video = if v18 then v3.createElement("VideoFrame", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Looped = true, 
-            Playing = true, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Size = l_getCropSize_0(v8, v11), 
-            VideoContent = v7.content, 
-            Volume = 0, 
-            [v3.Event.Loaded] = v17
-        }) else nil
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local CapturesCommon = require(ParentParent.CapturesCommon)
+local Foundation = require(ParentParent.Foundation)
+local React = require(ParentParent.React)
+local Checkbox = Foundation.Checkbox
+local View = Foundation.View
+local getCropSize = CapturesCommon.Utils.getCropSize
+
+return function(t1: {[any]: any}) -- line: 20
+	-- upvalues: React (copy), View (copy), Foundation (copy), Checkbox (copy), getCropSize (copy)
+	local v9, v10 = React.useState(Vector2.new(0, 0))
+	local v11 = React.useRef(nil)
+	local v12, v13 = React.useState(Vector2.new(0, 0))
+	local v14 = React.useCallback(function() -- line: 25
+		-- upvalues: t1 (copy)
+		t1.updateSelected(not t1.isSelected)
+	end, {
+		t1.isSelected,
+		t1.updateSelected
+	})
+	local v15 = React.useCallback(function(p1) -- line: 29
+		-- upvalues: v10 (copy)
+		v10(p1.AbsoluteSize)
+	end, {})
+	local v16 = React.useCallback(function(p2) -- line: 33
+		-- upvalues: v11 (copy), v13 (copy)
+		v11.current = p2
+		v13(p2.Resolution)
+	end, {})
+
+	React.useEffect(function() -- line: 38
+		-- upvalues: v11 (copy)
+		return function() -- line: 39
+			-- upvalues: v11 (copy)
+			if v11.current then
+				v11.current.Video = ""
+			end
+		end
+	end, {})
+
+	local v17 = typeof(t1.content) == "Content" and (t1.content.Object ~= nil and t1.content.Object:IsA("VideoCapture"))
+
+	return React.createElement(View, {
+		tag = "clip size-full",
+		onAbsoluteSizeChanged = v15
+	}, {
+		CheckboxOverlay = if not t1.showCheckbox then nil else React.createElement(View, {
+			tag = "size-full padding-small",
+			ZIndex = 2,
+			onActivated = v14,
+			stateLayer = {
+				affordance = Foundation.Enums.StateLayerAffordance.None
+			}
+		}, {
+			Checkbox = React.createElement(Checkbox, {
+				label = "",
+				AnchorPoint = Vector2.new(1, 0),
+				isChecked = t1.isSelected,
+				onActivated = v14,
+				Position = UDim2.fromScale(1, 0)
+			})
+		}),
+		Image = if v17 then nil else React.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ImageContent = t1.content,
+			Position = UDim2.fromScale(0.5, 0.5),
+			ScaleType = Enum.ScaleType.Crop,
+			Size = UDim2.fromScale(1, 1)
+		}),
+		Video = if not v17 then nil else React.createElement("VideoFrame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Looped = true,
+			Playing = true,
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = getCropSize(v9, v12),
+			VideoContent = t1.content,
+			Volume = 0,
+			[React.Event.Loaded] = v16
+		})
+	})
+end

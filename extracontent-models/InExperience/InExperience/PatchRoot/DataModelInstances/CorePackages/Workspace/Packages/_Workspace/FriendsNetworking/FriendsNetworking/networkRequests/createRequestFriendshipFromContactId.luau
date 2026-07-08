@@ -1,13 +1,15 @@
-local v0 = require(script.Parent.Parent.FRIENDS_URL);
-local _ = require(script.Parent.Parent.networkingFriendsTypes);
-return function(v2) --[[ Line: 11 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.POST({
-        Name = "RequestFriendshipFromContactId"
-    }, function(v3, v4) --[[ Line: 16 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0, {
-            currentUserId = v4.currentUserId
-        }):path("v1"):path("contacts"):id(v4.contactId):path("request-friendship"):body({});
-    end);
-end;
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+
+require(script.Parent.Parent.networkingFriendsTypes)
+
+return function(p1) -- line: 11
+	-- upvalues: FRIENDS_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "RequestFriendshipFromContactId"
+	}, function(p2, t1: {[any]: any}) -- line: 16
+		-- upvalues: FRIENDS_URL (copy)
+		return p2(FRIENDS_URL, {
+			currentUserId = t1.currentUserId
+		}):path("v1"):path("contacts"):id(t1.contactId):path("request-friendship"):body({})
+	end)
+end

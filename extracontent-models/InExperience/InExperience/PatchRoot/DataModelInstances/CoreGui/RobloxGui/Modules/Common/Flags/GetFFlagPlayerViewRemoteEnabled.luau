@@ -1,4 +1,5 @@
-game:DefineFastFlag("PlayerViewRemoteEnabled", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("PlayerViewRemoteEnabled");
-end;
+game:DefineFastFlag("PlayerViewRemoteEnabled", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("PlayerViewRemoteEnabled")
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAccessoryAdjustmentReturnOnNil", false);
+return game:DefineFastFlag("AXAccessoryAdjustmentReturnOnNil", false)

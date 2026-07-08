@@ -1,1 +1,1 @@
-return game:DefineFastString("NewFriendRequestsBadgeLayer", "Social.Friends");
+return game:DefineFastString("NewFriendRequestsBadgeLayer", "Social.Friends")

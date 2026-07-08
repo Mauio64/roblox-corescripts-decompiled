@@ -1,236 +1,240 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v4 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v4.Core.ImageSet.ImageSetLabel;
-local l_LoadableImage_0 = v4.App.Loading.LoadableImage;
-local l_useCursor_0 = v4.App.SelectionCursor.useCursor;
-local v9 = require(l_script_FirstAncestor_0.Footer.RightAlignedButtonWrapper);
-local v10 = require(l_script_FirstAncestor_0.ZoomAnimatedFrame);
-local v11 = require(l_script_FirstAncestor_0.GameTileViewConfig);
-local l_FFlagLuaAppGameTileInteractionFeedback_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppGameTileInteractionFeedback;
-local l_FFlagLuaAppMigrateGameTileHoverFixes_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppMigrateGameTileHoverFixes;
-local l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone;
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-return function(v16) --[[ Line: 87 ]] --[[ Name: GameTileView ]]
-    -- upvalues: l_useDesignTokens_0 (copy), l_useTokens_0 (copy), v11 (copy), l_useCursor_0 (copy), l_FFlagLuaAppMigrateGameTileHoverFixes_0 (copy), v2 (copy), l_FFlagLuaAppGameTileInteractionFeedback_0 (copy), v10 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), l_LoadableImage_0 (copy), l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 (copy), v9 (copy)
-    local v17 = l_useDesignTokens_0();
-    local v18 = if v16.isUnifiedGameTile then v16.numLinesForTitle or 1 else nil;
-    local v19 = v16.numLinesForMetadata or 1;
-    local l_textSizeOffset_0 = v16.textSizeOffset;
-    local v21 = l_useTokens_0();
-    local v22 = v11.getElementSizes(v17, l_textSizeOffset_0, if v16.isUnifiedGameTile then v18 else nil, if v16.isUnifiedGameTile then v21 else nil, v16.isUnifiedGameTile and true or nil, v19);
-    local v23 = if v21 and v16.isUnifiedGameTile then v21.Radius.Medium else v17.Global.Space_100;
-    local v24 = UDim.new(0, v23);
-    local v25 = l_useCursor_0(v24);
-    local v26 = if v21 and v16.isUnifiedGameTile then v21.Typography.TitleMedium else v17.Semantic.Typography.Subheader;
-    local l_FontSize_0 = v26.FontSize;
-    local v28 = if v21 and v16.isUnifiedGameTile then v21.Color.Content.Emphasis else v17.Semantic.Color.Text.Emphasis;
-    local l_Space_50_0 = v17.Global.Space_50;
-    local v30 = if v16.isUnifiedGameTile then v16.hoverPadding or v17.Global.Space_150 else v17.Global.Space_150;
-    local v31 = v16.hidePlayButton and 0 or v22.playButtonHeight;
-    local v32 = nil;
-    v32 = if v16.isUnifiedGameTile then if v16.isContained then v16.containmentSidePadding or v21.Padding.Medium else 0 else if v16.isContained then v17.Global.Space_150 else 0;
-    local v33 = (not not v16.hidePlayButton or v16.isContained and v16.isUnifiedGameTile) and 0 or v17.Global.Space_150;
-    local l_isHovered_0 = v16.isHovered;
-    local v35 = l_FFlagLuaAppMigrateGameTileHoverFixes_0 and l_isHovered_0 and v16.isUnifiedGameTile;
-    local v36 = UDim.new(1, -if v16.isUnifiedGameTile then v32 else v17.Global.Space_150 + v32);
-    local v37 = v16.Size or UDim2.fromScale(1, 1);
-    if l_isHovered_0 then
-        v37 = v37 + UDim2.fromOffset(v30 * 2, v30 * 2);
-    end;
-    local v38 = v11.getFooterHeight(v17, v16.isContained, v16.footerMetadata == nil, v16.title == nil, l_textSizeOffset_0, v16.extraFooterSpace, v18, v21, v16.isUnifiedGameTile, v16.numLinesForMetadata);
-    local v39 = if not not v16.title or v16.footerMetadata then v22.footerTopPadding else 0;
-    local v40 = if v16.title and v16.footerMetadata then v22.paddingAboveMetadata else 0;
-    local v41 = if v16.title then v22.titleHeight else 0;
-    local v42 = nil;
-    local v43 = nil;
-    local v44 = nil;
-    v42 = v2.useRef(false);
-    v43 = v2.useCallback(function(...) --[[ Line: 175 ]]
-        -- upvalues: v42 (ref), l_FFlagLuaAppGameTileInteractionFeedback_0 (ref), v16 (copy)
-        v42.current = false;
-        if l_FFlagLuaAppGameTileInteractionFeedback_0 and v16.onGuiStateChanged then
-            v16.onGuiStateChanged(...);
-        end;
-    end, {
-        v16.onGuiStateChanged
-    });
-    v44 = v2.useCallback(function() --[[ Line: 182 ]]
-        -- upvalues: v16 (copy), v42 (ref)
-        if v16.onTouchLongPress and not v16.isDisabled then
-            local l_current_0 = v42.current;
-            v42.current = true;
-            if l_current_0 == false then
-                v16.onTouchLongPress();
-            end;
-        end;
-    end, {
-        v16.onTouchLongPress, 
-        v16.isDisabled
-    });
-    local v46 = v2.useCallback(function() --[[ Line: 192 ]]
-        -- upvalues: v42 (ref), v16 (copy)
-        if v42.current then
-            v42.current = false;
-            return;
-        else
-            if v16.onActivated and not v16.isDisabled then
-                v16.onActivated();
-            end;
-            return;
-        end;
-    end, {
-        v16.onActivated, 
-        v16.isDisabled
-    });
-    return v2.createElement(v10, {
-        isZoomEnabled = l_isHovered_0, 
-        expansionOffsetX = l_Space_50_0 * 2, 
-        expansionOffsetTop = l_Space_50_0, 
-        expansionOffsetBottom = v31 + v33 + (v16.hidePlayButton and 0 or l_Space_50_0) / (v16.imageAspectRatio or 1) + l_Space_50_0 + if v16.hideMetadata and v16.footerMetadata then v22.metadataHeight else 0, 
-        reducedMotion = v16.reducedMotion
-    }, {
-        HoverShadow = l_isHovered_0 and v2.createElement(l_ImageSetLabel_0, {
-            Position = UDim2.new(0.5, 0, 0.5, 2), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, v30 + 18, 1, v30 + 20), 
-            Image = l_Images_0["component_assets/dropshadow_56_8"], 
-            ImageColor3 = v17.Semantic.Color.Common.DropShadow.Color3, 
-            ImageTransparency = v17.Semantic.Color.Common.DropShadow.Transparency, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(35, 35, 37, 37), 
-            ZIndex = -1
-        }) or nil, 
-        GameTileContent = v2.createElement("TextButton", {
-            SelectionOrder = v16.SelectionOrder, 
-            ref = v16.forwardRef, 
-            Size = v37, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            SelectionImageObject = v25, 
-            Active = not v16.isDisabled, 
-            [v2.Change.GuiState] = v43, 
-            [v2.Event.Activated] = v46, 
-            [v2.Event.SelectionGained] = v16.onSelectionGained, 
-            [v2.Event.SelectionLost] = v16.onSelectionLost, 
-            [v2.Event.TouchLongPress] = v44, 
-            ClipsDescendants = false, 
-            Text = "", 
-            BackgroundTransparency = if v21 and v16.isUnifiedGameTile then l_isHovered_0 and v21.Color.Surface.Surface_100.Transparency or 1 else l_isHovered_0 and v17.Semantic.Color.BackgroundUi.Default.Transparency or 1, 
-            BackgroundColor3 = if v21 and v16.isUnifiedGameTile then v21.Color.Surface.Surface_100.Color3 else v17.Semantic.Color.BackgroundUi.Default.Color3, 
-            AutoButtonColor = false, 
-            Selectable = v16.Selectable, 
-            [v2.Tag] = "data-testid=--game-tile"
-        }, {
-            UIPadding = l_isHovered_0 and v2.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v30), 
-                PaddingTop = UDim.new(0, v30), 
-                PaddingRight = UDim.new(0, v30), 
-                PaddingBottom = UDim.new(0, v30)
-            }) or nil, 
-            UICorner = v2.createElement("UICorner", {
-                CornerRadius = if l_FFlagLuaAppMigrateGameTileHoverFixes_0 and v16.isUnifiedGameTile then v24 else v24 + UDim.new(0, v30)
-            }), 
-            UIListLayout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            ThumbnailFrame = v2.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                LayoutOrder = 1, 
-                ZIndex = -1
-            }, {
-                Thumbnail = if v16.thumbnailComponent then v16.thumbnailComponent else v2.createElement(l_LoadableImage_0, {
-                    BackgroundTransparency = 1, 
-                    Image = v16.image, 
-                    Size = UDim2.new(1, 0, 1, (not v16.isContained or v35) and 0 or v23), 
-                    cornerRadius = v24, 
-                    showFailedStateWhenLoadingFailed = true, 
-                    useShimmerAnimationWhileLoading = true, 
-                    ZIndex = -2, 
-                    ScaleType = if not v16.isContained or v35 then nil else Enum.ScaleType.Tile, 
-                    TileSize = if not v16.isContained or v35 then nil else UDim2.new(1, 0, 1, -v23), 
-                    onLoaded = if l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 then v16.onTileImageLoaded else nil
-                }), 
-                ContainedBackgroundTop = if not v16.isContained or v35 then nil else v2.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v38 - v23), 
-                    Position = UDim2.new(0, 0, 1, 0), 
-                    BackgroundTransparency = 0, 
-                    ZIndex = -1, 
-                    BackgroundColor3 = if v16.isUnifiedGameTile and v21 then v21.Color.Surface.Surface_100.Color3 else v17.Semantic.Color.BackgroundUi.Default.Color3, 
-                    BorderSizePixel = 0
-                }), 
-                UIAspectRatioConstraint = v2.createElement("UIAspectRatioConstraint", {
-                    AspectRatio = v16.imageAspectRatio or 1
-                }), 
-                ThumbnailOverlay = v16.thumbnailOverlay, 
-                OverflowMenu = v16.overflowMenu
-            }), 
-            BottomContent = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v38), 
-                LayoutOrder = 2, 
-                BackgroundTransparency = v16.isContained and 0 or 1, 
-                BackgroundColor3 = if v21 and v16.isUnifiedGameTile then v21.Color.Surface.Surface_100.Color3 else v17.Semantic.Color.BackgroundUi.Default.Color3, 
-                BorderSizePixel = 0
-            }, {
-                UICorner = if v16.isContained then v2.createElement("UICorner", {
-                    CornerRadius = v24
-                }) else nil, 
-                TextWrapper = v2.createElement(v9, {
-                    Button = v16.rightCornerButton, 
-                    Padding = UDim.new(0, v16.isContained and 0 or v17.Global.Space_150), 
-                    Content = v2.createElement(v2.Fragment, nil, {
-                        Title = v16.title and v2.createElement("TextLabel", {
-                            Position = UDim2.new(0, v32, 0, v39), 
-                            Size = UDim2.new(1, -2 * v32, 0, v41), 
-                            BackgroundTransparency = 1, 
-                            Text = v16.title, 
-                            Font = v26.Font, 
-                            TextSize = l_FontSize_0, 
-                            TextTransparency = v28.Transparency, 
-                            TextColor3 = v28.Color3, 
-                            TextWrapped = if v18 and v16.isUnifiedGameTile then v18 > 1 else false, 
-                            TextTruncate = Enum.TextTruncate.SplitWord, 
-                            TextXAlignment = Enum.TextXAlignment.Left, 
-                            TextYAlignment = if v16.isUnifiedGameTile then Enum.TextYAlignment.Top else Enum.TextYAlignment.Center, 
-                            LayoutOrder = 3
-                        }) or nil, 
-                        Metadata = v16.footerMetadata and v2.createElement("Frame", {
-                            Position = UDim2.new(0, v32, 0, v41 + v39 + v40), 
-                            Size = UDim2.new(v36, UDim.new(0, v22.metadataHeight)), 
-                            ClipsDescendants = false, 
-                            BackgroundTransparency = 1, 
-                            LayoutOrder = 5
-                        }, {
-                            MetadataContent = v16.footerMetadata
-                        }), 
-                        ExtraContent = v16.extraFooterContent and v16.extraFooterSpace and v2.createElement("Frame", {
-                            Size = UDim2.new(1, -v32 * 2, 0, v16.extraFooterSpace), 
-                            Position = UDim2.new(0, v32, 0, v41 + v39 + v40 + v22.metadataHeight), 
-                            BackgroundTransparency = 1
-                        }, {
-                            v16.extraFooterContent
-                        })
-                    })
-                })
-            }) or nil, 
-            PaddingAboveActionRow = l_isHovered_0 and v2.createElement("Frame", {
-                LayoutOrder = 6, 
-                Size = UDim2.fromOffset(0, v33), 
-                BackgroundTransparency = 1
-            }) or nil, 
-            ActionRow = l_isHovered_0 and v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v31), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 7
-            }, {
-                Content = v16.hoverActionRow
-            }) or nil
-        })
-    });
-end;
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local React = require(GameTileParent.React)
+local useDesignTokens = require(GameTileParent.Style).useDesignTokens
+local UIBlox = require(GameTileParent.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(GameTileParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+local useCursor = UIBlox.App.SelectionCursor.useCursor
+local RightAlignedButtonWrapper = require(GameTile.Footer.RightAlignedButtonWrapper)
+local ZoomAnimatedFrame = require(GameTile.ZoomAnimatedFrame)
+local GameTileViewConfig = require(GameTile.GameTileViewConfig)
+local FFlagLuaAppGameTileInteractionFeedback = require(GameTileParent.SharedFlags).FFlagLuaAppGameTileInteractionFeedback
+local FFlagLuaAppMigrateGameTileHoverFixes = require(GameTileParent.SharedFlags).FFlagLuaAppMigrateGameTileHoverFixes
+local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(GameTileParent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
+local FFlagLuaAppHomePageFirstImageLoadObserver = require(GameTileParent.SharedFlags).FFlagLuaAppHomePageFirstImageLoadObserver
+local useTokens = require(GameTileParent.Foundation).Hooks.useTokens
+
+local function GameTileView(t1: {[any]: any}) -- line: 92
+	-- upvalues: useDesignTokens (copy), useTokens (copy), GameTileViewConfig (copy), FFlagRenameDeprecatedUIBloxTokens (copy), useCursor (copy), FFlagLuaAppMigrateGameTileHoverFixes (copy), React (copy), FFlagLuaAppGameTileInteractionFeedback (copy), ZoomAnimatedFrame (copy), ImageSetLabel (copy), Images (copy), FFlagLuaAppHomePageFirstImageLoadObserver (copy), LoadableImage (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), RightAlignedButtonWrapper (copy)
+	local v21 = useDesignTokens()
+	local v22 = if not t1.isUnifiedGameTile then nil else t1.numLinesForTitle or 1
+	local v23 = t1.numLinesForMetadata or 1
+	local textSizeOffset = t1.textSizeOffset
+	local v25 = useTokens()
+	local v26 = GameTileViewConfig.getElementSizes(v21, textSizeOffset, if not t1.isUnifiedGameTile then nil else v22, if not t1.isUnifiedGameTile then nil else v25, not not t1.isUnifiedGameTile or nil, v23)
+	local v27 = if not v25 or not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_100 else v21.Size.Size_200 else v25.Radius.Medium
+	local uDim = UDim.new(0, v27)
+	local v29 = useCursor(uDim)
+	local v30 = if not v25 or not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Typography.Subheader else v21.Typography.TitleLarge else v25.Typography.TitleMedium
+	local FontSize = v30.FontSize
+	local v32 = if not v25 or not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.Text.Emphasis else v21.Color.Content.Emphasis else v25.Color.Content.Emphasis
+	local v33 = if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_50 else v21.Size.Size_100
+	local v34 = if not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300 else t1.hoverPadding or if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300
+	local v35 = if not t1.hidePlayButton then v26.playButtonHeight else 0
+	local v36 = if not t1.isUnifiedGameTile then not t1.isContained and 0 or if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300 else not t1.isContained and 0 or (t1.containmentSidePadding or v25.Padding.Medium)
+	local v37 = if not t1.hidePlayButton and (not t1.isContained or not t1.isUnifiedGameTile) then if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300 else 0
+	local isHovered = t1.isHovered
+	local v39 = FFlagLuaAppMigrateGameTileHoverFixes and (isHovered and t1.isUnifiedGameTile)
+	local uDim2 = UDim.new(1, -if not t1.isUnifiedGameTile then ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300)) + v36 else v36)
+	local v41 = t1.Size or UDim2.fromScale(1, 1)
+
+	if isHovered then
+		v41 += UDim2.fromOffset(v34 * 2, v34 * 2)
+	end
+
+	local v42 = GameTileViewConfig.getFooterHeight(v21, t1.isContained, t1.footerMetadata == nil, t1.title == nil, textSizeOffset, t1.extraFooterSpace, v22, v25, t1.isUnifiedGameTile, t1.numLinesForMetadata)
+	local v43 = not t1.title and not t1.footerMetadata and 0 or v26.footerTopPadding
+	local v44 = (not t1.title or not t1.footerMetadata) and 0 or v26.paddingAboveMetadata
+	local v45 = not t1.title and 0 or v26.titleHeight
+	local u46 = React.useRef(false)
+	local v47 = React.useCallback(function(...) -- line: 196
+		-- upvalues: u46 (ref), FFlagLuaAppGameTileInteractionFeedback (copy), t1 (copy)
+		u46.current = false
+
+		if FFlagLuaAppGameTileInteractionFeedback and t1.onGuiStateChanged then
+			t1.onGuiStateChanged(...)
+		end
+	end, { t1.onGuiStateChanged })
+	local v48 = React.useCallback(function() -- line: 203
+		-- upvalues: t1 (copy), u46 (ref)
+		if t1.onTouchLongPress and not t1.isDisabled then
+			local current = u46.current
+
+			u46.current = true
+
+			if current == false then
+				t1.onTouchLongPress()
+			end
+		end
+	end, {
+		t1.onTouchLongPress,
+		t1.isDisabled
+	})
+	local v49 = React.useCallback(function() -- line: 213
+		-- upvalues: u46 (ref), t1 (copy)
+		if u46.current then
+			u46.current = false
+
+			return
+		end
+
+		if t1.onActivated and not t1.isDisabled then
+			t1.onActivated()
+		end
+	end, {
+		t1.onActivated,
+		t1.isDisabled
+	})
+
+	return React.createElement(ZoomAnimatedFrame, {
+		isZoomEnabled = isHovered,
+		expansionOffsetX = v33 * 2,
+		expansionOffsetTop = v33,
+		expansionOffsetBottom = v35 + v37 + ((if not t1.hidePlayButton then v33 else 0)) / (t1.imageAspectRatio or 1) + v33 + ((not t1.hideMetadata or not t1.footerMetadata) and 0 or v26.metadataHeight),
+		reducedMotion = t1.reducedMotion
+	}, {
+		HoverShadow = isHovered and React.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			ZIndex = -1,
+			Position = UDim2.new(0.5, 0, 0.5, 2),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.new(1, v34 + 18, 1, v34 + 20),
+			Image = Images["component_assets/dropshadow_56_8"],
+			ImageColor3 = ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.Common.DropShadow else v21.Color.Common.Shadow)).Color3,
+			ImageTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.Common.DropShadow else v21.Color.Common.Shadow)).Transparency,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(35, 35, 37, 37)
+		}) or nil,
+		GameTileContent = React.createElement("TextButton", {
+			SelectionOrder = t1.SelectionOrder,
+			ref = t1.forwardRef,
+			Size = v41,
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			SelectionImageObject = v29,
+			Active = not t1.isDisabled,
+			[React.Change.GuiState] = v47,
+			[React.Event.Activated] = v49,
+			[React.Event.SelectionGained] = t1.onSelectionGained,
+			[React.Event.SelectionLost] = t1.onSelectionLost,
+			[React.Event.TouchLongPress] = v48,
+			ClipsDescendants = false,
+			Text = "",
+			BackgroundTransparency = if not v25 or not t1.isUnifiedGameTile then isHovered and ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.BackgroundUi.Default else v21.Color.Surface.Surface_300)).Transparency or 1 else isHovered and v25.Color.Surface.Surface_100.Transparency or 1,
+			BackgroundColor3 = if not v25 or not t1.isUnifiedGameTile then ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.BackgroundUi.Default else v21.Color.Surface.Surface_300)).Color3 else v25.Color.Surface.Surface_100.Color3,
+			AutoButtonColor = false,
+			Selectable = t1.Selectable,
+			[React.Tag] = "data-testid=--game-tile"
+		}, {
+			UIPadding = isHovered and React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v34),
+				PaddingTop = UDim.new(0, v34),
+				PaddingRight = UDim.new(0, v34),
+				PaddingBottom = UDim.new(0, v34)
+			}) or nil,
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = if not FFlagLuaAppMigrateGameTileHoverFixes or not t1.isUnifiedGameTile then uDim + UDim.new(0, v34) else uDim
+			}),
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			ThumbnailFrame = React.createElement("Frame", {
+				[React.Tag] = if not FFlagLuaAppHomePageFirstImageLoadObserver then nil else "observed-image",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				LayoutOrder = 1,
+				ZIndex = -1
+			}, {
+				Thumbnail = if not t1.thumbnailComponent then React.createElement(LoadableImage, {
+					BackgroundTransparency = 1,
+					showFailedStateWhenLoadingFailed = true,
+					useShimmerAnimationWhileLoading = true,
+					ZIndex = -2,
+					Image = t1.image,
+					Size = UDim2.new(1, 0, 1, (not t1.isContained or v39) and 0 or v27),
+					cornerRadius = uDim,
+					ScaleType = if not t1.isContained or v39 then nil else Enum.ScaleType.Tile,
+					TileSize = if not t1.isContained or v39 then nil else UDim2.new(1, 0, 1, -v27),
+					onLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else t1.onTileImageLoaded
+				}) else t1.thumbnailComponent,
+				ContainedBackgroundTop = if not t1.isContained or v39 then nil else React.createElement("Frame", {
+					BackgroundTransparency = 0,
+					ZIndex = -1,
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 0, v42 - v27),
+					Position = UDim2.new(0, 0, 1, 0),
+					BackgroundColor3 = if not t1.isUnifiedGameTile or not v25 then ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.BackgroundUi.Default else v21.Color.Surface.Surface_300)).Color3 else v25.Color.Surface.Surface_100.Color3
+				}),
+				UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+					AspectRatio = t1.imageAspectRatio or 1
+				}),
+				ThumbnailOverlay = t1.thumbnailOverlay,
+				OverflowMenu = t1.overflowMenu
+			}),
+			BottomContent = React.createElement("Frame", {
+				LayoutOrder = 2,
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, v42),
+				BackgroundTransparency = not t1.isContained and 1 or 0,
+				BackgroundColor3 = if not v25 or not t1.isUnifiedGameTile then ((if not FFlagRenameDeprecatedUIBloxTokens then v21.Semantic.Color.BackgroundUi.Default else v21.Color.Surface.Surface_300)).Color3 else v25.Color.Surface.Surface_100.Color3
+			}, {
+				UICorner = if not t1.isContained then nil else React.createElement("UICorner", {
+					CornerRadius = uDim
+				}),
+				TextWrapper = React.createElement(RightAlignedButtonWrapper, {
+					Button = t1.rightCornerButton,
+					Padding = UDim.new(0, if not t1.isContained then if not FFlagRenameDeprecatedUIBloxTokens then v21.Global.Space_150 else v21.Size.Size_300 else 0),
+					Content = React.createElement(React.Fragment, nil, {
+						Title = t1.title and React.createElement("TextLabel", {
+							BackgroundTransparency = 1,
+							LayoutOrder = 3,
+							Position = UDim2.new(0, v36, 0, v43),
+							Size = UDim2.new(1, -2 * v36, 0, v45),
+							Text = t1.title,
+							Font = v30.Font,
+							TextSize = FontSize,
+							TextTransparency = v32.Transparency,
+							TextColor3 = v32.Color3,
+							TextWrapped = not not v22 and (not not t1.isUnifiedGameTile and v22 > 1),
+							TextTruncate = Enum.TextTruncate.SplitWord,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextYAlignment = if not t1.isUnifiedGameTile then Enum.TextYAlignment.Center else Enum.TextYAlignment.Top
+						}) or nil,
+						Metadata = t1.footerMetadata and React.createElement("Frame", {
+							ClipsDescendants = false,
+							BackgroundTransparency = 1,
+							LayoutOrder = 5,
+							Position = UDim2.new(0, v36, 0, v45 + v43 + v44),
+							Size = UDim2.new(uDim2, UDim.new(0, v26.metadataHeight))
+						}, {
+							MetadataContent = t1.footerMetadata
+						}),
+						ExtraContent = t1.extraFooterContent and (t1.extraFooterSpace and React.createElement("Frame", {
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, -v36 * 2, 0, t1.extraFooterSpace),
+							Position = UDim2.new(0, v36, 0, v45 + v43 + v44 + v26.metadataHeight)
+						}, { t1.extraFooterContent }))
+					})
+				})
+			}) or nil,
+			PaddingAboveActionRow = isHovered and React.createElement("Frame", {
+				LayoutOrder = 6,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(0, v37)
+			}) or nil,
+			ActionRow = isHovered and React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 7,
+				Size = UDim2.new(1, 0, 0, v35)
+			}, {
+				Content = t1.hoverActionRow
+			}) or nil
+		})
+	})
+end
+
+return GameTileView

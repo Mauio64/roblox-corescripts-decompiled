@@ -1,35 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxGames");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.t);
-local l_CreatorType_0 = require(l_script_FirstAncestor_0.Enums).CreatorType;
-local v4 = {};
-v4.new = function(v5) --[[ Line: 15 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    assert(v4.isValid(v5));
-    v4.__index = v4;
-    setmetatable(v5, v4);
-    return v5;
-end;
-v4.mock = function(v6) --[[ Line: 27 ]] --[[ Name: mock ]]
-    -- upvalues: v4 (copy), l_CreatorType_0 (copy)
-    v6 = v6 or {};
-    return (v4.new({
-        creatorId = v6.creatorId or "creatorId", 
-        creatorName = v6.creatorName or "creatorName", 
-        creatorType = v6.creatorType or l_CreatorType_0.User
-    }));
-end;
-v4.format = function(v7) --[[ Line: 39 ]] --[[ Name: format ]]
-    -- upvalues: v4 (copy), l_CreatorType_0 (copy)
-    return (v4.new({
-        creatorId = tostring(v7.id), 
-        creatorName = v7.name, 
-        creatorType = l_CreatorType_0.fromRawValue(v7.type)
-    }));
-end;
-v4.isValid = v2.strictInterface({
-    creatorId = v2.string, 
-    creatorName = v2.string, 
-    creatorType = v2.userdata
-});
-return v4;
+local RoduxGames = script:FindFirstAncestor("RoduxGames")
+local RoduxGamesParent = RoduxGames.Parent
+local t = require(RoduxGamesParent.t)
+local CreatorType = require(RoduxGames.Enums).CreatorType
+local t1 = {}
+
+function t1.new(p1) -- line: 15
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 27
+	-- upvalues: t1 (copy), CreatorType (copy)
+	local v8 = p2 or {}
+
+	return (t1.new({
+		creatorId = v8.creatorId or "creatorId",
+		creatorName = v8.creatorName or "creatorName",
+		creatorType = v8.creatorType or CreatorType.User
+	}))
+end
+function t1.format(p3) -- line: 39
+	-- upvalues: t1 (copy), CreatorType (copy)
+	return (t1.new({
+		creatorId = tostring(p3.id),
+		creatorName = p3.name,
+		creatorType = CreatorType.fromRawValue(p3.type)
+	}))
+end
+
+t1.isValid = t.strictInterface({
+	creatorId = t.string,
+	creatorName = t.string,
+	creatorType = t.userdata
+})
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableNewBackpackV2", false)
+return game:DefineFastFlag("EnableNewBackpackV5", false)

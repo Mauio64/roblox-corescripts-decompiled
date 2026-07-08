@@ -1,59 +1,62 @@
-local l_Parent_0 = script:FindFirstAncestor("AdPlayer").Parent;
-local l_AdsDisplayOrder_0 = require(l_Parent_0.AdGuiInteractivity).AdsDisplayOrder;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Foundation);
-local l_View_0 = v4.View;
-local l_Text_0 = v4.Text;
-local l_Button_0 = v4.Button;
-local l_ButtonVariant_0 = v4.Enums.ButtonVariant;
-local l_FillBehavior_0 = v4.Enums.FillBehavior;
-local l_StateLayerAffordance_0 = v4.Enums.StateLayerAffordance;
-local v11 = {
-    confirmationText = "CoreScripts.Ads.Label.RewardedVideoExitConfirmation"
-};
-return function(v12) --[[ Line: 24 ]] --[[ Name: ExitConfirmationModalComponent ]]
-    -- upvalues: l_useLocalization_0 (copy), v11 (copy), v3 (copy), l_AdsDisplayOrder_0 (copy), l_View_0 (copy), l_StateLayerAffordance_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_FillBehavior_0 (copy), l_ButtonVariant_0 (copy)
-    local v13 = l_useLocalization_0(v11);
-    return v3.createElement("ScreenGui", {
-        DisplayOrder = l_AdsDisplayOrder_0.Modal, 
-        IgnoreGuiInset = true, 
-        Enabled = v12.Enabled
-    }, {
-        modal = v3.createElement(l_View_0, {
-            tag = "anchor-center-center position-center-center bg-over-media-0 radius-medium padding-x-xxlarge padding-y-xxlarge", 
-            Size = UDim2.fromOffset(440, 164), 
-            onActivated = function() --[[ Line: 35 ]] --[[ Name: onActivated ]]
+local Parent = script:FindFirstAncestor("AdPlayer").Parent
+local AdsDisplayOrder = require(Parent.AdGuiInteractivity).AdsDisplayOrder
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
+local t1 = {
+	confirmationText = "CoreScripts.Ads.Label.RewardedVideoExitConfirmation"
+}
 
-            end, 
-            stateLayer = {
-                affordance = l_StateLayerAffordance_0.None
-            }
-        }, {
-            v3.createElement(l_Text_0, {
-                tag = "size-full-1100 position-top-center anchor-top-center text-align-x-left", 
-                Text = v13.confirmationText, 
-                TextScaled = true
-            }); 
-            buttonContainer = v3.createElement(l_View_0, {
-                tag = "size-full-1200 anchor-bottom-center position-bottom-center row gap-medium flex-fill"
-            }, {
-                cancelExitButton = v3.createElement(l_Button_0, {
-                    text = "Continue", 
-                    fillBehavior = l_FillBehavior_0.Fill, 
-                    width = UDim.new(1, 0), 
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    onActivated = v12.onCancel
-                }), 
-                confirmExitButton = v3.createElement(l_Button_0, {
-                    text = "Exit", 
-                    fillBehavior = l_FillBehavior_0.Fill, 
-                    width = UDim.new(1, 0), 
-                    variant = l_ButtonVariant_0.Standard, 
-                    onActivated = v12.onConfirm, 
-                    LayoutOrder = 2
-                })
-            })
-        })
-    });
-end;
+local function ExitConfirmationModalComponent(t2: {[any]: any}) -- line: 24
+	-- upvalues: useLocalization (copy), t1 (copy), React (copy), AdsDisplayOrder (copy), View (copy), StateLayerAffordance (copy), FoundationText (copy), Button (copy), FillBehavior (copy), ButtonVariant (copy)
+	local v15 = useLocalization(t1)
+
+	return React.createElement("ScreenGui", {
+		IgnoreGuiInset = true,
+		DisplayOrder = AdsDisplayOrder.Modal,
+		Enabled = t2.Enabled
+	}, {
+		modal = React.createElement(View, {
+			tag = "anchor-center-center position-center-center bg-over-media-0 radius-medium padding-x-xxlarge padding-y-xxlarge",
+			Size = UDim2.fromOffset(440, 164),
+			onActivated = function() -- line: 35
+			end,
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			}
+		}, {
+			React.createElement(FoundationText, {
+				tag = "size-full-1100 position-top-center anchor-top-center text-align-x-left",
+				TextScaled = true,
+				Text = v15.confirmationText
+			}),
+			buttonContainer = React.createElement(View, {
+				tag = "size-full-1200 anchor-bottom-center position-bottom-center row gap-medium flex-fill"
+			}, {
+				cancelExitButton = React.createElement(Button, {
+					text = "Continue",
+					fillBehavior = FillBehavior.Fill,
+					width = UDim.new(1, 0),
+					variant = ButtonVariant.Emphasis,
+					onActivated = t2.onCancel
+				}),
+				confirmExitButton = React.createElement(Button, {
+					text = "Exit",
+					LayoutOrder = 2,
+					fillBehavior = FillBehavior.Fill,
+					width = UDim.new(1, 0),
+					variant = ButtonVariant.Standard,
+					onActivated = t2.onConfirm
+				})
+			})
+		})
+	})
+end
+
+return ExitConfirmationModalComponent

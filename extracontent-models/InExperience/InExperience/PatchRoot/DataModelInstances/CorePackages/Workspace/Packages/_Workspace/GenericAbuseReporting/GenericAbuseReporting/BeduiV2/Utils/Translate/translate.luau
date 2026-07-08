@@ -1,123 +1,158 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local l_FFlagUpdateTranslateInReportRevamp_0 = require(l_Parent_0.SharedFlags).FFlagUpdateTranslateInReportRevamp;
-local function v9(v2, v3) --[[ Line: 33 ]] --[[ Name: mergeTranslationParams ]]
-    if type(v2) == "string" then
-        return v2;
-    else
-        local v4 = {};
-        if v2.params then
-            for v5, v6 in pairs(v2.params) do
-                v4[v5] = v6;
-            end;
-        end;
-        for v7, v8 in pairs(v3) do
-            v4[v7] = v8;
-        end;
-        return {
-            ["$translate"] = v2["$translate"], 
-            params = v4, 
-            wrappers = v2.wrappers
-        };
-    end;
-end;
-local function v16(v10, v11, v12) --[[ Line: 61 ]] --[[ Name: getWrappedText ]]
-    local v13 = "{" .. v10.type .. "Start}";
-    local v14 = "{" .. v10.type .. "End}";
-    if v10.type == "link" then
-        if v11:find(v13) == nil or v11:find(v14) == nil then
-            return v11, nil;
-        else
-            return v11:gsub(("%*(.-)%*"):format(v13, v14), string.format("<font color=\"rgb(%d, %d, %d)\">%s</font>", math.floor(v12.R * 255), math.floor(v12.G * 255), math.floor(v12.B * 255), "%1")), v10;
-        end;
-    elseif v10.type == "strong" then
-        local v15 = string.gsub(v11, v13, "<b>");
-        return string.gsub(v15, v14, "</b>"), nil;
-    else
-        warn("Unknown wrapper type: " .. tostring(v10.type));
-        return v11, nil;
-    end;
-end;
-local v17 = nil;
-local function v23(v18, v19) --[[ Line: 93 ]] --[[ Name: resolveParams ]]
-    -- upvalues: v17 (ref)
-    if v19 == nil then
-        return nil;
-    else
-        local v20 = {};
-        for v21, v22 in pairs(v19) do
-            if type(v22) == "string" then
-                v20[v21] = v22;
-            else
-                v20[v21] = v17(v18, v22);
-            end;
-        end;
-        return v20;
-    end;
-end;
-local function v37(v24, v25, v26) --[[ Line: 118 ]] --[[ Name: translateIntoRichTextString ]]
-    -- upvalues: l_FFlagUpdateTranslateInReportRevamp_0 (copy), v23 (copy), v16 (copy)
-    if v25 == nil then
-        return "", nil;
-    elseif type(v25) == "string" then
-        return v25, nil;
-    elseif type(v25) ~= "table" then
-        return tostring(v25), nil;
-    else
-        local v27 = v25["$translate"];
-        if not v27 or type(v27) ~= "string" then
-            return "", nil;
-        else
-            local l_params_0 = v25.params;
-            local v29 = nil;
-            if l_FFlagUpdateTranslateInReportRevamp_0 then
-                v29 = v23(v24, l_params_0);
-            end;
-            local v30 = v24[v27] or v27;
-            local v31 = nil;
-            if l_FFlagUpdateTranslateInReportRevamp_0 and v29 ~= nil then
-                v30 = v30:gsub("{(.-)}", v29);
-            elseif l_params_0 ~= nil then
-                v30 = v30:gsub("{(.-)}", l_params_0);
-            end;
-            if v25.wrappers then
-                for _, v33 in pairs(v25.wrappers) do
-                    local v34 = nil;
-                    local v35, v36 = v16(v33, v30, v26);
-                    v30 = v35;
-                    v34 = v36;
-                    if v34 ~= nil and v31 == nil then
-                        v31 = v34;
-                    end;
-                end;
-            end;
-            return v30, v31;
-        end;
-    end;
-end;
-v17 = function(v38, v39) --[[ Line: 174 ]]
-    -- upvalues: l_FFlagUpdateTranslateInReportRevamp_0 (copy), v23 (copy)
-    if v39 == nil then
-        return "";
-    elseif type(v39) == "string" then
-        return v39;
-    else
-        local v40 = v39["$translate"];
-        local l_params_1 = v39.params;
-        local v42 = nil;
-        if l_FFlagUpdateTranslateInReportRevamp_0 then
-            v42 = v23(v38, l_params_1);
-        end;
-        local v43 = v38[v40] or v40;
-        if l_FFlagUpdateTranslateInReportRevamp_0 and v42 ~= nil then
-            v43 = v43:gsub("{(.-)}", v42);
-        elseif l_params_1 ~= nil then
-            v43 = v43:gsub("{(.-)}", l_params_1);
-        end;
-        return (v43:gsub("{%w+Start}(.-)({%w+End})", "%1"):gsub("{%w+Start}", ""):gsub("{%w+End}", ""));
-    end;
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local Foundation = require(Parent.Foundation)
+local SharedFlags = require(Parent.SharedFlags)
+local getIconRichText = Foundation.Utility.getIconRichText
+local IconName = Foundation.Enums.IconName
+local FFlagUpdateTranslateInReportRevamp = SharedFlags.FFlagUpdateTranslateInReportRevamp
+local FFlagAbuseReportMenuV2 = SharedFlags.FFlagAbuseReportMenuV2
+
+local function getWrappedText(p1, s1: string, color3: Color3) -- line: 66
+	-- upvalues: FFlagAbuseReportMenuV2 (copy), getIconRichText (copy), IconName (copy)
+	local v21 = "{" .. p1.type .. "Start}"
+	local v22 = "{" .. p1.type .. "End}"
+
+	if p1.type == "link" then
+		if s1:find(v21) == nil or s1:find(v22) == nil then
+			return s1, nil
+		end
+
+		return if not FFlagAbuseReportMenuV2 then s1:gsub(`{ v21 }(.-){ v22 }`, string.format("<font color=\"rgb(%d, %d, %d)\">%s</font>", math.floor(color3.R * 255), math.floor(color3.G * 255), math.floor(color3.B * 255), "%1")) else string.gsub(s1, `{ v21 }(.-){ v22 }`, "%1 " .. getIconRichText(IconName.ArrowUpRightFromSquare)), p1
+	end
+
+	if p1.type == "strong" then
+		local v23 = string.gsub(s1, v21, "<b>")
+
+		return string.gsub(v23, v22, "</b>"), nil
+	end
+
+	warn("Unknown wrapper type: " .. tostring(p1.type))
+
+	return s1, nil
+end
+
+local u9 = nil
+
+local function resolveParams(t1: {[any]: any}, t2: {[any]: any}?) -- line: 100
+	-- upvalues: u9 (ref)
+	if t2 == nil then
+		return nil
+	end
+
+	local t3 = {}
+
+	for k, v in pairs(t2) do
+		if type(v) == "string" then
+			t3[k] = v
+		else
+			t3[k] = u9(t1, v)
+		end
+	end
+
+	return t3
+end
+
+function u9(t4: {[any]: any}, p2) -- line: 181
+	-- upvalues: FFlagUpdateTranslateInReportRevamp (copy), resolveParams (copy)
+	if p2 == nil then
+		return ""
+	end
+
+	if type(p2) == "string" then
+		return p2
+	end
+
+	local v42 = p2["$translate"]
+	local params = p2.params
+	local v44 = nil
+
+	if FFlagUpdateTranslateInReportRevamp then
+		v44 = resolveParams(t4, params)
+	end
+
+	local v45 = t4[v42] or v42
+
+	if FFlagUpdateTranslateInReportRevamp and v44 ~= nil then
+		v45 = v45:gsub("{(.-)}", v44)
+	elseif params ~= nil then
+		v45 = v45:gsub("{(.-)}", params)
+	end
+
+	return (v45:gsub("{%w+Start}(.-)({%w+End})", "%1"):gsub("{%w+Start}", ""):gsub("{%w+End}", ""))
+end
+
 return {
-    mergeTranslationParams = v9, 
-    translateIntoString = v17, 
-    translateIntoRichTextString = v37
-};
+	mergeTranslationParams = function(p3, t5: {[any]: any}) -- line: 38
+		if type(p3) == "string" then
+			return p3
+		end
+
+		local t6 = {}
+
+		if p3.params then
+			for k, v in pairs(p3.params) do
+				t6[k] = v
+			end
+		end
+
+		for k, v in pairs(t5) do
+			t6[k] = v
+		end
+
+		return {
+			["$translate"] = p3["$translate"],
+			params = t6,
+			wrappers = p3.wrappers
+		}
+	end,
+	translateIntoString = u9,
+	translateIntoRichTextString = function(t7: {[any]: any}, p4, color3: Color3) -- line: 125
+		-- upvalues: FFlagUpdateTranslateInReportRevamp (copy), resolveParams (copy), getWrappedText (copy)
+		if p4 == nil then
+			return "", nil
+		end
+
+		if type(p4) == "string" then
+			return p4, nil
+		end
+
+		if type(p4) ~= "table" then
+			return tostring(p4), nil
+		end
+
+		local v32 = p4["$translate"]
+
+		if not v32 or type(v32) ~= "string" then
+			return "", nil
+		end
+
+		local params = p4.params
+		local v34 = nil
+
+		if FFlagUpdateTranslateInReportRevamp then
+			v34 = resolveParams(t7, params)
+		end
+
+		local v35 = t7[v32] or v32
+		local v36 = nil
+
+		if FFlagUpdateTranslateInReportRevamp and v34 ~= nil then
+			v35 = v35:gsub("{(.-)}", v34)
+		elseif params ~= nil then
+			v35 = v35:gsub("{(.-)}", params)
+		end
+
+		if p4.wrappers then
+			for _, v in pairs(p4.wrappers) do
+				local v39
+
+				v35, v39 = getWrappedText(v, v35, color3)
+
+				if v39 ~= nil and v36 == nil then
+					v36 = v39
+				end
+			end
+		end
+
+		return v35, v36
+	end
+}

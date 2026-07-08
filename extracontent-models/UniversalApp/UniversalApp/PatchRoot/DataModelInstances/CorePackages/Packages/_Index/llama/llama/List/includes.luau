@@ -1,10 +1,15 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: includes ]]
-    local v2 = type(v0);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    for v3 = 1, #v0 do
-        if v0[v3] == v1 then
-            return true;
-        end;
-    end;
-    return false;
-end;
+local function includes(p1, p2) -- line: 2
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	for i = 1, #p1 do
+		if p2 == p1[i] then
+			return true
+		end
+	end
+
+	return false
+end
+
+return includes

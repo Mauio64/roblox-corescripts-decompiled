@@ -1,116 +1,136 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_IXPService_0 = game:GetService("IXPService");
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_Parent_0.Cryo);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_getDeepValue_0 = v2.SocialLibraries.Dictionary.getDeepValue;
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v2.getRbxthumbWithTypeSizeAndOptions;
-local l_UserLibConstants_0 = v2.UserLibConstants;
-local v12 = require(l_script_FirstAncestor_0.Components.FriendsLandingPage);
-local v13 = require(l_script_FirstAncestor_0.FriendsLandingContext);
-local l_PresenceType_0 = v2.RoduxPresence.Enums.PresenceType;
-local l_PresenceType_1 = require(l_Parent_0.GraphQLServer).types.PresenceType;
-local v16 = require(l_Parent_0.FriendsCommon);
-local l_useFriendsListOrderedByPresence_0 = v16.Hooks.useFriendsListOrderedByPresence;
-local l_useDecoratedTrustedConnections_0 = v16.Hooks.useDecoratedTrustedConnections;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v20 = require(l_script_FirstAncestor_0.Friends.filterStates);
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local l_FFlagConnectionsHubLayerExposure_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsHubLayerExposure;
-local l_FFlagConnectionManagementChips_0 = require(l_Parent_0.SharedFlags).FFlagConnectionManagementChips;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v25 = game:DefineFastInt("FriendsLandingPageSize", 50);
-local v26 = {
-    [l_PresenceType_1.Offline] = l_PresenceType_0.Offline, 
-    [l_PresenceType_1.Online] = l_PresenceType_0.Online, 
-    [l_PresenceType_1.InGame] = l_PresenceType_0.InGame, 
-    [l_PresenceType_1.InStudio] = l_PresenceType_0.InStudio
-};
-FriendsLandingContainer = function(_) --[[ Line: 49 ]] --[[ Name: FriendsLandingContainer ]]
-    -- upvalues: l_FFlagConnectionsHubLayerExposure_0 (copy), v4 (copy), l_IXPService_0 (copy), l_AppUserLayers_0 (copy), l_useLocalUserId_0 (copy), l_useSelector_0 (copy), l_getDeepValue_0 (copy), l_useAppPolicy_0 (copy), v13 (copy), l_useFriendsListOrderedByPresence_0 (copy), v25 (copy), l_FFlagConnectionManagementChips_0 (copy), l_useDecoratedTrustedConnections_0 (copy), v20 (copy), v5 (copy), l_PresenceType_1 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), l_UserLibConstants_0 (copy), v26 (copy), l_PresenceType_0 (copy), v12 (copy)
-    if l_FFlagConnectionsHubLayerExposure_0 then
-        v4.useEffect(function() --[[ Line: 51 ]]
-            -- upvalues: l_IXPService_0 (ref), l_AppUserLayers_0 (ref)
-            l_IXPService_0:LogFlagLinkedUserLayerExposure(l_AppUserLayers_0.ConnectionsHubExposureLayer);
-        end, {});
-    end;
-    local v28 = l_useLocalUserId_0();
-    local v30 = l_useSelector_0(function(v29) --[[ Line: 57 ]]
-        -- upvalues: l_getDeepValue_0 (ref), v28 (copy)
-        return l_getDeepValue_0(v29, (("FriendsLanding.Friends.countsByUserId.%*"):format(v28)));
-    end);
-    local v32 = l_useAppPolicy_0(function(v31) --[[ Line: 61 ]]
-        return v31.getShowDisplayName();
-    end);
-    local v33 = v4.useContext(v13.Context);
-    local v34 = l_useFriendsListOrderedByPresence_0({
-        userId = v28, 
-        pageSize = v25
-    });
-    local v35 = nil;
-    if l_FFlagConnectionManagementChips_0 then
-        v35 = l_useDecoratedTrustedConnections_0(v34.onlineFriends);
-    end;
-    local v39 = v4.useMemo(function() --[[ Line: 79 ]]
-        -- upvalues: v34 (copy), v33 (copy), v20 (ref), v5 (ref), l_FFlagConnectionManagementChips_0 (ref), v35 (ref), l_PresenceType_1 (ref)
-        local v36 = {};
-        if v34.onlineFriends and v34.offlineFriends then
-            if v33.filter == v20.All then
-                return (v5.List.join(v34.onlineFriends, v34.offlineFriends));
-            elseif v33.filter == v20.Offline then
-                return v34.offlineFriends;
-            elseif v33.filter == v20.Online then
-                return v34.onlineFriends;
-            elseif l_FFlagConnectionManagementChips_0 and v33.filter == v20.Trusted then
-                return v35 or {};
-            else
-                local l_onlineFriends_0 = v34.onlineFriends;
-                v36 = v5.List.filter(l_onlineFriends_0, function(v38) --[[ Line: 92 ]]
-                    -- upvalues: l_PresenceType_1 (ref)
-                    return v38.presence and v38.presence.userPresenceType == l_PresenceType_1.InGame;
-                end);
-            end;
-        end;
-        return v36;
-    end, if l_FFlagConnectionManagementChips_0 then if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v33.filter, 
-        v34.onlineFriends, 
-        v34.offlineFriends, 
-        v35
-    } else l_dependencyArray_0(v33.filter, v34.onlineFriends, v34.offlineFriends, v35) else if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v33.filter, 
-        v34.onlineFriends, 
-        v34.offlineFriends
-    } else l_dependencyArray_0(v33.filter, v34.onlineFriends, v34.offlineFriends));
-    local v44 = v4.useMemo(function() --[[ Line: 114 ]]
-        -- upvalues: v5 (ref), v39 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (ref), l_UserLibConstants_0 (ref), v26 (ref), l_PresenceType_0 (ref)
-        return v5.List.map(v39, function(v40, _) --[[ Line: 115 ]]
-            -- upvalues: l_getRbxthumbWithTypeSizeAndOptions_0 (ref), l_UserLibConstants_0 (ref), v26 (ref), l_PresenceType_0 (ref)
-            local v42 = l_getRbxthumbWithTypeSizeAndOptions_0(v40.id, l_UserLibConstants_0.RbxthumbTypes.Avatar, 352);
-            local v43 = if v40.presence then v26[v40.presence.userPresenceType] else l_PresenceType_0.Offline;
-            return {
-                id = v40.id, 
-                username = "", 
-                thumbnail = v42, 
-                userPresenceType = v43, 
-                universeId = v40.presence and v40.presence.universeId or nil, 
-                lastLocation = if v40.presence then v40.presence.lastLocation else nil
-            };
-        end);
-    end, {
-        v39
-    });
-    return v4.createElement(v12, {
-        totalFriendCount = v30, 
-        friends = if l_FFlagConnectionManagementChips_0 then v44 or {} else v44, 
-        fetchMoreFriends = if not v34 or v34.isEndOfList then nil else v34.fetchMoreFriends, 
-        refreshFriends = v34.refreshFriendsData, 
-        enableDisplayNamePolicy = v32, 
-        localUserId = v28
-    });
-end;
-return FriendsLandingContainer;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local IXPService = game:GetService("IXPService")
+local dependencies = require(FriendsLanding.dependencies)
+local FriendsLandingParent = FriendsLanding.Parent
+local IXPServiceWrapper = require(FriendsLandingParent.IXPServiceWrapper).IXPServiceWrapper
+local React = require(FriendsLandingParent.React)
+local Cryo = require(FriendsLandingParent.Cryo)
+local useAppPolicy = require(FriendsLandingParent.UniversalAppPolicy).useAppPolicy
+local useSelector = require(FriendsLandingParent.RoactUtils).Hooks.RoactRodux.useSelector
+local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
+local getRbxthumbWithTypeSizeAndOptions = dependencies.getRbxthumbWithTypeSizeAndOptions
+local UserLibConstants = dependencies.UserLibConstants
+local FriendsLandingPage = require(FriendsLanding.Components.FriendsLandingPage)
+local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
+local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
+local PresenceType2 = require(FriendsLandingParent.GraphQLServer).types.PresenceType
+local FriendsCommon = require(FriendsLandingParent.FriendsCommon)
+local useFriendsListOrderedByPresence = FriendsCommon.Hooks.useFriendsListOrderedByPresence
+local useDecoratedTrustedConnections = FriendsCommon.Hooks.useDecoratedTrustedConnections
+local useLocalUserId = require(FriendsLandingParent.RobloxAppHooks).useLocalUserId
+local filterStates = require(FriendsLanding.Friends.filterStates)
+local AppUserLayers = require(FriendsLandingParent.ExperimentLayers).AppUserLayers
+local FFlagConnectionsHubLayerExposure = require(FriendsLandingParent.SharedFlags).FFlagConnectionsHubLayerExposure
+local FFlagFixCohubExposureLayer = require(FriendsLandingParent.SharedFlags).FFlagFixCohubExposureLayer
+local FFlagConnectionManagementChips = require(FriendsLandingParent.SharedFlags).FFlagConnectionManagementChips
+local v26 = game:DefineFastInt("FriendsLandingPageSize", 50)
+local t1 = {
+	[PresenceType2.Offline] = PresenceType.Offline,
+	[PresenceType2.Online] = PresenceType.Online,
+	[PresenceType2.InGame] = PresenceType.InGame,
+	[PresenceType2.InStudio] = PresenceType.InStudio
+}
+
+function FriendsLandingContainer(_) -- line: 48
+	-- upvalues: FFlagConnectionsHubLayerExposure (copy), React (copy), FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy), useLocalUserId (copy), useSelector (copy), getDeepValue (copy), useAppPolicy (copy), FriendsLandingContext (copy), useFriendsListOrderedByPresence (copy), v26 (copy), FFlagConnectionManagementChips (copy), useDecoratedTrustedConnections (copy), filterStates (copy), Cryo (copy), PresenceType2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy), FriendsLandingPage (copy)
+	if FFlagConnectionsHubLayerExposure then
+		React.useEffect(function() -- line: 50
+			-- upvalues: FFlagFixCohubExposureLayer (copy), IXPServiceWrapper (copy), AppUserLayers (copy), IXPService (copy)
+			if FFlagFixCohubExposureLayer then
+				IXPServiceWrapper:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
+
+				return
+			end
+
+			IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.ConnectionsHubExposureLayer)
+		end, {})
+	end
+
+	local v29 = useLocalUserId()
+	local v30 = useSelector(function(p2) -- line: 60
+		-- upvalues: getDeepValue (copy), v29 (copy)
+		return getDeepValue(p2, `FriendsLanding.Friends.countsByUserId.{ v29 }`)
+	end)
+	local v31 = useAppPolicy(function(p3) -- line: 64
+		return p3.getShowDisplayName()
+	end)
+	local v32 = React.useContext(FriendsLandingContext.Context)
+	local v33 = useFriendsListOrderedByPresence({
+		userId = v29,
+		pageSize = v26
+	})
+	local u34 = nil
+
+	if FFlagConnectionManagementChips then
+		u34 = useDecoratedTrustedConnections(v33.onlineFriends)
+	end
+
+	local v35 = React.useMemo(function() -- line: 82
+		-- upvalues: v33 (copy), v32 (copy), filterStates (copy), Cryo (copy), FFlagConnectionManagementChips (copy), u34 (ref), PresenceType2 (copy)
+		local t2 = {}
+
+		if v33.onlineFriends and v33.offlineFriends then
+			if v32.filter == filterStates.All then
+				return (Cryo.List.join(v33.onlineFriends, v33.offlineFriends))
+			end
+
+			if v32.filter == filterStates.Offline then
+				return v33.offlineFriends
+			end
+
+			if v32.filter == filterStates.Online then
+				return v33.onlineFriends
+			end
+
+			if FFlagConnectionManagementChips and v32.filter == filterStates.Trusted then
+				return u34 or {}
+			end
+
+			local onlineFriends = v33.onlineFriends
+
+			t2 = Cryo.List.filter(onlineFriends, function(p4) -- line: 95
+				-- upvalues: PresenceType2 (copy)
+				return p4.presence and p4.presence.userPresenceType == PresenceType2.InGame
+			end)
+		end
+
+		return t2
+	end, if not FFlagConnectionManagementChips then {
+		v32.filter,
+		v33.onlineFriends,
+		v33.offlineFriends
+	} else {
+		v32.filter,
+		v33.onlineFriends,
+		v33.offlineFriends,
+		u34
+	})
+	local v36 = React.useMemo(function() -- line: 108
+		-- upvalues: Cryo (copy), v35 (copy), getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy)
+		return Cryo.List.map(v35, function(p5, _) -- line: 109
+			-- upvalues: getRbxthumbWithTypeSizeAndOptions (copy), UserLibConstants (copy), t1 (copy), PresenceType (copy)
+			local v44 = getRbxthumbWithTypeSizeAndOptions(p5.id, UserLibConstants.RbxthumbTypes.Avatar, 352)
+			local v45 = if not p5.presence then PresenceType.Offline else t1[p5.presence.userPresenceType]
+
+			return {
+				username = "",
+				id = p5.id,
+				thumbnail = v44,
+				userPresenceType = v45,
+				universeId = p5.presence and p5.presence.universeId or nil,
+				lastLocation = if not p5.presence then nil else p5.presence.lastLocation
+			}
+		end)
+	end, { v35 })
+
+	return React.createElement(FriendsLandingPage, {
+		totalFriendCount = v30,
+		friends = if not FFlagConnectionManagementChips then v36 else v36 or {},
+		fetchMoreFriends = if not v33 or v33.isEndOfList then nil else v33.fetchMoreFriends,
+		refreshFriends = v33.refreshFriendsData,
+		enableDisplayNamePolicy = v31,
+		localUserId = v29
+	})
+end
+
+return FriendsLandingContainer

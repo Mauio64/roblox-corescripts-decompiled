@@ -1,38 +1,44 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local function _(v2, v3) --[[ Line: 8 ]] --[[ Name: forwardRefValue ]]
-    if type(v2) == "function" then
-        v2(v3);
-        return;
-    else
-        if type(v2) == "table" then
-            v2.current = v3;
-        end;
-        return;
-    end;
-end;
-return function(v5, v6) --[[ Line: 21 ]] --[[ Name: useComposedRef ]]
-    -- upvalues: v1 (copy)
-    return (v1.useCallback(function(v7) --[[ Line: 22 ]]
-        -- upvalues: v5 (copy), v6 (copy)
-        local l_v5_0 = v5;
-        if type(l_v5_0) == "function" then
-            l_v5_0(v7);
-        elseif type(l_v5_0) == "table" then
-            l_v5_0.current = v7;
-        end;
-        l_v5_0 = v6;
-        if type(l_v5_0) == "function" then
-            l_v5_0(v7);
-            return;
-        else
-            if type(l_v5_0) == "table" then
-                l_v5_0.current = v7;
-            end;
-            return;
-        end;
-    end, {
-        v5, 
-        v6
-    }));
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+
+local function forwardRefValue(p1, p2) -- line: 8
+	if type(p1) == "function" then
+		p1(p2)
+
+		return
+	end
+
+	if type(p1) == "table" then
+		p1.current = p2
+	end
+end
+local function useComposedRef(p3, p4) -- line: 21
+	-- upvalues: React (copy)
+	return (React.useCallback(function(p5) -- line: 22
+		-- upvalues: p3 (copy), p4 (copy)
+		local v10 = p3
+
+		if type(v10) == "function" then
+			v10(p5)
+		elseif type(v10) == "table" then
+			v10.current = p5
+		end
+
+		local v11 = p4
+
+		if type(v11) == "function" then
+			v11(p5)
+
+			return
+		end
+
+		if type(v11) == "table" then
+			v11.current = p5
+		end
+	end, {
+		p3,
+		p4
+	}))
+end
+
+return useComposedRef

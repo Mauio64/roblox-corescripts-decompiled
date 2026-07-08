@@ -1,18 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Http.NetworkingPresence);
-return function() --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    return function(v2) --[[ Line: 6 ]]
-        -- upvalues: v1 (ref)
-        local l_Users_0 = v2:getState().Users;
-        local v4 = {};
-        for v5, _ in pairs(l_Users_0) do
-            if v5 ~= "-1" then
-                table.insert(v4, v5);
-            end;
-        end;
-        v2:dispatch(v1.GetPresencesFromUserIds.API(v4)):catch(function(v7) --[[ Line: 17 ]]
-            warn("NetworkingPresence failure in getAllUserPresences, Status: " .. tostring(v7));
-        end);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local NetworkingPresence = require(AppChat.Http.NetworkingPresence)
+
+return function() -- line: 5
+	-- upvalues: NetworkingPresence (copy)
+	return function(p1) -- line: 6
+		-- upvalues: NetworkingPresence (copy)
+		local Users = p1:getState().Users
+		local t1 = {}
+
+		for k, _ in pairs(Users) do
+			if k ~= "-1" then
+				table.insert(t1, k)
+			end
+		end
+
+		p1:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(t1)):catch(function(p2) -- line: 17
+			warn("NetworkingPresence failure in getAllUserPresences, Status: " .. tostring(p2))
+		end)
+	end
+end

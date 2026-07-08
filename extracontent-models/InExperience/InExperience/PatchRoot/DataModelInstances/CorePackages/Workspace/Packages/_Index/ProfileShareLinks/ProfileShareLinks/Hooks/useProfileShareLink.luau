@@ -1,62 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileShareLinks");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_default_0 = require(l_Parent_0.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.RoactUtils);
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useEffectOnce_0 = v4.Hooks.useEffectOnce;
-local l_SetCurrentToastMessage_0 = require(l_Parent_0.ToastRodux).Actions.SetCurrentToastMessage;
-local _ = require(l_Parent_0.SocialLuaAnalytics);
-local v9 = require(l_script_FirstAncestor_0.Enums.ProfileSharePolicyEnum);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useGetOrGenerateLinkUrl);
-local v11 = require(l_script_FirstAncestor_0.Hooks.useShortUrl);
-local v12 = require(l_script_FirstAncestor_0.Hooks.useProfileSharePolicy);
-local v13 = require(l_script_FirstAncestor_0.Analytics.useAnalytics);
-local v14 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local v15 = require(l_script_FirstAncestor_0.Common.TextKeys);
-return function(v16) --[[ Line: 31 ]]
-    -- upvalues: v13 (copy), l_useDispatch_0 (copy), v12 (copy), v10 (copy), v11 (copy), l_useEffectOnce_0 (copy), v9 (copy), v3 (copy), v14 (copy), l_default_0 (copy), l_SetCurrentToastMessage_0 (copy), v15 (copy)
-    local v17 = v16.enableFetch == nil or v16.enableFetch;
-    local v18 = v13();
-    local v19 = l_useDispatch_0();
-    local v20 = v12();
-    local v21 = v10();
-    local v22 = v11();
-    local v23 = v22 ~= nil;
-    l_useEffectOnce_0(v21, not v23 and v20 ~= v9.Disabled and v17);
-    local v26 = v3.useCallback(function() --[[ Line: 45 ]]
-        -- upvalues: v20 (copy), v9 (ref), v22 (copy), v18 (copy), v14 (ref), v16 (copy), l_default_0 (ref), v19 (copy), l_SetCurrentToastMessage_0 (ref), v15 (ref)
-        if v20 == v9.Disabled or v22 == nil then
-            return;
-        else
-            local v24 = tostring(DateTime.now().UnixTimestampMillis);
-            local v25 = ("%*&source=ProfileShare&stamp=%*"):format(v22, v24);
-            v18.fireAnalyticsEvent(v14.ProfileShareLinkActivated, {
-                context = v16.context, 
-                shareType = v20, 
-                stamp = v24
-            });
-            l_default_0:shareUrl({
-                context = v16.context, 
-                url = v25
-            });
-            if v20 == v9.Copy then
-                v19(l_SetCurrentToastMessage_0({
-                    toastMessage = v15.LinkCopied
-                }));
-            end;
-            return;
-        end;
-    end, {
-        v20, 
-        v22, 
-        v16.context, 
-        v18, 
-        v19
-    });
-    return {
-        hasLoaded = v23, 
-        policy = v20, 
-        onActivated = v26
-    };
-end;
+local ProfileShareLinks = script:FindFirstAncestor("ProfileShareLinks")
+local ProfileShareLinksParent = ProfileShareLinks.Parent
+local default = require(ProfileShareLinksParent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
+local React = require(ProfileShareLinksParent.React)
+local RoactUtils = require(ProfileShareLinksParent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffectOnce = RoactUtils.Hooks.useEffectOnce
+local SetCurrentToastMessage = require(ProfileShareLinksParent.ToastRodux).Actions.SetCurrentToastMessage
+
+require(ProfileShareLinksParent.SocialLuaAnalytics)
+
+local ProfileSharePolicyEnum = require(ProfileShareLinks.Enums.ProfileSharePolicyEnum)
+local useGetOrGenerateLinkUrl = require(ProfileShareLinks.Hooks.useGetOrGenerateLinkUrl)
+local useShortUrl = require(ProfileShareLinks.Hooks.useShortUrl)
+local useProfileSharePolicy = require(ProfileShareLinks.Hooks.useProfileSharePolicy)
+local useAnalytics = require(ProfileShareLinks.Analytics.useAnalytics)
+local EventNames = require(ProfileShareLinks.Analytics.EventNames)
+local TextKeys = require(ProfileShareLinks.Common.TextKeys)
+
+return function(t1: {[any]: any}) -- line: 31
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useProfileSharePolicy (copy), useGetOrGenerateLinkUrl (copy), useShortUrl (copy), useEffectOnce (copy), ProfileSharePolicyEnum (copy), React (copy), EventNames (copy), default (copy), SetCurrentToastMessage (copy), TextKeys (copy)
+	local v17 = t1.enableFetch == nil or t1.enableFetch
+	local v18 = useAnalytics()
+	local v19 = useDispatch()
+	local v20 = useProfileSharePolicy()
+	local v21 = useGetOrGenerateLinkUrl()
+	local v22 = useShortUrl()
+	local v23 = v22 ~= nil
+
+	useEffectOnce(v21, not v23 and (v20 ~= ProfileSharePolicyEnum.Disabled and v17))
+
+	local v24 = React.useCallback(function() -- line: 45
+		-- upvalues: v20 (copy), ProfileSharePolicyEnum (copy), v22 (copy), v18 (copy), EventNames (copy), t1 (copy), default (copy), v19 (copy), SetCurrentToastMessage (copy), TextKeys (copy)
+		if v20 == ProfileSharePolicyEnum.Disabled or v22 == nil then
+			return
+		end
+
+		local str = tostring(DateTime.now().UnixTimestampMillis)
+		local v26 = `{ v22 }&source=ProfileShare&stamp={ str }`
+
+		v18.fireAnalyticsEvent(EventNames.ProfileShareLinkActivated, {
+			context = t1.context,
+			shareType = v20,
+			stamp = str
+		})
+		default:shareUrl({
+			context = t1.context,
+			url = v26
+		})
+
+		if v20 == ProfileSharePolicyEnum.Copy then
+			v19(SetCurrentToastMessage({
+				toastMessage = TextKeys.LinkCopied
+			}))
+		end
+	end, {
+		v20,
+		v22,
+		t1.context,
+		v18,
+		v19
+	})
+
+	return {
+		hasLoaded = v23,
+		policy = v20,
+		onActivated = v24
+	}
+end

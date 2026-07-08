@@ -1,85 +1,92 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Roact);
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local v3 = v1.PureComponent:extend("FitFrameVertical");
-v3.defaultProps = {
-    AnchorPoint = Vector2.new(0, 0), 
-    Position = UDim2.new(0, 0, 0, 0), 
-    width = UDim.new(0, 0), 
-    contentPadding = UDim.new(0, 0), 
-    FillDirection = Enum.FillDirection.Vertical, 
-    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-    VerticalAlignment = Enum.VerticalAlignment.Top, 
-    marginTop = 0, 
-    marginBottom = 0, 
-    marginLeft = 0, 
-    marginRight = 0
-};
-v3.init = function(v4) --[[ Line: 22 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v4.layoutRef = v1.createRef();
-    v4.frameRef = v1.createRef();
-    v4.onResize = function() --[[ Line: 26 ]]
-        -- upvalues: v4 (copy)
-        local l_current_0 = v4.layoutRef.current;
-        local l_current_1 = v4.frameRef.current;
-        if not l_current_1 or not l_current_0 then
-            return;
-        else
-            local l_width_0 = v4.props.width;
-            local l_Y_0 = l_current_0.AbsoluteContentSize.Y;
-            l_current_1.Size = UDim2.new(l_width_0, UDim.new(0, l_Y_0 + v4.props.marginTop + v4.props.marginBottom));
-            return;
-        end;
-    end;
-end;
-v3.render = function(v9) --[[ Line: 41 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), l_Immutable_0 (copy)
-    local l_BackgroundColor3_0 = v9.props.BackgroundColor3;
-    local v11 = v9.props[v1.Children] or {};
-    local l_width_1 = v9.props.width;
-    local l_HorizontalAlignment_0 = v9.props.HorizontalAlignment;
-    local l_BackgroundTransparency_0 = v9.props.BackgroundTransparency;
-    local l_contentPadding_0 = v9.props.contentPadding;
-    local l_LayoutOrder_0 = v9.props.LayoutOrder;
-    local l_FillDirection_0 = v9.props.FillDirection;
-    local l_VerticalAlignment_0 = v9.props.VerticalAlignment;
-    local v19 = 0;
-    if v9.layoutRef.current then
-        v19 = v9.layoutRef.current.AbsoluteContentSize.Y;
-    end;
-    return v1.createElement("Frame", {
-        AnchorPoint = v9.props.AnchorPoint, 
-        Position = v9.props.Position, 
-        BackgroundColor3 = l_BackgroundColor3_0, 
-        BackgroundTransparency = l_BackgroundTransparency_0, 
-        Size = UDim2.new(l_width_1.Scale, l_width_1.Offset, 0, v19), 
-        LayoutOrder = l_LayoutOrder_0, 
-        [v1.Ref] = v9.frameRef, 
-        Visible = v9.props.Visible, 
-        BorderSizePixel = 0
-    }, l_Immutable_0.JoinDictionaries(v11, {
-        layout = v1.createElement("UIListLayout", {
-            Padding = l_contentPadding_0, 
-            FillDirection = l_FillDirection_0, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = l_HorizontalAlignment_0, 
-            VerticalAlignment = l_VerticalAlignment_0, 
-            [v1.Ref] = v9.layoutRef, 
-            [v1.Change.AbsoluteContentSize] = v9.onResize
-        }), 
-        padding = v1.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v9.props.marginLeft), 
-            PaddingRight = UDim.new(0, v9.props.marginRight), 
-            PaddingTop = UDim.new(0, v9.props.marginTop), 
-            PaddingBottom = UDim.new(0, v9.props.marginBottom)
-        })
-    }));
-end;
-v3.didMount = function(v20) --[[ Line: 90 ]] --[[ Name: didMount ]]
-    v20.onResize();
-end;
-v3.didUpdate = function(v21) --[[ Line: 94 ]] --[[ Name: didUpdate ]]
-    v21.onResize();
-end;
-return v3;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Roact = require(Parent.Roact)
+local Immutable = require(Parent.AppCommonLib).Immutable
+local v4 = Roact.PureComponent:extend("FitFrameVertical")
+
+v4.defaultProps = {
+	marginTop = 0,
+	marginBottom = 0,
+	marginLeft = 0,
+	marginRight = 0,
+	AnchorPoint = Vector2.new(0, 0),
+	Position = UDim2.new(0, 0, 0, 0),
+	width = UDim.new(0, 0),
+	contentPadding = UDim.new(0, 0),
+	FillDirection = Enum.FillDirection.Vertical,
+	HorizontalAlignment = Enum.HorizontalAlignment.Left,
+	VerticalAlignment = Enum.VerticalAlignment.Top
+}
+
+function v4.init(p1) -- line: 22
+	-- upvalues: Roact (copy)
+	p1.layoutRef = Roact.createRef()
+	p1.frameRef = Roact.createRef()
+
+	function p1.onResize() -- line: 26
+		-- upvalues: p1 (copy)
+		local current = p1.layoutRef.current
+		local current2 = p1.frameRef.current
+
+		if not current2 or not current then
+			return
+		end
+
+		local width = p1.props.width
+		local AbsoluteContentSizeY = current.AbsoluteContentSize.Y
+
+		current2.Size = UDim2.new(width, UDim.new(0, AbsoluteContentSizeY + p1.props.marginTop + p1.props.marginBottom))
+	end
+end
+function v4.render(p2) -- line: 41
+	-- upvalues: Roact (copy), Immutable (copy)
+	local propsBackgroundColor3 = p2.props.BackgroundColor3
+	local v8 = p2.props[Roact.Children] or {}
+	local width = p2.props.width
+	local HorizontalAlignment = p2.props.HorizontalAlignment
+	local propsBackgroundTransparency = p2.props.BackgroundTransparency
+	local contentPadding = p2.props.contentPadding
+	local propsLayoutOrder = p2.props.LayoutOrder
+	local FillDirection = p2.props.FillDirection
+	local VerticalAlignment = p2.props.VerticalAlignment
+	local n1 = 0
+
+	if p2.layoutRef.current then
+		n1 = p2.layoutRef.current.AbsoluteContentSize.Y
+	end
+
+	return Roact.createElement("Frame", {
+		AnchorPoint = p2.props.AnchorPoint,
+		Position = p2.props.Position,
+		BackgroundColor3 = propsBackgroundColor3,
+		BackgroundTransparency = propsBackgroundTransparency,
+		Size = UDim2.new(width.Scale, width.Offset, 0, n1),
+		LayoutOrder = propsLayoutOrder,
+		[Roact.Ref] = p2.frameRef,
+		Visible = p2.props.Visible,
+		BorderSizePixel = 0
+	}, Immutable.JoinDictionaries(v8, {
+		layout = Roact.createElement("UIListLayout", {
+			Padding = contentPadding,
+			FillDirection = FillDirection,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = HorizontalAlignment,
+			VerticalAlignment = VerticalAlignment,
+			[Roact.Ref] = p2.layoutRef,
+			[Roact.Change.AbsoluteContentSize] = p2.onResize
+		}),
+		padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, p2.props.marginLeft),
+			PaddingRight = UDim.new(0, p2.props.marginRight),
+			PaddingTop = UDim.new(0, p2.props.marginTop),
+			PaddingBottom = UDim.new(0, p2.props.marginBottom)
+		})
+	}))
+end
+function v4.didMount(p3) -- line: 90
+	p3.onResize()
+end
+function v4.didUpdate(p4) -- line: 94
+	p4.onResize()
+end
+
+return v4

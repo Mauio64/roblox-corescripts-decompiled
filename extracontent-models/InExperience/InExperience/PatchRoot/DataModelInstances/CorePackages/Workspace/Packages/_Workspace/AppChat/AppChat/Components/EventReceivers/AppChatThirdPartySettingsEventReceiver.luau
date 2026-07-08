@@ -1,22 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useProperty_0 = require(l_Parent_0.GuiObjectUtils).useProperty;
-local v5 = require(l_script_FirstAncestor_0.Actions.ThirdPartyChatSettingsLoaded);
-local l_ThirdPartyUserService_0 = game:GetService("ThirdPartyUserService");
-return function() --[[ Line: 9 ]] --[[ Name: AppChatThirdPartySettingsEventReceiver ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useProperty_0 (copy), l_ThirdPartyUserService_0 (copy), v2 (copy), v5 (copy)
-    local v7 = l_useDispatch_0();
-    local v8 = l_useProperty_0(l_ThirdPartyUserService_0, "FriendCommunicationRestrictionStatus");
-    v2.useEffect(function() --[[ Line: 12 ]]
-        -- upvalues: v7 (copy), v8 (copy), v5 (ref)
-        if v7 and v8 then
-            v7(v5(v8));
-        end;
-    end, {
-        v7, 
-        v8
-    });
-    return nil;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Responsive = require(AppChatParent.Responsive)
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useProperty = require(AppChatParent.GuiObjectUtils).useProperty
+local ThirdPartyChatSettingsLoaded = require(AppChat.Actions.ThirdPartyChatSettingsLoaded)
+local FFlagAppChatIgnoreUnknownThirdPartyChatStatus = require(AppChat.Flags.FFlagAppChatIgnoreUnknownThirdPartyChatStatus)
+local ThirdPartyUserService = game:GetService("ThirdPartyUserService")
+
+local function AppChatThirdPartySettingsEventReceiver() -- line: 12
+	-- upvalues: useDispatch (copy), useProperty (copy), ThirdPartyUserService (copy), FFlagAppChatIgnoreUnknownThirdPartyChatStatus (copy), Responsive (copy), React (copy), ThirdPartyChatSettingsLoaded (copy)
+	local v11 = useDispatch()
+	local v12 = useProperty(ThirdPartyUserService, "FriendCommunicationRestrictionStatus")
+	local v13 = if not FFlagAppChatIgnoreUnknownThirdPartyChatStatus then nil else Responsive.usePreferredInput()
+
+	React.useEffect(function() -- line: 16
+		-- upvalues: v11 (copy), v12 (copy), FFlagAppChatIgnoreUnknownThirdPartyChatStatus (copy), v13 (copy), Responsive (copy), ThirdPartyChatSettingsLoaded (copy)
+		if v11 and v12 then
+			local v14 = v12
+
+			if FFlagAppChatIgnoreUnknownThirdPartyChatStatus and v13 ~= Responsive.Input.Directional and v12 == Enum.ChatRestrictionStatus.Unknown then
+				v14 = Enum.ChatRestrictionStatus.NotRestricted
+			end
+
+			v11(ThirdPartyChatSettingsLoaded(v14))
+		end
+	end, {
+		v11,
+		v12,
+		v13
+	})
+
+	return nil
+end
+
+return AppChatThirdPartySettingsEventReceiver

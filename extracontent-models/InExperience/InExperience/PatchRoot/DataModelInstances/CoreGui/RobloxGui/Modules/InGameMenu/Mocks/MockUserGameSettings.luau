@@ -1,26 +1,31 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function() --[[ Line: 8 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local l_BindableEvent_0 = Instance.new("BindableEvent");
-    local v4 = {
-        FullscreenChanged = {
-            Connect = function(_, v3) --[[ Line: 13 ]] --[[ Name: Connect ]]
-                -- upvalues: l_BindableEvent_0 (copy)
-                return l_BindableEvent_0.Event:Connect(v3);
-            end, 
-            GoFullscreen = function() --[[ Line: 16 ]] --[[ Name: GoFullscreen ]]
-                -- upvalues: l_BindableEvent_0 (copy)
-                l_BindableEvent_0:Fire(true);
-            end
-        }
-    };
-    setmetatable(v4, {
-        __index = v0
-    });
-    return v4;
-end;
-v0.InFullScreen = function(_) --[[ Line: 28 ]] --[[ Name: InFullScreen ]]
-    return false;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 8
+	-- upvalues: t1 (copy)
+	local BindableEvent = Instance.new("BindableEvent")
+	local t2 = {
+		FullscreenChanged = {
+			Connect = function(_, p2) -- line: 13
+				-- upvalues: BindableEvent (copy)
+				return BindableEvent.Event:Connect(p2)
+			end,
+			GoFullscreen = function() -- line: 16
+				-- upvalues: BindableEvent (copy)
+				BindableEvent:Fire(true)
+			end
+		}
+	}
+
+	setmetatable(t2, {
+		__index = t1
+	})
+
+	return t2
+end
+function t1.InFullScreen(_) -- line: 28
+	return false
+end
+
+return t1

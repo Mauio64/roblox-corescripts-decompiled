@@ -1,1 +1,1 @@
-return game:DefineFastString("SocialOnboardingExperimentLayer", "Social.Friends");
+return game:DefineFastString("SocialOnboardingExperimentLayer", "Social.Friends")

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PrefillPreciseSelectionChoices", false);
+return game:DefineFastFlag("PrefillPreciseSelectionChoices", false)

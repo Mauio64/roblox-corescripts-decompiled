@@ -1,75 +1,84 @@
-local l_AssetService_0 = game:GetService("AssetService");
-local l_Parent_0 = script:FindFirstAncestor("QRCodeDisplay").Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Dash);
-local v4 = require(script.Parent.drawImage);
-local v5 = {
-    backgroundColor3 = Color3.fromRGB(255, 255, 255), 
-    backgroundTransparency = 0, 
-    pixelColor3 = Color3.fromRGB(0, 0, 0), 
-    pixelTransparency = 0, 
-    sideLength = 200
-};
-local function _(v6, v7) --[[ Line: 36 ]] --[[ Name: getQrCodeImageSize ]]
-    if not v7 then
-        return v6;
-    else
-        assert(type(v7) == "number", "rotation must be a number");
-        if v7 % 90 == 0 then
-            return v6;
-        else
-            local v8 = math.rad(v7);
-            return (math.round(v6 / (math.sin(v8) + math.cos(v8))));
-        end;
-    end;
-end;
-return function(v10) --[[ Line: 51 ]]
-    -- upvalues: v3 (copy), v5 (copy), v2 (copy), l_AssetService_0 (copy), v4 (copy)
-    local v11 = v3.join(v5, v10);
-    local v12, v13 = v2.useState(nil);
-    local v14 = v2.createRef();
-    local l_sideLength_0 = v11.sideLength;
-    local l_qrCodeRotation_0 = v11.qrCodeRotation;
-    local v17;
-    if not l_qrCodeRotation_0 then
-        v17 = l_sideLength_0;
-    else
-        assert(type(l_qrCodeRotation_0) == "number", "rotation must be a number");
-        if l_qrCodeRotation_0 % 90 == 0 then
-            v17 = l_sideLength_0;
-        else
-            local v18 = math.rad(l_qrCodeRotation_0);
-            v17 = math.round(l_sideLength_0 / (math.sin(v18) + math.cos(v18)));
-        end;
-    end;
-    v2.useEffect(function() --[[ Line: 58 ]]
-        -- upvalues: v14 (copy), v17 (copy), l_AssetService_0 (ref), v13 (copy), v4 (ref), v11 (copy)
-        if not v14.current or v14.current.Size.X ~= v17 then
-            v14.current = l_AssetService_0:CreateEditableImage({
-                Size = Vector2.new(v17, v17)
-            });
-            v13(Content.fromObject(v14.current));
-        end;
-        v4(v14.current, v17, v11.qrCodeMatrix, v11.pixelColor3, v11.pixelTransparency);
-    end, {
-        v17, 
-        v11.qrCodeMatrix, 
-        v11.pixelColor3, 
-        v11.pixelTransparency
-    });
-    return v2.createElement("Frame", {
-        BackgroundColor3 = v11.backgroundColor3, 
-        BackgroundTransparency = v11.backgroundTransparency, 
-        BorderSizePixel = 0, 
-        Size = UDim2.fromOffset(v11.sideLength, v11.sideLength)
-    }, {
-        ImageLabel = v2.createElement("ImageLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ImageContent = v12, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Rotation = v11.qrCodeRotation, 
-            Size = UDim2.fromOffset(v17, v17)
-        })
-    });
-end;
+local AssetService = game:GetService("AssetService")
+local Parent = script:FindFirstAncestor("QRCodeDisplay").Parent
+local React = require(Parent.React)
+local Dash = require(Parent.Dash)
+local drawImage = require(script.Parent.drawImage)
+local t1 = {
+	backgroundTransparency = 0,
+	pixelTransparency = 0,
+	sideLength = 200,
+	backgroundColor3 = Color3.fromRGB(255, 255, 255),
+	pixelColor3 = Color3.fromRGB(0, 0, 0)
+}
+
+local function getQrCodeImageSize(n1: number, n2: number?) -- line: 36
+	if not n2 then
+		return n1
+	end
+
+	assert(type(n2) == "number", "rotation must be a number")
+
+	if n2 % 90 == 0 then
+		return n1
+	end
+
+	local v10 = math.rad(n2)
+
+	return (math.round(n1 / (math.sin(v10) + math.cos(v10))))
+end
+
+return function(t2: {[any]: any}) -- line: 51
+	-- upvalues: Dash (copy), t1 (copy), React (copy), AssetService (copy), drawImage (copy)
+	local v12 = Dash.join(t1, t2)
+	local v13, v14 = React.useState(nil)
+	local v15 = React.createRef()
+	local sideLength = v12.sideLength
+	local qrCodeRotation = v12.qrCodeRotation
+
+	if not qrCodeRotation then
+	else
+		assert(type(qrCodeRotation) == "number", "rotation must be a number")
+
+		if qrCodeRotation % 90 == 0 then
+		else
+			local v18 = math.rad(qrCodeRotation)
+
+			sideLength = math.round(sideLength / (math.sin(v18) + math.cos(v18)))
+		end
+	end
+
+	local v19 = sideLength
+
+	React.useEffect(function() -- line: 58
+		-- upvalues: v15 (copy), v19 (copy), AssetService (copy), v14 (copy), drawImage (copy), v12 (copy)
+		if not v15.current or v15.current.Size.X ~= v19 then
+			v15.current = AssetService:CreateEditableImage({
+				Size = Vector2.new(v19, v19)
+			})
+			v14(Content.fromObject(v15.current))
+		end
+
+		drawImage(v15.current, v19, v12.qrCodeMatrix, v12.pixelColor3, v12.pixelTransparency)
+	end, {
+		v19,
+		v12.qrCodeMatrix,
+		v12.pixelColor3,
+		v12.pixelTransparency
+	})
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = v12.backgroundColor3,
+		BackgroundTransparency = v12.backgroundTransparency,
+		Size = UDim2.fromOffset(v12.sideLength, v12.sideLength)
+	}, {
+		ImageLabel = React.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ImageContent = v13,
+			Position = UDim2.fromScale(0.5, 0.5),
+			Rotation = v12.qrCodeRotation,
+			Size = UDim2.fromOffset(v19, v19)
+		})
+	})
+end

@@ -1,8 +1,10 @@
-local v0 = require(script.Parent.Parent.Action);
-local _ = require(script.Parent.Parent.Components.LuauHeap.LuauHeapTypes);
-return v0(script.Name, function(v2, v3) --[[ Line: 8 ]]
-    return {
-        isClientState = v2, 
-        sessionState = v3
-    };
-end);
+local Action = require(script.Parent.Parent.Action)
+
+require(script.Parent.Parent.Components.LuauHeap.LuauHeapTypes)
+
+return Action(script.Name, function(b1: boolean, p1) -- line: 8
+	return {
+		isClientState = b1,
+		sessionState = p1
+	}
+end)

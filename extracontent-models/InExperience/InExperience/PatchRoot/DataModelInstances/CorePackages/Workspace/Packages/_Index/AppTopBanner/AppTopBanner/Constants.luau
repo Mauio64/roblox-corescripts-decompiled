@@ -1,3 +1,3 @@
 return {
-    CONTENT_HEIGHT = 48
-};
+	CONTENT_HEIGHT = 48
+}

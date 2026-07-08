@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateSlotsSignals", false);
+return game:DefineFastFlag("AXMigrateSlotsSignals", false)

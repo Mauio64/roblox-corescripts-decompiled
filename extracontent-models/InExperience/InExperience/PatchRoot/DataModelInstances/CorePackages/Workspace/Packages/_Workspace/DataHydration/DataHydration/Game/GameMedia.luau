@@ -1,5 +1,6 @@
-local _ = require(script.GameMediaStoreTypes);
+require(script.GameMediaStoreTypes)
+
 return {
-    createGameMediaStore = require(script.createGameMediaStore), 
-    getGameMediaStore = require(script.getGameMediaStore)
-};
+	createGameMediaStore = require(script.createGameMediaStore),
+	getGameMediaStore = require(script.getGameMediaStore)
+}

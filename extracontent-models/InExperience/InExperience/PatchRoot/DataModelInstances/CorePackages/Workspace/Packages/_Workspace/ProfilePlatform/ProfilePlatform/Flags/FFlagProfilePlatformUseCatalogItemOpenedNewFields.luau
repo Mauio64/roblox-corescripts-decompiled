@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformUseCatalogItemOpenedNewFields", false);
+return game:DefineFastFlag("ProfilePlatformUseCatalogItemOpenedNewFields", false)

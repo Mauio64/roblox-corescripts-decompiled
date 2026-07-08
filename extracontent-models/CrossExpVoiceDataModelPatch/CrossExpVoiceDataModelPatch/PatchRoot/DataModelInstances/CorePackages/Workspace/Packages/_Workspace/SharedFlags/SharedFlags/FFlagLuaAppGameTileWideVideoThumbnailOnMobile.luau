@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppGameTileWideVideoThumbnailOnMobile", false);
+return game:DefineFastFlag("LuaAppGameTileWideVideoThumbnailOnMobile", false)

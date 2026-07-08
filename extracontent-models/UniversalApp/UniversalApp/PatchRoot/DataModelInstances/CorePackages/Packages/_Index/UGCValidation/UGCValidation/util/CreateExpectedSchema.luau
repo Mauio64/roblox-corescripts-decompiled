@@ -1,116 +1,213 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.Constants);
-local v3 = require(l_Parent_0.util.createIndividualBodyPartSchema);
-local v4 = require(l_Parent_0.util.createLayeredClothingSchema);
-local v5 = require(l_Parent_0.util.createEyebrowEyelashSchema);
-local v6 = require(l_Parent_0.util.createMeshPartAccessorySchema);
-local v7 = require(l_Parent_0.util.createMakeupSchema);
-local v8 = require(l_Parent_0.util.createDynamicHeadMeshPartSchema);
-local v9 = require(l_Parent_0.util.createAccessorySchema);
-local v10 = require(l_Parent_0.util.createEmoteSchema);
-local v11 = require(l_Parent_0.util.getUploadCategory);
-local v12 = require(l_Parent_0.flags.getFFlagUGCValidateMakeupAssetTypeNewPipeline);
-local v13 = require(l_Parent_0.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema);
-local v14 = {};
-local _ = function(v15) --[[ Line: 21 ]] --[[ Name: getRootInstance ]]
-    -- upvalues: v2 (copy)
-    for _, v17 in v15 do
-        if v17.Name == v2.FOLDER_NAMES.R15ArtistIntent then
-            return v17;
-        end;
-    end;
-    return v15[1];
-end;
-v14.generateBundleSchema = function(v19) --[[ Line: 32 ]] --[[ Name: generateBundleSchema ]]
-    -- upvalues: v2 (copy), v11 (copy), v14 (copy)
-    local v20 = false;
-    local v21 = {
-        ClassName = "Folder", 
-        _children = {}
-    };
-    for _, v23 in v19 do
-        local l_allSelectedInstances_0 = v23.allSelectedInstances;
-        local v25;
-        for _, v27 in l_allSelectedInstances_0 do
-            if v27.Name == v2.FOLDER_NAMES.R15ArtistIntent then
-                v25 = v27;
-                v20 = true;
-            end;
-            if v20 then
-                break;
-            end;
-        end;
-        if not v20 then
-            v25 = l_allSelectedInstances_0[1];
-        end;
-        v20 = false;
-        l_allSelectedInstances_0 = v11(v25, v23.assetTypeEnum, nil);
-        local v28 = v14.generateAssetSchema(l_allSelectedInstances_0, v23.assetTypeEnum, v25);
-        if v28.ClassName == "Folder" then
-            for _, v30 in v28._children do
-                table.insert(v21._children, v30);
-            end;
-        else
-            table.insert(v21._children, v28);
-        end;
-    end;
-    return v21;
-end;
-local function v36(v31) --[[ Line: 58 ]] --[[ Name: createBodyPartSchema ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v32 = v2.ASSET_TYPE_INFO[v31];
-    local v33 = {
-        ClassName = "Folder", 
-        _children = {}
-    };
-    for v34 in pairs(v32.subParts) do
-        local v35 = v3(v31, v34);
-        table.insert(v33._children, v35);
-    end;
-    return v33;
-end;
-local v50 = {
-    EMOTE_ANIMATION = function(_, _) --[[ Line: 74 ]] --[[ Name: EMOTE_ANIMATION ]]
-        -- upvalues: v10 (copy)
-        return v10();
-    end, 
-    DYNAMIC_HEAD = function(_, _) --[[ Line: 77 ]] --[[ Name: DYNAMIC_HEAD ]]
-        -- upvalues: v8 (copy)
-        return v8();
-    end, 
-    TORSO_AND_LIMBS = function(v41, _) --[[ Line: 80 ]] --[[ Name: TORSO_AND_LIMBS ]]
-        -- upvalues: v36 (copy)
-        return (v36(v41));
-    end, 
-    LAYERED_CLOTHING = function(v43, _) --[[ Line: 83 ]] --[[ Name: LAYERED_CLOTHING ]]
-        -- upvalues: v13 (copy), v5 (copy), v2 (copy), v4 (copy)
-        if v13() then
-            if v43 == Enum.AssetType.EyebrowAccessory or v43 == Enum.AssetType.EyelashAccessory then
-                return v5(v2.ASSET_TYPE_INFO[v43].attachmentNames);
-            else
-                return v4(v2.ASSET_TYPE_INFO[v43].attachmentNames);
-            end;
-        else
-            return v4(v2.ASSET_TYPE_INFO[v43].attachmentNames);
-        end;
-    end, 
-    RIGID_ACCESSORY = function(v45, v46) --[[ Line: 94 ]] --[[ Name: RIGID_ACCESSORY ]]
-        -- upvalues: v2 (copy), v6 (copy), v9 (copy)
-        local v47 = v2.ASSET_TYPE_INFO[v45];
-        if v46:FindFirstChildOfClass("MeshPart") then
-            return v6(v47.attachmentNames);
-        else
-            return v9(v47.attachmentNames);
-        end;
-    end, 
-    MAKEUP = v12() and function(_, _) --[[ Line: 104 ]]
-        -- upvalues: v7 (copy)
-        return v7();
-    end or nil
-};
-v14.generateAssetSchema = function(v51, v52, v53) --[[ Line: 109 ]] --[[ Name: generateAssetSchema ]]
-    -- upvalues: v50 (copy)
-    return v50[v51](v52, v53);
-end;
-return v14;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local Constants = require(ParentParent.Constants)
+local createIndividualBodyPartSchema = require(ParentParent.util.createIndividualBodyPartSchema)
+local createLayeredClothingSchema = require(ParentParent.util.createLayeredClothingSchema)
+local createEyebrowEyelashSchema = require(ParentParent.util.createEyebrowEyelashSchema)
+local createMeshPartAccessorySchema = require(ParentParent.util.createMeshPartAccessorySchema)
+local createMakeupSchema = require(ParentParent.util.createMakeupSchema)
+local createDynamicHeadMeshPartSchema = require(ParentParent.util.createDynamicHeadMeshPartSchema)
+local createAccessorySchema = require(ParentParent.util.createAccessorySchema)
+local createEmoteSchema = require(ParentParent.util.createEmoteSchema)
+local createAnimationSchema = require(ParentParent.util.createAnimationSchema)
+local getUploadCategory = require(ParentParent.util.getUploadCategory)
+local getFFlagUGCValidateEyebrowEyelashThumbnailSchema = require(ParentParent.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema)
+local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
+local getFFlagUGCValidationAnimationPackFolderStructure = require(ParentParent.flags.getFFlagUGCValidationAnimationPackFolderStructure)
+local t1 = {}
+
+local function getRootInstance(t2: {[any]: any}) -- line: 24
+	-- upvalues: Constants (copy)
+	for _, v23 in t2 do
+		if v23.Name == Constants.FOLDER_NAMES.R15ArtistIntent then
+			return v23
+		end
+	end
+
+	return t2[1]
+end
+
+function t1.generateBundleSchema(p1) -- line: 35
+	-- upvalues: Constants (copy), getUploadCategory (copy), t1 (copy)
+	local t3 = {
+		ClassName = "Folder",
+		_children = {}
+	}
+	local g32 = nil
+	local v31 = nil
+
+	for _, v27 in p1 do
+		local allSelectedInstances = v27.allSelectedInstances
+
+		for _, v30 in allSelectedInstances do
+			if v30.Name == Constants.FOLDER_NAMES.R15ArtistIntent then
+				v31 = v30
+				g32 = true
+			end
+
+			if g32 then
+				break
+			end
+		end
+
+		if not g32 then
+			v31 = allSelectedInstances[1]
+		end
+
+		g32 = false
+
+		local v33 = getUploadCategory(v31, v27.assetTypeEnum, nil)
+		local v34 = t1.generateAssetSchema(v33, v27.assetTypeEnum, v31)
+
+		if v34.ClassName == "Folder" then
+			for _, v36 in v34._children do
+				table.insert(t3._children, v36)
+			end
+		else
+			table.insert(t3._children, v34)
+		end
+	end
+
+	return t3
+end
+
+local function createBodyPartSchema(p2) -- line: 61
+	-- upvalues: Constants (copy), createIndividualBodyPartSchema (copy)
+	local v38 = Constants.ASSET_TYPE_INFO[p2]
+	local t4 = {
+		ClassName = "Folder",
+		_children = {}
+	}
+
+	for k in pairs(v38.subParts) do
+		local v41 = createIndividualBodyPartSchema(p2, k)
+
+		table.insert(t4._children, v41)
+	end
+
+	return t4
+end
+
+local t5 = {
+	EMOTE_ANIMATION = function(_, _) -- line: 77
+		-- upvalues: createEmoteSchema (copy)
+		return createEmoteSchema()
+	end,
+	DYNAMIC_HEAD = function(_, _) -- line: 80
+		-- upvalues: createDynamicHeadMeshPartSchema (copy)
+		return createDynamicHeadMeshPartSchema()
+	end,
+	TORSO_AND_LIMBS = function(p7, _) -- line: 83
+		-- upvalues: createBodyPartSchema (copy)
+		return (createBodyPartSchema(p7))
+	end,
+	LAYERED_CLOTHING = function(p9, _) -- line: 86
+		-- upvalues: getFFlagUGCValidateEyebrowEyelashThumbnailSchema (copy), createEyebrowEyelashSchema (copy), Constants (copy), createLayeredClothingSchema (copy)
+		if getFFlagUGCValidateEyebrowEyelashThumbnailSchema() then
+			if p9 == Enum.AssetType.EyebrowAccessory or p9 == Enum.AssetType.EyelashAccessory then
+				return createEyebrowEyelashSchema(Constants.ASSET_TYPE_INFO[p9].attachmentNames)
+			end
+
+			return createLayeredClothingSchema(Constants.ASSET_TYPE_INFO[p9].attachmentNames)
+		end
+
+		return createLayeredClothingSchema(Constants.ASSET_TYPE_INFO[p9].attachmentNames)
+	end,
+	RIGID_ACCESSORY = function(p11, p12) -- line: 97
+		-- upvalues: Constants (copy), createMeshPartAccessorySchema (copy), createAccessorySchema (copy)
+		local v52 = Constants.ASSET_TYPE_INFO[p11]
+
+		if p12:FindFirstChildOfClass("MeshPart") then
+			return createMeshPartAccessorySchema(v52.attachmentNames)
+		end
+
+		return createAccessorySchema(v52.attachmentNames)
+	end,
+	MAKEUP = function(_, _) -- line: 106
+		-- upvalues: createMakeupSchema (copy)
+		return createMakeupSchema()
+	end
+}
+
+if getFFlagUGCValidationAnimationPackSupport() then
+	function t5.ANIMATION(p15, p16) -- line: 112
+		-- upvalues: createAnimationSchema (copy)
+		return createAnimationSchema(p15, p16)
+	end
+end
+
+function t1.generateAssetSchema(s1: string, p17, p18) -- line: 117
+	-- upvalues: t5 (copy)
+	return t5[s1](p17, p18)
+end
+
+local function hasTopLevelR15Anim(p19) -- line: 125
+	if not p19 then
+		return false
+	end
+
+	for _, child in p19:GetChildren() do
+		if child.Name == "R15Anim" then
+			return true
+		end
+	end
+
+	return false
+end
+
+function t1.generateAnimationPackBundleSchema(p20) -- line: 138
+	-- upvalues: getFFlagUGCValidationAnimationPackFolderStructure (copy), Constants (copy)
+	local t6 = {
+		ClassName = "Model",
+		_children = {}
+	}
+	local v65 = getFFlagUGCValidationAnimationPackFolderStructure()
+	local g68
+
+	if v65 then
+		if not p20 then
+			v65 = false
+		else
+			g68 = nil
+
+			for _, child in p20:GetChildren() do
+				if child.Name == "R15Anim" then
+					v65 = true
+					g68 = true
+				end
+
+				if g68 then
+					break
+				end
+			end
+
+			if not g68 then
+				v65 = false
+			end
+		end
+	end
+
+	g68 = false
+
+	for _, v70 in Constants.ANIMATION_ASSET_INFO do
+		if v65 then
+			table.insert(t6._children, {
+				ClassName = "Folder",
+				Name = "R15Anim",
+				_ignoreDescendants = true
+			})
+		else
+			table.insert(t6._children, {
+				ClassName = "Model",
+				_ignoreDescendants = true,
+				Name = v70.modelName
+			})
+		end
+	end
+
+	return t6
+end
+
+return t1

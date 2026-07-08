@@ -1,31 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local l_React_0 = require(l_script_FirstAncestor_0.dependencies).React;
-local l_default_0 = require(l_script_FirstAncestor_0.CrossExperienceVoiceManager).default;
-local v3 = l_default_0:getAudioFocusService();
-return function() --[[ Line: 8 ]]
-    -- upvalues: l_React_0 (copy), v3 (copy), l_default_0 (copy)
-    local v4, v5 = l_React_0.useState(-1);
-    if v3 then
-        l_React_0.useEffect(function() --[[ Line: 12 ]]
-            -- upvalues: v5 (copy), l_default_0 (ref), v3 (ref)
-            v5(l_default_0:getCurrentAudioContext());
-            v3.OnContextRegistered:Connect(function() --[[ Line: 15 ]]
-                -- upvalues: v5 (ref), l_default_0 (ref)
-                v5(l_default_0:getCurrentAudioContext());
-            end);
-            v3.OnContextUnregistered:Connect(function() --[[ Line: 19 ]]
-                -- upvalues: v5 (ref), l_default_0 (ref)
-                v5(l_default_0:getCurrentAudioContext());
-            end);
-            v3.OnDeafenVoiceAudio:Connect(function(_) --[[ Line: 23 ]]
-                -- upvalues: v5 (ref), l_default_0 (ref)
-                v5(l_default_0:getCurrentAudioContext());
-            end);
-            v3.OnUndeafenVoiceAudio:Connect(function(_) --[[ Line: 27 ]]
-                -- upvalues: v5 (ref), l_default_0 (ref)
-                v5(l_default_0:getCurrentAudioContext());
-            end);
-        end, {});
-    end;
-    return v4;
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local React = require(CrossExperienceVoice.dependencies).React
+local default = require(CrossExperienceVoice.CrossExperienceVoiceManager).default
+local v4 = default:getAudioFocusService()
+
+return function() -- line: 8
+	-- upvalues: React (copy), v4 (copy), default (copy)
+	local v5, v6 = React.useState(-1)
+
+	if v4 then
+		React.useEffect(function() -- line: 12
+			-- upvalues: v6 (copy), default (copy), v4 (copy)
+			v6(default:getCurrentAudioContext())
+			v4.OnContextRegistered:Connect(function() -- line: 15
+				-- upvalues: v6 (copy), default (copy)
+				v6(default:getCurrentAudioContext())
+			end)
+			v4.OnContextUnregistered:Connect(function() -- line: 19
+				-- upvalues: v6 (copy), default (copy)
+				v6(default:getCurrentAudioContext())
+			end)
+			v4.OnDeafenVoiceAudio:Connect(function(_) -- line: 23
+				-- upvalues: v6 (copy), default (copy)
+				v6(default:getCurrentAudioContext())
+			end)
+			v4.OnUndeafenVoiceAudio:Connect(function(_) -- line: 27
+				-- upvalues: v6 (copy), default (copy)
+				v6(default:getCurrentAudioContext())
+			end)
+		end, {})
+	end
+
+	return v5
+end

@@ -1,126 +1,160 @@
-local _ = require(script.Parent.ChallengeHeaders);
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericChallenges");
-local v2 = require(l_script_FirstAncestor_0.Utils.constants);
-local v3 = require(l_script_FirstAncestor_0.Types.ChallengeType);
-local _ = require(l_script_FirstAncestor_0.Types.ChallengeParameters);
-local v5 = require(l_script_FirstAncestor_0.Types.TwoStepVerificationActionType);
-local v6 = require(l_script_FirstAncestor_0.Types.CaptchaActionType);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Base64_0 = require(l_Parent_0.AuthCommon).Utils.Base64;
-local l_NotificationService_0 = game:GetService("NotificationService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_UrlBase_0 = require(l_Parent_0.UrlBuilder).UrlBase;
-local v13 = require(l_Parent_0.Cryo);
-local function _() --[[ Line: 23 ]] --[[ Name: getUserDarkModeSettingQueryParam ]]
-    -- upvalues: l_NotificationService_0 (copy)
-    if string.lower(l_NotificationService_0.SelectedTheme) == "dark" then
-        return "true";
-    else
-        return "false";
-    end;
-end;
-local function v17() --[[ Line: 30 ]] --[[ Name: getUserAppTypeQueryParam ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    local v16 = "unknown";
-    if l_l_UserInputService_0_Platform_0 == Enum.Platform.Android then
-        return "android";
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.IOS then
-        return "ios";
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.Windows then
-        return "windows";
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.OSX then
-        return "osx";
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.UWP then
-        return "uwp";
-    else
-        if l_l_UserInputService_0_Platform_0 == Enum.Platform.XBoxOne then
-            v16 = "xbox";
-        end;
-        return v16;
-    end;
-end;
-local function v21(v18, v19) --[[ Line: 49 ]] --[[ Name: getChallengeTypeQueryParameters ]]
-    -- upvalues: v3 (copy), v6 (copy), v5 (copy)
-    if v18 == v3.Captcha then
-        assert(v19.actionType ~= nil, "actionType must be provided to render captcha");
-        assert(v19.dataExchangeBlob ~= nil, "dataExchangeBlob must be provided to render captcha");
-        assert(v19.captchaId ~= nil, "captchaId must be provided to render captcha");
-        return {
-            ["action-type"] = v6.toRawValue(v19.actionType), 
-            ["data-exchange-blob"] = v19.dataExchangeBlob, 
-            ["captcha-id"] = v19.captchaId
-        };
-    elseif v18 == v3.TwoStepVerification then
-        assert(v19.challengeId ~= nil, "challengeId must be provided to render 2sv");
-        assert(v19.userId ~= nil, "userId must be provided to render 2sv");
-        assert(v19.actionType ~= nil, "actionType must be provided to render 2sv");
-        assert(v19.allowRememberDevice ~= nil, "allowRememberDevice must be provided to render 2sv");
-        local v20 = {
-            ["challenge-id"] = v19.challengeId, 
-            ["user-id"] = v19.userId, 
-            ["action-type"] = v5.toRawValue(v19.actionType), 
-            ["allow-remember-device"] = v19.allowRememberDevice and "true" or "false", 
-            ["client-supports-2sv-recovery"] = v19.clientSupports2svRecovery and "true" or "false"
-        };
-        if v19.recoverySessionId ~= nil and string.len(v19.recoverySessionId) > 0 then
-            v20["recovery-session-id"] = v19.recoverySessionId;
-        end;
-        return v20;
-    elseif v18 == v3.SecurityQuestions then
-        assert(v19.sessionId ~= nil, "sessionId must be provided to render security questions");
-        assert(v19.userId ~= nil, "userId must be provided to render security questions");
-        return {
-            ["user-id"] = v19.userId, 
-            ["session-id"] = v19.sessionId
-        };
-    elseif v18 == v3.Reauthentication then
-        return {};
-    elseif v18 == v3.Generic then
-        assert(v19.genericChallengeId ~= nil, "genericChallengeId must be provided to render challenge");
-        assert(v19.genericChallengeType ~= nil, "genericChallengeType must be provided to render challenge");
-        assert(v19.genericChallengeMetadata ~= nil, "genericChallengeMetadata must be provided to render challenge");
-        return {
-            ["generic-challenge-id"] = v19.genericChallengeId, 
-            ["generic-challenge-type"] = v19.genericChallengeType, 
-            ["challenge-metadata-json"] = v19.genericChallengeMetadata
-        };
-    else
-        return {};
-    end;
-end;
-return function(v22, v23, v24) --[[ Line: 109 ]]
-    -- upvalues: v3 (copy), v2 (copy), v17 (copy), l_NotificationService_0 (copy), v21 (copy), l_Base64_0 (copy), l_UrlBuilder_0 (copy), l_UrlBase_0 (copy), v13 (copy)
-    if v22 ~= nil then
-        assert(v24 == nil, "challenge parameters cannot be specified for generic challenge rendering");
-        assert(string.len(v22.challengeId) > 0, "challenge id does not exist");
-        assert(v22.challengeType.typed ~= nil, "challenge is of an unknown type");
-    end;
-    local l_Generic_0 = v3.Generic;
-    if v23 ~= nil then
-        assert(v3.toRawValue(v23) ~= nil, "challenge type is not valid");
-        l_Generic_0 = v23;
-    end;
-    local v26 = {
-        [v2.appTypeQueryParam] = v17(), 
-        [v2.challengeTypeQueryParam] = v3.toRawValue(l_Generic_0), 
-        [v2.darkModeQueryParam] = string.lower(l_NotificationService_0.SelectedTheme) == "dark" and "true" or "false"
-    };
-    local v27 = nil;
-    if v24 ~= nil then
-        v27 = v21(l_Generic_0, v24);
-    else
-        assert(v22 ~= nil, "challenge headers must be defined for generic challenge rendering");
-        v27 = {
-            [v2.genericChallengeIdQueryParam] = v22.challengeId, 
-            [v2.genericChallengeTypeQueryParam] = v22.challengeType.raw, 
-            [v2.challengeMetadataJsonQueryParam] = l_Base64_0.EncodeUrl(v22.challengeMetadata.decoded)
-        };
-    end;
-    return l_UrlBuilder_0.new({
-        base = l_UrlBase_0.WWW, 
-        path = "challenge/cdn/hybrid", 
-        query = v13.Dictionary.join(v26, v27)
-    })();
-end;
+require(script.Parent.ChallengeHeaders)
+
+local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
+local constants = require(GenericChallenges.Utils.constants)
+local ChallengeType = require(GenericChallenges.Types.ChallengeType)
+
+require(GenericChallenges.Types.ChallengeParameters)
+
+local TwoStepVerificationActionType = require(GenericChallenges.Types.TwoStepVerificationActionType)
+local CaptchaActionType = require(GenericChallenges.Types.CaptchaActionType)
+local GenericChallengesParent = GenericChallenges.Parent
+local Base64 = require(GenericChallengesParent.AuthCommon).Utils.Base64
+local NotificationService = game:GetService("NotificationService")
+local UserInputService = game:GetService("UserInputService")
+local UrlBuilder = require(GenericChallengesParent.UrlBuilder).UrlBuilder
+local UrlBase = require(GenericChallengesParent.UrlBuilder).UrlBase
+local Cryo = require(GenericChallengesParent.Cryo)
+
+local function getUserDarkModeSettingQueryParam() -- line: 23
+	-- upvalues: NotificationService (copy)
+	if string.lower(NotificationService.SelectedTheme) == "dark" then
+		return "true"
+	end
+
+	return "false"
+end
+local function getUserAppTypeQueryParam() -- line: 30
+	-- upvalues: UserInputService (copy)
+	local Platform = UserInputService:GetPlatform()
+	local s1 = "unknown"
+
+	if Platform == Enum.Platform.Android then
+		return "android"
+	end
+
+	if Platform == Enum.Platform.IOS then
+		return "ios"
+	end
+
+	if Platform == Enum.Platform.Windows then
+		return "windows"
+	end
+
+	if Platform == Enum.Platform.OSX then
+		return "osx"
+	end
+
+	if Platform == Enum.Platform.UWP then
+		return "uwp"
+	end
+
+	if Platform == Enum.Platform.XBoxOne then
+		s1 = "xbox"
+	end
+
+	return s1
+end
+local function getChallengeTypeQueryParameters(p1, p2) -- line: 49
+	-- upvalues: ChallengeType (copy), CaptchaActionType (copy), TwoStepVerificationActionType (copy)
+	if p1 == ChallengeType.Captcha then
+		assert(p2.actionType ~= nil, "actionType must be provided to render captcha")
+		assert(p2.dataExchangeBlob ~= nil, "dataExchangeBlob must be provided to render captcha")
+		assert(p2.captchaId ~= nil, "captchaId must be provided to render captcha")
+
+		return {
+			["action-type"] = CaptchaActionType.toRawValue(p2.actionType),
+			["data-exchange-blob"] = p2.dataExchangeBlob,
+			["captcha-id"] = p2.captchaId
+		}
+	end
+
+	if p1 == ChallengeType.TwoStepVerification then
+		assert(p2.challengeId ~= nil, "challengeId must be provided to render 2sv")
+		assert(p2.userId ~= nil, "userId must be provided to render 2sv")
+		assert(p2.actionType ~= nil, "actionType must be provided to render 2sv")
+		assert(p2.allowRememberDevice ~= nil, "allowRememberDevice must be provided to render 2sv")
+
+		local t1 = {
+			["challenge-id"] = p2.challengeId,
+			["user-id"] = p2.userId,
+			["action-type"] = TwoStepVerificationActionType.toRawValue(p2.actionType),
+			["allow-remember-device"] = not p2.allowRememberDevice and "false" or "true",
+			["client-supports-2sv-recovery"] = not p2.clientSupports2svRecovery and "false" or "true"
+		}
+
+		if p2.recoverySessionId ~= nil and string.len(p2.recoverySessionId) > 0 then
+			t1["recovery-session-id"] = p2.recoverySessionId
+		end
+
+		return t1
+	end
+
+	if p1 == ChallengeType.SecurityQuestions then
+		assert(p2.sessionId ~= nil, "sessionId must be provided to render security questions")
+		assert(p2.userId ~= nil, "userId must be provided to render security questions")
+
+		return {
+			["user-id"] = p2.userId,
+			["session-id"] = p2.sessionId
+		}
+	end
+
+	if p1 == ChallengeType.Reauthentication then
+		return {}
+	end
+
+	if p1 == ChallengeType.Generic then
+		assert(p2.genericChallengeId ~= nil, "genericChallengeId must be provided to render challenge")
+		assert(p2.genericChallengeType ~= nil, "genericChallengeType must be provided to render challenge")
+		assert(p2.genericChallengeMetadata ~= nil, "genericChallengeMetadata must be provided to render challenge")
+
+		return {
+			["generic-challenge-id"] = p2.genericChallengeId,
+			["generic-challenge-type"] = p2.genericChallengeType,
+			["challenge-metadata-json"] = p2.genericChallengeMetadata
+		}
+	end
+
+	return {}
+end
+
+return function(p3, p4, p5) -- line: 109
+	-- upvalues: ChallengeType (copy), constants (copy), getUserAppTypeQueryParam (copy), NotificationService (copy), getChallengeTypeQueryParameters (copy), Base64 (copy), UrlBuilder (copy), UrlBase (copy), Cryo (copy)
+	if p3 ~= nil then
+		assert(p5 == nil, "challenge parameters cannot be specified for generic challenge rendering")
+		assert(string.len(p3.challengeId) > 0, "challenge id does not exist")
+		assert(p3.challengeType.typed ~= nil, "challenge is of an unknown type")
+	end
+
+	local Generic = ChallengeType.Generic
+
+	if p4 ~= nil then
+		assert(ChallengeType.toRawValue(p4) ~= nil, "challenge type is not valid")
+		Generic = p4
+	end
+
+	local t2 = {
+		[constants.appTypeQueryParam] = getUserAppTypeQueryParam(),
+		[constants.challengeTypeQueryParam] = ChallengeType.toRawValue(Generic),
+		[constants.darkModeQueryParam] = string.lower(NotificationService.SelectedTheme) ~= "dark" and "false" or "true"
+	}
+	local v26
+
+	if p5 ~= nil then
+		v26 = getChallengeTypeQueryParameters(Generic, p5)
+	else
+		assert(p3 ~= nil, "challenge headers must be defined for generic challenge rendering")
+		v26 = {
+			[constants.genericChallengeIdQueryParam] = p3.challengeId,
+			[constants.genericChallengeTypeQueryParam] = p3.challengeType.raw,
+			[constants.challengeMetadataJsonQueryParam] = Base64.EncodeUrl(p3.challengeMetadata.decoded)
+		}
+	end
+
+	return UrlBuilder.new({
+		path = "challenge/cdn/hybrid",
+		base = UrlBase.WWW,
+		query = Cryo.Dictionary.join(t2, v26)
+	})()
+end

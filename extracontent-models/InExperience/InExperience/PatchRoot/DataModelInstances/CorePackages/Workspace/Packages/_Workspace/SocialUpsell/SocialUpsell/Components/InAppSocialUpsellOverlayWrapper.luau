@@ -1,32 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Enum.SocialUpsellType);
-local v5 = require(l_script_FirstAncestor_0.Analytics.Enum.UpsellEntrySurfaceType);
-local v6 = require(l_script_FirstAncestor_0.Components.FAEUpsellOverlay);
-local l_FFlagEnableAEGIS2CommsFAEUpsell_0 = require(l_Parent_0.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell;
-local v8 = {
-    isInExperience = false, 
-    upsellEntrySurface = v5.Unknown, 
-    upsellType = v4.Unknown
-};
-return function(v9) --[[ Line: 27 ]]
-    -- upvalues: v3 (copy), v2 (copy), v8 (copy), l_FFlagEnableAEGIS2CommsFAEUpsell_0 (copy), v4 (copy), v6 (copy)
-    return (v3.useMemo(function() --[[ Line: 28 ]]
-        -- upvalues: v2 (ref), v8 (ref), v9 (copy), l_FFlagEnableAEGIS2CommsFAEUpsell_0 (ref), v4 (ref), v3 (ref), v6 (ref)
-        local v10 = nil;
-        local v11 = v2.Dictionary.union(v8, v9.data or {});
-        v11.containerRef = v9.containerRef;
-        if not l_FFlagEnableAEGIS2CommsFAEUpsell_0 then
-            v11.isInExperience = false;
-        end;
-        if v9.upsellType == v4.FacialAgeEstimation then
-            v10 = v3.createElement(v6, v11);
-        end;
-        return v10;
-    end, {
-        v9.upsellType, 
-        v9.data
-    }));
-end;
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+local SocialUpsellParent = SocialUpsell.Parent
+local Cryo = require(SocialUpsellParent.Cryo)
+local React = require(SocialUpsellParent.React)
+local SocialUpsellType = require(SocialUpsell.Enum.SocialUpsellType)
+local UpsellEntrySurfaceType = require(SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType)
+local FAEUpsellOverlay = require(SocialUpsell.Components.FAEUpsellOverlay)
+local FFlagEnableAEGIS2CommsFAEUpsell = require(SocialUpsellParent.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
+local t1 = {
+	isInExperience = false,
+	upsellEntrySurface = UpsellEntrySurfaceType.Unknown,
+	upsellType = SocialUpsellType.Unknown
+}
+
+return function(t2: {[any]: any}) -- line: 27
+	-- upvalues: React (copy), Cryo (copy), t1 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), SocialUpsellType (copy), FAEUpsellOverlay (copy)
+	return (React.useMemo(function() -- line: 28
+		-- upvalues: Cryo (copy), t1 (copy), t2 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), SocialUpsellType (copy), React (copy), FAEUpsellOverlay (copy)
+		local v11 = nil
+		local v12 = Cryo.Dictionary.union(t1, t2.data or {})
+
+		v12.containerRef = t2.containerRef
+
+		if not FFlagEnableAEGIS2CommsFAEUpsell then
+			v12.isInExperience = false
+		end
+
+		if t2.upsellType == SocialUpsellType.FacialAgeEstimation then
+			v11 = React.createElement(FAEUpsellOverlay, v12)
+		end
+
+		return v11
+	end, {
+		t2.upsellType,
+		t2.data
+	}))
+end

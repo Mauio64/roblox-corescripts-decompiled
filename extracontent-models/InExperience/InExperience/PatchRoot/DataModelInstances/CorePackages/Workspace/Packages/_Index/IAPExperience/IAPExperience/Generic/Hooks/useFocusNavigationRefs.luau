@@ -1,105 +1,115 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.FocusNavigationUtils);
-local v3 = require(l_Parent_0.InputHandlers);
-local l_useFocusRoot_0 = v2.useFocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v2.FocusNavigableSurfaceIdentifierEnum;
-local l_FocusNavigationEventNameEnum_0 = v2.FocusNavigationEventNameEnum;
-local l_useDefaultFocusBehavior_0 = require(l_Parent_0.ReactFocusNavigation).useDefaultFocusBehavior;
-local function _(v8, v9) --[[ Line: 13 ]] --[[ Name: mergeRefs ]]
-    return function(v10) --[[ Line: 14 ]]
-        -- upvalues: v8 (copy), v9 (copy)
-        if type(v8) == "function" then
-            v8(v10);
-        elseif v8 ~= nil then
-            v8.current = v10;
-        end;
-        if type(v9) == "function" then
-            v9(v10);
-            return;
-        else
-            if v9 ~= nil then
-                v9.current = v10;
-            end;
-            return;
-        end;
-    end;
-end;
-return function(v12, v13) --[[ Line: 31 ]] --[[ Name: useFocusNavigationRefs ]]
-    -- upvalues: l_useDefaultFocusBehavior_0 (copy), l_useFocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), l_FocusNavigationEventNameEnum_0 (copy), v3 (copy), v1 (copy)
-    local v14, v15 = l_useDefaultFocusBehavior_0();
-    local v16 = l_useFocusRoot_0({
-        surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-        customEventHandlers = {
-            [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                handler = v3.onRelease(v12)
-            }
-        }, 
-        isAutoFocusRoot = true
-    });
-    local v20 = v1.useMemo(function() --[[ Line: 44 ]]
-        -- upvalues: v16 (copy), v15 (copy)
-        local l_v16_0 = v16;
-        local l_v15_0 = v15;
-        return function(v19) --[[ Line: 14 ]]
-            -- upvalues: l_v16_0 (copy), l_v15_0 (copy)
-            if type(l_v16_0) == "function" then
-                l_v16_0(v19);
-            elseif l_v16_0 ~= nil then
-                l_v16_0.current = v19;
-            end;
-            if type(l_v15_0) == "function" then
-                l_v15_0(v19);
-                return;
-            else
-                if l_v15_0 ~= nil then
-                    l_v15_0.current = v19;
-                end;
-                return;
-            end;
-        end;
-    end, {
-        v16, 
-        v15
-    });
-    local v21 = v1.useRef(nil);
-    local v25 = v1.useMemo(function() --[[ Line: 50 ]]
-        -- upvalues: v21 (copy), v14 (copy)
-        local l_v21_0 = v21;
-        local l_v14_0 = v14;
-        return function(v24) --[[ Line: 14 ]]
-            -- upvalues: l_v21_0 (copy), l_v14_0 (copy)
-            if type(l_v21_0) == "function" then
-                l_v21_0(v24);
-            elseif l_v21_0 ~= nil then
-                l_v21_0.current = v24;
-            end;
-            if type(l_v14_0) == "function" then
-                l_v14_0(v24);
-                return;
-            else
-                if l_v14_0 ~= nil then
-                    l_v14_0.current = v24;
-                end;
-                return;
-            end;
-        end;
-    end, {
-        v14
-    });
-    local v26 = v1.useRef(false);
-    v1.useEffect(function() --[[ Line: 56 ]]
-        -- upvalues: v21 (copy), v26 (copy), v13 (copy)
-        local l_current_0 = v21.current;
-        if l_current_0 and not v26.current then
-            v26.current = true;
-            if v13 then
-                v13(l_current_0);
-            end;
-        end;
-    end, {
-        v21.current, 
-        v13
-    });
-    return v20, v25;
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local FocusNavigationUtils = require(ParentParent.FocusNavigationUtils)
+local InputHandlers = require(ParentParent.InputHandlers)
+local useFocusRoot = FocusNavigationUtils.useFocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local useDefaultFocusBehavior = require(ParentParent.ReactFocusNavigation).useDefaultFocusBehavior
+
+local function mergeRefs(p1, p2) -- line: 13
+	return function(p3) -- line: 14
+		-- upvalues: p1 (copy), p2 (copy)
+		if type(p1) == "function" then
+			p1(p3)
+		elseif p1 ~= nil then
+			p1.current = p3
+		end
+
+		if type(p2) == "function" then
+			p2(p3)
+
+			return
+		end
+
+		if p2 ~= nil then
+			p2.current = p3
+		end
+	end
+end
+local function useFocusNavigationRefs(p4, p5) -- line: 31
+	-- upvalues: useDefaultFocusBehavior (copy), useFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), React (copy)
+	local v15, v16 = useDefaultFocusBehavior()
+	local v17 = useFocusRoot({
+		isAutoFocusRoot = true,
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+		customEventHandlers = {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(p4)
+			}
+		}
+	})
+	local v18 = React.useMemo(function() -- line: 44
+		-- upvalues: v17 (copy), v16 (copy)
+		local v23 = v17
+		local v24 = v16
+
+		return function(p6) -- line: 14
+			-- upvalues: v23 (copy), v24 (copy)
+			if type(v23) == "function" then
+				v23(p6)
+			elseif v23 ~= nil then
+				v23.current = p6
+			end
+
+			if type(v24) == "function" then
+				v24(p6)
+
+				return
+			end
+
+			if v24 ~= nil then
+				v24.current = p6
+			end
+		end
+	end, {
+		v17,
+		v16
+	})
+	local v19 = React.useRef(nil)
+	local v20 = React.useMemo(function() -- line: 50
+		-- upvalues: v19 (copy), v15 (copy)
+		local v25 = v19
+		local v26 = v15
+
+		return function(p7) -- line: 14
+			-- upvalues: v25 (copy), v26 (copy)
+			if type(v25) == "function" then
+				v25(p7)
+			elseif v25 ~= nil then
+				v25.current = p7
+			end
+
+			if type(v26) == "function" then
+				v26(p7)
+
+				return
+			end
+
+			if v26 ~= nil then
+				v26.current = p7
+			end
+		end
+	end, { v15 })
+	local v21 = React.useRef(false)
+
+	React.useEffect(function() -- line: 56
+		-- upvalues: v19 (copy), v21 (copy), p5 (copy)
+		local current = v19.current
+
+		if current and not v21.current then
+			v21.current = true
+
+			if p5 then
+				p5(current)
+			end
+		end
+	end, {
+		v19.current,
+		p5
+	})
+
+	return v18, v20
+end
+
+return useFocusNavigationRefs

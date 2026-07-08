@@ -1,1 +1,1 @@
-return game:GetEngineFeature("CaptureServiceVideoProgressFailureSignals");
+return game:GetEngineFeature("CaptureServiceVideoProgressFailureSignals")

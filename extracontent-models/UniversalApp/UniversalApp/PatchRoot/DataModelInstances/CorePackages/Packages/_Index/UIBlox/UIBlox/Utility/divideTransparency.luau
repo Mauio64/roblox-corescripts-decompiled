@@ -1,3 +1,3 @@
-return function(v0, v1) --[[ Line: 7 ]]
-    return 1 - (1 - v0) / v1;
-end;
+return function(p1, p2) -- line: 7
+	return 1 - (1 - p1) / p2
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddCompactUnifiedUpsellModalMode", false);
+return game:DefineFastFlag("AddCompactUnifiedUpsellModalMode", false)

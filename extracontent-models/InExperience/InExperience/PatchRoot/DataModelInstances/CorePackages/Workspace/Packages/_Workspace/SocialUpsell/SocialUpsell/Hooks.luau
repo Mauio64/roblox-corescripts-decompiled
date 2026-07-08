@@ -1,4 +1,4 @@
 return {
-    useAgeVerificationChangeEvent = require(script.useAgeVerificationChangeEvent), 
-    useSocialUpsellOverlayController = require(script.useSocialUpsellOverlayController)
-};
+	useAgeVerificationChangeEvent = require(script.useAgeVerificationChangeEvent),
+	useSocialUpsellOverlayController = require(script.useSocialUpsellOverlayController)
+}

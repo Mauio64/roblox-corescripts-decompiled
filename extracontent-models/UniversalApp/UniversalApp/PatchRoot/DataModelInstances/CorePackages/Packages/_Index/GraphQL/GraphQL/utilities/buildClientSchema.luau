@@ -1,314 +1,366 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_luaUtils_0 = l_Parent_0.luaUtils;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Error_0 = v3.Error;
-local v6 = require(l_luaUtils_0.null);
-local v7 = require(l_luaUtils_0.isNillish);
-local l_isNillish_0 = v7.isNillish;
-local l_isNotNillish_0 = v7.isNotNillish;
-local l_inspect_0 = require(l_Parent_0.jsutils.inspect).inspect;
-local l_devAssert_0 = require(l_Parent_0.jsutils.devAssert).devAssert;
-local l_keyValMap_0 = require(l_Parent_0.jsutils.keyValMap).keyValMap;
-local l_isObjectLike_0 = require(l_Parent_0.jsutils.isObjectLike).isObjectLike;
-local l_parseValue_0 = require(l_Parent_0.language.parser).parseValue;
-local v15 = require(l_Parent_0.type.schema);
-local v16 = require(l_Parent_0.type.definition);
-local l_GraphQLSchema_0 = v15.GraphQLSchema;
-local l_GraphQLDirective_0 = require(l_Parent_0.type.directives).GraphQLDirective;
-local l_specifiedScalarTypes_0 = require(l_Parent_0.type.scalars).specifiedScalarTypes;
-local v20 = require(l_Parent_0.type.introspection);
-local l_introspectionTypes_0 = v20.introspectionTypes;
-local l_TypeKind_0 = v20.TypeKind;
-local l_isInputType_0 = v16.isInputType;
-local l_isOutputType_0 = v16.isOutputType;
-local l_GraphQLList_0 = v16.GraphQLList;
-local l_GraphQLNonNull_0 = v16.GraphQLNonNull;
-local l_GraphQLScalarType_0 = v16.GraphQLScalarType;
-local l_GraphQLObjectType_0 = v16.GraphQLObjectType;
-local l_GraphQLInterfaceType_0 = v16.GraphQLInterfaceType;
-local l_GraphQLUnionType_0 = v16.GraphQLUnionType;
-local l_GraphQLEnumType_0 = v16.GraphQLEnumType;
-local l_GraphQLInputObjectType_0 = v16.GraphQLInputObjectType;
-local l_assertNullableType_0 = v16.assertNullableType;
-local l_assertObjectType_0 = v16.assertObjectType;
-local l_assertInterfaceType_0 = v16.assertInterfaceType;
-local _ = require(script.Parent.getIntrospectionQuery);
-local l_valueFromAST_0 = require(script.Parent.valueFromAST).valueFromAST;
+local ParentParent = script.Parent.Parent
+local luaUtils = ParentParent.luaUtils
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local null = require(luaUtils.null)
+local isNillish = require(luaUtils.isNillish)
+local isNillish2 = isNillish.isNillish
+local isNotNillish = isNillish.isNotNillish
+local inspect = require(ParentParent.jsutils.inspect).inspect
+local devAssert = require(ParentParent.jsutils.devAssert).devAssert
+local keyValMap = require(ParentParent.jsutils.keyValMap).keyValMap
+local isObjectLike = require(ParentParent.jsutils.isObjectLike).isObjectLike
+local parseValue = require(ParentParent.language.parser).parseValue
+local schema = require(ParentParent.type.schema)
+local definition = require(ParentParent.type.definition)
+local GraphQLSchema = schema.GraphQLSchema
+local GraphQLDirective = require(ParentParent.type.directives).GraphQLDirective
+local specifiedScalarTypes = require(ParentParent.type.scalars).specifiedScalarTypes
+local introspection = require(ParentParent.type.introspection)
+local introspectionTypes = introspection.introspectionTypes
+local TypeKind = introspection.TypeKind
+local isInputType = definition.isInputType
+local isOutputType = definition.isOutputType
+local GraphQLList = definition.GraphQLList
+local GraphQLNonNull = definition.GraphQLNonNull
+local GraphQLScalarType = definition.GraphQLScalarType
+local GraphQLObjectType = definition.GraphQLObjectType
+local GraphQLInterfaceType = definition.GraphQLInterfaceType
+local GraphQLUnionType = definition.GraphQLUnionType
+local GraphQLEnumType = definition.GraphQLEnumType
+local GraphQLInputObjectType = definition.GraphQLInputObjectType
+local assertNullableType = definition.assertNullableType
+local assertObjectType = definition.assertObjectType
+local assertInterfaceType = definition.assertInterfaceType
+
+require(script.Parent.getIntrospectionQuery)
+
+local valueFromAST = require(script.Parent.valueFromAST).valueFromAST
+
 return {
-    buildClientSchema = function(v38, v39) --[[ Line: 100 ]] --[[ Name: buildClientSchema ]]
-        -- upvalues: l_TypeKind_0 (copy), l_Error_0 (copy), l_GraphQLList_0 (copy), l_GraphQLNonNull_0 (copy), l_assertNullableType_0 (copy), l_isNillish_0 (copy), l_inspect_0 (copy), l_assertObjectType_0 (copy), l_assertInterfaceType_0 (copy), l_isNotNillish_0 (copy), l_GraphQLScalarType_0 (copy), l_Array_0 (copy), l_GraphQLObjectType_0 (copy), l_GraphQLInterfaceType_0 (copy), l_GraphQLUnionType_0 (copy), l_GraphQLEnumType_0 (copy), l_keyValMap_0 (copy), l_GraphQLInputObjectType_0 (copy), l_isOutputType_0 (copy), l_isInputType_0 (copy), l_valueFromAST_0 (copy), l_parseValue_0 (copy), l_GraphQLDirective_0 (copy), l_devAssert_0 (copy), l_isObjectLike_0 (copy), l_specifiedScalarTypes_0 (copy), l_introspectionTypes_0 (copy), v6 (copy), l_GraphQLSchema_0 (copy)
-        local v40 = nil;
-        local v41 = nil;
-        local v42 = nil;
-        local v43 = nil;
-        local v44 = nil;
-        local v45 = nil;
-        local v46 = nil;
-        local v47 = nil;
-        local v48 = nil;
-        local v49 = nil;
-        local v50 = nil;
-        local v51 = nil;
-        local v52 = nil;
-        local v53 = nil;
-        local v54 = nil;
-        local v55 = nil;
-        local v56 = nil;
-        local v57 = nil;
-        local v58 = nil;
-        v40 = function(v59) --[[ Line: 132 ]] --[[ Name: getType ]]
-            -- upvalues: l_TypeKind_0 (ref), l_Error_0 (ref), l_GraphQLList_0 (ref), v40 (ref), l_GraphQLNonNull_0 (ref), l_assertNullableType_0 (ref), v41 (ref)
-            if v59.kind == l_TypeKind_0.LIST then
-                local l_ofType_0 = v59.ofType;
-                if not l_ofType_0 then
-                    error(l_Error_0.new("Decorated type deeper than introspection query."));
-                end;
-                return l_GraphQLList_0.new(v40(l_ofType_0));
-            elseif v59.kind == l_TypeKind_0.NON_NULL then
-                local l_ofType_1 = v59.ofType;
-                if not l_ofType_1 then
-                    error(l_Error_0.new("Decorated type deeper than introspection query."));
-                end;
-                local v62 = v40(l_ofType_1);
-                return l_GraphQLNonNull_0.new(l_assertNullableType_0(v62));
-            else
-                return v41(v59);
-            end;
-        end;
-        v41 = function(v63) --[[ Line: 155 ]] --[[ Name: getNamedType ]]
-            -- upvalues: l_isNillish_0 (ref), l_Error_0 (ref), l_inspect_0 (ref), v58 (ref)
-            local l_name_0 = v63.name;
-            if l_isNillish_0(l_name_0) then
-                error(l_Error_0.new(("Unknown type reference: %s."):format(l_inspect_0(v63))));
-            end;
-            local v65 = v58:get(l_name_0);
-            if l_isNillish_0(v65) then
-                error(l_Error_0.new(("Invalid or incomplete schema, unknown type: %s. Ensure that a full introspection query is used in order to build a client schema."):format(l_name_0)));
-            end;
-            return v65;
-        end;
-        v42 = function(v66) --[[ Line: 176 ]] --[[ Name: getObjectType ]]
-            -- upvalues: l_assertObjectType_0 (ref), v41 (ref)
-            return l_assertObjectType_0(v41(v66));
-        end;
-        v43 = function(v67) --[[ Line: 182 ]] --[[ Name: getInterfaceType ]]
-            -- upvalues: l_assertInterfaceType_0 (ref), v41 (ref)
-            return l_assertInterfaceType_0(v41(v67));
-        end;
-        v44 = function(v68) --[[ Line: 190 ]] --[[ Name: buildType ]]
-            -- upvalues: l_isNotNillish_0 (ref), l_TypeKind_0 (ref), v45 (ref), v47 (ref), v48 (ref), v49 (ref), v50 (ref), v51 (ref), l_inspect_0 (ref), l_Error_0 (ref)
-            if l_isNotNillish_0(v68) and l_isNotNillish_0(v68.name) and l_isNotNillish_0(v68.kind) then
-                if v68.kind == l_TypeKind_0.SCALAR then
-                    return v45(v68);
-                elseif v68.kind == l_TypeKind_0.OBJECT then
-                    return v47(v68);
-                elseif v68.kind == l_TypeKind_0.INTERFACE then
-                    return v48(v68);
-                elseif v68.kind == l_TypeKind_0.UNION then
-                    return v49(v68);
-                elseif v68.kind == l_TypeKind_0.ENUM then
-                    return v50(v68);
-                elseif v68.kind == l_TypeKind_0.INPUT_OBJECT then
-                    return v51(v68);
-                end;
-            end;
-            local v69 = l_inspect_0(v68);
-            error(l_Error_0.new(("Invalid or incomplete introspection result. Ensure that a full introspection query is used in order to build a client schema: %s."):format(v69)));
-        end;
-        v45 = function(v70) --[[ Line: 217 ]] --[[ Name: buildScalarDef ]]
-            -- upvalues: l_GraphQLScalarType_0 (ref)
-            return l_GraphQLScalarType_0.new({
-                name = v70.name, 
-                description = v70.description, 
-                specifiedByUrl = v70.specifiedByUrl
-            });
-        end;
-        v46 = function(v71) --[[ Line: 225 ]] --[[ Name: buildImplementationsList ]]
-            -- upvalues: l_TypeKind_0 (ref), l_inspect_0 (ref), l_Error_0 (ref), l_Array_0 (ref), v43 (ref)
-            if v71.interfaces == nil and v71.kind == l_TypeKind_0.INTERFACE then
-                return {};
-            else
-                if not v71.interfaces then
-                    local v72 = l_inspect_0(v71);
-                    error(l_Error_0.new(("Introspection result missing interfaces: %s."):format(v72)));
-                end;
-                return l_Array_0.map(v71.interfaces, v43);
-            end;
-        end;
-        v47 = function(v73) --[[ Line: 251 ]] --[[ Name: buildObjectDef ]]
-            -- upvalues: l_GraphQLObjectType_0 (ref), v46 (ref), v52 (ref)
-            return l_GraphQLObjectType_0.new({
-                name = v73.name, 
-                description = v73.description, 
-                interfaces = function() --[[ Line: 255 ]] --[[ Name: interfaces ]]
-                    -- upvalues: v46 (ref), v73 (copy)
-                    return v46(v73);
-                end, 
-                fields = function() --[[ Line: 258 ]] --[[ Name: fields ]]
-                    -- upvalues: v52 (ref), v73 (copy)
-                    return v52(v73);
-                end
-            });
-        end;
-        v48 = function(v74) --[[ Line: 264 ]] --[[ Name: buildInterfaceDef ]]
-            -- upvalues: l_GraphQLInterfaceType_0 (ref), v46 (ref), v52 (ref)
-            return l_GraphQLInterfaceType_0.new({
-                name = v74.name, 
-                description = v74.description, 
-                interfaces = function() --[[ Line: 270 ]] --[[ Name: interfaces ]]
-                    -- upvalues: v46 (ref), v74 (copy)
-                    return v46(v74);
-                end, 
-                fields = function() --[[ Line: 273 ]] --[[ Name: fields ]]
-                    -- upvalues: v52 (ref), v74 (copy)
-                    return v52(v74);
-                end
-            });
-        end;
-        v49 = function(v75) --[[ Line: 279 ]] --[[ Name: buildUnionDef ]]
-            -- upvalues: l_inspect_0 (ref), l_Error_0 (ref), l_GraphQLUnionType_0 (ref), l_Array_0 (ref), v42 (ref)
-            if not v75.possibleTypes then
-                local v76 = l_inspect_0(v75);
-                error(l_Error_0.new(("Introspection result missing possibleTypes: %s."):format(v76)));
-            end;
-            return l_GraphQLUnionType_0.new({
-                name = v75.name, 
-                description = v75.description, 
-                types = function() --[[ Line: 294 ]] --[[ Name: types ]]
-                    -- upvalues: l_Array_0 (ref), v75 (copy), v42 (ref)
-                    return l_Array_0.map(v75.possibleTypes, v42);
-                end
-            });
-        end;
-        v50 = function(v77) --[[ Line: 300 ]] --[[ Name: buildEnumDef ]]
-            -- upvalues: l_inspect_0 (ref), l_Error_0 (ref), l_GraphQLEnumType_0 (ref), l_keyValMap_0 (ref)
-            if not v77.enumValues then
-                local v78 = l_inspect_0(v77);
-                error(l_Error_0.new(("Introspection result missing enumValues: %s."):format(v78)));
-            end;
-            return l_GraphQLEnumType_0.new({
-                name = v77.name, 
-                description = v77.description, 
-                values = l_keyValMap_0(v77.enumValues, function(v79) --[[ Line: 312 ]]
-                    return v79.name;
-                end, function(v80) --[[ Line: 314 ]]
-                    return {
-                        description = v80.description, 
-                        deprecationReason = v80.deprecationReason
-                    };
-                end)
-            });
-        end;
-        v51 = function(v81) --[[ Line: 324 ]] --[[ Name: buildInputObjectDef ]]
-            -- upvalues: l_inspect_0 (ref), l_Error_0 (ref), l_GraphQLInputObjectType_0 (ref), v54 (ref)
-            if not v81.inputFields then
-                local v82 = l_inspect_0(v81);
-                error(l_Error_0.new(("Introspection result missing inputFields: %s."):format(v82)));
-            end;
-            return l_GraphQLInputObjectType_0.new({
-                name = v81.name, 
-                description = v81.description, 
-                fields = function() --[[ Line: 340 ]] --[[ Name: fields ]]
-                    -- upvalues: v54 (ref), v81 (copy)
-                    return v54(v81.inputFields);
-                end
-            });
-        end;
-        v52 = function(v83) --[[ Line: 346 ]] --[[ Name: buildFieldDefMap ]]
-            -- upvalues: l_Error_0 (ref), l_inspect_0 (ref), l_keyValMap_0 (ref), v53 (ref)
-            if not v83.fields then
-                error(l_Error_0.new(("Introspection result missing fields: %s."):format(l_inspect_0(v83))));
-            end;
-            return l_keyValMap_0(v83.fields, function(v84) --[[ Line: 358 ]]
-                return v84.name;
-            end, v53);
-        end;
-        v53 = function(v85) --[[ Line: 363 ]] --[[ Name: buildField ]]
-            -- upvalues: v40 (ref), l_isOutputType_0 (ref), l_inspect_0 (ref), l_Error_0 (ref), v54 (ref)
-            local v86 = v40(v85.type);
-            if not l_isOutputType_0(v86) then
-                local v87 = l_inspect_0(v86);
-                error(l_Error_0.new(("Introspection must provide output type for fields, but received: %s."):format(v87)));
-            end;
-            if not v85.args then
-                local v88 = l_inspect_0(v85);
-                error(l_Error_0.new(("Introspection result missing field args: %s."):format(v88)));
-            end;
-            return {
-                description = v85.description, 
-                deprecationReason = v85.deprecationReason, 
-                type = v86, 
-                args = v54(v85.args)
-            };
-        end;
-        v54 = function(v89) --[[ Line: 394 ]] --[[ Name: buildInputValueDefMap ]]
-            -- upvalues: l_keyValMap_0 (ref), v55 (ref)
-            return l_keyValMap_0(v89, function(v90) --[[ Line: 395 ]]
-                return v90.name;
-            end, v55);
-        end;
-        v55 = function(v91) --[[ Line: 400 ]] --[[ Name: buildInputValue ]]
-            -- upvalues: v40 (ref), l_isInputType_0 (ref), l_inspect_0 (ref), l_Error_0 (ref), l_isNotNillish_0 (ref), l_valueFromAST_0 (ref), l_parseValue_0 (ref)
-            local v92 = v40(v91.type);
-            if not l_isInputType_0(v92) then
-                local v93 = l_inspect_0(v92);
-                error(l_Error_0.new(("Introspection must provide input type for arguments, but received: %s."):format(v93)));
-            end;
-            local v94 = if l_isNotNillish_0(v91.defaultValue) then l_valueFromAST_0(l_parseValue_0(v91.defaultValue), v92) else nil;
-            return {
-                description = v91.description, 
-                type = v92, 
-                defaultValue = v94, 
-                deprecationReason = v91.deprecationReason
-            };
-        end;
-        v56 = function(v95) --[[ Line: 429 ]] --[[ Name: buildDirective ]]
-            -- upvalues: l_inspect_0 (ref), l_Error_0 (ref), l_GraphQLDirective_0 (ref), l_Array_0 (ref), v54 (ref)
-            if not v95.args then
-                local v96 = l_inspect_0(v95);
-                error(l_Error_0.new(("Introspection result missing directive args: %s."):format(v96)));
-            end;
-            if not v95.locations then
-                local v97 = l_inspect_0(v95);
-                error(l_Error_0.new(("Introspection result missing directive locations: %s."):format(v97)));
-            end;
-            return l_GraphQLDirective_0.new({
-                name = v95.name, 
-                description = v95.description, 
-                isRepeatable = v95.isRepeatable, 
-                locations = l_Array_0.slice(v95.locations), 
-                args = v54(v95.args)
-            });
-        end;
-        l_devAssert_0(l_isObjectLike_0(v38) and l_isObjectLike_0(v38.__schema), ("Invalid or incomplete introspection result. Ensure that you are passing \"data\" property of introspection response and no \"errors\" was returned alongside: %s."):format(l_inspect_0(v38)));
-        v57 = v38.__schema;
-        v58 = l_keyValMap_0(v57.types, function(v98) --[[ Line: 471 ]]
-            return v98.name;
-        end, function(v99) --[[ Line: 473 ]]
-            -- upvalues: v44 (ref)
-            return v44(v99);
-        end);
-        for _, v101 in ipairs(l_Array_0.concat(l_specifiedScalarTypes_0, l_introspectionTypes_0)) do
-            local l_name_1 = v101.name;
-            if v58:get(l_name_1) then
-                l_name_1 = v101.name;
-                v58:set(l_name_1, v101);
-            end;
-        end;
-        local v103 = if l_isNotNillish_0(v57.queryType) then v42(v57.queryType) else v6;
-        local v104 = if l_isNotNillish_0(v57.mutationType) then v42(v57.mutationType) else v6;
-        local v105 = if l_isNotNillish_0(v57.subscriptionType) then v42(v57.subscriptionType) else v6;
-        local v106 = if l_isNotNillish_0(v57.directives) then l_Array_0.map(v57.directives, v56) else {};
-        return l_GraphQLSchema_0.new({
-            description = v57.description, 
-            query = v103, 
-            mutation = v104, 
-            subscription = v105, 
-            types = v58:values(), 
-            directives = v106, 
-            assumeValid = if v39 then v39.assumeValid else nil
-        });
-    end
-};
+	buildClientSchema = function(p1, p2) -- line: 100
+		-- upvalues: TypeKind (copy), Error (copy), GraphQLList (copy), GraphQLNonNull (copy), assertNullableType (copy), isNillish2 (copy), inspect (copy), assertObjectType (copy), assertInterfaceType (copy), isNotNillish (copy), GraphQLScalarType (copy), Array (copy), GraphQLObjectType (copy), GraphQLInterfaceType (copy), GraphQLUnionType (copy), GraphQLEnumType (copy), keyValMap (copy), GraphQLInputObjectType (copy), isOutputType (copy), isInputType (copy), valueFromAST (copy), parseValue (copy), GraphQLDirective (copy), devAssert (copy), isObjectLike (copy), specifiedScalarTypes (copy), introspectionTypes (copy), null (copy), GraphQLSchema (copy)
+		local getNamedType = nil
+		local buildScalarDef = nil
+		local buildObjectDef = nil
+		local buildInterfaceDef = nil
+		local buildUnionDef = nil
+		local buildEnumDef = nil
+		local buildInputObjectDef = nil
+		local buildFieldDefMap = nil
+		local buildField = nil
+		local buildInputValueDefMap = nil
+		local buildInputValue = nil
+		local u51 = nil
+
+		local function getType(p3) -- line: 132
+			-- upvalues: TypeKind (copy), Error (copy), GraphQLList (copy), getType (ref), GraphQLNonNull (copy), assertNullableType (copy), getNamedType (ref)
+			if p3.kind == TypeKind.LIST then
+				local ofType = p3.ofType
+
+				if not ofType then
+					error(Error.new("Decorated type deeper than introspection query."))
+				end
+
+				return GraphQLList.new(getType(ofType))
+			end
+
+			if p3.kind == TypeKind.NON_NULL then
+				local ofType = p3.ofType
+
+				if not ofType then
+					error(Error.new("Decorated type deeper than introspection query."))
+				end
+
+				local v68 = getType(ofType)
+
+				return GraphQLNonNull.new(assertNullableType(v68))
+			end
+
+			return getNamedType(p3)
+		end
+
+		function getNamedType(p4) -- line: 155
+			-- upvalues: isNillish2 (copy), Error (copy), inspect (copy), u51 (ref)
+			local name = p4.name
+
+			if isNillish2(name) then
+				error(Error.new(("Unknown type reference: %s."):format(inspect(p4))))
+			end
+
+			local v71 = u51:get(name)
+
+			if isNillish2(v71) then
+				error(Error.new(("Invalid or incomplete schema, unknown type: %s. Ensure that a full introspection query is used in order to build a client schema."):format(name)))
+			end
+
+			return v71
+		end
+
+		local function getObjectType(p5) -- line: 176
+			-- upvalues: assertObjectType (copy), getNamedType (ref)
+			return assertObjectType(getNamedType(p5))
+		end
+		local function getInterfaceType(p6) -- line: 182
+			-- upvalues: assertInterfaceType (copy), getNamedType (ref)
+			return assertInterfaceType(getNamedType(p6))
+		end
+		local function buildType(p7) -- line: 190
+			-- upvalues: isNotNillish (copy), TypeKind (copy), buildScalarDef (ref), buildObjectDef (ref), buildInterfaceDef (ref), buildUnionDef (ref), buildEnumDef (ref), buildInputObjectDef (ref), inspect (copy), Error (copy)
+			if isNotNillish(p7) and (isNotNillish(p7.name) and isNotNillish(p7.kind)) then
+				if p7.kind == TypeKind.SCALAR then
+					return buildScalarDef(p7)
+				end
+
+				if p7.kind == TypeKind.OBJECT then
+					return buildObjectDef(p7)
+				end
+
+				if p7.kind == TypeKind.INTERFACE then
+					return buildInterfaceDef(p7)
+				end
+
+				if p7.kind == TypeKind.UNION then
+					return buildUnionDef(p7)
+				end
+
+				if p7.kind == TypeKind.ENUM then
+					return buildEnumDef(p7)
+				end
+
+				if p7.kind == TypeKind.INPUT_OBJECT then
+					return buildInputObjectDef(p7)
+				end
+			end
+
+			local v75 = inspect(p7)
+
+			error(Error.new(("Invalid or incomplete introspection result. Ensure that a full introspection query is used in order to build a client schema: %s."):format(v75)))
+		end
+
+		function buildScalarDef(p8) -- line: 217
+			-- upvalues: GraphQLScalarType (copy)
+			return GraphQLScalarType.new({
+				name = p8.name,
+				description = p8.description,
+				specifiedByUrl = p8.specifiedByUrl
+			})
+		end
+
+		local function buildImplementationsList(p9) -- line: 225
+			-- upvalues: TypeKind (copy), inspect (copy), Error (copy), Array (copy), getInterfaceType (ref)
+			if p9.interfaces == nil and p9.kind == TypeKind.INTERFACE then
+				return {}
+			end
+
+			if not p9.interfaces then
+				local v78 = inspect(p9)
+
+				error(Error.new(("Introspection result missing interfaces: %s."):format(v78)))
+			end
+
+			return Array.map(p9.interfaces, getInterfaceType)
+		end
+
+		function buildObjectDef(p10) -- line: 251
+			-- upvalues: GraphQLObjectType (copy), buildImplementationsList (ref), buildFieldDefMap (ref)
+			return GraphQLObjectType.new({
+				name = p10.name,
+				description = p10.description,
+				interfaces = function() -- line: 255
+					-- upvalues: buildImplementationsList (ref), p10 (copy)
+					return buildImplementationsList(p10)
+				end,
+				fields = function() -- line: 258
+					-- upvalues: buildFieldDefMap (ref), p10 (copy)
+					return buildFieldDefMap(p10)
+				end
+			})
+		end
+		function buildInterfaceDef(p11) -- line: 264
+			-- upvalues: GraphQLInterfaceType (copy), buildImplementationsList (ref), buildFieldDefMap (ref)
+			return GraphQLInterfaceType.new({
+				name = p11.name,
+				description = p11.description,
+				interfaces = function() -- line: 270
+					-- upvalues: buildImplementationsList (ref), p11 (copy)
+					return buildImplementationsList(p11)
+				end,
+				fields = function() -- line: 273
+					-- upvalues: buildFieldDefMap (ref), p11 (copy)
+					return buildFieldDefMap(p11)
+				end
+			})
+		end
+		function buildUnionDef(p12) -- line: 279
+			-- upvalues: inspect (copy), Error (copy), GraphQLUnionType (copy), Array (copy), getObjectType (ref)
+			if not p12.possibleTypes then
+				local v82 = inspect(p12)
+
+				error(Error.new(("Introspection result missing possibleTypes: %s."):format(v82)))
+			end
+
+			return GraphQLUnionType.new({
+				name = p12.name,
+				description = p12.description,
+				types = function() -- line: 294
+					-- upvalues: Array (copy), p12 (copy), getObjectType (ref)
+					return Array.map(p12.possibleTypes, getObjectType)
+				end
+			})
+		end
+		function buildEnumDef(p13) -- line: 300
+			-- upvalues: inspect (copy), Error (copy), GraphQLEnumType (copy), keyValMap (copy)
+			if not p13.enumValues then
+				local v84 = inspect(p13)
+
+				error(Error.new(("Introspection result missing enumValues: %s."):format(v84)))
+			end
+
+			return GraphQLEnumType.new({
+				name = p13.name,
+				description = p13.description,
+				values = keyValMap(p13.enumValues, function(p14) -- line: 312
+					return p14.name
+				end, function(p15) -- line: 314
+					return {
+						description = p15.description,
+						deprecationReason = p15.deprecationReason
+					}
+				end)
+			})
+		end
+		function buildInputObjectDef(p16) -- line: 324
+			-- upvalues: inspect (copy), Error (copy), GraphQLInputObjectType (copy), buildInputValueDefMap (ref)
+			if not p16.inputFields then
+				local v86 = inspect(p16)
+
+				error(Error.new(("Introspection result missing inputFields: %s."):format(v86)))
+			end
+
+			return GraphQLInputObjectType.new({
+				name = p16.name,
+				description = p16.description,
+				fields = function() -- line: 340
+					-- upvalues: buildInputValueDefMap (ref), p16 (copy)
+					return buildInputValueDefMap(p16.inputFields)
+				end
+			})
+		end
+		function buildFieldDefMap(p17) -- line: 346
+			-- upvalues: Error (copy), inspect (copy), keyValMap (copy), buildField (ref)
+			if not p17.fields then
+				error(Error.new(("Introspection result missing fields: %s."):format(inspect(p17))))
+			end
+
+			return keyValMap(p17.fields, function(p18) -- line: 358
+				return p18.name
+			end, buildField)
+		end
+		function buildField(p19) -- line: 363
+			-- upvalues: getType (ref), isOutputType (copy), inspect (copy), Error (copy), buildInputValueDefMap (ref)
+			local v89 = getType(p19.type)
+
+			if not isOutputType(v89) then
+				local v90 = inspect(v89)
+
+				error(Error.new(("Introspection must provide output type for fields, but received: %s."):format(v90)))
+			end
+
+			if not p19.args then
+				local v91 = inspect(p19)
+
+				error(Error.new(("Introspection result missing field args: %s."):format(v91)))
+			end
+
+			return {
+				description = p19.description,
+				deprecationReason = p19.deprecationReason,
+				type = v89,
+				args = buildInputValueDefMap(p19.args)
+			}
+		end
+		function buildInputValueDefMap(p20) -- line: 394
+			-- upvalues: keyValMap (copy), buildInputValue (ref)
+			return keyValMap(p20, function(p21) -- line: 395
+				return p21.name
+			end, buildInputValue)
+		end
+		function buildInputValue(p22) -- line: 400
+			-- upvalues: getType (ref), isInputType (copy), inspect (copy), Error (copy), isNotNillish (copy), valueFromAST (copy), parseValue (copy)
+			local v94 = getType(p22.type)
+
+			if not isInputType(v94) then
+				local v95 = inspect(v94)
+
+				error(Error.new(("Introspection must provide input type for arguments, but received: %s."):format(v95)))
+			end
+
+			local v96 = if not isNotNillish(p22.defaultValue) then nil else valueFromAST(parseValue(p22.defaultValue), v94)
+
+			return {
+				description = p22.description,
+				type = v94,
+				defaultValue = v96,
+				deprecationReason = p22.deprecationReason
+			}
+		end
+
+		local function buildDirective(p23) -- line: 429
+			-- upvalues: inspect (copy), Error (copy), GraphQLDirective (copy), Array (copy), buildInputValueDefMap (ref)
+			if not p23.args then
+				local v98 = inspect(p23)
+
+				error(Error.new(("Introspection result missing directive args: %s."):format(v98)))
+			end
+
+			if not p23.locations then
+				local v99 = inspect(p23)
+
+				error(Error.new(("Introspection result missing directive locations: %s."):format(v99)))
+			end
+
+			return GraphQLDirective.new({
+				name = p23.name,
+				description = p23.description,
+				isRepeatable = p23.isRepeatable,
+				locations = Array.slice(p23.locations),
+				args = buildInputValueDefMap(p23.args)
+			})
+		end
+
+		devAssert(isObjectLike(p1) and isObjectLike(p1.__schema), ("Invalid or incomplete introspection result. Ensure that you are passing \"data\" property of introspection response and no \"errors\" was returned alongside: %s."):format(inspect(p1)))
+
+		local __schema = p1.__schema
+
+		u51 = keyValMap(__schema.types, function(p24) -- line: 471
+			return p24.name
+		end, function(p25) -- line: 473
+			-- upvalues: buildType (ref)
+			return buildType(p25)
+		end)
+
+		for _, v in ipairs(Array.concat(specifiedScalarTypes, introspectionTypes)) do
+			if u51:get(v.name) then
+				u51:set(v.name, v)
+			end
+		end
+
+		local v61 = if not isNotNillish(__schema.queryType) then null else getObjectType(__schema.queryType)
+		local v62 = if not isNotNillish(__schema.mutationType) then null else getObjectType(__schema.mutationType)
+		local v63 = if not isNotNillish(__schema.subscriptionType) then null else getObjectType(__schema.subscriptionType)
+		local v64 = if not isNotNillish(__schema.directives) then {} else Array.map(__schema.directives, buildDirective)
+
+		return GraphQLSchema.new({
+			description = __schema.description,
+			query = v61,
+			mutation = v62,
+			subscription = v63,
+			types = u51:values(),
+			directives = v64,
+			assumeValid = if not p2 then nil else p2.assumeValid
+		})
+	end
+}

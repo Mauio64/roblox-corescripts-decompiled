@@ -1,76 +1,93 @@
-local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
-local l_WebViewService_0 = game:GetService("WebViewService");
-local l_BrowserService_0 = game:GetService("BrowserService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v6 = require(l_Parent_1.Loggers);
-local v7 = require(l_Parent_0.ClickoutTelemetry);
-local l_flaggedMutedError_0 = v6.flaggedMutedError;
-local v9 = game:DefineFastFlag("LuaAppIsClickoutEnabledUniverse", false);
-local l_GetFFlagEnableUnifiedWebViews_0 = require(l_Parent_1.SharedFlags).GetFFlagEnableUnifiedWebViews;
-return function() --[[ Line: 19 ]] --[[ Name: starterScript ]]
-    -- upvalues: v9 (copy), l_ReplicatedStorage_0 (copy), l_flaggedMutedError_0 (copy), l_HttpService_0 (copy), l_GetFFlagEnableUnifiedWebViews_0 (copy), l_WebViewService_0 (copy), v7 (copy), l_BrowserService_0 (copy)
-    if not v9 then
-        return;
-    else
-        l_ReplicatedStorage_0:WaitForChild("AdClickoutEvent").Event:Connect(function(v11) --[[ Line: 26 ]]
-            -- upvalues: l_flaggedMutedError_0 (ref), l_HttpService_0 (ref), l_GetFFlagEnableUnifiedWebViews_0 (ref), l_WebViewService_0 (ref), v7 (ref), l_BrowserService_0 (ref)
-            if string.find(v11, "[<>]") then
-                l_flaggedMutedError_0("InExperienceClickout_InvalidURL", (("AdClickoutEvent received invalid URL: %*"):format(v11)));
-                return;
-            elseif not string.match(v11, "^https://") then
-                l_flaggedMutedError_0("InExperienceClickout_InvalidURL", (("AdClickoutEvent received URL with invalid scheme: %*"):format(v11)));
-                return;
-            elseif #v11 == 0 then
-                l_flaggedMutedError_0("InExperienceClickout_InvalidURL", "AdClickoutEvent received empty URL.");
-                return;
-            elseif #v11 > 512 then
-                l_flaggedMutedError_0("InExperienceClickout_InvalidURL", (("AdClickoutEvent received URL exceeding max length: %*"):format(v11)));
-                return;
-            else
-                local v12 = l_HttpService_0:GenerateGUID(false);
-                local v13 = nil;
-                v13 = if l_GetFFlagEnableUnifiedWebViews_0() then l_WebViewService_0.OnWindowClosed:Connect(function() --[[ Line: 59 ]]
-                    -- upvalues: v7 (ref), v12 (copy), v11 (copy), l_WebViewService_0 (ref), v13 (ref)
-                    v7.logWebviewToggled(false, v12, v11);
-                    l_WebViewService_0:CloseWindow();
-                    if v13 then
-                        v13:Disconnect();
-                        v13 = nil;
-                    end;
-                end) else l_BrowserService_0.BrowserWindowClosed:Connect(function() --[[ Line: 68 ]]
-                    -- upvalues: v7 (ref), v12 (copy), v11 (copy), v13 (ref)
-                    v7.logWebviewToggled(false, v12, v11);
-                    if v13 then
-                        v13:Disconnect();
-                        v13 = nil;
-                    end;
-                end);
-                v7.logWebviewToggled(true, v12, v11);
-                if l_GetFFlagEnableUnifiedWebViews_0() then
-                    l_WebViewService_0:OpenWindow(v11, nil, true, nil, nil, true);
-                else
-                    local l_status_0, l_result_0 = pcall(function() --[[ Line: 89 ]]
-                        -- upvalues: l_HttpService_0 (ref), v11 (copy)
-                        return l_HttpService_0:JSONEncode({
-                            command = "open", 
-                            url = v11, 
-                            visible = true, 
-                            isGenericWebview = true, 
-                            showDomainAsTitle = true
-                        });
-                    end);
-                    if not l_status_0 then
-                        l_flaggedMutedError_0("InExperienceClickout_JSONEncodeFailed", (("AdClickoutEvent failed to JSON encode command for URL: %*"):format(v11)));
-                        return;
-                    else
-                        l_BrowserService_0:SendCommand(l_result_0);
-                    end;
-                end;
-                return;
-            end;
-        end);
-        return;
-    end;
-end;
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local WebViewService = game:GetService("WebViewService")
+local BrowserService = game:GetService("BrowserService")
+local HttpService = game:GetService("HttpService")
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Loggers = require(scriptParentParent.Loggers)
+local ClickoutTelemetry = require(scriptParent.ClickoutTelemetry)
+local flaggedMutedError = Loggers.flaggedMutedError
+local v10 = game:DefineFastFlag("LuaAppIsClickoutEnabledUniverse", false)
+local GetFFlagEnableUnifiedWebViews = require(scriptParentParent.SharedFlags).GetFFlagEnableUnifiedWebViews
+
+local function starterScript() -- line: 19
+	-- upvalues: v10 (copy), ReplicatedStorage (copy), flaggedMutedError (copy), HttpService (copy), GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), ClickoutTelemetry (copy), BrowserService (copy)
+	if not v10 then
+		return
+	end
+
+	ReplicatedStorage:WaitForChild("AdClickoutEvent").Event:Connect(function(s1: string) -- line: 26
+		-- upvalues: flaggedMutedError (copy), HttpService (copy), GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), ClickoutTelemetry (copy), BrowserService (copy)
+		if string.find(s1, "[<>]") then
+			flaggedMutedError("InExperienceClickout_InvalidURL", `AdClickoutEvent received invalid URL: { s1 }`)
+
+			return
+		end
+
+		if not string.match(s1, "^https://") then
+			flaggedMutedError("InExperienceClickout_InvalidURL", `AdClickoutEvent received URL with invalid scheme: { s1 }`)
+
+			return
+		end
+
+		if #s1 == 0 then
+			flaggedMutedError("InExperienceClickout_InvalidURL", "AdClickoutEvent received empty URL.")
+
+			return
+		end
+
+		if #s1 > 512 then
+			flaggedMutedError("InExperienceClickout_InvalidURL", `AdClickoutEvent received URL exceeding max length: { s1 }`)
+
+			return
+		end
+
+		local guid = HttpService:GenerateGUID(false)
+		local u15 = nil
+
+		u15 = if not GetFFlagEnableUnifiedWebViews() then BrowserService.BrowserWindowClosed:Connect(function() -- line: 68
+			-- upvalues: ClickoutTelemetry (copy), guid (copy), s1 (copy), u15 (ref)
+			ClickoutTelemetry.logWebviewToggled(false, guid, s1)
+
+			if u15 then
+				u15:Disconnect()
+				u15 = nil
+			end
+		end) else WebViewService.OnWindowClosed:Connect(function() -- line: 59
+			-- upvalues: ClickoutTelemetry (copy), guid (copy), s1 (copy), WebViewService (copy), u15 (ref)
+			ClickoutTelemetry.logWebviewToggled(false, guid, s1)
+			WebViewService:CloseWindow()
+
+			if u15 then
+				u15:Disconnect()
+				u15 = nil
+			end
+		end)
+		ClickoutTelemetry.logWebviewToggled(true, guid, s1)
+
+		if GetFFlagEnableUnifiedWebViews() then
+			WebViewService:OpenWindow(s1, nil, true, nil, nil, true)
+		else
+			local ok, result = pcall(function() -- line: 89
+				-- upvalues: HttpService (copy), s1 (copy)
+				return HttpService:JSONEncode({
+					command = "open",
+					visible = true,
+					isGenericWebview = true,
+					showDomainAsTitle = true,
+					url = s1
+				})
+			end)
+
+			if not ok then
+				flaggedMutedError("InExperienceClickout_JSONEncodeFailed", `AdClickoutEvent failed to JSON encode command for URL: { s1 }`)
+
+				return
+			end
+
+			BrowserService:SendCommand(result)
+		end
+	end)
+end
+
+return starterScript

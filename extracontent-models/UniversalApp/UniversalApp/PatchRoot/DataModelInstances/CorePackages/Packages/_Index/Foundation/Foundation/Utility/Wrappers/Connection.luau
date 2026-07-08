@@ -1,5 +1,5 @@
 return {
-    Disconnect = function(v0) --[[ Line: 2 ]] --[[ Name: Disconnect ]]
-        return v0:Disconnect();
-    end
-};
+	Disconnect = function(p1) -- line: 2
+		return p1:Disconnect()
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChangeSocialGraphLifecycleEvent", false);
+return game:DefineFastFlag("ChangeSocialGraphLifecycleEvent", false)

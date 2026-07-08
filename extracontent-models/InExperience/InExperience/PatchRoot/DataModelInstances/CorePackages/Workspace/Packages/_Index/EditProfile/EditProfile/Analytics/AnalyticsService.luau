@@ -1,16 +1,18 @@
-local l_Parent_0 = script:FindFirstAncestor("EditProfile").Parent;
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local v3 = require(l_Parent_0.Analytics);
-local v4 = v3.Analytics.new(l_RbxAnalyticsService_0);
-local l_getPlatformTarget_0 = v3.getPlatformTarget;
+local Parent = script:FindFirstAncestor("EditProfile").Parent
+local EventIngestService = game:GetService("EventIngestService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Analytics = require(Parent.Analytics)
+local v5 = Analytics.Analytics.new(RbxAnalyticsService)
+local getPlatformTarget = Analytics.getPlatformTarget
+
 return {
-    Diag = v4.Diag, 
-    EventStream = {
-        setRBXEventStream = function(_, v7, v8, v9) --[[ Line: 13 ]] --[[ Name: setRBXEventStream ]]
-            -- upvalues: l_EventIngestService_0 (copy), l_getPlatformTarget_0 (copy)
-            local v10 = v9 or {};
-            l_EventIngestService_0:SetRBXEventStream(l_getPlatformTarget_0(), v7, v8, v10);
-        end
-    }
-};
+	Diag = v5.Diag,
+	EventStream = {
+		setRBXEventStream = function(_, s1: string, s2: string, t1: {[any]: any}?) -- line: 13
+			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
+			local v11 = t1 or {}
+
+			EventIngestService:SetRBXEventStream(getPlatformTarget(), s1, s2, v11)
+		end
+	}
+}

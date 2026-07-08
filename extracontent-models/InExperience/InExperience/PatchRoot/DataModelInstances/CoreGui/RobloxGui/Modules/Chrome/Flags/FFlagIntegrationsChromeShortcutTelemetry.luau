@@ -1,4 +1,5 @@
-local l_Chrome_0 = script.Parent.Parent.Parent.Chrome;
-local v1 = require(l_Chrome_0.Flags.EnrolledConsoleExperienceControls);
-local v2 = game:DefineFastFlag("IntegrationsChromeShortcutTelemetry", false);
-return v1 or v2;
+local Chrome = script.Parent.Parent.Parent.Chrome
+local EnrolledConsoleExperienceControls = require(Chrome.Flags.EnrolledConsoleExperienceControls)
+local v3 = game:DefineFastFlag("IntegrationsChromeShortcutTelemetry", false)
+
+return EnrolledConsoleExperienceControls or v3

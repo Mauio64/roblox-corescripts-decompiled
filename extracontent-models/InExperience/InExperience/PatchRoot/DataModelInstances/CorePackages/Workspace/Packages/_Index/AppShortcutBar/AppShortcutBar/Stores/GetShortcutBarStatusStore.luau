@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("AppShortcutBar").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createShortcutBarStatusStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
+local Signals = require(Parent.Signals)
+local createShortcutBarStatusStore = require(script.createShortcutBarStatusStore)
+
+return Signals.createComputed(createShortcutBarStatusStore)

@@ -1,57 +1,64 @@
-local function _(v0) --[[ Line: 3 ]] --[[ Name: getSelectedRobuxPackage ]]
-    if not v0.robuxUpsellSuggestions or not v0.robuxUpsellSuggestions.products or not v0.robuxUpsellSuggestions.selection then
-        return nil;
-    else
-        return v0.robuxUpsellSuggestions.products[v0.robuxUpsellSuggestions.selection];
-    end;
-end;
+local function getSelectedRobuxPackage(p1) -- line: 3
+	if not p1.robuxUpsellSuggestions or (not p1.robuxUpsellSuggestions.products or not p1.robuxUpsellSuggestions.selection) then
+		return nil
+	end
+
+	return p1.robuxUpsellSuggestions.products[p1.robuxUpsellSuggestions.selection]
+end
+
 return {
-    getRobuxProductId = function(v2) --[[ Line: 14 ]] --[[ Name: getRobuxProductId ]]
-        local v3 = if v2.robuxUpsellSuggestions and v2.robuxUpsellSuggestions.products and v2.robuxUpsellSuggestions.selection then v2.robuxUpsellSuggestions.products[v2.robuxUpsellSuggestions.selection] else nil;
-        if not v3 then
-            return nil;
-        else
-            return v3.providerId;
-        end;
-    end, 
-    getProductId = function(v4) --[[ Line: 23 ]] --[[ Name: getProductId ]]
-        local v5 = if v4.robuxUpsellSuggestions and v4.robuxUpsellSuggestions.products and v4.robuxUpsellSuggestions.selection then v4.robuxUpsellSuggestions.products[v4.robuxUpsellSuggestions.selection] else nil;
-        if not v5 then
-            return nil;
-        else
-            return v5.productId;
-        end;
-    end, 
-    getProductName = function(v6) --[[ Line: 32 ]] --[[ Name: getProductName ]]
-        local v7 = if v6.robuxUpsellSuggestions and v6.robuxUpsellSuggestions.products and v6.robuxUpsellSuggestions.selection then v6.robuxUpsellSuggestions.products[v6.robuxUpsellSuggestions.selection] else nil;
-        if not v7 then
-            return nil;
-        else
-            return v7.productName;
-        end;
-    end, 
-    getRobuxPurchaseAmount = function(v8) --[[ Line: 41 ]] --[[ Name: getRobuxPurchaseAmount ]]
-        local v9 = if v8.robuxUpsellSuggestions and v8.robuxUpsellSuggestions.products and v8.robuxUpsellSuggestions.selection then v8.robuxUpsellSuggestions.products[v8.robuxUpsellSuggestions.selection] else nil;
-        if not v9 then
-            return nil;
-        else
-            return v9.robuxAmount;
-        end;
-    end, 
-    getRobuxAmountBeforeBonus = function(v10) --[[ Line: 59 ]] --[[ Name: getRobuxAmountBeforeBonus ]]
-        local v11 = if v10.robuxUpsellSuggestions and v10.robuxUpsellSuggestions.products and v10.robuxUpsellSuggestions.selection then v10.robuxUpsellSuggestions.products[v10.robuxUpsellSuggestions.selection] else nil;
-        if not v11 then
-            return nil;
-        else
-            return v11.robuxAmountBeforeBonus;
-        end;
-    end, 
-    getPrice = function(v12) --[[ Line: 50 ]] --[[ Name: getPrice ]]
-        local v13 = if v12.robuxUpsellSuggestions and v12.robuxUpsellSuggestions.products and v12.robuxUpsellSuggestions.selection then v12.robuxUpsellSuggestions.products[v12.robuxUpsellSuggestions.selection] else nil;
-        if not v13 then
-            return nil;
-        else
-            return v13.price;
-        end;
-    end
-};
+	getRobuxProductId = function(p2) -- line: 14
+		local v4 = if not not p2.robuxUpsellSuggestions and (not not p2.robuxUpsellSuggestions.products and p2.robuxUpsellSuggestions.selection) then p2.robuxUpsellSuggestions.products[p2.robuxUpsellSuggestions.selection] else nil
+
+		if not v4 then
+			return nil
+		end
+
+		return v4.providerId
+	end,
+	getProductId = function(p3) -- line: 23
+		local v6 = if not not p3.robuxUpsellSuggestions and (not not p3.robuxUpsellSuggestions.products and p3.robuxUpsellSuggestions.selection) then p3.robuxUpsellSuggestions.products[p3.robuxUpsellSuggestions.selection] else nil
+
+		if not v6 then
+			return nil
+		end
+
+		return v6.productId
+	end,
+	getProductName = function(p4) -- line: 32
+		local v8 = if not not p4.robuxUpsellSuggestions and (not not p4.robuxUpsellSuggestions.products and p4.robuxUpsellSuggestions.selection) then p4.robuxUpsellSuggestions.products[p4.robuxUpsellSuggestions.selection] else nil
+
+		if not v8 then
+			return nil
+		end
+
+		return v8.productName
+	end,
+	getRobuxPurchaseAmount = function(p5) -- line: 41
+		local v10 = if not not p5.robuxUpsellSuggestions and (not not p5.robuxUpsellSuggestions.products and p5.robuxUpsellSuggestions.selection) then p5.robuxUpsellSuggestions.products[p5.robuxUpsellSuggestions.selection] else nil
+
+		if not v10 then
+			return nil
+		end
+
+		return v10.robuxAmount
+	end,
+	getRobuxAmountBeforeBonus = function(p6) -- line: 59
+		local v14 = if not not p6.robuxUpsellSuggestions and (not not p6.robuxUpsellSuggestions.products and p6.robuxUpsellSuggestions.selection) then p6.robuxUpsellSuggestions.products[p6.robuxUpsellSuggestions.selection] else nil
+
+		if not v14 then
+			return nil
+		end
+
+		return v14.robuxAmountBeforeBonus
+	end,
+	getPrice = function(p7) -- line: 50
+		local v12 = if not not p7.robuxUpsellSuggestions and (not not p7.robuxUpsellSuggestions.products and p7.robuxUpsellSuggestions.selection) then p7.robuxUpsellSuggestions.products[p7.robuxUpsellSuggestions.selection] else nil
+
+		if not v12 then
+			return nil
+		end
+
+		return v12.price
+	end
+}

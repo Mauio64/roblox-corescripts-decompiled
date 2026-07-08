@@ -1,104 +1,107 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.ApolloClient);
-local v2 = require(l_script_FirstAncestor_0.Parent.GraphQLServer);
-local v3 = require(l_script_FirstAncestor_0.Parent.React);
-local v4 = require(l_script_FirstAncestor_0.Parent.Rodux);
-local v5 = require(l_script_FirstAncestor_0.Parent.RoactNavigation);
-local v6 = require(l_script_FirstAncestor_0.Parent.RoactRodux);
-local v7 = require(l_script_FirstAncestor_0.Parent.RobloxAppLocales);
-local v8 = require(l_script_FirstAncestor_0.Parent.Localization);
-local v9 = require(l_script_FirstAncestor_0.Parent.UIBlox);
-local l_DesignTokenProvider_0 = require(l_script_FirstAncestor_0.Parent.Style).DesignTokenProvider;
-local v11 = require(l_script_FirstAncestor_0.Parent.VirtualEventsState);
-local l_MockContentProvider_0 = v9.UnitTestHelpers.MockContentProvider;
-local l_FoundationProvider_0 = require(l_script_FirstAncestor_0.Parent.Foundation).FoundationProvider;
-local l_AppStyleProvider_0 = v9.App.Style.AppStyleProvider;
-local l_Constants_0 = v9.App.Style.Constants;
-local l_ContentProvider_0 = v9.App.Context.ContentProvider;
-local v17 = v4.combineReducers({
-    VirtualEvents = v11.installReducer()
-});
-return function(v18, v19) --[[ Line: 32 ]] --[[ Name: withMockProviders ]]
-    -- upvalues: v4 (copy), v17 (copy), v3 (copy), v6 (copy), l_ContentProvider_0 (copy), l_MockContentProvider_0 (copy), v8 (copy), v7 (copy), l_FoundationProvider_0 (copy), l_AppStyleProvider_0 (copy), l_Constants_0 (copy), v5 (copy), l_DesignTokenProvider_0 (copy), v2 (copy), v1 (copy)
-    local v20 = (if v19 then v19.store else nil) or v4.Store.new(v17, if v19 then v19.initialStoreState else nil, {
-        v4.thunkMiddleware
-    });
-    local v21 = {
-        StoreProvider = v3.createElement(v6.StoreProvider, {
-            store = v20
-        }, {
-            ContentProvider = v3.createElement(l_ContentProvider_0.Provider, {
-                value = l_MockContentProvider_0.new()
-            }, {
-                LocalizationProvider = v3.createElement(v8.LocalizationProvider, {
-                    localization = v7.Localization.new("en-us")
-                }, {
-                    FoundationProvider = v3.createElement(l_FoundationProvider_0, {
-                        theme = "Dark"
-                    }, {
-                        StyleProvider = v3.createElement(l_AppStyleProvider_0, {
-                            style = {
-                                themeName = l_Constants_0.ThemeName.Dark, 
-                                fontName = l_Constants_0.FontName.Gotham
-                            }
-                        }, {
-                            NavigationProvider = v3.createElement(v5.Provider, {
-                                value = {
-                                    isFocused = function() --[[ Line: 61 ]] --[[ Name: isFocused ]]
-                                        return true;
-                                    end, 
-                                    goBack = function() --[[ Line: 64 ]] --[[ Name: goBack ]]
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local ApolloClient = require(VirtualEvents.Parent.ApolloClient)
+local GraphQLServer = require(VirtualEvents.Parent.GraphQLServer)
+local React = require(VirtualEvents.Parent.React)
+local Rodux = require(VirtualEvents.Parent.Rodux)
+local RoactNavigation = require(VirtualEvents.Parent.RoactNavigation)
+local RoactRodux = require(VirtualEvents.Parent.RoactRodux)
+local RobloxAppLocales = require(VirtualEvents.Parent.RobloxAppLocales)
+local Localization = require(VirtualEvents.Parent.Localization)
+local UIBlox = require(VirtualEvents.Parent.UIBlox)
+local DesignTokenProvider = require(VirtualEvents.Parent.Style).DesignTokenProvider
+local VirtualEventsState = require(VirtualEvents.Parent.VirtualEventsState)
+local MockContentProvider = UIBlox.UnitTestHelpers.MockContentProvider
+local FoundationProvider = require(VirtualEvents.Parent.Foundation).FoundationProvider
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Constants = UIBlox.App.Style.Constants
+local ContentProvider = UIBlox.App.Context.ContentProvider
+local v18 = Rodux.combineReducers({
+	VirtualEvents = VirtualEventsState.installReducer()
+})
 
-                                    end, 
-                                    addListener = function() --[[ Line: 65 ]] --[[ Name: addListener ]]
-                                        return {
-                                            remove = function() --[[ Line: 67 ]] --[[ Name: remove ]]
+local function withMockProviders(t1: {[any]: any}, t2: {[any]: any}?) -- line: 32
+	-- upvalues: Rodux (copy), v18 (copy), React (copy), RoactRodux (copy), ContentProvider (copy), MockContentProvider (copy), Localization (copy), RobloxAppLocales (copy), FoundationProvider (copy), AppStyleProvider (copy), Constants (copy), RoactNavigation (copy), DesignTokenProvider (copy), GraphQLServer (copy), ApolloClient (copy)
+	local v22 = ((if not t2 then nil else t2.store)) or Rodux.Store.new(v18, if not t2 then nil else t2.initialStoreState, { Rodux.thunkMiddleware })
+	local t3 = {
+		StoreProvider = React.createElement(RoactRodux.StoreProvider, {
+			store = v22
+		}, {
+			ContentProvider = React.createElement(ContentProvider.Provider, {
+				value = MockContentProvider.new()
+			}, {
+				LocalizationProvider = React.createElement(Localization.LocalizationProvider, {
+					localization = RobloxAppLocales.Localization.new("en-us")
+				}, {
+					FoundationProvider = React.createElement(FoundationProvider, {
+						theme = "Dark"
+					}, {
+						StyleProvider = React.createElement(AppStyleProvider, {
+							style = {
+								themeName = Constants.ThemeName.Dark,
+								fontName = Constants.FontName.Gotham
+							}
+						}, {
+							NavigationProvider = React.createElement(RoactNavigation.Provider, {
+								value = {
+									isFocused = function() -- line: 61
+										return true
+									end,
+									goBack = function() -- line: 64
+									end,
+									addListener = function() -- line: 65
+										return {
+											remove = function() -- line: 67
+											end
+										}
+									end
+								}
+							}, {
+								DesignTokenProvider = React.createElement(DesignTokenProvider, {
+									tokenMappers = {}
+								}, {
+									Children = React.createElement(React.Fragment, nil, t1)
+								})
+							})
+						})
+					})
+				})
+			})
+		})
+	}
 
-                                            end
-                                        };
-                                    end
-                                }
-                            }, {
-                                DesignTokenProvider = v3.createElement(l_DesignTokenProvider_0, {
-                                    tokenMappers = {}
-                                }, {
-                                    Children = v3.createElement(v3.Fragment, nil, v18)
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    };
-    if v19 then
-        if v19.mockResolvers then
-            local v22 = v2.GraphQLServer.new({
-                mockResolvers = v19.mockResolvers
-            });
-            local v25 = v1.ApolloClient.new({
-                cache = v1.InMemoryCache.new({}), 
-                link = v1.HttpLink.new({
-                    uri = "/api", 
-                    fetch = function(_, v24) --[[ Line: 95 ]] --[[ Name: fetch ]]
-                        -- upvalues: v22 (copy)
-                        return v22:fetchLocal(v24);
-                    end
-                })
-            });
-            v21 = {
-                ApolloProvider = v3.createElement(v1.ApolloProvider, {
-                    client = v25
-                }, v21)
-            };
-        end;
-        if v19.mockNavigation then
-            v21 = {
-                NavigationProvider = v3.createElement(v5.Provider, {
-                    value = v19.mockNavigation
-                }, v21)
-            };
-        end;
-    end;
-    return v3.createElement(v3.Fragment, nil, v21);
-end;
+	if t2 then
+		if t2.mockResolvers then
+			local v24 = GraphQLServer.GraphQLServer.new({
+				mockResolvers = t2.mockResolvers
+			})
+			local v25 = ApolloClient.ApolloClient.new({
+				cache = ApolloClient.InMemoryCache.new({}),
+				link = ApolloClient.HttpLink.new({
+					uri = "/api",
+					fetch = function(_, p2) -- line: 95
+						-- upvalues: v24 (copy)
+						return v24:fetchLocal(p2)
+					end
+				})
+			})
+
+			t3 = {
+				ApolloProvider = React.createElement(ApolloClient.ApolloProvider, {
+					client = v25
+				}, t3)
+			}
+		end
+
+		if t2.mockNavigation then
+			t3 = {
+				NavigationProvider = React.createElement(RoactNavigation.Provider, {
+					value = t2.mockNavigation
+				}, t3)
+			}
+		end
+	end
+
+	return React.createElement(React.Fragment, nil, t3)
+end
+
+return withMockProviders

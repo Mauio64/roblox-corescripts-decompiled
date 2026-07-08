@@ -1,18 +1,20 @@
-local l_IXPService_0 = game:GetService("IXPService");
+local IXPService = game:GetService("IXPService")
+
 return {
-    getIxpLayerData = function(v1) --[[ Line: 3 ]]
-        -- upvalues: l_IXPService_0 (copy)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 4 ]]
-            -- upvalues: l_IXPService_0 (ref), v1 (copy)
-            return l_IXPService_0:GetUserLayerVariables(v1);
-        end);
-        return l_status_0 and l_result_0 or nil;
-    end, 
-    logUserLayerExposure = function(v4) --[[ Line: 11 ]]
-        -- upvalues: l_IXPService_0 (copy)
-        pcall(function() --[[ Line: 12 ]]
-            -- upvalues: l_IXPService_0 (ref), v4 (copy)
-            l_IXPService_0:LogUserLayerExposure(v4);
-        end);
-    end
-};
+	getIxpLayerData = function(s1: string) -- line: 3
+		-- upvalues: IXPService (copy)
+		local ok, result = pcall(function() -- line: 4
+			-- upvalues: IXPService (copy), s1 (copy)
+			return IXPService:GetUserLayerVariables(s1)
+		end)
+
+		return ok and result or nil
+	end,
+	logUserLayerExposure = function(s2: string) -- line: 11
+		-- upvalues: IXPService (copy)
+		pcall(function() -- line: 12
+			-- upvalues: IXPService (copy), s2 (copy)
+			IXPService:LogUserLayerExposure(s2)
+		end)
+	end
+}

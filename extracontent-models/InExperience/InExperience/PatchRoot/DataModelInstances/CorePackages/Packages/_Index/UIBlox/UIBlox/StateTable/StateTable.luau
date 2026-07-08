@@ -1,128 +1,118 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Parent.Cryo);
-local v2 = {};
-v2.__index = v2;
-local function _(v3, v4) --[[ Line: 9 ]] --[[ Name: validateStateTableItem ]]
-    local v5 = typeof(v3);
-    local v6 = true;
-    if v5 ~= "string" then
-        v6 = v5 == "userdata";
-    end;
-    assert(v6, string.format("%s '%s' must be a string or userdata but is a %s", v4, tostring(v3), v5));
-end;
-v2.new = function(v8, v9, v10, v11) --[[ Line: 72 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    assert(typeof(v8) == "string", "name must be a string");
-    assert(#v8 > 0, "name must not be an empty string");
-    local v12 = typeof(v9);
-    local v13 = true;
-    if v12 ~= "string" then
-        v13 = v12 == "userdata";
-    end;
-    assert(v13, string.format("%s '%s' must be a string or userdata but is a %s", "initialState", tostring(v9), v12));
-    v13 = true;
-    if v10 ~= nil then
-        v13 = typeof(v10) == "table";
-    end;
-    assert(v13, "initialContext must be a table or nil");
-    assert(typeof(v11) == "table", "transitionTable must be a table");
-    assert(typeof(v11[v9]) == "table", "initialState must be present in transitionTable");
-    v12 = {};
-    setmetatable(v12, v2);
-    v12.name = v8;
-    v12.currentState = v9;
-    v12.currentContext = v10 or {};
-    v12.transitionTable = {};
-    v12.events = {};
-    for v14, v15 in pairs(v11) do
-        local v16 = typeof(v14);
-        local v17 = true;
-        if v16 ~= "string" then
-            v17 = v16 == "userdata";
-        end;
-        assert(v17, string.format("%s '%s' must be a string or userdata but is a %s", "state", tostring(v14), v16));
-        assert(typeof(v15) == "table", string.format("state '%s' must map to a table", (tostring(v14))));
-        v16 = {};
-        for v18, v19 in pairs(v15) do
-            local v20 = typeof(v18);
-            local v21 = true;
-            if v20 ~= "string" then
-                v21 = v20 == "userdata";
-            end;
-            assert(v21, string.format("%s '%s' must be a string or userdata but is a %s", "event", tostring(v18), v20));
-            assert(typeof(v19) == "table", string.format("event '%s' must map to a table", (tostring(v18))));
-            v20 = v19.nextState;
-            v21 = v19.action;
-            if v20 ~= nil then
-                local v22 = typeof(v20);
-                local v23 = true;
-                if v22 ~= "string" then
-                    v23 = v22 == "userdata";
-                end;
-                assert(v23, string.format("%s '%s' must be a string or userdata but is a %s", "nextState", tostring(v20), v22));
-                assert(v11[v20] ~= nil, string.format("nextState '%s' does not exist in transitionTable", (tostring(v20))));
-            end;
-            local v24 = true;
-            if v21 ~= nil then
-                v24 = typeof(v21) == "function";
-            end;
-            assert(v24, "action must be a function");
-            v16[v18] = v19;
-            if v12.events[v18] == nil then
-                v12.events[v18] = function(v25) --[[ Line: 119 ]]
-                    -- upvalues: v12 (copy), v18 (copy)
-                    return v12:handleEvent(v18, v25);
-                end;
-            end;
-        end;
-        v12.transitionTable[v14] = v16;
-    end;
-    setmetatable(v12.events, {
-        __index = function(_, v27) --[[ Line: 130 ]] --[[ Name: __index ]]
-            -- upvalues: v12 (copy)
-            error(string.format("'%s' is not a valid event in StateTable '%s'", tostring(v27), v12.name), 2);
-        end
-    });
-    return v12;
-end;
-v2.handleEvent = function(v28, v29, v30) --[[ Line: 150 ]] --[[ Name: handleEvent ]]
-    -- upvalues: v1 (copy)
-    local v31 = typeof(v29);
-    local v32 = true;
-    if v31 ~= "string" then
-        v32 = v31 == "userdata";
-    end;
-    assert(v32, string.format("%s '%s' must be a string or userdata but is a %s", "event", tostring(v29), v31));
-    v32 = true;
-    if v30 ~= nil then
-        v32 = typeof(v30) == "table";
-    end;
-    assert(v32, "args must be nil or valid table");
-    v31 = v28.currentState;
-    v32 = v28.transitionTable[v31];
-    assert(v32 ~= nil, "no transition events for current state");
-    if v32[v29] ~= nil then
-        local v33 = v32[v29];
-        local v34 = v33.nextState or v31;
-        local l_action_0 = v33.action;
-        local l_currentContext_0 = v28.currentContext;
-        if l_action_0 ~= nil then
-            local v37 = l_action_0(v31, v34, v30, v28.currentContext) or {};
-            l_currentContext_0 = v1.Dictionary.join(v28.currentContext, v37);
-            v28.currentContext = l_currentContext_0;
-        end;
-        v28.currentState = v34;
-        if v28.stateChangeHandler ~= nil then
-            v28.stateChangeHandler(v31, v34, l_currentContext_0);
-        end;
-    end;
-end;
-v2.onStateChange = function(v38, v39) --[[ Line: 191 ]] --[[ Name: onStateChange ]]
-    local v40 = true;
-    if v39 ~= nil then
-        v40 = typeof(v39) == "function";
-    end;
-    assert(v40, "stateChangeHandler must be nil or a function");
-    v38.stateChangeHandler = v39;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local Cryo = require(ParentParent.Parent.Cryo)
+local t1 = {}
+
+t1.__index = t1
+
+local function validateStateTableItem(p1, p2) -- line: 9
+	local v7 = typeof(p1)
+
+	assert(v7 == "string" or v7 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", p2, tostring(p1), v7))
+end
+
+function t1.new(p3, p4, p5, p6) -- line: 72
+	-- upvalues: t1 (copy)
+	assert(typeof(p3) == "string", "name must be a string")
+	assert(#p3 > 0, "name must not be an empty string")
+
+	local v12 = typeof(p4)
+
+	assert(v12 == "string" or v12 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", "initialState", tostring(p4), v12))
+	assert(p5 == nil or typeof(p5) == "table", "initialContext must be a table or nil")
+	assert(typeof(p6) == "table", "transitionTable must be a table")
+	assert(typeof(p6[p4]) == "table", "initialState must be present in transitionTable")
+
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.name = p3
+	t2.currentState = p4
+	t2.currentContext = p5 or {}
+	t2.transitionTable = {}
+	t2.events = {}
+
+	for k, v in pairs(p6) do
+		local v16 = typeof(k)
+
+		assert(v16 == "string" or v16 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", "state", tostring(k), v16))
+		assert(typeof(v) == "table", string.format("state '%s' must map to a table", (tostring(k))))
+
+		local t3 = {}
+
+		for k2, v2 in pairs(v) do
+			local v20 = typeof(k2)
+
+			assert(v20 == "string" or v20 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", "event", tostring(k2), v20))
+			assert(typeof(v2) == "table", string.format("event '%s' must map to a table", (tostring(k2))))
+
+			local nextState = v2.nextState
+			local action = v2.action
+
+			if nextState ~= nil then
+				local v23 = typeof(nextState)
+
+				assert(v23 == "string" or v23 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", "nextState", tostring(nextState), v23))
+				assert(p6[nextState] ~= nil, string.format("nextState '%s' does not exist in transitionTable", (tostring(nextState))))
+			end
+
+			assert(action == nil or typeof(action) == "function", "action must be a function")
+			t3[k2] = v2
+
+			if t2.events[k2] == nil then
+				t2.events[k2] = function(p7) -- line: 119
+					-- upvalues: t2 (copy), k2 (copy)
+					return t2:handleEvent(k2, p7)
+				end
+			end
+		end
+
+		t2.transitionTable[k] = t3
+	end
+
+	setmetatable(t2.events, {
+		__index = function(_, p9) -- line: 130
+			-- upvalues: t2 (copy)
+			error(string.format("'%s' is not a valid event in StateTable '%s'", tostring(p9), t2.name), 2)
+		end
+	})
+
+	return t2
+end
+function t1.handleEvent(p10, p11, p12) -- line: 150
+	-- upvalues: Cryo (copy)
+	local v27 = typeof(p11)
+
+	assert(v27 == "string" or v27 == "userdata", string.format("%s '%s' must be a string or userdata but is a %s", "event", tostring(p11), v27))
+	assert(p12 == nil or typeof(p12) == "table", "args must be nil or valid table")
+
+	local currentState = p10.currentState
+	local v29 = p10.transitionTable[currentState]
+
+	assert(v29 ~= nil, "no transition events for current state")
+
+	if v29[p11] ~= nil then
+		local v30 = v29[p11]
+		local v31 = v30.nextState or currentState
+		local action = v30.action
+		local currentContext = p10.currentContext
+
+		if action ~= nil then
+			local v34 = action(currentState, v31, p12, p10.currentContext) or {}
+
+			currentContext = Cryo.Dictionary.join(p10.currentContext, v34)
+			p10.currentContext = currentContext
+		end
+
+		p10.currentState = v31
+
+		if p10.stateChangeHandler ~= nil then
+			p10.stateChangeHandler(currentState, v31, currentContext)
+		end
+	end
+end
+function t1.onStateChange(p13, p14) -- line: 191
+	assert(p14 == nil or typeof(p14) == "function", "stateChangeHandler must be nil or a function")
+	p13.stateChangeHandler = p14
+end
+
+return t1

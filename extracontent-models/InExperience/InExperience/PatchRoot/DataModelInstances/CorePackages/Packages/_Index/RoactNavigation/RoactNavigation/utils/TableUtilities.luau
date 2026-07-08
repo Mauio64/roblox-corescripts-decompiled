@@ -1,229 +1,294 @@
-local v0 = {};
-local v1 = {};
-local function _(v2) --[[ Line: 8 ]] --[[ Name: makeKeyString ]]
-    if type(v2) == "string" then
-        return string.format("%s", v2);
-    else
-        return string.format("[%s]", (tostring(v2)));
-    end;
-end;
-local function v6(v4) --[[ Line: 16 ]] --[[ Name: makeValueString ]]
-    local v5 = type(v4);
-    if v5 == "string" then
-        return string.format("%q", v4);
-    elseif v5 == "function" or v5 == "table" then
-        return string.format("<%s>", (tostring(v4)));
-    else
-        return string.format("%s", (tostring(v4)));
-    end;
-end;
-local function v14(v7, v8, v9, v10) --[[ Line: 27 ]] --[[ Name: printKeypair ]]
-    -- upvalues: v6 (copy)
-    local v11 = if type(v7) == "string" then string.format("%s", v7) else string.format("[%s]", (tostring(v7)));
-    local v12 = v6(v8);
-    local v13 = if v10 then string.format(" -- %s", v10) else "";
-    print(string.format("%s%s = %s,%s", v9, v11, v12, v13));
-end;
-v0.ShallowEqual = function(v15, v16, v17) --[[ Line: 39 ]] --[[ Name: ShallowEqual ]]
-    -- upvalues: v1 (copy)
-    if not v15 or not v16 then
-        return false;
-    elseif v15 == v16 then
-        return true;
-    else
-        if not v17 then
-            v17 = v1;
-        end;
-        for v18, v19 in v15 do
-            if v16[v18] ~= v19 and not v17[v18] then
-                return false;
-            end;
-        end;
-        for v20, v21 in v16 do
-            if v15[v20] ~= v21 and not v17[v20] then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
-local function v24(v22, v23) --[[ Line: 64 ]] --[[ Name: formatDeepEqualMessage ]]
-    if v23 ~= 0 then
-        return v22;
-    else
-        return v22:gsub("{1}", "first"):gsub("{2}", "second");
-    end;
-end;
-v0.DeepEqual = function(v25, v26, v27) --[[ Line: 75 ]] --[[ Name: DeepEqual ]]
-    -- upvalues: v24 (copy), v0 (copy)
-    v27 = v27 or 0;
-    if v25 == v26 then
-        return true;
-    elseif typeof(v25) ~= typeof(v26) then
-        local v28 = ("{1} is of type %s, but {2} is of type %s"):format(typeof(v25), (typeof(v26)));
-        return false, v24(v28, v27);
-    elseif typeof(v25) == "table" then
-        local v29 = {};
-        for v30, v31 in v25 do
-            v29[v30] = true;
-            local v32, v33 = v0.DeepEqual(v31, v26[v30], v27 + 1);
-            if not v32 then
-                local v34 = v33:gsub("{1}", ("{1}[%s]"):format((tostring(v30)))):gsub("{2}", ("{2}[%s]"):format((tostring(v30))));
-                return false, v24(v34, v27);
-            end;
-        end;
-        for v35, v36 in v26 do
-            if not v29[v35] then
-                local v37, v38 = v0.DeepEqual(v25[v35], v36, v27 + 1);
-                if not v37 then
-                    local v39 = v38:gsub("{1}", ("{1}[%s]"):format((tostring(v35)))):gsub("{2}", ("{2}[%s]"):format((tostring(v35))));
-                    return false, v24(v39, v27);
-                end;
-            end;
-        end;
-        return true;
-    else
-        return false, v24("{1} ~= {2}", v27);
-    end;
-end;
-v0.EqualKey = function(v40, v41, v42) --[[ Line: 127 ]] --[[ Name: EqualKey ]]
-    if v40 and v41 and v42 and v42 ~= "" and v40[v42] and v41[v42] and v40[v42] == v41[v42] then
-        return true;
-    else
-        return false;
-    end;
-end;
-v0.TableDifference = function(v43, v44) --[[ Line: 138 ]] --[[ Name: TableDifference ]]
-    local v45 = {};
-    for v46, v47 in v43 do
-        if v44[v46] ~= v43[v46] then
-            v45[v46] = v47;
-        end;
-    end;
-    return v45;
-end;
-local function _(v48) --[[ Line: 155 ]] --[[ Name: membershipTable ]]
-    local v49 = {};
-    for v50 = 1, #v48 do
-        v49[v48[v50]] = true;
-    end;
-    return v49;
-end;
-local _ = function(v52) --[[ Line: 166 ]] --[[ Name: listOfKeys ]]
-    local v53 = {};
-    for v54, _ in v52 do
-        table.insert(v53, v54);
-    end;
-    return v53;
-end;
-v0.ListDifference = function(v57, v58) --[[ Line: 178 ]] --[[ Name: ListDifference ]]
-    -- upvalues: v0 (copy)
-    local l_TableDifference_0 = v0.TableDifference;
-    local v60 = {};
-    for v61 = 1, #v57 do
-        v60[v57[v61]] = true;
-    end;
-    local l_v60_0 = v60;
-    local v63 = {};
-    for v64 = 1, #v58 do
-        v63[v58[v64]] = true;
-    end;
-    l_TableDifference_0 = l_TableDifference_0(l_v60_0, v63);
-    l_v60_0 = {};
-    for v65, _ in l_TableDifference_0 do
-        table.insert(l_v60_0, v65);
-    end;
-    return l_v60_0;
-end;
-v0.CheckListConsistency = function(v67) --[[ Line: 188 ]] --[[ Name: CheckListConsistency ]]
-    local v68 = false;
-    local v69 = false;
-    local v70 = true;
-    local v71 = 1;
-    for v72, _ in v67 do
-        if type(v72) == "string" then
-            v69 = true;
-        elseif type(v72) == "number" then
-            if v71 ~= v72 then
-                v70 = false;
-            end;
-            v68 = true;
-        else
-            return false;
-        end;
-        if v69 and v68 then
-            return false;
-        else
-            v71 = v71 + 1;
-        end;
-    end;
-    if v68 then
-        return v70;
-    else
-        return true;
-    end;
-end;
-v0.RecursiveToString = function(v74, v75) --[[ Line: 223 ]] --[[ Name: RecursiveToString ]]
-    -- upvalues: v0 (copy)
-    v75 = v75 or "";
-    if type(v74) == "table" then
-        local v76 = "";
-        if not v0.CheckListConsistency(v74) then
-            v76 = v76 .. "-- WARNING: this table fails the list consistency test\n";
-        end;
-        v76 = v76 .. "{\n";
-        for v77, v78 in v74 do
-            if type(v77) == "string" then
-                v76 = v76 .. "  " .. v75 .. tostring(v77) .. " = " .. v0.RecursiveToString(v78, "  " .. v75) .. ";\n";
-            end;
-            if type(v77) == "number" then
-                v76 = v76 .. "  " .. v75 .. v0.RecursiveToString(v78, "  " .. v75) .. ",\n";
-            end;
-        end;
-        return v76 .. v75 .. "}";
-    else
-        return (tostring(v74));
-    end;
-end;
-v0.Print = function(v79, v80) --[[ Line: 257 ]] --[[ Name: Print ]]
-    -- upvalues: v6 (copy), v14 (copy)
-    v80 = v80 or "  ";
-    if type(v79) ~= "table" then
-        error("TableUtilities.Print must be passed a table", 2);
-    end;
-    local v81 = {};
-    local function v82(v83, v84, v85) --[[ Line: 267 ]] --[[ Name: recurse ]]
-        -- upvalues: v81 (copy), v80 (ref), v6 (ref), v14 (ref), v82 (copy)
-        v81[v83] = true;
-        local v86 = string.rep(v80, v85);
-        local v87 = string.rep(v80, v85 + 1);
-        if v84 then
-            print(string.format("%s%s = %s {", v86, if type(v84) == "string" then string.format("%s", v84) else string.format("[%s]", (tostring(v84))), v6(v83)));
-        else
-            print(string.format("%s%s {", v86, v6(v83)));
-        end;
-        for v88, v89 in v83 do
-            if type(v89) == "table" then
-                if v81[v89] then
-                    v14(v88, v89, v87, "Possible cycle");
-                else
-                    v82(v89, v88, v85 + 1);
-                end;
-            else
-                local v90 = if type(v88) == "string" then string.format("%s", v88) else string.format("[%s]", (tostring(v88)));
-                local v91 = v6(v89);
-                print(string.format("%s%s = %s,%s", v87, v90, v91, ""));
-            end;
-        end;
-        print(string.format("%s}%s", v86, v85 > 0 and "," or ""));
-    end;
-    v82(v79, nil, 0);
-end;
-v0.FieldCount = function(v92) --[[ Line: 301 ]] --[[ Name: FieldCount ]]
-    local v93 = 0;
-    for _ in v92 do
-        v93 = v93 + 1;
-    end;
-    return v93;
-end;
-return v0;
+local t1 = {}
+local t2 = {}
+
+local function makeKeyString(p1) -- line: 8
+	if type(p1) == "string" then
+		return string.format("%s", p1)
+	end
+
+	return string.format("[%s]", (tostring(p1)))
+end
+local function makeValueString(p2) -- line: 16
+	local v11 = type(p2)
+
+	if v11 == "string" then
+		return string.format("%q", p2)
+	end
+
+	if v11 == "function" or v11 == "table" then
+		return string.format("<%s>", (tostring(p2)))
+	end
+
+	return string.format("%s", (tostring(p2)))
+end
+local function printKeypair(p3, p4, p5, p6) -- line: 27
+	-- upvalues: makeValueString (copy)
+	local v16 = if type(p3) ~= "string" then string.format("[%s]", (tostring(p3))) else string.format("%s", p3)
+	local v17 = makeValueString(p4)
+	local v18 = not p6 and "" or string.format(" -- %s", p6)
+
+	print(string.format("%s%s = %s,%s", p5, v16, v17, v18))
+end
+
+function t1.ShallowEqual(p7, p8, p9) -- line: 39
+	-- upvalues: t2 (copy)
+	if not p7 or not p8 then
+		return false
+	end
+
+	if p7 == p8 then
+		return true
+	end
+
+	if not p9 then
+		p9 = t2
+	end
+
+	for v22, v23 in p7 do
+		if v23 ~= p8[v22] and not p9[v22] then
+			return false
+		end
+	end
+
+	for v24, v25 in p8 do
+		if v25 ~= p7[v24] and not p9[v24] then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function formatDeepEqualMessage(p10, p11) -- line: 64
+	if p11 ~= 0 then
+		return p10
+	end
+
+	return p10:gsub("{1}", "first"):gsub("{2}", "second")
+end
+
+function t1.DeepEqual(p12, p13, p14) -- line: 75
+	-- upvalues: formatDeepEqualMessage (copy), t1 (copy)
+	local v31 = p14 or 0
+
+	if p12 == p13 then
+		return true
+	end
+
+	if typeof(p12) ~= typeof(p13) then
+		local v32 = ("{1} is of type %s, but {2} is of type %s"):format(typeof(p12), (typeof(p13)))
+
+		return false, formatDeepEqualMessage(v32, v31)
+	end
+
+	if typeof(p12) == "table" then
+		local t3 = {}
+
+		for v34, v35 in p12 do
+			t3[v34] = true
+
+			local v36, v37 = t1.DeepEqual(v35, p13[v34], v31 + 1)
+
+			if not v36 then
+				local v38 = v37:gsub("{1}", ("{1}[%s]"):format((tostring(v34)))):gsub("{2}", ("{2}[%s]"):format((tostring(v34))))
+
+				return false, formatDeepEqualMessage(v38, v31)
+			end
+		end
+
+		for v39, v40 in p13 do
+			if t3[v39] then
+				continue
+			end
+
+			local v41, v42 = t1.DeepEqual(p12[v39], v40, v31 + 1)
+
+			if not v41 then
+				local v43 = v42:gsub("{1}", ("{1}[%s]"):format((tostring(v39)))):gsub("{2}", ("{2}[%s]"):format((tostring(v39))))
+
+				return false, formatDeepEqualMessage(v43, v31)
+			end
+		end
+
+		return true
+	end
+
+	return false, formatDeepEqualMessage("{1} ~= {2}", v31)
+end
+function t1.EqualKey(p15, p16, p17) -- line: 127
+	if p15 and (p16 and p17 and p17 ~= "" and p15[p17] and p16[p17] and p15[p17] == p16[p17]) then
+		return true
+	end
+
+	return false
+end
+function t1.TableDifference(p18, p19) -- line: 138
+	local t4 = {}
+
+	for v50, v51 in p18 do
+		if p19[v50] ~= p18[v50] then
+			t4[v50] = v51
+		end
+	end
+
+	return t4
+end
+
+local function membershipTable(p20) -- line: 155
+	local t5 = {}
+
+	for i = 1, #p20 do
+		t5[p20[i]] = true
+	end
+
+	return t5
+end
+local function listOfKeys(p21) -- line: 166
+	local t6 = {}
+
+	for v57, _ in p21 do
+		table.insert(t6, v57)
+	end
+
+	return t6
+end
+
+function t1.ListDifference(p22, p23) -- line: 178
+	-- upvalues: t1 (copy)
+	local TableDifference = t1.TableDifference
+	local t7 = {}
+
+	for i = 1, #p22 do
+		t7[p22[i]] = true
+	end
+
+	local t8 = {}
+
+	for i = 1, #p23 do
+		t8[p23[i]] = true
+	end
+
+	local t9 = {}
+
+	for v67, _ in (TableDifference(t7, t8)) do
+		table.insert(t9, v67)
+	end
+
+	return t9
+end
+function t1.CheckListConsistency(p24) -- line: 188
+	local v70 = false
+	local v71 = false
+	local v72 = true
+	local n1 = 1
+
+	for v74, _ in p24 do
+		if type(v74) == "string" then
+			v71 = true
+		else
+			if type(v74) ~= "number" then
+				return false
+			end
+
+			if n1 ~= v74 then
+				v72 = false
+			end
+
+			v70 = true
+		end
+
+		if v71 and v70 then
+			return false
+		end
+
+		n1 += 1
+	end
+
+	if v70 then
+		return v72
+	end
+
+	return true
+end
+function t1.RecursiveToString(p25, p26) -- line: 223
+	-- upvalues: t1 (copy)
+	local v78 = p26 or ""
+
+	if type(p25) == "table" then
+		local s1 = ""
+
+		if not t1.CheckListConsistency(p25) then
+			s1 ..= "-- WARNING: this table fails the list consistency test\n"
+		end
+
+		local v80 = s1 .. "{\n"
+
+		for v81, v82 in p25 do
+			if type(v81) == "string" then
+				v80 ..= "  " .. v78 .. tostring(v81) .. " = " .. t1.RecursiveToString(v82, "  " .. v78) .. ";\n"
+			end
+
+			if type(v81) == "number" then
+				v80 ..= "  " .. v78 .. t1.RecursiveToString(v82, "  " .. v78) .. ",\n"
+			end
+		end
+
+		return v80 .. v78 .. "}"
+	end
+
+	return (tostring(p25))
+end
+function t1.Print(p27, p28) -- line: 257
+	-- upvalues: makeValueString (copy), printKeypair (copy)
+	local u85 = p28 or "  "
+
+	if type(p27) ~= "table" then
+		error("TableUtilities.Print must be passed a table", 2)
+	end
+
+	local t10 = {}
+
+	local function recurse(p29, p30, p31) -- line: 267
+		-- upvalues: t10 (copy), u85 (ref), makeValueString (copy), printKeypair (copy), recurse (copy)
+		t10[p29] = true
+
+		local v94 = string.rep(u85, p31)
+		local v95 = string.rep(u85, p31 + 1)
+
+		if p30 then
+			print(string.format("%s%s = %s {", v94, if type(p30) ~= "string" then string.format("[%s]", (tostring(p30))) else string.format("%s", p30), makeValueString(p29)))
+		else
+			print(string.format("%s%s {", v94, makeValueString(p29)))
+		end
+
+		for v96, v97 in p29 do
+			if type(v97) == "table" then
+				if t10[v97] then
+					printKeypair(v96, v97, v95, "Possible cycle")
+				else
+					recurse(v97, v96, p31 + 1)
+				end
+			else
+				local v98 = if type(v96) ~= "string" then string.format("[%s]", (tostring(v96))) else string.format("%s", v96)
+				local v99 = makeValueString(v97)
+
+				print(string.format("%s%s = %s,%s", v95, v98, v99, ""))
+			end
+		end
+
+		print(string.format("%s}%s", v94, not (p31 > 0) and "" or ","))
+	end
+
+	recurse(p27, nil, 0)
+end
+function t1.FieldCount(p32) -- line: 301
+	local n2 = 0
+
+	for _ in p32 do
+		n2 += 1
+	end
+
+	return n2
+end
+
+return t1

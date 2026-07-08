@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugEnablePageLoadTrackerVisualizer", false);
+return game:DefineFastFlag("DebugEnablePageLoadTrackerVisualizer", false)

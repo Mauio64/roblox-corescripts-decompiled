@@ -1,3 +1,3 @@
 return {
-    ScheduledSquadModel = require(script.ScheduledSquadModel)
-};
+	ScheduledSquadModel = require(script.ScheduledSquadModel)
+}

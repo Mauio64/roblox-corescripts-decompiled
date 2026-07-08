@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothReplacesFullview", false);
+return game:DefineFastFlag("AXPhotoboothReplacesFullview", false)

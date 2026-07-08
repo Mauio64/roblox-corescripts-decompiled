@@ -1,1 +1,1 @@
-return game:DefineFastInt("MinDaysToShowCountDownLabel", 1);
+return game:DefineFastInt("MinDaysToShowCountDownLabel", 1)

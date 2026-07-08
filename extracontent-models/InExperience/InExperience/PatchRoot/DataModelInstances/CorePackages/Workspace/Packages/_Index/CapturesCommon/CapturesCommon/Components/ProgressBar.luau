@@ -1,99 +1,107 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Foundation);
-local v2 = require(l_Parent_0.React);
-local l_ButtonSize_0 = v1.Enums.ButtonSize;
-local l_IconButton_0 = v1.IconButton;
-local l_Text_0 = v1.Text;
-local l_View_0 = v1.View;
-local function _(v7) --[[ Line: 29 ]] --[[ Name: formatTime ]]
-    local v8 = math.floor(v7 / 60);
-    local v9 = math.floor(v7 % 60);
-    return string.format("%02d:%02d", v8, v9);
-end;
-return function(v11) --[[ Line: 35 ]] --[[ Name: ProgressBar ]]
-    -- upvalues: v2 (copy), l_View_0 (copy), l_IconButton_0 (copy), l_ButtonSize_0 (copy), l_Text_0 (copy)
-    local v12 = v11.timePosition / v11.timeLength;
-    local l_timePosition_0 = v11.timePosition;
-    local v14 = math.floor(l_timePosition_0 / 60);
-    local v15 = math.floor(l_timePosition_0 % 60);
-    local v16 = string.format("%02d:%02d", v14, v15);
-    v14 = v11.timeLength;
-    v15 = math.floor(v14 / 60);
-    local v17 = math.floor(v14 % 60);
-    l_timePosition_0 = string.format("%02d:%02d", v15, v17);
-    v14 = v2.useRef(nil);
-    v15, v17 = v2.useState(0);
-    v2.useEffect(function() --[[ Line: 42 ]]
-        -- upvalues: v14 (copy), v17 (copy)
-        if not v14 or not v14.current then
-            return;
-        else
-            local v19 = v14.current.InputBegan:Connect(function(v18) --[[ Line: 49 ]]
-                -- upvalues: v17 (ref)
-                v17(v18.Position.X);
-            end);
-            return function() --[[ Line: 53 ]]
-                -- upvalues: v19 (copy)
-                v19:Disconnect();
-            end;
-        end;
-    end, {});
-    local v22 = v2.useCallback(function() --[[ Line: 58 ]]
-        -- upvalues: v14 (copy), v11 (copy), v15 (copy)
-        if not v14 or not v14.current then
-            return;
-        else
-            local l_X_0 = v14.current.AbsolutePosition.X;
-            local l_X_1 = v14.current.AbsoluteSize.X;
-            v11.onProgressBarActivated((v15 - l_X_0) / l_X_1);
-            return;
-        end;
-    end, {
-        v15, 
-        v11.onProgressBarActivated
-    });
-    return v2.createElement(l_View_0, {
-        tag = {
-            ["align-x-center align-y-center col size-full-1400"] = true, 
-            ["padding-medium"] = v11.isFullScreen, 
-            ["padding-x-medium"] = not v11.isFullScreen
-        }
-    }, {
-        ProgressBarContainer = v2.createElement(l_View_0, {
-            LayoutOrder = 1, 
-            onActivated = v22, 
-            ref = v14, 
-            tag = "radius-small bg-over-media-0 size-full-200"
-        }, {
-            Progress = v2.createElement(l_View_0, {
-                Size = UDim2.fromScale(v12, 1), 
-                tag = "radius-small bg-system-neutral"
-            })
-        }), 
-        CTAContainer = v2.createElement(l_View_0, {
-            LayoutOrder = 2, 
-            isDisabled = true, 
-            tag = "row flex-between align-x-center align-y-center size-full-1000"
-        }, {
-            PlayButton = v2.createElement(l_IconButton_0, {
-                icon = v11.isPlaying and "icons/controls/media-pause-medium" or "icons/controls/media-play-medium", 
-                isDisabled = false, 
-                LayoutOrder = 1, 
-                onActivated = v11.onPlayButtonActivated, 
-                size = l_ButtonSize_0.Medium
-            }), 
-            TimeText = if v11.isTimeHidden then nil else v2.createElement(l_Text_0, {
-                LayoutOrder = 2, 
-                Text = string.format("%s / %s", v16, l_timePosition_0), 
-                tag = "auto-xy text-body-large"
-            }), 
-            MuteButton = v2.createElement(l_IconButton_0, {
-                icon = v11.isMuted and "icons/controls/speakerMute" or "icons/controls/speaker", 
-                isDisabled = false, 
-                LayoutOrder = 3, 
-                onActivated = v11.onMuteButtonActivated, 
-                size = l_ButtonSize_0.Medium
-            })
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Foundation = require(ParentParent.Foundation)
+local React = require(ParentParent.React)
+local ButtonSize = Foundation.Enums.ButtonSize
+local IconButton = Foundation.IconButton
+local FoundationText = Foundation.Text
+local View = Foundation.View
+
+local function formatTime(n1: number) -- line: 29
+	local v11 = math.floor(n1 / 60)
+	local v12 = math.floor(n1 % 60)
+
+	return string.format("%02d:%02d", v11, v12)
+end
+local function ProgressBar(t1: {[any]: any}) -- line: 35
+	-- upvalues: React (copy), View (copy), IconButton (copy), ButtonSize (copy), FoundationText (copy)
+	local v14 = t1.timePosition / t1.timeLength
+	local timePosition = t1.timePosition
+	local v16 = math.floor(timePosition / 60)
+	local v17 = math.floor(timePosition % 60)
+	local v18 = string.format("%02d:%02d", v16, v17)
+	local timeLength = t1.timeLength
+	local v20 = math.floor(timeLength / 60)
+	local v21 = math.floor(timeLength % 60)
+	local v22 = string.format("%02d:%02d", v20, v21)
+	local v23 = React.useRef(nil)
+	local v24, v25 = React.useState(0)
+
+	React.useEffect(function() -- line: 42
+		-- upvalues: v23 (copy), v25 (copy)
+		if not v23 or not v23.current then
+			return
+		end
+
+		local connection = v23.current.InputBegan:Connect(function(input) -- line: 49
+			-- upvalues: v25 (copy)
+			v25(input.Position.X)
+		end)
+
+		return function() -- line: 53
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {})
+
+	local v26 = React.useCallback(function() -- line: 58
+		-- upvalues: v23 (copy), t1 (copy), v24 (copy)
+		if not v23 or not v23.current then
+			return
+		end
+
+		local AbsolutePositionX = v23.current.AbsolutePosition.X
+		local AbsoluteSizeX = v23.current.AbsoluteSize.X
+
+		t1.onProgressBarActivated((v24 - AbsolutePositionX) / AbsoluteSizeX)
+	end, {
+		v24,
+		t1.onProgressBarActivated
+	})
+
+	return React.createElement(View, {
+		tag = {
+			["align-x-center align-y-center col size-full-1400"] = true,
+			["padding-medium"] = t1.isFullScreen,
+			["padding-x-medium"] = not t1.isFullScreen
+		}
+	}, {
+		ProgressBarContainer = React.createElement(View, {
+			LayoutOrder = 1,
+			tag = "radius-small bg-over-media-0 size-full-200",
+			onActivated = v26,
+			ref = v23
+		}, {
+			Progress = React.createElement(View, {
+				tag = "radius-small bg-system-neutral",
+				Size = UDim2.fromScale(v14, 1)
+			})
+		}),
+		CTAContainer = React.createElement(View, {
+			LayoutOrder = 2,
+			isDisabled = true,
+			tag = "row flex-between align-x-center align-y-center size-full-1000"
+		}, {
+			PlayButton = React.createElement(IconButton, {
+				isDisabled = false,
+				LayoutOrder = 1,
+				icon = not t1.isPlaying and "icons/controls/media-play-medium" or "icons/controls/media-pause-medium",
+				onActivated = t1.onPlayButtonActivated,
+				size = ButtonSize.Medium
+			}),
+			TimeText = if not t1.isTimeHidden then React.createElement(FoundationText, {
+				LayoutOrder = 2,
+				tag = "auto-xy text-body-large",
+				Text = string.format("%s / %s", v18, v22)
+			}) else nil,
+			MuteButton = React.createElement(IconButton, {
+				isDisabled = false,
+				LayoutOrder = 3,
+				icon = not t1.isMuted and "icons/controls/speaker" or "icons/controls/speakerMute",
+				onActivated = t1.onMuteButtonActivated,
+				size = ButtonSize.Medium
+			})
+		})
+	})
+end
+
+return ProgressBar

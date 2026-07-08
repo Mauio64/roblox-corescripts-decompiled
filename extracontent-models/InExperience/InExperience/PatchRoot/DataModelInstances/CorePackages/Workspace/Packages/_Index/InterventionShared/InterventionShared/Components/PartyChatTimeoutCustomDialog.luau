@@ -52,6 +52,7 @@ return React.memo(function(p1) -- line: 29
 	})
 
 	return React.createElement(InterventionDialog, {
+		iconName = "icons/status/error_large",
 		titleText = v22:map(function(p2) -- line: 53
 			-- upvalues: v21 (copy), Constants (copy)
 			return v21:Format(Constants.localizationKeys.PartyChatSuspendedText, {
@@ -60,7 +61,6 @@ return React.memo(function(p1) -- line: 29
 		end),
 		bodyText = v20.CantUsePartyChatText,
 		onDismiss = p1.onDismiss,
-		iconName = "icons/status/error_large",
 		iconSize = IconSize.Large,
 		iconStyle = v19.Color.System.Alert,
 		eventId = p1.eventId,

@@ -1,60 +1,99 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiSharedUtilities");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.DataHydration);
-local v4 = require(l_Parent_0.SignalsReact);
-local l_getSduiComponentWrapper_0 = require(l_Parent_0.SduiCoreSystem).getSduiComponentWrapper;
-local v6 = require(l_script_FirstAncestor_0.getSduiApiStore);
-local _ = require(l_script_FirstAncestor_0.SduiLoadTimer);
-local v8 = require(l_script_FirstAncestor_0.useCreateClientBindingSduiContext);
-local l_DataHydrationTypes_0 = v3.DataHydrationTypes;
-local v10 = require(l_script_FirstAncestor_0.hooks.useComponentConfig);
-local v11 = require(l_script_FirstAncestor_0.hooks.useComponentLifecycleTiming);
-local v12 = require(l_script_FirstAncestor_0.hooks.useLocalAnalyticsData);
-local v13 = require(l_script_FirstAncestor_0.hooks.useStatefulRef);
-local v14 = require(l_script_FirstAncestor_0.ui.SduiFeatureEntryPointUi);
-local function _(v15) --[[ Line: 22 ]] --[[ Name: useUiStatus ]]
-    -- upvalues: v4 (copy), v6 (copy), l_DataHydrationTypes_0 (copy)
-    local v16 = v4.useSignalState(v6().getData(v15).status);
-    if v16 == l_DataHydrationTypes_0.DataStatus.NotReady then
-        return "Loading";
-    elseif v16 == l_DataHydrationTypes_0.DataStatus.Failed then
-        return "Error";
-    else
-        return "Resolved";
-    end;
-end;
-return v2.memo(v2.forwardRef(function(v18, v19) --[[ Line: 65 ]] --[[ Name: SduiFeatureEntryPoint ]]
-    -- upvalues: v10 (copy), v11 (copy), v4 (copy), v6 (copy), l_DataHydrationTypes_0 (copy), v13 (copy), v8 (copy), v12 (copy), v2 (copy), v14 (copy), l_getSduiComponentWrapper_0 (copy)
-    local l_configKey_0 = v18.configKey;
-    local l_appPage_0 = v18.appPage;
-    local v22 = v18.shouldDisplayLoading == nil or v18.shouldDisplayLoading;
-    local v23 = v18.shouldDisplayError == nil or v18.shouldDisplayError;
-    local v24 = v10(l_configKey_0, v18.identifier);
-    v11(v18.loadTimer, typeof(v24) == "table");
-    local v25 = v4.useSignalState(v6().getData(l_configKey_0).status);
-    local v26 = v25 == l_DataHydrationTypes_0.DataStatus.NotReady and "Loading" or v25 == l_DataHydrationTypes_0.DataStatus.Failed and "Error" or "Resolved";
-    local v27;
-    v25, v27 = v13(v19);
-    local v28 = v8(l_appPage_0, v25);
-    local v29 = v12(l_configKey_0, l_appPage_0, v18.additionalAnalyticsData);
-    return v2.createElement(v14, {
-        onRetry = v18.onRetry, 
-        contentSlot = if v24 then v2.createElement(l_getSduiComponentWrapper_0(v24), {
-            debugName = ("SduiFeatureEntryPoint-%*"):format(l_configKey_0), 
-            componentConfig = v24, 
-            sduiContext = v28, 
-            localAnalyticsData = v29
-        }) else nil, 
-        uiStatus = v26, 
-        errorSlot = v18.errorSlot, 
-        loadingSlot = v18.loadingSlot, 
-        shouldDisplayLoading = v22, 
-        shouldDisplayError = v23, 
-        Size = if v18.Size then v18.Size else UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = if v18.AutomaticSize then v18.AutomaticSize else Enum.AutomaticSize.Y, 
-        Position = v18.Position, 
-        LayoutOrder = v18.LayoutOrder, 
-        ref = v27
-    });
-end));
+local SduiSharedUtilities = script:FindFirstAncestor("SduiSharedUtilities")
+local SduiSharedUtilitiesParent = SduiSharedUtilities.Parent
+local React = require(SduiSharedUtilitiesParent.React)
+
+require(SduiSharedUtilitiesParent.Foundation)
+
+local DataHydration = require(SduiSharedUtilitiesParent.DataHydration)
+local SignalsReact = require(SduiSharedUtilitiesParent.SignalsReact)
+local getSduiComponentWrapper = require(SduiSharedUtilitiesParent.SduiCoreSystem).getSduiComponentWrapper
+local getSduiApiStore = require(SduiSharedUtilities.getSduiApiStore)
+
+require(SduiSharedUtilities.SduiLoadTimer)
+
+local useCreateClientBindingSduiContext = require(SduiSharedUtilities.useCreateClientBindingSduiContext)
+local DataHydrationTypes = DataHydration.DataHydrationTypes
+local useComponentConfig = require(SduiSharedUtilities.hooks.useComponentConfig)
+local useComponentLifecycleTiming = require(SduiSharedUtilities.hooks.useComponentLifecycleTiming)
+local useDataUpdatedTimestamp = require(SduiSharedUtilities.hooks.useDataUpdatedTimestamp)
+local useLocalAnalyticsData = require(SduiSharedUtilities.hooks.useLocalAnalyticsData)
+local useUiStatus = require(SduiSharedUtilities.hooks.useUiStatus)
+
+require(SduiSharedUtilities.SduiIntegrationTypes)
+
+local useStatefulRef = require(SduiSharedUtilities.hooks.useStatefulRef)
+local SduiFeatureEntryPointUi = require(SduiSharedUtilities.ui.SduiFeatureEntryPointUi)
+local SharedFlags = require(SduiSharedUtilitiesParent.SharedFlags)
+local FFlagSduiFeatureEntryPointTakesAbsoluteSizeHandler = SharedFlags.FFlagSduiFeatureEntryPointTakesAbsoluteSizeHandler
+local FFlagSduiUseSharedUiStatusHook = SharedFlags.FFlagSduiUseSharedUiStatusHook
+local FFlagSduiClientPageScope = SharedFlags.FFlagSduiClientPageScope
+local FFlagEnableSduiV2HomeInterleave = SharedFlags.FFlagEnableSduiV2HomeInterleave
+
+local function useUiStatusLegacy(p1) -- line: 33
+	-- upvalues: SignalsReact (copy), getSduiApiStore (copy), DataHydrationTypes (copy)
+	local v25 = SignalsReact.useSignalState(getSduiApiStore().getData(p1).status)
+
+	if v25 == DataHydrationTypes.DataStatus.NotReady then
+		return "Loading"
+	end
+
+	if v25 == DataHydrationTypes.DataStatus.Failed then
+		return "Error"
+	end
+
+	return "Resolved"
+end
+local function SduiFeatureEntryPoint(t1: {[any]: any}, p2) -- line: 83
+	-- upvalues: useComponentConfig (copy), useComponentLifecycleTiming (copy), FFlagEnableSduiV2HomeInterleave (copy), useDataUpdatedTimestamp (copy), FFlagSduiUseSharedUiStatusHook (copy), useUiStatus (copy), SignalsReact (copy), getSduiApiStore (copy), DataHydrationTypes (copy), useStatefulRef (copy), useCreateClientBindingSduiContext (copy), FFlagSduiClientPageScope (copy), useLocalAnalyticsData (copy), React (copy), SduiFeatureEntryPointUi (copy), getSduiComponentWrapper (copy), FFlagSduiFeatureEntryPointTakesAbsoluteSizeHandler (copy)
+	local configKey = t1.configKey
+	local appPage = t1.appPage
+	local v30 = t1.shouldDisplayLoading == nil or t1.shouldDisplayLoading
+	local v31 = t1.shouldDisplayError == nil or t1.shouldDisplayError
+	local v32 = useComponentConfig(configKey, t1.identifier)
+
+	useComponentLifecycleTiming(t1.loadTimer, typeof(v32) == "table")
+
+	local v33 = nil
+
+	if FFlagEnableSduiV2HomeInterleave then
+		v33 = useDataUpdatedTimestamp(configKey, t1.identifier)
+	end
+
+	local v34
+
+	if FFlagSduiUseSharedUiStatusHook then
+		v34 = useUiStatus(configKey)
+	else
+		local v35 = SignalsReact.useSignalState(getSduiApiStore().getData(configKey).status)
+
+		v34 = if v35 ~= DataHydrationTypes.DataStatus.NotReady then v35 ~= DataHydrationTypes.DataStatus.Failed and "Resolved" or "Error" else "Loading"
+	end
+
+	local v36, v37 = useStatefulRef(p2)
+	local v38 = useCreateClientBindingSduiContext(appPage, v36, nil, if not FFlagEnableSduiV2HomeInterleave then nil else v33, if not FFlagSduiClientPageScope then nil else configKey, if not FFlagEnableSduiV2HomeInterleave then nil else t1.appCompositionEnabledOverride, t1.routeName)
+	local v39 = useLocalAnalyticsData(configKey, appPage, t1.additionalAnalyticsData)
+
+	return React.createElement(SduiFeatureEntryPointUi, {
+		onRetry = t1.onRetry,
+		contentSlot = if not v32 then nil else React.createElement(getSduiComponentWrapper(v32), {
+			debugName = `SduiFeatureEntryPoint-{ configKey }`,
+			componentConfig = v32,
+			sduiContext = v38,
+			localAnalyticsData = v39,
+			extraLocalProps = if not FFlagEnableSduiV2HomeInterleave then nil else t1.extraLocalProps
+		}),
+		uiStatus = v34,
+		errorSlot = t1.errorSlot,
+		loadingSlot = t1.loadingSlot,
+		shouldDisplayLoading = v30,
+		shouldDisplayError = v31,
+		onAbsoluteSizeChange = if not FFlagSduiFeatureEntryPointTakesAbsoluteSizeHandler then nil else t1.onAbsoluteSizeChange,
+		Size = if not t1.Size then UDim2.new(1, 0, 0, 0) else t1.Size,
+		AutomaticSize = if not t1.AutomaticSize then Enum.AutomaticSize.Y else t1.AutomaticSize,
+		Position = t1.Position,
+		LayoutOrder = t1.LayoutOrder,
+		ref = v37
+	})
+end
+
+return React.memo(React.forwardRef(SduiFeatureEntryPoint))

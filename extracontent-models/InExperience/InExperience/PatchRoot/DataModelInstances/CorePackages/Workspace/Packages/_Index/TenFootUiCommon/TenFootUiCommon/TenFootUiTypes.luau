@@ -1,6 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("TenFootUiCommon").Parent;
-local _ = require(l_Parent_0.AppCommonLib);
-local _ = require(l_Parent_0.React);
-local _ = require(l_Parent_0.Navigation);
-local _ = require(l_Parent_0.UIBlox);
-return {};
+local Parent = script:FindFirstAncestor("TenFootUiCommon").Parent
+
+require(Parent.AppCommonLib)
+require(Parent.React)
+require(Parent.Navigation)
+require(Parent.UIBlox)
+
+return {}

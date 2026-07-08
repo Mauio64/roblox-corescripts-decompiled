@@ -1,3 +1,3 @@
 return {
-    MutualConnectionList = require(script.MutualConnectionList)
-};
+	MutualConnectionList = require(script.MutualConnectionList)
+}

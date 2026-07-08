@@ -1,5 +1,6 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local v3 = require(l_script_FirstAncestor_0.Stores.TimeoutStatusStore.createTimeoutStatusStore);
-return v2.createComputed(v3);
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local Signals = require(AvatarExperienceCommonParent.Signals)
+local createTimeoutStatusStore = require(AvatarExperienceCommon.Stores.TimeoutStatusStore.createTimeoutStatusStore)
+
+return Signals.createComputed(createTimeoutStatusStore)

@@ -1,68 +1,70 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_Workspace_0 = game:GetService("Workspace");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ObservableValue_0 = require(l_script_FirstAncestor_0.Service.ChromeUtils).ObservableValue;
-local v4 = l_ObservableValue_0.new(Vector2.new(0, 0));
-local v5 = l_ObservableValue_0.new(false);
-local v6 = nil;
-createViewportInfo = function(v7) --[[ Line: 25 ]] --[[ Name: createViewportInfo ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    local v8 = v7.Y > v7.X;
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    local v10 = true;
-    if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.IOS then
-        v10 = l_l_UserInputService_0_Platform_0 == Enum.Platform.Android;
-    end;
-    return {
-        size = v7, 
-        portraitOrientation = v8, 
-        tinyPortrait = v10 and v8 and v7.X < 360, 
-        isMobileDevice = v10
-    };
-end;
-local v11 = l_ObservableValue_0.new(createViewportInfo(Vector2.zero));
-updateViewportSize = function(v12) --[[ Line: 39 ]] --[[ Name: updateViewportSize ]]
-    -- upvalues: v4 (copy), v11 (copy)
-    local v13 = Vector2.new(v12.X, v12.Y);
-    v4:set(v13);
-    v11:set(createViewportInfo(v13));
-end;
-setCurrentCamera = function(v14) --[[ Line: 45 ]] --[[ Name: setCurrentCamera ]]
-    -- upvalues: v6 (ref), l_UserInputService_0 (copy), v5 (copy)
-    if v6 then
-        pcall(function() --[[ Line: 47 ]]
-            -- upvalues: v6 (ref)
-            v6:Disconnect();
-        end);
-        v6 = nil;
-    end;
-    if v14 then
-        local l_l_UserInputService_0_Platform_1 = l_UserInputService_0:GetPlatform();
-        local l_v5_0 = v5;
-        local v17 = true;
-        if l_l_UserInputService_0_Platform_1 ~= Enum.Platform.IOS then
-            v17 = l_l_UserInputService_0_Platform_1 == Enum.Platform.Android;
-        end;
-        l_v5_0:set(v17);
-        v6 = v14:GetPropertyChangedSignal("ViewportSize"):Connect(function() --[[ Line: 56 ]]
-            -- upvalues: v14 (copy)
-            updateViewportSize(v14.ViewportSize);
-        end);
-        updateViewportSize(v14.ViewportSize);
-    end;
-end;
-l_Workspace_0:GetPropertyChangedSignal("CurrentCamera"):Connect(function() --[[ Line: 63 ]]
-    -- upvalues: l_Workspace_0 (copy)
-    setCurrentCamera(l_Workspace_0.CurrentCamera);
-end);
-setCurrentCamera(l_Workspace_0.CurrentCamera);
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local ObservableValue = require(ChromeShared.Service.ChromeUtils).ObservableValue
+local v5 = ObservableValue.new(Vector2.new(0, 0))
+local v6 = ObservableValue.new(false)
+local u7 = nil
+
+function createViewportInfo(vector2: Vector2) -- line: 25
+	-- upvalues: UserInputService (copy)
+	local v10 = vector2.Y > vector2.X
+	local Platform = UserInputService:GetPlatform()
+	local v12 = Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android
+
+	return {
+		size = vector2,
+		portraitOrientation = v10,
+		tinyPortrait = v12 and (v10 and vector2.X < 360),
+		isMobileDevice = v12
+	}
+end
+
+local v8 = ObservableValue.new(createViewportInfo(Vector2.zero))
+
+function updateViewportSize(vector2: Vector2) -- line: 39
+	-- upvalues: v5 (copy), v8 (copy)
+	local vector2_2 = Vector2.new(vector2.X, vector2.Y)
+
+	v5:set(vector2_2)
+	v8:set(createViewportInfo(vector2_2))
+end
+function setCurrentCamera(p1) -- line: 45
+	-- upvalues: u7 (ref), UserInputService (copy), v6 (copy)
+	if u7 then
+		pcall(function() -- line: 47
+			-- upvalues: u7 (ref)
+			u7:Disconnect()
+		end)
+		u7 = nil
+	end
+
+	if p1 then
+		local Platform = UserInputService:GetPlatform()
+
+		v6:set(Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android)
+		u7 = p1:GetPropertyChangedSignal("ViewportSize"):Connect(function() -- line: 56
+			-- upvalues: p1 (copy)
+			updateViewportSize(p1.ViewportSize)
+		end)
+		updateViewportSize(p1.ViewportSize)
+	end
+end
+
+Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function() -- line: 63
+	-- upvalues: Workspace (copy)
+	setCurrentCamera(Workspace.CurrentCamera)
+end)
+setCurrentCamera(Workspace.CurrentCamera)
+
 return {
-    screenSize = v4, 
-    mobileDevice = v5, 
-    viewport = v11, 
-    isSmallTouchScreen = function() --[[ Line: 72 ]] --[[ Name: isSmallTouchScreen ]]
-        -- upvalues: v4 (copy), l_UserInputService_0 (copy)
-        local v18 = v4:get();
-        return l_UserInputService_0.TouchEnabled and (v18.Y < 500 or v18.X < 700);
-    end
-};
+	screenSize = v5,
+	mobileDevice = v6,
+	viewport = v8,
+	isSmallTouchScreen = function() -- line: 72
+		-- upvalues: v5 (copy), UserInputService (copy)
+		local v17 = v5:get()
+
+		return UserInputService.TouchEnabled and (v17.Y < 500 or v17.X < 700)
+	end
+}

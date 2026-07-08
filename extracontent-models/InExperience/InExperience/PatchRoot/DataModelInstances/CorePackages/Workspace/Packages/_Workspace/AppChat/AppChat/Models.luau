@@ -1,6 +1,7 @@
 return {
-    MessageModel = require(script.MessageModel), 
-    MockMessageModel = require(script.MockMessageModel), 
-    Conversation = require(script.Conversation), 
-    MockConversation = require(script.MockConversation)
-};
+	MessageModel = require(script.MessageModel),
+	MockMessageModel = require(script.MockMessageModel),
+	Conversation = require(script.Conversation),
+	ConversationChannels = require(script.ConversationChannels),
+	MockConversation = require(script.MockConversation)
+}

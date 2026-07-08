@@ -1,5 +1,6 @@
-local v0 = require(script.Parent.makeUseExperiment)("OnBrowserTrackerLayerLoadingStatusChanged", "GetBrowserTrackerLayerLoadingStatus", "GetBrowserTrackerLayerVariables", "LogBrowserTrackerLayerExposure", "GetBrowserTrackerStatusForLayer");
-return function(v1, v2, v3) --[[ Line: 38 ]]
-    -- upvalues: v0 (copy)
-    return v0(v1, v2, v3);
-end;
+local v1 = require(script.Parent.makeUseExperiment)("OnBrowserTrackerLayerLoadingStatusChanged", "GetBrowserTrackerLayerLoadingStatus", "GetBrowserTrackerLayerVariables", "LogBrowserTrackerLayerExposure", "GetBrowserTrackerStatusForLayer")
+
+return function(t1: {[any]: any}, p1, b1: boolean?) -- line: 38
+	-- upvalues: v1 (copy)
+	return v1(t1, p1, b1)
+end

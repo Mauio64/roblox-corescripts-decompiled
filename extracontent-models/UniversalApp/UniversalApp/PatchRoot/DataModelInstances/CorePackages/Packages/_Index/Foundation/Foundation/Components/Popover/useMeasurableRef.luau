@@ -1,78 +1,87 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Signal);
-local function v10() --[[ Line: 34 ]] --[[ Name: createSignal ]]
-    -- upvalues: v4 (copy)
-    local v5, v6 = v4.createSignal();
-    return {
-        signal = {
-            Connect = function(_, v8) --[[ Line: 39 ]] --[[ Name: Connect ]]
-                -- upvalues: v5 (copy)
-                local v9 = v5:subscribe(v8);
-                return {
-                    Disconnect = function() --[[ Line: 43 ]] --[[ Name: Disconnect ]]
-                        -- upvalues: v9 (copy)
-                        v9:unsubscribe();
-                    end
-                };
-            end
-        }, 
-        fire = v6
-    };
-end;
-local v11 = {};
-v11.__index = v11;
-v11.new = function(v12, v13) --[[ Line: 57 ]] --[[ Name: new ]]
-    -- upvalues: v11 (copy), v10 (copy)
-    local v14 = setmetatable({
-        AbsolutePosition = v12, 
-        AbsoluteSize = v13, 
-        _signals = {}
-    }, v11);
-    v14._signals.AbsolutePosition = v10();
-    v14._signals.AbsoluteSize = v10();
-    return v14;
-end;
-v11.GetPropertyChangedSignal = function(v15, v16) --[[ Line: 70 ]] --[[ Name: GetPropertyChangedSignal ]]
-    if v15._signals[v16] then
-        return v15._signals[v16].signal;
-    else
-        error((("%* is not a valid property name."):format(v16)));
-        return;
-    end;
-end;
-v11.SetPosition = function(v17, v18) --[[ Line: 77 ]] --[[ Name: SetPosition ]]
-    if v17.AbsolutePosition ~= v18 then
-        v17.AbsolutePosition = v18;
-        v17._signals.AbsolutePosition.fire(v18);
-    end;
-end;
-v11.SetSize = function(v19, v20) --[[ Line: 84 ]] --[[ Name: SetSize ]]
-    if v19.AbsoluteSize ~= v20 then
-        v19.AbsoluteSize = v20;
-        v19._signals.AbsoluteSize.fire(v20);
-    end;
-end;
-useMeasurableRef = function(v21, v22) --[[ Line: 91 ]] --[[ Name: useMeasurableRef ]]
-    -- upvalues: v3 (copy), v11 (copy)
-    local v23 = v3.useRef(nil);
-    if v23.current == nil then
-        v23.current = v11.new(v21, v22 or Vector2.one);
-    end;
-    v3.useEffect(function() --[[ Line: 97 ]]
-        -- upvalues: v23 (copy), v21 (copy)
-        v23.current:SetPosition(v21);
-    end, {
-        v21
-    });
-    v3.useEffect(function() --[[ Line: 101 ]]
-        -- upvalues: v23 (copy), v22 (copy)
-        v23.current:SetSize(v22 or Vector2.one);
-    end, {
-        v22
-    });
-    return v23;
-end;
-return useMeasurableRef;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(Foundation.Components.Types)
+
+local React = require(FoundationParent.React)
+local Signal = require(FoundationParent.Signal)
+
+local function createSignal() -- line: 34
+	-- upvalues: Signal (copy)
+	local v7, v8 = Signal.createSignal()
+
+	return {
+		signal = {
+			Connect = function(_, p2: ((...any) -> ...any)) -- line: 39
+				-- upvalues: v7 (copy)
+				local v23 = v7:subscribe(p2)
+
+				return {
+					Disconnect = function() -- line: 43
+						-- upvalues: v23 (copy)
+						v23:unsubscribe()
+					end
+				}
+			end
+		},
+		fire = v8
+	}
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(vector2: Vector2, vector2_2: Vector2) -- line: 57
+	-- upvalues: t1 (copy), createSignal (copy)
+	local v11 = setmetatable({
+		AbsolutePosition = vector2,
+		AbsoluteSize = vector2_2,
+		_signals = {}
+	}, t1)
+
+	v11._signals.AbsolutePosition = createSignal()
+	v11._signals.AbsoluteSize = createSignal()
+
+	return v11
+end
+function t1.GetPropertyChangedSignal(t2: {[any]: any}, s1: string) -- line: 70
+	if t2._signals[s1] then
+		return t2._signals[s1].signal
+	end
+
+	error(`{ s1 } is not a valid property name.`)
+end
+function t1.SetPosition(t3: {[any]: any}, vector2: Vector2) -- line: 77
+	if vector2 ~= t3.AbsolutePosition then
+		t3.AbsolutePosition = vector2
+		t3._signals.AbsolutePosition.fire(vector2)
+	end
+end
+function t1.SetSize(t4: {[any]: any}, vector2: Vector2) -- line: 84
+	if vector2 ~= t4.AbsoluteSize then
+		t4.AbsoluteSize = vector2
+		t4._signals.AbsoluteSize.fire(vector2)
+	end
+end
+function useMeasurableRef(vector2: Vector2, vector2_3: Vector2?) -- line: 91
+	-- upvalues: React (copy), t1 (copy)
+	local v20 = React.useRef(nil)
+
+	if v20.current == nil then
+		v20.current = t1.new(vector2, vector2_3 or Vector2.one)
+	end
+
+	React.useEffect(function() -- line: 97
+		-- upvalues: v20 (copy), vector2 (copy)
+		v20.current:SetPosition(vector2)
+	end, { vector2 })
+	React.useEffect(function() -- line: 101
+		-- upvalues: v20 (copy), vector2_3 (copy)
+		v20.current:SetSize(vector2_3 or Vector2.one)
+	end, { vector2_3 })
+
+	return v20
+end
+
+return useMeasurableRef

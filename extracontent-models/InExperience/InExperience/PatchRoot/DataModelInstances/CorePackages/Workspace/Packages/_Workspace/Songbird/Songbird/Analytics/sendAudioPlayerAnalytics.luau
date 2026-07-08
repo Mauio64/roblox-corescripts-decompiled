@@ -6,15 +6,15 @@ require(Songbird.Analytics.AnalyticActions)
 local getFIntSongbirdTelemetryThrottle = require(Songbird.Flags.getFIntSongbirdTelemetryThrottle)
 local t1 = {
 	eventName = "AudioPlayerEvents",
+	description = " Analytics for AudioPlayer component to track playback, favoriting, and reporting flows ",
+	links = "",
 	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
 	throttlingPercentage = getFIntSongbirdTelemetryThrottle(),
 	lastUpdated = {
 		25,
 		10,
 		24
-	},
-	description = " Analytics for AudioPlayer component to track playback, favoriting, and reporting flows ",
-	links = ""
+	}
 }
 
 local function createCounterEventConfig(s1: string) -- line: 23
@@ -28,11 +28,12 @@ local function createCounterEventConfig(s1: string) -- line: 23
 		links = t1.links
 	}
 end
-
-return function(t2: {[any]: any}) --[[ sendAudioPlayerAnalytics ]] -- line: 45
+local function sendAudioPlayerAnalytics(t2: {[any]: any}) -- line: 45
 	-- upvalues: createCounterEventConfig (copy), LoggingProtocol (copy), t1 (copy)
-	local v8 = createCounterEventConfig(t2.action)
+	local v9 = createCounterEventConfig(t2.action)
 
 	LoggingProtocol.default:logRobloxTelemetryEvent(t1, nil, t2)
-	LoggingProtocol.default:logRobloxTelemetryCounter(v8, 1)
+	LoggingProtocol.default:logRobloxTelemetryCounter(v9, 1)
 end
+
+return sendAudioPlayerAnalytics

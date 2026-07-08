@@ -1,554 +1,627 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_RunService_0 = game:GetService("RunService");
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v6 = require(l_Parent_1.Otter);
-local v7 = require(l_Parent_1.React);
-local v8 = require(l_Parent_1.ReactUtils);
-local v9 = require(l_Parent_1.Responsive);
-local v10 = require(l_Parent_1.RoactUtils);
-local v11 = require(l_Parent_1.SocialCommon);
-local v12 = require(l_Parent_0.Analytics.useAnalytics);
-local l_useBinding_0 = v7.useBinding;
-local l_useEffectOnce_0 = v10.Hooks.useEffectOnce;
-local l_useEventConnection_0 = v8.useEventConnection;
-local l_useIsHovered_0 = v11.Hooks.useIsHovered;
-local l_useIsTouchDown_0 = v11.Hooks.useIsTouchDown;
-local l_useLastInput_0 = v9.useLastInput;
-local v19 = require(l_Parent_0.Analytics.EventNames);
-local v20 = require(l_Parent_0.Utils.getClosestItemToCenter);
-local l_FFlagUseMediaPlayerInCarousel_0 = require(l_Parent_1.SharedFlags).FFlagUseMediaPlayerInCarousel;
-local v22 = {
-    dampingRatio = 1, 
-    frequency = 4
-};
-local function _(v23, v24, v25) --[[ Line: 75 ]] --[[ Name: isWithinEpsilon ]]
-    return math.abs(v23 - v24) < v25;
-end;
-local function v109(v27, v28, v29) --[[ Line: 79 ]] --[[ Name: createController ]]
-    -- upvalues: v6 (copy), v22 (copy), l_UserGameSettings_0 (copy), v20 (copy), l_RunService_0 (copy)
-    local v30 = nil;
-    local v31 = false;
-    local v32 = nil;
-    local v33 = false;
-    local v34 = 0;
-    local v35 = false;
-    local function v36() --[[ Line: 91 ]] --[[ Name: getWasTouched ]]
-        -- upvalues: v35 (ref)
-        return v35;
-    end;
-    local function v37() --[[ Line: 95 ]] --[[ Name: resetTouchState ]]
-        -- upvalues: v31 (ref), v35 (ref)
-        v31 = false;
-        v35 = false;
-    end;
-    local function v38() --[[ Line: 100 ]] --[[ Name: getIsNavigationLocked ]]
-        -- upvalues: v33 (ref)
-        return v33;
-    end;
-    local function v40(v39) --[[ Line: 104 ]] --[[ Name: setIsNavigationLocked ]]
-        -- upvalues: v31 (ref), v35 (ref), v33 (ref)
-        if v39 == true then
-            v31 = false;
-            v35 = false;
-        end;
-        v33 = v39;
-    end;
-    local function v47(v41, v42, v43) --[[ Line: 111 ]] --[[ Name: resetMotor ]]
-        -- upvalues: v32 (ref), v6 (ref), v31 (ref), v34 (ref), v27 (copy)
-        if v32 then
-            v32:destroy();
-            v32 = nil;
-        end;
-        local v44 = v6.createSingleMotor(v41);
-        v32 = v44;
-        v44:onStep(function(v45) --[[ Line: 123 ]]
-            -- upvalues: v32 (ref), v44 (copy), v31 (ref), v34 (ref), v42 (copy), v41 (copy), v27 (ref)
-            if v32 ~= v44 then
-                v44:destroy();
-                return;
-            elseif v31 then
-                v44:destroy();
-                v32 = nil;
-                return;
-            else
-                local v46 = if math.abs(v45 - v34) < 0.5 then v34 else v45;
-                if v42 and v42(v41, v46) then
-                    return;
-                else
-                    if v27.current then
-                        v27.current.CanvasPosition = Vector2.new(v46, 0);
-                    end;
-                    return;
-                end;
-            end;
-        end);
-        if v43 then
-            v44:onComplete(v43);
-        end;
-        v44:start();
-    end;
-    local function v51(v48, v49, v50) --[[ Line: 156 ]] --[[ Name: setGoal ]]
-        -- upvalues: v32 (ref), v34 (ref), v6 (ref), v22 (ref)
-        if not v32 then
-            return;
-        else
-            assert(v32 ~= nil, "setGoal called before resetMotor");
-            v34 = v48.X * (v49 - 1);
-            if v50 then
-                v32:setGoal(v6.instant(v34));
-                return;
-            else
-                v32:setGoal(v6.spring(v34, v22));
-                return;
-            end;
-        end;
-    end;
-    local function v79(v52, v53, v54, v55, v56, v57) --[[ Line: 171 ]] --[[ Name: handleDeleteTransition ]]
-        -- upvalues: v27 (copy), v28 (copy), v31 (ref), v35 (ref), v33 (ref), v47 (copy), v51 (copy), l_UserGameSettings_0 (ref), v6 (ref), v32 (ref), v34 (ref)
-        local l_current_0 = v27.current;
-        local l_current_1 = v28.current;
-        if not l_current_0 or not l_current_1 then
-            return;
-        else
-            assert(l_current_0 ~= nil, "carousel should exist");
-            assert(l_current_1 ~= nil, "selectedItem should exist");
-            local l_ScrollingEnabled_0 = l_current_0.ScrollingEnabled;
-            l_current_0.ScrollingEnabled = false;
-            v31 = false;
-            v35 = false;
-            v33 = true;
-            local function v66() --[[ Line: 194 ]] --[[ Name: handleDeleteNextImageMovement ]]
-                -- upvalues: v54 (copy), l_current_1 (copy), v55 (copy), v47 (ref), l_current_0 (copy), v57 (copy), v52 (copy), v33 (ref), l_ScrollingEnabled_0 (copy), v51 (ref), v56 (copy), l_UserGameSettings_0 (ref)
-                local function v65(v61, v62) --[[ Line: 195 ]] --[[ Name: onStep ]]
-                    -- upvalues: v54 (ref), l_current_1 (ref), v55 (ref)
-                    local v63 = math.abs(v61 - v62);
-                    local v64 = math.round(v54.X - v63);
-                    l_current_1.Size = UDim2.fromOffset(v64, v54.Y);
-                    return v55 == 1;
-                end;
-                v47(l_current_0.CanvasPosition.X, v65, function() --[[ Line: 205 ]]
-                    -- upvalues: v57 (ref), l_current_1 (ref), v52 (ref), v33 (ref), l_current_0 (ref), l_ScrollingEnabled_0 (ref)
-                    v57();
-                    l_current_1.Visible = false;
-                    v52(1);
-                    v33 = false;
-                    l_current_0.ScrollingEnabled = l_ScrollingEnabled_0;
-                end);
-                v51(v54, v55 - 1, v56 or l_UserGameSettings_0.ReducedMotion);
-            end;
-            local function v74() --[[ Line: 216 ]] --[[ Name: handleDeleteImagesFadeIn ]]
-                -- upvalues: v53 (copy), v55 (copy), v47 (ref), l_current_0 (copy), v57 (copy), l_current_1 (copy), v6 (ref), v52 (copy), v33 (ref), l_ScrollingEnabled_0 (copy), v54 (copy), v32 (ref), v34 (ref)
-                if not v53 then
-                    return;
-                else
-                    assert(v53 ~= nil, "setPostDeletionItemBinding should exist");
-                    local function v69(_, _) --[[ Line: 221 ]]
-                        -- upvalues: v55 (ref)
-                        return v55 == 1;
-                    end;
-                    v47(l_current_0.CanvasPosition.X, v69, function() --[[ Line: 225 ]]
-                        -- upvalues: v57 (ref), l_current_1 (ref), v6 (ref), v52 (ref), v53 (ref), v33 (ref), l_current_0 (ref), l_ScrollingEnabled_0 (ref)
-                        v57();
-                        l_current_1.Visible = false;
-                        local v70 = v6.createSingleMotor(0);
-                        v70:onStep(function(v71) --[[ Line: 229 ]]
-                            -- upvalues: v52 (ref), v53 (ref)
-                            v52(v71);
-                            v53(1);
-                        end);
-                        v70:onComplete(function() --[[ Line: 233 ]]
-                            -- upvalues: v33 (ref), l_current_0 (ref), l_ScrollingEnabled_0 (ref)
-                            v33 = false;
-                            l_current_0.ScrollingEnabled = l_ScrollingEnabled_0;
-                        end);
-                        v70:setGoal(v6.spring(1, {
-                            frequency = 2
-                        }));
-                    end);
-                    local l_v54_0 = v54;
-                    local v73 = v55 - 1;
-                    if not v32 then
-                        return;
-                    else
-                        assert(v32 ~= nil, "setGoal called before resetMotor");
-                        v34 = l_v54_0.X * (v73 - 1);
-                        v32:setGoal(v6.instant(v34));
-                        return;
-                    end;
-                end;
-            end;
-            local function v76() --[[ Line: 243 ]] --[[ Name: handleDeleteNextImageFadeOut ]]
-                -- upvalues: v53 (copy), v6 (ref), v74 (copy)
-                if not v53 then
-                    return;
-                else
-                    assert(v53 ~= nil, "setPostDeletionItemBinding should exist");
-                    local v75 = v6.createSingleMotor(1);
-                    v75:onStep(v53);
-                    v75:onComplete(v74);
-                    v75:setGoal(v6.spring(0, {
-                        frequency = 6
-                    }));
-                    return;
-                end;
-            end;
-            local v77 = v6.createSingleMotor(1);
-            v77:onStep(v52);
-            local v78 = nil;
-            if l_UserGameSettings_0.ReducedMotion then
-                v78 = 6;
-                v77:onComplete(v76);
-            else
-                v78 = 4;
-                v77:onComplete(v66);
-            end;
-            v77:setGoal(v6.spring(0, {
-                frequency = v78
-            }));
-            return;
-        end;
-    end;
-    local function v104(v80, v81) --[[ Line: 267 ]] --[[ Name: handleInertialMove ]]
-        -- upvalues: v27 (copy), v31 (ref), v20 (ref), v32 (ref), v6 (ref), v34 (ref), v22 (ref), v30 (ref), l_RunService_0 (ref), v29 (copy)
-        local v82 = nil;
-        local l_current_2 = v27.current;
-        if v31 or not l_current_2 then
-            return;
-        else
-            assert(l_current_2 ~= nil, "carousel should not be nil");
-            v82 = -l_current_2:GetSampledInertialVelocity().X;
-            l_current_2:ClearInertialScrolling();
-            local v84, v85 = v20(v80, l_current_2);
-            if math.abs(v82) < 60 and v84 == v81 then
-                if v85 > 0.5 then
-                    local l_X_0 = l_current_2.CanvasPosition.X;
-                    if v32 then
-                        v32:destroy();
-                        v32 = nil;
-                    end;
-                    local v87 = v6.createSingleMotor(l_X_0);
-                    v32 = v87;
-                    local v88 = nil;
-                    v87:onStep(function(v89) --[[ Line: 123 ]]
-                        -- upvalues: v32 (ref), v87 (copy), v31 (ref), v34 (ref), v88 (copy), l_X_0 (copy), v27 (ref)
-                        if v32 ~= v87 then
-                            v87:destroy();
-                            return;
-                        elseif v31 then
-                            v87:destroy();
-                            v32 = nil;
-                            return;
-                        else
-                            local v90 = if math.abs(v89 - v34) < 0.5 then v34 else v89;
-                            if v88 and v88(l_X_0, v90) then
-                                return;
-                            else
-                                if v27.current then
-                                    v27.current.CanvasPosition = Vector2.new(v90, 0);
-                                end;
-                                return;
-                            end;
-                        end;
-                    end);
-                    v87:start();
-                    if v32 then
-                        assert(v32 ~= nil, "setGoal called before resetMotor");
-                        v34 = v80.X * (v81 - 1);
-                        v32:setGoal(v6.spring(v34, v22));
-                    end;
-                end;
-                return;
-            else
-                if v30 then
-                    v30:Disconnect();
-                    v30 = nil;
-                end;
-                v30 = l_RunService_0.RenderStepped:Connect(function(v91) --[[ Line: 297 ]]
-                    -- upvalues: v27 (ref), v31 (ref), v30 (ref), v20 (ref), v80 (copy), v82 (ref), v81 (copy), v32 (ref), v6 (ref), v34 (ref), v22 (ref), v29 (ref)
-                    local l_current_3 = v27.current;
-                    if not l_current_3 or v31 then
-                        assert(v30 ~= nil, "handleInertialMoveConn should exist");
-                        v30:Disconnect();
-                        v30 = nil;
-                        return;
-                    else
-                        assert(l_current_3 ~= nil, "carousel should not be nil");
-                        local v93, v94 = v20(v80, l_current_3);
-                        if math.abs(v82) < 60 then
-                            assert(v30 ~= nil, "handleInertialMoveConn should exist");
-                            v30:Disconnect();
-                            v30 = nil;
-                            if v93 == v81 then
-                                local l_X_1 = l_current_3.CanvasPosition.X;
-                                if v32 then
-                                    v32:destroy();
-                                    v32 = nil;
-                                end;
-                                local v96 = v6.createSingleMotor(l_X_1);
-                                v32 = v96;
-                                local v97 = nil;
-                                local l_v96_0 = v96 --[[ copy: 5 -> 10 ]];
-                                local l_l_X_1_0 = l_X_1 --[[ copy: 4 -> 11 ]];
-                                v96:onStep(function(v100) --[[ Line: 123 ]]
-                                    -- upvalues: v32 (ref), l_v96_0 (copy), v31 (ref), v34 (ref), v97 (copy), l_l_X_1_0 (copy), v27 (ref)
-                                    if v32 ~= l_v96_0 then
-                                        l_v96_0:destroy();
-                                        return;
-                                    elseif v31 then
-                                        l_v96_0:destroy();
-                                        v32 = nil;
-                                        return;
-                                    else
-                                        local v101 = if math.abs(v100 - v34) < 0.5 then v34 else v100;
-                                        if v97 and v97(l_l_X_1_0, v101) then
-                                            return;
-                                        else
-                                            if v27.current then
-                                                v27.current.CanvasPosition = Vector2.new(v101, 0);
-                                            end;
-                                            return;
-                                        end;
-                                    end;
-                                end);
-                                v96:start();
-                                l_X_1 = v80;
-                                v96 = v81;
-                                if not v32 then
-                                    return;
-                                else
-                                    assert(v32 ~= nil, "setGoal called before resetMotor");
-                                    v34 = l_X_1.X * (v96 - 1);
-                                    v32:setGoal(v6.spring(v34, v22));
-                                    return;
-                                end;
-                            else
-                                v29(v93);
-                                return;
-                            end;
-                        else
-                            l_current_3.CanvasPosition = l_current_3.CanvasPosition + Vector2.new(v82 * v91, 0);
-                            local v102 = math.max(v94 / (v80.X / 2) * 1.25, 0.85);
-                            local v103 = nil;
-                            v103 = math.abs(v82) < 120 and 0.7 or v102 * 0.95;
-                            v82 = v82 * v103 ^ (v91 / 0.016666666666666666);
-                            return;
-                        end;
-                    end;
-                end);
-                return;
-            end;
-        end;
-    end;
-    local function v107(_, v106) --[[ Line: 343 ]] --[[ Name: onInputBegan ]]
-        -- upvalues: v33 (ref), v31 (ref), v35 (ref)
-        if v33 then
-            return;
-        else
-            if v106.UserInputType == Enum.UserInputType.Touch then
-                v31 = true;
-                v35 = true;
-            end;
-            return;
-        end;
-    end;
-    local v108 = {
-        carouselRef = v27, 
-        getWasTouched = v36, 
-        getIsNavigationLocked = v38, 
-        handleDeleteTransition = v79, 
-        handleInertialMove = v104, 
-        onInputBegan = v107, 
-        resetMotor = v47, 
-        resetTouchState = v37, 
-        setGoal = v51, 
-        setIsNavigationLocked = v40
-    };
-    v108.resetMotor(0);
-    return v108;
-end;
-return function(v110, v111, v112) --[[ Line: 372 ]]
-    -- upvalues: v12 (copy), l_useBinding_0 (copy), v7 (copy), l_useIsHovered_0 (copy), l_useIsTouchDown_0 (copy), l_useLastInput_0 (copy), v109 (copy), l_UserGameSettings_0 (copy), l_useEffectOnce_0 (copy), v20 (copy), l_useEventConnection_0 (copy), l_UserInputService_0 (copy), l_ContextActionService_0 (copy), v19 (copy), l_FFlagUseMediaPlayerInCarousel_0 (copy)
-    local v113 = v12();
-    local v114, v115 = l_useBinding_0(1);
-    local v116, v117 = l_useBinding_0(1);
-    local v118 = v7.useRef(nil);
-    local v119, v120, v121 = l_useIsHovered_0();
-    local v122 = l_useIsTouchDown_0();
-    local v123 = v7.useRef(nil);
-    local v124 = l_useLastInput_0();
-    local v125 = v7.useRef(nil);
-    if v125.current == nil then
-        v125.current = v109(v118, v123, v112);
-    end;
-    local l_current_4 = v125.current;
-    assert(l_current_4 ~= nil, "carouselController should exist");
-    v7.useEffect(function() --[[ Line: 392 ]]
-        -- upvalues: v118 (copy), l_UserGameSettings_0 (ref), l_current_4 (copy), v110 (copy), v111 (copy)
-        local l_current_5 = v118.current;
-        if not l_current_5 then
-            return;
-        else
-            assert(l_current_5 ~= nil, "carousel should exist");
-            local v128 = false;
-            if l_UserGameSettings_0.ReducedMotion then
-                v128 = true;
-            end;
-            l_current_4.resetMotor(l_current_5.CanvasPosition.X);
-            l_current_4.setGoal(v110, v111, v128);
-            return;
-        end;
-    end, {
-        v111
-    });
-    l_useEffectOnce_0(function() --[[ Line: 410 ]]
-        -- upvalues: l_current_4 (copy), v110 (copy), v111 (copy)
-        l_current_4.setGoal(v110, v111, true);
-    end, v111 ~= nil);
-    v7.useEffect(function() --[[ Line: 416 ]]
-        -- upvalues: l_current_4 (copy), v110 (copy), v111 (copy)
-        l_current_4.setGoal(v110, v111, true);
-    end, {
-        v110
-    });
-    v7.useEffect(function() --[[ Line: 421 ]]
-        -- upvalues: v122 (copy), l_current_4 (copy), v110 (copy), v111 (copy)
-        if not v122 and l_current_4.getWasTouched() then
-            l_current_4.resetTouchState();
-            l_current_4.handleInertialMove(v110, v111);
-        end;
-    end, {
-        v122
-    });
-    local v132 = v7.useCallback(function(v129) --[[ Line: 428 ]]
-        -- upvalues: v118 (copy), l_current_4 (copy), v20 (ref), v110 (copy), v119 (copy), v112 (copy)
-        local l_current_6 = v118.current;
-        if not l_current_6 then
-            return;
-        else
-            assert(l_current_6 ~= nil, "carousel should exist");
-            if l_current_4.getIsNavigationLocked() then
-                return;
-            else
-                local v131 = v20(v110, l_current_6);
-                if v119 and v129 > 0 then
-                    v112(v131 - 1);
-                    return;
-                else
-                    if v119 and v129 < 0 then
-                        v112(v131 + 1);
-                    end;
-                    return;
-                end;
-            end;
-        end;
-    end, {
-        v119, 
-        v110
-    });
-    l_useEventConnection_0(l_UserInputService_0.PointerAction, v132);
-    local v136 = v7.useCallback(function(v133) --[[ Line: 449 ]]
-        -- upvalues: l_UserGameSettings_0 (ref), v118 (copy), l_current_4 (copy), v20 (ref), v110 (copy), v112 (copy)
-        if not l_UserGameSettings_0.ReducedMotion then
-            return;
-        else
-            local l_current_7 = v118.current;
-            if not l_current_7 then
-                return;
-            else
-                assert(l_current_7 ~= nil, "carousel should exist");
-                if l_current_4.getIsNavigationLocked() then
-                    return;
-                else
-                    local v135 = v20(v110, l_current_7);
-                    if v133 == Enum.SwipeDirection.Left then
-                        v112(v135 + 1);
-                        return;
-                    else
-                        if v133 == Enum.SwipeDirection.Right then
-                            v112(v135 - 1);
-                        end;
-                        return;
-                    end;
-                end;
-            end;
-        end;
-    end, {});
-    l_useEventConnection_0(l_UserInputService_0.TouchSwipe, v136);
-    v7.useEffect(function() --[[ Line: 473 ]]
-        -- upvalues: l_ContextActionService_0 (ref), v118 (copy), l_current_4 (copy), v113 (copy), v19 (ref), v20 (ref), v110 (copy), v112 (copy)
-        l_ContextActionService_0:BindCoreAction("CapturesCarouselNavigateShortcutAction", function(_, v138, v139) --[[ Line: 474 ]]
-            -- upvalues: v118 (ref), l_current_4 (ref), v113 (ref), v19 (ref), v20 (ref), v110 (ref), v112 (ref)
-            local l_current_8 = v118.current;
-            if not l_current_8 then
-                return;
-            else
-                assert(l_current_8 ~= nil, "carousel should exist");
-                if l_current_4.getIsNavigationLocked() then
-                    return;
-                else
-                    if v138 == Enum.UserInputState.End then
-                        v113.fireEvent(v19.CapturesCarouselNavigatedByKeyboard);
-                        local v141 = v20(v110, l_current_8);
-                        if v139.KeyCode == Enum.KeyCode.Left then
-                            v112(v141 - 1);
-                            return;
-                        elseif v139.KeyCode == Enum.KeyCode.Right then
-                            v112(v141 + 1);
-                        end;
-                    end;
-                    return;
-                end;
-            end;
-        end, false, Enum.KeyCode.Left, Enum.KeyCode.Right);
-        return function() --[[ Line: 496 ]]
-            -- upvalues: l_ContextActionService_0 (ref)
-            l_ContextActionService_0:UnbindCoreAction("CapturesCarouselNavigateShortcutAction");
-        end;
-    end, {});
-    local v144 = v7.useCallback(function(v142, v143) --[[ Line: 501 ]]
-        -- upvalues: l_current_4 (copy), l_UserGameSettings_0 (ref), v120 (copy)
-        if l_current_4.getIsNavigationLocked() then
-            return;
-        elseif l_UserGameSettings_0.ReducedMotion then
-            v120(v142, v143);
-            return;
-        else
-            l_current_4.onInputBegan(v142, v143);
-            v120(v142, v143);
-            return;
-        end;
-    end, {
-        l_current_4.onInputBegan, 
-        v120
-    });
-    local v147 = v7.useCallback(function(v145, v146) --[[ Line: 515 ]]
-        -- upvalues: l_FFlagUseMediaPlayerInCarousel_0 (ref), v124 (copy), l_current_4 (copy), v121 (copy)
-        if l_FFlagUseMediaPlayerInCarousel_0 and v124 == "Touch" and not l_current_4.getWasTouched() then
-            l_current_4.onInputBegan(v145, v146);
-        end;
-        v121(v145, v146);
-    end, {
-        v121
-    });
-    local v149 = v7.useCallback(function(v148) --[[ Line: 522 ]]
-        -- upvalues: l_current_4 (copy), v115 (copy), v117 (copy), v110 (copy), v111 (copy)
-        l_current_4.handleDeleteTransition(v115, v117, v110, v111, false, v148);
-    end, {
-        v110, 
-        v111, 
-        v115
-    });
-    return {
-        carouselInputBegan = v144, 
-        carouselInputEnded = v147, 
-        carouselRef = v118, 
-        deleteSelectedItem = v149, 
-        postDeletionItemBinding = v116, 
-        selectedItemFadeOutBinding = v114, 
-        selectedItemRef = v123, 
-        setIsNavigationLocked = l_current_4.setIsNavigationLocked
-    };
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ContextActionService = game:GetService("ContextActionService")
+local RunService = game:GetService("RunService")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local UserInputService = game:GetService("UserInputService")
+local Otter = require(ParentParentParent.Otter)
+local React = require(ParentParentParent.React)
+local ReactUtils = require(ParentParentParent.ReactUtils)
+local Responsive = require(ParentParentParent.Responsive)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local SocialCommon = require(ParentParentParent.SocialCommon)
+local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+local useBinding = React.useBinding
+local useEffectOnce = RoactUtils.Hooks.useEffectOnce
+local useEventConnection = ReactUtils.useEventConnection
+local useIsHovered = SocialCommon.Hooks.useIsHovered
+local useIsTouchDown = SocialCommon.Hooks.useIsTouchDown
+local useLastInput = Responsive.useLastInput
+local EventNames = require(ParentParent.Analytics.EventNames)
+local getClosestItemToCenter = require(ParentParent.Utils.getClosestItemToCenter)
+local FFlagUseMediaPlayerInCarousel = require(ParentParentParent.SharedFlags).FFlagUseMediaPlayerInCarousel
+local t1 = {
+	dampingRatio = 1,
+	frequency = 4
+}
+
+local function isWithinEpsilon(n1: number, n2: number, n3: number) -- line: 75
+	return n3 > math.abs(n1 - n2)
+end
+local function createController(t2: {[any]: any}, p1, p2) -- line: 79
+	-- upvalues: Otter (copy), t1 (copy), UserGameSettings (copy), getClosestItemToCenter (copy), RunService (copy)
+	local u32 = nil
+	local u33 = false
+	local u34 = nil
+	local u35 = false
+	local n4 = 0
+	local u37 = false
+
+	local function resetMotor(n5: number, p3: ((...any) -> ...any)?, p4: ((...any) -> ...any)?) -- line: 111
+		-- upvalues: u34 (ref), Otter (copy), u33 (ref), n4 (ref), t2 (copy)
+		if u34 then
+			u34:destroy()
+			u34 = nil
+		end
+
+		local v67 = Otter.createSingleMotor(n5)
+
+		u34 = v67
+		v67:onStep(function(p5) -- line: 123
+			-- upvalues: u34 (ref), v67 (copy), u33 (ref), n4 (ref), p3 (copy), n5 (copy), t2 (copy)
+			if u34 ~= v67 then
+				v67:destroy()
+
+				return
+			end
+
+			if u33 then
+				v67:destroy()
+				u34 = nil
+
+				return
+			end
+
+			local v110 = if not (math.abs(p5 - n4) < 0.5) then p5 else n4
+
+			if p3 and p3(n5, v110) then
+				return
+			end
+
+			if t2.current then
+				t2.current.CanvasPosition = Vector2.new(v110, 0)
+			end
+		end)
+
+		if p4 then
+			v67:onComplete(p4)
+		end
+
+		v67:start()
+	end
+	local function setGoal(vector2: Vector2, n6: number, b1: boolean) -- line: 156
+		-- upvalues: u34 (ref), n4 (ref), Otter (copy), t1 (copy)
+		if not u34 then
+			return
+		end
+
+		assert(u34 ~= nil, "setGoal called before resetMotor")
+		n4 = vector2.X * (n6 - 1)
+
+		if b1 then
+			u34:setGoal(Otter.instant(n4))
+
+			return
+		end
+
+		u34:setGoal(Otter.spring(n4, t1))
+	end
+
+	local t3 = {
+		carouselRef = t2,
+		getWasTouched = function() -- line: 91
+			-- upvalues: u37 (ref)
+			return u37
+		end,
+		getIsNavigationLocked = function() -- line: 100
+			-- upvalues: u35 (ref)
+			return u35
+		end,
+		handleDeleteTransition = function(p6: ((...any) -> ...any), p7: ((...any) -> ...any), vector2: Vector2, n7: number, b2: boolean, p8: ((...any) -> ...any)) -- line: 171
+			-- upvalues: t2 (copy), p1 (copy), u33 (ref), u37 (ref), u35 (ref), resetMotor (copy), setGoal (copy), UserGameSettings (copy), Otter (copy), u34 (ref), n4 (ref)
+			local current = t2.current
+			local current2 = p1.current
+
+			if not current or not current2 then
+				return
+			end
+
+			assert(current ~= nil, "carousel should exist")
+			assert(current2 ~= nil, "selectedItem should exist")
+
+			local ScrollingEnabled = current.ScrollingEnabled
+
+			current.ScrollingEnabled = false
+			u33 = false
+			u37 = false
+			u35 = true
+
+			local function handleDeleteNextImageMovement() -- line: 194
+				-- upvalues: vector2 (copy), current2 (copy), n7 (copy), resetMotor (copy), current (copy), p8 (copy), p6 (copy), u35 (ref), ScrollingEnabled (copy), setGoal (copy), b2 (copy), UserGameSettings (copy)
+				local function onStep(n8: number, n9: number) -- line: 195
+					-- upvalues: vector2 (copy), current2 (copy), n7 (copy)
+					local v135 = math.abs(n8 - n9)
+					local v136 = math.round(vector2.X - v135)
+
+					current2.Size = UDim2.fromOffset(v136, vector2.Y)
+
+					return n7 == 1
+				end
+
+				resetMotor(current.CanvasPosition.X, onStep, function() -- line: 205
+					-- upvalues: p8 (copy), current2 (copy), p6 (copy), u35 (ref), current (copy), ScrollingEnabled (copy)
+					p8()
+					current2.Visible = false
+					p6(1)
+					u35 = false
+					current.ScrollingEnabled = ScrollingEnabled
+				end)
+				setGoal(vector2, n7 - 1, b2 or UserGameSettings.ReducedMotion)
+			end
+			local function handleDeleteImagesFadeIn() -- line: 216
+				-- upvalues: p7 (copy), n7 (copy), resetMotor (copy), current (copy), p8 (copy), current2 (copy), Otter (copy), p6 (copy), u35 (ref), ScrollingEnabled (copy), vector2 (copy), u34 (ref), n4 (ref)
+				if not p7 then
+					return
+				end
+
+				assert(p7 ~= nil, "setPostDeletionItemBinding should exist")
+				resetMotor(current.CanvasPosition.X, function(_, _: number) -- line: 221
+					-- upvalues: n7 (copy)
+					return n7 == 1
+				end, function() -- line: 225
+					-- upvalues: p8 (copy), current2 (copy), Otter (copy), p6 (copy), p7 (copy), u35 (ref), current (copy), ScrollingEnabled (copy)
+					p8()
+					current2.Visible = false
+
+					local v139 = Otter.createSingleMotor(0)
+
+					v139:onStep(function(p10) -- line: 229
+						-- upvalues: p6 (copy), p7 (copy)
+						p6(p10)
+						p7(1)
+					end)
+					v139:onComplete(function() -- line: 233
+						-- upvalues: u35 (ref), current (copy), ScrollingEnabled (copy)
+						u35 = false
+						current.ScrollingEnabled = ScrollingEnabled
+					end)
+					v139:setGoal(Otter.spring(1, {
+						frequency = 2
+					}))
+				end)
+
+				local v112 = vector2
+				local v113 = n7 - 1
+
+				if not u34 then
+					return
+				end
+
+				assert(u34 ~= nil, "setGoal called before resetMotor")
+				n4 = v112.X * (v113 - 1)
+				u34:setGoal(Otter.instant(n4))
+			end
+			local function handleDeleteNextImageFadeOut() -- line: 243
+				-- upvalues: p7 (copy), Otter (copy), handleDeleteImagesFadeIn (copy)
+				if not p7 then
+					return
+				end
+
+				assert(p7 ~= nil, "setPostDeletionItemBinding should exist")
+
+				local v114 = Otter.createSingleMotor(1)
+
+				v114:onStep(p7)
+				v114:onComplete(handleDeleteImagesFadeIn)
+				v114:setGoal(Otter.spring(0, {
+					frequency = 6
+				}))
+			end
+
+			local v83 = Otter.createSingleMotor(1)
+
+			v83:onStep(p6)
+
+			local n11
+
+			if UserGameSettings.ReducedMotion then
+				n11 = 6
+				v83:onComplete(handleDeleteNextImageFadeOut)
+			else
+				n11 = 4
+				v83:onComplete(handleDeleteNextImageMovement)
+			end
+
+			v83:setGoal(Otter.spring(0, {
+				frequency = n11
+			}))
+		end,
+		handleInertialMove = function(vector2: Vector2, n12: number) -- line: 267
+			-- upvalues: t2 (copy), u33 (ref), getClosestItemToCenter (copy), u34 (ref), Otter (copy), n4 (ref), t1 (copy), u32 (ref), RunService (copy), p2 (copy)
+			local current = t2.current
+
+			if u33 or not current then
+				return
+			end
+
+			assert(current ~= nil, "carousel should not be nil")
+
+			local u88 = -current:GetSampledInertialVelocity().X
+
+			current:ClearInertialScrolling()
+
+			local v89, v90 = getClosestItemToCenter(vector2, current)
+
+			if math.abs(u88) < 60 and v89 == n12 then
+				if v90 > 0.5 then
+					local CanvasPositionX = current.CanvasPosition.X
+
+					if u34 then
+						u34:destroy()
+						u34 = nil
+					end
+
+					local v92 = Otter.createSingleMotor(CanvasPositionX)
+
+					u34 = v92
+
+					local v93 = nil
+
+					v92:onStep(function(p11) -- line: 123
+						-- upvalues: u34 (ref), v92 (copy), u33 (ref), n4 (ref), v93 (copy), CanvasPositionX (copy), t2 (copy)
+						if u34 ~= v92 then
+							v92:destroy()
+
+							return
+						end
+
+						if u33 then
+							v92:destroy()
+							u34 = nil
+
+							return
+						end
+
+						local v116 = if not (math.abs(p11 - n4) < 0.5) then p11 else n4
+
+						if v93 and v93(CanvasPositionX, v116) then
+							return
+						end
+
+						if t2.current then
+							t2.current.CanvasPosition = Vector2.new(v116, 0)
+						end
+					end)
+					v92:start()
+
+					if u34 then
+						assert(u34 ~= nil, "setGoal called before resetMotor")
+						n4 = vector2.X * (n12 - 1)
+						u34:setGoal(Otter.spring(n4, t1))
+					end
+				end
+
+				return
+			end
+
+			if u32 then
+				u32:Disconnect()
+				u32 = nil
+			end
+
+			u32 = RunService.RenderStepped:Connect(function(dt) -- line: 297
+				-- upvalues: t2 (copy), u33 (ref), u32 (ref), getClosestItemToCenter (copy), vector2 (copy), u88 (ref), n12 (copy), u34 (ref), Otter (copy), n4 (ref), t1 (copy), p2 (copy)
+				local current3 = t2.current
+
+				if not current3 or u33 then
+					assert(u32 ~= nil, "handleInertialMoveConn should exist")
+					u32:Disconnect()
+					u32 = nil
+
+					return
+				end
+
+				assert(current3 ~= nil, "carousel should not be nil")
+
+				local v119, v120 = getClosestItemToCenter(vector2, current3)
+
+				if math.abs(u88) < 60 then
+					assert(u32 ~= nil, "handleInertialMoveConn should exist")
+					u32:Disconnect()
+					u32 = nil
+
+					if v119 == n12 then
+						local CanvasPositionX = current3.CanvasPosition.X
+
+						if u34 then
+							u34:destroy()
+							u34 = nil
+						end
+
+						local v122 = Otter.createSingleMotor(CanvasPositionX)
+
+						u34 = v122
+
+						local v123 = nil
+
+						v122:onStep(function(p12) -- line: 123
+							-- upvalues: u34 (ref), v122 (copy), u33 (ref), n4 (ref), v123 (copy), CanvasPositionX (copy), t2 (copy)
+							if u34 ~= v122 then
+								v122:destroy()
+
+								return
+							end
+
+							if u33 then
+								v122:destroy()
+								u34 = nil
+
+								return
+							end
+
+							local v141 = if not (math.abs(p12 - n4) < 0.5) then p12 else n4
+
+							if v123 and v123(CanvasPositionX, v141) then
+								return
+							end
+
+							if t2.current then
+								t2.current.CanvasPosition = Vector2.new(v141, 0)
+							end
+						end)
+						v122:start()
+
+						local v124 = vector2
+						local v125 = n12
+
+						if not u34 then
+							return
+						end
+
+						assert(u34 ~= nil, "setGoal called before resetMotor")
+						n4 = v124.X * (v125 - 1)
+						u34:setGoal(Otter.spring(n4, t1))
+
+						return
+					end
+
+					p2(v119)
+
+					return
+				end
+
+				current3.CanvasPosition = current3.CanvasPosition + Vector2.new(u88 * dt, 0)
+
+				local v126 = math.max(v120 / (vector2.X / 2) * 1.25, 0.85)
+				local v127 = if not (math.abs(u88) < 120) then v126 * 0.95 else 0.7
+
+				u88 *= v127 ^ (dt / 0.016666666666666666)
+			end)
+		end,
+		onInputBegan = function(_, p14) -- line: 343
+			-- upvalues: u35 (ref), u33 (ref), u37 (ref)
+			if u35 then
+				return
+			end
+
+			if p14.UserInputType == Enum.UserInputType.Touch then
+				u33 = true
+				u37 = true
+			end
+		end,
+		resetMotor = resetMotor,
+		resetTouchState = function() -- line: 95
+			-- upvalues: u33 (ref), u37 (ref)
+			u33 = false
+			u37 = false
+		end,
+		setGoal = setGoal,
+		setIsNavigationLocked = function(b3: boolean) -- line: 104
+			-- upvalues: u33 (ref), u37 (ref), u35 (ref)
+			if b3 == true then
+				u33 = false
+				u37 = false
+			end
+
+			u35 = b3
+		end
+	}
+
+	t3.resetMotor(0)
+
+	return t3
+end
+
+return function(vector2: Vector2, n13: number, p15: ((...any) -> ...any)) -- line: 372
+	-- upvalues: useAnalytics (copy), useBinding (copy), React (copy), useIsHovered (copy), useIsTouchDown (copy), useLastInput (copy), createController (copy), UserGameSettings (copy), useEffectOnce (copy), getClosestItemToCenter (copy), useEventConnection (copy), UserInputService (copy), ContextActionService (copy), EventNames (copy), FFlagUseMediaPlayerInCarousel (copy)
+	local v44 = useAnalytics()
+	local v45, v46 = useBinding(1)
+	local v47, v48 = useBinding(1)
+	local v49 = React.useRef(nil)
+	local v50, v51, v52 = useIsHovered()
+	local v53 = useIsTouchDown()
+	local v54 = React.useRef(nil)
+	local v55 = useLastInput()
+	local v56 = React.useRef(nil)
+
+	if v56.current == nil then
+		v56.current = createController(v49, v54, p15)
+	end
+
+	local current = v56.current
+
+	assert(current ~= nil, "carouselController should exist")
+	React.useEffect(function() -- line: 392
+		-- upvalues: v49 (copy), UserGameSettings (copy), current (copy), vector2 (copy), n13 (copy)
+		local current4 = v49.current
+
+		if not current4 then
+			return
+		end
+
+		assert(current4 ~= nil, "carousel should exist")
+
+		local v97 = false
+
+		if UserGameSettings.ReducedMotion then
+			v97 = true
+		end
+
+		current.resetMotor(current4.CanvasPosition.X)
+		current.setGoal(vector2, n13, v97)
+	end, { n13 })
+	useEffectOnce(function() -- line: 410
+		-- upvalues: current (copy), vector2 (copy), n13 (copy)
+		current.setGoal(vector2, n13, true)
+	end, n13 ~= nil)
+	React.useEffect(function() -- line: 416
+		-- upvalues: current (copy), vector2 (copy), n13 (copy)
+		current.setGoal(vector2, n13, true)
+	end, { vector2 })
+	React.useEffect(function() -- line: 421
+		-- upvalues: v53 (copy), current (copy), vector2 (copy), n13 (copy)
+		if not v53 and current.getWasTouched() then
+			current.resetTouchState()
+			current.handleInertialMove(vector2, n13)
+		end
+	end, { v53 })
+
+	local v58 = React.useCallback(function(n14: number) -- line: 428
+		-- upvalues: v49 (copy), current (copy), getClosestItemToCenter (copy), vector2 (copy), v50 (copy), p15 (copy)
+		local current5 = v49.current
+
+		if not current5 then
+			return
+		end
+
+		assert(current5 ~= nil, "carousel should exist")
+
+		if current.getIsNavigationLocked() then
+			return
+		end
+
+		local v100 = getClosestItemToCenter(vector2, current5)
+
+		if v50 and n14 > 0 then
+			p15(v100 - 1)
+
+			return
+		end
+
+		if v50 and n14 < 0 then
+			p15(v100 + 1)
+		end
+	end, {
+		v50,
+		vector2
+	})
+
+	useEventConnection(UserInputService.PointerAction, v58)
+
+	local v59 = React.useCallback(function(p16) -- line: 449
+		-- upvalues: UserGameSettings (copy), v49 (copy), current (copy), getClosestItemToCenter (copy), vector2 (copy), p15 (copy)
+		if not UserGameSettings.ReducedMotion then
+			return
+		end
+
+		local current6 = v49.current
+
+		if not current6 then
+			return
+		end
+
+		assert(current6 ~= nil, "carousel should exist")
+
+		if current.getIsNavigationLocked() then
+			return
+		end
+
+		local v103 = getClosestItemToCenter(vector2, current6)
+
+		if p16 == Enum.SwipeDirection.Left then
+			p15(v103 + 1)
+
+			return
+		end
+
+		if p16 == Enum.SwipeDirection.Right then
+			p15(v103 - 1)
+		end
+	end, {})
+
+	useEventConnection(UserInputService.TouchSwipe, v59)
+	React.useEffect(function() -- line: 473
+		-- upvalues: ContextActionService (copy), v49 (copy), current (copy), v44 (copy), EventNames (copy), getClosestItemToCenter (copy), vector2 (copy), p15 (copy)
+		ContextActionService:BindCoreAction("CapturesCarouselNavigateShortcutAction", function(_, p18, p19) -- line: 474
+			-- upvalues: v49 (copy), current (copy), v44 (copy), EventNames (copy), getClosestItemToCenter (copy), vector2 (copy), p15 (copy)
+			local current7 = v49.current
+
+			if not current7 then
+				return
+			end
+
+			assert(current7 ~= nil, "carousel should exist")
+
+			if current.getIsNavigationLocked() then
+				return
+			end
+
+			if p18 == Enum.UserInputState.End then
+				v44.fireEvent(EventNames.CapturesCarouselNavigatedByKeyboard)
+
+				local v132 = getClosestItemToCenter(vector2, current7)
+
+				if p19.KeyCode == Enum.KeyCode.Left then
+					p15(v132 - 1)
+
+					return
+				end
+
+				if p19.KeyCode == Enum.KeyCode.Right then
+					p15(v132 + 1)
+				end
+			end
+		end, false, Enum.KeyCode.Left, Enum.KeyCode.Right)
+
+		return function() -- line: 496
+			-- upvalues: ContextActionService (copy)
+			ContextActionService:UnbindCoreAction("CapturesCarouselNavigateShortcutAction")
+		end
+	end, {})
+
+	local v60 = React.useCallback(function(p20, p21) -- line: 501
+		-- upvalues: current (copy), UserGameSettings (copy), v51 (copy)
+		if current.getIsNavigationLocked() then
+			return
+		end
+
+		if UserGameSettings.ReducedMotion then
+			v51(p20, p21)
+
+			return
+		end
+
+		current.onInputBegan(p20, p21)
+		v51(p20, p21)
+	end, {
+		current.onInputBegan,
+		v51
+	})
+	local v61 = React.useCallback(function(p22, p23) -- line: 515
+		-- upvalues: FFlagUseMediaPlayerInCarousel (copy), v55 (copy), current (copy), v52 (copy)
+		if FFlagUseMediaPlayerInCarousel and (v55 == "Touch" and not current.getWasTouched()) then
+			current.onInputBegan(p22, p23)
+		end
+
+		v52(p22, p23)
+	end, { v52 })
+	local v62 = React.useCallback(function(p24) -- line: 522
+		-- upvalues: current (copy), v46 (copy), v48 (copy), vector2 (copy), n13 (copy)
+		current.handleDeleteTransition(v46, v48, vector2, n13, false, p24)
+	end, {
+		vector2,
+		n13,
+		v46
+	})
+
+	return {
+		carouselInputBegan = v60,
+		carouselInputEnded = v61,
+		carouselRef = v49,
+		deleteSelectedItem = v62,
+		postDeletionItemBinding = v47,
+		selectedItemFadeOutBinding = v45,
+		selectedItemRef = v54,
+		setIsNavigationLocked = current.setIsNavigationLocked
+	}
+end

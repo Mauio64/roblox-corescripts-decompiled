@@ -1,46 +1,47 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ExpChatShared);
-local v3 = require(l_Parent_0.Rodux);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v6 = require(l_Actions_0.ChatWindowConfigurationEnabled);
-local v7 = require(l_Actions_0.ChatTopBarButtonActivated);
-local v8 = require(l_Actions_0.SetCoreGuiEnabledChanged);
-local l_ClientAppLoaded_0 = v2.Actions.ClientAppLoaded;
-local v10 = {
-    _propertyEnabled = true, 
-    _coreGuiEnabled = true, 
-    _topBarVisibility = true, 
-    value = true
-};
-return v3.createReducer(v10, {
-    [v6.name] = function(v11, v12) --[[ Line: 29 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v11, {
-            _propertyEnabled = v12.enabled, 
-            value = v11._topBarVisibility and v11._coreGuiEnabled and v12.enabled
-        });
-    end, 
-    [v7.name] = function(v13, v14) --[[ Line: 36 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v13, {
-            _topBarVisibility = v14.isVisible, 
-            value = v13._propertyEnabled and v13._coreGuiEnabled and v14.isVisible
-        });
-    end, 
-    [v8.name] = function(v15, v16) --[[ Line: 43 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v15, {
-            _coreGuiEnabled = v16.enabled, 
-            value = v15._propertyEnabled and v15._topBarVisibility and v16.enabled
-        });
-    end, 
-    [l_ClientAppLoaded_0.name] = function(v17, v18) --[[ Line: 50 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v17, {
-            _coreGuiEnabled = v18.isChatCoreGuiEnabled, 
-            value = v17._propertyEnabled and v17._topBarVisibility and v18.isChatCoreGuiEnabled
-        });
-    end
-});
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local Rodux = require(ExpChatParent.Rodux)
+local Dictionary = require(ExpChatParent.llama).Dictionary
+local Actions = ExpChat.Actions
+local ChatWindowConfigurationEnabled = require(Actions.ChatWindowConfigurationEnabled)
+local ChatTopBarButtonActivated = require(Actions.ChatTopBarButtonActivated)
+local SetCoreGuiEnabledChanged = require(Actions.SetCoreGuiEnabledChanged)
+local ClientAppLoaded = ExpChatShared.Actions.ClientAppLoaded
+local t1 = {
+	_propertyEnabled = true,
+	_coreGuiEnabled = true,
+	_topBarVisibility = true,
+	value = true
+}
+
+return Rodux.createReducer(t1, {
+	[ChatWindowConfigurationEnabled.name] = function(t2: {[any]: any}, p1) -- line: 29
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(t2, {
+			_propertyEnabled = p1.enabled,
+			value = t2._topBarVisibility and (t2._coreGuiEnabled and p1.enabled)
+		})
+	end,
+	[ChatTopBarButtonActivated.name] = function(t3: {[any]: any}, p2) -- line: 36
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(t3, {
+			_topBarVisibility = p2.isVisible,
+			value = t3._propertyEnabled and (t3._coreGuiEnabled and p2.isVisible)
+		})
+	end,
+	[SetCoreGuiEnabledChanged.name] = function(t4: {[any]: any}, p3) -- line: 43
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(t4, {
+			_coreGuiEnabled = p3.enabled,
+			value = t4._propertyEnabled and (t4._topBarVisibility and p3.enabled)
+		})
+	end,
+	[ClientAppLoaded.name] = function(t5: {[any]: any}, p4) -- line: 50
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(t5, {
+			_coreGuiEnabled = p4.isChatCoreGuiEnabled,
+			value = t5._propertyEnabled and (t5._topBarVisibility and p4.isChatCoreGuiEnabled)
+		})
+	end
+})

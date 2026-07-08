@@ -1,1 +1,1 @@
-return game:GetEngineFeature("EnableSystemTray") and game:DefineFastFlag("EnableSystemTrayModals3", false);
+return game:GetEngineFeature("EnableSystemTray") and game:DefineFastFlag("EnableSystemTrayModals3", false)

@@ -1,9 +1,10 @@
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: l_LocalPlayer_0 (copy)
-    if l_LocalPlayer_0 and l_LocalPlayer_0.UserId % 10000 < v1 then
-        return true;
-    else
-        return false;
-    end;
-end;
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+return function(p1) -- line: 3
+	-- upvalues: LocalPlayer (copy)
+	if LocalPlayer and p1 > LocalPlayer.UserId % 10000 then
+		return true
+	end
+
+	return false
+end

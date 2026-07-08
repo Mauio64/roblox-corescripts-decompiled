@@ -1,5 +1,7 @@
-local v0 = require(script.ContactsProtocol);
-local _ = require(script.ContactsProtocolTypes);
+local ContactsProtocol = require(script.ContactsProtocol)
+
+require(script.ContactsProtocolTypes)
+
 return {
-    ContactsProtocol = v0
-};
+	ContactsProtocol = ContactsProtocol
+}

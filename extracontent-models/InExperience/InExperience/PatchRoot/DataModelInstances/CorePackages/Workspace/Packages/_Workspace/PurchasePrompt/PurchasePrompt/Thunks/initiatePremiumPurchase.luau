@@ -1,63 +1,72 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_script_FirstAncestor_0.Promise);
-local v4 = require(l_script_FirstAncestor_0.Thunk);
-local v5 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v6 = require(l_script_FirstAncestor_0.Actions.SetPurchaseFlowUUID);
-local v7 = require(l_script_FirstAncestor_0.Actions.RequestPremiumPurchase);
-local v8 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v9 = require(l_script_FirstAncestor_0.Network.getPremiumUpsellPrecheck);
-local v10 = require(l_script_FirstAncestor_0.Network.getPremiumProductInfo);
-local v11 = require(l_script_FirstAncestor_0.Network.getAccountInfo);
-local v12 = require(l_script_FirstAncestor_0.Network.getBalanceInfo);
-local v13 = require(l_script_FirstAncestor_0.Services.Network);
-local v14 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v15 = require(l_script_FirstAncestor_0.Thunks.resolvePremiumPromptState);
-local v16 = require(l_script_FirstAncestor_0.Utils.hasPendingRequest);
-local _ = require(l_Parent_0.AppCommonLib).Logging;
-local v18 = require(l_Parent_0.LoggingProtocol);
-local v19 = require(l_script_FirstAncestor_0.Flags.FFlagEnablePurchaseFlowUUIDMigration);
-local v20 = require(l_script_FirstAncestor_0.Events.PurchaseFlowUUIDTelemetry);
-local v21 = {
-    v13, 
-    v14
-};
-return function(_, _, _) --[[ Line: 33 ]] --[[ Name: initiatePremiumPurchase ]]
-    -- upvalues: v4 (copy), v21 (copy), v13 (copy), v14 (copy), v19 (copy), l_HttpService_0 (copy), v6 (copy), v18 (copy), v20 (copy), v16 (copy), v7 (copy), v8 (copy), v5 (copy), v3 (copy), v9 (copy), v10 (copy), v11 (copy), v12 (copy), v15 (copy)
-    return v4.new(script.Name, v21, function(v25, v26) --[[ Line: 34 ]]
-        -- upvalues: v13 (ref), v14 (ref), v19 (ref), l_HttpService_0 (ref), v6 (ref), v18 (ref), v20 (ref), v16 (ref), v7 (ref), v8 (ref), v5 (ref), v3 (ref), v9 (ref), v10 (ref), v11 (ref), v12 (ref), v15 (ref)
-        local v27 = v26[v13];
-        local v28 = v26[v14];
-        if v19 then
-            local v29 = l_HttpService_0:GenerateGUID(false);
-            v25:dispatch(v6(v29));
-            v18.default:logRobloxTelemetryCounter(v20.InitiatePurchaseCounter, 1, {
-                method = "initiatePremiumPurchase"
-            });
-        end;
-        if v16(v25:getState()) then
-            return nil;
-        else
-            v25:dispatch(v7());
-            if v28.getFlagOrder66() then
-                v25:dispatch(v8(v5.PurchaseDisabled));
-                return nil;
-            else
-                local v30 = not v28.isStudio();
-                return v3.all({
-                    canShowUpsell = v30 and v9(v27) or v3.resolve(true), 
-                    premiumProductInfo = v10(v27), 
-                    accountInfo = v11(v27, v28), 
-                    balanceInfo = v12(v27, v28, false)
-                }):andThen(function(v31) --[[ Line: 66 ]]
-                    -- upvalues: v25 (copy), v15 (ref)
-                    v25:dispatch(v15(v31.accountInfo, v31.balanceInfo, v31.premiumProductInfo, v31.canShowUpsell));
-                end):catch(function(v32) --[[ Line: 76 ]]
-                    -- upvalues: v25 (copy), v8 (ref)
-                    v25:dispatch(v8(v32));
-                end);
-            end;
-        end;
-    end);
-end;
+local HttpService = game:GetService("HttpService")
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Promise = require(PurchasePrompt.Promise)
+local Thunk = require(PurchasePrompt.Thunk)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local SetPurchaseFlowUUID = require(PurchasePrompt.Actions.SetPurchaseFlowUUID)
+local RequestPremiumPurchase = require(PurchasePrompt.Actions.RequestPremiumPurchase)
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local getPremiumUpsellPrecheck = require(PurchasePrompt.Network.getPremiumUpsellPrecheck)
+local getPremiumProductInfo = require(PurchasePrompt.Network.getPremiumProductInfo)
+local getAccountInfo = require(PurchasePrompt.Network.getAccountInfo)
+local getBalanceInfo = require(PurchasePrompt.Network.getBalanceInfo)
+local Network = require(PurchasePrompt.Services.Network)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local resolvePremiumPromptState = require(PurchasePrompt.Thunks.resolvePremiumPromptState)
+local hasPendingRequest = require(PurchasePrompt.Utils.hasPendingRequest)
+local _ = require(PurchasePromptParent.AppCommonLib).Logging
+local LoggingProtocol = require(PurchasePromptParent.LoggingProtocol)
+local FFlagEnablePurchaseFlowUUIDMigration = require(PurchasePrompt.Flags.FFlagEnablePurchaseFlowUUIDMigration)
+local PurchaseFlowUUIDTelemetry = require(PurchasePrompt.Events.PurchaseFlowUUIDTelemetry)
+local t1 = {
+	Network,
+	ExternalSettings
+}
+
+local function initiatePremiumPurchase(_, _, _) -- line: 33
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), ExternalSettings (copy), FFlagEnablePurchaseFlowUUIDMigration (copy), HttpService (copy), SetPurchaseFlowUUID (copy), LoggingProtocol (copy), PurchaseFlowUUIDTelemetry (copy), hasPendingRequest (copy), RequestPremiumPurchase (copy), ErrorOccurred (copy), PurchaseError (copy), Promise (copy), getPremiumUpsellPrecheck (copy), getPremiumProductInfo (copy), getAccountInfo (copy), getBalanceInfo (copy), resolvePremiumPromptState (copy)
+	return Thunk.new(script.Name, t1, function(p4, p5) -- line: 34
+		-- upvalues: Network (copy), ExternalSettings (copy), FFlagEnablePurchaseFlowUUIDMigration (copy), HttpService (copy), SetPurchaseFlowUUID (copy), LoggingProtocol (copy), PurchaseFlowUUIDTelemetry (copy), hasPendingRequest (copy), RequestPremiumPurchase (copy), ErrorOccurred (copy), PurchaseError (copy), Promise (copy), getPremiumUpsellPrecheck (copy), getPremiumProductInfo (copy), getAccountInfo (copy), getBalanceInfo (copy), resolvePremiumPromptState (copy)
+		local v29 = p5[Network]
+		local v30 = p5[ExternalSettings]
+
+		if FFlagEnablePurchaseFlowUUIDMigration then
+			local guid = HttpService:GenerateGUID(false)
+
+			p4:dispatch(SetPurchaseFlowUUID(guid))
+			LoggingProtocol.default:logRobloxTelemetryCounter(PurchaseFlowUUIDTelemetry.InitiatePurchaseCounter, 1, {
+				method = "initiatePremiumPurchase"
+			})
+		end
+
+		if hasPendingRequest(p4:getState()) then
+			return nil
+		end
+
+		p4:dispatch(RequestPremiumPurchase())
+
+		if v30.getFlagOrder66() then
+			p4:dispatch(ErrorOccurred(PurchaseError.PurchaseDisabled))
+
+			return nil
+		end
+
+		local v32 = v30.isStudio()
+
+		return Promise.all({
+			canShowUpsell = not v32 and getPremiumUpsellPrecheck(v29) or Promise.resolve(true),
+			premiumProductInfo = getPremiumProductInfo(v29),
+			accountInfo = getAccountInfo(v29, v30),
+			balanceInfo = getBalanceInfo(v29, v30, false)
+		}):andThen(function(p6) -- line: 66
+			-- upvalues: p4 (copy), resolvePremiumPromptState (copy)
+			p4:dispatch(resolvePremiumPromptState(p6.accountInfo, p6.balanceInfo, p6.premiumProductInfo, p6.canShowUpsell))
+		end):catch(function(p7) -- line: 76
+			-- upvalues: p4 (copy), ErrorOccurred (copy)
+			p4:dispatch(ErrorOccurred(p7))
+		end)
+	end)
+end
+
+return initiatePremiumPurchase

@@ -1,69 +1,82 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_Parent_0.SignalsReact);
-local l_Game_0 = require(l_Parent_0.DataHydration).Game;
-local v7 = require(l_Parent_0.RoactUtils);
-local v8 = require(l_Parent_0.Localization);
-local l_SduiChip_0 = require(l_Parent_0.SduiSharedContent).SduiChip;
-local v10 = require(l_Parent_0.ToastRodux);
-local l_ToastType_0 = v10.Enums.ToastType;
-local l_SetCurrentToastMessage_0 = v10.Actions.SetCurrentToastMessage;
-local l_gameFavorite_0 = require(l_Parent_0.DiscoveryAnalytics).Events.gameFavorite;
-local l_useDispatch_0 = v7.Hooks.RoactRodux.useDispatch;
-local l_useLocalization_0 = v8.Hooks.useLocalization;
-local v16 = require(l_script_FirstAncestor_0.Content.ExperienceDetails.Hooks.useOptimisticUpdateStatus);
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-return v3.memo(function(v18) --[[ Line: 39 ]] --[[ Name: ExperienceDetailsFavoriteChip ]]
-    -- upvalues: l_FFlagSduiServerCompat_0 (copy), l_useDispatch_0 (copy), v5 (copy), l_Game_0 (copy), l_useLocalization_0 (copy), v3 (copy), l_Players_0 (copy), l_gameFavorite_0 (copy), l_SetCurrentToastMessage_0 (copy), l_ToastType_0 (copy), v16 (copy), l_SduiChip_0 (copy), v4 (copy)
-    local v19 = nil;
-    v19 = if l_FFlagSduiServerCompat_0 then v18.layoutOrder else v18.LayoutOrder;
-    local l_universeId_0 = v18.universeId;
-    local v21 = l_useDispatch_0();
-    local v22 = v5.useSignalState(l_Game_0.getFavoritesStore(false).getAndFetchFavorite(l_universeId_0).data);
-    local v23 = v5.useSignalState(l_Game_0.getGameInfoStore(false).getAndFetchGameInfo(l_universeId_0).data);
-    local v24 = v23 and v23.rootPlaceId or nil;
-    local v25 = l_useLocalization_0({
-        favorite = "Feature.Favorites.Label.Favorite"
-    });
-    local v28 = v3.useCallback(function() --[[ Line: 59 ]]
-        -- upvalues: v22 (copy), v24 (copy), l_Players_0 (ref), l_gameFavorite_0 (ref), l_Game_0 (ref), l_universeId_0 (copy)
-        local v26 = not v22;
-        if v24 then
-            local v27 = l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId;
-            l_gameFavorite_0({
-                uid = tostring(v27), 
-                ctx = "ExperienceDetailsFavoriteChip", 
-                placeId = v24, 
-                state = v26 and "on" or "off"
-            }, "ExperienceDetailsFavoriteChip");
-        end;
-        return l_Game_0.getFavoritesStore(false).updateFavorite(l_universeId_0, v26);
-    end, {
-        l_universeId_0, 
-        v24, 
-        v22
-    });
-    local v30 = v3.useCallback(function(v29) --[[ Line: 75 ]]
-        -- upvalues: v21 (copy), l_SetCurrentToastMessage_0 (ref), l_ToastType_0 (ref)
-        if v29 and v29.type == "error" then
-            v21(l_SetCurrentToastMessage_0({
-                toastType = l_ToastType_0.NetworkingError, 
-                toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong"
-            }));
-        end;
-    end, {
-        v21
-    });
-    local v31 = v16(v28, v30);
-    return v3.createElement(l_SduiChip_0, {
-        text = v25.favorite, 
-        leadingIconName = v4.Enums.IconName.Star, 
-        leadingIconVariant = if v22 then v4.Enums.IconVariant.Filled else nil, 
-        onActivated = v31, 
-        LayoutOrder = if not l_FFlagSduiServerCompat_0 then v19 else nil, 
-        layoutOrder = if l_FFlagSduiServerCompat_0 then v19 else nil
-    });
-end);
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local Players = game:GetService("Players")
+local React = require(ServerDrivenUiParent.React)
+local Foundation = require(ServerDrivenUiParent.Foundation)
+local SignalsReact = require(ServerDrivenUiParent.SignalsReact)
+local Game = require(ServerDrivenUiParent.DataHydration).Game
+local RoactUtils = require(ServerDrivenUiParent.RoactUtils)
+local Localization = require(ServerDrivenUiParent.Localization)
+local SduiChip = require(ServerDrivenUiParent.SduiSharedContent).SduiChip
+local ToastRodux = require(ServerDrivenUiParent.ToastRodux)
+local ToastType = ToastRodux.Enums.ToastType
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+local gameFavorite = require(ServerDrivenUiParent.DiscoveryAnalytics).Events.gameFavorite
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useLocalization = Localization.Hooks.useLocalization
+local useOptimisticUpdateStatus = require(ServerDrivenUi.Content.ExperienceDetails.Hooks.useOptimisticUpdateStatus)
+local FFlagSduiFavoritesHydrationStructured = require(ServerDrivenUiParent.SharedFlags).FFlagSduiFavoritesHydrationStructured
+
+local function ExperienceDetailsFavoriteChip(t1: {[any]: any}) -- line: 37
+	-- upvalues: useDispatch (copy), Game (copy), SignalsReact (copy), FFlagSduiFavoritesHydrationStructured (copy), useLocalization (copy), React (copy), Players (copy), gameFavorite (copy), SetCurrentToastMessage (copy), ToastType (copy), useOptimisticUpdateStatus (copy), SduiChip (copy), Foundation (copy)
+	local layoutOrder = t1.layoutOrder
+	local universeId = t1.universeId
+	local v23 = useDispatch()
+	local v24 = Game.getFavoritesStore(false).getAndFetchFavorite(universeId)
+	local v25 = SignalsReact.useSignalState(function(p1) -- line: 43
+		-- upvalues: v24 (copy), FFlagSduiFavoritesHydrationStructured (copy)
+		local v33 = v24.data(p1)
+
+		if FFlagSduiFavoritesHydrationStructured then
+			return v33 ~= nil and v33.isFavorited
+		end
+
+		return v33 == true
+	end)
+	local v26 = SignalsReact.useSignalState(Game.getGameInfoStore(false).getAndFetchGameInfo(universeId).data)
+	local v27 = v26 and v26.rootPlaceId or nil
+	local v28 = useLocalization({
+		favorite = "Feature.Favorites.Label.Favorite"
+	})
+	local v29 = React.useCallback(function() -- line: 60
+		-- upvalues: v25 (copy), v27 (copy), Players (copy), gameFavorite (copy), Game (copy), universeId (copy)
+		local v34 = not v25
+
+		if v27 then
+			local v35 = Players.LocalPlayer and Players.LocalPlayer.UserId
+
+			gameFavorite({
+				ctx = "ExperienceDetailsFavoriteChip",
+				uid = tostring(v35),
+				placeId = v27,
+				state = not v34 and "off" or "on"
+			}, "ExperienceDetailsFavoriteChip")
+		end
+
+		return Game.getFavoritesStore(false).updateFavorite(universeId, v34)
+	end, {
+		universeId,
+		v27,
+		v25
+	})
+	local v30 = React.useCallback(function(p2) -- line: 76
+		-- upvalues: v23 (copy), SetCurrentToastMessage (copy), ToastType (copy)
+		if p2 and p2.type == "error" then
+			v23(SetCurrentToastMessage({
+				toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong",
+				toastType = ToastType.NetworkingError
+			}))
+		end
+	end, { v23 })
+	local v31 = useOptimisticUpdateStatus(v29, v30)
+
+	return React.createElement(SduiChip, {
+		text = v28.favorite,
+		leadingIconName = Foundation.Enums.IconName.Star,
+		leadingIconVariant = if not v25 then nil else Foundation.Enums.IconVariant.Filled,
+		onActivated = v31,
+		layoutOrder = layoutOrder
+	})
+end
+
+return React.memo(ExperienceDetailsFavoriteChip)

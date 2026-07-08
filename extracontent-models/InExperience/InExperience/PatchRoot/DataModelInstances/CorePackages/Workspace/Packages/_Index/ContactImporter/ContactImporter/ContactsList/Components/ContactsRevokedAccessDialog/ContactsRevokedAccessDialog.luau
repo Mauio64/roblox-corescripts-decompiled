@@ -1,60 +1,62 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_t_0 = v1.t;
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_withLocalization_0 = v1.withLocalization;
-local l_RoactRodux_0 = v1.RoactRodux;
-local l_InteractiveAlert_0 = l_UIBlox_0.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = l_UIBlox_0.App.Button.Enum.ButtonType;
-local l_withStyle_0 = l_UIBlox_0.Style.withStyle;
-local v10 = require(l_Parent_0.Common.TextKeys);
-local v11 = require(l_Parent_0.Common.Constants);
-local v12 = require(l_Parent_0.Flags.getFFlagPassNavigationToContactsRevoked);
-local v13 = l_Roact_0.PureComponent:extend("ContactsRevokedAccessDialog");
-v13.validateProps = l_t_0.strictInterface({
-    navigation = l_t_0.table, 
-    screenSize = l_t_0.Vector2
-});
-v13.render = function(v14) --[[ Line: 31 ]] --[[ Name: render ]]
-    -- upvalues: l_withLocalization_0 (copy), v10 (copy), l_withStyle_0 (copy), v11 (copy), v12 (copy), l_Roact_0 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    return l_withLocalization_0({
-        titleText = v10.CONTACTS_LIST_TITLE, 
-        revokedFlow = v10.CONTACTS_REVOKED_FLOW, 
-        closeModalOk = v10.CLOSE_MODAL_OK
-    })(function(v15) --[[ Line: 36 ]]
-        -- upvalues: l_withStyle_0 (ref), v14 (copy), v11 (ref), v12 (ref), l_Roact_0 (ref), l_InteractiveAlert_0 (ref), l_ButtonType_0 (ref)
-        return l_withStyle_0(function(_) --[[ Line: 37 ]]
-            -- upvalues: v14 (ref), v11 (ref), v12 (ref), l_Roact_0 (ref), l_InteractiveAlert_0 (ref), v15 (copy), l_ButtonType_0 (ref)
-            local l_props_0 = v14.props;
-            local l_navigation_0 = l_props_0.navigation;
-            local v19 = l_navigation_0.getParam(v11.CLOSE_MODAL) or v12() and l_navigation_0.pop;
-            return l_Roact_0.createElement(l_InteractiveAlert_0, {
-                title = v15.titleText, 
-                screenSize = l_props_0.screenSize, 
-                buttonStackInfo = {
-                    buttons = {
-                        {
-                            buttonType = l_ButtonType_0.Secondary, 
-                            props = {
-                                onActivated = function() --[[ Line: 51 ]] --[[ Name: onActivated ]]
-                                    -- upvalues: v19 (copy)
-                                    v19();
-                                end, 
-                                text = v15.closeModalOk
-                            }
-                        }
-                    }, 
-                    buttonHeight = 48, 
-                    forcedFillDirection = Enum.FillDirection.Vertical
-                }, 
-                bodyText = v15.revokedFlow
-            });
-        end);
-    end);
-end;
-return l_RoactRodux_0.connect(function(v20) --[[ Line: 67 ]]
-    return {
-        screenSize = v20.ScreenSize
-    };
-end, nil)(v13);
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local t = dependencies.t
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local withLocalization = dependencies.withLocalization
+local RoactRodux = dependencies.RoactRodux
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local withStyle = UIBlox.Style.withStyle
+local TextKeys = require(ParentParent.Common.TextKeys)
+local Constants = require(ParentParent.Common.Constants)
+local getFFlagPassNavigationToContactsRevoked = require(ParentParent.Flags.getFFlagPassNavigationToContactsRevoked)
+local v14 = Roact.PureComponent:extend("ContactsRevokedAccessDialog")
+
+v14.validateProps = t.strictInterface({
+	navigation = t.table,
+	screenSize = t.Vector2
+})
+
+function v14.render(p1) -- line: 31
+	-- upvalues: withLocalization (copy), TextKeys (copy), withStyle (copy), Constants (copy), getFFlagPassNavigationToContactsRevoked (copy), Roact (copy), InteractiveAlert (copy), ButtonType (copy)
+	return withLocalization({
+		titleText = TextKeys.CONTACTS_LIST_TITLE,
+		revokedFlow = TextKeys.CONTACTS_REVOKED_FLOW,
+		closeModalOk = TextKeys.CLOSE_MODAL_OK
+	})(function(p2) -- line: 36
+		-- upvalues: withStyle (copy), p1 (copy), Constants (copy), getFFlagPassNavigationToContactsRevoked (copy), Roact (copy), InteractiveAlert (copy), ButtonType (copy)
+		return withStyle(function(_) -- line: 37
+			-- upvalues: p1 (copy), Constants (copy), getFFlagPassNavigationToContactsRevoked (copy), Roact (copy), InteractiveAlert (copy), p2 (copy), ButtonType (copy)
+			local props = p1.props
+			local navigation = props.navigation
+			local v21 = navigation.getParam(Constants.CLOSE_MODAL) or getFFlagPassNavigationToContactsRevoked() and navigation.pop
+
+			return Roact.createElement(InteractiveAlert, {
+				title = p2.titleText,
+				screenSize = props.screenSize,
+				buttonStackInfo = {
+					buttonHeight = 48,
+					buttons = {{
+						buttonType = ButtonType.Secondary,
+						props = {
+							onActivated = function() -- line: 51
+								-- upvalues: v21 (copy)
+								v21()
+							end,
+							text = p2.closeModalOk
+						}
+					}},
+					forcedFillDirection = Enum.FillDirection.Vertical
+				},
+				bodyText = p2.revokedFlow
+			})
+		end)
+	end)
+end
+
+return RoactRodux.connect(function(p4) -- line: 67
+	return {
+		screenSize = p4.ScreenSize
+	}
+end, nil)(v14)

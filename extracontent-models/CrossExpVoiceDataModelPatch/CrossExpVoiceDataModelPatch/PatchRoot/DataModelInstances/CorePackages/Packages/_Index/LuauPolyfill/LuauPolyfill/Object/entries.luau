@@ -1,25 +1,30 @@
-local _ = require(script.Parent.Parent.types);
-return function(v1) --[[ Line: 7 ]]
-    assert(v1 ~= nil, "cannot get entries from a nil value");
-    local v2 = typeof(v1);
-    local v3 = {};
-    if v2 == "table" then
-        for v4, v5 in pairs(v1) do
-            table.insert(v3, {
-                v4, 
-                v5
-            });
-        end;
-        return v3;
-    else
-        if v2 == "string" then
-            for v6 = 1, string.len(v1) do
-                v3[v6] = {
-                    tostring(v6), 
-                    (string.sub(v1, v6, v6))
-                };
-            end;
-        end;
-        return v3;
-    end;
-end;
+require(script.Parent.Parent.types)
+
+return function(p1) -- line: 7
+	assert(p1 ~= nil, "cannot get entries from a nil value")
+
+	local v2 = typeof(p1)
+	local t1 = {}
+
+	if v2 == "table" then
+		for k, v in pairs(p1) do
+			table.insert(t1, {
+				k,
+				v
+			})
+		end
+
+		return t1
+	end
+
+	if v2 == "string" then
+		for i = 1, string.len(p1) do
+			t1[i] = {
+				tostring(i),
+				(string.sub(p1, i, i))
+			}
+		end
+	end
+
+	return t1
+end

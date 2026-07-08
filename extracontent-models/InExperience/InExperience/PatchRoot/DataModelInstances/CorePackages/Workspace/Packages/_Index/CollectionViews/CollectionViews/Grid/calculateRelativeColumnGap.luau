@@ -1,16 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("CollectionViews").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-return function(v2, v3, v4, v5) --[[ Line: 8 ]] --[[ Name: calculateRelativeColumnGap ]]
-    -- upvalues: v1 (copy)
-    if v2 < 2 then
-        return 0;
-    else
-        v1.assert(v2 >= 2);
-        local v6 = v2 * v4 + (v2 - 1) * v3 + v5 * 2;
-        if v6 > 0 then
-            return v3 / v6;
-        else
-            return 0;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("CollectionViews").Parent
+local ArgCheck = require(Parent.ArgCheck)
+
+local function calculateRelativeColumnGap(n1: number, n2: number, n3: number, n4: number) -- line: 8
+	-- upvalues: ArgCheck (copy)
+	if n1 < 2 then
+		return 0
+	end
+
+	ArgCheck.assert(n1 >= 2)
+
+	local v8 = n1 * n3 + (n1 - 1) * n2 + n4 * 2
+
+	if v8 > 0 then
+		return n2 / v8
+	end
+
+	return 0
+end
+
+return calculateRelativeColumnGap

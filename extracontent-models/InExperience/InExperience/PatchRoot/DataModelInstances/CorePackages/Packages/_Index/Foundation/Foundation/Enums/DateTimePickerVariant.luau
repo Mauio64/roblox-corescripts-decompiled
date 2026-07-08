@@ -1,5 +1,5 @@
 return {
-    Dual = "Dual", 
-    Single = "Single", 
-    SingleWithTime = "SingleWithTime"
-};
+	Dual = "Dual",
+	Single = "Single",
+	SingleWithTime = "SingleWithTime"
+}

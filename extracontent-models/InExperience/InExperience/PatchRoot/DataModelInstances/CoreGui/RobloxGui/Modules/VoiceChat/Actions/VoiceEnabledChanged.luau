@@ -1,12 +1,14 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-local v3 = require(l_CorePackages_0.Packages.t);
-local v4 = require(l_RobloxGui_0.Modules.VoiceChat.Helpers.maybeAssert);
-return l_makeActionCreator_0(script.Name, function(v5) --[[ Line: 9 ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    v4(v3.boolean(v5));
-    return {
-        enabled = v5
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+local t = require(CorePackages.Packages.t)
+local maybeAssert = require(RobloxGui.Modules.VoiceChat.Helpers.maybeAssert)
+
+return makeActionCreator(script.Name, function(p1) -- line: 9
+	-- upvalues: maybeAssert (copy), t (copy)
+	maybeAssert(t.boolean(p1))
+
+	return {
+		enabled = p1
+	}
+end)

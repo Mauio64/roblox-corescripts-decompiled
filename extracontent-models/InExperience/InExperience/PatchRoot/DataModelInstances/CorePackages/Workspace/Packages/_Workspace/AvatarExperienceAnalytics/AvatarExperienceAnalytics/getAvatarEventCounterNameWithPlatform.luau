@@ -1,27 +1,40 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent;
-local v2 = require(l_Parent_0.AvatarExperienceFlags);
-local l_isSpatial_0 = require(l_Parent_0.AppCommonLib).isSpatial;
-local l_FFlagAXMigrateReportAvatarEventCounter_0 = v2.FFlagAXMigrateReportAvatarEventCounter;
-return function(v5) --[[ Line: 12 ]] --[[ Name: getAvatarEventCounterNameWithPlatform ]]
-    -- upvalues: l_UserInputService_0 (copy), l_isSpatial_0 (copy), l_FFlagAXMigrateReportAvatarEventCounter_0 (copy)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    if l_isSpatial_0() then
-        return "VR" .. v5;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.Android then
-        return "Android" .. v5;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.IOS then
-        return "IOS" .. v5;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.Windows then
-        return "Windows" .. v5;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.OSX then
-        return "OSX" .. v5;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.PS4 or l_l_UserInputService_0_Platform_0 == Enum.Platform.PS5 then
-        return "PlayStation" .. v5;
-    else
-        if l_FFlagAXMigrateReportAvatarEventCounter_0 and (l_l_UserInputService_0_Platform_0 == Enum.Platform.XBoxOne or l_l_UserInputService_0_Platform_0 == Enum.Platform.XBox360) then
-            v5 = "Xbox-" .. v5;
-        end;
-        return v5;
-    end;
-end;
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local isSpatial = require(Parent.AppCommonLib).isSpatial
+
+local function getAvatarEventCounterNameWithPlatform(s1: string) -- line: 8
+	-- upvalues: UserInputService (copy), isSpatial (copy)
+	local Platform = UserInputService:GetPlatform()
+
+	if isSpatial() then
+		return "VR" .. s1
+	end
+
+	if Platform == Enum.Platform.Android then
+		return "Android" .. s1
+	end
+
+	if Platform == Enum.Platform.IOS then
+		return "IOS" .. s1
+	end
+
+	if Platform == Enum.Platform.Windows then
+		return "Windows" .. s1
+	end
+
+	if Platform == Enum.Platform.OSX then
+		return "OSX" .. s1
+	end
+
+	if Platform == Enum.Platform.PS4 or Platform == Enum.Platform.PS5 then
+		return "PlayStation" .. s1
+	end
+
+	if Platform == Enum.Platform.XBoxOne or Platform == Enum.Platform.XBox360 then
+		s1 = "Xbox-" .. s1
+	end
+
+	return s1
+end
+
+return getAvatarEventCounterNameWithPlatform

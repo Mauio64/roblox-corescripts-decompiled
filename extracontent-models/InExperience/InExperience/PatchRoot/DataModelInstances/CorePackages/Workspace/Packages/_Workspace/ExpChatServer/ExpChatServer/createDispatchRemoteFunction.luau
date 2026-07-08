@@ -1,121 +1,124 @@
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_Parent_0 = script:FindFirstAncestor("ExpChatServer").Parent;
-local l_List_0 = require(l_Parent_0.llama).List;
-local v4 = require(l_Parent_0.ExpChatShared).Logger:new("ExpChat/" .. script.Name);
-local v5 = game:DefineFastFlag("StopNaivelyCreatingWhisperChannels", false);
-local function _(v6, v7) --[[ Line: 13 ]] --[[ Name: canUsersTalkToEachOther ]]
-    -- upvalues: v5 (copy), l_TextChatService_0 (copy), v4 (copy)
-    if v5 and v6 == v7 then
-        return false;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 18 ]]
-            -- upvalues: l_TextChatService_0 (ref), v6 (copy), v7 (copy)
-            return l_TextChatService_0:CanUsersWhisperAsync(v6, v7);
-        end);
-        local v10 = l_status_0 and l_result_0;
-        v4:debug("CanUsersChat: {}", (tostring(v10)));
-        return v10;
-    end;
-end;
-local function _(v12, v13) --[[ Line: 28 ]] --[[ Name: whisperChannelAlreadyExists ]]
-    -- upvalues: l_TextChatService_0 (copy)
-    local v14 = string.format("RBXWhisper:%d_%d", v12 < v13 and v12 or v13, v13 < v12 and v12 or v13);
-    return (l_TextChatService_0:FindFirstChild("TextChannels") or l_TextChatService_0):FindFirstChild(v14);
-end;
-local function v23(v16, v17) --[[ Line: 35 ]] --[[ Name: createWhisperChannel ]]
-    -- upvalues: l_TextChatService_0 (copy), l_List_0 (copy)
-    local v18 = string.format("RBXWhisper:%d_%d", v16 < v17 and v16 or v17, v17 < v16 and v16 or v17);
-    local v19 = l_TextChatService_0:FindFirstChild("TextChannels") or l_TextChatService_0;
-    local l_TextChannel_0 = Instance.new("TextChannel");
-    l_TextChannel_0.Name = v18;
-    l_TextChannel_0.Parent = v19;
-    l_TextChannel_0:AddUserAsync(v16);
-    l_TextChannel_0:AddUserAsync(v17);
-    l_TextChannel_0.ChildRemoved:Connect(function(_) --[[ Line: 47 ]]
-        -- upvalues: l_List_0 (ref), l_TextChannel_0 (copy)
-        if l_List_0.count(l_TextChannel_0:GetChildren(), function(v22) --[[ Line: 48 ]]
-            return v22:IsA("TextSource");
-        end) < 2 then
-            l_TextChannel_0:Destroy();
-        end;
-    end);
-    return l_TextChannel_0;
-end;
-local function _(v24, v25, v26) --[[ Line: 60 ]] --[[ Name: createInstance ]]
-    local v27 = Instance.new(v24);
-    v27.Name = v25;
-    v27.Parent = v26;
-    return v27;
-end;
-return function() --[[ Line: 67 ]] --[[ Name: createDispatchRemoteFunction ]]
-    -- upvalues: l_RobloxReplicatedStorage_0 (copy), v4 (copy), v5 (copy), l_TextChatService_0 (copy), v23 (copy)
-    local l_ExperienceChat_0 = l_RobloxReplicatedStorage_0:FindFirstChild("ExperienceChat");
-    if not l_ExperienceChat_0 then
-        local l_l_RobloxReplicatedStorage_0_0 = l_RobloxReplicatedStorage_0;
-        local l_Folder_0 = Instance.new("Folder");
-        l_Folder_0.Name = "ExperienceChat";
-        l_Folder_0.Parent = l_l_RobloxReplicatedStorage_0_0;
-        l_ExperienceChat_0 = l_Folder_0;
-    end;
-    local l_WhisperChat_0 = l_ExperienceChat_0:FindFirstChild("WhisperChat");
-    if not l_WhisperChat_0 then
-        local l_RemoteFunction_0 = Instance.new("RemoteFunction");
-        l_RemoteFunction_0.Name = "WhisperChat";
-        l_RemoteFunction_0.Parent = l_ExperienceChat_0;
-        l_WhisperChat_0 = l_RemoteFunction_0;
-    end;
-    if l_WhisperChat_0:IsA("RemoteFunction") then
-        l_WhisperChat_0.OnServerInvoke = function(v34, v35) --[[ Line: 76 ]]
-            -- upvalues: v4 (ref), v5 (ref), l_TextChatService_0 (ref), v23 (ref)
-            v4:trace("WhisperChat remote invoked with: {}", (tostring(v35)));
-            local v36 = tonumber(v35);
-            local l_UserId_0 = v34.UserId;
-            if v36 then
-                if v5 then
-                    local v38 = string.format("RBXWhisper:%d_%d", l_UserId_0 < v36 and l_UserId_0 or v36, v36 < l_UserId_0 and l_UserId_0 or v36);
-                    local l_FirstChild_0 = (l_TextChatService_0:FindFirstChild("TextChannels") or l_TextChatService_0):FindFirstChild(v38);
-                    if l_FirstChild_0 then
-                        v4:trace("Whisper TextChannel already exists");
-                        return l_FirstChild_0;
-                    else
-                        if v5 and l_UserId_0 == v36 then
-                            v38 = false;
-                        else
-                            local l_status_1, l_result_1 = pcall(function() --[[ Line: 18 ]]
-                                -- upvalues: l_TextChatService_0 (ref), l_UserId_0 (copy), v36 (copy)
-                                return l_TextChatService_0:CanUsersWhisperAsync(l_UserId_0, v36);
-                            end);
-                            local v42 = l_status_1 and l_result_1;
-                            v4:debug("CanUsersChat: {}", (tostring(v42)));
-                            v38 = v42;
-                        end;
-                        if v38 then
-                            v4:trace("Creating whisper TextChannel");
-                            return (v23(l_UserId_0, v36));
-                        end;
-                    end;
-                else
-                    local v43;
-                    if v5 and l_UserId_0 == v36 then
-                        v43 = false;
-                    else
-                        local l_status_2, l_result_2 = pcall(function() --[[ Line: 18 ]]
-                            -- upvalues: l_TextChatService_0 (ref), l_UserId_0 (copy), v36 (copy)
-                            return l_TextChatService_0:CanUsersWhisperAsync(l_UserId_0, v36);
-                        end);
-                        local v46 = l_status_2 and l_result_2;
-                        v4:debug("CanUsersChat: {}", (tostring(v46)));
-                        v43 = v46;
-                    end;
-                    if v43 then
-                        v4:trace("Creating whisper TextChannel");
-                        return (v23(l_UserId_0, v36));
-                    end;
-                end;
-            end;
-            return nil;
-        end;
-    end;
-    return l_WhisperChat_0;
-end;
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
+local Parent = script:FindFirstAncestor("ExpChatServer").Parent
+local List = require(Parent.llama).List
+local v5 = require(Parent.ExpChatShared).Logger:new("ExpChat/" .. script.Name)
+
+local function canUsersTalkToEachOther(n1: number, n2: number) -- line: 11
+	-- upvalues: TextChatService (copy), v5 (copy)
+	if n1 == n2 then
+		return false
+	end
+
+	local ok, result = pcall(function() -- line: 15
+		-- upvalues: TextChatService (copy), n1 (copy), n2 (copy)
+		return TextChatService:CanUsersWhisperAsync(n1, n2)
+	end)
+	local v15 = ok and result
+
+	v5:debug("CanUsersChat: {}", (tostring(v15)))
+
+	return v15
+end
+local function whisperChannelAlreadyExists(n3: number, n4: number) -- line: 25
+	-- upvalues: TextChatService (copy)
+	local v18 = string.format("RBXWhisper:%d_%d", n3 < n4 and n3 or n4, n4 < n3 and n3 or n4)
+
+	return (TextChatService:FindFirstChild("TextChannels") or TextChatService):FindFirstChild(v18)
+end
+local function createWhisperChannel(n5: number, n6: number) -- line: 32
+	-- upvalues: TextChatService (copy), List (copy)
+	local v21 = string.format("RBXWhisper:%d_%d", n5 < n6 and n5 or n6, n6 < n5 and n5 or n6)
+	local v22 = TextChatService:FindFirstChild("TextChannels") or TextChatService
+	local TextChannel = Instance.new("TextChannel")
+
+	TextChannel.Name = v21
+	TextChannel.Parent = v22
+	TextChannel:AddUserAsync(n5)
+	TextChannel:AddUserAsync(n6)
+	TextChannel.ChildRemoved:Connect(function(_) -- line: 44
+		-- upvalues: List (copy), TextChannel (copy)
+		if List.count(TextChannel:GetChildren(), function(p2) -- line: 45
+			return p2:IsA("TextSource")
+		end) < 2 then
+			TextChannel:Destroy()
+		end
+	end)
+
+	return TextChannel
+end
+local function createInstance(s1: string, s2: string, p3) -- line: 57
+	local v27 = Instance.new(s1)
+
+	v27.Name = s2
+	v27.Parent = p3
+
+	return v27
+end
+local function createDispatchRemoteFunction() -- line: 64
+	-- upvalues: RobloxReplicatedStorage (copy), v5 (copy), TextChatService (copy), createWhisperChannel (copy)
+	local ExperienceChat = RobloxReplicatedStorage:FindFirstChild("ExperienceChat")
+
+	if not ExperienceChat then
+		local v29 = RobloxReplicatedStorage
+
+		ExperienceChat = Instance.new("Folder")
+		ExperienceChat.Name = "ExperienceChat"
+		ExperienceChat.Parent = v29
+	end
+
+	local WhisperChat = ExperienceChat:FindFirstChild("WhisperChat")
+
+	if not WhisperChat then
+		WhisperChat = Instance.new("RemoteFunction")
+		WhisperChat.Name = "WhisperChat"
+		WhisperChat.Parent = ExperienceChat
+	end
+
+	if WhisperChat:IsA("RemoteFunction") then
+		function WhisperChat.OnServerInvoke(player, p4) -- line: 73
+			-- upvalues: v5 (copy), TextChatService (copy), createWhisperChannel (copy)
+			v5:trace("WhisperChat remote invoked with: {}", (tostring(p4)))
+
+			local num = tonumber(p4)
+			local UserId = player.UserId
+
+			if num then
+				local v36 = string.format("RBXWhisper:%d_%d", UserId < num and UserId or num, num < UserId and UserId or num)
+				local v37 = (TextChatService:FindFirstChild("TextChannels") or TextChatService):FindFirstChild(v36)
+
+				if v37 then
+					v5:trace("Whisper TextChannel already exists")
+
+					return v37
+				end
+
+				local v38
+
+				if UserId == num then
+					v38 = false
+				else
+					local ok, result = pcall(function() -- line: 15
+						-- upvalues: TextChatService (copy), UserId (copy), num (copy)
+						return TextChatService:CanUsersWhisperAsync(UserId, num)
+					end)
+
+					v38 = ok and result
+					v5:debug("CanUsersChat: {}", (tostring(v38)))
+				end
+
+				if v38 then
+					v5:trace("Creating whisper TextChannel")
+
+					return (createWhisperChannel(UserId, num))
+				end
+			end
+
+			return nil
+		end
+	end
+
+	return WhisperChat
+end
+
+return createDispatchRemoteFunction

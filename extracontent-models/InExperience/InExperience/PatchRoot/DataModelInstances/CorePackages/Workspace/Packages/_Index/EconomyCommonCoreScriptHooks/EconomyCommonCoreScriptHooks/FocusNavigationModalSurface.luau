@@ -1,21 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent;
-local v1 = require(l_Parent_0.React);
-local l_FocusNavigableSurfaceIdentifierEnum_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum;
-local v3 = require(script.Parent.useFocusNavigationSurface);
-return function(v4) --[[ Line: 16 ]] --[[ Name: FocusNavigationModalSurface ]]
-    -- upvalues: v3 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), v1 (copy)
-    local v5 = v3({
-        selectionGroupName = v4.selectionGroupName, 
-        focusNavigableSurfaceIdentifier = if v4.surfaceIdentifier then v4.surfaceIdentifier else l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay
-    });
-    return v1.createElement("Frame", {
-        ref = v5, 
-        Size = UDim2.fromScale(1, 1), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        SelectionBehaviorDown = Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorLeft = Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorRight = Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorUp = Enum.SelectionBehavior.Stop
-    }, v4.children);
-end;
+local Parent = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent
+local React = require(Parent.React)
+local FocusNavigableSurfaceIdentifierEnum = require(Parent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+local useFocusNavigationSurface = require(script.Parent.useFocusNavigationSurface)
+
+local function FocusNavigationModalSurface(t1: {[any]: any}) -- line: 16
+	-- upvalues: useFocusNavigationSurface (copy), FocusNavigableSurfaceIdentifierEnum (copy), React (copy)
+	local v7 = useFocusNavigationSurface({
+		selectionGroupName = t1.selectionGroupName,
+		focusNavigableSurfaceIdentifier = if not t1.surfaceIdentifier then FocusNavigableSurfaceIdentifierEnum.CentralOverlay else t1.surfaceIdentifier
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ref = v7,
+		Size = UDim2.fromScale(1, 1),
+		SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorRight = Enum.SelectionBehavior.Stop,
+		SelectionBehaviorUp = Enum.SelectionBehavior.Stop
+	}, t1.children)
+end
+
+return FocusNavigationModalSurface

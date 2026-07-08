@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableConfirmSignifierOnSignUpPage", false);
+return game:DefineFastFlag("EnableConfirmSignifierOnSignUpPage", false)

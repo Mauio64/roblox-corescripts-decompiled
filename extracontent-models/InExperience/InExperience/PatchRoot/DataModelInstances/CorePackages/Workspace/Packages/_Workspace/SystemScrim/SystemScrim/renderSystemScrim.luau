@@ -1,29 +1,36 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SystemScrim");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.ReactRoblox);
-local v5 = require(l_script_FirstAncestor_0.SystemScrim);
-local v6 = require(l_script_FirstAncestor_0["data-model"].SystemScrimSignalStore);
-return function() --[[ Line: 13 ]] --[[ Name: renderSystemScrim ]]
-    -- upvalues: v6 (copy), l_CoreGui_0 (copy), v3 (copy), v5 (copy), v4 (copy)
-    local v7 = v6(false);
-    local l_ScreenGui_0 = Instance.new("ScreenGui");
-    l_ScreenGui_0.Name = "SystemScrim";
-    l_ScreenGui_0.DisplayOrder = -2147483648;
-    l_ScreenGui_0.IgnoreGuiInset = true;
-    l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-    l_ScreenGui_0.ClipToDeviceSafeArea = false;
-    l_ScreenGui_0.ScreenInsets = Enum.ScreenInsets.None;
-    l_ScreenGui_0.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None;
-    l_ScreenGui_0.Parent = l_CoreGui_0;
-    local v9 = v3.createElement(v5, {
-        store = v7
-    });
-    local v10 = v4.createRoot(l_ScreenGui_0);
-    v10:render(v9);
-    return {
-        root = v10, 
-        store = v7
-    };
-end;
+local CoreGui = game:GetService("CoreGui")
+local SystemScrim = script:FindFirstAncestor("SystemScrim")
+local SystemScrimParent = SystemScrim.Parent
+local React = require(SystemScrimParent.React)
+local ReactRoblox = require(SystemScrimParent.ReactRoblox)
+local SystemScrim2 = require(SystemScrim.SystemScrim)
+local SystemScrimSignalStore = require(SystemScrim["data-model"].SystemScrimSignalStore)
+
+local function renderSystemScrim() -- line: 13
+	-- upvalues: SystemScrimSignalStore (copy), CoreGui (copy), React (copy), SystemScrim2 (copy), ReactRoblox (copy)
+	local v9 = SystemScrimSignalStore(false)
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.Name = "SystemScrim"
+	ScreenGui.DisplayOrder = -2147483648
+	ScreenGui.IgnoreGuiInset = true
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	ScreenGui.ClipToDeviceSafeArea = false
+	ScreenGui.ScreenInsets = Enum.ScreenInsets.None
+	ScreenGui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
+	ScreenGui.Parent = CoreGui
+
+	local v11 = React.createElement(SystemScrim2, {
+		store = v9
+	})
+	local v12 = ReactRoblox.createRoot(ScreenGui)
+
+	v12:render(v11)
+
+	return {
+		root = v12,
+		store = v9
+	}
+end
+
+return renderSystemScrim

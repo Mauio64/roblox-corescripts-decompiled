@@ -1,91 +1,90 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local v2 = require(l_CorePackages_0.Packages.UGCValidation);
-local l_game_EngineFeature_0 = game:GetEngineFeature("UGCValidationWithContextEntrypointFeature");
-local function v31(v4) --[[ Line: 8 ]] --[[ Name: UGCValidationFunction ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), v2 (copy)
-    local l_instances_0 = v4.instances;
-    local l_assetType_0 = v4.assetType;
-    local l_isServer_0 = v4.isServer;
-    local l_fullBodyData_0 = v4.fullBodyData;
-    local l_allowUnreviewedAssets_0 = v4.allowUnreviewedAssets;
-    local l_restrictedUserIds_0 = v4.restrictedUserIds;
-    local l_token_0 = v4.token;
-    local l_universeId_0 = v4.universeId;
-    local l_requireAllFolders_0 = v4.requireAllFolders;
-    local v14 = {
-        skipSnapshot = true, 
-        skipPhysicsDataReset = true, 
-        skipValidateHSR = true
-    };
-    local v15 = nil;
-    local v16 = nil;
-    local v17 = nil;
-    local v18 = nil;
-    if l_game_EngineFeature_0 then
-        v15 = {
-            instances = l_instances_0, 
-            assetTypeEnum = l_assetType_0, 
-            isServer = l_isServer_0, 
-            allowUnreviewedAssets = l_allowUnreviewedAssets_0, 
-            restrictedUserIds = l_restrictedUserIds_0, 
-            token = l_token_0, 
-            universeId = l_universeId_0, 
-            allowEditableInstances = true, 
-            shouldYield = true, 
-            validateMeshPartAccessories = true, 
-            requireAllFolders = l_requireAllFolders_0, 
-            bypassFlags = v14
-        };
-        v16 = {
-            fullBodyData = l_fullBodyData_0, 
-            isServer = l_isServer_0, 
-            allowEditableInstances = true, 
-            bypassFlags = v14, 
-            shouldYield = true, 
-            requireAllFolders = l_requireAllFolders_0, 
-            validateMeshPartAccessories = false
-        };
-        if l_fullBodyData_0 then
-            local v19, v20 = v2.validateFullBodyWithContext(v16);
-            v17 = v19;
-            v18 = v20;
-        else
-            local v21, v22 = v2.validateWithContext(v15);
-            v17 = v21;
-            v18 = v22;
-        end;
-    elseif l_fullBodyData_0 then
-        local v23, v24 = v2.validateFullBody(l_fullBodyData_0, l_isServer_0, true, v14, true, l_requireAllFolders_0);
-        v17 = v23;
-        v18 = v24;
-    else
-        local v25, v26 = v2.validate(l_instances_0, l_assetType_0, l_isServer_0, l_allowUnreviewedAssets_0, l_restrictedUserIds_0, l_token_0, l_universeId_0, true, v14, true, true, l_requireAllFolders_0);
-        v17 = v25;
-        v18 = v26;
-    end;
-    if v2.isFolderStructureEnabled and v2.isFolderStructureEnabled() then
-        local v27 = {
-            source = l_isServer_0 and "InExpServer" or "InExpClient", 
-            enforceR15FolderStructure = l_requireAllFolders_0 or false
-        };
-        local v28 = nil;
-        v28 = if l_fullBodyData_0 then v2.ValidateFinalizedBundle(l_fullBodyData_0, Enum.BundleType.BodyParts, v27) else v2.ValidateAsset(l_instances_0, l_assetType_0, v27);
-        if v2.isEntrypointMergingEnabled and v2.isEntrypointMergingEnabled() then
-            local v29, v30 = v2.combineResultsIntoLegacy(v17, v18, v28);
-            v17 = v29;
-            v18 = v30;
-        end;
-    end;
-    if not v17 then
-        return false, v18;
-    else
-        return true, {
-            "Success"
-        };
-    end;
-end;
-return function() --[[ Line: 115 ]] --[[ Name: Install ]]
-    -- upvalues: l_UGCValidationService_0 (copy), v31 (copy)
-    l_UGCValidationService_0:RegisterUGCValidationFunction(v31);
-end;
+local CorePackages = game:GetService("CorePackages")
+local UGCValidationService = game:GetService("UGCValidationService")
+local UGCValidation = require(CorePackages.Packages.UGCValidation)
+local EngineFeature = game:GetEngineFeature("UGCValidationWithContextEntrypointFeature")
+local v5 = game:DefineFastFlag("UGCValidateMigrateSchemaProperties2", false)
+local v6 = game:DefineFastFlag("UGCValidateForwardIECRestrictedUserIds", false)
+
+local function UGCValidationFunction(p1) -- line: 10
+	-- upvalues: EngineFeature (copy), UGCValidation (copy), v5 (copy), v6 (copy)
+	local instances = p1.instances
+	local assetType = p1.assetType
+	local isServer = p1.isServer
+	local fullBodyData = p1.fullBodyData
+	local allowUnreviewedAssets = p1.allowUnreviewedAssets
+	local restrictedUserIds = p1.restrictedUserIds
+	local token = p1.token
+	local universeId = p1.universeId
+	local requireAllFolders = p1.requireAllFolders
+	local t1 = {
+		skipSnapshot = true,
+		skipPhysicsDataReset = true,
+		skipValidateHSR = true
+	}
+	local v22, v23
+
+	if EngineFeature then
+		local t2 = {
+			allowEditableInstances = true,
+			shouldYield = true,
+			validateMeshPartAccessories = true,
+			instances = instances,
+			assetTypeEnum = assetType,
+			isServer = isServer,
+			allowUnreviewedAssets = allowUnreviewedAssets,
+			restrictedUserIds = restrictedUserIds,
+			token = token,
+			universeId = universeId,
+			requireAllFolders = requireAllFolders,
+			bypassFlags = t1
+		}
+		local t3 = {
+			allowEditableInstances = true,
+			shouldYield = true,
+			validateMeshPartAccessories = false,
+			fullBodyData = fullBodyData,
+			isServer = isServer,
+			bypassFlags = t1,
+			requireAllFolders = requireAllFolders
+		}
+
+		if fullBodyData then
+			v22, v23 = UGCValidation.validateFullBodyWithContext(t3)
+		else
+			v22, v23 = UGCValidation.validateWithContext(t2)
+		end
+	elseif fullBodyData then
+		v22, v23 = UGCValidation.validateFullBody(fullBodyData, isServer, true, t1, true, requireAllFolders)
+	else
+		v22, v23 = UGCValidation.validate(instances, assetType, isServer, allowUnreviewedAssets, restrictedUserIds, token, universeId, true, t1, true, true, requireAllFolders)
+	end
+
+	if UGCValidation.isFolderStructureEnabled and UGCValidation.isFolderStructureEnabled() then
+		local t4 = {
+			source = not isServer and "InExpClient" or "InExpServer",
+			enforceR15FolderStructure = requireAllFolders or false,
+			iecConfigs = if not v5 then nil else {
+				token = token,
+				universeId = universeId,
+				restrictedUserIds = if not v6 then nil else restrictedUserIds
+			}
+		}
+		local v25 = if not fullBodyData then UGCValidation.ValidateAsset(instances, assetType, t4) else UGCValidation.ValidateFinalizedBundle(fullBodyData, Enum.BundleType.BodyParts, t4)
+
+		if UGCValidation.isEntrypointMergingEnabled and UGCValidation.isEntrypointMergingEnabled() then
+			v22, v23 = UGCValidation.combineResultsIntoLegacy(v22, v23, v25)
+		end
+	end
+
+	if not v22 then
+		return false, v23
+	end
+
+	return true, { "Success" }
+end
+local function Install() -- line: 126
+	-- upvalues: UGCValidationService (copy), UGCValidationFunction (copy)
+	UGCValidationService:RegisterUGCValidationFunction(UGCValidationFunction)
+end
+
+return Install

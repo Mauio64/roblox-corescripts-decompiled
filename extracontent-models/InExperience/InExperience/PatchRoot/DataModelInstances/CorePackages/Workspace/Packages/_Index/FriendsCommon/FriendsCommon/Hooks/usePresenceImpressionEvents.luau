@@ -1,82 +1,83 @@
-local l_Parent_0 = script:FindFirstAncestor("FriendsCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.SocialLuaAnalytics);
-local v4 = require(l_Parent_0.LoggingProtocol);
-local v5 = game:DefineFastInt("PresenceImpressionLoggingThrottlePerMyriad", 10000);
-local v6 = v3.Telemetry.createEmitter({
-    telemetryImpl = v4.default, 
-    defaultTelemetryConfig = {
-        throttlingThousandths = v5, 
-        links = "https://docs.google.com/document/d/1uj9vb188k-wC2u3U3-UX3fm7xLffIbbvF7BDq3hs2Ak"
-    }, 
-    getSharedInfo = function() --[[ Line: 29 ]] --[[ Name: getSharedInfo ]]
-        return {};
-    end
-});
-local v9 = v3.Telemetry.new({
-    name = "PresenceImpression", 
-    description = "Emitted when the presence status of a friend updates on the client", 
-    lastUpdated = {
-        2025, 
-        4, 
-        10
-    }, 
-    backendsList = {
-        {
-            type = "EventIngest", 
-            format = function(v7, _) --[[ Line: 41 ]] --[[ Name: format ]]
-                return v7;
-            end
-        }
-    }
-});
-areEqual = function(v10, v11) --[[ Line: 48 ]] --[[ Name: areEqual ]]
-    local v12 = false;
-    if v10.userPresenceType == v11.userPresenceType then
-        v12 = v10.placeId == v11.placeId;
-    end;
-    return v12;
-end;
-usePresenceImpressionEvents = function(v13) --[[ Line: 52 ]] --[[ Name: usePresenceImpressionEvents ]]
-    -- upvalues: v1 (copy), v2 (copy), v6 (copy), v9 (copy)
-    local v14, v15 = v1.useState({});
-    v1.useEffect(function() --[[ Line: 55 ]]
-        -- upvalues: v13 (copy), v2 (ref), v14 (copy), v6 (ref), v9 (ref), v15 (copy)
-        local v16 = {};
-        for _, v18 in pairs(v13) do
-            v16[v18.id] = v18.presence;
-        end;
-        local v19 = false;
-        local v20 = v2.Dictionary.join(v14, v16);
-        for v21, v22 in pairs(v20) do
-            if v16[v21] == nil then
-                v6.emit(v9, {
-                    observedUserId = v21, 
-                    presenceType = "Offline", 
-                    lastLocation = "Website", 
-                    implementationVariant = "UniversalAppGraphQL"
-                });
-                v19 = true;
-            elseif v14[v21] == nil or not areEqual(v14[v21], v16[v21]) then
-                local v23 = {
-                    observedUserId = v22.id, 
-                    presenceType = v22.userPresenceType, 
-                    placeId = v22.placeId, 
-                    universeId = v22.universeId, 
-                    gameId = v22.gameId, 
-                    lastLocation = v22.lastLocation, 
-                    implementationVariant = "UniversalAppGraphQL"
-                };
-                v6.emit(v9, v23);
-                v19 = true;
-            end;
-        end;
-        if v19 then
-            v15(v16);
-        end;
-    end, {
-        v13
-    });
-end;
-return usePresenceImpressionEvents;
+local Parent = script:FindFirstAncestor("FriendsCommon").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local v6 = game:DefineFastInt("PresenceImpressionLoggingThrottlePerMyriad", 10000)
+local FFlagFriendsSignalMigrationTelemetry = require(Parent.SharedFlags).FFlagFriendsSignalMigrationTelemetry
+local v8 = SocialLuaAnalytics.Telemetry.createEmitter({
+	telemetryImpl = LoggingProtocol.default,
+	defaultTelemetryConfig = {
+		links = "https://docs.google.com/document/d/1uj9vb188k-wC2u3U3-UX3fm7xLffIbbvF7BDq3hs2Ak",
+		throttlingThousandths = v6
+	},
+	getSharedInfo = function() -- line: 31
+		return {}
+	end
+})
+local v9 = SocialLuaAnalytics.Telemetry.new({
+	name = "PresenceImpression",
+	description = "Emitted when the presence status of a friend updates on the client",
+	lastUpdated = {
+		2025,
+		4,
+		10
+	},
+	backendsList = {{
+		type = "EventIngest",
+		format = function(t1: {[any]: any}, _: {[any]: any}) -- line: 43
+			return t1
+		end
+	}}
+})
+
+function areEqual(p1, p2) -- line: 50
+	return p1.userPresenceType == p2.userPresenceType and p1.placeId == p2.placeId
+end
+function usePresenceImpressionEvents(p3) -- line: 54
+	-- upvalues: React (copy), Cryo (copy), v8 (copy), v9 (copy), FFlagFriendsSignalMigrationTelemetry (copy)
+	local v15, v16 = React.useState({})
+
+	React.useEffect(function() -- line: 57
+		-- upvalues: p3 (copy), Cryo (copy), v15 (copy), v8 (copy), v9 (copy), FFlagFriendsSignalMigrationTelemetry (copy), v16 (copy)
+		local t3 = {}
+
+		for _, v in pairs(p3) do
+			t3[v.id] = v.presence
+		end
+
+		local v20 = false
+		local v21 = Cryo.Dictionary.join(v15, t3)
+
+		for k, v in pairs(v21) do
+			if t3[k] == nil then
+				v8.emit(v9, {
+					presenceType = "Offline",
+					lastLocation = "Website",
+					observedUserId = k,
+					implementationVariant = not FFlagFriendsSignalMigrationTelemetry and "UniversalAppGraphQL" or "UniversalAppFriendsStore"
+				})
+				v20 = true
+			elseif v15[k] == nil or not areEqual(v15[k], t3[k]) then
+				local t4 = {
+					observedUserId = v.id,
+					presenceType = v.userPresenceType,
+					placeId = v.placeId,
+					universeId = v.universeId,
+					gameId = v.gameId,
+					lastLocation = v.lastLocation,
+					implementationVariant = not FFlagFriendsSignalMigrationTelemetry and "UniversalAppGraphQL" or "UniversalAppFriendsStore"
+				}
+
+				v8.emit(v9, t4)
+				v20 = true
+			end
+		end
+
+		if v20 then
+			v16(t3)
+		end
+	end, { p3 })
+end
+
+return usePresenceImpressionEvents

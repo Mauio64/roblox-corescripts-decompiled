@@ -1,36 +1,40 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v2.Hooks.useTokens;
-local v4 = require(script.Parent.Utils.generateColorSequence);
-local v5 = game:DefineFastFlag("AXColorGradientRenderFlatWithJustOneColor", false);
-return function(v6) --[[ Line: 28 ]] --[[ Name: ColorGradientCircle ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v5 (copy), v2 (copy), v4 (copy)
-    local v7 = l_useTokens_0();
-    return v1.createElement("Frame", {
-        Size = v6.Size, 
-        Position = v6.Position, 
-        AnchorPoint = v6.AnchorPoint, 
-        BackgroundTransparency = 0
-    }, {
-        UICorner = v1.createElement("UICorner", {
-            CornerRadius = UDim.new(0.5, 0)
-        }), 
-        UIGradient = if v5 and #v6.Colors == 1 then v1.createElement(v2.View, {
-            tag = "size-full-full radius-circle", 
-            backgroundStyle = {
-                Color3 = v6.Colors[1], 
-                Transparency = 0
-            }
-        }) else v1.createElement("UIGradient", {
-            Rotation = v6.Rotation or 45, 
-            Color = v4(v6.Colors), 
-            Transparency = v6.Transparency or NumberSequence.new(0), 
-            Offset = v6.Offset or Vector2.new(0, 0)
-        }), 
-        UIStroke = if v6.hasBorder then v1.createElement("UIStroke", {
-            Thickness = 2, 
-            Color = v7.Color.System.Contrast.Color3
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local generateColorSequence = require(script.Parent.Utils.generateColorSequence)
+local v6 = game:DefineFastFlag("AXColorGradientRenderFlatWithJustOneColor", false)
+
+local function ColorGradientCircle(t1: {[any]: any}) -- line: 28
+	-- upvalues: useTokens (copy), React (copy), v6 (copy), Foundation (copy), generateColorSequence (copy)
+	local v9 = useTokens()
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 0,
+		Size = t1.Size,
+		Position = t1.Position,
+		AnchorPoint = t1.AnchorPoint
+	}, {
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0.5, 0)
+		}),
+		UIGradient = if not v6 or #t1.Colors ~= 1 then React.createElement("UIGradient", {
+			Rotation = t1.Rotation or 45,
+			Color = generateColorSequence(t1.Colors),
+			Transparency = t1.Transparency or NumberSequence.new(0),
+			Offset = t1.Offset or Vector2.new(0, 0)
+		}) else React.createElement(Foundation.View, {
+			tag = "size-full-full radius-circle",
+			backgroundStyle = {
+				Transparency = 0,
+				Color3 = t1.Colors[1]
+			}
+		}),
+		UIStroke = if not t1.hasBorder then nil else React.createElement("UIStroke", {
+			Thickness = 2,
+			Color = v9.Color.System.Contrast.Color3
+		})
+	})
+end
+
+return ColorGradientCircle

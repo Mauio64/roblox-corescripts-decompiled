@@ -1,433 +1,471 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InGameAssetReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Players_0 = game:GetService("Players");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ExperienceStateCaptureService_0 = game:GetService("ExperienceStateCaptureService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v7 = require(l_Parent_0.React);
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local l_ScreenshotManager_0 = require(l_Parent_0.Screenshot).ScreenshotManager;
-local v10 = require(l_Parent_0.LuauPolyfill);
-local l_clearTimeout_0 = v10.clearTimeout;
-local l_setTimeout_0 = v10.setTimeout;
-local v13 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.Constants);
-local v14 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.AnalyticsReducer);
-local v15 = require(l_script_FirstAncestor_0.Analysis.SceneAnalysis);
-local v16 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportSubmitDialog);
-local v17 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportCompleteModal);
-local v18 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetIPInfringementErrorModal);
-local v19 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportIPInfringementModal);
-local v20 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.PreciseSelection.ReportPreciseSelectionLandscapeHeader);
-local v21 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.PreciseSelection.ReportPreciseSelectionPortraitHeaderFooter);
-local v22 = require(l_script_FirstAncestor_0.Utility.buildReport);
-local v23 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.InGameAssetReportAnalytics);
-local v24 = require(l_script_FirstAncestor_0.Utility.getHighlightModeVariant);
-local v25 = game:DefineFastFlag("PreciseSelectionBugfixesEnabled", false);
-local l_FFlagPrefillPreciseSelectionChoices_0 = require(l_Parent_0.SharedFlags).FFlagPrefillPreciseSelectionChoices;
-local l_FFlagReportIPInfringement_0 = require(l_Parent_0.SharedFlags).FFlagReportIPInfringement;
-local v28 = string.gsub(l_ContentProvider_0.BaseUrl:lower(), "/m.", "/www.");
-local v29 = string.gsub(string.gsub(v28, "http:", "https:"), "https://www", "https://apis") .. "rights-management-api/rights/v1/snapshots";
-return function(v30) --[[ Line: 57 ]]
-    -- upvalues: v7 (copy), v14 (copy), v13 (copy), l_setTimeout_0 (copy), l_clearTimeout_0 (copy), v25 (copy), l_ScreenshotManager_0 (copy), v15 (copy), v23 (copy), l_ExperienceStateCaptureService_0 (copy), l_UserInputService_0 (copy), l_FFlagReportIPInfringement_0 (copy), l_HttpService_0 (copy), v29 (copy), v24 (copy), v22 (copy), l_Players_0 (copy), l_withLocalization_0 (copy), v21 (copy), v20 (copy), v16 (copy), l_FFlagPrefillPreciseSelectionChoices_0 (copy), v17 (copy), v19 (copy), v18 (copy)
-    local v31, v32 = v7.useState(false);
-    local v33, v34 = v7.useState(false);
-    local v35, v36 = v7.useState(false);
-    local v37, v38 = v7.useState("");
-    local v39, v40 = v7.useState(nil);
-    local v41, v42 = v7.useState(true);
-    local v43, v44 = v7.useReducer(v14, v13.AnalyticsInitialState);
-    local v45, v46 = v7.useState(nil);
-    local v47, v48 = v7.useState(nil);
-    local v49, v50 = v7.useState(nil);
-    local v51, v52 = v7.useState(false);
-    local v53, v54 = v7.useState(nil);
-    local v55, v56 = v7.useState("");
-    local v57, v58 = v7.useState(nil);
-    local v59, v60 = v7.useState(false);
-    local l_ViewportSize_0 = game.Workspace.CurrentCamera.ViewportSize;
-    local v62 = v30.getIsSmallPortraitMode(l_ViewportSize_0);
-    v7.useEffect(function() --[[ Line: 79 ]]
-        -- upvalues: v44 (copy), v13 (ref), v54 (copy), l_setTimeout_0 (ref), v52 (copy)
-        v44({
-            type = v13.AnalyticsActions.AccumulateForTimeSpent, 
-            accumulated_time_ms = workspace:GetServerTimeNow() * 1000
-        });
-        v44({
-            type = v13.AnalyticsActions.SetPlaceId, 
-            place_id = game.PlaceId
-        });
-        v54(l_setTimeout_0(function() --[[ Line: 88 ]]
-            -- upvalues: v52 (ref)
-            v52(true);
-        end, 10000));
-    end, {
-        v52, 
-        v54
-    });
-    local v63 = v7.useCallback(function() --[[ Line: 93 ]]
-        -- upvalues: v52 (copy), v53 (copy), l_clearTimeout_0 (ref)
-        v52(false);
-        if v53 then
-            l_clearTimeout_0(v53);
-        end;
-    end, {
-        v52, 
-        v53
-    });
-    local v64 = v7.useCallback(function() --[[ Line: 101 ]]
-        -- upvalues: v25 (ref), v37 (copy), l_ScreenshotManager_0 (ref), v38 (copy), v63 (copy), v32 (copy), v44 (copy), v13 (ref), l_ViewportSize_0 (copy), v62 (copy)
-        if v25 then
-            if v37 == "" then
-                l_ScreenshotManager_0:TakeScreenshotWithCallback(v38, nil);
-            end;
-        elseif not v37 then
-            l_ScreenshotManager_0:TakeScreenshotWithCallback(v38, nil);
-        end;
-        v63();
-        v32(true);
-        v44({
-            type = v13.AnalyticsActions.SetViewportInformation, 
-            viewport_size_x = l_ViewportSize_0.X, 
-            viewport_size_y = l_ViewportSize_0.Y, 
-            is_portrait_mode = v62
-        });
-        v44({
-            type = v13.AnalyticsActions.IncrementNextCount
-        });
-    end, {
-        v32, 
-        v38, 
-        v37, 
-        l_ViewportSize_0, 
-        v62, 
-        v44, 
-        v63
-    });
-    local v65 = v7.useCallback(function() --[[ Line: 141 ]]
-        -- upvalues: v40 (copy), v15 (ref), v49 (copy), v64 (copy)
-        v40(v15.interpretAndExtractItemsFromInstanceForPreciseSelection(v49));
-        v64();
-    end, {
-        v64, 
-        v40, 
-        v49
-    });
-    local v66 = v7.useCallback(function() --[[ Line: 147 ]]
-        -- upvalues: v23 (ref), v43 (copy), v30 (copy)
-        v23(v43, 2);
-        v30.backAction();
-    end, {
-        v30.backAction, 
-        v43
-    });
-    v7.useEffect(function() --[[ Line: 155 ]]
-        -- upvalues: v47 (copy), l_ExperienceStateCaptureService_0 (ref), v50 (copy), v44 (copy), v13 (ref), v25 (ref), v63 (copy), l_UserInputService_0 (ref), v40 (copy), v15 (ref), v64 (copy), v48 (copy)
-        if v47 then
-            v47:Disconnect();
-        end;
-        local v68 = l_ExperienceStateCaptureService_0.ItemSelectedInCaptureMode:Connect(function(v67) --[[ Line: 159 ]]
-            -- upvalues: v50 (ref), v44 (ref), v13 (ref), v25 (ref), v63 (ref), l_UserInputService_0 (ref), v40 (ref), v15 (ref), v64 (ref)
-            v50(v67);
-            if v67 then
-                v44({
-                    type = v13.AnalyticsActions.IncremementAnnotationCount
-                });
-                if v25 then
-                    v63();
-                end;
-            end;
-            if l_UserInputService_0.PreferredInput ~= Enum.PreferredInput.Touch then
-                v40(v15.interpretAndExtractItemsFromInstanceForPreciseSelection(v67));
-                v64();
-            end;
-        end);
-        v48(v68);
-    end, {
-        v50, 
-        v48, 
-        v64, 
-        v40, 
-        v44, 
-        v63
-    });
-    local v90 = v7.useCallback(function(v69, v70, v71) --[[ Line: 192 ]]
-        -- upvalues: l_FFlagReportIPInfringement_0 (ref), v39 (copy), v58 (copy), v13 (ref), v37 (copy), l_HttpService_0 (ref), v29 (ref), v56 (copy), v36 (copy), v32 (copy), v34 (copy), v44 (copy), v24 (ref), v22 (ref), l_Players_0 (ref)
-        if l_FFlagReportIPInfringement_0 and v69 == "ip infringement" then
-            if not v39 or not v39.extractedAssets then
-                v58(v13.IpErrorCodes.ClientNoAssetsExtracted);
-                return;
-            else
-                local v72 = {};
-                for v73, v74 in pairs(v39.extractedAssets) do
-                    for _, v76 in ipairs(v74) do
-                        local v77 = if v73 == "Package" then v76.id else v76;
-                        if v77 then
-                            local v78 = string.match(v77, "%d+");
-                            if v78 and v78 ~= "" then
-                                table.insert(v72, {
-                                    content_type = "Asset", 
-                                    content_id = v78
-                                });
-                            end;
-                        end;
-                    end;
-                end;
-                if #v72 > 0 then
-                    local v79 = {
-                        screenshot_id = v37, 
-                        universe_id = game.GameId, 
-                        contents = v72
-                    };
-                    local v80 = l_HttpService_0:JSONEncode(v79);
-                    l_HttpService_0:RequestInternal({
-                        Url = v29, 
-                        Method = "POST", 
-                        Headers = {
-                            ["Content-Type"] = "application/json", 
-                            Accept = "application/json"
-                        }, 
-                        Body = v80
-                    }):Start(function(_, v82) --[[ Line: 235 ]]
-                        -- upvalues: l_HttpService_0 (ref), v56 (ref), v36 (ref), v58 (ref), v13 (ref)
-                        if v82.StatusCode == 200 then
-                            local l_status_0, l_result_0 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v82.Body);
-                            if l_status_0 and l_result_0 and l_result_0.code then
-                                v56(l_result_0.code);
-                                v36(true);
-                                return;
-                            else
-                                v58(v13.IpErrorCodes.Unknown);
-                                return;
-                            end;
-                        else
-                            local l_Unknown_0 = v13.IpErrorCodes.Unknown;
-                            local l_status_1, l_result_1 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v82.Body);
-                            if l_status_1 and l_result_1 and l_result_1.app_error_code and l_result_1.app_error_code ~= "" then
-                                l_Unknown_0 = l_result_1.app_error_code;
-                            end;
-                            v58(l_Unknown_0);
-                            return;
-                        end;
-                    end);
-                    return;
-                else
-                    v58(v13.IpErrorCodes.ClientNoAssetsExtracted);
-                    return;
-                end;
-            end;
-        else
-            v32(false);
-            v34(true);
-            v44({
-                type = v13.AnalyticsActions.SetExtractionResults, 
-                results = v39, 
-                final_annotation_count = 0
-            });
-            v44({
-                type = v13.AnalyticsActions.SetReasonSelection, 
-                reason_selection = v69
-            });
-            v44({
-                type = v13.AnalyticsActions.SetSurfaceSelection, 
-                surface_selection = v70
-            });
-            v44({
-                type = v13.AnalyticsActions.SetCommentAdded, 
-                comment_added = #v71 > 0
-            });
-            local v88 = v24();
-            v44({
-                type = v13.AnalyticsActions.SetVariant, 
-                variant = v88
-            });
-            local v89 = v22(l_Players_0.LocalPlayer.UserId, v37, v39, v69, v70, v71, {}, nil, v88);
-            if v89 then
-                l_Players_0:ReportAbuseV3(l_Players_0.LocalPlayer, v89);
-            end;
-            return;
-        end;
-    end, {
-        v39, 
-        v32, 
-        v34, 
-        v37, 
-        v58, 
-        v36, 
-        v56, 
-        v44
-    });
-    local v91 = v7.useCallback(function() --[[ Line: 321 ]]
-        -- upvalues: v40 (copy), v32 (copy), l_ExperienceStateCaptureService_0 (ref)
-        v40(nil);
-        v32(false);
-        l_ExperienceStateCaptureService_0:ResetHighlight();
-    end, {
-        v32, 
-        v40
-    });
-    local v92 = v7.useCallback(function() --[[ Line: 328 ]]
-        -- upvalues: v34 (copy), v23 (ref), v43 (copy), v30 (copy)
-        v34(false);
-        v23(v43, 1);
-        v30.onReportComplete();
-    end, {
-        v30.onReportComplete, 
-        v34, 
-        v43
-    });
-    local v93 = v7.useCallback(function() --[[ Line: 334 ]]
-        -- upvalues: v41 (copy), v42 (copy), v44 (copy), v13 (ref)
-        if v41 then
-            v42(false);
-            return;
-        else
-            v44({
-                type = v13.AnalyticsActions.SetDidUserResize, 
-                did_user_resize = true
-            });
-            return;
-        end;
-    end, {
-        v41, 
-        v31, 
-        v44, 
-        v42
-    });
-    v7.useEffect(function() --[[ Line: 347 ]]
-        -- upvalues: v45 (copy), l_UserInputService_0 (ref), v66 (copy), v46 (copy)
-        if v45 then
-            v45:Disconnect();
-        end;
-        local v95 = l_UserInputService_0.InputEnded:Connect(function(v94) --[[ Line: 352 ]]
-            -- upvalues: v66 (ref)
-            if v94.KeyCode == Enum.KeyCode.Escape then
-                v66();
-            end;
-        end);
-        v46(v95);
-    end, {
-        v66, 
-        v46
-    });
-    local v96 = v7.useCallback(function() --[[ Line: 361 ]]
-        -- upvalues: v58 (copy)
-        v58(nil);
-    end, {});
-    local v102 = v7.useCallback(function() --[[ Line: 368 ]]
-        -- upvalues: v60 (copy), l_HttpService_0 (ref), v37 (copy), v29 (ref), v56 (copy), v58 (copy), v36 (copy), v13 (ref)
-        v60(true);
-        local v97 = l_HttpService_0:JSONEncode({
-            screenshot_id = v37, 
-            universe_id = game.GameId, 
-            contents = {}
-        });
-        l_HttpService_0:RequestInternal({
-            Url = v29, 
-            Method = "POST", 
-            Headers = {
-                ["Content-Type"] = "application/json", 
-                Accept = "application/json"
-            }, 
-            Body = v97
-        }):Start(function(_, v99) --[[ Line: 387 ]]
-            -- upvalues: v60 (ref), l_HttpService_0 (ref), v56 (ref), v58 (ref), v36 (ref), v13 (ref)
-            v60(false);
-            if v99.StatusCode == 200 then
-                local l_status_2, l_result_2 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v99.Body);
-                if l_status_2 and l_result_2 and l_result_2.code then
-                    v56(l_result_2.code);
-                    v58(nil);
-                    v36(true);
-                    return;
-                end;
-            end;
-            v58(v13.IpErrorCodes.Unknown);
-        end);
-    end, {
-        v37, 
-        v56, 
-        v58, 
-        v36, 
-        v60
-    });
-    return l_withLocalization_0({
-        mainTitle = "Feature.ReportAbuse.Label.HighlightProblemPrecise", 
-        next = "Feature.ReportAbuse.Action.Next", 
-        coachmarkTitle = "Feature.ReportAbuse.Label.CantSelectTitle", 
-        coachmarkText = "Feature.ReportAbuse.Label.CantSelectSubtitle"
-    })(function(v103) --[[ Line: 415 ]]
-        -- upvalues: v7 (ref), v93 (copy), v62 (copy), v21 (ref), v66 (copy), v20 (ref), v65 (copy), v51 (copy), v63 (copy), v31 (copy), v16 (ref), l_ViewportSize_0 (copy), v90 (copy), v91 (copy), v44 (copy), l_FFlagPrefillPreciseSelectionChoices_0 (ref), v39 (copy), v33 (copy), v17 (ref), v92 (copy), l_FFlagReportIPInfringement_0 (ref), v35 (copy), v19 (ref), v55 (copy), v57 (copy), v18 (ref), v96 (copy), v102 (copy), v59 (copy)
-        return v7.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            [v7.Change.AbsoluteSize] = v93
-        }, {
-            Header = v7.createElement("TextButton", {
-                Size = UDim2.new(1, 0, 0, 72), 
-                BackgroundTransparency = 1, 
-                ZIndex = 2, 
-                AutoButtonColor = false
-            }, {
-                Layout = v7.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                InGameAssetReportModeHeader = if v62 then v7.createElement(v21.PortraitModeHeader, {
-                    titleText = v103.mainTitle, 
-                    nextText = v103.next, 
-                    backAction = v66
-                }) else v7.createElement(v20, {
-                    titleText = v103.mainTitle, 
-                    nextText = v103.next, 
-                    nextAction = v65, 
-                    backAction = v66, 
-                    coachmarkTitle = v103.coachmarkTitle, 
-                    coachmarkText = v103.coachmarkText, 
-                    isCoachmarkOpen = v51, 
-                    onCoachmarkClose = v63
-                })
-            }), 
-            Footer = if v62 then v7.createElement("TextButton", {
-                Size = UDim2.new(1, 0, 0, 60), 
-                Position = UDim2.new(0, 0, 1, -60), 
-                ZIndex = 2, 
-                BackgroundTransparency = 1, 
-                AutoButtonColor = false
-            }, {
-                InGameAssetReportModeFooter = v7.createElement(v21.PortraitModeFooter, {
-                    nextAction = v65, 
-                    nextText = v103.next, 
-                    isCoachmarkOpen = v51, 
-                    onCoachmarkClose = v63, 
-                    coachmarkTitle = v103.coachmarkTitle, 
-                    coachmarkText = v103.coachmarkText
-                })
-            }) else nil, 
-            SubmitDialog = if v31 then v7.createElement(v16, {
-                screenSize = l_ViewportSize_0, 
-                onSubmit = v90, 
-                onBack = v91, 
-                analyticsDispatch = v44, 
-                extractionResult = if l_FFlagPrefillPreciseSelectionChoices_0 then v39 else nil
-            }) else nil, 
-            ReportCompleteModal = if v33 then v7.createElement(v17, {
-                screenSize = l_ViewportSize_0, 
-                onClose = v92
-            }) else nil, 
-            IPInfringementModal = if l_FFlagReportIPInfringement_0 and v35 then v7.createElement(v19, {
-                screenSize = l_ViewportSize_0, 
-                reportCode = v55, 
-                onClose = v92
-            }) else nil, 
-            ErrorModal = if l_FFlagReportIPInfringement_0 and v57 ~= nil then v7.createElement(v18, {
-                screenSize = l_ViewportSize_0, 
-                onBack = v96, 
-                errorCode = v57, 
-                onReportExperience = v102, 
-                isReportExperienceLoading = v59
-            }) else nil
-        });
-    end);
-end;
+local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+local InGameAssetReportingParent = InGameAssetReporting.Parent
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
+local HttpService = game:GetService("HttpService")
+local ContentProvider = game:GetService("ContentProvider")
+local React = require(InGameAssetReportingParent.React)
+local withLocalization = require(InGameAssetReportingParent.Localization).withLocalization
+local ScreenshotManager = require(InGameAssetReportingParent.Screenshot).ScreenshotManager
+local LuauPolyfill = require(InGameAssetReportingParent.LuauPolyfill)
+local clearTimeout = LuauPolyfill.clearTimeout
+local setTimeout = LuauPolyfill.setTimeout
+local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
+local AnalyticsReducer = require(InGameAssetReporting.InGameAssetReportUI.Resources.AnalyticsReducer)
+local SceneAnalysis = require(InGameAssetReporting.Analysis.SceneAnalysis)
+local InGameAssetReportSubmitDialog = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportSubmitDialog)
+local InGameAssetReportCompleteModal = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportCompleteModal)
+local InGameAssetIPInfringementErrorModal = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetIPInfringementErrorModal)
+local InGameAssetReportIPInfringementModal = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportIPInfringementModal)
+local ReportPreciseSelectionLandscapeHeader = require(InGameAssetReporting.InGameAssetReportUI.Components.PreciseSelection.ReportPreciseSelectionLandscapeHeader)
+local ReportPreciseSelectionPortraitHeaderFooter = require(InGameAssetReporting.InGameAssetReportUI.Components.PreciseSelection.ReportPreciseSelectionPortraitHeaderFooter)
+local buildReport = require(InGameAssetReporting.Utility.buildReport)
+local InGameAssetReportAnalytics = require(InGameAssetReporting.InGameAssetReportUI.Resources.InGameAssetReportAnalytics)
+local getHighlightModeVariant = require(InGameAssetReporting.Utility.getHighlightModeVariant)
+local v26 = game:DefineFastFlag("PreciseSelectionBugfixesEnabled", false)
+local FFlagPrefillPreciseSelectionChoices = require(InGameAssetReportingParent.SharedFlags).FFlagPrefillPreciseSelectionChoices
+local FFlagReportIPInfringement = require(InGameAssetReportingParent.SharedFlags).FFlagReportIPInfringement
+local v29 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+local v30 = string.gsub(string.gsub(v29, "http:", "https:"), "https://www", "https://apis") .. "rights-management-api/rights/v1/snapshots"
+
+return function(t1: {[any]: any}) -- line: 57
+	-- upvalues: React (copy), AnalyticsReducer (copy), Constants (copy), setTimeout (copy), clearTimeout (copy), v26 (copy), ScreenshotManager (copy), SceneAnalysis (copy), InGameAssetReportAnalytics (copy), ExperienceStateCaptureService (copy), UserInputService (copy), FFlagReportIPInfringement (copy), HttpService (copy), v30 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy), withLocalization (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), ReportPreciseSelectionLandscapeHeader (copy), InGameAssetReportSubmitDialog (copy), FFlagPrefillPreciseSelectionChoices (copy), InGameAssetReportCompleteModal (copy), InGameAssetReportIPInfringementModal (copy), InGameAssetIPInfringementErrorModal (copy)
+	local v32, v33 = React.useState(false)
+	local v34, v35 = React.useState(false)
+	local v36, v37 = React.useState(false)
+	local v38, v39 = React.useState("")
+	local v40, v41 = React.useState(nil)
+	local v42, v43 = React.useState(true)
+	local v44, v45 = React.useReducer(AnalyticsReducer, Constants.AnalyticsInitialState)
+	local v46, v47 = React.useState(nil)
+	local v48, v49 = React.useState(nil)
+	local v50, v51 = React.useState(nil)
+	local v52, v53 = React.useState(false)
+	local v54, v55 = React.useState(nil)
+	local v56, v57 = React.useState("")
+	local v58, v59 = React.useState(nil)
+	local v60, v61 = React.useState(false)
+	local ViewportSize = game.Workspace.CurrentCamera.ViewportSize
+	local v63 = t1.getIsSmallPortraitMode(ViewportSize)
+
+	React.useEffect(function() -- line: 79
+		-- upvalues: v45 (copy), Constants (copy), v55 (copy), setTimeout (copy), v53 (copy)
+		v45({
+			type = Constants.AnalyticsActions.AccumulateForTimeSpent,
+			accumulated_time_ms = workspace:GetServerTimeNow() * 1000
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetPlaceId,
+			place_id = game.PlaceId
+		})
+		v55(setTimeout(function() -- line: 88
+			-- upvalues: v53 (copy)
+			v53(true)
+		end, 10000))
+	end, {
+		v53,
+		v55
+	})
+
+	local v64 = React.useCallback(function() -- line: 93
+		-- upvalues: v53 (copy), v54 (copy), clearTimeout (copy)
+		v53(false)
+
+		if v54 then
+			clearTimeout(v54)
+		end
+	end, {
+		v53,
+		v54
+	})
+	local v65 = React.useCallback(function() -- line: 101
+		-- upvalues: v26 (copy), v38 (copy), ScreenshotManager (copy), v39 (copy), v64 (copy), v33 (copy), v45 (copy), Constants (copy), ViewportSize (copy), v63 (copy)
+		if v26 then
+			if v38 == "" then
+				ScreenshotManager:TakeScreenshotWithCallback(v39, nil)
+			end
+		elseif not v38 then
+			ScreenshotManager:TakeScreenshotWithCallback(v39, nil)
+		end
+
+		v64()
+		v33(true)
+		v45({
+			type = Constants.AnalyticsActions.SetViewportInformation,
+			viewport_size_x = ViewportSize.X,
+			viewport_size_y = ViewportSize.Y,
+			is_portrait_mode = v63
+		})
+		v45({
+			type = Constants.AnalyticsActions.IncrementNextCount
+		})
+	end, {
+		v33,
+		v39,
+		v38,
+		ViewportSize,
+		v63,
+		v45,
+		v64
+	})
+	local v66 = React.useCallback(function() -- line: 141
+		-- upvalues: v41 (copy), SceneAnalysis (copy), v50 (copy), v65 (copy)
+		v41(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(v50))
+		v65()
+	end, {
+		v65,
+		v41,
+		v50
+	})
+	local v67 = React.useCallback(function() -- line: 147
+		-- upvalues: InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
+		InGameAssetReportAnalytics(v44, 2)
+		t1.backAction()
+	end, {
+		t1.backAction,
+		v44
+	})
+
+	React.useEffect(function() -- line: 155
+		-- upvalues: v48 (copy), ExperienceStateCaptureService (copy), v51 (copy), v45 (copy), Constants (copy), v26 (copy), v64 (copy), UserInputService (copy), v41 (copy), SceneAnalysis (copy), v65 (copy), v49 (copy)
+		if v48 then
+			v48:Disconnect()
+		end
+
+		local connection = ExperienceStateCaptureService.ItemSelectedInCaptureMode:Connect(function(p1) -- line: 159
+			-- upvalues: v51 (copy), v45 (copy), Constants (copy), v26 (copy), v64 (copy), UserInputService (copy), v41 (copy), SceneAnalysis (copy), v65 (copy)
+			v51(p1)
+
+			if p1 then
+				v45({
+					type = Constants.AnalyticsActions.IncremementAnnotationCount
+				})
+
+				if v26 then
+					v64()
+				end
+			end
+
+			if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then
+				v41(SceneAnalysis.interpretAndExtractItemsFromInstanceForPreciseSelection(p1))
+				v65()
+			end
+		end)
+
+		v49(connection)
+	end, {
+		v51,
+		v49,
+		v65,
+		v41,
+		v45,
+		v64
+	})
+
+	local v68 = React.useCallback(function(s1: string, s2: string, p2) -- line: 192
+		-- upvalues: FFlagReportIPInfringement (copy), v40 (copy), v59 (copy), Constants (copy), v38 (copy), HttpService (copy), v30 (copy), v57 (copy), v37 (copy), v33 (copy), v35 (copy), v45 (copy), getHighlightModeVariant (copy), buildReport (copy), Players (copy)
+		if FFlagReportIPInfringement and s1 == "ip infringement" then
+			if not v40 or not v40.extractedAssets then
+				v59(Constants.IpErrorCodes.ClientNoAssetsExtracted)
+
+				return
+			end
+
+			local t2 = {}
+
+			for k, v in pairs(v40.extractedAssets) do
+				for _, v2 in ipairs(v) do
+					local v83 = if k ~= "Package" then v2 else v2.id
+
+					if v83 then
+						local match = string.match(v83, "%d+")
+
+						if match and match ~= "" then
+							table.insert(t2, {
+								content_type = "Asset",
+								content_id = match
+							})
+						end
+					end
+				end
+			end
+
+			if #t2 > 0 then
+				local t3 = {
+					screenshot_id = v38,
+					universe_id = game.GameId,
+					contents = t2
+				}
+				local json = HttpService:JSONEncode(t3)
+
+				HttpService:RequestInternal({
+					Method = "POST",
+					Url = v30,
+					Headers = {
+						["Content-Type"] = "application/json",
+						Accept = "application/json"
+					},
+					Body = json
+				}):Start(function(_, p4) -- line: 235
+					-- upvalues: HttpService (copy), v57 (copy), v37 (copy), v59 (copy), Constants (copy)
+					if p4.StatusCode == 200 then
+						local ok, result = pcall(HttpService.JSONDecode, HttpService, p4.Body)
+
+						if ok and result and result.code then
+							v57(result.code)
+							v37(true)
+
+							return
+						end
+
+						v59(Constants.IpErrorCodes.Unknown)
+
+						return
+					end
+
+					local Unknown = Constants.IpErrorCodes.Unknown
+					local ok, result = pcall(HttpService.JSONDecode, HttpService, p4.Body)
+
+					if ok and result and result.app_error_code and result.app_error_code ~= "" then
+						Unknown = result.app_error_code
+					end
+
+					v59(Unknown)
+				end)
+
+				return
+			end
+
+			v59(Constants.IpErrorCodes.ClientNoAssetsExtracted)
+
+			return
+		end
+
+		v33(false)
+		v35(true)
+		v45({
+			final_annotation_count = 0,
+			type = Constants.AnalyticsActions.SetExtractionResults,
+			results = v40
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetReasonSelection,
+			reason_selection = s1
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetSurfaceSelection,
+			surface_selection = s2
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetCommentAdded,
+			comment_added = #p2 > 0
+		})
+
+		local v87 = getHighlightModeVariant()
+
+		v45({
+			type = Constants.AnalyticsActions.SetVariant,
+			variant = v87
+		})
+
+		local v88 = buildReport(Players.LocalPlayer.UserId, v38, v40, s1, s2, p2, {}, nil, v87)
+
+		if v88 then
+			Players:ReportAbuseV3(Players.LocalPlayer, v88)
+		end
+	end, {
+		v40,
+		v33,
+		v35,
+		v38,
+		v59,
+		v37,
+		v57,
+		v45
+	})
+	local v69 = React.useCallback(function() -- line: 321
+		-- upvalues: v41 (copy), v33 (copy), ExperienceStateCaptureService (copy)
+		v41(nil)
+		v33(false)
+		ExperienceStateCaptureService:ResetHighlight()
+	end, {
+		v33,
+		v41
+	})
+	local v70 = React.useCallback(function() -- line: 328
+		-- upvalues: v35 (copy), InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
+		v35(false)
+		InGameAssetReportAnalytics(v44, 1)
+		t1.onReportComplete()
+	end, {
+		t1.onReportComplete,
+		v35,
+		v44
+	})
+	local v71 = React.useCallback(function() -- line: 334
+		-- upvalues: v42 (copy), v43 (copy), v45 (copy), Constants (copy)
+		if v42 then
+			v43(false)
+
+			return
+		end
+
+		v45({
+			did_user_resize = true,
+			type = Constants.AnalyticsActions.SetDidUserResize
+		})
+	end, {
+		v42,
+		v32,
+		v45,
+		v43
+	})
+
+	React.useEffect(function() -- line: 347
+		-- upvalues: v46 (copy), UserInputService (copy), v67 (copy), v47 (copy)
+		if v46 then
+			v46:Disconnect()
+		end
+
+		local connection = UserInputService.InputEnded:Connect(function(input) -- line: 352
+			-- upvalues: v67 (copy)
+			if input.KeyCode == Enum.KeyCode.Escape then
+				v67()
+			end
+		end)
+
+		v47(connection)
+	end, {
+		v67,
+		v47
+	})
+
+	local v72 = React.useCallback(function() -- line: 361
+		-- upvalues: v59 (copy)
+		v59(nil)
+	end, {})
+	local v73 = React.useCallback(function() -- line: 368
+		-- upvalues: v61 (copy), HttpService (copy), v38 (copy), v30 (copy), v57 (copy), v59 (copy), v37 (copy), Constants (copy)
+		v61(true)
+
+		local json = HttpService:JSONEncode({
+			screenshot_id = v38,
+			universe_id = game.GameId,
+			contents = {}
+		})
+
+		HttpService:RequestInternal({
+			Method = "POST",
+			Url = v30,
+			Headers = {
+				["Content-Type"] = "application/json",
+				Accept = "application/json"
+			},
+			Body = json
+		}):Start(function(_, p6) -- line: 387
+			-- upvalues: v61 (copy), HttpService (copy), v57 (copy), v59 (copy), v37 (copy), Constants (copy)
+			v61(false)
+
+			if p6.StatusCode == 200 then
+				local ok, result = pcall(HttpService.JSONDecode, HttpService, p6.Body)
+
+				if ok and result and result.code then
+					v57(result.code)
+					v59(nil)
+					v37(true)
+
+					return
+				end
+			end
+
+			v59(Constants.IpErrorCodes.Unknown)
+		end)
+	end, {
+		v38,
+		v57,
+		v59,
+		v37,
+		v61
+	})
+
+	return withLocalization({
+		mainTitle = "Feature.ReportAbuse.Label.HighlightProblemPrecise",
+		next = "Feature.ReportAbuse.Action.Next",
+		coachmarkTitle = "Feature.ReportAbuse.Label.CantSelectTitle",
+		coachmarkText = "Feature.ReportAbuse.Label.CantSelectSubtitle"
+	})(function(p7) -- line: 415
+		-- upvalues: React (copy), v71 (copy), v63 (copy), ReportPreciseSelectionPortraitHeaderFooter (copy), v67 (copy), ReportPreciseSelectionLandscapeHeader (copy), v66 (copy), v52 (copy), v64 (copy), v32 (copy), InGameAssetReportSubmitDialog (copy), ViewportSize (copy), v68 (copy), v69 (copy), v45 (copy), FFlagPrefillPreciseSelectionChoices (copy), v40 (copy), v34 (copy), InGameAssetReportCompleteModal (copy), v70 (copy), FFlagReportIPInfringement (copy), v36 (copy), InGameAssetReportIPInfringementModal (copy), v56 (copy), v58 (copy), InGameAssetIPInfringementErrorModal (copy), v72 (copy), v73 (copy), v60 (copy)
+		return React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = v71
+		}, {
+			Header = React.createElement("TextButton", {
+				BackgroundTransparency = 1,
+				ZIndex = 2,
+				AutoButtonColor = false,
+				Size = UDim2.new(1, 0, 0, 72)
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				InGameAssetReportModeHeader = if not v63 then React.createElement(ReportPreciseSelectionLandscapeHeader, {
+					titleText = p7.mainTitle,
+					nextText = p7.next,
+					nextAction = v66,
+					backAction = v67,
+					coachmarkTitle = p7.coachmarkTitle,
+					coachmarkText = p7.coachmarkText,
+					isCoachmarkOpen = v52,
+					onCoachmarkClose = v64
+				}) else React.createElement(ReportPreciseSelectionPortraitHeaderFooter.PortraitModeHeader, {
+					titleText = p7.mainTitle,
+					nextText = p7.next,
+					backAction = v67
+				})
+			}),
+			Footer = if not v63 then nil else React.createElement("TextButton", {
+				ZIndex = 2,
+				BackgroundTransparency = 1,
+				AutoButtonColor = false,
+				Size = UDim2.new(1, 0, 0, 60),
+				Position = UDim2.new(0, 0, 1, -60)
+			}, {
+				InGameAssetReportModeFooter = React.createElement(ReportPreciseSelectionPortraitHeaderFooter.PortraitModeFooter, {
+					nextAction = v66,
+					nextText = p7.next,
+					isCoachmarkOpen = v52,
+					onCoachmarkClose = v64,
+					coachmarkTitle = p7.coachmarkTitle,
+					coachmarkText = p7.coachmarkText
+				})
+			}),
+			SubmitDialog = if not v32 then nil else React.createElement(InGameAssetReportSubmitDialog, {
+				screenSize = ViewportSize,
+				onSubmit = v68,
+				onBack = v69,
+				analyticsDispatch = v45,
+				extractionResult = if not FFlagPrefillPreciseSelectionChoices then nil else v40
+			}),
+			ReportCompleteModal = if not v34 then nil else React.createElement(InGameAssetReportCompleteModal, {
+				screenSize = ViewportSize,
+				onClose = v70
+			}),
+			IPInfringementModal = if not FFlagReportIPInfringement or not v36 then nil else React.createElement(InGameAssetReportIPInfringementModal, {
+				screenSize = ViewportSize,
+				reportCode = v56,
+				onClose = v70
+			}),
+			ErrorModal = if not FFlagReportIPInfringement or v58 == nil then nil else React.createElement(InGameAssetIPInfringementErrorModal, {
+				screenSize = ViewportSize,
+				onBack = v72,
+				errorCode = v58,
+				onReportExperience = v73,
+				isReportExperienceLoading = v60
+			})
+		})
+	end)
+end

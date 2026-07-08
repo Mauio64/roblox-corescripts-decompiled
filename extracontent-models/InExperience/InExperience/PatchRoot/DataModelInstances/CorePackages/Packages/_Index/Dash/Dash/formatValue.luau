@@ -1,27 +1,37 @@
-local l_Parent_0 = script.Parent;
-return function(v1, v2) --[[ Line: 19 ]] --[[ Name: formatValue ]]
-    -- upvalues: l_Parent_0 (copy)
-    local v3 = v2 or "";
-    local v4, v5 = v3:find("[A-Za-z#?]+");
-    if v4 then
-        local v6 = v3:sub(v4, v5);
-        local v7 = "%" .. v3:sub(1, v4 - 1) .. v3:sub(v5 + 1) .. "s";
-        local v8 = require(l_Parent_0.pretty);
-        if v6 == "#?" then
-            return v7:format(v8(v1, {
-                multiline = true
-            }));
-        elseif v6 == "?" then
-            return v7:format(v8(v1));
-        else
-            return ("%" .. v3):format(v1);
-        end;
-    else
-        local v9 = "s";
-        if type(v1) == "number" then
-            local _, v11 = math.modf(v1);
-            v9 = v11 == 0 and "d" or "f";
-        end;
-        return ("%" .. v3 .. v9):format((tostring(v1)));
-    end;
-end;
+local scriptParent = script.Parent
+
+local function formatValue(p1, s1: string?) -- line: 19
+	-- upvalues: scriptParent (copy)
+	local v5 = s1 or ""
+	local start, stop = v5:find("[A-Za-z#?]+")
+
+	if start then
+		local v8 = v5:sub(start, stop)
+		local v9 = "%" .. v5:sub(1, start - 1) .. v5:sub(stop + 1) .. "s"
+		local pretty = require(scriptParent.pretty)
+
+		if v8 == "#?" then
+			return v9:format(pretty(p1, {
+				multiline = true
+			}))
+		end
+
+		if v8 == "?" then
+			return v9:format(pretty(p1))
+		end
+
+		return ("%" .. v5):format(p1)
+	end
+
+	local s2 = "s"
+
+	if type(p1) == "number" then
+		local _, fraction = math.modf(p1)
+
+		s2 = fraction ~= 0 and "f" or "d"
+	end
+
+	return ("%" .. v5 .. s2):format((tostring(p1)))
+end
+
+return formatValue

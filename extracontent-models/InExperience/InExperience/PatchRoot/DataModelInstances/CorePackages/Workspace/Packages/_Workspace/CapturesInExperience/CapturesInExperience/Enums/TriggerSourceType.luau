@@ -1,5 +1,5 @@
 return {
-    PromptedSave = "PromptedSave", 
-    PromptedShare = "PromptedShare", 
-    UserSave = "UserSave"
-};
+	PromptedSave = "PromptedSave",
+	PromptedShare = "PromptedShare",
+	UserSave = "UserSave"
+}

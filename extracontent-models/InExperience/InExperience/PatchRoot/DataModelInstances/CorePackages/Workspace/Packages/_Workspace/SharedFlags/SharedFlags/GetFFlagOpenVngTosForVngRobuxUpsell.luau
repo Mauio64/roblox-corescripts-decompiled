@@ -1,4 +1,5 @@
-game:DefineFastFlag("OpenVngTosForVngRobuxUpsell", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("OpenVngTosForVngRobuxUpsell");
-end;
+game:DefineFastFlag("OpenVngTosForVngRobuxUpsell", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("OpenVngTosForVngRobuxUpsell")
+end

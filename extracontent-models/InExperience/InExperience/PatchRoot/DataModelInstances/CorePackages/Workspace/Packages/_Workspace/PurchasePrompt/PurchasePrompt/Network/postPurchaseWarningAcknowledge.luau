@@ -1,20 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_enumerate_0 = require(l_Parent_0.PurchasePromptDeps).enumerate;
-local v3 = require(l_script_FirstAncestor_0.Utils.addRawValueMethodToEnum);
-local v4 = {};
-local v5 = {
-    None = "None", 
-    ConfirmedU13PaymentModal = "ConfirmedU13PaymentModal", 
-    ConfirmedU13MonthlyThreshold1Modal = "ConfirmedU13MonthlyThreshold1Modal", 
-    ConfirmedU13MonthlyThreshold2Modal = "ConfirmedU13MonthlyThreshold2Modal", 
-    ConfirmedParentalConsentWarningPaymentModal13To17 = "ConfirmedParentalConsentWarningPaymentModal13To17"
-};
-v4.UserActionType = l_enumerate_0(script.Name, v5);
-v3(v4.UserActionType, v5);
-v4.Post = function(v6, v7) --[[ Line: 21 ]] --[[ Name: Post ]]
-    -- upvalues: v4 (copy)
-    local v8 = v4.UserActionType.toRawValue(v7);
-    return v6.postPurchaseWarningAcknowledge(v8);
-end;
-return v4;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local enumerate = require(PurchasePromptParent.PurchasePromptDeps).enumerate
+local addRawValueMethodToEnum = require(PurchasePrompt.Utils.addRawValueMethodToEnum)
+local t1 = {}
+local t2 = {
+	None = "None",
+	ConfirmedU13PaymentModal = "ConfirmedU13PaymentModal",
+	ConfirmedU13MonthlyThreshold1Modal = "ConfirmedU13MonthlyThreshold1Modal",
+	ConfirmedU13MonthlyThreshold2Modal = "ConfirmedU13MonthlyThreshold2Modal",
+	ConfirmedParentalConsentWarningPaymentModal13To17 = "ConfirmedParentalConsentWarningPaymentModal13To17"
+}
+
+t1.UserActionType = enumerate(script.Name, t2)
+addRawValueMethodToEnum(t1.UserActionType, t2)
+
+function t1.Post(p1, s1: string) -- line: 21
+	-- upvalues: t1 (copy)
+	local v9 = t1.UserActionType.toRawValue(s1)
+
+	return p1.postPurchaseWarningAcknowledge(v9)
+end
+
+return t1

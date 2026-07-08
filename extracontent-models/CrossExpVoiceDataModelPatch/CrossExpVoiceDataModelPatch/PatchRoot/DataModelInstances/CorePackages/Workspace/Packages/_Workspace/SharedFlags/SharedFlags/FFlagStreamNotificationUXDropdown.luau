@@ -1,1 +1,1 @@
-return game:DefineFastFlag("StreamNotificationUXDropdown2", false);
+return game:DefineFastFlag("StreamNotificationUXDropdown2", false)

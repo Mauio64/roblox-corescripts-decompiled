@@ -1,3 +1,3 @@
-return function(_, _) --[[ Line: 1 ]]
-    return {};
-end;
+return function(_, _) -- line: 1
+	return {}
+end

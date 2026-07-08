@@ -1,4 +1,5 @@
-game:DefineFastFlag("NonVoiceFTUX", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("NonVoiceFTUX");
-end;
+game:DefineFastFlag("NonVoiceFTUX", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("NonVoiceFTUX")
+end

@@ -1,9 +1,13 @@
-local v0 = {};
-local l_Parent_0 = script.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v3 = require(script.core);
-l_Object_0.assign(v0, v3);
-v0.None = v3.None;
-local v4 = require(script.react);
-l_Object_0.assign(v0, v4);
-return v0;
+local t1 = {}
+local scriptParent = script.Parent
+local Object = require(scriptParent.LuauPolyfill).Object
+local core = require(script.core)
+
+Object.assign(t1, core)
+t1.None = core.None
+
+local react = require(script.react)
+
+Object.assign(t1, react)
+
+return t1

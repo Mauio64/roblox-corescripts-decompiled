@@ -5210,7 +5210,7 @@ t164.descriptor = {
 t1.VerticalAlignmentProp_ConditionalOptions = t164
 typeRegistry.default:register(t1.VerticalAlignmentProp_ConditionalOptions)
 t1.AutomaticSize = {
-	fromNumber = function(n73: number) --[[ fromNumber ]] -- line: 6218
+	fromNumber = function(n73: number) -- line: 6218
 		if n73 == 0 then
 			return "AUTOMATIC_SIZE_INVALID"
 		end
@@ -5233,7 +5233,7 @@ t1.AutomaticSize = {
 
 		return nil
 	end,
-	toNumber = function(p109) --[[ toNumber ]] -- line: 6234
+	toNumber = function(p109) -- line: 6234
 		if p109 == "AUTOMATIC_SIZE_INVALID" then
 			return 0
 		end
@@ -5256,7 +5256,7 @@ t1.AutomaticSize = {
 
 		return p109
 	end,
-	fromName = function(s1: string) --[[ fromName ]] -- line: 6250
+	fromName = function(s1: string) -- line: 6250
 		if s1 == "AUTOMATIC_SIZE_INVALID" then
 			return "AUTOMATIC_SIZE_INVALID"
 		end
@@ -5281,7 +5281,7 @@ t1.AutomaticSize = {
 	end
 }
 t1.TextTruncate = {
-	fromNumber = function(n74: number) --[[ fromNumber ]] -- line: 6268
+	fromNumber = function(n74: number) -- line: 6268
 		if n74 == 0 then
 			return "TEXT_TRUNCATE_INVALID"
 		end
@@ -5300,7 +5300,7 @@ t1.TextTruncate = {
 
 		return nil
 	end,
-	toNumber = function(p110) --[[ toNumber ]] -- line: 6282
+	toNumber = function(p110) -- line: 6282
 		if p110 == "TEXT_TRUNCATE_INVALID" then
 			return 0
 		end
@@ -5319,7 +5319,7 @@ t1.TextTruncate = {
 
 		return p110
 	end,
-	fromName = function(s2: string) --[[ fromName ]] -- line: 6296
+	fromName = function(s2: string) -- line: 6296
 		if s2 == "TEXT_TRUNCATE_INVALID" then
 			return "TEXT_TRUNCATE_INVALID"
 		end
@@ -5340,7 +5340,7 @@ t1.TextTruncate = {
 	end
 }
 t1.TextXAlignment = {
-	fromNumber = function(n75: number) --[[ fromNumber ]] -- line: 6312
+	fromNumber = function(n75: number) -- line: 6312
 		if n75 == 0 then
 			return "TEXT_X_ALIGNMENT_INVALID"
 		end
@@ -5359,7 +5359,7 @@ t1.TextXAlignment = {
 
 		return nil
 	end,
-	toNumber = function(p111) --[[ toNumber ]] -- line: 6326
+	toNumber = function(p111) -- line: 6326
 		if p111 == "TEXT_X_ALIGNMENT_INVALID" then
 			return 0
 		end
@@ -5378,7 +5378,7 @@ t1.TextXAlignment = {
 
 		return p111
 	end,
-	fromName = function(s3: string) --[[ fromName ]] -- line: 6340
+	fromName = function(s3: string) -- line: 6340
 		if s3 == "TEXT_X_ALIGNMENT_INVALID" then
 			return "TEXT_X_ALIGNMENT_INVALID"
 		end
@@ -5399,7 +5399,7 @@ t1.TextXAlignment = {
 	end
 }
 t1.TextYAlignment = {
-	fromNumber = function(n76: number) --[[ fromNumber ]] -- line: 6356
+	fromNumber = function(n76: number) -- line: 6356
 		if n76 == 0 then
 			return "TEXT_Y_ALIGNMENT_INVALID"
 		end
@@ -5418,7 +5418,7 @@ t1.TextYAlignment = {
 
 		return nil
 	end,
-	toNumber = function(p112) --[[ toNumber ]] -- line: 6370
+	toNumber = function(p112) -- line: 6370
 		if p112 == "TEXT_Y_ALIGNMENT_INVALID" then
 			return 0
 		end
@@ -5437,7 +5437,7 @@ t1.TextYAlignment = {
 
 		return p112
 	end,
-	fromName = function(s4: string) --[[ fromName ]] -- line: 6384
+	fromName = function(s4: string) -- line: 6384
 		if s4 == "TEXT_Y_ALIGNMENT_INVALID" then
 			return "TEXT_Y_ALIGNMENT_INVALID"
 		end
@@ -5458,7 +5458,7 @@ t1.TextYAlignment = {
 	end
 }
 t1.UIFlexMode = {
-	fromNumber = function(n77: number) --[[ fromNumber ]] -- line: 6400
+	fromNumber = function(n77: number) -- line: 6400
 		if n77 == 0 then
 			return "UI_FLEX_MODE_INVALID"
 		end
@@ -5485,7 +5485,7 @@ t1.UIFlexMode = {
 
 		return nil
 	end,
-	toNumber = function(p113) --[[ toNumber ]] -- line: 6418
+	toNumber = function(p113) -- line: 6418
 		if p113 == "UI_FLEX_MODE_INVALID" then
 			return 0
 		end
@@ -5512,7 +5512,7 @@ t1.UIFlexMode = {
 
 		return p113
 	end,
-	fromName = function(s5: string) --[[ fromName ]] -- line: 6436
+	fromName = function(s5: string) -- line: 6436
 		if s5 == "UI_FLEX_MODE_INVALID" then
 			return "UI_FLEX_MODE_INVALID"
 		end
@@ -5541,7 +5541,7 @@ t1.UIFlexMode = {
 	end
 }
 t1.ScaleType = {
-	fromNumber = function(n78: number) --[[ fromNumber ]] -- line: 6456
+	fromNumber = function(n78: number) -- line: 6456
 		if n78 == 0 then
 			return "SCALE_TYPE_INVALID"
 		end
@@ -5568,7 +5568,7 @@ t1.ScaleType = {
 
 		return nil
 	end,
-	toNumber = function(p114) --[[ toNumber ]] -- line: 6474
+	toNumber = function(p114) -- line: 6474
 		if p114 == "SCALE_TYPE_INVALID" then
 			return 0
 		end
@@ -5595,7 +5595,7 @@ t1.ScaleType = {
 
 		return p114
 	end,
-	fromName = function(s6: string) --[[ fromName ]] -- line: 6492
+	fromName = function(s6: string) -- line: 6492
 		if s6 == "SCALE_TYPE_INVALID" then
 			return "SCALE_TYPE_INVALID"
 		end
@@ -5624,7 +5624,7 @@ t1.ScaleType = {
 	end
 }
 t1.ResamplerMode = {
-	fromNumber = function(n79: number) --[[ fromNumber ]] -- line: 6512
+	fromNumber = function(n79: number) -- line: 6512
 		if n79 == 0 then
 			return "RESAMPLER_MODE_INVALID"
 		end
@@ -5639,7 +5639,7 @@ t1.ResamplerMode = {
 
 		return nil
 	end,
-	toNumber = function(p115) --[[ toNumber ]] -- line: 6524
+	toNumber = function(p115) -- line: 6524
 		if p115 == "RESAMPLER_MODE_INVALID" then
 			return 0
 		end
@@ -5654,7 +5654,7 @@ t1.ResamplerMode = {
 
 		return p115
 	end,
-	fromName = function(s7: string) --[[ fromName ]] -- line: 6536
+	fromName = function(s7: string) -- line: 6536
 		if s7 == "RESAMPLER_MODE_INVALID" then
 			return "RESAMPLER_MODE_INVALID"
 		end
@@ -5671,7 +5671,7 @@ t1.ResamplerMode = {
 	end
 }
 t1.SizeConstraint = {
-	fromNumber = function(n80: number) --[[ fromNumber ]] -- line: 6550
+	fromNumber = function(n80: number) -- line: 6550
 		if n80 == 0 then
 			return "SIZE_CONSTRAINT_INVALID"
 		end
@@ -5690,7 +5690,7 @@ t1.SizeConstraint = {
 
 		return nil
 	end,
-	toNumber = function(p116) --[[ toNumber ]] -- line: 6564
+	toNumber = function(p116) -- line: 6564
 		if p116 == "SIZE_CONSTRAINT_INVALID" then
 			return 0
 		end
@@ -5709,7 +5709,7 @@ t1.SizeConstraint = {
 
 		return p116
 	end,
-	fromName = function(s8: string) --[[ fromName ]] -- line: 6578
+	fromName = function(s8: string) -- line: 6578
 		if s8 == "SIZE_CONSTRAINT_INVALID" then
 			return "SIZE_CONSTRAINT_INVALID"
 		end
@@ -5730,7 +5730,7 @@ t1.SizeConstraint = {
 	end
 }
 t1.HorizontalAlignment = {
-	fromNumber = function(n81: number) --[[ fromNumber ]] -- line: 6594
+	fromNumber = function(n81: number) -- line: 6594
 		if n81 == 0 then
 			return "HORIZONTAL_ALIGNMENT_INVALID"
 		end
@@ -5749,7 +5749,7 @@ t1.HorizontalAlignment = {
 
 		return nil
 	end,
-	toNumber = function(p117) --[[ toNumber ]] -- line: 6608
+	toNumber = function(p117) -- line: 6608
 		if p117 == "HORIZONTAL_ALIGNMENT_INVALID" then
 			return 0
 		end
@@ -5768,7 +5768,7 @@ t1.HorizontalAlignment = {
 
 		return p117
 	end,
-	fromName = function(s9: string) --[[ fromName ]] -- line: 6622
+	fromName = function(s9: string) -- line: 6622
 		if s9 == "HORIZONTAL_ALIGNMENT_INVALID" then
 			return "HORIZONTAL_ALIGNMENT_INVALID"
 		end
@@ -5789,7 +5789,7 @@ t1.HorizontalAlignment = {
 	end
 }
 t1.VerticalAlignment = {
-	fromNumber = function(n82: number) --[[ fromNumber ]] -- line: 6638
+	fromNumber = function(n82: number) -- line: 6638
 		if n82 == 0 then
 			return "VERTICAL_ALIGNMENT_INVALID"
 		end
@@ -5808,7 +5808,7 @@ t1.VerticalAlignment = {
 
 		return nil
 	end,
-	toNumber = function(p118) --[[ toNumber ]] -- line: 6652
+	toNumber = function(p118) -- line: 6652
 		if p118 == "VERTICAL_ALIGNMENT_INVALID" then
 			return 0
 		end
@@ -5827,7 +5827,7 @@ t1.VerticalAlignment = {
 
 		return p118
 	end,
-	fromName = function(s10: string) --[[ fromName ]] -- line: 6666
+	fromName = function(s10: string) -- line: 6666
 		if s10 == "VERTICAL_ALIGNMENT_INVALID" then
 			return "VERTICAL_ALIGNMENT_INVALID"
 		end
@@ -5848,7 +5848,7 @@ t1.VerticalAlignment = {
 	end
 }
 t1.SelectionBehavior = {
-	fromNumber = function(n83: number) --[[ fromNumber ]] -- line: 6682
+	fromNumber = function(n83: number) -- line: 6682
 		if n83 == 0 then
 			return "SELECTION_BEHAVIOR_INVALID"
 		end
@@ -5863,7 +5863,7 @@ t1.SelectionBehavior = {
 
 		return nil
 	end,
-	toNumber = function(p119) --[[ toNumber ]] -- line: 6694
+	toNumber = function(p119) -- line: 6694
 		if p119 == "SELECTION_BEHAVIOR_INVALID" then
 			return 0
 		end
@@ -5878,7 +5878,7 @@ t1.SelectionBehavior = {
 
 		return p119
 	end,
-	fromName = function(s11: string) --[[ fromName ]] -- line: 6706
+	fromName = function(s11: string) -- line: 6706
 		if s11 == "SELECTION_BEHAVIOR_INVALID" then
 			return "SELECTION_BEHAVIOR_INVALID"
 		end
@@ -5895,7 +5895,7 @@ t1.SelectionBehavior = {
 	end
 }
 t1.KeyCode = {
-	fromNumber = function(n84: number) --[[ fromNumber ]] -- line: 6720
+	fromNumber = function(n84: number) -- line: 6720
 		if n84 == 0 then
 			return "KEY_CODE_INVALID"
 		end
@@ -5942,7 +5942,7 @@ t1.KeyCode = {
 
 		return nil
 	end,
-	toNumber = function(p120) --[[ toNumber ]] -- line: 6748
+	toNumber = function(p120) -- line: 6748
 		if p120 == "KEY_CODE_INVALID" then
 			return 0
 		end
@@ -5989,7 +5989,7 @@ t1.KeyCode = {
 
 		return p120
 	end,
-	fromName = function(s12: string) --[[ fromName ]] -- line: 6776
+	fromName = function(s12: string) -- line: 6776
 		if s12 == "KEY_CODE_INVALID" then
 			return "KEY_CODE_INVALID"
 		end

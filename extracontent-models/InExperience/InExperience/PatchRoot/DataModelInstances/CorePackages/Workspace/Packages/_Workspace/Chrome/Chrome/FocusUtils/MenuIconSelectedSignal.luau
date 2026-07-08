@@ -1,28 +1,33 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 17 ]] --[[ Name: new ]]
-    -- upvalues: l_Signal_0 (copy), v2 (copy)
-    return (setmetatable({
-        _value = false, 
-        _changeSignal = l_Signal_0.new()
-    }, v2));
-end;
-v2.get = function(v3) --[[ Line: 24 ]] --[[ Name: get ]]
-    return v3._value;
-end;
-v2.set = function(v4, v5) --[[ Line: 28 ]] --[[ Name: set ]]
-    if v4._value ~= v5 then
-        v4._value = v5;
-        v4._changeSignal:fire(v5);
-    end;
-end;
-v2.connect = function(v6, v7, v8) --[[ Line: 35 ]] --[[ Name: connect ]]
-    local v9 = v6._changeSignal:connect(v7);
-    if v8 == true then
-        v7(v6._value);
-    end;
-    return v9;
-end;
-return v2.new();
+local ParentParent = script.Parent.Parent.Parent
+local Signal = require(ParentParent.AppCommonLib).Signal
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 17
+	-- upvalues: Signal (copy), t1 (copy)
+	return (setmetatable({
+		_value = false,
+		_changeSignal = Signal.new()
+	}, t1))
+end
+function t1.get(p1) -- line: 24
+	return p1._value
+end
+function t1.set(t2: {[any]: any}, b1: boolean) -- line: 28
+	if b1 ~= t2._value then
+		t2._value = b1
+		t2._changeSignal:fire(b1)
+	end
+end
+function t1.connect(p2, p3, p4) -- line: 35
+	local v10 = p2._changeSignal:connect(p3)
+
+	if p4 == true then
+		p3(p2._value)
+	end
+
+	return v10
+end
+
+return t1.new()

@@ -1,173 +1,179 @@
-local l_Parent_0 = script:FindFirstAncestor("CoreScriptsPlayerFeedback").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_InteractiveAlert_0 = v2.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v2.App.Button.Enum.ButtonType;
-local l_useScreenSize_0 = require(l_Parent_0.CoreScriptsRoactCommon).useScreenSize;
-local l_useLastInputMethod_0 = require(l_Parent_0.FocusNavigationUtils).useLastInputMethod;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return (v1.memo(function(v10) --[[ Line: 26 ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useStyle_0 (copy), v1 (copy), l_useLastInputMethod_0 (copy), l_useLocalization_0 (copy), l_GuiService_0 (copy), l_ButtonType_0 (copy), l_InteractiveAlert_0 (copy)
-    local v11 = l_useScreenSize_0();
-    local v12 = l_useStyle_0();
-    local v13 = v1.useRef(nil);
-    local v14 = l_useLastInputMethod_0();
-    local v15, v16 = v1.useState(false);
-    v1.useEffect(function() --[[ Line: 34 ]]
-        -- upvalues: v15 (copy), v14 (copy), v16 (copy)
-        if not v15 and (v14 == "Keyboard" or v14 == "Gamepad") then
-            v16(true);
-        end;
-    end, {
-        v15, 
-        v14
-    });
-    local v17 = l_useLocalization_0({
-        Title = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Title", 
-        HeaderUnder13 = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.Under13", 
-        HintUnder13 = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.Under13", 
-        HeaderRateLimited = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.RateLimited", 
-        HintRateLimited = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.RateLimited", 
-        HeaderDefault = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.Default", 
-        HintDefault = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.Default", 
-        OkayButton = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.OkayButton"
-    });
-    local _ = v17.Title;
-    local v19 = "";
-    local v20 = "";
-    if v10.reason == "Under13" then
-        v19 = v17.HeaderUnder13;
-        v20 = v17.HintUnder13;
-    elseif v10.reason == "RateLimited" then
-        v19 = v17.HeaderRateLimited;
-        v20 = v17.HintRateLimited;
-    else
-        v19 = v17.HeaderDefault;
-        v20 = v17.HintDefault;
-    end;
-    local v26 = v1.useCallback(function() --[[ Line: 66 ]]
-        -- upvalues: v12 (copy), v1 (ref), v19 (ref), v20 (ref)
-        local l_Body_0 = v12.Font.Body;
-        local v22 = v12.Font.Header2 or v12.Font.Body;
-        local l_BaseSize_0 = v12.Font.BaseSize;
-        local v24 = math.floor(v22.RelativeSize * l_BaseSize_0);
-        local v25 = math.floor(l_Body_0.RelativeSize * l_BaseSize_0);
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.new(1, 0, 0, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 10), 
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left
-            }), 
-            Header = v1.createElement("TextLabel", {
-                BackgroundTransparency = 1, 
-                Text = v19, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                TextColor3 = v12.Theme.TextEmphasis.Color, 
-                TextTransparency = v12.Theme.TextEmphasis.Transparency, 
-                Font = v22.Font, 
-                TextSize = v24, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 1
-            }), 
-            Hint = v1.createElement("TextLabel", {
-                BackgroundTransparency = 1, 
-                Text = v20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                TextColor3 = v12.Theme.TextMuted.Color, 
-                TextTransparency = v12.Theme.TextMuted.Transparency, 
-                Font = l_Body_0.Font, 
-                TextSize = v25, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 2
-            })
-        });
-    end, {
-        v12, 
-        v19, 
-        v20
-    });
-    local v27 = v1.useCallback(function() --[[ Line: 114 ]]
-        -- upvalues: v10 (copy)
-        v10.closePrompt();
-    end, {
-        v10.closePrompt
-    });
-    local v29 = v1.useCallback(function(v28) --[[ Line: 118 ]]
-        -- upvalues: v13 (copy), v15 (copy), l_GuiService_0 (ref)
-        v13.current = v28;
-        if v15 and v28 then
-            pcall(function() --[[ Line: 121 ]]
-                -- upvalues: l_GuiService_0 (ref), v28 (copy)
-                l_GuiService_0:Select(v28);
-            end);
-        end;
-    end, {
-        v15
-    });
-    v1.useEffect(function() --[[ Line: 127 ]]
-        -- upvalues: v15 (copy), v13 (copy), l_GuiService_0 (ref)
-        if not v15 then
-            return;
-        else
-            local l_current_0 = v13.current;
-            if l_current_0 then
-                pcall(function() --[[ Line: 133 ]]
-                    -- upvalues: l_GuiService_0 (ref), l_current_0 (copy)
-                    l_GuiService_0:Select(l_current_0);
-                end);
-            end;
-            return;
-        end;
-    end, {
-        v15
-    });
-    local v31 = v1.useMemo(function() --[[ Line: 139 ]]
-        -- upvalues: l_ButtonType_0 (ref), v27 (copy), v17 (copy), v29 (copy), v15 (copy)
-        return {
-            buttons = {
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = v27, 
-                        text = v17.OkayButton, 
-                        isDelayedInput = false, 
-                        enableInputDelayed = false, 
-                        delayInputSeconds = 1, 
-                        isDisabled = false, 
-                        buttonRef = v29
-                    }, 
-                    isDefaultChild = v15
-                }
-            }
-        };
-    end, {
-        v27, 
-        v17.OkayButton, 
-        v15, 
-        v29
-    });
-    return v1.createElement(l_InteractiveAlert_0, {
-        title = v17.Title, 
-        buttonStackInfo = v31, 
-        isMiddleContentFocusable = false, 
-        middleContent = v26, 
-        position = UDim2.fromScale(0.5, 0.5), 
-        screenSize = v11, 
-        defaultChildRef = if v15 then v13 else nil, 
-        isRoactGamepadEnabled = v15, 
-        onCloseClicked = v27
-    });
-end));
+local CoreScriptsPlayerFeedback = script:FindFirstAncestor("CoreScriptsPlayerFeedback")
+local CoreScriptsPlayerFeedbackParent = CoreScriptsPlayerFeedback.Parent
+local React = require(CoreScriptsPlayerFeedbackParent.React)
+local UIBlox = require(CoreScriptsPlayerFeedbackParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local useScreenSize = require(CoreScriptsPlayerFeedbackParent.CoreScriptsRoactCommon).useScreenSize
+local useLastInputMethod = require(CoreScriptsPlayerFeedbackParent.FocusNavigationUtils).useLastInputMethod
+local GuiService = game:GetService("GuiService")
+local useEscapeDismiss = require(CoreScriptsPlayerFeedback.Hooks.useEscapeDismiss)
+local useLocalization = require(CoreScriptsPlayerFeedbackParent.Localization).Hooks.useLocalization
+
+return (React.memo(function(t1: {[any]: any}) -- line: 28
+	-- upvalues: useScreenSize (copy), useStyle (copy), React (copy), useLastInputMethod (copy), useLocalization (copy), useEscapeDismiss (copy), GuiService (copy), ButtonType (copy), InteractiveAlert (copy)
+	local v14 = useScreenSize()
+	local v15 = useStyle()
+	local v16 = React.useRef(nil)
+	local v17 = useLastInputMethod()
+	local v18, v19 = React.useState(false)
+
+	React.useEffect(function() -- line: 36
+		-- upvalues: v18 (copy), v17 (copy), v19 (copy)
+		if not v18 and (v17 == "Keyboard" or v17 == "Gamepad") then
+			v19(true)
+		end
+	end, {
+		v18,
+		v17
+	})
+
+	local v20 = useLocalization({
+		Title = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Title",
+		HeaderUnder13 = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.Under13",
+		HintUnder13 = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.Under13",
+		HeaderRateLimited = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.RateLimited",
+		HintRateLimited = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.RateLimited",
+		HeaderDefault = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Header.Default",
+		HintDefault = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.Hint.Default",
+		OkayButton = "CoreScripts.FeedbackPrompt.FeedbackPrompt.Unavailable.OkayButton"
+	})
+	local _ = v20.Title
+	local HeaderUnder13, HintUnder13
+
+	if t1.reason == "Under13" then
+		HeaderUnder13 = v20.HeaderUnder13
+		HintUnder13 = v20.HintUnder13
+	elseif t1.reason == "RateLimited" then
+		HeaderUnder13 = v20.HeaderRateLimited
+		HintUnder13 = v20.HintRateLimited
+	else
+		HeaderUnder13 = v20.HeaderDefault
+		HintUnder13 = v20.HintDefault
+	end
+
+	local v24 = React.useCallback(function() -- line: 68
+		-- upvalues: v15 (copy), React (copy), HeaderUnder13 (ref), HintUnder13 (ref)
+		local Body = v15.Font.Body
+		local v29 = v15.Font.Header2 or v15.Font.Body
+		local BaseSize = v15.Font.BaseSize
+		local v31 = math.floor(v29.RelativeSize * BaseSize)
+		local v32 = math.floor(Body.RelativeSize * BaseSize)
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 10),
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}),
+			Header = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				LayoutOrder = 1,
+				Text = HeaderUnder13,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				TextColor3 = v15.Theme.TextEmphasis.Color,
+				TextTransparency = v15.Theme.TextEmphasis.Transparency,
+				Font = v29.Font,
+				TextSize = v31,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}),
+			Hint = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				LayoutOrder = 2,
+				Text = HintUnder13,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				TextColor3 = v15.Theme.TextMuted.Color,
+				TextTransparency = v15.Theme.TextMuted.Transparency,
+				Font = Body.Font,
+				TextSize = v32,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			})
+		})
+	end, {
+		v15,
+		HeaderUnder13,
+		HintUnder13
+	})
+	local v25 = React.useCallback(function() -- line: 116
+		-- upvalues: t1 (copy)
+		t1.closePrompt()
+	end, { t1.closePrompt })
+
+	useEscapeDismiss("UnavailablePromptCancel", v25)
+
+	local v26 = React.useCallback(function(p1) -- line: 122
+		-- upvalues: v16 (copy), v18 (copy), GuiService (copy)
+		v16.current = p1
+
+		if v18 and p1 then
+			pcall(function() -- line: 125
+				-- upvalues: GuiService (copy), p1 (copy)
+				GuiService:Select(p1)
+			end)
+		end
+	end, { v18 })
+
+	React.useEffect(function() -- line: 131
+		-- upvalues: v18 (copy), v16 (copy), GuiService (copy)
+		if not v18 then
+			return
+		end
+
+		local current = v16.current
+
+		if current then
+			pcall(function() -- line: 137
+				-- upvalues: GuiService (copy), current (copy)
+				GuiService:Select(current)
+			end)
+		end
+	end, { v18 })
+
+	local v27 = React.useMemo(function() -- line: 143
+		-- upvalues: ButtonType (copy), v25 (copy), v20 (copy), v26 (copy), v18 (copy)
+		return {
+			buttons = {{
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					isDelayedInput = false,
+					enableInputDelayed = false,
+					delayInputSeconds = 1,
+					isDisabled = false,
+					onActivated = v25,
+					text = v20.OkayButton,
+					buttonRef = v26
+				},
+				isDefaultChild = v18
+			}}
+		}
+	end, {
+		v25,
+		v20.OkayButton,
+		v18,
+		v26
+	})
+
+	return React.createElement(InteractiveAlert, {
+		isMiddleContentFocusable = false,
+		title = v20.Title,
+		buttonStackInfo = v27,
+		middleContent = v24,
+		position = UDim2.fromScale(0.5, 0.5),
+		screenSize = v14,
+		defaultChildRef = if not v18 then nil else v16,
+		isRoactGamepadEnabled = v18,
+		onCloseClicked = v25
+	})
+end))

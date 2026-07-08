@@ -1,8 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    v1.isNotNil(v2, "linking");
-    v1.isType(v3, "string", "url");
-    v2:openURL(v3);
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local ArgCheck = require(Parent.ArgCheck)
+
+return function(p1, p2) -- line: 5
+	-- upvalues: ArgCheck (copy)
+	ArgCheck.isNotNil(p1, "linking")
+	ArgCheck.isType(p2, "string", "url")
+	p1:openURL(p2)
+end

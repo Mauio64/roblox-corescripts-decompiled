@@ -1,7 +1,9 @@
-local v0 = require(script.createSignal);
-local v1 = require(script.createReadableSignal);
-local _ = require(script.types);
+local createSignal = require(script.createSignal)
+local createReadableSignal = require(script.createReadableSignal)
+
+require(script.types)
+
 return {
-    createSignal = v0, 
-    createReadableSignal = v1
-};
+	createSignal = createSignal,
+	createReadableSignal = createReadableSignal
+}

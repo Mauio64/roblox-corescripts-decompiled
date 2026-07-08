@@ -1,1015 +1,1223 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local _ = require(l_Parent_2.LuauPolyfill);
-local _ = require(l_Parent_1.error);
-local v5 = require(l_Parent_0.tokenKind);
-local l_Location_0 = require(l_Parent_0.ast).Location;
-local l_Source_0 = require(l_Parent_0.source).Source;
-local v8 = require(l_Parent_0.lexer);
-local l_Lexer_0 = v8.Lexer;
-local l_isPunctuatorTokenKind_0 = v8.isPunctuatorTokenKind;
-local l_TokenKind_0 = v5.TokenKind;
-local l_DirectiveLocation_0 = require(l_Parent_0.directiveLocation).DirectiveLocation;
-local l_Kind_0 = require(l_Parent_0.kinds).Kind;
-local l_syntaxError_0 = require(script.Parent.Parent.error.syntaxError).syntaxError;
-local v15 = nil;
-local v16 = nil;
-local v17 = {};
-v17.__index = v17;
-local function v20(v18, v19) --[[ Line: 221 ]] --[[ Name: parse ]]
-    -- upvalues: v17 (copy)
-    return v17.new(v18, v19):parseDocument();
-end;
-local function v25(v21, v22) --[[ Line: 236 ]] --[[ Name: parseValue ]]
-    -- upvalues: v17 (copy), l_TokenKind_0 (copy)
-    local v23 = v17.new(v21, v22);
-    v23:expectToken(l_TokenKind_0.SOF);
-    local v24 = v23:parseValueLiteral(false);
-    v23:expectToken(l_TokenKind_0.EOF);
-    return v24;
-end;
-local function v30(v26, v27) --[[ Line: 254 ]] --[[ Name: parseType ]]
-    -- upvalues: v17 (copy), l_TokenKind_0 (copy)
-    local v28 = v17.new(v26, v27);
-    v28:expectToken(l_TokenKind_0.SOF);
-    local v29 = v28:parseTypeReference();
-    v28:expectToken(l_TokenKind_0.EOF);
-    return v29;
-end;
-v17.new = function(v31, v32) --[[ Line: 262 ]] --[[ Name: new ]]
-    -- upvalues: l_Source_0 (copy), l_Lexer_0 (copy), v17 (copy)
-    local v33 = nil;
-    v33 = if typeof(v31) == "string" then l_Source_0.new(v31) else v31;
-    return (setmetatable({
-        _lexer = l_Lexer_0.new(v33), 
-        _options = v32
-    }, v17));
-end;
-v17.parseName = function(v34) --[[ Line: 280 ]] --[[ Name: parseName ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local v35 = v34:expectToken(l_TokenKind_0.NAME);
-    return {
-        kind = l_Kind_0.NAME, 
-        value = v35.value, 
-        loc = v34:loc(v35)
-    };
-end;
-v17.parseDocument = function(v36) --[[ Line: 294 ]] --[[ Name: parseDocument ]]
-    -- upvalues: l_Kind_0 (copy), l_TokenKind_0 (copy)
-    local l_token_0 = v36._lexer.token;
-    return {
-        kind = l_Kind_0.DOCUMENT, 
-        definitions = v36:many(l_TokenKind_0.SOF, v36.parseDefinition, l_TokenKind_0.EOF), 
-        loc = v36:loc(l_token_0)
-    };
-end;
-v17.parseDefinition = function(v38) --[[ Line: 314 ]] --[[ Name: parseDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    if v38:peek(l_TokenKind_0.NAME) then
-        local l_value_0 = v38._lexer.token.value;
-        if l_value_0 == "query" or l_value_0 == "mutation" or l_value_0 == "subscription" then
-            return v38:parseOperationDefinition();
-        elseif l_value_0 == "fragment" then
-            return v38:parseFragmentDefinition();
-        elseif l_value_0 == "schema" or l_value_0 == "scalar" or l_value_0 == "type" or l_value_0 == "interface" or l_value_0 == "union" or l_value_0 == "enum" or l_value_0 == "input" or l_value_0 == "directive" then
-            return v38:parseTypeSystemDefinition();
-        elseif l_value_0 == "extend" then
-            return v38:parseTypeSystemExtension();
-        end;
-    elseif v38:peek(l_TokenKind_0.BRACE_L) then
-        return v38:parseOperationDefinition();
-    elseif v38:peekDescription() then
-        return v38:parseTypeSystemDefinition();
-    end;
-    error(v38:unexpected());
-end;
-v17.parseOperationDefinition = function(v40) --[[ Line: 351 ]] --[[ Name: parseOperationDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_1 = v40._lexer.token;
-    if v40:peek(l_TokenKind_0.BRACE_L) then
-        return {
-            kind = l_Kind_0.OPERATION_DEFINITION, 
-            operation = "query", 
-            name = nil, 
-            variableDefinitions = {}, 
-            directives = {}, 
-            selectionSet = v40:parseSelectionSet(), 
-            loc = v40:loc(l_token_1)
-        };
-    else
-        local v42 = v40:parseOperationType();
-        local v43 = nil;
-        if v40:peek(l_TokenKind_0.NAME) then
-            v43 = v40:parseName();
-        end;
-        return {
-            kind = l_Kind_0.OPERATION_DEFINITION, 
-            operation = v42, 
-            name = v43, 
-            variableDefinitions = v40:parseVariableDefinitions(), 
-            directives = v40:parseDirectives(false), 
-            selectionSet = v40:parseSelectionSet(), 
-            loc = v40:loc(l_token_1)
-        };
-    end;
-end;
-v17.parseOperationType = function(v44) --[[ Line: 384 ]] --[[ Name: parseOperationType ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v45 = v44:expectToken(l_TokenKind_0.NAME);
-    if v45.value == "query" then
-        return "query";
-    elseif v45.value == "mutation" then
-        return "mutation";
-    elseif v45.value == "subscription" then
-        return "subscription";
-    else
-        error(v44:unexpected(v45));
-        return;
-    end;
-end;
-v17.parseVariableDefinitions = function(v46) --[[ Line: 401 ]] --[[ Name: parseVariableDefinitions ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v46:optionalMany(l_TokenKind_0.PAREN_L, v46.parseVariableDefinition, l_TokenKind_0.PAREN_R);
-end;
-v17.parseVariableDefinition = function(v47) --[[ Line: 408 ]] --[[ Name: parseVariableDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_2 = v47._lexer.token;
-    local v49 = v47:parseVariable();
-    v47:expectToken(l_TokenKind_0.COLON);
-    local v50 = v47:parseTypeReference();
-    return {
-        kind = l_Kind_0.VARIABLE_DEFINITION, 
-        variable = v49, 
-        type = v50, 
-        defaultValue = if v47:expectOptionalToken(l_TokenKind_0.EQUALS) then v47:parseValueLiteral(true) else nil, 
-        directives = v47:parseDirectives(true), 
-        loc = v47:loc(l_token_2)
-    };
-end;
-v17.parseVariable = function(v51) --[[ Line: 428 ]] --[[ Name: parseVariable ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_3 = v51._lexer.token;
-    v51:expectToken(l_TokenKind_0.DOLLAR);
-    return {
-        kind = l_Kind_0.VARIABLE, 
-        name = v51:parseName(), 
-        loc = v51:loc(l_token_3)
-    };
-end;
-v17.parseSelectionSet = function(v53) --[[ Line: 441 ]] --[[ Name: parseSelectionSet ]]
-    -- upvalues: l_Kind_0 (copy), l_TokenKind_0 (copy)
-    local l_token_4 = v53._lexer.token;
-    return {
-        kind = l_Kind_0.SELECTION_SET, 
-        selections = v53:many(l_TokenKind_0.BRACE_L, v53.parseSelection, l_TokenKind_0.BRACE_R), 
-        loc = v53:loc(l_token_4)
-    };
-end;
-v17.parseSelection = function(v55) --[[ Line: 456 ]] --[[ Name: parseSelection ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    if v55:peek(l_TokenKind_0.SPREAD) then
-        return v55:parseFragment();
-    else
-        return v55:parseField();
-    end;
-end;
-v17.parseField = function(v56) --[[ Line: 469 ]] --[[ Name: parseField ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_5 = v56._lexer.token;
-    local v58 = v56:parseName();
-    local v59 = nil;
-    local v60 = nil;
-    if v56:expectOptionalToken(l_TokenKind_0.COLON) then
-        v59 = v58;
-        v60 = v56:parseName();
-    else
-        v60 = v58;
-    end;
-    return {
-        kind = l_Kind_0.FIELD, 
-        alias = v59, 
-        name = v60, 
-        arguments = v56:parseArguments(false), 
-        directives = v56:parseDirectives(false), 
-        selectionSet = v56:peek(l_TokenKind_0.BRACE_L) and v56:parseSelectionSet() or nil, 
-        loc = v56:loc(l_token_5)
-    };
-end;
-v17.parseArguments = function(v61, v62) --[[ Line: 497 ]] --[[ Name: parseArguments ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v63 = nil;
-    v63 = if v62 then v61.parseConstArgument else v61.parseArgument;
-    return v61:optionalMany(l_TokenKind_0.PAREN_L, v63, l_TokenKind_0.PAREN_R);
-end;
-v17.parseArgument = function(v64) --[[ Line: 510 ]] --[[ Name: parseArgument ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_6 = v64._lexer.token;
-    local v66 = v64:parseName();
-    v64:expectToken(l_TokenKind_0.COLON);
-    return {
-        kind = l_Kind_0.ARGUMENT, 
-        name = v66, 
-        value = v64:parseValueLiteral(false), 
-        loc = v64:loc(l_token_6)
-    };
-end;
-v17.parseConstArgument = function(v67) --[[ Line: 523 ]] --[[ Name: parseConstArgument ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_7 = v67._lexer.token;
-    local v69 = v67:parseName();
-    v67:expectToken(l_TokenKind_0.COLON);
-    local v70 = v67:parseValueLiteral(true);
-    return {
-        kind = l_Kind_0.ARGUMENT, 
-        name = v69, 
-        value = v70, 
-        loc = v67:loc(l_token_7)
-    };
-end;
-v17.parseFragment = function(v71) --[[ Line: 545 ]] --[[ Name: parseFragment ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_8 = v71._lexer.token;
-    v71:expectToken(l_TokenKind_0.SPREAD);
-    local v73 = v71:expectOptionalKeyword("on");
-    if not v73 and v71:peek(l_TokenKind_0.NAME) then
-        return {
-            kind = l_Kind_0.FRAGMENT_SPREAD, 
-            name = v71:parseFragmentName(), 
-            directives = v71:parseDirectives(false), 
-            loc = v71:loc(l_token_8)
-        };
-    else
-        return {
-            kind = l_Kind_0.INLINE_FRAGMENT, 
-            typeCondition = if v73 then v71:parseNamedType() else nil, 
-            directives = v71:parseDirectives(false), 
-            selectionSet = v71:parseSelectionSet(), 
-            loc = v71:loc(l_token_8)
-        };
-    end;
-end;
-v17.parseFragmentDefinition = function(v74) --[[ Line: 573 ]] --[[ Name: parseFragmentDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_9 = v74._lexer.token;
-    v74:expectKeyword("fragment");
-    if (v74._options and v74._options.experimentalFragmentVariables) == true then
-        local v76 = v74:parseFragmentName();
-        local v77 = v74:parseVariableDefinitions();
-        v74:expectKeyword("on");
-        local v78 = v74:parseNamedType();
-        local v79 = v74:parseDirectives(false);
-        local v80 = v74:parseSelectionSet();
-        local v81 = v74:loc(l_token_9);
-        return {
-            kind = l_Kind_0.FRAGMENT_DEFINITION, 
-            name = v76, 
-            variableDefinitions = v77, 
-            typeCondition = v78, 
-            directives = v79, 
-            selectionSet = v80, 
-            loc = v81
-        };
-    else
-        local v82 = v74:parseFragmentName();
-        v74:expectKeyword("on");
-        local v83 = v74:parseNamedType();
-        local v84 = v74:parseDirectives(false);
-        local v85 = v74:parseSelectionSet();
-        local v86 = v74:loc(l_token_9);
-        return {
-            kind = l_Kind_0.FRAGMENT_DEFINITION, 
-            name = v82, 
-            typeCondition = v83, 
-            directives = v84, 
-            selectionSet = v85, 
-            loc = v86
-        };
-    end;
-end;
-v17.parseFragmentName = function(v87) --[[ Line: 616 ]] --[[ Name: parseFragmentName ]]
-    if v87._lexer.token.value == "on" then
-        error(v87:unexpected());
-    end;
-    return v87:parseName();
-end;
-v17.parseValueLiteral = function(v88, v89) --[[ Line: 643 ]] --[[ Name: parseValueLiteral ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_10 = v88._lexer.token;
-    local l_kind_0 = l_token_10.kind;
-    if l_kind_0 == l_TokenKind_0.BRACKET_L then
-        return v88:parseList(v89);
-    elseif l_kind_0 == l_TokenKind_0.BRACE_L then
-        return v88:parseObject(v89);
-    elseif l_kind_0 == l_TokenKind_0.INT then
-        v88._lexer:advance();
-        return {
-            kind = l_Kind_0.INT, 
-            value = l_token_10.value, 
-            loc = v88:loc(l_token_10)
-        };
-    elseif l_kind_0 == l_TokenKind_0.FLOAT then
-        v88._lexer:advance();
-        return {
-            kind = l_Kind_0.FLOAT, 
-            value = l_token_10.value, 
-            loc = v88:loc(l_token_10)
-        };
-    elseif l_kind_0 == l_TokenKind_0.STRING or l_kind_0 == l_TokenKind_0.BLOCK_STRING then
-        return v88:parseStringLiteral();
-    elseif l_kind_0 == l_TokenKind_0.NAME then
-        v88._lexer:advance();
-        local l_value_1 = l_token_10.value;
-        if l_value_1 == "true" then
-            return {
-                kind = l_Kind_0.BOOLEAN, 
-                value = true, 
-                loc = v88:loc(l_token_10)
-            };
-        elseif l_value_1 == "false" then
-            return {
-                kind = l_Kind_0.BOOLEAN, 
-                value = false, 
-                loc = v88:loc(l_token_10)
-            };
-        elseif l_value_1 == "null" then
-            return {
-                kind = l_Kind_0.NULL, 
-                loc = v88:loc(l_token_10)
-            };
-        else
-            return {
-                kind = l_Kind_0.ENUM, 
-                value = l_value_1, 
-                loc = v88:loc(l_token_10)
-            };
-        end;
-    elseif l_kind_0 == l_TokenKind_0.DOLLAR and not v89 then
-        return v88:parseVariable();
-    else
-        error(v88:unexpected());
-        return;
-    end;
-end;
-v17.parseStringLiteral = function(v93) --[[ Line: 692 ]] --[[ Name: parseStringLiteral ]]
-    -- upvalues: l_Kind_0 (copy), l_TokenKind_0 (copy)
-    local l_token_11 = v93._lexer.token;
-    v93._lexer:advance();
-    return {
-        kind = l_Kind_0.STRING, 
-        value = l_token_11.value, 
-        block = l_token_11.kind == l_TokenKind_0.BLOCK_STRING, 
-        loc = v93:loc(l_token_11)
-    };
-end;
-v17.parseList = function(v95, v96) --[[ Line: 708 ]] --[[ Name: parseList ]]
-    -- upvalues: l_Kind_0 (copy), l_TokenKind_0 (copy)
-    local l_token_12 = v95._lexer.token;
-    return {
-        kind = l_Kind_0.LIST, 
-        values = v95:any(l_TokenKind_0.BRACKET_L, function() --[[ Line: 710 ]]
-            -- upvalues: v95 (copy), v96 (copy)
-            return v95:parseValueLiteral(v96);
-        end, l_TokenKind_0.BRACKET_R), 
-        loc = v95:loc(l_token_12)
-    };
-end;
-v17.parseObject = function(v98, v99) --[[ Line: 725 ]] --[[ Name: parseObject ]]
-    -- upvalues: l_Kind_0 (copy), l_TokenKind_0 (copy)
-    local l_token_13 = v98._lexer.token;
-    return {
-        kind = l_Kind_0.OBJECT, 
-        fields = v98:any(l_TokenKind_0.BRACE_L, function() --[[ Line: 727 ]]
-            -- upvalues: v98 (copy), v99 (copy)
-            return v98:parseObjectField(v99);
-        end, l_TokenKind_0.BRACE_R), 
-        loc = v98:loc(l_token_13)
-    };
-end;
-v17.parseObjectField = function(v101, v102) --[[ Line: 740 ]] --[[ Name: parseObjectField ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_14 = v101._lexer.token;
-    local v104 = v101:parseName();
-    v101:expectToken(l_TokenKind_0.COLON);
-    return {
-        kind = l_Kind_0.OBJECT_FIELD, 
-        name = v104, 
-        value = v101:parseValueLiteral(v102), 
-        loc = v101:loc(l_token_14)
-    };
-end;
-v17.parseDirectives = function(v105, v106) --[[ Line: 753 ]] --[[ Name: parseDirectives ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v107 = {};
-    while v105:peek(l_TokenKind_0.AT) do
-        table.insert(v107, v105:parseDirective(v106));
-    end;
-    return v107;
-end;
-v17.parseDirective = function(v108, v109) --[[ Line: 764 ]] --[[ Name: parseDirective ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_15 = v108._lexer.token;
-    v108:expectToken(l_TokenKind_0.AT);
-    return {
-        kind = l_Kind_0.DIRECTIVE, 
-        name = v108:parseName(), 
-        arguments = v108:parseArguments(v109), 
-        loc = v108:loc(l_token_15)
-    };
-end;
-v17.parseTypeReference = function(v111) --[[ Line: 783 ]] --[[ Name: parseTypeReference ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_16 = v111._lexer.token;
-    local v113 = nil;
-    if v111:expectOptionalToken(l_TokenKind_0.BRACKET_L) then
-        local v114 = v111:parseTypeReference();
-        v111:expectToken(l_TokenKind_0.BRACKET_R);
-        v113 = {
-            kind = l_Kind_0.LIST_TYPE, 
-            type = v114, 
-            loc = v111:loc(l_token_16)
-        };
-    else
-        v113 = v111:parseNamedType();
-    end;
-    if v111:expectOptionalToken(l_TokenKind_0.BANG) then
-        return {
-            kind = l_Kind_0.NON_NULL_TYPE, 
-            type = v113, 
-            loc = v111:loc(l_token_16)
-        };
-    else
-        return v113;
-    end;
-end;
-v17.parseNamedType = function(v115) --[[ Line: 816 ]] --[[ Name: parseNamedType ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_17 = v115._lexer.token;
-    return {
-        kind = l_Kind_0.NAMED_TYPE, 
-        name = v115:parseName(), 
-        loc = v115:loc(l_token_17)
-    };
-end;
-v17.parseTypeSystemDefinition = function(v117) --[[ Line: 839 ]] --[[ Name: parseTypeSystemDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v118 = if v117:peekDescription() then v117._lexer:lookahead() else v117._lexer.token;
-    if v118.kind == l_TokenKind_0.NAME then
-        local l_value_2 = v118.value;
-        if l_value_2 == "schema" then
-            return v117:parseSchemaDefinition();
-        elseif l_value_2 == "scalar" then
-            return v117:parseScalarTypeDefinition();
-        elseif l_value_2 == "type" then
-            return v117:parseObjectTypeDefinition();
-        elseif l_value_2 == "interface" then
-            return v117:parseInterfaceTypeDefinition();
-        elseif l_value_2 == "union" then
-            return v117:parseUnionTypeDefinition();
-        elseif l_value_2 == "enum" then
-            return v117:parseEnumTypeDefinition();
-        elseif l_value_2 == "input" then
-            return v117:parseInputObjectTypeDefinition();
-        elseif l_value_2 == "directive" then
-            return v117:parseDirectiveDefinition();
-        end;
-    end;
-    error(v117:unexpected(v118));
-end;
-v17.peekDescription = function(v120) --[[ Line: 869 ]] --[[ Name: peekDescription ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v120:peek(l_TokenKind_0.STRING) or v120:peek(l_TokenKind_0.BLOCK_STRING);
-end;
-v17.parseDescription = function(v121) --[[ Line: 876 ]] --[[ Name: parseDescription ]]
-    if v121:peekDescription() then
-        return v121:parseStringLiteral();
-    else
-        return;
-    end;
-end;
-v17.parseSchemaDefinition = function(v122) --[[ Line: 886 ]] --[[ Name: parseSchemaDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_18 = v122._lexer.token;
-    local v124 = v122:parseDescription();
-    v122:expectKeyword("schema");
-    local v125 = v122:parseDirectives(true);
-    local v126 = v122:many(l_TokenKind_0.BRACE_L, v122.parseOperationTypeDefinition, l_TokenKind_0.BRACE_R);
-    return {
-        kind = l_Kind_0.SCHEMA_DEFINITION, 
-        description = v124, 
-        directives = v125, 
-        operationTypes = v126, 
-        loc = v122:loc(l_token_18)
-    };
-end;
-v17.parseOperationTypeDefinition = function(v127) --[[ Line: 908 ]] --[[ Name: parseOperationTypeDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_19 = v127._lexer.token;
-    local v129 = v127:parseOperationType();
-    v127:expectToken(l_TokenKind_0.COLON);
-    local v130 = v127:parseNamedType();
-    return {
-        kind = l_Kind_0.OPERATION_TYPE_DEFINITION, 
-        operation = v129, 
-        type = v130, 
-        loc = v127:loc(l_token_19)
-    };
-end;
-v17.parseScalarTypeDefinition = function(v131) --[[ Line: 925 ]] --[[ Name: parseScalarTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_20 = v131._lexer.token;
-    local v133 = v131:parseDescription();
-    v131:expectKeyword("scalar");
-    local v134 = v131:parseName();
-    local v135 = v131:parseDirectives(true);
-    return {
-        kind = l_Kind_0.SCALAR_TYPE_DEFINITION, 
-        description = v133, 
-        name = v134, 
-        directives = v135, 
-        loc = v131:loc(l_token_20)
-    };
-end;
-v17.parseObjectTypeDefinition = function(v136) --[[ Line: 945 ]] --[[ Name: parseObjectTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_21 = v136._lexer.token;
-    local v138 = v136:parseDescription();
-    v136:expectKeyword("type");
-    local v139 = v136:parseName();
-    local v140 = v136:parseImplementsInterfaces();
-    local v141 = v136:parseDirectives(true);
-    local v142 = v136:parseFieldsDefinition();
-    return {
-        kind = l_Kind_0.OBJECT_TYPE_DEFINITION, 
-        description = v138, 
-        name = v139, 
-        interfaces = v140, 
-        directives = v141, 
-        fields = v142, 
-        loc = v136:loc(l_token_21)
-    };
-end;
-v17.parseImplementsInterfaces = function(v143) --[[ Line: 969 ]] --[[ Name: parseImplementsInterfaces ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    if v143:expectOptionalKeyword("implements") then
-        return v143:delimitedMany(l_TokenKind_0.AMP, v143.parseNamedType);
-    else
-        return {};
-    end;
-end;
-v17.parseFieldsDefinition = function(v144) --[[ Line: 980 ]] --[[ Name: parseFieldsDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v144:optionalMany(l_TokenKind_0.BRACE_L, v144.parseFieldDefinition, l_TokenKind_0.BRACE_R);
-end;
-v17.parseFieldDefinition = function(v145) --[[ Line: 988 ]] --[[ Name: parseFieldDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_22 = v145._lexer.token;
-    local v147 = v145:parseDescription();
-    local v148 = v145:parseName();
-    local v149 = v145:parseArgumentDefs();
-    v145:expectToken(l_TokenKind_0.COLON);
-    local v150 = v145:parseTypeReference();
-    local v151 = v145:parseDirectives(true);
-    return {
-        kind = l_Kind_0.FIELD_DEFINITION, 
-        description = v147, 
-        name = v148, 
-        arguments = v149, 
-        type = v150, 
-        directives = v151, 
-        loc = v145:loc(l_token_22)
-    };
-end;
-v17.parseArgumentDefs = function(v152) --[[ Line: 1010 ]] --[[ Name: parseArgumentDefs ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v152:optionalMany(l_TokenKind_0.PAREN_L, v152.parseInputValueDef, l_TokenKind_0.PAREN_R);
-end;
-v17.parseInputValueDef = function(v153) --[[ Line: 1018 ]] --[[ Name: parseInputValueDef ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_23 = v153._lexer.token;
-    local v155 = v153:parseDescription();
-    local v156 = v153:parseName();
-    v153:expectToken(l_TokenKind_0.COLON);
-    local v157 = v153:parseTypeReference();
-    local v158 = nil;
-    if v153:expectOptionalToken(l_TokenKind_0.EQUALS) then
-        v158 = v153:parseValueLiteral(true);
-    end;
-    local v159 = v153:parseDirectives(true);
-    return {
-        kind = l_Kind_0.INPUT_VALUE_DEFINITION, 
-        description = v155, 
-        name = v156, 
-        type = v157, 
-        defaultValue = v158, 
-        directives = v159, 
-        loc = v153:loc(l_token_23)
-    };
-end;
-v17.parseInterfaceTypeDefinition = function(v160) --[[ Line: 1044 ]] --[[ Name: parseInterfaceTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_24 = v160._lexer.token;
-    local v162 = v160:parseDescription();
-    v160:expectKeyword("interface");
-    local v163 = v160:parseName();
-    local v164 = v160:parseImplementsInterfaces();
-    local v165 = v160:parseDirectives(true);
-    local v166 = v160:parseFieldsDefinition();
-    return {
-        kind = l_Kind_0.INTERFACE_TYPE_DEFINITION, 
-        description = v162, 
-        name = v163, 
-        interfaces = v164, 
-        directives = v165, 
-        fields = v166, 
-        loc = v160:loc(l_token_24)
-    };
-end;
-v17.parseUnionTypeDefinition = function(v167) --[[ Line: 1067 ]] --[[ Name: parseUnionTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_25 = v167._lexer.token;
-    local v169 = v167:parseDescription();
-    v167:expectKeyword("union");
-    local v170 = v167:parseName();
-    local v171 = v167:parseDirectives(true);
-    local v172 = v167:parseUnionMemberTypes();
-    return {
-        kind = l_Kind_0.UNION_TYPE_DEFINITION, 
-        description = v169, 
-        name = v170, 
-        directives = v171, 
-        types = v172, 
-        loc = v167:loc(l_token_25)
-    };
-end;
-v17.parseUnionMemberTypes = function(v173) --[[ Line: 1089 ]] --[[ Name: parseUnionMemberTypes ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v174 = {};
-    if v173:expectOptionalToken(l_TokenKind_0.EQUALS) then
-        v173:expectOptionalToken(l_TokenKind_0.PIPE);
-        repeat
-            table.insert(v174, v173:parseNamedType());
-        until not v173:expectOptionalToken(l_TokenKind_0.PIPE);
-    end;
-    return v174;
-end;
-v17.parseEnumTypeDefinition = function(v175) --[[ Line: 1105 ]] --[[ Name: parseEnumTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_26 = v175._lexer.token;
-    local v177 = v175:parseDescription();
-    v175:expectKeyword("enum");
-    local v178 = v175:parseName();
-    local v179 = v175:parseDirectives(true);
-    local v180 = v175:parseEnumValuesDefinition();
-    return {
-        kind = l_Kind_0.ENUM_TYPE_DEFINITION, 
-        description = v177, 
-        name = v178, 
-        directives = v179, 
-        values = v180, 
-        loc = v175:loc(l_token_26)
-    };
-end;
-v17.parseEnumValuesDefinition = function(v181) --[[ Line: 1125 ]] --[[ Name: parseEnumValuesDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v181:optionalMany(l_TokenKind_0.BRACE_L, v181.parseEnumValueDefinition, l_TokenKind_0.BRACE_R);
-end;
-v17.parseEnumValueDefinition = function(v182) --[[ Line: 1134 ]] --[[ Name: parseEnumValueDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_27 = v182._lexer.token;
-    local v184 = v182:parseDescription();
-    local v185 = v182:parseName();
-    local v186 = v182:parseDirectives(true);
-    return {
-        kind = l_Kind_0.ENUM_VALUE_DEFINITION, 
-        description = v184, 
-        name = v185, 
-        directives = v186, 
-        loc = v182:loc(l_token_27)
-    };
-end;
-v17.parseInputObjectTypeDefinition = function(v187) --[[ Line: 1152 ]] --[[ Name: parseInputObjectTypeDefinition ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_28 = v187._lexer.token;
-    local v189 = v187:parseDescription();
-    v187:expectKeyword("input");
-    local v190 = v187:parseName();
-    local v191 = v187:parseDirectives(true);
-    local v192 = v187:parseInputFieldsDefinition();
-    return {
-        kind = l_Kind_0.INPUT_OBJECT_TYPE_DEFINITION, 
-        description = v189, 
-        name = v190, 
-        directives = v191, 
-        fields = v192, 
-        loc = v187:loc(l_token_28)
-    };
-end;
-v17.parseInputFieldsDefinition = function(v193) --[[ Line: 1172 ]] --[[ Name: parseInputFieldsDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    return v193:optionalMany(l_TokenKind_0.BRACE_L, v193.parseInputValueDef, l_TokenKind_0.BRACE_R);
-end;
-v17.parseTypeSystemExtension = function(v194) --[[ Line: 1189 ]] --[[ Name: parseTypeSystemExtension ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v195 = v194._lexer:lookahead();
-    if v195.kind == l_TokenKind_0.NAME then
-        local l_value_3 = v195.value;
-        if l_value_3 == "schema" then
-            return v194:parseSchemaExtension();
-        elseif l_value_3 == "scalar" then
-            return v194:parseScalarTypeExtension();
-        elseif l_value_3 == "type" then
-            return v194:parseObjectTypeExtension();
-        elseif l_value_3 == "interface" then
-            return v194:parseInterfaceTypeExtension();
-        elseif l_value_3 == "union" then
-            return v194:parseUnionTypeExtension();
-        elseif l_value_3 == "enum" then
-            return v194:parseEnumTypeExtension();
-        elseif l_value_3 == "input" then
-            return v194:parseInputObjectTypeExtension();
-        end;
-    end;
-    error(v194:unexpected(v195));
-end;
-v17.parseSchemaExtension = function(v197) --[[ Line: 1219 ]] --[[ Name: parseSchemaExtension ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_29 = v197._lexer.token;
-    v197:expectKeyword("extend");
-    v197:expectKeyword("schema");
-    local v199 = v197:parseDirectives(true);
-    local v200 = v197:optionalMany(l_TokenKind_0.BRACE_L, v197.parseOperationTypeDefinition, l_TokenKind_0.BRACE_R);
-    if #v199 == 0 and #v200 == 0 then
-        error(v197:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.SCHEMA_EXTENSION, 
-        directives = v199, 
-        operationTypes = v200, 
-        loc = v197:loc(l_token_29)
-    };
-end;
-v17.parseScalarTypeExtension = function(v201) --[[ Line: 1244 ]] --[[ Name: parseScalarTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_30 = v201._lexer.token;
-    v201:expectKeyword("extend");
-    v201:expectKeyword("scalar");
-    local v203 = v201:parseName();
-    local v204 = v201:parseDirectives(true);
-    if #v204 == 0 then
-        error(v201:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.SCALAR_TYPE_EXTENSION, 
-        name = v203, 
-        directives = v204, 
-        loc = v201:loc(l_token_30)
-    };
-end;
-v17.parseObjectTypeExtension = function(v205) --[[ Line: 1267 ]] --[[ Name: parseObjectTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_31 = v205._lexer.token;
-    v205:expectKeyword("extend");
-    v205:expectKeyword("type");
-    local v207 = v205:parseName();
-    local v208 = v205:parseImplementsInterfaces();
-    local v209 = v205:parseDirectives(true);
-    local v210 = v205:parseFieldsDefinition();
-    if #v208 == 0 and #v209 == 0 and #v210 == 0 then
-        error(v205:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.OBJECT_TYPE_EXTENSION, 
-        name = v207, 
-        interfaces = v208, 
-        directives = v209, 
-        fields = v210, 
-        loc = v205:loc(l_token_31)
-    };
-end;
-v17.parseInterfaceTypeExtension = function(v211) --[[ Line: 1294 ]] --[[ Name: parseInterfaceTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_32 = v211._lexer.token;
-    v211:expectKeyword("extend");
-    v211:expectKeyword("interface");
-    local v213 = v211:parseName();
-    local v214 = v211:parseImplementsInterfaces();
-    local v215 = v211:parseDirectives(true);
-    local v216 = v211:parseFieldsDefinition();
-    if #v214 == 0 and #v215 == 0 and #v216 == 0 then
-        error(v211:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.INTERFACE_TYPE_EXTENSION, 
-        name = v213, 
-        interfaces = v214, 
-        directives = v215, 
-        fields = v216, 
-        loc = v211:loc(l_token_32)
-    };
-end;
-v17.parseUnionTypeExtension = function(v217) --[[ Line: 1320 ]] --[[ Name: parseUnionTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_33 = v217._lexer.token;
-    v217:expectKeyword("extend");
-    v217:expectKeyword("union");
-    local v219 = v217:parseName();
-    local v220 = v217:parseDirectives(true);
-    local v221 = v217:parseUnionMemberTypes();
-    if #v220 == 0 and #v221 == 0 then
-        error(v217:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.UNION_TYPE_EXTENSION, 
-        name = v219, 
-        directives = v220, 
-        types = v221, 
-        loc = v217:loc(l_token_33)
-    };
-end;
-v17.parseEnumTypeExtension = function(v222) --[[ Line: 1344 ]] --[[ Name: parseEnumTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_34 = v222._lexer.token;
-    v222:expectKeyword("extend");
-    v222:expectKeyword("enum");
-    local v224 = v222:parseName();
-    local v225 = v222:parseDirectives(true);
-    local v226 = v222:parseEnumValuesDefinition();
-    if #v225 == 0 and #v226 == 0 then
-        error(v222:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.ENUM_TYPE_EXTENSION, 
-        name = v224, 
-        directives = v225, 
-        values = v226, 
-        loc = v222:loc(l_token_34)
-    };
-end;
-v17.parseInputObjectTypeExtension = function(v227) --[[ Line: 1368 ]] --[[ Name: parseInputObjectTypeExtension ]]
-    -- upvalues: l_Kind_0 (copy)
-    local l_token_35 = v227._lexer.token;
-    v227:expectKeyword("extend");
-    v227:expectKeyword("input");
-    local v229 = v227:parseName();
-    local v230 = v227:parseDirectives(true);
-    local v231 = v227:parseInputFieldsDefinition();
-    if #v230 == 0 and #v231 == 0 then
-        error(v227:unexpected());
-    end;
-    return {
-        kind = l_Kind_0.INPUT_OBJECT_TYPE_EXTENSION, 
-        name = v229, 
-        directives = v230, 
-        fields = v231, 
-        loc = v227:loc(l_token_35)
-    };
-end;
-v17.parseDirectiveDefinition = function(v232) --[[ Line: 1391 ]] --[[ Name: parseDirectiveDefinition ]]
-    -- upvalues: l_TokenKind_0 (copy), l_Kind_0 (copy)
-    local l_token_36 = v232._lexer.token;
-    local v234 = v232:parseDescription();
-    v232:expectKeyword("directive");
-    v232:expectToken(l_TokenKind_0.AT);
-    local v235 = v232:parseName();
-    local v236 = v232:parseArgumentDefs();
-    local v237 = v232:expectOptionalKeyword("repeatable");
-    v232:expectKeyword("on");
-    local v238 = v232:parseDirectiveLocations();
-    return {
-        kind = l_Kind_0.DIRECTIVE_DEFINITION, 
-        description = v234, 
-        name = v235, 
-        arguments = v236, 
-        repeatable = v237, 
-        locations = v238, 
-        loc = v232:loc(l_token_36)
-    };
-end;
-v17.parseDirectiveLocations = function(v239) --[[ Line: 1417 ]] --[[ Name: parseDirectiveLocations ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    v239:expectOptionalToken(l_TokenKind_0.PIPE);
-    local v240 = {};
-    repeat
-        table.insert(v240, v239:parseDirectiveLocation());
-    until not v239:expectOptionalToken(l_TokenKind_0.PIPE);
-    return v240;
-end;
-v17.parseDirectiveLocation = function(v241) --[[ Line: 1454 ]] --[[ Name: parseDirectiveLocation ]]
-    -- upvalues: l_DirectiveLocation_0 (copy)
-    local l_token_37 = v241._lexer.token;
-    local v243 = v241:parseName();
-    if l_DirectiveLocation_0[v243.value] ~= nil then
-        return v243;
-    else
-        error(v241:unexpected(l_token_37));
-        return;
-    end;
-end;
-v17.loc = function(v244, v245) --[[ Line: 1467 ]] --[[ Name: loc ]]
-    -- upvalues: l_Location_0 (copy)
-    if (v244._options and v244._options.noLocation) ~= true then
-        return l_Location_0.new(v245, v244._lexer.lastToken, v244._lexer.source);
-    else
-        return nil;
-    end;
-end;
-v17.peek = function(v246, v247) --[[ Line: 1477 ]] --[[ Name: peek ]]
-    return v246._lexer.token.kind == v247;
-end;
-v17.expectToken = function(v248, v249) --[[ Line: 1485 ]] --[[ Name: expectToken ]]
-    -- upvalues: l_syntaxError_0 (copy), v16 (ref), v15 (ref)
-    local l_token_38 = v248._lexer.token;
-    if l_token_38.kind == v249 then
-        v248._lexer:advance();
-        return l_token_38;
-    else
-        error(l_syntaxError_0(v248._lexer.source, l_token_38.start, "Expected " .. v16(v249) .. ", found " .. v15(l_token_38) .. "."));
-        return;
-    end;
-end;
-v17.expectOptionalToken = function(v251, v252) --[[ Line: 1505 ]] --[[ Name: expectOptionalToken ]]
-    local l_token_39 = v251._lexer.token;
-    if l_token_39.kind == v252 then
-        v251._lexer:advance();
-        return l_token_39;
-    else
-        return nil;
-    end;
-end;
-v17.expectKeyword = function(v254, v255) --[[ Line: 1518 ]] --[[ Name: expectKeyword ]]
-    -- upvalues: l_TokenKind_0 (copy), l_syntaxError_0 (copy), v15 (ref)
-    local l_token_40 = v254._lexer.token;
-    if l_token_40.kind == l_TokenKind_0.NAME and l_token_40.value == v255 then
-        v254._lexer:advance();
-        return;
-    else
-        error(l_syntaxError_0(v254._lexer.source, l_token_40.start, "Expected \"" .. v255 .. "\", found " .. v15(l_token_40) .. "."));
-        return;
-    end;
-end;
-v17.expectOptionalKeyword = function(v257, v258) --[[ Line: 1537 ]] --[[ Name: expectOptionalKeyword ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local l_token_41 = v257._lexer.token;
-    if l_token_41.kind == l_TokenKind_0.NAME and l_token_41.value == v258 then
-        v257._lexer:advance();
-        return true;
-    else
-        return false;
-    end;
-end;
-v17.unexpected = function(v260, v261) --[[ Line: 1550 ]] --[[ Name: unexpected ]]
-    -- upvalues: l_syntaxError_0 (copy), v15 (ref)
-    local v262 = v261 ~= nil and v261 or v260._lexer.token;
-    return l_syntaxError_0(v260._lexer.source, v262.start, "Unexpected " .. v15(v262) .. ".");
-end;
-v17.any = function(v263, v264, v265, v266) --[[ Line: 1561 ]] --[[ Name: any ]]
-    v263:expectToken(v264);
-    local v267 = {};
-    while not v263:expectOptionalToken(v266) do
-        table.insert(v267, v265(v263));
-    end;
-    return v267;
-end;
-v17.optionalMany = function(v268, v269, v270, v271) --[[ Line: 1582 ]] --[[ Name: optionalMany ]]
-    if v268:expectOptionalToken(v269) then
-        local v272 = {};
-        repeat
-            table.insert(v272, v270(v268));
-        until v268:expectOptionalToken(v271);
-        return v272;
-    else
-        return {};
-    end;
-end;
-v17.many = function(v273, v274, v275, v276) --[[ Line: 1604 ]] --[[ Name: many ]]
-    v273:expectToken(v274);
-    local v277 = {};
-    repeat
-        table.insert(v277, v275(v273));
-    until v273:expectOptionalToken(v276);
-    return v277;
-end;
-v17.delimitedMany = function(v278, v279, v280) --[[ Line: 1623 ]] --[[ Name: delimitedMany ]]
-    v278:expectOptionalToken(v279);
-    local v281 = {};
-    repeat
-        table.insert(v281, v280(v278));
-    until not v278:expectOptionalToken(v279);
-    return v281;
-end;
-v15 = function(v282) --[[ Line: 1640 ]] --[[ Name: getTokenDesc ]]
-    -- upvalues: v16 (ref)
-    local l_value_4 = v282.value;
-    return v16(v282.kind) .. (l_value_4 ~= nil and " \"" .. l_value_4 .. "\"" or "");
-end;
-v16 = function(v284) --[[ Line: 1648 ]] --[[ Name: getTokenKindDesc ]]
-    -- upvalues: l_isPunctuatorTokenKind_0 (copy)
-    return l_isPunctuatorTokenKind_0(v284) and "\"" .. v284 .. "\"" or v284;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+
+require(scriptParentParentParent.LuauPolyfill)
+require(scriptParentParent.error)
+
+local tokenKind = require(scriptParent.tokenKind)
+local Location = require(scriptParent.ast).Location
+local Source = require(scriptParent.source).Source
+local lexer = require(scriptParent.lexer)
+local Lexer = lexer.Lexer
+local isPunctuatorTokenKind = lexer.isPunctuatorTokenKind
+local TokenKind = tokenKind.TokenKind
+local DirectiveLocation = require(scriptParent.directiveLocation).DirectiveLocation
+local Kind = require(scriptParent.kinds).Kind
+local syntaxError = require(script.Parent.Parent.error.syntaxError).syntaxError
+local getTokenDesc = nil
+local getTokenKindDesc = nil
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, t2: {[any]: any}?) -- line: 262
+	-- upvalues: Source (copy), Lexer (copy), t1 (copy)
+	local v29 = if typeof(p1) ~= "string" then p1 else Source.new(p1)
+
+	return (setmetatable({
+		_lexer = Lexer.new(v29),
+		_options = t2
+	}, t1))
+end
+function t1.parseName(p2) -- line: 280
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local v31 = p2:expectToken(TokenKind.NAME)
+
+	return {
+		kind = Kind.NAME,
+		value = v31.value,
+		loc = p2:loc(v31)
+	}
+end
+function t1.parseDocument(p3) -- line: 294
+	-- upvalues: Kind (copy), TokenKind (copy)
+	local token = p3._lexer.token
+
+	return {
+		kind = Kind.DOCUMENT,
+		definitions = p3:many(TokenKind.SOF, p3.parseDefinition, TokenKind.EOF),
+		loc = p3:loc(token)
+	}
+end
+function t1.parseDefinition(p4) -- line: 314
+	-- upvalues: TokenKind (copy)
+	if p4:peek(TokenKind.NAME) then
+		local value = p4._lexer.token.value
+
+		if value == "query" or value == "mutation" or value == "subscription" then
+			return p4:parseOperationDefinition()
+		end
+
+		if value == "fragment" then
+			return p4:parseFragmentDefinition()
+		end
+
+		if value == "schema" or value == "scalar" or value == "type" or value == "interface" or value == "union" or value == "enum" or value == "input" or value == "directive" then
+			return p4:parseTypeSystemDefinition()
+		end
+
+		if value == "extend" then
+			return p4:parseTypeSystemExtension()
+		end
+	else
+		if p4:peek(TokenKind.BRACE_L) then
+			return p4:parseOperationDefinition()
+		end
+
+		if p4:peekDescription() then
+			return p4:parseTypeSystemDefinition()
+		end
+	end
+
+	error(p4:unexpected())
+end
+function t1.parseOperationDefinition(p5) -- line: 351
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p5._lexer.token
+
+	if p5:peek(TokenKind.BRACE_L) then
+		return {
+			operation = "query",
+			name = nil,
+			kind = Kind.OPERATION_DEFINITION,
+			variableDefinitions = {},
+			directives = {},
+			selectionSet = p5:parseSelectionSet(),
+			loc = p5:loc(token)
+		}
+	end
+
+	local v38 = p5:parseOperationType()
+	local v39 = nil
+
+	if p5:peek(TokenKind.NAME) then
+		v39 = p5:parseName()
+	end
+
+	return {
+		kind = Kind.OPERATION_DEFINITION,
+		operation = v38,
+		name = v39,
+		variableDefinitions = p5:parseVariableDefinitions(),
+		directives = p5:parseDirectives(false),
+		selectionSet = p5:parseSelectionSet(),
+		loc = p5:loc(token)
+	}
+end
+function t1.parseOperationType(p6) -- line: 384
+	-- upvalues: TokenKind (copy)
+	local v41 = p6:expectToken(TokenKind.NAME)
+
+	if v41.value == "query" then
+		return "query"
+	end
+
+	if v41.value == "mutation" then
+		return "mutation"
+	end
+
+	if v41.value == "subscription" then
+		return "subscription"
+	end
+
+	error(p6:unexpected(v41))
+end
+function t1.parseVariableDefinitions(p7) -- line: 401
+	-- upvalues: TokenKind (copy)
+	return p7:optionalMany(TokenKind.PAREN_L, p7.parseVariableDefinition, TokenKind.PAREN_R)
+end
+function t1.parseVariableDefinition(p8) -- line: 408
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p8._lexer.token
+	local v45 = p8:parseVariable()
+
+	p8:expectToken(TokenKind.COLON)
+
+	local v46 = p8:parseTypeReference()
+
+	return {
+		kind = Kind.VARIABLE_DEFINITION,
+		variable = v45,
+		type = v46,
+		defaultValue = if not p8:expectOptionalToken(TokenKind.EQUALS) then nil else p8:parseValueLiteral(true),
+		directives = p8:parseDirectives(true),
+		loc = p8:loc(token)
+	}
+end
+function t1.parseVariable(p9) -- line: 428
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p9._lexer.token
+
+	p9:expectToken(TokenKind.DOLLAR)
+
+	return {
+		kind = Kind.VARIABLE,
+		name = p9:parseName(),
+		loc = p9:loc(token)
+	}
+end
+function t1.parseSelectionSet(p10) -- line: 441
+	-- upvalues: Kind (copy), TokenKind (copy)
+	local token = p10._lexer.token
+
+	return {
+		kind = Kind.SELECTION_SET,
+		selections = p10:many(TokenKind.BRACE_L, p10.parseSelection, TokenKind.BRACE_R),
+		loc = p10:loc(token)
+	}
+end
+function t1.parseSelection(p11) -- line: 456
+	-- upvalues: TokenKind (copy)
+	if p11:peek(TokenKind.SPREAD) then
+		return p11:parseFragment()
+	end
+
+	return p11:parseField()
+end
+function t1.parseField(p12) -- line: 469
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p12._lexer.token
+	local v54 = p12:parseName()
+	local v55 = nil
+
+	if p12:expectOptionalToken(TokenKind.COLON) then
+		v55 = v54
+		v54 = p12:parseName()
+	end
+
+	return {
+		kind = Kind.FIELD,
+		alias = v55,
+		name = v54,
+		arguments = p12:parseArguments(false),
+		directives = p12:parseDirectives(false),
+		selectionSet = p12:peek(TokenKind.BRACE_L) and p12:parseSelectionSet() or nil,
+		loc = p12:loc(token)
+	}
+end
+function t1.parseArguments(t3: {[any]: any}, b1: boolean) -- line: 497
+	-- upvalues: TokenKind (copy)
+	local v58 = if not b1 then t3.parseArgument else t3.parseConstArgument
+
+	return t3:optionalMany(TokenKind.PAREN_L, v58, TokenKind.PAREN_R)
+end
+function t1.parseArgument(p13) -- line: 510
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p13._lexer.token
+	local v61 = p13:parseName()
+
+	p13:expectToken(TokenKind.COLON)
+
+	return {
+		kind = Kind.ARGUMENT,
+		name = v61,
+		value = p13:parseValueLiteral(false),
+		loc = p13:loc(token)
+	}
+end
+function t1.parseConstArgument(p14) -- line: 523
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p14._lexer.token
+	local v64 = p14:parseName()
+
+	p14:expectToken(TokenKind.COLON)
+
+	local v65 = p14:parseValueLiteral(true)
+
+	return {
+		kind = Kind.ARGUMENT,
+		name = v64,
+		value = v65,
+		loc = p14:loc(token)
+	}
+end
+function t1.parseFragment(p15) -- line: 545
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p15._lexer.token
+
+	p15:expectToken(TokenKind.SPREAD)
+
+	local v68 = p15:expectOptionalKeyword("on")
+
+	if not v68 and p15:peek(TokenKind.NAME) then
+		return {
+			kind = Kind.FRAGMENT_SPREAD,
+			name = p15:parseFragmentName(),
+			directives = p15:parseDirectives(false),
+			loc = p15:loc(token)
+		}
+	end
+
+	return {
+		kind = Kind.INLINE_FRAGMENT,
+		typeCondition = if not v68 then nil else p15:parseNamedType(),
+		directives = p15:parseDirectives(false),
+		selectionSet = p15:parseSelectionSet(),
+		loc = p15:loc(token)
+	}
+end
+function t1.parseFragmentDefinition(p16) -- line: 573
+	-- upvalues: Kind (copy)
+	local token = p16._lexer.token
+
+	p16:expectKeyword("fragment")
+
+	if (p16._options and p16._options.experimentalFragmentVariables) == true then
+		local v71 = p16:parseFragmentName()
+		local v72 = p16:parseVariableDefinitions()
+
+		p16:expectKeyword("on")
+
+		local v73 = p16:parseNamedType()
+		local v74 = p16:parseDirectives(false)
+		local v75 = p16:parseSelectionSet()
+		local v76 = p16:loc(token)
+
+		return {
+			kind = Kind.FRAGMENT_DEFINITION,
+			name = v71,
+			variableDefinitions = v72,
+			typeCondition = v73,
+			directives = v74,
+			selectionSet = v75,
+			loc = v76
+		}
+	end
+
+	local v77 = p16:parseFragmentName()
+
+	p16:expectKeyword("on")
+
+	local v78 = p16:parseNamedType()
+	local v79 = p16:parseDirectives(false)
+	local v80 = p16:parseSelectionSet()
+	local v81 = p16:loc(token)
+
+	return {
+		kind = Kind.FRAGMENT_DEFINITION,
+		name = v77,
+		typeCondition = v78,
+		directives = v79,
+		selectionSet = v80,
+		loc = v81
+	}
+end
+function t1.parseFragmentName(p17) -- line: 616
+	if p17._lexer.token.value == "on" then
+		error(p17:unexpected())
+	end
+
+	return p17:parseName()
+end
+function t1.parseValueLiteral(t4: {[any]: any}, b2: boolean) -- line: 643
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = t4._lexer.token
+	local kind = token.kind
+
+	if kind == TokenKind.BRACKET_L then
+		return t4:parseList(b2)
+	end
+
+	if kind == TokenKind.BRACE_L then
+		return t4:parseObject(b2)
+	end
+
+	if kind == TokenKind.INT then
+		t4._lexer:advance()
+
+		return {
+			kind = Kind.INT,
+			value = token.value,
+			loc = t4:loc(token)
+		}
+	end
+
+	if kind == TokenKind.FLOAT then
+		t4._lexer:advance()
+
+		return {
+			kind = Kind.FLOAT,
+			value = token.value,
+			loc = t4:loc(token)
+		}
+	end
+
+	if kind == TokenKind.STRING or kind == TokenKind.BLOCK_STRING then
+		return t4:parseStringLiteral()
+	end
+
+	if kind == TokenKind.NAME then
+		t4._lexer:advance()
+
+		local value = token.value
+
+		if value == "true" then
+			return {
+				value = true,
+				kind = Kind.BOOLEAN,
+				loc = t4:loc(token)
+			}
+		end
+
+		if value == "false" then
+			return {
+				value = false,
+				kind = Kind.BOOLEAN,
+				loc = t4:loc(token)
+			}
+		end
+
+		if value == "null" then
+			return {
+				kind = Kind.NULL,
+				loc = t4:loc(token)
+			}
+		end
+
+		return {
+			kind = Kind.ENUM,
+			value = value,
+			loc = t4:loc(token)
+		}
+	end
+
+	if kind == TokenKind.DOLLAR and not b2 then
+		return t4:parseVariable()
+	end
+
+	error(t4:unexpected())
+end
+function t1.parseStringLiteral(p18) -- line: 692
+	-- upvalues: Kind (copy), TokenKind (copy)
+	local token = p18._lexer.token
+
+	p18._lexer:advance()
+
+	return {
+		kind = Kind.STRING,
+		value = token.value,
+		block = token.kind == TokenKind.BLOCK_STRING,
+		loc = p18:loc(token)
+	}
+end
+function t1.parseList(t5: {[any]: any}, b3: boolean) -- line: 708
+	-- upvalues: Kind (copy), TokenKind (copy)
+	local token = t5._lexer.token
+
+	return {
+		kind = Kind.LIST,
+		values = t5:any(TokenKind.BRACKET_L, function() -- line: 710
+			-- upvalues: t5 (copy), b3 (copy)
+			return t5:parseValueLiteral(b3)
+		end, TokenKind.BRACKET_R),
+		loc = t5:loc(token)
+	}
+end
+function t1.parseObject(t6: {[any]: any}, b4: boolean) -- line: 725
+	-- upvalues: Kind (copy), TokenKind (copy)
+	local token = t6._lexer.token
+
+	return {
+		kind = Kind.OBJECT,
+		fields = t6:any(TokenKind.BRACE_L, function() -- line: 727
+			-- upvalues: t6 (copy), b4 (copy)
+			return t6:parseObjectField(b4)
+		end, TokenKind.BRACE_R),
+		loc = t6:loc(token)
+	}
+end
+function t1.parseObjectField(t7: {[any]: any}, b5: boolean) -- line: 740
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = t7._lexer.token
+	local v99 = t7:parseName()
+
+	t7:expectToken(TokenKind.COLON)
+
+	return {
+		kind = Kind.OBJECT_FIELD,
+		name = v99,
+		value = t7:parseValueLiteral(b5),
+		loc = t7:loc(token)
+	}
+end
+function t1.parseDirectives(p19, p20) -- line: 753
+	-- upvalues: TokenKind (copy)
+	local t8 = {}
+
+	while p19:peek(TokenKind.AT) do
+		table.insert(t8, p19:parseDirective(p20))
+	end
+
+	return t8
+end
+function t1.parseDirective(p21, p22) -- line: 764
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p21._lexer.token
+
+	p21:expectToken(TokenKind.AT)
+
+	return {
+		kind = Kind.DIRECTIVE,
+		name = p21:parseName(),
+		arguments = p21:parseArguments(p22),
+		loc = p21:loc(token)
+	}
+end
+function t1.parseTypeReference(p23) -- line: 783
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p23._lexer.token
+	local t9
+
+	if p23:expectOptionalToken(TokenKind.BRACKET_L) then
+		local v108 = p23:parseTypeReference()
+
+		p23:expectToken(TokenKind.BRACKET_R)
+		t9 = {
+			kind = Kind.LIST_TYPE,
+			type = v108,
+			loc = p23:loc(token)
+		}
+	else
+		t9 = p23:parseNamedType()
+	end
+
+	if p23:expectOptionalToken(TokenKind.BANG) then
+		return {
+			kind = Kind.NON_NULL_TYPE,
+			type = t9,
+			loc = p23:loc(token)
+		}
+	end
+
+	return t9
+end
+function t1.parseNamedType(p24) -- line: 816
+	-- upvalues: Kind (copy)
+	local token = p24._lexer.token
+
+	return {
+		kind = Kind.NAMED_TYPE,
+		name = p24:parseName(),
+		loc = p24:loc(token)
+	}
+end
+function t1.parseTypeSystemDefinition(p25) -- line: 839
+	-- upvalues: TokenKind (copy)
+	local v113 = if not p25:peekDescription() then p25._lexer.token else p25._lexer:lookahead()
+
+	if v113.kind == TokenKind.NAME then
+		local value = v113.value
+
+		if value == "schema" then
+			return p25:parseSchemaDefinition()
+		end
+
+		if value == "scalar" then
+			return p25:parseScalarTypeDefinition()
+		end
+
+		if value == "type" then
+			return p25:parseObjectTypeDefinition()
+		end
+
+		if value == "interface" then
+			return p25:parseInterfaceTypeDefinition()
+		end
+
+		if value == "union" then
+			return p25:parseUnionTypeDefinition()
+		end
+
+		if value == "enum" then
+			return p25:parseEnumTypeDefinition()
+		end
+
+		if value == "input" then
+			return p25:parseInputObjectTypeDefinition()
+		end
+
+		if value == "directive" then
+			return p25:parseDirectiveDefinition()
+		end
+	end
+
+	error(p25:unexpected(v113))
+end
+function t1.peekDescription(p26) -- line: 869
+	-- upvalues: TokenKind (copy)
+	return p26:peek(TokenKind.STRING) or p26:peek(TokenKind.BLOCK_STRING)
+end
+function t1.parseDescription(p27) -- line: 876
+	if p27:peekDescription() then
+		return p27:parseStringLiteral()
+	end
+end
+function t1.parseSchemaDefinition(p28) -- line: 886
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p28._lexer.token
+	local v119 = p28:parseDescription()
+
+	p28:expectKeyword("schema")
+
+	local v120 = p28:parseDirectives(true)
+	local v121 = p28:many(TokenKind.BRACE_L, p28.parseOperationTypeDefinition, TokenKind.BRACE_R)
+
+	return {
+		kind = Kind.SCHEMA_DEFINITION,
+		description = v119,
+		directives = v120,
+		operationTypes = v121,
+		loc = p28:loc(token)
+	}
+end
+function t1.parseOperationTypeDefinition(p29) -- line: 908
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p29._lexer.token
+	local v124 = p29:parseOperationType()
+
+	p29:expectToken(TokenKind.COLON)
+
+	local v125 = p29:parseNamedType()
+
+	return {
+		kind = Kind.OPERATION_TYPE_DEFINITION,
+		operation = v124,
+		type = v125,
+		loc = p29:loc(token)
+	}
+end
+function t1.parseScalarTypeDefinition(p30) -- line: 925
+	-- upvalues: Kind (copy)
+	local token = p30._lexer.token
+	local v128 = p30:parseDescription()
+
+	p30:expectKeyword("scalar")
+
+	local v129 = p30:parseName()
+	local v130 = p30:parseDirectives(true)
+
+	return {
+		kind = Kind.SCALAR_TYPE_DEFINITION,
+		description = v128,
+		name = v129,
+		directives = v130,
+		loc = p30:loc(token)
+	}
+end
+function t1.parseObjectTypeDefinition(p31) -- line: 945
+	-- upvalues: Kind (copy)
+	local token = p31._lexer.token
+	local v133 = p31:parseDescription()
+
+	p31:expectKeyword("type")
+
+	local v134 = p31:parseName()
+	local v135 = p31:parseImplementsInterfaces()
+	local v136 = p31:parseDirectives(true)
+	local v137 = p31:parseFieldsDefinition()
+
+	return {
+		kind = Kind.OBJECT_TYPE_DEFINITION,
+		description = v133,
+		name = v134,
+		interfaces = v135,
+		directives = v136,
+		fields = v137,
+		loc = p31:loc(token)
+	}
+end
+function t1.parseImplementsInterfaces(p32) -- line: 969
+	-- upvalues: TokenKind (copy)
+	if p32:expectOptionalKeyword("implements") then
+		return p32:delimitedMany(TokenKind.AMP, p32.parseNamedType)
+	end
+
+	return {}
+end
+function t1.parseFieldsDefinition(p33) -- line: 980
+	-- upvalues: TokenKind (copy)
+	return p33:optionalMany(TokenKind.BRACE_L, p33.parseFieldDefinition, TokenKind.BRACE_R)
+end
+function t1.parseFieldDefinition(p34) -- line: 988
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p34._lexer.token
+	local v142 = p34:parseDescription()
+	local v143 = p34:parseName()
+	local v144 = p34:parseArgumentDefs()
+
+	p34:expectToken(TokenKind.COLON)
+
+	local v145 = p34:parseTypeReference()
+	local v146 = p34:parseDirectives(true)
+
+	return {
+		kind = Kind.FIELD_DEFINITION,
+		description = v142,
+		name = v143,
+		arguments = v144,
+		type = v145,
+		directives = v146,
+		loc = p34:loc(token)
+	}
+end
+function t1.parseArgumentDefs(p35) -- line: 1010
+	-- upvalues: TokenKind (copy)
+	return p35:optionalMany(TokenKind.PAREN_L, p35.parseInputValueDef, TokenKind.PAREN_R)
+end
+function t1.parseInputValueDef(p36) -- line: 1018
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p36._lexer.token
+	local v150 = p36:parseDescription()
+	local v151 = p36:parseName()
+
+	p36:expectToken(TokenKind.COLON)
+
+	local v152 = p36:parseTypeReference()
+	local v153 = nil
+
+	if p36:expectOptionalToken(TokenKind.EQUALS) then
+		v153 = p36:parseValueLiteral(true)
+	end
+
+	local v154 = p36:parseDirectives(true)
+
+	return {
+		kind = Kind.INPUT_VALUE_DEFINITION,
+		description = v150,
+		name = v151,
+		type = v152,
+		defaultValue = v153,
+		directives = v154,
+		loc = p36:loc(token)
+	}
+end
+function t1.parseInterfaceTypeDefinition(p37) -- line: 1044
+	-- upvalues: Kind (copy)
+	local token = p37._lexer.token
+	local v157 = p37:parseDescription()
+
+	p37:expectKeyword("interface")
+
+	local v158 = p37:parseName()
+	local v159 = p37:parseImplementsInterfaces()
+	local v160 = p37:parseDirectives(true)
+	local v161 = p37:parseFieldsDefinition()
+
+	return {
+		kind = Kind.INTERFACE_TYPE_DEFINITION,
+		description = v157,
+		name = v158,
+		interfaces = v159,
+		directives = v160,
+		fields = v161,
+		loc = p37:loc(token)
+	}
+end
+function t1.parseUnionTypeDefinition(p38) -- line: 1067
+	-- upvalues: Kind (copy)
+	local token = p38._lexer.token
+	local v164 = p38:parseDescription()
+
+	p38:expectKeyword("union")
+
+	local v165 = p38:parseName()
+	local v166 = p38:parseDirectives(true)
+	local v167 = p38:parseUnionMemberTypes()
+
+	return {
+		kind = Kind.UNION_TYPE_DEFINITION,
+		description = v164,
+		name = v165,
+		directives = v166,
+		types = v167,
+		loc = p38:loc(token)
+	}
+end
+function t1.parseUnionMemberTypes(p39) -- line: 1089
+	-- upvalues: TokenKind (copy)
+	local t10 = {}
+
+	if p39:expectOptionalToken(TokenKind.EQUALS) then
+		p39:expectOptionalToken(TokenKind.PIPE)
+
+		repeat
+			table.insert(t10, p39:parseNamedType())
+		until not p39:expectOptionalToken(TokenKind.PIPE)
+	end
+
+	return t10
+end
+function t1.parseEnumTypeDefinition(p40) -- line: 1105
+	-- upvalues: Kind (copy)
+	local token = p40._lexer.token
+	local v172 = p40:parseDescription()
+
+	p40:expectKeyword("enum")
+
+	local v173 = p40:parseName()
+	local v174 = p40:parseDirectives(true)
+	local v175 = p40:parseEnumValuesDefinition()
+
+	return {
+		kind = Kind.ENUM_TYPE_DEFINITION,
+		description = v172,
+		name = v173,
+		directives = v174,
+		values = v175,
+		loc = p40:loc(token)
+	}
+end
+function t1.parseEnumValuesDefinition(p41) -- line: 1125
+	-- upvalues: TokenKind (copy)
+	return p41:optionalMany(TokenKind.BRACE_L, p41.parseEnumValueDefinition, TokenKind.BRACE_R)
+end
+function t1.parseEnumValueDefinition(p42) -- line: 1134
+	-- upvalues: Kind (copy)
+	local token = p42._lexer.token
+	local v179 = p42:parseDescription()
+	local v180 = p42:parseName()
+	local v181 = p42:parseDirectives(true)
+
+	return {
+		kind = Kind.ENUM_VALUE_DEFINITION,
+		description = v179,
+		name = v180,
+		directives = v181,
+		loc = p42:loc(token)
+	}
+end
+function t1.parseInputObjectTypeDefinition(p43) -- line: 1152
+	-- upvalues: Kind (copy)
+	local token = p43._lexer.token
+	local v184 = p43:parseDescription()
+
+	p43:expectKeyword("input")
+
+	local v185 = p43:parseName()
+	local v186 = p43:parseDirectives(true)
+	local v187 = p43:parseInputFieldsDefinition()
+
+	return {
+		kind = Kind.INPUT_OBJECT_TYPE_DEFINITION,
+		description = v184,
+		name = v185,
+		directives = v186,
+		fields = v187,
+		loc = p43:loc(token)
+	}
+end
+function t1.parseInputFieldsDefinition(p44) -- line: 1172
+	-- upvalues: TokenKind (copy)
+	return p44:optionalMany(TokenKind.BRACE_L, p44.parseInputValueDef, TokenKind.BRACE_R)
+end
+function t1.parseTypeSystemExtension(p45) -- line: 1189
+	-- upvalues: TokenKind (copy)
+	local v190 = p45._lexer:lookahead()
+
+	if v190.kind == TokenKind.NAME then
+		local value = v190.value
+
+		if value == "schema" then
+			return p45:parseSchemaExtension()
+		end
+
+		if value == "scalar" then
+			return p45:parseScalarTypeExtension()
+		end
+
+		if value == "type" then
+			return p45:parseObjectTypeExtension()
+		end
+
+		if value == "interface" then
+			return p45:parseInterfaceTypeExtension()
+		end
+
+		if value == "union" then
+			return p45:parseUnionTypeExtension()
+		end
+
+		if value == "enum" then
+			return p45:parseEnumTypeExtension()
+		end
+
+		if value == "input" then
+			return p45:parseInputObjectTypeExtension()
+		end
+	end
+
+	error(p45:unexpected(v190))
+end
+function t1.parseSchemaExtension(p46) -- line: 1219
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p46._lexer.token
+
+	p46:expectKeyword("extend")
+	p46:expectKeyword("schema")
+
+	local v194 = p46:parseDirectives(true)
+	local v195 = p46:optionalMany(TokenKind.BRACE_L, p46.parseOperationTypeDefinition, TokenKind.BRACE_R)
+
+	if #v194 == 0 and #v195 == 0 then
+		error(p46:unexpected())
+	end
+
+	return {
+		kind = Kind.SCHEMA_EXTENSION,
+		directives = v194,
+		operationTypes = v195,
+		loc = p46:loc(token)
+	}
+end
+function t1.parseScalarTypeExtension(p47) -- line: 1244
+	-- upvalues: Kind (copy)
+	local token = p47._lexer.token
+
+	p47:expectKeyword("extend")
+	p47:expectKeyword("scalar")
+
+	local v198 = p47:parseName()
+	local v199 = p47:parseDirectives(true)
+
+	if #v199 == 0 then
+		error(p47:unexpected())
+	end
+
+	return {
+		kind = Kind.SCALAR_TYPE_EXTENSION,
+		name = v198,
+		directives = v199,
+		loc = p47:loc(token)
+	}
+end
+function t1.parseObjectTypeExtension(p48) -- line: 1267
+	-- upvalues: Kind (copy)
+	local token = p48._lexer.token
+
+	p48:expectKeyword("extend")
+	p48:expectKeyword("type")
+
+	local v202 = p48:parseName()
+	local v203 = p48:parseImplementsInterfaces()
+	local v204 = p48:parseDirectives(true)
+	local v205 = p48:parseFieldsDefinition()
+
+	if #v203 == 0 and (#v204 == 0 and #v205 == 0) then
+		error(p48:unexpected())
+	end
+
+	return {
+		kind = Kind.OBJECT_TYPE_EXTENSION,
+		name = v202,
+		interfaces = v203,
+		directives = v204,
+		fields = v205,
+		loc = p48:loc(token)
+	}
+end
+function t1.parseInterfaceTypeExtension(p49) -- line: 1294
+	-- upvalues: Kind (copy)
+	local token = p49._lexer.token
+
+	p49:expectKeyword("extend")
+	p49:expectKeyword("interface")
+
+	local v208 = p49:parseName()
+	local v209 = p49:parseImplementsInterfaces()
+	local v210 = p49:parseDirectives(true)
+	local v211 = p49:parseFieldsDefinition()
+
+	if #v209 == 0 and (#v210 == 0 and #v211 == 0) then
+		error(p49:unexpected())
+	end
+
+	return {
+		kind = Kind.INTERFACE_TYPE_EXTENSION,
+		name = v208,
+		interfaces = v209,
+		directives = v210,
+		fields = v211,
+		loc = p49:loc(token)
+	}
+end
+function t1.parseUnionTypeExtension(p50) -- line: 1320
+	-- upvalues: Kind (copy)
+	local token = p50._lexer.token
+
+	p50:expectKeyword("extend")
+	p50:expectKeyword("union")
+
+	local v214 = p50:parseName()
+	local v215 = p50:parseDirectives(true)
+	local v216 = p50:parseUnionMemberTypes()
+
+	if #v215 == 0 and #v216 == 0 then
+		error(p50:unexpected())
+	end
+
+	return {
+		kind = Kind.UNION_TYPE_EXTENSION,
+		name = v214,
+		directives = v215,
+		types = v216,
+		loc = p50:loc(token)
+	}
+end
+function t1.parseEnumTypeExtension(p51) -- line: 1344
+	-- upvalues: Kind (copy)
+	local token = p51._lexer.token
+
+	p51:expectKeyword("extend")
+	p51:expectKeyword("enum")
+
+	local v219 = p51:parseName()
+	local v220 = p51:parseDirectives(true)
+	local v221 = p51:parseEnumValuesDefinition()
+
+	if #v220 == 0 and #v221 == 0 then
+		error(p51:unexpected())
+	end
+
+	return {
+		kind = Kind.ENUM_TYPE_EXTENSION,
+		name = v219,
+		directives = v220,
+		values = v221,
+		loc = p51:loc(token)
+	}
+end
+function t1.parseInputObjectTypeExtension(p52) -- line: 1368
+	-- upvalues: Kind (copy)
+	local token = p52._lexer.token
+
+	p52:expectKeyword("extend")
+	p52:expectKeyword("input")
+
+	local v224 = p52:parseName()
+	local v225 = p52:parseDirectives(true)
+	local v226 = p52:parseInputFieldsDefinition()
+
+	if #v225 == 0 and #v226 == 0 then
+		error(p52:unexpected())
+	end
+
+	return {
+		kind = Kind.INPUT_OBJECT_TYPE_EXTENSION,
+		name = v224,
+		directives = v225,
+		fields = v226,
+		loc = p52:loc(token)
+	}
+end
+function t1.parseDirectiveDefinition(p53) -- line: 1391
+	-- upvalues: TokenKind (copy), Kind (copy)
+	local token = p53._lexer.token
+	local v229 = p53:parseDescription()
+
+	p53:expectKeyword("directive")
+	p53:expectToken(TokenKind.AT)
+
+	local v230 = p53:parseName()
+	local v231 = p53:parseArgumentDefs()
+	local v232 = p53:expectOptionalKeyword("repeatable")
+
+	p53:expectKeyword("on")
+
+	local v233 = p53:parseDirectiveLocations()
+
+	return {
+		kind = Kind.DIRECTIVE_DEFINITION,
+		description = v229,
+		name = v230,
+		arguments = v231,
+		repeatable = v232,
+		locations = v233,
+		loc = p53:loc(token)
+	}
+end
+function t1.parseDirectiveLocations(p54) -- line: 1417
+	-- upvalues: TokenKind (copy)
+	p54:expectOptionalToken(TokenKind.PIPE)
+
+	local t11 = {}
+
+	repeat
+		table.insert(t11, p54:parseDirectiveLocation())
+	until not p54:expectOptionalToken(TokenKind.PIPE)
+
+	return t11
+end
+function t1.parseDirectiveLocation(p55) -- line: 1454
+	-- upvalues: DirectiveLocation (copy)
+	local token = p55._lexer.token
+	local v238 = p55:parseName()
+
+	if DirectiveLocation[v238.value] ~= nil then
+		return v238
+	end
+
+	error(p55:unexpected(token))
+end
+function t1.loc(p56, p57) -- line: 1467
+	-- upvalues: Location (copy)
+	if (p56._options and p56._options.noLocation) ~= true then
+		return Location.new(p57, p56._lexer.lastToken, p56._lexer.source)
+	end
+
+	return nil
+end
+function t1.peek(p58, p59) -- line: 1477
+	return p59 == p58._lexer.token.kind
+end
+function t1.expectToken(p60, p61) -- line: 1485
+	-- upvalues: syntaxError (copy), getTokenKindDesc (ref), getTokenDesc (ref)
+	local token = p60._lexer.token
+
+	if p61 == token.kind then
+		p60._lexer:advance()
+
+		return token
+	end
+
+	error(syntaxError(p60._lexer.source, token.start, "Expected " .. getTokenKindDesc(p61) .. ", found " .. getTokenDesc(token) .. "."))
+end
+function t1.expectOptionalToken(p62, p63) -- line: 1505
+	local token = p62._lexer.token
+
+	if p63 == token.kind then
+		p62._lexer:advance()
+
+		return token
+	end
+
+	return nil
+end
+function t1.expectKeyword(t12: {[any]: any}, s1: string) -- line: 1518
+	-- upvalues: TokenKind (copy), syntaxError (copy), getTokenDesc (ref)
+	local token = t12._lexer.token
+
+	if token.kind == TokenKind.NAME and s1 == token.value then
+		t12._lexer:advance()
+
+		return
+	end
+
+	error(syntaxError(t12._lexer.source, token.start, "Expected \"" .. s1 .. "\", found " .. getTokenDesc(token) .. "."))
+end
+function t1.expectOptionalKeyword(t13: {[any]: any}, s2: string) -- line: 1537
+	-- upvalues: TokenKind (copy)
+	local token = t13._lexer.token
+
+	if token.kind == TokenKind.NAME and s2 == token.value then
+		t13._lexer:advance()
+
+		return true
+	end
+
+	return false
+end
+function t1.unexpected(p64, p65) -- line: 1550
+	-- upvalues: syntaxError (copy), getTokenDesc (ref)
+	local v257 = p65 ~= nil and p65 or p64._lexer.token
+
+	return syntaxError(p64._lexer.source, v257.start, "Unexpected " .. getTokenDesc(v257) .. ".")
+end
+function t1.any(t14: {[any]: any}, p66, p67: ((...any) -> ...any), p68) -- line: 1561
+	t14:expectToken(p66)
+
+	local t15 = {}
+
+	while not t14:expectOptionalToken(p68) do
+		table.insert(t15, p67(t14))
+	end
+
+	return t15
+end
+function t1.optionalMany(t16: {[any]: any}, p69, p70: ((...any) -> ...any), p71) -- line: 1582
+	if t16:expectOptionalToken(p69) then
+		local t17 = {}
+
+		repeat
+			table.insert(t17, p70(t16))
+		until t16:expectOptionalToken(p71)
+
+		return t17
+	end
+
+	return {}
+end
+function t1.many(t18: {[any]: any}, p72, p73: ((...any) -> ...any), p74) -- line: 1604
+	t18:expectToken(p72)
+
+	local t19 = {}
+
+	repeat
+		table.insert(t19, p73(t18))
+	until t18:expectOptionalToken(p74)
+
+	return t19
+end
+function t1.delimitedMany(t20: {[any]: any}, p75, p76: ((...any) -> ...any)) -- line: 1623
+	t20:expectOptionalToken(p75)
+
+	local t21 = {}
+
+	repeat
+		table.insert(t21, p76(t20))
+	until not t20:expectOptionalToken(p75)
+
+	return t21
+end
+function getTokenDesc(p77) -- line: 1640
+	-- upvalues: getTokenKindDesc (ref)
+	local value = p77.value
+
+	return getTokenKindDesc(p77.kind) .. (value ~= nil and " \"" .. value .. "\"" or "")
+end
+function getTokenKindDesc(p78) -- line: 1648
+	-- upvalues: isPunctuatorTokenKind (copy)
+	return isPunctuatorTokenKind(p78) and "\"" .. p78 .. "\"" or p78
+end
+
 return {
-    Parser = v17, 
-    parse = v20, 
-    parseValue = v25, 
-    parseType = v30
-};
+	Parser = t1,
+	parse = function(p79, t22: {[any]: any}?) -- line: 221
+		-- upvalues: t1 (copy)
+		return t1.new(p79, t22):parseDocument()
+	end,
+	parseValue = function(p80, t23: {[any]: any}?) -- line: 236
+		-- upvalues: t1 (copy), TokenKind (copy)
+		local v21 = t1.new(p80, t23)
+
+		v21:expectToken(TokenKind.SOF)
+
+		local v22 = v21:parseValueLiteral(false)
+
+		v21:expectToken(TokenKind.EOF)
+
+		return v22
+	end,
+	parseType = function(p81, t24: {[any]: any}?) -- line: 254
+		-- upvalues: t1 (copy), TokenKind (copy)
+		local v25 = t1.new(p81, t24)
+
+		v25:expectToken(TokenKind.SOF)
+
+		local v26 = v25:parseTypeReference()
+
+		v25:expectToken(TokenKind.EOF)
+
+		return v26
+	end
+}

@@ -1,10 +1,12 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.collect);
-return function(v2, v3) --[[ Line: 15 ]] --[[ Name: keyBy ]]
-    -- upvalues: v1 (copy)
-    return v1(v2, function(v4, v5) --[[ Line: 16 ]]
-        -- upvalues: v3 (copy)
-        local _ = nil;
-        return if typeof(v3) == "function" then v3(v5, v4) else v5[v3], v5;
-    end);
-end;
+local scriptParent = script.Parent
+local collect = require(scriptParent.collect)
+
+local function keyBy(t1: {[any]: any}, p1) -- line: 15
+	-- upvalues: collect (copy)
+	return collect(t1, function(p2, p3) -- line: 16
+		-- upvalues: p1 (copy)
+		return if typeof(p1) ~= "function" then p3[p1] else p1(p3, p2), p3
+	end)
+end
+
+return keyBy

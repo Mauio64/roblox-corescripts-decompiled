@@ -1,142 +1,154 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 46 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        user_vote = if not (v4 ~= nil) or v4.user_vote == nil then nil else v4.user_vote, 
-        can_vote = v4 ~= nil and not (v4.can_vote == nil) and v4.can_vote, 
-        reason_for_not_voteable = (not (v4 ~= nil) or v4.reason_for_not_voteable == nil) and "" or v4.reason_for_not_voteable
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 56 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.user_vote ~= nil then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.varint);
-        v8, v9 = v0.writeVarInt(v8, v9, v5.user_vote and 1 or 0);
-        v6 = v8;
-        v7 = v9;
-    end;
-    if v5.can_vote then
-        local v10, v11 = v0.writeTag(v6, v7, 2, v0.wireTypes.varint);
-        v10, v11 = v0.writeVarInt(v10, v11, v5.can_vote and 1 or 0);
-        v6 = v10;
-        v7 = v11;
-    end;
-    if v5.reason_for_not_voteable ~= nil and v5.reason_for_not_voteable ~= "" then
-        local v12, v13 = v0.writeTag(v6, v7, 3, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v5.reason_for_not_voteable);
-        v6 = v12;
-        v7 = v13;
-    end;
-    local v14 = buffer.create(v7);
-    buffer.copy(v14, 0, v6, 0, v7);
-    return v14;
-end;
-v3.decode = function(v15) --[[ Line: 80 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v16 = v3.new();
-    local v17 = 0;
-    while v17 < buffer.len(v15) do
-        local v18 = nil;
-        local v19 = nil;
-        local v20, v21, v22 = v0.readTag(v15, v17);
-        v18 = v20;
-        v19 = v21;
-        v17 = v22;
-        if v19 == v0.wireTypes.varint then
-            if v18 == 1 then
-                v20 = nil;
-                v21, v22 = v0.readVarInt(v15, v17);
-                v20 = v21;
-                v17 = v22;
-                v16.user_vote = v20 ~= 0;
-            elseif v18 == 2 then
-                v20 = nil;
-                v21, v22 = v0.readVarInt(v15, v17);
-                v20 = v21;
-                v17 = v22;
-                v16.can_vote = v20 ~= 0;
-            else
-                v20 = nil;
-                v21, v22 = v0.readVarInt(v15, v17);
-                v20 = v21;
-                v17 = v22;
-            end;
-        elseif v19 == v0.wireTypes.lengthDelimited then
-            if v18 == 3 then
-                v20 = nil;
-                v21, v22 = v0.readBuffer(v15, v17);
-                v20 = v21;
-                v17 = v22;
-                v16.reason_for_not_voteable = buffer.tostring(v20);
-            else
-                v20 = nil;
-                v21, v22 = v0.readVarInt(v15, v17);
-                v17 = v22 + v21;
-            end;
-        elseif v19 == v0.wireTypes.i32 then
-            v20 = nil;
-            v21, v22 = v0.readFixed32(v15, v17);
-            v20 = v21;
-            v17 = v22;
-        elseif v19 == v0.wireTypes.i64 then
-            v20 = nil;
-            v21, v22 = v0.readFixed64(v15, v17);
-            v20 = v21;
-            v17 = v22;
-        else
-            error("Unsupported wire type: " .. v19);
-        end;
-    end;
-    return v16;
-end;
-v3.jsonEncode = function(v23) --[[ Line: 133 ]] --[[ Name: jsonEncode ]]
-    local v24 = {};
-    if v23.user_vote ~= nil then
-        v24.userVote = v23.user_vote;
-    end;
-    if v23.can_vote then
-        v24.canVote = v23.can_vote;
-    end;
-    if v23.reason_for_not_voteable ~= nil and v23.reason_for_not_voteable ~= "" then
-        v24.reasonForNotVoteable = v23.reason_for_not_voteable;
-    end;
-    return v24;
-end;
-v3.jsonDecode = function(v25) --[[ Line: 151 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy)
-    local v26 = v3.new();
-    if v25.user_vote ~= nil then
-        v26.user_vote = v25.user_vote;
-    end;
-    if v25.userVote ~= nil then
-        v26.user_vote = v25.userVote;
-    end;
-    if v25.can_vote ~= nil then
-        v26.can_vote = v25.can_vote;
-    end;
-    if v25.canVote ~= nil then
-        v26.can_vote = v25.canVote;
-    end;
-    if v25.reason_for_not_voteable ~= nil then
-        v26.reason_for_not_voteable = v25.reason_for_not_voteable;
-    end;
-    if v25.reasonForNotVoteable ~= nil then
-        v26.reason_for_not_voteable = v25.reasonForNotVoteable;
-    end;
-    return v26;
-end;
-v3.descriptor = {
-    name = "UniverseUserVoteData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserVoteData"
-};
-v2.UniverseUserVoteData = v3;
-v1.default:register(v2.UniverseUserVoteData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 46
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		user_vote = if t3 ~= nil and t3.user_vote ~= nil then t3.user_vote else nil,
+		can_vote = t3 ~= nil and (t3.can_vote ~= nil and t3.can_vote),
+		reason_for_not_voteable = if t3 ~= nil and t3.reason_for_not_voteable ~= nil then t3.reason_for_not_voteable else ""
+	}, t2))
+end
+function t2.encode(p1) -- line: 56
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.user_vote ~= nil then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v9, v10, not p1.user_vote and 0 or 1)
+	end
+
+	if p1.can_vote then
+		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v11, v12, not p1.can_vote and 0 or 1)
+	end
+
+	if p1.reason_for_not_voteable ~= nil and p1.reason_for_not_voteable ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.reason_for_not_voteable)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 80
+	-- upvalues: t2 (copy), proto (copy)
+	local v17 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v19, v20
+
+		v19, v20, n2 = proto.readTag(p2, n2)
+
+		if v20 == proto.wireTypes.varint then
+			if v19 == 1 then
+				local v21
+
+				v21, n2 = proto.readVarInt(p2, n2)
+				v17.user_vote = v21 ~= 0
+			elseif v19 == 2 then
+				local v22
+
+				v22, n2 = proto.readVarInt(p2, n2)
+				v17.can_vote = v22 ~= 0
+			else
+				local v23
+
+				v23, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v20 == proto.wireTypes.lengthDelimited then
+			if v19 == 3 then
+				local v24
+
+				v24, n2 = proto.readBuffer(p2, n2)
+				v17.reason_for_not_voteable = buffer.tostring(v24)
+			else
+				local v25, v26 = proto.readVarInt(p2, n2)
+
+				n2 = v26 + v25
+			end
+		elseif v20 == proto.wireTypes.i32 then
+			local v27
+
+			v27, n2 = proto.readFixed32(p2, n2)
+		elseif v20 == proto.wireTypes.i64 then
+			local v28
+
+			v28, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v20)
+		end
+	end
+
+	return v17
+end
+function t2.jsonEncode(p3) -- line: 133
+	local t4 = {}
+
+	if p3.user_vote ~= nil then
+		t4.userVote = p3.user_vote
+	end
+
+	if p3.can_vote then
+		t4.canVote = p3.can_vote
+	end
+
+	if p3.reason_for_not_voteable ~= nil and p3.reason_for_not_voteable ~= "" then
+		t4.reasonForNotVoteable = p3.reason_for_not_voteable
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 151
+	-- upvalues: t2 (copy)
+	local v32 = t2.new()
+
+	if t5.user_vote ~= nil then
+		v32.user_vote = t5.user_vote
+	end
+
+	if t5.userVote ~= nil then
+		v32.user_vote = t5.userVote
+	end
+
+	if t5.can_vote ~= nil then
+		v32.can_vote = t5.can_vote
+	end
+
+	if t5.canVote ~= nil then
+		v32.can_vote = t5.canVote
+	end
+
+	if t5.reason_for_not_voteable ~= nil then
+		v32.reason_for_not_voteable = t5.reason_for_not_voteable
+	end
+
+	if t5.reasonForNotVoteable ~= nil then
+		v32.reason_for_not_voteable = t5.reasonForNotVoteable
+	end
+
+	return v32
+end
+
+t2.descriptor = {
+	name = "UniverseUserVoteData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.UniverseUserVoteData"
+}
+t1.UniverseUserVoteData = t2
+typeRegistry.default:register(t1.UniverseUserVoteData)
+
 return {
-    UniverseUserVoteData = v2.UniverseUserVoteData
-};
+	UniverseUserVoteData = t1.UniverseUserVoteData
+}

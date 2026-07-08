@@ -1,3 +1,3 @@
 return {
-    useTTIRenderAndMountedTracking = require(script.useTTIRenderAndMountedTracking)
-};
+	useTTIRenderAndMountedTracking = require(script.useTTIRenderAndMountedTracking)
+}

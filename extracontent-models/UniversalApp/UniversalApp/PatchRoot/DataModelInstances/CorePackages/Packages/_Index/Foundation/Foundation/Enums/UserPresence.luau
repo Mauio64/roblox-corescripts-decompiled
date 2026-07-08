@@ -1,6 +1,6 @@
 return {
-    None = "None", 
-    Active = "Active", 
-    Away = "Away", 
-    InExperience = "InExperience"
-};
+	None = "None",
+	Active = "Active",
+	Away = "Away",
+	InExperience = "InExperience"
+}

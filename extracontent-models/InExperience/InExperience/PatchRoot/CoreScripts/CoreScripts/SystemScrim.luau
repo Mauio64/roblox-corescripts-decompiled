@@ -1,2 +1,3 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-require(l_CorePackages_0.Workspace.Packages.SystemScrim).renderSystemScrim();
+local CorePackages = game:GetService("CorePackages")
+
+require(CorePackages.Workspace.Packages.SystemScrim).renderSystemScrim()

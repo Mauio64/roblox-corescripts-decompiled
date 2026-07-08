@@ -115,25 +115,25 @@ end
 function t1.reportClosedNudge(t7: {[any]: any}, n4: number, s5: string) -- line: 239
 	t7._impl:ReportCounter("voicechat-closednudge", 1)
 	t7._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "CLOSED",
 		userId = n4,
-		voiceSessionId = s5,
-		closeType = "CLOSED"
+		voiceSessionId = s5
 	})
 end
 function t1.reportAcknowledgedNudge(t8: {[any]: any}, n5: number, s6: string) -- line: 248
 	t8._impl:ReportCounter("voicechat-acknowledgednudge", 1)
 	t8._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "ACKNOWLEDGED",
 		userId = n5,
-		voiceSessionId = s6,
-		closeType = "ACKNOWLEDGED"
+		voiceSessionId = s6
 	})
 end
 function t1.reportDeniedNudge(t9: {[any]: any}, n6: number, s7: string) -- line: 257
 	t9._impl:ReportCounter("voicechat-deniednudge", 1)
 	t9._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "DENIED",
 		userId = n6,
-		voiceSessionId = s7,
-		closeType = "DENIED"
+		voiceSessionId = s7
 	})
 end
 function t1.reportVoiceMuteIndividual(t10: {[any]: any}, t11: {[any]: any}) -- line: 266
@@ -186,26 +186,26 @@ function t1.reportJoinVoiceButtonEventWithVoiceSessionId(t17: {[any]: any}, s12:
 		buttonConsequence = s16
 	})
 end
-function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, p14, s17: string, b1: boolean, s18: string?, s19: string?) -- line: 336
+function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, s17: string, s18: string, b1: boolean, s19: string?, s20: string?) -- line: 336
 	-- upvalues: SessionService (copy), TelemetryService (copy)
 	local t19 = {
-		eventName = "joinVoiceUpsell" .. p14,
+		description = "Event fired when user sees or interacts with Join Voice button",
+		links = "https://github.rbx.com/Roblox/proto-schemas/pull/8530",
+		eventName = "joinVoiceUpsell" .. s17,
 		backends = { "EventIngest" },
 		throttlingPercentage = game:GetFastInt("LuaVoiceChatThrottleHundrethsPercent"),
 		lastUpdated = {
 			2025,
 			10,
 			30
-		},
-		description = "Event fired when user sees or interacts with Join Voice button",
-		links = "https://github.rbx.com/Roblox/proto-schemas/pull/8530"
+		}
 	}
 	local t20 = {
 		user_is_age_verified = b1,
-		button_context = s18,
-		button_consequence = s19,
+		button_context = s19,
+		button_consequence = s20,
 		clientTimeStamp = DateTime.now().UnixTimestampMillis,
-		playSessionId = s17,
+		playSessionId = s18,
 		sd_platform_id = SessionService:GetSessionID("level0"),
 		sd_logged_in_id = SessionService:GetSessionID("level1")
 	}
@@ -219,40 +219,40 @@ function t1.reportJoinVoiceUpsellEvent(_: {[any]: any}, p14, s17: string, b1: bo
 		}
 	})
 end
-function t1.reportLeaveVoiceButtonEvent(t21: {[any]: any}, s20: string, n11: number, n12: number, s21: string, s22: string) -- line: 369
+function t1.reportLeaveVoiceButtonEvent(t21: {[any]: any}, s21: string, n11: number, n12: number, s22: string, s23: string) -- line: 369
 	t21._impl:SendEventDeferred("client", "voice", "leaveVoiceButtonEvent", {
-		eventType = s20,
+		eventType = s21,
 		universeId = n11,
 		placeId = n12,
-		playSessionId = s21,
-		voiceSessionId = s22
+		playSessionId = s22,
+		voiceSessionId = s23
 	})
 end
-function t1.reportInExpConsent(t22: {[any]: any}, s23: string, s24: string, n13: number, n14: number, s25: string) -- line: 385
+function t1.reportInExpConsent(t22: {[any]: any}, s24: string, s25: string, n13: number, n14: number, s26: string) -- line: 385
 	t22._impl:SendEventDeferred("client", "voiceChat", "inExpConsentModalEvent", {
-		eventType = s23,
-		entry = s24,
+		eventType = s24,
+		entry = s25,
 		universeId = n13,
 		placeId = n14,
-		playSessionId = s25
+		playSessionId = s26
 	})
 end
-function t1.reportDevicePermissionsModalEvent(t23: {[any]: any}, s26: string, s27: string, n15: number, n16: number, s28: string) -- line: 401
-	local v90 = string.sub(s28, 2, #s28 - 1)
+function t1.reportDevicePermissionsModalEvent(t23: {[any]: any}, s27: string, s28: string, n15: number, n16: number, s29: string) -- line: 401
+	local v90 = string.sub(s29, 2, #s29 - 1)
 
 	t23._impl:SendEventDeferred("client", "voiceChat", "devicePermissionsModalEvent", {
-		eventType = s26,
+		eventType = s27,
 		universeId = n15,
 		placeId = n16,
 		playSessionId = v90,
-		voiceSessionId = s27
+		voiceSessionId = s28
 	})
 end
-function t1.reportConnectDisconnectEvents(p15, p16, p17) -- line: 420
-	p15._impl:SendEventDeferred("client", "voiceChat", p16, p17)
+function t1.reportConnectDisconnectEvents(p14, p15, p16) -- line: 420
+	p14._impl:SendEventDeferred("client", "voiceChat", p15, p16)
 end
-function t1.reportVoiceEvents(p18, p19, p20) -- line: 424
-	p18._impl:SendEventDeferred("client", "voice", p19, p20)
+function t1.reportVoiceEvents(p17, p18, p19) -- line: 424
+	p17._impl:SendEventDeferred("client", "voice", p18, p19)
 end
 
 return t1

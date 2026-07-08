@@ -1,3 +1,3 @@
 return {
-    useLaunchContext = require(script.useLaunchContext)
-};
+	useLaunchContext = require(script.useLaunchContext)
+}

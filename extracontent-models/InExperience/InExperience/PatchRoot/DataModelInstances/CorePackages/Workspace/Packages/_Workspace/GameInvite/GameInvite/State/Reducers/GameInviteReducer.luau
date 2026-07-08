@@ -1,19 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("GameInvite").Parent;
-local l_Parent_1 = script.Parent;
-local l_UserReducer_0 = require(l_Parent_0.UserLib).Reducers.UserReducer;
-local v3 = require(l_Parent_0.Rodux);
-local v4 = require(l_Parent_0.LegacyFriendsRodux);
-local l_ReducerDependencies_0 = require(l_Parent_0.NotificationsCommon).ReducerDependencies;
-local l_FriendCount_0 = v4.Reducers.FriendCount;
-local v7 = require(l_Parent_1.Invites);
-local l_RoduxNetworking_0 = l_ReducerDependencies_0.RoduxNetworking;
-local l_ShareLinksRodux_0 = l_ReducerDependencies_0.ShareLinksRodux;
-local v10 = l_RoduxNetworking_0.installReducer();
-local v11 = l_ShareLinksRodux_0.installReducer();
-return v3.combineReducers({
-    FriendCount = l_FriendCount_0, 
-    GameInvitesStatus = v7, 
-    Users = l_UserReducer_0, 
-    ShareLinks = v11, 
-    NetworkStatus = v10
-});
+local Parent = script:FindFirstAncestor("GameInvite").Parent
+local scriptParent = script.Parent
+local UserReducer = require(Parent.UserLib).Reducers.UserReducer
+local Rodux = require(Parent.Rodux)
+local LegacyFriendsRodux = require(Parent.LegacyFriendsRodux)
+local ReducerDependencies = require(Parent.NotificationsCommon).ReducerDependencies
+local FriendCount = LegacyFriendsRodux.Reducers.FriendCount
+local Invites = require(scriptParent.Invites)
+local RoduxNetworking = ReducerDependencies.RoduxNetworking
+local ShareLinksRodux = ReducerDependencies.ShareLinksRodux
+local v11 = RoduxNetworking.installReducer()
+local v12 = ShareLinksRodux.installReducer()
+
+return Rodux.combineReducers({
+	FriendCount = FriendCount,
+	GameInvitesStatus = Invites,
+	Users = UserReducer,
+	ShareLinks = v12,
+	NetworkStatus = v11
+})

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfileContextualMenuDisableFix", false);
+return game:DefineFastFlag("ProfileContextualMenuDisableFix", false)

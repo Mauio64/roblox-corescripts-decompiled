@@ -1,72 +1,78 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Cryo);
-local v3 = require(l_Parent_1.React);
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local v5 = require(l_Parent_0.Core.Control.InteractableList);
-local v6 = require(l_Parent_0.Core.Control.Enum.SelectionMode);
-local v7 = require(l_Parent_0.App.SelectionCursor.useCursor);
-local v8 = require(script.Parent.IconTab);
-local v9 = require(script.Parent.HorizontalContainer);
-local _ = require(script.Parent.Types);
-local v11 = require(script.Parent.Constants);
-local v12 = {
-    selection = {
-        1
-    }, 
-    items = {}, 
-    padding = {
-        left = v11.ICON_TAB_PADDING, 
-        right = v11.ICON_TAB_PADDING
-    }, 
-    itemSpacing = UDim.new(0, v11.ICON_TAB_ITEM_SPACING), 
-    itemPadding = {
-        left = v11.ICON_TAB_ITEM_PADDING_LEFT, 
-        right = v11.ICON_TAB_ITEM_PADDING_RIGHT
-    }
-};
-return function(v13) --[[ Line: 43 ]] --[[ Name: IconTabGroup ]]
-    -- upvalues: l_Object_0 (copy), v12 (copy), v7 (copy), v9 (copy), v11 (copy), v3 (copy), v5 (copy), v2 (copy), v8 (copy), v6 (copy)
-    local v14 = l_Object_0.assign({}, v12, v13);
-    local v15 = v7(UDim.new(0.5, 0), 0);
-    return v9({
-        size = UDim2.new(0, 0, 0, v11.ICON_TAB_GROUP_HEIGHT), 
-        showRoundedBackground = false, 
-        automaticSize = Enum.AutomaticSize.X, 
-        padding = v14.padding
-    }, {
-        MainTabList = v3.createElement(v5, {
-            size = UDim2.new(0, 0, 1, 0), 
-            automaticSize = Enum.AutomaticSize.X, 
-            fillDirection = Enum.FillDirection.Horizontal, 
-            horizontalAlignment = Enum.HorizontalAlignment.Left, 
-            sortOrder = Enum.SortOrder.LayoutOrder, 
-            itemList = v14.items, 
-            itemSize = UDim2.fromScale(0, 0), 
-            renderItem = function(v16, v17, v18) --[[ Line: 60 ]] --[[ Name: renderItem ]]
-                -- upvalues: v2 (ref), v14 (copy), v15 (copy), v3 (ref), v8 (ref)
-                local v19 = {
-                    LayoutOrder = v2.List.find(v14.items, v16), 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    SelectionImageObject = v15
-                };
-                return v3.createElement(v8, {
-                    item = v16, 
-                    selected = v18, 
-                    controlState = v17, 
-                    padding = v14.itemPadding
-                }), v19;
-            end, 
-            onSelectionChanged = function(v20) --[[ Line: 75 ]] --[[ Name: onSelectionChanged ]]
-                -- upvalues: v14 (copy)
-                local v21 = v14.items[v20[1]];
-                if v21 ~= nil and v21.onActivated ~= nil then
-                    v21.onActivated();
-                end;
-            end, 
-            selection = v14.selection, 
-            selectionMode = v6.Single, 
-            padding = v14.itemSpacing
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Cryo = require(ParentParentParent.Cryo)
+local React = require(ParentParentParent.React)
+local Object = require(ParentParentParent.LuauPolyfill).Object
+local InteractableList = require(ParentParent.Core.Control.InteractableList)
+local SelectionMode = require(ParentParent.Core.Control.Enum.SelectionMode)
+local useCursor = require(ParentParent.App.SelectionCursor.useCursor)
+local IconTab = require(script.Parent.IconTab)
+local HorizontalContainer = require(script.Parent.HorizontalContainer)
+
+require(script.Parent.Types)
+
+local Constants = require(script.Parent.Constants)
+local t1 = {
+	selection = { 1 },
+	items = {},
+	padding = {
+		left = Constants.ICON_TAB_PADDING,
+		right = Constants.ICON_TAB_PADDING
+	},
+	itemSpacing = UDim.new(0, Constants.ICON_TAB_ITEM_SPACING),
+	itemPadding = {
+		left = Constants.ICON_TAB_ITEM_PADDING_LEFT,
+		right = Constants.ICON_TAB_ITEM_PADDING_RIGHT
+	}
+}
+
+local function IconTabGroup(p1) -- line: 43
+	-- upvalues: Object (copy), t1 (copy), useCursor (copy), HorizontalContainer (copy), Constants (copy), React (copy), InteractableList (copy), Cryo (copy), IconTab (copy), SelectionMode (copy)
+	local v15 = Object.assign({}, t1, p1)
+	local v16 = useCursor(UDim.new(0.5, 0), 0)
+
+	return HorizontalContainer({
+		showRoundedBackground = false,
+		size = UDim2.new(0, 0, 0, Constants.ICON_TAB_GROUP_HEIGHT),
+		automaticSize = Enum.AutomaticSize.X,
+		padding = v15.padding
+	}, {
+		MainTabList = React.createElement(InteractableList, {
+			size = UDim2.new(0, 0, 1, 0),
+			automaticSize = Enum.AutomaticSize.X,
+			fillDirection = Enum.FillDirection.Horizontal,
+			horizontalAlignment = Enum.HorizontalAlignment.Left,
+			sortOrder = Enum.SortOrder.LayoutOrder,
+			itemList = v15.items,
+			itemSize = UDim2.fromScale(0, 0),
+			renderItem = function(p2, p3, b1: boolean) -- line: 60
+				-- upvalues: Cryo (copy), v15 (copy), v16 (copy), React (copy), IconTab (copy)
+				local t2 = {
+					LayoutOrder = Cryo.List.find(v15.items, p2),
+					AutomaticSize = Enum.AutomaticSize.XY,
+					SelectionImageObject = v16
+				}
+
+				return React.createElement(IconTab, {
+					item = p2,
+					selected = b1,
+					controlState = p3,
+					padding = v15.itemPadding
+				}), t2
+			end,
+			onSelectionChanged = function(p4) -- line: 75
+				-- upvalues: v15 (copy)
+				local v22 = v15.items[p4[1]]
+
+				if v22 ~= nil and v22.onActivated ~= nil then
+					v22.onActivated()
+				end
+			end,
+			selection = v15.selection,
+			selectionMode = SelectionMode.Single,
+			padding = v15.itemSpacing
+		})
+	})
+end
+
+return IconTabGroup

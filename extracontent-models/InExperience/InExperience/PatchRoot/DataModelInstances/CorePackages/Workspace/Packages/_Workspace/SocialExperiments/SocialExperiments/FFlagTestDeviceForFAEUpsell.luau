@@ -1,1 +1,1 @@
-return game:DefineFastFlag("TestDeviceForFAEUpsell", false);
+return game:DefineFastFlag("TestDeviceForFAEUpsell", false)

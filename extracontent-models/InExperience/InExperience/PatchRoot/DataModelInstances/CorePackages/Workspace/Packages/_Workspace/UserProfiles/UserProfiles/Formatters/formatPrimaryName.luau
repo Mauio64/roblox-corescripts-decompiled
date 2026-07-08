@@ -1,12 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("UserProfiles").Parent;
-local v1 = require(l_Parent_0.VerifiedBadges);
-return function(v2, v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    if v3.hasVerifiedBadge then
-        return (("%*%*"):format(v2, v1.emoji.verified));
-    elseif v3.hasPremiumMembership then
-        return (("%*%*"):format(v2, v1.emoji.premium));
-    else
-        return v2;
-    end;
-end;
+local Parent = script:FindFirstAncestor("UserProfiles").Parent
+local VerifiedBadges = require(Parent.VerifiedBadges)
+
+return function(s1: string, t1: {[any]: any}) -- line: 6
+	-- upvalues: VerifiedBadges (copy)
+	if t1.hasVerifiedBadge then
+		return `{ s1 }{ VerifiedBadges.emoji.verified }`
+	end
+
+	if t1.hasPremiumMembership then
+		return `{ s1 }{ VerifiedBadges.emoji.premium }`
+	end
+
+	return s1
+end

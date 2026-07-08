@@ -1,122 +1,137 @@
-local v0 = require(script.Parent.CoreScriptsProfiler);
-local v1 = require(script.Parent.ProfilerDataParser);
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_Parent_0 = script:FindFirstAncestor("CoreScriptsProfiler").Parent;
-local l_DeviceTier_0 = require(l_Parent_0.Devices).DeviceTier;
-game:DefineFastInt("CoreScriptsProfilerSamplingHundredthsPercentv1", 0);
-local v5 = game:DefineFastInt("CoreScriptsProfilerDelaySeconds", 5);
-local v6 = game:DefineFastInt("CoreScriptsProfilerDurationSeconds", 10);
-local v7 = game:DefineFastInt("CoreScriptsProfilerTelemetryLimit", 20);
+local CoreScriptsProfiler = require(script.Parent.CoreScriptsProfiler)
+local ProfilerDataParser = require(script.Parent.ProfilerDataParser)
+local TelemetryService = game:GetService("TelemetryService")
+local Parent = script:FindFirstAncestor("CoreScriptsProfiler").Parent
+local DeviceTier = require(Parent.Devices).DeviceTier
+
+game:DefineFastInt("CoreScriptsProfilerSamplingHundredthsPercentv1", 0)
+
+local v6 = game:DefineFastInt("CoreScriptsProfilerDelaySeconds", 5)
+local v7 = game:DefineFastInt("CoreScriptsProfilerDurationSeconds", 10)
+local v8 = game:DefineFastInt("CoreScriptsProfilerTelemetryLimit", 20)
+
 if not (math.random(0, 10000) <= game:GetFastInt("CoreScriptsProfilerSamplingHundredthsPercentv1")) then
-    return nil;
-else
-    local v8 = {
-        eventName = "CorescriptPackageStats", 
-        backends = {
-            "RobloxTelemetryStat"
-        }, 
-        lastUpdated = {
-            2025, 
-            11, 
-            25
-        }, 
-        description = "Task stats for each corescript package, all in milliseconds", 
-        links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/4084400405/Lua+time+break-down+CoreScriptsProfiler"
-    };
-    local v9 = {};
-    v9.__index = v9;
-    v9.new = function(v10) --[[ Line: 50 ]] --[[ Name: new ]]
-        -- upvalues: v9 (copy)
-        return (setmetatable({
-            profiler = nil, 
-            profilingActive = false, 
-            context = v10
-        }, v9));
-    end;
-    v9.start = function(v11) --[[ Line: 61 ]] --[[ Name: start ]]
-        -- upvalues: v0 (copy), v5 (copy)
-        v11.profiler = v0.new(function(_, v13) --[[ Line: 63 ]]
-            -- upvalues: v11 (copy)
-            v11:reportResults(v13);
-            v11:cleanup();
-        end);
-        task.delay(v5, function() --[[ Line: 69 ]]
-            -- upvalues: v11 (copy)
-            v11:startProfilingSession();
-        end);
-    end;
-    v9.startProfilingSession = function(v14) --[[ Line: 74 ]] --[[ Name: startProfilingSession ]]
-        -- upvalues: v6 (copy)
-        if v14.profilingActive then
-            return;
-        elseif not v14.profiler then
-            return;
-        else
-            v14.profilingActive = true;
-            v14.profiler:ClientStart();
-            task.delay(v6, function() --[[ Line: 86 ]]
-                -- upvalues: v14 (copy)
-                v14:stopProfilingSession();
-            end);
-            return;
-        end;
-    end;
-    v9.stopProfilingSession = function(v15) --[[ Line: 92 ]] --[[ Name: stopProfilingSession ]]
-        if not v15.profilingActive then
-            return;
-        elseif not v15.profiler then
-            return;
-        else
-            v15.profiler:ClientStop();
-            v15.profilingActive = false;
-            return;
-        end;
-    end;
-    local function v22(v16) --[[ Line: 107 ]] --[[ Name: sortPackageStatsByDuration ]]
-        local v17 = {};
-        for v18, v19 in v16 do
-            table.insert(v17, {
-                packageName = v18, 
-                count = v19.count, 
-                totalDuration = v19.totalDuration
-            });
-        end;
-        table.sort(v17, function(v20, v21) --[[ Line: 120 ]]
-            return v20.totalDuration > v21.totalDuration;
-        end);
-        return v17;
-    end;
-    v9.reportResults = function(v23, v24) --[[ Line: 128 ]] --[[ Name: reportResults ]]
-        -- upvalues: v1 (copy), v22 (copy), v7 (copy), l_DeviceTier_0 (copy), l_TelemetryService_0 (copy), v8 (copy)
-        local v25 = v1.new(v24):getPackageStatistics();
-        local v26 = v22(v25);
-        local v27 = math.min(#v26, v7);
-        local v28 = l_DeviceTier_0.GetDeviceMemoryTier();
-        for v29 = 1, v27 do
-            local v30 = v26[v29];
-            local v31 = {
-                packageName = v30.packageName, 
-                context = v23.context, 
-                deviceTier = v28
-            };
-            l_TelemetryService_0:LogStat(v8, {
-                customFields = v31
-            }, v30.totalDuration * 1000);
-        end;
-    end;
-    v9.cleanup = function(v32) --[[ Line: 157 ]] --[[ Name: cleanup ]]
-        if v32.profiler then
-            v32.profiler:Disconnect();
-            v32.profiler = nil;
-            v32.profilingActive = false;
-        end;
-    end;
-    local v33 = nil;
-    return function(v34) --[[ Line: 167 ]]
-        -- upvalues: v33 (ref), v9 (copy)
-        if not v33 then
-            v33 = v9.new(v34);
-        end;
-        return v33;
-    end;
-end;
+	return nil
+end
+
+local t1 = {
+	eventName = "CorescriptPackageStats",
+	description = "Task stats for each corescript package, all in milliseconds",
+	links = "https://roblox.atlassian.net/wiki/spaces/APEX/pages/4084400405/Lua+time+break-down+CoreScriptsProfiler",
+	backends = { "RobloxTelemetryStat" },
+	lastUpdated = {
+		2025,
+		11,
+		25
+	}
+}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(s1: string?) -- line: 50
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		profiler = nil,
+		profilingActive = false,
+		context = s1
+	}, t2))
+end
+function t2.start(p1) -- line: 61
+	-- upvalues: CoreScriptsProfiler (copy), v6 (copy)
+	p1.profiler = CoreScriptsProfiler.new(function(_: boolean, s2: string) -- line: 63
+		-- upvalues: p1 (copy)
+		p1:reportResults(s2)
+		p1:cleanup()
+	end)
+	task.delay(v6, function() -- line: 69
+		-- upvalues: p1 (copy)
+		p1:startProfilingSession()
+	end)
+end
+function t2.startProfilingSession(p2) -- line: 74
+	-- upvalues: v7 (copy)
+	if p2.profilingActive then
+		return
+	end
+
+	if not p2.profiler then
+		return
+	end
+
+	p2.profilingActive = true
+	p2.profiler:ClientStart()
+	task.delay(v7, function() -- line: 86
+		-- upvalues: p2 (copy)
+		p2:stopProfilingSession()
+	end)
+end
+function t2.stopProfilingSession(p3) -- line: 92
+	if not p3.profilingActive then
+		return
+	end
+
+	if not p3.profiler then
+		return
+	end
+
+	p3.profiler:ClientStop()
+	p3.profilingActive = false
+end
+
+local function sortPackageStatsByDuration(t3: {[any]: any}) -- line: 107
+	local t4 = {}
+
+	for v19, v20 in t3 do
+		table.insert(t4, {
+			packageName = v19,
+			count = v20.count,
+			totalDuration = v20.totalDuration
+		})
+	end
+
+	table.sort(t4, function(p4, p5) -- line: 120
+		return p4.totalDuration > p5.totalDuration
+	end)
+
+	return t4
+end
+
+function t2.reportResults(t5: {[any]: any}, s3: string) -- line: 128
+	-- upvalues: ProfilerDataParser (copy), sortPackageStatsByDuration (copy), v8 (copy), DeviceTier (copy), TelemetryService (copy), t1 (copy)
+	local v23 = ProfilerDataParser.new(s3):getPackageStatistics()
+	local v24 = sortPackageStatsByDuration(v23)
+	local v25 = math.min(#v24, v8)
+	local v26 = DeviceTier.GetDeviceMemoryTier()
+
+	for i = 1, v25 do
+		local v28 = v24[i]
+		local t6 = {
+			packageName = v28.packageName,
+			context = t5.context,
+			deviceTier = v26
+		}
+
+		TelemetryService:LogStat(t1, {
+			customFields = t6
+		}, v28.totalDuration * 1000)
+	end
+end
+function t2.cleanup(p6) -- line: 157
+	if p6.profiler then
+		p6.profiler:Disconnect()
+		p6.profiler = nil
+		p6.profilingActive = false
+	end
+end
+
+local u12 = nil
+
+return function(s4: string?) -- line: 167
+	-- upvalues: u12 (ref), t2 (copy)
+	if not u12 then
+		u12 = t2.new(s4)
+	end
+
+	return u12
+end

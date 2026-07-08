@@ -1,13 +1,14 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.AppChatNetworking);
-local v2 = require(script.Parent.Parent.parseNewConversationResponse);
-return function(v3, v4, v5) --[[ Line: 7 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return function(v6) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), v3 (copy), v4 (copy), v2 (ref), v5 (copy)
-        return v6:dispatch(v1.rodux.ExpandToGroupConversation.API(v3, v4)):andThen(function(v7) --[[ Line: 11 ]]
-            -- upvalues: v2 (ref), v5 (ref)
-            return v2(v7.responseBody.new_conversation, v5, "userExpandedToGroupConversation");
-        end);
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local AppChatNetworking = require(Parent.AppChatNetworking)
+local parseNewConversationResponse = require(script.Parent.Parent.parseNewConversationResponse)
+
+return function(s1: string, t1: {[any]: any}, p1) -- line: 7
+	-- upvalues: AppChatNetworking (copy), parseNewConversationResponse (copy)
+	return function(p2) -- line: 8
+		-- upvalues: AppChatNetworking (copy), s1 (copy), t1 (copy), parseNewConversationResponse (copy), p1 (copy)
+		return p2:dispatch(AppChatNetworking.rodux.ExpandToGroupConversation.API(s1, t1)):andThen(function(p3) -- line: 11
+			-- upvalues: parseNewConversationResponse (copy), p1 (copy)
+			return parseNewConversationResponse(p3.responseBody.new_conversation, p1, "userExpandedToGroupConversation")
+		end)
+	end
+end

@@ -1,35 +1,30 @@
-local v0 = nil;
-local v1 = false;
-local v2 = true;
-local function v3() --[[ Line: 25 ]]
-    -- upvalues: v0 (ref)
-    return v0;
-end;
-local function v5(v4) --[[ Line: 29 ]]
-    -- upvalues: v0 (ref)
-    v0 = v4;
-end;
-local function v6() --[[ Line: 33 ]]
-    -- upvalues: v1 (ref)
-    return v1;
-end;
-local function v8(v7) --[[ Line: 37 ]]
-    -- upvalues: v1 (ref)
-    v1 = v7;
-end;
-local function v9() --[[ Line: 41 ]]
-    -- upvalues: v2 (ref)
-    return v2;
-end;
-local function v11(v10) --[[ Line: 45 ]]
-    -- upvalues: v2 (ref)
-    v2 = v10;
-end;
+local u1 = nil
+local u2 = false
+local u3 = true
+
 return {
-    getAvatarLastEquippedState = v3, 
-    setAvatarLastEquippedState = v5, 
-    getChangedLayeredMakeupSorting = v6, 
-    setChangedLayeredMakeupSorting = v8, 
-    getShouldRevertLastEquippedState = v9, 
-    setShouldRevertLastEquippedState = v11
-};
+	getAvatarLastEquippedState = function() -- line: 25
+		-- upvalues: u1 (ref)
+		return u1
+	end,
+	setAvatarLastEquippedState = function(t1: {[any]: any}) -- line: 29
+		-- upvalues: u1 (ref)
+		u1 = t1
+	end,
+	getChangedLayeredMakeupSorting = function() -- line: 33
+		-- upvalues: u2 (ref)
+		return u2
+	end,
+	setChangedLayeredMakeupSorting = function(b1: boolean) -- line: 37
+		-- upvalues: u2 (ref)
+		u2 = b1
+	end,
+	getShouldRevertLastEquippedState = function() -- line: 41
+		-- upvalues: u3 (ref)
+		return u3
+	end,
+	setShouldRevertLastEquippedState = function(b2: boolean) -- line: 45
+		-- upvalues: u3 (ref)
+		u3 = b2
+	end
+}

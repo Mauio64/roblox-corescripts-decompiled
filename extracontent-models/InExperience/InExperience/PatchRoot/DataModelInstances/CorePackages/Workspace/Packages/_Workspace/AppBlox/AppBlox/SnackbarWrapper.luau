@@ -1,68 +1,71 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.Foundation);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactUtils);
-local l_Snackbar_0 = v1.Snackbar;
-local l_useScaledValue_0 = v1.Hooks.useScaledValue;
-local l_useSelector_0 = v3.Hooks.RoactRodux.useSelector;
-return v2.memo(function(v7) --[[ Line: 39 ]] --[[ Name: SnackbarWrapper ]]
-    -- upvalues: v2 (copy), l_useSelector_0 (copy), l_useScaledValue_0 (copy), l_Snackbar_0 (copy)
-    v2.useEffect(function() --[[ Line: 41 ]]
-        -- upvalues: v7 (copy)
-        local v8 = nil;
-        if v7.autoDismissDelaySeconds then
-            v8 = task.delay(v7.autoDismissDelaySeconds, v7.closeSnackbar);
-        end;
-        return function() --[[ Line: 48 ]]
-            -- upvalues: v8 (ref)
-            if v8 then
-                task.cancel(v8);
-                v8 = nil;
-            end;
-        end;
-    end, {
-        v7.closeSnackbar, 
-        v7.autoDismissDelaySeconds
-    });
-    local v11 = v2.useCallback(function(_, v10) --[[ Line: 56 ]]
-        -- upvalues: v7 (copy)
-        if v10 == Enum.SwipeDirection.Up then
-            v7.closeSnackbar();
-        end;
-    end, {
-        v7.closeSnackbar
-    });
-    local v12 = if v7.buttonText and v7.onButtonActivated then {
-        text = v7.buttonText, 
-        onActivated = v7.onButtonActivated
-    } else nil;
-    local v14 = l_useSelector_0(function(v13) --[[ Line: 68 ]]
-        return v13.GlobalGuiInset or {
-            left = 0, 
-            top = 0, 
-            right = 0, 
-            bottom = 0
-        };
-    end);
-    local v16 = l_useSelector_0(function(v15) --[[ Line: 77 ]]
-        return v15.TopBar.statusBarHeight;
-    end);
-    local v17 = l_useScaledValue_0(20);
-    local v18 = v7.Position or UDim2.new(0.5, 0, 0, v17 + v14.top + v16);
-    return v2.createElement("Frame", {
-        AnchorPoint = v7.AnchorPoint or Vector2.new(0.5, 0), 
-        Position = v18, 
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        BackgroundTransparency = 1, 
-        Selectable = false, 
-        Active = true, 
-        [v2.Event.TouchSwipe] = v11
-    }, {
-        v2.createElement(l_Snackbar_0, {
-            title = v7.titleText, 
-            icon = v7.icon, 
-            action = v12, 
-            onClose = if v7.hideCloseAffordance then nil else v7.closeSnackbar
-        })
-    });
-end);
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local Foundation = require(Parent.Foundation)
+local React = require(Parent.React)
+local RoactUtils = require(Parent.RoactUtils)
+local Snackbar = Foundation.Snackbar
+local useScaledValue = Foundation.Hooks.useScaledValue
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local function SnackbarWrapper(t1: {[any]: any}) -- line: 39
+	-- upvalues: React (copy), useSelector (copy), useScaledValue (copy), Snackbar (copy)
+	React.useEffect(function() -- line: 41
+		-- upvalues: t1 (copy)
+		local thread = nil
+
+		if t1.autoDismissDelaySeconds then
+			thread = task.delay(t1.autoDismissDelaySeconds, t1.closeSnackbar)
+		end
+
+		return function() -- line: 48
+			-- upvalues: thread (ref)
+			if thread then
+				task.cancel(thread)
+				thread = nil
+			end
+		end
+	end, {
+		t1.closeSnackbar,
+		t1.autoDismissDelaySeconds
+	})
+
+	local v10 = React.useCallback(function(_, p2) -- line: 56
+		-- upvalues: t1 (copy)
+		if p2 == Enum.SwipeDirection.Up then
+			t1.closeSnackbar()
+		end
+	end, { t1.closeSnackbar })
+	local v11 = if not t1.buttonText or not t1.onButtonActivated then nil else {
+		text = t1.buttonText,
+		onActivated = t1.onButtonActivated
+	}
+	local v12 = useSelector(function(p3) -- line: 68
+		return p3.GlobalGuiInset or {
+			left = 0,
+			top = 0,
+			right = 0,
+			bottom = 0
+		}
+	end)
+	local v13 = useSelector(function(p4) -- line: 77
+		return p4.TopBar.statusBarHeight
+	end)
+	local v14 = useScaledValue(20)
+	local v15 = t1.Position or UDim2.new(0.5, 0, 0, v14 + v12.top + v13)
+
+	return React.createElement("Frame", {
+		AnchorPoint = t1.AnchorPoint or Vector2.new(0.5, 0),
+		Position = v15,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		BackgroundTransparency = 1,
+		Selectable = false,
+		Active = true,
+		[React.Event.TouchSwipe] = v10
+	}, { React.createElement(Snackbar, {
+		title = t1.titleText,
+		icon = t1.icon,
+		action = v11,
+		onClose = if not t1.hideCloseAffordance then t1.closeSnackbar else nil
+	}) })
+end
+
+return React.memo(SnackbarWrapper)

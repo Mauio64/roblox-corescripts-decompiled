@@ -1,48 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("MediaPlayback");
-local v1 = require(l_script_FirstAncestor_0.Parent.Signals);
-local _ = require(l_script_FirstAncestor_0.Stores.getAudioPlaybackStore.types);
-local l_createSignal_0 = v1.createSignal;
-return function() --[[ Line: 9 ]] --[[ Name: createPlaylistStore ]]
-    -- upvalues: l_createSignal_0 (copy)
-    local v4, v5 = l_createSignal_0({});
-    local v6, v7 = l_createSignal_0({});
-    local function _(v8, v9) --[[ Line: 13 ]] --[[ Name: getRelativeIndex ]]
-        -- upvalues: v6 (copy), v4 (copy)
-        local v10 = v6(false)[tostring(v8)];
-        if v10 then
-            return v4(false)[v10 + v9];
-        else
-            return nil;
-        end;
-    end;
-    return {
-        get = v4, 
-        set = function(v12) --[[ Line: 22 ]] --[[ Name: set ]]
-            -- upvalues: v5 (copy), v7 (copy)
-            v5(v12);
-            local v13 = {};
-            for v14, v15 in v12 do
-                v13[tostring(v15)] = v14;
-            end;
-            v7(v13);
-        end, 
-        getNext = function(v16) --[[ Line: 32 ]] --[[ Name: getNext ]]
-            -- upvalues: v6 (copy), v4 (copy)
-            local v17 = v6(false)[tostring(v16)];
-            if v17 then
-                return v4(false)[v17 + 1];
-            else
-                return nil;
-            end;
-        end, 
-        getPrev = function(v18) --[[ Line: 36 ]] --[[ Name: getPrev ]]
-            -- upvalues: v6 (copy), v4 (copy)
-            local v19 = v6(false)[tostring(v18)];
-            if v19 then
-                return v4(false)[v19 + -1];
-            else
-                return nil;
-            end;
-        end
-    };
-end;
+local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+local Signals = require(MediaPlayback.Parent.Signals)
+
+require(MediaPlayback.Stores.getAudioPlaybackStore.types)
+
+local createSignal = Signals.createSignal
+
+local function createPlaylistStore() -- line: 9
+	-- upvalues: createSignal (copy)
+	local v5, v6 = createSignal({})
+	local v7, v8 = createSignal({})
+
+	local function getRelativeIndex(p1, n1: number) -- line: 13
+		-- upvalues: v7 (copy), v5 (copy)
+		local v12 = v7(false)[tostring(p1)]
+
+		if v12 then
+			return v5(false)[v12 + n1]
+		end
+
+		return nil
+	end
+
+	return {
+		get = v5,
+		set = function(t1: {[any]: any}) -- line: 22
+			-- upvalues: v6 (copy), v8 (copy)
+			v6(t1)
+
+			local t2 = {}
+
+			for v15, v16 in t1 do
+				t2[tostring(v16)] = v15
+			end
+
+			v8(t2)
+		end,
+		getNext = function(p2) -- line: 32
+			-- upvalues: v7 (copy), v5 (copy)
+			local v18 = v7(false)[tostring(p2)]
+
+			if v18 then
+				return v5(false)[v18 + 1]
+			end
+
+			return nil
+		end,
+		getPrev = function(p3) -- line: 36
+			-- upvalues: v7 (copy), v5 (copy)
+			local v20 = v7(false)[tostring(p3)]
+
+			if v20 then
+				return v5(false)[v20 + -1]
+			end
+
+			return nil
+		end
+	}
+end
+
+return createPlaylistStore

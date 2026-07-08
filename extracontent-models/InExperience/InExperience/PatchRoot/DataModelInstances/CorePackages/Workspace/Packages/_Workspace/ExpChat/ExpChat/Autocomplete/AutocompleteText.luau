@@ -1,21 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Autocomplete");
-local v1 = require(l_script_FirstAncestor_0.Trie.Trie);
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3) --[[ Line: 11 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v4 = {};
-    setmetatable(v4, v2);
-    v4.trie = v1.new();
-    v4.trie = v3(v4);
-    return v4;
-end;
-v2.getResults = function(v5, v6, v7) --[[ Line: 22 ]] --[[ Name: getResults ]]
-    local v8 = v5.trie:autocomplete(v6);
-    if v7 then
-        return v7(v8);
-    else
-        return v8;
-    end;
-end;
-return v2;
+local Autocomplete = script:FindFirstAncestor("Autocomplete")
+local Trie = require(Autocomplete.Trie.Trie)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1: ((...any) -> ...any)) -- line: 11
+	-- upvalues: t1 (copy), Trie (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.trie = Trie.new()
+	t2.trie = p1(t2)
+
+	return t2
+end
+function t1.getResults(t3: {[any]: any}, s1: string, p2: ((...any) -> ...any)?) -- line: 22
+	local v9 = t3.trie:autocomplete(s1)
+
+	if p2 then
+		return p2(v9)
+	end
+
+	return v9
+end
+
+return t1

@@ -14,76 +14,78 @@ local useRobloxPlusUpsellBannerNewBadgeInteraction = require(RobloxSubscriptionP
 local RobloxPlusUpsellBannerCTA = require(script.Parent.RobloxPlusUpsellBannerCTA)
 local v15 = game:DefineFastFlag("BoldBlackbirdUpsellBannerStroke", false)
 
-return function(t1: {[any]: any}) --[[ BlackbirdUpsellBanner ]] -- line: 35
+local function BlackbirdUpsellBanner(t1: {[any]: any}) -- line: 35
 	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), FFlagSupportNewBadgeRobloxPlus (copy), useRobloxPlusUpsellBannerNewBadgeInteraction (copy), View (copy), Icon (copy), IconName (copy), IconSize (copy), FoundationText (copy), RobloxPlusUpsellBannerCTA (copy), v15 (copy)
-	local v17 = useTokens()
-	local v18 = useLocalization({
+	local v18 = useTokens()
+	local v19 = useLocalization({
+		getFreeTrialText = "Feature.RobloxSubscription.Label.FreeTrialText",
+		subscribe = "Feature.RobloxSubscription.Action.Subscribe",
 		bannerText = {
 			"Feature.RobloxSubscription.Label.BlackbirdUpsellBanner",
 			discountPercentage = t1.productInfo.initialDiscountPercentage or 10
-		},
-		getFreeTrialText = "Feature.RobloxSubscription.Label.FreeTrialText",
-		subscribe = "Feature.RobloxSubscription.Action.Subscribe"
+		}
 	})
-	local v19 = React.useCallback(function() -- line: 47
-		-- upvalues: t1 (copy), v18 (copy)
+	local v20 = React.useCallback(function() -- line: 47
+		-- upvalues: t1 (copy), v19 (copy)
 		if t1.productInfo.isFreeTrial then
-			return v18.getFreeTrialText
+			return v19.getFreeTrialText
 		end
 
-		return v18.subscribe
+		return v19.subscribe
 	end, {
 		t1.productInfo.isFreeTrial,
-		v18.getFreeTrialText,
-		v18.subscribe
+		v19.getFreeTrialText,
+		v19.subscribe
 	})
-	local v20 = nil
+	local v21 = nil
 
 	if FFlagSupportNewBadgeRobloxPlus then
-		v20 = useRobloxPlusUpsellBannerNewBadgeInteraction(t1.onActivated)
+		v21 = useRobloxPlusUpsellBannerNewBadgeInteraction(t1.onActivated)
 	end
 
 	return React.createElement(View, {
 		tag = "size-full-0 auto-y padding-medium",
-		onActivated = if not FFlagSupportNewBadgeRobloxPlus then t1.onActivated else v20.onActivated,
+		onActivated = if not FFlagSupportNewBadgeRobloxPlus then t1.onActivated else v21.onActivated,
 		LayoutOrder = t1.LayoutOrder
 	}, {
 		ContentContainer = React.createElement(View, {
 			tag = "row align-y-center gap-small size-full-0 auto-y"
 		}, {
 			BlackbirdIcon = React.createElement(Icon, {
-				style = v17.Color.Content.Emphasis,
+				LayoutOrder = 1,
+				style = v18.Color.Content.Emphasis,
 				name = IconName.RobloxPlus,
-				size = IconSize.Medium,
-				LayoutOrder = 1
+				size = IconSize.Medium
 			}),
 			BannerText = React.createElement(FoundationText, {
-				Size = UDim2.new(0.7, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
 				TextWrapped = true,
 				tag = "text-body-small text-align-x-left content-emphasis",
-				Text = v18.bannerText,
-				LayoutOrder = 2
+				LayoutOrder = 2,
+				Size = UDim2.new(0.7, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Text = v19.bannerText
 			})
 		}),
 		SubscribeText = if FFlagSupportNewBadgeRobloxPlus then nil else React.createElement(FoundationText, {
+			tag = "auto-xy text-body-small content-default",
+			RichText = true,
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.new(1, 0, 0.5, 0),
-			tag = "auto-xy text-body-small content-default",
-			Text = "<u>" .. v19() .. "</u>",
-			RichText = true
+			Text = "<u>" .. v20() .. "</u>"
 		}),
 		SubscribeCTA = if not FFlagSupportNewBadgeRobloxPlus then nil else React.createElement(RobloxPlusUpsellBannerCTA, {
 			productInfo = t1.productInfo,
-			shouldShowNewBadge = v20.shouldShowNewBadge
+			shouldShowNewBadge = v21.shouldShowNewBadge
 		}),
 		UIStroke = React.createElement("UIStroke", {
-			Color = v17.Color.Stroke.Default.Color3,
-			Transparency = v17.Color.Stroke.Default.Transparency,
-			Thickness = if not v15 then v17.Stroke.Standard else v17.Stroke.Thick
+			Color = v18.Color.Stroke.Default.Color3,
+			Transparency = v18.Color.Stroke.Default.Transparency,
+			Thickness = if not v15 then v18.Stroke.Standard else v18.Stroke.Thick
 		}),
 		UICorner = React.createElement("UICorner", {
-			CornerRadius = UDim.new(0, v17.Radius.Medium)
+			CornerRadius = UDim.new(0, v18.Radius.Medium)
 		})
 	})
 end
+
+return BlackbirdUpsellBanner

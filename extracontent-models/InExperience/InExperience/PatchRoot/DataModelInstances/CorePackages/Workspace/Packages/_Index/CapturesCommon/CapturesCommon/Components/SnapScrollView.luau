@@ -1,98 +1,107 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Cryo);
-local v3 = require(l_Parent_1.Foundation);
-local v4 = require(l_Parent_1.React);
-local _ = require(l_Parent_0.Enums.NavigationType);
-local _ = require(l_Parent_0.Signal);
-local l_View_0 = v3.View;
-local l_useCallback_0 = v4.useCallback;
-local l_useEffect_0 = v4.useEffect;
-local v10 = require(l_Parent_0.Hooks.useSnapScrollController);
-local l_useState_0 = v4.useState;
-return function(v12) --[[ Line: 33 ]]
-    -- upvalues: l_useState_0 (copy), v10 (copy), l_useCallback_0 (copy), l_useEffect_0 (copy), v4 (copy), v2 (copy), l_View_0 (copy)
-    local v13, v14 = l_useState_0(Vector2.new(0, 0));
-    local v15 = v12.active == nil or v12.active;
-    local v16 = v12.initialIndex or 1;
-    local v17 = v12.itemAbsoluteSize or v13;
-    local v18 = v12.windowSize or 3;
-    local v19, v20, v21, v22, v23 = v10(v15, v16, v17, #v12.contents);
-    local v25 = l_useCallback_0(function(v24) --[[ Line: 44 ]]
-        -- upvalues: v14 (copy)
-        v14(v24.AbsoluteSize);
-    end, {});
-    l_useEffect_0(function() --[[ Line: 48 ]]
-        -- upvalues: v12 (copy), v19 (copy)
-        if v12.onIndexChanged then
-            v12.onIndexChanged(v19);
-        end;
-    end, {
-        v19, 
-        v12.onIndexChanged
-    });
-    local v28 = v4.useMemo(function() --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), v12 (copy), v19 (copy), v18 (copy), v4 (ref), l_View_0 (ref), v17 (copy)
-        return v2.List.map(v12.contents, function(v26, v27) --[[ Line: 55 ]]
-            -- upvalues: v19 (ref), v18 (ref), v4 (ref), l_View_0 (ref), v17 (ref), v12 (ref)
-            if v27 < v19 - v18 or v19 + v18 < v27 then
-                return v4.createElement(l_View_0, {
-                    key = ("PLACEHOLDER-%*"):format(v27), 
-                    LayoutOrder = v27, 
-                    Size = UDim2.fromOffset(v17.X, v17.Y), 
-                    tag = "anchor-top-center bg-action-subtle position-top-center"
-                });
-            else
-                return v12.renderContent(v26, v27);
-            end;
-        end);
-    end, {
-        v19, 
-        v17, 
-        v12.contents, 
-        v12.renderContent, 
-        v18
-    });
-    l_useEffect_0(function() --[[ Line: 68 ]]
-        -- upvalues: v12 (copy), v22 (copy)
-        if not v12.scrollToIndexSignal then
-            return;
-        else
-            local v29 = v12.scrollToIndexSignal:connect(v22);
-            return function() --[[ Line: 74 ]]
-                -- upvalues: v29 (copy)
-                v29:disconnect();
-            end;
-        end;
-    end, {
-        v12.scrollToIndexSignal, 
-        v22
-    });
-    l_useEffect_0(function() --[[ Line: 79 ]]
-        -- upvalues: v12 (copy), v23 (copy)
-        if not v12.triggerNavigationSignal then
-            return;
-        else
-            local v30 = v12.triggerNavigationSignal:connect(v23);
-            return function() --[[ Line: 85 ]]
-                -- upvalues: v30 (copy)
-                v30:disconnect();
-            end;
-        end;
-    end, {
-        v12.triggerNavigationSignal, 
-        v23
-    });
-    return v4.createElement(l_View_0, {
-        onAbsoluteSizeChanged = v25, 
-        ref = v20, 
-        tag = "anchor-top-center bg-action-subtle position-top-center size-full"
-    }, {
-        MotionView = v4.createElement(l_View_0, {
-            LayoutOrder = 1, 
-            ref = v21, 
-            Size = UDim2.fromScale(1, #v12.contents), 
-            tag = "align-x-center anchor-top-center bg-action-subtle col no-clip position-top-center"
-        }, v28)
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Cryo = require(ParentParentParent.Cryo)
+local Foundation = require(ParentParentParent.Foundation)
+local React = require(ParentParentParent.React)
+
+require(ParentParent.Enums.NavigationType)
+require(ParentParent.Signal)
+
+local View = Foundation.View
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local useSnapScrollController = require(ParentParent.Hooks.useSnapScrollController)
+local useState = React.useState
+
+return function(t1: {[any]: any}) -- line: 33
+	-- upvalues: useState (copy), useSnapScrollController (copy), useCallback (copy), useEffect (copy), React (copy), Cryo (copy), View (copy)
+	local v12, v13 = useState(Vector2.new(0, 0))
+	local v14 = t1.active == nil or t1.active
+	local v15 = t1.initialIndex or 1
+	local v16 = t1.itemAbsoluteSize or v12
+	local v17 = t1.windowSize or 3
+	local v18, v19, v20, v21, v22 = useSnapScrollController(v14, v15, v16, #t1.contents)
+	local v23 = useCallback(function(p1) -- line: 44
+		-- upvalues: v13 (copy)
+		v13(p1.AbsoluteSize)
+	end, {})
+
+	useEffect(function() -- line: 48
+		-- upvalues: t1 (copy), v18 (copy)
+		if t1.onIndexChanged then
+			t1.onIndexChanged(v18)
+		end
+	end, {
+		v18,
+		t1.onIndexChanged
+	})
+
+	local v24 = React.useMemo(function() -- line: 54
+		-- upvalues: Cryo (copy), t1 (copy), v18 (copy), v17 (copy), React (copy), View (copy), v16 (copy)
+		return Cryo.List.map(t1.contents, function(p2, p3) -- line: 55
+			-- upvalues: v18 (copy), v17 (copy), React (copy), View (copy), v16 (copy), t1 (copy)
+			if p3 < v18 - v17 or p3 > v18 + v17 then
+				return React.createElement(View, {
+					tag = "anchor-top-center bg-action-subtle position-top-center",
+					key = `PLACEHOLDER-{ p3 }`,
+					LayoutOrder = p3,
+					Size = UDim2.fromOffset(v16.X, v16.Y)
+				})
+			end
+
+			return t1.renderContent(p2, p3)
+		end)
+	end, {
+		v18,
+		v16,
+		t1.contents,
+		t1.renderContent,
+		v17
+	})
+
+	useEffect(function() -- line: 68
+		-- upvalues: t1 (copy), v21 (copy)
+		if not t1.scrollToIndexSignal then
+			return
+		end
+
+		local v26 = t1.scrollToIndexSignal:connect(v21)
+
+		return function() -- line: 74
+			-- upvalues: v26 (copy)
+			v26:disconnect()
+		end
+	end, {
+		t1.scrollToIndexSignal,
+		v21
+	})
+	useEffect(function() -- line: 79
+		-- upvalues: t1 (copy), v22 (copy)
+		if not t1.triggerNavigationSignal then
+			return
+		end
+
+		local v27 = t1.triggerNavigationSignal:connect(v22)
+
+		return function() -- line: 85
+			-- upvalues: v27 (copy)
+			v27:disconnect()
+		end
+	end, {
+		t1.triggerNavigationSignal,
+		v22
+	})
+
+	return React.createElement(View, {
+		tag = "anchor-top-center bg-action-subtle position-top-center size-full",
+		onAbsoluteSizeChanged = v23,
+		ref = v19
+	}, {
+		MotionView = React.createElement(View, {
+			LayoutOrder = 1,
+			tag = "align-x-center anchor-top-center bg-action-subtle col no-clip position-top-center",
+			ref = v20,
+			Size = UDim2.fromScale(1, #t1.contents)
+		}, v24)
+	})
+end

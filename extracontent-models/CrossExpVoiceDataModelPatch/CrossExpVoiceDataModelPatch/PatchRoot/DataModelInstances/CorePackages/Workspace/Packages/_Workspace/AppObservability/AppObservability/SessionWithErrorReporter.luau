@@ -1,48 +1,56 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local v1 = {};
-v1.__index = v1;
-v1.new = function(v2, v3) --[[ Line: 43 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy)
-    local v4 = setmetatable({
-        _eventConfig = v2, 
-        _lastReportedTimestampBySeverity = {}, 
-        _reportingInterval = v3 or 300, 
-        _lastReportedEventBySeverity = {}
-    }, v1);
-    v4._lastReportedTimestampBySeverity.NO_SEVERITY = nil;
-    v4._lastReportedEventBySeverity.NO_SEVERITY = nil;
-    return v4;
-end;
-v1.getCurrentTimeStamp = function(_) --[[ Line: 67 ]] --[[ Name: getCurrentTimeStamp ]]
-    return os.time();
-end;
-v1.reportEvent = function(v6, v7, v8, v9) --[[ Line: 80 ]] --[[ Name: reportEvent ]]
-    -- upvalues: l_TelemetryService_0 (copy)
-    local v10 = false;
-    local v11 = v6:getCurrentTimeStamp();
-    local v12 = v9 or "NO_SEVERITY";
-    local v13 = v6._lastReportedTimestampBySeverity[v12];
-    if v13 == nil or v11 - v13 >= v6._reportingInterval then
-        v10 = true;
-    end;
-    if v10 then
-        if v9 ~= nil then
-            if v8 == nil then
-                v8 = {
-                    tag_severity = v9
-                };
-            elseif type(v8) == "table" then
-                v8.tag_severity = v9;
-            end;
-        end;
-        l_TelemetryService_0:LogCounter(v6._eventConfig, {
-            customFields = v8
-        }, v7 or 1);
-        v6._lastReportedTimestampBySeverity[v12] = v11;
-        v6._lastReportedEventBySeverity[v12] = {
-            count = v7, 
-            customFields = v8
-        };
-    end;
-end;
-return v1;
+local TelemetryService = game:GetService("TelemetryService")
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, n1: number?) -- line: 43
+	-- upvalues: t1 (copy)
+	local v5 = setmetatable({
+		_eventConfig = p1,
+		_lastReportedTimestampBySeverity = {},
+		_reportingInterval = n1 or 300,
+		_lastReportedEventBySeverity = {}
+	}, t1)
+
+	v5._lastReportedTimestampBySeverity.NO_SEVERITY = nil
+	v5._lastReportedEventBySeverity.NO_SEVERITY = nil
+
+	return v5
+end
+function t1.getCurrentTimeStamp(_) -- line: 67
+	return os.time()
+end
+function t1.reportEvent(p3, n2: number, p4, s1: string?) -- line: 80
+	-- upvalues: TelemetryService (copy)
+	local v11 = false
+	local v12 = p3:getCurrentTimeStamp()
+	local v13 = s1 or "NO_SEVERITY"
+	local v14 = p3._lastReportedTimestampBySeverity[v13]
+
+	if v14 == nil or v12 - v14 >= p3._reportingInterval then
+		v11 = true
+	end
+
+	if v11 then
+		if s1 ~= nil then
+			if p4 == nil then
+				p4 = {
+					tag_severity = s1
+				}
+			elseif type(p4) == "table" then
+				p4.tag_severity = s1
+			end
+		end
+
+		TelemetryService:LogCounter(p3._eventConfig, {
+			customFields = p4
+		}, n2 or 1)
+		p3._lastReportedTimestampBySeverity[v13] = v12
+		p3._lastReportedEventBySeverity[v13] = {
+			count = n2,
+			customFields = p4
+		}
+	end
+end
+
+return t1

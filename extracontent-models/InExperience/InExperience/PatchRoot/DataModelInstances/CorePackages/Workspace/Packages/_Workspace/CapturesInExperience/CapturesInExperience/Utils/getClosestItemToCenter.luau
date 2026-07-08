@@ -1,6 +1,9 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getClosestItemToCenter ]]
-    local l_AbsoluteSize_0 = v1.AbsoluteSize;
-    local l_CanvasPosition_0 = v1.CanvasPosition;
-    local v4 = math.floor((l_CanvasPosition_0.X + l_AbsoluteSize_0.X / 2) / v0.X) + 1;
-    return v4, (math.abs(l_CanvasPosition_0.X - (v4 - 1) * v0.X));
-end;
+local function getClosestItemToCenter(vector2: Vector2, p1) -- line: 1
+	local AbsoluteSize = p1.AbsoluteSize
+	local CanvasPosition = p1.CanvasPosition
+	local v6 = math.floor((CanvasPosition.X + AbsoluteSize.X / 2) / vector2.X) + 1
+
+	return v6, (math.abs(CanvasPosition.X - (v6 - 1) * vector2.X))
+end
+
+return getClosestItemToCenter

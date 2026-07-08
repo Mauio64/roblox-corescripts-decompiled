@@ -24,69 +24,77 @@ local getInputTextSize = require(Foundation.Utility.getInputTextSize)
 require(Foundation.Enums.ControlState)
 
 local t1 = {
-	size = InputSize.Large,
-	testId = "--foundation-text-input"
+	testId = "--foundation-text-input",
+	size = InputSize.Large
 }
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ TextInput ]] -- line: 52
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), Flags (copy), React (copy), InputField (copy), withCommonProps (copy), getInputTextSize (copy), InternalTextInput (copy), View (copy), Icon (copy), IconButton (copy)
-	local v20 = withDefaults(p1, t1)
-	local v21 = useTokens()
-	local v22 = useTextInputVariants(v21, v20.size, if not Flags.FoundationTextInputVariant then nil else v20.variant)
+local function TextInput(p1, p2) -- line: 52
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), React (copy), InputField (copy), withCommonProps (copy), getInputTextSize (copy), InternalTextInput (copy), Flags (copy), View (copy), Icon (copy), IconButton (copy)
+	local v21 = withDefaults(p1, t1)
+	local v22 = useTokens()
+	local v23 = useTextInputVariants(v22, v21.size, v21.variant)
 
-	return React.createElement(InputField, withCommonProps(v20, {
-		width = v20.width,
+	return React.createElement(InputField, withCommonProps(v21, {
+		width = v21.width,
 		ref = p2,
-		label = v20.label,
-		size = getInputTextSize(v20.size),
-		isRequired = v20.isRequired,
-		isDisabled = if not Flags.FoundationTextInputDisabledField then nil else v20.isDisabled,
-		hasError = v20.hasError,
-		hint = v20.hint,
-		textBoxRef = v20.textBoxRef,
-		input = function(p3) --[[ input ]] -- line: 70
-			-- upvalues: React (copy), InternalTextInput (copy), v20 (copy), Flags (copy), v22 (copy), View (copy), Icon (copy), IconButton (copy)
+		label = v21.label,
+		size = getInputTextSize(v21.size),
+		isRequired = v21.isRequired,
+		isDisabled = v21.isDisabled,
+		hasError = v21.hasError,
+		hint = v21.hint,
+		textBoxRef = v21.textBoxRef,
+		input = function(p3) -- line: 69
+			-- upvalues: React (copy), InternalTextInput (copy), v21 (copy), Flags (copy), v23 (copy), View (copy), Icon (copy), IconButton (copy)
 			return React.createElement(InternalTextInput, {
 				ref = p3,
-				hasError = v20.hasError,
-				isDisabled = v20.isDisabled,
-				hasClearButton = if not Flags.FoundationInternalTextInputClearButton then nil else v20.hasClearButton,
-				text = v20.text,
-				textInputType = v20.textInputType,
-				focusBehavior = if not Flags.FoundationTextInputFocusBehavior then nil else v20.focusBehavior,
-				size = v20.size,
-				variant = if not Flags.FoundationTextInputVariant then nil else v20.variant,
+				inputRef = v21.inputRef,
+				hasError = v21.hasError,
+				isDisabled = v21.isDisabled,
+				hasClearButton = v21.hasClearButton,
+				text = v21.text,
+				textInputType = v21.textInputType,
+				focusBehavior = v21.focusBehavior,
+				size = v21.size,
+				variant = v21.variant,
+				Selectable = if not Flags.FoundationInputSelectionProps then nil else v21.Selectable,
+				NextSelectionUp = if not Flags.FoundationInputSelectionProps then nil else v21.NextSelectionUp,
+				NextSelectionDown = if not Flags.FoundationInputSelectionProps then nil else v21.NextSelectionDown,
+				NextSelectionLeft = if not Flags.FoundationInputSelectionProps then nil else v21.NextSelectionLeft,
+				NextSelectionRight = if not Flags.FoundationInputSelectionProps then nil else v21.NextSelectionRight,
 				horizontalPadding = {
-					left = ((if not Flags.FoundationInputVariantsConsolidateContainer then v22.innerContainer else v22.container)).horizontalPadding,
-					right = ((if not Flags.FoundationInputVariantsConsolidateContainer then v22.innerContainer else v22.container)).horizontalPadding
+					left = v23.container.horizontalPadding,
+					right = v23.container.horizontalPadding
 				},
-				onChanged = v20.onChanged,
-				onFocus = v20.onFocusGained,
-				onFocusLost = v20.onFocusLost,
-				onReturnPressed = v20.onReturnPressed,
-				placeholder = v20.placeholder,
-				leadingElement = if not v20.leadingIcon then nil else React.createElement(View, {
+				onChanged = v21.onChanged,
+				onFocus = v21.onFocusGained,
+				onFocusLost = v21.onFocusLost,
+				onReturnPressed = v21.onReturnPressed,
+				placeholder = v21.placeholder,
+				leadingElement = if not v21.leadingIcon then nil else React.createElement(View, {
 					tag = "row align-y-center size-0-full auto-x"
 				}, React.createElement(Icon, {
-					name = v20.leadingIcon,
-					style = v22.icon.style,
-					size = v22.icon.size
+					name = v21.leadingIcon,
+					style = v23.icon.style,
+					size = v23.icon.size
 				})),
-				trailingElement = if not v20.iconTrailing then nil else React.createElement(View, {
+				trailingElement = if not v21.iconTrailing then nil else React.createElement(View, {
 					tag = "row align-y-center size-0-full auto-x"
-				}, if type(v20.iconTrailing) ~= "table" or not v20.iconTrailing.onActivated then React.createElement(Icon, {
-					name = if type(v20.iconTrailing) ~= "table" then v20.iconTrailing else v20.iconTrailing.name,
-					style = v22.icon.style,
-					size = v22.icon.size
+				}, if type(v21.iconTrailing) ~= "table" or not v21.iconTrailing.onActivated then React.createElement(Icon, {
+					name = if type(v21.iconTrailing) ~= "table" then v21.iconTrailing else v21.iconTrailing.name,
+					style = v23.icon.style,
+					size = v23.icon.size
 				}) else React.createElement(IconButton, {
-					onActivated = v20.iconTrailing.onActivated,
-					isDisabled = v20.isDisabled,
-					size = v22.icon.size,
-					icon = v20.iconTrailing.name,
-					testId = `{ v20.testId }--trailing-icon-button`
+					onActivated = v21.iconTrailing.onActivated,
+					isDisabled = v21.isDisabled,
+					size = v23.icon.size,
+					icon = v21.iconTrailing.name,
+					testId = `{ v21.testId }--trailing-icon-button`
 				})),
-				testId = `{ v20.testId }--internal-text-input`
+				testId = `{ v21.testId }--internal-text-input`
 			})
 		end
 	}))
-end))
+end
+
+return React.memo(React.forwardRef(TextInput))

@@ -1,1 +1,1 @@
-return require(script.Padding);
+return require(script.Padding)

@@ -1,1 +1,1 @@
-return require(script.SocialLinksContainer);
+return require(script.SocialLinksContainer)

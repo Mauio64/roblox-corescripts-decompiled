@@ -30,7 +30,7 @@ local t1 = {
 
 return {
 	ELEVATION_LAYERS = t1,
-	getRelativeIndex = function(t2: {[any]: any}) --[[ getRelativeIndex ]] -- line: 23
+	getRelativeIndex = function(t2: {[any]: any}) -- line: 23
 		-- upvalues: t1 (copy)
 		local v5 = t1[t2.layer]
 

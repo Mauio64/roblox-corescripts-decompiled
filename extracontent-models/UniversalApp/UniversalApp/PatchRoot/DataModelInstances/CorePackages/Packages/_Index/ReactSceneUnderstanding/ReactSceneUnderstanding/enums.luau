@@ -1,6 +1,6 @@
 return {
-    CameraState = {
-        Idle = "idle", 
-        Moving = "moving"
-    }
-};
+	CameraState = {
+		Idle = "idle",
+		Moving = "moving"
+	}
+}

@@ -1,60 +1,72 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactRoblox);
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.Parent.Components.NotificationModalBase);
-local v4 = nil;
-local v5 = {};
-local function _(v6) --[[ Line: 13 ]] --[[ Name: UpdateRoot ]]
-    -- upvalues: v5 (ref), v4 (ref), v2 (copy), v3 (copy)
-    if v5 and v5.ModalKey ~= v6.ModalKey and v5.Params and v5.Params.CloseCallback then
-        v5.Params.CloseCallback();
-    end;
-    v5 = v6;
-    v4:render(v2.createElement(v3, v6));
-end;
-local function v10(v8) --[[ Line: 22 ]]
-    -- upvalues: v4 (ref), v5 (ref), v2 (copy), v3 (copy)
-    if v4 and v8 == v5.ModalKey then
-        local v9 = {};
-        if v5 and v5.ModalKey ~= v9.ModalKey and v5.Params and v5.Params.CloseCallback then
-            v5.Params.CloseCallback();
-        end;
-        v5 = v9;
-        v4:render(v2.createElement(v3, v9));
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ReactRoblox = require(ParentParent.ReactRoblox)
+local React = require(ParentParent.React)
+local NotificationModalBase = require(script.Parent.Components.NotificationModalBase)
+local u5 = nil
+local t1 = {}
+
+local function UpdateRoot(p1) -- line: 13
+	-- upvalues: t1 (ref), u5 (ref), React (copy), NotificationModalBase (copy)
+	if t1 and (t1.ModalKey ~= p1.ModalKey and t1.Params and t1.Params.CloseCallback) then
+		t1.Params.CloseCallback()
+	end
+
+	t1 = p1
+	u5:render(React.createElement(NotificationModalBase, p1))
+end
+
 return {
-    OpenModal = function(v11, v12, v13) --[[ Line: 28 ]]
-        -- upvalues: v4 (ref), v1 (copy), v5 (ref), v2 (copy), v3 (copy)
-        if not v4 then
-            local l_Folder_0 = Instance.new("Folder");
-            l_Folder_0.Name = "NotificationModals";
-            l_Folder_0.Parent = game:GetService("CoreGui");
-            v4 = v1.createRoot(l_Folder_0);
-        end;
-        local v17 = {
-            ModalKey = v11, 
-            Component = v12, 
-            Params = v13, 
-            CloseModal = function() --[[ Line: 40 ]] --[[ Name: CloseModal ]]
-                -- upvalues: v11 (copy), v4 (ref), v5 (ref), v2 (ref), v3 (ref)
-                local l_v11_0 = v11;
-                if v4 and l_v11_0 == v5.ModalKey then
-                    local v16 = {};
-                    if v5 and v5.ModalKey ~= v16.ModalKey and v5.Params and v5.Params.CloseCallback then
-                        v5.Params.CloseCallback();
-                    end;
-                    v5 = v16;
-                    v4:render(v2.createElement(v3, v16));
-                end;
-            end
-        };
-        if v5 and v5.ModalKey ~= v17.ModalKey and v5.Params and v5.Params.CloseCallback then
-            v5.Params.CloseCallback();
-        end;
-        v5 = v17;
-        v4:render(v2.createElement(v3, v17));
-        return true;
-    end, 
-    CloseModal = v10
-};
+	OpenModal = function(s1: string, p2, p3) -- line: 28
+		-- upvalues: u5 (ref), ReactRoblox (copy), t1 (ref), React (copy), NotificationModalBase (copy)
+		if not u5 then
+			local Folder = Instance.new("Folder")
+
+			Folder.Name = "NotificationModals"
+			Folder.Parent = game:GetService("CoreGui")
+			u5 = ReactRoblox.createRoot(Folder)
+		end
+
+		local t3 = {
+			ModalKey = s1,
+			Component = p2,
+			Params = p3,
+			CloseModal = function() -- line: 40
+				-- upvalues: s1 (copy), u5 (ref), t1 (ref), React (copy), NotificationModalBase (copy)
+				local v16 = s1
+
+				if u5 and v16 == t1.ModalKey then
+					local t2 = {}
+
+					if t1 and t1.ModalKey ~= t2.ModalKey and t1.Params and t1.Params.CloseCallback then
+						t1.Params.CloseCallback()
+					end
+
+					t1 = t2
+					u5:render(React.createElement(NotificationModalBase, t2))
+				end
+			end
+		}
+
+		if t1 and t1.ModalKey ~= t3.ModalKey and t1.Params and t1.Params.CloseCallback then
+			t1.Params.CloseCallback()
+		end
+
+		t1 = t3
+		u5:render(React.createElement(NotificationModalBase, t3))
+
+		return true
+	end,
+	CloseModal = function(s2: string) -- line: 22
+		-- upvalues: u5 (ref), t1 (ref), React (copy), NotificationModalBase (copy)
+		if u5 and s2 == t1.ModalKey then
+			local t4 = {}
+
+			if t1 and t1.ModalKey ~= t4.ModalKey and t1.Params and t1.Params.CloseCallback then
+				t1.Params.CloseCallback()
+			end
+
+			t1 = t4
+			u5:render(React.createElement(NotificationModalBase, t4))
+		end
+	end
+}

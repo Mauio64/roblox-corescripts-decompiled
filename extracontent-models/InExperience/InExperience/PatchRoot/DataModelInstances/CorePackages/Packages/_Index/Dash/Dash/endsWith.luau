@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 14 ]] --[[ Name: endsWith ]]
-    return v0:sub(-v1:len()) == v1;
-end;
+local function endsWith(s1: string, s2: string) -- line: 14
+	return s2 == s1:sub(-s2:len())
+end
+
+return endsWith

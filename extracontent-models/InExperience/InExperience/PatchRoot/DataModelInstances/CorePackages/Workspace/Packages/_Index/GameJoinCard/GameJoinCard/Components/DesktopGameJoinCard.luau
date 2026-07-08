@@ -1,1 +1,1 @@
-return require(script.DesktopGameJoinCardContainer);
+return require(script.DesktopGameJoinCardContainer)

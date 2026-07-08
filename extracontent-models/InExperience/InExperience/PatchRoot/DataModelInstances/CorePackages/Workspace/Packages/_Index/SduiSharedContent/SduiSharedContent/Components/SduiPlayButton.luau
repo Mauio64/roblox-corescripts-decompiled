@@ -1,59 +1,98 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiSharedContent");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_PlayButton_0 = require(l_Parent_0.GamePlayButton).PlayButton;
-local v5 = require(l_Parent_0.SduiCoreSystem);
-local l_executeAction_0 = v5.executeAction;
-local l_findAnalyticsField_0 = v5.findAnalyticsField;
-local l_SduiActionType_0 = v5.SduiActionType;
-local l_getSduiActionHandlerRegistry_0 = v5.getSduiActionHandlerRegistry;
-local v10 = require(l_script_FirstAncestor_0.Components.useSduiReportExperienceLaunched);
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-return v3.memo(function(v12) --[[ Line: 68 ]] --[[ Name: SduiPlayButton ]]
-    -- upvalues: v3 (copy), l_getSduiActionHandlerRegistry_0 (copy), l_SduiActionType_0 (copy), l_findAnalyticsField_0 (copy), v10 (copy), l_executeAction_0 (copy), l_FFlagSduiServerCompat_0 (copy), l_PlayButton_0 (copy), v2 (copy)
-    local l_analyticsContext_0 = v12.analyticsContext;
-    local v15 = v3.useCallback(function() --[[ Line: 71 ]]
-        -- upvalues: l_getSduiActionHandlerRegistry_0 (ref), l_SduiActionType_0 (ref), v12 (copy)
-        local v14 = l_getSduiActionHandlerRegistry_0().getActionHandlerConfig(l_SduiActionType_0.OpenGameDetails);
-        if v14 and v14.handler then
-            v14.handler(nil, v12.analyticsContext, v12.sduiContext);
-        end;
-    end, {
-        v12.sduiContext, 
-        v12.analyticsContext
-    });
-    local v16 = v12.placeId or v12.rootPlaceId;
-    local v17 = v12.rootPlaceId or v16;
-    local l_universeId_0 = v12.universeId;
-    local v19 = l_findAnalyticsField_0("eventContext", l_analyticsContext_0.analyticsData, "ExperienceTile");
-    local v20 = l_findAnalyticsField_0("referralSource", l_analyticsContext_0.analyticsData);
-    local v21 = v10(v12.sduiContext, v12.analyticsContext, l_universeId_0, v16, v17, v12.appliedFilters);
-    local v23 = v3.useCallback(function() --[[ Line: 95 ]]
-        -- upvalues: l_SduiActionType_0 (ref), l_executeAction_0 (ref), l_analyticsContext_0 (copy), v12 (copy)
-        local v22 = {
-            actionType = l_SduiActionType_0.PlayButtonClick
-        };
-        l_executeAction_0(v22, l_analyticsContext_0, v12.sduiContext);
-    end, {
-        l_analyticsContext_0, 
-        v12.sduiContext
-    });
-    local v24 = if l_FFlagSduiServerCompat_0 then v12.anchorPoint else v12.AnchorPoint;
-    local v25 = if l_FFlagSduiServerCompat_0 then v12.layoutOrder else v12.LayoutOrder;
-    local v26 = if l_FFlagSduiServerCompat_0 then v12.position else v12.Position;
-    local v27 = v12.fetchDelayInSeconds or 0.1;
-    return v3.createElement(l_PlayButton_0, v2.Dictionary.join(v12, {
-        AnchorPoint = v24, 
-        LayoutOrder = v25, 
-        Position = v26, 
-        fetchDelayInSeconds = v27, 
-        universeId = v12.universeId, 
-        placeId = v12.placeId, 
-        reportExperienceLaunched = v21, 
-        onPurchaseRequiredCallback = if v12.openGameDetailsOnPurchaseRequired then v15 else nil, 
-        onActivated = v23, 
-        referralSource = v20, 
-        eventContext = v19
-    }));
-end);
+local SduiSharedContent = script:FindFirstAncestor("SduiSharedContent")
+local SduiSharedContentParent = SduiSharedContent.Parent
+local Cryo = require(SduiSharedContentParent.Cryo)
+local React = require(SduiSharedContentParent.React)
+local PlayButton = require(SduiSharedContentParent.GamePlayButton).PlayButton
+local SduiCoreSystem = require(SduiSharedContentParent.SduiCoreSystem)
+local executeAction = SduiCoreSystem.executeAction
+local findAnalyticsField = SduiCoreSystem.findAnalyticsField
+local SduiActionType = SduiCoreSystem.SduiActionType
+local getSduiActionHandlerRegistry = SduiCoreSystem.getSduiActionHandlerRegistry
+local useSduiReportExperienceLaunched = require(SduiSharedContent.Components.useSduiReportExperienceLaunched)
+local getSduiFocusActivationStore = require(SduiSharedContentParent.SduiSharedUtilities).getSduiFocusActivationStore
+local FFlagSduiExperienceDetailsSupport = require(SduiSharedContentParent.SharedFlags).FFlagSduiExperienceDetailsSupport
+local FFlagLuaAppResetHoverOnSduiPlayButtonActivation = require(SduiSharedContentParent.SharedFlags).FFlagLuaAppResetHoverOnSduiPlayButtonActivation
+local FFlagLuaAppLaunchWhenLoadingEdp = require(SduiSharedContentParent.SharedFlags).FFlagLuaAppLaunchWhenLoadingEdp
+local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = require(SduiSharedContentParent.SharedFlags).FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
+
+local function SduiPlayButton(t1: {[any]: any}) -- line: 82
+	-- upvalues: React (copy), getSduiActionHandlerRegistry (copy), SduiActionType (copy), findAnalyticsField (copy), FFlagSduiExperienceDetailsSupport (copy), useSduiReportExperienceLaunched (copy), FFlagLuaAppResetHoverOnSduiPlayButtonActivation (copy), executeAction (copy), getSduiFocusActivationStore (copy), PlayButton (copy), Cryo (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
+	local analyticsContext = t1.analyticsContext
+	local v20 = React.useCallback(function() -- line: 85
+		-- upvalues: getSduiActionHandlerRegistry (copy), SduiActionType (copy), t1 (copy)
+		local v35 = getSduiActionHandlerRegistry().getActionHandlerConfig(SduiActionType.OpenGameDetails)
+
+		if v35 and v35.handler then
+			v35.handler(nil, t1.analyticsContext, t1.sduiContext)
+		end
+	end, {
+		t1.sduiContext,
+		t1.analyticsContext
+	})
+	local v21 = t1.placeId or t1.rootPlaceId
+	local v22 = t1.rootPlaceId or v21
+	local universeId = t1.universeId
+	local v24 = findAnalyticsField("eventContext", analyticsContext.analyticsData, "ExperienceTile")
+	local v25 = findAnalyticsField("referralSource", analyticsContext.analyticsData)
+	local v26 = if not FFlagSduiExperienceDetailsSupport or not t1.experienceJoinData then nil else t1.experienceJoinData.launchData
+	local v27 = useSduiReportExperienceLaunched(t1.sduiContext, t1.analyticsContext, universeId, v21, v22, t1.appliedFilters, if not FFlagSduiExperienceDetailsSupport then nil else v26)
+	local v28 = React.useCallback(function() -- line: 114
+		-- upvalues: FFlagLuaAppResetHoverOnSduiPlayButtonActivation (copy), t1 (copy), SduiActionType (copy), executeAction (copy), analyticsContext (copy)
+		if FFlagLuaAppResetHoverOnSduiPlayButtonActivation and t1.onActivatedEffect then
+			t1.onActivatedEffect()
+		end
+
+		local t2 = {
+			actionType = SduiActionType.PlayButtonClick
+		}
+
+		executeAction(t2, analyticsContext, t1.sduiContext)
+	end, {
+		analyticsContext,
+		t1.sduiContext,
+		if not FFlagLuaAppResetHoverOnSduiPlayButtonActivation then nil else t1.onActivatedEffect
+	})
+	local v29 = nil
+
+	if FFlagSduiExperienceDetailsSupport then
+		v29 = React.useCallback(function(p1: ((...any) -> ...any)) -- line: 137
+			-- upvalues: t1 (copy), getSduiFocusActivationStore (copy)
+			local tag = t1.tag
+
+			if tag == nil then
+				return function() -- line: 140
+				end
+			end
+
+			return getSduiFocusActivationStore().register(tag, p1)
+		end, { t1.tag })
+	end
+
+	local anchorPoint = t1.anchorPoint
+	local layoutOrder = t1.layoutOrder
+	local position = t1.position
+	local v33 = if not FFlagSduiExperienceDetailsSupport then nil else findAnalyticsField("launchSource", analyticsContext.analyticsData)
+	local v34 = t1.fetchDelayInSeconds or 0.1
+
+	return React.createElement(PlayButton, Cryo.Dictionary.join(t1, {
+		AnchorPoint = anchorPoint,
+		LayoutOrder = layoutOrder,
+		Position = position,
+		tag = if not FFlagSduiExperienceDetailsSupport then nil else t1.tag,
+		onRegisterActivation = if not FFlagSduiExperienceDetailsSupport then nil else v29,
+		fetchDelayInSeconds = v34,
+		universeId = t1.universeId,
+		placeId = t1.placeId,
+		useUIBloxButton = if not FFlagSduiExperienceDetailsSupport then nil else t1.enableUiBloxButton,
+		reportExperienceLaunched = v27,
+		onPurchaseRequiredCallback = if not t1.openGameDetailsOnPurchaseRequired then nil else v20,
+		onActivated = v28,
+		referralSource = v25,
+		eventContext = v24,
+		launchSource = if not FFlagSduiExperienceDetailsSupport then nil else v33,
+		launchWhenLoading = if not FFlagLuaAppLaunchWhenLoadingEdp then nil else t1.launchWhenLoading,
+		launchOnReleaseAfterUnmount = if not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp then nil else t1.launchOnReleaseAfterUnmount
+	}))
+end
+
+return React.memo(SduiPlayButton)

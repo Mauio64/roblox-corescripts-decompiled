@@ -1,18 +1,23 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_0.Map);
-local v4 = require(l_Parent_2.InstanceOf);
-local v5 = require(l_Parent_1.Array.reduce);
-local _ = require(l_Parent_2.ES7Types);
-return function(v7) --[[ Line: 27 ]] --[[ Name: coerceToTable ]]
-    -- upvalues: v4 (copy), v3 (copy), v5 (copy)
-    if not v4(v7, v3) then
-        return v7;
-    else
-        return v5(v7:entries(), function(v8, v9) --[[ Line: 33 ]]
-            v8[v9[1]] = v9[2];
-            return v8;
-        end, {});
-    end;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Map = require(scriptParent.Map)
+local InstanceOf = require(scriptParentParentParent.InstanceOf)
+local reduce = require(scriptParentParent.Array.reduce)
+
+require(scriptParentParentParent.ES7Types)
+
+local function coerceToTable(p1) -- line: 27
+	-- upvalues: InstanceOf (copy), Map (copy), reduce (copy)
+	if not InstanceOf(p1, Map) then
+		return p1
+	end
+
+	return reduce(p1:entries(), function(p2, p3) -- line: 33
+		p2[p3[1]] = p3[2]
+
+		return p2
+	end, {})
+end
+
+return coerceToTable

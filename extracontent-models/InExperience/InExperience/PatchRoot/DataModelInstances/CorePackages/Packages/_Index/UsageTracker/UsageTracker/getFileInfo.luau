@@ -1,27 +1,37 @@
-local l_CoreScriptSyncService_0 = game:GetService("CoreScriptSyncService");
-return function(v1, v2, v3) --[[ Line: 4 ]] --[[ Name: getFileInfo ]]
-    -- upvalues: l_CoreScriptSyncService_0 (copy)
-    local l_game_0 = game;
-    for _, v6 in string.split(v1, ".") do
-        if l_game_0 ~= nil then
-            l_game_0 = l_game_0:FindFirstChild(v6);
-        else
-            break;
-        end;
-    end;
-    if typeof(l_game_0) ~= "Instance" or not l_game_0:IsA("ModuleScript") then
-        warn("path led to non-ModuleScript:", v1, l_game_0.ClassName);
-        l_game_0 = nil;
-    end;
-    local v7 = nil;
-    if l_game_0 then
-        v7 = l_CoreScriptSyncService_0:GetScriptFilePath(l_game_0);
-        if v2 then
-            local v8, v9 = string.find(v7, v2, 1, true);
-            if v8 then
-                v7 = string.sub(v7, if v3 then v8 else v9 + 1);
-            end;
-        end;
-    end;
-    return l_game_0, v7;
-end;
+local CoreScriptSyncService = game:GetService("CoreScriptSyncService")
+
+local function getFileInfo(s1: string, s2: string?, b1: boolean?) -- line: 4
+	-- upvalues: CoreScriptSyncService (copy)
+	local _game = game
+
+	for _, v8 in string.split(s1, ".") do
+		if _game == nil then
+			break
+		end
+
+		_game = _game:FindFirstChild(v8)
+	end
+
+	if typeof(_game) ~= "Instance" or not _game:IsA("ModuleScript") then
+		warn("path led to non-ModuleScript:", s1, _game.ClassName)
+		_game = nil
+	end
+
+	local ScriptFilePath = nil
+
+	if _game then
+		ScriptFilePath = CoreScriptSyncService:GetScriptFilePath(_game)
+
+		if s2 then
+			local start, stop = string.find(ScriptFilePath, s2, 1, true)
+
+			if start then
+				ScriptFilePath = string.sub(ScriptFilePath, if not b1 then stop + 1 else start)
+			end
+		end
+	end
+
+	return _game, ScriptFilePath
+end
+
+return getFileInfo

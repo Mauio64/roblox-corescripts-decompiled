@@ -1,25 +1,28 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Object_0 = v3.Object;
-local l_InvariantError_0 = require(l_Parent_0.jsutils.invariant).InvariantError;
-local _ = require(script.Parent.Parent.core.types);
-v0.validateOperation = function(v8) --[[ Line: 19 ]] --[[ Name: validateOperation ]]
-    -- upvalues: l_Object_0 (copy), l_Array_0 (copy), l_InvariantError_0 (copy)
-    local v9 = {
-        "query", 
-        "operationName", 
-        "variables", 
-        "extensions", 
-        "context"
-    };
-    for _, v11 in ipairs(l_Object_0.keys(v8)) do
-        if l_Array_0.indexOf(v9, v11) < 0 then
-            error(l_InvariantError_0.new(("illegal argument: %s"):format(v11)));
-        end;
-    end;
-    return v8;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local InvariantError = require(ParentParent.jsutils.invariant).InvariantError
+
+require(script.Parent.Parent.core.types)
+
+function t1.validateOperation(p1) -- line: 19
+	-- upvalues: Object (copy), Array (copy), InvariantError (copy)
+	for _, v in ipairs(Object.keys(p1)) do
+		if Array.indexOf({
+			"query",
+			"operationName",
+			"variables",
+			"extensions",
+			"context"
+		}, v) < 0 then
+			error(InvariantError.new(("illegal argument: %s"):format(v)))
+		end
+	end
+
+	return p1
+end
+
+return t1

@@ -1,1 +1,1 @@
-return require(script.Interactable);
+return require(script.Interactable)

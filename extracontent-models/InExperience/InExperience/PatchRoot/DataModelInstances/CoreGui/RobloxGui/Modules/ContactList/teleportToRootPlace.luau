@@ -1,18 +1,19 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_TeleportService_0 = game:GetService("TeleportService");
-local l_GamesMultigetPlaceDetails_0 = require(l_CorePackages_0.Workspace.Packages.GameDetailRodux).GamesByPlaceId.GamesMultigetPlaceDetails;
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v5 = require(l_RobloxGui_0.Modules.Common.httpRequest)(l_HttpRbxApiService_0);
-return function() --[[ Line: 14 ]]
-    -- upvalues: l_GamesMultigetPlaceDetails_0 (copy), v5 (copy), l_TeleportService_0 (copy)
-    if game.PlaceId ~= 0 then
-        l_GamesMultigetPlaceDetails_0(v5, game.PlaceId):andThen(function(v6) --[[ Line: 16 ]]
-            -- upvalues: l_TeleportService_0 (ref)
-            local l_universeRootPlaceId_0 = v6.responseBody[1].universeRootPlaceId;
-            l_TeleportService_0:Teleport(l_universeRootPlaceId_0);
-        end, function() --[[ Line: 19 ]]
+local CorePackages = game:GetService("CorePackages")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local TeleportService = game:GetService("TeleportService")
+local GamesMultigetPlaceDetails = require(CorePackages.Workspace.Packages.GameDetailRodux).GamesByPlaceId.GamesMultigetPlaceDetails
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local v6 = require(RobloxGui.Modules.Common.httpRequest)(HttpRbxApiService)
 
-        end);
-    end;
-end;
+return function() -- line: 14
+	-- upvalues: GamesMultigetPlaceDetails (copy), v6 (copy), TeleportService (copy)
+	if game.PlaceId ~= 0 then
+		GamesMultigetPlaceDetails(v6, game.PlaceId):andThen(function(p1) -- line: 16
+			-- upvalues: TeleportService (copy)
+			local universeRootPlaceId = p1.responseBody[1].universeRootPlaceId
+
+			TeleportService:Teleport(universeRootPlaceId)
+		end, function() -- line: 19
+		end)
+	end
+end

@@ -4,9 +4,10 @@ local Analytics = require(ParentParent.Analytics)
 local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
 local validateFacsJointBounds = require(ParentParent.validation.validateFacsJointBounds)
 local getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds = require(ParentParent.flags.getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds)
-local v7 = game:DefineFastInt("UGCValidateFacialBoundsScale", 120) / 100
-local v8 = game:DefineFastInt("UGCValidateFacialExpressivenessThreshold", 10) / 100
-local v9 = game:DefineFastInt("UGCValidateFacialExpressivenessMinVertDelta", 2) / 100
+local getFFlagUGCValidateMigrateDynamicHeadData = require(ParentParent.flags.getFFlagUGCValidateMigrateDynamicHeadData)
+local v8 = game:DefineFastInt("UGCValidateFacialBoundsScale", 120) / 100
+local v9 = game:DefineFastInt("UGCValidateFacialExpressivenessThreshold", 10) / 100
+local v10 = game:DefineFastInt("UGCValidateFacialExpressivenessMinVertDelta", 2) / 100
 local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
 
 require(ParentParent.util.Types)
@@ -34,146 +35,155 @@ local t1 = {
 	"RightLowerLipDepressor"
 }
 
-local function downloadFailure(b1: boolean?, s1: string?, p1) -- line: 51
+local function downloadFailure(b1: boolean?, s1: string?, p1) -- line: 52
 	-- upvalues: Analytics (copy)
-	local v21 = string.format("Failed to load model for dynamic head '%s'. Make sure model exists and try again.", s1)
+	local v23 = string.format("Failed to load model for dynamic head '%s'. Make sure model exists and try again.", s1)
 
 	if b1 then
-		error(v21)
+		error(v23)
 	end
 
 	Analytics.reportFailure(Analytics.ErrorType.validateDynamicHeadMeshPartFormat_FailedToLoadMesh, nil, p1)
 
-	return false, { v21 }
+	return false, { v23 }
 end
-local function validateFacialBounds(p2, p3) -- line: 78
-	-- upvalues: pcallDeferred (copy), getExpectedPartSize (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v7 (copy)
+local function validateFacialBounds(p2, p3) -- line: 79
+	-- upvalues: pcallDeferred (copy), getExpectedPartSize (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v8 (copy)
 	local isServer = p3.isServer
-	local v25, v26 = pcallDeferred(function() -- line: 84
-		-- upvalues: getExpectedPartSize (copy), p2 (copy), p3 (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v7 (copy)
-		local v46 = getExpectedPartSize(p2, p3)
-		local v47, v48 = getEditableMeshFromContext(p2, "MeshId", p3)
+	local v27, v28 = pcallDeferred(function() -- line: 85
+		-- upvalues: getExpectedPartSize (copy), p2 (copy), p3 (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v8 (copy)
+		local v48 = getExpectedPartSize(p2, p3)
+		local v49, v50 = getEditableMeshFromContext(p2, "MeshId", p3)
 
-		if not v47 then
+		if not v49 then
 			error("Failed to retrieve MeshContent")
 		end
 
-		return UGCValidationService:ValidateEditableMeshFacialBounds(v48, v7, v46)
+		return UGCValidationService:ValidateEditableMeshFacialBounds(v50, v8, v48)
 	end, p3)
 
-	if not v25 then
-		local v27 = string.format("Failed to load mesh data for '%s'. Make sure the mesh exists and try again.", p2:GetFullName())
+	if not v27 then
+		local v29 = string.format("Failed to load mesh data for '%s'. Make sure the mesh exists and try again.", p2:GetFullName())
 
 		if isServer ~= nil and isServer then
-			error(v27)
+			error(v29)
 		end
 
-		return false, { v27 }
+		return false, { v29 }
 	end
 
-	if not v26 then
+	if not v28 then
 		return false, { string.format("DynamicHead (%s) when emoting surpasses the expected bounding box", p2:GetFullName()) }
 	end
 
 	return true
 end
-local function validateFacialExpressiveness(p4, p5) -- line: 118
-	-- upvalues: pcallDeferred (copy), getExpectedPartSize (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v9 (copy), v8 (copy)
+local function validateFacialExpressiveness(p4, p5) -- line: 119
+	-- upvalues: pcallDeferred (copy), getExpectedPartSize (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v10 (copy), v9 (copy)
 	local isServer = p5.isServer
-	local v31, v32 = pcallDeferred(function() -- line: 124
-		-- upvalues: getExpectedPartSize (copy), p4 (copy), p5 (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v9 (copy)
-		local v49 = getExpectedPartSize(p4, p5)
-		local v50, v51 = getEditableMeshFromContext(p4, "MeshId", p5)
-
-		if not v50 then
-			error("Failed to retrieve MeshContent")
-		end
-
-		return UGCValidationService:ValidateEditableMeshFacialExpressiveness(v51, v9, v49)
-	end, p5)
-
-	if not v31 then
-		local v33 = string.format("Failed to load mesh data for '%s'. Make sure the mesh exists and try again.", p4:GetFullName())
-
-		if isServer ~= nil and isServer then
-			error(v33)
-		end
-
-		return false, { v33 }
-	end
-
-	if v32 < v8 then
-		return false, { string.format("DynamicHead (%s) did not pass threshold (%f < %f) for percent change when emoting", p4:GetFullName(), v32, v8) }
-	end
-
-	return true
-end
-
-return function(p6, p7) --[[ validateDynamicHeadData ]] -- line: 160
-	-- upvalues: getEditableMeshFromContext (copy), UGCValidationService (copy), downloadFailure (copy), Analytics (copy), FailureReasonsAccumulator (copy), t1 (copy), validateFacialExpressiveness (copy), getEngineFeatureEngineUGCValidateMinMaxMeshSizeAcrossAllFacs (copy), validateFacialBounds (copy), getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds (copy), validateFacsJointBounds (copy)
-	local timestamp = tick()
-	local isServer = p7.isServer
-	local ok, result = pcall(function() -- line: 168
-		-- upvalues: getEditableMeshFromContext (copy), p6 (copy), p7 (copy), UGCValidationService (copy)
-		local v52, v53 = getEditableMeshFromContext(p6, "MeshId", p7)
+	local v33, v34 = pcallDeferred(function() -- line: 125
+		-- upvalues: getExpectedPartSize (copy), p4 (copy), p5 (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), v10 (copy)
+		local v51 = getExpectedPartSize(p4, p5)
+		local v52, v53 = getEditableMeshFromContext(p4, "MeshId", p5)
 
 		if not v52 then
 			error("Failed to retrieve MeshContent")
 		end
 
-		return UGCValidationService:ValidateDynamicHeadEditableMesh(v53)
-	end)
+		return UGCValidationService:ValidateEditableMeshFacialExpressiveness(v53, v10, v51)
+	end, p5)
 
-	if not ok then
-		return downloadFailure(isServer, p6.Name, p7)
-	end
+	if not v33 then
+		local v35 = string.format("Failed to load mesh data for '%s'. Make sure the mesh exists and try again.", p4:GetFullName())
 
-	if not result then
-		Analytics.reportFailure(Analytics.ErrorType.validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh, nil, p7)
-
-		return false, { string.format("Failed validation for dynamic head '%s' due to missing FACS information. You need to provide FACS controls for at least 17 poses (see documentation).", p6.Name) }
-	end
-
-	local v40 = FailureReasonsAccumulator.new()
-	local ok2, result2, v43 = pcall(function() -- line: 199
-		-- upvalues: getEditableMeshFromContext (copy), p6 (copy), p7 (copy), UGCValidationService (copy), t1 (copy)
-		local v54, v55 = getEditableMeshFromContext(p6, "MeshId", p7)
-
-		if not v54 then
-			error("Failed to retrieve MeshContent")
+		if isServer ~= nil and isServer then
+			error(v35)
 		end
 
-		return UGCValidationService:GetDynamicHeadEditableMeshInactiveControls(v55, t1)
-	end)
+		return false, { v35 }
+	end
 
-	if not ok2 then
-		if string.find(result2, "Download Error") == 1 then
+	if v34 < v9 then
+		return false, { string.format("DynamicHead (%s) did not pass threshold (%f < %f) for percent change when emoting", p4:GetFullName(), v34, v9) }
+	end
+
+	return true
+end
+local function validateDynamicHeadData(p6, p7) -- line: 161
+	-- upvalues: getFFlagUGCValidateMigrateDynamicHeadData (copy), getEditableMeshFromContext (copy), UGCValidationService (copy), downloadFailure (copy), Analytics (copy), FailureReasonsAccumulator (copy), t1 (copy), validateFacialExpressiveness (copy), getEngineFeatureEngineUGCValidateMinMaxMeshSizeAcrossAllFacs (copy), validateFacialBounds (copy), getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds (copy), validateFacsJointBounds (copy)
+	local timestamp = tick()
+	local isServer = p7.isServer
+
+	if not getFFlagUGCValidateMigrateDynamicHeadData() then
+		local ok, result = pcall(function() -- line: 170
+			-- upvalues: getEditableMeshFromContext (copy), p6 (copy), p7 (copy), UGCValidationService (copy)
+			local v54, v55 = getEditableMeshFromContext(p6, "MeshId", p7)
+
+			if not v54 then
+				error("Failed to retrieve MeshContent")
+			end
+
+			return UGCValidationService:ValidateDynamicHeadEditableMesh(v55)
+		end)
+
+		if not ok then
 			return downloadFailure(isServer, p6.Name, p7)
 		end
 
-		assert(false, result2)
+		if not result then
+			Analytics.reportFailure(Analytics.ErrorType.validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMesh, nil, p7)
+
+			return false, { string.format("Failed validation for dynamic head '%s' due to missing FACS information. You need to provide FACS controls for at least 17 poses (see documentation).", p6.Name) }
+		end
 	end
 
-	local v44 = #result2 == 0
-	local v45 = #v43 == 0
+	local v42 = FailureReasonsAccumulator.new()
 
-	if not v44 or not v45 then
-		Analytics.reportFailure(Analytics.ErrorType.validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls, nil, p7)
-		v40:updateReasons(v44, { `{ p6.Name }.MeshId ({ p6.MeshId }) is missing FACS controls: { table.concat(result2, ", ") }` })
-		v40:updateReasons(v45, { `{ p6.Name }.MeshId ({ p6.MeshId }) has inactive FACS controls: { table.concat(v43, ", ") }` })
+	if not getFFlagUGCValidateMigrateDynamicHeadData() then
+		local ok, result, v45 = pcall(function() -- line: 203
+			-- upvalues: getEditableMeshFromContext (copy), p6 (copy), p7 (copy), UGCValidationService (copy), t1 (copy)
+			local v56, v57 = getEditableMeshFromContext(p6, "MeshId", p7)
+
+			if not v56 then
+				error("Failed to retrieve MeshContent")
+			end
+
+			return UGCValidationService:GetDynamicHeadEditableMeshInactiveControls(v57, t1)
+		end)
+
+		if not ok then
+			if string.find(result, "Download Error") == 1 then
+				return downloadFailure(isServer, p6.Name, p7)
+			end
+
+			assert(false, result)
+		end
+
+		local v46 = #result == 0
+		local v47 = #v45 == 0
+
+		if not v46 or not v47 then
+			Analytics.reportFailure(Analytics.ErrorType.validateDynamicHeadMeshPartFormat_ValidateDynamicHeadMeshControls, nil, p7)
+			v42:updateReasons(v46, { `{ p6.Name }.MeshId ({ p6.MeshId }) is missing FACS controls: { table.concat(result, ", ") }` })
+			v42:updateReasons(v47, { `{ p6.Name }.MeshId ({ p6.MeshId }) has inactive FACS controls: { table.concat(v45, ", ") }` })
+		end
 	end
 
-	v40:updateReasons(validateFacialExpressiveness(p6, p7))
+	if not getFFlagUGCValidateMigrateDynamicHeadData() then
+		v42:updateReasons(validateFacialExpressiveness(p6, p7))
+	end
 
 	if not getEngineFeatureEngineUGCValidateMinMaxMeshSizeAcrossAllFacs() then
-		v40:updateReasons(validateFacialBounds(p6, p7))
+		v42:updateReasons(validateFacialBounds(p6, p7))
 	end
 
-	if getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds() then
-		v40:updateReasons(validateFacsJointBounds(p6, p7))
+	if not getFFlagUGCValidateMigrateDynamicHeadData() and getEngineFeatureEngineUGCValidateFACSJointTransformsWithinBounds() then
+		v42:updateReasons(validateFacsJointBounds(p6, p7))
 	end
 
 	Analytics.recordScriptTime(script.Name, timestamp, p7)
 
-	return v40:getFinalResults()
+	return v42:getFinalResults()
 end
+
+return validateDynamicHeadData

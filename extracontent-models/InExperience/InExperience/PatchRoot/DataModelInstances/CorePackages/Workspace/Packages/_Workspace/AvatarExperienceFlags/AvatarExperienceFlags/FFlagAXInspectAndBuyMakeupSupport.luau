@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXInspectAndBuyMakeupSupport", false);
+return game:DefineFastFlag("AXInspectAndBuyMakeupSupport", false)

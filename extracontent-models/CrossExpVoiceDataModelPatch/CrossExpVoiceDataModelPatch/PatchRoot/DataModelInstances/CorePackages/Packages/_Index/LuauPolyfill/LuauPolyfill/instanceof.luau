@@ -1,44 +1,46 @@
-return function(v0, v1) --[[ Line: 5 ]]
-    if _G.__DEV__ then
-        assert(typeof(v1) == "table", "Received a non-table as the second argument for instanceof");
-    end;
-    if typeof(v0) ~= "table" then
-        return false;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 14 ]]
-            -- upvalues: v1 (copy), v0 (ref)
-            local v2 = false;
-            if v1.new ~= nil then
-                v2 = v0.new == v1.new;
-            end;
-            return v2;
-        end);
-        if l_status_0 and l_result_0 then
-            return true;
-        else
-            local v5 = {
-                tbl = true
-            };
-            while true do
-                if v0 and typeof(v0) == "table" then
-                    v0 = getmetatable(v0);
-                    if typeof(v0) == "table" then
-                        v0 = v0.__index;
-                        if v0 == v1 then
-                            return true;
-                        end;
-                    end;
-                    if typeof(v0) == "table" then
-                        if v5[v0] then
-                            return false;
-                        else
-                            v5[v0] = true;
-                        end;
-                    end;
-                else
-                    return false;
-                end;
-            end;
-        end;
-    end;
-end;
+return function(p1, p2) -- line: 5
+	if _G.__DEV__ then
+		assert(typeof(p2) == "table", "Received a non-table as the second argument for instanceof")
+	end
+
+	if typeof(p1) ~= "table" then
+		return false
+	end
+
+	local ok, result = pcall(function() -- line: 14
+		-- upvalues: p2 (copy), p1 (ref)
+		return p2.new ~= nil and p1.new == p2.new
+	end)
+
+	if ok and result then
+		return true
+	end
+
+	local t1 = {
+		tbl = true
+	}
+
+	while p1 and typeof(p1) == "table" do
+		p1 = getmetatable(p1)
+
+		if typeof(p1) == "table" then
+			p1 = p1.__index
+
+			if p2 == p1 then
+				return true
+			end
+		end
+
+		if typeof(p1) ~= "table" then
+			continue
+		end
+
+		if t1[p1] then
+			return false
+		end
+
+		t1[p1] = true
+	end
+
+	return false
+end

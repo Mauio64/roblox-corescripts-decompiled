@@ -1,3 +1,5 @@
-return function(...) --[[ Line: 9 ]] --[[ Name: identity ]]
-    return ...;
-end;
+local function identity(...) -- line: 9
+	return ...
+end
+
+return identity

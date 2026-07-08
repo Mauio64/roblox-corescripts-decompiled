@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "premiumInfo");
+return require(script.Parent.makeActionCreator)(script.Name, "premiumInfo")

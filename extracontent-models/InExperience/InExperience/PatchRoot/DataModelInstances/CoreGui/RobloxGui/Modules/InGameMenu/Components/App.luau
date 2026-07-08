@@ -1,73 +1,81 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v1.Roact;
-local l_RoactRodux_0 = v1.RoactRodux;
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.InGameMenuPolicy);
-local v6 = require(script.Parent.ViewportOverlay);
-local v7 = require(script.Parent.SideNavigation);
-local v8 = require(script.Parent.LeaveGameDialog);
-local v9 = require(script.Parent.PageContainer);
-local v10 = require(script.Parent.RespawnDialog);
-local v11 = require(script.Parent.ReportPage.ReportDialog);
-local v12 = require(script.Parent.ReportPage.ReportSentDialog);
-local v13 = require(script.Parent.ControlsPage.ControlLayoutSetter);
-local v14 = require(script.Parent.Connection);
-local v15 = require(script.Parent.EducationalPopup);
-local v16 = require(script.Parent.MenuIconTooltip);
-local v17 = require(script.Parent.FullscreenTitleBar);
-local l_Flags_0 = l_Parent_0.Flags;
-local v19 = require(l_Flags_0.FFlagLuaMenuPerfImprovements);
-local v20 = require(l_Parent_0.Resources.Constants);
-local v25 = v5.connect(function(v21, _) --[[ Line: 75 ]]
-    return {
-        enableFullscreenTitleBar = v21.enableFullscreenTitleBar(), 
-        isEducationalPopupEnabled = v21.enableEducationalPopup()
-    };
-end)(function(v23) --[[ Line: 32 ]] --[[ Name: App ]]
-    -- upvalues: l_Roact_0 (copy), v17 (copy), v20 (copy), v19 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy), v10 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v15 (copy), v16 (copy)
-    local v24 = nil;
-    if v23.enableFullscreenTitleBar then
-        v24 = l_Roact_0.createElement(v17, {
-            displayOrder = v20.DisplayOrder.FullscreenTitleBar
-        });
-    end;
-    if v19 then
-        return l_Roact_0.createFragment({
-            Content = v23.isMenuOpen and l_Roact_0.createFragment({
-                Overlay = l_Roact_0.createElement(v6), 
-                SideNavigation = l_Roact_0.createElement(v7), 
-                LeaveGameDialog = l_Roact_0.createElement(v8), 
-                PageContainer = l_Roact_0.createElement(v9), 
-                RespawnDialog = l_Roact_0.createElement(v10), 
-                ReportDialog = l_Roact_0.createElement(v11), 
-                ReportSentDialog = l_Roact_0.createElement(v12), 
-                ControlLayoutSetter = l_Roact_0.createElement(v13)
-            }) or nil, 
-            Connection = l_Roact_0.createElement(v14), 
-            EducationalPopup = v23.isEducationalPopupEnabled and l_Roact_0.createElement(v15) or nil, 
-            MenuIconTooltip = v23.isEducationalPopupEnabled and l_Roact_0.createElement(v16) or nil, 
-            FullscreenTitleBar = v24
-        });
-    else
-        return l_Roact_0.createFragment({
-            Overlay = l_Roact_0.createElement(v6), 
-            SideNavigation = l_Roact_0.createElement(v7), 
-            LeaveGameDialog = l_Roact_0.createElement(v8), 
-            PageContainer = l_Roact_0.createElement(v9), 
-            RespawnDialog = l_Roact_0.createElement(v10), 
-            ReportDialog = l_Roact_0.createElement(v11), 
-            ReportSentDialog = l_Roact_0.createElement(v12), 
-            ControlLayoutSetter = l_Roact_0.createElement(v13), 
-            Connection = l_Roact_0.createElement(v14), 
-            EducationalPopup = v23.isEducationalPopupEnabled and l_Roact_0.createElement(v15) or nil, 
-            MenuIconTooltip = v23.isEducationalPopupEnabled and l_Roact_0.createElement(v16) or nil, 
-            FullscreenTitleBar = v24
-        });
-    end;
-end);
-return l_RoactRodux_0.connect(function(v26, _) --[[ Line: 82 ]] --[[ Name: mapStateToProps ]]
-    return {
-        isMenuOpen = v26.isMenuOpen
-    };
-end, nil)(v25);
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local ParentParent = script.Parent.Parent
+local InGameMenuPolicy = require(ParentParent.InGameMenuPolicy)
+local ViewportOverlay = require(script.Parent.ViewportOverlay)
+local SideNavigation = require(script.Parent.SideNavigation)
+local LeaveGameDialog = require(script.Parent.LeaveGameDialog)
+local PageContainer = require(script.Parent.PageContainer)
+local RespawnDialog = require(script.Parent.RespawnDialog)
+local ReportDialog = require(script.Parent.ReportPage.ReportDialog)
+local ReportSentDialog = require(script.Parent.ReportPage.ReportSentDialog)
+local ControlLayoutSetter = require(script.Parent.ControlsPage.ControlLayoutSetter)
+local Connection = require(script.Parent.Connection)
+local EducationalPopup = require(script.Parent.EducationalPopup)
+local MenuIconTooltip = require(script.Parent.MenuIconTooltip)
+local FullscreenTitleBar = require(script.Parent.FullscreenTitleBar)
+local Flags = ParentParent.Flags
+local FFlagLuaMenuPerfImprovements = require(Flags.FFlagLuaMenuPerfImprovements)
+local Constants = require(ParentParent.Resources.Constants)
+
+local function App(p1) -- line: 32
+	-- upvalues: Roact (copy), FullscreenTitleBar (copy), Constants (copy), FFlagLuaMenuPerfImprovements (copy), ViewportOverlay (copy), SideNavigation (copy), LeaveGameDialog (copy), PageContainer (copy), RespawnDialog (copy), ReportDialog (copy), ReportSentDialog (copy), ControlLayoutSetter (copy), Connection (copy), EducationalPopup (copy), MenuIconTooltip (copy)
+	local v26 = nil
+
+	if p1.enableFullscreenTitleBar then
+		v26 = Roact.createElement(FullscreenTitleBar, {
+			displayOrder = Constants.DisplayOrder.FullscreenTitleBar
+		})
+	end
+
+	if FFlagLuaMenuPerfImprovements then
+		return Roact.createFragment({
+			Content = p1.isMenuOpen and Roact.createFragment({
+				Overlay = Roact.createElement(ViewportOverlay),
+				SideNavigation = Roact.createElement(SideNavigation),
+				LeaveGameDialog = Roact.createElement(LeaveGameDialog),
+				PageContainer = Roact.createElement(PageContainer),
+				RespawnDialog = Roact.createElement(RespawnDialog),
+				ReportDialog = Roact.createElement(ReportDialog),
+				ReportSentDialog = Roact.createElement(ReportSentDialog),
+				ControlLayoutSetter = Roact.createElement(ControlLayoutSetter)
+			}) or nil,
+			Connection = Roact.createElement(Connection),
+			EducationalPopup = p1.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
+			MenuIconTooltip = p1.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
+			FullscreenTitleBar = v26
+		})
+	end
+
+	return Roact.createFragment({
+		Overlay = Roact.createElement(ViewportOverlay),
+		SideNavigation = Roact.createElement(SideNavigation),
+		LeaveGameDialog = Roact.createElement(LeaveGameDialog),
+		PageContainer = Roact.createElement(PageContainer),
+		RespawnDialog = Roact.createElement(RespawnDialog),
+		ReportDialog = Roact.createElement(ReportDialog),
+		ReportSentDialog = Roact.createElement(ReportSentDialog),
+		ControlLayoutSetter = Roact.createElement(ControlLayoutSetter),
+		Connection = Roact.createElement(Connection),
+		EducationalPopup = p1.isEducationalPopupEnabled and Roact.createElement(EducationalPopup) or nil,
+		MenuIconTooltip = p1.isEducationalPopupEnabled and Roact.createElement(MenuIconTooltip) or nil,
+		FullscreenTitleBar = v26
+	})
+end
+
+local v23 = InGameMenuPolicy.connect(function(p2, _) -- line: 75
+	return {
+		enableFullscreenTitleBar = p2.enableFullscreenTitleBar(),
+		isEducationalPopupEnabled = p2.enableEducationalPopup()
+	}
+end)(App)
+
+local function mapStateToProps(p4, _) -- line: 82
+	return {
+		isMenuOpen = p4.isMenuOpen
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(v23)

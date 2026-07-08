@@ -1,25 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxFriends").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local v2 = require(script.receivedCount);
-local v3 = require(script.byUserId);
-local v4 = require(script.mutualFriends);
-local v5 = require(script.sourceUniverseIds);
-local v6 = require(script.nextPageCursor);
-local v7 = require(script.sentAt);
-local v8 = require(script.originSourceType);
-local v9 = require(script.order);
-local v10 = require(script.senderNickname);
-return function(v11) --[[ Line: 14 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy), v10 (copy)
-    return v1.combineReducers({
-        receivedCount = v2(v11), 
-        byUserId = v3(v11), 
-        mutualFriends = v4(v11), 
-        sourceUniverseIds = v5(v11), 
-        nextPageCursor = v6(v11), 
-        sentAt = v7(v11), 
-        originSourceType = v8(v11), 
-        order = v9(v11), 
-        senderNickname = v10(v11)
-    });
-end;
+local Parent = script:FindFirstAncestor("RoduxFriends").Parent
+local Rodux = require(Parent.Rodux)
+local receivedCount = require(script.receivedCount)
+local byUserId = require(script.byUserId)
+local mutualFriends = require(script.mutualFriends)
+local sourceUniverseIds = require(script.sourceUniverseIds)
+local nextPageCursor = require(script.nextPageCursor)
+local sentAt = require(script.sentAt)
+local originSourceType = require(script.originSourceType)
+local order = require(script.order)
+local senderNickname = require(script.senderNickname)
+
+return function(p1) -- line: 14
+	-- upvalues: Rodux (copy), receivedCount (copy), byUserId (copy), mutualFriends (copy), sourceUniverseIds (copy), nextPageCursor (copy), sentAt (copy), originSourceType (copy), order (copy), senderNickname (copy)
+	return Rodux.combineReducers({
+		receivedCount = receivedCount(p1),
+		byUserId = byUserId(p1),
+		mutualFriends = mutualFriends(p1),
+		sourceUniverseIds = sourceUniverseIds(p1),
+		nextPageCursor = nextPageCursor(p1),
+		sentAt = sentAt(p1),
+		originSourceType = originSourceType(p1),
+		order = order(p1),
+		senderNickname = senderNickname(p1)
+	})
+end

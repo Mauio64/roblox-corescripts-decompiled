@@ -1,70 +1,71 @@
-local l_Parent_0 = script:FindFirstAncestor("StreamNotifications").Parent;
-local l_Images_0 = require(l_Parent_0.UIBlox).App.ImageSet.Images;
+local Parent = script:FindFirstAncestor("StreamNotifications").Parent
+local Images = require(Parent.UIBlox).App.ImageSet.Images
+
 return {
-    DefaultPadding = 8, 
-    DefaultMaxRows = 20, 
-    Modal = {
-        Width = 540, 
-        Height = 600, 
-        Padding = 8, 
-        CornerRadius = 12, 
-        WidthLimit = 640, 
-        CloseIcon = l_Images_0["icons/navigation/close"], 
-        BackIcon = l_Images_0["icons/navigation/pushBack"], 
-        SettingsIcon = l_Images_0["icons/common/settings"], 
-        HeaderHeight = 56
-    }, 
-    InitializingNotifications = {
-        Size = 48
-    }, 
-    LoadingMoreNotifications = {
-        Size = 24, 
-        TriggerDistance = 400
-    }, 
-    EmptyNotifications = {
-        Size = 96, 
-        Graphic = l_Images_0["icons/graphic/success_xlarge"], 
-        LabelHeight = 24
-    }, 
-    MetaActions = {
-        CloseButtonFrameSize = 36, 
-        CloseButtonSize = 30, 
-        CloseIcon = l_Images_0["icons/navigation/close"], 
-        CloseIconSize = 24, 
-        ActionIcons = {
-            turnOnNotifications = l_Images_0["icons/common/notificationOn"], 
-            turnOffNotifications = l_Images_0["icons/common/notificationOff"], 
-            report = l_Images_0["icons/actions/feedback"], 
-            default = l_Images_0["icons/placeholder/placeholderOff"]
-        }
-    }, 
-    Text = {
-        HeaderKey = "Notifications.NotificationStream.Label.Notifications", 
-        EmptyKey = "Notifications.NotificationStream.Label.AllCaughtUp", 
-        ShowMoreKey = "Notifications.NotificationStream.Bundle.ShowMoreV2", 
-        ShowLessKey = "Notifications.NotificationStream.Bundle.ShowLess"
-    }, 
-    DeliveryChannel = "Stream", 
-    StreamSessionStructuralIdentifier = {
-        Level1 = "level1", 
-        StreamNotification = "streamNotification", 
-        DeleteOnGameLeave = "_deleteOnGameLeave"
-    }, 
-    SENDRVersion = 0, 
-    Dropdown = {
-        Width = 360, 
-        MaxHeight = 638, 
-        MinHeight = 200, 
-        VerticalMargin = 100, 
-        CornerRadius = 16, 
-        HorizontalPadding = 20, 
-        PaddingTop = 8, 
-        PaddingBottom = 8, 
-        HeaderMinHeight = 40, 
-        CardGap = 16, 
-        HeaderBodyGap = 8, 
-        ScrollBarThickness = 4, 
-        BellIconOpen = l_Images_0["icons/common/notificationOn"], 
-        BellIconClosed = l_Images_0["icons/common/notificationOff"]
-    }
-};
+	DefaultPadding = 8,
+	DefaultMaxRows = 20,
+	DeliveryChannel = "Stream",
+	SENDRVersion = 0,
+	Modal = {
+		Width = 540,
+		Height = 600,
+		Padding = 8,
+		CornerRadius = 12,
+		WidthLimit = 640,
+		HeaderHeight = 56,
+		CloseIcon = Images["icons/navigation/close"],
+		BackIcon = Images["icons/navigation/pushBack"],
+		SettingsIcon = Images["icons/common/settings"]
+	},
+	InitializingNotifications = {
+		Size = 48
+	},
+	LoadingMoreNotifications = {
+		Size = 24,
+		TriggerDistance = 400
+	},
+	EmptyNotifications = {
+		Size = 96,
+		LabelHeight = 24,
+		Graphic = Images["icons/graphic/success_xlarge"]
+	},
+	MetaActions = {
+		CloseButtonFrameSize = 36,
+		CloseButtonSize = 30,
+		CloseIconSize = 24,
+		CloseIcon = Images["icons/navigation/close"],
+		ActionIcons = {
+			turnOnNotifications = Images["icons/common/notificationOn"],
+			turnOffNotifications = Images["icons/common/notificationOff"],
+			report = Images["icons/actions/feedback"],
+			default = Images["icons/placeholder/placeholderOff"]
+		}
+	},
+	Text = {
+		HeaderKey = "Notifications.NotificationStream.Label.Notifications",
+		EmptyKey = "Notifications.NotificationStream.Label.AllCaughtUp",
+		ShowMoreKey = "Notifications.NotificationStream.Bundle.ShowMoreV2",
+		ShowLessKey = "Notifications.NotificationStream.Bundle.ShowLess"
+	},
+	StreamSessionStructuralIdentifier = {
+		Level1 = "level1",
+		StreamNotification = "streamNotification",
+		DeleteOnGameLeave = "_deleteOnGameLeave"
+	},
+	Dropdown = {
+		Width = 360,
+		MaxHeight = 638,
+		MinHeight = 200,
+		VerticalMargin = 100,
+		CornerRadius = 16,
+		HorizontalPadding = 20,
+		PaddingTop = 8,
+		PaddingBottom = 8,
+		HeaderMinHeight = 40,
+		CardGap = 16,
+		HeaderBodyGap = 8,
+		ScrollBarThickness = 4,
+		BellIconOpen = Images["icons/common/notificationOn"],
+		BellIconClosed = Images["icons/common/notificationOff"]
+	}
+}

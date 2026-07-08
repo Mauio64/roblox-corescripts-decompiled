@@ -1,28 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Display);
-local v3 = require(l_Parent_0.Signals);
-local _ = require(l_script_FirstAncestor_0.CollectionViewTypes);
-local v5 = require(script.Parent.createCollectionLayoutStore);
-return function() --[[ Line: 17 ]] --[[ Name: createMainCollectionLayoutStore ]]
-    -- upvalues: v2 (copy), v3 (copy), v5 (copy)
-    local v6 = v2.GetDisplayStore(false);
-    local v7, v8 = v3.createSignal(nil);
-    local v11 = v3.createComputed(function(v9) --[[ Line: 22 ]]
-        -- upvalues: v7 (copy), v6 (copy)
-        local v10 = v7(v9);
-        if v10 then
-            return v10;
-        else
-            return v6.getViewportSize(v9).X;
-        end;
-    end);
-    local v12 = v5(v11);
-    return {
-        getContainerWidth = v12.getContainerWidth, 
-        getDesignSpaceContainerWidth = v12.getDesignSpaceContainerWidth, 
-        getItemsPerRow = v12.getItemsPerRow, 
-        getNumItemsForAllCategories = v12.getNumItemsForAllCategories, 
-        setDefaultContentRegionWidth = v8
-    };
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local Display = require(CollectionViewsParent.Display)
+local Signals = require(CollectionViewsParent.Signals)
+
+require(CollectionViews.CollectionViewTypes)
+
+local createCollectionLayoutStore = require(script.Parent.createCollectionLayoutStore)
+
+local function createMainCollectionLayoutStore() -- line: 17
+	-- upvalues: Display (copy), Signals (copy), createCollectionLayoutStore (copy)
+	local v7 = Display.GetDisplayStore(false)
+	local v8, v9 = Signals.createSignal(nil)
+	local v10 = Signals.createComputed(function(p1) -- line: 22
+		-- upvalues: v8 (copy), v7 (copy)
+		local v13 = v8(p1)
+
+		if v13 then
+			return v13
+		end
+
+		return v7.getViewportSize(p1).X
+	end)
+	local v11 = createCollectionLayoutStore(v10)
+
+	return {
+		getContainerWidth = v11.getContainerWidth,
+		getDesignSpaceContainerWidth = v11.getDesignSpaceContainerWidth,
+		getItemsPerRow = v11.getItemsPerRow,
+		getNumItemsForAllCategories = v11.getNumItemsForAllCategories,
+		setDefaultContentRegionWidth = v9
+	}
+end
+
+return createMainCollectionLayoutStore

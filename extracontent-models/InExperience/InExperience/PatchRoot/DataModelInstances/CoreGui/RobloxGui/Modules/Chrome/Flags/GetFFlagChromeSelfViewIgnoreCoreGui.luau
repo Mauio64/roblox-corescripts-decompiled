@@ -1,4 +1,5 @@
-game:DefineFastFlag("ChromeSelfViewIgnoreCoreGui", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ChromeSelfViewIgnoreCoreGui");
-end;
+game:DefineFastFlag("ChromeSelfViewIgnoreCoreGui", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ChromeSelfViewIgnoreCoreGui")
+end

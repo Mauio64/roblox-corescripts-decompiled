@@ -1,5 +1,6 @@
-local _ = require(script.types);
+require(script.types)
+
 return {
-    fetch = require(script.fetch), 
-    ["jest.config"] = script["jest.config"]
-};
+	fetch = require(script.fetch),
+	["jest.config"] = script["jest.config"]
+}

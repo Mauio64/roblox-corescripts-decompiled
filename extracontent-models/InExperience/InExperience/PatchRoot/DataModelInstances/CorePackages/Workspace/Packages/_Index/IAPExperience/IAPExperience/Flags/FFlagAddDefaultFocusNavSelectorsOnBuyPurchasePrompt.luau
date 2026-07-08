@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt", false);
+return game:DefineFastFlag("FFlagAddDefaultFocusNavSelectorsOnBuyPurchasePrompt", false)

@@ -1,6 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Constants);
-return function(v2) --[[ Line: 7 ]] --[[ Name: isLayeredClothingAssetType ]]
-    -- upvalues: v1 (copy)
-    return v1.LAYERED_ASSET_TYPES[v2] ~= nil;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local Constants = require(AvatarExperienceCommon.Constants)
+
+local function isLayeredClothingAssetType(s1: string) -- line: 7
+	-- upvalues: Constants (copy)
+	return Constants.LAYERED_ASSET_TYPES[s1] ~= nil
+end
+
+return isLayeredClothingAssetType

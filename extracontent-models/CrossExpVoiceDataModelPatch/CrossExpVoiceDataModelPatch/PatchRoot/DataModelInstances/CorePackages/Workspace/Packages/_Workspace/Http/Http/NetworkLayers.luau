@@ -1,4 +1,4 @@
 return {
-    HttpCanceller = require(script.HttpCanceller), 
-    requestInternalWrapper = require(script.requestInternalWrapper)
-};
+	HttpCanceller = require(script.HttpCanceller),
+	requestInternalWrapper = require(script.requestInternalWrapper)
+}

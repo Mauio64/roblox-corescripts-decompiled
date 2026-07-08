@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePartyVoiceChangersInLua", false);
+return game:DefineFastFlag("EnablePartyVoiceChangersInLua", false)

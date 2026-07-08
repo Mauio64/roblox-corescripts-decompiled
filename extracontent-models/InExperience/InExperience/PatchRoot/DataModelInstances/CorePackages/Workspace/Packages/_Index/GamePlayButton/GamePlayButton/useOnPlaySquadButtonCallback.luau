@@ -1,23 +1,25 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GamePlayButton");
-local v1 = require(l_script_FirstAncestor_0.OpenCentralOverlayForGameDetailsSquad);
-local v2 = require(l_script_FirstAncestor_0.PlayButtonStates);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-return function(v7, v8, v9, v10) --[[ Line: 12 ]]
-    -- upvalues: l_useDispatch_0 (copy), v4 (copy), l_GetFFlagIsSquadEnabled_0 (copy), v2 (copy), v1 (copy)
-    local v11 = l_useDispatch_0();
-    return v4.useCallback(function(v12) --[[ Line: 15 ]]
-        -- upvalues: l_GetFFlagIsSquadEnabled_0 (ref), v8 (copy), v2 (ref), v11 (copy), v1 (ref), v7 (copy), v9 (copy), v10 (copy)
-        if l_GetFFlagIsSquadEnabled_0() and v8 == v2.PlayableWithParty then
-            v11(v1(v7, v12.AbsolutePosition, v12.AbsoluteSize, v9, v10));
-        end;
-    end, {
-        v11, 
-        v7, 
-        v9, 
-        v8, 
-        v10
-    });
-end;
+local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
+local OpenCentralOverlayForGameDetailsSquad = require(GamePlayButton.OpenCentralOverlayForGameDetailsSquad)
+local PlayButtonStates = require(GamePlayButton.PlayButtonStates)
+local GamePlayButtonParent = GamePlayButton.Parent
+local React = require(GamePlayButtonParent.React)
+local useDispatch = require(GamePlayButtonParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local GetFFlagIsSquadEnabled = require(GamePlayButtonParent.SharedFlags).GetFFlagIsSquadEnabled
+
+return function(p1, p2, p3, p4) -- line: 12
+	-- upvalues: useDispatch (copy), React (copy), GetFFlagIsSquadEnabled (copy), PlayButtonStates (copy), OpenCentralOverlayForGameDetailsSquad (copy)
+	local v12 = useDispatch()
+
+	return React.useCallback(function(p5) -- line: 15
+		-- upvalues: GetFFlagIsSquadEnabled (copy), p2 (copy), PlayButtonStates (copy), v12 (copy), OpenCentralOverlayForGameDetailsSquad (copy), p1 (copy), p3 (copy), p4 (copy)
+		if GetFFlagIsSquadEnabled() and p2 == PlayButtonStates.PlayableWithParty then
+			v12(OpenCentralOverlayForGameDetailsSquad(p1, p5.AbsolutePosition, p5.AbsoluteSize, p3, p4))
+		end
+	end, {
+		v12,
+		p1,
+		p3,
+		p2,
+		p4
+	})
+end

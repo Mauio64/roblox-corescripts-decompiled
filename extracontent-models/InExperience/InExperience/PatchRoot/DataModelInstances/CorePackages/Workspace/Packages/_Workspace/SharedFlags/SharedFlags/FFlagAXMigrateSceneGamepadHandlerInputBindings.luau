@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateSceneGamepadHandlerInputBindings2", false);
+return game:DefineFastFlag("AXMigrateSceneGamepadHandlerInputBindings2", false)

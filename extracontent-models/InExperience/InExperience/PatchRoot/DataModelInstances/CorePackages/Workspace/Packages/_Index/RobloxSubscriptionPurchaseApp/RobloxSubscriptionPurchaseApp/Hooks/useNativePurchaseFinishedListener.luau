@@ -1,32 +1,82 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v5 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v6 = require(l_script_FirstAncestor_0.Actions.completeRobloxSubscriptionUpsellFlow);
-return function() --[[ Line: 13 ]] --[[ Name: useNativePurchaseFinishedListener ]]
-    -- upvalues: v4 (copy), v3 (copy), l_MarketplaceService_0 (copy), v5 (copy), v6 (copy)
-    local v7 = v4.get();
-    v3.useEffect(function() --[[ Line: 16 ]]
-        -- upvalues: l_MarketplaceService_0 (ref), v7 (copy), v5 (ref), v6 (ref)
-        local v10 = l_MarketplaceService_0.NativePurchaseFinishedWithLocalPlayer:Connect(function(_, v9) --[[ Line: 18 ]]
-            -- upvalues: v7 (ref), v5 (ref), v6 (ref)
-            if v7.getPromptState() == v5.SubscriptionPurchaseInProgress then
-                if v9 then
-                    v7.setDidTryPurchasing(true);
-                    v6();
-                    return;
-                else
-                    v7.setPromptState(v5.SubscriptionPurchaseUIReady);
-                end;
-            end;
-        end);
-        return function() --[[ Line: 32 ]]
-            -- upvalues: v10 (copy)
-            if v10 then
-                v10:Disconnect();
-            end;
-        end;
-    end, {});
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local React = require(RobloxSubscriptionPurchaseAppParent.React)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+local completeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.completeRobloxSubscriptionUpsellFlow)
+
+local function useNativePurchaseFinishedListener(p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 13
+	-- upvalues: RobloxSubscriptionStore (copy), React (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+	local v10 = RobloxSubscriptionStore.get()
+	local v11 = React.useRef(v10)
+	local v12 = React.useMemo(function() -- line: 20
+		-- upvalues: p1 (copy)
+		if p1 then
+			return p1
+		end
+
+		return function() -- line: 24
+			return game:GetService("MarketplaceService").NativePurchaseFinishedWithLocalPlayer
+		end
+	end, { p1 })
+	local v13 = React.useMemo(function() -- line: 30
+		-- upvalues: p2 (copy)
+		if p2 then
+			return p2
+		end
+
+		return function() -- line: 34
+			return game:GetService("MarketplaceService").NativePurchaseFinished
+		end
+	end, { p2 })
+
+	React.useEffect(function() -- line: 40
+		-- upvalues: v12 (copy), v11 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy), v13 (copy)
+		local connection = v12():Connect(function(_, p4) -- line: 42
+			-- upvalues: v11 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+			local current = v11.current
+
+			if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
+				if p4 then
+					current.setDidTryPurchasing(true)
+					completeRobloxSubscriptionUpsellFlow()
+
+					return
+				end
+
+				current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
+			end
+		end)
+		local connection2 = v13():Connect(function(_, _, p7) -- line: 57
+			-- upvalues: v11 (copy), PromptState (copy), completeRobloxSubscriptionUpsellFlow (copy)
+			local current = v11.current
+
+			if current.getPromptState() == PromptState.SubscriptionPurchaseInProgress then
+				if p7 then
+					current.setDidTryPurchasing(true)
+					completeRobloxSubscriptionUpsellFlow()
+
+					return
+				end
+
+				current.setPromptState(PromptState.SubscriptionPurchaseUIReady)
+			end
+		end)
+
+		return function() -- line: 71
+			-- upvalues: connection (copy), connection2 (copy)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+		end
+	end, {
+		v12,
+		v13
+	})
+end
+
+return useNativePurchaseFinishedListener

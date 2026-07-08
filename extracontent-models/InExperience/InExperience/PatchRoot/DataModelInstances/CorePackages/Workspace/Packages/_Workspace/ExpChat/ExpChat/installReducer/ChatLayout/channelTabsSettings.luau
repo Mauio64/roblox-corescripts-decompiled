@@ -1,35 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local v4 = require(l_script_FirstAncestor_0.Config);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v6 = require(l_Actions_0.ConfigurationObjectsLoaded);
-local v7 = require(l_Actions_0.ChannelTabsSettingsChanged);
-local v8 = {
-    BackgroundTransparency = v4.ChannelTabsSettings.BackgroundTransparency, 
-    BackgroundColor3 = v4.ChannelTabsSettings.BackgroundColor3, 
-    HoverBackgroundColor3 = v4.ChannelTabsSettings.HoverBackgroundColor3, 
-    FontFace = v4.ChannelTabsSettings.FontFace, 
-    TextSize = v4.ChannelTabsSettings.TextSize, 
-    TextColor3 = v4.ChannelTabsSettings.TextColor3, 
-    SelectedTabTextColor3 = v4.ChannelTabsSettings.SelectedTabTextColor3, 
-    TextStrokeColor3 = v4.ChannelTabsSettings.TextStrokeColor3, 
-    TextStrokeTransparency = v4.ChannelTabsSettings.TextStrokeTransparency
-};
-return v2.createReducer(v8, {
-    [v6.name] = function(v9, v10) --[[ Line: 25 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v9, v10.channelTabsSettings);
-    end, 
-    [v7.name] = function(v11, v12) --[[ Line: 29 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        if not v11[v12.property] then
-            return v11;
-        else
-            return l_Dictionary_0.join(v11, {
-                [v12.property] = v12.value
-            });
-        end;
-    end
-});
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Rodux = require(ExpChatParent.Rodux)
+local Dictionary = require(ExpChatParent.llama).Dictionary
+local Config = require(ExpChat.Config)
+local Actions = ExpChat.Actions
+local ConfigurationObjectsLoaded = require(Actions.ConfigurationObjectsLoaded)
+local ChannelTabsSettingsChanged = require(Actions.ChannelTabsSettingsChanged)
+local t1 = {
+	BackgroundTransparency = Config.ChannelTabsSettings.BackgroundTransparency,
+	BackgroundColor3 = Config.ChannelTabsSettings.BackgroundColor3,
+	HoverBackgroundColor3 = Config.ChannelTabsSettings.HoverBackgroundColor3,
+	FontFace = Config.ChannelTabsSettings.FontFace,
+	TextSize = Config.ChannelTabsSettings.TextSize,
+	TextColor3 = Config.ChannelTabsSettings.TextColor3,
+	SelectedTabTextColor3 = Config.ChannelTabsSettings.SelectedTabTextColor3,
+	TextStrokeColor3 = Config.ChannelTabsSettings.TextStrokeColor3,
+	TextStrokeTransparency = Config.ChannelTabsSettings.TextStrokeTransparency
+}
+
+return Rodux.createReducer(t1, {
+	[ConfigurationObjectsLoaded.name] = function(p1, p2) -- line: 25
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(p1, p2.channelTabsSettings)
+	end,
+	[ChannelTabsSettingsChanged.name] = function(p3, p4) -- line: 29
+		-- upvalues: Dictionary (copy)
+		if not p3[p4.property] then
+			return p3
+		end
+
+		return Dictionary.join(p3, {
+			[p4.property] = p4.value
+		})
+	end
+})

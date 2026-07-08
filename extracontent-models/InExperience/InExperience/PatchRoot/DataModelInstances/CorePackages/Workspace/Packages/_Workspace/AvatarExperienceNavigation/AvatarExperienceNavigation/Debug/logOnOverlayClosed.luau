@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceNavigation").Parent;
-local v1 = require(l_Parent_0.AppDebug).LogTree.logger("ax.rn.overlay");
-return function(v2, v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    v1:info("onOverlayClosed {}, captureFocus: {}", v2, v3);
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
+local v2 = require(Parent.AppDebug).LogTree.logger("ax.rn.overlay")
+
+return function(p1, b1: boolean?) -- line: 6
+	-- upvalues: v2 (copy)
+	v2:info("onOverlayClosed {}, captureFocus: {}", p1, b1)
+end

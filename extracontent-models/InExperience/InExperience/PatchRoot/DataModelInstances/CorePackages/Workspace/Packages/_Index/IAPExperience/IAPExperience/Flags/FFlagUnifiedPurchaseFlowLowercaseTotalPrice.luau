@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnifiedPurchaseFlowLowercaseTotalPrice", false);
+return game:DefineFastFlag("UnifiedPurchaseFlowLowercaseTotalPrice", false)

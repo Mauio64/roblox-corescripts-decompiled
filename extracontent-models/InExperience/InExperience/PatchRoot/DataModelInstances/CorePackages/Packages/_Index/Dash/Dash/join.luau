@@ -1,7 +1,12 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-local v2 = require(l_Parent_0.assign);
-return function(...) --[[ Line: 13 ]] --[[ Name: join ]]
-    -- upvalues: v2 (copy)
-    return v2({}, ...);
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local assign = require(scriptParent.assign)
+
+local function join(...) -- line: 13
+	-- upvalues: assign (copy)
+	return assign({}, ...)
+end
+
+return join

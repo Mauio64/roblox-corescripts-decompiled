@@ -1,1 +1,1 @@
-return require(script.ContactDescriptionContainer);
+return require(script.ContactDescriptionContainer)

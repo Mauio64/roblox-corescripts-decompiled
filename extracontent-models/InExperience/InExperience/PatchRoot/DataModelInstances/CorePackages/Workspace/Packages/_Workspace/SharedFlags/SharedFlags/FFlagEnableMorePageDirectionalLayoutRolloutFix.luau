@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableMorePageDirectionalLayoutRolloutFix", false);
+return game:DefineFastFlag("EnableMorePageDirectionalLayoutRolloutFix", false)

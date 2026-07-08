@@ -1,11 +1,16 @@
-local _ = require(script.ReactInternalTypes);
-local _ = require(script.ReactRootTags);
-local _ = require(script.ReactFiberHostConfig);
-local _ = require(script["ReactFiberHotReloading.new"]);
-return function(v4) --[[ Line: 39 ]] --[[ Name: initialize ]]
-    local v5 = require(script.ReactFiberHostConfig);
-    for v6, v7 in v4 do
-        v5[v6] = v7;
-    end;
-    return require(script.ReactFiberReconciler);
-end;
+require(script.ReactInternalTypes)
+require(script.ReactRootTags)
+require(script.ReactFiberHostConfig)
+require(script["ReactFiberHotReloading.new"])
+
+local function initialize(p1) -- line: 39
+	local ReactFiberHostConfig = require(script.ReactFiberHostConfig)
+
+	for v4, v5 in p1 do
+		ReactFiberHostConfig[v4] = v5
+	end
+
+	return require(script.ReactFiberReconciler)
+end
+
+return initialize

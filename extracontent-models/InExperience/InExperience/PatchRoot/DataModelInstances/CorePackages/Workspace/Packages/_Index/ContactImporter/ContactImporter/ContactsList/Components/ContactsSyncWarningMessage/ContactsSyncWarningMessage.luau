@@ -1,21 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("ContactImporter").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function(v6) --[[ Line: 16 ]] --[[ Name: ContactsSyncWarningMessage ]]
-    -- upvalues: l_useLocalization_0 (copy), v1 (copy), l_View_0 (copy), l_Text_0 (copy)
-    local v7 = l_useLocalization_0({
-        message = "Feature.Contacts.Message.ContactsSyncWarning"
-    });
-    return v1.createElement(l_View_0, {
-        LayoutOrder = v6.layoutOrder, 
-        tag = "size-full-0 auto-y margin-y-small"
-    }, {
-        text = v1.createElement(l_Text_0, {
-            tag = "auto-y size-full-0 text-align-x-left text-wrap radius-medium bg-action-alert padding-medium stroke-emphasis", 
-            Text = v7.message
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("ContactImporter").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+
+local function ContactsSyncWarningMessage(t1: {[any]: any}) -- line: 16
+	-- upvalues: useLocalization (copy), React (copy), View (copy), FoundationText (copy)
+	local v9 = useLocalization({
+		message = "Feature.Contacts.Message.ContactsSyncWarning"
+	})
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y margin-y-small",
+		LayoutOrder = t1.layoutOrder
+	}, {
+		text = React.createElement(FoundationText, {
+			tag = "auto-y size-full-0 text-align-x-left text-wrap radius-medium bg-action-alert padding-medium stroke-emphasis",
+			Text = v9.message
+		})
+	})
+end
+
+return ContactsSyncWarningMessage

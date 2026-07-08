@@ -1,19 +1,28 @@
-local v0 = {};
-local l_ApolloLink_0 = require(script.Parent.Parent.core).ApolloLink;
-local _ = require(script.Parent.selectHttpOptionsAndBody);
-local l_createHttpLink_0 = require(script.Parent.createHttpLink).createHttpLink;
-local v4 = setmetatable({}, {
-    __index = l_ApolloLink_0
-});
-v4.__index = v4;
-v4.new = function(v5) --[[ Line: 23 ]] --[[ Name: new ]]
-    -- upvalues: l_ApolloLink_0 (copy), l_createHttpLink_0 (copy), v4 (copy)
-    if v5 == nil then
-        v5 = {};
-    end;
-    local v6 = setmetatable(l_ApolloLink_0.new(l_createHttpLink_0(v5).request), v4);
-    v6.options = v5;
-    return v6;
-end;
-v0.HttpLink = v4;
-return v0;
+local t1 = {}
+local ApolloLink = require(script.Parent.Parent.core).ApolloLink
+
+require(script.Parent.selectHttpOptionsAndBody)
+
+local createHttpLink = require(script.Parent.createHttpLink).createHttpLink
+local self = setmetatable({}, {
+	__index = ApolloLink
+})
+
+self.__index = self
+
+function self.new(p1) -- line: 23
+	-- upvalues: ApolloLink (copy), createHttpLink (copy), self (copy)
+	if p1 == nil then
+		p1 = {}
+	end
+
+	local v6 = setmetatable(ApolloLink.new(createHttpLink(p1).request), self)
+
+	v6.options = p1
+
+	return v6
+end
+
+t1.HttpLink = self
+
+return t1

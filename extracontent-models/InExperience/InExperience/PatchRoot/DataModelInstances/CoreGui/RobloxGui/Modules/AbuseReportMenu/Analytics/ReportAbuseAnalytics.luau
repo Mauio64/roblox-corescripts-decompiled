@@ -1,118 +1,134 @@
-local l_SessionService_0 = game:GetService("SessionService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local v3 = {};
-v3.__index = v3;
-v3.MenuContexts = {
-    LegacyMenu = game:DefineFastString("ReportAnalyticsLegacyMenuContext", "ReportAbuseLegacyMenu"), 
-    LegacySentPage = game:DefineFastString("ReportAnalyticsLegacySentPageContext", "ReportAbuseLegacySentPage"), 
-    NewMenu = game:DefineFastString("ReportAnalyticsNewMenuContext", "ReportAbuseNewMenu")
-};
-v3.DiagCounters = {
-    SuccessfulSubmissionTime = game:DefineFastString("ReportAnalyticsSuccessfulSubmissionTimeStat", "SuccessfulSubmissionTime"), 
-    AbandonedSubmissionTime = game:DefineFastString("ReportAnalyticsAbandonedSubmissionTimeStat", "AbandonedSubmissionTime"), 
-    SubmittedMethodOfAbuse = game:DefineFastString("ReportAnalyticsSubmittedMethodOfAbuseStat", "SubmittedMethodOfAbuse")
-};
-v3.ActionNames = {
-    FieldChanged = game:DefineFastString("ReportAnalyticsFieldChanged", "FieldChanged"), 
-    FormSubmitted = game:DefineFastString("ReportAnalyticsFormSubmitted", "FormSubmitted"), 
-    FormAbandoned = game:DefineFastString("ReportAnalyticsFormAbandoned", "FormAbandoned"), 
-    ButtonActivated = game:DefineFastString("ReportAnalyticsButtonActivated", "ButtonActivated"), 
-    InGameAbuseReport = game:DefineFastString("ReportAnalyticsInGameAbuseReport", "InGameAbuseReport")
-};
-v3.SessionConstants = {
-    StructuralIdentifier = {
-        Level1 = "level1", 
-        AbuseReport = "AbuseReport"
-    }, 
-    Metadata = {
-        EntryPoint = "entryPoint", 
-        DeleteOnGameLeave = "_deleteOnGameLeave"
-    }
-};
-local v4 = {
-    SUBMIT = 1, 
-    ABANDON = 2
-};
-v3.new = function(v5, v6, v7) --[[ Line: 57 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    assert(v7, "Base context needs to be provided to ReportAbuseAnalytics");
-    local v8 = {
-        _eventStreamImpl = v5, 
-        _diagImpl = v6, 
-        _context = v7
-    };
-    setmetatable(v8, v3);
-    return v8;
-end;
-v3.reportFormSubmitted = function(v9, v10, v11, v12) --[[ Line: 70 ]] --[[ Name: reportFormSubmitted ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v13 = v9._context .. "_" .. v3.DiagCounters.SuccessfulSubmissionTime;
-    local v14 = v9._context .. "_" .. v3.DiagCounters.SubmittedMethodOfAbuse .. "_" .. v11;
-    v12 = v2.Dictionary.join(v12 or {}, {
-        timeToComplete = v10, 
-        methodOfAbuse = v11
-    });
-    v9._diagImpl:reportStats(v13, v10);
-    v9._diagImpl:reportCounter(v14, 1);
-    v9._eventStreamImpl:sendEventDeferred(v9._context, v3.ActionNames.FormSubmitted, v12);
-end;
-v3.reportFormAbandoned = function(v15, v16, v17) --[[ Line: 93 ]] --[[ Name: reportFormAbandoned ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v18 = v15._context .. "_" .. v3.DiagCounters.AbandonedSubmissionTime;
-    v17 = v2.Dictionary.join(v17 or {}, {
-        timeToExit = v16
-    });
-    v15._diagImpl:reportStats(v18, v16);
-    v15._eventStreamImpl:sendEventDeferred(v15._context, v3.ActionNames.FormAbandoned, v17);
-end;
-v3.reportAnalyticsFieldChanged = function(v19, v20) --[[ Line: 108 ]] --[[ Name: reportAnalyticsFieldChanged ]]
-    -- upvalues: v3 (copy)
-    v19._eventStreamImpl:sendEventDeferred(v19._context, v3.ActionNames.FieldChanged, v20 or {});
-end;
-v3.reportButtonClick = function(v21, v22) --[[ Line: 116 ]] --[[ Name: reportButtonClick ]]
-    -- upvalues: v3 (copy)
-    v21._eventStreamImpl:sendEventDeferred(v21._context, v3.ActionNames.ButtonActivated, v22 or {});
-end;
-v3.reportInGameAbuseReportInteraction = function(v23, v24) --[[ Line: 129 ]] --[[ Name: reportInGameAbuseReportInteraction ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    local v25 = v24.interactionType == v4.SUBMIT;
-    local l_AbandonedSubmissionTime_0 = v3.DiagCounters.AbandonedSubmissionTime;
-    if v25 then
-        l_AbandonedSubmissionTime_0 = v3.DiagCounters.SuccessfulSubmissionTime;
-        local v27 = v23._context .. "_" .. v3.DiagCounters.SubmittedMethodOfAbuse .. "_" .. v24.inferredTypeofabuseSelection;
-        v23._diagImpl:reportCounter(v27, 1);
-    end;
-    local v28 = v23._context .. "_" .. l_AbandonedSubmissionTime_0;
-    v23._diagImpl:reportStats(v28, v24.timeSpentMs);
-    v23._eventStreamImpl:sendEventDeferred(v23._context, v3.ActionNames.InGameAbuseReport, v24);
-end;
-v3.reportEventAndIncrement = function(v29, v30, v31) --[[ Line: 150 ]] --[[ Name: reportEventAndIncrement ]]
-    v29._diagImpl:reportCounter(v29._context .. "_" .. v30, 1);
-    v29._eventStreamImpl:sendEventDeferred(v29._context, v30, v31 or {});
-end;
-v3.startAbuseReportSession = function(_, v33) --[[ Line: 156 ]] --[[ Name: startAbuseReportSession ]]
-    -- upvalues: l_SessionService_0 (copy), v3 (copy)
-    if not l_SessionService_0:SessionExists(v3.SessionConstants.StructuralIdentifier.AbuseReport) then
-        l_SessionService_0:SetSession(v3.SessionConstants.StructuralIdentifier.Level1, v3.SessionConstants.StructuralIdentifier.AbuseReport, v3.SessionConstants.StructuralIdentifier.AbuseReport);
-    end;
-    if not l_SessionService_0:GetMetadata(v3.SessionConstants.StructuralIdentifier.AbuseReport, v3.SessionConstants.Metadata.EntryPoint) then
-        l_SessionService_0:SetMetadata(v3.SessionConstants.StructuralIdentifier.AbuseReport, v3.SessionConstants.Metadata.EntryPoint, v33);
-    end;
-    l_SessionService_0:SetMetadata(v3.SessionConstants.StructuralIdentifier.AbuseReport, v3.SessionConstants.Metadata.DeleteOnGameLeave, "True");
-end;
-v3.getAbuseReportSessionEntryPoint = function(_) --[[ Line: 188 ]] --[[ Name: getAbuseReportSessionEntryPoint ]]
-    -- upvalues: l_SessionService_0 (copy), v3 (copy)
-    if l_SessionService_0:SessionExists(v3.SessionConstants.StructuralIdentifier.AbuseReport) then
-        return (l_SessionService_0:GetMetadata(v3.SessionConstants.StructuralIdentifier.AbuseReport, v3.SessionConstants.Metadata.EntryPoint));
-    else
-        return "";
-    end;
-end;
-v3.endAbuseReportSession = function(_) --[[ Line: 202 ]] --[[ Name: endAbuseReportSession ]]
-    -- upvalues: l_SessionService_0 (copy), v3 (copy)
-    if l_SessionService_0:SessionExists(v3.SessionConstants.StructuralIdentifier.AbuseReport) then
-        l_SessionService_0:RemoveSession(v3.SessionConstants.StructuralIdentifier.AbuseReport);
-    end;
-end;
-return v3;
+local SessionService = game:GetService("SessionService")
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local t1 = {}
+
+t1.__index = t1
+t1.MenuContexts = {
+	LegacyMenu = game:DefineFastString("ReportAnalyticsLegacyMenuContext", "ReportAbuseLegacyMenu"),
+	LegacySentPage = game:DefineFastString("ReportAnalyticsLegacySentPageContext", "ReportAbuseLegacySentPage"),
+	NewMenu = game:DefineFastString("ReportAnalyticsNewMenuContext", "ReportAbuseNewMenu")
+}
+t1.DiagCounters = {
+	SuccessfulSubmissionTime = game:DefineFastString("ReportAnalyticsSuccessfulSubmissionTimeStat", "SuccessfulSubmissionTime"),
+	AbandonedSubmissionTime = game:DefineFastString("ReportAnalyticsAbandonedSubmissionTimeStat", "AbandonedSubmissionTime"),
+	SubmittedMethodOfAbuse = game:DefineFastString("ReportAnalyticsSubmittedMethodOfAbuseStat", "SubmittedMethodOfAbuse")
+}
+t1.ActionNames = {
+	FieldChanged = game:DefineFastString("ReportAnalyticsFieldChanged", "FieldChanged"),
+	FormSubmitted = game:DefineFastString("ReportAnalyticsFormSubmitted", "FormSubmitted"),
+	FormAbandoned = game:DefineFastString("ReportAnalyticsFormAbandoned", "FormAbandoned"),
+	ButtonActivated = game:DefineFastString("ReportAnalyticsButtonActivated", "ButtonActivated"),
+	InGameAbuseReport = game:DefineFastString("ReportAnalyticsInGameAbuseReport", "InGameAbuseReport")
+}
+t1.SessionConstants = {
+	StructuralIdentifier = {
+		Level1 = "level1",
+		AbuseReport = "AbuseReport"
+	},
+	Metadata = {
+		EntryPoint = "entryPoint",
+		DeleteOnGameLeave = "_deleteOnGameLeave"
+	}
+}
+
+local _ = {
+	SUBMIT = 1,
+	ABANDON = 2
+}
+
+function t1.new(p1, p2, p3) -- line: 57
+	-- upvalues: t1 (copy)
+	assert(p3, "Base context needs to be provided to ReportAbuseAnalytics")
+
+	local t2 = {
+		_eventStreamImpl = p1,
+		_diagImpl = p2,
+		_context = p3
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.reportFormSubmitted(p4, p5, p6, p7) -- line: 70
+	-- upvalues: t1 (copy), Cryo (copy)
+	local v14 = p4._context .. "_" .. t1.DiagCounters.SuccessfulSubmissionTime
+	local v15 = p4._context .. "_" .. t1.DiagCounters.SubmittedMethodOfAbuse .. "_" .. p6
+	local v16 = Cryo.Dictionary.join(p7 or {}, {
+		timeToComplete = p5,
+		methodOfAbuse = p6
+	})
+
+	p4._diagImpl:reportStats(v14, p5)
+	p4._diagImpl:reportCounter(v15, 1)
+	p4._eventStreamImpl:sendEventDeferred(p4._context, t1.ActionNames.FormSubmitted, v16)
+end
+function t1.reportFormAbandoned(p8, p9, p10) -- line: 93
+	-- upvalues: t1 (copy), Cryo (copy)
+	local v20 = p8._context .. "_" .. t1.DiagCounters.AbandonedSubmissionTime
+	local v21 = Cryo.Dictionary.join(p10 or {}, {
+		timeToExit = p9
+	})
+
+	p8._diagImpl:reportStats(v20, p9)
+	p8._eventStreamImpl:sendEventDeferred(p8._context, t1.ActionNames.FormAbandoned, v21)
+end
+function t1.reportAnalyticsFieldChanged(p11, p12) -- line: 108
+	-- upvalues: t1 (copy)
+	p11._eventStreamImpl:sendEventDeferred(p11._context, t1.ActionNames.FieldChanged, p12 or {})
+end
+function t1.reportButtonClick(p13, p14) -- line: 116
+	-- upvalues: t1 (copy)
+	p13._eventStreamImpl:sendEventDeferred(p13._context, t1.ActionNames.ButtonActivated, p14 or {})
+end
+function t1.reportInGameAbuseReportInteraction(t3: {[any]: any}, t4: {[any]: any}) -- line: 129
+	-- upvalues: t1 (copy)
+	local v28 = t4.interactionType == 1
+	local AbandonedSubmissionTime = t1.DiagCounters.AbandonedSubmissionTime
+
+	if v28 then
+		AbandonedSubmissionTime = t1.DiagCounters.SuccessfulSubmissionTime
+
+		local v30 = t3._context .. "_" .. t1.DiagCounters.SubmittedMethodOfAbuse .. "_" .. t4.inferredTypeofabuseSelection
+
+		t3._diagImpl:reportCounter(v30, 1)
+	end
+
+	local v31 = t3._context .. "_" .. AbandonedSubmissionTime
+
+	t3._diagImpl:reportStats(v31, t4.timeSpentMs)
+	t3._eventStreamImpl:sendEventDeferred(t3._context, t1.ActionNames.InGameAbuseReport, t4)
+end
+function t1.reportEventAndIncrement(p15, p16, p17) -- line: 150
+	p15._diagImpl:reportCounter(p15._context .. "_" .. p16, 1)
+	p15._eventStreamImpl:sendEventDeferred(p15._context, p16, p17 or {})
+end
+function t1.startAbuseReportSession(_, p19) -- line: 156
+	-- upvalues: SessionService (copy), t1 (copy)
+	if not SessionService:SessionExists(t1.SessionConstants.StructuralIdentifier.AbuseReport) then
+		SessionService:SetSession(t1.SessionConstants.StructuralIdentifier.Level1, t1.SessionConstants.StructuralIdentifier.AbuseReport, t1.SessionConstants.StructuralIdentifier.AbuseReport)
+	end
+
+	if not SessionService:GetMetadata(t1.SessionConstants.StructuralIdentifier.AbuseReport, t1.SessionConstants.Metadata.EntryPoint) then
+		SessionService:SetMetadata(t1.SessionConstants.StructuralIdentifier.AbuseReport, t1.SessionConstants.Metadata.EntryPoint, p19)
+	end
+
+	SessionService:SetMetadata(t1.SessionConstants.StructuralIdentifier.AbuseReport, t1.SessionConstants.Metadata.DeleteOnGameLeave, "True")
+end
+function t1.getAbuseReportSessionEntryPoint(_) -- line: 188
+	-- upvalues: SessionService (copy), t1 (copy)
+	if SessionService:SessionExists(t1.SessionConstants.StructuralIdentifier.AbuseReport) then
+		return (SessionService:GetMetadata(t1.SessionConstants.StructuralIdentifier.AbuseReport, t1.SessionConstants.Metadata.EntryPoint))
+	end
+
+	return ""
+end
+function t1.endAbuseReportSession(_) -- line: 202
+	-- upvalues: SessionService (copy), t1 (copy)
+	if SessionService:SessionExists(t1.SessionConstants.StructuralIdentifier.AbuseReport) then
+		SessionService:RemoveSession(t1.SessionConstants.StructuralIdentifier.AbuseReport)
+	end
+end
+
+return t1

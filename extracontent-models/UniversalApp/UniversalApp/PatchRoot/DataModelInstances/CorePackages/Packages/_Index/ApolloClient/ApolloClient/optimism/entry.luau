@@ -1,344 +1,390 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Set_0 = v1.Set;
-local l_Map_0 = v1.Map;
-local l_Error_0 = v1.Error;
-local v6 = {};
-local v7 = newproxy(true);
-getmetatable(v7).__tostring = function() --[[ Line: 34 ]]
-    return "Value.None";
-end;
-local v8 = nil;
-local v9 = nil;
-local v10 = nil;
-local v11 = nil;
-local v12 = nil;
-local v13 = nil;
-local v14 = nil;
-local v15 = nil;
-local v16 = nil;
-local v17 = nil;
-local v18 = nil;
-local v19 = nil;
-local v20 = nil;
-local v21 = nil;
-local l_parentEntrySlot_0 = require(script.Parent.context).parentEntrySlot;
-local _ = require(script.Parent.initTypes);
-local _ = require(script.Parent.depTypes);
-local v25 = require(script.Parent.helpers);
-local l_maybeUnsubscribe_0 = v25.maybeUnsubscribe;
-local l_toArray_0 = v25.toArray;
-local v28 = {};
-local function _(v29, v30) --[[ Line: 73 ]] --[[ Name: assert ]]
-    -- upvalues: l_Error_0 (copy)
-    if not v29 then
-        error(l_Error_0.new(v30 or "assertion failure"));
-    end;
-end;
-local _ = require(script.Parent.entryTypes);
-local _ = require(script.Parent.anyEntryTypes);
-local function _(v34, v35) --[[ Line: 87 ]] --[[ Name: valueIs ]]
-    local v36 = #v34;
-    local v37 = false;
-    if v36 > 0 then
-        v37 = false;
-        if v36 == #v35 then
-            v37 = v34[v36] == v35[v36];
-        end;
-    end;
-    return v37;
-end;
-local function v40(v39) --[[ Line: 98 ]] --[[ Name: valueGet ]]
-    -- upvalues: v7 (copy), l_Error_0 (copy)
-    if v39[2] ~= nil then
-        error(v39[2]);
-        return;
-    elseif v39[1] ~= nil then
-        if v39[1] == v7 then
-            return nil;
-        else
-            return v39[1];
-        end;
-    else
-        error(l_Error_0.new("unknown value"));
-        return;
-    end;
-end;
-local function _(v41) --[[ Line: 123 ]] --[[ Name: valueCopy ]]
-    return (table.clone(v41));
-end;
-local v43 = {};
-v43.__index = v43;
-v43.count = 0;
-v43.new = function(v44) --[[ Line: 138 ]] --[[ Name: new ]]
-    -- upvalues: v43 (copy), l_Set_0 (copy), l_Map_0 (copy)
-    local v45 = setmetatable({}, v43);
-    v45.parents = l_Set_0.new();
-    v45.childValues = l_Map_0.new(nil);
-    v45.dirtyChildren = nil;
-    v45.dirty = true;
-    v45.recomputing = false;
-    v45.value = {};
-    v45.deps = nil;
-    v45.fn = v44;
-    local l_v43_0 = v43;
-    l_v43_0.count = l_v43_0.count + 1;
-    return v45;
-end;
-v43.peek = function(v47) --[[ Line: 159 ]] --[[ Name: peek ]]
-    -- upvalues: v11 (ref), v8 (ref)
-    if #v47.value == 1 and not v11(v47) then
-        v8(v47);
-        return v47.value[1];
-    else
-        return nil;
-    end;
-end;
-v43.recompute = function(v48, v49) --[[ Line: 173 ]] --[[ Name: recompute ]]
-    -- upvalues: l_Error_0 (copy), v8 (ref), v11 (ref), v9 (ref), v40 (copy)
-    if v48.recomputing then
-        error(l_Error_0.new("already recomputing"));
-    end;
-    v8(v48);
-    if v11(v48) then
-        return v9(v48, v49);
-    else
-        return v40(v48.value);
-    end;
-end;
-v43.setDirty = function(v50) --[[ Line: 183 ]] --[[ Name: setDirty ]]
-    -- upvalues: v13 (ref), l_maybeUnsubscribe_0 (copy)
-    if v50.dirty then
-        return;
-    else
-        v50.dirty = true;
-        v50.value = {};
-        v13(v50);
-        l_maybeUnsubscribe_0(v50);
-        return;
-    end;
-end;
-v43.dispose = function(v51) --[[ Line: 198 ]] --[[ Name: dispose ]]
-    -- upvalues: v19 (ref), v15 (ref), v20 (ref)
-    v51:setDirty();
-    v19(v51);
-    v15(v51, function(v52, _) --[[ Line: 216 ]]
-        -- upvalues: v20 (ref), v51 (copy)
-        v52:setDirty();
-        v20(v52, v51);
-        return nil;
-    end);
-end;
-v43.forget = function(v54) --[[ Line: 223 ]] --[[ Name: forget ]]
-    v54:dispose();
-end;
-v43.dependOn = function(v55, v56) --[[ Line: 230 ]] --[[ Name: dependOn ]]
-    -- upvalues: v28 (copy), l_Set_0 (copy)
-    v56:add(v55);
-    if not v55.deps then
-        v55.deps = table.remove(v28) or l_Set_0.new();
-    end;
-    v55.deps:add(v56);
-end;
-v43.forgetDeps = function(v57) --[[ Line: 240 ]] --[[ Name: forgetDeps ]]
-    -- upvalues: l_Array_0 (copy), l_toArray_0 (copy), v28 (copy)
-    if v57.deps then
-        l_Array_0.forEach(l_toArray_0(v57.deps), function(v58) --[[ Line: 244 ]]
-            -- upvalues: v57 (copy)
-            v58:delete(v57);
-        end);
-        v57.deps:clear();
-        table.insert(v28, v57.deps);
-        v57.deps = nil;
-    end;
-end;
-v6.Entry = v43;
-v8 = function(v59) --[[ Line: 255 ]] --[[ Name: rememberParent ]]
-    -- upvalues: l_parentEntrySlot_0 (copy), v11 (ref), v16 (ref), v17 (ref)
-    local v60 = l_parentEntrySlot_0:getValue();
-    if v60 then
-        v59.parents:add(v60);
-        if not v60.childValues:has(v59) then
-            v60.childValues:set(v59, {});
-        end;
-        if v11(v59) then
-            v16(v60, v59);
-            return v60;
-        else
-            v17(v60, v59);
-            return v60;
-        end;
-    else
-        return nil;
-    end;
-end;
-v9 = function(v61, v62) --[[ Line: 281 ]] --[[ Name: reallyRecompute ]]
-    -- upvalues: v19 (ref), l_parentEntrySlot_0 (copy), v10 (ref), v21 (ref), v12 (ref), v40 (copy)
-    v19(v61);
-    l_parentEntrySlot_0:withValue(v61, v10, {
-        v61, 
-        v62
-    });
-    if v21(v61, v62) then
-        v12(v61);
-    end;
-    return v40(v61.value);
-end;
-v10 = function(_, v64, v65) --[[ Line: 298 ]] --[[ Name: recomputeNewValue ]]
-    -- upvalues: v7 (copy)
-    v64.recomputing = true;
-    table.clear(v64.value);
-    local l_status_0, l_result_0 = pcall(v64.fn, table.unpack(v65));
-    if l_status_0 then
-        v64.value[1] = l_result_0;
-        if v64.value[1] == nil then
-            v64.value[1] = v7;
-        end;
-    end;
-    if not l_status_0 then
-        v64.value[2] = l_result_0;
-    end;
-    v64.recomputing = false;
-end;
-v11 = function(v68) --[[ Line: 321 ]] --[[ Name: mightBeDirty ]]
-    return v68.dirty or v68.dirtyChildren ~= nil and v68.dirtyChildren.size > 0;
-end;
-v12 = function(v69) --[[ Line: 327 ]] --[[ Name: setClean ]]
-    -- upvalues: v11 (ref), v14 (ref)
-    v69.dirty = false;
-    if v11(v69) then
-        return;
-    else
-        v14(v69);
-        return;
-    end;
-end;
-v13 = function(v70) --[[ Line: 339 ]] --[[ Name: reportDirty ]]
-    -- upvalues: v15 (ref), v16 (ref)
-    v15(v70, v16);
-end;
-v14 = function(v71) --[[ Line: 343 ]] --[[ Name: reportClean ]]
-    -- upvalues: v15 (ref), v17 (ref)
-    v15(v71, v17);
-end;
-v15 = function(v72, v73) --[[ Line: 347 ]] --[[ Name: eachParent ]]
-    -- upvalues: l_toArray_0 (copy)
-    local l_size_0 = v72.parents.size;
-    if l_size_0 then
-        local v75 = l_toArray_0(v72.parents);
-        for v76 = 1, l_size_0 do
-            v73(v75[v76], v72);
-        end;
-    end;
-end;
-v16 = function(v77, v78) --[[ Line: 360 ]] --[[ Name: reportDirtyChild ]]
-    -- upvalues: l_Error_0 (copy), v11 (ref), v28 (copy), l_Set_0 (copy), v13 (ref)
-    if _G.__DEV__ then
-        local v79, v80 = v77.childValues:has(v78);
-        if not v79 then
-            error(l_Error_0.new(v80 or "assertion failure"));
-        end;
-        v79, v80 = v11(v78);
-        if not v79 then
-            error(l_Error_0.new(v80 or "assertion failure"));
-        end;
-    end;
-    local v81 = not v11(v77);
-    if not v77.dirtyChildren then
-        v77.dirtyChildren = table.remove(v28) or l_Set_0.new();
-    elseif v77.dirtyChildren:has(v78) then
-        return;
-    end;
-    v77.dirtyChildren:add(v78);
-    if v81 then
-        v13(v77);
-    end;
-end;
-v17 = function(v82, v83) --[[ Line: 394 ]] --[[ Name: reportCleanChild ]]
-    -- upvalues: l_Error_0 (copy), v11 (ref), v18 (ref), v14 (ref)
-    if _G.__DEV__ then
-        local v84, v85 = v82.childValues:has(v83);
-        if not v84 then
-            error(l_Error_0.new(v85 or "assertion failure"));
-        end;
-        if v11(v83) then
-            error(l_Error_0.new("assertion failure"));
-        end;
-    end;
-    local v86 = v82.childValues:get(v83);
-    if #v86 == 0 then
-        local l_childValues_0 = v82.childValues;
-        local l_v83_0 = v83;
-        local l_value_0 = v83.value;
-        l_childValues_0:set(l_v83_0, (table.clone(l_value_0)));
-    else
-        local l_value_1 = v83.value;
-        local v91 = #v86;
-        local v92 = false;
-        if v91 > 0 then
-            v92 = false;
-            if v91 == #l_value_1 then
-                v92 = v86[v91] == l_value_1[v91];
-            end;
-        end;
-        if not v92 then
-            v82:setDirty();
-        end;
-    end;
-    v18(v82, v83);
-    if v11(v82) then
-        return;
-    else
-        v14(v82);
-        return;
-    end;
-end;
-v18 = function(v93, v94) --[[ Line: 421 ]] --[[ Name: removeDirtyChild ]]
-    -- upvalues: v28 (copy)
-    local l_dirtyChildren_0 = v93.dirtyChildren;
-    if l_dirtyChildren_0 ~= nil then
-        l_dirtyChildren_0:delete(v94);
-        if l_dirtyChildren_0.size == 0 then
-            if #v28 < 100 then
-                table.insert(v28, l_dirtyChildren_0);
-            end;
-            v93.dirtyChildren = nil;
-        end;
-    end;
-end;
-v19 = function(v96) --[[ Line: 436 ]] --[[ Name: forgetChildren ]]
-    -- upvalues: l_Array_0 (copy), v20 (ref), l_Error_0 (copy)
-    if v96.childValues.size > 0 then
-        local v97 = table.clone(v96.childValues:keys());
-        l_Array_0.forEach(v97, function(v98) --[[ Line: 444 ]]
-            -- upvalues: v20 (ref), v96 (copy)
-            v20(v96, v98);
-        end);
-    end;
-    v96:forgetDeps();
-    if not (v96.dirtyChildren == nil) then
-        error(l_Error_0.new("assertion failure"));
-    end;
-end;
-v20 = function(v99, v100) --[[ Line: 458 ]] --[[ Name: forgetChild ]]
-    -- upvalues: v18 (ref)
-    v100.parents:delete(v99);
-    v99.childValues:delete(v100);
-    v18(v99, v100);
-end;
-v21 = function(v101, v102) --[[ Line: 464 ]] --[[ Name: maybeSubscribe ]]
-    -- upvalues: l_maybeUnsubscribe_0 (copy)
-    if typeof(v101.subscribe) == "function" and not pcall(function() --[[ Line: 466 ]]
-        -- upvalues: l_maybeUnsubscribe_0 (ref), v101 (copy), v102 (copy)
-        l_maybeUnsubscribe_0(v101);
-        v101.unsubscribe = v101.subscribe(table.unpack(v102));
-        return nil, false;
-    end) then
-        v101:setDirty();
-        return false;
-    else
-        return true;
-    end;
-end;
-return v6;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Set = LuauPolyfill.Set
+local Map = LuauPolyfill.Map
+local Error = LuauPolyfill.Error
+local t1 = {}
+local v8 = newproxy(true)
+
+getmetatable(v8).__tostring = function() -- line: 34
+	return "Value.None"
+end
+
+local rememberParent = nil
+local reallyRecompute = nil
+local recomputeNewValue = nil
+local mightBeDirty = nil
+local setClean = nil
+local reportDirty = nil
+local reportClean = nil
+local eachParent = nil
+local reportDirtyChild = nil
+local reportCleanChild = nil
+local removeDirtyChild = nil
+local forgetChildren = nil
+local forgetChild = nil
+local maybeSubscribe = nil
+local parentEntrySlot = require(script.Parent.context).parentEntrySlot
+
+require(script.Parent.initTypes)
+require(script.Parent.depTypes)
+
+local helpers = require(script.Parent.helpers)
+local maybeUnsubscribe = helpers.maybeUnsubscribe
+local toArray = helpers.toArray
+local t2 = {}
+
+local function assert(p1, s1: string?) -- line: 73
+	-- upvalues: Error (copy)
+	if not p1 then
+		error(Error.new(s1 or "assertion failure"))
+	end
+end
+
+require(script.Parent.entryTypes)
+require(script.Parent.anyEntryTypes)
+
+local function valueIs(p2, p3) -- line: 87
+	local v37 = #p2
+
+	return v37 > 0 and (v37 == #p3 and p2[v37] == p3[v37])
+end
+local function valueGet(p4) -- line: 98
+	-- upvalues: v8 (copy), Error (copy)
+	if p4[2] ~= nil then
+		error(p4[2])
+
+		return
+	end
+
+	if p4[1] ~= nil then
+		if p4[1] == v8 then
+			return nil
+		end
+
+		return p4[1]
+	end
+
+	error(Error.new("unknown value"))
+end
+local function valueCopy(p5) -- line: 123
+	return (table.clone(p5))
+end
+
+local t3 = {}
+
+t3.__index = t3
+t3.count = 0
+
+function t3.new(p6: ((...any) -> ...any)) -- line: 138
+	-- upvalues: t3 (copy), Set (copy), Map (copy)
+	local self = setmetatable({}, t3)
+
+	self.parents = Set.new()
+	self.childValues = Map.new(nil)
+	self.dirtyChildren = nil
+	self.dirty = true
+	self.recomputing = false
+	self.value = {}
+	self.deps = nil
+	self.fn = p6
+
+	local v42 = t3
+
+	v42.count = v42.count + 1
+
+	return self
+end
+function t3.peek(p7) -- line: 159
+	-- upvalues: mightBeDirty (ref), rememberParent (ref)
+	if #p7.value == 1 and not mightBeDirty(p7) then
+		rememberParent(p7)
+
+		return p7.value[1]
+	end
+
+	return nil
+end
+function t3.recompute(p8, p9) -- line: 173
+	-- upvalues: Error (copy), rememberParent (ref), mightBeDirty (ref), reallyRecompute (ref), valueGet (copy)
+	if p8.recomputing then
+		error(Error.new("already recomputing"))
+	end
+
+	rememberParent(p8)
+
+	if mightBeDirty(p8) then
+		return reallyRecompute(p8, p9)
+	end
+
+	return valueGet(p8.value)
+end
+function t3.setDirty(p10) -- line: 183
+	-- upvalues: reportDirty (ref), maybeUnsubscribe (copy)
+	if p10.dirty then
+		return
+	end
+
+	p10.dirty = true
+	p10.value = {}
+	reportDirty(p10)
+	maybeUnsubscribe(p10)
+end
+function t3.dispose(p11) -- line: 198
+	-- upvalues: forgetChildren (ref), eachParent (ref), forgetChild (ref)
+	p11:setDirty()
+	forgetChildren(p11)
+	eachParent(p11, function(p12, _) -- line: 216
+		-- upvalues: forgetChild (ref), p11 (copy)
+		p12:setDirty()
+		forgetChild(p12, p11)
+
+		return nil
+	end)
+end
+function t3.forget(p14) -- line: 223
+	p14:dispose()
+end
+function t3.dependOn(p15, p16) -- line: 230
+	-- upvalues: t2 (copy), Set (copy)
+	p16:add(p15)
+
+	if not p15.deps then
+		p15.deps = table.remove(t2) or Set.new()
+	end
+
+	p15.deps:add(p16)
+end
+function t3.forgetDeps(p17) -- line: 240
+	-- upvalues: Array (copy), toArray (copy), t2 (copy)
+	if p17.deps then
+		Array.forEach(toArray(p17.deps), function(p18) -- line: 244
+			-- upvalues: p17 (copy)
+			p18:delete(p17)
+		end)
+		p17.deps:clear()
+		table.insert(t2, p17.deps)
+		p17.deps = nil
+	end
+end
+
+t1.Entry = t3
+
+function rememberParent(p19) -- line: 255
+	-- upvalues: parentEntrySlot (copy), mightBeDirty (ref), reportDirtyChild (ref), reportCleanChild (ref)
+	local v53 = parentEntrySlot:getValue()
+
+	if v53 then
+		p19.parents:add(v53)
+
+		if not v53.childValues:has(p19) then
+			v53.childValues:set(p19, {})
+		end
+
+		if mightBeDirty(p19) then
+			reportDirtyChild(v53, p19)
+
+			return v53
+		end
+
+		reportCleanChild(v53, p19)
+
+		return v53
+	end
+
+	return nil
+end
+function reallyRecompute(p20, p21) -- line: 281
+	-- upvalues: forgetChildren (ref), parentEntrySlot (copy), recomputeNewValue (ref), maybeSubscribe (ref), setClean (ref), valueGet (copy)
+	forgetChildren(p20)
+	parentEntrySlot:withValue(p20, recomputeNewValue, {
+		p20,
+		p21
+	})
+
+	if maybeSubscribe(p20, p21) then
+		setClean(p20)
+	end
+
+	return valueGet(p20.value)
+end
+function recomputeNewValue(_, p23, p24) -- line: 298
+	-- upvalues: v8 (copy)
+	p23.recomputing = true
+	table.clear(p23.value)
+
+	local ok, result = pcall(p23.fn, table.unpack(p24))
+
+	if ok then
+		p23.value[1] = result
+
+		if p23.value[1] == nil then
+			p23.value[1] = v8
+		end
+	end
+
+	if not ok then
+		p23.value[2] = result
+	end
+
+	p23.recomputing = false
+end
+function mightBeDirty(p25) -- line: 321
+	return p25.dirty or p25.dirtyChildren ~= nil and p25.dirtyChildren.size > 0
+end
+function setClean(p26) -- line: 327
+	-- upvalues: mightBeDirty (ref), reportClean (ref)
+	p26.dirty = false
+
+	if mightBeDirty(p26) then
+		return
+	end
+
+	reportClean(p26)
+end
+function reportDirty(p27) -- line: 339
+	-- upvalues: eachParent (ref), reportDirtyChild (ref)
+	eachParent(p27, reportDirtyChild)
+end
+function reportClean(p28) -- line: 343
+	-- upvalues: eachParent (ref), reportCleanChild (ref)
+	eachParent(p28, reportCleanChild)
+end
+function eachParent(p29, p30: ((...any) -> ...any)) -- line: 347
+	-- upvalues: toArray (copy)
+	local size = p29.parents.size
+
+	if size then
+		local v68 = toArray(p29.parents)
+
+		for i = 1, size do
+			p30(v68[i], p29)
+		end
+	end
+end
+function reportDirtyChild(p31, p32) -- line: 360
+	-- upvalues: Error (copy), mightBeDirty (ref), t2 (copy), Set (copy), reportDirty (ref)
+	if _G.__DEV__ then
+		local v72, v73 = p31.childValues:has(p32)
+
+		if not v72 then
+			error(Error.new(v73 or "assertion failure"))
+		end
+
+		local v74, v75 = mightBeDirty(p32)
+
+		if not v74 then
+			error(Error.new(v75 or "assertion failure"))
+		end
+	end
+
+	local v76 = mightBeDirty(p31)
+
+	if not p31.dirtyChildren then
+		p31.dirtyChildren = table.remove(t2) or Set.new()
+	elseif p31.dirtyChildren:has(p32) then
+		return
+	end
+
+	p31.dirtyChildren:add(p32)
+
+	if not v76 then
+		reportDirty(p31)
+	end
+end
+function reportCleanChild(p33, p34) -- line: 394
+	-- upvalues: Error (copy), mightBeDirty (ref), removeDirtyChild (ref), reportClean (ref)
+	if _G.__DEV__ then
+		local v79, v80 = p33.childValues:has(p34)
+
+		if not v79 then
+			error(Error.new(v80 or "assertion failure"))
+		end
+
+		if mightBeDirty(p34) then
+			error(Error.new("assertion failure"))
+		end
+	end
+
+	local v81 = p33.childValues:get(p34)
+
+	if #v81 == 0 then
+		local childValues = p33.childValues
+		local value = p34.value
+
+		childValues:set(p34, (table.clone(value)))
+	else
+		local value = p34.value
+		local v85 = #v81
+
+		if not (v85 > 0) or (v85 ~= #value or v81[v85] ~= value[v85]) then
+			p33:setDirty()
+		end
+	end
+
+	removeDirtyChild(p33, p34)
+
+	if mightBeDirty(p33) then
+		return
+	end
+
+	reportClean(p33)
+end
+function removeDirtyChild(p35, p36) -- line: 421
+	-- upvalues: t2 (copy)
+	local dirtyChildren = p35.dirtyChildren
+
+	if dirtyChildren ~= nil then
+		dirtyChildren:delete(p36)
+
+		if dirtyChildren.size == 0 then
+			if #t2 < 100 then
+				table.insert(t2, dirtyChildren)
+			end
+
+			p35.dirtyChildren = nil
+		end
+	end
+end
+function forgetChildren(p37) -- line: 436
+	-- upvalues: Array (copy), forgetChild (ref), Error (copy)
+	if p37.childValues.size > 0 then
+		local v90 = table.clone(p37.childValues:keys())
+
+		Array.forEach(v90, function(p38) -- line: 444
+			-- upvalues: forgetChild (ref), p37 (copy)
+			forgetChild(p37, p38)
+		end)
+	end
+
+	p37:forgetDeps()
+
+	if p37.dirtyChildren ~= nil then
+		error(Error.new("assertion failure"))
+	end
+end
+function forgetChild(p39, p40) -- line: 458
+	-- upvalues: removeDirtyChild (ref)
+	p40.parents:delete(p39)
+	p39.childValues:delete(p40)
+	removeDirtyChild(p39, p40)
+end
+function maybeSubscribe(p41, p42) -- line: 464
+	-- upvalues: maybeUnsubscribe (copy)
+	if typeof(p41.subscribe) == "function" and not pcall(function() -- line: 466
+		-- upvalues: maybeUnsubscribe (copy), p41 (copy), p42 (copy)
+		maybeUnsubscribe(p41)
+		p41.unsubscribe = p41.subscribe(table.unpack(p42))
+
+		return nil, false
+	end) then
+		p41:setDirty()
+
+		return false
+	end
+
+	return true
+end
+
+return t1

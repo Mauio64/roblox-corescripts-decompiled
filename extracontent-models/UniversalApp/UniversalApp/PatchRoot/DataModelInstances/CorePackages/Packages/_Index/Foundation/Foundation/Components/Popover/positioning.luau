@@ -1,154 +1,155 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Enums.PopoverAlign);
-local v2 = require(l_script_FirstAncestor_0.Enums.PopoverSide);
+local Foundation = script:FindFirstAncestor("Foundation")
+local PopoverAlign = require(Foundation.Enums.PopoverAlign)
+local PopoverSide = require(Foundation.Enums.PopoverSide)
+
 return {
-    adjustForOnScreenKeyboard = function(v3, v4, v5) --[[ Line: 93 ]] --[[ Name: adjustForOnScreenKeyboard ]]
-        local v6 = v4 - v5;
-        local v7 = math.min(v3.Max.Y, v6.Y);
-        return Rect.new(v3.Min, Vector2.new(v3.Max.X, v7));
-    end, 
-    isOnScreen = function(v8, v9) --[[ Line: 25 ]] --[[ Name: isOnScreen ]]
-        if v8.Min.X > v9.Max.X or v8.Max.X < v9.Min.X or v8.Min.Y > v9.Max.Y or v8.Max.Y < v9.Min.Y then
-            return false;
-        else
-            return true;
-        end;
-    end, 
-    calculateSide = function(v10, v11, v12, v13) --[[ Line: 38 ]] --[[ Name: calculateSide ]]
-        -- upvalues: v2 (copy)
-        if v10 == v2.Top then
-            if v11.Min.Y - v13.Y < v12.Min.Y and v11.Max.Y + v13.Y < v12.Max.Y then
-                return v2.Bottom;
-            end;
-        elseif v10 == v2.Bottom then
-            if v11.Max.Y + v13.Y > v12.Max.Y and v11.Min.Y - v13.Y > v12.Min.Y then
-                return v2.Top;
-            end;
-        elseif v10 == v2.Left then
-            if v11.Min.X - v13.X < v12.Min.X and v11.Max.X + v13.X < v12.Max.X then
-                return v2.Right;
-            end;
-        elseif v10 == v2.Right and v11.Max.X + v13.X > v12.Max.X and v11.Min.X - v13.X > v12.Min.X then
-            return v2.Left;
-        end;
-        return v10;
-    end, 
-    calculatePositions = function(v14, v15, v16, v17, v18, v19, v20, v21) --[[ Line: 102 ]] --[[ Name: calculatePositions ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        local v22 = {
-            X = 0, 
-            Y = 0
-        };
-        local v23 = {
-            X = 0, 
-            Y = 0
-        };
-        local v24 = {
-            X = 0, 
-            Y = 0
-        };
-        local v25 = true;
-        if v14 ~= v2.Top then
-            v25 = v14 == v2.Bottom;
-        end;
-        local v26 = true;
-        if v14 ~= v2.Top then
-            v26 = v14 == v2.Left;
-        end;
-        local v27 = "X";
-        local v28 = "Y";
-        local l_Height_0 = v18.Height;
-        local l_X_0 = v18.Min.X;
-        local l_Y_0 = v18.Min.Y;
-        local l_Y_1 = v21.Y;
-        local l_X_1 = v21.X;
-        local l_X_2 = v18.Max.X;
-        local l_Y_2 = v18.Max.Y;
-        local l_Y_3 = v19.Min.Y;
-        local l_Y_4 = v19.Max.Y;
-        local l_X_3 = v19.Min.X;
-        local l_X_4 = v19.Max.X;
-        if v25 then
-            v27 = "Y";
-            v28 = "X";
-            l_Height_0 = v18.Width;
-            l_X_0 = v18.Min.Y;
-            l_Y_0 = v18.Min.X;
-            l_Y_1 = v21.X;
-            l_X_1 = v21.Y;
-            l_X_2 = v18.Max.Y;
-            l_Y_2 = v18.Max.X;
-            l_Y_3 = v19.Min.X;
-            l_Y_4 = v19.Max.X;
-            l_X_3 = v19.Min.Y;
-            l_X_4 = v19.Max.Y;
-        end;
-        local v40 = v15 + v20;
-        if v26 then
-            v22[v27] = l_X_0 - v40 - l_X_1;
-            v23[v27] = l_X_1;
-        else
-            v22[v27] = l_X_2 + v40;
-            v23[v27] = 0;
-        end;
-        if v16 == v1.Start then
-            v22[v28] = l_Y_0 + v17;
-        elseif v16 == v1.Center then
-            v22[v28] = l_Y_0 + l_Height_0 / 2 - l_Y_1 / 2 + v17;
-        else
-            v22[v28] = l_Y_2 + -v17;
-            v24[v28] = 1;
-        end;
-        local v41 = v22[v28] - v24[v28] * l_Y_1;
-        local v42 = v41 + l_Y_1;
-        if v41 < l_Y_3 then
-            v24[v28] = 0;
-            v22[v28] = l_Y_3;
-        elseif l_Y_4 < v42 then
-            v24[v28] = 1;
-            v22[v28] = l_Y_4;
-        end;
-        v41 = v22[v28] - v24[v28] * l_Y_1;
-        v42 = v41 + l_Y_1;
-        local v43 = math.max(l_Y_0, v41);
-        local v44 = math.min(l_Y_2, v42);
-        local _ = nil;
-        v23[v28] = (if v43 <= v44 then (v43 + v44) / 2 else if v42 < l_Y_0 then v42 - v20 else v41 + v20) - v22[v28];
-        v22[v27] = math.clamp(v22[v27], l_X_3, (math.max(l_X_4 - l_X_1 - v40, 0)));
-        v22.X = v22.X - v19.Min.X;
-        v22.Y = v22.Y - v19.Min.Y;
-        return Vector2.new(v22.X, v22.Y), Vector2.new(v23.X, v23.Y), Vector2.new(v24.X, v24.Y);
-    end, 
-    calculatePopoverBounds = function(v46, v47, v48, v49, v50) --[[ Line: 9 ]] --[[ Name: calculatePopoverBounds ]]
-        -- upvalues: v2 (copy)
-        local l_v50_0 = v50;
-        if v46 == v2.Top or v46 == v2.Bottom then
-            return l_v50_0 + Vector2.new(v48, v47 + v49);
-        else
-            return l_v50_0 + Vector2.new(v47 + v49, v48);
-        end;
-    end, 
-    calculateAlign = function(v52, v53, v54, v55, v56) --[[ Line: 59 ]] --[[ Name: calculateAlign ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        local v57 = true;
-        if v52 ~= v2.Top then
-            v57 = v52 == v2.Bottom;
-        end;
-        if v57 then
-            if v53 == v1.Start then
-                if v54.Min.X + v56.X > v55.Max.X then
-                    return v1.End;
-                end;
-            elseif v53 == v1.End and v54.Max.X - v56.X < v55.Min.X then
-                return v1.Start;
-            end;
-        elseif v53 == v1.Start then
-            if v54.Min.Y + v56.Y > v55.Max.Y then
-                return v1.End;
-            end;
-        elseif v53 == v1.End and v54.Max.Y - v56.Y < v55.Min.Y then
-            return v1.Start;
-        end;
-        return v53;
-    end
-};
+	adjustForOnScreenKeyboard = function(rect: Rect, vector2: Vector2, vector2_2: Vector2) -- line: 93
+		local v23 = vector2 - vector2_2
+		local v24 = math.min(rect.Max.Y, v23.Y)
+
+		return Rect.new(rect.Min, Vector2.new(rect.Max.X, v24))
+	end,
+	isOnScreen = function(rect: Rect, rect2: Rect) -- line: 25
+		if rect.Min.X > rect2.Max.X or (rect.Max.X < rect2.Min.X or rect.Min.Y > rect2.Max.Y or rect.Max.Y < rect2.Min.Y) then
+			return false
+		end
+
+		return true
+	end,
+	calculateSide = function(p1, rect: Rect, rect3: Rect, vector2: Vector2) -- line: 38
+		-- upvalues: PopoverSide (copy)
+		if p1 == PopoverSide.Top then
+			if rect.Min.Y - vector2.Y < rect3.Min.Y and rect.Max.Y + vector2.Y < rect3.Max.Y then
+				return PopoverSide.Bottom
+			end
+		elseif p1 == PopoverSide.Bottom then
+			if rect.Max.Y + vector2.Y > rect3.Max.Y and rect.Min.Y - vector2.Y > rect3.Min.Y then
+				return PopoverSide.Top
+			end
+		elseif p1 == PopoverSide.Left then
+			if rect.Min.X - vector2.X < rect3.Min.X and rect.Max.X + vector2.X < rect3.Max.X then
+				return PopoverSide.Right
+			end
+		elseif p1 == PopoverSide.Right and rect.Max.X + vector2.X > rect3.Max.X and rect.Min.X - vector2.X > rect3.Min.X then
+			return PopoverSide.Left
+		end
+
+		return p1
+	end,
+	calculatePositions = function(p2, n1: number, p3, n2: number, rect: Rect, rect4: Rect, n3: number, vector2: Vector2) -- line: 102
+		-- upvalues: PopoverSide (copy), PopoverAlign (copy)
+		local t1 = {
+			X = 0,
+			Y = 0
+		}
+		local t2 = {
+			X = 0,
+			Y = 0
+		}
+		local t3 = {
+			X = 0,
+			Y = 0
+		}
+		local v36 = p2 == PopoverSide.Top or p2 == PopoverSide.Bottom
+		local v37 = p2 == PopoverSide.Top or p2 == PopoverSide.Left
+		local s1 = "X"
+		local s2 = "Y"
+		local rectHeight = rect.Height
+		local MinX = rect.Min.X
+		local MinY = rect.Min.Y
+		local vector2Y = vector2.Y
+		local vector2X = vector2.X
+		local MaxX = rect.Max.X
+		local MaxY = rect.Max.Y
+		local MinY2 = rect4.Min.Y
+		local MaxY2 = rect4.Max.Y
+		local MinX2 = rect4.Min.X
+		local MaxX2 = rect4.Max.X
+
+		if v36 then
+			s1 = "Y"
+			s2 = "X"
+			rectHeight = rect.Width
+			MinX = rect.Min.Y
+			MinY = rect.Min.X
+			vector2Y = vector2.X
+			vector2X = vector2.Y
+			MaxX = rect.Max.Y
+			MaxY = rect.Max.X
+			MinY2 = rect4.Min.X
+			MaxY2 = rect4.Max.X
+			MinX2 = rect4.Min.Y
+			MaxX2 = rect4.Max.Y
+		end
+
+		local v51 = n1 + n3
+
+		if v37 then
+			t1[s1] = MinX - v51 - vector2X
+			t2[s1] = vector2X
+		else
+			t1[s1] = MaxX + v51
+			t2[s1] = 0
+		end
+
+		if p3 == PopoverAlign.Start then
+			t1[s2] = MinY + n2
+		elseif p3 == PopoverAlign.Center then
+			t1[s2] = MinY + rectHeight / 2 - vector2Y / 2 + n2
+		else
+			t1[s2] = MaxY + -n2
+			t3[s2] = 1
+		end
+
+		local v52 = t1[s2] - t3[s2] * vector2Y
+		local v53 = v52 + vector2Y
+
+		if v52 < MinY2 then
+			t3[s2] = 0
+			t1[s2] = MinY2
+		elseif MaxY2 < v53 then
+			t3[s2] = 1
+			t1[s2] = MaxY2
+		end
+
+		local v54 = t1[s2] - t3[s2] * vector2Y
+		local v55 = v54 + vector2Y
+		local v56 = math.max(MinY, v54)
+		local v57 = math.min(MaxY, v55)
+
+		t2[s2] = ((if not (v56 <= v57) then (if not (v55 < MinY) then v54 + n3 else v55 - n3) else (v56 + v57) / 2)) - t1[s2]
+		t1[s1] = math.clamp(t1[s1], MinX2, (math.max(MaxX2 - vector2X - v51, 0)))
+		t1.X = t1.X - rect4.Min.X
+		t1.Y = t1.Y - rect4.Min.Y
+
+		return Vector2.new(t1.X, t1.Y), Vector2.new(t2.X, t2.Y), Vector2.new(t3.X, t3.Y)
+	end,
+	calculatePopoverBounds = function(p4, n4: number, n5: number, n6: number, vector2: Vector2) -- line: 9
+		-- upvalues: PopoverSide (copy)
+		if p4 == PopoverSide.Top or p4 == PopoverSide.Bottom then
+			return vector2 + Vector2.new(n5, n4 + n6)
+		end
+
+		return vector2 + Vector2.new(n4 + n6, n5)
+	end,
+	calculateAlign = function(p5, p6, rect: Rect, rect5: Rect, vector2: Vector2) -- line: 59
+		-- upvalues: PopoverSide (copy), PopoverAlign (copy)
+		if p5 == PopoverSide.Top or p5 == PopoverSide.Bottom then
+			if p6 == PopoverAlign.Start then
+				if rect.Min.X + vector2.X > rect5.Max.X then
+					return PopoverAlign.End
+				end
+			elseif p6 == PopoverAlign.End and rect.Max.X - vector2.X < rect5.Min.X then
+				return PopoverAlign.Start
+			end
+		elseif p6 == PopoverAlign.Start then
+			if rect.Min.Y + vector2.Y > rect5.Max.Y then
+				return PopoverAlign.End
+			end
+		elseif p6 == PopoverAlign.End and rect.Max.Y - vector2.Y < rect5.Min.Y then
+			return PopoverAlign.Start
+		end
+
+		return p6
+	end
+}

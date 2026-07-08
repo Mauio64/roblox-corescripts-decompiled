@@ -1,54 +1,62 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.Signals);
-local l_createSignalMap_0 = require(l_Parent_1.CoreScriptsRoactCommon).Utilities.createSignalMap;
-local _ = require(l_Parent_0.LeaderboardStoreTypes);
-local v5 = require(l_Parent_0.LeaderboardStore);
-return function(v6, v7) --[[ Line: 22 ]] --[[ Name: createLeaderboardStore ]]
-    -- upvalues: v5 (copy), l_createSignalMap_0 (copy)
-    return function() --[[ Line: 23 ]]
-        -- upvalues: v6 (copy), v7 (copy), v5 (ref), l_createSignalMap_0 (ref)
-        local v8 = if v6 then v6 else game:GetService("Teams");
-        local v9 = if v7 then v7 else game:GetService("Players");
-        local v10 = v5.new(v8, v9);
-        return {
-            getGameStatsList = function() --[[ Line: 30 ]] --[[ Name: getGameStatsList ]]
-                -- upvalues: v10 (ref), l_createSignalMap_0 (ref)
-                if not v10 then
-                    return l_createSignalMap_0();
-                else
-                    return v10:getGameStatsList();
-                end;
-            end, 
-            getTeamList = function() --[[ Line: 36 ]] --[[ Name: getTeamList ]]
-                -- upvalues: v10 (ref), l_createSignalMap_0 (ref)
-                if not v10 then
-                    return l_createSignalMap_0();
-                else
-                    return v10:getTeamList();
-                end;
-            end, 
-            getTeamPlayerList = function(v11, v12) --[[ Line: 42 ]] --[[ Name: getTeamPlayerList ]]
-                -- upvalues: v10 (ref), l_createSignalMap_0 (ref)
-                if not v10 then
-                    return l_createSignalMap_0();
-                else
-                    return v10:getTeamPlayerList(v11, v12);
-                end;
-            end, 
-            getPlayerEntry = function(v13, v14) --[[ Line: 48 ]] --[[ Name: getPlayerEntry ]]
-                -- upvalues: v10 (ref)
-                if not v10 then
-                    return nil;
-                else
-                    return (v10:getPlayerEntry(v13, v14));
-                end;
-            end, 
-            cleanUp = function() --[[ Line: 56 ]] --[[ Name: cleanUp ]]
-                -- upvalues: v10 (ref)
-                v10:destroy();
-                v10 = nil;
-            end
-        };
-    end;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+
+require(scriptParentParent.Signals)
+
+local createSignalMap = require(scriptParentParent.CoreScriptsRoactCommon).Utilities.createSignalMap
+
+require(scriptParent.LeaderboardStoreTypes)
+
+local LeaderboardStore = require(scriptParent.LeaderboardStore)
+
+local function createLeaderboardStore(p1, p2) -- line: 22
+	-- upvalues: LeaderboardStore (copy), createSignalMap (copy)
+	return function() -- line: 23
+		-- upvalues: p1 (copy), p2 (copy), LeaderboardStore (copy), createSignalMap (copy)
+		local v8 = if not p1 then game:GetService("Teams") else p1
+		local v9 = if not p2 then game:GetService("Players") else p2
+		local u10 = LeaderboardStore.new(v8, v9)
+
+		return {
+			getGameStatsList = function() -- line: 30
+				-- upvalues: u10 (ref), createSignalMap (copy)
+				if not u10 then
+					return createSignalMap()
+				end
+
+				return u10:getGameStatsList()
+			end,
+			getTeamList = function() -- line: 36
+				-- upvalues: u10 (ref), createSignalMap (copy)
+				if not u10 then
+					return createSignalMap()
+				end
+
+				return u10:getTeamList()
+			end,
+			getTeamPlayerList = function(p3, p4) -- line: 42
+				-- upvalues: u10 (ref), createSignalMap (copy)
+				if not u10 then
+					return createSignalMap()
+				end
+
+				return u10:getTeamPlayerList(p3, p4)
+			end,
+			getPlayerEntry = function(p5, p6) -- line: 48
+				-- upvalues: u10 (ref)
+				if not u10 then
+					return nil
+				end
+
+				return (u10:getPlayerEntry(p5, p6))
+			end,
+			cleanUp = function() -- line: 56
+				-- upvalues: u10 (ref)
+				u10:destroy()
+				u10 = nil
+			end
+		}
+	end
+end
+
+return createLeaderboardStore

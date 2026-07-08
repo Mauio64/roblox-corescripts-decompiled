@@ -1,8 +1,9 @@
 return {
-    shouldShowGradientsForScrollingFrame = function(v0) --[[ Line: 11 ]] --[[ Name: shouldShowGradientsForScrollingFrame ]]
-        local l_X_0 = v0.AbsoluteSize.X;
-        local l_Offset_0 = v0.CanvasSize.X.Offset;
-        local l_X_1 = v0.CanvasPosition.X;
-        return l_X_0 < l_Offset_0, l_X_1 > 20, l_X_1 + l_X_0 < l_Offset_0 - 20;
-    end
-};
+	shouldShowGradientsForScrollingFrame = function(p1) -- line: 11
+		local AbsoluteSizeX = p1.AbsoluteSize.X
+		local XOffset = p1.CanvasSize.X.Offset
+		local CanvasPositionX = p1.CanvasPosition.X
+
+		return AbsoluteSizeX < XOffset, CanvasPositionX > 20, CanvasPositionX + AbsoluteSizeX < XOffset - 20
+	end
+}

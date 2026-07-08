@@ -1,254 +1,274 @@
-local l_Players_0 = game:GetService("Players");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SignalsReact);
-local v5 = require(l_Parent_0.Foundation);
-local l_useScaledValue_0 = v5.Hooks.useScaledValue;
-local l_useTokens_0 = v5.Hooks.useTokens;
-local l_View_0 = v5.View;
-local v9 = require(l_Parent_0.Responsive);
-local l_usePreferredInput_0 = v9.usePreferredInput;
-local l_Input_0 = v9.Input;
-local l_useLastInputMode_0 = require(l_Parent_0.FocusNavigationUtils).useLastInputMode;
-local v13 = require(l_Parent_0.PeopleService);
-local _ = require(l_script_FirstAncestor_0.Stores.GetScrollingFrameStore);
-local v15 = require(l_script_FirstAncestor_0.Hooks.useCardWidth);
-local v16 = require(l_script_FirstAncestor_0.Hooks.useCardLayoutValues);
-local v17 = require(l_script_FirstAncestor_0.Hooks.useGetPeopleService);
-local v18 = require(l_script_FirstAncestor_0.Components.Card.PersonCard);
-local v19 = require(l_script_FirstAncestor_0.Components.Card.LazyPersonCard);
-local v20 = require(l_script_FirstAncestor_0.Components.Common.VirtualizedGrid);
-local v21 = require(l_script_FirstAncestor_0.Constants);
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-local v23 = v13.getService("Flags");
-local l_GetFFlagPeoplePageEnablePersonSignalStore_0 = v23.GetFFlagPeoplePageEnablePersonSignalStore;
-local l_GetFFlagPeoplePageLazyRenderCards_0 = v23.GetFFlagPeoplePageLazyRenderCards;
-local l_FFlagPeoplePageRemoveUseMemoElements_0 = v23.FFlagPeoplePageRemoveUseMemoElements;
-local l_FFlagPeopleCardsEnableVirtualizedGrid_0 = v23.FFlagPeopleCardsEnableVirtualizedGrid;
-local v28 = game:DefineFastInt("MaxNumUniversesExposedToCardTooltip", 3);
-local v29 = false;
-local function v79(v30) --[[ Line: 59 ]] --[[ Name: PeopleCards ]]
-    -- upvalues: l_useTokens_0 (copy), l_useScaledValue_0 (copy), v21 (copy), l_FFlagPeopleCardsEnableVirtualizedGrid_0 (copy), v16 (copy), v15 (copy), v3 (copy), v17 (copy), l_GetFFlagPeoplePageEnablePersonSignalStore_0 (copy), v4 (copy), l_GetFFlagPeoplePageLazyRenderCards_0 (copy), l_useLastInputMode_0 (copy), l_usePreferredInput_0 (copy), l_Input_0 (copy), v29 (ref), v28 (copy), l_FFlagPeoplePageRemoveUseMemoElements_0 (copy), v19 (copy), v18 (copy), l_LocalPlayer_0 (copy), v20 (copy), l_View_0 (copy)
-    local l_Medium_0 = l_useTokens_0().Gap.Medium;
-    local v32 = l_useScaledValue_0(v21.PEOPLEPAGE.PEOPLE_CARDS.MINIMUM_CARD_WIDTH);
-    local v33 = nil;
-    local v34 = nil;
-    local v35 = nil;
-    local v36 = nil;
-    local v37 = nil;
-    if l_FFlagPeopleCardsEnableVirtualizedGrid_0 then
-        local v38, v39, v40, v41 = v16();
-        v33 = v38;
-        v35 = v39;
-        v36 = v40;
-        v37 = v41;
-    else
-        local v42, v43 = v15();
-        v33 = v42;
-        v34 = v43;
-    end;
-    local v44 = nil;
-    local v45 = nil;
-    if l_FFlagPeopleCardsEnableVirtualizedGrid_0 then
-        local v46, v47 = v3.useState(false);
-        v44 = v46;
-        v45 = v47;
-    end;
-    local v48 = v17("PeopleListStore");
-    local v49 = if not l_GetFFlagPeoplePageEnablePersonSignalStore_0() then v4.useSignalState(v48.people) else nil;
-    local v50 = if l_GetFFlagPeoplePageEnablePersonSignalStore_0() then v4.useSignalState(v48.peopleSignalMap.getCount) else nil;
-    local v51 = if l_GetFFlagPeoplePageLazyRenderCards_0() then l_useLastInputMode_0() else nil;
-    local v52 = if l_GetFFlagPeoplePageLazyRenderCards_0() then l_usePreferredInput_0() else nil;
-    local v54 = if l_GetFFlagPeoplePageLazyRenderCards_0() then v3.useMemo(function() --[[ Line: 92 ]]
-        -- upvalues: v51 (copy), v52 (copy), l_Input_0 (ref)
-        local v53 = true;
-        if v51 ~= "Focus" then
-            v53 = v52 ~= l_Input_0.Pointer;
-        end;
-        return v53;
-    end, {
-        v51, 
-        v52
-    }) else nil;
-    local v59 = v3.useMemo(function() --[[ Line: 98 ]]
-        -- upvalues: l_FFlagPeopleCardsEnableVirtualizedGrid_0 (ref), v44 (ref), v29 (ref), v30 (copy), v21 (ref), v28 (ref)
-        if l_FFlagPeopleCardsEnableVirtualizedGrid_0 and v44 or v29 or not v30.getUniversesExposedTo or not v30.addUniverseToExposureList then
-            return false;
-        else
-            local v55 = v30.getUniversesExposedTo(v21.PEOPLEPAGE.CARD_TOOLTIP.UNIVERSES_EXPOSED_TO_CARD_TOOLTIP);
-            local v56 = 0;
-            for _, v58 in v55 do
-                if v58 == game.GameId then
-                    return false;
-                else
-                    v56 = v56 + 1;
-                end;
-            end;
-            if v28 <= v56 then
-                return false;
-            else
-                v30.addUniverseToExposureList(v21.PEOPLEPAGE.CARD_TOOLTIP.UNIVERSES_EXPOSED_TO_CARD_TOOLTIP, game.GameId);
-                return true;
-            end;
-        end;
-    end, if l_FFlagPeopleCardsEnableVirtualizedGrid_0 then {
-        v44, 
-        v30.getUniversesExposedTo, 
-        v30.addUniverseToExposureList
-    } else {
-        v30.getUniversesExposedTo, 
-        v30.addUniverseToExposureList
-    });
-    local v60 = v3.useCallback(function() --[[ Line: 133 ]]
-        -- upvalues: v29 (ref), l_FFlagPeopleCardsEnableVirtualizedGrid_0 (ref), v45 (ref)
-        v29 = true;
-        if l_FFlagPeopleCardsEnableVirtualizedGrid_0 then
-            v45(true);
-        end;
-    end, {});
-    v3.useEffect(function() --[[ Line: 140 ]]
-        -- upvalues: v60 (copy)
-        return function() --[[ Line: 141 ]]
-            -- upvalues: v60 (ref)
-            v60();
-        end;
-    end, {});
-    local v62 = v3.useCallback(function(v61) --[[ Line: 146 ]]
-        -- upvalues: v34 (ref), v32 (copy), l_Medium_0 (copy)
-        v34(v32, v61.AbsoluteSize.X, l_Medium_0);
-    end, {
-        v34, 
-        v32, 
-        l_Medium_0
-    });
-    local v63 = {};
-    if not l_FFlagPeopleCardsEnableVirtualizedGrid_0 then
-        if l_FFlagPeoplePageRemoveUseMemoElements_0 then
-            if l_GetFFlagPeoplePageEnablePersonSignalStore_0() then
-                v63 = {};
-                v48.peopleSignalMap.iterateData(function(v64, v65) --[[ Line: 156 ]]
-                    -- upvalues: v63 (ref), v3 (ref), l_GetFFlagPeoplePageLazyRenderCards_0 (ref), v19 (ref), v18 (ref), v33 (ref), v59 (copy), l_LocalPlayer_0 (ref), v60 (copy), v30 (copy), v54 (copy)
-                    v63["PersonCard_" .. v64] = v3.createElement(if l_GetFFlagPeoplePageLazyRenderCards_0() then v19 else v18, {
-                        width = v33, 
-                        person = v65.getPerson(), 
-                        showTooltip = v59 and l_LocalPlayer_0 ~= nil and v64 == l_LocalPlayer_0.UserId, 
-                        onDismissTooltip = v60, 
-                        layoutOrder = v65.getOrder, 
-                        scrollingFrameStore = if l_GetFFlagPeoplePageLazyRenderCards_0() then v30.scrollingFrameStore else nil, 
-                        shouldShowMenu = if l_GetFFlagPeoplePageLazyRenderCards_0() then v54 else nil
-                    });
-                end, false);
-            else
-                v63 = {};
-                for v66, v67 in v49 do
-                    v63["PersonCard_" .. v67.UserId] = v3.createElement(if l_GetFFlagPeoplePageLazyRenderCards_0() then v19 else v18, {
-                        width = v33, 
-                        person = v67, 
-                        showTooltip = v59 and v66 == 1, 
-                        onDismissTooltip = v60, 
-                        layoutOrder = v66, 
-                        scrollingFrameStore = if l_GetFFlagPeoplePageLazyRenderCards_0() then v30.scrollingFrameStore else nil, 
-                        shouldShowMenu = if l_GetFFlagPeoplePageLazyRenderCards_0() then v54 else nil
-                    });
-                end;
-            end;
-        else
-            v63 = if l_GetFFlagPeoplePageEnablePersonSignalStore_0() then v3.useMemo(function() --[[ Line: 194 ]]
-                -- upvalues: v48 (copy), v3 (ref), l_GetFFlagPeoplePageLazyRenderCards_0 (ref), v19 (ref), v18 (ref), v33 (ref), v59 (copy), l_LocalPlayer_0 (ref), v60 (copy), v30 (copy), v54 (copy)
-                local v68 = {};
-                v48.peopleSignalMap.iterateData(function(v69, v70) --[[ Line: 197 ]]
-                    -- upvalues: v68 (copy), v3 (ref), l_GetFFlagPeoplePageLazyRenderCards_0 (ref), v19 (ref), v18 (ref), v33 (ref), v59 (ref), l_LocalPlayer_0 (ref), v60 (ref), v30 (ref), v54 (ref)
-                    v68["PersonCard_" .. v69] = v3.createElement(if l_GetFFlagPeoplePageLazyRenderCards_0() then v19 else v18, {
-                        width = v33, 
-                        person = v70.getPerson(), 
-                        showTooltip = v59 and l_LocalPlayer_0 ~= nil and v69 == l_LocalPlayer_0.UserId, 
-                        onDismissTooltip = v60, 
-                        layoutOrder = v70.getOrder, 
-                        scrollingFrameStore = if l_GetFFlagPeoplePageLazyRenderCards_0() then v30.scrollingFrameStore else nil, 
-                        shouldShowMenu = if l_GetFFlagPeoplePageLazyRenderCards_0() then v54 else nil
-                    });
-                end, false);
-                return v68;
-            end, {
-                v50, 
-                v59, 
-                v30.scrollingFrameStore, 
-                v54
-            }) else v3.useMemo(function() --[[ Line: 219 ]]
-                -- upvalues: v49 (copy), v3 (ref), l_GetFFlagPeoplePageLazyRenderCards_0 (ref), v19 (ref), v18 (ref), v33 (ref), v59 (copy), v60 (copy), v30 (copy), v54 (copy)
-                local v71 = {};
-                for v72, v73 in v49 do
-                    v71["PersonCard_" .. v73.UserId] = v3.createElement(if l_GetFFlagPeoplePageLazyRenderCards_0() then v19 else v18, {
-                        width = v33, 
-                        person = v73, 
-                        showTooltip = v59 and v72 == 1, 
-                        onDismissTooltip = v60, 
-                        layoutOrder = v72, 
-                        scrollingFrameStore = if l_GetFFlagPeoplePageLazyRenderCards_0() then v30.scrollingFrameStore else nil, 
-                        shouldShowMenu = if l_GetFFlagPeoplePageLazyRenderCards_0() then v54 else nil
-                    });
-                end;
-                return v71;
-            end, {
-                v49, 
-                v59, 
-                v30.scrollingFrameStore, 
-                v54
-            });
-        end;
-    end;
-    if l_FFlagPeopleCardsEnableVirtualizedGrid_0 then
-        local v75 = v3.useCallback(function(v74) --[[ Line: 246 ]]
-            -- upvalues: v37 (ref), v32 (copy), l_Medium_0 (copy)
-            v37(v32, v74, l_Medium_0);
-        end, {
-            v32, 
-            l_Medium_0
-        });
-        local v78 = v3.useCallback(function(v76) --[[ Line: 250 ]]
-            -- upvalues: v49 (copy), v3 (ref), v18 (ref), v33 (ref), v59 (copy), v60 (copy), v54 (copy)
-            local v77 = if v76 > 0 and v76 <= #v49 then v49[v76] else nil;
-            if not v77 then
-                return nil;
-            else
-                return v3.createElement(v18, {
-                    width = v33, 
-                    person = v77, 
-                    showTooltip = v59, 
-                    onDismissTooltip = v60, 
-                    shouldShowMenu = v54
-                });
-            end;
-        end, {
-            v49, 
-            v59, 
-            v54, 
-            v60
-        });
-        return (v3.createElement(v20, {
-            scrollingFrameStore = v30.scrollingFrameStore, 
-            itemWidth = v33, 
-            itemHeight = v35, 
-            numColumns = v36, 
-            gapSize = l_Medium_0, 
-            numItems = #v49, 
-            layoutOrder = v30.LayoutOrder, 
-            onContainerWidthChanged = v75, 
-            getElement = v78
-        }));
-    else
-        return (v3.createElement(l_View_0, {
-            tag = "size-full-0 auto-y", 
-            layout = {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, l_Medium_0), 
-                Wraps = true
-            }, 
-            LayoutOrder = v30.LayoutOrder, 
-            onAbsoluteSizeChanged = v62
-        }, v63));
-    end;
-end;
-return v3.memo(v79);
+local Players = game:GetService("Players")
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local Foundation = require(PeopleReactViewParent.Foundation)
+local useScaledValue = Foundation.Hooks.useScaledValue
+local useTokens = Foundation.Hooks.useTokens
+local View = Foundation.View
+local Responsive = require(PeopleReactViewParent.Responsive)
+local usePreferredInput = Responsive.usePreferredInput
+local Input = Responsive.Input
+local useLastInputMode = require(PeopleReactViewParent.FocusNavigationUtils).useLastInputMode
+local PeopleService = require(PeopleReactViewParent.PeopleService)
+
+require(PeopleReactView.Stores.GetScrollingFrameStore)
+
+local useCardWidth = require(PeopleReactView.Hooks.useCardWidth)
+local useCardLayoutValues = require(PeopleReactView.Hooks.useCardLayoutValues)
+local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
+local PersonCard = require(PeopleReactView.Components.Card.PersonCard)
+local LazyPersonCard = require(PeopleReactView.Components.Card.LazyPersonCard)
+local VirtualizedGrid = require(PeopleReactView.Components.Common.VirtualizedGrid)
+local Constants = require(PeopleReactView.Constants)
+local LocalPlayer = Players.LocalPlayer
+local v23 = PeopleService.getService("Flags")
+local GetFFlagPeoplePageEnablePersonSignalStore = v23.GetFFlagPeoplePageEnablePersonSignalStore
+local GetFFlagPeoplePageLazyRenderCards = v23.GetFFlagPeoplePageLazyRenderCards
+local FFlagPeoplePageRemoveUseMemoElements = v23.FFlagPeoplePageRemoveUseMemoElements
+local FFlagPeopleCardsEnableVirtualizedGrid = v23.FFlagPeopleCardsEnableVirtualizedGrid
+local v28 = game:DefineFastInt("MaxNumUniversesExposedToCardTooltip", 3)
+local u29 = false
+
+local function PeopleCards(t1: {[any]: any}) -- line: 59
+	-- upvalues: useTokens (copy), useScaledValue (copy), Constants (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), useCardLayoutValues (copy), useCardWidth (copy), React (copy), useGetPeopleService (copy), GetFFlagPeoplePageEnablePersonSignalStore (copy), SignalsReact (copy), GetFFlagPeoplePageLazyRenderCards (copy), useLastInputMode (copy), usePreferredInput (copy), Input (copy), u29 (ref), v28 (copy), FFlagPeoplePageRemoveUseMemoElements (copy), LazyPersonCard (copy), PersonCard (copy), LocalPlayer (copy), VirtualizedGrid (copy), View (copy)
+	local Medium = useTokens().Gap.Medium
+	local v33 = useScaledValue(Constants.PEOPLEPAGE.PEOPLE_CARDS.MINIMUM_CARD_WIDTH)
+	local u34 = nil
+	local v35 = nil
+	local v36 = nil
+	local u37 = nil
+	local u40
+
+	if FFlagPeopleCardsEnableVirtualizedGrid then
+		local v38, v39
+
+		v38, v35, v36, v39 = useCardLayoutValues()
+		u40 = v38
+		u37 = v39
+	else
+		local v41, v42 = useCardWidth()
+
+		u40 = v41
+		u34 = v42
+	end
+
+	local u43 = nil
+	local u44 = nil
+
+	if FFlagPeopleCardsEnableVirtualizedGrid then
+		local v45, v46 = React.useState(false)
+
+		u43 = v45
+		u44 = v46
+	end
+
+	local v47 = useGetPeopleService("PeopleListStore")
+	local v48 = if GetFFlagPeoplePageEnablePersonSignalStore() then nil else SignalsReact.useSignalState(v47.people)
+	local v49 = if not GetFFlagPeoplePageEnablePersonSignalStore() then nil else SignalsReact.useSignalState(v47.peopleSignalMap.getCount)
+	local v50 = if not GetFFlagPeoplePageLazyRenderCards() then nil else useLastInputMode()
+	local v51 = if not GetFFlagPeoplePageLazyRenderCards() then nil else usePreferredInput()
+	local v52 = if not GetFFlagPeoplePageLazyRenderCards() then nil else React.useMemo(function() -- line: 92
+		-- upvalues: v50 (copy), v51 (copy), Input (copy)
+		return v50 == "Focus" or v51 ~= Input.Pointer
+	end, {
+		v50,
+		v51
+	})
+	local v53 = React.useMemo(function() -- line: 98
+		-- upvalues: FFlagPeopleCardsEnableVirtualizedGrid (copy), u43 (ref), u29 (ref), t1 (copy), Constants (copy), v28 (copy)
+		if FFlagPeopleCardsEnableVirtualizedGrid and u43 or (u29 or not t1.getUniversesExposedTo or not t1.addUniverseToExposureList) then
+			return false
+		end
+
+		local n1 = 0
+
+		for _, v63 in (t1.getUniversesExposedTo(Constants.PEOPLEPAGE.CARD_TOOLTIP.UNIVERSES_EXPOSED_TO_CARD_TOOLTIP)) do
+			if v63 == game.GameId then
+				return false
+			end
+
+			n1 += 1
+		end
+
+		if n1 >= v28 then
+			return false
+		end
+
+		t1.addUniverseToExposureList(Constants.PEOPLEPAGE.CARD_TOOLTIP.UNIVERSES_EXPOSED_TO_CARD_TOOLTIP, game.GameId)
+
+		return true
+	end, if not FFlagPeopleCardsEnableVirtualizedGrid then {
+		t1.getUniversesExposedTo,
+		t1.addUniverseToExposureList
+	} else {
+		u43,
+		t1.getUniversesExposedTo,
+		t1.addUniverseToExposureList
+	})
+	local v54 = React.useCallback(function() -- line: 133
+		-- upvalues: u29 (ref), FFlagPeopleCardsEnableVirtualizedGrid (copy), u44 (ref)
+		u29 = true
+
+		if FFlagPeopleCardsEnableVirtualizedGrid then
+			u44(true)
+		end
+	end, {})
+
+	React.useEffect(function() -- line: 140
+		-- upvalues: v54 (copy)
+		return function() -- line: 141
+			-- upvalues: v54 (copy)
+			v54()
+		end
+	end, {})
+
+	local v55 = React.useCallback(function(p1) -- line: 146
+		-- upvalues: u34 (ref), v33 (copy), Medium (copy)
+		u34(v33, p1.AbsoluteSize.X, Medium)
+	end, {
+		u34,
+		v33,
+		Medium
+	})
+	local t2 = {}
+
+	if not FFlagPeopleCardsEnableVirtualizedGrid then
+		if FFlagPeoplePageRemoveUseMemoElements then
+			if GetFFlagPeoplePageEnablePersonSignalStore() then
+				t2 = {}
+				v47.peopleSignalMap.iterateData(function(n2: number, p2) -- line: 156
+					-- upvalues: t2 (ref), React (copy), GetFFlagPeoplePageLazyRenderCards (copy), LazyPersonCard (copy), PersonCard (copy), u40 (ref), v53 (copy), LocalPlayer (copy), v54 (copy), t1 (copy), v52 (copy)
+					t2["PersonCard_" .. n2] = React.createElement(if not GetFFlagPeoplePageLazyRenderCards() then PersonCard else LazyPersonCard, {
+						width = u40,
+						person = p2.getPerson(),
+						showTooltip = v53 and (LocalPlayer ~= nil and n2 == LocalPlayer.UserId),
+						onDismissTooltip = v54,
+						layoutOrder = p2.getOrder,
+						scrollingFrameStore = if not GetFFlagPeoplePageLazyRenderCards() then nil else t1.scrollingFrameStore,
+						shouldShowMenu = if not GetFFlagPeoplePageLazyRenderCards() then nil else v52
+					})
+				end, false)
+			else
+				t2 = {}
+
+				for v57, v58 in v48 do
+					t2["PersonCard_" .. v58.UserId] = React.createElement(if not GetFFlagPeoplePageLazyRenderCards() then PersonCard else LazyPersonCard, {
+						width = u40,
+						person = v58,
+						showTooltip = v53 and v57 == 1,
+						onDismissTooltip = v54,
+						layoutOrder = v57,
+						scrollingFrameStore = if not GetFFlagPeoplePageLazyRenderCards() then nil else t1.scrollingFrameStore,
+						shouldShowMenu = if not GetFFlagPeoplePageLazyRenderCards() then nil else v52
+					})
+				end
+			end
+		else
+			t2 = if not GetFFlagPeoplePageEnablePersonSignalStore() then React.useMemo(function() -- line: 219
+				-- upvalues: v48 (copy), React (copy), GetFFlagPeoplePageLazyRenderCards (copy), LazyPersonCard (copy), PersonCard (copy), u40 (ref), v53 (copy), v54 (copy), t1 (copy), v52 (copy)
+				local t3 = {}
+
+				for v69, v70 in v48 do
+					t3["PersonCard_" .. v70.UserId] = React.createElement(if not GetFFlagPeoplePageLazyRenderCards() then PersonCard else LazyPersonCard, {
+						width = u40,
+						person = v70,
+						showTooltip = v53 and v69 == 1,
+						onDismissTooltip = v54,
+						layoutOrder = v69,
+						scrollingFrameStore = if not GetFFlagPeoplePageLazyRenderCards() then nil else t1.scrollingFrameStore,
+						shouldShowMenu = if not GetFFlagPeoplePageLazyRenderCards() then nil else v52
+					})
+				end
+
+				return t3
+			end, {
+				v48,
+				v53,
+				t1.scrollingFrameStore,
+				v52
+			}) else React.useMemo(function() -- line: 194
+				-- upvalues: v47 (copy), React (copy), GetFFlagPeoplePageLazyRenderCards (copy), LazyPersonCard (copy), PersonCard (copy), u40 (ref), v53 (copy), LocalPlayer (copy), v54 (copy), t1 (copy), v52 (copy)
+				local t4 = {}
+
+				v47.peopleSignalMap.iterateData(function(n3: number, p3) -- line: 197
+					-- upvalues: t4 (copy), React (copy), GetFFlagPeoplePageLazyRenderCards (copy), LazyPersonCard (copy), PersonCard (copy), u40 (ref), v53 (copy), LocalPlayer (copy), v54 (copy), t1 (copy), v52 (copy)
+					t4["PersonCard_" .. n3] = React.createElement(if not GetFFlagPeoplePageLazyRenderCards() then PersonCard else LazyPersonCard, {
+						width = u40,
+						person = p3.getPerson(),
+						showTooltip = v53 and (LocalPlayer ~= nil and n3 == LocalPlayer.UserId),
+						onDismissTooltip = v54,
+						layoutOrder = p3.getOrder,
+						scrollingFrameStore = if not GetFFlagPeoplePageLazyRenderCards() then nil else t1.scrollingFrameStore,
+						shouldShowMenu = if not GetFFlagPeoplePageLazyRenderCards() then nil else v52
+					})
+				end, false)
+
+				return t4
+			end, {
+				v49,
+				v53,
+				t1.scrollingFrameStore,
+				v52
+			})
+		end
+	end
+
+	if FFlagPeopleCardsEnableVirtualizedGrid then
+		local v59 = React.useCallback(function(n4: number) -- line: 246
+			-- upvalues: u37 (ref), v33 (copy), Medium (copy)
+			u37(v33, n4, Medium)
+		end, {
+			v33,
+			Medium
+		})
+		local v60 = React.useCallback(function(n5: number) -- line: 250
+			-- upvalues: v48 (copy), React (copy), PersonCard (copy), u40 (ref), v53 (copy), v54 (copy), v52 (copy)
+			local v73 = if not (n5 > 0) or not (n5 <= #v48) then nil else v48[n5]
+
+			if not v73 then
+				return nil
+			end
+
+			return React.createElement(PersonCard, {
+				width = u40,
+				person = v73,
+				showTooltip = v53,
+				onDismissTooltip = v54,
+				shouldShowMenu = v52
+			})
+		end, {
+			v48,
+			v53,
+			v52,
+			v54
+		})
+
+		return (React.createElement(VirtualizedGrid, {
+			scrollingFrameStore = t1.scrollingFrameStore,
+			itemWidth = u40,
+			itemHeight = v35,
+			numColumns = v36,
+			gapSize = Medium,
+			numItems = #v48,
+			layoutOrder = t1.LayoutOrder,
+			onContainerWidthChanged = v59,
+			getElement = v60
+		}))
+	end
+
+	return (React.createElement(View, {
+		tag = "size-full-0 auto-y",
+		layout = {
+			Wraps = true,
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, Medium)
+		},
+		LayoutOrder = t1.LayoutOrder,
+		onAbsoluteSizeChanged = v55
+	}, t2))
+end
+
+return React.memo(PeopleCards)

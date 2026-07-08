@@ -1,1 +1,1 @@
-return game:DefineFastFlag("GamepadNavigationDialogABTest2", false);
+return game:DefineFastFlag("GamepadNavigationDialogABTest2", false)

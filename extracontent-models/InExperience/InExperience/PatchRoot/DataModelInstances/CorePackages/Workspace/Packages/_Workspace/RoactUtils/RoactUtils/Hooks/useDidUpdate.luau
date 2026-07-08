@@ -1,23 +1,27 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(false);
-    local v4 = v1.useRef(false);
-    v1.useEffect(function() --[[ Line: 14 ]]
-        -- upvalues: v3 (copy), v4 (copy), v2 (copy)
-        if not v3.current then
-            v3.current = true;
-            return;
-        else
-            if not v4.current then
-                v4.current = true;
-            end;
-            if v2 then
-                v2();
-            end;
-            return;
-        end;
-    end);
-    return v4;
-end;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(Parent.React)
+
+return function(p1: ((...any) -> ...any)?) -- line: 10
+	-- upvalues: React (copy)
+	local v4 = React.useRef(false)
+	local v5 = React.useRef(false)
+
+	React.useEffect(function() -- line: 14
+		-- upvalues: v4 (copy), v5 (copy), p1 (copy)
+		if not v4.current then
+			v4.current = true
+
+			return
+		end
+
+		if not v5.current then
+			v5.current = true
+		end
+
+		if p1 then
+			p1()
+		end
+	end)
+
+	return v5
+end

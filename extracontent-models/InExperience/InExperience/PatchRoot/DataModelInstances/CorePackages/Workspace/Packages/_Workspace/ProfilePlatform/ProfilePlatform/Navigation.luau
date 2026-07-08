@@ -1,1 +1,1 @@
-return require(script.ProfilePlatformNavigatorWithProviders);
+return require(script.ProfilePlatformNavigatorWithProviders)

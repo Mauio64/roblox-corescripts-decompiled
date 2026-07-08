@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatUseGuacForCrossAgeChat", false);
+return game:DefineFastFlag("ExpChatUseGuacForCrossAgeChat", false)

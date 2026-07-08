@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableNavigateToLoginAfterLogoutAll", false);
+return game:DefineFastFlag("EnableNavigateToLoginAfterLogoutAll", false)

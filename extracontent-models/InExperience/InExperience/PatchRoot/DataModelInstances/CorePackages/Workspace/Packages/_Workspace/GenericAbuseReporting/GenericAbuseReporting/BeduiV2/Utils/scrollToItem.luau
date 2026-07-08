@@ -1,43 +1,53 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local l_TweenService_0 = game:GetService("TweenService");
-local _ = require(l_Parent_0.React);
-return function(v3, v4) --[[ Line: 13 ]] --[[ Name: scrollToItem ]]
-    -- upvalues: l_TweenService_0 (copy)
-    if not v3 or not v3.current or not v4 then
-        return;
-    else
-        local l_FirstChildWhichIsA_0 = v3.current:FindFirstChildWhichIsA("ScrollingFrame", true);
-        if not l_FirstChildWhichIsA_0 then
-            return;
-        else
-            task.wait();
-            local l_current_0 = v4.current;
-            if not l_current_0 then
-                return;
-            else
-                local l_Y_0 = l_current_0.AbsolutePosition.Y;
-                local v8 = l_Y_0 + l_current_0.AbsoluteSize.Y;
-                local l_Y_1 = l_FirstChildWhichIsA_0.AbsolutePosition.Y;
-                local v10 = l_Y_1 + l_FirstChildWhichIsA_0.AbsoluteWindowSize.Y;
-                if l_Y_1 <= l_Y_0 and v8 <= v10 then
-                    return;
-                else
-                    local v11 = l_Y_0 - l_FirstChildWhichIsA_0.AbsolutePosition.Y + l_FirstChildWhichIsA_0.CanvasPosition.Y;
-                    local v12 = v8 - l_FirstChildWhichIsA_0.AbsolutePosition.Y + l_FirstChildWhichIsA_0.CanvasPosition.Y;
-                    local l_Y_2 = l_FirstChildWhichIsA_0.CanvasPosition.Y;
-                    if l_Y_0 < l_Y_1 then
-                        l_Y_2 = v11;
-                    elseif v10 < v8 then
-                        l_Y_2 = v12 - l_FirstChildWhichIsA_0.AbsoluteWindowSize.Y;
-                    end;
-                    l_Y_2 = math.max(0, (math.min(l_Y_2, l_FirstChildWhichIsA_0.AbsoluteCanvasSize.Y - l_FirstChildWhichIsA_0.AbsoluteWindowSize.Y)));
-                    local v14 = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
-                    l_TweenService_0:Create(l_FirstChildWhichIsA_0, v14, {
-                        CanvasPosition = Vector2.new(0, l_Y_2)
-                    }):Play();
-                    return;
-                end;
-            end;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local TweenService = game:GetService("TweenService")
+
+require(Parent.React)
+
+local function scrollToItem(p1, p2) -- line: 13
+	-- upvalues: TweenService (copy)
+	if not p1 or (not p1.current or not p2) then
+		return
+	end
+
+	local ScrollingFrame = p1.current:FindFirstChildWhichIsA("ScrollingFrame", true)
+
+	if not ScrollingFrame then
+		return
+	end
+
+	task.wait()
+
+	local current = p2.current
+
+	if not current then
+		return
+	end
+
+	local AbsolutePositionY = current.AbsolutePosition.Y
+	local v9 = AbsolutePositionY + current.AbsoluteSize.Y
+	local AbsolutePositionY2 = ScrollingFrame.AbsolutePosition.Y
+	local v11 = AbsolutePositionY2 + ScrollingFrame.AbsoluteWindowSize.Y
+
+	if AbsolutePositionY2 <= AbsolutePositionY and v9 <= v11 then
+		return
+	end
+
+	local v12 = AbsolutePositionY - ScrollingFrame.AbsolutePosition.Y + ScrollingFrame.CanvasPosition.Y
+	local v13 = v9 - ScrollingFrame.AbsolutePosition.Y + ScrollingFrame.CanvasPosition.Y
+	local CanvasPositionY = ScrollingFrame.CanvasPosition.Y
+
+	if AbsolutePositionY < AbsolutePositionY2 then
+		CanvasPositionY = v12
+	elseif v11 < v9 then
+		CanvasPositionY = v13 - ScrollingFrame.AbsoluteWindowSize.Y
+	end
+
+	local v15 = math.max(0, (math.min(CanvasPositionY, ScrollingFrame.AbsoluteCanvasSize.Y - ScrollingFrame.AbsoluteWindowSize.Y)))
+	local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+	TweenService:Create(ScrollingFrame, tweenInfo, {
+		CanvasPosition = Vector2.new(0, v15)
+	}):Play()
+end
+
+return scrollToItem

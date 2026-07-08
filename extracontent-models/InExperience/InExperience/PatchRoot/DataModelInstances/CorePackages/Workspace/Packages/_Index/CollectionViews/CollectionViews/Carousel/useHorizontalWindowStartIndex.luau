@@ -1,63 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_FFlagCollectionViewMathChanges_0 = require(l_Parent_0.SharedFlags).FFlagCollectionViewMathChanges;
-local _ = require(l_script_FirstAncestor_0.Carousel.calculateCarouselSpacingMetrics);
-return function(v5, v6, v7, v8, v9, v10) --[[ Line: 14 ]] --[[ Name: useHorizontalWindowStartIndex ]]
-    -- upvalues: v2 (copy), l_FFlagCollectionViewMathChanges_0 (copy)
-    local v11, v12 = v2.useState(1);
-    local v15 = v2.useCallback(function() --[[ Line: 26 ]]
-        -- upvalues: v8 (copy), v5 (copy), l_FFlagCollectionViewMathChanges_0 (ref), v9 (copy), v10 (copy), v6 (copy), v7 (copy), v12 (copy)
-        if v8 then
-            if v5.current ~= nil and (not l_FFlagCollectionViewMathChanges_0 or v9 > 0) then
-                local l_X_0 = v5.current.CanvasPosition.X;
-                local v14 = nil;
-                v14 = if l_FFlagCollectionViewMathChanges_0 then v10:getValue().stride else v6:getValue().X + v7;
-                if v14 > 0 then
-                    v12((math.max(1, (math.floor(l_X_0 / v14)))));
-                    return;
-                else
-                    v12(1);
-                    return;
-                end;
-            end;
-        else
-            v12(1);
-        end;
-    end, {
-        v8, 
-        v5, 
-        if l_FFlagCollectionViewMathChanges_0 then v10 else v6, 
-        if l_FFlagCollectionViewMathChanges_0 then v9 else v7
-    });
-    v2.useEffect(function() --[[ Line: 56 ]]
-        -- upvalues: v15 (copy)
-        v15();
-    end, {
-        v15
-    });
-    v2.useEffect(function() --[[ Line: 64 ]]
-        -- upvalues: v8 (copy), v5 (copy), v15 (copy)
-        if not v8 then
-            return nil;
-        else
-            local v16 = {};
-            if v5.current ~= nil then
-                v15();
-                table.insert(v16, v5.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v15));
-                table.insert(v16, v5.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v15));
-            end;
-            return function() --[[ Line: 80 ]]
-                -- upvalues: v16 (copy)
-                for _, v18 in v16 do
-                    v18:Disconnect();
-                end;
-            end;
-        end;
-    end, {
-        v5, 
-        v15, 
-        v8
-    });
-    return v11;
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local FFlagCollectionViewMathChanges = require(CollectionViewsParent.SharedFlags).FFlagCollectionViewMathChanges
+
+require(CollectionViews.Carousel.calculateCarouselSpacingMetrics)
+
+local function useHorizontalWindowStartIndex(t1: {[any]: any}, p1, n1: number, b1: boolean, n2: number, p2) -- line: 14
+	-- upvalues: React (copy), FFlagCollectionViewMathChanges (copy)
+	local v12, v13 = React.useState(1)
+	local v14 = React.useCallback(function() -- line: 26
+		-- upvalues: b1 (copy), t1 (copy), FFlagCollectionViewMathChanges (copy), n2 (copy), p2 (copy), p1 (copy), n1 (copy), v13 (copy)
+		if b1 then
+			if t1.current ~= nil and (not FFlagCollectionViewMathChanges or n2 > 0) then
+				local CanvasPositionX = t1.current.CanvasPosition.X
+				local v16 = if not FFlagCollectionViewMathChanges then p1:getValue().X + n1 else p2:getValue().stride
+
+				if v16 > 0 then
+					v13((math.max(1, (math.floor(CanvasPositionX / v16)))))
+
+					return
+				end
+
+				v13(1)
+
+				return
+			end
+		else
+			v13(1)
+		end
+	end, {
+		b1,
+		t1,
+		if not FFlagCollectionViewMathChanges then p1 else p2,
+		if not FFlagCollectionViewMathChanges then n1 else n2
+	})
+
+	React.useEffect(function() -- line: 56
+		-- upvalues: v14 (copy)
+		v14()
+	end, { v14 })
+	React.useEffect(function() -- line: 64
+		-- upvalues: b1 (copy), t1 (copy), v14 (copy)
+		if not b1 then
+			return nil
+		end
+
+		local t2 = {}
+
+		if t1.current ~= nil then
+			v14()
+			table.insert(t2, t1.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v14))
+			table.insert(t2, t1.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v14))
+		end
+
+		return function() -- line: 80
+			-- upvalues: t2 (copy)
+			for _, v19 in t2 do
+				v19:Disconnect()
+			end
+		end
+	end, {
+		t1,
+		v14,
+		b1
+	})
+
+	return v12
+end
+
+return useHorizontalWindowStartIndex

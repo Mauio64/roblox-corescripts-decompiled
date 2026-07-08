@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePeekViewFocusNav", false);
+return game:DefineFastFlag("EnablePeekViewFocusNav", false)

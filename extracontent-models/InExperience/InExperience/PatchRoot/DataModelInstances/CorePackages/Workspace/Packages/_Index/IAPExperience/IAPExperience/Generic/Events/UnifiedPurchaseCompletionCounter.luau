@@ -1,17 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("IAPExperience").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
+local Parent = script:FindFirstAncestor("IAPExperience").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+
 return {
-    UnifiedProductPurchaseCompletionModalShownCounter = {
-        eventName = "UnifiedProductPurchaseCompletionModalShownCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2025, 
-            10, 
-            8
-        }, 
-        throttlingPercentage = 100, 
-        description = "Counter fired when Unified Purchase Completion Modal is shown."
-    }
-};
+	UnifiedProductPurchaseCompletionModalShownCounter = {
+		eventName = "UnifiedProductPurchaseCompletionModalShownCounter",
+		throttlingPercentage = 100,
+		description = "Counter fired when Unified Purchase Completion Modal is shown.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2025,
+			10,
+			8
+		}
+	}
+}

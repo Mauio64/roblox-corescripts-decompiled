@@ -1,130 +1,144 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_UserInputService_0 = require(l_script_FirstAncestor_0.Utility.Wrappers).Services.UserInputService;
-local v4 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v5 = require(l_script_FirstAncestor_0.Enums.PopoverAlign);
-local v6 = require(l_script_FirstAncestor_0.Components.Popover.PopoverContext);
-local v7 = require(l_script_FirstAncestor_0.Enums.PopoverSide);
-local v8 = require(l_script_FirstAncestor_0.Enums.Radius);
-local v9 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v11 = require(l_script_FirstAncestor_0.Components.View);
-local v12 = require(l_script_FirstAncestor_0.Utility.useScaledValue);
-local v13 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v14 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v15 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v16 = require(l_script_FirstAncestor_0.Components.Popover);
-local v17 = {
-    align = v5.Start, 
-    side = v7.Right, 
-    testId = "--foundation-tooltip"
-};
-local function v21(v18) --[[ Line: 43 ]] --[[ Name: AnchorWrapper ]]
-    -- upvalues: v2 (copy), v6 (copy), v4 (copy), v16 (copy), v14 (copy)
-    local v19 = v2.useContext(v6);
-    local v20 = v2.useRef(nil);
-    v2.useEffect(function() --[[ Line: 47 ]]
-        -- upvalues: v19 (copy), v4 (ref), v20 (copy), v18 (copy)
-        if v19.anchor ~= nil then
-            if typeof(v19.anchor) ~= "Instance" then
-                v4:warning("MeasurableRef cannot be an anchor for the tooltip");
-                return;
-            else
-                v20.current = v19.anchor:GetPropertyChangedSignal("GuiState"):Connect(function() --[[ Line: 53 ]]
-                    -- upvalues: v18 (ref), v19 (ref)
-                    v18.onHover(v19.anchor.GuiState == Enum.GuiState.Hover);
-                end);
-            end;
-        end;
-        return function() --[[ Line: 58 ]]
-            -- upvalues: v20 (ref)
-            if v20.current ~= nil then
-                v20.current:Disconnect();
-            end;
-        end;
-    end, {
-        v19.anchor, 
-        v18.onHover
-    });
-    return v2.createElement(v16.Anchor, v14(v18, {}), v18.children);
-end;
-return v2.memo(function(v22) --[[ Line: 68 ]] --[[ Name: Tooltip ]]
-    -- upvalues: v15 (copy), v17 (copy), v2 (copy), v13 (copy), v12 (copy), l_UserInputService_0 (copy), v16 (copy), v21 (copy), v14 (copy), v8 (copy), v11 (copy), v9 (copy)
-    local v23 = v15(v22, v17);
-    local v24, v25 = v2.useState(false);
-    local v26 = v13();
-    local v27 = v12(320);
-    local v32 = v2.useMemo(function() --[[ Line: 74 ]]
-        -- upvalues: v23 (copy), l_UserInputService_0 (ref)
-        if v23.shortcut == nil then
-            return nil;
-        else
-            local v28 = "";
-            for v29, v30 in v23.shortcut do
-                local l_l_UserInputService_0_StringForKeyCode_0 = l_UserInputService_0:GetStringForKeyCode(v30);
-                if l_l_UserInputService_0_StringForKeyCode_0 == nil or l_l_UserInputService_0_StringForKeyCode_0 == "" then
-                    l_l_UserInputService_0_StringForKeyCode_0 = v30.Name;
-                end;
-                if v29 > 1 then
-                    v28 = v28 .. " + ";
-                end;
-                v28 = v28 .. l_l_UserInputService_0_StringForKeyCode_0;
-            end;
-            return v28;
-        end;
-    end, {
-        v23.shortcut
-    });
-    return v2.createElement(v16.Root, {
-        isOpen = v24, 
-        testId = v23.testId
-    }, {
-        Anchor = v2.createElement(v21, v14(v23, {
-            onHover = v25
-        }), v23.children), 
-        Content = v2.createElement(v16.Content, {
-            hasArrow = false, 
-            align = v23.align, 
-            side = {
-                position = v23.side, 
-                offset = v26.Size.Size_200
-            }, 
-            radius = v8.Small, 
-            backgroundStyle = v26.Inverse.Surface.Surface_0, 
-            selectionGroup = false
-        }, v2.createElement(v11, {
-            tag = {
-                ["col gap-xsmall auto-xy"] = true, 
-                ["padding-y-small padding-x-medium"] = v23.text ~= nil, 
-                ["padding-y-xsmall padding-x-small"] = v23.text == nil
-            }, 
-            sizeConstraint = {
-                MaxSize = Vector2.new(v27, 1e999)
-            }
-        }, {
-            Header = v2.createElement(v11, {
-                LayoutOrder = 1, 
-                tag = "row gap-small size-full-0 auto-y flex-between"
-            }, {
-                Title = v2.createElement(v9, {
-                    LayoutOrder = 1, 
-                    Text = v23.title, 
-                    tag = "auto-xy text-title-small content-inverse-emphasis text-truncate-end shrink"
-                }), 
-                Shortcut = if v23.shortcut then v2.createElement(v9, {
-                    LayoutOrder = 2, 
-                    Text = v32, 
-                    tag = "auto-xy text-body-small content-inverse-muted", 
-                    testId = ("%*--shortcut"):format(v23.testId)
-                }) else nil
-            }), 
-            Text = if v23.text and v23.text ~= "" then v2.createElement(v9, {
-                LayoutOrder = 2, 
-                Text = v23.text, 
-                tag = "auto-xy text-wrap text-align-x-left text-body-small content-inverse-default", 
-                testId = ("%*--text"):format(v23.testId)
-            }) else nil
-        }))
-    });
-end);
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local UserInputService = require(Foundation.Utility.Wrappers).Services.UserInputService
+local Logger = require(Foundation.Utility.Logger)
+local PopoverAlign = require(Foundation.Enums.PopoverAlign)
+local PopoverContext = require(Foundation.Components.Popover.PopoverContext)
+local PopoverSide = require(Foundation.Enums.PopoverSide)
+local Radius = require(Foundation.Enums.Radius)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useScaledValue = require(Foundation.Utility.useScaledValue)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local Popover = require(Foundation.Components.Popover)
+local t1 = {
+	testId = "--foundation-tooltip",
+	align = PopoverAlign.Start,
+	side = PopoverSide.Right
+}
+
+local function AnchorWrapper(p1) -- line: 45
+	-- upvalues: React (copy), PopoverContext (copy), Logger (copy), Popover (copy), withCommonProps (copy)
+	local v21 = React.useContext(PopoverContext)
+	local v22 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 49
+		-- upvalues: v21 (copy), Logger (copy), v22 (copy), p1 (copy)
+		if v21.anchor ~= nil then
+			if typeof(v21.anchor) ~= "Instance" then
+				Logger:warning("MeasurableRef cannot be an anchor for the tooltip")
+
+				return
+			end
+
+			v22.current = v21.anchor:GetPropertyChangedSignal("GuiState"):Connect(function() -- line: 55
+				-- upvalues: p1 (copy), v21 (copy)
+				p1.onHover(v21.anchor.GuiState == Enum.GuiState.Hover)
+			end)
+		end
+
+		return function() -- line: 60
+			-- upvalues: v22 (copy)
+			if v22.current ~= nil then
+				v22.current:Disconnect()
+			end
+		end
+	end, {
+		v21.anchor,
+		p1.onHover
+	})
+
+	return React.createElement(Popover.Anchor, withCommonProps(p1, {}), p1.children)
+end
+local function Tooltip(p2) -- line: 70
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), useTokens (copy), useScaledValue (copy), UserInputService (copy), Popover (copy), AnchorWrapper (copy), withCommonProps (copy), Radius (copy), View (copy), Text (copy)
+	local v24 = withDefaults(p2, t1)
+	local v25, v26 = React.useState(false)
+	local v27 = useTokens()
+	local v28 = useScaledValue(320)
+	local v29 = React.useMemo(function() -- line: 76
+		-- upvalues: v24 (copy), UserInputService (copy)
+		if v24.shortcut == nil then
+			return nil
+		end
+
+		local s1 = ""
+
+		for v31, v32 in v24.shortcut do
+			local StringForKeyCode = UserInputService:GetStringForKeyCode(v32)
+
+			if StringForKeyCode == nil or StringForKeyCode == "" then
+				StringForKeyCode = v32.Name
+			end
+
+			if v31 > 1 then
+				s1 ..= " + "
+			end
+
+			s1 ..= StringForKeyCode
+		end
+
+		return s1
+	end, { v24.shortcut })
+
+	return React.createElement(Popover.Root, {
+		isOpen = v25,
+		testId = v24.testId
+	}, {
+		Anchor = React.createElement(AnchorWrapper, withCommonProps(v24, {
+			onHover = v26
+		}), v24.children),
+		Content = React.createElement(Popover.Content, {
+			hasArrow = false,
+			selectionGroup = false,
+			align = v24.align,
+			side = {
+				position = v24.side,
+				offset = v27.Size.Size_200
+			},
+			radius = Radius.Small,
+			backgroundStyle = v27.Inverse.Surface.Surface_0
+		}, React.createElement(View, {
+			tag = {
+				["col gap-xsmall auto-xy"] = true,
+				["padding-x-medium padding-y-small"] = v24.text ~= nil,
+				["padding-x-small padding-y-xsmall"] = v24.text == nil
+			},
+			sizeConstraint = {
+				MaxSize = Vector2.new(v28, 1e999)
+			}
+		}, {
+			Header = if v24.title == "" and not v24.shortcut then nil else React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "row flex-between gap-small size-full-0 auto-y"
+			}, {
+				Title = if v24.title == "" then nil else React.createElement(Text, {
+					LayoutOrder = 1,
+					tag = "shrink auto-xy text-title-small text-truncate-end content-inverse-emphasis",
+					Text = v24.title,
+					testId = `{ v24.testId }--title`
+				}),
+				Shortcut = if not v24.shortcut then nil else React.createElement(Text, {
+					LayoutOrder = 2,
+					tag = "auto-xy text-body-small content-inverse-muted",
+					Text = v29,
+					testId = `{ v24.testId }--shortcut`
+				})
+			}),
+			Text = if not v24.text or v24.text == "" then nil else React.createElement(Text, {
+				LayoutOrder = 2,
+				tag = "auto-xy text-body-small text-wrap text-align-x-left content-inverse-default",
+				Text = v24.text,
+				testId = `{ v24.testId }--text`
+			})
+		}))
+	})
+end
+
+return React.memo(Tooltip)

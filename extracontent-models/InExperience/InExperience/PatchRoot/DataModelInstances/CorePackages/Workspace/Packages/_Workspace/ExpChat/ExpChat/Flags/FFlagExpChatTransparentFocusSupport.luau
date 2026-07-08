@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatTransparentFocusSupport", false);
+return game:DefineFastFlag("ExpChatTransparentFocusSupport", false)

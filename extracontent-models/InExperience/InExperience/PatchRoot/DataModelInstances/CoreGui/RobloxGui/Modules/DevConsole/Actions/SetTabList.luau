@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.Action)("SetTabList", function(v0, v1, v2) --[[ Line: 4 ]]
-    return {
-        tabList = v0, 
-        initIndex = v1, 
-        isDeveloperView = v2
-    };
-end);
+return require(script.Parent.Parent.Action)("SetTabList", function(p1, p2, p3) -- line: 4
+	return {
+		tabList = p1,
+		initIndex = p2,
+		isDeveloperView = p3
+	}
+end)

@@ -1,2 +1,3 @@
-local _ = require(script.Parent.Enums.TransferStatus);
-return {};
+require(script.Parent.Enums.TransferStatus)
+
+return {}

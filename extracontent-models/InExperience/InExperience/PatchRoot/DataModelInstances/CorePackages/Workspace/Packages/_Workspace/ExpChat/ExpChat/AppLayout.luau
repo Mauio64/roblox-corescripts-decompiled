@@ -1,1 +1,1 @@
-return require(script.AppLayout);
+return require(script.AppLayout)

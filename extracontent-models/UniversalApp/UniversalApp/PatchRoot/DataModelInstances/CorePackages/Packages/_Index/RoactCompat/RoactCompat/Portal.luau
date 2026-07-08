@@ -1,11 +1,15 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactRoblox);
-local v2 = require(l_Parent_0.ReactGlobals);
-local v3 = require(script.Parent.warnOnce);
-return function(v4) --[[ Line: 23 ]] --[[ Name: PortalComponent ]]
-    -- upvalues: v2 (copy), v3 (copy), v1 (copy)
-    if v2.__DEV__ and v2.__COMPAT_WARNINGS__ then
-        v3("Roact.Portal", "Please use the createPortal API on ReactRoblox instead");
-    end;
-    return v1.createPortal(v4.children, v4.target);
-end;
+local ParentParent = script.Parent.Parent
+local ReactRoblox = require(ParentParent.ReactRoblox)
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local warnOnce = require(script.Parent.warnOnce)
+
+local function PortalComponent(p1) -- line: 23
+	-- upvalues: ReactGlobals (copy), warnOnce (copy), ReactRoblox (copy)
+	if ReactGlobals.__DEV__ and ReactGlobals.__COMPAT_WARNINGS__ then
+		warnOnce("Roact.Portal", "Please use the createPortal API on ReactRoblox instead")
+	end
+
+	return ReactRoblox.createPortal(p1.children, p1.target)
+end
+
+return PortalComponent

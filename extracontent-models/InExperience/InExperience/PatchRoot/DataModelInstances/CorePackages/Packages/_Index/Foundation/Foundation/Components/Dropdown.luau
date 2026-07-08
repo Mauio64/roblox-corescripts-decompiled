@@ -1,3 +1,3 @@
 return {
-    Root = require(script.Dropdown)
-};
+	Root = require(script.Dropdown)
+}

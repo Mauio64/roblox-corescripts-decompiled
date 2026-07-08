@@ -1,1 +1,1 @@
-return game:DefineFastFlag("WhisperEmoteOnAvatarContextMenuWithExpChat", false);
+return game:DefineFastFlag("WhisperEmoteOnAvatarContextMenuWithExpChat", false)

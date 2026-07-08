@@ -1,99 +1,109 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactUtils);
-local v4 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v5 = require(script.Parent.BottomSheet);
-local v6 = require(script.Parent.CenterSheet);
-local v7 = require(script.Parent.SideSheet);
-local v8 = require(l_script_FirstAncestor_0.Providers.Overlay.useOverlay);
-local l_GuiService_0 = require(l_script_FirstAncestor_0.Utility.Wrappers).Services.GuiService;
-local _ = require(l_script_FirstAncestor_0.Enums.DialogSize);
-local v11 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = require(script.Parent.Types);
-local v13 = {
-    testId = "--foundation-sheet"
-};
-return v2.memo(v2.forwardRef(function(v14, v15) --[[ Line: 25 ]] --[[ Name: Sheet ]]
-    -- upvalues: v11 (copy), v13 (copy), v2 (copy), v8 (copy), l_GuiService_0 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy)
-    local v16 = v11(v14, v13);
-    local v17, v18 = v2.useState(v16.isOpen == nil or v16.isOpen);
-    local v19 = v2.useRef(nil);
-    local v20 = v8();
-    local v21, v22 = v2.useState(not v20 or v20.AbsoluteSize.X > v20.AbsoluteSize.Y);
-    local v23, v24 = v2.useState(l_GuiService_0.ViewportDisplaySize);
-    v2.useImperativeHandle(v16.sheetRef, function() --[[ Line: 35 ]]
-        -- upvalues: v19 (copy)
-        return v19.current;
-    end, {});
-    v2.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: v16 (copy), v19 (copy), v18 (copy)
-        if v16.isOpen == false and v19.current then
-            v19.current.close();
-            return;
-        else
-            if v16.isOpen then
-                v18(true);
-            end;
-            return;
-        end;
-    end, {
-        v16.isOpen
-    });
-    v2.useEffect(function() --[[ Line: 47 ]]
-        -- upvalues: v17 (copy), v16 (copy), v18 (copy)
-        if not v17 and v16.isOpen then
-            v18(true);
-        end;
-    end, {
-        v17
-    });
-    v3.useEventConnection(l_GuiService_0:GetPropertyChangedSignal("ViewportDisplaySize"), function() --[[ Line: 53 ]]
-        -- upvalues: v24 (copy), l_GuiService_0 (ref)
-        v24(l_GuiService_0.ViewportDisplaySize);
-    end, {});
-    v2.useLayoutEffect(function() --[[ Line: 57 ]]
-        -- upvalues: v20 (copy), v22 (copy)
-        local v25 = nil;
-        if v20 then
-            v22(v20.AbsoluteSize.X > v20.AbsoluteSize.Y);
-            v25 = v20:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 61 ]]
-                -- upvalues: v22 (ref), v20 (ref)
-                v22(v20.AbsoluteSize.X > v20.AbsoluteSize.Y);
-            end);
-        end;
-        return function() --[[ Line: 66 ]]
-            -- upvalues: v25 (ref)
-            if v25 then
-                v25:Disconnect();
-            end;
-        end;
-    end, {
-        v20
-    });
-    if not v17 then
-        return nil;
-    else
-        local v26 = table.clone(v16);
-        v26.isOpen = nil;
-        v26.ref = v15;
-        v26.sheetRef = v19;
-        if not v4.FoundationSideSheetNewWidthCalculation or v4.FoundationSideSheetFixNewWidth then
-            v26.displaySize = v23;
-        end;
-        v26.onClose = function() --[[ Line: 84 ]]
-            -- upvalues: v16 (copy), v18 (copy)
-            if v16.onClose then
-                v16.onClose();
-            end;
-            v18(false);
-        end;
-        if v23 == Enum.DisplaySize.Small and not v21 then
-            return v2.createElement(v5, v26);
-        elseif v16.preferCenterSheet then
-            return v2.createElement(v6, v26);
-        else
-            return v2.createElement(v7, v26);
-        end;
-    end;
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ReactUtils = require(FoundationParent.ReactUtils)
+local Flags = require(Foundation.Utility.Flags)
+local BottomSheet = require(script.Parent.BottomSheet)
+local CenterSheet = require(script.Parent.CenterSheet)
+local SideSheet = require(script.Parent.SideSheet)
+local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
+local useScreen = require(Foundation.Providers.Overlay.useScreen)
+local GuiService = require(Foundation.Utility.Wrappers).Services.GuiService
+
+require(Foundation.Enums.DialogSize)
+
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+require(script.Parent.Types)
+
+local t1 = {
+	testId = "--foundation-sheet"
+}
+
+local function Sheet(p1, p2) -- line: 26
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), Flags (copy), useScreen (copy), useOverlay (copy), GuiService (copy), ReactUtils (copy), BottomSheet (copy), CenterSheet (copy), SideSheet (copy)
+	local v17 = withDefaults(p1, t1)
+	local v18, v19 = React.useState(v17.isOpen == nil or v17.isOpen)
+	local v20 = React.useRef(nil)
+	local v21 = if not Flags.FoundationOverlayKeyboardAwarenessHardened then useOverlay() else useScreen()
+	local v22, v23 = React.useState(not v21 or v21.AbsoluteSize.X > v21.AbsoluteSize.Y)
+	local v24, v25 = React.useState(GuiService.ViewportDisplaySize)
+
+	React.useImperativeHandle(v17.sheetRef, function() -- line: 36
+		-- upvalues: v20 (copy)
+		return v20.current
+	end, {})
+	React.useEffect(function() -- line: 40
+		-- upvalues: v17 (copy), v20 (copy), v19 (copy)
+		if v17.isOpen == false and v20.current then
+			v20.current.close()
+
+			return
+		end
+
+		if v17.isOpen then
+			v19(true)
+		end
+	end, { v17.isOpen })
+	React.useEffect(function() -- line: 48
+		-- upvalues: v18 (copy), v17 (copy), v19 (copy)
+		if not v18 and v17.isOpen then
+			v19(true)
+		end
+	end, { v18 })
+	ReactUtils.useEventConnection(GuiService:GetPropertyChangedSignal("ViewportDisplaySize"), function() -- line: 54
+		-- upvalues: v25 (copy), GuiService (copy)
+		v25(GuiService.ViewportDisplaySize)
+	end, {})
+	React.useLayoutEffect(function() -- line: 58
+		-- upvalues: v21 (copy), v23 (copy)
+		local connection = nil
+
+		if v21 then
+			v23(v21.AbsoluteSize.X > v21.AbsoluteSize.Y)
+			connection = v21:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 62
+				-- upvalues: v23 (copy), v21 (copy)
+				v23(v21.AbsoluteSize.X > v21.AbsoluteSize.Y)
+			end)
+		end
+
+		return function() -- line: 67
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v21 })
+
+	if not v18 then
+		return nil
+	end
+
+	local v26 = table.clone(v17)
+
+	v26.isOpen = nil
+	v26.ref = p2
+	v26.sheetRef = v20
+	v26.displaySize = v24
+
+	function v26.onClose() -- line: 83
+		-- upvalues: v17 (copy), v19 (copy)
+		if v17.onClose then
+			v17.onClose()
+		end
+
+		v19(false)
+	end
+
+	if v24 == Enum.DisplaySize.Small and not v22 then
+		return React.createElement(BottomSheet, v26)
+	end
+
+	if v17.preferCenterSheet then
+		return React.createElement(CenterSheet, v26)
+	end
+
+	return React.createElement(SideSheet, v26)
+end
+
+return React.memo(React.forwardRef(Sheet))

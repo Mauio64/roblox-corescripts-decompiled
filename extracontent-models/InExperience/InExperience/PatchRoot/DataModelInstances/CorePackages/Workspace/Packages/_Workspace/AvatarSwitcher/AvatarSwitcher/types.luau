@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarSwitcher").Parent;
-local _ = require(l_Parent_0.AvatarExperienceSlotBasedEditor);
-return {};
+local Parent = script:FindFirstAncestor("AvatarSwitcher").Parent
+
+require(Parent.AvatarExperienceSlotBasedEditor)
+
+return {}

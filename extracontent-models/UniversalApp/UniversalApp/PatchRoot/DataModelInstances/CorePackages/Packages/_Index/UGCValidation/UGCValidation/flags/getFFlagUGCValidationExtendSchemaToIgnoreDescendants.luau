@@ -1,4 +1,5 @@
-game:DefineFastFlag("UGCValidationExtendSchemaToIgnoreDescendants", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("UGCValidationExtendSchemaToIgnoreDescendants");
-end;
+game:DefineFastFlag("UGCValidationExtendSchemaToIgnoreDescendants", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("UGCValidationExtendSchemaToIgnoreDescendants")
+end

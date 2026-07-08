@@ -1,42 +1,45 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("CoreGui").RobloxGui;
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.Parent.Constants);
-local v4 = v2.Component:extend("CheckboxDropdown");
-v4.render = function(v5) --[[ Line: 10 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v6 = v5.props[v2.Children] or {};
-    local l_absolutePosition_0 = v5.props.absolutePosition;
-    local l_frameWidth_0 = v5.props.frameWidth;
-    local l_elementHeight_0 = v5.props.elementHeight;
-    local l_numElements_0 = v5.props.numElements;
-    local l_dropdownTargetGui_0 = v5.props.dropdownTargetGui;
-    local l_onCloseCheckbox_0 = v5.props.onCloseCheckbox;
-    local v13 = l_elementHeight_0 * l_numElements_0;
-    local v14 = UDim2.new(0, l_frameWidth_0, 0, 24 + v13);
-    return v2.createElement(v2.Portal, {
-        target = l_dropdownTargetGui_0 ~= nil and l_dropdownTargetGui_0 or game:GetService("CoreGui").DevConsoleMaster
-    }, {
-        InputCatcher = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            BackgroundTransparency = 1, 
-            [v2.Event.InputEnded] = l_onCloseCheckbox_0
-        }, {
-            OuterFrame = v2.createElement("ImageButton", {
-                Size = v14, 
-                AutoButtonColor = false, 
-                Position = l_absolutePosition_0, 
-                BackgroundColor3 = v3.Color.TextBoxGray, 
-                BackgroundTransparency = 0
-            }, {
-                innerFrame = v2.createElement("Frame", {
-                    Position = UDim2.new(0, 12, 0, 12), 
-                    Size = UDim2.new(0, l_frameWidth_0, 0, v13), 
-                    BackgroundTransparency = 1
-                }, v6)
-            })
-        })
-    });
-end;
-return v4;
+local CorePackages = game:GetService("CorePackages")
+local _ = game:GetService("CoreGui").RobloxGui
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Constants)
+local v5 = Roact.Component:extend("CheckboxDropdown")
+
+function v5.render(p1) -- line: 10
+	-- upvalues: Roact (copy), Constants (copy)
+	local v7 = p1.props[Roact.Children] or {}
+	local absolutePosition = p1.props.absolutePosition
+	local frameWidth = p1.props.frameWidth
+	local elementHeight = p1.props.elementHeight
+	local numElements = p1.props.numElements
+	local dropdownTargetGui = p1.props.dropdownTargetGui
+	local onCloseCheckbox = p1.props.onCloseCheckbox
+	local v14 = elementHeight * numElements
+	local uDim2 = UDim2.new(0, frameWidth, 0, 24 + v14)
+
+	return Roact.createElement(Roact.Portal, {
+		target = dropdownTargetGui ~= nil and dropdownTargetGui or game:GetService("CoreGui").DevConsoleMaster
+	}, {
+		InputCatcher = Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundTransparency = 1,
+			[Roact.Event.InputEnded] = onCloseCheckbox
+		}, {
+			OuterFrame = Roact.createElement("ImageButton", {
+				AutoButtonColor = false,
+				BackgroundTransparency = 0,
+				Size = uDim2,
+				Position = absolutePosition,
+				BackgroundColor3 = Constants.Color.TextBoxGray
+			}, {
+				innerFrame = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 12, 0, 12),
+					Size = UDim2.new(0, frameWidth, 0, v14)
+				}, v7)
+			})
+		})
+	})
+end
+
+return v5

@@ -1,74 +1,86 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Rodux);
-local v4 = require(l_script_FirstAncestor_0.Conversations.Actions.RemovedConversation);
-local v5 = require(l_script_FirstAncestor_0.Conversations.Actions.CurrentConversationTimeoutEnded);
-local v6 = require(l_Parent_0.AppChatNetworking);
-local v7 = {
-    userTimeout = {}, 
-    byConversationId = {}
-};
-local function v12(v8) --[[ Line: 33 ]] --[[ Name: serializeChatTimeoutRange ]]
-    local v9 = DateTime.now();
-    local l_UnixTimestamp_0 = (DateTime.fromIsoDate(v8.start_time) or v9).UnixTimestamp;
-    local l_UnixTimestamp_1 = (DateTime.fromIsoDate(v8.end_time) or v9).UnixTimestamp;
-    return {
-        endTimestamp = math.clamp(v9.UnixTimestamp + v8.time_remaining, -17987443200, 253402300799), 
-        decisionEventId = v8.decision_event_id, 
-        duration = math.clamp(l_UnixTimestamp_1 - l_UnixTimestamp_0, 0, 253402300799)
-    };
-end;
-return (v3.createReducer(v7, {
-    [v6.rodux.GetChatModerationStatuses.Succeeded.name] = function(v13, v14) --[[ Line: 45 ]]
-        -- upvalues: v12 (copy), v2 (copy)
-        local l_responseBody_0 = v14.responseBody;
-        if l_responseBody_0.user_timeout_range then
-            local v16 = v12(l_responseBody_0.user_timeout_range);
-            v13 = v2.Dictionary.join(v13, {
-                userTimeout = v16
-            });
-        end;
-        if l_responseBody_0.conversation_timeout_ranges then
-            for _, v18 in l_responseBody_0.conversation_timeout_ranges do
-                local l_id_0 = v18.id;
-                local v20 = v12(v18.timeout_range);
-                v13 = v2.Dictionary.join(v13, {
-                    byConversationId = v2.Dictionary.join(v13.byConversationId, {
-                        [l_id_0] = v20
-                    })
-                });
-            end;
-        end;
-        return v13;
-    end, 
-    [v4.name] = function(v21, v22) --[[ Line: 66 ]]
-        -- upvalues: v2 (copy)
-        local l_conversationId_0 = v22.conversationId;
-        return v2.Dictionary.join(v21, {
-            byConversationId = v2.Dictionary.join(v21.byConversationId, {
-                [l_conversationId_0] = v2.None
-            })
-        });
-    end, 
-    [v5.name] = function(v24, v25) --[[ Line: 74 ]]
-        -- upvalues: v2 (copy)
-        local l_v24_0 = v24;
-        local l_UnixTimestamp_2 = DateTime.now().UnixTimestamp;
-        if v24.userTimeout and v24.userTimeout.endTimestamp and v24.userTimeout.endTimestamp < l_UnixTimestamp_2 then
-            l_v24_0 = v2.Dictionary.join(l_v24_0, {
-                userTimeout = {}
-            });
-        end;
-        local l_conversationId_1 = v25.conversationId;
-        if not v24.byConversationId[l_conversationId_1] or not v24.byConversationId[l_conversationId_1].endTimestamp or l_UnixTimestamp_2 <= v24.byConversationId[l_conversationId_1].endTimestamp then
-            return l_v24_0;
-        else
-            return v2.Dictionary.join(l_v24_0, {
-                byConversationId = v2.Dictionary.join(l_v24_0.byConversationId, {
-                    [l_conversationId_1] = v2.None
-                })
-            });
-        end;
-    end
-}));
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local Rodux = require(AppChatParent.Rodux)
+local RemovedConversation = require(AppChat.Conversations.Actions.RemovedConversation)
+local CurrentConversationTimeoutEnded = require(AppChat.Conversations.Actions.CurrentConversationTimeoutEnded)
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local t1 = {
+	userTimeout = {},
+	byConversationId = {}
+}
+
+local function serializeChatTimeoutRange(p1) -- line: 33
+	local dateTime = DateTime.now()
+	local UnixTimestamp = (DateTime.fromIsoDate(p1.start_time) or dateTime).UnixTimestamp
+	local UnixTimestamp2 = (DateTime.fromIsoDate(p1.end_time) or dateTime).UnixTimestamp
+
+	return {
+		endTimestamp = math.clamp(dateTime.UnixTimestamp + p1.time_remaining, -17987443200, 253402300799),
+		decisionEventId = p1.decision_event_id,
+		duration = math.clamp(UnixTimestamp2 - UnixTimestamp, 0, 253402300799)
+	}
+end
+
+return (Rodux.createReducer(t1, {
+	[AppChatNetworking.rodux.GetChatModerationStatuses.Succeeded.name] = function(p2, p3) -- line: 45
+		-- upvalues: serializeChatTimeoutRange (copy), Cryo (copy)
+		local responseBody = p3.responseBody
+
+		if responseBody.user_timeout_range then
+			local v17 = serializeChatTimeoutRange(responseBody.user_timeout_range)
+
+			p2 = Cryo.Dictionary.join(p2, {
+				userTimeout = v17
+			})
+		end
+
+		if responseBody.conversation_timeout_ranges then
+			for _, v19 in responseBody.conversation_timeout_ranges do
+				local id = v19.id
+				local v21 = serializeChatTimeoutRange(v19.timeout_range)
+
+				p2 = Cryo.Dictionary.join(p2, {
+					byConversationId = Cryo.Dictionary.join(p2.byConversationId, {
+						[id] = v21
+					})
+				})
+			end
+		end
+
+		return p2
+	end,
+	[RemovedConversation.name] = function(t2: {[any]: any}, p4) -- line: 66
+		-- upvalues: Cryo (copy)
+		local conversationId = p4.conversationId
+
+		return Cryo.Dictionary.join(t2, {
+			byConversationId = Cryo.Dictionary.join(t2.byConversationId, {
+				[conversationId] = Cryo.None
+			})
+		})
+	end,
+	[CurrentConversationTimeoutEnded.name] = function(t3: {[any]: any}, p5) -- line: 74
+		-- upvalues: Cryo (copy)
+		local v27 = t3
+		local UnixTimestamp = DateTime.now().UnixTimestamp
+
+		if t3.userTimeout and (t3.userTimeout.endTimestamp and UnixTimestamp > t3.userTimeout.endTimestamp) then
+			v27 = Cryo.Dictionary.join(v27, {
+				userTimeout = {}
+			})
+		end
+
+		local conversationId = p5.conversationId
+
+		if not t3.byConversationId[conversationId] or not t3.byConversationId[conversationId].endTimestamp or UnixTimestamp <= t3.byConversationId[conversationId].endTimestamp then
+			return v27
+		end
+
+		return Cryo.Dictionary.join(v27, {
+			byConversationId = Cryo.Dictionary.join(v27.byConversationId, {
+				[conversationId] = Cryo.None
+			})
+		})
+	end
+}))

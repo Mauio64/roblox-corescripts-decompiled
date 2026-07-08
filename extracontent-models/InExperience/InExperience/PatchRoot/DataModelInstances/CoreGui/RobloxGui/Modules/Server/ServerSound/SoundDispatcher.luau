@@ -1,68 +1,79 @@
-local l_Players_0 = game:GetService("Players");
-local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
-local v2 = {};
-local l_DefaultSoundEvents_0 = l_ReplicatedStorage_0:FindFirstChild("DefaultSoundEvents");
-if not l_DefaultSoundEvents_0 then
-    l_DefaultSoundEvents_0 = Instance.new("Folder");
-    l_DefaultSoundEvents_0.Name = "DefaultSoundEvents";
-    l_DefaultSoundEvents_0.Archivable = false;
-    l_DefaultSoundEvents_0.Parent = l_ReplicatedStorage_0;
-end;
-local function _(v4, v5) --[[ Line: 27 ]] --[[ Name: createEvent ]]
-    -- upvalues: l_DefaultSoundEvents_0 (ref)
-    local l_l_DefaultSoundEvents_0_FirstChild_0 = l_DefaultSoundEvents_0:FindFirstChild(v4);
-    if not l_l_DefaultSoundEvents_0_FirstChild_0 then
-        l_l_DefaultSoundEvents_0_FirstChild_0 = Instance.new(v5);
-        l_l_DefaultSoundEvents_0_FirstChild_0.Name = v4;
-        l_l_DefaultSoundEvents_0_FirstChild_0.Parent = l_DefaultSoundEvents_0;
-    end;
-    return l_l_DefaultSoundEvents_0_FirstChild_0;
-end;
-local l_DefaultServerSoundEvent_0 = l_DefaultSoundEvents_0:FindFirstChild("DefaultServerSoundEvent");
-if not l_DefaultServerSoundEvent_0 then
-    l_DefaultServerSoundEvent_0 = Instance.new("RemoteEvent");
-    l_DefaultServerSoundEvent_0.Name = "DefaultServerSoundEvent";
-    l_DefaultServerSoundEvent_0.Parent = l_DefaultSoundEvents_0;
-end;
-local l_l_DefaultServerSoundEvent_0_0 = l_DefaultServerSoundEvent_0;
-local l_AddCharacterLoadedEvent_0 = l_DefaultSoundEvents_0:FindFirstChild("AddCharacterLoadedEvent");
-if not l_AddCharacterLoadedEvent_0 then
-    l_AddCharacterLoadedEvent_0 = Instance.new("RemoteEvent");
-    l_AddCharacterLoadedEvent_0.Name = "AddCharacterLoadedEvent";
-    l_AddCharacterLoadedEvent_0.Parent = l_DefaultSoundEvents_0;
-end;
-l_DefaultServerSoundEvent_0 = l_AddCharacterLoadedEvent_0;
-local l_RemoveCharacterEvent_0 = l_DefaultSoundEvents_0:FindFirstChild("RemoveCharacterEvent");
-if not l_RemoveCharacterEvent_0 then
-    l_RemoveCharacterEvent_0 = Instance.new("RemoteEvent");
-    l_RemoveCharacterEvent_0.Name = "RemoveCharacterEvent";
-    l_RemoveCharacterEvent_0.Parent = l_DefaultSoundEvents_0;
-end;
-l_AddCharacterLoadedEvent_0 = l_RemoveCharacterEvent_0;
-l_RemoveCharacterEvent_0 = function(v12, v13, v14, v15) --[[ Line: 43 ]] --[[ Name: fireDefaultServerSoundEventToClient ]]
-    -- upvalues: v2 (copy), l_l_DefaultServerSoundEvent_0_0 (copy)
-    if v2[v12] then
-        l_l_DefaultServerSoundEvent_0_0:FireClient(v12, v13, v14, v15);
-    end;
-end;
-local function v17(v16) --[[ Line: 50 ]] --[[ Name: addCharacterLoaded ]]
-    -- upvalues: v2 (copy)
-    v2[v16] = true;
-end;
-local function v19(v18) --[[ Line: 55 ]] --[[ Name: removeCharacter ]]
-    -- upvalues: v2 (copy)
-    v2[v18] = nil;
-end;
-local l_SoundDispatcher_0 = l_DefaultSoundEvents_0:FindFirstChild("SoundDispatcher");
-if not l_SoundDispatcher_0 then
-    l_SoundDispatcher_0 = Instance.new("BindableEvent");
-    l_SoundDispatcher_0.Name = "SoundDispatcher";
-    l_SoundDispatcher_0.Parent = l_DefaultSoundEvents_0;
-end;
-l_SoundDispatcher_0.Event:Connect(l_RemoveCharacterEvent_0);
-l_l_DefaultServerSoundEvent_0_0.OnServerEvent:Connect(function() --[[ Line: 63 ]]
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local t1 = {}
+local DefaultSoundEvents = ReplicatedStorage:FindFirstChild("DefaultSoundEvents")
 
-end);
-l_DefaultServerSoundEvent_0.OnServerEvent:Connect(v17);
-l_AddCharacterLoadedEvent_0.OnServerEvent:Connect(v19);
-l_Players_0.PlayerRemoving:Connect(v19);
+if not DefaultSoundEvents then
+	DefaultSoundEvents = Instance.new("Folder")
+	DefaultSoundEvents.Name = "DefaultSoundEvents"
+	DefaultSoundEvents.Archivable = false
+	DefaultSoundEvents.Parent = ReplicatedStorage
+end
+
+local function createEvent(p1, p2) -- line: 27
+	-- upvalues: DefaultSoundEvents (ref)
+	local p1_2 = DefaultSoundEvents:FindFirstChild(p1)
+
+	if not p1_2 then
+		p1_2 = Instance.new(p2)
+		p1_2.Name = p1
+		p1_2.Parent = DefaultSoundEvents
+	end
+
+	return p1_2
+end
+
+local DefaultServerSoundEvent = DefaultSoundEvents:FindFirstChild("DefaultServerSoundEvent")
+
+if not DefaultServerSoundEvent then
+	DefaultServerSoundEvent = Instance.new("RemoteEvent")
+	DefaultServerSoundEvent.Name = "DefaultServerSoundEvent"
+	DefaultServerSoundEvent.Parent = DefaultSoundEvents
+end
+
+local v7 = DefaultServerSoundEvent
+local AddCharacterLoadedEvent = DefaultSoundEvents:FindFirstChild("AddCharacterLoadedEvent")
+
+if not AddCharacterLoadedEvent then
+	AddCharacterLoadedEvent = Instance.new("RemoteEvent")
+	AddCharacterLoadedEvent.Name = "AddCharacterLoadedEvent"
+	AddCharacterLoadedEvent.Parent = DefaultSoundEvents
+end
+
+local RemoveCharacterEvent = DefaultSoundEvents:FindFirstChild("RemoveCharacterEvent")
+
+if not RemoveCharacterEvent then
+	RemoveCharacterEvent = Instance.new("RemoteEvent")
+	RemoveCharacterEvent.Name = "RemoveCharacterEvent"
+	RemoveCharacterEvent.Parent = DefaultSoundEvents
+end
+
+local function fireDefaultServerSoundEventToClient(p3, p4, p5, p6) -- line: 43
+	-- upvalues: t1 (copy), v7 (copy)
+	if t1[p3] then
+		v7:FireClient(p3, p4, p5, p6)
+	end
+end
+local function addCharacterLoaded(p7) -- line: 50
+	-- upvalues: t1 (copy)
+	t1[p7] = true
+end
+local function removeCharacter(p8) -- line: 55
+	-- upvalues: t1 (copy)
+	t1[p8] = nil
+end
+
+local SoundDispatcher = DefaultSoundEvents:FindFirstChild("SoundDispatcher")
+
+if not SoundDispatcher then
+	SoundDispatcher = Instance.new("BindableEvent")
+	SoundDispatcher.Name = "SoundDispatcher"
+	SoundDispatcher.Parent = DefaultSoundEvents
+end
+
+SoundDispatcher.Event:Connect(fireDefaultServerSoundEventToClient)
+v7.OnServerEvent:Connect(function() -- line: 63
+end)
+AddCharacterLoadedEvent.OnServerEvent:Connect(addCharacterLoaded)
+RemoveCharacterEvent.OnServerEvent:Connect(removeCharacter)
+Players.PlayerRemoving:Connect(removeCharacter)

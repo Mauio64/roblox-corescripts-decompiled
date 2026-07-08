@@ -1,28 +1,38 @@
-local v0 = {};
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_DEV_0 = require(script.Parent.utilities).DEV;
-l_invariant_0(typeof(l_DEV_0) == "boolean", l_DEV_0);
-v0.ApolloCache = require(script.core.cache).ApolloCache;
-local _ = require(script.core.types.Cache);
-local _ = require(script.core.types.DataProxy);
-v0.MissingFieldError = require(script.core.types.common).MissingFieldError;
-local v8 = require(script.Parent.utilities.graphql.storeUtils);
-v0.isReference = v8.isReference;
-v0.makeReference = v8.makeReference;
-v0.EntityStore = require(script.inmemory.entityStore).EntityStore;
-v0.fieldNameFromStoreName = require(script.inmemory.helpers).fieldNameFromStoreName;
-v0.InMemoryCache = require(script.inmemory.inMemoryCache).InMemoryCache;
-local v9 = require(script.inmemory.reactiveVars);
-v0.makeVar = v9.makeVar;
-v0.cacheSlot = v9.cacheSlot;
-local v10 = require(script.inmemory.policies);
-v0.defaultDataIdFromObject = v10.defaultDataIdFromObject;
-v0.Policies = v10.Policies;
-v0.None = v10.None;
-v0.canonicalStringify = require(script.inmemory["object-canon"]).canonicalStringify;
-local v11 = require(script.inmemory.types);
-l_Object_0.assign(v0, v11);
-return v0;
+local t1 = {}
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Object = require(scriptParentParent.LuauPolyfill).Object
+local invariant = require(scriptParent.jsutils.invariant).invariant
+local DEV = require(script.Parent.utilities).DEV
+
+invariant(typeof(DEV) == "boolean", DEV)
+t1.ApolloCache = require(script.core.cache).ApolloCache
+require(script.core.types.Cache)
+require(script.core.types.DataProxy)
+t1.MissingFieldError = require(script.core.types.common).MissingFieldError
+
+local storeUtils = require(script.Parent.utilities.graphql.storeUtils)
+
+t1.isReference = storeUtils.isReference
+t1.makeReference = storeUtils.makeReference
+t1.EntityStore = require(script.inmemory.entityStore).EntityStore
+t1.fieldNameFromStoreName = require(script.inmemory.helpers).fieldNameFromStoreName
+t1.InMemoryCache = require(script.inmemory.inMemoryCache).InMemoryCache
+
+local reactiveVars = require(script.inmemory.reactiveVars)
+
+t1.makeVar = reactiveVars.makeVar
+t1.cacheSlot = reactiveVars.cacheSlot
+
+local policies = require(script.inmemory.policies)
+
+t1.defaultDataIdFromObject = policies.defaultDataIdFromObject
+t1.Policies = policies.Policies
+t1.None = policies.None
+t1.canonicalStringify = require(script.inmemory["object-canon"]).canonicalStringify
+
+local types = require(script.inmemory.types)
+
+Object.assign(t1, types)
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChangeWebViewReportButtonToText2", false);
+return game:DefineFastFlag("ChangeWebViewReportButtonToText2", false)

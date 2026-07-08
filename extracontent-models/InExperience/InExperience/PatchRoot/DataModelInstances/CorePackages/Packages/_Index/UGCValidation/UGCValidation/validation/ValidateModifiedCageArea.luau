@@ -1,214 +1,244 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Analytics);
-local v3 = require(l_Parent_0.WrapTargetCageUVReferenceValues);
-local _ = require(l_Parent_0.util.Types);
-local v5 = require(l_Parent_0.util.pcallDeferred);
-local v6 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local v7 = require(l_Parent_0.util.getMeshVerts);
-local v8 = require(l_Parent_0.util.CollisionTestUtil);
-local v9 = require(l_Parent_0.util.StringUtil);
-local v10 = game:DefineFastInt("UGCValidateExcludedUVModifyRequirements", 14);
-local v11 = game:DefineFastInt("UGCValidatePartUVModifyRequirements", 45);
-local v12 = game:DefineFastInt("UGCValidateRenderMeshInsideModifiedArea", 70);
-local v13 = tonumber((game:DefineFastString("UGCValidateModifiedAreaPaddingModifier", "1.1")));
-local v14 = {};
-local v15 = {
-    [Enum.AssetType.LeftShoeAccessory] = {
-        allowedParts = {
-            LeftFoot = true, 
-            LeftLowerLeg = true, 
-            LeftUpperLeg = true
-        }, 
-        mainParts = {
-            LeftFoot = true
-        }
-    }, 
-    [Enum.AssetType.RightShoeAccessory] = {
-        allowedParts = {
-            RightFoot = true, 
-            RightLowerLeg = true, 
-            RightUpperLeg = true
-        }, 
-        mainParts = {
-            RightFoot = true
-        }
-    }
-};
-local function v19(v16, v17, v18) --[[ Line: 58 ]] --[[ Name: reportTestFailedToExecute ]]
-    -- upvalues: v2 (copy)
-    if v18.isServer ~= nil and v18.isServer then
-        error(v16);
-    end;
-    v2.reportFailure(v17, nil, v18);
-    return false, {
-        v16
-    };
-end;
-local function v25(v20) --[[ Line: 73 ]] --[[ Name: gatherUVs ]]
-    -- upvalues: v3 (copy)
-    local v21 = {};
-    for v22 in v20 do
-        for _, v24 in (assert(v3[v22], "Body area not found in UV reference values")) do
-            table.insert(v21, v24);
-        end;
-    end;
-    return v21;
-end;
-local function v29(v26) --[[ Line: 87 ]] --[[ Name: lazyGetUVsExcludedForAssetType ]]
-    -- upvalues: v3 (copy), v25 (copy)
-    if not v26.uVsDisallowedForAssetType then
-        local v27 = {};
-        for v28 in v3 do
-            if not v26.allowedParts[v28] then
-                v27[v28] = true;
-            end;
-        end;
-        v26.uVsDisallowedForAssetType = v25(v27);
-    end;
-    return v26.uVsDisallowedForAssetType;
-end;
-local function _(v30) --[[ Line: 102 ]] --[[ Name: lazyGetUVsForAssetType ]]
-    -- upvalues: v25 (copy)
-    if not v30.uVsForAssetType then
-        v30.uVsForAssetType = v25(v30.allowedParts);
-    end;
-    return v30.uVsForAssetType;
-end;
-local function _(v32) --[[ Line: 110 ]] --[[ Name: lazyGetMainUVsForAssetType ]]
-    -- upvalues: v25 (copy)
-    if not v32.mainUVsForAssetType then
-        v32.mainUVsForAssetType = v25(v32.mainParts);
-    end;
-    return v32.mainUVsForAssetType;
-end;
-v14.validateExcludedModifiedUVs = function(v34, v35, v36, v37, v38) --[[ Line: 121 ]] --[[ Name: validateExcludedModifiedUVs ]]
-    -- upvalues: v15 (copy), v29 (copy), v5 (copy), l_UGCValidationService_0 (copy), v19 (copy), v2 (copy), v10 (copy), v9 (copy)
-    local v39 = assert(v15[v38.assetTypeEnum], "bodyArea should be defined");
-    local v40 = v29(v39);
-    if #v40 == 0 then
-        return true;
-    else
-        local v41, v42, v43, v44 = v5(function() --[[ Line: 136 ]]
-            -- upvalues: l_UGCValidationService_0 (ref), v40 (copy), v34 (copy), v35 (copy), v36 (copy), v37 (copy)
-            return l_UGCValidationService_0:CalculateEditableMeshNumModifiedCageUVsInSet(v40, v34.editableMesh, v35, v36.editableMesh, v37);
-        end, v38);
-        if not v41 then
-            return v19("Failed to execute excluded modified cage UV check. Make sure both cage meshes exists and try again.", v2.ErrorType.validateExcludedModifiedCageUVs_FailedToExecute, v38);
-        else
-            assert(v42 == #v40, "all the UVs in allExcludedUVsForBodyArea sent in to CalculateEditableMeshNumModifiedCageUVsInSet should be unique");
-            if v43 == 0 then
-                return true;
-            else
-                local v45 = v44 / v43 * 100;
-                if v10 < v45 then
-                    v2.reportFailure(v2.ErrorType.validateExcludedModifiedCageUVs_UnexpectedUVValue, nil, v38);
-                    return false, {
-                        string.format("%d%% of modified cage UVs in WrapLayer CageMesh (outer mesh) are outside the expected region of the body. For a %s no more than %d%% of the modified UVs can be outside the %s area. Move your asset to the correct area of the body.", math.floor(v45), v38.assetTypeEnum.Name, v10, v9.keysToString(v39.allowedParts, "/"))
-                    };
-                else
-                    return true;
-                end;
-            end;
-        end;
-    end;
-end;
-v14.validateMainModifiedUVs = function(v46, v47, v48, v49, v50) --[[ Line: 190 ]] --[[ Name: validateMainModifiedUVs ]]
-    -- upvalues: v15 (copy), v25 (copy), v5 (copy), l_UGCValidationService_0 (copy), v19 (copy), v2 (copy), v11 (copy), v9 (copy)
-    local v51 = assert(v15[v50.assetTypeEnum], "bodyArea should be defined");
-    if not v51.mainUVsForAssetType then
-        v51.mainUVsForAssetType = v25(v51.mainParts);
-    end;
-    local l_mainUVsForAssetType_0 = v51.mainUVsForAssetType;
-    if #l_mainUVsForAssetType_0 == 0 then
-        return true;
-    else
-        local v53, v54, _, v56 = v5(function() --[[ Line: 205 ]]
-            -- upvalues: l_UGCValidationService_0 (ref), l_mainUVsForAssetType_0 (copy), v46 (copy), v47 (copy), v48 (copy), v49 (copy)
-            return l_UGCValidationService_0:CalculateEditableMeshNumModifiedCageUVsInSet(l_mainUVsForAssetType_0, v46.editableMesh, v47, v48.editableMesh, v49);
-        end, v50);
-        if not v53 then
-            return v19("Failed to execute main modified cage UV check. Make sure both cage meshes exists and try again.", v2.ErrorType.validateMainModifiedCageUVs_FailedToExecute, v50);
-        else
-            assert(v54 == #l_mainUVsForAssetType_0, "all the UVs in allUVsForBodyArea sent in to CalculateEditableMeshNumModifiedCageUVsInSet should be unique");
-            local v57 = v56 / v54 * 100;
-            if not (v11 <= v57) then
-                v2.reportFailure(v2.ErrorType.validateMainModifiedCageUVs_TooFewModifiedUVsFound, nil, v50);
-                return false, {
-                    string.format("The WrapLayer CageMesh (outer mesh) for a %s must modify %d%% of the cage UVs in the %s area. Currently only %d%% are modified. Move your asset to the correct area of the body.", v50.assetTypeEnum.Name, v11, v9.keysToString(v51.mainParts, "/"), (math.floor(v57)))
-                };
-            else
-                return true;
-            end;
-        end;
-    end;
-end;
-v14.validateRenderMeshInsideModifiedOuterCageArea = function(v58, v59, v60, v61, v62, v63) --[[ Line: 251 ]] --[[ Name: validateRenderMeshInsideModifiedOuterCageArea ]]
-    -- upvalues: v15 (copy), v25 (copy), v5 (copy), l_UGCValidationService_0 (copy), v7 (copy), v19 (copy), v2 (copy), v13 (copy), v8 (copy), v12 (copy), v9 (copy)
-    local v64 = assert(v15[v63.assetTypeEnum], "bodyArea should be defined");
-    if not v64.uVsForAssetType then
-        v64.uVsForAssetType = v25(v64.allowedParts);
-    end;
-    local l_uVsForAssetType_0 = v64.uVsForAssetType;
-    if #l_uVsForAssetType_0 == 0 then
-        return true;
-    else
-        local v66, v67, v68 = v5(function() --[[ Line: 267 ]]
-            -- upvalues: l_UGCValidationService_0 (ref), l_uVsForAssetType_0 (copy), v59 (copy), v60 (copy), v61 (copy), v62 (copy)
-            return l_UGCValidationService_0:CalculateEditableMeshModifiedCageBoundingBox(l_uVsForAssetType_0, v59.editableMesh, v60, v61.editableMesh, v62);
-        end, v63);
-        local v69 = nil;
-        if v66 then
-            local v70 = nil;
-            local v71 = nil;
-            local v72, v73, v74 = v7(v58, v63);
-            v66 = v72;
-            v70 = v73;
-            v71 = v74;
-            if v66 then
-                if v71 and #v71 > 0 then
-                    v69 = v71;
-                else
-                    v66 = false;
-                end;
-            end;
-        end;
-        if not v66 then
-            return v19("Failed to execute testing render mesh inside bounding box of outer cage modified area. Make sure both cage meshes and render mesh exist and try again.", v2.ErrorType.validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute, v63);
-        else
-            v68 = v68 * v13;
-            local v75 = 0;
-            for _, v77 in v69 do
-                if v8.pointInAxisAlignedBounds(v77, v67, v68) then
-                    v75 = v75 + 1;
-                end;
-            end;
-            local v78 = v75 / #v69 * 100;
-            if not (v12 <= v78) then
-                v2.reportFailure(v2.ErrorType.validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly, nil, v63);
-                local v79 = v9.keysToString(v64.allowedParts, "/");
-                return false, {
-                    string.format("Only %d%% of the render mesh verts are situated in the modified %s area of the WrapLayer CageMesh (outer mesh). %d%% is required. Move the render mesh to be within the modified %s area of the WrapLayer CageMesh (outer mesh).", math.floor(v78), v79, v12, v79)
-                };
-            else
-                return true;
-            end;
-        end;
-    end;
-end;
-v14.validate = function(v80, v81, v82, v83, v84, v85) --[[ Line: 330 ]] --[[ Name: validate ]]
-    -- upvalues: v15 (copy), v6 (copy), v14 (copy)
-    local v86 = if v85.assetTypeEnum then v15[v85.assetTypeEnum] else nil;
-    if not v86 then
-        return true;
-    else
-        assert(v86.allowedParts, "bodyArea.allowedParts should be defined");
-        assert(v86.mainParts, "bodyArea.mainParts should be defined");
-        local v87 = v6.new();
-        v87:updateReasons(v14.validateExcludedModifiedUVs(v80, v81, v82, v83, v85));
-        v87:updateReasons(v14.validateMainModifiedUVs(v80, v81, v82, v83, v85));
-        v87:updateReasons(v14.validateRenderMeshInsideModifiedOuterCageArea(v84, v80, v81, v82, v83, v85));
-        return v87:getFinalResults();
-    end;
-end;
-return v14;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local WrapTargetCageUVReferenceValues = require(ParentParent.WrapTargetCageUVReferenceValues)
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+local getMeshVerts = require(ParentParent.util.getMeshVerts)
+local CollisionTestUtil = require(ParentParent.util.CollisionTestUtil)
+local StringUtil = require(ParentParent.util.StringUtil)
+local v10 = game:DefineFastInt("UGCValidateExcludedUVModifyRequirements", 14)
+local v11 = game:DefineFastInt("UGCValidatePartUVModifyRequirements", 45)
+local v12 = game:DefineFastInt("UGCValidateRenderMeshInsideModifiedArea", 70)
+local num = tonumber((game:DefineFastString("UGCValidateModifiedAreaPaddingModifier", "1.1")))
+local t1 = {}
+local t2 = {
+	[Enum.AssetType.LeftShoeAccessory] = {
+		allowedParts = {
+			LeftFoot = true,
+			LeftLowerLeg = true,
+			LeftUpperLeg = true
+		},
+		mainParts = {
+			LeftFoot = true
+		}
+	},
+	[Enum.AssetType.RightShoeAccessory] = {
+		allowedParts = {
+			RightFoot = true,
+			RightLowerLeg = true,
+			RightUpperLeg = true
+		},
+		mainParts = {
+			RightFoot = true
+		}
+	}
+}
+
+local function reportTestFailedToExecute(s1: string, s2: string, p1) -- line: 58
+	-- upvalues: Analytics (copy)
+	if p1.isServer ~= nil and p1.isServer then
+		error(s1)
+	end
+
+	Analytics.reportFailure(s2, nil, p1)
+
+	return false, { s1 }
+end
+local function gatherUVs(t3: {[any]: any}) -- line: 73
+	-- upvalues: WrapTargetCageUVReferenceValues (copy)
+	local t4 = {}
+
+	for v26 in t3 do
+		for _, v28 in (assert(WrapTargetCageUVReferenceValues[v26], "Body area not found in UV reference values")) do
+			table.insert(t4, v28)
+		end
+	end
+
+	return t4
+end
+local function lazyGetUVsExcludedForAssetType(p2) -- line: 87
+	-- upvalues: WrapTargetCageUVReferenceValues (copy), gatherUVs (copy)
+	if not p2.uVsDisallowedForAssetType then
+		local t5 = {}
+
+		for v31 in WrapTargetCageUVReferenceValues do
+			if not p2.allowedParts[v31] then
+				t5[v31] = true
+			end
+		end
+
+		p2.uVsDisallowedForAssetType = gatherUVs(t5)
+	end
+
+	return p2.uVsDisallowedForAssetType
+end
+local function lazyGetUVsForAssetType(p3) -- line: 102
+	-- upvalues: gatherUVs (copy)
+	if not p3.uVsForAssetType then
+		p3.uVsForAssetType = gatherUVs(p3.allowedParts)
+	end
+
+	return p3.uVsForAssetType
+end
+local function lazyGetMainUVsForAssetType(p4) -- line: 110
+	-- upvalues: gatherUVs (copy)
+	if not p4.mainUVsForAssetType then
+		p4.mainUVsForAssetType = gatherUVs(p4.mainParts)
+	end
+
+	return p4.mainUVsForAssetType
+end
+
+function t1.validateExcludedModifiedUVs(p5, cFrame: CFrame, p6, cFrame2: CFrame, p7) -- line: 121
+	-- upvalues: t2 (copy), lazyGetUVsExcludedForAssetType (copy), pcallDeferred (copy), UGCValidationService (copy), reportTestFailedToExecute (copy), Analytics (copy), v10 (copy), StringUtil (copy)
+	local v39 = assert(t2[p7.assetTypeEnum], "bodyArea should be defined")
+	local v40 = lazyGetUVsExcludedForAssetType(v39)
+
+	if #v40 == 0 then
+		return true
+	end
+
+	local v41, v42, v43, v44 = pcallDeferred(function() -- line: 136
+		-- upvalues: UGCValidationService (copy), v40 (copy), p5 (copy), cFrame (copy), p6 (copy), cFrame2 (copy)
+		return UGCValidationService:CalculateEditableMeshNumModifiedCageUVsInSet(v40, p5.editableMesh, cFrame, p6.editableMesh, cFrame2)
+	end, p7)
+
+	if not v41 then
+		return reportTestFailedToExecute("Failed to execute excluded modified cage UV check. Make sure both cage meshes exists and try again.", Analytics.ErrorType.validateExcludedModifiedCageUVs_FailedToExecute, p7)
+	end
+
+	assert(v42 == #v40, "all the UVs in allExcludedUVsForBodyArea sent in to CalculateEditableMeshNumModifiedCageUVsInSet should be unique")
+
+	if v43 == 0 then
+		return true
+	end
+
+	local v45 = v44 / v43 * 100
+
+	if v45 > v10 then
+		Analytics.reportFailure(Analytics.ErrorType.validateExcludedModifiedCageUVs_UnexpectedUVValue, nil, p7)
+
+		return false, { string.format("%d%% of modified cage UVs in WrapLayer CageMesh (outer mesh) are outside the expected region of the body. For a %s no more than %d%% of the modified UVs can be outside the %s area. Move your asset to the correct area of the body.", math.floor(v45), p7.assetTypeEnum.Name, v10, StringUtil.keysToString(v39.allowedParts, "/")) }
+	end
+
+	return true
+end
+function t1.validateMainModifiedUVs(p8, cFrame: CFrame, p9, cFrame3: CFrame, p10) -- line: 190
+	-- upvalues: t2 (copy), gatherUVs (copy), pcallDeferred (copy), UGCValidationService (copy), reportTestFailedToExecute (copy), Analytics (copy), v11 (copy), StringUtil (copy)
+	local v51 = assert(t2[p10.assetTypeEnum], "bodyArea should be defined")
+
+	if not v51.mainUVsForAssetType then
+		v51.mainUVsForAssetType = gatherUVs(v51.mainParts)
+	end
+
+	local mainUVsForAssetType = v51.mainUVsForAssetType
+
+	if #mainUVsForAssetType == 0 then
+		return true
+	end
+
+	local v53, v54, _, v56 = pcallDeferred(function() -- line: 205
+		-- upvalues: UGCValidationService (copy), mainUVsForAssetType (copy), p8 (copy), cFrame (copy), p9 (copy), cFrame3 (copy)
+		return UGCValidationService:CalculateEditableMeshNumModifiedCageUVsInSet(mainUVsForAssetType, p8.editableMesh, cFrame, p9.editableMesh, cFrame3)
+	end, p10)
+
+	if not v53 then
+		return reportTestFailedToExecute("Failed to execute main modified cage UV check. Make sure both cage meshes exists and try again.", Analytics.ErrorType.validateMainModifiedCageUVs_FailedToExecute, p10)
+	end
+
+	assert(v54 == #mainUVsForAssetType, "all the UVs in allUVsForBodyArea sent in to CalculateEditableMeshNumModifiedCageUVsInSet should be unique")
+
+	local v57 = v56 / v54 * 100
+
+	if not (v57 >= v11) then
+		Analytics.reportFailure(Analytics.ErrorType.validateMainModifiedCageUVs_TooFewModifiedUVsFound, nil, p10)
+
+		return false, { string.format("The WrapLayer CageMesh (outer mesh) for a %s must modify %d%% of the cage UVs in the %s area. Currently only %d%% are modified. Move your asset to the correct area of the body.", p10.assetTypeEnum.Name, v11, StringUtil.keysToString(v51.mainParts, "/"), (math.floor(v57))) }
+	end
+
+	return true
+end
+function t1.validateRenderMeshInsideModifiedOuterCageArea(p11, p12, cFrame: CFrame, p13, cFrame4: CFrame, p14) -- line: 251
+	-- upvalues: t2 (copy), gatherUVs (copy), pcallDeferred (copy), UGCValidationService (copy), getMeshVerts (copy), reportTestFailedToExecute (copy), Analytics (copy), num (copy), CollisionTestUtil (copy), v12 (copy), StringUtil (copy)
+	local v64 = assert(t2[p14.assetTypeEnum], "bodyArea should be defined")
+
+	if not v64.uVsForAssetType then
+		v64.uVsForAssetType = gatherUVs(v64.allowedParts)
+	end
+
+	local uVsForAssetType = v64.uVsForAssetType
+
+	if #uVsForAssetType == 0 then
+		return true
+	end
+
+	local v66, v67, v68 = pcallDeferred(function() -- line: 267
+		-- upvalues: UGCValidationService (copy), uVsForAssetType (copy), p12 (copy), cFrame (copy), p13 (copy), cFrame4 (copy)
+		return UGCValidationService:CalculateEditableMeshModifiedCageBoundingBox(uVsForAssetType, p12.editableMesh, cFrame, p13.editableMesh, cFrame4)
+	end, p14)
+	local v69 = nil
+
+	if v66 then
+		local v70, v71
+
+		v66, v70, v71 = getMeshVerts(p11, p14)
+
+		if v66 then
+			if v71 and #v71 > 0 then
+				v69 = v71
+			else
+				v66 = false
+			end
+		end
+	end
+
+	if not v66 then
+		return reportTestFailedToExecute("Failed to execute testing render mesh inside bounding box of outer cage modified area. Make sure both cage meshes and render mesh exist and try again.", Analytics.ErrorType.validateRenderMeshInsideModifiedOuterCageArea_FailedToExecute, p14)
+	end
+
+	local v72 = v68 * num
+	local n1 = 0
+
+	for _, v75 in v69 do
+		if CollisionTestUtil.pointInAxisAlignedBounds(v75, v67, v72) then
+			n1 += 1
+		end
+	end
+
+	local v76 = n1 / #v69 * 100
+
+	if not (v76 >= v12) then
+		Analytics.reportFailure(Analytics.ErrorType.validateRenderMeshInsideModifiedOuterCageArea_RenderMeshNotPositionedCorrectly, nil, p14)
+
+		local v77 = StringUtil.keysToString(v64.allowedParts, "/")
+
+		return false, { string.format("Only %d%% of the render mesh verts are situated in the modified %s area of the WrapLayer CageMesh (outer mesh). %d%% is required. Move the render mesh to be within the modified %s area of the WrapLayer CageMesh (outer mesh).", math.floor(v76), v77, v12, v77) }
+	end
+
+	return true
+end
+function t1.validate(p15, cFrame: CFrame, p16, cFrame5: CFrame, p17, p18) -- line: 330
+	-- upvalues: t2 (copy), FailureReasonsAccumulator (copy), t1 (copy)
+	local v84 = if not p18.assetTypeEnum then nil else t2[p18.assetTypeEnum]
+
+	if not v84 then
+		return true
+	end
+
+	assert(v84.allowedParts, "bodyArea.allowedParts should be defined")
+	assert(v84.mainParts, "bodyArea.mainParts should be defined")
+
+	local v85 = FailureReasonsAccumulator.new()
+
+	v85:updateReasons(t1.validateExcludedModifiedUVs(p15, cFrame, p16, cFrame5, p18))
+	v85:updateReasons(t1.validateMainModifiedUVs(p15, cFrame, p16, cFrame5, p18))
+	v85:updateReasons(t1.validateRenderMeshInsideModifiedOuterCageArea(p17, p15, cFrame, p16, cFrame5, p18))
+
+	return v85:getFinalResults()
+end
+
+return t1

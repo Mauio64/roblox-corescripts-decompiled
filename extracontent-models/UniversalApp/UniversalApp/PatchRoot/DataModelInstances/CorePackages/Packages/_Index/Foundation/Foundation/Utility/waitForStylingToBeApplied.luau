@@ -1,4 +1,6 @@
-return function() --[[ Line: 1 ]] --[[ Name: waitForStylingToBeApplied ]]
-    task.wait();
-    task.wait();
-end;
+local function waitForStylingToBeApplied() -- line: 1
+	task.wait()
+	task.wait()
+end
+
+return waitForStylingToBeApplied

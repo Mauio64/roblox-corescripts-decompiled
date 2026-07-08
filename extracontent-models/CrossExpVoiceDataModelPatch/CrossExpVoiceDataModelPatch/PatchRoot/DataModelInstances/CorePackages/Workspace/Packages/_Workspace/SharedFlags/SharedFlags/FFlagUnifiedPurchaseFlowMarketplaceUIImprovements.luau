@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnifiedPurchaseFlowMarketplaceUIImprovementsV4", false);
+return game:DefineFastFlag("UnifiedPurchaseFlowMarketplaceUIImprovementsV4", false)

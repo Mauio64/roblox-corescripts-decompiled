@@ -1,34 +1,39 @@
-local v0 = game:DefineFastInt("ReactLowEndMemoryCutoff", 3500);
-local v1 = game:DefineFastInt("ReactHighEndMemoryCutoff", 7500);
-local l_Parent_0 = script:FindFirstAncestor("Devices").Parent;
-local l_SystemInfoProtocol_0 = require(l_Parent_0.SystemInfoProtocol).SystemInfoProtocol;
-local v4 = {
-    LowEnd = "LowEnd", 
-    MidTier = "MidTier", 
-    HighEnd = "HighEnd"
-};
+local v1 = game:DefineFastInt("ReactLowEndMemoryCutoff", 3500)
+local v2 = game:DefineFastInt("ReactHighEndMemoryCutoff", 7500)
+local Parent = script:FindFirstAncestor("Devices").Parent
+local SystemInfoProtocol = require(Parent.SystemInfoProtocol).SystemInfoProtocol
+local _ = {
+	LowEnd = "LowEnd",
+	MidTier = "MidTier",
+	HighEnd = "HighEnd"
+}
+
 return {
-    GetDeviceMemoryTier = function() --[[ Line: 27 ]] --[[ Name: GetDeviceMemoryTier ]]
-        -- upvalues: l_SystemInfoProtocol_0 (copy), v0 (copy), v4 (copy), v1 (copy)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 28 ]]
-            -- upvalues: l_SystemInfoProtocol_0 (ref)
-            return l_SystemInfoProtocol_0.default:getSystemInfo({
-                l_SystemInfoProtocol_0.InfoNames.MAX_MEMORY
-            });
-        end);
-        if l_status_0 and typeof(l_result_0) == "table" then
-            local v7 = tonumber(l_result_0[l_SystemInfoProtocol_0.InfoNames.MAX_MEMORY]);
-            if not v7 then
-                return nil;
-            elseif v7 <= v0 then
-                return v4.LowEnd;
-            elseif v1 <= v7 then
-                return v4.HighEnd;
-            else
-                return v4.MidTier;
-            end;
-        else
-            return nil;
-        end;
-    end
-};
+	GetDeviceMemoryTier = function() -- line: 27
+		-- upvalues: SystemInfoProtocol (copy), v1 (copy), v2 (copy)
+		local ok, result = pcall(function() -- line: 28
+			-- upvalues: SystemInfoProtocol (copy)
+			return SystemInfoProtocol.default:getSystemInfo({ SystemInfoProtocol.InfoNames.MAX_MEMORY })
+		end)
+
+		if ok and typeof(result) == "table" then
+			local num = tonumber(result[SystemInfoProtocol.InfoNames.MAX_MEMORY])
+
+			if not num then
+				return nil
+			end
+
+			if num <= v1 then
+				return "LowEnd"
+			end
+
+			if num >= v2 then
+				return "HighEnd"
+			end
+
+			return "MidTier"
+		end
+
+		return nil
+	end
+}

@@ -1,1 +1,1 @@
-return require(script.byUserId);
+return require(script.byUserId)

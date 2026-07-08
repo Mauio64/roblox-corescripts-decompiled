@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RemoveCentralOverlayScrimForUnifiedPurchaseModal", false);
+return game:DefineFastFlag("RemoveCentralOverlayScrimForUnifiedPurchaseModal", false)

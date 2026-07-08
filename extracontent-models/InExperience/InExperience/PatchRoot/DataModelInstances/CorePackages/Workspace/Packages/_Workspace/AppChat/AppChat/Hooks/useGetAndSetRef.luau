@@ -1,19 +1,23 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 5 ]] --[[ Name: useGetAndSetRef ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(v2);
-    return v1.useCallback(function() --[[ Line: 7 ]]
-        -- upvalues: v3 (copy)
-        return v3.current;
-    end, {}), (v1.useCallback(function(v4) --[[ Line: 10 ]]
-        -- upvalues: v3 (copy)
-        if typeof(v4) == "function" then
-            v3.current = v4(v3.current);
-            return;
-        else
-            v3.current = v4;
-            return;
-        end;
-    end, {}));
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+
+local function useGetAndSetRef(p1) -- line: 5
+	-- upvalues: React (copy)
+	local v5 = React.useRef(p1)
+
+	return React.useCallback(function() -- line: 7
+		-- upvalues: v5 (copy)
+		return v5.current
+	end, {}), (React.useCallback(function(p2) -- line: 10
+		-- upvalues: v5 (copy)
+		if typeof(p2) == "function" then
+			v5.current = p2(v5.current)
+
+			return
+		end
+
+		v5.current = p2
+	end, {}))
+end
+
+return useGetAndSetRef

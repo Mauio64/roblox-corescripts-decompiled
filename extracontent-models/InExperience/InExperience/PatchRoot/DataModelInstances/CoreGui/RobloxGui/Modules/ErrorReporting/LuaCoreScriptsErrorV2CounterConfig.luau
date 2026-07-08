@@ -1,16 +1,15 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.LoggingProtocol);
-local v2 = game:DefineFastInt("LuaCoreScriptsErrorV2ThrottleHundredthPercentage", 0);
+local CorePackages = game:GetService("CorePackages")
+local LoggingProtocol = require(CorePackages.Workspace.Packages.LoggingProtocol)
+local v3 = game:DefineFastInt("LuaCoreScriptsErrorV2ThrottleHundredthPercentage", 0)
+
 return {
-    eventName = "LuaCoreScriptsError", 
-    backends = {
-        v1.TelemetryBackends.Counter
-    }, 
-    throttlingPercentage = v2, 
-    lastUpdated = {
-        25, 
-        1, 
-        29
-    }, 
-    description = "V2 Counter to for Lua CoreScripts Error."
-};
+	eventName = "LuaCoreScriptsError",
+	description = "V2 Counter to for Lua CoreScripts Error.",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = v3,
+	lastUpdated = {
+		25,
+		1,
+		29
+	}
+}

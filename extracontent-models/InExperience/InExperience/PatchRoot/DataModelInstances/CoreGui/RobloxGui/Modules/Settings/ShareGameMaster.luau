@@ -1,29 +1,30 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.Rodux);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_ShareGame_0 = l_Modules_0.Settings.Pages.ShareGame;
-local v6 = require(l_ShareGame_0.Components.App);
-local v7 = require(l_ShareGame_0.AppReducer);
-local v8 = require(l_ShareGame_0.InviteStore);
-local v9 = require(l_Modules_0.Flags.GetFFlagEnableSharedInviteStore);
+local CorePackages = game:GetService("CorePackages")
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Roact = require(CorePackages.Packages.Roact)
+local Rodux = require(CorePackages.Packages.Rodux)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ShareGame = Modules.Settings.Pages.ShareGame
+local App = require(ShareGame.Components.App)
+local AppReducer = require(ShareGame.AppReducer)
+local InviteStore = require(ShareGame.InviteStore)
+local GetFFlagEnableSharedInviteStore = require(Modules.Flags.GetFFlagEnableSharedInviteStore)
+
 return {
-    createApp = function(v10, v11) --[[ Line: 17 ]] --[[ Name: createApp ]]
-        -- upvalues: v9 (copy), v8 (copy), v3 (copy), v7 (copy), v2 (copy), v4 (copy), v6 (copy)
-        local v12 = {
-            store = if v9() then v8 else v3.Store.new(v7, nil, {
-                v3.thunkMiddleware
-            })
-        };
-        v12._instanceHandle = v2.mount(v2.createElement(v4.StoreProvider, {
-            store = v12.store
-        }, {
-            App = v2.createElement(v6, {
-                analytics = v11, 
-                pageTarget = v10
-            })
-        }));
-        return v12;
-    end
-};
+	createApp = function(p1, p2) -- line: 17
+		-- upvalues: GetFFlagEnableSharedInviteStore (copy), InviteStore (copy), Rodux (copy), AppReducer (copy), Roact (copy), RoactRodux (copy), App (copy)
+		local t1 = {
+			store = if not GetFFlagEnableSharedInviteStore() then Rodux.Store.new(AppReducer, nil, { Rodux.thunkMiddleware }) else InviteStore
+		}
+
+		t1._instanceHandle = Roact.mount(Roact.createElement(RoactRodux.StoreProvider, {
+			store = t1.store
+		}, {
+			App = Roact.createElement(App, {
+				analytics = p2,
+				pageTarget = p1
+			})
+		}))
+
+		return t1
+	end
+}

@@ -1,154 +1,156 @@
-local l_TextService_0 = game:GetService("TextService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v6 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v6.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v6.Core.ImageSet.ImageSetLabel;
-local v9 = require(l_script_FirstAncestor_0.Footer.getGameTileMetadataFont);
-local l_useTextSizeOffset_0 = v6.Core.Style.useTextSizeOffset;
-local v11 = require(l_Parent_0.Responsive);
-local l_useBreakpointXOrSmaller_0 = v11.useBreakpointXOrSmaller;
-local v13 = require(l_script_FirstAncestor_0.GameTileTypes);
-local l_FFlagLuaAppMigrateGameTileFooterValueFixes_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppMigrateGameTileFooterValueFixes;
-local l_FFlagLuaAppFixSmallScreenFooterStatsOverlap_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppFixSmallScreenFooterStatsOverlap;
-local l_FFlagLuaAppNarrowTileSmallerFooterFont_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont;
-local l_FFlagLuaAppNarrowTileHideRating_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppNarrowTileHideRating;
-local l_FFlagLuaAppNarrowTileHidePlayerCount_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppNarrowTileHidePlayerCount;
-local v19 = l_Images_0["icons/status/games/rating_small"];
-local v20 = l_Images_0["icons/status/games/people-playing_small"];
-local v21 = Vector2.new(1e999, 1e999);
-return function(v22) --[[ Line: 60 ]] --[[ Name: GridTileGameStats ]]
-    -- upvalues: l_useDesignTokens_0 (copy), l_useTextSizeOffset_0 (copy), l_useTokens_0 (copy), l_FFlagLuaAppFixSmallScreenFooterStatsOverlap_0 (copy), l_useBreakpointXOrSmaller_0 (copy), v11 (copy), v13 (copy), l_FFlagLuaAppNarrowTileSmallerFooterFont_0 (copy), l_FFlagLuaAppMigrateGameTileFooterValueFixes_0 (copy), v9 (copy), v3 (copy), l_FFlagLuaAppNarrowTileHideRating_0 (copy), l_TextService_0 (copy), v21 (copy), l_ImageSetLabel_0 (copy), v19 (copy), l_FFlagLuaAppNarrowTileHidePlayerCount_0 (copy), v20 (copy)
-    local v23 = l_useDesignTokens_0();
-    local v24 = l_useTextSizeOffset_0();
-    local v25 = l_useTokens_0();
-    local v26 = if l_FFlagLuaAppFixSmallScreenFooterStatsOverlap_0 then l_useBreakpointXOrSmaller_0(v11.Keys.XSmall) and v22.gameTileLayoutType == v13.GameTileLayoutType.Narrow else false;
-    local v27 = l_useBreakpointXOrSmaller_0(v11.Keys.Small) and v22.gameTileLayoutType == v13.GameTileLayoutType.Narrow;
-    local v28 = v26 or l_FFlagLuaAppNarrowTileSmallerFooterFont_0 and v22.compactMetadataFormat;
-    local v29 = if v22.isUnifiedGameTile then if l_FFlagLuaAppMigrateGameTileFooterValueFixes_0 then v25.Size.Size_500 else v25.Size.Size_300 else if l_FFlagLuaAppMigrateGameTileFooterValueFixes_0 then v23.Global.Space_250 else v23.Global.Space_150;
-    local v30 = if v22.isUnifiedGameTile then if v28 then v25.Gap.XXSmall else v25.Gap.XSmall else v23.Global.Space_50;
-    local v31 = if v22.isUnifiedGameTile then if l_FFlagLuaAppMigrateGameTileFooterValueFixes_0 then if v26 then v25.Gap.XXSmall else v25.Gap.Small else v25.Gap.Medium else v23.Global.Space_100;
-    local v32 = if v22.isUnifiedGameTile then v25.Color.Content.Default else v23.Semantic.Color.Text.Default;
-    local v33 = v9(v22.useLargerFont, v23, v25 or nil, v22.isUnifiedGameTile and true or nil, if l_FFlagLuaAppNarrowTileSmallerFooterFont_0 then v22.compactMetadataFormat else nil);
-    local l_FontSize_0 = v33.FontSize;
-    local l_Font_0 = v33.Font;
-    local v36 = false;
-    if v24 > 0 then
-        v36 = v27;
-    end;
-    local v37 = l_FontSize_0 / 1.26;
-    local l_ratingText_0 = v22.ratingText;
-    local v39 = v3.useMemo(function() --[[ Line: 111 ]]
-        -- upvalues: l_FFlagLuaAppNarrowTileHideRating_0 (ref), v22 (copy), l_ratingText_0 (copy), l_TextService_0 (ref), l_FontSize_0 (copy), l_Font_0 (copy), v21 (ref)
-        if l_FFlagLuaAppNarrowTileHideRating_0 and v22.hideRating or l_ratingText_0 == nil or l_ratingText_0 == "" then
-            return 0;
-        else
-            return l_TextService_0:GetTextSize(l_ratingText_0, l_FontSize_0, l_Font_0, v21).X;
-        end;
-    end, {
-        l_ratingText_0, 
-        l_FontSize_0, 
-        l_Font_0, 
-        v24, 
-        if l_FFlagLuaAppNarrowTileHideRating_0 then v22.hideRating else nil
-    });
-    local v40 = v37 + v30 + v39 + v31;
-    return v3.createElement("Frame", {
-        Size = UDim2.new(1, 0, v36 and 1 or 0, v36 and 0 or v29 + v24), 
-        Position = v22.Position, 
-        ClipsDescendants = false, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v22.LayoutOrder
-    }, {
-        UIListLayout = v3.createElement("UIListLayout", {
-            FillDirection = if v36 then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            Padding = if v36 then nil else UDim.new(0, v31)
-        }), 
-        RatingsFrame = if l_FFlagLuaAppNarrowTileHideRating_0 and v22.hideRating then nil else v3.createElement("Frame", {
-            Size = UDim2.new(0, v39 + v37 + v30, 0, v29 + v24), 
-            LayoutOrder = 1, 
-            BackgroundTransparency = 1
-        }, {
-            RatingIconSlot = v3.createElement("Frame", {
-                LayoutOrder = 1, 
-                Size = UDim2.fromOffset(v37, v37), 
-                ClipsDescendants = false, 
-                BackgroundTransparency = 1, 
-                Position = UDim2.fromScale(0, 0.5), 
-                AnchorPoint = Vector2.new(0, 0.5)
-            }, {
-                Icon = v3.createElement(l_ImageSetLabel_0, {
-                    Image = v19, 
-                    ImageColor3 = v32.Color3, 
-                    ImageTransparency = 0, 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    Size = UDim2.fromOffset(v37, v37), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BackgroundTransparency = 1
-                })
-            }), 
-            RatingText = v3.createElement("TextLabel", {
-                LayoutOrder = 2, 
-                Text = l_ratingText_0, 
-                Size = UDim2.new(0, v39 + v30, 0, l_FontSize_0 + v24), 
-                Position = UDim2.new(0, v37 + v30, 0.5, 0), 
-                AnchorPoint = Vector2.new(0, 0.5), 
-                BackgroundTransparency = 1, 
-                TextSize = l_FontSize_0, 
-                Font = v33.Font, 
-                TextTransparency = v32.Transparency, 
-                TextColor3 = v32.Color3, 
-                TextWrapped = false, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Center
-            })
-        }), 
-        PlayerCountFrame = if l_FFlagLuaAppNarrowTileHidePlayerCount_0 and v22.hidePlayerCount then nil else v3.createElement("Frame", {
-            Size = if v36 then UDim2.new(1, 0, 0, v29 + v24) else if l_FFlagLuaAppNarrowTileHideRating_0 and v22.hideRating then UDim2.new(1, 0, 0, v29 + v24) else UDim2.new(1, -v40, 0, v29 + v24), 
-            LayoutOrder = 2, 
-            BackgroundTransparency = 1
-        }, {
-            PlayerCountIconSlot = v3.createElement("Frame", {
-                Position = UDim2.new(0, 0, 0.5, 0), 
-                LayoutOrder = 1, 
-                Size = UDim2.fromOffset(v37, v37), 
-                ClipsDescendants = false, 
-                BackgroundTransparency = 1, 
-                AnchorPoint = Vector2.new(0, 0.5)
-            }, {
-                Icon = v3.createElement(l_ImageSetLabel_0, {
-                    Image = v20, 
-                    ImageColor3 = v32.Color3, 
-                    ImageTransparency = 0, 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    Size = UDim2.fromOffset(v37, v37), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BackgroundTransparency = 1
-                })
-            }), 
-            PlayerCountText = v3.createElement("TextLabel", {
-                LayoutOrder = 2, 
-                Text = v22.playerCountText, 
-                Size = UDim2.new(1, -v37 - v30, 0, l_FontSize_0 + v24), 
-                Position = UDim2.new(0, v37 + v30, 0.5, 0), 
-                AnchorPoint = Vector2.new(0, 0.5), 
-                BackgroundTransparency = 1, 
-                TextSize = v33.FontSize, 
-                Font = v33.Font, 
-                TextTransparency = v32.Transparency, 
-                TextColor3 = v32.Color3, 
-                TextWrapped = false, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Center
-            })
-        })
-    });
-end;
+local TextService = game:GetService("TextService")
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local React = require(GameTileParent.React)
+local useDesignTokens = require(GameTileParent.Style).useDesignTokens
+local useTokens = require(GameTileParent.Foundation).Hooks.useTokens
+local UIBlox = require(GameTileParent.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(GameTileParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local getGameTileMetadataFont = require(GameTile.Footer.getGameTileMetadataFont)
+local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+local Responsive = require(GameTileParent.Responsive)
+local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
+local GameTileTypes = require(GameTile.GameTileTypes)
+local FFlagLuaAppMigrateGameTileFooterValueFixes = require(GameTileParent.SharedFlags).FFlagLuaAppMigrateGameTileFooterValueFixes
+local FFlagLuaAppFixSmallScreenFooterStatsOverlap = require(GameTileParent.SharedFlags).FFlagLuaAppFixSmallScreenFooterStatsOverlap
+local FFlagLuaAppNarrowTileSmallerFooterFont = require(GameTileParent.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont
+local FFlagLuaAppNarrowTileHideRating = require(GameTileParent.SharedFlags).FFlagLuaAppNarrowTileHideRating
+local FFlagLuaAppNarrowTileHidePlayerCount = require(GameTileParent.SharedFlags).FFlagLuaAppNarrowTileHidePlayerCount
+local v21 = Images["icons/status/games/rating_small"]
+local v22 = Images["icons/status/games/people-playing_small"]
+local vector2 = Vector2.new(1e999, 1e999)
+
+local function GridTileGameStats(t1: {[any]: any}) -- line: 63
+	-- upvalues: useDesignTokens (copy), useTextSizeOffset (copy), useTokens (copy), FFlagLuaAppFixSmallScreenFooterStatsOverlap (copy), useBreakpointXOrSmaller (copy), Responsive (copy), GameTileTypes (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), FFlagLuaAppMigrateGameTileFooterValueFixes (copy), FFlagRenameDeprecatedUIBloxTokens (copy), getGameTileMetadataFont (copy), React (copy), FFlagLuaAppNarrowTileHideRating (copy), TextService (copy), vector2 (copy), ImageSetLabel (copy), v21 (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), v22 (copy)
+	local v26 = useDesignTokens()
+	local v27 = useTextSizeOffset()
+	local v28 = useTokens()
+	local v29 = not not FFlagLuaAppFixSmallScreenFooterStatsOverlap and (useBreakpointXOrSmaller(Responsive.Keys.XSmall) and t1.gameTileLayoutType == GameTileTypes.GameTileLayoutType.Narrow)
+	local v30 = useBreakpointXOrSmaller(Responsive.Keys.Small) and t1.gameTileLayoutType == GameTileTypes.GameTileLayoutType.Narrow
+	local v31 = v29 or FFlagLuaAppNarrowTileSmallerFooterFont and t1.compactMetadataFormat
+	local v32 = if not t1.isUnifiedGameTile then if not FFlagLuaAppMigrateGameTileFooterValueFixes then if not FFlagRenameDeprecatedUIBloxTokens then v26.Global.Space_150 else v26.Size.Size_300 else if not FFlagRenameDeprecatedUIBloxTokens then v26.Global.Space_250 else v26.Size.Size_500 else if not FFlagLuaAppMigrateGameTileFooterValueFixes then v28.Size.Size_300 else v28.Size.Size_500
+	local v33 = if not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v26.Global.Space_50 else v26.Size.Size_100 else if not v31 then v28.Gap.XSmall else v28.Gap.XXSmall
+	local v34 = if not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v26.Global.Space_100 else v26.Size.Size_200 else if not FFlagLuaAppMigrateGameTileFooterValueFixes then v28.Gap.Medium else if not v29 then v28.Gap.Small else v28.Gap.XXSmall
+	local v35 = if not t1.isUnifiedGameTile then if not FFlagRenameDeprecatedUIBloxTokens then v26.Semantic.Color.Text.Default else v26.Color.Content.Default else v28.Color.Content.Default
+	local v36 = getGameTileMetadataFont(t1.useLargerFont, v26, v28 or nil, not not t1.isUnifiedGameTile or nil, if not FFlagLuaAppNarrowTileSmallerFooterFont then nil else t1.compactMetadataFormat)
+	local FontSize = v36.FontSize
+	local Font = v36.Font
+	local v39 = v27 > 0 and v30
+	local v40 = FontSize / 1.26
+	local ratingText = t1.ratingText
+	local v42 = React.useMemo(function() -- line: 116
+		-- upvalues: FFlagLuaAppNarrowTileHideRating (copy), t1 (copy), ratingText (copy), TextService (copy), FontSize (copy), Font (copy), vector2 (copy)
+		if FFlagLuaAppNarrowTileHideRating and t1.hideRating or (ratingText == nil or ratingText == "") then
+			return 0
+		end
+
+		return TextService:GetTextSize(ratingText, FontSize, Font, vector2).X
+	end, {
+		ratingText,
+		FontSize,
+		Font,
+		v27,
+		if not FFlagLuaAppNarrowTileHideRating then nil else t1.hideRating
+	})
+	local v43 = v40 + v33 + v42 + v34
+
+	return React.createElement("Frame", {
+		ClipsDescendants = false,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, not v39 and 0 or 1, if not v39 then v32 + v27 else 0),
+		Position = t1.Position,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = if not v39 then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = if not v39 then UDim.new(0, v34) else nil
+		}),
+		RatingsFrame = if not FFlagLuaAppNarrowTileHideRating or not t1.hideRating then React.createElement("Frame", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, v42 + v40 + v33, 0, v32 + v27)
+		}, {
+			RatingIconSlot = React.createElement("Frame", {
+				LayoutOrder = 1,
+				ClipsDescendants = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v40, v40),
+				Position = UDim2.fromScale(0, 0.5),
+				AnchorPoint = Vector2.new(0, 0.5)
+			}, {
+				Icon = React.createElement(ImageSetLabel, {
+					ImageTransparency = 0,
+					BackgroundTransparency = 1,
+					Image = v21,
+					ImageColor3 = v35.Color3,
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.fromOffset(v40, v40),
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				})
+			}),
+			RatingText = React.createElement("TextLabel", {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				TextWrapped = false,
+				Text = ratingText,
+				Size = UDim2.new(0, v42 + v33, 0, FontSize + v27),
+				Position = UDim2.new(0, v40 + v33, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				TextSize = FontSize,
+				Font = v36.Font,
+				TextTransparency = v35.Transparency,
+				TextColor3 = v35.Color3,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center
+			})
+		}) else nil,
+		PlayerCountFrame = if not FFlagLuaAppNarrowTileHidePlayerCount or not t1.hidePlayerCount then React.createElement("Frame", {
+			LayoutOrder = 2,
+			BackgroundTransparency = 1,
+			Size = if not v39 then if not FFlagLuaAppNarrowTileHideRating or not t1.hideRating then UDim2.new(1, -v43, 0, v32 + v27) else UDim2.new(1, 0, 0, v32 + v27) else UDim2.new(1, 0, 0, v32 + v27)
+		}, {
+			PlayerCountIconSlot = React.createElement("Frame", {
+				LayoutOrder = 1,
+				ClipsDescendants = false,
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 0, 0.5, 0),
+				Size = UDim2.fromOffset(v40, v40),
+				AnchorPoint = Vector2.new(0, 0.5)
+			}, {
+				Icon = React.createElement(ImageSetLabel, {
+					ImageTransparency = 0,
+					BackgroundTransparency = 1,
+					Image = v22,
+					ImageColor3 = v35.Color3,
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.fromOffset(v40, v40),
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				})
+			}),
+			PlayerCountText = React.createElement("TextLabel", {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				TextWrapped = false,
+				Text = t1.playerCountText,
+				Size = UDim2.new(1, -v40 - v33, 0, FontSize + v27),
+				Position = UDim2.new(0, v40 + v33, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				TextSize = v36.FontSize,
+				Font = v36.Font,
+				TextTransparency = v35.Transparency,
+				TextColor3 = v35.Color3,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center
+			})
+		}) else nil
+	})
+end
+
+return GridTileGameStats

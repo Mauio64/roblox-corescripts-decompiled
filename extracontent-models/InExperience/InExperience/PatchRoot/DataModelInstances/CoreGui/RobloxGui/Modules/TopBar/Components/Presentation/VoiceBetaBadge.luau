@@ -1,283 +1,307 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_VRService_0 = game:GetService("VRService");
-local l_GamepadService_0 = game:GetService("GamepadService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local v6 = require(l_CorePackages_0.Packages.Roact);
-local v7 = require(l_CorePackages_0.Packages.RoactRodux);
-local v8 = require(l_CorePackages_0.Packages.t);
-local l_withStyle_0 = require(l_CorePackages_0.Packages.UIBlox).Core.Style.withStyle;
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local _ = require(l_RobloxGui_0.Modules.TenFootInterface);
-local _ = require(l_RobloxGui_0.Modules.isNewInGameMenuEnabled);
-local _ = require(l_RobloxGui_0.Modules.InGameMenuConstants);
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v15 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local l_AppFonts_0 = require(l_CorePackages_0.Workspace.Packages.Style).AppFonts;
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local v18 = v6.PureComponent:extend("MenuIcon");
-local v19 = require(l_RobloxGui_0.Modules.Flags.GetFStringVoiceBetaBadgeLearnMore);
-local v20 = require(l_RobloxGui_0.Modules.Flags.GetFFlagBetaBadgeLearnMoreLinkFormview);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v22 = require(l_Parent_0.Actions.SetKeepOutArea);
-local v23 = require(l_Parent_0.Actions.RemoveKeepOutArea);
-local v24 = require(l_Parent_0.Constants);
-local v25 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local l_FFlagTopBarSignalizeKeepOutAreas_0 = v25.Flags.FFlagTopBarSignalizeKeepOutAreas;
-local l_Chrome_0 = l_Parent_0.Parent.Chrome;
-local _ = if require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled() then require(l_Chrome_0.Service) else nil;
-v18.validateProps = v8.strictInterface({
-    layoutOrder = v8.integer, 
-    Analytics = v8.table, 
-    setKeepOutArea = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else v8.optional(v8.callback), 
-    removeKeepOutArea = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else v8.optional(v8.callback)
-});
-local v29 = {
-    FullScreen = 0, 
-    FormSheet = 2
-};
-local v30 = UDim2.fromOffset(31, 11);
-local v31 = UDim.new(0, 12);
-local v32 = UDim2.fromOffset(330, 185);
-local v33 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local function v34() --[[ Line: 62 ]]
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local VRService = game:GetService("VRService")
+local GamepadService = game:GetService("GamepadService")
+local GuiService = game:GetService("GuiService")
+local HttpService = game:GetService("HttpService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local withStyle = require(CorePackages.Packages.UIBlox).Core.Style.withStyle
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
 
-end;
-openWebview = function(v35) --[[ Line: 67 ]] --[[ Name: openWebview ]]
-    -- upvalues: l_HttpService_0 (copy), v20 (copy), v29 (copy), v15 (copy), l_GuiService_0 (copy)
-    local v36 = l_HttpService_0:JSONEncode({
-        title = game:GetEngineFeature("SetWebViewTitle") and "Help Center" or nil, 
-        presentationStyle = if v20() then v29.FormSheet else nil, 
-        visible = true, 
-        url = v35
-    });
-    v15:debug("Opening Webview with payload {}", v36);
-    l_GuiService_0:BroadcastNotification(v36, 20);
-end;
-v18.init = function(v37) --[[ Line: 80 ]] --[[ Name: init ]]
-    -- upvalues: v6 (copy), l_VRService_0 (copy), l_GamepadService_0 (copy), l_default_0 (copy), v34 (copy), v19 (copy), l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), v25 (copy)
-    v37.buttonRef = v6.createRef();
-    v37:setState({
-        vrShowMenuIcon = l_VRService_0.VREnabled and l_GamepadService_0.GamepadCursorEnabled, 
-        voiceChatServiceConnected = false, 
-        showPopup = false
-    });
-    if game:GetEngineFeature("VoiceChatSupported") then
-        l_default_0:asyncInit():andThen(function() --[[ Line: 91 ]]
-            -- upvalues: v37 (copy)
-            v37:setState({
-                voiceChatServiceConnected = true
-            });
-        end):catch(v34);
-    end;
-    v37.menuIconActivated = function() --[[ Line: 99 ]]
-        -- upvalues: v37 (copy)
-        v37:setState({
-            showPopup = not v37.state.showPopup
-        });
-        v37.props.Analytics.EventStream:setRBXEvent("voiceChat", not v37.state.showPopup and "openBetaBadge" or "closeBetaBadge");
-    end;
-    v37.learnMore = function() --[[ Line: 109 ]]
-        -- upvalues: v19 (ref), v37 (copy)
-        local v38 = v19();
-        openWebview(v38);
-        v37.props.Analytics.EventStream:setRBXEvent("voiceChat", "clickBetaBadgeLearnMore");
-    end;
-    if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-        v37.keepOutAreasStore = v25.Stores.GetKeepOutAreasStore(false);
-    end;
-end;
-v18.render = function(v39) --[[ Line: 121 ]] --[[ Name: render ]]
-    -- upvalues: l_VRService_0 (copy), l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), v24 (copy), l_withStyle_0 (copy), v6 (copy), v32 (copy), v33 (copy), v31 (copy), v30 (copy), l_AppFonts_0 (copy), l_GamepadService_0 (copy), l_ExternalEventConnection_0 (copy)
-    local v40 = (not l_VRService_0.VREnabled or v39.state.vrShowMenuIcon) and v39.state.voiceChatServiceConnected;
-    local function v44(v41) --[[ Line: 124 ]]
-        -- upvalues: v40 (copy), l_FFlagTopBarSignalizeKeepOutAreas_0 (ref), v39 (copy), v24 (ref)
-        if v40 and v41 then
-            local v42 = Vector2.new(v41.AbsolutePosition.X - 2, v41.AbsolutePosition.Y - 2);
-            local v43 = Vector2.new(v41.AbsoluteSize.X + 4, v41.AbsoluteSize.Y + 4);
-            if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-                v39.keepOutAreasStore.setKeepOutArea(v24.VoiceBetaBadgeKeepOutAreaId, v42, v43);
-                return;
-            else
-                v39.props.setKeepOutArea(v24.VoiceBetaBadgeKeepOutAreaId, v42, v43);
-                return;
-            end;
-        elseif l_FFlagTopBarSignalizeKeepOutAreas_0 then
-            v39.keepOutAreasStore.removeKeepOutArea(v24.VoiceBetaBadgeKeepOutAreaId);
-            return;
-        else
-            v39.props.removeKeepOutArea(v24.VoiceBetaBadgeKeepOutAreaId);
-            return;
-        end;
-    end;
-    if v39.buttonRef.current then
-        v44(v39.buttonRef.current);
-    end;
-    return l_withStyle_0(function(v45) --[[ Line: 148 ]]
-        -- upvalues: v6 (ref), v40 (copy), v39 (copy), v32 (ref), v33 (ref), v31 (ref), v44 (copy), v30 (ref), l_AppFonts_0 (ref), l_GamepadService_0 (ref), l_ExternalEventConnection_0 (ref), l_VRService_0 (ref)
-        local l_Footer_0 = v45.Font.Footer;
-        local l_Font_0 = l_Footer_0.Font;
-        local v48 = v45.Font.BaseSize * l_Footer_0.RelativeSize;
-        local l_BackgroundUIContrast_0 = v45.Theme.BackgroundUIContrast;
-        local l_TextEmphasis_0 = v45.Theme.TextEmphasis;
-        local l_TextLink_0 = v45.Theme.TextLink;
-        local v52 = Color3.fromRGB(238, 206, 83);
-        return v6.createFragment({
-            PopupWrapper = v6.createElement("Frame", {
-                Visible = v40 and v39.state.showPopup, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = v39.props.layoutOrder + 1
-            }, {
-                Popup = v6.createElement("Frame", {
-                    Size = v32, 
-                    Position = UDim2.fromOffset(0, 10), 
-                    BackgroundTransparency = l_BackgroundUIContrast_0.Transparency, 
-                    BackgroundColor3 = l_BackgroundUIContrast_0.Color
-                }, {
-                    Layout = v6.createElement("UIListLayout", {
-                        Padding = UDim.new(0, 8), 
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                        SortOrder = Enum.SortOrder.LayoutOrder
-                    }), 
-                    Popup = v6.createElement("Frame", {
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = 0
-                    }, {
-                        Layout = v6.createElement("UIListLayout", {
-                            Padding = UDim.new(0, 0), 
-                            FillDirection = Enum.FillDirection.Vertical, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                            SortOrder = Enum.SortOrder.LayoutOrder
-                        }), 
-                        Starter = v6.createElement("TextLabel", {
-                            Text = v33:FormatByKey("InGame.CommonUI.Badge.Popup.HeaderList"), 
-                            TextSize = v48, 
-                            Font = l_Font_0, 
-                            LayoutOrder = 0, 
-                            TextXAlignment = Enum.TextXAlignment.Left, 
-                            TextColor3 = l_TextEmphasis_0.Color, 
-                            AutomaticSize = Enum.AutomaticSize.XY, 
-                            BackgroundTransparency = 1
-                        }), 
-                        FirstBullet = v6.createElement("TextLabel", {
-                            Text = "\226\128\162 " .. v33:FormatByKey("InGame.CommonUI.Badge.Popup.VoiceChatBullet"), 
-                            TextSize = v48, 
-                            Font = l_Font_0, 
-                            LayoutOrder = 2, 
-                            TextXAlignment = Enum.TextXAlignment.Left, 
-                            TextColor3 = l_TextEmphasis_0.Color, 
-                            AutomaticSize = Enum.AutomaticSize.XY, 
-                            BackgroundTransparency = 1
-                        })
-                    }), 
-                    Text = v6.createElement("TextLabel", {
-                        Text = v33:FormatByKey("InGame.CommonUI.Badge.Popup.DisclaimerText2"), 
-                        TextSize = v48, 
-                        Font = l_Font_0, 
-                        LayoutOrder = 0, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextColor3 = l_TextEmphasis_0.Color, 
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        TextWrapped = true, 
-                        BackgroundTransparency = 1
-                    }), 
-                    LearnMoreLink = v6.createElement("TextButton", {
-                        Text = v33:FormatByKey("InGame.CommonUI.Badge.Popup.LearnMoreLink"), 
-                        TextSize = v48, 
-                        Font = l_Font_0, 
-                        LayoutOrder = 1, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextColor3 = l_TextLink_0.Color, 
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        BackgroundTransparency = 1, 
-                        [v6.Event.Activated] = v39.learnMore
-                    }), 
-                    UICorner = v6.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 8)
-                    }), 
-                    UIPadding = v6.createElement("UIPadding", {
-                        PaddingLeft = v31, 
-                        PaddingRight = v31, 
-                        PaddingBottom = v31, 
-                        PaddingTop = v31
-                    })
-                })
-            }), 
-            Button = v6.createElement("Frame", {
-                Visible = v40, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = v39.props.layoutOrder, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(0, 1), 
-                [v6.Change.AbsoluteSize] = v44, 
-                [v6.Change.AbsolutePosition] = v44, 
-                [v6.Ref] = v39.buttonRef
-            }, {
-                Layout = v6.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                ActualButton = v6.createElement("Frame", {
-                    Visible = v40, 
-                    BackgroundTransparency = 0, 
-                    Size = v30, 
-                    BackgroundColor3 = v52
-                }, {
-                    Button = v6.createElement("TextButton", {
-                        Text = v33:FormatByKey("InGame.CommonUI.Badge.BadgeText"), 
-                        Font = l_AppFonts_0.default:getBold(), 
-                        TextSize = 8, 
-                        BackgroundTransparency = 1, 
-                        BorderSizePixel = 0, 
-                        Size = v30, 
-                        TextColor3 = l_BackgroundUIContrast_0.Color, 
-                        [v6.Event.Activated] = v39.menuIconActivated
-                    }), 
-                    UICorner = v6.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 3)
-                    }), 
-                    UIStroke = v6.createElement("UIStroke", {
-                        Thickness = 2, 
-                        Color = l_TextEmphasis_0.Color
-                    }), 
-                    VREnabledListener = l_GamepadService_0 and v6.createElement(l_ExternalEventConnection_0, {
-                        event = l_GamepadService_0:GetPropertyChangedSignal("GamepadCursorEnabled"), 
-                        callback = function() --[[ Line: 282 ]]
-                            -- upvalues: v39 (ref), l_VRService_0 (ref), l_GamepadService_0 (ref)
-                            v39:setState({
-                                vrShowMenuIcon = l_VRService_0.VREnabled and l_GamepadService_0.GamepadCursorEnabled
-                            });
-                        end or nil
-                    })
-                })
-            })
-        });
-    end);
-end;
-local function v58(v53) --[[ Line: 294 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), v22 (copy), v23 (copy)
-    if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-        return {};
-    else
-        return {
-            setKeepOutArea = function(v54, v55, v56) --[[ Line: 299 ]] --[[ Name: setKeepOutArea ]]
-                -- upvalues: v53 (copy), v22 (ref)
-                return v53(v22(v54, v55, v56));
-            end, 
-            removeKeepOutArea = function(v57) --[[ Line: 302 ]] --[[ Name: removeKeepOutArea ]]
-                -- upvalues: v53 (copy), v23 (ref)
-                return v53(v23(v57));
-            end
-        };
-    end;
-end;
-if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-    return v18;
-else
-    return v7.UNSTABLE_connect2(nil, v58)(v18);
-end;
+require(RobloxGui.Modules.TenFootInterface)
+require(RobloxGui.Modules.isNewInGameMenuEnabled)
+require(RobloxGui.Modules.InGameMenuConstants)
+
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local v13 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local v16 = Roact.PureComponent:extend("MenuIcon")
+local GetFStringVoiceBetaBadgeLearnMore = require(RobloxGui.Modules.Flags.GetFStringVoiceBetaBadgeLearnMore)
+local GetFFlagBetaBadgeLearnMoreLinkFormview = require(RobloxGui.Modules.Flags.GetFFlagBetaBadgeLearnMoreLinkFormview)
+local ParentParent = script.Parent.Parent.Parent
+local SetKeepOutArea = require(ParentParent.Actions.SetKeepOutArea)
+local RemoveKeepOutArea = require(ParentParent.Actions.RemoveKeepOutArea)
+local Constants = require(ParentParent.Constants)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeKeepOutAreas = CoreGuiCommon.Flags.FFlagTopBarSignalizeKeepOutAreas
+local Chrome = ParentParent.Parent.Chrome
+
+if require(CorePackages.Workspace.Packages.Chrome).Enabled() then
+	require(Chrome.Service)
+end
+
+v16.validateProps = t.strictInterface({
+	layoutOrder = t.integer,
+	Analytics = t.table,
+	setKeepOutArea = if not FFlagTopBarSignalizeKeepOutAreas then t.optional(t.callback) else nil,
+	removeKeepOutArea = if not FFlagTopBarSignalizeKeepOutAreas then t.optional(t.callback) else nil
+})
+
+local _ = {
+	FullScreen = 0,
+	FormSheet = 2
+}
+local uDim2 = UDim2.fromOffset(31, 11)
+local uDim = UDim.new(0, 12)
+local uDim2_2 = UDim2.fromOffset(330, 185)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+
+local function v31() -- line: 62
+end
+
+function openWebview(p1) -- line: 67
+	-- upvalues: HttpService (copy), GetFFlagBetaBadgeLearnMoreLinkFormview (copy), v13 (copy), GuiService (copy)
+	local json = HttpService:JSONEncode({
+		visible = true,
+		title = if not game:GetEngineFeature("SetWebViewTitle") then nil else "Help Center",
+		presentationStyle = if not GetFFlagBetaBadgeLearnMoreLinkFormview() then nil else 2,
+		url = p1
+	})
+
+	v13:debug("Opening Webview with payload {}", json)
+	GuiService:BroadcastNotification(json, 20)
+end
+function v16.init(p2) -- line: 80
+	-- upvalues: Roact (copy), VRService (copy), GamepadService (copy), default (copy), v31 (copy), GetFStringVoiceBetaBadgeLearnMore (copy), FFlagTopBarSignalizeKeepOutAreas (copy), CoreGuiCommon (copy)
+	p2.buttonRef = Roact.createRef()
+	p2:setState({
+		voiceChatServiceConnected = false,
+		showPopup = false,
+		vrShowMenuIcon = VRService.VREnabled and GamepadService.GamepadCursorEnabled
+	})
+
+	if game:GetEngineFeature("VoiceChatSupported") then
+		default:asyncInit():andThen(function() -- line: 91
+			-- upvalues: p2 (copy)
+			p2:setState({
+				voiceChatServiceConnected = true
+			})
+		end):catch(v31)
+	end
+
+	function p2.menuIconActivated() -- line: 99
+		-- upvalues: p2 (copy)
+		p2:setState({
+			showPopup = not p2.state.showPopup
+		})
+		p2.props.Analytics.EventStream:setRBXEvent("voiceChat", p2.state.showPopup and "closeBetaBadge" or "openBetaBadge")
+	end
+	function p2.learnMore() -- line: 109
+		-- upvalues: GetFStringVoiceBetaBadgeLearnMore (copy), p2 (copy)
+		local v40 = GetFStringVoiceBetaBadgeLearnMore()
+
+		openWebview(v40)
+		p2.props.Analytics.EventStream:setRBXEvent("voiceChat", "clickBetaBadgeLearnMore")
+	end
+
+	if FFlagTopBarSignalizeKeepOutAreas then
+		p2.keepOutAreasStore = CoreGuiCommon.Stores.GetKeepOutAreasStore(false)
+	end
+end
+function v16.render(p3) -- line: 121
+	-- upvalues: VRService (copy), FFlagTopBarSignalizeKeepOutAreas (copy), Constants (copy), withStyle (copy), Roact (copy), uDim2_2 (copy), RobloxTranslator (copy), uDim (copy), uDim2 (copy), AppFonts (copy), GamepadService (copy), ExternalEventConnection (copy)
+	local v37 = (not VRService.VREnabled or p3.state.vrShowMenuIcon) and p3.state.voiceChatServiceConnected
+
+	local function v38(p4) -- line: 124
+		-- upvalues: v37 (copy), FFlagTopBarSignalizeKeepOutAreas (copy), p3 (copy), Constants (copy)
+		if v37 and p4 then
+			local vector2 = Vector2.new(p4.AbsolutePosition.X - 2, p4.AbsolutePosition.Y - 2)
+			local vector2_2 = Vector2.new(p4.AbsoluteSize.X + 4, p4.AbsoluteSize.Y + 4)
+
+			if FFlagTopBarSignalizeKeepOutAreas then
+				p3.keepOutAreasStore.setKeepOutArea(Constants.VoiceBetaBadgeKeepOutAreaId, vector2, vector2_2)
+
+				return
+			end
+
+			p3.props.setKeepOutArea(Constants.VoiceBetaBadgeKeepOutAreaId, vector2, vector2_2)
+
+			return
+		end
+
+		if FFlagTopBarSignalizeKeepOutAreas then
+			p3.keepOutAreasStore.removeKeepOutArea(Constants.VoiceBetaBadgeKeepOutAreaId)
+
+			return
+		end
+
+		p3.props.removeKeepOutArea(Constants.VoiceBetaBadgeKeepOutAreaId)
+	end
+
+	if p3.buttonRef.current then
+		v38(p3.buttonRef.current)
+	end
+
+	return withStyle(function(p5) -- line: 148
+		-- upvalues: Roact (copy), v37 (copy), p3 (copy), uDim2_2 (copy), RobloxTranslator (copy), uDim (copy), v38 (copy), uDim2 (copy), AppFonts (copy), GamepadService (copy), ExternalEventConnection (copy), VRService (copy)
+		local Footer = p5.Font.Footer
+		local FooterFont = Footer.Font
+		local v47 = p5.Font.BaseSize * Footer.RelativeSize
+		local BackgroundUIContrast = p5.Theme.BackgroundUIContrast
+		local TextEmphasis = p5.Theme.TextEmphasis
+		local TextLink = p5.Theme.TextLink
+		local color3 = Color3.fromRGB(238, 206, 83)
+
+		return Roact.createFragment({
+			PopupWrapper = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Visible = v37 and p3.state.showPopup,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = p3.props.layoutOrder + 1
+			}, {
+				Popup = Roact.createElement("Frame", {
+					Size = uDim2_2,
+					Position = UDim2.fromOffset(0, 10),
+					BackgroundTransparency = BackgroundUIContrast.Transparency,
+					BackgroundColor3 = BackgroundUIContrast.Color
+				}, {
+					Layout = Roact.createElement("UIListLayout", {
+						Padding = UDim.new(0, 8),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Left,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					Popup = Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						LayoutOrder = 0,
+						AutomaticSize = Enum.AutomaticSize.XY
+					}, {
+						Layout = Roact.createElement("UIListLayout", {
+							Padding = UDim.new(0, 0),
+							FillDirection = Enum.FillDirection.Vertical,
+							HorizontalAlignment = Enum.HorizontalAlignment.Left,
+							SortOrder = Enum.SortOrder.LayoutOrder
+						}),
+						Starter = Roact.createElement("TextLabel", {
+							LayoutOrder = 0,
+							BackgroundTransparency = 1,
+							Text = RobloxTranslator:FormatByKey("InGame.CommonUI.Badge.Popup.HeaderList"),
+							TextSize = v47,
+							Font = FooterFont,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextColor3 = TextEmphasis.Color,
+							AutomaticSize = Enum.AutomaticSize.XY
+						}),
+						FirstBullet = Roact.createElement("TextLabel", {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							Text = "• " .. RobloxTranslator:FormatByKey("InGame.CommonUI.Badge.Popup.VoiceChatBullet"),
+							TextSize = v47,
+							Font = FooterFont,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							TextColor3 = TextEmphasis.Color,
+							AutomaticSize = Enum.AutomaticSize.XY
+						})
+					}),
+					Text = Roact.createElement("TextLabel", {
+						LayoutOrder = 0,
+						TextWrapped = true,
+						BackgroundTransparency = 1,
+						Text = RobloxTranslator:FormatByKey("InGame.CommonUI.Badge.Popup.DisclaimerText2"),
+						TextSize = v47,
+						Font = FooterFont,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextColor3 = TextEmphasis.Color,
+						AutomaticSize = Enum.AutomaticSize.XY
+					}),
+					LearnMoreLink = Roact.createElement("TextButton", {
+						Text = RobloxTranslator:FormatByKey("InGame.CommonUI.Badge.Popup.LearnMoreLink"),
+						TextSize = v47,
+						Font = FooterFont,
+						LayoutOrder = 1,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextColor3 = TextLink.Color,
+						AutomaticSize = Enum.AutomaticSize.XY,
+						BackgroundTransparency = 1,
+						[Roact.Event.Activated] = p3.learnMore
+					}),
+					UICorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 8)
+					}),
+					UIPadding = Roact.createElement("UIPadding", {
+						PaddingLeft = uDim,
+						PaddingRight = uDim,
+						PaddingBottom = uDim,
+						PaddingTop = uDim
+					})
+				})
+			}),
+			Button = Roact.createElement("Frame", {
+				Visible = v37,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				LayoutOrder = p3.props.layoutOrder,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0, 1),
+				[Roact.Change.AbsoluteSize] = v38,
+				[Roact.Change.AbsolutePosition] = v38,
+				[Roact.Ref] = p3.buttonRef
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				ActualButton = Roact.createElement("Frame", {
+					BackgroundTransparency = 0,
+					Visible = v37,
+					Size = uDim2,
+					BackgroundColor3 = color3
+				}, {
+					Button = Roact.createElement("TextButton", {
+						Text = RobloxTranslator:FormatByKey("InGame.CommonUI.Badge.BadgeText"),
+						Font = AppFonts.default:getBold(),
+						TextSize = 8,
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Size = uDim2,
+						TextColor3 = BackgroundUIContrast.Color,
+						[Roact.Event.Activated] = p3.menuIconActivated
+					}),
+					UICorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 3)
+					}),
+					UIStroke = Roact.createElement("UIStroke", {
+						Thickness = 2,
+						Color = TextEmphasis.Color
+					}),
+					VREnabledListener = GamepadService and Roact.createElement(ExternalEventConnection, {
+						event = GamepadService:GetPropertyChangedSignal("GamepadCursorEnabled"),
+						callback = function() -- line: 282
+							-- upvalues: p3 (copy), VRService (copy), GamepadService (copy)
+							p3:setState({
+								vrShowMenuIcon = VRService.VREnabled and GamepadService.GamepadCursorEnabled
+							})
+						end or nil
+					})
+				})
+			})
+		})
+	end)
+end
+
+local function mapDispatchToProps(p6) -- line: 294
+	-- upvalues: FFlagTopBarSignalizeKeepOutAreas (copy), SetKeepOutArea (copy), RemoveKeepOutArea (copy)
+	if FFlagTopBarSignalizeKeepOutAreas then
+		return {}
+	end
+
+	return {
+		setKeepOutArea = function(p7, p8, p9) -- line: 299
+			-- upvalues: p6 (copy), SetKeepOutArea (copy)
+			return p6(SetKeepOutArea(p7, p8, p9))
+		end,
+		removeKeepOutArea = function(p10) -- line: 302
+			-- upvalues: p6 (copy), RemoveKeepOutArea (copy)
+			return p6(RemoveKeepOutArea(p10))
+		end
+	}
+end
+
+if FFlagTopBarSignalizeKeepOutAreas then
+	return v16
+end
+
+return RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v16)

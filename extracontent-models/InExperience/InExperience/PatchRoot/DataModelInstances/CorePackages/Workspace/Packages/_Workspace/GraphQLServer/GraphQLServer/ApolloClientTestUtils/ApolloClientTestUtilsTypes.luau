@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("GraphQLServer").Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-return {};
+local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+
+require(Parent.LuauPolyfill)
+
+return {}

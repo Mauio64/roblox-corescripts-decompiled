@@ -1,1 +1,1 @@
-return require(script.Parent.push);
+return require(script.Parent.push)

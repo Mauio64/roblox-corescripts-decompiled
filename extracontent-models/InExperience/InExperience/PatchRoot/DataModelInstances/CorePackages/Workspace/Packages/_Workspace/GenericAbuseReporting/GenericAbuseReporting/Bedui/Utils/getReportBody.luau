@@ -1,32 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local _ = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes);
-local v4 = require(l_script_FirstAncestor_0.Enums.AbuseCategory);
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-return function(v6) --[[ Line: 28 ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    local v7 = {};
-    v2.forEach(v6.additionalReportTags or {}, function(v8) --[[ Line: 38 ]]
-        -- upvalues: v7 (copy)
-        if not v8.tagKey or v8.tagKey == "" or not v8.tagValue or v8.tagValue == "" then
-            return;
-        elseif v7[v8.tagKey] ~= nil then
-            local v9 = v7[v8.tagKey];
-            v7[v8.tagKey] = v9 .. "," .. v8.tagValue;
-            return;
-        else
-            v7[v8.tagKey] = v8.tagValue;
-            return;
-        end;
-    end);
-    return {
-        abuseVector = v6.abuseVector, 
-        category = v6.formData.abuse_category or v4.ABUSE_CATEGORY_INVALID, 
-        comment = v6.formData.free_comment or "", 
-        submitterId = v6.localPlayerUserId, 
-        targetIdStr = v6.targetIdStr, 
-        targetType = v6.abuseVector, 
-        custom = if next(v7) ~= nil then v7 else nil
-    };
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local Dash = require(GenericAbuseReportingParent.Dash)
+
+require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
+
+local AbuseCategory = require(GenericAbuseReporting.Enums.AbuseCategory)
+
+require(GenericAbuseReporting.Enums.AbuseVector)
+
+return function(t1: {[any]: any}) -- line: 28
+	-- upvalues: Dash (copy), AbuseCategory (copy)
+	local t2 = {}
+
+	Dash.forEach(t1.additionalReportTags or {}, function(p1) -- line: 38
+		-- upvalues: t2 (copy)
+		if not p1.tagKey or (p1.tagKey == "" or not p1.tagValue or p1.tagValue == "") then
+			return
+		end
+
+		if t2[p1.tagKey] ~= nil then
+			local v8 = t2[p1.tagKey]
+
+			t2[p1.tagKey] = v8 .. "," .. p1.tagValue
+
+			return
+		end
+
+		t2[p1.tagKey] = p1.tagValue
+	end)
+
+	return {
+		abuseVector = t1.abuseVector,
+		category = t1.formData.abuse_category or AbuseCategory.ABUSE_CATEGORY_INVALID,
+		comment = t1.formData.free_comment or "",
+		submitterId = t1.localPlayerUserId,
+		targetIdStr = t1.targetIdStr,
+		targetType = t1.abuseVector,
+		custom = if next(t2) == nil then nil else t2
+	}
+end

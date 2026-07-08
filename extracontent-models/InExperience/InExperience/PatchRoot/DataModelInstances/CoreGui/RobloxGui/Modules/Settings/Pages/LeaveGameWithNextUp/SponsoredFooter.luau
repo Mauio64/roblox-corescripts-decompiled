@@ -1,83 +1,87 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Foundation);
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Workspace.Packages.Localization);
-local v4 = require(l_CorePackages_0.Workspace.Packages.Responsive);
-local l_useLocalization_0 = v3.Hooks.useLocalization;
-local l_usePreferredInput_0 = v4.usePreferredInput;
-local l_Text_0 = v1.Text;
-local l_View_0 = v1.View;
-local l_Icon_0 = v1.Icon;
-local l_InputSize_0 = v1.Enums.InputSize;
-local l_Popover_0 = v1.Popover;
-local l_ControlState_0 = v1.Enums.ControlState;
-local l_useScaledValue_0 = v1.Hooks.useScaledValue;
-return v2.memo(function(v14) --[[ Line: 23 ]] --[[ Name: SponsoredFooter ]]
-    -- upvalues: l_useLocalization_0 (copy), l_useScaledValue_0 (copy), v2 (copy), l_usePreferredInput_0 (copy), v4 (copy), l_ControlState_0 (copy), l_View_0 (copy), l_Text_0 (copy), l_Popover_0 (copy), l_Icon_0 (copy), l_InputSize_0 (copy)
-    local v15 = l_useLocalization_0({
-        SponsoredText = "Feature.GamePage.Label.Sponsored", 
-        SponsoredDisclosure = "CoreScripts.Ads.Label.SponsoredAdsDisclosureStatic"
-    });
-    local v16 = l_useScaledValue_0(320);
-    local v17, v18 = v2.useState(false);
-    local v19 = l_usePreferredInput_0() == v4.Input.Pointer;
-    local v21 = v2.useCallback(function(v20) --[[ Line: 32 ]]
-        -- upvalues: l_ControlState_0 (ref), v18 (copy)
-        if v20 == l_ControlState_0.Hover or v20 == l_ControlState_0.Selected then
-            v18(true);
-            return;
-        else
-            if v20 == l_ControlState_0.Default then
-                v18(false);
-            end;
-            return;
-        end;
-    end, {});
-    local v23 = v2.useCallback(function() --[[ Line: 39 ]]
-        -- upvalues: v18 (copy)
-        v18(function(v22) --[[ Line: 40 ]]
-            return not v22;
-        end);
-    end, {});
-    return v2.createElement(l_View_0, {
-        tag = "row align-y-bottom align-x-center gap-xsmall flex-between auto-y", 
-        LayoutOrder = v14.LayoutOrder
-    }, {
-        SponsoredText = v2.createElement(l_Text_0, {
-            tag = "size-full-0 text-no-wrap text-body-medium content-default text-align-x-left auto-xy", 
-            LayoutOrder = 1, 
-            Text = v15.SponsoredText
-        }), 
-        SponsoredTooltip = v2.createElement(l_Popover_0.Root, {
-            isOpen = v17
-        }, {
-            Anchor = v2.createElement(l_Popover_0.Anchor, {
-                LayoutOrder = 2
-            }, {
-                IconView = v2.createElement(l_View_0, {
-                    tag = "size-400-400 radius-circle", 
-                    onStateChanged = if v19 then v21 else nil, 
-                    onActivated = if v19 then nil else v23
-                }, {
-                    Icon = v2.createElement(l_Icon_0, {
-                        size = l_InputSize_0.Small, 
-                        name = "icons/actions/info"
-                    })
-                })
-            }), 
-            Content = v2.createElement(l_Popover_0.Content, nil, {
-                DescriptionView = v2.createElement(l_View_0, {
-                    tag = "col gap-xsmall padding-small auto-xy size-full-2400", 
-                    sizeConstraint = {
-                        MaxSize = Vector2.new(v16, 1e999)
-                    }
-                }, {
-                    Description = v2.createElement(l_Text_0, {
-                        Text = v15.SponsoredDisclosure, 
-                        tag = "auto-xy text-body-small text-wrap"
-                    })
-                })
-            })
-        })
-    });
-end);
+local CorePackages = game:GetService("CorePackages")
+local Foundation = require(CorePackages.Packages.Foundation)
+local React = require(CorePackages.Packages.React)
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local useLocalization = Localization.Hooks.useLocalization
+local usePreferredInput = Responsive.usePreferredInput
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local Icon = Foundation.Icon
+local InputSize = Foundation.Enums.InputSize
+local Popover = Foundation.Popover
+local ControlState = Foundation.Enums.ControlState
+local useScaledValue = Foundation.Hooks.useScaledValue
+
+local function SponsoredFooter(t1: {[any]: any}) -- line: 23
+	-- upvalues: useLocalization (copy), useScaledValue (copy), React (copy), usePreferredInput (copy), Responsive (copy), ControlState (copy), View (copy), FoundationText (copy), Popover (copy), Icon (copy), InputSize (copy)
+	local v17 = useLocalization({
+		SponsoredText = "Feature.GamePage.Label.Sponsored",
+		SponsoredDisclosure = "CoreScripts.Ads.Label.SponsoredAdsDisclosureStatic"
+	})
+	local v18 = useScaledValue(320)
+	local v19, v20 = React.useState(false)
+	local v21 = usePreferredInput() == Responsive.Input.Pointer
+	local v22 = React.useCallback(function(p1) -- line: 32
+		-- upvalues: ControlState (copy), v20 (copy)
+		if p1 == ControlState.Hover or p1 == ControlState.Selected then
+			v20(true)
+
+			return
+		end
+
+		if p1 == ControlState.Default then
+			v20(false)
+		end
+	end, {})
+	local v23 = React.useCallback(function() -- line: 39
+		-- upvalues: v20 (copy)
+		v20(function(p2) -- line: 40
+			return not p2
+		end)
+	end, {})
+
+	return React.createElement(View, {
+		tag = "row align-y-bottom align-x-center gap-xsmall flex-between auto-y",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		SponsoredText = React.createElement(FoundationText, {
+			tag = "size-full-0 text-no-wrap text-body-medium content-default text-align-x-left auto-xy",
+			LayoutOrder = 1,
+			Text = v17.SponsoredText
+		}),
+		SponsoredTooltip = React.createElement(Popover.Root, {
+			isOpen = v19
+		}, {
+			Anchor = React.createElement(Popover.Anchor, {
+				LayoutOrder = 2
+			}, {
+				IconView = React.createElement(View, {
+					tag = "size-400-400 radius-circle",
+					onStateChanged = if not v21 then nil else v22,
+					onActivated = if not v21 then v23 else nil
+				}, {
+					Icon = React.createElement(Icon, {
+						name = "icons/actions/info",
+						size = InputSize.Small
+					})
+				})
+			}),
+			Content = React.createElement(Popover.Content, nil, {
+				DescriptionView = React.createElement(View, {
+					tag = "col gap-xsmall padding-small auto-xy size-full-2400",
+					sizeConstraint = {
+						MaxSize = Vector2.new(v18, 1e999)
+					}
+				}, {
+					Description = React.createElement(FoundationText, {
+						tag = "auto-xy text-body-small text-wrap",
+						Text = v17.SponsoredDisclosure
+					})
+				})
+			})
+		})
+	})
+end
+
+return React.memo(SponsoredFooter)

@@ -1,129 +1,148 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialContextToasts");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_Toast_0 = v3.App.Dialog.Toast;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_Colors_0 = v3.App.Style.Colors;
-local v7 = require(l_Parent_0.Cryo);
-local l_CoPlayFooter_0 = v3.App.Tile.ExperienceTileMetadata.CoPlayFooter;
-local l_getLocalizedStrings_0 = require(l_Parent_0.NotificationsCommon).LocalizationHelper.getLocalizedStrings;
-local v10 = require(l_script_FirstAncestor_0.Enums.SocialContextToastAnalyticsActionTypes);
-local v11 = require(l_script_FirstAncestor_0.SocialContextToastEvents);
-local l_GetFFlagSocialContextToastEventStream_0 = require(l_Parent_0.SharedFlags).GetFFlagSocialContextToastEventStream;
-local v13 = Vector2.new(48, 48);
-local v14 = Vector2.new(36, 36);
-local function _(v15, v16, v17) --[[ Line: 34 ]] --[[ Name: makeCoPlayFooter ]]
-    -- upvalues: v2 (copy), l_CoPlayFooter_0 (copy), l_Colors_0 (copy)
-    return function(v18) --[[ Line: 35 ]]
-        -- upvalues: v15 (copy), v2 (ref), l_CoPlayFooter_0 (ref), v17 (copy), v16 (copy), l_Colors_0 (ref)
-        local l_Offset_0 = v18.Size.X.Offset;
-        local v20 = if #v15 == 1 then l_Offset_0 else (l_Offset_0 - -9) / 2;
-        return v2.createElement(l_CoPlayFooter_0, {
-            users = v15, 
-            size = v18.Size, 
-            faceGroupCount = 1, 
-            showEmphasisBorder = v17, 
-            styleProps = {
-                faceWidth = v20, 
-                faceHeight = v20, 
-                faceGroupGap = -9, 
-                badgeHeight = v20, 
-                badgeBorderColor = v16.Theme.SystemPrimaryContent, 
-                faceBorderColor = v16.Theme.SystemPrimaryContent, 
-                faceBackgroundColor = {
-                    l_Colors_0.Smoke; 
-                    Transparency = 0
-                }, 
-                showEmphasisBorder = v17
-            }
-        });
-    end;
-end;
-local v22 = {
-    areUsersActive = true
-};
-return function(v23) --[[ Line: 62 ]] --[[ Name: ToastWrapper ]]
-    -- upvalues: v7 (copy), v22 (copy), l_GetFFlagSocialContextToastEventStream_0 (copy), v2 (copy), v11 (copy), v10 (copy), l_useStyle_0 (copy), l_getLocalizedStrings_0 (copy), l_Toast_0 (copy), l_CoPlayFooter_0 (copy), l_Colors_0 (copy), v13 (copy), v14 (copy)
-    local v24 = false;
-    local v25 = v7.Dictionary.join(v22, v23);
-    local v26 = nil;
-    if l_GetFFlagSocialContextToastEventStream_0() then
-        local l_analyticsProps_0 = v25.analyticsProps;
-        local l_l_analyticsProps_0_0 = l_analyticsProps_0 --[[ copy: 3 -> 12 ]];
-        v26 = v2.useCallback(function() --[[ Line: 68 ]]
-            -- upvalues: v25 (copy), v11 (ref), l_l_analyticsProps_0_0 (copy), v10 (ref)
-            local v29 = nil;
-            if v25.userIdList then
-                v29 = table.concat(v25.userIdList);
-            end;
-            v11(l_l_analyticsProps_0_0.eventIngest, {
-                toastType = l_l_analyticsProps_0_0.toastType, 
-                friendId = v29, 
-                universeId = l_l_analyticsProps_0_0.gameId, 
-                placeId = l_l_analyticsProps_0_0.placeId, 
-                actionType = v10.ForceDismissed
-            });
-        end);
-    end;
-    if v25.onActivated == nil then
-        if l_GetFFlagSocialContextToastEventStream_0() then
-            v25.onActivated = v26;
-        else
-            v25.onActivated = function() --[[ Line: 89 ]]
+local SocialContextToasts = script:FindFirstAncestor("SocialContextToasts")
+local SocialContextToastsParent = SocialContextToasts.Parent
+local React = require(SocialContextToastsParent.React)
+local UIBlox = require(SocialContextToastsParent.UIBlox)
+local Toast = UIBlox.App.Dialog.Toast
+local useStyle = UIBlox.Core.Style.useStyle
+local Colors = UIBlox.App.Style.Colors
+local Cryo = require(SocialContextToastsParent.Cryo)
+local CoPlayFooter = UIBlox.App.Tile.ExperienceTileMetadata.CoPlayFooter
+local getLocalizedStrings = require(SocialContextToastsParent.NotificationsCommon).LocalizationHelper.getLocalizedStrings
+local SocialContextToastAnalyticsActionTypes = require(SocialContextToasts.Enums.SocialContextToastAnalyticsActionTypes)
+local SocialContextToastEvents = require(SocialContextToasts.SocialContextToastEvents)
+local GetFFlagSocialContextToastEventStream = require(SocialContextToastsParent.SharedFlags).GetFFlagSocialContextToastEventStream
+local vector2 = Vector2.new(48, 48)
+local vector2_2 = Vector2.new(36, 36)
 
-            end;
-        end;
-    end;
-    local v30 = l_useStyle_0();
-    local v31 = l_getLocalizedStrings_0(v25.toastStrings);
-    local l_userIdList_0 = v25.userIdList;
-    local l_createElement_0 = v2.createElement;
-    local l_l_Toast_0_0 = l_Toast_0;
-    local v35 = {
-        duration = 6
-    };
-    local v36 = {};
-    local v37;
-    if l_userIdList_0 then
-        local l_areUsersActive_0 = v25.areUsersActive;
-        v37 = function(v39) --[[ Line: 35 ]]
-            -- upvalues: l_userIdList_0 (copy), v2 (ref), l_CoPlayFooter_0 (ref), l_areUsersActive_0 (copy), v30 (copy), l_Colors_0 (ref)
-            local l_Offset_1 = v39.Size.X.Offset;
-            local v41 = if #l_userIdList_0 == 1 then l_Offset_1 else (l_Offset_1 - -9) / 2;
-            return v2.createElement(l_CoPlayFooter_0, {
-                users = l_userIdList_0, 
-                size = v39.Size, 
-                faceGroupCount = 1, 
-                showEmphasisBorder = l_areUsersActive_0, 
-                styleProps = {
-                    faceWidth = v41, 
-                    faceHeight = v41, 
-                    faceGroupGap = -9, 
-                    badgeHeight = v41, 
-                    badgeBorderColor = v30.Theme.SystemPrimaryContent, 
-                    faceBorderColor = v30.Theme.SystemPrimaryContent, 
-                    faceBackgroundColor = {
-                        l_Colors_0.Smoke; 
-                        Transparency = 0
-                    }, 
-                    showEmphasisBorder = l_areUsersActive_0
-                }
-            });
-        end;
-        v24 = v37;
-    end;
-    if not v24 then
-        v37 = nil;
-    end;
-    v24 = false;
-    v36.iconImage = v37;
-    v36.toastTitle = v31.label;
-    v36.iconSize = if l_userIdList_0 and #l_userIdList_0 > 1 then v13 else v14;
-    v36.onActivated = v25.onActivated;
-    v36.buttonText = v31.button;
-    v36.buttonType = v25.buttonType;
-    v36.onTouchSwipeUp = if l_GetFFlagSocialContextToastEventStream_0() then v26 else nil;
-    v35.toastContent = v36;
-    return l_createElement_0(l_l_Toast_0_0, v35);
-end;
+local function makeCoPlayFooter(p1, p2, p3) -- line: 34
+	-- upvalues: React (copy), CoPlayFooter (copy), Colors (copy)
+	return function(p4) -- line: 35
+		-- upvalues: p1 (copy), React (copy), CoPlayFooter (copy), p3 (copy), p2 (copy), Colors (copy)
+		local XOffset = p4.Size.X.Offset
+		local v38 = if #p1 ~= 1 then (XOffset - -9) / 2 else XOffset
+
+		return React.createElement(CoPlayFooter, {
+			faceGroupCount = 1,
+			users = p1,
+			size = p4.Size,
+			showEmphasisBorder = p3,
+			styleProps = {
+				faceGroupGap = -9,
+				faceWidth = v38,
+				faceHeight = v38,
+				badgeHeight = v38,
+				badgeBorderColor = p2.Theme.SystemPrimaryContent,
+				faceBorderColor = p2.Theme.SystemPrimaryContent,
+				faceBackgroundColor = {
+					Colors.Smoke,
+					Transparency = 0
+				},
+				showEmphasisBorder = p3
+			}
+		})
+	end
+end
+
+local t1 = {
+	areUsersActive = true
+}
+
+local function ToastWrapper(t2: {[any]: any}) -- line: 62
+	-- upvalues: Cryo (copy), t1 (copy), GetFFlagSocialContextToastEventStream (copy), React (copy), SocialContextToastEvents (copy), SocialContextToastAnalyticsActionTypes (copy), useStyle (copy), getLocalizedStrings (copy), Toast (copy), CoPlayFooter (copy), Colors (copy), vector2 (copy), vector2_2 (copy)
+	local v23 = Cryo.Dictionary.join(t1, t2)
+	local v24 = nil
+	local g35 = nil
+	local v34 = nil
+
+	if GetFFlagSocialContextToastEventStream() then
+		local analyticsProps = v23.analyticsProps
+
+		v24 = React.useCallback(function() -- line: 68
+			-- upvalues: v23 (copy), SocialContextToastEvents (copy), analyticsProps (copy), SocialContextToastAnalyticsActionTypes (copy)
+			local v39 = nil
+
+			if v23.userIdList then
+				v39 = table.concat(v23.userIdList)
+			end
+
+			SocialContextToastEvents(analyticsProps.eventIngest, {
+				toastType = analyticsProps.toastType,
+				friendId = v39,
+				universeId = analyticsProps.gameId,
+				placeId = analyticsProps.placeId,
+				actionType = SocialContextToastAnalyticsActionTypes.ForceDismissed
+			})
+		end)
+	end
+
+	if v23.onActivated == nil then
+		if GetFFlagSocialContextToastEventStream() then
+			v23.onActivated = v24
+		else
+			function v23.onActivated() -- line: 89
+			end
+		end
+	end
+
+	local v26 = useStyle()
+	local v27 = getLocalizedStrings(v23.toastStrings)
+	local userIdList = v23.userIdList
+	local createElement = React.createElement
+	local v30 = Toast
+	local t3 = {
+		duration = 6
+	}
+	local t4 = {}
+
+	if userIdList then
+		local areUsersActive = v23.areUsersActive
+
+		function v34(p5) -- line: 35
+			-- upvalues: userIdList (copy), React (copy), CoPlayFooter (copy), areUsersActive (copy), v26 (copy), Colors (copy)
+			local XOffset = p5.Size.X.Offset
+			local v42 = if #userIdList ~= 1 then (XOffset - -9) / 2 else XOffset
+
+			return React.createElement(CoPlayFooter, {
+				faceGroupCount = 1,
+				users = userIdList,
+				size = p5.Size,
+				showEmphasisBorder = areUsersActive,
+				styleProps = {
+					faceGroupGap = -9,
+					faceWidth = v42,
+					faceHeight = v42,
+					badgeHeight = v42,
+					badgeBorderColor = v26.Theme.SystemPrimaryContent,
+					faceBorderColor = v26.Theme.SystemPrimaryContent,
+					faceBackgroundColor = {
+						Colors.Smoke,
+						Transparency = 0
+					},
+					showEmphasisBorder = areUsersActive
+				}
+			})
+		end
+
+		if v34 then
+			g35 = true
+		end
+	end
+
+	if not g35 then
+		v34 = nil
+	end
+
+	g35 = false
+	t4.iconImage = v34
+	t4.toastTitle = v27.label
+	t4.iconSize = if not userIdList or not (#userIdList > 1) then vector2_2 else vector2
+	t4.onActivated = v23.onActivated
+	t4.buttonText = v27.button
+	t4.buttonType = v23.buttonType
+	t4.onTouchSwipeUp = if not GetFFlagSocialContextToastEventStream() then nil else v24
+	t3.toastContent = t4
+
+	return createElement(v30, t3)
+end
+
+return ToastWrapper

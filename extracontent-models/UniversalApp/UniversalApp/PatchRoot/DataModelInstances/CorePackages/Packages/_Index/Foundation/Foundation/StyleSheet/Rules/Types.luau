@@ -1,3 +1,5 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-return {};
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Providers.Style.Tokens)
+
+return {}

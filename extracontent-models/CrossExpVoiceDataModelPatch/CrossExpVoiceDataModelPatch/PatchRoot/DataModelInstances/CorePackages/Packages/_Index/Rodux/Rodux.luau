@@ -1,16 +1,17 @@
-local v0 = require(script.Store);
-local v1 = require(script.createReducer);
-local v2 = require(script.combineReducers);
-local v3 = require(script.makeActionCreator);
-local v4 = require(script.loggerMiddleware);
-local v5 = require(script.thunkMiddleware);
-local v6 = require(script.makeThunkMiddleware);
+local Store = require(script.Store)
+local createReducer = require(script.createReducer)
+local combineReducers = require(script.combineReducers)
+local makeActionCreator = require(script.makeActionCreator)
+local loggerMiddleware = require(script.loggerMiddleware)
+local thunkMiddleware = require(script.thunkMiddleware)
+local makeThunkMiddleware = require(script.makeThunkMiddleware)
+
 return {
-    Store = v0, 
-    createReducer = v1, 
-    combineReducers = v2, 
-    makeActionCreator = v3, 
-    loggerMiddleware = v4.middleware, 
-    thunkMiddleware = v5, 
-    makeThunkMiddleware = v6
-};
+	Store = Store,
+	createReducer = createReducer,
+	combineReducers = combineReducers,
+	makeActionCreator = makeActionCreator,
+	loggerMiddleware = loggerMiddleware.middleware,
+	thunkMiddleware = thunkMiddleware,
+	makeThunkMiddleware = makeThunkMiddleware
+}

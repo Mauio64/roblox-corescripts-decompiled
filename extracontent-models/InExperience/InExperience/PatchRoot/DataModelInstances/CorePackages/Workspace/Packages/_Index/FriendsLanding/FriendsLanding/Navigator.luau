@@ -1,29 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_RoactNavigation_0 = v1.RoactNavigation;
-local v3 = require(l_script_FirstAncestor_0.EnumScreens);
-local v4 = require(l_script_FirstAncestor_0.Navigator.ModalStackNavigator);
-local l_ToastScreen_0 = v1.SocialLibraries.Components.ToastScreen;
-return (l_RoactNavigation_0.createRobloxStackNavigator({
-    {
-        ModalStackNavigator = {
-            screen = v4, 
-            navigationOptions = {
-                transparent = true, 
-                absorbInputSelectable = false
-            }
-        }
-    }, 
-    {
-        [v3.GenericToast] = {
-            screen = l_ToastScreen_0, 
-            navigationOptions = {
-                overlayEnabled = true, 
-                overlayTransparency = 1, 
-                absorbInput = false
-            }
-        }
-    }
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local RoactNavigation = dependencies.RoactNavigation
+local EnumScreens = require(FriendsLanding.EnumScreens)
+local ModalStackNavigator = require(FriendsLanding.Navigator.ModalStackNavigator)
+local ToastScreen = dependencies.SocialLibraries.Components.ToastScreen
+
+return (RoactNavigation.createRobloxStackNavigator({
+	{
+		ModalStackNavigator = {
+			screen = ModalStackNavigator,
+			navigationOptions = {
+				transparent = true,
+				absorbInputSelectable = false
+			}
+		}
+	},
+	{
+		[EnumScreens.GenericToast] = {
+			screen = ToastScreen,
+			navigationOptions = {
+				overlayEnabled = true,
+				overlayTransparency = 1,
+				absorbInput = false
+			}
+		}
+	}
 }, {
-    mode = l_RoactNavigation_0.StackPresentationStyle.Overlay
-}));
+	mode = RoactNavigation.StackPresentationStyle.Overlay
+}))

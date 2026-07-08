@@ -1,149 +1,148 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CurrencyTransfers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_script_FirstAncestor_0.NetworkRequests.getTransferRequestByIdRequest);
-local v5 = require(l_script_FirstAncestor_0.Hooks.useUserNameFromUserId);
-local v6 = require(l_script_FirstAncestor_0.Localization.TransferLocalizationKeys);
-local v7 = require(l_script_FirstAncestor_0.Localization.transferLocaleFormat);
-local v8 = require(l_Parent_0.Foundation);
-local l_Sheet_0 = v8.Sheet;
-local l_View_0 = v8.View;
-local l_Text_0 = v8.Text;
-local l_Button_0 = v8.Button;
-local l_Icon_0 = v8.Icon;
-local l_ButtonVariant_0 = v8.Enums.ButtonVariant;
-local l_FillBehavior_0 = v8.Enums.FillBehavior;
-local l_useScaledValue_0 = v8.Hooks.useScaledValue;
-local l_useTokens_0 = v8.Hooks.useTokens;
-local l_Enums_0 = v8.Enums;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v20 = require(l_script_FirstAncestor_0.Enums.FailureReason);
-local v21 = require(l_script_FirstAncestor_0.Hooks.useTransferStore);
-local function _(v22, v23, v24) --[[ Line: 38 ]] --[[ Name: getErrorMessageAndButton ]]
-    -- upvalues: v20 (copy), v7 (copy)
-    if not v22 then
-        return v23.GenericError, v23.TryAgain;
-    else
-        local l_OK_0 = v23.OK;
-        local v26 = nil;
-        if v22 == v20.TransferDisabledForUser then
-            v26 = v23.AccountDisabled;
-        elseif v22 == v20.TransferExpired then
-            v26 = v7.substituteUsername(v23.TransferExpired, (tostring(v24)));
-        else
-            v26 = v23.GenericError;
-            l_OK_0 = v23.TryAgain;
-        end;
-        return v26, l_OK_0;
-    end;
-end;
-return function(_) --[[ Line: 64 ]] --[[ Name: ReceiveErrorSheet ]]
-    -- upvalues: v21 (copy), l_useTokens_0 (copy), v3 (copy), v20 (copy), v2 (copy), v4 (copy), v5 (copy), l_useLocalization_0 (copy), v6 (copy), v7 (copy), l_Sheet_0 (copy), l_useScaledValue_0 (copy), l_View_0 (copy), l_Icon_0 (copy), l_Enums_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_FillBehavior_0 (copy)
-    local v29 = v21();
-    local v30 = l_useTokens_0();
-    local v31 = v3.useSignalState(v29.getErrorTransferModel);
-    local v32 = v3.useSignalState(v29.getSender);
-    local v33 = v3.useSignalState(v29.getRobuxTransfer);
-    local v34 = v3.useSignalState(v29.getTransferRequestId);
-    local l_triggerOnClose_0 = v29.triggerOnClose;
-    local v36 = if v31 then v31.failureReason else nil;
-    local v37 = v36 == v20.TransferExpired;
-    v2.useEffect(function() --[[ Line: 76 ]]
-        -- upvalues: v37 (copy), v32 (copy), v33 (copy), v34 (copy), v4 (ref), v29 (copy)
-        if not v37 or v32 or v33 and v33.sender or not v34 then
-            return;
-        else
-            v4({
-                transferRequestId = v34
-            }):andThen(function(v38) --[[ Line: 86 ]]
-                -- upvalues: v29 (ref)
-                if v38 and v38.transfer and v38.transfer.sender then
-                    v29.setSender(v38.transfer.sender);
-                end;
-            end):catch(function() --[[ Line: 91 ]]
+local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+local CurrencyTransfersParent = CurrencyTransfers.Parent
+local React = require(CurrencyTransfersParent.React)
+local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
+local getTransferRequestByIdRequest = require(CurrencyTransfers.NetworkRequests.getTransferRequestByIdRequest)
+local useUserNameFromUserId = require(CurrencyTransfers.Hooks.useUserNameFromUserId)
+local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
+local transferLocaleFormat = require(CurrencyTransfers.Localization.transferLocaleFormat)
+local Foundation = require(CurrencyTransfersParent.Foundation)
+local Sheet = Foundation.Sheet
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local Icon = Foundation.Icon
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local useScaledValue = Foundation.Hooks.useScaledValue
+local useTokens = Foundation.Hooks.useTokens
+local Enums = Foundation.Enums
+local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+local FailureReason = require(CurrencyTransfers.Enums.FailureReason)
+local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
 
-            end);
-            return;
-        end;
-    end, {
-        v37, 
-        v34, 
-        v32, 
-        v33
-    });
-    local v39 = v32 or v33 and v33.sender or nil;
-    local v40 = if v39 then v39.targetId else nil;
-    local v41 = v5(if v37 and v40 and v40 ~= 0 then v40 else nil);
-    local v42 = if v39 and (v39.targetName or v39.targetDisplayName) then v39.targetName or v39.targetDisplayName else if v37 and v41 and v41 ~= "" then v41 else nil;
-    local v43 = l_useLocalization_0(v6.Presets.ReceiveErrorSheet);
-    local v44, v45;
-    if not v36 then
-        v44 = v43.GenericError;
-        v45 = v43.TryAgain;
-    else
-        local l_OK_1 = v43.OK;
-        local v47 = nil;
-        if v36 == v20.TransferDisabledForUser then
-            v47 = v43.AccountDisabled;
-        elseif v36 == v20.TransferExpired then
-            v47 = v7.substituteUsername(v43.TransferExpired, (tostring(v42)));
-        else
-            v47 = v43.GenericError;
-            l_OK_1 = v43.TryAgain;
-        end;
-        v44 = v47;
-        v45 = l_OK_1;
-    end;
-    return v2.createElement(l_Sheet_0.Root, {
-        preferCenterSheet = true, 
-        snapPoints = {
-            l_useScaledValue_0(300), 
-            0.5
-        }, 
-        onClose = l_triggerOnClose_0
-    }, {
-        Content = v2.createElement(l_Sheet_0.Content, {
-            LayoutOrder = 1
-        }, {
-            SheetContentContainer = v2.createElement(l_View_0, {
-                tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
-            }, {
-                ErrorIconContainer = v2.createElement(l_View_0, {
-                    tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis", 
-                    LayoutOrder = 1
-                }, {
-                    ErrorIcon = v2.createElement(l_Icon_0, {
-                        name = l_Enums_0.IconName.TriangleExclamation, 
-                        size = v30.Size.Size_1200, 
-                        tag = "content-inverse-emphasis"
-                    })
-                }), 
-                ErrorMessage = v2.createElement(l_Text_0, {
-                    Text = v44, 
-                    tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap", 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    LayoutOrder = 2
-                })
-            })
-        }), 
-        Actions = v2.createElement(l_Sheet_0.Actions, {
-            LayoutOrder = 2
-        }, {
-            v2.createElement(l_View_0, {
-                tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
-            }, {
-                v2.createElement(l_View_0, {
-                    tag = "row auto-y size-full-0 gap-small"
-                }, {
-                    v2.createElement(l_Button_0, {
-                        text = v45, 
-                        onActivated = l_triggerOnClose_0, 
-                        variant = l_ButtonVariant_0.Emphasis, 
-                        fillBehavior = l_FillBehavior_0.Fill
-                    })
-                })
-            })
-        })
-    });
-end;
+local function getErrorMessageAndButton(p1, t1: {[any]: any}, s1: string?) -- line: 38
+	-- upvalues: FailureReason (copy), transferLocaleFormat (copy)
+	if not p1 then
+		return t1.GenericError, t1.TryAgain
+	end
+
+	local OK = t1.OK
+	local AccountDisabled
+
+	if p1 == FailureReason.TransferDisabledForUser then
+		AccountDisabled = t1.AccountDisabled
+	elseif p1 == FailureReason.TransferExpired then
+		AccountDisabled = transferLocaleFormat.substituteUsername(t1.TransferExpired, (tostring(s1)))
+	else
+		AccountDisabled = t1.GenericError
+		OK = t1.TryAgain
+	end
+
+	return AccountDisabled, OK
+end
+local function ReceiveErrorSheet(_: {[any]: any}) -- line: 64
+	-- upvalues: useTransferStore (copy), useTokens (copy), SignalsReact (copy), FailureReason (copy), React (copy), getTransferRequestByIdRequest (copy), useUserNameFromUserId (copy), useLocalization (copy), TransferLocalizationKeys (copy), transferLocaleFormat (copy), Sheet (copy), useScaledValue (copy), View (copy), Icon (copy), Enums (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v31 = useTransferStore()
+	local v32 = useTokens()
+	local v33 = SignalsReact.useSignalState(v31.getErrorTransferModel)
+	local v34 = SignalsReact.useSignalState(v31.getSender)
+	local v35 = SignalsReact.useSignalState(v31.getRobuxTransfer)
+	local v36 = SignalsReact.useSignalState(v31.getTransferRequestId)
+	local triggerOnClose = v31.triggerOnClose
+	local v38 = if not v33 then nil else v33.failureReason
+	local v39 = v38 == FailureReason.TransferExpired
+
+	React.useEffect(function() -- line: 76
+		-- upvalues: v39 (copy), v34 (copy), v35 (copy), v36 (copy), getTransferRequestByIdRequest (copy), v31 (copy)
+		if not v39 or v34 or (v35 and v35.sender or not v36) then
+			return
+		end
+
+		getTransferRequestByIdRequest({
+			transferRequestId = v36
+		}):andThen(function(p2) -- line: 86
+			-- upvalues: v31 (copy)
+			if p2 and (p2.transfer and p2.transfer.sender) then
+				v31.setSender(p2.transfer.sender)
+			end
+		end):catch(function() -- line: 91
+		end)
+	end, {
+		v39,
+		v36,
+		v34,
+		v35
+	})
+
+	local v40 = v34 or (v35 and v35.sender or nil)
+	local v41 = if not v40 then nil else v40.targetId
+	local v42 = useUserNameFromUserId(if not v39 or (not v41 or v41 == 0) then nil else v41)
+	local v43 = if not v40 or not v40.targetName and not v40.targetDisplayName then if not v39 or (not v42 or v42 == "") then nil else v42 else v40.targetName or v40.targetDisplayName
+	local v44 = useLocalization(TransferLocalizationKeys.Presets.ReceiveErrorSheet)
+	local GenericError, TryAgain
+
+	if not v38 then
+		GenericError = v44.GenericError
+		TryAgain = v44.TryAgain
+	else
+		TryAgain = v44.OK
+
+		if v38 == FailureReason.TransferDisabledForUser then
+			GenericError = v44.AccountDisabled
+		elseif v38 == FailureReason.TransferExpired then
+			GenericError = transferLocaleFormat.substituteUsername(v44.TransferExpired, (tostring(v43)))
+		else
+			GenericError = v44.GenericError
+			TryAgain = v44.TryAgain
+		end
+	end
+
+	return React.createElement(Sheet.Root, {
+		preferCenterSheet = true,
+		snapPoints = {
+			useScaledValue(300),
+			0.5
+		},
+		onClose = triggerOnClose
+	}, {
+		Content = React.createElement(Sheet.Content, {
+			LayoutOrder = 1
+		}, {
+			SheetContentContainer = React.createElement(View, {
+				tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
+			}, {
+				ErrorIconContainer = React.createElement(View, {
+					tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
+					LayoutOrder = 1
+				}, {
+					ErrorIcon = React.createElement(Icon, {
+						tag = "content-inverse-emphasis",
+						name = Enums.IconName.TriangleExclamation,
+						size = v32.Size.Size_1200
+					})
+				}),
+				ErrorMessage = React.createElement(FoundationText, {
+					tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
+					LayoutOrder = 2,
+					Text = GenericError,
+					Size = UDim2.new(1, 0, 0, 0)
+				})
+			})
+		}),
+		Actions = React.createElement(Sheet.Actions, {
+			LayoutOrder = 2
+		}, { React.createElement(View, {
+			tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
+		}, { React.createElement(View, {
+			tag = "row auto-y size-full-0 gap-small"
+		}, { React.createElement(Button, {
+			text = TryAgain,
+			onActivated = triggerOnClose,
+			variant = ButtonVariant.Emphasis,
+			fillBehavior = FillBehavior.Fill
+		}) }) }) })
+	})
+end
+
+return ReceiveErrorSheet

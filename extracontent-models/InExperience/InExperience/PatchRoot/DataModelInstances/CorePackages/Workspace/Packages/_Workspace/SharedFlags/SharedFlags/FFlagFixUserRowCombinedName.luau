@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixUserRowCombinedName", false);
+return game:DefineFastFlag("FixUserRowCombinedName", false)

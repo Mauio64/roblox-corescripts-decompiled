@@ -1,55 +1,56 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.SduiCompat);
-local l_Chip_0 = v2.Chip;
-local l_FFlagSduiChipAccessoryProps_0 = require(l_Parent_0.SharedFlags).FFlagSduiChipAccessoryProps;
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-return v1.memo(function(v7) --[[ Line: 65 ]] --[[ Name: SduiChip ]]
-    -- upvalues: l_FFlagSduiServerCompat_0 (copy), l_FFlagSduiChipAccessoryProps_0 (copy), v1 (copy), l_Chip_0 (copy)
-    local v8 = nil;
-    local v9 = nil;
-    local v10 = nil;
-    if l_FFlagSduiServerCompat_0 then
-        v8 = v7.layoutOrder;
-        v9 = v7.anchorPoint;
-        v10 = v7.position;
-    else
-        v8 = v7.LayoutOrder;
-        v9 = v7.AnchorPoint;
-        v10 = v7.Position;
-    end;
-    local v11 = nil;
-    if l_FFlagSduiChipAccessoryProps_0 and v7.leading then
-        v11 = v7.leading;
-    elseif v7.leadingIconName then
-        v11 = if not not v7.leadingIconVariant or v7.leadingIsCircular or v7.leadingOnActivated then {
-            iconName = v7.leadingIconName, 
-            iconVariant = v7.leadingIconVariant, 
-            isCircular = v7.leadingIsCircular, 
-            onActivated = v7.leadingOnActivated
-        } else v7.leadingIconName;
-    end;
-    local v12 = nil;
-    if l_FFlagSduiChipAccessoryProps_0 and v7.trailing then
-        v12 = v7.trailing;
-    elseif v7.trailingIconName then
-        v12 = if not not v7.trailingIconVariant or v7.trailingIsCircular or v7.trailingOnActivated then {
-            iconName = v7.trailingIconName, 
-            iconVariant = v7.trailingIconVariant, 
-            isCircular = v7.trailingIsCircular, 
-            onActivated = v7.trailingOnActivated
-        } else v7.trailingIconName;
-    end;
-    return v1.createElement(l_Chip_0, {
-        text = v7.text, 
-        leading = v11, 
-        trailing = v12, 
-        onActivated = v7.onActivated, 
-        isChecked = v7.isChecked, 
-        size = v7.size, 
-        LayoutOrder = v8, 
-        AnchorPoint = v9, 
-        Position = v10
-    });
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+require(Parent.SduiCompat)
+
+local Chip = Foundation.Chip
+local FFlagSduiChipAccessoryProps = require(Parent.SharedFlags).FFlagSduiChipAccessoryProps
+local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+
+local function SduiChip(t1: {[any]: any}) -- line: 62
+	-- upvalues: FFlagSduiChipAccessoryProps (copy), React (copy), Chip (copy), FFlagSduiExperienceDetailsSupport (copy)
+	local layoutOrder = t1.layoutOrder
+	local anchorPoint = t1.anchorPoint
+	local position = t1.position
+	local leading = nil
+
+	if FFlagSduiChipAccessoryProps and t1.leading then
+		leading = t1.leading
+	elseif t1.leadingIconName then
+		leading = if not t1.leadingIconVariant and (not t1.leadingIsCircular and not t1.leadingOnActivated) then t1.leadingIconName else {
+			iconName = t1.leadingIconName,
+			iconVariant = t1.leadingIconVariant,
+			isCircular = t1.leadingIsCircular,
+			onActivated = t1.leadingOnActivated
+		}
+	end
+
+	local trailing = nil
+
+	if FFlagSduiChipAccessoryProps and t1.trailing then
+		trailing = t1.trailing
+	elseif t1.trailingIconName then
+		trailing = if not t1.trailingIconVariant and (not t1.trailingIsCircular and not t1.trailingOnActivated) then t1.trailingIconName else {
+			iconName = t1.trailingIconName,
+			iconVariant = t1.trailingIconVariant,
+			isCircular = t1.trailingIsCircular,
+			onActivated = t1.trailingOnActivated
+		}
+	end
+
+	return React.createElement(Chip, {
+		text = t1.text,
+		leading = leading,
+		trailing = trailing,
+		onActivated = t1.onActivated,
+		isChecked = t1.isChecked,
+		Selectable = if not FFlagSduiExperienceDetailsSupport then nil else t1.selectable,
+		size = t1.size,
+		LayoutOrder = layoutOrder,
+		AnchorPoint = anchorPoint,
+		Position = position
+	})
+end
+
+return React.memo(SduiChip)

@@ -1,31 +1,37 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v3 = require(script.Parent.Item);
-return function(v4) --[[ Line: 20 ]] --[[ Name: ItemList_DEPRECATED ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy), v3 (copy)
-    local v5 = l_useDesignTokens_0();
-    local v6 = {
-        Layout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-            Padding = UDim.new(0, v5.Global.Space_150)
-        })
-    };
-    for v7, v8 in v4.items do
-        v6[v8.id] = v1.createElement(v3, {
-            name = v8.name, 
-            image = v8.image, 
-            endSlot = v8.endSlot, 
-            LayoutOrder = v7
-        });
-    end;
-    return v1.createElement("Frame", {
-        LayoutOrder = v4.LayoutOrder, 
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0
-    }, v6);
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local useDesignTokens = require(Parent.Style).useDesignTokens
+local Item = require(script.Parent.Item)
+
+local function ItemList_DEPRECATED(t1: {[any]: any}) -- line: 23
+	-- upvalues: useDesignTokens (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Item (copy)
+	local v8 = useDesignTokens()
+	local t2 = {
+		Layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v8.Global.Space_150 else v8.Size.Size_300)
+		})
+	}
+
+	for v10, v11 in t1.items do
+		t2[v11.id] = React.createElement(Item, {
+			name = v11.name,
+			image = v11.image,
+			endSlot = v11.endSlot,
+			LayoutOrder = v10
+		})
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = t1.LayoutOrder,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, t2)
+end
+
+return ItemList_DEPRECATED

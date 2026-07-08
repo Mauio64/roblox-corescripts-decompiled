@@ -1,35 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ContactImporter");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_RODUX_KEY_0 = require(l_script_FirstAncestor_0.Common.Constants).RODUX_KEY;
-local l_NetworkStatus_0 = v1.RoduxNetworking.Enum.NetworkStatus;
-local l_NetworkingFriends_0 = v1.NetworkingFriends;
-local l_NetworkingContacts_0 = v1.NetworkingContacts;
-local l_Selectors_0 = v1.RoduxContacts.Selectors;
-local l_memoize_0 = v1.memoize;
-local l_getDeepValue_0 = v1.SocialLibraries.Dictionary.getDeepValue;
-local v9 = require(script.Parent.getDeviceContacts);
-local v10 = require(script.Parent.decorateMatchedContact);
-return function(v11) --[[ Line: 16 ]]
-    -- upvalues: l_getDeepValue_0 (copy), l_RODUX_KEY_0 (copy), l_memoize_0 (copy), v9 (copy), v10 (copy), l_Selectors_0 (copy), l_NetworkingFriends_0 (copy), l_NetworkStatus_0 (copy), l_NetworkingContacts_0 (copy)
-    local l_LocalUserId_0 = v11.LocalUserId;
-    local v13 = l_getDeepValue_0(v11, l_RODUX_KEY_0 .. ".Contacts");
-    local v14 = l_memoize_0(v9)(v13);
-    local v15 = v10(l_Selectors_0.sortContacts(v11), v13);
-    local v16 = true;
-    if l_NetworkingFriends_0.RequestFriendshipFromContactId.getStatus(v11, l_LocalUserId_0) ~= l_NetworkStatus_0.Fetching then
-        v16 = true;
-        if l_NetworkingContacts_0.FindContactFriends.getStatus(v11, l_LocalUserId_0) ~= l_NetworkStatus_0.Fetching then
-            v16 = true;
-            if l_NetworkingContacts_0.GetContactEntitiesByContactId.getStatus(v11, l_LocalUserId_0) ~= l_NetworkStatus_0.Fetching then
-                v16 = l_NetworkingContacts_0.UploadContactsByUser.getStatus(v11, l_LocalUserId_0) == l_NetworkStatus_0.Fetching;
-            end;
-        end;
-    end;
-    return {
-        localUserId = v11.LocalUserId, 
-        matchedContacts = v15, 
-        deviceContacts = v14, 
-        screenSize = v11.ScreenSize, 
-        isFetching = v16
-    };
-end;
+local ContactImporter = script:FindFirstAncestor("ContactImporter")
+local dependencies = require(ContactImporter.dependencies)
+local RODUX_KEY = require(ContactImporter.Common.Constants).RODUX_KEY
+local NetworkStatus = dependencies.RoduxNetworking.Enum.NetworkStatus
+local NetworkingFriends = dependencies.NetworkingFriends
+local NetworkingContacts = dependencies.NetworkingContacts
+local Selectors = dependencies.RoduxContacts.Selectors
+local memoize = dependencies.memoize
+local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
+local getDeviceContacts = require(script.Parent.getDeviceContacts)
+local decorateMatchedContact = require(script.Parent.decorateMatchedContact)
+
+return function(p1) -- line: 16
+	-- upvalues: getDeepValue (copy), RODUX_KEY (copy), memoize (copy), getDeviceContacts (copy), decorateMatchedContact (copy), Selectors (copy), NetworkingFriends (copy), NetworkStatus (copy), NetworkingContacts (copy)
+	local LocalUserId = p1.LocalUserId
+	local v14 = getDeepValue(p1, RODUX_KEY .. ".Contacts")
+	local v15 = memoize(getDeviceContacts)(v14)
+	local v16 = decorateMatchedContact(Selectors.sortContacts(p1), v14)
+	local v17 = NetworkingFriends.RequestFriendshipFromContactId.getStatus(p1, LocalUserId) == NetworkStatus.Fetching or (NetworkingContacts.FindContactFriends.getStatus(p1, LocalUserId) == NetworkStatus.Fetching or (NetworkingContacts.GetContactEntitiesByContactId.getStatus(p1, LocalUserId) == NetworkStatus.Fetching or NetworkingContacts.UploadContactsByUser.getStatus(p1, LocalUserId) == NetworkStatus.Fetching))
+
+	return {
+		localUserId = p1.LocalUserId,
+		matchedContacts = v16,
+		deviceContacts = v15,
+		screenSize = p1.ScreenSize,
+		isFetching = v17
+	}
+end

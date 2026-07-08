@@ -1,5 +1,5 @@
 return {
-    Bottom = "Bottom", 
-    Center = "Center", 
-    Side = "Side"
-};
+	Bottom = "Bottom",
+	Center = "Center",
+	Side = "Side"
+}

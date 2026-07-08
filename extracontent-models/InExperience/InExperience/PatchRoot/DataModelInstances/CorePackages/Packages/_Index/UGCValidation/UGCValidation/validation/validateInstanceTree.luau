@@ -1,36 +1,45 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Analytics);
-local v2 = require(l_Parent_0.Constants);
-local v3 = require(l_Parent_0.util.validateWithSchema);
-local _ = require(l_Parent_0.util.Types);
-return function(v5, v6, v7) --[[ Line: 9 ]] --[[ Name: validateInstanceTree ]]
-    -- upvalues: v3 (copy), v1 (copy), v2 (copy)
-    local v8 = v3(v5, v6, v7);
-    if v8.success == false then
-        v1.reportFailure(v1.ErrorType.validateInstanceTree, nil, v7);
-        return false, {
-            "Detected the following error(s): " .. v8.message
-        };
-    else
-        local v9 = {};
-        if v2.BANNED_NAMES[v6.Name] then
-            table.insert(v9, string.format("%s has an invalid name", v6:GetFullName()));
-        end;
-        for _, v11 in pairs(v6:GetDescendants()) do
-            for _, v13 in pairs(v2.BANNED_CLASS_NAMES) do
-                if v11:IsA(v13) then
-                    table.insert(v9, string.format("%s is of type %s which is not allowed", v11:GetFullName(), v13));
-                end;
-            end;
-            if v2.BANNED_NAMES[v11.Name] then
-                table.insert(v9, string.format("%s has an invalid name", v11:GetFullName()));
-            end;
-        end;
-        if #v9 > 0 then
-            v1.reportFailure(v1.ErrorType.validateInstanceTree_InvalidDescendants, nil, v7);
-            return false, v9;
-        else
-            return true;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+local validateWithSchema = require(ParentParent.util.validateWithSchema)
+
+require(ParentParent.util.Types)
+
+local function validateInstanceTree(p1, p2, p3) -- line: 9
+	-- upvalues: validateWithSchema (copy), Analytics (copy), Constants (copy)
+	local v9 = validateWithSchema(p1, p2, p3)
+
+	if v9.success == false then
+		Analytics.reportFailure(Analytics.ErrorType.validateInstanceTree, nil, p3)
+
+		return false, { "Detected the following error(s): " .. v9.message }
+	end
+
+	local t1 = {}
+
+	if Constants.BANNED_NAMES[p2.Name] then
+		table.insert(t1, string.format("%s has an invalid name", p2:GetFullName()))
+	end
+
+	for _, descendant in pairs(p2:GetDescendants()) do
+		for _, v in pairs(Constants.BANNED_CLASS_NAMES) do
+			if descendant:IsA(v) then
+				table.insert(t1, string.format("%s is of type %s which is not allowed", descendant:GetFullName(), v))
+			end
+		end
+
+		if Constants.BANNED_NAMES[descendant.Name] then
+			table.insert(t1, string.format("%s has an invalid name", descendant:GetFullName()))
+		end
+	end
+
+	if #t1 > 0 then
+		Analytics.reportFailure(Analytics.ErrorType.validateInstanceTree_InvalidDescendants, nil, p3)
+
+		return false, t1
+	end
+
+	return true
+end
+
+return validateInstanceTree

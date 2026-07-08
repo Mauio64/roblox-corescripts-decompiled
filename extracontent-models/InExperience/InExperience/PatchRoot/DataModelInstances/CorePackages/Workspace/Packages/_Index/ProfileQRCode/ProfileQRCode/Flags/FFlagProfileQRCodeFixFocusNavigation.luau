@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfileQRCodeFixFocusNavigation", false);
+return game:DefineFastFlag("ProfileQRCodeFixFocusNavigation", false)

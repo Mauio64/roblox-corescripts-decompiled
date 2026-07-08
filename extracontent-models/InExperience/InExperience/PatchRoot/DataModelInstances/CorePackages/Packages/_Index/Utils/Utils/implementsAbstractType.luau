@@ -1,24 +1,30 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Boolean_0 = require(l_Parent_0.LuauPolyfill).Boolean;
-local v2 = {};
-local v3 = require(l_Parent_0.GraphQL);
-local l_doTypesOverlap_0 = v3.doTypesOverlap;
-local l_isCompositeType_0 = v3.isCompositeType;
-local _ = require(script.Parent.types);
-v2.implementsAbstractType = function(v7, v8, v9) --[[ Line: 20 ]] --[[ Name: implementsAbstractType ]]
-    -- upvalues: l_Boolean_0 (copy), l_isCompositeType_0 (copy), l_doTypesOverlap_0 (copy)
-    if v9 == nil or v8 == nil then
-        return false;
-    elseif v8 == v9 then
-        return true;
-    else
-        local l_toJSBoolean_0 = l_Boolean_0.toJSBoolean;
-        local v11 = l_isCompositeType_0(v8);
-        if l_toJSBoolean_0(if l_Boolean_0.toJSBoolean(v11) then l_isCompositeType_0(v9) else v11) then
-            return l_doTypesOverlap_0(v7, v8, v9);
-        else
-            return false;
-        end;
-    end;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local Boolean = require(ParentParent.LuauPolyfill).Boolean
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local doTypesOverlap = GraphQL.doTypesOverlap
+local isCompositeType = GraphQL.isCompositeType
+
+require(script.Parent.types)
+
+function t1.implementsAbstractType(p1, p2, p3) -- line: 20
+	-- upvalues: Boolean (copy), isCompositeType (copy), doTypesOverlap (copy)
+	if p3 == nil or p2 == nil then
+		return false
+	end
+
+	if p2 == p3 then
+		return true
+	end
+
+	local toJSBoolean = Boolean.toJSBoolean
+	local v11 = isCompositeType(p2)
+
+	if toJSBoolean(if not Boolean.toJSBoolean(v11) then v11 else isCompositeType(p3)) then
+		return doTypesOverlap(p1, p2, p3)
+	end
+
+	return false
+end
+
+return t1

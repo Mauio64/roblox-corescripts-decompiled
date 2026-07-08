@@ -1,1 +1,1 @@
-return game:DefineFastInt("BulkPurchaseThrottleLimit", 5);
+return game:DefineFastInt("BulkPurchaseThrottleLimit", 5)

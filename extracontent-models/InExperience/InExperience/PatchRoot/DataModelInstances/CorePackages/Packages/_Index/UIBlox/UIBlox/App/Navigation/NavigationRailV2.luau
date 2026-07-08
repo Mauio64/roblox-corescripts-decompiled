@@ -1,151 +1,166 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Cryo);
-local v4 = require(l_Parent_2.React);
-local v5 = require(l_Parent_2.ReactOtter);
-local _ = require(l_Parent_0.Style.StyleTypes);
-local v7 = require(l_Parent_1.Core.Style.useStyle);
-local v8 = require(l_Parent_0.Navigation.Enum.NavigationRailAlignment);
-local v9 = {
-    visible = true, 
-    isVisible = true, 
-    zIndex = 1, 
-    animated = false, 
-    animationConfig = {
-        dampingRatio = 1, 
-        frequency = 3
-    }
-};
-return function(v10) --[[ Line: 64 ]] --[[ Name: NavigationRail ]]
-    -- upvalues: v3 (copy), v9 (copy), v7 (copy), v8 (copy), v4 (copy), v5 (copy)
-    assert(#v10.items > 0, "At least one item should be present!");
-    local v11 = v3.Dictionary.join(v9, v10);
-    local v12 = v7();
-    local v13 = if v11.paddings and v11.paddings.Top then v11.paddings.Top else v12.Tokens.Global.Space_75;
-    local v14 = if v11.paddings and v11.paddings.Bottom then v11.paddings.Bottom else v12.Tokens.Global.Space_75;
-    local v15 = if v11.paddings and v11.paddings.Left then v11.paddings.Left else v12.Tokens.Global.Space_75;
-    local v16 = if v11.paddings and v11.paddings.Right then v11.paddings.Right else v12.Tokens.Global.Space_75;
-    local v17 = nil;
-    if v11.alignment == v8.Justified then
-        v17 = Enum.VerticalAlignment.Top;
-    elseif v11.alignment == v8.Centered then
-        v17 = Enum.VerticalAlignment.Center;
-    else
-        error("NavigationRail alignment type is incorrect!");
-    end;
-    local v18, v19 = v4.useState(if v11.size then v11.size.X.Offset else 0);
-    local v21 = v4.useCallback(function(v20) --[[ Line: 90 ]]
-        -- upvalues: v11 (copy), v19 (copy)
-        if v11.animated then
-            v19(v20.AbsoluteSize.X);
-        end;
-    end, {
-        v11.animated
-    });
-    local v22, v23 = v5.useAnimatedBinding((not v11.animated or v11.isVisible) and 0 or -v18);
-    v4.useEffect(function() --[[ Line: 97 ]]
-        -- upvalues: v11 (copy), v23 (copy), v5 (ref), v18 (copy)
-        if v11.animated then
-            if v11.isVisible then
-                v23(v5.spring(0, v11.animationConfig));
-            else
-                v23(v5.spring(-v18, v11.animationConfig));
-            end;
-        end;
-        return nil;
-    end, {
-        v11.animated, 
-        v11.isVisible, 
-        v18, 
-        v11.animationConfig
-    });
-    local v24 = {
-        UIListLayout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            Padding = v11.spacing, 
-            SortOrder = Enum.SortOrder.Name
-        })
-    };
-    local v25 = {
-        UIListLayout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-            Padding = v11.spacing, 
-            SortOrder = Enum.SortOrder.Name
-        })
-    };
-    local v26 = false;
-    for v27, v28 in ipairs(v11.items) do
-        local v29 = v27 == v11.selection;
-        if v28.isSecondary then
-            v26 = true;
-            v25[tostring(v27)] = v11.renderItem(v28, v29);
-        else
-            v24[tostring(v27)] = v11.renderItem(v28, v29);
-        end;
-    end;
-    local v31 = v22:map(function(v30) --[[ Line: 136 ]]
-        return UDim2.new(0, math.floor(v30 + 0.5), 0, 0);
-    end);
-    if v11.leadingComponent then
-        v24["0"] = v11.leadingComponent;
-    end;
-    if v11.trailingComponent then
-        v24[":"] = v11.trailingComponent;
-    end;
-    return v4.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        ClipsDescendants = v11.clipsDescendants, 
-        Size = v11.size, 
-        Position = v11.position, 
-        Visible = v11.visible, 
-        ZIndex = v11.zIndex, 
-        [v4.Change.AbsoluteSize] = v21
-    }, {
-        AnimatedFrame = v4.createElement("Frame", {
-            Position = v31, 
-            BorderSizePixel = 0, 
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = if v11.backgroundColor then v11.backgroundColor.Color else v12.Theme.NavigationBar.Color, 
-            BackgroundTransparency = if v11.backgroundColor then v11.backgroundColor.Transparency else v12.Theme.NavigationBar.Transparency
-        }, {
-            UIPadding = v4.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, v13), 
-                PaddingBottom = UDim.new(0, v14), 
-                PaddingLeft = UDim.new(0, v15), 
-                PaddingRight = UDim.new(0, v16)
-            }), 
-            MainFrame = v4.createElement("Frame", {
-                Size = UDim2.fromScale(1, 1), 
-                BackgroundTransparency = 1
-            }, {
-                UIListLayout = v4.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = v17, 
-                    Padding = UDim.new(0, v12.Tokens.Global.Space_200)
-                }), 
-                PrimaryItems = v4.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 1, 
-                    Size = UDim2.fromScale(1, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, v24), 
-                CenteredSecondaryItems = if v26 and v11.alignment == v8.Centered then v4.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2, 
-                    Size = UDim2.fromScale(1, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, v25) else nil
-            }), 
-            JustifiedSecondaryItems = if v26 and v11.alignment == v8.Justified then v4.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1)
-            }, v25) else nil
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Cryo = require(ParentParentParentParent.Cryo)
+local React = require(ParentParentParentParent.React)
+local ReactOtter = require(ParentParentParentParent.ReactOtter)
+
+require(ParentParent.Style.StyleTypes)
+
+local useStyle = require(ParentParentParent.Core.Style.useStyle)
+local NavigationRailAlignment = require(ParentParent.Navigation.Enum.NavigationRailAlignment)
+local t1 = {
+	visible = true,
+	isVisible = true,
+	zIndex = 1,
+	animated = false,
+	animationConfig = {
+		dampingRatio = 1,
+		frequency = 3
+	}
+}
+
+local function NavigationRail(t2: {[any]: any}) -- line: 64
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), NavigationRailAlignment (copy), React (copy), ReactOtter (copy)
+	assert(#t2.items > 0, "At least one item should be present!")
+
+	local v12 = Cryo.Dictionary.join(t1, t2)
+	local v13 = useStyle()
+	local v14 = if not v12.paddings or not v12.paddings.Top then v13.Tokens.Global.Space_75 else v12.paddings.Top
+	local v15 = if not v12.paddings or not v12.paddings.Bottom then v13.Tokens.Global.Space_75 else v12.paddings.Bottom
+	local v16 = if not v12.paddings or not v12.paddings.Left then v13.Tokens.Global.Space_75 else v12.paddings.Left
+	local v17 = if not v12.paddings or not v12.paddings.Right then v13.Tokens.Global.Space_75 else v12.paddings.Right
+	local Top = nil
+
+	if v12.alignment == NavigationRailAlignment.Justified then
+		Top = Enum.VerticalAlignment.Top
+	elseif v12.alignment == NavigationRailAlignment.Centered then
+		Top = Enum.VerticalAlignment.Center
+	else
+		error("NavigationRail alignment type is incorrect!")
+	end
+
+	local v19, v20 = React.useState(not v12.size and 0 or v12.size.X.Offset)
+	local v21 = React.useCallback(function(p1) -- line: 90
+		-- upvalues: v12 (copy), v20 (copy)
+		if v12.animated then
+			v20(p1.AbsoluteSize.X)
+		end
+	end, { v12.animated })
+	local v22, v23 = ReactOtter.useAnimatedBinding((not v12.animated or v12.isVisible) and 0 or -v19)
+
+	React.useEffect(function() -- line: 97
+		-- upvalues: v12 (copy), v23 (copy), ReactOtter (copy), v19 (copy)
+		if v12.animated then
+			if v12.isVisible then
+				v23(ReactOtter.spring(0, v12.animationConfig))
+			else
+				v23(ReactOtter.spring(-v19, v12.animationConfig))
+			end
+		end
+
+		return nil
+	end, {
+		v12.animated,
+		v12.isVisible,
+		v19,
+		v12.animationConfig
+	})
+
+	local t3 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			Padding = v12.spacing,
+			SortOrder = Enum.SortOrder.Name
+		})
+	}
+	local t4 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			Padding = v12.spacing,
+			SortOrder = Enum.SortOrder.Name
+		})
+	}
+	local v26 = false
+
+	for i, v in ipairs(v12.items) do
+		local v29 = i == v12.selection
+
+		if v.isSecondary then
+			v26 = true
+			t4[tostring(i)] = v12.renderItem(v, v29)
+		else
+			t3[tostring(i)] = v12.renderItem(v, v29)
+		end
+	end
+
+	local v30 = v22:map(function(n1: number) -- line: 136
+		return UDim2.new(0, math.floor(n1 + 0.5), 0, 0)
+	end)
+
+	if v12.leadingComponent then
+		t3["0"] = v12.leadingComponent
+	end
+
+	if v12.trailingComponent then
+		t3[":"] = v12.trailingComponent
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = v12.clipsDescendants,
+		Size = v12.size,
+		Position = v12.position,
+		Visible = v12.visible,
+		ZIndex = v12.zIndex,
+		[React.Change.AbsoluteSize] = v21
+	}, {
+		AnimatedFrame = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			Position = v30,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = if not v12.backgroundColor then v13.Theme.NavigationBar.Color else v12.backgroundColor.Color,
+			BackgroundTransparency = if not v12.backgroundColor then v13.Theme.NavigationBar.Transparency else v12.backgroundColor.Transparency
+		}, {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, v14),
+				PaddingBottom = UDim.new(0, v15),
+				PaddingLeft = UDim.new(0, v16),
+				PaddingRight = UDim.new(0, v17)
+			}),
+			MainFrame = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Top,
+					Padding = UDim.new(0, v13.Tokens.Global.Space_200)
+				}),
+				PrimaryItems = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, t3),
+				CenteredSecondaryItems = if not v26 or v12.alignment ~= NavigationRailAlignment.Centered then nil else React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Size = UDim2.fromScale(1, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, t4)
+			}),
+			JustifiedSecondaryItems = if not v26 or v12.alignment ~= NavigationRailAlignment.Justified then nil else React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, t4)
+		})
+	})
+end
+
+return NavigationRail

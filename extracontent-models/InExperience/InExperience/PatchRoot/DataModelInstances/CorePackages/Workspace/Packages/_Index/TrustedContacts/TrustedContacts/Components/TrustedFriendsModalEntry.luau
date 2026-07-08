@@ -1,1 +1,1 @@
-return require(script.TrustedFriendsModalEntry);
+return require(script.TrustedFriendsModalEntry)

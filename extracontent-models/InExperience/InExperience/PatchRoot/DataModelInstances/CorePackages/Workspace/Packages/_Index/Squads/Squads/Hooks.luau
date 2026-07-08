@@ -1,4 +1,4 @@
 return {
-    useCanAccessParty = require(script.useCanAccessParty), 
-    useIsExperienceInvitePending = require(script.useIsExperienceInvitePending)
-};
+	useCanAccessParty = require(script.useCanAccessParty),
+	useIsExperienceInvitePending = require(script.useIsExperienceInvitePending)
+}

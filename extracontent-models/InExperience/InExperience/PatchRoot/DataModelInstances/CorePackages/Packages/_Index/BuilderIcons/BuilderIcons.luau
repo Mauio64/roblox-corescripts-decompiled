@@ -1,12 +1,16 @@
-local v0 = require(script.Icon);
-local v1 = require(script.IconVariant);
-local v2 = require(script.Font);
-local v3 = require(script.Migration);
-local v4 = require(script.getKeycodeBuilderIcon);
+local Icon = require(script.Icon)
+local IconVariant = require(script.IconVariant)
+local Font = require(script.Font)
+local Migration = require(script.Migration)
+local builderIconPlatformUtils = require(script.builderIconPlatformUtils)
+local getBuilderIconForKeycode = builderIconPlatformUtils.getBuilderIconForKeycode
+local getBuilderIconForCurrentPlatform = builderIconPlatformUtils.getBuilderIconForCurrentPlatform
+
 return {
-    Icon = v0, 
-    IconVariant = v1, 
-    Font = v2, 
-    Migration = v3, 
-    getBuilderIconForKeycode = v4
-};
+	Icon = Icon,
+	IconVariant = IconVariant,
+	Font = Font,
+	Migration = Migration,
+	getBuilderIconForKeycode = getBuilderIconForKeycode,
+	getBuilderIconForCurrentPlatform = getBuilderIconForCurrentPlatform
+}

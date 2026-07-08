@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateCatalogResultListNavigationToMVVM", false);
+return game:DefineFastFlag("AXMigrateCatalogResultListNavigationToMVVM", false)

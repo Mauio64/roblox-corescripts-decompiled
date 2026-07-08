@@ -1,4 +1,4 @@
 return {
-    Stacked = "Stacked", 
-    Spread = "Spread"
-};
+	Stacked = "Stacked",
+	Spread = "Spread"
+}

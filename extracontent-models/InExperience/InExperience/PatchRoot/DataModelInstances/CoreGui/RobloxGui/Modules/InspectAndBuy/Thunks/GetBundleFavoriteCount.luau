@@ -1,41 +1,43 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_PerformFetch_0 = require(l_CorePackages_0.Workspace.Packages.Http).PerformFetch;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Thunk);
-local v4 = require(l_Parent_0.Services.Network);
-local v5 = require(l_Parent_0.Actions.SetBundles);
-local v6 = require(l_Parent_0.Models.BundleInfo);
-local v7 = require(l_Parent_0.createInspectAndBuyKeyMapper);
-local v8 = require(l_Parent_0.Thunks.SendCounter);
-local v9 = require(l_Parent_0.Constants);
-local v10 = {
-    v4
-};
-local v11 = v7("getBundleFavoriteCount");
-return function(v12) --[[ Line: 21 ]] --[[ Name: GetBundleFavoriteCount ]]
-    -- upvalues: v3 (copy), v10 (copy), v4 (copy), v11 (copy), l_PerformFetch_0 (copy), v6 (copy), v5 (copy), v8 (copy), v9 (copy)
-    return v3.new(script.Name, v10, function(v13, v14) --[[ Line: 22 ]]
-        -- upvalues: v4 (ref), v11 (ref), v12 (copy), l_PerformFetch_0 (ref), v6 (ref), v5 (ref), v8 (ref), v9 (ref)
-        local v15 = v14[v4];
-        local v16 = v11(v13:getState().storeId, v12);
-        return l_PerformFetch_0.Single(v16, function(_) --[[ Line: 27 ]]
-            -- upvalues: v15 (copy), v12 (ref), v6 (ref), v13 (copy), v5 (ref), v8 (ref), v9 (ref)
-            return v15.getBundleFavoriteCount(v12):andThen(function(v18) --[[ Line: 28 ]]
-                -- upvalues: v6 (ref), v12 (ref), v13 (ref), v5 (ref), v8 (ref), v9 (ref)
-                if v18 then
-                    local v19 = v6.fromGetBundleFavoriteCount(v12, v18);
-                    v13:dispatch(v5({
-                        v19
-                    }));
-                end;
-                v13:dispatch(v8(v9.Counters.GetBundleFavoriteCount .. v9.CounterSuffix.RequestSucceeded));
-            end, function(_) --[[ Line: 36 ]]
-                -- upvalues: v13 (ref), v8 (ref), v9 (ref)
-                v13:dispatch(v8(v9.Counters.GetBundleFavoriteCount .. v9.CounterSuffix.RequestRejected));
-            end);
-        end)(v13):catch(function(_) --[[ Line: 41 ]]
-            -- upvalues: v13 (copy), v8 (ref), v9 (ref)
-            v13:dispatch(v8(v9.Counters.GetBundleFavoriteCount .. v9.CounterSuffix.RequestFailed));
-        end);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local Network = require(ParentParent.Services.Network)
+local SetBundles = require(ParentParent.Actions.SetBundles)
+local BundleInfo = require(ParentParent.Models.BundleInfo)
+local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local Constants = require(ParentParent.Constants)
+local t1 = { Network }
+local v12 = createInspectAndBuyKeyMapper("getBundleFavoriteCount")
+
+local function GetBundleFavoriteCount(p1) -- line: 21
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v12 (copy), PerformFetch (copy), BundleInfo (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 22
+		-- upvalues: Network (copy), v12 (copy), p1 (copy), PerformFetch (copy), BundleInfo (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+		local v17 = p3[Network]
+		local v18 = v12(p2:getState().storeId, p1)
+
+		return PerformFetch.Single(v18, function(_) -- line: 27
+			-- upvalues: v17 (copy), p1 (copy), BundleInfo (copy), p2 (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+			return v17.getBundleFavoriteCount(p1):andThen(function(p5) -- line: 28
+				-- upvalues: BundleInfo (copy), p1 (copy), p2 (copy), SetBundles (copy), SendCounter (copy), Constants (copy)
+				if p5 then
+					local v22 = BundleInfo.fromGetBundleFavoriteCount(p1, p5)
+
+					p2:dispatch(SetBundles({ v22 }))
+				end
+
+				p2:dispatch(SendCounter(Constants.Counters.GetBundleFavoriteCount .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_) -- line: 36
+				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+				p2:dispatch(SendCounter(Constants.Counters.GetBundleFavoriteCount .. Constants.CounterSuffix.RequestRejected))
+			end)
+		end)(p2):catch(function(_) -- line: 41
+			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+			p2:dispatch(SendCounter(Constants.Counters.GetBundleFavoriteCount .. Constants.CounterSuffix.RequestFailed))
+		end)
+	end)
+end
+
+return GetBundleFavoriteCount

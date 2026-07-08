@@ -1,12 +1,15 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Map_0 = require(l_Parent_0.LuauPolyfill).Map;
+local ParentParent = script.Parent.Parent.Parent
+local Map = require(ParentParent.LuauPolyfill).Map
+
 return {
-    keyValMap = function(v2, v3, v4) --[[ Line: 32 ]] --[[ Name: keyValMap ]]
-        -- upvalues: l_Map_0 (copy)
-        local v5 = l_Map_0.new();
-        for _, v7 in ipairs(v2) do
-            v5:set(v3(v7), v4(v7));
-        end;
-        return v5;
-    end
-};
+	keyValMap = function(p1, p2: ((...any) -> ...any), p3: ((...any) -> ...any)) -- line: 32
+		-- upvalues: Map (copy)
+		local v6 = Map.new()
+
+		for _, v in ipairs(p1) do
+			v6:set(p2(v), p3(v))
+		end
+
+		return v6
+	end
+}

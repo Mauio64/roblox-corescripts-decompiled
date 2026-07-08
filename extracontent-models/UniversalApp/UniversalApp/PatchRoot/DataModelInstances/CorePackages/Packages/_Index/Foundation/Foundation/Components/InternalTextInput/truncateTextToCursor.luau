@@ -1,27 +1,34 @@
-local function _(v0, v1) --[[ Line: 10 ]] --[[ Name: charAt ]]
-    return v0:sub(v1, v1);
-end;
-return function(v3) --[[ Line: 27 ]] --[[ Name: truncateTextToCursor ]]
-    local l_CursorPosition_0 = v3.CursorPosition;
-    if l_CursorPosition_0 == -1 then
-        return "";
-    else
-        local l_Text_0 = v3.Text;
-        local v6 = v3.TextSize * v3.LineHeight / 1.4;
-        local v7 = l_CursorPosition_0 + v3.AbsoluteSize.X / v6;
-        local v8 = string.find(l_Text_0, "\n", l_CursorPosition_0) or 1e999;
-        local v9 = string.find(l_Text_0, "[ \t\f\v]", l_CursorPosition_0) or 1e999;
-        local v10 = math.min(v8 - 1, v9, #l_Text_0);
-        local v11 = l_Text_0:sub(l_CursorPosition_0, l_CursorPosition_0):match("\n");
-        if v11 then
-            local v12 = l_CursorPosition_0 - 1;
-            v11 = l_Text_0:sub(v12, v12):match("\n") or l_CursorPosition_0 == 1;
-        end;
-        if v11 then
-            v10 = l_CursorPosition_0 - 1;
-        elseif v7 < v10 then
-            v10 = l_CursorPosition_0;
-        end;
-        return utf8.char(utf8.codepoint(l_Text_0, 1, v10));
-    end;
-end;
+local function charAt(s1: string, n1: number) -- line: 10
+	return s1:sub(n1, n1)
+end
+local function truncateTextToCursor(p1) -- line: 27
+	local CursorPosition = p1.CursorPosition
+
+	if CursorPosition == -1 then
+		return ""
+	end
+
+	local p1Text = p1.Text
+	local v8 = p1.TextSize * p1.LineHeight / 1.4
+	local v9 = CursorPosition + p1.AbsoluteSize.X / v8
+	local v10 = string.find(p1Text, "\n", CursorPosition) or 1e999
+	local v11 = string.find(p1Text, "[ \t\f\v]", CursorPosition) or 1e999
+	local v12 = math.min(v10 - 1, v11, #p1Text)
+	local v13 = p1Text:sub(CursorPosition, CursorPosition):match("\n")
+
+	if v13 then
+		local v14 = CursorPosition - 1
+
+		v13 = p1Text:sub(v14, v14):match("\n") or CursorPosition == 1
+	end
+
+	if v13 then
+		v12 = CursorPosition - 1
+	elseif v9 < v12 then
+		v12 = CursorPosition
+	end
+
+	return utf8.char(utf8.codepoint(p1Text, 1, v12))
+end
+
+return truncateTextToCursor

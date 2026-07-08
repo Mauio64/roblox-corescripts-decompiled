@@ -1,13 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v3 = require(l_Parent_0.ArgCheck);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-return function(v6, v7) --[[ Line: 12 ]]
-    -- upvalues: v3 (copy), l_LocalizationService_0 (copy), l_Url_0 (copy)
-    v3.assert(v7, "abuseVector is required");
-    v3.isType(v7, "string", "fetchBeduiData expects abuseVector as a string");
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    return v6(("%*abuse-reporting/v1/dynamic-dialog-sequential?context=%*&locale=%*&surface=ua&version=v1"):format(l_Url_0.APIS_URL, v7, l_RobloxLocaleId_0), "GET");
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local LocalizationService = game:GetService("LocalizationService")
+local ArgCheck = require(GenericAbuseReportingParent.ArgCheck)
+local Url = require(GenericAbuseReportingParent.Http).Url
+
+require(GenericAbuseReporting.Enums.AbuseVector)
+
+return function(p1, p2) -- line: 12
+	-- upvalues: ArgCheck (copy), LocalizationService (copy), Url (copy)
+	ArgCheck.assert(p2, "abuseVector is required")
+	ArgCheck.isType(p2, "string", "fetchBeduiData expects abuseVector as a string")
+
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+
+	return p1(`{ Url.APIS_URL }abuse-reporting/v1/dynamic-dialog-sequential?context={ p2 }&locale={ RobloxLocaleId }&surface=ua&version=v1`, "GET")
+end

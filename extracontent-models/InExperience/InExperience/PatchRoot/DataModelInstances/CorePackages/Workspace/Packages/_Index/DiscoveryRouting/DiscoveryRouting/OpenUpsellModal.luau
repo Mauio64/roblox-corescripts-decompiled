@@ -1,18 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryRouting").Parent;
-local l_CentralOverlayType_0 = require(l_Parent_0.RobloxAppEnums).CentralOverlayType;
-local l_SetCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Actions.SetCentralOverlay;
-return function(v3, v4, v5, v6, v7, v8, v9) --[[ Line: 7 ]]
-    -- upvalues: l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy)
-    return function(v10) --[[ Line: 16 ]]
-        -- upvalues: l_SetCentralOverlay_0 (ref), l_CentralOverlayType_0 (ref), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy)
-        v10:dispatch(l_SetCentralOverlay_0(l_CentralOverlayType_0.UpsellModal, {
-            titleText = v3, 
-            bodyText = v4, 
-            actionButtonText = v5, 
-            cancelButtonText = v6, 
-            onActionButtonClick = v7, 
-            onCancelButtonClick = v8, 
-            onCloseModal = v9
-        }));
-    end;
-end;
+local Parent = script:FindFirstAncestor("DiscoveryRouting").Parent
+local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
+local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+
+return function(p1, p2, p3, p4, p5, p6, p7) -- line: 7
+	-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
+	return function(p8) -- line: 16
+		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), p1 (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy), p6 (copy), p7 (copy)
+		p8:dispatch(SetCentralOverlay(CentralOverlayType.UpsellModal, {
+			titleText = p1,
+			bodyText = p2,
+			actionButtonText = p3,
+			cancelButtonText = p4,
+			onActionButtonClick = p5,
+			onCancelButtonClick = p6,
+			onCloseModal = p7
+		}))
+	end
+end

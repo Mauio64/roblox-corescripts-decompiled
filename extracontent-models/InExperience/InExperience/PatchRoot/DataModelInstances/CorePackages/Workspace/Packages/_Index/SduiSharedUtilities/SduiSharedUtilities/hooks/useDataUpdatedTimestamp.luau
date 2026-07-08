@@ -1,17 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiSharedUtilities");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_script_FirstAncestor_0.getSduiApiStore);
-return function(v5, v6) --[[ Line: 7 ]] --[[ Name: useDataUpdatedTimestamp ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    local v9 = v2.useCallback(function(v7) --[[ Line: 8 ]]
-        -- upvalues: v6 (copy), v5 (copy), v4 (ref)
-        local v8 = if v6 then ("%*_%*"):format(v5, v6) else nil;
-        return v4().getDataUpdatedTimestamp(v5, v7, v8);
-    end, {
-        v5, 
-        v6
-    });
-    return v3.useSignalState(v9);
-end;
+local SduiSharedUtilities = script:FindFirstAncestor("SduiSharedUtilities")
+local SduiSharedUtilitiesParent = SduiSharedUtilities.Parent
+local React = require(SduiSharedUtilitiesParent.React)
+local SignalsReact = require(SduiSharedUtilitiesParent.SignalsReact)
+local getSduiApiStore = require(SduiSharedUtilities.getSduiApiStore)
+
+local function useDataUpdatedTimestamp(s1: string, s2: string?) -- line: 7
+	-- upvalues: React (copy), getSduiApiStore (copy), SignalsReact (copy)
+	local v9 = React.useCallback(function(p1) -- line: 8
+		-- upvalues: s2 (copy), s1 (copy), getSduiApiStore (copy)
+		local v11 = if not s2 then nil else `{ s1 }_{ s2 }`
+
+		return getSduiApiStore().getDataUpdatedTimestamp(s1, p1, v11)
+	end, {
+		s1,
+		s2
+	})
+
+	return SignalsReact.useSignalState(v9)
+end
+
+return useDataUpdatedTimestamp

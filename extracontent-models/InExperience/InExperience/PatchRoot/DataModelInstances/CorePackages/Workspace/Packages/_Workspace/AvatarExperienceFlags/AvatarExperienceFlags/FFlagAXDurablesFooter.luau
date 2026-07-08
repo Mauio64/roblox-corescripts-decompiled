@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXDurablesFooter2", false);
+return game:DefineFastFlag("AXDurablesFooter2", false)

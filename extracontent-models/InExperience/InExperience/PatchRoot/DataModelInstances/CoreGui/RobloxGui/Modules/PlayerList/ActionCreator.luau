@@ -1,15 +1,18 @@
-return function(v0, v1) --[[ Line: 3 ]]
-    assert(type(v0) == "string", "A name must be provided to create an Action");
-    assert(type(v1) == "function", "A function must be provided to create an Action");
-    return (setmetatable({
-        name = v0
-    }, {
-        __call = function(_, ...) --[[ Line: 10 ]] --[[ Name: __call ]]
-            -- upvalues: v1 (copy), v0 (copy)
-            local v3 = v1(...);
-            assert(type(v3) == "table", "An action must return a table");
-            v3.type = v0;
-            return v3;
-        end
-    }));
-end;
+return function(p1, p2) -- line: 3
+	assert(type(p1) == "string", "A name must be provided to create an Action")
+	assert(type(p2) == "function", "A function must be provided to create an Action")
+
+	return (setmetatable({
+		name = p1
+	}, {
+		__call = function(_, ...) -- line: 10
+			-- upvalues: p2 (copy), p1 (copy)
+			local v4 = p2(...)
+
+			assert(type(v4) == "table", "An action must return a table")
+			v4.type = p1
+
+			return v4
+		end
+	}))
+end

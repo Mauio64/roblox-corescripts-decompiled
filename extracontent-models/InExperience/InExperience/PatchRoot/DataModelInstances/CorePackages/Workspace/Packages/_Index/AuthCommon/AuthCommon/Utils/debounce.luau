@@ -1,17 +1,17 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local v2 = 0;
-    return function(...) --[[ Line: 3 ]]
-        -- upvalues: v2 (ref), v1 (copy), v0 (copy)
-        local v3 = {
-            ...
-        };
-        local v4 = time();
-        v2 = v4;
-        task.delay(v1, function() --[[ Line: 7 ]]
-            -- upvalues: v2 (ref), v4 (copy), v0 (ref), v3 (copy)
-            if v2 == v4 then
-                v0(unpack(v3));
-            end;
-        end);
-    end;
-end;
+return function(p1, n1: number?) -- line: 1
+	local n2 = 0
+
+	return function(...) -- line: 3
+		-- upvalues: n2 (ref), n1 (copy), p1 (copy)
+		local t1 = { ... }
+		local v5 = time()
+
+		n2 = v5
+		task.delay(n1, function() -- line: 7
+			-- upvalues: n2 (ref), v5 (copy), p1 (copy), t1 (copy)
+			if n2 == v5 then
+				p1(unpack(t1))
+			end
+		end)
+	end
+end

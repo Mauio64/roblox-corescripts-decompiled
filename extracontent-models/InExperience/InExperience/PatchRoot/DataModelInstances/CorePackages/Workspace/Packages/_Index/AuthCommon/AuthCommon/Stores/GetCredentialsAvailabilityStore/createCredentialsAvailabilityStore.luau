@@ -1,19 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.Signals);
-return function() --[[ Line: 17 ]]
-    -- upvalues: v1 (copy)
-    local v2, v3 = v1.createSignal(false);
-    local v4, v5 = v1.createSignal(false);
-    local v6, v7 = v1.createSignal(false);
-    local v8, v9 = v1.createSignal(false);
-    return {
-        getFido2Available = v2, 
-        setFido2Available = v3, 
-        getFido2SupportsDeviceBoundOnly = v4, 
-        setFido2SupportsDeviceBoundOnly = v5, 
-        getPasswordsAvailable = v6, 
-        setPasswordsAvailable = v7, 
-        getV2InterfaceSupported = v8, 
-        setV2InterfaceSupported = v9
-    };
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local Signals = require(Parent.Signals)
+
+return function() -- line: 17
+	-- upvalues: Signals (copy)
+	local v3, v4 = Signals.createSignal(false)
+	local v5, v6 = Signals.createSignal(false)
+	local v7, v8 = Signals.createSignal(false)
+	local v9, v10 = Signals.createSignal(false)
+
+	return {
+		getFido2Available = v3,
+		setFido2Available = v4,
+		getFido2SupportsDeviceBoundOnly = v5,
+		setFido2SupportsDeviceBoundOnly = v6,
+		getPasswordsAvailable = v7,
+		setPasswordsAvailable = v8,
+		getV2InterfaceSupported = v9,
+		setV2InterfaceSupported = v10
+	}
+end

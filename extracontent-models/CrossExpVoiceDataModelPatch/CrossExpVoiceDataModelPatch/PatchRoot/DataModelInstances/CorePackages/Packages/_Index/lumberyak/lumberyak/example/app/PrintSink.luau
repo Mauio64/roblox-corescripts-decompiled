@@ -1,24 +1,31 @@
-local v0 = require(script.Parent.Parent.Parent.Logger);
-local v1 = {};
-v1.new = function(v2) --[[ Line: 5 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy)
-    local v3 = {
-        maxLevel = v2
-    };
-    setmetatable(v3, v1);
-    return v3;
-end;
-v1.log = function(_, v5, v6) --[[ Line: 14 ]] --[[ Name: log ]]
-    -- upvalues: v0 (copy)
-    if v6.level == v0.Levels.Error then
-        error(v5, 5);
-        return;
-    elseif v6.level == v0.Levels.Warning then
-        warn(v5);
-        return;
-    else
-        print(v5);
-        return;
-    end;
-end;
-return v1;
+local Logger = require(script.Parent.Parent.Parent.Logger)
+local t1 = {}
+
+function t1.new(p1) -- line: 5
+	-- upvalues: t1 (copy)
+	local t2 = {
+		maxLevel = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.log(_, p3, p4) -- line: 14
+	-- upvalues: Logger (copy)
+	if p4.level == Logger.Levels.Error then
+		error(p3, 5)
+
+		return
+	end
+
+	if p4.level == Logger.Levels.Warning then
+		warn(p3)
+
+		return
+	end
+
+	print(p3)
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableBlackbirdPageCloseCallback2", false);
+return game:DefineFastFlag("EnableBlackbirdPageCloseCallback2", false)

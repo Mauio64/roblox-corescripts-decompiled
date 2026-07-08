@@ -1,35 +1,34 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_devAssert_0 = require(l_Parent_0.jsutils.devAssert).devAssert;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local v3 = nil;
-local v4 = nil;
-v4 = function(v5) --[[ Line: 23 ]] --[[ Name: assertValidName ]]
-    -- upvalues: v3 (ref)
-    local v6 = v3(v5);
-    if v6 then
-        error(v6);
-    end;
-    return v5;
-end;
-v3 = function(v7) --[[ Line: 34 ]] --[[ Name: isValidNameError ]]
-    -- upvalues: l_devAssert_0 (copy), l_GraphQLError_0 (copy)
-    l_devAssert_0(type(v7) == "string", "Expected name to be a string.");
-    if string.len(v7) > 1 and v7:sub(1, 1) == "_" and v7:sub(2, 2) == "_" then
-        return l_GraphQLError_0.new("Name \"" .. v7 .. "\" must not begin with \"__\", which is reserved by GraphQL introspection.");
-    else
-        local v8, v9 = string.find(v7, "[_%a][_%a%d]*");
-        local v10 = false;
-        if v8 == 1 then
-            v10 = string.len(v7) == v9;
-        end;
-        if not v10 then
-            return l_GraphQLError_0.new("Names must match [_%a][_%a%d]* but \"" .. v7 .. "\" does not.");
-        else
-            return nil;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local devAssert = require(ParentParent.jsutils.devAssert).devAssert
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+
+local function isValidNameError(s1: string) -- line: 34
+	-- upvalues: devAssert (copy), GraphQLError (copy)
+	devAssert(type(s1) == "string", "Expected name to be a string.")
+
+	if string.len(s1) > 1 and s1:sub(1, 1) == "_" and s1:sub(2, 2) == "_" then
+		return GraphQLError.new("Name \"" .. s1 .. "\" must not begin with \"__\", which is reserved by GraphQL introspection.")
+	end
+
+	local start, stop = string.find(s1, "[_%a][_%a%d]*")
+
+	if start ~= 1 or stop ~= string.len(s1) then
+		return GraphQLError.new("Names must match [_%a][_%a%d]* but \"" .. s1 .. "\" does not.")
+	end
+
+	return nil
+end
+
 return {
-    assertValidName = v4, 
-    isValidNameError = v3
-};
+	assertValidName = function(s2: string) -- line: 23
+		-- upvalues: isValidNameError (ref)
+		local v6 = isValidNameError(s2)
+
+		if v6 then
+			error(v6)
+		end
+
+		return s2
+	end,
+	isValidNameError = isValidNameError
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSlotAvatarThumbnailPromptFix", false);
+return game:DefineFastFlag("AXSlotAvatarThumbnailPromptFix", false)

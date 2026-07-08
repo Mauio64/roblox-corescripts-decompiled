@@ -1,27 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local v5 = require(l_script_FirstAncestor_0.Common.Constants);
-local v6 = require(l_script_FirstAncestor_0.BaseComponents.Tile);
-local l_FFlagConnectionsToFriendsRename_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsToFriendsRename;
-local v8 = game:DefineFastFlag("UpdateSocialCarouselAddFriendsIcon", false) and "icons/actions/friend_sort/add_friends" or "icons/common/plus_heavy";
-return function(v9) --[[ Line: 18 ]] --[[ Name: AddFriendsTile ]]
-    -- upvalues: l_useAppPolicy_0 (copy), l_useLocalization_0 (copy), l_FFlagConnectionsToFriendsRename_0 (copy), v5 (copy), v2 (copy), v6 (copy), v8 (copy)
-    local v11 = l_useAppPolicy_0(function(v10) --[[ Line: 19 ]]
-        return v10.getRenameFriendsToConnections();
-    end);
-    local v12 = l_useLocalization_0({
-        addFriendsHeading = if l_FFlagConnectionsToFriendsRename_0 then v5.LOCALIZATION.ADD_FRIENDS_HEADING else if v11 then v5.LOCALIZATION.ADD_CONNECTIONS_HEADING else v5.LOCALIZATION.ADD_FRIENDS_HEADING
-    });
-    return v2.createElement(v6, {
-        index = v9.index, 
-        itemSize = v9.itemSize, 
-        onActivated = v9.onActivated, 
-        title = v12.addFriendsHeading, 
-        icon = v8, 
-        selectionOrder = v9.selectionOrder, 
-        badge = v9.badge
-    });
-end;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local React = require(SocialCarouselParent.React)
+local useLocalization = require(SocialCarouselParent.Localization).Hooks.useLocalization
+local useAppPolicy = require(SocialCarouselParent.UniversalAppPolicy).useAppPolicy
+local Constants = require(SocialCarousel.Common.Constants)
+local Tile = require(SocialCarousel.BaseComponents.Tile)
+local FFlagConnectionsToFriendsRename = require(SocialCarouselParent.SharedFlags).FFlagConnectionsToFriendsRename
+local v9 = not game:DefineFastFlag("UpdateSocialCarouselAddFriendsIcon", false) and "icons/common/plus_heavy" or "icons/actions/friend_sort/add_friends"
+
+local function AddFriendsTile(p1) -- line: 18
+	-- upvalues: useAppPolicy (copy), useLocalization (copy), FFlagConnectionsToFriendsRename (copy), Constants (copy), React (copy), Tile (copy), v9 (copy)
+	local v12 = useAppPolicy(function(p2) -- line: 19
+		return p2.getRenameFriendsToConnections()
+	end)
+	local v13 = useLocalization({
+		addFriendsHeading = if not FFlagConnectionsToFriendsRename then if not v12 then Constants.LOCALIZATION.ADD_FRIENDS_HEADING else Constants.LOCALIZATION.ADD_CONNECTIONS_HEADING else Constants.LOCALIZATION.ADD_FRIENDS_HEADING
+	})
+
+	return React.createElement(Tile, {
+		index = p1.index,
+		itemSize = p1.itemSize,
+		onActivated = p1.onActivated,
+		title = v13.addFriendsHeading,
+		icon = v9,
+		selectionOrder = p1.selectionOrder,
+		badge = p1.badge
+	})
+end
+
+return AddFriendsTile

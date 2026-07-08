@@ -1,38 +1,39 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local v3 = require(l_CorePackages_0.Packages.React);
-local v4 = require(l_CorePackages_0.Workspace.Packages.InputUi);
-local l_GamepadDisconnectedModal_0 = v4.Gamepad.GamepadDisconnectedModal;
-local l_useGamepadDisconnectOverlayEffect_0 = v4.Gamepad.useGamepadDisconnectOverlayEffect;
-local v7 = require(l_CoreGui_0.RobloxGui.Modules.InGameMenuConstants);
-local v8 = require(l_CorePackages_0.Workspace.Packages.Analytics).AnalyticsReporters.EventIngest.new(l_EventIngestService_0);
-return function() --[[ Line: 14 ]] --[[ Name: CoreScriptsGamepadDisconnectListener ]]
-    -- upvalues: v3 (copy), l_useGamepadDisconnectOverlayEffect_0 (copy), v8 (copy), v7 (copy), l_GamepadDisconnectedModal_0 (copy)
-    local v9, v10 = v3.useState(false);
-    local v11 = v3.useCallback(function() --[[ Line: 16 ]]
-        -- upvalues: v10 (copy)
-        v10(false);
-    end, {
-        v10
-    });
-    local v12 = v3.useCallback(function() --[[ Line: 19 ]]
-        -- upvalues: v10 (copy)
-        v10(true);
-    end, {
-        v10
-    });
-    l_useGamepadDisconnectOverlayEffect_0(v12, v11, v8, "InExperience");
-    if v9 then
-        return v3.createElement("ScreenGui", {
-            DisplayOrder = v7.DisplayOrder.HeadsetDisconnectedDialog, 
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = true, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        }, {
-            GamepadDisconnectedModal = v3.createElement(l_GamepadDisconnectedModal_0)
-        });
-    else
-        return nil;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local EventIngestService = game:GetService("EventIngestService")
+local React = require(CorePackages.Packages.React)
+local InputUi = require(CorePackages.Workspace.Packages.InputUi)
+local GamepadDisconnectedModal = InputUi.Gamepad.GamepadDisconnectedModal
+local useGamepadDisconnectOverlayEffect = InputUi.Gamepad.useGamepadDisconnectOverlayEffect
+local InGameMenuConstants = require(CoreGui.RobloxGui.Modules.InGameMenuConstants)
+local v9 = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventIngest.new(EventIngestService)
+
+local function CoreScriptsGamepadDisconnectListener() -- line: 14
+	-- upvalues: React (copy), useGamepadDisconnectOverlayEffect (copy), v9 (copy), InGameMenuConstants (copy), GamepadDisconnectedModal (copy)
+	local v11, v12 = React.useState(false)
+	local v13 = React.useCallback(function() -- line: 16
+		-- upvalues: v12 (copy)
+		v12(false)
+	end, { v12 })
+	local v14 = React.useCallback(function() -- line: 19
+		-- upvalues: v12 (copy)
+		v12(true)
+	end, { v12 })
+
+	useGamepadDisconnectOverlayEffect(v14, v13, v9, "InExperience")
+
+	if v11 then
+		return React.createElement("ScreenGui", {
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true,
+			DisplayOrder = InGameMenuConstants.DisplayOrder.HeadsetDisconnectedDialog,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		}, {
+			GamepadDisconnectedModal = React.createElement(GamepadDisconnectedModal)
+		})
+	end
+
+	return nil
+end
+
+return CoreScriptsGamepadDisconnectListener

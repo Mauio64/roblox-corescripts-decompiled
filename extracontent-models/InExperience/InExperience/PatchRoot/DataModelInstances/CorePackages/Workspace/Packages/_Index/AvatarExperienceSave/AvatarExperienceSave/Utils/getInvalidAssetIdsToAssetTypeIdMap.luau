@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getInvalidAssetIdsToAssetTypeIdMap ]]
-    local v2 = {};
-    for v3, v4 in v0 do
-        if not v1[v3] then
-            v2[v3] = v4;
-        end;
-    end;
-    return v2;
-end;
+local function getInvalidAssetIdsToAssetTypeIdMap(t1: {[any]: any}, t2: {[any]: any}) -- line: 1
+	local t3 = {}
+
+	for v5, v6 in t1 do
+		if not t2[v5] then
+			t3[v5] = v6
+		end
+	end
+
+	return t3
+end
+
+return getInvalidAssetIdsToAssetTypeIdMap

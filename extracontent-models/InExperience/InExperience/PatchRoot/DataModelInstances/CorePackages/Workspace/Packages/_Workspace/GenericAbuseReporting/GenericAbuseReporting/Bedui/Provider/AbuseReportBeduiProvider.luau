@@ -1,80 +1,87 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local v5 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiContext);
-local l_AbuseReportBeduiContextStatus_0 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes).AbuseReportBeduiContextStatus;
-local v7 = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-local v8 = require(l_script_FirstAncestor_0.Bedui.Provider.fetchBeduiData);
-local v9 = require(l_script_FirstAncestor_0.Bedui.Provider.validateBeduiData);
-local v10 = game:DefineFastFlag("FallbackGenericAbuseReporting", false);
-return function(v11) --[[ Line: 35 ]] --[[ Name: AbuseReportBeduiProvider ]]
-    -- upvalues: v2 (copy), l_AbuseReportBeduiContextStatus_0 (copy), l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), v8 (copy), v9 (copy), v10 (copy), v7 (copy), v5 (copy)
-    local v12, v13 = v2.useState({
-        status = l_AbuseReportBeduiContextStatus_0.Loading
-    });
-    local v14 = l_useRoactService_0(l_RoactNetworking_0);
-    v2.useEffect(function() --[[ Line: 41 ]]
-        -- upvalues: v8 (ref), v14 (copy), v11 (copy), v9 (ref), v10 (ref), v7 (ref), v13 (copy), l_AbuseReportBeduiContextStatus_0 (ref)
-        v8(v14, v11.abuseVector):andThen(function(v15) --[[ Line: 43 ]]
-            -- upvalues: v9 (ref), v10 (ref), v8 (ref), v14 (ref), v7 (ref), v13 (ref), l_AbuseReportBeduiContextStatus_0 (ref)
-            local v16, v17 = v9(v15.responseBody);
-            if not v16 then
-                warn("Invalid Bedui data:", v17);
-                if v10 then
-                    v8(v14, v7.Common):andThen(function(v18) --[[ Line: 51 ]]
-                        -- upvalues: v9 (ref), v13 (ref), l_AbuseReportBeduiContextStatus_0 (ref)
-                        local v19, v20 = v9(v18.responseBody);
-                        if not v19 then
-                            warn("Invalid Bedui common data:", v20);
-                            v13({
-                                status = l_AbuseReportBeduiContextStatus_0.Error, 
-                                error = v20
-                            });
-                            return;
-                        else
-                            v13({
-                                status = l_AbuseReportBeduiContextStatus_0.Success, 
-                                beduiData = v18.responseBody
-                            });
-                            return;
-                        end;
-                    end):catch(function(v21) --[[ Line: 67 ]]
-                        -- upvalues: v13 (ref), l_AbuseReportBeduiContextStatus_0 (ref)
-                        warn("Failed to get Bedui common data");
-                        v13({
-                            status = l_AbuseReportBeduiContextStatus_0.Error, 
-                            error = v21
-                        });
-                    end);
-                    return;
-                else
-                    v13({
-                        status = l_AbuseReportBeduiContextStatus_0.Error, 
-                        error = v17
-                    });
-                    return;
-                end;
-            else
-                v13({
-                    status = l_AbuseReportBeduiContextStatus_0.Success, 
-                    beduiData = v15.responseBody
-                });
-                return;
-            end;
-        end):catch(function(v22) --[[ Line: 87 ]]
-            -- upvalues: v13 (ref), l_AbuseReportBeduiContextStatus_0 (ref)
-            warn("Failed to get Bedui data");
-            v13({
-                status = l_AbuseReportBeduiContextStatus_0.Error, 
-                error = v22
-            });
-        end);
-    end, {
-        v11.abuseVector
-    });
-    return v2.createElement(v5.Provider, {
-        value = v12
-    }, v11.children);
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+local RoactNetworking = require(GenericAbuseReportingParent.RoactServiceTags).RoactNetworking
+local useRoactService = require(GenericAbuseReportingParent.RobloxAppHooks).useRoactService
+local AbuseReportBeduiContext = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiContext)
+local AbuseReportBeduiContextStatus = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).AbuseReportBeduiContextStatus
+local AbuseVector = require(GenericAbuseReporting.Enums.AbuseVector)
+local fetchBeduiData = require(GenericAbuseReporting.Bedui.Provider.fetchBeduiData)
+local validateBeduiData = require(GenericAbuseReporting.Bedui.Provider.validateBeduiData)
+local v11 = game:DefineFastFlag("FallbackGenericAbuseReporting", false)
+
+local function AbuseReportBeduiProvider(t1: {[any]: any}) -- line: 35
+	-- upvalues: React (copy), AbuseReportBeduiContextStatus (copy), useRoactService (copy), RoactNetworking (copy), fetchBeduiData (copy), validateBeduiData (copy), v11 (copy), AbuseVector (copy), AbuseReportBeduiContext (copy)
+	local v14, v15 = React.useState({
+		status = AbuseReportBeduiContextStatus.Loading
+	})
+	local v16 = useRoactService(RoactNetworking)
+
+	React.useEffect(function() -- line: 41
+		-- upvalues: fetchBeduiData (copy), v16 (copy), t1 (copy), validateBeduiData (copy), v11 (copy), AbuseVector (copy), v15 (copy), AbuseReportBeduiContextStatus (copy)
+		fetchBeduiData(v16, t1.abuseVector):andThen(function(p1) -- line: 43
+			-- upvalues: validateBeduiData (copy), v11 (copy), fetchBeduiData (copy), v16 (copy), AbuseVector (copy), v15 (copy), AbuseReportBeduiContextStatus (copy)
+			local v18, v19 = validateBeduiData(p1.responseBody)
+
+			if not v18 then
+				warn("Invalid Bedui data:", v19)
+
+				if v11 then
+					fetchBeduiData(v16, AbuseVector.Common):andThen(function(p2) -- line: 51
+						-- upvalues: validateBeduiData (copy), v15 (copy), AbuseReportBeduiContextStatus (copy)
+						local v22, v23 = validateBeduiData(p2.responseBody)
+
+						if not v22 then
+							warn("Invalid Bedui common data:", v23)
+							v15({
+								status = AbuseReportBeduiContextStatus.Error,
+								error = v23
+							})
+
+							return
+						end
+
+						v15({
+							status = AbuseReportBeduiContextStatus.Success,
+							beduiData = p2.responseBody
+						})
+					end):catch(function(p3) -- line: 67
+						-- upvalues: v15 (copy), AbuseReportBeduiContextStatus (copy)
+						warn("Failed to get Bedui common data")
+						v15({
+							status = AbuseReportBeduiContextStatus.Error,
+							error = p3
+						})
+					end)
+
+					return
+				end
+
+				v15({
+					status = AbuseReportBeduiContextStatus.Error,
+					error = v19
+				})
+
+				return
+			end
+
+			v15({
+				status = AbuseReportBeduiContextStatus.Success,
+				beduiData = p1.responseBody
+			})
+		end):catch(function(p4) -- line: 87
+			-- upvalues: v15 (copy), AbuseReportBeduiContextStatus (copy)
+			warn("Failed to get Bedui data")
+			v15({
+				status = AbuseReportBeduiContextStatus.Error,
+				error = p4
+			})
+		end)
+	end, { t1.abuseVector })
+
+	return React.createElement(AbuseReportBeduiContext.Provider, {
+		value = v14
+	}, t1.children)
+end
+
+return AbuseReportBeduiProvider

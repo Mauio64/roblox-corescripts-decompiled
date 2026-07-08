@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EasierUnmutingTCS5", false);
+return game:DefineFastFlag("EasierUnmutingTCS5", false)

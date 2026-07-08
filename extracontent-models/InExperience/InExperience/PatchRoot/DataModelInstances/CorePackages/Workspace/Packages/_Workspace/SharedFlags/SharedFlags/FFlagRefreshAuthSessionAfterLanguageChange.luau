@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RefreshAuthSessionAfterLanguageChange", false);
+return game:DefineFastFlag("RefreshAuthSessionAfterLanguageChange", false)

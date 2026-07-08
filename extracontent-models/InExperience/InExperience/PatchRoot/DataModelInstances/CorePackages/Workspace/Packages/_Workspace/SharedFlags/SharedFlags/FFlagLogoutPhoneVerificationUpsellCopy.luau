@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LogoutPhoneVerificationUpsellCopy_v3", false);
+return game:DefineFastFlag("LogoutPhoneVerificationUpsellCopy_v3", false)

@@ -4,7 +4,7 @@ local v3 = require(Parent.ExpChatShared).Logger:new("ExpChat/" .. script.Name)
 local sanitizeForRichText = require(script.Parent.sanitizeForRichText)
 local FFlagEnableClientSummarySystemMessageOnLua = require(Parent.SharedFlags).FFlagEnableClientSummarySystemMessageOnLua
 
-return function(p1, t1: {[any]: any}?, s1: string, p2, p3, s2: string?, p4: ((...any) -> ...any)?) --[[ displaySystemMessage ]] -- line: 12
+local function displaySystemMessage(p1, t1: {[any]: any}?, s1: string, p2, p3, s2: string?, p4: ((...any) -> ...any)?) -- line: 12
 	-- upvalues: v3 (copy), List (copy), FFlagEnableClientSummarySystemMessageOnLua (copy), sanitizeForRichText (copy)
 	v3:debug("Display system message: {}", s1)
 
@@ -32,13 +32,13 @@ return function(p1, t1: {[any]: any}?, s1: string, p2, p3, s2: string?, p4: ((..
 
 	if p3 and result then
 		if FFlagEnableClientSummarySystemMessageOnLua then
-			local v15 = sanitizeForRichText(result)
+			local v16 = sanitizeForRichText(result)
 
 			if p4 then
-				v15 = p4(v15)
+				v16 = p4(v16)
 			end
 
-			p3:DisplaySystemMessage(v15, s1)
+			p3:DisplaySystemMessage(v16, s1)
 
 			return
 		end
@@ -46,3 +46,5 @@ return function(p1, t1: {[any]: any}?, s1: string, p2, p3, s2: string?, p4: ((..
 		p3:DisplaySystemMessage(sanitizeForRichText(result), s1)
 	end
 end
+
+return displaySystemMessage

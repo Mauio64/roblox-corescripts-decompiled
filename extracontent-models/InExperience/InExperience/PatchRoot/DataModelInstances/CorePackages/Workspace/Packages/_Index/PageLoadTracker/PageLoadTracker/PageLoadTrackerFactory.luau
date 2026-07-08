@@ -1,38 +1,45 @@
-local v0 = require(script.Parent.createPageTracker);
-local function v4(v1, v2) --[[ Line: 10 ]] --[[ Name: getTracker ]]
-    -- upvalues: v0 (copy)
-    if v1.trackers[v2] == nil then
-        local v3 = v0();
-        v1.trackers[v2] = v3;
-    end;
-    return v1.trackers[v2];
-end;
-local function v8(v5, v6) --[[ Line: 18 ]] --[[ Name: removeTracker ]]
-    local v7 = v5.trackers[v6];
-    if v7 then
-        v7:stop();
-        v5.trackers[v6] = nil;
-    end;
-end;
-local function _() --[[ Line: 27 ]] --[[ Name: createFactory ]]
-    -- upvalues: v4 (copy), v8 (copy)
-    return {
-        trackers = {}, 
-        getTracker = v4, 
-        removeTracker = v8
-    };
-end;
-local v10 = nil;
+local createPageTracker = require(script.Parent.createPageTracker)
+
+local function getTracker(t1: {[any]: any}, s1: string) -- line: 10
+	-- upvalues: createPageTracker (copy)
+	if t1.trackers[s1] == nil then
+		local v8 = createPageTracker()
+
+		t1.trackers[s1] = v8
+	end
+
+	return t1.trackers[s1]
+end
+local function removeTracker(t2: {[any]: any}, s2: string) -- line: 18
+	local v11 = t2.trackers[s2]
+
+	if v11 then
+		v11:stop()
+		t2.trackers[s2] = nil
+	end
+end
+local function createFactory() -- line: 27
+	-- upvalues: getTracker (copy), removeTracker (copy)
+	return {
+		trackers = {},
+		getTracker = getTracker,
+		removeTracker = removeTracker
+	}
+end
+
+local t3 = nil
+
 return {
-    getInstance = function() --[[ Line: 39 ]] --[[ Name: getInstance ]]
-        -- upvalues: v10 (ref), v4 (copy), v8 (copy)
-        if not v10 then
-            v10 = {
-                trackers = {}, 
-                getTracker = v4, 
-                removeTracker = v8
-            };
-        end;
-        return v10;
-    end
-};
+	getInstance = function() -- line: 39
+		-- upvalues: t3 (ref), getTracker (copy), removeTracker (copy)
+		if not t3 then
+			t3 = {
+				trackers = {},
+				getTracker = getTracker,
+				removeTracker = removeTracker
+			}
+		end
+
+		return t3
+	end
+}

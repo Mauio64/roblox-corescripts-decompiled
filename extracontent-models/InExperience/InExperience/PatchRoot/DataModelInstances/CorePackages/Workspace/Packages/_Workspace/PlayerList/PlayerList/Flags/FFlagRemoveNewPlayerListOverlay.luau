@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagUseNewPlayerList) and game:DefineFastFlag("RemoveNewPlayerListOverlay", false);
+return game:DefineFastFlag("RemoveNewPlayerListOverlay", false)

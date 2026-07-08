@@ -1,37 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Enums.DialogSize);
-local v4 = require(script.Parent.getResponsiveSize);
-local v5 = require(l_script_FirstAncestor_0.Providers.Overlay.useOverlay);
-local v6 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v7 = require(script.Parent.DialogContext);
-return function(v8) --[[ Line: 23 ]] --[[ Name: DialogProvider ]]
-    -- upvalues: v5 (copy), v6 (copy), v2 (copy), v4 (copy), v7 (copy)
-    local v9 = v5();
-    local v10 = v6();
-    local v11, v12 = v2.useState(function() --[[ Line: 27 ]]
-        -- upvalues: v9 (copy), v4 (ref), v8 (copy), v10 (copy)
-        if v9 then
-            return v4(v9.AbsoluteSize.X, v8.size, v10);
-        else
-            return v8.responsiveSize or v8.size;
-        end;
-    end);
-    local v13, v14 = v2.useState(v8.hasHeroMedia);
-    local v15 = v2.useRef(nil);
-    local v16, v17 = v2.useState(nil);
-    return v2.createElement(v7.Provider, {
-        value = {
-            size = v8.size, 
-            responsiveSize = v11, 
-            setResponsiveSize = v12, 
-            hasHeroMedia = v13, 
-            setHasHeroMedia = v14, 
-            testId = v8.testId, 
-            closeAffordanceRef = v15, 
-            contentStartRef = v16, 
-            setContentStartRef = v17
-        }
-    }, v8.children);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+
+require(Foundation.Enums.DialogSize)
+
+local getResponsiveSize = require(script.Parent.getResponsiveSize)
+local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local DialogContext = require(script.Parent.DialogContext)
+
+local function DialogProvider(t1: {[any]: any}) -- line: 23
+	-- upvalues: useOverlay (copy), useTokens (copy), React (copy), getResponsiveSize (copy), DialogContext (copy)
+	local v10 = useOverlay()
+	local v11 = useTokens()
+	local v12, v13 = React.useState(function() -- line: 27
+		-- upvalues: v10 (copy), getResponsiveSize (copy), t1 (copy), v11 (copy)
+		if v10 then
+			return getResponsiveSize(v10.AbsoluteSize.X, t1.size, v11)
+		end
+
+		return t1.responsiveSize or t1.size
+	end)
+	local v14, v15 = React.useState(t1.hasHeroMedia)
+	local v16 = React.useRef(nil)
+	local v17, v18 = React.useState(nil)
+
+	return React.createElement(DialogContext.Provider, {
+		value = {
+			size = t1.size,
+			responsiveSize = v12,
+			setResponsiveSize = v13,
+			hasHeroMedia = v14,
+			setHasHeroMedia = v15,
+			testId = t1.testId,
+			closeAffordanceRef = v16,
+			contentStartRef = v17,
+			setContentStartRef = v18
+		}
+	}, t1.children)
+end
+
+return DialogProvider

@@ -1,78 +1,87 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.SocialCommon);
-local v3 = require(l_Parent_0.SocialUpsell);
-local v4 = require(l_Parent_0.AppChatNetworking);
-local l_SocialUpsellType_0 = require(l_Parent_0.SocialUpsell).Enums.SocialUpsellType;
-local l_getDeepValue_0 = v2.Utils.getDeepValue;
-local l_createCommonSocialUpsellBannerConfig_0 = v3.Utils.createCommonSocialUpsellBannerConfig;
-local l_Constants_0 = v3.Constants;
-local l_ChatLandingModalVariant_0 = v4.Constants.ChatLandingModalVariant;
-local l_ConversationBottomModal_0 = v4.Constants.ConversationBottomModal;
-local v11 = {
-    [l_ChatLandingModalVariant_0.ChatLandingAgeVerifiedCommsTimedModal] = l_SocialUpsellType_0.FacialAgeEstimation, 
-    [l_ChatLandingModalVariant_0.ChatLandingAgeVerifiedCommsUpsellModal] = l_SocialUpsellType_0.FacialAgeEstimation, 
-    [l_ConversationBottomModal_0.ConversationBottomAgeVerificationRequiredModal] = l_SocialUpsellType_0.ConversationFacialAgeEstimation, 
-    [l_ConversationBottomModal_0.NudgeToChatUpsell] = l_SocialUpsellType_0.ConversationFacialAgeEstimation
-};
-local v12 = {
-    open_fae_upsell = l_Constants_0.UPSELL_BUTTON_ACTION.Primary, 
-    open_fae_view_details = l_Constants_0.UPSELL_BUTTON_ACTION.Secondary, 
-    dismiss = l_Constants_0.UPSELL_BUTTON_ACTION.Dismiss
-};
-local function v18(v13) --[[ Line: 44 ]] --[[ Name: getCountdownLabelItem ]]
-    -- upvalues: l_getDeepValue_0 (copy), v1 (copy), v4 (copy), l_Constants_0 (copy)
-    local v14 = nil;
-    local v15 = l_getDeepValue_0(v13, "modal_layout.header.additional_content");
-    if v15 then
-        local v17 = v1.List.findWhere(v15, function(v16) --[[ Line: 48 ]]
-            -- upvalues: v4 (ref)
-            return v16.type == v4.Constants.ModalContentType.Countdown;
-        end);
-        if v17 and v15[v17].text then
-            v14 = {
-                type = l_Constants_0.UPSELL_LABEL_ITEM_TYPE_COUNTDOWN, 
-                text = v15[v17].text
-            };
-        end;
-    end;
-    return v14;
-end;
-local function _(v19) --[[ Line: 62 ]] --[[ Name: getButtonAction ]]
-    -- upvalues: v12 (copy)
-    if v19.action and v19.action.type then
-        return v12[v19.action.type];
-    else
-        return nil;
-    end;
-end;
-return function(v21) --[[ Line: 69 ]]
-    -- upvalues: v11 (copy), l_SocialUpsellType_0 (copy), l_getDeepValue_0 (copy), v18 (copy), v1 (copy), v12 (copy), l_createCommonSocialUpsellBannerConfig_0 (copy)
-    local v22 = v11[v21.modal_variant] or l_SocialUpsellType_0.Unknown;
-    local v23 = {};
-    local v24 = l_getDeepValue_0(v21, "modal_layout.buttons");
-    local v25 = v18(v21);
-    if v25 then
-        table.insert(v23, v25);
-    end;
-    local v28 = v1.List.filterMap(v24, function(v26) --[[ Line: 79 ]]
-        -- upvalues: v12 (ref)
-        local v27 = if v26.action and v26.action.type then v12[v26.action.type] else nil;
-        if v27 and v26.text then
-            return {
-                text = v26.text, 
-                action = v27
-            };
-        else
-            return nil;
-        end;
-    end);
-    return l_createCommonSocialUpsellBannerConfig_0({
-        type = v22, 
-        title = l_getDeepValue_0(v21, "modal_layout.header.text"), 
-        body = l_getDeepValue_0(v21, "modal_layout.body.text"), 
-        isDismissable = l_getDeepValue_0(v21, "modal_layout.dismissible"), 
-        labelItems = v23, 
-        buttons = v28
-    });
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+local SocialCommon = require(Parent.SocialCommon)
+local SocialUpsell = require(Parent.SocialUpsell)
+local AppChatNetworking = require(Parent.AppChatNetworking)
+local SocialUpsellType = require(Parent.SocialUpsell).Enums.SocialUpsellType
+local getDeepValue = SocialCommon.Utils.getDeepValue
+local createCommonSocialUpsellBannerConfig = SocialUpsell.Utils.createCommonSocialUpsellBannerConfig
+local Constants = SocialUpsell.Constants
+local ChatLandingModalVariant = AppChatNetworking.Constants.ChatLandingModalVariant
+local ConversationBottomModal = AppChatNetworking.Constants.ConversationBottomModal
+local t1 = {
+	[ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal] = SocialUpsellType.FacialAgeEstimation,
+	[ChatLandingModalVariant.ChatLandingAgeVerifiedCommsUpsellModal] = SocialUpsellType.FacialAgeEstimation,
+	[ConversationBottomModal.ConversationBottomAgeVerificationRequiredModal] = SocialUpsellType.ConversationFacialAgeEstimation,
+	[ConversationBottomModal.NudgeToBottomChatUpsell] = SocialUpsellType.ConversationFacialAgeEstimation
+}
+local t2 = {
+	open_fae_upsell = Constants.UPSELL_BUTTON_ACTION.Primary,
+	open_fae_view_details = Constants.UPSELL_BUTTON_ACTION.Secondary,
+	dismiss = Constants.UPSELL_BUTTON_ACTION.Dismiss
+}
+
+local function getCountdownLabelItem(p1) -- line: 44
+	-- upvalues: getDeepValue (copy), Cryo (copy), AppChatNetworking (copy), Constants (copy)
+	local t3 = nil
+	local v18 = getDeepValue(p1, "modal_layout.header.additional_content")
+
+	if v18 then
+		local v19 = Cryo.List.findWhere(v18, function(p2) -- line: 48
+			-- upvalues: AppChatNetworking (copy)
+			return p2.type == AppChatNetworking.Constants.ModalContentType.Countdown
+		end)
+
+		if v19 and v18[v19].text then
+			t3 = {
+				type = Constants.UPSELL_LABEL_ITEM_TYPE_COUNTDOWN,
+				text = v18[v19].text
+			}
+		end
+	end
+
+	return t3
+end
+local function getButtonAction(p3) -- line: 62
+	-- upvalues: t2 (copy)
+	if p3.action and p3.action.type then
+		return t2[p3.action.type]
+	end
+
+	return nil
+end
+
+return function(p4) -- line: 69
+	-- upvalues: t1 (copy), SocialUpsellType (copy), getDeepValue (copy), getCountdownLabelItem (copy), Cryo (copy), t2 (copy), createCommonSocialUpsellBannerConfig (copy)
+	local v22 = t1[p4.modal_variant] or SocialUpsellType.Unknown
+	local t4 = {}
+	local v24 = getDeepValue(p4, "modal_layout.buttons")
+	local v25 = getCountdownLabelItem(p4)
+
+	if v25 then
+		table.insert(t4, v25)
+	end
+
+	local v26 = Cryo.List.filterMap(v24, function(p5) -- line: 79
+		-- upvalues: t2 (copy)
+		local v29 = if not p5.action or not p5.action.type then nil else t2[p5.action.type]
+
+		if v29 and p5.text then
+			return {
+				text = p5.text,
+				action = v29
+			}
+		end
+
+		return nil
+	end)
+
+	return createCommonSocialUpsellBannerConfig({
+		type = v22,
+		title = getDeepValue(p4, "modal_layout.header.text"),
+		body = getDeepValue(p4, "modal_layout.body.text"),
+		isDismissable = getDeepValue(p4, "modal_layout.dismissible"),
+		labelItems = t4,
+		buttons = v26
+	})
+end

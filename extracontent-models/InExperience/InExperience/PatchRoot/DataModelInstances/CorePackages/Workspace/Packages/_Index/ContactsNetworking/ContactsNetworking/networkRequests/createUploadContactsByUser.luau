@@ -1,16 +1,18 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.API_URL);
-local _ = require(l_Parent_0.Types.networkRequestsTypes);
-return function(v3) --[[ Line: 7 ]]
-    -- upvalues: v1 (copy)
-    return v3.roduxNetworking.POST({
-        Name = "UploadContactsByUser"
-    }, function(v4, v5) --[[ Line: 12 ]]
-        -- upvalues: v1 (ref)
-        return v4(v1):path("contacts-api"):path("v1"):path("contacts"):body({
-            countryCode = v5.countryCode, 
-            contacts = v5.contacts, 
-            source = v5.source
-        });
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local API_URL = require(ParentParent.API_URL)
+
+require(ParentParent.Types.networkRequestsTypes)
+
+return function(p1) -- line: 7
+	-- upvalues: API_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "UploadContactsByUser"
+	}, function(p2, p3) -- line: 12
+		-- upvalues: API_URL (copy)
+		return p2(API_URL):path("contacts-api"):path("v1"):path("contacts"):body({
+			countryCode = p3.countryCode,
+			contacts = p3.contacts,
+			source = p3.source
+		})
+	end)
+end

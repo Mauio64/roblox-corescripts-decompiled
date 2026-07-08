@@ -1,65 +1,72 @@
-local l_Parent_0 = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(l_Parent_0.Cryo);
-return function(v3) --[[ Line: 22 ]] --[[ Name: createSignalMap ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4 = {};
-    local v5 = 0;
-    if v3 then
-        for v6, v7 in pairs(v3) do
-            v4[v6] = v7;
-            v5 = v5 + 1;
-        end;
-    end;
-    local v8, v9 = v1.createSignal(v4);
-    local v10, v11 = v1.createSignal(v5);
-    local function v14(v12, v13) --[[ Line: 35 ]] --[[ Name: getData ]]
-        -- upvalues: v8 (copy)
-        return v8(v13)[v12];
-    end;
-    local function v21(v15, v16, v17) --[[ Line: 39 ]] --[[ Name: setData ]]
-        -- upvalues: v8 (copy), v2 (ref), v11 (copy), v10 (copy), v9 (copy)
-        local v18 = v8(v17);
-        local v19 = v18[v15];
-        local v20 = v2.Dictionary.join(v18, {
-            [v15] = v16
-        });
-        if not v19 then
-            v11(v10(v17) + 1);
-        end;
-        v9(v20);
-    end;
-    local function v26(v22, v23) --[[ Line: 49 ]] --[[ Name: removeData ]]
-        -- upvalues: v8 (copy), v2 (ref), v11 (copy), v10 (copy), v9 (copy)
-        local v24 = v8(v23);
-        if v24[v22] then
-            local v25 = v2.Dictionary.join(v24, {
-                [v22] = v2.None
-            });
-            v11(v10(v23) - 1);
-            v9(v25);
-        end;
-    end;
-    local v28 = v1.createComputed(function(v27) --[[ Line: 60 ]]
-        -- upvalues: v8 (copy)
-        return v8(v27);
-    end);
-    local function v34(v29, v30) --[[ Line: 64 ]] --[[ Name: iterateData ]]
-        -- upvalues: v1 (ref), v8 (copy)
-        return v1.createEffect(function() --[[ Line: 65 ]]
-            -- upvalues: v8 (ref), v30 (copy), v29 (copy)
-            local v31 = v8(v30);
-            for v32, v33 in pairs(v31) do
-                v29(v32, v33);
-            end;
-        end);
-    end;
-    return {
-        getData = v14, 
-        setData = v21, 
-        removeData = v26, 
-        getCount = v10, 
-        iterateData = v34, 
-        getAllData = v28
-    };
-end;
+local Parent = script:FindFirstAncestor("CoreScriptsRoactCommon").Parent
+local Signals = require(Parent.Signals)
+local Cryo = require(Parent.Cryo)
+
+local function createSignalMap(t1: {[any]: any}?) -- line: 22
+	-- upvalues: Signals (copy), Cryo (copy)
+	local t2 = {}
+	local n1 = 0
+
+	if t1 then
+		for k, v in pairs(t1) do
+			t2[k] = v
+			n1 += 1
+		end
+	end
+
+	local v10, v11 = Signals.createSignal(t2)
+	local v12, v13 = Signals.createSignal(n1)
+	local v14 = Signals.createComputed(function(p1) -- line: 60
+		-- upvalues: v10 (copy)
+		return v10(p1)
+	end)
+
+	return {
+		getData = function(p2, p3) -- line: 35
+			-- upvalues: v10 (copy)
+			return v10(p3)[p2]
+		end,
+		setData = function(p4, p5, p6) -- line: 39
+			-- upvalues: v10 (copy), Cryo (copy), v13 (copy), v12 (copy), v11 (copy)
+			local v20 = v10(p6)
+			local v21 = v20[p4]
+			local v22 = Cryo.Dictionary.join(v20, {
+				[p4] = p5
+			})
+
+			if not v21 then
+				v13(v12(p6) + 1)
+			end
+
+			v11(v22)
+		end,
+		removeData = function(p7, p8) -- line: 49
+			-- upvalues: v10 (copy), Cryo (copy), v13 (copy), v12 (copy), v11 (copy)
+			local v25 = v10(p8)
+
+			if v25[p7] then
+				local v26 = Cryo.Dictionary.join(v25, {
+					[p7] = Cryo.None
+				})
+
+				v13(v12(p8) - 1)
+				v11(v26)
+			end
+		end,
+		getCount = v12,
+		iterateData = function(p9: ((...any) -> ...any), p10) -- line: 64
+			-- upvalues: Signals (copy), v10 (copy)
+			return Signals.createEffect(function() -- line: 65
+				-- upvalues: v10 (copy), p10 (copy), p9 (copy)
+				local v30 = v10(p10)
+
+				for k, v in pairs(v30) do
+					p9(k, v)
+				end
+			end)
+		end,
+		getAllData = v14
+	}
+end
+
+return createSignalMap

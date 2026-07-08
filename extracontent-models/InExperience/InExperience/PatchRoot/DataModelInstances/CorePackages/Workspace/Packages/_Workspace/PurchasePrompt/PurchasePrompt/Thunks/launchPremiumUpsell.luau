@@ -1,60 +1,73 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_Parent_0.Actions.ErrorOccurred);
-local v3 = require(l_Parent_0.Actions.PurchaseCompleteRecieved);
-local v4 = require(l_Parent_0.Actions.SetPromptState);
-local v5 = require(l_Parent_0.Actions.SetWindowState);
-local v6 = require(l_Parent_0.Enums.UpsellFlow);
-local v7 = require(l_Parent_0.Enums.PromptState);
-local v8 = require(l_Parent_0.Enums.PurchaseError);
-local v9 = require(l_Parent_0.Enums.WindowState);
-local v10 = require(l_Parent_0.NativeUpsell.getUpsellFlow);
-local v11 = require(l_Parent_0.Services.Analytics);
-local v12 = require(l_Parent_0.Services.PlatformInterface);
-local v13 = require(l_Parent_0.Services.ExternalSettings);
-local v14 = require(l_Parent_0.Thunks.hideWindow);
-local v15 = require(l_Parent_0.Thunk);
-local v16 = {
-    v11, 
-    v12, 
-    v13
-};
-return function() --[[ Line: 25 ]] --[[ Name: launchPremiumUpsell ]]
-    -- upvalues: v15 (copy), v16 (copy), v12 (copy), v13 (copy), v11 (copy), v3 (copy), v5 (copy), v9 (copy), v10 (copy), v6 (copy), v4 (copy), v7 (copy), v14 (copy), l_Players_0 (copy), v2 (copy), v8 (copy)
-    return v15.new(script.Name, v16, function(v17, v18) --[[ Line: 26 ]]
-        -- upvalues: v12 (ref), v13 (ref), v11 (ref), v3 (ref), v5 (ref), v9 (ref), v10 (ref), v6 (ref), v4 (ref), v7 (ref), v14 (ref), l_Players_0 (ref), v2 (ref), v8 (ref)
-        local v19 = v18[v12];
-        local v20 = v18[v13];
-        local v21 = v18[v11];
-        local l_premiumProductInfo_0 = v17:getState().premiumProductInfo;
-        if v20.isStudio() then
-            v19.signalMockPurchasePremium();
-            v17:dispatch(v3());
-            return v17:dispatch(v5(v9.Hidden));
-        else
-            local v23 = v10(v20.getPlatform());
-            v21.signalPremiumUpsellConfirmed();
-            if v23 == v6.Web then
-                local l_productId_0 = l_premiumProductInfo_0.productId;
-                v19.startPremiumUpsell(l_productId_0);
-                v17:dispatch(v4(v7.UpsellInProgress));
-                v17:dispatch(v14());
-                return;
-            elseif v23 == v6.Mobile then
-                local l_mobileProductId_0 = l_premiumProductInfo_0.mobileProductId;
-                local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-                if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
-                    v19.promptNativePurchaseWithLocalPlayer(l_mobileProductId_0);
-                else
-                    v19.promptNativePurchase(l_LocalPlayer_0, l_mobileProductId_0);
-                end;
-                v17:dispatch(v4(v7.UpsellInProgress));
-                v17:dispatch(v14());
-                return;
-            else
-                v17:dispatch(v2(v8.PremiumUnavailablePlatform));
-                return;
-            end;
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Players = game:GetService("Players")
+local ErrorOccurred = require(ParentParent.Actions.ErrorOccurred)
+local PurchaseCompleteRecieved = require(ParentParent.Actions.PurchaseCompleteRecieved)
+local SetPromptState = require(ParentParent.Actions.SetPromptState)
+local SetWindowState = require(ParentParent.Actions.SetWindowState)
+local UpsellFlow = require(ParentParent.Enums.UpsellFlow)
+local PromptState = require(ParentParent.Enums.PromptState)
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local WindowState = require(ParentParent.Enums.WindowState)
+local getUpsellFlow = require(ParentParent.NativeUpsell.getUpsellFlow)
+local Analytics = require(ParentParent.Services.Analytics)
+local PlatformInterface = require(ParentParent.Services.PlatformInterface)
+local ExternalSettings = require(ParentParent.Services.ExternalSettings)
+local hideWindow = require(ParentParent.Thunks.hideWindow)
+local Thunk = require(ParentParent.Thunk)
+local t1 = {
+	Analytics,
+	PlatformInterface,
+	ExternalSettings
+}
+
+local function launchPremiumUpsell() -- line: 25
+	-- upvalues: Thunk (copy), t1 (copy), PlatformInterface (copy), ExternalSettings (copy), Analytics (copy), PurchaseCompleteRecieved (copy), SetWindowState (copy), WindowState (copy), getUpsellFlow (copy), UpsellFlow (copy), SetPromptState (copy), PromptState (copy), hideWindow (copy), Players (copy), ErrorOccurred (copy), PurchaseError (copy)
+	return Thunk.new(script.Name, t1, function(p1, p2) -- line: 26
+		-- upvalues: PlatformInterface (copy), ExternalSettings (copy), Analytics (copy), PurchaseCompleteRecieved (copy), SetWindowState (copy), WindowState (copy), getUpsellFlow (copy), UpsellFlow (copy), SetPromptState (copy), PromptState (copy), hideWindow (copy), Players (copy), ErrorOccurred (copy), PurchaseError (copy)
+		local v21 = p2[PlatformInterface]
+		local v22 = p2[ExternalSettings]
+		local v23 = p2[Analytics]
+		local premiumProductInfo = p1:getState().premiumProductInfo
+
+		if v22.isStudio() then
+			v21.signalMockPurchasePremium()
+			p1:dispatch(PurchaseCompleteRecieved())
+
+			return p1:dispatch(SetWindowState(WindowState.Hidden))
+		end
+
+		local v25 = getUpsellFlow(v22.getPlatform())
+
+		v23.signalPremiumUpsellConfirmed()
+
+		if v25 == UpsellFlow.Web then
+			local productId = premiumProductInfo.productId
+
+			v21.startPremiumUpsell(productId)
+			p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+			p1:dispatch(hideWindow())
+
+			return
+		end
+
+		if v25 == UpsellFlow.Mobile then
+			local mobileProductId = premiumProductInfo.mobileProductId
+			local LocalPlayer = Players.LocalPlayer
+
+			if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
+				v21.promptNativePurchaseWithLocalPlayer(mobileProductId)
+			else
+				v21.promptNativePurchase(LocalPlayer, mobileProductId)
+			end
+
+			p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+			p1:dispatch(hideWindow())
+
+			return
+		end
+
+		p1:dispatch(ErrorOccurred(PurchaseError.PremiumUnavailablePlatform))
+	end)
+end
+
+return launchPremiumUpsell

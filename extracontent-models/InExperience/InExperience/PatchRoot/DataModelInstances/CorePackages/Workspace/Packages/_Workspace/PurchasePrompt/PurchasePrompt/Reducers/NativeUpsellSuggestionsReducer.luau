@@ -1,13 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Rodux_0 = require(l_Parent_0.PurchasePromptDeps).Rodux;
-local v3 = require(l_script_FirstAncestor_0.Actions.PromptNativeUpsellSuggestions);
-return l_Rodux_0.createReducer({}, {
-    [v3.name] = function(_, v5) --[[ Line: 9 ]]
-        return {
-            products = v5.products, 
-            selection = v5.selection, 
-            virtualItemBadgeType = v5.virtualItemBadgeType
-        };
-    end
-});
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local PromptNativeUpsellSuggestions = require(PurchasePrompt.Actions.PromptNativeUpsellSuggestions)
+
+return Rodux.createReducer({}, {
+	[PromptNativeUpsellSuggestions.name] = function(_, p2) -- line: 9
+		return {
+			products = p2.products,
+			selection = p2.selection,
+			virtualItemBadgeType = p2.virtualItemBadgeType
+		}
+	end
+})

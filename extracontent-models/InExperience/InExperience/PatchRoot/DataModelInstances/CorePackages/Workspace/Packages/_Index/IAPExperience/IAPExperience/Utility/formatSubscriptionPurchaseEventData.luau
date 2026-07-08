@@ -1,22 +1,24 @@
-return function(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) --[[ Line: 1 ]]
-    local v11 = nil;
-    local v12 = nil;
-    for v13, v14 in string.gmatch(v5, "(%w+)-(%w+)") do
-        v12 = string.upper(v13);
-        v11 = v14;
-    end;
-    return {
-        purchase_flow_uuid = v0, 
-        purchase_flow_event_type = v1, 
-        view_name = v2, 
-        input_type = v3, 
-        subscription_provider_id = v4, 
-        subscription_product_type_prefix = v12, 
-        subscription_id = v11, 
-        localized_subscription_name = v6, 
-        localized_subscription_description = v7, 
-        subscription_period = v8, 
-        price_in_cents_usd = v9, 
-        display_price = v10
-    };
-end;
+return function(s1: string, s2: string, s3: string, s4: string?, s5: string, s6: string, s7: string, s8: string, s9: string, n1: number, s10: string) -- line: 1
+	local v12 = nil
+	local v13 = nil
+
+	for match, v15 in string.gmatch(s6, "(%w+)-(%w+)") do
+		v13 = string.upper(match)
+		v12 = v15
+	end
+
+	return {
+		purchase_flow_uuid = s1,
+		purchase_flow_event_type = s2,
+		view_name = s3,
+		input_type = s4,
+		subscription_provider_id = s5,
+		subscription_product_type_prefix = v13,
+		subscription_id = v12,
+		localized_subscription_name = s7,
+		localized_subscription_description = s8,
+		subscription_period = s9,
+		price_in_cents_usd = n1,
+		display_price = s10
+	}
+end

@@ -1,27 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameDetailRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local v3 = require(l_script_FirstAncestor_0.GameDetails.AddGameDetails);
-local v4 = require(l_script_FirstAncestor_0.GameDetails.SetGameDetailError);
-return function(v5, v6) --[[ Line: 8 ]]
-    -- upvalues: v4 (copy), l_Immutable_0 (copy), v3 (copy)
-    v5 = v5 or {};
-    if v6.type == v4.name then
-        return (l_Immutable_0.Set(v5, v6.universeId, {
-            errorType = v6.errorType
-        }));
-    else
-        if v6.type == v3.name then
-            if not next(v5) then
-                return v5;
-            else
-                for v7, _ in pairs(v6.gameDetails) do
-                    if v5[v7] then
-                        v5 = l_Immutable_0.RemoveFromDictionary(v5, v7);
-                    end;
-                end;
-            end;
-        end;
-        return v5;
-    end;
-end;
+local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
+local GameDetailRoduxParent = GameDetailRodux.Parent
+local Immutable = require(GameDetailRoduxParent.AppCommonLib).Immutable
+local AddGameDetails = require(GameDetailRodux.GameDetails.AddGameDetails)
+local SetGameDetailError = require(GameDetailRodux.GameDetails.SetGameDetailError)
+
+return function(p1, p2) -- line: 8
+	-- upvalues: SetGameDetailError (copy), Immutable (copy), AddGameDetails (copy)
+	local v8 = p1 or {}
+
+	if p2.type == SetGameDetailError.name then
+		return (Immutable.Set(v8, p2.universeId, {
+			errorType = p2.errorType
+		}))
+	end
+
+	if p2.type == AddGameDetails.name then
+		if not next(v8) then
+			return v8
+		end
+
+		for k, _ in pairs(p2.gameDetails) do
+			if v8[k] then
+				v8 = Immutable.RemoveFromDictionary(v8, k)
+			end
+		end
+	end
+
+	return v8
+end

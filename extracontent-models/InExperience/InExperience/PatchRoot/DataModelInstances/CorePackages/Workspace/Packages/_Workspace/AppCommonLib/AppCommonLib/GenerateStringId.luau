@@ -1,6 +1,8 @@
-local v0 = 0;
-return function() --[[ Line: 7 ]]
-    -- upvalues: v0 (ref)
-    v0 = v0 + 1;
-    return (tostring(v0));
-end;
+local n1 = 0
+
+return function() -- line: 7
+	-- upvalues: n1 (ref)
+	n1 += 1
+
+	return (tostring(n1))
+end

@@ -1,82 +1,130 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Events.VR.FirstPersonToggleEvent);
-local v2 = require(l_Parent_0.Events.VR.HapticFeedbackEvent);
-local v3 = require(l_Parent_0.Events.VR.HapticFeedbackTwiceEvent);
-local v4 = require(l_Parent_0.Events.VR.SoundFeedbackEvent);
-local v5 = require(l_Parent_0.Events.VR.JumpEvent);
-local v6 = require(l_Parent_0.Events.VR.MoveToGoalEvent);
-local v7 = require(l_Parent_0.Events.VR.PerspectiveTooltipEvent);
-local v8 = require(l_Parent_0.Events.VR.MovementTooltipEvent);
-local v9 = require(l_Parent_0.Events.VR.LeaveGameIconHighlightEvent);
-local v10 = require(l_Parent_0.Enums.PlatformEnum);
-local v11 = require(l_Parent_0.Resources.FTUXEventTypes);
-local _ = require(script.Parent.Parent.EventType);
-local v13 = v11[v10.QuestVR];
+local ParentParent = script.Parent.Parent.Parent
+local FirstPersonToggleEvent = require(ParentParent.Events.VR.FirstPersonToggleEvent)
+local HapticFeedbackEvent = require(ParentParent.Events.VR.HapticFeedbackEvent)
+local HapticFeedbackTwiceEvent = require(ParentParent.Events.VR.HapticFeedbackTwiceEvent)
+local SoundFeedbackEvent = require(ParentParent.Events.VR.SoundFeedbackEvent)
+local JumpEvent = require(ParentParent.Events.VR.JumpEvent)
+local MoveToGoalEvent = require(ParentParent.Events.VR.MoveToGoalEvent)
+local PerspectiveTooltipEvent = require(ParentParent.Events.VR.PerspectiveTooltipEvent)
+local MovementTooltipEvent = require(ParentParent.Events.VR.MovementTooltipEvent)
+local LeaveGameIconHighlightEvent = require(ParentParent.Events.VR.LeaveGameIconHighlightEvent)
+local PlatformEnum = require(ParentParent.Enums.PlatformEnum)
+local FTUXEventTypes = require(ParentParent.Resources.FTUXEventTypes)
+
+require(script.Parent.Parent.EventType)
+
+local v13 = FTUXEventTypes[PlatformEnum.QuestVR]
+
 return {
-    Name = "VRFTUXEventHandler", 
-    StartEvent = function(v14, v15) --[[ Line: 25 ]] --[[ Name: StartEvent ]]
-        -- upvalues: v13 (copy), v1 (copy), v6 (copy), v5 (copy), v7 (copy), v8 (copy), v2 (copy), v4 (copy), v3 (copy), v9 (copy)
-        if v14 == v13.FirstPersonToggleEvent then
-            task.spawn(v1.StartEvent, v15);
-            return;
-        elseif v14 == v13.MoveToGoalEvent then
-            task.spawn(v6.StartEvent, v15);
-            return;
-        elseif v14 == v13.JumpEvent then
-            task.spawn(v5.StartEvent, v15);
-            return;
-        elseif v14 == v13.PerspectiveTooltipEvent then
-            task.spawn(v7.StartEvent);
-            return;
-        elseif v14 == v13.MovementTooltipEvent then
-            task.spawn(v8.StartEvent);
-            return;
-        elseif v14 == v13.HapticFeedbackEvent then
-            task.spawn(v2.StartEvent);
-            return;
-        elseif v14 == v13.SoundFeedbackEvent then
-            task.spawn(v4.StartEvent);
-            return;
-        elseif v14 == v13.HapticFeedbackTwiceEvent then
-            task.spawn(v3.StartEvent);
-            return;
-        elseif v14 == v13.LeaveGameIconHighlightEvent then
-            task.spawn(v9.StartEvent);
-            return;
-        else
-            warn("Unmapped VRFTUX event type: " .. tostring(v14));
-            return;
-        end;
-    end, 
-    StopEvent = function(v16) --[[ Line: 49 ]] --[[ Name: StopEvent ]]
-        -- upvalues: v13 (copy), v1 (copy), v6 (copy), v5 (copy), v7 (copy), v8 (copy), v9 (copy)
-        if v16 == v13.FirstPersonToggleEvent then
-            task.spawn(v1.StopEvent);
-            return;
-        elseif v16 == v13.MoveToGoalEvent then
-            task.spawn(v6.StopEvent);
-            return;
-        elseif v16 == v13.JumpEvent then
-            task.spawn(v5.StopEvent);
-            return;
-        elseif v16 == v13.PerspectiveTooltipEvent then
-            task.spawn(v7.StopEvent);
-            return;
-        elseif v16 == v13.MovementTooltipEvent then
-            task.spawn(v8.StopEvent);
-            return;
-        elseif v16 == v13.LeaveGameIconHighlightEvent then
-            task.spawn(v9.StopEvent);
-            return;
-        elseif v16 == v13.HapticFeedbackTwiceEvent then
-            return;
-        elseif v16 == v13.HapticFeedbackEvent then
-            return;
-        elseif v16 == v13.SoundFeedbackEvent then
-            return;
-        else
-            warn("Unmapped VRFTUX event type: " .. tostring(v16));
-            return;
-        end;
-    end
-};
+	Name = "VRFTUXEventHandler",
+	StartEvent = function(p1, p2: ((...any) -> ...any)) -- line: 25
+		-- upvalues: v13 (copy), FirstPersonToggleEvent (copy), MoveToGoalEvent (copy), JumpEvent (copy), PerspectiveTooltipEvent (copy), MovementTooltipEvent (copy), HapticFeedbackEvent (copy), SoundFeedbackEvent (copy), HapticFeedbackTwiceEvent (copy), LeaveGameIconHighlightEvent (copy)
+		if p1 == v13.FirstPersonToggleEvent then
+			task.spawn(FirstPersonToggleEvent.StartEvent, p2)
+
+			return
+		end
+
+		if p1 == v13.MoveToGoalEvent then
+			task.spawn(MoveToGoalEvent.StartEvent, p2)
+
+			return
+		end
+
+		if p1 == v13.JumpEvent then
+			task.spawn(JumpEvent.StartEvent, p2)
+
+			return
+		end
+
+		if p1 == v13.PerspectiveTooltipEvent then
+			task.spawn(PerspectiveTooltipEvent.StartEvent)
+
+			return
+		end
+
+		if p1 == v13.MovementTooltipEvent then
+			task.spawn(MovementTooltipEvent.StartEvent)
+
+			return
+		end
+
+		if p1 == v13.HapticFeedbackEvent then
+			task.spawn(HapticFeedbackEvent.StartEvent)
+
+			return
+		end
+
+		if p1 == v13.SoundFeedbackEvent then
+			task.spawn(SoundFeedbackEvent.StartEvent)
+
+			return
+		end
+
+		if p1 == v13.HapticFeedbackTwiceEvent then
+			task.spawn(HapticFeedbackTwiceEvent.StartEvent)
+
+			return
+		end
+
+		if p1 == v13.LeaveGameIconHighlightEvent then
+			task.spawn(LeaveGameIconHighlightEvent.StartEvent)
+
+			return
+		end
+
+		warn("Unmapped VRFTUX event type: " .. tostring(p1))
+	end,
+	StopEvent = function(p3) -- line: 49
+		-- upvalues: v13 (copy), FirstPersonToggleEvent (copy), MoveToGoalEvent (copy), JumpEvent (copy), PerspectiveTooltipEvent (copy), MovementTooltipEvent (copy), LeaveGameIconHighlightEvent (copy)
+		if p3 == v13.FirstPersonToggleEvent then
+			task.spawn(FirstPersonToggleEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.MoveToGoalEvent then
+			task.spawn(MoveToGoalEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.JumpEvent then
+			task.spawn(JumpEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.PerspectiveTooltipEvent then
+			task.spawn(PerspectiveTooltipEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.MovementTooltipEvent then
+			task.spawn(MovementTooltipEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.LeaveGameIconHighlightEvent then
+			task.spawn(LeaveGameIconHighlightEvent.StopEvent)
+
+			return
+		end
+
+		if p3 == v13.HapticFeedbackTwiceEvent then
+			return
+		end
+
+		if p3 == v13.HapticFeedbackEvent then
+			return
+		end
+
+		if p3 == v13.SoundFeedbackEvent then
+			return
+		end
+
+		warn("Unmapped VRFTUX event type: " .. tostring(p3))
+	end
+}

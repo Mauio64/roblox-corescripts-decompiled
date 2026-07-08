@@ -1,173 +1,264 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local l_console_0 = require(l_Parent_0.Shared).console;
-local _ = require(l_Parent_0.LuauPolyfill);
-local v4 = {};
-local function _(v5) --[[ Line: 29 ]] --[[ Name: isCallable ]]
-    if typeof(v5) == "function" then
-        return true;
-    else
-        if typeof(v5) == "table" then
-            local v6 = getmetatable(v5);
-            if v6 and rawget(v6, "__call") then
-                return true;
-            elseif v5._isMockFunction then
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
-local l_enableProfilerTimer_0 = require(l_Parent_0.Shared).ReactFeatureFlags.enableProfilerTimer;
-local _ = require(script.Parent.ReactInternalTypes);
-local _ = require(l_Parent_0.Shared);
-local l_DidCapture_0 = require(script.Parent.ReactFiberFlags).DidCapture;
-local v12 = nil;
-local v13 = nil;
-local v14 = false;
-v4.isDevToolsPresent = function() --[[ Line: 64 ]]
-    -- upvalues: v1 (copy)
-    return v1.__REACT_DEVTOOLS_GLOBAL_HOOK__ ~= nil;
-end;
-v4.injectInternals = function(v15) --[[ Line: 68 ]]
-    -- upvalues: v1 (copy), l_console_0 (copy), v12 (ref), v13 (ref)
-    if v1.__REACT_DEVTOOLS_GLOBAL_HOOK__ == nil then
-        return false;
-    else
-        local l___REACT_DEVTOOLS_GLOBAL_HOOK___0 = v1.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-        if l___REACT_DEVTOOLS_GLOBAL_HOOK___0.isDisabled then
-            return true;
-        elseif not l___REACT_DEVTOOLS_GLOBAL_HOOK___0.supportsFiber then
-            if v1.__DEV__ then
-                l_console_0.error("The installed version of React DevTools is too old and will not work with the current version of React. Please update React DevTools. https://reactjs.org/link/react-devtools");
-            end;
-            return true;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 91 ]]
-                -- upvalues: v12 (ref), l___REACT_DEVTOOLS_GLOBAL_HOOK___0 (copy), v15 (copy), v13 (ref)
-                v12 = l___REACT_DEVTOOLS_GLOBAL_HOOK___0.inject(v15);
-                v13 = l___REACT_DEVTOOLS_GLOBAL_HOOK___0;
-            end);
-            if not l_status_0 and v1.__DEV__ then
-                l_console_0.error("React instrumentation encountered an error: %s.", l_result_0);
-            end;
-            return true;
-        end;
-    end;
-end;
-v4.onScheduleRoot = function(v19, v20) --[[ Line: 107 ]]
-    -- upvalues: v1 (copy), v13 (ref), v12 (ref), v14 (ref), l_console_0 (copy)
-    local v21 = false;
-    if v1.__DEV__ and v13 then
-        local l_onScheduleFiberRoot_0 = v13.onScheduleFiberRoot;
-        local v23;
-        if typeof(l_onScheduleFiberRoot_0) == "function" then
-            v23 = true;
-        else
-            if typeof(l_onScheduleFiberRoot_0) == "table" then
-                local v24 = getmetatable(l_onScheduleFiberRoot_0);
-                if v24 and rawget(v24, "__call") then
-                    v23 = true;
-                    v21 = true;
-                elseif l_onScheduleFiberRoot_0._isMockFunction then
-                    v23 = true;
-                    v21 = true;
-                end;
-            end;
-            if not v21 then
-                if not v21 then
-                    v23 = false;
-                end;
-            end;
-        end;
-        v21 = false;
-        if v23 then
-            v23, l_onScheduleFiberRoot_0 = pcall(v13.onScheduleFiberRoot, v12, v19, v20);
-            if not v23 and v1.__DEV__ and not v14 then
-                v14 = true;
-                l_console_0.error("React instrumentation encountered an error: %s", l_onScheduleFiberRoot_0);
-            end;
-        end;
-    end;
-end;
-v4.onCommitRoot = function(v25, v26) --[[ Line: 127 ]]
-    -- upvalues: v13 (ref), l_DidCapture_0 (copy), l_enableProfilerTimer_0 (copy), v12 (ref), v1 (copy), v14 (ref), l_console_0 (copy)
-    local v27 = false;
-    if v13 then
-        local l_onCommitFiberRoot_0 = v13.onCommitFiberRoot;
-        local v29;
-        if typeof(l_onCommitFiberRoot_0) == "function" then
-            v29 = true;
-        else
-            if typeof(l_onCommitFiberRoot_0) == "table" then
-                local v30 = getmetatable(l_onCommitFiberRoot_0);
-                if v30 and rawget(v30, "__call") then
-                    v29 = true;
-                    v27 = true;
-                elseif l_onCommitFiberRoot_0._isMockFunction then
-                    v29 = true;
-                    v27 = true;
-                end;
-            end;
-            if not v27 then
-                if not v27 then
-                    v29 = false;
-                end;
-            end;
-        end;
-        v27 = false;
-        if v29 then
-            v29, l_onCommitFiberRoot_0 = pcall(function() --[[ Line: 133 ]]
-                -- upvalues: v25 (copy), l_DidCapture_0 (ref), l_enableProfilerTimer_0 (ref), v13 (ref), v12 (ref), v26 (copy)
-                local v31 = bit32.band(v25.current.flags, l_DidCapture_0) == l_DidCapture_0;
-                if l_enableProfilerTimer_0 then
-                    v13.onCommitFiberRoot(v12, v25, v26, v31);
-                    return;
-                else
-                    v13.onCommitFiberRoot(v12, v25, nil, v31);
-                    return;
-                end;
-            end);
-            if not v29 and v1.__DEV__ and not v14 then
-                v14 = true;
-                l_console_0.error("React instrumentation encountered an error: %s", l_onCommitFiberRoot_0);
-            end;
-        end;
-    end;
-end;
-v4.onCommitUnmount = function(v32) --[[ Line: 152 ]]
-    -- upvalues: v13 (ref), v12 (ref), v1 (copy), v14 (ref), l_console_0 (copy)
-    local v33 = false;
-    if v13 then
-        local l_onCommitFiberUnmount_0 = v13.onCommitFiberUnmount;
-        local v35;
-        if typeof(l_onCommitFiberUnmount_0) == "function" then
-            v35 = true;
-        else
-            if typeof(l_onCommitFiberUnmount_0) == "table" then
-                local v36 = getmetatable(l_onCommitFiberUnmount_0);
-                if v36 and rawget(v36, "__call") then
-                    v35 = true;
-                    v33 = true;
-                elseif l_onCommitFiberUnmount_0._isMockFunction then
-                    v35 = true;
-                    v33 = true;
-                end;
-            end;
-            if not v33 then
-                if not v33 then
-                    v35 = false;
-                end;
-            end;
-        end;
-        v33 = false;
-        if v35 then
-            v35, l_onCommitFiberUnmount_0 = pcall(v13.onCommitFiberUnmount, v12, v32);
-            if not v35 and v1.__DEV__ and not v14 then
-                v14 = true;
-                l_console_0.error("React instrumentation encountered an error: %s", l_onCommitFiberUnmount_0);
-            end;
-        end;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local console = require(ParentParent.Shared).console
+
+require(ParentParent.LuauPolyfill)
+
+local t1 = {}
+
+local function isCallable(p1) -- line: 29
+	if typeof(p1) == "function" then
+		return true
+	end
+
+	if typeof(p1) == "table" then
+		local mt = getmetatable(p1)
+
+		if mt and rawget(mt, "__call") then
+			return true
+		end
+
+		if p1._isMockFunction then
+			return true
+		end
+	end
+
+	return false
+end
+
+local enableProfilerTimer = require(ParentParent.Shared).ReactFeatureFlags.enableProfilerTimer
+
+require(script.Parent.ReactInternalTypes)
+require(ParentParent.Shared)
+
+local DidCapture = require(script.Parent.ReactFiberFlags).DidCapture
+local u8 = nil
+local u9 = nil
+local u10 = false
+
+function t1.isDevToolsPresent() -- line: 64
+	-- upvalues: ReactGlobals (copy)
+	return ReactGlobals.__REACT_DEVTOOLS_GLOBAL_HOOK__ ~= nil
+end
+function t1.injectInternals(p2) -- line: 68
+	-- upvalues: ReactGlobals (copy), console (copy), u8 (ref), u9 (ref)
+	if ReactGlobals.__REACT_DEVTOOLS_GLOBAL_HOOK__ == nil then
+		return false
+	end
+
+	local __REACT_DEVTOOLS_GLOBAL_HOOK__ = ReactGlobals.__REACT_DEVTOOLS_GLOBAL_HOOK__
+
+	if __REACT_DEVTOOLS_GLOBAL_HOOK__.isDisabled then
+		return true
+	end
+
+	if not __REACT_DEVTOOLS_GLOBAL_HOOK__.supportsFiber then
+		if ReactGlobals.__DEV__ then
+			console.error("The installed version of React DevTools is too old and will not work with the current version of React. Please update React DevTools. https://reactjs.org/link/react-devtools")
+		end
+
+		return true
+	end
+
+	local ok, result = pcall(function() -- line: 91
+		-- upvalues: u8 (ref), __REACT_DEVTOOLS_GLOBAL_HOOK__ (copy), p2 (copy), u9 (ref)
+		u8 = __REACT_DEVTOOLS_GLOBAL_HOOK__.inject(p2)
+		u9 = __REACT_DEVTOOLS_GLOBAL_HOOK__
+	end)
+
+	if not ok and ReactGlobals.__DEV__ then
+		console.error("React instrumentation encountered an error: %s.", result)
+	end
+
+	return true
+end
+function t1.onScheduleRoot(p3, p4) -- line: 107
+	-- upvalues: ReactGlobals (copy), u9 (ref), u8 (ref), u10 (ref), console (copy)
+	if not ReactGlobals.__DEV__ or not u9 then
+		return
+	end
+
+	local onScheduleFiberRoot = u9.onScheduleFiberRoot
+	local g21 = nil
+	local mt = nil
+	local v20 = nil
+
+	if typeof(onScheduleFiberRoot) == "function" then
+		v20 = true
+		g21 = true
+	end
+
+	repeat
+		if g21 or (g21 or typeof(onScheduleFiberRoot) == "table") then
+			if not g21 then
+				if not g21 then
+					mt = getmetatable(onScheduleFiberRoot)
+				end
+			end
+
+			repeat
+				if g21 or (g21 or (g21 or mt and rawget(mt, "__call"))) then
+					if not g21 then
+						if not g21 then
+							if not g21 then
+								v20 = true
+							end
+						end
+					end
+
+					g21 = false
+
+					if v20 then
+						local ok, result = pcall(u9.onScheduleFiberRoot, u8, p3, p4)
+
+						if not ok and ReactGlobals.__DEV__ and not u10 then
+							u10 = true
+							console.error("React instrumentation encountered an error: %s", result)
+						end
+					end
+
+					return
+				end
+
+				if onScheduleFiberRoot._isMockFunction then
+					v20 = true
+					g21 = true
+				end
+			until not g21
+		end
+
+		v20 = false
+		g21 = true
+	until not g21
+end
+function t1.onCommitRoot(p5, p6) -- line: 127
+	-- upvalues: u9 (ref), DidCapture (copy), enableProfilerTimer (copy), u8 (ref), ReactGlobals (copy), u10 (ref), console (copy)
+	if not u9 then
+		return
+	end
+
+	local onCommitFiberRoot = u9.onCommitFiberRoot
+	local g29 = nil
+	local mt = nil
+	local v28 = nil
+
+	if typeof(onCommitFiberRoot) == "function" then
+		v28 = true
+		g29 = true
+	end
+
+	repeat
+		if g29 or (g29 or typeof(onCommitFiberRoot) == "table") then
+			if not g29 then
+				if not g29 then
+					mt = getmetatable(onCommitFiberRoot)
+				end
+			end
+
+			repeat
+				if g29 or (g29 or (g29 or mt and rawget(mt, "__call"))) then
+					if not g29 then
+						if not g29 then
+							if not g29 then
+								v28 = true
+							end
+						end
+					end
+
+					g29 = false
+
+					if v28 then
+						local ok, result = pcall(function() -- line: 133
+							-- upvalues: p5 (copy), DidCapture (copy), enableProfilerTimer (copy), u9 (ref), u8 (ref), p6 (copy)
+							local v40 = bit32.band(p5.current.flags, DidCapture) == DidCapture
+
+							if enableProfilerTimer then
+								u9.onCommitFiberRoot(u8, p5, p6, v40)
+
+								return
+							end
+
+							u9.onCommitFiberRoot(u8, p5, nil, v40)
+						end)
+
+						if not ok and ReactGlobals.__DEV__ and not u10 then
+							u10 = true
+							console.error("React instrumentation encountered an error: %s", result)
+						end
+					end
+
+					return
+				end
+
+				if onCommitFiberRoot._isMockFunction then
+					v28 = true
+					g29 = true
+				end
+			until not g29
+		end
+
+		v28 = false
+		g29 = true
+	until not g29
+end
+function t1.onCommitUnmount(p7) -- line: 152
+	-- upvalues: u9 (ref), u8 (ref), ReactGlobals (copy), u10 (ref), console (copy)
+	if not u9 then
+		return
+	end
+
+	local onCommitFiberUnmount = u9.onCommitFiberUnmount
+	local g36 = nil
+	local mt = nil
+	local v35 = nil
+
+	if typeof(onCommitFiberUnmount) == "function" then
+		v35 = true
+		g36 = true
+	end
+
+	repeat
+		if g36 or (g36 or typeof(onCommitFiberUnmount) == "table") then
+			if not g36 then
+				if not g36 then
+					mt = getmetatable(onCommitFiberUnmount)
+				end
+			end
+
+			repeat
+				if g36 or (g36 or (g36 or mt and rawget(mt, "__call"))) then
+					if not g36 then
+						if not g36 then
+							if not g36 then
+								v35 = true
+							end
+						end
+					end
+
+					g36 = false
+
+					if v35 then
+						local ok, result = pcall(u9.onCommitFiberUnmount, u8, p7)
+
+						if not ok and ReactGlobals.__DEV__ and not u10 then
+							u10 = true
+							console.error("React instrumentation encountered an error: %s", result)
+						end
+					end
+
+					return
+				end
+
+				if onCommitFiberUnmount._isMockFunction then
+					v35 = true
+					g36 = true
+				end
+			until not g36
+		end
+
+		v35 = false
+		g36 = true
+	until not g36
+end
+
+return t1

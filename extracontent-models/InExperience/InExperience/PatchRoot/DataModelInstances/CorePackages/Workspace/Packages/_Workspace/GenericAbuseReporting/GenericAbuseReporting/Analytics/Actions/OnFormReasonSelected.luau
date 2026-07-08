@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 13 ]]
-    return {
-        reason_selection = v1.reason_selection
-    };
-end);
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 13
+	return {
+		reason_selection = t1.reason_selection
+	}
+end)

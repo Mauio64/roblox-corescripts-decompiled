@@ -1,7 +1,8 @@
-return (setmetatable({
-    isEnabled = false
-}, {
-    __call = function(_, ...) --[[ Line: 3 ]] --[[ Name: debugPrint ]]
+local function debugPrint(_, ...) -- line: 3
+end
 
-    end
-}));
+return (setmetatable({
+	isEnabled = false
+}, {
+	__call = debugPrint
+}))

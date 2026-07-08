@@ -1,5 +1,8 @@
-local l_HttpService_0 = game:GetService("HttpService");
-return function(v1) --[[ Line: 10 ]] --[[ Name: encodeURIComponent ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return (l_HttpService_0:UrlEncode(v1):gsub("%%2D", "-"):gsub("%%5F", "_"):gsub("%%2E", "."):gsub("%%21", "!"):gsub("%%7E", "~"):gsub("%%2A", "*"):gsub("%%27", "'"):gsub("%%28", "("):gsub("%%29", ")"));
-end;
+local HttpService = game:GetService("HttpService")
+
+local function encodeURIComponent(s1: string) -- line: 10
+	-- upvalues: HttpService (copy)
+	return (HttpService:UrlEncode(s1):gsub("%%2D", "-"):gsub("%%5F", "_"):gsub("%%2E", "."):gsub("%%21", "!"):gsub("%%7E", "~"):gsub("%%2A", "*"):gsub("%%27", "'"):gsub("%%28", "("):gsub("%%29", ")"))
+end
+
+return encodeURIComponent

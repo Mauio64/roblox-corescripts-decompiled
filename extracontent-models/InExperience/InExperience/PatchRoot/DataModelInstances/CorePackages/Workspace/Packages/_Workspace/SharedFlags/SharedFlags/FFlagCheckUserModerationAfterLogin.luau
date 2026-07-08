@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CheckUserModerationAfterLogin", false);
+return game:DefineFastFlag("CheckUserModerationAfterLogin", false)

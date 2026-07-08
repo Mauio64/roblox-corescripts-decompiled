@@ -1,157 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.React);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local v5 = require(l_script_FirstAncestor_0.Flags.FFlagExpChatTcIndicator);
-local function v12(v6, v7) --[[ Line: 11 ]] --[[ Name: mapStringToBeLocalized ]]
-    if type(v7) == "table" then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 13 ]]
-            -- upvalues: v6 (copy), v7 (copy)
-            return v6:FormatByKey(v7[1], v7[2]);
-        end);
-        if l_status_0 then
-            return l_result_0;
-        else
-            return "";
-        end;
-    elseif type(v7) == "string" then
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 23 ]]
-            -- upvalues: v6 (copy), v7 (copy)
-            return v6:FormatByKey(v7);
-        end);
-        if l_status_1 then
-            return l_result_1;
-        else
-            return "";
-        end;
-    else
-        return "";
-    end;
-end;
-local _ = function(v13) --[[ Line: 37 ]] --[[ Name: getConnect ]]
-    -- upvalues: l_Dictionary_0 (copy), v5 (copy), v12 (copy), v2 (copy)
-    return function(v14) --[[ Line: 38 ]]
-        -- upvalues: l_Dictionary_0 (ref), v5 (ref), v12 (ref), v2 (ref), v13 (copy)
-        local function v23(v15, v16) --[[ Line: 39 ]] --[[ Name: transformedMapper ]]
-            -- upvalues: l_Dictionary_0 (ref), v14 (copy), v5 (ref), v12 (ref)
-            return l_Dictionary_0.map(v14(v16), function(v17, _) --[[ Line: 40 ]]
-                -- upvalues: v5 (ref), v12 (ref), v15 (copy)
-                if v5 then
-                    return (v12(v15, v17));
-                elseif type(v17) == "table" then
-                    local l_status_2, l_result_2 = pcall(function() --[[ Line: 46 ]]
-                        -- upvalues: v15 (ref), v17 (copy)
-                        return v15:FormatByKey(v17[1], v17[2]);
-                    end);
-                    if l_status_2 then
-                        return l_result_2;
-                    else
-                        return "";
-                    end;
-                elseif type(v17) == "string" then
-                    local l_status_3, l_result_3 = pcall(function() --[[ Line: 56 ]]
-                        -- upvalues: v15 (ref), v17 (copy)
-                        return v15:FormatByKey(v17);
-                    end);
-                    if l_status_3 then
-                        return l_result_3;
-                    else
-                        return "";
-                    end;
-                else
-                    return "";
-                end;
-            end);
-        end;
-        return function(v24) --[[ Line: 71 ]]
-            -- upvalues: v2 (ref), v13 (ref), l_Dictionary_0 (ref), v23 (copy)
-            local v25 = v2.Component:extend("Connected-" .. tostring(v24));
-            v25.render = function(v26) --[[ Line: 74 ]] --[[ Name: render ]]
-                -- upvalues: v2 (ref), v13 (ref), v24 (copy), l_Dictionary_0 (ref), v23 (ref)
-                return v2.createElement(v13.Consumer, {
-                    render = function(v27) --[[ Line: 76 ]] --[[ Name: render ]]
-                        -- upvalues: v2 (ref), v24 (ref), l_Dictionary_0 (ref), v26 (copy), v23 (ref)
-                        return v2.createElement(v24, l_Dictionary_0.join(v26.props, v23(v27, v26.props)));
-                    end
-                });
-            end;
-            return v25;
-        end;
-    end;
-end;
-local _ = function(v29) --[[ Line: 90 ]] --[[ Name: getUseLocalization ]]
-    -- upvalues: v3 (copy), l_Dictionary_0 (copy), v12 (copy)
-    return function(v30) --[[ Line: 91 ]]
-        -- upvalues: v3 (ref), v29 (copy), l_Dictionary_0 (ref), v12 (ref)
-        local v31 = v3.useContext(v29);
-        return l_Dictionary_0.map(v30, function(v32, _) --[[ Line: 93 ]]
-            -- upvalues: v12 (ref), v31 (copy)
-            return (v12(v31, v32));
-        end);
-    end;
-end;
-return function(v35) --[[ Line: 99 ]]
-    -- upvalues: v2 (copy), l_Dictionary_0 (copy), v5 (copy), v12 (copy), v3 (copy)
-    local v36 = v2.createContext(v35);
-    return {
-        Consumer = v36.Consumer, 
-        Provider = v36.Provider, 
-        connect = function(v37) --[[ Line: 38 ]]
-            -- upvalues: l_Dictionary_0 (ref), v5 (ref), v12 (ref), v2 (ref), v36 (copy)
-            local function v46(v38, v39) --[[ Line: 39 ]] --[[ Name: transformedMapper ]]
-                -- upvalues: l_Dictionary_0 (ref), v37 (copy), v5 (ref), v12 (ref)
-                return l_Dictionary_0.map(v37(v39), function(v40, _) --[[ Line: 40 ]]
-                    -- upvalues: v5 (ref), v12 (ref), v38 (copy)
-                    if v5 then
-                        return (v12(v38, v40));
-                    elseif type(v40) == "table" then
-                        local l_status_4, l_result_4 = pcall(function() --[[ Line: 46 ]]
-                            -- upvalues: v38 (ref), v40 (copy)
-                            return v38:FormatByKey(v40[1], v40[2]);
-                        end);
-                        if l_status_4 then
-                            return l_result_4;
-                        else
-                            return "";
-                        end;
-                    elseif type(v40) == "string" then
-                        local l_status_5, l_result_5 = pcall(function() --[[ Line: 56 ]]
-                            -- upvalues: v38 (ref), v40 (copy)
-                            return v38:FormatByKey(v40);
-                        end);
-                        if l_status_5 then
-                            return l_result_5;
-                        else
-                            return "";
-                        end;
-                    else
-                        return "";
-                    end;
-                end);
-            end;
-            return function(v47) --[[ Line: 71 ]]
-                -- upvalues: v2 (ref), v36 (ref), l_Dictionary_0 (ref), v46 (copy)
-                local v48 = v2.Component:extend("Connected-" .. tostring(v47));
-                v48.render = function(v49) --[[ Line: 74 ]] --[[ Name: render ]]
-                    -- upvalues: v2 (ref), v36 (ref), v47 (copy), l_Dictionary_0 (ref), v46 (ref)
-                    return v2.createElement(v36.Consumer, {
-                        render = function(v50) --[[ Line: 76 ]] --[[ Name: render ]]
-                            -- upvalues: v2 (ref), v47 (ref), l_Dictionary_0 (ref), v49 (copy), v46 (ref)
-                            return v2.createElement(v47, l_Dictionary_0.join(v49.props, v46(v50, v49.props)));
-                        end
-                    });
-                end;
-                return v48;
-            end;
-        end, 
-        useLocalization = function(v51) --[[ Line: 91 ]]
-            -- upvalues: v3 (ref), v36 (copy), l_Dictionary_0 (ref), v12 (ref)
-            local v52 = v3.useContext(v36);
-            return l_Dictionary_0.map(v51, function(v53, _) --[[ Line: 93 ]]
-                -- upvalues: v12 (ref), v52 (copy)
-                return (v12(v52, v53));
-            end);
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Roact = require(Parent.Roact)
+local React = require(Parent.React)
+local Dictionary = require(Parent.llama).Dictionary
+
+local function mapStringToBeLocalized(p1, p2) -- line: 9
+	if type(p2) == "table" then
+		local ok, result = pcall(function() -- line: 11
+			-- upvalues: p1 (copy), p2 (copy)
+			return p1:FormatByKey(p2[1], p2[2])
+		end)
+
+		if ok then
+			return result
+		end
+
+		return ""
+	end
+
+	if type(p2) == "string" then
+		local ok, result = pcall(function() -- line: 21
+			-- upvalues: p1 (copy), p2 (copy)
+			return p1:FormatByKey(p2)
+		end)
+
+		if ok then
+			return result
+		end
+
+		return ""
+	end
+
+	return ""
+end
+local function getConnect(p3) -- line: 35
+	-- upvalues: Dictionary (copy), mapStringToBeLocalized (copy), Roact (copy)
+	return function(p4) -- line: 36
+		-- upvalues: Dictionary (copy), mapStringToBeLocalized (copy), Roact (copy), p3 (copy)
+		local function transformedMapper(p5, p6) -- line: 37
+			-- upvalues: Dictionary (copy), p4 (copy), mapStringToBeLocalized (copy)
+			return Dictionary.map(p4(p6), function(p7, _) -- line: 38
+				-- upvalues: mapStringToBeLocalized (copy), p5 (copy)
+				return (mapStringToBeLocalized(p5, p7))
+			end)
+		end
+
+		return function(p9) -- line: 43
+			-- upvalues: Roact (copy), p3 (copy), Dictionary (copy), transformedMapper (copy)
+			local v29 = Roact.Component:extend("Connected-" .. tostring(p9))
+
+			function v29.render(p10) -- line: 46
+				-- upvalues: Roact (copy), p3 (copy), p9 (copy), Dictionary (copy), transformedMapper (copy)
+				return Roact.createElement(p3.Consumer, {
+					render = function(p11) -- line: 48
+						-- upvalues: Roact (copy), p9 (copy), Dictionary (copy), p10 (copy), transformedMapper (copy)
+						return Roact.createElement(p9, Dictionary.join(p10.props, transformedMapper(p11, p10.props)))
+					end
+				})
+			end
+
+			return v29
+		end
+	end
+end
+local function getUseLocalization(p12) -- line: 62
+	-- upvalues: React (copy), Dictionary (copy), mapStringToBeLocalized (copy)
+	return function(t1: {[any]: any}) -- line: 63
+		-- upvalues: React (copy), p12 (copy), Dictionary (copy), mapStringToBeLocalized (copy)
+		local v21 = React.useContext(p12)
+
+		return Dictionary.map(t1, function(p13, _) -- line: 65
+			-- upvalues: mapStringToBeLocalized (copy), v21 (copy)
+			return (mapStringToBeLocalized(v21, p13))
+		end)
+	end
+end
+
+return function(p15) -- line: 71
+	-- upvalues: Roact (copy), Dictionary (copy), mapStringToBeLocalized (copy), React (copy)
+	local v17 = Roact.createContext(p15)
+
+	return {
+		Consumer = v17.Consumer,
+		Provider = v17.Provider,
+		connect = function(p16) -- line: 36
+			-- upvalues: Dictionary (copy), mapStringToBeLocalized (copy), Roact (copy), v17 (copy)
+			local function transformedMapper(p17, p18) -- line: 37
+				-- upvalues: Dictionary (copy), p16 (copy), mapStringToBeLocalized (copy)
+				return Dictionary.map(p16(p18), function(p19, _) -- line: 38
+					-- upvalues: mapStringToBeLocalized (copy), p17 (copy)
+					return (mapStringToBeLocalized(p17, p19))
+				end)
+			end
+
+			return function(p21) -- line: 43
+				-- upvalues: Roact (copy), v17 (copy), Dictionary (copy), transformedMapper (copy)
+				local v35 = Roact.Component:extend("Connected-" .. tostring(p21))
+
+				function v35.render(p22) -- line: 46
+					-- upvalues: Roact (copy), v17 (copy), p21 (copy), Dictionary (copy), transformedMapper (copy)
+					return Roact.createElement(v17.Consumer, {
+						render = function(p23) -- line: 48
+							-- upvalues: Roact (copy), p21 (copy), Dictionary (copy), p22 (copy), transformedMapper (copy)
+							return Roact.createElement(p21, Dictionary.join(p22.props, transformedMapper(p23, p22.props)))
+						end
+					})
+				end
+
+				return v35
+			end
+		end,
+		useLocalization = function(t2: {[any]: any}) -- line: 63
+			-- upvalues: React (copy), v17 (copy), Dictionary (copy), mapStringToBeLocalized (copy)
+			local v25 = React.useContext(v17)
+
+			return Dictionary.map(t2, function(p24, _) -- line: 65
+				-- upvalues: mapStringToBeLocalized (copy), v25 (copy)
+				return (mapStringToBeLocalized(v25, p24))
+			end)
+		end
+	}
+end

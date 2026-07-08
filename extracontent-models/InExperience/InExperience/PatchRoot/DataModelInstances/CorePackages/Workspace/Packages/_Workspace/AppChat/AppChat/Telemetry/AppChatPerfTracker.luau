@@ -1,47 +1,96 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Telemetry.AppChatPerfEventInfo);
-local v2 = require(l_script_FirstAncestor_0.Telemetry.AppChatTTITracker);
-local v3 = require(l_script_FirstAncestor_0.Telemetry.AppChatIntervalTracker);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+
+require(AppChatParent.TimeToInteractiveTracker)
+
+local AppChatPerfEventInfo = require(AppChat.Telemetry.AppChatPerfEventInfo)
+local AppChatTTITracker = require(AppChat.Telemetry.AppChatTTITracker)
+local AppChatIntervalTracker = require(AppChat.Telemetry.AppChatIntervalTracker)
+
 return {
-    Events = v1.Events, 
-    setSharedContext = function(v4) --[[ Line: 26 ]] --[[ Name: setSharedContext ]]
-        -- upvalues: v2 (copy)
-        v2.setSharedContext(v4);
-    end, 
-    isActive = function(v5, v6) --[[ Line: 30 ]] --[[ Name: isActive ]]
-        -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-        local v7 = v6 or {};
-        if v1.isTTIEvent(v5) then
-            return v2.isActive(v5, v7);
-        else
-            return v3.isActive(v5);
-        end;
-    end, 
-    start = function(v8, v9) --[[ Line: 40 ]] --[[ Name: start ]]
-        -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-        local v10 = v9 or {};
-        if v1.isTTIEvent(v8) then
-            return v2.start(v8, v10);
-        else
-            return v3.start(v8, v10);
-        end;
-    end, 
-    finish = function(v11, v12) --[[ Line: 48 ]] --[[ Name: finish ]]
-        -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-        local v13 = v12 or {};
-        if v1.isTTIEvent(v11) then
-            return v2.finish(v11, v13);
-        else
-            return v3.finish(v11);
-        end;
-    end, 
-    cancel = function(v14, v15) --[[ Line: 56 ]] --[[ Name: cancel ]]
-        -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-        local v16 = v15 or {};
-        if v1.isTTIEvent(v14) then
-            return v2.cancel(v14, v16);
-        else
-            return v3.cancel(v14);
-        end;
-    end
-};
+	Events = AppChatPerfEventInfo.Events,
+	Milestone = AppChatTTITracker.Milestone,
+	Hooks = AppChatTTITracker.Hooks,
+	setSharedContext = function(t1: {[any]: any}) -- line: 33
+		-- upvalues: AppChatTTITracker (copy)
+		AppChatTTITracker.setSharedContext(t1)
+	end,
+	isActive = function(p1, p2) -- line: 37
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy), AppChatIntervalTracker (copy)
+		local v9 = p2 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p1) then
+			return AppChatTTITracker.isActive(p1, v9)
+		end
+
+		return AppChatIntervalTracker.isActive(p1)
+	end,
+	start = function(p3, p4) -- line: 47
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy), AppChatIntervalTracker (copy)
+		local v12 = p4 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p3) then
+			return AppChatTTITracker.start(p3, v12)
+		end
+
+		return AppChatIntervalTracker.start(p3, v12)
+	end,
+	finish = function(p5, p6) -- line: 55
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy), AppChatIntervalTracker (copy)
+		local v15 = p6 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p5) then
+			return AppChatTTITracker.finish(p5, v15)
+		end
+
+		return AppChatIntervalTracker.finish(p5)
+	end,
+	getEventName = function(p7) -- line: 63
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy)
+		if AppChatPerfEventInfo.isTTIEvent(p7) then
+			return AppChatTTITracker.getEventName(p7)
+		end
+
+		return nil
+	end,
+	trackMilestone = function(p8, p9, p10) -- line: 70
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy)
+		local v20 = p10 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p8) then
+			return AppChatTTITracker.trackMilestone(p8, p9, v20)
+		end
+
+		return false
+	end,
+	trackSubphase = function(p11, p12, p13, p14) -- line: 78
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy)
+		local v25 = p14 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p11) then
+			return AppChatTTITracker.trackSubphase(p11, p12, p13, v25)
+		end
+
+		return false
+	end,
+	trackRequest = function(p15, p16, s1: string, p17) -- line: 91
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy)
+		local v30 = p17 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p15) then
+			return AppChatTTITracker.trackRequest(p15, p16, s1, v30)
+		end
+
+		return false
+	end,
+	cancel = function(p18, p19) -- line: 104
+		-- upvalues: AppChatPerfEventInfo (copy), AppChatTTITracker (copy), AppChatIntervalTracker (copy)
+		local v33 = p19 or {}
+
+		if AppChatPerfEventInfo.isTTIEvent(p18) then
+			return AppChatTTITracker.cancel(p18, v33)
+		end
+
+		return AppChatIntervalTracker.cancel(p18)
+	end
+}

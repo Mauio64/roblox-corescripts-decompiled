@@ -1,190 +1,201 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent;
-local v6 = require(l_Parent_0.Components.VirtualKeyboardMonitor);
-local v7 = require(l_Parent_0.Resources.Assets);
-local v8 = require(l_Parent_0.Dependencies);
-local v9 = require(v8.Divider);
-local l_ImageSetButton_0 = v3.Core.ImageSet.ImageSetButton;
-local l_withStyle_0 = v3.Core.Style.withStyle;
-local l_IconButton_0 = v3.App.Button.IconButton;
-local l_HeaderBar_0 = v3.App.Bar.HeaderBar;
-local l_IconSize_0 = v3.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_makeBackButton_0 = require(l_CorePackages_0.Workspace.Packages.AppHeaderBar).makeBackButton;
-local v17 = v2.Component:extend("ModalDialog");
-v17.validateProps = v4.strictInterface({
-    visible = v4.boolean, 
-    screenSize = v4.Vector2, 
-    titleText = v4.optional(v4.string), 
-    showCloseButton = v4.optional(v4.boolean), 
-    headerBar = v4.optional(v4.table), 
-    contents = v4.optional(v4.table), 
-    actionButtons = v4.optional(v4.table), 
-    onDismiss = v4.optional(v4.callback), 
-    onBackButtonActivated = v4.optional(v4.callback)
-});
-v17.init = function(v18) --[[ Line: 44 ]] --[[ Name: init ]]
-    -- upvalues: v6 (copy)
-    v18.virtualKeyboardMonitor = v6.getInstance();
-    v18.onOverlayActivated = function() --[[ Line: 46 ]]
-        -- upvalues: v18 (copy)
-        if v18.virtualKeyboardMonitor:isKeyboardJustOff() then
-            return;
-        else
-            v18.props.onDismiss();
-            return;
-        end;
-    end;
-end;
-v17.renderHeaderBarLeft = function(v19) --[[ Line: 55 ]] --[[ Name: renderHeaderBarLeft ]]
-    -- upvalues: v2 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy), l_makeBackButton_0 (copy)
-    local l_props_0 = v19.props;
-    if l_props_0.showCloseButton then
-        return function() --[[ Line: 59 ]]
-            -- upvalues: v2 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), l_props_0 (copy)
-            return v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/close"], 
-                onActivated = l_props_0.onDismiss
-            });
-        end;
-    elseif l_props_0.onBackButtonActivated ~= nil then
-        return l_makeBackButton_0(l_props_0.onBackButtonActivated);
-    else
-        return function() --[[ Line: 71 ]]
-            return nil;
-        end;
-    end;
-end;
-v17.renderHeaderBarRight = function(_) --[[ Line: 77 ]] --[[ Name: renderHeaderBarRight ]]
-    return function() --[[ Line: 79 ]]
-        return nil;
-    end;
-end;
-v17.render = function(v22) --[[ Line: 84 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v2 (copy), l_ImageSetButton_0 (copy), v7 (copy), l_HeaderBar_0 (copy), v9 (copy)
-    local l_props_1 = v22.props;
-    local v24 = Vector2.new(math.min(l_props_1.screenSize.X, 540), (math.min(l_props_1.screenSize.Y, 375)));
-    local v25 = nil;
-    local v26 = nil;
-    if l_props_1.screenSize.X < 540 then
-        v25 = Vector2.new(0.5, 1);
-        v26 = UDim2.fromScale(0.5, 1);
-    else
-        v25 = Vector2.new(0.5, 0.5);
-        v26 = UDim2.fromScale(0.5, 0.5);
-    end;
-    local v27 = math.min(230, v24.Y - 49 - 96);
-    if not l_props_1.actionButtons then
-        v27 = v27 + 96;
-    end;
-    return l_withStyle_0(function(v28) --[[ Line: 106 ]]
-        -- upvalues: v2 (ref), l_props_1 (copy), v22 (copy), l_ImageSetButton_0 (ref), v25 (ref), v7 (ref), v26 (ref), v24 (copy), l_HeaderBar_0 (ref), v9 (ref), v27 (ref)
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromScale(1, 1), 
-            Visible = l_props_1.visible
-        }, {
-            Overlay = v2.createElement("TextButton", {
-                AutoButtonColor = false, 
-                BackgroundColor3 = v28.Theme.Overlay.Color, 
-                BackgroundTransparency = v28.Theme.Overlay.Transparency, 
-                BorderSizePixel = 0, 
-                Size = UDim2.fromScale(1, 1), 
-                Text = "", 
-                ZIndex = -10, 
-                [v2.Event.Activated] = v22.onOverlayActivated
-            }), 
-            Dialog = v2.createElement(l_ImageSetButton_0, {
-                Active = true, 
-                AnchorPoint = v25, 
-                BackgroundTransparency = 1, 
-                Image = v7.Images.RoundedRect.Image, 
-                ImageColor3 = v28.Theme.BackgroundUIDefault.Color, 
-                ImageTransparency = v28.Theme.BackgroundUIDefault.Transparency, 
-                Position = v26, 
-                ScaleType = v7.Images.RoundedRect.ScaleType, 
-                Size = UDim2.fromOffset(v24.X, v24.Y), 
-                SliceCenter = v7.Images.RoundedRect.SliceCenter
-            }, {
-                Layout = v2.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                HeaderBar = v2.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 1, 
-                    Size = UDim2.new(1, 0, 0, 48)
-                }, {
-                    Bar = l_props_1.headerBar or v2.createElement(l_HeaderBar_0, {
-                        backgroundTransparency = 1, 
-                        barHeight = 48, 
-                        renderLeft = v22:renderHeaderBarLeft(), 
-                        renderRight = v22:renderHeaderBarRight(), 
-                        title = l_props_1.titleText
-                    }) or nil
-                }), 
-                Divider = v2.createElement(v9, {
-                    LayoutOrder = 2
-                }), 
-                Content = v2.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 3, 
-                    Size = UDim2.new(1, 0, 0, v27), 
-                    ZIndex = 10
-                }, {
-                    Contents = l_props_1.contents
-                }), 
-                ActionBar = l_props_1.actionButtons and v2.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 4, 
-                    Size = UDim2.new(1, 0, 0, 96)
-                }, {
-                    Padding = v2.createElement("UIPadding", {
-                        PaddingTop = UDim.new(0, 24), 
-                        PaddingBottom = UDim.new(0, 24), 
-                        PaddingLeft = UDim.new(0, 24), 
-                        PaddingRight = UDim.new(0, 24)
-                    }), 
-                    ActionButtons = l_props_1.actionButtons
-                }) or nil
-            })
-        });
-    end);
-end;
-v17.bindActions = function(v29) --[[ Line: 181 ]] --[[ Name: bindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:BindCoreAction("ModalDialogDismiss", function(_, v31, _) --[[ Line: 182 ]] --[[ Name: dismissFunc ]]
-        -- upvalues: v29 (copy)
-        if v31 == Enum.UserInputState.Begin then
-            v29.props.onDismiss();
-        end;
-    end, false, Enum.KeyCode.Escape);
-end;
-v17.unbindActions = function(_) --[[ Line: 190 ]] --[[ Name: unbindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("ModalDialogDismiss");
-end;
-v17.didMount = function(v34) --[[ Line: 194 ]] --[[ Name: didMount ]]
-    if v34.props.visible then
-        v34:bindActions();
-    end;
-end;
-v17.didUpdate = function(v35) --[[ Line: 200 ]] --[[ Name: didUpdate ]]
-    if v35.props.visible then
-        v35:bindActions();
-        return;
-    else
-        v35:unbindActions();
-        return;
-    end;
-end;
-v17.willUnmount = function(v36) --[[ Line: 208 ]] --[[ Name: willUnmount ]]
-    v36:unbindActions();
-end;
-return v17;
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent
+local VirtualKeyboardMonitor = require(ParentParent.Components.VirtualKeyboardMonitor)
+local Assets = require(ParentParent.Resources.Assets)
+local Dependencies = require(ParentParent.Dependencies)
+local Divider = require(Dependencies.Divider)
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local withStyle = UIBlox.Core.Style.withStyle
+local IconButton = UIBlox.App.Button.IconButton
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local makeBackButton = require(CorePackages.Workspace.Packages.AppHeaderBar).makeBackButton
+local v18 = Roact.Component:extend("ModalDialog")
+
+v18.validateProps = t.strictInterface({
+	visible = t.boolean,
+	screenSize = t.Vector2,
+	titleText = t.optional(t.string),
+	showCloseButton = t.optional(t.boolean),
+	headerBar = t.optional(t.table),
+	contents = t.optional(t.table),
+	actionButtons = t.optional(t.table),
+	onDismiss = t.optional(t.callback),
+	onBackButtonActivated = t.optional(t.callback)
+})
+
+function v18.init(p1) -- line: 44
+	-- upvalues: VirtualKeyboardMonitor (copy)
+	p1.virtualKeyboardMonitor = VirtualKeyboardMonitor.getInstance()
+
+	function p1.onOverlayActivated() -- line: 46
+		-- upvalues: p1 (copy)
+		if p1.virtualKeyboardMonitor:isKeyboardJustOff() then
+			return
+		end
+
+		p1.props.onDismiss()
+	end
+end
+function v18.renderHeaderBarLeft(p2) -- line: 55
+	-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), makeBackButton (copy)
+	local props = p2.props
+
+	if props.showCloseButton then
+		return function() -- line: 59
+			-- upvalues: Roact (copy), IconButton (copy), IconSize (copy), Images (copy), props (copy)
+			return Roact.createElement(IconButton, {
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/close"],
+				onActivated = props.onDismiss
+			})
+		end
+	end
+
+	if props.onBackButtonActivated ~= nil then
+		return makeBackButton(props.onBackButtonActivated)
+	end
+
+	return function() -- line: 71
+		return nil
+	end
+end
+function v18.renderHeaderBarRight(_) -- line: 77
+	return function() -- line: 79
+		return nil
+	end
+end
+function v18.render(p4) -- line: 84
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetButton (copy), Assets (copy), HeaderBar (copy), Divider (copy)
+	local props = p4.props
+	local vector2 = Vector2.new(math.min(props.screenSize.X, 540), (math.min(props.screenSize.Y, 375)))
+	local vector2_2, uDim2
+
+	if props.screenSize.X < 540 then
+		vector2_2 = Vector2.new(0.5, 1)
+		uDim2 = UDim2.fromScale(0.5, 1)
+	else
+		vector2_2 = Vector2.new(0.5, 0.5)
+		uDim2 = UDim2.fromScale(0.5, 0.5)
+	end
+
+	local u28 = math.min(230, vector2.Y - 49 - 96)
+
+	if not props.actionButtons then
+		u28 += 96
+	end
+
+	return withStyle(function(p5) -- line: 106
+		-- upvalues: Roact (copy), props (copy), p4 (copy), ImageSetButton (copy), vector2_2 (ref), Assets (copy), uDim2 (ref), vector2 (copy), HeaderBar (copy), Divider (copy), u28 (ref)
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			Visible = props.visible
+		}, {
+			Overlay = Roact.createElement("TextButton", {
+				AutoButtonColor = false,
+				BackgroundColor3 = p5.Theme.Overlay.Color,
+				BackgroundTransparency = p5.Theme.Overlay.Transparency,
+				BorderSizePixel = 0,
+				Size = UDim2.fromScale(1, 1),
+				Text = "",
+				ZIndex = -10,
+				[Roact.Event.Activated] = p4.onOverlayActivated
+			}),
+			Dialog = Roact.createElement(ImageSetButton, {
+				Active = true,
+				BackgroundTransparency = 1,
+				AnchorPoint = vector2_2,
+				Image = Assets.Images.RoundedRect.Image,
+				ImageColor3 = p5.Theme.BackgroundUIDefault.Color,
+				ImageTransparency = p5.Theme.BackgroundUIDefault.Transparency,
+				Position = uDim2,
+				ScaleType = Assets.Images.RoundedRect.ScaleType,
+				Size = UDim2.fromOffset(vector2.X, vector2.Y),
+				SliceCenter = Assets.Images.RoundedRect.SliceCenter
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				HeaderBar = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 48)
+				}, {
+					Bar = props.headerBar or (Roact.createElement(HeaderBar, {
+						backgroundTransparency = 1,
+						barHeight = 48,
+						renderLeft = p4:renderHeaderBarLeft(),
+						renderRight = p4:renderHeaderBarRight(),
+						title = props.titleText
+					}) or nil)
+				}),
+				Divider = Roact.createElement(Divider, {
+					LayoutOrder = 2
+				}),
+				Content = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 3,
+					ZIndex = 10,
+					Size = UDim2.new(1, 0, 0, u28)
+				}, {
+					Contents = props.contents
+				}),
+				ActionBar = props.actionButtons and Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 4,
+					Size = UDim2.new(1, 0, 0, 96)
+				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, 24),
+						PaddingBottom = UDim.new(0, 24),
+						PaddingLeft = UDim.new(0, 24),
+						PaddingRight = UDim.new(0, 24)
+					}),
+					ActionButtons = props.actionButtons
+				}) or nil
+			})
+		})
+	end)
+end
+function v18.bindActions(p6) -- line: 181
+	-- upvalues: ContextActionService (copy)
+	local function dismissFunc(_, p8, _) -- line: 182
+		-- upvalues: p6 (copy)
+		if p8 == Enum.UserInputState.Begin then
+			p6.props.onDismiss()
+		end
+	end
+
+	ContextActionService:BindCoreAction("ModalDialogDismiss", dismissFunc, false, Enum.KeyCode.Escape)
+end
+function v18.unbindActions(_) -- line: 190
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("ModalDialogDismiss")
+end
+function v18.didMount(p11) -- line: 194
+	if p11.props.visible then
+		p11:bindActions()
+	end
+end
+function v18.didUpdate(p12) -- line: 200
+	if p12.props.visible then
+		p12:bindActions()
+
+		return
+	end
+
+	p12:unbindActions()
+end
+function v18.willUnmount(p13) -- line: 208
+	p13:unbindActions()
+end
+
+return v18

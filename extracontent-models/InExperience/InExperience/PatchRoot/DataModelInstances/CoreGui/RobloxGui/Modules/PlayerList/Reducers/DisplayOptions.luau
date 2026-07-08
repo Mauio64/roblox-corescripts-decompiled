@@ -1,164 +1,196 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_VRService_0 = game:GetService("VRService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_CorePackages_0.Packages.Rodux);
-local v4 = require(l_CorePackages_0.Packages.Cryo);
-local v5 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local l_Parent_0 = script.Parent.Parent;
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v8 = require(l_Actions_0.SetPlayerListVisibility);
-local v9 = require(l_Actions_0.SetPlayerListEnabled);
-local v10 = require(l_Actions_0.SetTempHideKey);
-local v11 = require(l_Actions_0.SetPerformanceStatsVisible);
-local v12 = require(l_Actions_0.SetSmallTouchDevice);
-local v13 = require(l_Actions_0.SetTenFootInterface);
-local v14 = require(l_Actions_0.SetInspectMenuEnabled);
-local v15 = require(l_Actions_0.SetIsUsingGamepad);
-local v16 = require(l_Actions_0.SetHasPermissionToVoiceChat);
-local v17 = require(l_Actions_0.SetMinimized);
-local v18 = require(l_Actions_0.SetSubjectToChinaPolicies);
-local v19 = require(l_Parent_0.Flags.FFlagPlayerListPersistVisibility);
-local l_FFlagAddNewPlayerListMobileFocusNav_0 = v5.Flags.FFlagAddNewPlayerListMobileFocusNav;
-local l_FFlagPlayerListUseMobileOnSmallDisplay_0 = v5.Flags.FFlagPlayerListUseMobileOnSmallDisplay;
-local v22 = if v19 then UserSettings().GameSettings else nil;
-local v23 = {
-    isMinimized = false, 
-    setVisible = not l_FFlagPlayerListUseMobileOnSmallDisplay_0 and (not v19 or v22.PlayerListVisible), 
-    isVisible = true, 
-    isSmallTouchDevice = false, 
-    performanceStatsVisible = false, 
-    vrEnabled = l_VRService_0.VREnabled, 
-    inspectMenuEnabled = l_GuiService_0:GetInspectMenuEnabled(), 
-    playerlistCoreGuiEnabled = true, 
-    isTenFootInterface = false, 
-    isUsingGamepad = false, 
-    hasPermissionToVoiceChat = false, 
-    tempHideKeys = {}, 
-    subjectToChinaPolicies = true
-};
-local function _(v24) --[[ Line: 48 ]] --[[ Name: updateIsVisible ]]
-    -- upvalues: v4 (copy)
-    v24.isVisible = v24.setVisible;
-    if not v24.isTenFootInterface then
-        v24.isVisible = v24.isVisible;
-    end;
-    v24.isVisible = v24.isVisible and v4.isEmpty(v24.tempHideKeys);
-    return v24;
-end;
-return (v3.createReducer(v23, {
-    [v8.name] = function(v26, v27) --[[ Line: 61 ]]
-        -- upvalues: v19 (copy), v22 (copy), v4 (copy)
-        if v19 and not v26.isSmallTouchDevice and not v26.isTenFootInterface then
-            v22.PlayerListVisible = v27.isVisible;
-        end;
-        local v28 = v4.Dictionary.join(v26, {
-            setVisible = v27.isVisible
-        });
-        v28.isVisible = v28.setVisible;
-        if not v28.isTenFootInterface then
-            v28.isVisible = v28.isVisible;
-        end;
-        v28.isVisible = v28.isVisible and v4.isEmpty(v28.tempHideKeys);
-        return v28;
-    end, 
-    [v9.name] = function(v29, v30) --[[ Line: 73 ]]
-        -- upvalues: l_FFlagAddNewPlayerListMobileFocusNav_0 (copy), v4 (copy)
-        local v31 = nil;
-        if l_FFlagAddNewPlayerListMobileFocusNav_0 and not v30.isEnabled then
-            v31 = false;
-        end;
-        local v32 = v4.Dictionary.join(v29, {
-            playerlistCoreGuiEnabled = v30.isEnabled, 
-            setVisible = if l_FFlagAddNewPlayerListMobileFocusNav_0 then v31 else nil
-        });
-        v32.isVisible = v32.setVisible;
-        if not v32.isTenFootInterface then
-            v32.isVisible = v32.isVisible;
-        end;
-        v32.isVisible = v32.isVisible and v4.isEmpty(v32.tempHideKeys);
-        return v32;
-    end, 
-    [v10.name] = function(v33, v34) --[[ Line: 87 ]]
-        -- upvalues: v4 (copy)
-        local l_tempHideValue_0 = v34.tempHideValue;
-        if l_tempHideValue_0 == nil then
-            l_tempHideValue_0 = v4.None;
-        end;
-        local v36 = v4.Dictionary.join(v33, {
-            tempHideKeys = v4.Dictionary.join(v33.tempHideKeys, {
-                [v34.tempHideKey] = l_tempHideValue_0
-            })
-        });
-        v36.isVisible = v36.setVisible;
-        if not v36.isTenFootInterface then
-            v36.isVisible = v36.isVisible;
-        end;
-        v36.isVisible = v36.isVisible and v4.isEmpty(v36.tempHideKeys);
-        return v36;
-    end, 
-    [v11.name] = function(v37, v38) --[[ Line: 99 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v37, {
-            performanceStatsVisible = v38.isVisible
-        });
-    end, 
-    [v12.name] = function(v39, v40) --[[ Line: 105 ]]
-        -- upvalues: v4 (copy)
-        local v41 = v4.Dictionary.join(v39, {
-            isSmallTouchDevice = v40.isSmallTouchDevice
-        });
-        v41.isVisible = v41.setVisible;
-        if not v41.isTenFootInterface then
-            v41.isVisible = v41.isVisible;
-        end;
-        v41.isVisible = v41.isVisible and v4.isEmpty(v41.tempHideKeys);
-        return v41;
-    end, 
-    [v13.name] = function(v42, v43) --[[ Line: 111 ]]
-        -- upvalues: v4 (copy)
-        local l_setVisible_0 = v42.setVisible;
-        if v43.isTenFootInterface then
-            l_setVisible_0 = false;
-        end;
-        local v45 = v4.Dictionary.join(v42, {
-            isTenFootInterface = v43.isTenFootInterface, 
-            setVisible = l_setVisible_0
-        });
-        v45.isVisible = v45.setVisible;
-        if not v45.isTenFootInterface then
-            v45.isVisible = v45.isVisible;
-        end;
-        v45.isVisible = v45.isVisible and v4.isEmpty(v45.tempHideKeys);
-        return v45;
-    end, 
-    [v14.name] = function(v46, v47) --[[ Line: 122 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v46, {
-            inspectMenuEnabled = v47.enabled
-        });
-    end, 
-    [v15.name] = function(v48, v49) --[[ Line: 128 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v48, {
-            isUsingGamepad = v49.isUsingGamepad
-        });
-    end, 
-    [v16.name] = function(v50, v51) --[[ Line: 134 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v50, {
-            hasPermissionToVoiceChat = v51.hasPermissionToVoiceChat
-        });
-    end, 
-    [v17.name] = function(v52, v53) --[[ Line: 140 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v52, {
-            isMinimized = v53.isMinimized
-        });
-    end, 
-    [v18.name] = function(v54, v55) --[[ Line: 146 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v54, {
-            subjectToChinaPolicies = v55.subjectToChinaPolicies
-        });
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+local VRService = game:GetService("VRService")
+local GuiService = game:GetService("GuiService")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+local ParentParent = script.Parent.Parent
+local Actions = script.Parent.Parent.Actions
+local SetPlayerListVisibility = require(Actions.SetPlayerListVisibility)
+local SetPlayerListEnabled = require(Actions.SetPlayerListEnabled)
+local SetTempHideKey = require(Actions.SetTempHideKey)
+local SetPerformanceStatsVisible = require(Actions.SetPerformanceStatsVisible)
+local SetSmallTouchDevice = require(Actions.SetSmallTouchDevice)
+local SetTenFootInterface = require(Actions.SetTenFootInterface)
+local SetInspectMenuEnabled = require(Actions.SetInspectMenuEnabled)
+local SetIsUsingGamepad = require(Actions.SetIsUsingGamepad)
+local SetHasPermissionToVoiceChat = require(Actions.SetHasPermissionToVoiceChat)
+local SetMinimized = require(Actions.SetMinimized)
+local SetSubjectToChinaPolicies = require(Actions.SetSubjectToChinaPolicies)
+local FFlagPlayerListPersistVisibility = require(ParentParent.Flags.FFlagPlayerListPersistVisibility)
+local FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav
+local FFlagPlayerListUseMobileOnSmallDisplay = PlayerList.Flags.FFlagPlayerListUseMobileOnSmallDisplay
+local v23 = if not FFlagPlayerListPersistVisibility then nil else UserSettings().GameSettings
+local t1 = {
+	isMinimized = false,
+	isVisible = true,
+	isSmallTouchDevice = false,
+	performanceStatsVisible = false,
+	playerlistCoreGuiEnabled = true,
+	isTenFootInterface = false,
+	isUsingGamepad = false,
+	hasPermissionToVoiceChat = false,
+	subjectToChinaPolicies = true,
+	setVisible = not FFlagPlayerListUseMobileOnSmallDisplay and (not FFlagPlayerListPersistVisibility or v23.PlayerListVisible),
+	vrEnabled = VRService.VREnabled,
+	inspectMenuEnabled = GuiService:GetInspectMenuEnabled(),
+	tempHideKeys = {}
+}
+
+local function updateIsVisible(p1) -- line: 48
+	-- upvalues: Cryo (copy)
+	p1.isVisible = p1.setVisible
+
+	if not p1.isTenFootInterface then
+		p1.isVisible = p1.isVisible
+	end
+
+	p1.isVisible = p1.isVisible and Cryo.isEmpty(p1.tempHideKeys)
+
+	return p1
+end
+
+return (Rodux.createReducer(t1, {
+	[SetPlayerListVisibility.name] = function(p2, p3) -- line: 61
+		-- upvalues: FFlagPlayerListPersistVisibility (copy), v23 (copy), Cryo (copy)
+		if FFlagPlayerListPersistVisibility and (not p2.isSmallTouchDevice and not p2.isTenFootInterface) then
+			v23.PlayerListVisible = p3.isVisible
+		end
+
+		local v29 = Cryo.Dictionary.join(p2, {
+			setVisible = p3.isVisible
+		})
+
+		v29.isVisible = v29.setVisible
+
+		if not v29.isTenFootInterface then
+			v29.isVisible = v29.isVisible
+		end
+
+		v29.isVisible = v29.isVisible and Cryo.isEmpty(v29.tempHideKeys)
+
+		return v29
+	end,
+	[SetPlayerListEnabled.name] = function(p4, p5) -- line: 73
+		-- upvalues: FFlagAddNewPlayerListMobileFocusNav (copy), Cryo (copy)
+		local v32 = nil
+
+		if FFlagAddNewPlayerListMobileFocusNav and not p5.isEnabled then
+			v32 = false
+		end
+
+		local v33 = Cryo.Dictionary.join(p4, {
+			playerlistCoreGuiEnabled = p5.isEnabled,
+			setVisible = if not FFlagAddNewPlayerListMobileFocusNav then nil else v32
+		})
+
+		v33.isVisible = v33.setVisible
+
+		if not v33.isTenFootInterface then
+			v33.isVisible = v33.isVisible
+		end
+
+		v33.isVisible = v33.isVisible and Cryo.isEmpty(v33.tempHideKeys)
+
+		return v33
+	end,
+	[SetTempHideKey.name] = function(p6, p7) -- line: 87
+		-- upvalues: Cryo (copy)
+		local tempHideValue = p7.tempHideValue
+
+		if tempHideValue == nil then
+			tempHideValue = Cryo.None
+		end
+
+		local v37 = Cryo.Dictionary.join(p6, {
+			tempHideKeys = Cryo.Dictionary.join(p6.tempHideKeys, {
+				[p7.tempHideKey] = tempHideValue
+			})
+		})
+
+		v37.isVisible = v37.setVisible
+
+		if not v37.isTenFootInterface then
+			v37.isVisible = v37.isVisible
+		end
+
+		v37.isVisible = v37.isVisible and Cryo.isEmpty(v37.tempHideKeys)
+
+		return v37
+	end,
+	[SetPerformanceStatsVisible.name] = function(p8, p9) -- line: 99
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p8, {
+			performanceStatsVisible = p9.isVisible
+		})
+	end,
+	[SetSmallTouchDevice.name] = function(p10, p11) -- line: 105
+		-- upvalues: Cryo (copy)
+		local v42 = Cryo.Dictionary.join(p10, {
+			isSmallTouchDevice = p11.isSmallTouchDevice
+		})
+
+		v42.isVisible = v42.setVisible
+
+		if not v42.isTenFootInterface then
+			v42.isVisible = v42.isVisible
+		end
+
+		v42.isVisible = v42.isVisible and Cryo.isEmpty(v42.tempHideKeys)
+
+		return v42
+	end,
+	[SetTenFootInterface.name] = function(p12, p13) -- line: 111
+		-- upvalues: Cryo (copy)
+		local setVisible = p12.setVisible
+
+		if p13.isTenFootInterface then
+			setVisible = false
+		end
+
+		local v46 = Cryo.Dictionary.join(p12, {
+			isTenFootInterface = p13.isTenFootInterface,
+			setVisible = setVisible
+		})
+
+		v46.isVisible = v46.setVisible
+
+		if not v46.isTenFootInterface then
+			v46.isVisible = v46.isVisible
+		end
+
+		v46.isVisible = v46.isVisible and Cryo.isEmpty(v46.tempHideKeys)
+
+		return v46
+	end,
+	[SetInspectMenuEnabled.name] = function(p14, p15) -- line: 122
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p14, {
+			inspectMenuEnabled = p15.enabled
+		})
+	end,
+	[SetIsUsingGamepad.name] = function(p16, p17) -- line: 128
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p16, {
+			isUsingGamepad = p17.isUsingGamepad
+		})
+	end,
+	[SetHasPermissionToVoiceChat.name] = function(p18, p19) -- line: 134
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p18, {
+			hasPermissionToVoiceChat = p19.hasPermissionToVoiceChat
+		})
+	end,
+	[SetMinimized.name] = function(p20, p21) -- line: 140
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p20, {
+			isMinimized = p21.isMinimized
+		})
+	end,
+	[SetSubjectToChinaPolicies.name] = function(p22, p23) -- line: 146
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p22, {
+			subjectToChinaPolicies = p23.subjectToChinaPolicies
+		})
+	end
+}))

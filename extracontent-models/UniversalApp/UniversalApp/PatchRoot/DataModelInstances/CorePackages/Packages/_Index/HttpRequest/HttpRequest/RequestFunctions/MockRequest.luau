@@ -1,27 +1,31 @@
-local l_Parent_0 = script:FindFirstAncestor("HttpRequest").Parent;
-local v1 = require(l_Parent_0.Cryo);
-return function(v2, v3, v4) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    return {
-        Start = function(_, v6) --[[ Line: 6 ]] --[[ Name: Start ]]
-            -- upvalues: v4 (copy), v1 (ref), v2 (copy), v3 (copy)
-            local v7 = {};
-            if type(v4.mockResponse) == "function" then
-                v7 = v4.mockResponse();
-            elseif v4.mockResponse then
-                v7 = v4.mockResponse;
-            end;
-            local v8 = v1.Dictionary.join({
-                Url = v2, 
-                Method = v3
-            }, v7);
-            v6(v4.success, v8);
-        end, 
-        Cancel = function() --[[ Line: 21 ]] --[[ Name: Cancel ]]
-            -- upvalues: v4 (copy)
-            if v4.cancel then
-                v4.cancel();
-            end;
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("HttpRequest").Parent
+local Cryo = require(Parent.Cryo)
+
+return function(p1, p2, p3) -- line: 4
+	-- upvalues: Cryo (copy)
+	return {
+		Start = function(_, p5) -- line: 6
+			-- upvalues: p3 (copy), Cryo (copy), p1 (copy), p2 (copy)
+			local t1 = {}
+
+			if type(p3.mockResponse) == "function" then
+				t1 = p3.mockResponse()
+			elseif p3.mockResponse then
+				t1 = p3.mockResponse
+			end
+
+			local v9 = Cryo.Dictionary.join({
+				Url = p1,
+				Method = p2
+			}, t1)
+
+			p5(p3.success, v9)
+		end,
+		Cancel = function() -- line: 21
+			-- upvalues: p3 (copy)
+			if p3.cancel then
+				p3.cancel()
+			end
+		end
+	}
+end

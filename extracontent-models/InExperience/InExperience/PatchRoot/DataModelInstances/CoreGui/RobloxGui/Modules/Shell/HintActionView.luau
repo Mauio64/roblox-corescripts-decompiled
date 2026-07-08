@@ -1,111 +1,123 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Shell_0 = game:GetService("CoreGui"):FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_TextService_0 = game:GetService("TextService");
-local l_GlobalSettings_0 = require(l_Shell_0:FindFirstChild("GlobalSettings"));
-local l_Utility_0 = require(l_Shell_0:FindFirstChild("Utility"));
-local v6 = require(l_CorePackages_0.Packages.RoactGamepad);
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local l_getFFlagDebugLuaAppAlwaysUseGamepad_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).getFFlagDebugLuaAppAlwaysUseGamepad;
-return function(v9, v10, v11) --[[ Line: 26 ]] --[[ Name: createHintActionView ]]
-    -- upvalues: l_Create_0 (copy), l_GlobalSettings_0 (copy), l_TextService_0 (copy), l_Utility_0 (copy), l_ContextActionService_0 (copy), l_getFFlagDebugLuaAppAlwaysUseGamepad_0 (copy), v6 (copy)
-    if v11 == nil then
-        v11 = UDim2.new(1, -1, 1, -1);
-    end;
-    local v12 = {};
-    if v10 == nil or #v10 == 0 then
-        v10 = "DefaultHintAction";
-    end;
-    local v13 = l_Create_0("Frame")({
-        Name = "HintActionContainer", 
-        Size = UDim2.new(0, 0, 0, 0), 
-        BackgroundTransparency = 1, 
-        Parent = v9
-    });
-    local v14 = l_Create_0("TextLabel")({
-        Name = "HintActionText", 
-        BackgroundTransparency = 1, 
-        Font = l_GlobalSettings_0.RegularFont, 
-        FontSize = l_GlobalSettings_0.TitleSize, 
-        TextColor3 = l_GlobalSettings_0.WhiteTextColor, 
-        TextXAlignment = Enum.TextXAlignment.Right, 
-        Text = "", 
-        ZIndex = 10, 
-        Parent = v13
-    });
-    local v15 = l_Create_0("ImageLabel")({
-        Name = "HintActionImage", 
-        Size = UDim2.new(0, 83, 0, 83), 
-        BackgroundTransparency = 1, 
-        Image = "", 
-        ZIndex = 10, 
-        Parent = v13
-    });
-    local function v17() --[[ Line: 69 ]] --[[ Name: updateLayout ]]
-        -- upvalues: l_TextService_0 (ref), v14 (copy), l_Utility_0 (ref), v15 (copy), v13 (copy), v11 (ref)
-        local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v14.Text, l_Utility_0.ConvertFontSizeEnumToInt(v14.FontSize), v14.Font, Vector2.new(0, 0));
-        v14.Size = UDim2.new(0, l_l_TextService_0_TextSize_0.x, 0, v15.Size.Y.Offset);
-        v14.Position = UDim2.new(1, -l_l_TextService_0_TextSize_0.x, 0, -4);
-        l_l_TextService_0_TextSize_0 = l_l_TextService_0_TextSize_0.x + v15.Size.X.Offset + 8;
-        v13.Size = UDim2.new(0, l_l_TextService_0_TextSize_0, 0, v15.Size.Y.Offset);
-        v13.Position = UDim2.new(v11.X.Scale, v11.X.Offset * v13.Size.X.Offset, v11.Y.Scale, v11.Y.Offset * v13.Size.Y.Offset);
-    end;
-    v12.BindAction = function(_, v19, v20) --[[ Line: 86 ]] --[[ Name: BindAction ]]
-        -- upvalues: l_ContextActionService_0 (ref), v10 (ref), l_getFFlagDebugLuaAppAlwaysUseGamepad_0 (ref), v6 (ref)
-        if not v19 then
-            return;
-        else
-            l_ContextActionService_0:UnbindCoreAction(v10);
-            if l_getFFlagDebugLuaAppAlwaysUseGamepad_0() and v6.Config.DebugKeyboardBindings then
-                local v21 = v6.Config.DebugKeyboardBindings[v20] or {};
-                l_ContextActionService_0:BindCoreAction(v10, v19, false, v20, table.unpack(v21));
-                return;
-            else
-                l_ContextActionService_0:BindCoreAction(v10, v19, false, v20);
-                return;
-            end;
-        end;
-    end;
-    v12.UnbindAction = function(_) --[[ Line: 100 ]] --[[ Name: UnbindAction ]]
-        -- upvalues: l_ContextActionService_0 (ref), v10 (ref)
-        l_ContextActionService_0:UnbindCoreAction(v10);
-    end;
-    v12.SetParent = function(_, v24) --[[ Line: 104 ]] --[[ Name: SetParent ]]
-        -- upvalues: v13 (copy)
-        v13.Parent = v24;
-    end;
-    v12.SetVisible = function(_, v26) --[[ Line: 108 ]] --[[ Name: SetVisible ]]
-        -- upvalues: v13 (copy)
-        v13.Visible = v26;
-    end;
-    v12.SetTransparency = function(_, v28) --[[ Line: 112 ]] --[[ Name: SetTransparency ]]
-        -- upvalues: v14 (copy), v15 (copy)
-        v14.TextTransparency = v28;
-        v15.ImageTransparency = v28;
-    end;
-    v12.SetVisibleWithTween = function(_, v30) --[[ Line: 117 ]] --[[ Name: SetVisibleWithTween ]]
-        -- upvalues: l_Utility_0 (ref), v14 (copy), v15 (copy)
-        l_Utility_0.PropertyTweener(v14, "TextTransparency", v14.TextTransparency, v30, 0.25, l_Utility_0.EaseOutQuad, true);
-        l_Utility_0.PropertyTweener(v15, "ImageTransparency", v15.ImageTransparency, v30, 0.25, l_Utility_0.EaseOutQuad, true);
-    end;
-    v12.SetText = function(_, v32) --[[ Line: 122 ]] --[[ Name: SetText ]]
-        -- upvalues: v14 (copy), v17 (copy)
-        if v32 == v14.Text then
-            return;
-        else
-            v14.Text = v32;
-            v17();
-            return;
-        end;
-    end;
-    v12.SetImage = function(_, v34) --[[ Line: 131 ]] --[[ Name: SetImage ]]
-        -- upvalues: v15 (copy)
-        if v34 == v15.Image then
-            return;
-        else
-            v15.Image = v34;
-            return;
-        end;
-    end;
-    return v12;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Shell = game:GetService("CoreGui"):FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
+local ContextActionService = game:GetService("ContextActionService")
+local TextService = game:GetService("TextService")
+local GlobalSettings = require(Shell:FindFirstChild("GlobalSettings"))
+local Utility = require(Shell:FindFirstChild("Utility"))
+local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local getFFlagDebugLuaAppAlwaysUseGamepad = require(CorePackages.Workspace.Packages.SharedFlags).getFFlagDebugLuaAppAlwaysUseGamepad
+
+local function createHintActionView(p1, p2, p3) -- line: 26
+	-- upvalues: Create (copy), GlobalSettings (copy), TextService (copy), Utility (copy), ContextActionService (copy), getFFlagDebugLuaAppAlwaysUseGamepad (copy), RoactGamepad (copy)
+	if p3 == nil then
+		p3 = UDim2.new(1, -1, 1, -1)
+	end
+
+	local t1 = {}
+
+	if p2 == nil or #p2 == 0 then
+		p2 = "DefaultHintAction"
+	end
+
+	local v17 = Create("Frame")({
+		Name = "HintActionContainer",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 0, 0, 0),
+		Parent = p1
+	})
+	local v18 = Create("TextLabel")({
+		Name = "HintActionText",
+		BackgroundTransparency = 1,
+		Text = "",
+		ZIndex = 10,
+		Font = GlobalSettings.RegularFont,
+		FontSize = GlobalSettings.TitleSize,
+		TextColor3 = GlobalSettings.WhiteTextColor,
+		TextXAlignment = Enum.TextXAlignment.Right,
+		Parent = v17
+	})
+	local v19 = Create("ImageLabel")({
+		Name = "HintActionImage",
+		BackgroundTransparency = 1,
+		Image = "",
+		ZIndex = 10,
+		Size = UDim2.new(0, 83, 0, 83),
+		Parent = v17
+	})
+
+	local function updateLayout() -- line: 69
+		-- upvalues: TextService (copy), v18 (copy), Utility (copy), v19 (copy), v17 (copy), p3 (ref)
+		local TextSize = TextService:GetTextSize(v18.Text, Utility.ConvertFontSizeEnumToInt(v18.FontSize), v18.Font, Vector2.new(0, 0))
+
+		v18.Size = UDim2.new(0, TextSize.x, 0, v19.Size.Y.Offset)
+		v18.Position = UDim2.new(1, -TextSize.x, 0, -4)
+
+		local v22 = TextSize.x + v19.Size.X.Offset + 8
+
+		v17.Size = UDim2.new(0, v22, 0, v19.Size.Y.Offset)
+		v17.Position = UDim2.new(p3.X.Scale, p3.X.Offset * v17.Size.X.Offset, p3.Y.Scale, p3.Y.Offset * v17.Size.Y.Offset)
+	end
+
+	function t1.BindAction(_, p5, p6) -- line: 86
+		-- upvalues: ContextActionService (copy), p2 (ref), getFFlagDebugLuaAppAlwaysUseGamepad (copy), RoactGamepad (copy)
+		if not p5 then
+			return
+		end
+
+		ContextActionService:UnbindCoreAction(p2)
+
+		if getFFlagDebugLuaAppAlwaysUseGamepad() and RoactGamepad.Config.DebugKeyboardBindings then
+			local v26 = RoactGamepad.Config.DebugKeyboardBindings[p6] or {}
+
+			ContextActionService:BindCoreAction(p2, p5, false, p6, table.unpack(v26))
+
+			return
+		end
+
+		ContextActionService:BindCoreAction(p2, p5, false, p6)
+	end
+	function t1.UnbindAction(_) -- line: 100
+		-- upvalues: ContextActionService (copy), p2 (ref)
+		ContextActionService:UnbindCoreAction(p2)
+	end
+	function t1.SetParent(_, p9) -- line: 104
+		-- upvalues: v17 (copy)
+		v17.Parent = p9
+	end
+	function t1.SetVisible(_, p11) -- line: 108
+		-- upvalues: v17 (copy)
+		v17.Visible = p11
+	end
+	function t1.SetTransparency(_, p13) -- line: 112
+		-- upvalues: v18 (copy), v19 (copy)
+		v18.TextTransparency = p13
+		v19.ImageTransparency = p13
+	end
+	function t1.SetVisibleWithTween(_, p15) -- line: 117
+		-- upvalues: Utility (copy), v18 (copy), v19 (copy)
+		Utility.PropertyTweener(v18, "TextTransparency", v18.TextTransparency, p15, 0.25, Utility.EaseOutQuad, true)
+		Utility.PropertyTweener(v19, "ImageTransparency", v19.ImageTransparency, p15, 0.25, Utility.EaseOutQuad, true)
+	end
+	function t1.SetText(_, p17) -- line: 122
+		-- upvalues: v18 (copy), updateLayout (copy)
+		if p17 == v18.Text then
+			return
+		end
+
+		v18.Text = p17
+		updateLayout()
+	end
+	function t1.SetImage(_, p19) -- line: 131
+		-- upvalues: v19 (copy)
+		if p19 == v19.Image then
+			return
+		end
+
+		v19.Image = p19
+	end
+
+	return t1
+end
+
+return createHintActionView

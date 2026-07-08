@@ -1,382 +1,406 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ExperienceAuthService_0 = game:GetService("ExperienceAuthService");
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.t);
-local v6 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v7 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withStyle_0 = v7.Style.withStyle;
-local l_InteractiveAlert_0 = v7.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v7.App.Button.Enum.ButtonType;
-local l_IconButton_0 = v7.App.Button.IconButton;
-local v12 = require(l_CorePackages_0.Packages.RoactGamepad);
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-local v14 = require(script.Parent.Common.NameTextBox);
-local v15 = require(script.Parent.AssetDescriptionTextBox);
-local v16 = require(script.Parent.ObjectViewport);
-local v17 = require(script.Parent.Common.PreviewViewport);
-local v18 = require(script.Parent.EmoteThumbnailView);
-local v19 = require(script.Parent.EmoteThumbnailEditor);
-local v20 = require(script.Parent.EmoteThumbnailParameters);
-local v21 = require(script.Parent.Parent.Actions.CloseOpenPrompt);
-local l_Images_0 = v7.App.ImageSet.Images;
-local v23 = l_Images_0["icons/actions/previewExpand"];
-local v24 = l_Images_0["icons/actions/edit/edit"];
-local v25 = {
-    [Enum.AssetType.TShirtAccessory] = true, 
-    [Enum.AssetType.ShirtAccessory] = true, 
-    [Enum.AssetType.PantsAccessory] = true, 
-    [Enum.AssetType.JacketAccessory] = true, 
-    [Enum.AssetType.SweaterAccessory] = true, 
-    [Enum.AssetType.ShortsAccessory] = true, 
-    [Enum.AssetType.LeftShoeAccessory] = true, 
-    [Enum.AssetType.RightShoeAccessory] = true, 
-    [Enum.AssetType.DressSkirtAccessory] = true, 
-    [Enum.AssetType.HairAccessory] = true
-};
-local l_Parent_0 = script.Parent.Parent;
-local v27 = require(l_Parent_0.GetFFlagValidateDescription);
-local v28 = game:DefineFastFlag("SendConsentDeniedOnCancel", false);
-local l_game_EngineFeature_0 = game:GetEngineFeature("EnableEmotePublish");
-local v30 = v3.PureComponent:extend("PublishAssetPromptSingleStep");
-v30.validateProps = v5.strictInterface({
-    screenSize = v5.Vector2, 
-    assetInstance = v5.Instance, 
-    assetType = v5.enum(Enum.AssetType), 
-    guid = v5.any, 
-    scopes = v5.any, 
-    closePrompt = v5.callback
-});
-v30.getDefaultText = function(v31) --[[ Line: 92 ]] --[[ Name: getDefaultText ]]
-    -- upvalues: v6 (copy), l_LocalPlayer_0 (copy)
-    if v31.props.assetType == Enum.AssetType.Model then
-        return v6:FormatByKey("CoreScripts.PublishAssetPrompt.PackagesDefaultName", {
-            RBX_NAME = l_LocalPlayer_0 and l_LocalPlayer_0.Name or ""
-        });
-    else
-        return "";
-    end;
-end;
-v30.init = function(v32) --[[ Line: 102 ]] --[[ Name: init ]]
-    -- upvalues: v20 (copy), l_ExperienceAuthService_0 (copy), v27 (copy), l_game_EngineFeature_0 (copy), v3 (copy)
-    v32.assetName = v32:getDefaultText();
-    v32.assetDescription = v32:getDefaultText();
-    v32.isNameValid = true;
-    v32.isDescriptionValid = true;
-    v32:setState({
-        thumbnailParameters = v20.defaultParameters, 
-        showingThumbnailEditor = false, 
-        showingAssetPreview = false
-    });
-    v32.closePrompt = function() --[[ Line: 114 ]]
-        -- upvalues: v32 (copy)
-        v32.props.closePrompt();
-    end;
-    v32.openThumbnailEditor = function() --[[ Line: 118 ]]
-        -- upvalues: v32 (copy)
-        v32:setState({
-            showingThumbnailEditor = true
-        });
-    end;
-    v32.closeThumbnailEditor = function() --[[ Line: 124 ]]
-        -- upvalues: v32 (copy)
-        v32:setState({
-            showingThumbnailEditor = false
-        });
-    end;
-    v32.openAssetPreview = function() --[[ Line: 130 ]]
-        -- upvalues: v32 (copy)
-        v32:setState({
-            showingAssetPreview = true
-        });
-    end;
-    v32.closeAssetPreview = function() --[[ Line: 136 ]]
-        -- upvalues: v32 (copy)
-        v32:setState({
-            showingAssetPreview = false
-        });
-    end;
-    v32.updateThumbnailParameters = function(v33) --[[ Line: 142 ]]
-        -- upvalues: v32 (copy)
-        v32:setState({
-            thumbnailParameters = v33
-        });
-    end;
-    v32.denyAndClose = function() --[[ Line: 148 ]]
-        -- upvalues: l_ExperienceAuthService_0 (ref), v32 (copy)
-        l_ExperienceAuthService_0:ScopeCheckUIComplete(v32.props.guid, v32.props.scopes, Enum.ScopeCheckResult.ConsentDenied, {});
-        v32.closePrompt();
-    end;
-    v32.confirmAndUpload = function() --[[ Line: 158 ]]
-        -- upvalues: v32 (copy), v27 (ref), l_game_EngineFeature_0 (ref), v20 (ref), l_ExperienceAuthService_0 (ref)
-        if not v32.isNameValid then
-            return;
-        elseif v27() and not v32.isDescriptionValid then
-            return;
-        else
-            local v34 = {
-                assetName = v32.assetName, 
-                assetDescription = v32.assetDescription
-            };
-            if l_game_EngineFeature_0 and v32.props.assetType == Enum.AssetType.EmoteAnimation then
-                v34.emoteThumbnailParameters = v20.encodeAsATable(v32.state.thumbnailParameters);
-            end;
-            l_ExperienceAuthService_0:ScopeCheckUIComplete(v32.props.guid, v32.props.scopes, Enum.ScopeCheckResult.ConsentAccepted, v34);
-            v32.closePrompt();
-            return;
-        end;
-    end;
-    v32.onAssetNameUpdated = function(v35, v36) --[[ Line: 188 ]]
-        -- upvalues: v32 (copy)
-        if v36 then
-            v32.assetName = v35;
-            v32.isNameValid = true;
-            return;
-        else
-            v32.isNameValid = false;
-            return;
-        end;
-    end;
-    v32.onAssetDescriptionUpdated = function(v37, v38) --[[ Line: 197 ]]
-        -- upvalues: v32 (copy)
-        v32.assetDescription = v37;
-        v32.isDescriptionValid = v38;
-    end;
-    v32.nameTextBoxRef = v3.createRef();
-    v32.descriptionTextBoxRef = v3.createRef();
-end;
-v30.renderMiddle = function(v39, v40) --[[ Line: 206 ]] --[[ Name: renderMiddle ]]
-    -- upvalues: l_withStyle_0 (copy), l_game_EngineFeature_0 (copy), v3 (copy), v12 (copy), v16 (copy), v18 (copy), l_IconButton_0 (copy), v23 (copy), v24 (copy), v14 (copy), v15 (copy)
-    return l_withStyle_0(function(v41) --[[ Line: 207 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), v39 (copy), v3 (ref), v12 (ref), v16 (ref), v18 (ref), l_IconButton_0 (ref), v23 (ref), v24 (ref), v40 (copy), v14 (ref), v15 (ref)
-        local l_Font_0 = v41.Font;
-        local l_Theme_0 = v41.Theme;
-        local v44 = l_game_EngineFeature_0 and v39.props.assetType == Enum.AssetType.EmoteAnimation and v39.props.assetInstance:IsA("AnimationClip");
-        return v3.createElement(v12.Focusable.Frame, {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 150), 
-            defaultChild = v39.nameTextBoxRef, 
-            [v3.Ref] = v39.middleContentRef
-        }, {
-            UISizeConstraint = v3.createElement("UISizeConstraint", {
-                MinSize = Vector2.new(200, 200)
-            }), 
-            TopSection = v3.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, -50), 
-                BackgroundTransparency = 1
-            }, {
-                ViewportParent = v3.createElement("Frame", {
-                    Size = UDim2.new(0.4, 0, 1, 0), 
-                    BackgroundTransparency = 1
-                }, {
-                    ObjectViewport = not v44 and v3.createElement(v16, {
-                        model = v39.props.assetInstance
-                    }) or nil, 
-                    EmoteThumbnailParent = v44 and v3.createElement("Frame", {
-                        Size = UDim2.fromScale(1, 1), 
-                        BackgroundTransparency = 1
-                    }, {
-                        AspectRatioConstraint = v3.createElement("UIAspectRatioConstraint", {
-                            AspectRatio = 1, 
-                            AspectType = Enum.AspectType.FitWithinMaxSize, 
-                            DominantAxis = Enum.DominantAxis.Width
-                        }), 
-                        EmoteThumbnailView = v3.createElement(v18, {
-                            animationClip = v39.props.assetInstance, 
-                            thumbnailParameters = v39.state.thumbnailParameters
-                        }), 
-                        PreviewButton = v3.createElement(l_IconButton_0, {
-                            position = UDim2.new(1, -2, 1, -2), 
-                            anchorPoint = Vector2.new(1, 1), 
-                            icon = v23, 
-                            size = UDim2.new(0, 30, 0, 30), 
-                            showBackground = true, 
-                            onActivated = v39.openAssetPreview
-                        }), 
-                        EditButton = v3.createElement(l_IconButton_0, {
-                            position = UDim2.new(0, 2, 1, -2), 
-                            anchorPoint = Vector2.new(0, 1), 
-                            icon = v24, 
-                            size = UDim2.new(0, 30, 0, 30), 
-                            showBackground = true, 
-                            onActivated = v39.openThumbnailEditor
-                        })
-                    }) or nil
-                }), 
-                NameDescriptionFields = v3.createElement("Frame", {
-                    Size = UDim2.new(0.6, -10, 1, 0), 
-                    AnchorPoint = Vector2.new(1, 0), 
-                    Position = UDim2.fromScale(1, 0), 
-                    BackgroundTransparency = 1
-                }, {
-                    NameLabel = v3.createElement("TextLabel", {
-                        Size = UDim2.new(1, 0, 0, 15), 
-                        Font = l_Font_0.Body.Font, 
-                        Text = v40.name, 
-                        TextSize = 12, 
-                        TextColor3 = l_Theme_0.TextDefault.Color, 
-                        BackgroundTransparency = 1, 
-                        TextXAlignment = Enum.TextXAlignment.Left
-                    }), 
-                    NameInput = v3.createElement(v14, {
-                        Size = UDim2.new(1, 0, 0, 30), 
-                        Position = UDim2.new(0, 0, 0, 15), 
-                        onNameUpdated = v39.onAssetNameUpdated, 
-                        nameTextBoxRef = v39.nameTextBoxRef, 
-                        NextSelectionDown = v39.descriptionTextBoxRef, 
-                        defaultName = v39.assetName
-                    }), 
-                    DescriptionLabel = v3.createElement("TextLabel", {
-                        Size = UDim2.new(1, 0, 0, 15), 
-                        Position = UDim2.new(0, 0, 0, 60), 
-                        Font = l_Font_0.Body.Font, 
-                        TextSize = 12, 
-                        Text = v40.description, 
-                        TextColor3 = l_Theme_0.TextDefault.Color, 
-                        BackgroundTransparency = 1, 
-                        TextXAlignment = Enum.TextXAlignment.Left
-                    }), 
-                    DescriptionInput = v3.createElement(v15, {
-                        Size = UDim2.new(1, 0, 0, 80), 
-                        Position = UDim2.new(0, 0, 0, 75), 
-                        onAssetDescriptionUpdated = v39.onAssetDescriptionUpdated, 
-                        descriptionTextBoxRef = v39.descriptionTextBoxRef, 
-                        NextSelectionUp = v39.nameTextBoxRef, 
-                        defaultDescription = v39.assetDescription
-                    })
-                })
-            }), 
-            Disclaimer = v3.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 50), 
-                Text = v40.disclaimer, 
-                Font = l_Font_0.Body.Font, 
-                TextSize = 12, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                BackgroundTransparency = 1, 
-                AnchorPoint = Vector2.new(0, 1), 
-                Position = UDim2.fromScale(0, 1), 
-                TextWrapped = true
-            })
-        });
-    end);
-end;
-v30.renderAlertLocalized = function(v45, v46) --[[ Line: 332 ]] --[[ Name: renderAlertLocalized ]]
-    -- upvalues: v3 (copy), l_InteractiveAlert_0 (copy), v28 (copy), l_ButtonType_0 (copy), l_game_EngineFeature_0 (copy), v19 (copy), v17 (copy)
-    local v47 = v3.createElement(l_InteractiveAlert_0, {
-        title = v46.title, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = if v28 then v45.denyAndClose else v45.closePrompt, 
-                        text = v46.cancel
-                    }, 
-                    isDefaultChild = true
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = v45.confirmAndUpload, 
-                        text = v46.submit, 
-                        isDelayedInput = true, 
-                        enableInputDelayed = true, 
-                        delayInputSeconds = 3
-                    }, 
-                    isDefaultChild = false
-                }
-            }
-        }, 
-        middleContent = function() --[[ Line: 357 ]] --[[ Name: middleContent ]]
-            -- upvalues: v45 (copy), v46 (copy)
-            return v45:renderMiddle(v46);
-        end, 
-        screenSize = v45.props.screenSize, 
-        defaultChildRef = v45.props.defaultChildRef, 
-        isMiddleContentFocusable = true
-    });
-    if l_game_EngineFeature_0 then
-        return v3.createFragment({
-            Prompt = v47, 
-            ThumbnailEditor = v45.state.showingThumbnailEditor and v3.createElement(v19, {
-                animationClip = v45.props.assetInstance, 
-                initialThumbnailParameters = v45.state.thumbnailParameters, 
-                screenSize = v45.props.screenSize, 
-                updateThumbnailCallback = v45.updateThumbnailParameters, 
-                closePromptCallback = v45.closeThumbnailEditor
-            }) or nil, 
-            PreviewFrame = v45.state.showingAssetPreview and v3.createElement("Frame", {
-                Size = UDim2.new(0.5, 0, 0.5, 0), 
-                BackgroundColor3 = Color3.new(0.2, 0.2, 0.2), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                BackgroundTransparency = 0
-            }, {
-                PreviewViewport = v3.createElement(v17, {
-                    asset = v45.props.assetInstance, 
-                    closePreviewView = v45.closeAssetPreview
-                })
-            }) or nil
-        });
-    else
-        return v47;
-    end;
-end;
-local function _(v48) --[[ Line: 395 ]] --[[ Name: IsLayeredClothingType ]]
-    -- upvalues: v25 (copy)
-    if v25[v48] == true then
-        return true;
-    else
-        return false;
-    end;
-end;
-local function v52(v50) --[[ Line: 403 ]] --[[ Name: GetLocalizedStringsForAssetType ]]
-    -- upvalues: v6 (copy), v25 (copy)
-    local v51 = {
-        name = v6:FormatByKey("CoreScripts.PublishAssetPrompt.Name"), 
-        description = v6:FormatByKey("CoreScripts.PublishAssetPrompt.Description"), 
-        invalidName = v6:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidName"), 
-        invalidDescription = v6:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidDescription"), 
-        cancel = v6:FormatByKey("CoreScripts.PublishAssetPrompt.Cancel"), 
-        submit = v6:FormatByKey("CoreScripts.PublishAssetPrompt.Submit")
-    };
-    if v25[v50] == true then
-        v51.title = v6:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextClothing");
-        v51.disclaimer = v6:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerAvatar");
-        return v51;
-    elseif v50 == Enum.AssetType.EmoteAnimation then
-        v51.title = v6:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextEmote");
-        v51.disclaimer = v6:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerEmote");
-        return v51;
-    elseif v50 == Enum.AssetType.Model then
-        v51.title = v6:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextModel");
-        v51.disclaimer = v6:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerModel");
-        return v51;
-    else
-        if v50 == Enum.AssetType.Package then
-            v51.title = v6:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextPackage");
-            v51.disclaimer = v6:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerModel");
-        end;
-        return v51;
-    end;
-end;
-v30.render = function(v53) --[[ Line: 432 ]] --[[ Name: render ]]
-    -- upvalues: v52 (copy)
-    return v53:renderAlertLocalized((v52(v53.props.assetType)));
-end;
-return v4.connect(function(v54) --[[ Line: 437 ]] --[[ Name: mapStateToProps ]]
-    return {
-        assetInstance = v54.promptRequest.promptInfo.assetInstance, 
-        assetType = v54.promptRequest.promptInfo.assetType, 
-        guid = v54.promptRequest.promptInfo.guid, 
-        scopes = v54.promptRequest.promptInfo.scopes
-    };
-end, function(v55) --[[ Line: 446 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v21 (copy)
-    return {
-        closePrompt = function() --[[ Line: 448 ]] --[[ Name: closePrompt ]]
-            -- upvalues: v55 (copy), v21 (ref)
-            return v55(v21());
-        end
-    };
-end)(v30);
+local CorePackages = game:GetService("CorePackages")
+local ExperienceAuthService = game:GetService("ExperienceAuthService")
+local Players = game:GetService("Players")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local IconButton = UIBlox.App.Button.IconButton
+local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
+local LocalPlayer = Players.LocalPlayer
+local NameTextBox = require(script.Parent.Common.NameTextBox)
+local AssetDescriptionTextBox = require(script.Parent.AssetDescriptionTextBox)
+local ObjectViewport = require(script.Parent.ObjectViewport)
+local PreviewViewport = require(script.Parent.Common.PreviewViewport)
+local EmoteThumbnailView = require(script.Parent.EmoteThumbnailView)
+local EmoteThumbnailEditor = require(script.Parent.EmoteThumbnailEditor)
+local EmoteThumbnailParameters = require(script.Parent.EmoteThumbnailParameters)
+local CloseOpenPrompt = require(script.Parent.Parent.Actions.CloseOpenPrompt)
+local Images = UIBlox.App.ImageSet.Images
+local v24 = Images["icons/actions/previewExpand"]
+local v25 = Images["icons/actions/edit/edit"]
+local t1 = {
+	[Enum.AssetType.TShirtAccessory] = true,
+	[Enum.AssetType.ShirtAccessory] = true,
+	[Enum.AssetType.PantsAccessory] = true,
+	[Enum.AssetType.JacketAccessory] = true,
+	[Enum.AssetType.SweaterAccessory] = true,
+	[Enum.AssetType.ShortsAccessory] = true,
+	[Enum.AssetType.LeftShoeAccessory] = true,
+	[Enum.AssetType.RightShoeAccessory] = true,
+	[Enum.AssetType.DressSkirtAccessory] = true,
+	[Enum.AssetType.HairAccessory] = true
+}
+local ParentParent = script.Parent.Parent
+local GetFFlagValidateDescription = require(ParentParent.GetFFlagValidateDescription)
+local v29 = game:DefineFastFlag("SendConsentDeniedOnCancel", false)
+local EngineFeature = game:GetEngineFeature("EnableEmotePublish")
+local v31 = Roact.PureComponent:extend("PublishAssetPromptSingleStep")
+
+v31.validateProps = t.strictInterface({
+	screenSize = t.Vector2,
+	assetInstance = t.Instance,
+	assetType = t.enum(Enum.AssetType),
+	guid = t.any,
+	scopes = t.any,
+	closePrompt = t.callback
+})
+
+function v31.getDefaultText(p1) -- line: 92
+	-- upvalues: RobloxTranslator (copy), LocalPlayer (copy)
+	if p1.props.assetType == Enum.AssetType.Model then
+		return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.PackagesDefaultName", {
+			RBX_NAME = LocalPlayer and LocalPlayer.Name or ""
+		})
+	end
+
+	return ""
+end
+function v31.init(p2) -- line: 102
+	-- upvalues: EmoteThumbnailParameters (copy), ExperienceAuthService (copy), GetFFlagValidateDescription (copy), EngineFeature (copy), Roact (copy)
+	p2.assetName = p2:getDefaultText()
+	p2.assetDescription = p2:getDefaultText()
+	p2.isNameValid = true
+	p2.isDescriptionValid = true
+	p2:setState({
+		showingThumbnailEditor = false,
+		showingAssetPreview = false,
+		thumbnailParameters = EmoteThumbnailParameters.defaultParameters
+	})
+
+	function p2.closePrompt() -- line: 114
+		-- upvalues: p2 (copy)
+		p2.props.closePrompt()
+	end
+	function p2.openThumbnailEditor() -- line: 118
+		-- upvalues: p2 (copy)
+		p2:setState({
+			showingThumbnailEditor = true
+		})
+	end
+	function p2.closeThumbnailEditor() -- line: 124
+		-- upvalues: p2 (copy)
+		p2:setState({
+			showingThumbnailEditor = false
+		})
+	end
+	function p2.openAssetPreview() -- line: 130
+		-- upvalues: p2 (copy)
+		p2:setState({
+			showingAssetPreview = true
+		})
+	end
+	function p2.closeAssetPreview() -- line: 136
+		-- upvalues: p2 (copy)
+		p2:setState({
+			showingAssetPreview = false
+		})
+	end
+	function p2.updateThumbnailParameters(p3) -- line: 142
+		-- upvalues: p2 (copy)
+		p2:setState({
+			thumbnailParameters = p3
+		})
+	end
+	function p2.denyAndClose() -- line: 148
+		-- upvalues: ExperienceAuthService (copy), p2 (copy)
+		ExperienceAuthService:ScopeCheckUIComplete(p2.props.guid, p2.props.scopes, Enum.ScopeCheckResult.ConsentDenied, {})
+		p2.closePrompt()
+	end
+	function p2.confirmAndUpload() -- line: 158
+		-- upvalues: p2 (copy), GetFFlagValidateDescription (copy), EngineFeature (copy), EmoteThumbnailParameters (copy), ExperienceAuthService (copy)
+		if not p2.isNameValid then
+			return
+		end
+
+		if GetFFlagValidateDescription() and not p2.isDescriptionValid then
+			return
+		end
+
+		local t2 = {
+			assetName = p2.assetName,
+			assetDescription = p2.assetDescription
+		}
+
+		if EngineFeature and p2.props.assetType == Enum.AssetType.EmoteAnimation then
+			t2.emoteThumbnailParameters = EmoteThumbnailParameters.encodeAsATable(p2.state.thumbnailParameters)
+		end
+
+		ExperienceAuthService:ScopeCheckUIComplete(p2.props.guid, p2.props.scopes, Enum.ScopeCheckResult.ConsentAccepted, t2)
+		p2.closePrompt()
+	end
+	function p2.onAssetNameUpdated(p4, p5) -- line: 188
+		-- upvalues: p2 (copy)
+		if p5 then
+			p2.assetName = p4
+			p2.isNameValid = true
+
+			return
+		end
+
+		p2.isNameValid = false
+	end
+	function p2.onAssetDescriptionUpdated(p6, p7) -- line: 197
+		-- upvalues: p2 (copy)
+		p2.assetDescription = p6
+		p2.isDescriptionValid = p7
+	end
+
+	p2.nameTextBoxRef = Roact.createRef()
+	p2.descriptionTextBoxRef = Roact.createRef()
+end
+function v31.renderMiddle(p8, p9) -- line: 206
+	-- upvalues: withStyle (copy), EngineFeature (copy), Roact (copy), RoactGamepad (copy), ObjectViewport (copy), EmoteThumbnailView (copy), IconButton (copy), v24 (copy), v25 (copy), NameTextBox (copy), AssetDescriptionTextBox (copy)
+	return withStyle(function(p10) -- line: 207
+		-- upvalues: EngineFeature (copy), p8 (copy), Roact (copy), RoactGamepad (copy), ObjectViewport (copy), EmoteThumbnailView (copy), IconButton (copy), v24 (copy), v25 (copy), p9 (copy), NameTextBox (copy), AssetDescriptionTextBox (copy)
+		local p10Font = p10.Font
+		local Theme = p10.Theme
+		local v58 = EngineFeature and (p8.props.assetType == Enum.AssetType.EmoteAnimation and p8.props.assetInstance:IsA("AnimationClip"))
+
+		return Roact.createElement(RoactGamepad.Focusable.Frame, {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 150),
+			defaultChild = p8.nameTextBoxRef,
+			[Roact.Ref] = p8.middleContentRef
+		}, {
+			UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				MinSize = Vector2.new(200, 200)
+			}),
+			TopSection = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, -50)
+			}, {
+				ViewportParent = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0.4, 0, 1, 0)
+				}, {
+					ObjectViewport = not v58 and Roact.createElement(ObjectViewport, {
+						model = p8.props.assetInstance
+					}) or nil,
+					EmoteThumbnailParent = v58 and Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(1, 1)
+					}, {
+						AspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+							AspectRatio = 1,
+							AspectType = Enum.AspectType.FitWithinMaxSize,
+							DominantAxis = Enum.DominantAxis.Width
+						}),
+						EmoteThumbnailView = Roact.createElement(EmoteThumbnailView, {
+							animationClip = p8.props.assetInstance,
+							thumbnailParameters = p8.state.thumbnailParameters
+						}),
+						PreviewButton = Roact.createElement(IconButton, {
+							showBackground = true,
+							position = UDim2.new(1, -2, 1, -2),
+							anchorPoint = Vector2.new(1, 1),
+							icon = v24,
+							size = UDim2.new(0, 30, 0, 30),
+							onActivated = p8.openAssetPreview
+						}),
+						EditButton = Roact.createElement(IconButton, {
+							showBackground = true,
+							position = UDim2.new(0, 2, 1, -2),
+							anchorPoint = Vector2.new(0, 1),
+							icon = v25,
+							size = UDim2.new(0, 30, 0, 30),
+							onActivated = p8.openThumbnailEditor
+						})
+					}) or nil
+				}),
+				NameDescriptionFields = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0.6, -10, 1, 0),
+					AnchorPoint = Vector2.new(1, 0),
+					Position = UDim2.fromScale(1, 0)
+				}, {
+					NameLabel = Roact.createElement("TextLabel", {
+						TextSize = 12,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 15),
+						Font = p10Font.Body.Font,
+						Text = p9.name,
+						TextColor3 = Theme.TextDefault.Color,
+						TextXAlignment = Enum.TextXAlignment.Left
+					}),
+					NameInput = Roact.createElement(NameTextBox, {
+						Size = UDim2.new(1, 0, 0, 30),
+						Position = UDim2.new(0, 0, 0, 15),
+						onNameUpdated = p8.onAssetNameUpdated,
+						nameTextBoxRef = p8.nameTextBoxRef,
+						NextSelectionDown = p8.descriptionTextBoxRef,
+						defaultName = p8.assetName
+					}),
+					DescriptionLabel = Roact.createElement("TextLabel", {
+						TextSize = 12,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 15),
+						Position = UDim2.new(0, 0, 0, 60),
+						Font = p10Font.Body.Font,
+						Text = p9.description,
+						TextColor3 = Theme.TextDefault.Color,
+						TextXAlignment = Enum.TextXAlignment.Left
+					}),
+					DescriptionInput = Roact.createElement(AssetDescriptionTextBox, {
+						Size = UDim2.new(1, 0, 0, 80),
+						Position = UDim2.new(0, 0, 0, 75),
+						onAssetDescriptionUpdated = p8.onAssetDescriptionUpdated,
+						descriptionTextBoxRef = p8.descriptionTextBoxRef,
+						NextSelectionUp = p8.nameTextBoxRef,
+						defaultDescription = p8.assetDescription
+					})
+				})
+			}),
+			Disclaimer = Roact.createElement("TextLabel", {
+				TextSize = 12,
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 50),
+				Text = p9.disclaimer,
+				Font = p10Font.Body.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0, 1)
+			})
+		})
+	end)
+end
+function v31.renderAlertLocalized(p11, p12) -- line: 332
+	-- upvalues: Roact (copy), InteractiveAlert (copy), v29 (copy), ButtonType (copy), EngineFeature (copy), EmoteThumbnailEditor (copy), PreviewViewport (copy)
+	local v42 = Roact.createElement(InteractiveAlert, {
+		isMiddleContentFocusable = true,
+		title = p12.title,
+		buttonStackInfo = {
+			buttons = {
+				{
+					isDefaultChild = true,
+					props = {
+						onActivated = if not v29 then p11.closePrompt else p11.denyAndClose,
+						text = p12.cancel
+					}
+				},
+				{
+					isDefaultChild = false,
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						isDelayedInput = true,
+						enableInputDelayed = true,
+						delayInputSeconds = 3,
+						onActivated = p11.confirmAndUpload,
+						text = p12.submit
+					}
+				}
+			}
+		},
+		middleContent = function() -- line: 357
+			-- upvalues: p11 (copy), p12 (copy)
+			return p11:renderMiddle(p12)
+		end,
+		screenSize = p11.props.screenSize,
+		defaultChildRef = p11.props.defaultChildRef
+	})
+
+	if EngineFeature then
+		return Roact.createFragment({
+			Prompt = v42,
+			ThumbnailEditor = p11.state.showingThumbnailEditor and Roact.createElement(EmoteThumbnailEditor, {
+				animationClip = p11.props.assetInstance,
+				initialThumbnailParameters = p11.state.thumbnailParameters,
+				screenSize = p11.props.screenSize,
+				updateThumbnailCallback = p11.updateThumbnailParameters,
+				closePromptCallback = p11.closeThumbnailEditor
+			}) or nil,
+			PreviewFrame = p11.state.showingAssetPreview and Roact.createElement("Frame", {
+				BackgroundTransparency = 0,
+				Size = UDim2.new(0.5, 0, 0.5, 0),
+				BackgroundColor3 = Color3.new(0.2, 0.2, 0.2),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5)
+			}, {
+				PreviewViewport = Roact.createElement(PreviewViewport, {
+					asset = p11.props.assetInstance,
+					closePreviewView = p11.closeAssetPreview
+				})
+			}) or nil
+		})
+	end
+
+	return v42
+end
+
+local function IsLayeredClothingType(p13) -- line: 395
+	-- upvalues: t1 (copy)
+	if t1[p13] == true then
+		return true
+	end
+
+	return false
+end
+local function GetLocalizedStringsForAssetType(p14) -- line: 403
+	-- upvalues: RobloxTranslator (copy), t1 (copy)
+	local t3 = {
+		name = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Name"),
+		description = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Description"),
+		invalidName = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidName"),
+		invalidDescription = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.InvalidDescription"),
+		cancel = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Cancel"),
+		submit = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.Submit")
+	}
+
+	if t1[p14] == true then
+		t3.title = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextClothing")
+		t3.disclaimer = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerAvatar")
+
+		return t3
+	end
+
+	if p14 == Enum.AssetType.EmoteAnimation then
+		t3.title = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextEmote")
+		t3.disclaimer = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerEmote")
+
+		return t3
+	end
+
+	if p14 == Enum.AssetType.Model then
+		t3.title = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextModel")
+		t3.disclaimer = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerModel")
+
+		return t3
+	end
+
+	if p14 == Enum.AssetType.Package then
+		t3.title = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.TitleTextPackage")
+		t3.disclaimer = RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.DisclaimerModel")
+	end
+
+	return t3
+end
+
+function v31.render(p15) -- line: 432
+	-- upvalues: GetLocalizedStringsForAssetType (copy)
+	return p15:renderAlertLocalized((GetLocalizedStringsForAssetType(p15.props.assetType)))
+end
+
+local function mapStateToProps(p16) -- line: 437
+	return {
+		assetInstance = p16.promptRequest.promptInfo.assetInstance,
+		assetType = p16.promptRequest.promptInfo.assetType,
+		guid = p16.promptRequest.promptInfo.guid,
+		scopes = p16.promptRequest.promptInfo.scopes
+	}
+end
+local function mapDispatchToProps(p17) -- line: 446
+	-- upvalues: CloseOpenPrompt (copy)
+	return {
+		closePrompt = function() -- line: 448
+			-- upvalues: p17 (copy), CloseOpenPrompt (copy)
+			return p17(CloseOpenPrompt())
+		end
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v31)

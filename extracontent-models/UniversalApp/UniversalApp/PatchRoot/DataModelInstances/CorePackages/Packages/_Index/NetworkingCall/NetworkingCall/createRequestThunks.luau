@@ -1,11 +1,13 @@
-local _ = require(script.Parent.networkingCallTypes);
-local l_networkRequests_0 = script.Parent.networkRequests;
-local v2 = require(l_networkRequests_0.createGetCallHistory);
-local v3 = require(l_networkRequests_0.createGetSuggestedCallees);
-return function(v4) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return {
-        GetCallHistory = v2(v4), 
-        GetSuggestedCallees = v3(v4)
-    };
-end;
+require(script.Parent.networkingCallTypes)
+
+local networkRequests = script.Parent.networkRequests
+local createGetCallHistory = require(networkRequests.createGetCallHistory)
+local createGetSuggestedCallees = require(networkRequests.createGetSuggestedCallees)
+
+return function(p1) -- line: 9
+	-- upvalues: createGetCallHistory (copy), createGetSuggestedCallees (copy)
+	return {
+		GetCallHistory = createGetCallHistory(p1),
+		GetSuggestedCallees = createGetSuggestedCallees(p1)
+	}
+end

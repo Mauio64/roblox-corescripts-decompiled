@@ -1,1 +1,1 @@
-return game:DefineFastInt("PushUpsellCooldownPeriod", 3);
+return game:DefineFastInt("PushUpsellCooldownPeriod", 3)

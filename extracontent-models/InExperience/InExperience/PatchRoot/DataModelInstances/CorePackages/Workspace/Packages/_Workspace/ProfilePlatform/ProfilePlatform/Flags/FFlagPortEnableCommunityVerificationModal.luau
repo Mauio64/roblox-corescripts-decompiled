@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PortEnableCommunityVerificationModal", false);
+return game:DefineFastFlag("PortEnableCommunityVerificationModal", false)

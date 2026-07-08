@@ -1,72 +1,81 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_StyledTextLabel_0 = require(l_Parent_0.UIBlox).App.Text.StyledTextLabel;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v4 = require(script.Parent.Box);
-local function v8(v5) --[[ Line: 10 ]] --[[ Name: mapTokens ]]
-    local l_Size_600_0 = v5.Global.Size_600;
-    local l_Space_100_0 = v5.Global.Space_100;
-    return {
-        fontStyle = v5.Semantic.Typography.Body, 
-        colorStyle = v5.Semantic.Color.Text.Default, 
-        imageRightMargin = v5.Global.Space_150, 
-        imageBoxSize = l_Size_600_0, 
-        imageBoxPadding = l_Space_100_0, 
-        imageBoxTransparency = v5.Semantic.Color.Common.Placeholder.Transparency, 
-        imageBoxBackgroundColor = v5.Semantic.Color.Common.Placeholder.Color3, 
-        imageBoxCornerRadius = v5.Semantic.Radius.Medium, 
-        imageSize = l_Size_600_0 - l_Space_100_0 * 2
-    };
-end;
-return function(v9) --[[ Line: 34 ]] --[[ Name: Item ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v8 (copy), v1 (copy), v4 (copy), l_StyledTextLabel_0 (copy)
-    local v10 = l_useDesignTokens_0(v8);
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, v10.imageBoxSize), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v9.LayoutOrder
-    }, {
-        ImageBox = v1.createElement(v4, {
-            Size = UDim2.fromOffset(v10.imageBoxSize, v10.imageBoxSize), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = v10.imageBoxTransparency, 
-            BackgroundColor3 = v10.imageBoxBackgroundColor, 
-            padding = {
-                v10.imageBoxPadding, 
-                v10.imageBoxPadding, 
-                v10.imageBoxPadding, 
-                v10.imageBoxPadding
-            }, 
-            cornerRadius = UDim.new(0, v10.imageBoxCornerRadius)
-        }, {
-            Image = v1.createElement("ImageLabel", {
-                Image = v9.image, 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromOffset(v10.imageSize, v10.imageSize), 
-                [v1.Tag] = "data-testid=BulkPurchaseApp_ItemImage"
-            })
-        }), 
-        LineItem = v1.createElement("Frame", {
-            Position = UDim2.fromOffset(v10.imageBoxSize + v10.imageRightMargin, 0), 
-            Size = UDim2.new(1, -(v10.imageBoxSize + v10.imageRightMargin), 1, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, v1.createElement(l_StyledTextLabel_0, {
-            fontStyle = v10.fontStyle, 
-            colorStyle = v10.colorStyle, 
-            text = v9.name, 
-            textTruncate = Enum.TextTruncate.AtEnd, 
-            textYAlignment = Enum.TextYAlignment.Top, 
-            size = UDim2.new(0.66, 0, 1, 0), 
-            lineHeight = v10.fontStyle.lineHeight
-        }), v1.createElement("Frame", {
-            AnchorPoint = Vector2.new(1, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = UDim2.new(0.33, 0, 1, 0), 
-            Position = UDim2.new(1, 0, 0, 0)
-        }, v9.endSlot))
-    });
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local StyledTextLabel = require(Parent.UIBlox).App.Text.StyledTextLabel
+local useDesignTokens = require(Parent.Style).useDesignTokens
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
+local FFlagReplaceMissingDesignTokens = SharedFlags.FFlagReplaceMissingDesignTokens
+local Box = require(script.Parent.Box)
+
+local function mapTokens(p1) -- line: 15
+	-- upvalues: FFlagRenameDeprecatedUIBloxTokens (copy)
+	local v12 = if not FFlagRenameDeprecatedUIBloxTokens then p1.Global.Size_600 else p1.Size.Size_1200
+	local v13 = if not FFlagRenameDeprecatedUIBloxTokens then p1.Global.Space_100 else p1.Size.Size_200
+
+	return {
+		fontStyle = if not FFlagRenameDeprecatedUIBloxTokens then p1.Semantic.Typography.Body else p1.Typography.BodyLarge,
+		colorStyle = if not FFlagRenameDeprecatedUIBloxTokens then p1.Semantic.Color.Text.Default else p1.Color.Content.Default,
+		imageRightMargin = if not FFlagRenameDeprecatedUIBloxTokens then p1.Global.Space_150 else p1.Size.Size_300,
+		imageBoxSize = v12,
+		imageBoxPadding = v13,
+		imageBoxTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then p1.Semantic.Color.Common.Placeholder else p1.Color.Common.Shimmer)).Transparency,
+		imageBoxBackgroundColor = ((if not FFlagRenameDeprecatedUIBloxTokens then p1.Semantic.Color.Common.Placeholder else p1.Color.Common.Shimmer)).Color3,
+		imageBoxCornerRadius = if not FFlagRenameDeprecatedUIBloxTokens then p1.Semantic.Radius.Medium else p1.Radius.Medium,
+		imageSize = v12 - v13 * 2
+	}
+end
+local function Item(t1: {[any]: any}) -- line: 55
+	-- upvalues: useDesignTokens (copy), mapTokens (copy), React (copy), Box (copy), StyledTextLabel (copy), FFlagReplaceMissingDesignTokens (copy)
+	local v15 = useDesignTokens(mapTokens)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, v15.imageBoxSize),
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		ImageBox = React.createElement(Box, {
+			BorderSizePixel = 0,
+			Size = UDim2.fromOffset(v15.imageBoxSize, v15.imageBoxSize),
+			BackgroundTransparency = v15.imageBoxTransparency,
+			BackgroundColor3 = v15.imageBoxBackgroundColor,
+			padding = {
+				v15.imageBoxPadding,
+				v15.imageBoxPadding,
+				v15.imageBoxPadding,
+				v15.imageBoxPadding
+			},
+			cornerRadius = UDim.new(0, v15.imageBoxCornerRadius)
+		}, {
+			Image = React.createElement("ImageLabel", {
+				Image = t1.image,
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v15.imageSize, v15.imageSize),
+				[React.Tag] = "data-testid=BulkPurchaseApp_ItemImage"
+			})
+		}),
+		LineItem = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Position = UDim2.fromOffset(v15.imageBoxSize + v15.imageRightMargin, 0),
+			Size = UDim2.new(1, -(v15.imageBoxSize + v15.imageRightMargin), 1, 0)
+		}, React.createElement(StyledTextLabel, {
+			fontStyle = v15.fontStyle,
+			colorStyle = v15.colorStyle,
+			text = t1.name,
+			textTruncate = Enum.TextTruncate.AtEnd,
+			textYAlignment = Enum.TextYAlignment.Top,
+			size = UDim2.new(0.66, 0, 1, 0),
+			lineHeight = if not FFlagReplaceMissingDesignTokens then v15.fontStyle.lineHeight else v15.fontStyle.LineHeight
+		}), React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(1, 0),
+			Size = UDim2.new(0.33, 0, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0)
+		}, t1.endSlot))
+	})
+end
+
+return Item

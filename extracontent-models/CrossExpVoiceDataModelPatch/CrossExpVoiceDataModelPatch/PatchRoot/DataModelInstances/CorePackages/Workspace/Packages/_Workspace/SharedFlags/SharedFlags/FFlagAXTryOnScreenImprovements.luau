@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXTryOnScreenImprovements6", false);
+return game:DefineFastFlag("AXTryOnScreenImprovements6", false)

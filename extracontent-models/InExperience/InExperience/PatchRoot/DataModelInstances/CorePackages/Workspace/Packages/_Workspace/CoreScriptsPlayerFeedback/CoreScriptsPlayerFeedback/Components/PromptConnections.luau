@@ -1,57 +1,105 @@
-local l_Parent_0 = script:FindFirstAncestor("CoreScriptsPlayerFeedback").Parent;
-local v1 = require(l_Parent_0.ReactUtils);
-local v2 = require(l_Parent_0.React);
-local l_useEventConnection_0 = v1.useEventConnection;
-local v5 = v2.memo(function(v4) --[[ Line: 16 ]]
-    -- upvalues: l_useEventConnection_0 (copy)
-    l_useEventConnection_0(v4.event, v4.handler);
-    return nil;
-end);
-return (v2.memo(function(v6) --[[ Line: 21 ]]
-    -- upvalues: v2 (copy), v5 (copy)
-    local l_SocialService_0 = game:GetService("SocialService");
-    local v8 = v2.useCallback(function() --[[ Line: 24 ]]
-        -- upvalues: v6 (copy)
-        v6.openFeedbackPrompt();
-    end, {
-        v6.openFeedbackPrompt
-    });
-    local v10 = v2.useCallback(function(v9) --[[ Line: 28 ]]
-        -- upvalues: v6 (copy)
-        if v6.openUnavailablePrompt then
-            v6.openUnavailablePrompt(v9);
-        end;
-    end, {
-        v6.openUnavailablePrompt
-    });
-    local v11 = nil;
-    local v12 = nil;
-    if l_SocialService_0 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 38 ]]
-            -- upvalues: l_SocialService_0 (copy)
-            return l_SocialService_0.ShowPromptFeedbackSubmission;
-        end);
-        if l_status_0 then
-            v11 = l_result_0;
-        end;
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 45 ]]
-            -- upvalues: l_SocialService_0 (copy)
-            return l_SocialService_0.ShowPromptFeedbackUnavailable;
-        end);
-        l_status_0 = l_status_1;
-        l_result_0 = l_result_1;
-        if l_status_0 then
-            v12 = l_result_0;
-        end;
-    end;
-    return v2.createElement(v2.Fragment, {}, {
-        Show = v11 and v2.createElement(v5, {
-            event = v11, 
-            handler = v8
-        }) or nil, 
-        Unavailable = v12 and v2.createElement(v5, {
-            event = v12, 
-            handler = v10
-        }) or nil
-    });
-end));
+local CoreScriptsPlayerFeedback = script:FindFirstAncestor("CoreScriptsPlayerFeedback")
+local CoreScriptsPlayerFeedbackParent = CoreScriptsPlayerFeedback.Parent
+local ReactUtils = require(CoreScriptsPlayerFeedbackParent.ReactUtils)
+local GetFFlagEnablePlayerSupportPrompt = require(CoreScriptsPlayerFeedback.Flags.GetFFlagEnablePlayerSupportPrompt)
+local React = require(CoreScriptsPlayerFeedbackParent.React)
+local useEventConnection = ReactUtils.useEventConnection
+local v7 = GetFFlagEnablePlayerSupportPrompt()
+local v8 = React.memo(function(t1: {[any]: any}) -- line: 21
+	-- upvalues: useEventConnection (copy)
+	useEventConnection(t1.event, t1.handler)
+
+	return nil
+end)
+
+return (React.memo(function(t2: {[any]: any}) -- line: 26
+	-- upvalues: React (copy), v7 (copy), v8 (copy)
+	local SocialService = game:GetService("SocialService")
+	local v12 = React.useCallback(function() -- line: 29
+		-- upvalues: t2 (copy)
+		t2.openFeedbackPrompt()
+	end, { t2.openFeedbackPrompt })
+	local v13 = React.useCallback(function(p1) -- line: 32
+		-- upvalues: t2 (copy)
+		local u25 = false
+
+		pcall(function() -- line: 34
+			-- upvalues: u25 (ref), p1 (copy)
+			u25 = p1 == Enum.FeedbackType.PlayerSupport
+		end)
+
+		if u25 then
+			if t2.openPlayerSupportPrompt then
+				t2.openPlayerSupportPrompt()
+			else
+				t2.openFeedbackPrompt()
+			end
+		else
+			t2.openFeedbackPrompt()
+		end
+	end, {
+		t2.openFeedbackPrompt,
+		t2.openPlayerSupportPrompt
+	})
+	local v14 = if not v7 then v12 else v13
+	local v15 = React.useCallback(function(s1: string) -- line: 51
+		-- upvalues: t2 (copy)
+		if t2.openUnavailablePrompt then
+			t2.openUnavailablePrompt(s1)
+		end
+	end, { t2.openUnavailablePrompt })
+	local v16 = React.useCallback(function(s2: string, p2) -- line: 56
+		-- upvalues: t2 (copy)
+		local u29 = false
+
+		pcall(function() -- line: 58
+			-- upvalues: u29 (ref), p2 (copy)
+			u29 = p2 == Enum.FeedbackType.PlayerSupport
+		end)
+
+		if u29 then
+			if t2.openPlayerSupportUnavailablePrompt then
+				t2.openPlayerSupportUnavailablePrompt(s2)
+			end
+		elseif t2.openUnavailablePrompt then
+			t2.openUnavailablePrompt(s2)
+		end
+	end, {
+		t2.openUnavailablePrompt,
+		t2.openPlayerSupportUnavailablePrompt
+	})
+	local v17 = if not v7 then v15 else v16
+	local v18 = nil
+	local v19 = nil
+
+	if SocialService then
+		local ok, result = pcall(function() -- line: 79
+			-- upvalues: SocialService (copy)
+			return SocialService.ShowPromptFeedbackSubmission
+		end)
+
+		if ok then
+			v18 = result
+		end
+
+		local ok2, result2 = pcall(function() -- line: 86
+			-- upvalues: SocialService (copy)
+			return SocialService.ShowPromptFeedbackUnavailable
+		end)
+
+		if ok2 then
+			v19 = result2
+		end
+	end
+
+	return React.createElement(React.Fragment, {}, {
+		Show = v18 and React.createElement(v8, {
+			event = v18,
+			handler = v14
+		}) or nil,
+		Unavailable = v19 and React.createElement(v8, {
+			event = v19,
+			handler = v17
+		}) or nil
+	})
+end))

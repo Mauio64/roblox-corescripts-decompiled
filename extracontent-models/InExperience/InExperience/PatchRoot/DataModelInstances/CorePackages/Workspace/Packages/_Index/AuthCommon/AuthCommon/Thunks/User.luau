@@ -1,158 +1,181 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_Players_0 = game:GetService("Players");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v5 = require(l_script_FirstAncestor_0.Enums.AuthLocalStorageKeys);
-local l_Logger_0 = require(l_Parent_0.Loggers).Logger;
-local v7 = game:DefineFastFlag("EnableBlackbirdCheckDev", false);
-local l_game_EngineFeature_0 = game:GetEngineFeature("HasRobloxSubscriptionStorageKey");
-local v9 = {};
-v9.__index = v9;
-v9.new = function(v10, v11, v12, v13, v14, v15, v16) --[[ Line: 39 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy)
-    local v17 = {
-        userId = v10, 
-        username = v11, 
-        displayName = v15 or nil, 
-        membershipType = v12, 
-        isUnder13 = v13, 
-        countryCode = v14, 
-        hasRobloxSubscription = v16
-    };
-    setmetatable(v17, v9);
-    return v17;
-end;
-v9.fromRequest = function(v18) --[[ Line: 62 ]] --[[ Name: fromRequest ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v19 = if v7 then v18.responseBody.HasRobloxSubscription == true else nil;
-    return v9.new(v18.responseBody.UserId, v18.responseBody.Username, tonumber(v18.responseBody.MembershipType), v18.responseBody.AgeBracket == 1, v18.responseBody.CountryCode, v18.responseBody.DisplayName or nil, v19);
-end;
-v9.fromUserInfoRequest = function(v20) --[[ Line: 77 ]] --[[ Name: fromUserInfoRequest ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v21 = v20.responseBody.isPremium and 4 or 0;
-    local v22 = if v7 then v20.responseBody.hasRobloxSubscription == true else nil;
-    return v9.new(v20.responseBody.id, v20.responseBody.name, v21, v20.responseBody.ageBracket == 1, v20.responseBody.countryCode, v20.responseBody.displayName or nil, v22);
-end;
-v9.fromLocalStorage = function() --[[ Line: 94 ]] --[[ Name: fromLocalStorage ]]
-    -- upvalues: v7 (copy), l_game_EngineFeature_0 (copy), l_AppStorageService_0 (copy), v5 (copy), l_Logger_0 (copy), v9 (copy)
-    local v23 = nil;
-    if v7 and l_game_EngineFeature_0 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 98 ]]
-            -- upvalues: l_AppStorageService_0 (ref), v5 (ref)
-            return l_AppStorageService_0:GetItem(v5.HasRobloxSubscription);
-        end);
-        if l_status_0 then
-            local v26 = true;
-            if l_result_0 ~= "true" then
-                v26 = false;
-            end;
-            v23 = v26;
-        else
-            l_Logger_0:warning("Failed to read HasRobloxSubscription from local storage: {}", (tostring(l_result_0)));
-        end;
-    end;
-    return v9.new(tonumber(l_AppStorageService_0:GetItem(v5.UserId)) or -1, l_AppStorageService_0:GetItem(v5.Username), tonumber(l_AppStorageService_0:GetItem(v5.Membership)) or 0, l_AppStorageService_0:GetItem(v5.IsUnder13) == "true", l_AppStorageService_0:GetItem(v5.CountryCode) or nil, l_AppStorageService_0:GetItem(v5.DisplayName) or nil, v23);
-end;
-v9.clearLocalStorage = function() --[[ Line: 118 ]] --[[ Name: clearLocalStorage ]]
-    -- upvalues: l_AppStorageService_0 (copy), v5 (copy), v7 (copy), l_game_EngineFeature_0 (copy), l_Logger_0 (copy)
-    l_AppStorageService_0:SetItem(v5.UserId, "-1");
-    l_AppStorageService_0:SetItem(v5.Username, "");
-    l_AppStorageService_0:SetItem(v5.Membership, "");
-    l_AppStorageService_0:SetItem(v5.IsUnder13, "");
-    l_AppStorageService_0:SetItem(v5.DisplayName, "");
-    l_AppStorageService_0:SetItem(v5.CountryCode, "");
-    if v7 and l_game_EngineFeature_0 then
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 126 ]]
-            -- upvalues: l_AppStorageService_0 (ref), v5 (ref)
-            l_AppStorageService_0:SetItem(v5.HasRobloxSubscription, "");
-        end);
-        if not l_status_1 then
-            l_Logger_0:warning("Failed to clear HasRobloxSubscription from local storage: {}", (tostring(l_result_1)));
-        end;
-    end;
-    l_AppStorageService_0:Flush();
-end;
-v9.setToLocalPlayer = function(v29) --[[ Line: 136 ]] --[[ Name: setToLocalPlayer ]]
-    -- upvalues: v7 (copy), l_Players_0 (copy)
-    if v7 and v29.hasRobloxSubscription ~= nil then
-        l_Players_0:SetLocalPlayerInfo(v29.userId, v29.username, v29.displayName or "", v29.membershipType, v29.isUnder13, v29.hasRobloxSubscription);
-        return;
-    else
-        l_Players_0:SetLocalPlayerInfo(v29.userId, v29.username, v29.displayName or "", v29.membershipType, v29.isUnder13);
-        return;
-    end;
-end;
-v9.setToLocalStorage = function(v30) --[[ Line: 157 ]] --[[ Name: setToLocalStorage ]]
-    -- upvalues: l_AppStorageService_0 (copy), v5 (copy), v7 (copy), l_game_EngineFeature_0 (copy), l_Logger_0 (copy)
-    l_AppStorageService_0:SetItem(v5.UserId, (tostring(v30.userId)));
-    l_AppStorageService_0:SetItem(v5.Username, v30.username);
-    l_AppStorageService_0:SetItem(v5.Membership, (tostring(v30.membershipType)));
-    l_AppStorageService_0:SetItem(v5.IsUnder13, (tostring(v30.isUnder13)));
-    l_AppStorageService_0:SetItem(v5.DisplayName, (tostring(v30.displayName)));
-    l_AppStorageService_0:SetItem(v5.CountryCode, (tostring(v30.countryCode)));
-    if v7 and l_game_EngineFeature_0 then
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 165 ]]
-            -- upvalues: l_AppStorageService_0 (ref), v5 (ref), v30 (copy)
-            l_AppStorageService_0:SetItem(v5.HasRobloxSubscription, (tostring(v30.hasRobloxSubscription == true)));
-        end);
-        if not l_status_2 then
-            l_Logger_0:warning("Failed to save HasRobloxSubscription to local storage: {}", (tostring(l_result_2)));
-        end;
-    end;
-    l_AppStorageService_0:Flush();
-end;
-v9.isSame = function(v33, v34) --[[ Line: 178 ]] --[[ Name: isSame ]]
-    return v33.userId == v34.userId;
-end;
-v9.isEqual = function(v35, v36) --[[ Line: 182 ]] --[[ Name: isEqual ]]
-    -- upvalues: v7 (copy)
-    local v37 = false;
-    if v35.userId == v36.userId then
-        v37 = false;
-        if v35.username == v36.username then
-            v37 = false;
-            if v35.membershipType == v36.membershipType then
-                v37 = false;
-                if v35.isUnder13 == v36.isUnder13 then
-                    v37 = false;
-                    if v35.displayName == v36.displayName then
-                        v37 = false;
-                        if v35.countryCode == v36.countryCode then
-                            if v7 then
-                                return v35.hasRobloxSubscription == v36.hasRobloxSubscription;
-                            else
-                                v37 = true;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    return v37;
-end;
-v9.toString = function(v38) --[[ Line: 192 ]] --[[ Name: toString ]]
-    -- upvalues: v7 (copy)
-    local v39 = string.format("userId:%s, username:%s, membershipType:%s, isUnder13:%s, countryCode:%s", tostring(v38.userId), v38.username, tostring(v38.membershipType), tostring(v38.isUnder13), (tostring(v38.countryCode)));
-    if v7 then
-        v39 = v39 .. string.format(", hasRobloxSubscription:%s", (tostring(v38.hasRobloxSubscription)));
-    end;
-    return v39;
-end;
-v9.toJsonData = function(v40) --[[ Line: 207 ]] --[[ Name: toJsonData ]]
-    -- upvalues: v7 (copy), l_HttpService_0 (copy)
-    local v41 = {
-        userId = v40.userId, 
-        username = v40.username, 
-        displayName = v40.displayName or nil, 
-        membershipType = v40.membershipType, 
-        isUnder13 = v40.isUnder13, 
-        countryCode = v40.countryCode
-    };
-    if v7 then
-        v41.hasRobloxSubscription = v40.hasRobloxSubscription;
-    end;
-    return l_HttpService_0:JSONEncode(v41);
-end;
-return v9;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AppStorageService = game:GetService("AppStorageService")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local AuthCommonParent = AuthCommon.Parent
+local AuthLocalStorageKeys = require(AuthCommon.Enums.AuthLocalStorageKeys)
+local Logger = require(AuthCommonParent.Loggers).Logger
+local v8 = game:DefineFastFlag("EnableBlackbirdCheck", false)
+local EngineFeature = game:GetEngineFeature("HasRobloxSubscriptionStorageKey")
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(n1: number, s1: string, n2: number, b1: boolean, s2: string, s3: string, b2: boolean?) -- line: 39
+	-- upvalues: t1 (copy)
+	local t2 = {
+		userId = n1,
+		username = s1,
+		displayName = s3 or nil,
+		membershipType = n2,
+		isUnder13 = b1,
+		countryCode = s2,
+		hasRobloxSubscription = b2
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.fromRequest(p1) -- line: 62
+	-- upvalues: v8 (copy), t1 (copy)
+	local v20 = if not v8 then nil else p1.responseBody.HasRobloxSubscription == true
+
+	return t1.new(p1.responseBody.UserId, p1.responseBody.Username, tonumber(p1.responseBody.MembershipType), p1.responseBody.AgeBracket == 1, p1.responseBody.CountryCode, p1.responseBody.DisplayName or nil, v20)
+end
+function t1.fromUserInfoRequest(p2) -- line: 77
+	-- upvalues: v8 (copy), t1 (copy)
+	local v22 = not p2.responseBody.isPremium and 0 or 4
+	local v23 = if not v8 then nil else p2.responseBody.hasRobloxSubscription == true
+
+	return t1.new(p2.responseBody.id, p2.responseBody.name, v22, p2.responseBody.ageBracket == 1, p2.responseBody.countryCode, p2.responseBody.displayName or nil, v23)
+end
+function t1.fromLocalStorage() -- line: 94
+	-- upvalues: v8 (copy), EngineFeature (copy), AppStorageService (copy), AuthLocalStorageKeys (copy), Logger (copy), t1 (copy)
+	local v24 = nil
+
+	if v8 and EngineFeature then
+		local ok, result = pcall(function() -- line: 98
+			-- upvalues: AppStorageService (copy), AuthLocalStorageKeys (copy)
+			return AppStorageService:GetItem(AuthLocalStorageKeys.HasRobloxSubscription)
+		end)
+
+		if ok then
+			v24 = result == "true" or false
+		else
+			Logger:warning("Failed to read HasRobloxSubscription from local storage: {}", (tostring(result)))
+		end
+	end
+
+	return t1.new(tonumber(AppStorageService:GetItem(AuthLocalStorageKeys.UserId)) or -1, AppStorageService:GetItem(AuthLocalStorageKeys.Username), tonumber(AppStorageService:GetItem(AuthLocalStorageKeys.Membership)) or 0, AppStorageService:GetItem(AuthLocalStorageKeys.IsUnder13) == "true", AppStorageService:GetItem(AuthLocalStorageKeys.CountryCode) or nil, AppStorageService:GetItem(AuthLocalStorageKeys.DisplayName) or nil, v24)
+end
+function t1.clearLocalStorage() -- line: 118
+	-- upvalues: AppStorageService (copy), AuthLocalStorageKeys (copy), v8 (copy), EngineFeature (copy), Logger (copy)
+	AppStorageService:SetItem(AuthLocalStorageKeys.UserId, "-1")
+	AppStorageService:SetItem(AuthLocalStorageKeys.Username, "")
+	AppStorageService:SetItem(AuthLocalStorageKeys.Membership, "")
+	AppStorageService:SetItem(AuthLocalStorageKeys.IsUnder13, "")
+	AppStorageService:SetItem(AuthLocalStorageKeys.DisplayName, "")
+	AppStorageService:SetItem(AuthLocalStorageKeys.CountryCode, "")
+
+	if v8 and EngineFeature then
+		local ok, result = pcall(function() -- line: 126
+			-- upvalues: AppStorageService (copy), AuthLocalStorageKeys (copy)
+			AppStorageService:SetItem(AuthLocalStorageKeys.HasRobloxSubscription, "")
+		end)
+
+		if not ok then
+			Logger:warning("Failed to clear HasRobloxSubscription from local storage: {}", (tostring(result)))
+		end
+	end
+
+	AppStorageService:Flush()
+end
+function t1.setToLocalPlayer(p3) -- line: 136
+	-- upvalues: v8 (copy), Players (copy)
+	if v8 and p3.hasRobloxSubscription ~= nil then
+		Players:SetLocalPlayerInfo(p3.userId, p3.username, p3.displayName or "", p3.membershipType, p3.isUnder13, p3.hasRobloxSubscription)
+
+		return
+	end
+
+	Players:SetLocalPlayerInfo(p3.userId, p3.username, p3.displayName or "", p3.membershipType, p3.isUnder13)
+end
+function t1.setToLocalStorage(p4) -- line: 157
+	-- upvalues: AppStorageService (copy), AuthLocalStorageKeys (copy), v8 (copy), EngineFeature (copy), Logger (copy)
+	AppStorageService:SetItem(AuthLocalStorageKeys.UserId, (tostring(p4.userId)))
+	AppStorageService:SetItem(AuthLocalStorageKeys.Username, p4.username)
+	AppStorageService:SetItem(AuthLocalStorageKeys.Membership, (tostring(p4.membershipType)))
+	AppStorageService:SetItem(AuthLocalStorageKeys.IsUnder13, (tostring(p4.isUnder13)))
+	AppStorageService:SetItem(AuthLocalStorageKeys.DisplayName, (tostring(p4.displayName)))
+	AppStorageService:SetItem(AuthLocalStorageKeys.CountryCode, (tostring(p4.countryCode)))
+
+	if v8 and EngineFeature then
+		local ok, result = pcall(function() -- line: 165
+			-- upvalues: AppStorageService (copy), AuthLocalStorageKeys (copy), p4 (copy)
+			AppStorageService:SetItem(AuthLocalStorageKeys.HasRobloxSubscription, (tostring(p4.hasRobloxSubscription == true)))
+		end)
+
+		if not ok then
+			Logger:warning("Failed to save HasRobloxSubscription to local storage: {}", (tostring(result)))
+		end
+	end
+
+	AppStorageService:Flush()
+end
+function t1.isSame(p5, p6) -- line: 178
+	return p5.userId == p6.userId
+end
+function t1.isEqual(p7, p8) -- line: 182
+	-- upvalues: v8 (copy)
+	local v37 = false
+
+	if p7.userId == p8.userId then
+		v37 = false
+
+		if p7.username == p8.username then
+			v37 = false
+
+			if p7.membershipType == p8.membershipType then
+				v37 = false
+
+				if p7.isUnder13 == p8.isUnder13 then
+					v37 = false
+
+					if p7.displayName == p8.displayName then
+						v37 = false
+
+						if p7.countryCode == p8.countryCode then
+							if v8 then
+								return p7.hasRobloxSubscription == p8.hasRobloxSubscription
+							end
+
+							v37 = true
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return v37
+end
+function t1.toString(p9) -- line: 192
+	-- upvalues: v8 (copy)
+	local v39 = string.format("userId:%s, username:%s, membershipType:%s, isUnder13:%s, countryCode:%s", tostring(p9.userId), p9.username, tostring(p9.membershipType), tostring(p9.isUnder13), (tostring(p9.countryCode)))
+
+	if v8 then
+		v39 ..= string.format(", hasRobloxSubscription:%s", (tostring(p9.hasRobloxSubscription)))
+	end
+
+	return v39
+end
+function t1.toJsonData(p10) -- line: 207
+	-- upvalues: v8 (copy), HttpService (copy)
+	local t3 = {
+		userId = p10.userId,
+		username = p10.username,
+		displayName = p10.displayName or nil,
+		membershipType = p10.membershipType,
+		isUnder13 = p10.isUnder13,
+		countryCode = p10.countryCode
+	}
+
+	if v8 then
+		t3.hasRobloxSubscription = p10.hasRobloxSubscription
+	end
+
+	return HttpService:JSONEncode(t3)
+end
+
+return t1

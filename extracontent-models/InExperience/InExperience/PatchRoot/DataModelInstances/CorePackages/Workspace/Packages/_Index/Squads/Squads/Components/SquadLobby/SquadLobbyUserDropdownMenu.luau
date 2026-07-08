@@ -17,8 +17,6 @@ local React = dependencies.React
 local SharedFlags = dependencies.SharedFlags
 local Images = UIBlox.App.ImageSet.Images
 local ModalBottomSheet = UIBlox.ModalBottomSheet
-local dependencyArray = dependencies.Hooks.dependencyArray
-local SquadsCore = dependencies.SquadsCore
 local useDispatch = dependencies.Hooks.useDispatch
 local useLocalization = dependencies.Hooks.useLocalization
 local useStore = dependencies.Hooks.useStore
@@ -32,52 +30,50 @@ local ExperienceService2 = ExperienceService.ExperienceService
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
-local EventNames = SquadsCore.Analytics.EventNames
-local SquadExternalContractContext = SquadsCore.SquadExternalContractProvider.SquadExternalContractContext
-local SquadLocationEnum = SquadsCore.Enums.SquadLocationEnum
-local SquadPromptType = SquadsCore.Enums.SquadPromptType
-local Constants = SquadsCore.Common.Constants
-local useIsLocalPlayerPartyVoiceEligible = SquadsCore.Hooks.useIsLocalPlayerPartyVoiceEligible
-local useIsUserPartyVoiceEligible = SquadsCore.Hooks.useIsUserPartyVoiceEligible
-local useIsCurrentSquadPartyVoiceEligible = SquadsCore.Hooks.useIsCurrentSquadPartyVoiceEligible
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
+local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
+local SquadLocationEnum = require(SquadsParent.SquadsCore.Enums).SquadLocationEnum
+local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
+local Constants = require(SquadsParent.SquadsCore.Constants)
+local useIsLocalPlayerPartyVoiceEligible = require(SquadsParent.SquadsCore.Hooks).useIsLocalPlayerPartyVoiceEligible
+local useIsUserPartyVoiceEligible = require(SquadsParent.SquadsCore.Hooks).useIsUserPartyVoiceEligible
+local useIsCurrentSquadPartyVoiceEligible = require(SquadsParent.SquadsCore.Hooks).useIsCurrentSquadPartyVoiceEligible
 local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
 local getFFlagEnableCrossExpVoiceAbuseReport = SharedFlags.getFFlagEnableCrossExpVoiceAbuseReport
 local FFlagEnableSquadUserCardHoverFix = SharedFlags.FFlagEnableSquadUserCardHoverFix
 local FFlagSquadLaunchExperienceMobileFix = SharedFlags.FFlagSquadLaunchExperienceMobileFix
-local FFlagEnableAppChatFocusableFixes = SharedFlags.FFlagEnableAppChatFocusableFixes
-local FFlagRemoveDependencyArrayAntipattern = SharedFlags.FFlagRemoveDependencyArrayAntipattern
 local useIsParticipantMutedLocally = CrossExperienceVoice.Hooks.useIsParticipantMutedLocally
 local default = CrossExperienceVoice.CrossExperienceVoiceManager.default
-local v48 = Images["icons/common/play"]
-local v49 = Images["icons/menu/profile"]
-local v50 = Images["icons/actions/feedback"]
-local v51 = Images["icons/actions/leave"]
-local v52 = Images["icons/controls/headphoneDeafen_small"]
-local v53 = Images["icons/controls/microphoneMute"]
-local v54 = Images["icons/controls/microphone"]
+local v44 = Images["icons/common/play"]
+local v45 = Images["icons/menu/profile"]
+local v46 = Images["icons/actions/feedback"]
+local v47 = Images["icons/actions/leave"]
+local v48 = Images["icons/controls/headphoneDeafen_small"]
+local v49 = Images["icons/controls/microphoneMute"]
+local v50 = Images["icons/controls/microphone"]
 local t1 = {
 	isInExperience = false,
-	onDismiss = function() --[[ onDismiss ]] -- line: 105
-	end,
-	openViewProfile = function() --[[ openViewProfile ]] -- line: 106
-	end,
-	openVoiceAbuseReport = function() --[[ openVoiceAbuseReport ]] -- line: 107
-	end,
 	parentChannelId = "",
-	userId = ""
+	userId = "",
+	onDismiss = function() -- line: 102
+	end,
+	openViewProfile = function() -- line: 103
+	end,
+	openVoiceAbuseReport = function() -- line: 104
+	end
 }
 
-return function(t2: {[any]: any}) -- line: 112
-	-- upvalues: Cryo (copy), t1 (copy), React (copy), SquadExternalContractContext (copy), useDispatch (copy), useLocalUserId (copy), useStore (copy), useVoiceStatus (copy), FFlagEnableSquadUserCardHoverFix (copy), useSquadUserDropdownMenuButtons (copy), useIsParticipantMutedLocally (copy), useLocalization (copy), Constants (copy), EventNames (copy), SquadPartySheetActionEnum (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), SquadPromptType (copy), GetFFlagEnableCrossExpVoice (copy), useBackgroundExperience (copy), useParticipants (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), useSelector (copy), PresenceType (copy), GameParams (copy), FFlagSquadLaunchExperienceMobileFix (copy), SquadLocationEnum (copy), ExperienceService2 (copy), v52 (copy), v48 (copy), v51 (copy), v49 (copy), v50 (copy), v53 (copy), v54 (copy), default (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), FFlagEnableAppChatFocusableFixes (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusNavigableSurfaceIdentifierEnum (copy), ModalBottomSheet (copy)
-	local v57 = Cryo.Dictionary.union(t1, t2)
-	local v58 = React.useContext(SquadExternalContractContext)
-	local v59 = useDispatch()
-	local v60 = useLocalUserId()
-	local v61 = useStore()
-	local v62 = useVoiceStatus()
-	local v63 = if not FFlagEnableSquadUserCardHoverFix then nil else useSquadUserDropdownMenuButtons(v57.userId, v57.isInExperience)
-	local v64 = useIsParticipantMutedLocally(tonumber(v57.userId) or -1)
-	local v65 = useLocalization({
+return function(t2: {[any]: any}) -- line: 109
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), SquadExternalContractContext (copy), useDispatch (copy), useLocalUserId (copy), useStore (copy), useVoiceStatus (copy), FFlagEnableSquadUserCardHoverFix (copy), useSquadUserDropdownMenuButtons (copy), useIsParticipantMutedLocally (copy), useLocalization (copy), Constants (copy), EventNames (copy), SquadPartySheetActionEnum (copy), SquadPromptType (copy), GetFFlagEnableCrossExpVoice (copy), useBackgroundExperience (copy), useParticipants (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsUserPartyVoiceEligible (copy), useIsCurrentSquadPartyVoiceEligible (copy), useSelector (copy), PresenceType (copy), GameParams (copy), FFlagSquadLaunchExperienceMobileFix (copy), SquadLocationEnum (copy), ExperienceService2 (copy), v48 (copy), v44 (copy), v47 (copy), v45 (copy), v46 (copy), v49 (copy), v50 (copy), default (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusNavigableSurfaceIdentifierEnum (copy), ModalBottomSheet (copy)
+	local v53 = Cryo.Dictionary.union(t1, t2)
+	local v54 = React.useContext(SquadExternalContractContext)
+	local v55 = useDispatch()
+	local v56 = useLocalUserId()
+	local v57 = useStore()
+	local v58 = useVoiceStatus()
+	local v59 = if not FFlagEnableSquadUserCardHoverFix then nil else useSquadUserDropdownMenuButtons(v53.userId, v53.isInExperience)
+	local v60 = useIsParticipantMutedLocally(tonumber(v53.userId) or -1)
+	local v61 = useLocalization({
 		joinButtonText = "Common.VisitGame.Label.Play",
 		viewProfileText = "Feature.Chat.Label.ViewProfile",
 		reportUserText = "Feature.Chat.Action.ReportUser",
@@ -86,282 +82,282 @@ return function(t2: {[any]: any}) -- line: 112
 		muteVoiceButtonText = "Feature.Chat.Action.MuteVoice",
 		unmuteVoiceButtonText = "Feature.Chat.Action.UnmuteVoice"
 	})
-	local v66 = v58.useGetConversationFromId(v57.parentChannelId)
-	local v67 = React.useMemo(function() -- line: 137
-		-- upvalues: v66 (copy), Constants (copy), v60 (copy)
-		return v66 and (v66.type == Constants.CONVERSATION_CHANNEL_GROUP_TYPE and v66.initiator == v60)
+	local v62 = v54.useGetConversationFromId(v53.parentChannelId)
+	local v63 = React.useMemo(function() -- line: 134
+		-- upvalues: v62 (copy), Constants (copy), v56 (copy)
+		return v62 and (v62.type == Constants.CONVERSATION_CHANNEL_GROUP_TYPE and v62.initiator == v56)
 	end, {
-		v66,
-		v60
+		v62,
+		v56
 	})
-	local v68 = React.useCallback(function() -- line: 144
-		-- upvalues: v58 (copy), EventNames (copy), v57 (copy), SquadPartySheetActionEnum (copy), v62 (copy)
-		v58.fireSquadAnalytics(EventNames.PartySheetAction, {
-			parentChannelId = v57.parentChannelId,
+	local v64 = React.useCallback(function() -- line: 140
+		-- upvalues: v54 (copy), EventNames (copy), v53 (copy), SquadPartySheetActionEnum (copy), v58 (copy)
+		v54.fireSquadAnalytics(EventNames.PartySheetAction, {
+			parentChannelId = v53.parentChannelId,
 			actionType = SquadPartySheetActionEnum.ViewProfileButtonClicked,
-			voiceStatus = v62
+			voiceStatus = v58
 		})
-		v57.openViewProfile()
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v57.parentChannelId, v57.openViewProfile, v58.fireSquadAnalytics, v62) else {
-		v57.parentChannelId,
-		v57.openViewProfile,
-		v58.fireSquadAnalytics,
-		v62
+		v53.openViewProfile()
+	end, {
+		v53.parentChannelId,
+		v53.openViewProfile,
+		v54.fireSquadAnalytics,
+		v58
 	})
-	local v69 = React.useCallback(function() -- line: 169
-		-- upvalues: v58 (copy), EventNames (copy), v57 (copy), SquadPartySheetActionEnum (copy), v62 (copy), v61 (copy), SquadPromptType (copy), v59 (copy)
-		v58.fireSquadAnalytics(EventNames.PartySheetAction, {
-			parentChannelId = v57.parentChannelId,
+	local v65 = React.useCallback(function() -- line: 155
+		-- upvalues: v54 (copy), EventNames (copy), v53 (copy), SquadPartySheetActionEnum (copy), v58 (copy), v57 (copy), SquadPromptType (copy), v55 (copy)
+		v54.fireSquadAnalytics(EventNames.PartySheetAction, {
+			parentChannelId = v53.parentChannelId,
 			actionType = SquadPartySheetActionEnum.RemoveUserDropDownButtonClicked,
-			voiceStatus = v62
+			voiceStatus = v58
 		})
-		v58.setSquadPrompt(v61, {
+		v54.setSquadPrompt(v57, {
 			promptType = SquadPromptType.RemoveFromChat,
-			onConfirm = function() --[[ onConfirm ]] -- line: 178
-				-- upvalues: v57 (copy), v58 (copy), EventNames (copy), SquadPartySheetActionEnum (copy), v62 (copy), v59 (copy)
-				if v57.userId ~= "" and v57.parentChannelId ~= "" then
-					v58.fireSquadAnalytics(EventNames.PartySheetAction, {
-						parentChannelId = v57.parentChannelId,
+			onConfirm = function() -- line: 164
+				-- upvalues: v53 (copy), v54 (copy), EventNames (copy), SquadPartySheetActionEnum (copy), v58 (copy), v55 (copy)
+				if v53.userId ~= "" and v53.parentChannelId ~= "" then
+					v54.fireSquadAnalytics(EventNames.PartySheetAction, {
+						parentChannelId = v53.parentChannelId,
 						actionType = SquadPartySheetActionEnum.RemoveUserDialogButtonClicked,
-						voiceStatus = v62
+						voiceStatus = v58
 					})
 
-					return v58.removeUserFromParentChannel(v59, v57.parentChannelId, v57.userId)
+					return v54.removeUserFromParentChannel(v55, v53.parentChannelId, v53.userId)
 				end
 
 				return nil
 			end
 		})
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v59, v57.userId, v57.parentChannelId, v58.fireSquadAnalytics, v58.setSquadPrompt, v58.removeUserFromParentChannel, v62) else {
-		v59,
-		v57.userId,
-		v57.parentChannelId,
-		v58.fireSquadAnalytics,
-		v58.setSquadPrompt,
-		v58.removeUserFromParentChannel,
-		v62
+	end, {
+		v55,
+		v53.userId,
+		v53.parentChannelId,
+		v54.fireSquadAnalytics,
+		v54.setSquadPrompt,
+		v54.removeUserFromParentChannel,
+		v58
 	})
+	local u66 = nil
+	local u67 = nil
+	local u68 = nil
+	local t3 = {}
 	local u70 = nil
 	local u71 = nil
-	local u72 = nil
-	local t3 = {}
-	local u74 = nil
-	local u75 = nil
 
 	if GetFFlagEnableCrossExpVoice() then
-		u70 = useBackgroundExperience()
-		u72 = useParticipants() or {}
-		t3 = React.useMemo(function() -- line: 225
-			-- upvalues: u72 (ref)
+		u66 = useBackgroundExperience()
+		u68 = useParticipants() or {}
+		t3 = React.useMemo(function() -- line: 199
+			-- upvalues: u68 (ref)
 			local t4 = {}
 
-			for _, v in pairs(u72) do
+			for _, v in pairs(u68) do
 				table.insert(t4, v.userId)
 			end
 
 			return t4
-		end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(u72) else { u72 })
-		u74 = React.useMemo(function() -- line: 233
-			-- upvalues: u70 (ref)
-			if u70 then
-				return u70.voiceChannelId
+		end, { u68 })
+		u70 = React.useMemo(function() -- line: 206
+			-- upvalues: u66 (ref)
+			if u66 then
+				return u66.voiceChannelId
 			end
 
 			return nil
-		end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(u70) else { u70 })
-		u75 = React.useMemo(function() -- line: 241
-			-- upvalues: u70 (ref)
-			if u70 then
-				return u70.voiceSessionId
+		end, { u66 })
+		u71 = React.useMemo(function() -- line: 209
+			-- upvalues: u66 (ref)
+			if u66 then
+				return u66.voiceSessionId
 			end
 
 			return nil
-		end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(u70) else { u70 })
+		end, { u66 })
 
 		if not FFlagEnableSquadUserCardHoverFix then
-			local v76 = if not v57.userId then nil else tonumber(v57.userId)
+			local v72 = if not v53.userId then nil else tonumber(v53.userId)
 
-			if v76 then
-				local v77 = useIsLocalPlayerPartyVoiceEligible()
-				local v78 = useIsUserPartyVoiceEligible(v76)
+			if v72 then
+				local v73 = useIsLocalPlayerPartyVoiceEligible()
+				local v74 = useIsUserPartyVoiceEligible(v72)
 
-				u71 = useIsCurrentSquadPartyVoiceEligible() == true and (v77 and not v78)
+				u67 = useIsCurrentSquadPartyVoiceEligible() == true and (v73 and not v74)
 			end
 		end
 	end
 
-	local v79 = React.useCallback(function(p1) -- line: 262
-		-- upvalues: v57 (copy)
-		return p1.Squad.Presence.byUserId[v57.userId]
-	end, { v57.userId })
-	local v80 = useSelector(v79)
-	local v81 = React.useMemo(function() -- line: 268
-		-- upvalues: FFlagEnableSquadUserCardHoverFix (copy), v63 (copy), v80 (copy), PresenceType (copy)
+	local v75 = React.useCallback(function(p1) -- line: 226
+		-- upvalues: v53 (copy)
+		return p1.Squad.Presence.byUserId[v53.userId]
+	end, { v53.userId })
+	local v76 = useSelector(v75)
+	local v77 = React.useMemo(function() -- line: 231
+		-- upvalues: FFlagEnableSquadUserCardHoverFix (copy), v59 (copy), v76 (copy), PresenceType (copy)
 		if FFlagEnableSquadUserCardHoverFix then
-			return table.find(v63, "JoinButton") ~= nil and (v80 and (v80.userPresenceType == PresenceType.InGame and v80.placeId))
+			return table.find(v59, "JoinButton") ~= nil and (v76 and (v76.userPresenceType == PresenceType.InGame and v76.placeId))
 		end
 
-		return v80 and (v80.userPresenceType == PresenceType.InGame and v80.placeId)
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v80, v63) else {
-		v80,
-		v63
+		return v76 and (v76.userPresenceType == PresenceType.InGame and v76.placeId)
+	end, {
+		v76,
+		v59
 	})
-	local v82 = React.useCallback(function() -- line: 286
-		-- upvalues: v81 (copy), GameParams (copy), v57 (copy), v80 (copy), FFlagSquadLaunchExperienceMobileFix (copy), v58 (copy), SquadLocationEnum (copy), ExperienceService2 (copy)
-		if v81 then
-			local v88 = GameParams.fromUserId(v57.userId, v80.placeId)
+	local v78 = React.useCallback(function() -- line: 242
+		-- upvalues: v77 (copy), GameParams (copy), v53 (copy), v76 (copy), FFlagSquadLaunchExperienceMobileFix (copy), v54 (copy), SquadLocationEnum (copy), ExperienceService2 (copy)
+		if v77 then
+			local v84 = GameParams.fromUserId(v53.userId, v76.placeId)
 
-			if v57.isInExperience and FFlagSquadLaunchExperienceMobileFix then
+			if v53.isInExperience and FFlagSquadLaunchExperienceMobileFix then
 				game:Shutdown()
 			end
 
 			local s1 = "SquadLobby"
 
-			if v58.squadLocation == SquadLocationEnum.UniversalApp then
+			if v54.squadLocation == SquadLocationEnum.UniversalApp then
 				s1 = "SquadLobbyFromUA"
-			elseif v58.squadLocation == SquadLocationEnum.InExperience then
+			elseif v54.squadLocation == SquadLocationEnum.InExperience then
 				s1 = "SquadLobbyFromInExp"
 			end
 
-			ExperienceService2:LaunchExperience(v88, s1, nil)
+			ExperienceService2:LaunchExperience(v84, s1, nil)
 		end
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v81, v58.squadLocation, v57.isInExperience, v57.userId, v80) else {
-		v81,
-		v58.squadLocation,
-		v57.isInExperience,
-		v57.userId,
-		v80
+	end, {
+		v77,
+		v54.squadLocation,
+		v53.isInExperience,
+		v53.userId,
+		v76
 	})
-	local v83 = if not FFlagEnableSquadUserCardHoverFix then React.useMemo(function() -- line: 436
-		-- upvalues: v60 (copy), v57 (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), u74 (ref), u71 (ref), v52 (copy), v65 (copy), v81 (copy), v48 (copy), v82 (copy), v49 (copy), v68 (copy), v50 (copy), u75 (ref), t3 (ref), v67 (copy), v51 (copy), v69 (copy)
-		local v95 = tostring(v60) == v57.userId
-		local isInExperience = v57.isInExperience
-		local v97 = getFFlagEnableCrossExpVoiceAbuseReport() and (not not u74 and not v95)
+	local v79 = if not FFlagEnableSquadUserCardHoverFix then React.useMemo(function() -- line: 357
+		-- upvalues: v56 (copy), v53 (copy), getFFlagEnableCrossExpVoiceAbuseReport (copy), u70 (ref), u67 (ref), v48 (copy), v61 (copy), v77 (copy), v44 (copy), v78 (copy), v45 (copy), v64 (copy), v46 (copy), u71 (ref), t3 (ref), v63 (copy), v47 (copy), v65 (copy)
+		local v91 = tostring(v56) == v53.userId
+		local isInExperience = v53.isInExperience
+		local v93 = getFFlagEnableCrossExpVoiceAbuseReport() and (not not u70 and not v91)
 		local t5 = {}
 
-		if u71 then
+		if u67 then
 			table.insert(t5, {
-				icon = v52,
-				text = v65.voiceIneligibleText,
-				stayOnActivated = true
+				stayOnActivated = true,
+				icon = v48,
+				text = v61.voiceIneligibleText
 			})
 		end
 
-		if v81 then
+		if v77 then
 			table.insert(t5, {
-				icon = v48,
-				text = v65.joinButtonText,
-				onActivated = v82
+				icon = v44,
+				text = v61.joinButtonText,
+				onActivated = v78
 			})
 		end
 
 		if not isInExperience then
 			table.insert(t5, {
-				icon = v49,
-				text = v65.viewProfileText,
-				onActivated = v68
+				icon = v45,
+				text = v61.viewProfileText,
+				onActivated = v64
 			})
 		end
 
-		if v97 then
+		if v93 then
 			table.insert(t5, {
-				icon = v50,
-				text = v65.reportUserText,
-				onActivated = function() --[[ onActivated ]] -- line: 473
-					-- upvalues: v60 (copy), v57 (copy), u74 (ref), u75 (ref), t3 (ref)
+				icon = v46,
+				text = v61.reportUserText,
+				onActivated = function() -- line: 394
+					-- upvalues: v56 (copy), v53 (copy), u70 (ref), u71 (ref), t3 (ref)
 					local t6 = {
-						submitterUserId = tostring(v60),
-						abuserUserId = v57.userId,
+						submitterUserId = tostring(v56),
+						abuserUserId = v53.userId,
 						reportBeginTimestampMs = workspace:GetServerTimeNow() * 1000,
-						voiceChannelId = u74,
-						voiceSessionId = u75,
+						voiceChannelId = u70,
+						voiceSessionId = u71,
 						voiceUserIds = t3,
 						voiceUserCount = #t3
 					}
 
-					v57.openSquadVoiceAbuseReport(t6)
+					v53.openSquadVoiceAbuseReport(t6)
 				end
 			})
 		end
 
-		if v67 then
+		if v63 then
 			table.insert(t5, {
-				icon = v51,
-				text = v65.removeFromGroupText,
-				onActivated = v69
+				icon = v47,
+				text = v61.removeFromGroupText,
+				onActivated = v65
 			})
 		end
 
 		return t5
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v57.isInExperience, v57.userId, v57.openSquadVoiceAbuseReport, v65.joinButtonText, v65.removeFromGroupText, v65.reportUserText, v65.viewProfileText, v65.voiceIneligibleText, u71, v60, u74, u75, t3, v69, v81, v67, v82, v68) else {
-		v57.isInExperience,
-		v57.userId,
-		v57.openSquadVoiceAbuseReport,
-		v65.joinButtonText,
-		v65.removeFromGroupText,
-		v65.reportUserText,
-		v65.viewProfileText,
-		v65.voiceIneligibleText,
+	end, {
+		v53.isInExperience,
+		v53.userId,
+		v53.openSquadVoiceAbuseReport,
+		v61.joinButtonText,
+		v61.removeFromGroupText,
+		v61.reportUserText,
+		v61.viewProfileText,
+		v61.voiceIneligibleText,
+		u67,
+		v56,
+		u70,
 		u71,
-		v60,
-		u74,
-		u75,
 		t3,
-		v69,
-		v81,
-		v67,
-		v82,
-		v68
-	}) else React.useMemo(function() -- line: 322
-		-- upvalues: v52 (copy), v65 (copy), v48 (copy), v82 (copy), v51 (copy), v69 (copy), v49 (copy), v68 (copy), v50 (copy), v60 (copy), v57 (copy), u74 (ref), u75 (ref), t3 (ref), v64 (copy), v53 (copy), v54 (copy), default (copy), v63 (copy)
+		v65,
+		v77,
+		v63,
+		v78,
+		v64
+	}) else React.useMemo(function() -- line: 267
+		-- upvalues: v48 (copy), v61 (copy), v44 (copy), v78 (copy), v47 (copy), v65 (copy), v45 (copy), v64 (copy), v46 (copy), v56 (copy), v53 (copy), u70 (ref), u71 (ref), t3 (ref), v60 (copy), v49 (copy), v50 (copy), default (copy), v59 (copy)
 		local t8 = {
 			VoiceIneligibleButton = {
-				icon = v52,
-				text = v65.voiceIneligibleText,
-				stayOnActivated = true
+				stayOnActivated = true,
+				icon = v48,
+				text = v61.voiceIneligibleText
 			},
 			JoinButton = {
-				icon = v48,
-				text = v65.joinButtonText,
-				onActivated = v82
+				icon = v44,
+				text = v61.joinButtonText,
+				onActivated = v78
 			},
 			RemoveUserButton = {
-				icon = v51,
-				text = v65.removeFromGroupText,
-				onActivated = v69
+				icon = v47,
+				text = v61.removeFromGroupText,
+				onActivated = v65
 			},
 			ViewProfileButton = {
-				icon = v49,
-				text = v65.viewProfileText,
-				onActivated = v68
+				icon = v45,
+				text = v61.viewProfileText,
+				onActivated = v64
 			},
 			ReportButton = {
-				icon = v50,
-				text = v65.reportUserText,
-				onActivated = function() --[[ onActivated ]] -- line: 347
-					-- upvalues: v60 (copy), v57 (copy), u74 (ref), u75 (ref), t3 (ref)
+				icon = v46,
+				text = v61.reportUserText,
+				onActivated = function() -- line: 292
+					-- upvalues: v56 (copy), v53 (copy), u70 (ref), u71 (ref), t3 (ref)
 					local t7 = {
-						submitterUserId = tostring(v60),
-						abuserUserId = v57.userId,
+						submitterUserId = tostring(v56),
+						abuserUserId = v53.userId,
 						reportBeginTimestampMs = workspace:GetServerTimeNow() * 1000,
-						voiceChannelId = u74,
-						voiceSessionId = u75,
+						voiceChannelId = u70,
+						voiceSessionId = u71,
 						voiceUserIds = t3,
 						voiceUserCount = #t3
 					}
 
-					v57.openSquadVoiceAbuseReport(t7)
+					v53.openSquadVoiceAbuseReport(t7)
 				end
 			},
 			MuteVoiceButton = {
-				icon = if not v64 then v54 else v53,
-				text = if not v64 then v65.muteVoiceButtonText else v65.unmuteVoiceButtonText,
-				onActivated = function() --[[ onActivated ]] -- line: 365
-					-- upvalues: v57 (copy), v64 (copy), default (copy)
-					local num = tonumber(v57.userId)
+				icon = if not v60 then v50 else v49,
+				text = if not v60 then v61.muteVoiceButtonText else v61.unmuteVoiceButtonText,
+				onActivated = function() -- line: 310
+					-- upvalues: v53 (copy), v60 (copy), default (copy)
+					local num = tonumber(v53.userId)
 
 					if num then
-						if v64 then
+						if v60 then
 							default:unmuteVoiceParticipant(num)
 
 							return
@@ -372,79 +368,70 @@ return function(t2: {[any]: any}) -- line: 112
 						return
 					end
 
-					warn("Invalid userId: " .. tostring(v57.userId))
+					warn("Invalid userId: " .. tostring(v53.userId))
 				end
 			}
 		}
 		local t9 = {}
 
-		for _, v93 in v63 do
-			local v94 = t8[v93]
+		for _, v89 in v59 do
+			local v90 = t8[v89]
 
-			if v94 then
-				table.insert(t9, v94)
+			if v90 then
+				table.insert(t9, v90)
 			end
 		end
 
 		return t9
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v57.userId, v57.openSquadVoiceAbuseReport, v65.joinButtonText, v65.removeFromGroupText, v65.reportUserText, v65.viewProfileText, v65.voiceIneligibleText, v65.muteVoiceButtonText, v65.unmuteVoiceButtonText, v60, u74, u75, t3, v69, v63, v82, v68, v64) else {
-		v57.userId,
-		v57.openSquadVoiceAbuseReport,
-		v65.joinButtonText,
-		v65.removeFromGroupText,
-		v65.reportUserText,
-		v65.viewProfileText,
-		v65.voiceIneligibleText,
-		v65.muteVoiceButtonText,
-		v65.unmuteVoiceButtonText,
-		v60,
-		u74,
-		u75,
+	end, {
+		v53.userId,
+		v53.openSquadVoiceAbuseReport,
+		v61.joinButtonText,
+		v61.removeFromGroupText,
+		v61.reportUserText,
+		v61.viewProfileText,
+		v61.voiceIneligibleText,
+		v61.muteVoiceButtonText,
+		v61.unmuteVoiceButtonText,
+		v56,
+		u70,
+		u71,
 		t3,
-		v69,
-		v63,
-		v82,
-		v68,
-		v64
+		v65,
+		v59,
+		v78,
+		v64,
+		v60
 	})
 
-	if #v83 > 0 then
-		return if not FFlagEnableAppChatFocusableFixes then React.createElement(ModalBottomSheet, {
-			bottomGap = 20,
-			onDismiss = function() --[[ onDismiss ]] -- line: 569
-				-- upvalues: v57 (copy)
-				v57.onDismiss()
-			end,
-			buttonModels = v83,
-			screenWidth = 400,
-			showImages = true
-		}) else React.createElement(FocusNavigableSurfaceWrapper, {
+	if #v79 > 0 then
+		return React.createElement(FocusNavigableSurfaceWrapper, {
+			isAutoFocusRoot = true,
+			isFocusable = true,
+			isIsolated = true,
 			customEventHandlers = {
 				[FocusNavigationEventNameEnum.NavigateBack] = {
-					handler = InputHandlers.onRelease(function(p2) -- line: 546
-						-- upvalues: v57 (copy)
-						v57.onDismiss()
+					handler = InputHandlers.onRelease(function(p2) -- line: 443
+						-- upvalues: v53 (copy)
+						v53.onDismiss()
 						p2:cancel()
 					end)
 				}
 			},
-			isAutoFocusRoot = true,
-			isFocusable = true,
-			isIsolated = true,
 			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
 		}, { React.createElement(ModalBottomSheet, {
 			bottomGap = 20,
-			buttonModels = v83,
-			onDismiss = function() --[[ onDismiss ]] -- line: 560
-				-- upvalues: v57 (copy)
-				v57.onDismiss()
-			end,
 			screenWidth = 400,
-			showImages = true
+			showImages = true,
+			buttonModels = v79,
+			onDismiss = function() -- line: 457
+				-- upvalues: v53 (copy)
+				v53.onDismiss()
+			end
 		}) })
 	end
 
-	v57.onDismiss()
+	v53.onDismiss()
 
 	return nil
 end

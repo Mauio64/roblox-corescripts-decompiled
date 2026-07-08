@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddFriendsBannersNewUI_exp", false);
+return game:DefineFastFlag("AddFriendsBannersNewUI_exp", false)

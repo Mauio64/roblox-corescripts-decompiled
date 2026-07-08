@@ -1,7 +1,11 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: union ]]
-    local v2 = table.clone(v0);
-    for v3, v4 in v1 do
-        v2[v3] = v4;
-    end;
-    return v2;
-end;
+local function union(p1, p2) -- line: 2
+	local v4 = table.clone(p1)
+
+	for v5, v6 in p2 do
+		v4[v5] = v6
+	end
+
+	return v4
+end
+
+return union

@@ -1,102 +1,124 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.UIBlox);
-v1.init(require(l_Parent_0.Dev.RobloxAppUIBloxConfig));
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_FoundationProvider_0 = v3.FoundationProvider;
-local l_Theme_0 = v3.Enums.Theme;
-local l_Device_0 = v3.Enums.Device;
-local v7 = require(l_Parent_0.Dev.Rodux);
-local l_DesignTokenProvider_0 = require(l_Parent_0.Style).DesignTokenProvider;
-local v9 = require(l_Parent_0.Dev.RoactRodux);
-local l_AppStyleProvider_0 = require(l_Parent_0.Style).AppStyleProvider;
-local l_AppStyleProvider_1 = v1.App.Style.AppStyleProvider;
-local v12 = require(l_Parent_0.Dev.ReactRoblox);
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local function v16() --[[ Line: 19 ]] --[[ Name: createLocalization ]]
-    return {
-        Format = function(_, v15) --[[ Line: 21 ]] --[[ Name: Format ]]
-            return v15;
-        end, 
-        GetLocale = function() --[[ Line: 24 ]] --[[ Name: GetLocale ]]
-            return "locale";
-        end
-    };
-end;
-local function v17() --[[ Line: 30 ]] --[[ Name: createStore ]]
-    -- upvalues: v7 (copy)
-    return v7.Store.new(v7.createReducer({}, {}));
-end;
-local v18 = {
-    Light = l_Theme_0.Light, 
-    Dark = l_Theme_0.Dark
-};
-local v19 = {
-    Console = l_Device_0.Console, 
-    Desktop = l_Device_0.Desktop
-};
-local v20 = {
-    Default = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local UIBlox = require(Parent.UIBlox)
+
+UIBlox.init(require(Parent.Dev.RobloxAppUIBloxConfig))
+
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local Theme = Foundation.Enums.Theme
+local Device = Foundation.Enums.Device
+local Rodux = require(Parent.Dev.Rodux)
+local DesignTokenProvider = require(Parent.Style).DesignTokenProvider
+local RoactRodux = require(Parent.Dev.RoactRodux)
+local AppStyleProvider = require(Parent.Style).AppStyleProvider
+local AppStyleProvider2 = UIBlox.App.Style.AppStyleProvider
+local ReactRoblox = require(Parent.Dev.ReactRoblox)
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+
+local function createLocalization() -- line: 19
+	return {
+		Format = function(_, s1: string) -- line: 21
+			return s1
+		end,
+		GetLocale = function() -- line: 24
+			return "locale"
+		end
+	}
+end
+local function createStore() -- line: 30
+	-- upvalues: Rodux (copy)
+	return Rodux.Store.new(Rodux.createReducer({}, {}))
+end
+
+local t1 = {
+	Light = Theme.Light,
+	Dark = Theme.Dark
+}
+local t2 = {
+	Console = Device.Console,
+	Desktop = Device.Desktop
+}
+local t3 = {
+	Default = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+
 return {
-    name = "AvatarExperienceUIKit", 
-    roact = v2, 
-    reactRoblox = v12, 
-    mapStory = function(v21) --[[ Line: 59 ]] --[[ Name: mapStory ]]
-        -- upvalues: v18 (copy), v2 (copy), l_LocalizationProvider_0 (copy), v16 (copy), l_AppStyleProvider_1 (copy), v20 (copy), l_AppStyleProvider_0 (copy), v9 (copy), v17 (copy), l_DesignTokenProvider_0 (copy), l_FoundationProvider_0 (copy), v19 (copy)
-        return function(v22) --[[ Line: 60 ]]
-            -- upvalues: v18 (ref), v2 (ref), l_LocalizationProvider_0 (ref), v16 (ref), l_AppStyleProvider_1 (ref), v20 (ref), l_AppStyleProvider_0 (ref), v9 (ref), v17 (ref), l_DesignTokenProvider_0 (ref), l_FoundationProvider_0 (ref), v19 (ref), v21 (copy)
-            local v23 = v18[v22.theme];
-            return v2.createElement("Frame", {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.fromScale(1, 0), 
-                BackgroundTransparency = 1
-            }, {
-                UIPadding = v2.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 10), 
-                    PaddingBottom = UDim.new(0, 10), 
-                    PaddingLeft = UDim.new(0, 10), 
-                    PaddingRight = UDim.new(0, 10)
-                }), 
-                LocalizationProvider = v2.createElement(l_LocalizationProvider_0, {
-                    localization = v16()
-                }, {
-                    AppStyleProvider = v2.createElement(l_AppStyleProvider_1, {
-                        style = v22 and v20[v22.theme] or v20.Default
-                    }, {
-                        StyleProvider = v2.createElement(l_AppStyleProvider_0, {
-                            style = v22 and v20[v22.theme] or v20.Default
-                        }, {
-                            StoreProvider = v2.createElement(v9.StoreProvider, {
-                                store = v17()
-                            }, {
-                                DesignTokenProvider = v2.createElement(l_DesignTokenProvider_0, {
-                                    tokenMappers = {}
-                                }, {
-                                    FoundationProvider = v2.createElement(l_FoundationProvider_0, {
-                                        theme = v23, 
-                                        device = v19[v22.platform], 
-                                        preferences = v22.settings
-                                    }, {
-                                        Child = v2.createElement(v21, v22)
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            });
-        end;
-    end
-};
+	name = "UIKit",
+	group = "AvatarExperience",
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = function(p2) -- line: 59
+		-- upvalues: t1 (copy), React (copy), RoactRodux (copy), createStore (copy), FoundationProvider (copy), t2 (copy), AppStyleProvider2 (copy), t3 (copy), AppStyleProvider (copy), DesignTokenProvider (copy), LocalizationProvider (copy), createLocalization (copy)
+		return function(p3) -- line: 60
+			-- upvalues: t1 (copy), React (copy), RoactRodux (copy), createStore (copy), FoundationProvider (copy), t2 (copy), p2 (copy), AppStyleProvider2 (copy), t3 (copy), AppStyleProvider (copy), DesignTokenProvider (copy), LocalizationProvider (copy), createLocalization (copy)
+			local v24 = t1[p3.theme]
+			local v25 = if not p3.definition.foundationOnly then {
+				AppStyleProvider = React.createElement(AppStyleProvider2, {
+					style = p3 and t3[p3.theme] or t3.Default
+				}, {
+					StyleProvider = React.createElement(AppStyleProvider, {
+						style = p3 and t3[p3.theme] or t3.Default
+					}, {
+						StoreProvider = React.createElement(RoactRodux.StoreProvider, {
+							store = createStore()
+						}, {
+							DesignTokenProvider = React.createElement(DesignTokenProvider, {
+								tokenMappers = {}
+							}, {
+								FoundationProvider = React.createElement(FoundationProvider, {
+									theme = v24,
+									device = t2[p3.platform],
+									preferences = p3.settings,
+									scale = p3.settings and p3.settings.scale
+								}, {
+									Child = React.createElement(p2, p3)
+								})
+							})
+						})
+					})
+				})
+			} else {
+				StoreProvider = React.createElement(RoactRodux.StoreProvider, {
+					store = createStore()
+				}, {
+					FoundationProvider = React.createElement(FoundationProvider, {
+						theme = v24,
+						device = t2[p3.platform],
+						preferences = p3.settings,
+						scale = p3.settings and p3.settings.scale
+					}, {
+						Child = React.createElement(p2, p3)
+					})
+				})
+			}
+
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(1, 0)
+			}, {
+				UIPadding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10)
+				}),
+				LocalizationProvider = React.createElement(LocalizationProvider, {
+					localization = createLocalization()
+				}, v25)
+			})
+		end
+	end
+}

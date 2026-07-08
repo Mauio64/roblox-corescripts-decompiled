@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableProfilePlatformDisabledReasonText", false);
+return game:DefineFastFlag("EnableProfilePlatformDisabledReasonText", false)

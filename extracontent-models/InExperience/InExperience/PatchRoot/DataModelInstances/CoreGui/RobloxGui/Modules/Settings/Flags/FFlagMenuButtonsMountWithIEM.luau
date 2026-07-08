@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MenuButtonsMountWithIEM", false);
+return game:DefineFastFlag("MenuButtonsMountWithIEM", false)

@@ -1,1 +1,1 @@
-return require(script["AssertionError.global"]).AssertionError;
+return require(script["AssertionError.global"]).AssertionError

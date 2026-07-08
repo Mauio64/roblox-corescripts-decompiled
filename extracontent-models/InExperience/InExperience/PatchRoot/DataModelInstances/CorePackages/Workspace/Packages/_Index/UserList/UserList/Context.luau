@@ -1,3 +1,3 @@
 return {
-    ContactsContext = require(script.ContactsContext)
-};
+	ContactsContext = require(script.ContactsContext)
+}

@@ -1,32 +1,43 @@
-return function(v0, v1, v2) --[[ Line: 30 ]]
-    local v3 = {};
-    v3.__index = v3;
-    v3.__tostring = function(v4) --[[ Line: 33 ]]
-        -- upvalues: v0 (copy)
-        return getmetatable(v0).__tostring(v4);
-    end;
-    local v5 = {};
-    v3.new = function(...) --[[ Line: 39 ]]
-        -- upvalues: v2 (copy), v3 (copy)
-        local v6 = {};
-        v2(v6, ...);
-        return (setmetatable(v6, v3));
-    end;
-    if typeof((getmetatable(v0))) == "table" and getmetatable(v0).__call then
-        v5.__call = function(_, ...) --[[ Line: 46 ]]
-            -- upvalues: v3 (copy)
-            return v3.new(...);
-        end;
-    end;
-    v5.__index = v0;
-    v5.__tostring = function(v8) --[[ Line: 52 ]]
-        -- upvalues: v3 (copy), v1 (copy), v0 (copy)
-        if v8 == v3 then
-            return (tostring(v1));
-        else
-            return getmetatable(v0).__tostring(v8);
-        end;
-    end;
-    setmetatable(v3, v5);
-    return v3;
-end;
+return function(p1, p2, p3) -- line: 30
+	local t1 = {}
+
+	t1.__index = t1
+
+	function t1.__tostring(p4) -- line: 33
+		-- upvalues: p1 (copy)
+		return getmetatable(p1).__tostring(p4)
+	end
+
+	local t2 = {}
+
+	function t1.new(...) -- line: 39
+		-- upvalues: p3 (copy), t1 (copy)
+		local t3 = {}
+
+		p3(t3, ...)
+
+		return (setmetatable(t3, t1))
+	end
+
+	if typeof((getmetatable(p1))) == "table" and getmetatable(p1).__call then
+		function t2.__call(_, ...) -- line: 46
+			-- upvalues: t1 (copy)
+			return t1.new(...)
+		end
+	end
+
+	t2.__index = p1
+
+	function t2.__tostring(p6) -- line: 52
+		-- upvalues: t1 (copy), p2 (copy), p1 (copy)
+		if p6 == t1 then
+			return (tostring(p2))
+		end
+
+		return getmetatable(p1).__tostring(p6)
+	end
+
+	setmetatable(t1, t2)
+
+	return t1
+end

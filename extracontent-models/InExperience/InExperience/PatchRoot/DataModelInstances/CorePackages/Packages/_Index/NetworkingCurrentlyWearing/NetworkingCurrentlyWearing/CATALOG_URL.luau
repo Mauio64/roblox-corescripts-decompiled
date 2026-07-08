@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent;
-return require(l_Parent_0.Util).buildApiSiteUrl("catalog");
+local ParentParent = script.Parent.Parent
+
+return require(ParentParent.Util).buildApiSiteUrl("catalog")

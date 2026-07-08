@@ -15,6 +15,7 @@ local AccessoryType = require(script.Enums.AccessoryType)
 local AlertSeverity = require(script.Enums.AlertSeverity)
 local AlertVariant = require(script.Enums.AlertVariant)
 local AvatarGroupType = require(script.Enums.AvatarGroupType)
+local BadgeShape = require(script.Enums.BadgeShape)
 local BadgeSize = require(script.Enums.BadgeSize)
 local BadgeVariant = require(script.Enums.BadgeVariant)
 local Breakpoint = require(script.Enums.Breakpoint)
@@ -51,6 +52,7 @@ local SearchInputShape = require(script.Enums.SearchInputShape)
 local SliderVariant = require(script.Enums.SliderVariant)
 local StateLayerAffordance = require(script.Enums.StateLayerAffordance)
 local StateLayerMode = require(script.Enums.StateLayerMode)
+local StatusIndicatorShape = require(script.Enums.StatusIndicatorShape)
 local StatusIndicatorVariant = require(script.Enums.StatusIndicatorVariant)
 local Theme = require(script.Enums.Theme)
 local ThumbnailSize = require(script.Enums.ThumbnailSize)
@@ -63,8 +65,10 @@ local AvatarGroup = require(script.Components.AvatarGroup)
 local Badge = require(script.Components.Badge)
 local BaseMenu = require(script.Components.BaseMenu)
 local Button = require(script.Components.Button)
+local ButtonGroup = require(script.Components.ButtonGroup)
 local Checkbox = require(script.Components.Checkbox)
 local Coachmark = require(script.Components.Coachmark)
+local EducationalTooltip = require(script.Components.EducationalTooltip)
 local Chip = require(script.Components.Chip)
 local ColorPicker = require(script.Components.ColorPicker)
 local Dialog = require(script.Components.Dialog)
@@ -96,6 +100,9 @@ local Skeleton = require(script.Components.Skeleton)
 local Slider = require(script.Components.Slider)
 local Snackbar = require(script.Components.Snackbar)
 local StatusIndicator = require(script.Components.StatusIndicator)
+
+require(script.Components.AlertActions)
+
 local SystemBanner = require(script.Components.SystemBanner)
 local Tabs = require(script.Components.Tabs)
 local Text = require(script.Components.Text)
@@ -105,12 +112,13 @@ local Toggle = require(script.Components.Toggle)
 local Tooltip = require(script.Components.Tooltip)
 local Toast = require(script.Components.Toast)
 local View = require(script.Components.View)
-local v102 = strict({
+local v106 = strict({
 	Accordion = Accordion,
 	Avatar = Avatar,
 	AvatarGroup = AvatarGroup,
 	Badge = Badge,
 	Button = Button,
+	ButtonGroup = ButtonGroup,
 	Checkbox = Checkbox,
 	Chip = Chip,
 	Coachmark = Coachmark,
@@ -119,6 +127,7 @@ local v102 = strict({
 	Dialog = Dialog,
 	Divider = Divider,
 	Dropdown = Dropdown,
+	EducationalTooltip = EducationalTooltip,
 	Grid = Grid,
 	Empty = Empty,
 	FeedbackAlert = FeedbackAlert,
@@ -186,6 +195,7 @@ local v102 = strict({
 		AlertSeverity = AlertSeverity,
 		AlertVariant = AlertVariant,
 		AvatarGroupType = AvatarGroupType,
+		BadgeShape = BadgeShape,
 		BadgeSize = BadgeSize,
 		BadgeVariant = BadgeVariant,
 		Breakpoint = Breakpoint,
@@ -226,6 +236,7 @@ local v102 = strict({
 		SliderVariant = SliderVariant,
 		StateLayerAffordance = StateLayerAffordance,
 		StateLayerMode = StateLayerMode,
+		StatusIndicatorShape = StatusIndicatorShape,
 		StatusIndicatorVariant = StatusIndicatorVariant,
 		Theme = Theme,
 		ThumbnailType = ThumbnailType,
@@ -242,6 +253,7 @@ local v102 = strict({
 		composeStyleVariant = require(script.Utility.composeStyleVariant),
 		getBuilderIconForKeycode = require(script.Utility.getBuilderIconForKeycode),
 		getBuilderIconForCurrentPlatform = require(script.Utility.getBuilderIconForCurrentPlatform),
+		getBuilderIconVariant = require(script.Utility.getBuilderIconVariant),
 		getGridMetrics = require(script.Utility.getGridMetrics),
 		getRbxThumb = require(script.Utility.getRbxThumb),
 		getIconRichText = require(script.Utility.getIconRichText),
@@ -264,11 +276,11 @@ local v102 = strict({
 if _G.__FOUNDATION_TRACK_USAGE__ then
 	local UsageTracker = require(script.Parent.UsageTracker)
 
-	v102 = UsageTracker.trackMemberAccess("Foundation", v102, UsageTracker.isReactComponent)
+	v106 = UsageTracker.trackMemberAccess("Foundation", v106, UsageTracker.isReactComponent)
 end
 
 if _G.__FOUNDATION_TRACE_LOG__ then
 	require(script.Utility.Logger):enableTraceLog()
 end
 
-return v102
+return v106

@@ -1,82 +1,104 @@
 return {
-    JoinDictionaries = function(...) --[[ Line: 10 ]] --[[ Name: JoinDictionaries ]]
-        local v0 = {};
-        for v1 = 1, select("#", ...) do
-            local v2 = select(v1, ...);
-            for v3, v4 in pairs(v2) do
-                v0[v3] = v4;
-            end;
-        end;
-        return v0;
-    end, 
-    JoinLists = function(...) --[[ Line: 29 ]] --[[ Name: JoinLists ]]
-        local v5 = {};
-        for v6 = 1, select("#", ...) do
-            local v7 = select(v6, ...);
-            local v8 = #v5;
-            for v9 = 1, #v7 do
-                v5[v8 + v9] = v7[v9];
-            end;
-        end;
-        return v5;
-    end, 
-    Set = function(v10, v11, v12) --[[ Line: 47 ]] --[[ Name: Set ]]
-        local v13 = table.clone(v10);
-        v13[v11] = v12;
-        return v13;
-    end, 
-    Append = function(v14, ...) --[[ Line: 56 ]] --[[ Name: Append ]]
-        local v15 = {};
-        local v16 = #v14;
-        for v17 = 1, v16 do
-            v15[v17] = v14[v17];
-        end;
-        for v18 = 1, select("#", ...) do
-            v15[v16 + v18] = select(v18, ...);
-        end;
-        return v15;
-    end, 
-    RemoveFromDictionary = function(v19, ...) --[[ Line: 74 ]] --[[ Name: RemoveFromDictionary ]]
-        local v20 = {};
-        for v21, v22 in pairs(v19) do
-            local v23 = false;
-            for v24 = 1, select("#", ...) do
-                if v21 == select(v24, ...) then
-                    v23 = true;
-                    break;
-                end;
-            end;
-            if not v23 then
-                v20[v21] = v22;
-            end;
-        end;
-        return v20;
-    end, 
-    RemoveFromList = function(v25, v26) --[[ Line: 96 ]] --[[ Name: RemoveFromList ]]
-        local v27 = {};
-        for v28 = 1, #v25 do
-            if v28 ~= v26 then
-                table.insert(v27, v25[v28]);
-            end;
-        end;
-        return v27;
-    end, 
-    RemoveRangeFromList = function(v29, v30, v31) --[[ Line: 111 ]] --[[ Name: RemoveRangeFromList ]]
-        local v32 = {};
-        for v33 = 1, #v29 do
-            if v33 < v30 or v30 + v31 <= v33 then
-                table.insert(v32, v29[v33]);
-            end;
-        end;
-        return v32;
-    end, 
-    RemoveValueFromList = function(v34, v35) --[[ Line: 126 ]] --[[ Name: RemoveValueFromList ]]
-        local v36 = {};
-        for v37 = 1, #v34 do
-            if v34[v37] ~= v35 then
-                table.insert(v36, v34[v37]);
-            end;
-        end;
-        return v36;
-    end
-};
+	JoinDictionaries = function(...) -- line: 10
+		local t1 = {}
+
+		for i = 1, select("#", ...) do
+			local v3 = select(i, ...)
+
+			for k, v in pairs(v3) do
+				t1[k] = v
+			end
+		end
+
+		return t1
+	end,
+	JoinLists = function(...) -- line: 29
+		local t2 = {}
+
+		for i = 1, select("#", ...) do
+			local v8 = select(i, ...)
+			local v9 = #t2
+
+			for j = 1, #v8 do
+				t2[v9 + j] = v8[j]
+			end
+		end
+
+		return t2
+	end,
+	Set = function(p1, p2, p3) -- line: 47
+		local v14 = table.clone(p1)
+
+		v14[p2] = p3
+
+		return v14
+	end,
+	Append = function(p4, ...) -- line: 56
+		local t3 = {}
+		local v17 = #p4
+
+		for i = 1, v17 do
+			t3[i] = p4[i]
+		end
+
+		for i = 1, select("#", ...) do
+			t3[v17 + i] = select(i, ...)
+		end
+
+		return t3
+	end,
+	RemoveFromDictionary = function(p5, ...) -- line: 74
+		local t4 = {}
+
+		for k, v in pairs(p5) do
+			local v24 = false
+
+			for i = 1, select("#", ...) do
+				if k == select(i, ...) then
+					v24 = true
+
+					break
+				end
+			end
+
+			if not v24 then
+				t4[k] = v
+			end
+		end
+
+		return t4
+	end,
+	RemoveFromList = function(p6, p7) -- line: 96
+		local t5 = {}
+
+		for i = 1, #p6 do
+			if i ~= p7 then
+				table.insert(t5, p6[i])
+			end
+		end
+
+		return t5
+	end,
+	RemoveRangeFromList = function(p8, p9, p10) -- line: 111
+		local t6 = {}
+
+		for i = 1, #p8 do
+			if i < p9 or i >= p9 + p10 then
+				table.insert(t6, p8[i])
+			end
+		end
+
+		return t6
+	end,
+	RemoveValueFromList = function(p11, p12) -- line: 126
+		local t7 = {}
+
+		for i = 1, #p11 do
+			if p12 ~= p11[i] then
+				table.insert(t7, p11[i])
+			end
+		end
+
+		return t7
+	end
+}

@@ -1,30 +1,46 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Enabled_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled;
-local v4 = require(l_CorePackages_0.Workspace.Packages.CapturesInExperience);
-local v5 = v4.App.createApp();
-local l_ScreenGui_0 = Instance.new("ScreenGui");
-l_ScreenGui_0.DisplayOrder = v4.Constants.CarouselDisplayOrder;
-l_ScreenGui_0.Name = "ScreenshotsCarousel";
-l_ScreenGui_0.ResetOnSpawn = false;
-l_ScreenGui_0.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets;
-l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-l_ScreenGui_0.Parent = l_CoreGui_0;
-local l_ScreenGui_1 = Instance.new("ScreenGui");
-l_ScreenGui_1.DisplayOrder = v4.Constants.CarouselDisplayOrder;
-l_ScreenGui_1.Name = "CaptureManager";
-l_ScreenGui_1.ResetOnSpawn = false;
-l_ScreenGui_1.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-l_ScreenGui_1.Parent = l_CoreGui_0;
-local l_ScreenGui_2 = Instance.new("ScreenGui");
-l_ScreenGui_2.DisplayOrder = v4.Constants.OverlayDisplayOrder;
-l_ScreenGui_2.Name = v4.Constants.OverlayName;
-l_ScreenGui_2.ResetOnSpawn = false;
-l_ScreenGui_2.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-l_ScreenGui_2.Parent = l_CoreGui_0;
-v5.mountCaptureManager(l_ScreenGui_1);
-v5.mountCarousel(l_ScreenGui_0);
-v5.mountCoreUI(l_RobloxGui_0, l_Enabled_0());
-v5.mountCaptureOverlay(l_ScreenGui_2);
-return v5;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+local CapturesInExperience = require(CorePackages.Workspace.Packages.CapturesInExperience)
+local v6 = CapturesInExperience.App.createApp()
+local ScreenGui = Instance.new("ScreenGui")
+
+ScreenGui.DisplayOrder = CapturesInExperience.Constants.CarouselDisplayOrder
+ScreenGui.Name = "ScreenshotsCarousel"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = CoreGui
+
+local ScreenGui2 = Instance.new("ScreenGui")
+
+ScreenGui2.DisplayOrder = CapturesInExperience.Constants.CarouselDisplayOrder
+ScreenGui2.Name = "CaptureManager"
+ScreenGui2.ResetOnSpawn = false
+ScreenGui2.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui2.Parent = CoreGui
+
+local ScreenGui3 = Instance.new("ScreenGui")
+
+ScreenGui3.DisplayOrder = CapturesInExperience.Constants.OverlayDisplayOrder
+ScreenGui3.Name = CapturesInExperience.Constants.OverlayName
+ScreenGui3.ResetOnSpawn = false
+ScreenGui3.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui3.Parent = CoreGui
+
+local ScreenGui4 = Instance.new("ScreenGui")
+
+ScreenGui4.DisplayOrder = CapturesInExperience.Constants.CreationFlowDisplayOrder
+ScreenGui4.Name = "MomentsCreationFlow"
+ScreenGui4.ResetOnSpawn = false
+ScreenGui4.ScreenInsets = Enum.ScreenInsets.None
+ScreenGui4.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui4.Parent = CoreGui
+v6.mountCaptureManager(ScreenGui2)
+v6.mountCarousel(ScreenGui)
+v6.mountCoreUI(RobloxGui, Enabled())
+v6.mountCaptureOverlay(ScreenGui3)
+v6.mountMomentsCreationFlow(ScreenGui4)
+
+return v6

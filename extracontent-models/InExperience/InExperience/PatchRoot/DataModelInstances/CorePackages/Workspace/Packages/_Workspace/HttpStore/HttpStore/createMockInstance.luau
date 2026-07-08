@@ -1,23 +1,27 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_createMockHttpStore_0 = require(l_Parent_0.InternalHttpStore).createMockHttpStore;
-return function() --[[ Line: 67 ]] --[[ Name: createMockInstance ]]
-    -- upvalues: l_createMockHttpStore_0 (copy)
-    local v2 = l_createMockHttpStore_0();
-    return {
-        get = function() --[[ Line: 72 ]] --[[ Name: get ]]
-            -- upvalues: v2 (copy)
-            return v2;
-        end, 
-        _create = function() --[[ Line: 75 ]] --[[ Name: _create ]]
-            -- upvalues: v2 (copy)
-            return v2;
-        end, 
-        _dispose = function() --[[ Line: 78 ]] --[[ Name: _dispose ]]
-            -- upvalues: v2 (copy)
-            v2.reset();
-        end, 
-        setResponse = v2.setResponse, 
-        reset = v2.reset, 
-        mockStore = v2
-    };
-end;
+local ParentParent = script.Parent.Parent
+local createMockHttpStore = require(ParentParent.InternalHttpStore).createMockHttpStore
+
+local function createMockInstance() -- line: 67
+	-- upvalues: createMockHttpStore (copy)
+	local v4 = createMockHttpStore()
+
+	return {
+		get = function() -- line: 72
+			-- upvalues: v4 (copy)
+			return v4
+		end,
+		_create = function() -- line: 75
+			-- upvalues: v4 (copy)
+			return v4
+		end,
+		_dispose = function() -- line: 78
+			-- upvalues: v4 (copy)
+			v4.reset()
+		end,
+		setResponse = v4.setResponse,
+		reset = v4.reset,
+		mockStore = v4
+	}
+end
+
+return createMockInstance

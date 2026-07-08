@@ -1,94 +1,121 @@
-local l_AssetService_0 = game:GetService("AssetService");
-local l_AvatarCreationService_0 = game:GetService("AvatarCreationService");
-local l_ExperienceAuthService_0 = game:GetService("ExperienceAuthService");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_Parent_0 = script.Parent;
-local v5 = require(l_Parent_0.Thunks.OpenPublishAssetPrompt);
-local v6 = require(l_Parent_0.Thunks.OpenPublishAvatarPrompt);
-local v7 = require(l_Parent_0.Thunks.OpenPublishAvatarAssetPrompt);
-local v8 = require(l_Parent_0.Thunks.OpenResultModal);
-local v9 = require(l_Parent_0.Actions.SetHumanoidModel);
-local v10 = require(l_Parent_0.Actions.SetAccessoryInstance);
-local v11 = require(l_Parent_0.Actions.SetPriceInRobux);
-local v12 = require(l_Parent_0.Actions.OpenValidationErrorModal);
-local l_game_EngineFeature_0 = game:GetEngineFeature("PromptImportAnimationClipFromVideoAsyncEnabled");
-local function v20(v14) --[[ Line: 26 ]] --[[ Name: updateModelAttachmentsWithWrapDeformers ]]
-    -- upvalues: l_RobloxReplicatedStorage_0 (copy)
-    v14.Parent = l_RobloxReplicatedStorage_0;
-    for _, v16 in v14:GetChildren() do
-        if v16:IsA("MeshPart") then
-            local l_WrapDeformer_0 = v16:FindFirstChildWhichIsA("WrapDeformer");
-            if l_WrapDeformer_0 then
-                for _, v19 in v16:GetChildren() do
-                    if v19:IsA("Attachment") then
-                        v19.CFrame = l_WrapDeformer_0:GetDeformedCFrameAsync(v19.CFrame);
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
-return function(v21) --[[ Line: 50 ]] --[[ Name: ConnectAssetServiceEvents ]]
-    -- upvalues: l_ExperienceAuthService_0 (copy), l_game_EngineFeature_0 (copy), v5 (copy), l_AssetService_0 (copy), v6 (copy), v7 (copy), v8 (copy), l_AvatarCreationService_0 (copy), v10 (copy), v11 (copy), v20 (copy), v9 (copy), v12 (copy)
-    local v22 = {};
-    table.insert(v22, l_ExperienceAuthService_0.OpenAuthPrompt:Connect(function(v23, v24, v25) --[[ Line: 56 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), v21 (copy), v5 (ref), l_AssetService_0 (ref), v6 (ref), v7 (ref)
-        local v26 = l_game_EngineFeature_0 and v25.isVideoToAnimationFlow;
-        if #v24 == 1 and v24[1] == Enum.ExperienceAuthScope.CreatorAssetsCreate and not v26 then
-            if v25.instanceToPublish then
-                v21:dispatch(v5(v25.instanceToPublish, v25.assetType, v23, v24));
-                return;
-            elseif v25.serializedInstance then
-                local v27 = l_AssetService_0:DeserializeInstance(v25.serializedInstance);
-                v21:dispatch(v5(v27, v25.assetType, v23, v24));
-                return;
-            elseif v25.outfitToPublish then
-                v21:dispatch(v6(v23, v24));
-                return;
-            elseif v25.accessoryToPublish then
-                local l_accessoryType_0 = v25.accessoryType;
-                v21:dispatch(v7(l_accessoryType_0, v23, v24));
-            end;
-        end;
-    end));
-    table.insert(v22, l_AssetService_0.OpenPublishResultModal:Connect(function(v29) --[[ Line: 86 ]]
-        -- upvalues: v21 (copy), v8 (ref)
-        v21:dispatch(v8(v29));
-    end));
-    local function v30() --[[ Line: 90 ]] --[[ Name: checkNewEventsExist ]]
-        -- upvalues: l_AvatarCreationService_0 (ref)
-        return l_AvatarCreationService_0.UgcValidationSuccess and l_AvatarCreationService_0.UgcValidationFailure;
-    end;
-    if pcall(v30) then
-        table.insert(v22, l_AvatarCreationService_0.UgcValidationSuccess:Connect(function(v31, v32, v33) --[[ Line: 98 ]]
-            -- upvalues: v21 (copy), l_AvatarCreationService_0 (ref), v10 (ref), v11 (ref), v20 (ref), v9 (ref)
-            local v34 = v21:getState();
-            if v34 and v34.promptRequest.promptInfo.promptType == "PublishAvatarAsset" then
-                local v35 = l_AvatarCreationService_0:DeserializeAvatarModel(v32);
-                v21:dispatch(v10(v35));
-                if v33 then
-                    v21:dispatch(v11(v33));
-                end;
-                return;
-            else
-                if v34 and v34.promptRequest.promptInfo.guid == v31 then
-                    local v36 = l_AvatarCreationService_0:DeserializeAvatarModel(v32);
-                    v20(v36);
-                    v21:dispatch(v9(v36));
-                    v21:dispatch(v11(v33));
-                end;
-                return;
-            end;
-        end));
-    end;
-    if pcall(v30) then
-        table.insert(v22, l_AvatarCreationService_0.UgcValidationFailure:Connect(function(v37, v38) --[[ Line: 128 ]]
-            -- upvalues: v21 (copy), v12 (ref)
-            local v39 = v21:getState();
-            if v39 and v39.promptRequest.promptInfo.guid == v37 then
-                v21:dispatch(v12(v38));
-            end;
-        end));
-    end;
-    return v22;
-end;
+local AssetService = game:GetService("AssetService")
+local AvatarCreationService = game:GetService("AvatarCreationService")
+local ExperienceAuthService = game:GetService("ExperienceAuthService")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local scriptParent = script.Parent
+local OpenPublishAssetPrompt = require(scriptParent.Thunks.OpenPublishAssetPrompt)
+local OpenPublishAvatarPrompt = require(scriptParent.Thunks.OpenPublishAvatarPrompt)
+local OpenPublishAvatarAssetPrompt = require(scriptParent.Thunks.OpenPublishAvatarAssetPrompt)
+local OpenResultModal = require(scriptParent.Thunks.OpenResultModal)
+local SetHumanoidModel = require(scriptParent.Actions.SetHumanoidModel)
+local SetAccessoryInstance = require(scriptParent.Actions.SetAccessoryInstance)
+local SetPriceInRobux = require(scriptParent.Actions.SetPriceInRobux)
+local OpenValidationErrorModal = require(scriptParent.Actions.OpenValidationErrorModal)
+local EngineFeature = game:GetEngineFeature("PromptImportAnimationClipFromVideoAsyncEnabled")
+
+local function updateModelAttachmentsWithWrapDeformers(p1) -- line: 26
+	-- upvalues: RobloxReplicatedStorage (copy)
+	p1.Parent = RobloxReplicatedStorage
+
+	for _, child in p1:GetChildren() do
+		if child:IsA("MeshPart") then
+			local WrapDeformer = child:FindFirstChildWhichIsA("WrapDeformer")
+
+			if WrapDeformer then
+				for _, child2 in child:GetChildren() do
+					if child2:IsA("Attachment") then
+						child2.CFrame = WrapDeformer:GetDeformedCFrameAsync(child2.CFrame)
+					end
+				end
+			end
+		end
+	end
+end
+local function ConnectAssetServiceEvents(p2) -- line: 50
+	-- upvalues: ExperienceAuthService (copy), EngineFeature (copy), OpenPublishAssetPrompt (copy), AssetService (copy), OpenPublishAvatarPrompt (copy), OpenPublishAvatarAssetPrompt (copy), OpenResultModal (copy), AvatarCreationService (copy), SetAccessoryInstance (copy), SetPriceInRobux (copy), updateModelAttachmentsWithWrapDeformers (copy), SetHumanoidModel (copy), OpenValidationErrorModal (copy)
+	local t1 = {}
+
+	table.insert(t1, ExperienceAuthService.OpenAuthPrompt:Connect(function(p3, p4, p5) -- line: 56
+		-- upvalues: EngineFeature (copy), p2 (copy), OpenPublishAssetPrompt (copy), AssetService (copy), OpenPublishAvatarPrompt (copy), OpenPublishAvatarAssetPrompt (copy)
+		local v29 = EngineFeature and p5.isVideoToAnimationFlow
+
+		if #p4 == 1 and (p4[1] == Enum.ExperienceAuthScope.CreatorAssetsCreate and not v29) then
+			if p5.instanceToPublish then
+				p2:dispatch(OpenPublishAssetPrompt(p5.instanceToPublish, p5.assetType, p3, p4))
+
+				return
+			end
+
+			if p5.serializedInstance then
+				local v30 = AssetService:DeserializeInstance(p5.serializedInstance)
+
+				p2:dispatch(OpenPublishAssetPrompt(v30, p5.assetType, p3, p4))
+
+				return
+			end
+
+			if p5.outfitToPublish then
+				p2:dispatch(OpenPublishAvatarPrompt(p3, p4))
+
+				return
+			end
+
+			if p5.accessoryToPublish then
+				local accessoryType = p5.accessoryType
+
+				p2:dispatch(OpenPublishAvatarAssetPrompt(accessoryType, p3, p4))
+			end
+		end
+	end))
+	table.insert(t1, AssetService.OpenPublishResultModal:Connect(function(p6) -- line: 86
+		-- upvalues: p2 (copy), OpenResultModal (copy)
+		p2:dispatch(OpenResultModal(p6))
+	end))
+
+	local function checkNewEventsExist() -- line: 90
+		-- upvalues: AvatarCreationService (copy)
+		return AvatarCreationService.UgcValidationSuccess and AvatarCreationService.UgcValidationFailure
+	end
+
+	if pcall(checkNewEventsExist) then
+		table.insert(t1, AvatarCreationService.UgcValidationSuccess:Connect(function(p7, p8, p9) -- line: 98
+			-- upvalues: p2 (copy), AvatarCreationService (copy), SetAccessoryInstance (copy), SetPriceInRobux (copy), updateModelAttachmentsWithWrapDeformers (copy), SetHumanoidModel (copy)
+			local v36 = p2:getState()
+
+			if v36 and v36.promptRequest.promptInfo.promptType == "PublishAvatarAsset" then
+				local v37 = AvatarCreationService:DeserializeAvatarModel(p8)
+
+				p2:dispatch(SetAccessoryInstance(v37))
+
+				if p9 then
+					p2:dispatch(SetPriceInRobux(p9))
+				end
+
+				return
+			end
+
+			if v36 and p7 == v36.promptRequest.promptInfo.guid then
+				local v38 = AvatarCreationService:DeserializeAvatarModel(p8)
+
+				updateModelAttachmentsWithWrapDeformers(v38)
+				p2:dispatch(SetHumanoidModel(v38))
+				p2:dispatch(SetPriceInRobux(p9))
+			end
+		end))
+	end
+
+	if pcall(checkNewEventsExist) then
+		table.insert(t1, AvatarCreationService.UgcValidationFailure:Connect(function(p10, p11) -- line: 128
+			-- upvalues: p2 (copy), OpenValidationErrorModal (copy)
+			local v41 = p2:getState()
+
+			if v41 and p10 == v41.promptRequest.promptInfo.guid then
+				p2:dispatch(OpenValidationErrorModal(p11))
+			end
+		end))
+	end
+
+	return t1
+end
+
+return ConnectAssetServiceEvents

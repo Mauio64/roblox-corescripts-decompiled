@@ -8,9 +8,10 @@ local v4 = game:DefineFastFlag("UpdateAbuseReportRevampItemAbuseVector", false)
 local FFlagFixNotificationReportsMobile = require(GenericAbuseReportingParent.SharedFlags).FFlagFixNotificationReportsMobile
 local FFlagLuaAppEnableReportBadge = require(GenericAbuseReportingParent.SharedFlags).FFlagLuaAppEnableReportBadge
 local FFlagEnableReportingFlowForDevSubs = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForDevSubs
+local FFlagEnableReportingFlowForExperienceShop = require(GenericAbuseReportingParent.SharedFlags).FFlagEnableReportingFlowForExperienceShop
 
-return function(t1: {[any]: any}) -- line: 28
-	-- upvalues: AbuseVector (copy), FFlagEnableReportingFlowForDevSubs (copy), FFlagFixNotificationReportsMobile (copy), FFlagLuaAppEnableReportBadge (copy), v4 (copy)
+return function(t1: {[any]: any}) -- line: 30
+	-- upvalues: AbuseVector (copy), FFlagEnableReportingFlowForDevSubs (copy), FFlagEnableReportingFlowForExperienceShop (copy), FFlagFixNotificationReportsMobile (copy), FFlagLuaAppEnableReportBadge (copy), v4 (copy)
 	local t2 = {}
 
 	if t1.abuseVector == AbuseVector.Looks then
@@ -33,6 +34,12 @@ return function(t1: {[any]: any}) -- line: 28
 
 		t2.REPORT_TARGET_SUBSCRIPTION_TARGET_KEY = targetId.subscriptionTargetKey
 		t2.REPORT_TARGET_ASSET_ID = targetId.imageAssetId
+	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.DeveloperProduct then
+		t2.REPORT_TARGET_DEVELOPER_PRODUCT_ID = t1.targetId
+	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.GamePass then
+		t2.REPORT_TARGET_GAME_PASS_ID = t1.targetId
+	elseif FFlagEnableReportingFlowForExperienceShop and t1.abuseVector == AbuseVector.InExperienceShop then
+		t2.PLACE_ID = t1.targetId
 	elseif t1.abuseVector == AbuseVector.Group then
 		t2.REPORT_TARGET_GROUP_ID = t1.targetId
 	elseif FFlagFixNotificationReportsMobile and t1.abuseVector == AbuseVector.Notifications then

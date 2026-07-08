@@ -1,5 +1,6 @@
-local _ = require(script.Enums);
+require(script.Enums)
+
 return {
-    TrustedConnectionsStore = require(script.TrustedConnectionsStore), 
-    TrustedConnectionsEnums = require(script.Enums)
-};
+	TrustedConnectionsStore = require(script.TrustedConnectionsStore),
+	TrustedConnectionsEnums = require(script.Enums)
+}

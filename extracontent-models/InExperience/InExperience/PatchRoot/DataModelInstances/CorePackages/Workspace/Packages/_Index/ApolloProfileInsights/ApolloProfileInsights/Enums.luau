@@ -1,3 +1,3 @@
 return {
-    FriendRequestOriginSource = require(script.FriendRequestOriginSource)
-};
+	FriendRequestOriginSource = require(script.FriendRequestOriginSource)
+}

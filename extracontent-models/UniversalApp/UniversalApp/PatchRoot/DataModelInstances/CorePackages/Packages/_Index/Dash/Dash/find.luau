@@ -1,8 +1,11 @@
-return function(v0, v1) --[[ Line: 13 ]] --[[ Name: find ]]
-    for v2, v3 in v0 do
-        if v1(v3, v2) then
-            return v3;
-        end;
-    end;
-    return nil;
-end;
+local function find(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 13
+	for v4, v5 in t1 do
+		if p1(v5, v4) then
+			return v5
+		end
+	end
+
+	return nil
+end
+
+return find

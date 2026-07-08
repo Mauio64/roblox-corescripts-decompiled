@@ -1,67 +1,75 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.t);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local l_InteractiveAlert_0 = v5.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v5.App.Button.Enum.ButtonType;
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v9 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v11 = require(l_Parent_0.Thunks.SetAllowInventoryReadAccess);
-local v12 = v2.PureComponent:extend("AllowInventoryReadAccessPrompt");
-v12.validateProps = v4.strictInterface({
-    gameName = v4.string, 
-    screenSize = v4.Vector2, 
-    setAvatarReadAccessAllowed = v4.callback, 
-    setAvatarReadAccessDenied = v4.callback
-});
-v12.render = function(v13) --[[ Line: 31 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), l_InteractiveAlert_0 (copy), v9 (copy), l_ButtonType_0 (copy)
-    return v2.createElement(l_InteractiveAlert_0, {
-        title = v9:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptTitle"), 
-        bodyText = v9:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptText", {
-            RBX_NAME = v13.props.gameName
-        }), 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = v13.props.setAvatarReadAccessDenied, 
-                        text = v9:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptNo")
-                    }, 
-                    isDefaultChild = true
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = v13.props.setAvatarReadAccessAllowed, 
-                        text = v9:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptYes")
-                    }, 
-                    isDefaultChild = false
-                }
-            }
-        }, 
-        position = UDim2.fromScale(0.5, 0.5), 
-        screenSize = v13.props.screenSize
-    });
-end;
-return v3.connect(function(v14) --[[ Line: 65 ]] --[[ Name: mapStateToProps ]]
-    return {
-        gameName = v14.gameName, 
-        screenSize = v14.screenSize
-    };
-end, function(v15) --[[ Line: 72 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v11 (copy)
-    return {
-        setAvatarReadAccessDenied = function() --[[ Line: 74 ]] --[[ Name: setAvatarReadAccessDenied ]]
-            -- upvalues: v15 (copy), v11 (ref)
-            return v15(v11(false));
-        end, 
-        setAvatarReadAccessAllowed = function() --[[ Line: 78 ]] --[[ Name: setAvatarReadAccessAllowed ]]
-            -- upvalues: v15 (copy), v11 (ref)
-            return v15(v11(true));
-        end
-    };
-end)(v12);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ParentParent = script.Parent.Parent.Parent
+local SetAllowInventoryReadAccess = require(ParentParent.Thunks.SetAllowInventoryReadAccess)
+local v12 = Roact.PureComponent:extend("AllowInventoryReadAccessPrompt")
+
+v12.validateProps = t.strictInterface({
+	gameName = t.string,
+	screenSize = t.Vector2,
+	setAvatarReadAccessAllowed = t.callback,
+	setAvatarReadAccessDenied = t.callback
+})
+
+function v12.render(p1) -- line: 31
+	-- upvalues: Roact (copy), InteractiveAlert (copy), RobloxTranslator (copy), ButtonType (copy)
+	return Roact.createElement(InteractiveAlert, {
+		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptTitle"),
+		bodyText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptText", {
+			RBX_NAME = p1.props.gameName
+		}),
+		buttonStackInfo = {
+			buttons = {
+				{
+					isDefaultChild = true,
+					props = {
+						onActivated = p1.props.setAvatarReadAccessDenied,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptNo")
+					}
+				},
+				{
+					isDefaultChild = false,
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = p1.props.setAvatarReadAccessAllowed,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.InventoryReadAccessPromptYes")
+					}
+				}
+			}
+		},
+		position = UDim2.fromScale(0.5, 0.5),
+		screenSize = p1.props.screenSize
+	})
+end
+
+local function mapStateToProps(p2) -- line: 65
+	return {
+		gameName = p2.gameName,
+		screenSize = p2.screenSize
+	}
+end
+local function mapDispatchToProps(p3) -- line: 72
+	-- upvalues: SetAllowInventoryReadAccess (copy)
+	return {
+		setAvatarReadAccessDenied = function() -- line: 74
+			-- upvalues: p3 (copy), SetAllowInventoryReadAccess (copy)
+			return p3(SetAllowInventoryReadAccess(false))
+		end,
+		setAvatarReadAccessAllowed = function() -- line: 78
+			-- upvalues: p3 (copy), SetAllowInventoryReadAccess (copy)
+			return p3(SetAllowInventoryReadAccess(true))
+		end
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v12)

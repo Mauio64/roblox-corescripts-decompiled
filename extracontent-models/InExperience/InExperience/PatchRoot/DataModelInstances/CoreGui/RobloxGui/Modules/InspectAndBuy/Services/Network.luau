@@ -1,379 +1,427 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_Players_0 = game:GetService("Players");
-local l_HttpService_0 = game:GetService("HttpService");
-local v4 = require(l_CorePackages_0.Packages.Promise);
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_Url_0 = require(l_CorePackages_0.Workspace.Packages.Http).Url;
-local _ = require(l_CorePackages_0.Packages.LuauPolyfill);
-local _ = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceInspectAndBuy);
-local v9 = string.format("https://develop.%s", l_Url_0.DOMAIN);
-local v10 = game:DefineFastFlag("AXEnableIaBRbxClientFeature", false);
-local v11 = game:DefineFastString("InspectAndBuyFeature", "InspectAndBuy");
-local function _(v12, v13, v14, v15) --[[ Line: 29 ]] --[[ Name: request ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return l_HttpService_0:RequestInternal(v12):Start(function(v16, v17) --[[ Line: 30 ]]
-        -- upvalues: v13 (copy), l_HttpService_0 (ref), v14 (copy), v15 (copy)
-        if v16 and v17.StatusCode == 200 then
-            local v18 = true;
-            local v19 = nil;
-            if v13 and v17.Body ~= "null" then
-                local l_status_0, l_result_0 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v17.Body);
-                v18 = l_status_0;
-                v19 = l_result_0;
-            else
-                v19 = v17.Body;
-            end;
-            if v18 then
-                v14(v19);
-                return;
-            else
-                v15("Could not parse JSON.");
-                return;
-            end;
-        else
-            v15(v17);
-            return;
-        end;
-    end);
-end;
-local function v38(v23, v24) --[[ Line: 52 ]] --[[ Name: createYieldingPromise ]]
-    -- upvalues: v10 (copy), v11 (copy), v4 (copy), l_HttpService_0 (copy)
-    if v10 then
-        v23.Headers = v23.Headers or {};
-        v23.Headers["rbx-client-feature"] = v11;
-    end;
-    return v4.new(function(v25, v26) --[[ Line: 57 ]]
-        -- upvalues: v23 (copy), v24 (copy), l_HttpService_0 (ref)
-        coroutine.wrap(function() --[[ Line: 58 ]]
-            -- upvalues: v23 (ref), v24 (ref), v25 (copy), v26 (copy), l_HttpService_0 (ref)
-            local l_v23_0 = v23;
-            local l_v24_0 = v24;
-            local l_v25_0 = v25;
-            local l_v26_0 = v26;
-            local _ = l_HttpService_0:RequestInternal(l_v23_0):Start(function(v31, v32) --[[ Line: 30 ]]
-                -- upvalues: l_v24_0 (copy), l_HttpService_0 (ref), l_v25_0 (copy), l_v26_0 (copy)
-                if v31 and v32.StatusCode == 200 then
-                    local v33 = true;
-                    local v34 = nil;
-                    if l_v24_0 and v32.Body ~= "null" then
-                        local l_status_1, l_result_1 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v32.Body);
-                        v33 = l_status_1;
-                        v34 = l_result_1;
-                    else
-                        v34 = v32.Body;
-                    end;
-                    if v33 then
-                        l_v25_0(v34);
-                        return;
-                    else
-                        l_v26_0("Could not parse JSON.");
-                        return;
-                    end;
-                else
-                    l_v26_0(v32);
-                    return;
-                end;
-            end);
-        end)();
-    end);
-end;
-local function v41(v39) --[[ Line: 67 ]] --[[ Name: getPreviewAvatar ]]
-    -- upvalues: l_Url_0 (copy), l_HttpService_0 (copy), v38 (copy)
-    local v40 = {
-        Url = l_Url_0.APIS_URL .. "look-api/v1/looks/purchase-details", 
-        Method = "POST", 
-        Body = l_HttpService_0:JSONEncode({
-            assets = v39
-        }), 
-        Headers = {
-            ["Content-Type"] = "application/json"
-        }
-    };
-    return v38(v40, true);
-end;
-local function v47(v42) --[[ Line: 85 ]] --[[ Name: getProductInfo ]]
-    -- upvalues: v4 (copy), l_MarketplaceService_0 (copy)
-    return v4.new(function(v43, v44) --[[ Line: 86 ]]
-        -- upvalues: l_MarketplaceService_0 (ref), v42 (copy)
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 87 ]]
-            -- upvalues: l_MarketplaceService_0 (ref), v42 (ref)
-            if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                return l_MarketplaceService_0:GetProductInfoAsync(v42);
-            else
-                return l_MarketplaceService_0:GetProductInfo(v42);
-            end;
-        end);
-        if l_status_2 then
-            v43(l_result_2);
-            return;
-        else
-            v44("Failure in getProductInfo: ", (tostring(l_result_2)));
-            return;
-        end;
-    end);
-end;
-local function v54(v48, v49) --[[ Line: 106 ]] --[[ Name: getBatchItemDetails ]]
-    -- upvalues: v4 (copy), l_AvatarEditorService_0 (copy)
-    return v4.new(function(v50, v51) --[[ Line: 107 ]]
-        -- upvalues: l_AvatarEditorService_0 (ref), v48 (copy), v49 (copy)
-        local l_status_3, l_result_3 = pcall(function() --[[ Line: 108 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref), v48 (ref), v49 (ref)
-            if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                return l_AvatarEditorService_0:GetBatchItemDetailsAsync(v48, v49);
-            else
-                return l_AvatarEditorService_0:GetBatchItemDetails(v48, v49);
-            end;
-        end);
-        if l_status_3 then
-            v50(l_result_3);
-            return;
-        else
-            v51("Failure in batchGetItemDetails: ", (tostring(l_result_3)));
-            return;
-        end;
-    end);
-end;
-local function v57(v55) --[[ Line: 129 ]] --[[ Name: getBatchItemDetailsV2 ]]
-    -- upvalues: l_Url_0 (copy), l_HttpService_0 (copy), v38 (copy)
-    local v56 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/catalog/items/details", 
-        Method = "POST", 
-        Body = l_HttpService_0:JSONEncode({
-            items = v55
-        }), 
-        Headers = {
-            ["Content-Type"] = "application/json"
-        }
-    };
-    return v38(v56, true);
-end;
-local function v64(v58, v59) --[[ Line: 147 ]] --[[ Name: getItemDetails ]]
-    -- upvalues: v4 (copy), l_AvatarEditorService_0 (copy)
-    return v4.new(function(v60, v61) --[[ Line: 148 ]]
-        -- upvalues: l_AvatarEditorService_0 (ref), v58 (copy), v59 (copy)
-        local l_status_4, l_result_4 = pcall(function() --[[ Line: 149 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref), v58 (ref), v59 (ref)
-            if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                return l_AvatarEditorService_0:GetItemDetailsAsync(v58, v59);
-            else
-                return l_AvatarEditorService_0:GetItemDetails(v58, v59);
-            end;
-        end);
-        if l_status_4 then
-            v60(l_result_4);
-            return;
-        else
-            v61("Failure in getItemDetails: ", (tostring(l_result_4)));
-            return;
-        end;
-    end);
-end;
-local function v70(v65) --[[ Line: 168 ]] --[[ Name: getPlayerName ]]
-    -- upvalues: v4 (copy), l_Players_0 (copy)
-    return v4.new(function(v66, v67) --[[ Line: 169 ]]
-        -- upvalues: l_Players_0 (ref), v65 (copy)
-        local l_status_5, l_result_5 = pcall(function() --[[ Line: 170 ]]
-            -- upvalues: l_Players_0 (ref), v65 (ref)
-            return l_Players_0:GetNameFromUserIdAsync(v65);
-        end);
-        if l_status_5 then
-            v66(l_result_5);
-            return;
-        else
-            v67("Failure in getPlayerName: ", (tostring(l_result_5)));
-            return;
-        end;
-    end);
-end;
-local function v73(v71) --[[ Line: 185 ]] --[[ Name: getAssetBundles ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v72 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/assets/" .. tostring(v71) .. "/bundles", 
-        Method = "GET"
-    };
-    return v38(v72, true);
-end;
-local function v78(v74) --[[ Line: 198 ]] --[[ Name: getHumanoidDescriptionFromCostumeId ]]
-    -- upvalues: v4 (copy), l_Players_0 (copy)
-    return v4.new(function(v75, _) --[[ Line: 199 ]]
-        -- upvalues: l_Players_0 (ref), v74 (copy)
-        spawn(function() --[[ Line: 200 ]]
-            -- upvalues: l_Players_0 (ref), v74 (ref), v75 (copy)
-            local v77 = if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_Players_0:GetHumanoidDescriptionFromOutfitIdAsync(v74) else l_Players_0:GetHumanoidDescriptionFromOutfitId(v74);
-            if v77 then
-                v75(v77);
-            end;
-        end);
-    end);
-end;
-local function v81(v79) --[[ Line: 215 ]] --[[ Name: getAssetFavoriteCount ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v80 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/assets/" .. tostring(v79) .. "/count", 
-        Method = "GET"
-    };
-    return v38(v80, false);
-end;
-local function v84(v82) --[[ Line: 228 ]] --[[ Name: getBundleFavoriteCount ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v83 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/bundles/" .. tostring(v82) .. "/count", 
-        Method = "GET"
-    };
-    return v38(v83, false);
-end;
-local function v88(v85) --[[ Line: 241 ]] --[[ Name: getFavoriteForAsset ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), v38 (copy)
-    local l_UserId_0 = l_Players_0.LocalPlayer.UserId;
-    local v87 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_0) .. "/assets/" .. tostring(v85) .. "/favorite", 
-        Method = "GET"
-    };
-    return v38(v87, true);
-end;
-local function v92(v89) --[[ Line: 260 ]] --[[ Name: getFavoriteForBundle ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), v38 (copy)
-    local l_UserId_1 = l_Players_0.LocalPlayer.UserId;
-    local v91 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_1) .. "/bundles/" .. tostring(v89) .. "/favorite", 
-        Method = "GET"
-    };
-    return v38(v91, true);
-end;
-local function v96(v93) --[[ Line: 279 ]] --[[ Name: createFavoriteForAsset ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), l_HttpService_0 (copy), v38 (copy)
-    local l_UserId_2 = l_Players_0.LocalPlayer.UserId;
-    local v95 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_2) .. "/assets/" .. tostring(v93) .. "/favorite", 
-        Method = "POST", 
-        Body = l_HttpService_0:JSONEncode({})
-    };
-    return v38(v95, true);
-end;
-local function v100(v97) --[[ Line: 299 ]] --[[ Name: deleteFavoriteForAsset ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), v38 (copy)
-    local l_UserId_3 = l_Players_0.LocalPlayer.UserId;
-    local v99 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_3) .. "/assets/" .. tostring(v97) .. "/favorite", 
-        Method = "DELETE"
-    };
-    return v38(v99, true);
-end;
-local function v104(v101) --[[ Line: 318 ]] --[[ Name: createFavoriteForBundle ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), l_HttpService_0 (copy), v38 (copy)
-    local l_UserId_4 = l_Players_0.LocalPlayer.UserId;
-    local v103 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_4) .. "/bundles/" .. tostring(v101) .. "/favorite", 
-        Method = "POST", 
-        Body = l_HttpService_0:JSONEncode({})
-    };
-    return v38(v103, true);
-end;
-local function v108(v105) --[[ Line: 338 ]] --[[ Name: deleteFavoriteForBundle ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), v38 (copy)
-    local l_UserId_5 = l_Players_0.LocalPlayer.UserId;
-    local v107 = {
-        Url = l_Url_0.CATALOG_URL .. "v1/favorites/users/" .. tostring(l_UserId_5) .. "/bundles/" .. tostring(v105) .. "/favorite", 
-        Method = "DELETE"
-    };
-    return v38(v107, true);
-end;
-local function v111(v109) --[[ Line: 357 ]] --[[ Name: getEconomyProductInfo ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v110 = {
-        Url = l_Url_0.ECONOMY_URL .. "v1/products/" .. tostring(v109) .. "?showPurchasable=true", 
-        Method = "GET"
-    };
-    return v38(v110, true);
-end;
-local function v116(v112) --[[ Line: 370 ]] --[[ Name: getModelFromUserId ]]
-    -- upvalues: v4 (copy), l_Players_0 (copy)
-    return v4.new(function(v113, v114) --[[ Line: 371 ]]
-        -- upvalues: l_Players_0 (ref), v112 (copy)
-        spawn(function() --[[ Line: 372 ]]
-            -- upvalues: l_Players_0 (ref), v112 (ref), v113 (copy), v114 (copy)
-            local v115 = if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_Players_0:CreateHumanoidModelFromUserIdAsync(v112) else l_Players_0:CreateHumanoidModelFromUserId(v112);
-            if v115 then
-                v113(v115);
-                return;
-            else
-                v114("Failure in getModelFromUserId");
-                return;
-            end;
-        end);
-    end);
-end;
-local function v121(v117, v118) --[[ Line: 389 ]] --[[ Name: getCollectibleResellableInstances ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v119 = l_Url_0:makeQueryString({
-        ownerId = tostring(v118), 
-        ownerType = "User", 
-        cursor = "", 
-        limit = 500
-    });
-    local v120 = {
-        Url = string.format("%smarketplace-sales/v1/item/%s/resellable-instances?%s", l_Url_0.APIS_URL, v117, v119), 
-        Method = "GET"
-    };
-    return v38(v120, true);
-end;
-local function v124(v122) --[[ Line: 406 ]] --[[ Name: getVersionInfo ]]
-    -- upvalues: v9 (copy), v38 (copy)
-    local v123 = {
-        Url = string.format("%sv1/assets/%s/saved-versions", v9, v122), 
-        Method = "GET"
-    };
-    return v38(v123, true);
-end;
-local function v127(v125) --[[ Line: 415 ]] --[[ Name: getExperiencePlayability ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v126 = {
-        Url = string.format("%sv1/games/multiget-playability-status?universeIds=%s", l_Url_0.GAME_URL, v125), 
-        Method = "GET"
-    };
-    return v38(v126, true);
-end;
-local function v130(v128) --[[ Line: 424 ]] --[[ Name: getExperienceInfo ]]
-    -- upvalues: l_Url_0 (copy), v38 (copy)
-    local v129 = {
-        Url = string.format("%sv1/games?universeIds=%s", l_Url_0.GAME_URL, v128), 
-        Method = "GET"
-    };
-    return v38(v129, true);
-end;
+local CorePackages = game:GetService("CorePackages")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local Promise = require(CorePackages.Packages.Promise)
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local Url = require(CorePackages.Workspace.Packages.Http).Url
+
+require(CorePackages.Packages.LuauPolyfill)
+require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
+
+local v8 = string.format("https://develop.%s", Url.DOMAIN)
+local v9 = game:DefineFastFlag("AXEnableIaBRbxClientFeature", false)
+local v10 = game:DefineFastString("InspectAndBuyFeature", "InspectAndBuy")
+
+local function request(p1, p2, p3, p4) -- line: 29
+	-- upvalues: HttpService (copy)
+	return HttpService:RequestInternal(p1):Start(function(p5, p6) -- line: 30
+		-- upvalues: p2 (copy), HttpService (copy), p3 (copy), p4 (copy)
+		if p5 and p6.StatusCode == 200 then
+			local v108 = true
+			local result
+
+			if p2 and p6.Body ~= "null" then
+				v108, result = pcall(HttpService.JSONDecode, HttpService, p6.Body)
+			else
+				result = p6.Body
+			end
+
+			if v108 then
+				p3(result)
+
+				return
+			end
+
+			p4("Could not parse JSON.")
+
+			return
+		end
+
+		p4(p6)
+	end)
+end
+local function createYieldingPromise(p7, p8) -- line: 52
+	-- upvalues: v9 (copy), v10 (copy), Promise (copy), HttpService (copy)
+	if v9 then
+		p7.Headers = p7.Headers or {}
+		p7.Headers["rbx-client-feature"] = v10
+	end
+
+	return Promise.new(function(resolve, reject) -- line: 57
+		-- upvalues: p7 (copy), p8 (copy), HttpService (copy)
+		coroutine.wrap(function() -- line: 58
+			-- upvalues: p7 (copy), p8 (copy), resolve (copy), reject (copy), HttpService (copy)
+			local v132 = p7
+			local v133 = p8
+			local v134 = resolve
+			local v135 = reject
+
+			HttpService:RequestInternal(v132):Start(function(p9, p10) -- line: 30
+				-- upvalues: v133 (copy), HttpService (copy), v134 (copy), v135 (copy)
+				if p9 and p10.StatusCode == 200 then
+					local v140 = true
+					local result
+
+					if v133 and p10.Body ~= "null" then
+						v140, result = pcall(HttpService.JSONDecode, HttpService, p10.Body)
+					else
+						result = p10.Body
+					end
+
+					if v140 then
+						v134(result)
+
+						return
+					end
+
+					v135("Could not parse JSON.")
+
+					return
+				end
+
+				v135(p10)
+			end)
+		end)()
+	end)
+end
+local function getPreviewAvatar(p11) -- line: 67
+	-- upvalues: Url (copy), HttpService (copy), createYieldingPromise (copy)
+	local v42 = Url.APIS_URL .. "look-api/v1/looks/purchase-details"
+	local t1 = {
+		Method = "POST",
+		Url = v42,
+		Body = HttpService:JSONEncode({
+			assets = p11
+		}),
+		Headers = {
+			["Content-Type"] = "application/json"
+		}
+	}
+
+	return createYieldingPromise(t1, true)
+end
+local function getProductInfo(p12) -- line: 85
+	-- upvalues: Promise (copy), MarketplaceService (copy)
+	return Promise.new(function(resolve, reject) -- line: 86
+		-- upvalues: MarketplaceService (copy), p12 (copy)
+		local ok, result = pcall(function() -- line: 87
+			-- upvalues: MarketplaceService (copy), p12 (copy)
+			if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+				return MarketplaceService:GetProductInfoAsync(p12)
+			end
+
+			return MarketplaceService:GetProductInfo(p12)
+		end)
+
+		if ok then
+			resolve(result)
+
+			return
+		end
+
+		reject("Failure in getProductInfo: ", (tostring(result)))
+	end)
+end
+local function getBatchItemDetails(p13, p14) -- line: 106
+	-- upvalues: Promise (copy), AvatarEditorService (copy)
+	return Promise.new(function(resolve, reject) -- line: 107
+		-- upvalues: AvatarEditorService (copy), p13 (copy), p14 (copy)
+		local ok, result = pcall(function() -- line: 108
+			-- upvalues: AvatarEditorService (copy), p13 (copy), p14 (copy)
+			if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+				return AvatarEditorService:GetBatchItemDetailsAsync(p13, p14)
+			end
+
+			return AvatarEditorService:GetBatchItemDetails(p13, p14)
+		end)
+
+		if ok then
+			resolve(result)
+
+			return
+		end
+
+		reject("Failure in batchGetItemDetails: ", (tostring(result)))
+	end)
+end
+local function getBatchItemDetailsV2(t2: {[any]: any}) -- line: 129
+	-- upvalues: Url (copy), HttpService (copy), createYieldingPromise (copy)
+	local v48 = Url.CATALOG_URL .. "v1/catalog/items/details"
+	local t3 = {
+		Method = "POST",
+		Url = v48,
+		Body = HttpService:JSONEncode({
+			items = t2
+		}),
+		Headers = {
+			["Content-Type"] = "application/json"
+		}
+	}
+
+	return createYieldingPromise(t3, true)
+end
+local function getItemDetails(p15, p16) -- line: 147
+	-- upvalues: Promise (copy), AvatarEditorService (copy)
+	return Promise.new(function(resolve, reject) -- line: 148
+		-- upvalues: AvatarEditorService (copy), p15 (copy), p16 (copy)
+		local ok, result = pcall(function() -- line: 149
+			-- upvalues: AvatarEditorService (copy), p15 (copy), p16 (copy)
+			if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+				return AvatarEditorService:GetItemDetailsAsync(p15, p16)
+			end
+
+			return AvatarEditorService:GetItemDetails(p15, p16)
+		end)
+
+		if ok then
+			resolve(result)
+
+			return
+		end
+
+		reject("Failure in getItemDetails: ", (tostring(result)))
+	end)
+end
+local function getPlayerName(p17) -- line: 168
+	-- upvalues: Promise (copy), Players (copy)
+	return Promise.new(function(resolve, reject) -- line: 169
+		-- upvalues: Players (copy), p17 (copy)
+		local ok, result = pcall(function() -- line: 170
+			-- upvalues: Players (copy), p17 (copy)
+			return Players:GetNameFromUserIdAsync(p17)
+		end)
+
+		if ok then
+			resolve(result)
+
+			return
+		end
+
+		reject("Failure in getPlayerName: ", (tostring(result)))
+	end)
+end
+local function getAssetBundles(p18) -- line: 185
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v54 = Url.CATALOG_URL .. "v1/assets/" .. tostring(p18) .. "/bundles"
+	local t4 = {
+		Method = "GET",
+		Url = v54
+	}
+
+	return createYieldingPromise(t4, true)
+end
+local function getHumanoidDescriptionFromCostumeId(p19) -- line: 198
+	-- upvalues: Promise (copy), Players (copy)
+	return Promise.new(function(resolve, _) -- line: 199
+		-- upvalues: Players (copy), p19 (copy)
+		spawn(function() -- line: 200
+			-- upvalues: Players (copy), p19 (copy), resolve (copy)
+			local v136 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then Players:GetHumanoidDescriptionFromOutfitId(p19) else Players:GetHumanoidDescriptionFromOutfitIdAsync(p19)
+
+			if v136 then
+				resolve(v136)
+			end
+		end)
+	end)
+end
+local function getAssetFavoriteCount(p21) -- line: 215
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v58 = Url.CATALOG_URL .. "v1/favorites/assets/" .. tostring(p21) .. "/count"
+	local t5 = {
+		Method = "GET",
+		Url = v58
+	}
+
+	return createYieldingPromise(t5, false)
+end
+local function getBundleFavoriteCount(p22) -- line: 228
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v61 = Url.CATALOG_URL .. "v1/favorites/bundles/" .. tostring(p22) .. "/count"
+	local t6 = {
+		Method = "GET",
+		Url = v61
+	}
+
+	return createYieldingPromise(t6, false)
+end
+local function getFavoriteForAsset(p23) -- line: 241
+	-- upvalues: Players (copy), Url (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v65 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/assets/" .. tostring(p23) .. "/favorite"
+	local t7 = {
+		Method = "GET",
+		Url = v65
+	}
+
+	return createYieldingPromise(t7, true)
+end
+local function getFavoriteForBundle(p24) -- line: 260
+	-- upvalues: Players (copy), Url (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v69 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/bundles/" .. tostring(p24) .. "/favorite"
+	local t8 = {
+		Method = "GET",
+		Url = v69
+	}
+
+	return createYieldingPromise(t8, true)
+end
+local function createFavoriteForAsset(p25) -- line: 279
+	-- upvalues: Players (copy), Url (copy), HttpService (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v73 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/assets/" .. tostring(p25) .. "/favorite"
+	local t9 = {
+		Method = "POST",
+		Url = v73,
+		Body = HttpService:JSONEncode({})
+	}
+
+	return createYieldingPromise(t9, true)
+end
+local function deleteFavoriteForAsset(p26) -- line: 299
+	-- upvalues: Players (copy), Url (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v77 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/assets/" .. tostring(p26) .. "/favorite"
+	local t10 = {
+		Method = "DELETE",
+		Url = v77
+	}
+
+	return createYieldingPromise(t10, true)
+end
+local function createFavoriteForBundle(p27) -- line: 318
+	-- upvalues: Players (copy), Url (copy), HttpService (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v81 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/bundles/" .. tostring(p27) .. "/favorite"
+	local t11 = {
+		Method = "POST",
+		Url = v81,
+		Body = HttpService:JSONEncode({})
+	}
+
+	return createYieldingPromise(t11, true)
+end
+local function deleteFavoriteForBundle(p28) -- line: 338
+	-- upvalues: Players (copy), Url (copy), createYieldingPromise (copy)
+	local UserId = Players.LocalPlayer.UserId
+	local v85 = Url.CATALOG_URL .. "v1/favorites/users/" .. tostring(UserId) .. "/bundles/" .. tostring(p28) .. "/favorite"
+	local t12 = {
+		Method = "DELETE",
+		Url = v85
+	}
+
+	return createYieldingPromise(t12, true)
+end
+local function getEconomyProductInfo(p29) -- line: 357
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v88 = Url.ECONOMY_URL .. "v1/products/" .. tostring(p29) .. "?showPurchasable=true"
+	local t13 = {
+		Method = "GET",
+		Url = v88
+	}
+
+	return createYieldingPromise(t13, true)
+end
+local function getModelFromUserId(p30) -- line: 370
+	-- upvalues: Promise (copy), Players (copy)
+	return Promise.new(function(resolve, reject) -- line: 371
+		-- upvalues: Players (copy), p30 (copy)
+		spawn(function() -- line: 372
+			-- upvalues: Players (copy), p30 (copy), resolve (copy), reject (copy)
+			local v137 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then Players:CreateHumanoidModelFromUserId(p30) else Players:CreateHumanoidModelFromUserIdAsync(p30)
+
+			if v137 then
+				resolve(v137)
+
+				return
+			end
+
+			reject("Failure in getModelFromUserId")
+		end)
+	end)
+end
+local function getCollectibleResellableInstances(p31, p32) -- line: 389
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v93 = Url:makeQueryString({
+		ownerType = "User",
+		cursor = "",
+		limit = 500,
+		ownerId = tostring(p32)
+	})
+	local v94 = string.format("%smarketplace-sales/v1/item/%s/resellable-instances?%s", Url.APIS_URL, p31, v93)
+	local t14 = {
+		Method = "GET",
+		Url = v94
+	}
+
+	return createYieldingPromise(t14, true)
+end
+local function getVersionInfo(p33) -- line: 406
+	-- upvalues: v8 (copy), createYieldingPromise (copy)
+	local v97 = string.format("%sv1/assets/%s/saved-versions", v8, p33)
+	local t15 = {
+		Method = "GET",
+		Url = v97
+	}
+
+	return createYieldingPromise(t15, true)
+end
+local function getExperiencePlayability(p34) -- line: 415
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v100 = string.format("%sv1/games/multiget-playability-status?universeIds=%s", Url.GAME_URL, p34)
+	local t16 = {
+		Method = "GET",
+		Url = v100
+	}
+
+	return createYieldingPromise(t16, true)
+end
+local function getExperienceInfo(p35) -- line: 424
+	-- upvalues: Url (copy), createYieldingPromise (copy)
+	local v103 = string.format("%sv1/games?universeIds=%s", Url.GAME_URL, p35)
+	local t17 = {
+		Method = "GET",
+		Url = v103
+	}
+
+	return createYieldingPromise(t17, true)
+end
+
 return {
-    new = function() --[[ Line: 435 ]] --[[ Name: new ]]
-        -- upvalues: v47 (copy), v111 (copy), v70 (copy), v73 (copy), v78 (copy), v81 (copy), v84 (copy), v88 (copy), v92 (copy), v96 (copy), v100 (copy), v104 (copy), v108 (copy), v116 (copy), v121 (copy), v124 (copy), v127 (copy), v130 (copy), v64 (copy), v41 (copy), v54 (copy), v57 (copy)
-        local v131 = {
-            getProductInfo = v47, 
-            getEconomyProductInfo = v111, 
-            getPlayerName = v70, 
-            getAssetBundles = v73, 
-            getHumanoidDescriptionFromCostumeId = v78, 
-            getAssetFavoriteCount = v81, 
-            getBundleFavoriteCount = v84, 
-            getFavoriteForAsset = v88, 
-            getFavoriteForBundle = v92, 
-            createFavoriteForAsset = v96, 
-            deleteFavoriteForAsset = v100, 
-            createFavoriteForBundle = v104, 
-            deleteFavoriteForBundle = v108, 
-            getModelFromUserId = v116, 
-            getCollectibleResellableInstances = v121, 
-            getVersionInfo = v124, 
-            getExperiencePlayability = v127, 
-            getExperienceInfo = v130, 
-            getItemDetails = v64, 
-            getPreviewAvatar = v41, 
-            getBatchItemDetails = v54, 
-            getBatchItemDetailsV2 = v57
-        };
-        setmetatable(v131, {
-            __tostring = function() --[[ Line: 468 ]] --[[ Name: __tostring ]]
-                return "Service(Network)";
-            end
-        });
-        return v131;
-    end
-};
+	new = function() -- line: 435
+		-- upvalues: getProductInfo (copy), getEconomyProductInfo (copy), getPlayerName (copy), getAssetBundles (copy), getHumanoidDescriptionFromCostumeId (copy), getAssetFavoriteCount (copy), getBundleFavoriteCount (copy), getFavoriteForAsset (copy), getFavoriteForBundle (copy), createFavoriteForAsset (copy), deleteFavoriteForAsset (copy), createFavoriteForBundle (copy), deleteFavoriteForBundle (copy), getModelFromUserId (copy), getCollectibleResellableInstances (copy), getVersionInfo (copy), getExperiencePlayability (copy), getExperienceInfo (copy), getItemDetails (copy), getPreviewAvatar (copy), getBatchItemDetails (copy), getBatchItemDetailsV2 (copy)
+		local t18 = {
+			getProductInfo = getProductInfo,
+			getEconomyProductInfo = getEconomyProductInfo,
+			getPlayerName = getPlayerName,
+			getAssetBundles = getAssetBundles,
+			getHumanoidDescriptionFromCostumeId = getHumanoidDescriptionFromCostumeId,
+			getAssetFavoriteCount = getAssetFavoriteCount,
+			getBundleFavoriteCount = getBundleFavoriteCount,
+			getFavoriteForAsset = getFavoriteForAsset,
+			getFavoriteForBundle = getFavoriteForBundle,
+			createFavoriteForAsset = createFavoriteForAsset,
+			deleteFavoriteForAsset = deleteFavoriteForAsset,
+			createFavoriteForBundle = createFavoriteForBundle,
+			deleteFavoriteForBundle = deleteFavoriteForBundle,
+			getModelFromUserId = getModelFromUserId,
+			getCollectibleResellableInstances = getCollectibleResellableInstances,
+			getVersionInfo = getVersionInfo,
+			getExperiencePlayability = getExperiencePlayability,
+			getExperienceInfo = getExperienceInfo,
+			getItemDetails = getItemDetails,
+			getPreviewAvatar = getPreviewAvatar,
+			getBatchItemDetails = getBatchItemDetails,
+			getBatchItemDetailsV2 = getBatchItemDetailsV2
+		}
+
+		setmetatable(t18, {
+			__tostring = function() -- line: 468
+				return "Service(Network)"
+			end
+		})
+
+		return t18
+	end
+}

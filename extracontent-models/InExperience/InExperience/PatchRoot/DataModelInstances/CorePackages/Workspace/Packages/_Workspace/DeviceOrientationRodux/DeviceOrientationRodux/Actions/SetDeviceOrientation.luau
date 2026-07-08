@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("DeviceOrientationRodux").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 5 ]]
-    return {
-        deviceOrientation = v1
-    };
-end);
+local Parent = script:FindFirstAncestor("DeviceOrientationRodux").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
+	return {
+		deviceOrientation = p1
+	}
+end)

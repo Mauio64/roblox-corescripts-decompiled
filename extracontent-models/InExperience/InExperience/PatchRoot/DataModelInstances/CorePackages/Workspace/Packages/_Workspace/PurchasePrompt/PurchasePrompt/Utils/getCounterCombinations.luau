@@ -1,18 +1,23 @@
-return function(v0, v1, v2, v3, v4) --[[ Line: 1 ]]
-    local v5 = {};
-    if v3 ~= nil then
-        table.insert(v5, v0 .. v3 .. v1 .. v2);
-    else
-        table.insert(v5, v0 .. v1 .. v2);
-    end;
-    if v4 ~= nil then
-        local v6 = tostring(v4);
-        if v3 ~= nil then
-            table.insert(v5, v0 .. v3 .. v1 .. v6 .. v2);
-            return v5;
-        else
-            table.insert(v5, v0 .. v1 .. v6 .. v2);
-        end;
-    end;
-    return v5;
-end;
+return function(s1: string, s2: string, s3: string, s4: string?, n1: number?) -- line: 1
+	local t1 = {}
+
+	if s4 ~= nil then
+		table.insert(t1, s1 .. s4 .. s2 .. s3)
+	else
+		table.insert(t1, s1 .. s2 .. s3)
+	end
+
+	if n1 ~= nil then
+		local str = tostring(n1)
+
+		if s4 ~= nil then
+			table.insert(t1, s1 .. s4 .. s2 .. str .. s3)
+
+			return t1
+		end
+
+		table.insert(t1, s1 .. s2 .. str .. s3)
+	end
+
+	return t1
+end

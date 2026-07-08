@@ -1,6 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CancelSubscriptionApp");
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-local _ = require(l_script_FirstAncestor_0.Enums.ErrorStateEnum);
-return function(v3) --[[ Line: 8 ]] --[[ Name: selectErrorState ]]
-    return v3.errorState;
-end;
+local CancelSubscriptionApp = script:FindFirstAncestor("CancelSubscriptionApp")
+
+require(CancelSubscriptionApp.Store.Types)
+require(CancelSubscriptionApp.Enums.ErrorStateEnum)
+
+local function selectErrorState(p1) -- line: 8
+	return p1.errorState
+end
+
+return selectErrorState

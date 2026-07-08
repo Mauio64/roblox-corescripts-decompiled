@@ -1,40 +1,53 @@
-local l_Parent_0 = script:FindFirstAncestor("InputUi").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Players_0 = game:GetService("Players");
-local v3 = nil;
-pcall(function() --[[ Line: 6 ]]
-    -- upvalues: v3 (ref)
-    v3 = game:GetService("ThirdPartyUserService");
-end);
-local v4 = require(script.Parent.GamepadDisconnectedModalView);
-local function _() --[[ Line: 11 ]] --[[ Name: getPlatformOrRobloxUsername ]]
-    -- upvalues: v3 (ref), l_Players_0 (copy)
-    local v5 = "";
-    if v3 then
-        v5 = v3:GetUserPlatformName();
-    end;
-    if v5 == "" or v5 == nil then
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        if l_LocalPlayer_0 then
-            v5 = l_LocalPlayer_0.DisplayName or l_LocalPlayer_0.Name;
-        end;
-    end;
-    return v5 or "";
-end;
-return function(_) --[[ Line: 25 ]]
-    -- upvalues: v3 (ref), l_Players_0 (copy), v1 (copy), v4 (copy)
-    local v9 = "";
-    if v3 then
-        v9 = v3:GetUserPlatformName();
-    end;
-    if v9 == "" or v9 == nil then
-        local l_LocalPlayer_1 = l_Players_0.LocalPlayer;
-        if l_LocalPlayer_1 then
-            v9 = l_LocalPlayer_1.DisplayName or l_LocalPlayer_1.Name;
-        end;
-    end;
-    local v11 = v9 or "";
-    return v1.createElement(v4, {
-        username = v11
-    });
-end;
+local Parent = script:FindFirstAncestor("InputUi").Parent
+local React = require(Parent.React)
+local Players = game:GetService("Players")
+local ThirdPartyUserService = nil
+
+pcall(function() -- line: 6
+	-- upvalues: ThirdPartyUserService (ref)
+	ThirdPartyUserService = game:GetService("ThirdPartyUserService")
+end)
+
+local GamepadDisconnectedModalView = require(script.Parent.GamepadDisconnectedModalView)
+
+local function getPlatformOrRobloxUsername() -- line: 11
+	-- upvalues: ThirdPartyUserService (ref), Players (copy)
+	local s1 = ""
+
+	if ThirdPartyUserService then
+		s1 = ThirdPartyUserService:GetUserPlatformName()
+	end
+
+	if s1 == "" or s1 == nil then
+		local LocalPlayer = Players.LocalPlayer
+
+		if LocalPlayer then
+			s1 = LocalPlayer.DisplayName or LocalPlayer.Name
+		end
+	end
+
+	return s1 or ""
+end
+
+return function(_) -- line: 25
+	-- upvalues: ThirdPartyUserService (ref), Players (copy), React (copy), GamepadDisconnectedModalView (copy)
+	local s2 = ""
+
+	if ThirdPartyUserService then
+		s2 = ThirdPartyUserService:GetUserPlatformName()
+	end
+
+	if s2 == "" or s2 == nil then
+		local LocalPlayer = Players.LocalPlayer
+
+		if LocalPlayer then
+			s2 = LocalPlayer.DisplayName or LocalPlayer.Name
+		end
+	end
+
+	local v12 = s2 or ""
+
+	return React.createElement(GamepadDisconnectedModalView, {
+		username = v12
+	})
+end

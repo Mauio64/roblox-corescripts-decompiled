@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXLogNilCategoryAndSubcategorySelection", false);
+return game:DefineFastFlag("AXLogNilCategoryAndSubcategorySelection", false)

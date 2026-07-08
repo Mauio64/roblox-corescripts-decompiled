@@ -1,202 +1,210 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.Roact);
-local v5 = require(l_Parent_3.t);
-local l_Label_0 = require(l_Parent_2.Core.ImageSet.ImageSetComponent).Label;
-local v7 = require(l_Parent_3.Cryo);
-local _ = require(l_Parent_1.Style.StyleTypes);
-local v9 = require(l_Parent_2.Core.Style.Validator.validateColorInfo);
-local v10 = require(l_Parent_1.ImageSet.Images);
-local v11 = require(l_Parent_1.Button.IconButton);
-local v12 = require(l_Parent_1.ImageSet.getIconSize);
-local v13 = require(l_Parent_1.ImageSet.Enum.IconSize);
-local v14 = require(l_Parent_2.Core.Text.GenericTextLabel.GenericTextLabel);
-local v15 = require(l_Parent_2.Core.Style.withStyle);
-local v16 = require(l_Parent_0.Enum.VoteStates);
-local v17 = v10["icons/status/games/rating_large"];
-local v18 = v10["icons/actions/vote/voteDownOff"];
-local v19 = v10["icons/actions/vote/voteDownOn"];
-local v20 = v10["icons/actions/vote/voteUpOff"];
-local v21 = v10["icons/actions/vote/voteUpOn"];
-local v22 = {
-    containerSpacingTop = 12, 
-    containerSpacingTrailing = 12, 
-    containerSpacingBottom = 12, 
-    containerSpacingLeading = 12, 
-    containerBorderRadius = 8, 
-    containerGap = 12, 
-    statWidgetContainerGap = 12, 
-    statWidgetIconSize = v12(v13.Large), 
-    statWidgetDataGap = 0, 
-    buttonGroupGap = 12, 
-    buttonSize = 44, 
-    buttonIconSizeEnum = v13.Medium
-};
-local v23 = v4.PureComponent:extend("RateCount");
-v23.validateProps = v5.strictInterface({
-    position = v5.optional(v5.UDim2), 
-    layoutOrder = v5.optional(v5.integer), 
-    anchorPoint = v5.optional(v5.Vector2), 
-    width = v5.optional(v5.integer), 
-    height = v5.optional(v5.integer), 
-    rateText = v5.optional(v5.string), 
-    rateLabel = v5.optional(v5.string), 
-    voteState = v5.optional(v16.isEnumValue), 
-    onVoteDownActivated = v5.optional(v5.callback), 
-    onVoteUpActivated = v5.optional(v5.callback), 
-    styleProps = v5.optional(v5.strictInterface({
-        containerSpacingTop = v5.optional(v5.integer), 
-        containerSpacingTrailing = v5.optional(v5.integer), 
-        containerSpacingBottom = v5.optional(v5.integer), 
-        containerSpacingLeading = v5.optional(v5.integer), 
-        containerBorderRadius = v5.optional(v5.integer), 
-        containerBackgroundColor = v5.optional(v9), 
-        containerGap = v5.optional(v5.integer), 
-        statWidgetContainerGap = v5.optional(v5.integer), 
-        statWidgetIconSize = v5.optional(v5.integer), 
-        statWidgetIconContentColor = v5.optional(v9), 
-        statWidgetDataGap = v5.optional(v5.integer), 
-        statWidgetDataContentColor = v5.optional(v9), 
-        statWidgetDataLabelContentColor = v5.optional(v9), 
-        buttonGroupGap = v5.optional(v5.integer), 
-        buttonSize = v5.optional(v5.integer), 
-        buttonIconSizeEnum = v5.optional(v13.isEnumValue)
-    }))
-});
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local scriptParentParentParentParent = scriptParentParentParent.Parent
+local Roact = require(scriptParentParentParentParent.Roact)
+local t = require(scriptParentParentParentParent.t)
+local Label = require(scriptParentParentParent.Core.ImageSet.ImageSetComponent).Label
+local Cryo = require(scriptParentParentParentParent.Cryo)
+
+require(scriptParentParent.Style.StyleTypes)
+
+local validateColorInfo = require(scriptParentParentParent.Core.Style.Validator.validateColorInfo)
+local Images = require(scriptParentParent.ImageSet.Images)
+local IconButton = require(scriptParentParent.Button.IconButton)
+local getIconSize = require(scriptParentParent.ImageSet.getIconSize)
+local IconSize = require(scriptParentParent.ImageSet.Enum.IconSize)
+local GenericTextLabel = require(scriptParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
+local withStyle = require(scriptParentParentParent.Core.Style.withStyle)
+local VoteStates = require(scriptParent.Enum.VoteStates)
+local v17 = Images["icons/status/games/rating_large"]
+local v18 = Images["icons/actions/vote/voteDownOff"]
+local v19 = Images["icons/actions/vote/voteDownOn"]
+local v20 = Images["icons/actions/vote/voteUpOff"]
+local v21 = Images["icons/actions/vote/voteUpOn"]
+local t1 = {
+	containerSpacingTop = 12,
+	containerSpacingTrailing = 12,
+	containerSpacingBottom = 12,
+	containerSpacingLeading = 12,
+	containerBorderRadius = 8,
+	containerGap = 12,
+	statWidgetContainerGap = 12,
+	statWidgetDataGap = 0,
+	buttonGroupGap = 12,
+	buttonSize = 44,
+	statWidgetIconSize = getIconSize(IconSize.Large),
+	buttonIconSizeEnum = IconSize.Medium
+}
+local v23 = Roact.PureComponent:extend("RateCount")
+
+v23.validateProps = t.strictInterface({
+	position = t.optional(t.UDim2),
+	layoutOrder = t.optional(t.integer),
+	anchorPoint = t.optional(t.Vector2),
+	width = t.optional(t.integer),
+	height = t.optional(t.integer),
+	rateText = t.optional(t.string),
+	rateLabel = t.optional(t.string),
+	voteState = t.optional(VoteStates.isEnumValue),
+	onVoteDownActivated = t.optional(t.callback),
+	onVoteUpActivated = t.optional(t.callback),
+	styleProps = t.optional(t.strictInterface({
+		containerSpacingTop = t.optional(t.integer),
+		containerSpacingTrailing = t.optional(t.integer),
+		containerSpacingBottom = t.optional(t.integer),
+		containerSpacingLeading = t.optional(t.integer),
+		containerBorderRadius = t.optional(t.integer),
+		containerBackgroundColor = t.optional(validateColorInfo),
+		containerGap = t.optional(t.integer),
+		statWidgetContainerGap = t.optional(t.integer),
+		statWidgetIconSize = t.optional(t.integer),
+		statWidgetIconContentColor = t.optional(validateColorInfo),
+		statWidgetDataGap = t.optional(t.integer),
+		statWidgetDataContentColor = t.optional(validateColorInfo),
+		statWidgetDataLabelContentColor = t.optional(validateColorInfo),
+		buttonGroupGap = t.optional(t.integer),
+		buttonSize = t.optional(t.integer),
+		buttonIconSizeEnum = t.optional(IconSize.isEnumValue)
+	}))
+})
 v23.defaultProps = {
-    height = 72, 
-    rateText = "", 
-    rateLabel = "", 
-    voteState = v16.notVoted
-};
-v23.init = function(v24) --[[ Line: 151 ]] --[[ Name: init ]]
-    v24.onVoteDownActivated = function() --[[ Line: 152 ]]
-        -- upvalues: v24 (copy)
-        local l_onVoteDownActivated_0 = v24.props.onVoteDownActivated;
-        if l_onVoteDownActivated_0 then
-            l_onVoteDownActivated_0();
-        end;
-    end;
-    v24.onVoteUpActivated = function() --[[ Line: 159 ]]
-        -- upvalues: v24 (copy)
-        local l_onVoteUpActivated_0 = v24.props.onVoteUpActivated;
-        if l_onVoteUpActivated_0 then
-            l_onVoteUpActivated_0();
-        end;
-    end;
-end;
-v23.render = function(v27) --[[ Line: 167 ]] --[[ Name: render ]]
-    -- upvalues: v16 (copy), v15 (copy), v7 (copy), v22 (copy), v12 (copy), v4 (copy), l_Label_0 (copy), v17 (copy), v14 (copy), v11 (copy), v19 (copy), v18 (copy), v21 (copy), v20 (copy)
-    local l_position_0 = v27.props.position;
-    local l_layoutOrder_0 = v27.props.layoutOrder;
-    local l_anchorPoint_0 = v27.props.anchorPoint;
-    local l_width_0 = v27.props.width;
-    local l_height_0 = v27.props.height;
-    local v33 = nil;
-    v33 = if l_width_0 then UDim2.new(0, l_width_0, 0, l_height_0) else UDim2.new(1, 0, 0, l_height_0);
-    local l_rateText_0 = v27.props.rateText;
-    local l_rateLabel_0 = v27.props.rateLabel;
-    local l_voteState_0 = v27.props.voteState;
-    local v37 = l_voteState_0 == v16.votedDown;
-    local v38 = l_voteState_0 == v16.votedUp;
-    return v15(function(v39) --[[ Line: 187 ]]
-        -- upvalues: v7 (ref), v22 (ref), v27 (copy), v12 (ref), v4 (ref), v33 (ref), l_position_0 (copy), l_anchorPoint_0 (copy), l_layoutOrder_0 (copy), l_Label_0 (ref), v17 (ref), v14 (ref), l_rateText_0 (copy), l_rateLabel_0 (copy), v11 (ref), v37 (copy), v19 (ref), v18 (ref), v38 (copy), v21 (ref), v20 (ref)
-        local v40 = v7.Dictionary.join(v22, v27.props.styleProps or {});
-        local l_containerSpacingLeading_0 = v40.containerSpacingLeading;
-        local l_containerSpacingTrailing_0 = v40.containerSpacingTrailing;
-        local l_containerBorderRadius_0 = v40.containerBorderRadius;
-        local v44 = v40.containerBackgroundColor or v39.Theme.BackgroundContrast;
-        local l_containerGap_0 = v40.containerGap;
-        local l_statWidgetContainerGap_0 = v40.statWidgetContainerGap;
-        local l_statWidgetIconSize_0 = v40.statWidgetIconSize;
-        local v48 = v40.statWidgetIconContentColor or v39.Theme.IconEmphasis;
-        local l_statWidgetDataGap_0 = v40.statWidgetDataGap;
-        local v50 = v40.statWidgetDataContentColor or v39.Theme.TextEmphasis;
-        local v51 = v40.statWidgetDataLabelContentColor or v39.Theme.TextEmphasis;
-        local l_buttonGroupGap_0 = v40.buttonGroupGap;
-        local l_buttonSize_0 = v40.buttonSize;
-        local l_buttonIconSizeEnum_0 = v40.buttonIconSizeEnum;
-        local v55 = -(l_statWidgetIconSize_0 + math.max(v12(l_buttonIconSizeEnum_0, v39), l_buttonSize_0) * 2 + l_statWidgetContainerGap_0 + l_containerGap_0 + l_buttonGroupGap_0);
-        return v4.createElement("Frame", {
-            Size = v33, 
-            Position = l_position_0, 
-            AnchorPoint = l_anchorPoint_0, 
-            BackgroundColor3 = v44.Color, 
-            BackgroundTransparency = v44.Transparency, 
-            BorderSizePixel = 0, 
-            LayoutOrder = l_layoutOrder_0
-        }, {
-            RoundCorner = v4.createElement("UICorner", {
-                CornerRadius = UDim.new(0, l_containerBorderRadius_0)
-            }), 
-            ListLayout = v4.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, l_containerGap_0)
-            }), 
-            Padding = v4.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, l_containerSpacingLeading_0), 
-                PaddingRight = UDim.new(0, l_containerSpacingTrailing_0)
-            }), 
-            Icon = v4.createElement(l_Label_0, {
-                LayoutOrder = 1, 
-                Size = UDim2.fromOffset(l_statWidgetIconSize_0, l_statWidgetIconSize_0), 
-                Image = v17, 
-                ImageColor3 = v48.Color, 
-                ImageTransparency = v48.Transparency, 
-                BackgroundTransparency = 1
-            }), 
-            TextSection = v4.createElement("Frame", {
-                LayoutOrder = 2, 
-                Size = UDim2.new(1, v55, 0, 0), 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                ListLayout = v4.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    Padding = UDim.new(0, l_statWidgetDataGap_0)
-                }), 
-                RateText = v4.createElement(v14, {
-                    LayoutOrder = 1, 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Text = l_rateText_0, 
-                    colorStyle = v50, 
-                    fontStyle = v39.Font.Title, 
-                    BackgroundTransparency = 1
-                }), 
-                RateLabel = v4.createElement(v14, {
-                    LayoutOrder = 2, 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Text = l_rateLabel_0, 
-                    colorStyle = v51, 
-                    fontStyle = v39.Font.CaptionHeader, 
-                    BackgroundTransparency = 1
-                })
-            }), 
-            VoteDown = v4.createElement(v11, {
-                layoutOrder = 3, 
-                size = UDim2.fromOffset(l_buttonSize_0, l_buttonSize_0), 
-                icon = v37 and v19 or v18, 
-                iconColor3 = v39.Theme.IconEmphasis.Color, 
-                iconSize = l_buttonIconSizeEnum_0, 
-                onActivated = v27.onVoteDownActivated, 
-                showBackground = true
-            }), 
-            VoteUp = v4.createElement(v11, {
-                layoutOrder = 4, 
-                size = UDim2.fromOffset(l_buttonSize_0, l_buttonSize_0), 
-                icon = v38 and v21 or v20, 
-                iconColor3 = v39.Theme.IconEmphasis.Color, 
-                iconSize = l_buttonIconSizeEnum_0, 
-                onActivated = v27.onVoteUpActivated, 
-                showBackground = true
-            })
-        });
-    end);
-end;
-return v23;
+	height = 72,
+	rateText = "",
+	rateLabel = "",
+	voteState = VoteStates.notVoted
+}
+
+function v23.init(p1) -- line: 151
+	function p1.onVoteDownActivated() -- line: 152
+		-- upvalues: p1 (copy)
+		local onVoteDownActivated = p1.props.onVoteDownActivated
+
+		if onVoteDownActivated then
+			onVoteDownActivated()
+		end
+	end
+	function p1.onVoteUpActivated() -- line: 159
+		-- upvalues: p1 (copy)
+		local onVoteUpActivated = p1.props.onVoteUpActivated
+
+		if onVoteUpActivated then
+			onVoteUpActivated()
+		end
+	end
+end
+function v23.render(p2) -- line: 167
+	-- upvalues: VoteStates (copy), withStyle (copy), Cryo (copy), t1 (copy), getIconSize (copy), Roact (copy), Label (copy), v17 (copy), GenericTextLabel (copy), IconButton (copy), v19 (copy), v18 (copy), v21 (copy), v20 (copy)
+	local position = p2.props.position
+	local layoutOrder = p2.props.layoutOrder
+	local anchorPoint = p2.props.anchorPoint
+	local width = p2.props.width
+	local height = p2.props.height
+	local u31 = if not width then UDim2.new(1, 0, 0, height) else UDim2.new(0, width, 0, height)
+	local rateText = p2.props.rateText
+	local rateLabel = p2.props.rateLabel
+	local voteState = p2.props.voteState
+	local v35 = voteState == VoteStates.votedDown
+	local v36 = voteState == VoteStates.votedUp
+
+	return withStyle(function(p3) -- line: 187
+		-- upvalues: Cryo (copy), t1 (copy), p2 (copy), getIconSize (copy), Roact (copy), u31 (ref), position (copy), anchorPoint (copy), layoutOrder (copy), Label (copy), v17 (copy), GenericTextLabel (copy), rateText (copy), rateLabel (copy), IconButton (copy), v35 (copy), v19 (copy), v18 (copy), v36 (copy), v21 (copy), v20 (copy)
+		local v40 = Cryo.Dictionary.join(t1, p2.props.styleProps or {})
+		local containerSpacingLeading = v40.containerSpacingLeading
+		local containerSpacingTrailing = v40.containerSpacingTrailing
+		local containerBorderRadius = v40.containerBorderRadius
+		local v44 = v40.containerBackgroundColor or p3.Theme.BackgroundContrast
+		local containerGap = v40.containerGap
+		local statWidgetContainerGap = v40.statWidgetContainerGap
+		local statWidgetIconSize = v40.statWidgetIconSize
+		local v48 = v40.statWidgetIconContentColor or p3.Theme.IconEmphasis
+		local statWidgetDataGap = v40.statWidgetDataGap
+		local v50 = v40.statWidgetDataContentColor or p3.Theme.TextEmphasis
+		local v51 = v40.statWidgetDataLabelContentColor or p3.Theme.TextEmphasis
+		local buttonGroupGap = v40.buttonGroupGap
+		local buttonSize = v40.buttonSize
+		local buttonIconSizeEnum = v40.buttonIconSizeEnum
+		local v55 = -(statWidgetIconSize + math.max(getIconSize(buttonIconSizeEnum, p3), buttonSize) * 2 + statWidgetContainerGap + containerGap + buttonGroupGap)
+
+		return Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = u31,
+			Position = position,
+			AnchorPoint = anchorPoint,
+			BackgroundColor3 = v44.Color,
+			BackgroundTransparency = v44.Transparency,
+			LayoutOrder = layoutOrder
+		}, {
+			RoundCorner = Roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0, containerBorderRadius)
+			}),
+			ListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, containerGap)
+			}),
+			Padding = Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, containerSpacingLeading),
+				PaddingRight = UDim.new(0, containerSpacingTrailing)
+			}),
+			Icon = Roact.createElement(Label, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(statWidgetIconSize, statWidgetIconSize),
+				Image = v17,
+				ImageColor3 = v48.Color,
+				ImageTransparency = v48.Transparency
+			}),
+			TextSection = Roact.createElement("Frame", {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, v55, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				ListLayout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Vertical,
+					Padding = UDim.new(0, statWidgetDataGap)
+				}),
+				RateText = Roact.createElement(GenericTextLabel, {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Text = rateText,
+					colorStyle = v50,
+					fontStyle = p3.Font.Title
+				}),
+				RateLabel = Roact.createElement(GenericTextLabel, {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Text = rateLabel,
+					colorStyle = v51,
+					fontStyle = p3.Font.CaptionHeader
+				})
+			}),
+			VoteDown = Roact.createElement(IconButton, {
+				layoutOrder = 3,
+				showBackground = true,
+				size = UDim2.fromOffset(buttonSize, buttonSize),
+				icon = v35 and v19 or v18,
+				iconColor3 = p3.Theme.IconEmphasis.Color,
+				iconSize = buttonIconSizeEnum,
+				onActivated = p2.onVoteDownActivated
+			}),
+			VoteUp = Roact.createElement(IconButton, {
+				layoutOrder = 4,
+				showBackground = true,
+				size = UDim2.fromOffset(buttonSize, buttonSize),
+				icon = v36 and v21 or v20,
+				iconColor3 = p3.Theme.IconEmphasis.Color,
+				iconSize = buttonIconSizeEnum,
+				onActivated = p2.onVoteUpActivated
+			})
+		})
+	end)
+end
+
+return v23

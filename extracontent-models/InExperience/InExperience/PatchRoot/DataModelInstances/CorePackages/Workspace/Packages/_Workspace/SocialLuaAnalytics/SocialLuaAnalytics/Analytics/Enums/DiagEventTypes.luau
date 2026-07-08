@@ -1,4 +1,4 @@
 return {
-    Counter = "Counter", 
-    Stats = "Stats"
-};
+	Counter = "Counter",
+	Stats = "Stats"
+}

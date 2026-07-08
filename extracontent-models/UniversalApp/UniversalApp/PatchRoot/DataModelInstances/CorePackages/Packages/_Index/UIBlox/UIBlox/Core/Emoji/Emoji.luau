@@ -1,31 +1,36 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Enum.Emoji);
-local v4 = require(l_Parent_0.constants);
-local function _(v5) --[[ Line: 20 ]] --[[ Name: getEmojiString ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    if v3.isEnumValue(v5) then
-        return v4[v5.rawValue()];
-    else
-        return "";
-    end;
-end;
-return function(v7) --[[ Line: 28 ]] --[[ Name: Emoji ]]
-    -- upvalues: v2 (copy), v3 (copy), v4 (copy)
-    local l_createElement_0 = v2.createElement;
-    local v9 = v7.onActivated and "TextButton" or "TextLabel";
-    local v10 = {
-        Size = UDim2.fromScale(0, 1)
-    };
-    local l_emoji_0 = v7.emoji;
-    v10.Text = if v3.isEnumValue(l_emoji_0) then v4[l_emoji_0.rawValue()] else "";
-    v10.TextColor3 = Color3.fromHex("#fff");
-    v10.AutomaticSize = Enum.AutomaticSize.X;
-    v10.Font = v7.textFont;
-    v10.TextSize = v7.textSize;
-    v10.Position = v7.Position;
-    v10.BackgroundTransparency = 1;
-    v10[v2.Event.Activated] = v7.onActivated;
-    return l_createElement_0(v9, v10);
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local Emoji = require(scriptParent.Enum.Emoji)
+local constants = require(scriptParent.constants)
+
+local function getEmojiString(s1: string) -- line: 20
+	-- upvalues: Emoji (copy), constants (copy)
+	if Emoji.isEnumValue(s1) then
+		return constants[s1.rawValue()]
+	end
+
+	return ""
+end
+local function Emoji2(t1: {[any]: any}) -- line: 28
+	-- upvalues: React (copy), Emoji (copy), constants (copy)
+	local createElement = React.createElement
+	local v11 = not t1.onActivated and "TextLabel" or "TextButton"
+	local t2 = {
+		Size = UDim2.fromScale(0, 1)
+	}
+	local emoji = t1.emoji
+
+	t2.Text = not Emoji.isEnumValue(emoji) and "" or constants[emoji.rawValue()]
+	t2.TextColor3 = Color3.fromHex("#fff")
+	t2.AutomaticSize = Enum.AutomaticSize.X
+	t2.Font = t1.textFont
+	t2.TextSize = t1.textSize
+	t2.Position = t1.Position
+	t2.BackgroundTransparency = 1
+	t2[React.Event.Activated] = t1.onActivated
+
+	return createElement(v11, t2)
+end
+
+return Emoji2

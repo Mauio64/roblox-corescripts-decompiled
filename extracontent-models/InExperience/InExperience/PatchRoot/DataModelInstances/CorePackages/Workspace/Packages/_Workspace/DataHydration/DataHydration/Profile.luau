@@ -1,3 +1,3 @@
 return {
-    ProfileCTAStore = require(script.ProfileCTAStore)
-};
+	ProfileCTAStore = require(script.ProfileCTAStore)
+}

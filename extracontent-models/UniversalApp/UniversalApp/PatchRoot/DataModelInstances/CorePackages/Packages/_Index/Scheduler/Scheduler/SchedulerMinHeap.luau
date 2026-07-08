@@ -1,82 +1,93 @@
-local v0 = {};
-local v1 = nil;
-local v2 = nil;
-local v3 = nil;
-v0.push = function(v4, v5) --[[ Line: 22 ]]
-    -- upvalues: v2 (ref)
-    local v6 = #v4 + 1;
-    v4[v6] = v5;
-    v2(v4, v5, v6);
-end;
-v0.peek = function(v7) --[[ Line: 29 ]]
-    return v7[1];
-end;
-v0.pop = function(v8) --[[ Line: 33 ]]
-    -- upvalues: v3 (ref)
-    local v9 = v8[1];
-    if v9 ~= nil then
-        local v10 = v8[#v8];
-        v8[#v8] = nil;
-        if v10 ~= v9 then
-            v8[1] = v10;
-            v3(v8, v10, 1);
-        end;
-        return v9;
-    else
-        return nil;
-    end;
-end;
-v2 = function(v11, v12, v13) --[[ Line: 49 ]]
-    -- upvalues: v1 (ref)
-    while true do
-        local v14 = math.floor(v13 / 2);
-        local v15 = v11[v14];
-        if v15 ~= nil and v1(v15, v12) > 0 then
-            v11[v14] = v12;
-            v11[v13] = v15;
-            v13 = v14;
-        else
-            break;
-        end;
-    end;
-end;
-v3 = function(v16, v17, v18) --[[ Line: 65 ]]
-    -- upvalues: v1 (ref)
-    local v19 = #v16;
-    while true do
-        if v18 < v19 then
-            local v20 = v18 * 2;
-            local v21 = v16[v20];
-            local v22 = v20 + 1;
-            local v23 = v16[v22];
-            if v21 ~= nil and v1(v21, v17) < 0 then
-                if v23 ~= nil and v1(v23, v21) < 0 then
-                    v16[v18] = v23;
-                    v16[v22] = v17;
-                    v18 = v22;
-                else
-                    v16[v18] = v21;
-                    v16[v20] = v17;
-                    v18 = v20;
-                end;
-            elseif v23 ~= nil and v1(v23, v17) < 0 then
-                v16[v18] = v23;
-                v16[v22] = v17;
-                v18 = v22;
-            else
-                return;
-            end;
-        else
-            return;
-        end;
-    end;
-end;
-v1 = function(v24, v25) --[[ Line: 95 ]]
-    local v26 = v24.sortIndex - v25.sortIndex;
-    if v26 == 0 then
-        return v24.id - v25.id;
-    else
-        return v26;
-    end;
-end;
-return v0;
+local t1 = {}
+local u2 = nil
+local u3 = nil
+local u4 = nil
+
+function t1.push(t2: {[any]: any}, t3: {[any]: any}) -- line: 22
+	-- upvalues: u3 (ref)
+	local v7 = #t2 + 1
+
+	t2[v7] = t3
+	u3(t2, t3, v7)
+end
+function t1.peek(t4: {[any]: any}) -- line: 29
+	return t4[1]
+end
+function t1.pop(t5: {[any]: any}) -- line: 33
+	-- upvalues: u4 (ref)
+	local v10 = t5[1]
+
+	if v10 ~= nil then
+		local v11 = t5[#t5]
+
+		t5[#t5] = nil
+
+		if v11 ~= v10 then
+			t5[1] = v11
+			u4(t5, v11, 1)
+		end
+
+		return v10
+	end
+
+	return nil
+end
+function u3(t6: {[any]: any}, t7: {[any]: any}, n1: number) -- line: 49
+	-- upvalues: u2 (ref)
+	while true do
+		local v15 = math.floor(n1 / 2)
+		local v16 = t6[v15]
+
+		if v16 == nil or not (u2(v16, t7) > 0) then
+			break
+		end
+
+		t6[v15] = t7
+		t6[n1] = v16
+		n1 = v15
+	end
+end
+function u4(t8: {[any]: any}, t9: {[any]: any}, n2: number) -- line: 65
+	-- upvalues: u2 (ref)
+	local v20 = #t8
+
+	while n2 < v20 do
+		local v21 = n2 * 2
+		local v22 = t8[v21]
+		local v23 = v21 + 1
+		local v24 = t8[v23]
+
+		if v22 ~= nil and u2(v22, t9) < 0 then
+			if v24 ~= nil and u2(v24, v22) < 0 then
+				t8[n2] = v24
+				t8[v23] = t9
+				n2 = v23
+			else
+				t8[n2] = v22
+				t8[v21] = t9
+				n2 = v21
+			end
+
+			continue
+		end
+
+		if v24 == nil or not (u2(v24, t9) < 0) then
+			return
+		end
+
+		t8[n2] = v24
+		t8[v23] = t9
+		n2 = v23
+	end
+end
+function u2(t10: {[any]: any}, t11: {[any]: any}) -- line: 95
+	local v27 = t10.sortIndex - t11.sortIndex
+
+	if v27 == 0 then
+		return t10.id - t11.id
+	end
+
+	return v27
+end
+
+return t1

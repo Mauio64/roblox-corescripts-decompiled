@@ -1,24 +1,25 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Utils.checkAndSendEvent);
-local v2 = game:DefineFastFlag("FixAuthFormInteractionEnteredParamType", false);
-return function(v3, v4, v5, v6, v7) --[[ Line: 5 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v8 = {};
-    if v4 then
-        v8.field = v4;
-    end;
-    if v5 then
-        v8.state = v5;
-    end;
-    if v6 then
-        v8.origin = v6;
-    end;
-    if v7 ~= nil then
-        if v2 then
-            v8.entered = tostring(v7);
-        else
-            v8.entered = v7;
-        end;
-    end;
-    v1(v3, "authFormInteraction", v8);
-end;
+local ParentParent = script.Parent.Parent
+local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+
+return function(s1: string, s2: string?, s3: string?, s4: string?, p1) -- line: 4
+	-- upvalues: checkAndSendEvent (copy)
+	local t1 = {}
+
+	if s2 then
+		t1.field = s2
+	end
+
+	if s3 then
+		t1.state = s3
+	end
+
+	if s4 then
+		t1.origin = s4
+	end
+
+	if p1 ~= nil then
+		t1.entered = tostring(p1)
+	end
+
+	checkAndSendEvent(s1, "authFormInteraction", t1)
+end

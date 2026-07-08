@@ -1,3 +1,3 @@
 return {
-    FFlagUseRbxStorageInCapturesCommon = require(script.FFlagUseRbxStorageInCapturesCommon)
-};
+	FFlagUseRbxStorageInCapturesCommon = require(script.FFlagUseRbxStorageInCapturesCommon)
+}

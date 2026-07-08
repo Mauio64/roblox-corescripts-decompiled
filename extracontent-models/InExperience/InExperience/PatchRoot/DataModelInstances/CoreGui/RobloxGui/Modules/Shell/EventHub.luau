@@ -1,87 +1,88 @@
-local v0 = {};
-local function _(v1, v2) --[[ Line: 6 ]] --[[ Name: createListener ]]
-    return {
-        id = v1, 
-        callback = v2
-    };
-end;
+local t1 = {}
+
+local function createListener(p1, p2) -- line: 6
+	return {
+		id = p1,
+		callback = p2
+	}
+end
+
 return {
-    addEventListener = function(_, v5, v6, v7) --[[ Line: 18 ]] --[[ Name: addEventListener ]]
-        -- upvalues: v0 (copy)
-        if v0[v5] == nil then
-            v0[v5] = {};
-        end;
-        table.insert(v0[v5], {
-            id = v6, 
-            callback = v7
-        });
-    end, 
-    removeEventListener = function(_, v9, v10) --[[ Line: 26 ]] --[[ Name: removeEventListener ]]
-        -- upvalues: v0 (copy)
-        if v0[v9] == nil then
-            return;
-        else
-            for v11, v12 in ipairs(v0[v9]) do
-                if v12 ~= nil and v12.id == v10 then
-                    table.remove(v0[v9], v11);
-                end;
-            end;
-            return;
-        end;
-    end, 
-    removeCallbackFromEvent = function(_, v14, v15, v16) --[[ Line: 40 ]] --[[ Name: removeCallbackFromEvent ]]
-        -- upvalues: v0 (copy)
-        if v0[v14] == nil then
-            return;
-        else
-            for v17, v18 in ipairs(v0[v14]) do
-                if v18 ~= nil and v18.id == v15 and v18.callback == v16 then
-                    table.remove(v0[v14], v17);
-                    return;
-                end;
-            end;
-            return;
-        end;
-    end, 
-    dispatchEvent = function(_, v20, ...) --[[ Line: 56 ]] --[[ Name: dispatchEvent ]]
-        -- upvalues: v0 (copy)
-        if v0[v20] == nil then
-            return;
-        else
-            for _, v22 in ipairs(v0[v20]) do
-                v22.callback(...);
-            end;
-            return;
-        end;
-    end, 
-    Notifications = {
-        AuthenticationSuccess = "rbxNotificationAuthenticationSuccess", 
-        GameJoin = "rbxNotificationGameJoin", 
-        OpenGames = "rbxNotificationOpenGames", 
-        OpenGameDetail = "rbxNotificationOpenGameDetail", 
-        OpenGameGenre = "rbxNotificationOpenGameGenre", 
-        OpenBadgeScreen = "rbxNotificationOpenBadgeScreen", 
-        OpenSettingsScreen = "rbxNotificationOpenSettingsScreen", 
-        OpenSearchScreen = "rbxNotificationOpenSearchScreen", 
-        OpenStoreScreen = "rbxNotificationOpenStoreScreen", 
-        OpenAvatarEditorScreen = "rbxNotificationOpenAvatarEditorScreen", 
-        OpenAccountSettingsScreen = "rbxNotificationOpenAccountSettingsScreen", 
-        NavigateToEquippedAvatar = "rbxNotificationNavigateToEquippedAvatar", 
-        NavigateToRobuxScreen = "rbxNotificationNavigateToRobuxScreen", 
-        RobuxCatalogPurchaseInitiated = "rbxRobuxCatalogPurchaseInitiated", 
-        DonnedDifferentPackage = "rbxDonnedDifferentPackage", 
-        VotedOnPlace = "rbxVotedOnPlace", 
-        AvatarEquipBegin = "rbxAvatarEquipBegin", 
-        DonnedDifferentOutfit = "rbxDonnedDifferentOutfit", 
-        AvatarEquipSuccess = "rbxAvatarEquipSuccess", 
-        AvatarPurchaseBegin = "rbxAvatarPurchaseBegin", 
-        AvatarPurchaseSuccess = "rbxAvatarPurchaseSuccess", 
-        FavoriteToggle = "rbxFavoriteToggle", 
-        PlayedGamesChanged = "rbxPlayedGamesChanged", 
-        UnlockedUGC = "rbxNotificationUnlockedUGC", 
-        SetGamesHints = "rbxNotificationSetGamesHints", 
-        CharacterEquipped = "CharacterEquipped", 
-        CharacterUpdated = "CharacterUpdated", 
-        HardwareBundleGranted = "HardwareBundleGranted"
-    }
-};
+	addEventListener = function(_, p4, p5, p6) -- line: 18
+		-- upvalues: t1 (copy)
+		if t1[p4] == nil then
+			t1[p4] = {}
+		end
+
+		table.insert(t1[p4], {
+			id = p5,
+			callback = p6
+		})
+	end,
+	removeEventListener = function(_, p8, p9) -- line: 26
+		-- upvalues: t1 (copy)
+		if t1[p8] == nil then
+			return
+		end
+
+		for i, v in ipairs(t1[p8]) do
+			if v ~= nil and p9 == v.id then
+				table.remove(t1[p8], i)
+			end
+		end
+	end,
+	removeCallbackFromEvent = function(_, p11, p12, p13) -- line: 40
+		-- upvalues: t1 (copy)
+		if t1[p11] == nil then
+			return
+		end
+
+		for i, v in ipairs(t1[p11]) do
+			if v ~= nil and p12 == v.id and p13 == v.callback then
+				table.remove(t1[p11], i)
+
+				return
+			end
+		end
+	end,
+	dispatchEvent = function(_, p15, ...) -- line: 56
+		-- upvalues: t1 (copy)
+		if t1[p15] == nil then
+			return
+		end
+
+		for _, v in ipairs(t1[p15]) do
+			v.callback(...)
+		end
+	end,
+	Notifications = {
+		AuthenticationSuccess = "rbxNotificationAuthenticationSuccess",
+		GameJoin = "rbxNotificationGameJoin",
+		OpenGames = "rbxNotificationOpenGames",
+		OpenGameDetail = "rbxNotificationOpenGameDetail",
+		OpenGameGenre = "rbxNotificationOpenGameGenre",
+		OpenBadgeScreen = "rbxNotificationOpenBadgeScreen",
+		OpenSettingsScreen = "rbxNotificationOpenSettingsScreen",
+		OpenSearchScreen = "rbxNotificationOpenSearchScreen",
+		OpenStoreScreen = "rbxNotificationOpenStoreScreen",
+		OpenAvatarEditorScreen = "rbxNotificationOpenAvatarEditorScreen",
+		OpenAccountSettingsScreen = "rbxNotificationOpenAccountSettingsScreen",
+		NavigateToEquippedAvatar = "rbxNotificationNavigateToEquippedAvatar",
+		NavigateToRobuxScreen = "rbxNotificationNavigateToRobuxScreen",
+		RobuxCatalogPurchaseInitiated = "rbxRobuxCatalogPurchaseInitiated",
+		DonnedDifferentPackage = "rbxDonnedDifferentPackage",
+		VotedOnPlace = "rbxVotedOnPlace",
+		AvatarEquipBegin = "rbxAvatarEquipBegin",
+		DonnedDifferentOutfit = "rbxDonnedDifferentOutfit",
+		AvatarEquipSuccess = "rbxAvatarEquipSuccess",
+		AvatarPurchaseBegin = "rbxAvatarPurchaseBegin",
+		AvatarPurchaseSuccess = "rbxAvatarPurchaseSuccess",
+		FavoriteToggle = "rbxFavoriteToggle",
+		PlayedGamesChanged = "rbxPlayedGamesChanged",
+		UnlockedUGC = "rbxNotificationUnlockedUGC",
+		SetGamesHints = "rbxNotificationSetGamesHints",
+		CharacterEquipped = "CharacterEquipped",
+		CharacterUpdated = "CharacterUpdated",
+		HardwareBundleGranted = "HardwareBundleGranted"
+	}
+}

@@ -1,63 +1,81 @@
-local l_Parent_0 = script:FindFirstAncestor("ContactImporter").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local function v3(v2) --[[ Line: 5 ]] --[[ Name: isEmoji ]]
-    if v2 >= 9728 and v2 <= 9983 or v2 >= 9984 and v2 <= 10175 or v2 >= 127744 and v2 <= 128511 or v2 >= 128512 and v2 <= 128591 or v2 >= 128640 and v2 <= 128767 or v2 >= 128768 and v2 <= 128895 or v2 >= 129280 and v2 <= 129535 or v2 >= 127462 and v2 <= 127487 or v2 >= 127344 and v2 <= 127569 or v2 >= 129536 and v2 <= 129791 then
-        return true;
-    else
-        return false;
-    end;
-end;
-local _ = function(v4) --[[ Line: 33 ]] --[[ Name: getStringHasEmoji ]]
-    -- upvalues: v3 (copy)
-    for _, v6 in utf8.codes(v4) do
-        if v3(v6) then
-            return true;
-        end;
-    end;
-    return false;
-end;
-return function(v8) --[[ Line: 42 ]] --[[ Name: uprankContactsWithEmoji ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    return v1.List.sort(v8, function(v9, v10) --[[ Line: 43 ]]
-        -- upvalues: v3 (ref)
-        local v11 = false;
-        local v12 = false;
-        if v9.contactName and v10.contactName then
-            local l_contactName_0 = v9.contactName;
-            local v14;
-            for _, v16 in utf8.codes(l_contactName_0) do
-                if v3(v16) then
-                    v14 = true;
-                    v11 = true;
-                end;
-                if v11 then
-                    break;
-                end;
-            end;
-            if not v11 then
-                v14 = false;
-            end;
-            v11 = false;
-            local l_contactName_1 = v10.contactName;
-            for _, v19 in utf8.codes(l_contactName_1) do
-                if v3(v19) then
-                    l_contactName_0 = true;
-                    v12 = true;
-                end;
-                if v12 then
-                    break;
-                end;
-            end;
-            if not v12 then
-                l_contactName_0 = false;
-            end;
-            v12 = false;
-            if v14 ~= l_contactName_0 then
-                return v14;
-            elseif v9.contactName ~= v10.contactName then
-                return string.upper(v9.contactName) < string.upper(v10.contactName);
-            end;
-        end;
-        return (v9.contactId or "") < (v10.contactId or "");
-    end);
-end;
+local Parent = script:FindFirstAncestor("ContactImporter").Parent
+local Cryo = require(Parent.Cryo)
+
+local function isEmoji(n1: number) -- line: 5
+	if n1 >= 9728 and n1 <= 9983 or n1 >= 9984 and n1 <= 10175 or n1 >= 127744 and n1 <= 128511 or n1 >= 128512 and n1 <= 128591 or n1 >= 128640 and n1 <= 128767 or n1 >= 128768 and n1 <= 128895 or n1 >= 129280 and n1 <= 129535 or n1 >= 127462 and n1 <= 127487 or n1 >= 127344 and n1 <= 127569 or n1 >= 129536 and n1 <= 129791 then
+		return true
+	end
+
+	return false
+end
+local function getStringHasEmoji(s1: string) -- line: 33
+	-- upvalues: isEmoji (copy)
+	for _, v9 in utf8.codes(s1) do
+		if isEmoji(v9) then
+			return true
+		end
+	end
+
+	return false
+end
+local function uprankContactsWithEmoji(p1) -- line: 42
+	-- upvalues: Cryo (copy), isEmoji (copy)
+	return Cryo.List.sort(p1, function(p2, p3) -- line: 43
+		-- upvalues: isEmoji (copy)
+		if p2.contactName and p3.contactName then
+			local contactName = p2.contactName
+			local g17 = nil
+			local g22 = nil
+			local v16 = nil
+			local v21 = nil
+
+			for _, v15 in utf8.codes(contactName) do
+				if isEmoji(v15) then
+					v16 = true
+					g17 = true
+				end
+
+				if g17 then
+					break
+				end
+			end
+
+			if not g17 then
+				v16 = false
+			end
+
+			g17 = false
+
+			local contactName2 = p3.contactName
+
+			for _, v20 in utf8.codes(contactName2) do
+				if isEmoji(v20) then
+					v21 = true
+					g22 = true
+				end
+
+				if g22 then
+					break
+				end
+			end
+
+			if not g22 then
+				v21 = false
+			end
+
+			g22 = false
+
+			if v16 ~= v21 then
+				return v16
+			end
+
+			if p2.contactName ~= p3.contactName then
+				return string.upper(p2.contactName) < string.upper(p3.contactName)
+			end
+		end
+
+		return (p2.contactId or "") < (p3.contactId or "")
+	end)
+end
+
+return uprankContactsWithEmoji

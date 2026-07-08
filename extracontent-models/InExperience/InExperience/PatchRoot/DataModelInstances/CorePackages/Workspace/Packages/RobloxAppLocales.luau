@@ -1,2 +1,3 @@
-local l__Workspace_0 = script.Parent._Workspace;
-return (require(l__Workspace_0.RobloxAppLocales.RobloxAppLocales));
+local _Workspace = script.Parent._Workspace
+
+return (require(_Workspace.RobloxAppLocales.RobloxAppLocales))

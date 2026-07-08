@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixMediaGalleryOversized", false);
+return game:DefineFastFlag("FixMediaGalleryOversized", false)

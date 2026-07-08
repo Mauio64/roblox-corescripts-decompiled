@@ -1,201 +1,232 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Enums.ItemPurchaseActionTypeEnum);
-local v2 = require(l_script_FirstAncestor_0.Enums.SalesLocationType);
-local v3 = require(l_script_FirstAncestor_0.Enums.ItemRestrictions);
-local function _(v4) --[[ Line: 24 ]] --[[ Name: getExperienceCount ]]
-    return #if v4 then v4.experiences or {} else {};
-end;
-local function _(v6) --[[ Line: 29 ]] --[[ Name: getAvailableInExperienceOnly ]]
-    -- upvalues: v2 (copy)
-    return v6.saleLocationType == v2.ExperiencesDevApiOnly;
-end;
-local function _(v8) --[[ Line: 33 ]] --[[ Name: getHasLimitedAmount ]]
-    -- upvalues: v3 (copy)
-    local l_itemRestrictions_0 = v8.itemRestrictions;
-    local v10 = l_itemRestrictions_0 and l_itemRestrictions_0[v3.Limited];
-    local v11 = l_itemRestrictions_0 and l_itemRestrictions_0[v3.LimitedUnique];
-    local v12 = l_itemRestrictions_0 and l_itemRestrictions_0[v3.Collectible];
-    return v10 or v11 or v12;
-end;
-local function _(v14, v15, v16) --[[ Line: 41 ]] --[[ Name: getUserHasReachedQuantityLimit ]]
-    -- upvalues: v3 (copy)
-    local l_itemRestrictions_1 = v14.itemRestrictions;
-    local v18 = l_itemRestrictions_1 and l_itemRestrictions_1[v3.Limited];
-    local v19 = l_itemRestrictions_1 and l_itemRestrictions_1[v3.LimitedUnique];
-    local v20 = l_itemRestrictions_1 and l_itemRestrictions_1[v3.Collectible];
-    if not (v18 or v19 or v20) and v14.isOwned then
-        return true;
-    elseif not v15 or not v15.quantityLimitPerUser then
-        return false;
-    else
-        if v15 then
-            l_itemRestrictions_1 = false;
-            if v15.quantityLimitPerUser > 0 then
-                return v15.quantityLimitPerUser <= v16;
-            end;
-        else
-            l_itemRestrictions_1 = false;
-        end;
-        return l_itemRestrictions_1;
-    end;
-end;
-local function _(v22) --[[ Line: 59 ]] --[[ Name: getOriginalStockAvailable ]]
-    -- upvalues: v3 (copy)
-    local l_itemRestrictions_2 = v22.itemRestrictions;
-    local v24 = l_itemRestrictions_2 and l_itemRestrictions_2[v3.Limited];
-    local v25 = l_itemRestrictions_2 and l_itemRestrictions_2[v3.LimitedUnique];
-    local v26 = l_itemRestrictions_2 and l_itemRestrictions_2[v3.Collectible];
-    local v27 = v24 or v25 or v26;
-    return v27 and v22.numberRobloxHasAvailable and v22.numberRobloxHasAvailable > 0 or not v27;
-end;
-local function _(v29, v30) --[[ Line: 67 ]] --[[ Name: getButtonTypeIsPurchaseFromResale ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    if not v30 or not v29.hasResellers then
-        return false;
-    else
-        local v31 = if v29.priceInRobux and v29.lowestResalePrice then v29.lowestResalePrice < v29.priceInRobux else v29.lowestResalePrice ~= nil;
-        local v32 = v29.saleLocationType == v2.ExperiencesDevApiOnly;
-        local l_itemRestrictions_3 = v29.itemRestrictions;
-        local v34 = l_itemRestrictions_3 and l_itemRestrictions_3[v3.Limited];
-        local v35 = l_itemRestrictions_3 and l_itemRestrictions_3[v3.LimitedUnique];
-        local v36 = l_itemRestrictions_3 and l_itemRestrictions_3[v3.Collectible];
-        local v37 = v34 or v35 or v36;
-        local v38 = not (v37 and v29.numberRobloxHasAvailable and v29.numberRobloxHasAvailable > 0 or not v37) or v29.isOffSale == true or v32;
-        return v31 or v38;
-    end;
-end;
-local function _(v40) --[[ Line: 81 ]] --[[ Name: getButtonTypeIsFree ]]
-    -- upvalues: v2 (copy)
-    if v40.isOffSale then
-        return false;
-    else
-        return not (v40.saleLocationType == v2.ExperiencesDevApiOnly) and v40.priceInRobux == 0;
-    end;
-end;
-local function _(v42, v43) --[[ Line: 89 ]] --[[ Name: getButtonTypeIsExperienceLink ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    if v42.isOffSale then
-        return false;
-    else
-        local v44 = v42.saleLocationType == v2.ExperiencesDevApiOnly;
-        local l_itemRestrictions_4 = v42.itemRestrictions;
-        local v46 = l_itemRestrictions_4 and l_itemRestrictions_4[v3.Limited];
-        local v47 = l_itemRestrictions_4 and l_itemRestrictions_4[v3.LimitedUnique];
-        local v48 = l_itemRestrictions_4 and l_itemRestrictions_4[v3.Collectible];
-        local v49 = v46 or v47 or v48;
-        local v50 = v49 and v42.numberRobloxHasAvailable and v42.numberRobloxHasAvailable > 0 or not v49;
-        v49 = #(if v43 then v43.experiences or {} else {}) > 0;
-        return v44 and v49 and v50;
-    end;
-end;
-local function _(v52, v53) --[[ Line: 99 ]] --[[ Name: getButtonTypeIsSoldOut ]]
-    -- upvalues: v3 (copy)
-    local l_itemRestrictions_5 = v52.itemRestrictions;
-    local v55 = l_itemRestrictions_5 and l_itemRestrictions_5[v3.Limited];
-    local v56 = l_itemRestrictions_5 and l_itemRestrictions_5[v3.LimitedUnique];
-    local v57 = l_itemRestrictions_5 and l_itemRestrictions_5[v3.Collectible];
-    local v58 = v55 or v56 or v57;
-    local v59 = v58 and v52.numberRobloxHasAvailable and v52.numberRobloxHasAvailable > 0 or not v58;
-    v58 = v53 and v52.hasResellers;
-    return not v59 and not v58;
-end;
-local function _(v61, v62, v63, v64) --[[ Line: 105 ]] --[[ Name: getButtonTypeIsCustomizeLink ]]
-    -- upvalues: v3 (copy)
-    local l_isOwned_0 = v61.isOwned;
-    local l_itemRestrictions_6 = v61.itemRestrictions;
-    local v67 = l_itemRestrictions_6 and l_itemRestrictions_6[v3.Limited];
-    local v68 = l_itemRestrictions_6 and l_itemRestrictions_6[v3.LimitedUnique];
-    local v69 = l_itemRestrictions_6 and l_itemRestrictions_6[v3.Collectible];
-    local v70 = not (v67 or v68 or v69) and v61.isOwned and true or if v62 and v62.quantityLimitPerUser then if v62 then v62.quantityLimitPerUser > 0 and v62.quantityLimitPerUser <= v63 else false else false;
-    local v71 = v64 and v61.hasResellers;
-    v69 = v61.itemRestrictions;
-    local v72 = v69 and v69[v3.Limited];
-    local v73 = v69 and v69[v3.LimitedUnique];
-    local v74 = v69 and v69[v3.Collectible];
-    v68 = v72 or v73 or v74;
-    l_itemRestrictions_6 = not (v68 and v61.numberRobloxHasAvailable and v61.numberRobloxHasAvailable > 0 or not v68) or v70 or v61.isOffSale;
-    return l_isOwned_0 and l_itemRestrictions_6 and not v71;
-end;
-local function _(v76) --[[ Line: 121 ]] --[[ Name: getButtonTypeIsPurchasableFromRoblox ]]
-    -- upvalues: v2 (copy)
-    if v76.isOffSale then
-        return false;
-    else
-        return not (v76.saleLocationType == v2.ExperiencesDevApiOnly);
-    end;
-end;
-return function(v78, v79, v80, v81) --[[ Line: 128 ]] --[[ Name: getItemPurchaseActionType ]]
-    -- upvalues: v1 (copy), v3 (copy), v2 (copy)
-    if not v78 then
-        return v1.Disabled;
-    else
-        local l_isOwned_1 = v78.isOwned;
-        local l_itemRestrictions_7 = v78.itemRestrictions;
-        local v84 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.Limited];
-        local v85 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.LimitedUnique];
-        local v86 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.Collectible];
-        local v87 = not (v84 or v85 or v86) and v78.isOwned and true or if v79 and v79.quantityLimitPerUser then if v79 then v79.quantityLimitPerUser > 0 and v79.quantityLimitPerUser <= v80 else false else false;
-        local v88 = v81 and v78.hasResellers;
-        v86 = v78.itemRestrictions;
-        local v89 = v86 and v86[v3.Limited];
-        local v90 = v86 and v86[v3.LimitedUnique];
-        local v91 = v86 and v86[v3.Collectible];
-        v85 = v89 or v90 or v91;
-        l_itemRestrictions_7 = not (v85 and v78.numberRobloxHasAvailable and v78.numberRobloxHasAvailable > 0 or not v85) or v87 or v78.isOffSale;
-        if l_isOwned_1 and l_itemRestrictions_7 and not v88 then
-            return v1.CustomizeLink;
-        else
-            v88 = v78.itemRestrictions;
-            l_itemRestrictions_7 = v88 and v88[v3.Limited];
-            v84 = v88 and v88[v3.LimitedUnique];
-            v85 = v88 and v88[v3.Collectible];
-            v87 = l_itemRestrictions_7 or v84 or v85;
-            l_isOwned_1 = v87 and v78.numberRobloxHasAvailable and v78.numberRobloxHasAvailable > 0 or not v87;
-            v87 = v81 and v78.hasResellers;
-            if not l_isOwned_1 and not v87 then
-                return v1.SoldOut;
-            else
-                local v92;
-                if not v81 or not v78.hasResellers then
-                    v92 = false;
-                else
-                    l_isOwned_1 = if v78.priceInRobux and v78.lowestResalePrice then v78.lowestResalePrice < v78.priceInRobux else v78.lowestResalePrice ~= nil;
-                    v87 = v78.saleLocationType == v2.ExperiencesDevApiOnly;
-                    v85 = v78.itemRestrictions;
-                    v86 = v85 and v85[v3.Limited];
-                    v89 = v85 and v85[v3.LimitedUnique];
-                    v90 = v85 and v85[v3.Collectible];
-                    v84 = v86 or v89 or v90;
-                    v88 = not (v84 and v78.numberRobloxHasAvailable and v78.numberRobloxHasAvailable > 0 or not v84) or v78.isOffSale == true or v87;
-                    v92 = l_isOwned_1 or v88;
-                end;
-                if v92 then
-                    return v1.PurchaseFromResale;
-                else
-                    if v78.isOffSale then
-                        v92 = false;
-                    else
-                        l_isOwned_1 = v78.saleLocationType == v2.ExperiencesDevApiOnly;
-                        l_itemRestrictions_7 = v78.itemRestrictions;
-                        v84 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.Limited];
-                        v85 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.LimitedUnique];
-                        v86 = l_itemRestrictions_7 and l_itemRestrictions_7[v3.Collectible];
-                        v88 = v84 or v85 or v86;
-                        v87 = v88 and v78.numberRobloxHasAvailable and v78.numberRobloxHasAvailable > 0 or not v88;
-                        v88 = #(if v79 then v79.experiences or {} else {}) > 0;
-                        v92 = l_isOwned_1 and v88 and v87;
-                    end;
-                    if v92 then
-                        return v1.ExperienceLink;
-                    elseif not v78.isOffSale and not (v78.saleLocationType == v2.ExperiencesDevApiOnly) and v78.priceInRobux == 0 then
-                        return v1.Free;
-                    elseif not v78.isOffSale and not (v78.saleLocationType == v2.ExperiencesDevApiOnly) then
-                        return v1.PurchaseFromRoblox;
-                    else
-                        return v1.Disabled;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local ItemPurchaseActionTypeEnum = require(AvatarExperienceCommon.Enums.ItemPurchaseActionTypeEnum)
+local SalesLocationType = require(AvatarExperienceCommon.Enums.SalesLocationType)
+local ItemRestrictions = require(AvatarExperienceCommon.Enums.ItemRestrictions)
+local FFlagAXDurablesForMIS = require(AvatarExperienceCommonParent.AvatarExperienceFlags).FFlagAXDurablesForMIS
+
+local function getExperienceCount(t1: {[any]: any}?) -- line: 30
+	return #if not t1 then {} else t1.experiences or {}
+end
+local function getAvailableInExperienceOnly(t2: {[any]: any}) -- line: 35
+	-- upvalues: SalesLocationType (copy)
+	return t2.saleLocationType == SalesLocationType.ExperiencesDevApiOnly
+end
+local function getHasLimitedAmount(t3: {[any]: any}) -- line: 39
+	-- upvalues: ItemRestrictions (copy)
+	local itemRestrictions = t3.itemRestrictions
+	local v23 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v24 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v25 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+
+	return v23 or (v24 or v25)
+end
+local function getUserHasReachedQuantityLimit(t4: {[any]: any}, t5: {[any]: any}?, n1: number) -- line: 47
+	-- upvalues: ItemRestrictions (copy)
+	local itemRestrictions = t4.itemRestrictions
+	local v30 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v31 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v32 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+
+	if not v30 and (not v31 and not v32) and t4.isOwned then
+		return true
+	end
+
+	if not t5 or not t5.quantityLimitPerUser then
+		return false
+	end
+
+	local v33
+
+	if t5 then
+		v33 = false
+
+		if t5.quantityLimitPerUser > 0 then
+			return n1 >= t5.quantityLimitPerUser
+		end
+	else
+		v33 = false
+	end
+
+	return v33
+end
+local function getOriginalStockAvailable(t6: {[any]: any}) -- line: 65
+	-- upvalues: ItemRestrictions (copy)
+	local itemRestrictions = t6.itemRestrictions
+	local v36 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v37 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v38 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v39 = v36 or (v37 or v38)
+
+	return v39 and (t6.numberRobloxHasAvailable and t6.numberRobloxHasAvailable > 0) or not v39
+end
+local function getButtonTypeIsPurchaseFromResale(t7: {[any]: any}, b1: boolean) -- line: 73
+	-- upvalues: SalesLocationType (copy), ItemRestrictions (copy)
+	if not b1 or not t7.hasResellers then
+		return false
+	end
+
+	local v42 = if not t7.priceInRobux or not t7.lowestResalePrice then t7.lowestResalePrice ~= nil else t7.lowestResalePrice < t7.priceInRobux
+	local v43 = t7.saleLocationType == SalesLocationType.ExperiencesDevApiOnly
+	local itemRestrictions = t7.itemRestrictions
+	local v45 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v46 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v47 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v48 = v45 or (v46 or v47)
+	local v49 = not (v48 and (t7.numberRobloxHasAvailable and t7.numberRobloxHasAvailable > 0) or not v48) or (t7.isOffSale == true or v43)
+
+	return v42 or v49
+end
+local function getButtonTypeIsFree(t8: {[any]: any}) -- line: 87
+	-- upvalues: SalesLocationType (copy)
+	if t8.isOffSale then
+		return false
+	end
+
+	return t8.saleLocationType ~= SalesLocationType.ExperiencesDevApiOnly and t8.priceInRobux == 0
+end
+local function getButtonTypeIsExperienceLink(t9: {[any]: any}, t10: {[any]: any}?) -- line: 95
+	-- upvalues: SalesLocationType (copy), ItemRestrictions (copy)
+	if t9.isOffSale then
+		return false
+	end
+
+	local v53 = t9.saleLocationType == SalesLocationType.ExperiencesDevApiOnly
+	local itemRestrictions = t9.itemRestrictions
+	local v55 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v56 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v57 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v58 = v55 or (v56 or v57)
+	local v59 = v58 and (t9.numberRobloxHasAvailable and t9.numberRobloxHasAvailable > 0) or not v58
+	local v60 = #(if not t10 then {} else t10.experiences or {}) > 0
+
+	return v53 and (v60 and v59)
+end
+local function getButtonTypeIsSoldOut(t11: {[any]: any}, b2: boolean) -- line: 105
+	-- upvalues: ItemRestrictions (copy)
+	local itemRestrictions = t11.itemRestrictions
+	local v64 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v65 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v66 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v67 = v64 or (v65 or v66)
+	local v68 = v67 and (t11.numberRobloxHasAvailable and t11.numberRobloxHasAvailable > 0) or not v67
+	local v69 = b2 and t11.hasResellers
+
+	return not v68 and not v69
+end
+local function getButtonTypeIsCustomizeLink(t12: {[any]: any}, t13: {[any]: any}?, n2: number, b3: boolean) -- line: 111
+	-- upvalues: FFlagAXDurablesForMIS (copy), ItemRestrictions (copy)
+	local v74 = if not FFlagAXDurablesForMIS then t12.isOwned else t12.isOwned and not t12.expirationTime
+	local itemRestrictions = t12.itemRestrictions
+	local v76 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v77 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v78 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v79 = not (v76 or (v77 or v78)) and not not t12.isOwned or not not t13 and if t13.quantityLimitPerUser then not not t13 and (t13.quantityLimitPerUser > 0 and n2 >= t13.quantityLimitPerUser) else false
+	local v80 = b3 and t12.hasResellers
+	local itemRestrictions2 = t12.itemRestrictions
+	local v82 = itemRestrictions2 and itemRestrictions2[ItemRestrictions.Limited]
+	local v83 = itemRestrictions2 and itemRestrictions2[ItemRestrictions.LimitedUnique]
+	local v84 = itemRestrictions2 and itemRestrictions2[ItemRestrictions.Collectible]
+	local v85 = v82 or (v83 or v84)
+	local v86 = not (v85 and (t12.numberRobloxHasAvailable and t12.numberRobloxHasAvailable > 0) or not v85) or (v79 or t12.isOffSale)
+
+	return v74 and (v86 and not v80)
+end
+local function getButtonTypeIsPurchasableFromRoblox(t14: {[any]: any}) -- line: 127
+	-- upvalues: SalesLocationType (copy)
+	if t14.isOffSale then
+		return false
+	end
+
+	return t14.saleLocationType ~= SalesLocationType.ExperiencesDevApiOnly
+end
+local function getItemPurchaseActionType(t15: {[any]: any}?, t16: {[any]: any}?, n3: number, b4: boolean) -- line: 134
+	-- upvalues: ItemPurchaseActionTypeEnum (copy), FFlagAXDurablesForMIS (copy), ItemRestrictions (copy), SalesLocationType (copy)
+	if not t15 then
+		return ItemPurchaseActionTypeEnum.Disabled
+	end
+
+	local v92 = if not FFlagAXDurablesForMIS then t15.isOwned else t15.isOwned and not t15.expirationTime
+	local itemRestrictions = t15.itemRestrictions
+	local v94 = itemRestrictions and itemRestrictions[ItemRestrictions.Limited]
+	local v95 = itemRestrictions and itemRestrictions[ItemRestrictions.LimitedUnique]
+	local v96 = itemRestrictions and itemRestrictions[ItemRestrictions.Collectible]
+	local v97 = not (v94 or (v95 or v96)) and not not t15.isOwned or not not t16 and if t16.quantityLimitPerUser then not not t16 and (t16.quantityLimitPerUser > 0 and n3 >= t16.quantityLimitPerUser) else false
+	local v98 = b4 and t15.hasResellers
+	local itemRestrictions3 = t15.itemRestrictions
+	local v100 = itemRestrictions3 and itemRestrictions3[ItemRestrictions.Limited]
+	local v101 = itemRestrictions3 and itemRestrictions3[ItemRestrictions.LimitedUnique]
+	local v102 = itemRestrictions3 and itemRestrictions3[ItemRestrictions.Collectible]
+	local v103 = v100 or (v101 or v102)
+	local v104 = not (v103 and (t15.numberRobloxHasAvailable and t15.numberRobloxHasAvailable > 0) or not v103) or (v97 or t15.isOffSale)
+
+	if v92 and (v104 and not v98) then
+		return ItemPurchaseActionTypeEnum.CustomizeLink
+	end
+
+	local itemRestrictions4 = t15.itemRestrictions
+	local v106 = itemRestrictions4 and itemRestrictions4[ItemRestrictions.Limited]
+	local v107 = itemRestrictions4 and itemRestrictions4[ItemRestrictions.LimitedUnique]
+	local v108 = itemRestrictions4 and itemRestrictions4[ItemRestrictions.Collectible]
+	local v109 = v106 or (v107 or v108)
+	local v110 = v109 and (t15.numberRobloxHasAvailable and t15.numberRobloxHasAvailable > 0) or not v109
+	local v111 = b4 and t15.hasResellers
+
+	if not v110 and not v111 then
+		return ItemPurchaseActionTypeEnum.SoldOut
+	end
+
+	local v112
+
+	if not b4 or not t15.hasResellers then
+		v112 = false
+	else
+		local v113 = if not t15.priceInRobux or not t15.lowestResalePrice then t15.lowestResalePrice ~= nil else t15.lowestResalePrice < t15.priceInRobux
+		local v114 = t15.saleLocationType == SalesLocationType.ExperiencesDevApiOnly
+		local itemRestrictions5 = t15.itemRestrictions
+		local v116 = itemRestrictions5 and itemRestrictions5[ItemRestrictions.Limited]
+		local v117 = itemRestrictions5 and itemRestrictions5[ItemRestrictions.LimitedUnique]
+		local v118 = itemRestrictions5 and itemRestrictions5[ItemRestrictions.Collectible]
+		local v119 = v116 or (v117 or v118)
+		local v120 = not (v119 and (t15.numberRobloxHasAvailable and t15.numberRobloxHasAvailable > 0) or not v119) or (t15.isOffSale == true or v114)
+
+		v112 = v113 or v120
+	end
+
+	if v112 then
+		return ItemPurchaseActionTypeEnum.PurchaseFromResale
+	end
+
+	local v121
+
+	if t15.isOffSale then
+		v121 = false
+	else
+		local v122 = t15.saleLocationType == SalesLocationType.ExperiencesDevApiOnly
+		local itemRestrictions6 = t15.itemRestrictions
+		local v124 = itemRestrictions6 and itemRestrictions6[ItemRestrictions.Limited]
+		local v125 = itemRestrictions6 and itemRestrictions6[ItemRestrictions.LimitedUnique]
+		local v126 = itemRestrictions6 and itemRestrictions6[ItemRestrictions.Collectible]
+		local v127 = v124 or (v125 or v126)
+		local v128 = v127 and (t15.numberRobloxHasAvailable and t15.numberRobloxHasAvailable > 0) or not v127
+		local v129 = #(if not t16 then {} else t16.experiences or {}) > 0
+
+		v121 = v122 and (v129 and v128)
+	end
+
+	if v121 then
+		return ItemPurchaseActionTypeEnum.ExperienceLink
+	end
+
+	if not t15.isOffSale and (t15.saleLocationType ~= SalesLocationType.ExperiencesDevApiOnly and t15.priceInRobux == 0) then
+		return ItemPurchaseActionTypeEnum.Free
+	end
+
+	if not t15.isOffSale and t15.saleLocationType ~= SalesLocationType.ExperiencesDevApiOnly then
+		return ItemPurchaseActionTypeEnum.PurchaseFromRoblox
+	end
+
+	return ItemPurchaseActionTypeEnum.Disabled
+end
+
+return getItemPurchaseActionType

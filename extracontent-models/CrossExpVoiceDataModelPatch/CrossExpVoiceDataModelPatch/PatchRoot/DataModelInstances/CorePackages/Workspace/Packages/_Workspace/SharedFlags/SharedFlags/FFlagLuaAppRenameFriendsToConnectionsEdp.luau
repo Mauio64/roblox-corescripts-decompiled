@@ -1,1 +1,1 @@
-return not require(script.Parent.FFlagConnectionsToFriendsRename) and game:DefineFastFlag("LuaAppRenameFriendsToConnectionsEdp", false);
+return not require(script.Parent.FFlagConnectionsToFriendsRename) and game:DefineFastFlag("LuaAppRenameFriendsToConnectionsEdp", false)

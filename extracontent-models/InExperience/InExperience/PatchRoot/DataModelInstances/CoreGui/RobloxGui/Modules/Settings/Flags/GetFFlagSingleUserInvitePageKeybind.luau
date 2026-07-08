@@ -1,4 +1,5 @@
-game:DefineFastFlag("SingleUserInvitePageKeybind", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("SingleUserInvitePageKeybind");
-end;
+game:DefineFastFlag("SingleUserInvitePageKeybind", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("SingleUserInvitePageKeybind")
+end

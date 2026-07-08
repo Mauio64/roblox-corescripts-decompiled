@@ -1,2 +1,3 @@
-local _ = require(script.Parent.Events);
-return {};
+require(script.Parent.Events)
+
+return {}

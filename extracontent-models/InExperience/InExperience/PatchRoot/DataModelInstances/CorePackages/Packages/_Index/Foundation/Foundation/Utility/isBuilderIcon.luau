@@ -1,11 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-return require(l_Parent_0.Dash).memoize(function(v1) --[[ Line: 6 ]] --[[ Name: isBuilderIcon ]]
-    local v2 = false;
-    if v1 ~= nil then
-        v2 = false;
-        if v1 ~= "" then
-            v2 = v1:find("[^%l%d%-]") == nil;
-        end;
-    end;
-    return v2;
-end);
+local Parent = script:FindFirstAncestor("Foundation").Parent
+
+local function isBuilderIcon(s1: string?) -- line: 6
+	return s1 ~= nil and (s1 ~= "" and s1:find("[^%l%d%-]") == nil)
+end
+
+return require(Parent.Dash).memoize(isBuilderIcon)

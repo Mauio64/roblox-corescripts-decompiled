@@ -1,20 +1,24 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.Http);
-local v2 = require(l_Parent_0.HttpRequest);
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_Url_0 = v1.Url;
-return function(v5) --[[ Line: 12 ]] --[[ Name: fetchGameMedia ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_Url_0 (copy), v2 (copy)
-    local v6 = l_UrlBuilder_0.new({
-        base = l_Url_0.GAME_URL, 
-        path = "v2/games/{universeId}/media"
-    })({
-        universeId = v5
-    });
-    return v2.config({
-        requestFunction = function(v7, v8, v9) --[[ Line: 21 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v2 (ref)
-            return v2.requestFunctions.HttpRbxApi(v7, v8, v9);
-        end
-    })(v6, "GET");
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local Http = require(Parent.Http)
+local HttpRequest = require(Parent.HttpRequest)
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local Url = Http.Url
+
+local function fetchGameMedia(s1: string) -- line: 12
+	-- upvalues: UrlBuilder (copy), Url (copy), HttpRequest (copy)
+	local v8 = UrlBuilder.new({
+		path = "v2/games/{universeId}/media",
+		base = Url.GAME_URL
+	})({
+		universeId = s1
+	})
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 21
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		end
+	})(v8, "GET")
+end
+
+return fetchGameMedia

@@ -1,4 +1,4 @@
 return {
-    PlayWithPartyInPublicServer = "PlayWithPartyInPublicServer", 
-    PlayWithPartyInPrivatePartyServer = "PlayWithPartyInPrivatePartyServer"
-};
+	PlayWithPartyInPublicServer = "PlayWithPartyInPublicServer",
+	PlayWithPartyInPrivatePartyServer = "PlayWithPartyInPrivatePartyServer"
+}

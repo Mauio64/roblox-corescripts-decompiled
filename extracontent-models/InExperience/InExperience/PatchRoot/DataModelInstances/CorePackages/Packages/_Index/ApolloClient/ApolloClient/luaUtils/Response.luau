@@ -1,2 +1,3 @@
-local _ = require(script.Parent.Parent.Parent.LuauPolyfill);
-return {};
+require(script.Parent.Parent.Parent.LuauPolyfill)
+
+return {}

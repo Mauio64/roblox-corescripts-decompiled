@@ -1,174 +1,201 @@
-local v0 = nil;
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 7 ]]
-    return UserSettings():IsUserFeatureEnabled("UserFlagRemoveMessageFromMessageLog");
-end);
-v0 = l_status_0 and l_result_0;
-l_status_0 = false;
-local v3;
-l_result_0, v3 = pcall(function() --[[ Line: 15 ]]
-    return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2");
-end);
-l_status_0 = l_result_0 and v3;
-l_result_0 = {};
-local l_ClientChatModules_0 = game:GetService("Chat"):WaitForChild("ClientChatModules");
-local l_Parent_0 = script.Parent;
-local l_ChatSettings_0 = require(l_ClientChatModules_0:WaitForChild("ChatSettings"));
-local v7 = nil;
-if l_status_0 then
-    v7 = l_Parent_0:FindFirstChild("ChatTranslationEnabled");
-    if v7 == nil then
-        local v8 = nil;
-        do
-            local l_v8_0 = v8;
-            l_v8_0 = l_Parent_0.ChildAdded:Connect(function(v10) --[[ Line: 35 ]]
-                -- upvalues: v7 (ref), l_v8_0 (ref)
-                if v10.Name == "ChatTranslationEnabled" then
-                    v7 = v10;
-                    l_v8_0:Disconnect();
-                end;
-            end);
-        end;
-    end;
-end;
-local v11 = {};
-v11.__index = v11;
-v11.Destroy = function(v12) --[[ Line: 50 ]] --[[ Name: Destroy ]]
-    v12.Destroyed = true;
-end;
-v11.SetActive = function(v13, v14) --[[ Line: 54 ]] --[[ Name: SetActive ]]
-    if v14 == v13.Active then
-        return;
-    else
-        if v14 == false then
-            v13.MessageLogDisplay:Clear();
-        else
-            v13.MessageLogDisplay:SetCurrentChannelName(v13.Name);
-            for v15 = 1, #v13.MessageLog do
-                v13.MessageLogDisplay:AddMessage(v13.MessageLog[v15]);
-            end;
-        end;
-        v13.Active = v14;
-        return;
-    end;
-end;
-v11.UpdateMessageFiltered = function(v16, v17) --[[ Line: 69 ]] --[[ Name: UpdateMessageFiltered ]]
-    -- upvalues: l_status_0 (ref), v7 (ref), v0 (ref)
-    local v18 = 1;
-    local l_MessageLog_0 = v16.MessageLog;
-    local v20 = nil;
-    while v18 <= #l_MessageLog_0 do
-        local v21 = l_MessageLog_0[v18];
-        if v21.ID == v17.ID then
-            v20 = v21;
-            break;
-        else
-            v18 = v18 + 1;
-        end;
-    end;
-    if v20 then
-        v20.Message = v17.Message;
-        v20.IsFiltered = true;
-        if l_status_0 and v7 ~= nil and v7.Value then
-            v20.TranslatedMessage = v17.TranslatedMessage;
-            v20.ShowTranslated = true;
-        end;
-        if v16.Active then
-            if v0 and v20.Message == "" then
-                table.remove(v16.MessageLog, v18);
-            end;
-            v16.MessageLogDisplay:UpdateMessageFiltered(v20);
-            return;
-        end;
-    else
-        v16:AddMessageToChannelByTimeStamp(v17);
-    end;
-end;
-v11.AddMessageToChannel = function(v22, v23) --[[ Line: 105 ]] --[[ Name: AddMessageToChannel ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    table.insert(v22.MessageLog, v23);
-    if v22.Active then
-        v22.MessageLogDisplay:AddMessage(v23);
-    end;
-    if #v22.MessageLog > l_ChatSettings_0.MessageHistoryLengthPerChannel then
-        v22:RemoveLastMessageFromChannel();
-    end;
-end;
-v11.InternalAddMessageAtTimeStamp = function(v24, v25) --[[ Line: 115 ]] --[[ Name: InternalAddMessageAtTimeStamp ]]
-    for v26 = 1, #v24.MessageLog do
-        if v25.Time < v24.MessageLog[v26].Time then
-            table.insert(v24.MessageLog, v26, v25);
-            return;
-        end;
-    end;
-    table.insert(v24.MessageLog, v25);
-end;
-v11.AddMessagesToChannelByTimeStamp = function(v27, v28, v29) --[[ Line: 125 ]] --[[ Name: AddMessagesToChannelByTimeStamp ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    for v30 = v29, #v28 do
-        v27:InternalAddMessageAtTimeStamp(v28[v30]);
-    end;
-    while #v27.MessageLog > l_ChatSettings_0.MessageHistoryLengthPerChannel do
-        table.remove(v27.MessageLog, 1);
-    end;
-    if v27.Active then
-        v27.MessageLogDisplay:Clear();
-        for v31 = 1, #v27.MessageLog do
-            v27.MessageLogDisplay:AddMessage(v27.MessageLog[v31]);
-        end;
-    end;
-end;
-v11.AddMessageToChannelByTimeStamp = function(v32, v33) --[[ Line: 140 ]] --[[ Name: AddMessageToChannelByTimeStamp ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    if #v32.MessageLog >= 1 then
-        if v32.MessageLog[1].Time > v33.Time then
-            return;
-        elseif v33.Time >= v32.MessageLog[#v32.MessageLog].Time then
-            v32:AddMessageToChannel(v33);
-            return;
-        else
-            for v34 = 1, #v32.MessageLog do
-                if v33.Time < v32.MessageLog[v34].Time then
-                    table.insert(v32.MessageLog, v34, v33);
-                    if #v32.MessageLog > l_ChatSettings_0.MessageHistoryLengthPerChannel then
-                        v32:RemoveLastMessageFromChannel();
-                    end;
-                    if v32.Active then
-                        v32.MessageLogDisplay:AddMessageAtIndex(v33, v34);
-                    end;
-                    return;
-                end;
-            end;
-            return;
-        end;
-    else
-        v32:AddMessageToChannel(v33);
-        return;
-    end;
-end;
-v11.RemoveLastMessageFromChannel = function(v35) --[[ Line: 170 ]] --[[ Name: RemoveLastMessageFromChannel ]]
-    table.remove(v35.MessageLog, 1);
-    if v35.Active then
-        v35.MessageLogDisplay:RemoveLastMessage();
-    end;
-end;
-v11.ClearMessageLog = function(v36) --[[ Line: 178 ]] --[[ Name: ClearMessageLog ]]
-    v36.MessageLog = {};
-    if v36.Active then
-        v36.MessageLogDisplay:Clear();
-    end;
-end;
-v11.RegisterChannelTab = function(v37, v38) --[[ Line: 186 ]] --[[ Name: RegisterChannelTab ]]
-    v37.ChannelTab = v38;
-end;
-l_result_0.new = function(v39, v40) --[[ Line: 193 ]] --[[ Name: new ]]
-    -- upvalues: v11 (copy)
-    local v41 = setmetatable({}, v11);
-    v41.Destroyed = false;
-    v41.Active = false;
-    v41.MessageLog = {};
-    v41.MessageLogDisplay = v40;
-    v41.ChannelTab = nil;
-    v41.Name = v39;
-    return v41;
-end;
-return l_result_0;
+local ok, result = pcall(function() -- line: 7
+	return UserSettings():IsUserFeatureEnabled("UserFlagRemoveMessageFromMessageLog")
+end)
+local u3 = ok and result
+local ok2, result2 = pcall(function() -- line: 15
+	return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2")
+end)
+local u6 = ok2 and result2
+local t1 = {}
+local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
+local scriptParent = script.Parent
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+local ChatTranslationEnabled = nil
+
+if u6 then
+	ChatTranslationEnabled = scriptParent:FindFirstChild("ChatTranslationEnabled")
+
+	if ChatTranslationEnabled == nil then
+		local connection = nil
+
+		connection = scriptParent.ChildAdded:Connect(function(child) -- line: 35
+			-- upvalues: ChatTranslationEnabled (ref), connection (ref)
+			if child.Name == "ChatTranslationEnabled" then
+				ChatTranslationEnabled = child
+				connection:Disconnect()
+			end
+		end)
+	end
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.Destroy(p1) -- line: 50
+	p1.Destroyed = true
+end
+function t2.SetActive(p2, p3) -- line: 54
+	if p3 == p2.Active then
+		return
+	end
+
+	if p3 == false then
+		p2.MessageLogDisplay:Clear()
+	else
+		p2.MessageLogDisplay:SetCurrentChannelName(p2.Name)
+
+		for i = 1, #p2.MessageLog do
+			p2.MessageLogDisplay:AddMessage(p2.MessageLog[i])
+		end
+	end
+
+	p2.Active = p3
+end
+function t2.UpdateMessageFiltered(p4, p5) -- line: 69
+	-- upvalues: u6 (ref), ChatTranslationEnabled (ref), u3 (ref)
+	local n1 = 1
+	local MessageLog = p4.MessageLog
+	local v23 = nil
+
+	while n1 <= #MessageLog do
+		local v24 = MessageLog[n1]
+
+		if v24.ID == p5.ID then
+			v23 = v24
+
+			break
+		end
+
+		n1 += 1
+	end
+
+	if v23 then
+		v23.Message = p5.Message
+		v23.IsFiltered = true
+
+		if u6 and ChatTranslationEnabled ~= nil and ChatTranslationEnabled.Value then
+			v23.TranslatedMessage = p5.TranslatedMessage
+			v23.ShowTranslated = true
+		end
+
+		if p4.Active then
+			if u3 and v23.Message == "" then
+				table.remove(p4.MessageLog, n1)
+			end
+
+			p4.MessageLogDisplay:UpdateMessageFiltered(v23)
+
+			return
+		end
+	else
+		p4:AddMessageToChannelByTimeStamp(p5)
+	end
+end
+function t2.AddMessageToChannel(p6, p7) -- line: 105
+	-- upvalues: ChatSettings (copy)
+	table.insert(p6.MessageLog, p7)
+
+	if p6.Active then
+		p6.MessageLogDisplay:AddMessage(p7)
+	end
+
+	if #p6.MessageLog > ChatSettings.MessageHistoryLengthPerChannel then
+		p6:RemoveLastMessageFromChannel()
+	end
+end
+function t2.InternalAddMessageAtTimeStamp(p8, p9) -- line: 115
+	for i = 1, #p8.MessageLog do
+		if p9.Time < p8.MessageLog[i].Time then
+			table.insert(p8.MessageLog, i, p9)
+
+			return
+		end
+	end
+
+	table.insert(p8.MessageLog, p9)
+end
+function t2.AddMessagesToChannelByTimeStamp(p10, p11, p12) -- line: 125
+	-- upvalues: ChatSettings (copy)
+	for i = p12, #p11 do
+		p10:InternalAddMessageAtTimeStamp(p11[i])
+	end
+
+	while #p10.MessageLog > ChatSettings.MessageHistoryLengthPerChannel do
+		table.remove(p10.MessageLog, 1)
+	end
+
+	if p10.Active then
+		p10.MessageLogDisplay:Clear()
+
+		for i = 1, #p10.MessageLog do
+			p10.MessageLogDisplay:AddMessage(p10.MessageLog[i])
+		end
+	end
+end
+function t2.AddMessageToChannelByTimeStamp(p13, p14) -- line: 140
+	-- upvalues: ChatSettings (copy)
+	if #p13.MessageLog >= 1 then
+		if p13.MessageLog[1].Time > p14.Time then
+			return
+		end
+
+		if p14.Time >= p13.MessageLog[#p13.MessageLog].Time then
+			p13:AddMessageToChannel(p14)
+
+			return
+		end
+
+		for i = 1, #p13.MessageLog do
+			if p14.Time < p13.MessageLog[i].Time then
+				table.insert(p13.MessageLog, i, p14)
+
+				if #p13.MessageLog > ChatSettings.MessageHistoryLengthPerChannel then
+					p13:RemoveLastMessageFromChannel()
+				end
+
+				if p13.Active then
+					p13.MessageLogDisplay:AddMessageAtIndex(p14, i)
+				end
+
+				return
+			end
+		end
+
+		return
+	end
+
+	p13:AddMessageToChannel(p14)
+end
+function t2.RemoveLastMessageFromChannel(p15) -- line: 170
+	table.remove(p15.MessageLog, 1)
+
+	if p15.Active then
+		p15.MessageLogDisplay:RemoveLastMessage()
+	end
+end
+function t2.ClearMessageLog(p16) -- line: 178
+	p16.MessageLog = {}
+
+	if p16.Active then
+		p16.MessageLogDisplay:Clear()
+	end
+end
+function t2.RegisterChannelTab(p17, p18) -- line: 186
+	p17.ChannelTab = p18
+end
+function t1.new(p19, p20) -- line: 193
+	-- upvalues: t2 (copy)
+	local self = setmetatable({}, t2)
+
+	self.Destroyed = false
+	self.Active = false
+	self.MessageLog = {}
+	self.MessageLogDisplay = p20
+	self.ChannelTab = nil
+	self.Name = p19
+
+	return self
+end
+
+return t1

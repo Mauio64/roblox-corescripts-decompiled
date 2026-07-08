@@ -1,6 +1,7 @@
-local v0 = require(script.UserSignalTypes);
+local UserSignalTypes = require(script.UserSignalTypes)
+
 return {
-    PostSendUserSignal = require(script.PostSendUserSignal), 
-    UserSignalTypes = v0, 
-    ["jest.config"] = script["jest.config"]
-};
+	PostSendUserSignal = require(script.PostSendUserSignal),
+	UserSignalTypes = UserSignalTypes,
+	["jest.config"] = script["jest.config"]
+}

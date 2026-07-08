@@ -1,5 +1,3 @@
-local scriptParent = script.Parent
-local FFlagLuaAppEnableHomepageTwoByOneTile = require(scriptParent.SharedFlags).FFlagLuaAppEnableHomepageTwoByOneTile
 local OpenCentralOverlayForPlacesList = require(script.OpenCentralOverlayForPlacesList)
 local GameTileConstants = require(script.GameTileConstants)
 local GameTileTypes = require(script.GameTileTypes)
@@ -65,8 +63,9 @@ return {
 	getGameTileHiddenStore = require(script.HiddenGameTile.getGameTileHiddenStore),
 	HiddenTileContent = require(script.HiddenGameTile.HiddenTileContent),
 	EmphasisGameTile = require(script.EmphasisGameTile),
-	TwoByOneGameTile = if not FFlagLuaAppEnableHomepageTwoByOneTile then nil else require(script.TwoByOneGameTile),
-	TwoByOneGameTileTelemetry = if not FFlagLuaAppEnableHomepageTwoByOneTile then nil else TwoByOneGameTileTelemetry,
+	TwoByOneGameTile = require(script.TwoByOneGameTile),
+	TwoByOneGameTileTelemetry = TwoByOneGameTileTelemetry,
+	OneByTwoTile = require(script.OneByTwoTile),
 	getTileBadgeByPositionConfigFromEntry = getTileBadgeByPositionConfigFromEntry,
 	ItemLayoutDataParsingUtils = ItemLayoutDataParsingUtils,
 	ZoomAnimatedFrame = require(script.ZoomAnimatedFrame),

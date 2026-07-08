@@ -1,3 +1,3 @@
 return {
-    GetScheduledSquadsStore = require(script.GetScheduledSquadsStore)
-};
+	GetScheduledSquadsStore = require(script.GetScheduledSquadsStore)
+}

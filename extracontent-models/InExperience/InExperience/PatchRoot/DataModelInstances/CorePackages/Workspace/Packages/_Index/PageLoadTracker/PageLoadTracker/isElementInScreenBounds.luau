@@ -1,24 +1,28 @@
-local v0 = require(script.Parent.PageLoadConfig);
-isElementInScreenBounds = function(v1, v2, v3) --[[ Line: 3 ]] --[[ Name: isElementInScreenBounds ]]
-    -- upvalues: v0 (copy)
-    local l_AbsolutePosition_0 = v1.AbsolutePosition;
-    local l_AbsoluteSize_0 = v1.AbsoluteSize;
-    if l_AbsoluteSize_0.X <= 0 or l_AbsoluteSize_0.Y <= 0 then
-        return false;
-    else
-        local l_X_0 = l_AbsolutePosition_0.X;
-        local v7 = l_AbsolutePosition_0.X + l_AbsoluteSize_0.X;
-        local l_X_1 = v2.X;
-        local v9 = math.max(l_X_0, 0);
-        local v10 = math.max(0, math.min(v7, l_X_1) - v9);
-        local l_Y_0 = l_AbsolutePosition_0.Y;
-        local v12 = l_AbsolutePosition_0.Y + l_AbsoluteSize_0.Y;
-        local l_Y_1 = v2.Y;
-        local v14 = math.max(l_Y_0, v3);
-        local v15 = math.max(0, math.min(v12, l_Y_1) - v14);
-        local v16 = l_AbsoluteSize_0.X * v0.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO <= v10;
-        local v17 = l_AbsoluteSize_0.Y * v0.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO <= v15;
-        return v16 and v17;
-    end;
-end;
-return isElementInScreenBounds;
+local PageLoadConfig = require(script.Parent.PageLoadConfig)
+
+function isElementInScreenBounds(p1, vector2: Vector2, n1: number) -- line: 3
+	-- upvalues: PageLoadConfig (copy)
+	local AbsolutePosition = p1.AbsolutePosition
+	local AbsoluteSize = p1.AbsoluteSize
+
+	if AbsoluteSize.X <= 0 or AbsoluteSize.Y <= 0 then
+		return false
+	end
+
+	local AbsolutePositionX = AbsolutePosition.X
+	local v8 = AbsolutePosition.X + AbsoluteSize.X
+	local vector2X = vector2.X
+	local v10 = math.max(AbsolutePositionX, 0)
+	local v11 = math.max(0, math.min(v8, vector2X) - v10)
+	local AbsolutePositionY = AbsolutePosition.Y
+	local v13 = AbsolutePosition.Y + AbsoluteSize.Y
+	local vector2Y = vector2.Y
+	local v15 = math.max(AbsolutePositionY, n1)
+	local v16 = math.max(0, math.min(v13, vector2Y) - v15)
+	local v17 = v11 >= AbsoluteSize.X * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO
+	local v18 = v16 >= AbsoluteSize.Y * PageLoadConfig.SCREEN_BOUNDS.MIN_VISIBILITY_RATIO
+
+	return v17 and v18
+end
+
+return isElementInScreenBounds

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXNegativeAvatarSequenceFeatures", false);
+return game:DefineFastFlag("AXNegativeAvatarSequenceFeatures", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSquadTopBannerWideMode", false);
+return game:DefineFastFlag("EnableSquadTopBannerWideMode", false)

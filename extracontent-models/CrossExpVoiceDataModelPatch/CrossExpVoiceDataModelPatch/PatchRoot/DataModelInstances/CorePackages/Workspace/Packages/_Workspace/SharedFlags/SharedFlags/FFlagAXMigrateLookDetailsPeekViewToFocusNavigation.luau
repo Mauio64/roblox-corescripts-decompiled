@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateLookDetailsPeekViewToFocusNavigation", false);
+return game:DefineFastFlag("AXMigrateLookDetailsPeekViewToFocusNavigation", false)

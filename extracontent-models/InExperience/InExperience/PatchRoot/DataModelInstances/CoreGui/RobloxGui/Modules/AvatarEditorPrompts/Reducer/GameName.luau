@@ -1,13 +1,16 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v6 = require(l_Actions_0.GameNameFetched);
-local v7 = v4:FormatByKey("CoreScripts.AvatarEditorPrompts.GameNamePlaceHolder");
-return v2.createReducer(v7, {
-    [v6.name] = function(_, v9) --[[ Line: 16 ]]
-        return v9.gameName;
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Rodux = require(CorePackages.Packages.Rodux)
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local Actions = script.Parent.Parent.Actions
+local GameNameFetched = require(Actions.GameNameFetched)
+local v7 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.GameNamePlaceHolder")
+
+return Rodux.createReducer(v7, {
+	[GameNameFetched.name] = function(_, p2) -- line: 16
+		return p2.gameName
+	end
+})

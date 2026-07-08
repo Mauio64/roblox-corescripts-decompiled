@@ -1,125 +1,133 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericChallenges");
-local _ = require(l_script_FirstAncestor_0.Types.ChallengeParameters);
-local v2 = require(script.Parent.BuildHybridCallback);
-local v3 = require(l_script_FirstAncestor_0.Utils.getLocalizedTitle);
-local v4 = require(script.Parent.ChallengeWebView);
-local v5 = require(script.Parent.ChallengeError);
-local v6 = require(script.Parent.InitializeHybridCallback);
-local v7 = require(l_script_FirstAncestor_0.Utils.constants);
-local v8 = require(script.Parent.Hooks.BuildCredentialsProtocolHook);
-local v9 = require(l_script_FirstAncestor_0.Types.ErrorKind);
-local v10 = require(l_script_FirstAncestor_0.Utils.completionDataToRawHeaders);
-local v11 = game:DefineFastFlag("EnableRejectPromiseOnWebviewClosed", false);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-return function(v14) --[[ Line: 41 ]]
-    -- upvalues: v4 (copy), v3 (copy), v11 (copy), v7 (copy), v2 (copy), v8 (copy), v5 (copy), v9 (copy), v10 (copy), v6 (copy)
-    if v14.rawResponseHeaders ~= nil then
-        assert(v14.retryRequestCallback ~= nil, "Retry request callback must be defined for generic handling");
-        assert(v14.resolve ~= nil, "Promise resolution method must be provided for generic handling");
-        assert(v14.reject ~= nil, "Promise rejection method must be provided for generic handling");
-        local v15 = v4.new({
-            title = v3(v14.title), 
-            rawResponseHeaders = v14.rawResponseHeaders, 
-            modal = v14.renderWebViewInModal
-        });
-        if v11 then
-            local v16 = v14.rawResponseHeaders[v7.challengeTypeHeader];
-            local v17 = v14.rawResponseHeaders[v7.challengeIdHeader];
-            local v18 = false;
-            do
-                local l_v18_0 = v18;
-                v15:setHybridCallback(v2({
-                    Hooks = {
-                        v8()
-                    }, 
-                    OnChallengeLoadFailed = function(_) --[[ Line: 61 ]] --[[ Name: OnChallengeLoadFailed ]]
-                        -- upvalues: v14 (copy), v5 (ref), v9 (ref), v16 (copy), v15 (copy)
-                        if v14.challengeErrorCallback ~= nil then
-                            v14.challengeErrorCallback();
-                        end;
-                        v14.reject(v5.new(v9.LoadFailed, {
-                            challengeType = v16
-                        }));
-                        v15:close();
-                    end, 
-                    OnChallengeInvalidated = function(v21) --[[ Line: 70 ]] --[[ Name: OnChallengeInvalidated ]]
-                        -- upvalues: v14 (copy), v5 (ref), v9 (ref), v15 (copy)
-                        if v14.challengeErrorCallback ~= nil and v21.data ~= nil then
-                            v14.challengeErrorCallback(v21.data);
-                        end;
-                        v14.reject(v5.new(v9.Invalidated, v21.data));
-                        v15:close();
-                    end, 
-                    OnChallengeCompleted = function(v22) --[[ Line: 77 ]] --[[ Name: OnChallengeCompleted ]]
-                        -- upvalues: v14 (copy), v10 (ref), v17 (copy), l_v18_0 (ref), v15 (copy)
-                        if v22.data ~= nil and v22.data.challengeType ~= nil and v22.data.metadata ~= nil then
-                            v14.resolve(v14.retryRequestCallback(v10({
-                                challengeId = v17, 
-                                challengeType = v22.data.challengeType, 
-                                metadata = v22.data.metadata
-                            })));
-                        end;
-                        l_v18_0 = true;
-                        v15:close();
-                    end
-                }));
-                v15:setCloseCallback(function() --[[ Line: 91 ]]
-                    -- upvalues: l_v18_0 (ref), v14 (copy), v5 (ref), v9 (ref), v16 (copy)
-                    if not l_v18_0 then
-                        v14.reject(v5.new(v9.Invalidated, {
-                            challengeType = v16
-                        }));
-                    end;
-                end);
-            end;
-        else
-            v15:setHybridCallback(v6(v14.rawResponseHeaders[v7.challengeIdHeader], v14.rawResponseHeaders[v7.challengeTypeHeader], v15, v14.retryRequestCallback, v14.challengeErrorCallback, v14.resolve, v14.reject));
-        end;
-        v15:open();
-        return;
-    else
-        assert(v14.callbacks ~= nil, "Callbacks must be specified in manual challenge mode");
-        assert(v14.challengeParameters ~= nil, "Challenge parameters must be specified in manual challenge mode");
-        assert(v14.challengeType ~= nil, "Challenge type must be specified in manual challenge mode");
-        local v23 = v4.new({
-            title = v3(v14.title), 
-            challengeType = v14.challengeType, 
-            challengeParameters = v14.challengeParameters, 
-            modal = v14.renderWebViewInModal
-        });
-        local v24 = false;
-        v23:setHybridCallback(v2({
-            Hooks = {
-                v8()
-            }, 
-            OnChallengeLoadFailed = function(v25) --[[ Line: 128 ]] --[[ Name: OnChallengeLoadFailed ]]
-                -- upvalues: v14 (copy), v23 (copy)
-                v14.callbacks.OnChallengeLoadFailed(v25);
-                v23:close();
-            end, 
-            OnChallengeInvalidated = function(v26) --[[ Line: 132 ]] --[[ Name: OnChallengeInvalidated ]]
-                -- upvalues: v14 (copy), v23 (copy)
-                v14.callbacks.OnChallengeInvalidated(v26);
-                v23:close();
-            end, 
-            OnChallengeCompleted = function(v27) --[[ Line: 136 ]] --[[ Name: OnChallengeCompleted ]]
-                -- upvalues: v24 (ref), v14 (copy), v23 (copy)
-                v24 = true;
-                v14.callbacks.OnChallengeCompleted(v27);
-                v23:close();
-            end
-        }));
-        v23:setCloseCallback(function() --[[ Line: 142 ]]
-            -- upvalues: v24 (ref), v14 (copy)
-            if not v24 and v14.callbacks.OnChallengeAbandoned ~= nil then
-                v14.callbacks.OnChallengeAbandoned();
-            end;
-        end);
-        if v14.onWebViewOpen ~= nil then
-            v23:setOpenCallback(v14.onWebViewOpen);
-        end;
-        v23:open();
-        return;
-    end;
-end;
+local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
+
+require(GenericChallenges.Types.ChallengeParameters)
+
+local BuildHybridCallback = require(script.Parent.BuildHybridCallback)
+local getLocalizedTitle = require(GenericChallenges.Utils.getLocalizedTitle)
+local ChallengeWebView = require(script.Parent.ChallengeWebView)
+local ChallengeError = require(script.Parent.ChallengeError)
+local InitializeHybridCallback = require(script.Parent.InitializeHybridCallback)
+local constants = require(GenericChallenges.Utils.constants)
+local BuildCredentialsProtocolHook = require(script.Parent.Hooks.BuildCredentialsProtocolHook)
+local ErrorKind = require(GenericChallenges.Types.ErrorKind)
+local completionDataToRawHeaders = require(GenericChallenges.Utils.completionDataToRawHeaders)
+local v11 = game:DefineFastFlag("EnableRejectPromiseOnWebviewClosed", false)
+local GenericChallengesParent = GenericChallenges.Parent
+
+require(GenericChallengesParent.LuauPolyfill)
+
+return function(t1: {[any]: any}) -- line: 41
+	-- upvalues: ChallengeWebView (copy), getLocalizedTitle (copy), v11 (copy), constants (copy), BuildHybridCallback (copy), BuildCredentialsProtocolHook (copy), ChallengeError (copy), ErrorKind (copy), completionDataToRawHeaders (copy), InitializeHybridCallback (copy)
+	if t1.rawResponseHeaders ~= nil then
+		assert(t1.retryRequestCallback ~= nil, "Retry request callback must be defined for generic handling")
+		assert(t1.resolve ~= nil, "Promise resolution method must be provided for generic handling")
+		assert(t1.reject ~= nil, "Promise rejection method must be provided for generic handling")
+
+		local v14 = ChallengeWebView.new({
+			title = getLocalizedTitle(t1.title),
+			rawResponseHeaders = t1.rawResponseHeaders,
+			modal = t1.renderWebViewInModal
+		})
+
+		if v11 then
+			local v15 = t1.rawResponseHeaders[constants.challengeTypeHeader]
+			local v16 = t1.rawResponseHeaders[constants.challengeIdHeader]
+			local u17 = false
+
+			v14:setHybridCallback(BuildHybridCallback({
+				Hooks = { BuildCredentialsProtocolHook() },
+				OnChallengeLoadFailed = function(_: {[any]: any}) -- line: 61
+					-- upvalues: t1 (copy), ChallengeError (copy), ErrorKind (copy), v15 (copy), v14 (copy)
+					if t1.challengeErrorCallback ~= nil then
+						t1.challengeErrorCallback()
+					end
+
+					t1.reject(ChallengeError.new(ErrorKind.LoadFailed, {
+						challengeType = v15
+					}))
+					v14:close()
+				end,
+				OnChallengeInvalidated = function(t3: {[any]: any}) -- line: 70
+					-- upvalues: t1 (copy), ChallengeError (copy), ErrorKind (copy), v14 (copy)
+					if t1.challengeErrorCallback ~= nil and t3.data ~= nil then
+						t1.challengeErrorCallback(t3.data)
+					end
+
+					t1.reject(ChallengeError.new(ErrorKind.Invalidated, t3.data))
+					v14:close()
+				end,
+				OnChallengeCompleted = function(t4: {[any]: any}) -- line: 77
+					-- upvalues: t1 (copy), completionDataToRawHeaders (copy), v16 (copy), u17 (ref), v14 (copy)
+					if t4.data ~= nil and (t4.data.challengeType ~= nil and t4.data.metadata ~= nil) then
+						t1.resolve(t1.retryRequestCallback(completionDataToRawHeaders({
+							challengeId = v16,
+							challengeType = t4.data.challengeType,
+							metadata = t4.data.metadata
+						})))
+					end
+
+					u17 = true
+					v14:close()
+				end
+			}))
+			v14:setCloseCallback(function() -- line: 91
+				-- upvalues: u17 (ref), t1 (copy), ChallengeError (copy), ErrorKind (copy), v15 (copy)
+				if not u17 then
+					t1.reject(ChallengeError.new(ErrorKind.Invalidated, {
+						challengeType = v15
+					}))
+				end
+			end)
+		else
+			v14:setHybridCallback(InitializeHybridCallback(t1.rawResponseHeaders[constants.challengeIdHeader], t1.rawResponseHeaders[constants.challengeTypeHeader], v14, t1.retryRequestCallback, t1.challengeErrorCallback, t1.resolve, t1.reject))
+		end
+
+		v14:open()
+
+		return
+	end
+
+	assert(t1.callbacks ~= nil, "Callbacks must be specified in manual challenge mode")
+	assert(t1.challengeParameters ~= nil, "Challenge parameters must be specified in manual challenge mode")
+	assert(t1.challengeType ~= nil, "Challenge type must be specified in manual challenge mode")
+
+	local v18 = ChallengeWebView.new({
+		title = getLocalizedTitle(t1.title),
+		challengeType = t1.challengeType,
+		challengeParameters = t1.challengeParameters,
+		modal = t1.renderWebViewInModal
+	})
+	local u19 = false
+
+	v18:setHybridCallback(BuildHybridCallback({
+		Hooks = { BuildCredentialsProtocolHook() },
+		OnChallengeLoadFailed = function(t5: {[any]: any}) -- line: 128
+			-- upvalues: t1 (copy), v18 (copy)
+			t1.callbacks.OnChallengeLoadFailed(t5)
+			v18:close()
+		end,
+		OnChallengeInvalidated = function(t6: {[any]: any}) -- line: 132
+			-- upvalues: t1 (copy), v18 (copy)
+			t1.callbacks.OnChallengeInvalidated(t6)
+			v18:close()
+		end,
+		OnChallengeCompleted = function(t7: {[any]: any}) -- line: 136
+			-- upvalues: u19 (ref), t1 (copy), v18 (copy)
+			u19 = true
+			t1.callbacks.OnChallengeCompleted(t7)
+			v18:close()
+		end
+	}))
+	v18:setCloseCallback(function() -- line: 142
+		-- upvalues: u19 (ref), t1 (copy)
+		if not u19 and t1.callbacks.OnChallengeAbandoned ~= nil then
+			t1.callbacks.OnChallengeAbandoned()
+		end
+	end)
+
+	if t1.onWebViewOpen ~= nil then
+		v18:setOpenCallback(t1.onWebViewOpen)
+	end
+
+	v18:open()
+end

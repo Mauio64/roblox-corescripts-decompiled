@@ -1,46 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.AnimationConstants);
-return function(v4) --[[ Line: 15 ]] --[[ Name: useSubcategoryPillAnimation ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v5, v6 = v2.useState({});
-    local v7 = v2.useRef(nil);
-    local v8, v9 = v2.useState(false);
-    v2.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: v7 (copy)
-        return function() --[[ Line: 23 ]]
-            -- upvalues: v7 (ref)
-            if v7.current then
-                task.cancel(v7.current);
-            end;
-        end;
-    end, {});
-    v2.useEffect(function() --[[ Line: 31 ]]
-        -- upvalues: v4 (copy), v7 (copy), v6 (copy), v9 (copy), v3 (ref)
-        local v10 = if v4 and v4.Subcategories then v4.Subcategories else {};
-        if v7.current then
-            task.cancel(v7.current);
-        end;
-        if next(v10) then
-            v6(v10);
-            v9(false);
-        else
-            v9(true);
-        end;
-        v7.current = task.delay(v3.FIntAXSubcategoryPillFadeAnimationDurationMs / 1000, function() --[[ Line: 54 ]]
-            -- upvalues: v10 (copy), v6 (ref), v9 (ref), v7 (ref)
-            if not next(v10) then
-                v6({});
-            end;
-            v9(false);
-            v7.current = nil;
-        end);
-    end, {
-        v4
-    });
-    return {
-        subcategoriesState = v5, 
-        isFadingOut = v8
-    };
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local React = require(AvatarExperienceCommonParent.React)
+local AnimationConstants = require(AvatarExperienceCommon.AnimationConstants)
+
+local function useSubcategoryPillAnimation(p1) -- line: 15
+	-- upvalues: React (copy), AnimationConstants (copy)
+	local v7, v8 = React.useState({})
+	local v9 = React.useRef(nil)
+	local v10, v11 = React.useState(false)
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: v9 (copy)
+		return function() -- line: 23
+			-- upvalues: v9 (copy)
+			if v9.current then
+				task.cancel(v9.current)
+			end
+		end
+	end, {})
+	React.useEffect(function() -- line: 31
+		-- upvalues: p1 (copy), v9 (copy), v8 (copy), v11 (copy), AnimationConstants (copy)
+		local v12 = if not p1 or not p1.Subcategories then {} else p1.Subcategories
+
+		if v9.current then
+			task.cancel(v9.current)
+		end
+
+		if next(v12) then
+			v8(v12)
+			v11(false)
+		else
+			v11(true)
+		end
+
+		v9.current = task.delay(AnimationConstants.FIntAXSubcategoryPillFadeAnimationDurationMs / 1000, function() -- line: 54
+			-- upvalues: v12 (copy), v8 (copy), v11 (copy), v9 (copy)
+			if not next(v12) then
+				v8({})
+			end
+
+			v11(false)
+			v9.current = nil
+		end)
+	end, { p1 })
+
+	return {
+		subcategoriesState = v7,
+		isFadingOut = v10
+	}
+end
+
+return useSubcategoryPillAnimation

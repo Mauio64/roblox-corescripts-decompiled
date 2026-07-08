@@ -1,12 +1,13 @@
-local v0 = require(script.Utilities.createSignalMap);
+local createSignalMap = require(script.Utilities.createSignalMap)
+
 return {
-    CoreScriptsRootProvider = require(script.CoreScriptsRootProvider), 
-    Scrim = require(script.Scrim), 
-    Traversal = require(script.Traversal), 
-    ["jest.config"] = script["jest.config"], 
-    useScreenSize = require(script.useScreenSize), 
-    Utilities = {
-        createSignalMap = v0, 
-        sortTableByValue = require(script.Utilities.sortTableByValue)
-    }
-};
+	CoreScriptsRootProvider = require(script.CoreScriptsRootProvider),
+	Scrim = require(script.Scrim),
+	Traversal = require(script.Traversal),
+	["jest.config"] = script["jest.config"],
+	useScreenSize = require(script.useScreenSize),
+	Utilities = {
+		createSignalMap = createSignalMap,
+		sortTableByValue = require(script.Utilities.sortTableByValue)
+	}
+}

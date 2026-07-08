@@ -1,91 +1,105 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(script.Parent.EditSocialLinksModal);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_Parent_0.LuaSocialLibrariesDeps);
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_getDeepValue_0 = v5.SocialLibraries.config({}).Dictionary.getDeepValue;
-local v9 = require(l_script_FirstAncestor_0.Networking.SocialLinksNetworking);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_FFlagProfileEnableSocialNetworksUsernames_0 = require(l_Parent_0.SharedFlags).FFlagProfileEnableSocialNetworksUsernames;
-return function() --[[ Line: 21 ]] --[[ Name: EditSocialLinksModalContainer ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useLocalUserId_0 (copy), l_useNavigation_0 (copy), l_useSelector_0 (copy), l_getDeepValue_0 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v9 (copy), l_FFlagProfileEnableSocialNetworksUsernames_0 (copy), l_HttpService_0 (copy), v4 (copy), v2 (copy)
-    local v15 = l_useDispatch_0();
-    local v16 = l_useLocalUserId_0();
-    local v17 = l_useNavigation_0();
-    local v19 = l_useSelector_0(function(v18) --[[ Line: 26 ]]
-        -- upvalues: l_getDeepValue_0 (ref)
-        return l_getDeepValue_0(v18, "Profile.SocialLinks.selfSocialLinks");
-    end);
-    local function v20() --[[ Line: 30 ]] --[[ Name: cancelOnActivated ]]
-        -- upvalues: v17 (copy)
-        v17.goBack();
-    end;
-    local function v22(v21) --[[ Line: 34 ]] --[[ Name: openEditSocialNetworksErrorModal ]]
-        -- upvalues: v15 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref)
-        v15(l_NavigateDown_0({
-            name = l_AppPage_0.EditSocialNetworksError, 
-            extraProps = {
-                errorCode = v21
-            }
-        }));
-    end;
-    local function v37(v23, v24, v25, v26, v27, v28) --[[ Line: 43 ]] --[[ Name: saveSocialLinks ]]
-        -- upvalues: v15 (copy), v9 (ref), v16 (copy), l_FFlagProfileEnableSocialNetworksUsernames_0 (ref), v17 (copy), l_HttpService_0 (ref), v22 (copy)
-        return v15(v9.SetSocialLinks.API({
-            promotionChannelsVisibilityPrivacy = v23, 
-            facebook = v24, 
-            twitter = v25, 
-            youtube = v26, 
-            twitch = v27, 
-            guilded = v28
-        })):andThen(function(_) --[[ Line: 59 ]]
-            -- upvalues: v15 (ref), v9 (ref), v16 (ref), l_FFlagProfileEnableSocialNetworksUsernames_0 (ref), v17 (ref)
-            v15(v9.GetSelfSocialLinks.API({
-                alwaysReturnUrls = false, 
-                filterLink = false
-            })):catch(function(_) --[[ Line: 61 ]]
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local HttpService = game:GetService("HttpService")
+local EditSocialLinksModal = require(script.Parent.EditSocialLinksModal)
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local LuaSocialLibrariesDeps = require(EditProfileParent.LuaSocialLibrariesDeps)
+local NavigateDown = require(EditProfileParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(EditProfileParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(EditProfileParent.RobloxAppNavigation).NavigationCommands
+local AppPage = require(EditProfileParent.RobloxAppEnums).AppPage
+local getDeepValue = LuaSocialLibrariesDeps.SocialLibraries.config({}).Dictionary.getDeepValue
+local SocialLinksNetworking = require(EditProfile.Networking.SocialLinksNetworking)
+local useDispatch = require(EditProfileParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local useNavigation = require(EditProfileParent.Navigation).useNavigation
+local useSelector = require(EditProfileParent.RoactUtils).Hooks.RoactRodux.useSelector
+local FFlagProfileEnableSocialNetworksUsernames = require(EditProfileParent.SharedFlags).FFlagProfileEnableSocialNetworksUsernames
 
-            end);
-            v15(v9.GetSocialLinks.API({
-                userId = v16, 
-                alwaysReturnUrls = true, 
-                filterLink = true
-            })):andThen(function(_) --[[ Line: 68 ]]
-                -- upvalues: l_FFlagProfileEnableSocialNetworksUsernames_0 (ref), v15 (ref), v9 (ref), v16 (ref)
-                if l_FFlagProfileEnableSocialNetworksUsernames_0 then
-                    v15(v9.GetSocialLinks.API({
-                        userId = v16, 
-                        alwaysReturnUrls = false, 
-                        filterLink = true
-                    }));
-                end;
-            end):catch(function(_) --[[ Line: 77 ]]
+local function EditSocialLinksModalContainer() -- line: 25
+	-- upvalues: useDispatch (copy), useLocalUserId (copy), useNavigation (copy), useSelector (copy), getDeepValue (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy), SocialLinksNetworking (copy), FFlagProfileEnableSocialNetworksUsernames (copy), HttpService (copy), React (copy), EditSocialLinksModal (copy)
+	local v19 = useDispatch()
+	local v20 = useLocalUserId()
+	local v21 = useNavigation()
+	local v22 = useSelector(function(p1) -- line: 30
+		-- upvalues: getDeepValue (copy)
+		return getDeepValue(p1, "Profile.SocialLinks.selfSocialLinks")
+	end)
 
-            end);
-            v17.goBack();
-        end):catch(function(v33) --[[ Line: 80 ]]
-            -- upvalues: l_HttpService_0 (ref), v22 (ref)
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 81 ]]
-                -- upvalues: l_HttpService_0 (ref), v33 (copy)
-                return l_HttpService_0:JSONDecode(v33.Body);
-            end);
-            local v36 = -1;
-            if l_status_0 then
-                v36 = l_result_0 and l_result_0.errors and l_result_0.errors[1] and l_result_0.errors[1].code or -1;
-            end;
-            v22(v36);
-        end);
-    end;
-    return v4.createElement(v2, {
-        socialNetworksVisbility = v19.visibility, 
-        socialNetworks = v19.socialLinks, 
-        cancelOnActivated = v20, 
-        saveOnActivated = v37
-    });
-end;
+	local function openEditSocialNetworksErrorModal(p2) -- line: 38
+		-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), v19 (copy), NavigateDown (copy)
+		local t1 = {
+			name = AppPage.EditSocialNetworksError,
+			extraProps = {
+				errorCode = p2
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v9.down(v9.fromLegacyPage(t1))
+
+			return
+		end
+
+		v19(NavigateDown(t1))
+	end
+	local function saveSocialLinks(s1: string, s2: string, s3: string, s4: string, s5: string, s6: string) -- line: 52
+		-- upvalues: v19 (copy), SocialLinksNetworking (copy), v20 (copy), FFlagProfileEnableSocialNetworksUsernames (copy), v21 (copy), HttpService (copy), openEditSocialNetworksErrorModal (copy)
+		return v19(SocialLinksNetworking.SetSocialLinks.API({
+			promotionChannelsVisibilityPrivacy = s1,
+			facebook = s2,
+			twitter = s3,
+			youtube = s4,
+			twitch = s5,
+			guilded = s6
+		})):andThen(function(_) -- line: 68
+			-- upvalues: v19 (copy), SocialLinksNetworking (copy), v20 (copy), FFlagProfileEnableSocialNetworksUsernames (copy), v21 (copy)
+			v19(SocialLinksNetworking.GetSelfSocialLinks.API({
+				alwaysReturnUrls = false,
+				filterLink = false
+			})):catch(function(_) -- line: 70
+			end)
+			v19(SocialLinksNetworking.GetSocialLinks.API({
+				alwaysReturnUrls = true,
+				filterLink = true,
+				userId = v20
+			})):andThen(function(_) -- line: 77
+				-- upvalues: FFlagProfileEnableSocialNetworksUsernames (copy), v19 (copy), SocialLinksNetworking (copy), v20 (copy)
+				if FFlagProfileEnableSocialNetworksUsernames then
+					v19(SocialLinksNetworking.GetSocialLinks.API({
+						alwaysReturnUrls = false,
+						filterLink = true,
+						userId = v20
+					}))
+				end
+			end):catch(function(_) -- line: 86
+			end)
+			v21.goBack()
+		end):catch(function(p7) -- line: 89
+			-- upvalues: HttpService (copy), openEditSocialNetworksErrorModal (copy)
+			local ok, result = pcall(function() -- line: 90
+				-- upvalues: HttpService (copy), p7 (copy)
+				return HttpService:JSONDecode(p7.Body)
+			end)
+			local n1 = -1
+
+			if ok then
+				n1 = result and (not not result.errors and (not not result.errors[1] and result.errors[1].code)) or -1
+			end
+
+			openEditSocialNetworksErrorModal(n1)
+		end)
+	end
+
+	return React.createElement(EditSocialLinksModal, {
+		socialNetworksVisbility = v22.visibility,
+		socialNetworks = v22.socialLinks,
+		cancelOnActivated = function() -- line: 34
+			-- upvalues: v21 (copy)
+			v21.goBack()
+		end,
+		saveOnActivated = saveSocialLinks
+	})
+end
+
+return EditSocialLinksModalContainer

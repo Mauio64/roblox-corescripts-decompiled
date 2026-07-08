@@ -1,1 +1,1 @@
-return game:DefineFastString("GetFStringIXPLayerMobileUpsell", "Optimization.InExperienceUpsell.Mobile.UI");
+return game:DefineFastString("GetFStringIXPLayerMobileUpsell", "Optimization.InExperienceUpsell.Mobile.UI")

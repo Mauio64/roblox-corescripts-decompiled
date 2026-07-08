@@ -1,28 +1,30 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Actions.SetMenuOpen);
-local v3 = require(l_Parent_0.Utility.SendAnalytics);
-local v4 = require(l_Parent_0.Resources.Constants);
-local v5 = require(l_Parent_0.Actions.SetCurrentPage);
-local v6 = {
-    v4.ReportDialogKey
-};
-return function(v7, v8) --[[ Line: 14 ]]
-    -- upvalues: v4 (copy), v6 (copy), l_GuiService_0 (copy), v2 (copy), v5 (copy), v3 (copy)
-    return function(v9) --[[ Line: 15 ]]
-        -- upvalues: v8 (ref), v4 (ref), v6 (ref), l_GuiService_0 (ref), v2 (ref), v5 (ref), v3 (ref), v7 (copy)
-        if not v8 then
-            v8 = v4.defaultPageKey;
-        end;
-        if not table.find(v6, v8) then
-            if v8 ~= v4.InitalPageKey then
-                l_GuiService_0:SetMenuIsOpen(true, "InGameMenu");
-            end;
-            v9:dispatch(v2(true));
-            v9:dispatch(v5(v8));
-        end;
-        v3(v4.AnalyticsMenuOpenName, v4.AnalyticsMenuActionName, {
-            source = v7
-        });
-    end;
-end;
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent
+local SetMenuOpen = require(ParentParent.Actions.SetMenuOpen)
+local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
+local Constants = require(ParentParent.Resources.Constants)
+local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
+local t1 = { Constants.ReportDialogKey }
+
+return function(p1, p2) -- line: 14
+	-- upvalues: Constants (copy), t1 (copy), GuiService (copy), SetMenuOpen (copy), SetCurrentPage (copy), SendAnalytics (copy)
+	return function(p3) -- line: 15
+		-- upvalues: p2 (ref), Constants (copy), t1 (copy), GuiService (copy), SetMenuOpen (copy), SetCurrentPage (copy), SendAnalytics (copy), p1 (copy)
+		if not p2 then
+			p2 = Constants.defaultPageKey
+		end
+
+		if not table.find(t1, p2) then
+			if p2 ~= Constants.InitalPageKey then
+				GuiService:SetMenuIsOpen(true, "InGameMenu")
+			end
+
+			p3:dispatch(SetMenuOpen(true))
+			p3:dispatch(SetCurrentPage(p2))
+		end
+
+		SendAnalytics(Constants.AnalyticsMenuOpenName, Constants.AnalyticsMenuActionName, {
+			source = p1
+		})
+	end
+end

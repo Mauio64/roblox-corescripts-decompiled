@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppPlayButtonLoadingPrimary2", false);
+return game:DefineFastFlag("LuaAppPlayButtonLoadingPrimary2", false)

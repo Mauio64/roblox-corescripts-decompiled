@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("StreamNotifications").Parent;
-local l_getPlatformTarget_0 = require(l_Parent_0.Analytics).getPlatformTarget;
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: l_getPlatformTarget_0 (copy)
-    return function(v3, v4, v5) --[[ Line: 6 ]]
-        -- upvalues: v2 (copy), l_getPlatformTarget_0 (ref)
-        v2:SendEventDeferred(l_getPlatformTarget_0(), v3, v4, v5);
-    end;
-end;
+local Parent = script:FindFirstAncestor("StreamNotifications").Parent
+local getPlatformTarget = require(Parent.Analytics).getPlatformTarget
+
+return function(p1) -- line: 5
+	-- upvalues: getPlatformTarget (copy)
+	return function(s1: string, s2: string, t1: {[any]: any}?) -- line: 6
+		-- upvalues: p1 (copy), getPlatformTarget (copy)
+		p1:SendEventDeferred(getPlatformTarget(), s1, s2, t1)
+	end
+end

@@ -1,9 +1,5 @@
 return {
-    isNonNullObject = function(v0) --[[ Line: 9 ]] --[[ Name: isNonNullObject ]]
-        local v1 = false;
-        if v0 ~= nil then
-            v1 = type(v0) == "table";
-        end;
-        return v1;
-    end
-};
+	isNonNullObject = function(p1) -- line: 9
+		return p1 ~= nil and type(p1) == "table"
+	end
+}

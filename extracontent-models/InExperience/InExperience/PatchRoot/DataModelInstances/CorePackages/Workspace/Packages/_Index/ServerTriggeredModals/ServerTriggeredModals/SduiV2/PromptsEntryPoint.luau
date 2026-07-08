@@ -1,4 +1,5 @@
 return {
 	SelfUserProfileOpen = "SelfUserProfileOpen",
-	HomepageLaunch = "HomepageLaunch"
+	HomepageLaunch = "HomepageLaunch",
+	ChartsLaunch = "ChartsLaunch"
 }

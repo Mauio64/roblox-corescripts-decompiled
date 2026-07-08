@@ -1,18 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NetworkingVirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.Http);
-local _ = require(l_script_FirstAncestor_0.types);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    return (v3.POST(script.Name, function(v4, v5) --[[ Line: 9 ]]
-        -- upvalues: v1 (ref)
-        return v4(v1.Url.APIS_URL):path("virtual-events"):path("v1"):path("virtual-events"):path("create"):body({
-            title = v5.title, 
-            description = v5.description, 
-            eventTime = {
-                startTime = v5.eventTime.startTime:ToIsoDate(), 
-                endTime = v5.eventTime.endTime:ToIsoDate()
-            }, 
-            universeId = v5.universeId
-        });
-    end));
-end;
+local NetworkingVirtualEvents = script:FindFirstAncestor("NetworkingVirtualEvents")
+local Http = require(NetworkingVirtualEvents.Parent.Http)
+
+require(NetworkingVirtualEvents.types)
+
+return function(p1) -- line: 6
+	-- upvalues: Http (copy)
+	return (p1.POST(script.Name, function(p2, p3) -- line: 9
+		-- upvalues: Http (copy)
+		return p2(Http.Url.APIS_URL):path("virtual-events"):path("v1"):path("virtual-events"):path("create"):body({
+			title = p3.title,
+			description = p3.description,
+			eventTime = {
+				startTime = p3.eventTime.startTime:ToIsoDate(),
+				endTime = p3.eventTime.endTime:ToIsoDate()
+			},
+			universeId = p3.universeId
+		})
+	end))
+end

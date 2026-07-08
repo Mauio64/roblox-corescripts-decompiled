@@ -1,196 +1,244 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Set_0 = require(l_Parent_0.LuauPolyfill).Set;
-local v2 = {};
-local l_enableSchedulerTracing_0 = require(l_Parent_0.Shared).ReactFeatureFlags.enableSchedulerTracing;
-local v4 = 0;
-local v5 = 0;
-local v6 = nil;
-local v7 = nil;
-if l_enableSchedulerTracing_0 then
-    v6 = {
-        current = l_Set_0.new()
-    };
-    v7 = {
-        current = nil
-    };
-end;
-v2.__interactionsRef = v6;
-v2.__subscriberRef = v7;
-v2.unstable_clear = function(v8) --[[ Line: 92 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v6 (ref), l_Set_0 (copy)
-    if not l_enableSchedulerTracing_0 then
-        return v8();
-    else
-        local l_current_0 = v6.current;
-        v6.current = l_Set_0.new();
-        local l_status_0, l_result_0 = pcall(v8);
-        v6.current = l_current_0;
-        if not l_status_0 then
-            error(l_result_0);
-        end;
-        return l_result_0;
-    end;
-end;
-v2.unstable_getCurrent = function() --[[ Line: 112 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v6 (ref)
-    if not l_enableSchedulerTracing_0 then
-        return nil;
-    else
-        return v6.current;
-    end;
-end;
-v2.unstable_getThreadID = function() --[[ Line: 120 ]]
-    -- upvalues: v5 (ref)
-    v5 = v5 + 1;
-    return v5;
-end;
-v2.unstable_trace = function(v12, v13, v14, v15) --[[ Line: 125 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v4 (ref), v6 (ref), l_Set_0 (copy), v7 (ref)
-    local v16 = if v15 ~= nil then v15 else 0;
-    if not l_enableSchedulerTracing_0 then
-        return v14();
-    else
-        local v17 = {
-            __count = 1, 
-            id = v4, 
-            name = v12, 
-            timestamp = v13
-        };
-        v4 = v4 + 1;
-        local l_current_1 = v6.current;
-        local v19 = l_Set_0.new(l_current_1);
-        v19:add(v17);
-        v6.current = v19;
-        local l_current_2 = v7.current;
-        local v21 = nil;
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 159 ]]
-            -- upvalues: l_current_2 (copy), v17 (copy)
-            if l_current_2 ~= nil then
-                l_current_2.onInteractionTraced(v17);
-            end;
-        end);
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 166 ]]
-            -- upvalues: l_current_2 (copy), v19 (copy), v16 (copy)
-            if l_current_2 ~= nil then
-                l_current_2.onWorkStarted(v19, v16);
-            end;
-        end);
-        local l_status_3, l_result_3 = pcall(function() --[[ Line: 174 ]]
-            -- upvalues: v21 (ref), v14 (copy)
-            v21 = v14();
-        end);
-        v6.current = l_current_1;
-        local l_status_4, l_result_4 = pcall(function() --[[ Line: 180 ]]
-            -- upvalues: l_current_2 (copy), v19 (copy), v16 (copy)
-            if l_current_2 ~= nil then
-                l_current_2.onWorkStopped(v19, v16);
-            end;
-        end);
-        v17.__count = v17.__count - 1;
-        if l_current_2 ~= nil and v17.__count == 0 then
-            l_current_2.onInteractionScheduledWorkCompleted(v17);
-        end;
-        if not l_status_4 then
-            error(l_result_4);
-        end;
-        if not l_status_3 then
-            error(l_result_3);
-        end;
-        if not l_status_2 then
-            error(l_result_2);
-        end;
-        if not l_status_1 then
-            error(l_result_1);
-        end;
-        return v21;
-    end;
-end;
-v2.unstable_wrap = function(v30, v31) --[[ Line: 213 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v6 (ref), v7 (ref)
-    if v31 == nil then
-        v31 = 0;
-    end;
-    if not l_enableSchedulerTracing_0 then
-        return v30;
-    else
-        local l_current_3 = v6.current;
-        local l_current_4 = v7.current;
-        if l_current_4 ~= nil then
-            l_current_4.onWorkScheduled(l_current_3, v31);
-        end;
-        for _, v35 in l_current_3 do
-            v35.__count = v35.__count + 1;
-        end;
-        local v36 = false;
-        local function v48(_, ...) --[[ Line: 241 ]] --[[ Name: _wrapped ]]
-            -- upvalues: v6 (ref), l_current_3 (copy), l_current_4 (ref), v7 (ref), v31 (ref), v30 (copy), v36 (ref)
-            local l_current_5 = v6.current;
-            v6.current = l_current_3;
-            l_current_4 = v7.current;
-            local l_status_7, l_result_7 = pcall(function(...) --[[ Line: 248 ]]
-                -- upvalues: l_current_4 (ref), l_current_3 (ref), v31 (ref), v30 (ref), v6 (ref), l_current_5 (copy)
-                local v39 = nil;
-                local l_status_5, l_result_5 = pcall(function() --[[ Line: 252 ]]
-                    -- upvalues: l_current_4 (ref), l_current_3 (ref), v31 (ref)
-                    if l_current_4 ~= nil then
-                        l_current_4.onWorkStarted(l_current_3, v31);
-                    end;
-                end);
-                local l_status_6, l_result_6 = pcall(function(...) --[[ Line: 259 ]]
-                    -- upvalues: v39 (ref), v30 (ref)
-                    v39 = v30(...);
-                end, ...);
-                v6.current = l_current_5;
-                if l_current_4 ~= nil then
-                    l_current_4.onWorkStopped(l_current_3, v31);
-                end;
-                if not l_status_6 then
-                    error(l_result_6);
-                end;
-                if not l_status_5 then
-                    error(l_result_5);
-                end;
-                return v39;
-            end, ...);
-            if not v36 then
-                v36 = true;
-                for _, v47 in l_current_3 do
-                    v47.__count = v47.__count - 1;
-                    if l_current_4 ~= nil and v47.__count == 0 then
-                        l_current_4.onInteractionScheduledWorkCompleted(v47);
-                    end;
-                end;
-            end;
-            if not l_status_7 then
-                error(l_result_7);
-            end;
-            return l_result_7;
-        end;
-        local function v53() --[[ Line: 306 ]]
-            -- upvalues: l_current_4 (ref), v7 (ref), l_current_3 (copy), v31 (ref)
-            l_current_4 = v7.current;
-            local l_status_8, l_result_8 = pcall(function() --[[ Line: 309 ]]
-                -- upvalues: l_current_4 (ref), l_current_3 (ref), v31 (ref)
-                if l_current_4 ~= nil then
-                    l_current_4.onWorkCanceled(l_current_3, v31);
-                end;
-            end);
-            for _, v52 in l_current_3 do
-                v52.__count = v52.__count - 1;
-                if l_current_4 ~= nil and v52.__count == 0 then
-                    l_current_4.onInteractionScheduledWorkCompleted(v52);
-                end;
-            end;
-            if not l_status_8 then
-                error(l_result_8);
-            end;
-        end;
-        local v54 = {};
-        setmetatable(v54, {
-            __call = v48
-        });
-        v54.cancel = v53;
-        return v54;
-    end;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local Set = require(ParentParent.LuauPolyfill).Set
+local t1 = {}
+local enableSchedulerTracing = require(ParentParent.Shared).ReactFeatureFlags.enableSchedulerTracing
+local n1 = 0
+local n2 = 0
+local t2 = nil
+local t3 = nil
+
+if enableSchedulerTracing then
+	t2 = {
+		current = Set.new()
+	}
+	t3 = {
+		current = nil
+	}
+end
+
+t1.__interactionsRef = t2
+t1.__subscriberRef = t3
+
+function t1.unstable_clear(p1: ((...any) -> ...any)) -- line: 92
+	-- upvalues: enableSchedulerTracing (copy), t2 (ref), Set (copy)
+	if not enableSchedulerTracing then
+		return p1()
+	end
+
+	local current = t2.current
+
+	t2.current = Set.new()
+
+	local ok, result = pcall(p1)
+
+	t2.current = current
+
+	if not ok then
+		error(result)
+	end
+
+	return result
+end
+function t1.unstable_getCurrent() -- line: 112
+	-- upvalues: enableSchedulerTracing (copy), t2 (ref)
+	if not enableSchedulerTracing then
+		return nil
+	end
+
+	return t2.current
+end
+function t1.unstable_getThreadID() -- line: 120
+	-- upvalues: n2 (ref)
+	n2 += 1
+
+	return n2
+end
+function t1.unstable_trace(s1: string, n3: number, p2: ((...any) -> ...any), n4: number?) -- line: 125
+	-- upvalues: enableSchedulerTracing (copy), n1 (ref), t2 (ref), Set (copy), t3 (ref)
+	local v17 = n4 == nil and 0 or n4
+
+	if not enableSchedulerTracing then
+		return p2()
+	end
+
+	local t4 = {
+		__count = 1,
+		id = n1,
+		name = s1,
+		timestamp = n3
+	}
+
+	n1 += 1
+
+	local current = t2.current
+	local v20 = Set.new(current)
+
+	v20:add(t4)
+	t2.current = v20
+
+	local current2 = t3.current
+	local u22 = nil
+	local ok, result = pcall(function() -- line: 159
+		-- upvalues: current2 (copy), t4 (copy)
+		if current2 ~= nil then
+			current2.onInteractionTraced(t4)
+		end
+	end)
+	local ok2, result2 = pcall(function() -- line: 166
+		-- upvalues: current2 (copy), v20 (copy), v17 (copy)
+		if current2 ~= nil then
+			current2.onWorkStarted(v20, v17)
+		end
+	end)
+	local ok3, result3 = pcall(function() -- line: 174
+		-- upvalues: u22 (ref), p2 (copy)
+		u22 = p2()
+	end)
+
+	t2.current = current
+
+	local ok4, result4 = pcall(function() -- line: 180
+		-- upvalues: current2 (copy), v20 (copy), v17 (copy)
+		if current2 ~= nil then
+			current2.onWorkStopped(v20, v17)
+		end
+	end)
+
+	t4.__count = t4.__count - 1
+
+	if current2 ~= nil and t4.__count == 0 then
+		current2.onInteractionScheduledWorkCompleted(t4)
+	end
+
+	if not ok4 then
+		error(result4)
+	end
+
+	if not ok3 then
+		error(result3)
+	end
+
+	if not ok2 then
+		error(result2)
+	end
+
+	if not ok then
+		error(result)
+	end
+
+	return u22
+end
+function t1.unstable_wrap(p3: ((...any) -> ...any), n5: number) -- line: 213
+	-- upvalues: enableSchedulerTracing (copy), t2 (ref), t3 (ref)
+	if n5 == nil then
+		n5 = 0
+	end
+
+	if not enableSchedulerTracing then
+		return p3
+	end
+
+	local current = t2.current
+	local current3 = t3.current
+
+	if current3 ~= nil then
+		current3.onWorkScheduled(current, n5)
+	end
+
+	for _, v37 in current do
+		v37.__count = v37.__count + 1
+	end
+
+	local u38 = false
+
+	local function _wrapped(_, ...) -- line: 241
+		-- upvalues: t2 (ref), current (copy), current3 (ref), t3 (ref), n5 (ref), p3 (copy), u38 (ref)
+		local current4 = t2.current
+
+		t2.current = current
+		current3 = t3.current
+
+		local ok, result = pcall(function(...) -- line: 248
+			-- upvalues: current3 (ref), current (copy), n5 (ref), p3 (copy), t2 (ref), current4 (copy)
+			local u51 = nil
+			local ok, result = pcall(function() -- line: 252
+				-- upvalues: current3 (ref), current (copy), n5 (ref)
+				if current3 ~= nil then
+					current3.onWorkStarted(current, n5)
+				end
+			end)
+			local ok5, result5 = pcall(function(...) -- line: 259
+				-- upvalues: u51 (ref), p3 (copy)
+				u51 = p3(...)
+			end, ...)
+
+			t2.current = current4
+
+			if current3 ~= nil then
+				current3.onWorkStopped(current, n5)
+			end
+
+			if not ok5 then
+				error(result5)
+			end
+
+			if not ok then
+				error(result)
+			end
+
+			return u51
+		end, ...)
+
+		if not u38 then
+			u38 = true
+
+			for _, v46 in current do
+				v46.__count = v46.__count - 1
+
+				if current3 ~= nil and v46.__count == 0 then
+					current3.onInteractionScheduledWorkCompleted(v46)
+				end
+			end
+		end
+
+		if not ok then
+			error(result)
+		end
+
+		return result
+	end
+
+	local t5 = {}
+
+	setmetatable(t5, {
+		__call = _wrapped
+	})
+
+	function t5.cancel() -- line: 306
+		-- upvalues: current3 (ref), t3 (ref), current (copy), n5 (ref)
+		current3 = t3.current
+
+		local ok, result = pcall(function() -- line: 309
+			-- upvalues: current3 (ref), current (copy), n5 (ref)
+			if current3 ~= nil then
+				current3.onWorkCanceled(current, n5)
+			end
+		end)
+
+		for _, v50 in current do
+			v50.__count = v50.__count - 1
+
+			if current3 ~= nil and v50.__count == 0 then
+				current3.onInteractionScheduledWorkCompleted(v50)
+			end
+		end
+
+		if not ok then
+			error(result)
+		end
+	end
+
+	return t5
+end
+
+return t1

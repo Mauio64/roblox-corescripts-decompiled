@@ -1,10 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local v1 = require(l_script_FirstAncestor_0.Enums.TwoStepErrorCodes);
-return function(v2) --[[ Line: 9 ]] --[[ Name: getTwoStepLoginErrorKey ]]
-    -- upvalues: v1 (copy)
-    if v2 == v1.IllegalChildAccountLinking then
-        return "Authentication.Login.LinkIllegalChildAccountLinking";
-    else
-        return "Authentication.Login.Response.SomethingWentWrong";
-    end;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local TwoStepErrorCodes = require(AuthCommon.Enums.TwoStepErrorCodes)
+
+local function getTwoStepLoginErrorKey(n1: number?) -- line: 9
+	-- upvalues: TwoStepErrorCodes (copy)
+	if n1 == TwoStepErrorCodes.IllegalChildAccountLinking then
+		return "Authentication.Login.LinkIllegalChildAccountLinking"
+	end
+
+	return "Authentication.Login.Response.SomethingWentWrong"
+end
+
+return getTwoStepLoginErrorKey

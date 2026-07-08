@@ -1,258 +1,309 @@
-local l_Players_0 = game:GetService("Players");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v3 = require(l_CorePackages_0.Packages.Promise);
-local v4 = CFrame.new((Vector3.new(0, 150, 0, 0)));
-local v5 = game:DefineFastInt("InspectAndBuyClusterCompositionTimeoutMs", 3000);
-local v6 = {};
-v6.__index = v6;
-local function v10(v7) --[[ Line: 25 ]] --[[ Name: setupCharacterModels ]]
-    -- upvalues: l_Players_0 (copy), l_RobloxReplicatedStorage_0 (copy)
-    local v8 = nil;
-    local v9 = nil;
-    if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-        v8 = l_Players_0:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6);
-        v9 = l_Players_0:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15);
-    else
-        v8 = l_Players_0:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6);
-        v9 = l_Players_0:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15);
-    end;
-    v8.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
-    v9.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
-    v8.HumanoidRootPart.Anchored = true;
-    v9.HumanoidRootPart.Anchored = true;
-    v8.Parent = l_RobloxReplicatedStorage_0;
-    v9.Parent = l_RobloxReplicatedStorage_0;
-    v8.HumanoidRootPart.CFrame = CFrame.new(v7);
-    v9:SetPrimaryPartCFrame(v8.HumanoidRootPart.CFrame);
-    return v8, v9;
-end;
-v6.new = function(v11, v12, v13, v14) --[[ Line: 60 ]] --[[ Name: new ]]
-    -- upvalues: v6 (copy), v10 (copy), l_RobloxReplicatedStorage_0 (copy)
-    local v15 = {};
-    setmetatable(v15, v6);
-    v15.mockApplyDescription = v14;
-    local v16, v17 = v10(v12);
-    v15.r6 = v16;
-    v15.r15current = v17;
-    v15.r15offScreen = v17:Clone();
-    v15.r15offScreen.Parent = l_RobloxReplicatedStorage_0;
-    v15.avatarType = v13;
-    v15.worldModelRef = v11;
-    v15.inProgressPromise = nil;
-    v15.waitingPromise = nil;
-    v15.r6Promise = nil;
-    v15.destroyed = false;
-    return v15;
-end;
-v6.setupAnimations = function(v18, v19, v20) --[[ Line: 92 ]] --[[ Name: setupAnimations ]]
-    v19.Parent = v18.r6;
-    v20.Parent = v18.r15current;
-    v20.Archivable = true;
-    local v21 = v20:Clone();
-    v21.Parent = v18.r15offScreen;
-    v21.Archivable = false;
-    v20.Archivable = false;
-end;
-v6.getCurrentCharacter = function(v22) --[[ Line: 102 ]] --[[ Name: getCurrentCharacter ]]
-    if v22.avatarType == Enum.HumanoidRigType.R15 then
-        return v22.r15current;
-    else
-        return v22.r6;
-    end;
-end;
-v6.isR15 = function(v23) --[[ Line: 110 ]] --[[ Name: isR15 ]]
-    return v23.avatarType == Enum.HumanoidRigType.R15;
-end;
-v6.syncRotation = function(_, v25, v26) --[[ Line: 114 ]] --[[ Name: syncRotation ]]
-    local _, _, _, v30, v31, v32, v33, v34, v35, v36, v37, v38 = v25.HumanoidRootPart.CFrame:components();
-    local l_p_0 = v26.HumanoidRootPart.CFrame.p;
-    v26.HumanoidRootPart.CFrame = CFrame.new(l_p_0.X, l_p_0.Y, l_p_0.Z, v30, v31, v32, v33, v34, v35, v36, v37, v38);
-end;
-local function v49(v40, v41) --[[ Line: 122 ]] --[[ Name: hasLayeredAccessoryUpdates ]]
-    local l_v40_Accessories_0 = v40:GetAccessories(false);
-    local l_v41_Accessories_0 = v41:GetAccessories(false);
-    if #l_v41_Accessories_0 == 0 then
-        return false;
-    elseif #l_v40_Accessories_0 ~= #l_v41_Accessories_0 then
-        return true;
-    else
-        local v44 = {};
-        for _, v46 in ipairs(l_v40_Accessories_0) do
-            v44[v46.AssetId] = true;
-        end;
-        for _, v48 in ipairs(l_v41_Accessories_0) do
-            if not v44[v48.AssetId] then
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
-local function _(v50) --[[ Line: 148 ]] --[[ Name: hasWrapLayer ]]
-    return v50:FindFirstChildWhichIsA("WrapLayer", true) ~= nil;
-end;
-v6._doUpdateR6 = function(v52, v53) --[[ Line: 152 ]] --[[ Name: _doUpdateR6 ]]
-    -- upvalues: v3 (copy)
-    return v3.new(function(v54, _) --[[ Line: 153 ]]
-        -- upvalues: v52 (copy), v53 (copy)
-        v52.r6.Parent = v52.worldModelRef:getValue();
-        if v52.mockApplyDescription then
-            v52.mockApplyDescription(v52.r6, v53);
-        elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-            v52.r6.Humanoid:ApplyDescriptionAsync(v53);
-        else
-            v52.r6.Humanoid:ApplyDescription(v53);
-        end;
-        v54(v52:getCurrentCharacter());
-    end);
-end;
-v6._doSimpleUpdateR15 = function(v56, v57) --[[ Line: 169 ]] --[[ Name: _doSimpleUpdateR15 ]]
-    -- upvalues: v3 (copy)
-    return v3.new(function(v58, _) --[[ Line: 170 ]]
-        -- upvalues: v56 (copy), v57 (copy)
-        v56.r15current.Parent = v56.worldModelRef:getValue();
-        if v56.mockApplyDescription then
-            v56.mockApplyDescription(v56.r15current, v57);
-        elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-            v56.r15current.Humanoid:ApplyDescriptionAsync(v57);
-        else
-            v56.r15current.Humanoid:ApplyDescription(v57);
-        end;
-        v58(v56.r15current);
-    end);
-end;
-v6._updateOffscreenR15 = function(v60, v61) --[[ Line: 186 ]] --[[ Name: _updateOffscreenR15 ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    return v3.new(function(v62, _) --[[ Line: 187 ]]
-        -- upvalues: v60 (copy), v4 (ref), v61 (copy)
-        v60.r15offScreen.HumanoidRootPart.CFrame = v4;
-        v60.r15offScreen.Parent = v60.worldModelRef:getValue();
-        if v60.mockApplyDescription then
-            v60.mockApplyDescription(v60.r15offScreen, v61);
-        elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-            v60.r15offScreen.Humanoid:ApplyDescriptionAsync(v61);
-        else
-            v60.r15offScreen.Humanoid:ApplyDescription(v61);
-        end;
-        v62(v60.r15offScreen);
-    end);
-end;
-local function v65(v64) --[[ Line: 207 ]] --[[ Name: waitForClusterCompositionFinished ]]
-    -- upvalues: v3 (copy), v5 (copy)
-    if v64:FindFirstChildWhichIsA("WrapLayer", true) ~= nil then
-        return v3.race({
-            v3.fromEvent(v64.Humanoid.ClusterCompositionFinished), 
-            v3.delay(v5 * 0.001)
-        }):andThen(function() --[[ Line: 214 ]]
-            return true;
-        end);
-    else
-        return v3.resolve(false);
-    end;
-end;
-v6._completeUpdate = function(v66) --[[ Line: 222 ]] --[[ Name: _completeUpdate ]]
-    -- upvalues: v4 (copy), l_RobloxReplicatedStorage_0 (copy)
-    local l_CFrame_0 = v66.r15current.HumanoidRootPart.CFrame;
-    v66.r15offScreen.HumanoidRootPart.CFrame = l_CFrame_0;
-    v66.r15current.HumanoidRootPart.CFrame = v4;
-    v66.r15current.Parent = l_RobloxReplicatedStorage_0;
-    local l_r15current_0 = v66.r15current;
-    local l_r15offScreen_0 = v66.r15offScreen;
-    v66.r15offScreen = l_r15current_0;
-    v66.r15current = l_r15offScreen_0;
-    return v66.r15current;
-end;
-v6._doUpdateR15 = function(v70, v71) --[[ Line: 234 ]] --[[ Name: _doUpdateR15 ]]
-    -- upvalues: v49 (copy), v65 (copy)
-    local l_AppliedDescription_0 = v70.r15current.Humanoid:GetAppliedDescription();
-    if not v49(l_AppliedDescription_0, v71) then
-        return v70:_doSimpleUpdateR15(v71);
-    else
-        v70.inProgressPromise = v70:_updateOffscreenR15(v71):andThen(v65):andThen(function() --[[ Line: 242 ]]
-            -- upvalues: v70 (copy)
-            return v70:_completeUpdate();
-        end);
-        return v70.inProgressPromise;
-    end;
-end;
-v6.maybeUpdateCharacter = function(v73, v74) --[[ Line: 255 ]] --[[ Name: maybeUpdateCharacter ]]
-    -- upvalues: v3 (copy)
-    if v73.avatarType == Enum.HumanoidRigType.R6 then
-        v73.r6Promise = v73:_doUpdateR6(v74);
-        return v73.r6Promise;
-    elseif v73.inProgressPromise and v73.inProgressPromise:getStatus() == v3.Status.Started then
-        local l_waitingPromise_0 = v73.waitingPromise;
-        v73.waitingPromise = v73.inProgressPromise:andThen(function() --[[ Line: 266 ]]
-            -- upvalues: v73 (copy), v74 (copy)
-            return v73:_doUpdateR15(v74);
-        end);
-        if l_waitingPromise_0 then
-            l_waitingPromise_0:cancel();
-        end;
-        return v73.waitingPromise;
-    else
-        return v73:_doUpdateR15(v74);
-    end;
-end;
-v6.switchAvatarType = function(v76, v77) --[[ Line: 281 ]] --[[ Name: switchAvatarType ]]
-    -- upvalues: l_RobloxReplicatedStorage_0 (copy)
-    if v77 == v76.avatarType then
-        return v76:getCurrentCharacter();
-    else
-        v76:_cancelPromises();
-        v76.avatarType = v77;
-        local v78 = nil;
-        local v79 = nil;
-        if v77 == Enum.HumanoidRigType.R6 then
-            v78 = v76.r6;
-            v79 = v76.r15current;
-        else
-            v78 = v76.r15current;
-            v79 = v76.r6;
-        end;
-        v79.Parent = l_RobloxReplicatedStorage_0;
-        v79.Humanoid:UnequipTools();
-        v76:syncRotation(v79, v78);
-        return v78;
-    end;
-end;
-v6.start = function(_) --[[ Line: 307 ]] --[[ Name: start ]]
+local Players = game:GetService("Players")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local CorePackages = game:GetService("CorePackages")
+local Promise = require(CorePackages.Packages.Promise)
+local cFrame = CFrame.new((Vector3.new(0, 150, 0)))
+local v6 = game:DefineFastInt("InspectAndBuyClusterCompositionTimeoutMs", 3000)
+local t1 = {}
 
-end;
-local function _(v81) --[[ Line: 309 ]] --[[ Name: cancelPromise ]]
-    if v81 then
-        v81:cancel();
-    end;
-end;
-v6._cancelPromises = function(v83) --[[ Line: 315 ]] --[[ Name: _cancelPromises ]]
-    local l_inProgressPromise_0 = v83.inProgressPromise;
-    if l_inProgressPromise_0 then
-        l_inProgressPromise_0:cancel();
-    end;
-    l_inProgressPromise_0 = v83.waitingPromise;
-    if l_inProgressPromise_0 then
-        l_inProgressPromise_0:cancel();
-    end;
-    l_inProgressPromise_0 = v83.r6Promise;
-    if l_inProgressPromise_0 then
-        l_inProgressPromise_0:cancel();
-    end;
-    v83.inProgressPromise = nil;
-    v83.waitingPromise = nil;
-    v83.r6Promise = nil;
-end;
-v6.stop = function(v85) --[[ Line: 324 ]] --[[ Name: stop ]]
-    -- upvalues: l_RobloxReplicatedStorage_0 (copy)
-    v85.r6.Parent = l_RobloxReplicatedStorage_0;
-    v85.r15current.Parent = l_RobloxReplicatedStorage_0;
-    v85.r15offScreen.Parent = l_RobloxReplicatedStorage_0;
-    v85:_cancelPromises();
-end;
-v6.onDestroy = function(v86) --[[ Line: 332 ]] --[[ Name: onDestroy ]]
-    v86:_cancelPromises();
-    v86.r6:Destroy();
-    v86.r15current:Destroy();
-    v86.r15offScreen:Destroy();
-end;
-return v6;
+t1.__index = t1
+
+local function setupCharacterModels(p1) -- line: 25
+	-- upvalues: Players (copy), RobloxReplicatedStorage (copy)
+	local v14, v15
+
+	if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+		v14 = Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6)
+		v15 = Players:CreateHumanoidModelFromDescriptionAsync(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
+	else
+		v14 = Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R6)
+		v15 = Players:CreateHumanoidModelFromDescription(Instance.new("HumanoidDescription"), Enum.HumanoidRigType.R15)
+	end
+
+	v14.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	v15.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	v14.HumanoidRootPart.Anchored = true
+	v15.HumanoidRootPart.Anchored = true
+	v14.Parent = RobloxReplicatedStorage
+	v15.Parent = RobloxReplicatedStorage
+	v14.HumanoidRootPart.CFrame = CFrame.new(p1)
+	v15:SetPrimaryPartCFrame(v14.HumanoidRootPart.CFrame)
+
+	return v14, v15
+end
+
+function t1.new(p2, p3, p4, p5) -- line: 60
+	-- upvalues: t1 (copy), setupCharacterModels (copy), RobloxReplicatedStorage (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.mockApplyDescription = p5
+
+	local v21, v22 = setupCharacterModels(p3)
+
+	t2.r6 = v21
+	t2.r15current = v22
+	t2.r15offScreen = v22:Clone()
+	t2.r15offScreen.Parent = RobloxReplicatedStorage
+	t2.avatarType = p4
+	t2.worldModelRef = p2
+	t2.inProgressPromise = nil
+	t2.waitingPromise = nil
+	t2.r6Promise = nil
+	t2.destroyed = false
+
+	return t2
+end
+function t1.setupAnimations(p6, p7, p8) -- line: 92
+	p7.Parent = p6.r6
+	p8.Parent = p6.r15current
+	p8.Archivable = true
+
+	local clone = p8:Clone()
+
+	clone.Parent = p6.r15offScreen
+	clone.Archivable = false
+	p8.Archivable = false
+end
+function t1.getCurrentCharacter(p9) -- line: 102
+	if p9.avatarType == Enum.HumanoidRigType.R15 then
+		return p9.r15current
+	end
+
+	return p9.r6
+end
+function t1.isR15(p10) -- line: 110
+	return p10.avatarType == Enum.HumanoidRigType.R15
+end
+function t1.syncRotation(_, p12, p13) -- line: 114
+	local _, _, _, v35, v36, v37, v38, v39, v40, v41, v42, v43 = p12.HumanoidRootPart.CFrame:components()
+	local p = p13.HumanoidRootPart.CFrame.p
+
+	p13.HumanoidRootPart.CFrame = CFrame.new(p.X, p.Y, p.Z, v35, v36, v37, v38, v39, v40, v41, v42, v43)
+end
+
+local function hasLayeredAccessoryUpdates(p14, p15) -- line: 122
+	local Accessories = p14:GetAccessories(false)
+	local Accessories2 = p15:GetAccessories(false)
+
+	if #Accessories2 == 0 then
+		return false
+	end
+
+	if #Accessories ~= #Accessories2 then
+		return true
+	end
+
+	local t3 = {}
+
+	for _, v in ipairs(Accessories) do
+		t3[v.AssetId] = true
+	end
+
+	for _, v in ipairs(Accessories2) do
+		if not t3[v.AssetId] then
+			return true
+		end
+	end
+
+	return false
+end
+local function hasWrapLayer(p16) -- line: 148
+	return p16:FindFirstChildWhichIsA("WrapLayer", true) ~= nil
+end
+
+function t1._doUpdateR6(p17, p18) -- line: 152
+	-- upvalues: Promise (copy)
+	return Promise.new(function(resolve, _) -- line: 153
+		-- upvalues: p17 (copy), p18 (copy)
+		p17.r6.Parent = p17.worldModelRef:getValue()
+
+		if p17.mockApplyDescription then
+			p17.mockApplyDescription(p17.r6, p18)
+		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+			p17.r6.Humanoid:ApplyDescriptionAsync(p18)
+		else
+			p17.r6.Humanoid:ApplyDescription(p18)
+		end
+
+		resolve(p17:getCurrentCharacter())
+	end)
+end
+function t1._doSimpleUpdateR15(p20, p21) -- line: 169
+	-- upvalues: Promise (copy)
+	return Promise.new(function(resolve, _) -- line: 170
+		-- upvalues: p20 (copy), p21 (copy)
+		p20.r15current.Parent = p20.worldModelRef:getValue()
+
+		if p20.mockApplyDescription then
+			p20.mockApplyDescription(p20.r15current, p21)
+		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+			p20.r15current.Humanoid:ApplyDescriptionAsync(p21)
+		else
+			p20.r15current.Humanoid:ApplyDescription(p21)
+		end
+
+		resolve(p20.r15current)
+	end)
+end
+function t1._updateOffscreenR15(p23, p24) -- line: 186
+	-- upvalues: Promise (copy), cFrame (copy)
+	return Promise.new(function(resolve, _) -- line: 187
+		-- upvalues: p23 (copy), cFrame (copy), p24 (copy)
+		p23.r15offScreen.HumanoidRootPart.CFrame = cFrame
+		p23.r15offScreen.Parent = p23.worldModelRef:getValue()
+
+		if p23.mockApplyDescription then
+			p23.mockApplyDescription(p23.r15offScreen, p24)
+		elseif game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+			p23.r15offScreen.Humanoid:ApplyDescriptionAsync(p24)
+		else
+			p23.r15offScreen.Humanoid:ApplyDescription(p24)
+		end
+
+		resolve(p23.r15offScreen)
+	end)
+end
+
+local function waitForClusterCompositionFinished(p26) -- line: 207
+	-- upvalues: Promise (copy), v6 (copy)
+	if p26:FindFirstChildWhichIsA("WrapLayer", true) ~= nil then
+		return Promise.race({
+			Promise.fromEvent(p26.Humanoid.ClusterCompositionFinished),
+			Promise.delay(v6 * 0.001)
+		}):andThen(function() -- line: 214
+			return true
+		end)
+	end
+
+	return Promise.resolve(false)
+end
+
+function t1._completeUpdate(p27) -- line: 222
+	-- upvalues: cFrame (copy), RobloxReplicatedStorage (copy)
+	local HumanoidRootPartCFrame = p27.r15current.HumanoidRootPart.CFrame
+
+	p27.r15offScreen.HumanoidRootPart.CFrame = HumanoidRootPartCFrame
+	p27.r15current.HumanoidRootPart.CFrame = cFrame
+	p27.r15current.Parent = RobloxReplicatedStorage
+
+	local r15current = p27.r15current
+	local r15offScreen = p27.r15offScreen
+
+	p27.r15offScreen = r15current
+	p27.r15current = r15offScreen
+
+	return p27.r15current
+end
+function t1._doUpdateR15(p28, p29) -- line: 234
+	-- upvalues: hasLayeredAccessoryUpdates (copy), waitForClusterCompositionFinished (copy)
+	local AppliedDescription = p28.r15current.Humanoid:GetAppliedDescription()
+
+	if not hasLayeredAccessoryUpdates(AppliedDescription, p29) then
+		return p28:_doSimpleUpdateR15(p29)
+	end
+
+	p28.inProgressPromise = p28:_updateOffscreenR15(p29):andThen(waitForClusterCompositionFinished):andThen(function() -- line: 242
+		-- upvalues: p28 (copy)
+		return p28:_completeUpdate()
+	end)
+
+	return p28.inProgressPromise
+end
+function t1.maybeUpdateCharacter(p30, p31) -- line: 255
+	-- upvalues: Promise (copy)
+	if p30.avatarType == Enum.HumanoidRigType.R6 then
+		p30.r6Promise = p30:_doUpdateR6(p31)
+
+		return p30.r6Promise
+	end
+
+	if p30.inProgressPromise and p30.inProgressPromise:getStatus() == Promise.Status.Started then
+		local waitingPromise = p30.waitingPromise
+
+		p30.waitingPromise = p30.inProgressPromise:andThen(function() -- line: 266
+			-- upvalues: p30 (copy), p31 (copy)
+			return p30:_doUpdateR15(p31)
+		end)
+
+		if waitingPromise then
+			waitingPromise:cancel()
+		end
+
+		return p30.waitingPromise
+	end
+
+	return p30:_doUpdateR15(p31)
+end
+function t1.switchAvatarType(p32, p33) -- line: 281
+	-- upvalues: RobloxReplicatedStorage (copy)
+	if p33 == p32.avatarType then
+		return p32:getCurrentCharacter()
+	end
+
+	p32:_cancelPromises()
+	p32.avatarType = p33
+
+	local r6, r15current
+
+	if p33 == Enum.HumanoidRigType.R6 then
+		r6 = p32.r6
+		r15current = p32.r15current
+	else
+		r6 = p32.r15current
+		r15current = p32.r6
+	end
+
+	r15current.Parent = RobloxReplicatedStorage
+	r15current.Humanoid:UnequipTools()
+	p32:syncRotation(r15current, r6)
+
+	return r6
+end
+function t1.start(_) -- line: 307
+end
+
+local function cancelPromise(p35) -- line: 309
+	if p35 then
+		p35:cancel()
+	end
+end
+
+function t1._cancelPromises(p36) -- line: 315
+	local inProgressPromise = p36.inProgressPromise
+
+	if inProgressPromise then
+		inProgressPromise:cancel()
+	end
+
+	local waitingPromise = p36.waitingPromise
+
+	if waitingPromise then
+		waitingPromise:cancel()
+	end
+
+	local r6Promise = p36.r6Promise
+
+	if r6Promise then
+		r6Promise:cancel()
+	end
+
+	p36.inProgressPromise = nil
+	p36.waitingPromise = nil
+	p36.r6Promise = nil
+end
+function t1.stop(p37) -- line: 324
+	-- upvalues: RobloxReplicatedStorage (copy)
+	p37.r6.Parent = RobloxReplicatedStorage
+	p37.r15current.Parent = RobloxReplicatedStorage
+	p37.r15offScreen.Parent = RobloxReplicatedStorage
+	p37:_cancelPromises()
+end
+function t1.onDestroy(p38) -- line: 332
+	p38:_cancelPromises()
+	p38.r6:Destroy()
+	p38.r15current:Destroy()
+	p38.r15offScreen:Destroy()
+end
+
+return t1

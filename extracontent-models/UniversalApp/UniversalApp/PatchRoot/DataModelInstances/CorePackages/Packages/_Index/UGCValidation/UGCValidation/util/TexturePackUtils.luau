@@ -1,39 +1,47 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local l_util_0 = l_Parent_0.util;
-local v3 = require(l_util_0.ParseContentIds);
-local l_flags_0 = l_Parent_0.flags;
-local v5 = require(l_flags_0.getFFlagUGCValidateEmptySurfaceAppearance);
-local v6 = {};
-local function v15(v7, v8) --[[ Line: 17 ]] --[[ Name: findSurfaceAppearances ]]
-    -- upvalues: l_UGCValidationService_0 (copy), v3 (copy), v5 (copy)
-    local v9 = {};
-    local v10 = {};
-    local l_v7_Descendants_0 = v7:GetDescendants();
-    table.insert(l_v7_Descendants_0, v7);
-    for _, v13 in l_v7_Descendants_0 do
-        if v13:IsA("SurfaceAppearance") then
-            local l_l_UGCValidationService_0_PropertyValue_0 = l_UGCValidationService_0:GetPropertyValue(v13, "TexturePack");
-            if if l_l_UGCValidationService_0_PropertyValue_0 then v3.tryGetAssetIdFromContentId(l_l_UGCValidationService_0_PropertyValue_0) else nil then
-                table.insert(v9, v13);
-            elseif v5() then
-                if v13.ColorMap and v13.ColorMap ~= "" or v13.MetalnessMap and v13.MetalnessMap ~= "" or v13.NormalMap and v13.NormalMap ~= "" or v13.RoughnessMap and v13.RoughnessMap ~= "" or v13.EmissiveMaskContent and v13.EmissiveMaskContent.SourceType == Enum.ContentSourceType.Uri and v13.EmissiveMaskContent.Uri and v13.EmissiveMaskContent.Uri ~= "" or not v8 then
-                    table.insert(v10, v13);
-                end;
-            else
-                table.insert(v10, v13);
-            end;
-        end;
-    end;
-    return v9, v10;
-end;
-v6.findSurfaceAppearancesMissingTexturePacks = function(v16, v17) --[[ Line: 60 ]] --[[ Name: findSurfaceAppearancesMissingTexturePacks ]]
-    -- upvalues: v15 (copy)
-    local _, v19 = v15(v16, v17);
-    return v19;
-end;
-v6.findSurfaceAppearancesWithTexturePacks = function(v20) --[[ Line: 68 ]] --[[ Name: findSurfaceAppearancesWithTexturePacks ]]
-    -- upvalues: v15 (copy)
-    return (v15(v20, false));
-end;
-return v6;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+local util = ParentParent.util
+local ParseContentIds = require(util.ParseContentIds)
+local flags = ParentParent.flags
+local getFFlagUGCValidateEmptySurfaceAppearance = require(flags.getFFlagUGCValidateEmptySurfaceAppearance)
+local t1 = {}
+
+local function findSurfaceAppearances(p1, b1: boolean) -- line: 17
+	-- upvalues: UGCValidationService (copy), ParseContentIds (copy), getFFlagUGCValidateEmptySurfaceAppearance (copy)
+	local t2 = {}
+	local t3 = {}
+	local descendants = p1:GetDescendants()
+
+	table.insert(descendants, p1)
+
+	for _, v15 in descendants do
+		if v15:IsA("SurfaceAppearance") then
+			local PropertyValue = UGCValidationService:GetPropertyValue(v15, "TexturePack")
+
+			if if not PropertyValue then nil else ParseContentIds.tryGetAssetIdFromContentId(PropertyValue) then
+				table.insert(t2, v15)
+			elseif getFFlagUGCValidateEmptySurfaceAppearance() then
+				if v15.ColorMap and v15.ColorMap ~= "" or (v15.MetalnessMap and v15.MetalnessMap ~= "" or (v15.NormalMap and v15.NormalMap ~= "" or (v15.RoughnessMap and v15.RoughnessMap ~= "" or v15.EmissiveMaskContent and (v15.EmissiveMaskContent.SourceType == Enum.ContentSourceType.Uri and (v15.EmissiveMaskContent.Uri and v15.EmissiveMaskContent.Uri ~= ""))))) or not b1 then
+					table.insert(t3, v15)
+				end
+			else
+				table.insert(t3, v15)
+			end
+		end
+	end
+
+	return t2, t3
+end
+
+function t1.findSurfaceAppearancesMissingTexturePacks(p2, b2: boolean) -- line: 60
+	-- upvalues: findSurfaceAppearances (copy)
+	local _, v20 = findSurfaceAppearances(p2, b2)
+
+	return v20
+end
+function t1.findSurfaceAppearancesWithTexturePacks(p3) -- line: 68
+	-- upvalues: findSurfaceAppearances (copy)
+	return (findSurfaceAppearances(p3, false))
+end
+
+return t1

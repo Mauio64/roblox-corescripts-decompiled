@@ -1,17 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Enums.Theme);
-local v3 = require(l_script_FirstAncestor_0.Providers.Foundation);
-local _ = require(l_script_FirstAncestor_0.Providers.Preferences.PreferencesProvider);
-local v5 = require(l_script_FirstAncestor_0.Components.View);
-return function(v6, v7, v8) --[[ Line: 12 ]]
-    -- upvalues: v1 (copy), v3 (copy), v2 (copy), v5 (copy)
-    return v1.createElement(v3, {
-        theme = v8 or v2.Dark, 
-        preferences = v7
-    }, {
-        Content = v1.createElement(v5, {
-            Size = UDim2.fromScale(1, 1)
-        }, v6)
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local React = require(Foundation.Parent.React)
+local Theme = require(Foundation.Enums.Theme)
+local Foundation2 = require(Foundation.Providers.Foundation)
+
+require(Foundation.Providers.Preferences.PreferencesProvider)
+
+local View = require(Foundation.Components.View)
+
+return function(p1, p2, p3) -- line: 12
+	-- upvalues: React (copy), Foundation2 (copy), Theme (copy), View (copy)
+	return React.createElement(Foundation2, {
+		theme = p3 or Theme.Dark,
+		preferences = p2
+	}, {
+		Content = React.createElement(View, {
+			Size = UDim2.fromScale(1, 1)
+		}, p1)
+	})
+end

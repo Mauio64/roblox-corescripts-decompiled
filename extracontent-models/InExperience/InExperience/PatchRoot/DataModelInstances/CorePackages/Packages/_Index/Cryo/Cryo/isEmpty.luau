@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isEmpty ]]
-    return next(v0) == nil;
-end;
+local function isEmpty(p1) -- line: 1
+	return next(p1) == nil
+end
+
+return isEmpty

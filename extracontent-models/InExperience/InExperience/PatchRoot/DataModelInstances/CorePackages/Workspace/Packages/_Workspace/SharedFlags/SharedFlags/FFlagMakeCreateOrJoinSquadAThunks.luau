@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MakeCreateOrJoinSquadAThunks", false);
+return game:DefineFastFlag("MakeCreateOrJoinSquadAThunks", false)

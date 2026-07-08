@@ -1,35 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.SignalsReact);
-local v5 = require(l_Parent_0.BuilderIcons);
-local v6 = require(l_script_FirstAncestor_0.Stores.GetSelectedUsersStore);
-return v2.memo(function() --[[ Line: 13 ]] --[[ Name: FriendCountLabel ]]
-    -- upvalues: v6 (copy), v4 (copy), v3 (copy), v2 (copy), v5 (copy)
-    local v7 = v6(false);
-    local v8 = v4.useSignalBinding(v7.getSelectedUserIdsCount());
-    local v9 = v4.useSignalBinding(v7.getMaxSize());
-    local v10 = v3.Hooks.useTokens();
-    return v2.createElement(v3.View, {
-        tag = "col auto-xy padding-y-small gap-small align-x-center"
-    }, {
-        v2.createElement(v3.Icon, {
-            style = v10.Semantic.Color.Icon.Emphasis, 
-            name = v5.Migration.uiblox["icons/actions/friend_sort/add_friends"].name, 
-            variant = v3.Enums.IconVariant.Filled, 
-            size = v3.Enums.IconSize.Large, 
-            LayoutOrder = 1
-        }); 
-        Label = v2.createElement(v3.Text, {
-            tag = "auto-xy text-truncate-end text-caption-large content-emphasis", 
-            Text = v2.joinBindings({
-                v8, 
-                v9
-            }):map(function(v11) --[[ Line: 32 ]]
-                return (("%*/%*"):format(v11[1], v11[2]));
-            end), 
-            LayoutOrder = 2
-        })
-    });
-end);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Foundation = require(AppChatParent.Foundation)
+local SignalsReact = require(AppChatParent.SignalsReact)
+local BuilderIcons = require(AppChatParent.BuilderIcons)
+local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
+
+local function FriendCountLabel() -- line: 13
+	-- upvalues: GetSelectedUsersStore (copy), SignalsReact (copy), Foundation (copy), React (copy), BuilderIcons (copy)
+	local v9 = GetSelectedUsersStore(false)
+	local v10 = SignalsReact.useSignalBinding(v9.getSelectedUserIdsCount())
+	local v11 = SignalsReact.useSignalBinding(v9.getMaxSize())
+	local v12 = Foundation.Hooks.useTokens()
+
+	return React.createElement(Foundation.View, {
+		tag = "col auto-xy padding-y-small gap-small align-x-center"
+	}, {
+		React.createElement(Foundation.Icon, {
+			LayoutOrder = 1,
+			style = v12.Color.Content.Emphasis,
+			name = BuilderIcons.Migration.uiblox["icons/actions/friend_sort/add_friends"].name,
+			variant = Foundation.Enums.IconVariant.Filled,
+			size = Foundation.Enums.IconSize.Large
+		}),
+		Label = React.createElement(Foundation.Text, {
+			tag = "auto-xy text-truncate-end text-caption-large content-emphasis",
+			LayoutOrder = 2,
+			Text = React.joinBindings({
+				v10,
+				v11
+			}):map(function(p1) -- line: 32
+				return `{ p1[1] }/{ p1[2] }`
+			end)
+		})
+	})
+end
+
+return React.memo(FriendCountLabel)

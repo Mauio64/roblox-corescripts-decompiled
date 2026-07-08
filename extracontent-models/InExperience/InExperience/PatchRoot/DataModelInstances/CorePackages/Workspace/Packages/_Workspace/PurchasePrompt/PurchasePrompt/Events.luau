@@ -1,7 +1,8 @@
-local l_script_0 = script;
-local v1 = require(l_script_0.PurchaseFlowUUIDTelemetry);
-local v2 = require(l_script_0.FocusNavigationOptimizationTelemetry);
+local _script = script
+local PurchaseFlowUUIDTelemetry = require(_script.PurchaseFlowUUIDTelemetry)
+local FocusNavigationOptimizationTelemetry = require(_script.FocusNavigationOptimizationTelemetry)
+
 return {
-    PurchaseFlowUUIDTelemetry = v1, 
-    FocusNavigationOptimizationTelemetry = v2
-};
+	PurchaseFlowUUIDTelemetry = PurchaseFlowUUIDTelemetry,
+	FocusNavigationOptimizationTelemetry = FocusNavigationOptimizationTelemetry
+}

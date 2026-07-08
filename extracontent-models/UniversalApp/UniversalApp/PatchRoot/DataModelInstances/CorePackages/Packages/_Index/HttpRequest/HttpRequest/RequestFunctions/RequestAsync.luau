@@ -1,24 +1,25 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local v1 = require(script.Parent.Util.getHeaders);
-local v2 = require(script.Parent.Util.getPostBody);
-return function(v3, v4, v5) --[[ Line: 6 ]]
-    -- upvalues: l_HttpService_0 (copy), v2 (copy), v1 (copy)
-    return {
-        Start = function(_, v7) --[[ Line: 8 ]] --[[ Name: Start ]]
-            -- upvalues: l_HttpService_0 (ref), v3 (copy), v4 (copy), v2 (ref), v5 (copy), v1 (ref)
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 9 ]]
-                -- upvalues: l_HttpService_0 (ref), v3 (ref), v4 (ref), v2 (ref), v5 (ref), v1 (ref)
-                return l_HttpService_0:RequestAsync({
-                    Url = v3, 
-                    Method = v4, 
-                    Body = v2(v5.postBody, v4), 
-                    Headers = v1(v5.headers, v4)
-                });
-            end);
-            v7(l_status_0, l_result_0);
-        end, 
-        Cancel = function() --[[ Line: 20 ]] --[[ Name: Cancel ]]
+local HttpService = game:GetService("HttpService")
+local getHeaders = require(script.Parent.Util.getHeaders)
+local getPostBody = require(script.Parent.Util.getPostBody)
 
-        end
-    };
-end;
+return function(p1, p2, p3) -- line: 6
+	-- upvalues: HttpService (copy), getPostBody (copy), getHeaders (copy)
+	return {
+		Start = function(_, p5) -- line: 8
+			-- upvalues: HttpService (copy), p1 (copy), p2 (copy), getPostBody (copy), p3 (copy), getHeaders (copy)
+			local ok, result = pcall(function() -- line: 9
+				-- upvalues: HttpService (copy), p1 (copy), p2 (copy), getPostBody (copy), p3 (copy), getHeaders (copy)
+				return HttpService:RequestAsync({
+					Url = p1,
+					Method = p2,
+					Body = getPostBody(p3.postBody, p2),
+					Headers = getHeaders(p3.headers, p2)
+				})
+			end)
+
+			p5(ok, result)
+		end,
+		Cancel = function() -- line: 20
+		end
+	}
+end

@@ -1,5 +1,3 @@
 return {
-    testMatch = {
-        "**/*.test"
-    }
-};
+	testMatch = { "**/*.test" }
+}

@@ -1,24 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local v1 = require(l_script_FirstAncestor_0.Service);
-local v2 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.Constants);
-local v3 = require(l_script_FirstAncestor_0.ChromeShared.Hooks.useMappedSignal);
-local v4 = require(l_script_FirstAncestor_0.Integrations.CommonFtuxTooltip);
-local v5 = game:DefineFastInt("AvatarSwitcherTooltipPriority", 3000);
-local v6 = game:DefineFastString("AvatarSwitcherTooltipStorageKey", "AvatarSwitcherTooltipStorageKey");
-local v7 = game:DefineFastInt("AvatarSwitcherTooltipShowDelay", 1000);
-local v8 = game:DefineFastInt("AvatarSwitcherTooltipDismissDelay", 8500);
-return function(v9) --[[ Line: 17 ]] --[[ Name: AvatarSwitcherFtuxTooltip ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy), v8 (copy)
-    local v10 = v1:integrations()[v2.AVATAR_SWITCHER_ID];
-    local v11 = if v10 then v10.availability else nil;
-    return v3(v11) == v1.AvailabilitySignal.Available and v4({
-        id = "AVATAR_SWITCHER_TOOLTIP", 
-        priority = v5, 
-        isIconVisible = v9.visible, 
-        headerKey = "CoreScripts.FTUX.Heading.NewAvatarSwitcher", 
-        bodyKey = "CoreScripts.FTUX.Label.AvatarSwitcherDescription", 
-        localStorageKey = v6, 
-        showDelay = v7, 
-        dismissDelay = v8
-    });
-end;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local Service = require(Chrome.Service)
+local Constants = require(Chrome.ChromeShared.Unibar.Constants)
+local useMappedSignal = require(CorePackages.Workspace.Packages.Chrome).Hooks.useMappedSignal
+local CommonFtuxTooltip = require(Chrome.Integrations.CommonFtuxTooltip)
+local v7 = game:DefineFastInt("AvatarSwitcherTooltipPriority", 3000)
+local v8 = game:DefineFastString("AvatarSwitcherTooltipStorageKey", "AvatarSwitcherTooltipStorageKey")
+local v9 = game:DefineFastInt("AvatarSwitcherTooltipShowDelay", 1000)
+local v10 = game:DefineFastInt("AvatarSwitcherTooltipDismissDelay", 8500)
+
+local function AvatarSwitcherFtuxTooltip(t1: {[any]: any}) -- line: 19
+	-- upvalues: Service (copy), Constants (copy), useMappedSignal (copy), CommonFtuxTooltip (copy), v7 (copy), v8 (copy), v9 (copy), v10 (copy)
+	local v13 = Service:integrations()[Constants.AVATAR_SWITCHER_ID]
+	local v14 = if not v13 then nil else v13.availability
+
+	return useMappedSignal(v14) == Service.AvailabilitySignal.Available and CommonFtuxTooltip({
+		id = "AVATAR_SWITCHER_TOOLTIP",
+		headerKey = "CoreScripts.FTUX.Heading.NewAvatarSwitcher",
+		bodyKey = "CoreScripts.FTUX.Label.AvatarSwitcherDescription",
+		priority = v7,
+		isIconVisible = t1.visible,
+		localStorageKey = v8,
+		showDelay = v9,
+		dismissDelay = v10
+	})
+end
+
+return AvatarSwitcherFtuxTooltip

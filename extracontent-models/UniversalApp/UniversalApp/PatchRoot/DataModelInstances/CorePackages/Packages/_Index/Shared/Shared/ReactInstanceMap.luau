@@ -1,125 +1,94 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_Error_0 = v2.Error;
-local l_inspect_0 = v2.util.inspect;
-local v5 = require(script.Parent.getComponentName);
-local _ = script:FindFirstAncestor("ReactUtils");
-local l___DEV___0 = v1.__DEV__;
-local v8 = require(l_Parent_0.SafeFlags).createGetFFlag("ReactInstanceMapDisableErrorChecking")();
-local v9 = {};
-local function _(v10) --[[ Line: 44 ]] --[[ Name: isValidFiber ]]
-    local v11 = false;
-    if v10.tag ~= nil then
-        v11 = false;
-        if v10.subtreeFlags ~= nil then
-            v11 = false;
-            if v10.lanes ~= nil then
-                v11 = v10.childLanes ~= nil;
-            end;
-        end;
-    end;
-    return v11;
-end;
-v9.remove = function(v13) --[[ Line: 51 ]]
-    v13._reactInternals = nil;
-end;
-if not v8 or l___DEV___0 then
-    v9.get = function(v14) --[[ Line: 56 ]]
-        -- upvalues: l_Error_0 (copy), v5 (copy), l_inspect_0 (copy)
-        local l__reactInternals_0 = v14._reactInternals;
-        local v16 = false;
-        if l__reactInternals_0.tag ~= nil then
-            v16 = false;
-            if l__reactInternals_0.subtreeFlags ~= nil then
-                v16 = false;
-                if l__reactInternals_0.lanes ~= nil then
-                    v16 = l__reactInternals_0.childLanes ~= nil;
-                end;
-            end;
-        end;
-        if not v16 then
-            error(l_Error_0.new("invalid fiber in " .. (v5(v14) or "UNNAMED Component") .. " during get from ReactInstanceMap! " .. l_inspect_0(l__reactInternals_0)));
-            return l__reactInternals_0;
-        else
-            if l__reactInternals_0.alternate ~= nil then
-                local l_alternate_0 = l__reactInternals_0.alternate;
-                v16 = false;
-                if l_alternate_0.tag ~= nil then
-                    v16 = false;
-                    if l_alternate_0.subtreeFlags ~= nil then
-                        v16 = false;
-                        if l_alternate_0.lanes ~= nil then
-                            v16 = l_alternate_0.childLanes ~= nil;
-                        end;
-                    end;
-                end;
-                if not v16 then
-                    error(l_Error_0.new("invalid alternate fiber (" .. (v5(v14) or "UNNAMED alternate") .. ") in " .. (v5(v14) or "UNNAMED Component") .. " during get from ReactInstanceMap! " .. l_inspect_0(l__reactInternals_0.alternate)));
-                end;
-            end;
-            return l__reactInternals_0;
-        end;
-    end;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Error = LuauPolyfill.Error
+local inspect = LuauPolyfill.util.inspect
+local getComponentName = require(script.Parent.getComponentName)
+
+script:FindFirstAncestor("ReactUtils")
+
+local __DEV__ = ReactGlobals.__DEV__
+local v8 = require(ParentParent.SafeFlags).createGetFFlag("ReactInstanceMapDisableErrorChecking")()
+local t1 = {}
+
+local function isValidFiber(p1) -- line: 44
+	return p1.tag ~= nil and (p1.subtreeFlags ~= nil and (p1.lanes ~= nil and p1.childLanes ~= nil))
+end
+
+function t1.remove(p2) -- line: 51
+	p2._reactInternals = nil
+end
+
+if not v8 or __DEV__ then
+	function t1.get(p3) -- line: 56
+		-- upvalues: Error (copy), getComponentName (copy), inspect (copy)
+		local _reactInternals = p3._reactInternals
+
+		if _reactInternals.tag == nil or (_reactInternals.subtreeFlags == nil or (_reactInternals.lanes == nil or _reactInternals.childLanes == nil)) then
+			error(Error.new("invalid fiber in " .. (getComponentName(p3) or "UNNAMED Component") .. " during get from ReactInstanceMap! " .. inspect(_reactInternals)))
+
+			return _reactInternals
+		end
+
+		if _reactInternals.alternate ~= nil then
+			local alternate = _reactInternals.alternate
+
+			if alternate.tag == nil or (alternate.subtreeFlags == nil or (alternate.lanes == nil or alternate.childLanes == nil)) then
+				error(Error.new("invalid alternate fiber (" .. (getComponentName(p3) or "UNNAMED alternate") .. ") in " .. (getComponentName(p3) or "UNNAMED Component") .. " during get from ReactInstanceMap! " .. inspect(_reactInternals.alternate)))
+			end
+		end
+
+		return _reactInternals
+	end
 else
-    v9.get = function(v18) --[[ Line: 82 ]]
-        return v18._reactInternals;
-    end;
-end;
-v9.has = function(v19) --[[ Line: 87 ]]
-    return v19._reactInternals ~= nil;
-end;
-if not v8 or l___DEV___0 then
-    v9.set = function(v20, v21) --[[ Line: 92 ]]
-        -- upvalues: v5 (copy), l_inspect_0 (copy), l_Error_0 (copy)
-        local l_v21_0 = v21;
-        local v23 = nil;
-        while l_v21_0 ~= nil do
-            local l_l_v21_0_0 = l_v21_0;
-            local v25 = false;
-            if l_l_v21_0_0.tag ~= nil then
-                v25 = false;
-                if l_l_v21_0_0.subtreeFlags ~= nil then
-                    v25 = false;
-                    if l_l_v21_0_0.lanes ~= nil then
-                        v25 = l_l_v21_0_0.childLanes ~= nil;
-                    end;
-                end;
-            end;
-            if not v25 then
-                v23 = "invalid fiber in " .. (v5(v20) or "UNNAMED Component") .. " being set in ReactInstanceMap! " .. l_inspect_0(l_v21_0) .. "\n";
-                if v21 ~= l_v21_0 then
-                    v23 = v23 .. " (from original fiber " .. (v5(v20) or "UNNAMED Component") .. ")";
-                end;
-                error(l_Error_0.new(v23));
-            elseif l_v21_0.alternate ~= nil then
-                l_l_v21_0_0 = l_v21_0.alternate;
-                v25 = false;
-                if l_l_v21_0_0.tag ~= nil then
-                    v25 = false;
-                    if l_l_v21_0_0.subtreeFlags ~= nil then
-                        v25 = false;
-                        if l_l_v21_0_0.lanes ~= nil then
-                            v25 = l_l_v21_0_0.childLanes ~= nil;
-                        end;
-                    end;
-                end;
-                if not v25 then
-                    v23 = "invalid alternate fiber (" .. (v5(v20) or "UNNAMED alternate") .. ") in " .. (v5(v20) or "UNNAMED Component") .. " being set in ReactInstanceMap! " .. l_inspect_0(l_v21_0.alternate) .. "\n";
-                    if v21 ~= l_v21_0 then
-                        v23 = v23 .. " (from original fiber " .. (v5(v20) or "UNNAMED Component") .. ")";
-                    end;
-                    error(l_Error_0.new(v23));
-                end;
-            end;
-            l_v21_0 = l_v21_0.return_;
-        end;
-        v20._reactInternals = v21;
-    end;
-    return v9;
-else
-    v9.set = function(v26, v27) --[[ Line: 129 ]]
-        v26._reactInternals = v27;
-    end;
-    return v9;
-end;
+	function t1.get(p4) -- line: 82
+		return p4._reactInternals
+	end
+end
+
+function t1.has(p5) -- line: 87
+	return p5._reactInternals ~= nil
+end
+
+if not v8 or __DEV__ then
+	function t1.set(p6, p7) -- line: 92
+		-- upvalues: getComponentName (copy), inspect (copy), Error (copy)
+		local v20 = p7
+
+		while v20 ~= nil do
+			if v20.tag == nil or (v20.subtreeFlags == nil or (v20.lanes == nil or v20.childLanes == nil)) then
+				local v21 = "invalid fiber in " .. (getComponentName(p6) or "UNNAMED Component") .. " being set in ReactInstanceMap! " .. inspect(v20) .. "\n"
+
+				if p7 ~= v20 then
+					v21 ..= " (from original fiber " .. (getComponentName(p6) or "UNNAMED Component") .. ")"
+				end
+
+				error(Error.new(v21))
+			elseif v20.alternate ~= nil then
+				local alternate = v20.alternate
+
+				if alternate.tag == nil or (alternate.subtreeFlags == nil or (alternate.lanes == nil or alternate.childLanes == nil)) then
+					local v23 = "invalid alternate fiber (" .. (getComponentName(p6) or "UNNAMED alternate") .. ") in " .. (getComponentName(p6) or "UNNAMED Component") .. " being set in ReactInstanceMap! " .. inspect(v20.alternate) .. "\n"
+
+					if p7 ~= v20 then
+						v23 ..= " (from original fiber " .. (getComponentName(p6) or "UNNAMED Component") .. ")"
+					end
+
+					error(Error.new(v23))
+				end
+			end
+
+			v20 = v20.return_
+		end
+
+		p6._reactInternals = p7
+	end
+
+	return t1
+end
+
+function t1.set(p8, p9) -- line: 129
+	p8._reactInternals = p9
+end
+
+return t1

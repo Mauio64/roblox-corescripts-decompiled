@@ -1,40 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Roact);
-local v5 = require(l_Parent_0.Foundation);
-local l_TextButton_0 = require(l_Parent_0.UIBlox).App.Button.TextButton;
-local v7 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatDomLocatorFoundationMigration);
-return function(v8) --[[ Line: 14 ]]
-    -- upvalues: v2 (copy), v4 (copy), l_TextButton_0 (copy), v7 (copy), v3 (copy), v5 (copy)
-    local l_localizedStrings_0 = v8.localizedStrings;
-    local l_isDisabled_0 = v8.isDisabled;
-    local l_onActivated_0 = v8.onActivated;
-    v2.isNotNil(l_localizedStrings_0, "props.localizedStrings");
-    local v12 = v4.createElement(l_TextButton_0, {
-        text = l_localizedStrings_0.systemButtonText, 
-        isDisabled = l_isDisabled_0, 
-        onActivated = function() --[[ Line: 24 ]] --[[ Name: onActivated ]]
-            -- upvalues: l_isDisabled_0 (copy), l_onActivated_0 (copy), l_localizedStrings_0 (copy)
-            if l_isDisabled_0 then
-                return;
-            else
-                if l_onActivated_0 then
-                    l_onActivated_0(l_localizedStrings_0);
-                end;
-                return;
-            end;
-        end
-    });
-    if v7 and v8.testId then
-        return v3.createElement(v5.View, {
-            tag = "auto-xy", 
-            testId = v8.testId
-        }, {
-            button = v12
-        });
-    else
-        return v12;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local ArgCheck = require(AppChatParent.ArgCheck)
+local React = require(AppChatParent.React)
+local Roact = require(AppChatParent.Roact)
+local Foundation = require(AppChatParent.Foundation)
+local TextButton = require(AppChatParent.UIBlox).App.Button.TextButton
+local FFlagAppChatDomLocatorFoundationMigration = require(AppChat.Flags.FFlagAppChatDomLocatorFoundationMigration)
+
+return function(p1) -- line: 14
+	-- upvalues: ArgCheck (copy), Roact (copy), TextButton (copy), FFlagAppChatDomLocatorFoundationMigration (copy), React (copy), Foundation (copy)
+	local localizedStrings = p1.localizedStrings
+	local isDisabled = p1.isDisabled
+	local onActivated = p1.onActivated
+
+	ArgCheck.isNotNil(localizedStrings, "props.localizedStrings")
+
+	local v13 = Roact.createElement(TextButton, {
+		text = localizedStrings.systemButtonText,
+		isDisabled = isDisabled,
+		onActivated = function() -- line: 24
+			-- upvalues: isDisabled (copy), onActivated (copy), localizedStrings (copy)
+			if isDisabled then
+				return
+			end
+
+			if onActivated then
+				onActivated(localizedStrings)
+			end
+		end
+	})
+
+	if FFlagAppChatDomLocatorFoundationMigration and p1.testId then
+		return React.createElement(Foundation.View, {
+			tag = "auto-xy",
+			testId = p1.testId
+		}, {
+			button = v13
+		})
+	end
+
+	return v13
+end

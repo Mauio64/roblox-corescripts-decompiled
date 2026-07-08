@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXHideMenuOnScroll2", false);
+return game:DefineFastFlag("AXHideMenuOnScroll3", false)

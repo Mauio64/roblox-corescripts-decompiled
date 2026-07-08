@@ -1,9 +1,10 @@
-local v0 = require(script.CoreScriptsProfiler);
-local v1 = require(script.CoreScriptsProfilerTelemetry);
-local v2 = require(script.ProfilerDataParser);
+local CoreScriptsProfiler = require(script.CoreScriptsProfiler)
+local CoreScriptsProfilerTelemetry = require(script.CoreScriptsProfilerTelemetry)
+local ProfilerDataParser = require(script.ProfilerDataParser)
+
 return {
-    CoreScriptsProfiler = v0, 
-    CoreScriptsProfilerTelemetry = v1, 
-    ProfilerDataParser = v2, 
-    ["jest.config"] = script["jest.config"]
-};
+	CoreScriptsProfiler = CoreScriptsProfiler,
+	CoreScriptsProfilerTelemetry = CoreScriptsProfilerTelemetry,
+	ProfilerDataParser = ProfilerDataParser,
+	["jest.config"] = script["jest.config"]
+}

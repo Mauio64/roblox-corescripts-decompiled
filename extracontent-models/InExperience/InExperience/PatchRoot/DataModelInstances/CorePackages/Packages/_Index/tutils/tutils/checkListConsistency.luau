@@ -1,28 +1,34 @@
-return function(v0) --[[ Line: 7 ]]
-    local v1 = false;
-    local v2 = false;
-    local v3 = true;
-    local v4 = 1;
-    for v5, _ in pairs(v0) do
-        if type(v5) == "string" then
-            v2 = true;
-        elseif type(v5) == "number" then
-            if v4 ~= v5 then
-                v3 = false;
-            end;
-            v1 = true;
-        else
-            return false;
-        end;
-        if v2 and v1 then
-            return false;
-        else
-            v4 = v4 + 1;
-        end;
-    end;
-    if v1 then
-        return v3;
-    else
-        return true;
-    end;
-end;
+return function(p1) -- line: 7
+	local v2 = false
+	local v3 = false
+	local v4 = true
+	local n1 = 1
+
+	for k, _ in pairs(p1) do
+		if type(k) == "string" then
+			v3 = true
+		else
+			if type(k) ~= "number" then
+				return false
+			end
+
+			if n1 ~= k then
+				v4 = false
+			end
+
+			v2 = true
+		end
+
+		if v3 and v2 then
+			return false
+		end
+
+		n1 += 1
+	end
+
+	if v2 then
+		return v4
+	end
+
+	return true
+end

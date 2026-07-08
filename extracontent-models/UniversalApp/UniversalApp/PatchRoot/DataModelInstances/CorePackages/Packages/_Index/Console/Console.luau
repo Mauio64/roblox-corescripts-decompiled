@@ -1,1 +1,1 @@
-return require(script.makeConsoleImpl)();
+return require(script.makeConsoleImpl)()

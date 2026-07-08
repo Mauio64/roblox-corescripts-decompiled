@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FriendRequestNicknamesV9", false);
+return game:DefineFastFlag("FriendRequestNicknamesV9", false)

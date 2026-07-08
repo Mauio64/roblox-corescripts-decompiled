@@ -1,59 +1,78 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialExperiments").Parent;
-local l_ExperimentCacheManager_0 = require(l_Parent_0.ExperimentCacheManager).ExperimentCacheManager;
-local v2 = game:DefineFastString("FStringQueueExpLayer", "Party.Coordination.ExperienceJoin");
-local v3 = game:DefineFastString("QueueEnableAutoJoinNewServerVariant", "enableAutoJoinNewServer");
-local v4 = game:DefineFastString("QueueEnableJoinNewServerVariant", "enableJoinNewServerButton");
-local v5 = game:DefineFastFlag("ForceEnableQueueAutoJoinNewServer", false);
-local v6 = game:DefineFastFlag("ForceEnableQueueJoinNewServerButton", false);
-local v7 = game:DefineFastFlag("EnableQueueExperimentation", false) and game:GetEngineFeature("PlaceJoinStateEnabled");
-local function _(v8) --[[ Line: 17 ]] --[[ Name: getIsUserInTreatment ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v2 (copy)
-    local v9 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-    if v9 and v9[v8] ~= nil then
-        return v9[v8];
-    else
-        return false;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialExperiments").Parent
+local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
+local v3 = game:DefineFastString("FStringQueueExpLayer", "Party.Coordination.ExperienceJoin")
+local v4 = game:DefineFastString("QueueEnableAutoJoinNewServerVariant", "enableAutoJoinNewServer")
+local v5 = game:DefineFastString("QueueEnableJoinNewServerVariant", "enableJoinNewServerButton")
+local v6 = game:DefineFastFlag("ForceEnableQueueAutoJoinNewServer2", false)
+local v7 = game:DefineFastFlag("ForceEnableQueueJoinNewServerButton2", false)
+local v8 = game:DefineFastFlag("EnableQueueExperimentation2", false) and game:GetEngineFeature("PlaceJoinStateEnabled")
+
+local function getIsUserInTreatment(s1: string) -- line: 17
+	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
+	local v11 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+	if v11 and v11[s1] ~= nil then
+		return v11[s1]
+	end
+
+	return false
+end
+
 return {
-    getIsJoinNewServerButtonEnabled = function() --[[ Line: 32 ]] --[[ Name: getIsJoinNewServerButtonEnabled ]]
-        -- upvalues: v6 (copy), v7 (copy), v4 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        local l_v6_0 = v6;
-        if not l_v6_0 then
-            l_v6_0 = v7;
-            if l_v6_0 then
-                local l_v4_0 = v4;
-                local v13 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-                if v13 and v13[l_v4_0] ~= nil then
-                    return v13[l_v4_0];
-                else
-                    l_v6_0 = false;
-                end;
-            end;
-        end;
-        return l_v6_0;
-    end, 
-    getIsAutoJoinNewServerEnabled = function() --[[ Line: 27 ]] --[[ Name: getIsAutoJoinNewServerEnabled ]]
-        -- upvalues: v5 (copy), v7 (copy), v3 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        local l_v5_0 = v5;
-        if not l_v5_0 then
-            l_v5_0 = v7;
-            if l_v5_0 then
-                local l_v3_0 = v3;
-                local v16 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-                if v16 and v16[l_v3_0] ~= nil then
-                    return v16[l_v3_0];
-                else
-                    l_v5_0 = false;
-                end;
-            end;
-        end;
-        return l_v5_0;
-    end, 
-    logExposure = function() --[[ Line: 37 ]] --[[ Name: logExposure ]]
-        -- upvalues: v7 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        if v7 and l_ExperimentCacheManager_0.default:getLayerVariables(v2) ~= nil then
-            l_ExperimentCacheManager_0.default:logLayerExposure(v2);
-        end;
-    end
-};
+	getIsJoinNewServerButtonEnabled = function() -- line: 32
+		-- upvalues: v7 (copy), v8 (copy), v5 (copy), ExperimentCacheManager (copy), v3 (copy)
+		local v15 = v7
+
+		if not v15 then
+			v15 = v8
+
+			if v15 then
+				local v16 = v5
+				local v17 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+				if v17 and v17[v16] ~= nil then
+					return v17[v16]
+				end
+
+				v15 = false
+			end
+		end
+
+		return v15
+	end,
+	getIsAutoJoinNewServerEnabled = function() -- line: 27
+		-- upvalues: v6 (copy), v8 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
+		local v12 = v6
+
+		if not v12 then
+			v12 = v8
+
+			if v12 then
+				local v13 = v4
+				local v14 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+				if v14 and v14[v13] ~= nil then
+					return v14[v13]
+				end
+
+				v12 = false
+			end
+		end
+
+		return v12
+	end,
+	isInExperiment = function() -- line: 37
+		-- upvalues: v8 (copy), ExperimentCacheManager (copy), v3 (copy)
+		if v8 then
+			return ExperimentCacheManager.default:getLayerVariables(v3) ~= nil
+		end
+
+		return false
+	end,
+	logExposure = function() -- line: 45
+		-- upvalues: v8 (copy), ExperimentCacheManager (copy), v3 (copy)
+		if v8 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
+			ExperimentCacheManager.default:logLayerExposure(v3)
+		end
+	end
+}

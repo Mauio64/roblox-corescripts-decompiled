@@ -5,6 +5,12 @@ local Foundation = require(ProfilePlatformParent.Foundation)
 local DisplayBackground = require(ProfilePlatformParent.EditProfileBackground).DisplayBackground
 local BuyActionBar = require(ProfilePlatformParent.AvatarExperienceInspectAndBuy).Components.BuyActionBar
 local Dash = require(ProfilePlatformParent.Dash)
+local FocusNavigationUtils = require(ProfilePlatformParent.FocusNavigationUtils)
+local AppFocusRoot = FocusNavigationUtils.AppFocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local InputHandlers = require(ProfilePlatformParent.InputHandlers)
+local FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav
 local View = Foundation.View
 local FoundationText = Foundation.Text
 local IconButton = Foundation.IconButton
@@ -22,9 +28,12 @@ local InspectAvatarUtils = require(script.Parent.InspectAvatarUtils)
 local CatalogItemRowCardContainer = require(script.Parent.CatalogItemRowCardContainer)
 local isItemPurchasable = InspectAvatarUtils.isItemPurchasable
 
-return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
-	-- upvalues: useLocalization (copy), ItemDisplayHelpers (copy), React (copy), Dash (copy), CatalogItemRowCardContainer (copy), isItemPurchasable (copy), View (copy), DisplayBackground (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy), Skeleton (copy), Divider (copy), BuyActionBar (copy)
-	local v22 = useLocalization({
+local function InspectAvatarSheet(t1: {[any]: any}) -- line: 69
+	-- upvalues: useLocalization (copy), ItemDisplayHelpers (copy), React (copy), Dash (copy), CatalogItemRowCardContainer (copy), isItemPurchasable (copy), FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav (copy), InputHandlers (copy), View (copy), DisplayBackground (copy), IconButton (copy), IconName (copy), IconSize (copy), ButtonVariant (copy), FoundationText (copy), Skeleton (copy), Divider (copy), BuyActionBar (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy)
+	local v29 = useLocalization({
+		buyItems = "Feature.Catalog.Label.BuyItems",
+		bundle = "Feature.Catalog.Label.Bundle",
+		insufficientRobux = "Feature.Profile.Heading.InsufficientFunds",
 		title = {
 			"Feature.Profile.Header.InspectAndBuy",
 			username = t1.username
@@ -33,53 +42,57 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 			"Feature.Profile.Header.InspectAndBuy.BuySection",
 			numberOfSelectedItems = t1.purchaseSummary.count,
 			totalNumberOfItems = #t1.displayItems
-		},
-		buyItems = "Feature.Catalog.Label.BuyItems",
-		bundle = "Feature.Catalog.Label.Bundle",
-		insufficientRobux = "Feature.Profile.Heading.InsufficientFunds"
+		}
 	})
-	local v23 = useLocalization(ItemDisplayHelpers.PRICE_STATUS_LOCALIZATION_KEYS)
-	local v24 = useLocalization(ItemDisplayHelpers.ASSET_TYPE_LOCALIZATION_KEYS)
-	local v25 = useLocalization(ItemDisplayHelpers.BUNDLE_TYPE_LOCALIZATION_KEYS)
-	local v26 = React.useMemo(function() -- line: 78
-		-- upvalues: v22 (copy), Dash (copy), v24 (copy), v25 (copy)
+	local v30 = useLocalization(ItemDisplayHelpers.PRICE_STATUS_LOCALIZATION_KEYS)
+	local v31 = useLocalization(ItemDisplayHelpers.ASSET_TYPE_LOCALIZATION_KEYS)
+	local v32 = useLocalization(ItemDisplayHelpers.BUNDLE_TYPE_LOCALIZATION_KEYS)
+	local v33 = React.useMemo(function() -- line: 87
+		-- upvalues: v29 (copy), Dash (copy), v31 (copy), v32 (copy)
 		return {
-			bundle = v22.bundle,
 			bundleParts = nil,
-			assetTypeNames = Dash.join(v24, v25)
+			bundle = v29.bundle,
+			assetTypeNames = Dash.join(v31, v32)
 		}
 	end, {
-		v22.bundle,
-		v24,
-		v25
+		v29.bundle,
+		v31,
+		v32
 	})
 	local t2 = {}
 
-	for v28, v29 in t1.displayItems do
-		local id = v29.id
+	for v35, v36 in t1.displayItems do
+		local id = v36.id
 
 		t2[`item_{ id }`] = React.createElement(CatalogItemRowCardContainer, {
-			asset = v29,
-			index = v28,
-			isChecked = t1.selectedItems[id] == true,
-			isPurchasable = isItemPurchasable(v29),
 			rowHeight = 72,
-			localizedStrings = v26,
-			priceStatusLocalized = v23,
+			asset = v36,
+			index = v35,
+			isChecked = t1.selectedItems[id] == true,
+			isPurchasable = isItemPurchasable(v36),
+			localizedStrings = v33,
+			priceStatusLocalized = v30,
 			onToggleItem = t1.onToggleItem,
 			openItemDetails = t1.openItemDetails
 		})
 	end
 
-	return React.createElement(View, {
-		Size = UDim2.fromScale(1, 1)
-	}, {
+	local v38 = if not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then nil else React.useMemo(function() -- line: 114
+		-- upvalues: InputHandlers (copy), t1 (copy)
+		return InputHandlers.onRelease(function(p1) -- line: 115
+			-- upvalues: t1 (copy)
+			p1:cancel()
+			t1.onClose()
+		end)
+	end, { t1.onClose })
+	local t4 = {
 		Scrim = React.createElement("TextButton", {
 			Size = UDim2.new(1, -t1.cardWidth, 1, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Text = "",
 			AutoButtonColor = false,
+			Selectable = not FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav and nil,
 			[React.Event.Activated] = t1.onDismiss
 		}),
 		Sheet = React.createElement(View, {
@@ -88,12 +101,12 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 		}, {
 			StatusBarSpacer = if not (t1.topOffset > 0) then nil else React.createElement(View, {
 				tag = "bg-surface-0",
-				Size = UDim2.new(1, 0, 0, t1.topOffset),
-				LayoutOrder = 0
+				LayoutOrder = 0,
+				Size = UDim2.new(1, 0, 0, t1.topOffset)
 			}),
 			AvatarViewport = React.createElement(View, {
-				Size = UDim2.new(1, 0, 0, t1.avatarViewportHeight),
-				LayoutOrder = 1
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, t1.avatarViewportHeight)
 			}, {
 				Background = React.createElement(DisplayBackground, {
 					height = t1.avatarViewportHeight,
@@ -105,37 +118,37 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 					ZIndex = 2
 				}, {
 					BackButton = React.createElement(IconButton, {
+						isCircular = true,
 						icon = IconName.ChevronLargeLeft,
 						size = IconSize.Medium,
 						variant = ButtonVariant.Utility,
-						onActivated = t1.onClose,
-						isCircular = true
+						onActivated = t1.onClose
 					})
 				})
 			}),
 			Title = React.createElement(FoundationText, {
 				tag = "size-full-0 auto-y padding-y-small text-heading-small text-align-x-left",
-				Text = v22.title,
-				LayoutOrder = 2
+				LayoutOrder = 2,
+				Text = v29.title
 			}),
 			ScrollWrapper = React.createElement(View, {
 				tag = "fill size-full-0",
 				LayoutOrder = 3
 			}, {
 				ScrollContent = React.createElement("ScrollingFrame", {
-					Size = UDim2.fromScale(1, 1),
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					CanvasSize = UDim2.new(0, 0, 0, 0),
 					ScrollBarThickness = 0,
 					BackgroundTransparency = 1,
-					BorderSizePixel = 0
+					BorderSizePixel = 0,
+					Size = UDim2.fromScale(1, 1),
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					CanvasSize = UDim2.new(0, 0, 0, 0)
 				}, {
 					ItemList = if t1.isLoading then nil else React.createElement(View, {
 						tag = "col gap-large size-full-0 auto-y padding-bottom-large padding-top-medium"
 					}, t2),
 					LoadingShimmer = if not t1.isLoading then nil else React.createElement(View, {
 						tag = "col size-full-0 auto-y"
-					}, ((function() -- line: 174
+					}, ((function() -- line: 193
 						-- upvalues: React (copy), Skeleton (copy)
 						local t3 = {}
 
@@ -151,8 +164,8 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 				})
 			}),
 			FooterDivider = React.createElement(Divider, {
-				Size = UDim2.new(1, 0, 0, 1),
-				LayoutOrder = 4
+				LayoutOrder = 4,
+				Size = UDim2.new(1, 0, 0, 1)
 			}),
 			Footer = React.createElement(View, {
 				tag = "size-full-2500 bg-surface-0",
@@ -160,11 +173,11 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 			}, {
 				ActionBar = React.createElement(BuyActionBar, {
 					priceLabel = {
-						leftLabel = v22.buyHeader,
+						leftLabel = v29.buyHeader,
 						priceInRobux = tostring(t1.purchaseSummary.totalPrice)
 					},
 					purchaseButtonProps = {
-						purchaseButtonText = if not t1.hasInsufficientFunds then v22.buyItems else v22.insufficientRobux,
+						purchaseButtonText = if not t1.hasInsufficientFunds then v29.buyItems else v29.insufficientRobux,
 						onPurchase = t1.onBuyAll,
 						isDisabled = t1.isLoading or (t1.purchaseSummary.count == 0 or t1.hasInsufficientFunds == true),
 						variant = ButtonVariant.Emphasis
@@ -172,5 +185,24 @@ return function(t1: {[any]: any}) --[[ InspectAvatarSheet ]] -- line: 60
 				})
 			})
 		})
-	})
+	}
+
+	if FFlagSocialEnableProfileInspectAndBuyConsoleFocusNav then
+		return React.createElement(AppFocusRoot, {
+			isAutoFocusRoot = true,
+			isIsolated = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+			customEventHandlers = {
+				[FocusNavigationEventNameEnum.NavigateBack] = {
+					handler = v38
+				}
+			}
+		}, t4)
+	end
+
+	return React.createElement(View, {
+		Size = UDim2.fromScale(1, 1)
+	}, t4)
 end
+
+return InspectAvatarSheet

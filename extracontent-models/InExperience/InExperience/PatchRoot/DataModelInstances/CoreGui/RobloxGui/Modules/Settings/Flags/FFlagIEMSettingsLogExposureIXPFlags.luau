@@ -1,1 +1,1 @@
-return game:DefineFastFlag("IEMSettingsLogExposureIXPFlags", false);
+return game:DefineFastFlag("IEMSettingsLogExposureIXPFlags", false)

@@ -1,155 +1,183 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.React);
-local l_Portal_0 = require(l_Parent_3.Roact).Portal;
-local v6 = require(l_Parent_3.LuauPolyfill);
-local _ = require(l_Parent_0.Types);
-local v8 = require(l_Parent_0.Constants);
-local v9 = require(l_Parent_2.Core.Animation.withAnimation);
-local v10 = require(l_Parent_0.TooltipCallout);
-local v11 = require(l_Parent_1.Tooltip.Enum.TooltipOrientation);
-local function v17(v12, v13) --[[ Line: 19 ]] --[[ Name: argmax ]]
-    local v14 = nil;
-    for v15, v16 in pairs(v12) do
-        if not v13[v15] and (v14 == nil or v12[v14] < v16) then
-            v14 = v15;
-        end;
-    end;
-    return v14;
-end;
-local function v20(v18, v19) --[[ Line: 32 ]] --[[ Name: getDistances ]]
-    -- upvalues: v11 (copy), v8 (copy)
-    return {
-        [v11.Top] = v18.Y - v8.SCREEN_MARGIN, 
-        [v11.Bottom] = v19.Y - v18.Y - v8.SCREEN_MARGIN, 
-        [v11.Left] = v18.X - v8.SCREEN_MARGIN, 
-        [v11.Right] = v19.X - v18.X - v8.SCREEN_MARGIN
-    };
-end;
-getOrientationAndContentOffset = function(v21, v22, v23, v24) --[[ Line: 43 ]] --[[ Name: getOrientationAndContentOffset ]]
-    -- upvalues: v17 (copy), v11 (copy), v8 (copy)
-    local v25 = {};
-    local l_zero_0 = Vector2.zero;
-    while true do
-        if not v21 or v25[v21] then
-            local v27 = v17(v22, v25);
-            if v27 then
-                v21 = v27;
-            else
-                break;
-            end;
-        end;
-        if v21 == v11.Top or v21 == v11.Bottom then
-            if v23.Y + v8.DISTANCE_TO_CONTENT + v24.Y <= v22[v21] then
-                local l_Left_0 = v11.Left;
-                if v22[v11.Right] < v22[v11.Left] then
-                    l_Left_0 = v11.Right;
-                end;
-                local v29 = v22[l_Left_0];
-                if v8.MIN_DISTANCE_TO_CARET_MIDDLE <= v29 then
-                    l_zero_0 = math.max(0, v24.X / 2 - v29) * -1 * v8.ORIENTATION_VECTOR[l_Left_0];
-                    break;
-                else
-                    v25[v8.OPPOSITE_ORIENTATION[v21]] = true;
-                end;
-            end;
-        elseif v23.X + v8.DISTANCE_TO_CONTENT + v24.X <= v22[v21] then
-            local l_Top_0 = v11.Top;
-            if v22[v11.Bottom] < v22[v11.Top] then
-                l_Top_0 = v11.Bottom;
-            end;
-            local v31 = v22[l_Top_0];
-            if v8.MIN_DISTANCE_TO_CARET_MIDDLE <= v31 then
-                l_zero_0 = math.max(0, v24.Y / 2 - v31) * -1 * v8.ORIENTATION_VECTOR[l_Top_0];
-                break;
-            else
-                v25[v8.OPPOSITE_ORIENTATION[v21]] = true;
-            end;
-        end;
-        v25[v21] = true;
-        v21 = v8.OPPOSITE_ORIENTATION[v21];
-    end;
-    return v21, l_zero_0;
-end;
-return function(v32) --[[ Line: 106 ]] --[[ Name: TooltipController ]]
-    -- upvalues: v4 (copy), v11 (copy), v20 (copy), v8 (copy), v6 (copy), v10 (copy), l_Portal_0 (copy), v9 (copy)
-    local v33, v34 = v4.useState(Vector2.zero);
-    local v35, v36 = v4.useState(Vector2.zero);
-    local v37, v38 = v4.useState(Vector2.zero);
-    local v39, v40 = v4.useState(Vector2.zero);
-    local v41, v42 = v4.useState(Vector2.zero);
-    local v44 = v4.useCallback(function(v43) --[[ Line: 113 ]]
-        -- upvalues: v34 (copy), v36 (copy)
-        v34(v43.AbsolutePosition);
-        v36(v43.AbsoluteSize);
-    end);
-    local function v46(v45) --[[ Line: 119 ]]
-        -- upvalues: v40 (copy), v38 (copy)
-        if v45 then
-            v40(v45.AbsolutePosition);
-            v38(v45.AbsoluteSize);
-        end;
-    end;
-    local v47 = v35 / 2;
-    local v48 = v33 + v47 - v39;
-    local v49 = v32.preferredOrientation or v11.Top;
-    local v51, v52 = v4.useMemo(function() --[[ Line: 131 ]]
-        -- upvalues: v20 (ref), v48 (copy), v37 (copy), v49 (copy), v47 (copy), v41 (copy)
-        local v50 = v20(v48, v37);
-        return getOrientationAndContentOffset(v49, v50, v47, v41);
-    end, {
-        v49, 
-        v37, 
-        v48, 
-        v47, 
-        v41
-    });
-    local v53 = if not v32.disabled and v32.active then v8.ACTIVE_ANIMATION_TARGETS else v8.INACTIVE_ANIMATION_TARGETS;
-    local v59 = v9(v53, function(v54) --[[ Line: 142 ]] --[[ Name: renderWithAnimation ]]
-        -- upvalues: v51 (copy), v48 (copy), v47 (copy), v52 (copy), v42 (copy), v6 (ref), v32 (copy), v4 (ref), v10 (ref), v46 (copy), l_Portal_0 (ref)
-        if v54.transparency == 1 then
-            return nil;
-        else
-            local v55 = {
-                orientation = v51, 
-                triggerPointCenter = v48, 
-                triggerPointRadius = v47, 
-                contentOffsetVector = v52, 
-                onContentSizeChanged = v42, 
-                distanceOffset = v54.distanceOffset, 
-                transparency = v54.transparency
-            };
-            local v56 = v6.Object.assign({}, v32.tooltipProps, v55);
-            local v57 = {
-                Tooltip = v4.createElement(v10, v56)
-            };
-            local v58 = if v32.DEBUG_useTargetDirectly then v4.createElement("Frame", {
-                ZIndex = v32.DisplayOrder, 
-                Size = UDim2.fromScale(1, 1), 
-                BackgroundTransparency = 1, 
-                [v4.Change.AbsoluteSize] = v46, 
-                [v4.Change.AbsolutePosition] = v46, 
-                ref = v46
-            }, v57) else v4.createElement("ScreenGui", {
-                ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-                IgnoreGuiInset = true, 
-                DisplayOrder = v32.DisplayOrder, 
-                [v4.Change.AbsoluteSize] = v46, 
-                [v4.Change.AbsolutePosition] = v46, 
-                ref = v46
-            }, v57);
-            return v4.createElement(l_Portal_0, {
-                target = v32.guiTarget
-            }, {
-                TooltipLayer = v58
-            });
-        end;
-    end, v8.ANIMATION_OPTIONS);
-    local v60 = v32.triggerPointName or "TriggerPoint";
-    return v4.createElement(v4.Fragment, nil, {
-        Portal = v59, 
-        [v60] = v32.renderTriggerPoint(v44)
-    });
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local ParentParent = scriptParentParent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Portal = require(ParentParentParent.Roact).Portal
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+
+require(scriptParent.Types)
+
+local Constants = require(scriptParent.Constants)
+local withAnimation = require(ParentParent.Core.Animation.withAnimation)
+local TooltipCallout = require(scriptParent.TooltipCallout)
+local TooltipOrientation = require(scriptParentParent.Tooltip.Enum.TooltipOrientation)
+
+local function argmax(t1: {[any]: any}, t2: {[any]: any}) -- line: 19
+	local v17 = nil
+
+	for k, v in pairs(t1) do
+		if not t2[k] and (v17 == nil or v > t1[v17]) then
+			v17 = k
+		end
+	end
+
+	return v17
+end
+local function getDistances(vector2: Vector2, vector2_2: Vector2) -- line: 32
+	-- upvalues: TooltipOrientation (copy), Constants (copy)
+	return {
+		[TooltipOrientation.Top] = vector2.Y - Constants.SCREEN_MARGIN,
+		[TooltipOrientation.Bottom] = vector2_2.Y - vector2.Y - Constants.SCREEN_MARGIN,
+		[TooltipOrientation.Left] = vector2.X - Constants.SCREEN_MARGIN,
+		[TooltipOrientation.Right] = vector2_2.X - vector2.X - Constants.SCREEN_MARGIN
+	}
+end
+
+function getOrientationAndContentOffset(p1, p2, vector2: Vector2, vector2_3: Vector2) -- line: 43
+	-- upvalues: argmax (copy), TooltipOrientation (copy), Constants (copy)
+	local t3 = {}
+	local zero = Vector2.zero
+
+	while true do
+		if not p1 or t3[p1] then
+			local v28 = argmax(p2, t3)
+
+			if not v28 then
+				return p1, zero
+			end
+
+			p1 = v28
+		end
+
+		if p1 == TooltipOrientation.Top or p1 == TooltipOrientation.Bottom then
+			if vector2.Y + Constants.DISTANCE_TO_CONTENT + vector2_3.Y <= p2[p1] then
+				local Left = TooltipOrientation.Left
+
+				if p2[TooltipOrientation.Right] < p2[TooltipOrientation.Left] then
+					Left = TooltipOrientation.Right
+				end
+
+				local v30 = p2[Left]
+
+				if v30 >= Constants.MIN_DISTANCE_TO_CARET_MIDDLE then
+					zero = math.max(0, vector2_3.X / 2 - v30) * -1 * Constants.ORIENTATION_VECTOR[Left]
+
+					return p1, zero
+				end
+
+				t3[Constants.OPPOSITE_ORIENTATION[p1]] = true
+			end
+		elseif vector2.X + Constants.DISTANCE_TO_CONTENT + vector2_3.X <= p2[p1] then
+			local Top = TooltipOrientation.Top
+
+			if p2[TooltipOrientation.Bottom] < p2[TooltipOrientation.Top] then
+				Top = TooltipOrientation.Bottom
+			end
+
+			local v32 = p2[Top]
+
+			if v32 >= Constants.MIN_DISTANCE_TO_CARET_MIDDLE then
+				zero = math.max(0, vector2_3.Y / 2 - v32) * -1 * Constants.ORIENTATION_VECTOR[Top]
+
+				return p1, zero
+			end
+
+			t3[Constants.OPPOSITE_ORIENTATION[p1]] = true
+		end
+
+		t3[p1] = true
+		p1 = Constants.OPPOSITE_ORIENTATION[p1]
+	end
+end
+
+local function TooltipController(p3) -- line: 106
+	-- upvalues: React (copy), TooltipOrientation (copy), getDistances (copy), Constants (copy), LuauPolyfill (copy), TooltipCallout (copy), Portal (copy), withAnimation (copy)
+	local v34, v35 = React.useState(Vector2.zero)
+	local v36, v37 = React.useState(Vector2.zero)
+	local v38, v39 = React.useState(Vector2.zero)
+	local v40, v41 = React.useState(Vector2.zero)
+	local v42, v43 = React.useState(Vector2.zero)
+	local v44 = React.useCallback(function(p4) -- line: 113
+		-- upvalues: v35 (copy), v37 (copy)
+		v35(p4.AbsolutePosition)
+		v37(p4.AbsoluteSize)
+	end)
+
+	local function v45(p5) -- line: 119
+		-- upvalues: v41 (copy), v39 (copy)
+		if p5 then
+			v41(p5.AbsolutePosition)
+			v39(p5.AbsoluteSize)
+		end
+	end
+
+	local v46 = v36 / 2
+	local v47 = v34 + v46 - v40
+	local v48 = p3.preferredOrientation or TooltipOrientation.Top
+	local v49, v50 = React.useMemo(function() -- line: 131
+		-- upvalues: getDistances (copy), v47 (copy), v38 (copy), v48 (copy), v46 (copy), v42 (copy)
+		local v57 = getDistances(v47, v38)
+
+		return getOrientationAndContentOffset(v48, v57, v46, v42)
+	end, {
+		v48,
+		v38,
+		v47,
+		v46,
+		v42
+	})
+	local v51 = if not (not p3.disabled and p3.active) then Constants.INACTIVE_ANIMATION_TARGETS else Constants.ACTIVE_ANIMATION_TARGETS
+
+	local function renderWithAnimation(p6) -- line: 142
+		-- upvalues: v49 (copy), v47 (copy), v46 (copy), v50 (copy), v43 (copy), LuauPolyfill (copy), p3 (copy), React (copy), TooltipCallout (copy), v45 (copy), Portal (copy)
+		if p6.transparency == 1 then
+			return nil
+		end
+
+		local t4 = {
+			orientation = v49,
+			triggerPointCenter = v47,
+			triggerPointRadius = v46,
+			contentOffsetVector = v50,
+			onContentSizeChanged = v43,
+			distanceOffset = p6.distanceOffset,
+			transparency = p6.transparency
+		}
+		local v60 = LuauPolyfill.Object.assign({}, p3.tooltipProps, t4)
+		local t5 = {
+			Tooltip = React.createElement(TooltipCallout, v60)
+		}
+		local v62 = if not p3.DEBUG_useTargetDirectly then React.createElement("ScreenGui", {
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			IgnoreGuiInset = true,
+			DisplayOrder = p3.DisplayOrder,
+			[React.Change.AbsoluteSize] = v45,
+			[React.Change.AbsolutePosition] = v45,
+			ref = v45
+		}, t5) else React.createElement("Frame", {
+			ZIndex = p3.DisplayOrder,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = v45,
+			[React.Change.AbsolutePosition] = v45,
+			ref = v45
+		}, t5)
+
+		return React.createElement(Portal, {
+			target = p3.guiTarget
+		}, {
+			TooltipLayer = v62
+		})
+	end
+
+	local v53 = withAnimation(v51, renderWithAnimation, Constants.ANIMATION_OPTIONS)
+	local v54 = p3.triggerPointName or "TriggerPoint"
+
+	return React.createElement(React.Fragment, nil, {
+		Portal = v53,
+		[v54] = p3.renderTriggerPoint(v44)
+	})
+end
+
+return TooltipController

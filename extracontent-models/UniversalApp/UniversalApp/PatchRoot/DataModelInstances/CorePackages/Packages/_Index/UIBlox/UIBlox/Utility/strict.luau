@@ -1,15 +1,20 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: strict ]]
-    local v2 = v1 or tostring(v0);
-    return (setmetatable(v0, {
-        __index = function(_, v4) --[[ Line: 5 ]] --[[ Name: __index ]]
-            -- upvalues: v2 (copy)
-            local v5 = ("%q (%s) is not a valid member of %s"):format(tostring(v4), typeof(v4), v2);
-            error(v5, 2);
-        end, 
-        __newindex = function(_, v7, _) --[[ Line: 11 ]] --[[ Name: __newindex ]]
-            -- upvalues: v2 (copy)
-            local v9 = ("%q (%s) is not a valid member of %s"):format(tostring(v7), typeof(v7), v2);
-            error(v9, 2);
-        end
-    }));
-end;
+local function strict(p1, s1: string?) -- line: 1
+	local v4 = s1 or tostring(p1)
+
+	return (setmetatable(p1, {
+		__index = function(_, p3) -- line: 5
+			-- upvalues: v4 (copy)
+			local v7 = ("%q (%s) is not a valid member of %s"):format(tostring(p3), typeof(p3), v4)
+
+			error(v7, 2)
+		end,
+		__newindex = function(_, p5, _) -- line: 11
+			-- upvalues: v4 (copy)
+			local v11 = ("%q (%s) is not a valid member of %s"):format(tostring(p5), typeof(p5), v4)
+
+			error(v11, 2)
+		end
+	}))
+end
+
+return strict

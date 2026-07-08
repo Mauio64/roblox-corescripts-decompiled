@@ -1,14 +1,18 @@
-return function(v0, v1, v2) --[[ Line: 3 ]] --[[ Name: PlayerSearchPredicate ]]
-    if v0 == nil or v0 == "" then
-        return true;
-    else
-        if v2 then
-            local v3 = utf8.nfdnormalize(v2);
-            local v4 = utf8.nfdnormalize(v0);
-            if string.find(v3:lower(), v4:lower(), 1, true) ~= nil then
-                return true;
-            end;
-        end;
-        return string.find(v1:lower(), v0:lower(), 1, true) ~= nil;
-    end;
-end;
+local function PlayerSearchPredicate(p1, p2, p3) -- line: 3
+	if p1 == nil or p1 == "" then
+		return true
+	end
+
+	if p3 then
+		local v5 = utf8.nfdnormalize(p3)
+		local v6 = utf8.nfdnormalize(p1)
+
+		if string.find(v5:lower(), v6:lower(), 1, true) ~= nil then
+			return true
+		end
+	end
+
+	return string.find(p2:lower(), p1:lower(), 1, true) ~= nil
+end
+
+return PlayerSearchPredicate

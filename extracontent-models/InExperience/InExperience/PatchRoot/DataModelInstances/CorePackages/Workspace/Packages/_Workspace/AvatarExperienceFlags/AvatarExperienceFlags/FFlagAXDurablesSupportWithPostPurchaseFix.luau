@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXDurablesSupportWithPostPurchaseFix", false);
+return game:DefineFastFlag("AXDurablesSupportWithPostPurchaseFix", false)

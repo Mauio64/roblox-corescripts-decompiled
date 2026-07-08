@@ -1,3 +1,3 @@
 return {
-    UserListViewAdaptor = require(script.UserListViewAdaptor)
-};
+	UserListViewAdaptor = require(script.UserListViewAdaptor)
+}

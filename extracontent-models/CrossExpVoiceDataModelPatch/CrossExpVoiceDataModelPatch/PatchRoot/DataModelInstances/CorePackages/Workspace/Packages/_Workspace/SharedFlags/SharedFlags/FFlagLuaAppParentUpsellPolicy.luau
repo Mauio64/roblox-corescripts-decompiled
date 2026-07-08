@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppParentUpsellPolicy", false);
+return game:DefineFastFlag("LuaAppParentUpsellPolicy", false)

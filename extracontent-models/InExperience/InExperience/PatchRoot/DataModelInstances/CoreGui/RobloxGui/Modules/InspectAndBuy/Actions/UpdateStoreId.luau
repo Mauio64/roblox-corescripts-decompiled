@@ -1,4 +1,5 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function() --[[ Line: 11 ]]
-    return {};
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function() -- line: 11
+	return {}
+end)

@@ -1,246 +1,310 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.Signals);
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-local v7 = require(l_script_FirstAncestor_0.Components.ChatConversation.Utils.filterForLinksWithPolicy);
-local v8 = require(l_script_FirstAncestor_0.Conversations.populateMessageWithState);
-local v9 = require(l_script_FirstAncestor_0.Stores.GetMessageViewModelStore);
-local _ = require(l_script_FirstAncestor_0.MessageData.Types);
-local v11 = require(l_script_FirstAncestor_0.MessageData.Enums);
-local l_MessageStatus_0 = v11.MessageStatus;
-local l_MessageType_0 = v11.MessageType;
-local function _(v14) --[[ Line: 29 ]] --[[ Name: toLuaDateTime ]]
-    -- upvalues: l_DateTime_0 (copy)
-    if v14 == nil or v14 == "" then
-        return nil;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 33 ]]
-            -- upvalues: l_DateTime_0 (ref), v14 (copy)
-            return l_DateTime_0.fromIsoDate(v14);
-        end);
-        if l_status_0 then
-            return l_result_0;
-        else
-            return nil;
-        end;
-    end;
-end;
-local function v34(v18, v19) --[[ Line: 45 ]] --[[ Name: buildLegacyRepliesTo ]]
-    -- upvalues: v4 (copy), l_DateTime_0 (copy), l_MessageType_0 (copy)
-    local l_replies_to_0 = v18.replies_to;
-    if l_replies_to_0 == nil then
-        return nil;
-    else
-        local v21 = v19[l_replies_to_0.id];
-        if v21 ~= nil then
-            local l_join_0 = v4.Dictionary.join;
-            local l_v21_0 = v21;
-            local v24 = {
-                senderTargetId = tostring(v21.sender_user_id)
-            };
-            local l_created_at_0 = v21.created_at;
-            local v26;
-            if l_created_at_0 == nil or l_created_at_0 == "" then
-                v26 = nil;
-            else
-                local l_status_1, l_result_1 = pcall(function() --[[ Line: 33 ]]
-                    -- upvalues: l_DateTime_0 (ref), l_created_at_0 (copy)
-                    return l_DateTime_0.fromIsoDate(l_created_at_0);
-                end);
-                v26 = if l_status_1 then l_result_1 else nil;
-            end;
-            v24.sent = v26;
-            v24.messageType = v21.type == l_MessageType_0.System and "System" or "PlainText";
-            return l_join_0(l_v21_0, v24);
-        else
-            local v29 = {
-                id = l_replies_to_0.id, 
-                content = l_replies_to_0.content, 
-                messageType = l_replies_to_0.type == l_MessageType_0.System and "System" or "PlainText", 
-                senderTargetId = tostring(l_replies_to_0.sender_user_id)
-            };
-            local l_created_at_1 = l_replies_to_0.created_at;
-            local v31;
-            if l_created_at_1 == nil or l_created_at_1 == "" then
-                v31 = nil;
-            else
-                local l_status_2, l_result_2 = pcall(function() --[[ Line: 33 ]]
-                    -- upvalues: l_DateTime_0 (ref), l_created_at_1 (copy)
-                    return l_DateTime_0.fromIsoDate(l_created_at_1);
-                end);
-                v31 = if l_status_2 then l_result_2 else nil;
-            end;
-            v29.sent = v31;
-            return v29;
-        end;
-    end;
-end;
-local function v45(v35, v36) --[[ Line: 72 ]] --[[ Name: toLegacyMessage ]]
-    -- upvalues: l_MessageType_0 (copy), v4 (copy), l_DateTime_0 (copy), l_MessageStatus_0 (copy), v34 (copy)
-    local v37 = v35.type == l_MessageType_0.System and "System" or "PlainText";
-    local l_join_1 = v4.Dictionary.join;
-    local l_v35_0 = v35;
-    local v40 = {
-        senderTargetId = tostring(v35.sender_user_id), 
-        senderType = v35.type, 
-        messageType = v35.messageType or v37
-    };
-    local l_created_at_2 = v35.created_at;
-    local v42;
-    if l_created_at_2 == nil or l_created_at_2 == "" then
-        v42 = nil;
-    else
-        local l_status_3, l_result_3 = pcall(function() --[[ Line: 33 ]]
-            -- upvalues: l_DateTime_0 (ref), l_created_at_2 (copy)
-            return l_DateTime_0.fromIsoDate(l_created_at_2);
-        end);
-        v42 = if l_status_3 then l_result_3 else nil;
-    end;
-    v40.sent = v42;
-    v40.moderationType = v35.moderation_type;
-    v40.moderated = v35.status == l_MessageStatus_0.Moderated;
-    v40.failed = v35.status == l_MessageStatus_0.Failed;
-    v40.isSending = v35.status == l_MessageStatus_0.Pending;
-    v40.filteredForReceivers = v35.filtered_for_receivers;
-    v40.contentToDisplay = v35.content_to_display;
-    v40.repliesTo = v34(v35, v36);
-    return l_join_1(l_v35_0, v40);
-end;
-local function _(v46, v47) --[[ Line: 90 ]] --[[ Name: applyGroupedVariant ]]
-    -- upvalues: v11 (copy)
-    if v47 == nil then
-        return v46;
-    else
-        local l_GroupedMessageVariant_0 = v11.GroupedMessageVariant;
-        if v47 == l_GroupedMessageVariant_0.Single then
-            v46.isNewSender = true;
-            v46.isLastMessageInMessageGroup = true;
-            return v46;
-        elseif v47 == l_GroupedMessageVariant_0.First then
-            v46.isNewSender = true;
-            v46.isLastMessageInMessageGroup = false;
-            return v46;
-        elseif v47 == l_GroupedMessageVariant_0.Middle then
-            v46.isNewSender = false;
-            v46.isLastMessageInMessageGroup = false;
-            return v46;
-        else
-            if v47 == l_GroupedMessageVariant_0.Last then
-                v46.isNewSender = false;
-                v46.isLastMessageInMessageGroup = true;
-            end;
-            return v46;
-        end;
-    end;
-end;
-local function v62(v50, v51, v52, v53, v54, v55, v56, v57) --[[ Line: 114 ]] --[[ Name: buildPopulatedMessage ]]
-    -- upvalues: v8 (copy), v11 (copy)
-    local v58 = {
-        Users = v55, 
-        LocalUserId = v56
-    };
-    local v59 = v8(v58, v50, v50.id, v54, v52, v50.isSending == true, v53);
-    local v60;
-    if v51 == nil then
-        v60 = v59;
-    else
-        local l_GroupedMessageVariant_1 = v11.GroupedMessageVariant;
-        if v51 == l_GroupedMessageVariant_1.Single then
-            v59.isNewSender = true;
-            v59.isLastMessageInMessageGroup = true;
-        elseif v51 == l_GroupedMessageVariant_1.First then
-            v59.isNewSender = true;
-            v59.isLastMessageInMessageGroup = false;
-        elseif v51 == l_GroupedMessageVariant_1.Middle then
-            v59.isNewSender = false;
-            v59.isLastMessageInMessageGroup = false;
-        elseif v51 == l_GroupedMessageVariant_1.Last then
-            v59.isNewSender = false;
-            v59.isLastMessageInMessageGroup = true;
-        end;
-        v60 = v59;
-    end;
-    v60.stable_key = ("%*_%*"):format(v60.stableKey or v60.messageId, v57);
-    return v60;
-end;
-local function v84(v63, v64, v65, v66, v67, v68) --[[ Line: 154 ]] --[[ Name: buildMessageItemList ]]
-    -- upvalues: v4 (copy), v45 (copy), v7 (copy), v62 (copy)
-    if #v63 == 0 or v66 == nil then
-        return {};
-    else
-        local v71 = v4.List.filterMap(v63, function(v69) --[[ Line: 166 ]]
-            -- upvalues: v64 (copy), v45 (ref)
-            local v70 = v64[v69];
-            if v70 == nil then
-                return nil;
-            else
-                return v45(v70, v64);
-            end;
-        end);
-        local v72 = {};
-        local v73 = nil;
-        for v74 = #v71, 1, -1 do
-            local v75 = v71[v74];
-            local v76 = v7(v75);
-            local v77 = if v74 > 1 then v71[v74 - 1] else nil;
-            local v78 = v65(v75.id);
-            for v79, v80 in v76 do
-                local v81 = v76[v79 + 1] or v77;
-                local v82 = if #v76 == 1 then v78 else nil;
-                local v83 = v62(v80, v82, v73, v81, v66, v67, v68, v79);
-                table.insert(v72, v83);
-                v73 = v83;
-            end;
-        end;
-        return v4.List.reverse(v72);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local Cryo = require(AppChatParent.Cryo)
+local Signals = require(AppChatParent.Signals)
+local DateTime = require(AppChatParent.Time).DateTime
+local filterForLinksWithPolicy = require(AppChat.Components.ChatConversation.Utils.filterForLinksWithPolicy)
+local populateMessageWithState = require(AppChat.Conversations.populateMessageWithState)
+local GetConversationMessageViewModelStore = require(AppChat.Stores.GetConversationMessageViewModelStore)
+
+require(AppChat.MessageData.Types)
+
+local Enums = require(AppChat.MessageData.Enums)
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local MessageStatus = Enums.MessageStatus
+local MessageType = Enums.MessageType
+
+local function toLuaDateTime(s1: string?) -- line: 32
+	-- upvalues: DateTime (copy)
+	if s1 == nil or s1 == "" then
+		return nil
+	end
+
+	local ok, result = pcall(function() -- line: 36
+		-- upvalues: DateTime (copy), s1 (copy)
+		return DateTime.fromIsoDate(s1)
+	end)
+
+	if ok then
+		return result
+	end
+
+	return nil
+end
+local function buildLegacyRepliesTo(p1, t1: {[any]: any}) -- line: 48
+	-- upvalues: Cryo (copy), DateTime (copy), MessageType (copy)
+	local replies_to = p1.replies_to
+
+	if replies_to == nil then
+		return nil
+	end
+
+	local v29 = t1[replies_to.id]
+
+	if v29 ~= nil then
+		local join = Cryo.Dictionary.join
+		local t2 = {
+			senderTargetId = tostring(v29.sender_user_id)
+		}
+		local created_at = v29.created_at
+		local v33
+
+		if created_at == nil or created_at == "" then
+			v33 = nil
+		else
+			local ok, result = pcall(function() -- line: 36
+				-- upvalues: DateTime (copy), created_at (copy)
+				return DateTime.fromIsoDate(created_at)
+			end)
+
+			v33 = if not ok then nil else result
+		end
+
+		t2.sent = v33
+		t2.messageType = v29.type ~= MessageType.System and "PlainText" or "System"
+
+		return join(v29, t2)
+	end
+
+	local t3 = {
+		id = replies_to.id,
+		content = replies_to.content,
+		messageType = replies_to.type ~= MessageType.System and "PlainText" or "System",
+		senderTargetId = tostring(replies_to.sender_user_id)
+	}
+	local created_at = replies_to.created_at
+	local v38
+
+	if created_at == nil or created_at == "" then
+		v38 = nil
+	else
+		local ok, result = pcall(function() -- line: 36
+			-- upvalues: DateTime (copy), created_at (copy)
+			return DateTime.fromIsoDate(created_at)
+		end)
+
+		v38 = if not ok then nil else result
+	end
+
+	t3.sent = v38
+
+	return t3
+end
+local function toLegacyMessage(p2, t4: {[any]: any}) -- line: 75
+	-- upvalues: MessageType (copy), Cryo (copy), DateTime (copy), MessageStatus (copy), buildLegacyRepliesTo (copy)
+	local v43 = p2.type ~= MessageType.System and "PlainText" or "System"
+	local join = Cryo.Dictionary.join
+	local t5 = {
+		senderTargetId = tostring(p2.sender_user_id),
+		senderType = p2.type,
+		messageType = p2.messageType or v43
+	}
+	local created_at = p2.created_at
+	local v47
+
+	if created_at == nil or created_at == "" then
+		v47 = nil
+	else
+		local ok, result = pcall(function() -- line: 36
+			-- upvalues: DateTime (copy), created_at (copy)
+			return DateTime.fromIsoDate(created_at)
+		end)
+
+		v47 = if not ok then nil else result
+	end
+
+	t5.sent = v47
+	t5.moderationType = p2.moderation_type
+	t5.moderated = p2.status == MessageStatus.Moderated
+	t5.failed = p2.status == MessageStatus.Failed
+	t5.isSending = p2.status == MessageStatus.Pending
+	t5.filteredForReceivers = p2.filtered_for_receivers
+	t5.contentToDisplay = p2.content_to_display
+	t5.repliesTo = buildLegacyRepliesTo(p2, t4)
+
+	return join(p2, t5)
+end
+local function applyGroupedVariant(p3, s2: string?) -- line: 93
+	-- upvalues: Enums (copy)
+	if s2 == nil then
+		return p3
+	end
+
+	local GroupedMessageVariant = Enums.GroupedMessageVariant
+
+	if s2 == GroupedMessageVariant.Single then
+		p3.isNewSender = true
+		p3.isLastMessageInMessageGroup = true
+
+		return p3
+	end
+
+	if s2 == GroupedMessageVariant.First then
+		p3.isNewSender = true
+		p3.isLastMessageInMessageGroup = false
+
+		return p3
+	end
+
+	if s2 == GroupedMessageVariant.Middle then
+		p3.isNewSender = false
+		p3.isLastMessageInMessageGroup = false
+
+		return p3
+	end
+
+	if s2 == GroupedMessageVariant.Last then
+		p3.isNewSender = false
+		p3.isLastMessageInMessageGroup = true
+	end
+
+	return p3
+end
+local function buildPopulatedMessage(p4, s3: string?, p5, p6, p7, p8, s4: string, n1: number) -- line: 117
+	-- upvalues: populateMessageWithState (copy), Enums (copy)
+	local t6 = {
+		Users = p8,
+		LocalUserId = s4
+	}
+	local v62 = populateMessageWithState(t6, p4, p4.id, p7, p5, p4.isSending == true, p6)
+
+	if s3 == nil then
+	else
+		local GroupedMessageVariant = Enums.GroupedMessageVariant
+
+		if s3 == GroupedMessageVariant.Single then
+			v62.isNewSender = true
+			v62.isLastMessageInMessageGroup = true
+		elseif s3 == GroupedMessageVariant.First then
+			v62.isNewSender = true
+			v62.isLastMessageInMessageGroup = false
+		elseif s3 == GroupedMessageVariant.Middle then
+			v62.isNewSender = false
+			v62.isLastMessageInMessageGroup = false
+		elseif s3 == GroupedMessageVariant.Last then
+			v62.isNewSender = false
+			v62.isLastMessageInMessageGroup = true
+		end
+	end
+
+	v62.stable_key = `{ v62.stableKey or v62.messageId }_{ n1 }`
+
+	return v62
+end
+local function buildMessageItemList(t7: {[any]: any}, t8: {[any]: any}, p9: ((...any) -> ...any), p10, p11, s5: string) -- line: 157
+	-- upvalues: Cryo (copy), toLegacyMessage (copy), filterForLinksWithPolicy (copy), buildPopulatedMessage (copy)
+	if #t7 == 0 or p10 == nil then
+		return {}
+	end
+
+	local v70 = Cryo.List.filterMap(t7, function(p12) -- line: 169
+		-- upvalues: t8 (copy), toLegacyMessage (copy)
+		local v93 = t8[p12]
+
+		if v93 == nil then
+			return nil
+		end
+
+		return toLegacyMessage(v93, t8)
+	end)
+	local t9 = {}
+	local v72 = nil
+
+	for i = #v70, 1, -1 do
+		local v74 = v70[i]
+		local v75 = filterForLinksWithPolicy(v74)
+		local v76 = if not (i > 1) then nil else v70[i - 1]
+		local v77 = p9(v74.id)
+
+		for v78, v79 in v75 do
+			local v80 = v75[v78 + 1] or v76
+			local v81 = if #v75 ~= 1 then nil else v77
+
+			v72 = buildPopulatedMessage(v79, v81, v72, v80, p10, p11, s5, v78)
+			table.insert(t9, v72)
+		end
+	end
+
+	return Cryo.List.reverse(t9)
+end
+
 return {
-    useMessageItemList = function(v85, v86, v87, v88) --[[ Line: 215 ]] --[[ Name: useMessageItemList ]]
-        -- upvalues: v2 (copy), v9 (copy), v5 (copy), v84 (copy), l_useSignalState_0 (copy)
-        local v89 = v2.useMemo(function() --[[ Line: 216 ]]
-            -- upvalues: v9 (ref)
-            return v9(false);
-        end, {});
-        local l_channelsMessageStore_0 = v89.channelsMessageStore;
-        local l_chatConversationStore_0 = v89.chatConversationStore;
-        local v92 = v2.useRef(v88);
-        v92.current = v88;
-        local v93 = v2.useRef(v86);
-        v93.current = v86;
-        local v99 = v2.useMemo(function() --[[ Line: 229 ]]
-            -- upvalues: v85 (copy), v5 (ref), l_chatConversationStore_0 (copy), l_channelsMessageStore_0 (copy), v87 (copy), v92 (copy), v84 (ref), v89 (copy), v93 (copy)
-            if v85 == nil then
-                return v5.createComputed(function() --[[ Line: 231 ]]
-                    return {};
-                end);
-            else
-                return v5.createComputed(function(v94) --[[ Line: 236 ]]
-                    -- upvalues: l_chatConversationStore_0 (ref), v85 (ref), l_channelsMessageStore_0 (ref), v87 (ref), v92 (ref), v84 (ref), v89 (ref), v93 (ref)
-                    local v95 = l_chatConversationStore_0.getOrderedIds(v85, v94);
-                    local v96 = l_channelsMessageStore_0.messages(v94);
-                    local v97 = tostring(v87 or "");
-                    if v92.current == nil then
-                        return {};
-                    else
-                        return v84(v95, v96, function(v98) --[[ Line: 245 ]]
-                            -- upvalues: v89 (ref), v85 (ref), v94 (copy)
-                            return v89.getGroupedVariant(v98, v85)(v94);
-                        end, v92.current, v93.current, v97);
-                    end;
-                end);
-            end;
-        end, {
-            v85, 
-            v87, 
-            v89, 
-            l_channelsMessageStore_0, 
-            l_chatConversationStore_0
-        });
-        return l_useSignalState_0(v99);
-    end, 
-    buildMessageItemList = v84
-};
+	useMessageItemList = function(s6: string?, p13, s7: string?, p14) -- line: 218
+		-- upvalues: React (copy), GetConversationMessageViewModelStore (copy), Signals (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), buildMessageItemList (copy), useSignalState (copy)
+		local v86 = React.useMemo(function() -- line: 219
+			-- upvalues: GetConversationMessageViewModelStore (copy)
+			return GetConversationMessageViewModelStore(false)
+		end, {})
+		local conversationMessageStore = v86.conversationMessageStore
+		local conversationMessageListStore = v86.conversationMessageListStore
+		local v89 = React.useRef(p14)
+
+		v89.current = p14
+
+		local v90 = React.useRef(p13)
+
+		v90.current = p13
+
+		local v91 = React.useMemo(function() -- line: 232
+			-- upvalues: s6 (copy), Signals (copy), conversationMessageListStore (copy), conversationMessageStore (copy), s7 (copy), v89 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), buildMessageItemList (copy), v86 (copy), v90 (copy)
+			if s6 == nil then
+				return Signals.createComputed(function() -- line: 234
+					return {}
+				end)
+			end
+
+			return Signals.createComputed(function(p15) -- line: 239
+				-- upvalues: conversationMessageListStore (copy), s6 (copy), conversationMessageStore (copy), s7 (copy), v89 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), buildMessageItemList (copy), v86 (copy), v90 (copy)
+				local v95 = conversationMessageListStore.getOrderedIds(s6, p15)
+				local v96 = conversationMessageStore.messages(p15)
+				local str = tostring(s7 or "")
+
+				if v89.current == nil then
+					return {}
+				end
+
+				local v98 = FFlagAppChatPerfTracking and (FFlagAppChatMessageTTIMilestones and AppChatPerfTracker.isActive(AppChatPerfTracker.Events.ChatConversationTTI, {
+					conversationId = s6
+				}))
+
+				if v98 then
+					local t10 = {
+						conversationId = s6
+					}
+
+					AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.DataProcessingStarted.Name, t10)
+					AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.DataProcessingStarted.Name, AppChatPerfTracker.Milestone.DataProcessingStarted.Subphase.DataUpdate, t10)
+				end
+
+				local v100 = buildMessageItemList(v95, v96, function(p16) -- line: 268
+					-- upvalues: v86 (copy), s6 (copy), p15 (copy)
+					return v86.getGroupedVariant(p16, s6)(p15)
+				end, v89.current, v90.current, str)
+
+				if v98 then
+					local t11 = {
+						conversationId = s6
+					}
+
+					AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.DataProcessingCompleted.Name, t11)
+					AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.DataProcessingCompleted.Name, AppChatPerfTracker.Milestone.DataProcessingCompleted.Subphase.DataUpdate, t11)
+				end
+
+				return v100
+			end)
+		end, {
+			s6,
+			s7,
+			v86,
+			conversationMessageStore,
+			conversationMessageListStore
+		})
+
+		return useSignalState(v91)
+	end,
+	buildMessageItemList = buildMessageItemList
+}

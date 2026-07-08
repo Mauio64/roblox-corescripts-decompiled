@@ -1,55 +1,56 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceNavigation").Parent;
-local v1 = require(l_Parent_0.t);
-local v2 = require(script.Parent.RouteInfo);
-local _ = require(script.Parent.Types);
-local v4 = {};
-v4.__index = v4;
-v4.maxPreviousCount = 2;
-v4.Interface = v1.strictInterface({
-    current = v2.Interface, 
-    previousPages = v1.optional(v1.array(v2.Interface)), 
-    opaque = v2.Interface, 
-    isVisible = v1.boolean, 
-    isOverlayVisible = v1.boolean
-});
-v4.new = function(v5) --[[ Line: 40 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    local v6 = {
-        current = v5.current or v2.EMPTY, 
-        previousPages = v5.previousPages or {}, 
-        opaque = v5.opaque or v2.EMPTY, 
-        isVisible = v5.isVisible or false, 
-        isOverlayVisible = v5.isOverlayVisible or false
-    };
-    setmetatable(v6, v4);
-    return v6;
-end;
-v4.__tostring = function(v7) --[[ Line: 52 ]] --[[ Name: __tostring ]]
-    local l_current_0 = v7.current;
-    local l_opaque_0 = v7.opaque;
-    local v10 = (("AvatarRoute[" .. (v7.isVisible and "Visible" or "Not Visible")) .. (v7.isOverlayVisible and " *Overlay" or "")) .. ", " .. tostring(l_current_0);
-    if l_current_0.name ~= l_opaque_0.name then
-        v10 = v10 .. ", opaque: " .. tostring(l_opaque_0);
-    end;
-    return v10 .. "]";
-end;
-v4.__eq = function(v11, v12) --[[ Line: 67 ]] --[[ Name: __eq ]]
-    if not v11 or not v12 then
-        return false;
-    elseif rawequal(v11, v12) then
-        return true;
-    else
-        local v13 = false;
-        if v11.isVisible == v12.isVisible then
-            v13 = false;
-            if v11.isOverlayVisible == v12.isOverlayVisible then
-                v13 = false;
-                if v11.current == v12.current then
-                    v13 = v11.opaque == v12.opaque;
-                end;
-            end;
-        end;
-        return v13;
-    end;
-end;
-return v4;
+local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
+local t = require(Parent.t)
+local RouteInfo = require(script.Parent.RouteInfo)
+
+require(script.Parent.Types)
+
+local t1 = {}
+
+t1.__index = t1
+t1.maxPreviousCount = 2
+t1.Interface = t.strictInterface({
+	current = RouteInfo.Interface,
+	previousPages = t.optional(t.array(RouteInfo.Interface)),
+	opaque = RouteInfo.Interface,
+	isVisible = t.boolean,
+	isOverlayVisible = t.boolean
+})
+
+function t1.new(p1) -- line: 40
+	-- upvalues: RouteInfo (copy), t1 (copy)
+	local t2 = {
+		current = p1.current or RouteInfo.EMPTY,
+		previousPages = p1.previousPages or {},
+		opaque = p1.opaque or RouteInfo.EMPTY,
+		isVisible = p1.isVisible or false,
+		isOverlayVisible = p1.isOverlayVisible or false
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.__tostring(p2) -- line: 52
+	local current = p2.current
+	local opaque = p2.opaque
+	local v10 = (("AvatarRoute[" .. (not p2.isVisible and "Not Visible" or "Visible")) .. (not p2.isOverlayVisible and "" or " *Overlay")) .. ", " .. tostring(current)
+
+	if current.name ~= opaque.name then
+		v10 ..= ", opaque: " .. tostring(opaque)
+	end
+
+	return v10 .. "]"
+end
+function t1.__eq(p3, p4) -- line: 67
+	if not p3 or not p4 then
+		return false
+	end
+
+	if rawequal(p3, p4) then
+		return true
+	end
+
+	return p3.isVisible == p4.isVisible and (p3.isOverlayVisible == p4.isOverlayVisible and (p3.current == p4.current and p3.opaque == p4.opaque))
+end
+
+return t1

@@ -1,1 +1,1 @@
-return require(script.AboutDetailsSheet);
+return require(script.AboutDetailsSheet)

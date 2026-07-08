@@ -46,13 +46,16 @@ local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagLuaAppEnableOpenTypeSupport = SharedFlags.GetFFlagLuaAppEnableOpenTypeSupport
 local FFlagIEMFocusNavToButtons = SharedFlags.FFlagIEMFocusNavToButtons
 local FFlagIEMTabFocusNav = SharedFlags.FFlagIEMTabFocusNav
+local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
 local FFlagRelocateMobileMenuButtons = require(RobloxGui.Modules.Settings.Flags.FFlagRelocateMobileMenuButtons)
 local FIntRelocateMobileMenuButtonsVariant = require(RobloxGui.Modules.Settings.Flags.FIntRelocateMobileMenuButtonsVariant)
 local FFlagMenuButtonsMountWithIEM = require(RobloxGui.Modules.Settings.Flags.FFlagMenuButtonsMountWithIEM)
 local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
 local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
+local FFlagHidePeoplePageInviteFriends = SharedFlags.FFlagHidePeoplePageInviteFriends
+local FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration
 local UserProfileStore = UserProfiles.Stores.UserProfileStore
-local _, result = pcall(function() -- line: 72
+local _, result = pcall(function() -- line: 75
 	return game:GetService("PlatformFriendsService")
 end)
 local Theme = require(script.Parent.Parent.Theme)
@@ -70,30 +73,30 @@ local GetFFlagDefaultFriendingLabelTextNonEmpty = require(RobloxGui.Modules.Sett
 local GetFFlagEnableLeaveGameUpsellEntrypoint = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableLeaveGameUpsellEntrypoint)
 local GetFFlagDestroyPlayerCardOnLeave = require(RobloxGui.Modules.Settings.Flags.GetFFlagDestroyPlayerCardOnLeave)
 local GetFFlagEnableConsoleJoinVoice = require(RobloxGui.Modules.Settings.Flags.GetFFlagEnableConsoleJoinVoice)
-local v58 = game:DefineFastFlag("EnableConsoleJoinVoiceTranslation", false)
-local v59 = game:DefineFastFlag("CheckButtonFrameBeforeDestroy", false)
+local v61 = game:DefineFastFlag("EnableConsoleJoinVoiceTranslation", false)
+local v62 = game:DefineFastFlag("CheckButtonFrameBeforeDestroy", false)
 local isEngineTruncationEnabledForIngameSettings = require(RobloxGui.Modules.Flags.isEngineTruncationEnabledForIngameSettings)
 local EngineFeature2 = game:GetEngineFeature("VoiceChatMultistreamSubscriptionsEnabled")
-local v62 = game:DefineFastFlag("LuaFlagVoiceChatDisableSubscribeRetryForMultistream", true)
-local v63 = game:DefineFastFlag("PlayerListRefactorUsernameFormatting", false)
-local v64 = game:DefineFastFlag("CorrectlyPositionMuteButton", false)
-local v65 = game:DefineFastFlag("OnlyCaptureFocusIfOnPlayerPage", false)
-local v66 = game:DefineFastInt("SettingsHubPlayersButtonsResponsiveThreshold", 200)
+local v65 = game:DefineFastFlag("LuaFlagVoiceChatDisableSubscribeRetryForMultistream", true)
+local v66 = game:DefineFastFlag("PlayerListRefactorUsernameFormatting", false)
+local v67 = game:DefineFastFlag("CorrectlyPositionMuteButton", false)
+local v68 = game:DefineFastFlag("OnlyCaptureFocusIfOnPlayerPage", false)
+local v69 = game:DefineFastInt("SettingsHubPlayersButtonsResponsiveThreshold", 200)
 local GetFFlagCleanupMuteSelfButton = require(RobloxGui.Modules.Settings.Flags.GetFFlagCleanupMuteSelfButton)
-local v68 = game:DefineFastFlag("CheckForNilUserIdOnPlayerList", false)
-local v69 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
+local v71 = game:DefineFastFlag("CheckForNilUserIdOnPlayerList", false)
+local v72 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
 local MuteStatusIcons = default.MuteStatusIcons
 local PlayerMuteStatusIcons = default.PlayerMuteStatusIcons
 
-return ((function() --[[ Initialize ]] -- line: 148
-	-- upvalues: RobloxGui (copy), EngineFeature (copy), RbxAnalyticsService (copy), LocalizationService (copy), Localization (copy), uiblox (copy), BuilderIcons (copy), LocalPlayer (ref), Utility (copy), BlockingUtility (copy), Theme (copy), FFlagConnectionsToFriendsRename (copy), Constants2 (copy), GetFFlagDefaultFriendingLabelTextNonEmpty (copy), VoiceAnalytics (copy), v66 (copy), GetFFlagEnableConsoleJoinVoice (copy), GetFFlagCleanupMuteSelfButton (copy), v59 (copy), GuiService (copy), BlockingAnalytics (copy), onBlockButtonActivated (copy), RobloxTranslator (copy), MuteStatusIcons (copy), v62 (copy), EngineFeature2 (copy), default (copy), Constants (copy), Create (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), GetFFlagEnableLeaveGameUpsellEntrypoint (copy), FFlagIEMTabFocusNav (copy), PlayerMuteStatusIcons (copy), ReportAbuseMenuNewContainerPage (copy), v69 (copy), uDim2 (copy), v58 (copy), result (copy), FFlagIEMFocusNavToButtons (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy), v68 (copy), UserProfileStore (copy), isEngineTruncationEnabledForIngameSettings (copy), v63 (copy), formatUsername (copy), Players (copy), UserInputService (copy), RunService (copy), GetFFlagLuaInExperienceCoreScriptsGameInviteUnification (copy), GameInviteAnalyticsManager (ref), GameInviteAnalytics (copy), EventStream (copy), Diag (copy), SocialUtil (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v64 (copy), Cryo (copy), v65 (copy), GetFFlagDestroyPlayerCardOnLeave (copy), ReactRoblox (copy), React (copy), MenuButtonsContainer (copy), FFlagMenuButtonsMountWithIEM (copy)
-	local v72 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
+local function Initialize() -- line: 151
+	-- upvalues: RobloxGui (copy), EngineFeature (copy), RbxAnalyticsService (copy), LocalizationService (copy), Localization (copy), uiblox (copy), BuilderIcons (copy), LocalPlayer (ref), Utility (copy), BlockingUtility (copy), Theme (copy), FFlagConnectionsToFriendsRename (copy), Constants2 (copy), GetFFlagDefaultFriendingLabelTextNonEmpty (copy), VoiceAnalytics (copy), v69 (copy), GetFFlagEnableConsoleJoinVoice (copy), GetFFlagCleanupMuteSelfButton (copy), v62 (copy), GuiService (copy), BlockingAnalytics (copy), onBlockButtonActivated (copy), RobloxTranslator (copy), MuteStatusIcons (copy), v65 (copy), EngineFeature2 (copy), default (copy), Constants (copy), Create (copy), FFlagEnableSideSheet (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), GetFFlagEnableLeaveGameUpsellEntrypoint (copy), FFlagIEMTabFocusNav (copy), PlayerMuteStatusIcons (copy), ReportAbuseMenuNewContainerPage (copy), v72 (copy), uDim2 (copy), v61 (copy), result (copy), FFlagIEMFocusNavToButtons (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy), v71 (copy), UserProfileStore (copy), isEngineTruncationEnabledForIngameSettings (copy), v66 (copy), formatUsername (copy), Players (copy), UserInputService (copy), FFlagHidePeoplePageInviteFriends (copy), FFlagAddInviteFriendsIntegration (copy), RunService (copy), GetFFlagLuaInExperienceCoreScriptsGameInviteUnification (copy), GameInviteAnalyticsManager (ref), GameInviteAnalytics (copy), EventStream (copy), Diag (copy), SocialUtil (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v67 (copy), Cryo (copy), v68 (copy), GetFFlagDestroyPlayerCardOnLeave (copy), ReactRoblox (copy), React (copy), MenuButtonsContainer (copy), FFlagMenuButtonsMountWithIEM (copy)
+	local v76 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
 
-	v72.PageListLayout.Padding = UDim.new(0, 16)
-	v72.playSessionId = ""
+	v76.PageListLayout.Padding = UDim.new(0, 16)
+	v76.playSessionId = ""
 
 	if EngineFeature then
-		v72.playSessionId = RbxAnalyticsService:GetPlaySessionId()
+		v76.playSessionId = RbxAnalyticsService:GetPlaySessionId()
 	end
 
 	local t1 = {}
@@ -103,18 +106,45 @@ return ((function() --[[ Initialize ]] -- line: 148
 		t1[RobloxLocaleId] = Localization.new(RobloxLocaleId)
 	end
 
-	v72.TabHeader.Name = "PlayersTab"
+	v76.TabHeader.Name = "PlayersTab"
 
-	local v75 = uiblox["icons/menu/friends"]
+	local v79 = uiblox["icons/menu/friends"]
 
-	v72.TabHeader.TabLabel.Icon.Text = v75.name
-	v72.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v75.variant]
-	v72.TabHeader.TabLabel.Title.Text = "People"
-	v72.Page.Name = "Players"
+	v76.TabHeader.TabLabel.Icon.Text = v79.name
+	v76.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v79.variant]
+	v76.TabHeader.TabLabel.Title.Text = "People"
 
-	local function createFriendStatusTextLabel(p1, p2) -- line: 201
+	local function getFriendStatus(p1) -- line: 177
+		-- upvalues: LocalPlayer (ref)
+		local ok, result2 = pcall(function() -- line: 178
+			-- upvalues: LocalPlayer (ref), p1 (copy)
+			return LocalPlayer:GetFriendStatus(p1)
+		end)
+
+		if ok then
+			return result2
+		end
+
+		return Enum.FriendStatus.NotFriend
+	end
+
+	v76.Page.Name = "Players"
+
+	local function showRightSideButtons(p2) -- line: 192
+		-- upvalues: LocalPlayer (ref)
+		return p2 and (p2 ~= LocalPlayer and (p2.UserId > 0 and LocalPlayer.UserId > 0))
+	end
+	local function useOptimizedPortraitLayout() -- line: 196
+		-- upvalues: Utility (copy)
+		return Utility:IsSmallTouchScreen() and Utility:IsPortrait()
+	end
+	local function getIsBlocked(p3) -- line: 200
+		-- upvalues: BlockingUtility (copy)
+		return BlockingUtility:IsPlayerBlockedByUserId(p3.UserId)
+	end
+	local function createFriendStatusTextLabel(p4, p5) -- line: 204
 		-- upvalues: Theme (copy), FFlagConnectionsToFriendsRename (copy), t1 (copy), RobloxLocaleId (copy), Constants2 (copy), GetFFlagDefaultFriendingLabelTextNonEmpty (copy), LocalPlayer (ref), RbxAnalyticsService (copy), Utility (copy)
-		if p1 == nil then
+		if p4 == nil then
 			return nil
 		end
 
@@ -123,9 +153,9 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Frame.BackgroundTransparency = 1
 
 		local TextButton = nil
-		local u139 = nil
+		local u159 = nil
 
-		if p1 == Enum.FriendStatus.Friend or p1 == Enum.FriendStatus.FriendRequestSent then
+		if p4 == Enum.FriendStatus.Friend or p4 == Enum.FriendStatus.FriendRequestSent then
 			TextButton = Instance.new("TextButton")
 			TextButton.BackgroundTransparency = 1
 			TextButton.FontSize = Theme.fontSize(Enum.FontSize.Size24)
@@ -133,36 +163,36 @@ return ((function() --[[ Initialize ]] -- line: 148
 			TextButton.TextColor3 = Color3.new(1, 1, 1)
 			TextButton.SelectionImageObject = Frame
 
-			if p1 == Enum.FriendStatus.Friend then
+			if p4 == Enum.FriendStatus.Friend then
 				TextButton.Text = if not FFlagConnectionsToFriendsRename then t1[RobloxLocaleId]:Format(Constants2.ConnectionLocalizedKey) else t1[RobloxLocaleId]:Format(Constants2.FriendLocalizedKey)
 			else
 				TextButton.Text = "Request Sent"
 			end
-		elseif p1 == Enum.FriendStatus.Unknown or p1 == Enum.FriendStatus.NotFriend or p1 == Enum.FriendStatus.FriendRequestReceived then
-			local v140, v141 = Utility:MakeStyledButton("FriendStatus", if not FFlagConnectionsToFriendsRename then t1[RobloxLocaleId]:Format(Constants2.AddConnectionLocalizedKey) else t1[RobloxLocaleId]:Format(Constants2.AddFriendLocalizedKey), UDim2.new(0, 182, 0, Theme.ButtonHeight), function() -- line: 230
-				-- upvalues: TextButton (ref), u139 (ref), GetFFlagDefaultFriendingLabelTextNonEmpty (copy), FFlagConnectionsToFriendsRename (copy), t1 (copy), RobloxLocaleId (copy), Constants2 (copy), LocalPlayer (ref), p2 (copy), RbxAnalyticsService (copy)
-				if TextButton and (u139 and u139.Text ~= "") then
+		elseif p4 == Enum.FriendStatus.Unknown or p4 == Enum.FriendStatus.NotFriend or p4 == Enum.FriendStatus.FriendRequestReceived then
+			local v160, v161 = Utility:MakeStyledButton("FriendStatus", if not FFlagConnectionsToFriendsRename then t1[RobloxLocaleId]:Format(Constants2.AddConnectionLocalizedKey) else t1[RobloxLocaleId]:Format(Constants2.AddFriendLocalizedKey), UDim2.new(0, 182, 0, Theme.ButtonHeight), function() -- line: 233
+				-- upvalues: TextButton (ref), u159 (ref), GetFFlagDefaultFriendingLabelTextNonEmpty (copy), FFlagConnectionsToFriendsRename (copy), t1 (copy), RobloxLocaleId (copy), Constants2 (copy), LocalPlayer (ref), p5 (copy), RbxAnalyticsService (copy)
+				if TextButton and (u159 and u159.Text ~= "") then
 					TextButton.ImageTransparency = 1
-					u139.Text = ""
+					u159.Text = ""
 
 					if GetFFlagDefaultFriendingLabelTextNonEmpty() then
-						u139.Text = if not FFlagConnectionsToFriendsRename then t1[RobloxLocaleId]:Format(Constants2.AddConnectionLocalizedKey) else t1[RobloxLocaleId]:Format(Constants2.AddFriendLocalizedKey)
+						u159.Text = if not FFlagConnectionsToFriendsRename then t1[RobloxLocaleId]:Format(Constants2.AddConnectionLocalizedKey) else t1[RobloxLocaleId]:Format(Constants2.AddFriendLocalizedKey)
 					end
 
-					if LocalPlayer and p2 then
+					if LocalPlayer and p5 then
 						RbxAnalyticsService:ReportCounter("PlayersMenu-RequestFriendship")
 						RbxAnalyticsService:SetRBXEventStream(Constants2.AnalyticsTargetName, Constants2.AnalyticsRequestFriendContext, Constants2.AnalyticsRequestFriendName, {
 							category = "Game"
 						})
-						LocalPlayer:RequestFriendship(p2)
+						LocalPlayer:RequestFriendship(p5)
 					end
 				end
 			end)
 
-			TextButton = v140
-			u139 = v141
-			u139.ZIndex = 3
-			u139.Position = u139.Position + UDim2.new(0, 0, 0, 1)
+			TextButton = v160
+			u159 = v161
+			u159.ZIndex = 3
+			u159.Position = u159.Position + UDim2.new(0, 0, 0, 1)
 		end
 
 		if TextButton then
@@ -171,99 +201,99 @@ return ((function() --[[ Initialize ]] -- line: 148
 			TextButton.Size = UDim2.new(0, 150, 0, Theme.ButtonHeight)
 			TextButton.Position = UDim2.new(1, -198, 0, 7)
 
-			if u139 then
-				u139.Position = UDim2.new(0, 0, 0, 0)
+			if u159 then
+				u159.Position = UDim2.new(0, 0, 0, 0)
 			end
 		end
 
 		return TextButton
 	end
-	local function createFriendStatusImageLabel(p3, p4) -- line: 278
+	local function createFriendStatusImageLabel(p6, p7) -- line: 281
 		-- upvalues: Utility (copy), Theme (copy), LocalPlayer (ref), RbxAnalyticsService (copy), Constants2 (copy)
-		if p3 == Enum.FriendStatus.Friend or p3 == Enum.FriendStatus.FriendRequestSent then
+		if p6 == Enum.FriendStatus.Friend or p6 == Enum.FriendStatus.FriendRequestSent then
 			local s1 = "icons/menu/friends"
 			local n1 = 0
 
-			if p3 ~= Enum.FriendStatus.Friend then
+			if p6 ~= Enum.FriendStatus.Friend then
 				s1 = "icons/actions/friends/friendAdd"
 				n1 = 0.5
 			end
 
-			local v146, _ = Utility:MakeStyledImageButton("FriendStatus", s1, UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28))
+			local v166, _ = Utility:MakeStyledImageButton("FriendStatus", s1, UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28))
 
-			v146.Name = "FriendStatus"
-			v146.Selectable = false
-			v146.FriendStatusTextLabel.TextTransparency = n1
+			v166.Name = "FriendStatus"
+			v166.Selectable = false
+			v166.FriendStatusTextLabel.TextTransparency = n1
 
-			return v146
+			return v166
 		end
 
-		if p3 == Enum.FriendStatus.Unknown or p3 == Enum.FriendStatus.NotFriend or p3 == Enum.FriendStatus.FriendRequestReceived then
-			local u148 = nil
-			local u149 = nil
-			local v150, v151 = Utility:MakeStyledImageButton("FriendStatus", "icons/actions/friends/friendAdd", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 304
-				-- upvalues: u148 (ref), u149 (ref), LocalPlayer (ref), p4 (copy), RbxAnalyticsService (copy), Constants2 (copy)
-				if u148 and (u149 and u148.ImageTransparency ~= 1) then
-					u148.ImageTransparency = 1
-					u149.TextTransparency = 1
+		if p6 == Enum.FriendStatus.Unknown or p6 == Enum.FriendStatus.NotFriend or p6 == Enum.FriendStatus.FriendRequestReceived then
+			local u168 = nil
+			local u169 = nil
+			local v170, v171 = Utility:MakeStyledImageButton("FriendStatus", "icons/actions/friends/friendAdd", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 307
+				-- upvalues: u168 (ref), u169 (ref), LocalPlayer (ref), p7 (copy), RbxAnalyticsService (copy), Constants2 (copy)
+				if u168 and (u169 and u168.ImageTransparency ~= 1) then
+					u168.ImageTransparency = 1
+					u169.TextTransparency = 1
 
-					if LocalPlayer and p4 then
+					if LocalPlayer and p7 then
 						RbxAnalyticsService:ReportCounter("PlayersMenu-RequestFriendship")
 						RbxAnalyticsService:SetRBXEventStream(Constants2.AnalyticsTargetName, Constants2.AnalyticsRequestFriendContext, Constants2.AnalyticsRequestFriendName, {
 							category = "Game"
 						})
-						LocalPlayer:RequestFriendship(p4)
+						LocalPlayer:RequestFriendship(p7)
 					end
 				end
 			end)
 
-			u148 = v150
-			u149 = v151
-			u148.Name = "FriendStatus"
-			u148.Selectable = true
+			u168 = v170
+			u169 = v171
+			u168.Name = "FriendStatus"
+			u168.Selectable = true
 
-			return u148
+			return u168
 		end
 
 		return nil
 	end
 
-	local u78 = nil
-	local u79 = nil
-	local u80 = nil
-	local u81 = nil
-	local t2 = {}
-	local v83 = VoiceAnalytics.new(RbxAnalyticsService, "Players")
-	local u84 = false
-	local t3 = {}
 	local u86 = nil
 	local u87 = nil
+	local u88 = nil
+	local u89 = nil
+	local t2 = {}
+	local v91 = VoiceAnalytics.new(RbxAnalyticsService, "Players")
+	local u92 = false
+	local t3 = {}
+	local u94 = nil
+	local u95 = nil
 
-	local function u88() -- line: 349
-		-- upvalues: v72 (copy), v66 (copy), t3 (ref)
-		return v72.Page.AbsoluteSize.X < v66 * #t3
+	local function u96() -- line: 352
+		-- upvalues: v76 (copy), v69 (copy), t3 (ref)
+		return v76.Page.AbsoluteSize.X < v69 * #t3
 	end
-	local function u89() -- line: 353
-		-- upvalues: t3 (ref), u78 (ref), u79 (ref), u80 (ref), GetFFlagEnableConsoleJoinVoice (copy), u81 (ref), u84 (ref), u88 (ref), u86 (ref), GetFFlagCleanupMuteSelfButton (copy), u87 (ref), v59 (copy)
+	local function u97() -- line: 356
+		-- upvalues: t3 (ref), u86 (ref), u87 (ref), u88 (ref), GetFFlagEnableConsoleJoinVoice (copy), u89 (ref), u92 (ref), u96 (ref), u94 (ref), GetFFlagCleanupMuteSelfButton (copy), u95 (ref), v62 (copy)
 		t3 = {}
 
-		if u78 then
-			table.insert(t3, u78)
+		if u86 then
+			table.insert(t3, u86)
 		end
 
-		if u79 then
-			table.insert(t3, u79)
+		if u87 then
+			table.insert(t3, u87)
 		end
 
-		if u80 then
-			table.insert(t3, u80)
+		if u88 then
+			table.insert(t3, u88)
 		end
 
-		if GetFFlagEnableConsoleJoinVoice() and u81 then
-			table.insert(t3, u81)
+		if GetFFlagEnableConsoleJoinVoice() and u89 then
+			table.insert(t3, u89)
 		end
 
-		u84 = u88()
+		u92 = u96()
 
 		if #t3 > 0 then
 			local uDim2_2 = UDim2.new(1 / #t3, 0, 0, 52)
@@ -279,7 +309,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 				Padding = UDim.new(0, 20)
 			}
 
-			if u84 then
+			if u92 then
 				uDim2_2 = UDim2.new(1, 0, 0, 52)
 				t4 = {
 					Size = UDim2.fromScale(1, 0),
@@ -296,53 +326,79 @@ return ((function() --[[ Initialize ]] -- line: 148
 
 			local n2 = 1
 
-			for _, v157 in t3 do
-				v157.Size = uDim2_2
-				v157.Parent = u86
-				v157.LayoutOrder = n2
+			for _, v177 in t3 do
+				v177.Size = uDim2_2
+				v177.Parent = u94
+				v177.LayoutOrder = n2
 				n2 += 1
 			end
 
-			for v158, v159 in t5 do
+			for v178, v179 in t5 do
 				if GetFFlagCleanupMuteSelfButton() then
-					if u87 then
-						u87[v158] = v159
+					if u95 then
+						u95[v178] = v179
 					end
 				else
-					u87[v158] = v159
+					u95[v178] = v179
 				end
 			end
 
-			for v160, v161 in t4 do
+			for v180, v181 in t4 do
 				if GetFFlagCleanupMuteSelfButton() then
-					if u86 then
-						u86[v160] = v161
+					if u94 then
+						u94[v180] = v181
 					end
 				else
-					u86[v160] = v161
+					u94[v180] = v181
 				end
 			end
 
 			return
 		end
 
-		if v59 then
-			if u86 then
-				u86:Destroy()
-				u86 = nil
+		if v62 then
+			if u94 then
+				u94:Destroy()
+				u94 = nil
 
 				return
 			end
 		else
-			u86:Destroy()
-			u86 = nil
+			u94:Destroy()
+			u94 = nil
 		end
 	end
-	local function resizeFriendButton(p5, p6, p7, p8) -- line: 466
-		-- upvalues: LocalPlayer (ref), BlockingUtility (copy), createFriendStatusImageLabel (copy), createFriendStatusTextLabel (copy), Utility (copy)
-		local FriendStatus = p5:FindFirstChild("FriendStatus")
+	local function getDisplayNameLabel(p8) -- line: 447
+		if p8 and p8.Parent then
+			return p8:FindFirstChild("DisplayNameLabel")
+		end
 
-		if FriendStatus and p7 == p8 then
+		return nil
+	end
+	local function getInExperienceCombinedName(p9) -- line: 454
+		if #p9 == 0 then
+			return ""
+		end
+
+		local v184 = p9[1]
+
+		if v184 == nil then
+			return ""
+		end
+
+		local names = v184.names
+
+		if names == nil then
+			return ""
+		end
+
+		return names.getInExperienceCombinedName(false)
+	end
+	local function resizeFriendButton(p10, p11, p12, p13) -- line: 469
+		-- upvalues: LocalPlayer (ref), BlockingUtility (copy), createFriendStatusImageLabel (copy), createFriendStatusTextLabel (copy), Utility (copy)
+		local FriendStatus = p10:FindFirstChild("FriendStatus")
+
+		if FriendStatus and p12 == p13 then
 			return
 		end
 
@@ -351,19 +407,19 @@ return ((function() --[[ Initialize ]] -- line: 148
 			FriendStatus = nil
 		end
 
-		local v171 = nil
+		local v191 = nil
 
-		if p6 and (p6 ~= LocalPlayer and (p6.UserId > 0 and LocalPlayer.UserId > 0)) then
-			local ok, result2 = pcall(function() -- line: 175
-				-- upvalues: LocalPlayer (ref), p6 (copy)
-				return LocalPlayer:GetFriendStatus(p6)
+		if p11 and (p11 ~= LocalPlayer and (p11.UserId > 0 and LocalPlayer.UserId > 0)) then
+			local ok, result3 = pcall(function() -- line: 178
+				-- upvalues: LocalPlayer (ref), p11 (copy)
+				return LocalPlayer:GetFriendStatus(p11)
 			end)
 
-			v171 = if not ok then Enum.FriendStatus.NotFriend else result2
+			v191 = if not ok then Enum.FriendStatus.NotFriend else result3
 		end
 
-		if BlockingUtility:IsPlayerBlockedByUserId(p6.UserId) == false then
-			FriendStatus = if not p7 then createFriendStatusTextLabel(v171, p6) else createFriendStatusImageLabel(v171, p6)
+		if BlockingUtility:IsPlayerBlockedByUserId(p11.UserId) == false then
+			FriendStatus = if not p12 then createFriendStatusTextLabel(v191, p11) else createFriendStatusImageLabel(v191, p11)
 		end
 
 		if FriendStatus then
@@ -371,100 +427,113 @@ return ((function() --[[ Initialize ]] -- line: 148
 			FriendStatus.LayoutOrder = 5
 			FriendStatus.Selectable = true
 
-			local v174 = "utility-focus-state" .. "-friendstatuslabel-" .. p6.Name
+			local v194 = "utility-focus-state" .. "-friendstatuslabel-" .. p11.Name
 
-			Utility:MakeFocusState(FriendStatus, v174)
-			FriendStatus.Parent = p5
+			Utility:MakeFocusState(FriendStatus, v194)
+			FriendStatus.Parent = p10
 		end
 	end
-	local function friendStatusCreate(p9, p10) -- line: 500
-		-- upvalues: GuiService (copy), u78 (ref), resizeFriendButton (copy), Utility (copy)
+	local function friendStatusCreate(p14, p15) -- line: 503
+		-- upvalues: GuiService (copy), u86 (ref), resizeFriendButton (copy), Utility (copy)
 		local RightSideButtons = nil
 
-		if p9 then
-			RightSideButtons = p9:FindFirstChild("RightSideButtons")
+		if p14 then
+			RightSideButtons = p14:FindFirstChild("RightSideButtons")
 		end
 
 		if RightSideButtons then
-			for _, v in pairs(RightSideButtons:GetChildren()) do
-				if v and v.Name == "FriendStatus" then
-					if v == GuiService.SelectedCoreObject then
-						GuiService.SelectedCoreObject = u78
+			for _, child in pairs(RightSideButtons:GetChildren()) do
+				if child and child.Name == "FriendStatus" then
+					if child == GuiService.SelectedCoreObject then
+						GuiService.SelectedCoreObject = u86
 					end
 
-					v:Destroy()
+					child:Destroy()
 				end
 			end
 
-			resizeFriendButton(RightSideButtons, p10, Utility:IsPortrait(), nil)
+			resizeFriendButton(RightSideButtons, p15, Utility:IsPortrait(), nil)
 		end
 	end
 
-	LocalPlayer.FriendStatusChanged:connect(function(p11, _) -- line: 522
-		-- upvalues: v72 (copy), friendStatusCreate (copy)
-		if p11 then
-			local v182 = v72.Page:FindFirstChild("PlayerLabel" .. p11.Name)
+	LocalPlayer.FriendStatusChanged:connect(function(p16, _) -- line: 525
+		-- upvalues: v76 (copy), friendStatusCreate (copy)
+		if p16 then
+			local v202 = v76.Page:FindFirstChild("PlayerLabel" .. p16.Name)
 
-			if v182 then
-				friendStatusCreate(v182, p11)
+			if v202 then
+				friendStatusCreate(v202, p16)
 			end
 		end
 	end)
 
 	local resizeBlockButton = nil
 	local trySelection = nil
-	local v94 = BlockingAnalytics.new(LocalPlayer.UserId, {
+	local v104 = BlockingAnalytics.new(LocalPlayer.UserId, {
 		EventStream = RbxAnalyticsService
 	})
 
-	local function createBlockButton(p13, p14, p15, _) -- line: 535
-		-- upvalues: BlockingUtility (copy), resizeBlockButton (ref), resizeFriendButton (copy), trySelection (ref), GuiService (copy), onBlockButtonActivated (copy), v94 (copy), Constants2 (copy), Utility (copy), RobloxTranslator (copy), Theme (copy)
-		if BlockingUtility:IsPlayerBlockedByUserId(p14.UserId) then
-			return Utility:MakeStyledButton("BlockButton", RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Unblock"), UDim2.new(0, 110, 0, Theme.ButtonHeight), function() --[[ unBlockUser ]] -- line: 553
-				-- upvalues: BlockingUtility (copy), p14 (copy), v94 (copy), resizeBlockButton (ref), p13 (copy), p15 (copy), resizeFriendButton (copy)
-				if BlockingUtility:UnblockPlayerAsync(p14) then
-					v94:action("SettingsHub", "unblockUser", {
-						blockeeUserId = p14.UserId
-					})
-					resizeBlockButton(p13, p14, p15, not p15)
-					resizeFriendButton(p13, p14, p15, not p15)
+	local function createBlockButton(p18, p19, p20, _) -- line: 538
+		-- upvalues: BlockingUtility (copy), resizeBlockButton (ref), resizeFriendButton (copy), trySelection (ref), GuiService (copy), onBlockButtonActivated (copy), v104 (copy), Constants2 (copy), Utility (copy), RobloxTranslator (copy), Theme (copy)
+		local function updateBlockButton(p22) -- line: 541
+			-- upvalues: resizeBlockButton (ref), p18 (copy), p19 (copy), p20 (copy), resizeFriendButton (copy), trySelection (ref)
+			local v377 = resizeBlockButton(p18, p19, p20, not p20)
+
+			resizeFriendButton(p18, p19, p20, not p20)
+
+			if p22 then
+				trySelection(v377)
+			end
+		end
+		local function blockUser() -- line: 549
+			-- upvalues: GuiService (copy), onBlockButtonActivated (copy), p19 (copy), v104 (copy), Constants2 (copy), resizeBlockButton (ref), p18 (copy), p20 (copy), resizeFriendButton (copy), trySelection (ref)
+			local v378 = GuiService.SelectedCoreObject ~= nil or GuiService.SelectedObject ~= nil
+
+			onBlockButtonActivated(p19, v104, Constants2.AnalyticsInGameMenuName):andThen(function() -- line: 551
+				-- upvalues: v378 (copy), resizeBlockButton (ref), p18 (copy), p19 (copy), p20 (copy), resizeFriendButton (copy), trySelection (ref)
+				local v452 = v378
+				local v453 = resizeBlockButton(p18, p19, p20, not p20)
+
+				resizeFriendButton(p18, p19, p20, not p20)
+
+				if v452 then
+					trySelection(v453)
 				end
 			end)
 		end
+		local function unBlockUser() -- line: 556
+			-- upvalues: BlockingUtility (copy), p19 (copy), v104 (copy), resizeBlockButton (ref), p18 (copy), p20 (copy), resizeFriendButton (copy)
+			if BlockingUtility:UnblockPlayerAsync(p19) then
+				v104:action("SettingsHub", "unblockUser", {
+					blockeeUserId = p19.UserId
+				})
+				resizeBlockButton(p18, p19, p20, not p20)
+				resizeFriendButton(p18, p19, p20, not p20)
+			end
+		end
 
-		return Utility:MakeStyledImageButton("BlockButton", "icons/actions/block", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() --[[ blockUser ]] -- line: 546
-			-- upvalues: GuiService (copy), onBlockButtonActivated (copy), p14 (copy), v94 (copy), Constants2 (copy), resizeBlockButton (ref), p13 (copy), p15 (copy), resizeFriendButton (copy), trySelection (ref)
-			local v348 = GuiService.SelectedCoreObject ~= nil or GuiService.SelectedObject ~= nil
+		if BlockingUtility:IsPlayerBlockedByUserId(p19.UserId) then
+			return Utility:MakeStyledButton("BlockButton", RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Unblock"), UDim2.new(0, 110, 0, Theme.ButtonHeight), unBlockUser)
+		end
 
-			onBlockButtonActivated(p14, v94, Constants2.AnalyticsInGameMenuName):andThen(function() -- line: 548
-				-- upvalues: v348 (copy), resizeBlockButton (ref), p13 (copy), p14 (copy), p15 (copy), resizeFriendButton (copy), trySelection (ref)
-				local v422 = v348
-				local v423 = resizeBlockButton(p13, p14, p15, not p15)
-
-				resizeFriendButton(p13, p14, p15, not p15)
-
-				if v422 then
-					trySelection(v423)
-				end
-			end)
-		end)
+		return Utility:MakeStyledImageButton("BlockButton", "icons/actions/block", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), blockUser)
 	end
 
-	function trySelection(p17) -- line: 582
+	function trySelection(p23) -- line: 585
 		-- upvalues: GuiService (copy)
-		if p17 and not p17.Selectable then
-			GuiService:Select(p17)
+		if p23 and not p23.Selectable then
+			GuiService:Select(p23)
 
 			return
 		end
 
-		GuiService.SelectedCoreObject = p17
+		GuiService.SelectedCoreObject = p23
 	end
-	function resizeBlockButton(p18, p19, p20, p21) -- line: 590
+	function resizeBlockButton(p24, p25, p26, p27) -- line: 593
 		-- upvalues: LocalPlayer (ref), createBlockButton (copy), Utility (copy)
-		local BlockButton = p18:FindFirstChild("BlockButton")
+		local BlockButton = p24:FindFirstChild("BlockButton")
 
-		if BlockButton and p20 == p21 then
+		if BlockButton and p26 == p27 then
 			return BlockButton
 		end
 
@@ -473,8 +542,8 @@ return ((function() --[[ Initialize ]] -- line: 148
 			BlockButton = nil
 		end
 
-		if p19 and (p19 ~= LocalPlayer and (p19.UserId > 0 and LocalPlayer.UserId > 0)) then
-			BlockButton = createBlockButton(p18, p19, p20, p21)
+		if p25 and (p25 ~= LocalPlayer and (p25.UserId > 0 and LocalPlayer.UserId > 0)) then
+			BlockButton = createBlockButton(p24, p25, p26, p27)
 		end
 
 		if BlockButton then
@@ -482,24 +551,24 @@ return ((function() --[[ Initialize ]] -- line: 148
 			BlockButton.LayoutOrder = 4
 			BlockButton.Selectable = true
 
-			local v193 = "utility-focus-state" .. "-blockbutton-" .. p19.Name
+			local v216 = "utility-focus-state" .. "-blockbutton-" .. p25.Name
 
-			Utility:MakeFocusState(BlockButton, v193)
-			BlockButton.Parent = p18
+			Utility:MakeFocusState(BlockButton, v216)
+			BlockButton.Parent = p24
 		end
 
 		return BlockButton
 	end
 
-	local u96 = false
-	local u97 = false
+	local u106 = false
+	local u107 = false
 
-	local function muteButtonUpdate(p22, p23) -- line: 619
-		-- upvalues: MuteStatusIcons (copy), v62 (copy), EngineFeature2 (copy), default (copy), t2 (copy), Utility (copy), Theme (copy), v83 (copy), Constants (copy)
+	local function muteButtonUpdate(p28, p29) -- line: 622
+		-- upvalues: MuteStatusIcons (copy), v65 (copy), EngineFeature2 (copy), default (copy), t2 (copy), Utility (copy), Theme (copy), v91 (copy), Constants (copy)
 		local RightSideButtons = nil
 
-		if p22 then
-			RightSideButtons = p22:FindFirstChild("RightSideButtons")
+		if p28 then
+			RightSideButtons = p28:FindFirstChild("RightSideButtons")
 		end
 
 		if not RightSideButtons then
@@ -508,7 +577,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 
 		local MuteStatusButton = RightSideButtons:FindFirstChild("MuteStatusButton")
 
-		if p23 == nil then
+		if p29 == nil then
 			if MuteStatusButton then
 				MuteStatusButton:Destroy()
 			end
@@ -519,89 +588,89 @@ return ((function() --[[ Initialize ]] -- line: 148
 		local uDim2_3 = UDim2.fromOffset(36, 36)
 		local uDim2_4 = UDim2.fromOffset(0, 0)
 		local n3 = 0
-		local v201 = p23.isMuted and MuteStatusIcons.MicOff or MuteStatusIcons.MicOn
+		local v224 = p29.isMuted and MuteStatusIcons.MicOff or MuteStatusIcons.MicOn
 
-		if p23.subscriptionFailed then
-			v201 = MuteStatusIcons.Error
+		if p29.subscriptionFailed then
+			v224 = MuteStatusIcons.Error
 			uDim2_3 = UDim2.fromOffset(36, 36)
 			uDim2_4 = UDim2.fromOffset(2, -2)
 
-			if v62 and EngineFeature2 then
+			if v65 and EngineFeature2 then
 				n3 = 0.5
 			end
-		elseif p23.isMutedLocally then
-			v201 = MuteStatusIcons.MicDisabled
+		elseif p29.isMutedLocally then
+			v224 = MuteStatusIcons.MicDisabled
 			n3 = 0.5
-		elseif not p23.subscriptionCompleted then
-			v201 = MuteStatusIcons.Loading
-		elseif p23.isSignalActive then
-			local v202 = math.floor(0.5 + 5 * math.random()) * 20
+		elseif not p29.subscriptionCompleted then
+			v224 = MuteStatusIcons.Loading
+		elseif p29.isSignalActive then
+			local v225 = math.floor(0.5 + 5 * math.random()) * 20
 
-			v201 = default:GetIcon("Unmuted" .. tostring(v202), "SpeakerLight")
+			v224 = default:GetIcon("Unmuted" .. tostring(v225), "SpeakerLight")
 		end
 
 		if MuteStatusButton then
-			local v203 = t2[p23.userId] or RightSideButtons:FindFirstChild("MuteStatusImageLabel", true)
+			local v226 = t2[p29.userId] or RightSideButtons:FindFirstChild("MuteStatusImageLabel", true)
 
-			v203.Image = v201
-			v203.Size = uDim2_3
-			v203.ImageTransparency = n3
+			v226.Image = v224
+			v226.Size = uDim2_3
+			v226.ImageTransparency = n3
 
 			return
 		end
 
 		if default.voiceUIVisible then
-			local v204, v205 = Utility:MakeStyledImageButton("MuteStatus", v201, UDim2.fromOffset(Theme.ButtonHeight, Theme.ButtonHeight), uDim2_3, function() -- line: 679
-				-- upvalues: default (copy), p23 (copy), v83 (copy), Constants (copy), v62 (copy), EngineFeature2 (copy)
-				local v349 = default.participants[tostring(p23.userId)]
+			local v227, v228 = Utility:MakeStyledImageButton("MuteStatus", v224, UDim2.fromOffset(Theme.ButtonHeight, Theme.ButtonHeight), uDim2_3, function() -- line: 682
+				-- upvalues: default (copy), p29 (copy), v91 (copy), Constants (copy), v65 (copy), EngineFeature2 (copy)
+				local v379 = default.participants[tostring(p29.userId)]
 
-				if v349.subscriptionCompleted then
-					if v83 then
-						v83:onToggleMutePlayer(p23.userId, not v349.isMutedLocally)
+				if v379.subscriptionCompleted then
+					if v91 then
+						v91:onToggleMutePlayer(p29.userId, not v379.isMutedLocally)
 					end
 
-					default:ToggleMutePlayer(p23.userId, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+					default:ToggleMutePlayer(p29.userId, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
 
 					return
 				end
 
-				if v349.subscriptionFailed then
-					if v62 then
+				if v379.subscriptionFailed then
+					if v65 then
 						if not EngineFeature2 then
-							default:SubscribeRetry(p23.userId)
+							default:SubscribeRetry(p29.userId)
 
 							return
 						end
 					else
-						default:SubscribeRetry(p23.userId)
+						default:SubscribeRetry(p29.userId)
 					end
 				end
 			end)
 
-			t2[p23.userId] = v205
-			v205.ZIndex = 3
-			v205.Position = v205.Position + uDim2_4
-			v205.ImageTransparency = n3
+			t2[p29.userId] = v228
+			v228.ZIndex = 3
+			v228.Position = v228.Position + uDim2_4
+			v228.ImageTransparency = n3
 
-			local v206 = "utility-focus-state" .. "-mutestatusbutton-" .. p23.userId
+			local v229 = "utility-focus-state" .. "-mutestatusbutton-" .. p29.userId
 
-			Utility:MakeFocusState(v204, v206)
-			v204.Parent = RightSideButtons
+			Utility:MakeFocusState(v227, v229)
+			v227.Parent = RightSideButtons
 		end
 	end
 
-	local v99 = Create("Frame")({
+	local v109 = Create("Frame")({
 		Name = "ButtonsContainer",
-		Size = UDim2.new(1, 0, 0, Theme.ButtonHeight),
 		BackgroundTransparency = 1,
-		Parent = v72.Page,
-		Visible = false
+		Visible = false,
+		Size = UDim2.new(1, 0, 0, Theme.ButtonHeight),
+		Parent = v76.Page
 	})
 
-	v72.ButtonsContainer = v99
+	v76.ButtonsContainer = v109
 
-	if FFlagRelocateMobileMenuButtons and (FIntRelocateMobileMenuButtonsVariant == 1 or FIntRelocateMobileMenuButtonsVariant == 3) then
-		v99.Parent = nil
+	if FFlagEnableSideSheet or FFlagRelocateMobileMenuButtons and (FIntRelocateMobileMenuButtonsVariant == 1 or FIntRelocateMobileMenuButtonsVariant == 3) then
+		v109.Parent = nil
 	end
 
 	Create("UIPadding")({
@@ -609,88 +678,88 @@ return ((function() --[[ Initialize ]] -- line: 148
 		PaddingTop = UDim.new(0, 1),
 		PaddingLeft = UDim.new(0, 1),
 		PaddingRight = UDim.new(0, 1),
-		Parent = v99
+		Parent = v109
 	})
 
-	local v100, v101 = Utility:MakeStyledButton("LeaveButton", "Leave", UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 736
-		-- upvalues: GetFFlagEnableLeaveGameUpsellEntrypoint (copy), v72 (copy), Constants (copy)
-		if GetFFlagEnableLeaveGameUpsellEntrypoint() and v72.HubRef.leaveGameUpsellProp ~= Constants.PHONE_UPSELL_VALUE_PROP.None then
-			v72.HubRef:SwitchToPage(v72.HubRef.LeaveGameUpsellPage, nil, 1, true)
+	local v110, v111 = Utility:MakeStyledButton("LeaveButton", "Leave", UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 739
+		-- upvalues: GetFFlagEnableLeaveGameUpsellEntrypoint (copy), v76 (copy), Constants (copy)
+		if GetFFlagEnableLeaveGameUpsellEntrypoint() and v76.HubRef.leaveGameUpsellProp ~= Constants.PHONE_UPSELL_VALUE_PROP.None then
+			v76.HubRef:SwitchToPage(v76.HubRef.LeaveGameUpsellPage, nil, 1, true)
 
 			return
 		end
 
-		v72.HubRef:SwitchToPage(v72.HubRef.LeaveGamePage, false, 1)
+		v76.HubRef:SwitchToPage(v76.HubRef.LeaveGamePage, false, 1)
 	end)
 
-	v100.AnchorPoint = Vector2.new(0, 0)
-	v100.Position = UDim2.new(0, 0, 0, 0)
-	v101.Size = UDim2.new(1, -4, 1, 0)
-	v101.Position = UDim2.new(0, 2, 0, 0)
+	v110.AnchorPoint = Vector2.new(0, 0)
+	v110.Position = UDim2.new(0, 0, 0, 0)
+	v111.Size = UDim2.new(1, -4, 1, 0)
+	v111.Position = UDim2.new(0, 2, 0, 0)
 	Create("UIListLayout")({
 		FillDirection = Enum.FillDirection.Horizontal,
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		VerticalAlignment = Enum.VerticalAlignment.Center,
-		Parent = v100
+		Parent = v110
 	})
 	Create("UIPadding")({
 		PaddingLeft = UDim.new(0.025, 0),
-		Parent = v100
+		Parent = v110
 	})
-	v101.Size = UDim2.new(0, 0, 1, 0)
+	v111.Size = UDim2.new(0, 0, 1, 0)
 	Create("UIFlexItem")({
 		FlexMode = Enum.UIFlexMode.Grow,
-		Parent = v101
+		Parent = v111
 	})
 
 	if not FFlagRelocateMobileMenuButtons or FIntRelocateMobileMenuButtonsVariant == 0 then
-		v100.Parent = v99
+		v110.Parent = v109
 	end
 
-	local v102 = t1[RobloxLocaleId]:Format(Constants2.RespawnLocalizedKey)
-	local v103, v104 = Utility:MakeStyledButton("ResetButton", v102, UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 779
-		-- upvalues: v72 (copy)
-		v72.HubRef:SwitchToPage(v72.HubRef.ResetCharacterPage, false, 1)
+	local v112 = t1[RobloxLocaleId]:Format(Constants2.RespawnLocalizedKey)
+	local v113, v114 = Utility:MakeStyledButton("ResetButton", v112, UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 782
+		-- upvalues: v76 (copy)
+		v76.HubRef:SwitchToPage(v76.HubRef.ResetCharacterPage, false, 1)
 	end)
 
-	v103.AnchorPoint = Vector2.new(0.5, 0)
-	v103.Position = UDim2.new(0.5, 0, 0, 0)
-	v104.Size = UDim2.new(1, -4, 1, 0)
-	v104.Position = UDim2.new(0, 2, 0, 0)
+	v113.AnchorPoint = Vector2.new(0.5, 0)
+	v113.Position = UDim2.new(0.5, 0, 0, 0)
+	v114.Size = UDim2.new(1, -4, 1, 0)
+	v114.Position = UDim2.new(0, 2, 0, 0)
 
 	if not FFlagRelocateMobileMenuButtons or FIntRelocateMobileMenuButtonsVariant == 0 then
-		v103.Parent = v99
+		v113.Parent = v109
 	end
 
-	local v105, v106 = Utility:MakeStyledButton("ResumeButton", "Resume", UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 796
-		-- upvalues: v72 (copy), RbxAnalyticsService (copy), Constants2 (copy)
-		v72.HubRef:SetVisibility(false)
+	local v115, v116 = Utility:MakeStyledButton("ResumeButton", "Resume", UDim2.new(0.3333333333333333, -12, 1, 0), function() -- line: 799
+		-- upvalues: v76 (copy), RbxAnalyticsService (copy), Constants2 (copy)
+		v76.HubRef:SetVisibility(false)
 		RbxAnalyticsService:SetRBXEventStream(Constants2.AnalyticsTargetName, Constants2.AnalyticsResumeGameName, Constants2.AnalyticsMenuActionName, {
 			source = Constants2.AnalyticsResumeButtonSource,
-			playsessionid = v72.playSessionId,
+			playsessionid = v76.playSessionId,
 			universeid = tostring(game.GameId)
 		})
 	end)
 
-	v105.AnchorPoint = Vector2.new(1, 0)
-	v105.Position = UDim2.new(1, 0, 0, 0)
-	v106.Size = UDim2.new(1, -4, 1, 0)
-	v106.Position = UDim2.new(0, 2, 0, 0)
+	v115.AnchorPoint = Vector2.new(1, 0)
+	v115.Position = UDim2.new(1, 0, 0, 0)
+	v116.Size = UDim2.new(1, -4, 1, 0)
+	v116.Position = UDim2.new(0, 2, 0, 0)
 
 	if not FFlagRelocateMobileMenuButtons or FIntRelocateMobileMenuButtonsVariant == 0 then
-		v105.Parent = v99
+		v115.Parent = v109
 
 		if FFlagIEMTabFocusNav then
-			v72.FirstSelectableObjects = {
-				v105,
-				v103,
-				v100
+			v76.FirstSelectableObjects = {
+				v115,
+				v113,
+				v110
 			}
-			v72.FirstSelectableObjectsUpdated:fire()
+			v76.FirstSelectableObjectsUpdated:fire()
 		end
 	end
 
-	local function pollImage() -- line: 828
+	local function pollImage() -- line: 831
 		-- upvalues: default (copy), PlayerMuteStatusIcons (copy)
 		local localMuted = default.localMuted
 
@@ -703,20 +772,40 @@ return ((function() --[[ Initialize ]] -- line: 148
 		end
 
 		if default.isTalking then
-			local v208 = math.floor(0.5 + 5 * math.random()) * 20
+			local v231 = math.floor(0.5 + 5 * math.random()) * 20
 
-			return (default:GetIcon("Unmuted" .. tostring(v208), "MicLight"))
+			return (default:GetIcon("Unmuted" .. tostring(v231), "MicLight"))
 		end
 
 		return PlayerMuteStatusIcons.MicOn
 	end
-	local function resetButtonRow() -- line: 864
-		-- upvalues: FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), v99 (copy)
+	local function updateButtonPosition(p30, p31, p32, p33) -- line: 848
+		-- upvalues: v109 (copy)
+		local v236 = v109:FindFirstChild(p30 .. "Button", true)
+
+		if not v236 then
+			return
+		end
+
+		v236.Position = p31
+		v236.Size = p32
+		v236.AnchorPoint = p33
+	end
+	local function muteButtonReset() -- line: 860
+		-- upvalues: v109 (copy)
+		local PlayerMuteButtonButton = v109:FindFirstChild("PlayerMuteButtonButton", true)
+
+		if PlayerMuteButtonButton then
+			PlayerMuteButtonButton:Destroy()
+		end
+	end
+	local function resetButtonRow() -- line: 867
+		-- upvalues: FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), v109 (copy)
 		if not FFlagRelocateMobileMenuButtons or FIntRelocateMobileMenuButtonsVariant == 0 then
 			local uDim2_5 = UDim2.new(1, 0, 0, 0)
 			local uDim2_6 = UDim2.new(0.3333333333333333, -12, 1, 0)
 			local vector2 = Vector2.new(1, 0)
-			local ResumeButtonButton = v99:FindFirstChild("ResumeButtonButton", true)
+			local ResumeButtonButton = v109:FindFirstChild("ResumeButtonButton", true)
 
 			if ResumeButtonButton then
 				ResumeButtonButton.Position = uDim2_5
@@ -727,7 +816,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 			local uDim2_7 = UDim2.new(0.5, 0, 0, 0)
 			local uDim2_8 = UDim2.new(0.3333333333333333, -12, 1, 0)
 			local vector2_2 = Vector2.new(0.5, 0)
-			local ResetButtonButton = v99:FindFirstChild("ResetButtonButton", true)
+			local ResetButtonButton = v109:FindFirstChild("ResetButtonButton", true)
 
 			if ResetButtonButton then
 				ResetButtonButton.Position = uDim2_7
@@ -738,7 +827,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 			local uDim2_9 = UDim2.new(0, 0, 0, 0)
 			local uDim2_10 = UDim2.new(0.3333333333333333, -12, 1, 0)
 			local vector2_3 = Vector2.new(0, 0)
-			local LeaveButtonButton = v99:FindFirstChild("LeaveButtonButton", true)
+			local LeaveButtonButton = v109:FindFirstChild("LeaveButtonButton", true)
 
 			if LeaveButtonButton then
 				LeaveButtonButton.Position = uDim2_9
@@ -747,37 +836,55 @@ return ((function() --[[ Initialize ]] -- line: 148
 			end
 		end
 
-		local PlayerMuteButtonButton = v99:FindFirstChild("PlayerMuteButtonButton", true)
+		local PlayerMuteButtonButton = v109:FindFirstChild("PlayerMuteButtonButton", true)
 
 		if PlayerMuteButtonButton then
 			PlayerMuteButtonButton:Destroy()
 		end
 	end
+	local function updateMuteSelfButtonIcon() -- line: 891
+		-- upvalues: GetFFlagCleanupMuteSelfButton (copy), u94 (ref), pollImage (copy)
+		local MuteSelfButtonImageLabel = nil
 
-	Utility:OnResized(v99, function(_, p25) -- line: 905
-		-- upvalues: Utility (copy), Theme (copy), v99 (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), v104 (copy), v101 (copy), v106 (copy)
-		if (p25 or Utility:IsSmallTouchScreen()) and not Theme.AlwaysShowBottomBar() then
-			local v231 = p25 and Theme.textSize(18) or Theme.textSize(24)
+		if GetFFlagCleanupMuteSelfButton() then
+			if u94 then
+				MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
+			end
+		else
+			MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
+		end
 
-			v99.Visible = true
-			v99.Size = UDim2.new(1, 0, 0, Theme.ButtonHeight)
+		if not MuteSelfButtonImageLabel then
+			return
+		end
+
+		MuteSelfButtonImageLabel.Image = pollImage()
+	end
+
+	Utility:OnResized(v109, function(_, p35) -- line: 908
+		-- upvalues: Utility (copy), Theme (copy), v109 (copy), FFlagRelocateMobileMenuButtons (copy), FIntRelocateMobileMenuButtonsVariant (copy), v114 (copy), v111 (copy), v116 (copy)
+		if (p35 or Utility:IsSmallTouchScreen()) and not Theme.AlwaysShowBottomBar() then
+			local v254 = p35 and Theme.textSize(18) or Theme.textSize(24)
+
+			v109.Visible = true
+			v109.Size = UDim2.new(1, 0, 0, Theme.ButtonHeight)
 
 			if not FFlagRelocateMobileMenuButtons or FIntRelocateMobileMenuButtonsVariant == 0 then
-				v104.TextSize = v231
-				v101.TextSize = v231
-				v106.TextSize = v231
+				v114.TextSize = v254
+				v111.TextSize = v254
+				v116.TextSize = v254
 
 				return
 			end
 		else
-			v99.Visible = false
-			v99.Size = UDim2.new(1, 0, 0, 0)
+			v109.Visible = false
+			v109.Size = UDim2.new(1, 0, 0, 0)
 		end
 	end)
 
-	local function reportAbuseButtonCreate(p26, p27) -- line: 921
+	local function reportAbuseButtonCreate(p36, p37) -- line: 924
 		-- upvalues: LocalPlayer (ref), ReportAbuseMenuNewContainerPage (copy), Utility (copy), Theme (copy)
-		local RightSideButtons = p26:FindFirstChild("RightSideButtons")
+		local RightSideButtons = p36:FindFirstChild("RightSideButtons")
 
 		if RightSideButtons then
 			local ReportPlayer = RightSideButtons:FindFirstChild("ReportPlayer")
@@ -786,45 +893,80 @@ return ((function() --[[ Initialize ]] -- line: 148
 				ReportPlayer:Destroy()
 			end
 
-			if p27 and (p27 ~= LocalPlayer and (p27.UserId > 0 and LocalPlayer.UserId > 0)) then
-				local v236 = Utility:MakeStyledImageButton("ReportPlayer", "icons/actions/feedback", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 930
-					-- upvalues: ReportAbuseMenuNewContainerPage (copy), p27 (copy)
-					ReportAbuseMenuNewContainerPage:ReportPlayer(p27, "MenuPlayerList")
+			if p37 and (p37 ~= LocalPlayer and (p37.UserId > 0 and LocalPlayer.UserId > 0)) then
+				local v259 = Utility:MakeStyledImageButton("ReportPlayer", "icons/actions/feedback", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 933
+					-- upvalues: ReportAbuseMenuNewContainerPage (copy), p37 (copy)
+					ReportAbuseMenuNewContainerPage:ReportPlayer(p37, "MenuPlayerList")
 				end)
 
-				v236.Name = "ReportPlayer"
-				v236.Position = UDim2.new(1, -260, 0, 7)
-				v236.LayoutOrder = 3
-				v236.Selectable = true
+				v259.Name = "ReportPlayer"
+				v259.Position = UDim2.new(1, -260, 0, 7)
+				v259.LayoutOrder = 3
+				v259.Selectable = true
 
-				local v237 = "utility-focus-state" .. "-reportplayer-" .. p27.Name
+				local v260 = "utility-focus-state" .. "-reportplayer-" .. p37.Name
 
-				Utility:MakeFocusState(v236, v237)
-				v236.Parent = RightSideButtons
+				Utility:MakeFocusState(v259, v260)
+				v259.Parent = RightSideButtons
 			end
 		end
 	end
 
-	local u110 = nil
-	local u111 = false
-	local connection = nil
+	local u123 = nil
+	local u124 = false
+	local u125 = nil
 
-	local function shouldShowJoinVoiceButton() -- line: 992
-		-- upvalues: GetFFlagEnableConsoleJoinVoice (copy), u111 (ref), v69 (copy), default (copy)
-		return GetFFlagEnableConsoleJoinVoice() and (game:GetEngineFeature("VoiceChatSupported") and (not u111 and (not v69 and (default:verifyUniverseAndPlaceCanUseVoice() and (default:ShouldShowJoinVoiceOnDisconnect() and (default:GetVoiceConnectCookie() == "" and default:HasSeamlessVoiceFeature("InitialJoinVoice")))))))
+	local function muteAllButtonRemove() -- line: 964
+		-- upvalues: u87 (ref), u97 (ref)
+		if u87 then
+			u87.Visible = false
+			u87:Destroy()
+			u87 = nil
+		end
+
+		u97()
 	end
-	local function createRow(p28, p29, b1: boolean?) -- line: 1003
-		-- upvalues: Theme (copy), Create (copy)
-		local v241 = Instance.new(p28)
+	local function muteSelfButtonRemove() -- line: 973
+		-- upvalues: u88 (ref), u125 (ref), u97 (ref)
+		if u88 then
+			u88.Visible = false
+			u88:Destroy()
+			u88 = nil
+		end
 
-		v241.Size = UDim2.new(1, 0, 0, 62)
-		v241.Position = UDim2.new(0, 0, 0, 0)
-		v241.ZIndex = 2
-		v241.BackgroundColor3 = Theme.color("PlayerRowFrame")
-		v241.BackgroundTransparency = Theme.transparency("PlayerRowFrame")
+		if u125 then
+			u125:Disconnect()
+			u125 = nil
+		end
+
+		u97()
+	end
+	local function joinVoiceButtonRemove() -- line: 986
+		-- upvalues: u89 (ref), u97 (ref)
+		if u89 then
+			u89.Visible = false
+			u89:Destroy()
+			u89 = nil
+		end
+
+		u97()
+	end
+	local function shouldShowJoinVoiceButton() -- line: 995
+		-- upvalues: GetFFlagEnableConsoleJoinVoice (copy), u124 (ref), v72 (copy), default (copy)
+		return GetFFlagEnableConsoleJoinVoice() and (game:GetEngineFeature("VoiceChatSupported") and (not u124 and (not v72 and (default:verifyUniverseAndPlaceCanUseVoice() and (default:ShouldShowJoinVoiceOnDisconnect() and (default:GetVoiceConnectCookie() == "" and default:HasSeamlessVoiceFeature("InitialJoinVoice")))))))
+	end
+	local function createRow(p38, p39, b1: boolean?) -- line: 1006
+		-- upvalues: Theme (copy), Create (copy)
+		local v264 = Instance.new(p38)
+
+		v264.Size = UDim2.new(1, 0, 0, 62)
+		v264.Position = UDim2.new(0, 0, 0, 0)
+		v264.ZIndex = 2
+		v264.BackgroundColor3 = Theme.color("PlayerRowFrame")
+		v264.BackgroundTransparency = Theme.transparency("PlayerRowFrame")
 		Create("UICorner")({
 			CornerRadius = Theme.DefaultCornerRadius,
-			Parent = v241
+			Parent = v264
 		})
 
 		local TextLabel
@@ -842,22 +984,22 @@ return ((function() --[[ Initialize ]] -- line: 148
 		TextLabel.Size = UDim2.new(0, 36, 0, 36)
 		TextLabel.Position = UDim2.new(0, 12, 0, 12)
 		TextLabel.ZIndex = 3
-		TextLabel.Parent = v241
+		TextLabel.Parent = v264
 
 		local TextLabel2 = Instance.new("TextLabel")
 
 		TextLabel2.Text = ""
 		TextLabel2.TextXAlignment = Enum.TextXAlignment.Left
 		TextLabel2.Font = Theme.font(Enum.Font.SourceSans, "DisplayName")
-		TextLabel2.FontSize = p29 and Theme.fontSize(Enum.FontSize.Size36, "DisplayName") or Theme.fontSize(Enum.FontSize.Size24, "DisplayName")
+		TextLabel2.FontSize = p39 and Theme.fontSize(Enum.FontSize.Size36, "DisplayName") or Theme.fontSize(Enum.FontSize.Size24, "DisplayName")
 		TextLabel2.TextColor3 = Color3.new(1, 1, 1)
 		TextLabel2.BackgroundTransparency = 1
-		TextLabel2.Position = p29 and UDim2.new(0, 60, 0.5, -10) or UDim2.new(0, 60, 0.5, 0)
+		TextLabel2.Position = p39 and UDim2.new(0, 60, 0.5, -10) or UDim2.new(0, 60, 0.5, 0)
 		TextLabel2.Size = UDim2.new(0, 0, 0, 0)
 		TextLabel2.ZIndex = 3
-		TextLabel2.Parent = v241
+		TextLabel2.Parent = v264
 
-		if p29 then
+		if p39 then
 			local TextLabel3 = Instance.new("TextLabel")
 
 			TextLabel3.Text = ""
@@ -870,25 +1012,25 @@ return ((function() --[[ Initialize ]] -- line: 148
 			TextLabel3.Position = UDim2.new(0, 60, 0.5, 12)
 			TextLabel3.Size = UDim2.new(0, 0, 0, 0)
 			TextLabel3.ZIndex = 3
-			TextLabel3.Parent = v241
+			TextLabel3.Parent = v264
 		end
 
-		return v241
+		return v264
 	end
-	local function u115() -- line: 1062
-		-- upvalues: createRow (copy), u111 (ref), GetFFlagEnableConsoleJoinVoice (copy), shouldShowJoinVoiceButton (copy), uDim2 (copy), Theme (copy), t1 (copy), RobloxLocaleId (copy), FFlagConnectionsToFriendsRename (copy), Constants2 (copy), uiblox (copy), BuilderIcons (copy), Utility (copy)
-		local v245 = createRow("ImageButton", nil, true)
+	local function u131() -- line: 1065
+		-- upvalues: createRow (copy), u124 (ref), GetFFlagEnableConsoleJoinVoice (copy), shouldShowJoinVoiceButton (copy), uDim2 (copy), Theme (copy), t1 (copy), RobloxLocaleId (copy), FFlagConnectionsToFriendsRename (copy), Constants2 (copy), uiblox (copy), BuilderIcons (copy), Utility (copy)
+		local v268 = createRow("ImageButton", nil, true)
 
-		v245.Size = UDim2.new(1, 0, 0, 52)
+		v268.Size = UDim2.new(1, 0, 0, 52)
 
-		local TextLabel = v245.TextLabel
-		local Icon = v245.Icon
+		local TextLabel = v268.TextLabel
+		local Icon = v268.Icon
 
-		if u111 or GetFFlagEnableConsoleJoinVoice() and shouldShowJoinVoiceButton() then
-			v245.Size = uDim2
+		if u124 or GetFFlagEnableConsoleJoinVoice() and shouldShowJoinVoiceButton() then
+			v268.Size = uDim2
 			TextLabel.Size = UDim2.new(1, -60, 0, 0)
 			TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
-			v245.AnchorPoint = Vector2.new(0, 0)
+			v268.AnchorPoint = Vector2.new(0, 0)
 		end
 
 		TextLabel.Font = Theme.font(Enum.Font.SourceSansSemibold, "Semibold")
@@ -897,61 +1039,72 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Icon.AnchorPoint = Vector2.new(0, 0.5)
 		Icon.Position = UDim2.new(0, 18, 0.5, 0)
 
-		local v248 = uiblox["icons/actions/friends/friendInvite"]
-		local v249 = if not v248 then Theme.Images["icons/actions/friends/friendInvite"] else uiblox["icons/actions/friends/friendInvite"]
+		local v271 = uiblox["icons/actions/friends/friendInvite"]
+		local v272 = if not v271 then Theme.Images["icons/actions/friends/friendInvite"] else uiblox["icons/actions/friends/friendInvite"]
 
-		if v249 then
-			if v248 then
-				Icon.Text = v249.name
-				Icon.FontFace = BuilderIcons.Font[v249.variant]
+		if v272 then
+			if v271 then
+				Icon.Text = v272.name
+				Icon.FontFace = BuilderIcons.Font[v272.variant]
 			else
-				Icon.Image = v249.Image
-				Icon.ImageRectOffset = v249.ImageRectOffset
-				Icon.ImageRectSize = v249.ImageRectSize
+				Icon.Image = v272.Image
+				Icon.ImageRectOffset = v272.ImageRectOffset
+				Icon.ImageRectSize = v272.ImageRectSize
 			end
 		end
 
-		v245.InputBegan:Connect(function() -- line: 1104
-			-- upvalues: v245 (copy)
-			v245.ImageTransparency = 0.65
+		local function setIsHighlighted(p40) -- line: 1099
+			-- upvalues: v268 (copy)
+			if p40 then
+				v268.ImageTransparency = 0.65
+
+				return
+			end
+
+			v268.ImageTransparency = 0.85
+		end
+
+		v268.InputBegan:Connect(function() -- line: 1107
+			-- upvalues: v268 (copy)
+			v268.ImageTransparency = 0.65
 		end)
-		v245.InputEnded:Connect(function() -- line: 1107
-			-- upvalues: v245 (copy)
-			v245.ImageTransparency = 0.85
+		v268.InputEnded:Connect(function() -- line: 1110
+			-- upvalues: v268 (copy)
+			v268.ImageTransparency = 0.85
 		end)
-		v245.Activated:Connect(function() -- line: 1110
-			-- upvalues: v245 (copy)
-			v245.ImageTransparency = 0.85
+		v268.Activated:Connect(function() -- line: 1113
+			-- upvalues: v268 (copy)
+			v268.ImageTransparency = 0.85
 		end)
-		v245.TouchPan:Connect(function(_, p31) -- line: 1113
-			-- upvalues: v245 (copy)
-			if math.abs(p31.Y) > 20 then
-				v245.ImageTransparency = 0.85
+		v268.TouchPan:Connect(function(_, p42) -- line: 1116
+			-- upvalues: v268 (copy)
+			if math.abs(p42.Y) > 20 then
+				v268.ImageTransparency = 0.85
 			end
 		end)
-		v245.SelectionGained:connect(function() -- line: 1119
-			-- upvalues: v245 (copy)
-			v245.ImageTransparency = 0.65
+		v268.SelectionGained:connect(function() -- line: 1122
+			-- upvalues: v268 (copy)
+			v268.ImageTransparency = 0.65
 		end)
-		v245.SelectionLost:connect(function() -- line: 1122
-			-- upvalues: v245 (copy)
-			v245.ImageTransparency = 0.85
+		v268.SelectionLost:connect(function() -- line: 1125
+			-- upvalues: v268 (copy)
+			v268.ImageTransparency = 0.85
 		end)
-		v245.SelectionImageObject = v245:Clone()
-		Utility:MakeFocusState(v245, "utility-focus-state-sharegame")
+		v268.SelectionImageObject = v268:Clone()
+		Utility:MakeFocusState(v268, "utility-focus-state-sharegame")
 
-		return v245
+		return v268
 	end
-	local function u116() -- line: 1133
-		-- upvalues: createRow (copy), u78 (ref), Theme (copy), RobloxTranslator (copy), default (copy), Utility (copy)
-		local v250 = createRow("ImageButton")
+	local function u132() -- line: 1136
+		-- upvalues: createRow (copy), u86 (ref), Theme (copy), RobloxTranslator (copy), default (copy), Utility (copy)
+		local v274 = createRow("ImageButton")
 
-		v250.Size = UDim2.new(not u78 and 1 or 0.5, -10, 0, 52)
-		v250.Position = UDim2.new(1, 0, 0, 0)
-		v250.AnchorPoint = Vector2.new(1, 0)
+		v274.Size = UDim2.new(not u86 and 1 or 0.5, -10, 0, 52)
+		v274.Position = UDim2.new(1, 0, 0, 0)
+		v274.AnchorPoint = Vector2.new(1, 0)
 
-		local TextLabel = v250.TextLabel
-		local Icon = v250.Icon
+		local TextLabel = v274.TextLabel
+		local Icon = v274.Icon
 
 		TextLabel.Size = UDim2.new(1, -60, 0, 0)
 		TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -963,48 +1116,60 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Icon.Image = default:GetIcon("UnmuteAll", "Misc")
 		Icon.AnchorPoint = Vector2.new(0, 0.5)
 		Icon.Position = UDim2.new(0, 18, 0.5, 0)
-		v250.InputBegan:Connect(function() -- line: 1161
-			-- upvalues: v250 (copy)
-			v250.ImageTransparency = 0.65
+
+		local function setIsHighlighted(p43) -- line: 1156
+			-- upvalues: v274 (copy)
+			if p43 then
+				v274.ImageTransparency = 0.65
+
+				return
+			end
+
+			v274.ImageTransparency = 0.85
+		end
+
+		v274.InputBegan:Connect(function() -- line: 1164
+			-- upvalues: v274 (copy)
+			v274.ImageTransparency = 0.65
 		end)
-		v250.InputEnded:Connect(function() -- line: 1164
-			-- upvalues: v250 (copy)
-			v250.ImageTransparency = 0.85
+		v274.InputEnded:Connect(function() -- line: 1167
+			-- upvalues: v274 (copy)
+			v274.ImageTransparency = 0.85
 		end)
-		v250.Activated:Connect(function() -- line: 1167
-			-- upvalues: v250 (copy)
-			v250.ImageTransparency = 0.85
+		v274.Activated:Connect(function() -- line: 1170
+			-- upvalues: v274 (copy)
+			v274.ImageTransparency = 0.85
 		end)
-		v250.TouchPan:Connect(function(_, p33) -- line: 1170
-			-- upvalues: v250 (copy)
-			if math.abs(p33.Y) > 20 then
-				v250.ImageTransparency = 0.85
+		v274.TouchPan:Connect(function(_, p45) -- line: 1173
+			-- upvalues: v274 (copy)
+			if math.abs(p45.Y) > 20 then
+				v274.ImageTransparency = 0.85
 			end
 		end)
-		v250.SelectionGained:connect(function() -- line: 1176
-			-- upvalues: v250 (copy)
-			v250.ImageTransparency = 0.65
+		v274.SelectionGained:connect(function() -- line: 1179
+			-- upvalues: v274 (copy)
+			v274.ImageTransparency = 0.65
 		end)
-		v250.SelectionLost:connect(function() -- line: 1179
-			-- upvalues: v250 (copy)
-			v250.ImageTransparency = 0.85
+		v274.SelectionLost:connect(function() -- line: 1182
+			-- upvalues: v274 (copy)
+			v274.ImageTransparency = 0.85
 		end)
-		v250.SelectionImageObject = v250:Clone()
-		Utility:MakeFocusState(v250, "utility-focus-state-muteall")
+		v274.SelectionImageObject = v274:Clone()
+		Utility:MakeFocusState(v274, "utility-focus-state-muteall")
 
-		return v250
+		return v274
 	end
-	local function u117() -- line: 1190
-		-- upvalues: createRow (copy), Theme (copy), pollImage (copy), Utility (copy), t1 (copy), RobloxLocaleId (copy), default (copy), connection (ref), u96 (ref), GetFFlagCleanupMuteSelfButton (copy), u86 (ref), v83 (copy), u80 (ref)
-		local v253 = createRow("ImageButton")
+	local function u133() -- line: 1193
+		-- upvalues: createRow (copy), Theme (copy), pollImage (copy), Utility (copy), t1 (copy), RobloxLocaleId (copy), default (copy), u125 (ref), u106 (ref), GetFFlagCleanupMuteSelfButton (copy), u94 (ref), v91 (copy), u88 (ref)
+		local v278 = createRow("ImageButton")
 
-		v253.Name = "MuteSelfButton"
-		v253.Size = UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight)
-		v253.Position = UDim2.new(1, 0, 0, 0)
-		v253.AnchorPoint = Vector2.new(1, 0)
+		v278.Name = "MuteSelfButton"
+		v278.Size = UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight)
+		v278.Position = UDim2.new(1, 0, 0, 0)
+		v278.AnchorPoint = Vector2.new(1, 0)
 
-		local TextLabel = v253.TextLabel
-		local Icon = v253.Icon
+		local TextLabel = v278.TextLabel
+		local Icon = v278.Icon
 
 		TextLabel.Size = UDim2.new(1, -60, 0, 0)
 		TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -1016,159 +1181,216 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Icon.Image = pollImage()
 		Icon.AnchorPoint = Vector2.new(0, 0.5)
 		Icon.Position = UDim2.new(0, 18, 0.5, 0)
-		v253.InputBegan:Connect(function() -- line: 1219
-			-- upvalues: v253 (copy)
-			v253.ImageTransparency = 0.65
+
+		local function setIsHighlighted(p46) -- line: 1214
+			-- upvalues: v278 (copy)
+			if p46 then
+				v278.ImageTransparency = 0.65
+
+				return
+			end
+
+			v278.ImageTransparency = 0.85
+		end
+
+		v278.InputBegan:Connect(function() -- line: 1222
+			-- upvalues: v278 (copy)
+			v278.ImageTransparency = 0.65
 		end)
-		v253.InputEnded:Connect(function() -- line: 1222
-			-- upvalues: v253 (copy)
-			v253.ImageTransparency = 0.85
+		v278.InputEnded:Connect(function() -- line: 1225
+			-- upvalues: v278 (copy)
+			v278.ImageTransparency = 0.85
 		end)
-		v253.Activated:Connect(function() -- line: 1225
-			-- upvalues: v253 (copy)
-			v253.ImageTransparency = 0.85
+		v278.Activated:Connect(function() -- line: 1228
+			-- upvalues: v278 (copy)
+			v278.ImageTransparency = 0.85
 		end)
-		v253.TouchPan:Connect(function(_, p35) -- line: 1228
-			-- upvalues: v253 (copy)
-			if math.abs(p35.Y) > 20 then
-				v253.ImageTransparency = 0.85
+		v278.TouchPan:Connect(function(_, p48) -- line: 1231
+			-- upvalues: v278 (copy)
+			if math.abs(p48.Y) > 20 then
+				v278.ImageTransparency = 0.85
 			end
 		end)
-		v253.SelectionGained:connect(function() -- line: 1234
-			-- upvalues: v253 (copy)
-			v253.ImageTransparency = 0.65
+		v278.SelectionGained:connect(function() -- line: 1237
+			-- upvalues: v278 (copy)
+			v278.ImageTransparency = 0.65
 		end)
-		v253.SelectionLost:connect(function() -- line: 1237
-			-- upvalues: v253 (copy)
-			v253.ImageTransparency = 0.85
+		v278.SelectionLost:connect(function() -- line: 1240
+			-- upvalues: v278 (copy)
+			v278.ImageTransparency = 0.85
 		end)
-		v253.SelectionImageObject = v253:Clone()
-		Utility:MakeFocusState(v253, "utility-focus-state-playermute")
+		v278.SelectionImageObject = v278:Clone()
+		Utility:MakeFocusState(v278, "utility-focus-state-playermute")
 
-		local v256 = not default.localMuted and "CoreScripts.InGameMenu.QuickActions.MuteSelf" or "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
+		local function updatePlayerMuteText(p49) -- line: 1248
+			-- upvalues: TextLabel (copy), t1 (copy), RobloxLocaleId (copy)
+			local v390 = not p49 and "CoreScripts.InGameMenu.QuickActions.MuteSelf" or "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
 
-		TextLabel.Text = t1[RobloxLocaleId]:Format(v256)
-		connection = default.muteChanged.Event:Connect(function(p36) -- line: 1252
-			-- upvalues: u96 (ref), GetFFlagCleanupMuteSelfButton (copy), u86 (ref), pollImage (copy), TextLabel (copy), t1 (copy), RobloxLocaleId (copy)
-			u96 = p36
+			TextLabel.Text = t1[RobloxLocaleId]:Format(v390)
+		end
+
+		local v283 = not default.localMuted and "CoreScripts.InGameMenu.QuickActions.MuteSelf" or "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
+
+		TextLabel.Text = t1[RobloxLocaleId]:Format(v283)
+		u125 = default.muteChanged.Event:Connect(function(p50) -- line: 1255
+			-- upvalues: u106 (ref), GetFFlagCleanupMuteSelfButton (copy), u94 (ref), pollImage (copy), TextLabel (copy), t1 (copy), RobloxLocaleId (copy)
+			u106 = p50
 
 			local MuteSelfButtonImageLabel = nil
 
 			if GetFFlagCleanupMuteSelfButton() then
-				if u86 then
-					MuteSelfButtonImageLabel = u86:FindFirstChild("MuteSelfButtonImageLabel", true)
+				if u94 then
+					MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
 				end
 			else
-				MuteSelfButtonImageLabel = u86:FindFirstChild("MuteSelfButtonImageLabel", true)
+				MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
 			end
 
 			if MuteSelfButtonImageLabel then
 				MuteSelfButtonImageLabel.Image = pollImage()
 			end
 
-			local v363 = not p36 and "CoreScripts.InGameMenu.QuickActions.MuteSelf" or "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
+			local v393 = not p50 and "CoreScripts.InGameMenu.QuickActions.MuteSelf" or "CoreScripts.InGameMenu.QuickActions.UnmuteSelf"
 
-			TextLabel.Text = t1[RobloxLocaleId]:Format(v363)
+			TextLabel.Text = t1[RobloxLocaleId]:Format(v393)
 		end)
-		v253.Activated:Connect(function() -- line: 1258
-			-- upvalues: default (copy), v83 (copy), u96 (ref)
+		v278.Activated:Connect(function() -- line: 1261
+			-- upvalues: default (copy), v91 (copy), u106 (ref)
 			default:ToggleMic("InGameMenuPlayers")
 
-			if v83 then
-				v83:onToggleMuteSelf(u96)
+			if v91 then
+				v91:onToggleMuteSelf(u106)
 			end
 		end)
 
 		if GetFFlagCleanupMuteSelfButton() then
-			return v253
+			return v278
 		end
 
-		u80 = v253
+		u88 = v278
+	end
+	local function addMuteButtonExperience() -- line: 1276
+		-- upvalues: v72 (copy), GetFFlagCleanupMuteSelfButton (copy), u88 (ref), u133 (ref)
+		if v72 then
+			return
+		end
+
+		if GetFFlagCleanupMuteSelfButton() then
+			u88 = u133()
+
+			return
+		end
+
+		u133()
 	end
 
 	if GetFFlagEnableConsoleJoinVoice() then
-		function u110() -- line: 1286
-			-- upvalues: createRow (copy), uDim2 (copy), Theme (copy), v58 (copy), t1 (copy), RobloxLocaleId (copy), uiblox (copy), BuilderIcons (copy), Utility (copy), default (copy)
-			local v257 = createRow("ImageButton", nil, true)
+		function u123() -- line: 1289
+			-- upvalues: createRow (copy), uDim2 (copy), Theme (copy), v61 (copy), t1 (copy), RobloxLocaleId (copy), uiblox (copy), BuilderIcons (copy), Utility (copy), default (copy), Constants (copy)
+			local v284 = createRow("ImageButton", nil, true)
 
-			v257.Size = UDim2.new(1, 0, 0, 52)
-			v257.Size = uDim2
-			v257.AnchorPoint = Vector2.new(0, 0)
+			v284.Size = UDim2.new(1, 0, 0, 52)
+			v284.Size = uDim2
+			v284.AnchorPoint = Vector2.new(0, 0)
 
-			local TextLabel = v257.TextLabel
+			local TextLabel = v284.TextLabel
 
 			TextLabel.Size = UDim2.new(1, -60, 0, 0)
 			TextLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TextLabel.Font = Theme.font(Enum.Font.SourceSansSemibold, "Semibold")
 			TextLabel.AutoLocalize = false
 
-			if v58 then
+			if v61 then
 				TextLabel.Text = t1[RobloxLocaleId]:Format("Feature.SettingsHub.Action.ConnectVoiceChat")
 			else
 				TextLabel.Text = "Connect Voice Chat"
 			end
 
-			local Icon = v257.Icon
+			local Icon = v284.Icon
 
 			Icon.AnchorPoint = Vector2.new(0, 0.5)
 			Icon.Position = UDim2.new(0, 18, 0.5, 0)
 
-			local v260 = uiblox["icons/controls/publicAudioJoin"]
-			local v261 = if not v260 then Theme.Images["icons/controls/publicAudioJoin"] else uiblox["icons/controls/publicAudioJoin"]
+			local v287 = uiblox["icons/controls/publicAudioJoin"]
+			local v288 = if not v287 then Theme.Images["icons/controls/publicAudioJoin"] else uiblox["icons/controls/publicAudioJoin"]
 
-			if v261 then
-				if v260 then
-					Icon.Text = v261.name
-					Icon.FontFace = BuilderIcons.Font[v261.variant]
+			if v288 then
+				if v287 then
+					Icon.Text = v288.name
+					Icon.FontFace = BuilderIcons.Font[v288.variant]
 				else
-					Icon.Image = v261.Image
-					Icon.ImageRectOffset = v261.ImageRectOffset
-					Icon.ImageRectSize = v261.ImageRectSize
+					Icon.Image = v288.Image
+					Icon.ImageRectOffset = v288.ImageRectOffset
+					Icon.ImageRectSize = v288.ImageRectSize
 				end
 			end
 
-			v257.InputBegan:Connect(function() -- line: 1329
-				-- upvalues: v257 (copy)
-				v257.ImageTransparency = 0.65
+			local function setIsHighlighted(p51) -- line: 1324
+				-- upvalues: v284 (copy)
+				if p51 then
+					v284.ImageTransparency = 0.65
+
+					return
+				end
+
+				v284.ImageTransparency = 0.85
+			end
+
+			v284.InputBegan:Connect(function() -- line: 1332
+				-- upvalues: v284 (copy)
+				v284.ImageTransparency = 0.65
 			end)
-			v257.InputEnded:Connect(function() -- line: 1332
-				-- upvalues: v257 (copy)
-				v257.ImageTransparency = 0.85
+			v284.InputEnded:Connect(function() -- line: 1335
+				-- upvalues: v284 (copy)
+				v284.ImageTransparency = 0.85
 			end)
-			v257.Activated:Connect(function() -- line: 1335
-				-- upvalues: v257 (copy)
-				v257.ImageTransparency = 0.85
+			v284.Activated:Connect(function() -- line: 1338
+				-- upvalues: v284 (copy)
+				v284.ImageTransparency = 0.85
 			end)
-			v257.TouchPan:Connect(function(_, p38) -- line: 1338
-				-- upvalues: v257 (copy)
-				if math.abs(p38.Y) > 20 then
-					v257.ImageTransparency = 0.85
+			v284.TouchPan:Connect(function(_, p53) -- line: 1341
+				-- upvalues: v284 (copy)
+				if math.abs(p53.Y) > 20 then
+					v284.ImageTransparency = 0.85
 				end
 			end)
-			v257.SelectionGained:connect(function() -- line: 1344
-				-- upvalues: v257 (copy)
-				v257.ImageTransparency = 0.65
+			v284.SelectionGained:connect(function() -- line: 1347
+				-- upvalues: v284 (copy)
+				v284.ImageTransparency = 0.65
 			end)
-			v257.SelectionLost:connect(function() -- line: 1347
-				-- upvalues: v257 (copy)
-				v257.ImageTransparency = 0.85
+			v284.SelectionLost:connect(function() -- line: 1350
+				-- upvalues: v284 (copy)
+				v284.ImageTransparency = 0.85
 			end)
-			v257.SelectionImageObject = v257:Clone()
-			Utility:MakeFocusState(v257, "utility-focus-state-joinVoice")
-			v257.Activated:Connect(function() -- line: 1355
-				-- upvalues: default (copy)
+			v284.SelectionImageObject = v284:Clone()
+			Utility:MakeFocusState(v284, "utility-focus-state-joinVoice")
+			v284.Activated:Connect(function() -- line: 1358
+				-- upvalues: default (copy), Constants (copy)
+				default.pendingConnectionSource = Constants.VOICE_CONNECTION_SOURCE.SETTINGS_TOGGLE_ON
 				default:JoinVoice()
 			end)
 
-			return v257
+			return v284
 		end
 	end
 
-	local function resizeInspectButton(p39, p40, p41, p42) -- line: 1382
-		-- upvalues: RbxAnalyticsService (copy), Constants2 (copy), v72 (copy), GuiService (copy), Utility (copy), Theme (copy)
-		local Inspect = p39:FindFirstChild("Inspect")
+	local function addJoinVoiceButton() -- line: 1367
+		-- upvalues: shouldShowJoinVoiceButton (copy), u89 (ref), u123 (ref)
+		if not shouldShowJoinVoiceButton() or u89 then
+			return
+		end
 
-		if Inspect and p41 == p42 then
+		u89 = u123()
+	end
+	local function createInspectButtonImage(p54) -- line: 1375
+		-- upvalues: Utility (copy), Theme (copy)
+		return (Utility:MakeStyledImageButton("InspectButton", "icons/actions/zoomIn", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), p54))
+	end
+	local function resizeInspectButton(p55, p56, p57, p58) -- line: 1386
+		-- upvalues: RbxAnalyticsService (copy), Constants2 (copy), v76 (copy), GuiService (copy), Utility (copy), Theme (copy)
+		local Inspect = p55:FindFirstChild("Inspect")
+
+		if Inspect and p57 == p58 then
 			return
 		end
 
@@ -1176,34 +1398,34 @@ return ((function() --[[ Initialize ]] -- line: 148
 			Inspect:Destroy()
 		end
 
-		local v268 = Utility:MakeStyledImageButton("InspectButton", "icons/actions/zoomIn", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 1392
-			-- upvalues: RbxAnalyticsService (copy), Constants2 (copy), v72 (copy), GuiService (copy), p40 (copy)
+		local v296 = Utility:MakeStyledImageButton("InspectButton", "icons/actions/zoomIn", UDim2.new(0, Theme.ButtonHeight, 0, Theme.ButtonHeight), UDim2.new(0, 28, 0, 28), function() -- line: 1396
+			-- upvalues: RbxAnalyticsService (copy), Constants2 (copy), v76 (copy), GuiService (copy), p56 (copy)
 			RbxAnalyticsService:SetRBXEventStream(Constants2.AnalyticsTargetName, Constants2.AnalyticsExamineAvatarName, Constants2.AnalyticsMenuActionName, {
-				playsessionid = v72.playSessionId,
+				playsessionid = v76.playSessionId,
 				universeid = tostring(game.GameId)
 			})
-			GuiService:InspectPlayerFromUserIdWithCtx(p40.UserId, "escapeMenu")
-			v72.HubRef:SetVisibility(false)
+			GuiService:InspectPlayerFromUserIdWithCtx(p56.UserId, "escapeMenu")
+			v76.HubRef:SetVisibility(false)
 		end)
 
-		v268.Name = "Inspect"
-		v268.LayoutOrder = 2
-		v268.Selectable = true
-		v268.Parent = p39
+		v296.Name = "Inspect"
+		v296.LayoutOrder = 2
+		v296.Selectable = true
+		v296.Parent = p55
 
-		local v269 = "utility-focus-state" .. "-inspect-" .. p40.Name
+		local v297 = "utility-focus-state" .. "-inspect-" .. p56.Name
 
-		Utility:MakeFocusState(v268, v269)
+		Utility:MakeFocusState(v296, v297)
 	end
-	local function resizePlatformName(p43, p44, p45) -- line: 1415
+	local function resizePlatformName(p59, p60, p61) -- line: 1419
 		-- upvalues: result (copy), Utility (copy), Theme (copy), Create (copy)
-		local PlatformNameContainer = p43:FindFirstChild("PlatformNameContainer")
+		local PlatformNameContainer = p59:FindFirstChild("PlatformNameContainer")
 
 		if PlatformNameContainer then
 			PlatformNameContainer:Destroy()
 		end
 
-		if p44 == nil then
+		if p60 == nil then
 			return
 		end
 
@@ -1217,42 +1439,42 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Frame.AutomaticSize = Enum.AutomaticSize.X
 		Frame.Selectable = false
 		Frame.LayoutOrder = -1
-		Frame.Parent = p43
+		Frame.Parent = p59
 
-		local v275 = nil
+		local v303 = nil
 
-		if game:GetEngineFeature("PlatformFriendsService") and game:GetEngineFeature("PlatformFriendsProfile") and result and result:IsProfileEnabled() and p45 and p45 ~= "" then
-			function v275() -- line: 1448
-				-- upvalues: result (copy), p45 (copy)
-				result:ShowProfile(p45)
+		if game:GetEngineFeature("PlatformFriendsService") and game:GetEngineFeature("PlatformFriendsProfile") and result and result:IsProfileEnabled() and p61 and p61 ~= "" then
+			function v303() -- line: 1452
+				-- upvalues: result (copy), p61 (copy)
+				result:ShowProfile(p61)
 			end
 		end
 
-		local v276, v277 = Utility:MakeStyledButton("consoleNameContainer", p44, UDim2.new(0, 0, 0, Theme.ButtonHeight), v275)
+		local v304, v305 = Utility:MakeStyledButton("consoleNameContainer", p60, UDim2.new(0, 0, 0, Theme.ButtonHeight), v303)
 
-		v276.AnchorPoint = Vector2.new(0, 0.5)
-		v276.Position = UDim2.fromScale(0, 0.5)
-		v276.AutomaticSize = Enum.AutomaticSize.X
-		v276.Parent = Frame
-		v277.Size = UDim2.fromScale(0, 1)
-		v277.AutoLocalize = false
-		v277.TextSize = Theme.platformNameTextSize
-		v277.TextScaled = false
-		v277.TextWrapped = false
-		v277.AutomaticSize = Enum.AutomaticSize.X
+		v304.AnchorPoint = Vector2.new(0, 0.5)
+		v304.Position = UDim2.fromScale(0, 0.5)
+		v304.AutomaticSize = Enum.AutomaticSize.X
+		v304.Parent = Frame
+		v305.Size = UDim2.fromScale(0, 1)
+		v305.AutoLocalize = false
+		v305.TextSize = Theme.platformNameTextSize
+		v305.TextScaled = false
+		v305.TextWrapped = false
+		v305.AutomaticSize = Enum.AutomaticSize.X
 
-		local v278 = Create("ImageLabel")({
+		local v306 = Create("ImageLabel")({
 			Name = "iconLabel",
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromScale(0.5, 0.5),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			Size = Theme.platformNameIconSize,
 			Image = "rbxasset://textures/ui/Shell/Icons/PlatformLogo@3x.png",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = Theme.platformNameIconSize,
 			ImageColor3 = Color3.new(1, 1, 1)
 		})
 
-		v278.Parent = v276
+		v306.Parent = v304
 		Create("UIListLayout")({
 			Name = "PLatformNameUIListLayout",
 			FillDirection = Enum.FillDirection.Horizontal,
@@ -1260,31 +1482,31 @@ return ((function() --[[ Initialize ]] -- line: 148
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 12)
-		}).Parent = v276
-		v278.LayoutOrder = 1
-		v277.LayoutOrder = 2
+		}).Parent = v304
+		v306.LayoutOrder = 1
+		v305.LayoutOrder = 2
 		Create("UIPadding")({
 			PaddingLeft = UDim.new(0, 12),
 			PaddingRight = UDim.new(0, 12),
-			Parent = v276
+			Parent = v304
 		})
 
 		return Frame
 	end
-	local function u120() -- line: 1510
+	local function u139() -- line: 1514
 		-- upvalues: createRow (copy), FFlagIEMFocusNavToButtons (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy), GuiService (copy)
-		local v279 = createRow("ImageLabel", true)
+		local v307 = createRow("ImageLabel", true)
 
-		v279.TextLabel.Name = "DisplayNameLabel"
-		v279.SecondRow.Name = "NameLabel"
+		v307.TextLabel.Name = "DisplayNameLabel"
+		v307.SecondRow.Name = "NameLabel"
 
 		if FFlagIEMFocusNavToButtons then
-			v279.Selectable = false
-			v279.SelectionGroup = true
+			v307.Selectable = false
+			v307.SelectionGroup = true
 		end
 
 		if GetFFlagLuaAppEnableOpenTypeSupport() then
-			v279.NameLabel.OpenTypeFeatures = OpenTypeSupport:getUserNameStylisticAlternative()
+			v307.NameLabel.OpenTypeFeatures = OpenTypeSupport:getUserNameStylisticAlternative()
 		end
 
 		local Frame = Instance.new("Frame")
@@ -1294,52 +1516,52 @@ return ((function() --[[ Initialize ]] -- line: 148
 		Frame.ZIndex = 2
 		Frame.Position = UDim2.new(0, 0, 0, 0)
 		Frame.Size = UDim2.new(1, -12, 1, 0)
-		Frame.Parent = v279
+		Frame.Parent = v307
 
-		local u281 = nil
+		local u309 = nil
 
-		Frame.ChildAdded:connect(function(p46) -- line: 1546
-			-- upvalues: u281 (ref), v279 (copy), GuiService (copy), Frame (copy)
-			if p46:IsA("GuiObject") then
-				if u281 and p46 ~= u281 then
-					u281:Destroy()
-					u281 = nil
+		Frame.ChildAdded:connect(function(p62) -- line: 1550
+			-- upvalues: u309 (ref), v307 (copy), GuiService (copy), Frame (copy)
+			if p62:IsA("GuiObject") then
+				if u309 and p62 ~= u309 then
+					u309:Destroy()
+					u309 = nil
 				end
 
-				p46.SelectionGained:connect(function() -- line: 1552
-					-- upvalues: v279 (copy), GuiService (copy), Frame (copy)
-					if v279 then
+				p62.SelectionGained:connect(function() -- line: 1556
+					-- upvalues: v307 (copy), GuiService (copy), Frame (copy)
+					if v307 then
 						if GuiService.SelectedCoreObject and GuiService.SelectedCoreObject ~= nil and GuiService.SelectedCoreObject.Parent == Frame then
-							v279.ImageTransparency = 0.65
+							v307.ImageTransparency = 0.65
 
 							return
 						end
 
-						v279.ImageTransparency = 0.85
+						v307.ImageTransparency = 0.85
 					end
 				end)
-				p46.SelectionLost:connect(function() -- line: 1555
-					-- upvalues: p46 (copy), v279 (copy), GuiService (copy), Frame (copy)
-					local v424 = p46
+				p62.SelectionLost:connect(function() -- line: 1559
+					-- upvalues: p62 (copy), v307 (copy), GuiService (copy), Frame (copy)
+					local v454 = p62
 
-					if v279 then
-						if GuiService.SelectedCoreObject and v424 ~= GuiService.SelectedCoreObject and GuiService.SelectedCoreObject.Parent == Frame then
-							v279.ImageTransparency = 0.65
+					if v307 then
+						if GuiService.SelectedCoreObject and v454 ~= GuiService.SelectedCoreObject and GuiService.SelectedCoreObject.Parent == Frame then
+							v307.ImageTransparency = 0.65
 
 							return
 						end
 
-						v279.ImageTransparency = 0.85
+						v307.ImageTransparency = 0.85
 					end
 				end)
 			end
 		end)
-		u281 = Instance.new("Frame")
-		u281.Selectable = true
-		u281.Size = UDim2.new(1, 0, 1, 0)
-		u281.BackgroundTransparency = 1
-		u281.SelectionImageObject = u281:Clone()
-		u281.Parent = Frame
+		u309 = Instance.new("Frame")
+		u309.Selectable = true
+		u309.Size = UDim2.new(1, 0, 1, 0)
+		u309.BackgroundTransparency = 1
+		u309.SelectionImageObject = u309:Clone()
+		u309.Parent = Frame
 
 		local UIListLayout = Instance.new("UIListLayout")
 
@@ -1350,292 +1572,296 @@ return ((function() --[[ Initialize ]] -- line: 148
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		UIListLayout.Padding = UDim.new(0, 12)
 		UIListLayout.Parent = Frame
-		pcall(function() -- line: 1577
-			-- upvalues: v279 (copy)
-			v279.NameLabel.Localize = false
-			v279.DisplayNameLabel.Localize = false
+		pcall(function() -- line: 1581
+			-- upvalues: v307 (copy)
+			v307.NameLabel.Localize = false
+			v307.DisplayNameLabel.Localize = false
 		end)
 
-		return v279
+		return v307
 	end
-	local function managePlayerNameCutoff(p47, p48) -- line: 1589
-		-- upvalues: v68 (copy), UserProfileStore (copy), isEngineTruncationEnabledForIngameSettings (copy), Utility (copy), v63 (copy), formatUsername (copy)
-		local u285 = nil
-		local u286 = nil
+	local function managePlayerNameCutoff(p63, p64) -- line: 1593
+		-- upvalues: v71 (copy), UserProfileStore (copy), isEngineTruncationEnabledForIngameSettings (copy), Utility (copy), v66 (copy), formatUsername (copy)
+		local u313 = nil
+		local u314 = nil
 
-		local function reportFlagChanged(p49, p50, p51) -- line: 1592
-			-- upvalues: u285 (ref), p47 (copy), p48 (copy)
-			if p50 == "AbsolutePosition" and u285 then
-				local v372 = p49.AbsolutePosition.X - 20 - p47.NameLabel.AbsolutePosition.X
+		local function reportFlagChanged(p65, p66, p67) -- line: 1596
+			-- upvalues: u313 (ref), p63 (copy), p64 (copy)
+			if p66 == "AbsolutePosition" and u313 then
+				local v402 = p65.AbsolutePosition.X - 20 - p63.NameLabel.AbsolutePosition.X
 
-				p47.NameLabel.Text = "@" .. p48.Name
-				p47.DisplayNameLabel.Text = p48.DisplayName
+				p63.NameLabel.Text = "@" .. p64.Name
+				p63.DisplayNameLabel.Text = p64.DisplayName
 
-				if p51 then
-					p47.DisplayNameLabel.Text = p51
+				if p67 then
+					p63.DisplayNameLabel.Text = p67
 				end
 
-				local v373 = utf8.len(p48.DisplayName)
+				local v403 = utf8.len(p64.DisplayName)
 
-				if p51 then
-					v373 = utf8.len(p51)
+				if p67 then
+					v403 = utf8.len(p67)
 				end
 
-				while v372 < p47.NameLabel.TextBounds.X and v373 > 0 do
-					if p51 then
-						local v374 = utf8.offset(p51, v373)
+				while v402 < p63.NameLabel.TextBounds.X and v403 > 0 do
+					if p67 then
+						local v404 = utf8.offset(p67, v403)
 
-						p47.NameLabel.Text = string.sub(p51, 1, v374) .. "..."
+						p63.NameLabel.Text = string.sub(p67, 1, v404) .. "..."
 					else
-						local v375 = utf8.offset(p48.DisplayName, v373)
+						local v405 = utf8.offset(p64.DisplayName, v403)
 
-						p47.NameLabel.Text = string.sub(p48.DisplayName, 1, v375) .. "..."
+						p63.NameLabel.Text = string.sub(p64.DisplayName, 1, v405) .. "..."
 					end
 
-					v373 -= 1
+					v403 -= 1
 				end
 
-				local v376 = "@" .. p48.Name
-				local v377 = string.len(v376)
+				local v406 = "@" .. p64.Name
+				local v407 = string.len(v406)
 
-				while v372 < p47.NameLabel.TextBounds.X and v377 > 0 do
-					p47.NameLabel.Text = string.sub(v376, 1, v377) .. "..."
-					v377 -= 1
+				while v402 < p63.NameLabel.TextBounds.X and v407 > 0 do
+					p63.NameLabel.Text = string.sub(v406, 1, v407) .. "..."
+					v407 -= 1
 				end
 			end
 		end
-		local function reportFlagChangedWithCombinedName(p52, _, _) -- line: 1626
-			-- upvalues: v68 (copy), p48 (copy), reportFlagChanged (copy), UserProfileStore (copy), p47 (copy)
-			if v68 and not p48.UserId then
-				reportFlagChanged(p52, "AbsolutePosition")
+		local function reportFlagChangedWithCombinedName(p68, _, _) -- line: 1630
+			-- upvalues: v71 (copy), p64 (copy), reportFlagChanged (copy), UserProfileStore (copy), p63 (copy)
+			if v71 and not p64.UserId then
+				reportFlagChanged(p68, "AbsolutePosition")
 
 				return
 			end
 
-			UserProfileStore.get().fetchNamesByUserIds({ (tostring(p48.UserId)) }, function(p55) -- line: 1630
-				-- upvalues: p47 (copy), reportFlagChanged (copy), p52 (copy), p48 (copy)
-				local v426 = p47
-				local v427 = if not v426 or not v426.Parent then nil else v426:FindFirstChild("DisplayNameLabel")
+			UserProfileStore.get().fetchNamesByUserIds({ (tostring(p64.UserId)) }, function(p71) -- line: 1634
+				-- upvalues: p63 (copy), reportFlagChanged (copy), p68 (copy), p64 (copy)
+				local v456 = p63
+				local v457 = if not v456 or not v456.Parent then nil else v456:FindFirstChild("DisplayNameLabel")
 
-				if v427 == nil then
+				if v457 == nil then
 					return
 				end
 
-				local data = p55.data
+				local data = p71.data
 				local s2
 
 				if #data == 0 then
 					s2 = ""
 				else
-					local v430 = data[1]
+					local v460 = data[1]
 
-					if v430 == nil then
+					if v460 == nil then
 						s2 = ""
 					else
-						local names = v430.names
+						local names = v460.names
 
 						s2 = if names ~= nil then names.getInExperienceCombinedName(false) else ""
 					end
 				end
 
-				if string.len(s2) > 0 and s2 ~= v427.Text then
-					reportFlagChanged(p52, "AbsolutePosition", s2)
+				if string.len(s2) > 0 and s2 ~= v457.Text then
+					reportFlagChanged(p68, "AbsolutePosition", s2)
 
 					return
 				end
 
-				if p48.DisplayName ~= v427.Text then
-					reportFlagChanged(p52, "AbsolutePosition")
+				if p64.DisplayName ~= v457.Text then
+					reportFlagChanged(p68, "AbsolutePosition")
 				end
 			end)
 		end
 
 		if not isEngineTruncationEnabledForIngameSettings() then
-			Utility:OnResized(p47.NameLabel, function(_, p57) -- line: 1650
-				-- upvalues: u285 (ref), Utility (copy), u286 (ref), p47 (copy), reportFlagChangedWithCombinedName (copy), p48 (copy), v68 (copy), UserProfileStore (copy)
-				if u285 ~= nil and p57 == u285 then
+			Utility:OnResized(p63.NameLabel, function(_, p73) -- line: 1654
+				-- upvalues: u313 (ref), Utility (copy), u314 (ref), p63 (copy), reportFlagChangedWithCombinedName (copy), p64 (copy), v71 (copy), UserProfileStore (copy)
+				if u313 ~= nil and p73 == u313 then
 					return
 				end
 
-				local v383 = p57 and not (Utility:IsSmallTouchScreen() and Utility:IsPortrait())
+				local v413 = p73 and not (Utility:IsSmallTouchScreen() and Utility:IsPortrait())
 
-				u285 = v383
+				u313 = v413
 
-				if v383 then
-					if u286 == nil then
-						u286 = p47.RightSideButtons.ChildAdded:connect(function(p58) -- line: 1659
+				if v413 then
+					if u314 == nil then
+						u314 = p63.RightSideButtons.ChildAdded:connect(function(p74) -- line: 1663
 							-- upvalues: reportFlagChangedWithCombinedName (copy)
-							if p58.Name == "Inspect" then
-								p58.Changed:connect(function(_) -- line: 1661
-									-- upvalues: reportFlagChangedWithCombinedName (copy), p58 (copy)
-									reportFlagChangedWithCombinedName(p58, "AbsolutePosition")
+							if p74.Name == "Inspect" then
+								p74.Changed:connect(function(_) -- line: 1665
+									-- upvalues: reportFlagChangedWithCombinedName (copy), p74 (copy)
+									reportFlagChangedWithCombinedName(p74, "AbsolutePosition")
 								end)
-								reportFlagChangedWithCombinedName(p58, "AbsolutePosition")
+								reportFlagChangedWithCombinedName(p74, "AbsolutePosition")
 							end
 						end)
 					end
 
-					local Inspect = p47.RightSideButtons:FindFirstChild("Inspect")
+					local Inspect = p63.RightSideButtons:FindFirstChild("Inspect")
 
 					if Inspect then
-						Inspect.Changed:connect(function(p60) -- line: 1670
+						Inspect.Changed:connect(function(p76) -- line: 1674
 							-- upvalues: reportFlagChangedWithCombinedName (copy), Inspect (copy)
-							reportFlagChangedWithCombinedName(Inspect, p60)
+							reportFlagChangedWithCombinedName(Inspect, p76)
 						end)
 						reportFlagChangedWithCombinedName(Inspect, "AbsolutePosition")
 
 						return
 					end
 				else
-					if not p47:FindFirstChild("NameLabel") then
+					if not p63:FindFirstChild("NameLabel") then
 						return
 					end
 
-					p47.NameLabel.Text = "@" .. p48.Name
+					p63.NameLabel.Text = "@" .. p64.Name
 
-					if v68 and not p48.UserId then
-						p47.DisplayNameLabel.Text = p48.DisplayName
+					if v71 and not p64.UserId then
+						p63.DisplayNameLabel.Text = p64.DisplayName
 
 						return
 					end
 
-					UserProfileStore.get().fetchNamesByUserIds({ (tostring(p48.UserId)) }, function(p61) -- line: 1684
-						-- upvalues: p47 (copy), p48 (copy)
-						local v435 = p47
-						local v436 = if not v435 or not v435.Parent then nil else v435:FindFirstChild("DisplayNameLabel")
+					UserProfileStore.get().fetchNamesByUserIds({ (tostring(p64.UserId)) }, function(p77) -- line: 1688
+						-- upvalues: p63 (copy), p64 (copy)
+						local v465 = p63
+						local v466 = if not v465 or not v465.Parent then nil else v465:FindFirstChild("DisplayNameLabel")
 
-						if v436 == nil then
+						if v466 == nil then
 							return
 						end
 
-						local data = p61.data
+						local data = p77.data
 						local s3
 
 						if #data == 0 then
 							s3 = ""
 						else
-							local v439 = data[1]
+							local v469 = data[1]
 
-							if v439 == nil then
+							if v469 == nil then
 								s3 = ""
 							else
-								local names = v439.names
+								local names = v469.names
 
 								s3 = if names ~= nil then names.getInExperienceCombinedName(false) else ""
 							end
 						end
 
-						if string.len(s3) > 0 and s3 ~= v436.Text then
-							v436.Text = s3
+						if string.len(s3) > 0 and s3 ~= v466.Text then
+							v466.Text = s3
 
 							return
 						end
 
-						local DisplayName = p48.DisplayName
+						local DisplayName = p64.DisplayName
 
-						if DisplayName ~= v436.Text then
-							v436.Text = DisplayName
+						if DisplayName ~= v466.Text then
+							v466.Text = DisplayName
 						end
 					end)
 				end
 			end)
 		end
 
-		local function getNearestRightSideButtonXPosition() -- line: 1704
-			-- upvalues: p47 (copy)
+		local function getNearestRightSideButtonXPosition() -- line: 1708
+			-- upvalues: p63 (copy)
 			local AbsolutePositionX = nil
 
-			for _, v in pairs(p47.RightSideButtons:GetChildren()) do
-				if v:IsA("ImageButton") and (not AbsolutePositionX or AbsolutePositionX > v.AbsolutePosition.X) then
-					AbsolutePositionX = v.AbsolutePosition.X
+			for _, child in pairs(p63.RightSideButtons:GetChildren()) do
+				if child:IsA("ImageButton") and (not AbsolutePositionX or AbsolutePositionX > child.AbsolutePosition.X) then
+					AbsolutePositionX = child.AbsolutePosition.X
 				end
 			end
 
 			return AbsolutePositionX
 		end
 
-		local u290 = nil
+		local u318 = nil
 
-		local function rightSideButtonsChanged() -- line: 1719
-			-- upvalues: getNearestRightSideButtonXPosition (copy), u290 (ref), p47 (copy), v63 (copy), formatUsername (copy), p48 (copy), v68 (copy), UserProfileStore (copy)
-			local v388 = getNearestRightSideButtonXPosition()
+		local function rightSideButtonsChanged() -- line: 1723
+			-- upvalues: getNearestRightSideButtonXPosition (copy), u318 (ref), p63 (copy), v66 (copy), formatUsername (copy), p64 (copy), v71 (copy), UserProfileStore (copy)
+			local v418 = getNearestRightSideButtonXPosition()
 
-			if v388 == u290 then
+			if v418 == u318 then
 				return
 			end
 
-			u290 = v388
+			u318 = v418
 
-			local v389 = if not v388 then UDim2.new(1, -20, 0, 0) else UDim2.new(0, v388 - p47.NameLabel.AbsolutePosition.X - 20, 0, 0)
+			local v419 = if not v418 then UDim2.new(1, -20, 0, 0) else UDim2.new(0, v418 - p63.NameLabel.AbsolutePosition.X - 20, 0, 0)
 
-			p47.NameLabel.Size = v389
-			p47.DisplayNameLabel.Size = v389
-			p47.NameLabel.Text = if not v63 then "@" .. p48.Name else formatUsername(p48.Name)
+			p63.NameLabel.Size = v419
+			p63.DisplayNameLabel.Size = v419
+			p63.NameLabel.Text = if not v66 then "@" .. p64.Name else formatUsername(p64.Name)
 
-			if v68 and not p48.UserId then
-				p47.DisplayNameLabel.Text = p48.DisplayName
+			if v71 and not p64.UserId then
+				p63.DisplayNameLabel.Text = p64.DisplayName
 
 				return
 			end
 
-			UserProfileStore.get().fetchNamesByUserIds({ (tostring(p48.UserId)) }, function(p62) -- line: 1749
-				-- upvalues: p47 (copy), p48 (copy)
-				local v443 = p47
-				local v444 = if not v443 or not v443.Parent then nil else v443:FindFirstChild("DisplayNameLabel")
+			UserProfileStore.get().fetchNamesByUserIds({ (tostring(p64.UserId)) }, function(p78) -- line: 1753
+				-- upvalues: p63 (copy), p64 (copy)
+				local v473 = p63
+				local v474 = if not v473 or not v473.Parent then nil else v473:FindFirstChild("DisplayNameLabel")
 
-				if v444 == nil then
+				if v474 == nil then
 					return
 				end
 
-				local data = p62.data
+				local data = p78.data
 				local s4
 
 				if #data == 0 then
 					s4 = ""
 				else
-					local v447 = data[1]
+					local v477 = data[1]
 
-					if v447 == nil then
+					if v477 == nil then
 						s4 = ""
 					else
-						local names = v447.names
+						local names = v477.names
 
 						s4 = if names ~= nil then names.getInExperienceCombinedName(false) else ""
 					end
 				end
 
-				if string.len(s4) > 0 and s4 ~= v444.Text then
-					v444.Text = s4
+				if string.len(s4) > 0 and s4 ~= v474.Text then
+					v474.Text = s4
 
 					return
 				end
 
-				local DisplayName = p48.DisplayName
+				local DisplayName = p64.DisplayName
 
-				if DisplayName ~= v444.Text then
-					v444.Text = DisplayName
+				if DisplayName ~= v474.Text then
+					v474.Text = DisplayName
 				end
 			end)
 		end
 
 		if isEngineTruncationEnabledForIngameSettings() then
-			u286 = p47.RightSideButtons.ChildAdded:connect(function(p63) -- line: 1768
+			u314 = p63.RightSideButtons.ChildAdded:connect(function(p79) -- line: 1772
 				-- upvalues: rightSideButtonsChanged (copy)
 				rightSideButtonsChanged()
-				p63:GetPropertyChangedSignal("AbsolutePosition"):Connect(rightSideButtonsChanged)
+				p79:GetPropertyChangedSignal("AbsolutePosition"):Connect(rightSideButtonsChanged)
 			end)
 			rightSideButtonsChanged()
 		end
+	end
+	local function canShareCurrentGame() -- line: 1781
+		-- upvalues: LocalPlayer (ref)
+		return LocalPlayer.UserId > 0
 	end
 
 	local players = nil
 	local t6 = {}
 	local t7 = {}
-	local u125 = false
+	local u145 = false
 
-	local function updateAllMuteButtons() -- line: 1787
-		-- upvalues: u79 (ref), default (copy), Players (copy), t6 (copy), muteButtonUpdate (copy), u97 (ref), RobloxTranslator (copy)
-		if not u79 then
+	local function updateAllMuteButtons() -- line: 1791
+		-- upvalues: u87 (ref), default (copy), Players (copy), t6 (copy), muteButtonUpdate (copy), u107 (ref), RobloxTranslator (copy)
+		if not u87 then
 			return
 		end
 
@@ -1644,44 +1870,44 @@ return ((function() --[[ Initialize ]] -- line: 148
 		end
 
 		local players2 = Players:GetPlayers()
-		local v293 = true
+		local v321 = true
 
 		for _, v in ipairs(players2) do
-			local v296 = t6[v.Name]
+			local v324 = t6[v.Name]
 
-			if v and v296 then
-				local v297 = default.participants[tostring(v.UserId)]
+			if v and v324 then
+				local v325 = default.participants[tostring(v.UserId)]
 
-				if v297 and not v297.isMutedLocally then
-					v293 = false
+				if v325 and not v325.isMutedLocally then
+					v321 = false
 				end
 
-				muteButtonUpdate(v296, v297)
+				muteButtonUpdate(v324, v325)
 			end
 		end
 
-		if v293 then
-			u97 = true
+		if v321 then
+			u107 = true
 		else
-			u97 = false
+			u107 = false
 		end
 
-		local v298 = u97 and RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.UnmuteAll") or RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.MuteAll")
+		local v326 = u107 and RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.UnmuteAll") or RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.MuteAll")
 
-		if not u79 or not u79:FindFirstChild("TextLabel") then
+		if not u87 or not u87:FindFirstChild("TextLabel") then
 			return
 		end
 
-		u79.TextLabel.Text = v298
-		u79.Icon.Image = default:GetIcon(not u97 and "UnmuteAll" or "MuteAll", "Misc")
+		u87.TextLabel.Text = v326
+		u87.Icon.Image = default:GetIcon(not u107 and "UnmuteAll" or "MuteAll", "Misc")
 	end
-	local function destroyAllUserMuteButtons() -- line: 1830
-		-- upvalues: Players (copy), t6 (copy), GuiService (copy), UserInputService (copy), u78 (ref)
-		for _, v300 in (Players:GetPlayers()) do
-			local v301 = t6[v300.Name]
+	local function destroyAllUserMuteButtons() -- line: 1834
+		-- upvalues: Players (copy), t6 (copy), GuiService (copy), UserInputService (copy), u86 (ref)
+		for _, player in (Players:GetPlayers()) do
+			local v329 = t6[player.Name]
 
-			if v301 then
-				local RightSideButtons = v301:FindFirstChild("RightSideButtons")
+			if v329 then
+				local RightSideButtons = v329:FindFirstChild("RightSideButtons")
 
 				if RightSideButtons then
 					local MuteStatusButton = RightSideButtons:FindFirstChild("MuteStatusButton")
@@ -1689,7 +1915,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 					if MuteStatusButton then
 						if MuteStatusButton == GuiService.SelectedCoreObject then
 							if UserInputService.GamepadEnabled then
-								GuiService.SelectedCoreObject = u78
+								GuiService.SelectedCoreObject = u86
 							else
 								GuiService.SelectedCoreObject = nil
 							end
@@ -1701,37 +1927,37 @@ return ((function() --[[ Initialize ]] -- line: 148
 			end
 		end
 	end
-	local function v128(_) -- line: 1853
-		-- upvalues: FFlagIEMFocusNavToButtons (copy), v72 (copy), FFlagIEMTabFocusNav (copy), players (ref), Players (copy), v69 (copy), LocalPlayer (ref), Utility (copy), u111 (ref), u79 (ref), default (copy), u78 (ref), RunService (copy), u86 (ref), Create (copy), u87 (ref), uDim2 (copy), GetFFlagLuaInExperienceCoreScriptsGameInviteUnification (copy), GameInviteAnalyticsManager (ref), GameInviteAnalytics (copy), EventStream (copy), RbxAnalyticsService (copy), Diag (copy), u115 (ref), GetFFlagEnableConsoleJoinVoice (copy), shouldShowJoinVoiceButton (copy), u81 (ref), u110 (ref), u89 (ref), GuiService (copy), t6 (copy), t7 (copy), u120 (ref), muteButtonUpdate (copy), SocialUtil (copy), v63 (copy), formatUsername (copy), isEngineTruncationEnabledForIngameSettings (copy), managePlayerNameCutoff (copy), friendStatusCreate (copy), resizeFriendButton (copy), resizeBlockButton (ref), resizeInspectButton (copy), reportAbuseButtonCreate (copy), u116 (ref), u97 (ref), RobloxTranslator (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v83 (copy), Constants (copy), updateAllMuteButtons (copy), v64 (copy), v68 (copy), Cryo (copy), UserProfileStore (copy), resizePlatformName (copy), u125 (ref), GetFFlagCleanupMuteSelfButton (copy), pollImage (copy), UserInputService (copy), v65 (copy)
+	local function v148(_) -- line: 1857
+		-- upvalues: FFlagIEMFocusNavToButtons (copy), v76 (copy), FFlagIEMTabFocusNav (copy), players (ref), Players (copy), v72 (copy), LocalPlayer (ref), Utility (copy), u124 (ref), u87 (ref), default (copy), FFlagHidePeoplePageInviteFriends (copy), FFlagAddInviteFriendsIntegration (copy), FFlagEnableSideSheet (copy), u86 (ref), RunService (copy), u94 (ref), Create (copy), u95 (ref), uDim2 (copy), GetFFlagLuaInExperienceCoreScriptsGameInviteUnification (copy), GameInviteAnalyticsManager (ref), GameInviteAnalytics (copy), EventStream (copy), RbxAnalyticsService (copy), Diag (copy), u131 (ref), GetFFlagEnableConsoleJoinVoice (copy), shouldShowJoinVoiceButton (copy), u89 (ref), u123 (ref), u97 (ref), GuiService (copy), t6 (copy), t7 (copy), u139 (ref), muteButtonUpdate (copy), SocialUtil (copy), v66 (copy), formatUsername (copy), isEngineTruncationEnabledForIngameSettings (copy), managePlayerNameCutoff (copy), friendStatusCreate (copy), resizeFriendButton (copy), resizeBlockButton (ref), resizeInspectButton (copy), reportAbuseButtonCreate (copy), u132 (ref), u107 (ref), RobloxTranslator (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v91 (copy), Constants (copy), updateAllMuteButtons (copy), v67 (copy), v71 (copy), Cryo (copy), UserProfileStore (copy), resizePlatformName (copy), u145 (ref), GetFFlagCleanupMuteSelfButton (copy), pollImage (copy), UserInputService (copy), v68 (copy)
 		if FFlagIEMFocusNavToButtons then
-			v72.LastSelectableObjects = {}
+			v76.LastSelectableObjects = {}
 		end
 
-		if FFlagIEMTabFocusNav and not v72.ButtonsContainer.Visible then
-			v72.FirstSelectableObjects = {}
+		if FFlagIEMTabFocusNav and not v76.ButtonsContainer.Visible then
+			v76.FirstSelectableObjects = {}
 		end
 
 		players = Players:GetPlayers()
 
-		if v69 then
-			table.sort(players, function(p65, p66) -- line: 1863
+		if v72 then
+			table.sort(players, function(p81, p82) -- line: 1867
 				-- upvalues: LocalPlayer (ref)
-				local v393 = p65.Name:lower()
-				local v394 = p66.Name:lower()
+				local v423 = p81.Name:lower()
+				local v424 = p82.Name:lower()
 
-				if p65 == LocalPlayer then
-					v393 = " "
+				if p81 == LocalPlayer then
+					v423 = " "
 				end
 
-				if p66 == LocalPlayer then
-					v394 = " "
+				if p82 == LocalPlayer then
+					v424 = " "
 				end
 
-				return v393 < v394
+				return v423 < v424
 			end)
 		else
-			table.sort(players, function(p67, p68) -- line: 1876
-				return p67.Name:lower() < p68.Name:lower()
+			table.sort(players, function(p83, p84) -- line: 1880
+				return p83.Name:lower() < p84.Name:lower()
 			end)
 		end
 
@@ -1741,119 +1967,137 @@ return ((function() --[[ Initialize ]] -- line: 148
 			n4 = 85
 		end
 
-		local v306 = u111 and (not u79 and default.voiceUIVisible)
-		local v307 = LocalPlayer.UserId > 0 and (not u78 and not RunService:IsStudio())
+		local v334 = u124 and (not u87 and default.voiceUIVisible)
+		local v335 = FFlagHidePeoplePageInviteFriends and (FFlagAddInviteFriendsIntegration and FFlagEnableSideSheet)
+		local v336 = LocalPlayer.UserId > 0 and (not u86 and (not RunService:IsStudio() and not v335))
 
-		if (v307 or v306) and not u86 then
-			u86 = Create("Frame")({
+		if (v336 or v334) and not u94 then
+			u94 = Create("Frame")({
 				Name = "Holder",
 				BackgroundTransparency = 1,
+				LayoutOrder = 1,
 				Size = UDim2.fromScale(1, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Parent = v72.Page,
-				LayoutOrder = 1
+				Parent = v76.Page
 			})
-			u87 = Create("UIListLayout")({
+			u95 = Create("UIListLayout")({
 				FillDirection = Enum.FillDirection.Horizontal,
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 20),
-				Parent = u86
+				Parent = u94
 			})
 		end
 
-		local v308 = RunService:IsStudio()
+		local function layoutMuteAll() -- line: 1921
+			-- upvalues: u94 (ref), Create (copy), v76 (copy), u86 (ref), uDim2 (copy), u87 (ref)
+			if not u94 then
+				u94 = Create("Frame")({
+					Name = "Holder",
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 52),
+					Parent = v76.Page
+				})
+			end
 
-		if LocalPlayer.UserId > 0 and not u78 and not v308 then
-			local u309 = if not GetFFlagLuaInExperienceCoreScriptsGameInviteUnification() then GameInviteAnalytics.new():withEventStream(EventStream.new(RbxAnalyticsService)):withDiag(Diag.new(RbxAnalyticsService)):withButtonName(GameInviteAnalytics.ButtonName.SettingsHub) else GameInviteAnalyticsManager:withButtonName(GameInviteAnalyticsManager.ButtonName.SettingsHub)
+			u86.Parent = u94
+			u86.Size = uDim2
+			u87.Parent = u94
+		end
 
-			u78 = u115()
-			u78.Activated:connect(function() -- line: 1942
-				-- upvalues: u309 (ref), v72 (copy)
-				u309:inputShareGameEntryPoint()
-				v72.HubRef:InviteToGame()
+		local v338 = RunService:IsStudio()
+
+		if LocalPlayer.UserId > 0 and not u86 and not v338 and not v335 then
+			local u339 = if not GetFFlagLuaInExperienceCoreScriptsGameInviteUnification() then GameInviteAnalytics.new():withEventStream(EventStream.new(RbxAnalyticsService)):withDiag(Diag.new(RbxAnalyticsService)):withButtonName(GameInviteAnalytics.ButtonName.SettingsHub) else GameInviteAnalyticsManager:withButtonName(GameInviteAnalyticsManager.ButtonName.SettingsHub)
+
+			u86 = u131()
+			u86.Activated:connect(function() -- line: 1953
+				-- upvalues: u339 (ref), v76 (copy)
+				u339:inputShareGameEntryPoint()
+				v76.HubRef:InviteToGame()
 			end)
-			u78.LayoutOrder = 1
+			u86.LayoutOrder = 1
 
-			if v306 then
-				u78.Parent = u86
+			if v334 then
+				u86.Parent = u94
 			else
-				u78.Parent = v72.Page
+				u86.Parent = v76.Page
 			end
 		end
 
 		if GetFFlagEnableConsoleJoinVoice() and shouldShowJoinVoiceButton() then
-			if shouldShowJoinVoiceButton() and not u81 then
-				u81 = u110()
+			if shouldShowJoinVoiceButton() and not u89 then
+				u89 = u123()
 			end
 
-			u89()
+			u97()
 		end
 
 		if FFlagIEMTabFocusNav then
-			if v306 then
-				table.insert(v72.FirstSelectableObjects, u79)
+			if v334 then
+				table.insert(v76.FirstSelectableObjects, u87)
 			end
 
-			if v307 then
-				table.insert(v72.FirstSelectableObjects, u78)
+			if v336 then
+				table.insert(v76.FirstSelectableObjects, u86)
 			end
 
-			if v306 or v307 then
-				v72.FirstSelectableObjectsUpdated:fire()
+			if v334 or v336 then
+				v76.FirstSelectableObjectsUpdated:fire()
 			end
 		end
 
 		local InspectMenuEnabled = GuiService:GetInspectMenuEnabled()
 
 		for i = 1, #players do
-			local v312 = players[i]
-			local u313 = t6[v312.Name]
+			local v342 = players[i]
+			local u343 = t6[v342.Name]
 
-			if v312 then
-				t7[v312.Name] = true
+			if v342 then
+				t7[v342.Name] = true
 
-				if not u313 or not u313.Parent then
-					u313 = u120((i - 1) * 80 + n4)
-					u313.Parent = v72.Page
-					t6[v312.Name] = u313
+				if not u343 or not u343.Parent then
+					u343 = u139((i - 1) * 80 + n4)
+					u343.Parent = v76.Page
+					t6[v342.Name] = u343
 				end
 
-				u313.Name = "PlayerLabel" .. v312.Name
+				u343.Name = "PlayerLabel" .. v342.Name
 
-				if u111 then
-					local v314 = default.participants[tostring(v312.UserId)]
+				if u124 then
+					local v344 = default.participants[tostring(v342.UserId)]
 
-					muteButtonUpdate(u313, v314)
+					muteButtonUpdate(u343, v344)
 				end
 
-				local v315 = SocialUtil.GetPlayerImage(math.max(1, v312.UserId), Enum.ThumbnailSize.Size100x100, Enum.ThumbnailType.AvatarThumbnail)
+				local v345 = SocialUtil.GetPlayerImage(math.max(1, v342.UserId), Enum.ThumbnailSize.Size100x100, Enum.ThumbnailType.AvatarThumbnail)
 
-				u313.Icon.Image = v315
-				u313.NameLabel.Text = if not v63 then "@" .. v312.Name else formatUsername(v312.Name)
-				u313.ImageTransparency = 0.85
-				u313.LayoutOrder = i + 1
+				u343.Icon.Image = v345
+				u343.NameLabel.Text = if not v66 then "@" .. v342.Name else formatUsername(v342.Name)
+				u343.ImageTransparency = 0.85
+				u343.LayoutOrder = i + 1
 
 				if isEngineTruncationEnabledForIngameSettings() then
-					u313.NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
-					u313.DisplayNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+					u343.NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+					u343.DisplayNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
 				end
 
-				managePlayerNameCutoff(u313, v312)
-				friendStatusCreate(u313, v312)
+				managePlayerNameCutoff(u343, v342)
+				friendStatusCreate(u343, v342)
 
-				local u316 = nil
+				local u346 = nil
 
-				Utility:OnResized(u313, function(_, p70) -- line: 2024
-					-- upvalues: u313 (ref), Utility (copy), resizeFriendButton (copy), v312 (copy), u316 (ref), resizeBlockButton (ref), InspectMenuEnabled (copy), resizeInspectButton (copy)
-					local RightSideButtons = u313:FindFirstChild("RightSideButtons")
-					local DisplayNameLabel = u313:FindFirstChild("DisplayNameLabel")
-					local NameLabel = u313:FindFirstChild("NameLabel")
-					local v402 = RightSideButtons and RightSideButtons:FindFirstChild("RightSideListLayout")
+				Utility:OnResized(u343, function(_, p86) -- line: 2035
+					-- upvalues: u343 (ref), Utility (copy), resizeFriendButton (copy), v342 (copy), u346 (ref), resizeBlockButton (ref), InspectMenuEnabled (copy), resizeInspectButton (copy)
+					local RightSideButtons = u343:FindFirstChild("RightSideButtons")
+					local DisplayNameLabel = u343:FindFirstChild("DisplayNameLabel")
+					local NameLabel = u343:FindFirstChild("NameLabel")
+					local v432 = RightSideButtons and RightSideButtons:FindFirstChild("RightSideListLayout")
 
 					if Utility:IsSmallTouchScreen() and Utility:IsPortrait() then
-						u313.Size = UDim2.new(1, 0, 0, 105)
+						u343.Size = UDim2.new(1, 0, 0, 105)
 
 						if DisplayNameLabel then
 							if NameLabel then
@@ -1869,12 +2113,12 @@ return ((function() --[[ Initialize ]] -- line: 148
 							RightSideButtons.Size = UDim2.new(1, -12, 0.99, -8)
 						end
 
-						if v402 then
-							v402.HorizontalAlignment = Enum.HorizontalAlignment.Left
-							v402.VerticalAlignment = Enum.VerticalAlignment.Bottom
+						if v432 then
+							v432.HorizontalAlignment = Enum.HorizontalAlignment.Left
+							v432.VerticalAlignment = Enum.VerticalAlignment.Bottom
 						end
 					else
-						u313.Size = UDim2.new(1, 0, 0, 62)
+						u343.Size = UDim2.new(1, 0, 0, 62)
 
 						if DisplayNameLabel then
 							if NameLabel then
@@ -1890,140 +2134,125 @@ return ((function() --[[ Initialize ]] -- line: 148
 							RightSideButtons.Size = UDim2.new(1, -12, 1, 0)
 						end
 
-						if v402 then
-							v402.HorizontalAlignment = Enum.HorizontalAlignment.Right
-							v402.VerticalAlignment = Enum.VerticalAlignment.Center
+						if v432 then
+							v432.HorizontalAlignment = Enum.HorizontalAlignment.Right
+							v432.VerticalAlignment = Enum.VerticalAlignment.Center
 						end
 					end
 
 					if RightSideButtons then
-						resizeFriendButton(RightSideButtons, v312, p70, u316)
-						resizeBlockButton(RightSideButtons, v312, p70, u316)
+						resizeFriendButton(RightSideButtons, v342, p86, u346)
+						resizeBlockButton(RightSideButtons, v342, p86, u346)
 
 						if InspectMenuEnabled then
-							resizeInspectButton(RightSideButtons, v312, p70, u316)
+							resizeInspectButton(RightSideButtons, v342, p86, u346)
 						end
 
-						u316 = p70
+						u346 = p86
 					end
 				end)
-				reportAbuseButtonCreate(u313, v312)
+				reportAbuseButtonCreate(u343, v342)
 
 				if FFlagIEMFocusNavToButtons and i == #players then
-					local RightSideButtons = u313:FindFirstChild("RightSideButtons")
+					local RightSideButtons = u343:FindFirstChild("RightSideButtons")
 
 					if RightSideButtons then
-						for _, v319 in RightSideButtons:GetChildren() do
-							if v319:IsA("ImageButton") then
-								table.insert(v72.LastSelectableObjects, v319)
+						for _, child in RightSideButtons:GetChildren() do
+							if child:IsA("ImageButton") then
+								table.insert(v76.LastSelectableObjects, child)
 							end
 						end
 
-						v72.LastSelectableObjectsUpdated:fire()
+						v76.LastSelectableObjectsUpdated:fire()
 					end
 				end
 
-				if FFlagIEMTabFocusNav and i == 1 and #v72.FirstSelectableObjects == 0 then
-					local RightSideButtons = u313:FindFirstChild("RightSideButtons")
+				if FFlagIEMTabFocusNav and i == 1 and #v76.FirstSelectableObjects == 0 then
+					local RightSideButtons = u343:FindFirstChild("RightSideButtons")
 
 					if RightSideButtons then
-						for _, v322 in RightSideButtons:GetChildren() do
-							if v322:IsA("ImageButton") then
-								table.insert(v72.FirstSelectableObjects, v322)
+						for _, child in RightSideButtons:GetChildren() do
+							if child:IsA("ImageButton") then
+								table.insert(v76.FirstSelectableObjects, child)
 							end
 						end
 
-						v72.FirstSelectableObjectsUpdated:fire()
+						v76.FirstSelectableObjectsUpdated:fire()
 					end
 				end
 			end
 		end
 
-		if v306 then
-			u79 = u116()
-			u79.Activated:connect(function() -- line: 2123
-				-- upvalues: u97 (ref), RobloxTranslator (copy), u79 (ref), default (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v83 (copy), Constants (copy), updateAllMuteButtons (copy)
-				u97 = not u97
+		if v334 then
+			u87 = u132()
+			u87.Activated:connect(function() -- line: 2134
+				-- upvalues: u107 (ref), RobloxTranslator (copy), u87 (ref), default (copy), GetFFlagVoiceChatUILogging (copy), v31 (copy), v91 (copy), Constants (copy), updateAllMuteButtons (copy)
+				u107 = not u107
 
-				local v403 = u97 and RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.UnmuteAll") or RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.MuteAll")
+				local v433 = u107 and RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.UnmuteAll") or RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.MuteAll")
 
-				u79.TextLabel.Text = v403
-				u79.Icon.Image = default:GetIcon(not u97 and "UnmuteAll" or "MuteAll", "Misc")
+				u87.TextLabel.Text = v433
+				u87.Icon.Image = default:GetIcon(not u107 and "UnmuteAll" or "MuteAll", "Misc")
 
 				if GetFFlagVoiceChatUILogging() then
-					v31:debug("{} all players", not u97 and "Unmuting" or "Muting")
+					v31:debug("{} all players", not u107 and "Unmuting" or "Muting")
 				end
 
-				if v83 then
-					v83:onToggleMuteAll(u97)
+				if v91 then
+					v91:onToggleMuteAll(u107)
 				end
 
-				default:MuteAll(u97, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+				default:MuteAll(u107, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
 				updateAllMuteButtons()
 			end)
-			u79.LayoutOrder = 1
+			u87.LayoutOrder = 1
 
-			if v64 then
-				(function() --[[ layoutMuteAll ]] -- line: 1910
-					-- upvalues: u86 (ref), Create (copy), v72 (copy), u78 (ref), uDim2 (copy), u79 (ref)
-					if not u86 then
-						u86 = Create("Frame")({
-							Name = "Holder",
-							BackgroundTransparency = 1,
-							Size = UDim2.new(1, 0, 0, 52),
-							Parent = v72.Page,
-							LayoutOrder = 1
-						})
-					end
-
-					u78.Parent = u86
-					u78.Size = uDim2
-					u79.Parent = u86
-				end)()
+			if v67 then
+				layoutMuteAll()
 			else
-				u79.Parent = u86
+				u87.Parent = u94
 			end
 
-			u89()
+			u97()
 		end
 
-		local v323 = if not v68 then Cryo.List.filter(players, function(p71) -- line: 2161
-			return (tostring(p71.UserId))
-		end) else Cryo.List.filterMap(players, function(p72) -- line: 2153
-			if not p72.UserId then
+		local v353 = if not v71 then Cryo.List.filter(players, function(p87) -- line: 2172
+			return (tostring(p87.UserId))
+		end) else Cryo.List.filterMap(players, function(p88) -- line: 2164
+			if not p88.UserId then
 				return nil
 			end
 
-			return (tostring(p72.UserId))
+			return (tostring(p88.UserId))
 		end)
 
 		for _, v in ipairs(players) do
 			t6[v.Name].DisplayNameLabel.Text = v.DisplayName
 		end
 
-		UserProfileStore.get().fetchNamesByUserIds(v323, function(p73) -- line: 2170
+		UserProfileStore.get().fetchNamesByUserIds(v353, function(p89) -- line: 2181
 			-- upvalues: t6 (copy), resizePlatformName (copy)
-			for _, v408 in p73.data do
-				local v409 = t6[v408.names.getUsername(false)]
+			for _, v438 in p89.data do
+				local v439 = t6[v438.names.getUsername(false)]
 
-				if v409 then
-					local v410 = v408.names.getInExperienceCombinedName(false)
+				if v439 then
+					local v440 = v438.names.getInExperienceCombinedName(false)
 
-					if string.len(v410) > 0 and v410 ~= v409.DisplayNameLabel.Text then
-						v409.DisplayNameLabel.Text = v410
+					if string.len(v440) > 0 and v440 ~= v439.DisplayNameLabel.Text then
+						v439.DisplayNameLabel.Text = v440
 					end
 
-					local RightSideButtons = v409:FindFirstChild("RightSideButtons")
-					local v412 = nil
+					local RightSideButtons = v439:FindFirstChild("RightSideButtons")
+					local v442 = nil
 
-					if v408.names.getPlatformName(false) ~= "" then
-						v412 = v408.names.getPlatformName(false)
+					if v438.names.getPlatformName(false) ~= "" then
+						v442 = v438.names.getPlatformName(false)
 					end
 
 					if game:GetEngineFeature("PlatformFriendsService") and game:GetEngineFeature("PlatformFriendsProfile") then
-						resizePlatformName(RightSideButtons, v412, v408.getPlatformProfileId(false))
+						resizePlatformName(RightSideButtons, v442, v438.getPlatformProfileId(false))
 					else
-						resizePlatformName(RightSideButtons, v412)
+						resizePlatformName(RightSideButtons, v442)
 					end
 				end
 			end
@@ -2031,10 +2260,10 @@ return ((function() --[[ Initialize ]] -- line: 148
 
 		local n5 = 0
 
-		if u111 and not u125 then
+		if u124 and not u145 then
 			v31:debug("Setting Up Playerlist Mic Update Renderstep Hook")
-			RunService:BindToRenderStep("player-list-mute-update", Enum.RenderPriority.Last.Value, function() -- line: 2202
-				-- upvalues: n5 (ref), updateAllMuteButtons (copy), GetFFlagCleanupMuteSelfButton (copy), u86 (ref), pollImage (copy)
+			RunService:BindToRenderStep("player-list-mute-update", Enum.RenderPriority.Last.Value, function() -- line: 2213
+				-- upvalues: n5 (ref), updateAllMuteButtons (copy), GetFFlagCleanupMuteSelfButton (copy), u94 (ref), pollImage (copy)
 				n5 += 1
 
 				if n5 % 3 == 0 then
@@ -2043,11 +2272,11 @@ return ((function() --[[ Initialize ]] -- line: 148
 					local MuteSelfButtonImageLabel = nil
 
 					if GetFFlagCleanupMuteSelfButton() then
-						if u86 then
-							MuteSelfButtonImageLabel = u86:FindFirstChild("MuteSelfButtonImageLabel", true)
+						if u94 then
+							MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
 						end
 					else
-						MuteSelfButtonImageLabel = u86:FindFirstChild("MuteSelfButtonImageLabel", true)
+						MuteSelfButtonImageLabel = u94:FindFirstChild("MuteSelfButtonImageLabel", true)
 					end
 
 					if not MuteSelfButtonImageLabel then
@@ -2057,7 +2286,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 					MuteSelfButtonImageLabel.Image = pollImage()
 				end
 			end)
-			u125 = true
+			u145 = true
 		end
 
 		for k, v in pairs(t6) do
@@ -2069,189 +2298,189 @@ return ((function() --[[ Initialize ]] -- line: 148
 
 		if UserInputService.GamepadEnabled and (not FFlagIEMTabFocusNav or not GuiService.SelectedCoreObject) then
 			if GetFFlagCleanupMuteSelfButton() then
-				pcall(function() -- line: 2222
-					-- upvalues: v65 (copy), v72 (copy), GuiService (copy), u78 (ref)
-					if v65 then
-						if v72.Active then
-							GuiService.SelectedCoreObject = u78
+				pcall(function() -- line: 2233
+					-- upvalues: v68 (copy), v76 (copy), GuiService (copy), u86 (ref)
+					if v68 then
+						if v76.Active then
+							GuiService.SelectedCoreObject = u86
 
 							return
 						end
 					else
-						GuiService.SelectedCoreObject = u78
+						GuiService.SelectedCoreObject = u86
 					end
 				end)
 			else
-				GuiService.SelectedCoreObject = u78
+				GuiService.SelectedCoreObject = u86
 			end
 		end
 
-		Utility:OnResized("MenuPlayerListExtraPageSize", function(_, _) -- line: 2236
-			-- upvalues: Utility (copy), players (ref), v72 (copy)
+		Utility:OnResized("MenuPlayerListExtraPageSize", function(_, _) -- line: 2247
+			-- upvalues: Utility (copy), players (ref), v76 (copy)
 			local n6 = 20
 
 			if Utility:IsSmallTouchScreen() or Utility:IsPortrait() then
 				n6 = 85
 			end
 
-			local v417 = #players + 1
+			local v447 = #players + 1
 
 			if Utility:IsSmallTouchScreen() and Utility:IsPortrait() then
-				v72.Page.Size = UDim2.new(1, 0, 0, n6 + v417 * 123 - 5)
+				v76.Page.Size = UDim2.new(1, 0, 0, n6 + v447 * 123 - 5)
 
 				return
 			end
 
-			v72.Page.Size = UDim2.new(1, 0, 0, n6 + v417 * 80 - 5)
+			v76.Page.Size = UDim2.new(1, 0, 0, n6 + v447 * 80 - 5)
 		end)
 	end
 
-	if game:GetEngineFeature("VoiceChatSupported") and not u111 then
-		default:asyncInit():andThen(function() -- line: 2262
-			-- upvalues: u111 (ref), default (copy), v69 (copy), GetFFlagCleanupMuteSelfButton (copy), u80 (ref), u117 (ref), updateAllMuteButtons (copy), t2 (copy), u79 (ref), u89 (ref), connection (ref), GetFFlagEnableConsoleJoinVoice (copy), u81 (ref), v128 (copy), v64 (copy), v99 (copy), destroyAllUserMuteButtons (copy), resetButtonRow (copy)
-			u111 = true
+	if game:GetEngineFeature("VoiceChatSupported") and not u124 then
+		default:asyncInit():andThen(function() -- line: 2273
+			-- upvalues: u124 (ref), default (copy), v72 (copy), GetFFlagCleanupMuteSelfButton (copy), u88 (ref), u133 (ref), updateAllMuteButtons (copy), t2 (copy), u87 (ref), u97 (ref), u125 (ref), GetFFlagEnableConsoleJoinVoice (copy), u89 (ref), v148 (copy), v67 (copy), v109 (copy), destroyAllUserMuteButtons (copy), resetButtonRow (copy)
+			u124 = true
 			default:SetupParticipantListeners()
 
-			if not v69 then
+			if not v72 then
 				if GetFFlagCleanupMuteSelfButton() then
-					u80 = u117()
+					u88 = u133()
 				else
-					u117()
+					u133()
 				end
 			end
 
-			default.participantsUpdate.Event:Connect(function() -- line: 2267
+			default.participantsUpdate.Event:Connect(function() -- line: 2278
 				-- upvalues: updateAllMuteButtons (copy)
 				updateAllMuteButtons()
 			end)
-			default.participantLeft.Event:Connect(function(_, p77) -- line: 2270
+			default.participantLeft.Event:Connect(function(_, p93) -- line: 2281
 				-- upvalues: updateAllMuteButtons (copy), t2 (copy)
 				updateAllMuteButtons()
-				t2[p77] = nil
+				t2[p93] = nil
 			end)
-			default:getService().StateChanged:Connect(function(_, newState) -- line: 2275
-				-- upvalues: u79 (ref), u89 (ref), u80 (ref), connection (ref), GetFFlagEnableConsoleJoinVoice (copy), u81 (ref), u111 (ref), v128 (copy)
+			default:getService().StateChanged:Connect(function(_, newState) -- line: 2286
+				-- upvalues: u87 (ref), u97 (ref), u88 (ref), u125 (ref), GetFFlagEnableConsoleJoinVoice (copy), u89 (ref), u124 (ref), v148 (copy)
 				if newState == Enum.VoiceChatState.Ended then
-					if u79 then
-						u79.Visible = false
-						u79:Destroy()
-						u79 = nil
+					if u87 then
+						u87.Visible = false
+						u87:Destroy()
+						u87 = nil
 					end
 
-					u89()
+					u97()
 
-					if u80 then
-						u80.Visible = false
-						u80:Destroy()
-						u80 = nil
+					if u88 then
+						u88.Visible = false
+						u88:Destroy()
+						u88 = nil
 					end
 
-					if connection then
-						connection:Disconnect()
-						connection = nil
+					if u125 then
+						u125:Disconnect()
+						u125 = nil
 					end
 
-					u89()
+					u97()
 
 					if GetFFlagEnableConsoleJoinVoice() then
-						if u81 then
-							u81.Visible = false
-							u81:Destroy()
-							u81 = nil
+						if u89 then
+							u89.Visible = false
+							u89:Destroy()
+							u89 = nil
 						end
 
-						u89()
+						u97()
 					end
 
-					u111 = false
+					u124 = false
 
 					return
 				end
 
-				if newState == Enum.VoiceChatState.Joined and u111 == false then
-					u111 = true
+				if newState == Enum.VoiceChatState.Joined and u124 == false then
+					u124 = true
 
 					if GetFFlagEnableConsoleJoinVoice() then
-						if u81 then
-							u81.Visible = false
-							u81:Destroy()
-							u81 = nil
+						if u89 then
+							u89.Visible = false
+							u89:Destroy()
+							u89 = nil
 						end
 
-						u89()
+						u97()
 					end
 
-					v128()
+					v148()
 				end
 			end)
 
-			if v64 and not GetFFlagCleanupMuteSelfButton() then
-				v128()
+			if v67 and not GetFFlagCleanupMuteSelfButton() then
+				v148()
 			end
 
-			default.showVoiceUI.Event:Connect(function() -- line: 2299
-				-- upvalues: GetFFlagCleanupMuteSelfButton (copy), u80 (ref), v69 (copy), u117 (ref), v99 (copy), GetFFlagEnableConsoleJoinVoice (copy), u81 (ref), u89 (ref), v128 (copy)
+			default.showVoiceUI.Event:Connect(function() -- line: 2310
+				-- upvalues: GetFFlagCleanupMuteSelfButton (copy), u88 (ref), v72 (copy), u133 (ref), v109 (copy), GetFFlagEnableConsoleJoinVoice (copy), u89 (ref), u97 (ref), v148 (copy)
 				if GetFFlagCleanupMuteSelfButton() then
-					if not u80 and not v69 then
+					if not u88 and not v72 then
 						if GetFFlagCleanupMuteSelfButton() then
-							u80 = u117()
+							u88 = u133()
 						else
-							u117()
+							u133()
 						end
 					end
-				elseif not v99:FindFirstChild("MuteSelfButton", true) and not v69 then
+				elseif not v109:FindFirstChild("MuteSelfButton", true) and not v72 then
 					if GetFFlagCleanupMuteSelfButton() then
-						u80 = u117()
+						u88 = u133()
 					else
-						u117()
+						u133()
 					end
 				end
 
 				if GetFFlagEnableConsoleJoinVoice() then
-					if u81 then
-						u81.Visible = false
-						u81:Destroy()
-						u81 = nil
+					if u89 then
+						u89.Visible = false
+						u89:Destroy()
+						u89 = nil
 					end
 
-					u89()
+					u97()
 				end
 
-				v128()
+				v148()
 			end)
-			default.hideVoiceUI.Event:Connect(function() -- line: 2314
-				-- upvalues: u79 (ref), u89 (ref), u80 (ref), connection (ref), destroyAllUserMuteButtons (copy), v128 (copy), resetButtonRow (copy)
-				if u79 then
-					if u79 then
-						u79.Visible = false
-						u79:Destroy()
-						u79 = nil
+			default.hideVoiceUI.Event:Connect(function() -- line: 2325
+				-- upvalues: u87 (ref), u97 (ref), u88 (ref), u125 (ref), destroyAllUserMuteButtons (copy), v148 (copy), resetButtonRow (copy)
+				if u87 then
+					if u87 then
+						u87.Visible = false
+						u87:Destroy()
+						u87 = nil
 					end
 
-					u89()
+					u97()
 				end
 
-				if u80 then
-					u80.Visible = false
-					u80:Destroy()
-					u80 = nil
+				if u88 then
+					u88.Visible = false
+					u88:Destroy()
+					u88 = nil
 				end
 
-				if connection then
-					connection:Disconnect()
-					connection = nil
+				if u125 then
+					u125:Disconnect()
+					u125 = nil
 				end
 
-				u89()
+				u97()
 				destroyAllUserMuteButtons()
-				v128()
+				v148()
 				resetButtonRow()
 			end)
-			default.muteAllChanged.Event:Connect(function() -- line: 2323
+			default.muteAllChanged.Event:Connect(function() -- line: 2334
 				-- upvalues: updateAllMuteButtons (copy)
 				updateAllMuteButtons()
 			end)
-		end):catch(function(_) -- line: 2327
+		end):catch(function(_) -- line: 2338
 			-- upvalues: GetFFlagVoiceChatUILogging (copy), v31 (copy)
 			if GetFFlagVoiceChatUILogging() then
 				v31:warning("Failed to init VoiceChatServiceManager")
@@ -2259,26 +2488,26 @@ return ((function() --[[ Initialize ]] -- line: 148
 		end)
 	end
 
-	v72.Displayed.Event:connect(v128)
-	v72.Hidden.Event:connect(function() -- line: 2252
-		-- upvalues: u125 (ref), v31 (copy), RunService (copy)
-		if u125 then
+	v76.Displayed.Event:connect(v148)
+	v76.Hidden.Event:connect(function() -- line: 2263
+		-- upvalues: u145 (ref), v31 (copy), RunService (copy)
+		if u145 then
 			v31:debug("Unbinding Playerlist Mic Update Renderstep Hook")
-			u125 = false
+			u145 = false
 			RunService:UnbindFromRenderStep("player-list-mute-update")
 		end
 	end)
-	Players.PlayerRemoving:Connect(function(player) -- line: 2337
-		-- upvalues: t7 (copy), t6 (copy), GuiService (copy), UserInputService (copy), u78 (ref), GetFFlagDestroyPlayerCardOnLeave (copy)
+	Players.PlayerRemoving:Connect(function(player) -- line: 2348
+		-- upvalues: t7 (copy), t6 (copy), GuiService (copy), UserInputService (copy), u86 (ref), GetFFlagDestroyPlayerCardOnLeave (copy)
 		t7[player.Name] = nil
 
-		local v331 = t6[player.Name]
+		local v361 = t6[player.Name]
 
-		if not v331 then
+		if not v361 then
 			return
 		end
 
-		local RightSideButtons = v331:FindFirstChild("RightSideButtons")
+		local RightSideButtons = v361:FindFirstChild("RightSideButtons")
 
 		if not RightSideButtons then
 			return
@@ -2289,7 +2518,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 		if FriendStatus then
 			if FriendStatus == GuiService.SelectedCoreObject then
 				if UserInputService.GamepadEnabled then
-					GuiService.SelectedCoreObject = u78
+					GuiService.SelectedCoreObject = u86
 				else
 					GuiService.SelectedCoreObject = nil
 				end
@@ -2303,7 +2532,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 		if ReportPlayer then
 			if ReportPlayer == GuiService.SelectedCoreObject then
 				if UserInputService.GamepadEnabled then
-					GuiService.SelectedCoreObject = u78
+					GuiService.SelectedCoreObject = u86
 				else
 					GuiService.SelectedCoreObject = nil
 				end
@@ -2317,7 +2546,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 		if MuteStatusButton then
 			if MuteStatusButton == GuiService.SelectedCoreObject then
 				if UserInputService.GamepadEnabled then
-					GuiService.SelectedCoreObject = u78
+					GuiService.SelectedCoreObject = u86
 				else
 					GuiService.SelectedCoreObject = nil
 				end
@@ -2331,7 +2560,7 @@ return ((function() --[[ Initialize ]] -- line: 148
 		if BlockButton then
 			if BlockButton == GuiService.SelectedCoreObject then
 				if UserInputService.GamepadEnabled then
-					GuiService.SelectedCoreObject = u78
+					GuiService.SelectedCoreObject = u86
 				else
 					GuiService.SelectedCoreObject = nil
 				end
@@ -2352,11 +2581,11 @@ return ((function() --[[ Initialize ]] -- line: 148
 
 		if GetFFlagDestroyPlayerCardOnLeave() then
 			t6[player.Name] = nil
-			v331:Destroy()
+			v361:Destroy()
 		end
 	end)
 
-	local function removeInspectButtons() -- line: 2414
+	local function removeInspectButtons() -- line: 2425
 		-- upvalues: t6 (copy), GuiService (copy)
 		for _, v in pairs(t6) do
 			local RightSideButtons = v:FindFirstChild("RightSideButtons")
@@ -2375,46 +2604,48 @@ return ((function() --[[ Initialize ]] -- line: 148
 		end
 	end
 
-	GuiService.InspectMenuEnabledChangedSignal:Connect(function(p80) -- line: 2431
+	GuiService.InspectMenuEnabledChangedSignal:Connect(function(p96) -- line: 2442
 		-- upvalues: removeInspectButtons (copy)
-		if not p80 then
+		if not p96 then
 			removeInspectButtons()
 		end
 	end)
 
-	function v72.CreateMenuButtonsContainer(_) -- line: 2437
-		-- upvalues: FIntRelocateMobileMenuButtonsVariant (copy), v72 (copy), ReactRoblox (copy), v99 (copy), React (copy), MenuButtonsContainer (copy)
+	function v76.CreateMenuButtonsContainer(_) -- line: 2448
+		-- upvalues: FIntRelocateMobileMenuButtonsVariant (copy), v76 (copy), ReactRoblox (copy), v109 (copy), React (copy), MenuButtonsContainer (copy)
 		if FIntRelocateMobileMenuButtonsVariant == 2 then
-			if v72.buttonsContainerRoot then
+			if v76.buttonsContainerRoot then
 				return
 			end
 
-			v72.buttonsContainerRoot = ReactRoblox.createRoot(v99)
+			v76.buttonsContainerRoot = ReactRoblox.createRoot(v109)
 
-			local ExperienceControlStore = v72.HubRef:GetExperienceControlStore()
+			local ExperienceControlStore = v76.HubRef:GetExperienceControlStore()
 
-			v72.buttonsContainerRoot:render(React.createElement(MenuButtonsContainer, {
+			v76.buttonsContainerRoot:render(React.createElement(MenuButtonsContainer, {
 				onLeaveGame = ExperienceControlStore.onLeaveGame,
 				onRespawn = ExperienceControlStore.onRespawn,
 				onResume = ExperienceControlStore.onResume,
-				setAddMenuKeyBindings = function() --[[ setAddMenuKeyBindings ]] -- line: 2449
+				setAddMenuKeyBindings = function() -- line: 2460
 				end,
-				setRemoveMenuKeyBindings = function() --[[ setRemoveMenuKeyBindings ]] -- line: 2450
+				setRemoveMenuKeyBindings = function() -- line: 2461
 				end,
-				getVisibility = function() --[[ getVisibility ]] -- line: 2451
+				getVisibility = function() -- line: 2462
 					return true
 				end,
 				getCanRespawn = ExperienceControlStore.getCanRespawn
 			}))
 		end
 	end
-	function v72.UnmountMenuButtonsContainer(_) -- line: 2459
-		-- upvalues: FFlagMenuButtonsMountWithIEM (copy), FIntRelocateMobileMenuButtonsVariant (copy), v72 (copy)
-		if FFlagMenuButtonsMountWithIEM and (FIntRelocateMobileMenuButtonsVariant == 2 and v72.buttonsContainerRoot) then
-			v72.buttonsContainerRoot:unmount()
-			v72.buttonsContainerRoot = nil
+	function v76.UnmountMenuButtonsContainer(_) -- line: 2470
+		-- upvalues: FFlagMenuButtonsMountWithIEM (copy), FIntRelocateMobileMenuButtonsVariant (copy), v76 (copy)
+		if FFlagMenuButtonsMountWithIEM and (FIntRelocateMobileMenuButtonsVariant == 2 and v76.buttonsContainerRoot) then
+			v76.buttonsContainerRoot:unmount()
+			v76.buttonsContainerRoot = nil
 		end
 	end
 
-	return v72
-end)())
+	return v76
+end
+
+return (Initialize())

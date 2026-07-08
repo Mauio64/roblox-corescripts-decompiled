@@ -1,8 +1,9 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function(v1, v2, v3) --[[ Line: 5 ]]
-    return {
-        reportType = v1, 
-        targetPlayer = v2, 
-        onGoBack = v3
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2, p3) -- line: 5
+	return {
+		reportType = p1,
+		targetPlayer = p2,
+		onGoBack = p3
+	}
+end)

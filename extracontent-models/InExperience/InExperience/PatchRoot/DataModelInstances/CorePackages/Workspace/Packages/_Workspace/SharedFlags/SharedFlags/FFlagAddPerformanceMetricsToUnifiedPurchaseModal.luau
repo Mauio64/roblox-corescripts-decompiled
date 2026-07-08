@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddPerformanceMetricsToUnifiedPurchaseModal3", false);
+return game:DefineFastFlag("AddPerformanceMetricsToUnifiedPurchaseModal3", false)

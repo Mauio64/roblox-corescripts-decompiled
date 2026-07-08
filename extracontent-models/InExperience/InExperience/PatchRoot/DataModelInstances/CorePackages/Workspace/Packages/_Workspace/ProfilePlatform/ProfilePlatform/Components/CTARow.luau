@@ -1,1 +1,1 @@
-return require(script.CTAButtonsRowContainer);
+return require(script.CTAButtonsRowContainer)

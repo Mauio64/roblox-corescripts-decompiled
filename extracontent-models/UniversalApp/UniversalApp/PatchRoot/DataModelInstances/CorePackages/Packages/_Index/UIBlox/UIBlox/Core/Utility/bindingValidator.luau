@@ -1,27 +1,35 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: bindingValidator ]]
-    return function(v1) --[[ Line: 5 ]]
-        -- upvalues: v0 (copy)
-        local v2 = string.match(tostring(v1), "RoactBinding");
-        if typeof(v1) ~= "table" or not v2 then
-            warn(string.format("RoactBinding expected, got %s", (typeof(v1))));
-            return false;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 13 ]]
-                -- upvalues: v1 (copy)
-                return v1:getValue();
-            end);
-            if not l_status_0 then
-                warn("getValue() not defined");
-                return false;
-            else
-                local v5, v6 = v0(l_result_0);
-                if not v5 then
-                    warn(string.format("RoactBinding value: %s", v6));
-                    return false;
-                else
-                    return true;
-                end;
-            end;
-        end;
-    end;
-end;
+local function bindingValidator(p1) -- line: 4
+	return function(p2) -- line: 5
+		-- upvalues: p1 (copy)
+		local match = string.match(tostring(p2), "RoactBinding")
+
+		if typeof(p2) ~= "table" or not match then
+			warn(string.format("RoactBinding expected, got %s", (typeof(p2))))
+
+			return false
+		end
+
+		local ok, result = pcall(function() -- line: 13
+			-- upvalues: p2 (copy)
+			return p2:getValue()
+		end)
+
+		if not ok then
+			warn("getValue() not defined")
+
+			return false
+		end
+
+		local v7, v8 = p1(result)
+
+		if not v7 then
+			warn(string.format("RoactBinding value: %s", v8))
+
+			return false
+		end
+
+		return true
+	end
+end
+
+return bindingValidator

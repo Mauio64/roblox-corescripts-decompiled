@@ -1,525 +1,564 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local l_EventConnection_0 = require(l_Parent_0.ReactUtils).EventConnection;
-local v3 = require(l_Parent_0.Otter);
-local v4 = require(l_Parent_0.Roact);
-local v5 = require(l_Parent_0.UIBlox);
-local l_IconButton_0 = v5.App.Button.IconButton;
-local l_IconSize_0 = v5.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v5.App.ImageSet.Images;
-local l_getIconSize_0 = v5.App.ImageSet.getIconSize;
-local l_withStyle_0 = v5.Core.Style.withStyle;
-local v11 = require(l_Parent_0.t);
-local v12 = require(script.Parent.ThumbnailButton);
-local v13 = require(script.Parent.calcMediaGallerySizesFromHeight);
-local v14 = require(script.Parent.calcMediaGallerySizesFromWidth);
-local v15 = require(script.Parent.getShowItems);
-local v16 = l_getIconSize_0(l_IconSize_0.Medium);
-local v17 = {
-    frequency = 4, 
-    dampingRatio = 1
-};
-local v18 = v4.Component:extend("MediaGalleryPreview");
-v18.validateProps = v11.strictInterface({
-    layoutOrder = v11.optional(v11.integer), 
-    size = v11.optional(v11.UDim2), 
-    fullWidth = v11.optional(v11.boolean), 
-    anchorPoint = v11.optional(v11.Vector2), 
-    position = v11.optional(v11.UDim2), 
-    items = v11.array(v11.strictInterface({
-        imageId = v11.string, 
-        isYouTubeVideo = v11.optional(v11.boolean)
-    })), 
-    numberOfThumbnails = v11.optional(v11.integer), 
-    onPreviewActivated = v11.optional(v11.callback), 
-    onThumbnailActivated = v11.optional(v11.callback), 
-    onVideoPlayActivated = v11.optional(v11.callback)
-});
-v18.defaultProps = {
-    size = UDim2.fromScale(1, 1), 
-    numberOfThumbnails = 5, 
-    fullWidth = false
-};
-v18.getDerivedStateFromProps = function(v19, v20) --[[ Line: 77 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: v15 (copy)
-    if v20.items == v19.items and v20.numberOfThumbnails == v19.numberOfThumbnails then
-        return;
-    else
-        local v21, v22, v23 = v15(v19);
-        return {
-            items = v19.items, 
-            numberOfThumbnails = v19.numberOfThumbnails, 
-            itemsToShow = v21, 
-            youTubeVideoItemsSize = v22, 
-            imageItemsSize = v23, 
-            animationOn = v23 > 1, 
-            animatedIndex = v22 + 1, 
-            selectedIndex = v22 + 1
-        };
-    end;
-end;
-v18.init = function(v24) --[[ Line: 95 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    v24.state = {
-        items = nil, 
-        numberOfThumbnails = 1, 
-        itemsToShow = nil, 
-        youTubeVideoItemsSize = 0, 
-        imageItemsSize = 0, 
-        animationOn = false, 
-        animatedIndex = 1, 
-        selectedIndex = 1, 
-        showArrows = false, 
-        focusIndex = 1
-    };
-    v24.animationTime = 0;
-    v24.scrolling = false;
-    v24.scrollMotor = v3.createSingleMotor(0);
-    local v25, v26 = v4.createBinding(UDim2.fromScale(1, 1));
-    v24.contentSize = v25;
-    v24.updateContentSize = v26;
-    v25, v26 = v4.createBinding(UDim2.fromScale(1, 0.5));
-    v24.previewSize = v25;
-    v24.updatePreviewSize = v26;
-    v25, v26 = v4.createBinding(UDim2.fromScale(1, 0.5));
-    v24.paginationSize = v25;
-    v24.updatePaginationSize = v26;
-    v25, v26 = v4.createBinding(UDim2.fromScale(0, 0));
-    v24.thumbnailSize = v25;
-    v24.updateThumbnailSize = v26;
-    v25, v26 = v4.createBinding(Vector2.new(0, 0));
-    v24.canvasPosition = v25;
-    v24.updateCanvasPosition = v26;
-    v25, v26 = v4.createBinding(0);
-    v24.progress = v25;
-    v24.updateProgress = v26;
-    v25, v26 = v4.createBinding(0);
-    v24.previewTransparency = v25;
-    v24.updatePreviewTransparency = v26;
-    v24.onResize = function(v27) --[[ Line: 122 ]]
-        -- upvalues: v24 (copy)
-        v24:updateSizes(v27);
-        v24.updateCanvasPosition(Vector2.new(v24:getCanvasPositionX(), 0));
-    end;
-    v24.onMouseLeave = function(_, v29) --[[ Line: 127 ]]
-        -- upvalues: v24 (copy)
-        if v29.UserInputType ~= Enum.UserInputType.MouseMovement then
-            return;
-        else
-            v24.resetAnimation();
-            v24:setState(function(v30) --[[ Line: 133 ]]
-                -- upvalues: v24 (ref)
-                local l_selectedIndex_0 = v30.selectedIndex;
-                local v32 = v24.getNextFocusIndex(l_selectedIndex_0);
-                return {
-                    animationOn = v30.imageItemsSize > 1, 
-                    animatedIndex = l_selectedIndex_0, 
-                    focusIndex = v32
-                };
-            end);
-            return;
-        end;
-    end;
-    v24.onPreviewActivated = function() --[[ Line: 145 ]]
-        -- upvalues: v24 (copy)
-        v24.resetAnimation();
-        v24:setState({
-            animationOn = false
-        });
-        if v24.props.onPreviewActivated then
-            local l_originalIndex_0 = v24.state.itemsToShow[v24.state.selectedIndex].originalIndex;
-            v24.props.onPreviewActivated(l_originalIndex_0);
-        end;
-    end;
-    v24.onMouseEnterPagination = function(_, v35) --[[ Line: 160 ]]
-        -- upvalues: v24 (copy)
-        if v35.UserInputType ~= Enum.UserInputType.MouseMovement then
-            return;
-        else
-            v24:setState(function(v36) --[[ Line: 165 ]]
-                if v36.showArrows then
-                    return;
-                else
-                    return {
-                        showArrows = true
-                    };
-                end;
-            end);
-            return;
-        end;
-    end;
-    v24.onMouseLeavePagination = function(_, v38) --[[ Line: 176 ]]
-        -- upvalues: v24 (copy)
-        if v38.UserInputType ~= Enum.UserInputType.MouseMovement then
-            return;
-        else
-            v24:setState(function(v39) --[[ Line: 181 ]]
-                if not v39.showArrows then
-                    return;
-                else
-                    return {
-                        showArrows = false
-                    };
-                end;
-            end);
-            return;
-        end;
-    end;
-    v24.onCycleLeftActivated = function() --[[ Line: 192 ]]
-        -- upvalues: v24 (copy)
-        if v24.scrolling then
-            return;
-        else
-            local v40 = math.max(v24.state.focusIndex - 1, 1);
-            v24.resetAnimation();
-            v24:setState({
-                animationOn = false, 
-                focusIndex = v40
-            });
-            return;
-        end;
-    end;
-    v24.onCycleRightActivated = function() --[[ Line: 206 ]]
-        -- upvalues: v24 (copy)
-        if v24.scrolling then
-            return;
-        else
-            local v41 = #v24.props.items;
-            local v42 = math.min(v24.state.focusIndex + 1, v41);
-            v24.resetAnimation();
-            v24:setState({
-                animationOn = false, 
-                focusIndex = v42
-            });
-            return;
-        end;
-    end;
-    v24.onItemActivated = function(v43) --[[ Line: 221 ]]
-        -- upvalues: v24 (copy)
-        local l_isYouTubeVideo_0 = v24.state.itemsToShow[v43].isYouTubeVideo;
-        local l_selectedIndex_1 = v24.state.selectedIndex;
-        v24.resetAnimation();
-        v24:setState({
-            animationOn = false, 
-            selectedIndex = not l_isYouTubeVideo_0 and v43 or nil
-        });
-        if l_isYouTubeVideo_0 then
-            v24.onVideoPlayActivated(v43);
-        end;
-        if v24.props.onThumbnailActivated then
-            v24.props.onThumbnailActivated(l_selectedIndex_1, v43);
-        end;
-    end;
-    v24.onItemPlayActivated = function(v46) --[[ Line: 241 ]]
-        -- upvalues: v24 (copy)
-        v24.resetAnimation();
-        v24:setState({
-            animationOn = false
-        });
-        v24.onVideoPlayActivated(v46);
-    end;
-    v24.onVideoPlayActivated = function(v47) --[[ Line: 250 ]]
-        -- upvalues: v24 (copy)
-        if v24.props.onVideoPlayActivated then
-            local l_originalIndex_1 = v24.state.itemsToShow[v47].originalIndex;
-            v24.props.onVideoPlayActivated(l_originalIndex_1);
-        end;
-    end;
-    v24.getNextFocusIndex = function(v49) --[[ Line: 259 ]]
-        -- upvalues: v24 (copy)
-        local l_focusIndex_0 = v24.state.focusIndex;
-        local l_numberOfThumbnails_0 = v24.props.numberOfThumbnails;
-        if v49 < l_focusIndex_0 then
-            return v49;
-        elseif l_focusIndex_0 + l_numberOfThumbnails_0 <= v49 then
-            return v49 - l_numberOfThumbnails_0 + 1;
-        else
-            return l_focusIndex_0;
-        end;
-    end;
-    v24.resetAnimation = function() --[[ Line: 274 ]]
-        -- upvalues: v24 (copy)
-        v24.animationTime = 0;
-        v24.updateProgress(0);
-        v24.updatePreviewTransparency(0);
-    end;
-    v24.renderSteppedCallback = function(v52) --[[ Line: 280 ]]
-        -- upvalues: v24 (copy)
-        v24.animationTime = v24.animationTime + v52;
-        local v53 = v24.animationTime - 4.5;
-        if v24.animationTime > 5 then
-            v24.animationTime = 0;
-            v24.updateProgress(0);
-            local l_animatedIndex_0 = v24.state.animatedIndex;
-            local l_youTubeVideoItemsSize_0 = v24.state.youTubeVideoItemsSize;
-            local l_imageItemsSize_0 = v24.state.imageItemsSize;
-            local v57 = (l_animatedIndex_0 - l_youTubeVideoItemsSize_0) % l_imageItemsSize_0 + 1 + l_youTubeVideoItemsSize_0;
-            local v58 = v24.getNextFocusIndex(v57);
-            v24:setState({
-                animatedIndex = v57, 
-                selectedIndex = v57, 
-                focusIndex = v58
-            });
-            return;
-        else
-            v24.updateProgress(v24.animationTime / 5);
-            if v53 > 0 then
-                v24.updatePreviewTransparency(v53 / 0.5);
-            end;
-            return;
-        end;
-    end;
-    v24.scrollMotorOnStep = function(v59) --[[ Line: 310 ]]
-        -- upvalues: v24 (copy)
-        v24.updateCanvasPosition(Vector2.new(v59, 0));
-    end;
-    v24.scrollMotorOnComplete = function() --[[ Line: 314 ]]
-        -- upvalues: v24 (copy)
-        v24.scrolling = false;
-    end;
-    v24.scrollMotor:onStep(v24.scrollMotorOnStep);
-    v24.scrollMotor:onComplete(v24.scrollMotorOnComplete);
-end;
-v18.render = function(v60) --[[ Line: 322 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v4 (copy), l_IconButton_0 (copy), v16 (copy), l_Images_0 (copy), l_EventConnection_0 (copy), l_RunService_0 (copy)
-    local l_layoutOrder_0 = v60.props.layoutOrder;
-    local l_anchorPoint_0 = v60.props.anchorPoint;
-    local l_position_0 = v60.props.position;
-    local l_size_0 = v60.props.size;
-    local l_numberOfThumbnails_1 = v60.props.numberOfThumbnails;
-    local v66 = #v60.props.items;
-    local l_itemsToShow_0 = v60.state.itemsToShow;
-    local l_showArrows_0 = v60.state.showArrows;
-    local l_focusIndex_1 = v60.state.focusIndex;
-    local l_selectedIndex_2 = v60.state.selectedIndex;
-    local l_animationOn_0 = v60.state.animationOn;
-    local l_youTubeVideoItemsSize_1 = v60.state.youTubeVideoItemsSize;
-    local l_imageItemsSize_1 = v60.state.imageItemsSize;
-    local v74 = false;
-    if v66 > 1 then
-        v74 = not l_animationOn_0;
-    end;
-    local v75 = l_animationOn_0 and (l_selectedIndex_2 - l_youTubeVideoItemsSize_1) % l_imageItemsSize_1 + 1 + l_youTubeVideoItemsSize_1 or nil;
-    local v76 = l_numberOfThumbnails_1 < v66;
-    local v77 = l_focusIndex_1 <= 1;
-    local v78 = l_focusIndex_1 + l_numberOfThumbnails_1 > #l_itemsToShow_0;
-    return l_withStyle_0(function(v79) --[[ Line: 346 ]]
-        -- upvalues: v4 (ref), l_layoutOrder_0 (copy), l_size_0 (copy), l_anchorPoint_0 (copy), l_position_0 (copy), v60 (copy), v74 (copy), l_animationOn_0 (copy), v75 (copy), l_itemsToShow_0 (copy), l_selectedIndex_2 (copy), v76 (copy), l_showArrows_0 (copy), l_IconButton_0 (ref), v16 (ref), l_Images_0 (ref), v77 (copy), v78 (copy), l_EventConnection_0 (ref), l_RunService_0 (ref)
-        return v4.createElement("Frame", {
-            LayoutOrder = l_layoutOrder_0, 
-            Size = l_size_0, 
-            AnchorPoint = l_anchorPoint_0, 
-            Position = l_position_0, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            [v4.Change.AbsoluteSize] = v60.onResize, 
-            [v4.Event.InputEnded] = v74 and v60.onMouseLeave or nil
-        }, {
-            Content = v4.createElement("Frame", {
-                Size = v60.contentSize, 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1
-            }, {
-                ListLayout = v4.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, 24)
-                }), 
-                Preview = v4.createElement("Frame", {
-                    LayoutOrder = 1, 
-                    Size = v60.previewSize, 
-                    BackgroundTransparency = 1
-                }, {
-                    AnimationLabel = l_animationOn_0 and v4.createElement("ImageLabel", {
-                        Size = UDim2.fromScale(1, 1), 
-                        Image = v75 and l_itemsToShow_0[v75].imageId, 
-                        BackgroundTransparency = 1, 
-                        ZIndex = -1
-                    }, {
-                        Corner = v4.createElement("UICorner", {
-                            CornerRadius = UDim.new(0, 8)
-                        })
-                    }) or nil, 
-                    Button = v4.createElement("ImageButton", {
-                        Size = UDim2.fromScale(1, 1), 
-                        Image = l_itemsToShow_0[l_selectedIndex_2].imageId, 
-                        ImageTransparency = v60.previewTransparency, 
-                        BackgroundTransparency = 1, 
-                        AutoButtonColor = false, 
-                        ZIndex = 1, 
-                        [v4.Event.Activated] = v60.onPreviewActivated
-                    }, {
-                        Corner = v4.createElement("UICorner", {
-                            CornerRadius = UDim.new(0, 8)
-                        })
-                    })
-                }), 
-                Pagination = v4.createElement("Frame", {
-                    LayoutOrder = 2, 
-                    Size = v60.paginationSize, 
-                    BorderSizePixel = 0, 
-                    BackgroundTransparency = 1, 
-                    [v4.Event.InputBegan] = v76 and v60.onMouseEnterPagination or nil, 
-                    [v4.Event.InputEnded] = v76 and v60.onMouseLeavePagination or nil
-                }, {
-                    LeftArrow = l_showArrows_0 and v4.createElement(l_IconButton_0, {
-                        size = UDim2.new(0, v16, 1, 0), 
-                        anchorPoint = Vector2.new(0, 0.5), 
-                        position = UDim2.fromScale(0, 0.5), 
-                        icon = l_Images_0["icons/actions/cycleLeft"], 
-                        isDisabled = v77, 
-                        onActivated = v60.onCycleLeftActivated
-                    }) or nil, 
-                    Scroller = v60:renderScroller(v79), 
-                    RightArrow = l_showArrows_0 and v4.createElement(l_IconButton_0, {
-                        size = UDim2.new(0, v16, 1, 0), 
-                        anchorPoint = Vector2.new(1, 0.5), 
-                        position = UDim2.fromScale(1, 0.5), 
-                        icon = l_Images_0["icons/actions/cycleRight"], 
-                        isDisabled = v78, 
-                        onActivated = v60.onCycleRightActivated
-                    }) or nil
-                })
-            }), 
-            EventConnection = l_animationOn_0 and v4.createElement(l_EventConnection_0, {
-                event = l_RunService_0.RenderStepped, 
-                callback = v60.renderSteppedCallback
-            }) or nil
-        });
-    end);
-end;
-v18.renderScroller = function(v80, v81) --[[ Line: 432 ]] --[[ Name: renderScroller ]]
-    -- upvalues: v4 (copy), v16 (copy)
-    return v4.createElement("ScrollingFrame", {
-        Size = UDim2.new(1, -v16 * 2, 1, 0), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        BackgroundTransparency = 1, 
-        ScrollBarThickness = 0, 
-        ClipsDescendants = true, 
-        ScrollingDirection = Enum.ScrollingDirection.X, 
-        AutomaticCanvasSize = Enum.AutomaticSize.XY, 
-        CanvasPosition = v80.canvasPosition, 
-        Selectable = false
-    }, v80:renderThumbnails(v81));
-end;
-v18.renderThumbnails = function(v82, v83) --[[ Line: 447 ]] --[[ Name: renderThumbnails ]]
-    -- upvalues: v4 (copy), v12 (copy)
-    local l_selectedIndex_3 = v82.state.selectedIndex;
-    local l_animationOn_1 = v82.state.animationOn;
-    local l_animatedIndex_1 = v82.state.animatedIndex;
-    local v87 = {
-        ListLayout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 12)
-        })
-    };
-    for v88, v89 in ipairs(v82.state.itemsToShow) do
-        local v90 = v88 == l_selectedIndex_3;
-        local v91 = l_animationOn_1 and v88 == l_animatedIndex_1;
-        local v92 = v89.imageId and v89.imageId ~= "";
-        v87["item" .. v88] = v4.createElement("Frame", {
-            LayoutOrder = v88, 
-            Size = v82.thumbnailSize, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1
-        }, {
-            Thumbnail = v4.createElement(v12, {
-                itemKey = v88, 
-                imageId = v89.imageId, 
-                isVideo = v89.isYouTubeVideo, 
-                isSelected = v90, 
-                onActivated = v92 and v82.onItemActivated or nil, 
-                onPlayActivated = v89.isYouTubeVideo and v82.onItemPlayActivated or nil, 
-                useScaledPlayButton = true
-            }), 
-            TimerBar = v91 and v82:renderTimerBar(v83) or nil
-        });
-    end;
-    return v87;
-end;
-v18.renderTimerBar = function(v93, v94) --[[ Line: 488 ]] --[[ Name: renderTimerBar ]]
-    -- upvalues: v4 (copy)
-    local l_UIDefault_0 = v94.Theme.UIDefault;
-    local l_SecondaryContent_0 = v94.Theme.SecondaryContent;
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 2), 
-        AnchorPoint = Vector2.new(0, 1), 
-        Position = UDim2.fromScale(0, 1), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true, 
-        ZIndex = 100
-    }, {
-        Background = v4.createElement("Frame", {
-            Size = v93.thumbnailSize, 
-            AnchorPoint = Vector2.new(0, 1), 
-            Position = UDim2.fromScale(0, 1), 
-            BorderSizePixel = 0, 
-            BackgroundColor3 = l_UIDefault_0.Color, 
-            BackgroundTransparency = l_UIDefault_0.Transparency
-        }, {
-            Corner = v4.createElement("UICorner", {
-                CornerRadius = UDim.new(0, 8)
-            }), 
-            Progress = v4.createElement("Frame", {
-                Size = v93.progress:map(function(v97) --[[ Line: 513 ]]
-                    return UDim2.fromScale(v97, 1);
-                end), 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1, 
-                ClipsDescendants = true
-            }, {
-                Foreground = v4.createElement("Frame", {
-                    Size = v93.thumbnailSize, 
-                    BorderSizePixel = 0, 
-                    BackgroundColor3 = l_SecondaryContent_0.Color, 
-                    BackgroundTransparency = l_SecondaryContent_0.Transparency
-                }, {
-                    Corner = v4.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 8)
-                    })
-                })
-            })
-        })
-    });
-end;
-v18.didUpdate = function(v98, _, v100) --[[ Line: 535 ]] --[[ Name: didUpdate ]]
-    if v98.state.focusIndex ~= v100.focusIndex then
-        v98:scrollToNewIndex();
-    end;
-    if v98.state.selectedIndex ~= v100.selectedIndex then
-        v98.updatePreviewTransparency(0);
-    end;
-end;
-v18.updateSizes = function(v101, v102) --[[ Line: 545 ]] --[[ Name: updateSizes ]]
-    -- upvalues: v14 (copy), v13 (copy)
-    local l_X_0 = v102.AbsoluteSize.X;
-    local l_Y_0 = v102.AbsoluteSize.Y;
-    local l_numberOfThumbnails_2 = v101.props.numberOfThumbnails;
-    local v106 = v14(l_X_0, l_numberOfThumbnails_2, v101.props.fullWidth);
-    if l_Y_0 < v106.contentSize.Y.Offset then
-        v106 = v13(l_Y_0, l_numberOfThumbnails_2, v101.props.fullWidth);
-    end;
-    v101.updateContentSize(v106.contentSize);
-    v101.updatePreviewSize(v106.previewSize);
-    v101.updatePaginationSize(v106.paginationSize);
-    v101.updateThumbnailSize(v106.thumbnailSize);
-end;
-v18.getCanvasPositionX = function(v107) --[[ Line: 561 ]] --[[ Name: getCanvasPositionX ]]
-    local l_focusIndex_2 = v107.state.focusIndex;
-    local l_Offset_0 = v107.thumbnailSize:getValue().X.Offset;
-    return (l_focusIndex_2 - 1) * (l_Offset_0 + 12);
-end;
-v18.scrollToNewIndex = function(v110) --[[ Line: 567 ]] --[[ Name: scrollToNewIndex ]]
-    -- upvalues: v3 (copy), v17 (copy)
-    local l_X_1 = v110.canvasPosition:getValue().X;
-    local v112 = v110:getCanvasPositionX();
-    v110.scrollMotor:setGoal(v3.instant(l_X_1));
-    v110.scrollMotor:setGoal(v3.spring(v112, v17));
-    v110.scrolling = true;
-end;
-return v18;
+local RunService = game:GetService("RunService")
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local EventConnection = require(Parent.ReactUtils).EventConnection
+local Otter = require(Parent.Otter)
+local Roact = require(Parent.Roact)
+local UIBlox = require(Parent.UIBlox)
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local getIconSize = UIBlox.App.ImageSet.getIconSize
+local withStyle = UIBlox.Core.Style.withStyle
+local t = require(Parent.t)
+local ThumbnailButton = require(script.Parent.ThumbnailButton)
+local calcMediaGallerySizesFromHeight = require(script.Parent.calcMediaGallerySizesFromHeight)
+local calcMediaGallerySizesFromWidth = require(script.Parent.calcMediaGallerySizesFromWidth)
+local getShowItems = require(script.Parent.getShowItems)
+local v17 = getIconSize(IconSize.Medium)
+local t1 = {
+	frequency = 4,
+	dampingRatio = 1
+}
+local v19 = Roact.Component:extend("MediaGalleryPreview")
+
+v19.validateProps = t.strictInterface({
+	layoutOrder = t.optional(t.integer),
+	size = t.optional(t.UDim2),
+	fullWidth = t.optional(t.boolean),
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	items = t.array(t.strictInterface({
+		imageId = t.string,
+		isYouTubeVideo = t.optional(t.boolean)
+	})),
+	numberOfThumbnails = t.optional(t.integer),
+	onPreviewActivated = t.optional(t.callback),
+	onThumbnailActivated = t.optional(t.callback),
+	onVideoPlayActivated = t.optional(t.callback)
+})
+v19.defaultProps = {
+	numberOfThumbnails = 5,
+	fullWidth = false,
+	size = UDim2.fromScale(1, 1)
+}
+
+function v19.getDerivedStateFromProps(p1, p2) -- line: 77
+	-- upvalues: getShowItems (copy)
+	if p2.items == p1.items and p2.numberOfThumbnails == p1.numberOfThumbnails then
+		return
+	end
+
+	local v22, v23, v24 = getShowItems(p1)
+
+	return {
+		items = p1.items,
+		numberOfThumbnails = p1.numberOfThumbnails,
+		itemsToShow = v22,
+		youTubeVideoItemsSize = v23,
+		imageItemsSize = v24,
+		animationOn = v24 > 1,
+		animatedIndex = v23 + 1,
+		selectedIndex = v23 + 1
+	}
+end
+function v19.init(p3) -- line: 95
+	-- upvalues: Otter (copy), Roact (copy)
+	p3.state = {
+		items = nil,
+		numberOfThumbnails = 1,
+		itemsToShow = nil,
+		youTubeVideoItemsSize = 0,
+		imageItemsSize = 0,
+		animationOn = false,
+		animatedIndex = 1,
+		selectedIndex = 1,
+		showArrows = false,
+		focusIndex = 1
+	}
+	p3.animationTime = 0
+	p3.scrolling = false
+	p3.scrollMotor = Otter.createSingleMotor(0)
+
+	local v26, v27 = Roact.createBinding(UDim2.fromScale(1, 1))
+
+	p3.contentSize = v26
+	p3.updateContentSize = v27
+
+	local v28, v29 = Roact.createBinding(UDim2.fromScale(1, 0.5))
+
+	p3.previewSize = v28
+	p3.updatePreviewSize = v29
+
+	local v30, v31 = Roact.createBinding(UDim2.fromScale(1, 0.5))
+
+	p3.paginationSize = v30
+	p3.updatePaginationSize = v31
+
+	local v32, v33 = Roact.createBinding(UDim2.fromScale(0, 0))
+
+	p3.thumbnailSize = v32
+	p3.updateThumbnailSize = v33
+
+	local v34, v35 = Roact.createBinding(Vector2.new(0, 0))
+
+	p3.canvasPosition = v34
+	p3.updateCanvasPosition = v35
+
+	local v36, v37 = Roact.createBinding(0)
+
+	p3.progress = v36
+	p3.updateProgress = v37
+
+	local v38, v39 = Roact.createBinding(0)
+
+	p3.previewTransparency = v38
+	p3.updatePreviewTransparency = v39
+
+	function p3.onResize(p4) -- line: 122
+		-- upvalues: p3 (copy)
+		p3:updateSizes(p4)
+		p3.updateCanvasPosition(Vector2.new(p3:getCanvasPositionX(), 0))
+	end
+	function p3.onMouseLeave(_, p6) -- line: 127
+		-- upvalues: p3 (copy)
+		if p6.UserInputType ~= Enum.UserInputType.MouseMovement then
+			return
+		end
+
+		p3.resetAnimation()
+		p3:setState(function(p7) -- line: 133
+			-- upvalues: p3 (copy)
+			local selectedIndex = p7.selectedIndex
+			local v123 = p3.getNextFocusIndex(selectedIndex)
+
+			return {
+				animationOn = p7.imageItemsSize > 1,
+				animatedIndex = selectedIndex,
+				focusIndex = v123
+			}
+		end)
+	end
+	function p3.onPreviewActivated() -- line: 145
+		-- upvalues: p3 (copy)
+		p3.resetAnimation()
+		p3:setState({
+			animationOn = false
+		})
+
+		if p3.props.onPreviewActivated then
+			local originalIndex = p3.state.itemsToShow[p3.state.selectedIndex].originalIndex
+
+			p3.props.onPreviewActivated(originalIndex)
+		end
+	end
+	function p3.onMouseEnterPagination(_, p9) -- line: 160
+		-- upvalues: p3 (copy)
+		if p9.UserInputType ~= Enum.UserInputType.MouseMovement then
+			return
+		end
+
+		p3:setState(function(p10) -- line: 165
+			if p10.showArrows then
+				return
+			end
+
+			return {
+				showArrows = true
+			}
+		end)
+	end
+	function p3.onMouseLeavePagination(_, p12) -- line: 176
+		-- upvalues: p3 (copy)
+		if p12.UserInputType ~= Enum.UserInputType.MouseMovement then
+			return
+		end
+
+		p3:setState(function(p13) -- line: 181
+			if not p13.showArrows then
+				return
+			end
+
+			return {
+				showArrows = false
+			}
+		end)
+	end
+	function p3.onCycleLeftActivated() -- line: 192
+		-- upvalues: p3 (copy)
+		if p3.scrolling then
+			return
+		end
+
+		local v99 = math.max(p3.state.focusIndex - 1, 1)
+
+		p3.resetAnimation()
+		p3:setState({
+			animationOn = false,
+			focusIndex = v99
+		})
+	end
+	function p3.onCycleRightActivated() -- line: 206
+		-- upvalues: p3 (copy)
+		if p3.scrolling then
+			return
+		end
+
+		local v100 = #p3.props.items
+		local v101 = math.min(p3.state.focusIndex + 1, v100)
+
+		p3.resetAnimation()
+		p3:setState({
+			animationOn = false,
+			focusIndex = v101
+		})
+	end
+	function p3.onItemActivated(p14) -- line: 221
+		-- upvalues: p3 (copy)
+		local isYouTubeVideo = p3.state.itemsToShow[p14].isYouTubeVideo
+		local selectedIndex = p3.state.selectedIndex
+
+		p3.resetAnimation()
+		p3:setState({
+			animationOn = false,
+			selectedIndex = not isYouTubeVideo and p14 or nil
+		})
+
+		if isYouTubeVideo then
+			p3.onVideoPlayActivated(p14)
+		end
+
+		if p3.props.onThumbnailActivated then
+			p3.props.onThumbnailActivated(selectedIndex, p14)
+		end
+	end
+	function p3.onItemPlayActivated(p15) -- line: 241
+		-- upvalues: p3 (copy)
+		p3.resetAnimation()
+		p3:setState({
+			animationOn = false
+		})
+		p3.onVideoPlayActivated(p15)
+	end
+	function p3.onVideoPlayActivated(p16) -- line: 250
+		-- upvalues: p3 (copy)
+		if p3.props.onVideoPlayActivated then
+			local originalIndex = p3.state.itemsToShow[p16].originalIndex
+
+			p3.props.onVideoPlayActivated(originalIndex)
+		end
+	end
+	function p3.getNextFocusIndex(p17) -- line: 259
+		-- upvalues: p3 (copy)
+		local focusIndex = p3.state.focusIndex
+		local numberOfThumbnails = p3.props.numberOfThumbnails
+
+		if p17 < focusIndex then
+			return p17
+		end
+
+		if p17 >= focusIndex + numberOfThumbnails then
+			return p17 - numberOfThumbnails + 1
+		end
+
+		return focusIndex
+	end
+	function p3.resetAnimation() -- line: 274
+		-- upvalues: p3 (copy)
+		p3.animationTime = 0
+		p3.updateProgress(0)
+		p3.updatePreviewTransparency(0)
+	end
+	function p3.renderSteppedCallback(p18) -- line: 280
+		-- upvalues: p3 (copy)
+		p3.animationTime = p3.animationTime + p18
+
+		local v112 = p3.animationTime - 4.5
+
+		if p3.animationTime > 5 then
+			p3.animationTime = 0
+			p3.updateProgress(0)
+
+			local animatedIndex = p3.state.animatedIndex
+			local youTubeVideoItemsSize = p3.state.youTubeVideoItemsSize
+			local imageItemsSize = p3.state.imageItemsSize
+			local v116 = (animatedIndex - youTubeVideoItemsSize) % imageItemsSize + 1 + youTubeVideoItemsSize
+			local v117 = p3.getNextFocusIndex(v116)
+
+			p3:setState({
+				animatedIndex = v116,
+				selectedIndex = v116,
+				focusIndex = v117
+			})
+
+			return
+		end
+
+		p3.updateProgress(p3.animationTime / 5)
+
+		if v112 > 0 then
+			p3.updatePreviewTransparency(v112 / 0.5)
+		end
+	end
+	function p3.scrollMotorOnStep(p19) -- line: 310
+		-- upvalues: p3 (copy)
+		p3.updateCanvasPosition(Vector2.new(p19, 0))
+	end
+	function p3.scrollMotorOnComplete() -- line: 314
+		-- upvalues: p3 (copy)
+		p3.scrolling = false
+	end
+
+	p3.scrollMotor:onStep(p3.scrollMotorOnStep)
+	p3.scrollMotor:onComplete(p3.scrollMotorOnComplete)
+end
+function v19.render(p20) -- line: 322
+	-- upvalues: withStyle (copy), Roact (copy), IconButton (copy), v17 (copy), Images (copy), EventConnection (copy), RunService (copy)
+	local layoutOrder = p20.props.layoutOrder
+	local anchorPoint = p20.props.anchorPoint
+	local position = p20.props.position
+	local size = p20.props.size
+	local numberOfThumbnails = p20.props.numberOfThumbnails
+	local v46 = #p20.props.items
+	local itemsToShow = p20.state.itemsToShow
+	local showArrows = p20.state.showArrows
+	local focusIndex = p20.state.focusIndex
+	local selectedIndex = p20.state.selectedIndex
+	local animationOn = p20.state.animationOn
+	local youTubeVideoItemsSize = p20.state.youTubeVideoItemsSize
+	local imageItemsSize = p20.state.imageItemsSize
+	local v54 = v46 > 1 and not animationOn
+	local v55 = animationOn and (selectedIndex - youTubeVideoItemsSize) % imageItemsSize + 1 + youTubeVideoItemsSize or nil
+	local v56 = numberOfThumbnails < v46
+	local v57 = focusIndex <= 1
+	local v58 = focusIndex + numberOfThumbnails > #itemsToShow
+
+	return withStyle(function(p21) -- line: 346
+		-- upvalues: Roact (copy), layoutOrder (copy), size (copy), anchorPoint (copy), position (copy), p20 (copy), v54 (copy), animationOn (copy), v55 (copy), itemsToShow (copy), selectedIndex (copy), v56 (copy), showArrows (copy), IconButton (copy), v17 (copy), Images (copy), v57 (copy), v58 (copy), EventConnection (copy), RunService (copy)
+		return Roact.createElement("Frame", {
+			LayoutOrder = layoutOrder,
+			Size = size,
+			AnchorPoint = anchorPoint,
+			Position = position,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			[Roact.Change.AbsoluteSize] = p20.onResize,
+			[Roact.Event.InputEnded] = v54 and p20.onMouseLeave or nil
+		}, {
+			Content = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Size = p20.contentSize
+			}, {
+				ListLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 24)
+				}),
+				Preview = Roact.createElement("Frame", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Size = p20.previewSize
+				}, {
+					AnimationLabel = animationOn and Roact.createElement("ImageLabel", {
+						BackgroundTransparency = 1,
+						ZIndex = -1,
+						Size = UDim2.fromScale(1, 1),
+						Image = v55 and itemsToShow[v55].imageId
+					}, {
+						Corner = Roact.createElement("UICorner", {
+							CornerRadius = UDim.new(0, 8)
+						})
+					}) or nil,
+					Button = Roact.createElement("ImageButton", {
+						Size = UDim2.fromScale(1, 1),
+						Image = itemsToShow[selectedIndex].imageId,
+						ImageTransparency = p20.previewTransparency,
+						BackgroundTransparency = 1,
+						AutoButtonColor = false,
+						ZIndex = 1,
+						[Roact.Event.Activated] = p20.onPreviewActivated
+					}, {
+						Corner = Roact.createElement("UICorner", {
+							CornerRadius = UDim.new(0, 8)
+						})
+					})
+				}),
+				Pagination = Roact.createElement("Frame", {
+					LayoutOrder = 2,
+					Size = p20.paginationSize,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					[Roact.Event.InputBegan] = v56 and p20.onMouseEnterPagination or nil,
+					[Roact.Event.InputEnded] = v56 and p20.onMouseLeavePagination or nil
+				}, {
+					LeftArrow = showArrows and Roact.createElement(IconButton, {
+						size = UDim2.new(0, v17, 1, 0),
+						anchorPoint = Vector2.new(0, 0.5),
+						position = UDim2.fromScale(0, 0.5),
+						icon = Images["icons/actions/cycleLeft"],
+						isDisabled = v57,
+						onActivated = p20.onCycleLeftActivated
+					}) or nil,
+					Scroller = p20:renderScroller(p21),
+					RightArrow = showArrows and Roact.createElement(IconButton, {
+						size = UDim2.new(0, v17, 1, 0),
+						anchorPoint = Vector2.new(1, 0.5),
+						position = UDim2.fromScale(1, 0.5),
+						icon = Images["icons/actions/cycleRight"],
+						isDisabled = v58,
+						onActivated = p20.onCycleRightActivated
+					}) or nil
+				})
+			}),
+			EventConnection = animationOn and Roact.createElement(EventConnection, {
+				event = RunService.RenderStepped,
+				callback = p20.renderSteppedCallback
+			}) or nil
+		})
+	end)
+end
+function v19.renderScroller(p22, p23) -- line: 432
+	-- upvalues: Roact (copy), v17 (copy)
+	return Roact.createElement("ScrollingFrame", {
+		BackgroundTransparency = 1,
+		ScrollBarThickness = 0,
+		ClipsDescendants = true,
+		Selectable = false,
+		Size = UDim2.new(1, -v17 * 2, 1, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.5),
+		ScrollingDirection = Enum.ScrollingDirection.X,
+		AutomaticCanvasSize = Enum.AutomaticSize.XY,
+		CanvasPosition = p22.canvasPosition
+	}, p22:renderThumbnails(p23))
+end
+function v19.renderThumbnails(p24, p25) -- line: 447
+	-- upvalues: Roact (copy), ThumbnailButton (copy)
+	local selectedIndex = p24.state.selectedIndex
+	local animationOn = p24.state.animationOn
+	local animatedIndex = p24.state.animatedIndex
+	local t2 = {
+		ListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 12)
+		})
+	}
+
+	for i, v in ipairs(p24.state.itemsToShow) do
+		local v69 = i == selectedIndex
+		local v70 = animationOn and i == animatedIndex
+		local v71 = v.imageId and v.imageId ~= ""
+
+		t2["item" .. i] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = i,
+			Size = p24.thumbnailSize
+		}, {
+			Thumbnail = Roact.createElement(ThumbnailButton, {
+				useScaledPlayButton = true,
+				itemKey = i,
+				imageId = v.imageId,
+				isVideo = v.isYouTubeVideo,
+				isSelected = v69,
+				onActivated = v71 and p24.onItemActivated or nil,
+				onPlayActivated = v.isYouTubeVideo and p24.onItemPlayActivated or nil
+			}),
+			TimerBar = v70 and p24:renderTimerBar(p25) or nil
+		})
+	end
+
+	return t2
+end
+function v19.renderTimerBar(p26, p27) -- line: 488
+	-- upvalues: Roact (copy)
+	local UIDefault = p27.Theme.UIDefault
+	local SecondaryContent = p27.Theme.SecondaryContent
+
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		ZIndex = 100,
+		Size = UDim2.new(1, 0, 0, 2),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1)
+	}, {
+		Background = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = p26.thumbnailSize,
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.fromScale(0, 1),
+			BackgroundColor3 = UIDefault.Color,
+			BackgroundTransparency = UIDefault.Transparency
+		}, {
+			Corner = Roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 8)
+			}),
+			Progress = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				ClipsDescendants = true,
+				Size = p26.progress:map(function(p28) -- line: 513
+					return UDim2.fromScale(p28, 1)
+				end)
+			}, {
+				Foreground = Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					Size = p26.thumbnailSize,
+					BackgroundColor3 = SecondaryContent.Color,
+					BackgroundTransparency = SecondaryContent.Transparency
+				}, {
+					Corner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 8)
+					})
+				})
+			})
+		})
+	})
+end
+function v19.didUpdate(p29, _, p31) -- line: 535
+	if p29.state.focusIndex ~= p31.focusIndex then
+		p29:scrollToNewIndex()
+	end
+
+	if p29.state.selectedIndex ~= p31.selectedIndex then
+		p29.updatePreviewTransparency(0)
+	end
+end
+function v19.updateSizes(p32, p33) -- line: 545
+	-- upvalues: calcMediaGallerySizesFromWidth (copy), calcMediaGallerySizesFromHeight (copy)
+	local AbsoluteSizeX = p33.AbsoluteSize.X
+	local AbsoluteSizeY = p33.AbsoluteSize.Y
+	local numberOfThumbnails = p32.props.numberOfThumbnails
+	local v84 = calcMediaGallerySizesFromWidth(AbsoluteSizeX, numberOfThumbnails, p32.props.fullWidth)
+
+	if AbsoluteSizeY < v84.contentSize.Y.Offset then
+		v84 = calcMediaGallerySizesFromHeight(AbsoluteSizeY, numberOfThumbnails, p32.props.fullWidth)
+	end
+
+	p32.updateContentSize(v84.contentSize)
+	p32.updatePreviewSize(v84.previewSize)
+	p32.updatePaginationSize(v84.paginationSize)
+	p32.updateThumbnailSize(v84.thumbnailSize)
+end
+function v19.getCanvasPositionX(p34) -- line: 561
+	local focusIndex = p34.state.focusIndex
+	local XOffset = p34.thumbnailSize:getValue().X.Offset
+
+	return (focusIndex - 1) * (XOffset + 12)
+end
+function v19.scrollToNewIndex(p35) -- line: 567
+	-- upvalues: Otter (copy), t1 (copy)
+	local X = p35.canvasPosition:getValue().X
+	local v90 = p35:getCanvasPositionX()
+
+	p35.scrollMotor:setGoal(Otter.instant(X))
+	p35.scrollMotor:setGoal(Otter.spring(v90, t1))
+	p35.scrolling = true
+end
+
+return v19

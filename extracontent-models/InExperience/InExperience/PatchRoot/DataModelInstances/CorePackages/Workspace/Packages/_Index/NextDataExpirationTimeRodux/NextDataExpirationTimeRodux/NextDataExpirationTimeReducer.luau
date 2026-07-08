@@ -1,41 +1,57 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NextDataExpirationTimeRodux");
-local v1 = require(l_script_FirstAncestor_0.SetNextDataExpirationTime);
-local v2 = require(l_script_FirstAncestor_0.ExpirationTimeNamespace);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.DiscoveryTypes);
-local function v8() --[[ Line: 8 ]] --[[ Name: initializeExpirationTimes ]]
-    -- upvalues: v2 (copy)
-    local v5 = {};
-    for _, v7 in v2 do
-        v5[v7] = {};
-    end;
-    return v5;
-end;
+local NextDataExpirationTimeRodux = script:FindFirstAncestor("NextDataExpirationTimeRodux")
+local SetNextDataExpirationTime = require(NextDataExpirationTimeRodux.SetNextDataExpirationTime)
+local ExpirationTimeNamespace = require(NextDataExpirationTimeRodux.ExpirationTimeNamespace)
+local NextDataExpirationTimeRoduxParent = NextDataExpirationTimeRodux.Parent
+
+require(NextDataExpirationTimeRoduxParent.DiscoveryTypes)
+
+local function initializeExpirationTimes() -- line: 8
+	-- upvalues: ExpirationTimeNamespace (copy)
+	local t1 = {}
+
+	for _, v8 in ExpirationTimeNamespace do
+		t1[v8] = {}
+	end
+
+	return t1
+end
+
 return {
-    key = "NextDataExpirationTimeKey", 
-    reducer = function(v9, v10) --[[ Line: 17 ]]
-        -- upvalues: v8 (copy), v1 (copy)
-        v9 = v9 or v8();
-        if v10.type == v1.name then
-            assert(v9, "state should always exist, assert for linter");
-            local l_namespace_0 = v10.namespace;
-            local l_key_0 = v10.key;
-            assert(l_namespace_0, "SetNextDataExpirationTime does not have a valid namespace");
-            assert(l_key_0, (("SetNextDataExpirationTime does not have a valid key for namespace %*"):format(l_namespace_0)));
-            local v13 = v9[l_namespace_0];
-            if not v13 then
-                warn((("No namespace %* defined in NextDataExpirationTimeReducer for action"):format(l_namespace_0)));
-                return v9;
-            else
-                assert(v13, "namespaceState should always exist, assert for linter");
-                local v14 = table.clone(v13);
-                v14[l_key_0] = v10.nextDataExpirationTime;
-                local v15 = table.clone(v9);
-                v15[l_namespace_0] = v14;
-                return v15;
-            end;
-        else
-            return v9;
-        end;
-    end
-};
+	key = "NextDataExpirationTimeKey",
+	reducer = function(p1, p2) -- line: 17
+		-- upvalues: initializeExpirationTimes (copy), SetNextDataExpirationTime (copy)
+		local v11 = p1 or initializeExpirationTimes()
+
+		if p2.type == SetNextDataExpirationTime.name then
+			assert(v11, "state should always exist, assert for linter")
+
+			local namespace = p2.namespace
+			local key = p2.key
+
+			assert(namespace, "SetNextDataExpirationTime does not have a valid namespace")
+			assert(key, `SetNextDataExpirationTime does not have a valid key for namespace { namespace }`)
+
+			local v14 = v11[namespace]
+
+			if not v14 then
+				warn(`No namespace { namespace } defined in NextDataExpirationTimeReducer for action`)
+
+				return v11
+			end
+
+			assert(v14, "namespaceState should always exist, assert for linter")
+
+			local v15 = table.clone(v14)
+
+			v15[key] = p2.nextDataExpirationTime
+
+			local v16 = table.clone(v11)
+
+			v16[namespace] = v15
+
+			return v16
+		end
+
+		return v11
+	end
+}

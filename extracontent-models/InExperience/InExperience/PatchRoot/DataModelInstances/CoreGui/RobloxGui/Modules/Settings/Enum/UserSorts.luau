@@ -1,5 +1,5 @@
 return {
-    Alphabetical = "Alphabetical", 
-    StatusAlphabetical = "StatusAlphabetical", 
-    StatusFrequents = "StatusFrequents"
-};
+	Alphabetical = "Alphabetical",
+	StatusAlphabetical = "StatusAlphabetical",
+	StatusFrequents = "StatusFrequents"
+}

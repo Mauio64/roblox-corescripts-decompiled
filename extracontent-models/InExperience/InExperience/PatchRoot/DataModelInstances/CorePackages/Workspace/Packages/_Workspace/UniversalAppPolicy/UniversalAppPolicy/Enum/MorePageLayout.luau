@@ -1,5 +1,5 @@
 return {
-    Grid = "Grid", 
-    List = "List", 
-    Carousel = "Carousel"
-};
+	Grid = "Grid",
+	List = "List",
+	Carousel = "Carousel"
+}

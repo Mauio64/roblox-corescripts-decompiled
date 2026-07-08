@@ -1,5 +1,5 @@
 return {
-    SetNicknameModalOpened = "SetNicknameModalOpened", 
-    SetNicknameSkipClicked = "SetNicknameSkipClicked", 
-    SetNicknameAddNameClicked = "SetNicknameAddNameClicked"
-};
+	SetNicknameModalOpened = "SetNicknameModalOpened",
+	SetNicknameSkipClicked = "SetNicknameSkipClicked",
+	SetNicknameAddNameClicked = "SetNicknameAddNameClicked"
+}

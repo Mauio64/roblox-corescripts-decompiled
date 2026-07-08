@@ -5,7 +5,7 @@ local IconSize = Foundation.Enums.IconSize
 local BuilderIcons = require(Parent.BuilderIcons)
 local FFlagEnableFlyoutUncheckedBadge = require(Parent.SharedFlags).FFlagEnableFlyoutUncheckedBadge
 
-return function(t1: {[any]: any}) --[[ ChevronSmallDownButton ]] -- line: 16
+local function ChevronSmallDownButton(t1: {[any]: any}) -- line: 16
 	-- upvalues: React (copy), Foundation (copy), FFlagEnableFlyoutUncheckedBadge (copy), BuilderIcons (copy), IconSize (copy)
 	return React.createElement(Foundation.View, {
 		tag = "position-center-right anchor-center-right auto-xy radius-circle bg-action-standard padding-xsmall",
@@ -19,3 +19,5 @@ return function(t1: {[any]: any}) --[[ ChevronSmallDownButton ]] -- line: 16
 		})
 	})
 end
+
+return ChevronSmallDownButton

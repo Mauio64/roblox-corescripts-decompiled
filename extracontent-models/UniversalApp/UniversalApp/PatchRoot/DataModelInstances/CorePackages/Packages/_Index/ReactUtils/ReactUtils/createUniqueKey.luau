@@ -1,18 +1,25 @@
-return function() --[[ Line: 4 ]] --[[ Name: createUniqueKey ]]
-    local v0 = {};
-    return function(v1) --[[ Line: 7 ]]
-        -- upvalues: v0 (copy)
-        if v0[v1] == nil then
-            v0[v1] = 1;
-            return v1;
-        else
-            local v2;
-            repeat
-                v2 = v0;
-                v2[v1] = v2[v1] + 1;
-                v2 = ("%*_%*"):format(v1, v0[v1]);
-            until v0[v2] == nil;
-            return v2;
-        end;
-    end;
-end;
+local function createUniqueKey() -- line: 4
+	local t1 = {}
+
+	return function(p1) -- line: 7
+		-- upvalues: t1 (copy)
+		if t1[p1] == nil then
+			t1[p1] = 1
+
+			return p1
+		end
+
+		local v5
+
+		repeat
+			local v4 = t1
+
+			v4[p1] = v4[p1] + 1
+			v5 = `{ p1 }_{ t1[p1] }`
+		until t1[v5] == nil
+
+		return v5
+	end
+end
+
+return createUniqueKey

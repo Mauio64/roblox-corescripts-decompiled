@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FlyoutHideFriendsHeader", false);
+return game:DefineFastFlag("FlyoutHideFriendsHeader", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableRetryForLinkingProtocolFetch", false);
+return game:DefineFastFlag("EnableRetryForLinkingProtocolFetch", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableScreentimeMoreTimeOption", false);
+return game:DefineFastFlag("EnableScreentimeMoreTimeOption", false)

@@ -1,65 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InExperienceIntervention");
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_EventIngest_0 = require(l_Parent_0.Analytics).AnalyticsReporters.EventIngest;
-local v5 = require(l_Parent_0.Cryo);
-local v6 = l_EventIngest_0.new(l_EventIngestService_0);
-local v7 = {
-    InterventionTypes = {
-        Nudge = "INTERVENTION_CHAT_NUDGE", 
-        Timeout = "INTERVENTION_CHAT_TIMEOUT", 
-        PartyChatNudge = "INTERVENTION_PARTY_CHAT_NUDGE", 
-        PartyChatTimeout = "INTERVENTION_PARTY_CHAT_TIMEOUT"
-    }, 
-    EventTypes = {
-        AppealClicked = "EVENT_APPEAL_CLICKED", 
-        CtaClicked = "EVENT_CTA_CLICKED", 
-        ModalAppeared = "EVENT_MODAL_APPEARED", 
-        ModalMessageReceived = "EVENT_MODAL_MESSAGE_RECEIVED", 
-        ToastMessageReceived = "EVENT_TOAST_MESSAGE_RECEIVED", 
-        NudgeToastAppeared = "EVENT_NUDGE_TOAST_APPEARED", 
-        NudgeToastDismissed = "EVENT_NUDGE_TOAST_DISMISSED", 
-        ChatAttemptToastAppeared = "EVENT_CHAT_ATTEMPT_TOAST_APPEARED", 
-        ChatAttemptToastDismissed = "EVENT_CHAT_ATTEMPT_TOAST_DISMISSED", 
-        GetModerationDetailFailed = "EVENT_GET_MODERATION_DETAIL_FAILED"
-    }, 
-    EventContext = "InExperienceInterventionEvent", 
-    EventName = "InExperienceInterventionEvent"
-};
-local v8 = 0;
-if l_LocalPlayer_0 then
-    v8 = l_LocalPlayer_0.UserId;
-end;
-local function v19(v9, v10, v11, v12, v13, v14, v15, v16) --[[ Line: 43 ]]
-    -- upvalues: v8 (ref), v7 (copy), v5 (copy)
-    local l_UnixTimestampMillis_0 = DateTime.now().UnixTimestampMillis;
-    local v18 = {
-        user_id = v8, 
-        timestamp_milliseconds = l_UnixTimestampMillis_0, 
-        event_type = v9, 
-        intervention_type = v10, 
-        event_id = v12, 
-        evidence = v13, 
-        timeout_duration_seconds = v14, 
-        acknowledgeable = v16
-    };
-    if v9 == v7.EventTypes.CtaClicked or v9 == v7.EventTypes.AppealClicked or v9 == v7.EventTypes.NudgeToastDismissed or v9 == v7.EventTypes.ChatAttemptToastDismissed then
-        v18 = v5.Dictionary.join({
-            time_to_interact_seconds = (l_UnixTimestampMillis_0 - v11) / 1000
-        }, v18);
-    end;
-    if v9 == v7.EventTypes.GetModerationDetailFailed then
-        v18 = v5.Dictionary.join({
-            error = v15
-        }, v18);
-    end;
-    return v18;
-end;
+local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local InExperienceInterventionParent = InExperienceIntervention.Parent
+local EventIngestService = game:GetService("EventIngestService")
+local EventIngest = require(InExperienceInterventionParent.Analytics).AnalyticsReporters.EventIngest
+local Cryo = require(InExperienceInterventionParent.Cryo)
+local v7 = EventIngest.new(EventIngestService)
+local t1 = {
+	EventContext = "InExperienceInterventionEvent",
+	EventName = "InExperienceInterventionEvent",
+	InterventionTypes = {
+		Nudge = "INTERVENTION_CHAT_NUDGE",
+		Timeout = "INTERVENTION_CHAT_TIMEOUT",
+		PartyChatNudge = "INTERVENTION_PARTY_CHAT_NUDGE",
+		PartyChatTimeout = "INTERVENTION_PARTY_CHAT_TIMEOUT"
+	},
+	EventTypes = {
+		AppealClicked = "EVENT_APPEAL_CLICKED",
+		CtaClicked = "EVENT_CTA_CLICKED",
+		ModalAppeared = "EVENT_MODAL_APPEARED",
+		ModalMessageReceived = "EVENT_MODAL_MESSAGE_RECEIVED",
+		ToastMessageReceived = "EVENT_TOAST_MESSAGE_RECEIVED",
+		NudgeToastAppeared = "EVENT_NUDGE_TOAST_APPEARED",
+		NudgeToastDismissed = "EVENT_NUDGE_TOAST_DISMISSED",
+		ChatAttemptToastAppeared = "EVENT_CHAT_ATTEMPT_TOAST_APPEARED",
+		ChatAttemptToastDismissed = "EVENT_CHAT_ATTEMPT_TOAST_DISMISSED",
+		GetModerationDetailFailed = "EVENT_GET_MODERATION_DETAIL_FAILED"
+	}
+}
+local n1 = 0
+
+if LocalPlayer then
+	n1 = LocalPlayer.UserId
+end
+
+local function v10(p1, p2, p3, p4, p5, p6, p7, p8) -- line: 43
+	-- upvalues: n1 (ref), t1 (copy), Cryo (copy)
+	local UnixTimestampMillis = DateTime.now().UnixTimestampMillis
+	local t2 = {
+		user_id = n1,
+		timestamp_milliseconds = UnixTimestampMillis,
+		event_type = p1,
+		intervention_type = p2,
+		event_id = p4,
+		evidence = p5,
+		timeout_duration_seconds = p6,
+		acknowledgeable = p8
+	}
+
+	if p1 == t1.EventTypes.CtaClicked or (p1 == t1.EventTypes.AppealClicked or p1 == t1.EventTypes.NudgeToastDismissed or p1 == t1.EventTypes.ChatAttemptToastDismissed) then
+		t2 = Cryo.Dictionary.join({
+			time_to_interact_seconds = (UnixTimestampMillis - p3) / 1000
+		}, t2)
+	end
+
+	if p1 == t1.EventTypes.GetModerationDetailFailed then
+		t2 = Cryo.Dictionary.join({
+			error = p7
+		}, t2)
+	end
+
+	return t2
+end
+
 return {
-    sendAnalyticsEvent = function(v20, v21, v22, v23, v24, v25, v26, v27) --[[ Line: 85 ]]
-        -- upvalues: v6 (copy), v7 (copy), v19 (copy)
-        v6:sendEventDeferred(v7.EventContext, v7.EventName, (v19(v20, v21, v22, v23, v24, v25, v26, v27)));
-    end, 
-    Constants = v7
-};
+	sendAnalyticsEvent = function(p9, p10, p11, p12, p13, p14, p15, p16) -- line: 85
+		-- upvalues: v7 (copy), t1 (copy), v10 (copy)
+		v7:sendEventDeferred(t1.EventContext, t1.EventName, (v10(p9, p10, p11, p12, p13, p14, p15, p16)))
+	end,
+	Constants = t1
+}

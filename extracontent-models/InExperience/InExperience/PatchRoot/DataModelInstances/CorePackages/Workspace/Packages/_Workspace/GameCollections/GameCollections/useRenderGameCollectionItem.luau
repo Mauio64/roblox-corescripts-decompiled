@@ -19,62 +19,57 @@ require(GameCollectionsParent.VideoUtils)
 
 local FFlagLuaAppGameTileLockedBadge = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameTileLockedBadge
 local FFlagLuaAppGameTileInteractionFeedback = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameTileInteractionFeedback
-local FFlagLuaAppGameTileWideVideoThumbnail = require(GameCollectionsParent.SharedFlags).FFlagLuaAppGameTileWideVideoThumbnail
 local FFlagLuaAppEnableWhyThisAdModal = require(GameCollectionsParent.SharedFlags).FFlagLuaAppEnableWhyThisAdModal
 local FFlagLuaAppEnableSponsoredReportAd = require(GameCollectionsParent.SharedFlags).FFlagLuaAppEnableSponsoredReportAd
-local FFlagLuaAppEnableHomepageTwoByOneTile = require(GameCollectionsParent.SharedFlags).FFlagLuaAppEnableHomepageTwoByOneTile
 local FFlagLuaAppSupportSponsoredExplicitFeedback = require(GameCollectionsParent.SharedFlags).FFlagLuaAppSupportSponsoredExplicitFeedback
-local FFlagLuaAppSupportAdRatingFooter = require(GameCollectionsParent.SharedFlags).FFlagLuaAppSupportAdRatingFooter
-local FFlagSduiServerCompat = require(GameCollectionsParent.SharedFlags).FFlagSduiServerCompat
-local FFlagLuaAppSupportAdRatingFooterExperiment = require(GameCollectionsParent.SharedFlags).FFlagLuaAppSupportAdRatingFooterExperiment
 local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(GameCollectionsParent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
 local FFlagLuaAppNarrowTileSmallerFooterFont = require(GameCollectionsParent.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont
 local FFlagLuaAppNarrowTileHideRating = require(GameCollectionsParent.SharedFlags).FFlagLuaAppNarrowTileHideRating
 local FFlagLuaAppNarrowTileHidePlayerCount = require(GameCollectionsParent.SharedFlags).FFlagLuaAppNarrowTileHidePlayerCount
 local FFlagLuaAppHomeTouchAutoplay = require(GameCollectionsParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
+local FFlagLuaAppUsePrevalidatedVideoGamePlayability = require(GameCollectionsParent.SharedFlags).FFlagLuaAppUsePrevalidatedVideoGamePlayability
+local FFlagLuaAppFixCustomTileBugs = require(GameCollectionsParent.SharedFlags).FFlagLuaAppFixCustomTileBugs
 local GameCollectionItemType = GameCollectionItemTypes.GameCollectionItemType
 
-return function(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4: boolean?, p3: ((...any) -> ...any), p4: ((...any) -> ...any), s2: string?, s3: string?, s4: string?, p5: ((...any) -> ...any)?, s5: string?, n1: number?, b5: boolean?, s6: string?, b6: boolean?, b7: boolean?, b8: boolean?, p6, p7, p8, n2: number?, n3: number?, b9: boolean?, b10: boolean?, p9, p10: ((...any) -> ...any)?, n4: number?, b11: boolean?, t1: {[any]: any}?, p11: ((...any) -> ...any)?, s7: string?, s8: string?, b12: boolean?, b13: boolean?, n5: number?, b14: boolean?, s9: string?, b15: boolean?, b16: boolean?, p12: ((...any) -> ...any)?, b17: boolean?, b18: boolean?, b19: boolean?, p13) --[[ useRenderGameCollectionItem ]] -- line: 48
-	-- upvalues: usePreferredInput (copy), useNavigateToGameDetails (copy), FFlagLuaAppGameTileInteractionFeedback (copy), useTriggerGameTileFeedbackCallbacks (copy), Responsive (copy), useBreakpointXOrSmaller (copy), FFlagLuaAppNarrowTileHideRating (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), GameTileConstants (copy), GameTileLayoutType (copy), React (copy), SeeAllTile (copy), FFlagSduiServerCompat (copy), GameCollectionItemType (copy), FFlagLuaAppEnableHomepageTwoByOneTile (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppHomeTouchAutoplay (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), AppGameTile (copy), FFlagLuaAppGameTileWideVideoThumbnail (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), FFlagLuaAppSupportAdRatingFooter (copy), FFlagLuaAppSupportAdRatingFooterExperiment (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy)
-	local v79 = usePreferredInput()
-	local v80 = useNavigateToGameDetails()
+local function useRenderGameCollectionItem(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4: boolean?, p3: ((...any) -> ...any), p4: ((...any) -> ...any), s2: string?, s3: string?, s4: string?, p5: ((...any) -> ...any)?, s5: string?, n1: number?, b5: boolean?, s6: string?, b6: boolean?, b7: boolean?, b8: boolean?, p6, p7, p8, n2: number?, n3: number?, b9: boolean?, b10: boolean?, p9, p10: ((...any) -> ...any)?, n4: number?, b11: boolean?, t1: {[any]: any}?, p11: ((...any) -> ...any)?, s7: string?, s8: string?, b12: boolean?, b13: boolean?, n5: number?, b14: boolean?, _: string?, _: boolean?, _: boolean?, p12: ((...any) -> ...any)?, b17: boolean?, b18: boolean?, b19: boolean?, p13, b20: boolean?) -- line: 44
+	-- upvalues: usePreferredInput (copy), useNavigateToGameDetails (copy), FFlagLuaAppGameTileInteractionFeedback (copy), useTriggerGameTileFeedbackCallbacks (copy), Responsive (copy), useBreakpointXOrSmaller (copy), FFlagLuaAppNarrowTileHideRating (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), GameTileConstants (copy), GameTileLayoutType (copy), React (copy), SeeAllTile (copy), GameCollectionItemType (copy), FFlagLuaAppFixCustomTileBugs (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppHomeTouchAutoplay (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), AppGameTile (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy)
+	local v78 = usePreferredInput()
+	local v79 = useNavigateToGameDetails()
+	local u80 = nil
 	local u81 = nil
-	local u82 = nil
 
 	if FFlagLuaAppGameTileInteractionFeedback then
-		local v83, v84 = useTriggerGameTileFeedbackCallbacks()
+		local v82, v83 = useTriggerGameTileFeedbackCallbacks()
 
+		u80 = v82
 		u81 = v83
-		u82 = v84
 	end
 
-	local v85 = b4 and v79 == Responsive.Input.Pointer
-	local v86 = p2 == "Wide" or p2 == "Event"
-	local v87 = useBreakpointXOrSmaller(Responsive.Keys.Small)
-	local v88 = useBreakpointXOrSmaller(Responsive.Keys.XSmall)
-	local v89 = FFlagLuaAppNarrowTileHideRating and b18 or FFlagLuaAppNarrowTileHidePlayerCount and b19
-	local u90 = if not (v87 and (n2 > 0 and not v89)) then GameTileConstants.TileTextLines[p2 or GameTileLayoutType.Narrow].metadataTextLines else GameTileConstants.TileTextLines[p2 or GameTileLayoutType.Narrow].largeMetadataTextLines
+	local v84 = b4 and v78 == Responsive.Input.Pointer
+	local v85 = p2 == "Wide" or p2 == "Event"
+	local v86 = useBreakpointXOrSmaller(Responsive.Keys.Small)
+	local v87 = useBreakpointXOrSmaller(Responsive.Keys.XSmall)
+	local v88 = FFlagLuaAppNarrowTileHideRating and b18 or FFlagLuaAppNarrowTileHidePlayerCount and b19
+	local u89 = if not (v86 and (n2 > 0 and not v88)) then GameTileConstants.TileTextLines[p2 or GameTileLayoutType.Narrow].metadataTextLines else GameTileConstants.TileTextLines[p2 or GameTileLayoutType.Narrow].largeMetadataTextLines
 
-	return (React.useCallback(function(p14, n6: number, p15, n7: number?) -- line: 177
-		-- upvalues: n1 (copy), p5 (copy), React (copy), SeeAllTile (copy), FFlagSduiServerCompat (copy), GameCollectionItemType (copy), p8 (copy), t1 (copy), n4 (copy), FFlagLuaAppEnableHomepageTwoByOneTile (copy), n5 (copy), p6 (copy), p7 (copy), s5 (copy), s4 (copy), s3 (copy), p1 (copy), b5 (copy), p2 (copy), v85 (copy), b6 (copy), p3 (copy), p4 (copy), s2 (copy), p10 (copy), v80 (copy), s1 (copy), n2 (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), s7 (copy), p11 (copy), s8 (copy), b12 (copy), b13 (copy), b11 (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), p12 (copy), FFlagLuaAppHomeTouchAutoplay (copy), p13 (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), AppGameTile (copy), b2 (copy), b3 (copy), v86 (copy), b1 (copy), s6 (copy), b7 (copy), b8 (copy), FFlagLuaAppGameTileInteractionFeedback (copy), u81 (ref), u82 (ref), n3 (copy), u90 (ref), b9 (copy), b10 (copy), FFlagLuaAppGameTileWideVideoThumbnail (copy), p9 (copy), v88 (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), FFlagLuaAppSupportAdRatingFooter (copy), b14 (copy), FFlagLuaAppSupportAdRatingFooterExperiment (copy), s9 (copy), b15 (copy), b16 (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), b17 (copy), FFlagLuaAppNarrowTileHideRating (copy), b18 (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), b19 (copy)
+	return (React.useCallback(function(p14, n6: number, p15, n7: number?) -- line: 172
+		-- upvalues: n1 (copy), p5 (copy), React (copy), SeeAllTile (copy), GameCollectionItemType (copy), p8 (copy), t1 (copy), n4 (copy), n5 (copy), FFlagLuaAppFixCustomTileBugs (copy), p6 (copy), p7 (copy), s5 (copy), s4 (copy), s3 (copy), p1 (copy), b5 (copy), p2 (copy), v84 (copy), b6 (copy), p3 (copy), p4 (copy), s2 (copy), p10 (copy), v79 (copy), s1 (copy), n2 (copy), FFlagLuaAppSupportSponsoredExplicitFeedback (copy), s7 (copy), p11 (copy), s8 (copy), b12 (copy), b13 (copy), b11 (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), p12 (copy), FFlagLuaAppHomeTouchAutoplay (copy), p13 (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), AppGameTile (copy), b2 (copy), b3 (copy), v85 (copy), b1 (copy), s6 (copy), b7 (copy), b8 (copy), FFlagLuaAppGameTileInteractionFeedback (copy), u80 (ref), u81 (ref), n3 (copy), u89 (ref), b9 (copy), b10 (copy), p9 (copy), v87 (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableSponsoredReportAd (copy), b14 (copy), FFlagLuaAppNarrowTileSmallerFooterFont (copy), b17 (copy), FFlagLuaAppNarrowTileHideRating (copy), b18 (copy), FFlagLuaAppNarrowTileHidePlayerCount (copy), b19 (copy), FFlagLuaAppUsePrevalidatedVideoGamePlayability (copy), b20 (copy)
 		if n1 and (n6 == n1 and p5) then
 			return React.createElement(SeeAllTile, {
 				onActivated = p5,
-				Size = if FFlagSduiServerCompat then nil else p15,
-				size = if not FFlagSduiServerCompat then nil else p15,
-				LayoutOrder = if FFlagSduiServerCompat then nil else n6,
-				layoutOrder = if not FFlagSduiServerCompat then nil else n6
+				size = p15,
+				layoutOrder = n6
 			}), GameCollectionItemType.SeeAllTile
 		end
 
-		local v95 = nil
+		local v94 = nil
 
 		if p8 then
-			v95 = p8(n6)
+			v94 = p8(n6)
 		end
 
-		local v96 = t1 and t1[p14.universeId]
-		local v97 = if not n4 then nil else n4 + n6
+		local v95 = t1 and t1[p14.universeId]
+		local v96 = if not n4 then nil else n4 + n6
 
 		if p14.customRenderFunction then
 			return p14.customRenderFunction({
@@ -82,10 +77,11 @@ return function(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4
 				index = n6,
 				itemSize = p15,
 				rowNum = n7,
-				zIndex = if not FFlagLuaAppEnableHomepageTwoByOneTile then nil else -n6,
-				maxItemIndex = if not FFlagLuaAppEnableHomepageTwoByOneTile then nil else n5,
-				selectionOrder = v97,
-				isDisabled = v95,
+				zIndex = -n6,
+				maxItemIndex = n5,
+				selectionOrder = if not FFlagLuaAppFixCustomTileBugs then v96 else nil,
+				SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else v96,
+				isDisabled = v94,
 				onSelectionGained = p6,
 				onSelectionLost = p7,
 				topicId = s5,
@@ -94,33 +90,33 @@ return function(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4
 				playerCountStyle = p1,
 				hideGameStats = b5,
 				gameTileLayoutType = p2,
-				hoverTileEnabled = v85,
+				hoverTileEnabled = v84,
 				isContained = b6,
 				reportGameDetailOpened = p3,
 				reportExperienceLaunched = p4,
 				launchExperienceEventContext = s2,
 				onPeekViewClosed = p10,
-				navigateToGameDetails = v80,
+				navigateToGameDetails = v79,
 				impressionsTag = s1,
 				textSizeOffset = n2,
 				appPage = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else s7,
 				setGameHidden = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else p11,
-				isHidden = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else v96,
+				isHidden = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else v95,
 				sponsoredUserCohort = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else s8,
 				enableSponsoredFeedback = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else b12,
 				enableReportAd = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else b13,
 				enableExplicitFeedback = if not FFlagLuaAppSupportSponsoredExplicitFeedback then nil else b11,
-				onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone or (not p12 or v96) then nil else p12,
+				onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone or (not p12 or v95) then nil else p12,
 				videoPlaybackContext = if not FFlagLuaAppHomeTouchAutoplay then nil else p13
 			})
 		end
 
-		local v98 = nil
+		local v97 = nil
 
 		if FFlagLuaAppGameTileLockedBadge then
-			v98 = getTileBadgeByPositionConfigFromEntry(p14)
+			v97 = getTileBadgeByPositionConfigFromEntry(p14)
 		elseif p14.badgePosition and p14.badgeAnalyticsId and p14.badgeType and (p14.badgeText or p14.badgeIcon) then
-			v98 = {
+			v97 = {
 				[p14.badgePosition] = {{
 					analyticsId = p14.badgeAnalyticsId,
 					tileBadgeType = p14.badgeType,
@@ -142,56 +138,54 @@ return function(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4
 			friendFooterEnabled = b2,
 			showFriendActivity = b3,
 			impressionsTag = s1,
-			useGridTile = v86,
+			useGridTile = v85,
 			playerCountStyle = p1,
 			isSponsoredFooterAllowed = b1,
 			gameTileLayoutType = p2,
-			useHoverTile = v85,
+			useHoverTile = v84,
 			topicId = s5,
 			launchExperienceEventContext = s2,
 			referralSource = s3,
 			source = s4,
 			rowNum = n7,
-			navigateToGameDetails = v80,
+			navigateToGameDetails = v79,
 			hideGameStats = b5,
 			playButtonStyle = s6,
 			isContained = b6,
 			hideTitle = b7,
 			hideMetadata = b8,
-			onGuiStateChanged = if not FFlagLuaAppGameTileInteractionFeedback then nil else u81,
-			onActivated = if not FFlagLuaAppGameTileInteractionFeedback then nil else u82,
-			isDisabled = v95,
+			onGuiStateChanged = if not FFlagLuaAppGameTileInteractionFeedback then nil else u80,
+			onActivated = if not FFlagLuaAppGameTileInteractionFeedback then nil else u81,
+			isDisabled = v94,
 			onSelectionGained = p6,
 			onSelectionLost = p7,
 			textSizeOffset = n2,
 			contentTextLineCount = n3,
-			metadataTextLineCount = u90,
+			metadataTextLineCount = u89,
 			useExperienceTileMetadata = b9,
 			forceHideAgeRatings = b10,
-			videoAnalytics = if not FFlagLuaAppGameTileWideVideoThumbnail then nil else p9,
+			videoAnalytics = p9,
 			onPeekViewClosed = p10,
-			SelectionOrder = v97,
+			SelectionOrder = v96,
 			enableExplicitFeedback = b11,
 			setGameHidden = p11,
 			appPage = s7,
-			isHidden = v96,
-			isNarrowScreenXSmall = v88,
+			isHidden = v95,
+			isNarrowScreenXSmall = v87,
 			sponsoredUserCohort = if not FFlagLuaAppEnableWhyThisAdModal then nil else s8,
 			enableSponsoredFeedback = b12,
 			enableReportAd = if not FFlagLuaAppEnableSponsoredReportAd then nil else b13,
-			isSponsoredRatingFooterAllowed = if not FFlagLuaAppSupportAdRatingFooter then nil else b14,
-			sponsoredFooterAdLabelText = if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else s9,
-			sponsoredFooterAdLabelFirst = if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else b15,
-			sponsoredFooterIncludeRatingContent = if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else b16,
-			badgeOverride = v98,
-			onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone or (not p12 or v96) then nil else p12,
+			isSponsoredRatingFooterAllowed = b14,
+			badgeOverride = v97,
+			onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone or (not p12 or v95) then nil else p12,
 			compactMetadataFormat = if not FFlagLuaAppNarrowTileSmallerFooterFont then nil else b17,
 			hideRating = if not FFlagLuaAppNarrowTileHideRating then nil else b18,
 			hidePlayerCount = if not FFlagLuaAppNarrowTileHidePlayerCount then nil else b19,
+			hasPrevalidatedVideoGamePlayability = if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else b20,
 			videoPlaybackContext = if not FFlagLuaAppHomeTouchAutoplay then nil else p13
 		}), GameCollectionItemType.GameTile
 	end, {
-		v86,
+		v85,
 		b2,
 		b5,
 		b3,
@@ -207,41 +201,41 @@ return function(p1, b1: boolean?, p2, b2: boolean?, b3: boolean?, s1: string, b4
 		s4,
 		s3,
 		n1,
-		v85,
+		v84,
 		s6,
 		b6,
 		b7,
 		b8,
 		n2,
+		if not FFlagLuaAppGameTileInteractionFeedback then nil else u80,
 		if not FFlagLuaAppGameTileInteractionFeedback then nil else u81,
-		if not FFlagLuaAppGameTileInteractionFeedback then nil else u82,
 		p6,
 		p7,
 		p8,
 		n3,
 		b9,
 		b10,
-		if not FFlagLuaAppGameTileWideVideoThumbnail then nil else p9,
+		p9,
 		p10,
 		n4,
-		u90,
+		u89,
 		b11,
 		t1,
 		p11,
 		s7,
-		v88,
+		v87,
 		if not FFlagLuaAppEnableWhyThisAdModal then nil else s8,
 		b12,
 		if not FFlagLuaAppEnableSponsoredReportAd then nil else b13,
-		v80,
-		if not FFlagLuaAppSupportAdRatingFooter then nil else b14,
-		if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else s9,
-		if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else b15,
-		if not FFlagLuaAppSupportAdRatingFooterExperiment then nil else b16,
+		v79,
+		b14,
 		if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else p12,
 		if not FFlagLuaAppNarrowTileSmallerFooterFont then nil else b17,
 		if not FFlagLuaAppNarrowTileHideRating then nil else b18,
 		if not FFlagLuaAppNarrowTileHidePlayerCount then nil else b19,
+		if not FFlagLuaAppUsePrevalidatedVideoGamePlayability then nil else b20,
 		if not FFlagLuaAppHomeTouchAutoplay then nil else p13
 	}))
 end
+
+return useRenderGameCollectionItem

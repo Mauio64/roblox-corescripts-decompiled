@@ -1,137 +1,151 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local v2 = {};
-local _ = require(script.Parent.SchedulerPriorities);
-local l_enableProfiling_0 = require(script.Parent.SchedulerFeatureFlags).enableProfiling;
-local v5 = 0;
-local v6 = 0;
-local v7 = 0;
-local v8 = nil;
-local v9 = nil;
-local v10 = 1;
-local function v13(v11) --[[ Line: 46 ]] --[[ Name: logEvent ]]
-    -- upvalues: v9 (ref), v10 (ref), v7 (ref), l_console_0 (copy), v2 (copy), v8 (ref)
-    if v9 ~= nil then
-        v10 = v10 + #v11;
-        if v10 + 1 > v7 then
-            v7 = v7 * 2;
-            if v7 > 524288 then
-                l_console_0.error("Scheduler Profiling: Event log exceeded maximum size. Don't forget to call `stopLoggingProfilingEvents()`.");
-                v2.stopLoggingProfilingEvents();
-                return;
-            else
-                local v12 = {};
-                table.insert(v12, v9);
-                v8 = v12;
-                v9 = v12;
-            end;
-        end;
-        table.insert(v9, v11);
-    end;
-end;
-v2.startLoggingProfilingEvents = function() --[[ Line: 70 ]]
-    -- upvalues: v7 (ref), v8 (ref), v9 (ref), v10 (ref)
-    v7 = 131072;
-    v8 = {};
-    v9 = v8;
-    v10 = 1;
-end;
-v2.stopLoggingProfilingEvents = function() --[[ Line: 77 ]]
-    -- upvalues: v8 (ref), v7 (ref), v9 (ref), v10 (ref)
-    local l_v8_0 = v8;
-    v7 = 0;
-    v8 = nil;
-    v9 = nil;
-    v10 = 1;
-    return l_v8_0;
-end;
-v2.markTaskStart = function(v15, v16) --[[ Line: 87 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            1, 
-            v16 * 1000, 
-            v15.id, 
-            v15.priorityLevel
-        });
-    end;
-end;
-v2.markTaskCompleted = function(v17, v18) --[[ Line: 98 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            2, 
-            v18 * 1000, 
-            v17.id
-        });
-    end;
-end;
-v2.markTaskCanceled = function(v19, v20) --[[ Line: 109 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            4, 
-            v20 * 1000, 
-            v19.id
-        });
-    end;
-end;
-v2.markTaskErrored = function(v21, v22) --[[ Line: 117 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            3, 
-            v22 * 1000, 
-            v21.id
-        });
-    end;
-end;
-v2.markTaskRun = function(v23, v24) --[[ Line: 125 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v5 (ref), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 then
-        v5 = v5 + 1;
-        if v9 ~= nil then
-            v13({
-                5, 
-                v24 * 1000, 
-                v23.id, 
-                v5
-            });
-        end;
-    end;
-end;
-v2.markTaskYield = function(v25, v26) --[[ Line: 135 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy), v5 (ref)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            6, 
-            v26 * 1000, 
-            v25.id, 
-            v5
-        });
-    end;
-end;
-v2.markSchedulerSuspended = function(v27) --[[ Line: 143 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v6 (ref), v9 (ref), v13 (copy)
-    if l_enableProfiling_0 then
-        v6 = v6 + 1;
-        if v9 ~= nil then
-            v13({
-                7, 
-                v27 * 1000, 
-                v6
-            });
-        end;
-    end;
-end;
-v2.markSchedulerUnsuspended = function(v28) --[[ Line: 153 ]]
-    -- upvalues: l_enableProfiling_0 (copy), v9 (ref), v13 (copy), v6 (ref)
-    if l_enableProfiling_0 and v9 ~= nil then
-        v13({
-            8, 
-            v28 * 1000, 
-            v6
-        });
-    end;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local console = require(ParentParent.Shared).console
+local t1 = {}
+
+require(script.Parent.SchedulerPriorities)
+
+local enableProfiling = require(script.Parent.SchedulerFeatureFlags).enableProfiling
+local n1 = 0
+local n2 = 0
+local n3 = 0
+local u8 = nil
+local u9 = nil
+local n4 = 1
+
+local function logEvent(p1) -- line: 46
+	-- upvalues: u9 (ref), n4 (ref), n3 (ref), console (copy), t1 (copy), u8 (ref)
+	if u9 ~= nil then
+		n4 += #p1
+
+		if n4 + 1 > n3 then
+			n3 *= 2
+
+			if n3 > 524288 then
+				console.error("Scheduler Profiling: Event log exceeded maximum size. Don't forget to call `stopLoggingProfilingEvents()`.")
+				t1.stopLoggingProfilingEvents()
+
+				return
+			end
+
+			local t2 = {}
+
+			table.insert(t2, u9)
+			u8 = t2
+			u9 = t2
+		end
+
+		table.insert(u9, p1)
+	end
+end
+
+function t1.startLoggingProfilingEvents() -- line: 70
+	-- upvalues: n3 (ref), u8 (ref), u9 (ref), n4 (ref)
+	n3 = 131072
+	u8 = {}
+	u9 = u8
+	n4 = 1
+end
+function t1.stopLoggingProfilingEvents() -- line: 77
+	-- upvalues: u8 (ref), n3 (ref), u9 (ref), n4 (ref)
+	local v14 = u8
+
+	n3 = 0
+	u8 = nil
+	u9 = nil
+	n4 = 1
+
+	return v14
+end
+function t1.markTaskStart(p2, n5: number) -- line: 87
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			1,
+			n5 * 1000,
+			p2.id,
+			p2.priorityLevel
+		})
+	end
+end
+function t1.markTaskCompleted(p3, n6: number) -- line: 98
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			2,
+			n6 * 1000,
+			p3.id
+		})
+	end
+end
+function t1.markTaskCanceled(p4, n7: number) -- line: 109
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			4,
+			n7 * 1000,
+			p4.id
+		})
+	end
+end
+function t1.markTaskErrored(p5, n8: number) -- line: 117
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			3,
+			n8 * 1000,
+			p5.id
+		})
+	end
+end
+function t1.markTaskRun(p6, n9: number) -- line: 125
+	-- upvalues: enableProfiling (copy), n1 (ref), u9 (ref), logEvent (copy)
+	if enableProfiling then
+		n1 += 1
+
+		if u9 ~= nil then
+			logEvent({
+				5,
+				n9 * 1000,
+				p6.id,
+				n1
+			})
+		end
+	end
+end
+function t1.markTaskYield(p7, n10: number) -- line: 135
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy), n1 (ref)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			6,
+			n10 * 1000,
+			p7.id,
+			n1
+		})
+	end
+end
+function t1.markSchedulerSuspended(n11: number) -- line: 143
+	-- upvalues: enableProfiling (copy), n2 (ref), u9 (ref), logEvent (copy)
+	if enableProfiling then
+		n2 += 1
+
+		if u9 ~= nil then
+			logEvent({
+				7,
+				n11 * 1000,
+				n2
+			})
+		end
+	end
+end
+function t1.markSchedulerUnsuspended(n12: number) -- line: 153
+	-- upvalues: enableProfiling (copy), u9 (ref), logEvent (copy), n2 (ref)
+	if enableProfiling and u9 ~= nil then
+		logEvent({
+			8,
+			n12 * 1000,
+			n2
+		})
+	end
+end
+
+return t1

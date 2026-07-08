@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePeopleListLazyRender", false);
+return game:DefineFastFlag("EnablePeopleListLazyRender", false)

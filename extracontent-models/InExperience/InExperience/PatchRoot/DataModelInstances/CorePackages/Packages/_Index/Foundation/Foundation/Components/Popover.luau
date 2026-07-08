@@ -1,8 +1,11 @@
-local v0 = require(script.Popover);
-local v1 = require(script.Anchor);
-local v2 = require(script.Content);
+local Foundation = script:FindFirstAncestor("Foundation")
+local Flags = require(Foundation.Utility.Flags)
+local Popover = require(script.Popover)
+local Anchor = require(script.Anchor)
+local Content = require(script.Content)
+
 return {
-    Root = v0, 
-    Anchor = v1, 
-    Content = v2
-};
+	Root = Popover,
+	Anchor = Anchor,
+	Content = if not Flags.FoundationPopoverPluginSupport then Content else require(script.PopoverContentProxy)
+}

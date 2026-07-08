@@ -1,6 +1,7 @@
-local v0 = require(script.SessionType);
-local v1 = require(script.SetGamePlaySession);
+local SessionType = require(script.SessionType)
+local SetGamePlaySession = require(script.SetGamePlaySession)
+
 return {
-    SessionType = v0, 
-    SetGamePlaySession = v1
-};
+	SessionType = SessionType,
+	SetGamePlaySession = SetGamePlaySession
+}

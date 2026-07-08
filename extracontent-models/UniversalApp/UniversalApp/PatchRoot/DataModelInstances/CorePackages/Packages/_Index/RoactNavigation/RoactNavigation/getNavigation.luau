@@ -1,66 +1,68 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local v3 = require(l_Parent_0.Events);
-local v4 = require(l_Parent_0.routers.getNavigationActionCreators);
-local v5 = require(l_Parent_0.getChildNavigation);
-local v6 = require(l_Parent_0.getChildrenNavigationCache);
-return function(v7, v8, v9, v10, v11, v12) --[[ Line: 13 ]]
-    -- upvalues: v6 (copy), v5 (copy), v3 (copy), l_Object_0 (copy), v4 (copy)
-    local v13 = v7.getActionCreators(v8, nil);
-    local v14 = {
-        actions = v13, 
-        router = v7, 
-        state = v8, 
-        dispatch = v9, 
-        getScreenProps = v11, 
-        _dangerouslyGetParent = function() --[[ Line: 24 ]] --[[ Name: _dangerouslyGetParent ]]
-            return nil;
-        end, 
-        isFirstRouteInParent = function() --[[ Line: 27 ]] --[[ Name: isFirstRouteInParent ]]
-            return true;
-        end, 
-        _childrenNavigation = v6(v12())
-    };
-    v14.getChildNavigation = function(v15) --[[ Line: 33 ]] --[[ Name: getChildNavigation ]]
-        -- upvalues: v5 (ref), v14 (copy), v12 (copy)
-        return v5(v14, v15, v12);
-    end;
-    v14.isFocused = function(v16) --[[ Line: 37 ]] --[[ Name: isFocused ]]
-        -- upvalues: v12 (copy)
-        local l_state_0 = v12().state;
-        local l_routes_0 = l_state_0.routes;
-        local l_index_0 = l_state_0.index;
-        local v20 = true;
-        if v16 ~= nil then
-            v20 = l_routes_0[l_index_0].key == v16;
-        end;
-        return v20;
-    end;
-    v14.addListener = function(v21, v22) --[[ Line: 45 ]] --[[ Name: addListener ]]
-        -- upvalues: v3 (ref), v10 (copy)
-        if v21 ~= v3.Action then
-            return {
-                remove = function() --[[ Line: 47 ]] --[[ Name: remove ]]
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Object = require(scriptParentParent.LuauPolyfill).Object
+local Events = require(scriptParent.Events)
+local getNavigationActionCreators = require(scriptParent.routers.getNavigationActionCreators)
+local getChildNavigation = require(scriptParent.getChildNavigation)
+local getChildrenNavigationCache = require(scriptParent.getChildrenNavigationCache)
 
-                end
-            };
-        else
-            v10[v22] = true;
-            return {
-                remove = function() --[[ Line: 51 ]] --[[ Name: remove ]]
-                    -- upvalues: v10 (ref), v22 (copy)
-                    v10[v22] = nil;
-                end
-            };
-        end;
-    end;
-    local v23 = l_Object_0.assign(v4(v14.state), v13);
-    for v24, _ in v23 do
-        v14[v24] = function(...) --[[ Line: 61 ]]
-            -- upvalues: v14 (copy), v23 (copy), v24 (copy)
-            v14.dispatch(v23[v24](...));
-        end;
-    end;
-    return v14;
-end;
+return function(p1, p2, p3, p4, p5, p6) -- line: 13
+	-- upvalues: getChildrenNavigationCache (copy), getChildNavigation (copy), Events (copy), Object (copy), getNavigationActionCreators (copy)
+	local v14 = p1.getActionCreators(p2, nil)
+	local t1 = {
+		actions = v14,
+		router = p1,
+		state = p2,
+		dispatch = p3,
+		getScreenProps = p5,
+		_dangerouslyGetParent = function() -- line: 24
+			return nil
+		end,
+		isFirstRouteInParent = function() -- line: 27
+			return true
+		end,
+		_childrenNavigation = getChildrenNavigationCache(p6())
+	}
+
+	function t1.getChildNavigation(p7) -- line: 33
+		-- upvalues: getChildNavigation (copy), t1 (copy), p6 (copy)
+		return getChildNavigation(t1, p7, p6)
+	end
+	function t1.isFocused(p8) -- line: 37
+		-- upvalues: p6 (copy)
+		local state = p6().state
+		local routes = state.routes
+		local index = state.index
+
+		return p8 == nil or p8 == routes[index].key
+	end
+	function t1.addListener(p9, p10) -- line: 45
+		-- upvalues: Events (copy), p4 (copy)
+		if p9 ~= Events.Action then
+			return {
+				remove = function() -- line: 47
+				end
+			}
+		end
+
+		p4[p10] = true
+
+		return {
+			remove = function() -- line: 51
+				-- upvalues: p4 (copy), p10 (copy)
+				p4[p10] = nil
+			end
+		}
+	end
+
+	local v16 = Object.assign(getNavigationActionCreators(t1.state), v14)
+
+	for v17, _ in v16 do
+		t1[v17] = function(...) -- line: 61
+			-- upvalues: t1 (copy), v16 (copy), v17 (copy)
+			t1.dispatch(v16[v17](...))
+		end
+	end
+
+	return t1
+end

@@ -1,29 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Components.Common.Badge);
-local l_Enums_0 = v3.Enums;
-local l_FFlagAXUseStarIconForFavorites_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXUseStarIconForFavorites;
-return function(v7) --[[ Line: 35 ]] --[[ Name: ControlBar ]]
-    -- upvalues: v2 (copy), v3 (copy), v4 (copy), l_FFlagAXUseStarIconForFavorites_0 (copy), l_Enums_0 (copy)
-    return v2.createElement(v3.View, {
-        tag = "auto-xy row align-x-left align-y-center gap-small", 
-        LayoutOrder = v7.LayoutOrder
-    }, {
-        FavoritesBadge = v2.createElement(v4, {
-            icon = if l_FFlagAXUseStarIconForFavorites_0 then l_Enums_0.IconName.Star else l_Enums_0.IconName.Bookmark, 
-            iconVariant = v7.favoritesBadge.iconVariant, 
-            text = v7.favoritesBadge.text, 
-            onActivated = v7.favoritesBadge.onActivated, 
-            LayoutOrder = 1
-        }), 
-        TryOnBadge = if v7.tryOnBadge then v2.createElement(v4, {
-            icon = l_Enums_0.IconName.MirrorStanding, 
-            iconVariant = v7.tryOnBadge.iconVariant, 
-            text = v7.tryOnBadge.text, 
-            onActivated = v7.tryOnBadge.onActivated, 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local Badge = require(AvatarExperienceInspectAndBuy.Components.Common.Badge)
+local Enums = Foundation.Enums
+
+local function ControlBar(t1: {[any]: any}) -- line: 33
+	-- upvalues: React (copy), Foundation (copy), Badge (copy), Enums (copy)
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy row align-x-left align-y-center gap-small",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		FavoritesBadge = React.createElement(Badge, {
+			LayoutOrder = 1,
+			icon = Enums.IconName.Star,
+			iconVariant = t1.favoritesBadge.iconVariant,
+			text = t1.favoritesBadge.text,
+			onActivated = t1.favoritesBadge.onActivated
+		}),
+		TryOnBadge = if not t1.tryOnBadge then nil else React.createElement(Badge, {
+			LayoutOrder = 2,
+			icon = Enums.IconName.MirrorStanding,
+			iconVariant = t1.tryOnBadge.iconVariant,
+			text = t1.tryOnBadge.text,
+			onActivated = t1.tryOnBadge.onActivated
+		})
+	})
+end
+
+return ControlBar

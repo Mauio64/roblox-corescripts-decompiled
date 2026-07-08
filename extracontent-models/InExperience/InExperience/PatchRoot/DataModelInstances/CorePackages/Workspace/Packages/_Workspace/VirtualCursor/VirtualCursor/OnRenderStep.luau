@@ -1,259 +1,292 @@
-local l_Parent_0 = script.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Players_0 = game:GetService("Players");
-local l_GamepadService_0 = game:GetService("GamepadService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v5 = nil;
-local v6 = require(l_Parent_0.Input);
-local v7 = require(l_Parent_0.Interface);
-local v8 = require(l_Parent_0.Properties);
-local v9 = require(l_Parent_0.isCircleContainedInGuiObject);
-local v10 = require(l_Parent_0.RotatePointAroundObject);
-local v11 = 1;
-local v12 = false;
-local l_sin_0 = math.sin;
-local l_cos_0 = math.cos;
-local _ = math.abs;
-local l_max_0 = math.max;
-local l_min_0 = math.min;
-local l_sign_0 = math.sign;
-local l_abs_1 = math.abs;
-local v20 = {};
-local v21 = nil;
-local v22 = nil;
-local v23 = 1e999;
-local function _(v24) --[[ Line: 36 ]] --[[ Name: isSelectableGuiObject ]]
-    if not v24:IsA("GuiButton") and not v24:IsA("TextBox") then
-        return false;
-    elseif not v24.Active or not v24.Selectable then
-        return false;
-    elseif v24.AbsoluteSize.Magnitude == 0 then
-        return false;
-    else
-        return true;
-    end;
-end;
-local function _(v26, v27, v28) --[[ Line: 50 ]] --[[ Name: contains ]]
-    local v29 = false;
-    if v26.x >= v27.x then
-        v29 = false;
-        if v26.y >= v27.y then
-            v29 = false;
-            if v26.x <= v28.x then
-                v29 = v26.y <= v28.y;
-            end;
-        end;
-    end;
-    return v29;
-end;
-local function v52(v31, v32, v33) --[[ Line: 54 ]] --[[ Name: handleScrollingFrame ]]
-    -- upvalues: v20 (copy), v6 (copy), v8 (copy), l_abs_1 (copy), l_cos_0 (copy), l_sin_0 (copy), l_max_0 (copy), l_min_0 (copy), l_sign_0 (copy), v7 (copy)
-    if not v31:IsA("ScrollingFrame") then
-        return false;
-    elseif not v31.ScrollingEnabled then
-        return false;
-    elseif v20[v31] then
-        return false;
-    else
-        v20[v31] = true;
-        local l_v6_Thumbstick2Vector_0 = v6:GetThumbstick2Vector();
-        local v35 = v8.ScrollingSpeed * v33;
-        local l_ScrollingRadius_0 = v8.ScrollingRadius;
-        local l_AbsoluteCanvasSize_0 = v31.AbsoluteCanvasSize;
-        local l_AbsoluteSize_0 = v31.AbsoluteSize;
-        local l_ScrollingDirection_0 = v31.ScrollingDirection;
-        local v40 = false;
-        if l_AbsoluteCanvasSize_0.X > l_AbsoluteSize_0.X then
-            v40 = true;
-            if l_ScrollingDirection_0 ~= Enum.ScrollingDirection.XY then
-                v40 = l_ScrollingDirection_0 == Enum.ScrollingDirection.X;
-            end;
-        end;
-        local v41 = false;
-        if l_AbsoluteCanvasSize_0.Y > l_AbsoluteSize_0.Y then
-            v41 = true;
-            if l_ScrollingDirection_0 ~= Enum.ScrollingDirection.XY then
-                v41 = l_ScrollingDirection_0 == Enum.ScrollingDirection.Y;
-            end;
-        end;
-        local l_AbsoluteSize_1 = v31.AbsoluteSize;
-        local l_AbsolutePosition_0 = v31.AbsolutePosition;
-        local v44 = v31.Rotation / 180 * 3.141592653589793;
-        if l_abs_1(l_v6_Thumbstick2Vector_0.x) > v8.ThumbstickDeadzone and v40 then
-            v31.CanvasPosition = v31.CanvasPosition + Vector2.new(l_v6_Thumbstick2Vector_0.x * v35, 0);
-        end;
-        if l_abs_1(l_v6_Thumbstick2Vector_0.y) > v8.ThumbstickDeadzone and v41 then
-            v31.CanvasPosition = v31.CanvasPosition + Vector2.new(0, l_v6_Thumbstick2Vector_0.y * v35);
-        end;
-        local v45 = Vector2.new(l_cos_0(v44), (l_sin_0(v44)));
-        local v46 = Vector2.new(-l_sin_0(v44), (l_cos_0(v44)));
-        local v47 = Vector2.new(v32.X, v32.Y) - l_AbsolutePosition_0;
-        local v48 = v47:Dot(v45) - l_AbsoluteSize_1.X / 2;
-        local v49 = v47:Dot(v46) - l_AbsoluteSize_1.Y / 2;
-        local v50 = Vector2.new(l_abs_1(v48), (l_abs_1(v49))) - l_AbsoluteSize_1 / 2;
-        local l_Magnitude_0 = Vector2.new(l_max_0(v50.x, 0), (l_max_0(v50.y, 0))).Magnitude;
-        if l_abs_1(l_min_0(l_max_0(v50.x, v50.y), 0) + l_Magnitude_0) < l_ScrollingRadius_0 then
-            if l_abs_1(v50.x) < l_abs_1(v50.y) and v40 then
-                v31.CanvasPosition = v31.CanvasPosition + Vector2.new(l_sign_0(v48) * v35, 0);
-                v7:SetArrow(l_sign_0(v48), 0);
-                return true;
-            elseif l_abs_1(v50.x) >= l_abs_1(v50.y) and v41 then
-                v31.CanvasPosition = v31.CanvasPosition + Vector2.new(0, l_sign_0(v49) * v35);
-                v7:SetArrow(0, (l_sign_0(v49)));
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
-local function v65(_, v54, v55, v56) --[[ Line: 119 ]] --[[ Name: findClosestOrOccludingGuiObject ]]
-    -- upvalues: v52 (copy), v12 (ref), v21 (ref), v10 (copy), v23 (ref), v9 (copy), v8 (copy), v22 (ref)
-    for _, v58 in ipairs(v54) do
-        if v52(v58, v55, v56) then
-            v12 = true;
-            return;
-        else
-            if (if not not v58:IsA("GuiButton") or v58:IsA("TextBox") then if v58.Active and v58.Selectable then v58.AbsoluteSize.Magnitude ~= 0 else false else false) and not v21 then
-                v21 = v58;
-            end;
-            if if not not v58:IsA("GuiButton") or v58:IsA("TextBox") then if v58.Active and v58.Selectable then v58.AbsoluteSize.Magnitude ~= 0 else false else false then
-                local l_AbsolutePosition_1 = v58.AbsolutePosition;
-                local v60 = v58.AbsolutePosition + v58.AbsoluteSize;
-                local v61 = 0;
-                local v62 = if v58.AbsoluteRotation ~= 0 then v10(v55, v58) else v55;
-                if v62.x < l_AbsolutePosition_1.x or v62.y < l_AbsolutePosition_1.y or v62.x > v60.x or v62.y > v60.y then
-                    local v63 = if v62.x < l_AbsolutePosition_1.x then l_AbsolutePosition_1.x - v62.x else if v62.x > v60.x then v62.x - v60.x else 0;
-                    local v64 = if v62.y < l_AbsolutePosition_1.y then l_AbsolutePosition_1.y - v62.y else if v62.y > v60.y then v62.y - v60.y else 0;
-                    v61 = math.sqrt(math.pow(v63, 2) + math.pow(v64, 2));
-                end;
-                if v61 < v23 then
-                    v21 = v58;
-                    v23 = v61;
-                end;
-            end;
-            if v58.Visible and v58.Active and v58.Interactable and v9(v55, v8.CursorRadius * v8.OcclusionRadiusScale, v58) then
-                v22 = v58;
-                return;
-            end;
-        end;
-    end;
-end;
-local function v71(v66, v67, v68, v69) --[[ Line: 172 ]] --[[ Name: handleScrollingInAncestors ]]
-    -- upvalues: v52 (copy), v12 (ref)
-    local l_Parent_1 = v66.Parent;
-    while true do
-        if l_Parent_1 and l_Parent_1 ~= v67 then
-            if v52(l_Parent_1, v68, v69) then
-                v12 = true;
-                return;
-            else
-                l_Parent_1 = l_Parent_1.Parent;
-            end;
-        else
-            return;
-        end;
-    end;
-end;
-local function v81(v72, v73, v74) --[[ Line: 183 ]] --[[ Name: processCursorPosition ]]
-    -- upvalues: v20 (copy), v21 (ref), v22 (ref), v23 (ref), l_GuiService_0 (copy), v5 (ref), l_Players_0 (copy), l_CoreGui_0 (copy), v12 (ref), v65 (copy), v71 (copy)
-    table.clear(v20);
-    v21 = nil;
-    v22 = nil;
-    v23 = 1e999;
-    v72 = v72 - l_GuiService_0:GetGuiInset();
-    if v5 == nil then
-        v5 = l_Players_0.LocalPlayer:FindFirstChildOfClass("PlayerGui");
-    end;
-    local v75 = if v5 then v5:GetGuiObjectsInCircle(v72, v73) else {};
-    local l_l_CoreGui_0_GuiObjectsInCircle_0 = l_CoreGui_0:GetGuiObjectsInCircle(v72, v73);
-    v12 = false;
-    for _, v78 in ipairs({
-        {
-            l_CoreGui_0, 
-            l_l_CoreGui_0_GuiObjectsInCircle_0
-        }, 
-        {
-            v5, 
-            v75
-        }
-    }) do
-        local v79 = v78[1];
-        local v80 = v78[2];
-        v65(v79, v80, v72, v74);
-        if v12 then
-            return nil;
-        else
-            if v21 then
-                v71(v21, v79, v72, v74);
-            end;
-            if v12 then
-                return nil;
-            else
-                if v22 and v22 ~= v21 then
-                    v71(v22, v79, v72, v74);
-                end;
-                if v12 then
-                    return nil;
-                elseif v22 then
-                    return v21;
-                end;
-            end;
-        end;
-    end;
-    return v21;
-end;
-local function _() --[[ Line: 248 ]] --[[ Name: getMaxSpeed ]]
-    -- upvalues: l_GuiService_0 (copy), v8 (copy)
-    return l_GuiService_0:GetScreenResolution().Magnitude * v8.MaxSpeedRelative;
-end;
-return function(v83, v84) --[[ Line: 253 ]]
-    -- upvalues: l_GuiService_0 (copy), v6 (copy), l_GamepadService_0 (copy), v11 (ref), v7 (copy), v12 (ref), v8 (copy), v81 (copy), l_CoreGui_0 (copy), v5 (ref)
-    local v85 = l_GuiService_0:GetScreenResolution() + l_GuiService_0:GetGuiInset();
-    local l_v6_ThumbstickVector_0 = v6:GetThumbstickVector();
-    local l_l_GamepadService_0_GamepadCursorPosition_0 = l_GamepadService_0:GetGamepadCursorPosition();
-    local v88 = nil;
-    local _ = Vector2.new();
-    if v83.SelectedObject == nil then
-        v11 = 1;
-        v7:SetCursorHighlight(false);
-    end;
-    if v12 then
-        v11 = v8.ScrollingSlowDown;
-    end;
-    v88 = l_v6_ThumbstickVector_0 * (l_GuiService_0:GetScreenResolution().Magnitude * v8.MaxSpeedRelative) * v11;
-    if v88.Magnitude > 0 then
-        local v90 = l_l_GamepadService_0_GamepadCursorPosition_0 + v88 * v84;
-        local v91 = math.clamp(v90.x, 0, v85.x);
-        local v92 = math.clamp(v90.y, 0, v85.y);
-        l_l_GamepadService_0_GamepadCursorPosition_0 = Vector2.new(v91, v92);
-    end;
-    v7:SetCursorPosition(l_l_GamepadService_0_GamepadCursorPosition_0);
-    l_GamepadService_0:SetGamepadCursorPosition(l_l_GamepadService_0_GamepadCursorPosition_0);
-    v83.CursorPosition = l_l_GamepadService_0_GamepadCursorPosition_0;
-    local v93 = v81(l_l_GamepadService_0_GamepadCursorPosition_0, v8.SelectionRadius, v84);
-    if v93 ~= v83.PreviouslySelectedObject then
-        v83.PreviouslySelectedObject = v93;
-        v7:SetCursorHighlight(v93 ~= nil);
-        if v93 then
-            if v93 ~= v83.SelectedObject then
-                v83.SelectedObject = v93;
-                v11 = v8.SpeedAdjustmentTarget;
-            end;
-        else
-            v83.SelectedObject = nil;
-            v11 = 1;
-        end;
-        if v83.SelectedObject == nil then
-            l_GuiService_0.SelectedObject = nil;
-            l_GuiService_0.SelectedCoreObject = nil;
-            return;
-        elseif v83.SelectedObject:IsDescendantOf(l_CoreGui_0) then
-            l_GuiService_0.SelectedCoreObject = v83.SelectedObject;
-            l_GuiService_0.SelectedObject = nil;
-            return;
-        elseif v83.SelectedObject:IsDescendantOf(v5) then
-            l_GuiService_0.SelectedObject = v83.SelectedObject;
-            l_GuiService_0.SelectedCoreObject = nil;
-        end;
-    end;
-end;
+local scriptParent = script.Parent
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
+local GamepadService = game:GetService("GamepadService")
+local CoreGui = game:GetService("CoreGui")
+local PlayerGui = nil
+local Input = require(scriptParent.Input)
+local Interface = require(scriptParent.Interface)
+local Properties = require(scriptParent.Properties)
+local isCircleContainedInGuiObject = require(scriptParent.isCircleContainedInGuiObject)
+local RotatePointAroundObject = require(scriptParent.RotatePointAroundObject)
+local n1 = 1
+local u13 = false
+local sin = math.sin
+local cos = math.cos
+local _ = math.abs
+local max = math.max
+local min = math.min
+local sign = math.sign
+local abs = math.abs
+local t1 = {}
+local u22 = nil
+local u23 = nil
+local n2 = 1e999
+
+local function isSelectableGuiObject(p1) -- line: 36
+	if not p1:IsA("GuiButton") and not p1:IsA("TextBox") then
+		return false
+	end
+
+	if not p1.Active or not p1.Selectable then
+		return false
+	end
+
+	if p1.AbsoluteSize.Magnitude == 0 then
+		return false
+	end
+
+	return true
+end
+local function contains(p2, p3, p4) -- line: 50
+	return p2.x >= p3.x and (p2.y >= p3.y and (p2.x <= p4.x and p2.y <= p4.y))
+end
+local function handleScrollingFrame(p5, p6, p7) -- line: 54
+	-- upvalues: t1 (copy), Input (copy), Properties (copy), abs (copy), cos (copy), sin (copy), max (copy), min (copy), sign (copy), Interface (copy)
+	if not p5:IsA("ScrollingFrame") then
+		return false
+	end
+
+	if not p5.ScrollingEnabled then
+		return false
+	end
+
+	if t1[p5] then
+		return false
+	end
+
+	t1[p5] = true
+
+	local Thumbstick2Vector = Input:GetThumbstick2Vector()
+	local v40 = Properties.ScrollingSpeed * p7
+	local ScrollingRadius = Properties.ScrollingRadius
+	local AbsoluteCanvasSize = p5.AbsoluteCanvasSize
+	local AbsoluteSize = p5.AbsoluteSize
+	local ScrollingDirection = p5.ScrollingDirection
+	local v45 = AbsoluteCanvasSize.X > AbsoluteSize.X and (ScrollingDirection == Enum.ScrollingDirection.XY or ScrollingDirection == Enum.ScrollingDirection.X)
+	local v46 = AbsoluteCanvasSize.Y > AbsoluteSize.Y and (ScrollingDirection == Enum.ScrollingDirection.XY or ScrollingDirection == Enum.ScrollingDirection.Y)
+	local AbsoluteSize2 = p5.AbsoluteSize
+	local AbsolutePosition = p5.AbsolutePosition
+	local v49 = p5.Rotation / 180 * 3.141592653589793
+
+	if abs(Thumbstick2Vector.x) > Properties.ThumbstickDeadzone and v45 then
+		p5.CanvasPosition = p5.CanvasPosition + Vector2.new(Thumbstick2Vector.x * v40, 0)
+	end
+
+	if abs(Thumbstick2Vector.y) > Properties.ThumbstickDeadzone and v46 then
+		p5.CanvasPosition = p5.CanvasPosition + Vector2.new(0, Thumbstick2Vector.y * v40)
+	end
+
+	local vector2 = Vector2.new(cos(v49), (sin(v49)))
+	local vector2_2 = Vector2.new(-sin(v49), (cos(v49)))
+	local v52 = Vector2.new(p6.X, p6.Y) - AbsolutePosition
+	local v53 = v52:Dot(vector2) - AbsoluteSize2.X / 2
+	local v54 = v52:Dot(vector2_2) - AbsoluteSize2.Y / 2
+	local v55 = Vector2.new(abs(v53), (abs(v54))) - AbsoluteSize2 / 2
+	local Magnitude = Vector2.new(max(v55.x, 0), (max(v55.y, 0))).Magnitude
+
+	if ScrollingRadius > abs(min(max(v55.x, v55.y), 0) + Magnitude) then
+		if abs(v55.x) < abs(v55.y) and v45 then
+			p5.CanvasPosition = p5.CanvasPosition + Vector2.new(sign(v53) * v40, 0)
+			Interface:SetArrow(sign(v53), 0)
+
+			return true
+		end
+
+		if abs(v55.x) >= abs(v55.y) and v46 then
+			p5.CanvasPosition = p5.CanvasPosition + Vector2.new(0, sign(v54) * v40)
+			Interface:SetArrow(0, (sign(v54)))
+
+			return true
+		end
+	end
+
+	return false
+end
+local function findClosestOrOccludingGuiObject(_, t2: {[any]: any}, p9, p10) -- line: 119
+	-- upvalues: handleScrollingFrame (copy), u13 (ref), u22 (ref), RotatePointAroundObject (copy), n2 (ref), isCircleContainedInGuiObject (copy), Properties (copy), u23 (ref)
+	for _, v in ipairs(t2) do
+		if handleScrollingFrame(v, p9, p10) then
+			u13 = true
+
+			return
+		end
+
+		if ((if v:IsA("GuiButton") or v:IsA("TextBox") then not not v.Active and (if v.Selectable then v.AbsoluteSize.Magnitude ~= 0 else false) else false)) and not u22 then
+			u22 = v
+		end
+
+		if if v:IsA("GuiButton") or v:IsA("TextBox") then not not v.Active and if v.Selectable then v.AbsoluteSize.Magnitude ~= 0 else false else false then
+			local AbsolutePosition = v.AbsolutePosition
+			local v64 = v.AbsolutePosition + v.AbsoluteSize
+			local n3 = 0
+			local v66 = if v.AbsoluteRotation == 0 then p9 else RotatePointAroundObject(p9, v)
+
+			if v66.x < AbsolutePosition.x or v66.y < AbsolutePosition.y or v66.x > v64.x or v66.y > v64.y then
+				local v67 = if not (v66.x < AbsolutePosition.x) then not (v66.x > v64.x) and 0 or v66.x - v64.x else AbsolutePosition.x - v66.x
+				local v68 = if not (v66.y < AbsolutePosition.y) then not (v66.y > v64.y) and 0 or v66.y - v64.y else AbsolutePosition.y - v66.y
+
+				n3 = math.sqrt(math.pow(v67, 2) + math.pow(v68, 2))
+			end
+
+			if n3 < n2 then
+				u22 = v
+				n2 = n3
+			end
+		end
+
+		if v.Visible and v.Active and v.Interactable and isCircleContainedInGuiObject(p9, Properties.CursorRadius * Properties.OcclusionRadiusScale, v) then
+			u23 = v
+
+			return
+		end
+	end
+end
+local function handleScrollingInAncestors(p11, p12, p13, p14) -- line: 172
+	-- upvalues: handleScrollingFrame (copy), u13 (ref)
+	local p11Parent = p11.Parent
+
+	while p11Parent and p11Parent ~= p12 do
+		if handleScrollingFrame(p11Parent, p13, p14) then
+			u13 = true
+
+			return
+		end
+
+		p11Parent = p11Parent.Parent
+	end
+end
+local function processCursorPosition(p15, p16, p17) -- line: 183
+	-- upvalues: t1 (copy), u22 (ref), u23 (ref), n2 (ref), GuiService (copy), PlayerGui (ref), Players (copy), CoreGui (copy), u13 (ref), findClosestOrOccludingGuiObject (copy), handleScrollingInAncestors (copy)
+	table.clear(t1)
+	u22 = nil
+	u23 = nil
+	n2 = 1e999
+
+	local v77 = p15 - GuiService:GetGuiInset()
+
+	if PlayerGui == nil then
+		PlayerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
+	end
+
+	local v78 = if not PlayerGui then {} else PlayerGui:GetGuiObjectsInCircle(v77, p16)
+	local GuiObjectsInCircle = CoreGui:GetGuiObjectsInCircle(v77, p16)
+
+	u13 = false
+
+	local t3 = {
+		{
+			CoreGui,
+			GuiObjectsInCircle
+		},
+		{
+			PlayerGui,
+			v78
+		}
+	}
+
+	for _, v in ipairs(t3) do
+		local v83 = v[1]
+		local v84 = v[2]
+
+		findClosestOrOccludingGuiObject(v83, v84, v77, p17)
+
+		if u13 then
+			return nil
+		end
+
+		if u22 then
+			handleScrollingInAncestors(u22, v83, v77, p17)
+		end
+
+		if u13 then
+			return nil
+		end
+
+		if u23 and u23 ~= u22 then
+			handleScrollingInAncestors(u23, v83, v77, p17)
+		end
+
+		if u13 then
+			return nil
+		end
+
+		if u23 then
+			return u22
+		end
+	end
+
+	return u22
+end
+local function getMaxSpeed() -- line: 248
+	-- upvalues: GuiService (copy), Properties (copy)
+	return GuiService:GetScreenResolution().Magnitude * Properties.MaxSpeedRelative
+end
+
+return function(p18, p19) -- line: 253
+	-- upvalues: GuiService (copy), Input (copy), GamepadService (copy), n1 (ref), Interface (copy), u13 (ref), Properties (copy), processCursorPosition (copy), CoreGui (copy), PlayerGui (ref)
+	local v87 = GuiService:GetScreenResolution() + GuiService:GetGuiInset()
+	local ThumbstickVector = Input:GetThumbstickVector()
+	local GamepadCursorPosition = GamepadService:GetGamepadCursorPosition()
+
+	Vector2.new()
+
+	if p18.SelectedObject == nil then
+		n1 = 1
+		Interface:SetCursorHighlight(false)
+	end
+
+	if u13 then
+		n1 = Properties.ScrollingSlowDown
+	end
+
+	local v90 = ThumbstickVector * (GuiService:GetScreenResolution().Magnitude * Properties.MaxSpeedRelative) * n1
+
+	if v90.Magnitude > 0 then
+		local v91 = GamepadCursorPosition + v90 * p19
+		local v92 = math.clamp(v91.x, 0, v87.x)
+		local v93 = math.clamp(v91.y, 0, v87.y)
+
+		GamepadCursorPosition = Vector2.new(v92, v93)
+	end
+
+	Interface:SetCursorPosition(GamepadCursorPosition)
+	GamepadService:SetGamepadCursorPosition(GamepadCursorPosition)
+	p18.CursorPosition = GamepadCursorPosition
+
+	local v94 = processCursorPosition(GamepadCursorPosition, Properties.SelectionRadius, p19)
+
+	if v94 ~= p18.PreviouslySelectedObject then
+		p18.PreviouslySelectedObject = v94
+		Interface:SetCursorHighlight(v94 ~= nil)
+
+		if v94 then
+			if v94 ~= p18.SelectedObject then
+				p18.SelectedObject = v94
+				n1 = Properties.SpeedAdjustmentTarget
+			end
+		else
+			p18.SelectedObject = nil
+			n1 = 1
+		end
+
+		if p18.SelectedObject == nil then
+			GuiService.SelectedObject = nil
+			GuiService.SelectedCoreObject = nil
+
+			return
+		end
+
+		if p18.SelectedObject:IsDescendantOf(CoreGui) then
+			GuiService.SelectedCoreObject = p18.SelectedObject
+			GuiService.SelectedObject = nil
+
+			return
+		end
+
+		if p18.SelectedObject:IsDescendantOf(PlayerGui) then
+			GuiService.SelectedObject = p18.SelectedObject
+			GuiService.SelectedCoreObject = nil
+		end
+	end
+end

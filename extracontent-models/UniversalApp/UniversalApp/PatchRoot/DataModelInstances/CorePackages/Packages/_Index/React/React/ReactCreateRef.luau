@@ -1,36 +1,43 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local _ = require(l_Parent_0.Shared);
-local v3 = require(script.Parent["ReactBinding.roblox"]);
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+
+require(ParentParent.Shared)
+
+local lib = require(script.Parent["ReactBinding.roblox"])
+
 return {
-    createRef = function() --[[ Line: 26 ]]
-        -- upvalues: v3 (copy), v1 (copy)
-        local v4, _ = v3.create(nil);
-        local v6 = {};
-        if v1.__DEV__ then
-            v4._source = debug.traceback("Ref created at:", 1);
-        end;
-        setmetatable(v6, {
-            __index = function(_, v8) --[[ Line: 44 ]] --[[ Name: __index ]]
-                -- upvalues: v4 (copy)
-                if v8 == "current" then
-                    return v4:getValue();
-                else
-                    return v4[v8];
-                end;
-            end, 
-            __newindex = function(_, v10, v11) --[[ Line: 51 ]] --[[ Name: __newindex ]]
-                -- upvalues: v3 (ref), v4 (copy)
-                if v10 == "current" then
-                    v3.update(v4, v11);
-                end;
-                v4[v10] = v11;
-            end, 
-            __tostring = function(_) --[[ Line: 62 ]] --[[ Name: __tostring ]]
-                -- upvalues: v4 (copy)
-                return string.format("Ref(%s)", (tostring(v4:getValue())));
-            end
-        });
-        return v6;
-    end
-};
+	createRef = function() -- line: 26
+		-- upvalues: lib (copy), ReactGlobals (copy)
+		local v4, _ = lib.create(nil)
+		local t1 = {}
+
+		if ReactGlobals.__DEV__ then
+			v4._source = debug.traceback("Ref created at:", 1)
+		end
+
+		setmetatable(t1, {
+			__index = function(_, p2) -- line: 44
+				-- upvalues: v4 (copy)
+				if p2 == "current" then
+					return v4:getValue()
+				end
+
+				return v4[p2]
+			end,
+			__newindex = function(_, p4, p5) -- line: 51
+				-- upvalues: lib (copy), v4 (copy)
+				if p4 == "current" then
+					lib.update(v4, p5)
+				end
+
+				v4[p4] = p5
+			end,
+			__tostring = function(_) -- line: 62
+				-- upvalues: v4 (copy)
+				return string.format("Ref(%s)", (tostring(v4:getValue())))
+			end
+		})
+
+		return t1
+	end
+}

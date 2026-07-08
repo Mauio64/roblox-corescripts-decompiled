@@ -1,47 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.llama);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v4 = require(l_Actions_0.FriendshipCreated);
-local v5 = require(l_Actions_0.FriendshipDestroyed);
-local v6 = require(script.Parent.utils.addUser);
-local v7 = require(script.Parent.utils.removeUser);
-local v8 = require(script.Parent.utils.setFriendshipsInStore);
-local v9 = require(script.Parent.utils.removeTargetUserFriendshipInStore);
-local v10 = require(script.Parent.utils.countUserFriendsInStore);
-local _ = require(l_script_FirstAncestor_0.roduxFriendsTypes);
-local v12 = {
-    byUserId = {}, 
-    countsByUserId = {}
-};
-return function(v13) --[[ Line: 21 ]]
-    -- upvalues: v12 (copy), v4 (copy), v2 (copy), v6 (copy), v5 (copy), v7 (copy), v8 (copy), v10 (copy), v9 (copy)
-    local l_friendsNetworking_0 = v13.friendsNetworking;
-    return function(v15, v16) --[[ Line: 24 ]]
-        -- upvalues: v12 (ref), v4 (ref), v2 (ref), v6 (ref), v5 (ref), v7 (ref), l_friendsNetworking_0 (copy), v8 (ref), v10 (ref), v9 (ref)
-        local v17 = v15 or v12;
-        if v16 and v16.type == v4.name then
-            assert(type(v16.payload.userId1) == "string", "Expected userId1 to be a string");
-            assert(type(v16.payload.userId2) == "string", "Expected userId2 to be a string");
-            return (v2.Dictionary.join(v17.countsByUserId, {
-                [v16.payload.userId1] = #v6(v17.byUserId[v16.payload.userId1], v16.payload.userId2), 
-                [v16.payload.userId2] = #v6(v17.byUserId[v16.payload.userId2], v16.payload.userId1)
-            }));
-        elseif v16 and v16.type == v5.name then
-            assert(type(v16.payload.userId1) == "string", "Expected userId1 to be a string");
-            assert(type(v16.payload.userId2) == "string", "Expected userId2 to be a string");
-            return (v2.Dictionary.join(v17.countsByUserId, {
-                [v16.payload.userId1] = #v7(v17.byUserId[v16.payload.userId1], v16.payload.userId2), 
-                [v16.payload.userId2] = #v7(v17.byUserId[v16.payload.userId2], v16.payload.userId1)
-            }));
-        elseif v16 and v16.type == l_friendsNetworking_0.GetFriendsFromUserId.Succeeded.name then
-            local v18 = v8(v17.byUserId, v16);
-            return (v10(v18));
-        elseif v16 and v16.type == l_friendsNetworking_0.UnfriendTargetUserId.Succeeded.name then
-            local v19 = v9(v15.byUserId, v16);
-            return (v10(v19));
-        else
-            return v17.countsByUserId;
-        end;
-    end;
-end;
+local FriendsRodux = script:FindFirstAncestor("FriendsRodux")
+local FriendsRoduxParent = FriendsRodux.Parent
+local llama = require(FriendsRoduxParent.llama)
+local Actions = FriendsRodux.Actions
+local FriendshipCreated = require(Actions.FriendshipCreated)
+local FriendshipDestroyed = require(Actions.FriendshipDestroyed)
+local addUser = require(script.Parent.utils.addUser)
+local removeUser = require(script.Parent.utils.removeUser)
+local setFriendshipsInStore = require(script.Parent.utils.setFriendshipsInStore)
+local removeTargetUserFriendshipInStore = require(script.Parent.utils.removeTargetUserFriendshipInStore)
+local countUserFriendsInStore = require(script.Parent.utils.countUserFriendsInStore)
+
+require(FriendsRodux.roduxFriendsTypes)
+
+local t1 = {
+	byUserId = {},
+	countsByUserId = {}
+}
+
+return function(p1) -- line: 21
+	-- upvalues: t1 (copy), FriendshipCreated (copy), llama (copy), addUser (copy), FriendshipDestroyed (copy), removeUser (copy), setFriendshipsInStore (copy), countUserFriendsInStore (copy), removeTargetUserFriendshipInStore (copy)
+	local friendsNetworking = p1.friendsNetworking
+
+	return function(p2, p3) -- line: 24
+		-- upvalues: t1 (copy), FriendshipCreated (copy), llama (copy), addUser (copy), FriendshipDestroyed (copy), removeUser (copy), friendsNetworking (copy), setFriendshipsInStore (copy), countUserFriendsInStore (copy), removeTargetUserFriendshipInStore (copy)
+		local v17 = p2 or t1
+
+		if p3 and p3.type == FriendshipCreated.name then
+			assert(type(p3.payload.userId1) == "string", "Expected userId1 to be a string")
+			assert(type(p3.payload.userId2) == "string", "Expected userId2 to be a string")
+
+			return (llama.Dictionary.join(v17.countsByUserId, {
+				[p3.payload.userId1] = #addUser(v17.byUserId[p3.payload.userId1], p3.payload.userId2),
+				[p3.payload.userId2] = #addUser(v17.byUserId[p3.payload.userId2], p3.payload.userId1)
+			}))
+		end
+
+		if p3 and p3.type == FriendshipDestroyed.name then
+			assert(type(p3.payload.userId1) == "string", "Expected userId1 to be a string")
+			assert(type(p3.payload.userId2) == "string", "Expected userId2 to be a string")
+
+			return (llama.Dictionary.join(v17.countsByUserId, {
+				[p3.payload.userId1] = #removeUser(v17.byUserId[p3.payload.userId1], p3.payload.userId2),
+				[p3.payload.userId2] = #removeUser(v17.byUserId[p3.payload.userId2], p3.payload.userId1)
+			}))
+		end
+
+		if p3 and p3.type == friendsNetworking.GetFriendsFromUserId.Succeeded.name then
+			local v18 = setFriendshipsInStore(v17.byUserId, p3)
+
+			return (countUserFriendsInStore(v18))
+		end
+
+		if p3 and p3.type == friendsNetworking.UnfriendTargetUserId.Succeeded.name then
+			local v19 = removeTargetUserFriendshipInStore(p2.byUserId, p3)
+
+			return (countUserFriendsInStore(v19))
+		end
+
+		return v17.countsByUserId
+	end
+end

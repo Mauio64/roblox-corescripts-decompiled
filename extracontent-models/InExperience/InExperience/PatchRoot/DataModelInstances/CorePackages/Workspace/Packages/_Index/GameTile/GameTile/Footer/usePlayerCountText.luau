@@ -1,11 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local l_useAbbreviatedNumberLocalization_0 = require(l_Parent_0.Localization).Hooks.useAbbreviatedNumberLocalization;
-return function(v2) --[[ Line: 5 ]] --[[ Name: usePlayerCountText ]]
-    -- upvalues: l_useAbbreviatedNumberLocalization_0 (copy)
-    local v3 = l_useAbbreviatedNumberLocalization_0(v2);
-    if v3 == nil or v2 == -1 then
-        return "--";
-    else
-        return v3;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local useAbbreviatedNumberLocalization = require(Parent.Localization).Hooks.useAbbreviatedNumberLocalization
+
+local function usePlayerCountText(n1: number?) -- line: 5
+	-- upvalues: useAbbreviatedNumberLocalization (copy)
+	local v5 = useAbbreviatedNumberLocalization(n1)
+
+	if v5 == nil or n1 == -1 then
+		return "--"
+	end
+
+	return v5
+end
+
+return usePlayerCountText

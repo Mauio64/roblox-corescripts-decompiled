@@ -1,32 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-return function(v3, v4) --[[ Line: 11 ]] --[[ Name: createReactTelemetryLayer ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v5 = v1.createContext(function() --[[ Line: 16 ]]
-        -- upvalues: v2 (ref), v4 (copy)
-        return v2.Dictionary.union({}, v4);
-    end);
-    local function v10(v6) --[[ Line: 23 ]] --[[ Name: Provider ]]
-        -- upvalues: v1 (ref), v3 (copy), v2 (ref), v5 (copy)
-        local v7 = v1.useContext(v3);
-        local v9 = v1.useCallback(function() --[[ Line: 25 ]]
-            -- upvalues: v6 (copy), v2 (ref), v7 (copy)
-            local l_value_0 = v6.value;
-            if typeof(l_value_0) == "function" then
-                l_value_0 = l_value_0();
-            end;
-            return v2.Dictionary.union(v7(), l_value_0);
-        end, {
-            v7, 
-            v6.value
-        });
-        return v1.createElement(v5.Provider, {
-            value = v9
-        }, v6.children);
-    end;
-    return {
-        Context = v5, 
-        Provider = v10
-    };
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+
+local function createReactTelemetryLayer(p1, p2) -- line: 11
+	-- upvalues: React (copy), Cryo (copy)
+	local v7 = React.createContext(function() -- line: 16
+		-- upvalues: Cryo (copy), p2 (copy)
+		return Cryo.Dictionary.union({}, p2)
+	end)
+
+	return {
+		Context = v7,
+		Provider = function(t1: {[any]: any}) -- line: 23
+			-- upvalues: React (copy), p1 (copy), Cryo (copy), v7 (copy)
+			local v9 = React.useContext(p1)
+			local v10 = React.useCallback(function() -- line: 25
+				-- upvalues: t1 (copy), Cryo (copy), v9 (copy)
+				local value = t1.value
+
+				if typeof(value) == "function" then
+					value = value()
+				end
+
+				return Cryo.Dictionary.union(v9(), value)
+			end, {
+				v9,
+				t1.value
+			})
+
+			return React.createElement(v7.Provider, {
+				value = v10
+			}, t1.children)
+		end
+	}
+end
+
+return createReactTelemetryLayer

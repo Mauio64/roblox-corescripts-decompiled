@@ -1,1 +1,1 @@
-return require(script.getRbxThumb);
+return require(script.getRbxThumb)

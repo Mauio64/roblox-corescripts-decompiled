@@ -1,71 +1,76 @@
-local l_Parent_0 = script:FindFirstAncestor("AppShortcutBar").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Signals);
-local v3 = require(l_Parent_0.SignalsReact);
-local _ = require(l_Parent_0.FocusNavigationUtils);
-return function() --[[ Line: 21 ]] --[[ Name: createButtonHoldStore ]]
-    -- upvalues: v2 (copy), v1 (copy), v3 (copy)
-    local v5, v6 = v2.createSignal({});
-    local function v11(v7, v8) --[[ Line: 24 ]] --[[ Name: updateButtonHoldState ]]
-        -- upvalues: v6 (copy)
-        v6(function(v9) --[[ Line: 25 ]]
-            -- upvalues: v7 (copy), v8 (copy)
-            if v9[v7] ~= v8 then
-                local v10 = table.clone(v9);
-                v10[v7] = v8;
-                return v10;
-            else
-                return v9;
-            end;
-        end);
-    end;
-    local function v16() --[[ Line: 35 ]] --[[ Name: useDispatchButtonHoldStarted ]]
-        -- upvalues: v1 (ref), v6 (copy), v11 (copy)
-        return (v1.useCallback(function(v12, v13) --[[ Line: 37 ]]
-            -- upvalues: v6 (ref)
-            v6(function(v14) --[[ Line: 25 ]]
-                -- upvalues: v12 (copy), v13 (copy)
-                if v14[v12] ~= v13 then
-                    local v15 = table.clone(v14);
-                    v15[v12] = v13;
-                    return v15;
-                else
-                    return v14;
-                end;
-            end);
-        end, {
-            v11
-        }));
-    end;
-    local function v22() --[[ Line: 45 ]] --[[ Name: useDispatchButtonHoldEnded ]]
-        -- upvalues: v1 (ref), v6 (copy), v11 (copy)
-        return (v1.useCallback(function(v17) --[[ Line: 46 ]]
-            -- upvalues: v6 (ref)
-            local l_v6_0 = v6;
-            local v19 = nil;
-            l_v6_0(function(v20) --[[ Line: 25 ]]
-                -- upvalues: v17 (copy), v19 (copy)
-                if v20[v17] ~= v19 then
-                    local v21 = table.clone(v20);
-                    v21[v17] = v19;
-                    return v21;
-                else
-                    return v20;
-                end;
-            end);
-        end, {
-            v11
-        }));
-    end;
-    local function v23() --[[ Line: 52 ]] --[[ Name: useHeldProgressByEvent ]]
-        -- upvalues: v3 (ref), v5 (copy)
-        return v3.useSignalState(v5);
-    end;
-    return {
-        getButtonHoldState = v5, 
-        setButtonHoldState = v6, 
-        useDispatchButtonHoldStarted = v16, 
-        useDispatchButtonHoldEnded = v22, 
-        useHeldProgressByEvent = v23
-    };
-end;
+local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
+local React = require(Parent.React)
+local Signals = require(Parent.Signals)
+local SignalsReact = require(Parent.SignalsReact)
+
+require(Parent.FocusNavigationUtils)
+
+local function createButtonHoldStore() -- line: 21
+	-- upvalues: Signals (copy), React (copy), SignalsReact (copy)
+	local v6, v7 = Signals.createSignal({})
+
+	local function updateButtonHoldState(p1, p2) -- line: 24
+		-- upvalues: v7 (copy)
+		v7(function(p3) -- line: 25
+			-- upvalues: p1 (copy), p2 (copy)
+			if p3[p1] ~= p2 then
+				local v12 = table.clone(p3)
+
+				v12[p1] = p2
+
+				return v12
+			end
+
+			return p3
+		end)
+	end
+
+	return {
+		getButtonHoldState = v6,
+		setButtonHoldState = v7,
+		useDispatchButtonHoldStarted = function() -- line: 35
+			-- upvalues: React (copy), v7 (copy), updateButtonHoldState (copy)
+			return (React.useCallback(function(p4, p5) -- line: 37
+				-- upvalues: v7 (copy)
+				v7(function(p6) -- line: 25
+					-- upvalues: p4 (copy), p5 (copy)
+					if p6[p4] ~= p5 then
+						local v18 = table.clone(p6)
+
+						v18[p4] = p5
+
+						return v18
+					end
+
+					return p6
+				end)
+			end, { updateButtonHoldState }))
+		end,
+		useDispatchButtonHoldEnded = function() -- line: 45
+			-- upvalues: React (copy), v7 (copy), updateButtonHoldState (copy)
+			return (React.useCallback(function(p7) -- line: 46
+				-- upvalues: v7 (copy)
+				local v16 = nil
+
+				v7(function(p8) -- line: 25
+					-- upvalues: p7 (copy), v16 (copy)
+					if p8[p7] ~= v16 then
+						local v20 = table.clone(p8)
+
+						v20[p7] = v16
+
+						return v20
+					end
+
+					return p8
+				end)
+			end, { updateButtonHoldState }))
+		end,
+		useHeldProgressByEvent = function() -- line: 52
+			-- upvalues: SignalsReact (copy), v6 (copy)
+			return SignalsReact.useSignalState(v6)
+		end
+	}
+end
+
+return createButtonHoldStore

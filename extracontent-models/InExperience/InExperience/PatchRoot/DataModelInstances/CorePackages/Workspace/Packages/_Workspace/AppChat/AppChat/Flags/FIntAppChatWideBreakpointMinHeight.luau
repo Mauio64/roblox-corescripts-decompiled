@@ -1,1 +1,1 @@
-return game:DefineFastInt("AppChatWideBreakpointMinHeight", 0);
+return game:DefineFastInt("AppChatWideBreakpointMinHeight", 0)

@@ -1,10 +1,13 @@
-return function(v0, v1, v2) --[[ Line: 7 ]] --[[ Name: getZoomedSizeAndOffset ]]
-    local v3 = if v2 then v2.X else 0.5;
-    local v4 = if v2 then v2.Y else 0.5;
-    local v5 = if v1 == 0 then v0.X else v0.X / v1;
-    local v6 = if v1 == 0 then v0.Y else v0.Y / v1;
-    return {
-        offset = Vector2.new((v0.X - v5) * v3, (v0.Y - v6) * v4), 
-        size = Vector2.new(v5, v6)
-    };
-end;
+local function getZoomedSizeAndOffset(vector2: Vector2, n1: number, vector2_2: Vector2?) -- line: 7
+	local v5 = not vector2_2 and 0.5 or vector2_2.X
+	local v6 = not vector2_2 and 0.5 or vector2_2.Y
+	local v7 = if n1 ~= 0 then vector2.X / n1 else vector2.X
+	local v8 = if n1 ~= 0 then vector2.Y / n1 else vector2.Y
+
+	return {
+		offset = Vector2.new((vector2.X - v7) * v5, (vector2.Y - v8) * v6),
+		size = Vector2.new(v7, v8)
+	}
+end
+
+return getZoomedSizeAndOffset

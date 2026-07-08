@@ -1,45 +1,45 @@
-local v0 = newproxy(false);
-return function(v1) --[[ Line: 9 ]]
-    -- upvalues: v0 (copy)
-    local function v8(v2, v3, ...) --[[ Line: 10 ]] --[[ Name: setInterval ]]
-        -- upvalues: v0 (ref), v1 (copy)
-        local v4 = {
-            ...
-        };
-        local v5 = {
-            [v0] = 1
-        };
-        if v3 == nil then
-            v3 = 0;
-        end;
-        local v6 = v3 / 1000;
-        local v7 = nil;
-        v7 = function() --[[ Line: 24 ]]
-            -- upvalues: v1 (ref), v6 (copy), v5 (copy), v0 (ref), v2 (copy), v4 (copy), v7 (ref)
-            v1(v6, function() --[[ Line: 25 ]]
-                -- upvalues: v5 (ref), v0 (ref), v2 (ref), v4 (ref), v7 (ref)
-                if v5[v0] == 1 then
-                    v2(unpack(v4));
-                    v7();
-                end;
-            end);
-        end;
-        v7();
-        return v5;
-    end;
-    local function v10(v9) --[[ Line: 38 ]] --[[ Name: clearInterval ]]
-        -- upvalues: v0 (ref)
-        if v9 == nil then
-            return;
-        else
-            if v9[v0] == 1 then
-                v9[v0] = 3;
-            end;
-            return;
-        end;
-    end;
-    return {
-        setInterval = v8, 
-        clearInterval = v10
-    };
-end;
+local v1 = newproxy(false)
+
+return function(p1) -- line: 9
+	-- upvalues: v1 (copy)
+	return {
+		setInterval = function(p2, n1: number, ...) -- line: 10
+			-- upvalues: v1 (copy), p1 (copy)
+			local t1 = { ... }
+			local t2 = {
+				[v1] = 1
+			}
+
+			if n1 == nil then
+				n1 = 0
+			end
+
+			local v7 = n1 / 1000
+
+			local function u8() -- line: 24
+				-- upvalues: p1 (copy), v7 (copy), t2 (copy), v1 (copy), p2 (copy), t1 (copy), u8 (ref)
+				p1(v7, function() -- line: 25
+					-- upvalues: t2 (copy), v1 (copy), p2 (copy), t1 (copy), u8 (ref)
+					if t2[v1] == 1 then
+						p2(unpack(t1))
+						u8()
+					end
+				end)
+			end
+
+			u8()
+
+			return t2
+		end,
+		clearInterval = function(t3: {[any]: any}) -- line: 38
+			-- upvalues: v1 (copy)
+			if t3 == nil then
+				return
+			end
+
+			if t3[v1] == 1 then
+				t3[v1] = 3
+			end
+		end
+	}
+end

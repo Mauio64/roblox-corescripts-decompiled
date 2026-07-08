@@ -1,33 +1,38 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local l_inspect_0 = require(l_jsutils_0.inspect).inspect;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local v4 = require(l_Parent_0.type.definition);
-local l_getNamedType_0 = v4.getNamedType;
-local l_isLeafType_0 = v4.isLeafType;
+local ParentParent = script.Parent.Parent.Parent
+local jsutils = ParentParent.jsutils
+local inspect = require(jsutils.inspect).inspect
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local definition = require(ParentParent.type.definition)
+local getNamedType = definition.getNamedType
+local isLeafType = definition.isLeafType
+
 return {
-    ScalarLeafsRule = function(v7) --[[ Line: 25 ]]
-        -- upvalues: l_isLeafType_0 (copy), l_getNamedType_0 (copy), l_inspect_0 (copy), l_GraphQLError_0 (copy)
-        return {
-            Field = function(_, v9) --[[ Line: 27 ]] --[[ Name: Field ]]
-                -- upvalues: v7 (copy), l_isLeafType_0 (ref), l_getNamedType_0 (ref), l_inspect_0 (ref), l_GraphQLError_0 (ref)
-                local v10 = v7:getType();
-                local l_selectionSet_0 = v9.selectionSet;
-                if v10 then
-                    if l_isLeafType_0(l_getNamedType_0(v10)) then
-                        if l_selectionSet_0 then
-                            local l_value_0 = v9.name.value;
-                            local v13 = l_inspect_0(v10);
-                            v7:reportError(l_GraphQLError_0.new(("Field \"%s\" must not have a selection since type \"%s\" has no subfields."):format(l_value_0, v13), l_selectionSet_0));
-                            return;
-                        end;
-                    elseif not l_selectionSet_0 then
-                        local l_value_1 = v9.name.value;
-                        local v15 = l_inspect_0(v10);
-                        v7:reportError(l_GraphQLError_0.new(("Field \"%s\" of type \"%s\" must have a selection of subfields. Did you mean \"%s { ... }\"?"):format(l_value_1, v15, l_value_1), v9));
-                    end;
-                end;
-            end
-        };
-    end
-};
+	ScalarLeafsRule = function(p1) -- line: 25
+		-- upvalues: isLeafType (copy), getNamedType (copy), inspect (copy), GraphQLError (copy)
+		return {
+			Field = function(_, p3) -- line: 27
+				-- upvalues: p1 (copy), isLeafType (copy), getNamedType (copy), inspect (copy), GraphQLError (copy)
+				local v11 = p1:getType()
+				local selectionSet = p3.selectionSet
+
+				if v11 then
+					if isLeafType(getNamedType(v11)) then
+						if selectionSet then
+							local value = p3.name.value
+							local v14 = inspect(v11)
+
+							p1:reportError(GraphQLError.new(("Field \"%s\" must not have a selection since type \"%s\" has no subfields."):format(value, v14), selectionSet))
+
+							return
+						end
+					elseif not selectionSet then
+						local value = p3.name.value
+						local v16 = inspect(v11)
+
+						p1:reportError(GraphQLError.new(("Field \"%s\" of type \"%s\" must have a selection of subfields. Did you mean \"%s { ... }\"?"):format(value, v16, value), p3))
+					end
+				end
+			end
+		}
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateCategoryTooltip1", false);
+return game:DefineFastFlag("AXMigrateCategoryTooltip1", false)

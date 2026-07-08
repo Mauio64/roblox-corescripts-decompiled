@@ -1,12 +1,17 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 4 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = {};
-    setmetatable(v2, v0);
-    v2.children = {};
-    v2.isEndOfWord = false;
-    v2.data = v1;
-    return v2;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(s1: string) -- line: 4
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.children = {}
+	t2.isEndOfWord = false
+	t2.data = s1
+
+	return t2
+end
+
+return t1

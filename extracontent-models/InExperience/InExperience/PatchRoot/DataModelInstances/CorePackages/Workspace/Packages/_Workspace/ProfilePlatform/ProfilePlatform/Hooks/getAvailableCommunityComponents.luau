@@ -7,13 +7,12 @@ local Enums = require(ProfilePlatform.Common.Enums)
 local getSupportedActionsForProfileType = require(ProfilePlatform.Hooks.getSupportedActionsForProfileType)
 local FFlagAddSocialLinksToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddSocialLinksToCommunityProfile
 local FFlagAddVideoToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddVideoToCommunityProfile
-local FFlagProfilePlatformEnableCoverPhoto = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableCoverPhoto)
 local FFlagAddCommunityLockedToCommunityProfile = require(ProfilePlatformParent.SharedFlags).FFlagAddCommunityLockedToCommunityProfile
 local FFlagAddEventsToCommunityProfile = require(ProfilePlatform.Flags.FFlagAddEventsToCommunityProfile)
 local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
 
-return function() -- line: 15
-	-- upvalues: Enums (copy), FFlagProfilePlatformCTAsRefactor (copy), getSupportedActionsForProfileType (copy), FFlagAddSocialLinksToCommunityProfile (copy), FFlagAddVideoToCommunityProfile (copy), FFlagProfilePlatformEnableCoverPhoto (copy), FFlagAddCommunityLockedToCommunityProfile (copy), FFlagAddEventsToCommunityProfile (copy)
+return function() -- line: 14
+	-- upvalues: Enums (copy), FFlagProfilePlatformCTAsRefactor (copy), getSupportedActionsForProfileType (copy), FFlagAddSocialLinksToCommunityProfile (copy), FFlagAddVideoToCommunityProfile (copy), FFlagAddCommunityLockedToCommunityProfile (copy), FFlagAddEventsToCommunityProfile (copy)
 	local t1 = {
 		{
 			component = Enums.Components.CommunityProfileHeader
@@ -34,6 +33,9 @@ return function() -- line: 15
 		},
 		{
 			component = Enums.Components.ViewFullProfile
+		},
+		{
+			component = Enums.Components.CoverPhoto
 		}
 	}
 
@@ -46,12 +48,6 @@ return function() -- line: 15
 	if FFlagAddVideoToCommunityProfile then
 		table.insert(t1, {
 			component = Enums.Components.Videos
-		})
-	end
-
-	if FFlagProfilePlatformEnableCoverPhoto then
-		table.insert(t1, {
-			component = Enums.Components.CoverPhoto
 		})
 	end
 

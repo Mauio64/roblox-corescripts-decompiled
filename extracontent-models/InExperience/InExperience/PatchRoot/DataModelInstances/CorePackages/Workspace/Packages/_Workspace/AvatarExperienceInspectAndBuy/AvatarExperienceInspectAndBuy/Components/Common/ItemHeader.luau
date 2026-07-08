@@ -1,57 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v5 = require(l_script_FirstAncestor_0.Components.Common.BackButton);
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(v8) --[[ Line: 39 ]] --[[ Name: ItemHeader ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), v3 (copy), v5 (copy)
-    local v9 = l_useTokens_0();
-    return v2.createElement(v3.View, {
-        tag = "auto-xy size-full-0", 
-        LayoutOrder = v8.LayoutOrder
-    }, {
-        UIPadding = if v8.padding then v2.createElement("UIPadding", {
-            PaddingLeft = v8.padding.left, 
-            PaddingRight = v8.padding.right, 
-            PaddingTop = v8.padding.top, 
-            PaddingBottom = v8.padding.bottom
-        }) else nil, 
-        UIListLayout = if v8.purchaseButtonProps then v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
-        }) else nil, 
-        InnerFrame = v2.createElement(v3.View, {
-            tag = "auto-xy col align-y-center", 
-            Size = UDim2.new(1, 0, 0, 0)
-        }, {
-            BackButton = if v8.onBackButtonClick then v2.createElement(v5, {
-                onBackButtonClick = v8.onBackButtonClick, 
-                LayoutOrder = 1
-            }) else nil, 
-            HeaderAndSubheader = v2.createElement(v3.View, {
-                tag = "auto-xy col", 
-                LayoutOrder = 2
-            }, {
-                UIPadding = if v8.onBackButtonClick then v2.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, v9.Padding.Large)
-                }) else nil, 
-                Header = if v8.header then v8.header else nil, 
-                Subheader = if v8.subheader then v8.subheader else nil
-            })
-        }), 
-        BuyButton = if v8.purchaseButtonProps then v2.createElement(v3.Button, {
-            size = v3.Enums.InputSize.Medium, 
-            width = UDim.new(0, v9.Size.Size_3000), 
-            text = v8.purchaseButtonProps.purchaseButtonText, 
-            variant = v8.purchaseButtonProps.variant, 
-            isDisabled = v8.purchaseButtonProps.isDisabled, 
-            onActivated = v8.purchaseButtonProps.onPurchase, 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local BackButton = require(AvatarExperienceInspectAndBuy.Components.Common.BackButton)
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+require(AvatarExperienceInspectAndBuy.Types)
+
+local function ItemHeader(t1: {[any]: any}) -- line: 39
+	-- upvalues: useTokens (copy), React (copy), Foundation (copy), BackButton (copy)
+	local v9 = useTokens()
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy size-full-0",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		UIPadding = if not t1.padding then nil else React.createElement("UIPadding", {
+			PaddingLeft = t1.padding.left,
+			PaddingRight = t1.padding.right,
+			PaddingTop = t1.padding.top,
+			PaddingBottom = t1.padding.bottom
+		}),
+		UIListLayout = if not t1.purchaseButtonProps then nil else React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
+		}),
+		InnerFrame = React.createElement(Foundation.View, {
+			tag = "auto-xy col align-y-center",
+			Size = UDim2.new(1, 0, 0, 0)
+		}, {
+			BackButton = if not t1.onBackButtonClick then nil else React.createElement(BackButton, {
+				LayoutOrder = 1,
+				onBackButtonClick = t1.onBackButtonClick
+			}),
+			HeaderAndSubheader = React.createElement(Foundation.View, {
+				tag = "auto-xy col",
+				LayoutOrder = 2
+			}, {
+				UIPadding = if not t1.onBackButtonClick then nil else React.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, v9.Padding.Large)
+				}),
+				Header = if not t1.header then nil else t1.header,
+				Subheader = if not t1.subheader then nil else t1.subheader
+			})
+		}),
+		BuyButton = if not t1.purchaseButtonProps then nil else React.createElement(Foundation.Button, {
+			LayoutOrder = 2,
+			size = Foundation.Enums.InputSize.Medium,
+			width = UDim.new(0, v9.Size.Size_3000),
+			text = t1.purchaseButtonProps.purchaseButtonText,
+			variant = t1.purchaseButtonProps.variant,
+			isDisabled = t1.purchaseButtonProps.isDisabled,
+			onActivated = t1.purchaseButtonProps.onPurchase
+		})
+	})
+end
+
+return ItemHeader

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothCaptureServiceScreenshot", false);
+return game:DefineFastFlag("AXPhotoboothCaptureServiceScreenshot", false)

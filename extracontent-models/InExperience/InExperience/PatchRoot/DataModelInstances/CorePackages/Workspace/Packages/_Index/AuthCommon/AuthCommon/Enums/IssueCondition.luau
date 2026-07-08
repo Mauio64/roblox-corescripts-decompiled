@@ -1,5 +1,5 @@
 return {
-    Hidden = "Hidden", 
-    Problematic = "Problematic", 
-    Resolved = "Resolved"
-};
+	Hidden = "Hidden",
+	Problematic = "Problematic",
+	Resolved = "Resolved"
+}

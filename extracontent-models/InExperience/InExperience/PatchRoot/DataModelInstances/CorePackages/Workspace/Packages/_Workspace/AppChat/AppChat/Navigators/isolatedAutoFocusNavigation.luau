@@ -1,38 +1,40 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.InputHandlers);
-local v3 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigationEventNameEnum_0 = v3.FocusNavigationEventNameEnum;
-local v5 = require(script.Parent.autoFocusNavigation);
-return function(v6, v7, v8) --[[ Line: 13 ]] --[[ Name: isolatedAutoFocusNavigation ]]
-    -- upvalues: v1 (copy), l_FocusNavigationEventNameEnum_0 (copy), v2 (copy), v3 (copy), v5 (copy)
-    return function(v9) --[[ Line: 18 ]]
-        -- upvalues: v1 (ref), l_FocusNavigationEventNameEnum_0 (ref), v2 (ref), v8 (copy), v3 (ref), v7 (copy), v5 (ref), v6 (copy)
-        local v11 = v1.useMemo(function() --[[ Line: 19 ]]
-            -- upvalues: l_FocusNavigationEventNameEnum_0 (ref), v2 (ref), v8 (ref), v9 (copy)
-            return {
-                [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                    handler = v2.onRelease(function(v10) --[[ Line: 22 ]]
-                        -- upvalues: v8 (ref), v9 (ref)
-                        if v8 then
-                            v8(v9);
-                            v10:cancel();
-                        end;
-                    end)
-                }
-            };
-        end, {
-            v8
-        });
-        return v1.createElement(v3.FocusNavigableSurfaceWrapper, {
-            surfaceIdentifier = v7, 
-            isIsolated = true, 
-            shouldRestoreFocus = true, 
-            isAutoFocusRoot = false, 
-            isFocusable = true, 
-            customEventHandlers = if v8 then v11 else nil
-        }, {
-            content = v1.createElement(v5(v6), v9)
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local InputHandlers = require(Parent.InputHandlers)
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local autoFocusNavigation = require(script.Parent.autoFocusNavigation)
+
+local function isolatedAutoFocusNavigation(p1, p2, p3: ((...any) -> ...any)?) -- line: 13
+	-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusNavigationUtils (copy), autoFocusNavigation (copy)
+	return function(p4) -- line: 18
+		-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), p3 (copy), FocusNavigationUtils (copy), p2 (copy), autoFocusNavigation (copy), p1 (copy)
+		local v12 = React.useMemo(function() -- line: 19
+			-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), p3 (copy), p4 (copy)
+			return {
+				[FocusNavigationEventNameEnum.NavigateBack] = {
+					handler = InputHandlers.onRelease(function(p5) -- line: 22
+						-- upvalues: p3 (copy), p4 (copy)
+						if p3 then
+							p3(p4)
+							p5:cancel()
+						end
+					end)
+				}
+			}
+		end, { p3 })
+
+		return React.createElement(FocusNavigationUtils.FocusNavigableSurfaceWrapper, {
+			isIsolated = true,
+			shouldRestoreFocus = true,
+			isAutoFocusRoot = false,
+			isFocusable = true,
+			surfaceIdentifier = p2,
+			customEventHandlers = if not p3 then nil else v12
+		}, {
+			content = React.createElement(autoFocusNavigation(p1), p4)
+		})
+	end
+end
+
+return isolatedAutoFocusNavigation

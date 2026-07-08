@@ -1,5 +1,6 @@
-local v0 = require(script.Item);
+local Item = require(script.Item)
+
 return {
-    Root = require(script.Accordion), 
-    Item = v0
-};
+	Root = require(script.Accordion),
+	Item = Item
+}

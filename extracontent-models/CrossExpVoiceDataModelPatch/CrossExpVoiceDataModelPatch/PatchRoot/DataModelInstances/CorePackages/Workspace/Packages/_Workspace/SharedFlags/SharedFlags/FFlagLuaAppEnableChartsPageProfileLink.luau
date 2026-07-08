@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableChartsPageProfileLink", false);
+return game:DefineFastFlag("LuaAppEnableChartsPageProfileLink", false)

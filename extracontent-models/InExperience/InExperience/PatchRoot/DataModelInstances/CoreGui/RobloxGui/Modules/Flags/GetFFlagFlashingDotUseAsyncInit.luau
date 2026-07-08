@@ -1,4 +1,5 @@
-game:DefineFastFlag("FlashingDotUseAsyncInit", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("FlashingDotUseAsyncInit");
-end;
+game:DefineFastFlag("FlashingDotUseAsyncInit", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("FlashingDotUseAsyncInit")
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixIsConsoleCheckForSocialCarousel", false);
+return game:DefineFastFlag("FixIsConsoleCheckForSocialCarousel", false)

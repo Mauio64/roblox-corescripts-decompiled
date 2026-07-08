@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)("SetDevConsoleVisibility", function(v0) --[[ Line: 4 ]]
-    return {
-        isVisible = v0
-    };
-end);
+return require(script.Parent.Parent.Action)("SetDevConsoleVisibility", function(p1) -- line: 4
+	return {
+		isVisible = p1
+	}
+end)

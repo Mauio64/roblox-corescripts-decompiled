@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateBuilderIcons2", false);
+return game:DefineFastFlag("AXMigrateBuilderIcons2", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SignupTrackFailedRequestv1", false);
+return game:DefineFastFlag("SignupTrackFailedRequestv1", false)

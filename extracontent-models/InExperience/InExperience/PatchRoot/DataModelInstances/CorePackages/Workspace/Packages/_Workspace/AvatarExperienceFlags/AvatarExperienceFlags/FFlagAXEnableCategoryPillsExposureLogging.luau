@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableCategoryPillsExposureLogging2", false);
+return game:DefineFastFlag("AXEnableCategoryPillsExposureLogging2", false)

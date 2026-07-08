@@ -1,1 +1,1 @@
-return game:DefineFastString("RMDefinition", "show_rm_tile");
+return game:DefineFastString("RMDefinition", "show_rm_tile")

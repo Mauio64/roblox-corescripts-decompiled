@@ -1,380 +1,357 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_Players_0 = game:GetService("Players");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v3.FocusNavigableSurfaceIdentifierEnum;
-local l_FocusNavigationEventNameEnum_0 = v3.FocusNavigationEventNameEnum;
-local l_FocusRoot_0 = v3.FocusRoot;
-local v7 = require(l_Parent_0.InputHandlers);
-local v8 = require(l_Parent_0.React);
-local v9 = require(l_Parent_0.Cryo);
-local v10 = require(l_Parent_0.ReactOtter);
-local l_GuiService_0 = game:GetService("GuiService");
-local l_DefaultReportDialog_0 = require(l_Parent_0.GenericAbuseReporting).UXFlows.DefaultReportDialog;
-local v13 = require(l_Parent_0.NotificationModalsManager);
-local v14 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v14.Hooks.useTokens;
-local l_View_0 = v14.View;
-local l_Images_0 = require(l_Parent_0.UIBlox).App.ImageSet.Images;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v19 = require(l_Parent_0.DsaIllegalContentReporting);
-local l_isShowUKOSAIllegalContentReportingLink_0 = v19.isShowUKOSAIllegalContentReportingLink;
-local l_OSAReportLink_0 = v19.OSAReportLink;
-local l_isShowGenericIllegalContentReportingLink_0 = v19.isShowGenericIllegalContentReportingLink;
-local l_GenericReportLink_0 = v19.GenericReportLink;
-local v24 = require(l_script_FirstAncestor_0.Common.Constants);
-local v25 = require(l_script_FirstAncestor_0.Common.AnalyticsReducer);
-local v26 = require(l_script_FirstAncestor_0.Common.ChatLineReportAnalytics);
-local v27 = require(l_script_FirstAncestor_0.Common.buildReport);
-local v28 = require(l_script_FirstAncestor_0.Common.isSystemMessage);
-local v29 = require(l_script_FirstAncestor_0.Components.ChatLineReportSelectionModal);
-local v30 = require(l_script_FirstAncestor_0.Components.ChatLineReportSelectionModalOld);
-local v31 = require(l_script_FirstAncestor_0.Components.ChatLineReportVerbatim);
-local v32 = require(l_script_FirstAncestor_0.Components.ChatLineReportCompleteModal);
-local v33 = require(l_script_FirstAncestor_0.Common.ReportCategories);
-local v34 = require(l_script_FirstAncestor_0.Enums.ChatLineSelectionMode);
-local l_FFlagChatLineReportingFocusFixesEnabled_0 = require(l_Parent_0.SharedFlags).FFlagChatLineReportingFocusFixesEnabled;
-local v36 = require(l_script_FirstAncestor_0.Flags.FFlagChatLineReportingReworkEnabled);
-local l_game_EngineFeature_0 = game:GetEngineFeature("SSUIMetaLua");
-local l_FFlagMigrateAllOsaMessagingToCentralService_0 = require(l_Parent_0.SharedFlags).FFlagMigrateAllOsaMessagingToCentralService;
-local l_FFlagAddGenericIllegalReportingToTwoStepFlow_0 = require(l_Parent_0.SharedFlags).FFlagAddGenericIllegalReportingToTwoStepFlow;
-local l_FFlagEnableGlobalChatAbuseReporting_0 = require(l_Parent_0.SharedFlags).FFlagEnableGlobalChatAbuseReporting;
-local v41 = {
-    stiffness = 400, 
-    damping = 40, 
-    mass = 1
-};
-local v42 = {
-    [Enum.KeyCode.ButtonB] = l_FocusNavigationEventNameEnum_0.NavigateBack, 
-    [Enum.KeyCode.Escape] = l_FocusNavigationEventNameEnum_0.NavigateBack
-};
-return function(v43) --[[ Line: 66 ]] --[[ Name: ChatLineReportStepHandler ]]
-    -- upvalues: v8 (copy), v24 (copy), v25 (copy), l_GuiService_0 (copy), l_useLocalization_0 (copy), l_useTokens_0 (copy), v28 (copy), l_FFlagEnableGlobalChatAbuseReporting_0 (copy), l_game_EngineFeature_0 (copy), v10 (copy), v13 (copy), l_Images_0 (copy), v41 (copy), v26 (copy), v27 (copy), l_Players_0 (copy), v9 (copy), l_FFlagChatLineReportingFocusFixesEnabled_0 (copy), v36 (copy), v29 (copy), v30 (copy), v34 (copy), l_DefaultReportDialog_0 (copy), v31 (copy), v33 (copy), l_FFlagAddGenericIllegalReportingToTwoStepFlow_0 (copy), l_FFlagMigrateAllOsaMessagingToCentralService_0 (copy), l_isShowUKOSAIllegalContentReportingLink_0 (copy), l_View_0 (copy), l_OSAReportLink_0 (copy), l_isShowGenericIllegalContentReportingLink_0 (copy), l_GenericReportLink_0 (copy), v32 (copy), l_FocusNavigationEventNameEnum_0 (copy), v7 (copy), l_FocusRoot_0 (copy), v42 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    local v44, v45 = v8.useState(v24.ReportSteps.SELECT);
-    local v46, v47 = v8.useState(nil);
-    local v48, v49 = v8.useReducer(v25, v24.AnalyticsInitialState);
-    local v50, v51 = v8.useState(not l_GuiService_0.MenuIsOpen);
-    local v52, v53 = v8.useState(l_GuiService_0.MenuIsOpen);
-    local v54, v55 = v8.useState(false);
-    local v56, v57 = v8.useState(nil);
-    local v58, v59 = v8.useState("");
-    local v60 = l_useLocalization_0(v24.ChatLineLocalizationKeys);
-    local v61 = l_useLocalization_0({
-        ChatToastTitleSuccess = {
-            "Feature.ReportAbuse.Label.UserTextMuted"; 
-            name = v58
-        }, 
-        ChatToastTitleError = {
-            "Feature.ReportAbuse.Label.UserTextMutedError"; 
-            name = v58
-        }, 
-        ChatToastDescriptionErrorDoesNotExist = {
-            "Feature.ReportAbuse.Message.UserTextMutedErrorDoesNotExist"; 
-            name = v58
-        }
-    });
-    local v62 = l_useTokens_0();
-    v8.useEffect(function() --[[ Line: 90 ]]
-        -- upvalues: v49 (copy), v24 (ref), v43 (copy), v28 (ref), l_FFlagEnableGlobalChatAbuseReporting_0 (ref), l_GuiService_0 (ref), v53 (copy), v51 (copy)
-        v49({
-            type = v24.AnalyticsActions.AccumulateForTimeSpent, 
-            accumulated_time_ms = workspace:GetServerTimeNow() * 1000
-        });
-        v49({
-            type = v24.AnalyticsActions.SetPlaceId, 
-            place_id = game.PlaceId
-        });
-        local l_ViewportSize_0 = game.Workspace.CurrentCamera.ViewportSize;
-        local l_v49_0 = v49;
-        local v65 = {
-            type = v24.AnalyticsActions.SetViewportInformation, 
-            viewport_size_x = l_ViewportSize_0.X, 
-            viewport_size_y = l_ViewportSize_0.Y
-        };
-        local v66 = false;
-        if l_ViewportSize_0.X < l_ViewportSize_0.Y then
-            v66 = l_ViewportSize_0.X < 800;
-        end;
-        v65.is_portrait_mode = v66;
-        l_v49_0(v65);
-        l_v49_0 = 0;
-        v65 = 0;
-        for _, v68 in ipairs(v43.messages) do
-            if not v28(v68) then
-                l_v49_0 = l_v49_0 + 1;
-                if (not l_FFlagEnableGlobalChatAbuseReporting_0 or v68.textChannel) and v68.textChannel.Name ~= v24.ChannelTypes.General then
-                    v65 = v65 + 1;
-                end;
-            end;
-        end;
-        v49({
-            type = v24.AnalyticsActions.SetChatHistoryInformation, 
-            selectable_chat_history_size = l_v49_0, 
-            total_chat_history_size = #v43.messages, 
-            num_non_general_channel_chats = v65
-        });
-        v66 = l_GuiService_0.MenuOpened:Connect(function() --[[ Line: 132 ]]
-            -- upvalues: v53 (ref), v51 (ref)
-            v53(true);
-            v51(false);
-        end);
-        local v69 = l_GuiService_0.MenuClosed:Connect(function() --[[ Line: 136 ]]
-            -- upvalues: v53 (ref), v51 (ref)
-            v53(false);
-            v51(true);
-        end);
-        return function() --[[ Line: 140 ]]
-            -- upvalues: v66 (copy), v69 (copy)
-            v66:Disconnect();
-            v69:Disconnect();
-        end;
-    end, {});
-    v8.useEffect(function() --[[ Line: 147 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), v50 (copy)
-        if l_game_EngineFeature_0 then
-            pcall(function() --[[ Line: 149 ]]
-                -- upvalues: v50 (ref)
-                local l_SafetyService_0 = game:GetService("SafetyService");
-                if v50 then
-                    l_SafetyService_0:ReportChatLineReportingOpen();
-                    return;
-                else
-                    l_SafetyService_0:ReportChatLineReportingClose();
-                    return;
-                end;
-            end);
-        end;
-    end, {
-        v50
-    });
-    local v71, v72 = v10.useAnimatedBinding(1, function() --[[ Line: 160 ]]
-        -- upvalues: v50 (copy), v54 (copy), v56 (copy), v24 (ref), v13 (ref), l_Images_0 (ref), v61 (copy), v60 (copy), v62 (copy), v43 (copy)
-        if not v50 then
-            if v54 then
-                if v56 and v56.key == v24.SuccessfulMuteKey then
-                    v13.SetUIBloxToast({
-                        iconImage = l_Images_0[v24.ToastIconImageSuccess], 
-                        toastTitle = v61.ChatToastTitleSuccess, 
-                        toastSubtitle = v60.ChatToastDescriptionSuccess, 
-                        sequenceNumber = DateTime.now().UnixTimestamp, 
-                        iconColorStyle = {
-                            Color = v62.Color.System.Success.Color3, 
-                            Transparency = 0
-                        }
-                    });
-                elseif v56 then
-                    v13.SetUIBloxToast({
-                        iconImage = l_Images_0[v24.ToastIconImageError], 
-                        toastTitle = v61.ChatToastTitleError, 
-                        toastSubtitle = if v56.key == v24.ErrorSelfMuteKey then v60.ChatToastDescriptionErrorSelf else v61.ChatToastDescriptionErrorDoesNotExist, 
-                        sequenceNumber = DateTime.now().UnixTimestamp, 
-                        iconColorStyle = {
-                            Color = v62.Color.System.Warning.Color3, 
-                            Transparency = 0
-                        }
-                    });
-                end;
-            end;
-            v43.unmount();
-        end;
-    end);
-    local v73 = v8.useMemo(function() --[[ Line: 196 ]]
-        -- upvalues: v50 (copy)
-        if v50 then
-            return 0;
-        else
-            return 1;
-        end;
-    end, {
-        v50
-    });
-    v8.useEffect(function() --[[ Line: 200 ]]
-        -- upvalues: v72 (copy), v10 (ref), v73 (copy), v41 (ref)
-        v72(v10.spring(v73, v41));
-    end, {
-        v73
-    });
-    local v74 = v8.useCallback(function() --[[ Line: 205 ]]
-        -- upvalues: v46 (copy), v45 (copy), v24 (ref)
-        if v46 ~= nil then
-            v45(v24.ReportSteps.SUBMIT);
-        end;
-    end);
-    local v75 = v8.useCallback(function() --[[ Line: 211 ]]
-        -- upvalues: v26 (ref), v48 (copy), v51 (copy)
-        v26(v48, 2, false);
-        v51(false);
-    end, {
-        v48
-    });
-    local v76 = v8.useCallback(function() --[[ Line: 218 ]]
-        -- upvalues: v45 (copy), v24 (ref), v47 (copy)
-        v45(v24.ReportSteps.SELECT);
-        v47(nil);
-    end);
-    local v83 = v8.useCallback(function(v77, v78) --[[ Line: 223 ]]
-        -- upvalues: v27 (ref), l_Players_0 (ref), v46 (copy), v9 (ref), v43 (copy), v28 (ref), v49 (copy), v24 (ref), v45 (copy)
-        local v79 = {};
-        local v80 = v27(l_Players_0.LocalPlayer.UserId, v46.userId, v77, v78, v46.messageId);
-        v9.Dictionary.map(v43.messages, function(v81) --[[ Line: 234 ]]
-            -- upvalues: v28 (ref), v79 (copy)
-            if not v28(v81) then
-                v79[#v79 + 1] = {
-                    channel = v81.textChannel, 
-                    messageId = v81.messageId
-                };
-            end;
-        end);
-        local v82 = {
-            {
-                channel = v46.textChannel, 
-                messageId = v46.messageId
-            }
-        };
-        v49({
-            type = v24.AnalyticsActions.SetReasonSelection, 
-            reason_selection = v77
-        });
-        v49({
-            type = v24.AnalyticsActions.SetCommentAdded, 
-            comment_added = #v78 > 0
-        });
-        l_Players_0:ReportChatAbuse(v79, v82, v80);
-        v45(v24.ReportSteps.COMPLETE);
-        return true;
-    end, {
-        v43.messages, 
-        v46
-    });
-    local v85 = v8.useCallback(function(v84) --[[ Line: 266 ]]
-        -- upvalues: v26 (ref), v48 (copy), v57 (copy), v59 (copy), v55 (copy), v51 (copy)
-        if v84 then
-            v26(v48, 1, true);
-            v57(v84);
-            v59(v84.args.RBX_NAME);
-            v55(true);
-            v51(false);
-            return;
-        else
-            v26(v48, 1, false);
-            v51(false);
-            return;
-        end;
-    end, {
-        v48
-    });
-    local v86 = v8.useCallback(function() --[[ Line: 280 ]]
-        -- upvalues: v26 (ref), v48 (copy), v51 (copy)
-        v26(v48, 1, false);
-        v51(false);
-    end, {
-        v48
-    });
-    local v87 = if v44 == v24.ReportSteps.COMPLETE then v86 else v75;
-    local v92 = v8.createElement("TextButton", {
-        Active = v71:map(function(v88) --[[ Line: 290 ]]
-            return v88 == 0;
-        end), 
-        AutoButtonColor = false, 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = v71:map(function(v89) --[[ Line: 295 ]]
-            return v89 + 0.3;
-        end), 
-        BackgroundColor3 = Color3.fromHex("#000000"), 
-        Text = "", 
-        Selectable = not l_FFlagChatLineReportingFocusFixesEnabled_0 and nil, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        [v8.Event.Activated] = v87, 
-        ZIndex = 10
-    }, {
-        Frame = v8.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            Position = v71:map(function(v90) --[[ Line: 310 ]]
-                -- upvalues: v52 (copy)
-                if v52 then
-                    return UDim2.new(0, 0, -v90, 0);
-                else
-                    return UDim2.new(0, 0, v90, 0);
-                end;
-            end)
-        }, {
-            ChatLineReportStep = if v44 == v24.ReportSteps.SELECT then v8.createElement(if v36 then v29 else v30, {
-                onContinue = v74, 
-                onBack = v75, 
-                messages = v43.messages, 
-                selectedMessage = v46, 
-                setSelectedMessage = v47, 
-                analyticsDispatch = v49, 
-                mode = v34.Radio
-            }) else if v44 == v24.ReportSteps.SUBMIT then v8.createElement(l_DefaultReportDialog_0, {
-                analyticsContext = "ReportViaChatLine", 
-                topCustomComponent = v8.createElement(v31, {
-                    selectedMessage = v46
-                }), 
-                onSubmitProps = {
-                    hasNextSteps = true, 
-                    onProceedToNextStep = v83
-                }, 
-                localizationKeys = v24.GenericAbuseReportingLocalizationKeys, 
-                onCloseProps = {
-                    hasPreviousSteps = true, 
-                    onBackToPreviousStep = v76
-                }, 
-                reportCategories = v33, 
-                footerContent = if l_FFlagAddGenericIllegalReportingToTwoStepFlow_0 then nil else function() --[[ Line: 350 ]]
-                    -- upvalues: l_FFlagMigrateAllOsaMessagingToCentralService_0 (ref), l_isShowUKOSAIllegalContentReportingLink_0 (ref), v8 (ref), l_View_0 (ref), l_OSAReportLink_0 (ref), l_isShowGenericIllegalContentReportingLink_0 (ref), l_GenericReportLink_0 (ref)
-                    if not l_FFlagMigrateAllOsaMessagingToCentralService_0 and l_isShowUKOSAIllegalContentReportingLink_0() then
-                        return v8.createElement(l_View_0, {
-                            tag = "size-full-0 auto-y"
-                        }, {
-                            OSALink = v8.createElement(l_OSAReportLink_0)
-                        });
-                    elseif l_FFlagMigrateAllOsaMessagingToCentralService_0 and l_isShowGenericIllegalContentReportingLink_0() then
-                        return v8.createElement(l_View_0, {
-                            tag = "size-full-0 auto-y padding-left-large padding-top-medium radius-medium"
-                        }, v8.createElement(l_GenericReportLink_0));
-                    else
-                        return nil;
-                    end;
-                end, 
-                onBeforeSubmitAnalytics = function(v91) --[[ Line: 371 ]] --[[ Name: onBeforeSubmitAnalytics ]]
-                    return v91;
-                end
-            }) else if v44 == v24.ReportSteps.COMPLETE then v8.createElement(v32, {
-                localizationKeys = v24.GenericAbuseReportingLocalizationKeys, 
-                onDismiss = v85, 
-                selectedMessage = v46
-            }) else nil
-        })
-    });
-    if l_FFlagChatLineReportingFocusFixesEnabled_0 then
-        local v94 = v8.useMemo(function() --[[ Line: 388 ]]
-            -- upvalues: l_FocusNavigationEventNameEnum_0 (ref), v7 (ref), v87 (copy)
-            return {
-                [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                    handler = v7.onRelease(function(v93) --[[ Line: 391 ]]
-                        -- upvalues: v87 (ref)
-                        v87();
-                        v93:cancel();
-                    end)
-                }
-            };
-        end, {
-            v87
-        });
-        return v8.createElement(l_FocusRoot_0, {
-            eventHandlers = v94, 
-            eventMap = v42, 
-            isAutoFocusRoot = true, 
-            isIsolated = true, 
-            surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.PopUp
-        }, {
-            ChatLineReportStepHandler = v92
-        });
-    else
-        return v92;
-    end;
-end;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local Players = game:GetService("Players")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local FocusNavigationUtils = require(ChatLineReportingParent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local InputHandlers = require(ChatLineReportingParent.InputHandlers)
+local React = require(ChatLineReportingParent.React)
+local Cryo = require(ChatLineReportingParent.Cryo)
+local ReactOtter = require(ChatLineReportingParent.ReactOtter)
+local GuiService = game:GetService("GuiService")
+local DefaultReportDialog = require(ChatLineReportingParent.GenericAbuseReporting.DefaultReportDialog)
+local NotificationModalsManager = require(ChatLineReportingParent.NotificationModalsManager)
+local useTokens = require(ChatLineReportingParent.Foundation).Hooks.useTokens
+local Images = require(ChatLineReportingParent.UIBlox).App.ImageSet.Images
+local useLocalization = require(ChatLineReportingParent.Localization).Hooks.useLocalization
+local Constants = require(ChatLineReporting.Common.Constants)
+local AnalyticsReducer = require(ChatLineReporting.Common.AnalyticsReducer)
+local ChatLineReportAnalytics = require(ChatLineReporting.Common.ChatLineReportAnalytics)
+local buildReport = require(ChatLineReporting.Common.buildReport)
+local isSystemMessage = require(ChatLineReporting.Common.isSystemMessage)
+local ChatLineReportSelectionModal = require(ChatLineReporting.Components.ChatLineReportSelectionModal)
+local ChatLineReportSelectionModalOld = require(ChatLineReporting.Components.ChatLineReportSelectionModalOld)
+local ChatLineReportVerbatim = require(ChatLineReporting.Components.ChatLineReportVerbatim)
+local ChatLineReportCompleteModal = require(ChatLineReporting.Components.ChatLineReportCompleteModal)
+local ReportCategories = require(ChatLineReporting.Common.ReportCategories)
+local ChatLineSelectionMode = require(ChatLineReporting.Enums.ChatLineSelectionMode)
+local FFlagChatLineReportingFocusFixesEnabled = require(ChatLineReportingParent.SharedFlags).FFlagChatLineReportingFocusFixesEnabled
+local FFlagChatLineReportingReworkEnabled = require(ChatLineReporting.Flags.FFlagChatLineReportingReworkEnabled)
+local EngineFeature = game:GetEngineFeature("SSUIMetaLua")
+local FFlagEnableGlobalChatAbuseReporting = require(ChatLineReportingParent.SharedFlags).FFlagEnableGlobalChatAbuseReporting
+local FFlagGenericAbuseReportingGranularExports = require(ChatLineReportingParent.SharedFlags).FFlagGenericAbuseReportingGranularExports
+local t1 = {
+	stiffness = 400,
+	damping = 40,
+	mass = 1
+}
+local t2 = {
+	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
+}
+
+local function ChatLineReportStepHandler(t3: {[any]: any}) -- line: 58
+	-- upvalues: React (copy), Constants (copy), AnalyticsReducer (copy), GuiService (copy), useLocalization (copy), useTokens (copy), isSystemMessage (copy), FFlagEnableGlobalChatAbuseReporting (copy), EngineFeature (copy), ReactOtter (copy), NotificationModalsManager (copy), Images (copy), t1 (copy), ChatLineReportAnalytics (copy), buildReport (copy), Players (copy), Cryo (copy), FFlagChatLineReportingFocusFixesEnabled (copy), FFlagChatLineReportingReworkEnabled (copy), ChatLineReportSelectionModal (copy), ChatLineReportSelectionModalOld (copy), ChatLineSelectionMode (copy), DefaultReportDialog (copy), ChatLineReportVerbatim (copy), FFlagGenericAbuseReportingGranularExports (copy), ReportCategories (copy), ChatLineReportCompleteModal (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), FocusRoot (copy), t2 (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v38, v39 = React.useState(Constants.ReportSteps.SELECT)
+	local v40, v41 = React.useState(nil)
+	local v42, v43 = React.useReducer(AnalyticsReducer, Constants.AnalyticsInitialState)
+	local v44, v45 = React.useState(not GuiService.MenuIsOpen)
+	local v46, v47 = React.useState(GuiService.MenuIsOpen)
+	local v48, v49 = React.useState(false)
+	local v50, v51 = React.useState(nil)
+	local v52, v53 = React.useState("")
+	local v54 = useLocalization(Constants.ChatLineLocalizationKeys)
+	local v55 = useLocalization({
+		ChatToastTitleSuccess = {
+			"Feature.ReportAbuse.Label.UserTextMuted",
+			name = v52
+		},
+		ChatToastTitleError = {
+			"Feature.ReportAbuse.Label.UserTextMutedError",
+			name = v52
+		},
+		ChatToastDescriptionErrorDoesNotExist = {
+			"Feature.ReportAbuse.Message.UserTextMutedErrorDoesNotExist",
+			name = v52
+		}
+	})
+	local v56 = useTokens()
+
+	React.useEffect(function() -- line: 82
+		-- upvalues: v43 (copy), Constants (copy), t3 (copy), isSystemMessage (copy), FFlagEnableGlobalChatAbuseReporting (copy), GuiService (copy), v47 (copy), v45 (copy)
+		v43({
+			type = Constants.AnalyticsActions.AccumulateForTimeSpent,
+			accumulated_time_ms = workspace:GetServerTimeNow() * 1000
+		})
+		v43({
+			type = Constants.AnalyticsActions.SetPlaceId,
+			place_id = game.PlaceId
+		})
+
+		local ViewportSize = game.Workspace.CurrentCamera.ViewportSize
+
+		v43({
+			type = Constants.AnalyticsActions.SetViewportInformation,
+			viewport_size_x = ViewportSize.X,
+			viewport_size_y = ViewportSize.Y,
+			is_portrait_mode = ViewportSize.X < ViewportSize.Y and ViewportSize.X < 800
+		})
+
+		local n1 = 0
+		local n2 = 0
+
+		for _, v in ipairs(t3.messages) do
+			if not isSystemMessage(v) then
+				n1 += 1
+
+				if (not FFlagEnableGlobalChatAbuseReporting or v.textChannel) and v.textChannel.Name ~= Constants.ChannelTypes.General then
+					n2 += 1
+				end
+			end
+		end
+
+		v43({
+			type = Constants.AnalyticsActions.SetChatHistoryInformation,
+			selectable_chat_history_size = n1,
+			total_chat_history_size = #t3.messages,
+			num_non_general_channel_chats = n2
+		})
+
+		local connection = GuiService.MenuOpened:Connect(function() -- line: 124
+			-- upvalues: v47 (copy), v45 (copy)
+			v47(true)
+			v45(false)
+		end)
+		local connection2 = GuiService.MenuClosed:Connect(function() -- line: 128
+			-- upvalues: v47 (copy), v45 (copy)
+			v47(false)
+			v45(true)
+		end)
+
+		return function() -- line: 132
+			-- upvalues: connection (copy), connection2 (copy)
+			connection:Disconnect()
+			connection2:Disconnect()
+		end
+	end, {})
+	React.useEffect(function() -- line: 139
+		-- upvalues: EngineFeature (copy), v44 (copy)
+		if EngineFeature then
+			pcall(function() -- line: 141
+				-- upvalues: v44 (copy)
+				local SafetyService = game:GetService("SafetyService")
+
+				if v44 then
+					SafetyService:ReportChatLineReportingOpen()
+
+					return
+				end
+
+				SafetyService:ReportChatLineReportingClose()
+			end)
+		end
+	end, { v44 })
+
+	local v57, v58 = ReactOtter.useAnimatedBinding(1, function() -- line: 152
+		-- upvalues: v44 (copy), v48 (copy), v50 (copy), Constants (copy), NotificationModalsManager (copy), Images (copy), v55 (copy), v54 (copy), v56 (copy), t3 (copy)
+		if not v44 then
+			if v48 then
+				if v50 and v50.key == Constants.SuccessfulMuteKey then
+					NotificationModalsManager.SetUIBloxToast({
+						iconImage = Images[Constants.ToastIconImageSuccess],
+						toastTitle = v55.ChatToastTitleSuccess,
+						toastSubtitle = v54.ChatToastDescriptionSuccess,
+						sequenceNumber = DateTime.now().UnixTimestamp,
+						iconColorStyle = {
+							Transparency = 0,
+							Color = v56.Color.System.Success.Color3
+						}
+					})
+				elseif v50 then
+					NotificationModalsManager.SetUIBloxToast({
+						iconImage = Images[Constants.ToastIconImageError],
+						toastTitle = v55.ChatToastTitleError,
+						toastSubtitle = if v50.key ~= Constants.ErrorSelfMuteKey then v55.ChatToastDescriptionErrorDoesNotExist else v54.ChatToastDescriptionErrorSelf,
+						sequenceNumber = DateTime.now().UnixTimestamp,
+						iconColorStyle = {
+							Transparency = 0,
+							Color = v56.Color.System.Warning.Color3
+						}
+					})
+				end
+			end
+
+			t3.unmount()
+		end
+	end)
+	local v59 = React.useMemo(function() -- line: 188
+		-- upvalues: v44 (copy)
+		if v44 then
+			return 0
+		end
+
+		return 1
+	end, { v44 })
+
+	React.useEffect(function() -- line: 192
+		-- upvalues: v58 (copy), ReactOtter (copy), v59 (copy), t1 (copy)
+		v58(ReactOtter.spring(v59, t1))
+	end, { v59 })
+
+	local v60 = React.useCallback(function() -- line: 197
+		-- upvalues: v40 (copy), v39 (copy), Constants (copy)
+		if v40 ~= nil then
+			v39(Constants.ReportSteps.SUBMIT)
+		end
+	end)
+	local v61 = React.useCallback(function() -- line: 203
+		-- upvalues: ChatLineReportAnalytics (copy), v42 (copy), v45 (copy)
+		ChatLineReportAnalytics(v42, 2, false)
+		v45(false)
+	end, { v42 })
+	local v62 = React.useCallback(function() -- line: 210
+		-- upvalues: v39 (copy), Constants (copy), v41 (copy)
+		v39(Constants.ReportSteps.SELECT)
+		v41(nil)
+	end)
+	local v63 = React.useCallback(function(p1, p2) -- line: 215
+		-- upvalues: buildReport (copy), Players (copy), v40 (copy), Cryo (copy), t3 (copy), isSystemMessage (copy), v43 (copy), Constants (copy), v39 (copy)
+		local t4 = {}
+		local v79 = buildReport(Players.LocalPlayer.UserId, v40.userId, p1, p2, v40.messageId, v40.presetId, v40.presetChatVersion)
+
+		Cryo.Dictionary.map(t3.messages, function(p3) -- line: 228
+			-- upvalues: isSystemMessage (copy), t4 (copy)
+			if not isSystemMessage(p3) then
+				t4[#t4 + 1] = {
+					channel = p3.textChannel,
+					messageId = p3.messageId
+				}
+			end
+		end)
+
+		local t5 = {{
+			channel = v40.textChannel,
+			messageId = v40.messageId
+		}}
+
+		v43({
+			type = Constants.AnalyticsActions.SetReasonSelection,
+			reason_selection = p1
+		})
+		v43({
+			type = Constants.AnalyticsActions.SetCommentAdded,
+			comment_added = #p2 > 0
+		})
+		Players:ReportChatAbuse(t4, t5, v79)
+		v39(Constants.ReportSteps.COMPLETE)
+
+		return true
+	end, {
+		t3.messages,
+		v40
+	})
+	local v64 = React.useCallback(function(p4) -- line: 260
+		-- upvalues: ChatLineReportAnalytics (copy), v42 (copy), v51 (copy), v53 (copy), v49 (copy), v45 (copy)
+		if p4 then
+			ChatLineReportAnalytics(v42, 1, true)
+			v51(p4)
+			v53(p4.args.RBX_NAME)
+			v49(true)
+			v45(false)
+
+			return
+		end
+
+		ChatLineReportAnalytics(v42, 1, false)
+		v45(false)
+	end, { v42 })
+	local v65 = React.useCallback(function() -- line: 274
+		-- upvalues: ChatLineReportAnalytics (copy), v42 (copy), v45 (copy)
+		ChatLineReportAnalytics(v42, 1, false)
+		v45(false)
+	end, { v42 })
+	local v66 = if v38 ~= Constants.ReportSteps.COMPLETE then v61 else v65
+	local v67 = React.createElement("TextButton", {
+		Active = v57:map(function(p5) -- line: 284
+			return p5 == 0
+		end),
+		AutoButtonColor = false,
+		BorderSizePixel = 0,
+		BackgroundTransparency = v57:map(function(n3: number) -- line: 289
+			return n3 + 0.3
+		end),
+		BackgroundColor3 = Color3.fromHex("#000000"),
+		Text = "",
+		Selectable = not FFlagChatLineReportingFocusFixesEnabled and nil,
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		[React.Event.Activated] = v66,
+		ZIndex = 10
+	}, {
+		Frame = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = v57:map(function(n4: number) -- line: 304
+				-- upvalues: v46 (copy)
+				if v46 then
+					return UDim2.new(0, 0, -n4, 0)
+				end
+
+				return UDim2.new(0, 0, n4, 0)
+			end)
+		}, {
+			ChatLineReportStep = if v38 ~= Constants.ReportSteps.SELECT then if v38 ~= Constants.ReportSteps.SUBMIT then if v38 ~= Constants.ReportSteps.COMPLETE then nil else React.createElement(ChatLineReportCompleteModal, {
+				localizationKeys = if not FFlagGenericAbuseReportingGranularExports then Constants.GenericAbuseReportingLocalizationKeys else Constants.CompleteDialogLocalizationKeys,
+				onDismiss = v64,
+				selectedMessage = v40
+			}) else React.createElement(DefaultReportDialog, {
+				analyticsContext = "ReportViaChatLine",
+				topCustomComponent = React.createElement(ChatLineReportVerbatim, {
+					selectedMessage = v40
+				}),
+				onSubmitProps = {
+					hasNextSteps = true,
+					onProceedToNextStep = v63
+				},
+				localizationKeys = if not FFlagGenericAbuseReportingGranularExports then Constants.GenericAbuseReportingLocalizationKeys else Constants.SubmitDialogLocalizationKeys,
+				onCloseProps = {
+					hasPreviousSteps = true,
+					onBackToPreviousStep = v62
+				},
+				reportCategories = ReportCategories,
+				onBeforeSubmitAnalytics = function(p6) -- line: 344
+					return p6
+				end
+			}) else React.createElement(if not FFlagChatLineReportingReworkEnabled then ChatLineReportSelectionModalOld else ChatLineReportSelectionModal, {
+				onContinue = v60,
+				onBack = v61,
+				messages = t3.messages,
+				selectedMessage = v40,
+				setSelectedMessage = v41,
+				analyticsDispatch = v43,
+				mode = ChatLineSelectionMode.Radio
+			})
+		})
+	})
+
+	if FFlagChatLineReportingFocusFixesEnabled then
+		local v68 = React.useMemo(function() -- line: 363
+			-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v66 (copy)
+			return {
+				[FocusNavigationEventNameEnum.NavigateBack] = {
+					handler = InputHandlers.onRelease(function(p7) -- line: 366
+						-- upvalues: v66 (copy)
+						v66()
+						p7:cancel()
+					end)
+				}
+			}
+		end, { v66 })
+
+		return React.createElement(FocusRoot, {
+			isAutoFocusRoot = true,
+			isIsolated = true,
+			eventHandlers = v68,
+			eventMap = t2,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp
+		}, {
+			ChatLineReportStepHandler = v67
+		})
+	end
+
+	return v67
+end
+
+return ChatLineReportStepHandler

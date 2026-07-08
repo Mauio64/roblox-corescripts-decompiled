@@ -1,261 +1,320 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local l_HttpService_0 = game:GetService("HttpService");
-local v6 = {};
-local v7 = nil;
-local v8 = nil;
-local v9 = nil;
-local _ = require(script.Parent.types);
-local _ = require(l_Parent_1.GraphQL);
-local l_InvariantError_0 = require(l_Parent_0.jsutils.invariant).InvariantError;
-local l_isNonNullObject_0 = require(script.Parent.Parent.common.objects).isNonNullObject;
-local v14 = require(script.Parent.fragments);
-local v15 = require(l_Parent_0.luaUtils.objectKeysForEach);
-local l_getFragmentFromSelection_0 = v14.getFragmentFromSelection;
-v6.makeReference = function(v17) --[[ Line: 59 ]] --[[ Name: makeReference ]]
-    return {
-        __ref = tostring(v17)
-    };
-end;
-v6.isReference = function(v18) --[[ Line: 64 ]] --[[ Name: isReference ]]
-    local v19 = false;
-    if type(v18) == "table" then
-        v19 = type(v18.__ref) == "string";
-    end;
-    return v19;
-end;
-v6.isDocumentNode = function(v20) --[[ Line: 74 ]] --[[ Name: isDocumentNode ]]
-    -- upvalues: l_isNonNullObject_0 (copy), l_Array_0 (copy)
-    return l_isNonNullObject_0(v20) and v20.kind == "Document" and l_Array_0.isArray(v20.definitions);
-end;
-local function _(v21) --[[ Line: 81 ]] --[[ Name: isStringValue ]]
-    return v21.kind == "StringValue";
-end;
-local function _(v23) --[[ Line: 85 ]] --[[ Name: isBooleanValue ]]
-    return v23.kind == "BooleanValue";
-end;
-local function _(v25) --[[ Line: 89 ]] --[[ Name: isIntValue ]]
-    return v25.kind == "IntValue";
-end;
-local function _(v27) --[[ Line: 93 ]] --[[ Name: isFloatValue ]]
-    return v27.kind == "FloatValue";
-end;
-local function _(v29) --[[ Line: 97 ]] --[[ Name: isVariable ]]
-    return v29.kind == "Variable";
-end;
-local function _(v31) --[[ Line: 101 ]] --[[ Name: isObjectValue ]]
-    return v31.kind == "ObjectValue";
-end;
-local function _(v33) --[[ Line: 105 ]] --[[ Name: isListValue ]]
-    return v33.kind == "ListValue";
-end;
-local function _(v35) --[[ Line: 109 ]] --[[ Name: isEnumValue ]]
-    return v35.kind == "EnumValue";
-end;
-local function _(v37) --[[ Line: 113 ]] --[[ Name: isNullValue ]]
-    return v37.kind == "NullValue";
-end;
-local function v39(v40, v41, v42, v43) --[[ Line: 117 ]] --[[ Name: valueToObjectRepresentation ]]
-    -- upvalues: l_Array_0 (copy), v39 (copy), l_InvariantError_0 (copy)
-    if v42.kind == "IntValue" or v42.kind == "FloatValue" then
-        v40[v41.value] = tonumber(v42.value);
-        return;
-    elseif v42.kind == "BooleanValue" or v42.kind == "StringValue" then
-        v40[v41.value] = v42.value;
-        return;
-    elseif v42.kind == "ObjectValue" then
-        local v44 = {};
-        l_Array_0.map(v42.fields, function(v45) --[[ Line: 125 ]]
-            -- upvalues: v39 (ref), v44 (copy), v43 (copy)
-            v39(v44, v45.name, v45.value, v43);
-            return nil;
-        end);
-        v40[v41.value] = v44;
-        return;
-    elseif v42.kind == "Variable" then
-        local v46 = (v43 or {})[v42.name.value];
-        v40[v41.value] = v46;
-        return;
-    elseif v42.kind == "ListValue" then
-        v40[v41.value] = l_Array_0.map(v42.values, function(v47) --[[ Line: 136 ]]
-            -- upvalues: v39 (ref), v41 (copy), v43 (copy)
-            local v48 = {};
-            v39(v48, v41, v47, v43);
-            return v48[v41.value];
-        end);
-        return;
-    elseif v42.kind == "EnumValue" then
-        v40[v41.value] = v42.value;
-        return;
-    elseif v42.kind == "NullValue" then
-        v40[v41.value] = nil;
-        return;
-    else
-        error(l_InvariantError_0.new(tostring(("The inline argument \"%s\" of kind \"%s\""):format(v41.value, v42.kind)) .. "is not supported. Use variables instead of inline arguments to " .. "overcome this limitation."));
-        return;
-    end;
-end;
-v6.valueToObjectRepresentation = v39;
-v6.storeKeyNameFromField = function(v49, v50) --[[ Line: 158 ]] --[[ Name: storeKeyNameFromField ]]
-    -- upvalues: l_Array_0 (copy), v39 (copy), v7 (ref)
-    local v51 = nil;
-    if v49.directives then
-        v51 = {};
-        l_Array_0.forEach(v49.directives, function(v52) --[[ Line: 162 ]]
-            -- upvalues: v51 (ref), l_Array_0 (ref), v39 (ref), v50 (copy)
-            v51[v52.name.value] = {};
-            if v52.arguments then
-                l_Array_0.forEach(v52.arguments, function(v53) --[[ Line: 166 ]]
-                    -- upvalues: v39 (ref), v51 (ref), v52 (copy), v50 (ref)
-                    local l_name_0 = v53.name;
-                    local l_value_0 = v53.value;
-                    v39(v51[v52.name.value], l_name_0, l_value_0, v50);
-                end);
-            end;
-        end);
-    end;
-    local v56 = nil;
-    if v49.arguments and #v49.arguments > 0 then
-        v56 = {};
-        l_Array_0.forEach(v49.arguments, function(v57) --[[ Line: 177 ]]
-            -- upvalues: v39 (ref), v56 (ref), v50 (copy)
-            local l_name_1 = v57.name;
-            local l_value_1 = v57.value;
-            v39(v56, l_name_1, l_value_1, v50);
-        end);
-    end;
-    return v7(v49.name.value, v56, v51);
-end;
-local v60 = {
-    "connection", 
-    "include", 
-    "skip", 
-    "client", 
-    "rest", 
-    "export"
-};
-v7 = l_Object_0.assign(setmetatable({}, {
-    __call = function(_, v62, v63, v64) --[[ Line: 201 ]] --[[ Name: __call ]]
-        -- upvalues: l_Array_0 (copy), v8 (ref), v15 (copy), v60 (copy)
-        if v63 and v64 and v64.connection and v64.connection.key then
-            if v64.connection.filter and #v64.connection.filter > 0 then
-                local v65 = nil;
-                v65 = if v64.connection.filter then v64.connection.filter else {};
-                l_Array_0.sort(v65, nil);
-                local v66 = {};
-                l_Array_0.forEach(v65, function(v67) --[[ Line: 227 ]]
-                    -- upvalues: v66 (copy), v63 (copy)
-                    v66[v67] = v63[v67];
-                end);
-                return ("%s(%s)"):format(v64.connection.key, v8(v66));
-            else
-                return v64.connection.key;
-            end;
-        else
-            local l_v62_0 = v62;
-            if v63 then
-                l_v62_0 = l_v62_0 .. ("(%s)"):format((v8(v63)));
-            end;
-            if v64 then
-                v15(v64, function(v69) --[[ Line: 254 ]]
-                    -- upvalues: l_Array_0 (ref), v60 (ref), v64 (copy), l_v62_0 (ref), v8 (ref)
-                    if l_Array_0.indexOf(v60, v69) ~= -1 then
-                        return;
-                    elseif v64[v69] and next(v64[v69]) ~= nil then
-                        l_v62_0 = l_v62_0 .. ("@%s(%s)"):format(v69, v8(v64[v69]));
-                        return;
-                    else
-                        l_v62_0 = l_v62_0 .. ("@%s"):format(v69);
-                        return;
-                    end;
-                end);
-            end;
-            return l_v62_0;
-        end;
-    end
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local HttpService = game:GetService("HttpService")
+local t1 = {}
+local u8 = nil
+local stringify = nil
+local isField = nil
+
+require(script.Parent.types)
+require(ParentParentParent.GraphQL)
+
+local InvariantError = require(ParentParent.jsutils.invariant).InvariantError
+local isNonNullObject = require(script.Parent.Parent.common.objects).isNonNullObject
+local fragments = require(script.Parent.fragments)
+local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
+local getFragmentFromSelection = fragments.getFragmentFromSelection
+
+function t1.makeReference(s1: string) -- line: 59
+	return {
+		__ref = tostring(s1)
+	}
+end
+function t1.isReference(p1) -- line: 64
+	return type(p1) == "table" and type(p1.__ref) == "string"
+end
+function t1.isDocumentNode(p2) -- line: 74
+	-- upvalues: isNonNullObject (copy), Array (copy)
+	return isNonNullObject(p2) and (p2.kind == "Document" and Array.isArray(p2.definitions))
+end
+
+local function isStringValue(p3) -- line: 81
+	return p3.kind == "StringValue"
+end
+local function isBooleanValue(p4) -- line: 85
+	return p4.kind == "BooleanValue"
+end
+local function isIntValue(p5) -- line: 89
+	return p5.kind == "IntValue"
+end
+local function isFloatValue(p6) -- line: 93
+	return p6.kind == "FloatValue"
+end
+local function isVariable(p7) -- line: 97
+	return p7.kind == "Variable"
+end
+local function isObjectValue(p8) -- line: 101
+	return p8.kind == "ObjectValue"
+end
+local function isListValue(p9) -- line: 105
+	return p9.kind == "ListValue"
+end
+local function isEnumValue(p10) -- line: 109
+	return p10.kind == "EnumValue"
+end
+local function isNullValue(p11) -- line: 113
+	return p11.kind == "NullValue"
+end
+local function valueToObjectRepresentation(p12, p13, p14, p15) -- line: 117
+	-- upvalues: Array (copy), valueToObjectRepresentation (copy), InvariantError (copy)
+	if p14.kind == "IntValue" or p14.kind == "FloatValue" then
+		p12[p13.value] = tonumber(p14.value)
+
+		return
+	end
+
+	if p14.kind == "BooleanValue" or p14.kind == "StringValue" then
+		p12[p13.value] = p14.value
+
+		return
+	end
+
+	if p14.kind == "ObjectValue" then
+		local t2 = {}
+
+		Array.map(p14.fields, function(p16) -- line: 125
+			-- upvalues: valueToObjectRepresentation (copy), t2 (copy), p15 (copy)
+			valueToObjectRepresentation(t2, p16.name, p16.value, p15)
+
+			return nil
+		end)
+		p12[p13.value] = t2
+
+		return
+	end
+
+	if p14.kind == "Variable" then
+		local v45 = (p15 or {})[p14.name.value]
+
+		p12[p13.value] = v45
+
+		return
+	end
+
+	if p14.kind == "ListValue" then
+		p12[p13.value] = Array.map(p14.values, function(p17) -- line: 136
+			-- upvalues: valueToObjectRepresentation (copy), p13 (copy), p15 (copy)
+			local t3 = {}
+
+			valueToObjectRepresentation(t3, p13, p17, p15)
+
+			return t3[p13.value]
+		end)
+
+		return
+	end
+
+	if p14.kind == "EnumValue" then
+		p12[p13.value] = p14.value
+
+		return
+	end
+
+	if p14.kind == "NullValue" then
+		p12[p13.value] = nil
+
+		return
+	end
+
+	error(InvariantError.new(tostring(("The inline argument \"%s\" of kind \"%s\""):format(p13.value, p14.kind)) .. "is not supported. Use variables instead of inline arguments to " .. "overcome this limitation."))
+end
+
+t1.valueToObjectRepresentation = valueToObjectRepresentation
+
+function t1.storeKeyNameFromField(p18, p19) -- line: 158
+	-- upvalues: Array (copy), valueToObjectRepresentation (copy), u8 (ref)
+	local t4 = nil
+
+	if p18.directives then
+		t4 = {}
+		Array.forEach(p18.directives, function(p20) -- line: 162
+			-- upvalues: t4 (ref), Array (copy), valueToObjectRepresentation (copy), p19 (copy)
+			t4[p20.name.value] = {}
+
+			if p20.arguments then
+				Array.forEach(p20.arguments, function(p21) -- line: 166
+					-- upvalues: valueToObjectRepresentation (copy), t4 (ref), p20 (copy), p19 (copy)
+					local name = p21.name
+					local value = p21.value
+
+					valueToObjectRepresentation(t4[p20.name.value], name, value, p19)
+				end)
+			end
+		end)
+	end
+
+	local t5 = nil
+
+	if p18.arguments and #p18.arguments > 0 then
+		t5 = {}
+		Array.forEach(p18.arguments, function(p22) -- line: 177
+			-- upvalues: valueToObjectRepresentation (copy), t5 (ref), p19 (copy)
+			local name = p22.name
+			local value = p22.value
+
+			valueToObjectRepresentation(t5, name, value, p19)
+		end)
+	end
+
+	return u8(p18.name.value, t5, t4)
+end
+
+local t6 = {
+	"connection",
+	"include",
+	"skip",
+	"client",
+	"rest",
+	"export"
+}
+
+u8 = Object.assign(setmetatable({}, {
+	__call = function(_, s2: string, t7: {[any]: any}?, p24) -- line: 201
+		-- upvalues: Array (copy), stringify (ref), objectKeysForEach (copy), t6 (copy)
+		if t7 and (p24 and p24.connection and p24.connection.key) then
+			if p24.connection.filter and #p24.connection.filter > 0 then
+				local v54 = if not p24.connection.filter then {} else p24.connection.filter
+
+				Array.sort(v54, nil)
+
+				local t8 = {}
+
+				Array.forEach(v54, function(p25) -- line: 227
+					-- upvalues: t8 (copy), t7 (copy)
+					t8[p25] = t7[p25]
+				end)
+
+				return ("%s(%s)"):format(p24.connection.key, stringify(t8))
+			end
+
+			return p24.connection.key
+		end
+
+		local u56 = s2
+
+		if t7 then
+			u56 ..= ("(%s)"):format((stringify(t7)))
+		end
+
+		if p24 then
+			objectKeysForEach(p24, function(p26) -- line: 254
+				-- upvalues: Array (copy), t6 (copy), p24 (copy), u56 (ref), stringify (ref)
+				if Array.indexOf(t6, p26) ~= -1 then
+					return
+				end
+
+				if p24[p26] and next(p24[p26]) ~= nil then
+					u56 ..= ("@%s(%s)"):format(p26, stringify(p24[p26]))
+
+					return
+				end
+
+				u56 ..= ("@%s"):format(p26)
+			end)
+		end
+
+		return u56
+	end
 }), {
-    setStringify = function(_, v71) --[[ Line: 273 ]] --[[ Name: setStringify ]]
-        -- upvalues: v8 (ref)
-        local l_v8_0 = v8;
-        v8 = v71;
-        return l_v8_0;
-    end
-});
-v6.getStoreKeyName = v7;
-v8 = function(v73) --[[ Line: 284 ]] --[[ Name: stringify ]]
-    -- upvalues: l_isNonNullObject_0 (copy), l_HttpService_0 (copy), l_Array_0 (copy), l_Object_0 (copy), v8 (ref)
-    if not l_isNonNullObject_0(v73) then
-        return l_HttpService_0:JSONEncode(v73);
-    else
-        local v75 = l_Array_0.map(l_Array_0.sort(l_Object_0.keys(v73), nil), function(v74) --[[ Line: 295 ]]
-            -- upvalues: v8 (ref), v73 (copy)
-            return {
-                v74, 
-                v8(v73[v74])
-            };
-        end);
-        if l_Array_0.isArray(v73) then
-            return ("[%s]"):format(l_Array_0.join(l_Array_0.map(v75, function(v76) --[[ Line: 301 ]]
-                return v76[2];
-            end), ","));
-        else
-            return ("{%s}"):format(l_Array_0.join(l_Array_0.map(v75, function(v77) --[[ Line: 308 ]]
-                return ("\"%s\":%s"):format(v77[1], v77[2]);
-            end), ","));
-        end;
-    end;
-end;
-v6.argumentsObjectFromField = function(v78, v79) --[[ Line: 329 ]] --[[ Name: argumentsObjectFromField ]]
-    -- upvalues: l_Array_0 (copy), v39 (copy)
-    if v78.arguments and #v78.arguments > 0 then
-        local v80 = {};
-        l_Array_0.forEach(v78.arguments, function(v81) --[[ Line: 334 ]]
-            -- upvalues: v39 (ref), v80 (copy), v79 (copy)
-            local l_name_2 = v81.name;
-            local l_value_2 = v81.value;
-            v39(v80, l_name_2, l_value_2, v79);
-        end);
-        return v80;
-    else
-        return nil;
-    end;
-end;
-v6.resultKeyNameFromField = function(v84) --[[ Line: 344 ]] --[[ Name: resultKeyNameFromField ]]
-    if v84.alias then
-        return v84.alias.value;
-    else
-        return v84.name.value;
-    end;
-end;
-local function v85(v86, v87, v88) --[[ Line: 355 ]] --[[ Name: getTypenameFromResult ]]
-    -- upvalues: v9 (ref), v85 (copy), l_getFragmentFromSelection_0 (copy)
-    if typeof(v86.__typename) == "string" then
-        return v86.__typename;
-    else
-        for _, v90 in ipairs(v87.selections) do
-            if v9(v90) then
-                if v90.name.value == "__typename" then
-                    return v86[if v90.alias then v90.alias.value else v90.name.value];
-                end;
-            else
-                local v91 = v85(v86, l_getFragmentFromSelection_0(v90, v88).selectionSet, v88);
-                if typeof(v91) == "string" then
-                    return v91;
-                end;
-            end;
-        end;
-        return nil;
-    end;
-end;
-v6.getTypenameFromResult = v85;
-v9 = function(v92) --[[ Line: 385 ]] --[[ Name: isField ]]
-    return v92.kind == "Field";
-end;
-v6.isField = v9;
-v6.isInlineFragment = function(v93) --[[ Line: 390 ]] --[[ Name: isInlineFragment ]]
-    return v93.kind == "InlineFragment";
-end;
-return v6;
+	setStringify = function(_, p28) -- line: 273
+		-- upvalues: stringify (ref)
+		local v59 = stringify
+
+		stringify = p28
+
+		return v59
+	end
+})
+t1.getStoreKeyName = u8
+
+function stringify(p29) -- line: 284
+	-- upvalues: isNonNullObject (copy), HttpService (copy), Array (copy), Object (copy), stringify (ref)
+	if not isNonNullObject(p29) then
+		return HttpService:JSONEncode(p29)
+	end
+
+	local v61 = Array.map(Array.sort(Object.keys(p29), nil), function(p30) -- line: 295
+		-- upvalues: stringify (ref), p29 (copy)
+		return {
+			p30,
+			stringify(p29[p30])
+		}
+	end)
+
+	if Array.isArray(p29) then
+		return ("[%s]"):format(Array.join(Array.map(v61, function(p31) -- line: 301
+			return p31[2]
+		end), ","))
+	end
+
+	return ("{%s}"):format(Array.join(Array.map(v61, function(p32) -- line: 308
+		return ("\"%s\":%s"):format(p32[1], p32[2])
+	end), ","))
+end
+function t1.argumentsObjectFromField(p33, t9: {[any]: any}) -- line: 329
+	-- upvalues: Array (copy), valueToObjectRepresentation (copy)
+	if p33.arguments and #p33.arguments > 0 then
+		local t10 = {}
+
+		Array.forEach(p33.arguments, function(p34) -- line: 334
+			-- upvalues: valueToObjectRepresentation (copy), t10 (copy), t9 (copy)
+			local name = p34.name
+			local value = p34.value
+
+			valueToObjectRepresentation(t10, name, value, t9)
+		end)
+
+		return t10
+	end
+
+	return nil
+end
+function t1.resultKeyNameFromField(p35) -- line: 344
+	if p35.alias then
+		return p35.alias.value
+	end
+
+	return p35.name.value
+end
+
+local function getTypenameFromResult(t11: {[any]: any}, p36, p37) -- line: 355
+	-- upvalues: isField (ref), getTypenameFromResult (copy), getFragmentFromSelection (copy)
+	if typeof(t11.__typename) == "string" then
+		return t11.__typename
+	end
+
+	for _, v in ipairs(p36.selections) do
+		if not isField(v) then
+			local v71 = getTypenameFromResult(t11, getFragmentFromSelection(v, p37).selectionSet, p37)
+
+			if typeof(v71) ~= "string" then
+				continue
+			end
+
+			return v71
+		end
+
+		if v.name.value == "__typename" then
+			return t11[if not v.alias then v.name.value else v.alias.value]
+		end
+	end
+
+	return nil
+end
+
+t1.getTypenameFromResult = getTypenameFromResult
+
+function isField(p38) -- line: 385
+	return p38.kind == "Field"
+end
+
+t1.isField = isField
+
+function t1.isInlineFragment(p39) -- line: 390
+	return p39.kind == "InlineFragment"
+end
+
+return t1

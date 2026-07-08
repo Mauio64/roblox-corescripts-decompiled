@@ -1,235 +1,333 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Drawer");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_Parent_0.ReactOtter);
-local v6 = require(l_Parent_0.Signals);
-local v7 = require(script.Parent.Parent.Stores.GetDrawerVisibleStore);
-local v8 = require(script.Parent.Parent.Hooks.useSetDrawerVisible);
-local v9 = require(script.Parent.Parent.Hooks.useSetDrawerShouldMount);
-local v10 = require(script.Parent.Scrim);
-local v11 = require(script.Parent.Parent.Constants);
-local _ = require(script.Parent.Parent.Types);
-local l_DrawerPanelStatus_0 = require(script.Parent.Parent.Enum).DrawerPanelStatus;
-local v14 = game:DefineFastFlag("EnableUnMountDrawerOnClose1", false);
-return v3.memo(function(v15) --[[ Line: 22 ]]
-    -- upvalues: v8 (copy), v9 (copy), v3 (copy), l_DrawerPanelStatus_0 (copy), v14 (copy), v5 (copy), v11 (copy), v7 (copy), v6 (copy), l_UserInputService_0 (copy), v4 (copy), v10 (copy)
-    local v16 = v8();
-    local v17 = v9();
-    local v18 = v3.useRef(nil);
-    local v19 = v3.useRef(nil);
-    local v20, v21 = v3.useBinding(l_DrawerPanelStatus_0.Scrollable);
-    local v23 = v3.useMemo(function() --[[ Line: 28 ]]
-        -- upvalues: v20 (copy), l_DrawerPanelStatus_0 (ref)
-        return v20:map(function(v22) --[[ Line: 29 ]]
-            -- upvalues: l_DrawerPanelStatus_0 (ref)
-            return v22 == l_DrawerPanelStatus_0.Scrollable;
-        end);
-    end, {});
-    local v25 = v3.useMemo(function() --[[ Line: 34 ]]
-        -- upvalues: v20 (copy), l_DrawerPanelStatus_0 (ref)
-        return v20:map(function(v24) --[[ Line: 35 ]]
-            -- upvalues: l_DrawerPanelStatus_0 (ref)
-            if v24 == l_DrawerPanelStatus_0.Movable then
-                return 3;
-            else
-                return 1;
-            end;
-        end);
-    end, {});
-    local v26 = v15.topOffset or 0;
-    local v27 = v15.bottomOffset or 0;
-    local v28 = v15.leftOffset or 0;
-    local v29 = v15.menuWidth + v28;
-    local v31 = v3.useCallback(function(v30) --[[ Line: 50 ]]
-        -- upvalues: v20 (copy), l_DrawerPanelStatus_0 (ref), v21 (copy), v14 (ref), v29 (copy), v17 (copy)
-        if v20:getValue() == l_DrawerPanelStatus_0.Closing then
-            v21(l_DrawerPanelStatus_0.Scrollable);
-        end;
-        if v14 and v30 == -v29 then
-            v17(false);
-        end;
-    end, {});
-    local v32, v33 = v5.useAnimatedBinding(-v29, v31);
-    local v34 = v3.useRef(v29);
-    v34.current = v29;
-    local v35 = v3.useRef(false);
-    local v36, v37 = v5.useAnimatedBinding(1);
-    local v39 = v3.useCallback(function(v38) --[[ Line: 66 ]]
-        -- upvalues: v16 (copy), v21 (copy), l_DrawerPanelStatus_0 (ref), v15 (copy)
-        v16(false);
-        v21(l_DrawerPanelStatus_0.Closing);
-        if v15.onDrawerClosedAnalytics then
-            v15.onDrawerClosedAnalytics({
-                source = v38
-            });
-        end;
-    end, {
-        v15.onDrawerClosedAnalytics
-    });
-    local v41 = v3.useCallback(function(v40) --[[ Line: 74 ]]
-        -- upvalues: v35 (copy), v20 (copy), l_DrawerPanelStatus_0 (ref), v18 (copy), v19 (copy), v21 (copy)
-        if not v35.current then
-            return;
-        elseif v20:getValue() == l_DrawerPanelStatus_0.Closing then
-            return;
-        else
-            v18.current = v40.Position;
-            v19.current = DateTime.now().UnixTimestampMillis;
-            v21(l_DrawerPanelStatus_0.Static);
-            return;
-        end;
-    end, {});
-    local v45 = v3.useCallback(function(v42) --[[ Line: 86 ]]
-        -- upvalues: v35 (copy), v18 (copy), v19 (copy), v20 (copy), l_DrawerPanelStatus_0 (ref), v34 (copy), v11 (ref), v39 (copy), v33 (copy), v5 (ref), v21 (copy)
-        if not v35.current then
-            v18.current = nil;
-            v19.current = nil;
-            return;
-        elseif v18.current == nil or v19.current == nil or v20:getValue() ~= l_DrawerPanelStatus_0.Movable then
-            v18.current = nil;
-            v19.current = nil;
-            return;
-        else
-            local v43 = v18.current.X - v42.Position.X;
-            if v34.current * v11.DRAWER_SWIPE_THRESHOLD_PERCENT <= v43 then
-                v39("swipe");
-            elseif v43 > 0 then
-                local v44 = (DateTime.now().UnixTimestampMillis - v19.current) / 1000;
-                if v44 > 0.01 and v43 / v44 >= v11.DRAWER_VELOCITY_THRESHOLD then
-                    v39("swipe");
-                end;
-            end;
-            if v20:getValue() ~= l_DrawerPanelStatus_0.Closing then
-                v33(v5.ease(0, v11.DRAWER_ANIM_SETTINGS));
-                v21(l_DrawerPanelStatus_0.Scrollable);
-            end;
-            v18.current = nil;
-            v19.current = nil;
-            return;
-        end;
-    end, {});
-    local v49 = v3.useCallback(function(v46) --[[ Line: 124 ]]
-        -- upvalues: v35 (copy), v18 (copy), v20 (copy), l_DrawerPanelStatus_0 (ref), v21 (copy), v33 (copy), v5 (ref)
-        if not v35.current then
-            return;
-        elseif v18.current == nil or v20:getValue() == l_DrawerPanelStatus_0.Closing then
-            return;
-        else
-            local v47 = v46.Position.X - v18.current.X;
-            if v20:getValue() == l_DrawerPanelStatus_0.Static then
-                local v48 = v46.Position.Y - v18.current.Y;
-                if math.abs(v47) > math.abs(v48) then
-                    v21(l_DrawerPanelStatus_0.Movable);
-                else
-                    v21(l_DrawerPanelStatus_0.Scrollable);
-                end;
-            end;
-            if v20:getValue() == l_DrawerPanelStatus_0.Movable and v47 < 0 then
-                v33((v5.instant(v47)));
-            end;
-            if v46.Position.X > v18.current.X then
-                v18.current = v46.Position;
-            end;
-            return;
-        end;
-    end, {});
-    local v50 = if not v14 then v3.useRef(nil) else nil;
-    v3.useEffect(function() --[[ Line: 152 ]]
-        -- upvalues: v7 (ref), v6 (ref), v14 (ref), v50 (copy), v35 (copy), v34 (copy), v33 (copy), v5 (ref), v11 (ref), v37 (copy)
-        local l_getDrawerVisible_0 = v7(false).getDrawerVisible;
-        return v6.createEffect(function(v52) --[[ Line: 154 ]]
-            -- upvalues: v14 (ref), v50 (ref), l_getDrawerVisible_0 (copy), v35 (ref), v34 (ref), v33 (ref), v5 (ref), v11 (ref), v37 (ref)
-            if not v14 and v50 and v50.current and v50.current.CanvasPosition.Y > 0 then
-                v50.current:ScrollToTop();
-            end;
-            local v53 = l_getDrawerVisible_0(v52);
-            v35.current = v53;
-            local v54 = v53 and 0 or -v34.current;
-            v33(v5.ease(v54, v11.DRAWER_ANIM_SETTINGS));
-            local v55 = if v53 then v11.SCRIM_TRANSPARENCY else 1;
-            v37(v5.ease(v55, v11.DRAWER_ANIM_SETTINGS));
-        end);
-    end, {});
-    v3.useEffect(function() --[[ Line: 175 ]]
-        -- upvalues: l_UserInputService_0 (ref), v41 (copy), v45 (copy), v49 (copy)
-        local v56 = l_UserInputService_0.TouchStarted:Connect(v41);
-        local v57 = l_UserInputService_0.TouchEnded:Connect(v45);
-        local v58 = l_UserInputService_0.TouchMoved:Connect(v49);
-        return function() --[[ Line: 179 ]]
-            -- upvalues: v56 (copy), v57 (copy), v58 (copy)
-            v56:Disconnect();
-            v57:Disconnect();
-            v58:Disconnect();
-        end;
-    end, {});
-    local v59 = v3.useCallback(function() --[[ Line: 186 ]]
-        -- upvalues: v20 (copy), l_DrawerPanelStatus_0 (ref), v39 (copy)
-        if v20:getValue() == l_DrawerPanelStatus_0.Closing then
-            return;
-        else
-            if v20:getValue() ~= l_DrawerPanelStatus_0.Movable then
-                v39("shield");
-            end;
-            return;
-        end;
-    end, {
-        v20, 
-        v39
-    });
-    local v61 = v36:map(function(v60) --[[ Line: 197 ]]
-        return v60 < 1;
-    end);
-    return v3.createElement(v4.View, {
-        Size = UDim2.fromScale(1, 1), 
-        backgroundStyle = {
-            Transparency = 1
-        }, 
-        Visible = v61
-    }, {
-        Scrim = v3.createElement(v10, {
-            onActivated = v59, 
-            transparencyBinding = v36, 
-            zIndex = 1
-        }), 
-        DrawerAnimatedFrame = v3.createElement(v4.View, {
-            Position = v32:map(function(v62) --[[ Line: 214 ]]
-                return UDim2.fromOffset(v62, 0);
-            end), 
-            ZIndex = 2, 
-            Size = UDim2.new(0, v29, 1, 0), 
-            BorderSizePixel = 0, 
-            backgroundStyle = {
-                Color3 = v15.backgroundColor, 
-                Transparency = v15.backgroundTransparency
-            }, 
-            Selectable = false
-        }, {
-            DrawerContent = v3.createElement("ScrollingFrame", {
-                AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                Selectable = false, 
-                Size = UDim2.new(0, v15.menuWidth, 1, -v26 - v27), 
-                Position = UDim2.new(0, v28, 0, v26), 
-                CanvasSize = UDim2.new(0, v15.menuWidth, 0, 0), 
-                Active = v23, 
-                BorderSizePixel = 0, 
-                ScrollBarThickness = 0, 
-                ClipsDescendants = true, 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                ScrollingEnabled = v23, 
-                ZIndex = 2, 
-                ref = if not v14 then v50 else nil
-            }, v15.children), 
-            SinkInput = v3.createElement("ImageButton", {
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                Size = UDim2.fromScale(1, 1), 
-                Selectable = false, 
-                AutoButtonColor = false, 
-                ZIndex = v25
-            })
-        })
-    });
-end);
+local Drawer = script:FindFirstAncestor("Drawer")
+local UserInputService = game:GetService("UserInputService")
+local DrawerParent = Drawer.Parent
+local React = require(DrawerParent.React)
+local ReactIs = require(DrawerParent.ReactIs)
+local Foundation = require(DrawerParent.Foundation)
+local ReactOtter = require(DrawerParent.ReactOtter)
+local Signals = require(DrawerParent.Signals)
+local GetDrawerVisibleStore = require(script.Parent.Parent.Stores.GetDrawerVisibleStore)
+local useSetDrawerVisible = require(script.Parent.Parent.Hooks.useSetDrawerVisible)
+local useSetDrawerShouldMount = require(script.Parent.Parent.Hooks.useSetDrawerShouldMount)
+local Scrim = require(script.Parent.Scrim)
+local Constants = require(script.Parent.Parent.Constants)
+
+require(script.Parent.Parent.Types)
+
+local DrawerPanelStatus = require(script.Parent.Parent.Enum).DrawerPanelStatus
+local FocusNavigableSurfaceWrapper = nil
+local FocusNavigableSurfaceIdentifierEnum = nil
+local FocusNavigationEventNameEnum = nil
+local InputHandlers = nil
+local FFlagEnableDrawerFocusNav = require(DrawerParent.SharedFlags).FFlagEnableDrawerFocusNav
+
+if FFlagEnableDrawerFocusNav then
+	local FocusNavigationUtils = require(DrawerParent.FocusNavigationUtils)
+
+	FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
+	FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+	FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+	InputHandlers = require(DrawerParent.InputHandlers)
+end
+
+return React.memo(function(p1) -- line: 37
+	-- upvalues: useSetDrawerVisible (copy), useSetDrawerShouldMount (copy), React (copy), DrawerPanelStatus (copy), FFlagEnableDrawerFocusNav (copy), ReactIs (copy), ReactOtter (copy), Constants (copy), GetDrawerVisibleStore (copy), Signals (copy), UserInputService (copy), FocusNavigationEventNameEnum (ref), InputHandlers (ref), Foundation (copy), Scrim (copy), FocusNavigableSurfaceWrapper (ref), FocusNavigableSurfaceIdentifierEnum (ref)
+	local v22 = useSetDrawerVisible()
+	local v23 = useSetDrawerShouldMount()
+	local v24 = React.useRef(nil)
+	local v25 = React.useRef(nil)
+	local v26, v27 = React.useBinding(DrawerPanelStatus.Scrollable)
+	local v28 = React.useMemo(function() -- line: 43
+		-- upvalues: v26 (copy), DrawerPanelStatus (copy)
+		return v26:map(function(p2) -- line: 44
+			-- upvalues: DrawerPanelStatus (copy)
+			return p2 == DrawerPanelStatus.Scrollable
+		end)
+	end, {})
+	local v29 = React.useMemo(function() -- line: 49
+		-- upvalues: v26 (copy), DrawerPanelStatus (copy)
+		return v26:map(function(p3) -- line: 50
+			-- upvalues: DrawerPanelStatus (copy)
+			if p3 == DrawerPanelStatus.Movable then
+				return 3
+			end
+
+			return 1
+		end)
+	end, {})
+	local v30 = if not FFlagEnableDrawerFocusNav then nil else React.useMemo(function() -- line: 62
+		-- upvalues: p1 (copy), ReactIs (copy)
+		local backgroundStyle = p1.backgroundStyle
+
+		if backgroundStyle == nil then
+			return nil
+		end
+
+		if ReactIs.isBinding(backgroundStyle) then
+			return backgroundStyle:map(function(p4) -- line: 68
+				return p4.Color3
+			end)
+		end
+
+		return backgroundStyle.Color3
+	end, { p1.backgroundStyle })
+	local v31 = if not FFlagEnableDrawerFocusNav then nil else React.useMemo(function() -- line: 77
+		-- upvalues: p1 (copy), ReactIs (copy)
+		local backgroundStyle = p1.backgroundStyle
+
+		if backgroundStyle == nil then
+			return nil
+		end
+
+		if ReactIs.isBinding(backgroundStyle) then
+			return backgroundStyle:map(function(p5) -- line: 83
+				return p5.Transparency
+			end)
+		end
+
+		return backgroundStyle.Transparency
+	end, { p1.backgroundStyle })
+	local v32 = p1.topOffset or 0
+	local v33 = p1.bottomOffset or 0
+	local v34 = p1.leftOffset or 0
+	local v35 = p1.menuWidth + v34
+	local v36 = React.useCallback(function(p6) -- line: 95
+		-- upvalues: v26 (copy), DrawerPanelStatus (copy), v27 (copy), v35 (copy), v23 (copy)
+		if v26:getValue() == DrawerPanelStatus.Closing then
+			v27(DrawerPanelStatus.Scrollable)
+		end
+
+		if p6 == -v35 then
+			v23(false)
+		end
+	end, {})
+	local v37, v38 = ReactOtter.useAnimatedBinding(-v35, v36)
+	local v39 = React.useRef(v35)
+
+	v39.current = v35
+
+	local v40 = React.useRef(false)
+	local v41, v42 = ReactOtter.useAnimatedBinding(1)
+	local v43 = React.useCallback(function(p7) -- line: 111
+		-- upvalues: v22 (copy), v27 (copy), DrawerPanelStatus (copy), p1 (copy)
+		v22(false)
+		v27(DrawerPanelStatus.Closing)
+
+		if p1.onDrawerClosedAnalytics then
+			p1.onDrawerClosedAnalytics({
+				source = p7
+			})
+		end
+	end, { p1.onDrawerClosedAnalytics })
+	local v44 = React.useCallback(function(p8) -- line: 119
+		-- upvalues: v40 (copy), v26 (copy), DrawerPanelStatus (copy), v24 (copy), v25 (copy), v27 (copy)
+		if not v40.current then
+			return
+		end
+
+		if v26:getValue() == DrawerPanelStatus.Closing then
+			return
+		end
+
+		v24.current = p8.Position
+		v25.current = DateTime.now().UnixTimestampMillis
+		v27(DrawerPanelStatus.Static)
+	end, {})
+	local v45 = React.useCallback(function(p9) -- line: 131
+		-- upvalues: v40 (copy), v24 (copy), v25 (copy), v26 (copy), DrawerPanelStatus (copy), v39 (copy), Constants (copy), v43 (copy), v38 (copy), ReactOtter (copy), v27 (copy)
+		if not v40.current then
+			v24.current = nil
+			v25.current = nil
+
+			return
+		end
+
+		if v24.current == nil or v25.current == nil or v26:getValue() ~= DrawerPanelStatus.Movable then
+			v24.current = nil
+			v25.current = nil
+
+			return
+		end
+
+		local v57 = v24.current.X - p9.Position.X
+
+		if v57 >= v39.current * Constants.DRAWER_SWIPE_THRESHOLD_PERCENT then
+			v43("swipe")
+		elseif v57 > 0 then
+			local v58 = (DateTime.now().UnixTimestampMillis - v25.current) / 1000
+
+			if v58 > 0.01 and v57 / v58 >= Constants.DRAWER_VELOCITY_THRESHOLD then
+				v43("swipe")
+			end
+		end
+
+		if v26:getValue() ~= DrawerPanelStatus.Closing then
+			v38(ReactOtter.ease(0, Constants.DRAWER_ANIM_SETTINGS))
+			v27(DrawerPanelStatus.Scrollable)
+		end
+
+		v24.current = nil
+		v25.current = nil
+	end, {})
+	local v46 = React.useCallback(function(p10) -- line: 169
+		-- upvalues: v40 (copy), v24 (copy), v26 (copy), DrawerPanelStatus (copy), v27 (copy), v38 (copy), ReactOtter (copy)
+		if not v40.current then
+			return
+		end
+
+		if v24.current == nil or v26:getValue() == DrawerPanelStatus.Closing then
+			return
+		end
+
+		local v60 = p10.Position.X - v24.current.X
+
+		if v26:getValue() == DrawerPanelStatus.Static then
+			local v61 = p10.Position.Y - v24.current.Y
+
+			if math.abs(v60) > math.abs(v61) then
+				v27(DrawerPanelStatus.Movable)
+			else
+				v27(DrawerPanelStatus.Scrollable)
+			end
+		end
+
+		if v26:getValue() == DrawerPanelStatus.Movable and v60 < 0 then
+			v38((ReactOtter.instant(v60)))
+		end
+
+		if p10.Position.X > v24.current.X then
+			v24.current = p10.Position
+		end
+	end, {})
+
+	React.useEffect(function() -- line: 196
+		-- upvalues: GetDrawerVisibleStore (copy), Signals (copy), v40 (copy), v39 (copy), v38 (copy), ReactOtter (copy), Constants (copy), v42 (copy)
+		local getDrawerVisible = GetDrawerVisibleStore(false).getDrawerVisible
+
+		return Signals.createEffect(function(p11) -- line: 198
+			-- upvalues: getDrawerVisible (copy), v40 (copy), v39 (copy), v38 (copy), ReactOtter (copy), Constants (copy), v42 (copy)
+			local v74 = getDrawerVisible(p11)
+
+			v40.current = v74
+
+			local v75 = if not v74 then -v39.current else 0
+
+			v38(ReactOtter.ease(v75, Constants.DRAWER_ANIM_SETTINGS))
+
+			local v76 = not v74 and 1 or Constants.SCRIM_TRANSPARENCY
+
+			v42(ReactOtter.ease(v76, Constants.DRAWER_ANIM_SETTINGS))
+		end)
+	end, {})
+	React.useEffect(function() -- line: 210
+		-- upvalues: UserInputService (copy), v44 (copy), v45 (copy), v46 (copy)
+		local connection = UserInputService.TouchStarted:Connect(v44)
+		local connection2 = UserInputService.TouchEnded:Connect(v45)
+		local connection3 = UserInputService.TouchMoved:Connect(v46)
+
+		return function() -- line: 214
+			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
+			connection:Disconnect()
+			connection2:Disconnect()
+			connection3:Disconnect()
+		end
+	end, {})
+
+	local v47 = React.useCallback(function() -- line: 221
+		-- upvalues: v26 (copy), DrawerPanelStatus (copy), v43 (copy)
+		if v26:getValue() == DrawerPanelStatus.Closing then
+			return
+		end
+
+		if v26:getValue() ~= DrawerPanelStatus.Movable then
+			v43("shield")
+		end
+	end, {
+		v26,
+		v43
+	})
+	local v48 = v41:map(function(p12) -- line: 232
+		return p12 < 1
+	end)
+	local t1 = {
+		DrawerContent = React.createElement("ScrollingFrame", {
+			BackgroundTransparency = 1,
+			Selectable = false,
+			BorderSizePixel = 0,
+			ScrollBarThickness = 0,
+			ClipsDescendants = true,
+			ZIndex = 2,
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(0, p1.menuWidth, 1, -v32 - v33),
+			Position = UDim2.new(0, v34, 0, v32),
+			CanvasSize = UDim2.new(0, p1.menuWidth, 0, 0),
+			Active = v28,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ScrollingEnabled = v28
+		}, p1.children),
+		SinkInput = React.createElement("ImageButton", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Selectable = false,
+			AutoButtonColor = false,
+			Size = UDim2.fromScale(1, 1),
+			ZIndex = v29
+		})
+	}
+	local v50 = React.useMemo(function() -- line: 262
+		-- upvalues: FFlagEnableDrawerFocusNav (copy), FocusNavigationEventNameEnum (ref), InputHandlers (ref), v43 (copy)
+		if not FFlagEnableDrawerFocusNav then
+			return {}
+		end
+
+		return {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(p13) -- line: 268
+					-- upvalues: v43 (copy)
+					v43("focus-navigation-back")
+					p13:cancel()
+				end)
+			}
+		}
+	end, { v43 })
+
+	return React.createElement(Foundation.View, {
+		Size = UDim2.fromScale(1, 1),
+		backgroundStyle = {
+			Transparency = 1
+		},
+		Visible = v48
+	}, {
+		Scrim = React.createElement(Scrim, {
+			zIndex = 1,
+			onActivated = v47,
+			transparencyBinding = v41,
+			isModal = p1.scrimIsModal
+		}),
+		DrawerAnimatedFrame = if not FFlagEnableDrawerFocusNav then React.createElement(Foundation.View, {
+			ZIndex = 2,
+			BorderSizePixel = 0,
+			Selectable = false,
+			Position = v37:map(function(p14) -- line: 307
+				return UDim2.fromOffset(p14, 0)
+			end),
+			Size = UDim2.new(0, v35, 1, 0),
+			backgroundStyle = p1.backgroundStyle
+		}, t1) else React.createElement(FocusNavigableSurfaceWrapper, {
+			isIsolated = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.Drawer,
+			frameProps = {
+				ZIndex = 2,
+				BorderSizePixel = 0,
+				Selectable = false,
+				Position = v37:map(function(p15) -- line: 293
+					return UDim2.fromOffset(p15, 0)
+				end),
+				Size = UDim2.new(0, v35, 1, 0),
+				BackgroundColor3 = v30,
+				BackgroundTransparency = v31
+			},
+			customEventHandlers = v50
+		}, t1)
+	})
+end)

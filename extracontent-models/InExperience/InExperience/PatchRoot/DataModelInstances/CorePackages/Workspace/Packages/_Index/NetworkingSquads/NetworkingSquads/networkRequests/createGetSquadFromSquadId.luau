@@ -1,30 +1,35 @@
-local v0 = require(script.Parent.Parent.SQUAD_URL);
-local _ = require(script.Parent.Parent.networkingSquadTypes);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v0 (copy)
-    local l_roduxNetworking_0 = v2.roduxNetworking;
-    local v4 = nil;
-    local v7 = l_roduxNetworking_0.GET({
-        Name = "GetSquadFromSquadId"
-    }, function(v5, v6) --[[ Line: 11 ]]
-        -- upvalues: v2 (copy), v4 (ref), v0 (ref)
-        if v2.useMockedResponse then
-            v4 = {
-                responseBody = {
-                    groupUp = v6.mockedSquad
-                }
-            };
-        end;
-        return v5(v0):path("group-up"):path("v1"):path("status"):queryArgs({
-            groupUpId = v6.squadId
-        });
-    end);
-    if v2.useMockedResponse then
-        v7.Mock.clear();
-        v7.Mock.reply(function() --[[ Line: 28 ]]
-            -- upvalues: v4 (ref)
-            return v4;
-        end);
-    end;
-    return v7;
-end;
+local SQUAD_URL = require(script.Parent.Parent.SQUAD_URL)
+
+require(script.Parent.Parent.networkingSquadTypes)
+
+return function(p1) -- line: 5
+	-- upvalues: SQUAD_URL (copy)
+	local roduxNetworking = p1.roduxNetworking
+	local t1 = nil
+	local v5 = roduxNetworking.GET({
+		Name = "GetSquadFromSquadId"
+	}, function(p2, p3) -- line: 11
+		-- upvalues: p1 (copy), t1 (ref), SQUAD_URL (copy)
+		if p1.useMockedResponse then
+			t1 = {
+				responseBody = {
+					groupUp = p3.mockedSquad
+				}
+			}
+		end
+
+		return p2(SQUAD_URL):path("group-up"):path("v1"):path("status"):queryArgs({
+			groupUpId = p3.squadId
+		})
+	end)
+
+	if p1.useMockedResponse then
+		v5.Mock.clear()
+		v5.Mock.reply(function() -- line: 28
+			-- upvalues: t1 (ref)
+			return t1
+		end)
+	end
+
+	return v5
+end

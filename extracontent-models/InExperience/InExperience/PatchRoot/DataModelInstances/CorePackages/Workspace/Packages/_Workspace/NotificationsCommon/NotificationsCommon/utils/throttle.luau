@@ -1,18 +1,18 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local v2 = false;
-    local v3 = v1 or 1;
-    return function(...) --[[ Line: 4 ]]
-        -- upvalues: v2 (ref), v0 (copy), v3 (copy)
-        if v2 then
-            return;
-        else
-            v2 = true;
-            v0(...);
-            task.delay(v3, function() --[[ Line: 10 ]]
-                -- upvalues: v2 (ref)
-                v2 = false;
-            end);
-            return;
-        end;
-    end;
-end;
+return function(p1, n1: number?) -- line: 1
+	local u3 = false
+	local v4 = n1 or 1
+
+	return function(...) -- line: 4
+		-- upvalues: u3 (ref), p1 (copy), v4 (copy)
+		if u3 then
+			return
+		end
+
+		u3 = true
+		p1(...)
+		task.delay(v4, function() -- line: 10
+			-- upvalues: u3 (ref)
+			u3 = false
+		end)
+	end
+end

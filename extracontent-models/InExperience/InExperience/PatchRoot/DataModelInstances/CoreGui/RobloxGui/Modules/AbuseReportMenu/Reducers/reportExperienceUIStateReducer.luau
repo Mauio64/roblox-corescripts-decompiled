@@ -1,12 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local v1 = require(l_script_FirstAncestor_0.Components.Constants);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local l_PlayerMenuActions_0 = v1.PlayerMenuActions;
-return function(v4, v5) --[[ Line: 6 ]] --[[ Name: reportExperienceUIStateReducer ]]
-    -- upvalues: l_PlayerMenuActions_0 (copy)
-    local v6 = table.clone(v4);
-    if v5.type == l_PlayerMenuActions_0.UpdateComment then
-        v6.comment = v5.comment;
-    end;
-    return v6;
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+require(AbuseReportMenu.Components.Types)
+
+local PlayerMenuActions = Constants.PlayerMenuActions
+
+local function reportExperienceUIStateReducer(p1, p2) -- line: 6
+	-- upvalues: PlayerMenuActions (copy)
+	local v7 = table.clone(p1)
+
+	if p2.type == PlayerMenuActions.UpdateComment then
+		v7.comment = p2.comment
+	end
+
+	return v7
+end
+
+return reportExperienceUIStateReducer

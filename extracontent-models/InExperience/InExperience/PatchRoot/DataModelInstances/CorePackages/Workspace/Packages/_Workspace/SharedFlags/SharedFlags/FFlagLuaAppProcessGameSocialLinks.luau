@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppProcessGameSocialLinks", false);
+return game:DefineFastFlag("LuaAppProcessGameSocialLinks", false)

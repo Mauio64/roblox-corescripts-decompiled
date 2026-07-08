@@ -1,101 +1,105 @@
-local l_Parent_0 = script:FindFirstAncestor("Analytics").Parent;
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_GetFFlagShareGetPlatformTargetImpl_0 = require(l_Parent_0.SharedFlags).GetFFlagShareGetPlatformTargetImpl;
-local v3 = nil;
-v3 = if l_GetFFlagShareGetPlatformTargetImpl_0() then require(script.Parent.Parent.getPlatformTarget) else function() --[[ Line: 36 ]] --[[ Name: getPlatformTarget ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    local v4 = "unknownLua";
-    local l_None_0 = Enum.Platform.None;
-    pcall(function() --[[ Line: 42 ]]
-        -- upvalues: l_None_0 (ref), l_UserInputService_0 (ref)
-        l_None_0 = l_UserInputService_0:GetPlatform();
-    end);
-    local v6 = true;
-    if l_None_0 ~= Enum.Platform.Windows then
-        v6 = l_None_0 == Enum.Platform.OSX;
-    end;
-    local v7 = true;
-    if l_None_0 ~= Enum.Platform.IOS then
-        v7 = l_None_0 == Enum.Platform.Android;
-    end;
-    v7 = v7 or l_None_0 == Enum.Platform.UWP;
-    local v8 = true;
-    if l_None_0 ~= Enum.Platform.XBox360 then
-        v8 = l_None_0 == Enum.Platform.XBoxOne;
-    end;
-    v8 = v8 or l_None_0 == Enum.Platform.PS3 or l_None_0 == Enum.Platform.PS4 or game:GetEngineFeature("PlatformEnumPS5") and l_None_0 == Enum.Platform.PS5 or l_None_0 == Enum.Platform.WiiU;
-    return v6 and "client" or v7 and "mobile" or v8 and "console" or v4 .. tostring(l_None_0);
-end;
-local v9 = {};
-v9.__index = v9;
-v9.new = function(v10) --[[ Line: 79 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy)
-    local v11 = type(v10);
-    local v12 = true;
-    if v11 ~= "table" then
-        v12 = v11 == "userdata";
-    end;
-    assert(v12, "Unexpected value for reportingService");
-    local v13 = {
-        _reporter = v10, 
-        _isEnabled = true
-    };
-    setmetatable(v13, v9);
-    return v13;
-end;
-v9.setEnabled = function(v14, v15) --[[ Line: 92 ]] --[[ Name: setEnabled ]]
-    assert(type(v15) == "boolean", "Expected isEnabled to be a boolean");
-    v14._isEnabled = v15;
-end;
-v9.setRBXEvent = function(v16, v17, v18, v19) --[[ Line: 100 ]] --[[ Name: setRBXEvent ]]
-    -- upvalues: v3 (ref)
-    local v20 = v3();
-    v19 = v19 or {};
-    assert(type(v17) == "string", "Expected eventContext to be a string");
-    assert(type(v18) == "string", "Expected eventName to be a string");
-    assert(type(v19) == "table", "Expected additionalArgs to be a table");
-    assert(v16._isEnabled, "This reporting service is disabled");
-    v16._reporter:SetRBXEvent(v20, v17, v18, v19);
-end;
-v9.setRBXEventStream = function(v21, v22, v23, v24) --[[ Line: 116 ]] --[[ Name: setRBXEventStream ]]
-    -- upvalues: v3 (ref)
-    local v25 = v3();
-    v24 = v24 or {};
-    assert(type(v22) == "string", "Expected eventContext to be a string");
-    assert(type(v23) == "string", "Expected eventName to be a string");
-    assert(type(v24) == "table", "Expected additionalArgs to be a table");
-    assert(v21._isEnabled, "This reporting service is disabled");
-    v21._reporter:SetRBXEventStream(v25, v22, v23, v24);
-end;
-v9.releaseRBXEventStream = function(v26) --[[ Line: 129 ]] --[[ Name: releaseRBXEventStream ]]
-    -- upvalues: v3 (ref)
-    assert(v26._isEnabled, "This reporting service is disabled");
-    v26._reporter:ReleaseRBXEventStream(v3());
-end;
-v9.sendEventDeferred = function(v27, v28, v29, v30) --[[ Line: 138 ]] --[[ Name: sendEventDeferred ]]
-    -- upvalues: v3 (ref)
-    local v31 = v3();
-    v30 = v30 or {};
-    assert(type(v28) == "string", "Expected eventContext to be a string");
-    assert(type(v29) == "string", "Expected eventName to be a string");
-    assert(type(v30) == "table", "Expected additionalArgs to be a table");
-    assert(v27._isEnabled, "This reporting service is disabled");
-    v27._reporter:SendEventDeferred(v31, v28, v29, v30);
-end;
-v9.sendEventImmediately = function(v32, v33, v34, v35) --[[ Line: 154 ]] --[[ Name: sendEventImmediately ]]
-    -- upvalues: v3 (ref)
-    local v36 = v3();
-    v35 = v35 or {};
-    assert(type(v33) == "string", "Expected eventContext to be a string");
-    assert(type(v34) == "string", "Expected eventName to be a string");
-    assert(type(v35) == "table", "Expected additionalArgs to be a table");
-    assert(v32._isEnabled, "This reporting service is disabled");
-    v32._reporter:SendEventImmediately(v36, v33, v34, v35);
-end;
-v9.updateHeartbeatObject = function(v37, v38) --[[ Line: 168 ]] --[[ Name: updateHeartbeatObject ]]
-    v38 = v38 or {};
-    assert(type(v38) == "table", "Expected additionalArgs to be a table");
-    assert(v37._isEnabled, "This reporting service is disabled");
-    v37._reporter:UpdateHeartbeatObject(v38);
-end;
-return v9;
+local Parent = script:FindFirstAncestor("Analytics").Parent
+local UserInputService = game:GetService("UserInputService")
+local getPlatformTarget
+
+if require(Parent.SharedFlags).GetFFlagShareGetPlatformTargetImpl() then
+	getPlatformTarget = require(script.Parent.Parent.getPlatformTarget)
+else
+	function getPlatformTarget() -- line: 36
+		-- upvalues: UserInputService (copy)
+		local None = Enum.Platform.None
+
+		pcall(function() -- line: 42
+			-- upvalues: None (ref), UserInputService (copy)
+			None = UserInputService:GetPlatform()
+		end)
+
+		local v6 = None == Enum.Platform.Windows or None == Enum.Platform.OSX
+		local v7 = None == Enum.Platform.IOS or None == Enum.Platform.Android or None == Enum.Platform.UWP
+		local v8 = None == Enum.Platform.XBox360 or None == Enum.Platform.XBoxOne or (None == Enum.Platform.PS3 or (None == Enum.Platform.PS4 or game:GetEngineFeature("PlatformEnumPS5") and None == Enum.Platform.PS5)) or None == Enum.Platform.WiiU
+
+		return if not v6 then if not v7 then if not v8 then "unknownLua" .. tostring(None) else "console" else "mobile" else "client"
+	end
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 79
+	-- upvalues: t1 (copy)
+	local v10 = type(p1)
+
+	assert(v10 == "table" or v10 == "userdata", "Unexpected value for reportingService")
+
+	local t2 = {
+		_isEnabled = true,
+		_reporter = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 92
+	assert(type(b1) == "boolean", "Expected isEnabled to be a boolean")
+	t3._isEnabled = b1
+end
+function t1.setRBXEvent(t4: {[any]: any}, s1: string, s2: string, t5: {[any]: any}?) -- line: 100
+	-- upvalues: getPlatformTarget (ref)
+	local v18 = getPlatformTarget()
+	local v19 = t5 or {}
+
+	assert(type(s1) == "string", "Expected eventContext to be a string")
+	assert(type(s2) == "string", "Expected eventName to be a string")
+	assert(type(v19) == "table", "Expected additionalArgs to be a table")
+	assert(t4._isEnabled, "This reporting service is disabled")
+	t4._reporter:SetRBXEvent(v18, s1, s2, v19)
+end
+function t1.setRBXEventStream(t6: {[any]: any}, s3: string, s4: string, t7: {[any]: any}?) -- line: 116
+	-- upvalues: getPlatformTarget (ref)
+	local v24 = getPlatformTarget()
+	local v25 = t7 or {}
+
+	assert(type(s3) == "string", "Expected eventContext to be a string")
+	assert(type(s4) == "string", "Expected eventName to be a string")
+	assert(type(v25) == "table", "Expected additionalArgs to be a table")
+	assert(t6._isEnabled, "This reporting service is disabled")
+	t6._reporter:SetRBXEventStream(v24, s3, s4, v25)
+end
+function t1.releaseRBXEventStream(p2) -- line: 129
+	-- upvalues: getPlatformTarget (ref)
+	assert(p2._isEnabled, "This reporting service is disabled")
+	p2._reporter:ReleaseRBXEventStream(getPlatformTarget())
+end
+function t1.sendEventDeferred(t8: {[any]: any}, s5: string, s6: string, t9: {[any]: any}?) -- line: 138
+	-- upvalues: getPlatformTarget (ref)
+	local v31 = getPlatformTarget()
+	local v32 = t9 or {}
+
+	assert(type(s5) == "string", "Expected eventContext to be a string")
+	assert(type(s6) == "string", "Expected eventName to be a string")
+	assert(type(v32) == "table", "Expected additionalArgs to be a table")
+	assert(t8._isEnabled, "This reporting service is disabled")
+	t8._reporter:SendEventDeferred(v31, s5, s6, v32)
+end
+function t1.sendEventImmediately(t10: {[any]: any}, s7: string, s8: string, t11: {[any]: any}?) -- line: 154
+	-- upvalues: getPlatformTarget (ref)
+	local v37 = getPlatformTarget()
+	local v38 = t11 or {}
+
+	assert(type(s7) == "string", "Expected eventContext to be a string")
+	assert(type(s8) == "string", "Expected eventName to be a string")
+	assert(type(v38) == "table", "Expected additionalArgs to be a table")
+	assert(t10._isEnabled, "This reporting service is disabled")
+	t10._reporter:SendEventImmediately(v37, s7, s8, v38)
+end
+function t1.updateHeartbeatObject(t12: {[any]: any}, t13: {[any]: any}?) -- line: 168
+	local v41 = t13 or {}
+
+	assert(type(v41) == "table", "Expected additionalArgs to be a table")
+	assert(t12._isEnabled, "This reporting service is disabled")
+	t12._reporter:UpdateHeartbeatObject(v41)
+end
+
+return t1

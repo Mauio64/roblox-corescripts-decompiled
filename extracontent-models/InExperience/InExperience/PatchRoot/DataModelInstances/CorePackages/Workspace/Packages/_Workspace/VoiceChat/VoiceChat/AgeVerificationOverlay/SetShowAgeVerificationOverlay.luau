@@ -1,12 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("VoiceChat").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2, v3, v4, v5, v6, v7) --[[ Line: 7 ]]
-    return {
-        universeId = v1, 
-        isPlaceEnabledForVoice = v2, 
-        isUniverseEnabledForVoice = v3, 
-        isVoiceEnabled = v4, 
-        isUniverseEnabledForAvatarVideo = v6, 
-        showVoiceOptInOverlay = v5, 
-        elegibleToSeeVoiceUpsell = v7
-    };
-end);
+local Parent = script:FindFirstAncestor("VoiceChat").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3, p4, p5, p6, p7) -- line: 7
+	return {
+		universeId = p1,
+		isPlaceEnabledForVoice = p2,
+		isUniverseEnabledForVoice = p3,
+		isVoiceEnabled = p4,
+		isUniverseEnabledForAvatarVideo = p6,
+		showVoiceOptInOverlay = p5,
+		elegibleToSeeVoiceUpsell = p7
+	}
+end)

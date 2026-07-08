@@ -1,395 +1,545 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local v4 = require(l_script_FirstAncestor_0.Unibar.Constants);
-local l_game_EngineFeature_0 = game:GetEngineFeature("InGameMenuStateStorageKey");
-local v6 = nil;
-local v7 = false;
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v9 = "player_" .. tostring(if l_LocalPlayer_0 then l_LocalPlayer_0.UserId else 0);
-local function v10() --[[ Line: 25 ]] --[[ Name: initStore ]]
-    -- upvalues: v6 (ref), v9 (copy)
-    if v6.LocalPlayer == nil then
-        v6.LocalPlayer = {};
-    end;
-    if v6.LocalPlayer[v9] == nil then
-        v6.LocalPlayer[v9] = {};
-    end;
-    if v6.AnyPlayer == nil then
-        v6.AnyPlayer = {};
-    end;
-end;
-local function v12(v11) --[[ Line: 37 ]] --[[ Name: localPlayerSelector ]]
-    -- upvalues: v9 (copy)
-    if v11 and v11.LocalPlayer and v11.LocalPlayer[v9] then
-        return v11.LocalPlayer[v9];
-    else
-        return v11;
-    end;
-end;
-local function v14(v13) --[[ Line: 44 ]] --[[ Name: anyPlayerSelector ]]
-    if v13 and v13.AnyPlayer then
-        return v13.AnyPlayer;
-    else
-        return v13;
-    end;
-end;
-local function v19() --[[ Line: 51 ]] --[[ Name: loadStore ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), l_AppStorageService_0 (copy), v7 (ref), l_HttpService_0 (copy), v6 (ref), v10 (copy)
-    if not l_game_EngineFeature_0 then
-        return;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 55 ]]
-            -- upvalues: l_AppStorageService_0 (ref)
-            return l_AppStorageService_0:GetItem("InGameMenuState");
-        end);
-        if l_status_0 then
-            v7 = true;
-            if #l_result_0 > 0 then
-                local l_status_1, l_result_1 = pcall(function() --[[ Line: 61 ]]
-                    -- upvalues: l_HttpService_0 (ref), l_result_0 (copy)
-                    return l_HttpService_0:JSONDecode(l_result_0);
-                end);
-                if l_status_1 then
-                    v6 = l_result_1;
-                else
-                    v6 = {};
-                end;
-            else
-                v6 = {};
-            end;
-            v10();
-        end;
-        return;
-    end;
-end;
-local function v24() --[[ Line: 76 ]] --[[ Name: saveStore ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), v7 (ref), l_HttpService_0 (copy), v6 (ref), l_AppStorageService_0 (copy)
-    if not l_game_EngineFeature_0 then
-        return;
-    else
-        if v7 then
-            local l_status_2, l_result_2 = pcall(function() --[[ Line: 81 ]]
-                -- upvalues: l_HttpService_0 (ref), v6 (ref)
-                return l_HttpService_0:JSONEncode(v6);
-            end);
-            if l_status_2 then
-                local l_status_3, l_result_3 = pcall(function() --[[ Line: 85 ]]
-                    -- upvalues: l_AppStorageService_0 (ref), l_result_2 (copy)
-                    l_AppStorageService_0:SetItem("InGameMenuState", l_result_2);
-                    l_AppStorageService_0:Flush();
-                end);
-                if not l_status_3 then
-                    print(l_result_3);
-                    error("Failed to write JSON to AppStorageService", 0);
-                    return;
-                end;
-            else
-                error("Failed to encode JSON", 0);
-            end;
-        end;
-        return;
-    end;
-end;
-local function v25(v26) --[[ Line: 99 ]] --[[ Name: deepCopy ]]
-    -- upvalues: v25 (copy)
-    if type(v26) ~= "table" then
-        return v26;
-    else
-        local v27 = {};
-        for v28, v29 in pairs(v26) do
-            v27[v28] = v25(v29);
-        end;
-        return v27;
-    end;
-end;
-local function _(v30, v31, v32) --[[ Line: 111 ]] --[[ Name: store ]]
-    -- upvalues: v7 (ref), v19 (copy), v6 (ref), v25 (copy), v24 (copy)
-    if not v7 then
-        v19();
-    end;
-    if v7 then
-        local v33 = v32 and v32(v6) or v6;
-        local v34 = v33[v30];
-        v33[v30] = v25(v31);
-        if v34 ~= v33[v30] then
-            v24();
-        end;
-    end;
-end;
-local function _(v36, v37) --[[ Line: 125 ]] --[[ Name: load ]]
-    -- upvalues: v7 (ref), v19 (copy), v6 (ref), v25 (copy)
-    if not v7 then
-        v19();
-    end;
-    if v7 then
-        local v38 = v37 and v37(v6) or v6;
-        if v38 then
-            return (v25(v38[v36]));
-        end;
-    end;
-    return nil;
-end;
-local function v45(v40) --[[ Line: 138 ]] --[[ Name: getValue ]]
-    -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy)
-    local v41 = false;
-    local l_v12_0 = v12;
-    if not v7 then
-        v19();
-    end;
-    if v7 then
-        local v43;
-        if l_v12_0 then
-            local l_v6_0 = v6;
-            v43 = if l_v6_0 and l_v6_0.LocalPlayer and l_v6_0.LocalPlayer[v9] then l_v6_0.LocalPlayer[v9] else l_v6_0;
-            v41 = v43;
-        end;
-        if not v41 then
-            v43 = v6;
-        end;
-        v41 = false;
-        if v43 then
-            return (v25(v43[v40]));
-        end;
-    end;
-    return nil;
-end;
-local function v53(v46) --[[ Line: 143 ]] --[[ Name: getUniversesExposedTo ]]
-    -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy)
-    local v47 = false;
-    local v48 = false;
-    local l_v12_1 = v12;
-    if not v7 then
-        v19();
-    end;
-    local v50;
-    if v7 then
-        local v51;
-        if l_v12_1 then
-            local l_v6_1 = v6;
-            v51 = if l_v6_1 and l_v6_1.LocalPlayer and l_v6_1.LocalPlayer[v9] then l_v6_1.LocalPlayer[v9] else l_v6_1;
-            v47 = v51;
-        end;
-        if not v47 then
-            v51 = v6;
-        end;
-        v47 = false;
-        if v51 then
-            v50 = v25(v51[v46]);
-            v48 = true;
-        end;
-    end;
-    if not v48 then
-        v50 = nil;
-    end;
-    v48 = false;
-    if not v50 then
-        return {};
-    else
-        return v50;
-    end;
-end;
-local function v66(v54, v55) --[[ Line: 151 ]] --[[ Name: addUniverseToExposureList ]]
-    -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy), v4 (copy), v24 (copy)
-    local v56 = false;
-    local v57 = false;
-    local v58 = false;
-    local l_v12_2 = v12;
-    if not v7 then
-        v19();
-    end;
-    local v60;
-    if v7 then
-        local v61;
-        if l_v12_2 then
-            local l_v6_2 = v6;
-            v61 = if l_v6_2 and l_v6_2.LocalPlayer and l_v6_2.LocalPlayer[v9] then l_v6_2.LocalPlayer[v9] else l_v6_2;
-            v56 = v61;
-        end;
-        if not v56 then
-            v61 = v6;
-        end;
-        v56 = false;
-        if v61 then
-            v60 = v25(v61[v54]);
-            v57 = true;
-        end;
-    end;
-    if not v57 then
-        v60 = nil;
-    end;
-    v57 = false;
-    local v63 = if not v60 then {} else v60;
-    if not table.find(v63, v55) and #v63 < v4.MAX_NUM_UNIVERSES_SHOWN then
-        table.insert(v63, v55);
-        v60 = v12;
-        if not v7 then
-            v19();
-        end;
-        if v7 then
-            if v60 then
-                local l_v6_3 = v6;
-                l_v12_2 = if l_v6_3 and l_v6_3.LocalPlayer and l_v6_3.LocalPlayer[v9] then l_v6_3.LocalPlayer[v9] else l_v6_3;
-                v58 = l_v12_2;
-            end;
-            if not v58 then
-                l_v12_2 = v6;
-            end;
-            v58 = false;
-            local v65 = l_v12_2[v54];
-            l_v12_2[v54] = v25(v63);
-            if v65 ~= l_v12_2[v54] then
-                v24();
-            end;
-        end;
-    end;
-end;
-local function v74(v67) --[[ Line: 160 ]] --[[ Name: getNumUniversesExposedTo ]]
-    -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy)
-    local v68 = false;
-    local v69 = false;
-    local l_v12_3 = v12;
-    if not v7 then
-        v19();
-    end;
-    local v71;
-    if v7 then
-        local v72;
-        if l_v12_3 then
-            local l_v6_4 = v6;
-            v72 = if l_v6_4 and l_v6_4.LocalPlayer and l_v6_4.LocalPlayer[v9] then l_v6_4.LocalPlayer[v9] else l_v6_4;
-            v68 = v72;
-        end;
-        if not v68 then
-            v72 = v6;
-        end;
-        v68 = false;
-        if v72 then
-            v71 = v25(v72[v67]);
-            v69 = true;
-        end;
-    end;
-    if not v69 then
-        v71 = nil;
-    end;
-    v69 = false;
-    return #if not v71 then {} else v71;
-end;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local AppStorageService = game:GetService("AppStorageService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local Constants = require(ChromeShared.Unibar.Constants)
+local EngineFeature = game:GetEngineFeature("InGameMenuStateStorageKey")
+local u7 = nil
+local u8 = false
+local LocalPlayer = Players.LocalPlayer
+
+while not LocalPlayer do
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local v10 = "player_" .. tostring(not LocalPlayer and 0 or LocalPlayer.UserId)
+
+local function initStore() -- line: 25
+	-- upvalues: u7 (ref), v10 (copy)
+	if u7.LocalPlayer == nil then
+		u7.LocalPlayer = {}
+	end
+
+	if u7.LocalPlayer[v10] == nil then
+		u7.LocalPlayer[v10] = {}
+	end
+
+	if u7.AnyPlayer == nil then
+		u7.AnyPlayer = {}
+	end
+end
+local function localPlayerSelector(p1) -- line: 37
+	-- upvalues: v10 (copy)
+	if p1 and (p1.LocalPlayer and p1.LocalPlayer[v10]) then
+		return p1.LocalPlayer[v10]
+	end
+
+	return p1
+end
+local function anyPlayerSelector(p2) -- line: 44
+	if p2 and p2.AnyPlayer then
+		return p2.AnyPlayer
+	end
+
+	return p2
+end
+local function loadStore() -- line: 51
+	-- upvalues: EngineFeature (copy), AppStorageService (copy), u8 (ref), HttpService (copy), u7 (ref), initStore (copy)
+	if not EngineFeature then
+		return
+	end
+
+	local ok, result = pcall(function() -- line: 55
+		-- upvalues: AppStorageService (copy)
+		return AppStorageService:GetItem("InGameMenuState")
+	end)
+
+	if ok then
+		u8 = true
+
+		if #result > 0 then
+			local ok2, result2 = pcall(function() -- line: 61
+				-- upvalues: HttpService (copy), result (copy)
+				return HttpService:JSONDecode(result)
+			end)
+
+			if ok2 then
+				u7 = result2
+			else
+				u7 = {}
+			end
+		else
+			u7 = {}
+		end
+
+		initStore()
+	end
+end
+local function saveStore() -- line: 76
+	-- upvalues: EngineFeature (copy), u8 (ref), HttpService (copy), u7 (ref), AppStorageService (copy)
+	if not EngineFeature then
+		return
+	end
+
+	if u8 then
+		local ok, result = pcall(function() -- line: 81
+			-- upvalues: HttpService (copy), u7 (ref)
+			return HttpService:JSONEncode(u7)
+		end)
+
+		if ok then
+			local ok3, result3 = pcall(function() -- line: 85
+				-- upvalues: AppStorageService (copy), result (copy)
+				AppStorageService:SetItem("InGameMenuState", result)
+				AppStorageService:Flush()
+			end)
+
+			if not ok3 then
+				print(result3)
+				error("Failed to write JSON to AppStorageService", 0)
+
+				return
+			end
+		else
+			error("Failed to encode JSON", 0)
+		end
+	end
+end
+local function deepCopy(p3) -- line: 99
+	-- upvalues: deepCopy (copy)
+	if type(p3) ~= "table" then
+		return p3
+	end
+
+	local t1 = {}
+
+	for k, v in pairs(p3) do
+		t1[k] = deepCopy(v)
+	end
+
+	return t1
+end
+local function store(s1: string, p4, p5) -- line: 111
+	-- upvalues: u8 (ref), loadStore (copy), u7 (ref), deepCopy (copy), saveStore (copy)
+	if not u8 then
+		loadStore()
+	end
+
+	if u8 then
+		local v36 = p5 and p5(u7) or u7
+		local v37 = v36[s1]
+
+		v36[s1] = deepCopy(p4)
+
+		if v37 ~= v36[s1] then
+			saveStore()
+		end
+	end
+end
+local function load(s2: string, p6) -- line: 125
+	-- upvalues: u8 (ref), loadStore (copy), u7 (ref), deepCopy (copy)
+	if not u8 then
+		loadStore()
+	end
+
+	if u8 then
+		local v40 = p6 and p6(u7) or u7
+
+		if v40 then
+			return (deepCopy(v40[s2]))
+		end
+	end
+
+	return nil
+end
+
 return {
-    isEnabled = function() --[[ Line: 166 ]] --[[ Name: isEnabled ]]
-        -- upvalues: l_game_EngineFeature_0 (copy)
-        return l_game_EngineFeature_0;
-    end, 
-    storeForLocalPlayer = function(v75, v76) --[[ Line: 169 ]] --[[ Name: storeForLocalPlayer ]]
-        -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy), v24 (copy)
-        local v77 = false;
-        local l_v12_4 = v12;
-        if not v7 then
-            v19();
-        end;
-        if v7 then
-            local v79;
-            if l_v12_4 then
-                local l_v6_5 = v6;
-                v79 = if l_v6_5 and l_v6_5.LocalPlayer and l_v6_5.LocalPlayer[v9] then l_v6_5.LocalPlayer[v9] else l_v6_5;
-                v77 = v79;
-            end;
-            if not v77 then
-                v79 = v6;
-            end;
-            v77 = false;
-            local v81 = v79[v75];
-            v79[v75] = v25(v76);
-            if v81 ~= v79[v75] then
-                v24();
-            end;
-        end;
-    end, 
-    loadForLocalPlayer = function(v82) --[[ Line: 172 ]] --[[ Name: loadForLocalPlayer ]]
-        -- upvalues: v12 (copy), v7 (ref), v19 (copy), v6 (ref), v9 (copy), v25 (copy)
-        local v83 = false;
-        local l_v12_5 = v12;
-        if not v7 then
-            v19();
-        end;
-        if v7 then
-            local v85;
-            if l_v12_5 then
-                local l_v6_6 = v6;
-                v85 = if l_v6_6 and l_v6_6.LocalPlayer and l_v6_6.LocalPlayer[v9] then l_v6_6.LocalPlayer[v9] else l_v6_6;
-                v83 = v85;
-            end;
-            if not v83 then
-                v85 = v6;
-            end;
-            v83 = false;
-            if v85 then
-                return (v25(v85[v82]));
-            end;
-        end;
-        return nil;
-    end, 
-    storeForAnyPlayer = function(v87, v88) --[[ Line: 176 ]] --[[ Name: storeForAnyPlayer ]]
-        -- upvalues: v14 (copy), v7 (ref), v19 (copy), v6 (ref), v25 (copy), v24 (copy)
-        local v89 = false;
-        local l_v14_0 = v14;
-        if not v7 then
-            v19();
-        end;
-        if v7 then
-            local v91;
-            if l_v14_0 then
-                local l_v6_7 = v6;
-                v91 = if l_v6_7 and l_v6_7.AnyPlayer then l_v6_7.AnyPlayer else l_v6_7;
-                v89 = v91;
-            end;
-            if not v89 then
-                v91 = v6;
-            end;
-            v89 = false;
-            local v93 = v91[v87];
-            v91[v87] = v25(v88);
-            if v93 ~= v91[v87] then
-                v24();
-            end;
-        end;
-    end, 
-    loadForAnyPlayer = function(v94) --[[ Line: 179 ]] --[[ Name: loadForAnyPlayer ]]
-        -- upvalues: v14 (copy), v7 (ref), v19 (copy), v6 (ref), v25 (copy)
-        local v95 = false;
-        local l_v14_1 = v14;
-        if not v7 then
-            v19();
-        end;
-        if v7 then
-            local v97;
-            if l_v14_1 then
-                local l_v6_8 = v6;
-                v97 = if l_v6_8 and l_v6_8.AnyPlayer then l_v6_8.AnyPlayer else l_v6_8;
-                v95 = v97;
-            end;
-            if not v95 then
-                v97 = v6;
-            end;
-            v95 = false;
-            if v97 then
-                return (v25(v97[v94]));
-            end;
-        end;
-        return nil;
-    end, 
-    clearCache = function() --[[ Line: 183 ]] --[[ Name: clearCache ]]
-        -- upvalues: v7 (ref), v6 (ref)
-        v7 = false;
-        v6 = nil;
-    end, 
-    getValue = v45, 
-    getUniversesExposedTo = v53, 
-    getNumUniversesExposedTo = v74, 
-    addUniverseToExposureList = v66
-};
+	isEnabled = function() -- line: 166
+		-- upvalues: EngineFeature (copy)
+		return EngineFeature
+	end,
+	storeForLocalPlayer = function(p7, p8) -- line: 169
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy), saveStore (copy)
+		local v78 = localPlayerSelector
+		local g81 = nil
+		local v80 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		if not u8 then
+			return
+		end
+
+		if v78 then
+			local v79 = u7
+
+			v80 = if not v79 or (not v79.LocalPlayer or not v79.LocalPlayer[v10]) then v79 else v79.LocalPlayer[v10]
+
+			if v80 then
+				g81 = true
+			end
+		end
+
+		if not g81 then
+			v80 = u7
+		end
+
+		g81 = false
+
+		local v82 = v80[p7]
+
+		v80[p7] = deepCopy(p8)
+
+		if v82 ~= v80[p7] then
+			saveStore()
+		end
+	end,
+	loadForLocalPlayer = function(p9) -- line: 172
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy)
+		local v84 = localPlayerSelector
+		local g87 = nil
+		local v86 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		if not u8 then
+			return nil
+		end
+
+		if v84 then
+			local v85 = u7
+
+			v86 = if not v85 or (not v85.LocalPlayer or not v85.LocalPlayer[v10]) then v85 else v85.LocalPlayer[v10]
+
+			if v86 then
+				g87 = true
+			end
+		end
+
+		if not g87 then
+			v86 = u7
+		end
+
+		g87 = false
+
+		if v86 then
+			return (deepCopy(v86[p9]))
+		end
+
+		return nil
+	end,
+	storeForAnyPlayer = function(p10, p11) -- line: 176
+		-- upvalues: anyPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), deepCopy (copy), saveStore (copy)
+		local v90 = anyPlayerSelector
+		local g93 = nil
+		local v92 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		if not u8 then
+			return
+		end
+
+		if v90 then
+			local v91 = u7
+
+			v92 = if not v91 or not v91.AnyPlayer then v91 else v91.AnyPlayer
+
+			if v92 then
+				g93 = true
+			end
+		end
+
+		if not g93 then
+			v92 = u7
+		end
+
+		g93 = false
+
+		local v94 = v92[p10]
+
+		v92[p10] = deepCopy(p11)
+
+		if v94 ~= v92[p10] then
+			saveStore()
+		end
+	end,
+	loadForAnyPlayer = function(p12) -- line: 179
+		-- upvalues: anyPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), deepCopy (copy)
+		local v96 = anyPlayerSelector
+		local g99 = nil
+		local v98 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		if not u8 then
+			return nil
+		end
+
+		if v96 then
+			local v97 = u7
+
+			v98 = if not v97 or not v97.AnyPlayer then v97 else v97.AnyPlayer
+
+			if v98 then
+				g99 = true
+			end
+		end
+
+		if not g99 then
+			v98 = u7
+		end
+
+		g99 = false
+
+		if v98 then
+			return (deepCopy(v98[p12]))
+		end
+
+		return nil
+	end,
+	clearCache = function() -- line: 183
+		-- upvalues: u8 (ref), u7 (ref)
+		u8 = false
+		u7 = nil
+	end,
+	getValue = function(s3: string) -- line: 138
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy)
+		local v42 = localPlayerSelector
+		local g45 = nil
+		local v44 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		if not u8 then
+			return nil
+		end
+
+		if v42 then
+			local v43 = u7
+
+			v44 = if not v43 or (not v43.LocalPlayer or not v43.LocalPlayer[v10]) then v43 else v43.LocalPlayer[v10]
+
+			if v44 then
+				g45 = true
+			end
+		end
+
+		if not g45 then
+			v44 = u7
+		end
+
+		g45 = false
+
+		if v44 then
+			return (deepCopy(v44[s3]))
+		end
+
+		return nil
+	end,
+	getUniversesExposedTo = function(s4: string) -- line: 143
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy)
+		local v47 = localPlayerSelector
+		local g48 = nil
+		local g50 = nil
+		local g53 = nil
+		local v52 = nil
+		local v49 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		repeat
+			if g48 or not u8 then
+				g48 = false
+				v49 = nil
+				g50 = true
+			end
+
+			if not g50 then
+				if v47 then
+					local v51 = u7
+
+					v52 = if not v51 or (not v51.LocalPlayer or not v51.LocalPlayer[v10]) then v51 else v51.LocalPlayer[v10]
+
+					if v52 then
+						g53 = true
+					end
+				end
+
+				if not g53 then
+					v52 = u7
+				end
+
+				g53 = false
+			end
+
+			if g50 or v52 then
+				if not g50 then
+					v49 = deepCopy(v52[s4])
+				end
+
+				g50 = false
+
+				if not v49 then
+					return {}
+				end
+
+				return v49
+			end
+
+			g48 = true
+		until not g48
+	end,
+	getNumUniversesExposedTo = function(p13) -- line: 160
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy)
+		local v70 = localPlayerSelector
+		local g71 = nil
+		local g75 = nil
+		local v74 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		repeat
+			local v72
+
+			if g71 or not u8 then
+				g71 = false
+				v72 = nil
+
+				return #(v72 or {})
+			end
+
+			if v70 then
+				local v73 = u7
+
+				v74 = if not v73 or (not v73.LocalPlayer or not v73.LocalPlayer[v10]) then v73 else v73.LocalPlayer[v10]
+
+				if v74 then
+					g75 = true
+				end
+			end
+
+			if not g75 then
+				v74 = u7
+			end
+
+			g75 = false
+
+			if v74 then
+				v72 = deepCopy(v74[p13])
+
+				return #(v72 or {})
+			end
+
+			g71 = true
+		until not g71
+	end,
+	addUniverseToExposureList = function(s5: string, n1: number) -- line: 151
+		-- upvalues: localPlayerSelector (copy), u8 (ref), loadStore (copy), u7 (ref), v10 (copy), deepCopy (copy), Constants (copy), saveStore (copy)
+		local v56 = localPlayerSelector
+		local g57 = nil
+		local g59 = nil
+		local g62 = nil
+		local v61 = nil
+		local v58 = nil
+		local g67 = nil
+		local v66 = nil
+
+		if not u8 then
+			loadStore()
+		end
+
+		repeat
+			if g57 or not u8 then
+				g57 = false
+				v58 = nil
+				g59 = true
+			end
+
+			if not g59 then
+				if v56 then
+					local v60 = u7
+
+					v61 = if not v60 or (not v60.LocalPlayer or not v60.LocalPlayer[v10]) then v60 else v60.LocalPlayer[v10]
+
+					if v61 then
+						g62 = true
+					end
+				end
+
+				if not g62 then
+					v61 = u7
+				end
+
+				g62 = false
+			end
+
+			if g59 or v61 then
+				if not g59 then
+					v58 = deepCopy(v61[s5])
+				end
+
+				g59 = false
+
+				local v63 = v58 or {}
+
+				if not table.find(v63, n1) and #v63 < Constants.MAX_NUM_UNIVERSES_SHOWN then
+					table.insert(v63, n1)
+
+					local v64 = localPlayerSelector
+
+					if not u8 then
+						loadStore()
+					end
+
+					if u8 then
+						if v64 then
+							local v65 = u7
+
+							v66 = if not v65 or (not v65.LocalPlayer or not v65.LocalPlayer[v10]) then v65 else v65.LocalPlayer[v10]
+
+							if v66 then
+								g67 = true
+							end
+						end
+
+						if not g67 then
+							v66 = u7
+						end
+
+						g67 = false
+
+						local v68 = v66[s5]
+
+						v66[s5] = deepCopy(v63)
+
+						if v68 ~= v66[s5] then
+							saveStore()
+						end
+
+						return
+					end
+				end
+
+				return
+			end
+
+			g57 = true
+		until not g57
+	end
+}

@@ -1,122 +1,142 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local l_List_0 = require(l_Parent_0.llama).List;
-local v4 = require(l_script_FirstAncestor_0.BubbleChat.ChatBubble);
-local v5 = require(l_script_FirstAncestor_0.GlobalFlags);
-local v6 = v2.PureComponent:extend("BubbleChatList");
-local v7 = require(l_script_FirstAncestor_0.Flags.getFFlagChatTranslationUIEnabledBubbleChat);
-local v8 = require(l_script_FirstAncestor_0.Flags.getFFlagExpChatUseUpdatedMessageRendered);
-v6.getDerivedStateFromProps = function(v9, v10) --[[ Line: 16 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: l_List_0 (copy), v7 (copy), v8 (copy)
-    local v11 = {};
-    if v10.bubbles then
-        for _, v13 in ipairs(v10.bubbles) do
-            if not l_List_0.findWhere(v9.messages, function(v14, _) --[[ Line: 23 ]]
-                -- upvalues: v13 (copy)
-                return v14.messageId == v13.messageId;
-            end) then
-                table.insert(v11, {
-                    messageId = v13.messageId, 
-                    fadingOut = true
-                });
-            end;
-        end;
-    end;
-    for _, v17 in ipairs(v9.messages) do
-        local v18 = tonumber(tostring(v17.timestamp):sub(-9));
-        table.insert(v11, {
-            messageId = v17.messageId, 
-            fadingOut = false, 
-            text = v17.text, 
-            translation = if v7() then v17.translation else nil, 
-            useTranslation = if v7() then v17.useTranslation else nil, 
-            timestamp = v18 or v17.timestamp, 
-            bubbleChatMessageProperties = v17.bubbleChatMessageProperties, 
-            textChatMessageInstance = if v8() then v17.textChatMessageInstance else nil
-        });
-    end;
-    return {
-        bubbles = v11
-    };
-end;
-v6.init = function(v19, v20) --[[ Line: 58 ]] --[[ Name: init ]]
-    -- upvalues: l_List_0 (copy)
-    v19.state = {};
-    if (not v20.messages or #v20.messages == 0) and v20.onLastBubbleFadeOut then
-        v20.onLastBubbleFadeOut();
-    end;
-    v19.onBubbleFadeOut = function(v21) --[[ Line: 67 ]]
-        -- upvalues: l_List_0 (ref), v19 (copy)
-        local v23 = l_List_0.filter(v19.state.bubbles, function(v22) --[[ Line: 68 ]]
-            -- upvalues: v21 (copy)
-            return v22.messageId ~= v21;
-        end);
-        if #v23 == 0 and v19.props.onLastBubbleFadeOut then
-            v19.props.onLastBubbleFadeOut();
-            return;
-        else
-            v19:setState({
-                bubbles = v23
-            });
-            return;
-        end;
-    end;
-end;
-v6.render = function(v24) --[[ Line: 83 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v5 (copy), v4 (copy), v7 (copy), v8 (copy)
-    local v25 = {};
-    local l_chatSettings_0 = v24.props.chatSettings;
-    v25.Layout = v2.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-        Padding = UDim.new(0, l_chatSettings_0.BubblesSpacing)
-    });
-    v25.CaretPadding = v24.props.chatSettings.TailVisible and (not v5.AvatarChatEnabled or v24.props.showCaret) and v2.createElement("UIPadding", {
-        PaddingBottom = UDim.new(0, 8)
-    });
-    for v27, v28 in ipairs(v24.state.bubbles) do
-        local v29 = v27 == #v24.state.bubbles;
-        local v30 = v29 and v24.props.renderFirstInsert or nil;
-        local l_insertSize_0 = v24.props.insertSize;
-        local l_text_0 = v28.text;
-        local l_translation_0 = v28.translation;
-        if v28.bubbleChatMessageProperties then
-            local l_bubbleChatMessageProperties_0 = v28.bubbleChatMessageProperties;
-            if l_bubbleChatMessageProperties_0:IsA("TextChatMessageProperties") then
-                if l_bubbleChatMessageProperties_0.Text ~= "" then
-                    l_text_0 = l_bubbleChatMessageProperties_0.Text;
-                end;
-                if l_bubbleChatMessageProperties_0.Translation ~= "" then
-                    l_translation_0 = l_bubbleChatMessageProperties_0.Translation;
-                end;
-            end;
-        end;
-        v25["Bubble" .. v28.messageId] = v2.createElement(v4, {
-            messageId = v28.messageId, 
-            text = l_text_0 or "", 
-            translation = if v7() then l_translation_0 else nil, 
-            useTranslation = if v7() then v28.useTranslation else nil, 
-            timestamp = v28.timestamp or 0, 
-            isMostRecent = v29, 
-            theme = v24.props.theme, 
-            fadingOut = v28.fadingOut, 
-            onFadeOut = v24.onBubbleFadeOut, 
-            chatSettings = l_chatSettings_0, 
-            renderInsert = v30, 
-            insertSize = l_insertSize_0, 
-            showCaret = v24.props.showCaret, 
-            clientSettings = v24.props.clientSettings, 
-            bubbleChatMessageProperties = v28.bubbleChatMessageProperties, 
-            isTextChatServiceOn = v24.props.isTextChatServiceOn, 
-            textChatMessageInstance = if v8() then v28.textChatMessageInstance else nil
-        });
-    end;
-    return v2.createElement("Frame", {
-        Visible = v24.props.isVisible, 
-        Size = UDim2.fromScale(1, 1), 
-        BackgroundTransparency = 1
-    }, v25);
-end;
-return v6;
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Roact = require(ExpChatParent.Roact)
+local List = require(ExpChatParent.llama).List
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local ChatBubble = require(ExpChat.BubbleChat.ChatBubble)
+local GlobalFlags = require(ExpChat.GlobalFlags)
+local v8 = Roact.PureComponent:extend("BubbleChatList")
+local getFFlagChatTranslationUIEnabledBubbleChat = require(ExpChat.Flags.getFFlagChatTranslationUIEnabledBubbleChat)
+local getFFlagExpChatUseUpdatedMessageRendered = require(ExpChat.Flags.getFFlagExpChatUseUpdatedMessageRendered)
+local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
+
+function v8.getDerivedStateFromProps(p1, p2) -- line: 18
+	-- upvalues: List (copy), getFFlagChatTranslationUIEnabledBubbleChat (copy), FFlagExpChatPresetChatEnabled (copy), getFFlagExpChatUseUpdatedMessageRendered (copy)
+	local t1 = {}
+
+	if p2.bubbles then
+		for _, v in ipairs(p2.bubbles) do
+			if not List.findWhere(p1.messages, function(p3, _) -- line: 25
+				-- upvalues: v (copy)
+				return p3.messageId == v.messageId
+			end) then
+				table.insert(t1, {
+					fadingOut = true,
+					messageId = v.messageId
+				})
+			end
+		end
+	end
+
+	for _, v in ipairs(p1.messages) do
+		local num = tonumber(tostring(v.timestamp):sub(-9))
+
+		table.insert(t1, {
+			fadingOut = false,
+			messageId = v.messageId,
+			text = v.text,
+			translation = if not getFFlagChatTranslationUIEnabledBubbleChat() then nil else v.translation,
+			useTranslation = if not getFFlagChatTranslationUIEnabledBubbleChat() then nil else v.useTranslation,
+			timestamp = num or v.timestamp,
+			bubbleChatMessageProperties = v.bubbleChatMessageProperties,
+			presetId = if not FFlagExpChatPresetChatEnabled then nil else v.presetId,
+			textChatMessageInstance = if not getFFlagExpChatUseUpdatedMessageRendered() then nil else v.textChatMessageInstance
+		})
+	end
+
+	return {
+		bubbles = t1
+	}
+end
+function v8.init(p5, p6) -- line: 61
+	-- upvalues: List (copy)
+	p5.state = {}
+
+	if (not p6.messages or #p6.messages == 0) and p6.onLastBubbleFadeOut then
+		p6.onLastBubbleFadeOut()
+	end
+
+	function p5.onBubbleFadeOut(p7) -- line: 70
+		-- upvalues: List (copy), p5 (copy)
+		local v36 = List.filter(p5.state.bubbles, function(p8) -- line: 71
+			-- upvalues: p7 (copy)
+			return p8.messageId ~= p7
+		end)
+
+		if #v36 == 0 and p5.props.onLastBubbleFadeOut then
+			p5.props.onLastBubbleFadeOut()
+
+			return
+		end
+
+		p5:setState({
+			bubbles = v36
+		})
+	end
+end
+function v8.render(p9) -- line: 86
+	-- upvalues: Roact (copy), GlobalFlags (copy), ChatBubble (copy), getFFlagChatTranslationUIEnabledBubbleChat (copy), FFlagExpChatPresetChatEnabled (copy), getFFlagExpChatUseUpdatedMessageRendered (copy)
+	local t2 = {}
+	local chatSettings = p9.props.chatSettings
+
+	t2.Layout = Roact.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Bottom,
+		Padding = UDim.new(0, chatSettings.BubblesSpacing)
+	})
+	t2.CaretPadding = p9.props.chatSettings.TailVisible and ((not GlobalFlags.AvatarChatEnabled or p9.props.showCaret) and Roact.createElement("UIPadding", {
+		PaddingBottom = UDim.new(0, 8)
+	}))
+
+	for i, v in ipairs(p9.state.bubbles) do
+		local v27 = i == #p9.state.bubbles
+		local v28 = v27 and p9.props.renderFirstInsert or nil
+		local insertSize = p9.props.insertSize
+		local text = v.text
+		local translation = v.translation
+
+		if v.bubbleChatMessageProperties then
+			local bubbleChatMessageProperties = v.bubbleChatMessageProperties
+
+			if bubbleChatMessageProperties:IsA("TextChatMessageProperties") then
+				if bubbleChatMessageProperties.Text ~= "" then
+					text = bubbleChatMessageProperties.Text
+				end
+
+				if bubbleChatMessageProperties.Translation ~= "" then
+					translation = bubbleChatMessageProperties.Translation
+				end
+			end
+		end
+
+		t2["Bubble" .. v.messageId] = Roact.createElement(ChatBubble, {
+			messageId = v.messageId,
+			text = text or "",
+			translation = if not getFFlagChatTranslationUIEnabledBubbleChat() then nil else translation,
+			useTranslation = if not getFFlagChatTranslationUIEnabledBubbleChat() then nil else v.useTranslation,
+			timestamp = v.timestamp or 0,
+			isMostRecent = v27,
+			theme = p9.props.theme,
+			fadingOut = v.fadingOut,
+			onFadeOut = p9.onBubbleFadeOut,
+			chatSettings = chatSettings,
+			renderInsert = v28,
+			insertSize = insertSize,
+			showCaret = p9.props.showCaret,
+			clientSettings = p9.props.clientSettings,
+			bubbleChatMessageProperties = v.bubbleChatMessageProperties,
+			presetId = if not FFlagExpChatPresetChatEnabled then nil else v.presetId,
+			isTextChatServiceOn = p9.props.isTextChatServiceOn,
+			textChatMessageInstance = if not getFFlagExpChatUseUpdatedMessageRendered() then nil else v.textChatMessageInstance
+		})
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Visible = p9.props.isVisible,
+		Size = UDim2.fromScale(1, 1)
+	}, t2)
+end
+
+return v8

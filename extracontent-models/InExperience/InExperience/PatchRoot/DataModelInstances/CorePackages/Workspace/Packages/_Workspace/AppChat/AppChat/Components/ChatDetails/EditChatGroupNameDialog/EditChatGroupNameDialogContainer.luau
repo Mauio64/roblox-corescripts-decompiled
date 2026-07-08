@@ -6,7 +6,6 @@ require(AppChat.types)
 local Cryo = require(AppChatParent.Cryo)
 local React = require(AppChatParent.React)
 local SocialLibraries = require(AppChat.SocialLibraries)
-local dependencyArray = require(AppChatParent.RoactUtils).Hooks.dependencyArray
 local memo = React.memo
 local useCallback = React.useCallback
 local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
@@ -20,8 +19,6 @@ local AppChatNetworking = require(AppChatParent.AppChatNetworking)
 local ResponseStatus = AppChatNetworking.Constants.ResponseStatus
 local ResponseIndicator = SocialLibraries.Components.ResponseIndicator
 local EditChatGroupNameDialog = require(script.Parent.EditChatGroupNameDialog)
-local SharedFlags = require(AppChatParent.SharedFlags)
-local FFlagEnableAppChatFocusableFixes = SharedFlags.FFlagEnableAppChatFocusableFixes
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
 local Logger = require(AppChat.Logger)
 local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
@@ -29,16 +26,15 @@ local AppFocusRoot = FocusNavigationUtils.AppFocusRoot
 local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local InputHandlers = require(AppChatParent.InputHandlers)
-local FFlagRemoveDependencyArrayAntipattern = SharedFlags.FFlagRemoveDependencyArrayAntipattern
 local t1 = {
-	Success = function() --[[ Success ]] -- line: 47
+	Success = function() -- line: 42
 		return {
 			visible = false,
 			isLoading = false,
 			warningTextKey = nil
 		}
 	end,
-	Moderated = function() --[[ Moderated ]] -- line: 56
+	Moderated = function() -- line: 51
 		-- upvalues: GetFFlagIsSquadEnabled (copy)
 		return {
 			visible = true,
@@ -46,7 +42,7 @@ local t1 = {
 			warningTextKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Response.ChatNameFullyModerated" or "Feature.Chat.Response.ChatNameFullyModerated.V2"
 		}
 	end,
-	Default = function(p1, p2) --[[ Default ]] -- line: 65
+	Default = function(p1, p2) -- line: 60
 		-- upvalues: GetFFlagIsSquadEnabled (copy)
 		return {
 			visible = true,
@@ -58,7 +54,7 @@ local t1 = {
 			}
 		}
 	end,
-	Waiting = function() --[[ Waiting ]] -- line: 78
+	Waiting = function() -- line: 73
 		return {
 			visible = true,
 			isLoading = true
@@ -66,120 +62,116 @@ local t1 = {
 	end
 }
 local t2 = {
-	onModalClose = function() --[[ onModalClose ]] -- line: 97
-	end,
-	titleKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.ChatGroupName" or "Feature.Chat.Label.GroupName",
 	cancelTitleKey = "Feature.Chat.Action.Cancel",
 	confirmationTitleKey = "Feature.Chat.Action.Save",
+	onModalClose = function() -- line: 92
+	end,
+	titleKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Label.ChatGroupName" or "Feature.Chat.Label.GroupName",
 	placeholderTextKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Description.NameGroupChat" or "Feature.Chat.Description.NameGroup"
 }
 
-function EditChatGroupNameDialogContainer(t3: {[any]: any}) -- line: 108
-	-- upvalues: Cryo (copy), t2 (copy), useState (copy), useDispatch (copy), useCallback (copy), AppChatNetworking (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), useSelector (copy), t1 (copy), Logger (copy), ResponseStatus (copy), React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useLocalization (copy), ResponseIndicator (copy), EditChatGroupNameDialog (copy), FFlagEnableAppChatFocusableFixes (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
-	local v32 = Cryo.Dictionary.join(t2, t3)
-	local v33, v34 = useState({
+function EditChatGroupNameDialogContainer(t3: {[any]: any}) -- line: 103
+	-- upvalues: Cryo (copy), t2 (copy), useState (copy), useDispatch (copy), useCallback (copy), AppChatNetworking (copy), useSelector (copy), t1 (copy), Logger (copy), ResponseStatus (copy), React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useLocalization (copy), ResponseIndicator (copy), EditChatGroupNameDialog (copy), AppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v28 = Cryo.Dictionary.join(t2, t3)
+	local v29, v30 = useState({
 		visible = true,
 		isLoading = false
 	})
-	local v35 = useDispatch()
-	local v36 = useCallback(function(p3, p4) -- line: 116
-		-- upvalues: v35 (copy), AppChatNetworking (copy)
-		return v35(AppChatNetworking.rodux.UpdateConversationTitle.API(p3, p4))
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v35) else { v35 })
-	local v37 = useSelector(function(p5) -- line: 120
-		-- upvalues: v32 (copy)
-		local conversationId = v32.conversationId
-		local v46 = p5.ChatAppReducer.Conversations[conversationId]
+	local v31 = useDispatch()
+	local v32 = useCallback(function(p3, p4) -- line: 111
+		-- upvalues: v31 (copy), AppChatNetworking (copy)
+		return v31(AppChatNetworking.rodux.UpdateConversationTitle.API(p3, p4))
+	end, { v31 })
+	local v33 = useSelector(function(p5) -- line: 115
+		-- upvalues: v28 (copy)
+		local conversationId = v28.conversationId
+		local v42 = p5.ChatAppReducer.Conversations[conversationId]
 		local s1 = ""
 
-		if v46 and not v46.isDefaultTitle then
-			s1 = v46.title
+		if v42 and not v42.isDefaultTitle then
+			s1 = v42.title
 		end
 
 		return s1
 	end)
-	local v38 = useCallback(function(p6) -- line: 136
-		-- upvalues: v32 (copy), v34 (copy), t1 (copy), v36 (copy), Logger (copy), v37 (copy), ResponseStatus (copy)
-		if v32.conversationId then
-			v34(t1.Waiting())
-			v36(v32.conversationId, p6.InputBox):andThen(function(p7) -- line: 140
-				-- upvalues: Logger (copy), v34 (copy), t1 (copy), v37 (copy), p6 (copy), ResponseStatus (copy), v32 (copy)
+	local v34 = useCallback(function(p6) -- line: 130
+		-- upvalues: v28 (copy), v30 (copy), t1 (copy), v32 (copy), Logger (copy), v33 (copy), ResponseStatus (copy)
+		if v28.conversationId then
+			v30(t1.Waiting())
+			v32(v28.conversationId, p6.InputBox):andThen(function(p7) -- line: 134
+				-- upvalues: Logger (copy), v30 (copy), t1 (copy), v33 (copy), p6 (copy), ResponseStatus (copy), v28 (copy)
 				if not p7 or (not p7.responseBody or not p7.responseBody.conversations or not p7.responseBody.conversations[1]) then
 					Logger.error("Conversation rename response is invalid.")
-					v34(t1.Default(v37, p6.InputBox))
+					v30(t1.Default(v33, p6.InputBox))
 
 					return
 				end
 
 				if p7.responseBody.conversations[1].status == ResponseStatus.SUCCESS then
-					v34(t1.Success())
-					v32.onModalClose()
+					v30(t1.Success())
+					v28.onModalClose()
 
 					return
 				end
 
 				if p7.responseBody and p7.responseBody.conversations[1].status == ResponseStatus.MODERATED then
 					Logger.error("Conversation rename was moderated.")
-					v34(t1.Moderated())
+					v30(t1.Moderated())
 
 					return
 				end
 
 				Logger.error("Conversation rename request failed.")
-				v34(t1.Default(v37, p6.InputBox))
-			end):catch(function(_) -- line: 163
-				-- upvalues: v34 (copy), t1 (copy), v37 (copy), p6 (copy)
-				v34(t1.Default(v37, p6.InputBox))
+				v30(t1.Default(v33, p6.InputBox))
+			end):catch(function(_) -- line: 157
+				-- upvalues: v30 (copy), t1 (copy), v33 (copy), p6 (copy)
+				v30(t1.Default(v33, p6.InputBox))
 			end)
 		end
 
 		return true
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v32.conversationId, v37) else {
-		v32.conversationId,
-		v37
+	end, {
+		v28.conversationId,
+		v33
 	})
-	local v39 = React.useMemo(function() -- line: 175
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v32 (copy)
+	local v35 = React.useMemo(function() -- line: 165
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v28 (copy)
 		return {
 			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(function(p9) -- line: 179
-					-- upvalues: v32 (copy)
-					v32.onModalClose()
+				handler = InputHandlers.onRelease(function(p9) -- line: 169
+					-- upvalues: v28 (copy)
+					v28.onModalClose()
 					p9:cancel()
 				end)
 			}
 		}
-	end, { v32.onModalClose })
-	local v40 = useLocalization({
-		titleText = v32.titleKey,
-		placeholderText = v32.placeholderTextKey,
-		cancelText = v32.cancelTitleKey,
-		confirmText = v32.confirmationTitleKey,
-		warningText = v33.warningTextKey
+	end, { v28.onModalClose })
+	local v36 = useLocalization({
+		titleText = v28.titleKey,
+		placeholderText = v28.placeholderTextKey,
+		cancelText = v28.cancelTitleKey,
+		confirmText = v28.confirmationTitleKey,
+		warningText = v29.warningTextKey
 	})
-	local v41 = React.createElement(React.Fragment, nil, {
-		responseIndicator = v33.isLoading and React.createElement(ResponseIndicator, {
-			soakAreaColor3 = Color3.fromRGB(25, 25, 25),
-			soakAreaTransparency = 0.8
+	local v37 = React.createElement(React.Fragment, nil, {
+		responseIndicator = v29.isLoading and React.createElement(ResponseIndicator, {
+			soakAreaTransparency = 0.8,
+			soakAreaColor3 = Color3.fromRGB(25, 25, 25)
 		}),
-		dialog = v33.visible and React.createElement(EditChatGroupNameDialog, Cryo.Dictionary.join(v32, v40, {
-			onActivated = v38,
-			inputText = v37,
-			conversationTitle = v37
+		dialog = v29.visible and React.createElement(EditChatGroupNameDialog, Cryo.Dictionary.join(v28, v36, {
+			onActivated = v34,
+			inputText = v33,
+			conversationTitle = v33
 		}))
 	})
 
-	if FFlagEnableAppChatFocusableFixes then
-		return (React.createElement(AppFocusRoot, {
-			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
-			isIsolated = true,
-			isAutoFocusRoot = true,
-			isFocusable = true,
-			customEventHandlers = v39
-		}, v41))
-	end
-
-	return v41
+	return React.createElement(AppFocusRoot, {
+		isIsolated = true,
+		isAutoFocusRoot = true,
+		isFocusable = true,
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+		customEventHandlers = v35
+	}, v37)
 end
 
 return memo(EditChatGroupNameDialogContainer)

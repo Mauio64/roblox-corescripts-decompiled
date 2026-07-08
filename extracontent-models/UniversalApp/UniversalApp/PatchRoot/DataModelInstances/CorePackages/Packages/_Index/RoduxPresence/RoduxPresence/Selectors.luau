@@ -1,7 +1,8 @@
-local v0 = require(script.getUserPresenceByUserId);
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return {
-        getUserPresenceByUserId = v0(v1)
-    };
-end;
+local getUserPresenceByUserId = require(script.getUserPresenceByUserId)
+
+return function(p1) -- line: 3
+	-- upvalues: getUserPresenceByUserId (copy)
+	return {
+		getUserPresenceByUserId = getUserPresenceByUserId(p1)
+	}
+end

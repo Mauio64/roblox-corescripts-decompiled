@@ -1,128 +1,129 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SignalsReact);
-local v5 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v6 = require(l_script_FirstAncestor_0.Enums.ErrorReason);
-local v7 = require(l_script_FirstAncestor_0.Hooks.usePlaceholderLocalization);
-local v8 = require(l_script_FirstAncestor_0.Actions.completeRobloxSubscriptionUpsellFlow);
-local l_Sheet_0 = v2.Sheet;
-local l_View_0 = v2.View;
-local l_Text_0 = v2.Text;
-local l_Icon_0 = v2.Icon;
-local l_Button_0 = v2.Button;
-local l_IconName_0 = v2.Enums.IconName;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_FillBehavior_0 = v2.Enums.FillBehavior;
-local l_ButtonVariant_0 = v2.Enums.ButtonVariant;
-local function v21(v18, v19) --[[ Line: 32 ]] --[[ Name: mapErrorReasonToCopy ]]
-    -- upvalues: v6 (copy)
-    local v20 = ({
-        [v6.GenericError] = {
-            v19.GenericErrorTitle, 
-            v19.GenericErrorBody
-        }, 
-        [v6.AlreadySubscribed] = {
-            v19.AlreadySubscribedTitle, 
-            v19.AlreadySubscribedBody
-        }, 
-        [v6.UnsupportedPlatform] = {
-            v19.UnsupportedPlatformTitle, 
-            v19.UnsupportedPlatformBody
-        }
-    })[v18];
-    if v20 then
-        return {
-            title = v20[1], 
-            body = v20[2]
-        };
-    else
-        return {
-            title = v19.GenericErrorTitle, 
-            body = v19.GenericErrorBody
-        };
-    end;
-end;
-return function() --[[ Line: 59 ]] --[[ Name: useErrorSheetSlots ]]
-    -- upvalues: v5 (copy), v4 (copy), l_useTokens_0 (copy), v7 (copy), v3 (copy), v21 (copy), v8 (copy), l_Sheet_0 (copy), l_View_0 (copy), l_Text_0 (copy), l_Icon_0 (copy), l_IconName_0 (copy), l_Button_0 (copy), l_FillBehavior_0 (copy), l_ButtonVariant_0 (copy)
-    local v22 = v5.get();
-    local v23 = v4.useSignalState(v22.getErrorReason);
-    local v24 = l_useTokens_0();
-    local v25 = v7({
-        okButton = "Feature.RobloxSubscription.Action.Ok", 
-        GenericErrorTitle = "Feature.RobloxSubscription.Title.GenericError", 
-        GenericErrorBody = "Feature.RobloxSubscription.Body.GenericError", 
-        AlreadySubscribedTitle = "Feature.RobloxSubscription.Title.AlreadySubscribed", 
-        AlreadySubscribedBody = "Feature.RobloxSubscription.Body.AlreadySubscribed", 
-        UnsupportedPlatformTitle = "Feature.RobloxSubscription.Title.UnsupportedPlatform", 
-        UnsupportedPlatformBody = "Feature.RobloxSubscription.Body.UnsupportedPlatform"
-    });
-    local v26 = v3.useMemo(function() --[[ Line: 73 ]]
-        -- upvalues: v21 (ref), v23 (copy), v25 (copy)
-        return (v21(v23, v25));
-    end, {
-        v23, 
-        v25
-    });
-    local v27 = v3.useCallback(function() --[[ Line: 77 ]]
-        -- upvalues: v8 (ref)
-        v8();
-    end, {});
-    return v3.useMemo(function() --[[ Line: 81 ]]
-        -- upvalues: v3 (ref), l_Sheet_0 (ref), l_View_0 (ref), l_Text_0 (ref), v26 (copy), l_Icon_0 (ref), l_IconName_0 (ref), v24 (copy), l_Button_0 (ref), v25 (copy), v27 (copy), l_FillBehavior_0 (ref), l_ButtonVariant_0 (ref)
-        return {
-            Header = v3.createElement(l_Sheet_0.Header, {
-                hasCloseAffordance = true
-            }, {
-                TitleRow = v3.createElement(l_View_0, {
-                    LayoutOrder = 1, 
-                    tag = "auto-xy gap-small row"
-                }, {
-                    Title = v3.createElement(l_Text_0, {
-                        Text = v26.title, 
-                        tag = "auto-xy text-heading-small content-emphasis text-align-x-center"
-                    })
-                })
-            }), 
-            Content = v3.createElement(l_Sheet_0.Content, {
-                LayoutOrder = 2
-            }, {
-                Body = v3.createElement(l_View_0, {
-                    tag = "col size-full-0 auto-y align-x-center gap-medium padding-x-large"
-                }, {
-                    CenterIcon = v3.createElement(l_Icon_0, {
-                        LayoutOrder = 1, 
-                        name = l_IconName_0.TriangleExclamation, 
-                        size = v24.Size.Size_1200
-                    }), 
-                    BodyText = v3.createElement(l_Text_0, {
-                        LayoutOrder = 2, 
-                        Text = v26.body, 
-                        tag = "size-full-0 auto-y text-body-medium content-default text-align-x-center text-wrap"
-                    })
-                })
-            }), 
-            Actions = v3.createElement(l_Sheet_0.Actions, {
-                LayoutOrder = 3
-            }, {
-                v3.createElement(l_View_0, {
-                    LayoutOrder = 1, 
-                    tag = "row wrap auto-xy align-y-center align-x-center size-full-0 gap-medium"
-                }, {
-                    v3.createElement(l_Button_0, {
-                        LayoutOrder = 1, 
-                        text = v25.okButton, 
-                        onActivated = v27, 
-                        fillBehavior = l_FillBehavior_0.Fill, 
-                        variant = l_ButtonVariant_0.Emphasis
-                    })
-                })
-            })
-        };
-    end, {
-        v26, 
-        v25.okButton, 
-        v27
-    });
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local Foundation = require(RobloxSubscriptionPurchaseAppParent.Foundation)
+local React = require(RobloxSubscriptionPurchaseAppParent.React)
+local SignalsReact = require(RobloxSubscriptionPurchaseAppParent.SignalsReact)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+local useLocalization = require(RobloxSubscriptionPurchaseAppParent.Localization).Hooks.useLocalization
+local completeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.completeRobloxSubscriptionUpsellFlow)
+local Sheet = Foundation.Sheet
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Icon = Foundation.Icon
+local Button = Foundation.Button
+local IconName = Foundation.Enums.IconName
+local useTokens = Foundation.Hooks.useTokens
+local FillBehavior = Foundation.Enums.FillBehavior
+local ButtonVariant = Foundation.Enums.ButtonVariant
+
+local function mapErrorReasonToCopy(p1, t1: {[any]: any}) -- line: 32
+	-- upvalues: ErrorReason (copy)
+	local v23 = ({
+		[ErrorReason.GenericError] = {
+			t1.GenericErrorTitle,
+			t1.GenericErrorBody
+		},
+		[ErrorReason.AlreadySubscribed] = {
+			t1.AlreadySubscribedTitle,
+			t1.AlreadySubscribedBody
+		},
+		[ErrorReason.UnsupportedPlatform] = {
+			t1.UnsupportedPlatformTitle,
+			t1.UnsupportedPlatformBody
+		}
+	})[p1]
+
+	if v23 then
+		return {
+			title = v23[1],
+			body = v23[2]
+		}
+	end
+
+	return {
+		title = t1.GenericErrorTitle,
+		body = t1.GenericErrorBody
+	}
+end
+local function useErrorSheetSlots() -- line: 59
+	-- upvalues: RobloxSubscriptionStore (copy), SignalsReact (copy), useTokens (copy), useLocalization (copy), React (copy), mapErrorReasonToCopy (copy), completeRobloxSubscriptionUpsellFlow (copy), Sheet (copy), View (copy), FoundationText (copy), Icon (copy), IconName (copy), Button (copy), FillBehavior (copy), ButtonVariant (copy)
+	local v24 = RobloxSubscriptionStore.get()
+	local v25 = SignalsReact.useSignalState(v24.getErrorReason)
+	local v26 = useTokens()
+	local v27 = useLocalization({
+		okButton = "Features.Transfers.Action.Ok",
+		GenericErrorTitle = "Feature.RobloxSubscription.Title.GenericError",
+		GenericErrorBody = "Feature.RobloxSubscription.Body.GenericError",
+		AlreadySubscribedTitle = "Feature.RobloxSubscription.Title.AlreadySubscribed",
+		AlreadySubscribedBody = "Feature.RobloxSubscription.Body.AlreadySubscribed",
+		UnsupportedPlatformTitle = "Feature.RobloxSubscription.Title.UnsupportedPlatform",
+		UnsupportedPlatformBody = "Feature.RobloxSubscription.Body.UnsupportedPlatform"
+	})
+	local v28 = React.useMemo(function() -- line: 73
+		-- upvalues: mapErrorReasonToCopy (copy), v25 (copy), v27 (copy)
+		return (mapErrorReasonToCopy(v25, v27))
+	end, {
+		v25,
+		v27
+	})
+	local v29 = React.useCallback(function() -- line: 77
+		-- upvalues: completeRobloxSubscriptionUpsellFlow (copy)
+		completeRobloxSubscriptionUpsellFlow()
+	end, {})
+
+	return React.useMemo(function() -- line: 81
+		-- upvalues: React (copy), Sheet (copy), View (copy), FoundationText (copy), v28 (copy), Icon (copy), IconName (copy), v26 (copy), Button (copy), v27 (copy), v29 (copy), FillBehavior (copy), ButtonVariant (copy)
+		return {
+			Header = React.createElement(Sheet.Header, {
+				hasCloseAffordance = true
+			}, {
+				TitleRow = React.createElement(View, {
+					LayoutOrder = 1,
+					tag = "auto-xy gap-small row"
+				}, {
+					Title = React.createElement(FoundationText, {
+						tag = "auto-xy text-heading-small content-emphasis text-align-x-center",
+						Text = v28.title
+					})
+				})
+			}),
+			Content = React.createElement(Sheet.Content, {
+				LayoutOrder = 2
+			}, {
+				Body = React.createElement(View, {
+					tag = "col size-full-0 auto-y align-x-center gap-medium padding-x-large"
+				}, {
+					CenterIcon = React.createElement(Icon, {
+						LayoutOrder = 1,
+						name = IconName.TriangleExclamation,
+						size = v26.Size.Size_1200
+					}),
+					BodyText = React.createElement(FoundationText, {
+						LayoutOrder = 2,
+						tag = "size-full-0 auto-y text-body-medium content-default text-align-x-center text-wrap",
+						Text = v28.body
+					})
+				})
+			}),
+			Actions = React.createElement(Sheet.Actions, {
+				LayoutOrder = 3
+			}, { React.createElement(View, {
+				LayoutOrder = 1,
+				tag = "row wrap auto-xy align-y-center align-x-center size-full-0 gap-medium"
+			}, { React.createElement(Button, {
+				LayoutOrder = 1,
+				text = v27.okButton,
+				onActivated = v29,
+				fillBehavior = FillBehavior.Fill,
+				variant = ButtonVariant.Emphasis
+			}) }) })
+		}
+	end, {
+		v28,
+		v27.okButton,
+		v29
+	})
+end
+
+return useErrorSheetSlots

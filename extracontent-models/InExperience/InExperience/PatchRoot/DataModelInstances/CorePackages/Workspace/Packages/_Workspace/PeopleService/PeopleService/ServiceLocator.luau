@@ -1,57 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleService");
-local v1 = {};
-local v2 = {};
-local l_GetFFlagPeoplePageEnablePersonSignalStore_0 = require(l_script_FirstAncestor_0.Flags).GetFFlagPeoplePageEnablePersonSignalStore;
-local function v6(v4) --[[ Line: 19 ]] --[[ Name: loadService ]]
-    -- upvalues: l_GetFFlagPeoplePageEnablePersonSignalStore_0 (copy), v2 (ref)
-    local v5 = nil;
-    if v4 == "PeopleUtility" then
-        v5 = require(script.Parent.PeopleUtility);
-    elseif v4 == "PeopleListStore" then
-        v5 = if l_GetFFlagPeoplePageEnablePersonSignalStore_0() then require(script.Parent.PeopleListStore)() else require(script.Parent.PeopleListStore);
-    elseif v4 == "PeopleAnalyticsManager" then
-        v5 = require(script.Parent.Analytics.PeopleAnalyticsManager);
-    elseif v4 == "SettingsHubService" then
-        v5 = require(script.Parent.Integration.SettingsHubService);
-    elseif v4 == "PeopleVoiceChatStore" then
-        v5 = require(script.Parent.ButtonStores.PeopleVoiceChatStore);
-    elseif v4 == "PeopleBlockStatusStore" then
-        v5 = require(script.Parent.ButtonStores.PeopleBlockStatusStore);
-    elseif v4 == "FriendStatusStore" then
-        v5 = require(script.Parent.ButtonStores.FriendStatusStore);
-    elseif v4 == "PeopleReportAbuseMenu" then
-        v5 = require(script.Parent.Integration.PeopleReportAbuseMenu);
-    elseif v4 == "PeopleBlockingModalManager" then
-        v5 = require(script.Parent.Integration.PeopleBlockingModalManager);
-    elseif v4 == "Flags" then
-        v5 = require(script.Parent.Flags);
-    elseif v4 == "Constants" then
-        v5 = require(script.Parent.Constants);
-    elseif v4 == "FocusNavigationService" then
-        v5 = require(script.Parent.FocusNavigationService);
-    else
-        error("Unknown service: " .. v4);
-    end;
-    v2[v4] = v5;
-    return v5;
-end;
-v1.register = function(v7, v8) --[[ Line: 58 ]] --[[ Name: register ]]
-    -- upvalues: v2 (ref)
-    v2[v7] = v8;
-end;
-v1.get = function(v9) --[[ Line: 62 ]] --[[ Name: get ]]
-    -- upvalues: v2 (ref), v6 (copy)
-    if not v2[v9] then
-        v6(v9);
-    end;
-    return v2[v9];
-end;
-v1.has = function(v10) --[[ Line: 69 ]] --[[ Name: has ]]
-    -- upvalues: v2 (ref)
-    return v2[v10] ~= nil;
-end;
-v1.clear = function() --[[ Line: 73 ]] --[[ Name: clear ]]
-    -- upvalues: v2 (ref)
-    v2 = {};
-end;
-return v1;
+local PeopleService = script:FindFirstAncestor("PeopleService")
+local t1 = {}
+local t2 = {}
+local GetFFlagPeoplePageEnablePersonSignalStore = require(PeopleService.Flags).GetFFlagPeoplePageEnablePersonSignalStore
+
+local function loadService(p1) -- line: 19
+	-- upvalues: GetFFlagPeoplePageEnablePersonSignalStore (copy), t2 (ref)
+	local PeopleUtility = nil
+
+	if p1 == "PeopleUtility" then
+		PeopleUtility = require(script.Parent.PeopleUtility)
+	elseif p1 == "PeopleListStore" then
+		PeopleUtility = if not GetFFlagPeoplePageEnablePersonSignalStore() then require(script.Parent.PeopleListStore) else require(script.Parent.PeopleListStore)()
+	elseif p1 == "PeopleAnalyticsManager" then
+		PeopleUtility = require(script.Parent.Analytics.PeopleAnalyticsManager)
+	elseif p1 == "SettingsHubService" then
+		PeopleUtility = require(script.Parent.Integration.SettingsHubService)
+	elseif p1 == "PeopleVoiceChatStore" then
+		PeopleUtility = require(script.Parent.ButtonStores.PeopleVoiceChatStore)
+	elseif p1 == "PeopleBlockStatusStore" then
+		PeopleUtility = require(script.Parent.ButtonStores.PeopleBlockStatusStore)
+	elseif p1 == "FriendStatusStore" then
+		PeopleUtility = require(script.Parent.ButtonStores.FriendStatusStore)
+	elseif p1 == "PeopleReportAbuseMenu" then
+		PeopleUtility = require(script.Parent.Integration.PeopleReportAbuseMenu)
+	elseif p1 == "PeopleBlockingModalManager" then
+		PeopleUtility = require(script.Parent.Integration.PeopleBlockingModalManager)
+	elseif p1 == "Flags" then
+		PeopleUtility = require(script.Parent.Flags)
+	elseif p1 == "Constants" then
+		PeopleUtility = require(script.Parent.Constants)
+	elseif p1 == "FocusNavigationService" then
+		PeopleUtility = require(script.Parent.FocusNavigationService)
+	else
+		error("Unknown service: " .. p1)
+	end
+
+	t2[p1] = PeopleUtility
+
+	return PeopleUtility
+end
+
+function t1.register(p2, p3) -- line: 58
+	-- upvalues: t2 (ref)
+	t2[p2] = p3
+end
+function t1.get(p4) -- line: 62
+	-- upvalues: t2 (ref), loadService (copy)
+	if not t2[p4] then
+		loadService(p4)
+	end
+
+	return t2[p4]
+end
+function t1.has(p5) -- line: 69
+	-- upvalues: t2 (ref)
+	return t2[p5] ~= nil
+end
+function t1.clear() -- line: 73
+	-- upvalues: t2 (ref)
+	t2 = {}
+end
+
+return t1

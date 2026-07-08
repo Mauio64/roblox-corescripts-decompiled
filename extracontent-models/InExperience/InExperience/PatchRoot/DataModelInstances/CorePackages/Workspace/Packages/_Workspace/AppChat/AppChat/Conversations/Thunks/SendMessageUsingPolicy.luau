@@ -1,30 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_RequestTimeDiag_0 = require(l_Parent_0.Analytics).RequestTimeDiag;
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local v4 = require(l_Parent_0.Promise);
-local l_StatusCodes_0 = require(l_Parent_0.Http).StatusCodes;
-local l_ResponseStatus_0 = require(l_Parent_0.AppChatNetworking).Constants.ResponseStatus;
-return function(v7, _) --[[ Line: 11 ]]
-    -- upvalues: l_RequestTimeDiag_0 (copy), v3 (copy), l_StatusCodes_0 (copy), l_ResponseStatus_0 (copy), v4 (copy)
-    local v9 = l_RequestTimeDiag_0:new(v3.PerformanceMeasurement.LUA_CHAT_SEND_MESSAGE);
-    return function(v10) --[[ Line: 14 ]]
-        -- upvalues: v7 (copy), v9 (copy), l_StatusCodes_0 (ref), l_ResponseStatus_0 (ref), v4 (ref)
-        v7:onBeforeSendingMessage(v10);
-        return v7:sendMessage(v10):andThen(function(v11) --[[ Line: 19 ]]
-            -- upvalues: v9 (ref), l_StatusCodes_0 (ref), l_ResponseStatus_0 (ref), v4 (ref)
-            v9:report();
-            if not v11 or not v11.responseBody or v11.responseCode ~= l_StatusCodes_0.OK or not v11.responseBody.messages or #v11.responseBody.messages == 0 or v11.responseBody.messages[1].status and v11.responseBody.messages[1].status ~= "" and v11.responseBody.messages[1].status ~= l_ResponseStatus_0.SUCCESS then
-                return v4.reject(v11);
-            else
-                return v11;
-            end;
-        end):andThen(function(v12) --[[ Line: 40 ]]
-            -- upvalues: v7 (ref), v10 (copy)
-            return v7:onSuccess(v10, v12);
-        end):catch(function(v13) --[[ Line: 43 ]]
-            -- upvalues: v7 (ref), v10 (copy)
-            return v7:onFailure(v10, v13);
-        end);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local RequestTimeDiag = require(AppChatParent.Analytics).RequestTimeDiag
+local Constants = require(AppChat.Constants)
+local Promise = require(AppChatParent.Promise)
+local StatusCodes = require(AppChatParent.Http).StatusCodes
+local ResponseStatus = require(AppChatParent.AppChatNetworking).Constants.ResponseStatus
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local FFlagAppChatCatchSendMessageSyncError = require(AppChat.Flags.FFlagAppChatCatchSendMessageSyncError)
+local v12 = require(AppChat.Logger):new(script.Name)
+
+local function invokeSendMessage(p1, p2) -- line: 20
+	-- upvalues: FFlagAppChatCatchSendMessageSyncError (copy), v12 (copy), Promise (copy)
+	if not FFlagAppChatCatchSendMessageSyncError then
+		return p1:sendMessage(p2)
+	end
+
+	local ok, result = pcall(function() -- line: 25
+		-- upvalues: p1 (copy), p2 (copy)
+		return p1:sendMessage(p2)
+	end)
+
+	if not ok then
+		v12:error("sendPolicy:sendMessage threw synchronously: {}", (tostring(result)))
+
+		return Promise.reject({
+			sendMessageSyncError = tostring(result)
+		})
+	end
+
+	return result
+end
+
+return function(p3, _) -- line: 37
+	-- upvalues: RequestTimeDiag (copy), Constants (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), invokeSendMessage (copy), StatusCodes (copy), ResponseStatus (copy), Promise (copy)
+	local v20 = RequestTimeDiag:new(Constants.PerformanceMeasurement.LUA_CHAT_SEND_MESSAGE)
+
+	return function(p5) -- line: 40
+		-- upvalues: p3 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), invokeSendMessage (copy), v20 (copy), StatusCodes (copy), ResponseStatus (copy), Promise (copy)
+		p3:onBeforeSendingMessage(p5)
+
+		if FFlagAppChatPerfTracking and FFlagAppChatMessageTTIMilestones then
+			local t1 = {
+				conversationId = p3.conversationId
+			}
+
+			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, t1)
+			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, AppChatPerfTracker.Milestone.PrimaryDataStarted.Subphase.NetworkFetch, t1)
+			AppChatPerfTracker.trackRequest(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, "SendChatTextMessage", t1)
+		end
+
+		return invokeSendMessage(p3, p5):andThen(function(p6) -- line: 65
+			-- upvalues: v20 (copy), StatusCodes (copy), ResponseStatus (copy), Promise (copy)
+			v20:report()
+
+			if not p6 or (not p6.responseBody or p6.responseCode ~= StatusCodes.OK or not p6.responseBody.messages or #p6.responseBody.messages == 0) or p6.responseBody.messages[1].status and p6.responseBody.messages[1].status ~= "" and p6.responseBody.messages[1].status ~= ResponseStatus.SUCCESS then
+				return Promise.reject(p6)
+			end
+
+			return p6
+		end):andThen(function(p7) -- line: 86
+			-- upvalues: p3 (copy), p5 (copy)
+			return p3:onSuccess(p5, p7)
+		end):catch(function(p8) -- line: 89
+			-- upvalues: p3 (copy), p5 (copy)
+			return p3:onFailure(p5, p8)
+		end)
+	end
+end

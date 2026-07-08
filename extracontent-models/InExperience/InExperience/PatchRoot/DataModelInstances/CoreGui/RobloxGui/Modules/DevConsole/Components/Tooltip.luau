@@ -1,74 +1,81 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(script.Parent.Parent.Constants);
-local l_MainWindowHeader_0 = v4.Font.MainWindowHeader;
-local l_MainWindowHeader_1 = v4.DefaultFontSize.MainWindowHeader;
-local l_Text_0 = v4.Color.Text;
-local l_UnselectedGray_0 = v4.Color.UnselectedGray;
-local l_Padding_0 = v4.Tooltip.Padding;
-local l_Offset_0 = v4.Tooltip.Offset;
-local l_MaxWidth_0 = v4.Tooltip.MaxWidth;
-local l_Delay_0 = v4.Tooltip.Delay;
-return function(v13) --[[ Line: 21 ]] --[[ Name: Tooltip ]]
-    -- upvalues: v2 (copy), l_Delay_0 (copy), v3 (copy), l_CoreGui_0 (copy), l_MainWindowHeader_1 (copy), l_Text_0 (copy), l_MainWindowHeader_0 (copy), l_Offset_0 (copy), l_UnselectedGray_0 (copy), l_Padding_0 (copy), l_MaxWidth_0 (copy)
-    local v14, v15 = v2.useState(false);
-    local l_text_0 = v13.text;
-    local l_pos_0 = v13.pos;
-    v2.useEffect(function() --[[ Line: 26 ]]
-        -- upvalues: v15 (copy), l_Delay_0 (ref)
-        v15(false);
-        local v18 = false;
-        task.delay(l_Delay_0, function() --[[ Line: 29 ]]
-            -- upvalues: v18 (ref), v15 (ref)
-            if v18 then
-                return;
-            else
-                v15(true);
-                return;
-            end;
-        end);
-        return function() --[[ Line: 35 ]]
-            -- upvalues: v18 (ref)
-            v18 = true;
-        end;
-    end, {
-        l_text_0, 
-        l_pos_0
-    });
-    return v3.createElement(v3.Portal, {
-        target = l_CoreGui_0
-    }, {
-        TooltipContainer = v3.createElement("ScreenGui", {
-            DisplayOrder = 20, 
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = true, 
-            Enabled = v14
-        }, {
-            Tooltip = v3.createElement("TextLabel", {
-                Text = l_text_0, 
-                TextSize = l_MainWindowHeader_1, 
-                TextColor3 = l_Text_0, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                Font = l_MainWindowHeader_0, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                Position = l_pos_0 + l_Offset_0, 
-                BackgroundColor3 = l_UnselectedGray_0, 
-                BackgroundTransparency = 0, 
-                BorderSizePixel = 0
-            }, {
-                Padding = v3.createElement("UIPadding", {
-                    PaddingTop = l_Padding_0, 
-                    PaddingBottom = l_Padding_0, 
-                    PaddingLeft = l_Padding_0, 
-                    PaddingRight = l_Padding_0
-                }), 
-                SizeConstraint = v3.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(l_MaxWidth_0, 1e999)
-                })
-            })
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local React = require(CorePackages.Packages.React)
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Constants)
+local MainWindowHeader = Constants.Font.MainWindowHeader
+local MainWindowHeader2 = Constants.DefaultFontSize.MainWindowHeader
+local ColorText = Constants.Color.Text
+local UnselectedGray = Constants.Color.UnselectedGray
+local TooltipPadding = Constants.Tooltip.Padding
+local TooltipOffset = Constants.Tooltip.Offset
+local MaxWidth = Constants.Tooltip.MaxWidth
+local Delay = Constants.Tooltip.Delay
+
+local function Tooltip(t1: {[any]: any}) -- line: 21
+	-- upvalues: React (copy), Delay (copy), Roact (copy), CoreGui (copy), MainWindowHeader2 (copy), ColorText (copy), MainWindowHeader (copy), TooltipOffset (copy), UnselectedGray (copy), TooltipPadding (copy), MaxWidth (copy)
+	local v16, v17 = React.useState(false)
+	local text = t1.text
+	local pos = t1.pos
+
+	React.useEffect(function() -- line: 26
+		-- upvalues: v17 (copy), Delay (copy)
+		v17(false)
+
+		local u20 = false
+
+		task.delay(Delay, function() -- line: 29
+			-- upvalues: u20 (ref), v17 (copy)
+			if u20 then
+				return
+			end
+
+			v17(true)
+		end)
+
+		return function() -- line: 35
+			-- upvalues: u20 (ref)
+			u20 = true
+		end
+	end, {
+		text,
+		pos
+	})
+
+	return Roact.createElement(Roact.Portal, {
+		target = CoreGui
+	}, {
+		TooltipContainer = Roact.createElement("ScreenGui", {
+			DisplayOrder = 20,
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true,
+			Enabled = v16
+		}, {
+			Tooltip = Roact.createElement("TextLabel", {
+				TextWrapped = true,
+				BackgroundTransparency = 0,
+				BorderSizePixel = 0,
+				Text = text,
+				TextSize = MainWindowHeader2,
+				TextColor3 = ColorText,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = MainWindowHeader,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Position = pos + TooltipOffset,
+				BackgroundColor3 = UnselectedGray
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = TooltipPadding,
+					PaddingBottom = TooltipPadding,
+					PaddingLeft = TooltipPadding,
+					PaddingRight = TooltipPadding
+				}),
+				SizeConstraint = Roact.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(MaxWidth, 1e999)
+				})
+			})
+		})
+	})
+end
+
+return Tooltip

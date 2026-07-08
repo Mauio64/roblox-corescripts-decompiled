@@ -3,7 +3,7 @@ local PlayabilityStatusEnum = require(Parent.DiscoveryTypes).PlayabilityStatusEn
 local FFlagLuaAppPlayableUxTreatment = require(Parent.SharedFlags).FFlagLuaAppPlayableUxTreatment
 local Result = require(Parent.Result)
 local t1 = {
-	new = function() --[[ new ]] -- line: 45
+	new = function() -- line: 45
 		return {}
 	end
 }

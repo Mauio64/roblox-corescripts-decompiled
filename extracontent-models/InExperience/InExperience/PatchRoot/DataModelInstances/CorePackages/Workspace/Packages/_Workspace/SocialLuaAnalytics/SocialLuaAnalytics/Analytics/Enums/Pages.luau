@@ -1,4 +1,4 @@
 return {
-    PlayerProfile = "playerProfile", 
-    ShareLinkErrorDialog = "shareLinkErrorDialog"
-};
+	PlayerProfile = "playerProfile",
+	ShareLinkErrorDialog = "shareLinkErrorDialog"
+}

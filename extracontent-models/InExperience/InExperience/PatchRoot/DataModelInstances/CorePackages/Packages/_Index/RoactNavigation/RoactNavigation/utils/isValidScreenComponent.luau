@@ -1,11 +1,5 @@
-return function(v0) --[[ Line: 2 ]]
-    local v1 = type(v0);
-    local v2 = true;
-    if v1 ~= "function" then
-        v2 = false;
-        if v1 == "table" then
-            v2 = type(v0.render) == "function";
-        end;
-    end;
-    return v2;
-end;
+return function(p1) -- line: 2
+	local v2 = type(p1)
+
+	return v2 == "function" or v2 == "table" and type(p1.render) == "function"
+end

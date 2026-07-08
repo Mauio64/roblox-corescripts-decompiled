@@ -1,30 +1,31 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(script.Parent.Parent.Actions.OpenOrUpdateDialog);
-local v4 = require(script.Parent.Parent.Actions.CloseDialog);
-return v2.createReducer({
-    isOpen = false, 
-    title = "", 
-    bodyText = "", 
-    dismissCallback = nil
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local OpenOrUpdateDialog = require(script.Parent.Parent.Actions.OpenOrUpdateDialog)
+local CloseDialog = require(script.Parent.Parent.Actions.CloseDialog)
+
+return Rodux.createReducer({
+	isOpen = false,
+	title = "",
+	bodyText = "",
+	dismissCallback = nil
 }, {
-    [v3.name] = function(v5, v6) --[[ Line: 14 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v5, {
-            isOpen = true, 
-            title = v6.title, 
-            bodyText = v6.bodyText, 
-            dismissCallback = v6.dismissCallback
-        });
-    end, 
-    [v4.name] = function(v7, _) --[[ Line: 22 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v7, {
-            isOpen = false, 
-            title = "", 
-            bodyText = "", 
-            dismissCallback = v1.None
-        });
-    end
-});
+	[OpenOrUpdateDialog.name] = function(p1, p2) -- line: 14
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			isOpen = true,
+			title = p2.title,
+			bodyText = p2.bodyText,
+			dismissCallback = p2.dismissCallback
+		})
+	end,
+	[CloseDialog.name] = function(p3, _) -- line: 22
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			isOpen = false,
+			title = "",
+			bodyText = "",
+			dismissCallback = Cryo.None
+		})
+	end
+})

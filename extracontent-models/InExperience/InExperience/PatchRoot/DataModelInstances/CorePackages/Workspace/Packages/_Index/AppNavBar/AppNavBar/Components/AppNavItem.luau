@@ -1,66 +1,75 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local v4 = require(l_Parent_0.Localization);
-local v5 = require(l_Parent_0.SharedFlags);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_ControlState_0 = v3.Core.Control.Enum.ControlState;
-local l_NavigationTab_0 = v3.App.Navigation.NavigationTab;
-local l_NavigationTabLayout_0 = v3.App.Navigation.Enum.NavigationTabLayout;
-local l_useLocalization_0 = v4.Hooks.useLocalization;
-local l_FFlagAppNavLabelScaling_0 = v5.FFlagAppNavLabelScaling;
-return v2.memo(function(v12) --[[ Line: 50 ]] --[[ Name: AppNavItem ]]
-    -- upvalues: l_useStyle_0 (copy), l_useLocalization_0 (copy), v2 (copy), l_ControlState_0 (copy), l_FFlagAppNavLabelScaling_0 (copy), l_NavigationTab_0 (copy), l_NavigationTabLayout_0 (copy)
-    local l_Tokens_0 = l_useStyle_0().Tokens;
-    local v14 = l_useLocalization_0({
-        labelText = v12.item.labelText
-    });
-    local v15, v16 = v2.useState(l_ControlState_0.Initialize);
-    local l_Footer_0 = l_Tokens_0.Semantic.Typography.Footer;
-    local v18 = v12.systemBarLabelTextSizeBinding.default:getBinding();
-    v2.useEffect(function() --[[ Line: 59 ]]
-        -- upvalues: l_FFlagAppNavLabelScaling_0 (ref), v12 (copy), v14 (copy), l_Footer_0 (copy), l_Tokens_0 (copy)
-        if l_FFlagAppNavLabelScaling_0 then
-            v12.systemBarLabelTextSizeBinding.default:setTextToMaxSize(v14.labelText or "", l_Footer_0.Font, Vector2.new(l_Tokens_0.Global.Space_600, l_Tokens_0.Global.Space_600), l_Tokens_0.Global.FontSize_50);
-            return;
-        else
-            v12.systemBarLabelTextSizeBinding.default:getMinTextSize(v14.labelText or "", l_Footer_0.Font, Vector2.new(l_Tokens_0.Global.Space_600, l_Tokens_0.Global.Space_600));
-            return;
-        end;
-    end, {
-        v18, 
-        v14.labelText, 
-        l_Tokens_0
-    });
-    return v2.createElement(l_NavigationTab_0, {
-        iconImage = v12.item.iconImage, 
-        iconCheckedImage = v12.item.iconCheckedImage, 
-        renderIcon = v12.item.renderIcon and function(v19) --[[ Line: 80 ]]
-            -- upvalues: v12 (copy), v15 (copy)
-            return v12.item.renderIcon(v19, v15);
-        end or nil, 
-        hasLabel = v12.hasLabel, 
-        labelText = v14.labelText, 
-        labelTypography = {
-            Font = l_Footer_0.Font, 
-            FontSize = v18, 
-            LineHeight = l_Footer_0.LineHeight, 
-            LetterSpacing = l_Footer_0.LetterSpacing
-        }, 
-        isChecked = v12.isChecked, 
-        badgeVariant = v12.item.badgeVariant, 
-        badgeValue = v12.item.badgeValue, 
-        layout = l_NavigationTabLayout_0.Stacked, 
-        anchorPoint = if v12.isCenterPositioned then Vector2.new(0.5, 0.5) else nil, 
-        position = if v12.isCenterPositioned then UDim2.fromScale(0.5, 0.5) else nil, 
-        onActivated = v12.item.onActivated, 
-        onStateChanged = v12.item.renderIcon and function(_, v21) --[[ Line: 100 ]]
-            -- upvalues: v16 (copy)
-            v16(v21);
-        end or nil
-    });
-end, function(v22, v23) --[[ Line: 41 ]] --[[ Name: arePropsEqual ]]
-    -- upvalues: v1 (copy)
-    return v1.Dictionary.equals(v22.item, v23.item) and v22.systemBarLabelTextSizeBinding == v23.systemBarLabelTextSizeBinding and v22.isChecked == v23.isChecked and v22.isCenterPositioned == v23.isCenterPositioned and v22.hasLabel == v23.hasLabel;
-end);
+local ParentParent = script.Parent.Parent.Parent
+local Cryo = require(ParentParent.Cryo)
+local React = require(ParentParent.React)
+local UIBlox = require(ParentParent.UIBlox)
+local Localization = require(ParentParent.Localization)
+local SharedFlags = require(ParentParent.SharedFlags)
+local useStyle = UIBlox.Core.Style.useStyle
+local ControlState = UIBlox.Core.Control.Enum.ControlState
+local NavigationTab = UIBlox.App.Navigation.NavigationTab
+local NavigationTabLayout = UIBlox.App.Navigation.Enum.NavigationTabLayout
+local useLocalization = Localization.Hooks.useLocalization
+local FFlagAppNavLabelScaling = SharedFlags.FFlagAppNavLabelScaling
+local FFlagShrinkAppNavBar = SharedFlags.FFlagShrinkAppNavBar
+
+local function arePropsEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 42
+	-- upvalues: Cryo (copy), FFlagShrinkAppNavBar (copy)
+	return Cryo.Dictionary.equals(t1.item, t2.item) and ((FFlagShrinkAppNavBar or t1.systemBarLabelTextSizeBinding == t2.systemBarLabelTextSizeBinding) and (t1.isChecked == t2.isChecked and (t1.isCenterPositioned == t2.isCenterPositioned and t1.hasLabel == t2.hasLabel)))
+end
+local function AppNavItem(t3: {[any]: any}) -- line: 51
+	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), ControlState (copy), FFlagShrinkAppNavBar (copy), FFlagAppNavLabelScaling (copy), NavigationTab (copy), NavigationTabLayout (copy)
+	local Tokens = useStyle().Tokens
+	local v20 = useLocalization({
+		labelText = t3.item.labelText
+	})
+	local v21, v22 = React.useState(ControlState.Initialize)
+	local CaptionSmall = Tokens.Typography.CaptionSmall
+	local v24 = if not FFlagShrinkAppNavBar then t3.systemBarLabelTextSizeBinding.default:getBinding() else nil
+
+	if not FFlagShrinkAppNavBar then
+		React.useEffect(function() -- line: 61
+			-- upvalues: FFlagAppNavLabelScaling (copy), t3 (copy), v20 (copy), CaptionSmall (copy), Tokens (copy)
+			if FFlagAppNavLabelScaling then
+				t3.systemBarLabelTextSizeBinding.default:setTextToMaxSize(v20.labelText or "", CaptionSmall.Font, Vector2.new(Tokens.Size.Size_1200, Tokens.Size.Size_1200), Tokens.FontSize.FontSize_300)
+
+				return
+			end
+
+			t3.systemBarLabelTextSizeBinding.default:getMinTextSize(v20.labelText or "", CaptionSmall.Font, Vector2.new(Tokens.Size.Size_1200, Tokens.Size.Size_1200))
+		end, {
+			v24,
+			v20.labelText,
+			Tokens
+		})
+	end
+
+	return React.createElement(NavigationTab, {
+		iconImage = t3.item.iconImage,
+		iconCheckedImage = t3.item.iconCheckedImage,
+		renderIcon = if not t3.item.renderIcon then nil else function(b1: boolean) -- line: 83
+			-- upvalues: t3 (copy), v21 (copy)
+			return t3.item.renderIcon(b1, v21)
+		end,
+		hasLabel = t3.hasLabel,
+		labelText = v20.labelText,
+		labelTypography = if not FFlagShrinkAppNavBar then {
+			Font = CaptionSmall.Font,
+			FontSize = v24,
+			LineHeight = CaptionSmall.LineHeight,
+			LetterSpacing = CaptionSmall.LetterSpacing
+		} else Tokens.Typography.CaptionSmall,
+		isChecked = t3.isChecked,
+		badgeVariant = t3.item.badgeVariant,
+		badgeValue = t3.item.badgeValue,
+		layout = NavigationTabLayout.Stacked,
+		anchorPoint = if not t3.isCenterPositioned then nil else Vector2.new(0.5, 0.5),
+		position = if not t3.isCenterPositioned then nil else UDim2.fromScale(0.5, 0.5),
+		onActivated = t3.item.onActivated,
+		onStateChanged = if not t3.item.renderIcon then nil else function(_, p2) -- line: 105
+			-- upvalues: v22 (copy)
+			v22(p2)
+		end
+	})
+end
+
+return React.memo(AppNavItem, arePropsEqual)

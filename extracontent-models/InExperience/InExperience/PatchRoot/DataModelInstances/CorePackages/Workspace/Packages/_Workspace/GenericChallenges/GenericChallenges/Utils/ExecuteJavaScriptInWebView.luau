@@ -1,8 +1,10 @@
-local l_BrowserService_0 = game:GetService("BrowserService");
+local BrowserService = game:GetService("BrowserService")
+
 return {
-    Execute = function(v1, v2) --[[ Line: 5 ]] --[[ Name: Execute ]]
-        -- upvalues: l_BrowserService_0 (copy)
-        local v3 = "(function() { CoreRobloxUtilities.hybridResponseService.injectNativeResponse(" .. v1 .. ", " .. v2 .. "); })();";
-        l_BrowserService_0:ExecuteJavaScript(v3);
-    end
-};
+	Execute = function(s1: string, s2: string) -- line: 5
+		-- upvalues: BrowserService (copy)
+		local v4 = "(function() { CoreRobloxUtilities.hybridResponseService.injectNativeResponse(" .. s1 .. ", " .. s2 .. "); })();"
+
+		BrowserService:ExecuteJavaScript(v4)
+	end
+}

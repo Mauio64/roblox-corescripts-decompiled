@@ -1,19 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSave");
-local _ = require(l_script_FirstAncestor_0.Context.AvatarSaveContext);
-return function(v2) --[[ Line: 5 ]] --[[ Name: selectCharacterData ]]
-    return {
-        tryOn = {
-            TryOn = v2.AvatarExperience.AvatarScene.TryOn, 
-            OutfitTryOn = v2.AvatarExperience.AvatarScene.OutfitTryOn, 
-            LastSavedTriedOnOutfit = v2.AvatarExperience.AvatarScene.LastSavedTriedOnOutfit
-        }, 
-        equipped = {
-            AvatarType = v2.AvatarExperience.AvatarEditor.Character.AvatarType, 
-            AvatarScales = v2.AvatarExperience.AvatarEditor.Character.AvatarScales, 
-            BodyColor3s = v2.AvatarExperience.AvatarEditor.Character.BodyColor3s, 
-            BodyPartRangeIds = v2.AvatarExperience.AvatarEditor.Character.BodyPartRangeIds, 
-            EquippedAssets = v2.AvatarExperience.AvatarEditor.Character.EquippedAssets, 
-            EquippedEmotes = v2.AvatarExperience.AvatarEditor.EquippedEmotes
-        }
-    };
-end;
+local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
+local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+
+require(AvatarExperienceSave.Context.AvatarSaveContext)
+
+local FFlagAXBackgroundsPersistence = require(AvatarExperienceSaveParent.AvatarExperienceFlags).FFlagAXBackgroundsPersistence
+
+local function selectCharacterData(p1) -- line: 9
+	-- upvalues: FFlagAXBackgroundsPersistence (copy)
+	return {
+		tryOn = {
+			TryOn = p1.AvatarExperience.AvatarScene.TryOn,
+			OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn,
+			LastSavedTriedOnOutfit = p1.AvatarExperience.AvatarScene.LastSavedTriedOnOutfit
+		},
+		equipped = {
+			AvatarType = p1.AvatarExperience.AvatarEditor.Character.AvatarType,
+			AvatarScales = p1.AvatarExperience.AvatarEditor.Character.AvatarScales,
+			BodyColor3s = p1.AvatarExperience.AvatarEditor.Character.BodyColor3s,
+			BodyPartRangeIds = p1.AvatarExperience.AvatarEditor.Character.BodyPartRangeIds,
+			EquippedAssets = p1.AvatarExperience.AvatarEditor.Character.EquippedAssets,
+			EquippedEmotes = p1.AvatarExperience.AvatarEditor.EquippedEmotes,
+			BackgroundAssetId = if not FFlagAXBackgroundsPersistence then nil else p1.AvatarExperience.AvatarScene.ProfileConfiguration.BackgroundAssetId
+		}
+	}
+end
+
+return selectCharacterData

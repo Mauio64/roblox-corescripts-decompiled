@@ -1,5 +1,5 @@
 return {
-    RODUX_KEY = "FriendsCarousel", 
-    RECOMMENDATION_SESSION_ID_KEY = "friendRecommendationsSessionId", 
-    HomepageFriendsCarouselSourceName = "HomepageFriendsCarousel"
-};
+	RODUX_KEY = "FriendsCarousel",
+	RECOMMENDATION_SESSION_ID_KEY = "friendRecommendationsSessionId",
+	HomepageFriendsCarouselSourceName = "HomepageFriendsCarousel"
+}

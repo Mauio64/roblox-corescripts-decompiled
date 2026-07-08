@@ -1,5 +1,5 @@
 return {
-    Icon = "Icon", 
-    Media = "Media", 
-    Avatar = "Avatar"
-};
+	Icon = "Icon",
+	Media = "Media",
+	Avatar = "Avatar"
+}

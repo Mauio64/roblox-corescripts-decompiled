@@ -1,34 +1,36 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ShareGame_0 = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame;
-local l_ReducerDependencies_0 = require(l_CorePackages_0.Workspace.Packages.NotificationsCommon).ReducerDependencies;
-local l_PlaceInfosReducer_0 = require(l_CorePackages_0.Workspace.Packages.PlaceInfoRodux).Reducers.PlaceInfosReducer;
-local l_UserReducer_0 = require(l_CorePackages_0.Workspace.Packages.UserLib).Reducers.UserReducer;
-local l_Friends_0 = require(l_CorePackages_0.Workspace.Packages.LegacyFriendsRodux).Reducers.Friends;
-local l_FriendCount_0 = require(l_CorePackages_0.Workspace.Packages.LegacyFriendsRodux).Reducers.FriendCount;
-local v7 = require(l_ShareGame_0.Reducers.ConversationsSearch);
-local v8 = require(l_ShareGame_0.Reducers.DeviceInfo);
-local v9 = require(l_ShareGame_0.Reducers.Invites);
-local v10 = require(l_ShareGame_0.Reducers.GameInfo);
-local v11 = require(l_ShareGame_0.Reducers.Page);
-local v12 = require(l_ShareGame_0.Reducers.Toasts);
-local l_ShareLinksRodux_0 = l_ReducerDependencies_0.ShareLinksRodux;
-local v14 = l_ReducerDependencies_0.RoduxNetworking.installReducer();
-local v15 = l_ShareLinksRodux_0.installReducer();
-return function(v16, v17) --[[ Line: 25 ]]
-    -- upvalues: v7 (copy), v8 (copy), v9 (copy), v11 (copy), l_PlaceInfosReducer_0 (copy), v12 (copy), l_UserReducer_0 (copy), l_Friends_0 (copy), l_FriendCount_0 (copy), v15 (copy), v10 (copy), v14 (copy)
-    v16 = v16 or {};
-    return {
-        ConversationsSearch = v7(v16.ConversationsSearch, v17), 
-        DeviceInfo = v8(v16.DeviceInfo, v17), 
-        Invites = v9(v16.Invites, v17), 
-        Page = v11(v16.Page, v17), 
-        PlaceInfos = l_PlaceInfosReducer_0(v16.PlaceInfos, v17), 
-        Toasts = v12(v16.Toasts, v17), 
-        Users = l_UserReducer_0(v16.Users, v17), 
-        Friends = l_Friends_0(v16.Friends, v17), 
-        FriendCount = l_FriendCount_0(v16.FriendCount, v17), 
-        ShareLinks = v15(v16.ShareLinks, v17), 
-        GameInfo = v10(v16.GameInfo, v17), 
-        NetworkStatus = v14(v16.NetworkStatus, v17)
-    };
-end;
+local CorePackages = game:GetService("CorePackages")
+local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
+local ReducerDependencies = require(CorePackages.Workspace.Packages.NotificationsCommon).ReducerDependencies
+local PlaceInfosReducer = require(CorePackages.Workspace.Packages.PlaceInfoRodux).Reducers.PlaceInfosReducer
+local UserReducer = require(CorePackages.Workspace.Packages.UserLib).Reducers.UserReducer
+local Friends = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Reducers.Friends
+local FriendCount = require(CorePackages.Workspace.Packages.LegacyFriendsRodux).Reducers.FriendCount
+local ConversationsSearch = require(ShareGame.Reducers.ConversationsSearch)
+local DeviceInfo = require(ShareGame.Reducers.DeviceInfo)
+local Invites = require(ShareGame.Reducers.Invites)
+local GameInfo = require(ShareGame.Reducers.GameInfo)
+local Page = require(ShareGame.Reducers.Page)
+local Toasts = require(ShareGame.Reducers.Toasts)
+local ShareLinksRodux = ReducerDependencies.ShareLinksRodux
+local v15 = ReducerDependencies.RoduxNetworking.installReducer()
+local v16 = ShareLinksRodux.installReducer()
+
+return function(p1, p2) -- line: 25
+	-- upvalues: ConversationsSearch (copy), DeviceInfo (copy), Invites (copy), Page (copy), PlaceInfosReducer (copy), Toasts (copy), UserReducer (copy), Friends (copy), FriendCount (copy), v16 (copy), GameInfo (copy), v15 (copy)
+	local v19 = p1 or {}
+
+	return {
+		ConversationsSearch = ConversationsSearch(v19.ConversationsSearch, p2),
+		DeviceInfo = DeviceInfo(v19.DeviceInfo, p2),
+		Invites = Invites(v19.Invites, p2),
+		Page = Page(v19.Page, p2),
+		PlaceInfos = PlaceInfosReducer(v19.PlaceInfos, p2),
+		Toasts = Toasts(v19.Toasts, p2),
+		Users = UserReducer(v19.Users, p2),
+		Friends = Friends(v19.Friends, p2),
+		FriendCount = FriendCount(v19.FriendCount, p2),
+		ShareLinks = v16(v19.ShareLinks, p2),
+		GameInfo = GameInfo(v19.GameInfo, p2),
+		NetworkStatus = v15(v19.NetworkStatus, p2)
+	}
+end

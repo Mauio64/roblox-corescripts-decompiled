@@ -1,125 +1,198 @@
-local l_Parent_0 = script:FindFirstAncestor("ErrorReporters").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.t);
-local v3 = require(script.Parent.Parent.ProcessErrorStack);
-local v4 = require(script.Parent.Constants);
-local v5 = v2.optional(v2.map(v2.string, v2.some(v2.string, v2.number, v2.boolean)));
-local v15 = v2.optional(v2.map(v2.string, function(v6) --[[ Line: 47 ]]
-    -- upvalues: v2 (copy)
-    local function v7(v8) --[[ Line: 48 ]] --[[ Name: checkTypeRecursive ]]
-        -- upvalues: v7 (copy), v2 (ref)
-        if type(v8) == "table" then
-            for v9, v10 in pairs(v8) do
-                local v11, v12 = v7(v10);
-                if not v11 then
-                    return false, string.format("error when checking key: %s - %s", v9, v12 or "unknown error");
-                end;
-            end;
-            return true, nil;
-        else
-            return v2.some(v2.string, v2.number, v2.boolean)(v8), nil;
-        end;
-    end;
-    local v13, v14 = v7(v6);
-    return v13, v14;
-end));
-local v16 = v2.strictInterface({
-    guessed_frame = v2.optional(v2.boolean), 
-    funcName = v2.optional(v2.string), 
-    address = v2.optional(v2.string), 
-    line = v2.optional(v2.string), 
-    column = v2.optional(v2.string), 
-    sourceCode = v2.optional(v2.string), 
-    library = v2.optional(v2.string), 
-    debug_identifier = v2.optional(v2.string), 
-    faulted = v2.optional(v2.boolean), 
-    registers = v2.optional(v2.map(v2.string, v2.some(v2.string, v2.number)))
-});
-local v17 = v2.strictInterface({
-    name = v2.optional(v2.string), 
-    fault = v2.optional(v2.boolean), 
-    stack = v2.optional(v2.array(v16))
-});
-local v18 = v2.intersection(v2.strictInterface({
-    threads = v2.map(v2.string, v17), 
-    message = v2.optional(v2.string), 
-    level = v2.optional(v2.string), 
-    attributes = v5, 
-    annotations = v15
-}));
-local v19 = {
-    IAttributes = v5, 
-    IAnnotations = v15
-};
-v19.__index = v19;
-v19.validate = function(v20) --[[ Line: 127 ]] --[[ Name: validate ]]
-    -- upvalues: v18 (copy)
-    return v18(v20);
-end;
-v19.new = function() --[[ Line: 137 ]] --[[ Name: new ]]
-    -- upvalues: v19 (copy)
-    local v21 = {
-        threads = {}, 
-        attributes = {}, 
-        annotations = {}
-    };
-    setmetatable(v21, v19);
-    return v21;
-end;
-v19.addAttributes = function(v22, v23) --[[ Line: 154 ]] --[[ Name: addAttributes ]]
-    -- upvalues: v1 (copy)
-    if type(v23) ~= "table" then
-        warn("Cannot add attributes of type: ", (type(v23)));
-        return;
-    else
-        local l_attributes_0 = v22.attributes;
-        v22.attributes = v1.Dictionary.join(l_attributes_0, v23);
-        return;
-    end;
-end;
-v19.addAnnotations = function(v25, v26) --[[ Line: 172 ]] --[[ Name: addAnnotations ]]
-    -- upvalues: v1 (copy)
-    if type(v26) ~= "table" then
-        warn("Cannot add annotations of type: ", (type(v26)));
-        return;
-    else
-        local l_annotations_0 = v25.annotations;
-        v25.annotations = v1.Dictionary.join(l_annotations_0, v26);
-        return;
-    end;
-end;
-v19.fromMessageAndStack = function(v28, v29, v30) --[[ Line: 193 ]] --[[ Name: fromMessageAndStack ]]
-    -- upvalues: v19 (copy), v4 (copy), v3 (copy)
-    local v31 = v19.new();
-    v31.message = v28;
-    v31.level = v30 or v4.DEFAULT_ERROR_LEVEL;
-    local v32, v33 = v3(v29);
-    for _, v35 in v32 do
-        if v35.sourceCode and v33[v35.sourceCode] then
-            v35.sourceCode = v33[v35.sourceCode].path;
-        end;
-    end;
-    v31.threads = {
-        main = {
-            name = "main", 
-            stack = v32
-        }
-    };
-    return v31;
-end;
-v19.fromDetails = function(v36) --[[ Line: 225 ]] --[[ Name: fromDetails ]]
-    -- upvalues: v19 (copy), v4 (copy)
-    local v37 = nil;
-    if v36.stack then
-        v37 = v19.fromMessageAndStack(v36.message, v36.stack, v36.level);
-    else
-        v37 = v19.new();
-        v37.message = v36.message;
-        v37.level = v36.level or v4.DEFAULT_ERROR_LEVEL;
-    end;
-    if v36.annotations then
-        v37:addAnnotations(v36.annotations);
-    end;
-    return v37;
-end;
-return v19;
+local Parent = script:FindFirstAncestor("ErrorReporters").Parent
+local Cryo = require(Parent.Cryo)
+local t = require(Parent.t)
+local ProcessErrorStack = require(script.Parent.Parent.ProcessErrorStack)
+local Constants = require(script.Parent.Constants)
+local v6 = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
+local v7 = t.optional(t.map(t.string, function(p1) -- line: 53
+	-- upvalues: t (copy)
+	local function checkTypeRecursive(p2) -- line: 54
+		-- upvalues: checkTypeRecursive (copy), t (copy)
+		if type(p2) == "table" then
+			for k, v in pairs(p2) do
+				local v52, v53 = checkTypeRecursive(v)
+
+				if not v52 then
+					return false, string.format("error when checking key: %s - %s", k, v53 or "unknown error")
+				end
+			end
+
+			return true, nil
+		end
+
+		return t.some(t.string, t.number, t.boolean)(p2), nil
+	end
+
+	local v17, v18 = checkTypeRecursive(p1)
+
+	return v17, v18
+end))
+local v8 = t.map(t.string, t.some(t.string, t.number, t.boolean))
+local v9 = t.optional(t.map(t.string, v8))
+local v10 = t.strictInterface({
+	guessed_frame = t.optional(t.boolean),
+	funcName = t.optional(t.string),
+	address = t.optional(t.string),
+	line = t.optional(t.string),
+	column = t.optional(t.string),
+	sourceCode = t.optional(t.string),
+	library = t.optional(t.string),
+	debug_identifier = t.optional(t.string),
+	faulted = t.optional(t.boolean),
+	registers = t.optional(t.map(t.string, t.some(t.string, t.number)))
+})
+local v11 = t.strictInterface({
+	name = t.optional(t.string),
+	fault = t.optional(t.boolean),
+	stack = t.optional(t.array(v10))
+})
+local v12 = t.intersection(t.strictInterface({
+	threads = t.map(t.string, v11),
+	message = t.optional(t.string),
+	level = t.optional(t.string),
+	attributes = v6,
+	annotations = v7,
+	customMetadata = v9
+}))
+local t1 = {
+	IAttributes = v6,
+	IAnnotations = v7,
+	ICustomMetadata = v9
+}
+
+t1.__index = t1
+
+function t1.validate(p3) -- line: 144
+	-- upvalues: v12 (copy)
+	return v12(p3)
+end
+function t1.new() -- line: 154
+	-- upvalues: t1 (copy)
+	local t2 = {
+		threads = {},
+		attributes = {},
+		annotations = {},
+		customMetadata = {}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.addAttributes(t3: {[any]: any}, t4: {[any]: any}) -- line: 172
+	-- upvalues: Cryo (copy)
+	if type(t4) ~= "table" then
+		warn("Cannot add attributes of type: ", (type(t4)))
+
+		return
+	end
+
+	local attributes = t3.attributes
+
+	t3.attributes = Cryo.Dictionary.join(attributes, t4)
+end
+function t1.addAnnotations(t5: {[any]: any}, t6: {[any]: any}) -- line: 190
+	-- upvalues: Cryo (copy)
+	if type(t6) ~= "table" then
+		warn("Cannot add annotations of type: ", (type(t6)))
+
+		return
+	end
+
+	local annotations = t5.annotations
+
+	t5.annotations = Cryo.Dictionary.join(annotations, t6)
+end
+
+local function sanitizeCustomMetadataGroup(p4) -- line: 212
+	if type(p4) ~= "table" then
+		return nil
+	end
+
+	local t7 = {}
+
+	for k, v in pairs(p4) do
+		local v31 = type(v)
+
+		if v31 == "string" or v31 == "number" or v31 == "boolean" then
+			t7[k] = v
+		end
+	end
+
+	if next(t7) == nil then
+		return nil
+	end
+
+	return t7
+end
+
+function t1.addCustomMetadata(t8: {[any]: any}, t9: {[any]: any}) -- line: 244
+	-- upvalues: sanitizeCustomMetadataGroup (copy), Cryo (copy)
+	if type(t9) ~= "table" then
+		warn("Cannot add custom metadata of type: ", (type(t9)))
+
+		return
+	end
+
+	local customMetadata = t8.customMetadata
+
+	for k, v in pairs(t9) do
+		local v37 = sanitizeCustomMetadataGroup(v)
+
+		if v37 ~= nil then
+			local v38 = customMetadata[k]
+
+			if v38 ~= nil then
+				customMetadata[k] = Cryo.Dictionary.join(v38, v37)
+			else
+				customMetadata[k] = v37
+			end
+		end
+	end
+
+	t8.customMetadata = customMetadata
+end
+function t1.fromMessageAndStack(s1: string, s2: string, p5) -- line: 275
+	-- upvalues: t1 (copy), Constants (copy), ProcessErrorStack (copy)
+	local v42 = t1.new()
+
+	v42.message = s1
+	v42.level = p5 or Constants.DEFAULT_ERROR_LEVEL
+
+	local v43, v44 = ProcessErrorStack(s2)
+
+	for _, v46 in v43 do
+		if v46.sourceCode and v44[v46.sourceCode] then
+			v46.sourceCode = v44[v46.sourceCode].path
+		end
+	end
+
+	v42.threads = {
+		main = {
+			name = "main",
+			stack = v43
+		}
+	}
+
+	return v42
+end
+function t1.fromDetails(t10: {[any]: any}) -- line: 307
+	-- upvalues: t1 (copy), Constants (copy)
+	local v48
+
+	if t10.stack then
+		v48 = t1.fromMessageAndStack(t10.message, t10.stack, t10.level)
+	else
+		v48 = t1.new()
+		v48.message = t10.message
+		v48.level = t10.level or Constants.DEFAULT_ERROR_LEVEL
+	end
+
+	if t10.annotations then
+		v48:addAnnotations(t10.annotations)
+	end
+
+	return v48
+end
+
+return t1

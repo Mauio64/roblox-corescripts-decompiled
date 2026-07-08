@@ -1,1 +1,1 @@
-return require(script.CapturesContext);
+return require(script.CapturesContext)

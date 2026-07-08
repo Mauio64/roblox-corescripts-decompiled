@@ -1,16 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes);
-local l_FFlagAddThumbnailSelectorReport_0 = require(l_Parent_0.SharedFlags).FFlagAddThumbnailSelectorReport;
-return v2.createContext({
-    custom = if l_FFlagAddThumbnailSelectorReport_0 then {} else nil, 
-    formData = {}, 
-    updateForm = function(_, _) --[[ Line: 16 ]] --[[ Name: updateForm ]]
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
 
-    end, 
-    additionalReportTags = if l_FFlagAddThumbnailSelectorReport_0 then {} else nil, 
-    updateAdditionalReportTags = l_FFlagAddThumbnailSelectorReport_0 and function(_, _) --[[ Line: 19 ]]
+require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
 
-    end or nil
-});
+local FFlagAddThumbnailSelectorReport = require(GenericAbuseReportingParent.SharedFlags).FFlagAddThumbnailSelectorReport
+
+return React.createContext({
+	custom = if not FFlagAddThumbnailSelectorReport then nil else {},
+	formData = {},
+	updateForm = function(_: string, _: string) -- line: 16
+	end,
+	additionalReportTags = if not FFlagAddThumbnailSelectorReport then nil else {},
+	updateAdditionalReportTags = if not FFlagAddThumbnailSelectorReport then nil else function(_: string, _) -- line: 19
+	end
+})

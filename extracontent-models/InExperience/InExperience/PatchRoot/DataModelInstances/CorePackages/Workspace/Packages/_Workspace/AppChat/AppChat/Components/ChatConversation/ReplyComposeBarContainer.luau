@@ -9,7 +9,7 @@ local populateUserWithState = require(AppChat.Users.populateUserWithState)
 local UserProfiles = require(AppChatParent.UserProfiles)
 local useSignalState = require(AppChatParent.SignalsReact).useSignalState
 local GetReplyingToStore = require(AppChat.Stores.GetReplyingToStore)
-local GetChannelsMessageStore = require(AppChat.Stores.GetChannelsMessageStore)
+local GetConversationMessageStore = require(AppChat.Stores.GetConversationMessageStore)
 local useStyle = UIBlox.Core.Style.useStyle
 local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
 local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
@@ -22,14 +22,14 @@ local FFlagAppChatSignalsReplyStore = require(AppChat.Flags.FFlagAppChatSignalsR
 local t1 = {
 	LayoutOrder = 3,
 	message = nil,
-	close = function() --[[ close ]] -- line: 53
-	end,
 	inputBoxRef = nil,
-	setReplyComposeBarHeight = function(_) --[[ setReplyComposeBarHeight ]] -- line: 56
-	end,
 	unknownUserKey = "Feature.Chat.Label.UnknownUser",
 	replyingToYourselfKey = "Feature.Chat.Label.ReplyingToYourself",
-	replyingToOthersKey = "Feature.Chat.Label.ReplyingToOthers"
+	replyingToOthersKey = "Feature.Chat.Label.ReplyingToOthers",
+	close = function() -- line: 53
+	end,
+	setReplyComposeBarHeight = function(_) -- line: 56
+	end
 }
 
 function getTargetMessageInfo(p2) -- line: 63
@@ -44,195 +44,194 @@ function getTargetMessageInfo(p2) -- line: 63
 		targetMessageLength = if not p2.content then nil else #p2.content
 	}
 end
+
+local function getTargetMessageInfoFromSignals(s1: string?, s2: string?, s3: string?) -- line: 75
+	return {
+		targetMessageSenderId = s1,
+		targetMessageId = s2,
+		targetMessageLength = if not s3 then nil else #s3
+	}
+end
+
 function ReplyComposeBarContainer(t2: {[any]: any}) -- line: 83
-	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useLocalUserId (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), FFlagAppChatSignalsReplyStore (copy), GetReplyingToStore (copy), GetChannelsMessageStore (copy), useSignalState (copy), React (copy), FFlagAppChatReplyComposeBarContainer (copy), ReplyComposeBarConstants (copy), ChatConversationTelemetryEvents (copy), useSelector (copy), populateUserWithState (copy), UserProfiles (copy), useLocalization (copy), ReplyComposeBar (copy)
-	local v29 = Cryo.Dictionary.union(t1, t2)
-	local v30 = useStyle()
-	local v31 = useLocalUserId()
-	local v32 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useLocalUserId (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), FFlagAppChatSignalsReplyStore (copy), GetReplyingToStore (copy), GetConversationMessageStore (copy), useSignalState (copy), React (copy), FFlagAppChatReplyComposeBarContainer (copy), ReplyComposeBarConstants (copy), ChatConversationTelemetryEvents (copy), useSelector (copy), populateUserWithState (copy), UserProfiles (copy), useLocalization (copy), ReplyComposeBar (copy)
+	local v30 = Cryo.Dictionary.union(t1, t2)
+	local v31 = useStyle()
+	local v32 = useLocalUserId()
+	local v33 = useTelemetry(ChatConversationTelemetryLayer.Context)
 
 	if FFlagAppChatSignalsReplyStore then
-		local v33 = GetReplyingToStore(false)
-		local v34 = GetChannelsMessageStore(false)
-		local v35 = useSignalState(v33.getMessageId)
-		local v36 = React.useMemo(function() -- line: 94
-			-- upvalues: v35 (copy), v34 (copy)
-			if v35 == nil then
+		local v34 = GetReplyingToStore(false)
+		local v35 = GetConversationMessageStore(false)
+		local v36 = useSignalState(v34.getMessageId)
+		local v37 = React.useMemo(function() -- line: 94
+			-- upvalues: v36 (copy), v35 (copy)
+			if v36 == nil then
 				return nil
 			end
 
-			return v34.messages(false)[v35]
+			return v35.messages(false)[v36]
 		end, {
-			v35,
-			v34
+			v36,
+			v35
 		})
-		local v37 = if not v36 or not v36.sender_user_id then nil else tostring(v36.sender_user_id)
-		local v38 = if not v36 then nil else v36.content
-		local v39 = if not FFlagAppChatReplyComposeBarContainer then v30.Tokens.Global.Size_700 + ReplyComposeBarConstants.VERTICAL_PADDING * 2 + ReplyComposeBarConstants.BORDER_HEIGHT else nil
+		local v38 = if not v37 or not v37.sender_user_id then nil else tostring(v37.sender_user_id)
+		local v39 = if not v37 then nil else v37.content
+		local v40 = if not FFlagAppChatReplyComposeBarContainer then v31.Tokens.Size.Size_1400 + ReplyComposeBarConstants.VERTICAL_PADDING * 2 + ReplyComposeBarConstants.BORDER_HEIGHT else nil
 
 		React.useEffect(function() -- line: 114
-			-- upvalues: ChatConversationTelemetryEvents (copy), v32 (copy), v37 (copy), v35 (copy), v38 (copy), FFlagAppChatReplyComposeBarContainer (copy), v29 (copy), v39 (copy)
-			if ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered then
-				local emit = v32.emit
-				local ConversationInputBarReplyComposeRendered = ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered
-				local v61 = v37
-				local v62 = v35
-				local v63 = v38
+			-- upvalues: v33 (copy), ChatConversationTelemetryEvents (copy), v38 (copy), v36 (copy), v39 (copy), FFlagAppChatReplyComposeBarContainer (copy), v30 (copy), v40 (copy)
+			local emit = v33.emit
+			local ConversationInputBarReplyComposeRendered = ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered
+			local v62 = v38
+			local v63 = v36
+			local v64 = v39
 
-				emit(ConversationInputBarReplyComposeRendered, {
-					targetMessageSenderId = v61,
-					targetMessageId = v62,
-					targetMessageLength = if not v63 then nil else #v63
-				})
-			end
+			emit(ConversationInputBarReplyComposeRendered, {
+				targetMessageSenderId = v62,
+				targetMessageId = v63,
+				targetMessageLength = if not v64 then nil else #v64
+			})
 
 			if FFlagAppChatReplyComposeBarContainer then
-				return function() -- line: 122
+				return function() -- line: 120
 				end
 			end
 
-			v29.setReplyComposeBarHeight(v39)
+			v30.setReplyComposeBarHeight(v40)
 
-			return function() -- line: 125
-				-- upvalues: v29 (copy)
-				v29.setReplyComposeBarHeight(0)
+			return function() -- line: 123
+				-- upvalues: v30 (copy)
+				v30.setReplyComposeBarHeight(0)
 			end
 		end, {})
 
-		local v40 = useSelector(function(p3) -- line: 132
-			-- upvalues: v37 (copy), populateUserWithState (copy)
-			local v65 = if not p3 or (not p3.Users or not v37) then nil else p3.Users[v37]
+		local v41 = useSelector(function(p3) -- line: 130
+			-- upvalues: v38 (copy), populateUserWithState (copy)
+			local v66 = if not p3 or (not p3.Users or not v38) then nil else p3.Users[v38]
 
-			if v65 then
+			if v66 then
 				return {
-					targetUser = populateUserWithState(p3, v65)
+					targetUser = populateUserWithState(p3, v66)
 				}
 			end
 
 			return {}
 		end)
-		local v41 = UserProfiles.Hooks.useUserProfilesFetch({
-			userIds = if not v37 then {} else { v37 },
+		local v42 = UserProfiles.Hooks.useUserProfilesFetch({
+			userIds = if not v38 then {} else { v38 },
 			query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 		})
-		local v42 = if not v40.targetUser or (not v40.targetUser.displayName or v40.targetUser.displayName == "") then if not v41.data or (not v41.data.userProfiles or (not v41.data.userProfiles[1] or not v41.data.userProfiles[1].names)) then v29.unknownUserKey else UserProfiles.Selectors.getCombinedNameFromId(v41.data, v37) else v40.targetUser.displayName
-		local v43 = useLocalization((if v42 ~= v29.unknownUserKey then {} else {
-			replyingToUserName = v42
-		})).replyingToUserName or v42
-		local v44 = v31 == v37
-		local v45 = if not v44 then {
-			v29.replyingToOthersKey,
-			DISPLAY_NAME = v43
-		} else v29.replyingToYourselfKey
+		local v43 = if not v41.targetUser or (not v41.targetUser.displayName or v41.targetUser.displayName == "") then if not v42.data or (not v42.data.userProfiles or (not v42.data.userProfiles[1] or not v42.data.userProfiles[1].names)) then v30.unknownUserKey else UserProfiles.Selectors.getCombinedNameFromId(v42.data, v38) else v41.targetUser.displayName
+		local v44 = useLocalization((if v43 ~= v30.unknownUserKey then {} else {
+			replyingToUserName = v43
+		})).replyingToUserName or v43
+		local v45 = v32 == v38
+		local v46 = if not v45 then {
+			v30.replyingToOthersKey,
+			DISPLAY_NAME = v44
+		} else v30.replyingToYourselfKey
 		local replyingToUserText = useLocalization({
-			replyingToUserText = v45
+			replyingToUserText = v46
 		}).replyingToUserText
-		local v47 = if v44 or not v40.targetUser then nil else v37
-		local v48 = React.useCallback(function() -- line: 174
-			-- upvalues: ChatConversationTelemetryEvents (copy), v32 (copy), v37 (copy), v35 (copy), v38 (copy), v29 (copy)
-			if ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated then
-				local emit = v32.emit
-				local ConversationInputBarReplyComposeCancelBtnActivated = ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated
-				local v68 = v37
-				local v69 = v35
-				local v70 = v38
+		local v48 = if v45 or not v41.targetUser then nil else v38
+		local v49 = React.useCallback(function() -- line: 172
+			-- upvalues: v33 (copy), ChatConversationTelemetryEvents (copy), v38 (copy), v36 (copy), v39 (copy), v30 (copy)
+			local emit = v33.emit
+			local ConversationInputBarReplyComposeCancelBtnActivated = ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated
+			local v69 = v38
+			local v70 = v36
+			local v71 = v39
 
-				emit(ConversationInputBarReplyComposeCancelBtnActivated, {
-					targetMessageSenderId = v68,
-					targetMessageId = v69,
-					targetMessageLength = if not v70 then nil else #v70
-				})
-			end
-
-			v29.close()
+			emit(ConversationInputBarReplyComposeCancelBtnActivated, {
+				targetMessageSenderId = v69,
+				targetMessageId = v70,
+				targetMessageLength = if not v71 then nil else #v71
+			})
+			v30.close()
 		end, {
-			v29.close,
-			v32,
-			v37,
-			v35,
-			v38
+			v30.close,
+			v33,
+			v38,
+			v36,
+			v39
 		})
 
 		return React.createElement(ReplyComposeBar, {
-			LayoutOrder = v29.LayoutOrder,
-			totalHeight = if not FFlagAppChatReplyComposeBarContainer then v39 else nil,
+			LayoutOrder = v30.LayoutOrder,
+			totalHeight = if not FFlagAppChatReplyComposeBarContainer then v40 else nil,
 			replyingToUserText = replyingToUserText,
-			replyingToUserContent = v38,
-			replyingToUserId = v47,
-			onCloseActivated = v48
+			replyingToUserContent = v39,
+			replyingToUserId = v48,
+			onCloseActivated = v49
 		})
 	end
 
-	local v49 = if not FFlagAppChatReplyComposeBarContainer then v30.Tokens.Global.Size_700 + ReplyComposeBarConstants.VERTICAL_PADDING * 2 + ReplyComposeBarConstants.BORDER_HEIGHT else nil
+	local v50 = if not FFlagAppChatReplyComposeBarContainer then v31.Tokens.Size.Size_1400 + ReplyComposeBarConstants.VERTICAL_PADDING * 2 + ReplyComposeBarConstants.BORDER_HEIGHT else nil
 
-	React.useEffect(function() -- line: 206
-		-- upvalues: ChatConversationTelemetryEvents (copy), v32 (copy), v29 (copy), FFlagAppChatReplyComposeBarContainer (copy), v49 (copy)
-		if ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered then
-			v32.emit(ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered, getTargetMessageInfo(v29.message))
-		end
+	React.useEffect(function() -- line: 202
+		-- upvalues: v33 (copy), ChatConversationTelemetryEvents (copy), v30 (copy), FFlagAppChatReplyComposeBarContainer (copy), v50 (copy)
+		v33.emit(ChatConversationTelemetryEvents.ConversationInputBarReplyComposeRendered, getTargetMessageInfo(v30.message))
 
 		if FFlagAppChatReplyComposeBarContainer then
-			return function() -- line: 215
+			return function() -- line: 208
 			end
 		end
 
-		v29.setReplyComposeBarHeight(v49)
+		v30.setReplyComposeBarHeight(v50)
 
-		return function() -- line: 218
-			-- upvalues: v29 (copy)
-			v29.setReplyComposeBarHeight(0)
+		return function() -- line: 211
+			-- upvalues: v30 (copy)
+			v30.setReplyComposeBarHeight(0)
 		end
 	end, {})
 
-	local v50 = useSelector(function(p4) -- line: 225
-		-- upvalues: v29 (copy), populateUserWithState (copy)
-		local v72 = if not p4 or (not p4.Users or not v29.message.senderTargetId) then nil else p4.Users[v29.message.senderTargetId]
+	local v51 = useSelector(function(p4) -- line: 218
+		-- upvalues: v30 (copy), populateUserWithState (copy)
+		local v73 = if not p4 or (not p4.Users or not v30.message.senderTargetId) then nil else p4.Users[v30.message.senderTargetId]
 
-		if v72 then
+		if v73 then
 			return {
-				targetUser = populateUserWithState(p4, v72)
+				targetUser = populateUserWithState(p4, v73)
 			}
 		end
 
 		return {}
 	end)
-	local v51 = UserProfiles.Hooks.useUserProfilesFetch({
-		userIds = { v29.message.senderTargetId },
+	local v52 = UserProfiles.Hooks.useUserProfilesFetch({
+		userIds = { v30.message.senderTargetId },
 		query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds
 	})
-	local v52 = if not v50.targetUser or (not v50.targetUser.displayName or v50.targetUser.displayName == "") then if not v51.data or (not v51.data.userProfiles or (not v51.data.userProfiles[1] or not v51.data.userProfiles[1].names)) then v29.unknownUserKey else UserProfiles.Selectors.getCombinedNameFromId(v51.data, v29.message.senderTargetId) else v50.targetUser.displayName
-	local v53 = useLocalization((if v52 ~= v29.unknownUserKey then {} else {
-		replyingToUserName = v52
-	})).replyingToUserName or v52
-	local v54 = v31 == v29.message.senderTargetId
-	local v55 = if not v54 then {
-		v29.replyingToOthersKey,
-		DISPLAY_NAME = v53
-	} else v29.replyingToYourselfKey
+	local v53 = if not v51.targetUser or (not v51.targetUser.displayName or v51.targetUser.displayName == "") then if not v52.data or (not v52.data.userProfiles or (not v52.data.userProfiles[1] or not v52.data.userProfiles[1].names)) then v30.unknownUserKey else UserProfiles.Selectors.getCombinedNameFromId(v52.data, v30.message.senderTargetId) else v51.targetUser.displayName
+	local v54 = useLocalization((if v53 ~= v30.unknownUserKey then {} else {
+		replyingToUserName = v53
+	})).replyingToUserName or v53
+	local v55 = v32 == v30.message.senderTargetId
+	local v56 = if not v55 then {
+		v30.replyingToOthersKey,
+		DISPLAY_NAME = v54
+	} else v30.replyingToYourselfKey
 	local replyingToUserText = useLocalization({
-		replyingToUserText = v55
+		replyingToUserText = v56
 	}).replyingToUserText
-	local v57 = if v54 or not v50.targetUser then nil else v29.message.senderTargetId
-	local v58 = React.useCallback(function() -- line: 279
-		-- upvalues: ChatConversationTelemetryEvents (copy), v32 (copy), v29 (copy)
-		if ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated then
-			v32.emit(ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated, getTargetMessageInfo(v29.message))
-		end
-
-		v29.close()
+	local v58 = if v55 or not v51.targetUser then nil else v30.message.senderTargetId
+	local v59 = React.useCallback(function() -- line: 272
+		-- upvalues: v33 (copy), ChatConversationTelemetryEvents (copy), v30 (copy)
+		v33.emit(ChatConversationTelemetryEvents.ConversationInputBarReplyComposeCancelBtnActivated, getTargetMessageInfo(v30.message))
+		v30.close()
 	end, {
-		v29.close,
-		v32,
-		v29.message
+		v30.close,
+		v33,
+		v30.message
 	})
 
 	return React.createElement(ReplyComposeBar, {
-		LayoutOrder = v29.LayoutOrder,
-		totalHeight = if not FFlagAppChatReplyComposeBarContainer then v49 else nil,
+		LayoutOrder = v30.LayoutOrder,
+		totalHeight = if not FFlagAppChatReplyComposeBarContainer then v50 else nil,
 		replyingToUserText = replyingToUserText,
-		replyingToUserContent = v29.message.content,
-		replyingToUserId = v57,
-		onCloseActivated = v58
+		replyingToUserContent = v30.message.content,
+		replyingToUserId = v58,
+		onCloseActivated = v59
 	})
 end
 

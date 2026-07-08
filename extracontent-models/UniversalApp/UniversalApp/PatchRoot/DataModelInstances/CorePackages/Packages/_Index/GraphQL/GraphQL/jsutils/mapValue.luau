@@ -1,10 +1,13 @@
-local _ = require(script.Parent.ObjMap);
+require(script.Parent.ObjMap)
+
 return {
-    mapValue = function(v1, v2) --[[ Line: 15 ]] --[[ Name: mapValue ]]
-        local v3 = {};
-        for v4, v5 in pairs(v1) do
-            v3[v4] = v2(v5, v4);
-        end;
-        return v3;
-    end
-};
+	mapValue = function(p1, p2: ((...any) -> ...any)) -- line: 15
+		local t1 = {}
+
+		for k, v in pairs(p1) do
+			t1[k] = p2(v, k)
+		end
+
+		return t1
+	end
+}

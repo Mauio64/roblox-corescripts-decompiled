@@ -1,89 +1,103 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Dash);
-local v3 = require(script.Parent.Parent.Actions.SetActiveTab);
-local v4 = require(script.Parent.Parent.Actions.SetDevConsoleVisibility);
-local v5 = require(script.Parent.Parent.Actions.SetDevConsoleMinimized);
-local v6 = game:DefineFastInt("ReportDevConsoleTabEventsThrottleHundredthsPercent", 0);
-ReportDevConsoleOpenClose = function(v7, v8) --[[ Line: 23 ]] --[[ Name: ReportDevConsoleOpenClose ]]
-    -- upvalues: v4 (copy), l_RbxAnalyticsService_0 (copy)
-    if v8.type == v4.name then
-        local l_isVisible_0 = v7:getState().DisplayOptions.isVisible;
-        local l_visibleStartTime_0 = v7:getState().DisplayOptions.visibleStartTime;
-        if v8.isVisible ~= l_isVisible_0 then
-            if v8.isVisible then
-                l_RbxAnalyticsService_0:ReportCounter("DevConsoleStartVisible", 1);
-                return;
-            else
-                local v11 = tick() - l_visibleStartTime_0;
-                l_RbxAnalyticsService_0:ReportStats("DevConsoleSessionTime", v11);
-            end;
-        end;
-    end;
-end;
-getTabAnalyticsKeyName = function(v12, v13) --[[ Line: 39 ]] --[[ Name: getTabAnalyticsKeyName ]]
-    if v13 ~= nil then
-        return string.format("%s_%s", v12, v13 and "Client" or "Server");
-    else
-        return string.format("%s", v12);
-    end;
-end;
-dispatchTabAnalytics = function(v14) --[[ Line: 47 ]] --[[ Name: dispatchTabAnalytics ]]
-    -- upvalues: v2 (copy), l_RbxAnalyticsService_0 (copy), v6 (copy)
-    local v15 = v2.join({
-        placeId = game.PlaceId, 
-        calledFrom = "devConsoleTabChange"
-    }, v14);
-    l_RbxAnalyticsService_0:ReportInfluxSeries("devConsoleMetric", v15, v6);
-end;
-ReportTabChange = function(v16, v17) --[[ Line: 59 ]] --[[ Name: ReportTabChange ]]
-    -- upvalues: v3 (copy), v4 (copy), v5 (copy)
-    if v17.type == v3.name then
-        local l_MainView_0 = v16:getState().MainView;
-        local l_newTabIndex_0 = v17.newTabIndex;
-        local l_isClientView_0 = v17.isClientView;
-        if l_newTabIndex_0 ~= l_MainView_0.currTabIndex or l_isClientView_0 ~= nil and l_isClientView_0 ~= l_MainView_0.isClientView then
-            local v21 = {
-                initTab = getTabAnalyticsKeyName(l_MainView_0.currTabIndex, l_MainView_0.isClientView), 
-                endTab = getTabAnalyticsKeyName(l_newTabIndex_0, l_isClientView_0)
-            };
-            dispatchTabAnalytics(v21);
-            return;
-        end;
-    elseif v17.type == v4.name then
-        local l_MainView_1 = v16:getState().MainView;
-        local l_DisplayOptions_0 = v16:getState().DisplayOptions;
-        local v24 = nil;
-        v24 = if v17.isVisible then {
-            initTab = "StartVisible", 
-            endTab = getTabAnalyticsKeyName(l_MainView_1.currTabIndex, l_MainView_1.isClientView)
-        } else if l_DisplayOptions_0.isMinimized then {
-            initTab = "Minimized", 
-            endTab = "EndVisible"
-        } else {
-            initTab = getTabAnalyticsKeyName(l_MainView_1.currTabIndex, l_MainView_1.isClientView), 
-            endTab = "EndVisible"
-        };
-        dispatchTabAnalytics(v24);
-        return;
-    elseif v17.type == v5.name then
-        local l_MainView_2 = v16:getState().MainView;
-        local v26 = nil;
-        v26 = if v17.isMinimized then {
-            initTab = getTabAnalyticsKeyName(l_MainView_2.currTabIndex, l_MainView_2.isClientView), 
-            endTab = "Minimized"
-        } else {
-            initTab = "Minimized", 
-            endTab = getTabAnalyticsKeyName(l_MainView_2.currTabIndex, l_MainView_2.isClientView)
-        };
-        dispatchTabAnalytics(v26);
-    end;
-end;
-return function(v27, v28) --[[ Line: 117 ]]
-    return function(v29) --[[ Line: 118 ]]
-        -- upvalues: v28 (copy), v27 (copy)
-        ReportTabChange(v28, v29);
-        ReportDevConsoleOpenClose(v28, v29);
-        v27(v29);
-    end;
-end;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CorePackages = game:GetService("CorePackages")
+local Dash = require(CorePackages.Packages.Dash)
+local SetActiveTab = require(script.Parent.Parent.Actions.SetActiveTab)
+local SetDevConsoleVisibility = require(script.Parent.Parent.Actions.SetDevConsoleVisibility)
+local SetDevConsoleMinimized = require(script.Parent.Parent.Actions.SetDevConsoleMinimized)
+local v7 = game:DefineFastInt("ReportDevConsoleTabEventsThrottleHundredthsPercent", 0)
+
+function ReportDevConsoleOpenClose(p1, p2) -- line: 23
+	-- upvalues: SetDevConsoleVisibility (copy), RbxAnalyticsService (copy)
+	if p2.type == SetDevConsoleVisibility.name then
+		local isVisible = p1:getState().DisplayOptions.isVisible
+		local visibleStartTime = p1:getState().DisplayOptions.visibleStartTime
+
+		if isVisible ~= p2.isVisible then
+			if p2.isVisible then
+				RbxAnalyticsService:ReportCounter("DevConsoleStartVisible", 1)
+
+				return
+			end
+
+			local v12 = tick() - visibleStartTime
+
+			RbxAnalyticsService:ReportStats("DevConsoleSessionTime", v12)
+		end
+	end
+end
+function getTabAnalyticsKeyName(p3, p4) -- line: 39
+	if p4 ~= nil then
+		return string.format("%s_%s", p3, not p4 and "Server" or "Client")
+	end
+
+	return string.format("%s", p3)
+end
+function dispatchTabAnalytics(p5) -- line: 47
+	-- upvalues: Dash (copy), RbxAnalyticsService (copy), v7 (copy)
+	local v16 = Dash.join({
+		calledFrom = "devConsoleTabChange",
+		placeId = game.PlaceId
+	}, p5)
+
+	RbxAnalyticsService:ReportInfluxSeries("devConsoleMetric", v16, v7)
+end
+function ReportTabChange(p6, p7) -- line: 59
+	-- upvalues: SetActiveTab (copy), SetDevConsoleVisibility (copy), SetDevConsoleMinimized (copy)
+	if p7.type == SetActiveTab.name then
+		local MainView = p6:getState().MainView
+		local newTabIndex = p7.newTabIndex
+		local isClientView = p7.isClientView
+
+		if newTabIndex ~= MainView.currTabIndex or isClientView ~= nil and isClientView ~= MainView.isClientView then
+			local t1 = {
+				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView),
+				endTab = getTabAnalyticsKeyName(newTabIndex, isClientView)
+			}
+
+			dispatchTabAnalytics(t1)
+
+			return
+		end
+	else
+		if p7.type == SetDevConsoleVisibility.name then
+			local MainView = p6:getState().MainView
+			local DisplayOptions = p6:getState().DisplayOptions
+			local v25 = if not p7.isVisible then if not DisplayOptions.isMinimized then {
+				endTab = "EndVisible",
+				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+			} else {
+				initTab = "Minimized",
+				endTab = "EndVisible"
+			} else {
+				initTab = "StartVisible",
+				endTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+			}
+
+			dispatchTabAnalytics(v25)
+
+			return
+		end
+
+		if p7.type == SetDevConsoleMinimized.name then
+			local MainView = p6:getState().MainView
+			local v27 = if not p7.isMinimized then {
+				initTab = "Minimized",
+				endTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+			} else {
+				endTab = "Minimized",
+				initTab = getTabAnalyticsKeyName(MainView.currTabIndex, MainView.isClientView)
+			}
+
+			dispatchTabAnalytics(v27)
+		end
+	end
+end
+
+return function(p8, p9) -- line: 117
+	return function(p10) -- line: 118
+		-- upvalues: p9 (copy), p8 (copy)
+		ReportTabChange(p9, p10)
+		ReportDevConsoleOpenClose(p9, p10)
+		p8(p10)
+	end
+end

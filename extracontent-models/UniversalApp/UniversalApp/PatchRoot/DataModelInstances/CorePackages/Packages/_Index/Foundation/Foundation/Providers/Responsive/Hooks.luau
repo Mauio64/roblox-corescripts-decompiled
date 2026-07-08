@@ -1,6 +1,7 @@
-local v0 = require(script.useBreakpoint);
-local v1 = require(script.useResponsiveValue);
+local useBreakpoint = require(script.useBreakpoint)
+local useResponsiveValue = require(script.useResponsiveValue)
+
 return {
-    useBreakpoint = v0, 
-    useResponsiveValue = v1
-};
+	useBreakpoint = useBreakpoint,
+	useResponsiveValue = useResponsiveValue
+}

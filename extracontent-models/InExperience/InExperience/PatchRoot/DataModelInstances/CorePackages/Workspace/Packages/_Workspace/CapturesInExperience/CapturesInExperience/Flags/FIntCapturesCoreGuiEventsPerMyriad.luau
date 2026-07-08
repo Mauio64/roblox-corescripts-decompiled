@@ -1,1 +1,1 @@
-return game:DefineFastInt("CapturesCoreGuiEventsPerMyriad", 100);
+return game:DefineFastInt("CapturesCoreGuiEventsPerMyriad", 100)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixAvatarsTabPurchaseLogging", false);
+return game:DefineFastFlag("AXFixAvatarsTabPurchaseLogging", false)

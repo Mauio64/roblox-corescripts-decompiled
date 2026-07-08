@@ -1,6 +1,10 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: get ]]
-    local v2 = type(v0);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    assert(v1 ~= nil, "expected second argument to be anything but nil, got nil");
-    return v0[v1];
-end;
+local function get(p1, p2) -- line: 2
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+	assert(p2 ~= nil, "expected second argument to be anything but nil, got nil")
+
+	return p1[p2]
+end
+
+return get

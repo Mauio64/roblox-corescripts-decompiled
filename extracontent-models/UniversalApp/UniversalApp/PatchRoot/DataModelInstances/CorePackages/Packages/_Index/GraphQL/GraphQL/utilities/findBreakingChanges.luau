@@ -1,437 +1,501 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local l_keyMapOrdered_0 = require(l_Parent_0.luaUtils.keyMapOrdered).keyMapOrdered;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local l_inspect_0 = require(l_jsutils_0.inspect).inspect;
-local l_invariant_0 = require(l_jsutils_0.invariant).invariant;
-local l_naturalCompare_0 = require(l_jsutils_0.naturalCompare).naturalCompare;
-local l_language_0 = l_Parent_0.language;
-local l_print_0 = require(l_language_0.printer).print;
-local l_visit_0 = require(l_language_0.visitor).visit;
-local _ = require(l_language_0.ast);
-local l_type_0 = l_Parent_0.type;
-local _ = require(l_type_0.schema);
-local v16 = require(l_type_0.definition);
-local l_isSpecifiedScalarType_0 = require(l_type_0.scalars).isSpecifiedScalarType;
-local l_isScalarType_0 = v16.isScalarType;
-local l_isObjectType_0 = v16.isObjectType;
-local l_isInterfaceType_0 = v16.isInterfaceType;
-local l_isUnionType_0 = v16.isUnionType;
-local l_isEnumType_0 = v16.isEnumType;
-local l_isInputObjectType_0 = v16.isInputObjectType;
-local l_isNonNullType_0 = v16.isNonNullType;
-local l_isListType_0 = v16.isListType;
-local l_isNamedType_0 = v16.isNamedType;
-local l_isRequiredArgument_0 = v16.isRequiredArgument;
-local l_isRequiredInputField_0 = v16.isRequiredInputField;
-local l_astFromValue_0 = require(script.Parent.astFromValue).astFromValue;
-local v30 = nil;
-local v31 = nil;
-local v32 = nil;
-local v33 = nil;
-local v34 = nil;
-local v35 = nil;
-local v36 = nil;
-local v37 = nil;
-local v38 = nil;
-local v39 = nil;
-local v40 = nil;
-local v41 = nil;
-local v42 = nil;
-local v43 = nil;
-local v44 = l_Object_0.freeze({
-    TYPE_REMOVED = "TYPE_REMOVED", 
-    TYPE_CHANGED_KIND = "TYPE_CHANGED_KIND", 
-    TYPE_REMOVED_FROM_UNION = "TYPE_REMOVED_FROM_UNION", 
-    VALUE_REMOVED_FROM_ENUM = "VALUE_REMOVED_FROM_ENUM", 
-    REQUIRED_INPUT_FIELD_ADDED = "REQUIRED_INPUT_FIELD_ADDED", 
-    IMPLEMENTED_INTERFACE_REMOVED = "IMPLEMENTED_INTERFACE_REMOVED", 
-    FIELD_REMOVED = "FIELD_REMOVED", 
-    FIELD_CHANGED_KIND = "FIELD_CHANGED_KIND", 
-    REQUIRED_ARG_ADDED = "REQUIRED_ARG_ADDED", 
-    ARG_REMOVED = "ARG_REMOVED", 
-    ARG_CHANGED_KIND = "ARG_CHANGED_KIND", 
-    DIRECTIVE_REMOVED = "DIRECTIVE_REMOVED", 
-    DIRECTIVE_ARG_REMOVED = "DIRECTIVE_ARG_REMOVED", 
-    REQUIRED_DIRECTIVE_ARG_ADDED = "REQUIRED_DIRECTIVE_ARG_ADDED", 
-    DIRECTIVE_REPEATABLE_REMOVED = "DIRECTIVE_REPEATABLE_REMOVED", 
-    DIRECTIVE_LOCATION_REMOVED = "DIRECTIVE_LOCATION_REMOVED"
-});
-local v45 = l_Object_0.freeze({
-    VALUE_ADDED_TO_ENUM = "VALUE_ADDED_TO_ENUM", 
-    TYPE_ADDED_TO_UNION = "TYPE_ADDED_TO_UNION", 
-    OPTIONAL_INPUT_FIELD_ADDED = "OPTIONAL_INPUT_FIELD_ADDED", 
-    OPTIONAL_ARG_ADDED = "OPTIONAL_ARG_ADDED", 
-    IMPLEMENTED_INTERFACE_ADDED = "IMPLEMENTED_INTERFACE_ADDED", 
-    ARG_DEFAULT_VALUE_CHANGE = "ARG_DEFAULT_VALUE_CHANGE"
-});
-local function v49(v46, v47) --[[ Line: 122 ]] --[[ Name: findBreakingChanges ]]
-    -- upvalues: l_Array_0 (copy), v30 (ref), v44 (copy)
-    return (l_Array_0.filter(v30(v46, v47), function(v48) --[[ Line: 126 ]]
-        -- upvalues: v44 (ref)
-        return v44[v48.type] ~= nil;
-    end));
-end;
-local function v53(v50, v51) --[[ Line: 136 ]] --[[ Name: findDangerousChanges ]]
-    -- upvalues: l_Array_0 (copy), v30 (ref), v45 (copy)
-    return (l_Array_0.filter(v30(v50, v51), function(v52) --[[ Line: 140 ]]
-        -- upvalues: v45 (ref)
-        return v45[v52.type] ~= nil;
-    end));
-end;
-v30 = function(v54, v55) --[[ Line: 146 ]] --[[ Name: findSchemaChanges ]]
-    -- upvalues: l_Array_0 (copy), v31 (ref), v32 (ref)
-    return l_Array_0.concat(v31(v54, v55), v32(v54, v55));
-end;
-v32 = function(v56, v57) --[[ Line: 156 ]] --[[ Name: findDirectiveChanges ]]
-    -- upvalues: v33 (ref), v44 (copy), l_isRequiredArgument_0 (copy)
-    local v58 = {};
-    local v59 = v33(v56:getDirectives(), v57:getDirectives());
-    for _, v61 in ipairs(v59.removed) do
-        table.insert(v58, {
-            type = v44.DIRECTIVE_REMOVED, 
-            description = ("%s was removed."):format(v61.name)
-        });
-    end;
-    for _, v63 in ipairs(v59.persisted) do
-        local v64 = v63[1];
-        local v65 = v63[2];
-        local v66 = v33(v64.args, v65.args);
-        for _, v68 in ipairs(v66.added) do
-            if l_isRequiredArgument_0(v68) then
-                table.insert(v58, {
-                    type = v44.REQUIRED_DIRECTIVE_ARG_ADDED, 
-                    description = ("A required arg %s on directive %s was added."):format(v68.name, v64.name)
-                });
-            end;
-        end;
-        for _, v70 in ipairs(v66.removed) do
-            table.insert(v58, {
-                type = v44.DIRECTIVE_ARG_REMOVED, 
-                description = ("%s was removed from %s."):format(v70.name, v64.name)
-            });
-        end;
-        if v64.isRepeatable and not v65.isRepeatable then
-            table.insert(v58, {
-                type = v44.DIRECTIVE_REPEATABLE_REMOVED, 
-                description = ("Repeatable flag was removed from %s."):format(v64.name)
-            });
-        end;
-        for _, v72 in ipairs(v64.locations) do
-            if table.find(v65.locations, v72) == nil then
-                table.insert(v58, {
-                    type = v44.DIRECTIVE_LOCATION_REMOVED, 
-                    description = ("%s was removed from %s."):format(v72, v64.name)
-                });
-            end;
-        end;
-    end;
-    return v58;
-end;
-v31 = function(v73, v74) --[[ Line: 215 ]] --[[ Name: findTypeChanges ]]
-    -- upvalues: v33 (ref), v44 (copy), l_isSpecifiedScalarType_0 (copy), l_isEnumType_0 (copy), v34 (ref), l_isUnionType_0 (copy), v35 (ref), l_isInputObjectType_0 (copy), v36 (ref), l_isObjectType_0 (copy), l_Array_0 (copy), v37 (ref), v38 (ref), l_isInterfaceType_0 (copy), v39 (ref)
-    local v75 = {};
-    local v76 = v33(v73:getTypeMap():values(), v74:getTypeMap():values());
-    for _, v78 in ipairs(v76.removed) do
-        table.insert(v75, {
-            type = v44.TYPE_REMOVED, 
-            description = l_isSpecifiedScalarType_0(v78) and ("Standard scalar %s was removed because it is not referenced anymore."):format(v78.name) or ("%s was removed."):format(v78.name)
-        });
-    end;
-    for _, v80 in ipairs(v76.persisted) do
-        local v81 = v80[1];
-        local v82 = v80[2];
-        if l_isEnumType_0(v81) and l_isEnumType_0(v82) then
-            for _, v84 in ipairs(v34(v81, v82)) do
-                table.insert(v75, v84);
-            end;
-        elseif l_isUnionType_0(v81) and l_isUnionType_0(v82) then
-            for _, v86 in ipairs(v35(v81, v82)) do
-                table.insert(v75, v86);
-            end;
-        elseif l_isInputObjectType_0(v81) and l_isInputObjectType_0(v82) then
-            for _, v88 in ipairs(v36(v81, v82)) do
-                table.insert(v75, v88);
-            end;
-        elseif l_isObjectType_0(v81) and l_isObjectType_0(v82) then
-            for _, v90 in ipairs(l_Array_0.concat(v37(v81, v82), v38(v81, v82))) do
-                table.insert(v75, v90);
-            end;
-        elseif l_isInterfaceType_0(v81) and l_isInterfaceType_0(v82) then
-            for _, v92 in ipairs(l_Array_0.concat(v37(v81, v82), v38(v81, v82))) do
-                table.insert(v75, v92);
-            end;
-        elseif v81.new ~= v82.new then
-            table.insert(v75, {
-                type = v44.TYPE_CHANGED_KIND, 
-                description = ("%s changed from %s to %s."):format(v81.name, v39(v81), v39(v82))
-            });
-        end;
-    end;
-    return v75;
-end;
-v36 = function(v93, v94) --[[ Line: 284 ]] --[[ Name: findInputObjectTypeChanges ]]
-    -- upvalues: v33 (ref), l_isRequiredInputField_0 (copy), v44 (copy), v45 (copy), v40 (ref)
-    local v95 = {};
-    local v96 = v33(v93:getFields():values(), v94:getFields():values());
-    for _, v98 in ipairs(v96.added) do
-        if l_isRequiredInputField_0(v98) then
-            table.insert(v95, {
-                type = v44.REQUIRED_INPUT_FIELD_ADDED, 
-                description = ("A required field %s on input type %s was added."):format(v98.name, v93.name)
-            });
-        else
-            table.insert(v95, {
-                type = v45.OPTIONAL_INPUT_FIELD_ADDED, 
-                description = ("An optional field %s on input type %s was added."):format(v98.name, v93.name)
-            });
-        end;
-    end;
-    for _, v100 in ipairs(v96.removed) do
-        table.insert(v95, {
-            type = v44.FIELD_REMOVED, 
-            description = ("%s.%s was removed."):format(v93.name, v100.name)
-        });
-    end;
-    for _, v102 in ipairs(v96.persisted) do
-        local v103 = v102[1];
-        local v104 = v102[2];
-        if not v40(v103.type, v104.type) then
-            table.insert(v95, {
-                type = v44.FIELD_CHANGED_KIND, 
-                description = ("%s.%s changed type from %s to %s."):format(v93.name, v103.name, tostring(v103.type), (tostring(v104.type)))
-            });
-        end;
-    end;
-    return v95;
-end;
-v35 = function(v105, v106) --[[ Line: 339 ]] --[[ Name: findUnionTypeChanges ]]
-    -- upvalues: v33 (ref), v45 (copy), v44 (copy)
-    local v107 = {};
-    local v108 = v33(v105:getTypes(), v106:getTypes());
-    for _, v110 in ipairs(v108.added) do
-        table.insert(v107, {
-            type = v45.TYPE_ADDED_TO_UNION, 
-            description = ("%s was added to union type %s."):format(v110.name, v105.name)
-        });
-    end;
-    for _, v112 in ipairs(v108.removed) do
-        table.insert(v107, {
-            type = v44.TYPE_REMOVED_FROM_UNION, 
-            description = ("%s was removed from union type %s."):format(v112.name, v105.name)
-        });
-    end;
-    return v107;
-end;
-v34 = function(v113, v114) --[[ Line: 368 ]] --[[ Name: findEnumTypeChanges ]]
-    -- upvalues: v33 (ref), v45 (copy), v44 (copy)
-    local v115 = {};
-    local v116 = v33(v113:getValues(), v114:getValues());
-    for _, v118 in ipairs(v116.added) do
-        table.insert(v115, {
-            type = v45.VALUE_ADDED_TO_ENUM, 
-            description = ("%s was added to enum type %s."):format(v118.name, v113.name)
-        });
-    end;
-    for _, v120 in ipairs(v116.removed) do
-        table.insert(v115, {
-            type = v44.VALUE_REMOVED_FROM_ENUM, 
-            description = ("%s was removed from enum type %s."):format(v120.name, v113.name)
-        });
-    end;
-    return v115;
-end;
-v38 = function(v121, v122) --[[ Line: 390 ]] --[[ Name: findImplementedInterfacesChanges ]]
-    -- upvalues: v33 (ref), v45 (copy), v44 (copy)
-    local v123 = {};
-    local v124 = v33(v121:getInterfaces(), v122:getInterfaces());
-    for _, v126 in ipairs(v124.added) do
-        table.insert(v123, {
-            type = v45.IMPLEMENTED_INTERFACE_ADDED, 
-            description = ("%s added to interfaces implemented by %s."):format(v126.name, v121.name)
-        });
-    end;
-    for _, v128 in ipairs(v124.removed) do
-        table.insert(v123, {
-            type = v44.IMPLEMENTED_INTERFACE_REMOVED, 
-            description = ("%s no longer implements interface %s."):format(v121.name, v128.name)
-        });
-    end;
-    return v123;
-end;
-v37 = function(v129, v130) --[[ Line: 420 ]] --[[ Name: findFieldChanges ]]
-    -- upvalues: v33 (ref), v44 (copy), v41 (ref), v42 (ref)
-    local v131 = {};
-    local v132 = v33(v129:getFields():values(), v130:getFields():values());
-    for _, v134 in ipairs(v132.removed) do
-        table.insert(v131, {
-            type = v44.FIELD_REMOVED, 
-            description = ("%s.%s was removed."):format(v129.name, v134.name)
-        });
-    end;
-    for _, v136 in ipairs(v132.persisted) do
-        local v137 = v136[1];
-        local v138 = v136[2];
-        for _, v140 in ipairs(v41(v129, v137, v138)) do
-            table.insert(v131, v140);
-        end;
-        if not v42(v137.type, v138.type) then
-            table.insert(v131, {
-                type = v44.FIELD_CHANGED_KIND, 
-                description = ("%s.%s changed type from "):format(v129.name, v137.name) .. ("%s to %s."):format(tostring(v137.type), (tostring(v138.type)))
-            });
-        end;
-    end;
-    return v131;
-end;
-v41 = function(v141, v142, v143) --[[ Line: 461 ]] --[[ Name: findArgChanges ]]
-    -- upvalues: v33 (ref), v44 (copy), v40 (ref), v45 (copy), v43 (ref), l_isRequiredArgument_0 (copy)
-    local v144 = {};
-    local v145 = v33(v142.args, v143.args);
-    for _, v147 in ipairs(v145.removed) do
-        table.insert(v144, {
-            type = v44.ARG_REMOVED, 
-            description = ("%s.%s arg %s was removed."):format(v141.name, v142.name, v147.name)
-        });
-    end;
-    for _, v149 in ipairs(v145.persisted) do
-        local v150 = v149[1];
-        local v151 = v149[2];
-        if not v40(v150.type, v151.type) then
-            table.insert(v144, {
-                type = v44.ARG_CHANGED_KIND, 
-                description = ("%s.%s arg %s has changed type from "):format(v141.name, v142.name, v150.name) .. ("%s to %s."):format(tostring(v150.type), (tostring(v151.type)))
-            });
-        elseif v150.defaultValue ~= nil then
-            if v151.defaultValue == nil then
-                table.insert(v144, {
-                    type = v45.ARG_DEFAULT_VALUE_CHANGE, 
-                    description = ("%s.%s arg %s defaultValue was removed."):format(v141.name, v142.name, v150.name)
-                });
-            else
-                local v152 = v43(v150.defaultValue, v150.type);
-                local v153 = v43(v151.defaultValue, v151.type);
-                if v152 ~= v153 then
-                    table.insert(v144, {
-                        type = v45.ARG_DEFAULT_VALUE_CHANGE, 
-                        description = ("%s.%s arg %s has changed defaultValue from %s to %s."):format(v141.name, v142.name, v150.name, v152, v153)
-                    });
-                end;
-            end;
-        end;
-    end;
-    for _, v155 in ipairs(v145.added) do
-        if l_isRequiredArgument_0(v155) then
-            table.insert(v144, {
-                type = v44.REQUIRED_ARG_ADDED, 
-                description = ("A required arg %s on %s.%s was added."):format(v155.name, v141.name, v142.name)
-            });
-        else
-            table.insert(v144, {
-                type = v45.OPTIONAL_ARG_ADDED, 
-                description = ("An optional arg %s on %s.%s was added."):format(v155.name, v141.name, v142.name)
-            });
-        end;
-    end;
-    return v144;
-end;
-v42 = function(v156, v157) --[[ Line: 550 ]] --[[ Name: isChangeSafeForObjectOrInterfaceField ]]
-    -- upvalues: l_isListType_0 (copy), v42 (ref), l_isNonNullType_0 (copy), l_isNamedType_0 (copy)
-    if l_isListType_0(v156) then
-        return l_isListType_0(v157) and v42(v156.ofType, v157.ofType) or l_isNonNullType_0(v157) and v42(v156, v157.ofType);
-    elseif l_isNonNullType_0(v156) then
-        return l_isNonNullType_0(v157) and v42(v156.ofType, v157.ofType);
-    else
-        return l_isNamedType_0(v157) and v156.name == v157.name or l_isNonNullType_0(v157) and v42(v156, v157.ofType);
-    end;
-end;
-v40 = function(v158, v159) --[[ Line: 572 ]] --[[ Name: isChangeSafeForInputObjectFieldOrFieldArg ]]
-    -- upvalues: l_isListType_0 (copy), v40 (ref), l_isNonNullType_0 (copy), l_isNamedType_0 (copy)
-    if l_isListType_0(v158) then
-        return l_isListType_0(v159) and v40(v158.ofType, v159.ofType);
-    elseif l_isNonNullType_0(v158) then
-        return l_isNonNullType_0(v159) and v40(v158.ofType, v159.ofType) or not l_isNonNullType_0(v159) and v40(v158.ofType, v159);
-    else
-        return l_isNamedType_0(v159) and v158.name == v159.name;
-    end;
-end;
-v39 = function(v160) --[[ Line: 593 ]] --[[ Name: typeKindName ]]
-    -- upvalues: l_isScalarType_0 (copy), l_isObjectType_0 (copy), l_isInterfaceType_0 (copy), l_isUnionType_0 (copy), l_isEnumType_0 (copy), l_isInputObjectType_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy)
-    if l_isScalarType_0(v160) then
-        return "a Scalar type";
-    elseif l_isObjectType_0(v160) then
-        return "an Object type";
-    elseif l_isInterfaceType_0(v160) then
-        return "an Interface type";
-    elseif l_isUnionType_0(v160) then
-        return "a Union type";
-    elseif l_isEnumType_0(v160) then
-        return "an Enum type";
-    elseif l_isInputObjectType_0(v160) then
-        return "an Input type";
-    else
-        l_invariant_0(false, "Unexpected type: " .. l_inspect_0(v160));
-        return "";
-    end;
-end;
-v43 = function(v161, v162) --[[ Line: 620 ]] --[[ Name: stringifyValue ]]
-    -- upvalues: l_astFromValue_0 (copy), l_invariant_0 (copy), l_visit_0 (copy), l_Array_0 (copy), l_naturalCompare_0 (copy), l_Object_0 (copy), l_print_0 (copy)
-    local v163 = l_astFromValue_0(v161, v162);
-    l_invariant_0(v163 ~= nil);
-    local v169 = l_visit_0(v163, {
-        ObjectValue = function(_, v165) --[[ Line: 628 ]] --[[ Name: ObjectValue ]]
-            -- upvalues: l_Array_0 (ref), l_naturalCompare_0 (ref), l_Object_0 (ref)
-            local v166 = l_Array_0.concat({}, v165.fields);
-            l_Array_0.sort(v166, function(v167, v168) --[[ Line: 632 ]]
-                -- upvalues: l_naturalCompare_0 (ref)
-                return l_naturalCompare_0(v167.name.value, v168.name.value);
-            end);
-            return l_Object_0.assign({}, v165, {
-                fields = v166
-            });
-        end
-    });
-    return l_print_0(v169);
-end;
-v33 = function(v170, v171) --[[ Line: 645 ]] --[[ Name: diff ]]
-    -- upvalues: l_keyMapOrdered_0 (copy)
-    local v172 = {};
-    local v173 = {};
-    local v174 = {};
-    local v176 = l_keyMapOrdered_0(v170, function(v175) --[[ Line: 656 ]]
-        return v175.name;
-    end);
-    local v178 = l_keyMapOrdered_0(v171, function(v177) --[[ Line: 659 ]]
-        return v177.name;
-    end);
-    for _, v180 in ipairs(v170) do
-        local v181 = v178:get(v180.name);
-        if v181 == nil then
-            table.insert(v173, v180);
-        else
-            table.insert(v174, {
-                v180, 
-                v181
-            });
-        end;
-    end;
-    for _, v183 in ipairs(v171) do
-        if v176:get(v183.name) == nil then
-            table.insert(v172, v183);
-        end;
-    end;
-    return {
-        added = v172, 
-        persisted = v174, 
-        removed = v173
-    };
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local keyMapOrdered = require(ParentParent.luaUtils.keyMapOrdered).keyMapOrdered
+local jsutils = ParentParent.jsutils
+local inspect = require(jsutils.inspect).inspect
+local invariant = require(jsutils.invariant).invariant
+local naturalCompare = require(jsutils.naturalCompare).naturalCompare
+local language = ParentParent.language
+local print = require(language.printer).print
+local visit = require(language.visitor).visit
+
+require(language.ast)
+
+local type = ParentParent.type
+
+require(type.schema)
+
+local definition = require(type.definition)
+local isSpecifiedScalarType = require(type.scalars).isSpecifiedScalarType
+local isScalarType = definition.isScalarType
+local isObjectType = definition.isObjectType
+local isInterfaceType = definition.isInterfaceType
+local isUnionType = definition.isUnionType
+local isEnumType = definition.isEnumType
+local isInputObjectType = definition.isInputObjectType
+local isNonNullType = definition.isNonNullType
+local isListType = definition.isListType
+local isNamedType = definition.isNamedType
+local isRequiredArgument = definition.isRequiredArgument
+local isRequiredInputField = definition.isRequiredInputField
+local astFromValue = require(script.Parent.astFromValue).astFromValue
+local findSchemaChanges = nil
+local findTypeChanges = nil
+local findDirectiveChanges = nil
+local diff = nil
+local findEnumTypeChanges = nil
+local findUnionTypeChanges = nil
+local findInputObjectTypeChanges = nil
+local findFieldChanges = nil
+local findImplementedInterfacesChanges = nil
+local typeKindName = nil
+local isChangeSafeForInputObjectFieldOrFieldArg = nil
+local findArgChanges = nil
+local isChangeSafeForObjectOrInterfaceField = nil
+local stringifyValue = nil
+local v43 = Object.freeze({
+	TYPE_REMOVED = "TYPE_REMOVED",
+	TYPE_CHANGED_KIND = "TYPE_CHANGED_KIND",
+	TYPE_REMOVED_FROM_UNION = "TYPE_REMOVED_FROM_UNION",
+	VALUE_REMOVED_FROM_ENUM = "VALUE_REMOVED_FROM_ENUM",
+	REQUIRED_INPUT_FIELD_ADDED = "REQUIRED_INPUT_FIELD_ADDED",
+	IMPLEMENTED_INTERFACE_REMOVED = "IMPLEMENTED_INTERFACE_REMOVED",
+	FIELD_REMOVED = "FIELD_REMOVED",
+	FIELD_CHANGED_KIND = "FIELD_CHANGED_KIND",
+	REQUIRED_ARG_ADDED = "REQUIRED_ARG_ADDED",
+	ARG_REMOVED = "ARG_REMOVED",
+	ARG_CHANGED_KIND = "ARG_CHANGED_KIND",
+	DIRECTIVE_REMOVED = "DIRECTIVE_REMOVED",
+	DIRECTIVE_ARG_REMOVED = "DIRECTIVE_ARG_REMOVED",
+	REQUIRED_DIRECTIVE_ARG_ADDED = "REQUIRED_DIRECTIVE_ARG_ADDED",
+	DIRECTIVE_REPEATABLE_REMOVED = "DIRECTIVE_REPEATABLE_REMOVED",
+	DIRECTIVE_LOCATION_REMOVED = "DIRECTIVE_LOCATION_REMOVED"
+})
+local v44 = Object.freeze({
+	VALUE_ADDED_TO_ENUM = "VALUE_ADDED_TO_ENUM",
+	TYPE_ADDED_TO_UNION = "TYPE_ADDED_TO_UNION",
+	OPTIONAL_INPUT_FIELD_ADDED = "OPTIONAL_INPUT_FIELD_ADDED",
+	OPTIONAL_ARG_ADDED = "OPTIONAL_ARG_ADDED",
+	IMPLEMENTED_INTERFACE_ADDED = "IMPLEMENTED_INTERFACE_ADDED",
+	ARG_DEFAULT_VALUE_CHANGE = "ARG_DEFAULT_VALUE_CHANGE"
+})
+
+function findSchemaChanges(p1, p2) -- line: 146
+	-- upvalues: Array (copy), findTypeChanges (ref), findDirectiveChanges (ref)
+	return Array.concat(findTypeChanges(p1, p2), findDirectiveChanges(p1, p2))
+end
+function findDirectiveChanges(p3, p4) -- line: 156
+	-- upvalues: diff (ref), v43 (copy), isRequiredArgument (copy)
+	local t1 = {}
+	local v54 = diff(p3:getDirectives(), p4:getDirectives())
+
+	for _, v in ipairs(v54.removed) do
+		table.insert(t1, {
+			type = v43.DIRECTIVE_REMOVED,
+			description = ("%s was removed."):format(v.name)
+		})
+	end
+
+	for _, v in ipairs(v54.persisted) do
+		local v59 = v[1]
+		local v60 = v[2]
+		local v61 = diff(v59.args, v60.args)
+
+		for _, v2 in ipairs(v61.added) do
+			if isRequiredArgument(v2) then
+				table.insert(t1, {
+					type = v43.REQUIRED_DIRECTIVE_ARG_ADDED,
+					description = ("A required arg %s on directive %s was added."):format(v2.name, v59.name)
+				})
+			end
+		end
+
+		for _, v3 in ipairs(v61.removed) do
+			table.insert(t1, {
+				type = v43.DIRECTIVE_ARG_REMOVED,
+				description = ("%s was removed from %s."):format(v3.name, v59.name)
+			})
+		end
+
+		if v59.isRepeatable and not v60.isRepeatable then
+			table.insert(t1, {
+				type = v43.DIRECTIVE_REPEATABLE_REMOVED,
+				description = ("Repeatable flag was removed from %s."):format(v59.name)
+			})
+		end
+
+		for _, v4 in ipairs(v59.locations) do
+			if table.find(v60.locations, v4) == nil then
+				table.insert(t1, {
+					type = v43.DIRECTIVE_LOCATION_REMOVED,
+					description = ("%s was removed from %s."):format(v4, v59.name)
+				})
+			end
+		end
+	end
+
+	return t1
+end
+function findTypeChanges(p5, p6) -- line: 215
+	-- upvalues: diff (ref), v43 (copy), isSpecifiedScalarType (copy), isEnumType (copy), findEnumTypeChanges (ref), isUnionType (copy), findUnionTypeChanges (ref), isInputObjectType (copy), findInputObjectTypeChanges (ref), isObjectType (copy), Array (copy), findFieldChanges (ref), findImplementedInterfacesChanges (ref), isInterfaceType (copy), typeKindName (ref)
+	local t2 = {}
+	local v71 = diff(p5:getTypeMap():values(), p6:getTypeMap():values())
+
+	for _, v in ipairs(v71.removed) do
+		table.insert(t2, {
+			type = v43.TYPE_REMOVED,
+			description = isSpecifiedScalarType(v) and ("Standard scalar %s was removed because it is not referenced anymore."):format(v.name) or ("%s was removed."):format(v.name)
+		})
+	end
+
+	for _, v in ipairs(v71.persisted) do
+		local v76 = v[1]
+		local v77 = v[2]
+
+		if isEnumType(v76) and isEnumType(v77) then
+			for _, v5 in ipairs(findEnumTypeChanges(v76, v77)) do
+				table.insert(t2, v5)
+			end
+		elseif isUnionType(v76) and isUnionType(v77) then
+			for _, v6 in ipairs(findUnionTypeChanges(v76, v77)) do
+				table.insert(t2, v6)
+			end
+		elseif isInputObjectType(v76) and isInputObjectType(v77) then
+			for _, v7 in ipairs(findInputObjectTypeChanges(v76, v77)) do
+				table.insert(t2, v7)
+			end
+		elseif isObjectType(v76) and isObjectType(v77) then
+			for _, v8 in ipairs(Array.concat(findFieldChanges(v76, v77), findImplementedInterfacesChanges(v76, v77))) do
+				table.insert(t2, v8)
+			end
+		elseif isInterfaceType(v76) and isInterfaceType(v77) then
+			for _, v9 in ipairs(Array.concat(findFieldChanges(v76, v77), findImplementedInterfacesChanges(v76, v77))) do
+				table.insert(t2, v9)
+			end
+		elseif v76.new ~= v77.new then
+			table.insert(t2, {
+				type = v43.TYPE_CHANGED_KIND,
+				description = ("%s changed from %s to %s."):format(v76.name, typeKindName(v76), typeKindName(v77))
+			})
+		end
+	end
+
+	return t2
+end
+function findInputObjectTypeChanges(p7, p8) -- line: 284
+	-- upvalues: diff (ref), isRequiredInputField (copy), v43 (copy), v44 (copy), isChangeSafeForInputObjectFieldOrFieldArg (ref)
+	local t3 = {}
+	local v91 = diff(p7:getFields():values(), p8:getFields():values())
+
+	for _, v in ipairs(v91.added) do
+		if isRequiredInputField(v) then
+			table.insert(t3, {
+				type = v43.REQUIRED_INPUT_FIELD_ADDED,
+				description = ("A required field %s on input type %s was added."):format(v.name, p7.name)
+			})
+		else
+			table.insert(t3, {
+				type = v44.OPTIONAL_INPUT_FIELD_ADDED,
+				description = ("An optional field %s on input type %s was added."):format(v.name, p7.name)
+			})
+		end
+	end
+
+	for _, v in ipairs(v91.removed) do
+		table.insert(t3, {
+			type = v43.FIELD_REMOVED,
+			description = ("%s.%s was removed."):format(p7.name, v.name)
+		})
+	end
+
+	for _, v in ipairs(v91.persisted) do
+		local v98 = v[1]
+		local v99 = v[2]
+
+		if not isChangeSafeForInputObjectFieldOrFieldArg(v98.type, v99.type) then
+			table.insert(t3, {
+				type = v43.FIELD_CHANGED_KIND,
+				description = ("%s.%s changed type from %s to %s."):format(p7.name, v98.name, tostring(v98.type), (tostring(v99.type)))
+			})
+		end
+	end
+
+	return t3
+end
+function findUnionTypeChanges(p9, p10) -- line: 339
+	-- upvalues: diff (ref), v44 (copy), v43 (copy)
+	local t4 = {}
+	local v103 = diff(p9:getTypes(), p10:getTypes())
+
+	for _, v in ipairs(v103.added) do
+		table.insert(t4, {
+			type = v44.TYPE_ADDED_TO_UNION,
+			description = ("%s was added to union type %s."):format(v.name, p9.name)
+		})
+	end
+
+	for _, v in ipairs(v103.removed) do
+		table.insert(t4, {
+			type = v43.TYPE_REMOVED_FROM_UNION,
+			description = ("%s was removed from union type %s."):format(v.name, p9.name)
+		})
+	end
+
+	return t4
+end
+function findEnumTypeChanges(p11, p12) -- line: 368
+	-- upvalues: diff (ref), v44 (copy), v43 (copy)
+	local t5 = {}
+	local v111 = diff(p11:getValues(), p12:getValues())
+
+	for _, v in ipairs(v111.added) do
+		table.insert(t5, {
+			type = v44.VALUE_ADDED_TO_ENUM,
+			description = ("%s was added to enum type %s."):format(v.name, p11.name)
+		})
+	end
+
+	for _, v in ipairs(v111.removed) do
+		table.insert(t5, {
+			type = v43.VALUE_REMOVED_FROM_ENUM,
+			description = ("%s was removed from enum type %s."):format(v.name, p11.name)
+		})
+	end
+
+	return t5
+end
+function findImplementedInterfacesChanges(p13, p14) -- line: 390
+	-- upvalues: diff (ref), v44 (copy), v43 (copy)
+	local t6 = {}
+	local v119 = diff(p13:getInterfaces(), p14:getInterfaces())
+
+	for _, v in ipairs(v119.added) do
+		table.insert(t6, {
+			type = v44.IMPLEMENTED_INTERFACE_ADDED,
+			description = ("%s added to interfaces implemented by %s."):format(v.name, p13.name)
+		})
+	end
+
+	for _, v in ipairs(v119.removed) do
+		table.insert(t6, {
+			type = v43.IMPLEMENTED_INTERFACE_REMOVED,
+			description = ("%s no longer implements interface %s."):format(p13.name, v.name)
+		})
+	end
+
+	return t6
+end
+function findFieldChanges(p15, p16) -- line: 420
+	-- upvalues: diff (ref), v43 (copy), findArgChanges (ref), isChangeSafeForObjectOrInterfaceField (ref)
+	local t7 = {}
+	local v127 = diff(p15:getFields():values(), p16:getFields():values())
+
+	for _, v in ipairs(v127.removed) do
+		table.insert(t7, {
+			type = v43.FIELD_REMOVED,
+			description = ("%s.%s was removed."):format(p15.name, v.name)
+		})
+	end
+
+	for _, v in ipairs(v127.persisted) do
+		local v132 = v[1]
+		local v133 = v[2]
+
+		for _, v10 in ipairs(findArgChanges(p15, v132, v133)) do
+			table.insert(t7, v10)
+		end
+
+		if not isChangeSafeForObjectOrInterfaceField(v132.type, v133.type) then
+			table.insert(t7, {
+				type = v43.FIELD_CHANGED_KIND,
+				description = ("%s.%s changed type from "):format(p15.name, v132.name) .. ("%s to %s."):format(tostring(v132.type), (tostring(v133.type)))
+			})
+		end
+	end
+
+	return t7
+end
+function findArgChanges(p17, p18, p19) -- line: 461
+	-- upvalues: diff (ref), v43 (copy), isChangeSafeForInputObjectFieldOrFieldArg (ref), v44 (copy), stringifyValue (ref), isRequiredArgument (copy)
+	local t8 = {}
+	local v140 = diff(p18.args, p19.args)
+
+	for _, v in ipairs(v140.removed) do
+		table.insert(t8, {
+			type = v43.ARG_REMOVED,
+			description = ("%s.%s arg %s was removed."):format(p17.name, p18.name, v.name)
+		})
+	end
+
+	for _, v in ipairs(v140.persisted) do
+		local v145 = v[1]
+		local v146 = v[2]
+
+		if not isChangeSafeForInputObjectFieldOrFieldArg(v145.type, v146.type) then
+			table.insert(t8, {
+				type = v43.ARG_CHANGED_KIND,
+				description = ("%s.%s arg %s has changed type from "):format(p17.name, p18.name, v145.name) .. ("%s to %s."):format(tostring(v145.type), (tostring(v146.type)))
+			})
+		elseif v145.defaultValue ~= nil then
+			if v146.defaultValue == nil then
+				table.insert(t8, {
+					type = v44.ARG_DEFAULT_VALUE_CHANGE,
+					description = ("%s.%s arg %s defaultValue was removed."):format(p17.name, p18.name, v145.name)
+				})
+			else
+				local v147 = stringifyValue(v145.defaultValue, v145.type)
+				local v148 = stringifyValue(v146.defaultValue, v146.type)
+
+				if v147 ~= v148 then
+					table.insert(t8, {
+						type = v44.ARG_DEFAULT_VALUE_CHANGE,
+						description = ("%s.%s arg %s has changed defaultValue from %s to %s."):format(p17.name, p18.name, v145.name, v147, v148)
+					})
+				end
+			end
+		end
+	end
+
+	for _, v in ipairs(v140.added) do
+		if isRequiredArgument(v) then
+			table.insert(t8, {
+				type = v43.REQUIRED_ARG_ADDED,
+				description = ("A required arg %s on %s.%s was added."):format(v.name, p17.name, p18.name)
+			})
+		else
+			table.insert(t8, {
+				type = v44.OPTIONAL_ARG_ADDED,
+				description = ("An optional arg %s on %s.%s was added."):format(v.name, p17.name, p18.name)
+			})
+		end
+	end
+
+	return t8
+end
+function isChangeSafeForObjectOrInterfaceField(p20, p21) -- line: 550
+	-- upvalues: isListType (copy), isChangeSafeForObjectOrInterfaceField (ref), isNonNullType (copy), isNamedType (copy)
+	if isListType(p20) then
+		return isListType(p21) and isChangeSafeForObjectOrInterfaceField(p20.ofType, p21.ofType) or isNonNullType(p21) and isChangeSafeForObjectOrInterfaceField(p20, p21.ofType)
+	end
+
+	if isNonNullType(p20) then
+		return isNonNullType(p21) and isChangeSafeForObjectOrInterfaceField(p20.ofType, p21.ofType)
+	end
+
+	return isNamedType(p21) and p20.name == p21.name or isNonNullType(p21) and isChangeSafeForObjectOrInterfaceField(p20, p21.ofType)
+end
+function isChangeSafeForInputObjectFieldOrFieldArg(p22, p23) -- line: 572
+	-- upvalues: isListType (copy), isChangeSafeForInputObjectFieldOrFieldArg (ref), isNonNullType (copy), isNamedType (copy)
+	if isListType(p22) then
+		return isListType(p23) and isChangeSafeForInputObjectFieldOrFieldArg(p22.ofType, p23.ofType)
+	end
+
+	if isNonNullType(p22) then
+		return isNonNullType(p23) and isChangeSafeForInputObjectFieldOrFieldArg(p22.ofType, p23.ofType) or not isNonNullType(p23) and isChangeSafeForInputObjectFieldOrFieldArg(p22.ofType, p23)
+	end
+
+	return isNamedType(p23) and p22.name == p23.name
+end
+function typeKindName(p24) -- line: 593
+	-- upvalues: isScalarType (copy), isObjectType (copy), isInterfaceType (copy), isUnionType (copy), isEnumType (copy), isInputObjectType (copy), invariant (copy), inspect (copy)
+	if isScalarType(p24) then
+		return "a Scalar type"
+	end
+
+	if isObjectType(p24) then
+		return "an Object type"
+	end
+
+	if isInterfaceType(p24) then
+		return "an Interface type"
+	end
+
+	if isUnionType(p24) then
+		return "a Union type"
+	end
+
+	if isEnumType(p24) then
+		return "an Enum type"
+	end
+
+	if isInputObjectType(p24) then
+		return "an Input type"
+	end
+
+	invariant(false, "Unexpected type: " .. inspect(p24))
+
+	return ""
+end
+function stringifyValue(p25, p26) -- line: 620
+	-- upvalues: astFromValue (copy), invariant (copy), visit (copy), Array (copy), naturalCompare (copy), Object (copy), print (copy)
+	local v158 = astFromValue(p25, p26)
+
+	invariant(v158 ~= nil)
+
+	local v159 = visit(v158, {
+		ObjectValue = function(_, p28) -- line: 628
+			-- upvalues: Array (copy), naturalCompare (copy), Object (copy)
+			local v176 = Array.concat({}, p28.fields)
+
+			Array.sort(v176, function(p29, p30) -- line: 632
+				-- upvalues: naturalCompare (copy)
+				return naturalCompare(p29.name.value, p30.name.value)
+			end)
+
+			return Object.assign({}, p28, {
+				fields = v176
+			})
+		end
+	})
+
+	return print(v159)
+end
+function diff(p31, p32) -- line: 645
+	-- upvalues: keyMapOrdered (copy)
+	local t9 = {}
+	local t10 = {}
+	local t11 = {}
+	local v165 = keyMapOrdered(p31, function(p33) -- line: 656
+		return p33.name
+	end)
+	local v166 = keyMapOrdered(p32, function(p34) -- line: 659
+		return p34.name
+	end)
+
+	for _, v in ipairs(p31) do
+		local v169 = v166:get(v.name)
+
+		if v169 == nil then
+			table.insert(t10, v)
+		else
+			table.insert(t11, {
+				v,
+				v169
+			})
+		end
+	end
+
+	for _, v in ipairs(p32) do
+		if v165:get(v.name) == nil then
+			table.insert(t9, v)
+		end
+	end
+
+	return {
+		added = t9,
+		persisted = t11,
+		removed = t10
+	}
+end
+
 return {
-    BreakingChangeType = v44, 
-    DangerousChangeType = v45, 
-    findBreakingChanges = v49, 
-    findDangerousChanges = v53
-};
+	BreakingChangeType = v43,
+	DangerousChangeType = v44,
+	findBreakingChanges = function(p35, p36) -- line: 122
+		-- upvalues: Array (copy), findSchemaChanges (ref), v43 (copy)
+		return (Array.filter(findSchemaChanges(p35, p36), function(p37) -- line: 126
+			-- upvalues: v43 (copy)
+			return v43[p37.type] ~= nil
+		end))
+	end,
+	findDangerousChanges = function(p38, p39) -- line: 136
+		-- upvalues: Array (copy), findSchemaChanges (ref), v44 (copy)
+		return (Array.filter(findSchemaChanges(p38, p39), function(p40) -- line: 140
+			-- upvalues: v44 (copy)
+			return v44[p40.type] ~= nil
+		end))
+	end
+}

@@ -1,37 +1,43 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiBuilder_0 = v1.SduiBuilder;
-local l_SduiErrors_0 = v1.SduiErrors;
-local v4 = game:DefineFastString("SduiEagerProcessCollectionIds", "400000000");
-local v5 = {};
-for v6 in v4:gmatch("(%w+)") do
-    v5[v6] = true;
-end;
-return function(v7, v8, v9) --[[ Line: 17 ]] --[[ Name: processCollectionConfig ]]
-    -- upvalues: v5 (copy), l_SduiBuilder_0 (copy), l_SduiErrors_0 (copy)
-    if not v8 or not v5[tostring(v8)] then
-        return v7;
-    else
-        local v10 = ("%*-%*"):format(v9.appPage, v8);
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 26 ]]
-            -- upvalues: l_SduiBuilder_0 (ref), v7 (copy), v9 (copy), v10 (copy)
-            local v11, v12 = l_SduiBuilder_0.tryCreateEagerProcessedComponentConfig(v7, v9, v10, {}, true);
-            if v11 then
-                return v12;
-            else
-                error(v12);
-                return;
-            end;
-        end);
-        if not l_status_0 or not l_result_0 then
-            local v15 = if typeof(l_result_0) == "string" then l_result_0 else "";
-            v9.dependencies.logger.reportError(l_SduiErrors_0.SduiErrorType.FailedToEagerlyProcess, {
-                name = v10, 
-                message = ("Failed to process collection config %*"):format(v15)
-            }, v9.appPage);
-            return v7;
-        else
-            return l_result_0;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiBuilder = SduiCoreSystem.SduiBuilder
+local SduiErrors = SduiCoreSystem.SduiErrors
+local t1 = {}
+
+for match in game:DefineFastString("SduiEagerProcessCollectionIds", "400000000"):gmatch("(%w+)") do
+	t1[match] = true
+end
+
+local function processCollectionConfig(p1, s1: string, p2) -- line: 21
+	-- upvalues: t1 (copy), SduiBuilder (copy), SduiErrors (copy)
+	if not s1 or not t1[tostring(s1)] then
+		return p1
+	end
+
+	local v11 = `{ p2.appPage }-{ s1 }`
+	local ok, result = pcall(function() -- line: 30
+		-- upvalues: SduiBuilder (copy), p1 (copy), p2 (copy), v11 (copy)
+		local v15, v16 = SduiBuilder.tryCreateEagerProcessedComponentConfig(p1, p2, v11, {}, true)
+
+		if v15 then
+			return v16
+		end
+
+		error(v16)
+	end)
+
+	if not ok or not result then
+		local v14 = typeof(result) ~= "string" and "" or result
+
+		p2.dependencies.logger.reportError(SduiErrors.SduiErrorType.FailedToEagerlyProcess, {
+			name = v11,
+			message = `Failed to process collection config { v14 }`
+		}, p2.appPage)
+
+		return p1
+	end
+
+	return result
+end
+
+return processCollectionConfig

@@ -1,71 +1,77 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_ShareGame_0 = l_RobloxGui_0.Modules.Settings.Pages.ShareGame;
-local v3 = require(l_ShareGame_0.Components.RectangleButton);
-local v4 = require(l_ShareGame_0.Components.IconButton);
-local v5 = require(l_CorePackages_0.Packages.Roact);
-local v6 = require(l_ShareGame_0.Constants);
-local v7 = require(l_RobloxGui_0.Modules.Settings.Pages.ShareGame.Spritesheets.ShareGameIcons);
-local v8 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local v9 = require(l_ShareGame_0.getTranslator)();
-local v10 = v5.PureComponent:extend("BackButton");
-v10.IconType = {
-    Arrow = "Arrow", 
-    Cross = "Cross", 
-    None = "None"
-};
-v10.defaultProps = {
-    iconType = v10.IconType.None
-};
-local v11 = {
-    [v10.IconType.Arrow] = "back", 
-    [v10.IconType.Cross] = "cross"
-};
-local function v23(v12) --[[ Line: 36 ]]
-    -- upvalues: v11 (copy), v7 (copy), v5 (copy), v4 (copy)
-    local l_iconType_0 = v12.iconType;
-    local l_visible_0 = v12.visible;
-    local l_anchorPoint_0 = v12.anchorPoint;
-    local l_position_0 = v12.position;
-    local l_size_0 = v12.size;
-    local l_zIndex_0 = v12.zIndex;
-    local l_onClick_0 = v12.onClick;
-    local v20 = v11[l_iconType_0];
-    if v20 then
-        local l_v7_ImagePath_0 = v7:GetImagePath();
-        local l_v7_Frame_0 = v7:GetFrame(v20);
-        return v5.createElement(v4, {
-            visible = l_visible_0, 
-            anchorPoint = l_anchorPoint_0, 
-            position = l_position_0, 
-            size = l_size_0, 
-            zIndex = l_zIndex_0, 
-            onClick = l_onClick_0, 
-            iconHorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            iconSpritePath = l_v7_ImagePath_0, 
-            iconSpriteFrame = l_v7_Frame_0
-        });
-    else
-        return;
-    end;
-end;
-v10.render = function(v24) --[[ Line: 65 ]] --[[ Name: render ]]
-    -- upvalues: v10 (copy), v5 (copy), v3 (copy), v9 (copy), v8 (copy), v6 (copy), v23 (copy)
-    local l_iconType_1 = v24.props.iconType;
-    local l_zIndex_1 = v24.props.zIndex;
-    if l_iconType_1 == v10.IconType.None then
-        return v5.createElement(v3, v24.props, {
-            TextLabel = v5.createElement("TextLabel", {
-                Position = UDim2.new(0.5, 0, 0.5, 0), 
-                Text = v9:FormatByKey("Feature.SettingsHub.Action.InviteFriendsBack"), 
-                TextSize = v8.textSize(24, "BackButton"), 
-                TextColor3 = v6.Color.WHITE, 
-                Font = v8.font(Enum.Font.SourceSansSemibold, "BackButton"), 
-                ZIndex = l_zIndex_1
-            })
-        });
-    else
-        return v23(v24.props);
-    end;
-end;
-return v10;
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local ShareGame = RobloxGui.Modules.Settings.Pages.ShareGame
+local RectangleButton = require(ShareGame.Components.RectangleButton)
+local IconButton = require(ShareGame.Components.IconButton)
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(ShareGame.Constants)
+local ShareGameIcons = require(RobloxGui.Modules.Settings.Pages.ShareGame.Spritesheets.ShareGameIcons)
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local v10 = require(ShareGame.getTranslator)()
+local v11 = Roact.PureComponent:extend("BackButton")
+
+v11.IconType = {
+	Arrow = "Arrow",
+	Cross = "Cross",
+	None = "None"
+}
+v11.defaultProps = {
+	iconType = v11.IconType.None
+}
+
+local t1 = {
+	[v11.IconType.Arrow] = "back",
+	[v11.IconType.Cross] = "cross"
+}
+
+local function v13(p1) -- line: 36
+	-- upvalues: t1 (copy), ShareGameIcons (copy), Roact (copy), IconButton (copy)
+	local iconType = p1.iconType
+	local visible = p1.visible
+	local anchorPoint = p1.anchorPoint
+	local position = p1.position
+	local size = p1.size
+	local zIndex = p1.zIndex
+	local onClick = p1.onClick
+	local v22 = t1[iconType]
+
+	if v22 then
+		local ImagePath = ShareGameIcons:GetImagePath()
+		local Frame = ShareGameIcons:GetFrame(v22)
+
+		return Roact.createElement(IconButton, {
+			visible = visible,
+			anchorPoint = anchorPoint,
+			position = position,
+			size = size,
+			zIndex = zIndex,
+			onClick = onClick,
+			iconHorizontalAlignment = Enum.HorizontalAlignment.Left,
+			iconSpritePath = ImagePath,
+			iconSpriteFrame = Frame
+		})
+	end
+end
+
+function v11.render(p2) -- line: 65
+	-- upvalues: v11 (copy), Roact (copy), RectangleButton (copy), v10 (copy), Theme (copy), Constants (copy), v13 (copy)
+	local iconType = p2.props.iconType
+	local zIndex = p2.props.zIndex
+
+	if iconType == v11.IconType.None then
+		return Roact.createElement(RectangleButton, p2.props, {
+			TextLabel = Roact.createElement("TextLabel", {
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Text = v10:FormatByKey("Feature.SettingsHub.Action.InviteFriendsBack"),
+				TextSize = Theme.textSize(24, "BackButton"),
+				TextColor3 = Constants.Color.WHITE,
+				Font = Theme.font(Enum.Font.SourceSansSemibold, "BackButton"),
+				ZIndex = zIndex
+			})
+		})
+	end
+
+	return v13(p2.props)
+end
+
+return v11

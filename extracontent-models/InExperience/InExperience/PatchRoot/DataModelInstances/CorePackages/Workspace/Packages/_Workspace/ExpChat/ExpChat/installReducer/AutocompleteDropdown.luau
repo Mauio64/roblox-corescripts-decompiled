@@ -1,1 +1,1 @@
-return require(script.AutocompleteDropdownReducer);
+return require(script.AutocompleteDropdownReducer)

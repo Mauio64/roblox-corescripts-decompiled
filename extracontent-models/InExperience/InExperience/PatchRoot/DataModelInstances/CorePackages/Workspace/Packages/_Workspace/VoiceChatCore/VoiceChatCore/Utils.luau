@@ -1,96 +1,106 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 17 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    return (setmetatable({
-        listeners = {}
-    }, v2));
-end;
-v2.addListener = function(v3, v4, v5) --[[ Line: 25 ]] --[[ Name: addListener ]]
-    if not v3.listeners[v4] then
-        v3.listeners[v4] = {};
-    end;
-    table.insert(v3.listeners[v4], v5);
-end;
-v2.removeAllListeners = function(v6) --[[ Line: 32 ]] --[[ Name: removeAllListeners ]]
-    table.clear(v6.listeners);
-end;
-v2.emit = function(v7, v8, ...) --[[ Line: 36 ]] --[[ Name: emit ]]
-    local v9 = v7.listeners[v8];
-    if not v9 then
-        return;
-    else
-        for _, v11 in (table.clone(v9)) do
-            pcall(function(...) --[[ Line: 44 ]]
-                -- upvalues: v11 (copy)
-                v11(...);
-                return nil;
-            end, ...);
-        end;
-        return;
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 17
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		listeners = {}
+	}, t1))
+end
+function t1.addListener(t2: {[any]: any}, s1: string, p1: ((...any) -> ...any)) -- line: 25
+	if not t2.listeners[s1] then
+		t2.listeners[s1] = {}
+	end
+
+	table.insert(t2.listeners[s1], p1)
+end
+function t1.removeAllListeners(p2) -- line: 32
+	table.clear(p2.listeners)
+end
+function t1.emit(t3: {[any]: any}, s2: string, ...) -- line: 36
+	local v10 = t3.listeners[s2]
+
+	if not v10 then
+		return
+	end
+
+	for _, v12 in (table.clone(v10)) do
+		pcall(function(...) -- line: 44
+			-- upvalues: v12 (copy)
+			v12(...)
+
+			return nil
+		end, ...)
+	end
+end
+
 return {
-    jsonDecode = function(v12) --[[ Line: 51 ]] --[[ Name: jsonDecode ]]
-        -- upvalues: l_HttpService_0 (copy)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 52 ]]
-            -- upvalues: l_HttpService_0 (ref), v12 (copy)
-            return l_HttpService_0:JSONDecode(v12);
-        end);
-        if l_status_0 and l_result_0 then
-            return l_result_0;
-        else
-            return {};
-        end;
-    end, 
-    EventEmitter = v2, 
-    shorten = function(v15) --[[ Line: 62 ]] --[[ Name: shorten ]]
-        return "..." .. string.sub(tostring(v15), -4);
-    end, 
-    avoidEmitting = function(v16) --[[ Line: 66 ]] --[[ Name: avoidEmitting ]]
-        v16.DescendantAdded:Connect(function(v17) --[[ Line: 67 ]] --[[ Name: prune ]]
-            if v17:HasTag("RbxDefaultVoiceEmitter") then
-                task.defer(function() --[[ Line: 70 ]]
-                    -- upvalues: v17 (copy)
-                    v17:Destroy();
-                end);
-            end;
-        end);
-        for _, v19 in v16:GetDescendants() do
-            if v19:HasTag("RbxDefaultVoiceEmitter") then
-                task.defer(function() --[[ Line: 70 ]]
-                    -- upvalues: v19 (copy)
-                    v19:Destroy();
-                end);
-            end;
-        end;
-    end, 
-    destroyDefaultEmitter = function(v20) --[[ Line: 81 ]] --[[ Name: destroyDefaultEmitter ]]
-        -- upvalues: l_Players_0 (copy)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        if not l_LocalPlayer_0 then
-            return;
-        else
-            local l_Character_0 = l_LocalPlayer_0.Character;
-            if not l_Character_0 then
-                return;
-            else
-                if v20:IsDescendantOf(l_Character_0) then
-                    task.defer(function() --[[ Line: 92 ]]
-                        -- upvalues: v20 (copy)
-                        v20:Destroy();
-                    end);
-                end;
-                return;
-            end;
-        end;
-    end, 
-    bind = function(v23, v24) --[[ Line: 98 ]] --[[ Name: bind ]]
-        return function(...) --[[ Line: 99 ]]
-            -- upvalues: v23 (copy), v24 (copy)
-            return v23[v24](v23, ...);
-        end;
-    end
-};
+	jsonDecode = function(p3) -- line: 51
+		-- upvalues: HttpService (copy)
+		local ok, result = pcall(function() -- line: 52
+			-- upvalues: HttpService (copy), p3 (copy)
+			return HttpService:JSONDecode(p3)
+		end)
+
+		if ok and result then
+			return result
+		end
+
+		return {}
+	end,
+	EventEmitter = t1,
+	shorten = function(p4) -- line: 62
+		return "..." .. string.sub(tostring(p4), -4)
+	end,
+	avoidEmitting = function(p5) -- line: 66
+		local function prune(p6) -- line: 67
+			if p6:HasTag("RbxDefaultVoiceEmitter") then
+				task.defer(function() -- line: 70
+					-- upvalues: p6 (copy)
+					p6:Destroy()
+				end)
+			end
+		end
+
+		p5.DescendantAdded:Connect(prune)
+
+		for _, descendant in p5:GetDescendants() do
+			if descendant:HasTag("RbxDefaultVoiceEmitter") then
+				task.defer(function() -- line: 70
+					-- upvalues: descendant (copy)
+					descendant:Destroy()
+				end)
+			end
+		end
+	end,
+	destroyDefaultEmitter = function(p7) -- line: 81
+		-- upvalues: Players (copy)
+		local LocalPlayer = Players.LocalPlayer
+
+		if not LocalPlayer then
+			return
+		end
+
+		local Character = LocalPlayer.Character
+
+		if not Character then
+			return
+		end
+
+		if p7:IsDescendantOf(Character) then
+			task.defer(function() -- line: 92
+				-- upvalues: p7 (copy)
+				p7:Destroy()
+			end)
+		end
+	end,
+	bind = function(p8, p9) -- line: 98
+		return function(...) -- line: 99
+			-- upvalues: p8 (copy), p9 (copy)
+			return p8[p9](p8, ...)
+		end
+	end
+}

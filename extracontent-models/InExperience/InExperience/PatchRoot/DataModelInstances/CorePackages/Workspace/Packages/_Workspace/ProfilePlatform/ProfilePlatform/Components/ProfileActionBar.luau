@@ -1,1 +1,1 @@
-return require(script.ProfileActionBarContainer);
+return require(script.ProfileActionBarContainer)

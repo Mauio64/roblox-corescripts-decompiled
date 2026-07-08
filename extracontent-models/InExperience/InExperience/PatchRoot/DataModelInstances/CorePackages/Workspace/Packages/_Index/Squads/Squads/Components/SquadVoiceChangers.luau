@@ -1,6 +1,7 @@
-local v0 = require(script.SquadVoiceChangers);
-local v1 = require(script.SquadVoiceChangerOverlay);
+local SquadVoiceChangers = require(script.SquadVoiceChangers)
+local SquadVoiceChangerOverlay = require(script.SquadVoiceChangerOverlay)
+
 return {
-    SquadVoiceChangers = v0, 
-    SquadVoiceChangerOverlay = v1
-};
+	SquadVoiceChangers = SquadVoiceChangers,
+	SquadVoiceChangerOverlay = SquadVoiceChangerOverlay
+}

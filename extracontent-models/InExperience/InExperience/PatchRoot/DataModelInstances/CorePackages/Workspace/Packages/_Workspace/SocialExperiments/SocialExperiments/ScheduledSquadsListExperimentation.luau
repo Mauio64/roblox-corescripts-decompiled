@@ -1,40 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialExperiments").Parent;
-local l_ExperimentCacheManager_0 = require(l_Parent_0.ExperimentCacheManager).ExperimentCacheManager;
-local v2 = game:DefineFastString("ScheduledSquadsListExpLayer", "");
-local v3 = game:DefineFastString("ScheduledSquadsListChatLandingScreenEntrypointVariant", "enableTopBarEntrypoint");
-local v4 = game:DefineFastFlag("EnableScheduledSquadsListExperimentation_dev", false);
-local v5 = game:DefineFastFlag("EnableScheduledSquadsTopBarEntrypoint_dev", false);
-local function _(v6) --[[ Line: 15 ]] --[[ Name: getIsUserInTreatment ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v2 (copy)
-    local v7 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-    if v7 and v7[v6] ~= nil then
-        return v7[v6];
-    else
-        return false;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialExperiments").Parent
+local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
+local v3 = game:DefineFastString("ScheduledSquadsListExpLayer", "")
+local v4 = game:DefineFastString("ScheduledSquadsListChatLandingScreenEntrypointVariant", "enableTopBarEntrypoint")
+local v5 = game:DefineFastFlag("EnableScheduledSquadsListExperimentation_dev", false)
+local v6 = game:DefineFastFlag("EnableScheduledSquadsTopBarEntrypoint_dev", false)
+
+local function getIsUserInTreatment(s1: string) -- line: 15
+	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
+	local v9 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+	if v9 and v9[s1] ~= nil then
+		return v9[s1]
+	end
+
+	return false
+end
+
 return {
-    getIsTopBarEntrypointEnabled = function() --[[ Line: 25 ]] --[[ Name: getIsTopBarEntrypointEnabled ]]
-        -- upvalues: v5 (copy), v4 (copy), v3 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        local l_v5_0 = v5;
-        if not l_v5_0 then
-            l_v5_0 = v4;
-            if l_v5_0 then
-                local l_v3_0 = v3;
-                local v11 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-                if v11 and v11[l_v3_0] ~= nil then
-                    return v11[l_v3_0];
-                else
-                    l_v5_0 = false;
-                end;
-            end;
-        end;
-        return l_v5_0;
-    end, 
-    logExposure = function() --[[ Line: 33 ]] --[[ Name: logExposure ]]
-        -- upvalues: v4 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        if v4 and l_ExperimentCacheManager_0.default:getLayerVariables(v2) ~= nil then
-            l_ExperimentCacheManager_0.default:logLayerExposure(v2);
-        end;
-    end
-};
+	getIsTopBarEntrypointEnabled = function() -- line: 25
+		-- upvalues: v6 (copy), v5 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
+		local v10 = v6
+
+		if not v10 then
+			v10 = v5
+
+			if v10 then
+				local v11 = v4
+				local v12 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+				if v12 and v12[v11] ~= nil then
+					return v12[v11]
+				end
+
+				v10 = false
+			end
+		end
+
+		return v10
+	end,
+	logExposure = function() -- line: 33
+		-- upvalues: v5 (copy), ExperimentCacheManager (copy), v3 (copy)
+		if v5 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
+			ExperimentCacheManager.default:logLayerExposure(v3)
+		end
+	end
+}

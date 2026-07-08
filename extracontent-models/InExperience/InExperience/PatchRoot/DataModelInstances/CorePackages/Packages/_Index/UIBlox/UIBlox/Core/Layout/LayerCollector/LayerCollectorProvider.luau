@@ -1,90 +1,98 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(script.Parent.LayerCollectorContext);
-local l_GuiService_0 = game:GetService("GuiService");
-local v4 = v1.PureComponent:extend("LayerCollectorProvider");
-v4.init = function(v5) --[[ Line: 11 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v5.rootRef = v1.createRef();
-    v5.state = {
-        absoluteSize = Vector2.new(0, 0), 
-        insets = {
-            top = 0, 
-            left = 0, 
-            bottom = 0, 
-            right = 0
-        }
-    };
-end;
-v4.watchLayerCollector = function(v6, v7) --[[ Line: 24 ]] --[[ Name: watchLayerCollector ]]
-    -- upvalues: l_GuiService_0 (copy)
-    local l_AbsoluteSize_0 = v7.AbsoluteSize;
-    local v9 = Vector2.new(0, 0);
-    local v10 = Vector2.new(0, 0);
-    if v7:IsA("ScreenGui") then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 30 ]]
-            -- upvalues: v7 (copy)
-            return v7.IgnoreGuiInset;
-        end);
-        if l_status_0 and l_result_0 then
-            local l_l_GuiService_0_GuiInset_0, v14 = l_GuiService_0:GetGuiInset();
-            v9 = l_l_GuiService_0_GuiInset_0;
-            v10 = v14;
-        end;
-    end;
-    v6:setState({
-        absoluteSize = l_AbsoluteSize_0, 
-        insets = {
-            top = v9.Y, 
-            left = v9.X, 
-            bottom = v10.Y, 
-            right = v10.X
-        }
-    });
-    v6.absoluteSizeConnection = v7:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 48 ]]
-        -- upvalues: l_AbsoluteSize_0 (ref), v7 (copy), v6 (copy), v9 (ref), v10 (ref)
-        l_AbsoluteSize_0 = v7.AbsoluteSize;
-        v6:setState({
-            absoluteSize = l_AbsoluteSize_0, 
-            insets = {
-                top = v9.Y, 
-                left = v9.X, 
-                bottom = v10.Y, 
-                right = v10.X
-            }
-        });
-    end);
-end;
-v4.didMount = function(v15) --[[ Line: 64 ]] --[[ Name: didMount ]]
-    local l_current_0 = v15.rootRef.current;
-    local l_l_current_0_FirstAncestorWhichIsA_0 = l_current_0:FindFirstAncestorWhichIsA("LayerCollector");
-    if l_l_current_0_FirstAncestorWhichIsA_0 == nil then
-        v15.ancestryConnection = l_current_0.AncestryChanged:Connect(function() --[[ Line: 69 ]]
-            -- upvalues: l_l_current_0_FirstAncestorWhichIsA_0 (ref), l_current_0 (copy), v15 (copy)
-            l_l_current_0_FirstAncestorWhichIsA_0 = l_current_0:FindFirstAncestorWhichIsA("LayerCollector");
-            if l_l_current_0_FirstAncestorWhichIsA_0 ~= nil then
-                v15.ancestryConnection:Disconnect();
-                v15.ancestryConnection = nil;
-                v15:watchLayerCollector(l_l_current_0_FirstAncestorWhichIsA_0);
-            end;
-        end);
-    else
-        v15:watchLayerCollector(l_l_current_0_FirstAncestorWhichIsA_0);
-    end;
-end;
-v4.render = function(v18) --[[ Line: 82 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Provider, {
-        value = {
-            absoluteSize = v18.state.absoluteSize, 
-            insets = v18.state.insets
-        }
-    }, {
-        LayerCollectorChildRef = v1.createElement("Frame", {
-            Visible = false, 
-            [v1.Ref] = v18.rootRef
-        }), 
-        Children = v1.createFragment(v18.props[v1.Children])
-    });
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local LayerCollectorContext = require(script.Parent.LayerCollectorContext)
+local GuiService = game:GetService("GuiService")
+local v5 = Roact.PureComponent:extend("LayerCollectorProvider")
+
+function v5.init(p1) -- line: 11
+	-- upvalues: Roact (copy)
+	p1.rootRef = Roact.createRef()
+	p1.state = {
+		absoluteSize = Vector2.new(0, 0),
+		insets = {
+			top = 0,
+			left = 0,
+			bottom = 0,
+			right = 0
+		}
+	}
+end
+function v5.watchLayerCollector(t1: {[any]: any}, p2) -- line: 24
+	-- upvalues: GuiService (copy)
+	local AbsoluteSize = p2.AbsoluteSize
+	local vector2 = Vector2.new(0, 0)
+	local vector2_2 = Vector2.new(0, 0)
+
+	if p2:IsA("ScreenGui") then
+		local ok, result = pcall(function() -- line: 30
+			-- upvalues: p2 (copy)
+			return p2.IgnoreGuiInset
+		end)
+
+		if ok and result then
+			local v14, v15 = GuiService:GetGuiInset()
+
+			vector2 = v14
+			vector2_2 = v15
+		end
+	end
+
+	t1:setState({
+		absoluteSize = AbsoluteSize,
+		insets = {
+			top = vector2.Y,
+			left = vector2.X,
+			bottom = vector2_2.Y,
+			right = vector2_2.X
+		}
+	})
+	t1.absoluteSizeConnection = p2:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 48
+		-- upvalues: AbsoluteSize (ref), p2 (copy), t1 (copy), vector2 (ref), vector2_2 (ref)
+		AbsoluteSize = p2.AbsoluteSize
+		t1:setState({
+			absoluteSize = AbsoluteSize,
+			insets = {
+				top = vector2.Y,
+				left = vector2.X,
+				bottom = vector2_2.Y,
+				right = vector2_2.X
+			}
+		})
+	end)
+end
+function v5.didMount(p3) -- line: 64
+	local current = p3.rootRef.current
+	local LayerCollector = current:FindFirstAncestorWhichIsA("LayerCollector")
+
+	if LayerCollector == nil then
+		p3.ancestryConnection = current.AncestryChanged:Connect(function() -- line: 69
+			-- upvalues: LayerCollector (ref), current (copy), p3 (copy)
+			LayerCollector = current:FindFirstAncestorWhichIsA("LayerCollector")
+
+			if LayerCollector ~= nil then
+				p3.ancestryConnection:Disconnect()
+				p3.ancestryConnection = nil
+				p3:watchLayerCollector(LayerCollector)
+			end
+		end)
+	else
+		p3:watchLayerCollector(LayerCollector)
+	end
+end
+function v5.render(p4) -- line: 82
+	-- upvalues: Roact (copy), LayerCollectorContext (copy)
+	return Roact.createElement(LayerCollectorContext.Provider, {
+		value = {
+			absoluteSize = p4.state.absoluteSize,
+			insets = p4.state.insets
+		}
+	}, {
+		LayerCollectorChildRef = Roact.createElement("Frame", {
+			Visible = false,
+			[Roact.Ref] = p4.rootRef
+		}),
+		Children = Roact.createFragment(p4.props[Roact.Children])
+	})
+end
+
+return v5

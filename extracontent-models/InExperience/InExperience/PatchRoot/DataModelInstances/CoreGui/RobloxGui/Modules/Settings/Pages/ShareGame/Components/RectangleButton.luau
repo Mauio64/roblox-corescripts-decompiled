@@ -1,73 +1,78 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v3 = require(l_Modules_0.Settings.Theme);
-local v4 = v1.PureComponent:extend("RectangleButton");
-v4.defaultProps = {
-    visible = true
-};
-v4.init = function(v5) --[[ Line: 12 ]] --[[ Name: init ]]
-    v5.state = {
-        isHovering = false
-    };
-end;
-v4.render = function(v6) --[[ Line: 18 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    local l_size_0 = v6.props.size;
-    local l_position_0 = v6.props.position;
-    local l_anchorPoint_0 = v6.props.anchorPoint;
-    local l_layoutOrder_0 = v6.props.layoutOrder;
-    local l_zIndex_0 = v6.props.zIndex;
-    local l_onClick_0 = v6.props.onClick;
-    local l_visible_0 = v6.props.visible;
-    local v14 = v6.props[v1.Children] or {};
-    v14.Border = v1.createElement("UIStroke", {
-        Color = v3.color("DefaultButtonStroke"), 
-        Transparency = v3.transparency("DefaultButtonStroke"), 
-        Thickness = v3.DefaultStokeThickness
-    });
-    v14.UICorner = v1.createElement("UICorner", {
-        CornerRadius = v3.DefaultCornerRadius
-    });
-    return v1.createElement("ImageButton", {
-        BackgroundTransparency = 1, 
-        Image = "", 
-        Selectable = false, 
-        Size = l_size_0, 
-        Position = l_position_0, 
-        AnchorPoint = l_anchorPoint_0, 
-        LayoutOrder = l_layoutOrder_0, 
-        ZIndex = l_zIndex_0, 
-        Visible = l_visible_0, 
-        [v1.Event.InputBegan] = function() --[[ Line: 51 ]]
-            -- upvalues: v6 (copy)
-            v6:setState({
-                isHovering = true
-            });
-        end, 
-        [v1.Event.InputEnded] = function() --[[ Line: 54 ]]
-            -- upvalues: v6 (copy)
-            v6:setState({
-                isHovering = false
-            });
-        end, 
-        [v1.Event.Activated] = function() --[[ Line: 58 ]]
-            -- upvalues: l_onClick_0 (copy), v6 (copy)
-            if l_onClick_0 then
-                v6:setState({
-                    isHovering = false
-                });
-                l_onClick_0();
-            end;
-        end
-    }, {
-        ButtonBackgroundUIBlox = v1.createElement("ImageLabel", {
-            BackgroundColor3 = v3.color(v6.state.isHovering and "DefaultButtonHover" or "DefaultButton"), 
-            BackgroundTransparency = v3.transparency(v6.state.isHovering and "DefaultButtonHover" or "DefaultButton"), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            Size = UDim2.new(1, 0, 1, 0), 
-            ZIndex = l_zIndex_0
-        }, v14)
-    });
-end;
-return v4;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Theme = require(Modules.Settings.Theme)
+local v5 = Roact.PureComponent:extend("RectangleButton")
+
+v5.defaultProps = {
+	visible = true
+}
+
+function v5.init(p1) -- line: 12
+	p1.state = {
+		isHovering = false
+	}
+end
+function v5.render(p2) -- line: 18
+	-- upvalues: Roact (copy), Theme (copy)
+	local size = p2.props.size
+	local position = p2.props.position
+	local anchorPoint = p2.props.anchorPoint
+	local layoutOrder = p2.props.layoutOrder
+	local zIndex = p2.props.zIndex
+	local onClick = p2.props.onClick
+	local visible = p2.props.visible
+	local v15 = p2.props[Roact.Children] or {}
+
+	v15.Border = Roact.createElement("UIStroke", {
+		Color = Theme.color("DefaultButtonStroke"),
+		Transparency = Theme.transparency("DefaultButtonStroke"),
+		Thickness = Theme.DefaultStokeThickness
+	})
+	v15.UICorner = Roact.createElement("UICorner", {
+		CornerRadius = Theme.DefaultCornerRadius
+	})
+
+	return Roact.createElement("ImageButton", {
+		BackgroundTransparency = 1,
+		Image = "",
+		Selectable = false,
+		Size = size,
+		Position = position,
+		AnchorPoint = anchorPoint,
+		LayoutOrder = layoutOrder,
+		ZIndex = zIndex,
+		Visible = visible,
+		[Roact.Event.InputBegan] = function() -- line: 51
+			-- upvalues: p2 (copy)
+			p2:setState({
+				isHovering = true
+			})
+		end,
+		[Roact.Event.InputEnded] = function() -- line: 54
+			-- upvalues: p2 (copy)
+			p2:setState({
+				isHovering = false
+			})
+		end,
+		[Roact.Event.Activated] = function() -- line: 58
+			-- upvalues: onClick (copy), p2 (copy)
+			if onClick then
+				p2:setState({
+					isHovering = false
+				})
+				onClick()
+			end
+		end
+	}, {
+		ButtonBackgroundUIBlox = Roact.createElement("ImageLabel", {
+			BackgroundColor3 = Theme.color(not p2.state.isHovering and "DefaultButton" or "DefaultButtonHover"),
+			BackgroundTransparency = Theme.transparency(not p2.state.isHovering and "DefaultButton" or "DefaultButtonHover"),
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = zIndex
+		}, v15)
+	})
+end
+
+return v5

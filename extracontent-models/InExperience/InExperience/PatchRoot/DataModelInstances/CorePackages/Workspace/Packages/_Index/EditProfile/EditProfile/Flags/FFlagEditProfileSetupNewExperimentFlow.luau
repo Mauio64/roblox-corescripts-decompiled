@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileSetupNewExperimentFlow", false);
+return game:DefineFastFlag("EditProfileSetupNewExperimentFlow", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableBlackbirdV2", false);
+return game:DefineFastFlag("EnableBlackbirdV2", false)

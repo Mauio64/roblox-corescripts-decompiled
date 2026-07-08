@@ -1,275 +1,297 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v3 = require(script.Parent.Parent.Parent.Components.DataConsumer);
-local v4 = require(l_Components_0.HeaderButton);
-local v5 = require(script.Parent.ServerScriptsEntry);
-local v6 = require(script.Parent.Parent.Parent.Constants);
-local l_LineWidth_0 = v6.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v6.GeneralFormatting.LineColor;
-local l_ChartCellWidths_0 = v6.ServerScriptsFormatting.ChartCellWidths;
-local l_ChartHeaderNames_0 = v6.ServerScriptsFormatting.ChartHeaderNames;
-local l_HeaderFrameHeight_0 = v6.ServerScriptsFormatting.HeaderFrameHeight;
-local l_EntryFrameHeight_0 = v6.ServerScriptsFormatting.EntryFrameHeight;
-local l_CellPadding_0 = v6.ServerScriptsFormatting.CellPadding;
-local l_LineGraphHeight_0 = v6.GeneralFormatting.LineGraphHeight;
-local l_NoResultSearchStr_0 = v6.GeneralFormatting.NoResultSearchStr;
-local v16 = {};
-local v17 = {};
-local v18 = {};
-local v19 = 0;
-for _, v21 in ipairs(l_ChartCellWidths_0) do
-    table.insert(v16, UDim2.new(v19, l_CellPadding_0, 0, 0));
-    table.insert(v17, UDim2.new(v21, -l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-    table.insert(v18, UDim2.new(v21, -l_CellPadding_0, 0, l_EntryFrameHeight_0));
-    v19 = v19 + v21;
-end;
-local v22 = {};
-for v23, v24 in ipairs(v16) do
-    v22[v23] = UDim2.new(v24.X.Scale, v24.X.Offset - l_CellPadding_0, v24.Y.Scale, v24.Y.Offset);
-end;
-local v25 = v1.Component:extend("ServerScripts");
-local function v29(v26) --[[ Line: 45 ]] --[[ Name: constructHeader ]]
-    -- upvalues: l_ChartHeaderNames_0 (copy), v1 (copy), v4 (copy), v17 (copy), v16 (copy), l_LineWidth_0 (copy), l_LineColor_0 (copy), v22 (copy), l_HeaderFrameHeight_0 (copy)
-    local v27 = {};
-    for v28 = 1, #l_ChartHeaderNames_0 do
-        v27[l_ChartHeaderNames_0[v28]] = v1.createElement(v4, {
-            text = l_ChartHeaderNames_0[v28], 
-            size = v17[v28], 
-            pos = v16[v28], 
-            sortfunction = v26
-        });
-    end;
-    v27.upperHorizontalLine = v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    v27.verticalLine1 = v1.createElement("Frame", {
-        Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-        Position = v22[2], 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    v27.verticalLine2 = v1.createElement("Frame", {
-        Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-        Position = v22[3], 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    v27.lowerHorizontalLine = v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-        Position = UDim2.new(0, 0, 1, 0), 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_HeaderFrameHeight_0), 
-        BackgroundTransparency = 1
-    }, v27);
-end;
-local function v31(v30) --[[ Line: 91 ]] --[[ Name: getX ]]
-    return v30.time;
-end;
-local function v33(v32) --[[ Line: 95 ]] --[[ Name: getActivity ]]
-    return v32.data[1];
-end;
-local function v35(v34) --[[ Line: 99 ]] --[[ Name: getRate ]]
-    return v34.data[2];
-end;
-local function v37(v36) --[[ Line: 103 ]] --[[ Name: formatScriptsData ]]
-    return string.format("%.3f", v36);
-end;
-v25.init = function(v38, v39) --[[ Line: 107 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    local v40 = v39.ServerScriptsData:getCurrentData();
-    v38.onSortChanged = function(v41) --[[ Line: 110 ]]
-        -- upvalues: v39 (copy), v38 (copy)
-        if v41 == v39.ServerScriptsData:getSortType() then
-            v38:setState({
-                reverseSort = not v38.state.reverseSort
-            });
-            return;
-        else
-            v39.ServerScriptsData:setSortType(v41);
-            v38:setState({
-                reverseSort = false
-            });
-            return;
-        end;
-    end;
-    v38.getOnButtonPress = function(v42) --[[ Line: 124 ]]
-        -- upvalues: v38 (copy)
-        return function(_, _) --[[ Line: 125 ]]
-            -- upvalues: v38 (ref), v42 (copy)
-            local l_v38_0 = v38;
-            local v46 = {};
-            local v47 = false;
-            if v38.state.expandIndex ~= v42 then
-                v47 = v42;
-            end;
-            v46.expandIndex = v47;
-            l_v38_0:setState(v46);
-        end;
-    end;
-    v38.onCanvasPosChanged = function() --[[ Line: 132 ]]
-        -- upvalues: v38 (copy)
-        local l_CanvasPosition_0 = v38.scrollingRef.current.CanvasPosition;
-        if v38.state.canvasPos ~= l_CanvasPosition_0 then
-            v38:setState({
-                absScrollSize = v38.scrollingRef.current.AbsoluteSize, 
-                canvasPos = l_CanvasPosition_0
-            });
-        end;
-    end;
-    v38.scrollingRef = v1.createRef();
-    v38.state = {
-        serverScriptsData = v40, 
-        expandIndex = nil
-    };
-end;
-v25.willUpdate = function(v49) --[[ Line: 150 ]] --[[ Name: willUpdate ]]
-    if v49.canvasPosConnector then
-        v49.canvasPosConnector:Disconnect();
-    end;
-end;
-v25.didUpdate = function(v50) --[[ Line: 156 ]] --[[ Name: didUpdate ]]
-    if v50.scrollingRef.current then
-        v50.canvasPosConnector = v50.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v50.onCanvasPosChanged);
-    end;
-end;
-v25.didMount = function(v51) --[[ Line: 163 ]] --[[ Name: didMount ]]
-    v51.statsConnector = v51.props.ServerScriptsData:Signal():Connect(function(v52) --[[ Line: 164 ]]
-        -- upvalues: v51 (copy)
-        v51:setState({
-            serverScriptsData = v52
-        });
-    end);
-    if v51.scrollingRef.current then
-        v51.canvasPosConnector = v51.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v51.onCanvasPosChanged);
-        v51:setState({
-            absScrollSize = v51.scrollingRef.current.AbsoluteSize, 
-            canvasPos = v51.scrollingRef.current.CanvasPosition
-        });
-    end;
-end;
-v25.willUnmount = function(v53) --[[ Line: 181 ]] --[[ Name: willUnmount ]]
-    v53.statsConnector:Disconnect();
-    v53.statsConnector = nil;
-end;
-v25.render = function(v54) --[[ Line: 186 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v6 (copy), l_EntryFrameHeight_0 (copy), l_LineGraphHeight_0 (copy), v5 (copy), v18 (copy), v16 (copy), v22 (copy), v37 (copy), v31 (copy), v33 (copy), v35 (copy), l_NoResultSearchStr_0 (copy), v29 (copy), l_HeaderFrameHeight_0 (copy)
-    local l_searchTerm_0 = v54.props.searchTerm;
-    local l_scriptFilters_0 = v54.props.scriptFilters;
-    local l_layoutOrder_0 = v54.props.layoutOrder;
-    local l_size_0 = v54.props.size;
-    local l_serverScriptsData_0 = v54.state.serverScriptsData;
-    local l_reverseSort_0 = v54.state.reverseSort;
-    local l_absScrollSize_0 = v54.state.absScrollSize;
-    local l_canvasPos_0 = v54.state.canvasPos;
-    local v63 = {};
-    local v64 = #l_serverScriptsData_0;
-    if v64 == 0 then
-        return v1.createElement("TextLabel", {
-            Size = l_size_0, 
-            Position = UDim2.new(0, 0, 0, 0), 
-            Text = "Awaiting Server Scripts Information.", 
-            TextColor3 = v6.Color.Text, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0
-        });
-    else
-        local v65 = 0;
-        local v66 = -1;
-        local v67 = 0;
-        local v68 = 0;
-        if l_canvasPos_0 and l_absScrollSize_0 then
-            for v69, v70 in pairs(l_serverScriptsData_0) do
-                if not l_searchTerm_0 or string.find(v70.name:lower(), l_searchTerm_0:lower()) ~= nil then
-                    v68 = v68 + 1;
-                    local v71 = true;
-                    local l_Active_0 = l_scriptFilters_0.Active;
-                    local l_Inactive_0 = l_scriptFilters_0.Inactive;
-                    local v74 = v70.dataStats.dataSet:back();
-                    if l_Active_0 ~= l_Inactive_0 then
-                        if v74.data[1] > 0 and l_Inactive_0 then
-                            v71 = false;
-                        elseif v74.data[1] == 0 and l_Active_0 then
-                            v71 = false;
-                        end;
-                    end;
-                    if v71 then
-                        local v75 = v54.state.expandIndex == v70.name;
-                        local v76 = v75 and l_EntryFrameHeight_0 + 2 * l_LineGraphHeight_0 or l_EntryFrameHeight_0;
-                        if v65 + v76 >= l_canvasPos_0.Y then
-                            if v67 < l_absScrollSize_0.Y then
-                                local v77 = v74.data[1] > 0 and v6.Color.ActiveBox or v6.Color.InactiveBox;
-                                local v78 = l_reverseSort_0 and v64 - v69 or v69;
-                                v63[v69] = v1.createElement(v5, {
-                                    scriptData = v70, 
-                                    frameHeight = v76, 
-                                    showGraph = v75, 
-                                    layoutOrder = v78, 
-                                    activityBoxColor = v77, 
-                                    entryCellSize = v18, 
-                                    cellOffset = v16, 
-                                    verticalOffsets = v22, 
-                                    onButtonPress = v54.getOnButtonPress(v70.name), 
-                                    formatScriptsData = v37, 
-                                    getX = v31, 
-                                    getActivity = v33, 
-                                    getRate = v35, 
-                                    stringFormatY = v37
-                                });
-                            end;
-                            if v66 < 0 then
-                                v66 = v65;
-                            else
-                                v67 = v67 + v76;
-                            end;
-                        end;
-                        v65 = v65 + v76;
-                    end;
-                end;
-            end;
-            if v68 > 0 then
-                v63.WindowingPadding = v1.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v66), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 1
-                });
-            else
-                local v79 = string.format(l_NoResultSearchStr_0, l_searchTerm_0);
-                v63.emptySearch = v1.createElement("TextLabel", {
-                    Size = l_size_0, 
-                    Text = v79, 
-                    TextColor3 = v6.Color.Text, 
-                    BackgroundTransparency = 1
-                });
-            end;
-        end;
-        v63.UIListLayout = v1.createElement("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        });
-        return v1.createElement("Frame", {
-            Size = l_size_0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0
-        }, {
-            Header = v29(v54.onSortChanged), 
-            Entries = v1.createElement("ScrollingFrame", {
-                Position = UDim2.new(0, 0, 0, l_HeaderFrameHeight_0), 
-                Size = UDim2.new(1, 0, 1, -l_HeaderFrameHeight_0), 
-                BackgroundTransparency = 1, 
-                VerticalScrollBarInset = 1, 
-                ScrollBarThickness = 5, 
-                CanvasSize = UDim2.new(1, 0, 0, v65), 
-                [v1.Ref] = v54.scrollingRef
-            }, v63)
-        });
-    end;
-end;
-return v3(v25, "ServerScriptsData");
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local DataConsumer = require(script.Parent.Parent.Parent.Components.DataConsumer)
+local HeaderButton = require(Components.HeaderButton)
+local ServerScriptsEntry = require(script.Parent.ServerScriptsEntry)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local ChartCellWidths = Constants.ServerScriptsFormatting.ChartCellWidths
+local ChartHeaderNames = Constants.ServerScriptsFormatting.ChartHeaderNames
+local HeaderFrameHeight = Constants.ServerScriptsFormatting.HeaderFrameHeight
+local EntryFrameHeight = Constants.ServerScriptsFormatting.EntryFrameHeight
+local CellPadding = Constants.ServerScriptsFormatting.CellPadding
+local LineGraphHeight = Constants.GeneralFormatting.LineGraphHeight
+local NoResultSearchStr = Constants.GeneralFormatting.NoResultSearchStr
+local t1 = {}
+local t2 = {}
+local t3 = {}
+local n1 = 0
+
+for _, v in ipairs(ChartCellWidths) do
+	table.insert(t1, UDim2.new(n1, CellPadding, 0, 0))
+	table.insert(t2, UDim2.new(v, -CellPadding, 0, HeaderFrameHeight))
+	table.insert(t3, UDim2.new(v, -CellPadding, 0, EntryFrameHeight))
+	n1 += v
+end
+
+local t4 = {}
+
+for i, v in ipairs(t1) do
+	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+end
+
+local v26 = Roact.Component:extend("ServerScripts")
+
+local function constructHeader(p1) -- line: 45
+	-- upvalues: ChartHeaderNames (copy), Roact (copy), HeaderButton (copy), t2 (copy), t1 (copy), LineWidth (copy), LineColor (copy), t4 (copy), HeaderFrameHeight (copy)
+	local t5 = {}
+
+	for i = 1, #ChartHeaderNames do
+		t5[ChartHeaderNames[i]] = Roact.createElement(HeaderButton, {
+			text = ChartHeaderNames[i],
+			size = t2[i],
+			pos = t1[i],
+			sortfunction = p1
+		})
+	end
+
+	t5.upperHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundColor3 = LineColor
+	})
+	t5.verticalLine1 = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, LineWidth, 1, 0),
+		Position = t4[2],
+		BackgroundColor3 = LineColor
+	})
+	t5.verticalLine2 = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, LineWidth, 1, 0),
+		Position = t4[3],
+		BackgroundColor3 = LineColor
+	})
+	t5.lowerHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 1, 0),
+		BackgroundColor3 = LineColor
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, HeaderFrameHeight)
+	}, t5)
+end
+local function getX(p2) -- line: 91
+	return p2.time
+end
+local function getActivity(p3) -- line: 95
+	return p3.data[1]
+end
+local function getRate(p4) -- line: 99
+	return p4.data[2]
+end
+local function formatScriptsData(p5) -- line: 103
+	return string.format("%.3f", p5)
+end
+
+function v26.init(p6, p7) -- line: 107
+	-- upvalues: Roact (copy)
+	local v41 = p7.ServerScriptsData:getCurrentData()
+
+	function p6.onSortChanged(p8) -- line: 110
+		-- upvalues: p7 (copy), p6 (copy)
+		if p8 == p7.ServerScriptsData:getSortType() then
+			p6:setState({
+				reverseSort = not p6.state.reverseSort
+			})
+
+			return
+		end
+
+		p7.ServerScriptsData:setSortType(p8)
+		p6:setState({
+			reverseSort = false
+		})
+	end
+	function p6.getOnButtonPress(p9) -- line: 124
+		-- upvalues: p6 (copy)
+		return function(_, _) -- line: 125
+			-- upvalues: p6 (copy), p9 (copy)
+			p6:setState({
+				expandIndex = p6.state.expandIndex ~= p9 and p9
+			})
+		end
+	end
+	function p6.onCanvasPosChanged() -- line: 132
+		-- upvalues: p6 (copy)
+		local CanvasPosition = p6.scrollingRef.current.CanvasPosition
+
+		if CanvasPosition ~= p6.state.canvasPos then
+			p6:setState({
+				absScrollSize = p6.scrollingRef.current.AbsoluteSize,
+				canvasPos = CanvasPosition
+			})
+		end
+	end
+
+	p6.scrollingRef = Roact.createRef()
+	p6.state = {
+		expandIndex = nil,
+		serverScriptsData = v41
+	}
+end
+function v26.willUpdate(p12) -- line: 150
+	if p12.canvasPosConnector then
+		p12.canvasPosConnector:Disconnect()
+	end
+end
+function v26.didUpdate(p13) -- line: 156
+	if p13.scrollingRef.current then
+		p13.canvasPosConnector = p13.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p13.onCanvasPosChanged)
+	end
+end
+function v26.didMount(p14) -- line: 163
+	p14.statsConnector = p14.props.ServerScriptsData:Signal():Connect(function(p15) -- line: 164
+		-- upvalues: p14 (copy)
+		p14:setState({
+			serverScriptsData = p15
+		})
+	end)
+
+	if p14.scrollingRef.current then
+		p14.canvasPosConnector = p14.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p14.onCanvasPosChanged)
+		p14:setState({
+			absScrollSize = p14.scrollingRef.current.AbsoluteSize,
+			canvasPos = p14.scrollingRef.current.CanvasPosition
+		})
+	end
+end
+function v26.willUnmount(p16) -- line: 181
+	p16.statsConnector:Disconnect()
+	p16.statsConnector = nil
+end
+function v26.render(p17) -- line: 186
+	-- upvalues: Roact (copy), Constants (copy), EntryFrameHeight (copy), LineGraphHeight (copy), ServerScriptsEntry (copy), t3 (copy), t1 (copy), t4 (copy), formatScriptsData (copy), getX (copy), getActivity (copy), getRate (copy), NoResultSearchStr (copy), constructHeader (copy), HeaderFrameHeight (copy)
+	local searchTerm = p17.props.searchTerm
+	local scriptFilters = p17.props.scriptFilters
+	local layoutOrder = p17.props.layoutOrder
+	local size = p17.props.size
+	local serverScriptsData = p17.state.serverScriptsData
+	local reverseSort = p17.state.reverseSort
+	local absScrollSize = p17.state.absScrollSize
+	local canvasPos = p17.state.canvasPos
+	local t6 = {}
+	local v56 = #serverScriptsData
+
+	if v56 == 0 then
+		return Roact.createElement("TextLabel", {
+			Text = "Awaiting Server Scripts Information.",
+			BackgroundTransparency = 1,
+			Size = size,
+			Position = UDim2.new(0, 0, 0, 0),
+			TextColor3 = Constants.Color.Text,
+			LayoutOrder = layoutOrder
+		})
+	end
+
+	local n2 = 0
+	local n3 = -1
+	local n4 = 0
+	local n5 = 0
+
+	if canvasPos and absScrollSize then
+		for k, v in pairs(serverScriptsData) do
+			if not searchTerm or string.find(v.name:lower(), searchTerm:lower()) ~= nil then
+				n5 += 1
+
+				local v63 = true
+				local scriptFiltersActive = scriptFilters.Active
+				local Inactive = scriptFilters.Inactive
+				local v66 = v.dataStats.dataSet:back()
+
+				if scriptFiltersActive ~= Inactive then
+					if v66.data[1] > 0 and Inactive then
+						v63 = false
+					elseif v66.data[1] == 0 and scriptFiltersActive then
+						v63 = false
+					end
+				end
+
+				if v63 then
+					local v67 = p17.state.expandIndex == v.name
+					local v68 = v67 and EntryFrameHeight + 2 * LineGraphHeight or EntryFrameHeight
+
+					if n2 + v68 >= canvasPos.Y then
+						if n4 < absScrollSize.Y then
+							local v69 = v66.data[1] > 0 and Constants.Color.ActiveBox or Constants.Color.InactiveBox
+							local v70 = reverseSort and v56 - k or k
+
+							t6[k] = Roact.createElement(ServerScriptsEntry, {
+								scriptData = v,
+								frameHeight = v68,
+								showGraph = v67,
+								layoutOrder = v70,
+								activityBoxColor = v69,
+								entryCellSize = t3,
+								cellOffset = t1,
+								verticalOffsets = t4,
+								onButtonPress = p17.getOnButtonPress(v.name),
+								formatScriptsData = formatScriptsData,
+								getX = getX,
+								getActivity = getActivity,
+								getRate = getRate,
+								stringFormatY = formatScriptsData
+							})
+						end
+
+						if n3 < 0 then
+							n3 = n2
+						else
+							n4 += v68
+						end
+					end
+
+					n2 += v68
+				end
+			end
+		end
+
+		if n5 > 0 then
+			t6.WindowingPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, n3)
+			})
+		else
+			local v71 = string.format(NoResultSearchStr, searchTerm)
+
+			t6.emptySearch = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = size,
+				Text = v71,
+				TextColor3 = Constants.Color.Text
+			})
+		end
+	end
+
+	t6.UIListLayout = Roact.createElement("UIListLayout", {
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = size,
+		LayoutOrder = layoutOrder
+	}, {
+		Header = constructHeader(p17.onSortChanged),
+		Entries = Roact.createElement("ScrollingFrame", {
+			Position = UDim2.new(0, 0, 0, HeaderFrameHeight),
+			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
+			BackgroundTransparency = 1,
+			VerticalScrollBarInset = 1,
+			ScrollBarThickness = 5,
+			CanvasSize = UDim2.new(1, 0, 0, n2),
+			[Roact.Ref] = p17.scrollingRef
+		}, t6)
+	})
+end
+
+return DataConsumer(v26, "ServerScriptsData")

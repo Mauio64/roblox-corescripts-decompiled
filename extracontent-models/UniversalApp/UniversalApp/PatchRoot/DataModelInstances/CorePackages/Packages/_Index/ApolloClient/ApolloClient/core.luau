@@ -1,52 +1,76 @@
-local v0 = {};
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local l_DEV_0 = require(l_Parent_0.utilities).DEV;
-local v5 = require(script.ApolloClient);
-v0.ApolloClient = v5.ApolloClient;
-v0.mergeOptions = v5.mergeOptions;
-local v6 = require(script.ObservableQuery);
-v0.applyNextFetchPolicy = v6.applyNextFetchPolicy;
-v0.ObservableQuery = v6.ObservableQuery;
-local _ = require(script.watchQueryOptions);
-v0.NetworkStatus = require(script.networkStatus).NetworkStatus;
-local v8 = require(script.types);
-l_Object_0.assign(v0, v8);
-local _ = require(script.LocalState);
-local v10 = require(script.Parent.errors);
-v0.isApolloError = v10.isApolloError;
-v0.ApolloError = v10.ApolloError;
-local v11 = require(script.Parent.cache);
-v0.ApolloCache = v11.ApolloCache;
-v0.defaultDataIdFromObject = v11.defaultDataIdFromObject;
-v0.InMemoryCache = v11.InMemoryCache;
-v0.MissingFieldError = v11.MissingFieldError;
-v0.makeVar = v11.makeVar;
-v0.None = v11.None;
-local v12 = require(script.Parent.cache.inmemory.types);
-l_Object_0.assign(v0, v12);
-local v13 = require(script.Parent.link.core);
-l_Object_0.assign(v0, v13);
-local v14 = require(script.Parent.link.http);
-l_Object_0.assign(v0, v14);
-local v15 = require(script.Parent.link.utils);
-v0.fromError = v15.fromError;
-v0.toPromise = v15.toPromise;
-v0.fromPromise = v15.fromPromise;
-v0.throwServerError = v15.throwServerError;
-local v16 = require(script.Parent.utilities);
-v0.Observable = v16.Observable;
-v0.isReference = v16.isReference;
-v0.makeReference = v16.makeReference;
-v0.NULL = v16.NULL;
-local l_setVerbosity_0 = require(l_Parent_0.jsutils.invariant).setVerbosity;
-v0.setLogVerbosity = l_setVerbosity_0;
-l_setVerbosity_0(l_DEV_0 and "log" or "silent");
-local v18 = require(l_Parent_1.GraphQLTag);
-v0.gql = v18.default;
-v0.resetCaches = v18.resetCaches;
-v0.disableFragmentWarnings = v18.disableFragmentWarnings;
-v0.enableExperimentalFragmentVariables = v18.enableExperimentalFragmentVariables;
-v0.disableExperimentalFragmentVariables = v18.disableExperimentalFragmentVariables;
-return v0;
+local t1 = {}
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Object = require(scriptParentParent.LuauPolyfill).Object
+local DEV = require(scriptParent.utilities).DEV
+local ApolloClient = require(script.ApolloClient)
+
+t1.ApolloClient = ApolloClient.ApolloClient
+t1.mergeOptions = ApolloClient.mergeOptions
+
+local ObservableQuery = require(script.ObservableQuery)
+
+t1.applyNextFetchPolicy = ObservableQuery.applyNextFetchPolicy
+t1.ObservableQuery = ObservableQuery.ObservableQuery
+require(script.watchQueryOptions)
+t1.NetworkStatus = require(script.networkStatus).NetworkStatus
+
+local types = require(script.types)
+
+Object.assign(t1, types)
+require(script.LocalState)
+
+local errors = require(script.Parent.errors)
+
+t1.isApolloError = errors.isApolloError
+t1.ApolloError = errors.ApolloError
+
+local cache = require(script.Parent.cache)
+
+t1.ApolloCache = cache.ApolloCache
+t1.defaultDataIdFromObject = cache.defaultDataIdFromObject
+t1.InMemoryCache = cache.InMemoryCache
+t1.MissingFieldError = cache.MissingFieldError
+t1.makeVar = cache.makeVar
+t1.None = cache.None
+
+local types2 = require(script.Parent.cache.inmemory.types)
+
+Object.assign(t1, types2)
+
+local core = require(script.Parent.link.core)
+
+Object.assign(t1, core)
+
+local http = require(script.Parent.link.http)
+
+Object.assign(t1, http)
+
+local utils = require(script.Parent.link.utils)
+
+t1.fromError = utils.fromError
+t1.toPromise = utils.toPromise
+t1.fromPromise = utils.fromPromise
+t1.throwServerError = utils.throwServerError
+
+local utilities = require(script.Parent.utilities)
+
+t1.Observable = utilities.Observable
+t1.isReference = utilities.isReference
+t1.makeReference = utilities.makeReference
+t1.NULL = utilities.NULL
+
+local setVerbosity = require(scriptParent.jsutils.invariant).setVerbosity
+
+t1.setLogVerbosity = setVerbosity
+setVerbosity(not DEV and "silent" or "log")
+
+local GraphQLTag = require(scriptParentParent.GraphQLTag)
+
+t1.gql = GraphQLTag.default
+t1.resetCaches = GraphQLTag.resetCaches
+t1.disableFragmentWarnings = GraphQLTag.disableFragmentWarnings
+t1.enableExperimentalFragmentVariables = GraphQLTag.enableExperimentalFragmentVariables
+t1.disableExperimentalFragmentVariables = GraphQLTag.disableExperimentalFragmentVariables
+
+return t1

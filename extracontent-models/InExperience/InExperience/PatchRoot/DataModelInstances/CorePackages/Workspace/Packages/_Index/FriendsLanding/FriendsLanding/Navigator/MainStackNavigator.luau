@@ -1,25 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local _ = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_RoactNavigation_0 = v2.RoactNavigation;
-local v5 = require(l_script_FirstAncestor_0.Components.FriendsLandingScreen);
-local v6 = require(l_script_FirstAncestor_0.Components.FriendsLandingScreen.NavigationOptions);
-local v7 = require(l_script_FirstAncestor_0.EnumScreens);
-return (l_RoactNavigation_0.createRobloxStackNavigator({
-    {
-        [v7.FriendsLanding] = {
-            screen = v5, 
-            navigationOptions = v6
-        }
-    }
-}, {
-    transitionConfig = function() --[[ Line: 13 ]] --[[ Name: getTransitionConfig ]]
-        -- upvalues: l_UserGameSettings_0 (copy), l_RoactNavigation_0 (copy)
-        if l_UserGameSettings_0.ReducedMotion then
-            return l_RoactNavigation_0.StackViewTransitionConfigs.FadeInPlace;
-        else
-            return l_RoactNavigation_0.StackViewTransitionConfigs.SlideFromRight;
-        end;
-    end
-}));
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local _ = FriendsLanding.Parent
+local dependencies = require(FriendsLanding.dependencies)
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local RoactNavigation = dependencies.RoactNavigation
+local FriendsLandingScreen = require(FriendsLanding.Components.FriendsLandingScreen)
+local NavigationOptions = require(FriendsLanding.Components.FriendsLandingScreen.NavigationOptions)
+local EnumScreens = require(FriendsLanding.EnumScreens)
+
+local function getTransitionConfig() -- line: 13
+	-- upvalues: UserGameSettings (copy), RoactNavigation (copy)
+	if UserGameSettings.ReducedMotion then
+		return RoactNavigation.StackViewTransitionConfigs.FadeInPlace
+	end
+
+	return RoactNavigation.StackViewTransitionConfigs.SlideFromRight
+end
+
+return (RoactNavigation.createRobloxStackNavigator({{
+	[EnumScreens.FriendsLanding] = {
+		screen = FriendsLandingScreen,
+		navigationOptions = NavigationOptions
+	}
+}}, {
+	transitionConfig = getTransitionConfig
+}))

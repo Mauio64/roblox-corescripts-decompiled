@@ -1,110 +1,159 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v3 = require(script.Parent.Parent.Constants);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local v5 = require(l_Parent_0.SharedFlags);
-local l_GetFFlagPlatformEventEnabled_0 = v5.GetFFlagPlatformEventEnabled;
-local l_GetFStringPlatformEventUrl_0 = v5.GetFStringPlatformEventUrl;
-local l_FFlagEnableBlackbird_0 = v5.FFlagEnableBlackbird;
-local l_FFlagEnableBlackbirdOnFlyoutMenu_0 = v5.FFlagEnableBlackbirdOnFlyoutMenu;
-local l_FFlagEnableBlackbirdCheckDev_0 = v5.FFlagEnableBlackbirdCheckDev;
-local v11 = if l_FFlagEnableBlackbirdCheckDev_0 then require(script.Parent.useHasRobloxSubscription) else nil;
-local v12 = require(script.Parent.Parent.Config.FlyoutContentSettings);
-local function _(v13, v14) --[[ Line: 21 ]] --[[ Name: updateNotifications ]]
-    -- upvalues: v12 (copy)
-    local v15 = 0;
-    if v13.itemType == v12.ItemType.Settings then
-        v15 = v14.MorePageSettings;
-    elseif v13.itemType == v12.ItemType.Connections then
-        v15 = v14.MorePageFriends;
-    elseif v13.itemType == v12.ItemType.Messages then
-        v15 = v14.MorePageMessages;
-    end;
-    if v15 > 0 and (not v13.notificationCount or v13.notificationCount ~= v15) then
-        v13.notificationCount = v15;
-    end;
-end;
-return function() --[[ Line: 37 ]] --[[ Name: useFlyoutNavigationItems ]]
-    -- upvalues: v3 (copy), l_useSelector_0 (copy), v1 (copy), l_useAppPolicy_0 (copy), l_FFlagEnableBlackbirdCheckDev_0 (copy), v11 (copy), v12 (copy), l_FFlagEnableBlackbird_0 (copy), l_FFlagEnableBlackbirdOnFlyoutMenu_0 (copy), l_GetFFlagPlatformEventEnabled_0 (copy), l_GetFStringPlatformEventUrl_0 (copy)
-    local l_FLYOUT_DEFAULT_POLICY_0 = v3.FLYOUT_DEFAULT_POLICY;
-    local v19 = l_useSelector_0(function(v18) --[[ Line: 41 ]]
-        return v18.NotificationBadgeCounts;
-    end);
-    local v21 = l_useSelector_0(function(v20) --[[ Line: 45 ]]
-        return v20.OmniRecommendations and v20.OmniRecommendations.Home;
-    end);
-    local v22 = v21 and v21.sorts or {};
-    local v27, v28 = v1.useMemo(function() --[[ Line: 49 ]]
-        -- upvalues: v22 (copy), v3 (ref)
-        local v23 = nil;
-        local v24 = nil;
-        for _, v26 in pairs(v22) do
-            if v26.topicId == v3.SORT_ID_CONTINUE_PLAYING then
-                v23 = true;
-            elseif v26.topicId == v3.SORT_ID_FAVORITES then
-                v24 = true;
-            end;
-        end;
-        return v23, v24;
-    end, {
-        v22
-    });
-    local v30 = l_useAppPolicy_0(function(v29) --[[ Line: 61 ]]
-        return v29.getDisablePremiumEntrypoint() or false;
-    end);
-    local v32 = l_useAppPolicy_0(function(v31) --[[ Line: 64 ]]
-        return v31.getDisableBlackbirdEntrypoints() or false;
-    end);
-    local v33 = if l_FFlagEnableBlackbirdCheckDev_0 then v11() else false;
-    local v35 = l_useAppPolicy_0(function(v34) --[[ Line: 68 ]]
-        return v34.getGiftCardSourceRefOverride();
-    end);
-    local v37 = l_useAppPolicy_0(function(v36) --[[ Line: 71 ]]
-        return v36.getRedeemTileEnabled();
-    end);
-    local v38 = not v35 or v35 == "";
-    return v1.useMemo(function() --[[ Line: 77 ]]
-        -- upvalues: l_FLYOUT_DEFAULT_POLICY_0 (copy), v12 (ref), v28 (copy), v27 (copy), v30 (copy), v38 (copy), v37 (copy), l_FFlagEnableBlackbird_0 (ref), l_FFlagEnableBlackbirdOnFlyoutMenu_0 (ref), v32 (copy), l_FFlagEnableBlackbirdCheckDev_0 (ref), v33 (copy), v19 (copy), l_GetFFlagPlatformEventEnabled_0 (ref), l_GetFStringPlatformEventUrl_0 (ref)
-        local v39 = {};
-        local v40 = {};
-        for _, v42 in l_FLYOUT_DEFAULT_POLICY_0.MyLibrary do
-            local v43 = v12.ItemInfo[v42];
-            if v43 ~= nil and (v42 ~= v12.ItemType.Favorites or v28) and (v42 ~= v12.ItemType.ContinuePlaying or v27) and (v42 ~= v12.ItemType.Premium or not v30) and (v42 ~= v12.ItemType.GiftCards or not v38) and (v42 ~= v12.ItemType.Redeem or v37) and (not l_FFlagEnableBlackbird_0 or not l_FFlagEnableBlackbirdOnFlyoutMenu_0 or v42 ~= v12.ItemType.Premium and (v42 ~= v12.ItemType.Blackbird or not v32) and (v42 ~= v12.ItemType.Blackbird or not l_FFlagEnableBlackbirdCheckDev_0 or v33)) then
-                local v44 = table.clone(v43);
-                local l_v19_0 = v19;
-                local v46 = 0;
-                if v44.itemType == v12.ItemType.Settings then
-                    v46 = l_v19_0.MorePageSettings;
-                elseif v44.itemType == v12.ItemType.Connections then
-                    v46 = l_v19_0.MorePageFriends;
-                elseif v44.itemType == v12.ItemType.Messages then
-                    v46 = l_v19_0.MorePageMessages;
-                end;
-                if v46 > 0 and (not v44.notificationCount or v44.notificationCount ~= v46) then
-                    v44.notificationCount = v46;
-                end;
-                table.insert(v39, v44);
-            end;
-        end;
-        for _, v48 in l_FLYOUT_DEFAULT_POLICY_0.AdditionalNavigation do
-            local v49 = v12.ItemInfo[v48];
-            if v49 ~= nil and (v48 ~= v12.ItemType.Events or l_GetFFlagPlatformEventEnabled_0() and l_GetFStringPlatformEventUrl_0() ~= "") then
-                table.insert(v40, (table.clone(v49)));
-            end;
-        end;
-        return {
-            myLibraryItems = v39, 
-            additionalNavigationItems = v40
-        };
-    end, {
-        v28, 
-        v27, 
-        l_FLYOUT_DEFAULT_POLICY_0, 
-        v19, 
-        v30, 
-        v32, 
-        v33, 
-        v38
-    });
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local Constants = require(script.Parent.Parent.Constants)
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
+local SharedFlags = require(Parent.SharedFlags)
+local GetFFlagPlatformEventEnabled = SharedFlags.GetFFlagPlatformEventEnabled
+local GetFStringPlatformEventUrl = SharedFlags.GetFStringPlatformEventUrl
+local FFlagEnableBlackbird = SharedFlags.FFlagEnableBlackbird
+local FFlagEnableBlackbirdOnFlyoutMenu = SharedFlags.FFlagEnableBlackbirdOnFlyoutMenu
+local FFlagEnableRMOnMorePageGUAC = SharedFlags.FFlagEnableRMOnMorePageGUAC
+local FFlagEnableRMOnMorePageForAll = SharedFlags.FFlagEnableRMOnMorePageForAll
+local FFlagLuaAppFixNotificationBadgeCountsSync = SharedFlags.FFlagLuaAppFixNotificationBadgeCountsSync
+local v15 = game:DefineFastFlag("FlyoutGateMomentsTile", false)
+local useMomentsGating = require(Parent.MomentsCommon).Hooks.useMomentsGating
+local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
+
+local function updateNotifications(p1, p2, p3, p4) -- line: 22
+	-- upvalues: FlyoutContentSettings (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy)
+	local n1 = 0
+
+	if p1.itemType == FlyoutContentSettings.ItemType.Settings then
+		n1 = p2.MorePageSettings
+	elseif p1.itemType == FlyoutContentSettings.ItemType.Connections then
+		n1 = if not FFlagLuaAppFixNotificationBadgeCountsSync then p2.MorePageFriends else p3
+	elseif p1.itemType == FlyoutContentSettings.ItemType.Messages then
+		n1 = if not FFlagLuaAppFixNotificationBadgeCountsSync then p2.MorePageMessages else p4
+	end
+
+	if n1 > 0 and (not p1.notificationCount or n1 ~= p1.notificationCount) then
+		p1.notificationCount = n1
+	end
+end
+local function useFlyoutNavigationItems() -- line: 42
+	-- upvalues: Constants (copy), useSelector (copy), FFlagLuaAppFixNotificationBadgeCountsSync (copy), React (copy), useAppPolicy (copy), v15 (copy), useMomentsGating (copy), FFlagEnableRMOnMorePageGUAC (copy), FlyoutContentSettings (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), updateNotifications (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), FFlagEnableRMOnMorePageForAll (copy), AppPage (copy)
+	local FLYOUT_DEFAULT_POLICY = Constants.FLYOUT_DEFAULT_POLICY
+	local v26 = useSelector(function(p5) -- line: 46
+		return p5.NotificationBadgeCounts
+	end)
+	local v27 = useSelector(function(p6) -- line: 50
+		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then
+			return 0
+		end
+
+		local FriendsCarousel = p6.FriendsCarousel
+		local v44 = FriendsCarousel and (FriendsCarousel.Friends and FriendsCarousel.Friends.requests)
+
+		return v44 and v44.receivedCount or 0
+	end)
+	local v28 = useSelector(function(p7) -- line: 59
+		-- upvalues: FFlagLuaAppFixNotificationBadgeCountsSync (copy)
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then
+			return 0
+		end
+
+		return p7.SocialTab and p7.SocialTab.UnreadConversationCount or 0
+	end)
+	local v29 = useSelector(function(p8) -- line: 66
+		return p8.OmniRecommendations and p8.OmniRecommendations.Home
+	end)
+	local v30 = v29 and v29.sorts or {}
+	local v31, v32 = React.useMemo(function() -- line: 70
+		-- upvalues: v30 (copy), Constants (copy)
+		local v47 = nil
+		local v48 = nil
+
+		for _, v in pairs(v30) do
+			if v.topicId == Constants.SORT_ID_CONTINUE_PLAYING then
+				v47 = true
+			elseif v.topicId == Constants.SORT_ID_FAVORITES then
+				v48 = true
+			end
+		end
+
+		return v47, v48
+	end, { v30 })
+	local v33 = useAppPolicy(function(p9) -- line: 82
+		return p9.getDisablePremiumEntrypoint() or false
+	end)
+	local v34 = useAppPolicy(function(p10) -- line: 85
+		return p10.getDisableBlackbirdEntrypoints() or false
+	end)
+	local v35 = useAppPolicy(function(p11) -- line: 88
+		return p11.getGiftCardSourceRefOverride()
+	end)
+	local v36 = useAppPolicy(function(p12) -- line: 91
+		return p12.getRedeemTileEnabled()
+	end)
+	local v37 = if not v15 then nil else useMomentsGating()
+	local v38 = not not v15 and useAppPolicy(function(p13) -- line: 96
+		return p13.getDisplayMomentsMoreTabTile()
+	end)
+	local v39 = not v15 or (not FFlagEnableRMOnMorePageGUAC or v38)
+	local v40 = not v35 or v35 == ""
+
+	return React.useMemo(function() -- line: 106
+		-- upvalues: FLYOUT_DEFAULT_POLICY (copy), FlyoutContentSettings (copy), v32 (copy), v31 (copy), v33 (copy), v40 (copy), v36 (copy), FFlagEnableBlackbird (copy), FFlagEnableBlackbirdOnFlyoutMenu (copy), v34 (copy), updateNotifications (copy), v26 (copy), v27 (copy), v28 (copy), GetFFlagPlatformEventEnabled (copy), GetFStringPlatformEventUrl (copy), v15 (copy), v37 (copy), FFlagEnableRMOnMorePageForAll (copy), v39 (copy), AppPage (copy)
+		local t1 = {}
+		local t2 = {}
+
+		for _, v59 in FLYOUT_DEFAULT_POLICY.MyLibrary do
+			local v60 = FlyoutContentSettings.ItemInfo[v59]
+
+			if v60 ~= nil and (v59 ~= FlyoutContentSettings.ItemType.Favorites or v32) and (v59 ~= FlyoutContentSettings.ItemType.ContinuePlaying or v31) and (v59 ~= FlyoutContentSettings.ItemType.Premium or not v33) and (v59 ~= FlyoutContentSettings.ItemType.GiftCards or not v40) and (v59 ~= FlyoutContentSettings.ItemType.Redeem or v36) and (not FFlagEnableBlackbird or not FFlagEnableBlackbirdOnFlyoutMenu or v59 ~= FlyoutContentSettings.ItemType.Premium and (v59 ~= FlyoutContentSettings.ItemType.Blackbird or not v34)) then
+				local v61 = table.clone(v60)
+
+				updateNotifications(v61, v26, v27, v28)
+				table.insert(t1, v61)
+			end
+		end
+
+		for _, v63 in FLYOUT_DEFAULT_POLICY.AdditionalNavigation do
+			local v64 = FlyoutContentSettings.ItemInfo[v63]
+
+			if v64 == nil then
+				continue
+			end
+
+			if v63 == FlyoutContentSettings.ItemType.Events then
+				if not GetFFlagPlatformEventEnabled() or GetFStringPlatformEventUrl() == "" then
+					continue
+				end
+			elseif v63 == FlyoutContentSettings.ItemType.Moments and v15 and ((v37 == nil or not v37.isFlyoutEntryEnabled) and (not FFlagEnableRMOnMorePageForAll and not v39)) then
+				continue
+			end
+
+			local v65 = table.clone(v64)
+
+			if v63 == FlyoutContentSettings.ItemType.Moments and v37 ~= nil and v37.isFlyoutEntryEnabled and v37.platformIntegrationEnabled then
+				v65.context = {
+					appPage = AppPage.Moments
+				}
+			end
+
+			table.insert(t2, v65)
+		end
+
+		return {
+			myLibraryItems = t1,
+			additionalNavigationItems = t2
+		}
+	end, {
+		v32,
+		v31,
+		FLYOUT_DEFAULT_POLICY,
+		v26,
+		v33,
+		v34,
+		v40,
+		if not v15 then nil else v39,
+		v37,
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v27,
+		if not FFlagLuaAppFixNotificationBadgeCountsSync then nil else v28
+	})
+end
+
+return useFlyoutNavigationItems

@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isErrorReasonContainsEconomicRestrictions ]]
-    return string.find(v0, "EconomicRestrictions") ~= nil;
-end;
+local function isErrorReasonContainsEconomicRestrictions(s1: string) -- line: 1
+	return string.find(s1, "EconomicRestrictions") ~= nil
+end
+
+return isErrorReasonContainsEconomicRestrictions

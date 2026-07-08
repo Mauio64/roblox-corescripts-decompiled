@@ -1,35 +1,36 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_View_0 = v2.View;
-local l_Image_0 = v2.Image;
-local v5 = require(script.Parent.Parent.useExperienceBannerImage);
-local v6 = require(script.Parent.Parent.useGameInfo);
-local function v7() --[[ Line: 12 ]] --[[ Name: ExperienceDetailsBannerImageSkeleton ]]
-    -- upvalues: v1 (copy), l_View_0 (copy)
-    return v1.createElement(l_View_0, {
-        tag = "size-full bg-surface-100"
-    });
-end;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local useExperienceBannerImage = require(script.Parent.Parent.useExperienceBannerImage)
+local useGameInfo = require(script.Parent.Parent.useGameInfo)
+
+local function ExperienceDetailsBannerImageSkeleton() -- line: 12
+	-- upvalues: React (copy), View (copy)
+	return React.createElement(View, {
+		tag = "size-full bg-surface-100"
+	})
+end
+local function ExperienceDetailsBannerImageError(t1: {[any]: any}) -- line: 18
+	-- upvalues: useGameInfo (copy), useExperienceBannerImage (copy), React (copy), ExperienceDetailsBannerImageSkeleton (copy), FoundationImage (copy)
+	local v11 = useGameInfo(t1.universeId)
+	local v12 = useExperienceBannerImage(t1.universeId)
+	local v13 = v11 and v11.isUnavailable == true
+	local v14 = v12.status == "Success" and v12.url
+
+	if v13 or not v14 then
+		return React.createElement(ExperienceDetailsBannerImageSkeleton)
+	end
+
+	return React.createElement(FoundationImage, {
+		Image = v12.url,
+		Size = UDim2.fromScale(1, 1),
+		ScaleType = Enum.ScaleType.Crop
+	})
+end
+
 return {
-    Skeleton = v1.memo(v7), 
-    Error = v1.memo(function(v8) --[[ Line: 18 ]] --[[ Name: ExperienceDetailsBannerImageError ]]
-        -- upvalues: v6 (copy), v5 (copy), v1 (copy), v7 (copy), l_Image_0 (copy)
-        local v9 = v6(v8.universeId);
-        local v10 = v5(v8.universeId);
-        local v11 = v9 and v9.isUnavailable == true;
-        local v12 = false;
-        if v10.status == "Success" then
-            v12 = v10.url;
-        end;
-        if v11 or not v12 then
-            return v1.createElement(v7);
-        else
-            return v1.createElement(l_Image_0, {
-                Image = v10.url, 
-                Size = UDim2.fromScale(1, 1), 
-                ScaleType = Enum.ScaleType.Crop
-            });
-        end;
-    end)
-};
+	Skeleton = React.memo(ExperienceDetailsBannerImageSkeleton),
+	Error = React.memo(ExperienceDetailsBannerImageError)
+}

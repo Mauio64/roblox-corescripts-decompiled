@@ -1,178 +1,210 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Boolean_0 = v3.Boolean;
-local l_Error_0 = v3.Error;
-local v7 = require(l_Parent_0.jsutils.invariant);
-local l_InvariantError_0 = v7.InvariantError;
-local l_invariant_0 = v7.invariant;
-local l_Observable_0 = require(l_Parent_0.utilities).Observable;
-local _ = require(script.Parent.types);
-local v12 = require(script.Parent.Parent.utils);
-local l_validateOperation_0 = v12.validateOperation;
-local l_createOperation_0 = v12.createOperation;
-local l_transformOperation_0 = v12.transformOperation;
-local v16 = {};
-v16.__index = v16;
-local function v20(_, v18, v19) --[[ Line: 53 ]] --[[ Name: passthrough ]]
-    -- upvalues: l_Boolean_0 (copy), l_Observable_0 (copy)
-    if l_Boolean_0.toJSBoolean(v19) then
-        return (v19(v18));
-    else
-        return l_Observable_0.of();
-    end;
-end;
-local function v22(v21) --[[ Line: 61 ]] --[[ Name: toLink ]]
-    -- upvalues: v16 (copy)
-    if typeof(v21) == "function" then
-        return v16.new(v21);
-    else
-        return v21;
-    end;
-end;
-local _ = function(v23) --[[ Line: 69 ]] --[[ Name: isTerminating ]]
-    local v24, _ = debug.info(v23.request, "a");
-    return v24 <= 2;
-end;
-local v27 = setmetatable({}, {
-    __index = l_Error_0
-});
-v27.__index = v27;
-v27.new = function(v28, v29) --[[ Line: 79 ]] --[[ Name: new ]]
-    -- upvalues: l_Error_0 (copy), v27 (copy)
-    local v30 = l_Error_0.new(v28);
-    v30.link = v29;
-    return (setmetatable(v30, v27));
-end;
-v16.empty = function() --[[ Line: 86 ]] --[[ Name: empty ]]
-    -- upvalues: v16 (copy), l_Observable_0 (copy)
-    return v16.new(function(_) --[[ Line: 87 ]]
-        -- upvalues: l_Observable_0 (ref)
-        return l_Observable_0.of();
-    end);
-end;
-v16.from = function(v32) --[[ Line: 92 ]] --[[ Name: from ]]
-    -- upvalues: v16 (copy), l_Array_0 (copy), v22 (copy)
-    if #v32 == 0 then
-        return v16.empty();
-    else
-        return (l_Array_0.reduce(l_Array_0.map(v32, v22, nil), function(v33, v34) --[[ Line: 96 ]]
-            return v33:concat(v34);
-        end));
-    end;
-end;
-v16.split_ = function(v35, v36, v37) --[[ Line: 101 ]] --[[ Name: split_ ]]
-    -- upvalues: v16 (copy), l_Boolean_0 (copy), v20 (copy), l_Observable_0 (copy)
-    local v38 = if typeof(v36) == "function" then v16.new(v36) else v36;
-    local v39 = nil;
-    if l_Boolean_0.toJSBoolean(v37) and v37 ~= nil then
-        v39 = if typeof(v37) == "function" then v16.new(v37) else v37;
-    else
-        local v40 = v16.new(v20);
-        v39 = if typeof(v40) == "function" then v16.new(v40) else v40;
-    end;
-    local v41, v42 = debug.info(v38.request, "a");
-    if v41 <= 2 then
-        local v43;
-        v42, v43 = debug.info(v39.request, "a");
-        if v42 <= 2 then
-            return v16.new(function(_, v45) --[[ Line: 115 ]]
-                -- upvalues: v35 (copy), v38 (copy), l_Boolean_0 (ref), l_Observable_0 (ref), v39 (ref)
-                if v35(v45) then
-                    local v46 = v38:request(v45);
-                    return l_Boolean_0.toJSBoolean(v46) and v46 or l_Observable_0.of();
-                else
-                    local v47 = v39:request(v45);
-                    return l_Boolean_0.toJSBoolean(v47) and v47 or l_Observable_0.of();
-                end;
-            end);
-        end;
-    end;
-    return v16.new(function(_, v49, v50) --[[ Line: 125 ]]
-        -- upvalues: v35 (copy), v38 (copy), l_Boolean_0 (ref), l_Observable_0 (ref), v39 (ref)
-        if v35(v49) then
-            local v51 = v38:request(v49, v50);
-            return l_Boolean_0.toJSBoolean(v51) and v51 or l_Observable_0.of();
-        else
-            local v52 = v39:request(v49, v50);
-            return l_Boolean_0.toJSBoolean(v52) and v52 or l_Observable_0.of();
-        end;
-    end);
-end;
-v16.execute = function(v53, v54) --[[ Line: 137 ]] --[[ Name: execute ]]
-    -- upvalues: l_createOperation_0 (copy), l_transformOperation_0 (copy), l_validateOperation_0 (copy), l_Boolean_0 (copy), l_Observable_0 (copy)
-    local v55 = v53:request(l_createOperation_0(v54.context, l_transformOperation_0(l_validateOperation_0(v54))));
-    return l_Boolean_0.toJSBoolean(v55) and v55 or l_Observable_0.of();
-end;
-v16.concat_ = function(v56, v57) --[[ Line: 142 ]] --[[ Name: concat_ ]]
-    -- upvalues: v16 (copy), l_invariant_0 (copy), v27 (copy), l_Boolean_0 (copy), l_Observable_0 (copy)
-    local v58 = if typeof(v56) == "function" then v16.new(v56) else v56;
-    local v59, v60 = debug.info(v58.request, "a");
-    if v59 <= 2 then
-        l_invariant_0.warn(v27.new("You are calling concat on a terminating link, which will have no effect", v58));
-        return v58;
-    else
-        local v61 = if typeof(v57) == "function" then v16.new(v57) else v57;
-        local v62;
-        v60, v62 = debug.info(v61.request, "a");
-        if v60 <= 2 then
-            return v16.new(function(_, v64) --[[ Line: 153 ]]
-                -- upvalues: v58 (copy), v61 (copy), l_Boolean_0 (ref), l_Observable_0 (ref)
-                local v67 = v58:request(v64, function(v65) --[[ Line: 154 ]]
-                    -- upvalues: v61 (ref), l_Boolean_0 (ref), l_Observable_0 (ref)
-                    local v66 = v61:request(v65);
-                    return l_Boolean_0.toJSBoolean(v66) and v66 or l_Observable_0.of();
-                end);
-                return l_Boolean_0.toJSBoolean(v67) and v67 or l_Observable_0.of();
-            end);
-        else
-            return v16.new(function(_, v69, v70) --[[ Line: 161 ]]
-                -- upvalues: v58 (copy), v61 (copy), l_Boolean_0 (ref), l_Observable_0 (ref)
-                local v73 = v58:request(v69, function(v71) --[[ Line: 162 ]]
-                    -- upvalues: v61 (ref), v70 (copy), l_Boolean_0 (ref), l_Observable_0 (ref)
-                    local v72 = v61:request(v71, v70);
-                    return l_Boolean_0.toJSBoolean(v72) and v72 or l_Observable_0.of();
-                end);
-                return l_Boolean_0.toJSBoolean(v73) and v73 or l_Observable_0.of();
-            end);
-        end;
-    end;
-end;
-v16.new = function(v74) --[[ Line: 171 ]] --[[ Name: new ]]
-    -- upvalues: l_Boolean_0 (copy), v16 (copy)
-    local v75 = {};
-    if l_Boolean_0.toJSBoolean(v74) then
-        v75.request = v74;
-    end;
-    return (setmetatable(v75, v16));
-end;
-v16.split = function(v76, v77, v78, v79) --[[ Line: 179 ]] --[[ Name: split ]]
-    -- upvalues: v16 (copy), l_Boolean_0 (copy), v20 (copy)
-    return v76:concat(v16.split_(v77, v78, l_Boolean_0.toJSBoolean(v79) and v79 or v16.new(v20)));
-end;
-v16.concat = function(v80, v81) --[[ Line: 189 ]] --[[ Name: concat ]]
-    -- upvalues: v16 (copy)
-    return v16.concat_(v80, v81);
-end;
-v16.request = function(_, _, _) --[[ Line: 193 ]] --[[ Name: request ]]
-    -- upvalues: l_InvariantError_0 (copy)
-    error(l_InvariantError_0.new("request is not implemented"));
-end;
-v16.onError = function(_, v86, v87) --[[ Line: 197 ]] --[[ Name: onError ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(v87) and v87 ~= nil and l_Boolean_0.toJSBoolean(v87.error) then
-        v87:error(v86);
-        return false;
-    else
-        error(v86);
-        return;
-    end;
-end;
-v16.setOnError = function(v88, v89) --[[ Line: 213 ]] --[[ Name: setOnError ]]
-    v88.onError = v89;
-    return v88;
-end;
-v0.ApolloLink = v16;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local invariant = require(ParentParent.jsutils.invariant)
+local InvariantError = invariant.InvariantError
+local invariant2 = invariant.invariant
+local Observable = require(ParentParent.utilities).Observable
+
+require(script.Parent.types)
+
+local utils = require(script.Parent.Parent.utils)
+local validateOperation = utils.validateOperation
+local createOperation = utils.createOperation
+local transformOperation = utils.transformOperation
+local t2 = {}
+
+t2.__index = t2
+
+local function passthrough(_: {[any]: any}, p1, p2) -- line: 53
+	-- upvalues: Boolean (copy), Observable (copy)
+	if Boolean.toJSBoolean(p2) then
+		return (p2(p1))
+	end
+
+	return Observable.of()
+end
+local function toLink(p3) -- line: 61
+	-- upvalues: t2 (copy)
+	if typeof(p3) == "function" then
+		return t2.new(p3)
+	end
+
+	return p3
+end
+local function isTerminating(t4: {[any]: any}) -- line: 69
+	local v26, _ = debug.info(t4.request, "a")
+
+	return v26 <= 2
+end
+
+local self = setmetatable({}, {
+	__index = Error
+})
+
+self.__index = self
+
+function self.new(s1: string?, t5: {[any]: any}?) -- line: 79
+	-- upvalues: Error (copy), self (copy)
+	local v30 = Error.new(s1)
+
+	v30.link = t5
+
+	return (setmetatable(v30, self))
+end
+function t2.empty() -- line: 86
+	-- upvalues: t2 (copy), Observable (copy)
+	return t2.new(function(_) -- line: 87
+		-- upvalues: Observable (copy)
+		return Observable.of()
+	end)
+end
+function t2.from(p5) -- line: 92
+	-- upvalues: t2 (copy), Array (copy), toLink (copy)
+	if #p5 == 0 then
+		return t2.empty()
+	end
+
+	return (Array.reduce(Array.map(p5, toLink, nil), function(p6, p7) -- line: 96
+		return p6:concat(p7)
+	end))
+end
+function t2.split_(p8: ((...any) -> ...any), p9, p10) -- line: 101
+	-- upvalues: t2 (copy), Boolean (copy), passthrough (copy), Observable (copy)
+	local v35 = if typeof(p9) ~= "function" then p9 else t2.new(p9)
+	local u36
+
+	if Boolean.toJSBoolean(p10) and p10 ~= nil then
+		u36 = if typeof(p10) ~= "function" then p10 else t2.new(p10)
+	else
+		local v37 = t2.new(passthrough)
+
+		u36 = if typeof(v37) ~= "function" then v37 else t2.new(v37)
+	end
+
+	local v38, _ = debug.info(v35.request, "a")
+
+	if v38 <= 2 then
+		local v40 = u36
+		local v41, _ = debug.info(v40.request, "a")
+
+		if v41 <= 2 then
+			return t2.new(function(_, p12) -- line: 115
+				-- upvalues: p8 (copy), v35 (copy), Boolean (copy), Observable (copy), u36 (ref)
+				if p8(p12) then
+					local v75 = v35:request(p12)
+
+					return Boolean.toJSBoolean(v75) and v75 or Observable.of()
+				end
+
+				local v76 = u36:request(p12)
+
+				return Boolean.toJSBoolean(v76) and v76 or Observable.of()
+			end)
+		end
+	end
+
+	return t2.new(function(_, p14, p15) -- line: 125
+		-- upvalues: p8 (copy), v35 (copy), Boolean (copy), Observable (copy), u36 (ref)
+		if p8(p14) then
+			local v80 = v35:request(p14, p15)
+
+			return Boolean.toJSBoolean(v80) and v80 or Observable.of()
+		end
+
+		local v81 = u36:request(p14, p15)
+
+		return Boolean.toJSBoolean(v81) and v81 or Observable.of()
+	end)
+end
+function t2.execute(t6: {[any]: any}, p16) -- line: 137
+	-- upvalues: createOperation (copy), transformOperation (copy), validateOperation (copy), Boolean (copy), Observable (copy)
+	local v45 = t6:request(createOperation(p16.context, transformOperation(validateOperation(p16))))
+
+	return Boolean.toJSBoolean(v45) and v45 or Observable.of()
+end
+function t2.concat_(p17, p18) -- line: 142
+	-- upvalues: t2 (copy), invariant2 (copy), self (copy), Boolean (copy), Observable (copy)
+	local v48 = if typeof(p17) ~= "function" then p17 else t2.new(p17)
+	local v49, _ = debug.info(v48.request, "a")
+
+	if v49 <= 2 then
+		invariant2.warn(self.new("You are calling concat on a terminating link, which will have no effect", v48))
+
+		return v48
+	end
+
+	local v51 = if typeof(p18) ~= "function" then p18 else t2.new(p18)
+	local v52, _ = debug.info(v51.request, "a")
+
+	if v52 <= 2 then
+		return t2.new(function(_, p20) -- line: 153
+			-- upvalues: v48 (copy), v51 (copy), Boolean (copy), Observable (copy)
+			local v84 = v48:request(p20, function(p21) -- line: 154
+				-- upvalues: v51 (copy), Boolean (copy), Observable (copy)
+				local v90 = v51:request(p21)
+
+				return Boolean.toJSBoolean(v90) and v90 or Observable.of()
+			end)
+
+			return Boolean.toJSBoolean(v84) and v84 or Observable.of()
+		end)
+	end
+
+	return t2.new(function(_, p23, p24) -- line: 161
+		-- upvalues: v48 (copy), v51 (copy), Boolean (copy), Observable (copy)
+		local v88 = v48:request(p23, function(p25) -- line: 162
+			-- upvalues: v51 (copy), p24 (copy), Boolean (copy), Observable (copy)
+			local v92 = v51:request(p25, p24)
+
+			return Boolean.toJSBoolean(v92) and v92 or Observable.of()
+		end)
+
+		return Boolean.toJSBoolean(v88) and v88 or Observable.of()
+	end)
+end
+function t2.new(p26) -- line: 171
+	-- upvalues: Boolean (copy), t2 (copy)
+	local t7 = {}
+
+	if Boolean.toJSBoolean(p26) then
+		t7.request = p26
+	end
+
+	return (setmetatable(t7, t2))
+end
+function t2.split(t8: {[any]: any}, p27: ((...any) -> ...any), p28, p29) -- line: 179
+	-- upvalues: t2 (copy), Boolean (copy), passthrough (copy)
+	return t8:concat(t2.split_(p27, p28, Boolean.toJSBoolean(p29) and p29 or t2.new(passthrough)))
+end
+function t2.concat(p30, p31) -- line: 189
+	-- upvalues: t2 (copy)
+	return t2.concat_(p30, p31)
+end
+function t2.request(_, _, _) -- line: 193
+	-- upvalues: InvariantError (copy)
+	error(InvariantError.new("request is not implemented"))
+end
+function t2.onError(_, p36, p37) -- line: 197
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(p37) and (p37 ~= nil and Boolean.toJSBoolean(p37.error)) then
+		p37:error(p36)
+
+		return false
+	end
+
+	error(p36)
+end
+function t2.setOnError(p38, p39) -- line: 213
+	p38.onError = p39
+
+	return p38
+end
+
+t1.ApolloLink = t2
+
+return t1

@@ -1,5 +1,5 @@
 return {
-    Http = "http", 
-    LinkingProtocolRegistered = "linkingProtocolRegistered", 
-    Default = "default"
-};
+	Http = "http",
+	LinkingProtocolRegistered = "linkingProtocolRegistered",
+	Default = "default"
+}

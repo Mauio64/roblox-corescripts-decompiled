@@ -1,35 +1,42 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.util.pcallDeferred);
-local v4 = require(l_Parent_0.flags.getFIntUGCLCCageVerticesSimilarityMaximum);
-local v5 = require(l_Parent_0.Analytics);
-return function(v6, v7, v8, v9) --[[ Line: 14 ]] --[[ Name: validateVerticesSimilarity ]]
-    -- upvalues: v3 (copy), l_UGCValidationService_0 (copy), v5 (copy), v4 (copy)
-    local v10 = tick();
-    local l_isServer_0 = v7.isServer;
-    local v12, v13 = v3(function() --[[ Line: 24 ]]
-        -- upvalues: l_UGCValidationService_0 (ref), v6 (copy), v8 (copy)
-        return l_UGCValidationService_0:GetEditableMeshVerticesSimilarityRate(v6.editableMesh, v8);
-    end, v7);
-    if not v12 then
-        if l_isServer_0 ~= nil and l_isServer_0 then
-            error(string.format("Failed to execute similarity mesh vertex check for '%s'. Make sure mesh exists and try again.", v6.fullName));
-        end;
-        v5.reportFailure(v5.ErrorType.validateVerticesSimilarity_FailedToExecute, nil, v7);
-        return false, {
-            string.format("Failed to execute similarity mesh vertex check for '%s'. Make sure mesh exists and try again.", v6.fullName)
-        };
-    else
-        v13 = math.floor(v13 * 100);
-        if v4() < v13 then
-            v5.reportFailure(v5.ErrorType.validateVerticesSimilarity_MaxSimilarityExceeded, nil, v7);
-            return false, {
-                string.format("%s has %d%% of vertices too close to each other. Please edit the vertices to have at most %d%% coincident or close to one another.", v9, v13, v4()) .. "[Read more](https://create.roblox.com/docs/art/validation-errors#cageDensity)"
-            };
-        else
-            v5.recordScriptTime(script.Name, v10, v7);
-            return true;
-        end;
-    end;
-end;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local getFIntUGCLCCageVerticesSimilarityMaximum = require(ParentParent.flags.getFIntUGCLCCageVerticesSimilarityMaximum)
+local Analytics = require(ParentParent.Analytics)
+
+local function validateVerticesSimilarity(p1, p2, vector3: Vector3, s1: string) -- line: 14
+	-- upvalues: pcallDeferred (copy), UGCValidationService (copy), Analytics (copy), getFIntUGCLCCageVerticesSimilarityMaximum (copy)
+	local timestamp = tick()
+	local isServer = p2.isServer
+	local v13, v14 = pcallDeferred(function() -- line: 24
+		-- upvalues: UGCValidationService (copy), p1 (copy), vector3 (copy)
+		return UGCValidationService:GetEditableMeshVerticesSimilarityRate(p1.editableMesh, vector3)
+	end, p2)
+
+	if not v13 then
+		if isServer ~= nil and isServer then
+			error(string.format("Failed to execute similarity mesh vertex check for '%s'. Make sure mesh exists and try again.", p1.fullName))
+		end
+
+		Analytics.reportFailure(Analytics.ErrorType.validateVerticesSimilarity_FailedToExecute, nil, p2)
+
+		return false, { string.format("Failed to execute similarity mesh vertex check for '%s'. Make sure mesh exists and try again.", p1.fullName) }
+	end
+
+	local v15 = math.floor(v14 * 100)
+
+	if v15 > getFIntUGCLCCageVerticesSimilarityMaximum() then
+		Analytics.reportFailure(Analytics.ErrorType.validateVerticesSimilarity_MaxSimilarityExceeded, nil, p2)
+
+		return false, { string.format("%s has %d%% of vertices too close to each other. Please edit the vertices to have at most %d%% coincident or close to one another.", s1, v15, getFIntUGCLCCageVerticesSimilarityMaximum()) .. "[Read more](https://create.roblox.com/docs/art/validation-errors#cageDensity)" }
+	end
+
+	Analytics.recordScriptTime(script.Name, timestamp, p2)
+
+	return true
+end
+
+return validateVerticesSimilarity

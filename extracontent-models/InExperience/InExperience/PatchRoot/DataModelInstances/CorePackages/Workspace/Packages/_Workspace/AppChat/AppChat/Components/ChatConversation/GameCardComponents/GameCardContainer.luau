@@ -1,300 +1,312 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_FFlagLuaAppDefaultHttpRetry_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDefaultHttpRetry;
-local _ = require(l_script_FirstAncestor_0.types);
-local v6 = require(l_script_FirstAncestor_0.Constants);
-local v7 = require(l_script_FirstAncestor_0.Utils.constructGameThumbnailUrl);
-local v8 = require(l_Parent_0.React);
-local v9 = require(l_Parent_0.Cryo);
-local v10 = require(l_Parent_0.Signals);
-local l_EventStream_0 = require(l_Parent_0.Analytics).AnalyticsReporters.EventStream;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_memo_0 = v8.memo;
-local l_useCallback_0 = v8.useCallback;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v8.useEffect;
-local v17 = require(l_script_FirstAncestor_0.Hooks.useIsExternalNavigationAvailable);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useMemo_0 = v8.useMemo;
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v21 = require(l_Parent_0.Loggers).Logger:new("GameCardContainer");
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local l_GameParams_0 = require(l_Parent_0.ExperienceService).GameParams;
-local l_EventIngest_0 = require(l_Parent_0.Analytics).AnalyticsReporters.EventIngest;
-local l_ApiFetchGameDetails_0 = require(l_Parent_0.GameDetailRodux).GameDetails.ApiFetchGameDetails;
-local l_ApiFetchPlayabilityStatus_0 = require(l_Parent_0.PlayabilityRodux).PlayabilityStatus.ApiFetchPlayabilityStatus;
-local v27 = require(script.Parent.ReportAnEvent);
-local l_AppSessionService_0 = require(l_Parent_0.RoactServiceTags).AppSessionService;
-local l_SessionType_0 = require(l_Parent_0.RobloxAppSessionization).SessionType;
-local l_RoactServices_0 = require(l_Parent_0.RoactServices).RoactServices;
-local l_RoactAnalyticsCommonGameEvents_0 = require(l_Parent_0.RoactServiceTags).RoactAnalyticsCommonGameEvents;
-local v32 = require(script.Parent.GameCardGroupable);
-local v33 = require(l_Parent_0.DataHydration);
-local v34 = require(l_script_FirstAncestor_0.Enums.RoundedVariant);
-local v35 = require(l_script_FirstAncestor_0.Telemetry.useTelemetry);
-local v36 = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatConversationTelemetryLayer);
-local v37 = require(script.Parent.Parent.ChatConversationTelemetryEvents);
-local l_AppGame_0 = l_RoactServices_0.AppGame;
-local l_ExperienceService_0 = require(l_Parent_0.ExperienceService).ExperienceService;
-local l_SetGamePlaySession_0 = require(l_Parent_0.RobloxAppSessionization).SetGamePlaySession;
-local v41 = require(l_script_FirstAncestor_0.Hooks.useIsInExperience);
-local v42 = require(l_Parent_0.HttpRequest);
-local v46 = v42.config({
-    requestFunction = function(v43, v44, v45) --[[ Line: 67 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v21 (copy), v42 (copy)
-        v21:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v44, v43));
-        return v42.requestFunctions.HttpRbxApi(v43, v44, v45);
-    end, 
-    maxRetryCount = if l_FFlagLuaAppDefaultHttpRetry_0 then game:DefineFastInt("GameCardContainerHttpRetryCount", 4) else nil
-});
-local v47 = require(l_script_FirstAncestor_0.EnumScreens);
-local v48 = game:DefineFastFlag("AppChatShutdownBeforeLaunch", false);
-local v49 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatHidePlayButtonsInExp);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v61 = {
-    networkImpl = v46, 
-    eventStream = l_EventStream_0.new(l_RbxAnalyticsService_0), 
-    eventIngest = l_EventIngest_0.new(l_EventIngestService_0), 
-    placeId = nil, 
-    universeId = nil, 
-    conversationId = nil, 
-    luaChatPlayTogetherEnabled = nil, 
-    onDetailsOpened = function() --[[ Line: 114 ]] --[[ Name: onDetailsOpened ]]
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local EventIngestService = game:GetService("EventIngestService")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local FFlagLuaAppDefaultHttpRetry = require(AppChatParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
 
-    end, 
-    onPlayButtonActivated = function(v51) --[[ Line: 116 ]] --[[ Name: onPlayButtonActivated ]]
-        -- upvalues: l_SetGamePlaySession_0 (copy), l_SessionType_0 (copy), v27 (copy), v9 (copy), l_GameParams_0 (copy), v48 (copy), l_ExperienceService_0 (copy)
-        local l_placeId_0 = v51.placeId;
-        local l_senderUserId_0 = v51.senderUserId;
-        l_SetGamePlaySession_0(v51.sessionService, l_SessionType_0.StructuralIdentifier.GamePlayFromChat, true);
-        v27(v51, "clickBtnFromLinkCardInChat", "touch");
-        if l_placeId_0 then
-            local function v55(v54) --[[ Line: 125 ]]
-                -- upvalues: v51 (ref), v9 (ref), v27 (ref)
-                v51 = v9.Dictionary.join(v51, {
-                    joinAttemptId = v54
-                });
-                v27(v51, "gamePlayIntent", "PlayGameFromLinkCard");
-            end;
-            local v56 = l_GameParams_0.fromParams({
-                userId = l_senderUserId_0, 
-                placeId = l_placeId_0
-            });
-            if v48 then
-                game:Shutdown();
-            end;
-            l_ExperienceService_0:LaunchExperience(v56, "PlayGameFromLinkCard", v55);
-        end;
-    end, 
-    openDetails = function(v57) --[[ Line: 143 ]] --[[ Name: openDetails ]]
-        -- upvalues: v27 (copy)
-        local l_universeId_0 = v57.universeId;
-        local l_placeId_1 = v57.placeId;
-        v27(v57, "clickLinkCardInChat", "touch");
-        v57.onDetailsOpened();
-        v57.openGameDetailsPage(l_universeId_0, "LuaChatAssetCard");
-        local v60 = v57.analytics and v57.analytics.reportOpenGameDetailFromChat;
-        if v60 then
-            v60(l_placeId_1, v57.conversationId, l_universeId_0, "GameDetailFromLinkCard");
-        end;
-    end
-};
-local function _(v62, v63) --[[ Line: 160 ]] --[[ Name: getGameDetails ]]
-    return v62.GameDetails[v63] or {};
-end;
-local function _(v65, v66) --[[ Line: 164 ]] --[[ Name: getGamePlayabilityStatus ]]
-    return v65.PlayabilityStatus[v66] or {};
-end;
-GameCardContainer = function(v68) --[[ Line: 168 ]] --[[ Name: GameCardContainer ]]
-    -- upvalues: v9 (copy), v61 (copy), l_useSelector_0 (copy), l_useCallback_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v7 (copy), v6 (copy), v17 (copy), v47 (copy), l_useDispatch_0 (copy), l_ApiFetchGameDetails_0 (copy), l_ApiFetchPlayabilityStatus_0 (copy), v33 (copy), v10 (copy), l_useMemo_0 (copy), l_useSignalState_0 (copy), v35 (copy), v36 (copy), l_useEffect_0 (copy), v37 (copy), v34 (copy), v8 (copy), v32 (copy), v41 (copy), v49 (copy), l_withLocalization_0 (copy)
-    local v69 = v9.Dictionary.join(v61, v68);
-    if not v69.universeId then
-        assert("universeId does not exist", "universeId does not exist");
-    end;
-    local v72 = l_useSelector_0(l_useCallback_0(function(v70) --[[ Line: 174 ]]
-        -- upvalues: v69 (copy)
-        local l_universeId_1 = v69.universeId;
-        return v70.GameDetails[l_universeId_1] or {};
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v69.universeId
-    } else l_dependencyArray_0(v69.universeId)));
-    local v75 = l_useSelector_0(l_useCallback_0(function(v73) --[[ Line: 178 ]]
-        -- upvalues: v69 (copy)
-        local l_universeId_2 = v69.universeId;
-        return v73.PlayabilityStatus[l_universeId_2] or {};
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v69.universeId
-    } else l_dependencyArray_0(v69.universeId)));
-    local v76 = v7(v69.placeId, v6.GameCard.THUMBNAIL_WIDTH, v6.GameCard.THUMBNAIL_HEIGHT);
-    local v77 = ("rbxthumb://type=GameIcon&id=%*&w=%*&h=%*"):format(v69.universeId, 150, 150);
-    local v78 = v17({
-        v47.GameDetail
-    });
-    local v79 = v69.placeId or v72.rootPlaceId;
-    local l_name_0 = v72.name;
-    local v81 = v72.description or "";
-    local v82 = v72.price or 0;
-    local v83 = l_useDispatch_0();
-    local function v86(v84, v85) --[[ Line: 200 ]]
-        -- upvalues: v83 (copy), l_ApiFetchGameDetails_0 (ref), l_ApiFetchPlayabilityStatus_0 (ref)
-        v83(l_ApiFetchGameDetails_0.Fetch(v84, {
-            v85
-        }));
-        v83(l_ApiFetchPlayabilityStatus_0.Fetch(v84, {
-            v85
-        }));
-    end;
-    local v87 = v33.Game.getVotesStore(false);
-    local v88 = v10.createSignal(nil);
-    local v89 = v10.createSignal("NotReady");
-    local v90 = l_useMemo_0(function() --[[ Line: 210 ]]
-        -- upvalues: v69 (copy), v88 (copy), v89 (copy), v87 (copy)
-        if not v69.universeId then
-            return {
-                data = v88, 
-                status = v89
-            };
-        else
-            return v87.getAndFetchVotes({
-                v69.universeId
-            })[v69.universeId] or {
-                data = v88, 
-                status = v89
-            };
-        end;
-    end, {
-        v87, 
-        v69.universeId
-    });
-    local v91 = l_useSignalState_0(v90.data);
-    local v92 = l_useSignalState_0(v90.status);
-    local v94 = l_useMemo_0(function() --[[ Line: 230 ]]
-        -- upvalues: v91 (copy)
-        if v91 and v91.upVotes and v91.downVotes then
-            local v93 = v91.upVotes + v91.downVotes;
-            if v93 > 0 then
-                return tostring((math.floor(v91.upVotes / v93 * 100))) .. "%";
-            end;
-        end;
-        return "--";
-    end, {
-        v91
-    });
-    local v95 = v35(v36.Context);
-    l_useEffect_0(function() --[[ Line: 242 ]]
-        -- upvalues: v69 (copy), v86 (copy)
-        local l_universeId_3 = v69.universeId;
-        if not l_universeId_3 then
-            return;
-        else
-            v86(v69.networkImpl, l_universeId_3);
-            return;
-        end;
-    end, {
-        v69.universeId, 
-        v69.networkImpl
-    });
-    local v97 = l_useCallback_0(function() --[[ Line: 253 ]]
-        -- upvalues: v95 (copy), v37 (ref), v69 (copy), v79 (copy)
-        v95.emit(v37.GameCardThumbnailClicked, {
-            universeId = v69.universeId, 
-            placeId = v79
-        });
-        v69.openDetails(v69);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v95, 
-        v69.openDetails, 
-        v69.universeId, 
-        v79
-    } else l_dependencyArray_0(v95, v69.openDetails, v69.universeId, v79));
-    local v98 = l_useCallback_0(function() --[[ Line: 266 ]]
-        -- upvalues: v95 (copy), v37 (ref), v69 (copy), v79 (copy)
-        v95.emit(v37.GameCardPlayButtonClicked, {
-            universeId = v69.universeId, 
-            placeId = v79
-        });
-        v69.onPlayButtonActivated(v69);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v95, 
-        v69.onPlayButtonActivated, 
-        v69.universeId, 
-        v79
-    } else l_dependencyArray_0(v95, v69.onPlayButtonActivated, v69.universeId, v79));
-    local v99 = l_useCallback_0(function() --[[ Line: 279 ]]
-        -- upvalues: v95 (copy), v37 (ref), v69 (copy), v79 (copy)
-        v95.emit(v37.GameCardMetadataClicked, {
-            universeId = v69.universeId, 
-            placeId = v79
-        });
-        v69.openDetails(v69);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v95, 
-        v69.openDetails, 
-        v69.universeId, 
-        v79
-    } else l_dependencyArray_0(v95, v69.openDetails, v69.universeId, v79));
-    local function v107(v100) --[[ Line: 291 ]] --[[ Name: renderCard ]]
-        -- upvalues: v34 (ref), v97 (copy), v98 (copy), v99 (copy), v8 (ref), v32 (ref)
-        local v101 = not v100.universeId or not v100.gameName or not v100.gameThumbnail or v100.votesStatus == "NotReady" or not v100.gamePlayerCount;
-        local v102 = false;
-        if v100.isPlayButtonEnabled and v100.playabilityStatus then
-            v102 = v100.playabilityStatus.isPlayable == true;
-        end;
-        local v103 = if v100.isStartOfGroup then v34.Top else if v100.isIncoming then v34.TopRight else v34.TopLeft;
-        local v104 = if v100.openDetails then v97 else nil;
-        local v105 = if v100.onPlayButtonActivated then v98 else nil;
-        local v106 = if v100.openDetails then v99 else nil;
-        return v8.createElement(v32, {
-            gameName = v100.gameName, 
-            gameDescription = v100.gameDescription, 
-            gameThumbnail = v100.gameThumbnail, 
-            gameRating = v100.gameRating, 
-            gamePlayerCount = v100.gamePlayerCount, 
-            thumbnailAspectRatio = 1.7777777777777777, 
-            thumbnailRoundedVariant = v103, 
-            shouldShowPlayButton = v102, 
-            onPlayButtonActivated = v105, 
-            onThumbnailActivated = v104, 
-            onMetadataActivated = v106, 
-            isRepliedTo = v100.isRepliedTo, 
-            isIncoming = v100.isIncoming, 
-            isPending = v100.isPending, 
-            isLoading = v101, 
-            LayoutOrder = v100.layoutOrder
-        });
-    end;
-    local v108 = v41();
-    local v109 = not v49() or not v108 or false;
-    return l_withLocalization_0({
-        purchaseGameText = "Feature.GameDetails.Heading.PurchaseGame", 
-        viewDetailsText = "Feature.Chat.Action.ViewAssetDetails", 
-        playText = "Common.VisitGame.Label.Play", 
-        noDescriptionText = "Feature.Chat.Label.NoDescriptionYet"
-    })(function(_) --[[ Line: 342 ]]
-        -- upvalues: v9 (ref), v69 (copy), v72 (copy), v75 (copy), v77 (copy), v79 (copy), l_name_0 (copy), v81 (copy), v82 (copy), v109 (copy), v78 (copy), v47 (ref), v86 (copy), v76 (copy), v94 (copy), v92 (copy), v107 (copy)
-        local v111 = v9.Dictionary.join(v69, {
-            details = v72, 
-            playabilityStatus = v75, 
-            gameIcon = v77, 
-            placeId = v79, 
-            gameName = l_name_0, 
-            gameDescription = v81, 
-            gamePrice = v82, 
-            isPlayButtonEnabled = v109, 
-            viewDetailsEnabled = v78[v47.GameDetail], 
-            fetchGameData = v86, 
-            gameThumbnail = v76, 
-            gameRating = v94, 
-            gamePlayerCount = v72.playing or 0, 
-            votesStatus = v92
-        });
-        return v107(v111);
-    end);
-end;
-return l_RoactServices_0.connect({
-    game = l_AppGame_0, 
-    sessionService = l_AppSessionService_0, 
-    analytics = l_RoactAnalyticsCommonGameEvents_0
-})(l_memo_0(GameCardContainer));
+require(AppChat.types)
+
+local Constants = require(AppChat.Constants)
+local constructGameThumbnailUrl = require(AppChat.Utils.constructGameThumbnailUrl)
+local React = require(AppChatParent.React)
+local Cryo = require(AppChatParent.Cryo)
+local Signals = require(AppChatParent.Signals)
+local EventStream = require(AppChatParent.Analytics).AnalyticsReporters.EventStream
+local memo = React.memo
+local useCallback = React.useCallback
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useIsExternalNavigationAvailable = require(AppChat.Hooks.useIsExternalNavigationAvailable)
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useMemo = React.useMemo
+local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local v20 = require(AppChatParent.Loggers).Logger:new("GameCardContainer")
+local withLocalization = require(AppChatParent.Localization).withLocalization
+local GameParams = require(AppChatParent.ExperienceService).GameParams
+local EventIngest = require(AppChatParent.Analytics).AnalyticsReporters.EventIngest
+local ApiFetchGameDetails = require(AppChatParent.GameDetailRodux).GameDetails.ApiFetchGameDetails
+local ApiFetchPlayabilityStatus = require(AppChatParent.PlayabilityRodux).PlayabilityStatus.ApiFetchPlayabilityStatus
+local ReportAnEvent = require(script.Parent.ReportAnEvent)
+local AppSessionService = require(AppChatParent.RoactServiceTags).AppSessionService
+local SessionType = require(AppChatParent.RobloxAppSessionization).SessionType
+local RoactServices = require(AppChatParent.RoactServices).RoactServices
+local RoactAnalyticsCommonGameEvents = require(AppChatParent.RoactServiceTags).RoactAnalyticsCommonGameEvents
+local GameCardGroupable = require(script.Parent.GameCardGroupable)
+local DataHydration = require(AppChatParent.DataHydration)
+local RoundedVariant = require(AppChat.Enums.RoundedVariant)
+local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
+local ChatConversationTelemetryEvents = require(script.Parent.Parent.ChatConversationTelemetryEvents)
+local AppGame = RoactServices.AppGame
+local ExperienceService = require(AppChatParent.ExperienceService).ExperienceService
+local SetGamePlaySession = require(AppChatParent.RobloxAppSessionization).SetGamePlaySession
+local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
+local HttpRequest = require(AppChatParent.HttpRequest)
+local v42 = HttpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 66
+		-- upvalues: v20 (copy), HttpRequest (copy)
+		v20:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("GameCardContainerHttpRetryCount", 4)
+})
+local EnumScreens = require(AppChat.EnumScreens)
+local v44 = game:DefineFastFlag("AppChatShutdownBeforeLaunch", false)
+local getFFlagAppChatHidePlayButtonsInExp = require(AppChat.Flags.getFFlagAppChatHidePlayButtonsInExp)
+local t1 = {
+	placeId = nil,
+	universeId = nil,
+	conversationId = nil,
+	luaChatPlayTogetherEnabled = nil,
+	networkImpl = v42,
+	eventStream = EventStream.new(RbxAnalyticsService),
+	eventIngest = EventIngest.new(EventIngestService),
+	onDetailsOpened = function() -- line: 111
+	end,
+	onPlayButtonActivated = function(p4) -- line: 113
+		-- upvalues: SetGamePlaySession (copy), SessionType (copy), ReportAnEvent (copy), Cryo (copy), GameParams (copy), v44 (copy), ExperienceService (copy)
+		local placeId = p4.placeId
+		local senderUserId = p4.senderUserId
+
+		SetGamePlaySession(p4.sessionService, SessionType.StructuralIdentifier.GamePlayFromChat, true)
+		ReportAnEvent(p4, "clickBtnFromLinkCardInChat", "touch")
+
+		if placeId then
+			local v56 = GameParams.fromParams({
+				userId = senderUserId,
+				placeId = placeId
+			})
+
+			if v44 then
+				game:Shutdown()
+			end
+
+			ExperienceService:LaunchExperience(v56, "PlayGameFromLinkCard", function(s1: string?) -- line: 122
+				-- upvalues: p4 (ref), Cryo (copy), ReportAnEvent (copy)
+				p4 = Cryo.Dictionary.join(p4, {
+					joinAttemptId = s1
+				})
+				ReportAnEvent(p4, "gamePlayIntent", "PlayGameFromLinkCard")
+			end)
+		end
+	end,
+	openDetails = function(p5) -- line: 140
+		-- upvalues: ReportAnEvent (copy)
+		local universeId = p5.universeId
+		local placeId = p5.placeId
+
+		ReportAnEvent(p5, "clickLinkCardInChat", "touch")
+		p5.onDetailsOpened()
+		p5.openGameDetailsPage(universeId, "LuaChatAssetCard")
+
+		local v60 = p5.analytics and p5.analytics.reportOpenGameDetailFromChat
+
+		if v60 then
+			v60(placeId, p5.conversationId, universeId, "GameDetailFromLinkCard")
+		end
+	end
+}
+
+local function getGameDetails(p6, p7) -- line: 157
+	return p6.GameDetails[p7] or {}
+end
+local function getGamePlayabilityStatus(p8, p9) -- line: 161
+	return p8.PlayabilityStatus[p9] or {}
+end
+
+function GameCardContainer(p10) -- line: 165
+	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), useCallback (copy), constructGameThumbnailUrl (copy), Constants (copy), useIsExternalNavigationAvailable (copy), EnumScreens (copy), useDispatch (copy), ApiFetchGameDetails (copy), ApiFetchPlayabilityStatus (copy), DataHydration (copy), Signals (copy), useMemo (copy), useSignalState (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), useEffect (copy), ChatConversationTelemetryEvents (copy), RoundedVariant (copy), React (copy), GameCardGroupable (copy), useIsInExperience (copy), getFFlagAppChatHidePlayButtonsInExp (copy), withLocalization (copy)
+	local v66 = Cryo.Dictionary.join(t1, p10)
+
+	if not v66.universeId then
+		assert("universeId does not exist", "universeId does not exist")
+	end
+
+	local v67 = useSelector(useCallback(function(p11) -- line: 171
+		-- upvalues: v66 (copy)
+		local universeId = v66.universeId
+
+		return p11.GameDetails[universeId] or {}
+	end, { v66.universeId }))
+	local v68 = useSelector(useCallback(function(p12) -- line: 175
+		-- upvalues: v66 (copy)
+		local universeId = v66.universeId
+
+		return p12.PlayabilityStatus[universeId] or {}
+	end, { v66.universeId }))
+	local v69 = constructGameThumbnailUrl(v66.placeId, Constants.GameCard.THUMBNAIL_WIDTH, Constants.GameCard.THUMBNAIL_HEIGHT)
+	local v70 = `rbxthumb://type=GameIcon&id={ v66.universeId }&w={ 150 }&h={ 150 }`
+	local v71 = useIsExternalNavigationAvailable({ EnumScreens.GameDetail })
+	local v72 = v66.placeId or v67.rootPlaceId
+	local name = v67.name
+	local v74 = v67.description or ""
+	local v75 = v67.price or 0
+	local v76 = useDispatch()
+
+	local function v77(p13, p14) -- line: 197
+		-- upvalues: v76 (copy), ApiFetchGameDetails (copy), ApiFetchPlayabilityStatus (copy)
+		v76(ApiFetchGameDetails.Fetch(p13, { p14 }))
+		v76(ApiFetchPlayabilityStatus.Fetch(p13, { p14 }))
+	end
+
+	local v78 = DataHydration.Game.getVotesStore(false)
+	local v79 = Signals.createSignal(nil)
+	local v80 = Signals.createSignal("NotReady")
+	local v81 = useMemo(function() -- line: 207
+		-- upvalues: v66 (copy), v79 (copy), v80 (copy), v78 (copy)
+		if not v66.universeId then
+			return {
+				data = v79,
+				status = v80
+			}
+		end
+
+		return v78.getAndFetchVotes({ v66.universeId })[v66.universeId] or {
+			data = v79,
+			status = v80
+		}
+	end, {
+		v78,
+		v66.universeId
+	})
+	local v82 = useSignalState(v81.data)
+	local v83 = useSignalState(v81.status)
+	local v84 = useMemo(function() -- line: 227
+		-- upvalues: v82 (copy)
+		if v82 and (v82.upVotes and v82.downVotes) then
+			local v99 = v82.upVotes + v82.downVotes
+
+			if v99 > 0 then
+				return tostring((math.floor(v82.upVotes / v99 * 100))) .. "%"
+			end
+		end
+
+		return "--"
+	end, { v82 })
+	local v85 = useTelemetry(ChatConversationTelemetryLayer.Context)
+
+	useEffect(function() -- line: 239
+		-- upvalues: v66 (copy), v77 (copy)
+		local universeId = v66.universeId
+
+		if not universeId then
+			return
+		end
+
+		v77(v66.networkImpl, universeId)
+	end, {
+		v66.universeId,
+		v66.networkImpl
+	})
+
+	local v86 = useCallback(function() -- line: 249
+		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
+		v85.emit(ChatConversationTelemetryEvents.GameCardThumbnailClicked, {
+			universeId = v66.universeId,
+			placeId = v72
+		})
+		v66.openDetails(v66)
+	end, {
+		v85,
+		v66.openDetails,
+		v66.universeId,
+		v72
+	})
+	local v87 = useCallback(function() -- line: 257
+		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
+		v85.emit(ChatConversationTelemetryEvents.GameCardPlayButtonClicked, {
+			universeId = v66.universeId,
+			placeId = v72
+		})
+		v66.onPlayButtonActivated(v66)
+	end, {
+		v85,
+		v66.onPlayButtonActivated,
+		v66.universeId,
+		v72
+	})
+	local v88 = useCallback(function() -- line: 265
+		-- upvalues: v85 (copy), ChatConversationTelemetryEvents (copy), v66 (copy), v72 (copy)
+		v85.emit(ChatConversationTelemetryEvents.GameCardMetadataClicked, {
+			universeId = v66.universeId,
+			placeId = v72
+		})
+		v66.openDetails(v66)
+	end, {
+		v85,
+		v66.openDetails,
+		v66.universeId,
+		v72
+	})
+
+	local function renderCard(p15) -- line: 273
+		-- upvalues: RoundedVariant (copy), v86 (copy), v87 (copy), v88 (copy), React (copy), GameCardGroupable (copy)
+		local v102 = not p15.universeId or (not p15.gameName or (not p15.gameThumbnail or (p15.votesStatus == "NotReady" or not p15.gamePlayerCount)))
+		local v103 = false
+
+		if p15.isPlayButtonEnabled and p15.playabilityStatus then
+			v103 = p15.playabilityStatus.isPlayable == true
+		end
+
+		local v104 = if not p15.isStartOfGroup then if not p15.isIncoming then RoundedVariant.TopLeft else RoundedVariant.TopRight else RoundedVariant.Top
+		local v105 = if not p15.openDetails then nil else v86
+		local v106 = if not p15.onPlayButtonActivated then nil else v87
+		local v107 = if not p15.openDetails then nil else v88
+
+		return React.createElement(GameCardGroupable, {
+			thumbnailAspectRatio = 1.7777777777777777,
+			gameName = p15.gameName,
+			gameDescription = p15.gameDescription,
+			gameThumbnail = p15.gameThumbnail,
+			gameRating = p15.gameRating,
+			gamePlayerCount = p15.gamePlayerCount,
+			thumbnailRoundedVariant = v104,
+			shouldShowPlayButton = v103,
+			onPlayButtonActivated = v106,
+			onThumbnailActivated = v105,
+			onMetadataActivated = v107,
+			isRepliedTo = p15.isRepliedTo,
+			isIncoming = p15.isIncoming,
+			isPending = p15.isPending,
+			isLoading = v102,
+			LayoutOrder = p15.layoutOrder
+		})
+	end
+
+	local v90 = useIsInExperience()
+	local v91 = not getFFlagAppChatHidePlayButtonsInExp() or not v90
+
+	return withLocalization({
+		purchaseGameText = "Feature.GameDetails.Heading.PurchaseGame",
+		viewDetailsText = "Feature.Chat.Action.ViewAssetDetails",
+		playText = "Common.VisitGame.Label.Play",
+		noDescriptionText = "Feature.Chat.Label.NoDescriptionYet"
+	})(function(_) -- line: 324
+		-- upvalues: Cryo (copy), v66 (copy), v67 (copy), v68 (copy), v70 (copy), v72 (copy), name (copy), v74 (copy), v75 (copy), v91 (copy), v71 (copy), EnumScreens (copy), v77 (copy), v69 (copy), v84 (copy), v83 (copy), renderCard (copy)
+		local v109 = Cryo.Dictionary.join(v66, {
+			details = v67,
+			playabilityStatus = v68,
+			gameIcon = v70,
+			placeId = v72,
+			gameName = name,
+			gameDescription = v74,
+			gamePrice = v75,
+			isPlayButtonEnabled = v91,
+			viewDetailsEnabled = v71[EnumScreens.GameDetail],
+			fetchGameData = v77,
+			gameThumbnail = v69,
+			gameRating = v84,
+			gamePlayerCount = v67.playing or 0,
+			votesStatus = v83
+		})
+
+		return renderCard(v109)
+	end)
+end
+
+return RoactServices.connect({
+	game = AppGame,
+	sessionService = AppSessionService,
+	analytics = RoactAnalyticsCommonGameEvents
+})(memo(GameCardContainer))

@@ -1,5 +1,5 @@
 return {
-    ContactsToastSeen = "ContactsToastSeen", 
-    ContactsToastDismissed = "ContactsToastDismissed", 
-    ContactsToastButtonPressed = "ContactsToastButtonPressed"
-};
+	ContactsToastSeen = "ContactsToastSeen",
+	ContactsToastDismissed = "ContactsToastDismissed",
+	ContactsToastButtonPressed = "ContactsToastButtonPressed"
+}

@@ -1,47 +1,57 @@
-local _ = require(script.Parent.Parent.EventType);
-local v1 = {
-    Name = "MoveToGoalEvent"
-};
-local v2 = nil;
-local function _(v3, v4) --[[ Line: 11 ]] --[[ Name: spawnGoalArea ]]
-    local l_Part_0 = Instance.new("Part");
-    l_Part_0.Anchored = true;
-    l_Part_0.CanCollide = false;
-    l_Part_0.Transparency = 1;
-    l_Part_0.Size = Vector3.new(math.abs(v4.X - v3.X), 1, (math.abs(v4.Z - v3.Z)));
-    l_Part_0.Position = Vector3.new((v4.X + v3.X) / 2, 6.3, (v4.Z + v3.Z) / 2);
-    l_Part_0.Parent = workspace;
-    return l_Part_0;
-end;
-v1.StartEvent = function(v7) --[[ Line: 24 ]] --[[ Name: StartEvent ]]
-    -- upvalues: v2 (ref)
-    local l_Part_1 = Instance.new("Part");
-    l_Part_1.Anchored = true;
-    l_Part_1.CanCollide = false;
-    l_Part_1.Transparency = 1;
-    l_Part_1.Size = Vector3.new(17, 1, 18, 0);
-    l_Part_1.Position = Vector3.new(0.5, 6.300000190734863, -40, 0);
-    l_Part_1.Parent = workspace;
-    local l_l_Part_1_0 = l_Part_1;
-    task.wait(1);
-    v2 = l_l_Part_1_0.Touched:Connect(function(v10) --[[ Line: 32 ]]
-        -- upvalues: l_l_Part_1_0 (copy), v7 (copy), v2 (ref)
-        if game.Players:GetPlayerFromCharacter(v10.Parent) then
-            l_l_Part_1_0:Destroy();
-            task.wait(0.2);
-            v7();
-            if v2 then
-                v2:Disconnect();
-                v2 = nil;
-            end;
-        end;
-    end);
-end;
-v1.StopEvent = function() --[[ Line: 51 ]] --[[ Name: StopEvent ]]
-    -- upvalues: v2 (ref)
-    if v2 then
-        v2:Disconnect();
-        v2 = nil;
-    end;
-end;
-return v1;
+require(script.Parent.Parent.EventType)
+
+local t1 = {
+	Name = "MoveToGoalEvent"
+}
+local u2 = nil
+
+local function spawnGoalArea(vector3: Vector3, vector3_2: Vector3) -- line: 11
+	local Part = Instance.new("Part")
+
+	Part.Anchored = true
+	Part.CanCollide = false
+	Part.Transparency = 1
+	Part.Size = Vector3.new(math.abs(vector3_2.X - vector3.X), 1, (math.abs(vector3_2.Z - vector3.Z)))
+	Part.Position = Vector3.new((vector3_2.X + vector3.X) / 2, 6.3, (vector3_2.Z + vector3.Z) / 2)
+	Part.Parent = workspace
+
+	return Part
+end
+
+function t1.StartEvent(p1) -- line: 24
+	-- upvalues: u2 (ref)
+	local Part = Instance.new("Part")
+
+	Part.Anchored = true
+	Part.CanCollide = false
+	Part.Transparency = 1
+	Part.Size = Vector3.new(17, 1, 18)
+	Part.Position = Vector3.new(0.5, 6.300000190734863, -40)
+	Part.Parent = workspace
+
+	local v9 = Part
+
+	task.wait(1)
+	u2 = v9.Touched:Connect(function(part) -- line: 32
+		-- upvalues: v9 (copy), p1 (copy), u2 (ref)
+		if game.Players:GetPlayerFromCharacter(part.Parent) then
+			v9:Destroy()
+			task.wait(0.2)
+			p1()
+
+			if u2 then
+				u2:Disconnect()
+				u2 = nil
+			end
+		end
+	end)
+end
+function t1.StopEvent() -- line: 51
+	-- upvalues: u2 (ref)
+	if u2 then
+		u2:Disconnect()
+		u2 = nil
+	end
+end
+
+return t1

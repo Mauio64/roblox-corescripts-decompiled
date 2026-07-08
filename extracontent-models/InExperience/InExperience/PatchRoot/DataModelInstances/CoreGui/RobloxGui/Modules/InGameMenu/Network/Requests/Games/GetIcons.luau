@@ -1,6 +1,7 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Network.Url);
-return function(v2, v3) --[[ Line: 20 ]]
-    -- upvalues: v1 (copy)
-    return v2(string.format("%sv1/games/%d/icon", v1.GAME_URL, v3), "GET");
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Url = require(ParentParent.Network.Url)
+
+return function(p1, p2) -- line: 20
+	-- upvalues: Url (copy)
+	return p1(string.format("%sv1/games/%d/icon", Url.GAME_URL, p2), "GET")
+end

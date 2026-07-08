@@ -1,23 +1,26 @@
-local v0 = require(script.Parent.createSignal);
-return function(v1) --[[ Line: 30 ]] --[[ Name: createReadableSignal ]]
-    -- upvalues: v0 (copy)
-    local v2, v3 = v0();
-    local l_v1_0 = v1;
-    local function v7(_, v6) --[[ Line: 35 ]] --[[ Name: subscribe ]]
-        -- upvalues: v2 (copy)
-        return v2:subscribe(v6);
-    end;
-    local function v9(_) --[[ Line: 39 ]] --[[ Name: getValue ]]
-        -- upvalues: l_v1_0 (ref)
-        return l_v1_0;
-    end;
-    local function v11(v10) --[[ Line: 43 ]] --[[ Name: fire ]]
-        -- upvalues: l_v1_0 (ref), v3 (copy)
-        l_v1_0 = v10;
-        v3(v10);
-    end;
-    return {
-        subscribe = v7, 
-        getValue = v9
-    }, v11;
-end;
+local createSignal = require(script.Parent.createSignal)
+
+local function createReadableSignal(p1) -- line: 30
+	-- upvalues: createSignal (copy)
+	local v4, v5 = createSignal()
+	local u6 = p1
+
+	local function fire(p2) -- line: 43
+		-- upvalues: u6 (ref), v5 (copy)
+		u6 = p2
+		v5(p2)
+	end
+
+	return {
+		subscribe = function(_: {[any]: any}, p3: ((...any) -> ...any)) -- line: 35
+			-- upvalues: v4 (copy)
+			return v4:subscribe(p3)
+		end,
+		getValue = function(_: {[any]: any}) -- line: 39
+			-- upvalues: u6 (ref)
+			return u6
+		end
+	}, fire
+end
+
+return createReadableSignal

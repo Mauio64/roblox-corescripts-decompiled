@@ -1,7 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.SlotBasedEditorContext);
-return function() --[[ Line: 13 ]] --[[ Name: useSlotBasedEditorContext ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return (v1.useContext(v2));
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local React = require(Parent.React)
+local SlotBasedEditorContext = require(script.Parent.SlotBasedEditorContext)
+
+local function useSlotBasedEditorContext() -- line: 13
+	-- upvalues: React (copy), SlotBasedEditorContext (copy)
+	return (React.useContext(SlotBasedEditorContext))
+end
+
+return useSlotBasedEditorContext

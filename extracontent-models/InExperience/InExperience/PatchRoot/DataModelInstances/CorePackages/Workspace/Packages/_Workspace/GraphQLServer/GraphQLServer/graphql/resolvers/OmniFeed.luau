@@ -1,3 +1,3 @@
 return {
-    default = require(script.OmniFeedResolver).default
-};
+	default = require(script.OmniFeedResolver).default
+}

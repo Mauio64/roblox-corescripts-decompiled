@@ -1,14 +1,16 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Utils.getDeepValue);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1(v2, "keys");
-    local v4 = v1(v2, "values");
-    local v5 = nil;
-    for _, v7 in pairs(v3) do
-        if v4[v7] and v4[v7].previousMessageId == nil then
-            return v7;
-        end;
-    end;
-    return v5;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local getDeepValue = require(AppChat.Utils.getDeepValue)
+
+return function(p1) -- line: 4
+	-- upvalues: getDeepValue (copy)
+	local v4 = getDeepValue(p1, "keys")
+	local v5 = getDeepValue(p1, "values")
+
+	for _, v in pairs(v4) do
+		if v5[v] and v5[v].previousMessageId == nil then
+			return v
+		end
+	end
+
+	return nil
+end

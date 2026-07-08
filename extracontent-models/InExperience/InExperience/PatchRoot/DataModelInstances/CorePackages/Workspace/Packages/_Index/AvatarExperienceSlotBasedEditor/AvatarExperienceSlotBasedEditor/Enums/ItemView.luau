@@ -1,5 +1,5 @@
 return {
-    Off = "Off", 
-    AllItems = "AllItems", 
-    SlotItems = "SlotItems"
-};
+	Off = "Off",
+	AllItems = "AllItems",
+	SlotItems = "SlotItems"
+}

@@ -30,32 +30,49 @@ v14.defaultProps = {
 	isMostRecent = true
 }
 
+local function initMockSizingLabel() -- line: 41
+	-- upvalues: CoreGui (copy)
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.Enabled = false
+	ScreenGui.Name = "RichTextSizingLabel"
+
+	local TextLabel = Instance.new("TextLabel")
+
+	TextLabel.TextWrapped = true
+	TextLabel.RichText = true
+	TextLabel.Parent = ScreenGui
+	ScreenGui.Parent = CoreGui
+
+	return TextLabel
+end
+
 function v14.init(p1) -- line: 53
 	-- upvalues: Roact (copy), Otter (copy), TextChatService (copy)
-	local v18, v19 = Roact.createBinding(0)
+	local v20, v21 = Roact.createBinding(0)
 
-	p1.width = v18
-	p1.updateWidth = v19
+	p1.width = v20
+	p1.updateWidth = v21
 	p1.widthMotor = Otter.createSingleMotor(0)
 	p1.widthMotor:onStep(function(p2) -- line: 56
 		-- upvalues: p1 (copy)
 		p1.updateWidth((math.round(p2)))
 	end)
 
-	local v20, v21 = Roact.createBinding(0)
+	local v22, v23 = Roact.createBinding(0)
 
-	p1.height = v20
-	p1.updateHeight = v21
+	p1.height = v22
+	p1.updateHeight = v23
 	p1.heightMotor = Otter.createSingleMotor(0)
 	p1.heightMotor:onStep(function(p3) -- line: 62
 		-- upvalues: p1 (copy)
 		p1.updateHeight((math.round(p3)))
 	end)
 
-	local v22, v23 = Roact.createBinding(1)
+	local v24, v25 = Roact.createBinding(1)
 
-	p1.transparency = v22
-	p1.updateTransparency = v23
+	p1.transparency = v24
+	p1.updateTransparency = v25
 	p1.transparencyMotor = Otter.createSingleMotor(1)
 	p1.transparencyMotor:onStep(p1.updateTransparency)
 	p1.size = Roact.joinBindings({
@@ -105,14 +122,14 @@ function v14.render(p11) -- line: 116
 	local chatSettings = p11.props.chatSettings
 	local BackgroundImage = chatSettings.BackgroundImage
 	local BackgroundGradient = chatSettings.BackgroundGradient
-	local v39 = p11.props.renderInsert and p11.props.insertSize.X + chatSettings.Padding or 0
+	local v41 = p11.props.renderInsert and p11.props.insertSize.X + chatSettings.Padding or 0
 
 	return Roact.createElement("Frame", {
+		Transparency = 1,
 		LayoutOrder = p11.props.timestamp,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Size = p11.size,
-		Position = UDim2.fromScale(1, 0.5),
-		Transparency = 1
+		Position = UDim2.fromScale(1, 0.5)
 	}, {
 		Layout = Roact.createElement("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -121,13 +138,13 @@ function v14.render(p11) -- line: 116
 		}),
 		Frame = Roact.createElement("ImageLabel", Cryo.Dictionary.join(BackgroundImage, {
 			LayoutOrder = 1,
+			BorderSizePixel = 0,
+			ClipsDescendants = true,
 			BackgroundColor3 = chatSettings.BackgroundColor3,
 			AnchorPoint = Vector2.new(0.5, 0),
 			Size = UDim2.fromScale(1, 1),
-			BorderSizePixel = 0,
 			Position = UDim2.new(0.5, 0, 0, 0),
 			BackgroundTransparency = if BackgroundImage.Image == "" then p11.transparency else 1,
-			ClipsDescendants = true,
 			ImageTransparency = p11.transparency
 		}), {
 			UICorner = chatSettings.CornerEnabled and Roact.createElement("UICorner", {
@@ -147,18 +164,18 @@ function v14.render(p11) -- line: 116
 			}),
 			Insert = p11.props.renderInsert and p11.props.renderInsert(),
 			Text = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				AutoLocalize = false,
+				LayoutOrder = 2,
 				Text = p11.props.text,
-				Size = UDim2.new(1, -v39, 1, 0),
+				Size = UDim2.new(1, -v41, 1, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.fromScale(0.5, 0.5),
-				BackgroundTransparency = 1,
 				Font = chatSettings.Font,
 				TextColor3 = chatSettings.TextColor3,
 				TextSize = chatSettings.TextSize,
 				TextTransparency = p11.transparency,
-				TextWrapped = true,
-				AutoLocalize = false,
-				LayoutOrder = 2,
 				RichText = p11.isRichTextEnabled
 			}),
 			Gradient = BackgroundGradient.Enabled and Roact.createElement("UIGradient", BackgroundGradient)
@@ -166,8 +183,8 @@ function v14.render(p11) -- line: 116
 		Carat = p11.props.isMostRecent and (chatSettings.TailVisible and (p11.props.showCarat and Roact.createElement("ImageLabel", {
 			LayoutOrder = 2,
 			BackgroundTransparency = 1,
-			Size = UDim2.fromOffset(9, 6),
 			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
+			Size = UDim2.fromOffset(9, 6),
 			ImageColor3 = chatSettings.BackgroundColor3,
 			ImageTransparency = p11.transparency
 		})))
@@ -184,9 +201,9 @@ function v14.fadeOut(p12) -- line: 205
 			end
 		end)
 
-		local v41 = getTransparencySpringFromSettings(p12.props.chatSettings)
+		local v43 = getTransparencySpringFromSettings(p12.props.chatSettings)
 
-		p12.transparencyMotor:setGoal(v41(1))
+		p12.transparencyMotor:setGoal(v43(1))
 	end
 end
 function v14.didUpdate(p13, p14) -- line: 220
@@ -196,31 +213,31 @@ function v14.didUpdate(p13, p14) -- line: 220
 	end
 
 	if p14.text ~= p13.props.text or p14.chatSettings ~= p13.props.chatSettings or p14.renderInsert ~= p13.props.renderInsert or p14.insertSize ~= p13.props.insertSize then
-		local v44 = p13:getTextBounds()
-		local v45 = getSizeSpringFromSettings(p13.props.chatSettings)
+		local v46 = p13:getTextBounds()
+		local v47 = getSizeSpringFromSettings(p13.props.chatSettings)
 		local chatSettingsPadding = p13.props.chatSettings.Padding
-		local X = v44.X
-		local Y = v44.Y
+		local X = v46.X
+		local Y = v46.Y
 
 		if p13.props.renderInsert then
 			X += p13.props.insertSize.X + chatSettingsPadding
 			Y = math.max(Y, p13.props.insertSize.Y + chatSettingsPadding * 2)
 		end
 
-		p13.heightMotor:setGoal(v45(Y))
-		p13.widthMotor:setGoal(v45(X))
+		p13.heightMotor:setGoal(v47(Y))
+		p13.widthMotor:setGoal(v47(X))
 	end
 end
 function v14.didMount(p15) -- line: 247
 	-- upvalues: getSizeSpringFromSettings (copy), getTransparencySpringFromSettings (copy), Otter (copy)
 	p15.isMounted = true
 
-	local v50 = p15:getTextBounds()
+	local v52 = p15:getTextBounds()
 	local chatSettings = p15.props.chatSettings
-	local v52 = getSizeSpringFromSettings(chatSettings)
-	local v53 = getTransparencySpringFromSettings(chatSettings)
-	local X = v50.X
-	local Y = v50.Y
+	local v54 = getSizeSpringFromSettings(chatSettings)
+	local v55 = getTransparencySpringFromSettings(chatSettings)
+	local X = v52.X
+	local Y = v52.Y
 
 	if p15.props.renderInsert then
 		X += p15.props.insertSize.X + chatSettings.Padding
@@ -228,14 +245,14 @@ function v14.didMount(p15) -- line: 247
 	end
 
 	if p15.props.isMostRecent then
-		p15.heightMotor:setGoal(v52(Y))
+		p15.heightMotor:setGoal(v54(Y))
 		p15.widthMotor:setGoal(Otter.instant(X))
 	else
-		p15.heightMotor:setGoal(v52(Y))
-		p15.widthMotor:setGoal(v52(X))
+		p15.heightMotor:setGoal(v54(Y))
+		p15.widthMotor:setGoal(v54(X))
 	end
 
-	p15.transparencyMotor:setGoal(v53(chatSettings.Transparency))
+	p15.transparencyMotor:setGoal(v55(chatSettings.Transparency))
 end
 function v14.willUnmount(p16) -- line: 275
 	p16.isMounted = false
@@ -244,11 +261,13 @@ function v14.willUnmount(p16) -- line: 275
 	p16.widthMotor:destroy()
 end
 
-return RoactRodux.connect(function(p17, p18) --[[ mapStateToProps ]] -- line: 282
-	local v59 = p17.messages[p18.messageId]
+local function mapStateToProps(p17, p18) -- line: 282
+	local v61 = p17.messages[p18.messageId]
 
 	return {
-		text = v59 and v59.text or "",
-		timestamp = v59 and v59.timestamp or 0
+		text = v61 and v61.text or "",
+		timestamp = v61 and v61.timestamp or 0
 	}
-end)(v14)
+end
+
+return RoactRodux.connect(mapStateToProps)(v14)

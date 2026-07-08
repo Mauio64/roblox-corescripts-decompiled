@@ -1,135 +1,227 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-local v3 = require(l_Parent_0.Dash);
-local _ = require(script.Parent.AbuseSheetFlowTypes);
-local function v7(v5, v6) --[[ Line: 32 ]] --[[ Name: getInitialState ]]
-    -- upvalues: l_LocalPlayer_0 (copy)
-    return {
-        runId = v5, 
-        userId = if l_LocalPlayer_0 then l_LocalPlayer_0.UserId else 0, 
-        stack = {
-            {
-                nodeId = "root", 
-                data = {}, 
-                context = {}, 
-                enterTime = v6
-            }
-        }, 
-        navigationState = "idle", 
-        submissionState = "idle", 
-        openTime = v6
-    };
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local HttpService = game:GetService("HttpService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Dash = require(GenericAbuseReportingParent.Dash)
+
+require(script.Parent.AbuseSheetFlowTypes)
+
+local FFlagAbuseReportConfigStoreResolver = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportConfigStoreResolver
+local FFlagAbuseReportMenuV2 = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportMenuV2
+local FFlagAbuseReportInlineAlertStateOutsideReducer = require(GenericAbuseReporting.Flags.FFlagAbuseReportInlineAlertStateOutsideReducer)
+
+local function getInitialState(s1: string, n1: number, s2: string) -- line: 41
+	-- upvalues: LocalPlayer (copy), FFlagAbuseReportMenuV2 (copy)
+	return {
+		navigationState = "idle",
+		submissionState = "idle",
+		pendingInlineAlert = nil,
+		runId = s1,
+		userId = not LocalPlayer and 0 or LocalPlayer.UserId,
+		stack = {{
+			nodeId = not FFlagAbuseReportMenuV2 and "root" or s2,
+			data = {},
+			context = {},
+			store = {},
+			enterTime = n1
+		}},
+		openTime = n1
+	}
+end
+
 return {
-    getInitialState = v7, 
-    getNewRunId = function() --[[ Line: 78 ]] --[[ Name: getNewRunId ]]
-        -- upvalues: l_HttpService_0 (copy)
-        return l_HttpService_0:GenerateGUID(false);
-    end, 
-    selectContext = function(v8) --[[ Line: 82 ]] --[[ Name: selectContext ]]
-        local v9 = {};
-        for _, v11 in v8.stack do
-            if v11.context then
-                for v12, v13 in v11.context do
-                    v9[v12] = v13;
-                end;
-            end;
-        end;
-        return v9;
-    end, 
-    selectFormData = function(v14) --[[ Line: 94 ]] --[[ Name: selectFormData ]]
-        local v15 = {};
-        for _, v17 in v14.stack do
-            if v17.data then
-                for v18, v19 in v17.data do
-                    v15[v18] = v19;
-                end;
-            end;
-        end;
-        return v15;
-    end, 
-    reducer = function(v20, v21) --[[ Line: 106 ]] --[[ Name: reducer ]]
-        -- upvalues: v3 (copy), v7 (copy)
-        local v22 = nil;
-        if v21.type == "gotoNode" then
-            if not v21.payload or not v21.payload.nodeId then
-                error((("gotoNode action requires payload.nodeId, got: %*"):format((v3.pretty(v21, {
-                    depth = 5
-                })))));
-            end;
-            local v23 = {
-                nodeId = v21.payload.nodeId, 
-                data = {}, 
-                context = {}, 
-                enterTime = v21.payload.enterTime
-            };
-            local v24 = table.clone(v20.stack);
-            table.insert(v24, v23);
-            return (v3.join(v20, {
-                navigationState = "idle", 
-                lastNavigationDirection = "forward", 
-                stack = v24
-            }));
-        elseif v21.type == "replaceAndGotoNode" then
-            local v25 = v3.last(v20.stack);
-            if not v25 then
-                error("Stack is empty, cannot replace and go to node");
-            end;
-            local v26 = v3.slice(v20.stack, 1, #v20.stack - 1);
-            table.insert(v26, {
-                nodeId = v21.payload.nodeId, 
-                data = v25.data, 
-                context = v25.context, 
-                enterTime = v21.payload.enterTime
-            });
-            return (v3.join(v20, {
-                navigationState = "idle", 
-                lastNavigationDirection = "forward", 
-                stack = v26
-            }));
-        elseif v21.type == "goBack" then
-            if #v20.stack <= 1 then
-                warn("Cannot go back from stack with only one or zero items");
-                return v20;
-            else
-                return (v3.join(v20, {
-                    lastNavigationDirection = "back", 
-                    stack = v3.slice(v20.stack, 1, #v20.stack - 1)
-                }));
-            end;
-        elseif v21.type == "updateDataAndNavigateNext" then
-            local v27 = v3.last(v20.stack);
-            if not v27 then
-                error("Stack is empty, cannot update data");
-            end;
-            local v28 = v3.join(v27, {
-                data = v3.join(v27.data, v21.payload.data), 
-                context = v3.join(v27.context, v21.payload.context)
-            });
-            local v29 = v3.slice(v20.stack, 1, #v20.stack - 1);
-            table.insert(v29, v28);
-            return (v3.join(v20, {
-                stack = v29, 
-                navigationState = "gotoNext"
-            }));
-        elseif v21.type == "startedSubmission" then
-            return (v3.join(v20, {
-                submissionState = "submitting"
-            }));
-        elseif v21.type == "completedSubmission" then
-            return (v3.join(v20, {
-                submissionState = "completed"
-            }));
-        elseif v21.type == "submissionFailed" then
-            return (v3.join(v20, {
-                submissionState = "failed"
-            }));
-        elseif v21.type == "reset" then
-            return (v7(v21.payload.runId, v21.payload.initialEnterTime));
-        else
-            error("Unknown action type: " .. tostring(v21.type));
-            return v22;
-        end;
-    end
-};
+	getInitialState = getInitialState,
+	getNewRunId = function() -- line: 98
+		-- upvalues: HttpService (copy)
+		return HttpService:GenerateGUID(false)
+	end,
+	selectContext = function(t1: {[any]: any}) -- line: 102
+		local t2 = {}
+
+		for _, v16 in t1.stack do
+			if v16.context then
+				for v17, v18 in v16.context do
+					t2[v17] = v18
+				end
+			end
+		end
+
+		return t2
+	end,
+	selectFormData = function(t3: {[any]: any}) -- line: 114
+		local t4 = {}
+
+		for _, v22 in t3.stack do
+			if v22.data then
+				for v23, v24 in v22.data do
+					t4[v23] = v24
+				end
+			end
+		end
+
+		return t4
+	end,
+	selectStore = function(t5: {[any]: any}) -- line: 126
+		local t6 = {}
+
+		for _, v28 in t5.stack do
+			if v28.store then
+				for v29, v30 in v28.store do
+					t6[v29] = v30
+				end
+			end
+		end
+
+		return t6
+	end,
+	reducer = function(t7: {[any]: any}, t8: {[any]: any}) -- line: 138
+		-- upvalues: Dash (copy), FFlagAbuseReportMenuV2 (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), FFlagAbuseReportConfigStoreResolver (copy), getInitialState (copy)
+		local v33 = nil
+
+		if t8.type == "gotoNode" then
+			if not t8.payload or not t8.payload.nodeId then
+				error(`gotoNode action requires payload.nodeId, got: { Dash.pretty(t8, {
+					depth = 5
+				}) }`)
+			end
+
+			local t9 = {
+				nodeId = t8.payload.nodeId,
+				data = {},
+				context = {},
+				store = {},
+				enterTime = t8.payload.enterTime
+			}
+			local v35 = table.clone(t7.stack)
+
+			table.insert(v35, t9)
+			v33 = Dash.join(t7, {
+				navigationState = "idle",
+				lastNavigationDirection = "forward",
+				stack = v35
+			})
+
+			if FFlagAbuseReportMenuV2 and not FFlagAbuseReportInlineAlertStateOutsideReducer then
+				v33.pendingInlineAlert = t8.payload.inlineAlert
+
+				return v33
+			end
+		elseif t8.type == "replaceAndGotoNode" then
+			local v36 = Dash.last(t7.stack)
+
+			if not v36 then
+				error("Stack is empty, cannot replace and go to node")
+			end
+
+			local v37 = Dash.slice(t7.stack, 1, #t7.stack - 1)
+
+			table.insert(v37, {
+				nodeId = t8.payload.nodeId,
+				data = if FFlagAbuseReportConfigStoreResolver then {} else v36.data,
+				context = if FFlagAbuseReportConfigStoreResolver then {} else v36.context,
+				store = if not FFlagAbuseReportConfigStoreResolver then {} else v36.store,
+				enterTime = t8.payload.enterTime
+			})
+			v33 = Dash.join(t7, {
+				navigationState = "idle",
+				lastNavigationDirection = "forward",
+				stack = v37
+			})
+
+			if FFlagAbuseReportMenuV2 and not FFlagAbuseReportInlineAlertStateOutsideReducer then
+				v33.pendingInlineAlert = t8.payload.inlineAlert
+
+				return v33
+			end
+		elseif t8.type == "goBack" then
+			if #t7.stack <= 1 then
+				warn("Cannot go back from stack with only one or zero items")
+
+				return t7
+			end
+
+			v33 = Dash.join(t7, {
+				lastNavigationDirection = "back",
+				stack = Dash.slice(t7.stack, 1, #t7.stack - 1)
+			})
+
+			if FFlagAbuseReportMenuV2 and not FFlagAbuseReportInlineAlertStateOutsideReducer then
+				v33.pendingInlineAlert = nil
+
+				return v33
+			end
+		else
+			if t8.type == "updateDataAndNavigateNext" then
+				local v38 = Dash.last(t7.stack)
+
+				if not v38 then
+					error("Stack is empty, cannot update data")
+				end
+
+				if FFlagAbuseReportMenuV2 then
+					if t8.payload.expectedFromNodeId and t8.payload.expectedFromNodeId ~= v38.nodeId then
+						return t7
+					end
+
+					if t7.navigationState ~= "idle" then
+						return t7
+					end
+				end
+
+				local v39 = Dash.join(v38, {
+					data = if FFlagAbuseReportConfigStoreResolver then {} else Dash.join(v38.data, t8.payload.data),
+					context = if FFlagAbuseReportConfigStoreResolver then {} else Dash.join(v38.context, t8.payload.context),
+					store = if not FFlagAbuseReportConfigStoreResolver then {} else Dash.join(v38.store, t8.payload.store)
+				})
+				local v40 = Dash.slice(t7.stack, 1, #t7.stack - 1)
+
+				table.insert(v40, v39)
+
+				return (Dash.join(t7, {
+					navigationState = "gotoNext",
+					stack = v40
+				}))
+			end
+
+			if t8.type == "startedSubmission" then
+				return (Dash.join(t7, {
+					submissionState = "submitting"
+				}))
+			end
+
+			if t8.type == "completedSubmission" then
+				return (Dash.join(t7, {
+					submissionState = "completed"
+				}))
+			end
+
+			if t8.type == "submissionFailed" then
+				return (Dash.join(t7, {
+					submissionState = "failed"
+				}))
+			end
+
+			if t8.type == "reset" then
+				v33 = getInitialState(t8.payload.runId, t8.payload.initialEnterTime, t8.payload.startNodeId)
+
+				if FFlagAbuseReportMenuV2 and not FFlagAbuseReportInlineAlertStateOutsideReducer then
+					v33.pendingInlineAlert = t8.payload.inlineAlert
+
+					return v33
+				end
+			elseif FFlagAbuseReportMenuV2 and t8.type == "clearInlineAlert" then
+				v33 = table.clone(t7)
+
+				if not FFlagAbuseReportInlineAlertStateOutsideReducer then
+					v33.pendingInlineAlert = nil
+
+					return v33
+				end
+			else
+				error("Unknown action type: " .. tostring(t8.type))
+			end
+		end
+
+		return v33
+	end
+}

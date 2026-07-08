@@ -1,309 +1,328 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Core_0 = l_Parent_1.Core;
-local v4 = require(l_Parent_2.Roact);
-local v5 = require(l_Parent_2.t);
-local v6 = require(l_Parent_2.Cryo);
-local v7 = require(l_Parent_2.Foundation);
-local v8 = require(l_Core_0.Control.Interactable);
-local v9 = require(l_Core_0.Control.Enum.ControlState);
-local v10 = require(l_Core_0.Style.withStyle);
-local v11 = require(l_Parent_1.Core.Style.useStyle);
-local v12 = require(l_Parent_0.SelectionImage.withSelectionCursorProvider);
-local v13 = require(l_Parent_0.SelectionCursor.useCursorByType);
-local v14 = require(l_Parent_0.SelectionCursor.CursorType);
-local v15 = require(l_Parent_0.SelectionImage.CursorKind);
-local v16 = require(l_Core_0.ImageSet.ImageSetComponent);
-local l_Skeleton_0 = v7.Skeleton;
-local v18 = require(l_Parent_0.Constant.IconSize);
-local v19 = require(l_Core_0.Text.GenericTextLabel.GenericTextLabel);
-local v20 = require(l_Core_0.ImageSet.Validator.validateImage);
-local v21 = require(l_Core_0.Button.getContentStyle);
-local v22 = require(l_Core_0.Style.Validator.validateTypographyInfo);
-local v23 = require(l_Core_0.Style.Validator.validateColorInfo);
-local v24 = require(script.Parent.StyleDefaults);
-local v25 = v4.PureComponent:extend("DropdownMenuCell");
-local function v29(v26, v27) --[[ Line: 40 ]] --[[ Name: getColorFromMap ]]
-    -- upvalues: v9 (copy)
-    local v28 = v26[v27] or v26[v9.Default];
-    return {
-        Color = v28.Color, 
-        Transparency = v28.Transparency
-    };
-end;
-local function _(v30, v31, v32, v33, v34) --[[ Line: 48 ]] --[[ Name: getButtonStyle ]]
-    -- upvalues: v9 (copy)
-    local v35 = v30(v31, v32, v33);
-    if v32 ~= v9.Disabled and v32 ~= v9.Pressed and v34 then
-        v35.Transparency = 0.5 * v35.Transparency + 0.5;
-    end;
-    return v35;
-end;
-local function _(v37, v38, v39, v40, v41, v42) --[[ Line: 56 ]] --[[ Name: getButtonContentStyle ]]
-    -- upvalues: v9 (copy)
-    local v43 = v37(v38, v39, v40);
-    if v39 ~= v9.Disabled and v39 ~= v9.Pressed and (v41 or not v42) then
-        v43.Transparency = 0.5 * v43.Transparency + 0.5;
-    end;
-    return v43;
-end;
-v25.init = function(v45) --[[ Line: 68 ]] --[[ Name: init ]]
-    -- upvalues: v9 (copy)
-    v45:setState({
-        controlState = v9.Initialize
-    });
-    v45.onStateChanged = function(v46, v47) --[[ Line: 73 ]]
-        -- upvalues: v45 (copy)
-        v45:setState({
-            controlState = v47
-        });
-        if v45.props.onStateChanged then
-            v45.props.onStateChanged(v46, v47);
-        end;
-    end;
-end;
-local v48 = v5.union(v5.interface({
-    [v9.Default] = v5.string
-}), v5.interface({
-    [v9.Default] = v23
-}));
-v25.validateProps = v5.interface({
-    icon = v5.optional(v20), 
-    text = v5.optional(v5.string), 
-    textFont = v5.optional(v22), 
-    buttonImage = v20, 
-    buttonStateColorMap = v48, 
-    contentStateColorMap = v48, 
-    textStateColorMap = v5.optional(v48), 
-    iconStateColorMap = v5.optional(v48), 
-    isDisabled = v5.optional(v5.boolean), 
-    isActivated = v5.optional(v5.boolean), 
-    hasContent = v5.optional(v5.boolean), 
-    isLoading = v5.optional(v5.boolean), 
-    onActivated = v5.callback, 
-    onStateChanged = v5.optional(v5.callback), 
-    userInteractionEnabled = v5.optional(v5.boolean), 
-    iconSize = v5.optional(v5.number), 
-    containerPadding = v5.optional(v5.strictInterface({
-        left = v5.number, 
-        right = v5.number
-    })), 
-    iconTextSpacing = v5.optional(v5.number), 
-    border = v5.optional(v5.strictInterface({
-        cornerRadius = v5.number, 
-        size = v5.number
-    })), 
-    enableTokenOverride = v5.optional(v5.boolean), 
-    selectionOrder = v5.optional(v5.number), 
-    selectionCursor = v5.optional(v5.any)
-});
-v25.defaultProps = {
-    isDisabled = false, 
-    isLoading = false, 
-    SliceCenter = Rect.new(8, 8, 9, 9), 
-    iconSize = v18.Regular, 
-    containerPadding = {
-        left = 12, 
-        right = 20
-    }, 
-    iconTextSpacing = 5, 
-    border = {
-        cornerRadius = 8, 
-        size = 1
-    }, 
-    enableTokenOverride = false
-};
-v25.render = function(v49) --[[ Line: 186 ]] --[[ Name: render ]]
-    -- upvalues: v10 (copy), v12 (copy), v5 (copy), v15 (copy), v29 (copy), v21 (copy), v9 (copy), v4 (copy), l_Skeleton_0 (copy), v19 (copy), v16 (copy), v6 (copy), v8 (copy)
-    return v10(function(v50) --[[ Line: 187 ]]
-        -- upvalues: v12 (ref), v5 (ref), v49 (copy), v15 (ref), v29 (ref), v21 (ref), v9 (ref), v4 (ref), l_Skeleton_0 (ref), v19 (ref), v16 (ref), v6 (ref), v8 (ref)
-        return v12(function(v51) --[[ Line: 188 ]]
-            -- upvalues: v5 (ref), v50 (copy), v49 (ref), v15 (ref), v29 (ref), v21 (ref), v9 (ref), v4 (ref), l_Skeleton_0 (ref), v19 (ref), v16 (ref), v6 (ref), v8 (ref)
-            assert(v5.table(v50), "Style provider is missing.");
-            local l_controlState_0 = v49.state.controlState;
-            local l_text_0 = v49.props.text;
-            local l_icon_0 = v49.props.icon;
-            local l_iconSize_0 = v49.props.iconSize;
-            local l_containerPadding_0 = v49.props.containerPadding;
-            local l_iconTextSpacing_0 = v49.props.iconTextSpacing;
-            local l_isLoading_0 = v49.props.isLoading;
-            local l_isDisabled_0 = v49.props.isDisabled;
-            local l_buttonStateColorMap_0 = v49.props.buttonStateColorMap;
-            local l_contentStateColorMap_0 = v49.props.contentStateColorMap;
-            local v62 = v49.props.textStateColorMap or l_contentStateColorMap_0;
-            local v63 = v49.props.iconStateColorMap or l_contentStateColorMap_0;
-            if l_isLoading_0 then
-                l_isDisabled_0 = true;
-            end;
-            local v64 = v49.props.selectionCursor or v51 and v51(v15.RoundedRectNoInset);
-            local v65 = nil;
-            v65 = if v49.props.enableTokenOverride then v29 else v21;
-            local l_v65_0 = v65;
-            local l_v50_0 = v50;
-            local l_isActivated_0 = v49.props.isActivated;
-            local v69 = l_v65_0(l_buttonStateColorMap_0, l_controlState_0, l_v50_0);
-            if l_controlState_0 ~= v9.Disabled and l_controlState_0 ~= v9.Pressed and l_isActivated_0 then
-                v69.Transparency = 0.5 * v69.Transparency + 0.5;
-            end;
-            local l_v69_0 = v69;
-            l_v65_0 = l_text_0;
-            if l_v65_0 then
-                l_v50_0 = v65;
-                l_isActivated_0 = v50;
-                v69 = v49.props.isActivated;
-                local l_hasContent_0 = v49.props.hasContent;
-                local v72 = l_v50_0(v62, l_controlState_0, l_isActivated_0);
-                if l_controlState_0 ~= v9.Disabled and l_controlState_0 ~= v9.Pressed and (v69 or not l_hasContent_0) then
-                    v72.Transparency = 0.5 * v72.Transparency + 0.5;
-                end;
-                l_v65_0 = v72;
-            end;
-            l_v50_0 = l_icon_0;
-            if l_v50_0 then
-                l_isActivated_0 = v65;
-                v69 = v50;
-                local l_isActivated_1 = v49.props.isActivated;
-                local v74 = l_isActivated_0(v63, l_controlState_0, v69);
-                if l_controlState_0 ~= v9.Disabled and l_controlState_0 ~= v9.Pressed and l_isActivated_1 then
-                    v74.Transparency = 0.5 * v74.Transparency + 0.5;
-                end;
-                l_v50_0 = v74;
-            end;
-            l_isActivated_0 = v49.props.buttonImage;
-            v69 = nil;
-            v69 = if v49.props.enableTokenOverride then v49.props.textFont else v50.Font.Header2;
-            local v75 = nil;
-            v75 = if l_icon_0 ~= nil then l_iconSize_0 + l_iconTextSpacing_0 + l_containerPadding_0.right else l_containerPadding_0.right;
-            local v76 = nil;
-            v76 = if l_isLoading_0 then {
-                isLoadingShimmer = v4.createElement(l_Skeleton_0, {
-                    Size = UDim2.fromScale(1, 1)
-                })
-            } else v49.props[v4.Children] or {
-                TextContainer = v4.createElement("Frame", {
-                    Size = UDim2.fromScale(1, 1), 
-                    BackgroundTransparency = 1
-                }, {
-                    UIListLayout = v4.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                        SortOrder = Enum.SortOrder.LayoutOrder
-                    }), 
-                    Padding = v4.createElement("UIPadding", {
-                        PaddingLeft = UDim.new(0, l_containerPadding_0.left)
-                    }), 
-                    Text = if l_text_0 then v4.createElement(v19, {
-                        BackgroundTransparency = 1, 
-                        Text = l_text_0, 
-                        fontStyle = v69, 
-                        colorStyle = l_v65_0, 
-                        LayoutOrder = 1, 
-                        Size = UDim2.new(1, -v75, 1, 0), 
-                        TextTruncate = Enum.TextTruncate.AtEnd, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextWrapped = false
-                    }) else nil
-                }), 
-                IconContainer = v4.createElement("Frame", {
-                    Size = UDim2.fromScale(1, 1), 
-                    BackgroundTransparency = 1
-                }, {
-                    UIListLayout = v4.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                        SortOrder = Enum.SortOrder.LayoutOrder
-                    }), 
-                    Padding = v4.createElement("UIPadding", {
-                        PaddingRight = UDim.new(0, l_containerPadding_0.right)
-                    }), 
-                    Icon = l_icon_0 and v4.createElement(v16.Label, {
-                        Size = UDim2.fromOffset(l_iconSize_0, l_iconSize_0), 
-                        BackgroundTransparency = 1, 
-                        Image = l_icon_0, 
-                        ImageColor3 = l_v50_0.Color, 
-                        ImageTransparency = l_v50_0.Transparency, 
-                        LayoutOrder = 2
-                    }) or nil
-                })
-            };
-            local v77 = {
-                isActivated = v6.None, 
-                hasContent = v6.None, 
-                icon = v6.None, 
-                text = v6.None, 
-                textFont = v6.None, 
-                buttonImage = v6.None, 
-                buttonStateColorMap = v6.None, 
-                contentStateColorMap = v6.None, 
-                textStateColorMap = v6.None, 
-                iconStateColorMap = v6.None, 
-                iconSize = v6.None, 
-                containerPadding = v6.None, 
-                iconTextSpacing = v6.None, 
-                border = v6.None, 
-                enableTokenOverride = v6.None, 
-                onActivated = v6.None, 
-                isLoading = v6.None, 
-                [v4.Children] = v6.None, 
-                isDisabled = l_isDisabled_0, 
-                onStateChanged = v49.onStateChanged, 
-                userInteractionEnabled = v49.props.userInteractionEnabled, 
-                ScaleType = Enum.ScaleType.Slice, 
-                BackgroundTransparency = 1, 
-                AutoButtonColor = false, 
-                selectionCursor = v6.None, 
-                SelectionImageObject = v64, 
-                SelectionOrder = v49.props.selectionOrder, 
-                [v4.Event.Activated] = v49.props.onActivated
-            };
-            local v78 = nil;
-            local v79 = nil;
-            local v80 = nil;
-            if v49.props.enableTokenOverride then
-                local l_size_0 = v49.props.border.size;
-                v80 = UDim2.new(1, -2 * l_size_0, 1, -2 * l_size_0);
-                v79 = {
-                    UIStroke = v4.createElement("UIStroke", {
-                        Color = l_v69_0.Color, 
-                        Transparency = l_v69_0.Transparency, 
-                        Thickness = l_size_0
-                    }), 
-                    UICorner = v4.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, v49.props.border.cornerRadius)
-                    })
-                };
-                v78 = v6.Dictionary.join(v49.props, v77);
-            else
-                v80 = UDim2.new(1, 0, 1, 0);
-                v79 = {};
-                v78 = v6.Dictionary.join(v49.props, {
-                    Image = l_isActivated_0, 
-                    ImageColor3 = l_v69_0.Color, 
-                    ImageTransparency = l_v69_0.Transparency
-                }, v77);
-            end;
-            return v4.createElement(v8, v78, {
-                ButtonContent = v4.createElement("Frame", {
-                    Size = v80, 
-                    BackgroundTransparency = 1
-                }, v6.Dictionary.join(v79, v76))
-            });
-        end);
-    end);
-end;
-return function(v82) --[[ Line: 383 ]]
-    -- upvalues: v13 (copy), v14 (copy), v6 (copy), v11 (copy), v24 (copy), v4 (copy), v25 (copy)
-    local l_v82_0 = v82;
-    local v84 = v13(v14.RoundedRectNoInset);
-    l_v82_0 = v6.Dictionary.join(l_v82_0, {
-        selectionCursor = v84
-    });
-    if v82.enableTokenOverride then
-        local v85 = v11();
-        l_v82_0 = v6.Dictionary.join(v24.getDropdownMenuCellDefaultTokens(v85), v82);
-    end;
-    return v4.createElement(v25, l_v82_0);
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Core = ParentParentParent.Core
+local Roact = require(ParentParentParentParent.Roact)
+local t = require(ParentParentParentParent.t)
+local Cryo = require(ParentParentParentParent.Cryo)
+local Foundation = require(ParentParentParentParent.Foundation)
+local Interactable = require(Core.Control.Interactable)
+local ControlState = require(Core.Control.Enum.ControlState)
+local withStyle = require(Core.Style.withStyle)
+local useStyle = require(ParentParentParent.Core.Style.useStyle)
+local withSelectionCursorProvider = require(ParentParent.SelectionImage.withSelectionCursorProvider)
+local useCursorByType = require(ParentParent.SelectionCursor.useCursorByType)
+local CursorType = require(ParentParent.SelectionCursor.CursorType)
+local CursorKind = require(ParentParent.SelectionImage.CursorKind)
+local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
+local Skeleton = Foundation.Skeleton
+local IconSize = require(ParentParent.Constant.IconSize)
+local GenericTextLabel = require(Core.Text.GenericTextLabel.GenericTextLabel)
+local validateImage = require(Core.ImageSet.Validator.validateImage)
+local getContentStyle = require(Core.Button.getContentStyle)
+local validateTypographyInfo = require(Core.Style.Validator.validateTypographyInfo)
+local validateColorInfo = require(Core.Style.Validator.validateColorInfo)
+local StyleDefaults = require(script.Parent.StyleDefaults)
+local v26 = Roact.PureComponent:extend("DropdownMenuCell")
+
+local function getColorFromMap(p1, p2) -- line: 40
+	-- upvalues: ControlState (copy)
+	local v33 = p1[p2] or p1[ControlState.Default]
+
+	return {
+		Color = v33.Color,
+		Transparency = v33.Transparency
+	}
+end
+local function getButtonStyle(p3, p4, p5, p6, p7) -- line: 48
+	-- upvalues: ControlState (copy)
+	local v39 = p3(p4, p5, p6)
+
+	if p5 ~= ControlState.Disabled and (p5 ~= ControlState.Pressed and p7) then
+		v39.Transparency = 0.5 * v39.Transparency + 0.5
+	end
+
+	return v39
+end
+local function getButtonContentStyle(p8, p9, p10, p11, p12, p13) -- line: 56
+	-- upvalues: ControlState (copy)
+	local v46 = p8(p9, p10, p11)
+
+	if p10 ~= ControlState.Disabled and p10 ~= ControlState.Pressed and (p12 or not p13) then
+		v46.Transparency = 0.5 * v46.Transparency + 0.5
+	end
+
+	return v46
+end
+
+function v26.init(p14) -- line: 68
+	-- upvalues: ControlState (copy)
+	p14:setState({
+		controlState = ControlState.Initialize
+	})
+
+	function p14.onStateChanged(p15, p16) -- line: 73
+		-- upvalues: p14 (copy)
+		p14:setState({
+			controlState = p16
+		})
+
+		if p14.props.onStateChanged then
+			p14.props.onStateChanged(p15, p16)
+		end
+	end
+end
+
+local v30 = t.union(t.interface({
+	[ControlState.Default] = t.string
+}), t.interface({
+	[ControlState.Default] = validateColorInfo
+}))
+
+v26.validateProps = t.interface({
+	icon = t.optional(validateImage),
+	text = t.optional(t.string),
+	textFont = t.optional(validateTypographyInfo),
+	buttonImage = validateImage,
+	buttonStateColorMap = v30,
+	contentStateColorMap = v30,
+	textStateColorMap = t.optional(v30),
+	iconStateColorMap = t.optional(v30),
+	isDisabled = t.optional(t.boolean),
+	isActivated = t.optional(t.boolean),
+	hasContent = t.optional(t.boolean),
+	isLoading = t.optional(t.boolean),
+	onActivated = t.callback,
+	onStateChanged = t.optional(t.callback),
+	userInteractionEnabled = t.optional(t.boolean),
+	iconSize = t.optional(t.number),
+	containerPadding = t.optional(t.strictInterface({
+		left = t.number,
+		right = t.number
+	})),
+	iconTextSpacing = t.optional(t.number),
+	border = t.optional(t.strictInterface({
+		cornerRadius = t.number,
+		size = t.number
+	})),
+	enableTokenOverride = t.optional(t.boolean),
+	selectionOrder = t.optional(t.number),
+	selectionCursor = t.optional(t.any)
+})
+v26.defaultProps = {
+	isDisabled = false,
+	isLoading = false,
+	iconTextSpacing = 5,
+	enableTokenOverride = false,
+	SliceCenter = Rect.new(8, 8, 9, 9),
+	iconSize = IconSize.Regular,
+	containerPadding = {
+		left = 12,
+		right = 20
+	},
+	border = {
+		cornerRadius = 8,
+		size = 1
+	}
+}
+
+function v26.render(p17) -- line: 186
+	-- upvalues: withStyle (copy), withSelectionCursorProvider (copy), t (copy), CursorKind (copy), getColorFromMap (copy), getContentStyle (copy), ControlState (copy), Roact (copy), Skeleton (copy), GenericTextLabel (copy), ImageSetComponent (copy), Cryo (copy), Interactable (copy)
+	return withStyle(function(p18) -- line: 187
+		-- upvalues: withSelectionCursorProvider (copy), t (copy), p17 (copy), CursorKind (copy), getColorFromMap (copy), getContentStyle (copy), ControlState (copy), Roact (copy), Skeleton (copy), GenericTextLabel (copy), ImageSetComponent (copy), Cryo (copy), Interactable (copy)
+		return withSelectionCursorProvider(function(p19) -- line: 188
+			-- upvalues: t (copy), p18 (copy), p17 (copy), CursorKind (copy), getColorFromMap (copy), getContentStyle (copy), ControlState (copy), Roact (copy), Skeleton (copy), GenericTextLabel (copy), ImageSetComponent (copy), Cryo (copy), Interactable (copy)
+			assert(t.table(p18), "Style provider is missing.")
+
+			local controlState = p17.state.controlState
+			local text = p17.props.text
+			local icon = p17.props.icon
+			local iconSize = p17.props.iconSize
+			local containerPadding = p17.props.containerPadding
+			local iconTextSpacing = p17.props.iconTextSpacing
+			local isLoading = p17.props.isLoading
+			local isDisabled = p17.props.isDisabled
+			local buttonStateColorMap = p17.props.buttonStateColorMap
+			local contentStateColorMap = p17.props.contentStateColorMap
+			local v67 = p17.props.textStateColorMap or contentStateColorMap
+			local v68 = p17.props.iconStateColorMap or contentStateColorMap
+
+			if isLoading then
+				isDisabled = true
+			end
+
+			local v69 = p17.props.selectionCursor or p19 and p19(CursorKind.RoundedRectNoInset)
+			local v70 = if not p17.props.enableTokenOverride then getContentStyle else getColorFromMap
+			local v71 = p18
+			local isActivated = p17.props.isActivated
+			local v73 = v70(buttonStateColorMap, controlState, v71)
+
+			if controlState ~= ControlState.Disabled and controlState ~= ControlState.Pressed and isActivated then
+				v73.Transparency = 0.5 * v73.Transparency + 0.5
+			end
+
+			local v74 = text
+
+			if v74 then
+				local v75 = p18
+				local isActivated2 = p17.props.isActivated
+				local hasContent = p17.props.hasContent
+
+				v74 = v70(v67, controlState, v75)
+
+				if controlState ~= ControlState.Disabled and controlState ~= ControlState.Pressed and (isActivated2 or not hasContent) then
+					v74.Transparency = 0.5 * v74.Transparency + 0.5
+				end
+			end
+
+			local v78 = icon
+
+			if v78 then
+				local v79 = p18
+				local isActivated3 = p17.props.isActivated
+
+				v78 = v70(v68, controlState, v79)
+
+				if controlState ~= ControlState.Disabled and controlState ~= ControlState.Pressed and isActivated3 then
+					v78.Transparency = 0.5 * v78.Transparency + 0.5
+				end
+			end
+
+			local buttonImage = p17.props.buttonImage
+			local v82 = if not p17.props.enableTokenOverride then p18.Font.Header2 else p17.props.textFont
+			local v83 = if icon == nil then containerPadding.right else iconSize + iconTextSpacing + containerPadding.right
+			local v84 = if not isLoading then p17.props[Roact.Children] or {
+				TextContainer = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1)
+				}, {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						HorizontalAlignment = Enum.HorizontalAlignment.Left,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					Padding = Roact.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, containerPadding.left)
+					}),
+					Text = if not text then nil else Roact.createElement(GenericTextLabel, {
+						BackgroundTransparency = 1,
+						LayoutOrder = 1,
+						TextWrapped = false,
+						Text = text,
+						fontStyle = v82,
+						colorStyle = v74,
+						Size = UDim2.new(1, -v83, 1, 0),
+						TextTruncate = Enum.TextTruncate.AtEnd,
+						TextXAlignment = Enum.TextXAlignment.Left
+					})
+				}),
+				IconContainer = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1)
+				}, {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						HorizontalAlignment = Enum.HorizontalAlignment.Right,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					Padding = Roact.createElement("UIPadding", {
+						PaddingRight = UDim.new(0, containerPadding.right)
+					}),
+					Icon = icon and Roact.createElement(ImageSetComponent.Label, {
+						BackgroundTransparency = 1,
+						LayoutOrder = 2,
+						Size = UDim2.fromOffset(iconSize, iconSize),
+						Image = icon,
+						ImageColor3 = v78.Color,
+						ImageTransparency = v78.Transparency
+					}) or nil
+				})
+			} else {
+				isLoadingShimmer = Roact.createElement(Skeleton, {
+					Size = UDim2.fromScale(1, 1)
+				})
+			}
+			local t1 = {
+				isActivated = Cryo.None,
+				hasContent = Cryo.None,
+				icon = Cryo.None,
+				text = Cryo.None,
+				textFont = Cryo.None,
+				buttonImage = Cryo.None,
+				buttonStateColorMap = Cryo.None,
+				contentStateColorMap = Cryo.None,
+				textStateColorMap = Cryo.None,
+				iconStateColorMap = Cryo.None,
+				iconSize = Cryo.None,
+				containerPadding = Cryo.None,
+				iconTextSpacing = Cryo.None,
+				border = Cryo.None,
+				enableTokenOverride = Cryo.None,
+				onActivated = Cryo.None,
+				isLoading = Cryo.None,
+				[Roact.Children] = Cryo.None,
+				isDisabled = isDisabled,
+				onStateChanged = p17.onStateChanged,
+				userInteractionEnabled = p17.props.userInteractionEnabled,
+				ScaleType = Enum.ScaleType.Slice,
+				BackgroundTransparency = 1,
+				AutoButtonColor = false,
+				selectionCursor = Cryo.None,
+				SelectionImageObject = v69,
+				SelectionOrder = p17.props.selectionOrder,
+				[Roact.Event.Activated] = p17.props.onActivated
+			}
+			local uDim2, t2, v89
+
+			if p17.props.enableTokenOverride then
+				local size = p17.props.border.size
+
+				uDim2 = UDim2.new(1, -2 * size, 1, -2 * size)
+				t2 = {
+					UIStroke = Roact.createElement("UIStroke", {
+						Color = v73.Color,
+						Transparency = v73.Transparency,
+						Thickness = size
+					}),
+					UICorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, p17.props.border.cornerRadius)
+					})
+				}
+				v89 = Cryo.Dictionary.join(p17.props, t1)
+			else
+				uDim2 = UDim2.new(1, 0, 1, 0)
+				t2 = {}
+				v89 = Cryo.Dictionary.join(p17.props, {
+					Image = buttonImage,
+					ImageColor3 = v73.Color,
+					ImageTransparency = v73.Transparency
+				}, t1)
+			end
+
+			return Roact.createElement(Interactable, v89, {
+				ButtonContent = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = uDim2
+				}, Cryo.Dictionary.join(t2, v84))
+			})
+		end)
+	end)
+end
+
+return function(p20) -- line: 383
+	-- upvalues: useCursorByType (copy), CursorType (copy), Cryo (copy), useStyle (copy), StyleDefaults (copy), Roact (copy), v26 (copy)
+	local v50 = useCursorByType(CursorType.RoundedRectNoInset)
+	local v51 = Cryo.Dictionary.join(p20, {
+		selectionCursor = v50
+	})
+
+	if p20.enableTokenOverride then
+		local v52 = useStyle()
+
+		v51 = Cryo.Dictionary.join(StyleDefaults.getDropdownMenuCellDefaultTokens(v52), p20)
+	end
+
+	return Roact.createElement(v26, v51)
+end

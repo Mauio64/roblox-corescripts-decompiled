@@ -1,11 +1,12 @@
-local v0 = require(script.InteractionFeedbackContext);
-local v1 = require(script.useTriggerFeedback);
-local v2 = require(script.FeedbackManagerInjectionContextProvider);
-local v3 = require(script.withTriggerFeedback);
+local InteractionFeedbackContext = require(script.InteractionFeedbackContext)
+local useTriggerFeedback = require(script.useTriggerFeedback)
+local FeedbackManagerInjectionContextProvider = require(script.FeedbackManagerInjectionContextProvider)
+local withTriggerFeedback = require(script.withTriggerFeedback)
+
 return {
-    InteractionFeedbackContext = v0, 
-    useTriggerFeedback = v1, 
-    withTriggerFeedback = v3, 
-    FeedbackManagerInjectionContextProvider = v2, 
-    ["jest.config"] = script["jest.config"]
-};
+	InteractionFeedbackContext = InteractionFeedbackContext,
+	useTriggerFeedback = useTriggerFeedback,
+	withTriggerFeedback = withTriggerFeedback,
+	FeedbackManagerInjectionContextProvider = FeedbackManagerInjectionContextProvider,
+	["jest.config"] = script["jest.config"]
+}

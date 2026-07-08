@@ -1,46 +1,67 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local v4 = require(l_script_FirstAncestor_0.LuaAppNavigationContext);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v6 = require(l_script_FirstAncestor_0.Telemetry.useTelemetry);
-local l_script_FirstAncestor_1 = script:FindFirstAncestor("ChatLanding");
-local v8 = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatLandingTelemetryLayer);
-local v9 = require(l_script_FirstAncestor_1.ChatLandingTelemetryEvents);
-local v10 = require(l_script_FirstAncestor_0.Utils.getAppChatCommunitiesVisualConfig);
-local l_getFFlagCommunitiesUseVisualConfigUtil_0 = require(l_Parent_0.SharedFlags).getFFlagCommunitiesUseVisualConfigUtil;
-local l_GetFFlagUseCommunitiesTranslation_0 = require(l_Parent_0.SharedFlags).GetFFlagUseCommunitiesTranslation;
-local l_Images_0 = v3.App.ImageSet.Images;
-local v14 = require(l_script_FirstAncestor_0.Utils.DomLocators);
-local v15 = require(script.Parent.CustomConversationListEntry);
-local v16 = require(l_script_FirstAncestor_0.Flags.FFlagDebugAppChatEnableDomLocators);
-local v17 = l_Images_0["icons/menu/groups"];
-ConversationGroupsEntryContainer = function(v18) --[[ Line: 29 ]] --[[ Name: ConversationGroupsEntryContainer ]]
-    -- upvalues: l_getFFlagCommunitiesUseVisualConfigUtil_0 (copy), v10 (copy), l_useLocalization_0 (copy), l_GetFFlagUseCommunitiesTranslation_0 (copy), v2 (copy), v4 (copy), v6 (copy), v8 (copy), l_Images_0 (copy), v17 (copy), v15 (copy), v9 (copy), v16 (copy), v14 (copy)
-    local v19 = if l_getFFlagCommunitiesUseVisualConfigUtil_0() then v10() else nil;
-    local v20 = l_useLocalization_0({
-        groupsText = if l_getFFlagCommunitiesUseVisualConfigUtil_0() then v19.label else l_GetFFlagUseCommunitiesTranslation_0() and "Feature.SocialTab.Label.Groups" or "CommonUI.Features.Label.sGroups", 
-        createAndExploreGroupsText = "Feature.SocialTab.Label.CreateAndExploreGroups"
-    });
-    local v21 = v2.useContext(v4);
-    local v22 = v6(v8.Context);
-    local v23 = if l_getFFlagCommunitiesUseVisualConfigUtil_0() then l_Images_0[v19.icon] else v17;
-    return v2.createElement(v15, {
-        entryHeight = v18.entryHeight, 
-        entryIcon = v23, 
-        key = "ConversationGroupsEntry", 
-        onActivated = v2.useCallback(function() --[[ Line: 49 ]]
-            -- upvalues: v22 (copy), v9 (ref), v21 (copy)
-            v22.emit(v9.ChatLandingGroupsBtnClicked, {});
-            v21.navigateToGroups();
-        end, {
-            v22, 
-            v21
-        }), 
-        subTitleText = v20.createAndExploreGroupsText, 
-        titleText = v20.groupsText, 
-        testId = if v16 then v14.chatLandingConversationListHeader("communities") else nil
-    });
-end;
-return ConversationGroupsEntryContainer;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Foundation = require(AppChatParent.Foundation)
+local UIBlox = require(AppChatParent.UIBlox)
+local LuaAppNavigationContext = require(AppChat.LuaAppNavigationContext)
+local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+local ChatLanding = script:FindFirstAncestor("ChatLanding")
+local ChatLandingTelemetryLayer = require(AppChat.Telemetry.Layers.ChatLandingTelemetryLayer)
+local ChatLandingTelemetryEvents = require(ChatLanding.ChatLandingTelemetryEvents)
+local getAppChatCommunitiesVisualConfig = require(AppChat.Utils.getAppChatCommunitiesVisualConfig)
+local getFFlagCommunitiesUseVisualConfigUtil = require(AppChatParent.SharedFlags).getFFlagCommunitiesUseVisualConfigUtil
+local GetFFlagUseCommunitiesTranslation = require(AppChatParent.SharedFlags).GetFFlagUseCommunitiesTranslation
+local Images = UIBlox.App.ImageSet.Images
+local IconName = Foundation.Enums.IconName
+local DomLocators = require(AppChat.Utils.DomLocators)
+local CustomConversationListEntry = require(script.Parent.CustomConversationListEntry)
+local CustomConversationListRow = require(script.Parent.CustomConversationListRow)
+local FFlagAppChatCustomConversationListRow = require(AppChat.Flags.FFlagAppChatCustomConversationListRow)
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+local v22 = Images["icons/menu/groups"]
+
+function ConversationGroupsEntryContainer(t1: {[any]: any}) -- line: 33
+	-- upvalues: getFFlagCommunitiesUseVisualConfigUtil (copy), getAppChatCommunitiesVisualConfig (copy), useLocalization (copy), GetFFlagUseCommunitiesTranslation (copy), React (copy), LuaAppNavigationContext (copy), useTelemetry (copy), ChatLandingTelemetryLayer (copy), Images (copy), v22 (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ChatLandingTelemetryEvents (copy), FFlagAppChatCustomConversationListRow (copy), CustomConversationListRow (copy), IconName (copy), CustomConversationListEntry (copy)
+	local v24 = if not getFFlagCommunitiesUseVisualConfigUtil() then nil else getAppChatCommunitiesVisualConfig()
+	local v25 = useLocalization({
+		createAndExploreGroupsText = "Feature.SocialTab.Label.CreateAndExploreGroups",
+		groupsText = if not getFFlagCommunitiesUseVisualConfigUtil() then not GetFFlagUseCommunitiesTranslation() and "CommonUI.Features.Label.sGroups" or "Feature.SocialTab.Label.Groups" else v24.label
+	})
+	local v26 = React.useContext(LuaAppNavigationContext)
+	local v27 = useTelemetry(ChatLandingTelemetryLayer.Context)
+	local v28 = if not getFFlagCommunitiesUseVisualConfigUtil() then v22 else Images[v24.icon]
+	local v29 = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatLandingConversationListHeader("communities")
+	local v30 = React.useCallback(function() -- line: 52
+		-- upvalues: v27 (copy), ChatLandingTelemetryEvents (copy), v26 (copy)
+		v27.emit(ChatLandingTelemetryEvents.ChatLandingGroupsBtnClicked, {})
+		v26.navigateToGroups()
+	end, {
+		v27,
+		v26
+	})
+
+	if FFlagAppChatCustomConversationListRow then
+		return React.createElement(CustomConversationListRow, {
+			key = "ConversationGroupsEntry",
+			entryHeight = t1.entryHeight,
+			entryIcon = IconName.ThreePeople,
+			onActivated = v30,
+			subTitleText = v25.createAndExploreGroupsText,
+			titleText = v25.groupsText,
+			testId = v29
+		})
+	end
+
+	return React.createElement(CustomConversationListEntry, {
+		key = "ConversationGroupsEntry",
+		entryHeight = t1.entryHeight,
+		entryIcon = v28,
+		onActivated = v30,
+		subTitleText = v25.createAndExploreGroupsText,
+		titleText = v25.groupsText,
+		testId = v29
+	})
+end
+
+return ConversationGroupsEntryContainer

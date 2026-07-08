@@ -1,199 +1,223 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_FirstChild_0 = settings():FindFirstChild("Game Options");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v4 = nil;
-pcall(function() --[[ Line: 8 ]]
-    -- upvalues: v4 (ref)
-    v4 = game:GetService("PlatformService");
-end);
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v6 = require(l_CorePackages_0.Packages.React);
-local v7 = require(l_Modules_0.Shell.Utility);
-local v8 = require(l_Modules_0.Shell.Components.ContextActionEvent);
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local v10 = require(l_Modules_0.Shell.Components.RenderStep);
-local l_game_EngineFeature_0 = game:GetEngineFeature("MigrateOverscanToGameBasicSettings");
-local v12 = Vector2.new(0.85, 0.85);
-local v13 = Vector2.new(0.9, 0.9);
-local v14 = Vector2.new(1920, 1080);
-local v15 = Vector2.new(0, 0);
-local function v17(v16) --[[ Line: 28 ]] --[[ Name: EdgeImage ]]
-    -- upvalues: v6 (copy)
-    return v6.createElement("ImageLabel", {
-        Size = UDim2.new(0, 95, 0, 95), 
-        Position = v16.Position, 
-        AnchorPoint = v16.AnchorPoint, 
-        BackgroundTransparency = 1, 
-        Rotation = v16.Rotation, 
-        Image = "rbxasset://textures/ui/Shell/ScreenAdjustment/ScreenAdjustmentArrow.png"
-    });
-end;
-local v18 = v6.Component:extend("Edges");
-v18.init = function(v19) --[[ Line: 41 ]] --[[ Name: init ]]
-    -- upvalues: v7 (copy), v12 (copy), v14 (copy), v15 (copy), l_game_EngineFeature_0 (copy), l_UserGameSettings_0 (copy), l_FirstChild_0 (copy), v13 (copy), l_UserInputService_0 (copy)
-    local function _(v20) --[[ Line: 42 ]] --[[ Name: getCurrentEdgePercent ]]
-        -- upvalues: v7 (ref), v12 (ref)
-        return v7.ClampVector2(v12, Vector2.new(1, 1), v20);
-    end;
-    local function _(v22) --[[ Line: 46 ]] --[[ Name: getCurrentEdgeSize ]]
-        -- upvalues: v14 (ref), v7 (ref), v15 (ref)
-        local v23 = v22 * v14;
-        local v24 = Vector2.new(v7.Round(v23.X / 2), v7.Round(v23.Y / 2)) * 2;
-        return v7.ClampVector2(v15, v14, v24);
-    end;
-    v19.onAdjustThumbstick = function(_, _, v28) --[[ Line: 52 ]]
-        -- upvalues: v19 (copy), v7 (ref)
-        v19._stickPosition = v7.GamepadLinearToCurve(Vector2.new(v28.Position.X, -v28.Position.Y), 0.2);
-    end;
-    v19.onAccept = function() --[[ Line: 56 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), l_UserGameSettings_0 (ref), v19 (copy), l_FirstChild_0 (ref)
-        local _, _ = pcall(function() --[[ Line: 57 ]]
-            -- upvalues: l_game_EngineFeature_0 (ref), l_UserGameSettings_0 (ref), v19 (ref), l_FirstChild_0 (ref)
-            if l_game_EngineFeature_0 then
-                l_UserGameSettings_0.Overscan = Vector2.new(math.min(1, v19._edgePercent.X), (math.min(1, v19._edgePercent.Y)));
-                return;
-            else
-                l_FirstChild_0.OverscanPX = math.min(1, v19._edgePercent.X);
-                l_FirstChild_0.OverscanPY = math.min(1, v19._edgePercent.Y);
-                return;
-            end;
-        end);
-        if v19.props.onSetEdges then
-            v19.props.onSetEdges();
-        end;
-    end;
-    v19.onRenderStep = function() --[[ Line: 73 ]]
-        -- upvalues: v19 (copy), v15 (ref), v7 (ref), v12 (ref), v14 (ref)
-        local v31 = tick();
-        if v19._lastUpdate then
-            if v19._stickPosition ~= v15 then
-                local v32 = v31 - v19._lastUpdate;
-                local v33 = v19._stickPosition * v19._acceleration * v32 * 0.05;
-                local l_v19_0 = v19;
-                local v35 = v33 + v19._edgePercent;
-                l_v19_0._edgePercent = v7.ClampVector2(v12, Vector2.new(1, 1), v35);
-                v19._acceleration = math.min(v19._acceleration + v32 * 1, 3);
-                l_v19_0 = v19;
-                v35 = {};
-                local v36 = v19._edgePercent * v14;
-                local v37 = Vector2.new(v7.Round(v36.X / 2), v7.Round(v36.Y / 2)) * 2;
-                v35.currentSize = v7.ClampVector2(v15, v14, v37);
-                l_v19_0:setState(v35);
-            else
-                v19._acceleration = 1;
-            end;
-        end;
-        v19._lastUpdate = v31;
-    end;
-    v19.onSuspended = function() --[[ Line: 92 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), l_UserGameSettings_0 (ref), v19 (copy), l_FirstChild_0 (ref)
-        pcall(function() --[[ Line: 93 ]]
-            -- upvalues: l_game_EngineFeature_0 (ref), l_UserGameSettings_0 (ref), v19 (ref), l_FirstChild_0 (ref)
-            if l_game_EngineFeature_0 then
-                l_UserGameSettings_0.Overscan = Vector2.new(v19._lastSavedOverscan.X, v19._lastSavedOverscan.Y);
-                return;
-            else
-                l_FirstChild_0.OverscanPX = v19._lastSavedOverscan.X;
-                l_FirstChild_0.OverscanPY = v19._lastSavedOverscan.Y;
-                return;
-            end;
-        end);
-    end;
-    local l_v13_0 = v13;
-    local v39 = v7.ClampVector2(v12, Vector2.new(1, 1), l_v13_0);
-    local v40 = v39 * v14;
-    local v41 = Vector2.new(v7.Round(v40.X / 2), v7.Round(v40.Y / 2)) * 2;
-    l_v13_0 = v7.ClampVector2(v15, v14, v41);
-    if l_UserInputService_0:GetPlatform() == Enum.Platform.XBoxOne then
-        pcall(function() --[[ Line: 106 ]]
-            -- upvalues: l_game_EngineFeature_0 (ref), l_UserGameSettings_0 (ref), v39 (ref), v7 (ref), v12 (ref), l_v13_0 (ref), v14 (ref), v15 (ref), v19 (copy), l_FirstChild_0 (ref)
-            if l_game_EngineFeature_0 then
-                if l_UserGameSettings_0.Overscan.x > 0 and l_UserGameSettings_0.Overscan.y > 0 then
-                    v39 = Vector2.new(l_UserGameSettings_0.Overscan.x, l_UserGameSettings_0.Overscan.y);
-                    local l_v39_0 = v39;
-                    v39 = v7.ClampVector2(v12, Vector2.new(1, 1), l_v39_0);
-                    local v43 = v39 * v14;
-                    local v44 = Vector2.new(v7.Round(v43.X / 2), v7.Round(v43.Y / 2)) * 2;
-                    l_v13_0 = v7.ClampVector2(v15, v14, v44);
-                    v19._lastSavedOverscan = Vector2.new(l_UserGameSettings_0.Overscan.x, l_UserGameSettings_0.Overscan.y);
-                    l_UserGameSettings_0.Overscan = Vector2.new(1, 1);
-                    return;
-                end;
-            elseif l_FirstChild_0.OverscanPX > 0 and l_FirstChild_0.OverscanPY > 0 then
-                v39 = Vector2.new(l_FirstChild_0.OverscanPX, l_FirstChild_0.OverscanPY);
-                local l_v39_1 = v39;
-                v39 = v7.ClampVector2(v12, Vector2.new(1, 1), l_v39_1);
-                local v46 = v39 * v14;
-                local v47 = Vector2.new(v7.Round(v46.X / 2), v7.Round(v46.Y / 2)) * 2;
-                l_v13_0 = v7.ClampVector2(v15, v14, v47);
-                v19._lastSavedOverscan = Vector2.new(l_FirstChild_0.OverscanPX, l_FirstChild_0.OverscanPY);
-                l_FirstChild_0.OverscanPX = 1;
-                l_FirstChild_0.OverscanPY = 1;
-            end;
-        end);
-    end;
-    v19._stickPosition = v15;
-    v19._edgePercent = v39;
-    v19._lastUpdate = nil;
-    v19._acceleration = 1;
-    v19._seenAPressed = false;
-    v19.state = {
-        currentSize = l_v13_0
-    };
-end;
-v18.render = function(v48) --[[ Line: 145 ]] --[[ Name: render ]]
-    -- upvalues: v6 (copy), v17 (copy), v10 (copy), v8 (copy), v4 (ref), l_ExternalEventConnection_0 (copy)
-    return v6.createElement("Frame", {
-        Size = UDim2.new(0, v48.state.currentSize.X, 0, v48.state.currentSize.Y), 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundTransparency = 1
-    }, {
-        SelectionImage = v6.createElement("ImageLabel", {
-            Size = UDim2.new(1, 2, 1, 2), 
-            Position = UDim2.new(0, -1, 0, -1), 
-            BackgroundTransparency = 1, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(21, 21, 41, 41), 
-            Image = "rbxasset://textures/ui/Shell/ScreenAdjustment/ScreenRangeOverlay.png"
-        }), 
-        TopLeft = v6.createElement(v17, {
-            Rotation = 0, 
-            Position = UDim2.new(0, 0, 0, 0), 
-            AnchorPoint = Vector2.new(0, 0)
-        }), 
-        TopRight = v6.createElement(v17, {
-            Rotation = 90, 
-            Position = UDim2.new(1, 0, 0, 0), 
-            AnchorPoint = Vector2.new(1, 0)
-        }), 
-        BottomRight = v6.createElement(v17, {
-            Rotation = 180, 
-            Position = UDim2.new(1, 0, 1, 0), 
-            AnchorPoint = Vector2.new(1, 1)
-        }), 
-        BottomLeft = v6.createElement(v17, {
-            Rotation = 270, 
-            Position = UDim2.new(0, 0, 1, 0), 
-            AnchorPoint = Vector2.new(0, 1)
-        }), 
-        Render = v6.createElement(v10, {
-            name = "UpdateAdjustmentScreen", 
-            priority = Enum.RenderPriority.Input.Value, 
-            callback = v48.onRenderStep
-        }), 
-        AdjustConnectorThumbstick = v6.createElement(v8, {
-            name = "ThumbstickAdjustmentScreen", 
-            callback = v48.onAdjustThumbstick, 
-            binds = {
-                Enum.KeyCode.Thumbstick2
-            }
-        }), 
-        SuspendedCn = v4 and v6.createElement(l_ExternalEventConnection_0, {
-            event = v4.Suspended, 
-            callback = v48.onSuspended
-        })
-    });
-end;
-return v18;
+local CorePackages = game:GetService("CorePackages")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local v3 = settings():FindFirstChild("Game Options")
+local UserInputService = game:GetService("UserInputService")
+local PlatformService = nil
+
+pcall(function() -- line: 8
+	-- upvalues: PlatformService (ref)
+	PlatformService = game:GetService("PlatformService")
+end)
+
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local React = require(CorePackages.Packages.React)
+local Utility = require(Modules.Shell.Utility)
+local ContextActionEvent = require(Modules.Shell.Components.ContextActionEvent)
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local RenderStep = require(Modules.Shell.Components.RenderStep)
+local EngineFeature = game:GetEngineFeature("MigrateOverscanToGameBasicSettings")
+local vector2 = Vector2.new(0.85, 0.85)
+local vector2_2 = Vector2.new(0.9, 0.9)
+local vector2_3 = Vector2.new(1920, 1080)
+local vector2_4 = Vector2.new(0, 0)
+
+local function EdgeImage(p1) -- line: 28
+	-- upvalues: React (copy)
+	return React.createElement("ImageLabel", {
+		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/Shell/ScreenAdjustment/ScreenAdjustmentArrow.png",
+		Size = UDim2.new(0, 95, 0, 95),
+		Position = p1.Position,
+		AnchorPoint = p1.AnchorPoint,
+		Rotation = p1.Rotation
+	})
+end
+
+local v18 = React.Component:extend("Edges")
+
+function v18.init(p2) -- line: 41
+	-- upvalues: Utility (copy), vector2 (copy), vector2_3 (copy), vector2_4 (copy), EngineFeature (copy), UserGameSettings (copy), v3 (copy), vector2_2 (copy), UserInputService (copy)
+	local function getCurrentEdgePercent(p3) -- line: 42
+		-- upvalues: Utility (copy), vector2 (copy)
+		return Utility.ClampVector2(vector2, Vector2.new(1, 1), p3)
+	end
+	local function getCurrentEdgeSize(p4) -- line: 46
+		-- upvalues: vector2_3 (copy), Utility (copy), vector2_4 (copy)
+		local v31 = p4 * vector2_3
+		local v32 = Vector2.new(Utility.Round(v31.X / 2), Utility.Round(v31.Y / 2)) * 2
+
+		return Utility.ClampVector2(vector2_4, vector2_3, v32)
+	end
+
+	function p2.onAdjustThumbstick(_, _, p7) -- line: 52
+		-- upvalues: p2 (copy), Utility (copy)
+		p2._stickPosition = Utility.GamepadLinearToCurve(Vector2.new(p7.Position.X, -p7.Position.Y), 0.2)
+	end
+	function p2.onAccept() -- line: 56
+		-- upvalues: EngineFeature (copy), UserGameSettings (copy), p2 (copy), v3 (copy)
+		local _, _ = pcall(function() -- line: 57
+			-- upvalues: EngineFeature (copy), UserGameSettings (copy), p2 (copy), v3 (copy)
+			if EngineFeature then
+				UserGameSettings.Overscan = Vector2.new(math.min(1, p2._edgePercent.X), (math.min(1, p2._edgePercent.Y)))
+
+				return
+			end
+
+			v3.OverscanPX = math.min(1, p2._edgePercent.X)
+			v3.OverscanPY = math.min(1, p2._edgePercent.Y)
+		end)
+
+		if p2.props.onSetEdges then
+			p2.props.onSetEdges()
+		end
+	end
+	function p2.onRenderStep() -- line: 73
+		-- upvalues: p2 (copy), vector2_4 (copy), Utility (copy), vector2 (copy), vector2_3 (copy)
+		local timestamp = tick()
+
+		if p2._lastUpdate then
+			if p2._stickPosition ~= vector2_4 then
+				local v39 = timestamp - p2._lastUpdate
+				local v40 = p2._stickPosition * p2._acceleration * v39 * 0.05
+				local v41 = p2
+				local v42 = v40 + p2._edgePercent
+
+				v41._edgePercent = Utility.ClampVector2(vector2, Vector2.new(1, 1), v42)
+				p2._acceleration = math.min(p2._acceleration + v39 * 1, 3)
+
+				local v43 = p2
+				local t1 = {}
+				local v45 = p2._edgePercent * vector2_3
+				local v46 = Vector2.new(Utility.Round(v45.X / 2), Utility.Round(v45.Y / 2)) * 2
+
+				t1.currentSize = Utility.ClampVector2(vector2_4, vector2_3, v46)
+				v43:setState(t1)
+			else
+				p2._acceleration = 1
+			end
+		end
+
+		p2._lastUpdate = timestamp
+	end
+	function p2.onSuspended() -- line: 92
+		-- upvalues: EngineFeature (copy), UserGameSettings (copy), p2 (copy), v3 (copy)
+		pcall(function() -- line: 93
+			-- upvalues: EngineFeature (copy), UserGameSettings (copy), p2 (copy), v3 (copy)
+			if EngineFeature then
+				UserGameSettings.Overscan = Vector2.new(p2._lastSavedOverscan.X, p2._lastSavedOverscan.Y)
+
+				return
+			end
+
+			v3.OverscanPX = p2._lastSavedOverscan.X
+			v3.OverscanPY = p2._lastSavedOverscan.Y
+		end)
+	end
+
+	local v23 = vector2_2
+	local u24 = Utility.ClampVector2(vector2, Vector2.new(1, 1), v23)
+	local v25 = u24 * vector2_3
+	local v26 = Vector2.new(Utility.Round(v25.X / 2), Utility.Round(v25.Y / 2)) * 2
+	local u27 = Utility.ClampVector2(vector2_4, vector2_3, v26)
+
+	if UserInputService:GetPlatform() == Enum.Platform.XBoxOne then
+		pcall(function() -- line: 106
+			-- upvalues: EngineFeature (copy), UserGameSettings (copy), u24 (ref), Utility (copy), vector2 (copy), u27 (ref), vector2_3 (copy), vector2_4 (copy), p2 (copy), v3 (copy)
+			if EngineFeature then
+				if UserGameSettings.Overscan.x > 0 and UserGameSettings.Overscan.y > 0 then
+					u24 = Vector2.new(UserGameSettings.Overscan.x, UserGameSettings.Overscan.y)
+
+					local v47 = u24
+
+					u24 = Utility.ClampVector2(vector2, Vector2.new(1, 1), v47)
+
+					local v48 = u24 * vector2_3
+					local v49 = Vector2.new(Utility.Round(v48.X / 2), Utility.Round(v48.Y / 2)) * 2
+
+					u27 = Utility.ClampVector2(vector2_4, vector2_3, v49)
+					p2._lastSavedOverscan = Vector2.new(UserGameSettings.Overscan.x, UserGameSettings.Overscan.y)
+					UserGameSettings.Overscan = Vector2.new(1, 1)
+
+					return
+				end
+			elseif v3.OverscanPX > 0 and v3.OverscanPY > 0 then
+				u24 = Vector2.new(v3.OverscanPX, v3.OverscanPY)
+
+				local v50 = u24
+
+				u24 = Utility.ClampVector2(vector2, Vector2.new(1, 1), v50)
+
+				local v51 = u24 * vector2_3
+				local v52 = Vector2.new(Utility.Round(v51.X / 2), Utility.Round(v51.Y / 2)) * 2
+
+				u27 = Utility.ClampVector2(vector2_4, vector2_3, v52)
+				p2._lastSavedOverscan = Vector2.new(v3.OverscanPX, v3.OverscanPY)
+				v3.OverscanPX = 1
+				v3.OverscanPY = 1
+			end
+		end)
+	end
+
+	p2._stickPosition = vector2_4
+	p2._edgePercent = u24
+	p2._lastUpdate = nil
+	p2._acceleration = 1
+	p2._seenAPressed = false
+	p2.state = {
+		currentSize = u27
+	}
+end
+function v18.render(p8) -- line: 145
+	-- upvalues: React (copy), EdgeImage (copy), RenderStep (copy), ContextActionEvent (copy), PlatformService (ref), ExternalEventConnection (copy)
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, p8.state.currentSize.X, 0, p8.state.currentSize.Y),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5)
+	}, {
+		SelectionImage = React.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = "rbxasset://textures/ui/Shell/ScreenAdjustment/ScreenRangeOverlay.png",
+			Size = UDim2.new(1, 2, 1, 2),
+			Position = UDim2.new(0, -1, 0, -1),
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(21, 21, 41, 41)
+		}),
+		TopLeft = React.createElement(EdgeImage, {
+			Rotation = 0,
+			Position = UDim2.new(0, 0, 0, 0),
+			AnchorPoint = Vector2.new(0, 0)
+		}),
+		TopRight = React.createElement(EdgeImage, {
+			Rotation = 90,
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0)
+		}),
+		BottomRight = React.createElement(EdgeImage, {
+			Rotation = 180,
+			Position = UDim2.new(1, 0, 1, 0),
+			AnchorPoint = Vector2.new(1, 1)
+		}),
+		BottomLeft = React.createElement(EdgeImage, {
+			Rotation = 270,
+			Position = UDim2.new(0, 0, 1, 0),
+			AnchorPoint = Vector2.new(0, 1)
+		}),
+		Render = React.createElement(RenderStep, {
+			name = "UpdateAdjustmentScreen",
+			priority = Enum.RenderPriority.Input.Value,
+			callback = p8.onRenderStep
+		}),
+		AdjustConnectorThumbstick = React.createElement(ContextActionEvent, {
+			name = "ThumbstickAdjustmentScreen",
+			callback = p8.onAdjustThumbstick,
+			binds = { Enum.KeyCode.Thumbstick2 }
+		}),
+		SuspendedCn = PlatformService and React.createElement(ExternalEventConnection, {
+			event = PlatformService.Suspended,
+			callback = p8.onSuspended
+		})
+	})
+end
+
+return v18

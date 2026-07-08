@@ -1,8 +1,9 @@
-local v0 = require(script.getThumbnailsForUserIds);
-local v1 = require(script.populateUserWithState);
-local v2 = require(script.userPresenceUtils);
+local getThumbnailsForUserIds = require(script.getThumbnailsForUserIds)
+local populateUserWithState = require(script.populateUserWithState)
+local userPresenceUtils = require(script.userPresenceUtils)
+
 return {
-    getThumbnailsForUserIds = v0, 
-    populateUserWithState = v1, 
-    userPresenceUtils = v2
-};
+	getThumbnailsForUserIds = getThumbnailsForUserIds,
+	populateUserWithState = populateUserWithState,
+	userPresenceUtils = userPresenceUtils
+}

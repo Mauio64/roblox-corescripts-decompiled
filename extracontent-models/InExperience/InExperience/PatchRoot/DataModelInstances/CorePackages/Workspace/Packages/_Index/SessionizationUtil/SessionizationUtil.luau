@@ -1,8 +1,9 @@
-local v0 = require(script.SessionServiceWrapper);
-local v1 = require(script.MockSessionService);
-local v2 = require(script.SessionInfo);
+local SessionServiceWrapper = require(script.SessionServiceWrapper)
+local MockSessionService = require(script.MockSessionService)
+local SessionInfo = require(script.SessionInfo)
+
 return {
-    SessionServiceWrapper = v0, 
-    MockSessionService = v1, 
-    SessionInfo = v2
-};
+	SessionServiceWrapper = SessionServiceWrapper,
+	MockSessionService = MockSessionService,
+	SessionInfo = SessionInfo
+}

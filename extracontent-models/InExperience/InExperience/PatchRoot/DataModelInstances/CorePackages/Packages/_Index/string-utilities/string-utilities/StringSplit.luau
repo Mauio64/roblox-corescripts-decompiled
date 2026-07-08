@@ -1,52 +1,53 @@
-local function v0(v1, v2, v3) --[[ Line: 7 ]] --[[ Name: StringSplit ]]
-    -- upvalues: v0 (copy)
-    if #v1 == 0 then
-        if string.find(v1, v2) then
-            return {};
-        else
-            return {
-                ""
-            };
-        end;
-    else
-        if not v3 then
-            v3 = -1;
-        end;
-        if v3 == 1 then
-            return {
-                v1
-            };
-        else
-            if not v2 then
-                v2 = "%s+";
-            end;
-            local v4, v5 = string.find(v1, v2);
-            if not v4 then
-                return {
-                    v1
-                };
-            else
-                if v5 < 1 then
-                    local v6, v7 = string.find(string.sub(v1, 2), v2);
-                    v4 = v6;
-                    v5 = v7;
-                    v4 = v4 + 1;
-                    v5 = v5 + 1;
-                end;
-                local v8 = string.sub(v1, 1, v4 - 1);
-                local v9 = string.sub(v1, v5 + 1);
-                if #v9 == 0 and v4 <= v5 then
-                    return {
-                        v8, 
-                        v9
-                    };
-                else
-                    local v10 = v0(v9, v2, v3 - 1);
-                    table.insert(v10, 1, v8);
-                    return v10;
-                end;
-            end;
-        end;
-    end;
-end;
-return v0;
+local function StringSplit(p1, p2, p3) -- line: 7
+	-- upvalues: StringSplit (copy)
+	if #p1 == 0 then
+		if string.find(p1, p2) then
+			return {}
+		end
+
+		return { "" }
+	end
+
+	if not p3 then
+		p3 = -1
+	end
+
+	if p3 == 1 then
+		return { p1 }
+	end
+
+	if not p2 then
+		p2 = "%s+"
+	end
+
+	local start, stop = string.find(p1, p2)
+
+	if not start then
+		return { p1 }
+	end
+
+	if stop < 1 then
+		local start2, stop2 = string.find(string.sub(p1, 2), p2)
+
+		start = start2 + 1
+		stop = stop2 + 1
+	end
+
+	local v9 = string.sub(p1, 1, start - 1)
+	local v10 = string.sub(p1, stop + 1)
+
+	if #v10 == 0 and start <= stop then
+		return {
+			v9,
+			v10
+		}
+	end
+
+	local v11 = StringSplit(v10, p2, p3 - 1)
+
+	table.insert(v11, 1, v9)
+
+	return v11
+end
+
+return StringSplit

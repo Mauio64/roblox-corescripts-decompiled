@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddAbuseReportOffsetForLandscape", false);
+return game:DefineFastFlag("AddAbuseReportOffsetForLandscape", false)

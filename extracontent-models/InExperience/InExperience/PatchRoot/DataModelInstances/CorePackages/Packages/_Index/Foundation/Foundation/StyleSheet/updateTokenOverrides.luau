@@ -11,15 +11,17 @@ require(script.Parent.createStyleSheetRules)
 local getOverrideAttributes = require(script.Parent.getOverrideAttributes)
 local scaleValue = require(Foundation.Utility.scaleValue)
 
-return function(p1, p2, p3, n1: number, p4, p5) --[[ updateTokenOverrides ]] -- line: 15
+local function updateTokenOverrides(p1, p2, p3, n1: number, p4, p5) -- line: 15
 	-- upvalues: getOverrideAttributes (copy), Flags (copy), scaleValue (copy)
-	for v11, v12 in (getOverrideAttributes(p2, p3, p4)) do
-		local v13 = if not Flags.FoundationDisableTokenScaling then scaleValue(v12, n1) else v12
+	for v12, v13 in (getOverrideAttributes(p2, p3, p4)) do
+		local v14 = if not Flags.FoundationDisableTokenScaling then scaleValue(v13, n1) else v13
 
-		p1:SetAttribute(v11, v13)
+		p1:SetAttribute(v12, v14)
 
 		if p5 then
-			p5[v11] = v13
+			p5[v12] = v14
 		end
 	end
 end
+
+return updateTokenOverrides

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEdpFetchLatencyTracking", false);
+return game:DefineFastFlag("LuaAppEdpFetchLatencyTracking", false)

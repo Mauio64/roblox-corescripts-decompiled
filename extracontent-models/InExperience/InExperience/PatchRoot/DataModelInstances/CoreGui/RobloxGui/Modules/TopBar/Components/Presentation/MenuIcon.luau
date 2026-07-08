@@ -87,10 +87,10 @@ if isInExperienceUIVREnabled then
 	function u60() -- line: 88
 		-- upvalues: isInExperienceUIVREnabled (copy), isSpatial (ref), v27 (copy), UIManager (ref)
 		if isInExperienceUIVREnabled and isSpatial() then
-			local v69 = v27:showTopBar()
-			local v70 = UIManager.getInstance():isBottomBarInteractionOnAnimationSupported()
+			local v70 = v27:showTopBar()
+			local v71 = UIManager.getInstance():isBottomBarInteractionOnAnimationSupported()
 
-			return not v69 and not v70
+			return not v70 and not v71
 		end
 
 		return false
@@ -121,15 +121,15 @@ function v64.init(p1) -- line: 125
 		vrShowMenuIcon = false,
 		showTooltip = false,
 		isHovering = false,
-		clickLatched = not v65 and nil,
-		enableFlashingDot = false
+		enableFlashingDot = false,
+		clickLatched = not v65 and nil
 	})
 	p1.disposeUiScaleEffect = Signals.createEffect(function(p2) -- line: 133
 		-- upvalues: Display (copy), p1 (copy)
-		local v96 = Display.GetDisplayStore(p2)
+		local v97 = Display.GetDisplayStore(p2)
 
 		p1:setState({
-			UiScale = v96.getUIScale(p2)
+			UiScale = v97.getUIScale(p2)
 		})
 	end)
 
@@ -273,17 +273,19 @@ function v64.init(p1) -- line: 125
 				return
 			end
 
+			local function unfocusTilt(_, p9, _) -- line: 259
+				-- upvalues: FFlagEnableConsoleExpControls (copy), GuiService (copy)
+				if not FFlagEnableConsoleExpControls and p9 == Enum.UserInputState.End or FFlagEnableConsoleExpControls and p9 == Enum.UserInputState.Begin then
+					GuiService.SelectedCoreObject = nil
+
+					return Enum.ContextActionResult.Sink
+				end
+
+				return Enum.ContextActionResult.Pass
+			end
+
 			if b1 then
-				ContextActionService:BindCoreAction("Unfocus_Tilt", function(_, p9, _) --[[ unfocusTilt ]] -- line: 259
-					-- upvalues: FFlagEnableConsoleExpControls (copy), GuiService (copy)
-					if not FFlagEnableConsoleExpControls and p9 == Enum.UserInputState.End or FFlagEnableConsoleExpControls and p9 == Enum.UserInputState.Begin then
-						GuiService.SelectedCoreObject = nil
-
-						return Enum.ContextActionResult.Sink
-					end
-
-					return Enum.ContextActionResult.Pass
-				end, false, Enum.KeyCode.ButtonB)
+				ContextActionService:BindCoreAction("Unfocus_Tilt", unfocusTilt, false, Enum.KeyCode.ButtonB)
 
 				return
 			end
@@ -297,25 +299,25 @@ function v64.init(p1) -- line: 125
 	end
 
 	if ((if not FFlagEnableConsoleExpControls then Enabled else Enabled() and v51)) and FFlagEnableConsoleExpControls then
-		local v72 = v51:getShowTopBar()
-		local v73, v74 = Roact.createBinding(v72:get())
+		local v73 = v51:getShowTopBar()
+		local v74, v75 = Roact.createBinding(v73:get())
 
-		p1.showIcon = v73
-		p1.setShowIcon = v74
+		p1.showIcon = v74
+		p1.setShowIcon = v75
 
 		if FFlagReduceTopBarInsetsWhileHidden then
 			p1.priorAbsolutePosition = Vector2.zero
 			p1.priorAbsoluteSize = Vector2.zero
 		end
 
-		v72:connect(function() -- line: 292
-			-- upvalues: v72 (copy), p1 (copy), FFlagReduceTopBarInsetsWhileHidden (copy), Constants (copy)
-			local v105 = v72:get()
+		v73:connect(function() -- line: 292
+			-- upvalues: v73 (copy), p1 (copy), FFlagReduceTopBarInsetsWhileHidden (copy), Constants (copy)
+			local v107 = v73:get()
 
-			p1.setShowIcon(v105)
+			p1.setShowIcon(v107)
 
 			if FFlagReduceTopBarInsetsWhileHidden then
-				if v105 then
+				if v107 then
 					p1.props.onAreaChanged(Constants.MenuIconKeepOutAreaId, p1.priorAbsolutePosition, p1.priorAbsoluteSize)
 
 					return
@@ -338,19 +340,19 @@ function v64.init(p1) -- line: 125
 		p1.uiLessStore = Stores.GetUILessStore(false)
 
 		if p1.uiLessStore.getUILessModeEnabled(false) then
-			local v75, v76 = Roact.createBinding(true)
+			local v76, v77 = Roact.createBinding(true)
 
-			p1.showIcon = v75
-			p1.setShowIcon = v76
+			p1.showIcon = v76
+			p1.setShowIcon = v77
 			p1.priorAbsolutePosition = Vector2.zero
 			p1.priorAbsoluteSize = Vector2.zero
 			p1.disposeEffect = createEffect(function(p11) -- line: 322
 				-- upvalues: p1 (copy), Constants (copy)
-				local v107 = p1.uiLessStore.getUIVisible(p11)
+				local v109 = p1.uiLessStore.getUIVisible(p11)
 
-				p1.setShowIcon(v107)
+				p1.setShowIcon(v109)
 
-				if v107 then
+				if v109 then
 					p1.props.onAreaChanged(Constants.MenuIconKeepOutAreaId, p1.priorAbsolutePosition, p1.priorAbsoluteSize)
 
 					return
@@ -367,13 +369,13 @@ function v64.renderWithTooltipCompat(p12, p13, p14, p15) -- line: 336
 		return React.createElement(React.Fragment, nil, {
 			VRSpatialTooltip = if not p14.active or (not p12.state.triggerPointSize or not Panel3DInSpatialUI) then nil else React.createElement(Panel3DInSpatialUI, {
 				panelType = PanelType.ToolTipsContainer,
-				renderFunction = function(p16) --[[ renderFunction ]] -- line: 354
+				renderFunction = function(p16) -- line: 354
 					-- upvalues: React (copy), TooltipCallout (ref), p13 (copy), TooltipOrientation (copy), p12 (copy), SPATIAL_TOOLTIP_SPACING (ref)
 					return React.createElement(TooltipCallout, {
+						distanceOffset = 0,
 						textAlignment = Enum.TextXAlignment.Center,
 						headerText = p13.headerText,
 						orientation = TooltipOrientation.Top,
-						distanceOffset = 0,
 						triggerPointCenter = Vector2.new(p12.state.triggerPointPosition.X + p12.state.triggerPointSize.X / 2, p16.Y - SPATIAL_TOOLTIP_SPACING),
 						contentOffsetVector = Vector2.zero,
 						triggerPointRadius = Vector2.zero
@@ -408,12 +410,12 @@ function v64.willUnmount(p18) -- line: 378
 end
 function v64.render(p19) -- line: 395
 	-- upvalues: isInExperienceUIVREnabled (copy), VRService (copy), Constants (copy), FFlagReduceTopBarInsetsWhileHidden (copy), FFlagEnableConsoleExpControls (copy), Enabled (copy), v51 (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), Roact (copy), IconButton (copy), isNewTiltIconEnabled (copy), Images (copy), FFlagTopBarSignalizeMenuOpen (copy), v65 (copy), GamepadService (copy), ExternalEventConnection (copy), VRHub (copy), BadgeOver12 (copy), RobloxTranslator (copy), t1 (copy), v42 (copy), CoreGui (copy), TooltipOrientation (copy), v27 (copy), v28 (copy)
-	local u83 = not not isInExperienceUIVREnabled or (not VRService.VREnabled or p19.state.vrShowMenuIcon)
-	local v84 = Constants.TopBarButtonHeight * p19.state.UiScale
-	local v85 = Constants.TopBarButtonPadding * p19.state.UiScale
-	local v86 = Constants.MENU_ICON_SIZE * p19.state.UiScale
+	local u84 = not not isInExperienceUIVREnabled or (not VRService.VREnabled or p19.state.vrShowMenuIcon)
+	local v85 = Constants.TopBarButtonHeight * p19.state.UiScale
+	local v86 = Constants.TopBarButtonPadding * p19.state.UiScale
+	local v87 = Constants.MENU_ICON_SIZE * p19.state.UiScale
 
-	local function v87(p20) -- line: 407
+	local function v88(p20) -- line: 407
 		-- upvalues: FFlagReduceTopBarInsetsWhileHidden (copy), p19 (copy), FFlagEnableConsoleExpControls (copy), Enabled (copy), v51 (copy), Constants (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy)
 		if p20 then
 			if FFlagReduceTopBarInsetsWhileHidden then
@@ -440,9 +442,9 @@ function v64.render(p19) -- line: 395
 		end
 	end
 
-	local v88 = Roact.createElement(IconButton, {
+	local v89 = Roact.createElement(IconButton, {
 		icon = not isNewTiltIconEnabled() and "rbxasset://textures/ui/TopBar/coloredlogo.png" or Images["icons/logo/block"],
-		iconSize = if not FFlagTopBarSignalizeMenuOpen then v86 * (p19.props.iconScale or 1) else v86 * (not p19.state.tiltMenuOpen and 1 or Constants.MenuIconOpenScale),
+		iconSize = if not FFlagTopBarSignalizeMenuOpen then v87 * (p19.props.iconScale or 1) else v87 * (not p19.state.tiltMenuOpen and 1 or Constants.MenuIconOpenScale),
 		useIconScaleAnimation = isNewTiltIconEnabled(),
 		onActivated = p19.menuIconActivated,
 		onHover = p19.menuIconOnHover,
@@ -450,12 +452,12 @@ function v64.render(p19) -- line: 395
 		enableFlashingDot = p19.state.enableFlashingDot,
 		modal = FFlagAddUILessMode and (FIntAddUILessModeVariant == 2 and not not p19.uiLessStore.getUILessModeEnabled(false)) or nil
 	})
-	local v89 = GamepadService and Roact.createElement(ExternalEventConnection, {
+	local v90 = GamepadService and Roact.createElement(ExternalEventConnection, {
 		event = VRHub.ShowTopBarChanged.Event or GamepadService:GetPropertyChangedSignal("GamepadCursorEnabled"),
 		callback = p19.showTopBarCallback
 	})
-	local v90 = if not p19.props.showBadgeOver12 then nil else Roact.createElement(BadgeOver12, {
-		position = if not Enabled() then UDim2.new(0, -4, 1, 4) else UDim2.new(0, 1, 1, -(v85 + 1))
+	local v91 = if not p19.props.showBadgeOver12 then nil else Roact.createElement(BadgeOver12, {
+		position = if not Enabled() then UDim2.new(0, -4, 1, 4) else UDim2.new(0, 1, 1, -(v86 + 1))
 	})
 
 	if v65 then
@@ -478,10 +480,10 @@ function v64.render(p19) -- line: 395
 		end
 
 		local t3 = {
+			DisplayOrder = 10,
 			active = p19.state.showTooltip,
 			guiTarget = CoreGui,
-			preferredOrientation = TooltipOrientation.Bottom,
-			DisplayOrder = 10
+			preferredOrientation = TooltipOrientation.Bottom
 		}
 
 		if v42 and p19.props.referralRewardTooltipText and p19.props.referralRewardTooltipText ~= "" then
@@ -489,75 +491,75 @@ function v64.render(p19) -- line: 395
 		end
 
 		return p19:renderWithTooltipCompat(t2, t3, function(p21) -- line: 484
-			-- upvalues: v87 (copy), Enabled (copy), FFlagEnableConsoleExpControls (copy), p19 (copy), v27 (copy), v28 (copy), Roact (copy), IconButton (copy), isNewTiltIconEnabled (copy), Images (copy), FFlagTopBarSignalizeMenuOpen (copy), v86 (copy), Constants (copy), v65 (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), u83 (ref), v84 (copy), v90 (copy), v88 (copy), v89 (copy)
-			local function v112(p22) -- line: 485
-				-- upvalues: v87 (copy), p21 (copy)
-				v87(p22)
+			-- upvalues: v88 (copy), Enabled (copy), FFlagEnableConsoleExpControls (copy), p19 (copy), v27 (copy), v28 (copy), Roact (copy), IconButton (copy), isNewTiltIconEnabled (copy), Images (copy), FFlagTopBarSignalizeMenuOpen (copy), v87 (copy), Constants (copy), v65 (copy), FFlagAddUILessMode (copy), FIntAddUILessModeVariant (copy), u84 (ref), v85 (copy), v91 (copy), v89 (copy), v90 (copy)
+			local function v114(p22) -- line: 485
+				-- upvalues: v88 (copy), p21 (copy)
+				v88(p22)
 				p21(p22)
 			end
 
-			local v113 = nil
+			local v115 = nil
 
 			if Enabled() and (FFlagEnableConsoleExpControls and p19.props.unibarMenuRef and p19.props.unibarMenuRef.current) then
-				local v114 = v27:menuList():get()[1]
-				local v115 = if not v114 then nil else v28.ICON_NAME_PREFIX .. v114.id
-				local v116 = if not p19.props.unibarMenuRef.current or not v115 then nil else p19.props.unibarMenuRef.current:FindFirstChild(v115, true)
+				local v116 = v27:menuList():get()[1]
+				local v117 = if not v116 then nil else v28.ICON_NAME_PREFIX .. v116.id
+				local v118 = if not p19.props.unibarMenuRef.current or not v117 then nil else p19.props.unibarMenuRef.current:FindFirstChild(v117, true)
 
-				v113 = Roact.createElement(IconButton, {
+				v115 = Roact.createElement(IconButton, {
 					icon = not isNewTiltIconEnabled() and "rbxasset://textures/ui/TopBar/coloredlogo.png" or Images["icons/logo/block"],
-					iconSize = if not FFlagTopBarSignalizeMenuOpen then v86 * (p19.props.iconScale or 1) else v86 * (not p19.state.tiltMenuOpen and 1 or Constants.MenuIconOpenScale),
+					iconSize = if not FFlagTopBarSignalizeMenuOpen then v87 * (p19.props.iconScale or 1) else v87 * (not p19.state.tiltMenuOpen and 1 or Constants.MenuIconOpenScale),
 					useIconScaleAnimation = isNewTiltIconEnabled(),
 					onActivated = p19.menuIconActivated,
 					onHover = p19.menuIconOnHover,
 					onHoverEnd = if not v65 then nil else p19.menuIconOnHoverEnd,
 					enableFlashingDot = p19.state.enableFlashingDot,
 					onSelectionChanged = p19.onMenuIconSelectionChanged,
-					nextSelectionRightRef = v116,
+					nextSelectionRightRef = v118,
 					forwardRef = p19.props.menuIconRef
 				})
 			end
 
 			return Roact.createElement("Frame", {
-				Visible = if not (not not Enabled() and FFlagEnableConsoleExpControls) and (not FFlagAddUILessMode or (FIntAddUILessModeVariant == 0 or not p19.uiLessStore.getUILessModeEnabled(false))) then u83 else p19.showIcon:map(function(p23) -- line: 516
-					-- upvalues: u83 (ref)
-					return u83 and p23
+				Visible = if not (not not Enabled() and FFlagEnableConsoleExpControls) and (not FFlagAddUILessMode or (FIntAddUILessModeVariant == 0 or not p19.uiLessStore.getUILessModeEnabled(false))) then u84 else p19.showIcon:map(function(p23) -- line: 516
+					-- upvalues: u84 (ref)
+					return u84 and p23
 				end),
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, v84, 1, 0),
+				Size = UDim2.new(0, v85, 1, 0),
 				LayoutOrder = p19.props.layoutOrder,
 				SelectionGroup = Enabled() and not not FFlagEnableConsoleExpControls or nil,
 				SelectionBehaviorLeft = if not Enabled() or not FFlagEnableConsoleExpControls then nil else Enum.SelectionBehavior.Stop,
 				SelectionBehaviorUp = if not Enabled() or not FFlagEnableConsoleExpControls then nil else Enum.SelectionBehavior.Stop,
 				SelectionBehaviorDown = if not Enabled() or not FFlagEnableConsoleExpControls then nil else Enum.SelectionBehavior.Stop,
-				[Roact.Change.AbsoluteSize] = v112,
-				[Roact.Change.AbsolutePosition] = v112
+				[Roact.Change.AbsoluteSize] = v114,
+				[Roact.Change.AbsolutePosition] = v114
 			}, {
-				BadgeOver12 = v90,
-				Background = if not Enabled() or (not FFlagEnableConsoleExpControls or (not p19.props.unibarMenuRef or not p19.props.unibarMenuRef.current)) then v88 else nil,
-				IconHitArea = if not Enabled() or not FFlagEnableConsoleExpControls then nil else v113,
-				ShowTopBarListener = v89
+				BadgeOver12 = v91,
+				Background = if not Enabled() or (not FFlagEnableConsoleExpControls or (not p19.props.unibarMenuRef or not p19.props.unibarMenuRef.current)) then v89 else nil,
+				IconHitArea = if not Enabled() or not FFlagEnableConsoleExpControls then nil else v115,
+				ShowTopBarListener = v90
 			})
 		end)
 	end
 
 	return Roact.createElement("Frame", {
-		Visible = if not (not not Enabled() and FFlagEnableConsoleExpControls) and (not FFlagAddUILessMode or (FIntAddUILessModeVariant == 0 or not p19.uiLessStore.getUILessModeEnabled(false))) then u83 else p19.showIcon:map(function(p24) -- line: 537
-			-- upvalues: u83 (ref)
-			return u83 and p24
+		Visible = if not (not not Enabled() and FFlagEnableConsoleExpControls) and (not FFlagAddUILessMode or (FIntAddUILessModeVariant == 0 or not p19.uiLessStore.getUILessModeEnabled(false))) then u84 else p19.showIcon:map(function(p24) -- line: 537
+			-- upvalues: u84 (ref)
+			return u84 and p24
 		end),
 		BackgroundTransparency = 1,
-		Size = UDim2.new(0, v84, 1, 0),
+		Size = UDim2.new(0, v85, 1, 0),
 		LayoutOrder = p19.props.layoutOrder,
-		[Roact.Change.AbsoluteSize] = v87,
-		[Roact.Change.AbsolutePosition] = v87
+		[Roact.Change.AbsoluteSize] = v88,
+		[Roact.Change.AbsolutePosition] = v88
 	}, {
-		BadgeOver12 = v90,
-		Background = v88,
-		ShowTopBarListener = v89
+		BadgeOver12 = v91,
+		Background = v89,
+		ShowTopBarListener = v90
 	})
 end
 
-local v68 = RoactRodux.UNSTABLE_connect2(nil, function(p25) --[[ mapDispatchToProps ]] -- line: 553
+local function mapDispatchToProps(p25) -- line: 553
 	-- upvalues: FFlagTopBarDeprecateDisplayOptionsRodux (copy), SetGamepadMenuOpen (copy), FFlagTopBarSignalizeKeepOutAreas (copy), SetKeepOutArea (copy)
 	return {
 		setGamepadMenuOpen = not FFlagTopBarDeprecateDisplayOptionsRodux and function(p26) -- line: 557
@@ -569,10 +571,12 @@ local v68 = RoactRodux.UNSTABLE_connect2(nil, function(p25) --[[ mapDispatchToPr
 			return p25(SetKeepOutArea(p27, p28, p29))
 		end or nil
 	}
-end)(v64)
-
-if v42 then
-	return withReferralRewardTooltipInfo(v68)
 end
 
-return v68
+local v69 = RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v64)
+
+if v42 then
+	return withReferralRewardTooltipInfo(v69)
+end
+
+return v69

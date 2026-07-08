@@ -1,10 +1,3 @@
-return function(v0) --[[ Line: 8 ]]
-    local v1 = false;
-    if v0 ~= nil then
-        v1 = false;
-        if type(v0) == "table" then
-            v1 = v0.failureReason ~= nil and v0.expirationTimeInMinutes ~= nil or v0.FailureReason ~= nil and v0.ExpirationTimeInMinutes ~= nil;
-        end;
-    end;
-    return v1;
-end;
+return function(p1) -- line: 8
+	return p1 ~= nil and (type(p1) == "table" and (p1.failureReason ~= nil and p1.expirationTimeInMinutes ~= nil or p1.FailureReason ~= nil and p1.ExpirationTimeInMinutes ~= nil))
+end

@@ -1,49 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FetchStatusRodux");
-local v1 = require(l_script_FirstAncestor_0.SetFetchStatus);
-local v2 = require(l_script_FirstAncestor_0.FetchStatusNamespace);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_RetrievalStatus_0 = require(l_Parent_0.Http).Enum.RetrievalStatus;
-local _ = require(l_Parent_0.DiscoveryTypes);
-local l_FFlagLuaAppSortDeeplinkFix_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppSortDeeplinkFix;
-local function v7() --[[ Line: 11 ]] --[[ Name: initializeFetchStatus ]]
-    -- upvalues: v2 (copy), l_RetrievalStatus_0 (copy), l_FFlagLuaAppSortDeeplinkFix_0 (copy)
-    return {
-        [v2.GameSortToken] = {
-            Games = l_RetrievalStatus_0.NotStarted, 
-            HomeGames = l_RetrievalStatus_0.NotStarted, 
-            GamesSeeAll = l_RetrievalStatus_0.NotStarted, 
-            GamesList = if l_FFlagLuaAppSortDeeplinkFix_0 then l_RetrievalStatus_0.NotStarted else nil
-        }, 
-        [v2.GameSorts] = {}, 
-        [v2.OmniRecommendations] = {}, 
-        [v2.SearchLandingPage] = {}
-    };
-end;
+local FetchStatusRodux = script:FindFirstAncestor("FetchStatusRodux")
+local SetFetchStatus = require(FetchStatusRodux.SetFetchStatus)
+local FetchStatusNamespace = require(FetchStatusRodux.FetchStatusNamespace)
+local FetchStatusRoduxParent = FetchStatusRodux.Parent
+local RetrievalStatus = require(FetchStatusRoduxParent.Http).Enum.RetrievalStatus
+
+require(FetchStatusRoduxParent.DiscoveryTypes)
+
+local FFlagLuaAppSortDeeplinkFix = require(FetchStatusRoduxParent.SharedFlags).FFlagLuaAppSortDeeplinkFix
+
+local function initializeFetchStatus() -- line: 11
+	-- upvalues: FetchStatusNamespace (copy), RetrievalStatus (copy), FFlagLuaAppSortDeeplinkFix (copy)
+	return {
+		[FetchStatusNamespace.GameSortToken] = {
+			Games = RetrievalStatus.NotStarted,
+			HomeGames = RetrievalStatus.NotStarted,
+			GamesSeeAll = RetrievalStatus.NotStarted,
+			GamesList = if not FFlagLuaAppSortDeeplinkFix then nil else RetrievalStatus.NotStarted
+		},
+		[FetchStatusNamespace.GameSorts] = {},
+		[FetchStatusNamespace.OmniRecommendations] = {},
+		[FetchStatusNamespace.SearchLandingPage] = {}
+	}
+end
+
 return {
-    key = "FetchStatusKey", 
-    reducer = function(v8, v9) --[[ Line: 25 ]]
-        -- upvalues: v7 (copy), v1 (copy)
-        v8 = v8 or v7();
-        if v9.type == v1.name then
-            assert(v8, "state should always exist, assert for linter");
-            local l_fetchNamespace_0 = v9.fetchNamespace;
-            local l_fetchKey_0 = v9.fetchKey;
-            assert(l_fetchNamespace_0, "SetFetchStatus does not have a valid fetch namespace");
-            assert(l_fetchKey_0, (("SetFetchStatus does not have a valid fetch key for namespace %*"):format(l_fetchNamespace_0)));
-            local v12 = v8[l_fetchNamespace_0];
-            if not v12 then
-                warn((("No namespace %* defined in FetchStatusReducer for action"):format(l_fetchNamespace_0)));
-                return v8;
-            else
-                assert(v12, "namespaceState should always exist, assert for linter");
-                local v13 = table.clone(v12);
-                v13[l_fetchKey_0] = v9.fetchStatus;
-                local v14 = table.clone(v8);
-                v14[l_fetchNamespace_0] = v13;
-                return v14;
-            end;
-        else
-            return v8;
-        end;
-    end
-};
+	key = "FetchStatusKey",
+	reducer = function(p1, p2) -- line: 25
+		-- upvalues: initializeFetchStatus (copy), SetFetchStatus (copy)
+		local v10 = p1 or initializeFetchStatus()
+
+		if p2.type == SetFetchStatus.name then
+			assert(v10, "state should always exist, assert for linter")
+
+			local fetchNamespace = p2.fetchNamespace
+			local fetchKey = p2.fetchKey
+
+			assert(fetchNamespace, "SetFetchStatus does not have a valid fetch namespace")
+			assert(fetchKey, `SetFetchStatus does not have a valid fetch key for namespace { fetchNamespace }`)
+
+			local v13 = v10[fetchNamespace]
+
+			if not v13 then
+				warn(`No namespace { fetchNamespace } defined in FetchStatusReducer for action`)
+
+				return v10
+			end
+
+			assert(v13, "namespaceState should always exist, assert for linter")
+
+			local v14 = table.clone(v13)
+
+			v14[fetchKey] = p2.fetchStatus
+
+			local v15 = table.clone(v10)
+
+			v15[fetchNamespace] = v14
+
+			return v15
+		end
+
+		return v10
+	end
+}

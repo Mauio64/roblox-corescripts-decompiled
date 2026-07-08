@@ -1,78 +1,89 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local _ = function(v3) --[[ Line: 6 ]] --[[ Name: getConnect ]]
-    -- upvalues: l_Dictionary_0 (copy), v1 (copy)
-    return function(v4) --[[ Line: 7 ]]
-        -- upvalues: l_Dictionary_0 (ref), v1 (ref), v3 (copy)
-        local function v11(v5, v6) --[[ Line: 8 ]] --[[ Name: transformedMapper ]]
-            -- upvalues: l_Dictionary_0 (ref), v4 (copy)
-            return l_Dictionary_0.map(v4(v6), function(v7, _) --[[ Line: 9 ]]
-                -- upvalues: v5 (copy)
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 10 ]]
-                    -- upvalues: v5 (ref), v7 (copy)
-                    return v5:TranslateGameText(game, v7);
-                end);
-                if l_status_0 then
-                    return l_result_0;
-                else
-                    return "";
-                end;
-            end);
-        end;
-        return function(v12) --[[ Line: 22 ]]
-            -- upvalues: v1 (ref), v3 (ref), l_Dictionary_0 (ref), v11 (copy)
-            local v13 = v1.Component:extend("Connected-" .. tostring(v12));
-            v13.render = function(v14) --[[ Line: 25 ]] --[[ Name: render ]]
-                -- upvalues: v1 (ref), v3 (ref), v12 (copy), l_Dictionary_0 (ref), v11 (ref)
-                return v1.createElement(v3.Consumer, {
-                    render = function(v15) --[[ Line: 27 ]] --[[ Name: render ]]
-                        -- upvalues: v1 (ref), v12 (ref), l_Dictionary_0 (ref), v14 (copy), v11 (ref)
-                        return v1.createElement(v12, l_Dictionary_0.join(v14.props, v11(v15, v14.props)));
-                    end
-                });
-            end;
-            return v13;
-        end;
-    end;
-end;
-return function(v17) --[[ Line: 41 ]]
-    -- upvalues: v1 (copy), l_Dictionary_0 (copy)
-    local v18 = v1.createContext(v17);
-    return {
-        Consumer = v18.Consumer, 
-        Provider = v18.Provider, 
-        connect = function(v19) --[[ Line: 7 ]]
-            -- upvalues: l_Dictionary_0 (ref), v1 (ref), v18 (copy)
-            local function v26(v20, v21) --[[ Line: 8 ]] --[[ Name: transformedMapper ]]
-                -- upvalues: l_Dictionary_0 (ref), v19 (copy)
-                return l_Dictionary_0.map(v19(v21), function(v22, _) --[[ Line: 9 ]]
-                    -- upvalues: v20 (copy)
-                    local l_status_1, l_result_1 = pcall(function() --[[ Line: 10 ]]
-                        -- upvalues: v20 (ref), v22 (copy)
-                        return v20:TranslateGameText(game, v22);
-                    end);
-                    if l_status_1 then
-                        return l_result_1;
-                    else
-                        return "";
-                    end;
-                end);
-            end;
-            return function(v27) --[[ Line: 22 ]]
-                -- upvalues: v1 (ref), v18 (ref), l_Dictionary_0 (ref), v26 (copy)
-                local v28 = v1.Component:extend("Connected-" .. tostring(v27));
-                v28.render = function(v29) --[[ Line: 25 ]] --[[ Name: render ]]
-                    -- upvalues: v1 (ref), v18 (ref), v27 (copy), l_Dictionary_0 (ref), v26 (ref)
-                    return v1.createElement(v18.Consumer, {
-                        render = function(v30) --[[ Line: 27 ]] --[[ Name: render ]]
-                            -- upvalues: v1 (ref), v27 (ref), l_Dictionary_0 (ref), v29 (copy), v26 (ref)
-                            return v1.createElement(v27, l_Dictionary_0.join(v29.props, v26(v30, v29.props)));
-                        end
-                    });
-                end;
-                return v28;
-            end;
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local React = require(Parent.React)
+local Dictionary = require(Parent.llama).Dictionary
+
+local function getConnect(p1) -- line: 6
+	-- upvalues: Dictionary (copy), React (copy)
+	return function(p2) -- line: 7
+		-- upvalues: Dictionary (copy), React (copy), p1 (copy)
+		local function transformedMapper(p3, p4) -- line: 8
+			-- upvalues: Dictionary (copy), p2 (copy)
+			return Dictionary.map(p2(p4), function(s1: string, _) -- line: 9
+				-- upvalues: p3 (copy)
+				local ok, result = pcall(function() -- line: 10
+					-- upvalues: p3 (copy), s1 (copy)
+					return p3:TranslateGameText(game, s1)
+				end)
+
+				if ok then
+					return result
+				end
+
+				return ""
+			end)
+		end
+
+		return function(p6) -- line: 22
+			-- upvalues: React (copy), p1 (copy), Dictionary (copy), transformedMapper (copy)
+			local v15 = React.Component:extend("Connected-" .. tostring(p6))
+
+			function v15.render(p7) -- line: 25
+				-- upvalues: React (copy), p1 (copy), p6 (copy), Dictionary (copy), transformedMapper (copy)
+				return React.createElement(p1.Consumer, {
+					render = function(p8) -- line: 27
+						-- upvalues: React (copy), p6 (copy), Dictionary (copy), p7 (copy), transformedMapper (copy)
+						return React.createElement(p6, Dictionary.join(p7.props, transformedMapper(p8, p7.props)))
+					end
+				})
+			end
+
+			return v15
+		end
+	end
+end
+
+return function(p9) -- line: 41
+	-- upvalues: React (copy), Dictionary (copy)
+	local v7 = React.createContext(p9)
+
+	return {
+		Consumer = v7.Consumer,
+		Provider = v7.Provider,
+		connect = function(p10) -- line: 7
+			-- upvalues: Dictionary (copy), React (copy), v7 (copy)
+			local function transformedMapper(p11, p12) -- line: 8
+				-- upvalues: Dictionary (copy), p10 (copy)
+				return Dictionary.map(p10(p12), function(s2: string, _) -- line: 9
+					-- upvalues: p11 (copy)
+					local ok, result = pcall(function() -- line: 10
+						-- upvalues: p11 (copy), s2 (copy)
+						return p11:TranslateGameText(game, s2)
+					end)
+
+					if ok then
+						return result
+					end
+
+					return ""
+				end)
+			end
+
+			return function(p14) -- line: 22
+				-- upvalues: React (copy), v7 (copy), Dictionary (copy), transformedMapper (copy)
+				local v19 = React.Component:extend("Connected-" .. tostring(p14))
+
+				function v19.render(p15) -- line: 25
+					-- upvalues: React (copy), v7 (copy), p14 (copy), Dictionary (copy), transformedMapper (copy)
+					return React.createElement(v7.Consumer, {
+						render = function(p16) -- line: 27
+							-- upvalues: React (copy), p14 (copy), Dictionary (copy), p15 (copy), transformedMapper (copy)
+							return React.createElement(p14, Dictionary.join(p15.props, transformedMapper(p16, p15.props)))
+						end
+					})
+				end
+
+				return v19
+			end
+		end
+	}
+end

@@ -1,1 +1,1 @@
-return require(script.Parent.LocalizationContext).Consumer;
+return require(script.Parent.LocalizationContext).Consumer

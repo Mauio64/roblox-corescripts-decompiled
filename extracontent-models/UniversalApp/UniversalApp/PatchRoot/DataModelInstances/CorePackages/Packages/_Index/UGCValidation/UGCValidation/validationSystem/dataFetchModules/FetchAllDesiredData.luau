@@ -1,40 +1,91 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v2 = require(l_Parent_0.validationSystem.dataFetchModules.FetchEditables);
-local _ = require(l_Parent_0.util.Types);
-local l_SharedDataMember_0 = v1.SharedDataMember;
-local v5 = {
-    InExpClient = true, 
-    InExpServer = true
-};
-local v6 = {
-    l_SharedDataMember_0.renderMeshesData, 
-    l_SharedDataMember_0.innerCagesData, 
-    l_SharedDataMember_0.outerCagesData, 
-    l_SharedDataMember_0.meshTextures
-};
-local v7 = {
-    DATA_FETCH_FAILURE = {}
-};
-v7.storeDesiredData = function(v8, v9) --[[ Line: 26 ]] --[[ Name: storeDesiredData ]]
-    -- upvalues: v5 (copy), v6 (copy), v2 (copy), v7 (copy)
-    local l_rootInstance_0 = v8.rootInstance;
-    local l_source_0 = v8.consumerConfig.source;
-    local v12 = v8.consumerConfig.preloadedEditableMeshes or {};
-    local v13 = v8.consumerConfig.preloadedEditableImages or {};
-    local v14 = v5[l_source_0];
-    for _, v16 in v6 do
-        if v9[v16] then
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 35 ]]
-                -- upvalues: v2 (ref), l_rootInstance_0 (copy), v16 (copy), v14 (copy), v12 (copy), v13 (copy)
-                return (v2.getDatas(l_rootInstance_0, v16, v14, v12, v13));
-            end);
-            if l_status_0 and l_result_0 then
-                v8[v16] = l_result_0;
-            else
-                v8[v16] = v7.DATA_FETCH_FAILURE;
-            end;
-        end;
-    end;
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local FetchEditables = require(ParentParent.validationSystem.dataFetchModules.FetchEditables)
+local FetchCurveAnimations = require(ParentParent.validationSystem.dataFetchModules.FetchCurveAnimations)
+local FetchCurveAnimComputedFrames = require(ParentParent.validationSystem.dataFetchModules.FetchCurveAnimComputedFrames)
+local FetchContentIds = require(ParentParent.validationSystem.dataFetchModules.FetchContentIds)
+local FetchHSRAssets = require(ParentParent.validationSystem.dataFetchModules.FetchHSRAssets)
+local FetchCurveAnimBoneData = require(ParentParent.validationSystem.dataFetchModules.FetchCurveAnimBoneData)
+
+require(ParentParent.util.Types)
+
+local SharedDataMember = ValidationEnums.SharedDataMember
+local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
+local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
+local resetPhysicsData = require(ParentParent.util.resetPhysicsData)
+local t1 = {
+	SharedDataMember.renderMeshesData,
+	SharedDataMember.innerCagesData,
+	SharedDataMember.outerCagesData,
+	SharedDataMember.meshTextures
+}
+local t2 = {
+	InExpServer = true,
+	InExpClient = true
+}
+local t3 = {
+	DATA_FETCH_FAILURE = {}
+}
+
+function t3.storeDesiredData(p1, t4: {[any]: any}) -- line: 36
+	-- upvalues: getFFlagUGCValidateMigrateBodyPartBounds (copy), ValidationEnums (copy), resetPhysicsData (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), t2 (copy), t1 (copy), FetchEditables (copy), t3 (copy), SharedDataMember (copy), FetchCurveAnimations (copy), FetchCurveAnimComputedFrames (copy), FetchContentIds (copy), FetchHSRAssets (copy), FetchCurveAnimBoneData (copy)
+	local rootInstance = p1.rootInstance
+	local v19 = p1.consumerConfig.preloadedEditableMeshes or {}
+	local v20 = p1.consumerConfig.preloadedEditableImages or {}
+
+	if getFFlagUGCValidateMigrateBodyPartBounds() and p1.consumerConfig.consumerEnv ~= ValidationEnums.ConsumerEnv.IEC then
+		local v21 = p1.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.Backend
+
+		pcall(resetPhysicsData, { rootInstance }, {
+			isServer = v21,
+			bypassFlags = {}
+		})
+	end
+
+	local u22 = if not getFFlagUGCValidateMigrateSchemaProperties() then t2[p1.consumerConfig.source] == true else p1.consumerConfig.consumerEnv == ValidationEnums.ConsumerEnv.IEC
+
+	for _, v24 in t1 do
+		if t4[v24] then
+			local ok, result = pcall(function() -- line: 57
+				-- upvalues: FetchEditables (copy), rootInstance (copy), v24 (copy), u22 (ref), v19 (copy), v20 (copy)
+				return (FetchEditables.getDatas(rootInstance, v24, u22, v19, v20))
+			end)
+
+			if ok and result then
+				p1[v24] = result
+			else
+				p1[v24] = t3.DATA_FETCH_FAILURE
+			end
+		end
+	end
+
+	if t4[SharedDataMember.curveAnimations] then
+		p1.curveAnimations = FetchCurveAnimations.getData(rootInstance) or t3.DATA_FETCH_FAILURE
+	end
+
+	if t4[SharedDataMember.curveAnimComputedFrames] then
+		if p1.curveAnimations and p1.curveAnimations ~= t3.DATA_FETCH_FAILURE then
+			p1.curveAnimComputedFrames = FetchCurveAnimComputedFrames.getData(p1.curveAnimations) or t3.DATA_FETCH_FAILURE
+		else
+			p1.curveAnimComputedFrames = t3.DATA_FETCH_FAILURE
+		end
+	end
+
+	if getFFlagUGCValidateMigrateSchemaProperties() then
+		if t4[SharedDataMember.contentIds] then
+			p1.contentIds = FetchContentIds.getData(p1)
+		end
+
+		if t4[SharedDataMember.hsrAssets] then
+			p1.hsrAssets = FetchHSRAssets.getData(rootInstance, p1.consumerConfig) or t3.DATA_FETCH_FAILURE
+		end
+	end
+
+	if t4[SharedDataMember.curveAnimBoneData] then
+		local v27 = FetchCurveAnimBoneData.getData(p1[SharedDataMember.curveAnimations])
+
+		p1[SharedDataMember.curveAnimBoneData] = v27
+	end
+end
+
+return t3

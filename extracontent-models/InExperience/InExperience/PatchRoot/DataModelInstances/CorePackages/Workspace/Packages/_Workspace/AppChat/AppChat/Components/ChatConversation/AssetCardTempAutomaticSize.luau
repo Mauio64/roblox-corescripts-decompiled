@@ -1,67 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize);
-local v5 = require(l_script_FirstAncestor_0.Constants);
-local l_useScaledValue_0 = require(l_Parent_0.Foundation).Hooks.useScaledValue;
-local v7 = require(l_script_FirstAncestor_0.Components.ChatConversation.GameCardComponents.PlaceIdContainer);
-local v8 = require(l_script_FirstAncestor_0.Components.ChatConversation.GameCardComponents.GameCardContainer);
-local v9 = require(l_script_FirstAncestor_0.Components.ChatConversation.GameCardComponents.ShareLinkContainer);
-local v10 = {
-    additionalProps = {
-        shareLink = nil, 
-        placeId = nil, 
-        universeId = nil, 
-        senderUserId = nil, 
-        onDetailsOpened = function() --[[ Line: 24 ]] --[[ Name: onDetailsOpened ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Roact = require(AppChatParent.Roact)
+local Cryo = require(AppChatParent.Cryo)
+local ChatBubbleContainerAutomaticSize = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize)
+local Constants = require(AppChat.Constants)
+local useScaledValue = require(AppChatParent.Foundation).Hooks.useScaledValue
+local PlaceIdContainer = require(AppChat.Components.ChatConversation.GameCardComponents.PlaceIdContainer)
+local GameCardContainer = require(AppChat.Components.ChatConversation.GameCardComponents.GameCardContainer)
+local ShareLinkContainer = require(AppChat.Components.ChatConversation.GameCardComponents.ShareLinkContainer)
+local t1 = {
+	hasTail = false,
+	innerPadding = 0,
+	isIncoming = false,
+	isPending = true,
+	isUnfiltered = false,
+	isLastMessageInMessageGroup = false,
+	maxWidth = 0,
+	parentWidth = 0,
+	wideMode = false,
+	additionalProps = {
+		shareLink = nil,
+		placeId = nil,
+		universeId = nil,
+		senderUserId = nil,
+		onDetailsOpened = function() -- line: 24
+		end,
+		openGameDetailsPage = function() -- line: 25
+		end
+	}
+}
 
-        end, 
-        openGameDetailsPage = function() --[[ Line: 25 ]] --[[ Name: openGameDetailsPage ]]
+local function AssetCardTemp(p1) -- line: 38
+	-- upvalues: Cryo (copy), t1 (copy), ShareLinkContainer (copy), PlaceIdContainer (copy), GameCardContainer (copy), useScaledValue (copy), Constants (copy), Roact (copy), ChatBubbleContainerAutomaticSize (copy)
+	local v14 = Cryo.Dictionary.union(t1, p1)
+	local v15 = Cryo.Dictionary.union(t1.additionalProps, v14.additionalProps)
+	local v16 = if not v15.shareLink then v15.placeId and PlaceIdContainer or GameCardContainer else ShareLinkContainer
+	local isPending = v14.isPending
+	local v18 = useScaledValue(Constants.GameCard.THUMBNAIL_WIDTH)
+	local v19 = useScaledValue(Constants.GameCard.THUMBNAIL_HEIGHT + Constants.GameCard.FOOTER_HEIGHT)
 
-        end
-    }, 
-    hasTail = false, 
-    innerPadding = 0, 
-    isIncoming = false, 
-    isPending = true, 
-    isUnfiltered = false, 
-    isLastMessageInMessageGroup = false, 
-    maxWidth = 0, 
-    parentWidth = 0, 
-    wideMode = false
-};
-return function(v11) --[[ Line: 38 ]] --[[ Name: AssetCardTemp ]]
-    -- upvalues: v3 (copy), v10 (copy), v9 (copy), v7 (copy), v8 (copy), l_useScaledValue_0 (copy), v5 (copy), v2 (copy), v4 (copy)
-    local v12 = v3.Dictionary.union(v10, v11);
-    local v13 = v3.Dictionary.union(v10.additionalProps, v12.additionalProps);
-    local v14 = nil;
-    v14 = if v13.shareLink then v9 else v13.placeId and v7 or v8;
-    local l_isPending_0 = v12.isPending;
-    local v16 = l_useScaledValue_0(v5.GameCard.THUMBNAIL_WIDTH);
-    local v17 = l_useScaledValue_0(v5.GameCard.THUMBNAIL_HEIGHT + v5.GameCard.FOOTER_HEIGHT);
-    v13.isStartOfGroup = v12.hasTail;
-    v13.isIncoming = v12.isIncoming;
-    v13.isUnfiltered = v12.isUnfiltered;
-    v13.isPending = v12.isPending;
-    v13.isRepliedTo = v12.isRepliedTo;
-    return v2.createElement(v4, {
-        hasTail = v12.hasTail, 
-        isIncoming = v12.isIncoming, 
-        isPending = l_isPending_0, 
-        isUnfiltered = nil, 
-        isAssetCard = true, 
-        LayoutOrder = v12.LayoutOrder, 
-        padding = 0, 
-        isLastMessageInMessageGroup = v12.isLastMessageInMessageGroup or v10.isLastMessageInMessageGroup, 
-        [v2.Change.AbsoluteSize] = v12[v2.Change.AbsoluteSize]
-    }, {
-        AssetCard = v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromOffset(v16 or 256, v17 or 208), 
-            AutomaticSize = Enum.AutomaticSize.XY
-        }, {
-            Card = v2.createElement(v14, v13)
-        })
-    });
-end;
+	v15.isStartOfGroup = v14.hasTail
+	v15.isIncoming = v14.isIncoming
+	v15.isUnfiltered = v14.isUnfiltered
+	v15.isPending = v14.isPending
+	v15.isRepliedTo = v14.isRepliedTo
+
+	return Roact.createElement(ChatBubbleContainerAutomaticSize, {
+		hasTail = v14.hasTail,
+		isIncoming = v14.isIncoming,
+		isPending = isPending,
+		isUnfiltered = nil,
+		isAssetCard = true,
+		LayoutOrder = v14.LayoutOrder,
+		padding = 0,
+		isLastMessageInMessageGroup = v14.isLastMessageInMessageGroup or t1.isLastMessageInMessageGroup,
+		[Roact.Change.AbsoluteSize] = v14[Roact.Change.AbsoluteSize]
+	}, {
+		AssetCard = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(v18 or 256, v19 or 208),
+			AutomaticSize = Enum.AutomaticSize.XY
+		}, {
+			Card = Roact.createElement(v16, v15)
+		})
+	})
+end
+
+return AssetCardTemp

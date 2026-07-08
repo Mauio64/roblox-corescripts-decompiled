@@ -1,1 +1,1 @@
-return game:DefineFastInt("AddUILessModeVariant", 0);
+return game:DefineFastInt("AddUILessModeVariant", 0)

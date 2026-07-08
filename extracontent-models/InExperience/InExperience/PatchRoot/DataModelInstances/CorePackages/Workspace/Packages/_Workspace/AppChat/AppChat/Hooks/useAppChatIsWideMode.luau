@@ -1,27 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Responsive);
-local l_useIsWideMode_0 = require(l_Parent_0.SocialCommon).Hooks.useIsWideMode;
-local v4 = require(l_script_FirstAncestor_0.Flags.FIntAppChatWideBreakpointMinHeight);
-local v5 = require(l_script_FirstAncestor_0.Flags.FIntAppChatWideBreakpointMinWidth);
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: l_useIsWideMode_0 (copy), v2 (copy), v5 (copy), v4 (copy)
-    local v7 = l_useIsWideMode_0();
-    local v8 = v2.useOrientation();
-    local v9 = v2.useResponsive({
-        {
-            Key = "wide", 
-            minWidth = v5, 
-            minHeight = v4
-        }
-    }) == "wide";
-    if not v6 then
-        return v7;
-    else
-        local v10 = true;
-        if v8 == v2.Keys.Portrait or not v9 then
-            v10 = false;
-        end;
-        return v10;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Responsive = require(AppChatParent.Responsive)
+local useIsWideMode = require(AppChatParent.SocialCommon).Hooks.useIsWideMode
+local FIntAppChatWideBreakpointMinHeight = require(AppChat.Flags.FIntAppChatWideBreakpointMinHeight)
+local FIntAppChatWideBreakpointMinWidth = require(AppChat.Flags.FIntAppChatWideBreakpointMinWidth)
+
+return function(b1: boolean) -- line: 10
+	-- upvalues: useIsWideMode (copy), Responsive (copy), FIntAppChatWideBreakpointMinWidth (copy), FIntAppChatWideBreakpointMinHeight (copy)
+	local v8 = useIsWideMode()
+	local v9 = Responsive.useOrientation()
+	local v10 = Responsive.useResponsive({{
+		Key = "wide",
+		minWidth = FIntAppChatWideBreakpointMinWidth,
+		minHeight = FIntAppChatWideBreakpointMinHeight
+	}}) == "wide"
+
+	if not b1 then
+		return v8
+	end
+
+	local v11 = true
+
+	if v9 == Responsive.Keys.Portrait or not v10 then
+		v11 = false
+	end
+
+	return v11
+end

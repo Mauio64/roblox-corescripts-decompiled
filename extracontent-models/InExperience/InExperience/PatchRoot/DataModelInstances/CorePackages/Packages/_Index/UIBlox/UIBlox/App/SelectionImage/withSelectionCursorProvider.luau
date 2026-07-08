@@ -1,6 +1,9 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_withCursorMigration_0 = require(l_Parent_0.Foundation).UNSTABLE.withCursorMigration;
-return function(v2) --[[ Line: 7 ]] --[[ Name: SelectionCursorConsumer ]]
-    -- upvalues: l_withCursorMigration_0 (copy)
-    return l_withCursorMigration_0(v2);
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local withCursorMigration = require(ParentParent.Foundation).UNSTABLE.withCursorMigration
+
+local function SelectionCursorConsumer(p1) -- line: 7
+	-- upvalues: withCursorMigration (copy)
+	return withCursorMigration(p1)
+end
+
+return SelectionCursorConsumer

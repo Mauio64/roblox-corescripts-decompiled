@@ -1,97 +1,98 @@
-local l_Parent_0 = script.Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v2 = require(l_script_FirstAncestor_0.Utility.Wrappers);
-local l_LocalizationService_0 = v2.Services.LocalizationService;
-local l_GuiService_0 = v2.Services.GuiService;
-local v5 = require(l_Parent_0.Constants);
-local v6 = require(l_script_FirstAncestor_0.Generated.Translations.GeneratedTranslations);
-(function(v7) --[[ Line: 11 ]] --[[ Name: createFoundationLocalizationTable ]]
-    -- upvalues: l_GuiService_0 (copy), v5 (copy), v6 (copy)
-    local l_l_GuiService_0_FirstChild_0 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME);
-    if l_l_GuiService_0_FirstChild_0 ~= nil and l_l_GuiService_0_FirstChild_0:IsA("LocalizationTable") then
-        l_l_GuiService_0_FirstChild_0:SetEntries(v6);
-        return;
-    else
-        local l_LocalizationTable_0 = Instance.new("LocalizationTable");
-        l_LocalizationTable_0.Name = v5.LOCALIZATION_TABLE_NAME;
-        l_LocalizationTable_0.Archivable = false;
-        l_LocalizationTable_0.SourceLocaleId = "en-us";
-        l_LocalizationTable_0:SetEntries(v6);
-        l_LocalizationTable_0.Parent = v7;
-        return;
-    end;
-end)(l_GuiService_0);
-local l_Translator_0 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME):GetTranslator("en-us");
-local v11 = {};
-local function _(v12) --[[ Line: 35 ]] --[[ Name: getTranslatorForLocale ]]
-    -- upvalues: v11 (copy), l_GuiService_0 (copy), v5 (copy)
-    local v13 = v11[v12];
-    if v13 then
-        return v13;
-    else
-        v13 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME):GetTranslator(v12);
-        v11[v12] = v13;
-        return v13;
-    end;
-end;
-local function _() --[[ Line: 49 ]] --[[ Name: getTranslator ]]
-    -- upvalues: l_LocalizationService_0 (copy), v11 (copy), l_GuiService_0 (copy), v5 (copy)
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    local v16 = v11[l_RobloxLocaleId_0];
-    if v16 then
-        return v16;
-    else
-        v16 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME):GetTranslator(l_RobloxLocaleId_0);
-        v11[l_RobloxLocaleId_0] = v16;
-        return v16;
-    end;
-end;
-local function v23(v18, v19, v20) --[[ Line: 53 ]] --[[ Name: formatByKeyWithFallback ]]
-    -- upvalues: l_Translator_0 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 54 ]]
-        -- upvalues: v20 (copy), v18 (copy), v19 (copy)
-        return v20:FormatByKey(v18, v19);
-    end);
-    if l_status_0 then
-        return l_result_0;
-    elseif v20.LocaleId == "zh-cjv" then
-        return "";
-    else
-        return l_Translator_0:FormatByKey(v18, v19);
-    end;
-end;
+local scriptParent = script.Parent
+local Foundation = script:FindFirstAncestor("Foundation")
+local Wrappers = require(Foundation.Utility.Wrappers)
+local LocalizationService = Wrappers.Services.LocalizationService
+local GuiService = Wrappers.Services.GuiService
+local Constants = require(scriptParent.Constants)
+local Flags = require(Foundation.Utility.Flags)
+local GeneratedTranslations = require(Foundation.Generated.Translations.GeneratedTranslations)
+local v9 = if not Flags.FoundationTranslatorUseScript then GuiService else Foundation
+
+local function createFoundationLocalizationTable(p1) -- line: 14
+	-- upvalues: Constants (copy), GeneratedTranslations (copy), Flags (copy)
+	local ConstantsLOCALIZATION_TABLE_NAME = p1:FindFirstChild(Constants.LOCALIZATION_TABLE_NAME)
+
+	if ConstantsLOCALIZATION_TABLE_NAME ~= nil and ConstantsLOCALIZATION_TABLE_NAME:IsA("LocalizationTable") then
+		ConstantsLOCALIZATION_TABLE_NAME:SetEntries(GeneratedTranslations)
+
+		if Flags.FoundationTranslatorLocalizationRecovery then
+			return ConstantsLOCALIZATION_TABLE_NAME
+		end
+
+		return nil
+	end
+
+	local LocalizationTable = Instance.new("LocalizationTable")
+
+	LocalizationTable.Name = Constants.LOCALIZATION_TABLE_NAME
+	LocalizationTable.Archivable = false
+	LocalizationTable.SourceLocaleId = "en-us"
+	LocalizationTable:SetEntries(GeneratedTranslations)
+	LocalizationTable.Parent = p1
+
+	if Flags.FoundationTranslatorLocalizationRecovery then
+		return LocalizationTable
+	end
+
+	return nil
+end
+
+local u11 = createFoundationLocalizationTable(v9)
+local Translator = v9:FindFirstChild(Constants.LOCALIZATION_TABLE_NAME):GetTranslator("en-us")
+local t1 = {}
+
+local function getTranslatorForLocale(p2) -- line: 49
+	-- upvalues: Flags (copy), u11 (ref), createFoundationLocalizationTable (copy), v9 (copy), t1 (ref), Constants (copy)
+	if Flags.FoundationTranslatorLocalizationRecovery and (u11 == nil or u11.Parent == nil) then
+		u11 = createFoundationLocalizationTable(v9)
+		t1 = {}
+	end
+
+	local v21 = t1[p2]
+
+	if v21 then
+		return v21
+	end
+
+	local Translator2 = v9:FindFirstChild(Constants.LOCALIZATION_TABLE_NAME):GetTranslator(p2)
+
+	t1[p2] = Translator2
+
+	return Translator2
+end
+local function getTranslator() -- line: 70
+	-- upvalues: getTranslatorForLocale (copy), LocalizationService (copy)
+	return (getTranslatorForLocale(LocalizationService.RobloxLocaleId))
+end
+local function formatByKeyWithFallback(p3, p4, p5) -- line: 74
+	-- upvalues: Flags (copy), getTranslatorForLocale (copy), Translator (copy)
+	local ok, result = pcall(function() -- line: 75
+		-- upvalues: p5 (copy), p3 (copy), p4 (copy)
+		return p5:FormatByKey(p3, p4)
+	end)
+
+	if ok then
+		return result
+	end
+
+	if p5.LocaleId == "zh-cjv" then
+		return ""
+	end
+
+	if Flags.FoundationTranslatorLocalizationRecovery then
+		return getTranslatorForLocale("en-us"):FormatByKey(p3, p4)
+	end
+
+	return Translator:FormatByKey(p3, p4)
+end
+
 return {
-    FormatByKey = function(_, v25, v26) --[[ Line: 69 ]] --[[ Name: FormatByKey ]]
-        -- upvalues: v23 (copy), l_LocalizationService_0 (copy), v11 (copy), l_GuiService_0 (copy), v5 (copy)
-        local l_v23_0 = v23;
-        local l_v25_0 = v25;
-        local l_v26_0 = v26;
-        local l_RobloxLocaleId_1 = l_LocalizationService_0.RobloxLocaleId;
-        local v31 = v11[l_RobloxLocaleId_1];
-        local v32;
-        if v31 then
-            v32 = v31;
-        else
-            v31 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME):GetTranslator(l_RobloxLocaleId_1);
-            v11[l_RobloxLocaleId_1] = v31;
-            v32 = v31;
-        end;
-        return l_v23_0(l_v25_0, l_v26_0, v32);
-    end, 
-    FormatByKeyForLocale = function(_, v34, v35, v36) --[[ Line: 73 ]] --[[ Name: FormatByKeyForLocale ]]
-        -- upvalues: v23 (copy), v11 (copy), l_GuiService_0 (copy), v5 (copy)
-        local l_v23_1 = v23;
-        local l_v34_0 = v34;
-        local l_v36_0 = v36;
-        local v40 = v11[v35];
-        local v41;
-        if v40 then
-            v41 = v40;
-        else
-            v40 = l_GuiService_0:FindFirstChild(v5.LOCALIZATION_TABLE_NAME):GetTranslator(v35);
-            v11[v35] = v40;
-            v41 = v40;
-        end;
-        return l_v23_1(l_v34_0, l_v36_0, v41);
-    end
-};
+	FormatByKey = function(_, p7, p8) -- line: 94
+		-- upvalues: formatByKeyWithFallback (copy), getTranslatorForLocale (copy), LocalizationService (copy)
+		return formatByKeyWithFallback(p7, p8, (getTranslatorForLocale(LocalizationService.RobloxLocaleId)))
+	end,
+	FormatByKeyForLocale = function(_, p10, p11, p12) -- line: 98
+		-- upvalues: formatByKeyWithFallback (copy), getTranslatorForLocale (copy)
+		return formatByKeyWithFallback(p10, p12, (getTranslatorForLocale(p11)))
+	end
+}

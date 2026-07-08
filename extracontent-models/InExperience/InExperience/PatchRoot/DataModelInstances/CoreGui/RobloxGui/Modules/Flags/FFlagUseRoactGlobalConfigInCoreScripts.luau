@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UseRoactGlobalConfigInCoreScripts", false);
+return game:DefineFastFlag("UseRoactGlobalConfigInCoreScripts", false)

@@ -1,65 +1,76 @@
-local l_Parent_0 = script:FindFirstAncestor("Responsive").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.Parent.Responsive);
-local v3 = require(script.Parent.Parent.Context.ContainerRef);
-local v4 = game:DefineFastFlag("LuaAppResponsiveFixHookDeps", false);
-id = function(v5) --[[ Line: 9 ]] --[[ Name: id ]]
-    return v5;
-end;
-useResponsiveImpl = function(v6, v7, v8) --[[ Line: 17 ]] --[[ Name: useResponsiveImpl ]]
-    -- upvalues: v1 (copy), v3 (copy), v2 (copy), v4 (copy)
-    local v9 = if typeof(v6) == "function" then v6 else id;
-    local v10 = v1.useContext(v3);
-    local v11, v12 = v1.useState(v9(v2.DefaultKey));
-    local v13 = v1.useRef("");
-    local v14 = v1.useRef({
-        Key = v2.DefaultKey
-    });
-    local v15 = nil;
-    if typeof(v6) == "table" then
-        v15 = {};
-        for _, v17 in v6 do
-            v15[v17] = true;
-        end;
-    end;
-    v1.useEffect(function() --[[ Line: 34 ]]
-        -- upvalues: v10 (copy), v2 (ref), v7 (copy), v8 (copy), v15 (ref), v13 (copy), v14 (copy), v12 (copy), v9 (copy)
-        if v10 and v10.current then
-            local v18 = v2.bindContainer(v10.current, v7);
-            local v20 = v18:connect(function() --[[ Line: 37 ]]
-                -- upvalues: v18 (copy), v8 (ref), v15 (ref), v13 (ref), v14 (ref), v12 (ref), v9 (ref)
-                local v19 = v18:currentKey(v8);
-                if v15 then
-                    if v15[v19] or v13.current and v15[v13.current] then
-                        v14.current = v18:currentRule(v8);
-                        v12(v19);
-                    end;
-                else
-                    v14.current = v18:currentRule(v8);
-                    v12(v9(v19));
-                end;
-                v13.current = v19;
-            end);
-            v14.current = v18:currentRule(v8);
-            local v21 = v18:currentKey(v8);
-            v12(v9(v21));
-            v13.current = v21;
-            return function() --[[ Line: 56 ]]
-                -- upvalues: v20 (copy), v18 (copy)
-                v20:disconnect();
-                v18:destroy();
-            end;
-        else
-            return function() --[[ Line: 61 ]]
+local Parent = script:FindFirstAncestor("Responsive").Parent
+local React = require(Parent.React)
+local Responsive = require(script.Parent.Parent.Responsive)
+local ContainerRef = require(script.Parent.Parent.Context.ContainerRef)
+local v5 = game:DefineFastFlag("LuaAppResponsiveFixHookDeps", false)
 
-            end;
-        end;
-    end, {
-        v10, 
-        v10 and v10.current or false, 
-        if v4 then v7 else nil, 
-        if v4 then v8 else nil
-    });
-    return v11, v14.current;
-end;
-return useResponsiveImpl;
+function id(p1) -- line: 9
+	return p1
+end
+function useResponsiveImpl(p2, p3, s1: string?) -- line: 17
+	-- upvalues: React (copy), ContainerRef (copy), Responsive (copy), v5 (copy)
+	local v10 = if typeof(p2) ~= "function" then id else p2
+	local v11 = React.useContext(ContainerRef)
+	local v12, v13 = React.useState(v10(Responsive.DefaultKey))
+	local v14 = React.useRef("")
+	local v15 = React.useRef({
+		Key = Responsive.DefaultKey
+	})
+	local t1 = nil
+
+	if typeof(p2) == "table" then
+		t1 = {}
+
+		for _, v18 in p2 do
+			t1[v18] = true
+		end
+	end
+
+	React.useEffect(function() -- line: 34
+		-- upvalues: v11 (copy), Responsive (copy), p3 (copy), s1 (copy), t1 (ref), v14 (copy), v15 (copy), v13 (copy), v10 (copy)
+		if v11 and v11.current then
+			local v19 = Responsive.bindContainer(v11.current, p3)
+			local v20 = v19:connect(function() -- line: 37
+				-- upvalues: v19 (copy), s1 (copy), t1 (ref), v14 (copy), v15 (copy), v13 (copy), v10 (copy)
+				local v22 = v19:currentKey(s1)
+
+				if t1 then
+					if t1[v22] or v14.current and t1[v14.current] then
+						v15.current = v19:currentRule(s1)
+						v13(v22)
+					end
+				else
+					v15.current = v19:currentRule(s1)
+					v13(v10(v22))
+				end
+
+				v14.current = v22
+			end)
+
+			v15.current = v19:currentRule(s1)
+
+			local v21 = v19:currentKey(s1)
+
+			v13(v10(v21))
+			v14.current = v21
+
+			return function() -- line: 56
+				-- upvalues: v20 (copy), v19 (copy)
+				v20:disconnect()
+				v19:destroy()
+			end
+		end
+
+		return function() -- line: 61
+		end
+	end, {
+		v11,
+		not not v11 and (v11.current or false),
+		if not v5 then nil else p3,
+		if not v5 then nil else s1
+	})
+
+	return v12, v15.current
+end
+
+return useResponsiveImpl

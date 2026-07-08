@@ -1,5 +1,9 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-return function(_) --[[ Line: 9 ]] --[[ Name: validateShoes ]]
-    return true;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local function validateShoes(_) -- line: 9
+	return true
+end
+
+return validateShoes

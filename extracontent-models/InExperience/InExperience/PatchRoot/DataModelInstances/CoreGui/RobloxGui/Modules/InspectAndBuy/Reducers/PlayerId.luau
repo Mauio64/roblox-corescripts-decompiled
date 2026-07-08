@@ -1,9 +1,10 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetPlayerId);
-return v1.createReducer("", {
-    [v3.name] = function(_, v5) --[[ Line: 7 ]]
-        return v5.playerId;
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetPlayerId = require(ParentParent.Actions.SetPlayerId)
+
+return Rodux.createReducer("", {
+	[SetPlayerId.name] = function(_, p2) -- line: 7
+		return p2.playerId
+	end
+})

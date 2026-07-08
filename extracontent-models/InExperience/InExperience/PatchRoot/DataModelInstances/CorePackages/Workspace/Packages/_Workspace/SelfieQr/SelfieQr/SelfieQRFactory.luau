@@ -1,42 +1,47 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SelfieQr");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_CoreScriptsRootProvider_0 = require(l_Parent_0.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_Parent_0.Roact);
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local l_RoactServices_0 = require(l_Parent_0.RoactServices).RoactServices;
-local v8 = require(l_script_FirstAncestor_0.SelfieQRConnection);
-local l_requestInternalWrapper_0 = require(l_Parent_0.Http).NetworkLayers.requestInternalWrapper;
-local v10 = {};
-local v11 = false;
-local function v15(v12, v13) --[[ Line: 18 ]]
-    -- upvalues: v4 (copy), l_CoreScriptsRootProvider_0 (copy), l_RoactServices_0 (copy), l_RoactNetworking_0 (copy), l_requestInternalWrapper_0 (copy), l_HttpService_0 (copy), v5 (copy)
-    local v14 = v4.createElement(l_CoreScriptsRootProvider_0, {}, {
-        RoactServicesProvider = v4.createElement(l_RoactServices_0.ServiceProvider, {
-            services = {
-                [l_RoactNetworking_0] = l_requestInternalWrapper_0(l_HttpService_0)
-            }
-        }, v13)
-    });
-    v14 = v4.createElement("Folder", nil, v14);
-    return v5.mount(v14, v12, "SelfieQRRoot");
-end;
-v10.createFactory = function() --[[ Line: 32 ]] --[[ Name: createFactory ]]
-    -- upvalues: v11 (ref), v15 (copy), v4 (copy), v8 (copy)
-    local v16 = {};
-    v16.mountCoreUI = function(v17) --[[ Line: 34 ]]
-        -- upvalues: v11 (ref), v16 (copy), v15 (ref), v4 (ref), v8 (ref)
-        if v11 then
-            return;
-        else
-            v11 = true;
-            v16._coreUiHandle = v15(v17, {
-                SelfieQR = v4.createElement(v8, {})
-            });
-            return;
-        end;
-    end;
-    return v16;
-end;
-return v10;
+local HttpService = game:GetService("HttpService")
+local SelfieQr = script:FindFirstAncestor("SelfieQr")
+local SelfieQrParent = SelfieQr.Parent
+local CoreScriptsRootProvider = require(SelfieQrParent.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local React = require(SelfieQrParent.React)
+local Roact = require(SelfieQrParent.Roact)
+local RoactNetworking = require(SelfieQrParent.RoactServiceTags).RoactNetworking
+local RoactServices = require(SelfieQrParent.RoactServices).RoactServices
+local SelfieQRConnection = require(SelfieQr.SelfieQRConnection)
+local requestInternalWrapper = require(SelfieQrParent.Http).NetworkLayers.requestInternalWrapper
+local t1 = {}
+local u12 = false
+
+local function v13(p1, t2: {[any]: any}) -- line: 18
+	-- upvalues: React (copy), CoreScriptsRootProvider (copy), RoactServices (copy), RoactNetworking (copy), requestInternalWrapper (copy), HttpService (copy), Roact (copy)
+	local v16 = React.createElement(CoreScriptsRootProvider, {}, {
+		RoactServicesProvider = React.createElement(RoactServices.ServiceProvider, {
+			services = {
+				[RoactNetworking] = requestInternalWrapper(HttpService)
+			}
+		}, t2)
+	})
+	local v17 = React.createElement("Folder", nil, v16)
+
+	return Roact.mount(v17, p1, "SelfieQRRoot")
+end
+
+function t1.createFactory() -- line: 32
+	-- upvalues: u12 (ref), v13 (copy), React (copy), SelfieQRConnection (copy)
+	local t3 = {}
+
+	function t3.mountCoreUI(p2) -- line: 34
+		-- upvalues: u12 (ref), t3 (copy), v13 (copy), React (copy), SelfieQRConnection (copy)
+		if u12 then
+			return
+		end
+
+		u12 = true
+		t3._coreUiHandle = v13(p2, {
+			SelfieQR = React.createElement(SelfieQRConnection, {})
+		})
+	end
+
+	return t3
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatDomLocatorFoundationMigration", false);
+return game:DefineFastFlag("AppChatDomLocatorFoundationMigration", false)

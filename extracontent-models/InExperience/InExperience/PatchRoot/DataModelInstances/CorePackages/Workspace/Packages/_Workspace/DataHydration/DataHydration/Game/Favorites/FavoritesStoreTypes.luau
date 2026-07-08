@@ -1,10 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local _ = require(l_Parent_0.Signals);
-local v4 = require(l_Parent_0.t);
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+
+require(DataHydration.DataHydrationTypes)
+require(DataHydrationParent.Signals)
+
+local t = require(DataHydrationParent.t)
+
 return {
-    favoriteResponseValidator = v4.interface({
-        isFavorited = v4.optional(v4.boolean)
-    })
-};
+	favoriteResponseValidator = t.interface({
+		isFavorited = t.optional(t.boolean)
+	})
+}

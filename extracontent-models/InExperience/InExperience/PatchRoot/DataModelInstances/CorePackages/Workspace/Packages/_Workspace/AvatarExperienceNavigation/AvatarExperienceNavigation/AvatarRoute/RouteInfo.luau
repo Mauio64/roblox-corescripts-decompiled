@@ -1,43 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceNavigation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local v3 = require(l_Parent_0.t);
-local v4 = require(l_script_FirstAncestor_0.Enums.AvatarScreen);
-local _ = require(script.Parent.Types);
-local v6 = {};
-v6.__index = v6;
-v6.Interface = v3.strictInterface({
-    name = v3.string, 
-    key = v3.string, 
-    params = v3.table
-});
-v6.new = function(v7, v8, v9) --[[ Line: 20 ]] --[[ Name: new ]]
-    -- upvalues: v6 (copy)
-    local v10 = {
-        name = v7, 
-        key = v8, 
-        params = v9 or {}
-    };
-    setmetatable(v10, v6);
-    return v10;
-end;
-v6.EMPTY = v6.new(v4.None, v4.None);
-v6.__tostring = function(v11) --[[ Line: 32 ]] --[[ Name: __tostring ]]
-    return string.format("%s(key=%s)", v11.name, (tostring(v11.key)));
-end;
-v6.__eq = function(v12, v13) --[[ Line: 36 ]] --[[ Name: __eq ]]
-    -- upvalues: v2 (copy)
-    if rawequal(v12, v13) then
-        return true;
-    else
-        local v14 = false;
-        if v12.key == v13.key then
-            v14 = false;
-            if v12.name == v13.name then
-                v14 = v2.shallowEqual(v12.params, v13.params, nil);
-            end;
-        end;
-        return v14;
-    end;
-end;
-return v6;
+local AvatarExperienceNavigation = script:FindFirstAncestor("AvatarExperienceNavigation")
+local AvatarExperienceNavigationParent = AvatarExperienceNavigation.Parent
+local tutils = require(AvatarExperienceNavigationParent.tutils)
+local t = require(AvatarExperienceNavigationParent.t)
+local AvatarScreen = require(AvatarExperienceNavigation.Enums.AvatarScreen)
+
+require(script.Parent.Types)
+
+local t1 = {}
+
+t1.__index = t1
+t1.Interface = t.strictInterface({
+	name = t.string,
+	key = t.string,
+	params = t.table
+})
+
+function t1.new(s1: string, s2: string, p1) -- line: 20
+	-- upvalues: t1 (copy)
+	local t2 = {
+		name = s1,
+		key = s2,
+		params = p1 or {}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+
+t1.EMPTY = t1.new(AvatarScreen.None, AvatarScreen.None)
+
+function t1.__tostring(p2) -- line: 32
+	return string.format("%s(key=%s)", p2.name, (tostring(p2.key)))
+end
+function t1.__eq(p3, p4) -- line: 36
+	-- upvalues: tutils (copy)
+	if rawequal(p3, p4) then
+		return true
+	end
+
+	return p3.key == p4.key and (p3.name == p4.name and tutils.shallowEqual(p3.params, p4.params, nil))
+end
+
+return t1

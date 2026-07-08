@@ -1,479 +1,521 @@
-return function(v0) --[[ Line: 12 ]]
-    local l_Parent_0 = script.Parent.Parent;
-    local v2 = require(l_Parent_0.ReactGlobals);
-    local v3 = require(l_Parent_0.Shared);
-    local l_describeError_0 = v3.describeError;
-    local l_ReactFeatureFlags_0 = v3.ReactFeatureFlags;
-    local v6 = require(script.Parent.SchedulerFeatureFlags);
-    local l_enableSchedulerDebugging_0 = v6.enableSchedulerDebugging;
-    local l_enableProfiling_0 = v6.enableProfiling;
-    local v9 = v0 or require(script.Parent.SchedulerHostConfig);
-    local l_requestHostCallback_0 = v9.requestHostCallback;
-    local l_requestHostTimeout_0 = v9.requestHostTimeout;
-    local l_cancelHostTimeout_0 = v9.cancelHostTimeout;
-    local l_shouldYieldToHost_0 = v9.shouldYieldToHost;
-    local l_getCurrentTime_0 = v9.getCurrentTime;
-    local l_forceFrameRate_0 = v9.forceFrameRate;
-    local l_requestPaint_0 = v9.requestPaint;
-    local l_setSchedulerFlags_0 = v9.setSchedulerFlags;
-    local l_getSchedulerFlags_0 = v9.getSchedulerFlags;
-    local v19 = require(script.Parent.NoYield);
-    local v20 = nil;
-    local v21 = nil;
-    local v22 = nil;
-    local function _(v23, v24) --[[ Line: 51 ]]
-        -- upvalues: v21 (ref)
-        local v25 = #v23 + 1;
-        v23[v25] = v24;
-        v21(v23, v24, v25);
-    end;
-    local function _(v27) --[[ Line: 58 ]]
-        return v27[1];
-    end;
-    local function _(v29) --[[ Line: 62 ]]
-        -- upvalues: v22 (ref)
-        local v30 = v29[1];
-        if v30 ~= nil then
-            local v31 = v29[#v29];
-            v29[#v29] = nil;
-            if v31 ~= v30 then
-                v29[1] = v31;
-                v22(v29, v31, 1);
-            end;
-            return v30;
-        else
-            return nil;
-        end;
-    end;
-    v21 = function(v33, v34, v35) --[[ Line: 78 ]]
-        -- upvalues: v20 (ref)
-        while true do
-            local v36 = math.floor(v35 / 2);
-            local v37 = v33[v36];
-            if v37 ~= nil and v20(v37, v34) > 0 then
-                v33[v36] = v34;
-                v33[v35] = v37;
-                v35 = v36;
-            else
-                break;
-            end;
-        end;
-    end;
-    v22 = function(v38, v39, v40) --[[ Line: 94 ]]
-        -- upvalues: v20 (ref)
-        local v41 = #v38;
-        while true do
-            if v40 < v41 then
-                local v42 = v40 * 2;
-                local v43 = v38[v42];
-                local v44 = v42 + 1;
-                local v45 = v38[v44];
-                if v43 ~= nil and v20(v43, v39) < 0 then
-                    if v45 ~= nil and v20(v45, v43) < 0 then
-                        v38[v40] = v45;
-                        v38[v44] = v39;
-                        v40 = v44;
-                    else
-                        v38[v40] = v43;
-                        v38[v42] = v39;
-                        v40 = v42;
-                    end;
-                elseif v45 ~= nil and v20(v45, v39) < 0 then
-                    v38[v40] = v45;
-                    v38[v44] = v39;
-                    v40 = v44;
-                else
-                    return;
-                end;
-            else
-                return;
-            end;
-        end;
-    end;
-    v20 = function(v46, v47) --[[ Line: 124 ]]
-        local v48 = v46.sortIndex - v47.sortIndex;
-        if v48 == 0 then
-            return v46.id - v47.id;
-        else
-            return v48;
-        end;
-    end;
-    local v49 = require(script.Parent.SchedulerPriorities);
-    local l_ImmediatePriority_0 = v49.ImmediatePriority;
-    local l_UserBlockingPriority_0 = v49.UserBlockingPriority;
-    local l_NormalPriority_0 = v49.NormalPriority;
-    local l_LowPriority_0 = v49.LowPriority;
-    local l_IdlePriority_0 = v49.IdlePriority;
-    local v55 = require(script.Parent.SchedulerProfiling);
-    local l_markTaskRun_0 = v55.markTaskRun;
-    local l_markTaskYield_0 = v55.markTaskYield;
-    local l_markTaskCompleted_0 = v55.markTaskCompleted;
-    local l_markTaskCanceled_0 = v55.markTaskCanceled;
-    local l_markTaskErrored_0 = v55.markTaskErrored;
-    local l_markSchedulerSuspended_0 = v55.markSchedulerSuspended;
-    local l_markSchedulerUnsuspended_0 = v55.markSchedulerUnsuspended;
-    local l_markTaskStart_0 = v55.markTaskStart;
-    local l_stopLoggingProfilingEvents_0 = v55.stopLoggingProfilingEvents;
-    local l_startLoggingProfilingEvents_0 = v55.startLoggingProfilingEvents;
-    local v66 = {};
-    local v67 = {};
-    local v68 = 1;
-    local v69 = false;
-    local v70 = nil;
-    local l_l_NormalPriority_0_0 = l_NormalPriority_0;
-    local v72 = false;
-    local v73 = false;
-    local v74 = false;
-    local v75 = nil;
-    local v76 = nil;
-    local v77 = nil;
-    local function v87(v78) --[[ Line: 191 ]] --[[ Name: advanceTimers ]]
-        -- upvalues: v67 (copy), v22 (ref), v66 (copy), v21 (ref), l_enableProfiling_0 (copy), l_markTaskStart_0 (copy)
-        local v79 = v67[1];
-        while true do
-            if v79 ~= nil then
-                if v79.callback == nil then
-                    local l_v67_0 = v67;
-                    local v81 = l_v67_0[1];
-                    if v81 ~= nil then
-                        local v82 = l_v67_0[#l_v67_0];
-                        l_v67_0[#l_v67_0] = nil;
-                        if v82 ~= v81 then
-                            l_v67_0[1] = v82;
-                            v22(l_v67_0, v82, 1);
-                        end;
-                    end;
-                elseif v79.startTime <= v78 then
-                    local l_v67_1 = v67;
-                    local v84 = l_v67_1[1];
-                    if v84 ~= nil then
-                        local v85 = l_v67_1[#l_v67_1];
-                        l_v67_1[#l_v67_1] = nil;
-                        if v85 ~= v84 then
-                            l_v67_1[1] = v85;
-                            v22(l_v67_1, v85, 1);
-                        end;
-                    end;
-                    v79.sortIndex = v79.expirationTime;
-                    l_v67_1 = v66;
-                    v84 = v79;
-                    local v86 = #l_v67_1 + 1;
-                    l_v67_1[v86] = v84;
-                    v21(l_v67_1, v84, v86);
-                    if l_enableProfiling_0 then
-                        l_markTaskStart_0(v79, v78);
-                        v79.isQueued = true;
-                    end;
-                else
-                    return;
-                end;
-                v79 = v67[1];
-            else
-                return;
-            end;
-        end;
-    end;
-    v75 = function(v88) --[[ Line: 217 ]]
-        -- upvalues: v74 (ref), v87 (copy), v73 (ref), v66 (copy), l_requestHostCallback_0 (copy), v76 (ref), v67 (copy), l_requestHostTimeout_0 (copy), v75 (ref)
-        v74 = false;
-        v87(v88);
-        if not v73 then
-            if v66[1] ~= nil then
-                v73 = true;
-                l_requestHostCallback_0(v76);
-                return;
-            else
-                local v89 = v67[1];
-                if v89 ~= nil then
-                    l_requestHostTimeout_0(v75, v89.startTime - v88);
-                end;
-            end;
-        end;
-    end;
-    v76 = function(v90, v91) --[[ Line: 234 ]]
-        -- upvalues: l_enableProfiling_0 (copy), l_markSchedulerUnsuspended_0 (copy), v73 (ref), v74 (ref), l_cancelHostTimeout_0 (copy), v72 (ref), l_l_NormalPriority_0_0 (ref), v2 (copy), v77 (ref), l_describeError_0 (copy), v70 (ref), l_getCurrentTime_0 (copy), l_markTaskErrored_0 (copy), l_markSchedulerSuspended_0 (copy)
-        if l_enableProfiling_0 then
-            l_markSchedulerUnsuspended_0(v91);
-        end;
-        v73 = false;
-        if v74 then
-            v74 = false;
-            l_cancelHostTimeout_0();
-        end;
-        v72 = true;
-        local l_l_l_NormalPriority_0_0_0 = l_l_NormalPriority_0_0;
-        local v93 = nil;
-        local v94 = nil;
-        if not v2.__YOLO__ then
-            if l_enableProfiling_0 then
-                local v95, v96 = xpcall(v77, l_describeError_0, v90, v91);
-                v93 = v95;
-                v94 = v96;
-                if not v93 and v70 ~= nil then
-                    v95 = l_getCurrentTime_0();
-                    l_markTaskErrored_0(v70, v95);
-                    v70.isQueued = false;
-                end;
-            else
-                v93 = true;
-                v94 = v77(v90, v91);
-            end;
-        else
-            v93 = true;
-            v94 = v77(v90, v91);
-        end;
-        v70 = nil;
-        l_l_NormalPriority_0_0 = l_l_l_NormalPriority_0_0_0;
-        v72 = false;
-        if l_enableProfiling_0 then
-            local v97 = l_getCurrentTime_0();
-            l_markSchedulerSuspended_0(v97);
-        end;
-        if not v93 then
-            error(v94);
-        end;
-        return v94;
-    end;
-    v77 = function(v98, v99) --[[ Line: 291 ]]
-        -- upvalues: v2 (copy), l_ReactFeatureFlags_0 (copy), v87 (copy), v70 (ref), v66 (copy), l_enableSchedulerDebugging_0 (copy), v69 (ref), l_shouldYieldToHost_0 (copy), l_l_NormalPriority_0_0 (ref), l_markTaskRun_0 (copy), v19 (copy), l_getCurrentTime_0 (copy), l_markTaskYield_0 (copy), l_enableProfiling_0 (copy), l_markTaskCompleted_0 (copy), v22 (ref), v67 (copy), l_requestHostTimeout_0 (copy), v75 (ref)
-        local v100 = v2.__DEV__ and l_ReactFeatureFlags_0.catchYieldingInDEV;
-        local l_v99_0 = v99;
-        v87(l_v99_0);
-        v70 = v66[1];
-        while v70 ~= nil and (not l_enableSchedulerDebugging_0 or not v69) and (l_v99_0 >= v70.expirationTime or v98 and not l_shouldYieldToHost_0()) do
-            local l_callback_0 = v70.callback;
-            if typeof(l_callback_0) == "function" then
-                v70.callback = nil;
-                l_l_NormalPriority_0_0 = v70.priorityLevel;
-                local v103 = v70.expirationTime <= l_v99_0;
-                l_markTaskRun_0(v70, l_v99_0);
-                local v104 = nil;
-                v104 = if v100 then v19(l_callback_0, v103) else l_callback_0(v103);
-                l_v99_0 = l_getCurrentTime_0();
-                if typeof(v104) == "function" then
-                    v70.callback = v104;
-                    l_markTaskYield_0(v70, l_v99_0);
-                else
-                    if l_enableProfiling_0 then
-                        l_markTaskCompleted_0(v70, l_v99_0);
-                        v70.isQueued = false;
-                    end;
-                    if v70 == v66[1] then
-                        local l_v66_0 = v66;
-                        local v106 = l_v66_0[1];
-                        if v106 ~= nil then
-                            local v107 = l_v66_0[#l_v66_0];
-                            l_v66_0[#l_v66_0] = nil;
-                            if v107 ~= v106 then
-                                l_v66_0[1] = v107;
-                                v22(l_v66_0, v107, 1);
-                            end;
-                        end;
-                    end;
-                end;
-                v87(l_v99_0);
-            else
-                local l_v66_1 = v66;
-                local v109 = l_v66_1[1];
-                if v109 ~= nil then
-                    local v110 = l_v66_1[#l_v66_1];
-                    l_v66_1[#l_v66_1] = nil;
-                    if v110 ~= v109 then
-                        l_v66_1[1] = v110;
-                        v22(l_v66_1, v110, 1);
-                    end;
-                end;
-            end;
-            v70 = v66[1];
-        end;
-        if v70 ~= nil then
-            return true;
-        else
-            local v111 = v67[1];
-            if v111 ~= nil then
-                l_requestHostTimeout_0(v75, v111.startTime - l_v99_0);
-            end;
-            return false;
-        end;
-    end;
-    local function v119(v112, v113) --[[ Line: 358 ]] --[[ Name: unstable_runWithPriority ]]
-        -- upvalues: l_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_NormalPriority_0 (copy), l_LowPriority_0 (copy), l_IdlePriority_0 (copy), l_l_NormalPriority_0_0 (ref), v2 (copy), l_describeError_0 (copy)
-        if v112 ~= l_ImmediatePriority_0 and v112 ~= l_UserBlockingPriority_0 and v112 ~= l_NormalPriority_0 and v112 ~= l_LowPriority_0 and v112 ~= l_IdlePriority_0 then
-            v112 = l_NormalPriority_0;
-        end;
-        local l_l_l_NormalPriority_0_0_1 = l_l_NormalPriority_0_0;
-        l_l_NormalPriority_0_0 = v112;
-        local v115 = nil;
-        local v116 = nil;
-        if not v2.__YOLO__ then
-            local v117, v118 = xpcall(v113, l_describeError_0);
-            v115 = v117;
-            v116 = v118;
-        else
-            v115 = true;
-            v116 = v113();
-        end;
-        l_l_NormalPriority_0_0 = l_l_l_NormalPriority_0_0_1;
-        if not v115 then
-            error(v116);
-        end;
-        return v116;
-    end;
-    local function v127(v120) --[[ Line: 393 ]] --[[ Name: unstable_next ]]
-        -- upvalues: l_l_NormalPriority_0_0 (ref), l_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_NormalPriority_0 (copy), v2 (copy), l_describeError_0 (copy)
-        local v121 = nil;
-        v121 = if not (l_l_NormalPriority_0_0 ~= l_ImmediatePriority_0 and l_l_NormalPriority_0_0 ~= l_UserBlockingPriority_0) or l_l_NormalPriority_0_0 == l_NormalPriority_0 then l_NormalPriority_0 else l_l_NormalPriority_0_0;
-        local l_l_l_NormalPriority_0_0_2 = l_l_NormalPriority_0_0;
-        l_l_NormalPriority_0_0 = v121;
-        local v123 = nil;
-        local v124 = nil;
-        if not v2.__YOLO__ then
-            local v125, v126 = xpcall(v120, l_describeError_0);
-            v123 = v125;
-            v124 = v126;
-        else
-            v123 = true;
-            v124 = v120();
-        end;
-        l_l_NormalPriority_0_0 = l_l_l_NormalPriority_0_0_2;
-        if not v123 then
-            error(v124);
-        end;
-        return v124;
-    end;
-    local function v135(v128) --[[ Line: 429 ]] --[[ Name: unstable_wrapCallback ]]
-        -- upvalues: l_l_NormalPriority_0_0 (ref), v2 (copy), l_describeError_0 (copy)
-        local l_l_l_NormalPriority_0_0_3 = l_l_NormalPriority_0_0;
-        return function(...) --[[ Line: 432 ]]
-            -- upvalues: l_l_NormalPriority_0_0 (ref), l_l_l_NormalPriority_0_0_3 (copy), v2 (ref), v128 (copy), l_describeError_0 (ref)
-            local l_l_l_NormalPriority_0_0_4 = l_l_NormalPriority_0_0;
-            l_l_NormalPriority_0_0 = l_l_l_NormalPriority_0_0_3;
-            local v131 = nil;
-            local v132 = nil;
-            if not v2.__YOLO__ then
-                local v133, v134 = xpcall(v128, l_describeError_0, ...);
-                v131 = v133;
-                v132 = v134;
-            else
-                v131 = true;
-                v132 = v128(...);
-            end;
-            l_l_NormalPriority_0_0 = l_l_l_NormalPriority_0_0_4;
-            if not v131 then
-                error(v132);
-            end;
-            return v132;
-        end;
-    end;
-    local function v149(v136, v137, v138) --[[ Line: 457 ]] --[[ Name: unstable_scheduleCallback ]]
-        -- upvalues: l_getCurrentTime_0 (copy), l_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_IdlePriority_0 (copy), l_LowPriority_0 (copy), v68 (ref), l_enableProfiling_0 (copy), v67 (copy), v21 (ref), v66 (copy), v74 (ref), l_cancelHostTimeout_0 (copy), l_requestHostTimeout_0 (copy), v75 (ref), l_markTaskStart_0 (copy), v73 (ref), v72 (ref), l_requestHostCallback_0 (copy), v76 (ref)
-        local v139 = l_getCurrentTime_0();
-        local v140 = nil;
-        if typeof(v138) == "table" then
-            local l_delay_0 = v138.delay;
-            v140 = if typeof(l_delay_0) == "number" and l_delay_0 > 0 then v139 + l_delay_0 else v139;
-        else
-            v140 = v139;
-        end;
-        local _ = nil;
-        local v143 = v140 + (v136 == l_ImmediatePriority_0 and -1 or v136 == l_UserBlockingPriority_0 and 250 or v136 == l_IdlePriority_0 and 1073741823 or v136 == l_LowPriority_0 and 10000 or 5000);
-        local v144 = {
-            id = v68, 
-            callback = v137, 
-            priorityLevel = v136, 
-            startTime = v140, 
-            expirationTime = v143, 
-            sortIndex = -1
-        };
-        v68 = v68 + 1;
-        if l_enableProfiling_0 then
-            v144.isQueued = false;
-        end;
-        if v139 < v140 then
-            v144.sortIndex = v140;
-            local l_v67_2 = v67;
-            local v146 = #l_v67_2 + 1;
-            l_v67_2[v146] = v144;
-            v21(l_v67_2, v144, v146);
-            if #v66 == 0 and v144 == v67[1] then
-                if v74 then
-                    l_cancelHostTimeout_0();
-                else
-                    v74 = true;
-                end;
-                l_requestHostTimeout_0(v75, v140 - v139);
-                return v144;
-            end;
-        else
-            v144.sortIndex = v143;
-            local l_v66_2 = v66;
-            local v148 = #l_v66_2 + 1;
-            l_v66_2[v148] = v144;
-            v21(l_v66_2, v144, v148);
-            if l_enableProfiling_0 then
-                l_markTaskStart_0(v144, v139);
-                v144.isQueued = true;
-            end;
-            if not v73 and not v72 then
-                v73 = true;
-                l_requestHostCallback_0(v76);
-            end;
-        end;
-        return v144;
-    end;
-    local function v150() --[[ Line: 537 ]] --[[ Name: unstable_pauseExecution ]]
-        -- upvalues: v69 (ref)
-        v69 = true;
-    end;
-    local function v151() --[[ Line: 541 ]] --[[ Name: unstable_continueExecution ]]
-        -- upvalues: v69 (ref), v73 (ref), v72 (ref), l_requestHostCallback_0 (copy), v76 (ref)
-        v69 = false;
-        if not v73 and not v72 then
-            v73 = true;
-            l_requestHostCallback_0(v76);
-        end;
-    end;
-    local function v152() --[[ Line: 549 ]] --[[ Name: unstable_getFirstCallbackNode ]]
-        -- upvalues: v66 (copy)
-        return v66[1];
-    end;
-    local function v155(v153) --[[ Line: 553 ]] --[[ Name: unstable_cancelCallback ]]
-        -- upvalues: l_enableProfiling_0 (copy), l_getCurrentTime_0 (copy), l_markTaskCanceled_0 (copy)
-        if l_enableProfiling_0 and v153.isQueued then
-            local v154 = l_getCurrentTime_0();
-            l_markTaskCanceled_0(v153, v154);
-            v153.isQueued = false;
-        end;
-        v153.callback = nil;
-    end;
-    local function v156() --[[ Line: 568 ]] --[[ Name: unstable_getCurrentPriorityLevel ]]
-        -- upvalues: l_l_NormalPriority_0_0 (ref)
-        return l_l_NormalPriority_0_0;
-    end;
-    return {
-        unstable_ImmediatePriority = l_ImmediatePriority_0, 
-        unstable_UserBlockingPriority = l_UserBlockingPriority_0, 
-        unstable_NormalPriority = l_NormalPriority_0, 
-        unstable_IdlePriority = l_IdlePriority_0, 
-        unstable_LowPriority = l_LowPriority_0, 
-        unstable_runWithPriority = v119, 
-        unstable_next = v127, 
-        unstable_scheduleCallback = v149, 
-        unstable_cancelCallback = v155, 
-        unstable_wrapCallback = v135, 
-        unstable_getCurrentPriorityLevel = v156, 
-        unstable_shouldYield = l_shouldYieldToHost_0, 
-        unstable_requestPaint = l_requestPaint_0, 
-        unstable_continueExecution = v151, 
-        unstable_pauseExecution = v150, 
-        unstable_getFirstCallbackNode = v152, 
-        unstable_now = l_getCurrentTime_0, 
-        unstable_forceFrameRate = l_forceFrameRate_0, 
-        unstable_setSchedulerFlags = l_setSchedulerFlags_0, 
-        unstable_getSchedulerFlags = l_getSchedulerFlags_0, 
-        unstable_Profiling = if l_enableProfiling_0 then {
-            startLoggingProfilingEvents = l_startLoggingProfilingEvents_0, 
-            stopLoggingProfilingEvents = l_stopLoggingProfilingEvents_0
-        } else nil
-    };
-end;
+return function(p1) -- line: 12
+	local ParentParent = script.Parent.Parent
+	local ReactGlobals = require(ParentParent.ReactGlobals)
+	local Shared = require(ParentParent.Shared)
+	local describeError = Shared.describeError
+	local ReactFeatureFlags = Shared.ReactFeatureFlags
+	local SchedulerFeatureFlags = require(script.Parent.SchedulerFeatureFlags)
+	local enableSchedulerDebugging = SchedulerFeatureFlags.enableSchedulerDebugging
+	local enableProfiling = SchedulerFeatureFlags.enableProfiling
+	local v10 = p1 or require(script.Parent.SchedulerHostConfig)
+	local requestHostCallback = v10.requestHostCallback
+	local requestHostTimeout = v10.requestHostTimeout
+	local cancelHostTimeout = v10.cancelHostTimeout
+	local shouldYieldToHost = v10.shouldYieldToHost
+	local getCurrentTime = v10.getCurrentTime
+	local forceFrameRate = v10.forceFrameRate
+	local requestPaint = v10.requestPaint
+	local setSchedulerFlags = v10.setSchedulerFlags
+	local getSchedulerFlags = v10.getSchedulerFlags
+	local NoYield = require(script.Parent.NoYield)
+	local u21 = nil
+	local u22 = nil
+	local u23 = nil
+
+	function u22(t1: {[any]: any}, t2: {[any]: any}, n1: number) -- line: 78
+		-- upvalues: u21 (ref)
+		while true do
+			local v64 = math.floor(n1 / 2)
+			local v65 = t1[v64]
+
+			if v65 == nil or not (u21(v65, t2) > 0) then
+				break
+			end
+
+			t1[v64] = t2
+			t1[n1] = v65
+			n1 = v64
+		end
+	end
+	function u23(t3: {[any]: any}, t4: {[any]: any}, n2: number) -- line: 94
+		-- upvalues: u21 (ref)
+		local v69 = #t3
+
+		while n2 < v69 do
+			local v70 = n2 * 2
+			local v71 = t3[v70]
+			local v72 = v70 + 1
+			local v73 = t3[v72]
+
+			if v71 ~= nil and u21(v71, t4) < 0 then
+				if v73 ~= nil and u21(v73, v71) < 0 then
+					t3[n2] = v73
+					t3[v72] = t4
+					n2 = v72
+				else
+					t3[n2] = v71
+					t3[v70] = t4
+					n2 = v70
+				end
+
+				continue
+			end
+
+			if v73 == nil or not (u21(v73, t4) < 0) then
+				return
+			end
+
+			t3[n2] = v73
+			t3[v72] = t4
+			n2 = v72
+		end
+	end
+	function u21(t5: {[any]: any}, t6: {[any]: any}) -- line: 124
+		local v76 = t5.sortIndex - t6.sortIndex
+
+		if v76 == 0 then
+			return t5.id - t6.id
+		end
+
+		return v76
+	end
+
+	local SchedulerPriorities = require(script.Parent.SchedulerPriorities)
+	local ImmediatePriority = SchedulerPriorities.ImmediatePriority
+	local UserBlockingPriority = SchedulerPriorities.UserBlockingPriority
+	local NormalPriority = SchedulerPriorities.NormalPriority
+	local LowPriority = SchedulerPriorities.LowPriority
+	local IdlePriority = SchedulerPriorities.IdlePriority
+	local SchedulerProfiling = require(script.Parent.SchedulerProfiling)
+	local markTaskRun = SchedulerProfiling.markTaskRun
+	local markTaskYield = SchedulerProfiling.markTaskYield
+	local markTaskCompleted = SchedulerProfiling.markTaskCompleted
+	local markTaskCanceled = SchedulerProfiling.markTaskCanceled
+	local markTaskErrored = SchedulerProfiling.markTaskErrored
+	local markSchedulerSuspended = SchedulerProfiling.markSchedulerSuspended
+	local markSchedulerUnsuspended = SchedulerProfiling.markSchedulerUnsuspended
+	local markTaskStart = SchedulerProfiling.markTaskStart
+	local stopLoggingProfilingEvents = SchedulerProfiling.stopLoggingProfilingEvents
+	local startLoggingProfilingEvents = SchedulerProfiling.startLoggingProfilingEvents
+	local t7 = {}
+	local t8 = {}
+	local n3 = 1
+	local u44 = false
+	local u45 = nil
+	local u46 = NormalPriority
+	local u47 = false
+	local u48 = false
+	local u49 = false
+	local u50 = nil
+	local u51 = nil
+
+	local function advanceTimers(p2) -- line: 191
+		-- upvalues: t8 (copy), u23 (ref), t7 (copy), u22 (ref), enableProfiling (copy), markTaskStart (copy)
+		local v78 = t8[1]
+
+		while v78 ~= nil do
+			if v78.callback == nil then
+				local v79 = t8
+				local v80 = v79[1]
+
+				if v80 ~= nil then
+					local v81 = v79[#v79]
+
+					v79[#v79] = nil
+
+					if v81 ~= v80 then
+						v79[1] = v81
+						u23(v79, v81, 1)
+					end
+				end
+			else
+				if not (p2 >= v78.startTime) then
+					return
+				end
+
+				local v82 = t8
+				local v83 = v82[1]
+
+				if v83 ~= nil then
+					local v84 = v82[#v82]
+
+					v82[#v82] = nil
+
+					if v84 ~= v83 then
+						v82[1] = v84
+						u23(v82, v84, 1)
+					end
+				end
+
+				v78.sortIndex = v78.expirationTime
+
+				local v85 = t7
+				local v86 = #v85 + 1
+
+				v85[v86] = v78
+				u22(v85, v78, v86)
+
+				if enableProfiling then
+					markTaskStart(v78, p2)
+					v78.isQueued = true
+				end
+			end
+
+			v78 = t8[1]
+		end
+	end
+	local function u53(p3) -- line: 217
+		-- upvalues: u49 (ref), advanceTimers (copy), u48 (ref), t7 (copy), requestHostCallback (copy), u50 (ref), t8 (copy), requestHostTimeout (copy), u53 (ref)
+		u49 = false
+		advanceTimers(p3)
+
+		if not u48 then
+			if t7[1] ~= nil then
+				u48 = true
+				requestHostCallback(u50)
+
+				return
+			end
+
+			local v88 = t8[1]
+
+			if v88 ~= nil then
+				requestHostTimeout(u53, v88.startTime - p3)
+			end
+		end
+	end
+
+	function u50(p4, p5) -- line: 234
+		-- upvalues: enableProfiling (copy), markSchedulerUnsuspended (copy), u48 (ref), u49 (ref), cancelHostTimeout (copy), u47 (ref), u46 (ref), ReactGlobals (copy), u51 (ref), describeError (copy), u45 (ref), getCurrentTime (copy), markTaskErrored (copy), markSchedulerSuspended (copy)
+		if enableProfiling then
+			markSchedulerUnsuspended(p5)
+		end
+
+		u48 = false
+
+		if u49 then
+			u49 = false
+			cancelHostTimeout()
+		end
+
+		u47 = true
+
+		local v91 = u46
+		local ok, result
+
+		if not ReactGlobals.__YOLO__ then
+			if enableProfiling then
+				ok, result = xpcall(u51, describeError, p4, p5)
+
+				if not ok and u45 ~= nil then
+					local v94 = getCurrentTime()
+
+					markTaskErrored(u45, v94)
+					u45.isQueued = false
+				end
+			else
+				ok = true
+				result = u51(p4, p5)
+			end
+		else
+			ok = true
+			result = u51(p4, p5)
+		end
+
+		u45 = nil
+		u46 = v91
+		u47 = false
+
+		if enableProfiling then
+			local v95 = getCurrentTime()
+
+			markSchedulerSuspended(v95)
+		end
+
+		if not ok then
+			error(result)
+		end
+
+		return result
+	end
+	function u51(p6, p7) -- line: 291
+		-- upvalues: ReactGlobals (copy), ReactFeatureFlags (copy), advanceTimers (copy), u45 (ref), t7 (copy), enableSchedulerDebugging (copy), u44 (ref), shouldYieldToHost (copy), u46 (ref), markTaskRun (copy), NoYield (copy), getCurrentTime (copy), markTaskYield (copy), enableProfiling (copy), markTaskCompleted (copy), u23 (ref), t8 (copy), requestHostTimeout (copy), u53 (ref)
+		local v98 = ReactGlobals.__DEV__ and ReactFeatureFlags.catchYieldingInDEV
+
+		advanceTimers(p7)
+		u45 = t7[1]
+
+		while u45 ~= nil and (not enableSchedulerDebugging or not u44) and (not (p7 < u45.expirationTime) or p6 and not shouldYieldToHost()) do
+			local callback = u45.callback
+
+			if typeof(callback) == "function" then
+				u45.callback = nil
+				u46 = u45.priorityLevel
+
+				local v100 = p7 >= u45.expirationTime
+
+				markTaskRun(u45, p7)
+
+				local v101 = if not v98 then callback(v100) else NoYield(callback, v100)
+
+				p7 = getCurrentTime()
+
+				if typeof(v101) == "function" then
+					u45.callback = v101
+					markTaskYield(u45, p7)
+				else
+					if enableProfiling then
+						markTaskCompleted(u45, p7)
+						u45.isQueued = false
+					end
+
+					if u45 == t7[1] then
+						local v102 = t7
+						local v103 = v102[1]
+
+						if v103 ~= nil then
+							local v104 = v102[#v102]
+
+							v102[#v102] = nil
+
+							if v104 ~= v103 then
+								v102[1] = v104
+								u23(v102, v104, 1)
+							end
+						end
+					end
+				end
+
+				advanceTimers(p7)
+			else
+				local v105 = t7
+				local v106 = v105[1]
+
+				if v106 ~= nil then
+					local v107 = v105[#v105]
+
+					v105[#v105] = nil
+
+					if v107 ~= v106 then
+						v105[1] = v107
+						u23(v105, v107, 1)
+					end
+				end
+			end
+
+			u45 = t7[1]
+		end
+
+		if u45 ~= nil then
+			return true
+		end
+
+		local v108 = t8[1]
+
+		if v108 ~= nil then
+			requestHostTimeout(u53, v108.startTime - p7)
+		end
+
+		return false
+	end
+
+	return {
+		unstable_ImmediatePriority = ImmediatePriority,
+		unstable_UserBlockingPriority = UserBlockingPriority,
+		unstable_NormalPriority = NormalPriority,
+		unstable_IdlePriority = IdlePriority,
+		unstable_LowPriority = LowPriority,
+		unstable_runWithPriority = function(p8, p9) -- line: 358
+			-- upvalues: ImmediatePriority (copy), UserBlockingPriority (copy), NormalPriority (copy), LowPriority (copy), IdlePriority (copy), u46 (ref), ReactGlobals (copy), describeError (copy)
+			if p8 ~= ImmediatePriority and (p8 ~= UserBlockingPriority and p8 ~= NormalPriority and p8 ~= LowPriority and p8 ~= IdlePriority) then
+				p8 = NormalPriority
+			end
+
+			local v111 = u46
+
+			u46 = p8
+
+			local ok, result
+
+			if not ReactGlobals.__YOLO__ then
+				ok, result = xpcall(p9, describeError)
+			else
+				ok = true
+				result = p9()
+			end
+
+			u46 = v111
+
+			if not ok then
+				error(result)
+			end
+
+			return result
+		end,
+		unstable_next = function(p10) -- line: 393
+			-- upvalues: u46 (ref), ImmediatePriority (copy), UserBlockingPriority (copy), NormalPriority (copy), ReactGlobals (copy), describeError (copy)
+			local v115 = if u46 ~= ImmediatePriority and (u46 ~= UserBlockingPriority and u46 ~= NormalPriority) then u46 else NormalPriority
+			local v116 = u46
+
+			u46 = v115
+
+			local ok, result
+
+			if not ReactGlobals.__YOLO__ then
+				ok, result = xpcall(p10, describeError)
+			else
+				ok = true
+				result = p10()
+			end
+
+			u46 = v116
+
+			if not ok then
+				error(result)
+			end
+
+			return result
+		end,
+		unstable_scheduleCallback = function(p11, p12, p13) -- line: 457
+			-- upvalues: getCurrentTime (copy), ImmediatePriority (copy), UserBlockingPriority (copy), IdlePriority (copy), LowPriority (copy), n3 (ref), enableProfiling (copy), t8 (copy), u22 (ref), t7 (copy), u49 (ref), cancelHostTimeout (copy), requestHostTimeout (copy), u53 (ref), markTaskStart (copy), u48 (ref), u47 (ref), requestHostCallback (copy), u50 (ref)
+			local v124 = getCurrentTime()
+			local v126
+
+			if typeof(p13) == "table" then
+				local delay = p13.delay
+
+				v126 = if typeof(delay) ~= "number" or not (delay > 0) then v124 else v124 + delay
+			else
+				v126 = v124
+			end
+
+			local v127 = v126 + if p11 ~= ImmediatePriority then if p11 ~= UserBlockingPriority then if p11 ~= IdlePriority then p11 ~= LowPriority and 5000 or 10000 else 1073741823 else 250 else -1
+			local t9 = {
+				sortIndex = -1,
+				id = n3,
+				callback = p12,
+				priorityLevel = p11,
+				startTime = v126,
+				expirationTime = v127
+			}
+
+			n3 += 1
+
+			if enableProfiling then
+				t9.isQueued = false
+			end
+
+			if v124 < v126 then
+				t9.sortIndex = v126
+
+				local v129 = t8
+				local v130 = #v129 + 1
+
+				v129[v130] = t9
+				u22(v129, t9, v130)
+
+				if #t7 == 0 and t9 == t8[1] then
+					if u49 then
+						cancelHostTimeout()
+					else
+						u49 = true
+					end
+
+					requestHostTimeout(u53, v126 - v124)
+
+					return t9
+				end
+			else
+				t9.sortIndex = v127
+
+				local v131 = t7
+				local v132 = #v131 + 1
+
+				v131[v132] = t9
+				u22(v131, t9, v132)
+
+				if enableProfiling then
+					markTaskStart(t9, v124)
+					t9.isQueued = true
+				end
+
+				if not u48 and not u47 then
+					u48 = true
+					requestHostCallback(u50)
+				end
+			end
+
+			return t9
+		end,
+		unstable_cancelCallback = function(p14) -- line: 553
+			-- upvalues: enableProfiling (copy), getCurrentTime (copy), markTaskCanceled (copy)
+			if enableProfiling and p14.isQueued then
+				local v134 = getCurrentTime()
+
+				markTaskCanceled(p14, v134)
+				p14.isQueued = false
+			end
+
+			p14.callback = nil
+		end,
+		unstable_wrapCallback = function(p15) -- line: 429
+			-- upvalues: u46 (ref), ReactGlobals (copy), describeError (copy)
+			local v120 = u46
+
+			return function(...) -- line: 432
+				-- upvalues: u46 (ref), v120 (copy), ReactGlobals (copy), p15 (copy), describeError (copy)
+				local v135 = u46
+
+				u46 = v120
+
+				local ok, result
+
+				if not ReactGlobals.__YOLO__ then
+					ok, result = xpcall(p15, describeError, ...)
+				else
+					ok = true
+					result = p15(...)
+				end
+
+				u46 = v135
+
+				if not ok then
+					error(result)
+				end
+
+				return result
+			end
+		end,
+		unstable_getCurrentPriorityLevel = function() -- line: 568
+			-- upvalues: u46 (ref)
+			return u46
+		end,
+		unstable_shouldYield = shouldYieldToHost,
+		unstable_requestPaint = requestPaint,
+		unstable_continueExecution = function() -- line: 541
+			-- upvalues: u44 (ref), u48 (ref), u47 (ref), requestHostCallback (copy), u50 (ref)
+			u44 = false
+
+			if not u48 and not u47 then
+				u48 = true
+				requestHostCallback(u50)
+			end
+		end,
+		unstable_pauseExecution = function() -- line: 537
+			-- upvalues: u44 (ref)
+			u44 = true
+		end,
+		unstable_getFirstCallbackNode = function() -- line: 549
+			-- upvalues: t7 (copy)
+			return t7[1]
+		end,
+		unstable_now = getCurrentTime,
+		unstable_forceFrameRate = forceFrameRate,
+		unstable_setSchedulerFlags = setSchedulerFlags,
+		unstable_getSchedulerFlags = getSchedulerFlags,
+		unstable_Profiling = if not enableProfiling then nil else {
+			startLoggingProfilingEvents = startLoggingProfilingEvents,
+			stopLoggingProfilingEvents = stopLoggingProfilingEvents
+		}
+	}
+end

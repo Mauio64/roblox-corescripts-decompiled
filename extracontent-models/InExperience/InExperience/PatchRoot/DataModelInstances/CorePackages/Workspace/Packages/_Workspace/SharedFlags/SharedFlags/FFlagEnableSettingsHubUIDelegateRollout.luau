@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSettingsHubUIDelegateRollout", false);
+return game:DefineFastFlag("EnableSettingsHubUIDelegateRollout", false)

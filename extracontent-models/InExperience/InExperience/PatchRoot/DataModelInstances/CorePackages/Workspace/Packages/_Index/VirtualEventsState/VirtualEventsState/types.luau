@@ -1,3 +1,5 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEventsState");
-local _ = require(l_script_FirstAncestor_0.Parent.NetworkingVirtualEvents);
-return {};
+local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
+
+require(VirtualEventsState.Parent.NetworkingVirtualEvents)
+
+return {}

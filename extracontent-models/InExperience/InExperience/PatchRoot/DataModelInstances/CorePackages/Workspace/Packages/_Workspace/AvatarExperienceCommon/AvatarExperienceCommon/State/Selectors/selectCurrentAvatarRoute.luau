@@ -1,9 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local l_FFlagUseNavigationSelectors_0 = require(l_Parent_0.SharedFlags).FFlagUseNavigationSelectors;
-local l_Selectors_0 = require(l_Parent_0.NavigationRodux).Selectors;
-return function(v3) --[[ Line: 6 ]] --[[ Name: selectCurrentAvatarRoute ]]
-    -- upvalues: l_FFlagUseNavigationSelectors_0 (copy), l_Selectors_0 (copy)
-    local v4 = if l_FFlagUseNavigationSelectors_0 then v3.Navigation and l_Selectors_0.selectCurrentRoactNavigationRoute(v3) else v3.Navigation and v3.Navigation.currentRoute;
-    local v5 = v4 and v4.params and v4.params.fromAvatarRoute;
-    return v5 and v5.current;
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local FFlagUseNavigationSelectors = require(Parent.SharedFlags).FFlagUseNavigationSelectors
+local Selectors = require(Parent.NavigationRodux).Selectors
+
+local function selectCurrentAvatarRoute(p1) -- line: 6
+	-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy)
+	local v6 = if not FFlagUseNavigationSelectors then p1.Navigation and p1.Navigation.currentRoute else p1.Navigation and Selectors.selectCurrentRoactNavigationRoute(p1)
+	local v7 = v6 and (v6.params and v6.params.fromAvatarRoute)
+
+	return v7 and v7.current
+end
+
+return selectCurrentAvatarRoute

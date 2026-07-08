@@ -1,14 +1,16 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_1.Parent.Roact);
-local v3 = require(l_Parent_0.StyleConsumer);
-return function(v4) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    assert(type(v4) == "function", "Expect renderCallback to be a function.");
-    return v2.createElement(v3, {
-        render = function(v5) --[[ Line: 12 ]] --[[ Name: render ]]
-            -- upvalues: v4 (copy)
-            return v4(v5.derivedValues.textSizeOffset);
-        end
-    });
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local Roact = require(ParentParent.Parent.Roact)
+local StyleConsumer = require(scriptParent.StyleConsumer)
+
+return function(p1) -- line: 9
+	-- upvalues: Roact (copy), StyleConsumer (copy)
+	assert(type(p1) == "function", "Expect renderCallback to be a function.")
+
+	return Roact.createElement(StyleConsumer, {
+		render = function(p2) -- line: 12
+			-- upvalues: p1 (copy)
+			return p1(p2.derivedValues.textSizeOffset)
+		end
+	})
+end

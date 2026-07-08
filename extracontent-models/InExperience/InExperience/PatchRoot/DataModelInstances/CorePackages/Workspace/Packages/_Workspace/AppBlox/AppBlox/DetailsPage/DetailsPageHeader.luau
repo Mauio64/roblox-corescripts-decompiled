@@ -1,256 +1,273 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.UIBlox);
-local l_withStyle_0 = v1.Core.Style.withStyle;
-local l_ImageSetLabel_0 = v1.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v1.App.ImageSet.Images;
-local l_LoadableImage_0 = v1.App.Loading.LoadableImage;
-local l_ActionBar_0 = v1.App.Button.ActionBar;
-local l_DeviceType_0 = require(l_Parent_0.RobloxAppEnums).DeviceType;
-local v8 = require(l_Parent_0.Roact);
-local v9 = require(l_Parent_0.t);
-local v10 = require(script.Parent.DetailsPageTitleContent);
-local l_FFlagLuaAppFixDetailsPageThumbnailRenderInPhone_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppFixDetailsPageThumbnailRenderInPhone;
-local v12 = game:DefineFastFlag("LuaAppBottomAlignDetailsHeaderInfoFrame", false);
-local l_FFlagUIBloxEnableActionBarButtonOverride_0 = require(l_Parent_0.SharedFlags).UIBlox.FFlagUIBloxEnableActionBarButtonOverride;
-local l_FFlagUIBloxAddTestIdToActionBar_0 = require(l_Parent_0.SharedFlags).UIBlox.FFlagUIBloxAddTestIdToActionBar;
-local v15 = game:DefineFastFlag("FFlagFixDetailsPageIconShadowSlicing", false);
-local v16 = v8.PureComponent:extend("DetailsPageHeader");
-v16.defaultProps = {
-    thumbnailHeight = 200, 
-    thumbnailAspectRatio = Vector2.new(1, 1), 
-    actionBarHeight = 48, 
-    actionBarWidth = 380
-};
-v16.validateProps = v9.strictInterface({
-    thumbnailImageUrl = v9.optional(v9.string), 
-    thumbnailAspectRatio = v9.optional(v9.Vector2), 
-    thumbnailHeight = v9.optional(v9.number), 
-    titleText = v9.optional(v9.string), 
-    subTitleText = v9.optional(v9.string), 
-    actionBarLabelText = v9.optional(v9.string), 
-    renderInfoContent = v9.optional(v9.callback), 
-    renderCustomHeader = v9.optional(v9.callback), 
-    headerBarBackgroundHeight = v9.optional(v9.number), 
-    sideMargin = v9.optional(v9.number), 
-    itemPadding = v9.optional(v9.number), 
-    bottomMargin = v9.optional(v9.number), 
-    gradientHeight = v9.optional(v9.number), 
-    thumbnailShadowHeight = v9.optional(v9.number), 
-    actionBarHeight = v9.optional(v9.number), 
-    actionBarWidth = v9.optional(v9.number), 
-    maxContentWidth = v9.optional(v9.number), 
-    actionBarProps = v9.optional(v9.table), 
-    deviceType = v9.optional(v9.string)
-});
-v16.renderThumbnail = function(v17, v18, v19, v20, v21) --[[ Line: 78 ]] --[[ Name: renderThumbnail ]]
-    -- upvalues: v8 (copy), l_LoadableImage_0 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), v15 (copy)
-    return v8.createElement("Frame", {
-        Size = UDim2.fromOffset(v20, v21), 
-        LayoutOrder = 1, 
-        AnchorPoint = Vector2.new(0, 1), 
-        Position = UDim2.new(0, 0, 1, 0), 
-        BackgroundTransparency = 1
-    }, {
-        ThumbnailTile = v8.createElement(l_LoadableImage_0, {
-            cornerRadius = UDim.new(0, 8), 
-            Size = UDim2.fromScale(1, 1), 
-            Image = v17.props.thumbnailImageUrl
-        }), 
-        DropShadow = if v19 > 0 then v8.createElement(l_ImageSetLabel_0, {
-            Size = UDim2.new(1, 0, 0, 28), 
-            Position = UDim2.fromScale(0, 1), 
-            BackgroundTransparency = 1, 
-            Image = l_Images_0["component_assets/dropshadow_thumbnail_28"], 
-            ImageColor3 = v18.Theme.DropShadow.Color, 
-            ImageTransparency = v18.Theme.DropShadow.Transparency, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = if v15 then Rect.new(32, 0, 33, 1) else Rect.new(32, 0, 33, 28)
-        }) else nil
-    });
-end;
-v16.renderDesktopMode = function(v22, v23) --[[ Line: 108 ]] --[[ Name: renderDesktopMode ]]
-    -- upvalues: v8 (copy), v12 (copy), v10 (copy), l_ActionBar_0 (copy), l_FFlagUIBloxEnableActionBarButtonOverride_0 (copy), l_FFlagUIBloxAddTestIdToActionBar_0 (copy)
-    local l_thumbnailHeight_0 = v22.props.thumbnailHeight;
-    local v25 = l_thumbnailHeight_0 * (v22.props.thumbnailAspectRatio.X / v22.props.thumbnailAspectRatio.Y);
-    local v26 = v22.props.sideMargin or 48;
-    local v27 = v22.props.itemPadding or 24;
-    local v28 = 28;
-    if v22.props.thumbnailShadowHeight ~= nil then
-        v28 = v22.props.thumbnailShadowHeight;
-    end;
-    local v29 = v8.createElement("Frame", {
-        Size = UDim2.new(1, -(v25 + v26 * 2), 1, 0), 
-        BackgroundTransparency = 1, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = 2
-    }, if v22.props.renderCustomHeader then v22.props.renderCustomHeader() else {
-        Layout = v8.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            VerticalAlignment = if v12 then Enum.VerticalAlignment.Bottom else Enum.VerticalAlignment.Top, 
-            Padding = UDim.new(0, 16)
-        }), 
-        TitleInfo = v8.createElement(v10, {
-            titleText = v22.props.titleText, 
-            subTitleText = v22.props.subTitleText, 
-            renderInfoContent = v22.props.renderInfoContent, 
-            verticalAlignment = Enum.VerticalAlignment.Top, 
-            layoutOrder = 1
-        }), 
-        ActonBarFrame = v8.createElement("Frame", {
-            Size = UDim2.fromOffset(v22.props.actionBarWidth, v22.props.actionBarHeight), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 2
-        }, {
-            ActionBar = v22.props.actionBarProps and v8.createElement(l_ActionBar_0, {
-                button = v22.props.actionBarProps.button, 
-                buttonOverride = if l_FFlagUIBloxEnableActionBarButtonOverride_0 then v22.props.actionBarProps.buttonOverride else nil, 
-                icons = v22.props.actionBarProps.icons, 
-                iconSize = v22.props.actionBarProps.iconSize, 
-                buttonHeight = v22.props.actionBarProps.buttonHeight, 
-                buttonPadding = v22.props.actionBarProps.buttonPadding, 
-                textButtons = v22.props.actionBarProps.textButtons, 
-                enableButtonAtStart = true, 
-                marginOverride = {
-                    left = 0, 
-                    right = 0, 
-                    top = 0, 
-                    bottom = 0
-                }, 
-                horizontalAlignment = Enum.HorizontalAlignment.Left, 
-                testId = l_FFlagUIBloxAddTestIdToActionBar_0 and "--experience-details" or nil
-            }) or nil
-        }), 
-        ActionBarLabel = if v22.props.actionBarLabelText then v8.createElement("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Text = v22.props.actionBarLabelText, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextWrapped = true, 
-            BackgroundTransparency = 1, 
-            Font = v23.Tokens.Semantic.Typography.Body.Font, 
-            TextSize = v23.Tokens.Semantic.Typography.Body.FontSize, 
-            TextColor3 = v23.Tokens.Semantic.Color.Text.Emphasis.Color3, 
-            TextTransparency = v23.Tokens.Semantic.Color.Text.Emphasis.Transparency, 
-            LayoutOrder = 3
-        }) else nil
-    });
-    return {
-        Padding = v8.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v26), 
-            PaddingRight = UDim.new(0, v26), 
-            PaddingBottom = UDim.new(0, 16)
-        }), 
-        ContentFrame = v8.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Position = UDim2.fromScale(0.5, 1), 
-            AnchorPoint = Vector2.new(0.5, 1), 
-            BackgroundTransparency = 1
-        }, if v22.props.renderCustomHeader then {
-            CustomHeader = v22.props.renderCustomHeader(), 
-            UISizeConstraint = if v22.props.maxContentWidth then v8.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(v22.props.maxContentWidth, 1e999)
-            }) else nil
-        } else {
-            Layout = v8.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-                Padding = UDim.new(0, v27)
-            }), 
-            ThumbnailTileFrame = v22:renderThumbnail(v23, v28, v25, l_thumbnailHeight_0), 
-            InfoFrame = v29, 
-            UISizeConstraint = if v22.props.maxContentWidth then v8.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(v22.props.maxContentWidth, 1e999)
-            }) else nil
-        })
-    };
-end;
-v16.renderisPhone = function(v30, v31) --[[ Line: 237 ]] --[[ Name: renderisPhone ]]
-    -- upvalues: v8 (copy), l_FFlagLuaAppFixDetailsPageThumbnailRenderInPhone_0 (copy)
-    local l_thumbnailHeight_1 = v30.props.thumbnailHeight;
-    local v33 = l_thumbnailHeight_1 * (v30.props.thumbnailAspectRatio.X / v30.props.thumbnailAspectRatio.Y);
-    local v34 = v30.props.sideMargin or 24;
-    if v30.props.renderCustomHeader then
-        return {
-            Padding = v8.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v34), 
-                PaddingRight = UDim.new(0, v34), 
-                PaddingBottom = UDim.new(0, 16)
-            }), 
-            ContentFrame = v8.createElement("Frame", {
-                Size = UDim2.fromScale(1, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                AnchorPoint = Vector2.new(0, 1), 
-                Position = UDim2.fromScale(0, 1), 
-                BackgroundTransparency = 1
-            }, {
-                Content = v30.props.renderCustomHeader()
-            })
-        };
-    else
-        return {
-            Padding = v8.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v34), 
-                PaddingRight = UDim.new(0, v34), 
-                PaddingBottom = UDim.new(0, 16)
-            }), 
-            ThumbnailTileFrame = if l_FFlagLuaAppFixDetailsPageThumbnailRenderInPhone_0 then v30:renderThumbnail(v31, 0, v33, l_thumbnailHeight_1) else v30:renderThumbnail(v31, v33, l_thumbnailHeight_1)
-        };
-    end;
-end;
-v16.render = function(v35) --[[ Line: 275 ]] --[[ Name: render ]]
-    -- upvalues: l_DeviceType_0 (copy), l_withStyle_0 (copy), v8 (copy)
-    local v36 = v35.props.deviceType == l_DeviceType_0.Phone;
-    local l_thumbnailHeight_2 = v35.props.thumbnailHeight;
-    local v38 = v35.props.headerBarBackgroundHeight or 80;
-    local v39 = v35.props.gradientHeight or l_thumbnailHeight_2 + 16 - v38 + 44;
-    local l_bottomMargin_0 = v35.props.bottomMargin;
-    return l_withStyle_0(function(v41) --[[ Line: 285 ]]
-        -- upvalues: v8 (ref), v39 (copy), v38 (copy), v36 (copy), v35 (copy), l_thumbnailHeight_2 (copy), l_bottomMargin_0 (copy)
-        local l_Theme_0 = v41.Theme;
-        return v8.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1
-        }, {
-            Layout = v8.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left
-            }), 
-            GradientBar = v8.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v39), 
-                BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-                AnchorPoint = Vector2.new(0, 1), 
-                BorderSizePixel = 0, 
-                LayoutOrder = 1
-            }, {
-                Gradient = v8.createElement("UIGradient", {
-                    Rotation = 270, 
-                    Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 0), 
-                        NumberSequenceKeypoint.new(0.5, 0.25), 
-                        NumberSequenceKeypoint.new(1, 1)
-                    })
-                })
-            }), 
-            BackgroundBar = v8.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v38), 
-                Position = UDim2.fromScale(0, 1), 
-                AnchorPoint = Vector2.new(0, 1), 
-                BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-                BackgroundTransparency = l_Theme_0.BackgroundDefault.Transparency, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 2
-            }, v36 and v35:renderisPhone(v41, l_thumbnailHeight_2) or v35:renderDesktopMode(v41, l_thumbnailHeight_2)), 
-            Padding = if l_bottomMargin_0 then v8.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_bottomMargin_0), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 3
-            }) else nil
-        });
-    end);
-end;
-return v16;
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local UIBlox = require(Parent.UIBlox)
+local withStyle = UIBlox.Core.Style.withStyle
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+local ActionBar = UIBlox.App.Button.ActionBar
+local DeviceType = require(Parent.RobloxAppEnums).DeviceType
+local Roact = require(Parent.Roact)
+local t = require(Parent.t)
+local DetailsPageTitleContent = require(script.Parent.DetailsPageTitleContent)
+local FFlagLuaAppFixDetailsPageThumbnailRenderInPhone = require(Parent.SharedFlags).FFlagLuaAppFixDetailsPageThumbnailRenderInPhone
+local v13 = game:DefineFastFlag("LuaAppBottomAlignDetailsHeaderInfoFrame", false)
+local FFlagUIBloxEnableActionBarButtonOverride = require(Parent.SharedFlags).UIBlox.FFlagUIBloxEnableActionBarButtonOverride
+local FFlagUIBloxAddTestIdToActionBar = require(Parent.SharedFlags).UIBlox.FFlagUIBloxAddTestIdToActionBar
+local v16 = game:DefineFastFlag("FFlagFixDetailsPageIconShadowSlicing", false)
+local v17 = Roact.PureComponent:extend("DetailsPageHeader")
+
+v17.defaultProps = {
+	thumbnailHeight = 200,
+	actionBarHeight = 48,
+	actionBarWidth = 380,
+	thumbnailAspectRatio = Vector2.new(1, 1)
+}
+v17.validateProps = t.strictInterface({
+	thumbnailImageUrl = t.optional(t.string),
+	thumbnailAspectRatio = t.optional(t.Vector2),
+	thumbnailHeight = t.optional(t.number),
+	titleText = t.optional(t.string),
+	subTitleText = t.optional(t.string),
+	actionBarLabelText = t.optional(t.string),
+	renderInfoContent = t.optional(t.callback),
+	renderCustomHeader = t.optional(t.callback),
+	headerBarBackgroundHeight = t.optional(t.number),
+	sideMargin = t.optional(t.number),
+	itemPadding = t.optional(t.number),
+	bottomMargin = t.optional(t.number),
+	gradientHeight = t.optional(t.number),
+	thumbnailShadowHeight = t.optional(t.number),
+	actionBarHeight = t.optional(t.number),
+	actionBarWidth = t.optional(t.number),
+	maxContentWidth = t.optional(t.number),
+	actionBarProps = t.optional(t.table),
+	renderActionBarLabelImpressionsDetector = t.optional(t.callback),
+	scrollViewPositionChangedSignal = t.optional(t.table),
+	deviceType = t.optional(t.string)
+})
+
+function v17.init(p1) -- line: 80
+	-- upvalues: Roact (copy)
+	p1.actionBarLabelRef = Roact.createRef()
+end
+function v17.renderThumbnail(p2, p3, p4, p5, p6) -- line: 84
+	-- upvalues: Roact (copy), LoadableImage (copy), ImageSetLabel (copy), Images (copy), v16 (copy)
+	return Roact.createElement("Frame", {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(p5, p6),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 0, 1, 0)
+	}, {
+		ThumbnailTile = Roact.createElement(LoadableImage, {
+			cornerRadius = UDim.new(0, 8),
+			Size = UDim2.fromScale(1, 1),
+			Image = p2.props.thumbnailImageUrl
+		}),
+		DropShadow = if not (p4 > 0) then nil else Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 28),
+			Position = UDim2.fromScale(0, 1),
+			Image = Images["component_assets/dropshadow_thumbnail_28"],
+			ImageColor3 = p3.Theme.DropShadow.Color,
+			ImageTransparency = p3.Theme.DropShadow.Transparency,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = if not v16 then Rect.new(32, 0, 33, 28) else Rect.new(32, 0, 33, 1)
+		})
+	})
+end
+function v17.renderDesktopMode(p7, p8) -- line: 114
+	-- upvalues: Roact (copy), v13 (copy), DetailsPageTitleContent (copy), ActionBar (copy), FFlagUIBloxEnableActionBarButtonOverride (copy), FFlagUIBloxAddTestIdToActionBar (copy)
+	local thumbnailHeight = p7.props.thumbnailHeight
+	local v27 = thumbnailHeight * (p7.props.thumbnailAspectRatio.X / p7.props.thumbnailAspectRatio.Y)
+	local v28 = p7.props.sideMargin or 48
+	local v29 = p7.props.itemPadding or 24
+	local n1 = 28
+
+	if p7.props.thumbnailShadowHeight ~= nil then
+		n1 = p7.props.thumbnailShadowHeight
+	end
+
+	local v31 = Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Size = UDim2.new(1, -(v27 + v28 * 2), 1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, if not p7.props.renderCustomHeader then {
+		Layout = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			VerticalAlignment = if not v13 then Enum.VerticalAlignment.Top else Enum.VerticalAlignment.Bottom,
+			Padding = UDim.new(0, 16)
+		}),
+		TitleInfo = Roact.createElement(DetailsPageTitleContent, {
+			layoutOrder = 1,
+			titleText = p7.props.titleText,
+			subTitleText = p7.props.subTitleText,
+			renderInfoContent = p7.props.renderInfoContent,
+			verticalAlignment = Enum.VerticalAlignment.Top
+		}),
+		ActonBarFrame = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(p7.props.actionBarWidth, p7.props.actionBarHeight)
+		}, {
+			ActionBar = p7.props.actionBarProps and Roact.createElement(ActionBar, {
+				enableButtonAtStart = true,
+				button = p7.props.actionBarProps.button,
+				buttonOverride = if not FFlagUIBloxEnableActionBarButtonOverride then nil else p7.props.actionBarProps.buttonOverride,
+				icons = p7.props.actionBarProps.icons,
+				iconSize = p7.props.actionBarProps.iconSize,
+				buttonHeight = p7.props.actionBarProps.buttonHeight,
+				buttonPadding = p7.props.actionBarProps.buttonPadding,
+				textButtons = p7.props.actionBarProps.textButtons,
+				marginOverride = {
+					left = 0,
+					right = 0,
+					top = 0,
+					bottom = 0
+				},
+				horizontalAlignment = Enum.HorizontalAlignment.Left,
+				testId = if not FFlagUIBloxAddTestIdToActionBar then nil else "--experience-details"
+			}) or nil
+		}),
+		ActionBarLabel = if not p7.props.actionBarLabelText then nil else Roact.createElement("TextLabel", {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Text = p7.props.actionBarLabelText,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			Font = p8.Tokens.Typography.BodyLarge.Font,
+			TextSize = p8.Tokens.FontSize.FontSize_350,
+			TextColor3 = p8.Tokens.Color.Content.Emphasis.Color3,
+			TextTransparency = p8.Tokens.Color.Content.Emphasis.Transparency,
+			LayoutOrder = 3,
+			[Roact.Ref] = p7.actionBarLabelRef
+		}),
+		ActionBarLabelImpressionsDetector = if not p7.props.actionBarLabelText or not p7.props.renderActionBarLabelImpressionsDetector then nil else p7.props.renderActionBarLabelImpressionsDetector(p7.actionBarLabelRef, p7.props.scrollViewPositionChangedSignal)
+	} else p7.props.renderCustomHeader())
+
+	return {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, v28),
+			PaddingRight = UDim.new(0, v28),
+			PaddingBottom = UDim.new(0, 16)
+		}),
+		ContentFrame = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Position = UDim2.fromScale(0.5, 1),
+			AnchorPoint = Vector2.new(0.5, 1)
+		}, if not p7.props.renderCustomHeader then {
+			Layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				Padding = UDim.new(0, v29)
+			}),
+			ThumbnailTileFrame = p7:renderThumbnail(p8, n1, v27, thumbnailHeight),
+			InfoFrame = v31,
+			UISizeConstraint = if not p7.props.maxContentWidth then nil else Roact.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(p7.props.maxContentWidth, 1e999)
+			})
+		} else {
+			CustomHeader = p7.props.renderCustomHeader(),
+			UISizeConstraint = if not p7.props.maxContentWidth then nil else Roact.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(p7.props.maxContentWidth, 1e999)
+			})
+		})
+	}
+end
+function v17.renderisPhone(p9, p10) -- line: 251
+	-- upvalues: Roact (copy), FFlagLuaAppFixDetailsPageThumbnailRenderInPhone (copy)
+	local thumbnailHeight = p9.props.thumbnailHeight
+	local v35 = thumbnailHeight * (p9.props.thumbnailAspectRatio.X / p9.props.thumbnailAspectRatio.Y)
+	local v36 = p9.props.sideMargin or 24
+
+	if p9.props.renderCustomHeader then
+		return {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v36),
+				PaddingRight = UDim.new(0, v36),
+				PaddingBottom = UDim.new(0, 16)
+			}),
+			ContentFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0, 1)
+			}, {
+				Content = p9.props.renderCustomHeader()
+			})
+		}
+	end
+
+	return {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, v36),
+			PaddingRight = UDim.new(0, v36),
+			PaddingBottom = UDim.new(0, 16)
+		}),
+		ThumbnailTileFrame = if not FFlagLuaAppFixDetailsPageThumbnailRenderInPhone then p9:renderThumbnail(p10, v35, thumbnailHeight) else p9:renderThumbnail(p10, 0, v35, thumbnailHeight)
+	}
+end
+function v17.render(p11) -- line: 289
+	-- upvalues: DeviceType (copy), withStyle (copy), Roact (copy)
+	local v38 = p11.props.deviceType == DeviceType.Phone
+	local thumbnailHeight = p11.props.thumbnailHeight
+	local v40 = p11.props.headerBarBackgroundHeight or 80
+	local v41 = p11.props.gradientHeight or thumbnailHeight + 16 - v40 + 44
+	local bottomMargin = p11.props.bottomMargin
+
+	return withStyle(function(p12) -- line: 299
+		-- upvalues: Roact (copy), v41 (copy), v40 (copy), v38 (copy), p11 (copy), thumbnailHeight (copy), bottomMargin (copy)
+		local Theme = p12.Theme
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}),
+			GradientBar = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, v41),
+				BackgroundColor3 = Theme.BackgroundDefault.Color,
+				AnchorPoint = Vector2.new(0, 1)
+			}, {
+				Gradient = Roact.createElement("UIGradient", {
+					Rotation = 270,
+					Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, 0),
+						NumberSequenceKeypoint.new(0.5, 0.25),
+						NumberSequenceKeypoint.new(1, 1)
+					})
+				})
+			}),
+			BackgroundBar = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, v40),
+				Position = UDim2.fromScale(0, 1),
+				AnchorPoint = Vector2.new(0, 1),
+				BackgroundColor3 = Theme.BackgroundDefault.Color,
+				BackgroundTransparency = Theme.BackgroundDefault.Transparency
+			}, v38 and p11:renderisPhone(p12, thumbnailHeight) or p11:renderDesktopMode(p12, thumbnailHeight)),
+			Padding = if not bottomMargin then nil else Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 0, bottomMargin)
+			})
+		})
+	end)
+end
+
+return v17

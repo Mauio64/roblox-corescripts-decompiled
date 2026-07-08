@@ -1,2 +1,3 @@
-local v0 = require(script.Parent.GetFFlagIsSquadEnabled);
-return game:GetEngineFeature("PrivatePartyJoin") and v0() and game:DefineFastFlag("EnablePrivatePartyAcceptInvite", false);
+local GetFFlagIsSquadEnabled = require(script.Parent.GetFFlagIsSquadEnabled)
+
+return game:GetEngineFeature("PrivatePartyJoin") and (GetFFlagIsSquadEnabled() and game:DefineFastFlag("EnablePrivatePartyAcceptInvite", false))

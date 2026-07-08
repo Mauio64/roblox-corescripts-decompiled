@@ -1,6 +1,7 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local v1 = require(l_script_FirstAncestor_0.url.CHAT_PLATFORM_BASE_URL);
-return require(script.Parent.RoduxNetworking).POST(script.Name, function(v2) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    return v2(v1):path("v1"):path("clear-global-unread-count"):body({});
-end);
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+
+return require(script.Parent.RoduxNetworking).POST(script.Name, function(p1) -- line: 6
+	-- upvalues: CHAT_PLATFORM_BASE_URL (copy)
+	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("clear-global-unread-count"):body({})
+end)

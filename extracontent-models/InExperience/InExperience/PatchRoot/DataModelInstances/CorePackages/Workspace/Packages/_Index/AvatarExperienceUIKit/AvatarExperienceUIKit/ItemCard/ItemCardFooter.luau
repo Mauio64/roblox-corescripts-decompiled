@@ -1,58 +1,64 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v3 = require(l_Parent_0.AvatarExperienceFlags);
-local v4 = require(script.Parent.ItemCardPriceLine);
-local v5 = require(script.Parent.ItemCardCreatorName);
-local v6 = require(script.Parent.ItemCardTitle);
-local l_FFlagAXAddTextXAlignmentProp_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXAddTextXAlignmentProp;
-local l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 = v3.FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark;
-return function(v9) --[[ Line: 29 ]] --[[ Name: ItemCardFooter ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 (copy), v6 (copy), l_FFlagAXAddTextXAlignmentProp_0 (copy), v5 (copy), v4 (copy)
-    local v10 = l_useTokens_0();
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v9.LayoutOrder, 
-        ClipsDescendants = l_FFlagAXItemCardSelectedOverlayBorderInsteadOfCheckmark_0 and true or nil
-    }, {
-        ItemCardFooterLayout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            Padding = UDim.new(0, v10.Gap.XSmall)
-        }), 
-        ItemCardFooterInfo = if not not v9.title or v9.creatorName then v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            LayoutOrder = 1
-        }, {
-            ItemCardFooterInfoLayout = v1.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                Padding = UDim.new(0, v10.Gap.XXSmall)
-            }), 
-            ItemCardFooterInfoTitle = if v9.title then v1.createElement(v6, {
-                title = v9.title, 
-                titleTextSize = v9.titleTextSize, 
-                LayoutOrder = 1, 
-                TextXAlignment = if l_FFlagAXAddTextXAlignmentProp_0 then v9.TextXAlignment else nil
-            }) else nil, 
-            ItemCardFooterInfoCreatorName = if v9.creatorName then v1.createElement(v5, {
-                name = v9.creatorName, 
-                hasVerifiedBadge = v9.creatorHasVerifiedBadge, 
-                LayoutOrder = 2, 
-                TextXAlignment = if l_FFlagAXAddTextXAlignmentProp_0 then v9.TextXAlignment else nil
-            }) else nil
-        }) else nil, 
-        ItemCardFooterPrice = if v9.priceLineContent then v1.createElement(v4, {
-            content = v9.priceLineContent, 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local useTokens = require(Parent.Foundation).Hooks.useTokens
+local ItemCardPriceLine = require(script.Parent.ItemCardPriceLine)
+local ItemCardCreatorName = require(script.Parent.ItemCardCreatorName)
+local ItemCardTitle = require(script.Parent.ItemCardTitle)
+local FFlagAXAddTextXAlignmentProp = require(Parent.AvatarExperienceFlags).FFlagAXAddTextXAlignmentProp
+
+local function ItemCardFooter(t1: {[any]: any}) -- line: 27
+	-- upvalues: useTokens (copy), React (copy), ItemCardTitle (copy), FFlagAXAddTextXAlignmentProp (copy), ItemCardCreatorName (copy), ItemCardPriceLine (copy)
+	local v10 = useTokens()
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		ItemCardFooterLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = UDim.new(0, v10.Gap.XSmall)
+		}),
+		ItemCardFooterInfo = if not t1.title and not t1.creatorName then nil else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 1,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			ItemCardFooterInfoLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				Padding = UDim.new(0, v10.Gap.XXSmall)
+			}),
+			ItemCardFooterInfoTitle = if not t1.title then nil else React.createElement(ItemCardTitle, {
+				LayoutOrder = 1,
+				title = t1.title,
+				titleTextSize = t1.titleTextSize,
+				TextXAlignment = if not FFlagAXAddTextXAlignmentProp then nil else t1.TextXAlignment
+			}),
+			ItemCardFooterInfoCreatorName = if not t1.creatorName then nil else React.createElement(ItemCardCreatorName, {
+				LayoutOrder = 2,
+				name = t1.creatorName,
+				hasVerifiedBadge = t1.creatorHasVerifiedBadge,
+				TextXAlignment = if not FFlagAXAddTextXAlignmentProp then nil else t1.TextXAlignment
+			})
+		}),
+		ItemCardFooterPrice = if not t1.priceLineContent then nil else React.createElement(ItemCardPriceLine, {
+			LayoutOrder = 2,
+			content = t1.priceLineContent
+		})
+	})
+end
+
+if require(Parent.AvatarExperienceFlags).FFlagAXItemCardComponentsMemo then
+	return (React.memo(ItemCardFooter))
+end
+
+return ItemCardFooter

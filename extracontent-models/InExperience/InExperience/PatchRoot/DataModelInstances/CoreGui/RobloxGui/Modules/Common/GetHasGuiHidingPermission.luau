@@ -1,37 +1,43 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Promise);
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local v4 = require(l_RobloxGui_0.Modules.Flags.GetFIntCanHideGuiGroupId);
-return function(_, v6, _) --[[ Line: 11 ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    return v2.new(function(v8, v9) --[[ Line: 12 ]]
-        -- upvalues: v6 (copy), v4 (ref)
-        if not game:GetEngineFeature("GuiHidingApiSupport") then
-            v8(false);
-            return;
-        elseif not v6 then
-            v9("Invalid local player");
-            return;
-        else
-            local v10 = false;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 24 ]]
-                -- upvalues: v4 (ref), v10 (ref), v6 (ref)
-                local v11 = v4();
-                if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                    v10 = v6:IsInGroupAsync(v11);
-                    return;
-                else
-                    v10 = v6:IsInGroup(v11);
-                    return;
-                end;
-            end);
-            if l_status_0 then
-                v8(v10);
-            else
-                v9(l_result_0);
-            end;
-            return;
-        end;
-    end);
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local Promise = require(CorePackages.Packages.Promise)
+local RobloxGui = CoreGui.RobloxGui
+local GetFIntCanHideGuiGroupId = require(RobloxGui.Modules.Flags.GetFIntCanHideGuiGroupId)
+
+return function(_, p2, _) -- line: 11
+	-- upvalues: Promise (copy), GetFIntCanHideGuiGroupId (copy)
+	return Promise.new(function(resolve, reject) -- line: 12
+		-- upvalues: p2 (copy), GetFIntCanHideGuiGroupId (copy)
+		if not game:GetEngineFeature("GuiHidingApiSupport") then
+			resolve(false)
+
+			return
+		end
+
+		if not p2 then
+			reject("Invalid local player")
+
+			return
+		end
+
+		local u11 = false
+		local ok, result = pcall(function() -- line: 24
+			-- upvalues: GetFIntCanHideGuiGroupId (copy), u11 (ref), p2 (copy)
+			local v14 = GetFIntCanHideGuiGroupId()
+
+			if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+				u11 = p2:IsInGroupAsync(v14)
+
+				return
+			end
+
+			u11 = p2:IsInGroup(v14)
+		end)
+
+		if ok then
+			resolve(u11)
+		else
+			reject(result)
+		end
+	end)
+end

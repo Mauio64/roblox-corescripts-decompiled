@@ -1,122 +1,135 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_FFlagTopBarSignalizeHealthBar_0 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeHealthBar;
-local v7 = require(l_Parent_0.Actions.SetIsDead);
-local v8 = require(l_Parent_0.Actions.UpdateHealth);
-local v9 = require(l_Parent_0.Parent.Common.EventConnection);
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v11 = v2.PureComponent:extend("HealthConnector");
-v11.validateProps = v4.strictInterface({
-    setIsDead = v4.callback, 
-    updateHealth = v4.callback
-});
-v11.init = function(v12) --[[ Line: 34 ]] --[[ Name: init ]]
-    v12:setState({
-        character = nil, 
-        humanoid = nil
-    });
-end;
-v11.didMount = function(v13) --[[ Line: 41 ]] --[[ Name: didMount ]]
-    -- upvalues: l_LocalPlayer_0 (ref)
-    local l_Character_0 = l_LocalPlayer_0.Character;
-    local v15 = nil;
-    if l_Character_0 then
-        v15 = l_Character_0:FindFirstChildOfClass("Humanoid");
-    end;
-    v13:setState({
-        character = l_Character_0, 
-        humanoid = v15
-    });
-end;
-v11.render = function(v16) --[[ Line: 54 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v9 (copy), l_LocalPlayer_0 (ref)
-    local v17 = {};
-    if v16.state.humanoid then
-        v17.HealthChangedConnection = v2.createElement(v9, {
-            event = v16.state.humanoid.HealthChanged, 
-            callback = function(_) --[[ Line: 60 ]] --[[ Name: callback ]]
-                -- upvalues: v16 (copy)
-                v16.props.updateHealth(v16.state.humanoid.Health, v16.state.humanoid.MaxHealth);
-            end
-        });
-        v17.HumanoidDiedConnection = v2.createElement(v9, {
-            event = v16.state.humanoid.Died, 
-            callback = function() --[[ Line: 67 ]] --[[ Name: callback ]]
-                -- upvalues: v16 (copy)
-                v16.props.setIsDead(true);
-            end
-        });
-    elseif v16.state.character then
-        v17.ChildAddedConnection = v2.createElement(v9, {
-            event = v16.state.character.ChildAdded, 
-            callback = function(v19) --[[ Line: 74 ]] --[[ Name: callback ]]
-                -- upvalues: v16 (copy)
-                if v19:IsA("Humanoid") then
-                    v16:setState({
-                        humanoid = v19
-                    });
-                end;
-            end
-        });
-    end;
-    v17.CharacterAddedConnection = v2.createElement(v9, {
-        event = l_LocalPlayer_0.CharacterAdded, 
-        callback = function(v20) --[[ Line: 86 ]] --[[ Name: callback ]]
-            -- upvalues: v16 (copy), v2 (ref)
-            v16:setState({
-                humanoid = v20:FindFirstChildOfClass("Humanoid") or v2.None, 
-                character = v20
-            });
-            v16.props.setIsDead(false);
-        end
-    });
-    v17.CharacterRemovingConnection = v2.createElement(v9, {
-        event = l_LocalPlayer_0.CharacterRemoving, 
-        callback = function() --[[ Line: 97 ]] --[[ Name: callback ]]
-            -- upvalues: v16 (copy), v2 (ref)
-            v16:setState({
-                humanoid = v2.None, 
-                character = v2.None
-            });
-        end
-    });
-    return v2.createFragment(v17);
-end;
-v11.didUpdate = function(v21, _, v23) --[[ Line: 108 ]] --[[ Name: didUpdate ]]
-    if v21.state.humanoid == nil then
-        v21.props.updateHealth(0, 0);
-    elseif v21.state.humanoid ~= v23.humanoid then
-        v21.props.setIsDead(false);
-        v21.props.updateHealth(v21.state.humanoid.Health, v21.state.humanoid.MaxHealth);
-    end;
-    if v21.state.character and v21.state.character ~= v23.character then
-        local l_Humanoid_0 = v21.state.character:FindFirstChildWhichIsA("Humanoid");
-        if l_Humanoid_0 and l_Humanoid_0 ~= v21.state.humanoid then
-            v21:setState({
-                humanoid = l_Humanoid_0
-            });
-        end;
-    end;
-end;
-local function v29(v25) --[[ Line: 126 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v7 (copy), v8 (copy)
-    return {
-        setIsDead = function(v26) --[[ Line: 128 ]] --[[ Name: setIsDead ]]
-            -- upvalues: v25 (copy), v7 (ref)
-            return v25(v7(v26));
-        end, 
-        updateHealth = function(v27, v28) --[[ Line: 132 ]] --[[ Name: updateHealth ]]
-            -- upvalues: v25 (copy), v8 (ref)
-            return v25(v8(v27, v28));
-        end
-    };
-end;
-return if l_FFlagTopBarSignalizeHealthBar_0 then nil else v3.UNSTABLE_connect2(nil, v29)(v11);
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent.Parent
+local FFlagTopBarSignalizeHealthBar = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeHealthBar
+local SetIsDead = require(ParentParent.Actions.SetIsDead)
+local UpdateHealth = require(ParentParent.Actions.UpdateHealth)
+local EventConnection = require(ParentParent.Parent.Common.EventConnection)
+local LocalPlayer = Players.LocalPlayer
+
+while not LocalPlayer do
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local v12 = Roact.PureComponent:extend("HealthConnector")
+
+v12.validateProps = t.strictInterface({
+	setIsDead = t.callback,
+	updateHealth = t.callback
+})
+
+function v12.init(p1) -- line: 34
+	p1:setState({
+		character = nil,
+		humanoid = nil
+	})
+end
+function v12.didMount(p2) -- line: 41
+	-- upvalues: LocalPlayer (ref)
+	local Character = LocalPlayer.Character
+	local Humanoid = nil
+
+	if Character then
+		Humanoid = Character:FindFirstChildOfClass("Humanoid")
+	end
+
+	p2:setState({
+		character = Character,
+		humanoid = Humanoid
+	})
+end
+function v12.render(p3) -- line: 54
+	-- upvalues: Roact (copy), EventConnection (copy), LocalPlayer (ref)
+	local t1 = {}
+
+	if p3.state.humanoid then
+		t1.HealthChangedConnection = Roact.createElement(EventConnection, {
+			event = p3.state.humanoid.HealthChanged,
+			callback = function(_) -- line: 60
+				-- upvalues: p3 (copy)
+				p3.props.updateHealth(p3.state.humanoid.Health, p3.state.humanoid.MaxHealth)
+			end
+		})
+		t1.HumanoidDiedConnection = Roact.createElement(EventConnection, {
+			event = p3.state.humanoid.Died,
+			callback = function() -- line: 67
+				-- upvalues: p3 (copy)
+				p3.props.setIsDead(true)
+			end
+		})
+	elseif p3.state.character then
+		t1.ChildAddedConnection = Roact.createElement(EventConnection, {
+			event = p3.state.character.ChildAdded,
+			callback = function(p5) -- line: 74
+				-- upvalues: p3 (copy)
+				if p5:IsA("Humanoid") then
+					p3:setState({
+						humanoid = p5
+					})
+				end
+			end
+		})
+	end
+
+	t1.CharacterAddedConnection = Roact.createElement(EventConnection, {
+		event = LocalPlayer.CharacterAdded,
+		callback = function(p6) -- line: 86
+			-- upvalues: p3 (copy), Roact (copy)
+			p3:setState({
+				humanoid = p6:FindFirstChildOfClass("Humanoid") or Roact.None,
+				character = p6
+			})
+			p3.props.setIsDead(false)
+		end
+	})
+	t1.CharacterRemovingConnection = Roact.createElement(EventConnection, {
+		event = LocalPlayer.CharacterRemoving,
+		callback = function() -- line: 97
+			-- upvalues: p3 (copy), Roact (copy)
+			p3:setState({
+				humanoid = Roact.None,
+				character = Roact.None
+			})
+		end
+	})
+
+	return Roact.createFragment(t1)
+end
+function v12.didUpdate(p7, _, p9) -- line: 108
+	if p7.state.humanoid == nil then
+		p7.props.updateHealth(0, 0)
+	elseif p7.state.humanoid ~= p9.humanoid then
+		p7.props.setIsDead(false)
+		p7.props.updateHealth(p7.state.humanoid.Health, p7.state.humanoid.MaxHealth)
+	end
+
+	if p7.state.character and p7.state.character ~= p9.character then
+		local Humanoid = p7.state.character:FindFirstChildWhichIsA("Humanoid")
+
+		if Humanoid and Humanoid ~= p7.state.humanoid then
+			p7:setState({
+				humanoid = Humanoid
+			})
+		end
+	end
+end
+
+local function mapDispatchToProps(p10) -- line: 126
+	-- upvalues: SetIsDead (copy), UpdateHealth (copy)
+	return {
+		setIsDead = function(p11) -- line: 128
+			-- upvalues: p10 (copy), SetIsDead (copy)
+			return p10(SetIsDead(p11))
+		end,
+		updateHealth = function(p12, p13) -- line: 132
+			-- upvalues: p10 (copy), UpdateHealth (copy)
+			return p10(UpdateHealth(p12, p13))
+		end
+	}
+end
+
+return if not FFlagTopBarSignalizeHealthBar then RoactRodux.UNSTABLE_connect2(nil, mapDispatchToProps)(v12) else nil

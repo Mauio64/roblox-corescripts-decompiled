@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableImpressions", false);
+return game:DefineFastFlag("ProfilePlatformEnableImpressions", false)

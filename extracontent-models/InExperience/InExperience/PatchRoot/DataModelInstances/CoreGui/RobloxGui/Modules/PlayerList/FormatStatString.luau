@@ -1,18 +1,21 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_NumberLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).NumberLocalization;
-local l_RoundingBehaviour_0 = require(l_CorePackages_0.Workspace.Packages.Localization).RoundingBehaviour;
-return function(v4) --[[ Line: 9 ]]
-    -- upvalues: l_NumberLocalization_0 (copy), l_LocalizationService_0 (copy), l_RoundingBehaviour_0 (copy)
-    if v4 == nil then
-        return "-";
-    elseif type(v4) == "number" then
-        if tostring(v4):len() >= 7 then
-            return l_NumberLocalization_0.abbreviate(v4, l_LocalizationService_0.RobloxLocaleId, l_RoundingBehaviour_0.Truncate);
-        else
-            return l_NumberLocalization_0.localize(v4, l_LocalizationService_0.RobloxLocaleId);
-        end;
-    else
-        return (tostring(v4));
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local LocalizationService = game:GetService("LocalizationService")
+local NumberLocalization = require(CorePackages.Workspace.Packages.Localization).NumberLocalization
+local RoundingBehaviour = require(CorePackages.Workspace.Packages.Localization).RoundingBehaviour
+
+return function(p1) -- line: 9
+	-- upvalues: NumberLocalization (copy), LocalizationService (copy), RoundingBehaviour (copy)
+	if p1 == nil then
+		return "-"
+	end
+
+	if type(p1) == "number" then
+		if tostring(p1):len() >= 7 then
+			return NumberLocalization.abbreviate(p1, LocalizationService.RobloxLocaleId, RoundingBehaviour.Truncate)
+		end
+
+		return NumberLocalization.localize(p1, LocalizationService.RobloxLocaleId)
+	end
+
+	return (tostring(p1))
+end

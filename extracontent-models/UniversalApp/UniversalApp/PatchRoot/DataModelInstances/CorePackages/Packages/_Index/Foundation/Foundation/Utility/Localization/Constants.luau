@@ -1,3 +1,3 @@
 return {
-    LOCALIZATION_TABLE_NAME = "FoundationLocalization"
-};
+	LOCALIZATION_TABLE_NAME = "FoundationLocalization"
+}

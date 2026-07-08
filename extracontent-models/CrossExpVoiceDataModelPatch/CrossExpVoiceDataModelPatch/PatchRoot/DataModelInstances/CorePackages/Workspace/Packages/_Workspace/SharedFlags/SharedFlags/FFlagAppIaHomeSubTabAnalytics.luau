@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppIaHomeSubTabAnalytics", false);
+return game:DefineFastFlag("AppIaHomeSubTabAnalytics", false)

@@ -1,5 +1,5 @@
 return {
-    Default = "default", 
-    Quick = "quick", 
-    Slow = "slow"
-};
+	Default = "default",
+	Quick = "quick",
+	Slow = "slow"
+}

@@ -1,33 +1,37 @@
-local v0 = require(script.Parent.copy);
-local function v2(v1) --[[ Line: 4 ]] --[[ Name: noUpdate ]]
-    return v1;
-end;
-local function v4(v3, ...) --[[ Line: 8 ]] --[[ Name: call ]]
-    if type(v3) == "function" then
-        return v3(...);
-    else
-        return;
-    end;
-end;
-return function(v5, v6, v7, v8) --[[ Line: 14 ]] --[[ Name: update ]]
-    -- upvalues: v0 (copy), v2 (copy), v4 (copy)
-    local v9 = type(v5);
-    assert(v9 == "table", "expected a table for first argument, got " .. v9);
-    local v10 = type(v6);
-    local v11 = false;
-    if v10 == "number" then
-        v11 = v6 % 1 == 0;
-    end;
-    assert(v11, "expected an integer for second argument, got " .. v10);
-    local v12 = v0(v5);
-    v11 = nil;
-    v7 = v7 or v2;
-    if v12[v6] ~= nil then
-        v11 = v7(v12[v6], v6);
-        v4(v8, true, v11, v6);
-    else
-        v11 = v4(v8, false, v6);
-    end;
-    v12[v6] = v11;
-    return v12;
-end;
+local copy = require(script.Parent.copy)
+
+local function noUpdate(p1) -- line: 4
+	return p1
+end
+local function call(p2, ...) -- line: 8
+	if type(p2) == "function" then
+		return p2(...)
+	end
+end
+local function update(p3, p4, p5, p6) -- line: 14
+	-- upvalues: copy (copy), noUpdate (copy), call (copy)
+	local v11 = type(p3)
+
+	assert(v11 == "table", "expected a table for first argument, got " .. v11)
+
+	local v12 = type(p4)
+
+	assert(v12 == "number" and p4 % 1 == 0, "expected an integer for second argument, got " .. v12)
+
+	local v13 = copy(p3)
+	local v14 = p5 or noUpdate
+	local v15
+
+	if v13[p4] ~= nil then
+		v15 = v14(v13[p4], p4)
+		call(p6, true, v15, p4)
+	else
+		v15 = call(p6, false, p4)
+	end
+
+	v13[p4] = v15
+
+	return v13
+end
+
+return update

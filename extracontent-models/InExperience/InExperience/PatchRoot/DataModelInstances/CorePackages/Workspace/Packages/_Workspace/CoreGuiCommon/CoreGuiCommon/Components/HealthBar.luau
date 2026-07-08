@@ -1,144 +1,151 @@
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CoreGuiCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.RobloxAppHooks);
-local v7 = require(l_Parent_0.RobloxAppEnums);
-local v8 = require(l_Parent_0.Signals);
-local v9 = require(l_Parent_0.SignalsReact);
-local l_FFlagClampHealthPercentage_0 = require(l_script_FirstAncestor_0.Flags).FFlagClampHealthPercentage;
-local l_GetLocalHumanoidStore_0 = require(l_script_FirstAncestor_0.Stores).GetLocalHumanoidStore;
-local l_View_0 = v4.View;
-local l_useDeviceOrientation_0 = v6.useDeviceOrientation;
-local l_useTokens_0 = v4.Hooks.useTokens;
-local l_HealthBarColors_0 = v3.HealthBarColors;
-local function v25(v16) --[[ Line: 28 ]] --[[ Name: getHealthBarColor ]]
-    -- upvalues: l_HealthBarColors_0 (copy)
-    if v16 <= l_HealthBarColors_0.Red.Fraction then
-        return l_HealthBarColors_0.Red.Color;
-    elseif l_HealthBarColors_0.Green.Fraction <= v16 then
-        return l_HealthBarColors_0.Green.Color;
-    else
-        local v17 = Vector3.new(0, 0, 0, 0);
-        local v18 = 0;
-        for _, v20 in l_HealthBarColors_0 do
-            local v21 = Vector3.new(v20.Color.R, v20.Color.G, v20.Color.B);
-            local v22 = v16 - v20.Fraction;
-            if v22 == 0 then
-                return Color3.new(v21.X, v21.Y, v21.Z);
-            else
-                local v23 = 1 / (v22 * v22);
-                v17 = v17 + v23 * v21;
-                v18 = v18 + v23;
-            end;
-        end;
-        local v24 = v17 / v18;
-        return Color3.new(v24.X, v24.Y, v24.Z);
-    end;
-end;
-return v5.memo(function(v26) --[[ Line: 57 ]] --[[ Name: HealthBar ]]
-    -- upvalues: l_StarterGui_0 (copy), l_useTokens_0 (copy), l_useDeviceOrientation_0 (copy), v9 (copy), l_GetLocalHumanoidStore_0 (copy), v5 (copy), v3 (copy), l_FFlagClampHealthPercentage_0 (copy), v8 (copy), l_View_0 (copy), v7 (copy), v25 (copy)
-    local v27 = v26.mockStarterGui or l_StarterGui_0;
-    local v28 = l_useTokens_0();
-    local v29 = l_useDeviceOrientation_0();
-    local v30 = v9.useSignalState(l_GetLocalHumanoidStore_0);
-    local v31, v32 = v5.useState(v27:GetCoreGuiEnabled(Enum.CoreGuiType.Health));
-    local v33, v34 = v5.useBinding(v3.InitialHealth);
-    local v35, v36 = v5.useBinding(v3.InitialHealth);
-    local v37, v38 = v5.useBinding(false);
-    local v44 = v5.joinBindings({
-        v33, 
-        v35, 
-        v37
-    }):map(function(v39) --[[ Line: 70 ]]
-        -- upvalues: l_FFlagClampHealthPercentage_0 (ref)
-        local v40 = v39[1];
-        local v41 = v39[2];
-        local v42 = v39[3];
-        local v43 = 1;
-        if v42 then
-            return 0;
-        else
-            if v41 > 0 then
-                if l_FFlagClampHealthPercentage_0 then
-                    return (math.clamp(v40 / v41, 0, 1));
-                else
-                    v43 = v40 / v41;
-                end;
-            end;
-            return v43;
-        end;
-    end);
-    local v46 = v5.joinBindings({
-        v33, 
-        v35
-    }):map(function(v45) --[[ Line: 89 ]]
-        return v45[1] < v45[2];
-    end);
-    v5.useEffect(function() --[[ Line: 93 ]]
-        -- upvalues: v8 (ref), v30 (copy), v34 (copy), v3 (ref), v36 (copy), v38 (copy), v27 (copy), v32 (copy)
-        local v49 = v8.createEffect(function(v47) --[[ Line: 94 ]]
-            -- upvalues: v30 (ref), v34 (ref), v3 (ref), v36 (ref), v38 (ref)
-            local v48 = v30.getHealthValue(v47);
-            v34(v48.health or v3.InitialHealth);
-            v36(v48.maxHealth or v3.InitialHealth);
-            v38(v48.isDead or false);
-        end);
-        local v52 = v27.CoreGuiChangedSignal:Connect(function(v50, v51) --[[ Line: 103 ]]
-            -- upvalues: v32 (ref)
-            if v50 == Enum.CoreGuiType.Health or v50 == Enum.CoreGuiType.All then
-                v32(v51);
-            end;
-        end);
-        return function() --[[ Line: 110 ]]
-            -- upvalues: v49 (copy), v52 (copy)
-            v49();
-            v52:Disconnect();
-        end;
-    end, {
-        v30
-    });
-    if v31 then
-        return (v5.createElement(l_View_0, {
-            tag = "anchor-top-right position-top-right", 
-            Visible = v46, 
-            Size = UDim2.fromOffset(if v29 == v7.DeviceOrientationMode.Portrait then v28.Size.Size_2000 else v28.Size.Size_3000, v28.Size.Size_400), 
-            LayoutOrder = v26.layoutOrder, 
-            testId = "health-bar"
-        }, {
-            HealthBar = v5.createElement(l_View_0, {
-                tag = "bg-surface-300 radius-medium size-full", 
-                backgroundStyle = {
-                    Color3 = v28.Color.Extended.Gray.Gray_700.Color3, 
-                    Transparency = 0.2
-                }, 
-                stroke = {
-                    Thickness = v28.Stroke.Thicker, 
-                    Transparency = 0.2, 
-                    BorderStrokePosition = Enum.BorderStrokePosition.Outer
-                }, 
-                Position = UDim2.fromScale(0, 0.5), 
-                AnchorPoint = Vector2.new(0, 0.5)
-            }, {
-                Fill = v5.createElement(l_View_0, {
-                    tag = "anchor-left-center radius-medium", 
-                    backgroundStyle = v44:map(function(v53) --[[ Line: 145 ]]
-                        -- upvalues: v25 (ref)
-                        return {
-                            Color3 = v25(v53), 
-                            Transparency = 0
-                        };
-                    end), 
-                    Size = v44:map(function(v54) --[[ Line: 151 ]]
-                        return UDim2.fromScale(v54, 1);
-                    end), 
-                    testId = "health-bar-fill"
-                })
-            })
-        }));
-    else
-        return nil;
-    end;
-end);
+local StarterGui = game:GetService("StarterGui")
+local CoreGuiCommon = script:FindFirstAncestor("CoreGuiCommon")
+local CoreGuiCommonParent = CoreGuiCommon.Parent
+local Constants = require(CoreGuiCommon.Constants)
+local Foundation = require(CoreGuiCommonParent.Foundation)
+local React = require(CoreGuiCommonParent.React)
+local RobloxAppHooks = require(CoreGuiCommonParent.RobloxAppHooks)
+local RobloxAppEnums = require(CoreGuiCommonParent.RobloxAppEnums)
+local Signals = require(CoreGuiCommonParent.Signals)
+local SignalsReact = require(CoreGuiCommonParent.SignalsReact)
+local GetLocalHumanoidStore = require(CoreGuiCommon.Stores).GetLocalHumanoidStore
+local View = Foundation.View
+local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
+local useTokens = Foundation.Hooks.useTokens
+local HealthBarColors = Constants.HealthBarColors
+
+local function getHealthBarColor(p1) -- line: 25
+	-- upvalues: HealthBarColors (copy)
+	if p1 <= HealthBarColors.Red.Fraction then
+		return HealthBarColors.Red.Color
+	end
+
+	if p1 >= HealthBarColors.Green.Fraction then
+		return HealthBarColors.Green.Color
+	end
+
+	local vector3 = Vector3.new(0, 0, 0)
+	local n1 = 0
+
+	for _, v22 in HealthBarColors do
+		local vector3_2 = Vector3.new(v22.Color.R, v22.Color.G, v22.Color.B)
+		local v24 = p1 - v22.Fraction
+
+		if v24 == 0 then
+			return Color3.new(vector3_2.X, vector3_2.Y, vector3_2.Z)
+		end
+
+		local v25 = 1 / (v24 * v24)
+
+		vector3 += v25 * vector3_2
+		n1 += v25
+	end
+
+	local v26 = vector3 / n1
+
+	return Color3.new(v26.X, v26.Y, v26.Z)
+end
+local function HealthBar(t1: {[any]: any}) -- line: 54
+	-- upvalues: StarterGui (copy), useTokens (copy), useDeviceOrientation (copy), SignalsReact (copy), GetLocalHumanoidStore (copy), React (copy), Constants (copy), Signals (copy), View (copy), RobloxAppEnums (copy), getHealthBarColor (copy)
+	local v28 = t1.mockStarterGui or StarterGui
+	local v29 = useTokens()
+	local v30 = useDeviceOrientation()
+	local v31 = SignalsReact.useSignalState(GetLocalHumanoidStore)
+	local v32, v33 = React.useState(v28:GetCoreGuiEnabled(Enum.CoreGuiType.Health))
+	local v34, v35 = React.useBinding(Constants.InitialHealth)
+	local v36, v37 = React.useBinding(Constants.InitialHealth)
+	local v38, v39 = React.useBinding(false)
+	local v40 = React.joinBindings({
+		v34,
+		v36,
+		v38
+	}):map(function(p2) -- line: 67
+		local v43 = p2[1]
+		local v44 = p2[2]
+		local n2 = 1
+
+		if p2[3] then
+			return 0
+		end
+
+		if v44 > 0 then
+			n2 = math.clamp(v43 / v44, 0, 1)
+		end
+
+		return n2
+	end)
+	local v41 = React.joinBindings({
+		v34,
+		v36
+	}):map(function(t2: {[any]: any}) -- line: 82
+		return t2[1] < t2[2]
+	end)
+
+	React.useEffect(function() -- line: 86
+		-- upvalues: Signals (copy), v31 (copy), v35 (copy), Constants (copy), v37 (copy), v39 (copy), v28 (copy), v33 (copy)
+		local v47 = Signals.createEffect(function(p3) -- line: 87
+			-- upvalues: v31 (copy), v35 (copy), Constants (copy), v37 (copy), v39 (copy)
+			local v52 = v31.getHealthValue(p3)
+
+			v35(v52.health or Constants.InitialHealth)
+			v37(v52.maxHealth or Constants.InitialHealth)
+			v39(v52.isDead or false)
+		end)
+		local connection = v28.CoreGuiChangedSignal:Connect(function(p4, b1: boolean) -- line: 96
+			-- upvalues: v33 (copy)
+			if p4 == Enum.CoreGuiType.Health or p4 == Enum.CoreGuiType.All then
+				v33(b1)
+			end
+		end)
+
+		return function() -- line: 103
+			-- upvalues: v47 (copy), connection (copy)
+			v47()
+			connection:Disconnect()
+		end
+	end, { v31 })
+
+	if v32 then
+		return (React.createElement(View, {
+			tag = "anchor-top-right position-top-right",
+			testId = "health-bar",
+			Visible = v41,
+			Size = UDim2.fromOffset(if v30 ~= RobloxAppEnums.DeviceOrientationMode.Portrait then v29.Size.Size_3000 else v29.Size.Size_2000, v29.Size.Size_400),
+			LayoutOrder = t1.layoutOrder
+		}, {
+			HealthBar = React.createElement(View, {
+				tag = "bg-surface-300 radius-medium size-full",
+				backgroundStyle = {
+					Transparency = 0.2,
+					Color3 = v29.Color.Extended.Gray.Gray_700.Color3
+				},
+				stroke = {
+					Transparency = 0.2,
+					Thickness = v29.Stroke.Thicker,
+					BorderStrokePosition = Enum.BorderStrokePosition.Outer
+				},
+				Position = UDim2.fromScale(0, 0.5),
+				AnchorPoint = Vector2.new(0, 0.5)
+			}, {
+				Fill = React.createElement(View, {
+					tag = "anchor-left-center radius-medium",
+					testId = "health-bar-fill",
+					backgroundStyle = v40:map(function(p5) -- line: 138
+						-- upvalues: getHealthBarColor (copy)
+						return {
+							Transparency = 0,
+							Color3 = getHealthBarColor(p5)
+						}
+					end),
+					Size = v40:map(function(p6) -- line: 144
+						return UDim2.fromScale(p6, 1)
+					end)
+				})
+			})
+		}))
+	end
+
+	return nil
+end
+
+return React.memo(HealthBar)

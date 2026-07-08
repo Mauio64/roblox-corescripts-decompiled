@@ -1,1 +1,1 @@
-return "Assertion for Luau typechecking";
+return "Assertion for Luau typechecking"

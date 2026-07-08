@@ -1,6 +1,7 @@
-local _ = require(script.types);
+require(script.types)
+
 return {
-    VirtualEventModel = require(script.models.VirtualEventModel), 
-    config = require(script.config), 
-    createMockVirtualEventResponse = require(script.createMockVirtualEventResponse)
-};
+	VirtualEventModel = require(script.models.VirtualEventModel),
+	config = require(script.config),
+	createMockVirtualEventResponse = require(script.createMockVirtualEventResponse)
+}

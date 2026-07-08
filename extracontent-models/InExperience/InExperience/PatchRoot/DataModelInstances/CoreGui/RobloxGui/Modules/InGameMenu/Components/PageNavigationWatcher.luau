@@ -1,50 +1,61 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v1.Roact;
-local l_RoactRodux_0 = v1.RoactRodux;
-local l_t_0 = v1.t;
-local v5 = l_Roact_0.PureComponent:extend("PageNavigationWatcher");
-v5.validateProps = l_t_0.strictInterface({
-    desiredPage = l_t_0.string, 
-    onNavigateTo = l_t_0.optional(l_t_0.callback), 
-    onNavigateAway = l_t_0.optional(l_t_0.callback), 
-    currentPage = l_t_0.string, 
-    menuOpen = l_t_0.boolean
-});
-v5.init = function(v6, v7) --[[ Line: 25 ]] --[[ Name: init ]]
-    v6:setState({
-        lastPage = v7.currentPage, 
-        lastMenuOpen = v7.menuOpen
-    });
-end;
-v5.render = function(v8) --[[ Line: 32 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy)
-    return l_Roact_0.createFragment(v8.props[l_Roact_0.Children]);
-end;
-v5.didUpdate = function(v9) --[[ Line: 36 ]] --[[ Name: didUpdate ]]
-    local l_lastPage_0 = v9.state.lastPage;
-    local l_lastMenuOpen_0 = v9.state.lastMenuOpen;
-    local l_currentPage_0 = v9.props.currentPage;
-    local l_menuOpen_0 = v9.props.menuOpen;
-    if l_lastPage_0 ~= l_currentPage_0 or l_lastMenuOpen_0 ~= l_menuOpen_0 then
-        v9:setState({
-            lastPage = l_currentPage_0, 
-            lastMenuOpen = l_menuOpen_0
-        });
-        if l_currentPage_0 == v9.props.desiredPage and l_menuOpen_0 and v9.props.onNavigateTo ~= nil then
-            v9.props.onNavigateTo();
-            return;
-        elseif l_lastPage_0 == v9.props.desiredPage and l_lastMenuOpen_0 and v9.props.onNavigateAway ~= nil then
-            v9.props.onNavigateAway();
-            return;
-        elseif l_lastMenuOpen_0 and not l_menuOpen_0 and v9.props.onNavigateAway ~= nil then
-            v9.props.onNavigateAway();
-        end;
-    end;
-end;
-return l_RoactRodux_0.UNSTABLE_connect2(function(v14) --[[ Line: 58 ]]
-    return {
-        currentPage = v14.menuPage, 
-        menuOpen = v14.isMenuOpen
-    };
-end)(v5);
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local t = InGameMenuDependencies.t
+local v6 = Roact.PureComponent:extend("PageNavigationWatcher")
+
+v6.validateProps = t.strictInterface({
+	desiredPage = t.string,
+	onNavigateTo = t.optional(t.callback),
+	onNavigateAway = t.optional(t.callback),
+	currentPage = t.string,
+	menuOpen = t.boolean
+})
+
+function v6.init(p1, p2) -- line: 25
+	p1:setState({
+		lastPage = p2.currentPage,
+		lastMenuOpen = p2.menuOpen
+	})
+end
+function v6.render(p3) -- line: 32
+	-- upvalues: Roact (copy)
+	return Roact.createFragment(p3.props[Roact.Children])
+end
+function v6.didUpdate(p4) -- line: 36
+	local lastPage = p4.state.lastPage
+	local lastMenuOpen = p4.state.lastMenuOpen
+	local currentPage = p4.props.currentPage
+	local menuOpen = p4.props.menuOpen
+
+	if lastPage ~= currentPage or lastMenuOpen ~= menuOpen then
+		p4:setState({
+			lastPage = currentPage,
+			lastMenuOpen = menuOpen
+		})
+
+		if currentPage == p4.props.desiredPage and menuOpen and p4.props.onNavigateTo ~= nil then
+			p4.props.onNavigateTo()
+
+			return
+		end
+
+		if lastPage == p4.props.desiredPage and lastMenuOpen and p4.props.onNavigateAway ~= nil then
+			p4.props.onNavigateAway()
+
+			return
+		end
+
+		if lastMenuOpen and not menuOpen and p4.props.onNavigateAway ~= nil then
+			p4.props.onNavigateAway()
+		end
+	end
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p5) -- line: 58
+	return {
+		currentPage = p5.menuPage,
+		menuOpen = p5.isMenuOpen
+	}
+end)(v6)

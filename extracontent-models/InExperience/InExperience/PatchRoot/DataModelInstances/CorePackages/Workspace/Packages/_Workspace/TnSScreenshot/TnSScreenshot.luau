@@ -1,3 +1,3 @@
 return {
-    ScreenshotManager = require(script.ScreenshotManager)
-};
+	ScreenshotManager = require(script.ScreenshotManager)
+}

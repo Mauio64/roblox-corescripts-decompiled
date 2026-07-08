@@ -1,37 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("CollectionViews").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-return function(v3) --[[ Line: 18 ]] --[[ Name: useCollectionImpressionsSignal ]]
-    -- upvalues: v1 (copy), l_Signal_0 (copy)
-    local v4 = v1.useRef(nil);
-    if v4.current == nil then
-        v4.current = l_Signal_0.new();
-    end;
-    local l_current_0 = v4.current;
-    v1.useEffect(function() --[[ Line: 25 ]]
-        -- upvalues: l_current_0 (copy), v3 (copy)
-        l_current_0:fire();
-        local v6 = nil;
-        if v3 then
-            v6 = v3:connect(function() --[[ Line: 34 ]]
-                -- upvalues: l_current_0 (ref)
-                l_current_0:fire();
-            end);
-        end;
-        return function() --[[ Line: 39 ]]
-            -- upvalues: v6 (ref)
-            if v6 then
-                v6:disconnect();
-            end;
-        end;
-    end, {
-        v3, 
-        l_current_0
-    });
-    return l_current_0, (v1.useCallback(function() --[[ Line: 46 ]]
-        -- upvalues: l_current_0 (copy)
-        l_current_0:fire();
-    end, {
-        l_current_0
-    }));
-end;
+local Parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(Parent.React)
+local Signal = require(Parent.AppCommonLib).Signal
+
+local function useCollectionImpressionsSignal(p1) -- line: 18
+	-- upvalues: React (copy), Signal (copy)
+	local v6 = React.useRef(nil)
+
+	if v6.current == nil then
+		v6.current = Signal.new()
+	end
+
+	local current = v6.current
+
+	React.useEffect(function() -- line: 25
+		-- upvalues: current (copy), p1 (copy)
+		current:fire()
+
+		local u8 = nil
+
+		if p1 then
+			u8 = p1:connect(function() -- line: 34
+				-- upvalues: current (copy)
+				current:fire()
+			end)
+		end
+
+		return function() -- line: 39
+			-- upvalues: u8 (ref)
+			if u8 then
+				u8:disconnect()
+			end
+		end
+	end, {
+		p1,
+		current
+	})
+
+	return current, (React.useCallback(function() -- line: 46
+		-- upvalues: current (copy)
+		current:fire()
+	end, { current }))
+end
+
+return useCollectionImpressionsSignal

@@ -1,6 +1,7 @@
-local v0 = require(script.DiscoveryAppLaunchTracker);
+local DiscoveryAppLaunchTracker = require(script.DiscoveryAppLaunchTracker)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    DiscoveryAppLaunchTracker = v0, 
-    Flags = require(script.Flags)
-};
+	["jest.config"] = script["jest.config"],
+	DiscoveryAppLaunchTracker = DiscoveryAppLaunchTracker,
+	Flags = require(script.Flags)
+}

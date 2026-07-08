@@ -1,152 +1,156 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.t);
-local v6 = require(l_CorePackages_0.Packages.FitFrame);
-local l_FitFrameVertical_0 = v6.FitFrameVertical;
-local l_FitTextLabel_0 = v6.FitTextLabel;
-local v9 = require(l_CorePackages_0.Packages.UIBlox);
-local l_InteractiveAlert_0 = v9.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v9.App.Button.Enum.ButtonType;
-local l_withStyle_0 = v9.Core.Style.withStyle;
-local l_Images_0 = v9.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local l_Modules_0 = l_CoreGui_0.RobloxGui.Modules;
-local v16 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v17 = require(l_Modules_0.InGameMenuConstants);
-local v18 = l_Images_0["icons/status/alert"];
-local v19 = v4.PureComponent:extend("DisconnectedDialog");
-v19.validateProps = v5.strictInterface({
-    visible = v5.boolean, 
-    onConfirm = v5.callback, 
-    screenSize = v5.Vector2, 
-    guiService = v5.optional(v5.union(v5.instanceOf("GuiService"), v5.table))
-});
-v19.defaultProps = {
-    guiService = l_GuiService_0
-};
-v19.init = function(v20) --[[ Line: 50 ]] --[[ Name: init ]]
-    v20.guiService = v20.props.guiService;
-    v20.onConfirmBindingAction = function(_, v22, _) --[[ Line: 53 ]]
-        -- upvalues: v20 (copy)
-        if v22 ~= Enum.UserInputState.Begin then
-            return Enum.ContextActionResult.Pass;
-        else
-            v20.props.onConfirm();
-            return Enum.ContextActionResult.Sink;
-        end;
-    end;
-end;
-v19.render = function(v24) --[[ Line: 64 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v16 (copy), v4 (copy), l_InteractiveAlert_0 (copy), l_FitFrameVertical_0 (copy), l_ImageSetLabel_0 (copy), v18 (copy), l_FitTextLabel_0 (copy), l_ButtonType_0 (copy), l_CoreGui_0 (copy), v17 (copy)
-    return l_withStyle_0(function(v25) --[[ Line: 65 ]]
-        -- upvalues: v16 (ref), v4 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), l_ImageSetLabel_0 (ref), v18 (ref), l_FitTextLabel_0 (ref), l_ButtonType_0 (ref), v24 (copy), l_CoreGui_0 (ref), v17 (ref)
-        local l_Theme_0 = v25.Theme;
-        local l_Font_0 = v25.Font;
-        local v28 = v16:FormatByKey("InGame.ConnectionError.Heading.VRDisconnected");
-        local v29 = v16:FormatByKey("InGame.ConnectionError.Message.RestartApp");
-        local v30 = v16:FormatByKey("InGame.ConnectionError.Action.Restart");
-        local v31 = v4.createElement(l_InteractiveAlert_0, {
-            title = v28, 
-            middleContent = function() --[[ Line: 75 ]] --[[ Name: middleContent ]]
-                -- upvalues: v4 (ref), l_FitFrameVertical_0 (ref), l_ImageSetLabel_0 (ref), v18 (ref), l_FitTextLabel_0 (ref), l_Font_0 (copy), v29 (copy), l_Theme_0 (copy)
-                return v4.createElement(l_FitFrameVertical_0, {
-                    BackgroundTransparency = 1, 
-                    width = UDim.new(1, 0), 
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    contentPadding = UDim.new(0, 24)
-                }, {
-                    Icon = v4.createElement(l_ImageSetLabel_0, {
-                        LayoutOrder = 1, 
-                        BackgroundTransparency = 1, 
-                        Position = UDim2.new(0, 5, 0, 5), 
-                        Size = UDim2.fromOffset(40, 40), 
-                        Image = v18, 
-                        ImageTransparency = 0
-                    }), 
-                    BodyText = v4.createElement(l_FitTextLabel_0, {
-                        LayoutOrder = 2, 
-                        BackgroundTransparency = 1, 
-                        width = l_FitTextLabel_0.Width.FitToText, 
-                        Font = l_Font_0.Body.Font, 
-                        Text = v29, 
-                        TextSize = l_Font_0.BaseSize * l_Font_0.Body.RelativeSize, 
-                        TextColor3 = l_Theme_0.TextDefault.Color
-                    })
-                });
-            end, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = v24.props.onConfirm, 
-                            text = v30
-                        }
-                    }
-                }
-            }, 
-            screenSize = v24.props.screenSize
-        });
-        return v4.createElement(v4.Portal, {
-            target = l_CoreGui_0
-        }, {
-            HeadsetDisconnectedDialog = v4.createElement("ScreenGui", {
-                DisplayOrder = v17.DisplayOrder.HeadsetDisconnectedDialog, 
-                IgnoreGuiInset = true, 
-                OnTopOfCoreBlur = true, 
-                Enabled = v24.props.visible, 
-                ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            }, {
-                Overlay = v4.createElement("Frame", {
-                    Active = true, 
-                    BackgroundColor3 = l_Theme_0.Overlay.Color, 
-                    BackgroundTransparency = l_Theme_0.Overlay.Transparency, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.fromScale(1, 1)
-                }, {
-                    Alert = v31
-                })
-            })
-        });
-    end);
-end;
-v19.bindActions = function(v32) --[[ Line: 144 ]] --[[ Name: bindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:BindCoreAction("TopBarGamepadDisableMenuShortcut", function() --[[ Line: 148 ]]
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local FitFrame = require(CorePackages.Packages.FitFrame)
+local FitFrameVertical = FitFrame.FitFrameVertical
+local FitTextLabel = FitFrame.FitTextLabel
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local withStyle = UIBlox.Core.Style.withStyle
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Modules = CoreGui.RobloxGui.Modules
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local InGameMenuConstants = require(Modules.InGameMenuConstants)
+local v19 = Images["icons/status/alert"]
+local v20 = Roact.PureComponent:extend("DisconnectedDialog")
 
-    end, false, Enum.KeyCode.ButtonStart, Enum.KeyCode.Escape);
-    l_ContextActionService_0:BindCoreAction("TopBarDialogConfirm", v32.onConfirmBindingAction, false, Enum.KeyCode.Return, Enum.KeyCode.ButtonA);
-end;
-v19.unbindActions = function(_) --[[ Line: 163 ]] --[[ Name: unbindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("TopBarGamepadDisableMenuShortcut");
-    l_ContextActionService_0:UnbindCoreAction("TopBarDialogConfirm");
-end;
-v19.didMount = function(v34) --[[ Line: 168 ]] --[[ Name: didMount ]]
-    if v34.props.visible then
-        v34:bindActions();
-        v34.guiService:SetMenuIsOpen(true, "HeadsetDisconnectedDialog");
-    end;
-end;
-v19.didUpdate = function(v35, v36, _) --[[ Line: 175 ]] --[[ Name: didUpdate ]]
-    if v35.props.visible ~= v36.visible then
-        if v35.props.visible then
-            v35:bindActions();
-            v35.guiService:SetMenuIsOpen(true, "HeadsetDisconnectedDialog");
-            return;
-        else
-            v35:unbindActions();
-            v35.guiService:SetMenuIsOpen(false, "HeadsetDisconnectedDialog");
-        end;
-    end;
-end;
-v19.willUnmount = function(v38) --[[ Line: 187 ]] --[[ Name: willUnmount ]]
-    v38:unbindActions();
-    v38.guiService:SetMenuIsOpen(false, "HeadsetDisconnectedDialog");
-end;
-return v19;
+v20.validateProps = t.strictInterface({
+	visible = t.boolean,
+	onConfirm = t.callback,
+	screenSize = t.Vector2,
+	guiService = t.optional(t.union(t.instanceOf("GuiService"), t.table))
+})
+v20.defaultProps = {
+	guiService = GuiService
+}
+
+function v20.init(p1) -- line: 50
+	p1.guiService = p1.props.guiService
+
+	function p1.onConfirmBindingAction(_, p3, _) -- line: 53
+		-- upvalues: p1 (copy)
+		if p3 ~= Enum.UserInputState.Begin then
+			return Enum.ContextActionResult.Pass
+		end
+
+		p1.props.onConfirm()
+
+		return Enum.ContextActionResult.Sink
+	end
+end
+function v20.render(p5) -- line: 64
+	-- upvalues: withStyle (copy), RobloxTranslator (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ImageSetLabel (copy), v19 (copy), FitTextLabel (copy), ButtonType (copy), CoreGui (copy), InGameMenuConstants (copy)
+	return withStyle(function(p6) -- line: 65
+		-- upvalues: RobloxTranslator (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), ImageSetLabel (copy), v19 (copy), FitTextLabel (copy), ButtonType (copy), p5 (copy), CoreGui (copy), InGameMenuConstants (copy)
+		local Theme = p6.Theme
+		local p6Font = p6.Font
+		local v36 = RobloxTranslator:FormatByKey("InGame.ConnectionError.Heading.VRDisconnected")
+		local v37 = RobloxTranslator:FormatByKey("InGame.ConnectionError.Message.RestartApp")
+		local v38 = RobloxTranslator:FormatByKey("InGame.ConnectionError.Action.Restart")
+		local v39 = Roact.createElement(InteractiveAlert, {
+			title = v36,
+			middleContent = function() -- line: 75
+				-- upvalues: Roact (copy), FitFrameVertical (copy), ImageSetLabel (copy), v19 (copy), FitTextLabel (copy), p6Font (copy), v37 (copy), Theme (copy)
+				return Roact.createElement(FitFrameVertical, {
+					BackgroundTransparency = 1,
+					width = UDim.new(1, 0),
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					contentPadding = UDim.new(0, 24)
+				}, {
+					Icon = Roact.createElement(ImageSetLabel, {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						ImageTransparency = 0,
+						Position = UDim2.new(0, 5, 0, 5),
+						Size = UDim2.fromOffset(40, 40),
+						Image = v19
+					}),
+					BodyText = Roact.createElement(FitTextLabel, {
+						LayoutOrder = 2,
+						BackgroundTransparency = 1,
+						width = FitTextLabel.Width.FitToText,
+						Font = p6Font.Body.Font,
+						Text = v37,
+						TextSize = p6Font.BaseSize * p6Font.Body.RelativeSize,
+						TextColor3 = Theme.TextDefault.Color
+					})
+				})
+			end,
+			buttonStackInfo = {
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = p5.props.onConfirm,
+						text = v38
+					}
+				}}
+			},
+			screenSize = p5.props.screenSize
+		})
+
+		return Roact.createElement(Roact.Portal, {
+			target = CoreGui
+		}, {
+			HeadsetDisconnectedDialog = Roact.createElement("ScreenGui", {
+				IgnoreGuiInset = true,
+				OnTopOfCoreBlur = true,
+				DisplayOrder = InGameMenuConstants.DisplayOrder.HeadsetDisconnectedDialog,
+				Enabled = p5.props.visible,
+				ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			}, {
+				Overlay = Roact.createElement("Frame", {
+					Active = true,
+					BorderSizePixel = 0,
+					BackgroundColor3 = Theme.Overlay.Color,
+					BackgroundTransparency = Theme.Overlay.Transparency,
+					Size = UDim2.fromScale(1, 1)
+				}, {
+					Alert = v39
+				})
+			})
+		})
+	end)
+end
+function v20.bindActions(p7) -- line: 144
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:BindCoreAction("TopBarGamepadDisableMenuShortcut", function() -- line: 148
+	end, false, Enum.KeyCode.ButtonStart, Enum.KeyCode.Escape)
+	ContextActionService:BindCoreAction("TopBarDialogConfirm", p7.onConfirmBindingAction, false, Enum.KeyCode.Return, Enum.KeyCode.ButtonA)
+end
+function v20.unbindActions(_) -- line: 163
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("TopBarGamepadDisableMenuShortcut")
+	ContextActionService:UnbindCoreAction("TopBarDialogConfirm")
+end
+function v20.didMount(p9) -- line: 168
+	if p9.props.visible then
+		p9:bindActions()
+		p9.guiService:SetMenuIsOpen(true, "HeadsetDisconnectedDialog")
+	end
+end
+function v20.didUpdate(p10, p11, _) -- line: 175
+	if p10.props.visible ~= p11.visible then
+		if p10.props.visible then
+			p10:bindActions()
+			p10.guiService:SetMenuIsOpen(true, "HeadsetDisconnectedDialog")
+
+			return
+		end
+
+		p10:unbindActions()
+		p10.guiService:SetMenuIsOpen(false, "HeadsetDisconnectedDialog")
+	end
+end
+function v20.willUnmount(p13) -- line: 187
+	p13:unbindActions()
+	p13.guiService:SetMenuIsOpen(false, "HeadsetDisconnectedDialog")
+end
+
+return v20

@@ -1,160 +1,188 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_IXPService_0 = game:GetService("IXPService");
-local v2 = require(script.Parent.Roact);
-local v3 = require(script.Parent.t);
-local v4 = require(script.Parent.Cryo);
-local v5 = require(script.Symbol);
-local v6 = require(script.ExperimentContext);
-local v7 = v5.named("IxpServiceProp");
-local function v12(v8) --[[ Line: 31 ]] --[[ Name: registerUserLayers ]]
-    -- upvalues: v3 (copy), l_IXPService_0 (copy), l_RunService_0 (copy)
-    assert(v3.table(v8));
-    if l_IXPService_0 ~= nil then
-        if l_RunService_0:IsStudio() then
-            l_IXPService_0:ClearUserLayers();
-        end;
-        local v9 = {};
-        for _, v11 in pairs(v8) do
-            table.insert(v9, v11);
-        end;
-        l_IXPService_0:RegisterUserLayers(v9);
-    end;
-end;
-local function v14(v13) --[[ Line: 54 ]] --[[ Name: initializeUserLayers ]]
-    -- upvalues: l_IXPService_0 (copy)
-    if l_IXPService_0 ~= nil then
-        l_IXPService_0:InitializeUserLayers(v13);
-    end;
-end;
-local function v15() --[[ Line: 66 ]] --[[ Name: clearUserLayers ]]
-    -- upvalues: l_IXPService_0 (copy)
-    if l_IXPService_0 ~= nil then
-        l_IXPService_0:ClearUserLayers();
-    end;
-end;
-local function v54(v16, v17, v18, v19, v20) --[[ Line: 79 ]] --[[ Name: connect ]]
-    -- upvalues: v3 (copy), v2 (copy), v7 (copy), v4 (copy), v6 (copy)
-    assert(v3.string(v16));
-    assert(v3.string(v17));
-    assert(v3.string(v18));
-    assert(v3.string(v19));
-    assert(v3.string(v20));
-    return function(v21, v22, v23) --[[ Line: 95 ]]
-        -- upvalues: v2 (ref), v7 (ref), v18 (copy), v20 (copy), v19 (copy), v17 (copy), v4 (ref), v16 (copy), v6 (ref)
-        if v23 == nil then
-            v23 = true;
-        end;
-        local v24 = debug.traceback();
-        assert(type(v21) == "table", "connect expects layerNames to be a list of layers");
-        assert(type(v22) == "function", "connect expects mapLayersToProps to be a function");
-        return function(v25) --[[ Line: 104 ]]
-            -- upvalues: v24 (copy), v2 (ref), v7 (ref), v21 (copy), v18 (ref), v23 (ref), v20 (ref), v19 (ref), v17 (ref), v4 (ref), v22 (copy), v16 (ref), v6 (ref)
-            if v25 == nil then
-                local v26 = string.format("connect returns a function that must be passed a component.\n Check the connection at:\n %s", v24);
-                error(v26, 2);
-            end;
-            local v27 = ("AppExperiment(%s)"):format((tostring(v25)));
-            local v28 = v2.PureComponent:extend(v27);
-            v28.init = function(v29) --[[ Line: 117 ]] --[[ Name: init ]]
-                -- upvalues: v7 (ref), v21 (ref), v18 (ref), v23 (ref), v20 (ref), v19 (ref), v17 (ref)
-                v29.onLoadingStatusChangeConnection = nil;
-                v29.state = {
-                    layerToVariables = {}, 
-                    layerLoadingStatus = Enum.IXPLoadingStatus.None
-                };
-                v29.updateStateLayerData = function(v30) --[[ Line: 124 ]]
-                    -- upvalues: v29 (copy), v7 (ref), v21 (ref), v18 (ref)
-                    local v31 = v29.props[v7];
-                    if v31 ~= nil then
-                        local v32 = {};
-                        for _, v34 in ipairs(v21) do
-                            v32[v34] = v31[v18](v31, v34);
-                        end;
-                        v29:setState({
-                            layerToVariables = v32, 
-                            layerLoadingStatus = v30
-                        });
-                    end;
-                end;
-                v29.logAllLayersExposure = function(v35) --[[ Line: 140 ]]
-                    -- upvalues: v29 (copy), v7 (ref), v23 (ref), v21 (ref), v20 (ref), v19 (ref)
-                    local v36 = v29.props[v7];
-                    if v36 ~= nil and v35 == Enum.IXPLoadingStatus.Initialized and v23 then
-                        for _, v38 in ipairs(v21) do
-                            if v36[v20](v36, v38) == Enum.IXPLoadingStatus.Initialized then
-                                v36[v19](v36, v38);
-                            end;
-                        end;
-                    end;
-                end;
-                local v39 = v29.props[v7];
-                if v39 ~= nil then
-                    local v40 = v39[v17](v39);
-                    v29.updateStateLayerData(v40);
-                end;
-            end;
-            v28.render = function(v41) --[[ Line: 163 ]] --[[ Name: render ]]
-                -- upvalues: v4 (ref), v7 (ref), v22 (ref), v2 (ref), v25 (copy)
-                local v42 = v4.Dictionary.join(v41.props, {
-                    [v7] = v4.None
-                });
-                local v43 = v22(v41.state.layerToVariables, v42);
-                local v44 = v4.Dictionary.join(v42, v43);
-                return v2.createElement(v25, v44);
-            end;
-            v28.didMount = function(v45) --[[ Line: 172 ]] --[[ Name: didMount ]]
-                -- upvalues: v7 (ref), v16 (ref), v17 (ref), v18 (ref)
-                local v46 = v45.props[v7];
-                if v46 ~= nil then
-                    v45.onLoadingStatusChangeConnection = v46[v16]:Connect(function(_) --[[ Line: 177 ]]
-                        -- upvalues: v46 (copy), v17 (ref), v45 (copy), v18 (ref)
-                        local v48 = v46[v17](v46);
-                        if v45.state.layerLoadingStatus ~= v48 then
-                            v45.updateStateLayerData(v48, v18);
-                            v45.logAllLayersExposure(v48);
-                        end;
-                    end);
-                    local v49 = v46[v17](v46);
-                    if v45.state.layerLoadingStatus ~= v49 then
-                        v45.updateStateLayerData(v49, v18);
-                    end;
-                    v45.logAllLayersExposure(v49);
-                end;
-            end;
-            v28.willUnmount = function(v50) --[[ Line: 200 ]] --[[ Name: willUnmount ]]
-                if v50.onLoadingStatusChangeConnection ~= nil then
-                    v50.onLoadingStatusChangeConnection:Disconnect();
-                end;
-            end;
-            return function(v51) --[[ Line: 206 ]]
-                -- upvalues: v2 (ref), v6 (ref), v7 (ref), v4 (ref), v28 (copy)
-                return v2.createElement(v6.Consumer, {
-                    render = function(v52) --[[ Line: 208 ]] --[[ Name: render ]]
-                        -- upvalues: v51 (copy), v7 (ref), v4 (ref), v2 (ref), v28 (ref)
-                        assert(v51[v7] == nil, "Symbol 'IxpServiceProp' should never exist in the incoming props.");
-                        local v53 = v4.Dictionary.join(v51, {
-                            [v7] = v52
-                        });
-                        return v2.createElement(v28, v53);
-                    end
-                });
-            end;
-        end;
-    end;
-end;
-local v55 = v54("OnBrowserTrackerLayerLoadingStatusChanged", "GetBrowserTrackerLayerLoadingStatus", "GetBrowserTrackerLayerVariables", "LogBrowserTrackerLayerExposure", "GetBrowserTrackerStatusForLayer");
-local v56 = v54("OnUserLayerLoadingStatusChanged", "GetUserLayerLoadingStatus", "GetUserLayerVariables", "LogUserLayerExposure", "GetUserStatusForLayer");
+local RunService = game:GetService("RunService")
+local IXPService = game:GetService("IXPService")
+local Roact = require(script.Parent.Roact)
+local t = require(script.Parent.t)
+local Cryo = require(script.Parent.Cryo)
+local Symbol = require(script.Symbol)
+local ExperimentContext = require(script.ExperimentContext)
+local v8 = Symbol.named("IxpServiceProp")
+
+local function connect(s1: string, s2: string, s3: string, s4: string, s5: string) -- line: 79
+	-- upvalues: t (copy), Roact (copy), v8 (copy), Cryo (copy), ExperimentContext (copy)
+	assert(t.string(s1))
+	assert(t.string(s2))
+	assert(t.string(s3))
+	assert(t.string(s4))
+	assert(t.string(s5))
+
+	return function(p1, p2, b1: boolean?) -- line: 95
+		-- upvalues: Roact (copy), v8 (copy), s3 (copy), s5 (copy), s4 (copy), s2 (copy), Cryo (copy), s1 (copy), ExperimentContext (copy)
+		if b1 == nil then
+			b1 = true
+		end
+
+		local trace = debug.traceback()
+
+		assert(type(p1) == "table", "connect expects layerNames to be a list of layers")
+		assert(type(p2) == "function", "connect expects mapLayersToProps to be a function")
+
+		return function(p3) -- line: 104
+			-- upvalues: trace (copy), Roact (copy), v8 (copy), p1 (copy), s3 (copy), b1 (ref), s5 (copy), s4 (copy), s2 (copy), Cryo (copy), p2 (copy), s1 (copy), ExperimentContext (copy)
+			if p3 == nil then
+				local v28 = string.format("connect returns a function that must be passed a component.\n Check the connection at:\n %s", trace)
+
+				error(v28, 2)
+			end
+
+			local v29 = ("AppExperiment(%s)"):format((tostring(p3)))
+			local v30 = Roact.PureComponent:extend(v29)
+
+			function v30.init(p4) -- line: 117
+				-- upvalues: v8 (copy), p1 (copy), s3 (copy), b1 (ref), s5 (copy), s4 (copy), s2 (copy)
+				p4.onLoadingStatusChangeConnection = nil
+				p4.state = {
+					layerToVariables = {},
+					layerLoadingStatus = Enum.IXPLoadingStatus.None
+				}
+
+				function p4.updateStateLayerData(p5) -- line: 124
+					-- upvalues: p4 (copy), v8 (copy), p1 (copy), s3 (copy)
+					local v44 = p4.props[v8]
+
+					if v44 ~= nil then
+						local t1 = {}
+
+						for _, v in ipairs(p1) do
+							t1[v] = v44[s3](v44, v)
+						end
+
+						p4:setState({
+							layerToVariables = t1,
+							layerLoadingStatus = p5
+						})
+					end
+				end
+				function p4.logAllLayersExposure(p6) -- line: 140
+					-- upvalues: p4 (copy), v8 (copy), b1 (ref), p1 (copy), s5 (copy), s4 (copy)
+					local v49 = p4.props[v8]
+
+					if v49 ~= nil and (p6 == Enum.IXPLoadingStatus.Initialized and b1) then
+						for _, v in ipairs(p1) do
+							if v49[s5](v49, v) == Enum.IXPLoadingStatus.Initialized then
+								v49[s4](v49, v)
+							end
+						end
+					end
+				end
+
+				local v32 = p4.props[v8]
+
+				if v32 ~= nil then
+					local v33 = v32[s2](v32)
+
+					p4.updateStateLayerData(v33)
+				end
+			end
+			function v30.render(p7) -- line: 163
+				-- upvalues: Cryo (copy), v8 (copy), p2 (copy), Roact (copy), p3 (copy)
+				local v35 = Cryo.Dictionary.join(p7.props, {
+					[v8] = Cryo.None
+				})
+				local v36 = p2(p7.state.layerToVariables, v35)
+				local v37 = Cryo.Dictionary.join(v35, v36)
+
+				return Roact.createElement(p3, v37)
+			end
+			function v30.didMount(p8) -- line: 172
+				-- upvalues: v8 (copy), s1 (copy), s2 (copy), s3 (copy)
+				local v39 = p8.props[v8]
+
+				if v39 ~= nil then
+					p8.onLoadingStatusChangeConnection = v39[s1]:Connect(function(_) -- line: 177
+						-- upvalues: v39 (copy), s2 (copy), p8 (copy), s3 (copy)
+						local v53 = v39[s2](v39)
+
+						if v53 ~= p8.state.layerLoadingStatus then
+							p8.updateStateLayerData(v53, s3)
+							p8.logAllLayersExposure(v53)
+						end
+					end)
+
+					local v40 = v39[s2](v39)
+
+					if v40 ~= p8.state.layerLoadingStatus then
+						p8.updateStateLayerData(v40, s3)
+					end
+
+					p8.logAllLayersExposure(v40)
+				end
+			end
+			function v30.willUnmount(p10) -- line: 200
+				if p10.onLoadingStatusChangeConnection ~= nil then
+					p10.onLoadingStatusChangeConnection:Disconnect()
+				end
+			end
+
+			return function(p11) -- line: 206
+				-- upvalues: Roact (copy), ExperimentContext (copy), v8 (copy), Cryo (copy), v30 (copy)
+				return Roact.createElement(ExperimentContext.Consumer, {
+					render = function(p12) -- line: 208
+						-- upvalues: p11 (copy), v8 (copy), Cryo (copy), Roact (copy), v30 (copy)
+						assert(p11[v8] == nil, "Symbol 'IxpServiceProp' should never exist in the incoming props.")
+
+						local v55 = Cryo.Dictionary.join(p11, {
+							[v8] = p12
+						})
+
+						return Roact.createElement(v30, v55)
+					end
+				})
+			end
+		end
+	end
+end
+
+local v10 = connect("OnBrowserTrackerLayerLoadingStatusChanged", "GetBrowserTrackerLayerLoadingStatus", "GetBrowserTrackerLayerVariables", "LogBrowserTrackerLayerExposure", "GetBrowserTrackerStatusForLayer")
+local v11 = connect("OnUserLayerLoadingStatusChanged", "GetUserLayerLoadingStatus", "GetUserLayerVariables", "LogUserLayerExposure", "GetUserStatusForLayer")
+
 return {
-    Provider = v6.Provider, 
-    Consumer = v6.Consumer, 
-    Context = v6, 
-    registerUserLayers = v12, 
-    initializeUserLayers = v14, 
-    clearUserLayers = v15, 
-    useBrowserTrackerExperiment = require(script.useBrowserTrackerExperiment), 
-    useUserExperiment = require(script.useUserExperiment), 
-    useIXPService = require(script.useIXPService), 
-    connectBrowserTrackerLayer = v55, 
-    connectUserLayer = v56, 
-    MockIXPService = require(script.MockIXPService)
-};
+	Provider = ExperimentContext.Provider,
+	Consumer = ExperimentContext.Consumer,
+	Context = ExperimentContext,
+	registerUserLayers = function(t2: {[any]: any}) -- line: 31
+		-- upvalues: t (copy), IXPService (copy), RunService (copy)
+		assert(t.table(t2))
+
+		if IXPService ~= nil then
+			if RunService:IsStudio() then
+				IXPService:ClearUserLayers()
+			end
+
+			local t3 = {}
+
+			for _, v in pairs(t2) do
+				table.insert(t3, v)
+			end
+
+			IXPService:RegisterUserLayers(t3)
+		end
+	end,
+	initializeUserLayers = function(n1: number) -- line: 54
+		-- upvalues: IXPService (copy)
+		if IXPService ~= nil then
+			IXPService:InitializeUserLayers(n1)
+		end
+	end,
+	clearUserLayers = function() -- line: 66
+		-- upvalues: IXPService (copy)
+		if IXPService ~= nil then
+			IXPService:ClearUserLayers()
+		end
+	end,
+	useBrowserTrackerExperiment = require(script.useBrowserTrackerExperiment),
+	useUserExperiment = require(script.useUserExperiment),
+	useIXPService = require(script.useIXPService),
+	connectBrowserTrackerLayer = v10,
+	connectUserLayer = v11,
+	MockIXPService = require(script.MockIXPService)
+}

@@ -1,18 +1,22 @@
-local v0 = require(script.Parent.SetUserTyping);
-local v1 = 0;
-return function(v2, v3) --[[ Line: 7 ]]
-    -- upvalues: v1 (ref), v0 (copy)
-    return function(v4) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), v0 (ref), v2 (copy), v3 (copy)
-        spawn(function() --[[ Line: 9 ]]
-            -- upvalues: v1 (ref), v4 (copy), v0 (ref), v2 (ref), v3 (ref)
-            v1 = v1 + 1;
-            local l_v1_0 = v1;
-            v4:dispatch(v0(v2, v3, true));
-            wait(8);
-            if v1 == l_v1_0 then
-                v4:dispatch(v0(v2, v3, false));
-            end;
-        end);
-    end;
-end;
+local SetUserTyping = require(script.Parent.SetUserTyping)
+local n1 = 0
+
+return function(p1, p2) -- line: 7
+	-- upvalues: n1 (ref), SetUserTyping (copy)
+	return function(p3) -- line: 8
+		-- upvalues: n1 (ref), SetUserTyping (copy), p1 (copy), p2 (copy)
+		spawn(function() -- line: 9
+			-- upvalues: n1 (ref), p3 (copy), SetUserTyping (copy), p1 (copy), p2 (copy)
+			n1 += 1
+
+			local v6 = n1
+
+			p3:dispatch(SetUserTyping(p1, p2, true))
+			wait(8)
+
+			if v6 == n1 then
+				p3:dispatch(SetUserTyping(p1, p2, false))
+			end
+		end)
+	end
+end

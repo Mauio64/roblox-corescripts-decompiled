@@ -1,15 +1,16 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ReducerDependencies_0 = require(l_CorePackages_0.Workspace.Packages.NotificationsCommon).ReducerDependencies;
-local l_ShareLinksNetworking_0 = l_ReducerDependencies_0.ShareLinksNetworking;
-local l_ShareLinksRodux_0 = l_ReducerDependencies_0.ShareLinksRodux;
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: l_ShareLinksNetworking_0 (copy), l_ShareLinksRodux_0 (copy)
-    return {
-        fetchShareInviteLink = function() --[[ Line: 9 ]] --[[ Name: fetchShareInviteLink ]]
-            -- upvalues: v4 (copy), l_ShareLinksNetworking_0 (ref), l_ShareLinksRodux_0 (ref)
-            v4(l_ShareLinksNetworking_0.GenerateLink.API({
-                linkType = l_ShareLinksRodux_0.Enums.LinkType.ExperienceInvite.rawValue()
-            }));
-        end
-    };
-end;
+local CorePackages = game:GetService("CorePackages")
+local ReducerDependencies = require(CorePackages.Workspace.Packages.NotificationsCommon).ReducerDependencies
+local ShareLinksNetworking = ReducerDependencies.ShareLinksNetworking
+local ShareLinksRodux = ReducerDependencies.ShareLinksRodux
+
+return function(p1) -- line: 7
+	-- upvalues: ShareLinksNetworking (copy), ShareLinksRodux (copy)
+	return {
+		fetchShareInviteLink = function() -- line: 9
+			-- upvalues: p1 (copy), ShareLinksNetworking (copy), ShareLinksRodux (copy)
+			p1(ShareLinksNetworking.GenerateLink.API({
+				linkType = ShareLinksRodux.Enums.LinkType.ExperienceInvite.rawValue()
+			}))
+		end
+	}
+end

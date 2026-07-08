@@ -1,279 +1,293 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TextService_0 = game:GetService("TextService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.Parent.Constants);
-local l_FrameHeight_0 = v3.TabRowFormatting.FrameHeight;
-local l_TabDropDownWidth_0 = v3.TabRowFormatting.TabDropDownWidth;
-local l_TabOverlapThreshold_0 = v3.TabRowFormatting.TabOverlapThreshold;
-local l_FrameHeight_1 = v3.UtilityBarFormatting.FrameHeight;
-local l_SmallFrameHeight_0 = v3.UtilityBarFormatting.SmallFrameHeight;
-local l_SmallUtilPadding_0 = v3.UtilityBarFormatting.SmallUtilPadding;
-local l_ClientServerButtonWidth_0 = v3.UtilityBarFormatting.ClientServerButtonWidth;
-local l_ClientServerDropDownWidth_0 = v3.UtilityBarFormatting.ClientServerDropDownWidth;
-local l_MainRowPadding_0 = v3.GeneralFormatting.MainRowPadding;
-local l_Parent_0 = script.Parent;
-local v14 = require(l_Parent_0.ClientServerButton);
-local v15 = require(l_Parent_0.CheckboxContainer);
-local v16 = require(l_Parent_0.TabRowContainer);
-local v17 = require(l_Parent_0.SearchBar);
-local v18 = v2.Component:extend("UtilAndTab");
-v18.init = function(v19) --[[ Line: 29 ]] --[[ Name: init ]]
-    -- upvalues: l_TextService_0 (copy), v3 (copy), v2 (copy)
-    local l_tabList_0 = v19.props.tabList;
-    local v21 = 0;
-    local v22 = 0;
-    for v23, _ in pairs(l_tabList_0) do
-        v21 = v21 + l_TextService_0:GetTextSize(v23, v3.DefaultFontSize.TabBar, v3.Font.TabBar, Vector2.new(0, 0)).X;
-        v22 = v22 + 1;
-    end;
-    v19.showSearchBar = function() --[[ Line: 41 ]]
-        -- upvalues: v19 (copy)
-        v19:setState({
-            activeSearchTerm = true
-        });
-    end;
-    v19.cancelInput = function(_, v26) --[[ Line: 47 ]]
-        -- upvalues: v19 (copy)
-        if v26.UserInputType == Enum.UserInputType.MouseButton1 or v26.UserInputType == Enum.UserInputType.Touch and v26.UserInputState == Enum.UserInputState.End then
-            if v19.searchRef.current then
-                v19.searchRef.current.Text = "";
-            end;
-            local l_onSearchTermChanged_0 = v19.props.onSearchTermChanged;
-            if l_onSearchTermChanged_0 then
-                l_onSearchTermChanged_0("");
-            end;
-            v19:setState({
-                activeSearchTerm = false
-            });
-        end;
-    end;
-    v19.focusLost = function(v28, v29, _) --[[ Line: 68 ]]
-        -- upvalues: v19 (copy)
-        if v29 then
-            local l_text_0 = v28.text;
-            local l_onSearchTermChanged_1 = v19.props.onSearchTermChanged;
-            if l_onSearchTermChanged_1 then
-                l_onSearchTermChanged_1(l_text_0);
-            end;
-            local v33 = l_text_0 ~= "";
-            if v19.state.activeSearchTerm ~= v33 then
-                v19:setState({
-                    activeSearchTerm = v33
-                });
-            end;
-        end;
-    end;
-    v19.state = {
-        totalTabWidth = v21, 
-        totalTabCount = v22, 
-        activeSearchTerm = false
-    };
-    v19.utilRef = v2.createRef();
-    v19.searchRef = v2.createRef();
-end;
-v18.render = function(v34) --[[ Line: 94 ]] --[[ Name: render ]]
-    -- upvalues: l_TabOverlapThreshold_0 (copy), v3 (copy), l_SmallFrameHeight_0 (copy), l_FrameHeight_1 (copy), v2 (copy), l_ClientServerButtonWidth_0 (copy), l_MainRowPadding_0 (copy), l_SmallUtilPadding_0 (copy), l_TabDropDownWidth_0 (copy), l_ClientServerDropDownWidth_0 (copy), l_TextService_0 (copy), v16 (copy), v14 (copy), v15 (copy), v17 (copy), l_FrameHeight_0 (copy)
-    local l_windowWidth_0 = v34.props.windowWidth;
-    local l_formFactor_0 = v34.props.formFactor;
-    local l_tabList_1 = v34.props.tabList;
-    local l_orderedCheckboxState_0 = v34.props.orderedCheckboxState;
-    local l_layoutOrder_0 = v34.props.layoutOrder;
-    local l_isClientView_0 = v34.props.isClientView;
-    local l_searchTerm_0 = v34.props.searchTerm;
-    local l_onClientButton_0 = v34.props.onClientButton;
-    local l_onServerButton_0 = v34.props.onServerButton;
-    local l_onCheckboxChanged_0 = v34.props.onCheckboxChanged;
-    local l_onSearchTermChanged_2 = v34.props.onSearchTermChanged;
-    local l_totalTabWidth_0 = v34.state.totalTabWidth;
-    local l_totalTabCount_0 = v34.state.totalTabCount;
-    local l_activeSearchTerm_0 = v34.state.activeSearchTerm;
-    local v49 = (l_windowWidth_0 - l_totalTabWidth_0) / l_totalTabCount_0;
-    local v50 = false;
-    if v49 < l_TabOverlapThreshold_0 then
-        v50 = l_windowWidth_0 > 0;
-    end;
-    local v51 = nil;
-    local v52 = l_formFactor_0 == v3.FormFactor.Small and l_SmallFrameHeight_0 or l_FrameHeight_1;
-    local v53 = l_formFactor_0 == v3.FormFactor.Small and 6 or 7;
-    local v54 = v34.props[v2.Children] and math.ceil(#v34.props[v2.Children] / 5) or 1;
-    v51 = v2.createElement("Frame", {
-        Position = UDim2.new(1, -v53 * l_ClientServerButtonWidth_0 - l_MainRowPadding_0, 0, 0), 
-        Size = UDim2.new(0, 5 * l_ClientServerButtonWidth_0, 0, v52 * v54), 
-        BackgroundTransparency = 1
-    }, {
-        Layout = v2.createElement("UIGridLayout", {
-            CellPadding = UDim2.new(0, l_MainRowPadding_0, 0, 0), 
-            CellSize = UDim2.new(0, l_ClientServerButtonWidth_0, 0, v52), 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            FillDirectionMaxCells = 5
-        }); 
-        unpack(v34.props[v2.Children] or {})
-    });
-    if l_formFactor_0 == v3.FormFactor.Small or v50 then
-        local v55 = l_SmallFrameHeight_0 * v54 + l_SmallUtilPadding_0;
-        if l_activeSearchTerm_0 then
-            v55 = v55 + l_SmallFrameHeight_0 + l_SmallUtilPadding_0;
-        end;
-        local v56 = l_onClientButton_0 and l_onServerButton_0;
-        local v57 = l_windowWidth_0 - l_SmallFrameHeight_0 - l_TabDropDownWidth_0;
-        if v56 then
-            v57 = v57 - l_ClientServerDropDownWidth_0;
-        end;
-        local v58 = l_TextService_0:GetTextSize("Cancel", v3.DefaultFontSize.UtilBar, v3.Font.UtilBar, Vector2.new(0, 0)).X + 12;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v55), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0, 
-            [v2.Ref] = v34.props.refForParent
-        }, {
-            MainFrame = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_SmallFrameHeight_0), 
-                BackgroundTransparency = 1, 
-                [v2.Ref] = v34.utilRef
-            }, {
-                MainRow = v2.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        VerticalAlignment = Enum.VerticalAlignment.Top, 
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        Padding = UDim.new(0, l_SmallUtilPadding_0)
-                    }), 
-                    Tabs = v2.createElement(v16, {
-                        tabList = l_tabList_1, 
-                        windowWidth = l_windowWidth_0, 
-                        frameHeight = l_SmallFrameHeight_0, 
-                        formFactor = l_formFactor_0, 
-                        layoutOrder = 1
-                    }), 
-                    ClientServerButton = v56 and v2.createElement(v14, {
-                        frameHeight = l_SmallFrameHeight_0, 
-                        formFactor = l_formFactor_0, 
-                        useDropDown = v50, 
-                        isClientView = l_isClientView_0, 
-                        layoutOrder = 2, 
-                        onClientButton = l_onClientButton_0, 
-                        onServerButton = l_onServerButton_0
-                    }), 
-                    FilterCheckboxes = l_onCheckboxChanged_0 and v2.createElement(v15, {
-                        orderedCheckboxState = l_orderedCheckboxState_0, 
-                        frameWidth = v57, 
-                        frameHeight = l_SmallFrameHeight_0, 
-                        pos = UDim2.new(0, 2 * l_ClientServerButtonWidth_0 + l_MainRowPadding_0, 0, 0), 
-                        layoutOrder = 3, 
-                        onCheckboxChanged = l_onCheckboxChanged_0
-                    })
-                }), 
-                SearchButton = v2.createElement("ImageButton", {
-                    Size = UDim2.new(0, l_SmallFrameHeight_0, 0, l_SmallFrameHeight_0), 
-                    Position = UDim2.new(1, -l_SmallFrameHeight_0, 0, 0), 
-                    BackgroundTransparency = 1, 
-                    Image = v3.Image.Search, 
-                    Visible = not l_activeSearchTerm_0, 
-                    [v2.Event.Activated] = v34.showSearchBar
-                }), 
-                Buttons = v51
-            }), 
-            SearchBarFrame = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_SmallFrameHeight_0), 
-                Position = UDim2.new(0, 0, 0, (l_SmallFrameHeight_0 + l_SmallUtilPadding_0) * v54), 
-                Visible = l_activeSearchTerm_0, 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1
-            }, {
-                SearchBar = v2.createElement(v17, {
-                    size = UDim2.new(1, -v58, 0, l_SmallFrameHeight_0), 
-                    searchTerm = l_searchTerm_0, 
-                    showClear = l_activeSearchTerm_0, 
-                    textSize = v3.DefaultFontSize.Search, 
-                    font = v3.Font.Search, 
-                    frameHeight = l_SmallFrameHeight_0, 
-                    refForParent = v34.searchRef, 
-                    cancelInput = v34.cancelInput, 
-                    focusLost = v34.focusLost
-                }), 
-                CancelButton = v2.createElement("TextButton", {
-                    Size = UDim2.new(0, v58, 1, 0), 
-                    Position = UDim2.new(1, -v58, 0, 0), 
-                    Text = "Cancel", 
-                    TextSize = v3.DefaultFontSize.UtilBar, 
-                    TextColor3 = v3.Color.Text, 
-                    Font = v3.Font.UtilBar, 
-                    BorderSizePixel = 0, 
-                    BackgroundTransparency = 1, 
-                    [v2.Event.Activated] = v34.cancelInput
-                })
-            })
-        });
-    else
-        local v59 = l_onClientButton_0 and l_onServerButton_0;
-        local v60 = l_windowWidth_0 - l_SmallUtilPadding_0 * 3 - 3 * l_ClientServerButtonWidth_0;
-        if v59 then
-            v60 = v60 - l_ClientServerButtonWidth_0;
-        end;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_FrameHeight_0 + l_FrameHeight_1 * v54 + l_MainRowPadding_0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0, 
-            [v2.Ref] = v34.props.refForParent
-        }, {
-            Tabs = v2.createElement(v16, {
-                tabList = l_tabList_1, 
-                windowWidth = l_windowWidth_0, 
-                frameHeight = l_FrameHeight_0, 
-                formFactor = l_formFactor_0
-            }), 
-            UtilBar = v2.createElement("Frame", {
-                Position = UDim2.new(0, 4, 0, l_FrameHeight_0 + l_MainRowPadding_0), 
-                Size = UDim2.new(1, -8, 0, l_FrameHeight_1), 
-                BackgroundTransparency = 1, 
-                [v2.Ref] = v34.utilRef
-            }, {
-                MainRow = v2.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        VerticalAlignment = Enum.VerticalAlignment.Top, 
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        Padding = UDim.new(0, l_SmallUtilPadding_0)
-                    }), 
-                    ClientServerButton = v59 and v2.createElement(v14, {
-                        formFactor = l_formFactor_0, 
-                        isClientView = l_isClientView_0, 
-                        onClientButton = l_onClientButton_0, 
-                        onServerButton = l_onServerButton_0
-                    }), 
-                    FilterCheckboxes = l_onCheckboxChanged_0 and v2.createElement(v15, {
-                        orderedCheckboxState = l_orderedCheckboxState_0, 
-                        frameWidth = v60, 
-                        frameHeight = l_FrameHeight_1, 
-                        pos = UDim2.new(0, 2 * l_ClientServerButtonWidth_0 + l_MainRowPadding_0, 0, 0), 
-                        onCheckboxChanged = l_onCheckboxChanged_0
-                    })
-                }), 
-                SearchBar = l_onSearchTermChanged_2 and v2.createElement(v17, {
-                    size = UDim2.new(0, 2 * l_ClientServerButtonWidth_0, 0, l_FrameHeight_1), 
-                    pos = UDim2.new(1, -2 * l_ClientServerButtonWidth_0, 0, 0), 
-                    searchTerm = l_searchTerm_0, 
-                    showClear = l_activeSearchTerm_0, 
-                    textSize = v3.DefaultFontSize.Search, 
-                    font = v3.Font.Search, 
-                    frameHeight = v3.UtilityBarFormatting.FrameHeight, 
-                    refForParent = v34.searchRef, 
-                    cancelInput = v34.cancelInput, 
-                    focusLost = v34.focusLost
-                }), 
-                Buttons = v51
-            })
-        });
-    end;
-end;
-return v18;
+local CorePackages = game:GetService("CorePackages")
+local TextService = game:GetService("TextService")
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Constants)
+local FrameHeight = Constants.TabRowFormatting.FrameHeight
+local TabDropDownWidth = Constants.TabRowFormatting.TabDropDownWidth
+local TabOverlapThreshold = Constants.TabRowFormatting.TabOverlapThreshold
+local FrameHeight2 = Constants.UtilityBarFormatting.FrameHeight
+local SmallFrameHeight = Constants.UtilityBarFormatting.SmallFrameHeight
+local SmallUtilPadding = Constants.UtilityBarFormatting.SmallUtilPadding
+local ClientServerButtonWidth = Constants.UtilityBarFormatting.ClientServerButtonWidth
+local ClientServerDropDownWidth = Constants.UtilityBarFormatting.ClientServerDropDownWidth
+local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+local scriptParent = script.Parent
+local ClientServerButton = require(scriptParent.ClientServerButton)
+local CheckboxContainer = require(scriptParent.CheckboxContainer)
+local TabRowContainer = require(scriptParent.TabRowContainer)
+local SearchBar = require(scriptParent.SearchBar)
+local v19 = Roact.Component:extend("UtilAndTab")
+
+function v19.init(p1) -- line: 29
+	-- upvalues: TextService (copy), Constants (copy), Roact (copy)
+	local tabList = p1.props.tabList
+	local n1 = 0
+	local n2 = 0
+
+	for k, _ in pairs(tabList) do
+		n1 += TextService:GetTextSize(k, Constants.DefaultFontSize.TabBar, Constants.Font.TabBar, Vector2.new(0, 0)).X
+		n2 += 1
+	end
+
+	function p1.showSearchBar() -- line: 41
+		-- upvalues: p1 (copy)
+		p1:setState({
+			activeSearchTerm = true
+		})
+	end
+	function p1.cancelInput(_, p3) -- line: 47
+		-- upvalues: p1 (copy)
+		if p3.UserInputType == Enum.UserInputType.MouseButton1 or p3.UserInputType == Enum.UserInputType.Touch and p3.UserInputState == Enum.UserInputState.End then
+			if p1.searchRef.current then
+				p1.searchRef.current.Text = ""
+			end
+
+			local onSearchTermChanged = p1.props.onSearchTermChanged
+
+			if onSearchTermChanged then
+				onSearchTermChanged("")
+			end
+
+			p1:setState({
+				activeSearchTerm = false
+			})
+		end
+	end
+	function p1.focusLost(p4, p5, _) -- line: 68
+		-- upvalues: p1 (copy)
+		if p5 then
+			local text = p4.text
+			local onSearchTermChanged = p1.props.onSearchTermChanged
+
+			if onSearchTermChanged then
+				onSearchTermChanged(text)
+			end
+
+			local v60 = text ~= ""
+
+			if v60 ~= p1.state.activeSearchTerm then
+				p1:setState({
+					activeSearchTerm = v60
+				})
+			end
+		end
+	end
+
+	p1.state = {
+		activeSearchTerm = false,
+		totalTabWidth = n1,
+		totalTabCount = n2
+	}
+	p1.utilRef = Roact.createRef()
+	p1.searchRef = Roact.createRef()
+end
+function v19.render(p7) -- line: 94
+	-- upvalues: TabOverlapThreshold (copy), Constants (copy), SmallFrameHeight (copy), FrameHeight2 (copy), Roact (copy), ClientServerButtonWidth (copy), MainRowPadding (copy), SmallUtilPadding (copy), TabDropDownWidth (copy), ClientServerDropDownWidth (copy), TextService (copy), TabRowContainer (copy), ClientServerButton (copy), CheckboxContainer (copy), SearchBar (copy), FrameHeight (copy)
+	local windowWidth = p7.props.windowWidth
+	local formFactor = p7.props.formFactor
+	local tabList = p7.props.tabList
+	local orderedCheckboxState = p7.props.orderedCheckboxState
+	local layoutOrder = p7.props.layoutOrder
+	local isClientView = p7.props.isClientView
+	local searchTerm = p7.props.searchTerm
+	local onClientButton = p7.props.onClientButton
+	local onServerButton = p7.props.onServerButton
+	local onCheckboxChanged = p7.props.onCheckboxChanged
+	local onSearchTermChanged = p7.props.onSearchTermChanged
+	local totalTabWidth = p7.state.totalTabWidth
+	local totalTabCount = p7.state.totalTabCount
+	local activeSearchTerm = p7.state.activeSearchTerm
+	local v41 = (windowWidth - totalTabWidth) / totalTabCount < TabOverlapThreshold and windowWidth > 0
+	local v42 = formFactor == Constants.FormFactor.Small and SmallFrameHeight or FrameHeight2
+	local v43 = formFactor ~= Constants.FormFactor.Small and 7 or 6
+	local v44 = p7.props[Roact.Children] and math.ceil(#p7.props[Roact.Children] / 5) or 1
+	local v45 = Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, -v43 * ClientServerButtonWidth - MainRowPadding, 0, 0),
+		Size = UDim2.new(0, 5 * ClientServerButtonWidth, 0, v42 * v44)
+	}, {
+		Layout = Roact.createElement("UIGridLayout", {
+			FillDirectionMaxCells = 5,
+			CellPadding = UDim2.new(0, MainRowPadding, 0, 0),
+			CellSize = UDim2.new(0, ClientServerButtonWidth, 0, v42),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			VerticalAlignment = Enum.VerticalAlignment.Top
+		}),
+		unpack(p7.props[Roact.Children] or {})
+	})
+
+	if formFactor == Constants.FormFactor.Small or v41 then
+		local v46 = SmallFrameHeight * v44 + SmallUtilPadding
+
+		if activeSearchTerm then
+			v46 = v46 + SmallFrameHeight + SmallUtilPadding
+		end
+
+		local v47 = onClientButton and onServerButton
+		local v48 = windowWidth - SmallFrameHeight - TabDropDownWidth
+
+		if v47 then
+			v48 -= ClientServerDropDownWidth
+		end
+
+		local v49 = TextService:GetTextSize("Cancel", Constants.DefaultFontSize.UtilBar, Constants.Font.UtilBar, Vector2.new(0, 0)).X + 12
+
+		return Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 0, v46),
+			BackgroundTransparency = 1,
+			LayoutOrder = layoutOrder,
+			[Roact.Ref] = p7.props.refForParent
+		}, {
+			MainFrame = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0, SmallFrameHeight),
+				BackgroundTransparency = 1,
+				[Roact.Ref] = p7.utilRef
+			}, {
+				MainRow = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						HorizontalAlignment = Enum.HorizontalAlignment.Left,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						VerticalAlignment = Enum.VerticalAlignment.Top,
+						FillDirection = Enum.FillDirection.Horizontal,
+						Padding = UDim.new(0, SmallUtilPadding)
+					}),
+					Tabs = Roact.createElement(TabRowContainer, {
+						layoutOrder = 1,
+						tabList = tabList,
+						windowWidth = windowWidth,
+						frameHeight = SmallFrameHeight,
+						formFactor = formFactor
+					}),
+					ClientServerButton = v47 and Roact.createElement(ClientServerButton, {
+						layoutOrder = 2,
+						frameHeight = SmallFrameHeight,
+						formFactor = formFactor,
+						useDropDown = v41,
+						isClientView = isClientView,
+						onClientButton = onClientButton,
+						onServerButton = onServerButton
+					}),
+					FilterCheckboxes = onCheckboxChanged and Roact.createElement(CheckboxContainer, {
+						layoutOrder = 3,
+						orderedCheckboxState = orderedCheckboxState,
+						frameWidth = v48,
+						frameHeight = SmallFrameHeight,
+						pos = UDim2.new(0, 2 * ClientServerButtonWidth + MainRowPadding, 0, 0),
+						onCheckboxChanged = onCheckboxChanged
+					})
+				}),
+				SearchButton = Roact.createElement("ImageButton", {
+					Size = UDim2.new(0, SmallFrameHeight, 0, SmallFrameHeight),
+					Position = UDim2.new(1, -SmallFrameHeight, 0, 0),
+					BackgroundTransparency = 1,
+					Image = Constants.Image.Search,
+					Visible = not activeSearchTerm,
+					[Roact.Event.Activated] = p7.showSearchBar
+				}),
+				Buttons = v45
+			}),
+			SearchBarFrame = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, SmallFrameHeight),
+				Position = UDim2.new(0, 0, 0, (SmallFrameHeight + SmallUtilPadding) * v44),
+				Visible = activeSearchTerm
+			}, {
+				SearchBar = Roact.createElement(SearchBar, {
+					size = UDim2.new(1, -v49, 0, SmallFrameHeight),
+					searchTerm = searchTerm,
+					showClear = activeSearchTerm,
+					textSize = Constants.DefaultFontSize.Search,
+					font = Constants.Font.Search,
+					frameHeight = SmallFrameHeight,
+					refForParent = p7.searchRef,
+					cancelInput = p7.cancelInput,
+					focusLost = p7.focusLost
+				}),
+				CancelButton = Roact.createElement("TextButton", {
+					Size = UDim2.new(0, v49, 1, 0),
+					Position = UDim2.new(1, -v49, 0, 0),
+					Text = "Cancel",
+					TextSize = Constants.DefaultFontSize.UtilBar,
+					TextColor3 = Constants.Color.Text,
+					Font = Constants.Font.UtilBar,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					[Roact.Event.Activated] = p7.cancelInput
+				})
+			})
+		})
+	end
+
+	local v50 = onClientButton and onServerButton
+	local v51 = windowWidth - SmallUtilPadding * 3 - 3 * ClientServerButtonWidth
+
+	if v50 then
+		v51 -= ClientServerButtonWidth
+	end
+
+	return Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 0, FrameHeight + FrameHeight2 * v44 + MainRowPadding),
+		BackgroundTransparency = 1,
+		LayoutOrder = layoutOrder,
+		[Roact.Ref] = p7.props.refForParent
+	}, {
+		Tabs = Roact.createElement(TabRowContainer, {
+			tabList = tabList,
+			windowWidth = windowWidth,
+			frameHeight = FrameHeight,
+			formFactor = formFactor
+		}),
+		UtilBar = Roact.createElement("Frame", {
+			Position = UDim2.new(0, 4, 0, FrameHeight + MainRowPadding),
+			Size = UDim2.new(1, -8, 0, FrameHeight2),
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p7.utilRef
+		}, {
+			MainRow = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, {
+				UIListLayout = Roact.createElement("UIListLayout", {
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Top,
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, SmallUtilPadding)
+				}),
+				ClientServerButton = v50 and Roact.createElement(ClientServerButton, {
+					formFactor = formFactor,
+					isClientView = isClientView,
+					onClientButton = onClientButton,
+					onServerButton = onServerButton
+				}),
+				FilterCheckboxes = onCheckboxChanged and Roact.createElement(CheckboxContainer, {
+					orderedCheckboxState = orderedCheckboxState,
+					frameWidth = v51,
+					frameHeight = FrameHeight2,
+					pos = UDim2.new(0, 2 * ClientServerButtonWidth + MainRowPadding, 0, 0),
+					onCheckboxChanged = onCheckboxChanged
+				})
+			}),
+			SearchBar = onSearchTermChanged and Roact.createElement(SearchBar, {
+				size = UDim2.new(0, 2 * ClientServerButtonWidth, 0, FrameHeight2),
+				pos = UDim2.new(1, -2 * ClientServerButtonWidth, 0, 0),
+				searchTerm = searchTerm,
+				showClear = activeSearchTerm,
+				textSize = Constants.DefaultFontSize.Search,
+				font = Constants.Font.Search,
+				frameHeight = Constants.UtilityBarFormatting.FrameHeight,
+				refForParent = p7.searchRef,
+				cancelInput = p7.cancelInput,
+				focusLost = p7.focusLost
+			}),
+			Buttons = v45
+		})
+	})
+end
+
+return v19

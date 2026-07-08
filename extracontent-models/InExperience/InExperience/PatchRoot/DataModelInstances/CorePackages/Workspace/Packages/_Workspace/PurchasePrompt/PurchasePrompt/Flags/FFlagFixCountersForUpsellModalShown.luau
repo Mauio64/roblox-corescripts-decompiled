@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixCountersForUpsellModalShown", false);
+return game:DefineFastFlag("FixCountersForUpsellModalShown", false)

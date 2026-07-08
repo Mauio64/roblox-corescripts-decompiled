@@ -1,34 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GraphQLServer");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local l_GraphQLError_0 = require(l_script_FirstAncestor_0.Parent.GraphQL).GraphQLError;
-local v4 = require(l_script_FirstAncestor_0.graphql.utils.formatUserProfileFields);
-local _ = require(script.Parent.Parent.generatedTypes);
-local v6 = require(l_script_FirstAncestor_0.Flags.FFlagUserProfileBetterErrors);
+local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
+local GraphQLServerParent = GraphQLServer.Parent
+
+require(GraphQLServerParent.LuauPolyfill)
+
+local GraphQLError = require(GraphQLServer.Parent.GraphQL).GraphQLError
+local formatUserProfileFields = require(GraphQLServer.graphql.utils.formatUserProfileFields)
+
+require(script.Parent.Parent.generatedTypes)
+
+local FFlagUserProfileBetterErrors = require(GraphQLServer.Flags.FFlagUserProfileBetterErrors)
+
 return {
-    UserProfile = {
-        id = function(v7) --[[ Line: 16 ]] --[[ Name: id ]]
-            return (tostring(v7.userId));
-        end, 
-        displayName = function() --[[ Line: 19 ]] --[[ Name: displayName ]]
-            -- upvalues: l_GraphQLError_0 (copy)
-            return l_GraphQLError_0.new("The displayName field is not available on the UserProfile implementation of User, please use the names field instead");
-        end
-    }, 
-    Query = {
-        userProfiles = function(_, v9, v10, v11) --[[ Line: 26 ]] --[[ Name: userProfiles ]]
-            -- upvalues: v4 (copy), v6 (copy)
-            local v12 = v4(v11, v10.collectSubFieldsImpl);
-            return v10.dataLoaders.userProfiles:getLoader(v10.fetchImpl, v12):loadMany(v9.userIds):andThen(function(v13) --[[ Line: 31 ]]
-                return v13 or {};
-            end):catch(function(v14) --[[ Line: 34 ]]
-                -- upvalues: v6 (ref)
-                if v6 then
-                    return v14;
-                else
-                    return {};
-                end;
-            end);
-        end
-    }
-};
+	UserProfile = {
+		id = function(p1) -- line: 16
+			return (tostring(p1.userId))
+		end,
+		displayName = function() -- line: 19
+			-- upvalues: GraphQLError (copy)
+			return GraphQLError.new("The displayName field is not available on the UserProfile implementation of User, please use the names field instead")
+		end
+	},
+	Query = {
+		userProfiles = function(_, p3, p4, p5) -- line: 26
+			-- upvalues: formatUserProfileFields (copy), FFlagUserProfileBetterErrors (copy)
+			local v11 = formatUserProfileFields(p5, p4.collectSubFieldsImpl)
+
+			return p4.dataLoaders.userProfiles:getLoader(p4.fetchImpl, v11):loadMany(p3.userIds):andThen(function(p6) -- line: 31
+				return p6 or {}
+			end):catch(function(p7) -- line: 34
+				-- upvalues: FFlagUserProfileBetterErrors (copy)
+				if FFlagUserProfileBetterErrors then
+					return p7
+				end
+
+				return {}
+			end)
+		end
+	}
+}

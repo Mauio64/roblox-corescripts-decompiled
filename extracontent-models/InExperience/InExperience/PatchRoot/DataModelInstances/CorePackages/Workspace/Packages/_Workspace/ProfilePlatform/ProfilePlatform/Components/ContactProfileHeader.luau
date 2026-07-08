@@ -1,1 +1,1 @@
-return require(script.ContactProfileHeaderContainer);
+return require(script.ContactProfileHeaderContainer)

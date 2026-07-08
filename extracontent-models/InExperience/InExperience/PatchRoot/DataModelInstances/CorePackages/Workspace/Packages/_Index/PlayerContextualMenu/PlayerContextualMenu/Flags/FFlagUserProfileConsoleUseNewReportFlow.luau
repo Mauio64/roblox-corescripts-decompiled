@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfileConsoleUseNewReportFlow", false);
+return game:DefineFastFlag("UserProfileConsoleUseNewReportFlow", false)

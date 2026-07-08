@@ -1,3 +1,4 @@
-local v0 = require(script.Parent.FFlagAppIaScrollAway);
-local v1 = game:DefineFastFlag("AppIaScrollAwayFixSocial", false);
-return v0 and v1;
+local FFlagAppIaScrollAway = require(script.Parent.FFlagAppIaScrollAway)
+local v2 = game:DefineFastFlag("AppIaScrollAwayFixSocial", false)
+
+return FFlagAppIaScrollAway and v2

@@ -1,1 +1,1 @@
-return require(script.ChatInputBar);
+return require(script.ChatInputBar)

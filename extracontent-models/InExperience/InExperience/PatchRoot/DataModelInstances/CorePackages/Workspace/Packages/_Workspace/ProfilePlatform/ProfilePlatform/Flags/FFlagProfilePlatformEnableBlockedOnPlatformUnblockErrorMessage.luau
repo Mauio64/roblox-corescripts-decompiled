@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnabledBlockedOnPlatformUnblockErrorMessage", false);
+return game:DefineFastFlag("ProfilePlatformEnabledBlockedOnPlatformUnblockErrorMessage", false)

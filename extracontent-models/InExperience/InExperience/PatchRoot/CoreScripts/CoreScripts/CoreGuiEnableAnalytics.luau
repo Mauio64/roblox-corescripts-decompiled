@@ -1,38 +1,45 @@
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_EventStream_0 = require(l_CorePackages_0.Workspace.Packages.Analytics).AnalyticsReporters.EventStream;
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 19 ]] --[[ Name: new ]]
-    -- upvalues: l_EventStream_0 (copy), l_RbxAnalyticsService_0 (copy), l_StarterGui_0 (copy), v4 (copy)
-    local v5 = {
-        evenStream = l_EventStream_0.new(l_RbxAnalyticsService_0), 
-        playSessionStart = os.clock()
-    };
-    v5.sendCoreGuiAnalytic = function(v6, v7) --[[ Line: 25 ]]
-        -- upvalues: v5 (copy), l_RbxAnalyticsService_0 (ref)
-        local v8 = nil;
-        v8 = math.round((os.clock() - v5.playSessionStart) * 1000);
-        local v9 = {
-            placeid = tostring(game.PlaceId), 
-            universeid = tostring(game.GameId), 
-            type = tostring(v6.Name), 
-            enabled = tostring(v7), 
-            sessionid = l_RbxAnalyticsService_0:GetSessionId(), 
-            playSessionDurationMs = tostring(v8)
-        };
-        v5.evenStream:sendEventDeferred("core_gui_type", "core_gui_type", v9);
-    end;
-    v5.signalConnection = l_StarterGui_0.CoreGuiChangedSignal:Connect(function(v10, v11) --[[ Line: 42 ]]
-        -- upvalues: v5 (copy)
-        v5.sendCoreGuiAnalytic(v10, v11);
-    end);
-    setmetatable(v5, v4);
-    return v5;
-end;
-v4.DisconnectSignal = function(v12) --[[ Line: 50 ]] --[[ Name: DisconnectSignal ]]
-    v12.signalConnection:Disconnect();
-end;
-local _ = v4.new();
-return v4;
+local StarterGui = game:GetService("StarterGui")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CorePackages = game:GetService("CorePackages")
+local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 19
+	-- upvalues: EventStream (copy), RbxAnalyticsService (copy), StarterGui (copy), t1 (copy)
+	local t2 = {
+		evenStream = EventStream.new(RbxAnalyticsService),
+		playSessionStart = os.clock()
+	}
+
+	function t2.sendCoreGuiAnalytic(p1, b1: boolean) -- line: 25
+		-- upvalues: t2 (copy), RbxAnalyticsService (copy)
+		local v10 = math.round((os.clock() - t2.playSessionStart) * 1000)
+		local t3 = {
+			placeid = tostring(game.PlaceId),
+			universeid = tostring(game.GameId),
+			type = tostring(p1.Name),
+			enabled = tostring(b1),
+			sessionid = RbxAnalyticsService:GetSessionId(),
+			playSessionDurationMs = tostring(v10)
+		}
+
+		t2.evenStream:sendEventDeferred("core_gui_type", "core_gui_type", t3)
+	end
+
+	t2.signalConnection = StarterGui.CoreGuiChangedSignal:Connect(function(p2, b2: boolean) -- line: 42
+		-- upvalues: t2 (copy)
+		t2.sendCoreGuiAnalytic(p2, b2)
+	end)
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.DisconnectSignal(p3) -- line: 50
+	p3.signalConnection:Disconnect()
+end
+
+t1.new()
+
+return t1

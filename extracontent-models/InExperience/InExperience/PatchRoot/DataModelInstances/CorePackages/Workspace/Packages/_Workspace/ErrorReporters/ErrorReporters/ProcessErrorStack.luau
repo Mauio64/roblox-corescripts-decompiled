@@ -1,88 +1,94 @@
-local v0 = require(script.Parent.FFlagErrorStackFixDebugTracebackProcessing);
-local function v7(v1, v2) --[[ Line: 21 ]] --[[ Name: splitStringWithMarks ]]
-    if type(v1) ~= "string" or type(v2) ~= "table" then
-        return v1, "";
-    else
-        for _, v4 in ipairs(v2) do
-            local v5, v6 = v1:find(v4, nil, true);
-            if v5 ~= nil then
-                return v1:sub(1, v5 - 1), (v1:sub(v6 + 1));
-            end;
-        end;
-        return v1, "";
-    end;
-end;
-local function _(v8) --[[ Line: 39 ]] --[[ Name: findFileNameFromPath ]]
-    if type(v8) ~= "string" then
-        return "";
-    else
-        return string.match(v8, "([^.]*)$");
-    end;
-end;
-return function(v10, v11) --[[ Line: 47 ]] --[[ Name: ProcessErrorStack ]]
-    -- upvalues: v7 (copy), v0 (copy)
-    local v12 = {};
-    local v13 = {};
-    if not v11 then
-        v11 = 0;
-    end;
-    if type(v10) ~= "string" then
-        return v12, v13;
-    else
-        for v14 in v10:gmatch("[^\r\n]+") do
-            local _ = nil;
-            local v16 = nil;
-            local v17 = nil;
-            local v18 = nil;
-            local v19, v20 = v7(v14, {
-                ", line ", 
-                ", Line ", 
-                ":"
-            });
-            v16 = v19;
-            v19, v20 = v7(v20, {
-                " - "
-            });
-            v18 = v19;
-            v17 = v20;
-            if v0 and v17 == "" and v18 ~= "" then
-                v19, v20 = string.match(v18, "^(%d+)%s*(.*)");
-                if v19 then
-                    v18 = v19;
-                    if v20 ~= "" then
-                        v17 = v20;
-                    end;
-                end;
-            end;
-            if v18 ~= "" and v16 ~= "" then
-                local v21;
-                v19, v20, v21 = string.find(v16, "Script '(.*)'");
-                if v21 ~= nil then
-                    v16 = v21;
-                end;
-                local v22 = v13[v16];
-                if v22 == nil then
-                    v11 = v11 + 1;
-                    v22 = v11;
-                    v13[v16] = v22;
-                end;
-                if v17 == "" then
-                    local l_v16_0 = v16;
-                    v17 = type(l_v16_0) ~= "string" and "" or string.match(l_v16_0, "([^.]*)$");
-                end;
-                table.insert(v12, {
-                    line = v18, 
-                    funcName = v17, 
-                    sourceCode = tostring(v22)
-                });
-            end;
-        end;
-        local v24 = {};
-        for v25, v26 in pairs(v13) do
-            v24[tostring(v26)] = {
-                path = v25
-            };
-        end;
-        return v12, v24, v11;
-    end;
-end;
+local function splitStringWithMarks(p1, p2) -- line: 19
+	if type(p1) ~= "string" or type(p2) ~= "table" then
+		return p1, ""
+	end
+
+	for _, v in ipairs(p2) do
+		local start, stop = p1:find(v, nil, true)
+
+		if start ~= nil then
+			return p1:sub(1, start - 1), (p1:sub(stop + 1))
+		end
+	end
+
+	return p1, ""
+end
+local function findFileNameFromPath(p3) -- line: 37
+	if type(p3) ~= "string" then
+		return ""
+	end
+
+	return string.match(p3, "([^.]*)$")
+end
+local function ProcessErrorStack(p4, p5) -- line: 45
+	-- upvalues: splitStringWithMarks (copy)
+	local t1 = {}
+	local t2 = {}
+
+	if not p5 then
+		p5 = 0
+	end
+
+	if type(p4) ~= "string" then
+		return t1, t2
+	end
+
+	for match in p4:gmatch("[^\r\n]+") do
+		local v16, v17 = splitStringWithMarks(match, {
+			", line ",
+			", Line ",
+			":"
+		})
+		local v18, v19 = splitStringWithMarks(v17, { " - " })
+
+		if v19 == "" and v18 ~= "" then
+			local v20, v21 = string.match(v18, "^(%d+)%s*(.*)")
+
+			if v20 then
+				v18 = v20
+
+				if v21 ~= "" then
+					v19 = v21
+				end
+			end
+		end
+
+		if v18 ~= "" and v16 ~= "" then
+			local _, _, v24 = string.find(v16, "Script '(.*)'")
+
+			if v24 ~= nil then
+				v16 = v24
+			end
+
+			local v25 = t2[v16]
+
+			if v25 == nil then
+				p5 += 1
+				v25 = p5
+				t2[v16] = v25
+			end
+
+			if v19 == "" then
+				v19 = if type(v16) == "string" then string.match(v16, "([^.]*)$") else ""
+			end
+
+			table.insert(t1, {
+				line = v18,
+				funcName = v19,
+				sourceCode = tostring(v25)
+			})
+		end
+	end
+
+	local t3 = {}
+
+	for k, v in pairs(t2) do
+		t3[tostring(v)] = {
+			path = k
+		}
+	end
+
+	return t1, t3, p5
+end
+
+return ProcessErrorStack

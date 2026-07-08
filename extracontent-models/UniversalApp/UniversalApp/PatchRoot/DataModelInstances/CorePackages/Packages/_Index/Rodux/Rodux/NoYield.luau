@@ -1,14 +1,19 @@
-local function v2(v0, v1, ...) --[[ Line: 12 ]] --[[ Name: resultHandler ]]
-    if not v1 then
-        error(debug.traceback(v0, (...)), 2);
-    end;
-    if coroutine.status(v0) ~= "dead" then
-        error(debug.traceback(v0, "Attempted to yield inside changed event!"), 2);
-    end;
-    return ...;
-end;
-return function(v3, ...) --[[ Line: 25 ]] --[[ Name: NoYield ]]
-    -- upvalues: v2 (copy)
-    local v4 = coroutine.create(v3);
-    return v2(v4, coroutine.resume(v4, ...));
-end;
+local function resultHandler(p1, p2, ...) -- line: 12
+	if not p2 then
+		error(debug.traceback(p1, (...)), 2)
+	end
+
+	if coroutine.status(p1) ~= "dead" then
+		error(debug.traceback(p1, "Attempted to yield inside changed event!"), 2)
+	end
+
+	return ...
+end
+local function NoYield(p3, ...) -- line: 25
+	-- upvalues: resultHandler (copy)
+	local co = coroutine.create(p3)
+
+	return resultHandler(co, coroutine.resume(co, ...))
+end
+
+return NoYield

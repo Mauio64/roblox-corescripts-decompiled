@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ApplyLaunchContextForNewAccountSwitches", false);
+return game:DefineFastFlag("ApplyLaunchContextForNewAccountSwitches", false)

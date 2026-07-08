@@ -1,7 +1,9 @@
-return function(v0) --[[ Line: 5 ]] --[[ Name: destroyMakeupDescriptions ]]
-    for _, v2 in v0:GetChildren() do
-        if v2:IsA("MakeupDescription") then
-            v2:Destroy();
-        end;
-    end;
-end;
+local function destroyMakeupDescriptions(p1) -- line: 5
+	for _, child in p1:GetChildren() do
+		if child:IsA("MakeupDescription") then
+			child:Destroy()
+		end
+	end
+end
+
+return destroyMakeupDescriptions

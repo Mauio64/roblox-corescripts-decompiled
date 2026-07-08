@@ -1,18 +1,20 @@
-local v0 = require(script.Parent.ReactFiberLane);
-local l_NoLanes_0 = v0.NoLanes;
-local l_mergeLanes_0 = v0.mergeLanes;
+local ReactFiberLane = require(script.Parent.ReactFiberLane)
+local NoLanes = ReactFiberLane.NoLanes
+local mergeLanes = ReactFiberLane.mergeLanes
+
 return {
-    workInProgressRootSkippedLanes = function(v3) --[[ Line: 24 ]]
-        -- upvalues: l_NoLanes_0 (ref)
-        if v3 == nil then
-            return l_NoLanes_0;
-        else
-            l_NoLanes_0 = v3;
-            return l_NoLanes_0;
-        end;
-    end, 
-    markSkippedUpdateLanes = function(v4) --[[ Line: 34 ]]
-        -- upvalues: l_NoLanes_0 (ref), l_mergeLanes_0 (copy)
-        l_NoLanes_0 = l_mergeLanes_0(v4, l_NoLanes_0);
-    end
-};
+	workInProgressRootSkippedLanes = function(p1) -- line: 24
+		-- upvalues: NoLanes (ref)
+		if p1 == nil then
+			return NoLanes
+		end
+
+		NoLanes = p1
+
+		return NoLanes
+	end,
+	markSkippedUpdateLanes = function(p2) -- line: 34
+		-- upvalues: NoLanes (ref), mergeLanes (copy)
+		NoLanes = mergeLanes(p2, NoLanes)
+	end
+}

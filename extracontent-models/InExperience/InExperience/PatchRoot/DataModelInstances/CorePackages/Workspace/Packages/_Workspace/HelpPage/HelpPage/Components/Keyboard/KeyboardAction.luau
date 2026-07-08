@@ -1,218 +1,241 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Foundation);
-local _ = require(l_Parent_0.Configs.ConfigTypes);
-local v6 = require(l_Parent_0.Enums.ExtraKeysEnum);
-local v7 = require(l_Parent_1.Localization);
-local v8 = require(l_Parent_0.Constants);
-local l_View_0 = v4.View;
-local l_Text_0 = v4.Text;
-local l_useTokens_0 = v4.Hooks.useTokens;
-local l_useLocalization_0 = v7.Hooks.useLocalization;
-local l_KEYCODE_ORDER_0 = v8.HELP_PAGE.KEYCODE_ORDER;
-local function v16(v14) --[[ Line: 45 ]] --[[ Name: getKeyCodeName ]]
-    -- upvalues: v8 (copy), l_UserInputService_0 (copy)
-    if v8.HELP_PAGE.KEYCODES_LOCALIZED[v14] then
-        return {
-            needsLocalization = true, 
-            keyCodeName = v8.HELP_PAGE.KEYCODES_LOCALIZED[v14]
-        };
-    elseif v8.HELP_PAGE.KEYCODES_UNLOCALIZED[v14] then
-        return {
-            needsLocalization = false, 
-            keyCodeName = v8.HELP_PAGE.KEYCODES_UNLOCALIZED[v14]
-        };
-    else
-        local l_l_UserInputService_0_StringForKeyCode_0 = l_UserInputService_0:GetStringForKeyCode(v14);
-        return {
-            needsLocalization = false, 
-            keyCodeName = l_l_UserInputService_0_StringForKeyCode_0
-        };
-    end;
-end;
-local function _(v17) --[[ Line: 65 ]] --[[ Name: getKeycodeLayoutOrder ]]
-    -- upvalues: l_KEYCODE_ORDER_0 (copy), v6 (copy)
-    if l_KEYCODE_ORDER_0[v17] then
-        return l_KEYCODE_ORDER_0[v17];
-    elseif v17 ~= v6.DPad and v17 ~= v6.TouchPad then
-        return v17.Value;
-    else
-        return 1e999;
-    end;
-end;
-local function v25(v19) --[[ Line: 75 ]] --[[ Name: KeyCodeComponent ]]
-    -- upvalues: l_useTokens_0 (copy), v16 (copy), l_useLocalization_0 (copy), v8 (copy), v3 (copy), l_Text_0 (copy)
-    local v20 = l_useTokens_0();
-    local v21 = v16(v19.keyCode);
-    local v22 = {};
-    if v21.needsLocalization then
-        v22[v21.keyCodeName] = v21.keyCodeName;
-    end;
-    local v23 = l_useLocalization_0(v22);
-    local v24 = v21.needsLocalization and v23[v21.keyCodeName] or v21.keyCodeName;
-    if v19.addSeparator then
-        v24 = v8.HELP_PAGE.SEPARATORS.COMBO .. v24;
-    end;
-    return v3.createElement(l_Text_0, {
-        tag = "auto-xy text-align-x-left text-wrap text-body-small", 
-        textStyle = v20.Color.Extended.White.White_100, 
-        Text = v24
-    });
-end;
-local function v33(v26) --[[ Line: 97 ]] --[[ Name: KeyCodeComboComponent ]]
-    -- upvalues: l_useTokens_0 (copy), v3 (copy), l_View_0 (copy), l_Text_0 (copy), v8 (copy), v25 (copy)
-    local v27 = l_useTokens_0();
-    local v32 = v3.useMemo(function() --[[ Line: 100 ]]
-        -- upvalues: v26 (copy), v3 (ref), l_View_0 (ref), l_Text_0 (ref), v27 (copy), v8 (ref), v25 (ref)
-        local v28 = {};
-        if v26.addSeparator then
-            table.insert(v28, v3.createElement(l_View_0, {
-                tag = "auto-xy", 
-                LayoutOrder = -1e999, 
-                key = "separator"
-            }, {
-                Separator = v3.createElement(l_Text_0, {
-                    tag = "auto-xy text-align-x-left text-truncate text-body-small", 
-                    textStyle = v27.Color.Extended.White.White_100, 
-                    Text = v8.HELP_PAGE.SEPARATORS.ALTERNATIVE
-                })
-            }));
-        end;
-        for v29, v30 in ipairs(v26.combo) do
-            local v31 = v29 ~= 1;
-            table.insert(v28, v3.createElement(l_View_0, {
-                tag = "auto-xy", 
-                LayoutOrder = v29, 
-                key = v29
-            }, {
-                KeyCodeComponent = v3.createElement(v25, {
-                    keyCode = v30, 
-                    addSeparator = v31
-                })
-            }));
-        end;
-        return v28;
-    end, {
-        v26.combo, 
-        v26.addSeparator
-    });
-    return v3.createElement(l_View_0, {
-        tag = "row auto-xy wrap"
-    }, v32);
-end;
-local function v50(v34) --[[ Line: 145 ]] --[[ Name: InputComponent ]]
-    -- upvalues: v3 (copy), l_KEYCODE_ORDER_0 (copy), v6 (copy), l_View_0 (copy), v33 (copy)
-    if v34.input == nil then
-        return nil;
-    else
-        v3.useMemo(function() --[[ Line: 153 ]]
-            -- upvalues: v34 (copy), l_KEYCODE_ORDER_0 (ref), v6 (ref)
-            for _, v36 in ipairs(v34.input) do
-                table.sort(v36, function(v37, v38) --[[ Line: 155 ]]
-                    -- upvalues: l_KEYCODE_ORDER_0 (ref), v6 (ref)
-                    return (if l_KEYCODE_ORDER_0[v37] then l_KEYCODE_ORDER_0[v37] else if v37 ~= v6.DPad and v37 ~= v6.TouchPad then v37.Value else 1e999) < if l_KEYCODE_ORDER_0[v38] then l_KEYCODE_ORDER_0[v38] else if v38 ~= v6.DPad and v38 ~= v6.TouchPad then v38.Value else 1e999;
-                end);
-            end;
-            table.sort(v34.input, function(v39, v40) --[[ Line: 160 ]]
-                -- upvalues: l_KEYCODE_ORDER_0 (ref), v6 (ref)
-                if #v39 == #v40 then
-                    for v41 = 1, #v39 do
-                        if v39[v41] ~= v40[v41] then
-                            local v42 = v39[v41];
-                            local v43 = if l_KEYCODE_ORDER_0[v42] then l_KEYCODE_ORDER_0[v42] else if v42 ~= v6.DPad and v42 ~= v6.TouchPad then v42.Value else 1e999;
-                            local v44 = v40[v41];
-                            return v43 < if l_KEYCODE_ORDER_0[v44] then l_KEYCODE_ORDER_0[v44] else if v44 ~= v6.DPad and v44 ~= v6.TouchPad then v44.Value else 1e999;
-                        end;
-                    end;
-                    return false;
-                else
-                    return #v39 < #v40;
-                end;
-            end);
-        end, {
-            v34.input
-        });
-        local v49 = v3.useMemo(function() --[[ Line: 175 ]]
-            -- upvalues: v34 (copy), v3 (ref), l_View_0 (ref), v33 (ref)
-            local v45 = {};
-            for v46, v47 in ipairs(v34.input) do
-                local v48 = v46 ~= 1;
-                table.insert(v45, v3.createElement(l_View_0, {
-                    tag = "auto-xy", 
-                    LayoutOrder = v46, 
-                    key = v46
-                }, {
-                    KeyCodeComboComponent = v3.createElement(v33, {
-                        combo = v47, 
-                        addSeparator = v48, 
-                        layoutOrder = v46
-                    })
-                }));
-            end;
-            return v45;
-        end, {
-            v34.input
-        });
-        return v3.createElement(l_View_0, {
-            tag = "row auto-xy wrap"
-        }, v49);
-    end;
-end;
-return v3.memo(function(v51) --[[ Line: 205 ]]
-    -- upvalues: l_useTokens_0 (copy), l_useLocalization_0 (copy), v3 (copy), l_UserInputService_0 (copy), l_View_0 (copy), l_Text_0 (copy), v50 (copy)
-    local v52 = l_useTokens_0();
-    local v53 = l_useLocalization_0({
-        actionText = v51.control.label
-    });
-    local l_keyboardInput_0 = v51.control.keyboardInput;
-    local v56 = v3.useMemo(function() --[[ Line: 216 ]]
-        -- upvalues: l_keyboardInput_0 (copy), l_UserInputService_0 (ref)
-        if l_keyboardInput_0 == nil then
-            return nil;
-        else
-            local l_input_0 = l_keyboardInput_0.input;
-            if l_input_0 == nil then
-                if l_UserInputService_0:GetPlatform() == Enum.Platform.OSX then
-                    return l_keyboardInput_0.macInput;
-                else
-                    l_input_0 = l_keyboardInput_0.winInput;
-                end;
-            end;
-            return l_input_0;
-        end;
-    end, {
-        l_keyboardInput_0
-    });
-    if l_keyboardInput_0 == nil or v56 == nil then
-        return nil;
-    else
-        return v3.createElement(l_View_0, {
-            tag = "size-full-1100 row align-y-center align-x-left wrap flex-fill padding-x-small gap-small radius-xsmall", 
-            backgroundStyle = v52.Color.Extended.Gray.Gray_800, 
-            LayoutOrder = l_keyboardInput_0.layoutOrder, 
-            ClipsDescendants = true
-        }, {
-            ActionLabelContainer = v3.createElement(l_View_0, {
-                tag = "align-y-center align-x-left col", 
-                LayoutOrder = 1
-            }, {
-                ActionLabel = v3.createElement(l_Text_0, {
-                    tag = "auto-xy text-align-x-left text-title-small text-wrap", 
-                    textStyle = v52.Color.Extended.White.White_100, 
-                    Text = v53.actionText
-                })
-            }), 
-            InputLabelContainer = v3.createElement(l_View_0, {
-                tag = "align-y-center align-x-left col", 
-                LayoutOrder = 2, 
-                testId = "input-label-container"
-            }, {
-                InputLabel = v3.createElement(v50, {
-                    input = v56
-                })
-            })
-        });
-    end;
-end);
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Foundation = require(ParentParentParent.Foundation)
+
+require(ParentParent.Configs.ConfigTypes)
+
+local ExtraKeysEnum = require(ParentParent.Enums.ExtraKeysEnum)
+local Localization = require(ParentParentParent.Localization)
+local Constants = require(ParentParent.Constants)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local useTokens = Foundation.Hooks.useTokens
+local useLocalization = Localization.Hooks.useLocalization
+local KEYCODE_ORDER = Constants.HELP_PAGE.KEYCODE_ORDER
+
+local function getKeyCodeName(p1) -- line: 45
+	-- upvalues: Constants (copy), UserInputService (copy)
+	if Constants.HELP_PAGE.KEYCODES_LOCALIZED[p1] then
+		return {
+			needsLocalization = true,
+			keyCodeName = Constants.HELP_PAGE.KEYCODES_LOCALIZED[p1]
+		}
+	end
+
+	if Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p1] then
+		return {
+			needsLocalization = false,
+			keyCodeName = Constants.HELP_PAGE.KEYCODES_UNLOCALIZED[p1]
+		}
+	end
+
+	local StringForKeyCode = UserInputService:GetStringForKeyCode(p1)
+
+	return {
+		needsLocalization = false,
+		keyCodeName = StringForKeyCode
+	}
+end
+local function getKeycodeLayoutOrder(p2) -- line: 65
+	-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
+	if KEYCODE_ORDER[p2] then
+		return KEYCODE_ORDER[p2]
+	end
+
+	if p2 ~= ExtraKeysEnum.DPad and p2 ~= ExtraKeysEnum.TouchPad then
+		return p2.Value
+	end
+
+	return 1e999
+end
+local function KeyCodeComponent(t1: {[any]: any}) -- line: 75
+	-- upvalues: useTokens (copy), getKeyCodeName (copy), useLocalization (copy), Constants (copy), React (copy), FoundationText (copy)
+	local v23 = useTokens()
+	local v24 = getKeyCodeName(t1.keyCode)
+	local t2 = {}
+
+	if v24.needsLocalization then
+		t2[v24.keyCodeName] = v24.keyCodeName
+	end
+
+	local v26 = useLocalization(t2)
+	local v27 = v24.needsLocalization and v26[v24.keyCodeName] or v24.keyCodeName
+
+	if t1.addSeparator then
+		v27 = Constants.HELP_PAGE.SEPARATORS.COMBO .. v27
+	end
+
+	return React.createElement(FoundationText, {
+		tag = "auto-xy text-align-x-left text-wrap text-body-small",
+		textStyle = v23.Color.Extended.White.White_100,
+		Text = v27
+	})
+end
+local function KeyCodeComboComponent(t3: {[any]: any}) -- line: 97
+	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy), Constants (copy), KeyCodeComponent (copy)
+	local v29 = useTokens()
+	local v30 = React.useMemo(function() -- line: 100
+		-- upvalues: t3 (copy), React (copy), View (copy), FoundationText (copy), v29 (copy), Constants (copy), KeyCodeComponent (copy)
+		local t4 = {}
+
+		if t3.addSeparator then
+			table.insert(t4, React.createElement(View, {
+				tag = "auto-xy",
+				LayoutOrder = -1e999,
+				key = "separator"
+			}, {
+				Separator = React.createElement(FoundationText, {
+					tag = "auto-xy text-align-x-left text-truncate text-body-small",
+					textStyle = v29.Color.Extended.White.White_100,
+					Text = Constants.HELP_PAGE.SEPARATORS.ALTERNATIVE
+				})
+			}))
+		end
+
+		for i, v in ipairs(t3.combo) do
+			local v41 = i ~= 1
+
+			table.insert(t4, React.createElement(View, {
+				tag = "auto-xy",
+				LayoutOrder = i,
+				key = i
+			}, {
+				KeyCodeComponent = React.createElement(KeyCodeComponent, {
+					keyCode = v,
+					addSeparator = v41
+				})
+			}))
+		end
+
+		return t4
+	end, {
+		t3.combo,
+		t3.addSeparator
+	})
+
+	return React.createElement(View, {
+		tag = "row auto-xy wrap"
+	}, v30)
+end
+local function InputComponent(t5: {[any]: any}) -- line: 145
+	-- upvalues: React (copy), KEYCODE_ORDER (copy), ExtraKeysEnum (copy), View (copy), KeyCodeComboComponent (copy)
+	if t5.input == nil then
+		return nil
+	end
+
+	React.useMemo(function() -- line: 153
+		-- upvalues: t5 (copy), KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
+		for _, v in ipairs(t5.input) do
+			table.sort(v, function(p3, p4) -- line: 155
+				-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
+				return ((if not KEYCODE_ORDER[p3] then (p3 == ExtraKeysEnum.DPad or p3 == ExtraKeysEnum.TouchPad) and 1e999 or p3.Value else KEYCODE_ORDER[p3])) < if not KEYCODE_ORDER[p4] then (p4 == ExtraKeysEnum.DPad or p4 == ExtraKeysEnum.TouchPad) and 1e999 or p4.Value else KEYCODE_ORDER[p4]
+			end)
+		end
+
+		table.sort(t5.input, function(p5, p6) -- line: 160
+			-- upvalues: KEYCODE_ORDER (copy), ExtraKeysEnum (copy)
+			if #p5 == #p6 then
+				for i = 1, #p5 do
+					if p5[i] ~= p6[i] then
+						local v54 = p5[i]
+						local v55 = if not KEYCODE_ORDER[v54] then (v54 == ExtraKeysEnum.DPad or v54 == ExtraKeysEnum.TouchPad) and 1e999 or v54.Value else KEYCODE_ORDER[v54]
+						local v56 = p6[i]
+
+						return v55 < if not KEYCODE_ORDER[v56] then (v56 == ExtraKeysEnum.DPad or v56 == ExtraKeysEnum.TouchPad) and 1e999 or v56.Value else KEYCODE_ORDER[v56]
+					end
+				end
+
+				return false
+			end
+
+			return #p5 < #p6
+		end)
+	end, { t5.input })
+
+	local v32 = React.useMemo(function() -- line: 175
+		-- upvalues: t5 (copy), React (copy), View (copy), KeyCodeComboComponent (copy)
+		local t6 = {}
+
+		for i, v in ipairs(t5.input) do
+			local v47 = i ~= 1
+
+			table.insert(t6, React.createElement(View, {
+				tag = "auto-xy",
+				LayoutOrder = i,
+				key = i
+			}, {
+				KeyCodeComboComponent = React.createElement(KeyCodeComboComponent, {
+					combo = v,
+					addSeparator = v47,
+					layoutOrder = i
+				})
+			}))
+		end
+
+		return t6
+	end, { t5.input })
+
+	return React.createElement(View, {
+		tag = "row auto-xy wrap"
+	}, v32)
+end
+
+return React.memo(function(t7: {[any]: any}) -- line: 205
+	-- upvalues: useTokens (copy), useLocalization (copy), React (copy), UserInputService (copy), View (copy), FoundationText (copy), InputComponent (copy)
+	local v34 = useTokens()
+	local v35 = useLocalization({
+		actionText = t7.control.label
+	})
+	local keyboardInput = t7.control.keyboardInput
+	local v37 = React.useMemo(function() -- line: 216
+		-- upvalues: keyboardInput (copy), UserInputService (copy)
+		if keyboardInput == nil then
+			return nil
+		end
+
+		local input = keyboardInput.input
+
+		if input == nil then
+			if UserInputService:GetPlatform() == Enum.Platform.OSX then
+				return keyboardInput.macInput
+			end
+
+			input = keyboardInput.winInput
+		end
+
+		return input
+	end, { keyboardInput })
+
+	if keyboardInput == nil or v37 == nil then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "size-full-1100 row align-y-center align-x-left wrap flex-fill padding-x-small gap-small radius-xsmall",
+		ClipsDescendants = true,
+		backgroundStyle = v34.Color.Extended.Gray.Gray_800,
+		LayoutOrder = keyboardInput.layoutOrder
+	}, {
+		ActionLabelContainer = React.createElement(View, {
+			tag = "align-y-center align-x-left col",
+			LayoutOrder = 1
+		}, {
+			ActionLabel = React.createElement(FoundationText, {
+				tag = "auto-xy text-align-x-left text-title-small text-wrap",
+				textStyle = v34.Color.Extended.White.White_100,
+				Text = v35.actionText
+			})
+		}),
+		InputLabelContainer = React.createElement(View, {
+			tag = "align-y-center align-x-left col",
+			LayoutOrder = 2,
+			testId = "input-label-container"
+		}, {
+			InputLabel = React.createElement(InputComponent, {
+				input = v37
+			})
+		})
+	})
+end)

@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXRootSlotBasedEditorFlag) and game:DefineFastFlag("AXUpdateSlotBasedEditorToastAndPrompts", false);
+return require(script.Parent.FFlagAXRootSlotBasedEditorFlag) and game:DefineFastFlag("AXUpdateSlotBasedEditorToastAndPrompts", false)

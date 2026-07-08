@@ -1,22 +1,22 @@
-return function(v0, ...) --[[ Line: 22 ]] --[[ Name: pipe ]]
-    local v1 = select("#", ...);
-    if v1 == 0 then
-        return v0;
-    else
-        local v2 = {
-            ...
-        };
-        return function(...) --[[ Line: 28 ]]
-            -- upvalues: v0 (copy), v1 (copy), v2 (copy)
-            local v3 = {
-                v0(...)
-            };
-            for v4 = 1, v1 do
-                v3 = {
-                    v2[v4](unpack(v3))
-                };
-            end;
-            return unpack(v3);
-        end;
-    end;
-end;
+local function pipe(p1: ((...any) -> ...any), ...) -- line: 22
+	local v3 = select("#", ...)
+
+	if v3 == 0 then
+		return p1
+	end
+
+	local t1 = { ... }
+
+	return function(...) -- line: 28
+		-- upvalues: p1 (copy), v3 (copy), t1 (copy)
+		local t2 = { p1(...) }
+
+		for i = 1, v3 do
+			t2 = { t1[i](unpack(t2)) }
+		end
+
+		return unpack(t2)
+	end
+end
+
+return pipe

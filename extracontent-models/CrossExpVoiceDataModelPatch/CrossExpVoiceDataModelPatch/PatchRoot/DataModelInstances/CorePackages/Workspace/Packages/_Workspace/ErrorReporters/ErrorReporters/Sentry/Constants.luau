@@ -1,3 +1,3 @@
 return {
-    DEFAULT_ERROR_LEVEL = "error"
-};
+	DEFAULT_ERROR_LEVEL = "error"
+}

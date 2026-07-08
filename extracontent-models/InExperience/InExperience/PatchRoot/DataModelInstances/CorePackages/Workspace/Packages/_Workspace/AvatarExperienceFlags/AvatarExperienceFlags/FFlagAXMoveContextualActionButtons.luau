@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMoveContextualActionButtons", false);
+return game:DefineFastFlag("AXMoveContextualActionButtons", false)

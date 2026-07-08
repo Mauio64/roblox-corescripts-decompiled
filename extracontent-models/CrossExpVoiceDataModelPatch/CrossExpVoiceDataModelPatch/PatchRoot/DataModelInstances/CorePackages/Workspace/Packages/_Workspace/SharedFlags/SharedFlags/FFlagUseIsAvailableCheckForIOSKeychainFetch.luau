@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UseIsAvailableCheckForIOSKeychainFetch", false);
+return game:DefineFastFlag("UseIsAvailableCheckForIOSKeychainFetch", false)

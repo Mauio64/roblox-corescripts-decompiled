@@ -1,88 +1,98 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local l_ButtonType_0 = v2.App.Button.Enum.ButtonType;
-local l_InteractiveAlert_0 = v2.App.Dialog.Alert.InteractiveAlert;
-local v5 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v6 = v2.App.ImageSet.Images["icons/controls/keys/xboxA"];
-local v7 = require(l_CorePackages_0.Packages.Roact);
-local v8 = require(l_CorePackages_0.Packages.RoactRodux);
-local v9 = require(l_CorePackages_0.Packages.t);
-local v10 = require(l_CorePackages_0.Workspace.Packages.InputType);
-local l_getInputGroup_0 = require(l_CorePackages_0.Workspace.Packages.InputType).getInputGroup;
-local l_Parent_0 = script.Parent.Parent;
-local v13 = require(l_Parent_0.Thunks.CloseResultModal);
-local l_Parent_1 = script.Parent.Parent;
-local v15 = require(l_Parent_1.GetFFlagValidateDescription);
-local v16 = v7.PureComponent:extend("ResultModal");
-v16.validateProps = v9.strictInterface({
-    screenSize = v9.Vector2, 
-    resultModalType = v9.enum(Enum.PromptPublishAssetResult), 
-    closeResultModal = v9.callback
-});
-local function _(v17) --[[ Line: 38 ]] --[[ Name: isGamepadInput ]]
-    -- upvalues: l_getInputGroup_0 (copy), v10 (copy)
-    return l_getInputGroup_0(v17) == v10.InputTypeConstants.Gamepad;
-end;
-v16.init = function(v19) --[[ Line: 43 ]] --[[ Name: init ]]
-    -- upvalues: l_UserInputService_0 (copy), l_getInputGroup_0 (copy), v10 (copy)
-    local v20 = {};
-    local l_l_UserInputService_0_LastInputType_0 = l_UserInputService_0:GetLastInputType();
-    v20.isGamepad = l_getInputGroup_0(l_l_UserInputService_0_LastInputType_0) == v10.InputTypeConstants.Gamepad;
-    v19:setState(v20);
-end;
-v16.getLocalizedStringForResultPrompt = function(_, v23) --[[ Line: 49 ]] --[[ Name: getLocalizedStringForResultPrompt ]]
-    -- upvalues: v5 (copy)
-    if v23 == Enum.PromptPublishAssetResult.Success then
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.PublishSuccessMessage");
-    elseif v23 == Enum.PromptPublishAssetResult.UploadFailed then
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.PublishFailed");
-    elseif v23 == Enum.PromptPublishAssetResult.NoUserInput then
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.NoUserInput");
-    else
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.UndefinedError", {
-            RESULT_TYPE = tostring(v23)
-        });
-    end;
-end;
-v16.getLocalizedTitleForResultPrompt = function(_, v25) --[[ Line: 64 ]] --[[ Name: getLocalizedTitleForResultPrompt ]]
-    -- upvalues: v5 (copy)
-    if v25 == Enum.PromptPublishAssetResult.Success then
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.PublishSuccessTitle");
-    else
-        return v5:FormatByKey("CoreScripts.PublishAssetPrompt.PublishFailedTitle");
-    end;
-end;
-v16.render = function(v26) --[[ Line: 72 ]] --[[ Name: render ]]
-    -- upvalues: v7 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy), v15 (copy), v5 (copy), v6 (copy)
-    return v7.createElement(l_InteractiveAlert_0, {
-        title = v26:getLocalizedTitleForResultPrompt(v26.props.resultModalType), 
-        bodyText = v26:getLocalizedStringForResultPrompt(v26.props.resultModalType), 
-        screenSize = v26.props.screenSize, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = v26.props.closeResultModal, 
-                        text = if v15() then v5:FormatByKey("CoreScripts.PublishAssetPrompt.ResultModalOk") else v5:FormatByKey("InGame.CommonUI.Button.Ok"), 
-                        inputIcon = v26.state.isGamepad and v6 or nil
-                    }
-                }
-            }
-        }
-    });
-end;
-return v8.connect(function(v27) --[[ Line: 94 ]] --[[ Name: mapStateToProps ]]
-    return {
-        resultModalType = v27.promptRequest.resultModalType
-    };
-end, function(v28) --[[ Line: 100 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v13 (copy)
-    return {
-        closeResultModal = function() --[[ Line: 102 ]] --[[ Name: closeResultModal ]]
-            -- upvalues: v28 (copy), v13 (ref)
-            return v28(v13);
-        end
-    };
-end)(v16);
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local v7 = UIBlox.App.ImageSet.Images["icons/controls/keys/xboxA"]
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local InputType = require(CorePackages.Workspace.Packages.InputType)
+local getInputGroup = require(CorePackages.Workspace.Packages.InputType).getInputGroup
+local ParentParent = script.Parent.Parent
+local CloseResultModal = require(ParentParent.Thunks.CloseResultModal)
+local ParentParent2 = script.Parent.Parent
+local GetFFlagValidateDescription = require(ParentParent2.GetFFlagValidateDescription)
+local v17 = Roact.PureComponent:extend("ResultModal")
+
+v17.validateProps = t.strictInterface({
+	screenSize = t.Vector2,
+	resultModalType = t.enum(Enum.PromptPublishAssetResult),
+	closeResultModal = t.callback
+})
+
+local function isGamepadInput(p1) -- line: 38
+	-- upvalues: getInputGroup (copy), InputType (copy)
+	return getInputGroup(p1) == InputType.InputTypeConstants.Gamepad
+end
+
+function v17.init(p2) -- line: 43
+	-- upvalues: UserInputService (copy), getInputGroup (copy), InputType (copy)
+	local t1 = {}
+	local LastInputType = UserInputService:GetLastInputType()
+
+	t1.isGamepad = getInputGroup(LastInputType) == InputType.InputTypeConstants.Gamepad
+	p2:setState(t1)
+end
+function v17.getLocalizedStringForResultPrompt(_, p4) -- line: 49
+	-- upvalues: RobloxTranslator (copy)
+	if p4 == Enum.PromptPublishAssetResult.Success then
+		return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.PublishSuccessMessage")
+	end
+
+	if p4 == Enum.PromptPublishAssetResult.UploadFailed then
+		return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.PublishFailed")
+	end
+
+	if p4 == Enum.PromptPublishAssetResult.NoUserInput then
+		return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.NoUserInput")
+	end
+
+	return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.UndefinedError", {
+		RESULT_TYPE = tostring(p4)
+	})
+end
+function v17.getLocalizedTitleForResultPrompt(_, p6) -- line: 64
+	-- upvalues: RobloxTranslator (copy)
+	if p6 == Enum.PromptPublishAssetResult.Success then
+		return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.PublishSuccessTitle")
+	end
+
+	return RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.PublishFailedTitle")
+end
+function v17.render(p7) -- line: 72
+	-- upvalues: Roact (copy), InteractiveAlert (copy), ButtonType (copy), GetFFlagValidateDescription (copy), RobloxTranslator (copy), v7 (copy)
+	return Roact.createElement(InteractiveAlert, {
+		title = p7:getLocalizedTitleForResultPrompt(p7.props.resultModalType),
+		bodyText = p7:getLocalizedStringForResultPrompt(p7.props.resultModalType),
+		screenSize = p7.props.screenSize,
+		buttonStackInfo = {
+			buttons = {{
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					onActivated = p7.props.closeResultModal,
+					text = if not GetFFlagValidateDescription() then RobloxTranslator:FormatByKey("InGame.CommonUI.Button.Ok") else RobloxTranslator:FormatByKey("CoreScripts.PublishAssetPrompt.ResultModalOk"),
+					inputIcon = p7.state.isGamepad and v7 or nil
+				}
+			}}
+		}
+	})
+end
+
+local function mapStateToProps(p8) -- line: 94
+	return {
+		resultModalType = p8.promptRequest.resultModalType
+	}
+end
+local function mapDispatchToProps(p9) -- line: 100
+	-- upvalues: CloseResultModal (copy)
+	return {
+		closeResultModal = function() -- line: 102
+			-- upvalues: p9 (copy), CloseResultModal (copy)
+			return p9(CloseResultModal)
+		end
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v17)

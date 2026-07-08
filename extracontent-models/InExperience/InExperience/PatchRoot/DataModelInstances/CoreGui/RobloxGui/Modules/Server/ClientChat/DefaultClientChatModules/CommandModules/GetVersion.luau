@@ -1,14 +1,18 @@
-local l_Util_0 = require(script.Parent:WaitForChild("Util"));
-local l_ChatConstants_0 = require(script.Parent.Parent:WaitForChild("ChatConstants"));
+local Util = require(script.Parent:WaitForChild("Util"))
+local ChatConstants = require(script.Parent.Parent:WaitForChild("ChatConstants"))
+
+local function ProcessMessage(p1, p2, _) -- line: 9
+	-- upvalues: Util (copy), ChatConstants (copy)
+	if string.sub(p1, 1, 8):lower() == "/version" or string.sub(p1, 1, 9):lower() == "/version " then
+		Util:SendSystemMessageToSelf(string.format("This experience is running chat version [%d.%d.%s].", ChatConstants.MajorVersion, ChatConstants.MinorVersion, ChatConstants.BuildVersion), p2:GetCurrentChannel(), {})
+
+		return true
+	end
+
+	return false
+end
+
 return {
-    [l_Util_0.KEY_COMMAND_PROCESSOR_TYPE] = l_Util_0.COMPLETED_MESSAGE_PROCESSOR, 
-    [l_Util_0.KEY_PROCESSOR_FUNCTION] = function(v2, v3, _) --[[ Line: 9 ]] --[[ Name: ProcessMessage ]]
-        -- upvalues: l_Util_0 (copy), l_ChatConstants_0 (copy)
-        if string.sub(v2, 1, 8):lower() == "/version" or string.sub(v2, 1, 9):lower() == "/version " then
-            l_Util_0:SendSystemMessageToSelf(string.format("This experience is running chat version [%d.%d.%s].", l_ChatConstants_0.MajorVersion, l_ChatConstants_0.MinorVersion, l_ChatConstants_0.BuildVersion), v3:GetCurrentChannel(), {});
-            return true;
-        else
-            return false;
-        end;
-    end
-};
+	[Util.KEY_COMMAND_PROCESSOR_TYPE] = Util.COMPLETED_MESSAGE_PROCESSOR,
+	[Util.KEY_PROCESSOR_FUNCTION] = ProcessMessage
+}

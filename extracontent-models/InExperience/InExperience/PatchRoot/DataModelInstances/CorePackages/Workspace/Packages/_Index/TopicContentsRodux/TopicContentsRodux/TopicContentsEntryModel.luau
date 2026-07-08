@@ -3,16 +3,14 @@ local OmniRecommendationsContentType = require(Parent.DiscoveryTypes).OmniRecomm
 local Result = require(Parent.Result)
 local FFlagSearchOmniAutocompletePage = require(Parent.SharedFlags).FFlagSearchOmniAutocompletePage
 local FFlagEnableTopSongsSort = require(Parent.SharedFlags).FFlagEnableTopSongsSort
-local FFlagLuaAppEnableHomepageTwoByOneTile = require(Parent.SharedFlags).FFlagLuaAppEnableHomepageTwoByOneTile
 local FFlagLuaAppEnableWhyThisAdModal = require(Parent.SharedFlags).FFlagLuaAppEnableWhyThisAdModal
-local FFlagLuaAppLogOmniAnalyticsData = require(Parent.SharedFlags).FFlagLuaAppLogOmniAnalyticsData
-local FFlagLuaAppSupportPrimaryMediaContentMetadata = require(Parent.SharedFlags).FFlagLuaAppSupportPrimaryMediaContentMetadata
 local FFlagLuaAppGameTileLockedBadge = require(Parent.SharedFlags).FFlagLuaAppGameTileLockedBadge
+local FFlagLuaAppEnableHomepageOneByTwoTile = require(Parent.SharedFlags).FFlagLuaAppEnableHomepageOneByTwoTile
 local t2 = {
-	new = function() --[[ new ]] -- line: 20
+	new = function() -- line: 17
 		return {}
 	end,
-	mock = function(s1: string?) --[[ mock ]] -- line: 26
+	mock = function(s1: string?) -- line: 23
 		-- upvalues: OmniRecommendationsContentType (copy)
 		local t1 = {
 			contentType = OmniRecommendationsContentType.Game,
@@ -44,6 +42,9 @@ local t2 = {
 		t1.primaryWideImageAssetId = nil
 		t1.primaryWideImageListId = nil
 		t1.primaryWideVideoAssetId = nil
+		t1.primaryImageAssetId = nil
+		t1.primaryVideoAssetId = nil
+		t1.clickoutUrl = nil
 
 		return t1
 	end
@@ -55,33 +56,33 @@ function t2.fromGamesApiData(p1) -- line: 58
 		return Result.error("TopicContentsEntryModel.fromGamesApiData expects universeId to be a number or a string")
 	end
 
-	local v15 = t2.new()
+	local v13 = t2.new()
 
-	v15.contentType = OmniRecommendationsContentType.Game
-	v15.contentId = tostring(p1.universeId)
-	v15.isSponsored = p1.isSponsored
-	v15.isShowSponsoredLabel = nil
+	v13.contentType = OmniRecommendationsContentType.Game
+	v13.contentId = tostring(p1.universeId)
+	v13.isSponsored = p1.isSponsored
+	v13.isShowSponsoredLabel = nil
 
 	if p1.isShowSponsoredLabel == nil then
-		v15.isShowSponsoredLabel = true
+		v13.isShowSponsoredLabel = true
 	else
-		v15.isShowSponsoredLabel = p1.isShowSponsoredLabel
+		v13.isShowSponsoredLabel = p1.isShowSponsoredLabel
 	end
 
-	v15.adId = p1.nativeAdData
+	v13.adId = p1.nativeAdData
 
 	if FFlagLuaAppGameTileLockedBadge and p1.contentMetadata then
 		local contentMetadata = p1.contentMetadata
 
-		v15.badgePosition = contentMetadata.badgePosition
-		v15.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
-		v15.badgeType = contentMetadata.badgeType
-		v15.badgeText = contentMetadata.badgeText
-		v15.badgeIcon = contentMetadata.badgeIcon
-		v15.badgeComponentType = contentMetadata.badgeComponentType
+		v13.badgePosition = contentMetadata.badgePosition
+		v13.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
+		v13.badgeType = contentMetadata.badgeType
+		v13.badgeText = contentMetadata.badgeText
+		v13.badgeIcon = contentMetadata.badgeIcon
+		v13.badgeComponentType = contentMetadata.badgeComponentType
 	end
 
-	return Result.success(v15)
+	return Result.success(v13)
 end
 
 if FFlagSearchOmniAutocompletePage then
@@ -91,23 +92,23 @@ if FFlagSearchOmniAutocompletePage then
 			return Result.error("TopicContentsEntryModel.fromOmniAutocomplete expects universeId to be a number or a string")
 		end
 
-		local v18 = t2.new()
+		local v16 = t2.new()
 
-		v18.contentType = OmniRecommendationsContentType.Game
-		v18.contentId = tostring(p2.universeId)
+		v16.contentType = OmniRecommendationsContentType.Game
+		v16.contentId = tostring(p2.universeId)
 
 		if FFlagLuaAppGameTileLockedBadge and p2.contentMetadata then
 			local contentMetadata = p2.contentMetadata
 
-			v18.badgePosition = contentMetadata.badgePosition
-			v18.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
-			v18.badgeType = contentMetadata.badgeType
-			v18.badgeText = contentMetadata.badgeText
-			v18.badgeIcon = contentMetadata.badgeIcon
-			v18.badgeComponentType = contentMetadata.badgeComponentType
+			v16.badgePosition = contentMetadata.badgePosition
+			v16.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
+			v16.badgeType = contentMetadata.badgeType
+			v16.badgeText = contentMetadata.badgeText
+			v16.badgeIcon = contentMetadata.badgeIcon
+			v16.badgeComponentType = contentMetadata.badgeComponentType
 		end
 
-		return Result.success(v18)
+		return Result.success(v16)
 	end
 end
 
@@ -117,26 +118,26 @@ function t2.fromExploreApiData(p3) -- line: 118
 		return Result.error("TopicContentsEntryModel.fromExploreApiData expects universeId to be a number or a string")
 	end
 
-	local v21 = t2.new()
+	local v19 = t2.new()
 
-	v21.contentType = OmniRecommendationsContentType.Game
-	v21.contentId = tostring(p3.universeId)
-	v21.isSponsored = p3.isSponsored
-	v21.adId = p3.nativeAdData
-	v21.isShowSponsoredLabel = nil
+	v19.contentType = OmniRecommendationsContentType.Game
+	v19.contentId = tostring(p3.universeId)
+	v19.isSponsored = p3.isSponsored
+	v19.adId = p3.nativeAdData
+	v19.isShowSponsoredLabel = nil
 
 	if FFlagLuaAppGameTileLockedBadge and p3.contentMetadata then
 		local contentMetadata = p3.contentMetadata
 
-		v21.badgePosition = contentMetadata.badgePosition
-		v21.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
-		v21.badgeType = contentMetadata.badgeType
-		v21.badgeText = contentMetadata.badgeText
-		v21.badgeIcon = contentMetadata.badgeIcon
-		v21.badgeComponentType = contentMetadata.badgeComponentType
+		v19.badgePosition = contentMetadata.badgePosition
+		v19.badgeAnalyticsId = contentMetadata.badgeAnalyticsId
+		v19.badgeType = contentMetadata.badgeType
+		v19.badgeText = contentMetadata.badgeText
+		v19.badgeIcon = contentMetadata.badgeIcon
+		v19.badgeComponentType = contentMetadata.badgeComponentType
 	end
 
-	return Result.success(v21)
+	return Result.success(v19)
 end
 
 if FFlagEnableTopSongsSort then
@@ -146,71 +147,63 @@ if FFlagEnableTopSongsSort then
 			return Result.error("TopicContentsEntryModel.songFromExploreApiData expects assetId to be a number or a string")
 		end
 
-		local v24 = t2.new()
+		local v22 = t2.new()
 
-		v24.contentType = OmniRecommendationsContentType.Song
-		v24.contentId = tostring(p4.assetId)
-		v24.isSponsored = false
+		v22.contentType = OmniRecommendationsContentType.Song
+		v22.contentId = tostring(p4.assetId)
+		v22.isSponsored = false
 
-		return Result.success(v24)
+		return Result.success(v22)
 	end
 end
 
 function t2.fromOmniRecommendations(p5) -- line: 159
-	-- upvalues: t2 (copy), FFlagLuaAppEnableHomepageTwoByOneTile (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppSupportPrimaryMediaContentMetadata (copy), FFlagLuaAppLogOmniAnalyticsData (copy), Result (copy)
-	local v26 = t2.new()
+	-- upvalues: t2 (copy), FFlagLuaAppEnableWhyThisAdModal (copy), FFlagLuaAppEnableHomepageOneByTwoTile (copy), Result (copy)
+	local v24 = t2.new()
 
-	v26.contentType = p5.contentType
-	v26.contentId = tostring(p5.contentId)
+	v24.contentType = p5.contentType
+	v24.contentId = tostring(p5.contentId)
 
-	if FFlagLuaAppEnableHomepageTwoByOneTile and p5.contentMetadata then
-		v26.adId = p5.contentMetadata.EncryptedAdTrackingData or nil
-		v26.isSponsored = v26.adId ~= nil and v26.adId ~= ""
-		v26.isShowSponsoredLabel = nil
-		v26.payerName = if not FFlagLuaAppEnableWhyThisAdModal then nil else p5.contentMetadata.PayerName or nil
-		v26.logoAssetId = p5.contentMetadata.LogoAssetId
-		v26.logoAspectRatio = p5.contentMetadata.LogoAspectRatio
-		v26.headline = p5.contentMetadata.Headline
-		v26.subtitle = p5.contentMetadata.Subtitle
-		v26.ctaText = p5.contentMetadata.CtaText
-		v26.tileVariant = p5.contentMetadata.TileVariant
-		v26.badgePosition = p5.contentMetadata.badgePosition
-		v26.badgeAnalyticsId = p5.contentMetadata.badgeAnalyticsId
-		v26.badgeType = p5.contentMetadata.badgeType
-		v26.badgeText = p5.contentMetadata.badgeText
-		v26.badgeIcon = p5.contentMetadata.badgeIcon
-		v26.badgeComponentType = p5.contentMetadata.badgeComponentType
-		v26.componentType = p5.contentMetadata.ComponentType
-		v26.alignmentType = p5.contentMetadata.AlignmentType
-		v26.minRowPadding = p5.contentMetadata.MinRowPadding
-		v26.placeIdOverride = if not p5.contentMetadata.PlaceIdOverride then nil else tostring(p5.contentMetadata.PlaceIdOverride)
-		v26.launchDataOverride = p5.contentMetadata.LaunchDataOverride
-
-		if FFlagLuaAppSupportPrimaryMediaContentMetadata then
-			v26.primaryWideImageAssetId = if not p5.contentMetadata.PrimaryWideImageAssetId or p5.contentMetadata.PrimaryWideImageAssetId == "" then nil else p5.contentMetadata.PrimaryWideImageAssetId
-			v26.primaryWideImageListId = p5.contentMetadata.PrimaryWideImageListId
-			v26.primaryWideVideoAssetId = p5.contentMetadata.PrimaryWideVideoAssetId
-		end
+	if p5.contentMetadata then
+		v24.adId = p5.contentMetadata.EncryptedAdTrackingData or nil
+		v24.isSponsored = v24.adId ~= nil and v24.adId ~= ""
+		v24.isShowSponsoredLabel = nil
+		v24.payerName = if not FFlagLuaAppEnableWhyThisAdModal then nil else p5.contentMetadata.PayerName or nil
+		v24.logoAssetId = p5.contentMetadata.LogoAssetId
+		v24.logoAspectRatio = p5.contentMetadata.LogoAspectRatio
+		v24.headline = p5.contentMetadata.Headline
+		v24.subtitle = p5.contentMetadata.Subtitle
+		v24.ctaText = p5.contentMetadata.CtaText
+		v24.tileVariant = p5.contentMetadata.TileVariant
+		v24.badgePosition = p5.contentMetadata.badgePosition
+		v24.badgeAnalyticsId = p5.contentMetadata.badgeAnalyticsId
+		v24.badgeType = p5.contentMetadata.badgeType
+		v24.badgeText = p5.contentMetadata.badgeText
+		v24.badgeIcon = p5.contentMetadata.badgeIcon
+		v24.badgeComponentType = p5.contentMetadata.badgeComponentType
+		v24.componentType = p5.contentMetadata.ComponentType
+		v24.alignmentType = p5.contentMetadata.AlignmentType
+		v24.minRowPadding = p5.contentMetadata.MinRowPadding
+		v24.placeIdOverride = if not p5.contentMetadata.PlaceIdOverride then nil else tostring(p5.contentMetadata.PlaceIdOverride)
+		v24.launchDataOverride = p5.contentMetadata.LaunchDataOverride
+		v24.primaryWideImageAssetId = if not p5.contentMetadata.PrimaryWideImageAssetId or p5.contentMetadata.PrimaryWideImageAssetId == "" then nil else p5.contentMetadata.PrimaryWideImageAssetId
+		v24.primaryWideImageListId = p5.contentMetadata.PrimaryWideImageListId
+		v24.primaryWideVideoAssetId = p5.contentMetadata.PrimaryWideVideoAssetId
+		v24.primaryImageAssetId = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else p5.contentMetadata.PrimaryImageAssetId
+		v24.primaryVideoAssetId = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else p5.contentMetadata.PrimaryVideoAssetId
+		v24.clickoutUrl = if not FFlagLuaAppEnableHomepageOneByTwoTile then nil else p5.contentMetadata.ClickoutUrl
 	else
-		v26.adId = p5.contentMetadata and p5.contentMetadata.EncryptedAdTrackingData or nil
-		v26.isSponsored = v26.adId ~= nil and v26.adId ~= ""
-		v26.isShowSponsoredLabel = nil
-		v26.payerName = if not FFlagLuaAppEnableWhyThisAdModal then nil else p5.contentMetadata and p5.contentMetadata.PayerName or nil
-		v26.placeIdOverride = if not p5.contentMetadata or not p5.contentMetadata.PlaceIdOverride then nil else tostring(p5.contentMetadata.PlaceIdOverride)
-		v26.launchDataOverride = p5.contentMetadata and p5.contentMetadata.LaunchDataOverride or nil
-
-		if FFlagLuaAppSupportPrimaryMediaContentMetadata and p5.contentMetadata then
-			v26.primaryWideImageAssetId = if not p5.contentMetadata.PrimaryWideImageAssetId or p5.contentMetadata.PrimaryWideImageAssetId == "" then nil else p5.contentMetadata.PrimaryWideImageAssetId
-			v26.primaryWideImageListId = p5.contentMetadata.PrimaryWideImageListId
-			v26.primaryWideVideoAssetId = p5.contentMetadata.PrimaryWideVideoAssetId
-		end
+		v24.adId = nil
+		v24.isSponsored = false
+		v24.isShowSponsoredLabel = nil
+		v24.payerName = nil
+		v24.placeIdOverride = nil
+		v24.launchDataOverride = nil
 	end
 
-	if FFlagLuaAppLogOmniAnalyticsData then
-		v26.analyticsData = p5.analyticsData
-	end
+	v24.analyticsData = p5.analyticsData
 
-	return Result.success(v26)
+	return Result.success(v24)
 end
 
 return t2

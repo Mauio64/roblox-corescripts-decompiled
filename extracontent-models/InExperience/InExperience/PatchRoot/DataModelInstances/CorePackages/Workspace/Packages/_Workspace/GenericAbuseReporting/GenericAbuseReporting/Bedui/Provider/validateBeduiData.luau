@@ -1,44 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.t);
-local l_BeduiDataTypeInterface_0 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes).BeduiDataTypeInterface;
-local function _(v4, v5) --[[ Line: 15 ]] --[[ Name: validateInterface ]]
-    -- upvalues: v2 (copy)
-    return v2.interface(v5)(v4);
-end;
-local function v12(v7) --[[ Line: 24 ]] --[[ Name: validateStepId ]]
-    local v8 = false;
-    local v9 = {};
-    for _, v11 in v7.nodes do
-        if v11.stepId == v7.rootStepId then
-            if v8 then
-                return false, "Bedui data contains multiple steps with the same rootStepId";
-            else
-                v8 = true;
-            end;
-        end;
-        if table.find(v9, v11.stepId) then
-            return false, "Bedui data contains duplicate stepId: " .. tostring(v11.stepId);
-        else
-            table.insert(v9, v11.stepId);
-        end;
-    end;
-    if v8 then
-        return true, nil;
-    else
-        return false, "Bedui data does not contain a step with the rootStepId";
-    end;
-end;
-return function(v13) --[[ Line: 51 ]] --[[ Name: validateBeduiData ]]
-    -- upvalues: l_BeduiDataTypeInterface_0 (copy), v2 (copy), v12 (copy)
-    if v13 == nil then
-        return false, "Bedui data is nil";
-    else
-        local l_l_BeduiDataTypeInterface_0_0 = l_BeduiDataTypeInterface_0;
-        if not v2.interface(l_l_BeduiDataTypeInterface_0_0)(v13) then
-            return false, "Bedui data does not conform to the expected structure";
-        else
-            return v12(v13);
-        end;
-    end;
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local t = require(GenericAbuseReportingParent.t)
+local BeduiDataTypeInterface = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).BeduiDataTypeInterface
+
+local function validateInterface(p1, t1: {[any]: any}) -- line: 15
+	-- upvalues: t (copy)
+	return t.interface(t1)(p1)
+end
+local function validateStepId(p2) -- line: 24
+	local v11 = false
+	local t2 = {}
+
+	for _, v14 in p2.nodes do
+		if v14.stepId == p2.rootStepId then
+			if v11 then
+				return false, "Bedui data contains multiple steps with the same rootStepId"
+			end
+
+			v11 = true
+		end
+
+		if table.find(t2, v14.stepId) then
+			return false, "Bedui data contains duplicate stepId: " .. tostring(v14.stepId)
+		end
+
+		table.insert(t2, v14.stepId)
+	end
+
+	if v11 then
+		return true, nil
+	end
+
+	return false, "Bedui data does not contain a step with the rootStepId"
+end
+local function validateBeduiData(t3: {[any]: any}?) -- line: 51
+	-- upvalues: BeduiDataTypeInterface (copy), t (copy), validateStepId (copy)
+	if t3 == nil then
+		return false, "Bedui data is nil"
+	end
+
+	local v16 = BeduiDataTypeInterface
+
+	if not t.interface(v16)(t3) then
+		return false, "Bedui data does not conform to the expected structure"
+	end
+
+	return validateStepId(t3)
+end
+
+return validateBeduiData

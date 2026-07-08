@@ -1,8 +1,10 @@
-local _ = require(script.Parent.AnalyticsTypes);
-local v1 = require(script.getSessionIdByKey);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    return {
-        getSessionIdByKey = v1(v2)
-    };
-end;
+require(script.Parent.AnalyticsTypes)
+
+local getSessionIdByKey = require(script.getSessionIdByKey)
+
+return function(p1) -- line: 4
+	-- upvalues: getSessionIdByKey (copy)
+	return {
+		getSessionIdByKey = getSessionIdByKey(p1)
+	}
+end

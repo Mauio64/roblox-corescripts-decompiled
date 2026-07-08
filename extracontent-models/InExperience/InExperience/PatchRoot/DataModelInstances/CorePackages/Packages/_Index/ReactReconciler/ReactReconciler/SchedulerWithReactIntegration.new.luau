@@ -1,234 +1,281 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local _ = require(script.Parent.ReactInternalTypes);
-local v4 = require(l_Parent_0.Scheduler);
-local l_decoupleUpdatePriorityFromScheduler_0 = require(l_Parent_0.Shared).ReactFeatureFlags.decoupleUpdatePriorityFromScheduler;
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_describeError_0 = require(l_Parent_0.Shared).describeError;
-local v8 = require(script.Parent.ReactFiberLane);
-local l_SyncLanePriority_0 = v8.SyncLanePriority;
-local l_getCurrentUpdateLanePriority_0 = v8.getCurrentUpdateLanePriority;
-local l_setCurrentUpdateLanePriority_0 = v8.setCurrentUpdateLanePriority;
-local l_unstable_runWithPriority_0 = v4.unstable_runWithPriority;
-local l_unstable_scheduleCallback_0 = v4.unstable_scheduleCallback;
-local l_unstable_cancelCallback_0 = v4.unstable_cancelCallback;
-local l_unstable_shouldYield_0 = v4.unstable_shouldYield;
-local l_unstable_requestPaint_0 = v4.unstable_requestPaint;
-local l_unstable_now_0 = v4.unstable_now;
-local l_unstable_getCurrentPriorityLevel_0 = v4.unstable_getCurrentPriorityLevel;
-local l_unstable_ImmediatePriority_0 = v4.unstable_ImmediatePriority;
-local l_unstable_UserBlockingPriority_0 = v4.unstable_UserBlockingPriority;
-local l_unstable_NormalPriority_0 = v4.unstable_NormalPriority;
-local l_unstable_LowPriority_0 = v4.unstable_LowPriority;
-local l_unstable_IdlePriority_0 = v4.unstable_IdlePriority;
-local v24 = require(script.Parent["ReactFiberSchedulerPriorities.roblox"]);
-local l_ImmediatePriority_0 = v24.ImmediatePriority;
-local l_UserBlockingPriority_0 = v24.UserBlockingPriority;
-local l_NormalPriority_0 = v24.NormalPriority;
-local l_LowPriority_0 = v24.LowPriority;
-local l_IdlePriority_0 = v24.IdlePriority;
-local l_NoPriority_0 = v24.NoPriority;
-local v31 = nil;
-local v32 = {};
-local v33 = nil;
-v33 = if l_unstable_requestPaint_0 ~= nil then l_unstable_requestPaint_0 else function() --[[ Line: 94 ]]
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local Array = require(ParentParent.LuauPolyfill).Array
 
-end;
-local v34 = nil;
-local v35 = nil;
-local v36 = false;
-local v37 = l_unstable_now_0();
-local function v38() --[[ Line: 118 ]] --[[ Name: now ]]
-    -- upvalues: l_unstable_now_0 (copy), v37 (copy)
-    return l_unstable_now_0() - v37;
-end;
-local function v40() --[[ Line: 122 ]] --[[ Name: getCurrentPriorityLevel ]]
-    -- upvalues: l_unstable_getCurrentPriorityLevel_0 (copy), l_unstable_ImmediatePriority_0 (copy), l_ImmediatePriority_0 (copy), l_unstable_UserBlockingPriority_0 (copy), l_UserBlockingPriority_0 (copy), l_unstable_NormalPriority_0 (copy), l_NormalPriority_0 (copy), l_unstable_LowPriority_0 (copy), l_LowPriority_0 (copy), l_unstable_IdlePriority_0 (copy), l_IdlePriority_0 (copy), l_invariant_0 (copy), l_NoPriority_0 (copy)
-    local v39 = l_unstable_getCurrentPriorityLevel_0();
-    if v39 == l_unstable_ImmediatePriority_0 then
-        return l_ImmediatePriority_0;
-    elseif v39 == l_unstable_UserBlockingPriority_0 then
-        return l_UserBlockingPriority_0;
-    elseif v39 == l_unstable_NormalPriority_0 then
-        return l_NormalPriority_0;
-    elseif v39 == l_unstable_LowPriority_0 then
-        return l_LowPriority_0;
-    elseif v39 == l_unstable_IdlePriority_0 then
-        return l_IdlePriority_0;
-    else
-        l_invariant_0(false, "Unknown priority level.");
-        return l_NoPriority_0;
-    end;
-end;
-reactPriorityToSchedulerPriority = function(v41) --[[ Line: 141 ]] --[[ Name: reactPriorityToSchedulerPriority ]]
-    -- upvalues: l_ImmediatePriority_0 (copy), l_unstable_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_unstable_UserBlockingPriority_0 (copy), l_NormalPriority_0 (copy), l_unstable_NormalPriority_0 (copy), l_LowPriority_0 (copy), l_unstable_LowPriority_0 (copy), l_IdlePriority_0 (copy), l_unstable_IdlePriority_0 (copy), l_invariant_0 (copy)
-    if v41 == l_ImmediatePriority_0 then
-        return l_unstable_ImmediatePriority_0;
-    elseif v41 == l_UserBlockingPriority_0 then
-        return l_unstable_UserBlockingPriority_0;
-    elseif v41 == l_NormalPriority_0 then
-        return l_unstable_NormalPriority_0;
-    elseif v41 == l_LowPriority_0 then
-        return l_unstable_LowPriority_0;
-    elseif v41 == l_IdlePriority_0 then
-        return l_unstable_IdlePriority_0;
-    else
-        l_invariant_0(false, "Unknown priority level.");
-        return nil;
-    end;
-end;
-local function v45(v42, v43) --[[ Line: 160 ]] --[[ Name: runWithPriority ]]
-    -- upvalues: l_unstable_runWithPriority_0 (copy)
-    local v44 = reactPriorityToSchedulerPriority(v42);
-    return l_unstable_runWithPriority_0(v44, v43);
-end;
-local function v50(v46, v47, v48) --[[ Line: 168 ]] --[[ Name: scheduleCallback ]]
-    -- upvalues: l_unstable_scheduleCallback_0 (copy)
-    local v49 = reactPriorityToSchedulerPriority(v46);
-    return l_unstable_scheduleCallback_0(v49, v47, v48);
-end;
-local function v52(v51) --[[ Line: 177 ]] --[[ Name: scheduleSyncCallback ]]
-    -- upvalues: v34 (ref), v35 (ref), l_unstable_scheduleCallback_0 (copy), l_unstable_ImmediatePriority_0 (copy), v31 (ref), v32 (copy)
-    if v34 == nil then
-        v34 = {
-            v51
-        };
-        v35 = l_unstable_scheduleCallback_0(l_unstable_ImmediatePriority_0, v31);
-    else
-        table.insert(v34, v51);
-    end;
-    return v32;
-end;
-local function v54(v53) --[[ Line: 196 ]] --[[ Name: cancelCallback ]]
-    -- upvalues: v32 (copy), l_unstable_cancelCallback_0 (copy)
-    if v53 ~= v32 then
-        l_unstable_cancelCallback_0(v53);
-    end;
-end;
-local function v56() --[[ Line: 202 ]] --[[ Name: flushSyncCallbackQueue ]]
-    -- upvalues: v35 (ref), l_unstable_cancelCallback_0 (copy), v31 (ref)
-    if v35 ~= nil then
-        local l_v35_0 = v35;
-        v35 = nil;
-        l_unstable_cancelCallback_0(l_v35_0);
-    end;
-    return v31();
-end;
-v31 = function() --[[ Line: 211 ]]
-    -- upvalues: v36 (ref), v34 (ref), l_decoupleUpdatePriorityFromScheduler_0 (copy), l_getCurrentUpdateLanePriority_0 (copy), v1 (copy), l_setCurrentUpdateLanePriority_0 (copy), l_SyncLanePriority_0 (copy), v45 (copy), l_describeError_0 (copy), l_ImmediatePriority_0 (copy), l_unstable_runWithPriority_0 (copy), l_Array_0 (copy), l_unstable_scheduleCallback_0 (copy), l_unstable_ImmediatePriority_0 (copy), v56 (copy)
-    if not v36 and v34 ~= nil then
-        v36 = true;
-        local v57 = 1;
-        if l_decoupleUpdatePriorityFromScheduler_0 then
-            local v58 = l_getCurrentUpdateLanePriority_0();
-            local v59 = true;
-            local v60 = nil;
-            if not v1.__YOLO__ then
-                local l_v34_0 = v34;
-                l_setCurrentUpdateLanePriority_0(l_SyncLanePriority_0);
-                local v64, v65 = xpcall(v45, l_describeError_0, l_ImmediatePriority_0, function() --[[ Line: 232 ]]
-                    -- upvalues: l_v34_0 (copy), v57 (ref)
-                    for v62, v63 in l_v34_0 do
-                        v57 = v62;
-                        repeat
-                            v63 = v63(true);
-                        until v63 == nil;
-                    end;
-                end);
-                v59 = v64;
-                v60 = v65;
-                v34 = nil;
-            else
-                v59 = true;
-                local l_v34_1 = v34;
-                l_setCurrentUpdateLanePriority_0(l_SyncLanePriority_0);
-                local l_l_ImmediatePriority_0_0 = l_ImmediatePriority_0;
-                local function v70() --[[ Line: 250 ]]
-                    -- upvalues: l_v34_1 (copy), v57 (ref)
-                    for v68, v69 in l_v34_1 do
-                        v57 = v68;
-                        repeat
-                            v69 = v69(true);
-                        until v69 == nil;
-                        v57 = v57 + 1;
-                    end;
-                end;
-                local v71 = reactPriorityToSchedulerPriority(l_l_ImmediatePriority_0_0);
-                local _ = l_unstable_runWithPriority_0(v71, v70);
-                v34 = nil;
-            end;
-            l_setCurrentUpdateLanePriority_0(v58);
-            v36 = false;
-            if not v59 then
-                if v34 ~= nil then
-                    v34 = l_Array_0.slice(v34, v57 + 1);
-                end;
-                l_unstable_scheduleCallback_0(l_unstable_ImmediatePriority_0, v56);
-                error(v60);
-            end;
-        else
-            local v73 = nil;
-            local v74 = nil;
-            if not v1.__YOLO__ then
-                local l_v34_2 = v34;
-                local v78, v79 = xpcall(v45, l_describeError_0, l_ImmediatePriority_0, function() --[[ Line: 292 ]]
-                    -- upvalues: l_v34_2 (copy), v57 (ref)
-                    for v76, v77 in l_v34_2 do
-                        v57 = v76;
-                        repeat
-                            v77 = v77(true);
-                        until v77 == nil;
-                    end;
-                end);
-                v73 = v78;
-                v74 = v79;
-                v34 = nil;
-            else
-                v73 = true;
-                local l_v34_3 = v34;
-                local l_l_ImmediatePriority_0_1 = l_ImmediatePriority_0;
-                local function v84() --[[ Line: 308 ]]
-                    -- upvalues: l_v34_3 (copy), v57 (ref)
-                    for v82, v83 in l_v34_3 do
-                        v57 = v82;
-                        repeat
-                            v83 = v83(true);
-                        until v83 == nil;
-                    end;
-                end;
-                local v85 = reactPriorityToSchedulerPriority(l_l_ImmediatePriority_0_1);
-                local _ = l_unstable_runWithPriority_0(v85, v84);
-                v34 = nil;
-            end;
-            v36 = false;
-            if not v73 then
-                if v34 ~= nil then
-                    v34 = l_Array_0.slice(v34, v57 + 1);
-                end;
-                l_unstable_scheduleCallback_0(l_unstable_ImmediatePriority_0, v56);
-                error(v74);
-            end;
-        end;
-        return true;
-    else
-        return false;
-    end;
-end;
+require(script.Parent.ReactInternalTypes)
+
+local Scheduler = require(ParentParent.Scheduler)
+local decoupleUpdatePriorityFromScheduler = require(ParentParent.Shared).ReactFeatureFlags.decoupleUpdatePriorityFromScheduler
+local invariant = require(ParentParent.Shared).invariant
+local describeError = require(ParentParent.Shared).describeError
+local ReactFiberLane = require(script.Parent.ReactFiberLane)
+local SyncLanePriority = ReactFiberLane.SyncLanePriority
+local getCurrentUpdateLanePriority = ReactFiberLane.getCurrentUpdateLanePriority
+local setCurrentUpdateLanePriority = ReactFiberLane.setCurrentUpdateLanePriority
+local unstable_runWithPriority = Scheduler.unstable_runWithPriority
+local unstable_scheduleCallback = Scheduler.unstable_scheduleCallback
+local unstable_cancelCallback = Scheduler.unstable_cancelCallback
+local unstable_shouldYield = Scheduler.unstable_shouldYield
+local unstable_requestPaint = Scheduler.unstable_requestPaint
+local unstable_now = Scheduler.unstable_now
+local unstable_getCurrentPriorityLevel = Scheduler.unstable_getCurrentPriorityLevel
+local unstable_ImmediatePriority = Scheduler.unstable_ImmediatePriority
+local unstable_UserBlockingPriority = Scheduler.unstable_UserBlockingPriority
+local unstable_NormalPriority = Scheduler.unstable_NormalPriority
+local unstable_LowPriority = Scheduler.unstable_LowPriority
+local unstable_IdlePriority = Scheduler.unstable_IdlePriority
+local lib = require(script.Parent["ReactFiberSchedulerPriorities.roblox"])
+local ImmediatePriority = lib.ImmediatePriority
+local UserBlockingPriority = lib.UserBlockingPriority
+local NormalPriority = lib.NormalPriority
+local LowPriority = lib.LowPriority
+local IdlePriority = lib.IdlePriority
+local NoPriority = lib.NoPriority
+local u31 = nil
+local t1 = {}
+local v33 = unstable_requestPaint == nil and function() -- line: 94
+end or unstable_requestPaint
+local u34 = nil
+local u35 = nil
+local u36 = false
+local v37 = unstable_now()
+
+function reactPriorityToSchedulerPriority(p1) -- line: 141
+	-- upvalues: ImmediatePriority (copy), unstable_ImmediatePriority (copy), UserBlockingPriority (copy), unstable_UserBlockingPriority (copy), NormalPriority (copy), unstable_NormalPriority (copy), LowPriority (copy), unstable_LowPriority (copy), IdlePriority (copy), unstable_IdlePriority (copy), invariant (copy)
+	if p1 == ImmediatePriority then
+		return unstable_ImmediatePriority
+	end
+
+	if p1 == UserBlockingPriority then
+		return unstable_UserBlockingPriority
+	end
+
+	if p1 == NormalPriority then
+		return unstable_NormalPriority
+	end
+
+	if p1 == LowPriority then
+		return unstable_LowPriority
+	end
+
+	if p1 == IdlePriority then
+		return unstable_IdlePriority
+	end
+
+	invariant(false, "Unknown priority level.")
+
+	return nil
+end
+
+local function runWithPriority(p2, p3: ((...any) -> ...any)) -- line: 160
+	-- upvalues: unstable_runWithPriority (copy)
+	local v44 = reactPriorityToSchedulerPriority(p2)
+
+	return unstable_runWithPriority(v44, p3)
+end
+local function flushSyncCallbackQueue() -- line: 202
+	-- upvalues: u35 (ref), unstable_cancelCallback (copy), u31 (ref)
+	if u35 ~= nil then
+		local v51 = u35
+
+		u35 = nil
+		unstable_cancelCallback(v51)
+	end
+
+	return u31()
+end
+
+function u31() -- line: 211
+	-- upvalues: u36 (ref), u34 (ref), decoupleUpdatePriorityFromScheduler (copy), getCurrentUpdateLanePriority (copy), ReactGlobals (copy), setCurrentUpdateLanePriority (copy), SyncLanePriority (copy), runWithPriority (copy), describeError (copy), ImmediatePriority (copy), unstable_runWithPriority (copy), Array (copy), unstable_scheduleCallback (copy), unstable_ImmediatePriority (copy), flushSyncCallbackQueue (copy)
+	if not u36 and u34 ~= nil then
+		u36 = true
+
+		local n1 = 1
+
+		if decoupleUpdatePriorityFromScheduler then
+			local v53 = getCurrentUpdateLanePriority()
+			local result = nil
+			local ok
+
+			if not ReactGlobals.__YOLO__ then
+				local v55 = u34
+
+				setCurrentUpdateLanePriority(SyncLanePriority)
+				ok, result = xpcall(runWithPriority, describeError, ImmediatePriority, function() -- line: 232
+					-- upvalues: v55 (copy), n1 (ref)
+					for v66, v67 in v55 do
+						local v68 = v67
+
+						n1 = v66
+
+						repeat
+							v68 = v68(true)
+						until v68 == nil
+					end
+				end)
+				u34 = nil
+			else
+				ok = true
+
+				local v57 = u34
+
+				setCurrentUpdateLanePriority(SyncLanePriority)
+
+				local v58 = ImmediatePriority
+				local v59 = reactPriorityToSchedulerPriority(v58)
+
+				unstable_runWithPriority(v59, function() -- line: 250
+					-- upvalues: v57 (copy), n1 (ref)
+					for v69, v70 in v57 do
+						local v71 = v70
+
+						n1 = v69
+
+						repeat
+							v71 = v71(true)
+						until v71 == nil
+
+						n1 += 1
+					end
+				end)
+				u34 = nil
+			end
+
+			setCurrentUpdateLanePriority(v53)
+			u36 = false
+
+			if not ok then
+				if u34 ~= nil then
+					u34 = Array.slice(u34, n1 + 1)
+				end
+
+				unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
+				error(result)
+			end
+		else
+			local result = nil
+			local ok
+
+			if not ReactGlobals.__YOLO__ then
+				local v61 = u34
+
+				ok, result = xpcall(runWithPriority, describeError, ImmediatePriority, function() -- line: 292
+					-- upvalues: v61 (copy), n1 (ref)
+					for v72, v73 in v61 do
+						local v74 = v73
+
+						n1 = v72
+
+						repeat
+							v74 = v74(true)
+						until v74 == nil
+					end
+				end)
+				u34 = nil
+			else
+				ok = true
+
+				local v63 = u34
+				local v64 = ImmediatePriority
+				local v65 = reactPriorityToSchedulerPriority(v64)
+
+				unstable_runWithPriority(v65, function() -- line: 308
+					-- upvalues: v63 (copy), n1 (ref)
+					for v75, v76 in v63 do
+						local v77 = v76
+
+						n1 = v75
+
+						repeat
+							v77 = v77(true)
+						until v77 == nil
+					end
+				end)
+				u34 = nil
+			end
+
+			u36 = false
+
+			if not ok then
+				if u34 ~= nil then
+					u34 = Array.slice(u34, n1 + 1)
+				end
+
+				unstable_scheduleCallback(unstable_ImmediatePriority, flushSyncCallbackQueue)
+				error(result)
+			end
+		end
+
+		return true
+	end
+
+	return false
+end
+
 return {
-    ImmediatePriority = l_ImmediatePriority_0, 
-    UserBlockingPriority = l_UserBlockingPriority_0, 
-    NormalPriority = l_NormalPriority_0, 
-    LowPriority = l_LowPriority_0, 
-    IdlePriority = l_IdlePriority_0, 
-    NoPriority = l_NoPriority_0, 
-    getCurrentPriorityLevel = v40, 
-    flushSyncCallbackQueue = v56, 
-    runWithPriority = v45, 
-    scheduleCallback = v50, 
-    scheduleSyncCallback = v52, 
-    cancelCallback = v54, 
-    now = v38, 
-    requestPaint = v33, 
-    shouldYield = l_unstable_shouldYield_0
-};
+	ImmediatePriority = ImmediatePriority,
+	UserBlockingPriority = UserBlockingPriority,
+	NormalPriority = NormalPriority,
+	LowPriority = LowPriority,
+	IdlePriority = IdlePriority,
+	NoPriority = NoPriority,
+	getCurrentPriorityLevel = function() -- line: 122
+		-- upvalues: unstable_getCurrentPriorityLevel (copy), unstable_ImmediatePriority (copy), ImmediatePriority (copy), unstable_UserBlockingPriority (copy), UserBlockingPriority (copy), unstable_NormalPriority (copy), NormalPriority (copy), unstable_LowPriority (copy), LowPriority (copy), unstable_IdlePriority (copy), IdlePriority (copy), invariant (copy), NoPriority (copy)
+		local v40 = unstable_getCurrentPriorityLevel()
+
+		if v40 == unstable_ImmediatePriority then
+			return ImmediatePriority
+		end
+
+		if v40 == unstable_UserBlockingPriority then
+			return UserBlockingPriority
+		end
+
+		if v40 == unstable_NormalPriority then
+			return NormalPriority
+		end
+
+		if v40 == unstable_LowPriority then
+			return LowPriority
+		end
+
+		if v40 == unstable_IdlePriority then
+			return IdlePriority
+		end
+
+		invariant(false, "Unknown priority level.")
+
+		return NoPriority
+	end,
+	flushSyncCallbackQueue = flushSyncCallbackQueue,
+	runWithPriority = runWithPriority,
+	scheduleCallback = function(p4, p5: ((...any) -> ...any), t2: {[any]: any}?) -- line: 168
+		-- upvalues: unstable_scheduleCallback (copy)
+		local v48 = reactPriorityToSchedulerPriority(p4)
+
+		return unstable_scheduleCallback(v48, p5, t2)
+	end,
+	scheduleSyncCallback = function(p6: ((...any) -> ...any)) -- line: 177
+		-- upvalues: u34 (ref), u35 (ref), unstable_scheduleCallback (copy), unstable_ImmediatePriority (copy), u31 (ref), t1 (copy)
+		if u34 == nil then
+			u34 = { p6 }
+			u35 = unstable_scheduleCallback(unstable_ImmediatePriority, u31)
+		else
+			table.insert(u34, p6)
+		end
+
+		return t1
+	end,
+	cancelCallback = function(p7) -- line: 196
+		-- upvalues: t1 (copy), unstable_cancelCallback (copy)
+		if p7 ~= t1 then
+			unstable_cancelCallback(p7)
+		end
+	end,
+	now = function() -- line: 118
+		-- upvalues: unstable_now (copy), v37 (copy)
+		return unstable_now() - v37
+	end,
+	requestPaint = v33,
+	shouldYield = unstable_shouldYield
+}

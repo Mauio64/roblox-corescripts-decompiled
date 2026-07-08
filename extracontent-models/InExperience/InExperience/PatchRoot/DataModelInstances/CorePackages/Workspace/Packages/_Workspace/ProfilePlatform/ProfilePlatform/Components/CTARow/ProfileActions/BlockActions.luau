@@ -33,14 +33,14 @@ return {
 					p1.navigation.push(AppPage.BlockingModal, {
 						navProps = {
 							userId = p1.profileId,
-							onBlockSuccess = function() --[[ onBlockSuccess ]] -- line: 38
+							onBlockSuccess = function() -- line: 38
 								-- upvalues: p1 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 								p1.dispatch(SetCurrentToastMessage({
+									isLocalized = true,
 									toastMessage = p1.localized.userBlockedToast,
-									toastIcon = Images["icons/actions/block"],
-									isLocalized = true
+									toastIcon = Images["icons/actions/block"]
 								}))
-								p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId))
+								p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId, p1.actionsComponentRequest))
 							end
 						}
 					})
@@ -48,13 +48,13 @@ return {
 			}
 		}
 	end,
-	[Enums.ProfileActions.Unblock] = function(p2) -- line: 54
+	[Enums.ProfileActions.Unblock] = function(p2) -- line: 56
 		-- upvalues: ButtonVariant (copy), Enums (copy), ProfileTypes (copy), EventNames (copy), myUserBlockingNetworking (copy), refreshProfilePlatformActionInfo (copy), USER_BLOCKING_ERRORS (copy), SetCurrentToastMessage (copy), FFlagProfilePlatformEnableBlockedOnPlatformUnblockErrorMessage (copy)
 		return {
 			variant = ButtonVariant.Standard,
 			text = p2.localized[Enums.ProfileActions.Unblock],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 59
+				[ProfileTypes.User] = function() -- line: 61
 					-- upvalues: p2 (copy), EventNames (copy), myUserBlockingNetworking (copy), refreshProfilePlatformActionInfo (copy), USER_BLOCKING_ERRORS (copy), SetCurrentToastMessage (copy), FFlagProfilePlatformEnableBlockedOnPlatformUnblockErrorMessage (copy)
 					p2.analytics.fireAnalyticsEvent(EventNames.CTAButtonUnblock, {
 						buttonSurface = p2.buttonSurface
@@ -63,15 +63,15 @@ return {
 					return p2.dispatch(myUserBlockingNetworking.UnblockUserById.API({
 						userId = p2.profileId,
 						currentUserId = p2.localUserId
-					})):andThen(function() -- line: 68
+					})):andThen(function() -- line: 70
 						-- upvalues: p2 (copy), refreshProfilePlatformActionInfo (copy)
-						return p2.dispatch(refreshProfilePlatformActionInfo(p2.profileId))
-					end):catch(function(p3) -- line: 71
+						return p2.dispatch(refreshProfilePlatformActionInfo(p2.profileId, p2.actionsComponentRequest))
+					end):catch(function(p3) -- line: 75
 						-- upvalues: USER_BLOCKING_ERRORS (copy), p2 (copy), SetCurrentToastMessage (copy), FFlagProfilePlatformEnableBlockedOnPlatformUnblockErrorMessage (copy)
 						if p3 ~= nil and tonumber(p3.Body) == USER_BLOCKING_ERRORS.PARENT_BLOCKED_TARGET_USER_ERROR then
 							p2.dispatch(SetCurrentToastMessage({
-								toastMessage = p2.localized.unblockTargetParentManagedToast,
-								isLocalized = true
+								isLocalized = true,
+								toastMessage = p2.localized.unblockTargetParentManagedToast
 							}))
 
 							return
@@ -79,8 +79,8 @@ return {
 
 						if p3 ~= nil and tonumber(p3.Body) == USER_BLOCKING_ERRORS.UNBLOCK_TARGET_NOT_BLOCKED_ERROR then
 							p2.dispatch(SetCurrentToastMessage({
-								toastMessage = p2.localized.unblockTargetNotBlockedToast,
-								isLocalized = true
+								isLocalized = true,
+								toastMessage = p2.localized.unblockTargetNotBlockedToast
 							}))
 
 							return
@@ -88,16 +88,16 @@ return {
 
 						if FFlagProfilePlatformEnableBlockedOnPlatformUnblockErrorMessage and p3 ~= nil and tonumber(p3.Body) == USER_BLOCKING_ERRORS.UNBLOCK_TARGET_BLOCKED_ON_PLATFORM then
 							p2.dispatch(SetCurrentToastMessage({
-								toastMessage = p2.localized.blockedOnPlatformToast,
-								isLocalized = true
+								isLocalized = true,
+								toastMessage = p2.localized.blockedOnPlatformToast
 							}))
 
 							return
 						end
 
 						p2.dispatch(SetCurrentToastMessage({
-							toastMessage = p2.localized.somethingIsWrongToast,
-							isLocalized = true
+							isLocalized = true,
+							toastMessage = p2.localized.somethingIsWrongToast
 						}))
 					end)
 				end

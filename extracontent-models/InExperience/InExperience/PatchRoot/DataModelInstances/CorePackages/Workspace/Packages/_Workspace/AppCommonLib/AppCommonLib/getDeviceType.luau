@@ -1,33 +1,43 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("AppCommonLib").Parent;
-local v3 = require(script.Parent.IsVRAppBuild);
-local v4 = require(l_Parent_0.RobloxAppEnums);
-local l_DeviceOrientationMode_0 = v4.DeviceOrientationMode;
-local l_DeviceType_0 = v4.DeviceType;
-return function(v7) --[[ Line: 16 ]] --[[ Name: getDeviceType ]]
-    -- upvalues: v3 (copy), l_DeviceType_0 (copy), l_GuiService_0 (copy), l_UserInputService_0 (copy), l_DeviceOrientationMode_0 (copy)
-    if v3() then
-        return l_DeviceType_0.VR;
-    elseif l_GuiService_0:IsTenFootInterface() then
-        return l_DeviceType_0.Console;
-    else
-        local l_None_0 = Enum.Platform.None;
-        pcall(function() --[[ Line: 26 ]]
-            -- upvalues: l_None_0 (ref), l_UserInputService_0 (ref)
-            l_None_0 = l_UserInputService_0:GetPlatform();
-        end);
-        if l_None_0 == Enum.Platform.Windows or l_None_0 == Enum.Platform.OSX or l_None_0 == Enum.Platform.UWP then
-            return l_DeviceType_0.Desktop;
-        else
-            if l_None_0 == Enum.Platform.IOS or l_None_0 == Enum.Platform.Android then
-                if v7 == l_DeviceOrientationMode_0.Landscape then
-                    return l_DeviceType_0.Tablet;
-                elseif v7 == l_DeviceOrientationMode_0.Portrait then
-                    return l_DeviceType_0.Phone;
-                end;
-            end;
-            return l_DeviceType_0.Unknown;
-        end;
-    end;
-end;
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("AppCommonLib").Parent
+local IsVRAppBuild = require(script.Parent.IsVRAppBuild)
+local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local DeviceOrientationMode = RobloxAppEnums.DeviceOrientationMode
+local DeviceType = RobloxAppEnums.DeviceType
+
+local function getDeviceType(p1) -- line: 16
+	-- upvalues: IsVRAppBuild (copy), DeviceType (copy), GuiService (copy), UserInputService (copy), DeviceOrientationMode (copy)
+	if IsVRAppBuild() then
+		return DeviceType.VR
+	end
+
+	if GuiService:IsTenFootInterface() then
+		return DeviceType.Console
+	end
+
+	local None = Enum.Platform.None
+
+	pcall(function() -- line: 26
+		-- upvalues: None (ref), UserInputService (copy)
+		None = UserInputService:GetPlatform()
+	end)
+
+	if None == Enum.Platform.Windows or None == Enum.Platform.OSX or None == Enum.Platform.UWP then
+		return DeviceType.Desktop
+	end
+
+	if None == Enum.Platform.IOS or None == Enum.Platform.Android then
+		if p1 == DeviceOrientationMode.Landscape then
+			return DeviceType.Tablet
+		end
+
+		if p1 == DeviceOrientationMode.Portrait then
+			return DeviceType.Phone
+		end
+	end
+
+	return DeviceType.Unknown
+end
+
+return getDeviceType

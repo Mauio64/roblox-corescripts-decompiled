@@ -1,28 +1,30 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Packages");
-local v2 = require(l_script_FirstAncestor_0.Dev.Rhodium);
-local v3 = require(l_script_FirstAncestor_0.Roact);
-local l_Element_0 = v2.Element;
-local l_XPath_0 = v2.XPath;
-local v6 = require(script.Parent.Parent.UnitTestHelpers.mockStyle);
-return function(v7) --[[ Line: 11 ]]
-    -- upvalues: v3 (copy), v6 (copy), l_CoreGui_0 (copy), l_XPath_0 (copy), l_Element_0 (copy)
-    local v8 = false;
-    local v9 = v3.createElement("ScreenGui", {}, {
-        buttonElement = v3.createElement(v7, {
-            onActivated = function() --[[ Line: 16 ]] --[[ Name: onActivated ]]
-                -- upvalues: v8 (ref)
-                v8 = true;
-            end
-        })
-    });
-    local v10 = v6(v9);
-    local v11 = v3.mount(v10, l_CoreGui_0, "TestRoot");
-    local v12 = l_XPath_0.new("game.CoreGui.Children.buttonElement");
-    local v13 = l_Element_0.new(v12);
-    assert(v13:getRbxInstance() ~= nil, "button was nil");
-    v13:click();
-    wait(0);
-    assert(v8 == true, "button was not activated");
-    v3.unmount(v11);
-end;
+local CoreGui = game:GetService("CoreGui")
+local Packages = script:FindFirstAncestor("Packages")
+local Rhodium = require(Packages.Dev.Rhodium)
+local Roact = require(Packages.Roact)
+local Element = Rhodium.Element
+local XPath = Rhodium.XPath
+local mockStyle = require(script.Parent.Parent.UnitTestHelpers.mockStyle)
+
+return function(p1) -- line: 11
+	-- upvalues: Roact (copy), mockStyle (copy), CoreGui (copy), XPath (copy), Element (copy)
+	local u9 = false
+	local v10 = Roact.createElement("ScreenGui", {}, {
+		buttonElement = Roact.createElement(p1, {
+			onActivated = function() -- line: 16
+				-- upvalues: u9 (ref)
+				u9 = true
+			end
+		})
+	})
+	local v11 = mockStyle(v10)
+	local v12 = Roact.mount(v11, CoreGui, "TestRoot")
+	local v13 = XPath.new("game.CoreGui.Children.buttonElement")
+	local v14 = Element.new(v13)
+
+	assert(v14:getRbxInstance() ~= nil, "button was nil")
+	v14:click()
+	wait(0)
+	assert(u9 == true, "button was not activated")
+	Roact.unmount(v12)
+end

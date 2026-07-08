@@ -1,52 +1,63 @@
-local l_Parent_0 = script:FindFirstAncestor("Hooks").Parent;
-local v1 = require(l_Parent_0.Parent.React);
-local v2 = require(l_Parent_0.Utils.Highlighter.Theme);
-local _ = require(l_Parent_0.Types);
-local v4 = require(l_Parent_0.Utils.isCli);
-return function() --[[ Line: 8 ]] --[[ Name: useStudioThemeColors ]]
-    -- upvalues: v1 (copy), v2 (copy), v4 (copy)
-    local v5, v6 = v1.useState(v2.defaultColors);
-    v1.useEffect(function() --[[ Line: 11 ]]
-        -- upvalues: v4 (ref), v2 (ref), v6 (copy)
-        local function v9() --[[ Line: 12 ]] --[[ Name: getTokens ]]
-            -- upvalues: v4 (ref), v2 (ref)
-            if v4() then
-                return v2.defaultColors;
-            else
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 17 ]]
-                    return settings().Studio.Theme;
-                end);
-                if not l_status_0 then
-                    return {};
-                else
-                    return {
-                        background = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptBackground), 
-                        iden = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptText), 
-                        keyword = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptKeyword), 
-                        builtin = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptBuiltInFunction), 
-                        string = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptString), 
-                        number = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptNumber), 
-                        comment = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptComment), 
-                        operator = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptOperator), 
-                        custom = l_result_0:GetColor(Enum.StudioStyleGuideColor.ScriptBool)
-                    };
-                end;
-            end;
-        end;
-        v6((v9()));
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 40 ]]
-            -- upvalues: v6 (ref), v9 (copy)
-            return settings().Studio.ThemeChanged:Connect(function() --[[ Line: 41 ]]
-                -- upvalues: v6 (ref), v9 (ref)
-                v6((v9()));
-            end);
-        end);
-        return function() --[[ Line: 46 ]]
-            -- upvalues: l_status_1 (copy), l_result_1 (copy)
-            if l_status_1 and l_result_1 then
-                l_result_1:Disconnect();
-            end;
-        end;
-    end, {});
-    return v5;
-end;
+local Parent = script:FindFirstAncestor("Hooks").Parent
+local React = require(Parent.Parent.React)
+local Theme = require(Parent.Utils.Highlighter.Theme)
+
+require(Parent.Types)
+
+local isCli = require(Parent.Utils.isCli)
+
+local function useStudioThemeColors() -- line: 8
+	-- upvalues: React (copy), Theme (copy), isCli (copy)
+	local v6, v7 = React.useState(Theme.defaultColors)
+
+	React.useEffect(function() -- line: 11
+		-- upvalues: isCli (copy), Theme (copy), v7 (copy)
+		local function getTokens() -- line: 12
+			-- upvalues: isCli (copy), Theme (copy)
+			if isCli() then
+				return Theme.defaultColors
+			end
+
+			local ok, result = pcall(function() -- line: 17
+				return settings().Studio.Theme
+			end)
+
+			if not ok then
+				return {}
+			end
+
+			return {
+				background = result:GetColor(Enum.StudioStyleGuideColor.ScriptBackground),
+				iden = result:GetColor(Enum.StudioStyleGuideColor.ScriptText),
+				keyword = result:GetColor(Enum.StudioStyleGuideColor.ScriptKeyword),
+				builtin = result:GetColor(Enum.StudioStyleGuideColor.ScriptBuiltInFunction),
+				string = result:GetColor(Enum.StudioStyleGuideColor.ScriptString),
+				number = result:GetColor(Enum.StudioStyleGuideColor.ScriptNumber),
+				comment = result:GetColor(Enum.StudioStyleGuideColor.ScriptComment),
+				operator = result:GetColor(Enum.StudioStyleGuideColor.ScriptOperator),
+				custom = result:GetColor(Enum.StudioStyleGuideColor.ScriptBool)
+			}
+		end
+
+		v7((getTokens()))
+
+		local ok, result = pcall(function() -- line: 40
+			-- upvalues: v7 (copy), getTokens (copy)
+			return settings().Studio.ThemeChanged:Connect(function() -- line: 41
+				-- upvalues: v7 (copy), getTokens (copy)
+				v7((getTokens()))
+			end)
+		end)
+
+		return function() -- line: 46
+			-- upvalues: ok (copy), result (copy)
+			if ok and result then
+				result:Disconnect()
+			end
+		end
+	end, {})
+
+	return v6
+end
+
+return useStudioThemeColors

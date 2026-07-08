@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnablePeekViewStateOnMountParam", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnablePeekViewStateOnMountParam");
-end;
+game:DefineFastFlag("EnablePeekViewStateOnMountParam", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnablePeekViewStateOnMountParam")
+end

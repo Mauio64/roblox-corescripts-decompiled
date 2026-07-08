@@ -1,33 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VoiceChat");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_SharedFlags_0 = v1.SharedFlags;
-local l_default_0 = v1.LinkingProtocol.LinkingProtocol.default;
-local l_SettingsRoute_0 = v1.LinkingProtocol.Enums.SettingsRoute;
-local l_FFlagEnableRetryForLinkingProtocolFetch_0 = l_SharedFlags_0.FFlagEnableRetryForLinkingProtocolFetch;
-local l_FIntLinkingProtocolFetchRetries_0 = l_SharedFlags_0.FIntLinkingProtocolFetchRetries;
-local l_FIntLinkingProtocolFetchTimeoutMS_0 = l_SharedFlags_0.FIntLinkingProtocolFetchTimeoutMS;
-return function() --[[ Line: 20 ]]
-    -- upvalues: l_FFlagEnableRetryForLinkingProtocolFetch_0 (copy), l_FIntLinkingProtocolFetchRetries_0 (copy), l_default_0 (copy), l_SettingsRoute_0 (copy), l_FIntLinkingProtocolFetchTimeoutMS_0 (copy)
-    local v8 = false;
-    local v9 = false;
-    if l_FFlagEnableRetryForLinkingProtocolFetch_0 then
-        for _ = 0, l_FIntLinkingProtocolFetchRetries_0 do
-            local v13 = task.spawn(function() --[[ Line: 26 ]]
-                -- upvalues: v8 (ref), v9 (ref), l_default_0 (ref), l_SettingsRoute_0 (ref)
-                local v11, v12 = l_default_0:supportsSwitchToSettingsApp(l_SettingsRoute_0.Microphone):await();
-                v8 = v11;
-                v9 = v12;
-            end);
-            task.wait(l_FIntLinkingProtocolFetchTimeoutMS_0 / 1000);
-            task.cancel(v13);
-            if v9 ~= nil then
-                break;
-            end;
-        end;
-    else
-        local v14, v15 = l_default_0:supportsSwitchToSettingsApp(l_SettingsRoute_0.Microphone):await();
-        v8 = v14;
-        v9 = v15;
-    end;
-    return v8 and v9 == true;
-end;
+local VoiceChat = script:FindFirstAncestor("VoiceChat")
+local dependencies = require(VoiceChat.dependencies)
+local SharedFlags = dependencies.SharedFlags
+local default = dependencies.LinkingProtocol.LinkingProtocol.default
+local SettingsRoute = dependencies.LinkingProtocol.Enums.SettingsRoute
+local FFlagEnableRetryForLinkingProtocolFetch = SharedFlags.FFlagEnableRetryForLinkingProtocolFetch
+local FIntLinkingProtocolFetchRetries = SharedFlags.FIntLinkingProtocolFetchRetries
+local FIntLinkingProtocolFetchTimeoutMS = SharedFlags.FIntLinkingProtocolFetchTimeoutMS
+
+return function() -- line: 20
+	-- upvalues: FFlagEnableRetryForLinkingProtocolFetch (copy), FIntLinkingProtocolFetchRetries (copy), default (copy), SettingsRoute (copy), FIntLinkingProtocolFetchTimeoutMS (copy)
+	local u9 = false
+	local u10 = false
+
+	if FFlagEnableRetryForLinkingProtocolFetch then
+		for _ = 0, FIntLinkingProtocolFetchRetries do
+			local thread = task.spawn(function() -- line: 26
+				-- upvalues: u9 (ref), u10 (ref), default (copy), SettingsRoute (copy)
+				local v15, v16 = default:supportsSwitchToSettingsApp(SettingsRoute.Microphone):await()
+
+				u9 = v15
+				u10 = v16
+			end)
+
+			task.wait(FIntLinkingProtocolFetchTimeoutMS / 1000)
+			task.cancel(thread)
+
+			if u10 ~= nil then
+				break
+			end
+		end
+	else
+		local v13, v14 = default:supportsSwitchToSettingsApp(SettingsRoute.Microphone):await()
+
+		u9 = v13
+		u10 = v14
+	end
+
+	return u9 and u10 == true
+end

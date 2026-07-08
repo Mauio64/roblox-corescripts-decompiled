@@ -1,6 +1,6 @@
 return {
-    EditChatGroupNameDialog = "EditChatGroupNameDialog", 
-    LeaveGroupDialog = "LeaveGroupDialog", 
-    ParticipantDialog = "ParticipantDialog", 
-    RemoveUserDialog = "RemoveUserDialog"
-};
+	EditChatGroupNameDialog = "EditChatGroupNameDialog",
+	LeaveGroupDialog = "LeaveGroupDialog",
+	ParticipantDialog = "ParticipantDialog",
+	RemoveUserDialog = "RemoveUserDialog"
+}

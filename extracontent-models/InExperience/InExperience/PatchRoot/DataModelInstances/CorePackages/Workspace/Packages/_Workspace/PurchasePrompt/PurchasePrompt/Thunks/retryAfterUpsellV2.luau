@@ -1,145 +1,170 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local v1 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v2 = require(l_script_FirstAncestor_0.Actions.BalanceInfoRecieved);
-local v3 = require(l_script_FirstAncestor_0.Actions.PurchaseCompleteRecieved);
-local v4 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v5 = require(l_script_FirstAncestor_0.Actions.PromptNativeUpsellSuggestions);
-local _ = require(l_script_FirstAncestor_0.types);
-local v7 = require(l_script_FirstAncestor_0.Enums.PurchaseFlow);
-local v8 = require(l_script_FirstAncestor_0.Enums.UpsellFlow);
-local v9 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v10 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v11 = require(l_script_FirstAncestor_0.Enums.RequestType);
-local v12 = require(l_script_FirstAncestor_0.Enums.Counter);
-local v13 = require(l_script_FirstAncestor_0.Thunks.sendCounter);
-local _ = require(l_script_FirstAncestor_0.Models.RobuxUpsell);
-local v15 = require(l_script_FirstAncestor_0.Network.getRobuxUpsellSuggestions);
-local v16 = require(l_script_FirstAncestor_0.Network.getBalanceInfo);
-local v17 = require(l_script_FirstAncestor_0.Services.Network);
-local v18 = require(l_script_FirstAncestor_0.Services.Analytics);
-local v19 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v20 = require(l_script_FirstAncestor_0.Thunks.completeRequest);
-local v21 = require(l_script_FirstAncestor_0.Utils.getPlayerPrice);
-local v22 = require(l_script_FirstAncestor_0.Utils.hasPendingRequest);
-local v23 = require(l_script_FirstAncestor_0.Utils.getPaymentPlatform);
-local v24 = require(l_script_FirstAncestor_0.NativeUpsell.getUpsellFlow);
-local v25 = require(l_script_FirstAncestor_0.Thunk);
-local v26 = game:DefineFastFlag("AddUnifiedPurchaseRobuxUpsellCompletedTelemetry", false);
-local v27 = require(l_script_FirstAncestor_0.Utils.logUnifiedPurchaseTelemetryCounter);
-local v28 = require(l_script_FirstAncestor_0.Events.UnifiedPurchaseTelemetry);
-local v29 = require(script.Parent.purchaseItem);
-local v30 = game:DefineFastInt("UpsellAccountBalanceRetryAttemps", 3);
-local v31 = game:DefineFastInt("UpsellAccountBalanceRetryIntervalSec", 1);
-local v32 = {
-    v18, 
-    v17, 
-    v19
-};
-local function v39(v33, _, v35, v36, v37) --[[ Line: 51 ]] --[[ Name: restartUpsell ]]
-    -- upvalues: v15 (copy), v22 (copy), v5 (copy), v13 (copy), v12 (copy), v1 (copy), v10 (copy)
-    return v15(v35, v36, v37):andThen(function(v38) --[[ Line: 54 ]]
-        -- upvalues: v22 (ref), v33 (copy), v5 (ref), v13 (ref), v12 (ref)
-        if not v22(v33:getState()) then
-            return;
-        else
-            v33:dispatch(v5(v38.products, 1, v38.virtualItemBadgeType));
-            v33:dispatch(v13(v12.UpsellModalShownAgain));
-            return;
-        end;
-    end, function() --[[ Line: 64 ]]
-        -- upvalues: v22 (ref), v33 (copy), v1 (ref), v10 (ref), v13 (ref), v12 (ref)
-        if not v22(v33:getState()) then
-            return;
-        else
-            v33:dispatch(v1(v10.LargeRobuxUpsell));
-            v33:dispatch(v13(v12.UpsellGenericModalShownAgain));
-            return;
-        end;
-    end);
-end;
-local function v40(v41) --[[ Line: 75 ]] --[[ Name: retryAfterUpsell ]]
-    -- upvalues: v30 (copy), v25 (copy), v32 (copy), v18 (copy), v17 (copy), v19 (copy), v24 (copy), v11 (copy), v10 (copy), v3 (copy), v20 (copy), v7 (copy), v1 (copy), v16 (copy), v21 (copy), v22 (copy), v23 (copy), v2 (copy), v8 (copy), v39 (copy), v4 (copy), v9 (copy), v13 (copy), v12 (copy), v26 (copy), v27 (copy), v28 (copy), v29 (copy), v31 (copy), v40 (copy)
-    local v42 = v41 or v30;
-    return v25.new(script.Name, v32, function(v43, v44) --[[ Line: 78 ]]
-        -- upvalues: v18 (ref), v17 (ref), v19 (ref), v24 (ref), v11 (ref), v10 (ref), v3 (ref), v20 (ref), v7 (ref), v1 (ref), v16 (ref), v21 (ref), v22 (ref), v23 (ref), v2 (ref), v8 (ref), v39 (ref), v4 (ref), v9 (ref), v13 (ref), v12 (ref), v26 (ref), v27 (ref), v28 (ref), v29 (ref), v42 (copy), v31 (ref), v40 (ref)
-        local v45 = v44[v18];
-        local v46 = v44[v17];
-        local v47 = v44[v19];
-        local v48 = v43:getState();
-        local l_requestType_0 = v48.promptRequest.requestType;
-        local l_promptState_0 = v48.promptState;
-        local l_purchaseFlow_0 = v48.purchaseFlow;
-        local v52 = v24(v47.getPlatform());
-        if l_requestType_0 == v11.None then
-            return;
-        elseif l_promptState_0 ~= v10.UpsellInProgress and l_promptState_0 ~= v10.PollingBalance then
-            return;
-        elseif l_requestType_0 == v11.Premium or l_requestType_0 == v11.Subscription then
-            if l_promptState_0 == v10.UpsellInProgress then
-                v43:dispatch(v3());
-                v43:dispatch(v20());
-                return;
-            else
-                return;
-            end;
-        else
-            if l_purchaseFlow_0 == v7.RobuxUpsellV2 or l_purchaseFlow_0 == v7.LargeRobuxUpsell then
-                v43:dispatch(v1(v10.PollingBalance));
-            end;
-            return v16(v46, v47, false):andThen(function(v53) --[[ Line: 108 ]]
-                -- upvalues: v43 (copy), v21 (ref), v22 (ref), v23 (ref), v47 (copy), v2 (ref), l_purchaseFlow_0 (copy), v7 (ref), v52 (copy), v8 (ref), v39 (ref), v46 (copy), v4 (ref), v9 (ref), v13 (ref), v12 (ref), v26 (ref), v27 (ref), v28 (ref), v29 (ref), v42 (ref), v31 (ref), v40 (ref), v45 (copy)
-                local v54 = v43:getState();
-                local v55 = v54.accountInfo.membershipType == 4;
-                local v56 = v21(v54.productInfo, v55);
-                if not v22(v43:getState()) then
-                    return;
-                else
-                    local v57 = v23(v47.getPlatform());
-                    local l_balance_0 = v54.accountInfo.balance;
-                    local l_robux_0 = v53.robux;
-                    v43:dispatch(v2(v53));
-                    if l_balance_0 ~= l_robux_0 then
-                        if v56 ~= nil and l_robux_0 < v56 then
-                            if l_purchaseFlow_0 == v7.LargeRobuxUpsell or v52 == v8.Web then
-                                return v39(v43, v46, v56, l_robux_0, v57);
-                            else
-                                v43:dispatch(v4(v9.InvalidFunds));
-                                v43:dispatch(v13(v12.UpsellFailedNotEnoughRobux));
-                                return;
-                            end;
-                        else
-                            if v26 and v54.purchaseAnalyticsMetadata then
-                                local l_purchaseAnalyticsMetadata_0 = v54.purchaseAnalyticsMetadata;
-                                v27(v28.UnifiedRobuxUpsellRobuxPurchaseCompletedCounter, l_purchaseAnalyticsMetadata_0.surface, l_purchaseAnalyticsMetadata_0.productType);
-                            end;
-                            v43:dispatch(v29());
-                            return;
-                        end;
-                    elseif v42 > 0 then
-                        delay(v31, function() --[[ Line: 149 ]]
-                            -- upvalues: v43 (ref), v40 (ref), v42 (ref)
-                            v43:dispatch(v40(v42 - 1));
-                        end);
-                        return;
-                    else
-                        v45.signalFailedPurchasePostUpsell();
-                        if v52 == v8.Web then
-                            v39(v43, v46, v56, l_robux_0, v57);
-                        else
-                            v43:dispatch(v4(v9.InvalidFunds));
-                        end;
-                        if v26 and v54.purchaseAnalyticsMetadata then
-                            local l_purchaseAnalyticsMetadata_1 = v54.purchaseAnalyticsMetadata;
-                            v27(v28.UnifiedRobuxUpsellRobuxPurchaseFailedCounter, l_purchaseAnalyticsMetadata_1.surface, l_purchaseAnalyticsMetadata_1.productType);
-                        end;
-                        return;
-                    end;
-                end;
-            end):catch(function(v62) --[[ Line: 175 ]]
-                -- upvalues: v43 (copy), v4 (ref)
-                v43:dispatch(v4(v62));
-            end);
-        end;
-    end);
-end;
-return v40;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local BalanceInfoRecieved = require(PurchasePrompt.Actions.BalanceInfoRecieved)
+local PurchaseCompleteRecieved = require(PurchasePrompt.Actions.PurchaseCompleteRecieved)
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local PromptNativeUpsellSuggestions = require(PurchasePrompt.Actions.PromptNativeUpsellSuggestions)
+
+require(PurchasePrompt.types)
+
+local PurchaseFlow = require(PurchasePrompt.Enums.PurchaseFlow)
+local UpsellFlow = require(PurchasePrompt.Enums.UpsellFlow)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local RequestType = require(PurchasePrompt.Enums.RequestType)
+local Counter = require(PurchasePrompt.Enums.Counter)
+local sendCounter = require(PurchasePrompt.Thunks.sendCounter)
+
+require(PurchasePrompt.Models.RobuxUpsell)
+
+local getRobuxUpsellSuggestions = require(PurchasePrompt.Network.getRobuxUpsellSuggestions)
+local getBalanceInfo = require(PurchasePrompt.Network.getBalanceInfo)
+local Network = require(PurchasePrompt.Services.Network)
+local Analytics = require(PurchasePrompt.Services.Analytics)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local completeRequest = require(PurchasePrompt.Thunks.completeRequest)
+local getPlayerPrice = require(PurchasePrompt.Utils.getPlayerPrice)
+local hasPendingRequest = require(PurchasePrompt.Utils.hasPendingRequest)
+local getPaymentPlatform = require(PurchasePrompt.Utils.getPaymentPlatform)
+local getUpsellFlow = require(PurchasePrompt.NativeUpsell.getUpsellFlow)
+local Thunk = require(PurchasePrompt.Thunk)
+local FFlagAXMISWithBlackbird = require(PurchasePrompt.Parent.SharedFlags).FFlagAXMISWithBlackbird
+local v26 = game:DefineFastFlag("AddUnifiedPurchaseRobuxUpsellCompletedTelemetry", false)
+local logUnifiedPurchaseTelemetryCounter = require(PurchasePrompt.Utils.logUnifiedPurchaseTelemetryCounter)
+local UnifiedPurchaseTelemetry = require(PurchasePrompt.Events.UnifiedPurchaseTelemetry)
+local purchaseItem = require(script.Parent.purchaseItem)
+local v30 = game:DefineFastInt("UpsellAccountBalanceRetryAttemps", 3)
+local v31 = game:DefineFastInt("UpsellAccountBalanceRetryIntervalSec", 1)
+local t1 = {
+	Analytics,
+	Network,
+	ExternalSettings
+}
+
+local function restartUpsell(p1, _, p3, p4, p5) -- line: 52
+	-- upvalues: getRobuxUpsellSuggestions (copy), hasPendingRequest (copy), PromptNativeUpsellSuggestions (copy), sendCounter (copy), Counter (copy), SetPromptState (copy), PromptState (copy)
+	return getRobuxUpsellSuggestions(p3, p4, p5):andThen(function(p6) -- line: 55
+		-- upvalues: hasPendingRequest (copy), p1 (copy), PromptNativeUpsellSuggestions (copy), sendCounter (copy), Counter (copy)
+		if not hasPendingRequest(p1:getState()) then
+			return
+		end
+
+		p1:dispatch(PromptNativeUpsellSuggestions(p6.products, 1, p6.virtualItemBadgeType))
+		p1:dispatch(sendCounter(Counter.UpsellModalShownAgain))
+	end, function() -- line: 65
+		-- upvalues: hasPendingRequest (copy), p1 (copy), SetPromptState (copy), PromptState (copy), sendCounter (copy), Counter (copy)
+		if not hasPendingRequest(p1:getState()) then
+			return
+		end
+
+		p1:dispatch(SetPromptState(PromptState.LargeRobuxUpsell))
+		p1:dispatch(sendCounter(Counter.UpsellGenericModalShownAgain))
+	end)
+end
+local function retryAfterUpsell(n1: number?) -- line: 76
+	-- upvalues: v30 (copy), Thunk (copy), t1 (copy), Analytics (copy), Network (copy), ExternalSettings (copy), getUpsellFlow (copy), RequestType (copy), PromptState (copy), FFlagAXMISWithBlackbird (copy), PurchaseCompleteRecieved (copy), completeRequest (copy), PurchaseFlow (copy), SetPromptState (copy), getBalanceInfo (copy), getPlayerPrice (copy), hasPendingRequest (copy), getPaymentPlatform (copy), BalanceInfoRecieved (copy), UpsellFlow (copy), restartUpsell (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy), v26 (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), purchaseItem (copy), v31 (copy), retryAfterUpsell (copy)
+	local v41 = n1 or v30
+
+	return Thunk.new(script.Name, t1, function(p7, p8) -- line: 79
+		-- upvalues: Analytics (copy), Network (copy), ExternalSettings (copy), getUpsellFlow (copy), RequestType (copy), PromptState (copy), FFlagAXMISWithBlackbird (copy), PurchaseCompleteRecieved (copy), completeRequest (copy), PurchaseFlow (copy), SetPromptState (copy), getBalanceInfo (copy), getPlayerPrice (copy), hasPendingRequest (copy), getPaymentPlatform (copy), BalanceInfoRecieved (copy), UpsellFlow (copy), restartUpsell (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy), v26 (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), purchaseItem (copy), v41 (copy), v31 (copy), retryAfterUpsell (copy)
+		local v45 = p8[Analytics]
+		local v46 = p8[Network]
+		local v47 = p8[ExternalSettings]
+		local v48 = p7:getState()
+		local requestType = v48.promptRequest.requestType
+		local promptState = v48.promptState
+		local purchaseFlow = v48.purchaseFlow
+		local v52 = getUpsellFlow(v47.getPlatform())
+
+		if requestType == RequestType.None then
+			return
+		end
+
+		if promptState ~= PromptState.UpsellInProgress and promptState ~= PromptState.PollingBalance then
+			return
+		end
+
+		if requestType == RequestType.Premium or requestType == RequestType.Subscription or FFlagAXMISWithBlackbird and requestType == RequestType.RobuxUpsell then
+			if promptState == PromptState.UpsellInProgress then
+				p7:dispatch(PurchaseCompleteRecieved())
+				p7:dispatch(completeRequest())
+
+				return
+			end
+
+			return
+		end
+
+		if purchaseFlow == PurchaseFlow.RobuxUpsellV2 or purchaseFlow == PurchaseFlow.LargeRobuxUpsell then
+			p7:dispatch(SetPromptState(PromptState.PollingBalance))
+		end
+
+		return getBalanceInfo(v46, v47, false):andThen(function(p9) -- line: 113
+			-- upvalues: p7 (copy), getPlayerPrice (copy), hasPendingRequest (copy), getPaymentPlatform (copy), v47 (copy), BalanceInfoRecieved (copy), purchaseFlow (copy), PurchaseFlow (copy), v52 (copy), UpsellFlow (copy), restartUpsell (copy), v46 (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy), v26 (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), purchaseItem (copy), v41 (copy), v31 (copy), retryAfterUpsell (copy), v45 (copy)
+			local v54 = p7:getState()
+			local v55 = v54.accountInfo.membershipType == 4
+			local v56 = getPlayerPrice(v54.productInfo, v55)
+
+			if not hasPendingRequest(p7:getState()) then
+				return
+			end
+
+			local v57 = getPaymentPlatform(v47.getPlatform())
+			local balance = v54.accountInfo.balance
+			local robux = p9.robux
+
+			p7:dispatch(BalanceInfoRecieved(p9))
+
+			if balance ~= robux then
+				if v56 ~= nil and robux < v56 then
+					if purchaseFlow == PurchaseFlow.LargeRobuxUpsell or v52 == UpsellFlow.Web then
+						return restartUpsell(p7, v46, v56, robux, v57)
+					end
+
+					p7:dispatch(ErrorOccurred(PurchaseError.InvalidFunds))
+					p7:dispatch(sendCounter(Counter.UpsellFailedNotEnoughRobux))
+
+					return
+				end
+
+				if v26 and v54.purchaseAnalyticsMetadata then
+					local purchaseAnalyticsMetadata = v54.purchaseAnalyticsMetadata
+
+					logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellRobuxPurchaseCompletedCounter, purchaseAnalyticsMetadata.surface, purchaseAnalyticsMetadata.productType)
+				end
+
+				p7:dispatch(purchaseItem())
+
+				return
+			end
+
+			if v41 > 0 then
+				delay(v31, function() -- line: 154
+					-- upvalues: p7 (copy), retryAfterUpsell (copy), v41 (copy)
+					p7:dispatch(retryAfterUpsell(v41 - 1))
+				end)
+
+				return
+			end
+
+			v45.signalFailedPurchasePostUpsell()
+
+			if v52 == UpsellFlow.Web then
+				restartUpsell(p7, v46, v56, robux, v57)
+			else
+				p7:dispatch(ErrorOccurred(PurchaseError.InvalidFunds))
+			end
+
+			if v26 and v54.purchaseAnalyticsMetadata then
+				local purchaseAnalyticsMetadata = v54.purchaseAnalyticsMetadata
+
+				logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedRobuxUpsellRobuxPurchaseFailedCounter, purchaseAnalyticsMetadata.surface, purchaseAnalyticsMetadata.productType)
+			end
+		end):catch(function(p10) -- line: 180
+			-- upvalues: p7 (copy), ErrorOccurred (copy)
+			p7:dispatch(ErrorOccurred(p10))
+		end)
+	end)
+end
+
+return retryAfterUpsell

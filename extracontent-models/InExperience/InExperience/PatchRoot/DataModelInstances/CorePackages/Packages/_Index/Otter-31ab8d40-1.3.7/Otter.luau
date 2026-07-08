@@ -1,15 +1,18 @@
-local v0 = require(script.createGroupMotor);
-local v1 = require(script.createSingleMotor);
-local v2 = require(script.ease);
-local v3 = require(script.spring);
-local v4 = require(script.instant);
-local _ = require(script.types);
-local v6 = require(script.AnimationStepSignal);
+local createGroupMotor = require(script.createGroupMotor)
+local createSingleMotor = require(script.createSingleMotor)
+local ease = require(script.ease)
+local spring = require(script.spring)
+local instant = require(script.instant)
+
+require(script.types)
+
+local AnimationStepSignal = require(script.AnimationStepSignal)
+
 return {
-    createGroupMotor = v0, 
-    createSingleMotor = v1, 
-    ease = v2, 
-    spring = v3, 
-    instant = v4, 
-    __devAnimationStepSignal = v6
-};
+	createGroupMotor = createGroupMotor,
+	createSingleMotor = createSingleMotor,
+	ease = ease,
+	spring = spring,
+	instant = instant,
+	__devAnimationStepSignal = AnimationStepSignal
+}

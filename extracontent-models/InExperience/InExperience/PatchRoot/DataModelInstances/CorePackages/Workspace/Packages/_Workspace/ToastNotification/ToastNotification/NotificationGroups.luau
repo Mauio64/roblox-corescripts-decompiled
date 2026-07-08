@@ -1,20 +1,17 @@
-local l_Parent_0 = script.Parent;
-local l_NotificationTypeEnum_0 = require(l_Parent_0.type).NotificationTypeEnum;
+local scriptParent = script.Parent
+local NotificationTypeEnum = require(scriptParent.type).NotificationTypeEnum
+
 return {
-    ChatMessageGroup = {
-        l_NotificationTypeEnum_0.ChatNewMessage, 
-        l_NotificationTypeEnum_0.SquadInvitation
-    }, 
-    ChatLandingNotificationsGroup = {
-        l_NotificationTypeEnum_0.ChatNewMessage, 
-        l_NotificationTypeEnum_0.SquadInvitation, 
-        l_NotificationTypeEnum_0.SquadStartPartyPrompt, 
-        l_NotificationTypeEnum_0.SquadNudgeInvite
-    }, 
-    SquadNudgeInviteGroup = {
-        l_NotificationTypeEnum_0.SquadNudgeInvite
-    }, 
-    SquadStartPartyPromptGroup = {
-        l_NotificationTypeEnum_0.SquadStartPartyPrompt
-    }
-};
+	ChatMessageGroup = {
+		NotificationTypeEnum.ChatNewMessage,
+		NotificationTypeEnum.SquadInvitation
+	},
+	ChatLandingNotificationsGroup = {
+		NotificationTypeEnum.ChatNewMessage,
+		NotificationTypeEnum.SquadInvitation,
+		NotificationTypeEnum.SquadStartPartyPrompt,
+		NotificationTypeEnum.SquadNudgeInvite
+	},
+	SquadNudgeInviteGroup = { NotificationTypeEnum.SquadNudgeInvite },
+	SquadStartPartyPromptGroup = { NotificationTypeEnum.SquadStartPartyPrompt }
+}

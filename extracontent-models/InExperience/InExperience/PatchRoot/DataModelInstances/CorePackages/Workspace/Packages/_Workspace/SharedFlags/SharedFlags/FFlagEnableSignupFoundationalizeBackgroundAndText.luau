@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSignupFoundationalizeBackgroundAndText", false);
+return game:DefineFastFlag("EnableSignupFoundationalizeBackgroundAndText", false)

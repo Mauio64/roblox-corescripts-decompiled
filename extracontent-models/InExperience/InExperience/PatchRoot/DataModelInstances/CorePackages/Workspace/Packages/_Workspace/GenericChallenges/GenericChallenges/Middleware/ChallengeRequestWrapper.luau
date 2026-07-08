@@ -1,37 +1,43 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericChallenges").Parent;
-local v1 = require(l_Parent_0.Promise);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(script.Parent.IsChallengeHttpResponse);
-local v4 = require(script.Parent.InterceptChallenge);
-local _ = require(l_Parent_0.Http);
-return function(v6, v7) --[[ Line: 13 ]]
-    -- upvalues: v4 (copy), v1 (copy), v3 (copy), v2 (copy)
-    local l_v4_0 = v4;
-    if v7 ~= nil then
-        l_v4_0 = v7;
-    end;
-    return function(v9, v10, v11) --[[ Line: 18 ]]
-        -- upvalues: v6 (copy), v1 (ref), v3 (ref), v2 (ref), l_v4_0 (ref)
-        local v12, v13 = v6(v9, v10, v11);
-        return v12:andThen(function(v14) --[[ Line: 21 ]]
-            -- upvalues: v1 (ref)
-            return v1.resolve(v14);
-        end):catch(function(v15) --[[ Line: 25 ]]
-            -- upvalues: v3 (ref), v6 (ref), v9 (copy), v10 (copy), v2 (ref), v11 (copy), l_v4_0 (ref), v1 (ref)
-            if v15.StatusCode ~= nil and v15.Headers ~= nil and v3(v15.StatusCode, v15.Headers) then
-                local v17 = {
-                    retryRequestCallback = function(v16) --[[ Line: 33 ]] --[[ Name: retryRequestCallback ]]
-                        -- upvalues: v6 (ref), v9 (ref), v10 (ref), v2 (ref), v11 (ref)
-                        return v6(v9, v10, v2.Dictionary.join(v11, {
-                            headers = v16
-                        }));
-                    end, 
-                    rawResponseHeaders = v15.Headers
-                };
-                return l_v4_0(v17);
-            else
-                return v1.reject(v15);
-            end;
-        end), v13;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GenericChallenges").Parent
+local Promise = require(Parent.Promise)
+local Cryo = require(Parent.Cryo)
+local IsChallengeHttpResponse = require(script.Parent.IsChallengeHttpResponse)
+local InterceptChallenge = require(script.Parent.InterceptChallenge)
+
+require(Parent.Http)
+
+return function(p1, p2) -- line: 13
+	-- upvalues: InterceptChallenge (copy), Promise (copy), IsChallengeHttpResponse (copy), Cryo (copy)
+	local u8 = InterceptChallenge
+
+	if p2 ~= nil then
+		u8 = p2
+	end
+
+	return function(s1: string, s2: string, p3) -- line: 18
+		-- upvalues: p1 (copy), Promise (copy), IsChallengeHttpResponse (copy), Cryo (copy), u8 (ref)
+		local v12, v13 = p1(s1, s2, p3)
+
+		return v12:andThen(function(p4) -- line: 21
+			-- upvalues: Promise (copy)
+			return Promise.resolve(p4)
+		end):catch(function(p5) -- line: 25
+			-- upvalues: IsChallengeHttpResponse (copy), p1 (copy), s1 (copy), s2 (copy), Cryo (copy), p3 (copy), u8 (ref), Promise (copy)
+			if p5.StatusCode ~= nil and (p5.Headers ~= nil and IsChallengeHttpResponse(p5.StatusCode, p5.Headers)) then
+				local t1 = {
+					retryRequestCallback = function(p6) -- line: 33
+						-- upvalues: p1 (copy), s1 (copy), s2 (copy), Cryo (copy), p3 (copy)
+						return p1(s1, s2, Cryo.Dictionary.join(p3, {
+							headers = p6
+						}))
+					end,
+					rawResponseHeaders = p5.Headers
+				}
+
+				return u8(t1)
+			end
+
+			return Promise.reject(p5)
+		end), v13
+	end
+end

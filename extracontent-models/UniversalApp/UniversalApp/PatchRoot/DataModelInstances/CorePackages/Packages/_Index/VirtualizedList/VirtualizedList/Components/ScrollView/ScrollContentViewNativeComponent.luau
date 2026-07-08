@@ -1,26 +1,29 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Object_0 = v1.Object;
-local v4 = require(l_Parent_0.React);
-local l_Change_0 = v4.Change;
-local v6 = v4.Component:extend("ScrollContentViewNativeComponent");
-v6.init = function(v7, v8) --[[ Line: 27 ]] --[[ Name: init ]]
-    v7.props = v8;
-end;
-v6.render = function(v9) --[[ Line: 31 ]] --[[ Name: render ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy), l_Change_0 (copy), v4 (copy)
-    local v12 = if l_Array_0.isArray(v9.props.style) then l_Array_0.reduce(v9.props.style, function(v10, v11) --[[ Line: 33 ]]
-        -- upvalues: l_Object_0 (ref)
-        return l_Object_0.assign(v10, v11);
-    end, {}) else v9.props.style;
-    local v13 = l_Object_0.assign({
-        Name = "RCTScrollContentView", 
-        [l_Change_0.AbsoluteSize] = v9.props.onLayout, 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, if v9.props.AutomaticSize then {
-        AutomaticSize = v9.props.AutomaticSize
-    } else nil, v12);
-    return v4.createElement("Frame", v13, v9.props.children);
-end;
-return v6;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local React = require(ParentParent.React)
+local Change = React.Change
+local v7 = React.Component:extend("ScrollContentViewNativeComponent")
+
+function v7.init(p1, p2) -- line: 27
+	p1.props = p2
+end
+function v7.render(p3) -- line: 31
+	-- upvalues: Array (copy), Object (copy), Change (copy), React (copy)
+	local v11 = if not Array.isArray(p3.props.style) then p3.props.style else Array.reduce(p3.props.style, function(p4, p5) -- line: 33
+		-- upvalues: Object (copy)
+		return Object.assign(p4, p5)
+	end, {})
+	local v12 = Object.assign({
+		Name = "RCTScrollContentView",
+		[Change.AbsoluteSize] = p3.props.onLayout,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, if not p3.props.AutomaticSize then nil else {
+		AutomaticSize = p3.props.AutomaticSize
+	}, v11)
+
+	return React.createElement("Frame", v12, p3.props.children)
+end
+
+return v7

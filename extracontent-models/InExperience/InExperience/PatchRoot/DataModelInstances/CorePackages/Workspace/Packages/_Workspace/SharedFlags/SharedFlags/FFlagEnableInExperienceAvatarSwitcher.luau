@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableInExperienceAvatarSwitcher9", false) and game:DefineFastFlag("InExperienceAvatarSwitcherPlaceFilter", false);
+return game:DefineFastFlag("EnableInExperienceAvatarSwitcher9", false) and game:DefineFastFlag("InExperienceAvatarSwitcherPlaceFilter", false)

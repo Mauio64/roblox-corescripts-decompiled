@@ -1,81 +1,80 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Hooks.useConvertedItemData);
-local v4 = require(l_script_FirstAncestor_0.Hooks.useItemStatusLocalization);
-local v5 = require(l_script_FirstAncestor_0.Utils.getPriceStatus);
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local v7 = require(l_Parent_0.Foundation);
-local _ = require(l_script_FirstAncestor_0.Types);
-local v9 = require(l_script_FirstAncestor_0.Enums.PriceStatus);
-local v10 = require(l_script_FirstAncestor_0.Utils.itemDetailsUtils);
-local l_isCollectible_0 = v10.isCollectible;
-local l_calculatePurchaseStatusForItem_0 = v10.calculatePurchaseStatusForItem;
-local l_getPriceInRobux_0 = v10.getPriceInRobux;
-local v14 = require(l_script_FirstAncestor_0.Utils.formatNumber);
-local v15 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXFormatPDPPriceLabel_0 = v15.FFlagAXFormatPDPPriceLabel;
-local l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 = v15.FFlagAXHideInspectAndBuyPriceIfUnavailable;
-return function(v18) --[[ Line: 43 ]] --[[ Name: usePurchaseButtonProps ]]
-    -- upvalues: v3 (copy), v5 (copy), v4 (copy), v2 (copy), v7 (copy), v9 (copy), l_isCollectible_0 (copy), l_calculatePurchaseStatusForItem_0 (copy), l_FFlagAXFormatPDPPriceLabel_0 (copy), v14 (copy), l_getPriceInRobux_0 (copy), l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 (copy)
-    local v19 = v3(v18.selectedItem);
-    local v20 = v5(v19);
-    local v21 = v4(v19);
-    local v22 = v2.useMemo(function() --[[ Line: 49 ]]
-        -- upvalues: v18 (copy), v7 (ref)
-        return {
-            purchaseButtonText = v18.purchaseButtonText, 
-            onPurchase = v18.onBulkPurchase, 
-            isDisabled = v18.isDisabled, 
-            showRobuxIcon = false, 
-            variant = v7.Enums.ButtonVariant.Emphasis
-        };
-    end, {
-        v18
-    });
-    local v26 = v2.useMemo(function() --[[ Line: 60 ]]
-        -- upvalues: v20 (copy), v9 (ref), v21 (copy), v7 (ref), v19 (copy), l_isCollectible_0 (ref), l_calculatePurchaseStatusForItem_0 (ref), v18 (copy)
-        local v23 = true;
-        if v20 ~= v9.Free then
-            v23 = true;
-            if v20 ~= v9.PurchaseFromRoblox then
-                v23 = v20 == v9.PurchaseFromResale;
-            end;
-        end;
-        return {
-            purchaseButtonText = v21[v20], 
-            isDisabled = not v23, 
-            variant = if not v23 then v7.Enums.ButtonVariant.Standard else v7.Enums.ButtonVariant.Emphasis, 
-            onPurchase = function() --[[ Line: 73 ]] --[[ Name: onPurchase ]]
-                -- upvalues: v19 (ref), l_isCollectible_0 (ref), l_calculatePurchaseStatusForItem_0 (ref), v20 (ref), v18 (ref)
-                if v19 then
-                    local v24 = l_isCollectible_0(v19);
-                    local v25 = l_calculatePurchaseStatusForItem_0(v19, v20);
-                    v18.onPromptPurchase(v19.id, v19.itemType, v25.collectibleItemId, v25.collectibleLowestAvailableResaleProductId, v25.collectibleLowestAvailableResaleItemInstanceId, v25.collectibleLowestResalePrice, v24);
-                end;
-            end
-        };
-    end, {
-        v18, 
-        v20, 
-        v19
-    });
-    if v18.selectedItem then
-        return {
-            purchaseButtonProps = v26, 
-            priceLabel = {
-                leftLabel = v18.localizedStrings.total or "", 
-                priceInRobux = if l_FFlagAXFormatPDPPriceLabel_0 then v14(l_getPriceInRobux_0(v19, v20)) else tostring(l_getPriceInRobux_0(v19, v20))
-            }, 
-            priceStatus = if l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 then v20 else nil
-        };
-    else
-        return {
-            purchaseButtonProps = v22, 
-            priceLabel = {
-                leftLabel = v18.localizedStrings.totalItems or "", 
-                priceInRobux = v18.formattedTotalPrice
-            }
-        };
-    end;
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local useConvertedItemData = require(AvatarExperienceInspectAndBuy.Hooks.useConvertedItemData)
+local useItemStatusLocalization = require(AvatarExperienceInspectAndBuy.Hooks.useItemStatusLocalization)
+local getPriceStatus = require(AvatarExperienceInspectAndBuy.Utils.getPriceStatus)
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local PriceStatus = require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
+local itemDetailsUtils = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils)
+local isCollectible = itemDetailsUtils.isCollectible
+local calculatePurchaseStatusForItem = itemDetailsUtils.calculatePurchaseStatusForItem
+local getPriceInRobux = itemDetailsUtils.getPriceInRobux
+local formatNumber = require(AvatarExperienceInspectAndBuy.Utils.formatNumber)
+
+local function usePurchaseButtonProps(t1: {[any]: any}) -- line: 40
+	-- upvalues: useConvertedItemData (copy), getPriceStatus (copy), useItemStatusLocalization (copy), React (copy), Foundation (copy), PriceStatus (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), formatNumber (copy), getPriceInRobux (copy)
+	local v16 = useConvertedItemData(t1.selectedItem)
+	local v17 = getPriceStatus(v16)
+	local v18 = useItemStatusLocalization(v16)
+	local v19 = React.useMemo(function() -- line: 46
+		-- upvalues: t1 (copy), Foundation (copy)
+		return {
+			showRobuxIcon = false,
+			purchaseButtonText = t1.purchaseButtonText,
+			onPurchase = t1.onBulkPurchase,
+			isDisabled = t1.isDisabled,
+			variant = Foundation.Enums.ButtonVariant.Emphasis
+		}
+	end, { t1 })
+	local v20 = React.useMemo(function() -- line: 57
+		-- upvalues: v17 (copy), PriceStatus (copy), v18 (copy), Foundation (copy), v16 (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), t1 (copy)
+		local v21 = v17 == PriceStatus.Free or (v17 == PriceStatus.PurchaseFromRoblox or v17 == PriceStatus.PurchaseFromResale)
+
+		return {
+			purchaseButtonText = v18[v17],
+			isDisabled = not v21,
+			variant = if v21 then Foundation.Enums.ButtonVariant.Emphasis else Foundation.Enums.ButtonVariant.Standard,
+			onPurchase = function() -- line: 70
+				-- upvalues: v16 (copy), isCollectible (copy), calculatePurchaseStatusForItem (copy), v17 (copy), t1 (copy)
+				if v16 then
+					local v22 = isCollectible(v16)
+					local v23 = calculatePurchaseStatusForItem(v16, v17)
+
+					t1.onPromptPurchase(v16.id, v16.itemType, v23.collectibleItemId, v23.collectibleLowestAvailableResaleProductId, v23.collectibleLowestAvailableResaleItemInstanceId, v23.collectibleLowestResalePrice, v22)
+				end
+			end
+		}
+	end, {
+		t1,
+		v17,
+		v16
+	})
+
+	if t1.selectedItem then
+		return {
+			purchaseButtonProps = v20,
+			priceLabel = {
+				leftLabel = t1.localizedStrings.total or "",
+				priceInRobux = formatNumber(getPriceInRobux(v16, v17))
+			},
+			priceStatus = v17
+		}
+	end
+
+	return {
+		purchaseButtonProps = v19,
+		priceLabel = {
+			leftLabel = t1.localizedStrings.totalItems or "",
+			priceInRobux = t1.formattedTotalPrice
+		}
+	}
+end
+
+return usePurchaseButtonProps

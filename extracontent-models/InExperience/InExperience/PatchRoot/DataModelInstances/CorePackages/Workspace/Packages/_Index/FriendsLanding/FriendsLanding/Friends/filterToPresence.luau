@@ -1,29 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_PresenceType_0 = require(l_script_FirstAncestor_0.dependencies).RoduxPresence.Enums.PresenceType;
-local v2 = require(l_script_FirstAncestor_0.Friends.filterStates);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v2 (copy), l_PresenceType_0 (copy)
-    if v3 == v2.InExperience then
-        return {
-            l_PresenceType_0.InGame, 
-            l_PresenceType_0.InStudio
-        };
-    elseif v3 == v2.Offline then
-        return {
-            l_PresenceType_0.Offline
-        };
-    elseif v3 == v2.Online then
-        return {
-            l_PresenceType_0.Online, 
-            l_PresenceType_0.InStudio, 
-            l_PresenceType_0.InGame
-        };
-    else
-        return {
-            l_PresenceType_0.Online, 
-            l_PresenceType_0.InStudio, 
-            l_PresenceType_0.InGame, 
-            l_PresenceType_0.Offline
-        };
-    end;
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local PresenceType = require(FriendsLanding.dependencies).RoduxPresence.Enums.PresenceType
+local filterStates = require(FriendsLanding.Friends.filterStates)
+
+return function(p1) -- line: 6
+	-- upvalues: filterStates (copy), PresenceType (copy)
+	if p1 == filterStates.InExperience then
+		return {
+			PresenceType.InGame,
+			PresenceType.InStudio
+		}
+	end
+
+	if p1 == filterStates.Offline then
+		return { PresenceType.Offline }
+	end
+
+	if p1 == filterStates.Online then
+		return {
+			PresenceType.Online,
+			PresenceType.InStudio,
+			PresenceType.InGame
+		}
+	end
+
+	return {
+		PresenceType.Online,
+		PresenceType.InStudio,
+		PresenceType.InGame,
+		PresenceType.Offline
+	}
+end

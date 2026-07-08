@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSlotsDesktopRedesign2", false);
+return game:DefineFastFlag("AXSlotsDesktopRedesign2", false)

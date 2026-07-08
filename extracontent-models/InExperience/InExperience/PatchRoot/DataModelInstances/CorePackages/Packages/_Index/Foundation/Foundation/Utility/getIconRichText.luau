@@ -1,1 +1,1 @@
-return require(script.getIconRichText);
+return require(script.getIconRichText)

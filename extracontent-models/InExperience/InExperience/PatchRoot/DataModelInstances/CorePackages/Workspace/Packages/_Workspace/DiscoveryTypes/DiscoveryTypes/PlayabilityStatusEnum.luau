@@ -24,5 +24,7 @@ return {
 	FiatPurchaseRequired = "FiatPurchaseRequired",
 	FiatPurchaseDeviceRestricted = "FiatPurchaseDeviceRestricted",
 	ContextualPlayabilityExperienceBlockedParentalControls = "ContextualPlayabilityExperienceBlockedParentalControls",
-	ContextualPlayabilityAgeCheckRequired = "ContextualPlayabilityAgeCheckRequired"
+	ContextualPlayabilityAgeCheckRequired = "ContextualPlayabilityAgeCheckRequired",
+	ContextualPlayabilityRequireParentApproval = "ContextualPlayabilityRequireParentApproval",
+	ContextualPlayabilityCoreGated = "ContextualPlayabilityCoreGated"
 }

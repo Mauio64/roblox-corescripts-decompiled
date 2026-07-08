@@ -1,4 +1,5 @@
-game:DefineFastString("UGCLCAllowedAssetTypeIds", "");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("UGCLCAllowedAssetTypeIds");
-end;
+game:DefineFastString("UGCLCAllowedAssetTypeIds", "")
+
+return function() -- line: 3
+	return game:GetFastString("UGCLCAllowedAssetTypeIds")
+end

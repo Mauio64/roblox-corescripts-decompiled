@@ -1,3 +1,3 @@
 return {
-    InterventionPlacement = require(script.InterventionPlacement)
-};
+	InterventionPlacement = require(script.InterventionPlacement)
+}

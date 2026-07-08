@@ -64,6 +64,12 @@ return {
 		MutualFriends = "mutualFriends",
 		EditAppearanceEditAvatar = "editAppearanceEditAvatar",
 		EditAppearanceEditEmote = "editAppearanceEditEmote",
-		EditAppearanceSwitchAvatar = "editAppearanceSwitchAvatar"
+		EditAppearanceSwitchAvatar = "editAppearanceSwitchAvatar",
+		EditAppearanceEditBackground = "editAppearanceEditBackground",
+		InspectAvatar = "inspectAvatar",
+		InspectAvatarBuyItems = "inspectAvatarBuyItems",
+		InspectAvatarConfirmBuy = "inspectAvatarConfirmBuy",
+		MomentsSeeAll = "momentsSeeAll",
+		Moment = "moment"
 	}
 }

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AlwaysShowGamepadNavigationDialog", false);
+return game:DefineFastFlag("AlwaysShowGamepadNavigationDialog", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PeopleListContextualMenuFixFocusNavigation", false);
+return game:DefineFastFlag("PeopleListContextualMenuFixFocusNavigation", false)

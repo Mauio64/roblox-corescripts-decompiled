@@ -1,180 +1,194 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Constants);
-local v3 = require(l_script_FirstAncestor_0.Components.Image);
-local v4 = require(script.Parent.Parent.PopoverContext);
-local v5 = require(l_script_FirstAncestor_0.Components.View);
-local v6 = require(l_script_FirstAncestor_0.Utility.isPointInGuiObjectBounds);
-local v7 = require(script.Parent.Parent.useFloating);
-local v8 = require(l_script_FirstAncestor_0.Providers.Overlay.useOverlay);
-local v9 = require(l_script_FirstAncestor_0.Utility.usePointerPosition);
-local v10 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v11 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v12 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v13 = require(l_script_FirstAncestor_0.Enums.PopoverAlign);
-local v14 = require(l_script_FirstAncestor_0.Enums.PopoverSide);
-local v15 = require(l_script_FirstAncestor_0.Enums.Radius);
-local v16 = require(l_Parent_0.React);
-local v17 = require(l_Parent_0.ReactRoblox);
-local v18 = require(l_script_FirstAncestor_0.Enums.StateLayerAffordance);
-local v19 = require(l_script_FirstAncestor_0.Enums.ElevationLayer);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v21 = require(l_script_FirstAncestor_0.Providers.Elevation.useElevation);
-local l_ElevationOwnerScope_0 = require(l_script_FirstAncestor_0.Providers.Elevation.ElevationProvider).ElevationOwnerScope;
-local v23 = {
-    side = v14.Bottom, 
-    align = v13.Center, 
-    hasArrow = true, 
-    selection = v2.MODAL.DISABLE_SELECTION, 
-    selectionGroup = v2.MODAL.TRAP_FOCUS, 
-    radius = v15.Medium
-};
-local v24 = {
-    [v15.Small] = "radius-small", 
-    [v15.Medium] = "radius-medium", 
-    [v15.Circle] = "radius-circle"
-};
-local l_SHADOW_IMAGE_0 = v2.SHADOW_IMAGE;
-local l_SHADOW_SIZE_0 = v2.SHADOW_SIZE;
-return v16.forwardRef(function(v27, v28) --[[ Line: 74 ]] --[[ Name: PopoverContent ]]
-    -- upvalues: v11 (copy), v23 (copy), v16 (copy), v4 (copy), v8 (copy), v10 (copy), v21 (copy), v19 (copy), v9 (copy), v7 (copy), v6 (copy), v12 (copy), v5 (copy), v18 (copy), v3 (copy), l_SHADOW_IMAGE_0 (copy), l_SHADOW_SIZE_0 (copy), v24 (copy), l_ElevationOwnerScope_0 (copy), v17 (copy)
-    local v29 = v11(v27, v23);
-    local v30 = v16.useContext(v4);
-    local v31 = typeof(v30.anchor) == "Instance";
-    local v32 = if v31 then v29.hasArrow else false;
-    local v33 = v8();
-    local v34 = v10();
-    local v35 = v21(v19.Popover, {
-        stackAboveOwner = true
-    });
-    local l_Size_200_0 = v34.Size.Size_200;
-    local v37 = l_Size_200_0 * 1.4142135623730951 / 2;
-    local v38 = v29.backgroundStyle or v34.Color.Surface.Surface_100;
-    local v39, v40 = v16.useState(nil);
-    local v41, v42 = v16.useState(nil);
-    local v43 = v9(v41);
-    v16.useImperativeHandle(v28, function() --[[ Line: 93 ]]
-        -- upvalues: v39 (copy)
-        return v39;
-    end, {
-        v39
-    });
-    local v44, v45, v46, v47, v48, v49 = v7(v30.isOpen, v30.anchor, v39, v33, v29.side, v29.align, if v32 then v37 else 0);
-    local v50 = v16.useRef(nil);
-    local v54 = v16.useCallback(function(v51) --[[ Line: 109 ]]
-        -- upvalues: v50 (copy), v42 (copy), v29 (copy), v30 (copy), v31 (copy), v43 (copy), v6 (ref)
-        if v50.current then
-            v50.current:Disconnect();
-        end;
-        v42(v51);
-        if v51 ~= nil and v29.onPressedOutside then
-            v50.current = v51:GetPropertyChangedSignal("GuiState"):Connect(function() --[[ Line: 116 ]]
-                -- upvalues: v51 (copy), v30 (ref), v31 (ref), v43 (ref), v6 (ref), v29 (ref)
-                if v51.GuiState == Enum.GuiState.Press then
-                    if v30.anchor and v31 then
-                        local l_anchor_0 = v30.anchor;
-                        local v53 = v43:getValue();
-                        if v6(l_anchor_0, v53) then
-                            return;
-                        elseif l_anchor_0.GuiState ~= Enum.GuiState.Idle then
-                            return;
-                        end;
-                    end;
-                    v29.onPressedOutside();
-                end;
-            end);
-        end;
-    end, {
-        v29.onPressedOutside, 
-        v30.anchor
-    });
-    v16.useEffect(function() --[[ Line: 139 ]]
-        -- upvalues: v50 (copy)
-        return function() --[[ Line: 140 ]]
-            -- upvalues: v50 (ref)
-            if v50.current then
-                v50.current:Disconnect();
-            end;
-        end;
-    end, {});
-    local v61 = if not v12.FoundationPopoverConditionalRender or v30.isOpen then v16.createElement(v5, {
-        ZIndex = v35.zIndex, 
-        tag = "size-full", 
-        Visible = v45, 
-        testId = ("%*--container"):format(v30.testId)
-    }, {
-        Backdrop = if v29.onPressedOutside and v30.isOpen then v16.createElement(v5, {
-            ZIndex = 1, 
-            stateLayer = {
-                affordance = v18.None
-            }, 
-            Size = UDim2.fromScale(2, 2), 
-            tag = "position-center-center anchor-center-center", 
-            ref = v54, 
-            testId = ("%*--backdrop"):format(v30.testId)
-        }) else nil, 
-        Shadow = v16.createElement(v3, {
-            AnchorPoint = v49, 
-            Image = l_SHADOW_IMAGE_0, 
-            Size = v46:map(function(v55) --[[ Line: 170 ]]
-                -- upvalues: l_SHADOW_SIZE_0 (ref)
-                return v55 + UDim2.fromOffset(l_SHADOW_SIZE_0, l_SHADOW_SIZE_0);
-            end), 
-            Position = v16.joinBindings({
-                v44, 
-                v49
-            }):map(function(v56) --[[ Line: 173 ]]
-                -- upvalues: l_SHADOW_SIZE_0 (ref)
-                local v57 = v56[2].X == 0 and -1 or 1;
-                local v58 = v56[2].Y == 0 and -1 or 1;
-                return UDim2.fromOffset(v56[1].X + l_SHADOW_SIZE_0 / 2 * v57, v56[1].Y + l_SHADOW_SIZE_0 / 2 * v58 + 2);
-            end), 
-            ZIndex = 2, 
-            slice = {
-                center = Rect.new(l_SHADOW_SIZE_0, l_SHADOW_SIZE_0, l_SHADOW_SIZE_0 + 1, l_SHADOW_SIZE_0 + 1)
-            }, 
-            imageStyle = v34.Color.Extended.Black.Black_20, 
-            testId = ("%*--shadow"):format(v30.testId)
-        }), 
-        Arrow = if v32 then v16.createElement(v5, {
-            Size = UDim2.fromOffset(l_Size_200_0, l_Size_200_0), 
-            Position = v47:map(function(v59) --[[ Line: 191 ]]
-                return UDim2.fromOffset(v59.X, v59.Y);
-            end), 
-            Rotation = 45, 
-            ZIndex = 3, 
-            backgroundStyle = v38, 
-            tag = "anchor-center-center", 
-            testId = ("%*--arrow"):format(v30.testId)
-        }) else nil, 
-        Content = v16.createElement(v5, {
-            AnchorPoint = v49, 
-            Position = v44:map(function(v60) --[[ Line: 205 ]]
-                return UDim2.fromOffset(v60.X, v60.Y);
-            end), 
-            selection = v29.selection, 
-            selectionGroup = v29.selectionGroup, 
-            sizeConstraint = {
-                MaxSize = v48
-            }, 
-            stateLayer = {
-                affordance = v18.None
-            }, 
-            ZIndex = 4, 
-            onActivated = v29.onPressedOutside and function() --[[ Line: 218 ]]
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Constants = require(Foundation.Constants)
+local Dash = require(FoundationParent.Dash)
+local Image = require(Foundation.Components.Image)
+local PopoverContext = require(script.Parent.Parent.PopoverContext)
+local View = require(Foundation.Components.View)
+local isPointInGuiObjectBounds = require(Foundation.Utility.isPointInGuiObjectBounds)
+local useFloating = require(script.Parent.Parent.useFloating)
+local useOverlay = require(Foundation.Providers.Overlay.useOverlay)
+local usePointerPosition = require(Foundation.Utility.usePointerPosition)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local Flags = require(Foundation.Utility.Flags)
+local PopoverAlign = require(Foundation.Enums.PopoverAlign)
+local PopoverSide = require(Foundation.Enums.PopoverSide)
+local Radius = require(Foundation.Enums.Radius)
+local React = require(FoundationParent.React)
+local ReactRoblox = require(FoundationParent.ReactRoblox)
+local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
+local ElevationLayer = require(Foundation.Enums.ElevationLayer)
 
-            end or nil, 
-            backgroundStyle = v38, 
-            tag = ("auto-xy %*"):format(v24[v29.radius]), 
-            ref = v40, 
-            testId = ("%*--content"):format(v30.testId)
-        }, if v12.FoundationElevationKeepSiblingZIndex then v16.createElement(l_ElevationOwnerScope_0, {
-            owner = v35
-        }, v29.children) else v29.children)
-    }) else nil;
-    if v33 == nil then
-        return v61;
-    else
-        return v17.createPortal(v61, v33);
-    end;
-end);
+require(Foundation.Components.Types)
+
+local useElevation = require(Foundation.Providers.Elevation.useElevation)
+local ElevationOwnerScope = require(Foundation.Providers.Elevation.ElevationProvider).ElevationOwnerScope
+local t1 = {
+	hasArrow = true,
+	side = PopoverSide.Bottom,
+	align = PopoverAlign.Center,
+	selection = Constants.MODAL.DISABLE_SELECTION,
+	selectionGroup = Constants.MODAL.TRAP_FOCUS,
+	radius = Radius.Medium
+}
+local t2 = {
+	[Radius.Small] = "radius-small",
+	[Radius.Medium] = "radius-medium",
+	[Radius.Circle] = "radius-circle"
+}
+local SHADOW_IMAGE = Constants.SHADOW_IMAGE
+local SHADOW_SIZE = Constants.SHADOW_SIZE
+
+local function PopoverContent(t3: {[any]: any}, p1) -- line: 77
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), PopoverContext (copy), useOverlay (copy), useTokens (copy), useElevation (copy), ElevationLayer (copy), usePointerPosition (copy), useFloating (copy), isPointInGuiObjectBounds (copy), View (copy), StateLayerAffordance (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy), Flags (copy), Dash (copy), t2 (copy), ElevationOwnerScope (copy), ReactRoblox (copy)
+	local v31 = withDefaults(t3, t1)
+	local v32 = React.useContext(PopoverContext)
+	local v33 = typeof(v32.anchor) == "Instance"
+	local v34 = not not v33 and v31.hasArrow
+	local v35 = useOverlay()
+	local v36 = useTokens()
+	local v37 = useElevation(ElevationLayer.Popover, {
+		stackAboveOwner = true
+	})
+	local Size_200 = v36.Size.Size_200
+	local v39 = Size_200 * 1.4142135623730951 / 2
+	local v40 = v31.backgroundStyle or v36.Color.Surface.Surface_100
+	local v41, v42 = React.useState(nil)
+	local v43, v44 = React.useState(nil)
+	local v45 = usePointerPosition(v43)
+
+	React.useImperativeHandle(p1, function() -- line: 96
+		-- upvalues: v41 (copy)
+		return v41
+	end, { v41 })
+
+	local v46, v47, v48, v49, v50, v51 = useFloating(v32.isOpen, v32.anchor, v41, v35, v31.side, v31.align, not v34 and 0 or v39)
+	local v52 = React.useRef(nil)
+	local v53 = React.useCallback(function(p2) -- line: 112
+		-- upvalues: v52 (copy), v44 (copy), v31 (copy), v32 (copy), v33 (copy), v45 (copy), isPointInGuiObjectBounds (copy)
+		if v52.current then
+			v52.current:Disconnect()
+		end
+
+		v44(p2)
+
+		if p2 ~= nil and v31.onPressedOutside then
+			v52.current = p2:GetPropertyChangedSignal("GuiState"):Connect(function() -- line: 119
+				-- upvalues: p2 (copy), v32 (copy), v33 (copy), v45 (copy), isPointInGuiObjectBounds (copy), v31 (copy)
+				if p2.GuiState == Enum.GuiState.Press then
+					if v32.anchor and v33 then
+						local anchor = v32.anchor
+						local v63 = v45:getValue()
+
+						if isPointInGuiObjectBounds(anchor, v63) then
+							return
+						end
+
+						if anchor.GuiState ~= Enum.GuiState.Idle then
+							return
+						end
+					end
+
+					v31.onPressedOutside()
+				end
+			end)
+		end
+	end, {
+		v31.onPressedOutside,
+		v32.anchor
+	})
+
+	React.useEffect(function() -- line: 142
+		-- upvalues: v52 (copy)
+		return function() -- line: 143
+			-- upvalues: v52 (copy)
+			if v52.current then
+				v52.current:Disconnect()
+			end
+		end
+	end, {})
+
+	local v54 = if not v32.isOpen then nil else React.createElement(View, {
+		tag = "size-full",
+		ZIndex = v37.zIndex,
+		Visible = v47,
+		testId = `{ v32.testId }--container`
+	}, {
+		Backdrop = if not v31.onPressedOutside or not v32.isOpen then nil else React.createElement(View, {
+			ZIndex = 1,
+			tag = "position-center-center anchor-center-center",
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			},
+			Size = UDim2.fromScale(2, 2),
+			ref = v53,
+			testId = `{ v32.testId }--backdrop`
+		}),
+		Shadow = React.createElement(Image, {
+			ZIndex = 2,
+			AnchorPoint = v51,
+			Image = SHADOW_IMAGE,
+			Size = v48:map(function(uDim2: UDim2) -- line: 173
+				-- upvalues: SHADOW_SIZE (copy)
+				return uDim2 + UDim2.fromOffset(SHADOW_SIZE, SHADOW_SIZE)
+			end),
+			Position = React.joinBindings({
+				v46,
+				v51
+			}):map(function(t4: {[any]: any}) -- line: 176
+				-- upvalues: SHADOW_SIZE (copy)
+				local v58 = t4[2].X ~= 0 and 1 or -1
+				local v59 = t4[2].Y ~= 0 and 1 or -1
+
+				return UDim2.fromOffset(t4[1].X + SHADOW_SIZE / 2 * v58, t4[1].Y + SHADOW_SIZE / 2 * v59 + 2)
+			end),
+			slice = {
+				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1)
+			},
+			imageStyle = v36.Color.Extended.Black.Black_20,
+			testId = `{ v32.testId }--shadow`
+		}),
+		Arrow = if not v34 then nil else React.createElement(View, {
+			Rotation = 45,
+			ZIndex = 3,
+			tag = "anchor-center-center",
+			Size = UDim2.fromOffset(Size_200, Size_200),
+			Position = v49:map(function(vector2: Vector2) -- line: 194
+				return UDim2.fromOffset(vector2.X, vector2.Y)
+			end),
+			backgroundStyle = v40,
+			testId = `{ v32.testId }--arrow`
+		}),
+		Content = React.createElement(View, {
+			ZIndex = 4,
+			AnchorPoint = v51,
+			Position = v46:map(function(vector2: Vector2) -- line: 206
+				return UDim2.fromOffset(vector2.X, vector2.Y)
+			end),
+			selection = v31.selection,
+			selectionGroup = v31.selectionGroup,
+			sizeConstraint = {
+				MaxSize = v50
+			},
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			},
+			onActivated = if not v31.onPressedOutside and (not Flags.FoundationCoachmarkInteractionFixes or not v31.DO_NOT_USE_hasContentInputSink) then nil else Dash.noop,
+			backgroundStyle = v40,
+			tag = `auto-xy { t2[v31.radius] }`,
+			ref = v42,
+			testId = `{ v32.testId }--content`
+		}, React.createElement(ElevationOwnerScope, {
+			owner = v37
+		}, v31.children))
+	})
+
+	if v35 == nil then
+		return v54
+	end
+
+	return ReactRoblox.createPortal(v54, v35)
+end
+
+return React.forwardRef(PopoverContent)

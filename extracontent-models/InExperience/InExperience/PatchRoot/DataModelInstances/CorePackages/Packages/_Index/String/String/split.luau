@@ -1,60 +1,74 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.findOr);
-local v2 = require(l_Parent_0.slice);
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.ES7Types);
-local l_MAX_SAFE_INTEGER_0 = require(l_Parent_1.Number).MAX_SAFE_INTEGER;
-return function(v6, v7, v8) --[[ Line: 27 ]] --[[ Name: split ]]
-    -- upvalues: l_MAX_SAFE_INTEGER_0 (copy), v1 (copy), v2 (copy)
-    if v7 == nil then
-        return {
-            v6
-        };
-    elseif v8 == 0 then
-        return {};
-    else
-        local v9 = if not (v8 ~= nil) or v8 < 0 then l_MAX_SAFE_INTEGER_0 else v8;
-        local v10 = nil;
-        if typeof(v7) == "string" then
-            if v7 == "" then
-                local v11 = {};
-                for v12 in v6:gmatch(".") do
-                    table.insert(v11, v12);
-                end;
-                return v11;
-            else
-                v10 = {
-                    v7
-                };
-            end;
-        else
-            v10 = v7;
-        end;
-        local v13 = 1;
-        local v14 = {};
-        local v15 = nil;
-        local v16, v17 = utf8.len(v6);
-        assert(v16 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v6, (tostring(v17))));
-        repeat
-            local v18 = v1(v6, v10, v13);
-            if v18 ~= nil then
-                table.insert(v14, v2(v6, v13, v18.index));
-                local v19 = utf8.len(v18.match);
-                v13 = v18.index + v19;
-            else
-                table.insert(v14, v2(v6, v13, nil));
-            end;
-            if v18 ~= nil then
-                v15 = v18;
-            end;
-        until v18 == nil or v16 < v13 or v9 <= #v14;
-        if v15 ~= nil then
-            local v20, v21 = utf8.len(v15.match);
-            assert(v20 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v15.match, (tostring(v21))));
-            if v15.index + v20 == v16 + 1 then
-                table.insert(v14, "");
-            end;
-        end;
-        return v14;
-    end;
-end;
+local scriptParent = script.Parent
+local findOr = require(scriptParent.findOr)
+local slice = require(scriptParent.slice)
+local scriptParentParent = scriptParent.Parent
+
+require(scriptParentParent.ES7Types)
+
+local MAX_SAFE_INTEGER = require(scriptParentParent.Number).MAX_SAFE_INTEGER
+
+local function split(s1: string, p1, n1: number?) -- line: 27
+	-- upvalues: MAX_SAFE_INTEGER (copy), findOr (copy), slice (copy)
+	if p1 == nil then
+		return { s1 }
+	end
+
+	if n1 == 0 then
+		return {}
+	end
+
+	local v10 = if n1 ~= nil and not (n1 < 0) then n1 else MAX_SAFE_INTEGER
+
+	if typeof(p1) == "string" then
+		if p1 == "" then
+			local t1 = {}
+
+			for match in s1:gmatch(".") do
+				table.insert(t1, match)
+			end
+
+			return t1
+		end
+
+		p1 = { p1 }
+	end
+
+	local n2 = 1
+	local t2 = {}
+	local v15 = nil
+	local v16, v17 = utf8.len(s1)
+
+	assert(v16 ~= nil, ("string `%s` has an invalid byte at position %s"):format(s1, (tostring(v17))))
+
+	repeat
+		local v18 = findOr(s1, p1, n2)
+
+		if v18 ~= nil then
+			table.insert(t2, slice(s1, n2, v18.index))
+
+			local v19 = utf8.len(v18.match)
+
+			n2 = v18.index + v19
+		else
+			table.insert(t2, slice(s1, n2, nil))
+		end
+
+		if v18 ~= nil then
+			v15 = v18
+		end
+	until v18 == nil or v16 < n2 or v10 <= #t2
+
+	if v15 ~= nil then
+		local v20, v21 = utf8.len(v15.match)
+
+		assert(v20 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v15.match, (tostring(v21))))
+
+		if v15.index + v20 == v16 + 1 then
+			table.insert(t2, "")
+		end
+	end
+
+	return t2
+end
+
+return split

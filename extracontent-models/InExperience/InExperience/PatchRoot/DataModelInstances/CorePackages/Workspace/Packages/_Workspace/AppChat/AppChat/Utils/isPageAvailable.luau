@@ -1,18 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.EnumScreens);
-local l_isPlacementInExperience_0 = require(l_script_FirstAncestor_0.Contexts.ChatPlacementContext).isPlacementInExperience;
-local v3 = {
-    [v1.AddFriends] = true, 
-    [v1.PrivacySettings] = true, 
-    [v1.GameDetail] = true, 
-    [v1.ViewUserProfile] = true, 
-    [v1.Groups] = true
-};
-return function(v4, v5) --[[ Line: 15 ]]
-    -- upvalues: l_isPlacementInExperience_0 (copy), v3 (copy)
-    if l_isPlacementInExperience_0(v5) and v3[v4] then
-        return false;
-    else
-        return true;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local EnumScreens = require(AppChat.EnumScreens)
+local isPlacementInExperience = require(AppChat.Contexts.ChatPlacementContext).isPlacementInExperience
+local t1 = {
+	[EnumScreens.AddFriends] = true,
+	[EnumScreens.PrivacySettings] = true,
+	[EnumScreens.GameDetail] = true,
+	[EnumScreens.ViewUserProfile] = true,
+	[EnumScreens.Groups] = true
+}
+
+return function(s1: string, p1) -- line: 15
+	-- upvalues: isPlacementInExperience (copy), t1 (copy)
+	if isPlacementInExperience(p1) and t1[s1] then
+		return false
+	end
+
+	return true
+end

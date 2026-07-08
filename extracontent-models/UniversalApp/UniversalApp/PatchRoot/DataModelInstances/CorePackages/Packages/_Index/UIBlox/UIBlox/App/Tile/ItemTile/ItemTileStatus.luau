@@ -1,75 +1,82 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.t);
-local v5 = require(l_Parent_1.Core.Style.withStyle);
-local v6 = require(l_Parent_1.Core.Text.GetTextSize);
-local v7 = require(l_Parent_1.App.ImageSet.Images);
-local v8 = require(l_Parent_1.Core.ImageSet.ImageSetComponent);
-local v9 = require(l_Parent_0.Enum.ItemTileEnums);
-local v10 = v3.PureComponent:extend("ItemTileStatus");
-local v11 = Vector2.new(50, 20);
-local v12 = Vector2.new(10, 6);
-v10.validateProps = v4.strictInterface({
-    statusText = v4.string, 
-    statusStyle = v9.StatusStyle.isEnumValue
-});
-local function v15(v13, v14) --[[ Line: 30 ]] --[[ Name: getStyle ]]
-    -- upvalues: v9 (copy)
-    if v14 == v9.StatusStyle.Info then
-        return {
-            Background = v13.SystemPrimaryDefault, 
-            Text = v13.SystemPrimaryContent
-        };
-    elseif v14 == v9.StatusStyle.Alert then
-        return {
-            Background = v13.Alert, 
-            Text = v13.TextEmphasis
-        };
-    else
-        return {
-            Background = v13.SystemPrimaryDefault, 
-            Text = v13.SystemPrimaryContent
-        };
-    end;
-end;
-v10.render = function(v16) --[[ Line: 49 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v6 (copy), v11 (copy), v15 (copy), v3 (copy), v8 (copy), v7 (copy), v12 (copy)
-    return v5(function(v17) --[[ Line: 50 ]]
-        -- upvalues: v16 (copy), v6 (ref), v11 (ref), v15 (ref), v3 (ref), v8 (ref), v7 (ref), v12 (ref)
-        local l_Theme_0 = v17.Theme;
-        local l_Font_0 = v17.Font;
-        local l_Tokens_0 = v17.Tokens;
-        local l_statusText_0 = v16.props.statusText;
-        local l_statusStyle_0 = v16.props.statusStyle;
-        local l_Font_1 = l_Font_0.CaptionHeader.Font;
-        local v24 = l_Font_0.BaseSize * l_Font_0.CaptionHeader.RelativeSize;
-        local v25 = v6(l_statusText_0, v24, l_Font_1, v11);
-        local v26 = v15(l_Theme_0, l_statusStyle_0);
-        return v3.createElement(v8.Label, {
-            BackgroundTransparency = 1, 
-            Image = v7["component_assets/circle_17"], 
-            ImageColor3 = v26.Background.Color, 
-            ImageTransparency = v26.Background.Transparency, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(8, 8, 9, 9), 
-            Position = UDim2.new(0, l_Tokens_0.Global.Size_100, 0, l_Tokens_0.Global.Size_100), 
-            Size = UDim2.new(0, v25.X + v12.X, 0, v25.Y + v12.Y)
-        }, {
-            Text = v3.createElement("TextLabel", {
-                BackgroundTransparency = 1, 
-                Font = l_Font_1, 
-                TextSize = v24, 
-                Text = l_statusText_0, 
-                TextColor3 = v26.Text.Color, 
-                TextTransparency = v26.Text.TextTransparency, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(1, 0, 1, 0)
-            })
-        });
-    end);
-end;
-return v10;
+local ParentParent = script.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local ParentParent2Parent = ParentParent2.Parent
+local Roact = require(ParentParent2Parent.Roact)
+local t = require(ParentParent2Parent.t)
+local withStyle = require(ParentParent2.Core.Style.withStyle)
+local GetTextSize = require(ParentParent2.Core.Text.GetTextSize)
+local Images = require(ParentParent2.App.ImageSet.Images)
+local ImageSetComponent = require(ParentParent2.Core.ImageSet.ImageSetComponent)
+local ItemTileEnums = require(ParentParent.Enum.ItemTileEnums)
+local v11 = Roact.PureComponent:extend("ItemTileStatus")
+local vector2 = Vector2.new(50, 20)
+local vector2_2 = Vector2.new(10, 6)
+
+v11.validateProps = t.strictInterface({
+	statusText = t.string,
+	statusStyle = ItemTileEnums.StatusStyle.isEnumValue
+})
+
+local function getStyle(p1, p2) -- line: 30
+	-- upvalues: ItemTileEnums (copy)
+	if p2 == ItemTileEnums.StatusStyle.Info then
+		return {
+			Background = p1.SystemPrimaryDefault,
+			Text = p1.SystemPrimaryContent
+		}
+	end
+
+	if p2 == ItemTileEnums.StatusStyle.Alert then
+		return {
+			Background = p1.Alert,
+			Text = p1.TextEmphasis
+		}
+	end
+
+	return {
+		Background = p1.SystemPrimaryDefault,
+		Text = p1.SystemPrimaryContent
+	}
+end
+
+function v11.render(p3) -- line: 49
+	-- upvalues: withStyle (copy), GetTextSize (copy), vector2 (copy), getStyle (copy), Roact (copy), ImageSetComponent (copy), Images (copy), vector2_2 (copy)
+	return withStyle(function(p4) -- line: 50
+		-- upvalues: p3 (copy), GetTextSize (copy), vector2 (copy), getStyle (copy), Roact (copy), ImageSetComponent (copy), Images (copy), vector2_2 (copy)
+		local Theme = p4.Theme
+		local p4Font = p4.Font
+		local Tokens = p4.Tokens
+		local statusText = p3.props.statusText
+		local statusStyle = p3.props.statusStyle
+		local CaptionHeaderFont = p4Font.CaptionHeader.Font
+		local v25 = p4Font.BaseSize * p4Font.CaptionHeader.RelativeSize
+		local v26 = GetTextSize(statusText, v25, CaptionHeaderFont, vector2)
+		local v27 = getStyle(Theme, statusStyle)
+
+		return Roact.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			Image = Images["component_assets/circle_17"],
+			ImageColor3 = v27.Background.Color,
+			ImageTransparency = v27.Background.Transparency,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(8, 8, 9, 9),
+			Position = UDim2.new(0, Tokens.Global.Size_100, 0, Tokens.Global.Size_100),
+			Size = UDim2.new(0, v26.X + vector2_2.X, 0, v26.Y + vector2_2.Y)
+		}, {
+			Text = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Font = CaptionHeaderFont,
+				TextSize = v25,
+				Text = statusText,
+				TextColor3 = v27.Text.Color,
+				TextTransparency = v27.Text.TextTransparency,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0)
+			})
+		})
+	end)
+end
+
+return v11

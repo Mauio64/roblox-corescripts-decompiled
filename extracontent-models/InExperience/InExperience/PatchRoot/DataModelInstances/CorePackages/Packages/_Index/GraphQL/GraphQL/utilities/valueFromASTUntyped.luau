@@ -1,47 +1,63 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local l_language_0 = l_Parent_0.language;
-local v4 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v4.Array;
-local l_coerceToTable_0 = v4.coerceToTable;
-local v7 = require(l_Parent_0.luaUtils.null);
-local _ = require(l_jsutils_0.ObjMap);
-local l_inspect_0 = require(l_jsutils_0.inspect).inspect;
-local l_invariant_0 = require(l_jsutils_0.invariant).invariant;
-local l_keyValMap_0 = require(l_jsutils_0.keyValMap).keyValMap;
-local l_Kind_0 = require(l_language_0.kinds).Kind;
-local _ = require(l_language_0.ast);
-local function v14(v15, v16) --[[ Line: 48 ]] --[[ Name: valueFromASTUntyped ]]
-    -- upvalues: l_Kind_0 (copy), v7 (copy), l_Array_0 (copy), v14 (copy), l_coerceToTable_0 (copy), l_keyValMap_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy)
-    if v15.kind == l_Kind_0.NULL then
-        return v7;
-    elseif v15.kind == l_Kind_0.INT then
-        return (tonumber(v15.value, 10));
-    elseif v15.kind == l_Kind_0.FLOAT then
-        return (tonumber(v15.value));
-    elseif v15.kind == l_Kind_0.STRING or v15.kind == l_Kind_0.ENUM or v15.kind == l_Kind_0.BOOLEAN then
-        return v15.value;
-    elseif v15.kind == l_Kind_0.LIST then
-        return l_Array_0.map(v15.values, function(v17) --[[ Line: 66 ]]
-            -- upvalues: v14 (ref), v16 (copy)
-            return v14(v17, v16);
-        end);
-    elseif v15.kind == l_Kind_0.OBJECT then
-        return l_coerceToTable_0(l_keyValMap_0(v15.fields, function(v18) --[[ Line: 71 ]]
-            return v18.name.value;
-        end, function(v19) --[[ Line: 73 ]]
-            -- upvalues: v14 (ref), v16 (copy)
-            return v14(v19.value, v16);
-        end));
-    elseif v15.kind == l_Kind_0.VARIABLE then
-        return v16 and v16[v15.name.value];
-    else
-        l_invariant_0(false, "Unexpected value node: " .. l_inspect_0(v15));
-        error("Unexpected value node: " .. l_inspect_0(v15));
-        return;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local jsutils = ParentParent.jsutils
+local language = ParentParent.language
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local coerceToTable = LuauPolyfill.coerceToTable
+local null = require(ParentParent.luaUtils.null)
+
+require(jsutils.ObjMap)
+
+local inspect = require(jsutils.inspect).inspect
+local invariant = require(jsutils.invariant).invariant
+local keyValMap = require(jsutils.keyValMap).keyValMap
+local Kind = require(language.kinds).Kind
+
+require(language.ast)
+
+local function valueFromASTUntyped(p1, p2) -- line: 48
+	-- upvalues: Kind (copy), null (copy), Array (copy), valueFromASTUntyped (copy), coerceToTable (copy), keyValMap (copy), invariant (copy), inspect (copy)
+	if p1.kind == Kind.NULL then
+		return null
+	end
+
+	if p1.kind == Kind.INT then
+		return (tonumber(p1.value, 10))
+	end
+
+	if p1.kind == Kind.FLOAT then
+		return (tonumber(p1.value))
+	end
+
+	if p1.kind == Kind.STRING or p1.kind == Kind.ENUM or p1.kind == Kind.BOOLEAN then
+		return p1.value
+	end
+
+	if p1.kind == Kind.LIST then
+		return Array.map(p1.values, function(p3) -- line: 66
+			-- upvalues: valueFromASTUntyped (copy), p2 (copy)
+			return valueFromASTUntyped(p3, p2)
+		end)
+	end
+
+	if p1.kind == Kind.OBJECT then
+		return coerceToTable(keyValMap(p1.fields, function(p4) -- line: 71
+			return p4.name.value
+		end, function(p5) -- line: 73
+			-- upvalues: valueFromASTUntyped (copy), p2 (copy)
+			return valueFromASTUntyped(p5.value, p2)
+		end))
+	end
+
+	if p1.kind == Kind.VARIABLE then
+		return p2 and p2[p1.name.value]
+	end
+
+	invariant(false, "Unexpected value node: " .. inspect(p1))
+	error("Unexpected value node: " .. inspect(p1))
+end
+
 return {
-    valueFromASTUntyped = v14
-};
+	valueFromASTUntyped = valueFromASTUntyped
+}

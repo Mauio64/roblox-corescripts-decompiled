@@ -1,51 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxAppInteractionFeedbackConfig").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Responsive);
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v4 = require(l_Parent_0.RoactAppExperiment);
-local l_InteractionFeedbackContext_0 = require(l_Parent_0.InteractionFeedback).InteractionFeedbackContext;
-local v6 = require(script.Parent.SpatialConfig);
-local v7 = require(script.Parent.DirectionalConfig);
-local v8 = require(script.Parent.PointerConfig);
-local v9 = require(script.Parent.TouchConfig);
-local l_useUserExperiment_0 = v4.useUserExperiment;
-local v11 = game:DefineFastFlag("MobileSoundAndHapticsEnabledIXP", false);
-local v12 = game:DefineFastFlag("MobileSoundAndHapticsIXPBypass", false);
-return function(v13) --[[ Line: 17 ]] --[[ Name: InteractionFeedbackProvider ]]
-    -- upvalues: v2 (copy), v11 (copy), l_useUserExperiment_0 (copy), l_AppUserLayers_0 (copy), v1 (copy), v6 (copy), v12 (copy), v9 (copy), v7 (copy), v8 (copy), l_InteractionFeedbackContext_0 (copy)
-    local v14 = v2.useLastInput();
-    local v15 = v2.useIsSpatial();
-    local v16 = nil;
-    if v11 then
-        v16 = l_useUserExperiment_0({
-            l_AppUserLayers_0.MobileSoundAndHapticsLayer
-        }, function(v17) --[[ Line: 22 ]]
-            -- upvalues: l_AppUserLayers_0 (ref)
-            return (v17[l_AppUserLayers_0.MobileSoundAndHapticsLayer] or {}).mobileSoundAndHapticsEnabled;
-        end);
-    end;
-    local v18 = v1.useMemo(function() --[[ Line: 28 ]]
-        -- upvalues: v15 (copy), v6 (ref), v14 (copy), v2 (ref), v12 (ref), v11 (ref), v16 (ref), v9 (ref), v7 (ref), v8 (ref)
-        if v15 then
-            return v6;
-        elseif v14 == v2.Input.Touch then
-            if v12 or v11 and v16 then
-                return v9;
-            else
-                return {};
-            end;
-        elseif v14 == v2.Input.Directional then
-            return v7;
-        elseif v14 == v2.Input.Pointer then
-            return v8;
-        else
-            return {};
-        end;
-    end, {
-        v15, 
-        v14
-    });
-    return v1.createElement(l_InteractionFeedbackContext_0.Provider, {
-        value = v18
-    }, v13.children);
-end;
+local Parent = script:FindFirstAncestor("RobloxAppInteractionFeedbackConfig").Parent
+local React = require(Parent.React)
+local Responsive = require(Parent.Responsive)
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local RoactAppExperiment = require(Parent.RoactAppExperiment)
+local InteractionFeedbackContext = require(Parent.InteractionFeedback).InteractionFeedbackContext
+local SpatialConfig = require(script.Parent.SpatialConfig)
+local DirectionalConfig = require(script.Parent.DirectionalConfig)
+local PointerConfig = require(script.Parent.PointerConfig)
+local TouchConfig = require(script.Parent.TouchConfig)
+local useUserExperiment = RoactAppExperiment.useUserExperiment
+local v12 = game:DefineFastFlag("MobileSoundAndHapticsEnabledIXP", false)
+local v13 = game:DefineFastFlag("MobileSoundAndHapticsIXPBypass", false)
+
+local function InteractionFeedbackProvider(t1: {[any]: any}) -- line: 17
+	-- upvalues: Responsive (copy), v12 (copy), useUserExperiment (copy), AppUserLayers (copy), React (copy), SpatialConfig (copy), v13 (copy), TouchConfig (copy), DirectionalConfig (copy), PointerConfig (copy), InteractionFeedbackContext (copy)
+	local v16 = Responsive.useLastInput()
+	local v17 = Responsive.useIsSpatial()
+	local u18 = nil
+
+	if v12 then
+		u18 = useUserExperiment({ AppUserLayers.MobileSoundAndHapticsLayer }, function(p1) -- line: 22
+			-- upvalues: AppUserLayers (copy)
+			return (p1[AppUserLayers.MobileSoundAndHapticsLayer] or {}).mobileSoundAndHapticsEnabled
+		end)
+	end
+
+	local v19 = React.useMemo(function() -- line: 28
+		-- upvalues: v17 (copy), SpatialConfig (copy), v16 (copy), Responsive (copy), v13 (copy), v12 (copy), u18 (ref), TouchConfig (copy), DirectionalConfig (copy), PointerConfig (copy)
+		if v17 then
+			return SpatialConfig
+		end
+
+		if v16 == Responsive.Input.Touch then
+			if v13 or v12 and u18 then
+				return TouchConfig
+			end
+
+			return {}
+		end
+
+		if v16 == Responsive.Input.Directional then
+			return DirectionalConfig
+		end
+
+		if v16 == Responsive.Input.Pointer then
+			return PointerConfig
+		end
+
+		return {}
+	end, {
+		v17,
+		v16
+	})
+
+	return React.createElement(InteractionFeedbackContext.Provider, {
+		value = v19
+	}, t1.children)
+end
+
+return InteractionFeedbackProvider

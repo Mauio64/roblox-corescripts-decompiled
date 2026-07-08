@@ -1,48 +1,53 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.t);
-local v4 = require(l_Parent_0.App.ImageSet.Images);
-local v5 = require(l_Parent_0.App.Indicator.EmptyState);
-local v6 = require(l_Parent_0.App.Button.Button);
-local v7 = require(l_Parent_0.App.Button.Enum.ButtonType);
-local v8 = require(l_Parent_0.App.Loading.Enum.RenderOnFailedStyle);
-local v9 = v2.PureComponent:extend("FailedStatePage");
-v9.validateProps = v3.strictInterface({
-    onRetry = v3.optional(v3.callback), 
-    renderOnFailed = v3.optional(v8.isEnumValue), 
-    text = v3.optional(v3.string)
-});
-v9.defaultProps = {
-    renderOnFailed = v8.RetryButton
-};
-v9.render = function(v10) --[[ Line: 36 ]] --[[ Name: render ]]
-    -- upvalues: v8 (copy), v2 (copy), v5 (copy), v4 (copy), v6 (copy), v7 (copy)
-    if v10.props.renderOnFailed == v8.EmptyStatePage then
-        return v2.createElement(v5, {
-            position = UDim2.fromScale(0.5, 0.5), 
-            anchorPoint = Vector2.new(0.5, 0.5), 
-            onActivated = v10.props.onRetry, 
-            icon = v4["icons/status/noconnection_large"], 
-            text = v10.props.text
-        });
-    elseif v10.props.renderOnFailed == v8.RetryButton then
-        if v10.props.onRetry then
-            return v2.createElement(v6, {
-                buttonType = v7.Secondary, 
-                size = UDim2.fromOffset(44, 44), 
-                position = UDim2.fromScale(0.5, 0.5), 
-                anchorPoint = Vector2.new(0.5, 0.5), 
-                onActivated = v10.props.onRetry, 
-                icon = v4["icons/common/refresh"]
-            });
-        else
-            error("OnRetry callback empty. OnRetry needs to be a function to render the RetryButton");
-            return;
-        end;
-    else
-        error("Failed to provide proper RenderOnFailedStyle");
-        return;
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local t = require(ParentParentParent.t)
+local Images = require(ParentParent.App.ImageSet.Images)
+local EmptyState = require(ParentParent.App.Indicator.EmptyState)
+local Button = require(ParentParent.App.Button.Button)
+local ButtonType = require(ParentParent.App.Button.Enum.ButtonType)
+local RenderOnFailedStyle = require(ParentParent.App.Loading.Enum.RenderOnFailedStyle)
+local v10 = Roact.PureComponent:extend("FailedStatePage")
+
+v10.validateProps = t.strictInterface({
+	onRetry = t.optional(t.callback),
+	renderOnFailed = t.optional(RenderOnFailedStyle.isEnumValue),
+	text = t.optional(t.string)
+})
+v10.defaultProps = {
+	renderOnFailed = RenderOnFailedStyle.RetryButton
+}
+
+function v10.render(p1) -- line: 36
+	-- upvalues: RenderOnFailedStyle (copy), Roact (copy), EmptyState (copy), Images (copy), Button (copy), ButtonType (copy)
+	if p1.props.renderOnFailed == RenderOnFailedStyle.EmptyStatePage then
+		return Roact.createElement(EmptyState, {
+			position = UDim2.fromScale(0.5, 0.5),
+			anchorPoint = Vector2.new(0.5, 0.5),
+			onActivated = p1.props.onRetry,
+			icon = Images["icons/status/noconnection_large"],
+			text = p1.props.text
+		})
+	end
+
+	if p1.props.renderOnFailed == RenderOnFailedStyle.RetryButton then
+		if p1.props.onRetry then
+			return Roact.createElement(Button, {
+				buttonType = ButtonType.Secondary,
+				size = UDim2.fromOffset(44, 44),
+				position = UDim2.fromScale(0.5, 0.5),
+				anchorPoint = Vector2.new(0.5, 0.5),
+				onActivated = p1.props.onRetry,
+				icon = Images["icons/common/refresh"]
+			})
+		end
+
+		error("OnRetry callback empty. OnRetry needs to be a function to render the RetryButton")
+
+		return
+	end
+
+	error("Failed to provide proper RenderOnFailedStyle")
+end
+
+return v10

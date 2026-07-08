@@ -1,3 +1,3 @@
 return {
-    GetFFlagLuaAppFetchPlayabilityKillSwitch = require(script.GetFFlagLuaAppFetchPlayabilityKillSwitch)
-};
+	GetFFlagLuaAppFetchPlayabilityKillSwitch = require(script.GetFFlagLuaAppFetchPlayabilityKillSwitch)
+}

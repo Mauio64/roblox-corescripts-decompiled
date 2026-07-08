@@ -1,115 +1,107 @@
 return {
-    definitions = {
-        {
-            selectionSet = {
-                kind = "SelectionSet", 
-                selections = {
-                    {
-                        selectionSet = {
-                            kind = "SelectionSet", 
-                            selections = {
-                                {
-                                    arguments = {}, 
-                                    name = {
-                                        value = "id", 
-                                        kind = "Name"
-                                    }, 
-                                    kind = "Field", 
-                                    directives = {}
-                                }, 
-                                {
-                                    selectionSet = {
-                                        kind = "SelectionSet", 
-                                        selections = {
-                                            {
-                                                arguments = {}, 
-                                                name = {
-                                                    value = "combinedName", 
-                                                    kind = "Name"
-                                                }, 
-                                                kind = "Field", 
-                                                directives = {}
-                                            }, 
-                                            {
-                                                arguments = {}, 
-                                                name = {
-                                                    value = "alias", 
-                                                    kind = "Name"
-                                                }, 
-                                                kind = "Field", 
-                                                directives = {}
-                                            }
-                                        }
-                                    }, 
-                                    arguments = {}, 
-                                    name = {
-                                        value = "names", 
-                                        kind = "Name"
-                                    }, 
-                                    kind = "Field", 
-                                    directives = {}
-                                }
-                            }
-                        }, 
-                        arguments = {
-                            {
-                                value = {
-                                    kind = "Variable", 
-                                    name = {
-                                        value = "userIds", 
-                                        kind = "Name"
-                                    }
-                                }, 
-                                kind = "Argument", 
-                                name = {
-                                    value = "userIds", 
-                                    kind = "Name"
-                                }
-                            }
-                        }, 
-                        name = {
-                            value = "userProfiles", 
-                            kind = "Name"
-                        }, 
-                        kind = "Field", 
-                        directives = {}
-                    }
-                }
-            }, 
-            directives = {}, 
-            name = {
-                value = "UserProfiles", 
-                kind = "Name"
-            }, 
-            operation = "query", 
-            kind = "OperationDefinition", 
-            variableDefinitions = {
-                {
-                    type = {
-                        kind = "NonNullType", 
-                        type = {
-                            kind = "ListType", 
-                            type = {
-                                kind = "NamedType", 
-                                name = {
-                                    value = "String", 
-                                    kind = "Name"
-                                }
-                            }
-                        }
-                    }, 
-                    directives = {}, 
-                    kind = "VariableDefinition", 
-                    variable = {
-                        kind = "Variable", 
-                        name = {
-                            value = "userIds", 
-                            kind = "Name"
-                        }
-                    }
-                }
-            }
-        }
-    }, 
-    kind = "Document"
-};
+	kind = "Document",
+	definitions = {{
+		operation = "query",
+		kind = "OperationDefinition",
+		selectionSet = {
+			kind = "SelectionSet",
+			selections = {{
+				kind = "Field",
+				selectionSet = {
+					kind = "SelectionSet",
+					selections = {
+						{
+							kind = "Field",
+							arguments = {},
+							name = {
+								value = "id",
+								kind = "Name"
+							},
+							directives = {}
+						},
+						{
+							kind = "Field",
+							selectionSet = {
+								kind = "SelectionSet",
+								selections = {
+									{
+										kind = "Field",
+										arguments = {},
+										name = {
+											value = "combinedName",
+											kind = "Name"
+										},
+										directives = {}
+									},
+									{
+										kind = "Field",
+										arguments = {},
+										name = {
+											value = "alias",
+											kind = "Name"
+										},
+										directives = {}
+									}
+								}
+							},
+							arguments = {},
+							name = {
+								value = "names",
+								kind = "Name"
+							},
+							directives = {}
+						}
+					}
+				},
+				arguments = {{
+					kind = "Argument",
+					value = {
+						kind = "Variable",
+						name = {
+							value = "userIds",
+							kind = "Name"
+						}
+					},
+					name = {
+						value = "userIds",
+						kind = "Name"
+					}
+				}},
+				name = {
+					value = "userProfiles",
+					kind = "Name"
+				},
+				directives = {}
+			}}
+		},
+		directives = {},
+		name = {
+			value = "UserProfiles",
+			kind = "Name"
+		},
+		variableDefinitions = {{
+			kind = "VariableDefinition",
+			type = {
+				kind = "NonNullType",
+				type = {
+					kind = "ListType",
+					type = {
+						kind = "NamedType",
+						name = {
+							value = "String",
+							kind = "Name"
+						}
+					}
+				}
+			},
+			directives = {},
+			variable = {
+				kind = "Variable",
+				name = {
+					value = "userIds",
+					kind = "Name"
+				}
+			}
+		}}
+	}}
+}

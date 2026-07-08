@@ -1,144 +1,151 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local l_console_0 = require(l_Parent_0.Shared).console;
-local v3 = {};
-local l_ReactSymbols_0 = require(l_Parent_0.Shared).ReactSymbols;
-local l_REACT_CONTEXT_TYPE_0 = l_ReactSymbols_0.REACT_CONTEXT_TYPE;
-local l_REACT_ELEMENT_TYPE_0 = l_ReactSymbols_0.REACT_ELEMENT_TYPE;
-local l_REACT_FORWARD_REF_TYPE_0 = l_ReactSymbols_0.REACT_FORWARD_REF_TYPE;
-local l_REACT_FRAGMENT_TYPE_0 = l_ReactSymbols_0.REACT_FRAGMENT_TYPE;
-local l_REACT_LAZY_TYPE_0 = l_ReactSymbols_0.REACT_LAZY_TYPE;
-local l_REACT_MEMO_TYPE_0 = l_ReactSymbols_0.REACT_MEMO_TYPE;
-local l_REACT_PORTAL_TYPE_0 = l_ReactSymbols_0.REACT_PORTAL_TYPE;
-local l_REACT_PROFILER_TYPE_0 = l_ReactSymbols_0.REACT_PROFILER_TYPE;
-local l_REACT_PROVIDER_TYPE_0 = l_ReactSymbols_0.REACT_PROVIDER_TYPE;
-local l_REACT_STRICT_MODE_TYPE_0 = l_ReactSymbols_0.REACT_STRICT_MODE_TYPE;
-local l_REACT_SUSPENSE_TYPE_0 = l_ReactSymbols_0.REACT_SUSPENSE_TYPE;
-local l_REACT_SUSPENSE_LIST_TYPE_0 = l_ReactSymbols_0.REACT_SUSPENSE_LIST_TYPE;
-local l_isValidElementType_0 = require(l_Parent_0.Shared).isValidElementType;
-local l_REACT_BINDING_TYPE_0 = l_ReactSymbols_0.REACT_BINDING_TYPE;
-local v19 = require(l_Parent_0.SafeFlags).createGetFFlag("ReactIsProtectedTypeOf", false)();
-local function v27(v20) --[[ Line: 50 ]] --[[ Name: typeOf ]]
-    -- upvalues: v19 (copy), l_REACT_ELEMENT_TYPE_0 (copy), l_REACT_FRAGMENT_TYPE_0 (copy), l_REACT_PROFILER_TYPE_0 (copy), l_REACT_STRICT_MODE_TYPE_0 (copy), l_REACT_SUSPENSE_TYPE_0 (copy), l_REACT_SUSPENSE_LIST_TYPE_0 (copy), l_REACT_CONTEXT_TYPE_0 (copy), l_REACT_FORWARD_REF_TYPE_0 (copy), l_REACT_LAZY_TYPE_0 (copy), l_REACT_MEMO_TYPE_0 (copy), l_REACT_PROVIDER_TYPE_0 (copy), l_REACT_PORTAL_TYPE_0 (copy), l_REACT_BINDING_TYPE_0 (copy)
-    if typeof(v20) == "table" and v20 ~= nil then
-        local v21 = nil;
-        if v19 then
-            local v22 = nil;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 58 ]]
-                -- upvalues: v20 (copy)
-                return v20["$$typeof"];
-            end);
-            v22 = l_status_0;
-            v21 = l_result_0;
-            if not v22 then
-                return nil;
-            end;
-        else
-            v21 = v20["$$typeof"];
-        end;
-        if v21 == l_REACT_ELEMENT_TYPE_0 then
-            local l_type_0 = v20.type;
-            if l_type_0 == l_REACT_FRAGMENT_TYPE_0 or l_type_0 == l_REACT_PROFILER_TYPE_0 or l_type_0 == l_REACT_STRICT_MODE_TYPE_0 or l_type_0 == l_REACT_SUSPENSE_TYPE_0 or l_type_0 == l_REACT_SUSPENSE_LIST_TYPE_0 then
-                return l_type_0;
-            else
-                local v26 = l_type_0 and typeof(l_type_0) == "table" and l_type_0["$$typeof"];
-                if v26 == l_REACT_CONTEXT_TYPE_0 or v26 == l_REACT_FORWARD_REF_TYPE_0 or v26 == l_REACT_LAZY_TYPE_0 or v26 == l_REACT_MEMO_TYPE_0 or v26 == l_REACT_PROVIDER_TYPE_0 then
-                    return v26;
-                else
-                    return v21;
-                end;
-            end;
-        elseif v21 == l_REACT_PORTAL_TYPE_0 or v21 == l_REACT_BINDING_TYPE_0 then
-            return v21;
-        end;
-    end;
-    return nil;
-end;
-v3.typeOf = v27;
-v3.ContextConsumer = l_REACT_CONTEXT_TYPE_0;
-v3.ContextProvider = l_REACT_PROVIDER_TYPE_0;
-v3.Element = l_REACT_ELEMENT_TYPE_0;
-v3.ForwardRef = l_REACT_FORWARD_REF_TYPE_0;
-v3.Fragment = l_REACT_FRAGMENT_TYPE_0;
-v3.Lazy = l_REACT_LAZY_TYPE_0;
-v3.Memo = l_REACT_MEMO_TYPE_0;
-v3.Portal = l_REACT_PORTAL_TYPE_0;
-v3.Profiler = l_REACT_PROFILER_TYPE_0;
-v3.StrictMode = l_REACT_STRICT_MODE_TYPE_0;
-v3.Suspense = l_REACT_SUSPENSE_TYPE_0;
-v3.Binding = l_ReactSymbols_0.REACT_BINDING_TYPE;
-v3.isValidElementType = l_isValidElementType_0;
-local v28 = false;
-local v29 = false;
-v3.isAsyncMode = function(_) --[[ Line: 183 ]] --[[ Name: isAsyncMode ]]
-    -- upvalues: v1 (copy), v28 (ref), l_console_0 (copy)
-    if v1.__DEV__ and not v28 then
-        v28 = true;
-        l_console_0.warn("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 18+.");
-    end;
-    return false;
-end;
-v3.isConcurrentMode = function(_) --[[ Line: 200 ]] --[[ Name: isConcurrentMode ]]
-    -- upvalues: v1 (copy), v29 (ref), l_console_0 (copy)
-    if v1.__DEV__ and not v29 then
-        v29 = true;
-        l_console_0.warn("The ReactIs.isConcurrentMode() alias has been deprecated, and will be removed in React 18+.");
-    end;
-    return false;
-end;
-v3.isContextConsumer = function(v32) --[[ Line: 217 ]] --[[ Name: isContextConsumer ]]
-    -- upvalues: v27 (copy), l_REACT_CONTEXT_TYPE_0 (copy)
-    return v27(v32) == l_REACT_CONTEXT_TYPE_0;
-end;
-v3.isContextProvider = function(v33) --[[ Line: 221 ]] --[[ Name: isContextProvider ]]
-    -- upvalues: v27 (copy), l_REACT_PROVIDER_TYPE_0 (copy)
-    return v27(v33) == l_REACT_PROVIDER_TYPE_0;
-end;
-v3.isElement = function(v34) --[[ Line: 225 ]] --[[ Name: isElement ]]
-    -- upvalues: l_REACT_ELEMENT_TYPE_0 (copy)
-    local v35 = false;
-    if typeof(v34) == "table" then
-        v35 = false;
-        if v34 ~= nil then
-            v35 = v34["$$typeof"] == l_REACT_ELEMENT_TYPE_0;
-        end;
-    end;
-    return v35;
-end;
-v3.isForwardRef = function(v36) --[[ Line: 231 ]] --[[ Name: isForwardRef ]]
-    -- upvalues: v27 (copy), l_REACT_FORWARD_REF_TYPE_0 (copy)
-    return v27(v36) == l_REACT_FORWARD_REF_TYPE_0;
-end;
-v3.isFragment = function(v37) --[[ Line: 235 ]] --[[ Name: isFragment ]]
-    -- upvalues: v27 (copy), l_REACT_FRAGMENT_TYPE_0 (copy)
-    return v27(v37) == l_REACT_FRAGMENT_TYPE_0;
-end;
-v3.isLazy = function(v38) --[[ Line: 239 ]] --[[ Name: isLazy ]]
-    -- upvalues: v27 (copy), l_REACT_LAZY_TYPE_0 (copy)
-    return v27(v38) == l_REACT_LAZY_TYPE_0;
-end;
-v3.isMemo = function(v39) --[[ Line: 243 ]] --[[ Name: isMemo ]]
-    -- upvalues: v27 (copy), l_REACT_MEMO_TYPE_0 (copy)
-    return v27(v39) == l_REACT_MEMO_TYPE_0;
-end;
-v3.isPortal = function(v40) --[[ Line: 247 ]] --[[ Name: isPortal ]]
-    -- upvalues: v27 (copy), l_REACT_PORTAL_TYPE_0 (copy)
-    return v27(v40) == l_REACT_PORTAL_TYPE_0;
-end;
-v3.isProfiler = function(v41) --[[ Line: 251 ]] --[[ Name: isProfiler ]]
-    -- upvalues: v27 (copy), l_REACT_PROFILER_TYPE_0 (copy)
-    return v27(v41) == l_REACT_PROFILER_TYPE_0;
-end;
-v3.isStrictMode = function(v42) --[[ Line: 255 ]] --[[ Name: isStrictMode ]]
-    -- upvalues: v27 (copy), l_REACT_STRICT_MODE_TYPE_0 (copy)
-    return v27(v42) == l_REACT_STRICT_MODE_TYPE_0;
-end;
-v3.isSuspense = function(v43) --[[ Line: 259 ]] --[[ Name: isSuspense ]]
-    -- upvalues: v27 (copy), l_REACT_SUSPENSE_TYPE_0 (copy)
-    return v27(v43) == l_REACT_SUSPENSE_TYPE_0;
-end;
-v3.isBinding = function(v44) --[[ Line: 264 ]]
-    -- upvalues: v27 (copy), l_REACT_BINDING_TYPE_0 (copy)
-    return v27(v44) == l_REACT_BINDING_TYPE_0;
-end;
-return v3;
+local scriptParent = script.Parent
+local ReactGlobals = require(scriptParent.ReactGlobals)
+local console = require(scriptParent.Shared).console
+local t1 = {}
+local ReactSymbols = require(scriptParent.Shared).ReactSymbols
+local REACT_CONTEXT_TYPE = ReactSymbols.REACT_CONTEXT_TYPE
+local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
+local REACT_FORWARD_REF_TYPE = ReactSymbols.REACT_FORWARD_REF_TYPE
+local REACT_FRAGMENT_TYPE = ReactSymbols.REACT_FRAGMENT_TYPE
+local REACT_LAZY_TYPE = ReactSymbols.REACT_LAZY_TYPE
+local REACT_MEMO_TYPE = ReactSymbols.REACT_MEMO_TYPE
+local REACT_PORTAL_TYPE = ReactSymbols.REACT_PORTAL_TYPE
+local REACT_PROFILER_TYPE = ReactSymbols.REACT_PROFILER_TYPE
+local REACT_PROVIDER_TYPE = ReactSymbols.REACT_PROVIDER_TYPE
+local REACT_STRICT_MODE_TYPE = ReactSymbols.REACT_STRICT_MODE_TYPE
+local REACT_SUSPENSE_TYPE = ReactSymbols.REACT_SUSPENSE_TYPE
+local REACT_SUSPENSE_LIST_TYPE = ReactSymbols.REACT_SUSPENSE_LIST_TYPE
+local isValidElementType = require(scriptParent.Shared).isValidElementType
+local REACT_BINDING_TYPE = ReactSymbols.REACT_BINDING_TYPE
+local v20 = require(scriptParent.SafeFlags).createGetFFlag("ReactIsProtectedTypeOf", false)()
+
+local function typeOf(p1) -- line: 50
+	-- upvalues: v20 (copy), REACT_ELEMENT_TYPE (copy), REACT_FRAGMENT_TYPE (copy), REACT_PROFILER_TYPE (copy), REACT_STRICT_MODE_TYPE (copy), REACT_SUSPENSE_TYPE (copy), REACT_SUSPENSE_LIST_TYPE (copy), REACT_CONTEXT_TYPE (copy), REACT_FORWARD_REF_TYPE (copy), REACT_LAZY_TYPE (copy), REACT_MEMO_TYPE (copy), REACT_PROVIDER_TYPE (copy), REACT_PORTAL_TYPE (copy), REACT_BINDING_TYPE (copy)
+	if typeof(p1) == "table" and p1 ~= nil then
+		local result
+
+		if v20 then
+			local ok
+
+			ok, result = pcall(function() -- line: 58
+				-- upvalues: p1 (copy)
+				return p1["$$typeof"]
+			end)
+
+			if not ok then
+				return nil
+			end
+		else
+			result = p1["$$typeof"]
+		end
+
+		if result == REACT_ELEMENT_TYPE then
+			local type = p1.type
+
+			if type == REACT_FRAGMENT_TYPE or type == REACT_PROFILER_TYPE or type == REACT_STRICT_MODE_TYPE or type == REACT_SUSPENSE_TYPE or type == REACT_SUSPENSE_LIST_TYPE then
+				return type
+			end
+
+			local v28 = type and (typeof(type) == "table" and type["$$typeof"])
+
+			if v28 == REACT_CONTEXT_TYPE or v28 == REACT_FORWARD_REF_TYPE or v28 == REACT_LAZY_TYPE or v28 == REACT_MEMO_TYPE or v28 == REACT_PROVIDER_TYPE then
+				return v28
+			end
+
+			return result
+		end
+
+		if result == REACT_PORTAL_TYPE or result == REACT_BINDING_TYPE then
+			return result
+		end
+	end
+
+	return nil
+end
+
+t1.typeOf = typeOf
+t1.ContextConsumer = REACT_CONTEXT_TYPE
+t1.ContextProvider = REACT_PROVIDER_TYPE
+t1.Element = REACT_ELEMENT_TYPE
+t1.ForwardRef = REACT_FORWARD_REF_TYPE
+t1.Fragment = REACT_FRAGMENT_TYPE
+t1.Lazy = REACT_LAZY_TYPE
+t1.Memo = REACT_MEMO_TYPE
+t1.Portal = REACT_PORTAL_TYPE
+t1.Profiler = REACT_PROFILER_TYPE
+t1.StrictMode = REACT_STRICT_MODE_TYPE
+t1.Suspense = REACT_SUSPENSE_TYPE
+t1.Binding = ReactSymbols.REACT_BINDING_TYPE
+t1.isValidElementType = isValidElementType
+
+local u22 = false
+local u23 = false
+
+function t1.isAsyncMode(_) -- line: 183
+	-- upvalues: ReactGlobals (copy), u22 (ref), console (copy)
+	if ReactGlobals.__DEV__ and not u22 then
+		u22 = true
+		console.warn("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 18+.")
+	end
+
+	return false
+end
+function t1.isConcurrentMode(_) -- line: 200
+	-- upvalues: ReactGlobals (copy), u23 (ref), console (copy)
+	if ReactGlobals.__DEV__ and not u23 then
+		u23 = true
+		console.warn("The ReactIs.isConcurrentMode() alias has been deprecated, and will be removed in React 18+.")
+	end
+
+	return false
+end
+function t1.isContextConsumer(p4) -- line: 217
+	-- upvalues: typeOf (copy), REACT_CONTEXT_TYPE (copy)
+	return typeOf(p4) == REACT_CONTEXT_TYPE
+end
+function t1.isContextProvider(p5) -- line: 221
+	-- upvalues: typeOf (copy), REACT_PROVIDER_TYPE (copy)
+	return typeOf(p5) == REACT_PROVIDER_TYPE
+end
+function t1.isElement(p6) -- line: 225
+	-- upvalues: REACT_ELEMENT_TYPE (copy)
+	return typeof(p6) == "table" and (p6 ~= nil and p6["$$typeof"] == REACT_ELEMENT_TYPE)
+end
+function t1.isForwardRef(p7) -- line: 231
+	-- upvalues: typeOf (copy), REACT_FORWARD_REF_TYPE (copy)
+	return typeOf(p7) == REACT_FORWARD_REF_TYPE
+end
+function t1.isFragment(p8) -- line: 235
+	-- upvalues: typeOf (copy), REACT_FRAGMENT_TYPE (copy)
+	return typeOf(p8) == REACT_FRAGMENT_TYPE
+end
+function t1.isLazy(p9) -- line: 239
+	-- upvalues: typeOf (copy), REACT_LAZY_TYPE (copy)
+	return typeOf(p9) == REACT_LAZY_TYPE
+end
+function t1.isMemo(p10) -- line: 243
+	-- upvalues: typeOf (copy), REACT_MEMO_TYPE (copy)
+	return typeOf(p10) == REACT_MEMO_TYPE
+end
+function t1.isPortal(p11) -- line: 247
+	-- upvalues: typeOf (copy), REACT_PORTAL_TYPE (copy)
+	return typeOf(p11) == REACT_PORTAL_TYPE
+end
+function t1.isProfiler(p12) -- line: 251
+	-- upvalues: typeOf (copy), REACT_PROFILER_TYPE (copy)
+	return typeOf(p12) == REACT_PROFILER_TYPE
+end
+function t1.isStrictMode(p13) -- line: 255
+	-- upvalues: typeOf (copy), REACT_STRICT_MODE_TYPE (copy)
+	return typeOf(p13) == REACT_STRICT_MODE_TYPE
+end
+function t1.isSuspense(p14) -- line: 259
+	-- upvalues: typeOf (copy), REACT_SUSPENSE_TYPE (copy)
+	return typeOf(p14) == REACT_SUSPENSE_TYPE
+end
+function t1.isBinding(p15) -- line: 264
+	-- upvalues: typeOf (copy), REACT_BINDING_TYPE (copy)
+	return typeOf(p15) == REACT_BINDING_TYPE
+end
+
+return t1

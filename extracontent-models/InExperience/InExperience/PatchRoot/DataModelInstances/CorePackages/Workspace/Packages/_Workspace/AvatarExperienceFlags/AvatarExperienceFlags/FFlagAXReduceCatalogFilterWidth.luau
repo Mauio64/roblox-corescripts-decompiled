@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXReduceCatalogFilterWidth", false);
+return game:DefineFastFlag("AXReduceCatalogFilterWidth2", false)

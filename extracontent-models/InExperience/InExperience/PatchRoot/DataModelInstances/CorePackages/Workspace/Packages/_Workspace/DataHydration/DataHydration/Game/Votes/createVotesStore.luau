@@ -1,245 +1,288 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.Signals);
-local l_HttpService_0 = game:GetService("HttpService");
-local v5 = require(l_script_FirstAncestor_0.createDataCache);
-local v6 = require(l_script_FirstAncestor_0.createDataResolver);
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local v8 = require(script.Parent.VotesStoreTypes);
-local v9 = require(script.Parent.VotesUtils);
-local v10 = require(l_Parent_0.DiscoveryUtils);
-local l_StatusCodes_0 = require(l_Parent_0.Http).StatusCodes;
-local l_logResponseError_0 = v10.logResponseError;
-local l_DiscoveryEventErrorLogger_0 = v10.DiscoveryEventErrorLogger;
-local v14 = require(script.Parent.fetchVotes);
-local v15 = require(script.Parent.fetchUserVote);
-local v16 = require(script.Parent.requestUserVoteUpdate);
-local v17 = require(l_Parent_0.SharedFlags);
-local l_FFlagLuaAppDataHydrationUserVotesStore_0 = v17.FFlagLuaAppDataHydrationUserVotesStore;
-local l_FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes_0 = v17.FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes;
-local l_ReasonNotVoteable_0 = v8.ReasonNotVoteable;
-local l_FFlagLuaAppInExperienceDetailsPrompt_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt;
-local l_FFlagLuaAppDataHydrationUpdateItem_0 = v17.FFlagLuaAppDataHydrationUpdateItem;
-local v23 = game:DefineFastInt("USER_VOTE_CACHE_TTL_SECONDS", 600);
-return function() --[[ Line: 37 ]] --[[ Name: createVotesStore ]]
-    -- upvalues: v5 (copy), v6 (copy), v2 (copy), v14 (copy), l_FFlagLuaAppInExperienceDetailsPrompt_0 (copy), l_FFlagLuaAppDataHydrationUserVotesStore_0 (copy), v9 (copy), v23 (copy), l_logResponseError_0 (copy), v15 (copy), v8 (copy), l_DiscoveryEventErrorLogger_0 (copy), v3 (copy), l_FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes_0 (copy), v16 (copy), l_HttpService_0 (copy), l_ReasonNotVoteable_0 (copy), l_StatusCodes_0 (copy), l_FFlagLuaAppDataHydrationUpdateItem_0 (copy)
-    local v24 = v5();
-    local v35 = v6({
-        cache = v24, 
-        fetchFn = function(v25) --[[ Line: 41 ]] --[[ Name: fetchFn ]]
-            -- upvalues: v2 (ref), v14 (ref), l_FFlagLuaAppInExperienceDetailsPrompt_0 (ref), l_FFlagLuaAppDataHydrationUserVotesStore_0 (ref), v9 (ref)
-            local v26 = v2.keys(v25);
-            return v14(v26):andThen(function(v27) --[[ Line: 46 ]]
-                -- upvalues: l_FFlagLuaAppInExperienceDetailsPrompt_0 (ref), v2 (ref), l_FFlagLuaAppDataHydrationUserVotesStore_0 (ref), v9 (ref)
-                if not v27 then
-                    error("No response");
-                end;
-                if not v27.responseBody or not v27.responseBody.data then
-                    if l_FFlagLuaAppInExperienceDetailsPrompt_0 then
-                        error((("Response Code: %*"):format(v27.responseCode)));
-                    else
-                        error((("Response Code: %*"):format(v27.reponseCode)));
-                    end;
-                end;
-                local v28 = {};
-                local l_data_0 = v27.responseBody.data;
-                v2.forEach(l_data_0, function(v30) --[[ Line: 60 ]]
-                    -- upvalues: l_FFlagLuaAppDataHydrationUserVotesStore_0 (ref), v9 (ref), v28 (copy)
-                    local v31 = nil;
-                    local l_upVotes_0 = v30.upVotes;
-                    local l_downVotes_0 = v30.downVotes;
-                    if l_FFlagLuaAppDataHydrationUserVotesStore_0 and typeof(l_upVotes_0) == "number" and typeof(l_downVotes_0) == "number" then
-                        v31 = v9.calculateRating(l_upVotes_0, l_downVotes_0);
-                    elseif typeof(l_upVotes_0) == "number" and typeof(l_downVotes_0) == "number" then
-                        v31 = math.round((l_upVotes_0 + l_downVotes_0 == 0 and 0 or l_upVotes_0 / (l_upVotes_0 + l_downVotes_0)) * 100);
-                    end;
-                    v28[tostring(v30.id)] = {
-                        upVotes = l_upVotes_0, 
-                        downVotes = l_downVotes_0, 
-                        rating = v31
-                    };
-                end);
-                return v28;
-            end):catch(function(v34) --[[ Line: 89 ]]
-                error((("Error requesting votes: %*"):format(v34)));
-            end);
-        end
-    });
-    local v36 = nil;
-    local v37 = nil;
-    local v38 = nil;
-    if l_FFlagLuaAppDataHydrationUserVotesStore_0 then
-        v36 = v5(v23);
-        v37 = v6({
-            cache = v36, 
-            logError = function(v39) --[[ Line: 102 ]] --[[ Name: logError ]]
-                -- upvalues: l_logResponseError_0 (ref)
-                l_logResponseError_0("v1/games/votes/user", v39);
-            end, 
-            fetchFn = function(v40, _) --[[ Line: 105 ]] --[[ Name: fetchFn ]]
-                -- upvalues: v15 (ref), v8 (ref), l_DiscoveryEventErrorLogger_0 (ref)
-                return v15(v40):andThen(function(v42) --[[ Line: 109 ]]
-                    -- upvalues: v8 (ref), l_DiscoveryEventErrorLogger_0 (ref), v40 (copy)
-                    local l_responseBody_0 = v42.responseBody;
-                    if not v8.userVoteResponseValidator(l_responseBody_0) then
-                        l_DiscoveryEventErrorLogger_0.reportError("createVotesStore", "Invalid user vote response", {
-                            universeId = v40, 
-                            responseBody = l_responseBody_0
-                        });
-                        error({
-                            StatusCode = v42.responseCode
-                        });
-                    end;
-                    return l_responseBody_0;
-                end);
-            end, 
-            supportsMultiGet = false
-        });
-        v38 = function(v44, v45) --[[ Line: 125 ]]
-            -- upvalues: v3 (ref), v36 (ref), v24 (copy), v37 (ref), l_FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes_0 (ref), v9 (ref), v16 (ref), l_HttpService_0 (ref), v8 (ref), l_ReasonNotVoteable_0 (ref), l_StatusCodes_0 (ref), l_DiscoveryEventErrorLogger_0 (ref), l_logResponseError_0 (ref)
-            local v46, v47 = v3.createSignal(nil);
-            local v48, v49 = v36.getItem(v44);
-            local v50 = v48 and v48.data(false);
-            local v51 = if v50 then v50.userVote else nil;
-            local v52 = v24.getItem(v44);
-            local v53 = v52 and v52.data(false);
-            if v49 then
-                v37.fetchItem(v44);
-            elseif v50 and not v50.canVote then
-                v47({
-                    type = "error", 
-                    reasonForNotVoteable = v50.reasonForNotVoteable
-                });
-                return v46;
-            end;
-            local v54 = v50 and v50.canVote or nil;
-            local v55 = v50 and v50.reasonForNotVoteable or nil;
-            v36.replaceItem(v44, {
-                canVote = v54, 
-                reasonForNotVoteable = v55, 
-                userVote = v45
-            });
-            if v53 then
-                local v56 = nil;
-                local v57 = nil;
-                if l_FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes_0 then
-                    local v58 = v51 == true and 1 or 0;
-                    local v59 = v51 == false and 1 or 0;
-                    local v60 = v45 == true and 1 or 0;
-                    local v61 = v45 == false and 1 or 0;
-                    v56 = v60 - v58;
-                    v57 = v61 - v59;
-                else
-                    v56 = v45 == true and 1 or 0;
-                    v57 = v45 == false and 1 or 0;
-                end;
-                local v62 = v53.upVotes + v56;
-                local v63 = v53.downVotes + v57;
-                if l_FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes_0 then
-                    v62 = math.max(0, v62);
-                    v63 = math.max(0, v63);
-                end;
-                local v64 = v9.calculateRating(v62, v63);
-                local v65 = {
-                    upVotes = v62, 
-                    downVotes = v63, 
-                    rating = v64
-                };
-                v24.updateItem(v44, v65);
-            end;
-            v16(v44, v45):andThen(function(_) --[[ Line: 201 ]]
-                -- upvalues: v47 (copy), v45 (copy)
-                v47({
-                    type = "success", 
-                    userVote = v45
-                });
-            end):catch(function(v67) --[[ Line: 207 ]]
-                -- upvalues: v36 (ref), v44 (copy), v54 (copy), v55 (copy), v51 (copy), v53 (copy), v24 (ref), l_HttpService_0 (ref), v8 (ref), l_ReasonNotVoteable_0 (ref), l_StatusCodes_0 (ref), v47 (copy), l_DiscoveryEventErrorLogger_0 (ref), l_logResponseError_0 (ref)
-                v36.replaceItem(v44, {
-                    canVote = v54, 
-                    reasonForNotVoteable = v55, 
-                    userVote = v51
-                });
-                if v53 then
-                    v24.updateItem(v44, v53);
-                end;
-                local v68 = if type(v67) == "table" and v67.StatusCode then v67.StatusCode else nil;
-                local v69 = nil;
-                if v68 then
-                    local l_status_0, l_result_0 = pcall(function() --[[ Line: 227 ]]
-                        -- upvalues: l_HttpService_0 (ref), v67 (copy)
-                        return l_HttpService_0:JSONDecode(v67.Body);
-                    end);
-                    if l_status_0 and l_result_0 and l_result_0.errors then
-                        for _, v73 in ipairs(l_result_0.errors) do
-                            if v73.code == v8.PLAY_GAME_ERROR_CODE then
-                                v69 = l_ReasonNotVoteable_0.PlayGame;
-                            end;
-                        end;
-                    end;
-                    if v68 == l_StatusCodes_0.TOO_MANY_REQUESTS then
-                        v69 = l_ReasonNotVoteable_0.FloodCheckThresholdMet;
-                    end;
-                end;
-                v47({
-                    type = "error", 
-                    reasonForNotVoteable = v69
-                });
-                local v74 = if type(v67) == "table" and v67.StatusMessage then v67.StatusMessage else nil;
-                l_DiscoveryEventErrorLogger_0.reportError("updateUserVote", "Error updating user vote", {
-                    universeId = v44, 
-                    statusCode = v68, 
-                    statusMessage = v74
-                });
-                l_logResponseError_0("v1/games/votes/user-votes", {
-                    StatusCode = v68
-                });
-            end);
-            return v46;
-        end;
-    end;
-    local function v75() --[[ Line: 262 ]] --[[ Name: clear ]]
-        -- upvalues: v24 (copy), v35 (copy), l_FFlagLuaAppDataHydrationUserVotesStore_0 (ref), v36 (ref), v37 (ref)
-        v24.clear();
-        v35.clear();
-        if l_FFlagLuaAppDataHydrationUserVotesStore_0 then
-            v36.clear();
-            v37.clear();
-        end;
-    end;
-    local function v76() --[[ Line: 271 ]] --[[ Name: dispose ]]
-        -- upvalues: v24 (copy), v35 (copy), l_FFlagLuaAppDataHydrationUserVotesStore_0 (ref), v37 (ref)
-        v24.dispose();
-        v35.dispose();
-        if l_FFlagLuaAppDataHydrationUserVotesStore_0 then
-            v37.dispose();
-        end;
-    end;
-    return {
-        fetchVote = v35.fetchItem, 
-        fetchVotes = v35.fetchItems, 
-        getVote = v35.getCachedItem, 
-        getVotes = v35.getCachedItems, 
-        getAndFetchVote = v35.getAndFetchItem, 
-        getAndFetchVotes = v35.getAndFetchItems, 
-        fetchUserVote = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.fetchItem else nil, 
-        fetchUserVotes = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.fetchItems else nil, 
-        getUserVote = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.getCachedItem else nil, 
-        getUserVotes = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.getCachedItems else nil, 
-        getAndFetchUserVote = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.getAndFetchItem else nil, 
-        getAndFetchUserVotes = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v37.getAndFetchItems else nil, 
-        updateUserVote = if l_FFlagLuaAppDataHydrationUserVotesStore_0 then v38 else nil, 
-        updateVoteItem = l_FFlagLuaAppDataHydrationUpdateItem_0 and function(v77, v78, v79) --[[ Line: 298 ]]
-            -- upvalues: v24 (copy), v9 (ref)
-            v24.updateItem(v77, {
-                downVotes = v78, 
-                upVotes = v79, 
-                rating = v9.calculateRating(v79, v78)
-            });
-        end or nil, 
-        updateUserVoteItem = if l_FFlagLuaAppDataHydrationUpdateItem_0 and l_FFlagLuaAppDataHydrationUserVotesStore_0 then v36.updateItem else nil, 
-        clear = v75, 
-        dispose = v76
-    };
-end;
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local Dash = require(DataHydrationParent.Dash)
+local Signals = require(DataHydrationParent.Signals)
+local HttpService = game:GetService("HttpService")
+local createDataCache = require(DataHydration.createDataCache)
+local createDataResolver = require(DataHydration.createDataResolver)
+
+require(DataHydration.DataHydrationTypes)
+
+local VotesStoreTypes = require(script.Parent.VotesStoreTypes)
+local VotesUtils = require(script.Parent.VotesUtils)
+local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local StatusCodes = require(DataHydrationParent.Http).StatusCodes
+local logResponseError = DiscoveryUtils.logResponseError
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local fetchVotes = require(script.Parent.fetchVotes)
+local fetchUserVote = require(script.Parent.fetchUserVote)
+local requestUserVoteUpdate = require(script.Parent.requestUserVoteUpdate)
+local SharedFlags = require(DataHydrationParent.SharedFlags)
+local FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes = SharedFlags.FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes
+local ReasonNotVoteable = VotesStoreTypes.ReasonNotVoteable
+local FFlagLuaAppInExperienceDetailsPrompt = require(DataHydrationParent.SharedFlags).FFlagLuaAppInExperienceDetailsPrompt
+local FFlagLuaAppDataHydrationUpdateItem = SharedFlags.FFlagLuaAppDataHydrationUpdateItem
+local FFlagLuaAppVoteOptimisticUpdateRaceFix = SharedFlags.FFlagLuaAppVoteOptimisticUpdateRaceFix
+local getGameInfoStore = require(DataHydration.Game.GameInfo.getGameInfoStore)
+local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local v25 = game:DefineFastInt("USER_VOTE_CACHE_TTL_SECONDS", 600)
+
+local function createVotesStore() -- line: 40
+	-- upvalues: createDataCache (copy), createDataResolver (copy), Dash (copy), fetchVotes (copy), FFlagLuaAppInExperienceDetailsPrompt (copy), VotesUtils (copy), v25 (copy), logResponseError (copy), fetchUserVote (copy), VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy), Signals (copy), FFlagLuaAppVoteOptimisticUpdateRaceFix (copy), FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes (copy), FFlagSduiExperienceDetailsSupport (copy), getGameInfoStore (copy), requestUserVoteUpdate (copy), HttpService (copy), ReasonNotVoteable (copy), StatusCodes (copy), FFlagLuaAppDataHydrationUpdateItem (copy)
+	local v27 = createDataCache()
+	local v28 = createDataResolver({
+		cache = v27,
+		fetchFn = function(t1: {[any]: any}) -- line: 44
+			-- upvalues: Dash (copy), fetchVotes (copy), FFlagLuaAppInExperienceDetailsPrompt (copy), VotesUtils (copy)
+			local v32 = Dash.keys(t1)
+
+			return fetchVotes(v32):andThen(function(p1) -- line: 49
+				-- upvalues: FFlagLuaAppInExperienceDetailsPrompt (copy), Dash (copy), VotesUtils (copy)
+				if not p1 then
+					error("No response")
+				end
+
+				if not p1.responseBody or not p1.responseBody.data then
+					if FFlagLuaAppInExperienceDetailsPrompt then
+						error(`Response Code: { p1.responseCode }`)
+					else
+						error(`Response Code: { p1.reponseCode }`)
+					end
+				end
+
+				local t2 = {}
+				local data = p1.responseBody.data
+
+				Dash.forEach(data, function(p2) -- line: 63
+					-- upvalues: VotesUtils (copy), t2 (copy)
+					local v78 = nil
+					local upVotes = p2.upVotes
+					local downVotes = p2.downVotes
+
+					if typeof(upVotes) == "number" and typeof(downVotes) == "number" then
+						v78 = VotesUtils.calculateRating(upVotes, downVotes)
+					end
+
+					t2[tostring(p2.id)] = {
+						upVotes = upVotes,
+						downVotes = downVotes,
+						rating = v78
+					}
+				end)
+
+				return t2
+			end):catch(function(p3) -- line: 79
+				error(`Error requesting votes: { p3 }`)
+			end)
+		end
+	})
+	local v29 = createDataCache(v25)
+	local v30 = createDataResolver({
+		supportsMultiGet = false,
+		cache = v29,
+		logError = function(p4) -- line: 89
+			-- upvalues: logResponseError (copy)
+			logResponseError("v1/games/votes/user", p4)
+		end,
+		fetchFn = function(s1: string, _) -- line: 92
+			-- upvalues: fetchUserVote (copy), VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy)
+			return fetchUserVote(s1):andThen(function(p6) -- line: 96
+				-- upvalues: VotesStoreTypes (copy), DiscoveryEventErrorLogger (copy), s1 (copy)
+				local responseBody = p6.responseBody
+
+				if not VotesStoreTypes.userVoteResponseValidator(responseBody) then
+					DiscoveryEventErrorLogger.reportError("createVotesStore", "Invalid user vote response", {
+						universeId = s1,
+						responseBody = responseBody
+					})
+					error({
+						StatusCode = p6.responseCode
+					})
+				end
+
+				return responseBody
+			end)
+		end
+	})
+
+	return {
+		fetchVote = v28.fetchItem,
+		fetchVotes = v28.fetchItems,
+		getVote = v28.getCachedItem,
+		getVotes = v28.getCachedItems,
+		getAndFetchVote = v28.getAndFetchItem,
+		getAndFetchVotes = v28.getAndFetchItems,
+		fetchUserVote = v30.fetchItem,
+		fetchUserVotes = v30.fetchItems,
+		getUserVote = v30.getCachedItem,
+		getUserVotes = v30.getCachedItems,
+		getAndFetchUserVote = v30.getAndFetchItem,
+		getAndFetchUserVotes = v30.getAndFetchItems,
+		updateUserVote = function(s2: string, b1: boolean?) -- line: 112
+			-- upvalues: Signals (copy), v29 (copy), v27 (copy), FFlagLuaAppVoteOptimisticUpdateRaceFix (copy), v30 (copy), FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes (copy), VotesUtils (copy), FFlagSduiExperienceDetailsSupport (copy), getGameInfoStore (copy), requestUserVoteUpdate (copy), HttpService (copy), VotesStoreTypes (copy), ReasonNotVoteable (copy), StatusCodes (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy)
+			local v38, v39 = Signals.createSignal(nil)
+			local v40, v41 = v29.getItem(s2)
+			local v42 = v40 and v40.data(false)
+			local v43 = if not v42 then nil else v42.userVote
+			local v44 = v27.getItem(s2)
+			local v45 = v44 and v44.data(false)
+
+			if FFlagLuaAppVoteOptimisticUpdateRaceFix then
+				if not v41 and v42 and not v42.canVote then
+					v39({
+						type = "error",
+						reasonForNotVoteable = v42.reasonForNotVoteable
+					})
+
+					return v38
+				end
+			elseif v41 then
+				v30.fetchItem(s2)
+			elseif v42 and not v42.canVote then
+				v39({
+					type = "error",
+					reasonForNotVoteable = v42.reasonForNotVoteable
+				})
+
+				return v38
+			end
+
+			local v46 = v42 and v42.canVote or nil
+			local v47 = v42 and v42.reasonForNotVoteable or nil
+
+			v29.replaceItem(s2, {
+				canVote = v46,
+				reasonForNotVoteable = v47,
+				userVote = b1
+			})
+
+			if v45 then
+				local v52, v53
+
+				if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
+					local v48 = v43 ~= true and 0 or 1
+					local v49 = v43 ~= false and 0 or 1
+					local v50 = b1 ~= true and 0 or 1
+					local v51 = b1 ~= false and 0 or 1
+
+					v52 = v50 - v48
+					v53 = v51 - v49
+				else
+					v52 = b1 ~= true and 0 or 1
+					v53 = b1 ~= false and 0 or 1
+				end
+
+				local v54 = v45.upVotes + v52
+				local v55 = v45.downVotes + v53
+
+				if FFlagLuaAppDataHydrationVotesStoreTrackOptimisticVotes then
+					v54 = math.max(0, v54)
+					v55 = math.max(0, v55)
+				end
+
+				local v56 = VotesUtils.calculateRating(v54, v55)
+				local t3 = {
+					upVotes = v54,
+					downVotes = v55,
+					rating = v56
+				}
+
+				v27.updateItem(s2, t3)
+			end
+
+			local u58 = nil
+
+			if FFlagSduiExperienceDetailsSupport then
+				u58 = getGameInfoStore(false).applyVoteChange(s2, v43, b1)
+			end
+
+			requestUserVoteUpdate(s2, b1):andThen(function(_) -- line: 205
+				-- upvalues: v39 (copy), b1 (copy)
+				v39({
+					type = "success",
+					userVote = b1
+				})
+			end):catch(function(p8) -- line: 211
+				-- upvalues: v29 (copy), s2 (copy), v46 (copy), v47 (copy), v43 (copy), v45 (copy), v27 (copy), FFlagSduiExperienceDetailsSupport (copy), u58 (ref), getGameInfoStore (copy), HttpService (copy), VotesStoreTypes (copy), ReasonNotVoteable (copy), StatusCodes (copy), v39 (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy)
+				v29.replaceItem(s2, {
+					canVote = v46,
+					reasonForNotVoteable = v47,
+					userVote = v43
+				})
+
+				if v45 then
+					v27.updateItem(s2, v45)
+				end
+
+				if FFlagSduiExperienceDetailsSupport and u58 then
+					getGameInfoStore(false).updateGameInfo(s2, u58)
+				end
+
+				local v70 = if type(p8) ~= "table" or not p8.StatusCode then nil else p8.StatusCode
+				local PlayGame = nil
+
+				if v70 then
+					local ok, result = pcall(function() -- line: 236
+						-- upvalues: HttpService (copy), p8 (copy)
+						return HttpService:JSONDecode(p8.Body)
+					end)
+
+					if ok and result and result.errors then
+						for _, v in ipairs(result.errors) do
+							if v.code == VotesStoreTypes.PLAY_GAME_ERROR_CODE then
+								PlayGame = ReasonNotVoteable.PlayGame
+							end
+						end
+					end
+
+					if v70 == StatusCodes.TOO_MANY_REQUESTS then
+						PlayGame = ReasonNotVoteable.FloodCheckThresholdMet
+					end
+				end
+
+				v39({
+					type = "error",
+					reasonForNotVoteable = PlayGame
+				})
+
+				local v76 = if type(p8) ~= "table" or not p8.StatusMessage then nil else p8.StatusMessage
+
+				DiscoveryEventErrorLogger.reportError("updateUserVote", "Error updating user vote", {
+					universeId = s2,
+					statusCode = v70,
+					statusMessage = v76
+				})
+				logResponseError("v1/games/votes/user-votes", {
+					StatusCode = v70
+				})
+			end)
+
+			return v38
+		end,
+		updateVoteItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else function(s3: string, n1: number, n2: number) -- line: 299
+			-- upvalues: v27 (copy), VotesUtils (copy)
+			v27.updateItem(s3, {
+				downVotes = n1,
+				upVotes = n2,
+				rating = VotesUtils.calculateRating(n2, n1)
+			})
+		end,
+		updateUserVoteItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else v29.updateItem,
+		updateUserVoteItems = v29.updateItems,
+		clear = function() -- line: 269
+			-- upvalues: v27 (copy), v28 (copy), v29 (copy), v30 (copy)
+			v27.clear()
+			v28.clear()
+			v29.clear()
+			v30.clear()
+		end,
+		dispose = function() -- line: 276
+			-- upvalues: v27 (copy), v28 (copy), v30 (copy)
+			v27.dispose()
+			v28.dispose()
+			v30.dispose()
+		end
+	}
+end
+
+return createVotesStore

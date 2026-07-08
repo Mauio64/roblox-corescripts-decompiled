@@ -1,234 +1,238 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.ScrollView);
-local v4 = require(l_script_FirstAncestor_0.Components.View);
-local v5 = require(l_script_FirstAncestor_0.Utility.useScaledValue);
-local v6 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v7 = require(l_script_FirstAncestor_0.Utility.useBindable);
-local v8 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v9 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v11 = require(l_script_FirstAncestor_0.Enums.Radius);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v13 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v14 = require(script.Parent.BaseMenuContext);
-local v15 = require(script.Parent.useSubmenuHover);
-local v16 = require(script.Parent.DeclarativeBaseMenuContent);
-local v17 = {
-    size = v13.Medium
-};
-local v18 = {
-    [v11.Small] = "radius-small", 
-    [v11.Medium] = "radius-medium"
-};
-local function v20(v19) --[[ Line: 66 ]] --[[ Name: computeAutomaticSize ]]
-    if v19.autoSize then
-        if v19.isOverMaxHeight then
-            return Enum.AutomaticSize.X;
-        else
-            return Enum.AutomaticSize.XY;
-        end;
-    elseif v19.isOverMaxHeight then
-        return Enum.AutomaticSize.None;
-    else
-        return Enum.AutomaticSize.Y;
-    end;
-end;
-local function v23(v21) --[[ Line: 72 ]] --[[ Name: computeSize ]]
-    local v22 = if v21.isOverMaxHeight and v21.maxHeight then UDim.new(0, v21.maxHeight) else UDim.new();
-    if v21.autoSize then
-        return (UDim2.new(UDim.new(), v22));
-    else
-        return (UDim2.new(v21.width or UDim.new(), v22));
-    end;
-end;
-return v2.memo(v2.forwardRef(function(v24, v25) --[[ Line: 82 ]] --[[ Name: BaseMenu ]]
-    -- upvalues: v6 (copy), v2 (copy), v17 (copy), v9 (copy), v7 (copy), v5 (copy), v15 (copy), v16 (copy), v18 (copy), v20 (copy), v3 (copy), v8 (copy), v23 (copy), v4 (copy), v14 (copy)
-    local v26 = nil;
-    local v27 = nil;
-    local v28 = nil;
-    if v6.FoundationBaseMenuDelayVisible then
-        local v29, v30 = v2.useBinding(false);
-        v26 = v29;
-        v27 = v30;
-        v28 = table.clone(v17);
-        v28.Visible = v26;
-    end;
-    local v31 = v9(v24, if v6.FoundationBaseMenuDelayVisible then v28 else v17);
-    local v32 = v7(v31.width);
-    local v33 = v7(v31.maxHeight);
-    local v34 = v5(260);
-    local v35 = v5(320);
-    local v36, v37 = v2.useState(false);
-    local v38, v39 = v2.useBinding(UDim2.fromScale(0, 1));
-    local v40 = v15();
-    if v6.FoundationBaseMenuDelayVisible then
-        v2.useEffect(function() --[[ Line: 102 ]]
-            -- upvalues: v27 (ref)
-            task.delay(0, function() --[[ Line: 103 ]]
-                -- upvalues: v27 (ref)
-                v27(true);
-            end);
-        end, {});
-    end;
-    local v41 = v2.useCallback(function() --[[ Line: 109 ]]
-        -- upvalues: v37 (copy)
-        v37(true);
-    end, {});
-    local v43 = v2.useMemo(function() --[[ Line: 114 ]]
-        -- upvalues: v32 (copy), v34 (copy)
-        return v32:map(function(v42) --[[ Line: 115 ]]
-            -- upvalues: v34 (ref)
-            if v42 then
-                return v42.Offset;
-            else
-                return v34;
-            end;
-        end);
-    end, {
-        v32, 
-        v34
-    });
-    local v45 = v2.useMemo(function() --[[ Line: 121 ]]
-        -- upvalues: v32 (copy), v31 (copy), v35 (copy)
-        return v32:map(function(v44) --[[ Line: 122 ]]
-            -- upvalues: v31 (ref), v35 (ref)
-            return not v44 or v31.couldGrow and v44.Offset < v35;
-        end);
-    end, {
-        v32, 
-        v35, 
-        v31.couldGrow
-    });
-    local v50 = v2.useMemo(function() --[[ Line: 127 ]]
-        -- upvalues: v2 (ref), v45 (copy), v43 (copy), v35 (copy)
-        return {
-            MinSize = v2.joinBindings({
-                v45, 
-                v43
-            }):map(function(v46) --[[ Line: 129 ]]
-                local v47 = v46[1];
-                local v48 = v46[2];
-                if v47 then
-                    return (Vector2.new(v48, 0));
-                else
-                    return nil;
-                end;
-            end), 
-            MaxSize = v45:map(function(v49) --[[ Line: 134 ]]
-                -- upvalues: v35 (ref)
-                if v49 then
-                    return (Vector2.new(v35, 1e999));
-                else
-                    return nil;
-                end;
-            end)
-        };
-    end, {
-        v45, 
-        v43, 
-        v35
-    });
-    local v53 = v2.useMemo(function() --[[ Line: 140 ]]
-        -- upvalues: v2 (ref), v38 (copy), v33 (copy)
-        return v2.joinBindings({
-            canvasSize = v38, 
-            maxHeight = v33
-        }):map(function(v51) --[[ Line: 142 ]]
-            local v52 = false;
-            if v51.maxHeight ~= nil then
-                v52 = v51.canvasSize.Y.Offset > v51.maxHeight;
-            end;
-            return v52;
-        end);
-    end, {
-        v33
-    });
-    local v55 = v2.useCallback(function(v54) --[[ Line: 147 ]]
-        -- upvalues: v39 (copy)
-        return v39(UDim2.fromOffset(v54.AbsoluteSize.X, v54.AbsoluteSize.Y));
-    end, {
-        v39
-    });
-    local v56 = v31.children or v31.items and v2.createElement(v16, {
-        items = v31.items, 
-        size = v31.size
-    });
-    local v57 = if v31.radius ~= nil then v18[v31.radius] else "";
-    if v31.maxHeight then
-        local v58 = v2.joinBindings({
-            autoSize = v45, 
-            isOverMaxHeight = v53
-        }):map(v20);
-        return v2.createElement(v3, v8(v31, {
-            ref = v25, 
-            scroll = {
-                AutomaticSize = v58, 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                CanvasSize = v38
-            }, 
-            AutomaticSize = v58, 
-            Size = v2.joinBindings({
-                autoSize = v45, 
-                width = v32, 
-                isOverMaxHeight = v53, 
-                maxHeight = v33
-            }):map(v23), 
-            sizeConstraint = v50, 
-            tag = ("stroke-standard stroke-default %*"):format(v57)
-        }), v2.createElement(v4, {
-            tag = "col size-full", 
-            onAbsoluteSizeChanged = v55
-        }, v2.createElement(v14.Provider, {
-            value = {
-                onActivated = v31.onActivated, 
-                size = v31.size, 
-                hasLeading = v36, 
-                setHasLeading = v41, 
-                hoverOpenPath = v40.openPath, 
-                hoverOpenAtDepth = v40.openAtDepth, 
-                hoverCloseAtDepth = v40.closeAtDepth, 
-                hoverReset = v40.reset, 
-                depth = 1
-            }
-        }, v56)));
-    else
-        return v2.createElement(v4, v8(v31, {
-            tag = ("col stroke-standard stroke-default %*"):format(v57), 
-            AutomaticSize = v45:map(function(v59) --[[ Line: 211 ]]
-                if v59 then
-                    return Enum.AutomaticSize.XY;
-                else
-                    return Enum.AutomaticSize.Y;
-                end;
-            end), 
-            Size = v2.joinBindings({
-                v45, 
-                v32
-            }):map(function(v60) --[[ Line: 214 ]]
-                local v61 = v60[1];
-                local v62 = v60[2];
-                if v61 then
-                    return nil;
-                else
-                    return (UDim2.new(v62, UDim.new()));
-                end;
-            end), 
-            ref = v25, 
-            sizeConstraint = v50
-        }), v2.createElement(v14.Provider, {
-            value = {
-                onActivated = v31.onActivated, 
-                size = v31.size, 
-                hasLeading = v36, 
-                setHasLeading = v41, 
-                hoverOpenPath = v40.openPath, 
-                hoverOpenAtDepth = v40.openAtDepth, 
-                hoverCloseAtDepth = v40.closeAtDepth, 
-                hoverReset = v40.reset, 
-                depth = 1
-            }
-        }, v56));
-    end;
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Flags = require(Foundation.Utility.Flags)
+local ScrollView = require(Foundation.Components.ScrollView)
+local View = require(Foundation.Components.View)
+local useScaledValue = require(Foundation.Utility.useScaledValue)
+local useBindable = require(Foundation.Utility.useBindable)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+require(Foundation.Enums.ControlState)
+
+local Radius = require(Foundation.Enums.Radius)
+
+require(Foundation.Components.Types)
+
+local InputSize = require(Foundation.Enums.InputSize)
+local BaseMenuContext = require(script.Parent.BaseMenuContext)
+local useSubmenuHover = require(script.Parent.useSubmenuHover)
+local DeclarativeBaseMenuContent = require(script.Parent.DeclarativeBaseMenuContent)
+local t1 = {
+	size = InputSize.Medium
+}
+local t2 = {
+	[Radius.Small] = "radius-small",
+	[Radius.Medium] = "radius-medium"
+}
+
+local function computeAutomaticSize(t3: {[any]: any}) -- line: 67
+	if t3.autoSize then
+		if t3.isOverMaxHeight then
+			return Enum.AutomaticSize.X
+		end
+
+		return Enum.AutomaticSize.XY
+	end
+
+	if t3.isOverMaxHeight then
+		return Enum.AutomaticSize.None
+	end
+
+	return Enum.AutomaticSize.Y
+end
+local function computeSize(t4: {[any]: any}) -- line: 73
+	local v23 = if not t4.isOverMaxHeight or not t4.maxHeight then UDim.new() else UDim.new(0, t4.maxHeight)
+
+	if t4.autoSize then
+		return (UDim2.new(UDim.new(), v23))
+	end
+
+	return (UDim2.new(t4.width or UDim.new(), v23))
+end
+local function BaseMenu(p1, p2) -- line: 83
+	-- upvalues: React (copy), t1 (copy), withDefaults (copy), useBindable (copy), useScaledValue (copy), useSubmenuHover (copy), DeclarativeBaseMenuContent (copy), t2 (copy), computeAutomaticSize (copy), ScrollView (copy), withCommonProps (copy), Flags (copy), computeSize (copy), View (copy), BaseMenuContext (copy)
+	local v26, v27 = React.useBinding(false)
+	local v28 = table.clone(t1)
+
+	v28.Visible = v26
+
+	local v29 = withDefaults(p1, v28)
+	local v30 = useBindable(v29.width)
+	local v31 = useBindable(v29.maxHeight)
+	local v32 = useScaledValue(260)
+	local v33 = useScaledValue(320)
+	local v34, v35 = React.useState(false)
+	local v36, v37 = React.useBinding(UDim2.fromScale(0, 1))
+	local v38 = useSubmenuHover()
+
+	React.useEffect(function() -- line: 96
+		-- upvalues: v27 (copy)
+		task.delay(0, function() -- line: 97
+			-- upvalues: v27 (copy)
+			v27(true)
+		end)
+	end, {})
+
+	local v39 = React.useCallback(function() -- line: 102
+		-- upvalues: v35 (copy)
+		v35(true)
+	end, {})
+	local v40 = React.useMemo(function() -- line: 107
+		-- upvalues: v30 (copy), v32 (copy)
+		return v30:map(function(uDim: UDim?) -- line: 108
+			-- upvalues: v32 (copy)
+			if uDim then
+				return uDim.Offset
+			end
+
+			return v32
+		end)
+	end, {
+		v30,
+		v32
+	})
+	local v41 = React.useMemo(function() -- line: 114
+		-- upvalues: v30 (copy), v29 (copy), v33 (copy)
+		return v30:map(function(uDim: UDim?) -- line: 115
+			-- upvalues: v29 (copy), v33 (copy)
+			return not uDim or v29.couldGrow and uDim.Offset < v33
+		end)
+	end, {
+		v30,
+		v33,
+		v29.couldGrow
+	})
+	local v42 = React.useMemo(function() -- line: 120
+		-- upvalues: React (copy), v41 (copy), v40 (copy), v33 (copy)
+		return {
+			MinSize = React.joinBindings({
+				v41,
+				v40
+			}):map(function(p3) -- line: 122
+				local v56 = p3[1]
+				local v57 = p3[2]
+
+				if v56 then
+					return (Vector2.new(v57, 0))
+				end
+
+				return nil
+			end),
+			MaxSize = v41:map(function(p4) -- line: 127
+				-- upvalues: v33 (copy)
+				if p4 then
+					return (Vector2.new(v33, 1e999))
+				end
+
+				return nil
+			end)
+		}
+	end, {
+		v41,
+		v40,
+		v33
+	})
+	local v43 = React.useMemo(function() -- line: 133
+		-- upvalues: React (copy), v36 (copy), v31 (copy)
+		return React.joinBindings({
+			canvasSize = v36,
+			maxHeight = v31
+		}):map(function(t5: {[any]: any}) -- line: 135
+			return t5.maxHeight ~= nil and t5.canvasSize.Y.Offset > t5.maxHeight
+		end)
+	end, { v31 })
+	local v44 = React.useCallback(function(p5) -- line: 140
+		-- upvalues: v37 (copy)
+		return v37(UDim2.fromOffset(p5.AbsoluteSize.X, p5.AbsoluteSize.Y))
+	end, { v37 })
+	local v45 = v29.children or (not v29.items or React.createElement(DeclarativeBaseMenuContent, {
+		items = v29.items,
+		size = v29.size
+	}))
+	local v46 = v29.radius == nil and "" or t2[v29.radius]
+
+	if v29.maxHeight then
+		local v47 = React.joinBindings({
+			autoSize = v41,
+			isOverMaxHeight = v43
+		}):map(computeAutomaticSize)
+
+		return React.createElement(ScrollView, withCommonProps(v29, {
+			ref = p2,
+			scroll = {
+				AutomaticCanvasSize = if not Flags.FoundationBaseMenuAutoYCanvasSizing then nil else Enum.AutomaticSize.Y,
+				AutomaticSize = v47,
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				CanvasSize = v36
+			},
+			AutomaticSize = v47,
+			Size = React.joinBindings({
+				autoSize = v41,
+				width = v30,
+				isOverMaxHeight = v43,
+				maxHeight = v31
+			}):map(computeSize),
+			sizeConstraint = v42,
+			tag = `stroke-standard stroke-default { v46 }`
+		}), React.createElement(View, {
+			tag = not Flags.FoundationBaseMenuAutoYCanvasSizing and "col size-full" or "col size-full-0 auto-y",
+			onAbsoluteSizeChanged = v44
+		}, React.createElement(BaseMenuContext.Provider, {
+			value = {
+				depth = 1,
+				onActivated = v29.onActivated,
+				onNestedLeafActivated = v29.onNestedLeafActivated,
+				size = v29.size,
+				hasLeading = v34,
+				setHasLeading = v39,
+				hoverOpenPath = v38.openPath,
+				hoverOpenAtDepth = v38.openAtDepth,
+				hoverCloseAtDepth = v38.closeAtDepth,
+				hoverReset = v38.reset
+			}
+		}, v45)))
+	end
+
+	return React.createElement(View, withCommonProps(v29, {
+		tag = `col stroke-standard stroke-default { v46 }`,
+		AutomaticSize = v41:map(function(p6) -- line: 210
+			if p6 then
+				return Enum.AutomaticSize.XY
+			end
+
+			return Enum.AutomaticSize.Y
+		end),
+		Size = React.joinBindings({
+			v41,
+			v30
+		}):map(function(p7) -- line: 213
+			local v51 = p7[1]
+			local v52 = p7[2]
+
+			if v51 then
+				return nil
+			end
+
+			return (UDim2.new(v52, UDim.new()))
+		end),
+		ref = p2,
+		sizeConstraint = v42
+	}), React.createElement(BaseMenuContext.Provider, {
+		value = {
+			depth = 1,
+			onActivated = v29.onActivated,
+			onNestedLeafActivated = v29.onNestedLeafActivated,
+			size = v29.size,
+			hasLeading = v34,
+			setHasLeading = v39,
+			hoverOpenPath = v38.openPath,
+			hoverOpenAtDepth = v38.openAtDepth,
+			hoverCloseAtDepth = v38.closeAtDepth,
+			hoverReset = v38.reset
+		}
+	}, v45))
+end
+
+return React.memo(React.forwardRef(BaseMenu))

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LocalizeMenuNavigationToggleDialog", false);
+return game:DefineFastFlag("LocalizeMenuNavigationToggleDialog", false)

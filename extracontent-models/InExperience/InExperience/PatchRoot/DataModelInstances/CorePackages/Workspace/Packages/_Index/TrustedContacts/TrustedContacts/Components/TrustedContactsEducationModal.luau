@@ -1,1 +1,1 @@
-return require(script.TrustedContactsEducationModal);
+return require(script.TrustedContactsEducationModal)

@@ -1,1 +1,1 @@
-return require(script.Carat);
+return require(script.Carat)

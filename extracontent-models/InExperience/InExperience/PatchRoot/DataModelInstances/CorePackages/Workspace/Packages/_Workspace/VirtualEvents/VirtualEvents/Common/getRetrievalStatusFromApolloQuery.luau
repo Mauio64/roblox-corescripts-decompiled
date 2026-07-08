@@ -1,15 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local _ = require(l_script_FirstAncestor_0.Parent.ApolloClient);
-local l_RetrievalStatus_0 = require(l_script_FirstAncestor_0.Parent.Http).Enum.RetrievalStatus;
-return function(v3) --[[ Line: 16 ]] --[[ Name: getRetrievalStatusFromApolloQuery ]]
-    -- upvalues: l_RetrievalStatus_0 (copy)
-    if v3.loading then
-        return l_RetrievalStatus_0.Fetching;
-    elseif v3.data then
-        return l_RetrievalStatus_0.Done;
-    elseif v3.error then
-        return l_RetrievalStatus_0.Failed;
-    else
-        return l_RetrievalStatus_0.NotStarted;
-    end;
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
+require(VirtualEvents.Parent.ApolloClient)
+
+local RetrievalStatus = require(VirtualEvents.Parent.Http).Enum.RetrievalStatus
+
+local function getRetrievalStatusFromApolloQuery(p1) -- line: 16
+	-- upvalues: RetrievalStatus (copy)
+	if p1.loading then
+		return RetrievalStatus.Fetching
+	end
+
+	if p1.data then
+		return RetrievalStatus.Done
+	end
+
+	if p1.error then
+		return RetrievalStatus.Failed
+	end
+
+	return RetrievalStatus.NotStarted
+end
+
+return getRetrievalStatusFromApolloQuery

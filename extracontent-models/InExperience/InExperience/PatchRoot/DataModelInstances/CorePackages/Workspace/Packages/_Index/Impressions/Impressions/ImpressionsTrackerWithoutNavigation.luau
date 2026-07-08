@@ -1,113 +1,132 @@
-local l_Parent_0 = script:FindFirstAncestor("Impressions").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-local v3 = require(script.Parent.ImpressionsDetector);
-local v4 = require(script.Parent.ImpressionDetectorWithoutNavigation);
-local v5 = require(script.Parent.ImpressionsVisualizer);
-return function(v6) --[[ Line: 28 ]]
-    -- upvalues: v1 (copy), l_Signal_0 (copy), v5 (copy), v3 (copy), v4 (copy)
-    local v7 = v1.useRef({});
-    local v8 = v1.useRef(l_Signal_0.new());
-    local v9 = nil;
-    v9 = v1.useRef(nil);
-    if v9.current == nil then
-        v9.current = v5.new(v6.impressionsTag);
-    end;
-    assert(v9.current, "impressionsVisualizer should always be truthy; check needed for lint");
-    local v10, v11 = v1.useState({});
-    local v12, v13 = v1.useState(v6.dataUpdatedTimestamp);
-    local v14 = v1.useRef(v6.impressionsTag);
-    local l_viewPortBounds_0 = v6.viewPortBounds;
-    v1.useEffect(function() --[[ Line: 43 ]]
-        -- upvalues: v14 (copy), v6 (copy), v13 (copy), v7 (copy), v9 (ref)
-        if v14.current ~= v6.impressionsTag then
-            v14.current = v6.impressionsTag;
-            v13(v6.dataUpdatedTimestamp);
-            v7.current = {};
-            v9.current:onClearAllImpressions();
-            v9.current:setImpressionsTag(v6.impressionsTag);
-        end;
-    end, {
-        v6.impressionsTag
-    });
-    v1.useEffect(function() --[[ Line: 53 ]]
-        -- upvalues: v8 (copy), v6 (copy)
-        v8.current:fire();
-        local v16 = nil;
-        if v6.scrollViewPositionChangedSignal then
-            v16 = v6.scrollViewPositionChangedSignal:connect(function() --[[ Line: 57 ]]
-                -- upvalues: v8 (ref)
-                v8.current:fire();
-            end);
-        end;
-        return function() --[[ Line: 62 ]]
-            -- upvalues: v16 (ref)
-            if v16 ~= nil then
-                v16:disconnect();
-            end;
-        end;
-    end, {
-        v6.scrollViewPositionChangedSignal
-    });
-    v1.useEffect(function() --[[ Line: 70 ]]
-        -- upvalues: v6 (copy), v8 (copy), v12 (copy), v13 (copy), v7 (copy), v9 (ref)
-        if v6.pageContext and v6.routeName == v6.pageContext then
-            v8.current:fire();
-            if v6.dataUpdatedTimestamp ~= v12 then
-                v13(v6.dataUpdatedTimestamp);
-                v7.current = {};
-                v9.current:onClearAllImpressions();
-            end;
-        end;
-    end, {
-        v6.routeName, 
-        v6.pageContext, 
-        v6.dataUpdatedTimestamp, 
-        v12, 
-        l_viewPortBounds_0
-    });
-    v1.useEffect(function() --[[ Line: 93 ]]
-        -- upvalues: v10 (copy), v6 (copy), v9 (ref), v11 (copy)
-        if v10 ~= nil and #v10 > 0 then
-            v6.sendImpressions(v10);
-            v9.current:onSendImpressions(v10);
-            v11({});
-        end;
-    end, {
-        v10
-    });
-    v1.useEffect(function() --[[ Line: 101 ]]
-        -- upvalues: v9 (ref)
-        return function() --[[ Line: 102 ]]
-            -- upvalues: v9 (ref)
-            v9.current:destroy();
-        end;
-    end, {});
-    local v18 = v1.useCallback(function(v17) --[[ Line: 107 ]]
-        -- upvalues: v7 (copy)
-        if v7.current[v17] ~= nil then
-            return false;
-        else
-            v7.current[v17] = true;
-            return true;
-        end;
-    end, {});
-    local v20 = v1.useCallback(function(v19) --[[ Line: 116 ]]
-        -- upvalues: v11 (copy)
-        if not v19 or #v19 == 0 then
-            return;
-        else
-            v11(v19);
-            return;
-        end;
-    end, {});
-    local v21 = if v6.pageContext then v3 else v4;
-    return v1.createElement(v21, {
-        parentRef = v6.parentRef, 
-        viewPortBounds = l_viewPortBounds_0, 
-        onRequestImpressionsSignal = v8.current, 
-        filterImpressionFunc = v18, 
-        onImpressionsDetected = v20, 
-        impressionsTag = v6.impressionsTag
-    });
-end;
+local Parent = script:FindFirstAncestor("Impressions").Parent
+local React = require(Parent.React)
+local Signal = require(Parent.AppCommonLib).Signal
+local ImpressionsDetector = require(script.Parent.ImpressionsDetector)
+local ImpressionDetectorWithoutNavigation = require(script.Parent.ImpressionDetectorWithoutNavigation)
+local ImpressionsVisualizer = require(script.Parent.ImpressionsVisualizer)
+local SharedFlags = require(Parent.SharedFlags)
+local v8 = game:DefineFastFlag("LuaAppFixImpressionsHookDependencies", false)
+local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local v10 = game:DefineFastFlag("LuaAppFireRequestImpressionsOnTagChange", false)
+
+return function(t1: {[any]: any}) -- line: 36
+	-- upvalues: React (copy), Signal (copy), ImpressionsVisualizer (copy), v10 (copy), v8 (copy), ImpressionsDetector (copy), ImpressionDetectorWithoutNavigation (copy), FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy)
+	local v12 = React.useRef({})
+	local v13 = React.useRef(Signal.new())
+	local u14 = React.useRef(nil)
+
+	if u14.current == nil then
+		u14.current = ImpressionsVisualizer.new(t1.impressionsTag)
+	end
+
+	assert(u14.current, "impressionsVisualizer should always be truthy; check needed for lint")
+
+	local v15, v16 = React.useState({})
+	local v17, v18 = React.useState(t1.dataUpdatedTimestamp)
+	local v19 = React.useRef(t1.impressionsTag)
+	local viewPortBounds = t1.viewPortBounds
+
+	React.useEffect(function() -- line: 51
+		-- upvalues: v19 (copy), t1 (copy), v18 (copy), v12 (copy), u14 (ref), v10 (copy), v13 (copy)
+		if v19.current ~= t1.impressionsTag then
+			v19.current = t1.impressionsTag
+			v18(t1.dataUpdatedTimestamp)
+			v12.current = {}
+			u14.current:onClearAllImpressions()
+			u14.current:setImpressionsTag(t1.impressionsTag)
+
+			if v10 then
+				v13.current:fire()
+			end
+		end
+	end, {
+		t1.impressionsTag,
+		if not v8 then nil else t1.dataUpdatedTimestamp
+	})
+	React.useEffect(function() -- line: 67
+		-- upvalues: v13 (copy), t1 (copy)
+		v13.current:fire()
+
+		local u24 = nil
+
+		if t1.scrollViewPositionChangedSignal then
+			u24 = t1.scrollViewPositionChangedSignal:connect(function() -- line: 71
+				-- upvalues: v13 (copy)
+				v13.current:fire()
+			end)
+		end
+
+		return function() -- line: 76
+			-- upvalues: u24 (ref)
+			if u24 ~= nil then
+				u24:disconnect()
+			end
+		end
+	end, { t1.scrollViewPositionChangedSignal })
+	React.useEffect(function() -- line: 84
+		-- upvalues: t1 (copy), v13 (copy), v17 (copy), v18 (copy), v12 (copy), u14 (ref)
+		if t1.pageContext and t1.routeName == t1.pageContext then
+			v13.current:fire()
+
+			if t1.dataUpdatedTimestamp ~= v17 then
+				v18(t1.dataUpdatedTimestamp)
+				v12.current = {}
+				u14.current:onClearAllImpressions()
+			end
+		end
+	end, {
+		t1.routeName,
+		t1.pageContext,
+		t1.dataUpdatedTimestamp,
+		v17,
+		viewPortBounds
+	})
+	React.useEffect(function() -- line: 107
+		-- upvalues: v15 (copy), t1 (copy), u14 (ref), v16 (copy)
+		if v15 ~= nil and #v15 > 0 then
+			t1.sendImpressions(v15)
+			u14.current:onSendImpressions(v15)
+			v16({})
+		end
+	end, {
+		v15,
+		if not v8 then nil else t1.sendImpressions
+	})
+	React.useEffect(function() -- line: 118
+		-- upvalues: u14 (ref)
+		return function() -- line: 119
+			-- upvalues: u14 (ref)
+			u14.current:destroy()
+		end
+	end, {})
+
+	local v21 = React.useCallback(function(p1) -- line: 124
+		-- upvalues: v12 (copy)
+		if v12.current[p1] ~= nil then
+			return false
+		end
+
+		v12.current[p1] = true
+
+		return true
+	end, {})
+	local v22 = React.useCallback(function(p2) -- line: 133
+		-- upvalues: v16 (copy)
+		if not p2 or #p2 == 0 then
+			return
+		end
+
+		v16(p2)
+	end, {})
+	local v23 = if not t1.pageContext then ImpressionDetectorWithoutNavigation else ImpressionsDetector
+
+	return React.createElement(v23, {
+		parentRef = t1.parentRef,
+		viewPortBounds = viewPortBounds,
+		viewPortFillBounds = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else t1.viewPortFillBounds,
+		onRequestImpressionsSignal = v13.current,
+		filterImpressionFunc = v21,
+		onImpressionsDetected = v22,
+		impressionsTag = t1.impressionsTag
+	})
+end

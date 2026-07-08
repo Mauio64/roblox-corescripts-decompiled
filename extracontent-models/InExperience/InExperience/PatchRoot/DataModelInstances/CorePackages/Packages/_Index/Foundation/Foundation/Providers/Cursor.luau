@@ -1,1 +1,1 @@
-return require(script.CursorProvider);
+return require(script.CursorProvider)

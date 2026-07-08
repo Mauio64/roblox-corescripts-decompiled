@@ -1,13 +1,18 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: combineReducers ]]
-    return function(v1, v2) --[[ Line: 5 ]]
-        -- upvalues: v0 (copy)
-        if v1 == nil then
-            v1 = {};
-        end;
-        local v3 = {};
-        for v4, v5 in pairs(v0) do
-            v3[v4] = v5(v1[v4], v2);
-        end;
-        return v3;
-    end;
-end;
+local function combineReducers(p1) -- line: 4
+	return function(p2, p3) -- line: 5
+		-- upvalues: p1 (copy)
+		if p2 == nil then
+			p2 = {}
+		end
+
+		local t1 = {}
+
+		for k, v in pairs(p1) do
+			t1[k] = v(p2[k], p3)
+		end
+
+		return t1
+	end
+end
+
+return combineReducers

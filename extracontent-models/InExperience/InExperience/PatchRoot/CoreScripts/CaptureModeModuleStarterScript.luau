@@ -1,27 +1,47 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local _ = l_RobloxGui_0:WaitForChild("Modules");
-local v4 = require(l_CorePackages_0.Packages.UIBlox);
-local l_UIBloxInGameConfig_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).UIBloxInGameConfig;
-v4.init(l_UIBloxInGameConfig_0);
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
+RobloxGui:WaitForChild("Modules")
+
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local UIBloxInGameConfig = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).UIBloxInGameConfig
+
+UIBlox.init(UIBloxInGameConfig)
+
 if game:DefineFastFlag("FeedbackModuleEarlyFontInitialization", false) then
-    local l_TextService_0 = game:GetService("TextService");
-    local l_GetTextBoundsParams_0 = Instance.new("GetTextBoundsParams");
-    l_GetTextBoundsParams_0.Text = "random text";
-    l_GetTextBoundsParams_0.Font = Font.fromEnum(Enum.Font.Gotham);
-    l_GetTextBoundsParams_0.Size = 19;
-    l_GetTextBoundsParams_0.Width = 0;
-    local _ = l_TextService_0:GetTextBoundsAsync(l_GetTextBoundsParams_0);
-end;
-game:GetService("GuiService").NativeClose:Connect(function() --[[ Line: 26 ]] --[[ Name: handleNativeExit ]]
-    game:GetService("ExperienceStateCaptureService"):ToggleCaptureMode();
-end);
-game:WaitForChild("SafetyService");
+	local TextService = game:GetService("TextService")
+	local GetTextBoundsParams = Instance.new("GetTextBoundsParams")
+
+	GetTextBoundsParams.Text = "random text"
+	GetTextBoundsParams.Font = Font.fromEnum(Enum.Font.Gotham)
+	GetTextBoundsParams.Size = 19
+	GetTextBoundsParams.Width = 0
+	TextService:GetTextBoundsAsync(GetTextBoundsParams)
+end
+
+local v8 = game:DefineFastFlag("CaptureModePublishNativeExitReason", false)
+local MessageBusService = game:GetService("MessageBusService")
+local MessageId = MessageBusService:GetMessageId("CaptureMode", "sceneSelectionExitReason")
+
+local function handleNativeExit() -- line: 30
+	-- upvalues: v8 (copy), MessageBusService (copy), MessageId (copy)
+	if v8 then
+		MessageBusService:Publish(MessageId, {
+			reason = "nativeExit"
+		})
+	end
+
+	game:GetService("ExperienceStateCaptureService"):ToggleCaptureMode()
+end
+
+game:GetService("GuiService").NativeClose:Connect(handleNativeExit)
+game:WaitForChild("SafetyService")
+
 if game:GetService("SafetyService").IsCaptureModeForReport then
-    require(l_CorePackages_0.Workspace.Packages.InGameAssetReporting).initialize();
-    return;
-else
-    require(l_RobloxGui_0.Modules.Feedback).initialize();
-    return;
-end;
+	require(CorePackages.Workspace.Packages.InGameAssetReporting).initialize()
+
+	return
+end
+
+require(RobloxGui.Modules.Feedback).initialize()

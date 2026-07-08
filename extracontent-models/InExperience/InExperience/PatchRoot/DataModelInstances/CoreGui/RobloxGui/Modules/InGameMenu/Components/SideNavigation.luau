@@ -1,201 +1,208 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_RoactRodux_0 = v2.RoactRodux;
-local l_UIBlox_0 = v2.UIBlox;
-local l_t_0 = v2.t;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_Interactable_0 = l_UIBlox_0.Core.Control.Interactable;
-local l_ControlState_0 = l_UIBlox_0.Core.Control.Enum.ControlState;
-local l_Parent_0 = script.Parent.Parent;
-local v11 = require(l_Parent_0.Components.Connection.FocusHandler);
-local v12 = require(l_Parent_0.Components.ZonePortal);
-local v13 = require(l_Parent_0.Thunks.CloseMenu);
-local v14 = require(l_Parent_0.Actions.SetCurrentPage);
-local v15 = require(l_Parent_0.Resources.Constants);
-local v16 = require(l_Parent_0.Enums.Direction);
-local v17 = require(script.CloseMenuButton);
-local v18 = require(script.HomeButton);
-local v19 = require(script.SystemMenuButton);
-local v20 = require(l_Parent_0.InGameMenuPolicy);
-local v21 = require(l_Parent_0.Flags.GetFFlagIGMGamepadSelectionHistory);
-local v22 = l_Roact_0.PureComponent:extend("SideNavigation");
-v22.validateProps = l_t_0.strictInterface({
-    open = l_t_0.boolean, 
-    closeMenu = l_t_0.callback, 
-    goToHomePage = l_t_0.callback, 
-    goToSystemMenu = l_t_0.callback, 
-    currentPage = l_t_0.string, 
-    canCaptureFocus = l_t_0.optional(l_t_0.boolean), 
-    currentZone = v21() and l_t_0.optional(l_t_0.number) or nil, 
-    enableInGameHomeIcon = l_t_0.optional(l_t_0.boolean)
-});
-v22.init = function(v23) --[[ Line: 51 ]] --[[ Name: init ]]
-    -- upvalues: l_ControlState_0 (copy), v15 (copy), l_Roact_0 (copy), l_GuiService_0 (copy)
-    v23.controlStateUpdated = function(v24, v25) --[[ Line: 52 ]]
-        -- upvalues: l_ControlState_0 (ref), v23 (copy), v15 (ref)
-        if v24 == l_ControlState_0.Hover and v25 ~= l_ControlState_0.Hover and v23.props.currentPage == v15.InitalPageKey then
-            v23.props.closeMenu();
-        end;
-    end;
-    v23.firstItemRef = l_Roact_0.createRef();
-    v23.onContainerRendered = function(v26) --[[ Line: 62 ]]
-        -- upvalues: l_GuiService_0 (ref)
-        if v26 then
-            l_GuiService_0:RemoveSelectionGroup("SideNavigation_IGMSelectionGroup");
-            l_GuiService_0:AddSelectionParent("SideNavigation_IGMSelectionGroup", v26);
-        end;
-    end;
-end;
-v22.oldRender = function(v27) --[[ Line: 71 ]] --[[ Name: oldRender ]]
-    -- upvalues: v21 (copy), l_withStyle_0 (copy), l_Roact_0 (copy), v17 (copy), v11 (copy), l_GuiService_0 (copy), v15 (copy), v12 (copy), v16 (copy)
-    local v28 = nil;
-    if v21() then
-        local v29 = true;
-        if v27.props.currentZone == 0 then
-            v29 = not v27.props.open;
-        end;
-        v28 = v29;
-    end;
-    return l_withStyle_0(function(v30) --[[ Line: 77 ]]
-        -- upvalues: l_Roact_0 (ref), v27 (copy), v17 (ref), v11 (ref), v28 (ref), v21 (ref), l_GuiService_0 (ref), v15 (ref), v12 (ref), v16 (ref)
-        return l_Roact_0.createElement("TextButton", {
-            AutoButtonColor = false, 
-            Text = "", 
-            BackgroundColor3 = v30.Theme.BackgroundUIContrast.Color, 
-            BackgroundTransparency = v30.Theme.BackgroundUIContrast.Transparency, 
-            BorderSizePixel = 0, 
-            Size = UDim2.new(0, 64, 1, 0), 
-            Visible = v27.props.open, 
-            Selectable = false, 
-            [l_Roact_0.Ref] = v27.onContainerRendered
-        }, {
-            Padding = l_Roact_0.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 1)
-            }), 
-            CloseMenuButton = l_Roact_0.createElement(v17, {
-                onActivated = v27.props.closeMenu, 
-                AnchorPoint = Vector2.new(0.5, 0), 
-                Position = UDim2.new(0.5, 0, 0, 4), 
-                [l_Roact_0.Ref] = v27.firstItemRef
-            }), 
-            FocusHandler = l_Roact_0.createElement(v11, {
-                isFocused = v27.props.canCaptureFocus, 
-                shouldForgetPreviousSelection = v28, 
-                didFocus = v21() and function(v31) --[[ Line: 102 ]]
-                    -- upvalues: l_GuiService_0 (ref), v27 (ref)
-                    l_GuiService_0.SelectedCoreObject = v31 or v27.firstItemRef:getValue();
-                end or function() --[[ Line: 104 ]]
-                    -- upvalues: l_GuiService_0 (ref), v27 (ref)
-                    l_GuiService_0.SelectedCoreObject = v27.firstItemRef:getValue();
-                end
-            }), 
-            ZonePortal = v27.props.currentPage ~= v15.InitalPageKey and l_Roact_0.createElement(v12, {
-                targetZone = 1, 
-                direction = v16.Right
-            }) or nil
-        });
-    end);
-end;
-v22.newRender = function(v32) --[[ Line: 116 ]] --[[ Name: newRender ]]
-    -- upvalues: l_Roact_0 (copy), v19 (copy), v15 (copy), v18 (copy), v12 (copy), v16 (copy), l_withStyle_0 (copy), l_Interactable_0 (copy)
-    local l_currentPage_0 = v32.props.currentPage;
-    local v34 = {
-        Padding = l_Roact_0.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, 4)
-        }), 
-        Layout = l_Roact_0.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            Padding = UDim.new(0, 4)
-        }), 
-        SystemMenuButton = l_Roact_0.createElement(v19, {
-            on = l_currentPage_0 == v15.MainPagePageKey, 
-            onClose = v32.props.closeMenu, 
-            onActivated = v32.props.goToSystemMenu, 
-            layoutOrder = 1, 
-            anchorPoint = Vector2.new(0.5, 0), 
-            position = UDim2.new(0.5, 0, 0, 4), 
-            canCaptureFocus = v32.props.canCaptureFocus
-        }), 
-        HomeButton = l_Roact_0.createElement(v18, {
-            on = l_currentPage_0 == v15.LeaveToAppPromptPageKey, 
-            onActivated = v32.props.goToHomePage, 
-            layoutOrder = 2, 
-            anchorPoint = Vector2.new(0.5, 0), 
-            position = UDim2.new(0.5, 0, 0, 8)
-        })
-    };
-    local v35 = {
-        Padding = l_Roact_0.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, 1)
-        }), 
-        Content = l_Roact_0.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1, 
-            Selectable = false
-        }, v34), 
-        ZonePortal = v32.props.currentPage ~= v15.InitalPageKey and l_Roact_0.createElement(v12, {
-            targetZone = 1, 
-            direction = v16.Right
-        }) or nil
-    };
-    return l_withStyle_0(function(v36) --[[ Line: 162 ]]
-        -- upvalues: l_Roact_0 (ref), l_Interactable_0 (ref), v32 (copy), v35 (copy)
-        return l_Roact_0.createElement(l_Interactable_0, {
-            onStateChanged = v32.controlStateUpdated, 
-            AutoButtonColor = false, 
-            BackgroundColor3 = v36.Theme.BackgroundUIContrast.Color, 
-            BackgroundTransparency = v36.Theme.BackgroundUIContrast.Transparency, 
-            BorderSizePixel = 0, 
-            Size = UDim2.new(0, 64, 1, 0), 
-            Visible = v32.props.open, 
-            Selectable = false, 
-            [l_Roact_0.Ref] = v32.onContainerRendered
-        }, v35);
-    end);
-end;
-v22.render = function(v37) --[[ Line: 178 ]] --[[ Name: render ]]
-    if v37.props.enableInGameHomeIcon then
-        return v37:newRender();
-    else
-        return v37:oldRender();
-    end;
-end;
-v22 = v20.connect(function(v38, _) --[[ Line: 185 ]]
-    return {
-        enableInGameHomeIcon = v38.enableInGameHomeIcon()
-    };
-end)(v22);
-return l_RoactRodux_0.UNSTABLE_connect2(function(v40, _) --[[ Line: 191 ]]
-    -- upvalues: v15 (copy), v21 (copy)
-    local v42 = v40.isMenuOpen and not v40.respawn.dialogOpen and v40.displayOptions.inputType == v15.InputType.Gamepad and v40.currentZone == 0;
-    local v43 = nil;
-    if v21() then
-        v43 = v40.currentZone;
-    end;
-    return {
-        canCaptureFocus = v42, 
-        currentPage = v40.menuPage, 
-        open = v40.isMenuOpen, 
-        currentZone = v43
-    };
-end, function(v44) --[[ Line: 208 ]]
-    -- upvalues: v13 (copy), v14 (copy), v15 (copy)
-    return {
-        closeMenu = function() --[[ Line: 210 ]] --[[ Name: closeMenu ]]
-            -- upvalues: v44 (copy), v13 (ref)
-            v44(v13);
-        end, 
-        goToSystemMenu = function() --[[ Line: 213 ]] --[[ Name: goToSystemMenu ]]
-            -- upvalues: v44 (copy), v14 (ref), v15 (ref)
-            v44(v14(v15.MainPagePageKey));
-        end, 
-        goToHomePage = function() --[[ Line: 216 ]] --[[ Name: goToHomePage ]]
-            -- upvalues: v44 (copy), v14 (ref), v15 (ref)
-            v44(v14(v15.LeaveToAppPromptPageKey));
-        end
-    };
-end)(v22);
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local UIBlox = InGameMenuDependencies.UIBlox
+local t = InGameMenuDependencies.t
+local withStyle = UIBlox.Core.Style.withStyle
+local Interactable = UIBlox.Core.Control.Interactable
+local ControlState = UIBlox.Core.Control.Enum.ControlState
+local ParentParent = script.Parent.Parent
+local FocusHandler = require(ParentParent.Components.Connection.FocusHandler)
+local ZonePortal = require(ParentParent.Components.ZonePortal)
+local CloseMenu = require(ParentParent.Thunks.CloseMenu)
+local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
+local Constants = require(ParentParent.Resources.Constants)
+local Direction = require(ParentParent.Enums.Direction)
+local CloseMenuButton = require(script.CloseMenuButton)
+local HomeButton = require(script.HomeButton)
+local SystemMenuButton = require(script.SystemMenuButton)
+local InGameMenuPolicy = require(ParentParent.InGameMenuPolicy)
+local GetFFlagIGMGamepadSelectionHistory = require(ParentParent.Flags.GetFFlagIGMGamepadSelectionHistory)
+local v23 = Roact.PureComponent:extend("SideNavigation")
+
+v23.validateProps = t.strictInterface({
+	open = t.boolean,
+	closeMenu = t.callback,
+	goToHomePage = t.callback,
+	goToSystemMenu = t.callback,
+	currentPage = t.string,
+	canCaptureFocus = t.optional(t.boolean),
+	currentZone = GetFFlagIGMGamepadSelectionHistory() and t.optional(t.number) or nil,
+	enableInGameHomeIcon = t.optional(t.boolean)
+})
+
+function v23.init(p1) -- line: 51
+	-- upvalues: ControlState (copy), Constants (copy), Roact (copy), GuiService (copy)
+	function p1.controlStateUpdated(p2, p3) -- line: 52
+		-- upvalues: ControlState (copy), p1 (copy), Constants (copy)
+		if p2 == ControlState.Hover and (p3 ~= ControlState.Hover and p1.props.currentPage == Constants.InitalPageKey) then
+			p1.props.closeMenu()
+		end
+	end
+
+	p1.firstItemRef = Roact.createRef()
+
+	function p1.onContainerRendered(p4) -- line: 62
+		-- upvalues: GuiService (copy)
+		if p4 then
+			GuiService:RemoveSelectionGroup("SideNavigation_IGMSelectionGroup")
+			GuiService:AddSelectionParent("SideNavigation_IGMSelectionGroup", p4)
+		end
+	end
+end
+function v23.oldRender(p5) -- line: 71
+	-- upvalues: GetFFlagIGMGamepadSelectionHistory (copy), withStyle (copy), Roact (copy), CloseMenuButton (copy), FocusHandler (copy), GuiService (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+	local u27 = nil
+
+	if GetFFlagIGMGamepadSelectionHistory() then
+		u27 = p5.props.currentZone ~= 0 or not p5.props.open
+	end
+
+	return withStyle(function(p6) -- line: 77
+		-- upvalues: Roact (copy), p5 (copy), CloseMenuButton (copy), FocusHandler (copy), u27 (ref), GetFFlagIGMGamepadSelectionHistory (copy), GuiService (copy), Constants (copy), ZonePortal (copy), Direction (copy)
+		return Roact.createElement("TextButton", {
+			AutoButtonColor = false,
+			Text = "",
+			BackgroundColor3 = p6.Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = p6.Theme.BackgroundUIContrast.Transparency,
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, 64, 1, 0),
+			Visible = p5.props.open,
+			Selectable = false,
+			[Roact.Ref] = p5.onContainerRendered
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 1)
+			}),
+			CloseMenuButton = Roact.createElement(CloseMenuButton, {
+				onActivated = p5.props.closeMenu,
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0, 4),
+				[Roact.Ref] = p5.firstItemRef
+			}),
+			FocusHandler = Roact.createElement(FocusHandler, {
+				isFocused = p5.props.canCaptureFocus,
+				shouldForgetPreviousSelection = u27,
+				didFocus = GetFFlagIGMGamepadSelectionHistory() and function(p7) -- line: 102
+					-- upvalues: GuiService (copy), p5 (copy)
+					GuiService.SelectedCoreObject = p7 or p5.firstItemRef:getValue()
+				end or function() -- line: 104
+					-- upvalues: GuiService (copy), p5 (copy)
+					GuiService.SelectedCoreObject = p5.firstItemRef:getValue()
+				end
+			}),
+			ZonePortal = p5.props.currentPage ~= Constants.InitalPageKey and Roact.createElement(ZonePortal, {
+				targetZone = 1,
+				direction = Direction.Right
+			}) or nil
+		})
+	end)
+end
+function v23.newRender(p8) -- line: 116
+	-- upvalues: Roact (copy), SystemMenuButton (copy), Constants (copy), HomeButton (copy), ZonePortal (copy), Direction (copy), withStyle (copy), Interactable (copy)
+	local currentPage = p8.props.currentPage
+	local t1 = {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 4)
+		}),
+		Layout = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			Padding = UDim.new(0, 4)
+		}),
+		SystemMenuButton = Roact.createElement(SystemMenuButton, {
+			layoutOrder = 1,
+			on = currentPage == Constants.MainPagePageKey,
+			onClose = p8.props.closeMenu,
+			onActivated = p8.props.goToSystemMenu,
+			anchorPoint = Vector2.new(0.5, 0),
+			position = UDim2.new(0.5, 0, 0, 4),
+			canCaptureFocus = p8.props.canCaptureFocus
+		}),
+		HomeButton = Roact.createElement(HomeButton, {
+			layoutOrder = 2,
+			on = currentPage == Constants.LeaveToAppPromptPageKey,
+			onActivated = p8.props.goToHomePage,
+			anchorPoint = Vector2.new(0.5, 0),
+			position = UDim2.new(0.5, 0, 0, 8)
+		})
+	}
+	local t2 = {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 1)
+		}),
+		Content = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Selectable = false,
+			Size = UDim2.fromScale(1, 1)
+		}, t1),
+		ZonePortal = p8.props.currentPage ~= Constants.InitalPageKey and Roact.createElement(ZonePortal, {
+			targetZone = 1,
+			direction = Direction.Right
+		}) or nil
+	}
+
+	return withStyle(function(p9) -- line: 162
+		-- upvalues: Roact (copy), Interactable (copy), p8 (copy), t2 (copy)
+		return Roact.createElement(Interactable, {
+			onStateChanged = p8.controlStateUpdated,
+			AutoButtonColor = false,
+			BackgroundColor3 = p9.Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = p9.Theme.BackgroundUIContrast.Transparency,
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, 64, 1, 0),
+			Visible = p8.props.open,
+			Selectable = false,
+			[Roact.Ref] = p8.onContainerRendered
+		}, t2)
+	end)
+end
+function v23.render(p10) -- line: 178
+	if p10.props.enableInGameHomeIcon then
+		return p10:newRender()
+	end
+
+	return p10:oldRender()
+end
+
+local v24 = InGameMenuPolicy.connect(function(p11, _) -- line: 185
+	return {
+		enableInGameHomeIcon = p11.enableInGameHomeIcon()
+	}
+end)(v23)
+
+return RoactRodux.UNSTABLE_connect2(function(p13, _) -- line: 191
+	-- upvalues: Constants (copy), GetFFlagIGMGamepadSelectionHistory (copy)
+	local v37 = p13.isMenuOpen and (not p13.respawn.dialogOpen and (p13.displayOptions.inputType == Constants.InputType.Gamepad and p13.currentZone == 0))
+	local currentZone = nil
+
+	if GetFFlagIGMGamepadSelectionHistory() then
+		currentZone = p13.currentZone
+	end
+
+	return {
+		canCaptureFocus = v37,
+		currentPage = p13.menuPage,
+		open = p13.isMenuOpen,
+		currentZone = currentZone
+	}
+end, function(p15) -- line: 208
+	-- upvalues: CloseMenu (copy), SetCurrentPage (copy), Constants (copy)
+	return {
+		closeMenu = function() -- line: 210
+			-- upvalues: p15 (copy), CloseMenu (copy)
+			p15(CloseMenu)
+		end,
+		goToSystemMenu = function() -- line: 213
+			-- upvalues: p15 (copy), SetCurrentPage (copy), Constants (copy)
+			p15(SetCurrentPage(Constants.MainPagePageKey))
+		end,
+		goToHomePage = function() -- line: 216
+			-- upvalues: p15 (copy), SetCurrentPage (copy), Constants (copy)
+			p15(SetCurrentPage(Constants.LeaveToAppPromptPageKey))
+		end
+	}
+end)(v24)

@@ -1,98 +1,115 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.t);
-local l_FFlagEnableLuaAccountSwitch_0 = require(l_Parent_0.SharedFlags).FFlagEnableLuaAccountSwitch;
-local v4 = {};
-local v5 = {};
-v4[v5] = true;
-local v6 = v2.interface({
-    user = v2.interface({
-        id = v2.number, 
-        name = v2.string
-    }), 
-    twoStepVerificationData = v2.optional(v2.interface({
-        mediaType = v2.string, 
-        ticket = v2.string
-    })), 
-    twoStepVerificationDataV2 = v2.optional(v2.interface({
-        mediaType = v2.string, 
-        ticket = v2.string
-    })), 
-    accountBlob = v2.optional(v2.string)
-});
-v4.new = function(v7) --[[ Line: 51 ]] --[[ Name: new ]]
-    -- upvalues: l_FFlagEnableLuaAccountSwitch_0 (copy), v4 (copy)
-    local v8 = {
-        user = {
-            id = "0", 
-            name = ""
-        }
-    };
-    if v7 and type(v7) == "table" then
-        if v7.user then
-            v8.user.id = tostring(v7.user.id) or v8.user.id;
-            v8.user.name = v7.user.name or v8.user.name;
-        end;
-        if v7.twoStepVerificationData then
-            v8.twoStepVerificationData = {};
-            v8.twoStepVerificationData.mediaType = v7.twoStepVerificationData.mediaType or "";
-            v8.twoStepVerificationData.ticket = v7.twoStepVerificationData.ticket or "";
-        end;
-        if l_FFlagEnableLuaAccountSwitch_0 and v7.accountBlob then
-            v8.accountBlob = v7.accountBlob;
-        end;
-    end;
-    setmetatable(v8, v4);
-    return v8;
-end;
-v4.mock = function() --[[ Line: 79 ]] --[[ Name: mock ]]
-    -- upvalues: v4 (copy)
-    local v9 = v4.new();
-    v9.user = {
-        id = "1", 
-        name = "ROBLOX"
-    };
-    v9.twoStepVerificationData = {
-        mediaType = "Email", 
-        ticket = "00000000-0000-0000-0000-000000000000"
-    };
-    return v9;
-end;
-v4.fromJsonData = function(v10) --[[ Line: 95 ]] --[[ Name: fromJsonData ]]
-    -- upvalues: v4 (copy), v6 (copy), l_FFlagEnableLuaAccountSwitch_0 (copy), v1 (copy)
-    local v11 = v4.new();
-    local v12, v13 = v6(v10);
-    if v12 then
-        v11.user = {
-            id = tostring(v10.user.id), 
-            name = v10.user.name
-        };
-        if v10.twoStepVerificationData then
-            v11.twoStepVerificationData = {
-                mediaType = v10.twoStepVerificationData.mediaType, 
-                ticket = v10.twoStepVerificationData.ticket
-            };
-        end;
-        if l_FFlagEnableLuaAccountSwitch_0 and v10.accountBlob then
-            v11.accountBlob = v10.accountBlob;
-            return v11;
-        end;
-    else
-        v1.assert(false, v13);
-    end;
-    return v11;
-end;
-v4.is = function(v14) --[[ Line: 126 ]] --[[ Name: is ]]
-    -- upvalues: v5 (copy)
-    if type(v14) ~= "table" then
-        return false;
-    else
-        return v14[v5] == true;
-    end;
-end;
-v4.hasTwoStepData = function(v15) --[[ Line: 134 ]] --[[ Name: hasTwoStepData ]]
-    -- upvalues: v4 (copy)
-    return v4.is(v15) and type(v15.twoStepVerificationData) == "table";
-end;
-v4.__index = v4;
-return v4;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local t = require(Parent.t)
+local FFlagEnableLuaAccountSwitch = require(Parent.SharedFlags).FFlagEnableLuaAccountSwitch
+local t1 = {}
+local t2 = {}
+
+t1[t2] = true
+
+local v7 = t.interface({
+	user = t.interface({
+		id = t.number,
+		name = t.string
+	}),
+	twoStepVerificationData = t.optional(t.interface({
+		mediaType = t.string,
+		ticket = t.string
+	})),
+	twoStepVerificationDataV2 = t.optional(t.interface({
+		mediaType = t.string,
+		ticket = t.string
+	})),
+	accountBlob = t.optional(t.string)
+})
+
+function t1.new(p1) -- line: 51
+	-- upvalues: FFlagEnableLuaAccountSwitch (copy), t1 (copy)
+	local t3 = {
+		user = {
+			id = "0",
+			name = ""
+		}
+	}
+
+	if p1 and type(p1) == "table" then
+		if p1.user then
+			t3.user.id = tostring(p1.user.id) or t3.user.id
+			t3.user.name = p1.user.name or t3.user.name
+		end
+
+		if p1.twoStepVerificationData then
+			t3.twoStepVerificationData = {}
+			t3.twoStepVerificationData.mediaType = p1.twoStepVerificationData.mediaType or ""
+			t3.twoStepVerificationData.ticket = p1.twoStepVerificationData.ticket or ""
+		end
+
+		if FFlagEnableLuaAccountSwitch and p1.accountBlob then
+			t3.accountBlob = p1.accountBlob
+		end
+	end
+
+	setmetatable(t3, t1)
+
+	return t3
+end
+function t1.mock() -- line: 79
+	-- upvalues: t1 (copy)
+	local v10 = t1.new()
+
+	v10.user = {
+		id = "1",
+		name = "ROBLOX"
+	}
+	v10.twoStepVerificationData = {
+		mediaType = "Email",
+		ticket = "00000000-0000-0000-0000-000000000000"
+	}
+
+	return v10
+end
+function t1.fromJsonData(p2) -- line: 95
+	-- upvalues: t1 (copy), v7 (copy), FFlagEnableLuaAccountSwitch (copy), ArgCheck (copy)
+	local v12 = t1.new()
+	local v13, v14 = v7(p2)
+
+	if v13 then
+		v12.user = {
+			id = tostring(p2.user.id),
+			name = p2.user.name
+		}
+
+		if p2.twoStepVerificationData then
+			v12.twoStepVerificationData = {
+				mediaType = p2.twoStepVerificationData.mediaType,
+				ticket = p2.twoStepVerificationData.ticket
+			}
+		end
+
+		if FFlagEnableLuaAccountSwitch and p2.accountBlob then
+			v12.accountBlob = p2.accountBlob
+
+			return v12
+		end
+	else
+		ArgCheck.assert(false, v14)
+	end
+
+	return v12
+end
+function t1.is(p3) -- line: 126
+	-- upvalues: t2 (copy)
+	if type(p3) ~= "table" then
+		return false
+	end
+
+	return p3[t2] == true
+end
+function t1.hasTwoStepData(p4) -- line: 134
+	-- upvalues: t1 (copy)
+	return t1.is(p4) and type(p4.twoStepVerificationData) == "table"
+end
+
+t1.__index = t1
+
+return t1

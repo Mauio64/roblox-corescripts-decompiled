@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAppChatSnoozeMenuFocus", false);
+return game:DefineFastFlag("EnableAppChatSnoozeMenuFocus", false)

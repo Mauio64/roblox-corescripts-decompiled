@@ -1,5 +1,5 @@
 return {
-    GenericError = "GenericError", 
-    AlreadySubscribed = "AlreadySubscribed", 
-    UnsupportedPlatform = "UnsupportedPlatform"
-};
+	GenericError = "GenericError",
+	AlreadySubscribed = "AlreadySubscribed",
+	UnsupportedPlatform = "UnsupportedPlatform"
+}

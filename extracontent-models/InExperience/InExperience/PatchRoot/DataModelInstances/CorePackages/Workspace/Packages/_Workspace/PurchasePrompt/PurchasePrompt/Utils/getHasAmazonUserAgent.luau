@@ -1,5 +1,6 @@
-local l_HttpService_0 = game:GetService("HttpService");
-return function() --[[ Line: 3 ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return string.find(l_HttpService_0:GetUserAgent(), "AmazonAppStore");
-end;
+local HttpService = game:GetService("HttpService")
+
+return function() -- line: 3
+	-- upvalues: HttpService (copy)
+	return string.find(HttpService:GetUserAgent(), "AmazonAppStore")
+end

@@ -1,375 +1,361 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.ArgCheck);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v6 = require(l_Parent_0.Responsive);
-local l_useLastInput_0 = v6.useLastInput;
-local l_usePreferredInput_0 = v6.usePreferredInput;
-local l_useIsSpatial_0 = v6.useIsSpatial;
-local v10 = require(l_Parent_0.t);
-local l_validateProps_0 = require(l_Parent_0.DiscoveryUtils).validateProps;
-local v12 = require(l_script_FirstAncestor_0.useCollectionSizeBindings);
-local v13 = require(l_script_FirstAncestor_0.Carousel.useScrollButtonHandlers);
-local v14 = require(l_script_FirstAncestor_0.Carousel.useCarouselScrollingBinding);
-local v15 = require(l_script_FirstAncestor_0.Carousel.CollectionBackgroundMural);
-local v16 = require(l_script_FirstAncestor_0.CollectionHeader);
-local v17 = require(l_script_FirstAncestor_0.Carousel.ScrollingRowOfCollectionItems);
-local v18 = require(l_script_FirstAncestor_0.maybeForceDarkTheme);
-local v19 = require(l_script_FirstAncestor_0.Carousel.CarouselScrollButtons);
-local _ = require(l_script_FirstAncestor_0.CollectionViewTypes);
-local v21 = require(l_script_FirstAncestor_0.CollectionLayoutStore.useCollectionLayout);
-local l_CompositionTags_0 = require(l_Parent_0.AppComposition).CompositionTags;
-local v23 = require(l_script_FirstAncestor_0.Carousel.calculateCarouselSpacingMetrics);
-local v24 = require(l_Parent_0.SharedFlags);
-local l_FFlagLuaAppCompositionSupport_0 = v24.FFlagLuaAppCompositionSupport;
-local l_FFlagCollectionViewMathChanges_0 = v24.FFlagCollectionViewMathChanges;
-local l_FFlagLuaAppEnableVRCarouselScrolling_0 = v24.FFlagLuaAppEnableVRCarouselScrolling;
-local l_FFlagSduiCarouselHoverFixes_0 = v24.FFlagSduiCarouselHoverFixes;
-local l_FFlagLuaAppFixCarouselPeekInControl_0 = v24.FFlagLuaAppFixCarouselPeekInControl;
-local v30 = v10.strictInterface({
-    testId = v10.optional(v10.string), 
-    Position = v10.optional(v10.UDim2), 
-    LayoutOrder = v10.optional(v10.number), 
-    containerRef = v10.optional(v10.union(v10.table, v10.callback)), 
-    scrollingFrameRef = v10.optional(v10.table), 
-    onScrollingFrameRefCallback = v10.optional(v10.callback), 
-    numColumns = if l_FFlagLuaAppCompositionSupport_0 then v10.optional(v10.number) else v10.number, 
-    fractionalItemAmount = v10.optional(v10.number), 
-    items = v10.table, 
-    renderItem = v10.callback, 
-    getItemHeight = v10.callback, 
-    columnGap = v10.optional(v10.number), 
-    sideMargin = v10.optional(v10.number), 
-    backgroundMuralUrl = v10.optional(v10.string), 
-    title = v10.optional(v10.union(v10.string, v10.callback)), 
-    subtitle = v10.optional(v10.string), 
-    tooltipInfoText = v10.optional(v10.string), 
-    onActivateInfoIcon = v10.optional(v10.callback), 
-    tooltipSupportsVR = v10.optional(v10.boolean), 
-    tooltipSupportsTenFootUi = v10.optional(v10.boolean), 
-    onActivateHeader = v10.optional(v10.callback), 
-    onActivateSubtitle = v10.optional(v10.callback), 
-    headerButtonText = v10.optional(v10.string), 
-    onViewableItemsChanged = v10.optional(v10.callback), 
-    onContainerSizeChanged = v10.optional(v10.callback), 
-    onChangeCanvasPosition = v10.optional(v10.callback), 
-    onReachedThresholdFromEnd = v10.optional(v10.union(v10.callback, v10.table)), 
-    thresholdFromEnd = v10.optional(v10.number), 
-    scrollingEnabledOverride = v10.optional(v10.boolean), 
-    shouldShowScrollButtonsOverride = v10.optional(v10.boolean), 
-    hideHeaderButton = v10.optional(v10.boolean), 
-    maxItemsToShow = v10.optional(v10.number), 
-    numItemsToRenderOffScreen = v10.optional(v10.number), 
-    onScrollButtonEnter = v10.optional(v10.callback), 
-    onScrollButtonLeave = v10.optional(v10.callback), 
-    AutomaticSize = v10.optional(v10.enum(Enum.AutomaticSize)), 
-    headerComponent = v10.optional(v10.table), 
-    collectionItemSize = if l_FFlagLuaAppCompositionSupport_0 then v10.optional(v10.string) else nil, 
-    enableHoverOverflow = if l_FFlagLuaAppCompositionSupport_0 then v10.optional(v10.boolean) else nil
-});
-local v31 = {
-    numColumns = 0, 
-    fractionalItemAmount = 0, 
-    columnGap = 0, 
-    sideMargin = 0
-};
-local function _(v32, v33) --[[ Line: 217 ]] --[[ Name: isScrollingEnabled ]]
-    -- upvalues: l_FFlagLuaAppEnableVRCarouselScrolling_0 (copy)
-    if v32 ~= nil then
-        return v32;
-    elseif l_FFlagLuaAppEnableVRCarouselScrolling_0 then
-        return true;
-    else
-        return not v33;
-    end;
-end;
-local _ = function(v35, _, v37, v38, v39) --[[ Line: 230 ]] --[[ Name: areScrollButtonsEnabled ]]
-    -- upvalues: v6 (copy), l_FFlagLuaAppEnableVRCarouselScrolling_0 (copy)
-    if not v37 then
-        return false;
-    elseif v38 ~= nil then
-        return v38;
-    else
-        local v40 = true;
-        if v35 ~= v6.Input.Pointer then
-            v40 = l_FFlagLuaAppEnableVRCarouselScrolling_0 and v39;
-        end;
-        return v40;
-    end;
-end;
-return (v2.memo(function(v42) --[[ Line: 250 ]] --[[ Name: CollectionCarousel ]]
-    -- upvalues: l_validateProps_0 (copy), v30 (copy), v3 (copy), v31 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), v21 (copy), l_FFlagLuaAppFixCarouselPeekInControl_0 (copy), v4 (copy), v2 (copy), l_FFlagCollectionViewMathChanges_0 (copy), l_useLastInput_0 (copy), l_usePreferredInput_0 (copy), l_useIsSpatial_0 (copy), v6 (copy), l_FFlagLuaAppEnableVRCarouselScrolling_0 (copy), v12 (copy), v23 (copy), v13 (copy), v14 (copy), l_FFlagSduiCarouselHoverFixes_0 (copy), l_useDesignTokens_0 (copy), v17 (copy), v15 (copy), v18 (copy), v16 (copy), l_CompositionTags_0 (copy), v19 (copy)
-    l_validateProps_0(v30, v42);
-    local v43 = v3.Dictionary.join(v31, v42);
-    local l_sideMargin_0 = v43.sideMargin;
-    local v45 = nil;
-    local v46 = nil;
-    local v47 = nil;
-    if l_FFlagLuaAppCompositionSupport_0 then
-        local v48 = v21(v42.collectionItemSize);
-        v45 = v42.numColumns or v48.itemsPerRow;
-        v46 = v42.columnGap or v48.gutter;
-        v47 = if l_FFlagLuaAppFixCarouselPeekInControl_0 then if v42.collectionItemSize then v48.carouselPeek or 0 else nil else v48.carouselPeek or 0;
-    else
-        v45 = v43.numColumns;
-        v46 = v43.columnGap;
-    end;
-    v4.assert(v45 >= 1);
-    v4.assert(l_sideMargin_0 >= 0);
-    v4.assert(v43.fractionalItemAmount >= 0);
-    v4.assert(v46 >= 0);
-    local v49 = v2.useRef(nil);
-    local v50 = nil;
-    local v51 = nil;
-    local v52 = nil;
-    if l_FFlagCollectionViewMathChanges_0 then
-        local v53, v54 = v2.useBinding(0);
-        v50 = v53;
-        v51 = v54;
-        v52 = v2.useCallback(function(v55) --[[ Line: 280 ]]
-            -- upvalues: v51 (ref)
-            if v55 then
-                v51(v55.AbsoluteSize.X);
-            end;
-        end, {});
-    end;
-    local v57 = v2.useCallback(function(v56) --[[ Line: 287 ]]
-        -- upvalues: v49 (copy), l_FFlagCollectionViewMathChanges_0 (ref), v51 (ref), v43 (copy)
-        v49.current = v56;
-        if l_FFlagCollectionViewMathChanges_0 and v56 then
-            v51(v56.AbsoluteSize.X);
-        end;
-        if v43.onScrollingFrameRefCallback then
-            v43.onScrollingFrameRefCallback(v56);
-        end;
-        if v43.scrollingFrameRef then
-            v43.scrollingFrameRef.current = v56;
-        end;
-    end, {
-        v43.onScrollingFrameRefCallback, 
-        v43.scrollingFrameRef
-    });
-    local v58 = l_useLastInput_0();
-    local v59 = l_usePreferredInput_0();
-    local v60 = l_useIsSpatial_0();
-    local v61 = v43.hideHeaderButton or v59 == v6.Input.Directional;
-    local l_scrollingEnabledOverride_0 = v43.scrollingEnabledOverride;
-    local v63 = if l_scrollingEnabledOverride_0 ~= nil then l_scrollingEnabledOverride_0 else l_FFlagLuaAppEnableVRCarouselScrolling_0 and true or not v60;
-    l_scrollingEnabledOverride_0 = math.min(v43.maxItemsToShow or #v43.items, #v43.items);
-    if not v63 then
-        l_scrollingEnabledOverride_0 = math.min(v45, l_scrollingEnabledOverride_0);
-    end;
-    v4.assert(l_scrollingEnabledOverride_0 >= 0);
-    local v64 = if v63 and v45 < l_scrollingEnabledOverride_0 then v43.fractionalItemAmount else 0;
-    local v65, v66, v67, v68 = v12(v45, v46, l_sideMargin_0, v64, v43.getItemHeight, v43.onContainerSizeChanged, if l_FFlagLuaAppCompositionSupport_0 then v47 else nil);
-    local v69 = nil;
-    if l_FFlagCollectionViewMathChanges_0 then
-        v69 = v2.useMemo(function() --[[ Line: 339 ]]
-            -- upvalues: v2 (ref), v50 (ref), v65 (copy), v23 (ref), v45 (ref), v46 (ref), v47 (ref), v64 (copy)
-            return v2.joinBindings({
-                v50, 
-                v65
-            }):map(function(v70) --[[ Line: 340 ]]
-                -- upvalues: v23 (ref), v45 (ref), v46 (ref), v47 (ref), v64 (ref)
-                return v23(v70[1], v45, v46, v47 or 0, v64, v70[2].X);
-            end);
-        end, {
-            v50, 
-            v65, 
-            v45, 
-            v46, 
-            v47, 
-            v64
-        });
-    end;
-    local l_shouldShowScrollButtonsOverride_0 = v43.shouldShowScrollButtonsOverride;
-    local v72 = if l_FFlagLuaAppEnableVRCarouselScrolling_0 then v60 else nil;
-    local v73 = not not v63 and if l_shouldShowScrollButtonsOverride_0 ~= nil then l_shouldShowScrollButtonsOverride_0 else v58 == v6.Input.Pointer or l_FFlagLuaAppEnableVRCarouselScrolling_0 and v72;
-    local v74, v75;
-    l_shouldShowScrollButtonsOverride_0, v72, v74, v75 = v13(v49, l_scrollingEnabledOverride_0, v73, v45, if l_FFlagCollectionViewMathChanges_0 then nil else v65, if l_FFlagCollectionViewMathChanges_0 then nil else v46, nil, if l_FFlagCollectionViewMathChanges_0 then v69 else nil);
-    local v76 = nil;
-    local v77 = nil;
-    local v78 = nil;
-    local v79 = nil;
-    if l_FFlagLuaAppCompositionSupport_0 then
-        v76 = v14(v49, v43.enableHoverOverflow == true);
-        v77 = if l_FFlagSduiCarouselHoverFixes_0 then v46 * 0.5 else v46 * 0.5 + 1;
-        v78 = v2.useMemo(function() --[[ Line: 383 ]]
-            -- upvalues: v43 (copy), v2 (ref), v65 (copy), v76 (ref), v77 (ref)
-            if not v43.enableHoverOverflow then
-                return nil;
-            else
-                return v2.joinBindings({
-                    v65, 
-                    v76
-                }):map(function(v80) --[[ Line: 387 ]]
-                    -- upvalues: v77 (ref)
-                    local v81 = v80[1];
-                    local v82 = v80[2];
-                    return UDim2.new(1, v82 and 0 or -v77 * 2, 0, v81.Y);
-                end);
-            end;
-        end, {
-            v65, 
-            v76, 
-            v77, 
-            v43.enableHoverOverflow
-        });
-        v79 = v2.useMemo(function() --[[ Line: 393 ]]
-            -- upvalues: v43 (copy), v76 (ref), v77 (ref)
-            if not v43.enableHoverOverflow then
-                return nil;
-            else
-                return v76:map(function(v83) --[[ Line: 397 ]]
-                    -- upvalues: v77 (ref)
-                    return UDim2.new(0, v83 and 0 or v77, 0, 500);
-                end);
-            end;
-        end, {
-            v76, 
-            v77, 
-            v43.enableHoverOverflow
-        });
-    end;
-    local v84 = l_useDesignTokens_0();
-    local l_Size_200_0 = v84.Global.Size_200;
-    local l_Size_250_0 = v84.Global.Size_250;
-    local l_White_0 = v84.Global.Color.White;
-    local v88 = v43.backgroundMuralUrl ~= nil;
-    local v89 = v43.title and v43.title ~= "";
-    local v90 = v2.createElement(v17, {
-        Position = if l_FFlagLuaAppCompositionSupport_0 then v79 else nil, 
-        Size = if l_FFlagLuaAppCompositionSupport_0 then v78 else nil, 
-        ScrollingEnabled = v63, 
-        onChangeCanvasPosition = v43.onChangeCanvasPosition, 
-        onScrollingFrameRefCallback = v57, 
-        itemSizeBinding = v65, 
-        items = v43.items, 
-        totalItemsOnCanvas = l_scrollingEnabledOverride_0, 
-        numColumns = v45, 
-        columnGap = v46, 
-        renderItem = v43.renderItem, 
-        sideMargin = l_sideMargin_0, 
-        numItemsToRenderOffScreen = v43.numItemsToRenderOffScreen, 
-        onReachedThresholdFromEnd = v43.onReachedThresholdFromEnd, 
-        thresholdFromEnd = v43.thresholdFromEnd, 
-        onViewableItemsChanged = v43.onViewableItemsChanged, 
-        AutomaticSize = v43.AutomaticSize, 
-        spacingMetricsBinding = if l_FFlagCollectionViewMathChanges_0 then v69 else nil, 
-        onScrollingFrameAbsoluteSizeChanged = if l_FFlagCollectionViewMathChanges_0 then v52 else nil
-    });
-    local l_createElement_0 = v2.createElement;
-    local v92 = "Frame";
-    local v93 = {
-        ref = v43.containerRef, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Position = v43.Position, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v43.LayoutOrder, 
-        [v2.Tag] = if v43.testId then ("data-testid=%*"):format(v43.testId) else nil
-    };
-    local v94 = {
-        BackgroundMural = v43.backgroundMuralUrl and v2.createElement(v15, {
-            backgroundMuralUrl = v43.backgroundMuralUrl, 
-            containerSizeBinding = v66, 
-            ZIndex = -1
-        }) or nil
-    };
-    local l_createElement_1 = v2.createElement;
-    local v96 = "Frame";
-    local v97 = {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        [v2.Change.AbsoluteSize] = v67, 
-        ref = v68
-    };
-    local v98 = {
-        UIPadding = v2.createElement("UIPadding", {
-            PaddingTop = if v43.backgroundMuralUrl ~= nil then UDim.new(0, l_Size_250_0) else nil, 
-            PaddingLeft = if not l_FFlagLuaAppCompositionSupport_0 or l_sideMargin_0 > 0 then UDim.new(0, l_sideMargin_0) else nil, 
-            PaddingRight = if not l_FFlagLuaAppCompositionSupport_0 or l_sideMargin_0 > 0 then UDim.new(0, l_sideMargin_0) else nil
-        }), 
-        UIListLayout = v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, if not not v89 or v43.headerComponent then l_Size_200_0 else 0)
-        })
-    };
-    local v99;
-    if v43.headerComponent then
-        v99 = v43.headerComponent;
-    else
-        v99 = v18;
-        local l_createElement_2 = v2.createElement;
-        local l_v16_0 = v16;
-        local v102 = {
-            LayoutOrder = 1, 
-            title = v43.title, 
-            subtitle = v43.subtitle, 
-            tooltipInfoText = v43.tooltipInfoText, 
-            onActivateInfoIcon = v43.onActivateInfoIcon, 
-            tooltipSupportsVR = v43.tooltipSupportsVR, 
-            tooltipSupportsTenFootUi = v43.tooltipSupportsTenFootUi
-        };
-        local v103 = true;
-        if #v43.items >= 1 then
-            v103 = v61 or not v89;
-        end;
-        v102.hideButton = v103;
-        v102.onActivate = v43.onActivateHeader;
-        v102.onActivateSubtitle = v43.onActivateSubtitle;
-        v102.buttonText = v43.headerButtonText;
-        v102.titleColor = if v88 then l_White_0 else nil;
-        v102.subtitleColor = if v88 then l_White_0 else nil;
-        v99 = v99(l_createElement_2(l_v16_0, v102), v88);
-    end;
-    v98.CollectionHeader = v99;
-    v98.Items = v2.createElement("Frame", {
-        Size = if l_FFlagLuaAppCompositionSupport_0 and v43.enableHoverOverflow then v65:map(function(v104) --[[ Line: 491 ]]
-            return UDim2.new(1, 0, 0, v104.Y);
-        end) else UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = if l_FFlagLuaAppCompositionSupport_0 and v43.enableHoverOverflow then nil else Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = 2, 
-        [v2.Tag] = if not (l_FFlagLuaAppCompositionSupport_0 and v43.collectionItemSize) or v43.enableHoverOverflow then nil else l_CompositionTags_0.Utility.ClipAtMaxWidth
-    }, {
-        CarouselClip = if l_FFlagLuaAppCompositionSupport_0 and v43.enableHoverOverflow then v2.createElement("Frame", {
-            Size = v76:map(function(v105) --[[ Line: 509 ]]
-                -- upvalues: v77 (ref)
-                return UDim2.new(1, v105 and 0 or v77 * 2, 1, 1000);
-            end), 
-            Position = v76:map(function(v106) --[[ Line: 517 ]]
-                -- upvalues: v77 (ref)
-                return UDim2.new(0, v106 and 0 or -v77, 0, -500);
-            end), 
-            BackgroundTransparency = 1, 
-            [v2.Tag] = if v43.collectionItemSize then l_CompositionTags_0.Utility.ClipAtMaxWidth else nil
-        }, {
-            ScrollingItems = v90
-        }) else nil, 
-        ScrollingItems = if l_FFlagLuaAppCompositionSupport_0 and v43.enableHoverOverflow then nil else v90, 
-        ScrollButtons = if v73 then v2.createElement(v19, {
-            handleScrollLeft = l_shouldShowScrollButtonsOverride_0, 
-            handleScrollRight = v72, 
-            leftScrollingEnabled = v74, 
-            rightScrollingEnabled = v75, 
-            ZIndex = 10, 
-            Size = UDim2.new(1, 2 * l_sideMargin_0, 1, 0), 
-            Position = UDim2.new(0.5, 0, 0, 0), 
-            AnchorPoint = Vector2.new(0.5, 0), 
-            buttonOffsetFromEdge = v84.Global.Size_100, 
-            onScrollButtonEnter = v43.onScrollButtonEnter, 
-            onScrollButtonLeave = v43.onScrollButtonLeave
-        }) else nil
-    });
-    v94.CollectionContent = l_createElement_1(v96, v97, v98);
-    return l_createElement_0(v92, v93, v94);
-end));
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local Cryo = require(CollectionViewsParent.Cryo)
+local ArgCheck = require(CollectionViewsParent.ArgCheck)
+local useDesignTokens = require(CollectionViewsParent.Style).useDesignTokens
+local Responsive = require(CollectionViewsParent.Responsive)
+local useLastInput = Responsive.useLastInput
+local usePreferredInput = Responsive.usePreferredInput
+local useIsSpatial = Responsive.useIsSpatial
+local t = require(CollectionViewsParent.t)
+local validateProps = require(CollectionViewsParent.DiscoveryUtils).validateProps
+local useCollectionSizeBindings = require(CollectionViews.useCollectionSizeBindings)
+local useScrollButtonHandlers = require(CollectionViews.Carousel.useScrollButtonHandlers)
+local useCarouselScrollingBinding = require(CollectionViews.Carousel.useCarouselScrollingBinding)
+local CollectionBackgroundMural = require(CollectionViews.Carousel.CollectionBackgroundMural)
+local CollectionHeader = require(CollectionViews.CollectionHeader)
+local ScrollingRowOfCollectionItems = require(CollectionViews.Carousel.ScrollingRowOfCollectionItems)
+local maybeForceDarkTheme = require(CollectionViews.maybeForceDarkTheme)
+local CarouselScrollButtons = require(CollectionViews.Carousel.CarouselScrollButtons)
+
+require(CollectionViews.CollectionViewTypes)
+
+local useCollectionLayout = require(CollectionViews.CollectionLayoutStore.useCollectionLayout)
+local CompositionTags = require(CollectionViewsParent.AppComposition).CompositionTags
+local calculateCarouselSpacingMetrics = require(CollectionViews.Carousel.calculateCarouselSpacingMetrics)
+local SharedFlags = require(CollectionViewsParent.SharedFlags)
+local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
+local FFlagCollectionViewMathChanges = SharedFlags.FFlagCollectionViewMathChanges
+local FFlagLuaAppEnableVRCarouselScrolling = SharedFlags.FFlagLuaAppEnableVRCarouselScrolling
+local FFlagLuaAppFixCarouselPeekInControl = SharedFlags.FFlagLuaAppFixCarouselPeekInControl
+local FFlagLuaAppHideCarouselSubtitleChevron = SharedFlags.FFlagLuaAppHideCarouselSubtitleChevron
+local v30 = t.strictInterface({
+	testId = t.optional(t.string),
+	Position = t.optional(t.UDim2),
+	LayoutOrder = t.optional(t.number),
+	containerRef = t.optional(t.union(t.table, t.callback)),
+	scrollingFrameRef = t.optional(t.table),
+	onScrollingFrameRefCallback = t.optional(t.callback),
+	numColumns = t.optional(t.number),
+	fractionalItemAmount = t.optional(t.number),
+	items = t.table,
+	renderItem = t.callback,
+	getItemHeight = t.callback,
+	columnGap = t.optional(t.number),
+	sideMargin = t.optional(t.number),
+	backgroundMuralUrl = t.optional(t.string),
+	title = t.optional(t.union(t.string, t.callback)),
+	subtitle = t.optional(t.string),
+	tooltipInfoText = t.optional(t.string),
+	onActivateInfoIcon = t.optional(t.callback),
+	tooltipSupportsVR = t.optional(t.boolean),
+	tooltipSupportsTenFootUi = t.optional(t.boolean),
+	onActivateHeader = t.optional(t.callback),
+	onActivateSubtitle = t.optional(t.callback),
+	headerButtonText = t.optional(t.string),
+	onViewableItemsChanged = t.optional(t.callback),
+	onContainerSizeChanged = t.optional(t.callback),
+	onChangeCanvasPosition = t.optional(t.callback),
+	onReachedThresholdFromEnd = t.optional(t.union(t.callback, t.table)),
+	thresholdFromEnd = t.optional(t.number),
+	scrollingEnabledOverride = t.optional(t.boolean),
+	shouldShowScrollButtonsOverride = t.optional(t.boolean),
+	hideHeaderButton = t.optional(t.boolean),
+	maxItemsToShow = t.optional(t.number),
+	numItemsToRenderOffScreen = t.optional(t.number),
+	onScrollButtonEnter = t.optional(t.callback),
+	onScrollButtonLeave = t.optional(t.callback),
+	AutomaticSize = t.optional(t.enum(Enum.AutomaticSize)),
+	headerComponent = t.optional(t.table),
+	collectionItemSize = t.optional(t.string),
+	enableHoverOverflow = t.optional(t.boolean),
+	hideSubtitleChevron = if not FFlagLuaAppHideCarouselSubtitleChevron then nil else t.optional(t.boolean)
+})
+local t1 = {
+	numColumns = 0,
+	fractionalItemAmount = 0,
+	columnGap = 0,
+	sideMargin = 0
+}
+
+local function isScrollingEnabled(b1: boolean?, b2: boolean?) -- line: 222
+	-- upvalues: FFlagLuaAppEnableVRCarouselScrolling (copy)
+	if b1 ~= nil then
+		return b1
+	end
+
+	if FFlagLuaAppEnableVRCarouselScrolling then
+		return true
+	end
+
+	return not b2
+end
+local function areScrollButtonsEnabled(s1: string, _: string, b3: boolean, b4: boolean?, b5: boolean) -- line: 235
+	-- upvalues: Responsive (copy), FFlagLuaAppEnableVRCarouselScrolling (copy)
+	if not b3 then
+		return false
+	end
+
+	if b4 ~= nil then
+		return b4
+	end
+
+	return s1 == Responsive.Input.Pointer or FFlagLuaAppEnableVRCarouselScrolling and b5
+end
+local function CollectionCarousel(t2: {[any]: any}) -- line: 255
+	-- upvalues: validateProps (copy), v30 (copy), Cryo (copy), t1 (copy), useCollectionLayout (copy), FFlagLuaAppFixCarouselPeekInControl (copy), ArgCheck (copy), React (copy), FFlagCollectionViewMathChanges (copy), useLastInput (copy), usePreferredInput (copy), useIsSpatial (copy), Responsive (copy), FFlagLuaAppEnableVRCarouselScrolling (copy), useCollectionSizeBindings (copy), calculateCarouselSpacingMetrics (copy), useScrollButtonHandlers (copy), useCarouselScrollingBinding (copy), useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), ScrollingRowOfCollectionItems (copy), CollectionBackgroundMural (copy), maybeForceDarkTheme (copy), CollectionHeader (copy), FFlagLuaAppHideCarouselSubtitleChevron (copy), CompositionTags (copy), CarouselScrollButtons (copy)
+	validateProps(v30, t2)
+
+	local v43 = Cryo.Dictionary.join(t1, t2)
+	local sideMargin = v43.sideMargin
+	local v45 = useCollectionLayout(t2.collectionItemSize)
+	local v46 = t2.numColumns or v45.itemsPerRow
+	local v47 = t2.columnGap or v45.gutter
+	local v48 = if not FFlagLuaAppFixCarouselPeekInControl then v45.carouselPeek or 0 else if not t2.collectionItemSize then nil else v45.carouselPeek or 0
+
+	ArgCheck.assert(v46 >= 1)
+	ArgCheck.assert(sideMargin >= 0)
+	ArgCheck.assert(v43.fractionalItemAmount >= 0)
+	ArgCheck.assert(v47 >= 0)
+
+	local v49 = React.useRef(nil)
+	local u50 = nil
+	local u51 = nil
+	local v52 = nil
+
+	if FFlagCollectionViewMathChanges then
+		local v53, v54 = React.useBinding(0)
+
+		u50 = v53
+		u51 = v54
+		v52 = React.useCallback(function(p1) -- line: 279
+			-- upvalues: u51 (ref)
+			if p1 then
+				u51(p1.AbsoluteSize.X)
+			end
+		end, {})
+	end
+
+	local v55 = React.useCallback(function(p2) -- line: 286
+		-- upvalues: v49 (copy), FFlagCollectionViewMathChanges (copy), u51 (ref), v43 (copy)
+		v49.current = p2
+
+		if FFlagCollectionViewMathChanges and p2 then
+			u51(p2.AbsoluteSize.X)
+		end
+
+		if v43.onScrollingFrameRefCallback then
+			v43.onScrollingFrameRefCallback(p2)
+		end
+
+		if v43.scrollingFrameRef then
+			v43.scrollingFrameRef.current = p2
+		end
+	end, {
+		v43.onScrollingFrameRefCallback,
+		v43.scrollingFrameRef
+	})
+	local v56 = useLastInput()
+	local v57 = usePreferredInput()
+	local v58 = useIsSpatial()
+	local v59 = v43.hideHeaderButton or v57 == Responsive.Input.Directional
+	local scrollingEnabledOverride = v43.scrollingEnabledOverride
+	local v61 = if scrollingEnabledOverride == nil then not not FFlagLuaAppEnableVRCarouselScrolling or not v58 else scrollingEnabledOverride
+	local v62 = math.min(v43.maxItemsToShow or #v43.items, #v43.items)
+
+	if not v61 then
+		v62 = math.min(v46, v62)
+	end
+
+	ArgCheck.assert(v62 >= 0)
+
+	local v63 = (not v61 or not (v46 < v62)) and 0 or v43.fractionalItemAmount
+	local v64, v65, v66, v67 = useCollectionSizeBindings(v46, v47, sideMargin, v63, v43.getItemHeight, v43.onContainerSizeChanged, v48)
+	local v68 = nil
+
+	if FFlagCollectionViewMathChanges then
+		v68 = React.useMemo(function() -- line: 338
+			-- upvalues: React (copy), u50 (ref), v64 (copy), calculateCarouselSpacingMetrics (copy), v46 (copy), v47 (copy), v48 (copy), v63 (copy)
+			return React.joinBindings({
+				u50,
+				v64
+			}):map(function(p3) -- line: 339
+				-- upvalues: calculateCarouselSpacingMetrics (copy), v46 (copy), v47 (copy), v48 (copy), v63 (copy)
+				return calculateCarouselSpacingMetrics(p3[1], v46, v47, v48 or 0, v63, p3[2].X)
+			end)
+		end, {
+			u50,
+			v64,
+			v46,
+			v47,
+			v48,
+			v63
+		})
+	end
+
+	local shouldShowScrollButtonsOverride = v43.shouldShowScrollButtonsOverride
+	local v70 = if not FFlagLuaAppEnableVRCarouselScrolling then nil else v58
+	local v71 = if v61 then if shouldShowScrollButtonsOverride == nil then v56 == Responsive.Input.Pointer or FFlagLuaAppEnableVRCarouselScrolling and v70 else shouldShowScrollButtonsOverride else false
+	local v72, v73, v74, v75 = useScrollButtonHandlers(v49, v62, v71, v46, if not FFlagCollectionViewMathChanges then v64 else nil, if not FFlagCollectionViewMathChanges then v47 else nil, nil, if not FFlagCollectionViewMathChanges then nil else v68)
+	local v76 = useCarouselScrollingBinding(v49, v43.enableHoverOverflow == true)
+	local v77 = v47 * 0.5
+	local v78 = React.useMemo(function() -- line: 377
+		-- upvalues: v43 (copy), React (copy), v64 (copy), v76 (copy), v77 (copy)
+		if not v43.enableHoverOverflow then
+			return nil
+		end
+
+		return React.joinBindings({
+			v64,
+			v76
+		}):map(function(p4) -- line: 381
+			-- upvalues: v77 (copy)
+			local v94 = p4[1]
+			local v95 = p4[2]
+
+			return UDim2.new(1, if not v95 then -v77 * 2 else 0, 0, v94.Y)
+		end)
+	end, {
+		v64,
+		v76,
+		v77,
+		v43.enableHoverOverflow
+	})
+	local v79 = React.useMemo(function() -- line: 387
+		-- upvalues: v43 (copy), v76 (copy), v77 (copy)
+		if not v43.enableHoverOverflow then
+			return nil
+		end
+
+		return v76:map(function(p5) -- line: 391
+			-- upvalues: v77 (copy)
+			return UDim2.new(0, if not p5 then v77 else 0, 0, 500)
+		end)
+	end, {
+		v76,
+		v77,
+		v43.enableHoverOverflow
+	})
+	local v80 = useDesignTokens()
+	local v81 = if not FFlagRenameDeprecatedUIBloxTokens then v80.Global.Size_200 else v80.Size.Size_400
+	local v82 = if not FFlagRenameDeprecatedUIBloxTokens then v80.Global.Size_250 else v80.Size.Size_500
+	local v83 = if not FFlagRenameDeprecatedUIBloxTokens then v80.Global.Color.White else v80.Color.Extended.White.White_100
+	local v84 = v43.backgroundMuralUrl ~= nil
+	local v85 = v43.title and v43.title ~= ""
+	local v86 = React.createElement(ScrollingRowOfCollectionItems, {
+		Position = v79,
+		Size = v78,
+		ScrollingEnabled = v61,
+		onChangeCanvasPosition = v43.onChangeCanvasPosition,
+		onScrollingFrameRefCallback = v55,
+		itemSizeBinding = v64,
+		items = v43.items,
+		totalItemsOnCanvas = v62,
+		numColumns = v46,
+		columnGap = v47,
+		renderItem = v43.renderItem,
+		sideMargin = sideMargin,
+		numItemsToRenderOffScreen = v43.numItemsToRenderOffScreen,
+		onReachedThresholdFromEnd = v43.onReachedThresholdFromEnd,
+		thresholdFromEnd = v43.thresholdFromEnd,
+		onViewableItemsChanged = v43.onViewableItemsChanged,
+		AutomaticSize = v43.AutomaticSize,
+		spacingMetricsBinding = if not FFlagCollectionViewMathChanges then nil else v68,
+		onScrollingFrameAbsoluteSizeChanged = if not FFlagCollectionViewMathChanges then nil else v52
+	})
+
+	return React.createElement("Frame", {
+		ref = v43.containerRef,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Position = v43.Position,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = v43.LayoutOrder,
+		[React.Tag] = if not v43.testId then nil else `data-testid={ v43.testId }`
+	}, {
+		BackgroundMural = v43.backgroundMuralUrl and React.createElement(CollectionBackgroundMural, {
+			ZIndex = -1,
+			backgroundMuralUrl = v43.backgroundMuralUrl,
+			containerSizeBinding = v65
+		}) or nil,
+		CollectionContent = React.createElement("Frame", {
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			[React.Change.AbsoluteSize] = v66,
+			ref = v67
+		}, {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingTop = if v43.backgroundMuralUrl == nil then nil else UDim.new(0, v82),
+				PaddingLeft = if not (sideMargin > 0) then nil else UDim.new(0, sideMargin),
+				PaddingRight = if not (sideMargin > 0) then nil else UDim.new(0, sideMargin)
+			}),
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, not v85 and not v43.headerComponent and 0 or v81)
+			}),
+			CollectionHeader = if not v43.headerComponent then maybeForceDarkTheme(React.createElement(CollectionHeader, {
+				LayoutOrder = 1,
+				title = v43.title,
+				subtitle = v43.subtitle,
+				tooltipInfoText = v43.tooltipInfoText,
+				onActivateInfoIcon = v43.onActivateInfoIcon,
+				tooltipSupportsVR = v43.tooltipSupportsVR,
+				tooltipSupportsTenFootUi = v43.tooltipSupportsTenFootUi,
+				hideButton = #v43.items < 1 or (v59 or not v85),
+				onActivate = v43.onActivateHeader,
+				onActivateSubtitle = v43.onActivateSubtitle,
+				buttonText = v43.headerButtonText,
+				titleColor = if not v84 then nil else v83,
+				subtitleColor = if not v84 then nil else v83,
+				hideSubtitleChevron = if not FFlagLuaAppHideCarouselSubtitleChevron then nil else v43.hideSubtitleChevron
+			}), v84) else v43.headerComponent,
+			Items = React.createElement("Frame", {
+				Size = if not v43.enableHoverOverflow then UDim2.new(1, 0, 0, 0) else v64:map(function(vector2: Vector2) -- line: 496
+					return UDim2.new(1, 0, 0, vector2.Y)
+				end),
+				AutomaticSize = if v43.enableHoverOverflow then nil else Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				[React.Tag] = if not v43.collectionItemSize or v43.enableHoverOverflow then nil else CompositionTags.Utility.ClipAtMaxWidth
+			}, {
+				CarouselClip = if not v43.enableHoverOverflow then nil else React.createElement("Frame", {
+					Size = v76:map(function(p6) -- line: 510
+						-- upvalues: v77 (copy)
+						return UDim2.new(1, if not p6 then v77 * 2 else 0, 1, 1000)
+					end),
+					Position = v76:map(function(p7) -- line: 518
+						-- upvalues: v77 (copy)
+						return UDim2.new(0, if not p7 then -v77 else 0, 0, -500)
+					end),
+					BackgroundTransparency = 1,
+					[React.Tag] = if not v43.collectionItemSize then nil else CompositionTags.Utility.ClipAtMaxWidth
+				}, {
+					ScrollingItems = v86
+				}),
+				ScrollingItems = if v43.enableHoverOverflow then nil else v86,
+				ScrollButtons = if not v71 then nil else React.createElement(CarouselScrollButtons, {
+					ZIndex = 10,
+					handleScrollLeft = v72,
+					handleScrollRight = v73,
+					leftScrollingEnabled = v74,
+					rightScrollingEnabled = v75,
+					Size = UDim2.new(1, 2 * sideMargin, 1, 0),
+					Position = UDim2.new(0.5, 0, 0, 0),
+					AnchorPoint = Vector2.new(0.5, 0),
+					buttonOffsetFromEdge = if not FFlagRenameDeprecatedUIBloxTokens then v80.Global.Size_100 else v80.Size.Size_200,
+					onScrollButtonEnter = v43.onScrollButtonEnter,
+					onScrollButtonLeave = v43.onScrollButtonLeave
+				})
+			})
+		})
+	})
+end
+
+return (React.memo(CollectionCarousel))

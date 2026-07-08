@@ -1,5 +1,5 @@
 return {
-    UNKNOWN = "UNKNOWN", 
-    LOGGED_OUT = "LOGGED_OUT", 
-    LOGGED_IN = "LOGGED_IN"
-};
+	UNKNOWN = "UNKNOWN",
+	LOGGED_OUT = "LOGGED_OUT",
+	LOGGED_IN = "LOGGED_IN"
+}

@@ -1,4 +1,4 @@
 return {
-    Default = "Default", 
-    Regroup = "Regroup"
-};
+	Default = "Default",
+	Regroup = "Regroup"
+}

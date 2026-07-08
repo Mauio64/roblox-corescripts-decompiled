@@ -1,28 +1,36 @@
-local l_Parent_0 = script:FindFirstAncestor("GameInfosRodux").Parent;
-local v1 = require(script.Parent.AddGames);
-local v2 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.DiscoveryTypes);
-local function v9(v4, v5) --[[ Line: 12 ]] --[[ Name: getMergedState ]]
-    -- upvalues: v2 (copy)
-    local v6 = {};
-    for v7, _ in pairs(v5) do
-        if v4[v7] then
-            v6[v7] = v2.Dictionary.join(v4[v7], v5[v7]);
-        else
-            v6[v7] = v5[v7];
-        end;
-    end;
-    return (v2.Dictionary.join(v4, v6));
-end;
+local Parent = script:FindFirstAncestor("GameInfosRodux").Parent
+local AddGames = require(script.Parent.AddGames)
+local Cryo = require(Parent.Cryo)
+
+require(Parent.DiscoveryTypes)
+
+local function getMergedState(p1, p2) -- line: 12
+	-- upvalues: Cryo (copy)
+	local t1 = {}
+
+	for k, _ in pairs(p2) do
+		if p1[k] then
+			t1[k] = Cryo.Dictionary.join(p1[k], p2[k])
+		else
+			t1[k] = p2[k]
+		end
+	end
+
+	return (Cryo.Dictionary.join(p1, t1))
+end
+
 return {
-    key = "GameInfosKey", 
-    reducer = function(v10, v11) --[[ Line: 26 ]]
-        -- upvalues: v1 (copy), v9 (copy)
-        v10 = v10 or {};
-        assert(v10, "");
-        if v11.type == v1.name then
-            v10 = v9(v10, v11.games);
-        end;
-        return v10;
-    end
-};
+	key = "GameInfosKey",
+	reducer = function(t2: {[any]: any}?, p3) -- line: 26
+		-- upvalues: AddGames (copy), getMergedState (copy)
+		local v12 = t2 or {}
+
+		assert(v12, "")
+
+		if p3.type == AddGames.name then
+			v12 = getMergedState(v12, p3.games)
+		end
+
+		return v12
+	end
+}

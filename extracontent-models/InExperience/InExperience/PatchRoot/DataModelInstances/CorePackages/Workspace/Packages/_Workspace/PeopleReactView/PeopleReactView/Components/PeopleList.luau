@@ -1,132 +1,156 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.PeopleService);
-local v5 = require(l_Parent_0.SignalsReact);
-local l_View_0 = v2.View;
-local l_useSignalState_0 = v5.useSignalState;
-local v8 = require(l_script_FirstAncestor_0.Components.List.PersonRow);
-local v9 = require(l_script_FirstAncestor_0.Components.List.LazyPersonRow);
-local _ = require(l_script_FirstAncestor_0.Stores.GetScrollingFrameStore);
-local v11 = v4.getService("Flags");
-local l_GetFFlagAddPeoplePageCardLayout_0 = v11.GetFFlagAddPeoplePageCardLayout;
-local l_FFlagEnablePeopleListLazyRender_0 = v11.FFlagEnablePeopleListLazyRender;
-local l_FFlagPeoplePageRemoveUseMemoElements_0 = v11.FFlagPeoplePageRemoveUseMemoElements;
-local l_FFlagPeopleListFixMemoryLeak_0 = v11.FFlagPeopleListFixMemoryLeak;
-local function v17(v16) --[[ Line: 33 ]] --[[ Name: MemoizedPersonRow ]]
-    -- upvalues: v3 (copy), l_FFlagEnablePeopleListLazyRender_0 (copy), v9 (copy), v8 (copy)
-    return v3.useMemo(function() --[[ Line: 38 ]]
-        -- upvalues: l_FFlagEnablePeopleListLazyRender_0 (ref), v3 (ref), v9 (ref), v16 (copy), v8 (ref)
-        if l_FFlagEnablePeopleListLazyRender_0 then
-            return (v3.createElement(v9, {
-                key = tostring(v16.person.UserId), 
-                person = v16.person, 
-                layoutOrder = v16.index, 
-                scrollingFrameStore = v16.scrollingFrameStore
-            }));
-        else
-            return (v3.createElement(v8, {
-                key = tostring(v16.person.UserId), 
-                person = v16.person, 
-                layoutOrder = v16.index
-            }));
-        end;
-    end, {
-        v16.person.UserId, 
-        v16.index, 
-        v16.scrollingFrameStore
-    });
-end;
-local function v33(v18, v19, v20, v21) --[[ Line: 58 ]] --[[ Name: buildPersonRows ]]
-    -- upvalues: v3 (copy), v17 (copy), l_FFlagEnablePeopleListLazyRender_0 (copy)
-    local v22 = {};
-    local v23 = {};
-    local v24 = 0;
-    if not next(v20) then
-        for v25, v26 in v18 do
-            v20[v26.UserId] = (v25 - 1) * math.floor(100000 / #v18);
-        end;
-    end;
-    for v27, v28 in v18 do
-        if v19[v28.UserId] then
-            v22[v28.UserId] = v19[v28.UserId];
-            v23[v28.UserId] = v20[v28.UserId];
-            v24 = v20[v28.UserId];
-        else
-            local v29 = 0;
-            if v27 ~= 1 then
-                local v30 = v27 + 1;
-                local v31 = 100000;
-                while v30 <= #v18 do
-                    local l_UserId_0 = v18[v30].UserId;
-                    if v20[l_UserId_0] then
-                        v31 = v20[l_UserId_0];
-                        break;
-                    else
-                        v30 = v30 + 1;
-                    end;
-                end;
-                v29 = math.floor((v24 + v31) / 2);
-            end;
-            v22[v28.UserId] = v3.createElement(v17, {
-                person = v28, 
-                index = v29, 
-                scrollingFrameStore = if l_FFlagEnablePeopleListLazyRender_0 then v21 else nil
-            });
-            v23[v28.UserId] = v29;
-            v24 = v29;
-        end;
-    end;
-    return v22, v23;
-end;
-local v34 = {};
-local v35 = {};
-local function v49(v36) --[[ Line: 126 ]] --[[ Name: PeopleList ]]
-    -- upvalues: v3 (copy), v4 (copy), l_useSignalState_0 (copy), l_FFlagPeopleListFixMemoryLeak_0 (copy), v33 (copy), l_FFlagEnablePeopleListLazyRender_0 (copy), v34 (ref), v35 (ref), l_View_0 (copy), l_GetFFlagAddPeoplePageCardLayout_0 (copy)
-    local v37 = v3.useMemo(function() --[[ Line: 127 ]]
-        -- upvalues: v4 (ref)
-        return v4.getService("PeopleListStore");
-    end, {});
-    local v38 = l_useSignalState_0(v37.people);
-    local v39 = v3.useRef(nil);
-    local v40 = nil;
-    if l_FFlagPeopleListFixMemoryLeak_0 then
-        local v41 = v3.useRef({});
-        local v42 = v3.useRef({});
-        local v43, v44 = v33(v38, v41.current, v42.current, if l_FFlagEnablePeopleListLazyRender_0 then v36.scrollingFrameStore else nil);
-        v41.current = v43;
-        v42.current = v44;
-        v40 = v41.current;
-    else
-        local v45, v46 = v33(v38, v34, v35, if l_FFlagEnablePeopleListLazyRender_0 then v36.scrollingFrameStore else nil);
-        v34 = v45;
-        v35 = v46;
-        v3.useEffect(function() --[[ Line: 153 ]]
-            -- upvalues: v34 (ref), v35 (ref), v33 (ref), v38 (copy), l_FFlagEnablePeopleListLazyRender_0 (ref), v36 (copy)
-            local v47, v48 = v33(v38, v34, v35, if l_FFlagEnablePeopleListLazyRender_0 then v36.scrollingFrameStore else nil);
-            v34 = v47;
-            v35 = v48;
-        end, {
-            v38, 
-            v36.scrollingFrameStore
-        });
-        v40 = v34;
-    end;
-    return v3.createElement(l_View_0, {
-        tag = "size-full-0 auto-y col gap-small", 
-        LayoutOrder = if l_GetFFlagAddPeoplePageCardLayout_0() then v36.LayoutOrder else 2
-    }, {
-        PeopleList = v3.createElement(l_View_0, {
-            tag = "size-full-0 col gap-small auto-y", 
-            ref = v39
-        }, {
-            v40
-        })
-    });
-end;
-if l_FFlagPeoplePageRemoveUseMemoElements_0 then
-    return v3.memo(v49);
-else
-    return v49;
-end;
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local Foundation = require(PeopleReactViewParent.Foundation)
+local React = require(PeopleReactViewParent.React)
+local PeopleService = require(PeopleReactViewParent.PeopleService)
+local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local View = Foundation.View
+local useSignalState = SignalsReact.useSignalState
+local PersonRow = require(PeopleReactView.Components.List.PersonRow)
+local LazyPersonRow = require(PeopleReactView.Components.List.LazyPersonRow)
+
+require(PeopleReactView.Stores.GetScrollingFrameStore)
+
+local v11 = PeopleService.getService("Flags")
+local GetFFlagAddPeoplePageCardLayout = v11.GetFFlagAddPeoplePageCardLayout
+local FFlagEnablePeopleListLazyRender = v11.FFlagEnablePeopleListLazyRender
+
+local function MemoizedPersonRow(t1: {[any]: any}) -- line: 32
+	-- upvalues: React (copy), FFlagEnablePeopleListLazyRender (copy), LazyPersonRow (copy), PersonRow (copy)
+	return React.useMemo(function() -- line: 37
+		-- upvalues: FFlagEnablePeopleListLazyRender (copy), React (copy), LazyPersonRow (copy), t1 (copy), PersonRow (copy)
+		if FFlagEnablePeopleListLazyRender then
+			return (React.createElement(LazyPersonRow, {
+				key = tostring(t1.person.UserId),
+				person = t1.person,
+				layoutOrder = t1.index,
+				scrollingFrameStore = t1.scrollingFrameStore
+			}))
+		end
+
+		return (React.createElement(PersonRow, {
+			key = tostring(t1.person.UserId),
+			person = t1.person,
+			layoutOrder = t1.index
+		}))
+	end, {
+		t1.person.UserId,
+		t1.index,
+		t1.scrollingFrameStore
+	})
+end
+local function buildPersonRows(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}, p1) -- line: 57
+	-- upvalues: React (copy), MemoizedPersonRow (copy), FFlagEnablePeopleListLazyRender (copy)
+	local t5 = {}
+	local t6 = {}
+	local n1 = 0
+	local g30 = nil
+	local g34 = nil
+	local UserId = nil
+	local g31 = nil
+
+	if not next(t4) then
+		for v25, v26 in t2 do
+			t4[v26.UserId] = (v25 - 1) * math.floor(100000 / #t2)
+		end
+	end
+
+	for v27, v28 in t2 do
+		if not t3[v28.UserId] then
+			local n2 = 0
+
+			repeat
+				if g30 or v27 == 1 then
+					g30 = false
+					t5[v28.UserId] = React.createElement(MemoizedPersonRow, {
+						person = v28,
+						index = n2,
+						scrollingFrameStore = if not FFlagEnablePeopleListLazyRender then nil else p1
+					})
+					t6[v28.UserId] = n2
+					n1 = n2
+					g31 = true
+
+					break
+				end
+
+				local v32 = v27 + 1
+				local n3 = 100000
+
+				repeat
+					while g34 or true do
+						if g34 or not (v32 <= #t2) then
+							g34 = false
+							n2 = math.floor((n1 + n3) / 2)
+							g30 = true
+						end
+
+						if g30 then
+							break
+						end
+
+						UserId = t2[v32].UserId
+
+						if t4[UserId] then
+							break
+						end
+
+						v32 += 1
+					end
+
+					if g30 then
+						break
+					end
+
+					n3 = t4[UserId]
+					g34 = true
+				until not g34
+			until not g30
+
+			if g31 then
+				g31 = false
+
+				continue
+			end
+		end
+
+		t5[v28.UserId] = t3[v28.UserId]
+		t6[v28.UserId] = t4[v28.UserId]
+		n1 = t4[v28.UserId]
+	end
+
+	return t5, t6
+end
+local function PeopleList(t7: {[any]: any}) -- line: 122
+	-- upvalues: React (copy), PeopleService (copy), useSignalState (copy), buildPersonRows (copy), FFlagEnablePeopleListLazyRender (copy), View (copy), GetFFlagAddPeoplePageCardLayout (copy)
+	local v37 = React.useMemo(function() -- line: 123
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("PeopleListStore")
+	end, {})
+	local v38 = useSignalState(v37.people)
+	local v39 = React.useRef(nil)
+	local v40 = React.useRef({})
+	local v41 = React.useRef({})
+	local v42, v43 = buildPersonRows(v38, v40.current, v41.current, if not FFlagEnablePeopleListLazyRender then nil else t7.scrollingFrameStore)
+
+	v40.current = v42
+	v41.current = v43
+
+	local current = v40.current
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y col gap-small",
+		LayoutOrder = not GetFFlagAddPeoplePageCardLayout() and 2 or t7.LayoutOrder
+	}, {
+		PeopleList = React.createElement(View, {
+			tag = "size-full-0 col gap-small auto-y",
+			ref = v39
+		}, { current })
+	})
+end
+
+if v11.FFlagPeoplePageRemoveUseMemoElements then
+	return React.memo(PeopleList)
+end
+
+return PeopleList

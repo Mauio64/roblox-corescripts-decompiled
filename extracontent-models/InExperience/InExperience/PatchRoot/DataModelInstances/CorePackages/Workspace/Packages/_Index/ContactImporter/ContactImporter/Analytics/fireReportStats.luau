@@ -1,7 +1,8 @@
-return function(v0) --[[ Line: 1 ]]
-    return function(v1, v2) --[[ Line: 2 ]]
-        -- upvalues: v0 (copy)
-        local v3 = v0.eventList[v1];
-        v0.diagImpl:reportStats(v3.name, v2.loadingTime);
-    end;
-end;
+return function(p1) -- line: 1
+	return function(p2, p3) -- line: 2
+		-- upvalues: p1 (copy)
+		local v4 = p1.eventList[p2]
+
+		p1.diagImpl:reportStats(v4.name, p3.loadingTime)
+	end
+end

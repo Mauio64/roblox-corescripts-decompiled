@@ -1,5 +1,5 @@
 return {
-    SaveCaptures = "SaveCaptures", 
-    ShareCapture = "ShareCapture", 
-    CapturePermissions = "CapturePermissions"
-};
+	SaveCaptures = "SaveCaptures",
+	ShareCapture = "ShareCapture",
+	CapturePermissions = "CapturePermissions"
+}

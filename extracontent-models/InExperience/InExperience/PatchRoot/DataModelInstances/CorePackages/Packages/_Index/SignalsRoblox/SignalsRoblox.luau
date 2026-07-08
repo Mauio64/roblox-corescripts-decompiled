@@ -1,4 +1,4 @@
 return {
-    createRBXEventSignal = require(script.createRBXEventSignal), 
-    createDetachedEffect = require(script.createDetachedEffect)
-};
+	createRBXEventSignal = require(script.createRBXEventSignal),
+	createDetachedEffect = require(script.createDetachedEffect)
+}

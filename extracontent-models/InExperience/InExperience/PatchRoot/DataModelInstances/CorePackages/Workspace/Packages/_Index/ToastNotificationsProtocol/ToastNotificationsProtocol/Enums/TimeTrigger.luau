@@ -1,4 +1,4 @@
 return {
-    OnDisplay = "onDisplay", 
-    OnReceive = "onReceive"
-};
+	OnDisplay = "onDisplay",
+	OnReceive = "onReceive"
+}

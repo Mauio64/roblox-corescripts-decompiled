@@ -1,3 +1,3 @@
 return {
-    useTCStreamNotificationEventHandler = require(script.useTCStreamNotificationEventHandler)
-};
+	useTCStreamNotificationEventHandler = require(script.useTCStreamNotificationEventHandler)
+}

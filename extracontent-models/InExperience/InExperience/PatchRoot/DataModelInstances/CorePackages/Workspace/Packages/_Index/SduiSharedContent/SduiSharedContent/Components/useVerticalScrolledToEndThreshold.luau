@@ -1,43 +1,87 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3, v4) --[[ Line: 6 ]] --[[ Name: useVerticalScrolledToEndThreshold ]]
-    -- upvalues: v1 (copy)
-    local v5 = v1.useRef(false);
-    v1.useEffect(function() --[[ Line: 18 ]]
-        -- upvalues: v4 (copy), v3 (copy), v2 (copy), v5 (copy)
-        if v4 == nil or v3 == nil or v2.current == nil then
-            return nil;
-        else
-            local v6 = {};
-            local l_current_0 = v2.current;
-            local function v10() --[[ Line: 26 ]] --[[ Name: checkThreshold ]]
-                -- upvalues: l_current_0 (copy), v3 (ref), v5 (ref), v4 (ref)
-                local v8 = l_current_0.AbsoluteCanvasSize.Y - l_current_0.AbsoluteWindowSize.Y - v3;
-                local l_Y_0 = l_current_0.CanvasPosition.Y;
-                if l_Y_0 < v8 and v5.current then
-                    v5.current = false;
-                    return;
-                else
-                    if v8 < l_Y_0 and not v5.current then
-                        v5.current = true;
-                        v4();
-                    end;
-                    return;
-                end;
-            end;
-            table.insert(v6, l_current_0:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(v10));
-            table.insert(v6, l_current_0:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(v10));
-            table.insert(v6, l_current_0:GetPropertyChangedSignal("CanvasPosition"):Connect(v10));
-            return function() --[[ Line: 49 ]]
-                -- upvalues: v6 (copy)
-                for _, v12 in v6 do
-                    v12:Disconnect();
-                end;
-            end;
-        end;
-    end, {
-        v2, 
-        v3, 
-        v4
-    });
-end;
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local v3 = game:DefineFastFlag("LuaAppSduiVerticalFeedThresholdRefresh", false)
+
+local function useVerticalScrolledToEndThreshold(t1: {[any]: any}, n1: number?, p1: ((...any) -> ...any)?) -- line: 8
+	-- upvalues: React (copy), v3 (copy)
+	local v9 = React.useRef(false)
+	local u10 = nil
+
+	if v3 then
+		u10 = React.useRef(p1)
+		u10.current = p1
+
+		if p1 == nil then
+			n1 = nil
+		end
+	end
+
+	React.useEffect(function() -- line: 29
+		-- upvalues: v3 (copy), p1 (copy), n1 (ref), t1 (copy), v9 (copy), u10 (ref)
+		if not v3 and p1 == nil or (n1 == nil or t1.current == nil) then
+			return nil
+		end
+
+		local t2 = {}
+		local current = t1.current
+
+		local function checkThreshold() -- line: 41
+			-- upvalues: current (copy), n1 (ref), v9 (copy), v3 (copy), u10 (ref), p1 (copy)
+			local v15 = current.AbsoluteCanvasSize.Y - current.AbsoluteWindowSize.Y - n1
+			local CanvasPositionY = current.CanvasPosition.Y
+
+			if CanvasPositionY < v15 and v9.current then
+				v9.current = false
+
+				return
+			end
+
+			if v15 < CanvasPositionY and not v9.current then
+				v9.current = true
+
+				if v3 then
+					if u10.current then
+						u10.current()
+
+						return
+					end
+				else
+					p1()
+				end
+			end
+		end
+
+		table.insert(t2, current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(checkThreshold))
+		table.insert(t2, current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(checkThreshold))
+		table.insert(t2, current:GetPropertyChangedSignal("CanvasPosition"):Connect(checkThreshold))
+
+		local u14 = nil
+
+		if v3 then
+			u14 = false
+			task.defer(function() -- line: 73
+				-- upvalues: u14 (ref), checkThreshold (copy)
+				if not u14 then
+					checkThreshold()
+				end
+			end)
+		end
+
+		return function() -- line: 80
+			-- upvalues: v3 (copy), u14 (ref), t2 (copy)
+			if v3 then
+				u14 = true
+			end
+
+			for _, v18 in t2 do
+				v18:Disconnect()
+			end
+		end
+	end, {
+		t1,
+		n1,
+		if not v3 then p1 else nil
+	})
+end
+
+return useVerticalScrolledToEndThreshold

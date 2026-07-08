@@ -1,82 +1,90 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v7 = require(l_Parent_0.Thunks.CloseOpenPrompt);
-local v8 = v3.PureComponent:extend("ContextActionsBinder");
-v8.validateProps = v5.strictInterface({
-    promptOpen = v5.boolean, 
-    closeOpenPrompt = v5.callback
-});
-v8.init = function(v9) --[[ Line: 27 ]] --[[ Name: init ]]
-    v9.actionsBound = false;
-end;
-v8.bindActions = function(v10) --[[ Line: 31 ]] --[[ Name: bindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy), l_GuiService_0 (copy)
-    if v10.actionsBound then
-        return;
-    else
-        v10.actionsBound = true;
-        l_ContextActionService_0:BindCoreAction("CloseAvatarEditorPrompt", function(_, v12, _) --[[ Line: 38 ]]
-            -- upvalues: l_GuiService_0 (ref), v10 (copy)
-            if l_GuiService_0.MenuIsOpen then
-                return Enum.ContextActionResult.Pass;
-            elseif v12 ~= Enum.UserInputState.Begin then
-                return Enum.ContextActionResult.Pass;
-            else
-                v10.props.closeOpenPrompt();
-                return Enum.ContextActionResult.Sink;
-            end;
-        end, false, Enum.KeyCode.Escape);
-        return;
-    end;
-end;
-v8.unbindActions = function(v14) --[[ Line: 51 ]] --[[ Name: unbindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    if not v14.actionsBound then
-        return;
-    else
-        v14.actionsBound = false;
-        l_ContextActionService_0:UnbindCoreAction("CloseAvatarEditorPrompt");
-        return;
-    end;
-end;
-v8.didMount = function(v15) --[[ Line: 61 ]] --[[ Name: didMount ]]
-    if v15.props.promptOpen then
-        v15:bindActions();
-    end;
-end;
-v8.render = function(_) --[[ Line: 67 ]] --[[ Name: render ]]
-    return nil;
-end;
-v8.didUpdate = function(v17, v18, _) --[[ Line: 71 ]] --[[ Name: didUpdate ]]
-    if v17.props.promptOpen ~= v18.promptOpen then
-        if v17.props.promptOpen then
-            v17:bindActions();
-            return;
-        else
-            v17:unbindActions();
-        end;
-    end;
-end;
-v8.willUnmount = function(v20) --[[ Line: 81 ]] --[[ Name: willUnmount ]]
-    if v20.actionsBound then
-        v20:unbindActions();
-    end;
-end;
-return v4.connect(function(v21) --[[ Line: 87 ]] --[[ Name: mapStateToProps ]]
-    return {
-        promptOpen = v21.promptInfo.promptType ~= nil
-    };
-end, function(v22) --[[ Line: 93 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v7 (copy)
-    return {
-        closeOpenPrompt = function() --[[ Line: 95 ]] --[[ Name: closeOpenPrompt ]]
-            -- upvalues: v22 (copy), v7 (ref)
-            return v22(v7);
-        end
-    };
-end)(v8);
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent.Parent
+local CloseOpenPrompt = require(ParentParent.Thunks.CloseOpenPrompt)
+local v9 = Roact.PureComponent:extend("ContextActionsBinder")
+
+v9.validateProps = t.strictInterface({
+	promptOpen = t.boolean,
+	closeOpenPrompt = t.callback
+})
+
+function v9.init(p1) -- line: 27
+	p1.actionsBound = false
+end
+function v9.bindActions(p2) -- line: 31
+	-- upvalues: ContextActionService (copy), GuiService (copy)
+	if p2.actionsBound then
+		return
+	end
+
+	p2.actionsBound = true
+	ContextActionService:BindCoreAction("CloseAvatarEditorPrompt", function(_, p4, _) -- line: 38
+		-- upvalues: GuiService (copy), p2 (copy)
+		if GuiService.MenuIsOpen then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if p4 ~= Enum.UserInputState.Begin then
+			return Enum.ContextActionResult.Pass
+		end
+
+		p2.props.closeOpenPrompt()
+
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.Escape)
+end
+function v9.unbindActions(p6) -- line: 51
+	-- upvalues: ContextActionService (copy)
+	if not p6.actionsBound then
+		return
+	end
+
+	p6.actionsBound = false
+	ContextActionService:UnbindCoreAction("CloseAvatarEditorPrompt")
+end
+function v9.didMount(p7) -- line: 61
+	if p7.props.promptOpen then
+		p7:bindActions()
+	end
+end
+function v9.render(_) -- line: 67
+	return nil
+end
+function v9.didUpdate(p9, p10, _) -- line: 71
+	if p9.props.promptOpen ~= p10.promptOpen then
+		if p9.props.promptOpen then
+			p9:bindActions()
+
+			return
+		end
+
+		p9:unbindActions()
+	end
+end
+function v9.willUnmount(p12) -- line: 81
+	if p12.actionsBound then
+		p12:unbindActions()
+	end
+end
+
+local function mapStateToProps(p13) -- line: 87
+	return {
+		promptOpen = p13.promptInfo.promptType ~= nil
+	}
+end
+local function mapDispatchToProps(p14) -- line: 93
+	-- upvalues: CloseOpenPrompt (copy)
+	return {
+		closeOpenPrompt = function() -- line: 95
+			-- upvalues: p14 (copy), CloseOpenPrompt (copy)
+			return p14(CloseOpenPrompt)
+		end
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v9)

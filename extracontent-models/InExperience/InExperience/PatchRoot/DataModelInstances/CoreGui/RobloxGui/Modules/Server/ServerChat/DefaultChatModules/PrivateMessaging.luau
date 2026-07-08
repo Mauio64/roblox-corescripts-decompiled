@@ -1,209 +1,246 @@
-local l_Chat_0 = game:GetService("Chat");
-local l_RunService_0 = game:GetService("RunService");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_ClientChatModules_0 = l_Chat_0:WaitForChild("ClientChatModules");
-local l_ChatModules_0 = l_Chat_0:WaitForChild("ChatModules");
-local l_ChatConstants_0 = require(l_ClientChatModules_0:WaitForChild("ChatConstants"));
-local l_ChatSettings_0 = require(l_ClientChatModules_0:WaitForChild("ChatSettings"));
-local v7 = require(l_ChatModules_0.Utility.DisplayNameHelpers);
-local v8 = nil;
-pcall(function() --[[ Line: 17 ]]
-    -- upvalues: v8 (ref)
-    v8 = require(game:GetService("Chat").ClientChatModules.ChatLocalization);
-end);
-if v8 == nil then
-    v8 = {};
-end;
-if not v8.FormatMessageToSend or not v8.LocalizeFormattedMessage then
-    v8.FormatMessageToSend = function(_, _, v11) --[[ Line: 20 ]] --[[ Name: FormatMessageToSend ]]
-        return v11;
-    end;
-end;
-local v12 = {
-    ChatColor = l_ChatSettings_0.ErrorMessageTextColor or Color3.fromRGB(245, 50, 50)
-};
-local v13 = false;
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 27 ]]
-    return UserSettings():IsUserFeatureEnabled("UserUseNewDirectChatAPI");
-end);
-if l_status_0 then
-    v13 = l_result_0;
-end;
-l_status_0 = function() --[[ Line: 35 ]] --[[ Name: GetWhisperChannelPrefix ]]
-    -- upvalues: l_ChatConstants_0 (copy)
-    if l_ChatConstants_0.WhisperChannelPrefix then
-        return l_ChatConstants_0.WhisperChannelPrefix;
-    else
-        return "To ";
-    end;
-end;
-l_result_0 = function(v16) --[[ Line: 42 ]] --[[ Name: GetWhisperChannelId ]]
-    -- upvalues: l_ChatConstants_0 (copy)
-    return (if l_ChatConstants_0.WhisperChannelPrefix then l_ChatConstants_0.WhisperChannelPrefix else "To ") .. v16;
-end;
-return function(v17) --[[ Line: 46 ]] --[[ Name: Run ]]
-    -- upvalues: l_RunService_0 (copy), v13 (ref), l_TextChatService_0 (copy), l_Chat_0 (copy), l_ChatSettings_0 (copy), v7 (copy), v8 (ref), v12 (copy), l_ChatConstants_0 (copy)
-    local function v26(v18, v19) --[[ Line: 48 ]] --[[ Name: CanCommunicate ]]
-        -- upvalues: l_RunService_0 (ref), v13 (ref), l_TextChatService_0 (ref), l_Chat_0 (ref)
-        if l_RunService_0:IsStudio() then
-            return true;
-        else
-            local l_v18_Player_0 = v18:GetPlayer();
-            local l_v19_Player_0 = v19:GetPlayer();
-            if l_v18_Player_0 and l_v19_Player_0 then
-                if v13 then
-                    local l_status_1, l_result_1 = pcall(function() --[[ Line: 56 ]]
-                        -- upvalues: l_TextChatService_0 (ref), l_v18_Player_0 (copy), l_v19_Player_0 (copy)
-                        return l_TextChatService_0:CanUsersDirectChatAsync(l_v18_Player_0.UserId, {
-                            l_v19_Player_0.UserId
-                        });
-                    end);
-                    return l_status_1 and #l_result_1 > 0;
-                else
-                    local l_status_2, l_result_2 = pcall(function() --[[ Line: 61 ]]
-                        -- upvalues: l_Chat_0 (ref), l_v18_Player_0 (copy), l_v19_Player_0 (copy)
-                        return l_Chat_0:CanUsersChatAsync(l_v18_Player_0.UserId, l_v19_Player_0.UserId);
-                    end);
-                    return l_status_2 and l_result_2;
-                end;
-            else
-                return false;
-            end;
-        end;
-    end;
-    local function v44(v27, v28, v29) --[[ Line: 70 ]] --[[ Name: DoWhisperCommand ]]
-        -- upvalues: v17 (copy), l_ChatSettings_0 (ref), v7 (ref), v8 (ref), v12 (ref), l_ChatConstants_0 (ref), v26 (copy)
-        local l_v17_Speaker_0 = v17:GetSpeaker(v27);
-        local l_v28_0 = v28;
-        local v32 = nil;
-        if string.sub(v28, 1, 1) == "\"" then
-            local v33 = string.find(v28, "\"", 2);
-            if v33 then
-                l_v28_0 = string.sub(v28, 2, v33 - 1);
-                v32 = string.sub(v28, v33 + 2);
-            end;
-        else
-            local v34 = string.match(v28, "^[^%s]+");
-            if v34 then
-                l_v28_0 = v34;
-                v32 = string.sub(v28, string.len(l_v28_0) + 2);
-            end;
-        end;
-        local v35 = nil;
-        local v36 = nil;
-        if l_ChatSettings_0.PlayerDisplayNamesEnabled and l_ChatSettings_0.WhisperByDisplayNameEnabled then
-            local v37, v38 = v7.getUserNameFromChattedName(l_v28_0, v27, l_v17_Speaker_0:GetNameForDisplay());
-            v35 = v37;
-            v36 = v38;
-        else
-            local v39, v40 = v7.getUserNameFromChattedName(l_v28_0, v27, nil);
-            v35 = v39;
-            v36 = v40;
-        end;
-        local l_v17_Speaker_1 = v17:GetSpeaker(v35);
-        if v36 == v7.CommandErrorCodes.ChattingToSelf then
-            l_v17_Speaker_0:SendSystemMessage(v8:FormatMessageToSend("GameChat_PrivateMessaging_CannotWhisperToSelf", "You cannot whisper to yourself."), v29, v12);
-            return;
-        elseif v36 == v7.CommandErrorCodes.NoMatches then
-            l_v17_Speaker_0:SendSystemMessage(v8:FormatMessageToSend("GameChat_MuteSpeaker_SpeakerDoesNotExist", string.format("Speaker '%s' does not exist.", (tostring(l_v28_0))), "RBX_NAME", (tostring(v35))), v29, v12);
-            return;
-        elseif v36 == v7.CommandErrorCodes.MultipleMatches then
-            local v42 = v7.getUsersWithDisplayNameString(l_v28_0, v27);
-            l_v17_Speaker_0:SendSystemMessage(v8:FormatMessageToSend("InGame.Chat.Response.DisplayNameMultipleMatches", "Warning: The following users have this display name: "), v29, v12);
-            l_v17_Speaker_0:SendSystemMessage(v42, v29, v12);
-            return;
-        else
-            if l_v17_Speaker_1 then
-                local l_v17_Channel_0 = v17:GetChannel((if l_ChatConstants_0.WhisperChannelPrefix then l_ChatConstants_0.WhisperChannelPrefix else "To ") .. v35);
-                if l_v17_Channel_0 then
-                    if not v26(l_v17_Speaker_0, l_v17_Speaker_1) then
-                        l_v17_Speaker_0:SendSystemMessage(v8:FormatMessageToSend("GameChat_PrivateMessaging_CannotChat", "You are not able to chat with this player."), v29, v12);
-                        return;
-                    else
-                        if not l_v17_Speaker_0:IsInChannel(l_v17_Channel_0.Name) then
-                            l_v17_Speaker_0:JoinChannel(l_v17_Channel_0.Name);
-                        end;
-                        if v32 and string.len(v32) > 0 then
-                            l_v17_Speaker_0:SayMessage(v32, l_v17_Channel_0.Name);
-                        end;
-                        l_v17_Speaker_0:SetMainChannel(l_v17_Channel_0.Name);
-                        return;
-                    end;
-                else
-                    l_v17_Speaker_0:SendSystemMessage(v8:FormatMessageToSend("GameChat_MuteSpeaker_SpeakerDoesNotExist", string.format("Speaker '%s' does not exist.", (tostring(l_v28_0))), "RBX_NAME", (tostring(v35))), v29, v12);
-                end;
-            end;
-            return;
-        end;
-    end;
-    local function v49(v45, v46, v47) --[[ Line: 147 ]] --[[ Name: WhisperCommandsFunction ]]
-        -- upvalues: v44 (copy)
-        local v48 = false;
-        if string.sub(v46, 1, 3):lower() == "/w " then
-            v44(v45, string.sub(v46, 4), v47);
-            return true;
-        else
-            if string.sub(v46, 1, 9):lower() == "/whisper " then
-                v44(v45, string.sub(v46, 10), v47);
-                v48 = true;
-            end;
-            return v48;
-        end;
-    end;
-    local function v57(v50, v51, v52) --[[ Line: 163 ]] --[[ Name: PrivateMessageReplicationFunction ]]
-        -- upvalues: v17 (copy), l_ChatConstants_0 (ref)
-        local l_v17_Speaker_2 = v17:GetSpeaker(v50);
-        local l_ExtraData_0 = l_v17_Speaker_2.ExtraData;
-        l_v17_Speaker_2:SendMessage(v51, v52, v50, l_ExtraData_0);
-        local l_v17_Speaker_3 = v17:GetSpeaker((string.sub(v52, 4)));
-        local v56 = (if l_ChatConstants_0.WhisperChannelPrefix then l_ChatConstants_0.WhisperChannelPrefix else "To ") .. v50;
-        if l_v17_Speaker_3 then
-            if not l_v17_Speaker_3:IsInChannel(v56) then
-                l_v17_Speaker_3:JoinChannel(v56);
-            end;
-            l_v17_Speaker_3:SendMessage(v51, v56, v50, l_ExtraData_0);
-        end;
-        return true;
-    end;
-    local function v61(_, v59, _) --[[ Line: 181 ]] --[[ Name: PrivateMessageAddTypeFunction ]]
-        -- upvalues: l_ChatConstants_0 (ref)
-        if l_ChatConstants_0.MessageTypeWhisper then
-            v59.MessageType = l_ChatConstants_0.MessageTypeWhisper;
-        end;
-    end;
-    v17:RegisterProcessCommandsFunction("whisper_commands", v49, l_ChatConstants_0.StandardPriority);
-    local function _() --[[ Line: 189 ]] --[[ Name: GetWhisperChanneNameColor ]]
-        -- upvalues: l_ChatSettings_0 (ref)
-        if l_ChatSettings_0.WhisperChannelNameColor then
-            return l_ChatSettings_0.WhisperChannelNameColor;
-        else
-            return Color3.fromRGB(102, 14, 102);
-        end;
-    end;
-    v17.SpeakerAdded:connect(function(v63) --[[ Line: 196 ]]
-        -- upvalues: v17 (copy), l_ChatSettings_0 (ref), l_ChatConstants_0 (ref), v8 (ref), v57 (copy), v61 (copy)
-        local l_v17_Speaker_4 = v17:GetSpeaker(v63);
-        local v65 = nil;
-        v65 = if l_ChatSettings_0.PlayerDisplayNamesEnabled and l_v17_Speaker_4:GetPlayer() then l_v17_Speaker_4:GetNameForDisplay() .. "(@" .. v63 .. ")" else v63;
-        local v66 = (if l_ChatConstants_0.WhisperChannelPrefix then l_ChatConstants_0.WhisperChannelPrefix else "To ") .. v63;
-        if v17:GetChannel(v66) then
-            v17:RemoveChannel(v66);
-        end;
-        local v67 = v17:AddChannel(v66);
-        v67.Joinable = false;
-        v67.Leavable = true;
-        v67.AutoJoin = false;
-        v67.Private = true;
-        v67.WelcomeMessage = v8:FormatMessageToSend("GameChat_PrivateMessaging_NowChattingWith", "You are now privately chatting with " .. v65 .. ".", "RBX_NAME", (tostring(v65)));
-        v67.ChannelNameColor = if l_ChatSettings_0.WhisperChannelNameColor then l_ChatSettings_0.WhisperChannelNameColor else Color3.fromRGB(102, 14, 102);
-        v67:RegisterProcessCommandsFunction("replication_function", v57, l_ChatConstants_0.LowPriority);
-        v67:RegisterFilterMessageFunction("message_type_function", v61);
-    end);
-    v17.SpeakerRemoved:connect(function(v68) --[[ Line: 228 ]]
-        -- upvalues: l_ChatConstants_0 (ref), v17 (copy)
-        local v69 = (if l_ChatConstants_0.WhisperChannelPrefix then l_ChatConstants_0.WhisperChannelPrefix else "To ") .. v68;
-        if v17:GetChannel(v69) then
-            v17:RemoveChannel(v69);
-        end;
-    end);
-end;
+local Chat = game:GetService("Chat")
+local RunService = game:GetService("RunService")
+local TextChatService = game:GetService("TextChatService")
+local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+local ChatModules = Chat:WaitForChild("ChatModules")
+local ChatConstants = require(ClientChatModules:WaitForChild("ChatConstants"))
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+local DisplayNameHelpers = require(ChatModules.Utility.DisplayNameHelpers)
+local ChatLocalization = nil
+
+pcall(function() -- line: 17
+	-- upvalues: ChatLocalization (ref)
+	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+end)
+
+if ChatLocalization == nil then
+	ChatLocalization = {}
+end
+
+if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
+	function ChatLocalization.FormatMessageToSend(_, _, p3) -- line: 20
+		return p3
+	end
+end
+
+local t1 = {
+	ChatColor = ChatSettings.ErrorMessageTextColor or Color3.fromRGB(245, 50, 50)
+}
+local u11 = false
+local ok, result = pcall(function() -- line: 27
+	return UserSettings():IsUserFeatureEnabled("UserUseNewDirectChatAPI")
+end)
+
+if ok then
+	u11 = result
+end
+
+local function GetWhisperChannelPrefix() -- line: 35
+	-- upvalues: ChatConstants (copy)
+	if ChatConstants.WhisperChannelPrefix then
+		return ChatConstants.WhisperChannelPrefix
+	end
+
+	return "To "
+end
+local function GetWhisperChannelId(p4) -- line: 42
+	-- upvalues: ChatConstants (copy)
+	return (not ChatConstants.WhisperChannelPrefix and "To " or ChatConstants.WhisperChannelPrefix) .. p4
+end
+local function Run(p5) -- line: 46
+	-- upvalues: RunService (copy), u11 (ref), TextChatService (copy), Chat (copy), ChatSettings (copy), DisplayNameHelpers (copy), ChatLocalization (ref), t1 (copy), ChatConstants (copy)
+	local function CanCommunicate(p6, p7) -- line: 48
+		-- upvalues: RunService (copy), u11 (ref), TextChatService (copy), Chat (copy)
+		if RunService:IsStudio() then
+			return true
+		end
+
+		local Player = p6:GetPlayer()
+		local Player2 = p7:GetPlayer()
+
+		if Player and Player2 then
+			if u11 then
+				local ok2, result2 = pcall(function() -- line: 56
+					-- upvalues: TextChatService (copy), Player (copy), Player2 (copy)
+					return TextChatService:CanUsersDirectChatAsync(Player.UserId, { Player2.UserId })
+				end)
+
+				return ok2 and #result2 > 0
+			end
+
+			local ok3, result3 = pcall(function() -- line: 61
+				-- upvalues: Chat (copy), Player (copy), Player2 (copy)
+				return Chat:CanUsersChatAsync(Player.UserId, Player2.UserId)
+			end)
+
+			return ok3 and result3
+		end
+
+		return false
+	end
+	local function DoWhisperCommand(p8, p9, p10) -- line: 70
+		-- upvalues: p5 (copy), ChatSettings (copy), DisplayNameHelpers (copy), ChatLocalization (ref), t1 (copy), ChatConstants (copy), CanCommunicate (copy)
+		local Speaker = p5:GetSpeaker(p8)
+		local v40 = p9
+		local v41 = nil
+
+		if string.sub(p9, 1, 1) == "\"" then
+			local v42 = string.find(p9, "\"", 2)
+
+			if v42 then
+				v40 = string.sub(p9, 2, v42 - 1)
+				v41 = string.sub(p9, v42 + 2)
+			end
+		else
+			local match = string.match(p9, "^[^%s]+")
+
+			if match then
+				v40 = match
+				v41 = string.sub(p9, string.len(v40) + 2)
+			end
+		end
+
+		local v44, v45
+
+		if ChatSettings.PlayerDisplayNamesEnabled and ChatSettings.WhisperByDisplayNameEnabled then
+			v44, v45 = DisplayNameHelpers.getUserNameFromChattedName(v40, p8, Speaker:GetNameForDisplay())
+		else
+			v44, v45 = DisplayNameHelpers.getUserNameFromChattedName(v40, p8, nil)
+		end
+
+		local Speaker2 = p5:GetSpeaker(v44)
+
+		if v45 == DisplayNameHelpers.CommandErrorCodes.ChattingToSelf then
+			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_PrivateMessaging_CannotWhisperToSelf", "You cannot whisper to yourself."), p10, t1)
+
+			return
+		end
+
+		if v45 == DisplayNameHelpers.CommandErrorCodes.NoMatches then
+			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_MuteSpeaker_SpeakerDoesNotExist", string.format("Speaker '%s' does not exist.", (tostring(v40))), "RBX_NAME", (tostring(v44))), p10, t1)
+
+			return
+		end
+
+		if v45 == DisplayNameHelpers.CommandErrorCodes.MultipleMatches then
+			local v47 = DisplayNameHelpers.getUsersWithDisplayNameString(v40, p8)
+
+			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("InGame.Chat.Response.DisplayNameMultipleMatches", "Warning: The following users have this display name: "), p10, t1)
+			Speaker:SendSystemMessage(v47, p10, t1)
+
+			return
+		end
+
+		if Speaker2 then
+			local Channel = p5:GetChannel((not ChatConstants.WhisperChannelPrefix and "To " or ChatConstants.WhisperChannelPrefix) .. v44)
+
+			if Channel then
+				if not CanCommunicate(Speaker, Speaker2) then
+					Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_PrivateMessaging_CannotChat", "You are not able to chat with this player."), p10, t1)
+
+					return
+				end
+
+				if not Speaker:IsInChannel(Channel.Name) then
+					Speaker:JoinChannel(Channel.Name)
+				end
+
+				if v41 and string.len(v41) > 0 then
+					Speaker:SayMessage(v41, Channel.Name)
+				end
+
+				Speaker:SetMainChannel(Channel.Name)
+
+				return
+			end
+
+			Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_MuteSpeaker_SpeakerDoesNotExist", string.format("Speaker '%s' does not exist.", (tostring(v40))), "RBX_NAME", (tostring(v44))), p10, t1)
+		end
+	end
+	local function WhisperCommandsFunction(p11, p12, p13) -- line: 147
+		-- upvalues: DoWhisperCommand (copy)
+		local v52 = false
+
+		if string.sub(p12, 1, 3):lower() == "/w " then
+			DoWhisperCommand(p11, string.sub(p12, 4), p13)
+
+			return true
+		end
+
+		if string.sub(p12, 1, 9):lower() == "/whisper " then
+			DoWhisperCommand(p11, string.sub(p12, 10), p13)
+			v52 = true
+		end
+
+		return v52
+	end
+	local function PrivateMessageReplicationFunction(p14, p15, p16) -- line: 163
+		-- upvalues: p5 (copy), ChatConstants (copy)
+		local Speaker = p5:GetSpeaker(p14)
+		local ExtraData = Speaker.ExtraData
+
+		Speaker:SendMessage(p15, p16, p14, ExtraData)
+
+		local Speaker3 = p5:GetSpeaker((string.sub(p16, 4)))
+		local v59 = (not ChatConstants.WhisperChannelPrefix and "To " or ChatConstants.WhisperChannelPrefix) .. p14
+
+		if Speaker3 then
+			if not Speaker3:IsInChannel(v59) then
+				Speaker3:JoinChannel(v59)
+			end
+
+			Speaker3:SendMessage(p15, v59, p14, ExtraData)
+		end
+
+		return true
+	end
+	local function PrivateMessageAddTypeFunction(_, p18, _) -- line: 181
+		-- upvalues: ChatConstants (copy)
+		if ChatConstants.MessageTypeWhisper then
+			p18.MessageType = ChatConstants.MessageTypeWhisper
+		end
+	end
+
+	p5:RegisterProcessCommandsFunction("whisper_commands", WhisperCommandsFunction, ChatConstants.StandardPriority)
+
+	local function GetWhisperChanneNameColor() -- line: 189
+		-- upvalues: ChatSettings (copy)
+		if ChatSettings.WhisperChannelNameColor then
+			return ChatSettings.WhisperChannelNameColor
+		end
+
+		return Color3.fromRGB(102, 14, 102)
+	end
+
+	p5.SpeakerAdded:connect(function(p20) -- line: 196
+		-- upvalues: p5 (copy), ChatSettings (copy), ChatConstants (copy), ChatLocalization (ref), PrivateMessageReplicationFunction (copy), PrivateMessageAddTypeFunction (copy)
+		local Speaker = p5:GetSpeaker(p20)
+		local v65 = if not ChatSettings.PlayerDisplayNamesEnabled or not Speaker:GetPlayer() then p20 else Speaker:GetNameForDisplay() .. "(@" .. p20 .. ")"
+		local v66 = (not ChatConstants.WhisperChannelPrefix and "To " or ChatConstants.WhisperChannelPrefix) .. p20
+
+		if p5:GetChannel(v66) then
+			p5:RemoveChannel(v66)
+		end
+
+		local v67 = p5:AddChannel(v66)
+
+		v67.Joinable = false
+		v67.Leavable = true
+		v67.AutoJoin = false
+		v67.Private = true
+		v67.WelcomeMessage = ChatLocalization:FormatMessageToSend("GameChat_PrivateMessaging_NowChattingWith", "You are now privately chatting with " .. v65 .. ".", "RBX_NAME", (tostring(v65)))
+		v67.ChannelNameColor = if not ChatSettings.WhisperChannelNameColor then Color3.fromRGB(102, 14, 102) else ChatSettings.WhisperChannelNameColor
+		v67:RegisterProcessCommandsFunction("replication_function", PrivateMessageReplicationFunction, ChatConstants.LowPriority)
+		v67:RegisterFilterMessageFunction("message_type_function", PrivateMessageAddTypeFunction)
+	end)
+	p5.SpeakerRemoved:connect(function(p21) -- line: 228
+		-- upvalues: ChatConstants (copy), p5 (copy)
+		local v69 = (not ChatConstants.WhisperChannelPrefix and "To " or ChatConstants.WhisperChannelPrefix) .. p21
+
+		if p5:GetChannel(v69) then
+			p5:RemoveChannel(v69)
+		end
+	end)
+end
+
+return Run

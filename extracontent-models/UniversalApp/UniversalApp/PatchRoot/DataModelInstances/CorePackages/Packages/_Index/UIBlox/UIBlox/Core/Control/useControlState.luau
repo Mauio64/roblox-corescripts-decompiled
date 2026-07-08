@@ -1,12 +1,16 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Control.Enum.ControlState);
-return function() --[[ Line: 20 ]] --[[ Name: useControlState ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v4, v5 = v2.useState(v3.Initialize);
-    return v4, (v2.useCallback(function(_, v7) --[[ Line: 23 ]]
-        -- upvalues: v5 (copy)
-        v5(v7);
-    end, {}));
-end;
+local ParentParent = script.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local React = require(ParentParent2.React)
+local ControlState = require(ParentParent.Control.Enum.ControlState)
+
+local function useControlState() -- line: 20
+	-- upvalues: React (copy), ControlState (copy)
+	local v6, v7 = React.useState(ControlState.Initialize)
+
+	return v6, (React.useCallback(function(_, p2) -- line: 23
+		-- upvalues: v7 (copy)
+		v7(p2)
+	end, {}))
+end
+
+return useControlState

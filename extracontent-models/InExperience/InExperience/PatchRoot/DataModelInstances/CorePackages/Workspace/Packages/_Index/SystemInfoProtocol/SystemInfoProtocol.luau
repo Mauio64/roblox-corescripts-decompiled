@@ -1,3 +1,3 @@
 return {
-    SystemInfoProtocol = require(script.SystemInfoProtocol)
-};
+	SystemInfoProtocol = require(script.SystemInfoProtocol)
+}

@@ -1,124 +1,144 @@
-local l_Players_0 = game:GetService("Players");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("CoreGui");
-local l_UserProfileStore_0 = require(l_CorePackages_0.Workspace.Packages.UserProfiles).Stores.UserProfileStore;
-local l_FFlagUserProfileStoreQueryRefetch_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagUserProfileStoreQueryRefetch;
-local v5 = {};
-local v6 = {
-    CharacterAdded = "CharacterAdded", 
-    CharacterRemoving = "CharacterRemoving", 
-    HumanoidDisplayNameChanged = "HumanoidDisplayNameChanged", 
-    CharacterHumanoidAdded = "CharacterHumanoidAdded"
-};
-local function v12(v7, v8, v9) --[[ Line: 26 ]] --[[ Name: setName ]]
-    -- upvalues: v5 (copy), v6 (copy)
-    local l_inExperienceCombinedName_0 = v9.names.inExperienceCombinedName;
-    local l_displayName_0 = v9.names.displayName;
-    if v9.names.displayName == v7.DisplayName then
-        v7.InternalDisplayName = l_inExperienceCombinedName_0;
-        v5[v8][v6.HumanoidDisplayNameChanged] = v7:GetPropertyChangedSignal("DisplayName"):Connect(function() --[[ Line: 33 ]]
-            -- upvalues: l_displayName_0 (copy), v7 (copy)
-            if l_displayName_0 ~= v7.DisplayName then
-                v7.InternalDisplayName = "";
-            end;
-        end);
-    end;
-end;
-local function v18(v13, v14, v15) --[[ Line: 41 ]] --[[ Name: checkHumanoid ]]
-    -- upvalues: v12 (copy), v5 (copy), v6 (copy)
-    local l_Humanoid_0 = v14:FindFirstChildWhichIsA("Humanoid");
-    if l_Humanoid_0 then
-        v12(l_Humanoid_0, v13, v15);
-    end;
-    v5[v13][v6.CharacterHumanoidAdded] = v14.ChildAdded:Connect(function(v17) --[[ Line: 46 ]]
-        -- upvalues: v12 (ref), v13 (copy), v15 (copy)
-        if v17:IsA("Humanoid") then
-            v12(v17, v13, v15);
-        end;
-    end);
-end;
-local function v24(v19, v20) --[[ Line: 53 ]] --[[ Name: setNameOnCharacterAdded ]]
-    -- upvalues: v5 (copy), v18 (copy), v6 (copy)
-    v5[v19] = {};
-    if v19.Character then
-        v18(v19, v19.Character, v20);
-    end;
-    v5[v19][v6.CharacterAdded] = v19.CharacterAdded:Connect(function(v21) --[[ Line: 59 ]]
-        -- upvalues: v18 (ref), v19 (copy), v20 (copy)
-        v18(v19, v21, v20);
-    end);
-    v5[v19][v6.CharacterRemoving] = v19.CharacterRemoving:Connect(function() --[[ Line: 62 ]]
-        -- upvalues: v5 (ref), v19 (copy), v6 (ref)
-        local v22 = v5[v19][v6.CharacterHumanoidAdded];
-        local v23 = v5[v19][v6.HumanoidDisplayNameChanged];
-        if v22 then
-            v5[v19][v6.CharacterHumanoidAdded]:Disconnect();
-        end;
-        if v23 then
-            v5[v19][v6.HumanoidDisplayNameChanged]:Disconnect();
-        end;
-    end);
-end;
-local function v36() --[[ Line: 74 ]] --[[ Name: setCurrentPlayersNames ]]
-    -- upvalues: l_Players_0 (copy), l_UserProfileStore_0 (copy), v24 (copy)
-    local l_l_Players_0_Players_0 = l_Players_0:GetPlayers();
-    local v26 = {};
-    local v27 = {};
-    for _, v29 in pairs(l_l_Players_0_Players_0) do
-        table.insert(v26, (tostring(v29.UserId)));
-        v27[tostring(v29.UserId)] = v29;
-    end;
-    l_UserProfileStore_0.get().fetchNamesByUserIds(v26, function(v30) --[[ Line: 82 ]]
-        -- upvalues: v27 (copy), v24 (ref)
-        local l_status_0 = v30.status;
-        local l_data_0 = v30.data;
-        if l_status_0 == "success" then
-            for _, v34 in l_data_0 do
-                local v35 = v27[v34.userId];
-                v24(v35, {
-                    names = {
-                        inExperienceCombinedName = v34.names.getInExperienceCombinedName(false), 
-                        displayName = v34.names.getDisplayName(false)
-                    }
-                });
-            end;
-        end;
-    end);
-end;
-local function v42(v37) --[[ Line: 98 ]] --[[ Name: onPlayerAdded ]]
-    -- upvalues: l_UserProfileStore_0 (copy), v24 (copy)
-    l_UserProfileStore_0.get().fetchNamesByUserIds({
-        (tostring(v37.UserId))
-    }, function(v38) --[[ Line: 99 ]]
-        -- upvalues: v24 (ref), v37 (copy)
-        local l_status_1 = v38.status;
-        local l_data_1 = v38.data;
-        if l_status_1 == "success" then
-            local v41 = l_data_1[1];
-            v24(v37, {
-                names = {
-                    inExperienceCombinedName = v41.names.getInExperienceCombinedName(false), 
-                    displayName = v41.names.getDisplayName(false)
-                }
-            });
-        end;
-    end);
-end;
-local function v47(v43) --[[ Line: 113 ]] --[[ Name: onPlayerRemoving ]]
-    -- upvalues: v5 (copy), l_FFlagUserProfileStoreQueryRefetch_0 (copy), l_UserProfileStore_0 (copy)
-    local v44 = v5[v43];
-    if v5[v43] then
-        for _, v46 in pairs(v44) do
-            v46:Disconnect();
-        end;
-        v5[v43] = nil;
-    end;
-    if l_FFlagUserProfileStoreQueryRefetch_0 then
-        l_UserProfileStore_0.get().invalidateCachedNamesForUserIds({
-            (tostring(v43.UserId))
-        });
-    end;
-end;
-v36();
-l_Players_0.PlayerAdded:Connect(v42);
-l_Players_0.PlayerRemoving:Connect(v47);
+local Players = game:GetService("Players")
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("CoreGui")
+
+local UserProfileStore = require(CorePackages.Workspace.Packages.UserProfiles).Stores.UserProfileStore
+local FFlagUserProfileStoreQueryRefetch = require(CorePackages.Workspace.Packages.SharedFlags).FFlagUserProfileStoreQueryRefetch
+local v5 = game:DefineFastFlag("FixCharacterNameHandlerNilProfileCrash", false)
+local t1 = {}
+local _ = {
+	CharacterAdded = "CharacterAdded",
+	CharacterRemoving = "CharacterRemoving",
+	HumanoidDisplayNameChanged = "HumanoidDisplayNameChanged",
+	CharacterHumanoidAdded = "CharacterHumanoidAdded"
+}
+
+local function setName(p1, p2, t2: {[any]: any}) -- line: 29
+	-- upvalues: t1 (copy)
+	local inExperienceCombinedName = t2.names.inExperienceCombinedName
+	local displayName = t2.names.displayName
+
+	if t2.names.displayName == p1.DisplayName then
+		p1.InternalDisplayName = inExperienceCombinedName
+		t1[p2].HumanoidDisplayNameChanged = p1:GetPropertyChangedSignal("DisplayName"):Connect(function() -- line: 36
+			-- upvalues: displayName (copy), p1 (copy)
+			if displayName ~= p1.DisplayName then
+				p1.InternalDisplayName = ""
+			end
+		end)
+	end
+end
+local function checkHumanoid(p3, p4, t3: {[any]: any}) -- line: 44
+	-- upvalues: setName (copy), t1 (copy)
+	local Humanoid = p4:FindFirstChildWhichIsA("Humanoid")
+
+	if Humanoid then
+		setName(Humanoid, p3, t3)
+	end
+
+	t1[p3].CharacterHumanoidAdded = p4.ChildAdded:Connect(function(child) -- line: 49
+		-- upvalues: setName (copy), p3 (copy), t3 (copy)
+		if child:IsA("Humanoid") then
+			setName(child, p3, t3)
+		end
+	end)
+end
+local function setNameOnCharacterAdded(p5, t4: {[any]: any}) -- line: 56
+	-- upvalues: t1 (copy), checkHumanoid (copy)
+	t1[p5] = {}
+
+	if p5.Character then
+		checkHumanoid(p5, p5.Character, t4)
+	end
+
+	t1[p5].CharacterAdded = p5.CharacterAdded:Connect(function(character) -- line: 62
+		-- upvalues: checkHumanoid (copy), p5 (copy), t4 (copy)
+		checkHumanoid(p5, character, t4)
+	end)
+	t1[p5].CharacterRemoving = p5.CharacterRemoving:Connect(function() -- line: 65
+		-- upvalues: t1 (copy), p5 (copy)
+		local CharacterHumanoidAdded = t1[p5].CharacterHumanoidAdded
+		local HumanoidDisplayNameChanged = t1[p5].HumanoidDisplayNameChanged
+
+		if CharacterHumanoidAdded then
+			t1[p5].CharacterHumanoidAdded:Disconnect()
+		end
+
+		if HumanoidDisplayNameChanged then
+			t1[p5].HumanoidDisplayNameChanged:Disconnect()
+		end
+	end)
+end
+local function setCurrentPlayersNames() -- line: 77
+	-- upvalues: Players (copy), UserProfileStore (copy), v5 (copy), setNameOnCharacterAdded (copy)
+	local players = Players:GetPlayers()
+	local t5 = {}
+	local t6 = {}
+
+	for _, v in pairs(players) do
+		table.insert(t5, (tostring(v.UserId)))
+		t6[tostring(v.UserId)] = v
+	end
+
+	UserProfileStore.get().fetchNamesByUserIds(t5, function(p6) -- line: 85
+		-- upvalues: t6 (copy), v5 (copy), setNameOnCharacterAdded (copy)
+		local status = p6.status
+		local data = p6.data
+
+		if status == "success" then
+			for _, v43 in data do
+				local v44 = t6[v43.userId]
+
+				if not v5 or v44 and v43.names ~= nil then
+					setNameOnCharacterAdded(v44, {
+						names = {
+							inExperienceCombinedName = v43.names.getInExperienceCombinedName(false),
+							displayName = v43.names.getDisplayName(false)
+						}
+					})
+				end
+			end
+		end
+	end)
+end
+local function onPlayerAdded(p7) -- line: 104
+	-- upvalues: UserProfileStore (copy), v5 (copy), setNameOnCharacterAdded (copy)
+	UserProfileStore.get().fetchNamesByUserIds({ (tostring(p7.UserId)) }, function(p8) -- line: 105
+		-- upvalues: v5 (copy), setNameOnCharacterAdded (copy), p7 (copy)
+		local status = p8.status
+		local data = p8.data
+		local v48 = not v5 or #data > 0 and data[1].names ~= nil
+
+		if status == "success" and v48 then
+			local v49 = data[1]
+
+			setNameOnCharacterAdded(p7, {
+				names = {
+					inExperienceCombinedName = v49.names.getInExperienceCombinedName(false),
+					displayName = v49.names.getDisplayName(false)
+				}
+			})
+		end
+	end)
+end
+local function onPlayerRemoving(p9) -- line: 122
+	-- upvalues: t1 (copy), FFlagUserProfileStoreQueryRefetch (copy), UserProfileStore (copy)
+	local v32 = t1[p9]
+
+	if t1[p9] then
+		for _, v in pairs(v32) do
+			v:Disconnect()
+		end
+
+		t1[p9] = nil
+	end
+
+	if FFlagUserProfileStoreQueryRefetch then
+		UserProfileStore.get().invalidateCachedNamesForUserIds({ (tostring(p9.UserId)) })
+	end
+end
+
+setCurrentPlayersNames()
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoving)

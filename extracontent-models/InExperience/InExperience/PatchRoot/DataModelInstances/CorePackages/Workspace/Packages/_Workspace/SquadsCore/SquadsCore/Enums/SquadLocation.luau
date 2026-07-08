@@ -1,4 +1,4 @@
 return {
-    InApp = "InApp", 
-    InExperience = "InExperience"
-};
+	InApp = "InApp",
+	InExperience = "InExperience"
+}

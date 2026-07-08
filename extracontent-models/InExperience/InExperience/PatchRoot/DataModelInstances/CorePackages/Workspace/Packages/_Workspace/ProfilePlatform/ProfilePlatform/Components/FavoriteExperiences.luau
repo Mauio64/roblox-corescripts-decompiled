@@ -1,1 +1,1 @@
-return require(script.FavoriteExperiences);
+return require(script.FavoriteExperiences)

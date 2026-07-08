@@ -1,38 +1,37 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_AppUserLayers_0 = require(l_CorePackages_0.Workspace.Packages.ExperimentLayers).AppUserLayers;
-local v2 = require(script.Parent.makeExperiment);
-local v3 = game:DefineFastFlag("XboxPrimaryNavABIXPEnabled", false);
-local v4 = game:DefineFastFlag("XboxPrimaryNavABIXPEnrolledForAll", false);
-local v5 = game:DefineFastString("XboxPrimaryNavABIXPVariable", "tenFootPrimaryNavEnabled");
-local v6 = {};
-local function v8(v7) --[[ Line: 29 ]] --[[ Name: setExperimentState ]]
-    -- upvalues: v6 (ref)
-    v6 = v7;
-end;
-local function v9() --[[ Line: 33 ]] --[[ Name: isEnrolledForAll ]]
-    -- upvalues: v4 (copy)
-    return v4;
-end;
-local function v10() --[[ Line: 37 ]] --[[ Name: isEnabled ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    return v4 or v3;
-end;
-local function v11() --[[ Line: 41 ]] --[[ Name: isUserEnrolled ]]
-    -- upvalues: v4 (copy), v3 (copy), v6 (ref), l_AppUserLayers_0 (copy), v5 (copy)
-    if v4 then
-        return true;
-    elseif not (v4 or v3) then
-        return false;
-    else
-        return (v6[l_AppUserLayers_0.XboxClassicUILayer] or {})[v5] or false;
-    end;
-end;
-local v12 = v2("OnUserLayerLoadingStatusChanged", "GetUserLayerLoadingStatus", "GetUserLayerVariables", "LogUserLayerExposure", "GetUserStatusForLayer");
+local CorePackages = game:GetService("CorePackages")
+local AppUserLayers = require(CorePackages.Workspace.Packages.ExperimentLayers).AppUserLayers
+local makeExperiment = require(script.Parent.makeExperiment)
+local v4 = game:DefineFastFlag("XboxPrimaryNavABIXPEnabled", false)
+local v5 = game:DefineFastFlag("XboxPrimaryNavABIXPEnrolledForAll", false)
+local v6 = game:DefineFastString("XboxPrimaryNavABIXPVariable", "tenFootPrimaryNavEnabled")
+local t1 = {}
+local v8 = makeExperiment("OnUserLayerLoadingStatusChanged", "GetUserLayerLoadingStatus", "GetUserLayerVariables", "LogUserLayerExposure", "GetUserStatusForLayer")
+
 return {
-    isEnabled = v10, 
-    isEnrolledForAll = v9, 
-    isUserEnrolled = v11, 
-    layer = l_AppUserLayers_0.XboxClassicUILayer, 
-    experiment = v12, 
-    setExperimentState = v8
-};
+	isEnabled = function() -- line: 37
+		-- upvalues: v5 (copy), v4 (copy)
+		return v5 or v4
+	end,
+	isEnrolledForAll = function() -- line: 33
+		-- upvalues: v5 (copy)
+		return v5
+	end,
+	isUserEnrolled = function() -- line: 41
+		-- upvalues: v5 (copy), v4 (copy), t1 (ref), AppUserLayers (copy), v6 (copy)
+		if v5 then
+			return true
+		end
+
+		if not v5 and not v4 then
+			return false
+		end
+
+		return (t1[AppUserLayers.XboxClassicUILayer] or {})[v6] or false
+	end,
+	layer = AppUserLayers.XboxClassicUILayer,
+	experiment = v8,
+	setExperimentState = function(p1) -- line: 29
+		-- upvalues: t1 (ref)
+		t1 = p1
+	end
+}

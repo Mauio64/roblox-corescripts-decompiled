@@ -1,338 +1,366 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.Parent.Parent.Parent.Parent.google.protobuf.timestamp);
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5) --[[ Line: 63 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    return (setmetatable({
-        id = (not (v5 ~= nil) or v5.id == nil) and 0 or v5.id, 
-        display_name = (not (v5 ~= nil) or v5.display_name == nil) and "" or v5.display_name, 
-        display_icon_image_id = (not (v5 ~= nil) or v5.display_icon_image_id == nil) and 0 or v5.display_icon_image_id, 
-        display_description = (not (v5 ~= nil) or v5.display_description == nil) and "" or v5.display_description, 
-        total_awarded_count = (not (v5 ~= nil) or v5.total_awarded_count == nil) and 0 or v5.total_awarded_count, 
-        past_day_awarded_count = (not (v5 ~= nil) or v5.past_day_awarded_count == nil) and 0 or v5.past_day_awarded_count, 
-        rarity = (not (v5 ~= nil) or v5.rarity == nil) and "" or v5.rarity, 
-        badge_type_label = (not (v5 ~= nil) or v5.badge_type_label == nil) and "" or v5.badge_type_label, 
-        created_time = if not (v5 ~= nil) or v5.created_time == nil then nil else v5.created_time, 
-        updated_time = if not (v5 ~= nil) or v5.updated_time == nil then nil else v5.updated_time, 
-        is_earned_by_user = v5 ~= nil and not (v5.is_earned_by_user == nil) and v5.is_earned_by_user, 
-        awarded_time = if not (v5 ~= nil) or v5.awarded_time == nil then nil else v5.awarded_time
-    }, v4));
-end;
-v4.encode = function(v6) --[[ Line: 88 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v7 = buffer.create(0);
-    local v8 = 0;
-    if v6.id ~= nil and v6.id ~= 0 then
-        local v9, v10 = v0.writeTag(v7, v8, 1, v0.wireTypes.varint);
-        v9, v10 = v0.writeVarInt(v9, v10, v6.id);
-        v7 = v9;
-        v8 = v10;
-    end;
-    if v6.display_name ~= nil and v6.display_name ~= "" then
-        local v11, v12 = v0.writeTag(v7, v8, 2, v0.wireTypes.lengthDelimited);
-        v11, v12 = v0.writeString(v11, v12, v6.display_name);
-        v7 = v11;
-        v8 = v12;
-    end;
-    if v6.display_icon_image_id ~= nil and v6.display_icon_image_id ~= 0 then
-        local v13, v14 = v0.writeTag(v7, v8, 3, v0.wireTypes.varint);
-        v13, v14 = v0.writeVarInt(v13, v14, v6.display_icon_image_id);
-        v7 = v13;
-        v8 = v14;
-    end;
-    if v6.display_description ~= nil and v6.display_description ~= "" then
-        local v15, v16 = v0.writeTag(v7, v8, 4, v0.wireTypes.lengthDelimited);
-        v15, v16 = v0.writeString(v15, v16, v6.display_description);
-        v7 = v15;
-        v8 = v16;
-    end;
-    if v6.total_awarded_count ~= nil and v6.total_awarded_count ~= 0 then
-        local v17, v18 = v0.writeTag(v7, v8, 5, v0.wireTypes.varint);
-        v17, v18 = v0.writeVarInt(v17, v18, v6.total_awarded_count);
-        v7 = v17;
-        v8 = v18;
-    end;
-    if v6.past_day_awarded_count ~= nil and v6.past_day_awarded_count ~= 0 then
-        local v19, v20 = v0.writeTag(v7, v8, 6, v0.wireTypes.varint);
-        v19, v20 = v0.writeVarInt(v19, v20, v6.past_day_awarded_count);
-        v7 = v19;
-        v8 = v20;
-    end;
-    if v6.rarity ~= nil and v6.rarity ~= "" then
-        local v21, v22 = v0.writeTag(v7, v8, 7, v0.wireTypes.lengthDelimited);
-        v21, v22 = v0.writeString(v21, v22, v6.rarity);
-        v7 = v21;
-        v8 = v22;
-    end;
-    if v6.badge_type_label ~= nil and v6.badge_type_label ~= "" then
-        local v23, v24 = v0.writeTag(v7, v8, 8, v0.wireTypes.lengthDelimited);
-        v23, v24 = v0.writeString(v23, v24, v6.badge_type_label);
-        v7 = v23;
-        v8 = v24;
-    end;
-    if v6.created_time ~= nil then
-        local v25 = v6.created_time:encode();
-        local v26, v27 = v0.writeTag(v7, v8, 9, v0.wireTypes.lengthDelimited);
-        v26, v27 = v0.writeBuffer(v26, v27, v25, buffer.len(v25));
-        v7 = v26;
-        v8 = v27;
-    end;
-    if v6.updated_time ~= nil then
-        local v28 = v6.updated_time:encode();
-        local v29, v30 = v0.writeTag(v7, v8, 10, v0.wireTypes.lengthDelimited);
-        v29, v30 = v0.writeBuffer(v29, v30, v28, buffer.len(v28));
-        v7 = v29;
-        v8 = v30;
-    end;
-    if v6.is_earned_by_user then
-        local v31, v32 = v0.writeTag(v7, v8, 11, v0.wireTypes.varint);
-        v31, v32 = v0.writeVarInt(v31, v32, v6.is_earned_by_user and 1 or 0);
-        v7 = v31;
-        v8 = v32;
-    end;
-    if v6.awarded_time ~= nil then
-        local v33 = v6.awarded_time:encode();
-        local v34, v35 = v0.writeTag(v7, v8, 12, v0.wireTypes.lengthDelimited);
-        v34, v35 = v0.writeBuffer(v34, v35, v33, buffer.len(v33));
-        v7 = v34;
-        v8 = v35;
-    end;
-    local v36 = buffer.create(v8);
-    buffer.copy(v36, 0, v7, 0, v8);
-    return v36;
-end;
-v4.decode = function(v37) --[[ Line: 160 ]] --[[ Name: decode ]]
-    -- upvalues: v4 (copy), v0 (copy), v3 (copy)
-    local v38 = v4.new();
-    local v39 = 0;
-    while v39 < buffer.len(v37) do
-        local v40 = nil;
-        local v41 = nil;
-        local v42, v43, v44 = v0.readTag(v37, v39);
-        v40 = v42;
-        v41 = v43;
-        v39 = v44;
-        if v41 == v0.wireTypes.varint then
-            if v40 == 1 then
-                v42 = nil;
-                v43, v44 = v0.readVarIntI64(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.id = v42;
-            elseif v40 == 3 then
-                v42 = nil;
-                v43, v44 = v0.readVarIntI64(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.display_icon_image_id = v42;
-            elseif v40 == 5 then
-                v42 = nil;
-                v43, v44 = v0.readVarIntI64(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.total_awarded_count = v42;
-            elseif v40 == 6 then
-                v42 = nil;
-                v43, v44 = v0.readVarIntI64(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.past_day_awarded_count = v42;
-            elseif v40 == 11 then
-                v42 = nil;
-                v43, v44 = v0.readVarInt(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.is_earned_by_user = v42 ~= 0;
-            else
-                v42 = nil;
-                v43, v44 = v0.readVarInt(v37, v39);
-                v42 = v43;
-                v39 = v44;
-            end;
-        elseif v41 == v0.wireTypes.lengthDelimited then
-            if v40 == 2 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.display_name = buffer.tostring(v42);
-            elseif v40 == 4 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.display_description = buffer.tostring(v42);
-            elseif v40 == 7 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.rarity = buffer.tostring(v42);
-            elseif v40 == 8 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.badge_type_label = buffer.tostring(v42);
-            elseif v40 == 9 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.created_time = v3.Timestamp.decode(v42);
-            elseif v40 == 10 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.updated_time = v3.Timestamp.decode(v42);
-            elseif v40 == 12 then
-                v42 = nil;
-                v43, v44 = v0.readBuffer(v37, v39);
-                v42 = v43;
-                v39 = v44;
-                v38.awarded_time = v3.Timestamp.decode(v42);
-            else
-                v42 = nil;
-                v43, v44 = v0.readVarInt(v37, v39);
-                v39 = v44 + v43;
-            end;
-        elseif v41 == v0.wireTypes.i32 then
-            v42 = nil;
-            v43, v44 = v0.readFixed32(v37, v39);
-            v42 = v43;
-            v39 = v44;
-        elseif v41 == v0.wireTypes.i64 then
-            v42 = nil;
-            v43, v44 = v0.readFixed64(v37, v39);
-            v42 = v43;
-            v39 = v44;
-        else
-            error("Unsupported wire type: " .. v41);
-        end;
-    end;
-    return v38;
-end;
-v4.jsonEncode = function(v45) --[[ Line: 258 ]] --[[ Name: jsonEncode ]]
-    local v46 = {};
-    if v45.id ~= nil and v45.id ~= 0 then
-        v46.id = v45.id;
-    end;
-    if v45.display_name ~= nil and v45.display_name ~= "" then
-        v46.displayName = v45.display_name;
-    end;
-    if v45.display_icon_image_id ~= nil and v45.display_icon_image_id ~= 0 then
-        v46.displayIconImageId = v45.display_icon_image_id;
-    end;
-    if v45.display_description ~= nil and v45.display_description ~= "" then
-        v46.displayDescription = v45.display_description;
-    end;
-    if v45.total_awarded_count ~= nil and v45.total_awarded_count ~= 0 then
-        v46.totalAwardedCount = v45.total_awarded_count;
-    end;
-    if v45.past_day_awarded_count ~= nil and v45.past_day_awarded_count ~= 0 then
-        v46.pastDayAwardedCount = v45.past_day_awarded_count;
-    end;
-    if v45.rarity ~= nil and v45.rarity ~= "" then
-        v46.rarity = v45.rarity;
-    end;
-    if v45.badge_type_label ~= nil and v45.badge_type_label ~= "" then
-        v46.badgeTypeLabel = v45.badge_type_label;
-    end;
-    if v45.created_time ~= nil then
-        v46.createdTime = v45.created_time:jsonEncode();
-    end;
-    if v45.updated_time ~= nil then
-        v46.updatedTime = v45.updated_time:jsonEncode();
-    end;
-    if v45.is_earned_by_user then
-        v46.isEarnedByUser = v45.is_earned_by_user;
-    end;
-    if v45.awarded_time ~= nil then
-        v46.awardedTime = v45.awarded_time:jsonEncode();
-    end;
-    return v46;
-end;
-v4.jsonDecode = function(v47) --[[ Line: 312 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    local v48 = v4.new();
-    if v47.id ~= nil then
-        v48.id = v47.id;
-    end;
-    if v47.display_name ~= nil then
-        v48.display_name = v47.display_name;
-    end;
-    if v47.displayName ~= nil then
-        v48.display_name = v47.displayName;
-    end;
-    if v47.display_icon_image_id ~= nil then
-        v48.display_icon_image_id = v47.display_icon_image_id;
-    end;
-    if v47.displayIconImageId ~= nil then
-        v48.display_icon_image_id = v47.displayIconImageId;
-    end;
-    if v47.display_description ~= nil then
-        v48.display_description = v47.display_description;
-    end;
-    if v47.displayDescription ~= nil then
-        v48.display_description = v47.displayDescription;
-    end;
-    if v47.total_awarded_count ~= nil then
-        v48.total_awarded_count = v47.total_awarded_count;
-    end;
-    if v47.totalAwardedCount ~= nil then
-        v48.total_awarded_count = v47.totalAwardedCount;
-    end;
-    if v47.past_day_awarded_count ~= nil then
-        v48.past_day_awarded_count = v47.past_day_awarded_count;
-    end;
-    if v47.pastDayAwardedCount ~= nil then
-        v48.past_day_awarded_count = v47.pastDayAwardedCount;
-    end;
-    if v47.rarity ~= nil then
-        v48.rarity = v47.rarity;
-    end;
-    if v47.badge_type_label ~= nil then
-        v48.badge_type_label = v47.badge_type_label;
-    end;
-    if v47.badgeTypeLabel ~= nil then
-        v48.badge_type_label = v47.badgeTypeLabel;
-    end;
-    if v47.created_time ~= nil then
-        v48.created_time = v3.Timestamp.jsonDecode(v47.created_time);
-    end;
-    if v47.createdTime ~= nil then
-        v48.created_time = v3.Timestamp.jsonDecode(v47.createdTime);
-    end;
-    if v47.updated_time ~= nil then
-        v48.updated_time = v3.Timestamp.jsonDecode(v47.updated_time);
-    end;
-    if v47.updatedTime ~= nil then
-        v48.updated_time = v3.Timestamp.jsonDecode(v47.updatedTime);
-    end;
-    if v47.is_earned_by_user ~= nil then
-        v48.is_earned_by_user = v47.is_earned_by_user;
-    end;
-    if v47.isEarnedByUser ~= nil then
-        v48.is_earned_by_user = v47.isEarnedByUser;
-    end;
-    if v47.awarded_time ~= nil then
-        v48.awarded_time = v3.Timestamp.jsonDecode(v47.awarded_time);
-    end;
-    if v47.awardedTime ~= nil then
-        v48.awarded_time = v3.Timestamp.jsonDecode(v47.awardedTime);
-    end;
-    return v48;
-end;
-v4.descriptor = {
-    name = "BadgeData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.BadgeData"
-};
-v2.BadgeData = v4;
-v1.default:register(v2.BadgeData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local timestamp = require(script.Parent.Parent.Parent.Parent.Parent.google.protobuf.timestamp)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 63
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		id = if t3 ~= nil and t3.id ~= nil then t3.id else 0,
+		display_name = if t3 ~= nil and t3.display_name ~= nil then t3.display_name else "",
+		display_icon_image_id = if t3 ~= nil and t3.display_icon_image_id ~= nil then t3.display_icon_image_id else 0,
+		display_description = if t3 ~= nil and t3.display_description ~= nil then t3.display_description else "",
+		total_awarded_count = if t3 ~= nil and t3.total_awarded_count ~= nil then t3.total_awarded_count else 0,
+		past_day_awarded_count = if t3 ~= nil and t3.past_day_awarded_count ~= nil then t3.past_day_awarded_count else 0,
+		rarity = if t3 ~= nil and t3.rarity ~= nil then t3.rarity else "",
+		badge_type_label = if t3 ~= nil and t3.badge_type_label ~= nil then t3.badge_type_label else "",
+		created_time = if t3 ~= nil and t3.created_time ~= nil then t3.created_time else nil,
+		updated_time = if t3 ~= nil and t3.updated_time ~= nil then t3.updated_time else nil,
+		is_earned_by_user = t3 ~= nil and (t3.is_earned_by_user ~= nil and t3.is_earned_by_user),
+		awarded_time = if t3 ~= nil and t3.awarded_time ~= nil then t3.awarded_time else nil
+	}, t2))
+end
+function t2.encode(p1) -- line: 88
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.id ~= nil and p1.id ~= 0 then
+		local v10, v11 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v10, v11, p1.id)
+	end
+
+	if p1.display_name ~= nil and p1.display_name ~= "" then
+		local v12, v13 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v12, v13, p1.display_name)
+	end
+
+	if p1.display_icon_image_id ~= nil and p1.display_icon_image_id ~= 0 then
+		local v14, v15 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v14, v15, p1.display_icon_image_id)
+	end
+
+	if p1.display_description ~= nil and p1.display_description ~= "" then
+		local v16, v17 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v16, v17, p1.display_description)
+	end
+
+	if p1.total_awarded_count ~= nil and p1.total_awarded_count ~= 0 then
+		local v18, v19 = proto.writeTag(buf, n1, 5, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v18, v19, p1.total_awarded_count)
+	end
+
+	if p1.past_day_awarded_count ~= nil and p1.past_day_awarded_count ~= 0 then
+		local v20, v21 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v20, v21, p1.past_day_awarded_count)
+	end
+
+	if p1.rarity ~= nil and p1.rarity ~= "" then
+		local v22, v23 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v22, v23, p1.rarity)
+	end
+
+	if p1.badge_type_label ~= nil and p1.badge_type_label ~= "" then
+		local v24, v25 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v24, v25, p1.badge_type_label)
+	end
+
+	if p1.created_time ~= nil then
+		local v26 = p1.created_time:encode()
+		local v27, v28 = proto.writeTag(buf, n1, 9, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v27, v28, v26, buffer.len(v26))
+	end
+
+	if p1.updated_time ~= nil then
+		local v29 = p1.updated_time:encode()
+		local v30, v31 = proto.writeTag(buf, n1, 10, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v30, v31, v29, buffer.len(v29))
+	end
+
+	if p1.is_earned_by_user then
+		local v32, v33 = proto.writeTag(buf, n1, 11, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v32, v33, not p1.is_earned_by_user and 0 or 1)
+	end
+
+	if p1.awarded_time ~= nil then
+		local v34 = p1.awarded_time:encode()
+		local v35, v36 = proto.writeTag(buf, n1, 12, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v35, v36, v34, buffer.len(v34))
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 160
+	-- upvalues: t2 (copy), proto (copy), timestamp (copy)
+	local v39 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v41, v42
+
+		v41, v42, n2 = proto.readTag(p2, n2)
+
+		if v42 == proto.wireTypes.varint then
+			if v41 == 1 then
+				local v43
+
+				v43, n2 = proto.readVarIntI64(p2, n2)
+				v39.id = v43
+			elseif v41 == 3 then
+				local v44
+
+				v44, n2 = proto.readVarIntI64(p2, n2)
+				v39.display_icon_image_id = v44
+			elseif v41 == 5 then
+				local v45
+
+				v45, n2 = proto.readVarIntI64(p2, n2)
+				v39.total_awarded_count = v45
+			elseif v41 == 6 then
+				local v46
+
+				v46, n2 = proto.readVarIntI64(p2, n2)
+				v39.past_day_awarded_count = v46
+			elseif v41 == 11 then
+				local v47
+
+				v47, n2 = proto.readVarInt(p2, n2)
+				v39.is_earned_by_user = v47 ~= 0
+			else
+				local v48
+
+				v48, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v42 == proto.wireTypes.lengthDelimited then
+			if v41 == 2 then
+				local v49
+
+				v49, n2 = proto.readBuffer(p2, n2)
+				v39.display_name = buffer.tostring(v49)
+			elseif v41 == 4 then
+				local v50
+
+				v50, n2 = proto.readBuffer(p2, n2)
+				v39.display_description = buffer.tostring(v50)
+			elseif v41 == 7 then
+				local v51
+
+				v51, n2 = proto.readBuffer(p2, n2)
+				v39.rarity = buffer.tostring(v51)
+			elseif v41 == 8 then
+				local v52
+
+				v52, n2 = proto.readBuffer(p2, n2)
+				v39.badge_type_label = buffer.tostring(v52)
+			elseif v41 == 9 then
+				local v53
+
+				v53, n2 = proto.readBuffer(p2, n2)
+				v39.created_time = timestamp.Timestamp.decode(v53)
+			elseif v41 == 10 then
+				local v54
+
+				v54, n2 = proto.readBuffer(p2, n2)
+				v39.updated_time = timestamp.Timestamp.decode(v54)
+			elseif v41 == 12 then
+				local v55
+
+				v55, n2 = proto.readBuffer(p2, n2)
+				v39.awarded_time = timestamp.Timestamp.decode(v55)
+			else
+				local v56, v57 = proto.readVarInt(p2, n2)
+
+				n2 = v57 + v56
+			end
+		elseif v42 == proto.wireTypes.i32 then
+			local v58
+
+			v58, n2 = proto.readFixed32(p2, n2)
+		elseif v42 == proto.wireTypes.i64 then
+			local v59
+
+			v59, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v42)
+		end
+	end
+
+	return v39
+end
+function t2.jsonEncode(p3) -- line: 258
+	local t4 = {}
+
+	if p3.id ~= nil and p3.id ~= 0 then
+		t4.id = p3.id
+	end
+
+	if p3.display_name ~= nil and p3.display_name ~= "" then
+		t4.displayName = p3.display_name
+	end
+
+	if p3.display_icon_image_id ~= nil and p3.display_icon_image_id ~= 0 then
+		t4.displayIconImageId = p3.display_icon_image_id
+	end
+
+	if p3.display_description ~= nil and p3.display_description ~= "" then
+		t4.displayDescription = p3.display_description
+	end
+
+	if p3.total_awarded_count ~= nil and p3.total_awarded_count ~= 0 then
+		t4.totalAwardedCount = p3.total_awarded_count
+	end
+
+	if p3.past_day_awarded_count ~= nil and p3.past_day_awarded_count ~= 0 then
+		t4.pastDayAwardedCount = p3.past_day_awarded_count
+	end
+
+	if p3.rarity ~= nil and p3.rarity ~= "" then
+		t4.rarity = p3.rarity
+	end
+
+	if p3.badge_type_label ~= nil and p3.badge_type_label ~= "" then
+		t4.badgeTypeLabel = p3.badge_type_label
+	end
+
+	if p3.created_time ~= nil then
+		t4.createdTime = p3.created_time:jsonEncode()
+	end
+
+	if p3.updated_time ~= nil then
+		t4.updatedTime = p3.updated_time:jsonEncode()
+	end
+
+	if p3.is_earned_by_user then
+		t4.isEarnedByUser = p3.is_earned_by_user
+	end
+
+	if p3.awarded_time ~= nil then
+		t4.awardedTime = p3.awarded_time:jsonEncode()
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 312
+	-- upvalues: t2 (copy), timestamp (copy)
+	local v63 = t2.new()
+
+	if t5.id ~= nil then
+		v63.id = t5.id
+	end
+
+	if t5.display_name ~= nil then
+		v63.display_name = t5.display_name
+	end
+
+	if t5.displayName ~= nil then
+		v63.display_name = t5.displayName
+	end
+
+	if t5.display_icon_image_id ~= nil then
+		v63.display_icon_image_id = t5.display_icon_image_id
+	end
+
+	if t5.displayIconImageId ~= nil then
+		v63.display_icon_image_id = t5.displayIconImageId
+	end
+
+	if t5.display_description ~= nil then
+		v63.display_description = t5.display_description
+	end
+
+	if t5.displayDescription ~= nil then
+		v63.display_description = t5.displayDescription
+	end
+
+	if t5.total_awarded_count ~= nil then
+		v63.total_awarded_count = t5.total_awarded_count
+	end
+
+	if t5.totalAwardedCount ~= nil then
+		v63.total_awarded_count = t5.totalAwardedCount
+	end
+
+	if t5.past_day_awarded_count ~= nil then
+		v63.past_day_awarded_count = t5.past_day_awarded_count
+	end
+
+	if t5.pastDayAwardedCount ~= nil then
+		v63.past_day_awarded_count = t5.pastDayAwardedCount
+	end
+
+	if t5.rarity ~= nil then
+		v63.rarity = t5.rarity
+	end
+
+	if t5.badge_type_label ~= nil then
+		v63.badge_type_label = t5.badge_type_label
+	end
+
+	if t5.badgeTypeLabel ~= nil then
+		v63.badge_type_label = t5.badgeTypeLabel
+	end
+
+	if t5.created_time ~= nil then
+		v63.created_time = timestamp.Timestamp.jsonDecode(t5.created_time)
+	end
+
+	if t5.createdTime ~= nil then
+		v63.created_time = timestamp.Timestamp.jsonDecode(t5.createdTime)
+	end
+
+	if t5.updated_time ~= nil then
+		v63.updated_time = timestamp.Timestamp.jsonDecode(t5.updated_time)
+	end
+
+	if t5.updatedTime ~= nil then
+		v63.updated_time = timestamp.Timestamp.jsonDecode(t5.updatedTime)
+	end
+
+	if t5.is_earned_by_user ~= nil then
+		v63.is_earned_by_user = t5.is_earned_by_user
+	end
+
+	if t5.isEarnedByUser ~= nil then
+		v63.is_earned_by_user = t5.isEarnedByUser
+	end
+
+	if t5.awarded_time ~= nil then
+		v63.awarded_time = timestamp.Timestamp.jsonDecode(t5.awarded_time)
+	end
+
+	if t5.awardedTime ~= nil then
+		v63.awarded_time = timestamp.Timestamp.jsonDecode(t5.awardedTime)
+	end
+
+	return v63
+end
+
+t2.descriptor = {
+	name = "BadgeData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.BadgeData"
+}
+t1.BadgeData = t2
+typeRegistry.default:register(t1.BadgeData)
+
 return {
-    BadgeData = v2.BadgeData
-};
+	BadgeData = t1.BadgeData
+}

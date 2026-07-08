@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppUnifiedLoggingDialogContentType", false);
+return game:DefineFastFlag("LuaAppUnifiedLoggingDialogContentType", false)

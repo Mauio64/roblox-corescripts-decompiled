@@ -1,3 +1,3 @@
 return {
-    ApiFetchUsersFriendCount = require(script.ApiFetchUsersFriendCount)
-};
+	ApiFetchUsersFriendCount = require(script.ApiFetchUsersFriendCount)
+}

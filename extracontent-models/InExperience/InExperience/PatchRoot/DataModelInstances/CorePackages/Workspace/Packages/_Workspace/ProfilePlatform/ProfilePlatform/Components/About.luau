@@ -1,4 +1,4 @@
 return {
-    About = require(script.AboutContainer), 
-    parseSectionsFromData = require(script.parseSectionsFromData)
-};
+	About = require(script.AboutContainer),
+	parseSectionsFromData = require(script.parseSectionsFromData)
+}

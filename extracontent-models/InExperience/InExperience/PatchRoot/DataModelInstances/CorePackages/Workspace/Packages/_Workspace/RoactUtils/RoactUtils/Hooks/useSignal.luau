@@ -1,24 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.AppCommonLib);
-local v3 = require(script.Parent.dependencyArray);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-return function(v5, v6) --[[ Line: 18 ]] --[[ Name: useSignal ]]
-    -- upvalues: v1 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), v3 (copy)
-    v1.useEffect(function() --[[ Line: 20 ]]
-        -- upvalues: v5 (copy), v6 (copy)
-        if not v5 then
-            return;
-        else
-            assert(v5 ~= nil, "signal is not nil");
-            local v7 = v5:connect(v6);
-            return function() --[[ Line: 27 ]]
-                -- upvalues: v7 (copy)
-                v7:disconnect();
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v5, 
-        v6
-    } else v3(v5, v6));
-end;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(Parent.React)
+
+require(Parent.AppCommonLib)
+
+local function useSignal(p1, p2: ((...any) -> ...any)) -- line: 15
+	-- upvalues: React (copy)
+	React.useEffect(function() -- line: 16
+		-- upvalues: p1 (copy), p2 (copy)
+		if not p1 then
+			return
+		end
+
+		assert(p1 ~= nil, "signal is not nil")
+
+		local v6 = p1:connect(p2)
+
+		return function() -- line: 23
+			-- upvalues: v6 (copy)
+			v6:disconnect()
+		end
+	end, {
+		p1,
+		p2
+	})
+end
+
+return useSignal

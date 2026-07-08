@@ -1,185 +1,296 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.Responsive);
-local l_View_0 = v2.View;
-local l_withDefaults_0 = v2.Utility.withDefaults;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_StateLayerAffordance_0 = v2.Enums.StateLayerAffordance;
-local l_useDeviceInsets_0 = v3.useDeviceInsets;
-local v9 = require(script.Parent.DetailsPageLayoutContext);
-local v10 = require(script.Parent.DetailsPageLayoutUtils);
-local v11 = {
-    testId = "app-blox-details-page", 
-    fullBleedAspectRatio = 1.7777777777777777, 
-    fullBleedOverlap = 180
-};
-return v1.memo(v1.forwardRef(function(v12, v13) --[[ Line: 49 ]] --[[ Name: DetailsPageLayoutRoot ]]
-    -- upvalues: l_useDeviceInsets_0 (copy), l_useTokens_0 (copy), l_withDefaults_0 (copy), v11 (copy), v1 (copy), v10 (copy), v9 (copy), l_View_0 (copy), l_StateLayerAffordance_0 (copy)
-    local v14 = l_useDeviceInsets_0();
-    local v15 = l_useTokens_0();
-    local v16 = l_withDefaults_0(v12, v11);
-    local v17 = false;
-    if v16.fullBleedContent ~= nil then
-        v17 = not v16.isFullscreen;
-    end;
-    local v18, v19 = v1.useBinding(false);
-    local v20, v21 = v1.useBinding(false);
-    local v22, v23 = v1.useBinding(0);
-    local l_fullBleedOverlap_0 = v16.fullBleedOverlap;
-    local v25 = v15.Size.Size_1000 + v15.Padding.Large + v15.Padding.Medium + v14.top;
-    local v26, v27 = v1.useState(false);
-    local v28 = not v17 or v26;
-    local v29, v30 = v1.useBinding(Vector2.new(0, 0));
-    local v31, v32 = v1.useBinding(0);
-    local v33, v34 = v1.useBinding(0);
-    local v35, v36 = v1.useState(0);
-    local v37, v38 = v1.useState(false);
-    local v39 = v1.useRef(false);
-    local v41 = v29:map(function(v40) --[[ Line: 81 ]]
-        return v40.Y;
-    end);
-    local v43 = v29:map(function(v42) --[[ Line: 85 ]]
-        -- upvalues: v16 (copy)
-        return UDim2.new(0, v42.X, 0, v42.X / v16.fullBleedAspectRatio);
-    end);
-    local v45 = v29:map(function(v44) --[[ Line: 91 ]]
-        -- upvalues: v17 (copy), v10 (ref), v16 (copy), v25 (copy)
-        if not v17 then
-            return 0;
-        else
-            return v10.computeContentTopOffset(v44.X, v16.fullBleedAspectRatio, v25);
-        end;
-    end);
-    local v50 = v1.joinBindings({
-        v45, 
-        v31
-    }):map(function(v46) --[[ Line: 100 ]]
-        -- upvalues: v25 (copy)
-        local v47 = v46[1];
-        local v48 = v46[2];
-        local v49 = math.max(0, v47 + v25 - v48) / 2;
-        return UDim2.new(0.5, 0, 0, v49);
-    end);
-    local v57 = v1.joinBindings({
-        v31, 
-        v45, 
-        v33
-    }):map(function(v51) --[[ Line: 110 ]]
-        -- upvalues: v10 (ref), v25 (copy), l_fullBleedOverlap_0 (copy)
-        local v52 = v51[1];
-        local v53 = v51[2];
-        local v54 = v51[3];
-        if v53 == 0 then
-            return (math.clamp(v52 / v10.getNoBannerFadeParams(v25), 0, 1));
-        else
-            local v55, v56 = v10.getHeaderFadeParams(v53, v54, l_fullBleedOverlap_0);
-            return (math.clamp((v52 - v55) / v56, 0, 1));
-        end;
-    end);
-    local v61 = v1.useCallback(function(v58) --[[ Line: 125 ]]
-        -- upvalues: v30 (copy), v38 (copy), v17 (copy), v39 (copy), v10 (ref), v16 (copy), v25 (copy), l_fullBleedOverlap_0 (copy), v36 (copy), v32 (copy)
-        local l_AbsoluteSize_0 = v58.AbsoluteSize;
-        v30(l_AbsoluteSize_0);
-        if l_AbsoluteSize_0.X > 0 and l_AbsoluteSize_0.Y > 0 then
-            v38(true);
-            if v17 and not v39.current then
-                v39.current = true;
-                local v60 = v10.computeInitialScrollY(l_AbsoluteSize_0.X, v16.fullBleedAspectRatio, v25, l_fullBleedOverlap_0);
-                v36(v60);
-                v32(v60);
-            end;
-        end;
-    end, {
-        v17, 
-        v16.fullBleedAspectRatio, 
-        v25, 
-        l_fullBleedOverlap_0
-    });
-    local v62 = v1.useRef(0);
-    local v64 = v1.useCallback(function(v63) --[[ Line: 147 ]]
-        -- upvalues: v62 (copy), v34 (copy)
-        if math.abs(v63 - v62.current) > 0.5 then
-            v62.current = v63;
-            v34(v63);
-        end;
-    end, {});
-    local v71 = v1.useCallback(function(v65) --[[ Line: 154 ]]
-        -- upvalues: v32 (copy), v17 (copy), v45 (copy), v33 (copy), v10 (ref), l_fullBleedOverlap_0 (copy), v27 (copy)
-        local l_Y_0 = v65.CanvasPosition.Y;
-        v32(l_Y_0);
-        if v17 then
-            local v67 = v45:getValue();
-            local v68 = v33:getValue();
-            local v69, v70 = v10.getHeaderFadeParams(v67, v68, l_fullBleedOverlap_0);
-            v27(v10.shouldShowStickyBar(l_Y_0, v67, v69, v70));
-        end;
-    end, {
-        v17, 
-        l_fullBleedOverlap_0
-    });
-    local v72 = v1.useMemo(function() --[[ Line: 176 ]]
-        -- upvalues: v17 (copy), v18 (copy), v19 (copy), v20 (copy), v21 (copy), v16 (copy), v25 (copy), v22 (copy), v23 (copy), v71 (copy), v45 (copy), l_fullBleedOverlap_0 (copy), v35 (copy), v37 (copy), v41 (copy), v57 (copy), v28 (copy), v64 (copy)
-        return {
-            hasFullBleed = v17, 
-            hasHeader = v18, 
-            setHasHeader = v19, 
-            hasActions = v20, 
-            setHasActions = v21, 
-            isFullscreen = v16.isFullscreen, 
-            headerBarHeight = v25, 
-            actionBarHeight = v22, 
-            setActionBarHeight = v23, 
-            onCanvasPositionChanged = v71, 
-            contentTopOffset = v45, 
-            maxContentWidth = 850, 
-            fullBleedOverlap = l_fullBleedOverlap_0, 
-            initialScrollY = v35, 
-            hasValidContainerSize = v37, 
-            containerHeight = v41, 
-            headerOpacity = v57, 
-            stickyHeaderActive = v28, 
-            onClose = v16.onClose, 
-            testId = v16.testId, 
-            onCanvasSizeChanged = v64
-        };
-    end, {
-        v17, 
-        v16.isFullscreen, 
-        v25, 
-        l_fullBleedOverlap_0, 
-        v35, 
-        v37, 
-        v28, 
-        v16.onClose, 
-        v16.testId, 
-        v41, 
-        v57, 
-        v71, 
-        v64
-    });
-    return v1.createElement(v9.Provider, {
-        value = v72
-    }, v1.createElement(l_View_0, {
-        tag = "size-full clip bg-surface-0", 
-        stateLayer = {
-            affordance = l_StateLayerAffordance_0.None
-        }, 
-        onAbsoluteSizeChanged = v61, 
-        ref = v13, 
-        testId = ("%*--root"):format(v16.testId)
-    }, {
-        FullBleed = if v17 then v1.createElement(l_View_0, {
-            tag = "size-full position-top-center anchor-top-center clip", 
-            ZIndex = 0, 
-            testId = ("%*--fullbleed"):format(v16.testId)
-        }, {
-            ParallaxFrame = v1.createElement(l_View_0, {
-                Position = v50, 
-                Size = v43, 
-                tag = "clip anchor-center-center"
-            }, v16.fullBleedContent)
-        }) else nil, 
-        Children = v1.createElement(v1.Fragment, nil, v16.children)
-    }));
-end));
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local Responsive = require(Parent.Responsive)
+local SharedFlags = require(Parent.SharedFlags)
+local Display = require(Parent.Display)
+local AppNavBar = require(Parent.AppNavBar)
+local View = Foundation.View
+local withDefaults = Foundation.Utility.withDefaults
+local useTokens = Foundation.Hooks.useTokens
+local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
+local useDeviceInsets = Responsive.useDeviceInsets
+local useNavBarSize = AppNavBar.useNavBarSize
+local useNavBarPlacement = AppNavBar.useNavBarPlacement
+local CompositionTags = require(Parent.AppComposition).CompositionTags
+local DetailsPageLayoutContext = require(script.Parent.DetailsPageLayoutContext)
+local DetailsPageLayoutUtils = require(script.Parent.DetailsPageLayoutUtils)
+local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local FFlagLuaAppClampBannerPaddingToViewport = SharedFlags.FFlagLuaAppClampBannerPaddingToViewport
+local FFlagDetailsPageLayoutSeedContainerSize = SharedFlags.FFlagDetailsPageLayoutSeedContainerSize
+local t1 = {
+	testId = "app-blox-details-page",
+	fullBleedAspectRatio = 1.7777777777777777,
+	fullBleedOverlapOffset = 180
+}
+
+local function DetailsPageLayoutRoot(t2: {[any]: any}, p1) -- line: 68
+	-- upvalues: useDeviceInsets (copy), useTokens (copy), withDefaults (copy), t1 (copy), CompositionTags (copy), React (copy), Responsive (copy), FFlagDetailsPageLayoutSeedContainerSize (copy), useNavBarSize (copy), useNavBarPlacement (copy), Display (copy), AppNavBar (copy), DetailsPageLayoutUtils (copy), FFlagLuaAppClampBannerPaddingToViewport (copy), DetailsPageLayoutContext (copy), View (copy), StateLayerAffordance (copy), FFlagSduiExperienceDetailsSupport (copy)
+	local v25 = useDeviceInsets()
+	local v26 = useTokens()
+	local v27 = withDefaults(t2, t1)
+	local v28 = v27.compositionLayoutTag or CompositionTags.Layout.Detail
+	local fullBleedAspectRatio = v27.fullBleedAspectRatio
+	local v30 = (fullBleedAspectRatio == nil or not (fullBleedAspectRatio > 0)) and 1.7777777777777777 or fullBleedAspectRatio
+	local v31 = v27.fullBleedContent ~= nil and not v27.isFullscreen
+	local v32, v33 = React.useBinding(false)
+	local v34, v35 = React.useBinding(false)
+	local v36, v37 = React.useBinding(0)
+	local UIScale = v26.Config.UI.Scale
+	local v39 = v27.fullBleedOverlapOffset * UIScale
+	local v40 = if not v27.gradientTopBleedOffset then v26.Size.Size_2000 else v27.gradientTopBleedOffset * UIScale
+	local v41 = v26.Size.Size_1000 + v26.Padding.Large + v26.Padding.Medium
+	local v42 = ((if not Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small) then v26.Size.Size_2000 else v41)) + v25.top
+	local v43, v44 = React.useState(nil)
+	local v45 = v43 ~= nil
+	local v46, v47 = React.useState(nil)
+	local v48, v49 = React.useState(false)
+	local v50 = not v31 or (v48 or v45)
+	local containerSize = nil
+	local n1 = 0
+
+	if FFlagDetailsPageLayoutSeedContainerSize then
+		local v53 = useNavBarSize()
+		local v54 = useNavBarPlacement()
+		local v55 = React.useMemo(function() -- line: 119
+			-- upvalues: Display (copy), v54 (copy), AppNavBar (copy), v53 (copy), v31 (copy), DetailsPageLayoutUtils (copy), v30 (copy), v42 (copy), v39 (copy), t2 (copy)
+			local v77 = Display.GetDisplayStore(false).getViewportSize(false)
+			local v78 = if v54 ~= AppNavBar.Placement.Left then v77.X else math.max(0, v77.X - v53)
+			local vector2 = Vector2.new(v78, v77.Y)
+			local v80 = not v31 and 0 or DetailsPageLayoutUtils.computeInitialScrollYForSize(vector2, {
+				fullBleedAspectRatio = v30,
+				headerBarHeight = v42,
+				fullBleedOverlapOffset = v39,
+				hasFullBleed = v31,
+				bannerBottomVisiblePercent = t2.bannerBottomVisiblePercent
+			})
+
+			return {
+				containerSize = vector2,
+				initialScrollY = v80
+			}
+		end, {})
+
+		containerSize = v55.containerSize
+		n1 = v55.initialScrollY
+	end
+
+	local v56, v57 = React.useBinding(if not FFlagDetailsPageLayoutSeedContainerSize then Vector2.new(0, 0) else containerSize)
+	local v58, v59 = React.useBinding(not FFlagDetailsPageLayoutSeedContainerSize and 0 or n1)
+	local v60, v61 = React.useBinding(0)
+	local v62, v63 = React.useState(not FFlagDetailsPageLayoutSeedContainerSize and 0 or n1)
+	local v64, v65 = React.useState(not not FFlagDetailsPageLayoutSeedContainerSize)
+	local v66 = React.useRef(not not FFlagDetailsPageLayoutSeedContainerSize and v31)
+	local v67 = v56:map(function(vector2: Vector2) -- line: 157
+		return vector2.Y
+	end)
+	local v68 = v56:map(function(vector2: Vector2) -- line: 161
+		-- upvalues: v30 (copy)
+		return UDim2.new(0, vector2.X, 0, vector2.X / v30)
+	end)
+	local v69 = v56:map(function(vector2: Vector2) -- line: 167
+		-- upvalues: v31 (copy), DetailsPageLayoutUtils (copy), v30 (copy), v42 (copy)
+		if not v31 then
+			return 0
+		end
+
+		return DetailsPageLayoutUtils.computeContentTopOffset(vector2.X, v30, v42)
+	end)
+	local v70 = React.joinBindings({
+		v69,
+		v58
+	}):map(function(p2) -- line: 176
+		-- upvalues: v42 (copy)
+		local v85 = p2[1]
+		local v86 = p2[2]
+		local v87 = math.max(0, v85 + v42 - v86) / 2
+
+		return UDim2.new(0.5, 0, 0, v87)
+	end)
+	local v71 = React.joinBindings({
+		v58,
+		v69,
+		v60
+	}):map(function(p3) -- line: 186
+		-- upvalues: DetailsPageLayoutUtils (copy), v42 (copy), v39 (copy)
+		local v89 = p3[1]
+		local v90 = p3[2]
+		local v91 = p3[3]
+
+		if v90 == 0 then
+			return (math.clamp(v89 / DetailsPageLayoutUtils.getNoBannerFadeParams(v42), 0, 1))
+		end
+
+		local v92, v93 = DetailsPageLayoutUtils.getHeaderFadeParams(v90, v91, v39)
+
+		return (math.clamp((v89 - v92) / v93, 0, 1))
+	end)
+	local v72 = React.useCallback(function(p4) -- line: 202
+		-- upvalues: v57 (copy), v65 (copy), v31 (copy), v66 (copy), FFlagDetailsPageLayoutSeedContainerSize (copy), DetailsPageLayoutUtils (copy), v30 (copy), v42 (copy), v39 (copy), t2 (copy), FFlagLuaAppClampBannerPaddingToViewport (copy), v63 (copy), v59 (copy)
+		local AbsoluteSize = p4.AbsoluteSize
+
+		v57(AbsoluteSize)
+
+		if AbsoluteSize.X > 0 and AbsoluteSize.Y > 0 then
+			v65(true)
+
+			if v31 and not v66.current then
+				v66.current = true
+
+				local v96
+
+				if FFlagDetailsPageLayoutSeedContainerSize then
+					v96 = DetailsPageLayoutUtils.computeInitialScrollYForSize(AbsoluteSize, {
+						fullBleedAspectRatio = v30,
+						headerBarHeight = v42,
+						fullBleedOverlapOffset = v39,
+						hasFullBleed = v31,
+						bannerBottomVisiblePercent = t2.bannerBottomVisiblePercent
+					})
+				else
+					local v97 = AbsoluteSize.X / v30
+					local v98 = if t2.bannerBottomVisiblePercent == nil then DetailsPageLayoutUtils.computeInitialScrollY(AbsoluteSize.X, v30, v42, v39) else math.max(0, (math.floor(v97 - t2.bannerBottomVisiblePercent * v97)))
+					local v99 = DetailsPageLayoutUtils.computeContentTopOffset(AbsoluteSize.X, v30, v42)
+					local v100 = DetailsPageLayoutUtils.computeCanvasPaddingTop(v99, v31, v39, v42)
+
+					if FFlagLuaAppClampBannerPaddingToViewport then
+						v100 = math.min(v100, AbsoluteSize.Y * 0.75)
+					end
+
+					v96 = math.min(v98, (math.max(0, v100 - v42)))
+				end
+
+				v63(v96)
+				v59(v96)
+			end
+		end
+	end, {
+		v31,
+		v30,
+		v42,
+		v39,
+		t2.bannerBottomVisiblePercent,
+		if not FFlagDetailsPageLayoutSeedContainerSize then nil else containerSize
+	})
+	local v73 = React.useRef(0)
+	local v74 = React.useCallback(function(n2: number) -- line: 264
+		-- upvalues: v73 (copy), v61 (copy)
+		if math.abs(n2 - v73.current) > 0.5 then
+			v73.current = n2
+			v61(n2)
+		end
+	end, {})
+	local v75 = React.useCallback(function(p5) -- line: 271
+		-- upvalues: v59 (copy), v31 (copy), v69 (copy), v60 (copy), DetailsPageLayoutUtils (copy), v39 (copy), v49 (copy)
+		local CanvasPositionY = p5.CanvasPosition.Y
+
+		v59(CanvasPositionY)
+
+		if v31 then
+			local v104 = v69:getValue()
+			local v105 = v60:getValue()
+			local v106, v107 = DetailsPageLayoutUtils.getHeaderFadeParams(v104, v105, v39)
+
+			v49(DetailsPageLayoutUtils.shouldShowStickyBar(CanvasPositionY, v104, v106, v107))
+		end
+	end, {
+		v31,
+		v39
+	})
+	local v76 = React.useMemo(function() -- line: 293
+		-- upvalues: v31 (copy), v32 (copy), v33 (copy), v34 (copy), v35 (copy), v27 (copy), v42 (copy), v36 (copy), v37 (copy), v75 (copy), v69 (copy), v39 (copy), v40 (copy), v62 (copy), v64 (copy), v67 (copy), v71 (copy), v50 (copy), v74 (copy), v45 (copy), v44 (copy), v46 (copy), v47 (copy)
+		return {
+			hasFullBleed = v31,
+			hasHeader = v32,
+			setHasHeader = v33,
+			hasActions = v34,
+			setHasActions = v35,
+			isFullscreen = v27.isFullscreen,
+			headerBarHeight = v42,
+			actionBarHeight = v36,
+			setActionBarHeight = v37,
+			onCanvasPositionChanged = v75,
+			contentTopOffset = v69,
+			fullBleedOverlapOffset = v39,
+			gradientTopBleedOffset = v40,
+			initialScrollY = v62,
+			hasValidContainerSize = v64,
+			containerHeight = v67,
+			headerOpacity = v71,
+			stickyHeaderActive = v50,
+			onClose = v27.onClose,
+			testId = v27.testId,
+			onCanvasSizeChanged = v74,
+			isFullscreenOverlay = v45,
+			setFullscreenContent = v44,
+			onExitFullscreenOverlay = v46,
+			setOnExitFullscreenOverlay = v47
+		}
+	end, {
+		v31,
+		v27.isFullscreen,
+		v42,
+		v39,
+		v40,
+		v62,
+		v64,
+		v50,
+		v27.onClose,
+		v27.testId,
+		v67,
+		v71,
+		v75,
+		v74,
+		v45,
+		v46
+	})
+
+	return React.createElement(DetailsPageLayoutContext.Provider, {
+		value = v76
+	}, React.createElement(View, {
+		tag = `size-full clip bg-surface-0 { v28 }`,
+		stateLayer = {
+			affordance = StateLayerAffordance.None
+		},
+		onAbsoluteSizeChanged = v72,
+		ref = p1,
+		selectionGroup = v27.selectionGroup,
+		testId = `{ v27.testId }--root`
+	}, {
+		FullBleed = if not v31 then nil else React.createElement(View, {
+			tag = "position-top-center anchor-top-center size-full clip",
+			ZIndex = 0,
+			testId = `{ v27.testId }--fullbleed`
+		}, {
+			ParallaxFrame = React.createElement(View, {
+				tag = "anchor-center-center clip",
+				Position = v70,
+				Size = v68
+			}, v27.fullBleedContent)
+		}),
+		Children = React.createElement(React.Fragment, nil, v27.children),
+		FullscreenOverlay = if not v45 then nil else React.createElement(View, {
+			ZIndex = 10,
+			tag = "clip",
+			Size = if not FFlagSduiExperienceDetailsSupport then UDim2.new(1, 0, 1, -v42) else v32:map(function(b1: boolean) -- line: 371
+				-- upvalues: v42 (copy)
+				if b1 then
+					return (UDim2.new(1, 0, 1, -v42))
+				end
+
+				return (UDim2.fromScale(1, 1))
+			end),
+			Position = if not FFlagSduiExperienceDetailsSupport then UDim2.fromOffset(0, v42) else v32:map(function(b2: boolean) -- line: 376
+				-- upvalues: v42 (copy)
+				if b2 then
+					return (UDim2.fromOffset(0, v42))
+				end
+
+				return (UDim2.fromOffset(0, 0))
+			end),
+			testId = `{ v27.testId }--fullscreen-overlay`
+		}, v43)
+	}))
+end
+
+return React.memo(React.forwardRef(DetailsPageLayoutRoot))

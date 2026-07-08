@@ -1,25 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.RoactNavigation);
-local v3 = require(l_script_FirstAncestor_0.EnumScreens);
-return function(v4, v5, v6) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    v4.reset({
-        v2.Actions.navigate({
-            routeName = v3.ChatLanding
-        }), 
-        v2.Actions.navigate({
-            routeName = v3.ChatConversation, 
-            params = {
-                conversationId = v5
-            }
-        }), 
-        v2.Actions.navigate({
-            routeName = v3.SquadLobby, 
-            params = {
-                conversationId = v5, 
-                extraParams = v6
-            }
-        })
-    }, 3);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local RoactNavigation = require(AppChatParent.RoactNavigation)
+local EnumScreens = require(AppChat.EnumScreens)
+
+return function(p1, s1: string, p2) -- line: 9
+	-- upvalues: RoactNavigation (copy), EnumScreens (copy)
+	p1.reset({
+		RoactNavigation.Actions.navigate({
+			routeName = EnumScreens.ChatLanding
+		}),
+		RoactNavigation.Actions.navigate({
+			routeName = EnumScreens.ChatConversation,
+			params = {
+				conversationId = s1
+			}
+		}),
+		RoactNavigation.Actions.navigate({
+			routeName = EnumScreens.SquadLobby,
+			params = {
+				conversationId = s1,
+				extraParams = p2
+			}
+		})
+	}, 3)
+end

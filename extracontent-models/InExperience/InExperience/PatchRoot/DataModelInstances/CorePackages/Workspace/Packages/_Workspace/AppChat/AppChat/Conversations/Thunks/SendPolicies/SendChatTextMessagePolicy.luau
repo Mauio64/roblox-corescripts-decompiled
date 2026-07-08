@@ -1,30 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AppChatNetworking);
-local v3 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v4 = require(l_script_FirstAncestor_0.Models.MessageModel);
-local v5 = require(script.Parent.SendChatMessagePolicy);
-local v6 = setmetatable({}, v5);
-v6.__index = v6;
-v6.new = function(v7, v8, v9, v10, v11) --[[ Line: 13 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), v5 (copy)
-    v3:info("New policy constructed for conversationId: {} messageText: {}, replyingToId: {}", v8, v9, if v10 then v10.id else nil);
-    local v12 = v5:new(v8, v10);
-    setmetatable(v12, v7);
-    v12.messageText = v9;
-    v12.decorators = v11;
-    return v12;
-end;
-v6.sendMessage = function(v13, _) --[[ Line: 31 ]] --[[ Name: sendMessage ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    v3:info("sendMessage - conversationId: {} messageText: {}, replyingToId: {}", v13.conversationId, v13.messageText, if v13.replyingToMessage then v13.replyingToMessage.id else nil);
-    return v2.http.SendChatTextMessage(nil, v13.conversationId, v13.messageText, if v13.replyingToMessage then v13.replyingToMessage.id else nil);
-end;
-v6.sendingMessagePayload = function(v15) --[[ Line: 47 ]] --[[ Name: sendingMessagePayload ]]
-    -- upvalues: v4 (copy)
-    return {
-        messageType = v4.MessageTypes.PlainText, 
-        content = v15.messageText
-    };
-end;
-return v6;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local v4 = require(AppChat.Logger):new(script.Name)
+local MessageModel = require(AppChat.Models.MessageModel)
+local SendChatMessagePolicy = require(script.Parent.SendChatMessagePolicy)
+local self = setmetatable({}, SendChatMessagePolicy)
+
+self.__index = self
+
+function self.new(p1, p2, p3, p4, p5) -- line: 13
+	-- upvalues: v4 (copy), SendChatMessagePolicy (copy)
+	v4:info("New policy constructed for conversationId: {} messageText: {}, replyingToId: {}", p2, p3, if not p4 then nil else p4.id)
+
+	local v13 = SendChatMessagePolicy:new(p2, p4)
+
+	setmetatable(v13, p1)
+	v13.messageText = p3
+	v13.decorators = p5
+
+	return v13
+end
+function self.sendMessage(p6, _) -- line: 31
+	-- upvalues: v4 (copy), AppChatNetworking (copy)
+	v4:info("sendMessage - conversationId: {} messageText: {}, replyingToId: {}", p6.conversationId, p6.messageText, if not p6.replyingToMessage then nil else p6.replyingToMessage.id)
+
+	return AppChatNetworking.http.SendChatTextMessage(nil, p6.conversationId, p6.messageText, if not p6.replyingToMessage then nil else p6.replyingToMessage.id)
+end
+function self.sendingMessagePayload(p8) -- line: 47
+	-- upvalues: MessageModel (copy)
+	return {
+		messageType = MessageModel.MessageTypes.PlainText,
+		content = p8.messageText
+	}
+end
+
+return self

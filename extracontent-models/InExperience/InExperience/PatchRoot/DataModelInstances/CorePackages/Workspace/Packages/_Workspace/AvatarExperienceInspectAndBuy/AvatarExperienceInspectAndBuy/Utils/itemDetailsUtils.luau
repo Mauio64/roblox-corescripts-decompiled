@@ -1,111 +1,119 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_ItemRestrictions_0 = require(l_Parent_0.AXCommon).Enums.ItemRestrictions;
-local v3 = require(l_script_FirstAncestor_0.Enums.PriceStatus);
-local v4 = require(l_Parent_0.VerifiedBadges);
-local v5 = require(l_script_FirstAncestor_0.Constants);
-local _ = require(l_script_FirstAncestor_0.Types);
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local ItemRestrictions = require(AvatarExperienceInspectAndBuyParent.AXCommon).Enums.ItemRestrictions
+local PriceStatus = require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
+local VerifiedBadges = require(AvatarExperienceInspectAndBuyParent.VerifiedBadges)
+local Constants = require(AvatarExperienceInspectAndBuy.Constants)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
 return {
-    isCollectible = function(v7) --[[ Line: 17 ]] --[[ Name: isCollectible ]]
-        -- upvalues: l_ItemRestrictions_0 (copy)
-        if not v7 then
-            return false;
-        elseif not v7.itemRestrictions then
-            return false;
-        else
-            local v8 = v7.itemRestrictions[l_ItemRestrictions_0.Collectible];
-            local v9 = v7.itemRestrictions[l_ItemRestrictions_0.Limited];
-            local v10 = v7.itemRestrictions[l_ItemRestrictions_0.LimitedUnique];
-            if v8 or v9 or v10 then
-                return true;
-            else
-                return false;
-            end;
-        end;
-    end, 
-    isInExperienceCreationPlayable = function(v11) --[[ Line: 37 ]] --[[ Name: isInExperienceCreationPlayable ]]
-        -- upvalues: v5 (copy)
-        local v12 = if v11 then v11.playabilityStatus else nil;
-        if v12 and v5.ShowPlayableAttributionMapper[v12] then
-            return true;
-        else
-            return false;
-        end;
-    end, 
-    isTradeable = function(v13) --[[ Line: 76 ]] --[[ Name: isTradeable ]]
-        -- upvalues: l_ItemRestrictions_0 (copy)
-        return v13 and v13.itemRestrictions and (v13.itemRestrictions[l_ItemRestrictions_0.Limited] or v13.itemRestrictions[l_ItemRestrictions_0.LimitedUnique]);
-    end, 
-    getPriceInRobux = function(v14, v15) --[[ Line: 85 ]] --[[ Name: getPriceInRobux ]]
-        -- upvalues: v3 (copy)
-        if v14 and v15 == v3.PurchaseFromResale and v14.collectibleItemDetails then
-            return v14.collectibleItemDetails.lowestResalePrice;
-        elseif v14 then
-            return v14.priceInRobux;
-        else
-            return nil;
-        end;
-    end, 
-    getItemWidth = function(v16, v17, v18) --[[ Line: 93 ]] --[[ Name: getItemWidth ]]
-        local v19 = math.floor((v16 - (v17 - 1) * v18) / v17);
-        if v19 < 0 then
-            return 0;
-        else
-            return v19;
-        end;
-    end, 
-    getCreatorName = function(v20) --[[ Line: 103 ]] --[[ Name: getCreatorName ]]
-        -- upvalues: v4 (copy)
-        if v20 and v20.creator and v20.creator.creatorHasVerifiedBadge and v20.creator.creatorName then
-            return (("%*%*"):format(v20.creator.creatorName, v4.emoji.verified));
-        elseif v20 and v20.creator and v20.creator.creatorName then
-            return v20.creator.creatorName;
-        else
-            return "";
-        end;
-    end, 
-    getOriginalPrice = function(v21, v22, v23) --[[ Line: 113 ]] --[[ Name: getOriginalPrice ]]
-        if v21 and v21.isOffSale then
-            return v22;
-        elseif v21 and v21.priceInRobux then
-            return v23(v21.priceInRobux);
-        else
-            return "";
-        end;
-    end, 
-    getQuantitySold = function(v24, v25) --[[ Line: 123 ]] --[[ Name: getQuantitySold ]]
-        if v24 and v24.collectibleItemDetails and v24.collectibleItemDetails.totalQuantity and v24.collectibleItemDetails.unitsAvailableForConsumption then
-            return v25(v24.collectibleItemDetails.totalQuantity - v24.collectibleItemDetails.unitsAvailableForConsumption) .. "/" .. v25(v24.collectibleItemDetails.totalQuantity);
-        else
-            return "";
-        end;
-    end, 
-    calculatePurchaseStatusForItem = function(v26, v27) --[[ Line: 55 ]] --[[ Name: calculatePurchaseStatusForItem ]]
-        -- upvalues: v3 (copy)
-        local v28 = nil;
-        local v29 = nil;
-        local v30 = nil;
-        if v27 == v3.PurchaseFromResale and v26.collectibleItemDetails then
-            v28 = v26.collectibleItemDetails.lowestResalePrice;
-            v29 = v26.collectibleItemDetails.collectibleLowestAvailableResaleProductId;
-            v30 = v26.collectibleItemDetails.collectibleLowestAvailableResaleItemInstanceId;
-        end;
-        return {
-            collectibleItemId = v26.collectibleItemId, 
-            collectibleLowestResalePrice = v28, 
-            collectibleLowestAvailableResaleProductId = v29, 
-            collectibleLowestAvailableResaleItemInstanceId = v30
-        };
-    end, 
-    shouldShowPriceLabel = function(v31) --[[ Line: 147 ]] --[[ Name: shouldShowPriceLabel ]]
-        -- upvalues: v3 (copy)
-        local v32 = true;
-        if v31 ~= nil then
-            v32 = true;
-            if v31 ~= v3.PurchaseFromResale then
-                v32 = v31 == v3.PurchaseFromRoblox;
-            end;
-        end;
-        return v32;
-    end
-};
+	isCollectible = function(p1) -- line: 17
+		-- upvalues: ItemRestrictions (copy)
+		if not p1 then
+			return false
+		end
+
+		if not p1.itemRestrictions then
+			return false
+		end
+
+		local v8 = p1.itemRestrictions[ItemRestrictions.Collectible]
+		local v9 = p1.itemRestrictions[ItemRestrictions.Limited]
+		local v10 = p1.itemRestrictions[ItemRestrictions.LimitedUnique]
+
+		if v8 or v9 or v10 then
+			return true
+		end
+
+		return false
+	end,
+	isInExperienceCreationPlayable = function(p2) -- line: 37
+		-- upvalues: Constants (copy)
+		local v12 = if not p2 then nil else p2.playabilityStatus
+
+		if v12 and Constants.ShowPlayableAttributionMapper[v12] then
+			return true
+		end
+
+		return false
+	end,
+	isTradeable = function(p3) -- line: 76
+		-- upvalues: ItemRestrictions (copy)
+		return p3 and (p3.itemRestrictions and (p3.itemRestrictions[ItemRestrictions.Limited] or p3.itemRestrictions[ItemRestrictions.LimitedUnique]))
+	end,
+	getPriceInRobux = function(p4, p5) -- line: 85
+		-- upvalues: PriceStatus (copy)
+		if p4 and (p5 == PriceStatus.PurchaseFromResale and p4.collectibleItemDetails) then
+			return p4.collectibleItemDetails.lowestResalePrice
+		end
+
+		if p4 then
+			return p4.priceInRobux
+		end
+
+		return nil
+	end,
+	getItemWidth = function(n1: number, n2: number, n3: number) -- line: 93
+		local v24 = math.floor((n1 - (n2 - 1) * n3) / n2)
+
+		if v24 < 0 then
+			return 0
+		end
+
+		return v24
+	end,
+	getCreatorName = function(p6) -- line: 103
+		-- upvalues: VerifiedBadges (copy)
+		if p6 and (p6.creator and p6.creator.creatorHasVerifiedBadge and p6.creator.creatorName) then
+			return `{ p6.creator.creatorName }{ VerifiedBadges.emoji.verified }`
+		end
+
+		if p6 and p6.creator and p6.creator.creatorName then
+			return p6.creator.creatorName
+		end
+
+		return ""
+	end,
+	getOriginalPrice = function(p7, s1: string, p8: ((...any) -> ...any)) -- line: 113
+		if p7 and p7.isOffSale then
+			return s1
+		end
+
+		if p7 and p7.priceInRobux then
+			return p8(p7.priceInRobux)
+		end
+
+		return ""
+	end,
+	getQuantitySold = function(p9, p10: ((...any) -> ...any)) -- line: 123
+		if p9 and (p9.collectibleItemDetails and p9.collectibleItemDetails.totalQuantity and p9.collectibleItemDetails.unitsAvailableForConsumption) then
+			return p10(p9.collectibleItemDetails.totalQuantity - p9.collectibleItemDetails.unitsAvailableForConsumption) .. "/" .. p10(p9.collectibleItemDetails.totalQuantity)
+		end
+
+		return ""
+	end,
+	calculatePurchaseStatusForItem = function(p11, p12) -- line: 55
+		-- upvalues: PriceStatus (copy)
+		local lowestResalePrice = nil
+		local collectibleLowestAvailableResaleProductId = nil
+		local collectibleLowestAvailableResaleItemInstanceId = nil
+
+		if p12 == PriceStatus.PurchaseFromResale and p11.collectibleItemDetails then
+			lowestResalePrice = p11.collectibleItemDetails.lowestResalePrice
+			collectibleLowestAvailableResaleProductId = p11.collectibleItemDetails.collectibleLowestAvailableResaleProductId
+			collectibleLowestAvailableResaleItemInstanceId = p11.collectibleItemDetails.collectibleLowestAvailableResaleItemInstanceId
+		end
+
+		return {
+			collectibleItemId = p11.collectibleItemId,
+			collectibleLowestResalePrice = lowestResalePrice,
+			collectibleLowestAvailableResaleProductId = collectibleLowestAvailableResaleProductId,
+			collectibleLowestAvailableResaleItemInstanceId = collectibleLowestAvailableResaleItemInstanceId
+		}
+	end,
+	shouldShowPriceLabel = function(p13) -- line: 147
+		-- upvalues: PriceStatus (copy)
+		return p13 == nil or (p13 == PriceStatus.PurchaseFromResale or p13 == PriceStatus.PurchaseFromRoblox)
+	end
+}

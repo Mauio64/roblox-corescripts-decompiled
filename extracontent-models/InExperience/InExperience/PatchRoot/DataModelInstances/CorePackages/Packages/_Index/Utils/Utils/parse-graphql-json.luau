@@ -1,60 +1,77 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local v4 = {};
-local l_buildClientSchema_0 = require(l_Parent_0.GraphQL).buildClientSchema;
-local _ = require(script.Parent.loaders);
-local _ = require(script.Parent.types);
-local l_String_0 = v1.String;
-local v9 = require(script.Parent.json);
-local function _(v10) --[[ Line: 26 ]] --[[ Name: stripBOM ]]
-    -- upvalues: l_String_0 (copy)
-    v10 = tostring(v10);
-    if l_String_0.charCodeAt(v10, 1) == 65279 then
-        v10 = l_String_0.slice(v10, 2);
-    end;
-    return v10;
-end;
-local function _(v12) --[[ Line: 41 ]] --[[ Name: parseBOM ]]
-    -- upvalues: v9 (copy), l_String_0 (copy)
-    local l_parse_0 = v9.parse;
-    local v14 = tostring(v12);
-    if l_String_0.charCodeAt(v14, 1) == 65279 then
-        v14 = l_String_0.slice(v14, 2);
-    end;
-    return l_parse_0(v14);
-end;
-v4.parseGraphQLJSON = function(v16, v17, v18) --[[ Line: 44 ]] --[[ Name: parseGraphQLJSON ]]
-    -- upvalues: v9 (copy), l_String_0 (copy), l_Boolean_0 (copy), l_buildClientSchema_0 (copy), l_Error_0 (copy)
-    local l_parse_1 = v9.parse;
-    local v20 = tostring(v17);
-    if l_String_0.charCodeAt(v20, 1) == 65279 then
-        v20 = l_String_0.slice(v20, 2);
-    end;
-    l_parse_1 = l_parse_1(v20);
-    if l_Boolean_0.toJSBoolean(l_parse_1.data) then
-        l_parse_1 = l_parse_1.data;
-    end;
-    if l_parse_1.kind == "Document" then
-        return {
-            location = v16, 
-            document = l_parse_1
-        };
-    elseif l_Boolean_0.toJSBoolean(l_parse_1.__schema) then
-        local v21 = l_buildClientSchema_0(l_parse_1, v18);
-        return {
-            location = v16, 
-            schema = v21
-        };
-    elseif typeof(l_parse_1) == "string" then
-        return {
-            location = v16, 
-            rawSDL = l_parse_1
-        };
-    else
-        error(l_Error_0.new("Not valid JSON content"));
-        return;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local t1 = {}
+local buildClientSchema = require(ParentParent.GraphQL).buildClientSchema
+
+require(script.Parent.loaders)
+require(script.Parent.types)
+
+local String = LuauPolyfill.String
+local json = require(script.Parent.json)
+
+local function stripBOM(s1: string) -- line: 26
+	-- upvalues: String (copy)
+	local str = tostring(s1)
+
+	if String.charCodeAt(str, 1) == 65279 then
+		str = String.slice(str, 2)
+	end
+
+	return str
+end
+local function parseBOM(s2: string) -- line: 41
+	-- upvalues: json (copy), String (copy)
+	local parse = json.parse
+	local str = tostring(s2)
+
+	if String.charCodeAt(str, 1) == 65279 then
+		str = String.slice(str, 2)
+	end
+
+	return parse(str)
+end
+
+function t1.parseGraphQLJSON(s3: string, s4: string, p1) -- line: 44
+	-- upvalues: json (copy), String (copy), Boolean (copy), buildClientSchema (copy), Error (copy)
+	local parse = json.parse
+	local str = tostring(s4)
+
+	if String.charCodeAt(str, 1) == 65279 then
+		str = String.slice(str, 2)
+	end
+
+	local v21 = parse(str)
+
+	if Boolean.toJSBoolean(v21.data) then
+		v21 = v21.data
+	end
+
+	if v21.kind == "Document" then
+		return {
+			location = s3,
+			document = v21
+		}
+	end
+
+	if Boolean.toJSBoolean(v21.__schema) then
+		local v22 = buildClientSchema(v21, p1)
+
+		return {
+			location = s3,
+			schema = v22
+		}
+	end
+
+	if typeof(v21) == "string" then
+		return {
+			location = s3,
+			rawSDL = v21
+		}
+	end
+
+	error(Error.new("Not valid JSON content"))
+end
+
+return t1

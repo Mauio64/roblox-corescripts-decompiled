@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableContentfulPaintTracking", false);
+return game:DefineFastFlag("LuaAppEnableContentfulPaintTracking", false)

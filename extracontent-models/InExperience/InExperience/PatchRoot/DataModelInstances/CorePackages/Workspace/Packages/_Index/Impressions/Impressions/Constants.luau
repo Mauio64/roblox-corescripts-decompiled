@@ -1,3 +1,3 @@
 return {
-    ItemIndex = "ITEMINDEX"
-};
+	ItemIndex = "ITEMINDEX"
+}

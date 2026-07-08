@@ -1,5 +1,7 @@
-return function(v0, ...) --[[ Line: 9 ]] --[[ Name: forEachArgs ]]
-    for v1 = 1, select("#", ...) do
-        v0(select(v1, ...), v1);
-    end;
-end;
+local function forEachArgs(p1: ((...any) -> ...any), ...) -- line: 9
+	for i = 1, select("#", ...) do
+		p1(select(i, ...), i)
+	end
+end
+
+return forEachArgs

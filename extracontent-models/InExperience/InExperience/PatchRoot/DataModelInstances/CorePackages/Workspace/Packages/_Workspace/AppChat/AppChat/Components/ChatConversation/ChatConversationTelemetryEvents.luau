@@ -1,350 +1,350 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Telemetry.Telemetry);
-local _ = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatConversationTelemetryLayer);
-local _ = require(l_script_FirstAncestor_0.Analytics.Enums.ConversationActionType);
-local _ = require(l_Parent_0.SocialLuaAnalytics);
-local v6 = require(l_script_FirstAncestor_0.Telemetry.DefaultTelemetryEvents);
-local v7 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatEnableRepliesUI);
-local v8 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableMessageContextMenu);
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableHiddenMessages);
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatUseSwipeForReplies);
-local l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 = require(l_script_FirstAncestor_0.Flags).FFlagAppChatTelemetryCounterWithEmittedInfo;
-local l_namedCounterConfigurationNoEmittedInfo_0 = v6.namedCounterConfigurationNoEmittedInfo;
-local l_namedCounterConfigurationAndFormat_0 = v6.namedCounterConfigurationAndFormat;
-local l_EVENT_INGEST_NO_EMITTED_INFO_0 = v6.EVENT_INGEST_NO_EMITTED_INFO;
-local function v16() --[[ Line: 26 ]] --[[ Name: targetMessageFormatFunction ]]
-    -- upvalues: v6 (copy), v9 (copy)
-    return v6.eventIngestWithFormatFunction(function(v15) --[[ Line: 27 ]]
-        -- upvalues: v9 (ref)
-        return {
-            targetMessageId = v15.targetMessageId, 
-            targetMessageSenderId = v15.targetMessageSenderId, 
-            targetMessageSentAt = v15.targetMessageSentAt, 
-            targetMessageLength = v15.targetMessageLength, 
-            targetMessageVisibility = if v9 then v15.targetMessageVisibility else nil
-        };
-    end);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Telemetry = require(AppChat.Telemetry.Telemetry)
+
+require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
+require(AppChat.Analytics.Enums.ConversationActionType)
+require(AppChatParent.SocialLuaAnalytics)
+
+local DefaultTelemetryEvents = require(AppChat.Telemetry.DefaultTelemetryEvents)
+local FFlagAppChatEnableMessageContextMenu = require(AppChat.Flags.FFlagAppChatEnableMessageContextMenu)
+local FFlagAppChatUseSwipeForReplies = require(AppChat.Flags.FFlagAppChatUseSwipeForReplies)
+local namedCounterConfigurationNoEmittedInfo = DefaultTelemetryEvents.namedCounterConfigurationNoEmittedInfo
+local namedCounterConfigurationAndFormat = DefaultTelemetryEvents.namedCounterConfigurationAndFormat
+local EVENT_INGEST_NO_EMITTED_INFO = DefaultTelemetryEvents.EVENT_INGEST_NO_EMITTED_INFO
+
+local function targetMessageFormatFunction() -- line: 23
+	-- upvalues: DefaultTelemetryEvents (copy)
+	return DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t1: {[any]: any}) -- line: 24
+		return {
+			targetMessageId = t1.targetMessageId,
+			targetMessageSenderId = t1.targetMessageSenderId,
+			targetMessageSentAt = t1.targetMessageSentAt,
+			targetMessageLength = t1.targetMessageLength,
+			targetMessageVisibility = t1.targetMessageVisibility
+		}
+	end)
+end
+
 return {
-    ScreenRendered = v2.new({
-        name = "conversationScreenRendered", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Rendered"), 
-            v6.eventIngestWithFormatFunction(function(v17) --[[ Line: 53 ]]
-                return {
-                    loadedMessageCount = v17.loadedMessageCount
-                };
-            end)
-        }
-    }), 
-    ScreenExit = v2.new({
-        name = "conversationScreenExit", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Exit", function(v18) --[[ Line: 66 ]]
-                return {
-                    conversationExitType = v18.conversationExitType
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Exit"), 
-            v6.eventIngestWithFormatFunction(function(v19) --[[ Line: 75 ]]
-                return {
-                    conversationExitType = v19.conversationExitType
-                };
-            end)
-        }
-    }), 
-    ConversationInfoBtnClicked = v2.new({
-        name = "conversationInfoBtnClicked", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Button.Info"), 
-            l_EVENT_INGEST_NO_EMITTED_INFO_0
-        }
-    }), 
-    ConversationMessageSent = v2.new({
-        name = "conversationMessageSent", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Message.Sent", function(v20) --[[ Line: 98 ]]
-                return {
-                    messageSentResult = v20.messageSentResult
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.Sent"), 
-            v6.eventIngestWithFormatFunction(function(v21) --[[ Line: 114 ]]
-                return {
-                    messageSentResult = v21.messageSentResult, 
-                    messageId = v21.messageId, 
-                    recipientIds = v21.recipientIds, 
-                    targetMessageId = v21.targetMessageId, 
-                    targetMessageSenderId = v21.targetMessageSenderId, 
-                    targetMessageSentAt = v21.targetMessageSentAt, 
-                    targetMessageLength = v21.targetMessageLength
-                };
-            end)
-        }
-    }), 
-    ConversationMoreMenuBtnClicked = v2.new({
-        name = "conversationMoreMenuBtnClicked", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Button.MoreMenu", function(v22) --[[ Line: 143 ]]
-                return {
-                    action = v22.action
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Button.MoreMenu"), 
-            v6.eventIngestWithFormatFunction(function(v23) --[[ Line: 153 ]]
-                return {
-                    action = v23.action
-                };
-            end)
-        }
-    }), 
-    ConversationSendBtnClicked = v2.new({
-        name = "conversationSendBtnClicked", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Button.Send", function(v24) --[[ Line: 167 ]]
-                return {
-                    sendBtnClickResult = v24.sendBtnClickResult
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Button.Send"), 
-            v6.eventIngestWithFormatFunction(function(v25) --[[ Line: 177 ]]
-                return {
-                    sendBtnClickResult = v25.sendBtnClickResult
-                };
-            end)
-        }
-    }), 
-    ConversationMessagePressed = if v7() then v2.new({
-        name = "chatMessagePressed", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            9
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.Pressed"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageLongPressed = if v7() then v2.new({
-        name = "chatMessageLongPressed", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            9
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.LongPressed"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageSwiped = if v7() and v10 then v2.new({
-        name = "chatMessageSwiped", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            11, 
-            25
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.Swiped"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageReplyIconImpression = if v7() then v2.new({
-        name = "chatMessageReplyIconImpression", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            9
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.ReplyIcon.Impression"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageReplyIconClicked = if v7() then v2.new({
-        name = "chatMessageReplyIconClicked", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            9
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.ReplyIcon.Clicked"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageOpenMenuIconClicked = if v8 then v2.new({
-        name = "chatMessageOpenMenuIconClicked", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            9
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.OpenMenuIcon.Clicked"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationInputBarReplyComposeRendered = if v7() then v2.new({
-        name = "chatInputBarReplyComposeRendered", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            17
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.ReplyComposeBar.Rendered"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationInputBarReplyComposeCancelBtnActivated = if v7() then v2.new({
-        name = "chatInputBarReplyComposeCancelBtnActivated", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            9, 
-            17
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.ReplyComposeBar.Button.Cancel"), 
-            v16()
-        }
-    }) else nil, 
-    ConversationMessageFtuxTooltipImpression = if v7() then v2.new({
-        name = "chatMessageFtuxTooltipImpression", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Message.FtuxTooltip.Impression", function(v26) --[[ Line: 281 ]]
-                return {
-                    tooltipVariant = v26.tooltipVariant
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.FtuxTooltip.Impression"), 
-            v6.eventIngestWithFormatFunction(function(v27) --[[ Line: 292 ]]
-                return {
-                    tooltipVariant = v27.tooltipVariant
-                };
-            end)
-        }
-    }) else nil, 
-    ConversationMessageFtuxTooltipDismissed = if v7() then v2.new({
-        name = "chatMessageFtuxTooltipDismissed", 
-        description = "", 
-        lastUpdated = {
-            2026, 
-            1, 
-            27
-        }, 
-        backendsList = {
-            if l_FFlagAppChatTelemetryCounterWithEmittedInfo_0 then l_namedCounterConfigurationAndFormat_0("AppChat.ChatConversation.Message.FtuxTooltip.Dismissed", function(v28) --[[ Line: 311 ]]
-                return {
-                    tooltipVariant = v28.tooltipVariant
-                };
-            end) else l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.Message.FtuxTooltip.Dismissed"), 
-            v6.eventIngestWithFormatFunction(function(v29) --[[ Line: 322 ]]
-                return {
-                    tooltipVariant = v29.tooltipVariant
-                };
-            end)
-        }
-    }) else nil, 
-    GameCardThumbnailClicked = v2.new({
-        name = "gameCardThumbnailClicked", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            11, 
-            18
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.GameCard.Thumbnail.Clicked"), 
-            v6.eventIngestWithFormatFunction(function(v30) --[[ Line: 338 ]]
-                return {
-                    universeId = v30.universeId, 
-                    placeId = v30.placeId
-                };
-            end)
-        }
-    }), 
-    GameCardPlayButtonClicked = v2.new({
-        name = "gameCardPlayButtonClicked", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            11, 
-            18
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.GameCard.Button.Play"), 
-            v6.eventIngestWithFormatFunction(function(v31) --[[ Line: 355 ]]
-                return {
-                    universeId = v31.universeId, 
-                    placeId = v31.placeId
-                };
-            end)
-        }
-    }), 
-    GameCardMetadataClicked = v2.new({
-        name = "gameCardMetadataClicked", 
-        description = "", 
-        lastUpdated = {
-            2025, 
-            11, 
-            19
-        }, 
-        backendsList = {
-            l_namedCounterConfigurationNoEmittedInfo_0("AppChat.ChatConversation.GameCard.Metadata.Clicked"), 
-            v6.eventIngestWithFormatFunction(function(v32) --[[ Line: 372 ]]
-                return {
-                    universeId = v32.universeId, 
-                    placeId = v32.placeId
-                };
-            end)
-        }
-    })
-};
+	ScreenRendered = Telemetry.new({
+		name = "conversationScreenRendered",
+		description = "",
+		lastUpdated = {
+			2025,
+			7,
+			31
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Rendered"),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t2: {[any]: any}) -- line: 48
+				return {
+					loadedMessageCount = t2.loadedMessageCount
+				}
+			end)
+		}
+	}),
+	ScreenExit = Telemetry.new({
+		name = "conversationScreenExit",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Exit", function(t3: {[any]: any}) -- line: 60
+				return {
+					conversationExitType = t3.conversationExitType
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t4: {[any]: any}) -- line: 68
+				return {
+					conversationExitType = t4.conversationExitType
+				}
+			end)
+		}
+	}),
+	ConversationInfoBtnClicked = Telemetry.new({
+		name = "conversationInfoBtnClicked",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Button.Info"),
+			EVENT_INGEST_NO_EMITTED_INFO
+		}
+	}),
+	ConversationMessageSent = Telemetry.new({
+		name = "conversationMessageSent",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Message.Sent", function(t5: {[any]: any}) -- line: 90
+				return {
+					messageSentResult = t5.messageSentResult
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t6: {[any]: any}) -- line: 103
+				return {
+					messageSentResult = t6.messageSentResult,
+					messageId = t6.messageId,
+					recipientIds = t6.recipientIds,
+					targetMessageId = t6.targetMessageId,
+					targetMessageSenderId = t6.targetMessageSenderId,
+					targetMessageSentAt = t6.targetMessageSentAt,
+					targetMessageLength = t6.targetMessageLength
+				}
+			end)
+		}
+	}),
+	ConversationMoreMenuBtnClicked = Telemetry.new({
+		name = "conversationMoreMenuBtnClicked",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Button.MoreMenu", function(t7: {[any]: any}) -- line: 129
+				return {
+					action = t7.action
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t8: {[any]: any}) -- line: 137
+				return {
+					action = t8.action
+				}
+			end)
+		}
+	}),
+	ConversationSendBtnClicked = Telemetry.new({
+		name = "conversationSendBtnClicked",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Button.Send", function(t9: {[any]: any}) -- line: 150
+				return {
+					sendBtnClickResult = t9.sendBtnClickResult
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t10: {[any]: any}) -- line: 157
+				return {
+					sendBtnClickResult = t10.sendBtnClickResult
+				}
+			end)
+		}
+	}),
+	ConversationMessagePressed = Telemetry.new({
+		name = "chatMessagePressed",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			9
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.Pressed"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageLongPressed = Telemetry.new({
+		name = "chatMessageLongPressed",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			9
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.LongPressed"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageSwiped = if not FFlagAppChatUseSwipeForReplies then nil else Telemetry.new({
+		name = "chatMessageSwiped",
+		description = "",
+		lastUpdated = {
+			2025,
+			11,
+			25
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.Swiped"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageReplyIconImpression = Telemetry.new({
+		name = "chatMessageReplyIconImpression",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			9
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.ReplyIcon.Impression"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageReplyIconClicked = Telemetry.new({
+		name = "chatMessageReplyIconClicked",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			9
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.ReplyIcon.Clicked"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageOpenMenuIconClicked = if not FFlagAppChatEnableMessageContextMenu then nil else Telemetry.new({
+		name = "chatMessageOpenMenuIconClicked",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			9
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.Message.OpenMenuIcon.Clicked"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationInputBarReplyComposeRendered = Telemetry.new({
+		name = "chatInputBarReplyComposeRendered",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			17
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.ReplyComposeBar.Rendered"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationInputBarReplyComposeCancelBtnActivated = Telemetry.new({
+		name = "chatInputBarReplyComposeCancelBtnActivated",
+		description = "",
+		lastUpdated = {
+			2025,
+			9,
+			17
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.ReplyComposeBar.Button.Cancel"),
+			targetMessageFormatFunction()
+		}
+	}),
+	ConversationMessageFtuxTooltipImpression = Telemetry.new({
+		name = "chatMessageFtuxTooltipImpression",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Message.FtuxTooltip.Impression", function(t11: {[any]: any}) -- line: 247
+				return {
+					tooltipVariant = t11.tooltipVariant
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t12: {[any]: any}) -- line: 255
+				return {
+					tooltipVariant = t12.tooltipVariant
+				}
+			end)
+		}
+	}),
+	ConversationMessageFtuxTooltipDismissed = Telemetry.new({
+		name = "chatMessageFtuxTooltipDismissed",
+		description = "",
+		lastUpdated = {
+			2026,
+			1,
+			27
+		},
+		backendsList = {
+			namedCounterConfigurationAndFormat("AppChat.ChatConversation.Message.FtuxTooltip.Dismissed", function(t13: {[any]: any}) -- line: 271
+				return {
+					tooltipVariant = t13.tooltipVariant
+				}
+			end),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t14: {[any]: any}) -- line: 279
+				return {
+					tooltipVariant = t14.tooltipVariant
+				}
+			end)
+		}
+	}),
+	GameCardThumbnailClicked = Telemetry.new({
+		name = "gameCardThumbnailClicked",
+		description = "",
+		lastUpdated = {
+			2025,
+			11,
+			18
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.GameCard.Thumbnail.Clicked"),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t15: {[any]: any}) -- line: 294
+				return {
+					universeId = t15.universeId,
+					placeId = t15.placeId
+				}
+			end)
+		}
+	}),
+	GameCardPlayButtonClicked = Telemetry.new({
+		name = "gameCardPlayButtonClicked",
+		description = "",
+		lastUpdated = {
+			2025,
+			11,
+			18
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.GameCard.Button.Play"),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t16: {[any]: any}) -- line: 311
+				return {
+					universeId = t16.universeId,
+					placeId = t16.placeId
+				}
+			end)
+		}
+	}),
+	GameCardMetadataClicked = Telemetry.new({
+		name = "gameCardMetadataClicked",
+		description = "",
+		lastUpdated = {
+			2025,
+			11,
+			19
+		},
+		backendsList = {
+			namedCounterConfigurationNoEmittedInfo("AppChat.ChatConversation.GameCard.Metadata.Clicked"),
+			DefaultTelemetryEvents.eventIngestWithFormatFunction(function(t17: {[any]: any}) -- line: 328
+				return {
+					universeId = t17.universeId,
+					placeId = t17.placeId
+				}
+			end)
+		}
+	})
+}

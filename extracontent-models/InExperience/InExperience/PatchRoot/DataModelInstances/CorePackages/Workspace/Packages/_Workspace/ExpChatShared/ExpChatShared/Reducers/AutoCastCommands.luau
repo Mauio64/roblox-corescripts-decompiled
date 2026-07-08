@@ -1,1 +1,1 @@
-return require(script.byAlias);
+return require(script.byAlias)

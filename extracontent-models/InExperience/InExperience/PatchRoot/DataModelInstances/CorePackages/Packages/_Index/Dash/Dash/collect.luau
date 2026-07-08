@@ -1,12 +1,19 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-return function(v2, v3) --[[ Line: 16 ]] --[[ Name: collect ]]
-    local v4 = {};
-    for v5, v6 in v2 do
-        local v7, v8 = v3(v5, v6);
-        if v7 ~= nil then
-            v4[v7] = v8;
-        end;
-    end;
-    return v4;
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local function collect(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 16
+	local t2 = {}
+
+	for v6, v7 in t1 do
+		local v8, v9 = p1(v6, v7)
+
+		if v8 ~= nil then
+			t2[v8] = v9
+		end
+	end
+
+	return t2
+end
+
+return collect

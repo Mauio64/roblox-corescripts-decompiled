@@ -4,9 +4,9 @@ local TelemetryService = game:GetService("TelemetryService")
 local Dash = require(Parent.Dash)
 local FFlagFixAnalyticsForDynamicReportV2 = require(Parent.SharedFlags).FFlagFixAnalyticsForDynamicReportV2
 local t1 = {
-	OpenDialog = "OpenDialog",
-	EarlyClose = "EarlyClose",
-	Close = "Close",
+	ReportStarted = "OpenDialog",
+	ReportAbandoned = "EarlyClose",
+	ReportCompleted = "Close",
 	Submit = "Submit",
 	SubmitSuccess = "SubmitSuccess",
 	SubmitFail = "SubmitFail",
@@ -24,77 +24,87 @@ local t1 = {
 	CommentInput = "CommentInput",
 	TextChannelSwitch = "TextChannelSwitch",
 	EmptyState = "EmptyState",
-	SceneCaptureResult = "SceneCaptureResult"
+	SceneCaptureResult = "SceneCaptureResult",
+	ConfigLoaded = "ConfigLoaded"
 }
 
-local function flattenForTelemetry(t2: {[any]: any}) -- line: 91
-	local t3 = {}
+local function isArray(t2: {[any]: any}) -- line: 84
+	local n1 = 0
 
-	for v14, v15 in t2 do
-		if type(v15) == "table" then
-			local n1 = 0
+	for _ in t2 do
+		n1 += 1
+	end
 
-			for _ in v15 do
-				n1 += 1
+	return n1 == #t2 and n1 > 0
+end
+local function flattenForTelemetry(t3: {[any]: any}) -- line: 97
+	local t4 = {}
+
+	for v15, v16 in t3 do
+		if type(v16) == "table" then
+			local n2 = 0
+
+			for _ in v16 do
+				n2 += 1
 			end
 
-			if n1 == #v15 and n1 > 0 then
-				local t4 = {}
+			if n2 == #v16 and n2 > 0 then
+				local t5 = {}
 
-				for _, v20 in v15 do
-					table.insert(t4, (tostring(v20)))
+				for _, v21 in v16 do
+					table.insert(t5, (tostring(v21)))
 				end
 
-				t3[v14] = "[" .. table.concat(t4, ", ") .. "]"
+				t4[v15] = "[" .. table.concat(t5, ", ") .. "]"
 			else
-				for v21, v22 in v15 do
-					t3[tostring(v21)] = tostring(v22)
+				for v22, v23 in v16 do
+					t4[tostring(v22)] = tostring(v23)
 				end
 			end
 		else
-			t3[v14] = tostring(v15)
+			t4[v15] = tostring(v16)
 		end
 	end
 
-	return t3
+	return t4
 end
 
-local t5 = {
+local t6 = {
 	eventName = "DynamicAbuseReportEventV2",
 	description = "Event to track dynamic abuse report v2",
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/8782",
 	lastUpdated = {
 		2026,
-		4,
-		16
+		5,
+		20
 	},
 	backends = {
 		"EventIngest",
 		"Points"
 	},
-	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportV2ThrottleHundredthsPercent", 0),
-	links = "https://github.rbx.com/Roblox/proto-schemas/pull/8782"
+	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportV2ThrottleHundredthsPercent", 0)
 }
 
 return {
-	sendAnalyticsEvent = function(t6: {[any]: any}, t7: {[any]: any}) --[[ sendAnalyticsEvent ]] -- line: 127
-		-- upvalues: FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), LocalPlayer (copy), TelemetryService (copy), t5 (copy), flattenForTelemetry (copy)
+	sendAnalyticsEvent = function(t7: {[any]: any}, t8: {[any]: any}) -- line: 133
+		-- upvalues: FFlagFixAnalyticsForDynamicReportV2 (copy), Dash (copy), LocalPlayer (copy), TelemetryService (copy), t6 (copy), flattenForTelemetry (copy)
 		if FFlagFixAnalyticsForDynamicReportV2 then
-			local v25 = Dash.join(t6, t7, {
+			local v26 = Dash.join(t7, t8, {
 				user_id = LocalPlayer and LocalPlayer.UserId or nil
 			})
 
-			TelemetryService:LogEvent(t5, {
-				customFields = flattenForTelemetry(v25),
-				eventContext = t6.abuse_vector
+			TelemetryService:LogEvent(t6, {
+				customFields = flattenForTelemetry(v26),
+				eventContext = t7.abuse_vector
 			})
 
 			return
 		end
 
-		TelemetryService:LogEvent(Dash.join(t5, {
-			eventContext = t6.abuse_vector
+		TelemetryService:LogEvent(Dash.join(t6, {
+			eventContext = t7.abuse_vector
 		}), {
-			customFields = Dash.join(t6, t7, {
+			customFields = Dash.join(t7, t8, {
 				user_id = LocalPlayer and LocalPlayer.UserId or nil
 			})
 		})

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXRemoveMemoizeFromAccessoryAdjustmentUtils", false);
+return game:DefineFastFlag("AXRemoveMemoizeFromAccessoryAdjustmentUtils", false)

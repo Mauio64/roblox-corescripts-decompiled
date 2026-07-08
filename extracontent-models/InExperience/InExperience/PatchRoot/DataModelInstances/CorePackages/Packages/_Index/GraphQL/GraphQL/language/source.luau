@@ -1,34 +1,41 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_inspect_0 = require(l_Parent_0.jsutils.inspect).inspect;
-local l_devAssert_0 = require(l_Parent_0.jsutils.devAssert).devAssert;
-local v3 = require(l_Parent_0.jsutils.instanceOf);
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5, v6, v7) --[[ Line: 39 ]] --[[ Name: new ]]
-    -- upvalues: l_devAssert_0 (copy), l_inspect_0 (copy), v4 (copy)
-    local v8 = v6 or "GraphQL request";
-    local v9 = v7 or {
-        line = 1, 
-        column = 1
-    };
-    l_devAssert_0(typeof(v5) == "string", "Body must be a string. Received: " .. l_inspect_0(v5) .. ".");
-    local v10 = {
-        body = v5, 
-        name = v8, 
-        locationOffset = v9
-    };
-    l_devAssert_0(v10.locationOffset.line > 0, "line in locationOffset is 1-indexed and must be positive.");
-    l_devAssert_0(v10.locationOffset.column > 0, "column in locationOffset is 1-indexed and must be positive.");
-    return (setmetatable(v10, v4));
-end;
-v4.__tostring = function(_) --[[ Line: 61 ]] --[[ Name: __tostring ]]
-    return "{table Source}";
-end;
-isSource = function(v12) --[[ Line: 71 ]] --[[ Name: isSource ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    return v3(v12, v4);
-end;
+local ParentParent = script.Parent.Parent
+local inspect = require(ParentParent.jsutils.inspect).inspect
+local devAssert = require(ParentParent.jsutils.devAssert).devAssert
+local instanceOf = require(ParentParent.jsutils.instanceOf)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(s1: string, s2: string?, t2: {[any]: any}?) -- line: 39
+	-- upvalues: devAssert (copy), inspect (copy), t1 (copy)
+	local v9 = s2 or "GraphQL request"
+	local v10 = t2 or {
+		line = 1,
+		column = 1
+	}
+
+	devAssert(typeof(s1) == "string", "Body must be a string. Received: " .. inspect(s1) .. ".")
+
+	local t3 = {
+		body = s1,
+		name = v9,
+		locationOffset = v10
+	}
+
+	devAssert(t3.locationOffset.line > 0, "line in locationOffset is 1-indexed and must be positive.")
+	devAssert(t3.locationOffset.column > 0, "column in locationOffset is 1-indexed and must be positive.")
+
+	return (setmetatable(t3, t1))
+end
+function t1.__tostring(_) -- line: 61
+	return "{table Source}"
+end
+function isSource(p2) -- line: 71
+	-- upvalues: instanceOf (copy), t1 (copy)
+	return instanceOf(p2, t1)
+end
+
 return {
-    Source = v4, 
-    isSource = isSource
-};
+	Source = t1,
+	isSource = isSource
+}

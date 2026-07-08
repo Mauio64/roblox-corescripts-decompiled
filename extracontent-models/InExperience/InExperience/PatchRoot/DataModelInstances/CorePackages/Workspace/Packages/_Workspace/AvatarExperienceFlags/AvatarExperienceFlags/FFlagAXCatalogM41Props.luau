@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogM41Props", false);
+return game:DefineFastFlag("AXCatalogM41Props3", false)

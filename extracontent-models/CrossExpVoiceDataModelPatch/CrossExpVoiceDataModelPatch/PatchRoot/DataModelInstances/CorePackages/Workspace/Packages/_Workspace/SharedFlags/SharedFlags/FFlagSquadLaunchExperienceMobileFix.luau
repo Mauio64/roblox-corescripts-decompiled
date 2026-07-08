@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SquadLaunchExperienceMobileFix", false);
+return game:DefineFastFlag("SquadLaunchExperienceMobileFix", false)

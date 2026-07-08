@@ -1,18 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialContextToasts").Parent;
-local v1 = require(l_Parent_0.t);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = v1.strictInterface({
-    toastType = v1.string, 
-    friendId = v1.string, 
-    universeId = v1.string, 
-    placeId = v1.string, 
-    actionType = v1.string
-});
-return function(v4, v5) --[[ Line: 15 ]]
-    -- upvalues: v3 (copy), l_mutedError_0 (copy)
-    local v6, v7 = v3(v5);
-    if not v6 then
-        l_mutedError_0(v7);
-    end;
-    v4:sendEventDeferred("SocialContextToast", "socialContextToastEvent", v5);
-end;
+local Parent = script:FindFirstAncestor("SocialContextToasts").Parent
+local t = require(Parent.t)
+local mutedError = require(Parent.Loggers).mutedError
+local v4 = t.strictInterface({
+	toastType = t.string,
+	friendId = t.string,
+	universeId = t.string,
+	placeId = t.string,
+	actionType = t.string
+})
+
+return function(p1, p2) -- line: 15
+	-- upvalues: v4 (copy), mutedError (copy)
+	local v7, v8 = v4(p2)
+
+	if not v7 then
+		mutedError(v8)
+	end
+
+	p1:sendEventDeferred("SocialContextToast", "socialContextToastEvent", p2)
+end

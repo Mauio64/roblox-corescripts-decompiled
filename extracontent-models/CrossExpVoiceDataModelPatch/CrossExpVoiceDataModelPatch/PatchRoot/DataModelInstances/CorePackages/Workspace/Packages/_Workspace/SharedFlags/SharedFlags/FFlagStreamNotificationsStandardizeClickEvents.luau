@@ -1,1 +1,1 @@
-return game:DefineFastFlag("StreamNotificationsStandardizeClickEvents", false);
+return game:DefineFastFlag("StreamNotificationsStandardizeClickEvents", false)

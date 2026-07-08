@@ -1,210 +1,221 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_ImageSetLabel_0 = v1.UIBlox.Core.ImageSet.ImageSetLabel;
-local v4 = game:DefineFastFlag("EnableCallbackInputBoxSelectionFixes", false);
-local v5 = l_Roact_0.PureComponent:extend("CallbackInputBox");
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Roact = dependencies.Roact
+local ImageSetLabel = dependencies.UIBlox.Core.ImageSet.ImageSetLabel
+local v5 = Roact.PureComponent:extend("CallbackInputBox")
+
 v5.defaultProps = {
-    initialInputText = "", 
-    inputTextFont = Enum.Font.BuilderSans, 
-    inputTextColor3 = Color3.new(1, 0, 1), 
-    inputTextSize = 14, 
-    inputTextYAlignment = Enum.TextYAlignment.Center, 
-    inputTextXAlignment = Enum.TextXAlignment.Center, 
-    inputTextTransparency = 0, 
-    placeholderTextTransparency = 0.6, 
-    placeholderTextColor3 = Color3.new(1, 0, 0), 
-    placeholderText = "Test placeholder text", 
-    clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-close-white.png", 
-    clearIconColor3 = Color3.new(1, 1, 0), 
-    clearIconTransparency = 0, 
-    clearButtonSize = 24, 
-    clipsDescendants = true, 
-    manualFocusRelease = false, 
-    captureFocusOnMount = false, 
-    multiLine = false, 
-    textWrapped = false, 
-    showCancelIconOnLoad = false, 
-    textInputType = Enum.TextInputType.Default, 
-    returnKeyType = Enum.ReturnKeyType.Default, 
-    inputBoxSelectionImageObject = nil, 
-    clearButtonSelectionImageObject = nil, 
-    clearButtonDisabled = nil, 
-    textChangedCallback = nil, 
-    focusChangedCallback = function() --[[ Line: 42 ]] --[[ Name: focusChangedCallback ]]
+	initialInputText = "",
+	inputTextFont = Enum.Font.BuilderSans,
+	inputTextColor3 = Color3.new(1, 0, 1),
+	inputTextSize = 14,
+	inputTextYAlignment = Enum.TextYAlignment.Center,
+	inputTextXAlignment = Enum.TextXAlignment.Center,
+	inputTextTransparency = 0,
+	placeholderTextTransparency = 0.6,
+	placeholderTextColor3 = Color3.new(1, 0, 0),
+	placeholderText = "Test placeholder text",
+	clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-close-white.png",
+	clearIconColor3 = Color3.new(1, 1, 0),
+	clearIconTransparency = 0,
+	clearButtonSize = 24,
+	clipsDescendants = true,
+	manualFocusRelease = false,
+	captureFocusOnMount = false,
+	multiLine = false,
+	textWrapped = false,
+	showCancelIconOnLoad = false,
+	textInputType = Enum.TextInputType.Default,
+	returnKeyType = Enum.ReturnKeyType.Default,
+	inputBoxSelectionImageObject = nil,
+	clearButtonSelectionImageObject = nil,
+	clearButtonDisabled = nil,
+	textChangedCallback = nil,
+	focusChangedCallback = function() -- line: 40
+	end,
+	onSelectCallback = function() -- line: 41
+	end,
+	returnPressedFromOnScreenKeyboardCallback = function() -- line: 42
+	end,
+	inputBoxRef = nil,
+	[Roact.Change.AbsoluteSize] = function() -- line: 46
+	end
+}
 
-    end, 
-    onSelectCallback = function() --[[ Line: 43 ]] --[[ Name: onSelectCallback ]]
+function v5.init(p1) -- line: 49
+	-- upvalues: Roact (copy)
+	p1.clearRef = Roact.createRef()
+	p1.inputBoxRef = p1.props.inputBoxRef or Roact.createRef()
+	p1.inputText = p1.props.initialInputText
+	p1.textChangedEventUnlocked = false
 
-    end, 
-    returnPressedFromOnScreenKeyboardCallback = function() --[[ Line: 44 ]] --[[ Name: returnPressedFromOnScreenKeyboardCallback ]]
+	function p1.focusTextbox() -- line: 60
+		-- upvalues: p1 (copy)
+		p1.props.onSelectCallback()
 
-    end, 
-    inputBoxRef = nil, 
-    [l_Roact_0.Change.AbsoluteSize] = function() --[[ Line: 48 ]]
+		if not p1.inputBoxRef.current:IsFocused() then
+			p1.inputBoxRef.current:captureFocus()
+		end
+	end
+end
+function v5.render(p2) -- line: 68
+	-- upvalues: Roact (copy), ImageSetLabel (copy)
+	local placeholderTextTransparency = p2.props.placeholderTextTransparency
+	local inputTextTransparency = p2.props.inputTextTransparency
+	local v10 = if not not p2.inputText and p2.inputText ~= "" then inputTextTransparency else placeholderTextTransparency
 
-    end
-};
-v5.init = function(v6) --[[ Line: 51 ]] --[[ Name: init ]]
-    -- upvalues: l_Roact_0 (copy)
-    v6.clearRef = l_Roact_0.createRef();
-    v6.inputBoxRef = v6.props.inputBoxRef or l_Roact_0.createRef();
-    v6.inputText = v6.props.initialInputText;
-    v6.textChangedEventUnlocked = false;
-    v6.focusTextbox = function() --[[ Line: 62 ]]
-        -- upvalues: v6 (copy)
-        v6.props.onSelectCallback();
-        if not v6.inputBoxRef.current:IsFocused() then
-            v6.inputBoxRef.current:captureFocus();
-        end;
-    end;
-end;
-v5.render = function(v7) --[[ Line: 70 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), v4 (copy), l_ImageSetLabel_0 (copy)
-    local l_placeholderTextTransparency_0 = v7.props.placeholderTextTransparency;
-    local l_inputTextTransparency_0 = v7.props.inputTextTransparency;
-    local v10 = nil;
-    v10 = if not v7.inputText or v7.inputText == "" then l_placeholderTextTransparency_0 else l_inputTextTransparency_0;
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, {
-        layout = l_Roact_0.createElement("UIListLayout", {
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        inputBox = l_Roact_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            LayoutOrder = 1
-        }, {
-            layout = l_Roact_0.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            inputTextBox = l_Roact_0.createElement("TextBox", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, -v7.props.clearButtonSize, 1, 0), 
-                Position = UDim2.new(0, 0, 0, 0), 
-                TextColor3 = v7.props.inputTextColor3, 
-                TextSize = v7.props.inputTextSize, 
-                TextTransparency = v10, 
-                Font = v7.props.inputTextFont, 
-                PlaceholderText = v7.props.placeholderText, 
-                PlaceholderColor3 = v7.props.placeholderTextColor3, 
-                TextXAlignment = v7.props.inputTextXAlignment, 
-                TextYAlignment = v7.props.inputTextYAlignment, 
-                OverlayNativeInput = true, 
-                ClearTextOnFocus = false, 
-                ClipsDescendants = v7.props.clipsDescendants, 
-                LayoutOrder = 1, 
-                ManualFocusRelease = v7.props.manualFocusRelease, 
-                MultiLine = v7.props.multiLine, 
-                TextWrapped = v7.props.textWrapped, 
-                TextInputType = v7.props.textInputType, 
-                ReturnKeyType = v7.props.returnKeyType, 
-                SelectionImageObject = if v4 then v7.props.inputBoxSelectionImageObject else nil, 
-                [l_Roact_0.Event.ReturnPressedFromOnScreenKeyboard] = v7.props.returnPressedFromOnScreenKeyboardCallback, 
-                [l_Roact_0.Event.TouchTap] = v7.focusTextbox, 
-                [l_Roact_0.Event.Focused] = function(v11) --[[ Line: 138 ]]
-                    -- upvalues: v7 (copy), l_inputTextTransparency_0 (copy), l_placeholderTextTransparency_0 (copy)
-                    if v7.inputBoxRef.current and v7.inputBoxRef.current.Text ~= "" then
-                        if v7.clearRef.current and not v7.props.clearButtonDisabled then
-                            v7.clearRef.current.Visible = true;
-                        end;
-                        v11.TextColor3 = v7.props.inputTextColor3;
-                        v11.TextTransparency = l_inputTextTransparency_0;
-                    else
-                        v11.TextColor3 = v7.props.placeholderTextColor3;
-                        v11.TextTransparency = l_placeholderTextTransparency_0;
-                    end;
-                    v7.props.focusChangedCallback(true);
-                end, 
-                [l_Roact_0.Event.FocusLost] = function(v12, v13) --[[ Line: 154 ]]
-                    -- upvalues: v7 (copy), l_placeholderTextTransparency_0 (copy)
-                    if v7.inputBoxRef.current and v7.inputBoxRef.current.Text == "" then
-                        v12.TextColor3 = v7.props.placeholderTextColor3;
-                        v12.TextTransparency = l_placeholderTextTransparency_0;
-                    end;
-                    v7.props.focusChangedCallback(false, v13);
-                end, 
-                [l_Roact_0.Change.Text] = function(v14) --[[ Line: 163 ]]
-                    -- upvalues: v7 (copy), l_inputTextTransparency_0 (copy), l_placeholderTextTransparency_0 (copy)
-                    if v14.Text ~= "" or v7.textChangedEventUnlocked then
-                        if v14.Text ~= "" then
-                            if v7.clearRef.current and not v7.props.clearButtonDisabled then
-                                v7.clearRef.current.Visible = true;
-                            end;
-                            v14.TextColor3 = v7.props.inputTextColor3;
-                            v14.TextTransparency = l_inputTextTransparency_0;
-                        else
-                            if v7.clearRef.current then
-                                v7.clearRef.current.Visible = false;
-                            end;
-                            v14.TextColor3 = v7.props.placeholderTextColor3;
-                            v14.TextTransparency = l_placeholderTextTransparency_0;
-                        end;
-                        v7.inputText = v14.Text;
-                        if v7.props.textChangedCallback then
-                            v7.props.textChangedCallback(v14.Text);
-                        end;
-                    end;
-                    v7.textChangedEventUnlocked = true;
-                end, 
-                [l_Roact_0.Ref] = v7.inputBoxRef, 
-                [l_Roact_0.Change.AbsoluteSize] = v7.props[l_Roact_0.Change.AbsoluteSize]
-            }), 
-            Clear = l_Roact_0.createElement("ImageButton", {
-                BackgroundTransparency = 1, 
-                Size = if v4 then UDim2.new(0, v7.props.clearButtonSize, 0, v7.props.clearButtonSize) else UDim2.new(0, v7.props.clearButtonSize, 1, 0), 
-                AutoButtonColor = false, 
-                LayoutOrder = 2, 
-                Visible = not v7.props.clearButtonDisabled, 
-                SelectionImageObject = if v4 then v7.props.clearButtonSelectionImageObject else nil, 
-                Selectable = if v4 then v7.clearRef.current and v7.clearRef.current.Visible == true else nil, 
-                [l_Roact_0.Event.Activated] = function() --[[ Line: 210 ]]
-                    -- upvalues: v7 (copy)
-                    if v7.inputBoxRef.current then
-                        v7.inputBoxRef.current.Text = "";
-                    end;
-                    v7.inputText = "";
-                    if v7.clearRef.current then
-                        v7.clearRef.current.Visible = false;
-                    end;
-                end
-            }, {
-                layout = l_Roact_0.createElement("UIListLayout", {
-                    VerticalAlignment = "Center", 
-                    HorizontalAlignment = "Center"
-                }), 
-                Icon = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(0, v7.props.clearButtonSize, 0, v7.props.clearButtonSize), 
-                    Image = v7.props.clearIcon, 
-                    ImageColor3 = v7.props.clearIconColor3, 
-                    ImageTransparency = v7.props.clearIconTransparency, 
-                    Visible = v7.props.showCancelIconOnLoad, 
-                    [l_Roact_0.Ref] = v7.clearRef
-                })
-            })
-        })
-    });
-end;
-v5.didMount = function(v15) --[[ Line: 242 ]] --[[ Name: didMount ]]
-    if v15.inputBoxRef.current then
-        v15.inputBoxRef.current.Text = v15.inputText;
-        if v15.props.captureFocusOnMount then
-            spawn(function() --[[ Line: 247 ]]
-                -- upvalues: v15 (copy)
-                if v15.inputBoxRef and v15.inputBoxRef.current then
-                    v15.inputBoxRef.current:captureFocus();
-                end;
-            end);
-        end;
-    end;
-end;
-return v5;
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		layout = Roact.createElement("UIListLayout", {
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		inputBox = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			inputTextBox = Roact.createElement("TextBox", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -p2.props.clearButtonSize, 1, 0),
+				Position = UDim2.new(0, 0, 0, 0),
+				TextColor3 = p2.props.inputTextColor3,
+				TextSize = p2.props.inputTextSize,
+				TextTransparency = v10,
+				Font = p2.props.inputTextFont,
+				PlaceholderText = p2.props.placeholderText,
+				PlaceholderColor3 = p2.props.placeholderTextColor3,
+				TextXAlignment = p2.props.inputTextXAlignment,
+				TextYAlignment = p2.props.inputTextYAlignment,
+				OverlayNativeInput = true,
+				ClearTextOnFocus = false,
+				ClipsDescendants = p2.props.clipsDescendants,
+				LayoutOrder = 1,
+				ManualFocusRelease = p2.props.manualFocusRelease,
+				MultiLine = p2.props.multiLine,
+				TextWrapped = p2.props.textWrapped,
+				TextInputType = p2.props.textInputType,
+				ReturnKeyType = p2.props.returnKeyType,
+				SelectionImageObject = p2.props.inputBoxSelectionImageObject,
+				[Roact.Event.ReturnPressedFromOnScreenKeyboard] = p2.props.returnPressedFromOnScreenKeyboardCallback,
+				[Roact.Event.TouchTap] = p2.focusTextbox,
+				[Roact.Event.Focused] = function(p3) -- line: 134
+					-- upvalues: p2 (copy), inputTextTransparency (copy), placeholderTextTransparency (copy)
+					if p2.inputBoxRef.current and p2.inputBoxRef.current.Text ~= "" then
+						if p2.clearRef.current and not p2.props.clearButtonDisabled then
+							p2.clearRef.current.Visible = true
+						end
+
+						p3.TextColor3 = p2.props.inputTextColor3
+						p3.TextTransparency = inputTextTransparency
+					else
+						p3.TextColor3 = p2.props.placeholderTextColor3
+						p3.TextTransparency = placeholderTextTransparency
+					end
+
+					p2.props.focusChangedCallback(true)
+				end,
+				[Roact.Event.FocusLost] = function(p4, p5) -- line: 150
+					-- upvalues: p2 (copy), placeholderTextTransparency (copy)
+					if p2.inputBoxRef.current and p2.inputBoxRef.current.Text == "" then
+						p4.TextColor3 = p2.props.placeholderTextColor3
+						p4.TextTransparency = placeholderTextTransparency
+					end
+
+					p2.props.focusChangedCallback(false, p5)
+				end,
+				[Roact.Change.Text] = function(p6) -- line: 159
+					-- upvalues: p2 (copy), inputTextTransparency (copy), placeholderTextTransparency (copy)
+					if p6.Text ~= "" or p2.textChangedEventUnlocked then
+						if p6.Text ~= "" then
+							if p2.clearRef.current and not p2.props.clearButtonDisabled then
+								p2.clearRef.current.Visible = true
+							end
+
+							p6.TextColor3 = p2.props.inputTextColor3
+							p6.TextTransparency = inputTextTransparency
+						else
+							if p2.clearRef.current then
+								p2.clearRef.current.Visible = false
+							end
+
+							p6.TextColor3 = p2.props.placeholderTextColor3
+							p6.TextTransparency = placeholderTextTransparency
+						end
+
+						p2.inputText = p6.Text
+
+						if p2.props.textChangedCallback then
+							p2.props.textChangedCallback(p6.Text)
+						end
+					end
+
+					p2.textChangedEventUnlocked = true
+				end,
+				[Roact.Ref] = p2.inputBoxRef,
+				[Roact.Change.AbsoluteSize] = p2.props[Roact.Change.AbsoluteSize]
+			}),
+			Clear = Roact.createElement("ImageButton", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, p2.props.clearButtonSize, 0, p2.props.clearButtonSize),
+				AutoButtonColor = false,
+				LayoutOrder = 2,
+				Visible = not p2.props.clearButtonDisabled,
+				SelectionImageObject = p2.props.clearButtonSelectionImageObject,
+				Selectable = p2.clearRef.current and p2.clearRef.current.Visible == true,
+				[Roact.Event.Activated] = function() -- line: 200
+					-- upvalues: p2 (copy)
+					if p2.inputBoxRef.current then
+						p2.inputBoxRef.current.Text = ""
+					end
+
+					p2.inputText = ""
+
+					if p2.clearRef.current then
+						p2.clearRef.current.Visible = false
+					end
+				end
+			}, {
+				layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = "Center",
+					HorizontalAlignment = "Center"
+				}),
+				Icon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, p2.props.clearButtonSize, 0, p2.props.clearButtonSize),
+					Image = p2.props.clearIcon,
+					ImageColor3 = p2.props.clearIconColor3,
+					ImageTransparency = p2.props.clearIconTransparency,
+					Visible = p2.props.showCancelIconOnLoad,
+					[Roact.Ref] = p2.clearRef
+				})
+			})
+		})
+	})
+end
+function v5.didMount(p7) -- line: 232
+	if p7.inputBoxRef.current then
+		p7.inputBoxRef.current.Text = p7.inputText
+
+		if p7.props.captureFocusOnMount then
+			spawn(function() -- line: 237
+				-- upvalues: p7 (copy)
+				if p7.inputBoxRef and p7.inputBoxRef.current then
+					p7.inputBoxRef.current:captureFocus()
+				end
+			end)
+		end
+	end
+end
+
+return v5

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSkipEmotesInAvatarData", false);
+return game:DefineFastFlag("AXSkipEmotesInAvatarData", false)

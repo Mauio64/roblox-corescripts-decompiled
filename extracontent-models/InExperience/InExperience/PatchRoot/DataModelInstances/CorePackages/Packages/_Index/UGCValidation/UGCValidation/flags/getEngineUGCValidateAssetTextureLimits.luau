@@ -1,3 +1,3 @@
-return function() --[[ Line: 1 ]]
-    return game:GetEngineFeature("EngineUGCValidateAssetTextureLimits");
-end;
+return function() -- line: 1
+	return game:GetEngineFeature("EngineUGCValidateAssetTextureLimits")
+end

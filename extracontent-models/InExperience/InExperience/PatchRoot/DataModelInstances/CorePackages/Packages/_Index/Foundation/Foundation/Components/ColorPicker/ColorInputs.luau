@@ -1,371 +1,340 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Components.Dropdown);
-local v6 = require(l_script_FirstAncestor_0.Components.NumberInput);
-local v7 = require(l_script_FirstAncestor_0.Components.TextInput);
-local v8 = require(l_script_FirstAncestor_0.Components.View);
-local v9 = require(l_script_FirstAncestor_0.Enums.ColorInputMode);
-local v10 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v11 = require(l_script_FirstAncestor_0.Enums.NumberInputControlsVariant);
-local v12 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v13 = require(l_script_FirstAncestor_0.Components.ColorPicker.colorInputUtils);
-local v14 = require(l_script_FirstAncestor_0.Components.ColorPicker.colorUtils);
-local v15 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v16 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v18 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local function v26(v19, v20, v21) --[[ Line: 39 ]] --[[ Name: createNumberInputElement ]]
-    -- upvalues: v12 (copy), v3 (copy), v6 (copy), v2 (copy)
-    local v22 = v19.value:getValue();
-    if v12.FoundationColorPickerPartialHSV and v22 == nil then
-        return v3.createElement(v6, v2.join({
-            value = -1, 
-            onChanged = function(v23) --[[ Line: 52 ]] --[[ Name: onChanged ]]
-                -- upvalues: v19 (copy)
-                if v23 ~= -1 then
-                    v19.handler(v23, v19.component);
-                end;
-            end, 
-            controlsVariant = v20, 
-            minimum = v19.minimum or 0, 
-            maximum = v19.maximum or 255, 
-            step = v19.step or 1, 
-            precision = v19.precision or 0, 
-            formatAsString = function(_) --[[ Line: 62 ]] --[[ Name: formatAsString ]]
-                return "";
-            end
-        }, v21));
-    else
-        return v3.createElement(v6, v2.join({
-            value = v22, 
-            onChanged = function(v25) --[[ Line: 73 ]] --[[ Name: onChanged ]]
-                -- upvalues: v19 (copy)
-                v19.handler(v25, v19.component);
-            end, 
-            controlsVariant = v20, 
-            minimum = v19.minimum or 0, 
-            maximum = v19.maximum or 255, 
-            step = v19.step or 1, 
-            precision = v19.precision or 0
-        }, v21));
-    end;
-end;
-local function v36(v27, v28, v29, v30, v31) --[[ Line: 85 ]] --[[ Name: renderInput ]]
-    -- upvalues: v10 (copy), v12 (copy), v9 (copy), v3 (copy), v8 (copy), v7 (copy), v2 (copy), v26 (copy), v11 (copy)
-    local v32 = v30 == v28.key:lower() and "" or ("-%*"):format((v28.key:lower()));
-    local v33 = {
-        size = v10.XSmall, 
-        label = "", 
-        width = if v12.FoundationColorPickerDesignUpdate then UDim.new(1, 0) else v28.width or UDim.new(0, v27.Size.Size_1500), 
-        LayoutOrder = v29, 
-        testId = ("%*-%*%*"):format(v31, v30, v32)
-    };
-    if v28.key == v9.Hex then
-        if v12.FoundationColorPickerDesignUpdate then
-            return v3.createElement(v8, {
-                tag = "grow-1 size-0-full", 
-                LayoutOrder = v29
-            }, {
-                Input = v3.createElement(v7, {
-                    text = v28.value:getValue(), 
-                    onChanged = function(v34) --[[ Line: 113 ]] --[[ Name: onChanged ]]
-                        -- upvalues: v28 (copy)
-                        v28.handler(v34, v28.component);
-                    end, 
-                    placeholder = v28.placeholder or "#000000", 
-                    size = v10.XSmall, 
-                    label = "", 
-                    width = UDim.new(1, 0), 
-                    testId = ("%*-%*"):format(v31, v30)
-                })
-            });
-        else
-            return v3.createElement(v7, v2.join({
-                text = v28.value:getValue(), 
-                onChanged = function(v35) --[[ Line: 128 ]] --[[ Name: onChanged ]]
-                    -- upvalues: v28 (copy)
-                    v28.handler(v35, v28.component);
-                end, 
-                placeholder = v28.placeholder or "0"
-            }, v33));
-        end;
-    elseif v12.FoundationColorPickerDesignUpdate then
-        return v3.createElement(v8, {
-            tag = "grow-1 size-0-full", 
-            LayoutOrder = v29
-        }, {
-            Input = v26(v28, v11.None, v33)
-        });
-    else
-        return v26(v28, v11.Stacked, v33);
-    end;
-end;
-local v37 = {
-    alpha = v3.createBinding(1)
-};
-return function(v38) --[[ Line: 165 ]] --[[ Name: ColorInputs ]]
-    -- upvalues: v9 (copy), v16 (copy), v37 (copy), v18 (copy), v3 (copy), v12 (copy), v14 (copy), v8 (copy), v7 (copy), v10 (copy), v13 (copy), v36 (copy), v15 (copy), v2 (copy), v5 (copy)
-    local v39 = v38.availableModes or {
-        v9.RGB, 
-        v9.HSV, 
-        v9.Hex, 
-        v9.Brick
-    };
-    local v40 = v16(v38, v37);
-    local v41 = v18();
-    local v42 = v40.mode or v9.RGB;
-    local l_color_0 = v40.color;
-    local l_alpha_0 = v40.alpha;
-    local v46 = v3.useCallback(function(v45) --[[ Line: 175 ]]
-        -- upvalues: v40 (copy)
-        if v40.onColorChanged then
-            v40.onColorChanged(v45);
-        end;
-    end, {
-        v40.onColorChanged
-    });
-    local l_onAlphaChanged_0 = v40.onAlphaChanged;
-    local v48 = v40.onAlphaChanged ~= nil;
-    local v51 = l_color_0:map(function(v49) --[[ Line: 185 ]]
-        -- upvalues: v12 (ref), v14 (ref)
-        if v12.FoundationColorPickerPartialHSV and v14.isPartialHSV(v49) then
-            return {
-                r = nil, 
-                g = nil, 
-                b = nil
-            };
-        else
-            local v50 = if v12.FoundationColorPickerPartialHSV then v14.toColor3(v49) else v49;
-            return {
-                r = math.round(v50.R * 255), 
-                g = math.round(v50.G * 255), 
-                b = math.round(v50.B * 255)
-            };
-        end;
-    end);
-    local v56 = l_color_0:map(function(v52) --[[ Line: 200 ]]
-        -- upvalues: v12 (ref)
-        if v12.FoundationColorPickerPartialHSV and type(v52) == "table" then
-            return {
-                h = v52.H, 
-                s = v52.S, 
-                v = v52.V
-            };
-        else
-            local v53, v54, v55 = v52:ToHSV();
-            return {
-                h = math.round(v53 * 360), 
-                s = math.round(v54 * 100), 
-                v = math.round(v55 * 100)
-            };
-        end;
-    end);
-    local v58 = v51:map(function(v57) --[[ Line: 213 ]]
-        if v57.r ~= nil and v57.g ~= nil and v57.b ~= nil then
-            return string.format("#%02X%02X%02X", v57.r, v57.g, v57.b);
-        else
-            return "";
-        end;
-    end);
-    local v64 = v3.useCallback(function(v59, v60) --[[ Line: 221 ]]
-        -- upvalues: v51 (copy), v12 (ref), v46 (copy)
-        local v61 = math.clamp(v59, 0, 255);
-        local v62 = table.clone(v51:getValue());
-        v62[v60] = v61;
-        if v12.FoundationColorPickerPartialHSV and (v62.r == nil or v62.g == nil or v62.b == nil) then
-            return;
-        else
-            local v63 = Color3.fromRGB(v62.r, v62.g, v62.b);
-            v46(v63);
-            return;
-        end;
-    end, {
-        v51, 
-        v46
-    });
-    local v66 = v3.useCallback(function(v65) --[[ Line: 237 ]]
-        -- upvalues: l_onAlphaChanged_0 (copy)
-        if l_onAlphaChanged_0 then
-            l_onAlphaChanged_0(v65);
-        end;
-    end, {
-        l_onAlphaChanged_0
-    });
-    local v71 = v3.useCallback(function(v67, v68) --[[ Line: 243 ]]
-        -- upvalues: v56 (copy), v12 (ref), v46 (copy)
-        local v69 = table.clone(v56:getValue());
-        if v12.FoundationColorPickerPartialHSV and v69[v68] == nil and v67 == 0 then
-            return;
-        else
-            v69[v68] = math.clamp(v67, 0, v68 == "h" and 360 or 100);
-            local v70 = Color3.fromHSV(v69.h / 360, (v69.s or 100) / 100, (v69.v or 100) / 100);
-            v46(v70);
-            return;
-        end;
-    end, {
-        v56, 
-        v46
-    });
-    local v78 = v3.useCallback(function(v72) --[[ Line: 257 ]]
-        -- upvalues: v46 (copy)
-        local v73 = v72:gsub("#", ""):upper();
-        if v73:match("^%x%x%x%x%x%x$") then
-            local v74 = tonumber(v73:sub(1, 2), 16);
-            local v75 = tonumber(v73:sub(3, 4), 16);
-            local v76 = tonumber(v73:sub(5, 6), 16);
-            if v74 and v75 and v76 then
-                local v77 = Color3.fromRGB(v74, v75, v76);
-                v46(v77);
-            end;
-        end;
-    end, {
-        v46
-    });
-    local v88 = v3.useMemo(function() --[[ Line: 273 ]]
-        -- upvalues: v9 (ref), v48 (copy), v39 (copy)
-        local v79 = {
-            {
-                id = v9.RGB, 
-                text = v9.RGB
-            }, 
-            {
-                id = v9.HSV, 
-                text = v9.HSV
-            }, 
-            {
-                id = v9.Hex, 
-                text = v9.Hex
-            }, 
-            {
-                id = v9.Brick, 
-                text = v9.Brick
-            }
-        };
-        if v48 then
-            table.insert(v79, 2, {
-                id = v9.RGBA, 
-                text = v9.RGBA
-            });
-        end;
-        local l_v39_0 = v39;
-        if not l_v39_0 then
-            return v79;
-        else
-            local v81 = {};
-            for _, v83 in v79 do
-                local l_id_0 = v83.id;
-                for _, v86 in l_v39_0 do
-                    local v87 = true;
-                    if l_id_0 ~= v86 then
-                        v87 = false;
-                        if l_id_0 == v9.RGBA then
-                            v87 = false;
-                            if v86 == v9.RGB then
-                                v87 = v48;
-                            end;
-                        end;
-                    end;
-                    if v87 then
-                        table.insert(v81, v83);
-                        break;
-                    end;
-                end;
-            end;
-            return v81;
-        end;
-    end, {
-        v48
-    });
-    v3.useEffect(function() --[[ Line: 308 ]]
-        -- upvalues: v42 (copy), v9 (ref), v48 (copy), v40 (copy)
-        if v42 == v9.RGBA and not v48 and v40.onModeChanged then
-            v40.onModeChanged(v9.RGB);
-        end;
-    end, {
-        v42, 
-        v48
-    });
-    local function v93() --[[ Line: 316 ]]
-        -- upvalues: v42 (copy), v9 (ref), v12 (ref), v3 (ref), v8 (ref), v7 (ref), l_color_0 (copy), v10 (ref), v40 (copy), v13 (ref), v51 (copy), v56 (copy), v58 (copy), l_alpha_0 (copy), v64 (copy), v71 (copy), v78 (copy), v66 (copy), v41 (copy), v36 (ref)
-        if v42 == v9.Brick then
-            if v12.FoundationColorPickerDesignUpdate then
-                return {
-                    BrickColorName = v3.createElement(v8, {
-                        tag = "grow-1 size-0-full", 
-                        LayoutOrder = 1
-                    }, {
-                        Input = v3.createElement(v7, {
-                            text = BrickColor.new(l_color_0:getValue()).Name, 
-                            onChanged = function() --[[ Line: 326 ]] --[[ Name: onChanged ]]
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
 
-                            end, 
-                            isDisabled = true, 
-                            size = v10.XSmall, 
-                            label = "", 
-                            width = UDim.new(1, 0), 
-                            testId = ("%*-brick-name"):format(v40.testId)
-                        })
-                    })
-                };
-            else
-                return nil;
-            end;
-        else
-            local v89 = v13.createInputConfigs(v51, v56, v58, l_alpha_0, v64, v71, v78, v66, v41)[v42];
-            if not v89 then
-                return nil;
-            else
-                local v90 = {};
-                for v91, v92 in ipairs(v89) do
-                    v90[v92.key .. "Input"] = v36(v41, v92, v91, v42:lower(), v40.testId);
-                end;
-                return v90;
-            end;
-        end;
-    end;
-    if v12.FoundationColorPickerDesignUpdate then
-        return v3.createElement(v8, v15(v40, {
-            tag = "row gap-xsmall size-full-600"
-        }), v2.join({
-            ModeDropdown = if #v88 > 1 then v3.createElement(v5.Root, {
-                items = v88, 
-                value = v42, 
-                onItemChanged = function(v94) --[[ Line: 374 ]] --[[ Name: onItemChanged ]]
-                    -- upvalues: v40 (copy)
-                    if v40.onModeChanged then
-                        v40.onModeChanged(v94);
-                    end;
-                end, 
-                size = v10.XSmall, 
-                label = "", 
-                width = UDim.new(0, v41.Size.Size_1600), 
-                testId = ("%*--mode-dropdown"):format(v40.testId)
-            }) else nil
-        }, (v93())));
-    else
-        return v3.createElement(v8, v15(v40, {
-            tag = "row gap-small auto-xy align-y-center"
-        }), {
-            ModeDropdown = if #v88 > 1 then v3.createElement(v5.Root, {
-                items = v88, 
-                value = v42, 
-                onItemChanged = function(v95) --[[ Line: 399 ]] --[[ Name: onItemChanged ]]
-                    -- upvalues: v40 (copy)
-                    if v40.onModeChanged then
-                        v40.onModeChanged(v95);
-                    end;
-                end, 
-                size = v10.XSmall, 
-                label = "", 
-                width = UDim.new(0, v41.Size.Size_2000), 
-                testId = ("%*--mode-dropdown"):format(v40.testId)
-            }) else nil, 
-            Inputs = v3.createElement(v8, {
-                tag = "row gap-small auto-xy"
-            }, (v93()))
-        });
-    end;
-end;
+require(Foundation.Components.Types)
+
+local Dropdown = require(Foundation.Components.Dropdown)
+local NumberInput = require(Foundation.Components.NumberInput)
+local TextInput = require(Foundation.Components.TextInput)
+local View = require(Foundation.Components.View)
+local ColorInputMode = require(Foundation.Enums.ColorInputMode)
+local InputSize = require(Foundation.Enums.InputSize)
+local NumberInputControlsVariant = require(Foundation.Enums.NumberInputControlsVariant)
+local colorInputUtils = require(Foundation.Components.ColorPicker.colorInputUtils)
+local colorUtils = require(Foundation.Components.ColorPicker.colorUtils)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+require(Foundation.Providers.Style.Tokens)
+
+local useTokens = require(Foundation.Providers.Style.useTokens)
+
+local function createNumberInputElement(p1, p2, p3) -- line: 38
+	-- upvalues: React (copy), NumberInput (copy), Dash (copy)
+	local v24 = p1.value:getValue()
+
+	if v24 == nil then
+		return React.createElement(NumberInput, Dash.join({
+			value = -1,
+			onChanged = function(n1: number) -- line: 51
+				-- upvalues: p1 (copy)
+				if n1 ~= -1 then
+					p1.handler(n1, p1.component)
+				end
+			end,
+			controlsVariant = p2,
+			minimum = p1.minimum or 0,
+			maximum = p1.maximum or 255,
+			step = p1.step or 1,
+			precision = p1.precision or 0,
+			formatAsString = function(_: number) -- line: 61
+				return ""
+			end
+		}, p3))
+	end
+
+	return React.createElement(NumberInput, Dash.join({
+		value = v24,
+		onChanged = function(n3: number) -- line: 72
+			-- upvalues: p1 (copy)
+			p1.handler(n3, p1.component)
+		end,
+		controlsVariant = p2,
+		minimum = p1.minimum or 0,
+		maximum = p1.maximum or 255,
+		step = p1.step or 1,
+		precision = p1.precision or 0
+	}, p3))
+end
+local function renderInput(_, p5, n4: number, s1: string, s2: string?) -- line: 84
+	-- upvalues: InputSize (copy), ColorInputMode (copy), React (copy), View (copy), TextInput (copy), createNumberInputElement (copy), NumberInputControlsVariant (copy)
+	local v30 = if s1 ~= p5.key:lower() then `-{ p5.key:lower() }` else ""
+	local t1 = {
+		label = "",
+		size = InputSize.XSmall,
+		width = UDim.new(1, 0),
+		LayoutOrder = n4,
+		testId = `{ s2 }-{ s1 }{ v30 }`
+	}
+
+	if p5.key == ColorInputMode.Hex then
+		return React.createElement(View, {
+			tag = "grow-1 size-0-full",
+			LayoutOrder = n4
+		}, {
+			Input = React.createElement(TextInput, {
+				label = "",
+				text = p5.value:getValue(),
+				onChanged = function(s3: string) -- line: 109
+					-- upvalues: p5 (copy)
+					p5.handler(s3, p5.component)
+				end,
+				placeholder = p5.placeholder or "#000000",
+				size = InputSize.XSmall,
+				width = UDim.new(1, 0),
+				testId = `{ s2 }-{ s1 }`
+			})
+		})
+	end
+
+	return React.createElement(View, {
+		tag = "grow-1 size-0-full",
+		LayoutOrder = n4
+	}, {
+		Input = createNumberInputElement(p5, NumberInputControlsVariant.None, t1)
+	})
+end
+
+local t2 = {
+	alpha = React.createBinding(1)
+}
+
+local function ColorInputs(p6) -- line: 143
+	-- upvalues: ColorInputMode (copy), withDefaults (copy), t2 (copy), useTokens (copy), React (copy), colorUtils (copy), View (copy), TextInput (copy), InputSize (copy), colorInputUtils (copy), renderInput (copy), withCommonProps (copy), Dash (copy), Dropdown (copy)
+	local v33 = p6.availableModes or {
+		ColorInputMode.RGB,
+		ColorInputMode.HSV,
+		ColorInputMode.Hex,
+		ColorInputMode.Brick
+	}
+	local v34 = withDefaults(p6, t2)
+	local v35 = useTokens()
+	local v36 = v34.mode or ColorInputMode.RGB
+	local color = v34.color
+	local alpha = v34.alpha
+	local v39 = React.useCallback(function(p7) -- line: 153
+		-- upvalues: v34 (copy)
+		if v34.onColorChanged then
+			v34.onColorChanged(p7)
+		end
+	end, { v34.onColorChanged })
+	local onAlphaChanged = v34.onAlphaChanged
+	local v41 = v34.onAlphaChanged ~= nil
+	local v42 = color:map(function(p8) -- line: 163
+		-- upvalues: colorUtils (copy)
+		if colorUtils.isPartialHSV(p8) then
+			return {
+				r = nil,
+				g = nil,
+				b = nil
+			}
+		end
+
+		local v56 = colorUtils.toColor3(p8)
+
+		return {
+			r = math.round(v56.R * 255),
+			g = math.round(v56.G * 255),
+			b = math.round(v56.B * 255)
+		}
+	end)
+	local v43 = color:map(function(p9) -- line: 176
+		if type(p9) == "table" then
+			return {
+				h = p9.H,
+				s = p9.S,
+				v = p9.V
+			}
+		end
+
+		local v58, v59, v60 = p9:ToHSV()
+
+		return {
+			h = math.round(v58 * 360),
+			s = math.round(v59 * 100),
+			v = math.round(v60 * 100)
+		}
+	end)
+	local v44 = v42:map(function(t3: {[any]: any}) -- line: 189
+		if t3.r ~= nil and (t3.g ~= nil and t3.b ~= nil) then
+			return string.format("#%02X%02X%02X", t3.r, t3.g, t3.b)
+		end
+
+		return ""
+	end)
+	local v45 = React.useCallback(function(n5: number, s4: string?) -- line: 197
+		-- upvalues: v42 (copy), v39 (copy)
+		local v64 = math.clamp(n5, 0, 255)
+		local v65 = table.clone(v42:getValue())
+
+		v65[s4] = v64
+
+		if v65.r == nil or v65.g == nil or v65.b == nil then
+			return
+		end
+
+		local color3 = Color3.fromRGB(v65.r, v65.g, v65.b)
+
+		v39(color3)
+	end, {
+		v42,
+		v39
+	})
+	local v46 = React.useCallback(function(n6: number) -- line: 213
+		-- upvalues: onAlphaChanged (copy)
+		if onAlphaChanged then
+			onAlphaChanged(n6)
+		end
+	end, { onAlphaChanged })
+	local v47 = React.useCallback(function(n7: number, s5: string?) -- line: 219
+		-- upvalues: v43 (copy), v39 (copy)
+		local v70 = table.clone(v43:getValue())
+
+		if v70[s5] == nil and n7 == 0 then
+			return
+		end
+
+		v70[s5] = math.clamp(n7, 0, s5 ~= "h" and 100 or 360)
+
+		local color3 = Color3.fromHSV(v70.h / 360, (v70.s or 100) / 100, (v70.v or 100) / 100)
+
+		v39(color3)
+	end, {
+		v43,
+		v39
+	})
+	local v48 = React.useCallback(function(s6: string) -- line: 233
+		-- upvalues: v39 (copy)
+		local v73 = s6:gsub("#", ""):upper()
+
+		if v73:match("^%x%x%x%x%x%x$") then
+			local num = tonumber(v73:sub(1, 2), 16)
+			local num2 = tonumber(v73:sub(3, 4), 16)
+			local num3 = tonumber(v73:sub(5, 6), 16)
+
+			if num and num2 and num3 then
+				local color3 = Color3.fromRGB(num, num2, num3)
+
+				v39(color3)
+			end
+		end
+	end, { v39 })
+	local v49 = React.useMemo(function() -- line: 249
+		-- upvalues: ColorInputMode (copy), v41 (copy), v33 (copy)
+		local t4 = {
+			{
+				id = ColorInputMode.RGB,
+				text = ColorInputMode.RGB
+			},
+			{
+				id = ColorInputMode.HSV,
+				text = ColorInputMode.HSV
+			},
+			{
+				id = ColorInputMode.Hex,
+				text = ColorInputMode.Hex
+			},
+			{
+				id = ColorInputMode.Brick,
+				text = ColorInputMode.Brick
+			}
+		}
+
+		if v41 then
+			table.insert(t4, 2, {
+				id = ColorInputMode.RGBA,
+				text = ColorInputMode.RGBA
+			})
+		end
+
+		local v79 = v33
+
+		if not v79 then
+			return t4
+		end
+
+		local t5 = {}
+
+		for _, v82 in t4 do
+			local id = v82.id
+
+			for _, v85 in v79 do
+				if id == v85 or id == ColorInputMode.RGBA and (v85 == ColorInputMode.RGB and v41) then
+					table.insert(t5, v82)
+
+					break
+				end
+			end
+		end
+
+		return t5
+	end, { v41 })
+
+	React.useEffect(function() -- line: 284
+		-- upvalues: v36 (copy), ColorInputMode (copy), v41 (copy), v34 (copy)
+		if v36 == ColorInputMode.RGBA and (not v41 and v34.onModeChanged) then
+			v34.onModeChanged(ColorInputMode.RGB)
+		end
+	end, {
+		v36,
+		v41
+	})
+
+	return React.createElement(View, withCommonProps(v34, {
+		tag = "row gap-xsmall size-full-600"
+	}), Dash.join({
+		ModeDropdown = if not (#v49 > 1) then nil else React.createElement(Dropdown.Root, {
+			label = "",
+			items = v49,
+			value = v36,
+			onItemChanged = function(p10) -- line: 344
+				-- upvalues: v34 (copy)
+				if v34.onModeChanged then
+					v34.onModeChanged(p10)
+				end
+			end,
+			size = InputSize.XSmall,
+			width = UDim.new(0, v35.Size.Size_1600),
+			testId = `{ v34.testId }--mode-dropdown`
+		})
+	}, ((function() -- line: 292
+		-- upvalues: v36 (copy), ColorInputMode (copy), React (copy), View (copy), TextInput (copy), color (copy), InputSize (copy), v34 (copy), colorInputUtils (copy), v42 (copy), v43 (copy), v44 (copy), alpha (copy), v45 (copy), v47 (copy), v48 (copy), v46 (copy), v35 (copy), renderInput (copy)
+		if v36 == ColorInputMode.Brick then
+			return {
+				BrickColorName = React.createElement(View, {
+					tag = "grow-1 size-0-full",
+					LayoutOrder = 1
+				}, {
+					Input = React.createElement(TextInput, {
+						isDisabled = true,
+						label = "",
+						text = BrickColor.new(color:getValue()).Name,
+						onChanged = function() -- line: 301
+						end,
+						size = InputSize.XSmall,
+						width = UDim.new(1, 0),
+						testId = `{ v34.testId }-brick-name`
+					})
+				})
+			}
+		end
+
+		local v86 = colorInputUtils.createInputConfigs(v42, v43, v44, alpha, v45, v47, v48, v46, v35)[v36]
+
+		if not v86 then
+			return nil
+		end
+
+		local t6 = {}
+
+		for i, v in ipairs(v86) do
+			t6[v.key .. "Input"] = renderInput(v35, v, i, v36:lower(), v34.testId)
+		end
+
+		return t6
+	end)())))
+end
+
+return ColorInputs

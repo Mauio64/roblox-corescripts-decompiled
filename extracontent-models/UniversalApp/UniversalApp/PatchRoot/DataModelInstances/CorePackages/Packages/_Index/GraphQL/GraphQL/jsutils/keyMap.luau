@@ -1,12 +1,16 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local _ = require(script.Parent.ObjMap);
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+require(script.Parent.ObjMap)
+
 return {
-    keyMap = function(v3, v4) --[[ Line: 38 ]] --[[ Name: keyMap ]]
-        local v5 = {};
-        for _, v7 in ipairs(v3) do
-            v5[v4(v7)] = v7;
-        end;
-        return v5;
-    end
-};
+	keyMap = function(p1, p2: ((...any) -> ...any)) -- line: 38
+		local t1 = {}
+
+		for _, v in ipairs(p1) do
+			t1[p2(v)] = v
+		end
+
+		return t1
+	end
+}

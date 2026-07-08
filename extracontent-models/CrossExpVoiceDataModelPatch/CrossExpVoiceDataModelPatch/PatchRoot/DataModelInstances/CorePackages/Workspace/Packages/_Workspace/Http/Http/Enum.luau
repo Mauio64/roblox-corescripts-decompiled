@@ -1,3 +1,3 @@
 return {
-    RetrievalStatus = require(script.RetrievalStatus)
-};
+	RetrievalStatus = require(script.RetrievalStatus)
+}

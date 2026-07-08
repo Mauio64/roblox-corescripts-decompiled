@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLuaLogReporterMultipleLogs", false);
+return game:DefineFastFlag("EnableLuaLogReporterMultipleLogs", false)

@@ -1,4 +1,4 @@
 return {
-    Hue = "Hue", 
-    Alpha = "Alpha"
-};
+	Hue = "Hue",
+	Alpha = "Alpha"
+}

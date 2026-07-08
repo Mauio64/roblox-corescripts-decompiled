@@ -1,13 +1,15 @@
-local v2 = setmetatable({}, {
-    __index = function(_, v1) --[[ Line: 2 ]] --[[ Name: __index ]]
-        error(("Invalid TimeUnit \"%s\""):format((tostring(v1))), 2);
-    end
-});
-v2.Seconds = "Seconds";
-v2.Minutes = "Minutes";
-v2.Hours = "Hours";
-v2.Days = "Days";
-v2.Months = "Months";
-v2.Years = "Years";
-v2.Weeks = "Weeks";
-return v2;
+local self = setmetatable({}, {
+	__index = function(_, p2) -- line: 2
+		error(("Invalid TimeUnit \"%s\""):format((tostring(p2))), 2)
+	end
+})
+
+self.Seconds = "Seconds"
+self.Minutes = "Minutes"
+self.Hours = "Hours"
+self.Days = "Days"
+self.Months = "Months"
+self.Years = "Years"
+self.Weeks = "Weeks"
+
+return self

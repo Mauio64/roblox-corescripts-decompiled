@@ -1,14 +1,22 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-local l_insert_0 = table.insert;
-return function(v3, v4) --[[ Line: 18 ]] --[[ Name: collectArray ]]
-    -- upvalues: l_insert_0 (copy)
-    local v5 = {};
-    for v6, v7 in v3 do
-        local v8 = v4(v6, v7);
-        if v8 ~= nil then
-            l_insert_0(v5, v8);
-        end;
-    end;
-    return v5;
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local insert = table.insert
+
+local function collectArray(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 18
+	-- upvalues: insert (copy)
+	local t2 = {}
+
+	for v7, v8 in t1 do
+		local v9 = p1(v7, v8)
+
+		if v9 ~= nil then
+			insert(t2, v9)
+		end
+	end
+
+	return t2
+end
+
+return collectArray

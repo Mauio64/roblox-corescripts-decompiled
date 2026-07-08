@@ -1,31 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.t);
-local v3 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.SduiComponentType);
-local l_ConditionalPropsInterface_0 = require(l_script_FirstAncestor_0.ConditionalProps.SduiConditionalPropTypes).ConditionalPropsInterface;
-local l_FFlagSduiActionTelemetryHandler_0 = require(l_Parent_0.SharedFlags).FFlagSduiActionTelemetryHandler;
-local v7 = {
-    actionType = v2.string, 
-    actionParams = v2.optional(v2.table), 
-    telemetryHandler = if l_FFlagSduiActionTelemetryHandler_0 then v2.optional(v2.string) else nil
-};
-local v8 = {
-    componentType = v2.string, 
-    props = v2.optional(v2.table), 
-    templateKey = v2.optional(v2.string), 
-    analyticsData = v2.optional(v2.table), 
-    children = v2.optional(v2.table), 
-    conditionalProps = v2.optional(v2.array(v2.interface(l_ConditionalPropsInterface_0))), 
-    feedItemKey = v2.optional(v2.string), 
-    __processed = v2.optional(v2.boolean), 
-    __isClientBinding = v2.optional(v2.boolean)
-};
-local v9 = v3.Dictionary.join(v8, {
-    componentType = v2.optional(v2.string)
-});
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local t = require(SduiCoreSystemParent.t)
+local Cryo = require(SduiCoreSystemParent.Cryo)
+
+require(SduiCoreSystem.SduiComponentType)
+
+local ConditionalPropsInterface = require(SduiCoreSystem.ConditionalProps.SduiConditionalPropTypes).ConditionalPropsInterface
+local FFlagSduiActionTelemetryHandler = require(SduiCoreSystemParent.SharedFlags).FFlagSduiActionTelemetryHandler
+local t1 = {
+	actionType = t.string,
+	actionParams = t.optional(t.table),
+	telemetryHandler = if not FFlagSduiActionTelemetryHandler then nil else t.optional(t.string)
+}
+local t2 = {
+	componentType = t.string,
+	props = t.optional(t.table),
+	templateKey = t.optional(t.string),
+	analyticsData = t.optional(t.table),
+	children = t.optional(t.table),
+	conditionalProps = t.optional(t.array(t.interface(ConditionalPropsInterface))),
+	feedItemKey = t.optional(t.string),
+	__processed = t.optional(t.boolean),
+	__isClientBinding = t.optional(t.boolean),
+	__usageRecorded = t.optional(t.boolean)
+}
+local v9 = Cryo.Dictionary.join(t2, {
+	componentType = t.optional(t.string)
+})
+
 return {
-    ActionInterface = v7, 
-    UiComponentInterface = v8, 
-    SduiTemplateInterface = v9
-};
+	ActionInterface = t1,
+	UiComponentInterface = t2,
+	SduiTemplateInterface = v9
+}

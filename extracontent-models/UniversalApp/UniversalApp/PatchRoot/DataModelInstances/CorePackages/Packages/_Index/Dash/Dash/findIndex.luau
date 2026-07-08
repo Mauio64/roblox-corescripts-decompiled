@@ -1,8 +1,11 @@
-return function(v0, v1) --[[ Line: 10 ]] --[[ Name: findIndex ]]
-    for v2, v3 in ipairs(v0) do
-        if v1(v3, v2) then
-            return v2;
-        end;
-    end;
-    return nil;
-end;
+local function findIndex(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 10
+	for i, v in ipairs(t1) do
+		if p1(v, i) then
+			return i
+		end
+	end
+
+	return nil
+end
+
+return findIndex

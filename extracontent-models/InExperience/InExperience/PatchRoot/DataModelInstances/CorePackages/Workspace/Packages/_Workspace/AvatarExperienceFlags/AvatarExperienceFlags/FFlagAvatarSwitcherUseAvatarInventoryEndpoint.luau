@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AvatarSwitcherUseAvatarInventoryEndpoint", false);
+return game:DefineFastFlag("AvatarSwitcherUseAvatarInventoryEndpoint", false)

@@ -1,20 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_makeActionCreator_0 = require(l_Parent_0.Rodux).makeActionCreator;
-local _ = require(l_script_FirstAncestor_0.Models.RobuxUpsell);
-local v7 = l_makeActionCreator_0(script.Name, function(v4, v5, v6) --[[ Line: 10 ]]
-    return {
-        products = v4, 
-        selection = v5, 
-        virtualItemBadgeType = v6
-    };
-end);
-local v12 = {
-    name = v7.name, 
-    __call = function(_, v9, v10, v11) --[[ Line: 23 ]] --[[ Name: __call ]]
-        -- upvalues: v7 (copy)
-        return v7(v9, v10, v11);
-    end
-};
-setmetatable(v12, v12);
-return v12;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local makeActionCreator = require(PurchasePromptParent.Rodux).makeActionCreator
+
+require(PurchasePrompt.Models.RobuxUpsell)
+
+local v4 = makeActionCreator(script.Name, function(t1: {[any]: any}, n1: number, s1: string) -- line: 10
+	return {
+		products = t1,
+		selection = n1,
+		virtualItemBadgeType = s1
+	}
+end)
+local t3 = {
+	name = v4.name,
+	__call = function(_, t2: {[any]: any}, n2: number, s2: string) -- line: 23
+		-- upvalues: v4 (copy)
+		return v4(t2, n2, s2)
+	end
+}
+
+setmetatable(t3, t3)
+
+return t3

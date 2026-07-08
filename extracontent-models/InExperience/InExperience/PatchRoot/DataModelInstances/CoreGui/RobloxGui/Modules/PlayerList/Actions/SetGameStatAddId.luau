@@ -1,6 +1,6 @@
-return require(script.Parent.Parent.ActionCreator)("SetGameStatAddId", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        statName = v0, 
-        serverAddId = v1
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetGameStatAddId", function(p1, p2) -- line: 4
+	return {
+		statName = p1,
+		serverAddId = p2
+	}
+end)

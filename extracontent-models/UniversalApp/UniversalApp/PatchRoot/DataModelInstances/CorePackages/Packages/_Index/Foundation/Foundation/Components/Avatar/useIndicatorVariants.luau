@@ -1,65 +1,76 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v3 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local v4 = require(l_script_FirstAncestor_0.Enums.IndicatorShape);
-local v5 = require(l_script_FirstAncestor_0.Enums.IndicatorVariant);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-mapToProps = function(v7, v8, v9) --[[ Line: 29 ]] --[[ Name: mapToProps ]]
-    -- upvalues: v4 (copy)
-    local v10 = UDim2.fromOffset(v9, v9);
-    if v7 == v4.Ring then
-        return {
-            indicator = {
-                imageStyle = v8, 
-                Image = "component_assets/circle_15_stroke_3", 
-                Size = UDim2.fromOffset(v9, v9)
-            }
-        };
-    elseif v7 == v4.Circle then
-        return {
-            indicator = {
-                imageStyle = v8, 
-                Image = "component_assets/circle_16", 
-                Size = v10
-            }
-        };
-    else
-        return {
-            indicator = {
-                imageStyle = v8, 
-                Size = v10
-            }
-        };
-    end;
-end;
-local function v13(v11) --[[ Line: 61 ]] --[[ Name: variantsFactory ]]
-    -- upvalues: v5 (copy), v4 (copy)
-    local v12 = {
-        [v5.Success] = v11.Color.System.Success, 
-        [v5.Neutral] = v11.Color.System.Neutral, 
-        [v5.Warning] = v11.Color.System.Warning, 
-        [v5.Emphasis] = v11.Color.System.Emphasis, 
-        [v5.Alert] = v11.Color.System.Alert
-    };
-    return {
-        shapes = {
-            [v4.Circle] = {
-                indicator = {
-                    tag = "radius-circle"
-                }
-            }, 
-            [v4.Ring] = {
-                indicator = {
-                    tag = "radius-circle"
-                }
-            }
-        }, 
-        variants = v12
-    };
-end;
-return function(v14, v15, v16, v17) --[[ Line: 78 ]]
-    -- upvalues: v3 (copy), v13 (copy), v1 (copy)
-    local v18 = v3.useVariants("Indicator", v13, v14);
-    return v1(v18.shapes[v15], mapToProps(v15, v18.variants[v16], v17));
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+
+require(Foundation.Providers.Style.Tokens)
+
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+local IndicatorShape = require(Foundation.Enums.IndicatorShape)
+local IndicatorVariant = require(Foundation.Enums.IndicatorVariant)
+
+require(Foundation.Components.Types)
+
+function mapToProps(p1, p2, n1: number) -- line: 29
+	-- upvalues: IndicatorShape (copy)
+	local uDim2 = UDim2.fromOffset(n1, n1)
+
+	if p1 == IndicatorShape.Ring then
+		return {
+			indicator = {
+				Image = "component_assets/circle_15_stroke_3",
+				imageStyle = p2,
+				Size = UDim2.fromOffset(n1, n1)
+			}
+		}
+	end
+
+	if p1 == IndicatorShape.Circle then
+		return {
+			indicator = {
+				Image = "component_assets/circle_16",
+				imageStyle = p2,
+				Size = uDim2
+			}
+		}
+	end
+
+	return {
+		indicator = {
+			imageStyle = p2,
+			Size = uDim2
+		}
+	}
+end
+
+local function variantsFactory(p3) -- line: 61
+	-- upvalues: IndicatorVariant (copy), IndicatorShape (copy)
+	local t1 = {
+		[IndicatorVariant.Success] = p3.Color.System.Success,
+		[IndicatorVariant.Neutral] = p3.Color.System.Neutral,
+		[IndicatorVariant.Warning] = p3.Color.System.Warning,
+		[IndicatorVariant.Emphasis] = p3.Color.System.Emphasis,
+		[IndicatorVariant.Alert] = p3.Color.System.Alert
+	}
+
+	return {
+		shapes = {
+			[IndicatorShape.Circle] = {
+				indicator = {
+					tag = "radius-circle"
+				}
+			},
+			[IndicatorShape.Ring] = {
+				indicator = {
+					tag = "radius-circle"
+				}
+			}
+		},
+		variants = t1
+	}
+end
+
+return function(p4, p5, p6, n2: number) -- line: 78
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+	local v17 = VariantsContext.useVariants("Indicator", variantsFactory, p4)
+
+	return composeStyleVariant(v17.shapes[p5], mapToProps(p5, v17.variants[p6], n2))
+end

@@ -1,27 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_script_FirstAncestor_0.Service);
-local v3 = require(l_script_FirstAncestor_0.Integrations.CommonIcon);
-local l_SideSheetPlacement_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enums.SideSheetPlacement;
-local v5 = require(script.Parent.InGameMenuIntegrationUtils);
-local v6 = v5.createPageOpenSignal("PlayersPage");
-return v2:register({
-    initialAvailability = v2.AvailabilitySignal.Available, 
-    id = "people", 
-    label = "CoreScripts.InGameMenu.PageTitle.Players", 
-    sideSheetPlacement = l_SideSheetPlacement_0.Page, 
-    activated = function(_) --[[ Line: 19 ]] --[[ Name: activated ]]
-        -- upvalues: v5 (copy), v6 (copy)
-        v5.toggleIGMPage("PlayersPage", v6:get());
-    end, 
-    isActivated = function() --[[ Line: 22 ]] --[[ Name: isActivated ]]
-        -- upvalues: v6 (copy)
-        return v6:get();
-    end, 
-    components = {
-        Icon = function(_) --[[ Line: 26 ]] --[[ Name: Icon ]]
-            -- upvalues: v3 (copy), v6 (copy)
-            return v3("icons/menu/friends", "icons/menu/friendsOn", v6);
-        end
-    }
-});
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local Service = require(Chrome.Service)
+local CommonIcon = require(Chrome.Integrations.CommonIcon)
+local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
+local InGameMenuIntegrationUtils = require(script.Parent.InGameMenuIntegrationUtils)
+local v8 = InGameMenuIntegrationUtils.createPageOpenSignal("PlayersPage")
+
+return Service:register({
+	id = "people",
+	label = "CoreScripts.InGameMenu.PageTitle.Players",
+	initialAvailability = Service.AvailabilitySignal.Available,
+	sideSheetPlacement = SideSheetPlacement.Page,
+	activated = function(_) -- line: 22
+		-- upvalues: InGameMenuIntegrationUtils (copy), v8 (copy)
+		InGameMenuIntegrationUtils.toggleIGMPage("PlayersPage", v8:get())
+	end,
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 27
+		-- upvalues: v8 (copy)
+		return v8:get()
+	end or v8,
+	components = {
+		Icon = function(_) -- line: 31
+			-- upvalues: CommonIcon (copy), v8 (copy)
+			return CommonIcon("icons/menu/friends", "icons/menu/friendsOn", v8)
+		end
+	}
+})

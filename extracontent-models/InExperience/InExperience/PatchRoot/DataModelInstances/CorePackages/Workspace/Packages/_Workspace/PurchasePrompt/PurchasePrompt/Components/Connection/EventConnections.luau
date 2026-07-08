@@ -1,26 +1,32 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Roact_0 = require(l_Parent_0.PurchasePromptDeps).Roact;
-local v4 = require(l_script_FirstAncestor_0.Enums.UpsellFlow);
-local v5 = require(l_script_FirstAncestor_0.NativeUpsell.getUpsellFlow);
-local v6 = require(script.Parent.MarketplaceServiceEventConnector);
-local v7 = require(script.Parent.InputTypeManager);
-local v8 = require(script.Parent.BrowserPurchaseFinishedConnector);
-local v9 = require(script.Parent.NativePurchaseFinishedConnector);
-return function() --[[ Line: 20 ]] --[[ Name: EventConnections ]]
-    -- upvalues: v5 (copy), l_UserInputService_0 (copy), v4 (copy), l_Roact_0 (copy), v8 (copy), v9 (copy), v6 (copy), v7 (copy)
-    local v10 = nil;
-    local v11 = v5(l_UserInputService_0:GetPlatform());
-    if v11 == v4.Web then
-        v10 = l_Roact_0.createElement(v8);
-    elseif v11 == v4.Mobile then
-        v10 = l_Roact_0.createElement(v9);
-    end;
-    local v12 = l_UserInputService_0:GetPlatform() ~= Enum.Platform.XBoxOne;
-    return l_Roact_0.createElement("Folder", {}, {
-        MarketPlaceServiceEventConnector = l_Roact_0.createElement(v6), 
-        InputTypeManager = v12 and l_Roact_0.createElement(v7) or nil, 
-        UpsellFinishedConnector = v10
-    });
-end;
+local UserInputService = game:GetService("UserInputService")
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Roact = require(PurchasePromptParent.PurchasePromptDeps).Roact
+local UpsellFlow = require(PurchasePrompt.Enums.UpsellFlow)
+local getUpsellFlow = require(PurchasePrompt.NativeUpsell.getUpsellFlow)
+local MarketplaceServiceEventConnector = require(script.Parent.MarketplaceServiceEventConnector)
+local InputTypeManager = require(script.Parent.InputTypeManager)
+local BrowserPurchaseFinishedConnector = require(script.Parent.BrowserPurchaseFinishedConnector)
+local NativePurchaseFinishedConnector = require(script.Parent.NativePurchaseFinishedConnector)
+
+local function EventConnections() -- line: 20
+	-- upvalues: getUpsellFlow (copy), UserInputService (copy), UpsellFlow (copy), Roact (copy), BrowserPurchaseFinishedConnector (copy), NativePurchaseFinishedConnector (copy), MarketplaceServiceEventConnector (copy), InputTypeManager (copy)
+	local v12 = nil
+	local v13 = getUpsellFlow(UserInputService:GetPlatform())
+
+	if v13 == UpsellFlow.Web then
+		v12 = Roact.createElement(BrowserPurchaseFinishedConnector)
+	elseif v13 == UpsellFlow.Mobile then
+		v12 = Roact.createElement(NativePurchaseFinishedConnector)
+	end
+
+	local v14 = UserInputService:GetPlatform() ~= Enum.Platform.XBoxOne
+
+	return Roact.createElement("Folder", {}, {
+		MarketPlaceServiceEventConnector = Roact.createElement(MarketplaceServiceEventConnector),
+		InputTypeManager = v14 and Roact.createElement(InputTypeManager) or nil,
+		UpsellFinishedConnector = v12
+	})
+end
+
+return EventConnections

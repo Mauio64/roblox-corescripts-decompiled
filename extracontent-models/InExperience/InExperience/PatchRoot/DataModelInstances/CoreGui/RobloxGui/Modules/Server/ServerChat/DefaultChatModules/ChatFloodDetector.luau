@@ -1,76 +1,100 @@
-local l_ClientChatModules_0 = game:GetService("Chat"):WaitForChild("ClientChatModules");
-local l_ChatConstants_0 = require(l_ClientChatModules_0:WaitForChild("ChatConstants"));
-local v2 = false;
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 11 ]]
-    return UserSettings():IsUserFeatureEnabled("UserAddChatThrottlingToAllChannels");
-end);
-if l_status_0 then
-    v2 = l_result_0;
-end;
-l_status_0 = true;
-if v2 then
-    l_status_0 = false;
-end;
-l_result_0 = {};
-local v5 = {};
-local v6 = nil;
-pcall(function() --[[ Line: 33 ]]
-    -- upvalues: v6 (ref)
-    v6 = require(game:GetService("Chat").ClientChatModules.ChatLocalization);
-end);
-if v6 == nil then
-    v6 = {};
-end;
-if not v6.FormatMessageToSend or not v6.LocalizeFormattedMessage then
-    v6.FormatMessageToSend = function(_, _, v9) --[[ Line: 37 ]] --[[ Name: FormatMessageToSend ]]
-        return v9;
-    end;
-end;
-local function _(v10) --[[ Line: 40 ]] --[[ Name: EnterTimeIntoLog ]]
-    table.insert(v10, tick() + 15);
-end;
-return function(v12) --[[ Line: 44 ]] --[[ Name: Run ]]
-    -- upvalues: v5 (copy), l_result_0 (copy), l_status_0 (ref), v6 (ref), l_ChatConstants_0 (copy)
-    v12:RegisterProcessCommandsFunction("flood_detection", function(v13, _, v15) --[[ Line: 45 ]] --[[ Name: FloodDetectionProcessCommandsFunction ]]
-        -- upvalues: v5 (ref), v12 (copy), l_result_0 (ref), l_status_0 (ref), v6 (ref)
-        if v5[v13] then
-            return false;
-        else
-            local l_v12_Speaker_0 = v12:GetSpeaker(v13);
-            if not l_v12_Speaker_0 then
-                return false;
-            elseif not l_v12_Speaker_0:GetPlayer() then
-                return false;
-            else
-                if not l_result_0[v13] then
-                    l_result_0[v13] = {};
-                end;
-                local v17 = nil;
-                if l_status_0 then
-                    if not l_result_0[v13][v15] then
-                        l_result_0[v13][v15] = {};
-                    end;
-                    v17 = l_result_0[v13][v15];
-                else
-                    v17 = l_result_0[v13];
-                end;
-                local v18 = tick();
-                while #v17 > 0 and v17[1] < v18 do
-                    table.remove(v17, 1);
-                end;
-                if #v17 < 7 then
-                    table.insert(v17, tick() + 15);
-                    return false;
-                else
-                    local v19 = math.ceil(v17[1] - v18);
-                    l_v12_Speaker_0:SendSystemMessage(v6:FormatMessageToSend("GameChat_ChatFloodDetector_MessageDisplaySeconds", string.format("You must wait %d %s before sending another message!", v19, v19 > 1 and "seconds" or "second"), "RBX_NUMBER", (tostring(v19))), v15);
-                    return true;
-                end;
-            end;
-        end;
-    end, l_ChatConstants_0.LowPriority);
-    v12.SpeakerRemoved:connect(function(v20) --[[ Line: 102 ]]
-        -- upvalues: l_result_0 (ref)
-        l_result_0[v20] = nil;
-    end);
-end;
+local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
+local ChatConstants = require(ClientChatModules:WaitForChild("ChatConstants"))
+local v3 = false
+local ok, result = pcall(function() -- line: 11
+	return UserSettings():IsUserFeatureEnabled("UserAddChatThrottlingToAllChannels")
+end)
+
+if ok then
+	v3 = result
+end
+
+local u6 = true
+
+if v3 then
+	u6 = false
+end
+
+local t1 = {}
+local t2 = {}
+local ChatLocalization = nil
+
+pcall(function() -- line: 33
+	-- upvalues: ChatLocalization (ref)
+	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+end)
+
+if ChatLocalization == nil then
+	ChatLocalization = {}
+end
+
+if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
+	function ChatLocalization.FormatMessageToSend(_, _, p3) -- line: 37
+		return p3
+	end
+end
+
+local function EnterTimeIntoLog(p4) -- line: 40
+	table.insert(p4, tick() + 15)
+end
+local function Run(p5) -- line: 44
+	-- upvalues: t2 (copy), t1 (copy), u6 (ref), ChatLocalization (ref), ChatConstants (copy)
+	local function FloodDetectionProcessCommandsFunction(p6, _, p8) -- line: 45
+		-- upvalues: t2 (copy), p5 (copy), t1 (copy), u6 (ref), ChatLocalization (ref)
+		if t2[p6] then
+			return false
+		end
+
+		local Speaker = p5:GetSpeaker(p6)
+
+		if not Speaker then
+			return false
+		end
+
+		if not Speaker:GetPlayer() then
+			return false
+		end
+
+		if not t1[p6] then
+			t1[p6] = {}
+		end
+
+		local v22
+
+		if u6 then
+			if not t1[p6][p8] then
+				t1[p6][p8] = {}
+			end
+
+			v22 = t1[p6][p8]
+		else
+			v22 = t1[p6]
+		end
+
+		local timestamp = tick()
+
+		while #v22 > 0 and timestamp > v22[1] do
+			table.remove(v22, 1)
+		end
+
+		if #v22 < 7 then
+			table.insert(v22, tick() + 15)
+
+			return false
+		end
+
+		local v24 = math.ceil(v22[1] - timestamp)
+
+		Speaker:SendSystemMessage(ChatLocalization:FormatMessageToSend("GameChat_ChatFloodDetector_MessageDisplaySeconds", string.format("You must wait %d %s before sending another message!", v24, not (v24 > 1) and "second" or "seconds"), "RBX_NUMBER", (tostring(v24))), p8)
+
+		return true
+	end
+
+	p5:RegisterProcessCommandsFunction("flood_detection", FloodDetectionProcessCommandsFunction, ChatConstants.LowPriority)
+	p5.SpeakerRemoved:connect(function(p9) -- line: 102
+		-- upvalues: t1 (copy)
+		t1[p9] = nil
+	end)
+end
+
+return Run

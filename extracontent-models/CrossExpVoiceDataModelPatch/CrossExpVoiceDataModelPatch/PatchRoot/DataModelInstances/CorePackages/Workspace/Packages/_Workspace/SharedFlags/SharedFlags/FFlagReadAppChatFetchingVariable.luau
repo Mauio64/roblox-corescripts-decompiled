@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ReadAppChatFetchingVariable", false);
+return game:DefineFastFlag("ReadAppChatFetchingVariable", false)

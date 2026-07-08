@@ -1,14 +1,16 @@
-local v0 = require(script.Motion);
-local v1 = require(script.Utility.useMotion);
-local v2 = require(script.AnimatePresence.AnimatePresence);
-local v3 = require(script.AnimatePresence.usePresence);
-local _ = require(script.Types);
+local Motion = require(script.Motion)
+local useMotion = require(script.Utility.useMotion)
+local AnimatePresence = require(script.AnimatePresence.AnimatePresence)
+local usePresence = require(script.AnimatePresence.usePresence)
+
+require(script.Types)
+
 return {
-    createState = v0.createState, 
-    animate = v0.animate, 
-    transition = v0.transition, 
-    useMotion = v1, 
-    usePresence = v3, 
-    AnimatePresence = v2, 
-    TransitionPreset = require(script.Enums.TransitionPreset)
-};
+	createState = Motion.createState,
+	animate = Motion.animate,
+	transition = Motion.transition,
+	useMotion = useMotion,
+	usePresence = usePresence,
+	AnimatePresence = AnimatePresence,
+	TransitionPreset = require(script.Enums.TransitionPreset)
+}

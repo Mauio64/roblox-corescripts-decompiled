@@ -1,7 +1,6 @@
 local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
 local ProfilePlatformParent = ProfilePlatform.Parent
 local React = require(ProfilePlatformParent.React)
-local dependencyArray = require(ProfilePlatformParent.RoactUtils).Hooks.dependencyArray
 
 require(ProfilePlatformParent.SocialCommon)
 require(ProfilePlatform.Types.Component)
@@ -15,39 +14,42 @@ local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrap
 local useAreWebViewsSupported = require(ProfilePlatform.Hooks.useAreWebViewsSupported)
 local useIsProfileQrCodeEnabled = require(ProfilePlatform.Hooks.useIsProfileQrCodeEnabled)
 local useCanRenderTransferOnProfile = require(ProfilePlatform.Hooks.useCanRenderTransferOnProfile)
+local useCanSeeChatTab = require(ProfilePlatform.Hooks.useCanSeeChatTab)
 local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
-local FFlagProfilePlatformEnableCommunityProfilePage = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableCommunityProfilePage)
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
-local FFlagRemoveDependencyArrayAntipattern = require(ProfilePlatformParent.SharedFlags).FFlagRemoveDependencyArrayAntipattern
 local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+local FFlagProfilePlatformFilterChatActionByPolicy = require(ProfilePlatform.Flags.FFlagProfilePlatformFilterChatActionByPolicy)
 
-return function() -- line: 29
-	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), Enums (copy), getAvailableUserComponents (copy), FFlagProfilePlatformEnableVR (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), FFlagProfilePlatformEnableCommunityProfilePage (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy)
-	local v20 = useProfileWrapperContext()
-	local profileType = v20.profileType
-	local v22 = getDeepValue(v20, "sourceInfo.contextualInfoType")
-	local v23 = useAreWebViewsSupported()
-	local v24 = useIsProfileQrCodeEnabled()
-	local v25 = useCanRenderTransferOnProfile()
+return function() -- line: 25
+	-- upvalues: useProfileWrapperContext (copy), getDeepValue (copy), useAreWebViewsSupported (copy), useIsProfileQrCodeEnabled (copy), useCanRenderTransferOnProfile (copy), FFlagProfilePlatformFilterChatActionByPolicy (copy), useCanSeeChatTab (copy), FFlagProfilePlatformCTAsRefactor (copy), useLocalUserId (copy), React (copy), Enums (copy), getAvailableUserComponents (copy), FFlagProfilePlatformEnableVR (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy)
+	local v19 = useProfileWrapperContext()
+	local profileType = v19.profileType
+	local v21 = getDeepValue(v19, "sourceInfo.contextualInfoType")
+	local v22 = useAreWebViewsSupported()
+	local v23 = useIsProfileQrCodeEnabled()
+	local v24 = useCanRenderTransferOnProfile()
+	local v25 = if not FFlagProfilePlatformFilterChatActionByPolicy then nil else useCanSeeChatTab()
 	local v26 = if not FFlagProfilePlatformCTAsRefactor then nil else useLocalUserId()
-	local v27 = not not FFlagProfilePlatformCTAsRefactor and tostring(v20.profileId) == tostring(v26)
+	local v27 = not not FFlagProfilePlatformCTAsRefactor and tostring(v19.profileId) == tostring(v26)
 
-	return (React.useMemo(function() -- line: 43
-		-- upvalues: profileType (copy), Enums (copy), getAvailableUserComponents (copy), v22 (copy), FFlagProfilePlatformEnableVR (copy), v23 (copy), v24 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v25 (copy), FFlagProfilePlatformCTAsRefactor (copy), v27 (copy), FFlagProfilePlatformEnableCommunityProfilePage (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy)
+	return (React.useMemo(function() -- line: 40
+		-- upvalues: profileType (copy), Enums (copy), getAvailableUserComponents (copy), v21 (copy), FFlagProfilePlatformEnableVR (copy), v22 (copy), v23 (copy), FFlagProfilePlatformEnableCurrencyTransfer (copy), v24 (copy), FFlagProfilePlatformFilterChatActionByPolicy (copy), v25 (copy), FFlagProfilePlatformCTAsRefactor (copy), v27 (copy), getAvailableCommunityComponents (copy), getAvailableContactComponents (copy)
 		if profileType == Enums.ProfileTypes.User then
-			return getAvailableUserComponents(v22, if not FFlagProfilePlatformEnableVR then {
-				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v25,
+			return getAvailableUserComponents(v21, if not FFlagProfilePlatformEnableVR then {
+				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v24,
+				canSeeChatTab = if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v25,
 				isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v27
 			} else {
-				areWebViewsSupported = v23,
-				isProfileQrCodeEnabled = v24,
-				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v25,
+				areWebViewsSupported = v22,
+				isProfileQrCodeEnabled = v23,
+				canRenderTransferInProfile = not not FFlagProfilePlatformEnableCurrencyTransfer and v24,
+				canSeeChatTab = if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v25,
 				isSelfView = if not FFlagProfilePlatformCTAsRefactor then nil else v27
 			})
 		end
 
-		if FFlagProfilePlatformEnableCommunityProfilePage and profileType == Enums.ProfileTypes.Community then
+		if profileType == Enums.ProfileTypes.Community then
 			return getAvailableCommunityComponents()
 		end
 
@@ -56,17 +58,19 @@ return function() -- line: 29
 		end
 
 		return {}
-	end, if not FFlagProfilePlatformEnableVR then if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(profileType, v22, v23, v24, if not FFlagProfilePlatformCTAsRefactor then nil else v27, if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v25) else {
+	end, if not FFlagProfilePlatformEnableVR then {
 		profileType,
+		v21,
 		v22,
 		v23,
-		v24,
 		if not FFlagProfilePlatformCTAsRefactor then nil else v27,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v25
-	} else if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(profileType, v22, if not FFlagProfilePlatformCTAsRefactor then nil else v27, if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v25) else {
+		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v24,
+		if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v25
+	} else {
 		profileType,
-		v22,
+		v21,
 		if not FFlagProfilePlatformCTAsRefactor then nil else v27,
-		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v25
+		if not FFlagProfilePlatformEnableCurrencyTransfer then nil else v24,
+		if not FFlagProfilePlatformFilterChatActionByPolicy then nil else v25
 	}))
 end

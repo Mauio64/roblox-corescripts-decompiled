@@ -1,4 +1,5 @@
-game:DefineFastInt("UGCValidateMeshCenteringHundredsThreshold", 100);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("UGCValidateMeshCenteringHundredsThreshold");
-end;
+game:DefineFastInt("UGCValidateMeshCenteringHundredsThreshold", 100)
+
+return function() -- line: 3
+	return game:GetFastInt("UGCValidateMeshCenteringHundredsThreshold")
+end

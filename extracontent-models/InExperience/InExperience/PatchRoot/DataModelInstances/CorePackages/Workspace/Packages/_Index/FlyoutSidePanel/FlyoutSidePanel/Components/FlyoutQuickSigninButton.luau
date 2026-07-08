@@ -1,43 +1,58 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v6 = require(l_Parent_0.Foundation);
-local l_Button_0 = v6.Button;
-local l_ButtonVariant_0 = v6.Enums.ButtonVariant;
-local l_ButtonSize_0 = v6.Enums.ButtonSize;
-local v10 = require(script.Parent.Parent.Analytics.FlyoutAnalytics);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_AppEventIngestService_0 = require(l_Parent_0.RoactServiceTags).AppEventIngestService;
-local v13 = require(script.Parent.Parent.Config.FlyoutContentSettings);
-return function(v14) --[[ Line: 22 ]] --[[ Name: FlyoutQuickSigninButton ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useRoactService_0 (copy), l_AppEventIngestService_0 (copy), v1 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v13 (copy), v10 (copy), l_useLocalization_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_ButtonSize_0 (copy)
-    local v15 = l_useDispatch_0();
-    local v16 = l_useRoactService_0(l_AppEventIngestService_0);
-    local v18 = v1.useCallback(function() --[[ Line: 26 ]]
-        -- upvalues: v14 (copy), v15 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v13 (ref), v10 (ref), v16 (copy)
-        v14.closeDrawer();
-        v15(l_NavigateDown_0({
-            name = l_AppPage_0.CrossDeviceLogin
-        }));
-        local l_QuickSignin_0 = v13.ItemType.QuickSignin;
-        v10.sendMoreLegacyAndFlyoutItemClickEvent(v16, l_QuickSignin_0);
-    end, {
-        v16, 
-        v14.closeDrawer
-    });
-    local v19 = l_useLocalization_0({
-        title = "Authentication.CrossDevice.Heading.QuickLogin"
-    });
-    return v1.createElement(l_Button_0, {
-        text = v19.title, 
-        variant = l_ButtonVariant_0.Standard, 
-        LayoutOrder = v14.layoutOrder, 
-        onActivated = v18, 
-        isDisabled = false, 
-        size = l_ButtonSize_0.Large, 
-        width = UDim.new(1, 0)
-    });
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v8 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonSize = Foundation.Enums.ButtonSize
+local FlyoutAnalytics = require(script.Parent.Parent.Analytics.FlyoutAnalytics)
+local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
+local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
+
+local function FlyoutQuickSigninButton(p1) -- line: 26
+	-- upvalues: useDispatch (copy), useRoactService (copy), AppEventIngestService (copy), React (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), useLocalization (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
+	local v19 = useDispatch()
+	local v20 = useRoactService(AppEventIngestService)
+	local v21 = React.useCallback(function() -- line: 30
+		-- upvalues: p1 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v8 (copy), v19 (copy), NavigateDown (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), v20 (copy)
+		p1.closeDrawer()
+
+		local t1 = {
+			name = AppPage.CrossDeviceLogin
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v8.down(v8.fromLegacyPage(t1))
+		else
+			v19(NavigateDown(t1))
+		end
+
+		local QuickSignin = FlyoutContentSettings.ItemType.QuickSignin
+
+		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v20, QuickSignin)
+	end, {
+		v20,
+		p1.closeDrawer
+	})
+	local v22 = useLocalization({
+		title = "Authentication.CrossDevice.Heading.QuickLogin"
+	})
+
+	return React.createElement(Button, {
+		isDisabled = false,
+		text = v22.title,
+		variant = ButtonVariant.Standard,
+		LayoutOrder = p1.layoutOrder,
+		onActivated = v21,
+		size = ButtonSize.Large,
+		width = UDim.new(1, 0)
+	})
+end
+
+return FlyoutQuickSigninButton

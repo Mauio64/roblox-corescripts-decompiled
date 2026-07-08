@@ -1,173 +1,170 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_RobloxGui_0.Modules.Settings.Utility);
-local v5 = require(l_RobloxGui_0.Modules.Settings.leaveGame);
-local v6 = require(l_CorePackages_0.Packages.React);
-local v7 = require(l_CorePackages_0.Packages.ReactFocusNavigation);
-local v8 = require(l_CorePackages_0.Workspace.Packages.FocusNavigationUtils);
-local l_useLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).Hooks.useLocalization;
-local l_Constants_0 = require(l_RobloxGui_0.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"));
-local v11 = require(l_RobloxGui_0:WaitForChild("Modules"):WaitForChild("TenFootInterface")):IsEnabled();
-local v12 = require(l_CorePackages_0.Packages.Foundation);
-local v13 = require(script.Parent.Telemetry);
-local v14 = require(script.Parent.NextUpState);
-local l_useFocusGuiObject_0 = v7.useFocusGuiObject;
-local l_useLastInputMode_0 = v8.useLastInputMode;
-local l_Button_0 = v12.Button;
-local l_ButtonVariant_0 = v12.Enums.ButtonVariant;
-local l_InputSize_0 = v12.Enums.InputSize;
-local l_Text_0 = v12.Text;
-local l_View_0 = v12.View;
-local l_useTokens_0 = v12.Hooks.useTokens;
-local v23 = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry);
-local v24 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled();
-local v25 = if v24 then require(l_RobloxGui_0.Modules.Chrome.Service) else nil;
-local v26 = if v24 then require(l_RobloxGui_0.Modules.Chrome.ChromeShared.Unibar.Constants) else nil;
-local v27 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local l_FFlagEnableConsoleExpControls_0 = v27.FFlagEnableConsoleExpControls;
-local l_FFlagChromeShortcutRemoveRespawnOnLeavePage_0 = v27.FFlagChromeShortcutRemoveRespawnOnLeavePage;
-return v6.memo(function(v30) --[[ Line: 48 ]] --[[ Name: LeaveButtonsContainer ]]
-    -- upvalues: l_useTokens_0 (copy), v6 (copy), l_useLastInputMode_0 (copy), l_useFocusGuiObject_0 (copy), l_useLocalization_0 (copy), l_Constants_0 (copy), l_FFlagEnableConsoleExpControls_0 (copy), v24 (copy), v25 (copy), v26 (copy), l_FFlagChromeShortcutRemoveRespawnOnLeavePage_0 (copy), l_ContextActionService_0 (copy), v23 (copy), v13 (copy), v14 (copy), v5 (copy), v4 (copy), v11 (copy), l_View_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_InputSize_0 (copy), l_ButtonVariant_0 (copy)
-    local v31 = l_useTokens_0();
-    local v32 = v6.useRef(nil);
-    local v33 = l_useLastInputMode_0();
-    local v34 = l_useFocusGuiObject_0();
-    local v35 = l_useLocalization_0({
-        [l_Constants_0.ConfirmLeaveGameLocalizedKey] = l_Constants_0.ConfirmLeaveGameLocalizedKey, 
-        [l_Constants_0.LeaveGameLocalizedKey] = l_Constants_0.LeaveGameLocalizedKey, 
-        [l_Constants_0.DontLeaveGameLocalizedKey] = l_Constants_0.DontLeaveGameLocalizedKey
-    });
-    local v40 = v6.useCallback(function(_, v37, v38) --[[ Line: 60 ]]
-        -- upvalues: v30 (copy)
-        if v37 == Enum.UserInputState.Begin then
-            local v39 = true;
-            if v38.UserInputType ~= Enum.UserInputType.Gamepad1 then
-                v39 = true;
-                if v38.UserInputType ~= Enum.UserInputType.Gamepad2 then
-                    v39 = true;
-                    if v38.UserInputType ~= Enum.UserInputType.Gamepad3 then
-                        v39 = v38.UserInputType == Enum.UserInputType.Gamepad4;
-                    end;
-                end;
-            end;
-            v30.onDontLeave(v39);
-        end;
-    end, {
-        v30.onDontLeave
-    });
-    v6.useEffect(function() --[[ Line: 71 ]]
-        -- upvalues: l_FFlagEnableConsoleExpControls_0 (ref), v24 (ref), v25 (ref), v26 (ref), l_FFlagChromeShortcutRemoveRespawnOnLeavePage_0 (ref), l_ContextActionService_0 (ref), v40 (copy)
-        if l_FFlagEnableConsoleExpControls_0 then
-            if v24 and v25 and v26 then
-                if l_FFlagChromeShortcutRemoveRespawnOnLeavePage_0 then
-                    v25:setShortcutBar(v26.TILTMENU_LEAVE_DIALOG_SHORTCUTBAR_ID);
-                else
-                    v25:setShortcutBar(v26.TILTMENU_DIALOG_SHORTCUTBAR_ID);
-                end;
-            end;
-        else
-            l_ContextActionService_0:BindCoreAction("LeaveGameCancelAction", v40, false, Enum.KeyCode.ButtonB);
-        end;
-        return function() --[[ Line: 84 ]]
-            -- upvalues: l_ContextActionService_0 (ref)
-            l_ContextActionService_0:UnbindCoreAction("LeaveGameCancelAction");
-        end;
-    end, {
-        v40
-    });
-    v6.useEffect(function() --[[ Line: 89 ]]
-        -- upvalues: v33 (copy), v34 (copy), v32 (copy)
-        if v33 == "Focus" then
-            v34(v32.current);
-            return;
-        else
-            v34(nil);
-            return;
-        end;
-    end, {
-        v33, 
-        v32.current
-    });
-    local v41 = if v23 then v6.useRef(false) else nil;
-    local v43 = v23 and function(v42) --[[ Line: 99 ]]
-        -- upvalues: v41 (copy), v13 (ref)
-        if v41.current then
-            return;
-        else
-            v41.current = true;
-            v13.logNextUpExitModalAction(v42);
-            return;
-        end;
-    end or nil;
-    if v23 then
-        v6.useEffect(function() --[[ Line: 109 ]]
-            -- upvalues: v43 (copy), v13 (ref)
-            return function() --[[ Line: 110 ]]
-                -- upvalues: v43 (ref), v13 (ref)
-                v43(v13.NextUpSortViewActionType.CloseExitModalEscape);
-            end;
-        end, {});
-    end;
-    local v44 = v6.useCallback(function() --[[ Line: 116 ]]
-        -- upvalues: v23 (ref), v43 (copy), v13 (ref), v14 (ref), v5 (ref)
-        if v23 then
-            v43(v13.NextUpSortViewActionType.LeaveGame);
-        else
-            v13.logNextUpSortView(v14.getNextUpTilesLoaded());
-        end;
-        v5(true);
-    end, {});
-    local v45 = v6.useCallback(function() --[[ Line: 125 ]]
-        -- upvalues: v23 (ref), v43 (copy), v13 (ref), v14 (ref), v30 (copy), v4 (ref)
-        if v23 then
-            v43(v13.NextUpSortViewActionType.CloseExitModalClick);
-        else
-            v13.logNextUpSortView(v14.getNextUpTilesLoaded());
-        end;
-        v30.onDontLeave(v4:IsUsingGamepad());
-    end, {
-        v30.onDontLeave
-    });
-    local v46 = "text-heading-medium";
-    if v4:IsSmallTouchScreen() then
-        v46 = "text-heading-small";
-    elseif v11 then
-        v46 = "text-heading-large";
-    end;
-    return v6.createElement(l_View_0, {
-        Position = UDim2.new(0, 0, 0, v11 and 100 or 0), 
-        tag = "size-full-0 auto-y col gap-large", 
-        LayoutOrder = 1
-    }, {
-        LeaveGameText = v6.createElement(l_Text_0, {
-            Text = v35[l_Constants_0.ConfirmLeaveGameLocalizedKey], 
-            LayoutOrder = 1, 
-            tag = ("text-wrap %* auto-y size-full-0"):format(v46), 
-            textStyle = v31.Color.Extended.White.White_100
-        }), 
-        LeaveButtonsContainer = v6.createElement(l_View_0, {
-            LayoutOrder = 2, 
-            tag = "size-full-0 auto-y row align-x-center gap-medium wrap flex-x-fill"
-        }, {
-            LeaveGameButton = v6.createElement(l_Button_0, {
-                text = v35[l_Constants_0.LeaveGameLocalizedKey], 
-                size = l_InputSize_0.Medium, 
-                variant = l_ButtonVariant_0.SoftEmphasis, 
-                width = UDim.new(0, v30.buttonSize), 
-                LayoutOrder = 1, 
-                ref = v32, 
-                onActivated = v44
-            }), 
-            DontLeaveGameButton = v6.createElement(l_Button_0, {
-                text = v35[l_Constants_0.DontLeaveGameLocalizedKey], 
-                size = l_InputSize_0.Medium, 
-                variant = l_ButtonVariant_0.Standard, 
-                width = UDim.new(0, v30.buttonSize), 
-                LayoutOrder = 2, 
-                onActivated = v45
-            })
-        })
-    });
-end);
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Utility = require(RobloxGui.Modules.Settings.Utility)
+local leaveGame = require(RobloxGui.Modules.Settings.leaveGame)
+local React = require(CorePackages.Packages.React)
+local ReactFocusNavigation = require(CorePackages.Packages.ReactFocusNavigation)
+local FocusNavigationUtils = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
+local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local Constants = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
+local v12 = require(RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")):IsEnabled()
+local Foundation = require(CorePackages.Packages.Foundation)
+local Telemetry = require(script.Parent.Telemetry)
+local NextUpState = require(script.Parent.NextUpState)
+local useFocusGuiObject = ReactFocusNavigation.useFocusGuiObject
+local useLastInputMode = FocusNavigationUtils.useLastInputMode
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local useTokens = Foundation.Hooks.useTokens
+local FFlagEnableNextUpImageLatencyTelemetry = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry)
+local v25 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
+local v26 = if not v25 then nil else require(RobloxGui.Modules.Chrome.Service)
+local v27 = if not v25 then nil else require(RobloxGui.Modules.Chrome.ChromeShared.Unibar.Constants)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagChromeShortcutRemoveRespawnOnLeavePage = SharedFlags.FFlagChromeShortcutRemoveRespawnOnLeavePage
+
+local function LeaveButtonsContainer(t1: {[any]: any}) -- line: 48
+	-- upvalues: useTokens (copy), React (copy), useLastInputMode (copy), useFocusGuiObject (copy), useLocalization (copy), Constants (copy), FFlagEnableConsoleExpControls (copy), v25 (copy), v26 (copy), v27 (copy), FFlagChromeShortcutRemoveRespawnOnLeavePage (copy), ContextActionService (copy), FFlagEnableNextUpImageLatencyTelemetry (copy), Telemetry (copy), NextUpState (copy), leaveGame (copy), Utility (copy), v12 (copy), View (copy), FoundationText (copy), Button (copy), InputSize (copy), ButtonVariant (copy)
+	local v33 = useTokens()
+	local v34 = React.useRef(nil)
+	local v35 = useLastInputMode()
+	local v36 = useFocusGuiObject()
+	local v37 = useLocalization({
+		[Constants.ConfirmLeaveGameLocalizedKey] = Constants.ConfirmLeaveGameLocalizedKey,
+		[Constants.LeaveGameLocalizedKey] = Constants.LeaveGameLocalizedKey,
+		[Constants.DontLeaveGameLocalizedKey] = Constants.DontLeaveGameLocalizedKey
+	})
+	local v38 = React.useCallback(function(_, p2, p3) -- line: 60
+		-- upvalues: t1 (copy)
+		if p2 == Enum.UserInputState.Begin then
+			local v47 = p3.UserInputType == Enum.UserInputType.Gamepad1 or (p3.UserInputType == Enum.UserInputType.Gamepad2 or (p3.UserInputType == Enum.UserInputType.Gamepad3 or p3.UserInputType == Enum.UserInputType.Gamepad4))
+
+			t1.onDontLeave(v47)
+		end
+	end, { t1.onDontLeave })
+
+	React.useEffect(function() -- line: 71
+		-- upvalues: FFlagEnableConsoleExpControls (copy), v25 (copy), v26 (copy), v27 (copy), FFlagChromeShortcutRemoveRespawnOnLeavePage (copy), ContextActionService (copy), v38 (copy)
+		if FFlagEnableConsoleExpControls then
+			if v25 and v26 and v27 then
+				if FFlagChromeShortcutRemoveRespawnOnLeavePage then
+					v26:setShortcutBar(v27.TILTMENU_LEAVE_DIALOG_SHORTCUTBAR_ID)
+				else
+					v26:setShortcutBar(v27.TILTMENU_DIALOG_SHORTCUTBAR_ID)
+				end
+			end
+		else
+			ContextActionService:BindCoreAction("LeaveGameCancelAction", v38, false, Enum.KeyCode.ButtonB)
+		end
+
+		return function() -- line: 84
+			-- upvalues: ContextActionService (copy)
+			ContextActionService:UnbindCoreAction("LeaveGameCancelAction")
+		end
+	end, { v38 })
+	React.useEffect(function() -- line: 89
+		-- upvalues: v35 (copy), v36 (copy), v34 (copy)
+		if v35 == "Focus" then
+			v36(v34.current)
+
+			return
+		end
+
+		v36(nil)
+	end, {
+		v35,
+		v34.current
+	})
+
+	local v39 = if not FFlagEnableNextUpImageLatencyTelemetry then nil else React.useRef(false)
+	local v40 = if not FFlagEnableNextUpImageLatencyTelemetry then nil else function(p4) -- line: 99
+		-- upvalues: v39 (copy), Telemetry (copy)
+		if v39.current then
+			return
+		end
+
+		v39.current = true
+		Telemetry.logNextUpExitModalAction(p4)
+	end
+
+	if FFlagEnableNextUpImageLatencyTelemetry then
+		React.useEffect(function() -- line: 109
+			-- upvalues: v40 (copy), Telemetry (copy)
+			return function() -- line: 110
+				-- upvalues: v40 (copy), Telemetry (copy)
+				v40(Telemetry.NextUpSortViewActionType.CloseExitModalEscape)
+			end
+		end, {})
+	end
+
+	local v41 = React.useCallback(function() -- line: 116
+		-- upvalues: FFlagEnableNextUpImageLatencyTelemetry (copy), v40 (copy), Telemetry (copy), NextUpState (copy), leaveGame (copy)
+		if FFlagEnableNextUpImageLatencyTelemetry then
+			v40(Telemetry.NextUpSortViewActionType.LeaveGame)
+		else
+			Telemetry.logNextUpSortView(NextUpState.getNextUpTilesLoaded())
+		end
+
+		leaveGame(true)
+	end, {})
+	local v42 = React.useCallback(function() -- line: 125
+		-- upvalues: FFlagEnableNextUpImageLatencyTelemetry (copy), v40 (copy), Telemetry (copy), NextUpState (copy), t1 (copy), Utility (copy)
+		if FFlagEnableNextUpImageLatencyTelemetry then
+			v40(Telemetry.NextUpSortViewActionType.CloseExitModalClick)
+		else
+			Telemetry.logNextUpSortView(NextUpState.getNextUpTilesLoaded())
+		end
+
+		t1.onDontLeave(Utility:IsUsingGamepad())
+	end, { t1.onDontLeave })
+	local s1 = "text-heading-medium"
+
+	if Utility:IsSmallTouchScreen() then
+		s1 = "text-heading-small"
+	elseif v12 then
+		s1 = "text-heading-large"
+	end
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y col gap-large",
+		LayoutOrder = 1,
+		Position = UDim2.new(0, 0, 0, not v12 and 0 or 100)
+	}, {
+		LeaveGameText = React.createElement(FoundationText, {
+			LayoutOrder = 1,
+			Text = v37[Constants.ConfirmLeaveGameLocalizedKey],
+			tag = `text-wrap { s1 } auto-y size-full-0`,
+			textStyle = v33.Color.Extended.White.White_100
+		}),
+		LeaveButtonsContainer = React.createElement(View, {
+			LayoutOrder = 2,
+			tag = "size-full-0 auto-y row align-x-center gap-medium wrap flex-x-fill"
+		}, {
+			LeaveGameButton = React.createElement(Button, {
+				LayoutOrder = 1,
+				text = v37[Constants.LeaveGameLocalizedKey],
+				size = InputSize.Medium,
+				variant = ButtonVariant.SoftEmphasis,
+				width = UDim.new(0, t1.buttonSize),
+				ref = v34,
+				onActivated = v41
+			}),
+			DontLeaveGameButton = React.createElement(Button, {
+				LayoutOrder = 2,
+				text = v37[Constants.DontLeaveGameLocalizedKey],
+				size = InputSize.Medium,
+				variant = ButtonVariant.Standard,
+				width = UDim.new(0, t1.buttonSize),
+				onActivated = v42
+			})
+		})
+	})
+end
+
+return React.memo(LeaveButtonsContainer)

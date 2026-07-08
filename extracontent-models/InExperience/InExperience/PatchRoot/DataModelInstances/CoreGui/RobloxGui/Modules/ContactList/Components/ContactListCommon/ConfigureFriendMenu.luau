@@ -1,75 +1,79 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_BaseMenu_0 = v3.App.Menu.BaseMenu;
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_ContactList_0 = l_CoreGui_0:WaitForChild("RobloxGui").Modules.ContactList;
-local v8 = require(l_ContactList_0.dependencies);
-local l_useSelector_0 = v8.Hooks.useSelector;
-local v10 = require(l_ContactList_0.Analytics.useAnalytics);
-local v11 = require(l_ContactList_0.Analytics.EventNamesEnum);
-local v12 = require(l_ContactList_0.Enums.FriendAction);
-local l_useLocalization_0 = v8.Hooks.useLocalization;
-return function(v14) --[[ Line: 22 ]] --[[ Name: ConfigureFriendMenu ]]
-    -- upvalues: v10 (copy), l_useStyle_0 (copy), l_useSelector_0 (copy), l_useLocalization_0 (copy), v2 (copy), l_BaseMenu_0 (copy), l_Images_0 (copy), v11 (copy), v12 (copy)
-    local v15 = v10();
-    local l_Theme_0 = l_useStyle_0().Theme;
-    local v18 = l_useSelector_0(function(v17) --[[ Line: 27 ]]
-        if v17.PlayerMenu.friend then
-            return v17.PlayerMenu.friend.combinedName;
-        else
-            return "";
-        end;
-    end);
-    local v20 = l_useSelector_0(function(v19) --[[ Line: 35 ]]
-        if v19.PlayerMenu.friend then
-            return v19.PlayerMenu.friend.userId;
-        else
-            return nil;
-        end;
-    end);
-    local v21 = l_useLocalization_0({
-        blockLabel = {
-            "Feature.Call.Label.Block"; 
-            combinedName = v18
-        }, 
-        unfriendLabel = {
-            "Feature.Call.Label.Unfriend"; 
-            combinedName = v18
-        }
-    });
-    return v2.createElement(l_BaseMenu_0, {
-        buttonProps = {
-            {
-                icon = l_Images_0["icons/actions/block"], 
-                text = v21.blockLabel, 
-                onActivated = function() --[[ Line: 59 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v15 (copy), v11 (ref), v20 (copy), v14 (copy), v12 (ref)
-                    v15.fireEvent(v11.PhoneBookPlayerMenuBlockClicked, {
-                        eventTimestampMs = os.time() * 1000, 
-                        friendUserId = v20
-                    });
-                    v14.initiateConfirmation(v12.Block);
-                end
-            }, 
-            {
-                icon = l_Images_0["icons/actions/friends/friendRemove"], 
-                text = v21.unfriendLabel, 
-                onActivated = function() --[[ Line: 70 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v15 (copy), v11 (ref), v20 (copy), v14 (copy), v12 (ref)
-                    v15.fireEvent(v11.PhoneBookPlayerMenuUnfriendClicked, {
-                        eventTimestampMs = os.time() * 1000, 
-                        friendUserId = v20
-                    });
-                    v14.initiateConfirmation(v12.Unfriend);
-                end
-            }
-        }, 
-        background = l_Theme_0.BackgroundUIDefault, 
-        width = UDim.new(0, 352), 
-        position = UDim2.new(0.5, 0, 0.5, 0), 
-        anchorPoint = Vector2.new(0.5, 0.5)
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local BaseMenu = UIBlox.App.Menu.BaseMenu
+local Images = UIBlox.App.ImageSet.Images
+local useStyle = UIBlox.Core.Style.useStyle
+local ContactList = CoreGui:WaitForChild("RobloxGui").Modules.ContactList
+local dependencies = require(ContactList.dependencies)
+local useSelector = dependencies.Hooks.useSelector
+local useAnalytics = require(ContactList.Analytics.useAnalytics)
+local EventNamesEnum = require(ContactList.Analytics.EventNamesEnum)
+local FriendAction = require(ContactList.Enums.FriendAction)
+local useLocalization = dependencies.Hooks.useLocalization
+
+local function ConfigureFriendMenu(p1) -- line: 22
+	-- upvalues: useAnalytics (copy), useStyle (copy), useSelector (copy), useLocalization (copy), Roact (copy), BaseMenu (copy), Images (copy), EventNamesEnum (copy), FriendAction (copy)
+	local v17 = useAnalytics()
+	local Theme = useStyle().Theme
+	local v19 = useSelector(function(p2) -- line: 27
+		if p2.PlayerMenu.friend then
+			return p2.PlayerMenu.friend.combinedName
+		end
+
+		return ""
+	end)
+	local v20 = useSelector(function(p3) -- line: 35
+		if p3.PlayerMenu.friend then
+			return p3.PlayerMenu.friend.userId
+		end
+
+		return nil
+	end)
+	local v21 = useLocalization({
+		blockLabel = {
+			"Feature.Call.Label.Block",
+			combinedName = v19
+		},
+		unfriendLabel = {
+			"Feature.Call.Label.Unfriend",
+			combinedName = v19
+		}
+	})
+
+	return Roact.createElement(BaseMenu, {
+		buttonProps = {
+			{
+				icon = Images["icons/actions/block"],
+				text = v21.blockLabel,
+				onActivated = function() -- line: 59
+					-- upvalues: v17 (copy), EventNamesEnum (copy), v20 (copy), p1 (copy), FriendAction (copy)
+					v17.fireEvent(EventNamesEnum.PhoneBookPlayerMenuBlockClicked, {
+						eventTimestampMs = os.time() * 1000,
+						friendUserId = v20
+					})
+					p1.initiateConfirmation(FriendAction.Block)
+				end
+			},
+			{
+				icon = Images["icons/actions/friends/friendRemove"],
+				text = v21.unfriendLabel,
+				onActivated = function() -- line: 70
+					-- upvalues: v17 (copy), EventNamesEnum (copy), v20 (copy), p1 (copy), FriendAction (copy)
+					v17.fireEvent(EventNamesEnum.PhoneBookPlayerMenuUnfriendClicked, {
+						eventTimestampMs = os.time() * 1000,
+						friendUserId = v20
+					})
+					p1.initiateConfirmation(FriendAction.Unfriend)
+				end
+			}
+		},
+		background = Theme.BackgroundUIDefault,
+		width = UDim.new(0, 352),
+		position = UDim2.new(0.5, 0, 0.5, 0),
+		anchorPoint = Vector2.new(0.5, 0.5)
+	})
+end
+
+return ConfigureFriendMenu

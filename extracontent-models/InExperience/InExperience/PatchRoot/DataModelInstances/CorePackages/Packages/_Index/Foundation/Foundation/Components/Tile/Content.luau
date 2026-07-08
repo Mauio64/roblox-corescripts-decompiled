@@ -1,1 +1,1 @@
-return require(script.TileContent);
+return require(script.TileContent)

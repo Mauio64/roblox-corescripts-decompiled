@@ -1,1 +1,1 @@
-return game:DefineFastString("SpatialRobloxUIIXPLayerName", "PlatformExcellence.VR.SpatialUI");
+return game:DefineFastString("SpatialRobloxUIIXPLayerName", "PlatformExcellence.VR.SpatialUI")

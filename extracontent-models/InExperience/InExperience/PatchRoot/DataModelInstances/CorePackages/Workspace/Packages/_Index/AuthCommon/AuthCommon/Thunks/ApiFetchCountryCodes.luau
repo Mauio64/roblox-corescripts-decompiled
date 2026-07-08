@@ -1,37 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local l_PerformFetch_0 = require(l_Parent_0.Http).PerformFetch;
-local v4 = require(l_script_FirstAncestor_0.Http.Requests.GetCountryCodes);
-local v5 = require(l_script_FirstAncestor_0.Models.CountryCode);
-local v6 = require(l_script_FirstAncestor_0.Actions.SetCountryCodeList);
-local v12 = {
-    _updateStoreWithCountryCodes = function(v7, v8) --[[ Line: 13 ]] --[[ Name: _updateStoreWithCountryCodes ]]
-        -- upvalues: v5 (copy), v6 (copy), v2 (copy)
-        local v9 = {};
-        for v10, v11 in pairs(v8.responseBody) do
-            v9[v10] = v5.fromJSON(v11);
-        end;
-        v7:dispatch(v6(v9));
-        return v2.resolve();
-    end
-};
-v12.Fetch = function(v13) --[[ Line: 22 ]] --[[ Name: Fetch ]]
-    -- upvalues: l_PerformFetch_0 (copy), v4 (copy), v12 (copy), v2 (copy)
-    return l_PerformFetch_0.Single("luaapp.countriesapi.countrycodes", function(v14) --[[ Line: 23 ]]
-        -- upvalues: v4 (ref), v13 (copy), v12 (ref), v2 (ref)
-        return v4(v13):andThen(function(v15) --[[ Line: 24 ]]
-            -- upvalues: v12 (ref), v14 (copy), v2 (ref)
-            if v15 and v15.responseBody then
-                return v12._updateStoreWithCountryCodes(v14, v15);
-            else
-                return v2.reject();
-            end;
-        end);
-    end);
-end;
-v12.GetFetchingStatus = function(v16) --[[ Line: 34 ]] --[[ Name: GetFetchingStatus ]]
-    -- upvalues: l_PerformFetch_0 (copy)
-    return l_PerformFetch_0.GetStatus(v16, "luaapp.countriesapi.countrycodes");
-end;
-return v12;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Promise = require(AuthCommonParent.Promise)
+local PerformFetch = require(AuthCommonParent.Http).PerformFetch
+local GetCountryCodes = require(AuthCommon.Http.Requests.GetCountryCodes)
+local CountryCode = require(AuthCommon.Models.CountryCode)
+local SetCountryCodeList = require(AuthCommon.Actions.SetCountryCodeList)
+local t2 = {
+	_updateStoreWithCountryCodes = function(p1, p2) -- line: 13
+		-- upvalues: CountryCode (copy), SetCountryCodeList (copy), Promise (copy)
+		local t1 = {}
+
+		for k, v in pairs(p2.responseBody) do
+			t1[k] = CountryCode.fromJSON(v)
+		end
+
+		p1:dispatch(SetCountryCodeList(t1))
+
+		return Promise.resolve()
+	end
+}
+
+function t2.Fetch(p3) -- line: 22
+	-- upvalues: PerformFetch (copy), GetCountryCodes (copy), t2 (copy), Promise (copy)
+	return PerformFetch.Single("luaapp.countriesapi.countrycodes", function(p4) -- line: 23
+		-- upvalues: GetCountryCodes (copy), p3 (copy), t2 (copy), Promise (copy)
+		return GetCountryCodes(p3):andThen(function(p5) -- line: 24
+			-- upvalues: t2 (copy), p4 (copy), Promise (copy)
+			if p5 and p5.responseBody then
+				return t2._updateStoreWithCountryCodes(p4, p5)
+			end
+
+			return Promise.reject()
+		end)
+	end)
+end
+function t2.GetFetchingStatus(p6) -- line: 34
+	-- upvalues: PerformFetch (copy)
+	return PerformFetch.GetStatus(p6, "luaapp.countriesapi.countrycodes")
+end
+
+return t2

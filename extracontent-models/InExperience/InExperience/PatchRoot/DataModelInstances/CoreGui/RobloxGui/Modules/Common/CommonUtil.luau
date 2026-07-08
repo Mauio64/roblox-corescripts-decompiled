@@ -1,14 +1,18 @@
 return {
-    TableConcat = function(v0, v1) --[[ Line: 12 ]] --[[ Name: TableConcat ]]
-        for v2 = 1, #v1 do
-            v0[#v0 + 1] = v1[v2];
-        end;
-        return v0;
-    end, 
-    SortByName = function(v3) --[[ Line: 21 ]] --[[ Name: SortByName ]]
-        table.sort(v3, function(v4, v5) --[[ Line: 22 ]] --[[ Name: compareInstanceNames ]]
-            return v4.Name < v5.Name;
-        end);
-        return v3;
-    end
-};
+	TableConcat = function(p1, p2) -- line: 12
+		for i = 1, #p2 do
+			p1[#p1 + 1] = p2[i]
+		end
+
+		return p1
+	end,
+	SortByName = function(p3) -- line: 21
+		local function compareInstanceNames(p4, p5) -- line: 22
+			return p4.Name < p5.Name
+		end
+
+		table.sort(p3, compareInstanceNames)
+
+		return p3
+	end
+}

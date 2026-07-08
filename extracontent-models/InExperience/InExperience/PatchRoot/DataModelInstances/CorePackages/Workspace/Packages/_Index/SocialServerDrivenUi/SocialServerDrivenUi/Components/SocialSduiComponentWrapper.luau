@@ -1,1 +1,1 @@
-return require(script.SocialSduiComponentWrapper);
+return require(script.SocialSduiComponentWrapper)

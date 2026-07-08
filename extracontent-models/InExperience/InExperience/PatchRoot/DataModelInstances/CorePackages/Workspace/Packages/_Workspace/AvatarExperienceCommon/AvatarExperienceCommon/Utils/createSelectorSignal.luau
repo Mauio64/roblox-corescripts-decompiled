@@ -1,17 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local _ = require(l_script_FirstAncestor_0.Hooks.useSelectorSignal);
-local function v6(v4, v5) --[[ Line: 9 ]]
-    return v4 == v5;
-end;
-return function(v7, v8, v9) --[[ Line: 14 ]] --[[ Name: createSelectorSignal ]]
-    -- upvalues: v2 (copy), v6 (copy)
-    local v10 = v7:getState();
-    local v11, v12 = v2.createSignal(v10);
-    v7.changed:connect(v12);
-    return v2.createComputed(function(v13) --[[ Line: 20 ]]
-        -- upvalues: v8 (copy), v11 (copy)
-        return v8(v11(v13));
-    end, v9 or v6);
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local Signals = require(AvatarExperienceCommonParent.Signals)
+
+require(AvatarExperienceCommon.Hooks.useSelectorSignal)
+
+local function v4(p1, p2) -- line: 9
+	return p1 == p2
+end
+local function createSelectorSignal(p3, p4, p5) -- line: 14
+	-- upvalues: Signals (copy), v4 (copy)
+	local v11 = p3:getState()
+	local v12, v13 = Signals.createSignal(v11)
+
+	p3.changed:connect(v13)
+
+	return Signals.createComputed(function(p6) -- line: 20
+		-- upvalues: p4 (copy), v12 (copy)
+		return p4(v12(p6))
+	end, p5 or v4)
+end
+
+return createSelectorSignal

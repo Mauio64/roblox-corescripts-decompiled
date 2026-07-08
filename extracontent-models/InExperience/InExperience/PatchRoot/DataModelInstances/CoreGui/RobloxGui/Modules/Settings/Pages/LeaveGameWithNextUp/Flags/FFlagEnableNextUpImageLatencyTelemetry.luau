@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableNextUpImageLatencyTelemetry", false);
+return game:DefineFastFlag("EnableNextUpImageLatencyTelemetry", false)

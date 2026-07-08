@@ -1,11 +1,16 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Signals);
-local _ = require(script.Parent.EnumReactPage);
-return v1.createComputed(function() --[[ Line: 11 ]] --[[ Name: ReactPageSignal ]]
-    -- upvalues: v1 (copy)
-    local v3, v4 = v1.createSignal(nil);
-    return {
-        currentReactPage = v3, 
-        setCurrentReactPage = v4
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+local Signals = require(CorePackages.Packages.Signals)
+
+require(script.Parent.EnumReactPage)
+
+local function ReactPageSignal() -- line: 11
+	-- upvalues: Signals (copy)
+	local v4, v5 = Signals.createSignal(nil)
+
+	return {
+		currentReactPage = v4,
+		setCurrentReactPage = v5
+	}
+end
+
+return Signals.createComputed(ReactPageSignal)

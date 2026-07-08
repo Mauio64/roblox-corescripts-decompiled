@@ -1,164 +1,177 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_script_FirstAncestor_0.Common.Constants);
-local v5 = require(l_script_FirstAncestor_0.Components.CurrentlyWearing.SortCurrentlyWearing);
-local v6 = require(l_Parent_0.RoactUtils);
-local l_dependencyArray_0 = v6.Hooks.dependencyArray;
-local l_useSelector_0 = v6.Hooks.RoactRodux.useSelector;
-local l_useDispatch_0 = v6.Hooks.RoactRodux.useDispatch;
-local l_useEffectOnMount_0 = v6.Hooks.useEffectOnMount;
-local v11 = require(l_script_FirstAncestor_0.Common.Enums);
-local v12 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local v13 = require(l_script_FirstAncestor_0.Networking.NetworkingCurrentlyWearing);
-local v14 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local v15 = require(l_script_FirstAncestor_0.Contexts.useProfileWrapperContext);
-local v16 = require(l_script_FirstAncestor_0.Contexts.useProfileAnalyticsContext);
-local v17 = require(l_script_FirstAncestor_0.Hooks.useMarketplaceAnalyticsContext);
-local v18 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local _ = require(l_script_FirstAncestor_0.Common.AssetInfo);
-local v21 = require(l_script_FirstAncestor_0.Networking.NetworkingCatalog);
-local l_FFlagProfilePlatformEnableInventory_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableInventory;
-local l_FFlagProfilePlatformEnableStore_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableStore;
-local v24 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformUseCatalogItemOpenedNewFields);
-local l_FFlagAddIEMProfilePage_0 = require(l_Parent_0.SharedFlags).FFlagAddIEMProfilePage;
-local l_IXPService_0 = game:GetService("IXPService");
-local v27 = game:DefineFastString("SocialProfileCurrentlyWearingClickThroughLayer", "Social.ProfileCurrentlyWearingClickThrough");
-local l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableBundlesInAssetsCarousel;
-local v29 = require(l_script_FirstAncestor_0.Components.AssetsCarousel);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-return function(v31) --[[ Line: 49 ]] --[[ Name: CurrentlyWearingCarousel ]]
-    -- upvalues: l_useDispatch_0 (copy), v15 (copy), v16 (copy), l_FFlagProfilePlatformEnableInventory_0 (copy), l_useLocalization_0 (copy), v18 (copy), v17 (copy), l_FFlagAddIEMProfilePage_0 (copy), v2 (copy), v11 (copy), l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 (copy), l_IXPService_0 (copy), v27 (copy), l_FFlagProfilePlatformEnableStore_0 (copy), v12 (copy), v24 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v14 (copy), v4 (copy), l_useSelector_0 (copy), v21 (copy), v3 (copy), l_useEffectOnMount_0 (copy), v13 (copy), v5 (copy), v29 (copy)
-    local v32 = l_useDispatch_0();
-    local v33 = v15();
-    local v34 = v16();
-    local v35 = if l_FFlagProfilePlatformEnableInventory_0 then l_useLocalization_0({
-        currentlyWearing = v18.CurrentlyWearing
-    }) else nil;
-    local v36 = v17();
-    local v37 = if l_FFlagAddIEMProfilePage_0 then v33.sourceInfo.source else nil;
-    local v43 = v2.useCallback(function(v38, v39, _, _, v42) --[[ Line: 64 ]]
-        -- upvalues: l_FFlagAddIEMProfilePage_0 (ref), v37 (copy), v11 (ref), v33 (copy), l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 (ref), l_IXPService_0 (ref), v27 (ref), l_FFlagProfilePlatformEnableStore_0 (ref), v34 (copy), v12 (ref), v24 (ref), v36 (copy)
-        if l_FFlagAddIEMProfilePage_0 and v37 == v11.Sources.InExperienceProfile then
-            v33.navigateTo.inspectAvatar();
-            return;
-        else
-            if l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 then
-                v33.navigateTo.itemOrBundleDetails(v38, v39);
-            else
-                v33.navigateTo.itemDetails(v38);
-            end;
-            l_IXPService_0:LogFlagLinkedUserLayerExposure(v27);
-            if l_FFlagProfilePlatformEnableStore_0 then
-                v34.fireAnalyticsEvent(v12.CatalogItemOpened, if v24 then {
-                    btnContext = tostring(v11.Components.CurrentlyWearing), 
-                    btnUnitId = tostring(v38), 
-                    btnSortPosition = tostring(v42)
-                } else {
-                    source = tostring(v11.Components.CurrentlyWearing), 
-                    positionInComponent = tostring(v42), 
-                    component = tostring(v11.Components.CurrentlyWearing), 
-                    itemId = tostring(v38)
-                });
-                v33.externalAnalytics.catalogAnalytics.clickCatalogItemFromProfile(v36, v38, v39, tostring(v11.Components.CurrentlyWearing), v42);
-                return;
-            else
-                v34.fireAnalyticsEvent(v12.CatalogItemOpened);
-                v33.externalAnalytics.catalogAnalytics.clickCatalogItemFromProfile(v36, v38, v39);
-                return;
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v33.navigateTo.itemDetails, 
-        v33.externalAnalytics.catalogAnalytics, 
-        v33.navigateTo.tryOnItem, 
-        v33.navigateTo.inspectAvatar, 
-        v37
-    } else l_dependencyArray_0(v33.navigateTo.itemDetails, v33.externalAnalytics.catalogAnalytics, v33.navigateTo.tryOnItem, v33.navigateTo.inspectAvatar, v37));
-    local v44 = v14(v11.Components.CurrentlyWearing).assets or {};
-    local v45 = nil;
-    local v46 = nil;
-    if l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 then
-        local v55 = v2.useCallback(function(v47) --[[ Line: 130 ]]
-            -- upvalues: v4 (ref), v44 (copy), v11 (ref)
-            local v48 = v47[v4.RODUX_KEY].BundleDetails or {};
-            local v49 = v47[v4.RODUX_KEY].AssetDetails or {};
-            local v50 = {};
-            local v51 = 1;
-            for _, v53 in v44 do
-                local v54 = nil;
-                v54 = if v53.itemType == v11.ItemTypes.Bundle then v48[tostring(v53.assetId)] else v49[tostring(v53.assetId)];
-                if v54 then
-                    v54.itemType = v53.itemType;
-                    v50[v51] = v54;
-                    v51 = v51 + 1;
-                end;
-            end;
-            return v50;
-        end, {
-            v44
-        });
-        v45 = l_useSelector_0(v55);
-        v2.useEffect(function() --[[ Line: 153 ]]
-            -- upvalues: v44 (copy), v32 (copy), v21 (ref)
-            if #v44 > 0 then
-                v32(v21.GetItemAndBundleDetails.API(v44));
-            end;
-        end, {
-            v44, 
-            v32
-        });
-    else
-        local v57 = v2.useMemo(function() --[[ Line: 159 ]]
-            -- upvalues: v3 (ref), v44 (copy)
-            return v3.List.map(v44, function(v56) --[[ Line: 160 ]]
-                return v56.assetId;
-            end);
-        end, {
-            v44
-        });
-        l_useEffectOnMount_0(function() --[[ Line: 165 ]]
-            -- upvalues: v32 (copy), v13 (ref), v57 (copy)
-            v32(v13.GetItemDetails.API(v57)):andThen(function(_) --[[ Line: 167 ]]
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local Cryo = require(ProfilePlatformParent.Cryo)
+local Constants = require(ProfilePlatform.Common.Constants)
+local SortCurrentlyWearing = require(ProfilePlatform.Components.CurrentlyWearing.SortCurrentlyWearing)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
+local Enums = require(ProfilePlatform.Common.Enums)
+local EventNames = require(ProfilePlatform.Analytics.EventNames)
+local NetworkingCurrentlyWearing = require(ProfilePlatform.Networking.NetworkingCurrentlyWearing)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
+local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
+local useMarketplaceAnalyticsContext = require(ProfilePlatform.Hooks.useMarketplaceAnalyticsContext)
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
 
-            end):catch(function(_) --[[ Line: 168 ]]
+require(ProfilePlatform.Common.AssetInfo)
 
-            end);
-        end);
-        local v61 = l_useSelector_0(function(v60) --[[ Line: 173 ]]
-            -- upvalues: v4 (ref)
-            return v60[v4.RODUX_KEY].ItemAssets or {};
-        end);
-        v46 = v2.useMemo(function() --[[ Line: 177 ]]
-            -- upvalues: v57 (copy), v61 (copy), v3 (ref), v5 (ref)
-            local v62 = {};
-            local v63 = 1;
-            for _, v65 in v57 do
-                local v66 = v61[tostring(v65)];
-                if v66 then
-                    v62[v63] = v66;
-                    v63 = v63 + 1;
-                end;
-            end;
-            return v3.List.sort(v62, function(v67, v68) --[[ Line: 190 ]]
-                -- upvalues: v5 (ref)
-                return v5(v67, v68);
-            end);
-        end, {
-            v61, 
-            v57
-        });
-    end;
-    if not l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 or #v45 > 0 then
-        return (v2.createElement(v29, {
-            title = if l_FFlagProfilePlatformEnableInventory_0 then v35.currentlyWearing else nil, 
-            layoutOrder = v31.layoutOrder, 
-            assets = if l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 then v45 else v46, 
-            openItemDetails = v43
-        }));
-    else
-        return nil;
-    end;
-end;
+local NetworkingCatalog = require(ProfilePlatform.Networking.NetworkingCatalog)
+local FFlagProfilePlatformEnableInventory = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableInventory
+local FFlagProfilePlatformEnableStore = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableStore
+local FFlagProfilePlatformUseCatalogItemOpenedNewFields = require(ProfilePlatform.Flags.FFlagProfilePlatformUseCatalogItemOpenedNewFields)
+local FFlagAddIEMProfilePage = require(ProfilePlatformParent.SharedFlags).FFlagAddIEMProfilePage
+local FFlagAXEnableProfileTab = require(ProfilePlatformParent.SharedFlags).FFlagAXEnableProfileTab
+local IXPService = game:GetService("IXPService")
+local v27 = game:DefineFastString("SocialProfileCurrentlyWearingClickThroughLayer", "Social.ProfileCurrentlyWearingClickThrough")
+local FFlagProfilePlatformEnableBundlesInAssetsCarousel = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableBundlesInAssetsCarousel
+local AssetsCarousel = require(ProfilePlatform.Components.AssetsCarousel)
+
+local function CurrentlyWearingCarousel(t1: {[any]: any}) -- line: 47
+	-- upvalues: useDispatch (copy), useProfileWrapperContext (copy), useProfileAnalyticsContext (copy), FFlagProfilePlatformEnableInventory (copy), useLocalization (copy), TextKeys (copy), useMarketplaceAnalyticsContext (copy), FFlagAddIEMProfilePage (copy), React (copy), Enums (copy), FFlagProfilePlatformEnableBundlesInAssetsCarousel (copy), IXPService (copy), v27 (copy), FFlagProfilePlatformEnableStore (copy), EventNames (copy), FFlagProfilePlatformUseCatalogItemOpenedNewFields (copy), useProfileJsonComponent (copy), Constants (copy), useSelector (copy), NetworkingCatalog (copy), Cryo (copy), useEffectOnMount (copy), NetworkingCurrentlyWearing (copy), SortCurrentlyWearing (copy), AssetsCarousel (copy), FFlagAXEnableProfileTab (copy)
+	local v32 = useDispatch()
+	local v33 = useProfileWrapperContext()
+	local v34 = useProfileAnalyticsContext()
+	local v35 = if not FFlagProfilePlatformEnableInventory then nil else useLocalization({
+		currentlyWearing = TextKeys.CurrentlyWearing
+	})
+	local v36 = useMarketplaceAnalyticsContext()
+	local v37 = if not FFlagAddIEMProfilePage then nil else v33.sourceInfo.source
+	local v38 = React.useCallback(function(s1: string, s2: string, _: string?, _: string?, n1: number?) -- line: 62
+		-- upvalues: FFlagAddIEMProfilePage (copy), v37 (copy), Enums (copy), v33 (copy), FFlagProfilePlatformEnableBundlesInAssetsCarousel (copy), IXPService (copy), v27 (copy), FFlagProfilePlatformEnableStore (copy), v34 (copy), EventNames (copy), FFlagProfilePlatformUseCatalogItemOpenedNewFields (copy), v36 (copy)
+		if FFlagAddIEMProfilePage and v37 == Enums.Sources.InExperienceProfile then
+			v33.navigateTo.inspectAvatar()
+
+			return
+		end
+
+		if FFlagProfilePlatformEnableBundlesInAssetsCarousel then
+			v33.navigateTo.itemOrBundleDetails(s1, s2)
+		else
+			v33.navigateTo.itemDetails(s1)
+		end
+
+		IXPService:LogFlagLinkedUserLayerExposure(v27)
+
+		if FFlagProfilePlatformEnableStore then
+			v34.fireAnalyticsEvent(EventNames.CatalogItemOpened, if not FFlagProfilePlatformUseCatalogItemOpenedNewFields then {
+				source = tostring(Enums.Components.CurrentlyWearing),
+				positionInComponent = tostring(n1),
+				component = tostring(Enums.Components.CurrentlyWearing),
+				itemId = tostring(s1)
+			} else {
+				btnContext = tostring(Enums.Components.CurrentlyWearing),
+				btnUnitId = tostring(s1),
+				btnSortPosition = tostring(n1)
+			})
+			v33.externalAnalytics.catalogAnalytics.clickCatalogItemFromProfile(v36, s1, s2, tostring(Enums.Components.CurrentlyWearing), n1)
+
+			return
+		end
+
+		v34.fireAnalyticsEvent(EventNames.CatalogItemOpened)
+		v33.externalAnalytics.catalogAnalytics.clickCatalogItemFromProfile(v36, s1, s2)
+	end, {
+		v33.navigateTo.itemDetails,
+		v33.externalAnalytics.catalogAnalytics,
+		v33.navigateTo.tryOnItem,
+		v33.navigateTo.inspectAvatar,
+		v37
+	})
+	local v39 = useProfileJsonComponent(Enums.Components.CurrentlyWearing).assets or {}
+	local v40 = nil
+	local v41 = nil
+
+	if FFlagProfilePlatformEnableBundlesInAssetsCarousel then
+		local v42 = React.useCallback(function(p1) -- line: 120
+			-- upvalues: Constants (copy), v39 (copy), Enums (copy)
+			local v51 = p1[Constants.RODUX_KEY].BundleDetails or {}
+			local v52 = p1[Constants.RODUX_KEY].AssetDetails or {}
+			local t2 = {}
+			local n2 = 1
+
+			for _, v56 in v39 do
+				local v57 = if v56.itemType ~= Enums.ItemTypes.Bundle then v52[tostring(v56.assetId)] else v51[tostring(v56.assetId)]
+
+				if v57 then
+					v57.itemType = v56.itemType
+					t2[n2] = v57
+					n2 += 1
+				end
+			end
+
+			return t2
+		end, { v39 })
+
+		v40 = useSelector(v42)
+		React.useEffect(function() -- line: 143
+			-- upvalues: v39 (copy), v32 (copy), NetworkingCatalog (copy)
+			if #v39 > 0 then
+				v32(NetworkingCatalog.GetItemAndBundleDetails.API(v39))
+			end
+		end, {
+			v39,
+			v32
+		})
+	else
+		local v43 = React.useMemo(function() -- line: 149
+			-- upvalues: Cryo (copy), v39 (copy)
+			return Cryo.List.map(v39, function(p2) -- line: 150
+				return p2.assetId
+			end)
+		end, { v39 })
+
+		useEffectOnMount(function() -- line: 155
+			-- upvalues: v32 (copy), NetworkingCurrentlyWearing (copy), v43 (copy)
+			v32(NetworkingCurrentlyWearing.GetItemDetails.API(v43)):andThen(function(_) -- line: 157
+			end):catch(function(_) -- line: 158
+			end)
+		end)
+
+		local v44 = useSelector(function(p5) -- line: 163
+			-- upvalues: Constants (copy)
+			return p5[Constants.RODUX_KEY].ItemAssets or {}
+		end)
+
+		v41 = React.useMemo(function() -- line: 167
+			-- upvalues: v43 (copy), v44 (copy), Cryo (copy), SortCurrentlyWearing (copy)
+			local t3 = {}
+			local n3 = 1
+
+			for _, v62 in v43 do
+				local v63 = v44[tostring(v62)]
+
+				if v63 then
+					t3[n3] = v63
+					n3 += 1
+				end
+			end
+
+			return Cryo.List.sort(t3, function(p6, p7) -- line: 180
+				-- upvalues: SortCurrentlyWearing (copy)
+				return SortCurrentlyWearing(p6, p7)
+			end)
+		end, {
+			v44,
+			v43
+		})
+	end
+
+	if not FFlagProfilePlatformEnableBundlesInAssetsCarousel or #v40 > 0 then
+		return (React.createElement(AssetsCarousel, {
+			title = if not FFlagProfilePlatformEnableInventory then nil else v35.currentlyWearing,
+			layoutOrder = t1.layoutOrder,
+			assets = if not FFlagProfilePlatformEnableBundlesInAssetsCarousel then v41 else v40,
+			openItemDetails = v38,
+			tileVariant = if not FFlagAXEnableProfileTab then nil else v33.currentlyWearingVariant
+		}))
+	end
+
+	return nil
+end
+
+return CurrentlyWearingCarousel

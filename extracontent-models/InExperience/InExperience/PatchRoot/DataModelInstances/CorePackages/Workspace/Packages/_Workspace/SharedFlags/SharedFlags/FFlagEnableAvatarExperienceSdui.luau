@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAvatarExperienceSdui", false);
+return game:DefineFastFlag("EnableAvatarExperienceSdui", false)

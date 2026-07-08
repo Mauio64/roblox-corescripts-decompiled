@@ -1,5 +1,8 @@
-local v0 = require(script.Parent.useLazyRef);
-return function(v1) --[[ Line: 11 ]] --[[ Name: useInitializedValue ]]
-    -- upvalues: v0 (copy)
-    return v0(v1).current;
-end;
+local useLazyRef = require(script.Parent.useLazyRef)
+
+local function useInitializedValue(p1: ((...any) -> ...any)) -- line: 11
+	-- upvalues: useLazyRef (copy)
+	return useLazyRef(p1).current
+end
+
+return useInitializedValue

@@ -1,3 +1,3 @@
 return {
-    SystemScrimSignalStore = require(script.SystemScrimSignalStore)
-};
+	SystemScrimSignalStore = require(script.SystemScrimSignalStore)
+}

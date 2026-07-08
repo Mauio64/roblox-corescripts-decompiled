@@ -1,311 +1,302 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.Image);
-local v4 = require(l_script_FirstAncestor_0.Enums.StateLayerAffordance);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = require(l_script_FirstAncestor_0.Components.View);
-local v7 = require(l_script_FirstAncestor_0.Components.ColorPicker.BrickColorConstants);
-local v8 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v9 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v10 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v11 = require(l_script_FirstAncestor_0.Utility.Wrappers);
-local l_Connection_0 = v11.Connection;
-local l_Signal_0 = v11.Signal;
-local function _(v14) --[[ Line: 50 ]] --[[ Name: getHexagonDimensions ]]
-    return v14 * 1.7320508075688772, v14 * 2;
-end;
-local function v18(v16) --[[ Line: 54 ]] --[[ Name: calculateGridRadius ]]
-    for v17 = 3, 20, 2 do
-        if v16 < v17 * v17 - math.floor(v17 / 2) * (math.floor(v17 / 2) + 1) then
-            return v17 - 2;
-        end;
-    end;
-    return 7;
-end;
-local function v35(v19) --[[ Line: 76 ]] --[[ Name: BottomRowSwatches ]]
-    -- upvalues: v2 (copy), l_Signal_0 (copy), l_Connection_0 (copy), v3 (copy), v6 (copy)
-    local v20, v21 = v2.useState(0);
-    local v22 = v2.useRef(nil);
-    v2.useEffect(function() --[[ Line: 80 ]]
-        -- upvalues: v22 (copy), v20 (copy), v21 (copy), l_Signal_0 (ref), l_Connection_0 (ref)
-        local l_current_0 = v22.current;
-        if not l_current_0 then
-            return;
-        else
-            local v24 = math.round(l_current_0.AbsoluteSize.X);
-            if v24 ~= v20 then
-                v21(v24);
-            end;
-            local v25 = l_Signal_0.Connect(l_current_0:GetPropertyChangedSignal("AbsoluteSize"), function() --[[ Line: 89 ]]
-                -- upvalues: v21 (ref), l_current_0 (copy)
-                v21((math.round(l_current_0.AbsoluteSize.X)));
-            end);
-            return function() --[[ Line: 92 ]]
-                -- upvalues: l_Connection_0 (ref), v25 (copy)
-                l_Connection_0.Disconnect(v25);
-            end;
-        end;
-    end, {
-        v20
-    });
-    local v26 = {};
-    if v20 > 0 then
-        local v27 = #v19.colors;
-        local v28 = v20 - v19.paddingHorizontal * 2;
-        local v29 = math.floor(v28 / v27);
-        local v30 = v29 * (v27 - 1);
-        local v31 = v19.paddingHorizontal + math.floor((v28 - v30) / 2);
-        for v32, v33 in ipairs(v19.colors) do
-            local v34 = v31 + v29 * (v32 - 1);
-            v26[("Swatch_%*"):format(v32)] = v2.createElement(v3, {
-                Size = UDim2.fromOffset(v19.swatchWidth, v19.swatchHeight), 
-                Position = UDim2.fromOffset(v34, v19.swatchCenterY), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = "component_assets/hexagon_24", 
-                imageStyle = {
-                    Color3 = v33.Color
-                }
-            });
-        end;
-    end;
-    return v2.createElement(v6, {
-        tag = "size-full", 
-        ref = v22
-    }, v26);
-end;
-return function(v36) --[[ Line: 127 ]] --[[ Name: BrickColorPicker ]]
-    -- upvalues: v8 (copy), v10 (copy), v2 (copy), v7 (copy), v18 (copy), v3 (copy), v6 (copy), v9 (copy), v4 (copy), v35 (copy)
-    local v37 = v8();
-    local v38 = if v10.FoundationColorPickerDesignUpdate then v37.Size.Size_200 else v37.Size.Size_350;
-    local v39 = nil;
-    local v40 = nil;
-    if v10.FoundationColorPickerDesignUpdate then
-        v39 = v37.Size.Size_350;
-        v40 = v37.Size.Size_400;
-    else
-        local v41 = v38 * 1.7320508075688772;
-        local v42 = v38 * 2;
-        v39 = v41;
-        v40 = v42;
-    end;
-    local l_Size_100_0 = v37.Size.Size_100;
-    local l_Size_350_0 = v37.Size.Size_350;
-    local l_Size_400_0 = v37.Size.Size_400;
-    local l_Size_200_0 = v37.Size.Size_200;
-    local v47 = v2.useMemo(function() --[[ Line: 144 ]]
-        -- upvalues: v7 (ref)
-        return v7.MAIN;
-    end, {});
-    local v48 = v2.useMemo(function() --[[ Line: 148 ]]
-        -- upvalues: v7 (ref)
-        return v7.BOTTOM;
-    end, {});
-    local v50 = v2.useMemo(function() --[[ Line: 152 ]]
-        -- upvalues: v18 (ref), v47 (copy)
-        local v49 = v18(#v47);
-        if v49 < 3 then
-            warn("BrickColorPicker: Calculated grid radius is too small, falling back to minimum");
-            return 3;
-        else
-            return v49;
-        end;
-    end, {});
-    local v72, v73 = v2.useMemo(function() --[[ Line: 163 ]]
-        -- upvalues: v50 (copy), v38 (copy), v10 (ref), v37 (copy), v47 (copy), v48 (copy), v39 (ref), v40 (ref)
-        local v51 = {};
-        local v52 = 1;
-        local l_v50_0 = v50;
-        local v54 = v38 + (v10.FoundationColorPickerDesignUpdate and 1 or v37.Size.Size_50);
-        local l_v38_0 = v38;
-        local v56 = if v10.FoundationColorPickerDesignUpdate then math.round(v54 * 1.5) else nil;
-        for v57 = 0, l_v50_0 - 1 do
-            for v58 = 0, 2 * l_v50_0 - 1 - 1 do
-                if math.abs(math.floor(l_v50_0 / 2) - v57) + math.abs(math.floor((2 * l_v50_0 - 1) / 2) - v58) < l_v50_0 and v57 % 2 == v58 % 2 and v52 <= #v47 then
-                    local v59 = l_v38_0 * v58;
-                    local v60 = if v56 then v56 * v57 else math.round(v54 * 1.5 * v57);
-                    table.insert(v51, {
-                        brickColor = v47[v52], 
-                        x = v59, 
-                        y = v60
-                    });
-                    v52 = v52 + 1;
-                end;
-            end;
-        end;
-        if not v10.FoundationColorPickerDesignUpdate and #v48 > 0 then
-            local l_Size_100_1 = v37.Size.Size_100;
-            local v62 = math.round(v54 * 1.5 * l_v50_0 + l_Size_100_1);
-            for v63, v64 in ipairs(v48) do
-                local v65 = l_v38_0 * (1 + (v63 - 1) * 2);
-                table.insert(v51, {
-                    brickColor = v64, 
-                    x = v65, 
-                    y = v62
-                });
-            end;
-        end;
-        local v66 = 1e999;
-        local v67 = -1e999;
-        local v68 = 1e999;
-        local v69 = -1e999;
-        for _, v71 in v51 do
-            v66 = math.min(v66, v71.x - v39 / 2);
-            v67 = math.max(v67, v71.x + v39 / 2);
-            v68 = math.min(v68, v71.y - v40 / 2);
-            v69 = math.max(v69, v71.y + v40 / 2);
-        end;
-        return v51, {
-            width = v67 - v66, 
-            height = v69 - v68, 
-            offset = Vector2.new(v66, v68)
-        };
-    end, {
-        v50, 
-        v38, 
-        v47, 
-        v48, 
-        v37.Size.Size_100, 
-        v37.Size.Size_50
-    });
-    local v85 = v2.useCallback(function(v74, v75) --[[ Line: 237 ]]
-        -- upvalues: v73 (copy), v72 (copy), v38 (copy), v36 (copy)
-        if v75.UserInputType == Enum.UserInputType.MouseButton1 then
-            local v76 = nil;
-            local v77 = 1e999;
-            local v78 = v75.Position.X - v74.AbsolutePosition.X;
-            local v79 = v75.Position.Y - v74.AbsolutePosition.Y;
-            local v80 = v78 + v73.offset.X;
-            local v81 = v79 + v73.offset.Y;
-            for _, v83 in v72 do
-                local v84 = (v80 - v83.x) ^ 2 + (v81 - v83.y) ^ 2;
-                if v84 < v77 then
-                    v77 = v84;
-                    v76 = v83;
-                end;
-            end;
-            if v76 and v77 < v38 * v38 then
-                v36.onBrickColorChanged(v76.brickColor);
-                if v36.onColorChanged then
-                    v36.onColorChanged(v76.brickColor.Color);
-                end;
-            end;
-        end;
-    end, {
-        v72, 
-        v73, 
-        v38, 
-        v36.onBrickColorChanged, 
-        v36.onColorChanged
-    });
-    local v92 = v2.useCallback(function(v86, v87) --[[ Line: 263 ]]
-        -- upvalues: l_Size_100_0 (copy), v48 (copy), v36 (copy)
-        if v87.UserInputType == Enum.UserInputType.MouseButton1 then
-            local v88 = v87.Position.X - v86.AbsolutePosition.X;
-            local v89 = v86.AbsoluteSize.X - 2 * l_Size_100_0;
-            local v90 = v88 - l_Size_100_0;
-            if v90 >= 0 and v90 <= v89 then
-                local v91 = v48[math.clamp(math.floor(v90 / v89 * #v48) + 1, 1, #v48)];
-                v36.onBrickColorChanged(v91);
-                if v36.onColorChanged then
-                    v36.onColorChanged(v91.Color);
-                end;
-            end;
-        end;
-    end, {
-        v48, 
-        v36.onBrickColorChanged, 
-        v36.onColorChanged
-    });
-    local v97 = v2.useCallback(function(v93, v94) --[[ Line: 282 ]]
-        -- upvalues: v73 (copy), v2 (ref), v3 (ref), v39 (ref), l_Size_200_0 (copy), v40 (ref), v37 (copy)
-        local v95 = UDim2.fromOffset(v93.x - v73.offset.X, v93.y - v73.offset.Y);
-        local v96 = {};
-        if v94 then
-            v96.outline = v2.createElement(v3, {
-                Size = UDim2.fromOffset(v39 + l_Size_200_0, v40 + l_Size_200_0), 
-                Position = v95, 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = "component_assets/hexagon_24", 
-                imageStyle = v37.Color.ActionEmphasis.Background, 
-                ZIndex = 1
-            });
-        end;
-        v96.hexagon = v2.createElement(v3, {
-            Size = UDim2.fromOffset(v39, v40), 
-            Position = v95, 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Image = "component_assets/hexagon_24", 
-            imageStyle = {
-                Color3 = v93.brickColor.Color
-            }, 
-            ZIndex = 2
-        });
-        return v96;
-    end, {
-        v73.offset.X, 
-        v73.offset.Y, 
-        v39, 
-        v40
-    });
-    local v105 = v2.useCallback(function() --[[ Line: 315 ]]
-        -- upvalues: v36 (copy), v72 (copy), v97 (copy)
-        local v98 = {};
-        local v99 = v36.selectedColor and v36.selectedColor:getValue() or nil;
-        for v100, v101 in v72 do
-            local v102 = false;
-            if v99 ~= nil then
-                v102 = v99 == v101.brickColor.Color;
-            end;
-            for v103, v104 in (v97(v101, v102)) do
-                v98[("%*_%*"):format(v103, v100)] = v104;
-            end;
-        end;
-        return v98;
-    end, {
-        v36.selectedColor
-    });
-    if not v10.FoundationColorPickerDesignUpdate then
-        return v2.createElement(v6, v9(v36, {
-            Size = UDim2.fromOffset(v73.width, v73.height)
-        }), {
-            ColorGrid = v2.createElement(v6, {
-                tag = "size-full position-top-left anchor-top-left", 
-                onActivated = v85, 
-                stateLayer = {
-                    affordance = v4.None
-                }
-            }, (v105()))
-        });
-    else
-        return v2.createElement(v6, v9(v36, {
-            tag = "col align-x-center gap-small auto-y size-full-0"
-        }), {
-            ColorGrid = v2.createElement(v6, {
-                Size = UDim2.fromOffset(v73.width, v73.height), 
-                LayoutOrder = 1, 
-                onActivated = v85, 
-                stateLayer = {
-                    affordance = v4.None
-                }
-            }, (v105())), 
-            BottomRow = v2.createElement(v6, {
-                Size = UDim2.new(1, -v37.Size.Size_400, 0, v37.Size.Size_500), 
-                tag = "stroke-standard stroke-muted radius-circle bg-surface-100", 
-                LayoutOrder = 2, 
-                onActivated = v92, 
-                stateLayer = {
-                    affordance = v4.None
-                }
-            }, {
-                Swatches = v2.createElement(v35, {
-                    colors = v48, 
-                    paddingHorizontal = l_Size_100_0, 
-                    swatchWidth = l_Size_350_0, 
-                    swatchHeight = l_Size_400_0, 
-                    swatchCenterY = v37.Size.Size_250
-                })
-            })
-        });
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Image = require(Foundation.Components.Image)
+local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local BrickColorConstants = require(Foundation.Components.ColorPicker.BrickColorConstants)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local Wrappers = require(Foundation.Utility.Wrappers)
+local Connection = Wrappers.Connection
+local Signal = Wrappers.Signal
+
+local function calculateGridRadius(n1: number) -- line: 49
+	for i = 3, 20, 2 do
+		if n1 < i * i - math.floor(i / 2) * (math.floor(i / 2) + 1) then
+			return i - 2
+		end
+	end
+
+	return 7
+end
+local function BottomRowSwatches(t1: {[any]: any}) -- line: 71
+	-- upvalues: React (copy), Signal (copy), Connection (copy), Image (copy), View (copy)
+	local v19, v20 = React.useState(0)
+	local v21 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 75
+		-- upvalues: v21 (copy), v19 (copy), v20 (copy), Signal (copy), Connection (copy)
+		local current = v21.current
+
+		if not current then
+			return
+		end
+
+		local v50 = math.round(current.AbsoluteSize.X)
+
+		if v50 ~= v19 then
+			v20(v50)
+		end
+
+		local v51 = Signal.Connect(current:GetPropertyChangedSignal("AbsoluteSize"), function() -- line: 84
+			-- upvalues: v20 (copy), current (copy)
+			v20((math.round(current.AbsoluteSize.X)))
+		end)
+
+		return function() -- line: 87
+			-- upvalues: Connection (copy), v51 (copy)
+			Connection.Disconnect(v51)
+		end
+	end, { v19 })
+
+	local t2 = {}
+
+	if v19 > 0 then
+		local v23 = #t1.colors
+		local v24 = v19 - t1.paddingHorizontal * 2
+		local v25 = math.floor(v24 / v23)
+		local v26 = v25 * (v23 - 1)
+		local v27 = t1.paddingHorizontal + math.floor((v24 - v26) / 2)
+
+		for i, v in ipairs(t1.colors) do
+			local v30 = v27 + v25 * (i - 1)
+
+			t2[`Swatch_{ i }`] = React.createElement(Image, {
+				Image = "component_assets/hexagon_24",
+				Size = UDim2.fromOffset(t1.swatchWidth, t1.swatchHeight),
+				Position = UDim2.fromOffset(v30, t1.swatchCenterY),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				imageStyle = {
+					Color3 = v.Color
+				}
+			})
+		end
+	end
+
+	return React.createElement(View, {
+		tag = "size-full",
+		ref = v21
+	}, t2)
+end
+local function BrickColorPicker(p1) -- line: 122
+	-- upvalues: useTokens (copy), React (copy), BrickColorConstants (copy), calculateGridRadius (copy), Image (copy), View (copy), withCommonProps (copy), StateLayerAffordance (copy), BottomRowSwatches (copy)
+	local v32 = useTokens()
+	local Size_200 = v32.Size.Size_200
+	local Size_350 = v32.Size.Size_350
+	local Size_400 = v32.Size.Size_400
+	local Size_100 = v32.Size.Size_100
+	local Size_350_2 = v32.Size.Size_350
+	local Size_400_2 = v32.Size.Size_400
+	local Size_200_2 = v32.Size.Size_200
+	local v40 = React.useMemo(function() -- line: 134
+		-- upvalues: BrickColorConstants (copy)
+		return BrickColorConstants.MAIN
+	end, {})
+	local v41 = React.useMemo(function() -- line: 138
+		-- upvalues: BrickColorConstants (copy)
+		return BrickColorConstants.BOTTOM
+	end, {})
+	local v42 = React.useMemo(function() -- line: 142
+		-- upvalues: calculateGridRadius (copy), v40 (copy)
+		local v52 = calculateGridRadius(#v40)
+
+		if v52 < 3 then
+			warn("BrickColorPicker: Calculated grid radius is too small, falling back to minimum")
+
+			return 3
+		end
+
+		return v52
+	end, {})
+	local v43, v44 = React.useMemo(function() -- line: 153
+		-- upvalues: v42 (copy), Size_200 (copy), v40 (copy), Size_350 (copy), Size_400 (copy)
+		local t3 = {}
+		local n2 = 1
+		local v55 = v42
+		local v56 = Size_200 + 1
+		local v57 = Size_200
+		local v58 = math.round(v56 * 1.5)
+
+		for i = 0, v55 - 1 do
+			for j = 0, 2 * v55 - 1 - 1 do
+				if v55 > math.abs(math.floor(v55 / 2) - i) + math.abs(math.floor((2 * v55 - 1) / 2) - j) and i % 2 == j % 2 and n2 <= #v40 then
+					local v61 = v57 * j
+					local v62 = if not v58 then math.round(v56 * 1.5 * i) else v58 * i
+
+					table.insert(t3, {
+						brickColor = v40[n2],
+						x = v61,
+						y = v62
+					})
+					n2 += 1
+				end
+			end
+		end
+
+		local n3 = 1e999
+		local n4 = -1e999
+		local n5 = 1e999
+		local n6 = -1e999
+
+		for _, v68 in t3 do
+			n3 = math.min(n3, v68.x - Size_350 / 2)
+			n4 = math.max(n4, v68.x + Size_350 / 2)
+			n5 = math.min(n5, v68.y - Size_400 / 2)
+			n6 = math.max(n6, v68.y + Size_400 / 2)
+		end
+
+		return t3, {
+			width = n4 - n3,
+			height = n6 - n5,
+			offset = Vector2.new(n3, n5)
+		}
+	end, {
+		v42,
+		Size_200,
+		v40,
+		v41,
+		v32.Size.Size_100,
+		v32.Size.Size_50
+	})
+	local v45 = React.useCallback(function(p2, p3) -- line: 207
+		-- upvalues: v44 (copy), v43 (copy), Size_200 (copy), p1 (copy)
+		if p3.UserInputType == Enum.UserInputType.MouseButton1 then
+			local v71 = nil
+			local n7 = 1e999
+			local v73 = p3.Position.X - p2.AbsolutePosition.X
+			local v74 = p3.Position.Y - p2.AbsolutePosition.Y
+			local v75 = v73 + v44.offset.X
+			local v76 = v74 + v44.offset.Y
+
+			for _, v78 in v43 do
+				local v79 = (v75 - v78.x) ^ 2 + (v76 - v78.y) ^ 2
+
+				if v79 < n7 then
+					n7 = v79
+					v71 = v78
+				end
+			end
+
+			if v71 and n7 < Size_200 * Size_200 then
+				p1.onBrickColorChanged(v71.brickColor)
+
+				if p1.onColorChanged then
+					p1.onColorChanged(v71.brickColor.Color)
+				end
+			end
+		end
+	end, {
+		v43,
+		v44,
+		Size_200,
+		p1.onBrickColorChanged,
+		p1.onColorChanged
+	})
+	local v46 = React.useCallback(function(p4, p5) -- line: 233
+		-- upvalues: Size_100 (copy), v41 (copy), p1 (copy)
+		if p5.UserInputType == Enum.UserInputType.MouseButton1 then
+			local v82 = p5.Position.X - p4.AbsolutePosition.X
+			local v83 = p4.AbsoluteSize.X - 2 * Size_100
+			local v84 = v82 - Size_100
+
+			if v84 >= 0 and v84 <= v83 then
+				local v85 = v41[math.clamp(math.floor(v84 / v83 * #v41) + 1, 1, #v41)]
+
+				p1.onBrickColorChanged(v85)
+
+				if p1.onColorChanged then
+					p1.onColorChanged(v85.Color)
+				end
+			end
+		end
+	end, {
+		v41,
+		p1.onBrickColorChanged,
+		p1.onColorChanged
+	})
+	local v47 = React.useCallback(function(t4: {[any]: any}, b1: boolean) -- line: 252
+		-- upvalues: v44 (copy), React (copy), Image (copy), Size_350 (copy), Size_200_2 (copy), Size_400 (copy), v32 (copy)
+		local uDim2 = UDim2.fromOffset(t4.x - v44.offset.X, t4.y - v44.offset.Y)
+		local t5 = {}
+
+		if b1 then
+			t5.outline = React.createElement(Image, {
+				Image = "component_assets/hexagon_24",
+				ZIndex = 1,
+				Size = UDim2.fromOffset(Size_350 + Size_200_2, Size_400 + Size_200_2),
+				Position = uDim2,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				imageStyle = v32.Color.ActionEmphasis.Background
+			})
+		end
+
+		t5.hexagon = React.createElement(Image, {
+			Image = "component_assets/hexagon_24",
+			ZIndex = 2,
+			Size = UDim2.fromOffset(Size_350, Size_400),
+			Position = uDim2,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			imageStyle = {
+				Color3 = t4.brickColor.Color
+			}
+		})
+
+		return t5
+	end, {
+		v44.offset.X,
+		v44.offset.Y,
+		Size_350,
+		Size_400
+	})
+	local v48 = React.useCallback(function() -- line: 285
+		-- upvalues: p1 (copy), v43 (copy), v47 (copy)
+		local t6 = {}
+		local v91 = p1.selectedColor and p1.selectedColor:getValue() or nil
+
+		for v92, v93 in v43 do
+			local v94 = v91 ~= nil and v91 == v93.brickColor.Color
+
+			for v95, v96 in (v47(v93, v94)) do
+				t6[`{ v95 }_{ v92 }`] = v96
+			end
+		end
+
+		return t6
+	end, { p1.selectedColor })
+
+	return React.createElement(View, withCommonProps(p1, {
+		tag = "col align-x-center gap-small size-full-0 auto-y"
+	}), {
+		ColorGrid = React.createElement(View, {
+			LayoutOrder = 1,
+			Size = UDim2.fromOffset(v44.width, v44.height),
+			onActivated = v45,
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			}
+		}, (v48())),
+		BottomRow = React.createElement(View, {
+			tag = "stroke-standard stroke-muted radius-circle bg-surface-100",
+			LayoutOrder = 2,
+			Size = UDim2.new(1, -v32.Size.Size_400, 0, v32.Size.Size_500),
+			onActivated = v46,
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			}
+		}, {
+			Swatches = React.createElement(BottomRowSwatches, {
+				colors = v41,
+				paddingHorizontal = Size_100,
+				swatchWidth = Size_350_2,
+				swatchHeight = Size_400_2,
+				swatchCenterY = v32.Size.Size_250
+			})
+		})
+	})
+end
+
+return BrickColorPicker

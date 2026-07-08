@@ -1,39 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_Parent_0.Foundation);
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_ButtonSize_0 = v3.Enums.ButtonSize;
-local v6 = require(script.Parent.Parent.Analytics.FlyoutAnalytics);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_AppEventIngestService_0 = require(l_Parent_0.RoactServiceTags).AppEventIngestService;
-local v9 = require(script.Parent.Parent.Config.FlyoutContentSettings);
-return function(v10) --[[ Line: 19 ]] --[[ Name: FlyoutReportLogs ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppEventIngestService_0 (copy), v1 (copy), v9 (copy), v6 (copy), l_useLocalization_0 (copy), v3 (copy), l_ButtonVariant_0 (copy), l_ButtonSize_0 (copy)
-    local v11 = l_useRoactService_0(l_AppEventIngestService_0);
-    local v13 = v1.useCallback(function() --[[ Line: 21 ]]
-        -- upvalues: v10 (copy), v9 (ref), v6 (ref), v11 (copy)
-        v10.closeDrawer();
-        if v10.openReportLogConfirmation then
-            v10.openReportLogConfirmation();
-        end;
-        local l_ReportLogs_0 = v9.ItemType.ReportLogs;
-        v6.sendMoreLegacyAndFlyoutItemClickEvent(v11, l_ReportLogs_0);
-    end, {
-        v10.openReportLogConfirmation, 
-        v10.closeDrawer, 
-        v11
-    });
-    local v14 = l_useLocalization_0({
-        text = "CommonUI.Features.Label.ReportLogs"
-    });
-    return v1.createElement(v3.Button, {
-        text = v14.text, 
-        variant = l_ButtonVariant_0.Standard, 
-        LayoutOrder = v10.layoutOrder, 
-        isDisabled = false, 
-        size = l_ButtonSize_0.Large, 
-        width = UDim.new(1, 0), 
-        onActivated = v13
-    });
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Foundation = require(Parent.Foundation)
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonSize = Foundation.Enums.ButtonSize
+local FlyoutAnalytics = require(script.Parent.Parent.Analytics.FlyoutAnalytics)
+local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+local AppEventIngestService = require(Parent.RoactServiceTags).AppEventIngestService
+local FlyoutContentSettings = require(script.Parent.Parent.Config.FlyoutContentSettings)
+
+local function FlyoutReportLogs(t1: {[any]: any}) -- line: 19
+	-- upvalues: useRoactService (copy), AppEventIngestService (copy), React (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), useLocalization (copy), Foundation (copy), ButtonVariant (copy), ButtonSize (copy)
+	local v13 = useRoactService(AppEventIngestService)
+	local v14 = React.useCallback(function() -- line: 21
+		-- upvalues: t1 (copy), FlyoutContentSettings (copy), FlyoutAnalytics (copy), v13 (copy)
+		t1.closeDrawer()
+
+		if t1.openReportLogConfirmation then
+			t1.openReportLogConfirmation()
+		end
+
+		local ReportLogs = FlyoutContentSettings.ItemType.ReportLogs
+
+		FlyoutAnalytics.sendMoreLegacyAndFlyoutItemClickEvent(v13, ReportLogs)
+	end, {
+		t1.openReportLogConfirmation,
+		t1.closeDrawer,
+		v13
+	})
+	local v15 = useLocalization({
+		text = "CommonUI.Features.Label.ReportLogs"
+	})
+
+	return React.createElement(Foundation.Button, {
+		isDisabled = false,
+		text = v15.text,
+		variant = ButtonVariant.Standard,
+		LayoutOrder = t1.layoutOrder,
+		size = ButtonSize.Large,
+		width = UDim.new(1, 0),
+		onActivated = v14
+	})
+end
+
+return FlyoutReportLogs

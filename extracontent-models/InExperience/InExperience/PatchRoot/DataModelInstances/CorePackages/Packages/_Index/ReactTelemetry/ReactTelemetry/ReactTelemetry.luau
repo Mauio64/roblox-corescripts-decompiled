@@ -1,37 +1,38 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v2 = require(script.Parent.reportCounter);
-local v3 = require(script.Parent.customFields);
+local ParentParent = script.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local reportCounter = require(script.Parent.reportCounter)
+local customFields = require(script.Parent.customFields)
+
 return {
-    customFields = v3, 
-    reportNewDevtoolsConnection = function() --[[ Line: 12 ]] --[[ Name: reportNewDevtoolsConnection ]]
-        -- upvalues: v2 (copy), v3 (copy)
-        v2({
-            eventName = "react_new_devtools_connection", 
-            lastUpdated = {
-                2025, 
-                8, 
-                28
-            }, 
-            description = "A new connection to React Devtools", 
-            links = "https://roblox.atlassian.net/wiki/spaces/luauee/pages/3836510338/DevTools+Telemetry", 
-            customFields = v3
-        });
-    end, 
-    reportFailedDevtoolsConnection = function(v4) --[[ Line: 23 ]] --[[ Name: reportFailedDevtoolsConnection ]]
-        -- upvalues: v2 (copy), l_Object_0 (copy), v3 (copy)
-        v2({
-            eventName = "react_failed_devtools_connection", 
-            lastUpdated = {
-                2025, 
-                8, 
-                28
-            }, 
-            description = "A failed connection to React Devtools", 
-            links = "https://roblox.atlassian.net/wiki/spaces/luauee/pages/3836510338/DevTools+Telemetry", 
-            customFields = l_Object_0.assign({}, v3, {
-                error_type = v4
-            })
-        });
-    end
-};
+	customFields = customFields,
+	reportNewDevtoolsConnection = function() -- line: 12
+		-- upvalues: reportCounter (copy), customFields (copy)
+		reportCounter({
+			eventName = "react_new_devtools_connection",
+			description = "A new connection to React Devtools",
+			links = "https://roblox.atlassian.net/wiki/spaces/luauee/pages/3836510338/DevTools+Telemetry",
+			lastUpdated = {
+				2025,
+				8,
+				28
+			},
+			customFields = customFields
+		})
+	end,
+	reportFailedDevtoolsConnection = function(s1: string) -- line: 23
+		-- upvalues: reportCounter (copy), Object (copy), customFields (copy)
+		reportCounter({
+			eventName = "react_failed_devtools_connection",
+			description = "A failed connection to React Devtools",
+			links = "https://roblox.atlassian.net/wiki/spaces/luauee/pages/3836510338/DevTools+Telemetry",
+			lastUpdated = {
+				2025,
+				8,
+				28
+			},
+			customFields = Object.assign({}, customFields, {
+				error_type = s1
+			})
+		})
+	end
+}

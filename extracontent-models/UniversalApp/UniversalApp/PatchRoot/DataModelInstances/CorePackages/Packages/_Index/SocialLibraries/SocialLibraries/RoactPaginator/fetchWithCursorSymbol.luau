@@ -1,2 +1,3 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-return require(l_script_FirstAncestor_0.dependencies).Symbol.named("fetchWithCursor");
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+
+return require(SocialLibraries.dependencies).Symbol.named("fetchWithCursor")

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("QRInSearchScanner", false);
+return game:DefineFastFlag("QRInSearchScanner", false)

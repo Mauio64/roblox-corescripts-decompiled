@@ -1,151 +1,173 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Boolean_0 = v3.Boolean;
-local l_Object_0 = v3.Object;
-local v6 = require(l_Parent_0.jsutils.equal);
-local l_DocumentType_0 = require(script.Parent.Parent.parser).DocumentType;
-local l_ApolloError_0 = require(l_Parent_0.errors).ApolloError;
-local _ = require(script.Parent.Parent.types.types);
-local l_OperationData_0 = require(script.Parent.OperationData).OperationData;
-local l_mergeOptions_0 = require(l_Parent_0.core).mergeOptions;
-local _ = require(l_Parent_0.link.core);
-local v13 = setmetatable({}, {
-    __index = l_OperationData_0
-});
-v13.__index = v13;
-v13.new = function(v14) --[[ Line: 83 ]] --[[ Name: new ]]
-    -- upvalues: l_OperationData_0 (copy), l_Boolean_0 (copy), l_DocumentType_0 (copy), v13 (copy)
-    local v15 = l_OperationData_0.new(v14.options, v14.context);
-    v15.runMutation = function(v16) --[[ Line: 92 ]]
-        -- upvalues: v15 (copy), l_Boolean_0 (ref)
-        if v16 == nil then
-            v16 = {};
-        end;
-        v15:onMutationStart();
-        local v17 = v15:generateNewMutationId();
-        return v15:mutate(v16):andThen(function(v18) --[[ Line: 100 ]]
-            -- upvalues: v15 (ref), v17 (copy)
-            v15:onMutationCompleted(v18, v17);
-            return v18;
-        end):catch(function(v19) --[[ Line: 104 ]]
-            -- upvalues: v15 (ref), v17 (copy), l_Boolean_0 (ref)
-            local v20 = v15:getOptions();
-            local l_onError_0 = v20.onError;
-            v15:onMutationError(v19, v17);
-            if l_Boolean_0.toJSBoolean(l_onError_0) then
-                l_onError_0(v20, v19);
-                return {
-                    data = nil, 
-                    errors = v19
-                };
-            else
-                error(v19);
-                return;
-            end;
-        end);
-    end;
-    v15:verifyDocumentType(v14.options.mutation, l_DocumentType_0.Mutation);
-    v15.result = v14.result;
-    v15.setResult = v14.setResult;
-    v15.mostRecentMutationId = 0;
-    return (setmetatable(v15, v13));
-end;
-v13.execute = function(v22, v23) --[[ Line: 127 ]] --[[ Name: execute ]]
-    -- upvalues: l_DocumentType_0 (copy), l_Object_0 (copy)
-    v22.isMounted = true;
-    v22:verifyDocumentType(v22:getOptions().mutation, l_DocumentType_0.Mutation);
-    return {
-        v22.runMutation, 
-        l_Object_0.assign({}, v23, {
-            client = v22:refreshClient().client
-        })
-    };
-end;
-v13.afterExecute = function(v24) --[[ Line: 133 ]] --[[ Name: afterExecute ]]
-    v24.isMounted = true;
-    return function(...) --[[ Line: 135 ]]
-        -- upvalues: v24 (copy)
-        return v24:unmount(...);
-    end;
-end;
-v13.cleanup = function(_) --[[ Line: 140 ]] --[[ Name: cleanup ]]
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local equal = require(ParentParent.jsutils.equal)
+local DocumentType = require(script.Parent.Parent.parser).DocumentType
+local ApolloError = require(ParentParent.errors).ApolloError
 
-end;
-v13.mutate = function(v26, v27) --[[ Line: 144 ]] --[[ Name: mutate ]]
-    -- upvalues: l_mergeOptions_0 (copy)
-    return v26:refreshClient().client:mutate(l_mergeOptions_0(v26:getOptions(), v27));
-end;
-v13.onMutationStart = function(v28) --[[ Line: 148 ]] --[[ Name: onMutationStart ]]
-    if not v28.result.loading and not v28:getOptions().ignoreResults then
-        v28:updateResult({
-            loading = true, 
-            error = nil, 
-            data = nil, 
-            called = true
-        });
-    end;
-end;
-v13.onMutationCompleted = function(v29, v30, v31) --[[ Line: 160 ]] --[[ Name: onMutationCompleted ]]
-    -- upvalues: l_ApolloError_0 (copy), l_Boolean_0 (copy)
-    local v32 = v29:getOptions();
-    local l_onCompleted_0 = v32.onCompleted;
-    local l_ignoreResults_0 = v32.ignoreResults;
-    local l_data_0 = v30.data;
-    local l_errors_0 = v30.errors;
-    local v37 = if l_errors_0 and #l_errors_0 > 0 then l_ApolloError_0.new({
-        graphQLErrors = l_errors_0
-    }) else nil;
-    local function _() --[[ Line: 172 ]] --[[ Name: callOncomplete ]]
-        -- upvalues: l_Boolean_0 (ref), l_onCompleted_0 (copy), l_data_0 (copy)
-        if l_Boolean_0.toJSBoolean(l_onCompleted_0) then
-            return l_onCompleted_0(l_data_0);
-        else
-            return nil;
-        end;
-    end;
-    if v29:isMostRecentMutation(v31) and not l_ignoreResults_0 then
-        v29:updateResult({
-            called = true, 
-            loading = false, 
-            data = l_data_0, 
-            error = v37
-        });
-    end;
-    if l_Boolean_0.toJSBoolean(l_onCompleted_0) then
-        local _ = l_onCompleted_0(l_data_0);
-        return;
-    else
-        return;
-    end;
-end;
-v13.onMutationError = function(v40, v41, v42) --[[ Line: 191 ]] --[[ Name: onMutationError ]]
-    if v40:isMostRecentMutation(v42) then
-        v40:updateResult({
-            loading = false, 
-            error = v41, 
-            data = nil, 
-            called = true
-        });
-    end;
-end;
-v13.generateNewMutationId = function(v43) --[[ Line: 202 ]] --[[ Name: generateNewMutationId ]]
-    v43.mostRecentMutationId = v43.mostRecentMutationId + 1;
-    return v43.mostRecentMutationId;
-end;
-v13.isMostRecentMutation = function(v44, v45) --[[ Line: 207 ]] --[[ Name: isMostRecentMutation ]]
-    return v44.mostRecentMutationId == v45;
-end;
-v13.updateResult = function(v46, v47) --[[ Line: 211 ]] --[[ Name: updateResult ]]
-    -- upvalues: v6 (copy)
-    if v46.isMounted and (not v46.previousResult or not v6(v46.previousResult, v47)) then
-        v46:setResult(v47);
-        v46.previousResult = v47;
-        return v47;
-    else
-        return nil;
-    end;
-end;
-v0.MutationData = v13;
-return v0;
+require(script.Parent.Parent.types.types)
+
+local OperationData = require(script.Parent.OperationData).OperationData
+local mergeOptions = require(ParentParent.core).mergeOptions
+
+require(ParentParent.link.core)
+
+local self = setmetatable({}, {
+	__index = OperationData
+})
+
+self.__index = self
+
+function self.new(t2: {[any]: any}) -- line: 83
+	-- upvalues: OperationData (copy), Boolean (copy), DocumentType (copy), self (copy)
+	local v14 = OperationData.new(t2.options, t2.context)
+
+	function v14.runMutation(t3: {[any]: any}?) -- line: 92
+		-- upvalues: v14 (copy), Boolean (copy)
+		if t3 == nil then
+			t3 = {}
+		end
+
+		v14:onMutationStart()
+
+		local v41 = v14:generateNewMutationId()
+
+		return v14:mutate(t3):andThen(function(p1) -- line: 100
+			-- upvalues: v14 (copy), v41 (copy)
+			v14:onMutationCompleted(p1, v41)
+
+			return p1
+		end):catch(function(p2) -- line: 104
+			-- upvalues: v14 (copy), v41 (copy), Boolean (copy)
+			local v44 = v14:getOptions()
+			local onError = v44.onError
+
+			v14:onMutationError(p2, v41)
+
+			if Boolean.toJSBoolean(onError) then
+				onError(v44, p2)
+
+				return {
+					data = nil,
+					errors = p2
+				}
+			end
+
+			error(p2)
+		end)
+	end
+
+	v14:verifyDocumentType(t2.options.mutation, DocumentType.Mutation)
+	v14.result = t2.result
+	v14.setResult = t2.setResult
+	v14.mostRecentMutationId = 0
+
+	return (setmetatable(v14, self))
+end
+function self.execute(p3, p4) -- line: 127
+	-- upvalues: DocumentType (copy), Object (copy)
+	p3.isMounted = true
+	p3:verifyDocumentType(p3:getOptions().mutation, DocumentType.Mutation)
+
+	return {
+		p3.runMutation,
+		Object.assign({}, p4, {
+			client = p3:refreshClient().client
+		})
+	}
+end
+function self.afterExecute(p5) -- line: 133
+	p5.isMounted = true
+
+	return function(...) -- line: 135
+		-- upvalues: p5 (copy)
+		return p5:unmount(...)
+	end
+end
+function self.cleanup(_) -- line: 140
+end
+function self.mutate(p7, p8) -- line: 144
+	-- upvalues: mergeOptions (copy)
+	return p7:refreshClient().client:mutate(mergeOptions(p7:getOptions(), p8))
+end
+function self.onMutationStart(p9) -- line: 148
+	if not p9.result.loading and not p9:getOptions().ignoreResults then
+		p9:updateResult({
+			loading = true,
+			error = nil,
+			data = nil,
+			called = true
+		})
+	end
+end
+function self.onMutationCompleted(t4: {[any]: any}, p10, n1: number) -- line: 160
+	-- upvalues: ApolloError (copy), Boolean (copy)
+	local v25 = t4:getOptions()
+	local onCompleted = v25.onCompleted
+	local ignoreResults = v25.ignoreResults
+	local data = p10.data
+	local errors = p10.errors
+	local v30 = if not errors or not (#errors > 0) then nil else ApolloError.new({
+		graphQLErrors = errors
+	})
+
+	local function callOncomplete() -- line: 172
+		-- upvalues: Boolean (copy), onCompleted (copy), data (copy)
+		if Boolean.toJSBoolean(onCompleted) then
+			return onCompleted(data)
+		end
+
+		return nil
+	end
+
+	if t4:isMostRecentMutation(n1) and not ignoreResults then
+		t4:updateResult({
+			called = true,
+			loading = false,
+			data = data,
+			error = v30
+		})
+	end
+
+	if Boolean.toJSBoolean(onCompleted) then
+		onCompleted(data)
+
+		return
+	end
+end
+function self.onMutationError(t5: {[any]: any}, p11, n2: number) -- line: 191
+	if t5:isMostRecentMutation(n2) then
+		t5:updateResult({
+			loading = false,
+			data = nil,
+			called = true,
+			error = p11
+		})
+	end
+end
+function self.generateNewMutationId(p12) -- line: 202
+	p12.mostRecentMutationId = p12.mostRecentMutationId + 1
+
+	return p12.mostRecentMutationId
+end
+function self.isMostRecentMutation(t6: {[any]: any}, n3: number) -- line: 207
+	return n3 == t6.mostRecentMutationId
+end
+function self.updateResult(t7: {[any]: any}, t8: {[any]: any}) -- line: 211
+	-- upvalues: equal (copy)
+	if t7.isMounted and (not t7.previousResult or not equal(t7.previousResult, t8)) then
+		t7:setResult(t8)
+		t7.previousResult = t8
+
+		return t8
+	end
+
+	return nil
+end
+
+t1.MutationData = self
+
+return t1

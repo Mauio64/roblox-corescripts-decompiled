@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "violationType", "timeoutMinutes");
+return require(script.Parent.makeActionCreator)(script.Name, "violationType", "timeoutMinutes")

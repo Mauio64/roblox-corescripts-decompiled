@@ -1,22 +1,28 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.FocusNavigation);
-local v3 = require(script.Parent.FocusNavigationContext);
-return function() --[[ Line: 16 ]] --[[ Name: useDispatchSyntheticEvent ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    local v4 = v1.useContext(v3);
-    return (v1.useCallback(function(v5, v6, v7) --[[ Line: 20 ]]
-        -- upvalues: v4 (copy)
-        if not v4 then
-            if _G.__DEV__ then
-                warn("useDispatchSyntheticEvent: No FocusNavigationService available in context");
-            end;
-            return false;
-        else
-            assert(v6:IsA("GuiObject"), "Synthetic events must be dispatched on GuiObjects");
-            return v4:dispatchSyntheticEvent(v5, v6, v7);
-        end;
-    end, {
-        v4
-    }));
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+
+require(ParentParent.FocusNavigation)
+
+local FocusNavigationContext = require(script.Parent.FocusNavigationContext)
+
+local function useDispatchSyntheticEvent() -- line: 16
+	-- upvalues: React (copy), FocusNavigationContext (copy)
+	local v5 = React.useContext(FocusNavigationContext)
+
+	return (React.useCallback(function(s1: string, p1, p2) -- line: 20
+		-- upvalues: v5 (copy)
+		if not v5 then
+			if _G.__DEV__ then
+				warn("useDispatchSyntheticEvent: No FocusNavigationService available in context")
+			end
+
+			return false
+		end
+
+		assert(p1:IsA("GuiObject"), "Synthetic events must be dispatched on GuiObjects")
+
+		return v5:dispatchSyntheticEvent(s1, p1, p2)
+	end, { v5 }))
+end
+
+return useDispatchSyntheticEvent

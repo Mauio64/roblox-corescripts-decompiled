@@ -1,4 +1,4 @@
 return {
-    PlayabilityStatus = require(script.PlayabilityStatus), 
-    CreatorType = require(script.CreatorType)
-};
+	PlayabilityStatus = require(script.PlayabilityStatus),
+	CreatorType = require(script.CreatorType)
+}

@@ -1,109 +1,130 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_RunService_0 = game:GetService("RunService");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_RobloxGui_0.Modules.VoiceChat.Hooks.useVoiceState);
-local v7 = require(l_RobloxGui_0.Modules.VoiceChat.Constants);
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v9 = UDim2.fromOffset(36, 36);
-local function _(v10) --[[ Line: 16 ]] --[[ Name: useJoinBinding ]]
-    -- upvalues: v5 (copy), v4 (copy)
-    return v5.useMemo(function() --[[ Line: 17 ]]
-        -- upvalues: v4 (ref), v10 (copy)
-        return v4.joinBindings(v10);
-    end, {});
-end;
-local function _(v12) --[[ Line: 22 ]] --[[ Name: mapLevelToIcon ]]
-    -- upvalues: v7 (copy), l_default_0 (copy)
-    return function(v13) --[[ Line: 24 ]]
-        -- upvalues: v7 (ref), l_default_0 (ref), v12 (copy)
-        local v14 = v13[1];
-        local v15 = v13[2];
-        if v14 == v7.VOICE_STATE.MUTED or v14 == v7.VOICE_STATE.LOCAL_MUTED then
-            return l_default_0:GetIcon("Muted", v12);
-        elseif v14 == v7.VOICE_STATE.CONNECTING then
-            return l_default_0:GetIcon("Connecting", v12);
-        elseif v14 == v7.VOICE_STATE.INACTIVE then
-            return l_default_0:GetIcon("Unmuted0", v12);
-        elseif v14 == v7.VOICE_STATE.TALKING then
-            local v16 = math.floor(0.5 + 5 * v15) * 20;
-            return l_default_0:GetIcon("Unmuted" .. tostring(v16), v12);
-        else
-            return l_default_0:GetIcon("Error", v12);
-        end;
-    end;
-end;
-local function v18() --[[ Line: 42 ]] --[[ Name: GenerateGUID ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return l_HttpService_0:GenerateGUID();
-end;
-return function(v19) --[[ Line: 55 ]] --[[ Name: VRBarVoiceIcon ]]
-    -- upvalues: v6 (copy), v5 (copy), v4 (copy), v18 (copy), v7 (copy), l_RunService_0 (copy), l_default_0 (copy), v9 (copy)
-    local v20 = v6(v19.userId, v19.disable or false);
-    local v21, v22 = v5.useBinding(0);
-    local v23, v24 = v5.useBinding(v20);
-    local v25 = {
-        v23, 
-        v21
-    };
-    local l_v25_0 = v25 --[[ copy: 7 -> 10 ]];
-    local v27 = v5.useMemo(function() --[[ Line: 17 ]]
-        -- upvalues: v4 (ref), l_v25_0 (copy)
-        return v4.joinBindings(l_v25_0);
-    end, {});
-    v25 = v5.useRef(v18()).current or "";
-    v24(v20);
-    local v28 = v20 == v7.VOICE_STATE.TALKING;
-    v5.useEffect(function() --[[ Line: 65 ]]
-        -- upvalues: v28 (copy), l_RunService_0 (ref), v25 (copy), v22 (copy)
-        if v28 then
-            l_RunService_0:BindToRenderStep(v25, 1, function() --[[ Line: 67 ]]
-                -- upvalues: v22 (ref)
-                v22(math.random());
-            end);
-        end;
-        return function() --[[ Line: 71 ]]
-            -- upvalues: v28 (ref), l_RunService_0 (ref), v25 (ref)
-            if v28 then
-                l_RunService_0:UnbindFromRenderStep(v25);
-            end;
-        end;
-    end, {
-        v28
-    });
-    local v35 = v5.useMemo(function() --[[ Line: 78 ]]
-        -- upvalues: v27 (copy), v19 (copy), v7 (ref), l_default_0 (ref)
-        local l_v27_0 = v27;
-        local l_iconStyle_0 = v19.iconStyle;
-        return l_v27_0:map(function(v31) --[[ Line: 24 ]]
-            -- upvalues: v7 (ref), l_default_0 (ref), l_iconStyle_0 (copy)
-            local v32 = v31[1];
-            local v33 = v31[2];
-            if v32 == v7.VOICE_STATE.MUTED or v32 == v7.VOICE_STATE.LOCAL_MUTED then
-                return l_default_0:GetIcon("Muted", l_iconStyle_0);
-            elseif v32 == v7.VOICE_STATE.CONNECTING then
-                return l_default_0:GetIcon("Connecting", l_iconStyle_0);
-            elseif v32 == v7.VOICE_STATE.INACTIVE then
-                return l_default_0:GetIcon("Unmuted0", l_iconStyle_0);
-            elseif v32 == v7.VOICE_STATE.TALKING then
-                local v34 = math.floor(0.5 + 5 * v33) * 20;
-                return l_default_0:GetIcon("Unmuted" .. tostring(v34), l_iconStyle_0);
-            else
-                return l_default_0:GetIcon("Error", l_iconStyle_0);
-            end;
-        end);
-    end, {
-        v19.iconStyle
-    });
-    return v4.createElement("ImageLabel", {
-        BackgroundTransparency = v19.BackgroundTransparency or 1, 
-        Image = v35, 
-        ImageColor3 = v19.ImageColor3, 
-        ImageTransparency = v19.ImageTransparency, 
-        Position = v19.Position, 
-        Size = v19.Size or v9, 
-        [v4.Children] = v19[v4.Children]
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local Roact = require(CorePackages.Packages.Roact)
+local React = require(CorePackages.Packages.React)
+local useVoiceState = require(RobloxGui.Modules.VoiceChat.Hooks.useVoiceState)
+local Constants = require(RobloxGui.Modules.VoiceChat.Constants)
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local uDim2 = UDim2.fromOffset(36, 36)
+
+local function useJoinBinding(p1) -- line: 16
+	-- upvalues: React (copy), Roact (copy)
+	return React.useMemo(function() -- line: 17
+		-- upvalues: Roact (copy), p1 (copy)
+		return Roact.joinBindings(p1)
+	end, {})
+end
+local function mapLevelToIcon(p2) -- line: 22
+	-- upvalues: Constants (copy), default (copy)
+	return function(p3) -- line: 24
+		-- upvalues: Constants (copy), default (copy), p2 (copy)
+		local v29 = p3[1]
+		local v30 = p3[2]
+
+		if v29 == Constants.VOICE_STATE.MUTED or v29 == Constants.VOICE_STATE.LOCAL_MUTED then
+			return default:GetIcon("Muted", p2)
+		end
+
+		if v29 == Constants.VOICE_STATE.CONNECTING then
+			return default:GetIcon("Connecting", p2)
+		end
+
+		if v29 == Constants.VOICE_STATE.INACTIVE then
+			return default:GetIcon("Unmuted0", p2)
+		end
+
+		if v29 == Constants.VOICE_STATE.TALKING then
+			local v31 = math.floor(0.5 + 5 * v30) * 20
+
+			return default:GetIcon("Unmuted" .. tostring(v31), p2)
+		end
+
+		return default:GetIcon("Error", p2)
+	end
+end
+local function GenerateGUID() -- line: 42
+	-- upvalues: HttpService (copy)
+	return HttpService:GenerateGUID()
+end
+local function VRBarVoiceIcon(t1: {[any]: any}) -- line: 55
+	-- upvalues: useVoiceState (copy), React (copy), Roact (copy), GenerateGUID (copy), Constants (copy), RunService (copy), default (copy), uDim2 (copy)
+	local v18 = useVoiceState(t1.userId, t1.disable or false)
+	local v19, v20 = React.useBinding(0)
+	local v21, v22 = React.useBinding(v18)
+	local t2 = {
+		v21,
+		v19
+	}
+	local v24 = React.useMemo(function() -- line: 17
+		-- upvalues: Roact (copy), t2 (copy)
+		return Roact.joinBindings(t2)
+	end, {})
+	local v25 = React.useRef(GenerateGUID()).current or ""
+
+	v22(v18)
+
+	local v26 = v18 == Constants.VOICE_STATE.TALKING
+
+	React.useEffect(function() -- line: 65
+		-- upvalues: v26 (copy), RunService (copy), v25 (copy), v20 (copy)
+		if v26 then
+			RunService:BindToRenderStep(v25, 1, function() -- line: 67
+				-- upvalues: v20 (copy)
+				v20(math.random())
+			end)
+		end
+
+		return function() -- line: 71
+			-- upvalues: v26 (copy), RunService (copy), v25 (copy)
+			if v26 then
+				RunService:UnbindFromRenderStep(v25)
+			end
+		end
+	end, { v26 })
+
+	local v27 = React.useMemo(function() -- line: 78
+		-- upvalues: v24 (copy), t1 (copy), Constants (copy), default (copy)
+		local v32 = v24
+		local iconStyle = t1.iconStyle
+
+		return v32:map(function(p4) -- line: 24
+			-- upvalues: Constants (copy), default (copy), iconStyle (copy)
+			local v35 = p4[1]
+			local v36 = p4[2]
+
+			if v35 == Constants.VOICE_STATE.MUTED or v35 == Constants.VOICE_STATE.LOCAL_MUTED then
+				return default:GetIcon("Muted", iconStyle)
+			end
+
+			if v35 == Constants.VOICE_STATE.CONNECTING then
+				return default:GetIcon("Connecting", iconStyle)
+			end
+
+			if v35 == Constants.VOICE_STATE.INACTIVE then
+				return default:GetIcon("Unmuted0", iconStyle)
+			end
+
+			if v35 == Constants.VOICE_STATE.TALKING then
+				local v37 = math.floor(0.5 + 5 * v36) * 20
+
+				return default:GetIcon("Unmuted" .. tostring(v37), iconStyle)
+			end
+
+			return default:GetIcon("Error", iconStyle)
+		end)
+	end, { t1.iconStyle })
+
+	return Roact.createElement("ImageLabel", {
+		BackgroundTransparency = t1.BackgroundTransparency or 1,
+		Image = v27,
+		ImageColor3 = t1.ImageColor3,
+		ImageTransparency = t1.ImageTransparency,
+		Position = t1.Position,
+		Size = t1.Size or uDim2,
+		[Roact.Children] = t1[Roact.Children]
+	})
+end
+
+return VRBarVoiceIcon

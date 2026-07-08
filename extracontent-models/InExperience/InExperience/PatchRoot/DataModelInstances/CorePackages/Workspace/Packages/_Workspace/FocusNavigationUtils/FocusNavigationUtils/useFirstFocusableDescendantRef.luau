@@ -1,68 +1,85 @@
-local l_Parent_0 = script:FindFirstAncestor("FocusNavigationUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.getFirstFocusableDescendant);
-local function _(v3) --[[ Line: 6 ]] --[[ Name: safeDisconnect ]]
-    if v3 then
-        v3:Disconnect();
-    end;
-end;
-return function(v5) --[[ Line: 23 ]] --[[ Name: useFirstFocusableDescendantRef ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v6 = v1.useRef(nil);
-    v1.useEffect(function() --[[ Line: 26 ]]
-        -- upvalues: v2 (ref), v6 (copy), v5 (copy)
-        local v7 = nil;
-        local v8 = nil;
-        local v9 = nil;
-        local function v10(v11) --[[ Line: 31 ]] --[[ Name: updateFirstFocusable ]]
-            -- upvalues: v7 (ref), v9 (ref), v2 (ref), v10 (copy), v6 (ref)
-            local l_v7_0 = v7;
-            if l_v7_0 then
-                l_v7_0:Disconnect();
-            end;
-            l_v7_0 = v9;
-            if l_v7_0 then
-                l_v7_0:Disconnect();
-            end;
-            l_v7_0 = v2(v11);
-            if l_v7_0 then
-                v7 = l_v7_0:GetPropertyChangedSignal("Selectable"):Connect(function() --[[ Line: 38 ]]
-                    -- upvalues: v10 (ref), v11 (copy)
-                    v10(v11);
-                end);
-                v9 = l_v7_0.AncestryChanged:Connect(function() --[[ Line: 42 ]]
-                    -- upvalues: v10 (ref), v11 (copy)
-                    v10(v11);
-                end);
-            end;
-            v6.current = l_v7_0;
-        end;
-        if v5 then
-            v10(v5);
-            v8 = v5.DescendantAdded:Connect(function() --[[ Line: 51 ]]
-                -- upvalues: v10 (copy), v5 (ref)
-                v10(v5);
-            end);
-        else
-            v6.current = nil;
-        end;
-        return function() --[[ Line: 58 ]]
-            -- upvalues: v7 (ref), v8 (ref), v9 (ref)
-            local l_v7_1 = v7;
-            if l_v7_1 then
-                l_v7_1:Disconnect();
-            end;
-            l_v7_1 = v8;
-            if l_v7_1 then
-                l_v7_1:Disconnect();
-            end;
-            l_v7_1 = v9;
-            if l_v7_1 then
-                l_v7_1:Disconnect();
-            end;
-        end;
-    end, {
-        v5
-    });
-    return v6;
-end;
+local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
+local React = require(Parent.React)
+local getFirstFocusableDescendant = require(script.Parent.getFirstFocusableDescendant)
+
+local function safeDisconnect(p1) -- line: 6
+	if p1 then
+		p1:Disconnect()
+	end
+end
+local function useFirstFocusableDescendantRef(p2) -- line: 23
+	-- upvalues: React (copy), getFirstFocusableDescendant (copy)
+	local v8 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 26
+		-- upvalues: getFirstFocusableDescendant (copy), v8 (copy), p2 (copy)
+		local connection = nil
+		local connection2 = nil
+		local connection3 = nil
+
+		local function updateFirstFocusable(p3) -- line: 31
+			-- upvalues: connection (ref), connection3 (ref), getFirstFocusableDescendant (copy), updateFirstFocusable (copy), v8 (copy)
+			local v14 = connection
+
+			if v14 then
+				v14:Disconnect()
+			end
+
+			local v15 = connection3
+
+			if v15 then
+				v15:Disconnect()
+			end
+
+			local v16 = getFirstFocusableDescendant(p3)
+
+			if v16 then
+				connection = v16:GetPropertyChangedSignal("Selectable"):Connect(function() -- line: 38
+					-- upvalues: updateFirstFocusable (copy), p3 (copy)
+					updateFirstFocusable(p3)
+				end)
+				connection3 = v16.AncestryChanged:Connect(function() -- line: 42
+					-- upvalues: updateFirstFocusable (copy), p3 (copy)
+					updateFirstFocusable(p3)
+				end)
+			end
+
+			v8.current = v16
+		end
+
+		if p2 then
+			updateFirstFocusable(p2)
+			connection2 = p2.DescendantAdded:Connect(function() -- line: 51
+				-- upvalues: updateFirstFocusable (copy), p2 (copy)
+				updateFirstFocusable(p2)
+			end)
+		else
+			v8.current = nil
+		end
+
+		return function() -- line: 58
+			-- upvalues: connection (ref), connection2 (ref), connection3 (ref)
+			local v17 = connection
+
+			if v17 then
+				v17:Disconnect()
+			end
+
+			local v18 = connection2
+
+			if v18 then
+				v18:Disconnect()
+			end
+
+			local v19 = connection3
+
+			if v19 then
+				v19:Disconnect()
+			end
+		end
+	end, { p2 })
+
+	return v8
+end
+
+return useFirstFocusableDescendantRef

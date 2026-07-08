@@ -1,31 +1,44 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.Analytics);
-local v3 = require(l_Parent_0.Constants);
-return function(v4, v5) --[[ Line: 9 ]] --[[ Name: validateMaterials ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v6 = {};
-    local l_v4_Descendants_0 = v4:GetDescendants();
-    table.insert(l_v4_Descendants_0, v4);
-    for _, v9 in l_v4_Descendants_0 do
-        if v9:IsA("BasePart") and not v3.MATERIAL_WHITELIST[v9.Material] then
-            table.insert(v6, v9:GetFullName());
-        end;
-    end;
-    if #v6 > 0 then
-        local v10 = {};
-        local v11 = {};
-        for v12 in pairs(v3.MATERIAL_WHITELIST) do
-            table.insert(v11, v12.Name);
-        end;
-        table.insert(v10, "Invalid material setup for");
-        for _, v14 in pairs(v6) do
-            table.insert(v10, v14);
-        end;
-        table.insert(v10, "Accepted values are: " .. table.concat(v11, ", "));
-        v2.reportFailure(v2.ErrorType.validateMaterials, nil, v5);
-        return false, v10;
-    else
-        return true;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+
+local function validateMaterials(p1, p2) -- line: 9
+	-- upvalues: Constants (copy), Analytics (copy)
+	local t1 = {}
+	local descendants = p1:GetDescendants()
+
+	table.insert(descendants, p1)
+
+	for _, v10 in descendants do
+		if v10:IsA("BasePart") and not Constants.MATERIAL_WHITELIST[v10.Material] then
+			table.insert(t1, v10:GetFullName())
+		end
+	end
+
+	if #t1 > 0 then
+		local t2 = {}
+		local t3 = {}
+
+		for k in pairs(Constants.MATERIAL_WHITELIST) do
+			table.insert(t3, k.Name)
+		end
+
+		table.insert(t2, "Invalid material setup for")
+
+		for _, v in pairs(t1) do
+			table.insert(t2, v)
+		end
+
+		table.insert(t2, "Accepted values are: " .. table.concat(t3, ", "))
+		Analytics.reportFailure(Analytics.ErrorType.validateMaterials, nil, p2)
+
+		return false, t2
+	end
+
+	return true
+end
+
+return validateMaterials

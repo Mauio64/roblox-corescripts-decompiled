@@ -1,370 +1,429 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InterventionShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_VRService_0 = game:GetService("VRService");
-local v3 = require(l_Parent_0.React);
-local l_useCallback_0 = v3.useCallback;
-local l_useRef_0 = v3.useRef;
-local l_useEffect_0 = v3.useEffect;
-local v7 = require(l_script_FirstAncestor_0.Utils.Constants);
-local v8 = require(l_Parent_0.Cryo);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v10 = require(l_script_FirstAncestor_0.Components.genericComponents.EvidenceField);
-local v11 = require(l_script_FirstAncestor_0.InterventionAnalytics);
-local l_LinkingProtocol_0 = require(l_Parent_0.LinkingProtocol).LinkingProtocol;
-local v13 = require(l_script_FirstAncestor_0.Http.PostDismissIntervention);
-local v14 = require(l_Parent_0.Responsive);
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local v16 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v16.FocusNavigableSurfaceIdentifierEnum;
-local l_FocusRoot_0 = v16.FocusRoot;
-local v19 = require(l_Parent_0.Foundation);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_Badge_0 = v19.Badge;
-local l_BadgeVariant_0 = v19.Enums.BadgeVariant;
-local l_Button_0 = v19.Button;
-local l_ButtonVariant_0 = v19.Enums.ButtonVariant;
-local l_ButtonSize_0 = v19.Enums.ButtonSize;
-local l_Dialog_0 = v19.Dialog;
-local l_DialogSize_0 = v19.Enums.DialogSize;
-local l_Divider_0 = v19.Divider;
-local l_IconName_0 = v19.Enums.IconName;
-local l_IconPosition_0 = v19.Enums.IconPosition;
-local l_IconVariant_0 = v19.Enums.IconVariant;
-local l_Radius_0 = v19.Enums.Radius;
-local l_Skeleton_0 = v19.Skeleton;
-local l_Text_0 = v19.Text;
-local l_View_0 = v19.View;
-local v36 = require(l_script_FirstAncestor_0.Hooks.useInterventionFocusRoot);
-local v37 = require(l_script_FirstAncestor_0.Hooks.useInterventionPlacement);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_usePreferredInput_0 = v14.usePreferredInput;
-local l_useTokens_0 = v19.Hooks.useTokens;
-local v41 = require(l_script_FirstAncestor_0.Hooks.useWebView);
-local v42 = require(l_script_FirstAncestor_0.Flags.FFlagFeatureRestrictionMiscFixes);
-local l_FFlagUniversalFeatureRestrictionReceivers_0 = require(l_Parent_0.SharedFlags).FFlagUniversalFeatureRestrictionReceivers;
-return v3.memo(function(v44) --[[ Line: 82 ]] --[[ Name: GenericInterventionDialog ]]
-    -- upvalues: l_useTokens_0 (copy), l_useRef_0 (copy), v37 (copy), l_useLocalization_0 (copy), v7 (copy), l_usePreferredInput_0 (copy), v14 (copy), l_UrlBuilder_0 (copy), v41 (copy), l_LinkingProtocol_0 (copy), v42 (copy), v36 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), l_useEffect_0 (copy), v11 (copy), l_useCallback_0 (copy), v13 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_VRService_0 (copy), l_FFlagUniversalFeatureRestrictionReceivers_0 (copy), v3 (copy), l_Text_0 (copy), l_View_0 (copy), l_Divider_0 (copy), v10 (copy), l_Badge_0 (copy), l_BadgeVariant_0 (copy), l_IconName_0 (copy), l_IconPosition_0 (copy), l_IconVariant_0 (copy), v8 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_ButtonSize_0 (copy), l_Dialog_0 (copy), l_DialogSize_0 (copy), l_Skeleton_0 (copy), l_Radius_0 (copy), l_FocusRoot_0 (copy)
-    local v45 = l_useTokens_0();
-    local v46 = l_useRef_0(DateTime.now().UnixTimestampMillis);
-    local v47 = v37();
-    local v48 = l_useLocalization_0(v7.localizationKeys);
-    local v49 = l_usePreferredInput_0() == v14.Input.Directional;
-    local v50 = l_UrlBuilder_0.static.appealsPortal.main();
-    local v51 = v41(v50, v48.AppealsPortalTitleText);
-    local l_default_0 = l_LinkingProtocol_0.default;
-    local v53 = if v42 then v36({
-        surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.ModerationOverlay, 
-        isAutoFocusRoot = true
-    }) else nil;
-    l_useEffect_0(function() --[[ Line: 101 ]]
-        -- upvalues: v11 (ref), v44 (copy), v47 (copy), v46 (copy)
-        v11.sendAnalyticsEvent(v11.TelemetryConfigs.DialogRendered, {
-            eventType = v11.Constants.EventTypes.ModalAppeared, 
-            interventionType = v44.interventionTypeForAnalytics, 
-            placement = v47, 
-            renderedTimestamp = v46.current, 
-            eventId = v44.eventId, 
-            evidence = v44.evidence, 
-            duration = v44.durationForAnalytics, 
-            acknowledgeable = v44.acknowledgeable
-        });
-    end, {
-        v46
-    });
-    local v56 = l_useCallback_0(function() --[[ Line: 115 ]]
-        -- upvalues: v11 (ref), v44 (copy), v47 (copy), v46 (copy), v13 (ref)
-        v11.sendAnalyticsEvent(v11.TelemetryConfigs.DialogCtaClicked, {
-            eventType = v11.Constants.EventTypes.CtaClicked, 
-            interventionType = v44.interventionTypeForAnalytics, 
-            placement = v47, 
-            renderedTimestamp = v46.current, 
-            eventId = v44.eventId, 
-            acknowledgeable = v44.acknowledgeable
-        });
-        if v44.acknowledgeable and v44.interventionId then
-            v13(v44.interventionId):andThen(function(_) --[[ Line: 126 ]]
-                -- upvalues: v11 (ref), v44 (ref), v47 (ref), v46 (ref)
-                v11.sendAnalyticsEvent(v11.TelemetryConfigs.DialogInterventionDismissSuccess, {
-                    eventType = v11.Constants.EventTypes.DialogInterventionDismissSuccess, 
-                    interventionType = v44.interventionTypeForAnalytics, 
-                    placement = v47, 
-                    renderedTimestamp = v46.current, 
-                    eventId = v44.eventId, 
-                    acknowledgeable = v44.acknowledgeable
-                });
-            end):catch(function(v55) --[[ Line: 138 ]]
-                -- upvalues: v11 (ref), v44 (ref), v47 (ref), v46 (ref)
-                v11.sendAnalyticsEvent(v11.TelemetryConfigs.DialogInterventionDismissFailed, {
-                    eventType = v11.Constants.EventTypes.DialogInterventionDismissFailed, 
-                    interventionType = v44.interventionTypeForAnalytics, 
-                    placement = v47, 
-                    renderedTimestamp = v46.current, 
-                    eventId = v44.eventId, 
-                    error = v55.error, 
-                    acknowledgeable = v44.acknowledgeable
-                });
-            end);
-        end;
-        v44.onDismiss();
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v44.onDismiss, 
-        v44.interventionTypeForAnalytics, 
-        v47, 
-        v46.current, 
-        v44.eventId
-    } else l_dependencyArray_0(v44.onDismiss, v44.interventionTypeForAnalytics, v47, v46.current, v44.eventId));
-    local v57 = l_useCallback_0(function() --[[ Line: 177 ]]
-        -- upvalues: v11 (ref), v44 (copy), v47 (copy), v46 (copy), l_VRService_0 (ref), v49 (copy), l_default_0 (copy), v50 (copy), v51 (copy)
-        v11.sendAnalyticsEvent(v11.TelemetryConfigs.DialogAppealClicked, {
-            eventType = v11.Constants.EventTypes.AppealClicked, 
-            interventionType = v44.interventionTypeForAnalytics, 
-            placement = v47, 
-            renderedTimestamp = v46.current, 
-            eventId = v44.eventId, 
-            acknowledgeable = v44.acknowledgeable
-        });
-        if l_VRService_0.VREnabled or v49 then
-            l_default_0:openURL(v50);
-            return;
-        else
-            v51();
-            return;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v51, 
-        l_default_0, 
-        l_VRService_0.VREnabled, 
-        v49, 
-        v44.interventionTypeForAnalytics, 
-        v47, 
-        v46.current
-    } else l_dependencyArray_0(v51, l_default_0, l_VRService_0.VREnabled, v49, v44.interventionTypeForAnalytics, v47, v46.current));
-    local v58 = {};
-    local v59 = l_FFlagUniversalFeatureRestrictionReceivers_0 and v44.useDetailedLayout;
-    if v44.bodyText and v44.bodyText ~= "" then
-        v58.BodyText = v3.createElement(l_Text_0, {
-            Text = v44.bodyText, 
-            tag = "auto-xy text-body-medium content-default text-align-x-left text-wrap", 
-            testId = "dialog-body-text", 
-            LayoutOrder = 1
-        });
-    end;
-    if v59 then
-        local v60 = {};
-        if v44.evidence and v44.evidence ~= "" then
-            v60.EvidenceItem = v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y padding-x-medium", 
-                testId = "dialog-evidence-item", 
-                LayoutOrder = 1
-            }, {
-                EvidenceText = v3.createElement(l_Text_0, {
-                    Text = v44.evidence, 
-                    tag = "auto-xy text-body-medium text-align-x-left text-wrap", 
-                    RichText = true
-                })
-            });
-        end;
-        if v44.violationReason and v44.violationReason ~= "" then
-            if v44.evidence and v44.evidence ~= "" then
-                v60.DividerAfterEvidence = v3.createElement(l_Divider_0, {
-                    LayoutOrder = 2
-                });
-            end;
-            v60.ReasonItem = v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y padding-x-medium", 
-                testId = "dialog-reason-item", 
-                LayoutOrder = 3
-            }, {
-                ReasonField = v3.createElement(v10, {
-                    fieldLabel = v48.ReasonText, 
-                    fieldValue = v44.violationReason
-                })
-            });
-        end;
-        if v44.formattedEndDate and v44.formattedEndDate ~= "" then
-            v60.EndingOnItem = v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y row padding-x-medium align-y-center", 
-                testId = "dialog-ending-on-item", 
-                LayoutOrder = 4
-            }, {
-                EndingOnInfo = v3.createElement(l_View_0, {
-                    tag = "auto-y col fill", 
-                    LayoutOrder = 1
-                }, {
-                    EvidenceField = v3.createElement(v10, {
-                        fieldLabel = "Ending on", 
-                        fieldValue = v44.formattedEndDate
-                    })
-                }), 
-                CountdownBadge = v3.createElement(l_Badge_0, {
-                    text = v44.countdownText or "Complete", 
-                    variant = l_BadgeVariant_0.Neutral, 
-                    icon = if v44.countdownText then {
-                        name = l_IconName_0.Clock, 
-                        position = l_IconPosition_0.Left, 
-                        variant = l_IconVariant_0.Filled
-                    } else nil, 
-                    LayoutOrder = 2
-                })
-            });
-        end;
-        if not v8.isEmpty(v60) then
-            v58.DetailedList = v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y padding-top-xxsmall padding-x-xxsmall padding-bottom-medium", 
-                testId = "dialog-detailed-list", 
-                LayoutOrder = 2
-            }, v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y col padding-y-large gap-large radius-large bg-shift-100 stroke-standard stroke-default"
-            }, v60));
-        end;
-    elseif v44.evidence and v44.evidence ~= "" or v44.violationReason and v44.violationReason ~= "" or v44.isAppealable then
-        v58.Evidence = v3.createElement(l_View_0, {
-            tag = "size-full-0 auto-y padding-xxsmall", 
-            LayoutOrder = 2
-        }, {
-            v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y col gap-small padding-medium radius-medium bg-surface-200 stroke-standard stroke-default"
-            }, {
-                EvidenceText = v44.evidence and v44.evidence ~= "" and v3.createElement(l_Text_0, {
-                    Text = v44.evidence, 
-                    tag = "auto-xy text-body-medium text-align-x-left text-wrap", 
-                    RichText = true, 
-                    LayoutOrder = 1
-                }), 
-                Reason = v44.violationReason and v44.violationReason ~= "" and v3.createElement(l_Text_0, {
-                    Text = ("<b>%*:</b>\n%*"):format(v48.ReasonText, v44.violationReason), 
-                    tag = "auto-xy text-body-medium text-align-x-left text-wrap", 
-                    RichText = true, 
-                    LayoutOrder = 2
-                }), 
-                AppealButton = v44.isAppealable and v3.createElement(l_Button_0, {
-                    text = v48.ReportMistakeText, 
-                    variant = l_ButtonVariant_0.Standard, 
-                    size = l_ButtonSize_0.XSmall, 
-                    width = UDim.new(1, 0), 
-                    onActivated = v57, 
-                    LayoutOrder = 3
-                })
-            })
-        });
-    end;
-    if v44.dsaMessage and v44.dsaMessage ~= "" and not v59 then
-        v58.DsaMessage = v3.createElement(l_Text_0, {
-            Text = v44.dsaMessage, 
-            tag = "auto-xy text-caption-small content-default text-align-x-left text-wrap", 
-            LayoutOrder = 3
-        });
-    end;
-    local v61 = nil;
-    if v59 then
-        v61 = {
-            {
-                variant = l_ButtonVariant_0.Emphasis, 
-                size = l_ButtonSize_0.Medium, 
-                text = v48.OkText, 
-                onActivated = v56, 
-                width = UDim.new(1, 0)
-            }
-        };
-        if v44.isAppealable then
-            table.insert(v61, {
-                variant = l_ButtonVariant_0.Standard, 
-                size = l_ButtonSize_0.Medium, 
-                text = v48.ReportMistakeText, 
-                onActivated = v57, 
-                width = UDim.new(1, 0)
-            });
-        end;
-    end;
-    if v42 then
-        return v3.createElement(l_Dialog_0.Root, {
-            size = l_DialogSize_0.Medium, 
-            hasCloseButton = false, 
-            ref = v53, 
-            hasBackdrop = not l_VRService_0.VREnabled, 
-            disablePortal = v47 ~= v7.InterventionPlacementType.InExperience
-        }, {
-            DialogTitle = not v44.isLoading and v3.createElement(l_Dialog_0.Title, {
-                text = v44.titleText
-            }), 
-            DialogContent = v3.createElement(l_Dialog_0.Content, nil, if v44.isLoading then v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y col gap-medium margin-top-small"
-            }, {
-                Heading = v3.createElement(l_Skeleton_0, {
-                    Size = UDim2.new(0.6, 0, 0, v45.Size.Size_1100), 
-                    radius = l_Radius_0.Medium, 
-                    LayoutOrder = 1
-                }), 
-                Body = v3.createElement(l_Skeleton_0, {
-                    Size = UDim2.new(1, 0, 0, v45.Size.Size_2000), 
-                    radius = l_Radius_0.Medium, 
-                    LayoutOrder = 2
-                }), 
-                Actions = v3.createElement(l_Skeleton_0, {
-                    Size = UDim2.new(1, 0, 0, v45.Size.Size_800), 
-                    radius = l_Radius_0.Medium, 
-                    LayoutOrder = 3
-                })
-            }) else v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y col gap-medium"
-            }, v58)), 
-            DialogActions = not v44.isLoading and v3.createElement(l_Dialog_0.Actions, {
-                actions = if v59 then v61 else {
-                    {
-                        variant = l_ButtonVariant_0.Emphasis, 
-                        size = l_ButtonSize_0.Small, 
-                        text = v48.OkText, 
-                        onActivated = v56
-                    }
-                }, 
-                label = if v59 and v44.useDetailedLayout and v44.dsaMessage and v44.dsaMessage ~= "" then v44.dsaMessage else nil
-            })
-        });
-    else
-        return (v3.createElement(l_FocusRoot_0, {
-            surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.PopUp, 
-            isIsolated = true, 
-            isAutoFocusRoot = true
-        }, {
-            v3.createElement(l_Dialog_0.Root, {
-                size = l_DialogSize_0.Medium, 
-                hasCloseButton = false
-            }, {
-                DialogTitle = not v44.isLoading and v3.createElement(l_Dialog_0.Title, {
-                    text = v44.titleText
-                }), 
-                DialogContent = v3.createElement(l_Dialog_0.Content, nil, if v44.isLoading then v3.createElement(l_View_0, {
-                    tag = "size-full-0 auto-y col gap-medium margin-top-small"
-                }, {
-                    Heading = v3.createElement(l_Skeleton_0, {
-                        Size = UDim2.new(0.6, 0, 0, v45.Size.Size_1100), 
-                        radius = l_Radius_0.Medium, 
-                        LayoutOrder = 1
-                    }), 
-                    Body = v3.createElement(l_Skeleton_0, {
-                        Size = UDim2.new(1, 0, 0, v45.Size.Size_2000), 
-                        radius = l_Radius_0.Medium, 
-                        LayoutOrder = 2
-                    }), 
-                    Actions = v3.createElement(l_Skeleton_0, {
-                        Size = UDim2.new(1, 0, 0, v45.Size.Size_800), 
-                        radius = l_Radius_0.Medium, 
-                        LayoutOrder = 3
-                    })
-                }) else v3.createElement(l_View_0, {
-                    tag = "size-full-0 auto-y col gap-medium"
-                }, v58)), 
-                DialogActions = not v44.isLoading and v3.createElement(l_Dialog_0.Actions, {
-                    actions = {
-                        {
-                            variant = l_ButtonVariant_0.Emphasis, 
-                            size = l_ButtonSize_0.Small, 
-                            text = v48.OkText, 
-                            onActivated = v56
-                        }
-                    }
-                })
-            })
-        }));
-    end;
-end);
+local InterventionShared = script:FindFirstAncestor("InterventionShared")
+local InterventionSharedParent = InterventionShared.Parent
+local VRService = game:GetService("VRService")
+local React = require(InterventionSharedParent.React)
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local useRef = React.useRef
+local Constants = require(InterventionShared.Utils.Constants)
+local Cryo = require(InterventionSharedParent.Cryo)
+local EvidenceField = require(InterventionShared.Components.genericComponents.EvidenceField)
+local InterventionAnalytics = require(InterventionShared.InterventionAnalytics)
+local LinkingProtocol = require(InterventionSharedParent.LinkingProtocol).LinkingProtocol
+local PostDismissIntervention = require(InterventionShared.Http.PostDismissIntervention)
+local Responsive = require(InterventionSharedParent.Responsive)
+local NotificationModalsManager = require(InterventionSharedParent.NotificationModalsManager)
+local UrlBuilder = require(InterventionSharedParent.UrlBuilder).UrlBuilder
+local FocusNavigableSurfaceIdentifierEnum = require(InterventionSharedParent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+local Foundation = require(InterventionSharedParent.Foundation)
+local Badge = Foundation.Badge
+local BadgeVariant = Foundation.Enums.BadgeVariant
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonSize = Foundation.Enums.ButtonSize
+local Dialog = Foundation.Dialog
+local DialogSize = Foundation.Enums.DialogSize
+local Divider = Foundation.Divider
+local IconName = Foundation.Enums.IconName
+local IconPosition = Foundation.Enums.IconPosition
+local IconVariant = Foundation.Enums.IconVariant
+local EnumsRadius = Foundation.Enums.Radius
+local Skeleton = Foundation.Skeleton
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local Images = require(InterventionSharedParent.FoundationImages).Images
+local useInterventionFocusRoot = require(InterventionShared.Hooks.useInterventionFocusRoot)
+local useInterventionPlacement = require(InterventionShared.Hooks.useInterventionPlacement)
+local useLocalization = require(InterventionSharedParent.Localization).Hooks.useLocalization
+local usePreferredInput = Responsive.usePreferredInput
+local useTokens = Foundation.Hooks.useTokens
+local useWebView = require(InterventionShared.Hooks.useWebView)
+local FFlagNavigateToSafetyDashboardForAppeals = require(InterventionSharedParent.SharedFlags).FFlagNavigateToSafetyDashboardForAppeals
+local FFlagUniversalFeatureRestrictionReceivers = require(InterventionSharedParent.SharedFlags).FFlagUniversalFeatureRestrictionReceivers
+local v43 = Images["icons/actions/accept"]
+
+local function GenericInterventionDialog(t1: {[any]: any}) -- line: 86
+	-- upvalues: useTokens (copy), useRef (copy), useInterventionPlacement (copy), useLocalization (copy), Constants (copy), usePreferredInput (copy), Responsive (copy), FFlagNavigateToSafetyDashboardForAppeals (copy), UrlBuilder (copy), useWebView (copy), LinkingProtocol (copy), useInterventionFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), useEffect (copy), InterventionAnalytics (copy), useCallback (copy), PostDismissIntervention (copy), FFlagUniversalFeatureRestrictionReceivers (copy), NotificationModalsManager (copy), v43 (copy), VRService (copy), React (copy), FoundationText (copy), View (copy), Divider (copy), EvidenceField (copy), Badge (copy), BadgeVariant (copy), IconName (copy), IconPosition (copy), IconVariant (copy), Cryo (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy), Dialog (copy), DialogSize (copy), Skeleton (copy), EnumsRadius (copy)
+	local v46 = useTokens()
+	local v47 = useRef(DateTime.now().UnixTimestampMillis)
+	local v48 = useInterventionPlacement()
+	local v49 = useLocalization(Constants.localizationKeys)
+	local v50 = usePreferredInput() == Responsive.Input.Directional
+	local v51 = if not FFlagNavigateToSafetyDashboardForAppeals then UrlBuilder.static.appealsPortal.main() else UrlBuilder.static.safetyDashboard.main()
+	local v52 = useWebView(v51, if not FFlagNavigateToSafetyDashboardForAppeals then v49.AppealsPortalTitleText else v49.AccountStatusTitleText)
+	local default = LinkingProtocol.default
+	local v54 = useInterventionFocusRoot({
+		isAutoFocusRoot = true,
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay
+	})
+
+	useEffect(function() -- line: 110
+		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogRendered, {
+			eventType = InterventionAnalytics.Constants.EventTypes.ModalAppeared,
+			interventionType = t1.interventionTypeForAnalytics,
+			placement = v48,
+			renderedTimestamp = v47.current,
+			eventId = t1.eventId,
+			evidence = t1.evidence,
+			duration = t1.durationForAnalytics,
+			acknowledgeable = t1.acknowledgeable,
+			abuseVector = t1.abuseVectorForAnalytics
+		})
+	end, { v47 })
+
+	local v55 = useCallback(function() -- line: 125
+		-- upvalues: t1 (copy), PostDismissIntervention (copy), InterventionAnalytics (copy), v48 (copy), v47 (copy)
+		if t1.acknowledgeable and t1.interventionId then
+			PostDismissIntervention(t1.interventionId):andThen(function(_) -- line: 127
+				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissSuccess, {
+					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissSuccess,
+					interventionType = t1.interventionTypeForAnalytics,
+					placement = v48,
+					renderedTimestamp = v47.current,
+					eventId = t1.eventId,
+					acknowledgeable = t1.acknowledgeable,
+					abuseVector = t1.abuseVectorForAnalytics
+				})
+			end):catch(function(p2) -- line: 140
+				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissFailed, {
+					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissFailed,
+					interventionType = t1.interventionTypeForAnalytics,
+					placement = v48,
+					renderedTimestamp = v47.current,
+					eventId = t1.eventId,
+					error = p2.error,
+					acknowledgeable = t1.acknowledgeable,
+					abuseVector = t1.abuseVectorForAnalytics
+				})
+			end)
+		end
+	end, {
+		t1.acknowledgeable,
+		t1.interventionId,
+		t1.interventionTypeForAnalytics,
+		v48,
+		v47.current,
+		t1.eventId,
+		t1.abuseVectorForAnalytics
+	})
+	local v56 = useCallback(function() -- line: 171
+		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), v55 (copy), PostDismissIntervention (copy)
+		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogCtaClicked, {
+			eventType = InterventionAnalytics.Constants.EventTypes.CtaClicked,
+			interventionType = t1.interventionTypeForAnalytics,
+			placement = v48,
+			renderedTimestamp = v47.current,
+			eventId = t1.eventId,
+			acknowledgeable = t1.acknowledgeable,
+			abuseVector = t1.abuseVectorForAnalytics
+		})
+
+		if FFlagUniversalFeatureRestrictionReceivers then
+			v55()
+		elseif t1.acknowledgeable and t1.interventionId then
+			PostDismissIntervention(t1.interventionId):andThen(function(_) -- line: 186
+				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissSuccess, {
+					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissSuccess,
+					interventionType = t1.interventionTypeForAnalytics,
+					placement = v48,
+					renderedTimestamp = v47.current,
+					eventId = t1.eventId,
+					acknowledgeable = t1.acknowledgeable,
+					abuseVector = t1.abuseVectorForAnalytics
+				})
+			end):catch(function(p4) -- line: 199
+				-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy)
+				InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogInterventionDismissFailed, {
+					eventType = InterventionAnalytics.Constants.EventTypes.DialogInterventionDismissFailed,
+					interventionType = t1.interventionTypeForAnalytics,
+					placement = v48,
+					renderedTimestamp = v47.current,
+					eventId = t1.eventId,
+					error = p4.error,
+					acknowledgeable = t1.acknowledgeable,
+					abuseVector = t1.abuseVectorForAnalytics
+				})
+			end)
+		end
+
+		t1.onDismiss()
+	end, {
+		t1.onDismiss,
+		t1.interventionTypeForAnalytics,
+		v48,
+		v47.current,
+		t1.eventId,
+		t1.abuseVectorForAnalytics,
+		t1.acknowledgeable,
+		t1.interventionId,
+		v55
+	})
+	local v57 = useCallback(function() -- line: 235
+		-- upvalues: InterventionAnalytics (copy), t1 (copy), v48 (copy), v47 (copy), FFlagUniversalFeatureRestrictionReceivers (copy), v55 (copy), NotificationModalsManager (copy), v43 (copy), v49 (copy), v46 (copy), VRService (copy), v50 (copy), default (copy), v51 (copy), v52 (copy)
+		InterventionAnalytics.sendAnalyticsEvent(InterventionAnalytics.TelemetryConfigs.DialogAppealClicked, {
+			eventType = InterventionAnalytics.Constants.EventTypes.AppealClicked,
+			interventionType = t1.interventionTypeForAnalytics,
+			placement = v48,
+			renderedTimestamp = v47.current,
+			eventId = t1.eventId,
+			acknowledgeable = t1.acknowledgeable,
+			abuseVector = t1.abuseVectorForAnalytics
+		})
+
+		if FFlagUniversalFeatureRestrictionReceivers and (t1.useDetailedLayout and t1.onAppeal) then
+			t1.onAppeal()
+
+			if not t1.shouldOpenAppealsPortal then
+				v55()
+				t1.onDismiss()
+				NotificationModalsManager.SetUIBloxToast({
+					iconImage = v43,
+					toastTitle = v49.TakeALookText,
+					toastSubtitle = v49.FeedbackHelpsText,
+					sequenceNumber = DateTime.now().UnixTimestamp,
+					iconColorStyle = {
+						Transparency = 0,
+						Color = v46.Color.System.Success.Color3
+					}
+				})
+
+				return
+			end
+		end
+
+		if VRService.VREnabled or v50 then
+			default:openURL(v51)
+
+			return
+		end
+
+		v52()
+	end, {
+		v52,
+		default,
+		VRService.VREnabled,
+		v50,
+		t1.interventionTypeForAnalytics,
+		v48,
+		v47.current,
+		v51,
+		t1.abuseVectorForAnalytics,
+		t1.acknowledgeable,
+		t1.interventionId,
+		t1.eventId,
+		v49.FeedbackHelpsText,
+		v49.TakeALookText,
+		t1.onAppeal,
+		t1.shouldOpenAppealsPortal,
+		t1.onDismiss,
+		t1.useDetailedLayout,
+		v46.Color.System.Success.Color3,
+		v55
+	})
+	local t2 = {}
+	local v59 = FFlagUniversalFeatureRestrictionReceivers and t1.useDetailedLayout
+
+	if t1.bodyText and t1.bodyText ~= "" then
+		t2.BodyText = React.createElement(FoundationText, {
+			tag = "auto-xy text-body-medium content-default text-align-x-left text-wrap",
+			testId = "dialog-body-text",
+			LayoutOrder = 1,
+			Text = t1.bodyText
+		})
+	end
+
+	if v59 then
+		local t3 = {}
+
+		if t1.evidence and t1.evidence ~= "" then
+			t3.EvidenceItem = React.createElement(View, {
+				tag = "size-full-0 auto-y padding-x-medium",
+				testId = "dialog-evidence-item",
+				LayoutOrder = 1
+			}, {
+				EvidenceText = React.createElement(FoundationText, {
+					tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+					RichText = true,
+					Text = t1.evidence
+				})
+			})
+		end
+
+		if t1.violationReason and t1.violationReason ~= "" then
+			if t1.evidence and t1.evidence ~= "" then
+				t3.DividerAfterEvidence = React.createElement(Divider, {
+					LayoutOrder = 2
+				})
+			end
+
+			t3.ReasonItem = React.createElement(View, {
+				tag = "size-full-0 auto-y padding-x-medium",
+				testId = "dialog-reason-item",
+				LayoutOrder = 3
+			}, {
+				ReasonField = React.createElement(EvidenceField, {
+					fieldLabel = v49.ReasonText,
+					fieldValue = t1.violationReason
+				})
+			})
+		end
+
+		if t1.userNote and t1.userNote ~= "" then
+			t3.NoteItem = React.createElement(View, {
+				tag = "size-full-0 auto-y padding-x-medium",
+				testId = "dialog-note-item",
+				LayoutOrder = 4
+			}, {
+				NoteText = React.createElement(EvidenceField, {
+					fieldLabel = v49.ModeratorNoteLabel,
+					fieldValue = t1.userNote
+				})
+			})
+		end
+
+		if t1.formattedEndDate and t1.formattedEndDate ~= "" then
+			t3.EndingOnItem = React.createElement(View, {
+				tag = "size-full-0 auto-y row padding-x-medium align-y-center",
+				testId = "dialog-ending-on-item",
+				LayoutOrder = 5
+			}, {
+				EndingOnInfo = React.createElement(View, {
+					tag = "auto-y col fill",
+					LayoutOrder = 1
+				}, {
+					EvidenceField = React.createElement(EvidenceField, {
+						hasColon = false,
+						fieldLabel = v49.EndsOnText,
+						fieldValue = t1.formattedEndDate
+					})
+				}),
+				CountdownBadge = React.createElement(Badge, {
+					LayoutOrder = 2,
+					text = t1.countdownText or v49.CompleteText,
+					variant = BadgeVariant.Neutral,
+					icon = if not t1.countdownText then nil else {
+						name = IconName.Clock,
+						position = IconPosition.Left,
+						variant = IconVariant.Filled
+					}
+				})
+			})
+		end
+
+		if not Cryo.isEmpty(t3) then
+			t2.DetailedList = React.createElement(View, {
+				tag = "size-full-0 auto-y padding-top-xxsmall padding-x-xxsmall padding-bottom-medium",
+				testId = "dialog-detailed-list",
+				LayoutOrder = 2
+			}, React.createElement(View, {
+				tag = "size-full-0 auto-y col padding-y-large gap-large radius-large bg-shift-100 stroke-standard stroke-default"
+			}, t3))
+		end
+	elseif t1.evidence and t1.evidence ~= "" or (t1.violationReason and t1.violationReason ~= "" or t1.isAppealable) then
+		t2.Evidence = React.createElement(View, {
+			tag = "size-full-0 auto-y padding-xxsmall",
+			LayoutOrder = 2
+		}, { React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-small padding-medium radius-medium bg-surface-200 stroke-standard stroke-default"
+		}, {
+			EvidenceText = t1.evidence and (t1.evidence ~= "" and React.createElement(FoundationText, {
+				tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+				RichText = true,
+				LayoutOrder = 1,
+				Text = t1.evidence
+			})),
+			Reason = t1.violationReason and (t1.violationReason ~= "" and React.createElement(FoundationText, {
+				tag = "auto-xy text-body-medium text-align-x-left text-wrap",
+				RichText = true,
+				LayoutOrder = 2,
+				Text = `<b>{ v49.ReasonText }:</b>\n{ t1.violationReason }`
+			})),
+			AppealButton = t1.isAppealable and React.createElement(Button, {
+				LayoutOrder = 3,
+				text = v49.ReportMistakeText,
+				variant = ButtonVariant.Standard,
+				size = ButtonSize.XSmall,
+				width = UDim.new(1, 0),
+				onActivated = v57
+			})
+		}) })
+	end
+
+	if t1.dsaMessage and t1.dsaMessage ~= "" and not v59 then
+		t2.DsaMessage = React.createElement(FoundationText, {
+			tag = "auto-xy text-caption-small content-default text-align-x-left text-wrap",
+			LayoutOrder = 3,
+			Text = t1.dsaMessage
+		})
+	end
+
+	local t4 = nil
+
+	if v59 then
+		t4 = {{
+			variant = ButtonVariant.Emphasis,
+			size = ButtonSize.Medium,
+			text = v49.OkText,
+			onActivated = v56,
+			width = UDim.new(1, 0)
+		}}
+
+		if t1.isAppealable then
+			table.insert(t4, {
+				variant = ButtonVariant.Standard,
+				size = ButtonSize.Medium,
+				text = v49.ReportMistakeText,
+				onActivated = v57,
+				width = UDim.new(1, 0)
+			})
+		end
+	end
+
+	return React.createElement(Dialog.Root, {
+		hasCloseButton = false,
+		size = DialogSize.Medium,
+		ref = v54,
+		hasBackdrop = not VRService.VREnabled,
+		disablePortal = v48 ~= Constants.InterventionPlacementType.InExperience
+	}, {
+		DialogTitle = not t1.isLoading and React.createElement(Dialog.Title, {
+			text = t1.titleText
+		}),
+		DialogContent = React.createElement(Dialog.Content, nil, if not t1.isLoading then React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-medium"
+		}, t2) else React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-medium margin-top-small"
+		}, {
+			Heading = React.createElement(Skeleton, {
+				LayoutOrder = 1,
+				Size = UDim2.new(0.6, 0, 0, v46.Size.Size_1100),
+				radius = EnumsRadius.Medium
+			}),
+			Body = React.createElement(Skeleton, {
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, v46.Size.Size_2000),
+				radius = EnumsRadius.Medium
+			}),
+			Actions = React.createElement(Skeleton, {
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 0, v46.Size.Size_800),
+				radius = EnumsRadius.Medium
+			})
+		})),
+		DialogActions = not t1.isLoading and React.createElement(Dialog.Actions, {
+			actions = if not v59 then {{
+				variant = ButtonVariant.Emphasis,
+				size = ButtonSize.Small,
+				text = v49.OkText,
+				onActivated = v56
+			}} else t4,
+			label = if not v59 or (not t1.useDetailedLayout or (not t1.dsaMessage or t1.dsaMessage == "")) then nil else t1.dsaMessage
+		})
+	})
+end
+
+return React.memo(GenericInterventionDialog)

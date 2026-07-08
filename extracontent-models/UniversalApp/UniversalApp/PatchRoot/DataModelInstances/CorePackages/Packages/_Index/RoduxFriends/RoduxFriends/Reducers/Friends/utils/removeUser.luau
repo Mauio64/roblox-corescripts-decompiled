@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxFriends").Parent;
-local v1 = require(l_Parent_0.llama);
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    return v1.List.removeValue(v2 or {}, v3);
-end;
+local Parent = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(Parent.llama)
+
+return function(p1, p2) -- line: 5
+	-- upvalues: llama (copy)
+	return llama.List.removeValue(p1 or {}, p2)
+end

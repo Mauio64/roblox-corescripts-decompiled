@@ -1,6 +1,7 @@
-local l_script_0 = script;
-local v1 = require(l_script_0.preloadAsset);
+local _script = script
+local preloadAsset = require(_script.preloadAsset)
+
 return {
-    Assets = require(l_script_0.Generated.ConsolidatedAssets), 
-    preloadAsset = v1
-};
+	Assets = require(_script.Generated.ConsolidatedAssets),
+	preloadAsset = preloadAsset
+}

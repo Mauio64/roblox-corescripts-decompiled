@@ -1,828 +1,857 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local l_FitFrameVertical_0 = require(l_Parent_2.RoactFitComponents).FitFrameVertical;
-local l_Colors_0 = require(l_Parent_2.Style).Colors;
-local v6 = require(l_Parent_2.UIBlox);
-local l_InteractiveAlert_0 = v6.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v6.App.Button.Enum.ButtonType;
-local l_withStyle_0 = v6.Core.Style.withStyle;
-local v10 = require(l_Parent_1.Flags.FFlagLowCogsBannerInfoIcon);
-local v11 = require(l_Parent_1.Generic.InfoIconWithTooltip);
-local v12 = require(l_Parent_1.Locale.MultiTextLocalizer);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Localization_0 = require(l_Parent_2.AppLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_2.Localization).LocalizationProvider;
-local l_withLocalization_0 = require(l_Parent_2.Localization).withLocalization;
-local _ = require(l_Parent_2.IXPServiceWrapper).IXPServiceWrapper;
-local v18 = require(l_Parent_2.SharedFlags);
-local l_default_0 = require(l_Parent_2.LoggingProtocol).default;
-local v20 = require(l_Parent_1.Generic.Events.LegacyUpsellCounter);
-local v21 = require(l_Parent_1.Utility.logger);
-local v22 = require(l_Parent_1.Flags.FFlagMobilePopularItemBadgingExperimentEnabled);
-local _ = require(l_Parent_1.Flags.GetFStringMobilePopularItemBadgingLayer);
-local v24 = require(l_Parent_0.ProductDetails);
-local v25 = require(l_Parent_0.ProductDetailsNew);
-local v26 = require(l_Parent_1.Generic.Constants);
-local v27 = require(l_Parent_1.Flags.getEnableCondenseRobuxUpsell);
-local v28 = require(l_Parent_1.Flags.FFlagIntroduceMetricsLegacyUpsell);
-local v29 = v3.Component:extend(script.Name);
-v29.defaultProps = {
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    position = UDim2.new(0.5, 0, 0.5, 0), 
-    isLoading = false, 
-    isDisabled = false, 
-    isDelayedInput = false, 
-    isQuest = false, 
-    enableInputDelayed = false, 
-    inputDelaySec = 3, 
-    isVng = false
-};
-v29.init = function(v30) --[[ Line: 107 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v27 (copy), v26 (copy)
-    v30.contentRef = v3.createRef();
-    v30.state = {
-        contentSize = Vector2.new(0, 0), 
-        footerSize = Vector2.new(0, 0), 
-        isCondensed = false
-    };
-    v30.validateCondensedCondition = function(v31) --[[ Line: 115 ]]
-        -- upvalues: v27 (ref), v26 (ref), v30 (copy)
-        if not v27() then
-            return;
-        else
-            local v32 = v31.AbsoluteSize.Y + v26.MODAL_HEIGHT_WITHOUT_CONTENT + v26.MODAL_NORMAL_SECTION_PADDING * 2 + v26.MODAL_NORMAL_BUTTON_HEIGHT * 2;
-            if v30.state.isCondensed then
-                v30:setState({
-                    isCondensed = v30.props.screenSize.Y < v32 + (v26.MODAL_NORMAL_CONTENT_PADDING - v26.MODAL_CONDENSED_CONTENT_PADDING) * 6 + (v26.MODAL_NORMAL_BUTTON_MARGIN - v26.MODAL_CONDENSED_BUTTON_MARGIN) + (v26.NORMAL_ICON_SIZE - v26.CONDENSED_ICON_SIZE)
-                });
-                return;
-            else
-                v30:setState({
-                    isCondensed = v30.props.screenSize.Y < v32 + v26.MODAL_NORMAL_BUTTON_MARGIN
-                });
-                return;
-            end;
-        end;
-    end;
-    v30.changeContentSize = function(v33) --[[ Line: 143 ]]
-        -- upvalues: v30 (copy)
-        v30.validateCondensedCondition(v33);
-        if v30.state.contentSize ~= v33.AbsoluteSize then
-            v30:setState({
-                contentSize = v33.AbsoluteSize
-            });
-        end;
-    end;
-end;
-v29.didMount = function(_) --[[ Line: 153 ]] --[[ Name: didMount ]]
-    -- upvalues: v28 (copy), v21 (copy), l_default_0 (copy), v20 (copy)
-    if v28 then
-        v21.debug({
-            message = "Legacy Upsell Modal Shown"
-        });
-        l_default_0:logRobloxTelemetryCounter(v20.LegacyUpsellShownCounter, 1, {});
-    end;
-end;
-v29.render = function(v35) --[[ Line: 162 ]] --[[ Name: render ]]
-    -- upvalues: v18 (copy), v3 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), v22 (copy), v12 (copy)
-    local v36 = v35.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL";
-    if v18.FFlagLowCogsBannerExperiment then
-        return v3.createElement(l_LocalizationProvider_0, {
-            localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-        }, {
-            Alert = v35:renderNewAlert()
-        });
-    elseif v22 then
-        return v3.createElement(l_LocalizationProvider_0, {
-            localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-        }, {
-            Alert = v35:renderAlertNewProductDetails()
-        });
-    else
-        return v3.createElement(v12, {
-            keys = {
-                InsufficientRobuxTitle = {
-                    key = "IAPExperience.RobuxUpsell.Title.InsufficientRobux"
-                }, 
-                AdditionalRobux = {
-                    key = "IAPExperience.RobuxUpsell.Text.AdditionalRobux"
-                }, 
-                WouldYouBuy = {
-                    key = "IAPExperience.RobuxUpsell.Text.WouldYouBuy"
-                }, 
-                DisclosurePayment = {
-                    key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment"
-                }, 
-                DisclosureTermsURL = {
-                    key = v36
-                }, 
-                TermsOfUse = {
-                    key = "IAPExperience.RobuxUpsell.Text.TermsOfUse"
-                }, 
-                BuyRobuxButton = {
-                    key = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem"
-                }, 
-                ButtonCancel = {
-                    key = "IAPExperience.RobuxUpsell.Action.Cancel"
-                }, 
-                LoadingText = {
-                    key = "IAPExperience.RobuxUpsell.Text.Loading"
-                }, 
-                PurchaseNotAvialableForQuest = {
-                    key = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet"
-                }
-            }, 
-            render = function(v37) --[[ Line: 220 ]] --[[ Name: render ]]
-                -- upvalues: v35 (copy)
-                return v35:renderAlert(v37);
-            end
-        });
-    end;
-end;
-v29.renderAlert = function(v38, v39) --[[ Line: 226 ]] --[[ Name: renderAlert ]]
-    -- upvalues: l_withStyle_0 (copy), v27 (copy), v3 (copy), l_InteractiveAlert_0 (copy), l_FitFrameVertical_0 (copy), v26 (copy), v24 (copy), l_ButtonType_0 (copy)
-    local l_props_0 = v38.props;
-    local l_state_0 = v38.state;
-    return l_withStyle_0(function(v42) --[[ Line: 230 ]]
-        -- upvalues: v27 (ref), l_state_0 (copy), l_props_0 (copy), v39 (copy), v3 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), v26 (ref), v38 (copy), v24 (ref), l_ButtonType_0 (ref)
-        local l_Theme_0 = v42.Theme;
-        local l_Font_0 = v42.Font;
-        local v45 = l_Font_0.BaseSize * l_Font_0.Body.RelativeSize;
-        if v27() then
-            v45 = l_state_0.isCondensed and v45 * 0.9 or v45;
-        end;
-        local v46 = l_props_0.itemRobuxCost - l_props_0.balanceAmount;
-        local v47 = v39.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v46));
-        local v48 = Color3.new(math.round(l_Theme_0.TextEmphasis.Color.R * 255), math.round(l_Theme_0.TextEmphasis.Color.G * 255), (math.round(l_Theme_0.TextEmphasis.Color.B * 255)));
-        local v49 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(v48), utf8.char(57346), (tostring(l_props_0.robuxPurchaseAmount)));
-        local v50 = v39.WouldYouBuy:gsub("{robux}", v49);
-        local v51 = string.split(v39.DisclosureTermsURL, "{termsofuse}");
-        local l_TermsOfUse_0 = v39.TermsOfUse;
-        if l_props_0.termsOfUseActivated then
-            l_TermsOfUse_0 = "<u>" .. l_TermsOfUse_0 .. "</u>";
-        end;
-        return v3.createElement(l_InteractiveAlert_0, {
-            screenSize = l_props_0.screenSize, 
-            position = l_props_0.position, 
-            anchorPoint = l_props_0.anchorPoint, 
-            title = v39.InsufficientRobuxTitle, 
-            middleContent = function() --[[ Line: 266 ]] --[[ Name: middleContent ]]
-                -- upvalues: v3 (ref), l_FitFrameVertical_0 (ref), v27 (ref), l_state_0 (ref), v26 (ref), v38 (ref), v24 (ref), l_props_0 (ref), l_Theme_0 (copy), l_Font_0 (copy), v47 (copy), v50 (copy), v45 (ref), v39 (ref), v51 (copy), l_TermsOfUse_0 (ref)
-                return v3.createElement(l_FitFrameVertical_0, {
-                    BackgroundTransparency = 1, 
-                    width = UDim.new(1, 0), 
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    contentPadding = if v27() then UDim.new(0, l_state_0.isCondensed and v26.MODAL_CONDENSED_CONTENT_PADDING or v26.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, v26.MODAL_NORMAL_CONTENT_PADDING), 
-                    [v3.Ref] = v38.contentRef, 
-                    [v3.Change.AbsoluteSize] = v38.changeContentSize
-                }, {
-                    ProductDetails = v3.createElement(v24, {
-                        layoutOrder = 1, 
-                        model = l_props_0.model, 
-                        itemIcon = l_props_0.itemIcon, 
-                        itemName = l_props_0.itemName, 
-                        itemRobuxCost = l_props_0.itemRobuxCost, 
-                        itemIconWidth = if v27() then l_state_0.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil, 
-                        itemIconHeight = if v27() then l_state_0.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil
-                    }), 
-                    Underline = v3.createElement("Frame", {
-                        LayoutOrder = 2, 
-                        BorderSizePixel = 0, 
-                        BackgroundColor3 = l_Theme_0.Divider.Color, 
-                        BackgroundTransparency = l_Theme_0.Divider.Transparency, 
-                        Size = UDim2.new(1, 0, 0, 1)
-                    }), 
-                    AdditionalBuyText = v3.createElement("TextLabel", {
-                        LayoutOrder = 3, 
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.new(0, v38.state.contentSize.X, 0, 0), 
-                        RichText = true, 
-                        AutomaticSize = Enum.AutomaticSize.Y, 
-                        TextWrapped = true, 
-                        Font = l_Font_0.Body.Font, 
-                        Text = if v38.props.isQuest then v47 else v47 .. " " .. v50, 
-                        TextSize = v45, 
-                        TextColor3 = l_Theme_0.TextDefault.Color, 
-                        TextTransparency = l_Theme_0.TextDefault.Transparency
-                    }), 
-                    Underline2 = v3.createElement("Frame", {
-                        LayoutOrder = 4, 
-                        BorderSizePixel = 0, 
-                        BackgroundColor3 = l_Theme_0.Divider.Color, 
-                        BackgroundTransparency = l_Theme_0.Divider.Transparency, 
-                        Size = UDim2.new(1, 0, 0, 1)
-                    }), 
-                    DisclosureFrame = v3.createElement(l_FitFrameVertical_0, {
-                        LayoutOrder = 5, 
-                        BackgroundTransparency = 1, 
-                        width = UDim.new(1, 0), 
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        contentPadding = UDim.new(0, 1)
-                    }, {
-                        DisclosurePayment = v3.createElement("TextLabel", {
-                            LayoutOrder = 1, 
-                            BackgroundTransparency = 1, 
-                            AutomaticSize = Enum.AutomaticSize.XY, 
-                            Font = l_Font_0.Body.Font, 
-                            Text = if v38.props.isQuest then v39.PurchaseNotAvailableOnHeadSet else v39.DisclosurePayment, 
-                            TextSize = v45, 
-                            TextColor3 = l_Theme_0.TextDefault.Color, 
-                            TextTransparency = l_Theme_0.TextDefault.Transparency, 
-                            TextWrapped = true
-                        }), 
-                        DisclosureTermsFrame = if v38.props.isQuest then nil else v3.createElement(l_FitFrameVertical_0, {
-                            LayoutOrder = 2, 
-                            BackgroundTransparency = 1, 
-                            width = UDim.new(1, 0), 
-                            FillDirection = Enum.FillDirection.Horizontal, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                            VerticalAlignment = Enum.VerticalAlignment.Center, 
-                            contentPadding = UDim.new(0, 1)
-                        }, {
-                            BeforeDisclosureText = v3.createElement("TextLabel", {
-                                LayoutOrder = 0, 
-                                BackgroundTransparency = 1, 
-                                AutomaticSize = Enum.AutomaticSize.XY, 
-                                Font = l_Font_0.Body.Font, 
-                                Text = v51[1], 
-                                TextSize = v45, 
-                                TextColor3 = l_Theme_0.TextDefault.Color, 
-                                TextTransparency = l_Theme_0.TextDefault.Transparency
-                            }), 
-                            TermsOfUse = v3.createElement("TextButton", {
-                                LayoutOrder = 1, 
-                                BackgroundTransparency = 1, 
-                                RichText = true, 
-                                AutomaticSize = Enum.AutomaticSize.XY, 
-                                Font = l_Font_0.Body.Font, 
-                                Text = l_TermsOfUse_0, 
-                                TextSize = v45, 
-                                TextColor3 = l_Theme_0.TextDefault.Color, 
-                                TextTransparency = l_Theme_0.TextDefault.Transparency, 
-                                Selectable = l_props_0.termsOfUseActivated ~= nil, 
-                                [v3.Event.Activated] = l_props_0.termsOfUseActivated
-                            }), 
-                            AfterDisclosureText = v3.createElement("TextLabel", {
-                                LayoutOrder = 2, 
-                                BackgroundTransparency = 1, 
-                                AutomaticSize = Enum.AutomaticSize.XY, 
-                                Font = l_Font_0.Body.Font, 
-                                Text = v51[2], 
-                                TextSize = v45, 
-                                TextColor3 = l_Theme_0.TextDefault.Color, 
-                                TextTransparency = l_Theme_0.TextDefault.Transparency
-                            })
-                        })
-                    })
-                });
-            end, 
-            buttonStackInfo = {
-                forcedFillDirection = Enum.FillDirection.Vertical, 
-                marginBetween = if v27() then l_state_0.isCondensed and v26.MODAL_CONDENSED_BUTTON_MARGIN or v26.MODAL_NORMAL_BUTTON_MARGIN else v26.MODAL_NORMAL_BUTTON_MARGIN, 
-                buttons = if v38.props.isQuest then {
-                    {
-                        props = {
-                            isDisabled = l_props_0.isDisabled, 
-                            onActivated = l_props_0.cancelPurchaseActivated, 
-                            text = v39.ButtonCancel, 
-                            inputIcon = l_props_0.cancelControllerIcon
-                        }
-                    }
-                } else {
-                    {
-                        props = {
-                            isDisabled = l_props_0.isDisabled, 
-                            onActivated = l_props_0.cancelPurchaseActivated, 
-                            text = v39.ButtonCancel, 
-                            inputIcon = l_props_0.cancelControllerIcon
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            isLoading = l_props_0.isLoading, 
-                            isDisabled = l_props_0.isDisabled, 
-                            isDelayedInput = l_props_0.isDelayedInput, 
-                            enableInputDelayed = l_props_0.enableInputDelayed, 
-                            delayInputSeconds = l_props_0.inputDelaySec, 
-                            onActivated = l_props_0.buyItemActivated, 
-                            text = if l_props_0.enableInputDelayed then v39.LoadingText else v39.BuyRobuxButton, 
-                            inputIcon = l_props_0.buyItemControllerIcon
-                        }
-                    }
-                }
-            }
-        });
-    end);
-end;
-v29.renderAlertNewProductDetails = function(v53, _) --[[ Line: 450 ]] --[[ Name: renderAlertNewProductDetails ]]
-    -- upvalues: l_withLocalization_0 (copy), l_withStyle_0 (copy), v27 (copy), v26 (copy), v3 (copy), v25 (copy), v24 (copy), l_InteractiveAlert_0 (copy), l_FitFrameVertical_0 (copy), l_ButtonType_0 (copy)
-    local l_props_1 = v53.props;
-    local l_state_1 = v53.state;
-    return l_withLocalization_0({
-        InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux", 
-        AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux", 
-        WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy", 
-        DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment", 
-        DisclosureTermsURL = v53.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL", 
-        TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse", 
-        BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem", 
-        ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel", 
-        LoadingText = "IAPExperience.RobuxUpsell.Text.Loading", 
-        PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet", 
-        NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux", 
-        BadgeText = "IAPExperience.RobuxUpsell.Text.PopularItem"
-    })(function(v57) --[[ Line: 468 ]]
-        -- upvalues: l_withStyle_0 (ref), v27 (ref), l_state_1 (copy), l_props_1 (copy), v26 (ref), v3 (ref), v25 (ref), v24 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), v53 (copy), l_ButtonType_0 (ref)
-        return l_withStyle_0(function(v58) --[[ Line: 469 ]]
-            -- upvalues: v27 (ref), l_state_1 (ref), l_props_1 (ref), v57 (copy), v26 (ref), v3 (ref), v25 (ref), v24 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), v53 (ref), l_ButtonType_0 (ref)
-            local l_Theme_1 = v58.Theme;
-            local l_Font_1 = v58.Font;
-            local v61 = l_Font_1.BaseSize * l_Font_1.Body.RelativeSize;
-            if v27() then
-                v61 = l_state_1.isCondensed and v61 * 0.9 or v61;
-            end;
-            local v62 = l_props_1.itemRobuxCost - l_props_1.balanceAmount;
-            local v63 = v57.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v62));
-            local v64 = Color3.new(math.round(l_Theme_1.TextEmphasis.Color.R * 255), math.round(l_Theme_1.TextEmphasis.Color.G * 255), (math.round(l_Theme_1.TextEmphasis.Color.B * 255)));
-            local v65 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(v64), utf8.char(57346), (tostring(l_props_1.robuxPurchaseAmount)));
-            local v66 = v57.WouldYouBuy:gsub("{robux}", v65);
-            local v67 = string.split(v57.DisclosureTermsURL, "{termsofuse}");
-            local l_TermsOfUse_1 = v57.TermsOfUse;
-            if l_props_1.termsOfUseActivated then
-                l_TermsOfUse_1 = "<u>" .. l_TermsOfUse_1 .. "</u>";
-            end;
-            local v69 = if game.GameId then tostring(game.GameId) else nil;
-            local v70 = if l_props_1.itemProductId then tostring(l_props_1.itemProductId) else nil;
-            local v71 = {
-                layoutOrder = 1, 
-                model = l_props_1.model, 
-                itemIcon = l_props_1.itemIcon, 
-                itemName = l_props_1.itemName, 
-                itemRobuxCost = l_props_1.itemRobuxCost, 
-                itemIconWidth = if v27() then l_state_1.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil, 
-                itemIconHeight = if v27() then l_state_1.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil
-            };
-            local v72 = false;
-            local v73 = nil;
-            local v74 = nil;
-            local v75 = 0;
-            if not v69 or v70 then
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Roact = require(scriptParentParentParent.Roact)
+local FitFrameVertical = require(scriptParentParentParent.RoactFitComponents).FitFrameVertical
+local Colors = require(scriptParentParentParent.Style).Colors
+local UIBlox = require(scriptParentParentParent.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local withStyle = UIBlox.Core.Style.withStyle
+local FFlagLowCogsBannerInfoIcon = require(scriptParentParent.Flags.FFlagLowCogsBannerInfoIcon)
+local InfoIconWithTooltip = require(scriptParentParent.Generic.InfoIconWithTooltip)
+local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
+local LocalizationService = game:GetService("LocalizationService")
+local Localization = require(scriptParentParentParent.AppLocales).Localization
+local LocalizationProvider = require(scriptParentParentParent.Localization).LocalizationProvider
+local withLocalization = require(scriptParentParentParent.Localization).withLocalization
+local _ = require(scriptParentParentParent.IXPServiceWrapper).IXPServiceWrapper
+local SharedFlags = require(scriptParentParentParent.SharedFlags)
+local default = require(scriptParentParentParent.LoggingProtocol).default
+local LegacyUpsellCounter = require(scriptParentParent.Generic.Events.LegacyUpsellCounter)
+local logger = require(scriptParentParent.Utility.logger)
+local FFlagMobilePopularItemBadgingExperimentEnabled = require(scriptParentParent.Flags.FFlagMobilePopularItemBadgingExperimentEnabled)
 
-            end;
-            local v76 = v72 and v75 ~= 0;
-            local v77 = nil;
-            if v76 then
-                local v78 = table.clone(v71);
-                v78.isPopularItem = v72;
-                v78.catalogSize = v73;
-                v78.salesRank = v74;
-                v78.badgeText = v57.BadgeText;
-                v78.universeId = v69;
-                v78.itemProductId = v70;
-                v78.userVariant = v75;
-                v77 = v3.createElement(v25, v78);
-            else
-                v77 = v3.createElement(v24, v71);
-            end;
-            return v3.createElement(l_InteractiveAlert_0, {
-                screenSize = l_props_1.screenSize, 
-                position = l_props_1.position, 
-                anchorPoint = l_props_1.anchorPoint, 
-                title = v57.NeedMoreRobux, 
-                middleContent = function() --[[ Line: 570 ]] --[[ Name: middleContent ]]
-                    -- upvalues: v3 (ref), l_FitFrameVertical_0 (ref), v27 (ref), l_state_1 (ref), v26 (ref), v53 (ref), v77 (ref), l_Theme_1 (copy), l_Font_1 (copy), v63 (copy), v66 (copy), v61 (ref), v57 (ref), v67 (copy), l_TermsOfUse_1 (ref), l_props_1 (ref)
-                    return v3.createElement(l_FitFrameVertical_0, {
-                        BackgroundTransparency = 1, 
-                        width = UDim.new(1, 0), 
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        contentPadding = if v27() then UDim.new(0, l_state_1.isCondensed and v26.MODAL_CONDENSED_CONTENT_PADDING or v26.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, v26.MODAL_NORMAL_CONTENT_PADDING), 
-                        [v3.Ref] = v53.contentRef, 
-                        [v3.Change.AbsoluteSize] = v53.changeContentSize
-                    }, {
-                        ProductDetails = v77, 
-                        SimulateMargin = v3.createElement("Frame", {
-                            BackgroundTransparency = 1, 
-                            LayoutOrder = 2, 
-                            Size = UDim2.new(0, 12, 0, 12)
-                        }), 
-                        Underline = v3.createElement("Frame", {
-                            LayoutOrder = 2, 
-                            BorderSizePixel = 0, 
-                            BackgroundColor3 = l_Theme_1.Divider.Color, 
-                            BackgroundTransparency = l_Theme_1.Divider.Transparency, 
-                            Size = UDim2.new(1, 0, 0, 1)
-                        }), 
-                        AdditionalBuyText = v3.createElement("TextLabel", {
-                            LayoutOrder = 3, 
-                            BackgroundTransparency = 1, 
-                            Size = UDim2.new(0, v53.state.contentSize.X, 0, 0), 
-                            RichText = true, 
-                            AutomaticSize = Enum.AutomaticSize.Y, 
-                            TextWrapped = true, 
-                            Font = l_Font_1.Body.Font, 
-                            Text = if v53.props.isQuest then v63 else v63 .. " " .. v66, 
-                            TextSize = v61, 
-                            TextColor3 = l_Theme_1.TextDefault.Color, 
-                            TextTransparency = l_Theme_1.TextDefault.Transparency
-                        }), 
-                        Underline2 = v3.createElement("Frame", {
-                            LayoutOrder = 4, 
-                            BorderSizePixel = 0, 
-                            BackgroundColor3 = l_Theme_1.Divider.Color, 
-                            BackgroundTransparency = l_Theme_1.Divider.Transparency, 
-                            Size = UDim2.new(1, 0, 0, 1)
-                        }), 
-                        DisclosureFrame = v3.createElement(l_FitFrameVertical_0, {
-                            LayoutOrder = 5, 
-                            BackgroundTransparency = 1, 
-                            width = UDim.new(1, 0), 
-                            FillDirection = Enum.FillDirection.Vertical, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                            VerticalAlignment = Enum.VerticalAlignment.Center, 
-                            contentPadding = UDim.new(0, 1)
-                        }, {
-                            DisclosurePayment = v3.createElement("TextLabel", {
-                                LayoutOrder = 1, 
-                                BackgroundTransparency = 1, 
-                                AutomaticSize = Enum.AutomaticSize.XY, 
-                                Font = l_Font_1.Body.Font, 
-                                Text = if v53.props.isQuest then v57.PurchaseNotAvailableOnHeadSet else v57.DisclosurePayment, 
-                                TextSize = v61, 
-                                TextColor3 = l_Theme_1.TextDefault.Color, 
-                                TextTransparency = l_Theme_1.TextDefault.Transparency, 
-                                TextWrapped = true
-                            }), 
-                            DisclosureTermsFrame = if v53.props.isQuest then nil else v3.createElement(l_FitFrameVertical_0, {
-                                LayoutOrder = 2, 
-                                BackgroundTransparency = 1, 
-                                width = UDim.new(1, 0), 
-                                FillDirection = Enum.FillDirection.Horizontal, 
-                                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                                contentPadding = UDim.new(0, 1)
-                            }, {
-                                BeforeDisclosureText = v3.createElement("TextLabel", {
-                                    LayoutOrder = 0, 
-                                    BackgroundTransparency = 1, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_1.Body.Font, 
-                                    Text = v67[1], 
-                                    TextSize = v61, 
-                                    TextColor3 = l_Theme_1.TextDefault.Color, 
-                                    TextTransparency = l_Theme_1.TextDefault.Transparency
-                                }), 
-                                TermsOfUse = v3.createElement("TextButton", {
-                                    LayoutOrder = 1, 
-                                    BackgroundTransparency = 1, 
-                                    RichText = true, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_1.Body.Font, 
-                                    Text = l_TermsOfUse_1, 
-                                    TextSize = v61, 
-                                    TextColor3 = l_Theme_1.TextDefault.Color, 
-                                    TextTransparency = l_Theme_1.TextDefault.Transparency, 
-                                    Selectable = l_props_1.termsOfUseActivated ~= nil, 
-                                    [v3.Event.Activated] = l_props_1.termsOfUseActivated
-                                }), 
-                                AfterDisclosureText = v3.createElement("TextLabel", {
-                                    LayoutOrder = 2, 
-                                    BackgroundTransparency = 1, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_1.Body.Font, 
-                                    Text = v67[2], 
-                                    TextSize = v61, 
-                                    TextColor3 = l_Theme_1.TextDefault.Color, 
-                                    TextTransparency = l_Theme_1.TextDefault.Transparency
-                                })
-                            })
-                        })
-                    });
-                end, 
-                buttonStackInfo = {
-                    forcedFillDirection = Enum.FillDirection.Vertical, 
-                    marginBetween = if v27() then l_state_1.isCondensed and v26.MODAL_CONDENSED_BUTTON_MARGIN or v26.MODAL_NORMAL_BUTTON_MARGIN else v26.MODAL_NORMAL_BUTTON_MARGIN, 
-                    buttons = if v53.props.isQuest then {
-                        {
-                            props = {
-                                isDisabled = l_props_1.isDisabled, 
-                                onActivated = l_props_1.cancelPurchaseActivated, 
-                                text = v57.ButtonCancel, 
-                                inputIcon = l_props_1.cancelControllerIcon
-                            }
-                        }
-                    } else {
-                        {
-                            props = {
-                                isDisabled = l_props_1.isDisabled, 
-                                onActivated = l_props_1.cancelPurchaseActivated, 
-                                text = v57.ButtonCancel, 
-                                inputIcon = l_props_1.cancelControllerIcon
-                            }
-                        }, 
-                        {
-                            buttonType = l_ButtonType_0.PrimarySystem, 
-                            props = {
-                                isLoading = l_props_1.isLoading, 
-                                isDisabled = l_props_1.isDisabled, 
-                                isDelayedInput = l_props_1.isDelayedInput, 
-                                enableInputDelayed = l_props_1.enableInputDelayed, 
-                                delayInputSeconds = l_props_1.inputDelaySec, 
-                                onActivated = l_props_1.buyItemActivated, 
-                                text = if l_props_1.enableInputDelayed then v57.LoadingText else v57.BuyRobuxButton, 
-                                inputIcon = l_props_1.buyItemControllerIcon
-                            }
-                        }
-                    }
-                }
-            });
-        end);
-    end);
-end;
-v29.renderNewAlert = function(v79) --[[ Line: 752 ]] --[[ Name: renderNewAlert ]]
-    -- upvalues: l_withLocalization_0 (copy), l_withStyle_0 (copy), v27 (copy), v3 (copy), l_InteractiveAlert_0 (copy), l_FitFrameVertical_0 (copy), v26 (copy), v24 (copy), l_ButtonType_0 (copy)
-    local l_props_2 = v79.props;
-    local l_state_2 = v79.state;
-    return l_withLocalization_0({
-        InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux", 
-        AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux", 
-        WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy", 
-        DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment", 
-        DisclosureTermsURL = v79.props.isVng and "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL", 
-        TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse", 
-        BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem", 
-        ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel", 
-        LoadingText = "IAPExperience.RobuxUpsell.Text.Loading", 
-        PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet", 
-        NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux", 
-        BonusBannerV1 = "IAPExperience.RobuxUpsell.Text.BonusBannerV1", 
-        BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo"
-    })(function(v82) --[[ Line: 772 ]]
-        -- upvalues: l_withStyle_0 (ref), v27 (ref), l_state_2 (copy), l_props_2 (copy), v3 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), v26 (ref), v79 (copy), v24 (ref), l_ButtonType_0 (ref)
-        return l_withStyle_0(function(v83) --[[ Line: 773 ]]
-            -- upvalues: v27 (ref), l_state_2 (ref), l_props_2 (ref), v82 (copy), v3 (ref), l_InteractiveAlert_0 (ref), l_FitFrameVertical_0 (ref), v26 (ref), v79 (ref), v24 (ref), l_ButtonType_0 (ref)
-            local l_Theme_2 = v83.Theme;
-            local l_Font_2 = v83.Font;
-            local v86 = l_Font_2.BaseSize * l_Font_2.Body.RelativeSize;
-            if v27() then
-                v86 = l_state_2.isCondensed and v86 * 0.9 or v86;
-            end;
-            local v87 = l_Font_2.BaseSize * l_Font_2.Footer.RelativeSize;
-            local v88 = l_props_2.itemRobuxCost - l_props_2.balanceAmount;
-            local v89 = v82.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v88));
-            local v90 = Color3.new(math.round(l_Theme_2.TextEmphasis.Color.R * 255), math.round(l_Theme_2.TextEmphasis.Color.G * 255), (math.round(l_Theme_2.TextEmphasis.Color.B * 255)));
-            local v91 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(v90), utf8.char(57346), (tostring(l_props_2.robuxPurchaseAmount)));
-            local v92 = v82.WouldYouBuy:gsub("{robux}", v91);
-            local v93 = string.split(v82.DisclosureTermsURL, "{termsofuse}");
-            local l_TermsOfUse_2 = v82.TermsOfUse;
-            if l_props_2.termsOfUseActivated then
-                l_TermsOfUse_2 = "<u>" .. l_TermsOfUse_2 .. "</u>";
-            end;
-            local v95 = "";
-            if l_props_2.robuxPurchaseAmountBeforeBonus ~= nil then
-                local v96 = tostring(l_props_2.robuxPurchaseAmountBeforeBonus);
-                local v97 = tostring(l_props_2.robuxPurchaseAmount);
-                local v98 = utf8.char(57346) .. "<s>" .. v96 .. "</s>" .. utf8.char(57346) .. v97;
-                v92 = v82.WouldYouBuy:gsub("{robux}", v98);
-                local v99 = l_props_2.robuxPurchaseAmount - l_props_2.robuxPurchaseAmountBeforeBonus;
-                local v100 = utf8.char(57346) .. tostring(v99);
-                v95 = v82.BonusBannerV1:gsub("{robux}", v100);
-            end;
-            return v3.createElement(l_InteractiveAlert_0, {
-                screenSize = l_props_2.screenSize, 
-                position = l_props_2.position, 
-                anchorPoint = l_props_2.anchorPoint, 
-                title = v82.NeedMoreRobux, 
-                middleContent = function() --[[ Line: 830 ]] --[[ Name: middleContent ]]
-                    -- upvalues: v3 (ref), l_FitFrameVertical_0 (ref), v27 (ref), l_state_2 (ref), v26 (ref), v79 (ref), v24 (ref), l_props_2 (ref), l_Theme_2 (copy), l_Font_2 (copy), v89 (copy), v92 (ref), v86 (ref), v82 (ref), v87 (copy), v93 (copy), l_TermsOfUse_2 (ref)
-                    return v3.createElement(l_FitFrameVertical_0, {
-                        BackgroundTransparency = 1, 
-                        BackgroundColor3 = Color3.fromRGB(0, 255, 0), 
-                        width = UDim.new(1, 0), 
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        contentPadding = if v27() then UDim.new(0, l_state_2.isCondensed and v26.MODAL_CONDENSED_CONTENT_PADDING or v26.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, v26.MODAL_NORMAL_CONTENT_PADDING), 
-                        [v3.Ref] = v79.contentRef, 
-                        [v3.Change.AbsoluteSize] = v79.changeContentSize
-                    }, {
-                        ProductDetails = v3.createElement(v24, {
-                            layoutOrder = 1, 
-                            model = l_props_2.model, 
-                            itemIcon = l_props_2.itemIcon, 
-                            itemName = l_props_2.itemName, 
-                            itemRobuxCost = l_props_2.itemRobuxCost, 
-                            itemIconWidth = if v27() then l_state_2.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil, 
-                            itemIconHeight = if v27() then l_state_2.isCondensed and v26.CONDENSED_ICON_SIZE or nil else nil
-                        }), 
-                        Underline = v3.createElement("Frame", {
-                            LayoutOrder = 2, 
-                            BorderSizePixel = 0, 
-                            BackgroundColor3 = l_Theme_2.Divider.Color, 
-                            BackgroundTransparency = l_Theme_2.Divider.Transparency, 
-                            Size = UDim2.new(1, 0, 0, 1)
-                        }), 
-                        AdditionalBuyText = v3.createElement("TextLabel", {
-                            LayoutOrder = 3, 
-                            BackgroundTransparency = 1, 
-                            Size = UDim2.new(0, v79.state.contentSize.X, 0, 0), 
-                            RichText = true, 
-                            AutomaticSize = Enum.AutomaticSize.Y, 
-                            TextWrapped = true, 
-                            Font = l_Font_2.Body.Font, 
-                            Text = if v79.props.isQuest then v89 else v89 .. " " .. v92, 
-                            TextSize = v86, 
-                            TextColor3 = l_Theme_2.TextDefault.Color, 
-                            TextTransparency = l_Theme_2.TextDefault.Transparency
-                        }), 
-                        Underline2 = v3.createElement("Frame", {
-                            LayoutOrder = 4, 
-                            BorderSizePixel = 0, 
-                            BackgroundColor3 = l_Theme_2.Divider.Color, 
-                            BackgroundTransparency = l_Theme_2.Divider.Transparency, 
-                            Size = UDim2.new(1, 0, 0, 1)
-                        }), 
-                        DisclosureFrame = v3.createElement(l_FitFrameVertical_0, {
-                            LayoutOrder = 5, 
-                            BackgroundTransparency = 1, 
-                            width = UDim.new(1, 0), 
-                            FillDirection = Enum.FillDirection.Vertical, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                            VerticalAlignment = Enum.VerticalAlignment.Center, 
-                            contentPadding = UDim.new(0, 1)
-                        }, {
-                            DisclosurePayment = v3.createElement("TextLabel", {
-                                LayoutOrder = 1, 
-                                BackgroundTransparency = 1, 
-                                AutomaticSize = Enum.AutomaticSize.XY, 
-                                Font = l_Font_2.Body.Font, 
-                                Text = if v79.props.isQuest then v82.PurchaseNotAvailableOnHeadSet else v82.DisclosurePayment, 
-                                TextSize = v87, 
-                                TextColor3 = l_Theme_2.TextDefault.Color, 
-                                TextTransparency = l_Theme_2.TextDefault.Transparency, 
-                                TextWrapped = true
-                            }), 
-                            DisclosureTermsFrame = if v79.props.isQuest then nil else v3.createElement(l_FitFrameVertical_0, {
-                                LayoutOrder = 2, 
-                                BackgroundTransparency = 1, 
-                                width = UDim.new(1, 0), 
-                                FillDirection = Enum.FillDirection.Horizontal, 
-                                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                                contentPadding = UDim.new(0, 1)
-                            }, {
-                                BeforeDisclosureText = v3.createElement("TextLabel", {
-                                    LayoutOrder = 0, 
-                                    BackgroundTransparency = 1, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_2.Body.Font, 
-                                    Text = v93[1], 
-                                    TextSize = v87, 
-                                    TextColor3 = l_Theme_2.TextDefault.Color, 
-                                    TextTransparency = l_Theme_2.TextDefault.Transparency
-                                }), 
-                                TermsOfUse = v3.createElement("TextButton", {
-                                    LayoutOrder = 1, 
-                                    BackgroundTransparency = 1, 
-                                    RichText = true, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_2.Body.Font, 
-                                    Text = l_TermsOfUse_2, 
-                                    TextSize = v87, 
-                                    TextColor3 = l_Theme_2.TextDefault.Color, 
-                                    TextTransparency = l_Theme_2.TextDefault.Transparency, 
-                                    Selectable = l_props_2.termsOfUseActivated ~= nil, 
-                                    [v3.Event.Activated] = l_props_2.termsOfUseActivated
-                                }), 
-                                AfterDisclosureText = v3.createElement("TextLabel", {
-                                    LayoutOrder = 2, 
-                                    BackgroundTransparency = 1, 
-                                    AutomaticSize = Enum.AutomaticSize.XY, 
-                                    Font = l_Font_2.Body.Font, 
-                                    Text = v93[2], 
-                                    TextSize = v87, 
-                                    TextColor3 = l_Theme_2.TextDefault.Color, 
-                                    TextTransparency = l_Theme_2.TextDefault.Transparency
-                                })
-                            })
-                        })
-                    });
-                end, 
-                buttonStackInfo = {
-                    forcedFillDirection = Enum.FillDirection.Vertical, 
-                    marginBetween = if v27() then l_state_2.isCondensed and v26.MODAL_CONDENSED_BUTTON_MARGIN or v26.MODAL_NORMAL_BUTTON_MARGIN else v26.MODAL_NORMAL_BUTTON_MARGIN, 
-                    buttons = if v79.props.isQuest then {
-                        {
-                            props = {
-                                isDisabled = l_props_2.isDisabled, 
-                                onActivated = l_props_2.cancelPurchaseActivated, 
-                                text = v82.ButtonCancel, 
-                                inputIcon = l_props_2.cancelControllerIcon
-                            }
-                        }
-                    } else {
-                        {
-                            props = {
-                                isDisabled = l_props_2.isDisabled, 
-                                onActivated = l_props_2.cancelPurchaseActivated, 
-                                text = v82.ButtonCancel, 
-                                inputIcon = l_props_2.cancelControllerIcon
-                            }
-                        }, 
-                        {
-                            buttonType = l_ButtonType_0.PrimarySystem, 
-                            props = {
-                                isLoading = l_props_2.isLoading, 
-                                isDisabled = l_props_2.isDisabled, 
-                                isDelayedInput = l_props_2.isDelayedInput, 
-                                enableInputDelayed = l_props_2.enableInputDelayed, 
-                                delayInputSeconds = l_props_2.inputDelaySec, 
-                                onActivated = l_props_2.buyItemActivated, 
-                                text = if l_props_2.enableInputDelayed then v82.LoadingText else v82.BuyRobuxButton, 
-                                inputIcon = l_props_2.buyItemControllerIcon
-                            }
-                        }
-                    }
-                }, 
-                footerContent = function() --[[ Line: 1007 ]] --[[ Name: footerContent ]]
-                    -- upvalues: v79 (ref), v83 (copy), v95 (ref), v82 (ref)
-                    return v79:renderFooterExperiment(v83, v95, v82.BonusBannerInfo);
-                end
-            });
-        end);
-    end);
-end;
-v29.renderFooterExperiment = function(v101, v102, v103, v104) --[[ Line: 1015 ]] --[[ Name: renderFooterExperiment ]]
-    -- upvalues: l_Colors_0 (copy), v3 (copy), l_FitFrameVertical_0 (copy), v10 (copy), v11 (copy)
-    local l_Font_3 = v102.Font;
-    local l_Flint_0 = l_Colors_0.Flint;
-    if v103 == "" then
-        return nil;
-    else
-        return v3.createElement(l_FitFrameVertical_0, {
-            BackgroundTransparency = 1, 
-            width = UDim.new(1, 0), 
-            margin = {
-                top = 0, 
-                bottom = -24, 
-                left = -24, 
-                right = -24
-            }, 
-            [v3.Ref] = v101.footerRef, 
-            [v3.Change.AbsoluteSize] = v101.changeFooterSize
-        }, {
-            Banner = v3.createElement("ImageLabel", {
-                BackgroundTransparency = 1, 
-                LayoutOrder = 2, 
-                Image = "rbxasset://textures/ui/BottomRoundedRect8px.png", 
-                ImageColor3 = Color3.fromRGB(239, 215, 140), 
-                Size = UDim2.new(1, 0, 0, 40), 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(8, 0, 24, 16), 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                BannerContent = v3.createElement(l_FitFrameVertical_0, {
-                    LayoutOrder = 2, 
-                    BackgroundTransparency = 1, 
-                    width = UDim.new(1, 0), 
-                    margin = {
-                        top = 12, 
-                        bottom = 0, 
-                        left = 0, 
-                        right = 0
-                    }, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center
-                }, {
-                    BonusBefore = v3.createElement("TextLabel", {
-                        LayoutOrder = 1, 
-                        BackgroundTransparency = 1, 
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        RichText = true, 
-                        Font = l_Font_3.Footer.Font, 
-                        Text = v103, 
-                        TextSize = l_Font_3.BaseSize * l_Font_3.Footer.RelativeSize, 
-                        TextColor3 = l_Flint_0, 
-                        TextWrapped = true
-                    }), 
-                    InfoIcon = if v10 then v11({
-                        text = v104, 
-                        layoutOrder = 2, 
-                        color = l_Flint_0, 
-                        eventActivated = v101.bonusBannerInfoIconStateChange
-                    }) else nil
-                })
-            })
-        });
-    end;
-end;
-return v29;
+require(scriptParentParent.Flags.GetFStringMobilePopularItemBadgingLayer)
+
+local ProductDetails = require(scriptParent.ProductDetails)
+local ProductDetailsNew = require(scriptParent.ProductDetailsNew)
+local Constants = require(scriptParentParent.Generic.Constants)
+local getEnableCondenseRobuxUpsell = require(scriptParentParent.Flags.getEnableCondenseRobuxUpsell)
+local FFlagIntroduceMetricsLegacyUpsell = require(scriptParentParent.Flags.FFlagIntroduceMetricsLegacyUpsell)
+local v29 = Roact.Component:extend(script.Name)
+
+v29.defaultProps = {
+	isLoading = false,
+	isDisabled = false,
+	isDelayedInput = false,
+	isQuest = false,
+	enableInputDelayed = false,
+	inputDelaySec = 3,
+	isVng = false,
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0)
+}
+
+function v29.init(p1) -- line: 107
+	-- upvalues: Roact (copy), getEnableCondenseRobuxUpsell (copy), Constants (copy)
+	p1.contentRef = Roact.createRef()
+	p1.state = {
+		isCondensed = false,
+		contentSize = Vector2.new(0, 0),
+		footerSize = Vector2.new(0, 0)
+	}
+
+	function p1.validateCondensedCondition(p2) -- line: 115
+		-- upvalues: getEnableCondenseRobuxUpsell (copy), Constants (copy), p1 (copy)
+		if not getEnableCondenseRobuxUpsell() then
+			return
+		end
+
+		local v52 = p2.AbsoluteSize.Y + Constants.MODAL_HEIGHT_WITHOUT_CONTENT + Constants.MODAL_NORMAL_SECTION_PADDING * 2 + Constants.MODAL_NORMAL_BUTTON_HEIGHT * 2
+
+		if p1.state.isCondensed then
+			p1:setState({
+				isCondensed = p1.props.screenSize.Y < v52 + (Constants.MODAL_NORMAL_CONTENT_PADDING - Constants.MODAL_CONDENSED_CONTENT_PADDING) * 6 + (Constants.MODAL_NORMAL_BUTTON_MARGIN - Constants.MODAL_CONDENSED_BUTTON_MARGIN) + (Constants.NORMAL_ICON_SIZE - Constants.CONDENSED_ICON_SIZE)
+			})
+
+			return
+		end
+
+		p1:setState({
+			isCondensed = p1.props.screenSize.Y < v52 + Constants.MODAL_NORMAL_BUTTON_MARGIN
+		})
+	end
+	function p1.changeContentSize(p3) -- line: 143
+		-- upvalues: p1 (copy)
+		p1.validateCondensedCondition(p3)
+
+		if p1.state.contentSize ~= p3.AbsoluteSize then
+			p1:setState({
+				contentSize = p3.AbsoluteSize
+			})
+		end
+	end
+end
+function v29.didMount(_) -- line: 153
+	-- upvalues: FFlagIntroduceMetricsLegacyUpsell (copy), logger (copy), default (copy), LegacyUpsellCounter (copy)
+	if FFlagIntroduceMetricsLegacyUpsell then
+		logger.debug({
+			message = "Legacy Upsell Modal Shown"
+		})
+		default:logRobloxTelemetryCounter(LegacyUpsellCounter.LegacyUpsellShownCounter, 1, {})
+	end
+end
+function v29.render(p5) -- line: 162
+	-- upvalues: SharedFlags (copy), Roact (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), FFlagMobilePopularItemBadgingExperimentEnabled (copy), MultiTextLocalizer (copy)
+	local v33 = not p5.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
+
+	if SharedFlags.FFlagLowCogsBannerExperiment then
+		return Roact.createElement(LocalizationProvider, {
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		}, {
+			Alert = p5:renderNewAlert()
+		})
+	end
+
+	if FFlagMobilePopularItemBadgingExperimentEnabled then
+		return Roact.createElement(LocalizationProvider, {
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		}, {
+			Alert = p5:renderAlertNewProductDetails()
+		})
+	end
+
+	return Roact.createElement(MultiTextLocalizer, {
+		keys = {
+			InsufficientRobuxTitle = {
+				key = "IAPExperience.RobuxUpsell.Title.InsufficientRobux"
+			},
+			AdditionalRobux = {
+				key = "IAPExperience.RobuxUpsell.Text.AdditionalRobux"
+			},
+			WouldYouBuy = {
+				key = "IAPExperience.RobuxUpsell.Text.WouldYouBuy"
+			},
+			DisclosurePayment = {
+				key = "IAPExperience.RobuxUpsell.Text.DisclosurePayment"
+			},
+			DisclosureTermsURL = {
+				key = v33
+			},
+			TermsOfUse = {
+				key = "IAPExperience.RobuxUpsell.Text.TermsOfUse"
+			},
+			BuyRobuxButton = {
+				key = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem"
+			},
+			ButtonCancel = {
+				key = "IAPExperience.RobuxUpsell.Action.Cancel"
+			},
+			LoadingText = {
+				key = "IAPExperience.RobuxUpsell.Text.Loading"
+			},
+			PurchaseNotAvialableForQuest = {
+				key = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet"
+			}
+		},
+		render = function(t1: {[any]: any}) -- line: 220
+			-- upvalues: p5 (copy)
+			return p5:renderAlert(t1)
+		end
+	})
+end
+function v29.renderAlert(t2: {[any]: any}, t3: {[any]: any}) -- line: 226
+	-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), ProductDetails (copy), ButtonType (copy)
+	local props = t2.props
+	local state = t2.state
+
+	return withStyle(function(p6) -- line: 230
+		-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t3 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), t2 (copy), ProductDetails (copy), ButtonType (copy)
+		local Theme = p6.Theme
+		local p6Font = p6.Font
+		local u58 = p6Font.BaseSize * p6Font.Body.RelativeSize
+
+		if getEnableCondenseRobuxUpsell() then
+			u58 = state.isCondensed and u58 * 0.9 or u58
+		end
+
+		local v59 = props.itemRobuxCost - props.balanceAmount
+		local v60 = t3.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v59))
+		local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
+		local v62 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
+		local v63 = t3.WouldYouBuy:gsub("{robux}", v62)
+		local parts = string.split(t3.DisclosureTermsURL, "{termsofuse}")
+		local TermsOfUse = t3.TermsOfUse
+
+		if props.termsOfUseActivated then
+			TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+		end
+
+		return Roact.createElement(InteractiveAlert, {
+			screenSize = props.screenSize,
+			position = props.position,
+			anchorPoint = props.anchorPoint,
+			title = t3.InsufficientRobuxTitle,
+			middleContent = function() -- line: 266
+				-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), t2 (copy), ProductDetails (copy), props (copy), Theme (copy), p6Font (copy), v60 (copy), v63 (copy), u58 (ref), t3 (copy), parts (copy), TermsOfUse (ref)
+				return Roact.createElement(FitFrameVertical, {
+					BackgroundTransparency = 1,
+					width = UDim.new(1, 0),
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
+					[Roact.Ref] = t2.contentRef,
+					[Roact.Change.AbsoluteSize] = t2.changeContentSize
+				}, {
+					ProductDetails = Roact.createElement(ProductDetails, {
+						layoutOrder = 1,
+						model = props.model,
+						itemIcon = props.itemIcon,
+						itemName = props.itemName,
+						itemRobuxCost = props.itemRobuxCost,
+						itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
+						itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+					}),
+					Underline = Roact.createElement("Frame", {
+						LayoutOrder = 2,
+						BorderSizePixel = 0,
+						BackgroundColor3 = Theme.Divider.Color,
+						BackgroundTransparency = Theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 0, 1)
+					}),
+					AdditionalBuyText = Roact.createElement("TextLabel", {
+						LayoutOrder = 3,
+						BackgroundTransparency = 1,
+						RichText = true,
+						TextWrapped = true,
+						Size = UDim2.new(0, t2.state.contentSize.X, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y,
+						Font = p6Font.Body.Font,
+						Text = if not t2.props.isQuest then v60 .. " " .. v63 else v60,
+						TextSize = u58,
+						TextColor3 = Theme.TextDefault.Color,
+						TextTransparency = Theme.TextDefault.Transparency
+					}),
+					Underline2 = Roact.createElement("Frame", {
+						LayoutOrder = 4,
+						BorderSizePixel = 0,
+						BackgroundColor3 = Theme.Divider.Color,
+						BackgroundTransparency = Theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 0, 1)
+					}),
+					DisclosureFrame = Roact.createElement(FitFrameVertical, {
+						LayoutOrder = 5,
+						BackgroundTransparency = 1,
+						width = UDim.new(1, 0),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						contentPadding = UDim.new(0, 1)
+					}, {
+						DisclosurePayment = Roact.createElement("TextLabel", {
+							LayoutOrder = 1,
+							BackgroundTransparency = 1,
+							TextWrapped = true,
+							AutomaticSize = Enum.AutomaticSize.XY,
+							Font = p6Font.Body.Font,
+							Text = if not t2.props.isQuest then t3.DisclosurePayment else t3.PurchaseNotAvailableOnHeadSet,
+							TextSize = u58,
+							TextColor3 = Theme.TextDefault.Color,
+							TextTransparency = Theme.TextDefault.Transparency
+						}),
+						DisclosureTermsFrame = if not t2.props.isQuest then Roact.createElement(FitFrameVertical, {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							width = UDim.new(1, 0),
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							contentPadding = UDim.new(0, 1)
+						}, {
+							BeforeDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 0,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								Font = p6Font.Body.Font,
+								Text = parts[1],
+								TextSize = u58,
+								TextColor3 = Theme.TextDefault.Color,
+								TextTransparency = Theme.TextDefault.Transparency
+							}),
+							TermsOfUse = Roact.createElement("TextButton", {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								RichText = true,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								Font = p6Font.Body.Font,
+								Text = TermsOfUse,
+								TextSize = u58,
+								TextColor3 = Theme.TextDefault.Color,
+								TextTransparency = Theme.TextDefault.Transparency,
+								Selectable = props.termsOfUseActivated ~= nil,
+								[Roact.Event.Activated] = props.termsOfUseActivated
+							}),
+							AfterDisclosureText = Roact.createElement("TextLabel", {
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								Font = p6Font.Body.Font,
+								Text = parts[2],
+								TextSize = u58,
+								TextColor3 = Theme.TextDefault.Color,
+								TextTransparency = Theme.TextDefault.Transparency
+							})
+						}) else nil
+					})
+				})
+			end,
+			buttonStackInfo = {
+				forcedFillDirection = Enum.FillDirection.Vertical,
+				marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
+				buttons = if not t2.props.isQuest then {
+					{
+						props = {
+							isDisabled = props.isDisabled,
+							onActivated = props.cancelPurchaseActivated,
+							text = t3.ButtonCancel,
+							inputIcon = props.cancelControllerIcon
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							isLoading = props.isLoading,
+							isDisabled = props.isDisabled,
+							isDelayedInput = props.isDelayedInput,
+							enableInputDelayed = props.enableInputDelayed,
+							delayInputSeconds = props.inputDelaySec,
+							onActivated = props.buyItemActivated,
+							text = if not props.enableInputDelayed then t3.BuyRobuxButton else t3.LoadingText,
+							inputIcon = props.buyItemControllerIcon
+						}
+					}
+				} else {{
+					props = {
+						isDisabled = props.isDisabled,
+						onActivated = props.cancelPurchaseActivated,
+						text = t3.ButtonCancel,
+						inputIcon = props.cancelControllerIcon
+					}
+				}}
+			}
+		})
+	end)
+end
+function v29.renderAlertNewProductDetails(t4: {[any]: any}, _: {[any]: any}) -- line: 450
+	-- upvalues: withLocalization (copy), withStyle (copy), getEnableCondenseRobuxUpsell (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), ButtonType (copy)
+	local props = t4.props
+	local state = t4.state
+
+	return withLocalization({
+		InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux",
+		AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux",
+		WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy",
+		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse",
+		BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem",
+		ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel",
+		LoadingText = "IAPExperience.RobuxUpsell.Text.Loading",
+		PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet",
+		NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux",
+		BadgeText = "IAPExperience.RobuxUpsell.Text.PopularItem",
+		DisclosureTermsURL = not t4.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
+	})(function(t6: {[any]: any}) -- line: 468
+		-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), t4 (copy), ButtonType (copy)
+		return withStyle(function(p7) -- line: 469
+			-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t6 (copy), Constants (copy), Roact (copy), ProductDetailsNew (copy), ProductDetails (copy), InteractiveAlert (copy), FitFrameVertical (copy), t4 (copy), ButtonType (copy)
+			local Theme = p7.Theme
+			local p7Font = p7.Font
+			local u71 = p7Font.BaseSize * p7Font.Body.RelativeSize
+
+			if getEnableCondenseRobuxUpsell() then
+				u71 = state.isCondensed and u71 * 0.9 or u71
+			end
+
+			local v72 = props.itemRobuxCost - props.balanceAmount
+			local v73 = t6.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v72))
+			local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
+			local v75 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
+			local v76 = t6.WouldYouBuy:gsub("{robux}", v75)
+			local parts = string.split(t6.DisclosureTermsURL, "{termsofuse}")
+			local TermsOfUse = t6.TermsOfUse
+
+			if props.termsOfUseActivated then
+				TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+			end
+
+			local v79 = if not game.GameId then nil else tostring(game.GameId)
+			local v80 = if not props.itemProductId then nil else tostring(props.itemProductId)
+			local t7 = {
+				layoutOrder = 1,
+				model = props.model,
+				itemIcon = props.itemIcon,
+				itemName = props.itemName,
+				itemRobuxCost = props.itemRobuxCost,
+				itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
+				itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+			}
+			local v82 = false
+			local n1 = 0
+
+			if v79 then
+				if not v80 then
+				end
+			end
+
+			local u85
+
+			if v82 and n1 ~= 0 then
+				local v84 = table.clone(t7)
+
+				v84.isPopularItem = v82
+				v84.catalogSize = nil
+				v84.salesRank = nil
+				v84.badgeText = t6.BadgeText
+				v84.universeId = v79
+				v84.itemProductId = v80
+				v84.userVariant = n1
+				u85 = Roact.createElement(ProductDetailsNew, v84)
+			else
+				u85 = Roact.createElement(ProductDetails, t7)
+			end
+
+			return Roact.createElement(InteractiveAlert, {
+				screenSize = props.screenSize,
+				position = props.position,
+				anchorPoint = props.anchorPoint,
+				title = t6.NeedMoreRobux,
+				middleContent = function() -- line: 570
+					-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), t4 (copy), u85 (ref), Theme (copy), p7Font (copy), v73 (copy), v76 (copy), u71 (ref), t6 (copy), parts (copy), TermsOfUse (ref), props (copy)
+					return Roact.createElement(FitFrameVertical, {
+						BackgroundTransparency = 1,
+						width = UDim.new(1, 0),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
+						[Roact.Ref] = t4.contentRef,
+						[Roact.Change.AbsoluteSize] = t4.changeContentSize
+					}, {
+						ProductDetails = u85,
+						SimulateMargin = Roact.createElement("Frame", {
+							BackgroundTransparency = 1,
+							LayoutOrder = 2,
+							Size = UDim2.new(0, 12, 0, 12)
+						}),
+						Underline = Roact.createElement("Frame", {
+							LayoutOrder = 2,
+							BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Divider.Color,
+							BackgroundTransparency = Theme.Divider.Transparency,
+							Size = UDim2.new(1, 0, 0, 1)
+						}),
+						AdditionalBuyText = Roact.createElement("TextLabel", {
+							LayoutOrder = 3,
+							BackgroundTransparency = 1,
+							RichText = true,
+							TextWrapped = true,
+							Size = UDim2.new(0, t4.state.contentSize.X, 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y,
+							Font = p7Font.Body.Font,
+							Text = if not t4.props.isQuest then v73 .. " " .. v76 else v73,
+							TextSize = u71,
+							TextColor3 = Theme.TextDefault.Color,
+							TextTransparency = Theme.TextDefault.Transparency
+						}),
+						Underline2 = Roact.createElement("Frame", {
+							LayoutOrder = 4,
+							BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Divider.Color,
+							BackgroundTransparency = Theme.Divider.Transparency,
+							Size = UDim2.new(1, 0, 0, 1)
+						}),
+						DisclosureFrame = Roact.createElement(FitFrameVertical, {
+							LayoutOrder = 5,
+							BackgroundTransparency = 1,
+							width = UDim.new(1, 0),
+							FillDirection = Enum.FillDirection.Vertical,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							contentPadding = UDim.new(0, 1)
+						}, {
+							DisclosurePayment = Roact.createElement("TextLabel", {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								TextWrapped = true,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								Font = p7Font.Body.Font,
+								Text = if not t4.props.isQuest then t6.DisclosurePayment else t6.PurchaseNotAvailableOnHeadSet,
+								TextSize = u71,
+								TextColor3 = Theme.TextDefault.Color,
+								TextTransparency = Theme.TextDefault.Transparency
+							}),
+							DisclosureTermsFrame = if not t4.props.isQuest then Roact.createElement(FitFrameVertical, {
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								width = UDim.new(1, 0),
+								FillDirection = Enum.FillDirection.Horizontal,
+								HorizontalAlignment = Enum.HorizontalAlignment.Center,
+								VerticalAlignment = Enum.VerticalAlignment.Center,
+								contentPadding = UDim.new(0, 1)
+							}, {
+								BeforeDisclosureText = Roact.createElement("TextLabel", {
+									LayoutOrder = 0,
+									BackgroundTransparency = 1,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p7Font.Body.Font,
+									Text = parts[1],
+									TextSize = u71,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency
+								}),
+								TermsOfUse = Roact.createElement("TextButton", {
+									LayoutOrder = 1,
+									BackgroundTransparency = 1,
+									RichText = true,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p7Font.Body.Font,
+									Text = TermsOfUse,
+									TextSize = u71,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency,
+									Selectable = props.termsOfUseActivated ~= nil,
+									[Roact.Event.Activated] = props.termsOfUseActivated
+								}),
+								AfterDisclosureText = Roact.createElement("TextLabel", {
+									LayoutOrder = 2,
+									BackgroundTransparency = 1,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p7Font.Body.Font,
+									Text = parts[2],
+									TextSize = u71,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency
+								})
+							}) else nil
+						})
+					})
+				end,
+				buttonStackInfo = {
+					forcedFillDirection = Enum.FillDirection.Vertical,
+					marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
+					buttons = if not t4.props.isQuest then {
+						{
+							props = {
+								isDisabled = props.isDisabled,
+								onActivated = props.cancelPurchaseActivated,
+								text = t6.ButtonCancel,
+								inputIcon = props.cancelControllerIcon
+							}
+						},
+						{
+							buttonType = ButtonType.PrimarySystem,
+							props = {
+								isLoading = props.isLoading,
+								isDisabled = props.isDisabled,
+								isDelayedInput = props.isDelayedInput,
+								enableInputDelayed = props.enableInputDelayed,
+								delayInputSeconds = props.inputDelaySec,
+								onActivated = props.buyItemActivated,
+								text = if not props.enableInputDelayed then t6.BuyRobuxButton else t6.LoadingText,
+								inputIcon = props.buyItemControllerIcon
+							}
+						}
+					} else {{
+						props = {
+							isDisabled = props.isDisabled,
+							onActivated = props.cancelPurchaseActivated,
+							text = t6.ButtonCancel,
+							inputIcon = props.cancelControllerIcon
+						}
+					}}
+				}
+			})
+		end)
+	end)
+end
+function v29.renderNewAlert(p8) -- line: 752
+	-- upvalues: withLocalization (copy), withStyle (copy), getEnableCondenseRobuxUpsell (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), ProductDetails (copy), ButtonType (copy)
+	local props = p8.props
+	local state = p8.state
+
+	return withLocalization({
+		InsufficientRobuxTitle = "IAPExperience.RobuxUpsell.Title.InsufficientRobux",
+		AdditionalRobux = "IAPExperience.RobuxUpsell.Text.AdditionalRobux",
+		WouldYouBuy = "IAPExperience.RobuxUpsell.Text.WouldYouBuy",
+		DisclosurePayment = "IAPExperience.RobuxUpsell.Text.DisclosurePayment",
+		TermsOfUse = "IAPExperience.RobuxUpsell.Text.TermsOfUse",
+		BuyRobuxButton = "IAPExperience.RobuxUpsell.Action.BuyRobuxAndItem",
+		ButtonCancel = "IAPExperience.RobuxUpsell.Action.Cancel",
+		LoadingText = "IAPExperience.RobuxUpsell.Text.Loading",
+		PurchaseNotAvialableForQuest = "IAPExperience.RobuxUpsell.Text.PurchaseNotAvailableOnHeadSet",
+		NeedMoreRobux = "IAPExperience.RobuxUpsell.Text.NeedMoreRobux",
+		BonusBannerV1 = "IAPExperience.RobuxUpsell.Text.BonusBannerV1",
+		BonusBannerInfo = "IAPExperience.RobuxUpsell.Text.BonusBannerInfo",
+		DisclosureTermsURL = not p8.props.isVng and "IAPExperience.RobuxUpsell.Text.DisclosureTermsURL" or "IAPExperience.RobuxUpsell.Text.VNGDisclosureTermsURL"
+	})(function(t8: {[any]: any}) -- line: 772
+		-- upvalues: withStyle (copy), getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), p8 (copy), ProductDetails (copy), ButtonType (copy)
+		return withStyle(function(p9) -- line: 773
+			-- upvalues: getEnableCondenseRobuxUpsell (copy), state (copy), props (copy), t8 (copy), Roact (copy), InteractiveAlert (copy), FitFrameVertical (copy), Constants (copy), p8 (copy), ProductDetails (copy), ButtonType (copy)
+			local Theme = p9.Theme
+			local p9Font = p9.Font
+			local u89 = p9Font.BaseSize * p9Font.Body.RelativeSize
+
+			if getEnableCondenseRobuxUpsell() then
+				u89 = state.isCondensed and u89 * 0.9 or u89
+			end
+
+			local v90 = p9Font.BaseSize * p9Font.Footer.RelativeSize
+			local v91 = props.itemRobuxCost - props.balanceAmount
+			local v92 = t8.AdditionalRobux:gsub("{robux}", utf8.char(57346) .. tostring(v91))
+			local color3 = Color3.new(math.round(Theme.TextEmphasis.Color.R * 255), math.round(Theme.TextEmphasis.Color.G * 255), (math.round(Theme.TextEmphasis.Color.B * 255)))
+			local v94 = string.format("<font color=\"rgb(%s)\">%s%s</font>", tostring(color3), utf8.char(57346), (tostring(props.robuxPurchaseAmount)))
+			local u95 = t8.WouldYouBuy:gsub("{robux}", v94)
+			local parts = string.split(t8.DisclosureTermsURL, "{termsofuse}")
+			local TermsOfUse = t8.TermsOfUse
+
+			if props.termsOfUseActivated then
+				TermsOfUse = "<u>" .. TermsOfUse .. "</u>"
+			end
+
+			local s1 = ""
+
+			if props.robuxPurchaseAmountBeforeBonus ~= nil then
+				local str = tostring(props.robuxPurchaseAmountBeforeBonus)
+				local str2 = tostring(props.robuxPurchaseAmount)
+				local v101 = utf8.char(57346) .. "<s>" .. str .. "</s>" .. utf8.char(57346) .. str2
+
+				u95 = t8.WouldYouBuy:gsub("{robux}", v101)
+
+				local v102 = props.robuxPurchaseAmount - props.robuxPurchaseAmountBeforeBonus
+				local v103 = utf8.char(57346) .. tostring(v102)
+
+				s1 = t8.BonusBannerV1:gsub("{robux}", v103)
+			end
+
+			return Roact.createElement(InteractiveAlert, {
+				screenSize = props.screenSize,
+				position = props.position,
+				anchorPoint = props.anchorPoint,
+				title = t8.NeedMoreRobux,
+				middleContent = function() -- line: 830
+					-- upvalues: Roact (copy), FitFrameVertical (copy), getEnableCondenseRobuxUpsell (copy), state (copy), Constants (copy), p8 (copy), ProductDetails (copy), props (copy), Theme (copy), p9Font (copy), v92 (copy), u95 (ref), u89 (ref), t8 (copy), v90 (copy), parts (copy), TermsOfUse (ref)
+					return Roact.createElement(FitFrameVertical, {
+						BackgroundTransparency = 1,
+						BackgroundColor3 = Color3.fromRGB(0, 255, 0),
+						width = UDim.new(1, 0),
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						contentPadding = if not getEnableCondenseRobuxUpsell() then UDim.new(0, Constants.MODAL_NORMAL_CONTENT_PADDING) else UDim.new(0, state.isCondensed and Constants.MODAL_CONDENSED_CONTENT_PADDING or Constants.MODAL_NORMAL_CONTENT_PADDING),
+						[Roact.Ref] = p8.contentRef,
+						[Roact.Change.AbsoluteSize] = p8.changeContentSize
+					}, {
+						ProductDetails = Roact.createElement(ProductDetails, {
+							layoutOrder = 1,
+							model = props.model,
+							itemIcon = props.itemIcon,
+							itemName = props.itemName,
+							itemRobuxCost = props.itemRobuxCost,
+							itemIconWidth = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil,
+							itemIconHeight = if not getEnableCondenseRobuxUpsell() then nil else state.isCondensed and Constants.CONDENSED_ICON_SIZE or nil
+						}),
+						Underline = Roact.createElement("Frame", {
+							LayoutOrder = 2,
+							BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Divider.Color,
+							BackgroundTransparency = Theme.Divider.Transparency,
+							Size = UDim2.new(1, 0, 0, 1)
+						}),
+						AdditionalBuyText = Roact.createElement("TextLabel", {
+							LayoutOrder = 3,
+							BackgroundTransparency = 1,
+							RichText = true,
+							TextWrapped = true,
+							Size = UDim2.new(0, p8.state.contentSize.X, 0, 0),
+							AutomaticSize = Enum.AutomaticSize.Y,
+							Font = p9Font.Body.Font,
+							Text = if not p8.props.isQuest then v92 .. " " .. u95 else v92,
+							TextSize = u89,
+							TextColor3 = Theme.TextDefault.Color,
+							TextTransparency = Theme.TextDefault.Transparency
+						}),
+						Underline2 = Roact.createElement("Frame", {
+							LayoutOrder = 4,
+							BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Divider.Color,
+							BackgroundTransparency = Theme.Divider.Transparency,
+							Size = UDim2.new(1, 0, 0, 1)
+						}),
+						DisclosureFrame = Roact.createElement(FitFrameVertical, {
+							LayoutOrder = 5,
+							BackgroundTransparency = 1,
+							width = UDim.new(1, 0),
+							FillDirection = Enum.FillDirection.Vertical,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							contentPadding = UDim.new(0, 1)
+						}, {
+							DisclosurePayment = Roact.createElement("TextLabel", {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								TextWrapped = true,
+								AutomaticSize = Enum.AutomaticSize.XY,
+								Font = p9Font.Body.Font,
+								Text = if not p8.props.isQuest then t8.DisclosurePayment else t8.PurchaseNotAvailableOnHeadSet,
+								TextSize = v90,
+								TextColor3 = Theme.TextDefault.Color,
+								TextTransparency = Theme.TextDefault.Transparency
+							}),
+							DisclosureTermsFrame = if not p8.props.isQuest then Roact.createElement(FitFrameVertical, {
+								LayoutOrder = 2,
+								BackgroundTransparency = 1,
+								width = UDim.new(1, 0),
+								FillDirection = Enum.FillDirection.Horizontal,
+								HorizontalAlignment = Enum.HorizontalAlignment.Center,
+								VerticalAlignment = Enum.VerticalAlignment.Center,
+								contentPadding = UDim.new(0, 1)
+							}, {
+								BeforeDisclosureText = Roact.createElement("TextLabel", {
+									LayoutOrder = 0,
+									BackgroundTransparency = 1,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p9Font.Body.Font,
+									Text = parts[1],
+									TextSize = v90,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency
+								}),
+								TermsOfUse = Roact.createElement("TextButton", {
+									LayoutOrder = 1,
+									BackgroundTransparency = 1,
+									RichText = true,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p9Font.Body.Font,
+									Text = TermsOfUse,
+									TextSize = v90,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency,
+									Selectable = props.termsOfUseActivated ~= nil,
+									[Roact.Event.Activated] = props.termsOfUseActivated
+								}),
+								AfterDisclosureText = Roact.createElement("TextLabel", {
+									LayoutOrder = 2,
+									BackgroundTransparency = 1,
+									AutomaticSize = Enum.AutomaticSize.XY,
+									Font = p9Font.Body.Font,
+									Text = parts[2],
+									TextSize = v90,
+									TextColor3 = Theme.TextDefault.Color,
+									TextTransparency = Theme.TextDefault.Transparency
+								})
+							}) else nil
+						})
+					})
+				end,
+				buttonStackInfo = {
+					forcedFillDirection = Enum.FillDirection.Vertical,
+					marginBetween = if not getEnableCondenseRobuxUpsell() then Constants.MODAL_NORMAL_BUTTON_MARGIN else state.isCondensed and Constants.MODAL_CONDENSED_BUTTON_MARGIN or Constants.MODAL_NORMAL_BUTTON_MARGIN,
+					buttons = if not p8.props.isQuest then {
+						{
+							props = {
+								isDisabled = props.isDisabled,
+								onActivated = props.cancelPurchaseActivated,
+								text = t8.ButtonCancel,
+								inputIcon = props.cancelControllerIcon
+							}
+						},
+						{
+							buttonType = ButtonType.PrimarySystem,
+							props = {
+								isLoading = props.isLoading,
+								isDisabled = props.isDisabled,
+								isDelayedInput = props.isDelayedInput,
+								enableInputDelayed = props.enableInputDelayed,
+								delayInputSeconds = props.inputDelaySec,
+								onActivated = props.buyItemActivated,
+								text = if not props.enableInputDelayed then t8.BuyRobuxButton else t8.LoadingText,
+								inputIcon = props.buyItemControllerIcon
+							}
+						}
+					} else {{
+						props = {
+							isDisabled = props.isDisabled,
+							onActivated = props.cancelPurchaseActivated,
+							text = t8.ButtonCancel,
+							inputIcon = props.cancelControllerIcon
+						}
+					}}
+				},
+				footerContent = function() -- line: 1007
+					-- upvalues: p8 (copy), p9 (copy), s1 (ref), t8 (copy)
+					return p8:renderFooterExperiment(p9, s1, t8.BonusBannerInfo)
+				end
+			})
+		end)
+	end)
+end
+function v29.renderFooterExperiment(p10, p11, p12, p13) -- line: 1015
+	-- upvalues: Colors (copy), Roact (copy), FitFrameVertical (copy), FFlagLowCogsBannerInfoIcon (copy), InfoIconWithTooltip (copy)
+	local p11Font = p11.Font
+	local Flint = Colors.Flint
+
+	if p12 == "" then
+		return nil
+	end
+
+	return Roact.createElement(FitFrameVertical, {
+		BackgroundTransparency = 1,
+		width = UDim.new(1, 0),
+		margin = {
+			top = 0,
+			bottom = -24,
+			left = -24,
+			right = -24
+		},
+		[Roact.Ref] = p10.footerRef,
+		[Roact.Change.AbsoluteSize] = p10.changeFooterSize
+	}, {
+		Banner = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Image = "rbxasset://textures/ui/BottomRoundedRect8px.png",
+			ImageColor3 = Color3.fromRGB(239, 215, 140),
+			Size = UDim2.new(1, 0, 0, 40),
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(8, 0, 24, 16),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			BannerContent = Roact.createElement(FitFrameVertical, {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				width = UDim.new(1, 0),
+				margin = {
+					top = 12,
+					bottom = 0,
+					left = 0,
+					right = 0
+				},
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}, {
+				BonusBefore = Roact.createElement("TextLabel", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					RichText = true,
+					TextWrapped = true,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Font = p11Font.Footer.Font,
+					Text = p12,
+					TextSize = p11Font.BaseSize * p11Font.Footer.RelativeSize,
+					TextColor3 = Flint
+				}),
+				InfoIcon = if not FFlagLowCogsBannerInfoIcon then nil else InfoIconWithTooltip({
+					layoutOrder = 2,
+					text = p13,
+					color = Flint,
+					eventActivated = p10.bonusBannerInfoIconStateChange
+				})
+			})
+		})
+	})
+end
+
+return v29

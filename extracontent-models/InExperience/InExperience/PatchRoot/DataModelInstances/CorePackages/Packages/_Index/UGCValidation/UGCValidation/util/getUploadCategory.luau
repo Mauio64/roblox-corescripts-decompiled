@@ -1,35 +1,48 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v2 = require(l_Parent_0.Constants);
-local v3 = require(l_Parent_0.ConstantsInterface);
-local v4 = require(l_Parent_0.flags.getFStringUGCLCAllowedAssetTypeIds);
-local v5 = require(l_Parent_0.flags.getFFlagUGCValidateMakeupAssetTypeNewPipeline);
-local v6 = string.split(v4(), ",");
-return function(v7, v8, v9) --[[ Line: 9 ]] --[[ Name: getUploadCategory ]]
-    -- upvalues: v1 (copy), v2 (copy), v6 (copy), v5 (copy), v3 (copy)
-    if v9 ~= nil then
-        if v9 == Enum.BundleType.BodyParts then
-            return v1.UploadCategory.FULL_BODY;
-        else
-            return v1.UploadCategory.BOTH_SHOES;
-        end;
-    else
-        assert(v8);
-        local v10 = nil;
-        if v8 == Enum.AssetType.EmoteAnimation then
-            v10 = v1.UploadCategory.EMOTE_ANIMATION;
-        elseif v2.ASSET_TYPE_INFO[v8] and v2.ASSET_TYPE_INFO[v8].isBodyPart then
-            v10 = v8 == Enum.AssetType.DynamicHead and v1.UploadCategory.DYNAMIC_HEAD or v1.UploadCategory.TORSO_AND_LIMBS;
-        elseif table.find(v6, (tostring(v8.Value))) then
-            v10 = v1.UploadCategory.LAYERED_CLOTHING;
-        elseif v2.ASSET_TYPE_INFO[v8] and v2.ASSET_TYPE_INFO[v8].rigidAllowed then
-            v10 = v1.UploadCategory.RIGID_ACCESSORY;
-        elseif v5() and v3.isMakeupAsset(v8) then
-            v10 = v1.UploadCategory.MAKEUP;
-        end;
-        if v10 == nil then
-            error((("No assigned validation category for %*, %*, %* "):format(v7.Name, v8, v9)));
-        end;
-        return v10;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local Constants = require(ParentParent.Constants)
+local ConstantsInterface = require(ParentParent.ConstantsInterface)
+local getFStringUGCLCAllowedAssetTypeIds = require(ParentParent.flags.getFStringUGCLCAllowedAssetTypeIds)
+local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
+local parts = string.split(getFStringUGCLCAllowedAssetTypeIds(), ",")
+
+local function getUploadCategory(p1, p2, p3) -- line: 9
+	-- upvalues: ValidationEnums (copy), getFFlagUGCValidationAnimationPackSupport (copy), Constants (copy), parts (copy), ConstantsInterface (copy)
+	if p3 ~= nil then
+		if p3 == Enum.BundleType.BodyParts then
+			return ValidationEnums.UploadCategory.FULL_BODY
+		end
+
+		if getFFlagUGCValidationAnimationPackSupport() and p3 == Enum.BundleType.Animations then
+			return ValidationEnums.UploadCategory.ANIMATION_PACK
+		end
+
+		return ValidationEnums.UploadCategory.BOTH_SHOES
+	end
+
+	assert(p2)
+
+	local EMOTE_ANIMATION = nil
+
+	if p2 == Enum.AssetType.EmoteAnimation then
+		EMOTE_ANIMATION = ValidationEnums.UploadCategory.EMOTE_ANIMATION
+	elseif Constants.ASSET_TYPE_INFO[p2] and Constants.ASSET_TYPE_INFO[p2].isBodyPart then
+		EMOTE_ANIMATION = p2 == Enum.AssetType.DynamicHead and ValidationEnums.UploadCategory.DYNAMIC_HEAD or ValidationEnums.UploadCategory.TORSO_AND_LIMBS
+	elseif table.find(parts, (tostring(p2.Value))) then
+		EMOTE_ANIMATION = ValidationEnums.UploadCategory.LAYERED_CLOTHING
+	elseif Constants.ASSET_TYPE_INFO[p2] and Constants.ASSET_TYPE_INFO[p2].rigidAllowed then
+		EMOTE_ANIMATION = ValidationEnums.UploadCategory.RIGID_ACCESSORY
+	elseif ConstantsInterface.isMakeupAsset(p2) then
+		EMOTE_ANIMATION = ValidationEnums.UploadCategory.MAKEUP
+	elseif getFFlagUGCValidationAnimationPackSupport() and Constants.ANIMATION_ASSET_INFO and Constants.ANIMATION_ASSET_INFO[p2] then
+		EMOTE_ANIMATION = ValidationEnums.UploadCategory.ANIMATION
+	end
+
+	if EMOTE_ANIMATION == nil then
+		error(`No assigned validation category for { p1.Name }, { p2 }, { p3 } `)
+	end
+
+	return EMOTE_ANIMATION
+end
+
+return getUploadCategory

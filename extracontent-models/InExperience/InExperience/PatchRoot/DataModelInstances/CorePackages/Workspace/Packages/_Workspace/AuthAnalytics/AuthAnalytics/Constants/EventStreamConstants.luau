@@ -110,7 +110,9 @@ return {
 		AccountSwitchingErrorModalShown = "accountSwitchingErrorModalShown",
 		SignupSuccess = "signupSuccess",
 		TosCheckbox = "tosCheckbox",
-		BirthdayDropdown = "birthdayDropdown"
+		BirthdayDropdown = "birthdayDropdown",
+		BirthdayPicker = "birthdayPicker",
+		BirthdayPickerAgeCalculatorShown = "birthdayPickerAgeCalculatorShown"
 	},
 	Context = {
 		AccountPickerLandingScreen = "accountPickerLandingScreen",
@@ -197,7 +199,9 @@ return {
 		UnauthorizedError = "unauthorizedError",
 		InvoluntaryLogoutGracePeriod = "involuntaryLogoutGracePeriod",
 		SignupEmailOnAddAuthMethod = "signupEmailOnAddAuthMethod",
-		AddAuthMethodPage = "addAuthMethodPage"
+		AddAuthMethodPage = "addAuthMethodPage",
+		PlatformRestrictedPage = "platformRestrictedPage",
+		KISAU14Signup = "kisaU14Signup"
 	},
 	ActionType = {
 		Submit = "submit",
@@ -213,6 +217,7 @@ return {
 		FlyoutSidePanel = "flyoutSidePanel"
 	},
 	AuthEventName = {
+		AuthButtonShown = "authButtonShown",
 		AuthModalShown = "authModalShown",
 		AuthPageLoad = "authPageload",
 		AuthOperationTiming = "authOperationTiming"
@@ -249,6 +254,11 @@ return {
 		UpgradeSuccess = "upgradeSuccess",
 		UpgradeFailure = "upgradeFailure",
 		FilteredByIXP = "filteredByIXP",
+		SwitchAccountsShown = "shown",
+		SwitchAccountsU13Hidden = "u13Hidden",
+		SwitchAccountsIxpHidden = "ixpHidden",
+		SwitchAccountsExclusionsHidden = "exclusionsHidden",
+		SwitchAccountsBlobEmpty = "blobEmpty",
 		SignupLayerExposure = "signupLayerExposure",
 		ShouldSeePasskeyUpsell = "shouldSeePasskeyUpsell",
 		ALCheckSuccess = "alCheckSuccess",
@@ -256,9 +266,18 @@ return {
 		ALError = "alError",
 		BirthdayDropdownBirthdaySelected = "birthdayDropdownBirthdaySelected",
 		BirthdayDropdownInvalidBirthdayError = "birthdayDropdownInvalidBirthdayError",
+		BirthdayPickerOpened = "birthdayPickerOpened",
+		BirthdayPickerAllPicked = "birthdayPickerAllPicked",
+		BirthdayPickerClosedWithoutConfirm = "birthdayPickerClosedWithoutConfirm",
 		GracePeriodApplied = "gracePeriodApplied",
 		GracePeriodExceeded = "gracePeriodExceeded",
-		WebViewLastClosed = "WebViewLastClosed"
+		WebViewLastClosed = "WebViewLastClosed",
+		Diagnostic401WebviewOpen = "diagnostic401_webviewOpen",
+		Diagnostic401WebviewRecentlyClosed = "diagnostic401_webviewRecentlyClosed",
+		Diagnostic401WebviewClosedExpired = "diagnostic401_webviewClosedExpired",
+		Diagnostic401WebviewNeverOpened = "diagnostic401_webviewNeverOpened",
+		SkipVPC = "skipVPC",
+		LaunchParentSignUpOtp = "launchParentSignUpOtp"
 	},
 	EventTimingKeys = {
 		OsClock = "os_clock",

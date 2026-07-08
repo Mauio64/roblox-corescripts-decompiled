@@ -3,6 +3,8 @@ local Badges = require(script.Badges)
 local Game = require(script.Game)
 local TrustedConnections = require(script.TrustedConnections)
 local Profile = require(script.Profile)
+local Presence = require(script.Presence)
+local Friends = require(script.Friends)
 local Creator = require(script.Creator)
 local SocialLink = require(script.SocialLink)
 local ExperienceEvents = require(script.ExperienceEvents)
@@ -14,6 +16,8 @@ local MarketplaceBundle = require(script.MarketplaceBundle)
 local MarketplaceLook = require(script.MarketplaceLook)
 local Song = require(script.Song)
 local DataHydrationUtils = require(script.DataHydrationUtils)
+local FFlagSduiExperienceDetailsSupport = require(script.Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+local v20 = if not FFlagSduiExperienceDetailsSupport then nil else require(script.UserProfile)
 
 return {
 	["jest.config"] = script["jest.config"],
@@ -21,6 +25,7 @@ return {
 	createDataCache = require(script.createDataCache),
 	DataHydrationTypes = DataHydrationTypes,
 	DataHydrationUtils = DataHydrationUtils,
+	DataStatus = DataHydrationTypes.DataStatus,
 	Badges = Badges,
 	Game = Game,
 	Creator = Creator,
@@ -31,9 +36,11 @@ return {
 	ExperienceEvents = ExperienceEvents,
 	TrustedConnections = TrustedConnections,
 	Profile = Profile,
+	Presence = Presence,
+	Friends = Friends,
 	MarketplaceAsset = MarketplaceAsset,
 	MarketplaceBundle = MarketplaceBundle,
 	MarketplaceLook = MarketplaceLook,
 	Song = Song,
-	DataStatus = DataHydrationTypes.DataStatus
+	UserProfile = if not FFlagSduiExperienceDetailsSupport then nil else v20
 }

@@ -139,10 +139,10 @@ function t1.linkGenerated(t5: {[any]: any}, t6: {[any]: any}) -- line: 133
 	-- upvalues: t1 (copy)
 	local LinkGenerated = t1.EventName.LinkGenerated
 	local t7 = {
-		linkType = t6.linkType,
-		linkId = t6.linkId,
 		page = "inGameMenu",
-		subpage = "inviteFriendsPage"
+		subpage = "inviteFriendsPage",
+		linkType = t6.linkType,
+		linkId = t6.linkId
 	}
 
 	t5:_getEventStream():setRBXEventStream("shareLinks", LinkGenerated, t7)
@@ -154,8 +154,8 @@ function t1.onShareButtonClick(t8: {[any]: any}, n1: number?) -- line: 145
 		btn = "shareServerInviteLink",
 		page = "inGameMenu",
 		subpage = "inviteFriendsPage",
-		linkId = if not game:GetFastFlag("GameInviteModalIncludeLinkIdInShareButton") then nil else n1,
-		isShortUrlEnabled = true
+		isShortUrlEnabled = true,
+		linkId = if not game:GetFastFlag("GameInviteModalIncludeLinkIdInShareButton") then nil else n1
 	}
 
 	t8:_getEventStream():setRBXEventStream("shareLinks", ShareButtonClick, t9)
@@ -165,9 +165,9 @@ function t1.onSearchFocused(p16) -- line: 158
 	local InviteSearchFocused = t1.EventName.InviteSearchFocused
 	local s3 = "inGame"
 	local t10 = {
-		btn = p16:_getButtonName(),
 		page = "inGameMenu",
-		subpage = "inviteFriendsPage"
+		subpage = "inviteFriendsPage",
+		btn = p16:_getButtonName()
 	}
 
 	if p16:_getIsUniversalApp() then

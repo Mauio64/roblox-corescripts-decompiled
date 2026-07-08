@@ -17,46 +17,38 @@ local scaleValue = require(Foundation.Utility.scaleValue)
 local function insertRule(t1: {[any]: any}, p1, s1: string) -- line: 23
 	-- upvalues: React (copy), StyleRule (copy)
 	local properties = p1.properties
-	local v14 = "." .. s1
-	local v15 = p1.modifier == nil and "" or ":" .. p1.modifier
-	local v16 = v14 .. v15 .. (p1.pseudo == nil and "" or " ::" .. p1.pseudo)
+	local v15 = "." .. s1
+	local v16 = p1.modifier == nil and "" or ":" .. p1.modifier
+	local v17 = v15 .. v16 .. (p1.pseudo == nil and "" or " ::" .. p1.pseudo)
 
 	if p1.pseudo ~= nil then
-		v16 ..= ", " .. v14 .. v15 .. " > " .. p1.pseudo
+		v17 ..= ", " .. v15 .. v16 .. " > " .. p1.pseudo
 	end
 
 	table.insert(t1, React.createElement(StyleRule, {
-		key = v16,
+		key = v17,
 		Priority = p1.priority,
-		Selector = v16,
+		Selector = v17,
 		properties = properties
 	}))
 end
 local function updateRuleAttributes(p2, t2: {[any]: any}?, t3: {[any]: any}, n1: number?, p3) -- line: 46
 	-- upvalues: Flags (copy), scaleValue (copy)
-	local v22 = t2 or {}
-	local v23 = if not Flags.FoundationDisableTokenScaling then n1 or 1 else 1
+	local v23 = t2 or {}
+	local v24 = if not Flags.FoundationDisableTokenScaling then n1 or 1 else 1
 
-	for _, v25 in v22 do
-		if Flags.FoundationUseAttributeTokens then
-			local v26 = if not p3 then nil else p3[v25.name]
-			local v27 = if v26 == nil then v25.value else v26
-			local v28 = scaleValue(v27, v23)
+	for _, v26 in v23 do
+		local v27 = if not p3 then nil else p3[v26.name]
+		local v28 = if v27 == nil then v26.value else v27
+		local v29 = scaleValue(v28, v24)
 
-			if v28 ~= t3[v25.name] then
-				p2:SetAttribute(v25.name, v28)
-				t3[v25.name] = v28
-			end
-		elseif v23 ~= t3[v25.name] then
-			local v29 = scaleValue(v25.value, v23)
-
-			p2:SetAttribute(v25.name, v29)
-			t3[v25.name] = v23
+		if v29 ~= t3[v26.name] then
+			p2:SetAttribute(v26.name, v29)
+			t3[v26.name] = v29
 		end
 	end
 end
-
-return function(t4: {[any]: any}, t5: {[any]: any}, p4, t6: {[any]: any}?, n2: number?, p5) --[[ createStyleSheetRules ]] -- line: 73
+local function createStyleSheetRules(t4: {[any]: any}, t5: {[any]: any}, p4, t6: {[any]: any}?, n2: number?, p5) -- line: 67
 	-- upvalues: updateRuleAttributes (copy), insertRule (copy)
 	local t7 = {}
 
@@ -84,3 +76,5 @@ return function(t4: {[any]: any}, t5: {[any]: any}, p4, t6: {[any]: any}?, n2: n
 
 	return t7
 end
+
+return createStyleSheetRules

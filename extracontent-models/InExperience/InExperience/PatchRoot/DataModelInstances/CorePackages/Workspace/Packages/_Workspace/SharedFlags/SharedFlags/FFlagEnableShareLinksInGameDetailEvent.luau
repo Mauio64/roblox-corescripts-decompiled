@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableShareLinksInGameDetailEvent", false);
+return game:DefineFastFlag("EnableShareLinksInGameDetailEvent", false)

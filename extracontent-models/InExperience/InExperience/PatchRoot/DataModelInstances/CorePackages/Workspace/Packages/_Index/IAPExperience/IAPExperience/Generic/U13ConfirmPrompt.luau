@@ -1,91 +1,99 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.UIBlox);
-local l_InteractiveAlert_0 = v4.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v4.App.Button.Enum.ButtonType;
-local v7 = require(l_Parent_1.Locale.MultiTextLocalizer);
-local v8 = require(l_Parent_0.U13ConfirmType);
-local v9 = v3.Component:extend(script.Name);
-v9.defaultProps = {
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    position = UDim2.new(0.5, 0, 0.5, 0)
-};
-v9.getMessage = function(_, v11, v12) --[[ Line: 36 ]] --[[ Name: getMessage ]]
-    -- upvalues: v8 (copy)
-    if v12 == v8.U13PaymentModal then
-        return v11.u13PaymentModal;
-    elseif v12 == v8.U13MonthlyThreshold1Modal then
-        return v11.u13MonthlyThreshold1Modal;
-    elseif v12 == v8.U13MonthlyThreshold2Modal then
-        return v11.u13MonthlyThreshold2Modal;
-    elseif v12 == v8.ParentalConsentWarningPaymentModal13To17 then
-        return v11.parentalConsentWarningPaymentModal13To17;
-    else
-        return;
-    end;
-end;
-v9.render = function(v13) --[[ Line: 48 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v7 (copy)
-    return v3.createElement(v7, {
-        keys = {
-            title = {
-                key = "IAPExperience.U13Confirm.Title.Warning"
-            }, 
-            u13PaymentModal = {
-                key = "IAPExperience.U13Confirm.Text.U13PaymentModal"
-            }, 
-            u13MonthlyThreshold1Modal = {
-                key = "IAPExperience.U13Confirm.Text.U13MonthlyThreshold1Modal"
-            }, 
-            u13MonthlyThreshold2Modal = {
-                key = "IAPExperience.U13Confirm.Text.U13MonthlyThreshold2Modal"
-            }, 
-            parentalConsentWarningPaymentModal13To17 = {
-                key = "IAPExperience.U13Confirm.Text.ParentalConsentWarningPaymentModal13To17"
-            }, 
-            confirm = {
-                key = "IAPExperience.U13Confirm.Action.Confirm"
-            }, 
-            cancel = {
-                key = "IAPExperience.U13Confirm.Action.Cancel"
-            }
-        }, 
-        render = function(v14) --[[ Line: 73 ]] --[[ Name: render ]]
-            -- upvalues: v13 (copy)
-            return v13:renderAlert(v14);
-        end
-    });
-end;
-v9.renderAlert = function(v15, v16) --[[ Line: 79 ]] --[[ Name: renderAlert ]]
-    -- upvalues: v3 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local l_props_0 = v15.props;
-    return v3.createElement(l_InteractiveAlert_0, {
-        anchorPoint = l_props_0.anchorPoint, 
-        position = l_props_0.position, 
-        screenSize = l_props_0.screenSize, 
-        title = v16.title, 
-        bodyText = v15:getMessage(v16, l_props_0.modalType), 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = l_props_0.cancelActivated, 
-                        text = v16.cancel, 
-                        inputIcon = l_props_0.cancelControllerIcon
-                    }
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = l_props_0.doneActivated, 
-                        text = v16.confirm, 
-                        inputIcon = l_props_0.doneControllerIcon
-                    }
-                }
-            }
-        }
-    });
-end;
-return v9;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Roact = require(scriptParentParentParent.Roact)
+local UIBlox = require(scriptParentParentParent.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
+local U13ConfirmType = require(scriptParent.U13ConfirmType)
+local v10 = Roact.Component:extend(script.Name)
+
+v10.defaultProps = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0)
+}
+
+function v10.getMessage(_: {[any]: any}, t2: {[any]: any}, p1) -- line: 36
+	-- upvalues: U13ConfirmType (copy)
+	if p1 == U13ConfirmType.U13PaymentModal then
+		return t2.u13PaymentModal
+	end
+
+	if p1 == U13ConfirmType.U13MonthlyThreshold1Modal then
+		return t2.u13MonthlyThreshold1Modal
+	end
+
+	if p1 == U13ConfirmType.U13MonthlyThreshold2Modal then
+		return t2.u13MonthlyThreshold2Modal
+	end
+
+	if p1 == U13ConfirmType.ParentalConsentWarningPaymentModal13To17 then
+		return t2.parentalConsentWarningPaymentModal13To17
+	end
+end
+function v10.render(p2) -- line: 48
+	-- upvalues: Roact (copy), MultiTextLocalizer (copy)
+	return Roact.createElement(MultiTextLocalizer, {
+		keys = {
+			title = {
+				key = "IAPExperience.U13Confirm.Title.Warning"
+			},
+			u13PaymentModal = {
+				key = "IAPExperience.U13Confirm.Text.U13PaymentModal"
+			},
+			u13MonthlyThreshold1Modal = {
+				key = "IAPExperience.U13Confirm.Text.U13MonthlyThreshold1Modal"
+			},
+			u13MonthlyThreshold2Modal = {
+				key = "IAPExperience.U13Confirm.Text.U13MonthlyThreshold2Modal"
+			},
+			parentalConsentWarningPaymentModal13To17 = {
+				key = "IAPExperience.U13Confirm.Text.ParentalConsentWarningPaymentModal13To17"
+			},
+			confirm = {
+				key = "IAPExperience.U13Confirm.Action.Confirm"
+			},
+			cancel = {
+				key = "IAPExperience.U13Confirm.Action.Cancel"
+			}
+		},
+		render = function(t3: {[any]: any}) -- line: 73
+			-- upvalues: p2 (copy)
+			return p2:renderAlert(t3)
+		end
+	})
+end
+function v10.renderAlert(t4: {[any]: any}, t5: {[any]: any}) -- line: 79
+	-- upvalues: Roact (copy), InteractiveAlert (copy), ButtonType (copy)
+	local props = t4.props
+
+	return Roact.createElement(InteractiveAlert, {
+		anchorPoint = props.anchorPoint,
+		position = props.position,
+		screenSize = props.screenSize,
+		title = t5.title,
+		bodyText = t4:getMessage(t5, props.modalType),
+		buttonStackInfo = {
+			buttons = {
+				{
+					props = {
+						onActivated = props.cancelActivated,
+						text = t5.cancel,
+						inputIcon = props.cancelControllerIcon
+					}
+				},
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props.doneActivated,
+						text = t5.confirm,
+						inputIcon = props.doneControllerIcon
+					}
+				}
+			}
+		}
+	})
+end
+
+return v10

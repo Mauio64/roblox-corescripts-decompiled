@@ -1,67 +1,79 @@
-local v0, v1 = ...;
-arg0 = v0;
-arg1 = v1;
-v0 = function(v2, v3) --[[ Line: 6 ]] --[[ Name: x1 ]]
-    return v2 + v3;
-end;
-v1 = function(v4, v5) --[[ Line: 7 ]] --[[ Name: x2 ]]
-    return v4 - v5;
-end;
-local function v8(v6, v7) --[[ Line: 8 ]] --[[ Name: x3 ]]
-    return v7 - v6;
-end;
-local function v11(v9, v10) --[[ Line: 9 ]] --[[ Name: x4 ]]
-    return (tonumber(tostring(v10 % 1000) .. tostring((math.abs(v9 % 1000)))));
-end;
-local function v14(v12, v13) --[[ Line: 10 ]] --[[ Name: x5 ]]
-    return (tonumber(tostring(v13 % 1337) .. tostring((math.abs(v12 % 1337)))));
-end;
-local function v17(v15, v16) --[[ Line: 11 ]] --[[ Name: x6 ]]
-    return v15 % 1000 * (v16 % 1000);
-end;
-local function v20(v18, v19) --[[ Line: 12 ]] --[[ Name: x7 ]]
-    return v18 % 1337 * (v19 % 1337);
-end;
-local function v25(v21, v22) --[[ Line: 13 ]] --[[ Name: x8 ]]
-    local v23 = v21 + v22;
-    local v24 = v21 - v22;
-    return v23 % 1000 * (v24 % 1000);
-end;
-local v26 = {
-    1, 
-    2, 
-    3, 
-    4, 
-    5, 
-    6, 
-    7, 
-    8
-};
-local v27 = Random.new(5);
+local v1, v2 = ...
+
+arg0 = v1
+arg1 = v2
+
+local function x1(p1, p2) -- line: 6
+	return p1 + p2
+end
+local function x2(p3, p4) -- line: 7
+	return p3 - p4
+end
+local function x3(p5, p6) -- line: 8
+	return p6 - p5
+end
+local function x4(p7, p8) -- line: 9
+	return (tonumber(tostring(p8 % 1000) .. tostring((math.abs(p7 % 1000)))))
+end
+local function x5(p9, p10) -- line: 10
+	return (tonumber(tostring(p10 % 1337) .. tostring((math.abs(p9 % 1337)))))
+end
+local function x6(p11, p12) -- line: 11
+	return p11 % 1000 * (p12 % 1000)
+end
+local function x7(p13, p14) -- line: 12
+	return p13 % 1337 * (p14 % 1337)
+end
+local function x8(p15, p16) -- line: 13
+	local v35 = p15 + p16
+	local v36 = p15 - p16
+
+	return v35 % 1000 * (v36 % 1000)
+end
+
+local t1 = {
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	8
+}
+local random = Random.new(5)
+
 for _ = 1, 32 do
-    local v29 = v27:NextInteger(1, 8);
-    local v30 = v27:NextInteger(1, 8);
-    local v31 = v26[v29];
-    v26[v29] = v26[v30];
-    v26[v30] = v31;
-end;
-local v32 = {
-    [v26[1]] = v0, 
-    [v26[2]] = v1, 
-    [v26[3]] = v8, 
-    [v26[4]] = v11, 
-    [v26[5]] = v14, 
-    [v26[6]] = v17, 
-    [v26[7]] = v20, 
-    [v26[8]] = v25
-};
-return ((function(v33, v34) --[[ Line: 35 ]] --[[ Name: x9 ]]
-    -- upvalues: v32 (copy)
-    local v35 = 393;
-    local v36 = 1;
-    for _ = 1, 16 do
-        v35 = (v35 + v32[math.abs(v34 + v35 + v36) % 8 + 1](v35 + v33, v34)) % 10000000;
-        v36 = v36 + 1;
-    end;
-    return v35;
-end)(arg0, arg1));
+	local v14 = random:NextInteger(1, 8)
+	local v15 = random:NextInteger(1, 8)
+	local v16 = t1[v14]
+
+	t1[v14] = t1[v15]
+	t1[v15] = v16
+end
+
+local t2 = {
+	[t1[1]] = x1,
+	[t1[2]] = x2,
+	[t1[3]] = x3,
+	[t1[4]] = x4,
+	[t1[5]] = x5,
+	[t1[6]] = x6,
+	[t1[7]] = x7,
+	[t1[8]] = x8
+}
+
+local function x9(p17, p18) -- line: 35
+	-- upvalues: t2 (copy)
+	local n1 = 393
+	local n2 = 1
+
+	for _ = 1, 16 do
+		n1 = (n1 + t2[math.abs(p18 + n1 + n2) % 8 + 1](n1 + p17, p18)) % 10000000
+		n2 += 1
+	end
+
+	return n1
+end
+
+return (x9(arg0, arg1))

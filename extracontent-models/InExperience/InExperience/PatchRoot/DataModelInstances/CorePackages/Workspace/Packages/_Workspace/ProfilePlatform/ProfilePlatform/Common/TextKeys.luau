@@ -23,6 +23,7 @@ return {
 	EditAppearance = "Feature.Profile.Action.EditAppearance",
 	EditEmotes = "Feature.Profile.Action.EditEmotes",
 	SwitchAvatar = "Feature.Profile.Action.SwitchAvatar",
+	EditBackground = "Feature.Profile.Action.EditBackground",
 	EditProfile = "Feature.Friends.Action.EditProfile",
 	IgnoreFriendRequest = "Feature.AddFriends.Action.IgnoreFriendRequest",
 	IgnoreConnectionRequest = not FFlagConnectionsToFriendsRename and "Feature.AddFriends.Action.IgnoreConnectionRequest" or nil,

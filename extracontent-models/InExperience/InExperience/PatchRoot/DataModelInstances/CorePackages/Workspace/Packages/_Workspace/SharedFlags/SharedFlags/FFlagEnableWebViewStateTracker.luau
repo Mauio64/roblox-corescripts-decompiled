@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableWebViewStateTracker3", false);
+return game:DefineFastFlag("EnableWebViewStateTracker3", false)

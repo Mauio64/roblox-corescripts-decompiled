@@ -1,13 +1,16 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PurchaseError);
-local v2 = require(l_Parent_0.Promise);
-return function(v3) --[[ Line: 7 ]] --[[ Name: checkUserPurchaseSettings ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return v3.checkUserPurchaseSettings():andThen(function(v4) --[[ Line: 10 ]]
-        -- upvalues: v2 (ref)
-        return v2.resolve(v4);
-    end):catch(function(_) --[[ Line: 13 ]]
-        -- upvalues: v2 (ref), v1 (ref)
-        return v2.reject(v1.UnknownFailure);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local Promise = require(ParentParent.Promise)
+
+local function checkUserPurchaseSettings(p1) -- line: 7
+	-- upvalues: Promise (copy), PurchaseError (copy)
+	return p1.checkUserPurchaseSettings():andThen(function(p2) -- line: 10
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p2)
+	end):catch(function(_) -- line: 13
+		-- upvalues: Promise (copy), PurchaseError (copy)
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end)
+end
+
+return checkUserPurchaseSettings

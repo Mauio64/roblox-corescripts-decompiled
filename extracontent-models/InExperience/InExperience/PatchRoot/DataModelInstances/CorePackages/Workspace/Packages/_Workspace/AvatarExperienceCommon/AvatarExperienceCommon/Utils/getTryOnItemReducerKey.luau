@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 6 ]] --[[ Name: getTryOnItemReducerKey ]]
-    return (("%*-%*"):format(v0, v1));
-end;
+local function getTryOnItemReducerKey(s1: string, s2: string) -- line: 6
+	return `{ s1 }-{ s2 }`
+end
+
+return getTryOnItemReducerKey

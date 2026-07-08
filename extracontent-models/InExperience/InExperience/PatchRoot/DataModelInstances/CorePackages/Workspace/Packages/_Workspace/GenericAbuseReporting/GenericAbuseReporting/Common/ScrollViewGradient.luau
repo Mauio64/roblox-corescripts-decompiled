@@ -1,124 +1,135 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_View_0 = v3.View;
-local l_ScrollView_0 = v3.ScrollView;
-local l_ScrollBarVisibility_0 = v3.Enums.ScrollBarVisibility;
-local l_useLayerCollector_0 = require(l_Parent_0.UIBlox).Core.Layout.LayerCollector.useLayerCollector;
-return (v2.forwardRef(function(v8, v9) --[[ Line: 21 ]]
-    -- upvalues: v2 (copy), l_useLayerCollector_0 (copy), l_View_0 (copy), l_ScrollView_0 (copy), l_ScrollBarVisibility_0 (copy)
-    local v10 = v2.useRef(nil);
-    local v11, v12 = v2.useState(Vector2.zero);
-    local v13, v14 = v2.useState(Vector2.zero);
-    local v15, v16 = v2.useState(true);
-    local v17, v18 = v2.useState(false);
-    local l_absoluteSize_0 = l_useLayerCollector_0().absoluteSize;
-    v2.useLayoutEffect(function() --[[ Line: 30 ]]
-        -- upvalues: v10 (copy), v12 (copy), v14 (copy)
-        if v10.current then
-            v12(v10.current.AbsoluteCanvasSize);
-            v14(v10.current.AbsoluteWindowSize);
-            local v20 = v10.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function() --[[ Line: 37 ]]
-                -- upvalues: v12 (ref), v10 (ref)
-                v12(v10.current.AbsoluteCanvasSize);
-            end);
-            local v21 = v10.current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() --[[ Line: 42 ]]
-                -- upvalues: v14 (ref), v10 (ref)
-                v14(v10.current.AbsoluteWindowSize);
-            end);
-            return function() --[[ Line: 46 ]]
-                -- upvalues: v20 (copy), v21 (copy)
-                v20:Disconnect();
-                v21:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 51 ]]
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReporting.Parent.React)
+local Foundation = require(GenericAbuseReportingParent.Foundation)
+local View = Foundation.View
+local ScrollView = Foundation.ScrollView
+local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
+local useLayerCollector = require(GenericAbuseReportingParent.UIBlox).Core.Layout.LayerCollector.useLayerCollector
 
-            end;
-        end;
-    end, {
-        v10.current, 
-        l_absoluteSize_0
-    });
-    v2.useEffect(function() --[[ Line: 54 ]]
-        -- upvalues: v10 (copy), v11 (copy), v13 (copy), v16 (copy), v18 (copy)
-        if v10.current then
-            local v23 = v10.current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() --[[ Line: 56 ]]
-                -- upvalues: v10 (ref), v11 (ref), v13 (ref), v16 (ref), v18 (ref)
-                local l_CanvasPosition_0 = v10.current.CanvasPosition;
-                if v11.Y == v13.Y then
-                    v16(true);
-                    v18(true);
-                    return;
-                elseif l_CanvasPosition_0.Y <= 0 then
-                    v16(true);
-                    return;
-                elseif l_CanvasPosition_0.Y >= v11.Y - v13.Y then
-                    v18(true);
-                    return;
-                else
-                    v16(false);
-                    v18(false);
-                    return;
-                end;
-            end);
-            return function() --[[ Line: 71 ]]
-                -- upvalues: v23 (copy)
-                v23:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 75 ]]
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 21
+	-- upvalues: React (copy), useLayerCollector (copy), View (copy), ScrollView (copy), ScrollBarVisibility (copy)
+	local v11 = React.useRef(nil)
+	local v12, v13 = React.useState(Vector2.zero)
+	local v14, v15 = React.useState(Vector2.zero)
+	local v16, v17 = React.useState(true)
+	local v18, v19 = React.useState(false)
+	local absoluteSize = useLayerCollector().absoluteSize
 
-            end;
-        end;
-    end, {
-        v10.current, 
-        l_absoluteSize_0, 
-        v11, 
-        v13
-    });
-    return v2.createElement(l_View_0, {
-        tag = "size-full"
-    }, {
-        TopGradient = v2.createElement(l_View_0, {
-            Size = UDim2.new(1, -15, 0, v8.gradientHeight), 
-            tag = not v15 and "bg-surface-300" or nil, 
-            ZIndex = 2
-        }, {
-            UIGradient = v2.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0), 
-                    NumberSequenceKeypoint.new(1, 1)
-                })
-            })
-        }), 
-        BottomGradient = v2.createElement(l_View_0, {
-            Position = UDim2.new(0, 0, 1, -v8.gradientHeight), 
-            Size = UDim2.new(1, -15, 0, v8.gradientHeight), 
-            tag = not v17 and "bg-surface-300" or nil, 
-            ZIndex = 2
-        }, {
-            UIGradient = v2.createElement("UIGradient", {
-                Rotation = 270, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0), 
-                    NumberSequenceKeypoint.new(1, 1)
-                })
-            })
-        }), 
-        ScrollView = v2.createElement(l_ScrollView_0, {
-            Size = v8.Size or UDim2.new(1, 0, 1, 0), 
-            ZIndex = v8.ZIndex, 
-            scroll = {
-                AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                CanvasSize = UDim2.fromOffset(0, 0), 
-                scrollBarVisibility = l_ScrollBarVisibility_0.Always, 
-                ScrollingDirection = Enum.ScrollingDirection.Y
-            }, 
-            scrollingFrameRef = v10, 
-            ref = v9
-        }, v8.children)
-    });
-end));
+	React.useLayoutEffect(function() -- line: 30
+		-- upvalues: v11 (copy), v13 (copy), v15 (copy)
+		if v11.current then
+			v13(v11.current.AbsoluteCanvasSize)
+			v15(v11.current.AbsoluteWindowSize)
+
+			local connection = v11.current:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function() -- line: 37
+				-- upvalues: v13 (copy), v11 (copy)
+				v13(v11.current.AbsoluteCanvasSize)
+			end)
+			local connection2 = v11.current:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() -- line: 42
+				-- upvalues: v15 (copy), v11 (copy)
+				v15(v11.current.AbsoluteWindowSize)
+			end)
+
+			return function() -- line: 46
+				-- upvalues: connection (copy), connection2 (copy)
+				connection:Disconnect()
+				connection2:Disconnect()
+			end
+		end
+
+		return function() -- line: 51
+		end
+	end, {
+		v11.current,
+		absoluteSize
+	})
+	React.useEffect(function() -- line: 54
+		-- upvalues: v11 (copy), v12 (copy), v14 (copy), v17 (copy), v19 (copy)
+		if v11.current then
+			local connection = v11.current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 56
+				-- upvalues: v11 (copy), v12 (copy), v14 (copy), v17 (copy), v19 (copy)
+				local CanvasPosition = v11.current.CanvasPosition
+
+				if v12.Y == v14.Y then
+					v17(true)
+					v19(true)
+
+					return
+				end
+
+				if CanvasPosition.Y <= 0 then
+					v17(true)
+
+					return
+				end
+
+				if CanvasPosition.Y >= v12.Y - v14.Y then
+					v19(true)
+
+					return
+				end
+
+				v17(false)
+				v19(false)
+			end)
+
+			return function() -- line: 71
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end
+
+		return function() -- line: 75
+		end
+	end, {
+		v11.current,
+		absoluteSize,
+		v12,
+		v14
+	})
+
+	return React.createElement(View, {
+		tag = "size-full"
+	}, {
+		TopGradient = React.createElement(View, {
+			ZIndex = 2,
+			Size = UDim2.new(1, -15, 0, t1.gradientHeight),
+			tag = if v16 then nil else "bg-surface-300"
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+			})
+		}),
+		BottomGradient = React.createElement(View, {
+			ZIndex = 2,
+			Position = UDim2.new(0, 0, 1, -t1.gradientHeight),
+			Size = UDim2.new(1, -15, 0, t1.gradientHeight),
+			tag = if v18 then nil else "bg-surface-300"
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 270,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+			})
+		}),
+		ScrollView = React.createElement(ScrollView, {
+			Size = t1.Size or UDim2.new(1, 0, 1, 0),
+			ZIndex = t1.ZIndex,
+			scroll = {
+				AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				CanvasSize = UDim2.fromOffset(0, 0),
+				scrollBarVisibility = ScrollBarVisibility.Always,
+				ScrollingDirection = Enum.ScrollingDirection.Y
+			},
+			scrollingFrameRef = v11,
+			ref = p1
+		}, t1.children)
+	})
+end))

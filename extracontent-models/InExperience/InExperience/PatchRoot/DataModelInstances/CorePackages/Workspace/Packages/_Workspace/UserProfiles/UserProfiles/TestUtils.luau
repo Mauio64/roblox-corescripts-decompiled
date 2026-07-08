@@ -1,3 +1,3 @@
 return {
-    writeProfileDataToCache = require(script.writeProfileDataToCache)
-};
+	writeProfileDataToCache = require(script.writeProfileDataToCache)
+}

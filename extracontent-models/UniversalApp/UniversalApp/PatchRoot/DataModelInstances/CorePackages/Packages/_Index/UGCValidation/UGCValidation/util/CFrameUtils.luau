@@ -1,17 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(script.Parent.valueToString);
-local v2 = require(l_Parent_0.util.floatEquals);
+local ParentParent = script.Parent.Parent
+local valueToString = require(script.Parent.valueToString)
+local floatEquals = require(ParentParent.util.floatEquals)
+
 return {
-    fuzzyEq = function(v3, v4, v5) --[[ Line: 7 ]] --[[ Name: fuzzyEq ]]
-        -- upvalues: v2 (copy)
-        local l_v3_Components_0, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17 = v3:GetComponents();
-        local l_v4_Components_0, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29 = v4:GetComponents();
-        return v2(l_v3_Components_0, l_v4_Components_0, v5) and v2(v7, v19, v5) and v2(v8, v20, v5) and v2(v9, v21, v5) and v2(v10, v22, v5) and v2(v11, v23, v5) and v2(v12, v24, v5) and v2(v13, v25, v5) and v2(v14, v26, v5) and v2(v15, v27, v5) and v2(v16, v28, v5) and v2(v17, v29, v5);
-    end, 
-    getRotationString = function(v30) --[[ Line: 24 ]] --[[ Name: getRotationString ]]
-        -- upvalues: v1 (copy)
-        local v31 = Vector3.new(v30:ToOrientation());
-        v31 = Vector3.new(math.deg(v31.X), math.deg(v31.Y), (math.deg(v31.Z)));
-        return v1(v31);
-    end
-};
+	fuzzyEq = function(cFrame: CFrame, cFrame2: CFrame, n1: number?) -- line: 7
+		-- upvalues: floatEquals (copy)
+		local v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18 = cFrame:GetComponents()
+		local v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30 = cFrame2:GetComponents()
+
+		return floatEquals(v7, v19, n1) and (floatEquals(v8, v20, n1) and (floatEquals(v9, v21, n1) and (floatEquals(v10, v22, n1) and (floatEquals(v11, v23, n1) and (floatEquals(v12, v24, n1) and (floatEquals(v13, v25, n1) and (floatEquals(v14, v26, n1) and (floatEquals(v15, v27, n1) and (floatEquals(v16, v28, n1) and (floatEquals(v17, v29, n1) and floatEquals(v18, v30, n1)))))))))))
+	end,
+	getRotationString = function(cFrame: CFrame) -- line: 24
+		-- upvalues: valueToString (copy)
+		local vector3 = Vector3.new(cFrame:ToOrientation())
+		local vector3_2 = Vector3.new(math.deg(vector3.X), math.deg(vector3.Y), (math.deg(vector3.Z)))
+
+		return valueToString(vector3_2)
+	end
+}

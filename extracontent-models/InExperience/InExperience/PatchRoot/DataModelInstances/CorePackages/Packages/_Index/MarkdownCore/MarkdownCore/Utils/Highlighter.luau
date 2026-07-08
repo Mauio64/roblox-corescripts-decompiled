@@ -1,30 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("Utils").Parent;
-local _ = require(l_Parent_0.Types);
-local v2 = require(script.Utility);
-local v3 = require(script.Theme);
-local v4 = require(script.Theme.defaultTokenColors);
-local v5 = {
-    defaultLexer = require(script.Lexer)
-};
-v5.highlight = function(v6, v7) --[[ Line: 14 ]] --[[ Name: highlight ]]
-    -- upvalues: v3 (copy), v4 (copy), v2 (copy), v5 (copy)
-    if v7 then
-        v3.setColors(v7);
-    else
-        v3.setColors(v4);
-    end;
-    v6 = v2.convertTabsToSpaces(v2.removeControlChars(v6));
-    local l_defaultLexer_0 = v5.defaultLexer;
-    local v9 = v3.getColor("iden");
-    local v10 = "";
-    for v11, v12 in l_defaultLexer_0.scan(v6) do
-        local v13 = v3.getColor(v11) or v9;
-        v10 = v10 .. v3.getColoredRichText(v13, v2.sanitizeRichText(v12));
-    end;
-    return v10;
-end;
-v5.getTokenColor = function(v14) --[[ Line: 35 ]] --[[ Name: getTokenColor ]]
-    -- upvalues: v3 (copy)
-    return v3.getColor(v14);
-end;
-return v5;
+local Parent = script:FindFirstAncestor("Utils").Parent
+
+require(Parent.Types)
+
+local Utility = require(script.Utility)
+local Theme = require(script.Theme)
+local defaultTokenColors = require(script.Theme.defaultTokenColors)
+local t1 = {
+	defaultLexer = require(script.Lexer)
+}
+
+function t1.highlight(s1: string, p1) -- line: 14
+	-- upvalues: Theme (copy), defaultTokenColors (copy), Utility (copy), t1 (copy)
+	if p1 then
+		Theme.setColors(p1)
+	else
+		Theme.setColors(defaultTokenColors)
+	end
+
+	local v8 = Utility.convertTabsToSpaces(Utility.removeControlChars(s1))
+	local defaultLexer = t1.defaultLexer
+	local v10 = Theme.getColor("iden")
+	local s2 = ""
+
+	for v12, v13 in defaultLexer.scan(v8) do
+		local v14 = Theme.getColor(v12) or v10
+
+		s2 ..= Theme.getColoredRichText(v14, Utility.sanitizeRichText(v13))
+	end
+
+	return s2
+end
+function t1.getTokenColor(p2) -- line: 35
+	-- upvalues: Theme (copy)
+	return Theme.getColor(p2)
+end
+
+return t1

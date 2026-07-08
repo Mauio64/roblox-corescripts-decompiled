@@ -1,111 +1,105 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v3 = require(l_Parent_1.Foundation);
-local v4 = require(l_Parent_1.React);
-local l_Skeleton_0 = v3.Skeleton;
-local l_View_0 = v3.View;
-local v7 = require(l_Parent_0.Utils.getCropSize);
-local v8 = require(l_Parent_0.Utils.getFitSize);
-local v9 = require(l_Parent_0.Enums.LoadingState);
-local v10 = require(l_Parent_0.Flags.FFlagUseRbxStorageInCapturesCommon);
-return function(v11) --[[ Line: 36 ]]
-    -- upvalues: v4 (copy), v9 (copy), l_ContentProvider_0 (copy), l_View_0 (copy), v8 (copy), v7 (copy), v10 (copy), l_Skeleton_0 (copy)
-    local v12, v13 = v4.useState(Vector2.new(0, 0));
-    local v14, v15 = v4.useState(v9.Loading);
-    local v16, v17 = v4.useState(Vector2.new(0, 0));
-    v4.useEffect(function() --[[ Line: 41 ]]
-        -- upvalues: v11 (copy), l_ContentProvider_0 (ref), v15 (copy), v9 (ref)
-        if v11.Video == nil or v11.Video == "" then
-            return;
-        else
-            local v19 = l_ContentProvider_0:GetAssetFetchStatusChangedSignal(v11.Video):Connect(function(v18) --[[ Line: 47 ]]
-                -- upvalues: v15 (ref), v9 (ref)
-                if v18 == Enum.AssetFetchStatus.Failure then
-                    v15(v9.Failed);
-                end;
-            end);
-            return function() --[[ Line: 53 ]]
-                -- upvalues: v19 (copy), v15 (ref), v9 (ref)
-                v19:Disconnect();
-                v15(v9.Loading);
-            end;
-        end;
-    end, {
-        v11.Video
-    });
-    local v21 = v4.useCallback(function(v20) --[[ Line: 59 ]]
-        -- upvalues: v13 (copy)
-        v13(v20.AbsoluteSize);
-    end, {
-        v13
-    });
-    local v24 = v4.useCallback(function(v22) --[[ Line: 63 ]]
-        -- upvalues: v17 (copy), v11 (copy)
-        local l_Resolution_0 = v22.Resolution;
-        v17(l_Resolution_0);
-        if v11.onResolutionChanged then
-            v11.onResolutionChanged(l_Resolution_0);
-        end;
-    end, {
-        v11.onResolutionChanged, 
-        v17
-    });
-    local v26 = v4.useCallback(function(v25) --[[ Line: 72 ]]
-        -- upvalues: v14 (copy), v9 (ref), v15 (copy), v11 (copy)
-        if v14 == v9.Loading then
-            v15(v9.Finished);
-        end;
-        v11.onLoaded(v25);
-    end, {
-        v14, 
-        v11.onLoaded
-    });
-    if v14 == v9.Failed then
-        return v11.renderOnFailed();
-    else
-        local l_createElement_0 = v4.createElement;
-        local l_l_View_0_0 = l_View_0;
-        local v29 = {
-            AnchorPoint = v11.AnchorPoint, 
-            BackgroundTransparency = v11.BackgroundTransparency, 
-            ClipsDescendants = true, 
-            isDisabled = true, 
-            onAbsoluteSizeChanged = v21, 
-            Position = v11.Position, 
-            Size = v11.Size, 
-            ZIndex = v11.ZIndex
-        };
-        local v30 = {};
-        local l_createElement_1 = v4.createElement;
-        local v32 = "VideoFrame";
-        local v33 = {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Looped = v11.Looped == nil or v11.Looped, 
-            Playing = v11.Playing, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            ref = v11.videoRef, 
-            Size = if v11.scaleType == Enum.ScaleType.Fit then v8(v12, v16) else if v11.scaleType == Enum.ScaleType.Crop then v7(v12, v16) else UDim2.fromScale(1, 1), 
-            Video = v11.Video, 
-            VideoContent = if v10 then v11.VideoContent else nil
-        };
-        local v34 = false;
-        if v16.X > 0 then
-            v34 = v16.Y > 0;
-        end;
-        v33.Visible = v34;
-        v33[v4.Change.Resolution] = v24;
-        v33[v4.Event.Loaded] = v26;
-        v30.VideoFrame = l_createElement_1(v32, v33, {
-            Corner = if v11.cornerRadius then v4.createElement("UICorner", {
-                CornerRadius = UDim.new(0, v11.cornerRadius)
-            }) else nil
-        });
-        v30.Shimmer = if v14 ~= v9.Finished then v4.createElement(l_Skeleton_0, {
-            Size = UDim2.fromScale(1, 1), 
-            ZIndex = 2
-        }) else nil;
-        return l_createElement_0(l_l_View_0_0, v29, v30);
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ContentProvider = game:GetService("ContentProvider")
+local Foundation = require(ParentParentParent.Foundation)
+local React = require(ParentParentParent.React)
+local Skeleton = Foundation.Skeleton
+local View = Foundation.View
+local getCropSize = require(ParentParent.Utils.getCropSize)
+local getFitSize = require(ParentParent.Utils.getFitSize)
+local LoadingState = require(ParentParent.Enums.LoadingState)
+local FFlagUseRbxStorageInCapturesCommon = require(ParentParent.Flags.FFlagUseRbxStorageInCapturesCommon)
+
+return function(t1: {[any]: any}) -- line: 36
+	-- upvalues: React (copy), LoadingState (copy), ContentProvider (copy), View (copy), getFitSize (copy), getCropSize (copy), FFlagUseRbxStorageInCapturesCommon (copy), Skeleton (copy)
+	local v13, v14 = React.useState(Vector2.new(0, 0))
+	local v15, v16 = React.useState(LoadingState.Loading)
+	local v17, v18 = React.useState(Vector2.new(0, 0))
+
+	React.useEffect(function() -- line: 41
+		-- upvalues: t1 (copy), ContentProvider (copy), v16 (copy), LoadingState (copy)
+		if t1.Video == nil or t1.Video == "" then
+			return
+		end
+
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(t1.Video):Connect(function(p1) -- line: 47
+			-- upvalues: v16 (copy), LoadingState (copy)
+			if p1 == Enum.AssetFetchStatus.Failure then
+				v16(LoadingState.Failed)
+			end
+		end)
+
+		return function() -- line: 53
+			-- upvalues: connection (copy), v16 (copy), LoadingState (copy)
+			connection:Disconnect()
+			v16(LoadingState.Loading)
+		end
+	end, { t1.Video })
+
+	local v19 = React.useCallback(function(p2) -- line: 59
+		-- upvalues: v14 (copy)
+		v14(p2.AbsoluteSize)
+	end, { v14 })
+	local v20 = React.useCallback(function(p3) -- line: 63
+		-- upvalues: v18 (copy), t1 (copy)
+		local Resolution = p3.Resolution
+
+		v18(Resolution)
+
+		if t1.onResolutionChanged then
+			t1.onResolutionChanged(Resolution)
+		end
+	end, {
+		t1.onResolutionChanged,
+		v18
+	})
+	local v21 = React.useCallback(function(p4) -- line: 72
+		-- upvalues: v15 (copy), LoadingState (copy), v16 (copy), t1 (copy)
+		if v15 == LoadingState.Loading then
+			v16(LoadingState.Finished)
+		end
+
+		t1.onLoaded(p4)
+	end, {
+		v15,
+		t1.onLoaded
+	})
+
+	if v15 == LoadingState.Failed then
+		return t1.renderOnFailed()
+	end
+
+	return React.createElement(View, {
+		ClipsDescendants = true,
+		isDisabled = true,
+		AnchorPoint = t1.AnchorPoint,
+		BackgroundTransparency = t1.BackgroundTransparency,
+		onAbsoluteSizeChanged = v19,
+		Position = t1.Position,
+		Size = t1.Size,
+		ZIndex = t1.ZIndex
+	}, {
+		VideoFrame = React.createElement("VideoFrame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundTransparency = 1,
+			Looped = t1.Looped == nil or t1.Looped,
+			Playing = t1.Playing,
+			Position = UDim2.fromScale(0.5, 0.5),
+			ref = t1.videoRef,
+			Size = if t1.scaleType ~= Enum.ScaleType.Fit then if t1.scaleType ~= Enum.ScaleType.Crop then UDim2.fromScale(1, 1) else getCropSize(v13, v17) else getFitSize(v13, v17),
+			Video = t1.Video,
+			VideoContent = if not FFlagUseRbxStorageInCapturesCommon then nil else t1.VideoContent,
+			Visible = v17.X > 0 and v17.Y > 0,
+			[React.Change.Resolution] = v20,
+			[React.Event.Loaded] = v21
+		}, {
+			Corner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, t1.cornerRadius)
+			})
+		}),
+		Shimmer = if v15 == LoadingState.Finished then nil else React.createElement(Skeleton, {
+			ZIndex = 2,
+			Size = UDim2.fromScale(1, 1)
+		})
+	})
+end

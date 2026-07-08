@@ -1,4 +1,7 @@
 return {
+	ExpChatLocalChatEnabledMessageExperimentation = require(script.ExpChatLocalChatEnabledMessageExperimentation),
+	ArgoPartyExperimentation = require(script.ArgoPartyExperimentation),
+	ExpChatNewSystemMessagesExperimentation = require(script.ExpChatNewSystemMessagesExperimentation),
 	QueueExperimentation = require(script.QueueExperimentation),
 	ScheduledSquadsListExperimentation = require(script.ScheduledSquadsListExperimentation),
 	SquadCoordinationExperienceJoinExperimentation = require(script.SquadCoordinationExperienceJoinExperimentation),

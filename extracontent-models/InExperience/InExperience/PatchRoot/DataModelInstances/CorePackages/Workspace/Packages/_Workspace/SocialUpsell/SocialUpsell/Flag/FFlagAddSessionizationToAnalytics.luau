@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddSessionizationToAnalytics", false);
+return game:DefineFastFlag("AddSessionizationToAnalytics", false)

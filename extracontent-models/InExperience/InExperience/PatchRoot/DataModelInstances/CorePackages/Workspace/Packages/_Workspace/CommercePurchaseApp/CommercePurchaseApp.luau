@@ -1,4 +1,4 @@
 return {
-    renderCommercePurchaseApp = require(script.renderCommercePurchaseApp), 
-    ["jest.config"] = script["jest.config"]
-};
+	renderCommercePurchaseApp = require(script.renderCommercePurchaseApp),
+	["jest.config"] = script["jest.config"]
+}

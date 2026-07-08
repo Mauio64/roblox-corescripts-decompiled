@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXLogItemsUnavailablePromptShown", false);
+return game:DefineFastFlag("AXLogItemsUnavailablePromptShown", false)

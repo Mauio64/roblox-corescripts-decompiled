@@ -1,4 +1,4 @@
 return {
-    SetShareInviteLink = require(script.SetShareInviteLink), 
-    ClearShareInviteLink = require(script.ClearShareInviteLink)
-};
+	SetShareInviteLink = require(script.SetShareInviteLink),
+	ClearShareInviteLink = require(script.ClearShareInviteLink)
+}

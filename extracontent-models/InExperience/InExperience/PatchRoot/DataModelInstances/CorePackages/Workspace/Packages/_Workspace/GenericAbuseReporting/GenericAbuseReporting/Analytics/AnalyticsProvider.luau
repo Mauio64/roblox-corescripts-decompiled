@@ -1,38 +1,44 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.submitAnalytics);
-local v3 = require(script.Parent.AnalyticsSubmitContext);
-local v4 = require(script.Parent.AnalyticsStateContext);
-local v5 = require(script.Parent.AnalyticsDispatchContext);
-local v6 = require(script.Parent.AnalyticsReducer);
-return function(v7) --[[ Line: 22 ]] --[[ Name: AnalyticsProvider ]]
-    -- upvalues: v1 (copy), v6 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy)
-    local v8, v9 = v1.useReducer(v6.reducer, v6.initialState);
-    local v12 = v1.useCallback(function(v10) --[[ Line: 25 ]]
-        -- upvalues: v7 (copy), v8 (copy), v2 (ref)
-        local v11 = if v7.onBeforeSubmitAnalytics then v7.onBeforeSubmitAnalytics(v8) else v8;
-        if v11 then
-            if v7.onSubmitAnalytics then
-                v7.onSubmitAnalytics(v11, v10);
-                return;
-            else
-                v2(v11, v10);
-            end;
-        end;
-    end, {
-        v8, 
-        v7.onBeforeSubmitAnalytics, 
-        v7.onSubmitAnalytics
-    });
-    return v1.createElement(v3.Provider, {
-        value = v12
-    }, {
-        stateProvider = v1.createElement(v4.Provider, {
-            value = v8
-        }, {
-            dispatchProvider = v1.createElement(v5.Provider, {
-                value = v9
-            }, v7.children)
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+local submitAnalytics = require(script.Parent.submitAnalytics)
+local AnalyticsSubmitContext = require(script.Parent.AnalyticsSubmitContext)
+local AnalyticsStateContext = require(script.Parent.AnalyticsStateContext)
+local AnalyticsDispatchContext = require(script.Parent.AnalyticsDispatchContext)
+local AnalyticsReducer = require(script.Parent.AnalyticsReducer)
+
+local function AnalyticsProvider(t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), AnalyticsReducer (copy), submitAnalytics (copy), AnalyticsSubmitContext (copy), AnalyticsStateContext (copy), AnalyticsDispatchContext (copy)
+	local v10, v11 = React.useReducer(AnalyticsReducer.reducer, AnalyticsReducer.initialState)
+	local v12 = React.useCallback(function(p1) -- line: 25
+		-- upvalues: t1 (copy), v10 (copy), submitAnalytics (copy)
+		local v14 = if not t1.onBeforeSubmitAnalytics then v10 else t1.onBeforeSubmitAnalytics(v10)
+
+		if v14 then
+			if t1.onSubmitAnalytics then
+				t1.onSubmitAnalytics(v14, p1)
+
+				return
+			end
+
+			submitAnalytics(v14, p1)
+		end
+	end, {
+		v10,
+		t1.onBeforeSubmitAnalytics,
+		t1.onSubmitAnalytics
+	})
+
+	return React.createElement(AnalyticsSubmitContext.Provider, {
+		value = v12
+	}, {
+		stateProvider = React.createElement(AnalyticsStateContext.Provider, {
+			value = v10
+		}, {
+			dispatchProvider = React.createElement(AnalyticsDispatchContext.Provider, {
+				value = v11
+			}, t1.children)
+		})
+	})
+end
+
+return AnalyticsProvider

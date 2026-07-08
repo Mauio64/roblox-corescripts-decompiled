@@ -9,8 +9,11 @@ return {
 	ProfileCompletion = "ProfileCompletion",
 	ProfileActionBar = "ProfileActionBar",
 	PartyChatConversationUA = "PartyChatConversationUA",
+	AddFriendsPage = "AddFriendsPage",
+	TrustedFriends = "TrustedFriends",
 	PartyChatConversationInExperience = "PartyChatConversationInExperience",
 	PartyTabInExperience = "PartyTabInExperience",
 	InExperienceChatInputBar = "InExperienceChatInputBar",
-	InExperienceVoiceChatIcon = "InExperienceVoiceChatIcon"
+	InExperienceVoiceChatIcon = "InExperienceVoiceChatIcon",
+	TrustedFriendsInExperience = "TrustedFriendsInExperience"
 }

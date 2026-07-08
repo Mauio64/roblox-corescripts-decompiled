@@ -1,50 +1,59 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.util.pcallDeferred);
-local v4 = require(l_Parent_0.util.calculateMinMax);
-local function v11(v5, v6, v7) --[[ Line: 14 ]] --[[ Name: getVerts ]]
-    -- upvalues: v3 (copy), l_UGCValidationService_0 (copy)
-    local v8, v9 = v3(function() --[[ Line: 19 ]]
-        -- upvalues: l_UGCValidationService_0 (ref), v5 (copy)
-        return l_UGCValidationService_0:GetEditableMeshVerts(v5.editableMesh);
-    end, v7);
-    if not v8 then
-        local v10 = "Failed to read mesh: " .. v5.fullName;
-        if v6 then
-            error(v10);
-        end;
-        return false, {
-            v10
-        };
-    else
-        return true, nil, v9;
-    end;
-end;
-local function v21(v12, v13) --[[ Line: 36 ]] --[[ Name: getBoundsInfo ]]
-    -- upvalues: v4 (copy)
-    local v14 = nil;
-    local v15 = nil;
-    for _, v17 in pairs(v12) do
-        local v18 = if v13 then v17 * v13 else v17;
-        local v19, v20 = v4(v14, v15, v18, v18);
-        v14 = v19;
-        v15 = v20;
-    end;
-    return v14, v15;
-end;
-return function(v22, v23) --[[ Line: 47 ]] --[[ Name: getMeshMinMax ]]
-    -- upvalues: v11 (copy), v21 (copy)
-    local l_isServer_0 = v23.isServer;
-    local v25, v26, v27 = v11(v22, l_isServer_0, v23);
-    if not v25 then
-        return v25, v26;
-    elseif not v27 or #v27 == 0 then
-        return false, {
-            "Mesh: " .. v22.fullName .. " contains no verts"
-        };
-    else
-        local v28, v29 = v21(v27, v22.scale);
-        return true, nil, v28, v29;
-    end;
-end;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local calculateMinMax = require(ParentParent.util.calculateMinMax)
+
+local function getVerts(p1, b1: boolean?, p2) -- line: 14
+	-- upvalues: pcallDeferred (copy), UGCValidationService (copy)
+	local v11, v12 = pcallDeferred(function() -- line: 19
+		-- upvalues: UGCValidationService (copy), p1 (copy)
+		return UGCValidationService:GetEditableMeshVerts(p1.editableMesh)
+	end, p2)
+
+	if not v11 then
+		local v13 = "Failed to read mesh: " .. p1.fullName
+
+		if b1 then
+			error(v13)
+		end
+
+		return false, { v13 }
+	end
+
+	return true, nil, v12
+end
+local function getBoundsInfo(p3, vector3: Vector3?) -- line: 36
+	-- upvalues: calculateMinMax (copy)
+	local v16 = nil
+	local v17 = nil
+
+	for _, v in pairs(p3) do
+		local v20 = if not vector3 then v else v * vector3
+
+		v16, v17 = calculateMinMax(v16, v17, v20, v20)
+	end
+
+	return v16, v17
+end
+local function getMeshMinMax(p4, p5) -- line: 47
+	-- upvalues: getVerts (copy), getBoundsInfo (copy)
+	local isServer = p5.isServer
+	local v24, v25, v26 = getVerts(p4, isServer, p5)
+
+	if not v24 then
+		return v24, v25
+	end
+
+	if not v26 or #v26 == 0 then
+		return false, { "Mesh: " .. p4.fullName .. " contains no verts" }
+	end
+
+	local v27, v28 = getBoundsInfo(v26, p4.scale)
+
+	return true, nil, v27, v28
+end
+
+return getMeshMinMax

@@ -1,24 +1,25 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Rodux_0 = require(l_CorePackages_0.Packages.InGameMenuDependencies).Rodux;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Resources.Constants);
-local v4 = require(l_Parent_0.Actions.SetInspectMenuEnabled);
-local v5 = require(l_Parent_0.Actions.SetInputType);
-local l_InputType_0 = v3.InputType;
-return l_Rodux_0.createReducer({
-    inspectMenuEnabled = true, 
-    inputType = l_InputType_0.MouseAndKeyboard
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.InGameMenuDependencies).Rodux
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Resources.Constants)
+local SetInspectMenuEnabled = require(ParentParent.Actions.SetInspectMenuEnabled)
+local SetInputType = require(ParentParent.Actions.SetInputType)
+local InputType = Constants.InputType
+
+return Rodux.createReducer({
+	inspectMenuEnabled = true,
+	inputType = InputType.MouseAndKeyboard
 }, {
-    [v4.name] = function(v7, v8) --[[ Line: 20 ]]
-        return {
-            inspectMenuEnabled = v8.enabled, 
-            inputType = v7.inputType
-        };
-    end, 
-    [v5.name] = function(v9, v10) --[[ Line: 27 ]]
-        return {
-            inspectMenuEnabled = v9.inspectMenuEnabled, 
-            inputType = v10.inputType
-        };
-    end
-});
+	[SetInspectMenuEnabled.name] = function(p1, p2) -- line: 20
+		return {
+			inspectMenuEnabled = p2.enabled,
+			inputType = p1.inputType
+		}
+	end,
+	[SetInputType.name] = function(p3, p4) -- line: 27
+		return {
+			inspectMenuEnabled = p3.inspectMenuEnabled,
+			inputType = p4.inputType
+		}
+	end
+})

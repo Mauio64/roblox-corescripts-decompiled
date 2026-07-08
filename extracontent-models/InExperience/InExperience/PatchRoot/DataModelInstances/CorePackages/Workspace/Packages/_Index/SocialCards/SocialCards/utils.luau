@@ -1,3 +1,3 @@
 return {
-    CardsHelper = require(script.CardsHelper)
-};
+	CardsHelper = require(script.CardsHelper)
+}

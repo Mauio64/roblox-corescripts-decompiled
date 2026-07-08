@@ -1,28 +1,32 @@
-local v0 = _G.__SIGNALS_VALIDATION_ENABLED__ or _G.__DEV__;
-local function v4(v1, v2, ...) --[[ Line: 3 ]] --[[ Name: handleNoYieldValidation ]]
-    if not v2 then
-        local v3 = ...;
-        if typeof(v3) == "string" then
-            error(debug.traceback(v1, v3), 2);
-        else
-            error(tostring(v3), 2);
-        end;
-    end;
-    if coroutine.status(v1) ~= "dead" then
-        error(debug.traceback(v1, "Attempted to yield!"), 2);
-    end;
-    return ...;
-end;
-local function v7(v5, ...) --[[ Line: 20 ]] --[[ Name: callWithValidation ]]
-    -- upvalues: v4 (copy)
-    local v6 = coroutine.create(v5);
-    return v4(v6, coroutine.resume(v6, ...));
-end;
-local function v9(v8, ...) --[[ Line: 25 ]] --[[ Name: callWithoutValidation ]]
-    return v8(...);
-end;
-if v0 then
-    return v7;
-else
-    return v9;
-end;
+local function handleNoYieldValidation(p1: thread, b1: boolean, ...) -- line: 3
+	if not b1 then
+		local v6 = ...
+
+		if typeof(v6) == "string" then
+			error(debug.traceback(p1, v6), 2)
+		else
+			error(tostring(v6), 2)
+		end
+	end
+
+	if coroutine.status(p1) ~= "dead" then
+		error(debug.traceback(p1, "Attempted to yield!"), 2)
+	end
+
+	return ...
+end
+local function callWithValidation(p2: ((...any) -> ...any), ...) -- line: 20
+	-- upvalues: handleNoYieldValidation (copy)
+	local co = coroutine.create(p2)
+
+	return handleNoYieldValidation(co, coroutine.resume(co, ...))
+end
+local function callWithoutValidation(p3: ((...any) -> ...any), ...) -- line: 25
+	return p3(...)
+end
+
+if _G.__SIGNALS_VALIDATION_ENABLED__ or _G.__DEV__ then
+	return callWithValidation
+end
+
+return callWithoutValidation

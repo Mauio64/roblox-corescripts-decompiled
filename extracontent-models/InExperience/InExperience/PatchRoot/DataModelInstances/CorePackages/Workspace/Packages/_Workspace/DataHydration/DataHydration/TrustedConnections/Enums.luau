@@ -1,3 +1,3 @@
 return {
-    TrustedConnectionStatus = require(script.TrustedConnectionStatus)
-};
+	TrustedConnectionStatus = require(script.TrustedConnectionStatus)
+}

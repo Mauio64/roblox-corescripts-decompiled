@@ -1,16 +1,18 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v2 = require(l_Parent_0.React);
-local v3 = {};
-local v4 = v2.createContext(nil);
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local t1 = {}
+local v4 = require(ParentParent.React).createContext(nil)
+
 if _G.__DEV__ then
-    v4.displayName = "ScrollViewContext";
-end;
-v3.default = v4;
-v3.HORIZONTAL = l_Object_0.freeze({
-    horizontal = true
-});
-v3.VERTICAL = l_Object_0.freeze({
-    horizontal = false
-});
-return v3;
+	v4.displayName = "ScrollViewContext"
+end
+
+t1.default = v4
+t1.HORIZONTAL = Object.freeze({
+	horizontal = true
+})
+t1.VERTICAL = Object.freeze({
+	horizontal = false
+})
+
+return t1

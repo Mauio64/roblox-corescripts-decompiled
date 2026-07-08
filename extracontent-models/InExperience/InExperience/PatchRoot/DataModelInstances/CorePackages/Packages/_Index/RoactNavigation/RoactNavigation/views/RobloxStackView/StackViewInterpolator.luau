@@ -1,147 +1,175 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.utils.getSceneIndicesForInterpolationInputRange);
-local v2 = require(l_Parent_0.utils.lerp);
-local function v6(v3) --[[ Line: 33 ]] --[[ Name: forInitial ]]
-    local v4 = v3.initialPositionValue ~= v3.scene.index;
-    local v5 = v4 and 1000000 or 0;
-    return {
-        forceHidden = v4, 
-        initialPosition = UDim2.new(0, v5, 0, v5), 
-        positionStep = nil
-    };
-end;
+local ParentParent = script.Parent.Parent.Parent
+local getSceneIndicesForInterpolationInputRange = require(ParentParent.utils.getSceneIndicesForInterpolationInputRange)
+local lerp = require(ParentParent.utils.lerp)
+
+local function forInitial(p1) -- line: 33
+	local v6 = p1.initialPositionValue ~= p1.scene.index
+	local v7 = not v6 and 0 or 1000000
+
+	return {
+		positionStep = nil,
+		forceHidden = v6,
+		initialPosition = UDim2.new(0, v7, 0, v7)
+	}
+end
+
 return {
-    forHorizontal = function(v7) --[[ Line: 48 ]] --[[ Name: forHorizontal ]]
-        -- upvalues: v6 (copy), v1 (copy), v2 (copy)
-        local l_initialPositionValue_0 = v7.initialPositionValue;
-        local l_layout_0 = v7.layout;
-        local l_scene_0 = v7.scene;
-        if not l_layout_0.isMeasured then
-            return (v6(v7));
-        else
-            local v11 = v1(v7);
-            if not v11 then
-                return {
-                    forceHidden = true, 
-                    initialPosition = UDim2.new(0, 100000, 0, 100000), 
-                    positionStep = nil
-                };
-            else
-                local l_first_0 = v11.first;
-                local l_last_0 = v11.last;
-                local l_index_0 = l_scene_0.index;
-                local l_initWidth_0 = l_layout_0.initWidth;
-                local function _(v16) --[[ Line: 75 ]] --[[ Name: calculate ]]
-                    -- upvalues: l_first_0 (copy), l_initWidth_0 (copy), l_index_0 (copy), v2 (ref), l_last_0 (copy)
-                    if v16 < l_first_0 then
-                        return l_initWidth_0;
-                    elseif v16 < l_index_0 then
-                        return v2(l_initWidth_0, 0, (v16 - l_first_0) / (l_index_0 - l_first_0));
-                    elseif v16 == l_index_0 then
-                        return 0;
-                    elseif v16 < l_last_0 then
-                        return v2(0, -l_initWidth_0, (v16 - l_index_0) / (l_last_0 - l_index_0));
-                    else
-                        return -l_initWidth_0;
-                    end;
-                end;
-                local function v22(v18, v19) --[[ Line: 90 ]] --[[ Name: stepper ]]
-                    -- upvalues: l_first_0 (copy), l_initWidth_0 (copy), l_index_0 (copy), v2 (ref), l_last_0 (copy)
-                    local l_current_0 = v18.current;
-                    if not l_current_0 then
-                        return;
-                    else
-                        local l_Position_0 = l_current_0.Position;
-                        l_current_0.Position = UDim2.new(l_Position_0.X.Scale, if v19 < l_first_0 then l_initWidth_0 else if v19 < l_index_0 then v2(l_initWidth_0, 0, (v19 - l_first_0) / (l_index_0 - l_first_0)) else v19 == l_index_0 and 0 or if v19 < l_last_0 then v2(0, -l_initWidth_0, (v19 - l_index_0) / (l_last_0 - l_index_0)) else -l_initWidth_0, l_Position_0.Y.Scale, l_Position_0.Y.Offset);
-                        return;
-                    end;
-                end;
-                return {
-                    initialPosition = UDim2.new(0, if l_initialPositionValue_0 < l_first_0 then l_initWidth_0 else if l_initialPositionValue_0 < l_index_0 then v2(l_initWidth_0, 0, (l_initialPositionValue_0 - l_first_0) / (l_index_0 - l_first_0)) else l_initialPositionValue_0 == l_index_0 and 0 or if l_initialPositionValue_0 < l_last_0 then v2(0, -l_initWidth_0, (l_initialPositionValue_0 - l_index_0) / (l_last_0 - l_index_0)) else -l_initWidth_0, 0, 0), 
-                    positionStep = v22
-                };
-            end;
-        end;
-    end, 
-    forVertical = function(v23) --[[ Line: 110 ]] --[[ Name: forVertical ]]
-        -- upvalues: v6 (copy), v1 (copy), v2 (copy)
-        local l_initialPositionValue_1 = v23.initialPositionValue;
-        local l_layout_1 = v23.layout;
-        local l_scene_1 = v23.scene;
-        if not l_layout_1.isMeasured then
-            return (v6(v23));
-        else
-            local v27 = v1(v23);
-            if not v27 then
-                return {
-                    forceHidden = true, 
-                    initialPosition = UDim2.new(0, 100000, 0, 100000), 
-                    positionStep = nil
-                };
-            else
-                local l_first_1 = v27.first;
-                local l_index_1 = l_scene_1.index;
-                local l_initHeight_0 = l_layout_1.initHeight;
-                local function v32(v31) --[[ Line: 133 ]] --[[ Name: calculate ]]
-                    -- upvalues: l_first_1 (copy), l_initHeight_0 (copy), l_index_1 (copy), v2 (ref)
-                    if v31 < l_first_1 then
-                        return l_initHeight_0;
-                    elseif v31 < l_index_1 then
-                        return v2(l_initHeight_0, 0, (v31 - l_first_1) / (l_index_1 - l_first_1));
-                    else
-                        return 0;
-                    end;
-                end;
-                return {
-                    initialPosition = UDim2.new(0, 0, 0, v32(l_initialPositionValue_1)), 
-                    positionStep = function(v33, v34) --[[ Line: 144 ]] --[[ Name: stepper ]]
-                        -- upvalues: v32 (copy)
-                        local l_current_1 = v33.current;
-                        if not l_current_1 then
-                            return;
-                        else
-                            local l_Position_1 = l_current_1.Position;
-                            l_current_1.Position = UDim2.new(l_Position_1.X.Scale, l_Position_1.X.Offset, l_Position_1.Y.Scale, v32(v34));
-                            return;
-                        end;
-                    end
-                };
-            end;
-        end;
-    end, 
-    forFade = function(v37) --[[ Line: 165 ]] --[[ Name: forFade ]]
-        -- upvalues: v6 (copy), v1 (copy)
-        local l_initialPositionValue_2 = v37.initialPositionValue;
-        local l_layout_2 = v37.layout;
-        local l_scene_2 = v37.scene;
-        if not l_layout_2.isMeasured then
-            return (v6(v37));
-        elseif not v1(v37) then
-            return {
-                forceHidden = true, 
-                initialPosition = UDim2.new(0, 100000, 0, 100000), 
-                positionStep = nil
-            };
-        else
-            local l_index_2 = l_scene_2.index;
-            local function _(v42) --[[ Line: 186 ]] --[[ Name: calculate ]]
-                -- upvalues: l_index_2 (copy)
-                return l_index_2 - 0.5 <= v42;
-            end;
-            return {
-                forceHidden = not (l_index_2 - 0.5 <= l_initialPositionValue_2), 
-                initialPosition = UDim2.new(0, 0, 0, 0), 
-                positionStep = function(v44, v45) --[[ Line: 190 ]] --[[ Name: stepper ]]
-                    -- upvalues: l_index_2 (copy)
-                    local l_current_2 = v44.current;
-                    if not l_current_2 then
-                        return;
-                    else
-                        l_current_2.Visible = l_index_2 - 0.5 <= v45;
-                        return;
-                    end;
-                end
-            };
-        end;
-    end
-};
+	forHorizontal = function(p2) -- line: 48
+		-- upvalues: forInitial (copy), getSceneIndicesForInterpolationInputRange (copy), lerp (copy)
+		local initialPositionValue = p2.initialPositionValue
+		local layout = p2.layout
+		local scene = p2.scene
+
+		if not layout.isMeasured then
+			return (forInitial(p2))
+		end
+
+		local v12 = getSceneIndicesForInterpolationInputRange(p2)
+
+		if not v12 then
+			return {
+				forceHidden = true,
+				positionStep = nil,
+				initialPosition = UDim2.new(0, 100000, 0, 100000)
+			}
+		end
+
+		local first = v12.first
+		local last = v12.last
+		local index = scene.index
+		local initWidth = layout.initWidth
+
+		local function calculate(p3) -- line: 75
+			-- upvalues: first (copy), initWidth (copy), index (copy), lerp (copy), last (copy)
+			if p3 < first then
+				return initWidth
+			end
+
+			if p3 < index then
+				return lerp(initWidth, 0, (p3 - first) / (index - first))
+			end
+
+			if p3 == index then
+				return 0
+			end
+
+			if p3 < last then
+				return lerp(0, -initWidth, (p3 - index) / (last - index))
+			end
+
+			return -initWidth
+		end
+		local function stepper(p4, p5) -- line: 90
+			-- upvalues: first (copy), initWidth (copy), index (copy), lerp (copy), last (copy)
+			local current = p4.current
+
+			if not current then
+				return
+			end
+
+			local currentPosition = current.Position
+
+			current.Position = UDim2.new(currentPosition.X.Scale, if not (p5 < first) then if not (p5 < index) then if p5 ~= index then if not (p5 < last) then -initWidth else lerp(0, -initWidth, (p5 - index) / (last - index)) else 0 else lerp(initWidth, 0, (p5 - first) / (index - first)) else initWidth, currentPosition.Y.Scale, currentPosition.Y.Offset)
+		end
+
+		return {
+			initialPosition = UDim2.new(0, if not (initialPositionValue < first) then if not (initialPositionValue < index) then if initialPositionValue ~= index then if not (initialPositionValue < last) then -initWidth else lerp(0, -initWidth, (initialPositionValue - index) / (last - index)) else 0 else lerp(initWidth, 0, (initialPositionValue - first) / (index - first)) else initWidth, 0, 0),
+			positionStep = stepper
+		}
+	end,
+	forVertical = function(p6) -- line: 110
+		-- upvalues: forInitial (copy), getSceneIndicesForInterpolationInputRange (copy), lerp (copy)
+		local initialPositionValue = p6.initialPositionValue
+		local layout = p6.layout
+		local scene = p6.scene
+
+		if not layout.isMeasured then
+			return (forInitial(p6))
+		end
+
+		local v23 = getSceneIndicesForInterpolationInputRange(p6)
+
+		if not v23 then
+			return {
+				forceHidden = true,
+				positionStep = nil,
+				initialPosition = UDim2.new(0, 100000, 0, 100000)
+			}
+		end
+
+		local first = v23.first
+		local index = scene.index
+		local initHeight = layout.initHeight
+
+		local function calculate(p7) -- line: 133
+			-- upvalues: first (copy), initHeight (copy), index (copy), lerp (copy)
+			if p7 < first then
+				return initHeight
+			end
+
+			if p7 < index then
+				return lerp(initHeight, 0, (p7 - first) / (index - first))
+			end
+
+			return 0
+		end
+		local function stepper(p8, p9) -- line: 144
+			-- upvalues: calculate (copy)
+			local current = p8.current
+
+			if not current then
+				return
+			end
+
+			local currentPosition = current.Position
+
+			current.Position = UDim2.new(currentPosition.X.Scale, currentPosition.X.Offset, currentPosition.Y.Scale, calculate(p9))
+		end
+
+		return {
+			initialPosition = UDim2.new(0, 0, 0, calculate(initialPositionValue)),
+			positionStep = stepper
+		}
+	end,
+	forFade = function(p10) -- line: 165
+		-- upvalues: forInitial (copy), getSceneIndicesForInterpolationInputRange (copy)
+		local initialPositionValue = p10.initialPositionValue
+		local layout = p10.layout
+		local scene = p10.scene
+
+		if not layout.isMeasured then
+			return (forInitial(p10))
+		end
+
+		if not getSceneIndicesForInterpolationInputRange(p10) then
+			return {
+				forceHidden = true,
+				positionStep = nil,
+				initialPosition = UDim2.new(0, 100000, 0, 100000)
+			}
+		end
+
+		local index = scene.index
+
+		local function calculate(p11) -- line: 186
+			-- upvalues: index (copy)
+			return p11 >= index - 0.5
+		end
+		local function stepper(p12, p13) -- line: 190
+			-- upvalues: index (copy)
+			local current = p12.current
+
+			if not current then
+				return
+			end
+
+			current.Visible = p13 >= index - 0.5
+		end
+
+		return {
+			forceHidden = not (initialPositionValue >= index - 0.5),
+			initialPosition = UDim2.new(0, 0, 0, 0),
+			positionStep = stepper
+		}
+	end
+}

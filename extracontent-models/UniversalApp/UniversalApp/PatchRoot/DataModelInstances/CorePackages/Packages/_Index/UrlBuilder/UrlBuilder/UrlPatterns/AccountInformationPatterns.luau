@@ -1,6 +1,6 @@
-return function(v0) --[[ Line: 1 ]]
-    return {
-        metadata = v0.fromString("accountinformation:metadata"), 
-        phone = v0.fromString("accountinformation:phone")
-    };
-end;
+return function(p1) -- line: 1
+	return {
+		metadata = p1.fromString("accountinformation:metadata"),
+		phone = p1.fromString("accountinformation:phone")
+	}
+end

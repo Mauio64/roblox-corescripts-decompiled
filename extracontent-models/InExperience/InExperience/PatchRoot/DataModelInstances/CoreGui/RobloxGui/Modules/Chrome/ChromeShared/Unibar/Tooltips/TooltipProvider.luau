@@ -1,126 +1,130 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local l_dependencyArray_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.dependencyArray;
-local v3 = require(script.Parent.TooltipContext);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-TooltipProvider = function(v5) --[[ Line: 33 ]] --[[ Name: TooltipProvider ]]
-    -- upvalues: v1 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v3 (copy)
-    local v6, v7 = v1.useState(nil);
-    local v8 = v1.useRef(nil);
-    local v9 = v1.useRef(nil);
-    local v10 = v1.useRef(nil);
-    local v11 = v1.useRef({});
-    local v13 = v1.useCallback(function(v12) --[[ Line: 44 ]]
-        -- upvalues: v7 (copy), v8 (copy), v9 (copy)
-        v7(v12);
-        v8.current = v12;
-        if v8.current and v9.current and v8.current.id == v9.current.id then
-            v9.current = nil;
-        end;
-    end, {});
-    local v18 = v1.useCallback(function(v14) --[[ Line: 56 ]]
-        -- upvalues: v8 (copy), v13 (copy), v9 (copy), v11 (copy)
-        if v8 and v8.current and v8.current.id == v14 then
-            v13(nil);
-        end;
-        if v9 and v9.current and v9.current.id == v14 then
-            v9.current = nil;
-        end;
-        local v15 = nil;
-        for _, v17 in pairs(v11.current) do
-            if v17.id == v14 then
-                v15 = v17;
-                break;
-            end;
-        end;
-        if v15 and v15.priority and v11.current[v15.priority] then
-            v11.current[v15.priority] = nil;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v6
-    } else l_dependencyArray_0(v6));
-    v10.current = v1.useCallback(function() --[[ Line: 77 ]]
-        -- upvalues: v8 (copy), v9 (copy), v11 (copy), v13 (copy), v18 (copy), v10 (copy)
-        if v8.current or v9.current then
-            return;
-        else
-            local l_current_0 = v11.current;
-            local v20 = {};
-            for _, v22 in pairs(l_current_0) do
-                table.insert(v20, v22);
-            end;
-            table.sort(v20, function(v23, v24) --[[ Line: 89 ]]
-                return v23.priority > v24.priority;
-            end);
-            local v25 = v20[1];
-            if not v25 then
-                return;
-            else
-                v9.current = v25;
-                task.delay(v25.showDelay / 1000, function() --[[ Line: 100 ]]
-                    -- upvalues: v13 (ref), v25 (copy), v18 (ref), v10 (ref)
-                    v13(v25);
-                    task.delay(v25.dismissDelay / 1000, function() --[[ Line: 103 ]]
-                        -- upvalues: v18 (ref), v25 (ref), v10 (ref)
-                        v18(v25.id);
-                        if v10.current then
-                            v10.current();
-                        end;
-                    end);
-                end);
-                return;
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v6
-    } else l_dependencyArray_0(v6));
-    local function _() --[[ Line: 112 ]]
-        -- upvalues: v10 (copy)
-        if v10.current then
-            v10.current();
-        end;
-    end;
-    local v35 = v1.useMemo(function() --[[ Line: 118 ]]
-        -- upvalues: v11 (copy), v10 (copy), v18 (copy), v6 (copy)
-        return {
-            registerTooltip = function(v27, v28, v29, v30) --[[ Line: 120 ]] --[[ Name: registerTooltip ]]
-                -- upvalues: v11 (ref), v10 (ref)
-                if not v11.current[v28] then
-                    table.insert(v11.current, v28, {
-                        id = v27, 
-                        priority = v28, 
-                        showDelay = v29, 
-                        dismissDelay = v30
-                    });
-                    if v10.current then
-                        v10.current();
-                    end;
-                end;
-            end, 
-            unregisterTooltip = function(v31) --[[ Line: 131 ]] --[[ Name: unregisterTooltip ]]
-                -- upvalues: v18 (ref), v10 (ref)
-                v18(v31);
-                if v10.current then
-                    v10.current();
-                end;
-            end, 
-            dismissTooltip = function(v32, _) --[[ Line: 135 ]] --[[ Name: dismissTooltip ]]
-                -- upvalues: v18 (ref), v10 (ref)
-                v18(v32);
-                if v10.current then
-                    v10.current();
-                end;
-            end, 
-            isCurrentTooltip = function(v34) --[[ Line: 139 ]] --[[ Name: isCurrentTooltip ]]
-                -- upvalues: v6 (ref)
-                return v6 and v6.id == v34;
-            end
-        };
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v6
-    } else l_dependencyArray_0(v6));
-    return v1.createElement(v3.Provider, {
-        value = v35
-    }, v5.children);
-end;
-return TooltipProvider;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local TooltipContext = require(script.Parent.TooltipContext)
+
+function TooltipProvider(p1) -- line: 29
+	-- upvalues: React (copy), TooltipContext (copy)
+	local v5, v6 = React.useState(nil)
+	local v7 = React.useRef(nil)
+	local v8 = React.useRef(nil)
+	local v9 = React.useRef(nil)
+	local v10 = React.useRef({})
+	local v11 = React.useCallback(function(t1: {[any]: any}?) -- line: 40
+		-- upvalues: v6 (copy), v7 (copy), v8 (copy)
+		v6(t1)
+		v7.current = t1
+
+		if v7.current and (v8.current and v7.current.id == v8.current.id) then
+			v8.current = nil
+		end
+	end, {})
+	local v12 = React.useCallback(function(s1: string) -- line: 52
+		-- upvalues: v7 (copy), v11 (copy), v8 (copy), v10 (copy)
+		if v7 and (v7.current and s1 == v7.current.id) then
+			v11(nil)
+		end
+
+		if v8 and v8.current and s1 == v8.current.id then
+			v8.current = nil
+		end
+
+		local v16 = nil
+
+		for _, v in pairs(v10.current) do
+			if s1 == v.id then
+				v16 = v
+
+				break
+			end
+		end
+
+		if v16 and v16.priority and v10.current[v16.priority] then
+			v10.current[v16.priority] = nil
+		end
+	end, { v5 })
+
+	v9.current = React.useCallback(function() -- line: 73
+		-- upvalues: v7 (copy), v8 (copy), v10 (copy), v11 (copy), v12 (copy), v9 (copy)
+		if v7.current or v8.current then
+			return
+		end
+
+		local current = v10.current
+		local t2 = {}
+
+		for _, v in pairs(current) do
+			table.insert(t2, v)
+		end
+
+		table.sort(t2, function(t3: {[any]: any}, t4: {[any]: any}) -- line: 85
+			return t3.priority > t4.priority
+		end)
+
+		local v23 = t2[1]
+
+		if not v23 then
+			return
+		end
+
+		v8.current = v23
+		task.delay(v23.showDelay / 1000, function() -- line: 96
+			-- upvalues: v11 (copy), v23 (copy), v12 (copy), v9 (copy)
+			v11(v23)
+			task.delay(v23.dismissDelay / 1000, function() -- line: 99
+				-- upvalues: v12 (copy), v23 (copy), v9 (copy)
+				v12(v23.id)
+
+				if v9.current then
+					v9.current()
+				end
+			end)
+		end)
+	end, { v5 })
+
+	local v13 = React.useMemo(function() -- line: 114
+		-- upvalues: v10 (copy), v9 (copy), v12 (copy), v5 (copy)
+		return {
+			registerTooltip = function(s2: string, n1: number, n2: number, n3: number) -- line: 116
+				-- upvalues: v10 (copy), v9 (copy)
+				if not v10.current[n1] then
+					table.insert(v10.current, n1, {
+						id = s2,
+						priority = n1,
+						showDelay = n2,
+						dismissDelay = n3
+					})
+
+					if v9.current then
+						v9.current()
+					end
+				end
+			end,
+			unregisterTooltip = function(s3: string) -- line: 127
+				-- upvalues: v12 (copy), v9 (copy)
+				v12(s3)
+
+				if v9.current then
+					v9.current()
+				end
+			end,
+			dismissTooltip = function(s4: string, _: string?) -- line: 131
+				-- upvalues: v12 (copy), v9 (copy)
+				v12(s4)
+
+				if v9.current then
+					v9.current()
+				end
+			end,
+			isCurrentTooltip = function(s6: string) -- line: 135
+				-- upvalues: v5 (copy)
+				return v5 and s6 == v5.id
+			end
+		}
+	end, { v5 })
+
+	return React.createElement(TooltipContext.Provider, {
+		value = v13
+	}, p1.children)
+end
+
+return TooltipProvider

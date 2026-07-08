@@ -1,417 +1,500 @@
-local v0 = {
-    version = "0.9.0", 
-    options = {
-        separator = "&"
-    }, 
-    services = {
-        acap = 674, 
-        cap = 1026, 
-        dict = 2628, 
-        ftp = 21, 
-        gopher = 70, 
-        http = 80, 
-        https = 443, 
-        iax = 4569, 
-        icap = 1344, 
-        imap = 143, 
-        ipp = 631, 
-        ldap = 389, 
-        mtqp = 1038, 
-        mupdate = 3905, 
-        news = 2009, 
-        nfs = 2049, 
-        nntp = 119, 
-        rtsp = 554, 
-        sip = 5060, 
-        snmp = 161, 
-        telnet = 23, 
-        tftp = 69, 
-        vemmi = 575, 
-        afs = 1483, 
-        jms = 5673, 
-        rsync = 873, 
-        prospero = 191, 
-        videotex = 516
-    }
-};
-local v1 = {
-    ["-"] = true, 
-    _ = true, 
-    ["."] = true, 
-    ["!"] = true, 
-    ["~"] = true, 
-    ["*"] = true, 
-    ["'"] = true, 
-    ["("] = true, 
-    [")"] = true, 
-    [":"] = true, 
-    ["@"] = true, 
-    ["&"] = true, 
-    ["="] = true, 
-    ["+"] = true, 
-    ["$"] = true, 
-    [","] = true, 
-    [";"] = true
-};
-local function _(v2, v3) --[[ Line: 60 ]] --[[ Name: decode ]]
-    local l_v2_0 = v2;
-    if not v3 then
-        l_v2_0 = l_v2_0:gsub("+", " ");
-    end;
-    return (l_v2_0:gsub("%%(%x%x)", function(v5) --[[ Line: 65 ]]
-        return (string.char((tonumber(v5, 16))));
-    end));
-end;
-local function _(v7) --[[ Line: 70 ]] --[[ Name: encode ]]
-    return (v7:gsub("([^A-Za-z0-9%_%.%-%~])", function(v8) --[[ Line: 71 ]]
-        return string.upper(string.format("%%%02x", string.byte(v8)));
-    end));
-end;
-local function _(v10) --[[ Line: 77 ]] --[[ Name: encodeValue ]]
-    return v10:gsub("([^A-Za-z0-9%_%.%-%~])", function(v11) --[[ Line: 71 ]]
-        return string.upper(string.format("%%%02x", string.byte(v11)));
-    end):gsub("%%20", "+");
-end;
-local function v16(v13) --[[ Line: 82 ]] --[[ Name: encodeSegment ]]
-    -- upvalues: v1 (copy)
-    return v13:gsub("([^a-zA-Z0-9])", function(v14) --[[ Line: 83 ]]
-        -- upvalues: v1 (ref)
-        if v1[v14] then
-            return v14;
-        else
-            return (v14:gsub("([^A-Za-z0-9%_%.%-%~])", function(v15) --[[ Line: 71 ]]
-                return string.upper(string.format("%%%02x", string.byte(v15)));
-            end));
-        end;
-    end);
-end;
-local function v19(v17, v18) --[[ Line: 92 ]] --[[ Name: concat ]]
-    return v17 .. v18:build();
-end;
-v0.build = function(v20) --[[ Line: 98 ]] --[[ Name: build ]]
-    -- upvalues: v16 (copy), v0 (copy)
-    local v21 = "";
-    if v20.path then
-        local l_path_0 = v20.path;
-        l_path_0:gsub("([^/]+)", function(v23) --[[ Line: 102 ]]
-            -- upvalues: v16 (ref)
-            return v16(v23);
-        end);
-        v21 = v21 .. tostring(l_path_0);
-    end;
-    if v20.query then
-        local v24 = tostring(v20.query);
-        if v24 ~= "" then
-            v21 = v21 .. "?" .. v24;
-        end;
-    end;
-    if v20.host then
-        local l_host_0 = v20.host;
-        if v20.port and v20.scheme and v0.services[v20.scheme] ~= v20.port then
-            l_host_0 = l_host_0 .. ":" .. v20.port;
-        end;
-        local v26 = nil;
-        if v20.user and v20.user ~= "" then
-            v26 = v20.user;
-            if v20.password then
-                v26 = v26 .. ":" .. v20.password;
-            end;
-        end;
-        if v26 and v26 ~= "" then
-            l_host_0 = v26 .. "@" .. l_host_0;
-        end;
-        if l_host_0 then
-            v21 = if v21 ~= "" then "//" .. l_host_0 .. "/" .. v21:gsub("^/+", "") else "//" .. l_host_0;
-        end;
-    end;
-    if v20.scheme then
-        v21 = v20.scheme .. ":" .. v21;
-    end;
-    if v20.fragment then
-        v21 = v21 .. "#" .. v20.fragment;
-    end;
-    return v21;
-end;
-v0.buildQuery = function(v27, v28, v29) --[[ Line: 148 ]] --[[ Name: buildQuery ]]
-    -- upvalues: v0 (copy)
-    local v30 = {};
-    if not v28 then
-        v28 = v0.options.separator or "&";
-    end;
-    local v31 = {};
-    for v32 in pairs(v27) do
-        v31[#v31 + 1] = v32;
-    end;
-    table.sort(v31);
-    for _, v34 in ipairs(v31) do
-        local v35 = v27[v34];
-        v34 = tostring(v34):gsub("([^A-Za-z0-9%_%.%-%~])", function(v36) --[[ Line: 71 ]]
-            return string.upper(string.format("%%%02x", string.byte(v36)));
-        end);
-        if v29 then
-            v34 = string.format("%s[%s]", tostring(v29), (tostring(v34)));
-        end;
-        if type(v35) == "table" then
-            v30[#v30 + 1] = v0.buildQuery(v35, v28, v34);
-        else
-            local v38 = tostring(v35):gsub("([^A-Za-z0-9%_%.%-%~])", function(v37) --[[ Line: 71 ]]
-                return string.upper(string.format("%%%02x", string.byte(v37)));
-            end):gsub("%%20", "+");
-            if v38 ~= "" then
-                v30[#v30 + 1] = string.format("%s=%s", v34, v38);
-            else
-                v30[#v30 + 1] = v34;
-            end;
-        end;
-    end;
-    return table.concat(v30, v28);
-end;
-v0.parseQuery = function(v39, v40) --[[ Line: 185 ]] --[[ Name: parseQuery ]]
-    -- upvalues: v0 (copy)
-    if not v40 then
-        v40 = v0.options.separator or "&";
-    end;
-    local v41 = {};
-    for v42, v43 in v39:gmatch(string.format("([^%q=]+)(=*[^%q=]*)", v40, v40)) do
-        local v45 = v42:gsub("+", " "):gsub("%%(%x%x)", function(v44) --[[ Line: 65 ]]
-            return (string.char((tonumber(v44, 16))));
-        end);
-        local v46 = {};
-        v45 = v45:gsub("%[([^%]]*)%]", function(v47) --[[ Line: 194 ]]
-            -- upvalues: v46 (copy)
-            v47 = if string.find(v47, "^-?%d+$") then tonumber(v47) else v47:gsub("+", " "):gsub("%%(%x%x)", function(v48) --[[ Line: 65 ]]
-                return (string.char((tonumber(v48, 16))));
-            end);
-            table.insert(v46, v47);
-            return "=";
-        end):gsub("=+.*$", ""):gsub("%s", "_");
-        v43 = v43:gsub("^=+", "");
-        if not v41[v45] then
-            v41[v45] = {};
-        end;
-        if #v46 > 0 and type(v41[v45]) ~= "table" then
-            v41[v45] = {};
-        elseif #v46 == 0 and type(v41[v45]) == "table" then
-            v41[v45] = v43:gsub("+", " "):gsub("%%(%x%x)", function(v49) --[[ Line: 65 ]]
-                return (string.char((tonumber(v49, 16))));
-            end);
-        end;
-        local v50 = v41[v45];
-        for v51, v52 in ipairs(v46) do
-            if type(v50) ~= "table" then
-                v50 = {};
-            end;
-            if v52 == "" then
-                v52 = #v50 + 1;
-            end;
-            if not v50[v52] then
-                v50[v52] = {};
-            end;
-            if v51 == #v46 then
-                v50[v52] = v43:gsub("+", " "):gsub("%%(%x%x)", function(v53) --[[ Line: 65 ]]
-                    return (string.char((tonumber(v53, 16))));
-                end);
-            end;
-            v50 = v50[v52];
-        end;
-    end;
-    setmetatable(v41, {
-        __tostring = v0.buildQuery
-    });
-    return v41;
-end;
-v0.setQuery = function(v54, v55) --[[ Line: 241 ]] --[[ Name: setQuery ]]
-    -- upvalues: v0 (copy)
-    local l_v55_0 = v55;
-    if type(l_v55_0) == "table" then
-        l_v55_0 = v0.buildQuery(l_v55_0);
-    end;
-    v54.query = v0.parseQuery(l_v55_0);
-    return l_v55_0;
-end;
-v0.setAuthority = function(v57, v58) --[[ Line: 254 ]] --[[ Name: setAuthority ]]
-    v57.authority = v58;
-    v57.port = nil;
-    v57.host = nil;
-    v57.userinfo = nil;
-    v57.user = nil;
-    v57.password = nil;
-    v58 = v58:gsub("^([^@]*)@", function(v59) --[[ Line: 262 ]]
-        -- upvalues: v57 (copy)
-        v57.userinfo = v59;
-        return "";
-    end):gsub("^%[[^%]]+%]", function(v60) --[[ Line: 266 ]]
-        -- upvalues: v57 (copy)
-        v57.host = v60;
-        return "";
-    end):gsub(":([^:]*)$", function(v61) --[[ Line: 271 ]]
-        -- upvalues: v57 (copy)
-        v57.port = tonumber(v61);
-        return "";
-    end);
-    if v58 ~= "" and not v57.host then
-        v57.host = v58:lower();
-    end;
-    if v57.userinfo then
-        v57.user = v57.userinfo:gsub(":([^:]*)$", function(v62) --[[ Line: 280 ]]
-            -- upvalues: v57 (copy)
-            v57.password = v62;
-            return "";
-        end);
-    end;
-    return v58;
-end;
-v0.parse = function(v63) --[[ Line: 295 ]] --[[ Name: parse ]]
-    -- upvalues: v0 (copy), v19 (copy)
-    local v64 = {};
-    v0.setAuthority(v64, "");
-    v0.setQuery(v64, "");
-    v64.path = tostring(v63 or ""):gsub("#(.*)$", function(v65) --[[ Line: 301 ]]
-        -- upvalues: v64 (copy)
-        v64.fragment = v65;
-        return "";
-    end):gsub("^([%w][%w%+%-%.]*)%:", function(v66) --[[ Line: 305 ]]
-        -- upvalues: v64 (copy)
-        v64.scheme = v66:lower();
-        return "";
-    end):gsub("%?(.*)", function(v67) --[[ Line: 309 ]]
-        -- upvalues: v0 (ref), v64 (copy)
-        v0.setQuery(v64, v67);
-        return "";
-    end):gsub("^//([^/]*)", function(v68) --[[ Line: 313 ]]
-        -- upvalues: v0 (ref), v64 (copy)
-        v0.setAuthority(v64, v68);
-        return "";
-    end):gsub("%%(%x%x)", function(v69) --[[ Line: 65 ]]
-        return (string.char((tonumber(v69, 16))));
-    end);
-    setmetatable(v64, {
-        __index = v0, 
-        __concat = v19, 
-        __tostring = v0.build
-    });
-    return v64;
-end;
-v0.removeDotSegments = function(v70) --[[ Line: 331 ]] --[[ Name: removeDotSegments ]]
-    local v71 = {};
-    if string.len(v70) == 0 then
-        return "";
-    else
-        local v72 = false;
-        local v73 = false;
-        if string.sub(v70, 1, 1) == "/" then
-            v72 = true;
-        end;
-        if (string.len(v70) > 1 or v72 == false) and string.sub(v70, -1) == "/" then
-            v73 = true;
-        end;
-        v70:gsub("[^/]+", function(v74) --[[ Line: 345 ]]
-            -- upvalues: v71 (copy)
-            table.insert(v71, v74);
-        end);
-        local v75 = {};
-        local v76 = 0;
-        for _, v78 in ipairs(v71) do
-            if v78 == ".." then
-                if v76 > 0 then
-                    v76 = v76 - 1;
-                end;
-            elseif v78 ~= "." then
-                v76 = v76 + 1;
-                v75[v76] = v78;
-            end;
-        end;
-        local v79 = "";
-        v79 = if #v75 > 0 and v76 > 0 then table.concat(v75, "/", 1, v76) else "";
-        if v72 then
-            v79 = "/" .. v79;
-        end;
-        if v73 then
-            v79 = v79 .. "/";
-        end;
-        return v79;
-    end;
-end;
-local function v88(v80, v81) --[[ Line: 375 ]] --[[ Name: absolutePath ]]
-    if string.sub(v81, 1, 1) == "/" then
-        return "/" .. string.gsub(v81, "^[%./]+", "");
-    else
-        local l_v80_0 = v80;
-        if v81 ~= "" then
-            l_v80_0 = "/" .. l_v80_0:gsub("[^/]*$", "");
-        end;
-        l_v80_0 = (l_v80_0 .. v81):gsub("([^/]*%./)", function(v83) --[[ Line: 384 ]]
-            if v83 ~= "./" then
-                return v83;
-            else
-                return "";
-            end;
-        end);
-        l_v80_0 = string.gsub(l_v80_0, "/%.$", "/");
-        local v84 = nil;
-        while v84 ~= l_v80_0 do
-            v84 = l_v80_0;
-            l_v80_0 = string.gsub(v84, "([^/]*/%.%./)", function(v85) --[[ Line: 391 ]]
-                if v85 ~= "../../" then
-                    return "";
-                else
-                    return v85;
-                end;
-            end);
-        end;
-        l_v80_0 = string.gsub(l_v80_0, "([^/]*/%.%.?)$", function(v86) --[[ Line: 395 ]]
-            if v86 ~= "../.." then
-                return "";
-            else
-                return v86;
-            end;
-        end);
-        local v87 = nil;
-        while v87 ~= l_v80_0 do
-            v87 = l_v80_0;
-            l_v80_0 = string.gsub(v87, "^/?%.%./", "");
-        end;
-        return "/" .. l_v80_0;
-    end;
-end;
-v0.resolve = function(v89, v90) --[[ Line: 409 ]] --[[ Name: resolve ]]
-    -- upvalues: v0 (copy), v88 (copy)
-    if type(v89) == "string" then
-        v89 = v0.parse(v89);
-    end;
-    if type(v90) == "string" then
-        v90 = v0.parse(v90);
-    end;
-    if v90.scheme then
-        return v90;
-    else
-        v90.scheme = v89.scheme;
-        if not v90.authority or v90.authority == "" then
-            v90:setAuthority(v89.authority);
-            if not v90.path or v90.path == "" then
-                v90.path = v89.path;
-                local l_query_0 = v90.query;
-                if not l_query_0 or not next(l_query_0) then
-                    v90.query = v89.query;
-                    return v90;
-                end;
-            else
-                v90.path = v88(v89.path, v90.path);
-            end;
-        end;
-        return v90;
-    end;
-end;
-v0.normalize = function(v92) --[[ Line: 439 ]] --[[ Name: normalize ]]
-    -- upvalues: v0 (copy), v88 (copy)
-    if type(v92) == "string" then
-        v92 = v0.parse(v92);
-    end;
-    if v92.path then
-        local l_path_1 = v92.path;
-        l_path_1 = v88(l_path_1, "");
-        v92.path = string.gsub(l_path_1, "//+", "/");
-    end;
-    return v92;
-end;
-return v0;
+local t1 = {
+	version = "0.9.0",
+	options = {
+		separator = "&"
+	},
+	services = {
+		acap = 674,
+		cap = 1026,
+		dict = 2628,
+		ftp = 21,
+		gopher = 70,
+		http = 80,
+		https = 443,
+		iax = 4569,
+		icap = 1344,
+		imap = 143,
+		ipp = 631,
+		ldap = 389,
+		mtqp = 1038,
+		mupdate = 3905,
+		news = 2009,
+		nfs = 2049,
+		nntp = 119,
+		rtsp = 554,
+		sip = 5060,
+		snmp = 161,
+		telnet = 23,
+		tftp = 69,
+		vemmi = 575,
+		afs = 1483,
+		jms = 5673,
+		rsync = 873,
+		prospero = 191,
+		videotex = 516
+	}
+}
+local t2 = {
+	["-"] = true,
+	_ = true,
+	["."] = true,
+	["!"] = true,
+	["~"] = true,
+	["*"] = true,
+	["'"] = true,
+	["("] = true,
+	[")"] = true,
+	[":"] = true,
+	["@"] = true,
+	["&"] = true,
+	["="] = true,
+	["+"] = true,
+	["$"] = true,
+	[","] = true,
+	[";"] = true
+}
+
+local function decode(p1, p2) -- line: 60
+	if not p2 then
+		p1 = p1:gsub("+", " ")
+	end
+
+	return (p1:gsub("%%(%x%x)", function(p3) -- line: 65
+		return (string.char((tonumber(p3, 16))))
+	end))
+end
+local function encode(p4) -- line: 70
+	return (p4:gsub("([^A-Za-z0-9%_%.%-%~])", function(p5) -- line: 71
+		return string.upper(string.format("%%%02x", string.byte(p5)))
+	end))
+end
+local function encodeValue(p6) -- line: 77
+	return p6:gsub("([^A-Za-z0-9%_%.%-%~])", function(p7) -- line: 71
+		return string.upper(string.format("%%%02x", string.byte(p7)))
+	end):gsub("%%20", "+")
+end
+local function encodeSegment(p8) -- line: 82
+	-- upvalues: t2 (copy)
+	return p8:gsub("([^a-zA-Z0-9])", function(p9) -- line: 83
+		-- upvalues: t2 (copy)
+		if t2[p9] then
+			return p9
+		end
+
+		return (p9:gsub("([^A-Za-z0-9%_%.%-%~])", function(p10) -- line: 71
+			return string.upper(string.format("%%%02x", string.byte(p10)))
+		end))
+	end)
+end
+local function concat(p11, p12) -- line: 92
+	return p11 .. p12:build()
+end
+
+function t1.build(p13) -- line: 98
+	-- upvalues: encodeSegment (copy), t1 (copy)
+	local s1 = ""
+
+	if p13.path then
+		local path = p13.path
+
+		path:gsub("([^/]+)", function(p14) -- line: 102
+			-- upvalues: encodeSegment (copy)
+			return encodeSegment(p14)
+		end)
+		s1 ..= tostring(path)
+	end
+
+	if p13.query then
+		local str = tostring(p13.query)
+
+		if str ~= "" then
+			s1 ..= "?" .. str
+		end
+	end
+
+	if p13.host then
+		local host = p13.host
+
+		if p13.port and p13.scheme and t1.services[p13.scheme] ~= p13.port then
+			host ..= ":" .. p13.port
+		end
+
+		local user = nil
+
+		if p13.user and p13.user ~= "" then
+			user = p13.user
+
+			if p13.password then
+				user ..= ":" .. p13.password
+			end
+		end
+
+		if user and user ~= "" then
+			host = user .. "@" .. host
+		end
+
+		if host then
+			s1 = if s1 == "" then "//" .. host else "//" .. host .. "/" .. s1:gsub("^/+", "")
+		end
+	end
+
+	if p13.scheme then
+		s1 = p13.scheme .. ":" .. s1
+	end
+
+	if p13.fragment then
+		s1 ..= "#" .. p13.fragment
+	end
+
+	return s1
+end
+function t1.buildQuery(p15, p16, p17) -- line: 148
+	-- upvalues: t1 (copy)
+	local t3 = {}
+
+	if not p16 then
+		p16 = t1.options.separator or "&"
+	end
+
+	local t4 = {}
+
+	for k in pairs(p15) do
+		t4[#t4 + 1] = k
+	end
+
+	table.sort(t4)
+
+	for _, v in ipairs(t4) do
+		local v30 = v
+		local v31 = p15[v30]
+		local v32 = tostring(v30):gsub("([^A-Za-z0-9%_%.%-%~])", function(p18) -- line: 71
+			return string.upper(string.format("%%%02x", string.byte(p18)))
+		end)
+
+		if p17 then
+			v32 = string.format("%s[%s]", tostring(p17), (tostring(v32)))
+		end
+
+		if type(v31) == "table" then
+			t3[#t3 + 1] = t1.buildQuery(v31, p16, v32)
+		else
+			local v33 = tostring(v31):gsub("([^A-Za-z0-9%_%.%-%~])", function(p19) -- line: 71
+				return string.upper(string.format("%%%02x", string.byte(p19)))
+			end):gsub("%%20", "+")
+
+			if v33 ~= "" then
+				t3[#t3 + 1] = string.format("%s=%s", v32, v33)
+			else
+				t3[#t3 + 1] = v32
+			end
+		end
+	end
+
+	return table.concat(t3, p16)
+end
+function t1.parseQuery(p20, p21) -- line: 185
+	-- upvalues: t1 (copy)
+	if not p21 then
+		p21 = t1.options.separator or "&"
+	end
+
+	local t5 = {}
+
+	for match, v38 in p20:gmatch(string.format("([^%q=]+)(=*[^%q=]*)", p21, p21)) do
+		local t6 = {}
+		local v40 = match:gsub("+", " "):gsub("%%(%x%x)", function(p22) -- line: 65
+			return (string.char((tonumber(p22, 16))))
+		end):gsub("%[([^%]]*)%]", function(p23) -- line: 194
+			-- upvalues: t6 (copy)
+			local v84 = if not string.find(p23, "^-?%d+$") then p23:gsub("+", " "):gsub("%%(%x%x)", function(p24) -- line: 65
+				return (string.char((tonumber(p24, 16))))
+			end) else tonumber(p23)
+
+			table.insert(t6, v84)
+
+			return "="
+		end):gsub("=+.*$", ""):gsub("%s", "_")
+		local v41 = v38:gsub("^=+", "")
+
+		if not t5[v40] then
+			t5[v40] = {}
+		end
+
+		if #t6 > 0 and type(t5[v40]) ~= "table" then
+			t5[v40] = {}
+		elseif #t6 == 0 and type(t5[v40]) == "table" then
+			t5[v40] = v41:gsub("+", " "):gsub("%%(%x%x)", function(p25) -- line: 65
+				return (string.char((tonumber(p25, 16))))
+			end)
+		end
+
+		local v42 = t5[v40]
+
+		for i, v in ipairs(t6) do
+			local v45 = v
+
+			if type(v42) ~= "table" then
+				v42 = {}
+			end
+
+			if v45 == "" then
+				v45 = #v42 + 1
+			end
+
+			if not v42[v45] then
+				v42[v45] = {}
+			end
+
+			if i == #t6 then
+				v42[v45] = v41:gsub("+", " "):gsub("%%(%x%x)", function(p26) -- line: 65
+					return (string.char((tonumber(p26, 16))))
+				end)
+			end
+
+			v42 = v42[v45]
+		end
+	end
+
+	setmetatable(t5, {
+		__tostring = t1.buildQuery
+	})
+
+	return t5
+end
+function t1.setQuery(p27, p28) -- line: 241
+	-- upvalues: t1 (copy)
+	if type(p28) == "table" then
+		p28 = t1.buildQuery(p28)
+	end
+
+	p27.query = t1.parseQuery(p28)
+
+	return p28
+end
+function t1.setAuthority(p29, p30) -- line: 254
+	p29.authority = p30
+	p29.port = nil
+	p29.host = nil
+	p29.userinfo = nil
+	p29.user = nil
+	p29.password = nil
+
+	local v50 = p30:gsub("^([^@]*)@", function(p31) -- line: 262
+		-- upvalues: p29 (copy)
+		p29.userinfo = p31
+
+		return ""
+	end):gsub("^%[[^%]]+%]", function(p32) -- line: 266
+		-- upvalues: p29 (copy)
+		p29.host = p32
+
+		return ""
+	end):gsub(":([^:]*)$", function(p33) -- line: 271
+		-- upvalues: p29 (copy)
+		p29.port = tonumber(p33)
+
+		return ""
+	end)
+
+	if v50 ~= "" and not p29.host then
+		p29.host = v50:lower()
+	end
+
+	if p29.userinfo then
+		p29.user = p29.userinfo:gsub(":([^:]*)$", function(p34) -- line: 280
+			-- upvalues: p29 (copy)
+			p29.password = p34
+
+			return ""
+		end)
+	end
+
+	return v50
+end
+function t1.parse(p35) -- line: 295
+	-- upvalues: t1 (copy), concat (copy)
+	local t7 = {}
+
+	t1.setAuthority(t7, "")
+	t1.setQuery(t7, "")
+	t7.path = tostring(p35 or ""):gsub("#(.*)$", function(p36) -- line: 301
+		-- upvalues: t7 (copy)
+		t7.fragment = p36
+
+		return ""
+	end):gsub("^([%w][%w%+%-%.]*)%:", function(p37) -- line: 305
+		-- upvalues: t7 (copy)
+		t7.scheme = p37:lower()
+
+		return ""
+	end):gsub("%?(.*)", function(p38) -- line: 309
+		-- upvalues: t1 (copy), t7 (copy)
+		t1.setQuery(t7, p38)
+
+		return ""
+	end):gsub("^//([^/]*)", function(p39) -- line: 313
+		-- upvalues: t1 (copy), t7 (copy)
+		t1.setAuthority(t7, p39)
+
+		return ""
+	end):gsub("%%(%x%x)", function(p40) -- line: 65
+		return (string.char((tonumber(p40, 16))))
+	end)
+	setmetatable(t7, {
+		__index = t1,
+		__concat = concat,
+		__tostring = t1.build
+	})
+
+	return t7
+end
+function t1.removeDotSegments(p41) -- line: 331
+	local t8 = {}
+
+	if string.len(p41) == 0 then
+		return ""
+	end
+
+	local v55 = false
+	local v56 = false
+
+	if string.sub(p41, 1, 1) == "/" then
+		v55 = true
+	end
+
+	if (string.len(p41) > 1 or v55 == false) and string.sub(p41, -1) == "/" then
+		v56 = true
+	end
+
+	p41:gsub("[^/]+", function(p42) -- line: 345
+		-- upvalues: t8 (copy)
+		table.insert(t8, p42)
+	end)
+
+	local t9 = {}
+	local n1 = 0
+
+	for _, v in ipairs(t8) do
+		if v == ".." then
+			if n1 > 0 then
+				n1 -= 1
+			end
+		elseif v ~= "." then
+			n1 += 1
+			t9[n1] = v
+		end
+	end
+
+	local v61 = (not (#t9 > 0) or not (n1 > 0)) and "" or table.concat(t9, "/", 1, n1)
+
+	if v55 then
+		v61 = "/" .. v61
+	end
+
+	if v56 then
+		v61 ..= "/"
+	end
+
+	return v61
+end
+
+local function absolutePath(p43, p44) -- line: 375
+	if string.sub(p44, 1, 1) == "/" then
+		return "/" .. string.gsub(p44, "^[%./]+", "")
+	end
+
+	if p44 ~= "" then
+		p43 = "/" .. p43:gsub("[^/]*$", "")
+	end
+
+	local v64 = (p43 .. p44):gsub("([^/]*%./)", function(p45) -- line: 384
+		if p45 ~= "./" then
+			return p45
+		end
+
+		return ""
+	end)
+	local v65 = string.gsub(v64, "/%.$", "/")
+	local v66 = nil
+
+	while v66 ~= v65 do
+		v66 = v65
+		v65 = string.gsub(v66, "([^/]*/%.%./)", function(p46) -- line: 391
+			if p46 ~= "../../" then
+				return ""
+			end
+
+			return p46
+		end)
+	end
+
+	local v67 = string.gsub(v65, "([^/]*/%.%.?)$", function(p47) -- line: 395
+		if p47 ~= "../.." then
+			return ""
+		end
+
+		return p47
+	end)
+	local v68 = nil
+
+	while v68 ~= v67 do
+		v68 = v67
+		v67 = string.gsub(v68, "^/?%.%./", "")
+	end
+
+	return "/" .. v67
+end
+
+function t1.resolve(p48, p49) -- line: 409
+	-- upvalues: t1 (copy), absolutePath (copy)
+	if type(p48) == "string" then
+		p48 = t1.parse(p48)
+	end
+
+	if type(p49) == "string" then
+		p49 = t1.parse(p49)
+	end
+
+	if p49.scheme then
+		return p49
+	end
+
+	p49.scheme = p48.scheme
+
+	if not p49.authority or p49.authority == "" then
+		p49:setAuthority(p48.authority)
+
+		if not p49.path or p49.path == "" then
+			p49.path = p48.path
+
+			local query = p49.query
+
+			if not query or not next(query) then
+				p49.query = p48.query
+
+				return p49
+			end
+		else
+			p49.path = absolutePath(p48.path, p49.path)
+		end
+	end
+
+	return p49
+end
+function t1.normalize(p50) -- line: 439
+	-- upvalues: t1 (copy), absolutePath (copy)
+	if type(p50) == "string" then
+		p50 = t1.parse(p50)
+	end
+
+	if p50.path then
+		local path = p50.path
+		local v74 = absolutePath(path, "")
+
+		p50.path = string.gsub(v74, "//+", "/")
+	end
+
+	return p50
+end
+
+return t1

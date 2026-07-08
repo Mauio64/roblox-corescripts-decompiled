@@ -1,4 +1,4 @@
 return {
-    Wide = "Wide", 
-    Square = "Square"
-};
+	Wide = "Wide",
+	Square = "Square"
+}

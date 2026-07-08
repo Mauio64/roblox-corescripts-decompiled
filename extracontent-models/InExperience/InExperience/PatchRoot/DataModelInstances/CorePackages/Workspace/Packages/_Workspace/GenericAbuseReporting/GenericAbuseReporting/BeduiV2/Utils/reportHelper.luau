@@ -1,138 +1,185 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local v4 = require(l_Parent_0.Promise);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes);
-local function v7(v6) --[[ Line: 40 ]] --[[ Name: tag ]]
-    return {
-        valueList = {
-            {
-                data = v6
-            }
-        }
-    };
-end;
-local function v14(v8, v9) --[[ Line: 44 ]] --[[ Name: buildVoiceReport ]]
-    -- upvalues: l_Players_0 (copy), l_HttpService_0 (copy), v7 (copy)
-    local v10 = {};
-    if v9 then
-        for _, v12 in ipairs(v9.sortedPlayerListUserIds) do
-            table.insert(v10, {
-                data = tostring(v12)
-            });
-        end;
-    end;
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    return l_HttpService_0:JSONEncode({
-        tags = {
-            ENTRY_POINT = v7("in-experience"), 
-            SUBMITTER_USER_ID = v7((tostring(l_LocalPlayer_0 and l_LocalPlayer_0.UserId or 0))), 
-            REPORT_TARGET_USER_ID = v7(v8.data.targetIdStr), 
-            REPORTED_ABUSE_CATEGORY = v7(v8.data.category), 
-            REPORTER_COMMENT = v7(v8.data.comment or ""), 
-            IS_PLACE_VOICE_ENABLED = v7("true"), 
-            VOICE_USER_IDS_FROM_CLIENT = {
-                valueList = v10
-            }, 
-            IN_EXP_MENU_OPENED_UNIX_MILLI = v7((tostring(v9 and v9.menuOpenedUnixMilli or 0))), 
-            VOICE_CHANNEL_ID = v7(v9 and v9.channelId or ""), 
-            VOICE_USER_COUNT = v7((tostring(v9 and v9.voiceUserCount or 0))), 
-            VOICE_IMPACTED_USER_COUNT = v7((tostring(v9 and v9.voiceImpactedUserCount or 0))), 
-            REPORTED_ABUSE_VECTOR = v7(v8.data.abuseVector)
-        }
-    });
-end;
-local function v17(v15) --[[ Line: 73 ]] --[[ Name: buildChatReport ]]
-    -- upvalues: l_Players_0 (copy), v7 (copy)
-    local l_LocalPlayer_1 = l_Players_0.LocalPlayer;
-    return {
-        tags = {
-            ENTRY_POINT = v7("in-experience"), 
-            SUBMITTER_USER_ID = v7((tostring(l_LocalPlayer_1 and l_LocalPlayer_1.UserId or 0))), 
-            REPORT_TARGET_USER_ID = v7(v15.data.targetIdStr), 
-            REPORTED_ABUSE_CATEGORY = v7(v15.data.category), 
-            REPORTER_COMMENT = v7(v15.data.comment or ""), 
-            REPORTED_ABUSE_VECTOR = v7(v15.data.abuseVector), 
-            VARIANT = v7("IGM_CLRv2")
-        }
-    };
-end;
-local function v20(v18) --[[ Line: 88 ]] --[[ Name: buildAvatarReport ]]
-    -- upvalues: l_Players_0 (copy), v7 (copy)
-    local l_LocalPlayer_2 = l_Players_0.LocalPlayer;
-    return {
-        tags = {
-            ENTRY_POINT = v7("in-experience"), 
-            SUBMITTER_USER_ID = v7((tostring(l_LocalPlayer_2 and l_LocalPlayer_2.UserId or 0))), 
-            REPORT_TARGET_USER_ID = v7(v18.data.targetIdStr), 
-            REPORTED_ABUSE_CATEGORY = v7(v18.data.category), 
-            REPORTER_COMMENT = v7(v18.data.comment or ""), 
-            REPORTED_ABUSE_VECTOR = v7(v18.data.abuseVector)
-        }
-    };
-end;
-local function v23(v21) --[[ Line: 102 ]] --[[ Name: buildPlaceReport ]]
-    -- upvalues: l_Players_0 (copy), l_HttpService_0 (copy), v7 (copy)
-    local l_LocalPlayer_3 = l_Players_0.LocalPlayer;
-    return l_HttpService_0:JSONEncode({
-        tags = {
-            ENTRY_POINT = v7("in-experience"), 
-            SUBMITTER_USER_ID = v7((tostring(l_LocalPlayer_3 and l_LocalPlayer_3.UserId or 0))), 
-            PLACE_ID = v7((tostring(game.PlaceId))), 
-            REPORTED_ABUSE_CATEGORY = v7(v21.data.category), 
-            REPORTER_COMMENT = v7(v21.data.comment or ""), 
-            REPORTED_ABUSE_VECTOR = v7(v21.data.abuseVector)
-        }
-    });
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local Promise = require(GenericAbuseReportingParent.Promise)
+
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
+
+local appendReportAnythingTags = require(GenericAbuseReporting.BeduiV2.Utils.appendReportAnythingTags).appendReportAnythingTags
+
+local function tag(s1: string?) -- line: 46
+	if not s1 then
+		return nil
+	end
+
+	return {
+		valueList = {{
+			data = s1
+		}}
+	}
+end
+local function buildVoiceReport(p1, t1: {[any]: any}?) -- line: 53
+	-- upvalues: Players (copy), HttpService (copy), tag (copy)
+	local t2 = {}
+
+	if t1 then
+		for _, v in ipairs(t1.sortedPlayerListUserIds) do
+			table.insert(t2, {
+				data = tostring(v)
+			})
+		end
+	end
+
+	local LocalPlayer = Players.LocalPlayer
+
+	return HttpService:JSONEncode({
+		tags = {
+			ENTRY_POINT = tag("in-experience"),
+			SUBMITTER_USER_ID = tag((tostring(LocalPlayer and LocalPlayer.UserId or 0))),
+			REPORT_TARGET_USER_ID = tag(p1.data.targetIdStr),
+			REPORTED_ABUSE_CATEGORY = tag(p1.data.category),
+			REPORTER_COMMENT = tag(p1.data.comment or ""),
+			IS_PLACE_VOICE_ENABLED = tag("true"),
+			VOICE_USER_IDS_FROM_CLIENT = {
+				valueList = t2
+			},
+			IN_EXP_MENU_OPENED_UNIX_MILLI = tag((tostring(t1 and t1.menuOpenedUnixMilli or 0))),
+			VOICE_CHANNEL_ID = tag(t1 and t1.channelId or ""),
+			VOICE_USER_COUNT = tag((tostring(t1 and t1.voiceUserCount or 0))),
+			VOICE_IMPACTED_USER_COUNT = tag((tostring(t1 and t1.voiceImpactedUserCount or 0))),
+			REPORTED_ABUSE_VECTOR = tag(p1.data.abuseVector)
+		}
+	})
+end
+local function buildChatReport(p2, t3: {[any]: any}) -- line: 82
+	-- upvalues: Players (copy), tag (copy)
+	local LocalPlayer = Players.LocalPlayer
+	local v22 = t3.targetMessages and (not not t3.targetMessages[1] and t3.targetMessages[1].messageId) or ""
+	local v23 = t3.targetMessages and (not not t3.targetMessages[1] and t3.targetMessages[1].presetId) or nil
+	local v24 = t3.targetMessages and (not not t3.targetMessages[1] and t3.targetMessages[1].presetChatVersion) or nil
+
+	return {
+		tags = {
+			ENTRY_POINT = tag("in-experience"),
+			SUBMITTER_USER_ID = tag((tostring(LocalPlayer and LocalPlayer.UserId or 0))),
+			REPORT_TARGET_USER_ID = tag(p2.data.targetIdStr),
+			REPORTED_ABUSE_CATEGORY = tag(p2.data.category),
+			REPORTER_COMMENT = tag(p2.data.comment or ""),
+			REPORTED_ABUSE_VECTOR = tag(p2.data.abuseVector),
+			REPORT_TARGET_MESSAGE_ID = tag(v22),
+			PRESET_ID = tag(v23),
+			PRESET_CHAT_VERSION = tag(v24),
+			VARIANT = tag("IGM_CLRv2")
+		}
+	}
+end
+local function buildAvatarReport(p3, p4) -- line: 112
+	-- upvalues: Players (copy), tag (copy), appendReportAnythingTags (copy)
+	local LocalPlayer = Players.LocalPlayer
+	local t4 = {
+		ENTRY_POINT = tag("in-experience"),
+		SUBMITTER_USER_ID = tag((tostring(LocalPlayer and LocalPlayer.UserId or 0))),
+		REPORT_TARGET_USER_ID = tag(p3.data.targetIdStr),
+		REPORTED_ABUSE_CATEGORY = tag(p3.data.category),
+		REPORTER_COMMENT = tag(p3.data.comment or ""),
+		REPORTED_ABUSE_VECTOR = tag(p3.data.abuseVector)
+	}
+
+	appendReportAnythingTags(t4, p4)
+
+	return {
+		tags = t4
+	}
+end
+local function buildPlaceReport(p5, p6) -- line: 129
+	-- upvalues: Players (copy), tag (copy), appendReportAnythingTags (copy), HttpService (copy)
+	local LocalPlayer = Players.LocalPlayer
+	local t5 = {
+		ENTRY_POINT = tag("in-experience"),
+		SUBMITTER_USER_ID = tag((tostring(LocalPlayer and LocalPlayer.UserId or 0))),
+		PLACE_ID = tag((tostring(game.PlaceId))),
+		REPORTED_ABUSE_CATEGORY = tag(p5.data.category),
+		REPORTER_COMMENT = tag(p5.data.comment or ""),
+		REPORTED_ABUSE_VECTOR = tag(p5.data.abuseVector)
+	}
+
+	appendReportAnythingTags(t5, p6)
+
+	return HttpService:JSONEncode({
+		tags = t5
+	})
+end
+
 return {
-    submitVoiceReport = function(v24, v25) --[[ Line: 127 ]] --[[ Name: submitVoiceReport ]]
-        -- upvalues: v14 (copy), v4 (copy), l_Players_0 (copy)
-        local v26 = v14(v24, v25);
-        return v4.try(function() --[[ Line: 129 ]]
-            -- upvalues: l_Players_0 (ref), v26 (copy)
-            l_Players_0:ReportAbuseV3(l_Players_0.LocalPlayer, v26);
-            return {
-                responseBody = {}
-            };
-        end);
-    end, 
-    submitChatReport = function(v27, v28) --[[ Line: 135 ]] --[[ Name: submitChatReport ]]
-        -- upvalues: v17 (copy), v4 (copy), l_Players_0 (copy)
-        local v29 = v17(v27);
-        return v4.try(function() --[[ Line: 137 ]]
-            -- upvalues: l_Players_0 (ref), v28 (copy), v29 (copy)
-            l_Players_0:ReportChatAbuse(v28.eligibleMessages, v28.targetMessages, v29);
-            return {
-                responseBody = {}
-            };
-        end);
-    end, 
-    submitAvatarReport = function(v30) --[[ Line: 143 ]] --[[ Name: submitAvatarReport ]]
-        -- upvalues: v20 (copy), v4 (copy), l_Players_0 (copy)
-        local v31 = v20(v30);
-        return v4.try(function() --[[ Line: 145 ]]
-            -- upvalues: l_Players_0 (ref), v30 (copy), v31 (copy)
-            l_Players_0:ReportAvatarAbuse(tonumber(v30.data.targetIdStr), v31);
-            return {
-                responseBody = {}
-            };
-        end);
-    end, 
-    submitPlaceReport = function(v32) --[[ Line: 151 ]] --[[ Name: submitPlaceReport ]]
-        -- upvalues: v23 (copy), v4 (copy), l_Players_0 (copy)
-        local v33 = v23(v32);
-        return v4.try(function() --[[ Line: 153 ]]
-            -- upvalues: l_Players_0 (ref), v33 (copy)
-            l_Players_0:ReportAbuseV3(l_Players_0.LocalPlayer, v33);
-            return {
-                responseBody = {}
-            };
-        end);
-    end, 
-    buildVoiceReport = v14, 
-    buildChatReport = v17, 
-    buildAvatarReport = v20, 
-    buildPlaceReport = v23
-};
+	submitVoiceReport = function(p7, t6: {[any]: any}?) -- line: 155
+		-- upvalues: buildVoiceReport (copy), Promise (copy), Players (copy)
+		local v35 = buildVoiceReport(p7, t6)
+
+		return Promise.try(function() -- line: 157
+			-- upvalues: Players (copy), v35 (copy)
+			Players:ReportAbuseV3(Players.LocalPlayer, v35)
+
+			return {
+				responseBody = {}
+			}
+		end)
+	end,
+	submitChatReport = function(p8, t7: {[any]: any}) -- line: 163
+		-- upvalues: buildChatReport (copy), Promise (copy), Players (copy)
+		local v38 = buildChatReport(p8, t7)
+
+		return Promise.try(function() -- line: 165
+			-- upvalues: Players (copy), t7 (copy), v38 (copy)
+			Players:ReportChatAbuse(t7.eligibleMessages, t7.targetMessages, v38)
+
+			return {
+				responseBody = {}
+			}
+		end)
+	end,
+	submitChatReportWithoutMessage = function(p9) -- line: 171
+		-- upvalues: Promise (copy), Players (copy)
+		return Promise.try(function() -- line: 172
+			-- upvalues: p9 (copy), Players (copy)
+			local num = tonumber(p9.data.targetIdStr)
+			local v47 = num and Players:GetPlayerByUserId(num)
+
+			Players:ReportAbuse(v47, p9.data.category, p9.data.comment or "")
+
+			return {
+				responseBody = {}
+			}
+		end)
+	end,
+	submitAvatarReport = function(p10, p11) -- line: 180
+		-- upvalues: buildAvatarReport (copy), Promise (copy), Players (copy)
+		local v42 = buildAvatarReport(p10, p11)
+
+		return Promise.try(function() -- line: 182
+			-- upvalues: Players (copy), p10 (copy), v42 (copy)
+			Players:ReportAvatarAbuse(tonumber(p10.data.targetIdStr), v42)
+
+			return {
+				responseBody = {}
+			}
+		end)
+	end,
+	submitPlaceReport = function(p12, p13) -- line: 188
+		-- upvalues: buildPlaceReport (copy), Promise (copy), Players (copy)
+		local v45 = buildPlaceReport(p12, p13)
+
+		return Promise.try(function() -- line: 190
+			-- upvalues: Players (copy), v45 (copy)
+			Players:ReportAbuseV3(Players.LocalPlayer, v45)
+
+			return {
+				responseBody = {}
+			}
+		end)
+	end,
+	buildVoiceReport = buildVoiceReport,
+	buildChatReport = buildChatReport,
+	buildAvatarReport = buildAvatarReport,
+	buildPlaceReport = buildPlaceReport
+}

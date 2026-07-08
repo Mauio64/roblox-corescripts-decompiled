@@ -1,10 +1,14 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent;
-local _ = require(script.Parent.Parent.Enums.Categories);
-local _ = require(script.Parent.Parent.Enums.ScreenLayout);
-local _ = require(script.Parent.Parent.Enums.ItemView);
-local _ = require(script.Parent.Parent.Stores.createCategoryInventoryStore);
-local _ = require(script.Parent.Parent.Stores.createSortAndFiltersStore);
-local _ = require(script.Parent.Parent.Stores.createSlotBasedEditorStore);
-local v7 = require(l_Parent_0.React);
-local _ = require(script.Parent.Parent.Types);
-return (v7.createContext(nil));
+local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+
+require(script.Parent.Parent.Enums.Categories)
+require(script.Parent.Parent.Enums.ScreenLayout)
+require(script.Parent.Parent.Enums.ItemView)
+require(script.Parent.Parent.Stores.createCategoryInventoryStore)
+require(script.Parent.Parent.Stores.createSortAndFiltersStore)
+require(script.Parent.Parent.Stores.createSlotBasedEditorStore)
+
+local React = require(Parent.React)
+
+require(script.Parent.Parent.Types)
+
+return (React.createContext(nil))

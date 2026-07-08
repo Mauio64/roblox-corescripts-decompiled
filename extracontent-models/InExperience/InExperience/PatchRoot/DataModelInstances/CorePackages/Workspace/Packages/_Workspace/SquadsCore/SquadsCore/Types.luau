@@ -1,3 +1,5 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local _ = require(l_script_FirstAncestor_0.Enums.SquadExperienceInviteType);
-return nil;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+
+require(SquadsCore.Enums.SquadExperienceInviteType)
+
+return nil

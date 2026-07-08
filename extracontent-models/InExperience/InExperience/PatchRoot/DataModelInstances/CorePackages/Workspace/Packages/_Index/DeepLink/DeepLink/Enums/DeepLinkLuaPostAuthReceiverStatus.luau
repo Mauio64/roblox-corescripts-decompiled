@@ -1,4 +1,4 @@
 return {
-    Ready = "Ready", 
-    Disconnected = "Disconnected"
-};
+	Ready = "Ready",
+	Disconnected = "Disconnected"
+}

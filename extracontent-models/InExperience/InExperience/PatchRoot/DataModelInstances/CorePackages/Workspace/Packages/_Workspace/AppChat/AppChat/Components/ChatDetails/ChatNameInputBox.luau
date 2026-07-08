@@ -1,41 +1,44 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.SocialLibraries);
-local v3 = require(l_Parent_0.Roact);
-local v4 = require(l_Parent_0.UIBlox);
-local l_InputBoxWithCharacterCounter_0 = v2.Components.InputBoxWithCharacterCounter;
-local v6 = v3.PureComponent:extend("ChatNameInputBox");
-v6.defaultProps = {
-    initialInputText = "", 
-    placeholderText = "(PLACEHOLDER) Name your chat group"
-};
-v6.render = function(v7) --[[ Line: 18 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v3 (copy), l_InputBoxWithCharacterCounter_0 (copy)
-    return v4.Style.withStyle(function(v8) --[[ Line: 19 ]]
-        -- upvalues: v3 (ref), l_InputBoxWithCharacterCounter_0 (ref), v7 (copy)
-        return v3.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 64), 
-            BackgroundTransparency = 1
-        }, {
-            InputBox = v3.createElement(l_InputBoxWithCharacterCounter_0, {
-                initialInputText = v7.props.initialInputText, 
-                validInputTextColor3 = Color3.fromRGB(117, 117, 117), 
-                validInputTextTransparency = 0, 
-                invalidInputTextColor3 = Color3.fromRGB(226, 35, 26), 
-                invalidInputTextTransparency = 0, 
-                inputTextFont = Enum.Font.Gotham, 
-                inputTextColor3 = Color3.fromRGB(25, 25, 25), 
-                inputTextSize = 23, 
-                inputTextTransparency = 0, 
-                placeholderTextTransparency = 0, 
-                placeholderTextColor3 = Color3.fromRGB(184, 184, 184), 
-                placeholderText = v7.props.placeholderText, 
-                clearIconColor3 = Color3.fromRGB(255, 255, 255), 
-                clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-clear-solid.png", 
-                characterLimit = 150, 
-                style = v8
-            })
-        });
-    end);
-end;
-return v6;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local SocialLibraries = require(AppChat.SocialLibraries)
+local Roact = require(AppChatParent.Roact)
+local UIBlox = require(AppChatParent.UIBlox)
+local InputBoxWithCharacterCounter = SocialLibraries.Components.InputBoxWithCharacterCounter
+local v7 = Roact.PureComponent:extend("ChatNameInputBox")
+
+v7.defaultProps = {
+	initialInputText = "",
+	placeholderText = "(PLACEHOLDER) Name your chat group"
+}
+
+function v7.render(p1) -- line: 18
+	-- upvalues: UIBlox (copy), Roact (copy), InputBoxWithCharacterCounter (copy)
+	return UIBlox.Style.withStyle(function(p2) -- line: 19
+		-- upvalues: Roact (copy), InputBoxWithCharacterCounter (copy), p1 (copy)
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 64)
+		}, {
+			InputBox = Roact.createElement(InputBoxWithCharacterCounter, {
+				validInputTextTransparency = 0,
+				invalidInputTextTransparency = 0,
+				inputTextSize = 23,
+				inputTextTransparency = 0,
+				placeholderTextTransparency = 0,
+				clearIcon = "rbxasset://textures/ui/LuaChat/icons/ic-clear-solid.png",
+				characterLimit = 150,
+				initialInputText = p1.props.initialInputText,
+				validInputTextColor3 = Color3.fromRGB(117, 117, 117),
+				invalidInputTextColor3 = Color3.fromRGB(226, 35, 26),
+				inputTextFont = Enum.Font.Gotham,
+				inputTextColor3 = Color3.fromRGB(25, 25, 25),
+				placeholderTextColor3 = Color3.fromRGB(184, 184, 184),
+				placeholderText = p1.props.placeholderText,
+				clearIconColor3 = Color3.fromRGB(255, 255, 255),
+				style = p2
+			})
+		})
+	end)
+end
+
+return v7

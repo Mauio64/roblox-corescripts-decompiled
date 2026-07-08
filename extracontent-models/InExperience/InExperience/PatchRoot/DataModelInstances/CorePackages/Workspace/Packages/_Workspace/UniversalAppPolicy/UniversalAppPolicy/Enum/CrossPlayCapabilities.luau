@@ -1,5 +1,5 @@
 return {
-    CrossPlatform = "CrossPlatform", 
-    Multiplayer = "Multiplayer", 
-    SharedContent = "SharedContent"
-};
+	CrossPlatform = "CrossPlatform",
+	Multiplayer = "Multiplayer",
+	SharedContent = "SharedContent"
+}

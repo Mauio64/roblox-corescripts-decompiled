@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEdpMediaGalleryVideoPreviewIxp5", false);
+return game:DefineFastFlag("LuaAppEdpMediaGalleryVideoPreviewIxp5", false)

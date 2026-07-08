@@ -1,203 +1,212 @@
-local l_TextService_0 = game:GetService("TextService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.UIBlox);
-local v5 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent;
-local v7 = require(l_Parent_0.Resources.Assets);
-local v8 = require(l_Parent_0.Components.PortedComponents.ThemedTextLabel);
-local l_ImageSetLabel_0 = v4.Core.ImageSet.ImageSetLabel;
-local l_withStyle_0 = v4.Core.Style.withStyle;
-local l_CursorKind_0 = v4.App.SelectionImage.CursorKind;
-local l_withSelectionCursorProvider_0 = v4.App.SelectionImage.withSelectionCursorProvider;
-local v13 = v3.PureComponent:extend("TextEntryField");
-v13.validateProps = v5.strictInterface({
-    enabled = v5.boolean, 
-    text = v5.string, 
-    textChanged = v5.callback, 
-    maxTextLength = v5.integer, 
-    autoFocusOnEnabled = v5.boolean, 
-    PlaceholderText = v5.string, 
-    LayoutOrder = v5.optional(v5.integer), 
-    Size = v5.UDim2, 
-    Position = v5.optional(v5.UDim2), 
-    textBoxRef = v5.optional(v5.table)
-});
-v13.init = function(v14) --[[ Line: 47 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy)
-    v14.textBoxRef = v14.props.textBoxRef or v3.createRef();
-    v14.state = {
-        textBoxWidth = 100, 
-        scrollingFrameHeight = 100, 
-        canvasPosition = 0, 
-        cursorPosition = 0
-    };
-end;
-v13.calculateNeedsRescroll = function(v15, v16, v17) --[[ Line: 58 ]] --[[ Name: calculateNeedsRescroll ]]
-    -- upvalues: l_TextService_0 (copy)
-    v15:setState(function(v18, v19) --[[ Line: 60 ]]
-        -- upvalues: v17 (copy), v16 (copy), l_TextService_0 (ref)
-        if v18.cursorPosition == -1 then
-            return nil;
-        else
-            local v20 = v19.text:sub(1, v18.cursorPosition - 1);
-            local v21 = v17.RelativeSize * v16.Font.BaseSize;
-            local v22 = Vector2.new(v19.textBoxWidth, 10000);
-            local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v20, v21, v17.Font, v22);
-            if l_l_TextService_0_TextSize_0.Y > v18.scrollingFrameHeight + v18.canvasPosition then
-                return {
-                    canvasPosition = l_l_TextService_0_TextSize_0.Y - v18.scrollingFrameHeight
-                };
-            elseif l_l_TextService_0_TextSize_0.Y - v21 < v18.canvasPosition then
-                return {
-                    canvasPosition = l_l_TextService_0_TextSize_0.Y - v21
-                };
-            else
-                return nil;
-            end;
-        end;
-    end);
-end;
-v13.renderWithSelectionCursor = function(v24, v25) --[[ Line: 103 ]] --[[ Name: renderWithSelectionCursor ]]
-    -- upvalues: l_withStyle_0 (copy), l_TextService_0 (copy), v3 (copy), l_ImageSetLabel_0 (copy), v7 (copy), l_CursorKind_0 (copy), v8 (copy)
-    return l_withStyle_0(function(v26) --[[ Line: 104 ]]
-        -- upvalues: l_TextService_0 (ref), v24 (copy), v3 (ref), l_ImageSetLabel_0 (ref), v7 (ref), v25 (copy), l_CursorKind_0 (ref), v8 (ref)
-        local l_TextDefault_0 = v26.Theme.TextDefault;
-        local l_Body_0 = v26.Font.Body;
-        local l_l_TextService_0_TextSize_1 = l_TextService_0:GetTextSize(v24.props.text, l_Body_0.RelativeSize * v26.Font.BaseSize, l_Body_0.Font, Vector2.new(v24.state.textBoxWidth, 10000));
-        return v3.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            Image = v7.Images.RoundedRect.Image, 
-            ImageColor3 = v26.Theme.BackgroundMuted.Color, 
-            ImageTransparency = v26.Theme.BackgroundMuted.Transparency, 
-            Position = v24.props.Position, 
-            ScaleType = v7.Images.RoundedRect.ScaleType, 
-            Size = v24.props.Size, 
-            SliceCenter = v7.Images.RoundedRect.SliceCenter, 
-            LayoutOrder = v24.props.LayoutOrder
-        }, {
-            ScrollingFrame = v3.createElement("ScrollingFrame", {
-                Size = UDim2.new(1, -24, 1, -14), 
-                AnchorPoint = Vector2.new(0.5, 0), 
-                Position = UDim2.new(0.5, 0, 0, 7), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                CanvasSize = UDim2.new(1, -24, 0, l_l_TextService_0_TextSize_1.Y), 
-                ScrollBarThickness = 8, 
-                VerticalScrollBarInset = Enum.ScrollBarInset.Always, 
-                CanvasPosition = Vector2.new(0, v24.state.canvasPosition), 
-                Selectable = false, 
-                [v3.Change.CanvasPosition] = function(v30) --[[ Line: 138 ]]
-                    -- upvalues: v24 (ref)
-                    v24:setState({
-                        canvasPosition = v30.CanvasPosition.Y
-                    });
-                end, 
-                [v3.Change.AbsoluteSize] = function(v31) --[[ Line: 144 ]]
-                    -- upvalues: v24 (ref), v26 (copy), l_Body_0 (copy)
-                    v24:setState({
-                        scrollingFrameHeight = v31.AbsoluteSize.Y
-                    }, function() --[[ Line: 145 ]]
-                        -- upvalues: v24 (ref), v26 (ref), l_Body_0 (ref)
-                        v24:calculateNeedsRescroll(v26, l_Body_0);
-                    end);
-                end
-            }, {
-                TextBox = v3.createElement("TextBox", {
-                    Size = UDim2.new(1, -2, 1, 0), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    Text = v24.props.text, 
-                    ClearTextOnFocus = false, 
-                    TextEditable = v24.props.enabled, 
-                    BackgroundTransparency = 1, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextYAlignment = Enum.TextYAlignment.Top, 
-                    TextColor3 = l_TextDefault_0.Color, 
-                    TextTransparency = l_TextDefault_0.Transparency, 
-                    Font = l_Body_0.Font, 
-                    TextSize = l_Body_0.RelativeSize * v26.Font.BaseSize, 
-                    TextWrapped = true, 
-                    MultiLine = true, 
-                    SelectionImageObject = v25(l_CursorKind_0.InputFields), 
-                    [v3.Ref] = v24.textBoxRef, 
-                    [v3.Change.Text] = function(v32) --[[ Line: 170 ]]
-                        -- upvalues: v24 (ref), v26 (copy), l_Body_0 (copy)
-                        local l_status_0, l_result_0 = pcall(function() --[[ Line: 171 ]]
-                            -- upvalues: v32 (copy)
-                            return utf8.len(utf8.nfcnormalize(v32.Text));
-                        end);
-                        if not l_status_0 or v24.props.maxTextLength < l_result_0 then
-                            v32.Text = v24.props.text;
-                            return;
-                        else
-                            v24.props.textChanged(v32.Text);
-                            v24:setState({
-                                cursorPosition = v32.CursorPosition
-                            }, function() --[[ Line: 180 ]]
-                                -- upvalues: v24 (ref), v26 (ref), l_Body_0 (ref)
-                                v24:calculateNeedsRescroll(v26, l_Body_0);
-                            end);
-                            return;
-                        end;
-                    end, 
-                    [v3.Change.AbsoluteSize] = function(v35) --[[ Line: 185 ]]
-                        -- upvalues: v24 (ref), v26 (copy), l_Body_0 (copy)
-                        v24:setState({
-                            textBoxWidth = v35.AbsoluteSize.X
-                        }, function() --[[ Line: 186 ]]
-                            -- upvalues: v24 (ref), v26 (ref), l_Body_0 (ref)
-                            v24:calculateNeedsRescroll(v26, l_Body_0);
-                        end);
-                    end, 
-                    [v3.Change.CursorPosition] = function(v36) --[[ Line: 191 ]]
-                        -- upvalues: v24 (ref), v26 (copy), l_Body_0 (copy)
-                        v24:setState({
-                            cursorPosition = v36.CursorPosition
-                        }, function() --[[ Line: 192 ]]
-                            -- upvalues: v24 (ref), v26 (ref), l_Body_0 (ref)
-                            v24:calculateNeedsRescroll(v26, l_Body_0);
-                        end);
-                    end
-                }, {
-                    PlaceholderText = v3.createElement(v8, {
-                        themeKey = "TextDefault", 
-                        fontKey = "Body", 
-                        Text = v24.props.PlaceholderText, 
-                        Size = UDim2.new(1, 0, 1, 0), 
-                        Position = UDim2.new(0, 0, 0, 0), 
-                        TextTransparency = 0.5, 
-                        TextWrapped = true, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextYAlignment = Enum.TextYAlignment.Top, 
-                        Visible = v24.props.text == ""
-                    })
-                })
-            })
-        });
-    end);
-end;
-v13.render = function(v37) --[[ Line: 216 ]] --[[ Name: render ]]
-    -- upvalues: l_withSelectionCursorProvider_0 (copy)
-    return l_withSelectionCursorProvider_0(function(v38) --[[ Line: 217 ]]
-        -- upvalues: v37 (copy)
-        return v37:renderWithSelectionCursor(v38);
-    end);
-end;
-v13.didUpdate = function(v39, v40) --[[ Line: 222 ]] --[[ Name: didUpdate ]]
-    if not v39.props.enabled and v40.enabled then
-        if v39.textBoxRef.current and v39.textBoxRef.current:IsFocused() then
-            v39.textBoxRef.current:ReleaseFocus();
-            return;
-        end;
-    elseif v39.props.enabled and not v40.enabled and v39.props.autoFocusOnEnabled and v39.textBoxRef.current then
-        v39.textBoxRef.current:CaptureFocus();
-    end;
-end;
-return v3.forwardRef(function(v41, v42) --[[ Line: 235 ]]
-    -- upvalues: v3 (copy), v13 (copy), v2 (copy)
-    return v3.createElement(v13, v2.Dictionary.join(v41, {
-        textBoxRef = v42
-    }));
-end);
+local TextService = game:GetService("TextService")
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent
+local Assets = require(ParentParent.Resources.Assets)
+local ThemedTextLabel = require(ParentParent.Components.PortedComponents.ThemedTextLabel)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local withStyle = UIBlox.Core.Style.withStyle
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local v14 = Roact.PureComponent:extend("TextEntryField")
+
+v14.validateProps = t.strictInterface({
+	enabled = t.boolean,
+	text = t.string,
+	textChanged = t.callback,
+	maxTextLength = t.integer,
+	autoFocusOnEnabled = t.boolean,
+	PlaceholderText = t.string,
+	LayoutOrder = t.optional(t.integer),
+	Size = t.UDim2,
+	Position = t.optional(t.UDim2),
+	textBoxRef = t.optional(t.table)
+})
+
+function v14.init(p1) -- line: 47
+	-- upvalues: Roact (copy)
+	p1.textBoxRef = p1.props.textBoxRef or Roact.createRef()
+	p1.state = {
+		textBoxWidth = 100,
+		scrollingFrameHeight = 100,
+		canvasPosition = 0,
+		cursorPosition = 0
+	}
+end
+function v14.calculateNeedsRescroll(p2, p3, p4) -- line: 58
+	-- upvalues: TextService (copy)
+	p2:setState(function(p5, p6) -- line: 60
+		-- upvalues: p4 (copy), p3 (copy), TextService (copy)
+		if p5.cursorPosition == -1 then
+			return nil
+		end
+
+		local v28 = p6.text:sub(1, p5.cursorPosition - 1)
+		local v29 = p4.RelativeSize * p3.Font.BaseSize
+		local vector2 = Vector2.new(p6.textBoxWidth, 10000)
+		local TextSize = TextService:GetTextSize(v28, v29, p4.Font, vector2)
+
+		if TextSize.Y > p5.scrollingFrameHeight + p5.canvasPosition then
+			return {
+				canvasPosition = TextSize.Y - p5.scrollingFrameHeight
+			}
+		end
+
+		if TextSize.Y - v29 < p5.canvasPosition then
+			return {
+				canvasPosition = TextSize.Y - v29
+			}
+		end
+
+		return nil
+	end)
+end
+function v14.renderWithSelectionCursor(p7, p8) -- line: 103
+	-- upvalues: withStyle (copy), TextService (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy)
+	return withStyle(function(p9) -- line: 104
+		-- upvalues: TextService (copy), p7 (copy), Roact (copy), ImageSetLabel (copy), Assets (copy), p8 (copy), CursorKind (copy), ThemedTextLabel (copy)
+		local TextDefault = p9.Theme.TextDefault
+		local Body = p9.Font.Body
+		local TextSize = TextService:GetTextSize(p7.props.text, Body.RelativeSize * p9.Font.BaseSize, Body.Font, Vector2.new(p7.state.textBoxWidth, 10000))
+
+		return Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Image = Assets.Images.RoundedRect.Image,
+			ImageColor3 = p9.Theme.BackgroundMuted.Color,
+			ImageTransparency = p9.Theme.BackgroundMuted.Transparency,
+			Position = p7.props.Position,
+			ScaleType = Assets.Images.RoundedRect.ScaleType,
+			Size = p7.props.Size,
+			SliceCenter = Assets.Images.RoundedRect.SliceCenter,
+			LayoutOrder = p7.props.LayoutOrder
+		}, {
+			ScrollingFrame = Roact.createElement("ScrollingFrame", {
+				Size = UDim2.new(1, -24, 1, -14),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0, 7),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				CanvasSize = UDim2.new(1, -24, 0, TextSize.Y),
+				ScrollBarThickness = 8,
+				VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+				CanvasPosition = Vector2.new(0, p7.state.canvasPosition),
+				Selectable = false,
+				[Roact.Change.CanvasPosition] = function(p10) -- line: 138
+					-- upvalues: p7 (copy)
+					p7:setState({
+						canvasPosition = p10.CanvasPosition.Y
+					})
+				end,
+				[Roact.Change.AbsoluteSize] = function(p11) -- line: 144
+					-- upvalues: p7 (copy), p9 (copy), Body (copy)
+					p7:setState({
+						scrollingFrameHeight = p11.AbsoluteSize.Y
+					}, function() -- line: 145
+						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+						p7:calculateNeedsRescroll(p9, Body)
+					end)
+				end
+			}, {
+				TextBox = Roact.createElement("TextBox", {
+					Size = UDim2.new(1, -2, 1, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					Text = p7.props.text,
+					ClearTextOnFocus = false,
+					TextEditable = p7.props.enabled,
+					BackgroundTransparency = 1,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					TextColor3 = TextDefault.Color,
+					TextTransparency = TextDefault.Transparency,
+					Font = Body.Font,
+					TextSize = Body.RelativeSize * p9.Font.BaseSize,
+					TextWrapped = true,
+					MultiLine = true,
+					SelectionImageObject = p8(CursorKind.InputFields),
+					[Roact.Ref] = p7.textBoxRef,
+					[Roact.Change.Text] = function(p12) -- line: 170
+						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+						local ok, result = pcall(function() -- line: 171
+							-- upvalues: p12 (copy)
+							return utf8.len(utf8.nfcnormalize(p12.Text))
+						end)
+
+						if not ok or result > p7.props.maxTextLength then
+							p12.Text = p7.props.text
+
+							return
+						end
+
+						p7.props.textChanged(p12.Text)
+						p7:setState({
+							cursorPosition = p12.CursorPosition
+						}, function() -- line: 180
+							-- upvalues: p7 (copy), p9 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p9, Body)
+						end)
+					end,
+					[Roact.Change.AbsoluteSize] = function(p13) -- line: 185
+						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+						p7:setState({
+							textBoxWidth = p13.AbsoluteSize.X
+						}, function() -- line: 186
+							-- upvalues: p7 (copy), p9 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p9, Body)
+						end)
+					end,
+					[Roact.Change.CursorPosition] = function(p14) -- line: 191
+						-- upvalues: p7 (copy), p9 (copy), Body (copy)
+						p7:setState({
+							cursorPosition = p14.CursorPosition
+						}, function() -- line: 192
+							-- upvalues: p7 (copy), p9 (copy), Body (copy)
+							p7:calculateNeedsRescroll(p9, Body)
+						end)
+					end
+				}, {
+					PlaceholderText = Roact.createElement(ThemedTextLabel, {
+						themeKey = "TextDefault",
+						fontKey = "Body",
+						TextTransparency = 0.5,
+						TextWrapped = true,
+						Text = p7.props.PlaceholderText,
+						Size = UDim2.new(1, 0, 1, 0),
+						Position = UDim2.new(0, 0, 0, 0),
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextYAlignment = Enum.TextYAlignment.Top,
+						Visible = p7.props.text == ""
+					})
+				})
+			})
+		})
+	end)
+end
+function v14.render(p15) -- line: 216
+	-- upvalues: withSelectionCursorProvider (copy)
+	return withSelectionCursorProvider(function(p16) -- line: 217
+		-- upvalues: p15 (copy)
+		return p15:renderWithSelectionCursor(p16)
+	end)
+end
+function v14.didUpdate(p17, p18) -- line: 222
+	if not p17.props.enabled and p18.enabled then
+		if p17.textBoxRef.current and p17.textBoxRef.current:IsFocused() then
+			p17.textBoxRef.current:ReleaseFocus()
+
+			return
+		end
+	elseif p17.props.enabled and not p18.enabled and p17.props.autoFocusOnEnabled and p17.textBoxRef.current then
+		p17.textBoxRef.current:CaptureFocus()
+	end
+end
+
+return Roact.forwardRef(function(p19, p20) -- line: 235
+	-- upvalues: Roact (copy), v14 (copy), Cryo (copy)
+	return Roact.createElement(v14, Cryo.Dictionary.join(p19, {
+		textBoxRef = p20
+	}))
+end)

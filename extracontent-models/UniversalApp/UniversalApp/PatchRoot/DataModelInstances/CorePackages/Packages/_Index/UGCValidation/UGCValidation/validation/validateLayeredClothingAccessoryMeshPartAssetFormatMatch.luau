@@ -1,23 +1,31 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Analytics);
-local _ = require(l_Parent_0.util.Types);
-return function(v3, v4, v5) --[[ Line: 7 ]] --[[ Name: validateLayeredClothingAccessoryMeshPartAssetFormatMatch ]]
-    -- upvalues: v1 (copy)
-    local l_Handle_0 = v3:FindFirstChild("Handle");
-    assert(l_Handle_0 and l_Handle_0:IsA("MeshPart"));
-    local l_Handle_1 = v4:FindFirstChild("Handle");
-    assert(l_Handle_1 and l_Handle_1:IsA("MeshPart"));
-    if l_Handle_0.MeshId ~= l_Handle_1.MeshId then
-        v1.reportFailure(v1.ErrorType.validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch, nil, v5);
-        return false, {
-            string.format("Model meshId mismatch between MeshPart.MeshId and SpecialMesh.MeshId for %s. You need to match the meshIds and try again.", v3.Name)
-        };
-    elseif l_Handle_0.TextureID ~= l_Handle_1.TextureID then
-        v1.reportFailure(v1.ErrorType.validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch, nil, v5);
-        return false, {
-            string.format("Model textureId mismatch between MeshPart.TextureID and SpecialMesh.TextureId for %s. You need to match the textureIds and try again.", v3.Name)
-        };
-    else
-        return true;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+
+require(ParentParent.util.Types)
+
+local function validateLayeredClothingAccessoryMeshPartAssetFormatMatch(p1, p2, p3) -- line: 7
+	-- upvalues: Analytics (copy)
+	local Handle = p1:FindFirstChild("Handle")
+
+	assert(Handle and Handle:IsA("MeshPart"))
+
+	local Handle2 = p2:FindFirstChild("Handle")
+
+	assert(Handle2 and Handle2:IsA("MeshPart"))
+
+	if Handle.MeshId ~= Handle2.MeshId then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessoryMeshPartAssetFormatMatch_MeshIdMismatch, nil, p3)
+
+		return false, { string.format("Model meshId mismatch between MeshPart.MeshId and SpecialMesh.MeshId for %s. You need to match the meshIds and try again.", p1.Name) }
+	end
+
+	if Handle.TextureID ~= Handle2.TextureID then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessoryMeshPartAssetFormatMatch_TextureIdMismatch, nil, p3)
+
+		return false, { string.format("Model textureId mismatch between MeshPart.TextureID and SpecialMesh.TextureId for %s. You need to match the textureIds and try again.", p1.Name) }
+	end
+
+	return true
+end
+
+return validateLayeredClothingAccessoryMeshPartAssetFormatMatch

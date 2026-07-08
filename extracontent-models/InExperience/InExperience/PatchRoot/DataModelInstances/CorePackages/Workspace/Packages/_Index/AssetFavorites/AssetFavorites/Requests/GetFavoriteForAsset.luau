@@ -1,10 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AssetFavorites");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v4, v5, v6) --[[ Line: 16 ]]
-    -- upvalues: l_Url_0 (copy), l_HttpService_0 (copy)
-    return v4(string.format("%s/v1/favorites/users/%s/assets/%s/favorite", l_Url_0.CATALOG_URL, v5, v6), "GET", {
-        postBody = l_HttpService_0:JSONEncode({})
-    });
-end;
+local AssetFavorites = script:FindFirstAncestor("AssetFavorites")
+local HttpService = game:GetService("HttpService")
+local AssetFavoritesParent = AssetFavorites.Parent
+local Url = require(AssetFavoritesParent.Http).Url
+
+return function(p1, s1: string, s2: string) -- line: 16
+	-- upvalues: Url (copy), HttpService (copy)
+	return p1(string.format("%s/v1/favorites/users/%s/assets/%s/favorite", Url.CATALOG_URL, s1, s2), "GET", {
+		postBody = HttpService:JSONEncode({})
+	})
+end

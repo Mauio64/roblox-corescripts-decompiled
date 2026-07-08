@@ -1,6 +1,6 @@
 return {
-    IncompatibleAccounts = "IncompatibleAccounts", 
-    RetryLogInAlreadyLinked = "RetryLogInAlreadyLinked", 
-    RetryLogInGenericError = "RetryLogInGenericError", 
-    RetryLogInConnectionFailure = "RetryLogInConnectionFailure"
-};
+	IncompatibleAccounts = "IncompatibleAccounts",
+	RetryLogInAlreadyLinked = "RetryLogInAlreadyLinked",
+	RetryLogInGenericError = "RetryLogInGenericError",
+	RetryLogInConnectionFailure = "RetryLogInConnectionFailure"
+}

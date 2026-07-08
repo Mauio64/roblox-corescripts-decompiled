@@ -1,72 +1,82 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Boolean_0 = v2.Boolean;
-local l_Object_0 = v2.Object;
-local v6 = {};
-local _ = require(l_Parent_1.GraphQL);
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_Error_0 = v2.Error;
-v6.getFragmentQueryDocument = function(v10, v11) --[[ Line: 49 ]] --[[ Name: getFragmentQueryDocument ]]
-    -- upvalues: l_Array_0 (copy), l_Error_0 (copy), l_Boolean_0 (copy), l_invariant_0 (copy), l_Object_0 (copy)
-    local l_v11_0 = v11;
-    local v13 = {};
-    l_Array_0.forEach(v10.definitions, function(v14) --[[ Line: 55 ]]
-        -- upvalues: l_Error_0 (ref), l_Boolean_0 (ref), v13 (copy)
-        if v14.kind == "OperationDefinition" then
-            error(l_Error_0.new(("Found a %s operation%s. "):format(tostring(v14.operation), if l_Boolean_0.toJSBoolean(v14.name) then (" named '%s'"):format((tostring(v14.name.value))) else "") .. "No operations are allowed when using a fragment as a query. Only fragments are allowed."));
-        end;
-        if v14.kind == "FragmentDefinition" then
-            table.insert(v13, v14);
-        end;
-    end);
-    if typeof(l_v11_0) == "nil" then
-        l_invariant_0(#v13 == 1, string.format("Found %s fragments. `fragmentName` must be provided when there is not exactly 1 fragment.", (tostring(#v13))));
-        l_v11_0 = v13[1].name.value;
-    end;
-    return (l_Object_0.assign({}, v10, {
-        definitions = l_Array_0.concat({}, {
-            {
-                kind = "OperationDefinition", 
-                operation = "query", 
-                selectionSet = {
-                    kind = "SelectionSet", 
-                    selections = {
-                        {
-                            kind = "FragmentSpread", 
-                            name = {
-                                kind = "Name", 
-                                value = l_v11_0
-                            }
-                        }
-                    }
-                }
-            }
-        }, v10.definitions)
-    }));
-end;
-v6.createFragmentMap = function(v15) --[[ Line: 121 ]] --[[ Name: createFragmentMap ]]
-    -- upvalues: l_Array_0 (copy)
-    local v16 = if v15 ~= nil then v15 else {};
-    local v17 = {};
-    l_Array_0.forEach(v16, function(v18) --[[ Line: 124 ]]
-        -- upvalues: v17 (copy)
-        v17[v18.name.value] = v18;
-    end);
-    return v17;
-end;
-v6.getFragmentFromSelection = function(v19, v20) --[[ Line: 131 ]] --[[ Name: getFragmentFromSelection ]]
-    -- upvalues: l_invariant_0 (copy)
-    local l_kind_0 = v19.kind;
-    if l_kind_0 == "InlineFragment" then
-        return v19;
-    elseif l_kind_0 == "FragmentSpread" then
-        local v22 = v20 and v20[v19.name.value];
-        l_invariant_0(v22, ("No fragment named %s."):format(v19.name.value));
-        return v22;
-    else
-        return nil;
-    end;
-end;
-return v6;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+
+require(ParentParentParent.GraphQL)
+
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local Error = LuauPolyfill.Error
+
+function t1.getFragmentQueryDocument(p1, s1: string?) -- line: 49
+	-- upvalues: Array (copy), Error (copy), Boolean (copy), invariant (copy), Object (copy)
+	local t2 = {}
+
+	Array.forEach(p1.definitions, function(p2) -- line: 55
+		-- upvalues: Error (copy), Boolean (copy), t2 (copy)
+		if p2.kind == "OperationDefinition" then
+			error(Error.new(("Found a %s operation%s. "):format(tostring(p2.operation), not Boolean.toJSBoolean(p2.name) and "" or (" named '%s'"):format((tostring(p2.name.value)))) .. "No operations are allowed when using a fragment as a query. Only fragments are allowed."))
+		end
+
+		if p2.kind == "FragmentDefinition" then
+			table.insert(t2, p2)
+		end
+	end)
+
+	if typeof(s1) == "nil" then
+		invariant(#t2 == 1, string.format("Found %s fragments. `fragmentName` must be provided when there is not exactly 1 fragment.", (tostring(#t2))))
+		s1 = t2[1].name.value
+	end
+
+	return (Object.assign({}, p1, {
+		definitions = Array.concat({}, {{
+			kind = "OperationDefinition",
+			operation = "query",
+			selectionSet = {
+				kind = "SelectionSet",
+				selections = {{
+					kind = "FragmentSpread",
+					name = {
+						kind = "Name",
+						value = s1
+					}
+				}}
+			}
+		}}, p1.definitions)
+	}))
+end
+function t1.createFragmentMap(p3) -- line: 121
+	-- upvalues: Array (copy)
+	local v14 = if p3 == nil then {} else p3
+	local t3 = {}
+
+	Array.forEach(v14, function(p4) -- line: 124
+		-- upvalues: t3 (copy)
+		t3[p4.name.value] = p4
+	end)
+
+	return t3
+end
+function t1.getFragmentFromSelection(p5, t4: {[any]: any}?) -- line: 131
+	-- upvalues: invariant (copy)
+	local kind = p5.kind
+
+	if kind == "InlineFragment" then
+		return p5
+	end
+
+	if kind == "FragmentSpread" then
+		local v19 = t4 and t4[p5.name.value]
+
+		invariant(v19, ("No fragment named %s."):format(p5.name.value))
+
+		return v19
+	end
+
+	return nil
+end
+
+return t1

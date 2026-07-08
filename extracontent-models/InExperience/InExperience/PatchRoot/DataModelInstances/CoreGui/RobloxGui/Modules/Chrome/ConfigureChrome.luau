@@ -13,56 +13,95 @@ local isConnectDropdownEnabled = require(Chrome.Integrations.Connect.isConnectDr
 local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.SharedExperimentDefinition).isInExperienceUIVREnabled
 local ConfigureShortcuts = require(Chrome.ChromeShared.Shortcuts.ConfigureShortcuts)
 local Constants2 = require(Chrome.ChromeShared.Unibar.Constants)
+local InExperienceSideSheet = require(CorePackages.Workspace.Packages.InExperienceSideSheet)
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local GetFFlagDebugEnableUnibarDummyIntegrations = SharedFlags.GetFFlagDebugEnableUnibarDummyIntegrations
 local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
 local FFlagEnableInExperienceAvatarSwitcher = SharedFlags.FFlagEnableInExperienceAvatarSwitcher
 local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
-local FFlagAddIGMToSideSheet = SharedFlags.FFlagAddIGMToSideSheet
+local FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration
+local FFlagSideSheetSwapGalleryOrder = SharedFlags.FFlagSideSheetSwapGalleryOrder
+local FFlagEnableInExperienceShop = SharedFlags.FFlagEnableInExperienceShop
+local FFlagAppNavMyStatsTab = SharedFlags.FFlagAppNavMyStatsTab
+local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
+local FFlagRemoveFriendsChatUnibarEntrypoints = SharedFlags.FFlagRemoveFriendsChatUnibarEntrypoints
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagReverseUnibar = require(Chrome.Flags.FFlagReverseUnibar)
+local FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags.FFlagIntegrateTraversalHistoryInSideSheet
+local FFlagAddTraversalHistory = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).Traversal.Flags.FFlagAddTraversalHistory
 local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
 
-require(Chrome.Integrations)
-
-if FFlagEnableConsoleExpControls then
-	ConfigureShortcuts()
-end;
-
-(function() --[[ configureUnibar ]] -- line: 37
-	-- upvalues: isConnectDropdownEnabled (copy), GetFFlagDebugEnableUnibarDummyIntegrations (copy), isConnectUnibarEnabled (copy), Constants (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), Service (copy), FFlagEnableInExperienceAvatarSwitcher (copy), Constants2 (copy), GuiService (copy), FFlagEnableSideSheet (copy), FFlagAddIGMToSideSheet (copy)
+local function initializeIntegrations() -- line: 42
+	-- upvalues: Chrome (copy)
+	require(Chrome.Integrations)
+end
+local function configureUnibar() -- line: 50
+	-- upvalues: FFlagEnableSideSheet (copy), isConnectDropdownEnabled (copy), FFlagRemoveFriendsChatUnibarEntrypoints (copy), FFlagExpChatEnableFriendsTab (copy), ArgoPartyExperimentation (copy), FFlagReverseUnibar (copy), GetFFlagDebugEnableUnibarDummyIntegrations (copy), isConnectUnibarEnabled (copy), Constants (copy), FFlagAppNavMyStatsTab (copy), isInExperienceUIVREnabled (copy), isSpatial (copy), Service (copy), FFlagEnableInExperienceAvatarSwitcher (copy), Constants2 (copy), GuiService (copy), FFlagSideSheetSwapGalleryOrder (copy), FFlagAddTraversalHistory (copy), FFlagIntegrateTraversalHistoryInSideSheet (copy), FFlagAddInviteFriendsIntegration (copy), InExperienceSideSheet (copy), FFlagEnableInExperienceShop (copy)
 	local t1 = {
 		"leaderboard",
 		"emotes",
 		"backpack"
 	}
 
-	table.insert(t1, "respawn")
+	if not FFlagEnableSideSheet then
+		table.insert(t1, "respawn")
+	end
+
 	table.insert(t1, 1, "trust_and_safety")
 
-	if isConnectDropdownEnabled() then
+	if isConnectDropdownEnabled() and (not FFlagRemoveFriendsChatUnibarEntrypoints or not FFlagExpChatEnableFriendsTab or not ArgoPartyExperimentation.getIsRenameEnabled()) then
 		table.insert(t1, 1, "connect_dropdown")
 	end
 
 	local t2 = {
-		"toggle_mic_mute",
+		"nine_dot",
 		"chat",
-		"nine_dot"
+		"toggle_mic_mute"
 	}
 
-	table.insert(t2, 2, "join_voice")
+	if FFlagReverseUnibar then
+		table.insert(t2, 3, "join_voice")
 
-	if GetFFlagDebugEnableUnibarDummyIntegrations() then
-		table.insert(t2, 1, "dummy_window")
-		table.insert(t2, 1, "dummy_window_2")
+		if GetFFlagDebugEnableUnibarDummyIntegrations() then
+			table.insert(t2, "dummy_window")
+			table.insert(t2, "dummy_window_2")
+		end
+
+		if isConnectUnibarEnabled() then
+			table.insert(t2, not ArgoPartyExperimentation.getIsRenameEnabled() and "connect_unibar" or "party_entrypoint")
+		end
+
+		local v32 = table.find(t2, "toggle_mic_mute")
+
+		if v32 then
+			table.insert(t2, v32, Constants.TOGGLE_MIC_INTEGRATION_ID)
+		end
+	else
+		t2 = {
+			"toggle_mic_mute",
+			"chat",
+			"nine_dot"
+		}
+		table.insert(t2, 2, "join_voice")
+
+		if GetFFlagDebugEnableUnibarDummyIntegrations() then
+			table.insert(t2, 1, "dummy_window")
+			table.insert(t2, 1, "dummy_window_2")
+		end
+
+		if isConnectUnibarEnabled() then
+			table.insert(t2, 1, not ArgoPartyExperimentation.getIsRenameEnabled() and "connect_unibar" or "party_entrypoint")
+		end
+
+		local v33 = table.find(t2, "toggle_mic_mute")
+
+		if v33 then
+			table.insert(t2, v33 + 1, Constants.TOGGLE_MIC_INTEGRATION_ID)
+		end
 	end
 
-	if isConnectUnibarEnabled() then
-		table.insert(t2, 1, "connect_unibar")
-	end
-
-	local v20 = table.find(t2, "toggle_mic_mute")
-
-	if v20 then
-		table.insert(t2, v20 + 1, Constants.TOGGLE_MIC_INTEGRATION_ID)
+	if FFlagAppNavMyStatsTab then
+		table.insert(t2, "assistant_build")
 	end
 
 	if isInExperienceUIVREnabled and isSpatial() then
@@ -95,14 +134,47 @@ end;
 		table.insert(t1, 4, "music_entrypoint")
 	end
 
-	if FFlagEnableSideSheet and FFlagAddIGMToSideSheet then
+	if FFlagEnableSideSheet then
 		table.insert(t1, "people")
 		table.insert(t1, "settings")
-		table.insert(t1, "gallery")
+
+		if FFlagSideSheetSwapGalleryOrder then
+			table.insert(t1, "gallery")
+			table.remove(t1, table.find(t1, "trust_and_safety"))
+			table.insert(t1, "trust_and_safety")
+		else
+			table.remove(t1, table.find(t1, "trust_and_safety"))
+			table.insert(t1, "trust_and_safety")
+			table.insert(t1, "gallery")
+		end
+
 		table.insert(t1, "help")
+
+		if FFlagAddTraversalHistory and FFlagIntegrateTraversalHistoryInSideSheet then
+			table.insert(t1, "traversal_history")
+		end
+
+		if FFlagAddInviteFriendsIntegration then
+			table.insert(t1, 2, "invite_friends")
+		end
+
+		table.insert(t1, InExperienceSideSheet.Enums.ActionBinding.Leave)
+		table.insert(t1, InExperienceSideSheet.Enums.ActionBinding.Respawn)
+	end
+
+	if FFlagEnableInExperienceShop then
+		table.insert(t1, 2, Constants2.IN_EXPERIENCE_SHOP_ID)
 	end
 
 	Service:configureSubMenu("nine_dot", t1)
-end)()
+end
+
+require(Chrome.Integrations)
+
+if FFlagEnableConsoleExpControls then
+	ConfigureShortcuts()
+end
+
+configureUnibar()
 
 return nil

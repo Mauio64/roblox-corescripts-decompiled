@@ -1,205 +1,238 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3, v4, v5) --[[ Line: 7 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    return (setmetatable({
-        ids = v2.makeArray(v4), 
-        delimiter = v5
-    }, v3));
-end;
-v2.setIds = function(v6, v7) --[[ Line: 14 ]] --[[ Name: setIds ]]
-    -- upvalues: v2 (copy)
-    v6.ids = v2.makeArray(v7);
-end;
-v2.makeArray = function(v8) --[[ Line: 18 ]] --[[ Name: makeArray ]]
-    if type(v8) == "table" then
-        return v8;
-    else
-        return {
-            v8
-        };
-    end;
-end;
-v2.__tostring = function(v9) --[[ Line: 25 ]] --[[ Name: __tostring ]]
-    return table.concat(v9.ids, v9.delimiter);
-end;
-local v10 = {};
-v10.__index = v10;
-v10.new = function(v11, v12) --[[ Line: 54 ]] --[[ Name: new ]]
-    -- upvalues: v10 (copy)
-    local v13 = {
-        baseUrl = v11:gsub("/*$", ""), 
-        args = {}, 
-        pathElements = {}, 
-        configurableIds = nil, 
-        namedIds = {}, 
-        idsDelimiter = ",", 
-        options = {
-            queryArgs = nil, 
-            postBody = nil, 
-            headers = nil
-        }, 
-        useExpandedForm = {}, 
-        statusIds = nil, 
-        additionalData = v12 or {}
-    };
-    setmetatable(v13, v10);
-    return v13;
-end;
-v10.path = function(v14, v15) --[[ Line: 80 ]] --[[ Name: path ]]
-    v15 = v15:gsub("^/", ""):gsub("/$", "");
-    table.insert(v14.pathElements, v15);
-    return v14;
-end;
-v10.id = function(v16, v17, v18) --[[ Line: 87 ]] --[[ Name: id ]]
-    -- upvalues: v2 (copy)
-    if not v18 and #v16.pathElements < 1 then
-        warn("Cannot name id or ids because there is no leading path segment and no name is provided");
-    end;
-    local v19 = v18 or v16.pathElements[#v16.pathElements];
-    v16.namedIds[v19] = v17;
-    v16.configurableIds = v2:new(v17, v16.idsDelimiter);
-    table.insert(v16.pathElements, v16.configurableIds);
-    return v16;
-end;
-v10.queryArgWithIds = function(v20, v21, v22) --[[ Line: 99 ]] --[[ Name: queryArgWithIds ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v23 = v1.List.join(v22, v20.namedIds[v21] or {});
-    v20.namedIds[v21] = v23;
-    v20.configurableIds = v2:new(v23, v20.idsDelimiter);
-    v20.args = v1.Dictionary.join(v20.args, {
-        [v21] = v20.configurableIds
-    });
-    return v20;
-end;
-v10.expandedQueryArgsWithIds = function(v24, v25, v26) --[[ Line: 109 ]] --[[ Name: expandedQueryArgsWithIds ]]
-    v24.useExpandedForm[v25] = true;
-    v24:queryArgWithIds(v25, v26);
-    return v24;
-end;
-v10.queryArgs = function(v27, v28) --[[ Line: 115 ]] --[[ Name: queryArgs ]]
-    -- upvalues: v1 (copy)
-    v27.args = v1.Dictionary.join(v27.args, v28);
-    v27.options.queryArgs = v1.Dictionary.join(v28, v27.options.queryArgs or {});
-    return v27;
-end;
-v10.body = function(v29, v30) --[[ Line: 121 ]] --[[ Name: body ]]
-    v29.options.postBody = v30;
-    return v29;
-end;
-v10.headers = function(v31, v32) --[[ Line: 126 ]] --[[ Name: headers ]]
-    v31.options.headers = v32;
-    return v31;
-end;
-v10.makeKeyMapper = function(v33) --[[ Line: 131 ]] --[[ Name: makeKeyMapper ]]
-    return function(v34) --[[ Line: 132 ]]
-        -- upvalues: v33 (copy)
-        return v33:getStatusIds() and v33:makeStatusUrl(v34) or v33:makeNamedIdsUrl(v34);
-    end;
-end;
-v10._normalize = function(_, v36) --[[ Line: 139 ]] --[[ Name: _normalize ]]
-    return v36:gsub("/+", "/");
-end;
-v10.makeUri = function(v37) --[[ Line: 143 ]] --[[ Name: makeUri ]]
-    local v38 = "";
-    for _, v40 in ipairs(v37.pathElements) do
-        v38 = v38 .. "/" .. tostring(v40);
-    end;
-    return v37:_normalize(v38);
-end;
-local function v41(v42, v43, v44, v45) --[[ Line: 151 ]] --[[ Name: concatArguments ]]
-    -- upvalues: v41 (copy)
-    if v45 then
-        for _, v47 in pairs(v44.ids) do
-            v42 = v41(v42, v43, v47);
-        end;
-        return v42;
-    else
-        local v48 = tostring(v43) .. "=" .. tostring(v44);
-        if v42:len() > 1 then
-            return v42 .. "&" .. v48;
-        else
-            return v48;
-        end;
-    end;
-end;
-v10.makeQueryArgs = function(v49, v50, v51) --[[ Line: 168 ]] --[[ Name: makeQueryArgs ]]
-    -- upvalues: v41 (copy)
-    v49:_plugInConfigurableIds(v50);
-    local v52 = "";
-    for v53, v54 in pairs(v49.args) do
-        if v51 and v49.namedIds[v53] or not v51 then
-            v52 = v41(v52, v53, v54, v49.useExpandedForm[v53]);
-        end;
-    end;
-    if v52:len() > 1 then
-        return "?" .. v52;
-    else
-        return "";
-    end;
-end;
-v10.makeUrl = function(v55, v56, v57) --[[ Line: 184 ]] --[[ Name: makeUrl ]]
-    v55:_plugInConfigurableIds(v56);
-    return v55.baseUrl .. v55:makeUri() .. v55:makeQueryArgs(v56, v57);
-end;
-v10.makeStatusUrl = function(v58, v59) --[[ Line: 190 ]] --[[ Name: makeStatusUrl ]]
-    local v60 = v58.baseUrl .. v58:makeUri();
-    if not v59 then
-        return v60;
-    else
-        local v61 = type(v59) == "table" and v59 or {
-            v59
-        };
-        local v62 = "";
-        for v63, v64 in pairs(v61) do
-            v62 = v63 > 1 and v62 .. "&" .. v64 or v64;
-        end;
-        return v60 .. "?" .. v62;
-    end;
-end;
-v10.makeNamedIdsUrl = function(v65, v66) --[[ Line: 205 ]] --[[ Name: makeNamedIdsUrl ]]
-    return v65:makeUrl(v66, true);
-end;
-v10.makeOptions = function(v67) --[[ Line: 209 ]] --[[ Name: makeOptions ]]
-    return v67.options;
-end;
-v10._plugInConfigurableIds = function(v68, v69) --[[ Line: 213 ]] --[[ Name: _plugInConfigurableIds ]]
-    if v69 ~= nil and v68.configurableIds then
-        v68.configurableIds:setIds(v69);
-    end;
-end;
-v10.getIds = function(v70) --[[ Line: 219 ]] --[[ Name: getIds ]]
-    if v70.configurableIds and v70.configurableIds.ids then
-        return v70.configurableIds.ids;
-    elseif v70.statusIds then
-        return v70.statusIds;
-    else
-        return {};
-    end;
-end;
-v10.getNamedIds = function(v71) --[[ Line: 229 ]] --[[ Name: getNamedIds ]]
-    return v71.namedIds;
-end;
-v10.setStatusIds = function(v72, v73) --[[ Line: 233 ]] --[[ Name: setStatusIds ]]
-    -- upvalues: v1 (copy)
-    if v72.configurableIds then
-        warn("Cannot set statusIds because ids already provided in URl");
-        return v72;
-    else
-        v72.statusIds = v1.List.join(v72.statusIds or {}, v73);
-        return v72;
-    end;
-end;
-v10.getStatusIds = function(v74) --[[ Line: 242 ]] --[[ Name: getStatusIds ]]
-    if v74.configurableIds then
-        return nil;
-    else
-        return v74.statusIds;
-    end;
-end;
-v10.getAdditionalData = function(v75) --[[ Line: 250 ]] --[[ Name: getAdditionalData ]]
-    return v75.additionalData or {};
-end;
-return v10;
+local scriptParent = script.Parent
+local Cryo = require(scriptParent.Cryo)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, p3) -- line: 7
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		ids = t1.makeArray(p2),
+		delimiter = p3
+	}, p1))
+end
+function t1.setIds(p4, p5) -- line: 14
+	-- upvalues: t1 (copy)
+	p4.ids = t1.makeArray(p5)
+end
+function t1.makeArray(p6) -- line: 18
+	if type(p6) == "table" then
+		return p6
+	end
+
+	return { p6 }
+end
+function t1.__tostring(p7) -- line: 25
+	return table.concat(p7.ids, p7.delimiter)
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(s1: string, p8) -- line: 54
+	-- upvalues: t2 (copy)
+	local v15 = s1:gsub("/*$", "")
+	local t3 = {
+		configurableIds = nil,
+		idsDelimiter = ",",
+		statusIds = nil,
+		baseUrl = v15,
+		args = {},
+		pathElements = {},
+		namedIds = {},
+		options = {
+			queryArgs = nil,
+			postBody = nil,
+			headers = nil
+		},
+		useExpandedForm = {},
+		additionalData = p8 or {}
+	}
+
+	setmetatable(t3, t2)
+
+	return t3
+end
+function t2.path(p9, s2: string) -- line: 80
+	local v19 = s2:gsub("^/", ""):gsub("/$", "")
+
+	table.insert(p9.pathElements, v19)
+
+	return p9
+end
+function t2.id(p10, p11, p12) -- line: 87
+	-- upvalues: t1 (copy)
+	if not p12 and #p10.pathElements < 1 then
+		warn("Cannot name id or ids because there is no leading path segment and no name is provided")
+	end
+
+	local v23 = p12 or p10.pathElements[#p10.pathElements]
+
+	p10.namedIds[v23] = p11
+	p10.configurableIds = t1:new(p11, p10.idsDelimiter)
+	table.insert(p10.pathElements, p10.configurableIds)
+
+	return p10
+end
+function t2.queryArgWithIds(p13, p14, p15) -- line: 99
+	-- upvalues: Cryo (copy), t1 (copy)
+	local v27 = Cryo.List.join(p15, p13.namedIds[p14] or {})
+
+	p13.namedIds[p14] = v27
+	p13.configurableIds = t1:new(v27, p13.idsDelimiter)
+	p13.args = Cryo.Dictionary.join(p13.args, {
+		[p14] = p13.configurableIds
+	})
+
+	return p13
+end
+function t2.expandedQueryArgsWithIds(p16, p17, p18) -- line: 109
+	p16.useExpandedForm[p17] = true
+	p16:queryArgWithIds(p17, p18)
+
+	return p16
+end
+function t2.queryArgs(p19, p20) -- line: 115
+	-- upvalues: Cryo (copy)
+	p19.args = Cryo.Dictionary.join(p19.args, p20)
+	p19.options.queryArgs = Cryo.Dictionary.join(p20, p19.options.queryArgs or {})
+
+	return p19
+end
+function t2.body(p21, p22) -- line: 121
+	p21.options.postBody = p22
+
+	return p21
+end
+function t2.headers(p23, t4: {[any]: any}) -- line: 126
+	p23.options.headers = t4
+
+	return p23
+end
+function t2.makeKeyMapper(p24) -- line: 131
+	return function(p25) -- line: 132
+		-- upvalues: p24 (copy)
+		return p24:getStatusIds() and p24:makeStatusUrl(p25) or p24:makeNamedIdsUrl(p25)
+	end
+end
+function t2._normalize(_, p27) -- line: 139
+	return p27:gsub("/+", "/")
+end
+function t2.makeUri(p28) -- line: 143
+	local s3 = ""
+
+	for _, v in ipairs(p28.pathElements) do
+		s3 ..= "/" .. tostring(v)
+	end
+
+	return p28:_normalize(s3)
+end
+
+local function concatArguments(s4: string, s5: string, p29, b1: boolean?) -- line: 151
+	-- upvalues: concatArguments (copy)
+	if b1 then
+		for _, v in pairs(p29.ids) do
+			s4 = concatArguments(s4, s5, v)
+		end
+
+		return s4
+	end
+
+	local v50 = tostring(s5) .. "=" .. tostring(p29)
+
+	if s4:len() > 1 then
+		return s4 .. "&" .. v50
+	end
+
+	return v50
+end
+
+function t2.makeQueryArgs(p30, p31, b2: boolean?) -- line: 168
+	-- upvalues: concatArguments (copy)
+	p30:_plugInConfigurableIds(p31)
+
+	local s6 = ""
+
+	for k, v in pairs(p30.args) do
+		if b2 and p30.namedIds[k] or not b2 then
+			s6 = concatArguments(s6, k, v, p30.useExpandedForm[k])
+		end
+	end
+
+	if s6:len() > 1 then
+		return "?" .. s6
+	end
+
+	return ""
+end
+function t2.makeUrl(p32, p33, b3: boolean?) -- line: 184
+	p32:_plugInConfigurableIds(p33)
+
+	return p32.baseUrl .. p32:makeUri() .. p32:makeQueryArgs(p33, b3)
+end
+function t2.makeStatusUrl(p34, p35) -- line: 190
+	local v62 = p34.baseUrl .. p34:makeUri()
+
+	if not p35 then
+		return v62
+	end
+
+	local v63 = type(p35) == "table" and p35 or { p35 }
+	local s7 = ""
+
+	for k, v in pairs(v63) do
+		s7 = k > 1 and s7 .. "&" .. v or v
+	end
+
+	return v62 .. "?" .. s7
+end
+function t2.makeNamedIdsUrl(p36, p37) -- line: 205
+	return p36:makeUrl(p37, true)
+end
+function t2.makeOptions(p38) -- line: 209
+	return p38.options
+end
+function t2._plugInConfigurableIds(p39, p40) -- line: 213
+	if p40 ~= nil and p39.configurableIds then
+		p39.configurableIds:setIds(p40)
+	end
+end
+function t2.getIds(p41) -- line: 219
+	if p41.configurableIds and p41.configurableIds.ids then
+		return p41.configurableIds.ids
+	end
+
+	if p41.statusIds then
+		return p41.statusIds
+	end
+
+	return {}
+end
+function t2.getNamedIds(p42) -- line: 229
+	return p42.namedIds
+end
+function t2.setStatusIds(p43, p44) -- line: 233
+	-- upvalues: Cryo (copy)
+	if p43.configurableIds then
+		warn("Cannot set statusIds because ids already provided in URl")
+
+		return p43
+	end
+
+	p43.statusIds = Cryo.List.join(p43.statusIds or {}, p44)
+
+	return p43
+end
+function t2.getStatusIds(p45) -- line: 242
+	if p45.configurableIds then
+		return nil
+	end
+
+	return p45.statusIds
+end
+function t2.getAdditionalData(p46) -- line: 250
+	return p46.additionalData or {}
+end
+
+return t2

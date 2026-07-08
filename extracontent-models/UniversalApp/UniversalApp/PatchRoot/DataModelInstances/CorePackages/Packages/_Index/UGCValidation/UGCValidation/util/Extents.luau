@@ -1,109 +1,128 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function() --[[ Line: 14 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v1 = setmetatable({}, v0);
-    v1.min = Vector3.new(1e999, 1e999, 1e999, 0);
-    v1.max = Vector3.new(-1e999, -1e999, -1e999, 0);
-    return v1;
-end;
-v0.fromMinMax = function(v2, v3) --[[ Line: 22 ]] --[[ Name: fromMinMax ]]
-    -- upvalues: v0 (copy)
-    local v4 = v0.new();
-    local v5 = {
-        X = v2.X, 
-        Y = v2.Y, 
-        Z = v2.Z
-    };
-    local v6 = {
-        X = v3.X, 
-        Y = v3.Y, 
-        Z = v3.Z
-    };
-    for _, v8 in {
-        "X", 
-        "Y", 
-        "Z"
-    } do
-        if v6[v8] ~= -1e999 and v5[v8] ~= 1e999 and v5[v8] > v6[v8] then
-            local v9 = v5[v8];
-            v5[v8] = v6[v8];
-            v6[v8] = v9;
-        end;
-    end;
-    v4.min = Vector3.new(v5.X, v5.Y, v5.Z);
-    v4.max = Vector3.new(v6.X, v6.Y, v6.Z);
-    return v4;
-end;
-v0.unionExtents = function(v10, v11) --[[ Line: 42 ]] --[[ Name: unionExtents ]]
-    -- upvalues: v0 (copy)
-    local v12 = v0.new();
-    v12.min = v10.min:Min(v11.min);
-    v12.max = v10.max:Max(v11.max);
-    return v12;
-end;
-v0.intersectExtents = function(v13, v14) --[[ Line: 49 ]] --[[ Name: intersectExtents ]]
-    -- upvalues: v0 (copy)
-    local v15 = {
-        X = 1e999, 
-        Y = 1e999, 
-        Z = 1e999
-    };
-    local v16 = {
-        X = -1e999, 
-        Y = -1e999, 
-        Z = -1e999
-    };
-    for _, v18 in {
-        "X", 
-        "Y", 
-        "Z"
-    } do
-        if v13.max[v18] >= v13.min[v18] and v14.max[v18] >= v14.min[v18] then
-            local v19 = math.max(v13.min[v18], v14.min[v18]);
-            local v20 = math.min(v13.max[v18], v14.max[v18]);
-            if v19 <= v20 then
-                v15[v18] = v19;
-                v16[v18] = v20;
-            end;
-        end;
-    end;
-    local v21 = v0.new();
-    v21.min = Vector3.new(v15.X, v15.Y, v15.Z);
-    v21.max = Vector3.new(v16.X, v16.Y, v16.Z);
-    return v21;
-end;
-v0.expandToInclude = function(v22, v23) --[[ Line: 72 ]] --[[ Name: expandToInclude ]]
-    -- upvalues: v0 (copy)
-    local v24 = v0.new();
-    v24.min = v22.min:Min(v23);
-    v24.max = v22.max:Max(v23);
-    return v24;
-end;
-v0.isValid = function(v25) --[[ Line: 79 ]] --[[ Name: isValid ]]
-    for _, v27 in {
-        "X", 
-        "Y", 
-        "Z"
-    } do
-        if v25.max[v27] < v25.min[v27] then
-            return false;
-        end;
-    end;
-    return true;
-end;
-v0.size = function(v28) --[[ Line: 88 ]] --[[ Name: size ]]
-    if v28:isValid() then
-        return v28.max - v28.min;
-    else
-        return nil;
-    end;
-end;
-v0.center = function(v29) --[[ Line: 95 ]] --[[ Name: center ]]
-    if v29:isValid() then
-        return (v29.max + v29.min) / 2;
-    else
-        return nil;
-    end;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 14
+	-- upvalues: t1 (copy)
+	local self = setmetatable({}, t1)
+
+	self.min = Vector3.new(1e999, 1e999, 1e999)
+	self.max = Vector3.new(-1e999, -1e999, -1e999)
+
+	return self
+end
+function t1.fromMinMax(vector3: Vector3, vector3_2: Vector3) -- line: 22
+	-- upvalues: t1 (copy)
+	local v5 = t1.new()
+	local t2 = {
+		X = vector3.X,
+		Y = vector3.Y,
+		Z = vector3.Z
+	}
+	local t3 = {
+		X = vector3_2.X,
+		Y = vector3_2.Y,
+		Z = vector3_2.Z
+	}
+
+	for _, v9 in {
+		"X",
+		"Y",
+		"Z"
+	} do
+		if t3[v9] ~= -1e999 and t2[v9] ~= 1e999 and t2[v9] > t3[v9] then
+			local v10 = t2[v9]
+
+			t2[v9] = t3[v9]
+			t3[v9] = v10
+		end
+	end
+
+	v5.min = Vector3.new(t2.X, t2.Y, t2.Z)
+	v5.max = Vector3.new(t3.X, t3.Y, t3.Z)
+
+	return v5
+end
+function t1.unionExtents(p1, p2) -- line: 42
+	-- upvalues: t1 (copy)
+	local v13 = t1.new()
+
+	v13.min = p1.min:Min(p2.min)
+	v13.max = p1.max:Max(p2.max)
+
+	return v13
+end
+function t1.intersectExtents(p3, p4) -- line: 49
+	-- upvalues: t1 (copy)
+	local t4 = {
+		X = 1e999,
+		Y = 1e999,
+		Z = 1e999
+	}
+	local t5 = {
+		X = -1e999,
+		Y = -1e999,
+		Z = -1e999
+	}
+
+	for _, v19 in {
+		"X",
+		"Y",
+		"Z"
+	} do
+		if not (p3.max[v19] < p3.min[v19]) and not (p4.max[v19] < p4.min[v19]) then
+			local v20 = math.max(p3.min[v19], p4.min[v19])
+			local v21 = math.min(p3.max[v19], p4.max[v19])
+
+			if v20 <= v21 then
+				t4[v19] = v20
+				t5[v19] = v21
+			end
+		end
+	end
+
+	local v22 = t1.new()
+
+	v22.min = Vector3.new(t4.X, t4.Y, t4.Z)
+	v22.max = Vector3.new(t5.X, t5.Y, t5.Z)
+
+	return v22
+end
+function t1.expandToInclude(t6: {[any]: any}, vector3: Vector3) -- line: 72
+	-- upvalues: t1 (copy)
+	local v25 = t1.new()
+
+	v25.min = t6.min:Min(vector3)
+	v25.max = t6.max:Max(vector3)
+
+	return v25
+end
+function t1.isValid(p5) -- line: 79
+	for _, v28 in {
+		"X",
+		"Y",
+		"Z"
+	} do
+		if p5.max[v28] < p5.min[v28] then
+			return false
+		end
+	end
+
+	return true
+end
+function t1.size(p6) -- line: 88
+	if p6:isValid() then
+		return p6.max - p6.min
+	end
+
+	return nil
+end
+function t1.center(p7) -- line: 95
+	if p7:isValid() then
+		return (p7.max + p7.min) / 2
+	end
+
+	return nil
+end
+
+return t1

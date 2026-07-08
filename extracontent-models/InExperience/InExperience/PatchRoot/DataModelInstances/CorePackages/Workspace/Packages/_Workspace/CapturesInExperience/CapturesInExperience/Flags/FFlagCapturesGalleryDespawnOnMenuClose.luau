@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CapturesGalleryDespawnOnMenuClose", false);
+return game:DefineFastFlag("CapturesGalleryDespawnOnMenuClose", false)

@@ -1,154 +1,199 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CurrencyTransfers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Localization.TransferLocalizationKeys);
-local v4 = require(l_script_FirstAncestor_0.Localization.transferLocaleFormat);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v6 = require(l_script_FirstAncestor_0.Utils.WebViewServiceWrapper);
-local v7 = require(l_script_FirstAncestor_0.Constants.PurchaseRobuxConstants);
-local v8 = require(l_script_FirstAncestor_0.Enums.TransferOrigination);
-local v9 = require(l_script_FirstAncestor_0.NetworkRequests.getBalanceRequest);
-local v10 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v11 = require(l_script_FirstAncestor_0.Actions.Send.setTransferPromptState);
-local v12 = require(l_Parent_0.Foundation);
-local l_Sheet_0 = v12.Sheet;
-local l_View_0 = v12.View;
-local l_Text_0 = v12.Text;
-local l_Button_0 = v12.Button;
-local l_Icon_0 = v12.Icon;
-local l_ButtonVariant_0 = v12.Enums.ButtonVariant;
-local l_FillBehavior_0 = v12.Enums.FillBehavior;
-local l_useScaledValue_0 = v12.Hooks.useScaledValue;
-local l_useTokens_0 = v12.Hooks.useTokens;
-local l_Enums_0 = v12.Enums;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v24 = require(l_script_FirstAncestor_0.Components.Generic.TransferRobuxHeader);
-local v25 = require(l_script_FirstAncestor_0.Hooks.useTransferStore);
-local v26 = require(l_script_FirstAncestor_0.Utils.formatNumber);
-return function(_) --[[ Line: 42 ]] --[[ Name: InsufficientBalanceSheet ]]
-    -- upvalues: v25 (copy), l_useTokens_0 (copy), l_useLocalization_0 (copy), v3 (copy), v26 (copy), l_LocalizationService_0 (copy), v2 (copy), v4 (copy), v7 (copy), v6 (copy), v8 (copy), v11 (copy), v10 (copy), v9 (copy), l_Sheet_0 (copy), l_useScaledValue_0 (copy), v24 (copy), l_View_0 (copy), l_Icon_0 (copy), l_Enums_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_FillBehavior_0 (copy)
-    local v28 = v25();
-    local v29 = l_useTokens_0();
-    local v30 = l_useLocalization_0(v3.Presets.InsufficientBalanceSheet);
-    local v31 = v28.getRobuxBalanceAmount(false);
-    local v32 = math.max(0, (v28.getSelectedAmount(false) or 0) - v31);
-    local v33 = v26(l_LocalizationService_0.RobloxLocaleId, v32);
-    local v34 = v2.useMemo(function() --[[ Line: 50 ]]
-        -- upvalues: v4 (ref), v30 (copy), v33 (copy)
-        return v4.substituteAmount(v30.InsufficientBalance or "", (tostring(v33)));
-    end, {
-        v33, 
-        v30.InsufficientBalance
-    });
-    local function v41() --[[ Line: 54 ]] --[[ Name: goBackToInputAndOpenBuyRobux ]]
-        -- upvalues: v28 (copy), v7 (ref), v6 (ref), v8 (ref), v11 (ref), v10 (ref), v9 (ref)
-        local v35 = v28.getTransferOrigination(false);
-        local v36 = v7.getPurchaseRobuxUrl();
-        local l_PURCHASE_ROBUX_WEBVIEW_TITLE_0 = v7.PURCHASE_ROBUX_WEBVIEW_TITLE;
-        v6.new({
-            url = v36, 
-            title = l_PURCHASE_ROBUX_WEBVIEW_TITLE_0, 
-            closeCallback = function() --[[ Line: 61 ]] --[[ Name: closeCallback ]]
-                -- upvalues: v35 (copy), v8 (ref), v11 (ref), v28 (ref), v10 (ref), v9 (ref)
-                local function _() --[[ Line: 62 ]] --[[ Name: applyPromptAfterBalance ]]
-                    -- upvalues: v35 (ref), v8 (ref), v11 (ref), v28 (ref), v10 (ref)
-                    if v35 == v8.InExperience then
-                        v11(v28, v10.TransferConfirm);
-                        return;
-                    else
-                        v11(v28, v10.TransferInput);
-                        return;
-                    end;
-                end;
-                v9():andThen(function(v39) --[[ Line: 70 ]]
-                    -- upvalues: v28 (ref), v35 (ref), v8 (ref), v11 (ref), v10 (ref)
-                    v28.setRobuxBalanceAmount(v39);
-                    v28.setBalanceReceivedFromApi(true);
-                    if v35 == v8.InExperience then
-                        v11(v28, v10.TransferConfirm);
-                        return;
-                    else
-                        v11(v28, v10.TransferInput);
-                        return;
-                    end;
-                end):catch(function(_) --[[ Line: 75 ]]
-                    -- upvalues: v35 (ref), v8 (ref), v11 (ref), v28 (ref), v10 (ref)
-                    if v35 == v8.InExperience then
-                        v11(v28, v10.TransferConfirm);
-                        return;
-                    else
-                        v11(v28, v10.TransferInput);
-                        return;
-                    end;
-                end);
-            end
-        }):open();
-    end;
-    local function v42() --[[ Line: 83 ]] --[[ Name: handleClose ]]
-        -- upvalues: v28 (copy), v8 (ref), v11 (ref), v10 (ref)
-        if v28.getTransferOrigination(false) == v8.InExperience then
-            v28.triggerOnClose();
-            return;
-        else
-            v11(v28, v10.TransferInput);
-            return;
-        end;
-    end;
-    return v2.createElement(l_Sheet_0.Root, {
-        preferCenterSheet = true, 
-        snapPoints = {
-            l_useScaledValue_0(300), 
-            0.5
-        }, 
-        onClose = v42
-    }, {
-        Header = v2.createElement(l_Sheet_0.Header, {}, {
-            TransferRobuxHeader = v2.createElement(v24, {
-                titleText = v30.SendRobux, 
-                robuxBalanceAmount = v31
-            })
-        }), 
-        Content = v2.createElement(l_Sheet_0.Content, {
-            LayoutOrder = 2
-        }, {
-            SheetContentContainer = v2.createElement(l_View_0, {
-                tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
-            }, {
-                ErrorIconContainer = v2.createElement(l_View_0, {
-                    tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis", 
-                    LayoutOrder = 1
-                }, {
-                    ErrorIcon = v2.createElement(l_Icon_0, {
-                        name = l_Enums_0.IconName.TriangleExclamation, 
-                        size = v29.Size.Size_1200, 
-                        tag = "content-inverse-emphasis"
-                    })
-                }), 
-                ErrorMessage = v2.createElement(l_Text_0, {
-                    Text = v34, 
-                    tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap", 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    LayoutOrder = 2
-                })
-            })
-        }), 
-        Actions = v2.createElement(l_Sheet_0.Actions, {
-            LayoutOrder = 3
-        }, {
-            v2.createElement(l_View_0, {
-                tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
-            }, {
-                v2.createElement(l_View_0, {
-                    tag = "row auto-y size-full-0 gap-small"
-                }, {
-                    v2.createElement(l_Button_0, {
-                        text = v30.BuyRobux or "Buy", 
-                        onActivated = v41, 
-                        variant = l_ButtonVariant_0.Emphasis, 
-                        fillBehavior = l_FillBehavior_0.Fill
-                    })
-                })
-            })
-        })
-    });
-end;
+local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+local CurrencyTransfersParent = CurrencyTransfers.Parent
+local React = require(CurrencyTransfersParent.React)
+local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
+local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
+local transferLocaleFormat = require(CurrencyTransfers.Localization.transferLocaleFormat)
+local LocalizationService = game:GetService("LocalizationService")
+local WebViewServiceWrapper = require(CurrencyTransfers.Utils.WebViewServiceWrapper)
+local PurchaseRobuxConstants = require(CurrencyTransfers.Constants.PurchaseRobuxConstants)
+local TransferOrigination = require(CurrencyTransfers.Enums.TransferOrigination)
+local getBalanceAfterPurchaseWebview = require(CurrencyTransfers.NetworkRequests.getBalanceAfterPurchaseWebview)
+local getBalanceRequest = require(CurrencyTransfers.NetworkRequests.getBalanceRequest)
+local PromptState = require(CurrencyTransfers.Enums.PromptState)
+local setTransferPromptState = require(CurrencyTransfers.Actions.Send.setTransferPromptState)
+local GetFFlagCurrencyTransferFixBalanceReRender = require(CurrencyTransfers.Flags.GetFFlagCurrencyTransferFixBalanceReRender)
+local Foundation = require(CurrencyTransfersParent.Foundation)
+local Sheet = Foundation.Sheet
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local Icon = Foundation.Icon
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local useScaledValue = Foundation.Hooks.useScaledValue
+local useTokens = Foundation.Hooks.useTokens
+local Enums = Foundation.Enums
+local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+local TransferRobuxHeader = require(CurrencyTransfers.Components.Generic.TransferRobuxHeader)
+local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
+local formatNumber = require(CurrencyTransfers.Utils.formatNumber)
+
+local function InsufficientBalanceSheet(_: {[any]: any}) -- line: 46
+	-- upvalues: useTransferStore (copy), useTokens (copy), useLocalization (copy), TransferLocalizationKeys (copy), GetFFlagCurrencyTransferFixBalanceReRender (copy), SignalsReact (copy), React (copy), formatNumber (copy), LocalizationService (copy), transferLocaleFormat (copy), PurchaseRobuxConstants (copy), WebViewServiceWrapper (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy), getBalanceAfterPurchaseWebview (copy), getBalanceRequest (copy), Sheet (copy), useScaledValue (copy), TransferRobuxHeader (copy), View (copy), Icon (copy), Enums (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v33 = useTransferStore()
+	local v34 = useTokens()
+	local v35 = useLocalization(TransferLocalizationKeys.Presets.InsufficientBalanceSheet)
+	local v36 = if not GetFFlagCurrencyTransferFixBalanceReRender() then v33.getRobuxBalanceAmount(false) else SignalsReact.useSignalState(v33.getRobuxBalanceAmount) or 0
+	local v37 = React.useRef(0)
+	local v38 = math.max(0, (((if not GetFFlagCurrencyTransferFixBalanceReRender() then v33.getSelectedAmount(false) or 0 else SignalsReact.useSignalState(v33.getSelectedAmount) or 0)) or 0) - v36)
+	local v39 = formatNumber(LocalizationService.RobloxLocaleId, v38)
+	local v40 = React.useMemo(function() -- line: 59
+		-- upvalues: transferLocaleFormat (copy), v35 (copy), v39 (copy)
+		return transferLocaleFormat.substituteAmount(v35.InsufficientBalance or "", (tostring(v39)))
+	end, {
+		v39,
+		v35.InsufficientBalance
+	})
+
+	local function goBackToInputAndOpenBuyRobux() -- line: 63
+		-- upvalues: v33 (copy), PurchaseRobuxConstants (copy), WebViewServiceWrapper (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy), GetFFlagCurrencyTransferFixBalanceReRender (copy), v37 (copy), getBalanceAfterPurchaseWebview (copy), getBalanceRequest (copy)
+		local v43 = v33.getTransferOrigination(false)
+		local v44 = PurchaseRobuxConstants.getPurchaseRobuxUrl()
+		local PURCHASE_ROBUX_WEBVIEW_TITLE = PurchaseRobuxConstants.PURCHASE_ROBUX_WEBVIEW_TITLE
+
+		WebViewServiceWrapper.new({
+			url = v44,
+			title = PURCHASE_ROBUX_WEBVIEW_TITLE,
+			closeCallback = function() -- line: 70
+				-- upvalues: v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), v33 (copy), PromptState (copy), GetFFlagCurrencyTransferFixBalanceReRender (copy), v37 (copy), getBalanceAfterPurchaseWebview (copy), getBalanceRequest (copy)
+				local function applyPromptAfterBalance() -- line: 71
+					-- upvalues: v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), v33 (copy), PromptState (copy)
+					if v43 == TransferOrigination.InExperience then
+						setTransferPromptState(v33, PromptState.TransferConfirm)
+
+						return
+					end
+
+					setTransferPromptState(v33, PromptState.TransferInput)
+				end
+
+				if GetFFlagCurrencyTransferFixBalanceReRender() then
+					v37.current = v37.current + 1
+
+					local current = v37.current
+
+					getBalanceAfterPurchaseWebview():andThen(function(p1) -- line: 82
+						-- upvalues: v37 (copy), current (copy), v33 (copy), v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy)
+						if v37.current ~= current then
+							return
+						end
+
+						v33.setRobuxBalanceAmount(p1)
+						v33.setBalanceReceivedFromApi(true)
+
+						if v43 == TransferOrigination.InExperience then
+							setTransferPromptState(v33, PromptState.TransferConfirm)
+
+							return
+						end
+
+						setTransferPromptState(v33, PromptState.TransferInput)
+					end):catch(function(_) -- line: 90
+						-- upvalues: v37 (copy), current (copy), v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), v33 (copy), PromptState (copy)
+						if v37.current ~= current then
+							return
+						end
+
+						if v43 == TransferOrigination.InExperience then
+							setTransferPromptState(v33, PromptState.TransferConfirm)
+
+							return
+						end
+
+						setTransferPromptState(v33, PromptState.TransferInput)
+					end)
+
+					return
+				end
+
+				getBalanceRequest():andThen(function(p3) -- line: 98
+					-- upvalues: v33 (copy), v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy)
+					v33.setRobuxBalanceAmount(p3)
+					v33.setBalanceReceivedFromApi(true)
+
+					if v43 == TransferOrigination.InExperience then
+						setTransferPromptState(v33, PromptState.TransferConfirm)
+
+						return
+					end
+
+					setTransferPromptState(v33, PromptState.TransferInput)
+				end):catch(function(_) -- line: 103
+					-- upvalues: v43 (copy), TransferOrigination (copy), setTransferPromptState (copy), v33 (copy), PromptState (copy)
+					if v43 == TransferOrigination.InExperience then
+						setTransferPromptState(v33, PromptState.TransferConfirm)
+
+						return
+					end
+
+					setTransferPromptState(v33, PromptState.TransferInput)
+				end)
+			end
+		}):open()
+	end
+	local function handleClose() -- line: 112
+		-- upvalues: v33 (copy), TransferOrigination (copy), setTransferPromptState (copy), PromptState (copy)
+		if v33.getTransferOrigination(false) == TransferOrigination.InExperience then
+			v33.triggerOnClose()
+
+			return
+		end
+
+		setTransferPromptState(v33, PromptState.TransferInput)
+	end
+
+	return React.createElement(Sheet.Root, {
+		preferCenterSheet = true,
+		snapPoints = {
+			useScaledValue(300),
+			0.5
+		},
+		onClose = handleClose
+	}, {
+		Header = React.createElement(Sheet.Header, {}, {
+			TransferRobuxHeader = React.createElement(TransferRobuxHeader, {
+				titleText = v35.SendRobux,
+				robuxBalanceAmount = v36
+			})
+		}),
+		Content = React.createElement(Sheet.Content, {
+			LayoutOrder = 2
+		}, {
+			SheetContentContainer = React.createElement(View, {
+				tag = "col gap-xlarge auto-y size-full-0 align-x-center align-y-center padding-top-xlarge"
+			}, {
+				ErrorIconContainer = React.createElement(View, {
+					tag = "size-1200-1200 radius-circle align-x-center align-y-center bg-inverse-emphasis",
+					LayoutOrder = 1
+				}, {
+					ErrorIcon = React.createElement(Icon, {
+						tag = "content-inverse-emphasis",
+						name = Enums.IconName.TriangleExclamation,
+						size = v34.Size.Size_1200
+					})
+				}),
+				ErrorMessage = React.createElement(FoundationText, {
+					tag = "text-body-large content-emphasis text-align-x-center auto-y text-wrap",
+					LayoutOrder = 2,
+					Text = v40,
+					Size = UDim2.new(1, 0, 0, 0)
+				})
+			})
+		}),
+		Actions = React.createElement(Sheet.Actions, {
+			LayoutOrder = 3
+		}, { React.createElement(View, {
+			tag = "col auto-y align-y-center align-x-center size-full-0 gap-small"
+		}, { React.createElement(View, {
+			tag = "row auto-y size-full-0 gap-small"
+		}, { React.createElement(Button, {
+			text = v35.BuyRobux or "Buy",
+			onActivated = goBackToInputAndOpenBuyRobux,
+			variant = ButtonVariant.Emphasis,
+			fillBehavior = FillBehavior.Fill
+		}) }) }) })
+	})
+end
+
+return InsufficientBalanceSheet

@@ -1,56 +1,60 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(l_Parent_0.UIBlox);
-local v3 = require(script.Parent.Header);
-local v4 = require(script.Parent.Body);
-local v5 = require(script.Parent.FitFrameVertical);
-local v6 = v1.PureComponent:extend("AssetCard");
-v6.defaultProps = {
-    cardTitle = nil, 
-    cardIcon = nil, 
-    cardBodyText = nil, 
-    contentLoadedCallback = nil, 
-    bodyActivated = function() --[[ Line: 25 ]] --[[ Name: bodyActivated ]]
-        print("Card body was activated!");
-    end
-};
-v6.render = function(v7) --[[ Line: 30 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v2 (copy), v5 (copy), v3 (copy), v4 (copy)
-    local v8 = v7.props[v1.Children];
-    return v2.Style.withStyle(function(_) --[[ Line: 33 ]]
-        -- upvalues: v1 (ref), v5 (ref), v3 (ref), v7 (copy), v4 (ref), v8 (copy)
-        return v1.createElement(v5, {
-            BackgroundTransparency = 1, 
-            width = UDim.new(1, 0), 
-            Visible = true, 
-            contentPadding = UDim.new(0, 5), 
-            LayoutOrder = 2
-        }, {
-            topSpacing = v1.createElement(v5, {
-                BackgroundTransparency = 1, 
-                width = UDim.new(1, 0), 
-                contentPadding = UDim.new(0, 12)
-            }, {
-                header = v1.createElement(v3, {
-                    cardTitle = v7.props.cardTitle or nil, 
-                    isLoading = v7.props.isLoading, 
-                    LayoutOrder = 1
-                }), 
-                body = v1.createElement(v4, {
-                    cardIcon = v7.props.cardIcon, 
-                    cardBodyText = v7.props.cardBodyText or nil, 
-                    isLoading = v7.props.isLoading, 
-                    contentLoadedCallback = v7.props.contentLoadedCallback, 
-                    LayoutOrder = 2, 
-                    bodyActivated = v7.props.bodyActivated
-                })
-            }), 
-            bottomSpacing = v1.createElement(v5, {
-                width = UDim.new(1, 0), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 3
-            }, v8)
-        });
-    end);
-end;
-return v6;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Roact = require(Parent.Roact)
+local UIBlox = require(Parent.UIBlox)
+local Header = require(script.Parent.Header)
+local Body = require(script.Parent.Body)
+local FitFrameVertical = require(script.Parent.FitFrameVertical)
+local v7 = Roact.PureComponent:extend("AssetCard")
+
+v7.defaultProps = {
+	cardTitle = nil,
+	cardIcon = nil,
+	cardBodyText = nil,
+	contentLoadedCallback = nil,
+	bodyActivated = function() -- line: 25
+		print("Card body was activated!")
+	end
+}
+
+function v7.render(p1) -- line: 30
+	-- upvalues: Roact (copy), UIBlox (copy), FitFrameVertical (copy), Header (copy), Body (copy)
+	local v9 = p1.props[Roact.Children]
+
+	return UIBlox.Style.withStyle(function(_) -- line: 33
+		-- upvalues: Roact (copy), FitFrameVertical (copy), Header (copy), p1 (copy), Body (copy), v9 (copy)
+		return Roact.createElement(FitFrameVertical, {
+			BackgroundTransparency = 1,
+			Visible = true,
+			LayoutOrder = 2,
+			width = UDim.new(1, 0),
+			contentPadding = UDim.new(0, 5)
+		}, {
+			topSpacing = Roact.createElement(FitFrameVertical, {
+				BackgroundTransparency = 1,
+				width = UDim.new(1, 0),
+				contentPadding = UDim.new(0, 12)
+			}, {
+				header = Roact.createElement(Header, {
+					LayoutOrder = 1,
+					cardTitle = p1.props.cardTitle or nil,
+					isLoading = p1.props.isLoading
+				}),
+				body = Roact.createElement(Body, {
+					LayoutOrder = 2,
+					cardIcon = p1.props.cardIcon,
+					cardBodyText = p1.props.cardBodyText or nil,
+					isLoading = p1.props.isLoading,
+					contentLoadedCallback = p1.props.contentLoadedCallback,
+					bodyActivated = p1.props.bodyActivated
+				})
+			}),
+			bottomSpacing = Roact.createElement(FitFrameVertical, {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				width = UDim.new(1, 0)
+			}, v9)
+		})
+	end)
+end
+
+return v7

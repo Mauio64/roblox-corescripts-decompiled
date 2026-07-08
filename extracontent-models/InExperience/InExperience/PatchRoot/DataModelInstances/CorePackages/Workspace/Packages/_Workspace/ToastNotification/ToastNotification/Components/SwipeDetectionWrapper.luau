@@ -1,59 +1,66 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-return function(v3) --[[ Line: 19 ]]
-    -- upvalues: v2 (copy), l_UserInputService_0 (copy)
-    local v4 = v2.createRef();
-    local v5, v6 = v2.useState(false);
-    v2.useEffect(function() --[[ Line: 23 ]]
-        -- upvalues: v3 (copy), l_UserInputService_0 (ref), v4 (copy), v6 (copy), v5 (copy)
-        if v3.swipeEnabled and v3.swipeCallback then
-            local v10 = l_UserInputService_0.TouchStarted:Connect(function(v7) --[[ Line: 29 ]]
-                -- upvalues: v4 (ref), v6 (ref)
-                local v8 = v4 and v4.current;
-                if not v8 then
-                    return;
-                else
-                    local v9 = Vector2.new(v7.Position.X, v7.Position.Y) - v8.AbsolutePosition;
-                    if v9.X >= 0 and v9.Y >= 0 and v9.X <= v8.AbsoluteSize.X and v9.Y <= v8.AbsoluteSize.Y then
-                        v6(true);
-                    end;
-                    return;
-                end;
-            end);
-            local v11 = l_UserInputService_0.TouchEnded:Connect(function() --[[ Line: 46 ]]
-                -- upvalues: v6 (ref)
-                v6(false);
-            end);
-            local v13 = if v5 then l_UserInputService_0.TouchSwipe:Connect(function(v12) --[[ Line: 50 ]]
-                -- upvalues: v5 (ref), v3 (ref)
-                if v5 then
-                    v3.swipeCallback(v12);
-                end;
-            end) else nil;
-            return function() --[[ Line: 57 ]]
-                -- upvalues: v10 (copy), v11 (copy), v13 (copy)
-                v10:Disconnect();
-                v11:Disconnect();
-                if v13 then
-                    v13:Disconnect();
-                end;
-            end;
-        else
-            v6(false);
-            return nil;
-        end;
-    end, {
-        v3.swipeEnabled, 
-        v3.swipeCallback, 
-        v4, 
-        v5
-    });
-    return v2.createElement("Frame", {
-        Size = v3.Size, 
-        AutomaticSize = v3.AutomaticSize, 
-        BackgroundTransparency = 1, 
-        Active = true, 
-        ref = v4
-    }, v3.children);
-end;
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+
+return function(t1: {[any]: any}) -- line: 19
+	-- upvalues: React (copy), UserInputService (copy)
+	local v5 = React.createRef()
+	local v6, v7 = React.useState(false)
+
+	React.useEffect(function() -- line: 23
+		-- upvalues: t1 (copy), UserInputService (copy), v5 (copy), v7 (copy), v6 (copy)
+		if t1.swipeEnabled and t1.swipeCallback then
+			local connection = UserInputService.TouchStarted:Connect(function(p1) -- line: 29
+				-- upvalues: v5 (copy), v7 (copy)
+				local v12 = v5 and v5.current
+
+				if not v12 then
+					return
+				end
+
+				local v13 = Vector2.new(p1.Position.X, p1.Position.Y) - v12.AbsolutePosition
+
+				if v13.X >= 0 and v13.Y >= 0 and v13.X <= v12.AbsoluteSize.X and v13.Y <= v12.AbsoluteSize.Y then
+					v7(true)
+				end
+			end)
+			local connection2 = UserInputService.TouchEnded:Connect(function() -- line: 46
+				-- upvalues: v7 (copy)
+				v7(false)
+			end)
+			local v10 = if not v6 then nil else UserInputService.TouchSwipe:Connect(function(p2) -- line: 50
+				-- upvalues: v6 (copy), t1 (copy)
+				if v6 then
+					t1.swipeCallback(p2)
+				end
+			end)
+
+			return function() -- line: 57
+				-- upvalues: connection (copy), connection2 (copy), v10 (copy)
+				connection:Disconnect()
+				connection2:Disconnect()
+
+				if v10 then
+					v10:Disconnect()
+				end
+			end
+		end
+
+		v7(false)
+
+		return nil
+	end, {
+		t1.swipeEnabled,
+		t1.swipeCallback,
+		v5,
+		v6
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Active = true,
+		Size = t1.Size,
+		AutomaticSize = t1.AutomaticSize,
+		ref = v5
+	}, t1.children)
+end

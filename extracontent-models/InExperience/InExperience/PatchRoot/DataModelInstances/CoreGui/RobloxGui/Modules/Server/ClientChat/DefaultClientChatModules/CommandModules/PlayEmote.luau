@@ -1,193 +1,228 @@
-local l_Chat_0 = game:GetService("Chat");
-local l_Players_0 = game:GetService("Players");
-local l_Parent_0 = script.Parent;
-local l_Util_0 = require(l_Parent_0:WaitForChild("Util"));
-local v4 = nil;
-pcall(function() --[[ Line: 13 ]]
-    -- upvalues: v4 (ref), l_Chat_0 (copy)
-    v4 = require(l_Chat_0.ClientChatModules.ChatLocalization);
-end);
-if v4 == nil then
-    v4 = {
-        Get = function(_, _, v7) --[[ Line: 14 ]] --[[ Name: Get ]]
-            return v7;
-        end
-    };
-end;
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-local v9 = {
-    wave = true, 
-    point = true, 
-    dance = true, 
-    dance2 = true, 
-    dance3 = true, 
-    laugh = true, 
-    cheer = true
-};
-local v10 = {
-    NotSupported = "InGame.Chat.Response.EmotesNotSupported", 
-    R15Only = "InGame.Chat.Response.EmotesWrongAvatarType", 
-    SwitchToR15 = "InGame.Chat.ErrorMessageSwitchToR15", 
-    NoMatchingEmote = "InGame.Chat.Response.EmoteNotAvailable", 
-    TemporarilyUnavailable = "InGame.Chat.Response.EmotesTemporarilyUnavailable", 
-    AnimationPlaying = "InGame.Chat.ErrorMessageAnimationPlaying"
-};
-local v11 = {
-    [v10.NotSupported] = "You can't use Emotes here.", 
-    [v10.R15Only] = "Only R15 avatars can use Emotes.", 
-    [v10.SwitchToR15] = "Switch to your R15 avatar to play Emote.", 
-    [v10.NoMatchingEmote] = "You can't use that Emote.", 
-    [v10.TemporarilyUnavailable] = "You can't use Emotes right now.", 
-    [v10.AnimationPlaying] = "You cannot play Emotes during this action."
-};
-local v12 = Color3.fromRGB(245, 50, 50);
-local function _(v13) --[[ Line: 48 ]] --[[ Name: getEmoteName ]]
-    if string.sub(v13, 1, 3) == "/e " then
-        return (string.sub(v13, 4));
-    elseif string.sub(v13, 1, 7) == "/emote " then
-        return (string.sub(v13, 8));
-    else
-        return nil;
-    end;
-end;
-local function _(v15, v16) --[[ Line: 58 ]] --[[ Name: sendErrorMessage ]]
-    -- upvalues: v4 (ref), v11 (copy), v12 (copy), l_Util_0 (copy)
-    local v17 = v4:Get(v16, v11[v16]);
-    local v18 = {
-        ChatColor = v12
-    };
-    l_Util_0:SendSystemMessageToSelf(v17, v15, v18);
-end;
-local function v68(v20, v21, _) --[[ Line: 67 ]] --[[ Name: ProcessMessage ]]
-    -- upvalues: v9 (copy), l_LocalPlayer_0 (copy), v10 (copy), v4 (ref), v11 (copy), v12 (copy), l_Util_0 (copy)
-    local v23 = if string.sub(v20, 1, 3) == "/e " then string.sub(v20, 4) else if string.sub(v20, 1, 7) == "/emote " then string.sub(v20, 8) else nil;
-    if not v23 then
-        return false;
-    elseif v9[v23] then
-        return true;
-    else
-        local l_v21_CurrentChannel_0 = v21:GetCurrentChannel();
-        if not l_v21_CurrentChannel_0 then
-            return true;
-        else
-            local l_Character_0 = l_LocalPlayer_0.Character;
-            if not l_Character_0 then
-                local l_TemporarilyUnavailable_0 = v10.TemporarilyUnavailable;
-                local v27 = v4:Get(l_TemporarilyUnavailable_0, v11[l_TemporarilyUnavailable_0]);
-                local v28 = {
-                    ChatColor = v12
-                };
-                l_Util_0:SendSystemMessageToSelf(v27, l_v21_CurrentChannel_0, v28);
-                return true;
-            else
-                local l_Animate_0 = l_Character_0:FindFirstChild("Animate");
-                if not l_Animate_0 then
-                    local l_NotSupported_0 = v10.NotSupported;
-                    local v31 = v4:Get(l_NotSupported_0, v11[l_NotSupported_0]);
-                    local v32 = {
-                        ChatColor = v12
-                    };
-                    l_Util_0:SendSystemMessageToSelf(v31, l_v21_CurrentChannel_0, v32);
-                    return true;
-                elseif not l_Animate_0:FindFirstChild("PlayEmote") then
-                    local l_NotSupported_1 = v10.NotSupported;
-                    local v34 = v4:Get(l_NotSupported_1, v11[l_NotSupported_1]);
-                    local v35 = {
-                        ChatColor = v12
-                    };
-                    l_Util_0:SendSystemMessageToSelf(v34, l_v21_CurrentChannel_0, v35);
-                    return true;
-                else
-                    local l_Humanoid_0 = l_Character_0:FindFirstChildOfClass("Humanoid");
-                    if not l_Humanoid_0 then
-                        local l_TemporarilyUnavailable_1 = v10.TemporarilyUnavailable;
-                        local v38 = v4:Get(l_TemporarilyUnavailable_1, v11[l_TemporarilyUnavailable_1]);
-                        local v39 = {
-                            ChatColor = v12
-                        };
-                        l_Util_0:SendSystemMessageToSelf(v38, l_v21_CurrentChannel_0, v39);
-                        return true;
-                    elseif l_Humanoid_0.RigType ~= Enum.HumanoidRigType.R15 then
-                        local l_R15Only_0 = v10.R15Only;
-                        local v41 = v4:Get(l_R15Only_0, v11[l_R15Only_0]);
-                        local v42 = {
-                            ChatColor = v12
-                        };
-                        l_Util_0:SendSystemMessageToSelf(v41, l_v21_CurrentChannel_0, v42);
-                        return true;
-                    else
-                        local l_HumanoidDescription_0 = l_Humanoid_0:FindFirstChildOfClass("HumanoidDescription");
-                        if not l_HumanoidDescription_0 then
-                            local l_TemporarilyUnavailable_2 = v10.TemporarilyUnavailable;
-                            local v45 = v4:Get(l_TemporarilyUnavailable_2, v11[l_TemporarilyUnavailable_2]);
-                            local v46 = {
-                                ChatColor = v12
-                            };
-                            l_Util_0:SendSystemMessageToSelf(v45, l_v21_CurrentChannel_0, v46);
-                            return true;
-                        else
-                            local v47 = {};
-                            local l_l_HumanoidDescription_0_Emotes_0 = l_HumanoidDescription_0:GetEmotes();
-                            for v49, _ in pairs(l_l_HumanoidDescription_0_Emotes_0) do
-                                v47[string.lower(v49)] = v49;
-                            end;
-                            local v51 = tonumber(v23);
-                            if v51 then
-                                local l_l_HumanoidDescription_0_EquippedEmotes_0 = l_HumanoidDescription_0:GetEquippedEmotes();
-                                for _, v54 in pairs(l_l_HumanoidDescription_0_EquippedEmotes_0) do
-                                    if v54.Slot == v51 then
-                                        v23 = v54.Name;
-                                    end;
-                                end;
-                            end;
-                            v23 = v47[string.lower(v23)];
-                            if not v23 then
-                                local l_NoMatchingEmote_0 = v10.NoMatchingEmote;
-                                local v56 = v4:Get(l_NoMatchingEmote_0, v11[l_NoMatchingEmote_0]);
-                                local v57 = {
-                                    ChatColor = v12
-                                };
-                                l_Util_0:SendSystemMessageToSelf(v56, l_v21_CurrentChannel_0, v57);
-                                return true;
-                            else
-                                spawn(function() --[[ Line: 143 ]]
-                                    -- upvalues: l_Humanoid_0 (copy), v23 (ref), l_v21_CurrentChannel_0 (copy), v10 (ref), v4 (ref), v11 (ref), v12 (ref), l_Util_0 (ref)
-                                    local l_status_0, l_result_0 = pcall(function() --[[ Line: 144 ]]
-                                        -- upvalues: l_Humanoid_0 (ref), v23 (ref)
-                                        return l_Humanoid_0:PlayEmote(v23);
-                                    end);
-                                    if not l_status_0 then
-                                        local l_l_v21_CurrentChannel_0_0 = l_v21_CurrentChannel_0;
-                                        local l_NotSupported_2 = v10.NotSupported;
-                                        local v62 = v4:Get(l_NotSupported_2, v11[l_NotSupported_2]);
-                                        local v63 = {
-                                            ChatColor = v12
-                                        };
-                                        l_Util_0:SendSystemMessageToSelf(v62, l_l_v21_CurrentChannel_0_0, v63);
-                                        return;
-                                    else
-                                        if not l_result_0 then
-                                            local l_l_v21_CurrentChannel_0_1 = l_v21_CurrentChannel_0;
-                                            local l_TemporarilyUnavailable_3 = v10.TemporarilyUnavailable;
-                                            local v66 = v4:Get(l_TemporarilyUnavailable_3, v11[l_TemporarilyUnavailable_3]);
-                                            local v67 = {
-                                                ChatColor = v12
-                                            };
-                                            l_Util_0:SendSystemMessageToSelf(v66, l_l_v21_CurrentChannel_0_1, v67);
-                                        end;
-                                        return;
-                                    end;
-                                end);
-                                return true;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+local Chat = game:GetService("Chat")
+local Players = game:GetService("Players")
+local scriptParent = script.Parent
+local Util = require(scriptParent:WaitForChild("Util"))
+local ChatLocalization = nil
+
+pcall(function() -- line: 13
+	-- upvalues: ChatLocalization (ref), Chat (copy)
+	ChatLocalization = require(Chat.ClientChatModules.ChatLocalization)
+end)
+
+if ChatLocalization == nil then
+	ChatLocalization = {
+		Get = function(_, _, p3) -- line: 14
+			return p3
+		end
+	}
+end
+
+local LocalPlayer = Players.LocalPlayer
+local t1 = {
+	wave = true,
+	point = true,
+	dance = true,
+	dance2 = true,
+	dance3 = true,
+	laugh = true,
+	cheer = true
+}
+local _ = {
+	NotSupported = "InGame.Chat.Response.EmotesNotSupported",
+	R15Only = "InGame.Chat.Response.EmotesWrongAvatarType",
+	SwitchToR15 = "InGame.Chat.ErrorMessageSwitchToR15",
+	NoMatchingEmote = "InGame.Chat.Response.EmoteNotAvailable",
+	TemporarilyUnavailable = "InGame.Chat.Response.EmotesTemporarilyUnavailable",
+	AnimationPlaying = "InGame.Chat.ErrorMessageAnimationPlaying"
+}
+local t2 = {
+	["InGame.Chat.Response.EmotesNotSupported"] = "You can't use Emotes here.",
+	["InGame.Chat.Response.EmotesWrongAvatarType"] = "Only R15 avatars can use Emotes.",
+	["InGame.Chat.ErrorMessageSwitchToR15"] = "Switch to your R15 avatar to play Emote.",
+	["InGame.Chat.Response.EmoteNotAvailable"] = "You can't use that Emote.",
+	["InGame.Chat.Response.EmotesTemporarilyUnavailable"] = "You can't use Emotes right now.",
+	["InGame.Chat.ErrorMessageAnimationPlaying"] = "You cannot play Emotes during this action."
+}
+local color3 = Color3.fromRGB(245, 50, 50)
+
+local function getEmoteName(p4) -- line: 48
+	if string.sub(p4, 1, 3) == "/e " then
+		return (string.sub(p4, 4))
+	end
+
+	if string.sub(p4, 1, 7) == "/emote " then
+		return (string.sub(p4, 8))
+	end
+
+	return nil
+end
+local function sendErrorMessage(p5, p6) -- line: 58
+	-- upvalues: ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
+	local v20 = ChatLocalization:Get(p6, t2[p6])
+	local t3 = {
+		ChatColor = color3
+	}
+
+	Util:SendSystemMessageToSelf(v20, p5, t3)
+end
+local function ProcessMessage(p7, p8, _) -- line: 67
+	-- upvalues: t1 (copy), LocalPlayer (copy), ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
+	local v25 = if string.sub(p7, 1, 3) ~= "/e " then if string.sub(p7, 1, 7) ~= "/emote " then nil else string.sub(p7, 8) else string.sub(p7, 4)
+
+	if not v25 then
+		return false
+	end
+
+	if t1[v25] then
+		return true
+	end
+
+	local CurrentChannel = p8:GetCurrentChannel()
+
+	if not CurrentChannel then
+		return true
+	end
+
+	local Character = LocalPlayer.Character
+
+	if not Character then
+		local v28 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
+		local t4 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v28, CurrentChannel, t4)
+
+		return true
+	end
+
+	local Animate = Character:FindFirstChild("Animate")
+
+	if not Animate then
+		local v31 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
+		local t5 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v31, CurrentChannel, t5)
+
+		return true
+	end
+
+	if not Animate:FindFirstChild("PlayEmote") then
+		local v33 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
+		local t6 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v33, CurrentChannel, t6)
+
+		return true
+	end
+
+	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+	if not Humanoid then
+		local v36 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
+		local t7 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v36, CurrentChannel, t7)
+
+		return true
+	end
+
+	if Humanoid.RigType ~= Enum.HumanoidRigType.R15 then
+		local v38 = ChatLocalization:Get("InGame.Chat.Response.EmotesWrongAvatarType", t2["InGame.Chat.Response.EmotesWrongAvatarType"])
+		local t8 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v38, CurrentChannel, t8)
+
+		return true
+	end
+
+	local HumanoidDescription = Humanoid:FindFirstChildOfClass("HumanoidDescription")
+
+	if not HumanoidDescription then
+		local v41 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
+		local t9 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v41, CurrentChannel, t9)
+
+		return true
+	end
+
+	local t10 = {}
+	local Emotes = HumanoidDescription:GetEmotes()
+
+	for k, _ in pairs(Emotes) do
+		t10[string.lower(k)] = k
+	end
+
+	local num = tonumber(v25)
+
+	if num then
+		local EquippedEmotes = HumanoidDescription:GetEquippedEmotes()
+
+		for _, v in pairs(EquippedEmotes) do
+			if num == v.Slot then
+				v25 = v.Name
+			end
+		end
+	end
+
+	local u51 = t10[string.lower(v25)]
+
+	if not u51 then
+		local v52 = ChatLocalization:Get("InGame.Chat.Response.EmoteNotAvailable", t2["InGame.Chat.Response.EmoteNotAvailable"])
+		local t11 = {
+			ChatColor = color3
+		}
+
+		Util:SendSystemMessageToSelf(v52, CurrentChannel, t11)
+
+		return true
+	end
+
+	spawn(function() -- line: 143
+		-- upvalues: Humanoid (copy), u51 (ref), CurrentChannel (copy), ChatLocalization (ref), t2 (copy), color3 (copy), Util (copy)
+		local ok, result = pcall(function() -- line: 144
+			-- upvalues: Humanoid (copy), u51 (ref)
+			return Humanoid:PlayEmote(u51)
+		end)
+
+		if not ok then
+			local v56 = CurrentChannel
+			local v57 = ChatLocalization:Get("InGame.Chat.Response.EmotesNotSupported", t2["InGame.Chat.Response.EmotesNotSupported"])
+			local t12 = {
+				ChatColor = color3
+			}
+
+			Util:SendSystemMessageToSelf(v57, v56, t12)
+
+			return
+		end
+
+		if not result then
+			local v59 = CurrentChannel
+			local v60 = ChatLocalization:Get("InGame.Chat.Response.EmotesTemporarilyUnavailable", t2["InGame.Chat.Response.EmotesTemporarilyUnavailable"])
+			local t13 = {
+				ChatColor = color3
+			}
+
+			Util:SendSystemMessageToSelf(v60, v59, t13)
+		end
+	end)
+
+	return true
+end
+
 return {
-    [l_Util_0.KEY_COMMAND_PROCESSOR_TYPE] = l_Util_0.COMPLETED_MESSAGE_PROCESSOR, 
-    [l_Util_0.KEY_PROCESSOR_FUNCTION] = v68
-};
+	[Util.KEY_COMMAND_PROCESSOR_TYPE] = Util.COMPLETED_MESSAGE_PROCESSOR,
+	[Util.KEY_PROCESSOR_FUNCTION] = ProcessMessage
+}

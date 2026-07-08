@@ -1,44 +1,48 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_VRService_0 = game:GetService("VRService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v3 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v3.Roact;
-local l_RoactRodux_0 = v3.RoactRodux;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v7 = require(l_Parent_0.Actions.SetInputType);
-local v8 = require(l_Parent_0.Utility.ExternalEventConnection);
-local l_InputTypeMap_0 = require(l_Parent_0.Resources.Constants).InputTypeMap;
-local v10 = l_Roact_0.PureComponent:extend("LastInputTypeConnector");
-v10.updateInputType = function(v11, v12) --[[ Line: 19 ]] --[[ Name: updateInputType ]]
-    -- upvalues: l_VRService_0 (copy), l_InputTypeMap_0 (copy)
-    if l_VRService_0.VREnabled then
-        v12 = l_InputTypeMap_0[Enum.UserInputType.MouseMovement];
-    end;
-    if v12 then
-        v11.props.setInputType(v12);
-    end;
-end;
-v10.init = function(v13) --[[ Line: 32 ]] --[[ Name: init ]]
-    -- upvalues: l_InputTypeMap_0 (copy), l_UserInputService_0 (copy)
-    v13:updateInputType(l_InputTypeMap_0[l_UserInputService_0:GetLastInputType()]);
-end;
-v10.render = function(v14) --[[ Line: 37 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), v8 (copy), l_UserInputService_0 (copy), l_InputTypeMap_0 (copy)
-    return l_Roact_0.createElement(v8, {
-        event = l_UserInputService_0.LastInputTypeChanged, 
-        callback = function(v15) --[[ Line: 40 ]] --[[ Name: callback ]]
-            -- upvalues: l_InputTypeMap_0 (ref), v14 (copy)
-            local v16 = l_InputTypeMap_0[v15];
-            v14:updateInputType(v16);
-        end
-    });
-end;
-return l_RoactRodux_0.UNSTABLE_connect2(nil, function(v17) --[[ Line: 47 ]]
-    -- upvalues: v7 (copy)
-    return {
-        setInputType = function(v18) --[[ Line: 49 ]] --[[ Name: setInputType ]]
-            -- upvalues: v17 (copy), v7 (ref)
-            return v17(v7(v18));
-        end
-    };
-end)(v10);
+local CorePackages = game:GetService("CorePackages")
+local VRService = game:GetService("VRService")
+local UserInputService = game:GetService("UserInputService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local ParentParent = script.Parent.Parent.Parent
+local SetInputType = require(ParentParent.Actions.SetInputType)
+local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
+local InputTypeMap = require(ParentParent.Resources.Constants).InputTypeMap
+local v11 = Roact.PureComponent:extend("LastInputTypeConnector")
+
+function v11.updateInputType(p1, p2) -- line: 19
+	-- upvalues: VRService (copy), InputTypeMap (copy)
+	if VRService.VREnabled then
+		p2 = InputTypeMap[Enum.UserInputType.MouseMovement]
+	end
+
+	if p2 then
+		p1.props.setInputType(p2)
+	end
+end
+function v11.init(p3) -- line: 32
+	-- upvalues: InputTypeMap (copy), UserInputService (copy)
+	p3:updateInputType(InputTypeMap[UserInputService:GetLastInputType()])
+end
+function v11.render(p4) -- line: 37
+	-- upvalues: Roact (copy), ExternalEventConnection (copy), UserInputService (copy), InputTypeMap (copy)
+	return Roact.createElement(ExternalEventConnection, {
+		event = UserInputService.LastInputTypeChanged,
+		callback = function(p5) -- line: 40
+			-- upvalues: InputTypeMap (copy), p4 (copy)
+			local v18 = InputTypeMap[p5]
+
+			p4:updateInputType(v18)
+		end
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(nil, function(p6) -- line: 47
+	-- upvalues: SetInputType (copy)
+	return {
+		setInputType = function(p7) -- line: 49
+			-- upvalues: p6 (copy), SetInputType (copy)
+			return p6(SetInputType(p7))
+		end
+	}
+end)(v11)

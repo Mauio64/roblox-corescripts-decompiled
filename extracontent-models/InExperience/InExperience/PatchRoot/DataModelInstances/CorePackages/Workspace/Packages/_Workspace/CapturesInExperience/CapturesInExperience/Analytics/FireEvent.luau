@@ -1,14 +1,15 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_Parent_0.Analytics.AnalyticsService);
-local v3 = require(l_Parent_0.Constants);
-local v4 = require(l_Parent_0.Utils.getLocalUserId);
-return (require(l_Parent_0.Analytics.setupFireEvent)({
-    analytics = v2, 
-    infoForAllEvents = {
-        isUnder13 = if l_Players_0.LocalPlayer then l_Players_0.LocalPlayer:GetUnder13() else nil, 
-        pid = tostring(game.PlaceId), 
-        source = v3.AnalyticsSource, 
-        uid = v4(l_Players_0)
-    }
-}));
+local ParentParent = script.Parent.Parent
+local Players = game:GetService("Players")
+local AnalyticsService = require(ParentParent.Analytics.AnalyticsService)
+local Constants = require(ParentParent.Constants)
+local getLocalUserId = require(ParentParent.Utils.getLocalUserId)
+
+return (require(ParentParent.Analytics.setupFireEvent)({
+	analytics = AnalyticsService,
+	infoForAllEvents = {
+		isUnder13 = if not Players.LocalPlayer then nil else Players.LocalPlayer:GetUnder13(),
+		pid = tostring(game.PlaceId),
+		source = Constants.AnalyticsSource,
+		uid = getLocalUserId(Players)
+	}
+}))

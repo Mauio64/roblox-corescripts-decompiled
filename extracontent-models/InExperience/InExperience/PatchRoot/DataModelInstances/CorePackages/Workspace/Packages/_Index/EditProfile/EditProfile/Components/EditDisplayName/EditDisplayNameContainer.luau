@@ -1,74 +1,72 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.Parent.EditDisplayName);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v5 = require(l_Parent_0.UserProfiles).Stores.UserProfileStore.get();
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v7 = require(l_script_FirstAncestor_0.Stores.Requests.updateUserDisplayName);
-local v8 = require(l_script_FirstAncestor_0.Stores.Requests.validateUserDisplayName);
-local v9 = require(l_script_FirstAncestor_0.Analytics.AnalyticsServiceV2);
-return function(v10) --[[ Line: 21 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v2 (copy), v5 (copy), l_useSignalState_0 (copy), v9 (copy), v7 (copy), v8 (copy), v3 (copy)
-    local v11 = l_useLocalUserId_0();
-    local v12 = v2.useMemo(function() --[[ Line: 23 ]]
-        -- upvalues: v5 (ref), v11 (copy)
-        return v5.fetchNamesByUserIds({
-            (tostring(v11))
-        });
-    end, {
-        v11
-    });
-    local v13 = l_useSignalState_0(v12);
-    local v14 = v2.useMemo(function() --[[ Line: 28 ]]
-        -- upvalues: v13 (copy)
-        if v13 and v13.status == "success" and v13.data and #v13.data > 0 then
-            return v13.data[1].names.getDisplayName(false) or "";
-        else
-            return "";
-        end;
-    end, {
-        v13
-    });
-    local v15, v16 = v2.useState(v14);
-    local v18 = v2.useCallback(function(v17) --[[ Line: 36 ]]
-        -- upvalues: v16 (copy)
-        v16(v17);
-    end, {});
-    v2.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: v9 (ref)
-        v9.sendDisplayNameModalLoaded();
-    end, {});
-    v2.useEffect(function() --[[ Line: 44 ]]
-        -- upvalues: v10 (copy), v7 (ref), v11 (copy), v15 (copy), v9 (ref), v13 (copy)
-        v10.registerSaveHandler(function() --[[ Line: 45 ]]
-            -- upvalues: v7 (ref), v11 (ref), v15 (ref), v9 (ref), v13 (ref)
-            return v7(tostring(v11), v15):andThen(function(v19) --[[ Line: 46 ]]
-                -- upvalues: v9 (ref), v15 (ref), v13 (ref)
-                v9.sendDisplayNameSaved(v15);
-                if v13 and v13.data and #v13.data > 0 then
-                    local v20 = v13.data[1];
-                    if v20.names.setDisplayName then
-                        v20.names.setDisplayName(v19);
-                    end;
-                end;
-            end);
-        end);
-    end, {
-        v10.registerSaveHandler, 
-        v11, 
-        v15, 
-        v13
-    });
-    local function v22(v21) --[[ Line: 58 ]] --[[ Name: validateDisplayName ]]
-        -- upvalues: v8 (ref), v11 (copy)
-        return v8(tostring(v11), v21);
-    end;
-    return v2.createElement(v3, {
-        initialDisplayName = v14, 
-        onDataChange = v18, 
-        validateDisplayName = v22, 
-        updateErrorState = v10.updateErrorState, 
-        textBoxRef = v10.textBoxRef
-    });
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local EditDisplayName = require(script.Parent.EditDisplayName)
+local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local v6 = require(EditProfileParent.UserProfiles).Stores.UserProfileStore.get()
+local useSignalState = require(EditProfileParent.SignalsReact).useSignalState
+local updateUserDisplayName = require(EditProfile.Stores.Requests.updateUserDisplayName)
+local validateUserDisplayName = require(EditProfile.Stores.Requests.validateUserDisplayName)
+local AnalyticsServiceV2 = require(EditProfile.Analytics.AnalyticsServiceV2)
+
+return function(t1: {[any]: any}) -- line: 21
+	-- upvalues: useLocalUserId (copy), React (copy), v6 (copy), useSignalState (copy), AnalyticsServiceV2 (copy), updateUserDisplayName (copy), validateUserDisplayName (copy), EditDisplayName (copy)
+	local v12 = useLocalUserId()
+	local v13 = React.useMemo(function() -- line: 23
+		-- upvalues: v6 (copy), v12 (copy)
+		return v6.fetchNamesByUserIds({ (tostring(v12)) })
+	end, { v12 })
+	local v14 = useSignalState(v13)
+	local v15 = React.useMemo(function() -- line: 28
+		-- upvalues: v14 (copy)
+		if v14 and (v14.status == "success" and v14.data and #v14.data > 0) then
+			return v14.data[1].names.getDisplayName(false) or ""
+		end
+
+		return ""
+	end, { v14 })
+	local v16, v17 = React.useState(v15)
+	local v18 = React.useCallback(function(p1) -- line: 36
+		-- upvalues: v17 (copy)
+		v17(p1)
+	end, {})
+
+	React.useEffect(function() -- line: 40
+		-- upvalues: AnalyticsServiceV2 (copy)
+		AnalyticsServiceV2.sendDisplayNameModalLoaded()
+	end, {})
+	React.useEffect(function() -- line: 44
+		-- upvalues: t1 (copy), updateUserDisplayName (copy), v12 (copy), v16 (copy), AnalyticsServiceV2 (copy), v14 (copy)
+		t1.registerSaveHandler(function() -- line: 45
+			-- upvalues: updateUserDisplayName (copy), v12 (copy), v16 (copy), AnalyticsServiceV2 (copy), v14 (copy)
+			return updateUserDisplayName(tostring(v12), v16):andThen(function(p2) -- line: 46
+				-- upvalues: AnalyticsServiceV2 (copy), v16 (copy), v14 (copy)
+				AnalyticsServiceV2.sendDisplayNameSaved(v16)
+
+				if v14 and (v14.data and #v14.data > 0) then
+					local v22 = v14.data[1]
+
+					if v22.names.setDisplayName then
+						v22.names.setDisplayName(p2)
+					end
+				end
+			end)
+		end)
+	end, {
+		t1.registerSaveHandler,
+		v12,
+		v16,
+		v14
+	})
+
+	return React.createElement(EditDisplayName, {
+		initialDisplayName = v15,
+		onDataChange = v18,
+		validateDisplayName = function(s1: string) -- line: 58
+			-- upvalues: validateUserDisplayName (copy), v12 (copy)
+			return validateUserDisplayName(tostring(v12), s1)
+		end,
+		updateErrorState = t1.updateErrorState,
+		textBoxRef = t1.textBoxRef
+	})
+end

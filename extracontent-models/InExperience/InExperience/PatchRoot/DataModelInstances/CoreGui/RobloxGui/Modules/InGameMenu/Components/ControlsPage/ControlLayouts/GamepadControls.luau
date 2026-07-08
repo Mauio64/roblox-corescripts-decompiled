@@ -1,78 +1,81 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_UIBlox_0 = v2.UIBlox;
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v6 = require(script.Parent.Parent.ControlLayoutContainer);
-local v7 = require(l_Parent_0.Components.ThemedTextLabel);
-local v8 = require(l_Parent_0.Resources.Assets);
-local v9 = require(l_Parent_0.Resources.Controls);
-local v10 = require(l_CorePackages_0.Packages.React);
-local v11 = require(l_Parent_0.Localization.withLocalization);
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v13 = #v9.gamepadLabels.right * 43 + 62;
-local function v19(v14) --[[ Line: 42 ]] --[[ Name: verticalControlsList ]]
-    -- upvalues: v11 (copy), l_Roact_0 (copy), v7 (copy)
-    return v11(v14.controls)(function(v15) --[[ Line: 43 ]]
-        -- upvalues: l_Roact_0 (ref), v7 (ref), v14 (copy)
-        local v16 = {
-            ListLayout = l_Roact_0.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 21)
-            })
-        };
-        for v17, v18 in ipairs(v15) do
-            v16["controlLabel_" .. v17] = l_Roact_0.createElement(v7, {
-                fontKey = "Header2", 
-                themeKey = "TextEmphasis", 
-                TextXAlignment = v14.TextXAlignment, 
-                Size = UDim2.new(0, 1, 0, 22), 
-                Text = v18, 
-                LayoutOrder = v17
-            });
-        end;
-        return l_Roact_0.createElement("Frame", {
-            Position = v14.Position, 
-            Size = UDim2.new(0, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, v16);
-    end);
-end;
-return function(v20) --[[ Line: 71 ]] --[[ Name: GamepadControls ]]
-    -- upvalues: l_UserInputService_0 (copy), l_Roact_0 (copy), v6 (copy), l_ImageSetLabel_0 (copy), v8 (copy), v10 (copy), v19 (copy), v9 (copy), v13 (copy)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    local v22 = true;
-    if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.XBox360 then
-        v22 = l_l_UserInputService_0_Platform_0 == Enum.Platform.XBoxOne;
-    end;
-    return l_Roact_0.createElement(v6, {
-        titleText = "CoreScripts.InGameMenu.Controls.GamepadTitle", 
-        closeButtonRef = v20.closeButtonRef
-    }, {
-        GamepadImage = l_Roact_0.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            Image = v22 and v8.Images.GamepadXbox or v8.Images.Gamepad, 
-            Size = UDim2.new(0, 473, 0, 465), 
-            Position = UDim2.new(0.5, 16.5, 0.5, 0), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            [v10.Tag] = "data-testid=GamepadInstructions"
-        }, {
-            LeftControlsList = l_Roact_0.createElement(v19, {
-                TextXAlignment = Enum.TextXAlignment.Right, 
-                Position = UDim2.new(0, -26, 0, 62), 
-                controls = v9.gamepadLabels.left
-            }), 
-            RightControlsList = l_Roact_0.createElement(v19, {
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                Position = UDim2.new(1, -7, 0, 62), 
-                controls = v9.gamepadLabels.right
-            }), 
-            RightIconsControlslIst = l_Roact_0.createElement(v19, {
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                Position = UDim2.new(1, 26, 0, v13), 
-                controls = v9.gamepadLabels.camera
-            })
-        })
-    });
-end;
+local UserInputService = game:GetService("UserInputService")
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local UIBlox = InGameMenuDependencies.UIBlox
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ControlLayoutContainer = require(script.Parent.Parent.ControlLayoutContainer)
+local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
+local Assets = require(ParentParent.Resources.Assets)
+local Controls = require(ParentParent.Resources.Controls)
+local React = require(CorePackages.Packages.React)
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v14 = #Controls.gamepadLabels.right * 43 + 62
+
+local function verticalControlsList(p1) -- line: 42
+	-- upvalues: withLocalization (copy), Roact (copy), ThemedTextLabel (copy)
+	return withLocalization(p1.controls)(function(p2) -- line: 43
+		-- upvalues: Roact (copy), ThemedTextLabel (copy), p1 (copy)
+		local t1 = {
+			ListLayout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 21)
+			})
+		}
+
+		for i, v in ipairs(p2) do
+			t1["controlLabel_" .. i] = Roact.createElement(ThemedTextLabel, {
+				fontKey = "Header2",
+				themeKey = "TextEmphasis",
+				TextXAlignment = p1.TextXAlignment,
+				Size = UDim2.new(0, 1, 0, 22),
+				Text = v,
+				LayoutOrder = i
+			})
+		end
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Position = p1.Position,
+			Size = UDim2.new(0, 0, 1, 0)
+		}, t1)
+	end)
+end
+local function GamepadControls(p3) -- line: 71
+	-- upvalues: UserInputService (copy), Roact (copy), ControlLayoutContainer (copy), ImageSetLabel (copy), Assets (copy), React (copy), verticalControlsList (copy), Controls (copy), v14 (copy)
+	local Platform = UserInputService:GetPlatform()
+	local v20 = Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.XBoxOne
+
+	return Roact.createElement(ControlLayoutContainer, {
+		titleText = "CoreScripts.InGameMenu.Controls.GamepadTitle",
+		closeButtonRef = p3.closeButtonRef
+	}, {
+		GamepadImage = Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Image = v20 and Assets.Images.GamepadXbox or Assets.Images.Gamepad,
+			Size = UDim2.new(0, 473, 0, 465),
+			Position = UDim2.new(0.5, 16.5, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			[React.Tag] = "data-testid=GamepadInstructions"
+		}, {
+			LeftControlsList = Roact.createElement(verticalControlsList, {
+				TextXAlignment = Enum.TextXAlignment.Right,
+				Position = UDim2.new(0, -26, 0, 62),
+				controls = Controls.gamepadLabels.left
+			}),
+			RightControlsList = Roact.createElement(verticalControlsList, {
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = UDim2.new(1, -7, 0, 62),
+				controls = Controls.gamepadLabels.right
+			}),
+			RightIconsControlslIst = Roact.createElement(verticalControlsList, {
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Position = UDim2.new(1, 26, 0, v14),
+				controls = Controls.gamepadLabels.camera
+			})
+		})
+	})
+end
+
+return GamepadControls

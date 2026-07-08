@@ -1,29 +1,34 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Promise);
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local _ = require(script.Parent.ObjMap);
+local ParentParent = script.Parent.Parent.Parent
+local Promise = require(ParentParent.Promise)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+
+require(script.Parent.ObjMap)
+
 return {
-    promiseForObject = function(v6) --[[ Line: 19 ]] --[[ Name: promiseForObject ]]
-        -- upvalues: l_Object_0 (copy), l_Array_0 (copy), v1 (copy)
-        local v7 = l_Object_0.keys(v6);
-        local v10 = l_Array_0.map(v7, function(v8) --[[ Line: 21 ]]
-            -- upvalues: v6 (copy), v1 (ref)
-            local v9 = v6[v8];
-            if v1.is(v9) then
-                return v9;
-            else
-                return v1.resolve(v9);
-            end;
-        end);
-        return v1.all(v10):andThen(function(v11) --[[ Line: 31 ]]
-            -- upvalues: l_Array_0 (ref), v7 (copy)
-            return l_Array_0.reduce(v11, function(v12, v13, v14) --[[ Line: 32 ]]
-                -- upvalues: v7 (ref)
-                v12[v7[v14]] = v13;
-                return v12;
-            end, {});
-        end);
-    end
-};
+	promiseForObject = function(p1) -- line: 19
+		-- upvalues: Object (copy), Array (copy), Promise (copy)
+		local v7 = Object.keys(p1)
+		local v8 = Array.map(v7, function(p2) -- line: 21
+			-- upvalues: p1 (copy), Promise (copy)
+			local v10 = p1[p2]
+
+			if Promise.is(v10) then
+				return v10
+			end
+
+			return Promise.resolve(v10)
+		end)
+
+		return Promise.all(v8):andThen(function(p3) -- line: 31
+			-- upvalues: Array (copy), v7 (copy)
+			return Array.reduce(p3, function(p4, p5, p6) -- line: 32
+				-- upvalues: v7 (copy)
+				p4[v7[p6]] = p5
+
+				return p4
+			end, {})
+		end)
+	end
+}

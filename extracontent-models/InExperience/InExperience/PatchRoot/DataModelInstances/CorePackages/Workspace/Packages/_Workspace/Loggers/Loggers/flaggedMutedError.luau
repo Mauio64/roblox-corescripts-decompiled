@@ -1,25 +1,34 @@
-local v0 = require(script.Parent.mutedError);
-game:DefineFastString("SuppressMutedErrorKeys", "");
-local function _() --[[ Line: 32 ]] --[[ Name: getFStringSuppressMutedErrorKeys ]]
-    return game:GetFastString("SuppressMutedErrorKeys");
-end;
-local v2 = "";
-local v3 = {};
-local function v8(v4) --[[ Line: 39 ]] --[[ Name: shouldSuppressMutedError ]]
-    -- upvalues: v2 (ref), v3 (ref)
-    local l_game_FastString_0 = game:GetFastString("SuppressMutedErrorKeys");
-    if l_game_FastString_0 ~= v2 then
-        v2 = l_game_FastString_0;
-        v3 = {};
-        for _, v7 in (l_game_FastString_0:split(",")) do
-            v3[v7] = true;
-        end;
-    end;
-    return v3[v4] or false;
-end;
-return function(v9, v10, v11) --[[ Line: 53 ]] --[[ Name: flaggedMutedError ]]
-    -- upvalues: v8 (copy), v0 (copy)
-    if not v8(v9) then
-        v0(v10, v11);
-    end;
-end;
+local mutedError = require(script.Parent.mutedError)
+
+game:DefineFastString("SuppressMutedErrorKeys", "")
+
+local function getFStringSuppressMutedErrorKeys() -- line: 32
+	return game:GetFastString("SuppressMutedErrorKeys")
+end
+
+local s1 = ""
+local t1 = {}
+
+local function shouldSuppressMutedError(s2: string) -- line: 39
+	-- upvalues: s1 (ref), t1 (ref)
+	local FastString = game:GetFastString("SuppressMutedErrorKeys")
+
+	if FastString ~= s1 then
+		s1 = FastString
+		t1 = {}
+
+		for _, v10 in (FastString:split(",")) do
+			t1[v10] = true
+		end
+	end
+
+	return t1[s2] or false
+end
+local function flaggedMutedError(s3: string, s4: string, p1) -- line: 53
+	-- upvalues: shouldSuppressMutedError (copy), mutedError (copy)
+	if not shouldSuppressMutedError(s3) then
+		mutedError(s4, p1)
+	end
+end
+
+return flaggedMutedError

@@ -1,60 +1,59 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.BuilderIcons);
-local v5 = require(l_Parent_0.Cryo);
-local v6 = require(script.Parent.OptionsEnum);
-local v7 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableMessageContextMenu);
-local v11 = {
-    LayoutOrder = 1, 
-    isIncoming = false, 
-    handleEvent = function(_, _, _) --[[ Line: 22 ]] --[[ Name: handleEvent ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Foundation = require(AppChatParent.Foundation)
+local BuilderIcons = require(AppChatParent.BuilderIcons)
+local Cryo = require(AppChatParent.Cryo)
+local OptionsEnum = require(script.Parent.OptionsEnum)
+local FFlagAppChatEnableMessageContextMenu = require(AppChat.Flags.FFlagAppChatEnableMessageContextMenu)
+local t1 = {
+	LayoutOrder = 1,
+	isIncoming = false,
+	handleEvent = function(_, _, _) -- line: 22
+	end,
+	emitImpressionTelemetryEvent = function() -- line: 23
+	end
+}
 
-    end, 
-    emitImpressionTelemetryEvent = function() --[[ Line: 23 ]] --[[ Name: emitImpressionTelemetryEvent ]]
+function Options(t2: {[any]: any}) -- line: 35
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), OptionsEnum (copy), Foundation (copy), BuilderIcons (copy), FFlagAppChatEnableMessageContextMenu (copy)
+	local v14 = Cryo.Dictionary.union(t1, t2)
 
-    end
-};
-Options = function(v12) --[[ Line: 35 ]] --[[ Name: Options ]]
-    -- upvalues: v5 (copy), v11 (copy), v2 (copy), v6 (copy), v3 (copy), v4 (copy), v7 (copy)
-    local v13 = v5.Dictionary.union(v11, v12);
-    v2.useEffect(function() --[[ Line: 38 ]]
-        -- upvalues: v13 (copy)
-        v13.emitImpressionTelemetryEvent();
-    end, {});
-    local v14 = v2.useCallback(function() --[[ Line: 42 ]]
-        -- upvalues: v13 (copy), v2 (ref), v6 (ref)
-        v13.handleEvent(v2.Event.Activated, nil, v6.Reply);
-    end, {
-        v13.handleEvent
-    });
-    local v15 = v2.useCallback(function() --[[ Line: 46 ]]
-        -- upvalues: v13 (copy), v2 (ref), v6 (ref)
-        v13.handleEvent(v2.Event.Activated, nil, v6.MessageContextMenu);
-    end, {
-        v13.handleEvent
-    });
-    return v2.createElement(v3.View, {
-        tag = "row auto-xy gap-xxsmall", 
-        LayoutOrder = v13.LayoutOrder
-    }, {
-        Reply = v2.createElement(v3.IconButton, {
-            onActivated = v14, 
-            icon = v4.Icon.ArrowThickToRight, 
-            variant = v3.Enums.ButtonVariant.Standard, 
-            size = v3.Enums.InputSize.Medium, 
-            isCircular = true, 
-            LayoutOrder = v13.isIncoming and 1 or -1
-        }), 
-        MessageContextMenu = if v7 then v2.createElement(v3.IconButton, {
-            onActivated = v15, 
-            icon = v4.Icon.ThreeDotsHorizontal, 
-            variant = v3.Enums.ButtonVariant.Standard, 
-            size = v3.Enums.InputSize.Medium, 
-            isCircular = true, 
-            LayoutOrder = v13.isIncoming and 2 or -2
-        }) else nil
-    });
-end;
-return v2.memo(Options);
+	React.useEffect(function() -- line: 38
+		-- upvalues: v14 (copy)
+		v14.emitImpressionTelemetryEvent()
+	end, {})
+
+	local v15 = React.useCallback(function() -- line: 42
+		-- upvalues: v14 (copy), React (copy), OptionsEnum (copy)
+		v14.handleEvent(React.Event.Activated, nil, OptionsEnum.Reply)
+	end, { v14.handleEvent })
+	local v16 = React.useCallback(function() -- line: 46
+		-- upvalues: v14 (copy), React (copy), OptionsEnum (copy)
+		v14.handleEvent(React.Event.Activated, nil, OptionsEnum.MessageContextMenu)
+	end, { v14.handleEvent })
+
+	return React.createElement(Foundation.View, {
+		tag = "row auto-xy gap-xxsmall",
+		LayoutOrder = v14.LayoutOrder
+	}, {
+		Reply = React.createElement(Foundation.IconButton, {
+			isCircular = true,
+			onActivated = v15,
+			icon = BuilderIcons.Icon.ArrowThickToRight,
+			variant = Foundation.Enums.ButtonVariant.Standard,
+			size = Foundation.Enums.InputSize.Medium,
+			LayoutOrder = not v14.isIncoming and -1 or 1
+		}),
+		MessageContextMenu = if not FFlagAppChatEnableMessageContextMenu then nil else React.createElement(Foundation.IconButton, {
+			isCircular = true,
+			onActivated = v16,
+			icon = BuilderIcons.Icon.ThreeDotsHorizontal,
+			variant = Foundation.Enums.ButtonVariant.Standard,
+			size = Foundation.Enums.InputSize.Medium,
+			LayoutOrder = not v14.isIncoming and -2 or 2
+		})
+	})
+end
+
+return React.memo(Options)

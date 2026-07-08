@@ -1,28 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+
 return {
-    NotInterestedMissingAppPage = {
-        eventName = "Discovery_NotInterestedMissingAppPage", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            25, 
-            8, 
-            14
-        }, 
-        description = "Counter for Not Interested Missing App Page"
-    }, 
-    NotInterestedUserSignalFailed = {
-        eventName = "Discovery_NotInterestedUserSignalFailed", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            25, 
-            8, 
-            14
-        }, 
-        description = "Counter for Not Interested User Signal Failed"
-    }
-};
+	NotInterestedMissingAppPage = {
+		eventName = "Discovery_NotInterestedMissingAppPage",
+		description = "Counter for Not Interested Missing App Page",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			25,
+			8,
+			14
+		}
+	},
+	NotInterestedUserSignalFailed = {
+		eventName = "Discovery_NotInterestedUserSignalFailed",
+		description = "Counter for Not Interested User Signal Failed",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			25,
+			8,
+			14
+		}
+	}
+}

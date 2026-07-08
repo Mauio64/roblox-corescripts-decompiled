@@ -1,16 +1,17 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetScreenSize);
-return v1.createReducer({
-    inputType = nil, 
-    screenSize = Vector2.new(0, 0)
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+local SetScreenSize = require(ParentParent.Actions.SetScreenSize)
+
+return Rodux.createReducer({
+	inputType = nil,
+	screenSize = Vector2.new(0, 0)
 }, {
-    [v4.name] = function(v5, v6) --[[ Line: 18 ]]
-        -- upvalues: v2 (copy)
-        return v2.Dictionary.join(v5, {
-            screenSize = v6.screenSize
-        });
-    end
-});
+	[SetScreenSize.name] = function(p1, p2) -- line: 18
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			screenSize = p2.screenSize
+		})
+	end
+})

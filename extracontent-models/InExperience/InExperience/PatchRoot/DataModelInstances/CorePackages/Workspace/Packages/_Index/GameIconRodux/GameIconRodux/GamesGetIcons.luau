@@ -1,24 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("GameIconRodux").Parent;
-local l_IXPServiceWrapper_0 = require(l_Parent_0.IxpServiceWrapper).IXPServiceWrapper;
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local l_FFlagGetGameIconsFromThumbnailsDeliveryApiIxp_0 = require(l_Parent_0.SharedFlags).FFlagGetGameIconsFromThumbnailsDeliveryApiIxp;
-local l_FFlagForceGetGameIconsFromThumbnailsDeliveryApi_0 = require(l_Parent_0.SharedFlags).FFlagForceGetGameIconsFromThumbnailsDeliveryApi;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v6, v7, v8) --[[ Line: 25 ]]
-    -- upvalues: l_Url_0 (copy), l_FFlagForceGetGameIconsFromThumbnailsDeliveryApi_0 (copy), l_FFlagGetGameIconsFromThumbnailsDeliveryApiIxp_0 (copy), l_IXPServiceWrapper_0 (copy), l_AppUserLayers_0 (copy)
-    local v9 = l_Url_0:makeQueryString({
-        universeIds = table.concat(v7, ","), 
-        format = "png", 
-        size = v8
-    });
-    local l_THUMBNAILS_URL_0 = l_Url_0.THUMBNAILS_URL;
-    if l_FFlagForceGetGameIconsFromThumbnailsDeliveryApi_0 then
-        l_THUMBNAILS_URL_0 = l_Url_0.THUMBNAILSDELIVERY_URL;
-    elseif l_FFlagGetGameIconsFromThumbnailsDeliveryApiIxp_0 then
-        local l_l_IXPServiceWrapper_0_LayerData_0 = l_IXPServiceWrapper_0:GetLayerData(l_AppUserLayers_0.ServeThumbnailsFromEdge);
-        if l_l_IXPServiceWrapper_0_LayerData_0 and l_l_IXPServiceWrapper_0_LayerData_0.get_gamesicons_from_edge then
-            l_THUMBNAILS_URL_0 = l_Url_0.THUMBNAILSDELIVERY_URL;
-        end;
-    end;
-    return v6(string.format("%sv1/games/icons?%s", l_THUMBNAILS_URL_0, v9), "GET");
-end;
+local Parent = script:FindFirstAncestor("GameIconRodux").Parent
+local IXPServiceWrapper = require(Parent.IxpServiceWrapper).IXPServiceWrapper
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local FFlagGetGameIconsFromThumbnailsDeliveryApiIxp = require(Parent.SharedFlags).FFlagGetGameIconsFromThumbnailsDeliveryApiIxp
+local FFlagForceGetGameIconsFromThumbnailsDeliveryApi = require(Parent.SharedFlags).FFlagForceGetGameIconsFromThumbnailsDeliveryApi
+local Url = require(Parent.Http).Url
+
+return function(p1, p2, p3) -- line: 25
+	-- upvalues: Url (copy), FFlagForceGetGameIconsFromThumbnailsDeliveryApi (copy), FFlagGetGameIconsFromThumbnailsDeliveryApiIxp (copy), IXPServiceWrapper (copy), AppUserLayers (copy)
+	local v10 = Url:makeQueryString({
+		format = "png",
+		universeIds = table.concat(p2, ","),
+		size = p3
+	})
+	local THUMBNAILS_URL = Url.THUMBNAILS_URL
+
+	if FFlagForceGetGameIconsFromThumbnailsDeliveryApi then
+		THUMBNAILS_URL = Url.THUMBNAILSDELIVERY_URL
+	elseif FFlagGetGameIconsFromThumbnailsDeliveryApiIxp then
+		local LayerData = IXPServiceWrapper:GetLayerData(AppUserLayers.ServeThumbnailsFromEdge)
+
+		if LayerData and LayerData.get_gamesicons_from_edge then
+			THUMBNAILS_URL = Url.THUMBNAILSDELIVERY_URL
+		end
+	end
+
+	return p1(string.format("%sv1/games/icons?%s", THUMBNAILS_URL, v10), "GET")
+end

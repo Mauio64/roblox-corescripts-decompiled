@@ -1,3 +1,3 @@
-return function() --[[ Line: 3 ]]
-    return os.clock();
-end;
+return function() -- line: 3
+	return os.clock()
+end

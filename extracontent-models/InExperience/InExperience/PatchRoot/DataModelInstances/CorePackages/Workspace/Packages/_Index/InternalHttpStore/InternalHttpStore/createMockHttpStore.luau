@@ -1,56 +1,60 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Signals);
-local _ = require(l_Parent_0.HttpStoreTypes);
-return function() --[[ Line: 20 ]] --[[ Name: createMockHttpStore ]]
-    -- upvalues: v2 (copy)
-    local v4 = {};
-    local function v9(v5, v6) --[[ Line: 29 ]] --[[ Name: getOrCreateResponse ]]
-        -- upvalues: v4 (ref), v2 (ref)
-        if not v4[v5] then
-            local v7, v8 = v2.createSignal({
-                status = "NotStarted", 
-                config = v6
-            });
-            v4[v5] = {
-                get = v7, 
-                set = v8
-            };
-        end;
-        return v4[v5];
-    end;
-    local function v13(v10, v11) --[[ Line: 40 ]] --[[ Name: fetch ]]
-        -- upvalues: v9 (copy)
-        local v12 = v10 or v11.Url;
-        return v9(v12, v11).get, function() --[[ Line: 43 ]]
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Signals = require(scriptParentParent.Signals)
 
-        end;
-    end;
-    local function v14() --[[ Line: 46 ]] --[[ Name: cancelAll ]]
+require(scriptParent.HttpStoreTypes)
 
-    end;
-    local function v19(v15, v16) --[[ Line: 53 ]] --[[ Name: setResponse ]]
-        -- upvalues: v4 (ref), v2 (ref)
-        if v4[v15] then
-            v4[v15].set(v16);
-            return;
-        else
-            local v17, v18 = v2.createSignal(v16);
-            v4[v15] = {
-                get = v17, 
-                set = v18
-            };
-            return;
-        end;
-    end;
-    local function v20() --[[ Line: 63 ]] --[[ Name: reset ]]
-        -- upvalues: v4 (ref)
-        v4 = {};
-    end;
-    return {
-        fetch = v13, 
-        cancelAll = v14, 
-        setResponse = v19, 
-        reset = v20
-    };
-end;
+local function createMockHttpStore() -- line: 20
+	-- upvalues: Signals (copy)
+	local t1 = {}
+
+	local function getOrCreateResponse(s1: string, p1) -- line: 29
+		-- upvalues: t1 (ref), Signals (copy)
+		if not t1[s1] then
+			local v9, v10 = Signals.createSignal({
+				status = "NotStarted",
+				config = p1
+			})
+
+			t1[s1] = {
+				get = v9,
+				set = v10
+			}
+		end
+
+		return t1[s1]
+	end
+
+	return {
+		fetch = function(s2: string?, p2) -- line: 40
+			-- upvalues: getOrCreateResponse (copy)
+			local v13 = s2 or p2.Url
+
+			return getOrCreateResponse(v13, p2).get, function() -- line: 43
+			end
+		end,
+		cancelAll = function() -- line: 46
+		end,
+		setResponse = function(s3: string, p3) -- line: 53
+			-- upvalues: t1 (ref), Signals (copy)
+			if t1[s3] then
+				t1[s3].set(p3)
+
+				return
+			end
+
+			local v16, v17 = Signals.createSignal(p3)
+
+			t1[s3] = {
+				get = v16,
+				set = v17
+			}
+		end,
+		reset = function() -- line: 63
+			-- upvalues: t1 (ref)
+			t1 = {}
+		end
+	}
+end
+
+return createMockHttpStore

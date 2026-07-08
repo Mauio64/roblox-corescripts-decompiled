@@ -1,37 +1,42 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-v2.init(require(l_CorePackages_0.Workspace.Packages.RobloxAppUIBloxConfig));
-local l_AppStyleProvider_0 = v2.App.Style.AppStyleProvider;
-v1.setGlobalConfig({
-    elementTracing = true, 
-    propValidation = true
-});
-local v4 = {
-    Default = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+
+UIBlox.init(require(CorePackages.Workspace.Packages.RobloxAppUIBloxConfig))
+
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+
+Roact.setGlobalConfig({
+	elementTracing = true,
+	propValidation = true
+})
+
+local t1 = {
+	Default = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+
 return {
-    roact = v1, 
-    mapStory = function(v5) --[[ Line: 31 ]] --[[ Name: mapStory ]]
-        -- upvalues: v1 (copy), l_AppStyleProvider_0 (copy), v4 (copy)
-        return function(v6) --[[ Line: 32 ]]
-            -- upvalues: v1 (ref), l_AppStyleProvider_0 (ref), v4 (ref), v5 (copy)
-            return v1.createElement(l_AppStyleProvider_0, {
-                style = v6 and v4[v6.theme] or v4.Default
-            }, {
-                Child = v1.createElement(v5, v6)
-            });
-        end;
-    end
-};
+	roact = Roact,
+	mapStory = function(p1) -- line: 31
+		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy)
+		return function(p2) -- line: 32
+			-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), p1 (copy)
+			return Roact.createElement(AppStyleProvider, {
+				style = p2 and t1[p2.theme] or t1.Default
+			}, {
+				Child = Roact.createElement(p1, p2)
+			})
+		end
+	end
+}

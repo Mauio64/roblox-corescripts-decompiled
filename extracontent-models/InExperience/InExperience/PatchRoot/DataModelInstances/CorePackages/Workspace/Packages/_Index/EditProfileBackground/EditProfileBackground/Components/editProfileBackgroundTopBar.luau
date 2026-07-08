@@ -1,1 +1,1 @@
-return require(script.editProfileBackgroundTopBar);
+return require(script.editProfileBackgroundTopBar)

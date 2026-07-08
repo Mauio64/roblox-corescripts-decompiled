@@ -20,6 +20,7 @@ local SocialUpsellAnalytics = require(SocialUpsell.Analytics.SocialUpsellAnalyti
 local UpsellComponent = require(SocialUpsell.Analytics.Enum.UpsellComponent)
 local EventTypes = require(SocialUpsellParent.SocialLuaAnalytics).Analytics.Enums.EventTypes
 local FFlagAddUpsellEntryComponentToAnalytics = require(SocialUpsell.Flag.FFlagAddUpsellEntryComponentToAnalytics)
+local FFlagAgeBasedUXHomepageVerificationBannerGreyButton = require(SocialUpsellParent.SharedFlags).FFlagAgeBasedUXHomepageVerificationBannerGreyButton
 local UPSELL_BUTTON_ACTION = Constants.UPSELL_BUTTON_ACTION
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local Banner = AppBlox.Banner
@@ -27,29 +28,61 @@ local t1 = {
 	isContained = true
 }
 
-local function getBannerPropsFromConfig(p1, t2: {[any]: any}) -- line: 84
-	-- upvalues: isCompactUpsellBanner (copy), UPSELL_BUTTON_ACTION (copy), ButtonVariant (copy), Constants (copy), Foundation (copy)
+local function getButtonVariant(p1, p2) -- line: 66
+	-- upvalues: FFlagAgeBasedUXHomepageVerificationBannerGreyButton (copy), isCompactUpsellBanner (copy), UPSELL_BUTTON_ACTION (copy), ButtonVariant (copy)
+	if FFlagAgeBasedUXHomepageVerificationBannerGreyButton and p1.variantOverride then
+		return p1.variantOverride
+	end
+
+	local v27 = isCompactUpsellBanner(p2)
+
+	if p1.action then
+		if p1.action == UPSELL_BUTTON_ACTION.Primary then
+			if v27 then
+				return ButtonVariant.SoftEmphasis
+			end
+
+			return ButtonVariant.Emphasis
+		end
+
+		if p1.action == UPSELL_BUTTON_ACTION.Secondary then
+			return ButtonVariant.Utility
+		end
+	end
+
+	return nil
+end
+local function getBannerPropsFromConfig(p3, t2: {[any]: any}) -- line: 83
+	-- upvalues: FFlagAgeBasedUXHomepageVerificationBannerGreyButton (copy), isCompactUpsellBanner (copy), UPSELL_BUTTON_ACTION (copy), ButtonVariant (copy), Constants (copy), Foundation (copy)
 	local t3 = {}
 	local t4 = {}
 
-	if p1.buttons then
-		for _, v30 in p1.buttons do
+	if p3.buttons then
+		for _, v33 in p3.buttons do
 			local t5 = {
-				text = v30.text
+				text = v33.text
 			}
-			local v32 = isCompactUpsellBanner(p1)
+			local variantOverride
 
-			t5.variant = if not v30.action then nil else if v30.action ~= UPSELL_BUTTON_ACTION.Primary then if v30.action ~= UPSELL_BUTTON_ACTION.Secondary then nil else ButtonVariant.Utility else if not v32 then ButtonVariant.Emphasis else ButtonVariant.SoftEmphasis
-			t5.onActivated = t2[v30.action]
+			if FFlagAgeBasedUXHomepageVerificationBannerGreyButton and v33.variantOverride then
+				variantOverride = v33.variantOverride
+			else
+				local v36 = isCompactUpsellBanner(p3)
+
+				variantOverride = if not v33.action then nil else if v33.action ~= UPSELL_BUTTON_ACTION.Primary then if v33.action ~= UPSELL_BUTTON_ACTION.Secondary then nil else ButtonVariant.Utility else if not v36 then ButtonVariant.Emphasis else ButtonVariant.SoftEmphasis
+			end
+
+			t5.variant = variantOverride
+			t5.onActivated = t2[v33.action]
 			table.insert(t4, t5)
 		end
 	end
 
-	if p1.labelItems then
-		for _, v34 in p1.labelItems do
-			if v34.type == Constants.UPSELL_LABEL_ITEM_TYPE_COUNTDOWN then
+	if p3.labelItems then
+		for _, v38 in p3.labelItems do
+			if v38.type == Constants.UPSELL_LABEL_ITEM_TYPE_COUNTDOWN then
 				table.insert(t3, {
-					text = v34.text,
+					text = v38.text,
 					icon = {
 						variant = Foundation.Enums.IconVariant.Filled,
 						position = Foundation.Enums.IconPosition.Left,
@@ -62,124 +95,125 @@ local function getBannerPropsFromConfig(p1, t2: {[any]: any}) -- line: 84
 	end
 
 	return {
-		title = p1.title,
-		body = p1.body,
+		title = p3.title,
+		body = p3.body,
 		badges = t3,
 		buttons = t4,
-		onDismiss = if not p1.isDismissable then nil else t2[UPSELL_BUTTON_ACTION.Dismiss],
-		image = p1.image,
-		icon = if not p1.image then p1.icon else nil
+		onDismiss = if not p3.isDismissable then nil else t2[UPSELL_BUTTON_ACTION.Dismiss],
+		image = p3.image,
+		icon = if not p3.image then p3.icon else nil
 	}
 end
-
-return function(t6: {[any]: any}) --[[ UpsellBanner ]] -- line: 125
+local function UpsellBanner(t6: {[any]: any}) -- line: 124
 	-- upvalues: Cryo (copy), t1 (copy), React (copy), HttpService (copy), getUpsellSignalStore (copy), SocialUpsellAnalytics (copy), UpsellComponent (copy), useEffect (copy), EventTypes (copy), FFlagAddUpsellEntryComponentToAnalytics (copy), useCallback (copy), UPSELL_BUTTON_ACTION (copy), getBannerPropsFromConfig (copy), Banner (copy)
-	local v36 = Cryo.Dictionary.union(t1, t6)
-	local v37 = React.useMemo(function() -- line: 128
-		-- upvalues: v36 (copy), HttpService (copy)
-		return v36.impressionId or HttpService:GenerateGUID(false)
+	local v40 = Cryo.Dictionary.union(t1, t6)
+	local v41 = React.useMemo(function() -- line: 127
+		-- upvalues: v40 (copy), HttpService (copy)
+		return v40.impressionId or HttpService:GenerateGUID(false)
 	end, {
-		v36.impressionId,
-		v36.config.type
+		v40.impressionId,
+		v40.config.type
 	})
-	local v38 = React.useRef(nil)
-	local v39 = getUpsellSignalStore()
-	local v40 = React.useMemo(function() -- line: 135
-		-- upvalues: SocialUpsellAnalytics (copy), v36 (copy), UpsellComponent (copy)
-		return SocialUpsellAnalytics.evaluateUpsellStage(v36.upsellEntrySurface, UpsellComponent.Banner, v36.upsellEntryComponent)
+	local v42 = React.useRef(nil)
+	local v43 = getUpsellSignalStore()
+	local v44 = React.useMemo(function() -- line: 134
+		-- upvalues: SocialUpsellAnalytics (copy), v40 (copy), UpsellComponent (copy)
+		return SocialUpsellAnalytics.evaluateUpsellStage(v40.upsellEntrySurface, UpsellComponent.Banner, v40.upsellEntryComponent)
 	end, {
-		v36.upsellEntrySurface,
-		v36.upsellEntryComponent
+		v40.upsellEntrySurface,
+		v40.upsellEntryComponent
 	})
 
-	useEffect(function() -- line: 144
-		-- upvalues: v37 (copy), v38 (copy), SocialUpsellAnalytics (copy), EventTypes (copy), v36 (copy), v40 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
-		if v37 and v38.current ~= v37 then
+	useEffect(function() -- line: 143
+		-- upvalues: v41 (copy), v42 (copy), SocialUpsellAnalytics (copy), EventTypes (copy), v40 (copy), v44 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
+		if v41 and v42.current ~= v41 then
 			SocialUpsellAnalytics.logUpsellEvent(EventTypes.SocialUpsellShown, {
-				upsellPurpose = v36.config.type,
-				upsellEntrySurface = v36.upsellEntrySurface,
-				upsellStage = v40,
-				upsellImpressionId = v37,
+				upsellPurpose = v40.config.type,
+				upsellEntrySurface = v40.upsellEntrySurface,
+				upsellStage = v44,
+				upsellImpressionId = v41,
 				upsellComponent = UpsellComponent.Banner,
-				conversationId = v36.conversationId,
-				upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v36.upsellEntryComponent
+				conversationId = v40.conversationId,
+				upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v40.upsellEntryComponent
 			})
-			v38.current = v37
+			v42.current = v41
 		end
 	end, {
-		v36.config.type,
-		v36.upsellEntrySurface,
-		v40,
-		v37,
-		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v36.upsellEntryComponent
+		v40.config.type,
+		v40.upsellEntrySurface,
+		v44,
+		v41,
+		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v40.upsellEntryComponent
 	})
-	useEffect(function() -- line: 170
-		-- upvalues: v36 (copy), v39 (copy)
-		local type = v36.config.type
-		local upsellEntrySurface = v36.upsellEntrySurface
+	useEffect(function() -- line: 169
+		-- upvalues: v40 (copy), v43 (copy)
+		local type = v40.config.type
+		local upsellEntrySurface = v40.upsellEntrySurface
 
-		v39.setUpsellBannerData(type, upsellEntrySurface, v36.config)
+		v43.setUpsellBannerData(type, upsellEntrySurface, v40.config)
 
-		return function() -- line: 175
-			-- upvalues: v39 (copy), type (copy), upsellEntrySurface (copy)
-			v39.setUpsellBannerData(type, upsellEntrySurface, nil)
+		return function() -- line: 174
+			-- upvalues: v43 (copy), type (copy), upsellEntrySurface (copy)
+			v43.setUpsellBannerData(type, upsellEntrySurface, nil)
 		end
 	end, {
-		v36.upsellEntrySurface,
-		v36.config,
-		v39
+		v40.upsellEntrySurface,
+		v40.config,
+		v43
 	})
 
-	local v41 = useCallback(function(p2: ((...any) -> ...any), p3) -- line: 182
-		-- upvalues: SocialUpsellAnalytics (copy), EventTypes (copy), v36 (copy), v40 (copy), v37 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
-		return function() -- line: 183
-			-- upvalues: SocialUpsellAnalytics (copy), EventTypes (copy), v36 (copy), v40 (copy), v37 (copy), UpsellComponent (copy), p3 (copy), FFlagAddUpsellEntryComponentToAnalytics (copy), p2 (copy)
+	local v45 = useCallback(function(p4: ((...any) -> ...any), p5) -- line: 181
+		-- upvalues: SocialUpsellAnalytics (copy), EventTypes (copy), v40 (copy), v44 (copy), v41 (copy), UpsellComponent (copy), FFlagAddUpsellEntryComponentToAnalytics (copy)
+		return function() -- line: 182
+			-- upvalues: SocialUpsellAnalytics (copy), EventTypes (copy), v40 (copy), v44 (copy), v41 (copy), UpsellComponent (copy), p5 (copy), FFlagAddUpsellEntryComponentToAnalytics (copy), p4 (copy)
 			SocialUpsellAnalytics.logUpsellEvent(EventTypes.SocialUpsellButtonClick, {
-				upsellPurpose = v36.config.type,
-				upsellEntrySurface = v36.upsellEntrySurface,
-				upsellStage = v40,
-				upsellImpressionId = v37,
+				upsellPurpose = v40.config.type,
+				upsellEntrySurface = v40.upsellEntrySurface,
+				upsellStage = v44,
+				upsellImpressionId = v41,
 				upsellComponent = UpsellComponent.Banner,
-				btn = p3,
-				conversationId = v36.conversationId,
-				upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v36.upsellEntryComponent
+				btn = p5,
+				conversationId = v40.conversationId,
+				upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else v40.upsellEntryComponent
 			})
-			p2(v37)
+			p4(v41)
 		end
 	end, {
-		v36.upsellEntrySurface,
-		v36.config.type,
-		v40,
-		v37,
-		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v36.upsellEntryComponent
-	})
-	local v42 = useCallback(v41(v36.onPrimaryAction, UPSELL_BUTTON_ACTION.Primary), {
+		v40.upsellEntrySurface,
+		v40.config.type,
+		v44,
 		v41,
-		v36.onPrimaryAction
+		if not FFlagAddUpsellEntryComponentToAnalytics then nil else v40.upsellEntryComponent
 	})
-	local v43 = useCallback(v41(v36.onSecondaryAction, UPSELL_BUTTON_ACTION.Secondary), {
-		v41,
-		v36.onSecondaryAction
+	local v46 = useCallback(v45(v40.onPrimaryAction, UPSELL_BUTTON_ACTION.Primary), {
+		v45,
+		v40.onPrimaryAction
 	})
-	local v44 = useCallback(v41(v36.onDismiss, "Dismiss"), {
-		v41,
-		v36.onDismiss
+	local v47 = useCallback(v45(v40.onSecondaryAction, UPSELL_BUTTON_ACTION.Secondary), {
+		v45,
+		v40.onSecondaryAction
 	})
-	local v45 = React.useMemo(function() -- line: 225
-		-- upvalues: getBannerPropsFromConfig (copy), v36 (copy), UPSELL_BUTTON_ACTION (copy), v42 (copy), v43 (copy), v44 (copy)
-		return (getBannerPropsFromConfig(v36.config, {
-			[UPSELL_BUTTON_ACTION.Primary] = v42,
-			[UPSELL_BUTTON_ACTION.Secondary] = v43,
-			[UPSELL_BUTTON_ACTION.Dismiss] = v44
+	local v48 = useCallback(v45(v40.onDismiss, "Dismiss"), {
+		v45,
+		v40.onDismiss
+	})
+	local v49 = React.useMemo(function() -- line: 224
+		-- upvalues: getBannerPropsFromConfig (copy), v40 (copy), UPSELL_BUTTON_ACTION (copy), v46 (copy), v47 (copy), v48 (copy)
+		return (getBannerPropsFromConfig(v40.config, {
+			[UPSELL_BUTTON_ACTION.Primary] = v46,
+			[UPSELL_BUTTON_ACTION.Secondary] = v47,
+			[UPSELL_BUTTON_ACTION.Dismiss] = v48
 		}))
 	end, {
-		v36.config,
-		v42,
-		v43,
-		v44
+		v40.config,
+		v46,
+		v47,
+		v48
 	})
 
-	return React.createElement(Banner, Cryo.Dictionary.join(v45, {
-		isContained = v36.isContained
+	return React.createElement(Banner, Cryo.Dictionary.join(v49, {
+		isContained = v40.isContained
 	}))
 end
+
+return UpsellBanner

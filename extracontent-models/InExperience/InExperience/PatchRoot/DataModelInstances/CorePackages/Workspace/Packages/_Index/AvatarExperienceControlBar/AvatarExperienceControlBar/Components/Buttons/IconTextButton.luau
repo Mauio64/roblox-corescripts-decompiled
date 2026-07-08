@@ -1,71 +1,73 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.Localization);
-local v5 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local l_useLocalization_0 = v4.Hooks.useLocalization;
-local v7 = require(l_script_FirstAncestor_0.Hooks.useHoverBinding);
-local l_isBuilderIcon_0 = v3.Utility.isBuilderIcon;
-local l_FFlagAXMigrateBuilderIcons_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons;
-local l_FFlagAXResetAvatarButton_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXResetAvatarButton;
-return (v2.forwardRef(function(v11, v12) --[[ Line: 29 ]]
-    -- upvalues: v5 (copy), v7 (copy), l_useLocalization_0 (copy), l_FFlagAXMigrateBuilderIcons_0 (copy), l_isBuilderIcon_0 (copy), v2 (copy), v3 (copy), l_FFlagAXResetAvatarButton_0 (copy)
-    local v13 = v5();
-    local v14, v15 = v7();
-    local v16 = if v11.radius then v11.radius else v13.defaultIconTextButtonRadius;
-    local v17 = l_useLocalization_0({
-        text = v11.localizedTextKey
-    });
-    local v18 = if v17.text then v17.text else v11.text;
-    local v19 = if v11.iconSize then v11.iconSize else v13.defaultIconSize;
-    local v20 = l_FFlagAXMigrateBuilderIcons_0 and l_isBuilderIcon_0(v11.icon);
-    return v2.createElement(v3.View, {
-        onActivated = v11.onActivated, 
-        isDisabled = v11.disabled, 
-        tag = "auto-xy size-full-0 clip row gap-xsmall items-center", 
-        ref = v12, 
-        onStateChanged = v15, 
-        GroupTransparency = if l_FFlagAXResetAvatarButton_0 then if v11.disabled then v13.contentDisabledTransparency else v13.contentForegroundStyle.Transparency else nil, 
-        backgroundStyle = v14:map(function(v21) --[[ Line: 55 ]]
-            -- upvalues: v13 (copy)
-            return {
-                Color3 = v13.hoverIconBackgroundStyle.Color3, 
-                Transparency = if v21 then v13.hoverIconBackgroundStyle.Transparency else 1
-            };
-        end), 
-        cornerRadius = UDim.new(0, v16), 
-        padding = {
-            left = UDim.new(0, v13.textButtonPaddingLeft), 
-            right = UDim.new(0, v13.textButtonPaddingRight), 
-            top = UDim.new(0, v13.textButtonPaddingY), 
-            bottom = UDim.new(0, v13.textButtonPaddingY)
-        }, 
-        Visible = v11.Visible, 
-        LayoutOrder = v11.LayoutOrder
-    }, {
-        Icon = v2.createElement(v3.View, {
-            Size = UDim2.new(0, v13.iconTextButtonIconContainerSize, 0, v13.iconTextButtonIconContainerSize), 
-            tag = if l_FFlagAXMigrateBuilderIcons_0 then {
-                ["radius-circle"] = true, 
-                ["row align-x-center align-y-center"] = v20
-            } else "radius-circle"
-        }, {
-            IconImage = if v20 then v2.createElement(v3.Icon, {
-                tag = "position-center-center anchor-center-center", 
-                name = v11.icon, 
-                size = v19, 
-                style = v13.contentForegroundStyle
-            }) else v2.createElement(v3.Image, {
-                tag = "position-center-center anchor-center-center", 
-                Image = v11.icon, 
-                Size = UDim2.new(0, v19, 0, v19), 
-                imageStyle = v13.contentForegroundStyle
-            })
-        }), 
-        Text = v2.createElement(v3.Text, {
-            Text = v18, 
-            tag = "auto-xy text-title-medium content-emphasis"
-        })
-    });
-end));
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local Localization = require(AvatarExperienceControlBarParent.Localization)
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useLocalization = Localization.Hooks.useLocalization
+local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+local isBuilderIcon = Foundation.Utility.isBuilderIcon
+local FFlagAXMigrateBuilderIcons = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
+local FFlagAXResetAvatarButton = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXResetAvatarButton
+
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 29
+	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), useLocalization (copy), FFlagAXMigrateBuilderIcons (copy), isBuilderIcon (copy), React (copy), Foundation (copy), FFlagAXResetAvatarButton (copy)
+	local v14 = useSemanticTokens()
+	local v15, v16 = useHoverBinding()
+	local v17 = if not t1.radius then v14.defaultIconTextButtonRadius else t1.radius
+	local v18 = useLocalization({
+		text = t1.localizedTextKey
+	})
+	local v19 = if not v18.text then t1.text else v18.text
+	local v20 = if not t1.iconSize then v14.defaultIconSize else t1.iconSize
+	local v21 = FFlagAXMigrateBuilderIcons and isBuilderIcon(t1.icon)
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy size-full-0 clip row gap-xsmall items-center",
+		onActivated = t1.onActivated,
+		isDisabled = t1.disabled,
+		ref = p1,
+		onStateChanged = v16,
+		GroupTransparency = if not FFlagAXResetAvatarButton then nil else if not t1.disabled then v14.contentForegroundStyle.Transparency else v14.contentDisabledTransparency,
+		backgroundStyle = v15:map(function(p2) -- line: 55
+			-- upvalues: v14 (copy)
+			return {
+				Color3 = v14.hoverIconBackgroundStyle.Color3,
+				Transparency = not p2 and 1 or v14.hoverIconBackgroundStyle.Transparency
+			}
+		end),
+		cornerRadius = UDim.new(0, v17),
+		padding = {
+			left = UDim.new(0, v14.textButtonPaddingLeft),
+			right = UDim.new(0, v14.textButtonPaddingRight),
+			top = UDim.new(0, v14.textButtonPaddingY),
+			bottom = UDim.new(0, v14.textButtonPaddingY)
+		},
+		Visible = t1.Visible,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		Icon = React.createElement(Foundation.View, {
+			Size = UDim2.new(0, v14.iconTextButtonIconContainerSize, 0, v14.iconTextButtonIconContainerSize),
+			tag = not FFlagAXMigrateBuilderIcons and "radius-circle" or {
+				["radius-circle"] = true,
+				["row align-x-center align-y-center"] = v21
+			}
+		}, {
+			IconImage = if not v21 then React.createElement(Foundation.Image, {
+				tag = "position-center-center anchor-center-center",
+				Image = t1.icon,
+				Size = UDim2.new(0, v20, 0, v20),
+				imageStyle = v14.contentForegroundStyle
+			}) else React.createElement(Foundation.Icon, {
+				tag = "position-center-center anchor-center-center",
+				name = t1.icon,
+				size = v20,
+				style = v14.contentForegroundStyle
+			})
+		}),
+		Text = React.createElement(Foundation.Text, {
+			tag = "auto-xy text-title-medium content-emphasis",
+			Text = v19
+		})
+	})
+end))

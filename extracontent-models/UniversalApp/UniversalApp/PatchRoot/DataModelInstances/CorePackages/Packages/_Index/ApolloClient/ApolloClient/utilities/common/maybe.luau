@@ -1,15 +1,15 @@
 return {
-    maybe = function(v0) --[[ Line: 10 ]] --[[ Name: maybe ]]
-        local _, v2, v3 = xpcall(function() --[[ Line: 12 ]]
-            -- upvalues: v0 (copy)
-            return v0(), true;
-        end, function() --[[ Line: 14 ]]
+	maybe = function(p1: ((...any) -> ...any)) -- line: 10
+		local _, result, v4 = xpcall(function() -- line: 12
+			-- upvalues: p1 (copy)
+			return p1(), true
+		end, function() -- line: 14
+		end)
 
-        end);
-        if v3 then
-            return v2;
-        else
-            return nil;
-        end;
-    end
-};
+		if v4 then
+			return result
+		end
+
+		return nil
+	end
+}

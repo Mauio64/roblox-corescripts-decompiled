@@ -1,55 +1,61 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Loading.LoadableImage);
-local _ = require(l_Parent_0.Style.StyleTypes);
-local v5 = UDim.new(0, 8);
-return function(v6) --[[ Line: 27 ]] --[[ Name: VerticalTileThumbnail ]]
-    -- upvalues: v5 (copy), v2 (copy), v3 (copy)
-    local l_aspectRatio_0 = v6.aspectRatio;
-    local l_isTopRounded_0 = v6.isTopRounded;
-    local l_isBottomRounded_0 = v6.isBottomRounded;
-    local l_thumbnail_0 = v6.thumbnail;
-    local l_border_0 = v6.border;
-    local v12 = l_isTopRounded_0 and l_isBottomRounded_0;
-    local v13 = not v12 and (l_isTopRounded_0 or l_isBottomRounded_0);
-    local v14 = if l_border_0 ~= nil then l_border_0.CornerRadius else v5;
-    return v2.createElement("Frame", {
-        Size = if l_aspectRatio_0 then UDim2.new(1, 0, l_aspectRatio_0, 0) else UDim2.new(1, 0, 1, 0), 
-        SizeConstraint = if l_aspectRatio_0 then Enum.SizeConstraint.RelativeXX else nil, 
-        BackgroundTransparency = 1
-    }, {
-        TopFrame = v2.createElement("Frame", {
-            Position = UDim2.fromScale(0, 0), 
-            Size = UDim2.fromScale(1, not v13 and 1 or 0.5), 
-            ClipsDescendants = true, 
-            BackgroundTransparency = 1
-        }, {
-            TopImage = v2.createElement(v3, {
-                BackgroundTransparency = 1, 
-                Image = l_thumbnail_0, 
-                Position = UDim2.fromScale(0, 0), 
-                Size = UDim2.fromScale(1, not v13 and 1 or 2), 
-                cornerRadius = if not not v12 or l_isTopRounded_0 then v14 else nil, 
-                showFailedStateWhenLoadingFailed = true, 
-                useShimmerAnimationWhileLoading = true
-            })
-        }), 
-        BottomFrame = if v13 then v2.createElement("Frame", {
-            Position = UDim2.fromScale(0, 0.5), 
-            Size = UDim2.fromScale(1, 0.5), 
-            ClipsDescendants = true, 
-            BackgroundTransparency = 1
-        }, {
-            BottomImage = v2.createElement(v3, {
-                BackgroundTransparency = 1, 
-                Image = l_thumbnail_0, 
-                Position = UDim2.fromScale(0, -1), 
-                Size = UDim2.fromScale(1, 2), 
-                cornerRadius = if not not v12 or l_isBottomRounded_0 then v14 else nil, 
-                showFailedStateWhenLoadingFailed = true, 
-                useShimmerAnimationWhileLoading = true
-            })
-        }) else nil
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local React = require(ParentParent2.React)
+local LoadableImage = require(ParentParent.Loading.LoadableImage)
+
+require(ParentParent.Style.StyleTypes)
+
+local uDim = UDim.new(0, 8)
+
+local function VerticalTileThumbnail(t1: {[any]: any}) -- line: 27
+	-- upvalues: uDim (copy), React (copy), LoadableImage (copy)
+	local aspectRatio = t1.aspectRatio
+	local isTopRounded = t1.isTopRounded
+	local isBottomRounded = t1.isBottomRounded
+	local thumbnail = t1.thumbnail
+	local border = t1.border
+	local v13 = isTopRounded and isBottomRounded
+	local v14 = not v13 and (isTopRounded or isBottomRounded)
+	local v15 = if border == nil then uDim else border.CornerRadius
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = if not aspectRatio then UDim2.new(1, 0, 1, 0) else UDim2.new(1, 0, aspectRatio, 0),
+		SizeConstraint = if not aspectRatio then nil else Enum.SizeConstraint.RelativeXX
+	}, {
+		TopFrame = React.createElement("Frame", {
+			ClipsDescendants = true,
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(0, 0),
+			Size = UDim2.fromScale(1, v14 and 0.5 or 1)
+		}, {
+			TopImage = React.createElement(LoadableImage, {
+				BackgroundTransparency = 1,
+				showFailedStateWhenLoadingFailed = true,
+				useShimmerAnimationWhileLoading = true,
+				Image = thumbnail,
+				Position = UDim2.fromScale(0, 0),
+				Size = UDim2.fromScale(1, v14 and 2 or 1),
+				cornerRadius = if not v13 and not isTopRounded then nil else v15
+			})
+		}),
+		BottomFrame = if not v14 then nil else React.createElement("Frame", {
+			ClipsDescendants = true,
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(0, 0.5),
+			Size = UDim2.fromScale(1, 0.5)
+		}, {
+			BottomImage = React.createElement(LoadableImage, {
+				BackgroundTransparency = 1,
+				showFailedStateWhenLoadingFailed = true,
+				useShimmerAnimationWhileLoading = true,
+				Image = thumbnail,
+				Position = UDim2.fromScale(0, -1),
+				Size = UDim2.fromScale(1, 2),
+				cornerRadius = if not v13 and not isBottomRounded then nil else v15
+			})
+		})
+	})
+end
+
+return VerticalTileThumbnail

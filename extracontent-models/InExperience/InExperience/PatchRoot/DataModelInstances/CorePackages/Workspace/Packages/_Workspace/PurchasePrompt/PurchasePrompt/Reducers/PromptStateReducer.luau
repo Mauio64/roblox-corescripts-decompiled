@@ -1,30 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Rodux_0 = require(l_Parent_0.PurchasePromptDeps).Rodux;
-local v3 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v4 = require(l_script_FirstAncestor_0.Actions.CompleteRequest);
-local v5 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v6 = require(l_script_FirstAncestor_0.Actions.StartPurchase);
-local v7 = require(l_script_FirstAncestor_0.Actions.PromptNativeUpsellSuggestions);
-local v8 = require(l_script_FirstAncestor_0.Enums.PromptState);
-return (l_Rodux_0.createReducer(v8.None, {
-    [v3.name] = function(_, v10) --[[ Line: 14 ]]
-        return v10.promptState;
-    end, 
-    [v4.name] = function(_, _) --[[ Line: 17 ]]
-        -- upvalues: v8 (copy)
-        return v8.None;
-    end, 
-    [v5.name] = function(_, _) --[[ Line: 20 ]]
-        -- upvalues: v8 (copy)
-        return v8.Error;
-    end, 
-    [v6.name] = function(_, _) --[[ Line: 23 ]]
-        -- upvalues: v8 (copy)
-        return v8.PurchaseInProgress;
-    end, 
-    [v7.name] = function(_, _) --[[ Line: 26 ]]
-        -- upvalues: v8 (copy)
-        return v8.RobuxUpsell;
-    end
-}));
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local CompleteRequest = require(PurchasePrompt.Actions.CompleteRequest)
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local StartPurchase = require(PurchasePrompt.Actions.StartPurchase)
+local PromptNativeUpsellSuggestions = require(PurchasePrompt.Actions.PromptNativeUpsellSuggestions)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+
+return (Rodux.createReducer(PromptState.None, {
+	[SetPromptState.name] = function(_, p2) -- line: 14
+		return p2.promptState
+	end,
+	[CompleteRequest.name] = function(_, _) -- line: 17
+		-- upvalues: PromptState (copy)
+		return PromptState.None
+	end,
+	[ErrorOccurred.name] = function(_, _) -- line: 20
+		-- upvalues: PromptState (copy)
+		return PromptState.Error
+	end,
+	[StartPurchase.name] = function(_, _) -- line: 23
+		-- upvalues: PromptState (copy)
+		return PromptState.PurchaseInProgress
+	end,
+	[PromptNativeUpsellSuggestions.name] = function(_, _) -- line: 26
+		-- upvalues: PromptState (copy)
+		return PromptState.RobuxUpsell
+	end
+}))

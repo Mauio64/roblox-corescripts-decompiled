@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAddInventoryItemsListProps", false);
+return game:DefineFastFlag("AXAddInventoryItemsListProps", false)

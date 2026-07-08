@@ -1,50 +1,79 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local v3 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v4 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local _ = require(l_script_FirstAncestor_0.types);
-local _ = require(l_script_FirstAncestor_0.Models.GetRobloxSubscriptionProductsModel);
-local v7 = require(l_script_FirstAncestor_0.Network.createPaymentSession);
-local v8 = require(l_script_FirstAncestor_0.Network.getRobloxSubscriptionProducts);
-local v9 = require(l_script_FirstAncestor_0.Utils.logRobloxSubscriptionUpsellCounter);
-local v10 = require(l_script_FirstAncestor_0.Events.RobloxSubscriptionUpsellTelemetry);
-local v11 = require(l_script_FirstAncestor_0.Actions.transitionToError);
-local v12 = require(l_script_FirstAncestor_0.Enums.ErrorReason);
-local l_getAppFeaturePolicies_0 = require(l_Parent_0.UniversalAppPolicy).getAppFeaturePolicies;
-initiateRobloxSubscriptionPurchaseInternal = function(v14) --[[ Line: 26 ]] --[[ Name: initiateRobloxSubscriptionPurchaseInternal ]]
-    -- upvalues: v9 (copy), v10 (copy), l_getAppFeaturePolicies_0 (copy), v11 (copy), v12 (copy), v3 (copy), v4 (copy), v7 (copy), v8 (copy), v2 (copy)
-    v9(v10.RobloxSubscriptionUpsellModalInitiatedCounter);
-    if l_getAppFeaturePolicies_0().getDisableBlackbirdEntrypoints() then
-        v11(v12.UnsupportedPlatform, "initiateRobloxSubscriptionPurchaseInternal");
-        return;
-    else
-        local v15 = v3.get();
-        v15.setPromptState(v4.SubscriptionPurchaseRequested);
-        local v16 = v7(v14);
-        local v17 = v8();
-        v2.all({
-            v16, 
-            v17
-        }):andThen(function(v18) --[[ Line: 44 ]]
-            -- upvalues: v15 (copy), v11 (ref), v12 (ref), v4 (ref)
-            local v19 = v18[1];
-            local v20 = v18[2];
-            v15.setPaymentSessionId(v19);
-            if #v20 > 0 then
-                local v21 = v20[1];
-                v15.setRobloxSubscriptionProduct(v21);
-                v15.setPromptState(v4.SubscriptionPurchaseUIReady);
-                return;
-            else
-                v11(v12.AlreadySubscribed, "initiateRobloxSubscriptionPurchaseInternal");
-                return;
-            end;
-        end, function(_) --[[ Line: 62 ]]
-            -- upvalues: v11 (ref), v12 (ref)
-            v11(v12.GenericError, "initiateRobloxSubscriptionPurchaseInternal");
-        end);
-        return;
-    end;
-end;
-return initiateRobloxSubscriptionPurchaseInternal;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local Promise = require(RobloxSubscriptionPurchaseAppParent.Promise)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+
+require(RobloxSubscriptionPurchaseApp.types)
+require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
+
+local createPaymentSession = require(RobloxSubscriptionPurchaseApp.Network.createPaymentSession)
+local getRobloxSubscriptionProducts = require(RobloxSubscriptionPurchaseApp.Network.getRobloxSubscriptionProducts)
+local logRobloxSubscriptionUpsellCounter = require(RobloxSubscriptionPurchaseApp.Utils.logRobloxSubscriptionUpsellCounter)
+local logSubscriptionPurchaseFlowEvent = require(RobloxSubscriptionPurchaseApp.Utils.logSubscriptionPurchaseFlowEvent)
+local FFlagEnableSubscriptionPurchaseFlowEventIngest = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableSubscriptionPurchaseFlowEventIngest)
+local RobloxSubscriptionUpsellTelemetry = require(RobloxSubscriptionPurchaseApp.Events.RobloxSubscriptionUpsellTelemetry)
+local transitionToError = require(RobloxSubscriptionPurchaseApp.Actions.transitionToError)
+local FFlagRobloxPlusFAEFreeTrial = require(RobloxSubscriptionPurchaseApp.Flags.FFlagRobloxPlusFAEFreeTrial)
+local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+local getAppFeaturePolicies = require(RobloxSubscriptionPurchaseAppParent.UniversalAppPolicy).getAppFeaturePolicies
+
+function initiateRobloxSubscriptionPurchaseInternal(p1) -- line: 31
+	-- upvalues: logRobloxSubscriptionUpsellCounter (copy), RobloxSubscriptionUpsellTelemetry (copy), RobloxSubscriptionStore (copy), FFlagRobloxPlusFAEFreeTrial (copy), getAppFeaturePolicies (copy), transitionToError (copy), ErrorReason (copy), PromptState (copy), FFlagEnableSubscriptionPurchaseFlowEventIngest (copy), logSubscriptionPurchaseFlowEvent (copy), createPaymentSession (copy), getRobloxSubscriptionProducts (copy), Promise (copy)
+	logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionUpsellModalInitiatedCounter)
+
+	local v17 = RobloxSubscriptionStore.get()
+	local v18 = nil
+
+	if FFlagRobloxPlusFAEFreeTrial then
+		v18 = v17.getPurchaseUIOptions()
+	end
+
+	local v19 = getAppFeaturePolicies().getDisableBlackbirdEntrypoints()
+
+	if FFlagRobloxPlusFAEFreeTrial and v18 ~= nil and v18.skipGuacPolicy then
+		v19 = false
+	end
+
+	if v19 then
+		transitionToError(ErrorReason.UnsupportedPlatform, "initiateRobloxSubscriptionPurchaseInternal")
+
+		return
+	end
+
+	v17.setPromptState(PromptState.SubscriptionPurchaseRequested)
+
+	if FFlagEnableSubscriptionPurchaseFlowEventIngest then
+		logSubscriptionPurchaseFlowEvent("SubscriptionUpsellModalOpen")
+	end
+
+	local v20 = createPaymentSession(p1)
+	local v21 = getRobloxSubscriptionProducts()
+
+	Promise.all({
+		v20,
+		v21
+	}):andThen(function(p2) -- line: 61
+		-- upvalues: v17 (copy), transitionToError (copy), ErrorReason (copy), PromptState (copy)
+		local v23 = p2[1]
+		local v24 = p2[2]
+
+		v17.setPaymentSessionId(v23)
+
+		if #v24 > 0 then
+			local v25 = v24[1]
+
+			v17.setRobloxSubscriptionProduct(v25)
+			v17.setPromptState(PromptState.SubscriptionPurchaseUIReady)
+
+			return
+		end
+
+		transitionToError(ErrorReason.AlreadySubscribed, "initiateRobloxSubscriptionPurchaseInternal")
+	end, function(_) -- line: 79
+		-- upvalues: transitionToError (copy), ErrorReason (copy)
+		transitionToError(ErrorReason.GenericError, "initiateRobloxSubscriptionPurchaseInternal")
+	end)
+end
+
+return initiateRobloxSubscriptionPurchaseInternal

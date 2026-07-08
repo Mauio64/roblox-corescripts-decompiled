@@ -1,3 +1,4 @@
-return function(_) --[[ Line: 1 ]] --[[ Name: useMutualFriendsForContextualInfo ]]
+local function useMutualFriendsForContextualInfo(_) -- line: 1
+end
 
-end;
+return useMutualFriendsForContextualInfo

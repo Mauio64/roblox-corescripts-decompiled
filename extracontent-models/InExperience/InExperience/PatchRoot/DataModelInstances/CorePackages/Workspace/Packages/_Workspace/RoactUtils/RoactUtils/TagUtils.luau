@@ -1,17 +1,20 @@
 return {
-    combineReactTags = function(...) --[[ Line: 15 ]] --[[ Name: combineReactTags ]]
-        local v0 = table.pack(...);
-        local v1 = {};
-        for v2 = 1, v0.n do
-            local v3 = v0[v2];
-            if v3 and v3 ~= "" then
-                table.insert(v1, v3);
-            end;
-        end;
-        if #v1 > 0 then
-            return (table.concat(v1, " "));
-        else
-            return nil;
-        end;
-    end
-};
+	combineReactTags = function(...) -- line: 15
+		local v1 = table.pack(...)
+		local t1 = {}
+
+		for i = 1, v1.n do
+			local v4 = v1[i]
+
+			if v4 and v4 ~= "" then
+				table.insert(t1, v4)
+			end
+		end
+
+		if #t1 > 0 then
+			return (table.concat(t1, " "))
+		end
+
+		return nil
+	end
+}

@@ -1,33 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.FocusNavigationUtils);
-local l_HeaderBar_0 = require(l_Parent_0.UIBlox).App.Bar.HeaderBar;
-local v5 = require(l_Parent_0.Localization);
-local v6 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_useLocalization_0 = v5.Hooks.useLocalization;
-local l_makeBackButton_0 = require(l_Parent_0.AppHeaderBar).makeBackButton;
-local l_useLastInputMode_0 = v3.useLastInputMode;
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagEditProfileFixFocusNavigation);
-return function(v11) --[[ Line: 22 ]] --[[ Name: EditProfileTopBar ]]
-    -- upvalues: v10 (copy), l_useLastInputMode_0 (copy), l_useLocalization_0 (copy), v6 (copy), l_makeBackButton_0 (copy), v2 (copy), l_HeaderBar_0 (copy)
-    local v12 = if v10 then l_useLastInputMode_0() == "Focus" else nil;
-    local v13 = l_useLocalization_0({
-        title = v6.Title
-    });
-    local v14 = l_makeBackButton_0(v11.onClose);
-    return v2.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 48), 
-        LayoutOrder = v11.layoutOrder, 
-        ZIndex = 2
-    }, {
-        headerBar = v2.createElement(l_HeaderBar_0, {
-            isSecondary = true, 
-            title = v13.title, 
-            backgroundTransparency = 1, 
-            barHeight = 48, 
-            renderLeft = if (not v10 or v12) and v10 then nil else v14
-        })
-    });
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local FocusNavigationUtils = require(EditProfileParent.FocusNavigationUtils)
+local HeaderBar = require(EditProfileParent.UIBlox).App.Bar.HeaderBar
+local Localization = require(EditProfileParent.Localization)
+local TextKeys = require(EditProfile.Common.TextKeys)
+local useLocalization = Localization.Hooks.useLocalization
+local makeBackButton = require(EditProfileParent.AppHeaderBar).makeBackButton
+local useLastInputMode = FocusNavigationUtils.useLastInputMode
+local FFlagEditProfileFixFocusNavigation = require(EditProfile.Flags.FFlagEditProfileFixFocusNavigation)
+
+local function EditProfileTopBar(t1: {[any]: any}) -- line: 22
+	-- upvalues: FFlagEditProfileFixFocusNavigation (copy), useLastInputMode (copy), useLocalization (copy), TextKeys (copy), makeBackButton (copy), React (copy), HeaderBar (copy)
+	local v14 = if not FFlagEditProfileFixFocusNavigation then nil else useLastInputMode() == "Focus"
+	local v15 = useLocalization({
+		title = TextKeys.Title
+	})
+	local v16 = makeBackButton(t1.onClose)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Size = UDim2.new(1, 0, 0, 48),
+		LayoutOrder = t1.layoutOrder
+	}, {
+		headerBar = React.createElement(HeaderBar, {
+			isSecondary = true,
+			backgroundTransparency = 1,
+			barHeight = 48,
+			title = v15.title,
+			renderLeft = if not (not not FFlagEditProfileFixFocusNavigation and not v14) and FFlagEditProfileFixFocusNavigation then nil else v16
+		})
+	})
+end
+
+return EditProfileTopBar

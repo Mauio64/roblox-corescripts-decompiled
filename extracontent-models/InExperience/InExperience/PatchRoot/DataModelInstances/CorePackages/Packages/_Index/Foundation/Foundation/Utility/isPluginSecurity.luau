@@ -2,7 +2,7 @@ local Foundation = script:FindFirstAncestor("Foundation")
 local Flags = require(Foundation.Utility.Flags)
 local Wrappers = require(Foundation.Utility.Wrappers)
 
-return function() --[[ isPluginSecurity ]] -- line: 5
+local function isPluginSecurity() -- line: 5
 	-- upvalues: Wrappers (copy), Flags (copy)
 	local CoreGui = Wrappers.Services.CoreGui
 
@@ -22,3 +22,5 @@ return function() --[[ isPluginSecurity ]] -- line: 5
 
 	return ok
 end
+
+return isPluginSecurity

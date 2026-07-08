@@ -1,49 +1,56 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v3 = require(l_script_FirstAncestor_0.Actions.SetEconomicRestrictionError);
-local v4 = require(l_script_FirstAncestor_0.Actions.PurchaseCompleteRecieved);
-local v5 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v6 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v7 = require(l_script_FirstAncestor_0.Network.performSubscriptionPurchase);
-local v8 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v9 = require(l_script_FirstAncestor_0.Services.Network);
-local v10 = require(l_script_FirstAncestor_0.Thunk);
-local v11 = require(l_script_FirstAncestor_0.Thunks.hideWindow);
-local v12 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v13 = require(l_Parent_0.IAPExperience);
-local l_isErrorReasonPrefixWithEconomicRestrictions_0 = v13.Utility.isErrorReasonPrefixWithEconomicRestrictions;
-local l_parseErrorReasonToEconomicRestriction_0 = v13.Utility.parseErrorReasonToEconomicRestriction;
-local v16 = {
-    v8, 
-    v9
-};
-return function(v17) --[[ Line: 23 ]] --[[ Name: launchSubscriptionPurchase ]]
-    -- upvalues: v10 (copy), v16 (copy), v8 (copy), v9 (copy), v4 (copy), v11 (copy), v7 (copy), l_isErrorReasonPrefixWithEconomicRestrictions_0 (copy), l_parseErrorReasonToEconomicRestriction_0 (copy), v3 (copy), v2 (copy), v12 (copy), v5 (copy), v6 (copy)
-    return v10.new(script.Name, v16, function(v18, v19) --[[ Line: 24 ]]
-        -- upvalues: v8 (ref), v9 (ref), v4 (ref), v11 (ref), v7 (ref), v17 (copy), l_isErrorReasonPrefixWithEconomicRestrictions_0 (ref), l_parseErrorReasonToEconomicRestriction_0 (ref), v3 (ref), v2 (ref), v12 (ref), v5 (ref), v6 (ref)
-        local v20 = v19[v8];
-        local v21 = v19[v9];
-        if v20.isStudio() then
-            v18:dispatch(v4());
-            v18:dispatch(v11());
-            return nil;
-        else
-            v7(v21, v18:getState().promptRequest.id, v17):catch(function(v22) --[[ Line: 35 ]]
-                -- upvalues: l_isErrorReasonPrefixWithEconomicRestrictions_0 (ref), l_parseErrorReasonToEconomicRestriction_0 (ref), v18 (copy), v3 (ref), v2 (ref), v12 (ref)
-                if l_isErrorReasonPrefixWithEconomicRestrictions_0(v22) then
-                    local v23 = l_parseErrorReasonToEconomicRestriction_0(v22);
-                    v18:dispatch(v3(v23.violationType, v23.timeoutMinutes));
-                    v18:dispatch(v2(v12.EconomicRestriction));
-                    return;
-                else
-                    v18:dispatch(v2(v22));
-                    return;
-                end;
-            end);
-            v18:dispatch(v5(v6.UpsellInProgress));
-            v18:dispatch(v11());
-            return nil;
-        end;
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local SetEconomicRestrictionError = require(PurchasePrompt.Actions.SetEconomicRestrictionError)
+local PurchaseCompleteRecieved = require(PurchasePrompt.Actions.PurchaseCompleteRecieved)
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local performSubscriptionPurchase = require(PurchasePrompt.Network.performSubscriptionPurchase)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local Network = require(PurchasePrompt.Services.Network)
+local Thunk = require(PurchasePrompt.Thunk)
+local hideWindow = require(PurchasePrompt.Thunks.hideWindow)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local IAPExperience = require(PurchasePromptParent.IAPExperience)
+local isErrorReasonPrefixWithEconomicRestrictions = IAPExperience.Utility.isErrorReasonPrefixWithEconomicRestrictions
+local parseErrorReasonToEconomicRestriction = IAPExperience.Utility.parseErrorReasonToEconomicRestriction
+local t1 = {
+	ExternalSettings,
+	Network
+}
+
+local function launchSubscriptionPurchase(p1) -- line: 23
+	-- upvalues: Thunk (copy), t1 (copy), ExternalSettings (copy), Network (copy), PurchaseCompleteRecieved (copy), hideWindow (copy), performSubscriptionPurchase (copy), isErrorReasonPrefixWithEconomicRestrictions (copy), parseErrorReasonToEconomicRestriction (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy), SetPromptState (copy), PromptState (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 24
+		-- upvalues: ExternalSettings (copy), Network (copy), PurchaseCompleteRecieved (copy), hideWindow (copy), performSubscriptionPurchase (copy), p1 (copy), isErrorReasonPrefixWithEconomicRestrictions (copy), parseErrorReasonToEconomicRestriction (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy), SetPromptState (copy), PromptState (copy)
+		local v22 = p3[ExternalSettings]
+		local v23 = p3[Network]
+
+		if v22.isStudio() then
+			p2:dispatch(PurchaseCompleteRecieved())
+			p2:dispatch(hideWindow())
+
+			return nil
+		end
+
+		performSubscriptionPurchase(v23, p2:getState().promptRequest.id, p1):catch(function(p4) -- line: 35
+			-- upvalues: isErrorReasonPrefixWithEconomicRestrictions (copy), parseErrorReasonToEconomicRestriction (copy), p2 (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy)
+			if isErrorReasonPrefixWithEconomicRestrictions(p4) then
+				local v25 = parseErrorReasonToEconomicRestriction(p4)
+
+				p2:dispatch(SetEconomicRestrictionError(v25.violationType, v25.timeoutMinutes))
+				p2:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
+
+				return
+			end
+
+			p2:dispatch(ErrorOccurred(p4))
+		end)
+		p2:dispatch(SetPromptState(PromptState.UpsellInProgress))
+		p2:dispatch(hideWindow())
+
+		return nil
+	end)
+end
+
+return launchSubscriptionPurchase

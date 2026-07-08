@@ -55,31 +55,32 @@ function v16.init(p1) -- line: 77
 		-- upvalues: p1 (copy)
 		if p7 or not p6 then
 			return {
-				horizontalAlignment = Enum.HorizontalAlignment.Left,
 				left = 24,
-				right = 24
+				right = 24,
+				horizontalAlignment = Enum.HorizontalAlignment.Left
 			}
 		end
 
 		local v35 = (n1 - p5) / 2
 		local v36 = not (n1 < 1280) and 80 or 24
 		local XOffset = UDim2.fromOffset(p1.props.actionBarWidth, 48).X.Offset
+		local v38 = math.max(XOffset + v36, v35)
 
 		return {
-			left = math.max(XOffset + v36, v35) - XOffset,
-			right = 24
+			right = 24,
+			left = v38 - XOffset
 		}
 	end
 
 	function p1.getLayoutConfig(p8, p9, p10, p11, p12, p13, p14) -- line: 135
 		-- upvalues: p1 (copy), GetTextSize (copy), v18 (copy)
-		local v51 = not not p1.props.infoProps and not not p1.props.infoProps.enableInfoAtStart
+		local v52 = not not p1.props.infoProps and not not p1.props.infoProps.enableInfoAtStart
 		local BaseSize = p14.Font.BaseSize
-		local v53 = p13.RelativeSize * BaseSize
+		local v54 = p13.RelativeSize * BaseSize
 		local vector2 = Vector2.new(10000, 10000)
-		local v55 = GetTextSize(p12, v53, p13.Font, vector2).X + p11 + (not (p11 > 0) and 0 or 12)
+		local v56 = GetTextSize(p12, v54, p13.Font, vector2).X + p11 + (not (p11 > 0) and 0 or 12)
 		local t1 = {
-			layoutOrder = v51 and {
+			layoutOrder = v52 and {
 				infoSection = 1,
 				actionBarSection = 2
 			} or {
@@ -99,7 +100,7 @@ function v16.init(p1) -- line: 77
 		end
 
 		t1.infoSectionWidth = infoSectionWidth
-		t1.infoSectionPadding = v18(p8, v55, p9, v51)
+		t1.infoSectionPadding = v18(p8, v56, p9, v52)
 		t1.actionBarSectionSize = UDim2.fromOffset(p1.props.actionBarWidth, 48)
 		t1.actionBarSectionMarginOverride = {
 			left = 0,
@@ -121,10 +122,10 @@ function v16.render(p15) -- line: 176
 
 	return withStyle(function(p16) -- line: 181
 		-- upvalues: v21 (copy), p15 (copy), v15 (copy), v22 (copy), v20 (copy), Roact (copy), ActionBar (copy), v14 (copy), ImageSetLabel (copy), StyledTextLabel (copy)
-		local v60 = v21 and (not not p15.props.infoProps.icon and v15) or 0
-		local v61 = v21 and p15.props.infoProps.title or ""
+		local v61 = v21 and (not not p15.props.infoProps.icon and v15) or 0
+		local v62 = v21 and p15.props.infoProps.title or ""
 		local Header2 = p16.Font.Header2
-		local v63 = p15.getLayoutConfig(v22 or 0, v20, p15.props.infoProps, v60, v61, Header2, p16)
+		local v64 = p15.getLayoutConfig(v22 or 0, v20, p15.props.infoProps, v61, v62, Header2, p16)
 
 		return p15:renderHorizontalLayout({
 			layoutOrder = p15.props.layoutOrder,
@@ -137,31 +138,31 @@ function v16.render(p15) -- line: 176
 			}
 		}, {
 			ActionBarSection = v20 and p15:renderHorizontalLayout({
-				layoutOrder = v63.layoutOrder.actionBarSection,
-				size = v63.actionBarSectionSize,
+				layoutOrder = v64.layoutOrder.actionBarSection,
+				size = v64.actionBarSectionSize,
 				horizontalAlignment = Enum.HorizontalAlignment.Left
 			}, {
 				ActionBar = Roact.createElement(ActionBar, {
+					enableButtonAtStart = true,
 					button = p15.props.actionBarProps.button,
 					buttonOverride = if not v14 then nil else p15.props.actionBarProps.buttonOverride,
 					icons = p15.props.actionBarProps.icons,
-					marginOverride = v63.actionBarSectionMarginOverride,
-					enableButtonAtStart = true
+					marginOverride = v64.actionBarSectionMarginOverride
 				})
 			}) or nil,
 			InfoSection = v21 and (v22 ~= nil and p15:renderHorizontalLayout({
-				layoutOrder = v63.layoutOrder.infoSection,
-				width = v63.infoSectionWidth,
-				horizontalAlignment = v63.infoHorizontalAlignment,
-				padding = v63.infoSectionPadding,
-				internalSpacing = 12
+				internalSpacing = 12,
+				layoutOrder = v64.layoutOrder.infoSection,
+				width = v64.infoSectionWidth,
+				horizontalAlignment = v64.infoHorizontalAlignment,
+				padding = v64.infoSectionPadding
 			}, {
 				Icon = p15.props.infoProps.icon and Roact.createElement(ImageSetLabel, {
-					Size = UDim2.new(0, v60, 0, v60),
 					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, v61, 0, v61),
 					Position = UDim2.new(0, 0, 0, 0),
 					Image = p15.props.infoProps.icon,
-					BackgroundTransparency = 1,
 					ScaleType = Enum.ScaleType.Crop
 				}, {
 					RoundCorner = Roact.createElement("UICorner", {
@@ -170,11 +171,11 @@ function v16.render(p15) -- line: 176
 				}) or nil,
 				Title = Roact.createElement(StyledTextLabel, {
 					layoutOrder = 2,
-					size = UDim2.new(0, 0, 0, 48),
-					automaticSize = Enum.AutomaticSize.X,
-					text = v61,
 					fluidSizing = false,
 					textWrapped = true,
+					size = UDim2.new(0, 0, 0, 48),
+					automaticSize = Enum.AutomaticSize.X,
+					text = v62,
 					textXAlignment = Enum.TextXAlignment.Left,
 					colorStyle = p16.Theme.TextEmphasis,
 					fontStyle = Header2,

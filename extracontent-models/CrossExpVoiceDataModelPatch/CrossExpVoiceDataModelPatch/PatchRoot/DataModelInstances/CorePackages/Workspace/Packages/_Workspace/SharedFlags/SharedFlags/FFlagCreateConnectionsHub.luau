@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CreateConnectionsHub_v6", false);
+return game:DefineFastFlag("CreateConnectionsHub_v6", false)

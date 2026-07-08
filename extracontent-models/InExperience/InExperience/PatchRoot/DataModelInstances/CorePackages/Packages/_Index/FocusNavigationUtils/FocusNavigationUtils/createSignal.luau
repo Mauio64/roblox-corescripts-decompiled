@@ -1,49 +1,57 @@
-return function(v0) --[[ Line: 29 ]] --[[ Name: createSignal ]]
-    local v1 = {};
-    local v2 = {};
-    local l_v0_0 = v0;
-    local v4 = false;
-    local function v9(_, v6) --[[ Line: 36 ]] --[[ Name: subscribe ]]
-        -- upvalues: v4 (ref), v1 (copy), v2 (copy)
-        local v7 = {
-            callback = v6, 
-            unsubscribed = false
-        };
-        if v4 and not v1[v6] then
-            v2[v6] = v7;
-        else
-            v1[v6] = v7;
-        end;
-        return {
-            unsubscribe = function(_) --[[ Line: 50 ]] --[[ Name: unsubscribe ]]
-                -- upvalues: v7 (copy), v1 (ref), v6 (copy), v2 (ref)
-                v7.unsubscribed = true;
-                v1[v6] = nil;
-                v2[v6] = nil;
-            end
-        };
-    end;
-    local function v11(_) --[[ Line: 61 ]] --[[ Name: getValue ]]
-        -- upvalues: l_v0_0 (ref)
-        return l_v0_0;
-    end;
-    local function v17(v12) --[[ Line: 65 ]] --[[ Name: fire ]]
-        -- upvalues: l_v0_0 (ref), v4 (ref), v1 (copy), v2 (copy)
-        l_v0_0 = v12;
-        v4 = true;
-        for v13, v14 in v1 do
-            if not v14.unsubscribed and not v2[v13] then
-                v13(v12);
-            end;
-        end;
-        v4 = false;
-        for v15, v16 in v2 do
-            v1[v15] = v16;
-        end;
-        table.clear(v2);
-    end;
-    return {
-        subscribe = v9, 
-        getValue = v11
-    }, v17;
-end;
+local function createSignal(p1) -- line: 29
+	local t1 = {}
+	local t2 = {}
+	local u5 = p1
+	local u6 = false
+
+	local function fire(p2) -- line: 65
+		-- upvalues: u5 (ref), u6 (ref), t1 (copy), t2 (copy)
+		u5 = p2
+		u6 = true
+
+		for v13, v14 in t1 do
+			if not v14.unsubscribed and not t2[v13] then
+				v13(p2)
+			end
+		end
+
+		u6 = false
+
+		for v15, v16 in t2 do
+			t1[v15] = v16
+		end
+
+		table.clear(t2)
+	end
+
+	return {
+		subscribe = function(_: {[any]: any}, p3) -- line: 36
+			-- upvalues: u6 (ref), t1 (copy), t2 (copy)
+			local t4 = {
+				unsubscribed = false,
+				callback = p3
+			}
+
+			if u6 and not t1[p3] then
+				t2[p3] = t4
+			else
+				t1[p3] = t4
+			end
+
+			return {
+				unsubscribe = function(_: {[any]: any}) -- line: 50
+					-- upvalues: t4 (copy), t1 (copy), p3 (copy), t2 (copy)
+					t4.unsubscribed = true
+					t1[p3] = nil
+					t2[p3] = nil
+				end
+			}
+		end,
+		getValue = function(_: {[any]: any}) -- line: 61
+			-- upvalues: u5 (ref)
+			return u5
+		end
+	}, fire
+end
+
+return createSignal

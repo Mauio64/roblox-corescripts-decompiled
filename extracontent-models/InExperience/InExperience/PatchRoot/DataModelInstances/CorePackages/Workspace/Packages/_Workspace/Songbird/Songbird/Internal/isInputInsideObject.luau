@@ -1,20 +1,13 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: isInputInsideObject ]]
-    if not v1 then
-        return false;
-    else
-        local l_AbsolutePosition_0 = v1.AbsolutePosition;
-        local l_AbsoluteSize_0 = v1.AbsoluteSize;
-        local v4 = Rect.new(l_AbsolutePosition_0, l_AbsolutePosition_0 + l_AbsoluteSize_0);
-        local v5 = false;
-        if v0.X >= v4.Min.X then
-            v5 = false;
-            if v0.Y >= v4.Min.Y then
-                v5 = false;
-                if v0.X <= v4.Max.X then
-                    v5 = v0.Y <= v4.Max.Y;
-                end;
-            end;
-        end;
-        return v5;
-    end;
-end;
+local function isInputInsideObject(vector3: Vector3, p1) -- line: 1
+	if not p1 then
+		return false
+	end
+
+	local AbsolutePosition = p1.AbsolutePosition
+	local AbsoluteSize = p1.AbsoluteSize
+	local rect = Rect.new(AbsolutePosition, AbsolutePosition + AbsoluteSize)
+
+	return vector3.X >= rect.Min.X and (vector3.Y >= rect.Min.Y and (vector3.X <= rect.Max.X and vector3.Y <= rect.Max.Y))
+end
+
+return isInputInsideObject

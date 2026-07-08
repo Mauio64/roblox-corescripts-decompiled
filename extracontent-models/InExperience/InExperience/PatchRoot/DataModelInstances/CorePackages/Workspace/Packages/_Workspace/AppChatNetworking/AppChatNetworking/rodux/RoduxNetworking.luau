@@ -1,9 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.RoduxNetworking);
-local v3 = require(l_script_FirstAncestor_0.url.HttpRequest);
-return v2.config({
-    keyPath = "ChatAppReducer.networkStatus", 
-    networkImpl = v3.default, 
-    killRequestWithFilteredIds = true
-});
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local AppChatNetworkingParent = AppChatNetworking.Parent
+local RoduxNetworking = require(AppChatNetworkingParent.RoduxNetworking)
+local HttpRequest = require(AppChatNetworking.url.HttpRequest)
+
+return RoduxNetworking.config({
+	keyPath = "ChatAppReducer.networkStatus",
+	killRequestWithFilteredIds = true,
+	networkImpl = HttpRequest.default
+})

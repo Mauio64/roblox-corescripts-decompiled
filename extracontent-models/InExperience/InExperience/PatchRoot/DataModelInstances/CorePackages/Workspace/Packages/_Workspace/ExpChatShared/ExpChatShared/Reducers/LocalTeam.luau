@@ -1,13 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChatShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Actions.ClientAppLoaded);
-local v4 = require(l_script_FirstAncestor_0.Actions.LocalTeamChanged);
-return v2.createReducer(nil, {
-    [v4.name] = function(_, v6) --[[ Line: 9 ]]
-        return v6.team;
-    end, 
-    [v3.name] = function(_, v8) --[[ Line: 13 ]]
-        return v8.team;
-    end
-});
+local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
+local ExpChatSharedParent = ExpChatShared.Parent
+local Rodux = require(ExpChatSharedParent.Rodux)
+local ClientAppLoaded = require(ExpChatShared.Actions.ClientAppLoaded)
+local LocalTeamChanged = require(ExpChatShared.Actions.LocalTeamChanged)
+
+return Rodux.createReducer(nil, {
+	[LocalTeamChanged.name] = function(_, p2) -- line: 9
+		return p2.team
+	end,
+	[ClientAppLoaded.name] = function(_, p4) -- line: 13
+		return p4.team
+	end
+})

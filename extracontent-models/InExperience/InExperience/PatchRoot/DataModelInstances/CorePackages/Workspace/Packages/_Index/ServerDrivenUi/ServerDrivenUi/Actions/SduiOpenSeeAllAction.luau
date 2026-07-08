@@ -1,44 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v3 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiActionType_0 = v3.SduiActionType;
-local l_SduiErrorType_0 = v3.SduiErrors.SduiErrorType;
-return function(v6, _, v8) --[[ Line: 17 ]]
-    -- upvalues: l_SduiErrorType_0 (copy), l_SduiActionType_0 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy)
-    local v9 = v6 and v6.actionParams or nil;
-    if v9 == nil then
-        v8.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.OpenSeeAll, 
-            message = "Missing actionParams"
-        }, v8.appPage);
-        return;
-    else
-        assert(v9, "actionParams must exist");
-        local v10 = tostring(v9.collectionId);
-        if v10 == nil then
-            v8.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-                name = l_SduiActionType_0.OpenSeeAll, 
-                message = ("Missing collectionId: %*"):format(v10), 
-                propName = "collectionId"
-            }, v8.appPage);
-            return;
-        else
-            local l_collectionPosition_0 = v9.collectionPosition;
-            local v12 = v8.appPage == "Home";
-            v8.dependencies.gameAnalytics.reportSeeAllWithId(v10, v9.gameSetTargetId, l_collectionPosition_0);
-            v8.dependencies.dispatch(l_NavigateDown_0({
-                name = l_AppPage_0.GamesList, 
-                detail = v10, 
-                extraProps = {
-                    sortPageId = tostring(v10), 
-                    sortName = v10, 
-                    pageContext = v8.appPage, 
-                    isOmni = v12, 
-                    sortIndex = if v12 then tonumber(l_collectionPosition_0) else nil
-                }
-            }));
-            return;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v5 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiActionType = SduiCoreSystem.SduiActionType
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+
+return function(p1, _, p3) -- line: 21
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v5 (copy), NavigateDown (copy)
+	local v12 = p1 and p1.actionParams or nil
+
+	if v12 == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing actionParams",
+			name = SduiActionType.OpenSeeAll
+		}, p3.appPage)
+
+		return
+	end
+
+	assert(v12, "actionParams must exist")
+
+	local str = tostring(v12.collectionId)
+
+	if str == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			propName = "collectionId",
+			name = SduiActionType.OpenSeeAll,
+			message = `Missing collectionId: { str }`
+		}, p3.appPage)
+
+		return
+	end
+
+	local collectionPosition = v12.collectionPosition
+	local v15 = p3.appPage == "Home"
+
+	p3.dependencies.gameAnalytics.reportSeeAllWithId(str, v12.gameSetTargetId, collectionPosition)
+
+	local t1 = {
+		name = AppPage.GamesList,
+		detail = str,
+		extraProps = {
+			sortPageId = tostring(str),
+			sortName = str,
+			pageContext = p3.appPage,
+			isOmni = v15,
+			sortIndex = if not v15 then nil else tonumber(collectionPosition)
+		}
+	}
+
+	if FFlagSignalsNavP3Dispatch then
+		v5.down(v5.fromLegacyPage(t1))
+
+		return
+	end
+
+	p3.dependencies.dispatch(NavigateDown(t1))
+end

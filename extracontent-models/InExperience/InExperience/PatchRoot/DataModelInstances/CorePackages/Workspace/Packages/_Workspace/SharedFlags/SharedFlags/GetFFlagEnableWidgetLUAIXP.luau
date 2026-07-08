@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableWidgetLUAIXP", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableWidgetLUAIXP");
-end;
+game:DefineFastFlag("EnableWidgetLUAIXP", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableWidgetLUAIXP")
+end

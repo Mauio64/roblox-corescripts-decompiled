@@ -1,128 +1,128 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local v3 = require(l_script_FirstAncestor_0.Enums.SquadButtonSourceEnum);
-local v4 = require(l_script_FirstAncestor_0.Enums.SquadButtonClickIntentionEnum);
-local v5 = require(l_Parent_0.SharedFlags);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_Cryo_0 = v2.Cryo;
-local l_dependencyArray_0 = v2.Hooks.dependencyArray;
-local l_createConversation_0 = v2.SquadsCore.Thunks.createConversation;
-local l_leaveSquad_0 = v2.SquadsCore.Thunks.leaveSquad;
-local l_React_0 = v2.React;
-local l_SquadExternalContractContext_0 = v2.SquadsCore.SquadExternalContractProvider.SquadExternalContractContext;
-local l_SquadPromptType_0 = v2.SquadsCore.Enums.SquadPromptType;
-local l_useCurrentSquadParentChannelId_0 = v2.SquadsCore.Hooks.useCurrentSquadParentChannelId;
-local l_useCurrentSquadSelector_0 = v2.Hooks.useCurrentSquadSelector;
-local l_useDispatch_0 = v2.Hooks.useDispatch;
-local l_useLocalization_0 = v2.Hooks.useLocalization;
-local l_useStore_0 = v2.Hooks.useStore;
-local v19 = require(script.Parent.SquadInviteFriends);
-local l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 = v5.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled;
-local l_FFlagEnableAppChatFocusableFixes_0 = v2.SharedFlags.FFlagEnableAppChatFocusableFixes;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v5.FFlagRemoveDependencyArrayAntipattern;
-local l_EventNames_0 = v2.SquadsCore.Analytics.EventNames;
-return function(v24) --[[ Line: 41 ]] --[[ Name: QuickStartSquadInviteFriendsContainer ]]
-    -- upvalues: l_React_0 (copy), l_SquadExternalContractContext_0 (copy), l_useDispatch_0 (copy), l_useStore_0 (copy), l_useCurrentSquadSelector_0 (copy), l_useCurrentSquadParentChannelId_0 (copy), l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 (copy), l_useLocalUserId_0 (copy), l_useLocalization_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_EventNames_0 (copy), v3 (copy), v4 (copy), l_createConversation_0 (copy), l_Cryo_0 (copy), l_leaveSquad_0 (copy), l_SquadPromptType_0 (copy), v19 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy)
-    local v25 = l_React_0.useContext(l_SquadExternalContractContext_0);
-    local v26 = l_useDispatch_0();
-    local v27 = l_useStore_0();
-    local v28 = l_useCurrentSquadSelector_0();
-    local v29 = l_useCurrentSquadParentChannelId_0();
-    local v30 = v25.useGetConversationFromId(v29);
-    local v31 = not l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 or v25.useIsChatEnabled();
-    local v32 = l_useLocalUserId_0();
-    local v33 = l_useLocalization_0({
-        startPartyText = "Feature.Squads.Action.Start"
-    });
-    local v34 = l_React_0.useRef(false);
-    local v36 = l_React_0.useCallback(function(v35) --[[ Line: 63 ]]
-        -- upvalues: v34 (copy), v24 (copy)
-        v34.current = true;
-        v24.navigateIntoSquadLobby(v35);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v24.navigateIntoSquadLobby
-    } else l_dependencyArray_0(v24.navigateIntoSquadLobby));
-    local v40 = l_React_0.useCallback(function(v37) --[[ Line: 73 ]]
-        -- upvalues: v25 (copy), l_EventNames_0 (ref), v24 (copy), v3 (ref), v4 (ref), v26 (copy), l_createConversation_0 (ref), v36 (copy)
-        local v38 = #v37 == 1 and "one_to_one" or "group";
-        v25.fireSquadAnalytics(l_EventNames_0.EnterSquadButtonPressed, {
-            partyAttemptId = v24.partyAttemptId, 
-            squadButtonSource = v3.PartyQuickStartButton, 
-            squadLocation = v25.squadLocation, 
-            userIntention = v4.Create
-        });
-        v26(l_createConversation_0({
-            conversationType = v38, 
-            userIds = v37, 
-            source = "conversationCreatedFromPartyQuickStart", 
-            onSuccessCallback = function(v39) --[[ Line: 87 ]] --[[ Name: onSuccessCallback ]]
-                -- upvalues: v36 (ref)
-                v36(v39);
-            end, 
-            squadContext = v25
-        }));
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v26, 
-        v24.partyAttemptId, 
-        v24.navigateIntoSquadLobby, 
-        v25.createConversation, 
-        v25.setSquadPrompt, 
-        v25.squadLocation, 
-        v25.fireSquadAnalytics, 
-        v27
-    } else l_dependencyArray_0(v26, v24.partyAttemptId, v24.navigateIntoSquadLobby, v25.createConversation, v25.setSquadPrompt, v25.squadLocation, v25.fireSquadAnalytics, v27));
-    local v47 = l_React_0.useCallback(function(v41) --[[ Line: 117 ]]
-        -- upvalues: l_Cryo_0 (ref), v28 (copy), v30 (copy), v36 (copy), v29 (copy), v26 (copy), l_leaveSquad_0 (ref), l_SquadPromptType_0 (ref), v25 (copy), v40 (copy), l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 (ref), v31 (copy)
-        local v42 = l_Cryo_0.Dictionary.keys(v41);
-        if v28 and v30.type == "one_to_one" and #v42 == 1 then
-            local v43 = v42[1];
-            local l_participants_0 = v30.participants;
-            for _, v46 in ipairs(l_participants_0) do
-                if v46 == v43 then
-                    v36(v29);
-                    return;
-                end;
-            end;
-        end;
-        if v28 then
-            v26(l_leaveSquad_0(l_SquadPromptType_0.JoinAnotherSquad, v25.setSquadPrompt, function() --[[ Line: 138 ]]
-                -- upvalues: v40 (ref), v42 (copy)
-                v40(v42);
-            end, v25.squadLocation, not l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 or v31));
-            return;
-        else
-            v40(v42);
-            return;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v28, 
-        v26, 
-        v40, 
-        v30, 
-        v29, 
-        v24.navigateIntoSquadLobby, 
-        v25.setSquadPrompt, 
-        v25.squadLocation, 
-        if l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 then v31 else nil
-    } else l_dependencyArray_0(v28, v26, v40, v30, v29, v24.navigateIntoSquadLobby, v25.setSquadPrompt, v25.squadLocation, if l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 then v31 else nil));
-    return l_React_0.createElement(v19, {
-        onMultiInvite = v47, 
-        buttonText = v33.startPartyText, 
-        participants = if v32 and v32 ~= "" then {
-            v32
-        } else nil, 
-        partyStartedRef = v34, 
-        analyticsInfo = l_React_0.useMemo(function() --[[ Line: 179 ]]
-            -- upvalues: v24 (copy)
-            return {
-                partyAttemptId = v24.partyAttemptId, 
-                selectionPageType = "QuickStartInvite"
-            };
-        end, {
-            v24.partyAttemptId
-        }), 
-        onSelectedFriendsChanged = if l_FFlagEnableAppChatFocusableFixes_0 then v24.onSelectedFriendsChanged else nil, 
-        shouldHideFooterButton = if l_FFlagEnableAppChatFocusableFixes_0 then v24.shouldHideFooterButton else nil
-    });
-end;
+local Squads = script:FindFirstAncestor("Squads")
+local SquadsParent = Squads.Parent
+local dependencies = require(Squads.dependencies)
+local SquadButtonSourceEnum = require(Squads.Enums.SquadButtonSourceEnum)
+local SquadButtonClickIntentionEnum = require(Squads.Enums.SquadButtonClickIntentionEnum)
+local SharedFlags = require(SquadsParent.SharedFlags)
+local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
+local Cryo = dependencies.Cryo
+local createConversation = require(SquadsParent.SquadsCore.Thunks).createConversation
+local leaveSquad = require(SquadsParent.SquadsCore.Thunks).leaveSquad
+local React = dependencies.React
+local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
+local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
+local useCurrentSquadParentChannelId = require(SquadsParent.SquadsCore.Hooks).useCurrentSquadParentChannelId
+local useCurrentSquadSelector = dependencies.Hooks.useCurrentSquadSelector
+local useDispatch = dependencies.Hooks.useDispatch
+local useLocalization = dependencies.Hooks.useLocalization
+local useStore = dependencies.Hooks.useStore
+local SquadInviteFriends = require(script.Parent.SquadInviteFriends)
+local FFlagPartyDevAPIToRespectThirdPartySettingsEnabled = SharedFlags.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
+
+local function QuickStartSquadInviteFriendsContainer(t1: {[any]: any}) -- line: 38
+	-- upvalues: React (copy), SquadExternalContractContext (copy), useDispatch (copy), useStore (copy), useCurrentSquadSelector (copy), useCurrentSquadParentChannelId (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), useLocalUserId (copy), useLocalization (copy), EventNames (copy), SquadButtonSourceEnum (copy), SquadButtonClickIntentionEnum (copy), createConversation (copy), Cryo (copy), leaveSquad (copy), SquadPromptType (copy), SquadInviteFriends (copy)
+	local v24 = React.useContext(SquadExternalContractContext)
+	local v25 = useDispatch()
+	local v26 = useStore()
+	local v27 = useCurrentSquadSelector()
+	local v28 = useCurrentSquadParentChannelId()
+	local v29 = v24.useGetConversationFromId(v28)
+	local v30 = not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v24.useIsChatEnabled()
+	local v31 = useLocalUserId()
+	local v32 = useLocalization({
+		startPartyText = "Feature.Squads.Action.Start"
+	})
+	local v33 = React.useRef(false)
+	local v34 = React.useCallback(function(p1) -- line: 59
+		-- upvalues: v33 (copy), t1 (copy)
+		v33.current = true
+		t1.navigateIntoSquadLobby(p1)
+	end, { t1.navigateIntoSquadLobby })
+	local v35 = React.useCallback(function(p2) -- line: 64
+		-- upvalues: v24 (copy), EventNames (copy), t1 (copy), SquadButtonSourceEnum (copy), SquadButtonClickIntentionEnum (copy), v25 (copy), createConversation (copy), v34 (copy)
+		local v39 = #p2 ~= 1 and "group" or "one_to_one"
+
+		v24.fireSquadAnalytics(EventNames.EnterSquadButtonPressed, {
+			partyAttemptId = t1.partyAttemptId,
+			squadButtonSource = SquadButtonSourceEnum.PartyQuickStartButton,
+			squadLocation = v24.squadLocation,
+			userIntention = SquadButtonClickIntentionEnum.Create
+		})
+		v25(createConversation({
+			source = "conversationCreatedFromPartyQuickStart",
+			conversationType = v39,
+			userIds = p2,
+			onSuccessCallback = function(p3) -- line: 78
+				-- upvalues: v34 (copy)
+				v34(p3)
+			end,
+			squadContext = v24
+		}))
+	end, {
+		v25,
+		t1.partyAttemptId,
+		t1.navigateIntoSquadLobby,
+		v24.createConversation,
+		v24.setSquadPrompt,
+		v24.squadLocation,
+		v24.fireSquadAnalytics,
+		v26
+	})
+	local v36 = React.useCallback(function(p4) -- line: 94
+		-- upvalues: Cryo (copy), v27 (copy), v29 (copy), v34 (copy), v28 (copy), v25 (copy), leaveSquad (copy), SquadPromptType (copy), v24 (copy), v35 (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v30 (copy)
+		local v41 = Cryo.Dictionary.keys(p4)
+
+		if v27 and (v29.type == "one_to_one" and #v41 == 1) then
+			local v42 = v41[1]
+			local participants = v29.participants
+
+			for _, v in ipairs(participants) do
+				if v == v42 then
+					v34(v28)
+
+					return
+				end
+			end
+		end
+
+		if v27 then
+			v25(leaveSquad(SquadPromptType.JoinAnotherSquad, v24.setSquadPrompt, function() -- line: 115
+				-- upvalues: v35 (copy), v41 (copy)
+				v35(v41)
+			end, v24.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v30))
+
+			return
+		end
+
+		v35(v41)
+	end, {
+		v27,
+		v25,
+		v35,
+		v29,
+		v28,
+		t1.navigateIntoSquadLobby,
+		v24.setSquadPrompt,
+		v24.squadLocation,
+		if not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then nil else v30
+	})
+
+	return React.createElement(SquadInviteFriends, {
+		onMultiInvite = v36,
+		buttonText = v32.startPartyText,
+		participants = if not v31 or v31 == "" then nil else { v31 },
+		partyStartedRef = v33,
+		analyticsInfo = React.useMemo(function() -- line: 142
+			-- upvalues: t1 (copy)
+			return {
+				selectionPageType = "QuickStartInvite",
+				partyAttemptId = t1.partyAttemptId
+			}
+		end, { t1.partyAttemptId }),
+		onSelectedFriendsChanged = t1.onSelectedFriendsChanged,
+		shouldHideFooterButton = t1.shouldHideFooterButton
+	})
+end
+
+return QuickStartSquadInviteFriendsContainer

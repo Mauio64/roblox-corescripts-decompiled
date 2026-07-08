@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppLoosenCollectionIdTypeInterface", false);
+return game:DefineFastFlag("LuaAppLoosenCollectionIdTypeInterface", false)

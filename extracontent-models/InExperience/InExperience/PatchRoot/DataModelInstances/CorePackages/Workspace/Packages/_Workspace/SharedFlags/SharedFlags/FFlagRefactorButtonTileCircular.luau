@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RefactorButtonTileCircular", false);
+return game:DefineFastFlag("RefactorButtonTileCircular", false)

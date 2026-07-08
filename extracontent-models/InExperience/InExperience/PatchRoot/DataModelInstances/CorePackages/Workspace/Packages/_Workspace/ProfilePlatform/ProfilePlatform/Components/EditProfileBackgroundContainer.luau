@@ -1,1 +1,1 @@
-return require(script.EditProfileBackgroundPageContainer);
+return require(script.EditProfileBackgroundPageContainer)

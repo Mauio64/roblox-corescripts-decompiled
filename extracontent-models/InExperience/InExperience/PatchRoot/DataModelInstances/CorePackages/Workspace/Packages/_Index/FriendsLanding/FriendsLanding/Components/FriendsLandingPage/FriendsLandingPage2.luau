@@ -1,413 +1,447 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Roact);
-local l_UIBlox_0 = v1.UIBlox;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local l_useUiModeInfo_0 = require(l_Parent_0.RobloxAppHooks).useUiModeInfo;
-local l_UiMode_0 = require(l_Parent_0.RobloxAppEnums).UiMode;
-local v11 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigationEventNameEnum_0 = v11.FocusNavigationEventNameEnum;
-local v13 = require(l_Parent_0.ReactFocusNavigation);
-local v14 = require(l_Parent_0.InputHandlers);
-local _ = require(l_Parent_0.PlayerContextualMenu);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_CollectionGrid_0 = require(l_Parent_0.CollectionViews).CollectionGrid;
-local l_HorizontalPageMargin_0 = l_UIBlox_0.App.Container.HorizontalPageMargin;
-local l_convertUserPresenceTypeToString_0 = require(l_Parent_0.SocialCommon).Utils.convertUserPresenceTypeToString;
-local l_useFocusGuiObject_0 = v1.useFocusGuiObject;
-local v22 = require(l_script_FirstAncestor_0.FriendsLandingContext);
-local v23 = require(l_script_FirstAncestor_0.FriendsLandingAnalytics);
-local l_RefreshScrollingFrame_0 = v1.SocialLibraries.Components.RefreshScrollingFrame;
-local l_GridMetrics_0 = l_UIBlox_0.App.Grid.GridMetrics;
-local v26 = require(l_script_FirstAncestor_0.EnumScreens);
-local v27 = require(l_script_FirstAncestor_0.Friends.filterStates);
-local v28 = require(l_script_FirstAncestor_0.FriendsLandingAnalytics.ButtonClickEvents);
-local v29 = require(l_script_FirstAncestor_0.Common.Constants);
-local l_useAnimatedScrollToSelection_0 = require(l_Parent_0.RobloxAppHooks).useAnimatedScrollToSelection;
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v32 = require(l_Parent_0.Display);
-local v33 = require(l_script_FirstAncestor_0.Components.FilterByButton);
-local v34 = require(l_script_FirstAncestor_0.Components.FriendTile);
-local v35 = require(l_script_FirstAncestor_0.Components.EmptyResultsView);
-local v36 = require(l_script_FirstAncestor_0.Components.NoFriendsView);
-local v37 = require(l_script_FirstAncestor_0.Navigator.isFromConnectionsHub);
-local l_AmpApiProvider_0 = require(l_Parent_0.AmpUpsell).AmpApiProvider;
-local l_AccessResponseEnum_0 = require(l_Parent_0.AmpUpsell).AmpEnums.AccessResponseEnum;
-local l_Button_0 = l_UIBlox_0.App.Button.Button;
-local l_ButtonType_0 = l_UIBlox_0.App.Button.Enum.ButtonType;
-local l_useTextSizeOffset_0 = l_UIBlox_0.Core.Style.useTextSizeOffset;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v44 = require(l_Parent_0.UserList);
-local l_UserListLayoutAdaptor_0 = v44.UserListLayoutAdaptor;
-local l_LayoutMode_0 = v44.Enums.LayoutMode;
-local function v47() --[[ Line: 62 ]]
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local FriendsLandingParent = FriendsLanding.Parent
+local React = require(FriendsLandingParent.React)
+local Roact = require(FriendsLandingParent.Roact)
+local UIBlox = dependencies.UIBlox
+local useNavigation = require(FriendsLandingParent.Navigation).useNavigation
+local useDesignTokens = require(FriendsLandingParent.Style).useDesignTokens
+local useTokens = require(FriendsLandingParent.Foundation).Hooks.useTokens
+local useUiModeInfo = require(FriendsLandingParent.RobloxAppHooks).useUiModeInfo
+local useScreenSize = require(FriendsLandingParent.RobloxAppHooks).useScreenSize
+local UiMode = require(FriendsLandingParent.RobloxAppEnums).UiMode
+local RobloxAppEnums = require(FriendsLandingParent.RobloxAppEnums)
+local FocusNavigationUtils = require(FriendsLandingParent.FocusNavigationUtils)
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local ReactFocusNavigation = require(FriendsLandingParent.ReactFocusNavigation)
+local InputHandlers = require(FriendsLandingParent.InputHandlers)
 
-end;
-local v48 = require(l_script_FirstAncestor_0.Flags.FFlagFixScalingOnFriendsLanding);
-local l_FFlagConnectionManagementChips_0 = require(l_Parent_0.SharedFlags).FFlagConnectionManagementChips;
-local l_FFlagCreateConnectionsHub_0 = require(l_Parent_0.SharedFlags).FFlagCreateConnectionsHub;
-local l_FFlagFriendsPageAlwaysOpenPPV_0 = require(l_Parent_0.SharedFlags).FFlagFriendsPageAlwaysOpenPPV;
-local l_FFlagFriendsPageUserListEnabled_0 = require(l_Parent_0.SharedFlags).FFlagFriendsPageUserListEnabled;
-local l_FFlagExtendScrollingFramesBySafeInsets_0 = require(l_Parent_0.SharedFlags).FFlagExtendScrollingFramesBySafeInsets;
-local l_FFlagEnableLeftNavOnConsole_0 = require(l_Parent_0.SharedFlags).FFlagEnableLeftNavOnConsole;
-local l_FStringIsUserInTcEligibleCountryAmpFeature_0 = require(l_Parent_0.SharedFlags).FStringIsUserInTcEligibleCountryAmpFeature;
-local l_FStringCanAccessTrustedContactsAmpNameSpace_0 = require(l_Parent_0.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-return function(v58) --[[ Line: 100 ]] --[[ Name: FriendsLandingPage ]]
-    -- upvalues: l_useLocalization_0 (copy), v3 (copy), v22 (copy), v23 (copy), l_useNavigation_0 (copy), l_useDesignTokens_0 (copy), l_useUiModeInfo_0 (copy), v48 (copy), l_useTokens_0 (copy), l_useFocusGuiObject_0 (copy), l_UiMode_0 (copy), v11 (copy), v14 (copy), v26 (copy), v13 (copy), l_FocusNavigationEventNameEnum_0 (copy), l_useTextSizeOffset_0 (copy), l_FFlagConnectionManagementChips_0 (copy), l_AmpApiProvider_0 (copy), l_FStringIsUserInTcEligibleCountryAmpFeature_0 (copy), l_FStringCanAccessTrustedContactsAmpNameSpace_0 (copy), l_AccessResponseEnum_0 (copy), l_FFlagFriendsPageAlwaysOpenPPV_0 (copy), l_convertUserPresenceTypeToString_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v28 (copy), v29 (copy), l_FFlagFriendsPageUserListEnabled_0 (copy), v34 (copy), v47 (copy), v27 (copy), l_FFlagCreateConnectionsHub_0 (copy), l_AppPage_0 (copy), l_GridMetrics_0 (copy), l_useAnimatedScrollToSelection_0 (copy), l_FFlagExtendScrollingFramesBySafeInsets_0 (copy), l_useSignalState_0 (copy), v32 (copy), v37 (copy), v4 (copy), l_HorizontalPageMargin_0 (copy), l_RefreshScrollingFrame_0 (copy), l_FFlagEnableLeftNavOnConsole_0 (copy), v33 (copy), v35 (copy), v36 (copy), l_UserListLayoutAdaptor_0 (copy), l_LayoutMode_0 (copy), l_CollectionGrid_0 (copy), l_Button_0 (copy), l_ButtonType_0 (copy)
-    local v59 = l_useLocalization_0({
-        pageError = "CommonUI.Messages.Response.PageError", 
-        successText = "Feature.Friends.Action.FriendRemoved", 
-        errorText = "Feature.Toast.NetworkingError.SomethingIsWrong", 
-        friends = "CommonUI.Features.Label.Friends", 
-        showMore = "Feature.Avatar.Action.ShowMore"
-    });
-    local v60 = v3.useContext(v22.Context);
-    local v61 = v3.useContext(v23.Context);
-    local v62 = l_useNavigation_0();
-    local l_navigateToLuaAppPages_0 = v60.navigateToLuaAppPages;
-    local v64 = l_useDesignTokens_0();
-    local v65 = l_useUiModeInfo_0();
-    local v66 = if v48 then l_useTokens_0() else nil;
-    local v67 = l_useFocusGuiObject_0();
-    local v68 = v65.uiMode == l_UiMode_0.TenFoot;
-    local v69 = v11.useLastInputMode() == "Cursor";
-    local v71 = v14.onRelease(function(v70) --[[ Line: 123 ]]
-        -- upvalues: l_navigateToLuaAppPages_0 (copy), v26 (ref)
-        v70:cancel();
-        l_navigateToLuaAppPages_0[v26.SearchPage]();
-    end);
-    local v72 = v13.useEventHandler(l_FocusNavigationEventNameEnum_0.Search, v71);
-    local v73 = if v68 then v64.Global.Space_800 else v64.Global.Space_1000;
-    local v74 = l_useTextSizeOffset_0();
-    v73 = v73 + v74 * 3;
-    local v75 = nil;
-    local v76 = nil;
-    if l_FFlagConnectionManagementChips_0 then
-        local v77, v78 = v3.useState(false);
-        v75 = v77;
-        v76 = v78;
-    end;
-    v3.useEffect(function() --[[ Line: 144 ]]
-        -- upvalues: v61 (copy), l_FFlagConnectionManagementChips_0 (ref), l_AmpApiProvider_0 (ref), l_FStringIsUserInTcEligibleCountryAmpFeature_0 (ref), l_FStringCanAccessTrustedContactsAmpNameSpace_0 (ref), l_AccessResponseEnum_0 (ref), v76 (ref)
-        v61:pageMountingTimeReport();
-        if l_FFlagConnectionManagementChips_0 and l_AmpApiProvider_0.upsellFeatureAccess(l_FStringIsUserInTcEligibleCountryAmpFeature_0, {}, l_FStringCanAccessTrustedContactsAmpNameSpace_0).access == l_AccessResponseEnum_0.Granted then
-            v76(true);
-        end;
-    end, {});
-    local v80 = if l_FFlagFriendsPageAlwaysOpenPPV_0 then nil else v3.useCallback(function(v79) --[[ Line: 157 ]]
-        -- upvalues: v60 (copy), l_convertUserPresenceTypeToString_0 (ref)
-        return function() --[[ Line: 158 ]]
-            -- upvalues: v60 (ref), v79 (copy), l_convertUserPresenceTypeToString_0 (ref)
-            v60.openPlayerContextualMenu({
-                subjectUserId = v79.id, 
-                robloxFriendshipStatus = Enum.FriendStatus.Friend, 
-                subjectPresence = {
-                    locationString = v79.lastLocation, 
-                    locationPlaceId = v79.placeId, 
-                    locationRootPlaceId = v79.rootPlaceId, 
-                    locationUniverseId = v79.universeId, 
-                    status = l_convertUserPresenceTypeToString_0(v79.userPresenceType)
-                }, 
-                friendshipOriginSourceType = nil
-            });
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v60.openPlayerContextualMenu
-    } else l_dependencyArray_0(v60.openPlayerContextualMenu));
-    local v86 = v3.useCallback(function(v81, v82, _, _, _) --[[ Line: 180 ]]
-        -- upvalues: v61 (copy), v26 (ref), v28 (ref), v60 (copy), v29 (ref)
-        return function() --[[ Line: 181 ]]
-            -- upvalues: v61 (ref), v26 (ref), v28 (ref), v81 (copy), v82 (copy), v60 (ref), v29 (ref)
-            v61:navigate(v26.ViewUserProfile);
-            v61:buttonClick(v28.PlayerTile, {
-                friendId = v81, 
-                position = v82 - 1, 
-                subpage = "peekView", 
-                page = "playerProfile"
-            });
-            v60.openProfilePeekView(v81, {
-                source = v29.FriendsLandingPageSourceName
-            });
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v61, 
-        v60.openProfilePeekView
-    } else l_dependencyArray_0(v61, v60.openProfilePeekView));
-    local v89 = if l_FFlagFriendsPageUserListEnabled_0 then v3.useCallback(function(v87, v88) --[[ Line: 201 ]]
-        -- upvalues: v61 (copy), v26 (ref), v28 (ref), v60 (copy), v29 (ref)
-        v61:navigate(v26.ViewUserProfile);
-        v61:buttonClick(v28.PlayerTile, {
-            friendId = v87, 
-            position = v88 - 1, 
-            subpage = "peekView", 
-            page = "playerProfile"
-        });
-        v60.openProfilePeekView(v87, {
-            source = v29.FriendsLandingPageSourceName
-        });
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v61
-    } else l_dependencyArray_0(v61)) else nil;
-    local function v90() --[[ Line: 216 ]]
-        -- upvalues: v61 (copy)
-        v61:pageLoadingTimeReport();
-    end;
-    local v91 = v3.useCallback(function() --[[ Line: 221 ]]
-        -- upvalues: v62 (copy), v26 (ref), v59 (copy)
-        return function() --[[ Line: 222 ]]
-            -- upvalues: v62 (ref), v26 (ref), v59 (ref)
-            v62.navigate(v26.GenericToast, {
-                toastProps = {
-                    toastContent = {
-                        toastTitle = v59.errorText
-                    }
-                }
-            });
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v62, 
-        v59
-    } else l_dependencyArray_0(v62, v59));
-    local v94 = v3.useCallback(function(v92, v93) --[[ Line: 236 ]]
-        -- upvalues: v3 (ref), v34 (ref), l_FFlagFriendsPageAlwaysOpenPPV_0 (ref), v86 (copy), v68 (copy), v80 (copy), v91 (copy), v90 (copy), v58 (copy), v67 (copy)
-        return v3.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v93
-        }, {
-            tile = v3.createElement(v34, {
-                user = v92, 
-                index = v93, 
-                openPlayerProfile = if l_FFlagFriendsPageAlwaysOpenPPV_0 then v86 else if v68 then if v80 == nil then v91 else v80 else v86, 
-                isPlayerContextualMenuEnabled = v68, 
-                pageLoadingTimeReport = v90, 
-                selected = v93 == v58.selectedItemIndex, 
-                focusGuiObject = v67
-            })
-        }), "FriendTile";
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v58.selectedItemIndex, 
-        v68, 
-        if l_FFlagFriendsPageAlwaysOpenPPV_0 then nil else v80, 
-        v86
-    } else l_dependencyArray_0(v58.selectedItemIndex, v68, if l_FFlagFriendsPageAlwaysOpenPPV_0 then nil else v80, v86));
-    local v96 = v3.useCallback(function(v95) --[[ Line: 273 ]]
-        -- upvalues: v73 (ref)
-        return v95 + v73;
-    end, l_dependencyArray_0(v73, v74));
-    local v97 = v3.useCallback(function() --[[ Line: 277 ]]
-        -- upvalues: v61 (copy), v28 (ref), v62 (copy), v26 (ref), v47 (ref), v58 (copy)
-        v61:buttonClick(v28.FriendFilterPill);
-        v62.navigate(v26.FilterByModal, {
-            onFewestInteractionsSelection = v47, 
-            friendCount = v58.totalFriendCount
-        });
-    end, l_dependencyArray_0(v62, v61));
-    local v99 = if l_FFlagConnectionManagementChips_0 then v3.useCallback(function(v98) --[[ Line: 286 ]]
-        -- upvalues: v61 (copy), v28 (ref), v60 (copy)
-        v61:buttonClick(v28.FriendFilterPill);
-        v60.setFilterKeys(v98);
-    end, l_dependencyArray_0(v61, v60.setFilterKeys)) else nil;
-    local v100 = v3.useCallback(function() --[[ Line: 292 ]]
-        -- upvalues: v61 (copy), v60 (copy), v27 (ref), v59 (copy)
-        v61:pageLoaded();
-        v60.setFilterKeys(v27.All);
-        return v60.refreshPage({
-            errorMessage = v59.pageError, 
-            onResolve = function() --[[ Line: 298 ]] --[[ Name: onResolve ]]
-                -- upvalues: v61 (ref)
-                v61:pageLoadedWithArgs();
-            end
-        });
-    end, l_dependencyArray_0(v60.refreshPage, v59, v61, v60.setFilterKeys));
-    local v101 = v3.useCallback(function() --[[ Line: 304 ]]
-        -- upvalues: v61 (copy), v28 (ref), v26 (ref), l_FFlagCreateConnectionsHub_0 (ref), v62 (copy), l_AppPage_0 (ref)
-        v61:buttonClick(v28.AddFriendsNoFriendsEmptyView);
-        v61:navigate(v26.AddFriends);
-        if l_FFlagCreateConnectionsHub_0 then
-            v62.navigate(l_AppPage_0.CoHubAddConnections);
-            return;
-        else
-            v62.navigate(l_AppPage_0.AddFriendsPage);
-            return;
-        end;
-    end, l_dependencyArray_0(v61, v62));
-    local v102 = v58.friends and #v58.friends or 0;
-    local v103 = v58.totalFriendCount or 0;
-    local v104 = v103 == 0;
-    local v105 = false;
-    if v102 == 0 then
-        v105 = v103 > 0;
-    end;
-    local v106 = v58.fetchMoreFriends and not v104 and not v105 and (not v60.filter or v60.filter == v27.All);
-    local v107 = v3.useCallback(function() --[[ Line: 323 ]]
-        -- upvalues: v58 (copy)
-        if v58.fetchMoreFriends then
-            v58.fetchMoreFriends();
-        end;
-    end, {
-        v58.fetchMoreFriends
-    });
-    local v108 = v68 and 24 or 12;
-    local v109, v110 = v3.useState(100);
-    local v111 = nil;
-    local v112 = nil;
-    if v68 then
-        v111 = v64.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics;
-        v112 = v64.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing;
-    else
-        v111 = {
-            minimumItemsPerRow = 2, 
-            minimumItemWidth = if v48 then 176 * v66.Config.UI.Scale else 176
-        };
-        v112 = 12;
-    end;
-    local v113 = v3.useMemo(function() --[[ Line: 346 ]]
-        -- upvalues: l_GridMetrics_0 (ref), v111 (ref)
-        return l_GridMetrics_0.makeCustomMetricsGetter(v111);
-    end, {
-        v111
-    });
-    local v114 = v3.useMemo(function() --[[ Line: 350 ]]
-        -- upvalues: v113 (copy), v109 (copy), v112 (ref)
-        return v113(v109, v112);
-    end, {
-        v113
-    });
-    local v116 = v3.useCallback(function(v115) --[[ Line: 354 ]]
-        -- upvalues: v110 (copy)
-        v110(v115.X);
-    end, {});
-    local v117 = v3.useRef({});
-    local l_ScrollAnimationConfig_0 = v64.LuaApps.App.Page.ScrollAnimationConfig;
-    local v119, v120 = l_useAnimatedScrollToSelection_0(Enum.ScrollingDirection.Y, 0, v64.Global.Space_1000, l_ScrollAnimationConfig_0);
-    local v121 = nil;
-    v121 = if v68 then (v104 or v105 or v69) and 8 or 1000 else 8;
-    local v122 = if l_FFlagExtendScrollingFramesBySafeInsets_0 then l_useSignalState_0(v32.GetDisplayStore().getDeviceSafePadding) else nil;
-    v121 = v121 + if l_FFlagExtendScrollingFramesBySafeInsets_0 then v122.bottom else 0;
-    local v123 = l_FFlagCreateConnectionsHub_0 and v37(v62);
-    local v127 = if l_FFlagFriendsPageUserListEnabled_0 then v3.useCallback(function(v124, v125, v126) --[[ Line: 379 ]]
-        -- upvalues: v3 (ref), v34 (ref), v89 (copy), v90 (copy)
-        return v3.createElement(v34, {
-            user = v125, 
-            createRow = v124, 
-            index = v126, 
-            openPlayerProfileHandle = v89, 
-            pageLoadingTimeReport = v90, 
-            isPlayerContextualMenuEnabled = nil
-        });
-    end, {
-        v90, 
-        v89
-    }) else nil;
-    return v3.createElement("Frame", {
-        [v4.Ref] = v72, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundColor3 = if v123 then nil else v64.LuaApps.App.Page.BackgroundColor, 
-        BackgroundTransparency = v123 and 1 or v64.LuaApps.App.Page.BackgroundTransparency
-    }, {
-        HorizontalPageMargin = v3.createElement(l_HorizontalPageMargin_0, {
-            Size = UDim2.fromScale(1, 1), 
-            backgroundTransparency = 1
-        }, {
-            scrollView = v3.createElement(l_RefreshScrollingFrame_0, {
-                scrollingElementProps = {
-                    Size = UDim2.new(1, 0, 1, -v29.TOP_BAR_HEIGHT + (l_FFlagExtendScrollingFramesBySafeInsets_0 and v122.bottom or 0)), 
-                    BackgroundTransparency = 1, 
-                    ScrollingDirection = Enum.ScrollingDirection.Y, 
-                    ScrollBarThickness = 0, 
-                    CanvasSize = UDim2.new(1, 0, 0, 0), 
-                    AutomaticCanvasSize = Enum.AutomaticSize.XY, 
-                    CanvasPosition = v119, 
-                    [v4.Event.SelectionChanged] = v120, 
-                    Selectable = not l_FFlagEnableLeftNavOnConsole_0 and nil
-                }, 
-                [v4.Ref] = v117, 
-                refresh = v100, 
-                usesBuilderIcon = true
-            }, {
-                UISizeConstraint = if l_FFlagFriendsPageUserListEnabled_0 then v3.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(640, 1e999)
-                }) else nil, 
-                layout = v3.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Vertical
-                }), 
-                pulldownSpacing = v3.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, 1), 
-                    LayoutOrder = 0, 
-                    BackgroundTransparency = 1
-                }) or nil, 
-                filterByButton = if v68 then nil else v3.createElement(v33, {
-                    analytics = v61, 
-                    filter = v60.filter, 
-                    friendCount = if v60.filter == v27.All then v103 else v102, 
-                    isDisabled = v103 == 0, 
-                    layoutOrder = 2, 
-                    onActivated = if l_FFlagConnectionManagementChips_0 then v99 else v97, 
-                    maxWidth = l_FFlagConnectionManagementChips_0 and 640 or nil, 
-                    canAccessTrustedContacts = if l_FFlagConnectionManagementChips_0 then v75 else nil
-                }), 
-                NoResultsView = if v105 then v3.createElement(v35, {
-                    layoutOrder = 6
-                }) else nil, 
-                NoFriendsView = if v104 then v3.createElement(v36, {
-                    layoutOrder = 6, 
-                    pageLoadingTimeReport = v90, 
-                    openAddFriendsPage = v101
-                }) else nil, 
-                UserListLayoutAdaptor = if l_FFlagFriendsPageUserListEnabled_0 then if v105 or v104 then nil else v3.createElement(l_UserListLayoutAdaptor_0, {
-                    layoutOrder = 6, 
-                    layoutMode = l_LayoutMode_0.Vertical, 
-                    header = {
-                        title = v59.peopleYouMayKnow
-                    }, 
-                    entities = v58.friends, 
-                    isScrollEnabled = false, 
-                    renderRow = v127, 
-                    hasMore = v106, 
-                    onLoadMore = v107
-                }) else nil, 
-                FriendsGridView = if l_FFlagFriendsPageUserListEnabled_0 then nil else if v105 or v104 then nil else v3.createElement(l_CollectionGrid_0, {
-                    LayoutOrder = 6, 
-                    items = v58.friends, 
-                    verticalScrollingFrameRef = v117, 
-                    renderItem = v94, 
-                    getItemHeight = v96, 
-                    numColumns = v114.itemsPerRow, 
-                    columnGap = v112, 
-                    verticalPadding = v108, 
-                    onContainerSizeChanged = v116
-                }), 
-                showMoreFrame = if l_FFlagFriendsPageUserListEnabled_0 then nil else if v106 then v3.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v29.CTA_BUTTON_HEIGHT), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 7
-                }, {
-                    UIPadding = v3.createElement("UIPadding", {
-                        PaddingLeft = UDim.new(0, 2), 
-                        PaddingRight = UDim.new(0, 2), 
-                        PaddingTop = UDim.new(0, 10)
-                    }), 
-                    showMoreButton = v3.createElement(l_Button_0, {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        size = UDim2.new(1, 0, 1, 0), 
-                        onActivated = v107, 
-                        text = v59.showMore
-                    })
-                }) else nil, 
-                additionalPadding = v3.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v121), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 8
-                })
-            })
-        })
-    });
-end;
+require(FriendsLandingParent.PlayerContextualMenu)
+
+local dependencyArray = require(FriendsLandingParent.RoactUtils).Hooks.dependencyArray
+local useLocalization = require(FriendsLandingParent.Localization).Hooks.useLocalization
+local CollectionGrid = require(FriendsLandingParent.CollectionViews).CollectionGrid
+local HorizontalPageMargin = UIBlox.App.Container.HorizontalPageMargin
+local getPageMargin = UIBlox.App.Container.getPageMargin
+local convertUserPresenceTypeToString = require(FriendsLandingParent.SocialCommon).Utils.convertUserPresenceTypeToString
+local useFocusGuiObject = dependencies.useFocusGuiObject
+local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
+local FriendsLandingAnalytics = require(FriendsLanding.FriendsLandingAnalytics)
+local RefreshScrollingFrame = dependencies.SocialLibraries.Components.RefreshScrollingFrame
+local GridMetrics = UIBlox.App.Grid.GridMetrics
+local EnumScreens = require(FriendsLanding.EnumScreens)
+local filterStates = require(FriendsLanding.Friends.filterStates)
+local ButtonClickEvents = require(FriendsLanding.FriendsLandingAnalytics.ButtonClickEvents)
+local Constants = require(FriendsLanding.Common.Constants)
+local useAnimatedScrollToSelection = require(FriendsLandingParent.RobloxAppHooks).useAnimatedScrollToSelection
+local useSignalState = require(FriendsLandingParent.SignalsReact).useSignalState
+local Display = require(FriendsLandingParent.Display)
+local useFocusOnMount = require(FriendsLandingParent.FocusNavigationUtils).useFocusOnMount
+local FilterByButton = require(FriendsLanding.Components.FilterByButton)
+local FriendTile = require(FriendsLanding.Components.FriendTile)
+local EmptyResultsView = require(FriendsLanding.Components.EmptyResultsView)
+local NoFriendsView = require(FriendsLanding.Components.NoFriendsView)
+local isFromConnectionsHub = require(FriendsLanding.Navigator.isFromConnectionsHub)
+local AmpApiProvider = require(FriendsLandingParent.AmpUpsell).AmpApiProvider
+local AccessResponseEnum = require(FriendsLandingParent.AmpUpsell).AmpEnums.AccessResponseEnum
+local Button = UIBlox.App.Button.Button
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+local AppPage = require(FriendsLandingParent.RobloxAppEnums).AppPage
+local UserList = require(FriendsLandingParent.UserList)
+local UserListLayoutAdaptor = UserList.UserListLayoutAdaptor
+local LayoutMode = UserList.Enums.LayoutMode
+
+local function v51() -- line: 66
+end
+
+local FFlagFixScalingOnFriendsLanding = require(FriendsLanding.Flags.FFlagFixScalingOnFriendsLanding)
+local FFlagConnectionManagementChips = require(FriendsLandingParent.SharedFlags).FFlagConnectionManagementChips
+local FFlagCreateConnectionsHub = require(FriendsLandingParent.SharedFlags).FFlagCreateConnectionsHub
+local FFlagFixCohubUiBugs = require(FriendsLandingParent.SharedFlags).FFlagFixCohubUiBugs
+local FFlagFriendsPageAlwaysOpenPPV = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageAlwaysOpenPPV
+local FFlagFriendsPageUserListEnabled = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageUserListEnabled
+local FFlagExtendScrollingFramesBySafeInsets = require(FriendsLandingParent.SharedFlags).FFlagExtendScrollingFramesBySafeInsets
+local FFlagEnableLeftNavOnConsole = require(FriendsLandingParent.SharedFlags).FFlagEnableLeftNavOnConsole
+local FStringIsUserInTcEligibleCountryAmpFeature = require(FriendsLandingParent.SharedFlags).FStringIsUserInTcEligibleCountryAmpFeature
+local FStringCanAccessTrustedContactsAmpNameSpace = require(FriendsLandingParent.SharedFlags).FStringCanAccessTrustedContactsAmpNameSpace
+local v62 = game:DefineFastFlag("FixSearchYNavigation", false)
+local v63 = game:DefineFastFlag("FixFriendsLandingRightMargin", false)
+local FFlagLuaAppsDefaultSelection = require(FriendsLandingParent.SharedFlags).FFlagLuaAppsDefaultSelection
+
+local function FriendsLandingPage(t1: {[any]: any}) -- line: 106
+	-- upvalues: useLocalization (copy), React (copy), FriendsLandingContext (copy), FriendsLandingAnalytics (copy), useNavigation (copy), useDesignTokens (copy), useUiModeInfo (copy), FFlagFixScalingOnFriendsLanding (copy), useTokens (copy), useFocusGuiObject (copy), FFlagFixCohubUiBugs (copy), getPageMargin (copy), useScreenSize (copy), UiMode (copy), FocusNavigationUtils (copy), InputHandlers (copy), v62 (copy), FFlagEnableLeftNavOnConsole (copy), AppPage (copy), RobloxAppEnums (copy), EnumScreens (copy), ReactFocusNavigation (copy), FocusNavigationEventNameEnum (copy), useTextSizeOffset (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), FFlagFriendsPageAlwaysOpenPPV (copy), convertUserPresenceTypeToString (copy), ButtonClickEvents (copy), Constants (copy), FFlagFriendsPageUserListEnabled (copy), FriendTile (copy), dependencyArray (copy), v51 (copy), filterStates (copy), FFlagCreateConnectionsHub (copy), GridMetrics (copy), useAnimatedScrollToSelection (copy), FFlagExtendScrollingFramesBySafeInsets (copy), useSignalState (copy), Display (copy), isFromConnectionsHub (copy), FFlagLuaAppsDefaultSelection (copy), useFocusOnMount (copy), Roact (copy), HorizontalPageMargin (copy), v63 (copy), RefreshScrollingFrame (copy), FilterByButton (copy), EmptyResultsView (copy), NoFriendsView (copy), UserListLayoutAdaptor (copy), LayoutMode (copy), CollectionGrid (copy), Button (copy), ButtonType (copy)
+	local v67 = useLocalization({
+		pageError = "CommonUI.Messages.Response.PageError",
+		successText = "Feature.Friends.Action.FriendRemoved",
+		errorText = "Feature.Toast.NetworkingError.SomethingIsWrong",
+		friends = "CommonUI.Features.Label.Friends",
+		showMore = "Feature.Avatar.Action.ShowMore"
+	})
+	local v68 = React.useContext(FriendsLandingContext.Context)
+	local v69 = React.useContext(FriendsLandingAnalytics.Context)
+	local v70 = useNavigation()
+	local navigateToLuaAppPages = v68.navigateToLuaAppPages
+	local v72 = useDesignTokens()
+	local v73 = useUiModeInfo()
+	local v74 = if not FFlagFixScalingOnFriendsLanding then nil else useTokens()
+	local v75 = useFocusGuiObject()
+	local v76 = if not FFlagFixCohubUiBugs then nil else getPageMargin(useScreenSize().X)
+	local v77 = v73.uiMode == UiMode.TenFoot
+	local v78 = FocusNavigationUtils.useLastInputMode() == "Cursor"
+	local v79 = InputHandlers.onRelease(function(p1) -- line: 131
+		-- upvalues: v62 (copy), v77 (copy), FFlagEnableLeftNavOnConsole (copy), v70 (copy), AppPage (copy), RobloxAppEnums (copy), navigateToLuaAppPages (copy), EnumScreens (copy)
+		p1:cancel()
+
+		if v62 then
+			if v77 and not FFlagEnableLeftNavOnConsole then
+				v70.navigate(AppPage.SearchPage, {
+					defaultSearchType = RobloxAppEnums.SearchTypes.Players
+				})
+
+				return
+			end
+
+			v70.navigate(AppPage.UserSearch, {
+				shouldShowUserSearchLandingPage = true
+			})
+
+			return
+		end
+
+		navigateToLuaAppPages[EnumScreens.SearchPage]()
+	end)
+	local v80 = ReactFocusNavigation.useEventHandler(FocusNavigationEventNameEnum.Search, v79)
+	local v81 = if not v77 then v72.Size.Size_2000 else v72.Size.Size_1600
+	local v82 = useTextSizeOffset()
+	local u83 = v81 + v82 * 3
+	local v84 = nil
+	local u85 = nil
+
+	if FFlagConnectionManagementChips then
+		local v86
+
+		v84, v86 = React.useState(false)
+		u85 = v86
+	end
+
+	React.useEffect(function() -- line: 163
+		-- upvalues: v69 (copy), FFlagConnectionManagementChips (copy), AmpApiProvider (copy), FStringIsUserInTcEligibleCountryAmpFeature (copy), FStringCanAccessTrustedContactsAmpNameSpace (copy), AccessResponseEnum (copy), u85 (ref)
+		v69:pageMountingTimeReport()
+
+		if FFlagConnectionManagementChips and AmpApiProvider.upsellFeatureAccess(FStringIsUserInTcEligibleCountryAmpFeature, {}, FStringCanAccessTrustedContactsAmpNameSpace).access == AccessResponseEnum.Granted then
+			u85(true)
+		end
+	end, {})
+
+	local v87 = if not FFlagFriendsPageAlwaysOpenPPV then React.useCallback(function(p2) -- line: 175
+		-- upvalues: v68 (copy), convertUserPresenceTypeToString (copy)
+		return function() -- line: 176
+			-- upvalues: v68 (copy), p2 (copy), convertUserPresenceTypeToString (copy)
+			v68.openPlayerContextualMenu({
+				friendshipOriginSourceType = nil,
+				subjectUserId = p2.id,
+				robloxFriendshipStatus = Enum.FriendStatus.Friend,
+				subjectPresence = {
+					locationString = p2.lastLocation,
+					locationPlaceId = p2.placeId,
+					locationRootPlaceId = p2.rootPlaceId,
+					locationUniverseId = p2.universeId,
+					status = convertUserPresenceTypeToString(p2.userPresenceType)
+				}
+			})
+		end
+	end, { v68.openPlayerContextualMenu }) else nil
+	local v88 = React.useCallback(function(p3, n1: number, _, _, _) -- line: 193
+		-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), v68 (copy), Constants (copy)
+		return function() -- line: 194
+			-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), p3 (copy), n1 (copy), v68 (copy), Constants (copy)
+			v69:navigate(EnumScreens.ViewUserProfile)
+			v69:buttonClick(ButtonClickEvents.PlayerTile, {
+				subpage = "peekView",
+				page = "playerProfile",
+				friendId = p3,
+				position = n1 - 1
+			})
+			v68.openProfilePeekView(p3, {
+				source = Constants.FriendsLandingPageSourceName
+			})
+		end
+	end, {
+		v69,
+		v68.openProfilePeekView
+	})
+	local v89 = if not FFlagFriendsPageUserListEnabled then nil else React.useCallback(function(p7, n2: number) -- line: 210
+		-- upvalues: v69 (copy), EnumScreens (copy), ButtonClickEvents (copy), v68 (copy), Constants (copy)
+		v69:navigate(EnumScreens.ViewUserProfile)
+		v69:buttonClick(ButtonClickEvents.PlayerTile, {
+			subpage = "peekView",
+			page = "playerProfile",
+			friendId = p7,
+			position = n2 - 1
+		})
+		v68.openProfilePeekView(p7, {
+			source = Constants.FriendsLandingPageSourceName
+		})
+	end, { v69 })
+
+	local function v90() -- line: 225
+		-- upvalues: v69 (copy)
+		v69:pageLoadingTimeReport()
+	end
+
+	local v91 = React.useCallback(function() -- line: 229
+		-- upvalues: v70 (copy), EnumScreens (copy), v67 (copy)
+		return function() -- line: 230
+			-- upvalues: v70 (copy), EnumScreens (copy), v67 (copy)
+			v70.navigate(EnumScreens.GenericToast, {
+				toastProps = {
+					toastContent = {
+						toastTitle = v67.errorText
+					}
+				}
+			})
+		end
+	end, {
+		v70,
+		v67
+	})
+	local v92 = React.useCallback(function(p8, p9) -- line: 239
+		-- upvalues: React (copy), FriendTile (copy), FFlagFriendsPageAlwaysOpenPPV (copy), v88 (copy), v77 (copy), v87 (copy), v91 (copy), v90 (copy), t1 (copy), v75 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			LayoutOrder = p9
+		}, {
+			tile = React.createElement(FriendTile, {
+				user = p8,
+				index = p9,
+				openPlayerProfile = if not FFlagFriendsPageAlwaysOpenPPV then if not v77 then v88 else if v87 ~= nil then v87 else v91 else v88,
+				isPlayerContextualMenuEnabled = v77,
+				pageLoadingTimeReport = v90,
+				selected = p9 == t1.selectedItemIndex,
+				focusGuiObject = v75
+			})
+		}), "FriendTile"
+	end, {
+		t1.selectedItemIndex,
+		v77,
+		if not FFlagFriendsPageAlwaysOpenPPV then v87 else nil,
+		v88
+	})
+	local v93 = React.useCallback(function(n3: number) -- line: 267
+		-- upvalues: u83 (ref)
+		return n3 + u83
+	end, dependencyArray(u83, v82))
+	local v94 = React.useCallback(function() -- line: 271
+		-- upvalues: v69 (copy), ButtonClickEvents (copy), v70 (copy), EnumScreens (copy), v51 (copy), t1 (copy)
+		v69:buttonClick(ButtonClickEvents.FriendFilterPill)
+		v70.navigate(EnumScreens.FilterByModal, {
+			onFewestInteractionsSelection = v51,
+			friendCount = t1.totalFriendCount
+		})
+	end, dependencyArray(v70, v69))
+	local v95 = if not FFlagConnectionManagementChips then nil else React.useCallback(function(s1: string) -- line: 280
+		-- upvalues: v69 (copy), ButtonClickEvents (copy), v68 (copy)
+		v69:buttonClick(ButtonClickEvents.FriendFilterPill)
+		v68.setFilterKeys(s1)
+	end, dependencyArray(v69, v68.setFilterKeys))
+	local v96 = React.useCallback(function() -- line: 286
+		-- upvalues: v69 (copy), v68 (copy), filterStates (copy), v67 (copy)
+		v69:pageLoaded()
+		v68.setFilterKeys(filterStates.All)
+
+		return v68.refreshPage({
+			errorMessage = v67.pageError,
+			onResolve = function() -- line: 292
+				-- upvalues: v69 (copy)
+				v69:pageLoadedWithArgs()
+			end
+		})
+	end, dependencyArray(v68.refreshPage, v67, v69, v68.setFilterKeys))
+	local v97 = React.useCallback(function() -- line: 298
+		-- upvalues: v69 (copy), ButtonClickEvents (copy), EnumScreens (copy), FFlagCreateConnectionsHub (copy), v70 (copy), AppPage (copy)
+		v69:buttonClick(ButtonClickEvents.AddFriendsNoFriendsEmptyView)
+		v69:navigate(EnumScreens.AddFriends)
+
+		if FFlagCreateConnectionsHub then
+			v70.navigate(AppPage.CoHubAddConnections)
+
+			return
+		end
+
+		v70.navigate(AppPage.AddFriendsPage)
+	end, dependencyArray(v69, v70))
+	local v98 = t1.friends and #t1.friends or 0
+	local v99 = t1.totalFriendCount or 0
+	local v100 = v99 == 0
+	local v101 = v98 == 0 and v99 > 0
+	local v102 = t1.fetchMoreFriends and (not v100 and (not v101 and (not v68.filter or v68.filter == filterStates.All)))
+	local v103 = React.useCallback(function() -- line: 317
+		-- upvalues: t1 (copy)
+		if t1.fetchMoreFriends then
+			t1.fetchMoreFriends()
+		end
+	end, { t1.fetchMoreFriends })
+	local v104 = not v77 and 12 or 24
+	local v105, v106 = React.useState(100)
+	local GridViewItemMetrics, GridHorizontalSpacing
+
+	if v77 then
+		GridViewItemMetrics = v72.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics
+		GridHorizontalSpacing = v72.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing
+	else
+		GridViewItemMetrics = {
+			minimumItemsPerRow = 2,
+			minimumItemWidth = not FFlagFixScalingOnFriendsLanding and 176 or 176 * v74.Config.UI.Scale
+		}
+		GridHorizontalSpacing = 12
+	end
+
+	local v109 = React.useMemo(function() -- line: 340
+		-- upvalues: GridMetrics (copy), GridViewItemMetrics (ref)
+		return GridMetrics.makeCustomMetricsGetter(GridViewItemMetrics)
+	end, { GridViewItemMetrics })
+	local v110 = React.useMemo(function() -- line: 344
+		-- upvalues: v109 (copy), v105 (copy), GridHorizontalSpacing (ref)
+		return v109(v105, GridHorizontalSpacing)
+	end, { v109 })
+	local v111 = React.useCallback(function(vector2: Vector2) -- line: 348
+		-- upvalues: v106 (copy)
+		v106(vector2.X)
+	end, {})
+	local v112 = React.useRef({})
+	local ScrollAnimationConfig = v72.LuaApps.App.Page.ScrollAnimationConfig
+	local v114, v115 = useAnimatedScrollToSelection(Enum.ScrollingDirection.Y, 0, v72.Size.Size_2000, ScrollAnimationConfig)
+	local v116 = not v77 and 8 or (not v100 and (not v101 and not v78) and 1000 or 8)
+	local v117 = if not FFlagExtendScrollingFramesBySafeInsets then nil else useSignalState(Display.GetDisplayStore().getDeviceSafePadding)
+	local v118 = v116 + (not FFlagExtendScrollingFramesBySafeInsets and 0 or v117.bottom)
+	local v119 = FFlagCreateConnectionsHub and isFromConnectionsHub(v70)
+	local v120 = if not FFlagLuaAppsDefaultSelection then nil else useFocusOnMount()
+	local v121 = if not FFlagFriendsPageUserListEnabled then nil else React.useCallback(function(p10, p11, p12) -- line: 375
+		-- upvalues: React (copy), FriendTile (copy), v89 (copy), v90 (copy)
+		return React.createElement(FriendTile, {
+			isPlayerContextualMenuEnabled = nil,
+			user = p11,
+			createRow = p10,
+			index = p12,
+			openPlayerProfileHandle = v89,
+			pageLoadingTimeReport = v90
+		})
+	end, {
+		v90,
+		v89
+	})
+
+	return React.createElement("Frame", {
+		[Roact.Ref] = v80,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = if not v119 then v72.LuaApps.App.Page.BackgroundColor else nil,
+		BackgroundTransparency = if not v119 then v72.LuaApps.App.Page.BackgroundTransparency else 1
+	}, {
+		HorizontalPageMargin = React.createElement(HorizontalPageMargin, {
+			backgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			Padding = if not FFlagFixCohubUiBugs then nil else React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v76),
+				PaddingRight = if not v63 then nil else UDim.new(0, v76)
+			}),
+			scrollView = React.createElement(RefreshScrollingFrame, {
+				scrollingElementProps = {
+					Size = UDim2.new(1, 0, 1, -Constants.TOP_BAR_HEIGHT + (FFlagExtendScrollingFramesBySafeInsets and v117.bottom or 0)),
+					BackgroundTransparency = 1,
+					ScrollingDirection = Enum.ScrollingDirection.Y,
+					ScrollBarThickness = 0,
+					CanvasSize = UDim2.new(1, 0, 0, 0),
+					AutomaticCanvasSize = Enum.AutomaticSize.XY,
+					CanvasPosition = v114,
+					[Roact.Event.SelectionChanged] = v115,
+					Selectable = not FFlagEnableLeftNavOnConsole and nil
+				},
+				[Roact.Ref] = v112,
+				refresh = v96,
+				usesBuilderIcon = true
+			}, {
+				UISizeConstraint = if not FFlagFriendsPageUserListEnabled then nil else React.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(640, 1e999)
+				}),
+				layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Vertical
+				}),
+				pulldownSpacing = React.createElement("Frame", {
+					LayoutOrder = 0,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 1)
+				}) or nil,
+				filterByButton = if not v77 then React.createElement(FilterByButton, {
+					layoutOrder = 2,
+					analytics = v69,
+					filter = v68.filter,
+					friendCount = if v68.filter ~= filterStates.All then v98 else v99,
+					isDisabled = v99 == 0,
+					onActivated = if not FFlagConnectionManagementChips then v94 else v95,
+					maxWidth = if not FFlagConnectionManagementChips then nil else 640,
+					canAccessTrustedContacts = if not FFlagConnectionManagementChips then nil else v84
+				}) else nil,
+				NoResultsView = if not v101 then nil else React.createElement(EmptyResultsView, {
+					layoutOrder = 6
+				}),
+				NoFriendsView = if not v100 then nil else React.createElement(NoFriendsView, {
+					layoutOrder = 6,
+					pageLoadingTimeReport = v90,
+					openAddFriendsPage = v97
+				}),
+				UserListLayoutAdaptor = if not FFlagFriendsPageUserListEnabled then nil else if v101 or v100 then nil else React.createElement(UserListLayoutAdaptor, {
+					layoutOrder = 6,
+					isScrollEnabled = false,
+					layoutMode = LayoutMode.Vertical,
+					header = {
+						title = v67.peopleYouMayKnow
+					},
+					entities = t1.friends,
+					renderRow = v121,
+					hasMore = v102,
+					onLoadMore = v103
+				}),
+				FriendsGridView = if not FFlagFriendsPageUserListEnabled then if v101 or v100 then nil else React.createElement(CollectionGrid, {
+					LayoutOrder = 6,
+					containerRef = if not FFlagLuaAppsDefaultSelection then nil else v120,
+					items = t1.friends,
+					verticalScrollingFrameRef = v112,
+					renderItem = v92,
+					getItemHeight = v93,
+					numColumns = v110.itemsPerRow,
+					columnGap = GridHorizontalSpacing,
+					verticalPadding = v104,
+					onContainerSizeChanged = v111
+				}) else nil,
+				showMoreFrame = if not FFlagFriendsPageUserListEnabled then if not v102 then nil else React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 7,
+					Size = UDim2.new(1, 0, 0, Constants.CTA_BUTTON_HEIGHT)
+				}, {
+					UIPadding = React.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, 2),
+						PaddingRight = UDim.new(0, 2),
+						PaddingTop = UDim.new(0, 10)
+					}),
+					showMoreButton = React.createElement(Button, {
+						buttonType = ButtonType.Secondary,
+						size = UDim2.new(1, 0, 1, 0),
+						onActivated = v103,
+						text = v67.showMore
+					})
+				}) else nil,
+				additionalPadding = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 8,
+					Size = UDim2.new(1, 0, 0, v118)
+				})
+			})
+		})
+	})
+end
+
+return FriendsLandingPage

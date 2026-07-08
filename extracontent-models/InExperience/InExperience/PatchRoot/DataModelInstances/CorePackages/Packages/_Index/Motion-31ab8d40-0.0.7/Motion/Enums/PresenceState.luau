@@ -1,5 +1,5 @@
 return {
-    Entering = "Entering", 
-    Present = "Present", 
-    Exiting = "Exiting"
-};
+	Entering = "Entering",
+	Present = "Present",
+	Exiting = "Exiting"
+}

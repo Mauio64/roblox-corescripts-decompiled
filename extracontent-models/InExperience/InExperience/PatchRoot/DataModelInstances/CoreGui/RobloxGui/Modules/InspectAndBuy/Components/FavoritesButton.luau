@@ -1,155 +1,168 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.Colors);
-local v6 = require(l_Parent_0.Thunks.CreateFavoriteForAsset);
-local v7 = require(l_Parent_0.Thunks.DeleteFavoriteForAsset);
-local v8 = require(l_Parent_0.Thunks.CreateFavoriteForBundle);
-local v9 = require(l_Parent_0.Thunks.DeleteFavoriteForBundle);
-local v10 = require(l_Parent_0.Thunks.GetFavoriteForAsset);
-local v11 = require(l_Parent_0.Thunks.GetFavoriteForBundle);
-local v12 = require(l_Parent_0.Selectors.GotFavoriteForDetailsItem);
-local v13 = require(l_Parent_0.Selectors.IsDetailsItemPartOfBundleAndOffsale);
-local v14 = require(l_Parent_0.Selectors.GetIsFavorite);
-local v15 = require(l_Parent_0.UtilityFunctions);
-local v16 = require(l_Parent_0.getSelectionImageObjectRounded);
-local l_Favorite_0 = require(script.Parent.Common.ControllerShortcutKeycodes).Favorite;
-local v18 = v2.PureComponent:extend("FavoritesButton");
-v18.init = function(v19) --[[ Line: 28 ]] --[[ Name: init ]]
-    -- upvalues: v16 (copy), l_ContextActionService_0 (copy), l_Favorite_0 (copy)
-    v19.selectedImage = v16();
-    v19.fetchFavoriteRetries = 0;
-    l_ContextActionService_0:BindCoreAction("FavoriteGamepadShortcut", function(_, v21, _) --[[ Line: 32 ]]
-        -- upvalues: v19 (copy)
-        if v21 == Enum.UserInputState.End then
-            v19:activateButton();
-            return Enum.ContextActionResult.Sink;
-        else
-            return Enum.ContextActionResult.Pass;
-        end;
-    end, false, l_Favorite_0);
-end;
-v18.willUpdate = function(v23, v24) --[[ Line: 41 ]] --[[ Name: willUpdate ]]
-    -- upvalues: v15 (copy)
-    local l_gotFavoriteForDetailsItem_0 = v24.gotFavoriteForDetailsItem;
-    local l_getFavoriteForAsset_0 = v23.props.getFavoriteForAsset;
-    local l_getFavoriteForBundle_0 = v23.props.getFavoriteForBundle;
-    if v24 and v24.assetInfo and not l_gotFavoriteForDetailsItem_0 and v23.fetchFavoriteRetries < 10 then
-        local l_assetInfo_0 = v24.assetInfo;
-        local v29 = l_assetInfo_0 and l_assetInfo_0.parentBundleId ~= nil;
-        coroutine.wrap(function() --[[ Line: 55 ]]
-            -- upvalues: v29 (copy), l_getFavoriteForAsset_0 (copy), l_assetInfo_0 (copy), v15 (ref), l_getFavoriteForBundle_0 (copy)
-            if not v29 then
-                l_getFavoriteForAsset_0(l_assetInfo_0.assetId);
-                return;
-            else
-                local v30 = v15.getBundleId(l_assetInfo_0);
-                l_getFavoriteForBundle_0(v30);
-                return;
-            end;
-        end)();
-        v23.fetchFavoriteRetries = v23.fetchFavoriteRetries + 1;
-    end;
-end;
-v18.activateButton = function(v31) --[[ Line: 67 ]] --[[ Name: activateButton ]]
-    -- upvalues: v15 (copy)
-    local l_isFavorited_0 = v31.props.isFavorited;
-    local l_IsDetailsItemPartOfBundleAndOffsale_0 = v31.props.IsDetailsItemPartOfBundleAndOffsale;
-    local l_createFavoriteForAsset_0 = v31.props.createFavoriteForAsset;
-    local l_deleteFavoriteForAsset_0 = v31.props.deleteFavoriteForAsset;
-    local l_createFavoriteForBundle_0 = v31.props.createFavoriteForBundle;
-    local l_deleteFavoriteForBundle_0 = v31.props.deleteFavoriteForBundle;
-    local l_assetInfo_1 = v31.props.assetInfo;
-    if l_isFavorited_0 then
-        if l_IsDetailsItemPartOfBundleAndOffsale_0 then
-            l_deleteFavoriteForBundle_0((v15.getBundleId(l_assetInfo_1)));
-            return;
-        else
-            l_deleteFavoriteForAsset_0(l_assetInfo_1.assetId);
-            return;
-        end;
-    elseif l_IsDetailsItemPartOfBundleAndOffsale_0 then
-        l_createFavoriteForBundle_0((v15.getBundleId(l_assetInfo_1)));
-        return;
-    else
-        l_createFavoriteForAsset_0(l_assetInfo_1.assetId);
-        return;
-    end;
-end;
-v18.willUnmount = function(_) --[[ Line: 93 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("FavoriteGamepadShortcut");
-end;
-v18.render = function(v40) --[[ Line: 97 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v5 (copy)
-    local l_isFavorited_1 = v40.props.isFavorited;
-    local l_favoriteButtonRef_0 = v40.props.favoriteButtonRef;
-    return v2.createElement("ImageButton", {
-        AnchorPoint = Vector2.new(0.5, 0), 
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0, 44, 0, 44), 
-        LayoutOrder = 1, 
-        Image = "rbxasset://textures/ui/InspectMenu/Button_outline.png", 
-        ImageColor3 = v5.White, 
-        ScaleType = Enum.ScaleType.Slice, 
-        SliceCenter = Rect.new(5, 5, 120, 20), 
-        SelectionImageObject = v40.selectedImage, 
-        Visible = true, 
-        [v2.Ref] = l_favoriteButtonRef_0, 
-        [v2.Event.Activated] = function() --[[ Line: 114 ]]
-            -- upvalues: v40 (copy)
-            v40:activateButton();
-        end
-    }, {
-        FavoriteIcon = v2.createElement("ImageLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 26, 0, 26), 
-            Position = UDim2.new(0, 22, 0, 22), 
-            Image = l_isFavorited_1 and "rbxasset://textures/ui/InspectMenu/ico_favorite.png" or "rbxasset://textures/ui/InspectMenu/ico_favorite_off.png", 
-            ImageColor3 = v5.White
-        })
-    });
-end;
-return v3.UNSTABLE_connect2(function(v43, _) --[[ Line: 129 ]]
-    -- upvalues: v12 (copy), v14 (copy), v13 (copy)
-    local l_assetId_0 = v43.detailsInformation.assetId;
-    return {
-        view = v43.view, 
-        assetInfo = v43.assets[l_assetId_0], 
-        bundleInfo = v43.bundles, 
-        gotFavoriteForDetailsItem = v12(v43), 
-        isFavorited = v14(v43), 
-        IsDetailsItemPartOfBundleAndOffsale = v13(v43)
-    };
-end, function(v46) --[[ Line: 140 ]]
-    -- upvalues: v6 (copy), v7 (copy), v8 (copy), v9 (copy), v10 (copy), v11 (copy)
-    return {
-        createFavoriteForAsset = function(v47) --[[ Line: 142 ]] --[[ Name: createFavoriteForAsset ]]
-            -- upvalues: v46 (copy), v6 (ref)
-            v46(v6(v47));
-        end, 
-        deleteFavoriteForAsset = function(v48) --[[ Line: 145 ]] --[[ Name: deleteFavoriteForAsset ]]
-            -- upvalues: v46 (copy), v7 (ref)
-            v46(v7(v48));
-        end, 
-        createFavoriteForBundle = function(v49) --[[ Line: 148 ]] --[[ Name: createFavoriteForBundle ]]
-            -- upvalues: v46 (copy), v8 (ref)
-            v46(v8(v49));
-        end, 
-        deleteFavoriteForBundle = function(v50) --[[ Line: 151 ]] --[[ Name: deleteFavoriteForBundle ]]
-            -- upvalues: v46 (copy), v9 (ref)
-            v46(v9(v50));
-        end, 
-        getFavoriteForAsset = function(v51) --[[ Line: 154 ]] --[[ Name: getFavoriteForAsset ]]
-            -- upvalues: v46 (copy), v10 (ref)
-            v46(v10(v51));
-        end, 
-        getFavoriteForBundle = function(v52) --[[ Line: 157 ]] --[[ Name: getFavoriteForBundle ]]
-            -- upvalues: v46 (copy), v11 (ref)
-            v46(v11(v52));
-        end
-    };
-end)(v18);
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local Colors = require(ParentParent.Colors)
+local CreateFavoriteForAsset = require(ParentParent.Thunks.CreateFavoriteForAsset)
+local DeleteFavoriteForAsset = require(ParentParent.Thunks.DeleteFavoriteForAsset)
+local CreateFavoriteForBundle = require(ParentParent.Thunks.CreateFavoriteForBundle)
+local DeleteFavoriteForBundle = require(ParentParent.Thunks.DeleteFavoriteForBundle)
+local GetFavoriteForAsset = require(ParentParent.Thunks.GetFavoriteForAsset)
+local GetFavoriteForBundle = require(ParentParent.Thunks.GetFavoriteForBundle)
+local GotFavoriteForDetailsItem = require(ParentParent.Selectors.GotFavoriteForDetailsItem)
+local IsDetailsItemPartOfBundleAndOffsale = require(ParentParent.Selectors.IsDetailsItemPartOfBundleAndOffsale)
+local GetIsFavorite = require(ParentParent.Selectors.GetIsFavorite)
+local UtilityFunctions = require(ParentParent.UtilityFunctions)
+local getSelectionImageObjectRounded = require(ParentParent.getSelectionImageObjectRounded)
+local Favorite = require(script.Parent.Common.ControllerShortcutKeycodes).Favorite
+local v19 = Roact.PureComponent:extend("FavoritesButton")
+
+function v19.init(p1) -- line: 28
+	-- upvalues: getSelectionImageObjectRounded (copy), ContextActionService (copy), Favorite (copy)
+	p1.selectedImage = getSelectionImageObjectRounded()
+	p1.fetchFavoriteRetries = 0
+	ContextActionService:BindCoreAction("FavoriteGamepadShortcut", function(_, p3, _) -- line: 32
+		-- upvalues: p1 (copy)
+		if p3 == Enum.UserInputState.End then
+			p1:activateButton()
+
+			return Enum.ContextActionResult.Sink
+		end
+
+		return Enum.ContextActionResult.Pass
+	end, false, Favorite)
+end
+function v19.willUpdate(p5, p6) -- line: 41
+	-- upvalues: UtilityFunctions (copy)
+	local gotFavoriteForDetailsItem = p6.gotFavoriteForDetailsItem
+	local getFavoriteForAsset = p5.props.getFavoriteForAsset
+	local getFavoriteForBundle = p5.props.getFavoriteForBundle
+
+	if p6 and (p6.assetInfo and (not gotFavoriteForDetailsItem and p5.fetchFavoriteRetries < 10)) then
+		local assetInfo = p6.assetInfo
+		local v27 = assetInfo and assetInfo.parentBundleId ~= nil
+
+		coroutine.wrap(function() -- line: 55
+			-- upvalues: v27 (copy), getFavoriteForAsset (copy), assetInfo (copy), UtilityFunctions (copy), getFavoriteForBundle (copy)
+			if not v27 then
+				getFavoriteForAsset(assetInfo.assetId)
+
+				return
+			end
+
+			local v47 = UtilityFunctions.getBundleId(assetInfo)
+
+			getFavoriteForBundle(v47)
+		end)()
+		p5.fetchFavoriteRetries = p5.fetchFavoriteRetries + 1
+	end
+end
+function v19.activateButton(p7) -- line: 67
+	-- upvalues: UtilityFunctions (copy)
+	local isFavorited = p7.props.isFavorited
+	local IsDetailsItemPartOfBundleAndOffsale2 = p7.props.IsDetailsItemPartOfBundleAndOffsale
+	local createFavoriteForAsset = p7.props.createFavoriteForAsset
+	local deleteFavoriteForAsset = p7.props.deleteFavoriteForAsset
+	local createFavoriteForBundle = p7.props.createFavoriteForBundle
+	local deleteFavoriteForBundle = p7.props.deleteFavoriteForBundle
+	local assetInfo = p7.props.assetInfo
+
+	if isFavorited then
+		if IsDetailsItemPartOfBundleAndOffsale2 then
+			deleteFavoriteForBundle((UtilityFunctions.getBundleId(assetInfo)))
+
+			return
+		end
+
+		deleteFavoriteForAsset(assetInfo.assetId)
+
+		return
+	end
+
+	if IsDetailsItemPartOfBundleAndOffsale2 then
+		createFavoriteForBundle((UtilityFunctions.getBundleId(assetInfo)))
+
+		return
+	end
+
+	createFavoriteForAsset(assetInfo.assetId)
+end
+function v19.willUnmount(_) -- line: 93
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("FavoriteGamepadShortcut")
+end
+function v19.render(p9) -- line: 97
+	-- upvalues: Roact (copy), Colors (copy)
+	local isFavorited = p9.props.isFavorited
+	local favoriteButtonRef = p9.props.favoriteButtonRef
+
+	return Roact.createElement("ImageButton", {
+		AnchorPoint = Vector2.new(0.5, 0),
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 44, 0, 44),
+		LayoutOrder = 1,
+		Image = "rbxasset://textures/ui/InspectMenu/Button_outline.png",
+		ImageColor3 = Colors.White,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(5, 5, 120, 20),
+		SelectionImageObject = p9.selectedImage,
+		Visible = true,
+		[Roact.Ref] = favoriteButtonRef,
+		[Roact.Event.Activated] = function() -- line: 114
+			-- upvalues: p9 (copy)
+			p9:activateButton()
+		end
+	}, {
+		FavoriteIcon = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.new(0, 26, 0, 26),
+			Position = UDim2.new(0, 22, 0, 22),
+			Image = not isFavorited and "rbxasset://textures/ui/InspectMenu/ico_favorite_off.png" or "rbxasset://textures/ui/InspectMenu/ico_favorite.png",
+			ImageColor3 = Colors.White
+		})
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p10, _) -- line: 129
+	-- upvalues: GotFavoriteForDetailsItem (copy), GetIsFavorite (copy), IsDetailsItemPartOfBundleAndOffsale (copy)
+	local assetId = p10.detailsInformation.assetId
+
+	return {
+		view = p10.view,
+		assetInfo = p10.assets[assetId],
+		bundleInfo = p10.bundles,
+		gotFavoriteForDetailsItem = GotFavoriteForDetailsItem(p10),
+		isFavorited = GetIsFavorite(p10),
+		IsDetailsItemPartOfBundleAndOffsale = IsDetailsItemPartOfBundleAndOffsale(p10)
+	}
+end, function(p12) -- line: 140
+	-- upvalues: CreateFavoriteForAsset (copy), DeleteFavoriteForAsset (copy), CreateFavoriteForBundle (copy), DeleteFavoriteForBundle (copy), GetFavoriteForAsset (copy), GetFavoriteForBundle (copy)
+	return {
+		createFavoriteForAsset = function(p13) -- line: 142
+			-- upvalues: p12 (copy), CreateFavoriteForAsset (copy)
+			p12(CreateFavoriteForAsset(p13))
+		end,
+		deleteFavoriteForAsset = function(p14) -- line: 145
+			-- upvalues: p12 (copy), DeleteFavoriteForAsset (copy)
+			p12(DeleteFavoriteForAsset(p14))
+		end,
+		createFavoriteForBundle = function(p15) -- line: 148
+			-- upvalues: p12 (copy), CreateFavoriteForBundle (copy)
+			p12(CreateFavoriteForBundle(p15))
+		end,
+		deleteFavoriteForBundle = function(p16) -- line: 151
+			-- upvalues: p12 (copy), DeleteFavoriteForBundle (copy)
+			p12(DeleteFavoriteForBundle(p16))
+		end,
+		getFavoriteForAsset = function(p17) -- line: 154
+			-- upvalues: p12 (copy), GetFavoriteForAsset (copy)
+			p12(GetFavoriteForAsset(p17))
+		end,
+		getFavoriteForBundle = function(p18) -- line: 157
+			-- upvalues: p12 (copy), GetFavoriteForBundle (copy)
+			p12(GetFavoriteForBundle(p18))
+		end
+	}
+end)(v19)

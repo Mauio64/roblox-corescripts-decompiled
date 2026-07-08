@@ -1,7 +1,9 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: assetIdAsContent ]]
-    if typeof(v0) == "string" and v0:find("^.+://") then
-        return v0;
-    else
-        return (("rbxassetid://%*"):format(v0));
-    end;
-end;
+local function assetIdAsContent(p1) -- line: 1
+	if typeof(p1) == "string" and p1:find("^.+://") then
+		return p1
+	end
+
+	return `rbxassetid://{ p1 }`
+end
+
+return assetIdAsContent

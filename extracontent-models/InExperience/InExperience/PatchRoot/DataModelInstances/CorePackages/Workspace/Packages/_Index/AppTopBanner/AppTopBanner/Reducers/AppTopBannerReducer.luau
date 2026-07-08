@@ -1,51 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppTopBanner");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Rodux);
-local v4 = require(l_script_FirstAncestor_0.Enums.AppTopBannerType);
-local v5 = require(l_script_FirstAncestor_0.Constants);
-local v6 = require(l_script_FirstAncestor_0.Actions.SetAppTopBanner);
-local v7 = require(l_script_FirstAncestor_0.Actions.DisableAppTopBanner);
-local v8 = {
-    isDisabled = true, 
-    expanded = false, 
-    appTopBannerType = v4.None, 
-    appTopBannerContentProps = nil, 
-    appTopBannerContentHeight = 0, 
-    onAppTopBannerClick = function() --[[ Line: 37 ]] --[[ Name: onAppTopBannerClick ]]
+local AppTopBanner = script:FindFirstAncestor("AppTopBanner")
+local AppTopBannerParent = AppTopBanner.Parent
+local Cryo = require(AppTopBannerParent.Cryo)
+local Rodux = require(AppTopBannerParent.Rodux)
+local AppTopBannerType = require(AppTopBanner.Enums.AppTopBannerType)
+local Constants = require(AppTopBanner.Constants)
+local SetAppTopBanner = require(AppTopBanner.Actions.SetAppTopBanner)
+local DisableAppTopBanner = require(AppTopBanner.Actions.DisableAppTopBanner)
+local t1 = {
+	isDisabled = true,
+	expanded = false,
+	appTopBannerContentProps = nil,
+	appTopBannerContentHeight = 0,
+	appTopBannerType = AppTopBannerType.None,
+	onAppTopBannerClick = function() -- line: 37
+	end
+}
 
-    end
-};
-return v3.createReducer(v8, {
-    [v6.name] = function(v9, v10) --[[ Line: 41 ]]
-        -- upvalues: v2 (copy), v5 (copy), v8 (copy)
-        local l_isDisabled_0 = v9.isDisabled;
-        if v10.expanded then
-            return (v2.Dictionary.join(v9, {
-                expanded = v10.expanded, 
-                appTopBannerType = v10.appTopBannerType, 
-                appTopBannerContentProps = v10.appTopBannerContentProps, 
-                onAppTopBannerClick = v10.onAppTopBannerClick, 
-                appTopBannerContentHeight = v10.appTopBannerContentHeight or v5.CONTENT_HEIGHT, 
-                isDisabled = l_isDisabled_0
-            }));
-        else
-            if v9.expanded ~= v10.expanded then
-                v9 = v2.Dictionary.join(v8, {
-                    isDisabled = l_isDisabled_0
-                });
-            end;
-            return v9;
-        end;
-    end, 
-    [v7.name] = function(v12, v13) --[[ Line: 61 ]]
-        -- upvalues: v2 (copy)
-        if v12.isDisabled == v13.isDisabled then
-            return v12;
-        else
-            return (v2.Dictionary.join(v12, {
-                isDisabled = not v12.isDisabled
-            }));
-        end;
-    end
-});
+return Rodux.createReducer(t1, {
+	[SetAppTopBanner.name] = function(t2: {[any]: any}, t3: {[any]: any}) -- line: 41
+		-- upvalues: Cryo (copy), Constants (copy), t1 (copy)
+		local isDisabled = t2.isDisabled
+
+		if t3.expanded then
+			return (Cryo.Dictionary.join(t2, {
+				expanded = t3.expanded,
+				appTopBannerType = t3.appTopBannerType,
+				appTopBannerContentProps = t3.appTopBannerContentProps,
+				onAppTopBannerClick = t3.onAppTopBannerClick,
+				appTopBannerContentHeight = t3.appTopBannerContentHeight or Constants.CONTENT_HEIGHT,
+				isDisabled = isDisabled
+			}))
+		end
+
+		if t2.expanded ~= t3.expanded then
+			t2 = Cryo.Dictionary.join(t1, {
+				isDisabled = isDisabled
+			})
+		end
+
+		return t2
+	end,
+	[DisableAppTopBanner.name] = function(t4: {[any]: any}, t5: {[any]: any}) -- line: 61
+		-- upvalues: Cryo (copy)
+		if t4.isDisabled == t5.isDisabled then
+			return t4
+		end
+
+		return (Cryo.Dictionary.join(t4, {
+			isDisabled = not t4.isDisabled
+		}))
+	end
+})

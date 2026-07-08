@@ -14,7 +14,7 @@ return function() -- line: 16
 		setSavedPasswordAfterLogin = v6,
 		getPasswordManagerMediatedSignup = v7,
 		setPasswordManagerMediatedSignup = v8,
-		resetAll = function() --[[ resetAll ]] -- line: 21
+		resetAll = function() -- line: 21
 			-- upvalues: v4 (copy), v6 (copy), v8 (copy)
 			v4(false)
 			v6(false)

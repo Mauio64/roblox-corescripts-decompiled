@@ -1,83 +1,90 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.Cryo);
-local v4 = require(l_Parent_1.t);
-local v5 = require(l_Parent_0.Core.ImageSet.ImageSetComponent);
-local v6 = require(l_Parent_0.Core.Text.GenericTextLabel.GenericTextLabel);
-local v7 = require(l_Parent_0.Core.Text.GetTextSize);
-local v8 = require(l_Parent_0.Core.Text.GetWrappedTextWithIcon);
-local v9 = require(l_Parent_0.Core.Style.Validator.validateFontInfo);
-local v10 = require(l_Parent_0.Core.Style.Validator.validateTypographyInfo);
-local v11 = require(l_Parent_0.Core.Style.Validator.validateColorInfo);
-local v12 = require(l_Parent_0.Core.Style.withStyle);
-local v13 = v2.PureComponent:extend("ImageTextLabel");
-v13.validateProps = v4.interface({
-    imageProps = v4.optional(v4.interface({
-        Size = v4.UDim2
-    })), 
-    genericTextLabelProps = v4.interface({
-        Text = v4.string, 
-        fontStyle = v4.union(v9, v10), 
-        colorStyle = v11, 
-        fluidSizing = v4.optional(v4.boolean), 
-        AnchorPoint = v4.None, 
-        Position = v4.None, 
-        Size = v4.None, 
-        TextXAlignment = v4.None, 
-        TextYAlignment = v4.None, 
-        TextScaled = v4.None, 
-        maxSize = v4.None, 
-        richText = v4.optional(v4.boolean)
-    }), 
-    frameProps = v4.optional(v4.interface({
-        Size = v4.None
-    })), 
-    maxSize = v4.optional(v4.Vector2), 
-    padding = v4.optional(v4.number)
-});
-v13.defaultProps = {
-    maxSize = Vector2.new(10000, 10000), 
-    frameProps = {}, 
-    padding = 0
-};
-v13.render = function(v14) --[[ Line: 68 ]] --[[ Name: render ]]
-    -- upvalues: v12 (copy), v8 (copy), v7 (copy), v2 (copy), v3 (copy), v5 (copy), v6 (copy)
-    local l_genericTextLabelProps_0 = v14.props.genericTextLabelProps;
-    local l_imageProps_0 = v14.props.imageProps;
-    local l_frameProps_0 = v14.props.frameProps;
-    local l_padding_0 = v14.props.padding;
-    local l_Text_0 = v14.props.genericTextLabelProps.Text;
-    local l_maxSize_0 = v14.props.maxSize;
-    local l_useMaxHeight_0 = v14.props.useMaxHeight;
-    local l_richText_0 = v14.props.richText;
-    return v12(function(v23) --[[ Line: 78 ]]
-        -- upvalues: l_genericTextLabelProps_0 (copy), l_imageProps_0 (copy), l_Text_0 (ref), v8 (ref), l_padding_0 (copy), v7 (ref), l_maxSize_0 (copy), l_useMaxHeight_0 (copy), v2 (ref), v3 (ref), l_frameProps_0 (copy), v5 (ref), v6 (ref), v14 (copy), l_richText_0 (copy)
-        local l_fontStyle_0 = l_genericTextLabelProps_0.fontStyle;
-        local l_BaseSize_0 = v23.Font.BaseSize;
-        local v26 = if l_fontStyle_0.RelativeSize then l_BaseSize_0 * l_fontStyle_0.RelativeSize else l_fontStyle_0.FontSize;
-        local l_Font_0 = l_fontStyle_0.Font;
-        if l_imageProps_0 then
-            l_Text_0 = v8(l_Text_0, v26, l_Font_0, l_imageProps_0.Size.X.Offset, l_padding_0);
-        end;
-        local v28 = v7(l_Text_0, v26, l_Font_0, Vector2.new(l_maxSize_0.X, l_maxSize_0.Y));
-        local v29 = l_useMaxHeight_0 and l_maxSize_0.Y or v28.Y;
-        return v2.createElement("Frame", v3.Dictionary.join(l_frameProps_0, {
-            Size = UDim2.new(0, v28.X, 0, v29)
-        }), {
-            Icon = if l_imageProps_0 then v2.createElement(v5.Label, l_imageProps_0) else nil, 
-            Name = v2.createElement(v6, v3.Dictionary.join(l_genericTextLabelProps_0, {
-                Text = l_Text_0, 
-                AnchorPoint = Vector2.new(0, 0), 
-                Position = UDim2.new(0, 0, 0, 0), 
-                Size = UDim2.new(1, 0, 1, 0), 
-                TextXAlignment = l_genericTextLabelProps_0.TextXAlignment or Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                fluidSizing = not l_imageProps_0 and v14.props.fluidSizing, 
-                maxSize = l_maxSize_0, 
-                RichText = l_richText_0
-            }))
-        });
-    end);
-end;
-return v13;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local Cryo = require(ParentParentParent.Cryo)
+local t = require(ParentParentParent.t)
+local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
+local GenericTextLabel = require(ParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
+local GetTextSize = require(ParentParent.Core.Text.GetTextSize)
+local GetWrappedTextWithIcon = require(ParentParent.Core.Text.GetWrappedTextWithIcon)
+local validateFontInfo = require(ParentParent.Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(ParentParent.Core.Style.Validator.validateTypographyInfo)
+local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
+local withStyle = require(ParentParent.Core.Style.withStyle)
+local v14 = Roact.PureComponent:extend("ImageTextLabel")
+
+v14.validateProps = t.interface({
+	imageProps = t.optional(t.interface({
+		Size = t.UDim2
+	})),
+	genericTextLabelProps = t.interface({
+		Text = t.string,
+		fontStyle = t.union(validateFontInfo, validateTypographyInfo),
+		colorStyle = validateColorInfo,
+		fluidSizing = t.optional(t.boolean),
+		AnchorPoint = t.None,
+		Position = t.None,
+		Size = t.None,
+		TextXAlignment = t.None,
+		TextYAlignment = t.None,
+		TextScaled = t.None,
+		maxSize = t.None,
+		richText = t.optional(t.boolean)
+	}),
+	frameProps = t.optional(t.interface({
+		Size = t.None
+	})),
+	maxSize = t.optional(t.Vector2),
+	padding = t.optional(t.number)
+})
+v14.defaultProps = {
+	padding = 0,
+	maxSize = Vector2.new(10000, 10000),
+	frameProps = {}
+}
+
+function v14.render(p1) -- line: 68
+	-- upvalues: withStyle (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), Roact (copy), Cryo (copy), ImageSetComponent (copy), GenericTextLabel (copy)
+	local genericTextLabelProps = p1.props.genericTextLabelProps
+	local imageProps = p1.props.imageProps
+	local frameProps = p1.props.frameProps
+	local padding = p1.props.padding
+	local genericTextLabelPropsText = p1.props.genericTextLabelProps.Text
+	local maxSize = p1.props.maxSize
+	local useMaxHeight = p1.props.useMaxHeight
+	local richText = p1.props.richText
+
+	return withStyle(function(p2) -- line: 78
+		-- upvalues: genericTextLabelProps (copy), imageProps (copy), genericTextLabelPropsText (ref), GetWrappedTextWithIcon (copy), padding (copy), GetTextSize (copy), maxSize (copy), useMaxHeight (copy), Roact (copy), Cryo (copy), frameProps (copy), ImageSetComponent (copy), GenericTextLabel (copy), p1 (copy), richText (copy)
+		local fontStyle = genericTextLabelProps.fontStyle
+		local BaseSize = p2.Font.BaseSize
+		local v27 = if not fontStyle.RelativeSize then fontStyle.FontSize else BaseSize * fontStyle.RelativeSize
+		local fontStyleFont = fontStyle.Font
+
+		if imageProps then
+			genericTextLabelPropsText = GetWrappedTextWithIcon(genericTextLabelPropsText, v27, fontStyleFont, imageProps.Size.X.Offset, padding)
+		end
+
+		local v29 = GetTextSize(genericTextLabelPropsText, v27, fontStyleFont, Vector2.new(maxSize.X, maxSize.Y))
+		local v30 = useMaxHeight and maxSize.Y or v29.Y
+
+		return Roact.createElement("Frame", Cryo.Dictionary.join(frameProps, {
+			Size = UDim2.new(0, v29.X, 0, v30)
+		}), {
+			Icon = if not imageProps then nil else Roact.createElement(ImageSetComponent.Label, imageProps),
+			Name = Roact.createElement(GenericTextLabel, Cryo.Dictionary.join(genericTextLabelProps, {
+				Text = genericTextLabelPropsText,
+				AnchorPoint = Vector2.new(0, 0),
+				Position = UDim2.new(0, 0, 0, 0),
+				Size = UDim2.new(1, 0, 1, 0),
+				TextXAlignment = genericTextLabelProps.TextXAlignment or Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				fluidSizing = not imageProps and p1.props.fluidSizing,
+				maxSize = maxSize,
+				RichText = richText
+			}))
+		})
+	end)
+end
+
+return v14

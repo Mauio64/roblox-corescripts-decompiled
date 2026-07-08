@@ -1,40 +1,46 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v5 = require(l_Parent_0.Resources.FTUXSlideshowData);
-local v6 = require(l_CorePackages_0.Packages.LuauPolyfill);
-local _ = require(l_Parent_0.Enums.PlatformEnum);
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-return function(v9) --[[ Line: 19 ]] --[[ Name: Description ]]
-    -- upvalues: l_useStyle_0 (copy), v5 (copy), l_withLocalization_0 (copy), v1 (copy), v6 (copy), v2 (copy)
-    local v10 = l_useStyle_0();
-    local l_Theme_0 = v10.Theme;
-    local l_Font_0 = v10.Font;
-    local l_text_0 = v5[v9.platform][v9.currentIndex].text;
-    return l_withLocalization_0(l_text_0)(function(v14) --[[ Line: 28 ]]
-        -- upvalues: v1 (ref), v6 (ref), l_text_0 (copy), v2 (ref), l_Font_0 (copy), l_Theme_0 (copy)
-        return v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0.4, 0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            LayoutOrder = 2, 
-            BackgroundTransparency = 1
-        }, v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, 0), 
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), v6.Array.map(l_text_0, function(_, v16) --[[ Line: 43 ]]
-            -- upvalues: v1 (ref), v2 (ref), v14 (copy), l_Font_0 (ref), l_Theme_0 (ref), l_text_0 (ref)
-            return (v1.createElement(v2.App.Text.StyledTextLabel, {
-                text = v14[v16], 
-                fontStyle = l_Font_0.CaptionBody, 
-                colorStyle = l_Theme_0.TextDefault, 
-                textXAlignment = Enum.TextXAlignment.Left, 
-                size = UDim2.new(1, 0, 1 / #l_text_0, 0), 
-                layoutOrder = v16
-            }));
-        end));
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local ParentParent = script.Parent.Parent.Parent
+local FTUXSlideshowData = require(ParentParent.Resources.FTUXSlideshowData)
+local LuauPolyfill = require(CorePackages.Packages.LuauPolyfill)
+
+require(ParentParent.Enums.PlatformEnum)
+
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+
+local function Description(t1: {[any]: any}) -- line: 19
+	-- upvalues: useStyle (copy), FTUXSlideshowData (copy), withLocalization (copy), React (copy), LuauPolyfill (copy), UIBlox (copy)
+	local v11 = useStyle()
+	local Theme = v11.Theme
+	local Font = v11.Font
+	local text = FTUXSlideshowData[t1.platform][t1.currentIndex].text
+
+	return withLocalization(text)(function(p1) -- line: 28
+		-- upvalues: React (copy), LuauPolyfill (copy), text (copy), UIBlox (copy), Font (copy), Theme (copy)
+		return React.createElement("Frame", {
+			LayoutOrder = 2,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0.4, 0),
+			Position = UDim2.new(0, 0, 0, 0)
+		}, React.createElement("UIListLayout", {
+			Padding = UDim.new(0, 0),
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}), LuauPolyfill.Array.map(text, function(_, p3) -- line: 43
+			-- upvalues: React (copy), UIBlox (copy), p1 (copy), Font (copy), Theme (copy), text (copy)
+			return (React.createElement(UIBlox.App.Text.StyledTextLabel, {
+				text = p1[p3],
+				fontStyle = Font.CaptionBody,
+				colorStyle = Theme.TextDefault,
+				textXAlignment = Enum.TextXAlignment.Left,
+				size = UDim2.new(1, 0, 1 / #text, 0),
+				layoutOrder = p3
+			}))
+		end))
+	end)
+end
+
+return Description

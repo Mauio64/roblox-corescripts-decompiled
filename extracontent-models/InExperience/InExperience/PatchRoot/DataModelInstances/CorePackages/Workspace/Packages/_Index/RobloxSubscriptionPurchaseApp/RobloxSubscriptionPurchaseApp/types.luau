@@ -1,5 +1,8 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local _ = require(l_script_FirstAncestor_0.Enums.RobloxSubscriptionFlowCompleteReason);
-local _ = require(l_script_FirstAncestor_0.Enums.SurfaceContext);
-local _ = require(l_script_FirstAncestor_0.Enums.SurfaceName);
-return {};
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+
+require(RobloxSubscriptionPurchaseApp.Enums.RobloxSubscriptionFlowCompleteReason)
+require(RobloxSubscriptionPurchaseApp.Enums.SurfaceContext)
+require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
+require(RobloxSubscriptionPurchaseApp.Enums.PurchaseClientSessionIdType)
+
+return {}

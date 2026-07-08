@@ -1,17 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-return function(v2, ...) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    v1.isType(v2, "table", "isKeyCodePressed.pressedKeys");
-    local v3 = {
-        ...
-    };
-    for _, v5 in ipairs(v2) do
-        for _, v7 in ipairs(v3) do
-            if v5.KeyCode == v7 then
-                return true;
-            end;
-        end;
-    end;
-    return false;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local ArgCheck = require(Parent.ArgCheck)
+
+return function(p1, ...) -- line: 6
+	-- upvalues: ArgCheck (copy)
+	ArgCheck.isType(p1, "table", "isKeyCodePressed.pressedKeys")
+
+	for _, v in ipairs(p1) do
+		for _, v2 in ipairs({ ... }) do
+			if v2 == v.KeyCode then
+				return true
+			end
+		end
+	end
+
+	return false
+end

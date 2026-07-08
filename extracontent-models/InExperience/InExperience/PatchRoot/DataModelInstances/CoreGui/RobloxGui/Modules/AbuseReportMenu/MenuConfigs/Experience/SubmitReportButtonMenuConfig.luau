@@ -1,75 +1,90 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_Players_0 = game:GetService("Players");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v4 = require(l_script_FirstAncestor_0.Components.Constants);
-local v5 = require(l_script_FirstAncestor_0.IXP.TnSIXPWrapper);
-local v6 = require(l_script_FirstAncestor_0.ReportAnything.Utility.AbuseReportBuilder);
-local v7 = require(l_script_FirstAncestor_0.Analytics.ReportAbuseAnalytics);
-local v8 = require(l_script_FirstAncestor_0.MenuConfigs.getToastMessageFromAbuseReason);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+local TnSIXPWrapper = require(AbuseReportMenu.IXP.TnSIXPWrapper)
+local AbuseReportBuilder = require(AbuseReportMenu.ReportAnything.Utility.AbuseReportBuilder)
+local ReportAbuseAnalytics = require(AbuseReportMenu.Analytics.ReportAbuseAnalytics)
+local getToastMessageFromAbuseReason = require(AbuseReportMenu.MenuConfigs.getToastMessageFromAbuseReason)
+
 return {
-    componentType = "button", 
-    getIsVisible = function(_) --[[ Line: 14 ]] --[[ Name: getIsVisible ]]
-        return true;
-    end, 
-    variant = "primary", 
-    getIconSrc = function(_) --[[ Line: 18 ]] --[[ Name: getIconSrc ]]
-        return "";
-    end, 
-    getButtonLabel = function(_) --[[ Line: 21 ]] --[[ Name: getButtonLabel ]]
-        return "SubmitButton";
-    end, 
-    onClick = function(v12, _, v14) --[[ Line: 24 ]] --[[ Name: onClick ]]
-        -- upvalues: l_Players_0 (copy), v5 (copy), v6 (copy), v7 (copy), v4 (copy), v8 (copy), l_MarketplaceService_0 (copy)
-        local l_abuseReason_0 = v12.abuseReason;
-        if l_abuseReason_0 ~= nil and l_Players_0.LocalPlayer ~= nil then
-            if v5.getReportAnythingExperienceEnabled() then
-                local v16 = v6.buildExperienceReportRequest({
-                    localUserId = l_Players_0.LocalPlayer.UserId, 
-                    placeId = game.PlaceId, 
-                    abuseComment = v12.comment, 
-                    abuseReason = l_abuseReason_0, 
-                    menuEntryPoint = v7:getAbuseReportSessionEntryPoint(), 
-                    variant = v6.Constants.Variant.NM
-                }, v14.reportAnythingState, v14.reportAnythingAnalytics.getAccumulatedParameters());
-                l_Players_0:ReportAbuseV3(l_Players_0.LocalPlayer, v16);
-                v14.analyticsDispatch({
-                    type = v4.AnalyticsActions.SetSubmissionCompleted
-                });
-                local v17 = v8(l_abuseReason_0, true);
-                v14.onReportComplete(v17);
-                return;
-            else
-                spawn(function() --[[ Line: 49 ]]
-                    -- upvalues: l_MarketplaceService_0 (ref), v12 (copy), l_Players_0 (ref), l_abuseReason_0 (copy)
-                    local v18 = tostring(game.PlaceId);
-                    local v19 = "N/A";
-                    local v20 = "N/A";
-                    pcall(function() --[[ Line: 51 ]]
-                        -- upvalues: l_MarketplaceService_0 (ref), v19 (ref), v20 (ref)
-                        if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                            local l_l_MarketplaceService_0_ProductInfoAsync_0 = l_MarketplaceService_0:GetProductInfoAsync(game.PlaceId, Enum.InfoType.Asset);
-                            v19 = l_l_MarketplaceService_0_ProductInfoAsync_0.Name;
-                            v20 = l_l_MarketplaceService_0_ProductInfoAsync_0.Description;
-                            return;
-                        else
-                            local l_l_MarketplaceService_0_ProductInfo_0 = l_MarketplaceService_0:GetProductInfo(game.PlaceId, Enum.InfoType.Asset);
-                            v19 = l_l_MarketplaceService_0_ProductInfo_0.Name;
-                            v20 = l_l_MarketplaceService_0_ProductInfo_0.Description;
-                            return;
-                        end;
-                    end);
-                    local v23 = string.format("User Report: \n    %s \nPlace Title: \n    %s \nPlaceId: \n    %s \nPlace Description: \n    %s \n", v12.comment, v19, v18, v20);
-                    l_Players_0:ReportAbuse(nil, l_abuseReason_0, v23);
-                end);
-                v14.analyticsDispatch({
-                    type = v4.AnalyticsActions.SetSubmissionCompleted
-                });
-                local v24 = v8(l_abuseReason_0);
-                v14.onReportComplete(v24);
-            end;
-        end;
-    end, 
-    fieldLabel = "", 
-    componentName = "SubmitButton"
-};
+	componentType = "button",
+	variant = "primary",
+	fieldLabel = "",
+	componentName = "SubmitButton",
+	getIsVisible = function(_) -- line: 14
+		return true
+	end,
+	getIconSrc = function(_) -- line: 18
+		return ""
+	end,
+	getButtonLabel = function(_) -- line: 21
+		return "SubmitButton"
+	end,
+	onClick = function(p4, _, p6) -- line: 24
+		-- upvalues: Players (copy), TnSIXPWrapper (copy), AbuseReportBuilder (copy), ReportAbuseAnalytics (copy), Constants (copy), getToastMessageFromAbuseReason (copy), MarketplaceService (copy)
+		local abuseReason = p4.abuseReason
+
+		if abuseReason ~= nil and Players.LocalPlayer ~= nil then
+			if TnSIXPWrapper.getReportAnythingExperienceEnabled() then
+				local v16 = AbuseReportBuilder.buildExperienceReportRequest({
+					localUserId = Players.LocalPlayer.UserId,
+					placeId = game.PlaceId,
+					abuseComment = p4.comment,
+					abuseReason = abuseReason,
+					menuEntryPoint = ReportAbuseAnalytics:getAbuseReportSessionEntryPoint(),
+					variant = AbuseReportBuilder.Constants.Variant.NM
+				}, p6.reportAnythingState, p6.reportAnythingAnalytics.getAccumulatedParameters())
+
+				Players:ReportAbuseV3(Players.LocalPlayer, v16)
+				p6.analyticsDispatch({
+					type = Constants.AnalyticsActions.SetSubmissionCompleted
+				})
+
+				local v17 = getToastMessageFromAbuseReason(abuseReason, true)
+
+				p6.onReportComplete(v17)
+
+				return
+			end
+
+			spawn(function() -- line: 49
+				-- upvalues: MarketplaceService (copy), p4 (copy), Players (copy), abuseReason (copy)
+				local str = tostring(game.PlaceId)
+				local s1 = "N/A"
+				local s2 = "N/A"
+
+				pcall(function() -- line: 51
+					-- upvalues: MarketplaceService (copy), s1 (ref), s2 (ref)
+					if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+						local ProductInfoAsync = MarketplaceService:GetProductInfoAsync(game.PlaceId, Enum.InfoType.Asset)
+
+						s1 = ProductInfoAsync.Name
+						s2 = ProductInfoAsync.Description
+
+						return
+					end
+
+					local ProductInfo = MarketplaceService:GetProductInfo(game.PlaceId, Enum.InfoType.Asset)
+
+					s1 = ProductInfo.Name
+					s2 = ProductInfo.Description
+				end)
+
+				local v22 = string.format("User Report: \n    %s \nPlace Title: \n    %s \nPlaceId: \n    %s \nPlace Description: \n    %s \n", p4.comment, s1, str, s2)
+
+				Players:ReportAbuse(nil, abuseReason, v22)
+			end)
+			p6.analyticsDispatch({
+				type = Constants.AnalyticsActions.SetSubmissionCompleted
+			})
+
+			local v18 = getToastMessageFromAbuseReason(abuseReason)
+
+			p6.onReportComplete(v18)
+		end
+	end
+}

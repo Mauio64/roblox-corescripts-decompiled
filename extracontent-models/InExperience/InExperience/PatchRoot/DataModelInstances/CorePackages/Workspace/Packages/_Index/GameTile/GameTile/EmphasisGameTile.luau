@@ -35,71 +35,70 @@ local sponsoredGamesRecordClick = require(GameTileParent.DiscoveryAnalytics).Req
 local useTagAsViewportAutoplayCandidate = require(GameTileParent.VideoUtils).useTagAsViewportAutoplayCandidate
 local GameTileThumbnailBadges = require(GameTile.Overlays.GameTileThumbnailBadges)
 local v34 = game:DefineFastFlag("WrapEmphasisTileDescriptionText", false)
-local FFlagLuaAppTwoByOneTileTelemetryFix = require(GameTileParent.SharedFlags).FFlagLuaAppTwoByOneTileTelemetryFix
 local FFlagLuaAppGameTileLockedBadge = require(GameTileParent.SharedFlags).FFlagLuaAppGameTileLockedBadge
-local v37 = game:DefineFastFlag("LuaAppFixEmphasisHoverLogic", false)
+local v36 = game:DefineFastFlag("LuaAppFixEmphasisHoverLogic", false)
 local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(GameTileParent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
-local FFlagLuaAppSupportPrimaryMediaContentMetadata = require(GameTileParent.SharedFlags).FFlagLuaAppSupportPrimaryMediaContentMetadata
 local FFlagLuaAppHomeTouchAutoplay = require(GameTileParent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
 local FFlagLuaAppTileVideoCandidateOnly = require(GameTileParent.SharedFlags).FFlagLuaAppTileVideoCandidateOnly
+local FFlagLuaAppFixCustomTileBugs = require(GameTileParent.SharedFlags).FFlagLuaAppFixCustomTileBugs
 
 return function(t1: {[any]: any}) -- line: 92
-	-- upvalues: useDesignTokens (copy), useTokens (copy), useSelector (copy), GameInfosReducer (copy), useRoactService (copy), RoactNetworking (copy), useDispatch (copy), React (copy), ApiFetchGameDetails (copy), getGameTileLayoutData (copy), FFlagLuaAppSupportPrimaryMediaContentMetadata (copy), ItemLayoutDataParsingUtils (copy), formatExperienceThumbnail (copy), BigGameIconReducer (copy), GameTileViewConfig (copy), v37 (copy), IsVRAppBuild (copy), useIsHoveredTile (copy), HoverTileCoordinator (copy), FFlagLuaAppTwoByOneTileTelemetryFix (copy), GameCollectionItemTypes (copy), sponsoredGamesRecordClick (copy), AppExperienceActionRow (copy), GridTileTextFooter (copy), CreatorNameMetadata (copy), GameStats (copy), GameTileConstants (copy), v34 (copy), ImpressionsTagUtility (copy), FFlagLuaAppHomeTouchAutoplay (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), GameTileThumbnailBadges (copy), GameTileView (copy), UserGameSettings (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
-	local v43 = useDesignTokens()
-	local v44 = useTokens()
+	-- upvalues: useDesignTokens (copy), useTokens (copy), useSelector (copy), GameInfosReducer (copy), useRoactService (copy), RoactNetworking (copy), useDispatch (copy), React (copy), ApiFetchGameDetails (copy), getGameTileLayoutData (copy), ItemLayoutDataParsingUtils (copy), formatExperienceThumbnail (copy), BigGameIconReducer (copy), GameTileViewConfig (copy), v36 (copy), IsVRAppBuild (copy), useIsHoveredTile (copy), HoverTileCoordinator (copy), GameCollectionItemTypes (copy), sponsoredGamesRecordClick (copy), AppExperienceActionRow (copy), GridTileTextFooter (copy), CreatorNameMetadata (copy), GameStats (copy), GameTileConstants (copy), v34 (copy), ImpressionsTagUtility (copy), FFlagLuaAppHomeTouchAutoplay (copy), useTagAsViewportAutoplayCandidate (copy), FFlagLuaAppTileVideoCandidateOnly (copy), FFlagLuaAppGameTileLockedBadge (copy), getTileBadgeByPositionConfigFromEntry (copy), GameTileThumbnailBadges (copy), GameTileView (copy), FFlagLuaAppFixCustomTileBugs (copy), UserGameSettings (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
+	local v42 = useDesignTokens()
+	local v43 = useTokens()
 	local universeId = t1.entry.universeId
-	local v46 = useSelector(function(p1) -- line: 100
+	local v45 = useSelector(function(p1) -- line: 100
 		-- upvalues: GameInfosReducer (copy), universeId (copy)
 		return p1.Personalization[GameInfosReducer.key][universeId]
 	end)
-	local v47 = useSelector(function(p2) -- line: 103
+	local v46 = useSelector(function(p2) -- line: 103
 		-- upvalues: universeId (copy)
 		return p2.GameDetails[universeId]
 	end)
-	local v48 = useRoactService(RoactNetworking)
-	local v49 = useDispatch()
+	local v47 = useRoactService(RoactNetworking)
+	local v48 = useDispatch()
 
 	React.useEffect(function() -- line: 109
-		-- upvalues: v47 (copy), v49 (copy), ApiFetchGameDetails (copy), v48 (copy), universeId (copy)
-		if v47 then
+		-- upvalues: v46 (copy), v48 (copy), ApiFetchGameDetails (copy), v47 (copy), universeId (copy)
+		if v46 then
 			return
 		end
 
-		v49(ApiFetchGameDetails.Fetch(v48, { universeId }))
+		v48(ApiFetchGameDetails.Fetch(v47, { universeId }))
 	end, {
-		v47,
+		v46,
 		universeId,
-		v48,
-		v49
+		v47,
+		v48
 	})
 
-	local v50 = getGameTileLayoutData(v46, t1.topicId)
-	local v51 = t1.gameTileLayoutType or "Narrow"
-	local v52 = v51 == "Wide" or v51 == "Event"
-	local v53 = ((if not FFlagLuaAppSupportPrimaryMediaContentMetadata or not t1.entry.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v50) else t1.entry.primaryWideImageAssetId)) or (v46 and v46.primaryWideAssetId or nil)
-	local v54 = formatExperienceThumbnail(v53, t1.entry.placeId, true)
-	local v55 = useSelector(function(p3) -- line: 131
+	local v49 = getGameTileLayoutData(v45, t1.topicId)
+	local v50 = t1.gameTileLayoutType or "Narrow"
+	local v51 = v50 == "Wide" or v50 == "Event"
+	local v52 = ((if not t1.entry.primaryWideImageAssetId then ItemLayoutDataParsingUtils.getWideImageAssetId(v49) else t1.entry.primaryWideImageAssetId)) or (v45 and v45.primaryWideAssetId or nil)
+	local v53 = formatExperienceThumbnail(v52, t1.entry.placeId, true)
+	local v54 = useSelector(function(p3) -- line: 130
 		-- upvalues: BigGameIconReducer (copy), universeId (copy)
 		return p3[BigGameIconReducer.key][universeId] and p3[BigGameIconReducer.key][universeId].url or ""
 	end)
-	local v56 = GameTileViewConfig.getImageAspectRatio(v51)
-	local v57 = v50 and v50.title or (v46 and v46.name or "")
-	local v58 = nil
-	local u59 = nil
+	local v55 = GameTileViewConfig.getImageAspectRatio(v50)
+	local v56 = v49 and v49.title or (v45 and v45.name or "")
+	local v57 = nil
+	local u58 = nil
 
-	if v37 then
-		local v60 = not IsVRAppBuild() and (not not t1.useHoverTile and (t1.impressionsTag ~= nil or false))
+	if v36 then
+		local v59 = not IsVRAppBuild() and (not not t1.useHoverTile and (t1.impressionsTag ~= nil or false))
 
-		v58 = React.useRef(nil)
+		v57 = React.useRef(nil)
 
-		local v61 = `{ t1.impressionsTag or "" }_{ t1.index }_{ v51 }`
+		local v60 = `{ t1.impressionsTag or "" }_{ t1.index }_{ v50 }`
 
-		u59 = useIsHoveredTile(v58, v61, v60)
+		u58 = useIsHoveredTile(v57, v60, v59)
 	end
 
-	local v62 = React.useCallback(function() -- line: 154
-		-- upvalues: v37 (copy), u59 (ref), HoverTileCoordinator (copy), t1 (copy), FFlagLuaAppTwoByOneTileTelemetryFix (copy), GameCollectionItemTypes (copy), universeId (copy), sponsoredGamesRecordClick (copy), v48 (copy)
-		if v37 and u59 then
+	local v61 = React.useCallback(function() -- line: 153
+		-- upvalues: v36 (copy), u58 (ref), HoverTileCoordinator (copy), t1 (copy), GameCollectionItemTypes (copy), universeId (copy), sponsoredGamesRecordClick (copy), v47 (copy)
+		if v36 and u58 then
 			HoverTileCoordinator.default:reset()
 		end
 
@@ -108,7 +107,7 @@ return function(t1: {[any]: any}) -- line: 92
 			index = t1.index,
 			referralSource = t1.referralSource,
 			onPeekViewClosed = t1.onPeekViewClosed,
-			experienceJoinData = if not FFlagLuaAppTwoByOneTileTelemetryFix then nil else {
+			experienceJoinData = {
 				tileType = t1.entry.tileType or GameCollectionItemTypes.GameCollectionItemType.EmphasisTile,
 				nativeAdData = t1.entry.adId
 			}
@@ -118,7 +117,7 @@ return function(t1: {[any]: any}) -- line: 92
 		t1.reportGameDetailOpened(t1.index, universeId)
 
 		if t1.entry.isSponsored then
-			sponsoredGamesRecordClick(v48, t1.entry.adId)
+			sponsoredGamesRecordClick(v47, t1.entry.adId)
 		end
 	end, {
 		universeId,
@@ -127,67 +126,67 @@ return function(t1: {[any]: any}) -- line: 92
 		t1.entry.isSponsored,
 		t1.entry.adId,
 		t1.reportGameDetailOpened,
-		v48,
+		v47,
 		t1.navigateToGameDetails,
 		t1.referralSource,
 		t1.index,
-		if not v37 then nil else u59
+		if not v36 then nil else u58
 	})
 
-	if not v37 then
-		local v63 = not IsVRAppBuild() and (not not t1.useHoverTile and (t1.impressionsTag ~= nil or false))
+	if not v36 then
+		local v62 = not IsVRAppBuild() and (not not t1.useHoverTile and (t1.impressionsTag ~= nil or false))
 
-		v58 = React.useRef(nil)
+		v57 = React.useRef(nil)
 
-		local v64 = `{ t1.impressionsTag or "" }_{ t1.index }_{ v51 }`
+		local v63 = `{ t1.impressionsTag or "" }_{ t1.index }_{ v50 }`
 
-		u59 = useIsHoveredTile(v58, v64, v63)
+		u58 = useIsHoveredTile(v57, v63, v62)
 	end
 
-	local v65 = t1.showDescription or false
-	local v66 = v46 and v46.totalUpVotes or 0
-	local v67 = v46 and v46.totalDownVotes or 0
-	local v68 = v47 and (v47.creator and v47.creator.hasVerifiedBadge)
-	local v69 = v47 and v47.description or ""
-	local v70 = v47 and v47.licenseDescription or nil
-	local v71 = v47 and v47.localizedFiatPrice or nil
-	local v72 = v70 or v71
-	local v73 = t1.hideGameStats or (v65 or v72 ~= nil)
-	local v74 = v46 and (v46.creatorName ~= "" and v46.creatorName) or v47 and (v47.creator and v47.creator.name)
-	local v75 = not v72 and 3 or 2
-	local v76 = React.useMemo(function() -- line: 228
-		-- upvalues: v74 (copy), v65 (copy), v75 (copy), v73 (copy), v72 (copy)
+	local v64 = t1.showDescription or false
+	local v65 = v45 and v45.totalUpVotes or 0
+	local v66 = v45 and v45.totalDownVotes or 0
+	local v67 = v46 and (v46.creator and v46.creator.hasVerifiedBadge)
+	local v68 = v46 and v46.description or ""
+	local v69 = v46 and v46.licenseDescription or nil
+	local v70 = v46 and v46.localizedFiatPrice or nil
+	local v71 = v69 or v70
+	local v72 = t1.hideGameStats or (v64 or v71 ~= nil)
+	local v73 = v45 and (v45.creatorName ~= "" and v45.creatorName) or v46 and (v46.creator and v46.creator.name)
+	local v74 = not v71 and 3 or 2
+	local v75 = React.useMemo(function() -- line: 225
+		-- upvalues: v73 (copy), v64 (copy), v74 (copy), v72 (copy), v71 (copy)
 		local n1 = 0
 
-		if v74 and v74 ~= "" then
+		if v73 and v73 ~= "" then
 			n1 += 1
 		end
 
-		if v65 then
-			n1 += v75
+		if v64 then
+			n1 += v74
 		end
 
-		if not v73 then
+		if not v72 then
 			n1 += 1
 		end
 
-		if v72 then
+		if v71 then
 			n1 += 1
 		end
 
 		return n1
 	end, {
-		v74,
-		v65,
 		v73,
+		v64,
 		v72,
-		v75
+		v71,
+		v74
 	})
-	local v77 = t1.isContained or false
-	local playButtonHeight = GameTileViewConfig.getElementSizes(v43, t1.textSizeOffset, 1, v44, true, v76).playButtonHeight
-	local v79 = if not v37 then nil else React.useCallback(function(...) -- line: 262
-		-- upvalues: u59 (ref), HoverTileCoordinator (copy), t1 (copy)
-		if u59 then
+	local v76 = t1.isContained or false
+	local playButtonHeight = GameTileViewConfig.getElementSizes(v42, t1.textSizeOffset, 1, v43, true, v75).playButtonHeight
+	local v78 = if not v36 then nil else React.useCallback(function(...) -- line: 259
+		-- upvalues: u58 (ref), HoverTileCoordinator (copy), t1 (copy)
+		if u58 then
 			HoverTileCoordinator.default:reset()
 		end
 
@@ -195,119 +194,119 @@ return function(t1: {[any]: any}) -- line: 92
 			t1.reportExperienceLaunched(...)
 		end
 	end, {
-		u59,
+		u58,
 		t1.reportExperienceLaunched
 	})
-	local v80 = React.useMemo(function() -- line: 274
-		-- upvalues: React (copy), AppExperienceActionRow (copy), universeId (copy), t1 (copy), v37 (copy), v79 (copy), v62 (copy), v56 (copy), playButtonHeight (copy)
+	local v79 = React.useMemo(function() -- line: 271
+		-- upvalues: React (copy), AppExperienceActionRow (copy), universeId (copy), t1 (copy), v36 (copy), v78 (copy), v61 (copy), v55 (copy), playButtonHeight (copy)
 		return React.createElement(AppExperienceActionRow, {
-			universeId = universeId,
-			referralSource = t1.referralSource,
 			launchSource = "FeaturedSearchTile",
-			reportExperienceLaunched = if not v37 then t1.reportExperienceLaunched else v79,
-			openGameDetails = v62,
-			entry = t1.entry,
-			launchExperienceEventContext = t1.launchExperienceEventContext,
-			showButtonText = v56 > 1,
 			horizontalPadding = 0,
 			verticalPadding = 0,
+			isUnifiedGameTileEnabled = true,
+			universeId = universeId,
+			referralSource = t1.referralSource,
+			reportExperienceLaunched = if not v36 then t1.reportExperienceLaunched else v78,
+			openGameDetails = v61,
+			entry = t1.entry,
+			launchExperienceEventContext = t1.launchExperienceEventContext,
+			showButtonText = v55 > 1,
 			height = playButtonHeight,
-			index = t1.index,
-			isUnifiedGameTileEnabled = true
+			index = t1.index
 		})
 	end, {
 		universeId,
 		t1.referralSource,
-		if not v37 then t1.reportExperienceLaunched else v79,
-		v62,
+		if not v36 then t1.reportExperienceLaunched else v78,
+		v61,
 		t1.entry,
 		t1.launchExperienceEventContext,
 		playButtonHeight,
 		t1.index,
-		v56
+		v55
 	})
-	local v81 = React.useMemo(function() -- line: 307
-		-- upvalues: React (copy), v72 (copy), GridTileTextFooter (copy), CreatorNameMetadata (copy), v74 (copy), v68 (copy), GameStats (copy), v66 (copy), v67 (copy), t1 (copy), GameTileConstants (copy), v52 (copy), v73 (copy), v51 (copy), v65 (copy), v69 (copy), v75 (copy), v34 (copy)
+	local v80 = React.useMemo(function() -- line: 304
+		-- upvalues: React (copy), v71 (copy), GridTileTextFooter (copy), CreatorNameMetadata (copy), v73 (copy), v67 (copy), GameStats (copy), v65 (copy), v66 (copy), t1 (copy), GameTileConstants (copy), v51 (copy), v72 (copy), v50 (copy), v64 (copy), v68 (copy), v74 (copy), v34 (copy)
 		return React.createElement(React.Fragment, {}, {
 			UIListLayout = React.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder
 			}),
-			ExtraMetadata = if not v72 then nil else React.createElement(GridTileTextFooter, {
-				text = v72,
+			ExtraMetadata = if not v71 then nil else React.createElement(GridTileTextFooter, {
 				LayoutOrder = 1,
 				useLargerFont = true,
-				isUnifiedGameTile = true
+				isUnifiedGameTile = true,
+				text = v71
 			}),
 			CreatorName = React.createElement(CreatorNameMetadata, {
-				name = v74,
-				hasVerifiedBadge = v68,
-				LayoutOrder = 2
+				LayoutOrder = 2,
+				name = v73,
+				hasVerifiedBadge = v67
 			}),
 			GameStats = React.createElement(GameStats, {
-				stats = {
-					totalUpVotes = v66,
-					totalDownVotes = v67,
-					playerCount = if t1.playerCountStyle ~= GameTileConstants.PlayerCountStyleValues.Footer then nil else t1.entry.playerCount
-				},
-				isGridTile = v52,
-				hideGameStats = v73,
-				gameTileLayoutType = v51,
 				LayoutOrder = 3,
 				useLargerFont = true,
-				isUnifiedGameTile = true
+				isUnifiedGameTile = true,
+				stats = {
+					totalUpVotes = v65,
+					totalDownVotes = v66,
+					playerCount = if t1.playerCountStyle ~= GameTileConstants.PlayerCountStyleValues.Footer then nil else t1.entry.playerCount
+				},
+				isGridTile = v51,
+				hideGameStats = v72,
+				gameTileLayoutType = v50
 			}),
-			Description = if not v65 then nil else React.createElement(GridTileTextFooter, {
-				text = v69,
+			Description = if not v64 then nil else React.createElement(GridTileTextFooter, {
 				LayoutOrder = 4,
-				linesOfText = v75,
 				useLargerFont = true,
 				isUnifiedGameTile = true,
-				TextYAlignment = Enum.TextYAlignment.Top,
 				ClipsDescendants = true,
+				text = v68,
+				linesOfText = v74,
+				TextYAlignment = Enum.TextYAlignment.Top,
 				TextWrapped = not not v34 or nil
 			})
 		})
 	end, {
-		v74,
+		v73,
+		v65,
 		v66,
-		v67,
 		t1.playerCountStyle,
 		t1.entry.playerCount,
-		v52,
-		v73,
 		v51,
-		v65,
-		v69,
 		v72,
+		v50,
+		v64,
 		v68,
-		v75
+		v71,
+		v67,
+		v74
 	})
-	local v82, v83 = React.useState(Vector2.new(0, 0))
-	local v84 = React.useMemo(function() -- line: 376
-		-- upvalues: GameTileViewConfig (copy), v43 (copy), v82 (copy), v51 (copy), v77 (copy), t1 (copy), v76 (copy), v44 (copy)
-		local v93 = GameTileViewConfig.getTileHeight(v43, v82.X, v51, v77, false, false, t1.textSizeOffset, nil, 1, v76, v44, true)
+	local v81, v82 = React.useState(Vector2.new(0, 0))
+	local v83 = React.useMemo(function() -- line: 373
+		-- upvalues: GameTileViewConfig (copy), v42 (copy), v81 (copy), v50 (copy), v76 (copy), t1 (copy), v75 (copy), v43 (copy)
+		local v92 = GameTileViewConfig.getTileHeight(v42, v81.X, v50, v76, false, false, t1.textSizeOffset, nil, 1, v75, v43, true)
 
-		return v82.Y - v93
+		return v81.Y - v92
 	end, {
-		v43,
-		v82,
-		v51,
-		v77,
+		v42,
+		v81,
+		v50,
+		v76,
 		t1.textSizeOffset,
 		1,
-		v76,
-		v44
+		v75,
+		v43
 	})
-	local v85 = React.useRef(nil)
+	local v84 = React.useRef(nil)
 
-	React.useEffect(function() -- line: 407
-		-- upvalues: ImpressionsTagUtility (copy), v85 (copy), t1 (copy)
-		ImpressionsTagUtility.AddTag(v85, t1.impressionsTag, t1.index)
+	React.useEffect(function() -- line: 404
+		-- upvalues: ImpressionsTagUtility (copy), v84 (copy), t1 (copy)
+		ImpressionsTagUtility.AddTag(v84, t1.impressionsTag, t1.index)
 
-		return function() -- line: 409
-			-- upvalues: ImpressionsTagUtility (copy), v85 (copy), t1 (copy)
-			ImpressionsTagUtility.RemoveTag(v85, t1.impressionsTag, t1.index)
+		return function() -- line: 406
+			-- upvalues: ImpressionsTagUtility (copy), v84 (copy), t1 (copy)
+			ImpressionsTagUtility.RemoveTag(v84, t1.impressionsTag, t1.index)
 		end
 	end, {
 		t1.impressionsTag,
@@ -315,17 +314,17 @@ return function(t1: {[any]: any}) -- line: 92
 	})
 
 	if FFlagLuaAppHomeTouchAutoplay then
-		useTagAsViewportAutoplayCandidate(v85, t1.videoPlaybackContext, not FFlagLuaAppTileVideoCandidateOnly and nil)
+		useTagAsViewportAutoplayCandidate(v84, t1.videoPlaybackContext, not FFlagLuaAppTileVideoCandidateOnly and nil)
 	end
 
-	local v86 = nil
+	local v85 = nil
 
 	if FFlagLuaAppGameTileLockedBadge then
-		local v87 = getTileBadgeByPositionConfigFromEntry(t1.entry)
+		local v86 = getTileBadgeByPositionConfigFromEntry(t1.entry)
 
-		if v87 then
-			v86 = React.createElement(GameTileThumbnailBadges, {
-				tileBadgesByPosition = v87
+		if v86 then
+			v85 = React.createElement(GameTileThumbnailBadges, {
+				tileBadgesByPosition = v86
 			})
 		end
 	end
@@ -340,33 +339,34 @@ return function(t1: {[any]: any}) -- line: 92
 			Position = UDim2.fromScale(0, 0),
 			Size = t1.size,
 			BackgroundTransparency = 1,
-			ref = v85,
-			[React.Change.AbsoluteSize] = function(p4) -- line: 446
-				-- upvalues: v83 (copy)
-				v83(p4.AbsoluteSize)
+			ref = v84,
+			[React.Change.AbsoluteSize] = function(p4) -- line: 443
+				-- upvalues: v82 (copy)
+				v82(p4.AbsoluteSize)
 			end
 		}, {
 			GameTileView = React.createElement(GameTileView, {
-				forwardRef = v58,
-				selectionOrder = t1.selectionOrder,
+				numLinesForTitle = 1,
+				isUnifiedGameTile = true,
+				hidePlayButton = true,
+				forwardRef = v57,
+				selectionOrder = if not FFlagLuaAppFixCustomTileBugs then t1.selectionOrder else nil,
+				SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t1.SelectionOrder,
 				isDisabled = t1.isDisabled,
-				onActivated = v62,
+				onActivated = v61,
 				onSelectionGained = t1.onSelectionGained,
 				onSelectionLost = t1.onSelectionLost,
-				image = if not v52 then v55 else v54,
-				title = v57,
-				numLinesForTitle = 1,
-				numLinesForMetadata = v76,
-				isHovered = u59,
-				footerMetadata = v81,
-				isUnifiedGameTile = true,
-				imageAspectRatio = v56,
-				isContained = v77,
-				extraFooterContent = if not v65 then v80 else nil,
-				extraFooterSpace = if not v65 then v84 else nil,
-				hidePlayButton = true,
+				image = if not v51 then v54 else v53,
+				title = v56,
+				numLinesForMetadata = v75,
+				isHovered = u58,
+				footerMetadata = v80,
+				imageAspectRatio = v55,
+				isContained = v76,
+				extraFooterContent = if not v64 then v79 else nil,
+				extraFooterSpace = if not v64 then v83 else nil,
 				reducedMotion = UserGameSettings.ReducedMotion,
-				thumbnailOverlay = if not FFlagLuaAppGameTileLockedBadge then nil else v86,
+				thumbnailOverlay = if not FFlagLuaAppGameTileLockedBadge then nil else v85,
 				onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else t1.onTileImageLoaded
 			})
 		})

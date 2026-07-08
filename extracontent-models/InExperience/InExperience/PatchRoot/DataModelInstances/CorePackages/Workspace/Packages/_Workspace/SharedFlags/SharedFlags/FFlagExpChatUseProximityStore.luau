@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatUseProximityStore", false);
+return game:DefineFastFlag("ExpChatUseProximityStore", false)

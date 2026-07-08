@@ -1,31 +1,25 @@
-local v0 = require(script.CoreVoiceManager);
-local v1 = require(script.Analytics);
-local v2 = require(script.Constants);
-local l_Requests_0 = script.Requests;
-local l_Flags_0 = script.Flags;
+local CoreVoiceManager = require(script.CoreVoiceManager)
+local Analytics = require(script.Analytics)
+local Constants = require(script.Constants)
+local Requests = script.Requests
+local Flags = script.Flags
+
 return {
-    CoreVoiceManager = v0, 
-    Constants = v2, 
-    Analytics = v1, 
-    Flags = {
-        GetFFlagHideUIWhenVoiceDefaultDisabled = require(l_Flags_0.GetFFlagHideUIWhenVoiceDefaultDisabled), 
-        GetFFlagOverwriteIsMutedLocally = require(l_Flags_0.GetFFlagOverwriteIsMutedLocally), 
-        GetFFlagReceiveLikelySpeakingUsers = require(l_Flags_0.GetFFlagReceiveLikelySpeakingUsers), 
-        GetFFlagSetActiveWhenConnecting = require(l_Flags_0.GetFFlagSetActiveWhenConnecting), 
-        GetFFlagUpdateDeviceInputPlayerChanged = require(l_Flags_0.GetFFlagUpdateDeviceInputPlayerChanged), 
-        GetFFlagUseAudioInstanceAdded = require(l_Flags_0.GetFFlagUseAudioInstanceAdded), 
-        GetFFlagEnableLuaVoiceChatAnalytics = require(l_Flags_0.GetFFlagEnableLuaVoiceChatAnalytics), 
-        GetFFlagUseLuaSignalrConsumer = require(l_Flags_0.GetFFlagUseLuaSignalrConsumer), 
-        GetFFlagVoiceChatServiceManagerUseAvatarChat = require(l_Flags_0.GetFFlagVoiceChatServiceManagerUseAvatarChat), 
-        GetFFlagBatchVoiceParticipantsUpdates = require(l_Flags_0.GetFFlagBatchVoiceParticipantsUpdates), 
-        GetFIntThrottleParticipantsUpdateMs = require(l_Flags_0.GetFIntThrottleParticipantsUpdateMs), 
-        GetFFlagEnableVoiceNudge = require(l_Flags_0.GetFFlagEnableVoiceNudge), 
-        GetFFlagEnableFtuxExitOnMuteToggle = require(l_Flags_0.GetFFlagEnableFtuxExitOnMuteToggle), 
-        GetFFlagEnableExpJoinMicPermAnalytics = require(l_Flags_0.GetFFlagEnableExpJoinMicPermAnalytics), 
-        GetFFlagEnableSeamlessVoiceFeature = require(l_Flags_0.GetFFlagEnableSeamlessVoiceFeature)
-    }, 
-    Requests = {
-        GetShowAgeVerificationOverlay = require(l_Requests_0.GetShowAgeVerificationOverlay)
-    }, 
-    ["jest.config"] = script["jest.config"]
-};
+	CoreVoiceManager = CoreVoiceManager,
+	Constants = Constants,
+	Analytics = Analytics,
+	Flags = {
+		GetFFlagUpdateDeviceInputPlayerChanged = require(Flags.GetFFlagUpdateDeviceInputPlayerChanged),
+		GetFFlagVoiceChatServiceManagerUseAvatarChat = require(Flags.GetFFlagVoiceChatServiceManagerUseAvatarChat),
+		GetFFlagBatchVoiceParticipantsUpdates = require(Flags.GetFFlagBatchVoiceParticipantsUpdates),
+		GetFIntThrottleParticipantsUpdateMs = require(Flags.GetFIntThrottleParticipantsUpdateMs),
+		GetFFlagEnableFtuxExitOnMuteToggle = require(Flags.GetFFlagEnableFtuxExitOnMuteToggle),
+		GetFFlagEnableExpJoinMicPermAnalytics = require(Flags.GetFFlagEnableExpJoinMicPermAnalytics),
+		GetFFlagEnableSeamlessVoiceFeature = require(Flags.GetFFlagEnableSeamlessVoiceFeature),
+		GetFFlagFixGetPlayerByUserIdStringCast = require(Flags.GetFFlagFixGetPlayerByUserIdStringCast)
+	},
+	Requests = {
+		GetShowAgeVerificationOverlay = require(Requests.GetShowAgeVerificationOverlay)
+	},
+	["jest.config"] = script["jest.config"]
+}

@@ -1,1 +1,1 @@
-return require(script.Parent.InExperienceUIVRIXP):isInExperienceUIVREnabled();
+return require(script.Parent.InExperienceUIVRIXP):isInExperienceUIVREnabled()

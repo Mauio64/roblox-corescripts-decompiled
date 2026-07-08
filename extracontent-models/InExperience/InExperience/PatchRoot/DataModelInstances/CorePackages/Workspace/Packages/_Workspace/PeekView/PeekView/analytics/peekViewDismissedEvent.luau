@@ -1,32 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("PeekView").Parent;
-local v1 = require(l_Parent_0.t);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = v1.strictInterface({
-    page = v1.string, 
-    dismissMethod = v1.string
-});
-local v4 = v1.strictInterface({
-    page = v1.string, 
-    dismissMethod = v1.string, 
-    locale = v1.optional(v1.string), 
-    universeId = v1.string, 
-    source = v1.string, 
-    index = v1.number
-});
-local v5 = v1.union(v3, v4);
+local Parent = script:FindFirstAncestor("PeekView").Parent
+local t = require(Parent.t)
+local mutedError = require(Parent.Loggers).mutedError
+local v4 = t.strictInterface({
+	page = t.string,
+	dismissMethod = t.string
+})
+local v5 = t.strictInterface({
+	page = t.string,
+	dismissMethod = t.string,
+	locale = t.optional(t.string),
+	universeId = t.string,
+	source = t.string,
+	index = t.number
+})
+local v6 = t.union(v4, v5)
+
 return {
-    dismissMethodEnum = {
-        topBarTap = "topBarTap", 
-        scrimTap = "scrimTap", 
-        swipe = "swipe", 
-        handleTap = "handleTap"
-    }, 
-    logEvent = function(v6, v7, v8) --[[ Line: 31 ]] --[[ Name: logEvent ]]
-        -- upvalues: v5 (copy), l_mutedError_0 (copy)
-        local v9, v10 = v5(v8);
-        if not v9 then
-            l_mutedError_0(v10);
-        end;
-        v6:sendEventDeferred(v7, "uiPeekViewDismissed", v8);
-    end
-};
+	dismissMethodEnum = {
+		topBarTap = "topBarTap",
+		scrimTap = "scrimTap",
+		swipe = "swipe",
+		handleTap = "handleTap"
+	},
+	logEvent = function(p1, s1: string, p2) -- line: 31
+		-- upvalues: v6 (copy), mutedError (copy)
+		local v10, v11 = v6(p2)
+
+		if not v10 then
+			mutedError(v11)
+		end
+
+		p1:sendEventDeferred(s1, "uiPeekViewDismissed", p2)
+	end
+}

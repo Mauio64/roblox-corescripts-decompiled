@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SocialCarouselEnableNewFriendRequestsBadgeForAll", false);
+return game:DefineFastFlag("SocialCarouselEnableNewFriendRequestsBadgeForAll", false)

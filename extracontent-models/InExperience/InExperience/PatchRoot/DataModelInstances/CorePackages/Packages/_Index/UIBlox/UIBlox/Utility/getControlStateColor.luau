@@ -1,23 +1,37 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Core.Control.Enum.ControlState);
-local _ = require(l_Parent_0.App.Style.StyleTypes);
-return function(v3, v4) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy)
-    if v3 == v1.Initialize then
-        return v4.Initialize;
-    elseif v3 == v1.Default then
-        return v4.Default;
-    elseif v3 == v1.Pressed then
-        return v4.Pressed;
-    elseif v3 == v1.Hover then
-        return v4.Hover;
-    elseif v3 == v1.Selected then
-        return v4.Selected;
-    elseif v3 == v1.SelectedPressed then
-        return v4.SelectedPressed;
-    elseif v3 == v1.Disabled then
-        return v4.Disabled;
-    else
-        return nil;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
+
+require(ParentParent.App.Style.StyleTypes)
+
+return function(p1, p2) -- line: 10
+	-- upvalues: ControlState (copy)
+	if p1 == ControlState.Initialize then
+		return p2.Initialize
+	end
+
+	if p1 == ControlState.Default then
+		return p2.Default
+	end
+
+	if p1 == ControlState.Pressed then
+		return p2.Pressed
+	end
+
+	if p1 == ControlState.Hover then
+		return p2.Hover
+	end
+
+	if p1 == ControlState.Selected then
+		return p2.Selected
+	end
+
+	if p1 == ControlState.SelectedPressed then
+		return p2.SelectedPressed
+	end
+
+	if p1 == ControlState.Disabled then
+		return p2.Disabled
+	end
+
+	return nil
+end

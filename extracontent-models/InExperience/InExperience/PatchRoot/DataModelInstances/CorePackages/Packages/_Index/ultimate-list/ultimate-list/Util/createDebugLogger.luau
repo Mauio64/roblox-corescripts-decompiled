@@ -1,7 +1,7 @@
 local ancestor = script:FindFirstAncestor("ultimate-list")
 local DebugFlags = require(ancestor.DebugFlags)
 
-return function(s1: string) --[[ createDebugLogger ]] -- line: 7
+local function createDebugLogger(s1: string) -- line: 7
 	-- upvalues: DebugFlags (copy)
 	return function(p1, ...) -- line: 8
 		-- upvalues: DebugFlags (copy), s1 (copy)
@@ -18,3 +18,5 @@ return function(s1: string) --[[ createDebugLogger ]] -- line: 7
 		print(`[{ s1 }]`, p1(...))
 	end
 end
+
+return createDebugLogger

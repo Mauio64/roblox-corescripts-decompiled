@@ -1,49 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_memo_0 = v3.memo;
-local v5 = require(l_script_FirstAncestor_0.Components.Cells.IconWithTextCell);
-local v6 = require(l_script_FirstAncestor_0.Flags.FFlagDebugAppChatEnableDomLocators);
-local v7 = require(l_script_FirstAncestor_0.Utils.DomLocators);
-local v8 = {
-    groupNameText = "groupName", 
-    iconImage = nil, 
-    onActivated = nil, 
-    LayoutOrder = 1, 
-    iconCellWidth = 60, 
-    isDisabled = false, 
-    cellHeight = 36, 
-    style = nil, 
-    paddingBottom = 12
-};
-GroupNameEntryCell = function(v9) --[[ Line: 40 ]] --[[ Name: GroupNameEntryCell ]]
-    -- upvalues: v2 (copy), v8 (copy), v3 (copy), v5 (copy), v6 (copy), v7 (copy)
-    local v10 = v2.Dictionary.join(v8, v9);
-    local v11 = if v10.isDisabled then v10.style.Tokens.Global.Size_150 else 0;
-    return v3.createElement("Frame", {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v10.LayoutOrder, 
-        Size = UDim2.fromScale(1, 0)
-    }, {
-        padding = v3.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v11), 
-            PaddingBottom = UDim.new(0, v10.paddingBottom)
-        })
-    }, {
-        IconWithText = v3.createElement(v5, {
-            primaryIcon = if v10.isDisabled then nil else v10.iconImage, 
-            Text = v10.groupNameText, 
-            iconCellWidth = v10.iconCellWidth, 
-            showDivider = false, 
-            isDisabled = v10.isDisabled, 
-            onActivated = v10.onActivated, 
-            LayoutOrder = 1, 
-            Size = UDim2.new(1, -v11, 0, v10.cellHeight), 
-            style = v10.style, 
-            testId = if v6 then v7.chatDetailsListActionButton(v10.groupNameText) else nil
-        })
-    });
-end;
-return l_memo_0(GroupNameEntryCell);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local memo = React.memo
+local IconWithTextCell = require(AppChat.Components.Cells.IconWithTextCell)
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+local DomLocators = require(AppChat.Utils.DomLocators)
+local t1 = {
+	groupNameText = "groupName",
+	iconImage = nil,
+	onActivated = nil,
+	LayoutOrder = 1,
+	iconCellWidth = 60,
+	isDisabled = false,
+	cellHeight = 36,
+	style = nil,
+	paddingBottom = 12
+}
+
+function GroupNameEntryCell(t2: {[any]: any}) -- line: 40
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), IconWithTextCell (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
+	local v11 = Cryo.Dictionary.join(t1, t2)
+	local v12 = not v11.isDisabled and 0 or v11.style.Tokens.Size.Size_300
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = v11.LayoutOrder,
+		Size = UDim2.fromScale(1, 0)
+	}, {
+		padding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, v12),
+			PaddingBottom = UDim.new(0, v11.paddingBottom)
+		})
+	}, {
+		IconWithText = React.createElement(IconWithTextCell, {
+			showDivider = false,
+			LayoutOrder = 1,
+			primaryIcon = if not v11.isDisabled then v11.iconImage else nil,
+			Text = v11.groupNameText,
+			iconCellWidth = v11.iconCellWidth,
+			isDisabled = v11.isDisabled,
+			onActivated = v11.onActivated,
+			Size = UDim2.new(1, -v12, 0, v11.cellHeight),
+			style = v11.style,
+			testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatDetailsListActionButton(v11.groupNameText)
+		})
+	})
+end
+
+return memo(GroupNameEntryCell)

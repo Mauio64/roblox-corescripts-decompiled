@@ -1,5 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CommercePurchaseApp");
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-return function(v2) --[[ Line: 7 ]] --[[ Name: selectCommerceProductId ]]
-    return v2.commercePurchaseState.commerceProductId;
-end;
+local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
+
+require(CommercePurchaseApp.Store.Types)
+
+local function selectCommerceProductId(p1) -- line: 7
+	return p1.commercePurchaseState.commerceProductId
+end
+
+return selectCommerceProductId

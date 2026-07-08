@@ -1,10 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthAnalytics");
-local v1 = require(l_script_FirstAncestor_0.Utils.checkAndSendEvent);
-return function(v2, v3, v4) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    local v5 = {
-        elapsedTime = v3, 
-        state = v4
-    };
-    v1(v2, "authOperationTiming", v5);
-end;
+local AuthAnalytics = script:FindFirstAncestor("AuthAnalytics")
+local checkAndSendEvent = require(AuthAnalytics.Utils.checkAndSendEvent)
+
+return function(s1: string, n1: number, s2: string) -- line: 4
+	-- upvalues: checkAndSendEvent (copy)
+	local t1 = {
+		elapsedTime = n1,
+		state = s2
+	}
+
+	checkAndSendEvent(s1, "authOperationTiming", t1)
+end

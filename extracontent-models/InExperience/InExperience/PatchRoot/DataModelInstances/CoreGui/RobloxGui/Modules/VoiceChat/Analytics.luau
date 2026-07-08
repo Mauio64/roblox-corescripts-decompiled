@@ -99,25 +99,25 @@ end
 function t1.reportClosedNudge(t5: {[any]: any}, n3: number, s4: string) -- line: 199
 	t5._impl:ReportCounter("voicechat-closednudge", 1)
 	t5._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "CLOSED",
 		userId = n3,
-		voiceSessionId = s4,
-		closeType = "CLOSED"
+		voiceSessionId = s4
 	})
 end
 function t1.reportAcknowledgedNudge(t6: {[any]: any}, n4: number, s5: string) -- line: 208
 	t6._impl:ReportCounter("voicechat-acknowledgednudge", 1)
 	t6._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "ACKNOWLEDGED",
 		userId = n4,
-		voiceSessionId = s5,
-		closeType = "ACKNOWLEDGED"
+		voiceSessionId = s5
 	})
 end
 function t1.reportDeniedNudge(t7: {[any]: any}, n5: number, s6: string) -- line: 217
 	t7._impl:ReportCounter("voicechat-deniednudge", 1)
 	t7._impl:SendEventDeferred("client", "voiceChat", "closedNudge", {
+		closeType = "DENIED",
 		userId = n5,
-		voiceSessionId = s6,
-		closeType = "DENIED"
+		voiceSessionId = s6
 	})
 end
 function t1.reportVoiceMuteIndividual(t8: {[any]: any}, t9: {[any]: any}) -- line: 226

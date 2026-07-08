@@ -1,13 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Rodux_0 = require(l_Parent_0.PurchasePromptDeps).Rodux;
-local v3 = require(l_script_FirstAncestor_0.Actions.PurchaseCompleteRecieved);
-local v4 = require(l_script_FirstAncestor_0.Actions.CompleteRequest);
-return l_Rodux_0.createReducer(false, {
-    [v3.name] = function(_, _) --[[ Line: 10 ]]
-        return true;
-    end, 
-    [v4.name] = function(_, _) --[[ Line: 13 ]]
-        return false;
-    end
-});
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local PurchaseCompleteRecieved = require(PurchasePrompt.Actions.PurchaseCompleteRecieved)
+local CompleteRequest = require(PurchasePrompt.Actions.CompleteRequest)
+
+return Rodux.createReducer(false, {
+	[PurchaseCompleteRecieved.name] = function(_, _) -- line: 10
+		return true
+	end,
+	[CompleteRequest.name] = function(_, _) -- line: 13
+		return false
+	end
+})

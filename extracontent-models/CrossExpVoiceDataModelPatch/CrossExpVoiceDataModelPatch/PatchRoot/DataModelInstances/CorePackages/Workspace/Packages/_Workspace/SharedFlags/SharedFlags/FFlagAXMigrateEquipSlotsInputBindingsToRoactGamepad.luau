@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateEquipSlotsInputBindingsToRoactGamepad2", false);
+return game:DefineFastFlag("AXMigrateEquipSlotsInputBindingsToRoactGamepad2", false)

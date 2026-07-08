@@ -23,23 +23,23 @@ local t1 = {
 	reportUserText = "localizedText.ReportUser",
 	removeFromGroupText = "localizedText.RemoveFromGroup",
 	cancelText = "localizedText.Cancel",
-	openViewProfile = function(_) --[[ openViewProfile ]] -- line: 61
+	openViewProfile = function(_) -- line: 61
 		-- upvalues: Logger (copy)
 		Logger:warning("openViewProfile was not passed to ParticipantDialogDeprecated")
 	end,
-	openChat = function(...) --[[ openChat ]] -- line: 64
+	openChat = function(...) -- line: 64
 		-- upvalues: Logger (copy)
 		Logger:warning("openChat was not passed to ParticipantDialogDeprecated")
 	end,
-	openReportUser = function(...) --[[ openReportUser ]] -- line: 67
+	openReportUser = function(...) -- line: 67
 		-- upvalues: Logger (copy)
 		Logger:warning("openReportUser was not passed to ParticipantDialogDeprecated")
 	end,
-	openRemoveUserDialog = function(...) --[[ openRemoveUserDialog ]] -- line: 70
+	openRemoveUserDialog = function(...) -- line: 70
 		-- upvalues: Logger (copy)
 		Logger:warning("openRemoveUserDialog was not passed to ParticipantDialogDeprecated")
 	end,
-	onDismiss = function(_) --[[ onDismiss ]] -- line: 73
+	onDismiss = function(_) -- line: 73
 		-- upvalues: Logger (copy)
 		Logger:warning("onDismiss was not passed to ParticipantDialogDeprecated")
 	end
@@ -56,10 +56,21 @@ function ParticipantDialogDeprecated(t2: {[any]: any}) -- line: 80
 	end
 	local t3 = {}
 
-	if v16.showViewProfileButton then
+	local function insertAction(s1: string?, p3: ((...any) -> ...any)?, b1: boolean?) -- line: 90
+		-- upvalues: t3 (copy)
 		table.insert(t3, {
-			text = v16.viewProfileText,
+			text = s1,
+			stayOnActivated = not not b1 or nil,
+			onActivated = if not b1 then p3 else nil
+		})
+	end
+
+	if v16.showViewProfileButton then
+		local viewProfileText = v16.viewProfileText
+
+		table.insert(t3, {
 			stayOnActivated = nil,
+			text = viewProfileText,
 			onActivated = function() -- line: 102
 				-- upvalues: Logger (copy), participantId (copy), v16 (copy)
 				Logger:info("User activated viewProfile | userId: {}", participantId)
@@ -69,9 +80,11 @@ function ParticipantDialogDeprecated(t2: {[any]: any}) -- line: 80
 	end
 
 	if v16.showChatButton then
+		local chatText = v16.chatText
+
 		table.insert(t3, {
-			text = v16.chatText,
 			stayOnActivated = nil,
+			text = chatText,
 			onActivated = function() -- line: 109
 				-- upvalues: Logger (copy), participantId (copy), v17 (copy), ChatDetailsTelemetryEvents (copy), v16 (copy)
 				Logger:info("User activated openChat | userId: {}", participantId)
@@ -81,9 +94,11 @@ function ParticipantDialogDeprecated(t2: {[any]: any}) -- line: 80
 		})
 	end
 
+	local reportUserText = v16.reportUserText
+
 	table.insert(t3, {
-		text = v16.reportUserText,
 		stayOnActivated = nil,
+		text = reportUserText,
 		onActivated = function() -- line: 116
 			-- upvalues: Logger (copy), participantId (copy), conversationId (copy), v17 (copy), ChatDetailsTelemetryEvents (copy), v16 (copy)
 			Logger:info("User activated reportUser | userId: {}, conversationId: {}", participantId, conversationId)
@@ -93,9 +108,11 @@ function ParticipantDialogDeprecated(t2: {[any]: any}) -- line: 80
 	})
 
 	if showRemoveUserButton then
+		local removeFromGroupText = v16.removeFromGroupText
+
 		table.insert(t3, {
-			text = v16.removeFromGroupText,
 			stayOnActivated = nil,
+			text = removeFromGroupText,
 			onActivated = function() -- line: 123
 				-- upvalues: v16 (copy), participantId (copy), conversationId (copy)
 				v16.openRemoveUserDialog(participantId, conversationId)
@@ -103,18 +120,20 @@ function ParticipantDialogDeprecated(t2: {[any]: any}) -- line: 80
 		})
 	end
 
+	local cancelText = v16.cancelText
+
 	table.insert(t3, {
-		text = v16.cancelText,
 		stayOnActivated = nil,
+		text = cancelText,
 		onActivated = v21
 	})
 
 	return React.createElement(ModalBottomSheet, {
 		bottomGap = 10,
-		onDismiss = v21,
-		buttonModels = t3,
 		screenWidth = 400,
-		showImages = false
+		showImages = false,
+		onDismiss = v21,
+		buttonModels = t3
 	})
 end
 

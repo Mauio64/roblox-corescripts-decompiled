@@ -1,1 +1,1 @@
-return require(script.BlockingModal);
+return require(script.BlockingModal)

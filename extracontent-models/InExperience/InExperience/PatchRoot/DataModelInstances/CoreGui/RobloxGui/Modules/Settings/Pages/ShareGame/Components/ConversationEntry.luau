@@ -1,112 +1,117 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_Modules_0.Settings.Theme);
-local l_ShareGame_0 = l_Modules_0.Settings.Pages.ShareGame;
-local v7 = require(l_ShareGame_0.Components.ConversationDetails);
-local v8 = require(l_ShareGame_0.Components.ConversationThumbnail);
-local l_EventStream_0 = require(l_CorePackages_0.Workspace.Packages.Analytics).AnalyticsReporters.EventStream;
-local v10 = require(l_ShareGame_0.Components.InviteButton);
-local l_InviteStatus_0 = require(l_ShareGame_0.Constants).InviteStatus;
-local v12 = v4.PureComponent:extend("ConversationEntry");
-v12.init = function(v13) --[[ Line: 30 ]] --[[ Name: init ]]
-    -- upvalues: l_EventStream_0 (copy), l_RbxAnalyticsService_0 (copy), l_InviteStatus_0 (copy), l_Players_0 (copy)
-    v13.eventStream = l_EventStream_0.new(l_RbxAnalyticsService_0);
-    v13.onInvite = function() --[[ Line: 33 ]]
-        -- upvalues: v13 (copy), l_InviteStatus_0 (ref), l_Players_0 (ref)
-        local l_inviteStatus_0 = v13.props.inviteStatus;
-        if l_inviteStatus_0 and l_inviteStatus_0 ~= l_InviteStatus_0.Failed then
-            return;
-        else
-            local l_analytics_0 = v13.props.analytics;
-            local l_users_0 = v13.props.users;
-            local l_inviteUser_0 = v13.props.inviteUser;
-            if #l_users_0 == 1 then
-                local function v23(v18) --[[ Line: 45 ]]
-                    -- upvalues: l_users_0 (copy), l_Players_0 (ref), l_analytics_0 (copy)
-                    if not v18 then
-                        return;
-                    else
-                        local v19 = {};
-                        for _, v21 in pairs(l_users_0) do
-                            table.insert(v19, v21.id);
-                        end;
-                        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-                        l_analytics_0:onActivatedInviteSent(l_LocalPlayer_0.UserId, v18.conversationId, v19);
-                        return;
-                    end;
-                end;
-                l_inviteUser_0(l_users_0[1].id):andThen(v23, function() --[[ Line: 60 ]]
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Roact = require(CorePackages.Packages.Roact)
+local Theme = require(Modules.Settings.Theme)
+local ShareGame = Modules.Settings.Pages.ShareGame
+local ConversationDetails = require(ShareGame.Components.ConversationDetails)
+local ConversationThumbnail = require(ShareGame.Components.ConversationThumbnail)
+local EventStream = require(CorePackages.Workspace.Packages.Analytics).AnalyticsReporters.EventStream
+local InviteButton = require(ShareGame.Components.InviteButton)
+local InviteStatus = require(ShareGame.Constants).InviteStatus
+local v13 = Roact.PureComponent:extend("ConversationEntry")
 
-                end);
-            end;
-            return;
-        end;
-    end;
-end;
-v12.render = function(v24) --[[ Line: 66 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v5 (copy), v8 (copy), v7 (copy), v10 (copy)
-    local l_visible_0 = v24.props.visible;
-    local l_layoutOrder_0 = v24.props.layoutOrder;
-    local l_zIndex_0 = v24.props.zIndex;
-    local l_size_0 = v24.props.size;
-    local l_subtitle_0 = v24.props.subtitle;
-    local l_title_0 = v24.props.title;
-    local l_users_1 = v24.props.users;
-    local l_inviteStatus_1 = v24.props.inviteStatus;
-    local l_presence_0 = v24.props.presence;
-    return v4.createElement("ImageButton", {
-        Visible = l_visible_0, 
-        Selectable = true, 
-        BackgroundColor3 = v5.color("PlayerRowFrame"), 
-        BackgroundTransparency = v5.transparency("PlayerRowFrame", 1), 
-        ImageTransparency = 0, 
-        ScaleType = Enum.ScaleType.Stretch, 
-        SliceCenter = Rect.new(), 
-        Size = l_size_0, 
-        LayoutOrder = l_layoutOrder_0, 
-        ZIndex = l_zIndex_0, 
-        [v4.Event.Activated] = v24.onInvite
-    }, {
-        UICorner = v4.createElement("UICorner", {
-            CornerRadius = v5.MenuContainerCornerRadius
-        }) or nil, 
-        UIPadding = v4.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, 12), 
-            PaddingRight = UDim.new(0, 12), 
-            PaddingTop = UDim.new(0, 12), 
-            PaddingBottom = UDim.new(0, 12)
-        }), 
-        UIListLayout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 12)
-        }), 
-        Thumbnail = v4.createElement(v8, {
-            users = l_users_1, 
-            size = UDim2.new(0, 32, 0, 32), 
-            layoutOrder = 0, 
-            zIndex = l_zIndex_0
-        }), 
-        Details = v4.createElement(v7, {
-            title = l_title_0, 
-            subtitle = l_subtitle_0, 
-            presence = l_presence_0, 
-            size = UDim2.new(1, -125, 1, 0), 
-            layoutOrder = 1, 
-            zIndex = l_zIndex_0
-        }), 
-        InviteButton = v4.createElement(v10, {
-            size = UDim2.new(0, 69, 1, 0), 
-            layoutOrder = 2, 
-            zIndex = l_zIndex_0, 
-            onInvite = v24.onInvite, 
-            inviteStatus = l_inviteStatus_1
-        })
-    });
-end;
-return v12;
+function v13.init(p1) -- line: 30
+	-- upvalues: EventStream (copy), RbxAnalyticsService (copy), InviteStatus (copy), Players (copy)
+	p1.eventStream = EventStream.new(RbxAnalyticsService)
+
+	function p1.onInvite() -- line: 33
+		-- upvalues: p1 (copy), InviteStatus (copy), Players (copy)
+		local inviteStatus = p1.props.inviteStatus
+
+		if inviteStatus and inviteStatus ~= InviteStatus.Failed then
+			return
+		end
+
+		local analytics = p1.props.analytics
+		local users = p1.props.users
+		local inviteUser = p1.props.inviteUser
+
+		if #users == 1 then
+			inviteUser(users[1].id):andThen(function(p2) -- line: 45
+				-- upvalues: users (copy), Players (copy), analytics (copy)
+				if not p2 then
+					return
+				end
+
+				local t1 = {}
+
+				for _, v in pairs(users) do
+					table.insert(t1, v.id)
+				end
+
+				local LocalPlayer = Players.LocalPlayer
+
+				analytics:onActivatedInviteSent(LocalPlayer.UserId, p2.conversationId, t1)
+			end, function() -- line: 60
+			end)
+		end
+	end
+end
+function v13.render(p3) -- line: 66
+	-- upvalues: Roact (copy), Theme (copy), ConversationThumbnail (copy), ConversationDetails (copy), InviteButton (copy)
+	local visible = p3.props.visible
+	local layoutOrder = p3.props.layoutOrder
+	local zIndex = p3.props.zIndex
+	local size = p3.props.size
+	local subtitle = p3.props.subtitle
+	local title = p3.props.title
+	local users = p3.props.users
+	local inviteStatus = p3.props.inviteStatus
+	local presence = p3.props.presence
+
+	return Roact.createElement("ImageButton", {
+		Visible = visible,
+		Selectable = true,
+		BackgroundColor3 = Theme.color("PlayerRowFrame"),
+		BackgroundTransparency = Theme.transparency("PlayerRowFrame", 1),
+		ImageTransparency = 0,
+		ScaleType = Enum.ScaleType.Stretch,
+		SliceCenter = Rect.new(),
+		Size = size,
+		LayoutOrder = layoutOrder,
+		ZIndex = zIndex,
+		[Roact.Event.Activated] = p3.onInvite
+	}, {
+		UICorner = Roact.createElement("UICorner", {
+			CornerRadius = Theme.MenuContainerCornerRadius
+		}) or nil,
+		UIPadding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 12),
+			PaddingRight = UDim.new(0, 12),
+			PaddingTop = UDim.new(0, 12),
+			PaddingBottom = UDim.new(0, 12)
+		}),
+		UIListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 12)
+		}),
+		Thumbnail = Roact.createElement(ConversationThumbnail, {
+			layoutOrder = 0,
+			users = users,
+			size = UDim2.new(0, 32, 0, 32),
+			zIndex = zIndex
+		}),
+		Details = Roact.createElement(ConversationDetails, {
+			layoutOrder = 1,
+			title = title,
+			subtitle = subtitle,
+			presence = presence,
+			size = UDim2.new(1, -125, 1, 0),
+			zIndex = zIndex
+		}),
+		InviteButton = Roact.createElement(InviteButton, {
+			layoutOrder = 2,
+			size = UDim2.new(0, 69, 1, 0),
+			zIndex = zIndex,
+			onInvite = p3.onInvite,
+			inviteStatus = inviteStatus
+		})
+	})
+end
+
+return v13

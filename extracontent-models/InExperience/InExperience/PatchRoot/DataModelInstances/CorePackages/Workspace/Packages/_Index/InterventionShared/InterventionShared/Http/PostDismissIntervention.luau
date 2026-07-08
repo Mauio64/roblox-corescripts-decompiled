@@ -1,44 +1,51 @@
-local l_Parent_0 = script:FindFirstAncestor("InterventionShared").Parent;
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(l_Parent_0.Promise);
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-return function(v5) --[[ Line: 18 ]] --[[ Name: PostDismissIntervention ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_HttpService_0 (copy), v3 (copy), l_HttpRbxApiService_0 (copy)
-    local v6 = l_UrlBuilder_0.usermoderation.dismissIntervention();
-    local v7 = l_HttpService_0:JSONEncode({
-        intervention_id = v5
-    });
-    return v3.new(function(v8, v9) --[[ Line: 24 ]]
-        -- upvalues: l_HttpRbxApiService_0 (ref), v6 (copy), v7 (copy), l_HttpService_0 (ref)
-        task.defer(function() --[[ Line: 25 ]]
-            -- upvalues: l_HttpRbxApiService_0 (ref), v6 (ref), v7 (ref), l_HttpService_0 (ref), v8 (copy), v9 (copy)
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 26 ]]
-                -- upvalues: l_HttpRbxApiService_0 (ref), v6 (ref), v7 (ref)
-                return l_HttpRbxApiService_0:PostAsyncFullUrl(v6, v7, Enum.ThrottlingPriority.Default);
-            end);
-            if l_status_0 then
-                local l_status_1, l_result_1 = pcall(function() --[[ Line: 31 ]]
-                    -- upvalues: l_HttpService_0 (ref), l_result_0 (copy)
-                    return l_HttpService_0:JSONDecode(l_result_0);
-                end);
-                if l_status_1 then
-                    v8(l_result_1);
-                    return;
-                else
-                    v9({
-                        error = "Failed to parse JSON response", 
-                        details = l_result_1
-                    });
-                    return;
-                end;
-            else
-                v9({
-                    error = "HTTP request failed", 
-                    details = l_result_0
-                });
-                return;
-            end;
-        end);
-    end);
-end;
+local Parent = script:FindFirstAncestor("InterventionShared").Parent
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local HttpService = game:GetService("HttpService")
+local Promise = require(Parent.Promise)
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+
+local function PostDismissIntervention(s1: string) -- line: 18
+	-- upvalues: UrlBuilder (copy), HttpService (copy), Promise (copy), HttpRbxApiService (copy)
+	local v8 = UrlBuilder.usermoderation.dismissIntervention()
+	local json = HttpService:JSONEncode({
+		intervention_id = s1
+	})
+
+	return Promise.new(function(resolve, reject) -- line: 24
+		-- upvalues: HttpRbxApiService (copy), v8 (copy), json (copy), HttpService (copy)
+		task.defer(function() -- line: 25
+			-- upvalues: HttpRbxApiService (copy), v8 (copy), json (copy), HttpService (copy), resolve (copy), reject (copy)
+			local ok, result = pcall(function() -- line: 26
+				-- upvalues: HttpRbxApiService (copy), v8 (copy), json (copy)
+				return HttpRbxApiService:PostAsyncFullUrl(v8, json, Enum.ThrottlingPriority.Default)
+			end)
+
+			if ok then
+				local ok2, result2 = pcall(function() -- line: 31
+					-- upvalues: HttpService (copy), result (copy)
+					return HttpService:JSONDecode(result)
+				end)
+
+				if ok2 then
+					resolve(result2)
+
+					return
+				end
+
+				reject({
+					error = "Failed to parse JSON response",
+					details = result2
+				})
+
+				return
+			end
+
+			reject({
+				error = "HTTP request failed",
+				details = result
+			})
+		end)
+	end)
+end
+
+return PostDismissIntervention

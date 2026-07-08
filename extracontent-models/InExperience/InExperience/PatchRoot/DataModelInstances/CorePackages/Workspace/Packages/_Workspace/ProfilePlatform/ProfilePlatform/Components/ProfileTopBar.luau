@@ -1,1 +1,1 @@
-return require(script.ProfileTopBar);
+return require(script.ProfileTopBar)

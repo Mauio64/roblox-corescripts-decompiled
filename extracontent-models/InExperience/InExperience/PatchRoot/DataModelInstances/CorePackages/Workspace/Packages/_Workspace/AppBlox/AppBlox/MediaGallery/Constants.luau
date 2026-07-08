@@ -1,16 +1,18 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local _ = require(l_Parent_0.UIBlox);
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+
+require(Parent.UIBlox)
+
 return {
-    getDefaultStyleProps = function(v2) --[[ Line: 19 ]] --[[ Name: getDefaultStyleProps ]]
-        return {
-            borderRadius = UDim.new(0, v2.Tokens.Component.VerticalTile.Base.Container.BorderRadius.LeadingTop), 
-            contentGap = v2.Tokens.Global.Space_150, 
-            gutter = v2.Tokens.Global.Space_300, 
-            titleFont = v2.Font.Header1, 
-            titleTextColor = {
-                Color = v2.Tokens.Semantic.Color.Text.Emphasis.Color3, 
-                Transparency = v2.Tokens.Semantic.Color.Text.Emphasis.Transparency
-            }
-        };
-    end
-};
+	getDefaultStyleProps = function(p1) -- line: 19
+		return {
+			borderRadius = UDim.new(0, p1.Tokens.Radius.Medium),
+			contentGap = p1.Tokens.Size.Size_300,
+			gutter = p1.Tokens.Size.Size_600,
+			titleFont = p1.Font.Header1,
+			titleTextColor = {
+				Color = p1.Tokens.Color.Content.Emphasis.Color3,
+				Transparency = p1.Tokens.Color.Content.Emphasis.Transparency
+			}
+		}
+	end
+}

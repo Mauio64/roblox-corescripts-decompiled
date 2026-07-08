@@ -1,134 +1,186 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Enums.FillBehavior);
-local v5 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v6 = require(script.Parent.TabItem);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v8 = require(l_script_FirstAncestor_0.Components.View);
-local v9 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v10 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v11 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v12 = require(l_script_FirstAncestor_0.Utility.useAnimatedHighlight);
-local v13 = require(script.Parent.OverflowScrollContainer);
-local v14 = {
-    fillBehavior = v4.Fill, 
-    size = v5.Medium, 
-    testId = "--foundation-tabs", 
-    ZIndex = 1
-};
-return v3.memo(v3.forwardRef(function(v15, v16) --[[ Line: 44 ]] --[[ Name: Tabs ]]
-    -- upvalues: v9 (copy), v11 (copy), v14 (copy), v3 (copy), v2 (copy), v4 (copy), v12 (copy), v8 (copy), v10 (copy), v13 (copy), v6 (copy)
-    local v17 = v9();
-    local v18 = v11(v15, v14);
-    local v19, v20 = v3.useState(v18.defaultActiveTabId or v2.get(v18, {
-        1, 
-        "id"
-    }));
-    local v22 = v3.useCallback(function(v21) --[[ Line: 50 ]]
-        -- upvalues: v18 (copy), v20 (copy)
-        if v18.onActivated then
-            v18.onActivated(v21);
-        end;
-        v20(v21);
-    end);
-    local v23 = v18.fillBehavior == v4.Fill;
-    local v24 = v18.activeTabId or v19;
-    local v26 = v2.find(v18.tabs, function(v25) --[[ Line: 59 ]]
-        -- upvalues: v24 (copy)
-        return v25.id == v24;
-    end);
-    local v27 = v3.useRef(nil);
-    local v31 = v3.useMemo(function() --[[ Line: 66 ]]
-        -- upvalues: v18 (copy), v3 (ref)
-        local v28 = {};
-        for _, v30 in v18.tabs do
-            v28[v30.id] = v30.ref or v3.createRef();
-        end;
-        return v28;
-    end, {
-        v18.tabs
-    });
-    local v32 = v12(v24, v16 or v27, v31, v18.size, v18.fillBehavior);
-    local l_highlightPosition_0 = v32.highlightPosition;
-    local l_highlightWidth_0 = v32.highlightWidth;
-    local l_activeItemHeight_0 = v32.activeItemHeight;
-    return v3.createElement(v8, {
-        tag = "size-full-0 auto-y clip"
-    }, {
-        Tabs = v3.createElement(v8, v10(v18, {
-            ref = v16 or v27, 
-            tag = "auto-y size-full-0 col"
-        }), {
-            Wrapper = v3.createElement(v8, {
-                LayoutOrder = 1, 
-                tag = "auto-y size-full-0", 
-                testId = ("%*--wrapper"):format(v18.testId)
-            }, {
-                ScrollContainer = v3.createElement(v13, {
-                    LayoutOrder = 1, 
-                    size = v18.size, 
-                    testId = ("%*--scroll-container"):format(v18.testId)
-                }, {
-                    TabList = v3.createElement(v8, {
-                        tag = {
-                            ["row auto-xy flex-y-fill"] = true, 
-                            ["gap-large"] = not v23, 
-                            ["size-full-0"] = v23
-                        }, 
-                        testId = ("%*--list"):format(v18.testId)
-                    }, v2.map(v18.tabs, function(v36, v37) --[[ Line: 111 ]]
-                        -- upvalues: v3 (ref), v6 (ref), v24 (copy), v22 (copy), v18 (copy), v31 (copy)
-                        return v3.createElement(v6, {
-                            id = v36.id, 
-                            text = v36.text, 
-                            key = tostring(v36.id), 
-                            icon = v36.icon, 
-                            isActive = v36.id == v24, 
-                            onActivated = v22, 
-                            LayoutOrder = v37, 
-                            fillBehavior = v18.fillBehavior, 
-                            size = v18.size, 
-                            isDisabled = v36.isDisabled, 
-                            testId = ("%*--item-%*"):format(v18.testId, v36.id), 
-                            ref = v31[v36.id]
-                        });
-                    end))
-                }), 
-                Border = v3.createElement(v8, {
-                    LayoutOrder = 2, 
-                    AnchorPoint = Vector2.new(0, 1), 
-                    Size = UDim2.new(1, 0, 0, v17.Stroke.Thick), 
-                    Position = UDim2.fromScale(0, 1), 
-                    backgroundStyle = v17.Color.Stroke.Default, 
-                    testId = ("%*--border"):format(v18.testId)
-                })
-            }), 
-            Content = if v26 and v26.content then v3.createElement(v8, {
-                LayoutOrder = 2, 
-                tag = "auto-y size-full-0", 
-                testId = ("%*--content"):format(v18.testId)
-            }, v26.content) else nil
-        }), 
-        AnimatedBorder = v3.createElement(v8, {
-            LayoutOrder = 0, 
-            ZIndex = v18.ZIndex + 1, 
-            Size = l_highlightWidth_0:map(function(v38) --[[ Line: 151 ]]
-                -- upvalues: v17 (copy)
-                return UDim2.fromOffset(v38, v17.Stroke.Thick);
-            end), 
-            Position = v3.joinBindings({
-                l_highlightPosition_0, 
-                l_activeItemHeight_0
-            }):map(function(v39) --[[ Line: 154 ]]
-                -- upvalues: v17 (copy)
-                local v40 = v39[1];
-                local v41 = v39[2];
-                return UDim2.fromOffset(v40, v41 - v17.Stroke.Thick);
-            end), 
-            backgroundStyle = v17.Color.System.Contrast, 
-            testId = ("%*--animated-border"):format(v18.testId)
-        })
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+local Flags = require(Foundation.Utility.Flags)
+local InputSize = require(Foundation.Enums.InputSize)
+local TabItem = require(script.Parent.TabItem)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useAnimatedHighlight = require(Foundation.Utility.useAnimatedHighlight)
+local OverflowScrollContainer = require(script.Parent.OverflowScrollContainer)
+local t1 = {
+	testId = "--foundation-tabs",
+	ZIndex = 1,
+	fillBehavior = FillBehavior.Fill,
+	size = InputSize.Medium
+}
+
+local function Tabs(p1, p2) -- line: 45
+	-- upvalues: useTokens (copy), withDefaults (copy), t1 (copy), React (copy), Dash (copy), FillBehavior (copy), Flags (copy), useAnimatedHighlight (copy), View (copy), withCommonProps (copy), OverflowScrollContainer (copy), TabItem (copy)
+	local v19 = useTokens()
+	local v20 = withDefaults(p1, t1)
+	local v21, v22 = React.useState(v20.defaultActiveTabId or Dash.get(v20, {
+		1,
+		"id"
+	}))
+	local v23 = React.useCallback(function(p3) -- line: 51
+		-- upvalues: v20 (copy), v22 (copy)
+		if v20.onActivated then
+			v20.onActivated(p3)
+		end
+
+		v22(p3)
+	end)
+	local v24 = v20.fillBehavior == FillBehavior.Fill
+	local v25 = v20.activeTabId or v21
+	local v26 = Dash.find(v20.tabs, function(p4) -- line: 60
+		-- upvalues: v25 (copy)
+		return p4.id == v25
+	end)
+	local v27 = React.useRef(nil)
+	local u29
+
+	if Flags.FoundationFixStaleAnimatedHighlightRefs then
+		local v28 = React.useRef({})
+
+		u29 = React.useMemo(function() -- line: 70
+			-- upvalues: v28 (copy), v20 (copy), React (copy)
+			local current = v28.current
+
+			for _, v38 in v20.tabs do
+				if v38.ref then
+					current[v38.id] = v38.ref
+				elseif not current[v38.id] then
+					current[v38.id] = React.createRef()
+				end
+			end
+
+			return current
+		end, { v20.tabs })
+	else
+		u29 = React.useMemo(function() -- line: 82
+			-- upvalues: v20 (copy), React (copy)
+			local t2 = {}
+
+			for _, v41 in v20.tabs do
+				t2[v41.id] = v41.ref or React.createRef()
+			end
+
+			return t2
+		end, { v20.tabs })
+	end
+
+	local v30 = useAnimatedHighlight(v25, p2 or v27, u29, v20.size, v20.fillBehavior)
+	local highlightPosition = v30.highlightPosition
+	local highlightWidth = v30.highlightWidth
+	local activeItemHeight = v30.activeItemHeight
+
+	return React.createElement(View, withCommonProps(v20, if not Flags.FoundationTabsInlineSizeFull then {
+		tag = "size-full-0 auto-y clip"
+	} else {
+		tag = "auto-y clip",
+		Size = UDim2.fromScale(1, 0)
+	}), {
+		Tabs = React.createElement(View, if not Flags.FoundationTabsInlineSizeFull then {
+			tag = "col size-full-0 auto-y",
+			ref = p2 or v27
+		} else {
+			tag = "col auto-y",
+			ref = p2 or v27,
+			Size = UDim2.fromScale(1, 0)
+		}, {
+			Wrapper = React.createElement(View, if not Flags.FoundationTabsInlineSizeFull then {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y",
+				testId = `{ v20.testId }--wrapper`
+			} else {
+				LayoutOrder = 1,
+				tag = "auto-y",
+				Size = UDim2.fromScale(1, 0),
+				testId = `{ v20.testId }--wrapper`
+			}, {
+				ScrollContainer = React.createElement(OverflowScrollContainer, {
+					LayoutOrder = 1,
+					size = v20.size,
+					testId = `{ v20.testId }--scroll-container`
+				}, {
+					TabList = React.createElement(View, {
+						tag = if not Flags.FoundationTabsInlineSizeFull then {
+							["row flex-y-fill auto-xy"] = true,
+							["gap-large"] = not v24,
+							["size-full-0"] = v24
+						} else {
+							["row flex-y-fill auto-xy"] = true,
+							["gap-large"] = not v24
+						},
+						Size = if not Flags.FoundationTabsInlineSizeFull or not v24 then nil else UDim2.fromScale(1, 0),
+						testId = `{ v20.testId }--list`
+					}, Dash.map(v20.tabs, function(p5, p6) -- line: 155
+						-- upvalues: React (copy), TabItem (copy), v25 (copy), v23 (copy), v20 (copy), u29 (ref)
+						return React.createElement(TabItem, {
+							id = p5.id,
+							text = p5.text,
+							key = tostring(p5.id),
+							icon = p5.icon,
+							isActive = p5.id == v25,
+							onActivated = v23,
+							LayoutOrder = p6,
+							fillBehavior = v20.fillBehavior,
+							size = v20.size,
+							isDisabled = p5.isDisabled,
+							testId = `{ v20.testId }--item-{ p5.id }`,
+							ref = u29[p5.id]
+						})
+					end))
+				}),
+				Border = React.createElement(View, {
+					LayoutOrder = 2,
+					AnchorPoint = Vector2.new(0, 1),
+					Size = UDim2.new(1, 0, 0, v19.Stroke.Thick),
+					Position = UDim2.fromScale(0, 1),
+					backgroundStyle = v19.Color.Stroke.Default,
+					testId = `{ v20.testId }--border`
+				})
+			}),
+			Content = if not v26 or not v26.content then nil else React.createElement(View, if not Flags.FoundationTabsInlineSizeFull then {
+				LayoutOrder = 2,
+				tag = "size-full-0 auto-y",
+				testId = `{ v20.testId }--content`
+			} else {
+				LayoutOrder = 2,
+				tag = "auto-y",
+				Size = UDim2.fromScale(1, 0),
+				testId = `{ v20.testId }--content`
+			}, v26.content)
+		}),
+		AnimatedBorder = React.createElement(View, {
+			LayoutOrder = 0,
+			ZIndex = v20.ZIndex + 1,
+			Size = highlightWidth:map(function(p7) -- line: 206
+				-- upvalues: v19 (copy)
+				return UDim2.fromOffset(p7, v19.Stroke.Thick)
+			end),
+			Position = React.joinBindings({
+				highlightPosition,
+				activeItemHeight
+			}):map(function(p8) -- line: 209
+				-- upvalues: v19 (copy)
+				local v46 = p8[1]
+				local v47 = p8[2]
+
+				return UDim2.fromOffset(v46, v47 - v19.Stroke.Thick)
+			end),
+			backgroundStyle = v19.Color.System.Contrast,
+			testId = `{ v20.testId }--animated-border`
+		})
+	})
+end
+
+return React.memo(React.forwardRef(Tabs))

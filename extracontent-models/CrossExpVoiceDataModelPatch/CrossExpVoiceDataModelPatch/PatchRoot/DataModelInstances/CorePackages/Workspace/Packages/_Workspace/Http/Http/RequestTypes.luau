@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("Http").Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-return {};
+local Parent = script:FindFirstAncestor("Http").Parent
+
+require(Parent.LuauPolyfill)
+
+return {}

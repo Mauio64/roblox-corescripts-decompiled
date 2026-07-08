@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableOnPlatformSharingExperiment_v5", false);
+return game:DefineFastFlag("EnableOnPlatformSharingExperiment_v5", false)

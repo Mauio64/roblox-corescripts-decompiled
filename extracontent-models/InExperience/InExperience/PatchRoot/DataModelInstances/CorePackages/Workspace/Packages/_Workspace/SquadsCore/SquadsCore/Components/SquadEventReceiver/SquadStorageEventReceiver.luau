@@ -1,50 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local v3 = require(l_script_FirstAncestor_0.RoduxSquads);
-local v4 = require(l_script_FirstAncestor_0.Common.Constants);
-local v5 = require(l_script_FirstAncestor_0.Components.SquadExternalContractProvider.SquadExternalContractContext);
-local v6 = require(l_script_FirstAncestor_0.Thunks.fetchActiveSquad);
-local v7 = require(l_script_FirstAncestor_0.Hooks.useCurrentSquadId);
-local v8 = require(l_script_FirstAncestor_0.Common.validateSquadId);
-local v9 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v9.useEffect;
-return function() --[[ Line: 18 ]]
-    -- upvalues: l_useDispatch_0 (copy), v7 (copy), v9 (copy), v5 (copy), l_AppStorageService_0 (copy), v4 (copy), l_useEffect_0 (copy), v8 (copy), v6 (copy), v3 (copy)
-    local v12 = l_useDispatch_0();
-    local v13 = v7() or "";
-    local v14, v15 = v9.useState(false);
-    local v16 = v9.useContext(v5).useIsChatEnabled();
-    v9.useEffect(function() --[[ Line: 27 ]]
-        -- upvalues: v14 (copy), l_AppStorageService_0 (ref), v4 (ref), v13 (copy)
-        if v14 then
-            l_AppStorageService_0:SetItem(v4.ACTIVE_SQUAD_APP_STORAGE_KEY, v13);
-            l_AppStorageService_0:Flush();
-        end;
-    end, {
-        v13, 
-        v14
-    });
-    l_useEffect_0(function() --[[ Line: 35 ]]
-        -- upvalues: v16 (copy), l_AppStorageService_0 (ref), v4 (ref), v8 (ref), v13 (copy), v12 (copy), v6 (ref), v3 (ref), v15 (copy)
-        if not v16 then
-            return;
-        else
-            local l_l_AppStorageService_0_Item_0 = l_AppStorageService_0:GetItem(v4.ACTIVE_SQUAD_APP_STORAGE_KEY);
-            local v18 = v8(l_l_AppStorageService_0_Item_0);
-            if v18 and v13 == "" then
-                v12(v6());
-            elseif l_l_AppStorageService_0_Item_0 ~= "" and not v18 or v13 ~= "" and v13 ~= l_l_AppStorageService_0_Item_0 then
-                v12(v3.Actions.CurrentSquadUpdated(nil));
-                l_AppStorageService_0:SetItem(v4.ACTIVE_SQUAD_APP_STORAGE_KEY, "");
-                l_AppStorageService_0:Flush();
-            end;
-            v15(true);
-            return;
-        end;
-    end, {
-        v16
-    });
-    return nil;
-end;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local AppStorageService = game:GetService("AppStorageService")
+local RoduxSquads = require(SquadsCore.RoduxSquads)
+local Constants = require(SquadsCore.Common.Constants)
+local SquadExternalContractContext = require(SquadsCore.Components.SquadExternalContractProvider.SquadExternalContractContext)
+local fetchActiveSquad = require(SquadsCore.Thunks.fetchActiveSquad)
+local useCurrentSquadId = require(SquadsCore.Hooks.useCurrentSquadId)
+local validateSquadId = require(SquadsCore.Common.validateSquadId)
+local React = require(SquadsCoreParent.React)
+local useDispatch = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+
+return function() -- line: 18
+	-- upvalues: useDispatch (copy), useCurrentSquadId (copy), React (copy), SquadExternalContractContext (copy), AppStorageService (copy), Constants (copy), useEffect (copy), validateSquadId (copy), fetchActiveSquad (copy), RoduxSquads (copy)
+	local v13 = useDispatch()
+	local v14 = useCurrentSquadId() or ""
+	local v15, v16 = React.useState(false)
+	local v17 = React.useContext(SquadExternalContractContext).useIsChatEnabled()
+
+	React.useEffect(function() -- line: 27
+		-- upvalues: v15 (copy), AppStorageService (copy), Constants (copy), v14 (copy)
+		if v15 then
+			AppStorageService:SetItem(Constants.ACTIVE_SQUAD_APP_STORAGE_KEY, v14)
+			AppStorageService:Flush()
+		end
+	end, {
+		v14,
+		v15
+	})
+	useEffect(function() -- line: 35
+		-- upvalues: v17 (copy), AppStorageService (copy), Constants (copy), validateSquadId (copy), v14 (copy), v13 (copy), fetchActiveSquad (copy), RoduxSquads (copy), v16 (copy)
+		if not v17 then
+			return
+		end
+
+		local Item = AppStorageService:GetItem(Constants.ACTIVE_SQUAD_APP_STORAGE_KEY)
+		local v19 = validateSquadId(Item)
+
+		if v19 and v14 == "" then
+			v13(fetchActiveSquad())
+		elseif Item ~= "" and not v19 or v14 ~= "" and Item ~= v14 then
+			v13(RoduxSquads.Actions.CurrentSquadUpdated(nil))
+			AppStorageService:SetItem(Constants.ACTIVE_SQUAD_APP_STORAGE_KEY, "")
+			AppStorageService:Flush()
+		end
+
+		v16(true)
+	end, { v17 })
+
+	return nil
+end

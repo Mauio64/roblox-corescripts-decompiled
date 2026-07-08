@@ -1,27 +1,32 @@
-local v0 = {};
-v0.__index = v0;
-v0.GetPropertyChangedSignal = function(v1, v2) --[[ Line: 4 ]] --[[ Name: GetPropertyChangedSignal ]]
-    if v2 == "VRDeviceAvailable" then
-        return v1._vrDeviceAvailableChanged.Event;
-    else
-        error(("%s is not a valid property name"):format((tostring(v2))));
-        return;
-    end;
-end;
-v0.toggleHeadsetConnectionState = function(v3) --[[ Line: 11 ]] --[[ Name: toggleHeadsetConnectionState ]]
-    local v4 = not v3.VRDeviceAvailable;
-    v3.VRDeviceAvailable = v4;
-    v3._vrDeviceAvailableChanged:Fire(v4);
-end;
-v0.new = function() --[[ Line: 18 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v5 = {
-        VRDeviceAvailable = true, 
-        _vrDeviceAvailableChanged = Instance.new("BindableEvent")
-    };
-    setmetatable(v5, {
-        __index = v0
-    });
-    return v5;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.GetPropertyChangedSignal(p1, p2) -- line: 4
+	if p2 == "VRDeviceAvailable" then
+		return p1._vrDeviceAvailableChanged.Event
+	end
+
+	error(("%s is not a valid property name"):format((tostring(p2))))
+end
+function t1.toggleHeadsetConnectionState(p3) -- line: 11
+	local v5 = not p3.VRDeviceAvailable
+
+	p3.VRDeviceAvailable = v5
+	p3._vrDeviceAvailableChanged:Fire(v5)
+end
+function t1.new() -- line: 18
+	-- upvalues: t1 (copy)
+	local t2 = {
+		VRDeviceAvailable = true,
+		_vrDeviceAvailableChanged = Instance.new("BindableEvent")
+	}
+
+	setmetatable(t2, {
+		__index = t1
+	})
+
+	return t2
+end
+
+return t1

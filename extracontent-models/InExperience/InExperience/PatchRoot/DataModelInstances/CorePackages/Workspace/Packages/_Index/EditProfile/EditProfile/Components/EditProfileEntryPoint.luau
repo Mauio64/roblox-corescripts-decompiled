@@ -1,1 +1,1 @@
-return (require(script.EditProfileAnalyticsWrapper));
+return (require(script.EditProfileAnalyticsWrapper))

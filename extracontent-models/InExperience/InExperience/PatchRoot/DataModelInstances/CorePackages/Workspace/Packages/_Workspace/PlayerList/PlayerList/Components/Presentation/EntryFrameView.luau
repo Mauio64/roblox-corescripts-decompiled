@@ -1,60 +1,63 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.Cryo);
-local l_View_0 = require(l_Parent_1.Foundation).View;
-local v5 = require(l_Parent_0.Flags.FFlagAddNewPlayerListFocusNav);
-local v6 = require(l_Parent_0.Flags.FFlagRemoveNewPlayerListOverlay);
-local function v8(v7) --[[ Line: 30 ]] --[[ Name: EntryFrameView ]]
-    -- upvalues: v2 (copy), l_View_0 (copy), v6 (copy), v5 (copy)
-    return v2.createElement(l_View_0, {
-        Size = v7.size, 
-        BackgroundTransparency = if v6 then nil else 1, 
-        AutoButtonColor = if v6 then nil else false, 
-        backgroundStyle = if v6 then {
-            Color3 = v7.backgroundStyle.Color, 
-            Transparency = v7.backgroundStyle.Transparency
-        } else nil, 
-        Text = if v6 then nil else "", 
-        AutoLocalize = if v6 then nil else false, 
-        Selectable = not v7.isTeamFrame, 
-        Active = if v6 then nil else not v7.isTeamFrame, 
-        onActivated = v7.onActivated, 
-        onStateChanged = v7.onStateChanged, 
-        ref = if v5 then v7.forwardRef else v7.firstPlayerRef
-    }, if v6 then v7.children else {
-        BackgroundFrame = v2.createElement("Frame", {
-            ZIndex = 0, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v7.backgroundStyle.Transparency, 
-            BackgroundColor3 = v7.backgroundStyle.Color, 
-            BorderSizePixel = 0
-        }), 
-        DoubleOverLay = v2.createElement("Frame", {
-            ZIndex = 1, 
-            Visible = v7.doubleOverlay, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v7.overlayStyle and v7.overlayStyle.Transparency, 
-            BackgroundColor3 = v7.overlayStyle and v7.overlayStyle.Color, 
-            BorderSizePixel = 0
-        }), 
-        OverlayFrame = v2.createElement("Frame", {
-            ZIndex = 2, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v7.overlayStyle and v7.overlayStyle.Transparency, 
-            BackgroundColor3 = v7.overlayStyle and v7.overlayStyle.Color, 
-            BorderSizePixel = 0
-        }, v7.children)
-    });
-end;
-if v5 then
-    local v11 = v2.forwardRef(function(v9, v10) --[[ Line: 85 ]]
-        -- upvalues: v2 (copy), v8 (copy), v3 (copy)
-        return v2.createElement(v8, v3.Dictionary.join(v9, {
-            forwardRef = v10
-        }));
-    end);
-    return v2.memo(v11);
-else
-    return v2.memo(v8);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Cryo = require(ParentParentParent.Cryo)
+local View = require(ParentParentParent.Foundation).View
+local FFlagAddNewPlayerListFocusNav = require(ParentParent.Flags.FFlagAddNewPlayerListFocusNav)
+local FFlagRemoveNewPlayerListOverlay = require(ParentParent.Flags.FFlagRemoveNewPlayerListOverlay)
+
+local function EntryFrameView(t1: {[any]: any}) -- line: 30
+	-- upvalues: React (copy), View (copy), FFlagRemoveNewPlayerListOverlay (copy), FFlagAddNewPlayerListFocusNav (copy)
+	return React.createElement(View, {
+		Size = t1.size,
+		BackgroundTransparency = not FFlagRemoveNewPlayerListOverlay and 1 or nil,
+		AutoButtonColor = not not FFlagRemoveNewPlayerListOverlay and nil,
+		backgroundStyle = if not FFlagRemoveNewPlayerListOverlay then nil else {
+			Color3 = t1.backgroundStyle.Color,
+			Transparency = t1.backgroundStyle.Transparency
+		},
+		Text = not FFlagRemoveNewPlayerListOverlay and "" or nil,
+		AutoLocalize = not not FFlagRemoveNewPlayerListOverlay and nil,
+		Selectable = not t1.isTeamFrame,
+		Active = if not FFlagRemoveNewPlayerListOverlay then not t1.isTeamFrame else nil,
+		onActivated = t1.onActivated,
+		onStateChanged = t1.onStateChanged,
+		ref = if not FFlagAddNewPlayerListFocusNav then t1.firstPlayerRef else t1.forwardRef
+	}, if not FFlagRemoveNewPlayerListOverlay then {
+		BackgroundFrame = React.createElement("Frame", {
+			ZIndex = 0,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = t1.backgroundStyle.Transparency,
+			BackgroundColor3 = t1.backgroundStyle.Color
+		}),
+		DoubleOverLay = React.createElement("Frame", {
+			ZIndex = 1,
+			BorderSizePixel = 0,
+			Visible = t1.doubleOverlay,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = t1.overlayStyle and t1.overlayStyle.Transparency,
+			BackgroundColor3 = t1.overlayStyle and t1.overlayStyle.Color
+		}),
+		OverlayFrame = React.createElement("Frame", {
+			ZIndex = 2,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = t1.overlayStyle and t1.overlayStyle.Transparency,
+			BackgroundColor3 = t1.overlayStyle and t1.overlayStyle.Color
+		}, t1.children)
+	} else t1.children)
+end
+
+if FFlagAddNewPlayerListFocusNav then
+	local v9 = React.forwardRef(function(p1, p2) -- line: 85
+		-- upvalues: React (copy), EntryFrameView (copy), Cryo (copy)
+		return React.createElement(EntryFrameView, Cryo.Dictionary.join(p1, {
+			forwardRef = p2
+		}))
+	end)
+
+	return React.memo(v9)
+end
+
+return React.memo(EntryFrameView)

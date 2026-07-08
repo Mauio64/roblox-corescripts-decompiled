@@ -1,33 +1,38 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_Divider_0 = v3.Divider;
-local l_DividerOrientation_0 = v3.Enums.DividerOrientation;
-local _ = require(l_script_FirstAncestor_0.Enums.ViewType);
-return function(v7) --[[ Line: 78 ]] --[[ Name: ResponsivePanelLayout ]]
-    -- upvalues: v2 (copy), v3 (copy), l_Divider_0 (copy), l_DividerOrientation_0 (copy)
-    local l_panelConfig_0 = v7.panelConfig;
-    return v2.createElement(v3.View, {
-        tag = l_panelConfig_0.tag, 
-        LayoutOrder = v7.LayoutOrder, 
-        ClipsDescendants = true
-    }, {
-        FirstPanel = if v7.renderFirstPanel then v2.createElement(v3.View, {
-            Size = if v7.renderSecondPanel then l_panelConfig_0.panelSizes.first else UDim2.new(1, 0, 1, 0), 
-            LayoutOrder = l_panelConfig_0.layoutOrder.first
-        }, {
-            RightBorder = if l_panelConfig_0.showRightBorder then v2.createElement(l_Divider_0, {
-                orientation = l_DividerOrientation_0.Vertical, 
-                Position = UDim2.new(1, -1, 0, 0)
-            }) else nil, 
-            StartSlot = v7.renderFirstPanel()
-        }) else nil, 
-        SecondPanel = if v7.renderSecondPanel then v2.createElement(v3.View, {
-            Size = if v7.renderFirstPanel then l_panelConfig_0.panelSizes.second else UDim2.new(1, 0, 1, 0), 
-            LayoutOrder = l_panelConfig_0.layoutOrder.second
-        }, {
-            EndSlot = v7.renderSecondPanel()
-        }) else nil
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local Divider = Foundation.Divider
+local DividerOrientation = Foundation.Enums.DividerOrientation
+
+require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+
+local function ResponsivePanelLayout(t1: {[any]: any}) -- line: 78
+	-- upvalues: React (copy), Foundation (copy), Divider (copy), DividerOrientation (copy)
+	local panelConfig = t1.panelConfig
+
+	return React.createElement(Foundation.View, {
+		ClipsDescendants = true,
+		tag = panelConfig.tag,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		FirstPanel = if not t1.renderFirstPanel then nil else React.createElement(Foundation.View, {
+			Size = if not t1.renderSecondPanel then UDim2.new(1, 0, 1, 0) else panelConfig.panelSizes.first,
+			LayoutOrder = panelConfig.layoutOrder.first
+		}, {
+			RightBorder = if not panelConfig.showRightBorder then nil else React.createElement(Divider, {
+				orientation = DividerOrientation.Vertical,
+				Position = UDim2.new(1, -1, 0, 0)
+			}),
+			StartSlot = t1.renderFirstPanel()
+		}),
+		SecondPanel = if not t1.renderSecondPanel then nil else React.createElement(Foundation.View, {
+			Size = if not t1.renderFirstPanel then UDim2.new(1, 0, 1, 0) else panelConfig.panelSizes.second,
+			LayoutOrder = panelConfig.layoutOrder.second
+		}, {
+			EndSlot = t1.renderSecondPanel()
+		})
+	})
+end
+
+return ResponsivePanelLayout

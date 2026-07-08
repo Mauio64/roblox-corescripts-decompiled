@@ -1,1 +1,1 @@
-return require(script.ProfileCompletionContainer);
+return require(script.ProfileCompletionContainer)

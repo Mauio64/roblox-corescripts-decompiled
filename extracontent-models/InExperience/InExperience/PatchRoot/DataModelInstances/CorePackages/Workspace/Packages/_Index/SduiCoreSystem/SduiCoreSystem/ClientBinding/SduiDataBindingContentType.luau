@@ -15,5 +15,14 @@ return {
 	marketplaceLook = "marketplaceLook",
 	song = "song",
 	gamePass = "gamePass",
-	playability = "playability"
+	gameDeveloperProduct = "gameDeveloperProduct",
+	gameSubscription = "gameSubscription",
+	playability = "playability",
+	universeUserVote = "universeUserVote",
+	universeUserFavorite = "universeUserFavorite",
+	universeUserFollow = "universeUserFollow",
+	universeUserVoteFeedbackMetadata = "universeUserVoteFeedbackMetadata",
+	userProfile = "userProfile",
+	clientPageScope = "clientPageScope",
+	capability = "capability"
 }

@@ -1,14 +1,16 @@
-return function(v0) --[[ Line: 4 ]]
-    local v6 = setmetatable({}, {
-        __index = function(v1, v2) --[[ Line: 6 ]] --[[ Name: __index ]]
-            return (rawget(v1, v2:lower()));
-        end, 
-        __newindex = function(v3, v4, v5) --[[ Line: 9 ]] --[[ Name: __newindex ]]
-            rawset(v3, v4:lower(), v5);
-        end
-    });
-    for v7, v8 in pairs(v0) do
-        v6[v7] = v8;
-    end;
-    return v6;
-end;
+return function(p1) -- line: 4
+	local self = setmetatable({}, {
+		__index = function(p2, p3) -- line: 6
+			return (rawget(p2, p3:lower()))
+		end,
+		__newindex = function(p4, p5, p6) -- line: 9
+			rawset(p4, p5:lower(), p6)
+		end
+	})
+
+	for k, v in pairs(p1) do
+		self[k] = v
+	end
+
+	return self
+end

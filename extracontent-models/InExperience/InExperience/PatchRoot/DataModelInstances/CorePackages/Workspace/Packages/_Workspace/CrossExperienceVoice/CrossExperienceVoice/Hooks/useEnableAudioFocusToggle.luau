@@ -1,93 +1,107 @@
-local l_game_EngineFeature_0 = game:GetEngineFeature("AudioFocusManagement");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_SharedFlags_0 = v2.SharedFlags;
-local v4 = l_SharedFlags_0.GetFFlagEnableCrossExperienceVoiceCaptureMute();
-local v5 = l_SharedFlags_0.GetFFlagEnableVoiceChatMuteForVideoCaptures();
-local v6 = if v5 then game:GetService("CaptureService") else nil;
-local l_React_0 = v2.React;
-local l_Cryo_0 = v2.Cryo;
-local function v13() --[[ Line: 18 ]] --[[ Name: useIsCapturingVideo ]]
-    -- upvalues: l_React_0 (copy), v6 (copy)
-    local v9, v10 = l_React_0.useState(v6 and v6:IsCapturingVideo());
-    l_React_0.useEffect(function() --[[ Line: 21 ]]
-        -- upvalues: v6 (ref), v10 (copy)
-        if not v6 then
-            return;
-        else
-            local v12 = v6.VideoCaptureInProgress:Connect(function(v11) --[[ Line: 26 ]]
-                -- upvalues: v10 (ref)
-                v10(v11);
-            end);
-            return function() --[[ Line: 30 ]]
-                -- upvalues: v6 (ref), v12 (copy)
-                if v6 then
-                    v12:Disconnect();
-                end;
-            end;
-        end;
-    end, {});
-    return v9;
-end;
-return function() --[[ Line: 40 ]] --[[ Name: useEnableAudioFocusToggle ]]
-    -- upvalues: l_React_0 (copy), v4 (copy), v5 (copy), v13 (copy), l_Cryo_0 (copy), l_game_EngineFeature_0 (copy)
-    local v14, v15 = l_React_0.useState({});
-    local v16 = false;
-    if v4 and v5 then
-        v16 = v13();
-    end;
-    local v19 = l_React_0.useCallback(function(v17) --[[ Line: 48 ]]
-        -- upvalues: v14 (copy), l_Cryo_0 (ref), v15 (copy)
-        if not v14[v17] then
-            local v18 = l_Cryo_0.Dictionary.join(v14, {
-                [v17] = true
-            });
-            v15(v18);
-        end;
-    end, {
-        v14
-    });
-    local v22 = l_React_0.useCallback(function(v20) --[[ Line: 57 ]]
-        -- upvalues: v14 (copy), l_Cryo_0 (ref), v15 (copy)
-        if v14[v20] then
-            local v21 = l_Cryo_0.Dictionary.join(v14, {
-                [v20] = nil
-            });
-            v15(v21);
-        end;
-    end, {
-        v14
-    });
-    l_React_0.useEffect(function() --[[ Line: 66 ]]
-        -- upvalues: l_game_EngineFeature_0 (ref), v15 (copy), v19 (copy), v22 (copy)
-        if not l_game_EngineFeature_0 then
-            return;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 71 ]]
-                return game:GetService("AudioFocusService");
-            end);
-            if not l_status_0 or not l_result_0 then
-                return;
-            else
-                local v25 = {};
-                local l_l_result_0_RegisteredContexts_0 = l_result_0:GetRegisteredContexts();
-                for v27, _ in pairs(l_l_result_0_RegisteredContexts_0) do
-                    v25[v27] = true;
-                end;
-                v15(v25);
-                local v29 = l_result_0.OnContextRegistered:Connect(v19);
-                local v30 = l_result_0.OnContextUnregistered:Connect(v22);
-                return function() --[[ Line: 88 ]]
-                    -- upvalues: v29 (copy), v30 (copy)
-                    if v29 then
-                        v29:Disconnect();
-                    end;
-                    if v30 then
-                        v30:Disconnect();
-                    end;
-                end;
-            end;
-        end;
-    end, {});
-    return v14[1] and v14[2] and not v16;
-end;
+local EngineFeature = game:GetEngineFeature("AudioFocusManagement")
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local SharedFlags = dependencies.SharedFlags
+local v5 = SharedFlags.GetFFlagEnableCrossExperienceVoiceCaptureMute()
+local v6 = SharedFlags.GetFFlagEnableVoiceChatMuteForVideoCaptures()
+local v7 = if not v6 then nil else game:GetService("CaptureService")
+local React = dependencies.React
+local Cryo = dependencies.Cryo
+
+local function useIsCapturingVideo() -- line: 18
+	-- upvalues: React (copy), v7 (copy)
+	local v12, v13 = React.useState(v7 and v7:IsCapturingVideo())
+
+	React.useEffect(function() -- line: 21
+		-- upvalues: v7 (copy), v13 (copy)
+		if not v7 then
+			return
+		end
+
+		local connection = v7.VideoCaptureInProgress:Connect(function(b1: boolean) -- line: 26
+			-- upvalues: v13 (copy)
+			v13(b1)
+		end)
+
+		return function() -- line: 30
+			-- upvalues: v7 (copy), connection (copy)
+			if v7 then
+				connection:Disconnect()
+			end
+		end
+	end, {})
+
+	return v12
+end
+local function useEnableAudioFocusToggle() -- line: 40
+	-- upvalues: React (copy), v5 (copy), v6 (copy), useIsCapturingVideo (copy), Cryo (copy), EngineFeature (copy)
+	local v14, v15 = React.useState({})
+	local v16 = false
+
+	if v5 and v6 then
+		v16 = useIsCapturingVideo()
+	end
+
+	local v17 = React.useCallback(function(p1) -- line: 48
+		-- upvalues: v14 (copy), Cryo (copy), v15 (copy)
+		if not v14[p1] then
+			local v21 = Cryo.Dictionary.join(v14, {
+				[p1] = true
+			})
+
+			v15(v21)
+		end
+	end, { v14 })
+	local v18 = React.useCallback(function(p2) -- line: 57
+		-- upvalues: v14 (copy), Cryo (copy), v15 (copy)
+		if v14[p2] then
+			local v23 = Cryo.Dictionary.join(v14, {
+				[p2] = nil
+			})
+
+			v15(v23)
+		end
+	end, { v14 })
+
+	React.useEffect(function() -- line: 66
+		-- upvalues: EngineFeature (copy), v15 (copy), v17 (copy), v18 (copy)
+		if not EngineFeature then
+			return
+		end
+
+		local ok, result = pcall(function() -- line: 71
+			return game:GetService("AudioFocusService")
+		end)
+
+		if not ok or not result then
+			return
+		end
+
+		local t1 = {}
+		local RegisteredContexts = result:GetRegisteredContexts()
+
+		for k, _ in pairs(RegisteredContexts) do
+			t1[k] = true
+		end
+
+		v15(t1)
+
+		local connection = result.OnContextRegistered:Connect(v17)
+		local connection2 = result.OnContextUnregistered:Connect(v18)
+
+		return function() -- line: 88
+			-- upvalues: connection (copy), connection2 (copy)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+		end
+	end, {})
+
+	return v14[1] and (v14[2] and not v16)
+end
+
+return useEnableAudioFocusToggle

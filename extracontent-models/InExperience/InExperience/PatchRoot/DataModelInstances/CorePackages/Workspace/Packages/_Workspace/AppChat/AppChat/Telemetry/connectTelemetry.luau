@@ -1,18 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Telemetry.useTelemetry);
-return function(v5) --[[ Line: 8 ]] --[[ Name: connectTelemetry ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy)
-    return function(v6) --[[ Line: 9 ]]
-        -- upvalues: v4 (ref), v5 (copy), v3 (ref), v2 (ref)
-        return function(v7) --[[ Line: 10 ]]
-            -- upvalues: v4 (ref), v5 (ref), v3 (ref), v6 (copy), v2 (ref)
-            local v8 = v4(v5);
-            return v3.createElement(v6, v2.Dictionary.union(v7, {
-                telemetry = v8
-            }));
-        end;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+
+local function connectTelemetry(p1) -- line: 8
+	-- upvalues: useTelemetry (copy), React (copy), Cryo (copy)
+	return function(p2) -- line: 9
+		-- upvalues: useTelemetry (copy), p1 (copy), React (copy), Cryo (copy)
+		return function(p3) -- line: 10
+			-- upvalues: useTelemetry (copy), p1 (copy), React (copy), p2 (copy), Cryo (copy)
+			local v10 = useTelemetry(p1)
+
+			return React.createElement(p2, Cryo.Dictionary.union(p3, {
+				telemetry = v10
+			}))
+		end
+	end
+end
+
+return connectTelemetry

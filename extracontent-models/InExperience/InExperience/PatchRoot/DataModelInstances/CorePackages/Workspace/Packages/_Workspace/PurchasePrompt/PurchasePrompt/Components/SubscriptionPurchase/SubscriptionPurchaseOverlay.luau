@@ -1,141 +1,176 @@
-local _ = game:GetService("ContextActionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.PurchasePromptDeps);
-local v4 = require(l_Parent_0.ToastRodux);
-local v5 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v6 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local _ = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v8 = require(l_Parent_0.RobloxTranslator);
-local l_Roact_0 = v3.Roact;
-local l_ToastType_0 = v4.Enums.ToastType;
-local l_IAPExperience_0 = v3.IAPExperience;
-local l_SubscriptionPurchaseFlow_0 = l_IAPExperience_0.PurchaseFlow.SubscriptionPurchaseFlow;
-local l_SubscriptionPurchaseFlowState_0 = l_IAPExperience_0.PurchaseFlow.SubscriptionPurchaseFlowState;
-local l_PurchaseErrorType_0 = l_IAPExperience_0.PurchaseFlow.PurchaseErrorType;
-local v15 = require(l_script_FirstAncestor_0.Enums.VPCModalType);
-local v16 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableSubscriptionPurchaseToast);
-local v17 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableVpcForInExperienceSubscriptionPurchase);
-local v18 = l_Roact_0.PureComponent:extend(script.Name);
-v18.init = function(v19) --[[ Line: 63 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy)
-    v19.confirmButtonPressed = function() --[[ Line: 64 ]]
-        -- upvalues: v19 (copy), v5 (ref)
-        local l_props_0 = v19.props;
-        local l_promptState_0 = l_props_0.promptState;
-        if l_promptState_0 == v5.PromptSubscriptionPurchase then
-            l_props_0.promptSubscriptionPurchase();
-            return;
-        elseif l_promptState_0 == v5.PurchaseComplete then
-            l_props_0.endPurchase();
-            return;
-        elseif l_promptState_0 == v5.Error then
-            l_props_0.endPurchase();
-            return;
-        else
-            return;
-        end;
-    end;
-    v19.cancelButtonPressed = function() --[[ Line: 80 ]]
-        -- upvalues: v19 (copy)
-        v19.props.endPurchase();
-    end;
-end;
-v18.getFlowState = function(v22) --[[ Line: 87 ]] --[[ Name: getFlowState ]]
-    -- upvalues: v5 (copy), l_SubscriptionPurchaseFlowState_0 (copy), v17 (copy), v6 (copy)
-    local l_props_1 = v22.props;
-    local l_promptState_1 = l_props_1.promptState;
-    if l_promptState_1 == v5.PromptSubscriptionPurchase then
-        return l_SubscriptionPurchaseFlowState_0.PurchaseModal;
-    elseif l_promptState_1 == v5.Error then
-        if v17() and l_props_1.purchaseError == v6.VpcRequired then
-            return l_SubscriptionPurchaseFlowState_0.PurchaseVPCModal;
-        else
-            return l_SubscriptionPurchaseFlowState_0.Error;
-        end;
-    else
-        return l_SubscriptionPurchaseFlowState_0.None;
-    end;
-end;
-v18.getErrorType = function(v25) --[[ Line: 106 ]] --[[ Name: getErrorType ]]
-    -- upvalues: v6 (copy), l_PurchaseErrorType_0 (copy)
-    local l_props_2 = v25.props;
-    if l_props_2.purchaseError == v6.AlreadySubscribed then
-        return l_PurchaseErrorType_0.AlreadySubscribed;
-    elseif l_props_2.purchaseError == v6.SubscriptionExceededUserSpendLimit then
-        return l_PurchaseErrorType_0.SubscriptionExceededUserSpendLimit;
-    elseif l_props_2.purchaseError == v6.SubscriptionUnsupportedLocale then
-        return l_PurchaseErrorType_0.SubscriptionUnsupportedLocale;
-    elseif l_props_2.purchaseError == v6.RestrictedUser then
-        return l_PurchaseErrorType_0.RestrictedUser;
-    elseif l_props_2.purchaseError == v6.SubscriptionPurchasePlatformNotSupported then
-        return l_PurchaseErrorType_0.SubscriptionPurchasePlatformNotSupported;
-    elseif l_props_2.purchaseError == v6.SubscriptionInvalidSaleLocation then
-        return l_PurchaseErrorType_0.SubscriptionInvalidSaleLocation;
-    elseif l_props_2.purchaseError == v6.SubscriptionNotForSale then
-        return l_PurchaseErrorType_0.SubscriptionNotForSale;
-    elseif l_props_2.purchaseError == v6.VpcRequired then
-        return l_PurchaseErrorType_0.VpcRequired;
-    elseif l_props_2.purchaseError == v6.ExceedParentalSpendLimit then
-        return l_PurchaseErrorType_0.ExceedParentalSpendLimit;
-    elseif l_props_2.purchaseError == v6.EconomicRestriction then
-        return l_PurchaseErrorType_0.EconomicRestriction;
-    else
-        return l_PurchaseErrorType_0.Unknown;
-    end;
-end;
-v18.getVPCModalType = function(_, v28) --[[ Line: 134 ]] --[[ Name: getVPCModalType ]]
-    -- upvalues: l_SubscriptionPurchaseFlowState_0 (copy), v15 (copy)
-    if v28 == l_SubscriptionPurchaseFlowState_0.PurchaseVPCModal then
-        return v15.toRawValue(v15.EnablePurchase);
-    else
-        return v15.toRawValue(v15.None);
-    end;
-end;
-v18.render = function(v29) --[[ Line: 141 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), l_SubscriptionPurchaseFlow_0 (copy)
-    local l_props_3 = v29.props;
-    local v31 = v29:getFlowState();
-    local v32 = v29:getErrorType();
-    return l_Roact_0.createElement(l_SubscriptionPurchaseFlow_0, {
-        screenSize = l_props_3.screenSize, 
-        purchaseState = v31, 
-        errorType = v32, 
-        economicRestrictionError = l_props_3.economicRestrictionError, 
-        purchaseVPCType = v29:getVPCModalType(v31), 
-        subscriptionId = l_props_3.subscriptionId, 
-        name = l_props_3.name, 
-        subscriptionProviderId = l_props_3.subscriptionProviderId, 
-        subscriptionProviderName = l_props_3.subscriptionProviderName, 
-        priceTier = l_props_3.priceTier, 
-        displayPrice = l_props_3.displayPrice, 
-        period = l_props_3.period, 
-        disclaimerText = l_props_3.disclaimerText, 
-        description = l_props_3.description, 
-        itemIcon = l_props_3.itemIcon, 
-        primaryPaymentMethod = l_props_3.primaryPaymentMethod, 
-        secondaryPaymentMethod = l_props_3.secondaryPaymentMethod, 
-        acceptControllerIcon = l_props_3.isGamepadEnabled and "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png" or nil, 
-        isTestingMode = l_props_3.isTestingMode, 
-        purchaseSubscription = l_props_3.promptSubscriptionPurchase, 
-        cancelPurchase = l_props_3.endPurchase, 
-        flowComplete = l_props_3.endPurchase, 
-        onAnalyticEvent = l_props_3.onAnalyticEvent, 
-        eventPrefix = "InGame"
-    });
-end;
-v18.didUpdate = function(v33) --[[ Line: 183 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v16 (copy), l_SubscriptionPurchaseFlowState_0 (copy), l_PurchaseErrorType_0 (copy), v8 (copy), l_ToastType_0 (copy)
-    if v16() then
-        local v34 = v33:getFlowState();
-        local v35 = v33:getErrorType();
-        if v34 == l_SubscriptionPurchaseFlowState_0.Error and v35 == l_PurchaseErrorType_0.Unknown then
-            v33.props.setCurrentToastMessage({
-                toastTitle = v8:FormatByKey("Feature.Subscription.Error.GenericSubscribeError"), 
-                toastType = l_ToastType_0.NetworkingError
-            });
-            v33.props.endPurchase();
-        end;
-    end;
-end;
-return v18;
+game:GetService("ContextActionService")
+
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local PurchasePromptDeps = require(PurchasePromptParent.PurchasePromptDeps)
+local ToastRodux = require(PurchasePromptParent.ToastRodux)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+
+game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(PurchasePromptParent.RobloxTranslator)
+local Roact = PurchasePromptDeps.Roact
+local ToastType = ToastRodux.Enums.ToastType
+local IAPExperience = PurchasePromptDeps.IAPExperience
+local SubscriptionPurchaseFlow = IAPExperience.PurchaseFlow.SubscriptionPurchaseFlow
+local SubscriptionPurchaseFlowState = IAPExperience.PurchaseFlow.SubscriptionPurchaseFlowState
+local PurchaseErrorType = IAPExperience.PurchaseFlow.PurchaseErrorType
+local VPCModalType = require(PurchasePrompt.Enums.VPCModalType)
+local GetFFlagEnableSubscriptionPurchaseToast = require(PurchasePrompt.Flags.GetFFlagEnableSubscriptionPurchaseToast)
+local GetFFlagEnableVpcForInExperienceSubscriptionPurchase = require(PurchasePrompt.Flags.GetFFlagEnableVpcForInExperienceSubscriptionPurchase)
+local v17 = Roact.PureComponent:extend(script.Name)
+
+function v17.init(p1) -- line: 63
+	-- upvalues: PromptState (copy)
+	function p1.confirmButtonPressed() -- line: 64
+		-- upvalues: p1 (copy), PromptState (copy)
+		local props = p1.props
+		local promptState = props.promptState
+
+		if promptState == PromptState.PromptSubscriptionPurchase then
+			props.promptSubscriptionPurchase()
+
+			return
+		end
+
+		if promptState == PromptState.PurchaseComplete then
+			props.endPurchase()
+
+			return
+		end
+
+		if promptState == PromptState.Error then
+			props.endPurchase()
+
+			return
+		end
+	end
+	function p1.cancelButtonPressed() -- line: 80
+		-- upvalues: p1 (copy)
+		p1.props.endPurchase()
+	end
+end
+function v17.getFlowState(p2) -- line: 87
+	-- upvalues: PromptState (copy), SubscriptionPurchaseFlowState (copy), GetFFlagEnableVpcForInExperienceSubscriptionPurchase (copy), PurchaseError (copy)
+	local props = p2.props
+	local promptState = props.promptState
+
+	if promptState == PromptState.PromptSubscriptionPurchase then
+		return SubscriptionPurchaseFlowState.PurchaseModal
+	end
+
+	if promptState == PromptState.Error then
+		if GetFFlagEnableVpcForInExperienceSubscriptionPurchase() and props.purchaseError == PurchaseError.VpcRequired then
+			return SubscriptionPurchaseFlowState.PurchaseVPCModal
+		end
+
+		return SubscriptionPurchaseFlowState.Error
+	end
+
+	return SubscriptionPurchaseFlowState.None
+end
+function v17.getErrorType(p3) -- line: 106
+	-- upvalues: PurchaseError (copy), PurchaseErrorType (copy)
+	local props = p3.props
+
+	if props.purchaseError == PurchaseError.AlreadySubscribed then
+		return PurchaseErrorType.AlreadySubscribed
+	end
+
+	if props.purchaseError == PurchaseError.SubscriptionExceededUserSpendLimit then
+		return PurchaseErrorType.SubscriptionExceededUserSpendLimit
+	end
+
+	if props.purchaseError == PurchaseError.SubscriptionUnsupportedLocale then
+		return PurchaseErrorType.SubscriptionUnsupportedLocale
+	end
+
+	if props.purchaseError == PurchaseError.RestrictedUser then
+		return PurchaseErrorType.RestrictedUser
+	end
+
+	if props.purchaseError == PurchaseError.SubscriptionPurchasePlatformNotSupported then
+		return PurchaseErrorType.SubscriptionPurchasePlatformNotSupported
+	end
+
+	if props.purchaseError == PurchaseError.SubscriptionInvalidSaleLocation then
+		return PurchaseErrorType.SubscriptionInvalidSaleLocation
+	end
+
+	if props.purchaseError == PurchaseError.SubscriptionNotForSale then
+		return PurchaseErrorType.SubscriptionNotForSale
+	end
+
+	if props.purchaseError == PurchaseError.VpcRequired then
+		return PurchaseErrorType.VpcRequired
+	end
+
+	if props.purchaseError == PurchaseError.ExceedParentalSpendLimit then
+		return PurchaseErrorType.ExceedParentalSpendLimit
+	end
+
+	if props.purchaseError == PurchaseError.EconomicRestriction then
+		return PurchaseErrorType.EconomicRestriction
+	end
+
+	return PurchaseErrorType.Unknown
+end
+function v17.getVPCModalType(_, p5) -- line: 134
+	-- upvalues: SubscriptionPurchaseFlowState (copy), VPCModalType (copy)
+	if p5 == SubscriptionPurchaseFlowState.PurchaseVPCModal then
+		return VPCModalType.toRawValue(VPCModalType.EnablePurchase)
+	end
+
+	return VPCModalType.toRawValue(VPCModalType.None)
+end
+function v17.render(p6) -- line: 141
+	-- upvalues: Roact (copy), SubscriptionPurchaseFlow (copy)
+	local props = p6.props
+	local v28 = p6:getFlowState()
+	local v29 = p6:getErrorType()
+
+	return Roact.createElement(SubscriptionPurchaseFlow, {
+		eventPrefix = "InGame",
+		screenSize = props.screenSize,
+		purchaseState = v28,
+		errorType = v29,
+		economicRestrictionError = props.economicRestrictionError,
+		purchaseVPCType = p6:getVPCModalType(v28),
+		subscriptionId = props.subscriptionId,
+		name = props.name,
+		subscriptionProviderId = props.subscriptionProviderId,
+		subscriptionProviderName = props.subscriptionProviderName,
+		priceTier = props.priceTier,
+		displayPrice = props.displayPrice,
+		period = props.period,
+		disclaimerText = props.disclaimerText,
+		description = props.description,
+		itemIcon = props.itemIcon,
+		primaryPaymentMethod = props.primaryPaymentMethod,
+		secondaryPaymentMethod = props.secondaryPaymentMethod,
+		acceptControllerIcon = if not props.isGamepadEnabled then nil else "rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png",
+		isTestingMode = props.isTestingMode,
+		purchaseSubscription = props.promptSubscriptionPurchase,
+		cancelPurchase = props.endPurchase,
+		flowComplete = props.endPurchase,
+		onAnalyticEvent = props.onAnalyticEvent
+	})
+end
+function v17.didUpdate(p7) -- line: 183
+	-- upvalues: GetFFlagEnableSubscriptionPurchaseToast (copy), SubscriptionPurchaseFlowState (copy), PurchaseErrorType (copy), RobloxTranslator (copy), ToastType (copy)
+	if GetFFlagEnableSubscriptionPurchaseToast() then
+		local v31 = p7:getFlowState()
+		local v32 = p7:getErrorType()
+
+		if v31 == SubscriptionPurchaseFlowState.Error and v32 == PurchaseErrorType.Unknown then
+			p7.props.setCurrentToastMessage({
+				toastTitle = RobloxTranslator:FormatByKey("Feature.Subscription.Error.GenericSubscribeError"),
+				toastType = ToastType.NetworkingError
+			})
+			p7.props.endPurchase()
+		end
+	end
+end
+
+return v17

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SquadVoiceMenuFoundationRefactor", false);
+return game:DefineFastFlag("SquadVoiceMenuFoundationRefactor", false)

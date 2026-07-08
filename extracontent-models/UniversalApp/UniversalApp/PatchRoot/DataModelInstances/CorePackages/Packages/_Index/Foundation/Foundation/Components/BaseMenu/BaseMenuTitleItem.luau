@@ -1,23 +1,49 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Components.View);
-local v6 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v7 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlState);
-local _ = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v10 = require(script.Parent.useBaseMenuItemVariants);
-return v2.memo(v2.forwardRef(function(v11, v12) --[[ Line: 28 ]] --[[ Name: BaseMenuTitleItem ]]
-    -- upvalues: v6 (copy), v10 (copy), v2 (copy), v5 (copy), v7 (copy), v3 (copy)
-    local v13 = v6();
-    local v14 = v10(v13, v11.size, false);
-    return v2.createElement(v5, v7(v11, {
-        tag = v14.container.tag, 
-        ref = v12
-    }), v2.createElement(v3, {
-        Text = v11.text, 
-        tag = v14.title.tag
-    }));
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+
+require(Foundation.Enums.ControlState)
+require(Foundation.Enums.InputSize)
+
+local Flags = require(Foundation.Utility.Flags)
+local useBaseMenuItemVariants = require(script.Parent.useBaseMenuItemVariants)
+
+local function BaseMenuTitleItem(p1, p2) -- line: 32
+	-- upvalues: useTokens (copy), useBaseMenuItemVariants (copy), Flags (copy), React (copy), View (copy), withCommonProps (copy), Text (copy)
+	local v13 = useTokens()
+	local v14 = useBaseMenuItemVariants(v13, p1.size, false)
+
+	if Flags.FoundationBaseMenuBeta then
+		local v15 = if p1.menuHasCheck ~= true then v14.container.paddingLeftWithoutCheck or 0 else (v14.container.paddingLeftWithCheck or 0) + (v14.title.checkColumnWidth or 0)
+		local v16 = v14.container.paddingRight or 0
+
+		return React.createElement(View, withCommonProps(p1, {
+			tag = `row align-y-center { v14.container.tag }`,
+			padding = {
+				left = UDim.new(0, v15),
+				right = UDim.new(0, v16)
+			},
+			ref = p2
+		}), React.createElement(Text, {
+			Text = p1.text,
+			tag = v14.title.tag
+		}))
+	end
+
+	return React.createElement(View, withCommonProps(p1, {
+		tag = v14.container.tag,
+		ref = p2
+	}), React.createElement(Text, {
+		Text = p1.text,
+		tag = v14.title.tag
+	}))
+end
+
+return React.memo(React.forwardRef(BaseMenuTitleItem))

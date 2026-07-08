@@ -1,18 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialBlockingModal");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.RoduxNetworking);
-local l_ChallengeRequestWrapper_0 = require(l_Parent_0.GenericChallenges).Middleware.ChallengeRequestWrapper;
-local v4 = require(l_Parent_0.HttpRequest);
-local v5 = game:DefineFastInt("AddFriendsHttpRetryCount", 3);
-local v6 = require(l_script_FirstAncestor_0.Rodux.RODUX_KEY);
-local v10 = v4.config({
-    requestFunction = function(v7, v8, v9) --[[ Line: 13 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v4 (copy)
-        return v4.requestFunctions.RequestInternal(v7, v8, v9);
-    end, 
-    maxRetryCount = v5
-});
-return (v2.config({
-    keyPath = ("%*.NetworkStatus"):format(v6), 
-    networkImpl = l_ChallengeRequestWrapper_0(v10)
-}));
+local SocialBlockingModal = script:FindFirstAncestor("SocialBlockingModal")
+local SocialBlockingModalParent = SocialBlockingModal.Parent
+local RoduxNetworking = require(SocialBlockingModalParent.RoduxNetworking)
+local ChallengeRequestWrapper = require(SocialBlockingModalParent.GenericChallenges).Middleware.ChallengeRequestWrapper
+local HttpRequest = require(SocialBlockingModalParent.HttpRequest)
+local v6 = game:DefineFastInt("AddFriendsHttpRetryCount", 3)
+local RODUX_KEY = require(SocialBlockingModal.Rodux.RODUX_KEY)
+local v8 = HttpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 13
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+	end,
+	maxRetryCount = v6
+})
+
+return (RoduxNetworking.config({
+	keyPath = `{ RODUX_KEY }.NetworkStatus`,
+	networkImpl = ChallengeRequestWrapper(v8)
+}))

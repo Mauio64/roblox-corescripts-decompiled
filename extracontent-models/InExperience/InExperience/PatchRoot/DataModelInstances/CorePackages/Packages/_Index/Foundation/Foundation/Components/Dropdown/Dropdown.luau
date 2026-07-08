@@ -1,97 +1,131 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.BaseMenu);
-local v4 = require(l_script_FirstAncestor_0.Components.Popover);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v7 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v8 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v9 = require(l_script_FirstAncestor_0.Enums.PopoverAlign);
-local v10 = require(l_script_FirstAncestor_0.Enums.PopoverSide);
-local v11 = require(l_script_FirstAncestor_0.Enums.Radius);
-local v12 = require(script.Parent.DropdownControl);
-local v13 = require(script.Parent.markSelectedItem);
-local v14 = {
-    width = UDim.new(0, 400), 
-    size = v8.Medium, 
-    testId = "--foundation-dropdown"
-};
-local v15 = {
-    position = v10.Bottom, 
-    offset = 5
-};
-return v2.memo(v2.forwardRef(function(v16, v17) --[[ Line: 70 ]] --[[ Name: Dropdown ]]
-    -- upvalues: v7 (copy), v14 (copy), v2 (copy), v13 (copy), v4 (copy), v12 (copy), v6 (copy), v9 (copy), v15 (copy), v11 (copy), v3 (copy)
-    local v18 = v7(v16, v14);
-    local v19, v20 = v2.useState(false);
-    local v21 = v2.useRef(nil);
-    local v22, v23 = v2.useBinding(v18.width);
-    local v24, v25 = v13(v18.items, v18.value);
-    local v27 = v2.useCallback(function() --[[ Line: 79 ]]
-        -- upvalues: v20 (copy)
-        v20(function(v26) --[[ Line: 80 ]]
-            return not v26;
-        end);
-    end, {});
-    local v28 = v2.useCallback(function() --[[ Line: 85 ]]
-        -- upvalues: v20 (copy)
-        v20(false);
-    end, {});
-    local v30 = v2.useCallback(function(v29) --[[ Line: 89 ]]
-        -- upvalues: v20 (copy), v18 (copy)
-        v20(false);
-        v18.onItemChanged(v29);
-    end, {
-        v18.onItemChanged
-    });
-    v18.onAbsoluteSizeChanged = v2.useCallback(function(v31) --[[ Line: 94 ]]
-        -- upvalues: v16 (copy), v23 (copy)
-        if v16.onAbsoluteSizeChanged then
-            v16.onAbsoluteSizeChanged(v31);
-        end;
-        v23(UDim.new(0, v31.AbsoluteSize.X));
-    end, {
-        v23, 
-        v16.onAbsoluteSizeChanged
-    });
-    return v2.createElement(v4.Root, {
-        isOpen = v19, 
-        ref = v17
-    }, {
-        DropdownControl = v2.createElement(v12, v6(v18, {
-            onActivated = v27, 
-            hasError = v18.hasError, 
-            isDisabled = v18.isDisabled, 
-            item = v25, 
-            placeholder = v18.placeholder, 
-            isMenuOpen = v19, 
-            width = v18.width, 
-            size = v18.size, 
-            label = v18.label, 
-            hint = v18.hint, 
-            inputRef = v21
-        })), 
-        Anchor = v2.createElement(v4.Anchor, {
-            anchorRef = v21
-        }), 
-        Menu = v2.createElement(v4.Content, {
-            hasArrow = false, 
-            align = v9.End, 
-            side = v15, 
-            onPressedOutside = v28, 
-            radius = v11.Medium, 
-            selection = v18.selection, 
-            selectionGroup = v18.selectionGroup
-        }, v2.createElement(v3.Root, {
-            size = v18.size, 
-            couldGrow = true, 
-            width = v22, 
-            items = v24, 
-            maxHeight = v18.maxHeight, 
-            onActivated = v30, 
-            radius = v11.Medium, 
-            testId = ("%*--menu"):format(v18.testId)
-        }))
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local BaseMenu = require(Foundation.Components.BaseMenu)
+local Popover = require(Foundation.Components.Popover)
+
+require(Foundation.Components.Types)
+
+local Flags = require(Foundation.Utility.Flags)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local InputSize = require(Foundation.Enums.InputSize)
+local InputVariant = require(Foundation.Enums.InputVariant)
+local PopoverAlign = require(Foundation.Enums.PopoverAlign)
+local PopoverSide = require(Foundation.Enums.PopoverSide)
+local Radius = require(Foundation.Enums.Radius)
+local DropdownControl = require(script.Parent.DropdownControl)
+local markSelectedItem = require(script.Parent.markSelectedItem)
+local t1 = {
+	testId = "--foundation-dropdown",
+	variant = if not Flags.FoundationDropdownVariant then nil else InputVariant.Standard,
+	width = UDim.new(0, 400),
+	size = InputSize.Medium
+}
+local t2 = {
+	offset = 5,
+	position = PopoverSide.Bottom
+}
+
+local function Dropdown(p1, p2) -- line: 80
+	-- upvalues: withDefaults (copy), t1 (copy), Flags (copy), InputVariant (copy), React (copy), markSelectedItem (copy), Popover (copy), DropdownControl (copy), withCommonProps (copy), PopoverAlign (copy), t2 (copy), Radius (copy), BaseMenu (copy)
+	local v21 = withDefaults(p1, t1)
+
+	if Flags.FoundationDropdownVariant and v21.variant == nil then
+		v21.variant = InputVariant.Standard
+	end
+
+	local v22, v23 = React.useState(false)
+	local v24 = React.useRef(nil)
+	local v25, v26 = React.useState(nil)
+	local v27 = React.useCallback(function(p3) -- line: 89
+		-- upvalues: v24 (copy), v26 (copy)
+		v24.current = p3
+		v26(p3)
+	end, {})
+
+	if Flags.FoundationDropdownSelectionProps then
+		React.useImperativeHandle(p2, function() -- line: 95
+			-- upvalues: v25 (copy)
+			return v25
+		end, { v25 })
+	end
+
+	local v28, v29 = React.useBinding(v21.width)
+	local v30, v31 = markSelectedItem(v21.items, v21.value)
+	local v32 = React.useCallback(function() -- line: 105
+		-- upvalues: v23 (copy)
+		v23(function(p4) -- line: 106
+			return not p4
+		end)
+	end, {})
+	local v33 = React.useCallback(function() -- line: 111
+		-- upvalues: v23 (copy)
+		v23(false)
+	end, {})
+	local v34 = React.useCallback(function(p5) -- line: 115
+		-- upvalues: v23 (copy), v21 (copy)
+		v23(false)
+		v21.onItemChanged(p5)
+	end, { v21.onItemChanged })
+
+	v21.onAbsoluteSizeChanged = React.useCallback(function(p6) -- line: 120
+		-- upvalues: p1 (copy), v29 (copy)
+		if p1.onAbsoluteSizeChanged then
+			p1.onAbsoluteSizeChanged(p6)
+		end
+
+		v29(UDim.new(0, p6.AbsoluteSize.X))
+	end, {
+		v29,
+		p1.onAbsoluteSizeChanged
+	})
+
+	return React.createElement(Popover.Root, {
+		isOpen = v22,
+		ref = if not Flags.FoundationDropdownSelectionProps then p2 else nil
+	}, {
+		DropdownControl = React.createElement(DropdownControl, withCommonProps(v21, {
+			variant = if not Flags.FoundationDropdownVariant then nil else v21.variant,
+			onActivated = v32,
+			hasError = v21.hasError,
+			isDisabled = v21.isDisabled,
+			item = v31,
+			placeholder = v21.placeholder,
+			isMenuOpen = v22,
+			width = v21.width,
+			size = v21.size,
+			label = v21.label,
+			hint = v21.hint,
+			inputRef = if not Flags.FoundationDropdownSelectionProps then v24 else v27,
+			Selectable = if not Flags.FoundationDropdownSelectionProps then nil else v21.Selectable,
+			NextSelectionUp = if not Flags.FoundationDropdownSelectionProps then nil else v21.NextSelectionUp,
+			NextSelectionDown = if not Flags.FoundationDropdownSelectionProps then nil else v21.NextSelectionDown,
+			NextSelectionLeft = if not Flags.FoundationDropdownSelectionProps then nil else v21.NextSelectionLeft,
+			NextSelectionRight = if not Flags.FoundationDropdownSelectionProps then nil else v21.NextSelectionRight
+		})),
+		Anchor = React.createElement(Popover.Anchor, {
+			anchorRef = v24
+		}),
+		Menu = React.createElement(Popover.Content, {
+			hasArrow = false,
+			align = PopoverAlign.End,
+			side = t2,
+			onPressedOutside = v33,
+			radius = Radius.Medium,
+			selection = v21.selection,
+			selectionGroup = v21.selectionGroup
+		}, React.createElement(BaseMenu.Root, {
+			couldGrow = true,
+			size = v21.size,
+			width = v28,
+			items = v30,
+			maxHeight = v21.maxHeight,
+			onActivated = v34,
+			radius = Radius.Medium,
+			testId = `{ v21.testId }--menu`
+		}))
+	})
+end
+
+return React.memo(React.forwardRef(Dropdown))

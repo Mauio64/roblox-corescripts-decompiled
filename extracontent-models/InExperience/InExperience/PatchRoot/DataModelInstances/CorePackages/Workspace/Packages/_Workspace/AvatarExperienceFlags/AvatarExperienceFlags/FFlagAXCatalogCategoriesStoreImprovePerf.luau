@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXCatalogCategoriesStore) and game:DefineFastFlag("AXCatalogCategoriesStoreImprovePerf", false);
+return game:DefineFastFlag("AXCatalogCategoriesStoreImprovePerf", false)

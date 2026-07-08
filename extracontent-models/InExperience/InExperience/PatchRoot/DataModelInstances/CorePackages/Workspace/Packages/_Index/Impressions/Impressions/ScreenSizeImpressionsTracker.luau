@@ -3,9 +3,9 @@ local React = require(Parent.React)
 local ImpressionsTracker = require(script.Parent.ImpressionsTracker)
 local useViewportBounds = require(Parent.ViewportUtils).useViewportBounds
 
-return function(t1: {[any]: any}) -- line: 29
+return function(t1: {[any]: any}) -- line: 30
 	-- upvalues: useViewportBounds (copy), React (copy), ImpressionsTracker (copy)
-	local v6 = useViewportBounds()
+	local v6 = useViewportBounds(nil, t1.ignoreBottomInset)
 
 	return React.createElement(ImpressionsTracker, {
 		pageContext = t1.pageContext,

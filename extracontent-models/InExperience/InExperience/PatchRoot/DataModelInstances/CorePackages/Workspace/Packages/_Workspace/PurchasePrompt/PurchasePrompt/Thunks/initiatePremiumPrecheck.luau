@@ -1,78 +1,88 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Thunk);
-local v3 = require(l_script_FirstAncestor_0.Services.Network);
-local v4 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v5 = require(l_script_FirstAncestor_0.Services.Analytics);
-local v6 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v7 = require(l_script_FirstAncestor_0.Enums.PaymentPlatform);
-local v8 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v9 = require(l_script_FirstAncestor_0.Thunks.launchPremiumUpsell);
-local v10 = require(l_script_FirstAncestor_0.Network.checkUserPurchaseSettings);
-local v11 = require(l_script_FirstAncestor_0.Utils.getPaymentPlatform);
-local v12 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v13 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v14 = require(l_Parent_0.IAPExperience);
-local v15 = require(l_script_FirstAncestor_0.Actions.SetEconomicRestrictionError);
-local l_EconomicRestrictionsViolationType_0 = v14.Enums.EconomicRestrictionsViolationType;
-local l_CheckUserPurchaseSettingsFailureReason_0 = v14.Enums.CheckUserPurchaseSettingsFailureReason;
-local l_mapCheckUserPurchaseSettingsFailureReasonToViolationType_0 = v14.Utility.mapCheckUserPurchaseSettingsFailureReasonToViolationType;
-local v19 = {
-    v5, 
-    v3, 
-    v4
-};
-local function v26(v20, v21, v22) --[[ Line: 35 ]] --[[ Name: handleCheckUserSettingsResult ]]
-    -- upvalues: v12 (copy), v13 (copy), l_mapCheckUserPurchaseSettingsFailureReasonToViolationType_0 (copy), l_EconomicRestrictionsViolationType_0 (copy), v9 (copy), l_CheckUserPurchaseSettingsFailureReason_0 (copy), v8 (copy), v6 (copy), v15 (copy)
-    if v20 == nil then
-        return v21:dispatch(v12(v13.UnknownFailure));
-    else
-        local v23 = l_mapCheckUserPurchaseSettingsFailureReasonToViolationType_0(v20.failureReason);
-        local v24 = false;
-        if v23 ~= l_EconomicRestrictionsViolationType_0.None then
-            v24 = v20.expirationTimeInMinutes ~= nil;
-        end;
-        local v25 = true;
-        if v20.isEligible ~= nil then
-            v25 = v20.failureReason == nil;
-        end;
-        if v25 and not v24 then
-            return v21:dispatch(v12(v13.UnknownFailure));
-        elseif v20.isEligible == true then
-            return v21:dispatch(v9());
-        elseif v20.failureReason == l_CheckUserPurchaseSettingsFailureReason_0.PurchaseNotEnabled then
-            v22.signalUserSettingEligibilityModal(l_CheckUserPurchaseSettingsFailureReason_0.PurchaseNotEnabled);
-            return v21:dispatch(v8(v6.EnablePurchaseVPCModal));
-        elseif v20.failureReason == l_CheckUserPurchaseSettingsFailureReason_0.SpendLimitExceeded then
-            return v21:dispatch(v9());
-        elseif v24 then
-            v22.signalEconomicRestrictionError(v23, v20.expirationTimeInMinutes);
-            v21:dispatch(v15(v23, v20.expirationTimeInMinutes));
-            return v21:dispatch(v12(v13.EconomicRestriction));
-        else
-            return v21:dispatch(v12(v13.UnknownFailure));
-        end;
-    end;
-end;
-return function() --[[ Line: 72 ]] --[[ Name: initiatePremiumPrecheck ]]
-    -- upvalues: v2 (copy), v19 (copy), v3 (copy), v5 (copy), v4 (copy), v9 (copy), v11 (copy), v7 (copy), v10 (copy), v26 (copy), v12 (copy), v13 (copy)
-    return v2.new(script.Name, v19, function(v27, v28) --[[ Line: 73 ]]
-        -- upvalues: v3 (ref), v5 (ref), v4 (ref), v9 (ref), v11 (ref), v7 (ref), v10 (ref), v26 (ref), v12 (ref), v13 (ref)
-        local v29 = v28[v3];
-        local v30 = v28[v5];
-        local v31 = v28[v4];
-        if v31.isStudio() then
-            return v27:dispatch(v9());
-        elseif v11(v31.getPlatform()) == v7.Web then
-            return v27:dispatch(v9());
-        else
-            return v10(v29):andThen(function(v32) --[[ Line: 90 ]]
-                -- upvalues: v26 (ref), v27 (copy), v30 (copy)
-                return v26(v32, v27, v30);
-            end):catch(function(_) --[[ Line: 93 ]]
-                -- upvalues: v27 (copy), v12 (ref), v13 (ref)
-                return v27:dispatch(v12(v13.UnknownFailure));
-            end);
-        end;
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Thunk = require(PurchasePrompt.Thunk)
+local Network = require(PurchasePrompt.Services.Network)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local Analytics = require(PurchasePrompt.Services.Analytics)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local PaymentPlatform = require(PurchasePrompt.Enums.PaymentPlatform)
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local launchPremiumUpsell = require(PurchasePrompt.Thunks.launchPremiumUpsell)
+local checkUserPurchaseSettings = require(PurchasePrompt.Network.checkUserPurchaseSettings)
+local getPaymentPlatform = require(PurchasePrompt.Utils.getPaymentPlatform)
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local IAPExperience = require(PurchasePromptParent.IAPExperience)
+local SetEconomicRestrictionError = require(PurchasePrompt.Actions.SetEconomicRestrictionError)
+local EconomicRestrictionsViolationType = IAPExperience.Enums.EconomicRestrictionsViolationType
+local CheckUserPurchaseSettingsFailureReason = IAPExperience.Enums.CheckUserPurchaseSettingsFailureReason
+local mapCheckUserPurchaseSettingsFailureReasonToViolationType = IAPExperience.Utility.mapCheckUserPurchaseSettingsFailureReasonToViolationType
+local t1 = {
+	Analytics,
+	Network,
+	ExternalSettings
+}
+
+local function handleCheckUserSettingsResult(p1, p2, p3) -- line: 35
+	-- upvalues: ErrorOccurred (copy), PurchaseError (copy), mapCheckUserPurchaseSettingsFailureReasonToViolationType (copy), EconomicRestrictionsViolationType (copy), launchPremiumUpsell (copy), CheckUserPurchaseSettingsFailureReason (copy), SetPromptState (copy), PromptState (copy), SetEconomicRestrictionError (copy)
+	if p1 == nil then
+		return p2:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+	end
+
+	local v26 = mapCheckUserPurchaseSettingsFailureReasonToViolationType(p1.failureReason)
+	local v27 = v26 ~= EconomicRestrictionsViolationType.None and p1.expirationTimeInMinutes ~= nil
+
+	if (p1.isEligible == nil or p1.failureReason == nil) and not v27 then
+		return p2:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+	end
+
+	if p1.isEligible == true then
+		return p2:dispatch(launchPremiumUpsell())
+	end
+
+	if p1.failureReason == CheckUserPurchaseSettingsFailureReason.PurchaseNotEnabled then
+		p3.signalUserSettingEligibilityModal(CheckUserPurchaseSettingsFailureReason.PurchaseNotEnabled)
+
+		return p2:dispatch(SetPromptState(PromptState.EnablePurchaseVPCModal))
+	end
+
+	if p1.failureReason == CheckUserPurchaseSettingsFailureReason.SpendLimitExceeded then
+		return p2:dispatch(launchPremiumUpsell())
+	end
+
+	if v27 then
+		p3.signalEconomicRestrictionError(v26, p1.expirationTimeInMinutes)
+		p2:dispatch(SetEconomicRestrictionError(v26, p1.expirationTimeInMinutes))
+
+		return p2:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
+	end
+
+	return p2:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+end
+local function initiatePremiumPrecheck() -- line: 72
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), Analytics (copy), ExternalSettings (copy), launchPremiumUpsell (copy), getPaymentPlatform (copy), PaymentPlatform (copy), checkUserPurchaseSettings (copy), handleCheckUserSettingsResult (copy), ErrorOccurred (copy), PurchaseError (copy)
+	return Thunk.new(script.Name, t1, function(p4, p5) -- line: 73
+		-- upvalues: Network (copy), Analytics (copy), ExternalSettings (copy), launchPremiumUpsell (copy), getPaymentPlatform (copy), PaymentPlatform (copy), checkUserPurchaseSettings (copy), handleCheckUserSettingsResult (copy), ErrorOccurred (copy), PurchaseError (copy)
+		local v30 = p5[Network]
+		local v31 = p5[Analytics]
+		local v32 = p5[ExternalSettings]
+
+		if v32.isStudio() then
+			return p4:dispatch(launchPremiumUpsell())
+		end
+
+		if getPaymentPlatform(v32.getPlatform()) == PaymentPlatform.Web then
+			return p4:dispatch(launchPremiumUpsell())
+		end
+
+		return checkUserPurchaseSettings(v30):andThen(function(p6) -- line: 90
+			-- upvalues: handleCheckUserSettingsResult (copy), p4 (copy), v31 (copy)
+			return handleCheckUserSettingsResult(p6, p4, v31)
+		end):catch(function(_) -- line: 93
+			-- upvalues: p4 (copy), ErrorOccurred (copy), PurchaseError (copy)
+			return p4:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+		end)
+	end)
+end
+
+return initiatePremiumPrecheck

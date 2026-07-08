@@ -1,12 +1,16 @@
-return function(v0, v1) --[[ Line: 4 ]] --[[ Name: removeIndex ]]
-    local v2 = {};
-    local v3 = 0;
-    for v4 = 1, #v0 do
-        if v4 == v1 then
-            v3 = 1;
-        else
-            v2[v4 - v3] = v0[v4];
-        end;
-    end;
-    return v2;
-end;
+local function removeIndex(p1, p2) -- line: 4
+	local t1 = {}
+	local n1 = 0
+
+	for i = 1, #p1 do
+		if i == p2 then
+			n1 = 1
+		else
+			t1[i - n1] = p1[i]
+		end
+	end
+
+	return t1
+end
+
+return removeIndex

@@ -1,14 +1,17 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.networkingPresenceTypes);
-local v2 = require(l_Parent_0.PRESENCE_URL);
-return function(v3) --[[ Line: 5 ]]
-    -- upvalues: v2 (copy)
-    return v3.roduxNetworking.POST({
-        Name = "GetPresencesFromUserIds"
-    }, function(v4, v5) --[[ Line: 8 ]]
-        -- upvalues: v2 (ref)
-        return v4(v2):path("v1"):path("presence"):path("users"):body({
-            userIds = v5
-        }):setStatusIds(v5);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.networkingPresenceTypes)
+
+local PRESENCE_URL = require(ParentParent.PRESENCE_URL)
+
+return function(p1) -- line: 5
+	-- upvalues: PRESENCE_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "GetPresencesFromUserIds"
+	}, function(p2, p3) -- line: 8
+		-- upvalues: PRESENCE_URL (copy)
+		return p2(PRESENCE_URL):path("v1"):path("presence"):path("users"):body({
+			userIds = p3
+		}):setStatusIds(p3)
+	end)
+end

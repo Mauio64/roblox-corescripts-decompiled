@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChatNetworking").Parent;
-return (("https://apis.%*platform-chat-api"):format(require(l_Parent_0.Http).Url.DOMAIN));
+local Parent = script:FindFirstAncestor("AppChatNetworking").Parent
+
+return `https://apis.{ require(Parent.Http).Url.DOMAIN }platform-chat-api`

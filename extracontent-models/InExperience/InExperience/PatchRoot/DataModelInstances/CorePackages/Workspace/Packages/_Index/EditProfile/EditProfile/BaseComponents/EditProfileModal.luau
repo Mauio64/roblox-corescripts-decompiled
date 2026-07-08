@@ -1,1 +1,1 @@
-return require(script.EditProfileModal);
+return require(script.EditProfileModal)

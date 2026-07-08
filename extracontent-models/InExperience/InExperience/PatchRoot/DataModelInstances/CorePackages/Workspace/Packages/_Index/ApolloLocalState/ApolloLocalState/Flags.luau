@@ -1,3 +1,3 @@
 return {
-    GetFFlagEnableMergeOmniFeedSorts = require(script.GetFFlagEnableMergeOmniFeedSorts)
-};
+	GetFFlagEnableMergeOmniFeedSorts = require(script.GetFFlagEnableMergeOmniFeedSorts)
+}

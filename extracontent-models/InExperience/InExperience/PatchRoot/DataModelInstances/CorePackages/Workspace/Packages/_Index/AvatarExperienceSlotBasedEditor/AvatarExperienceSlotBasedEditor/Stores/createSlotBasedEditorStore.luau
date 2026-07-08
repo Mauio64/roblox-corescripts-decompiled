@@ -1,34 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local l_DeviceOrientationMode_0 = require(l_Parent_0.RobloxAppEnums).DeviceOrientationMode;
-local v4 = require(l_script_FirstAncestor_0.Constants);
-local v5 = require(l_script_FirstAncestor_0.Enums.Categories);
-local l_createSelectorSignal_0 = require(l_Parent_0.AXCommon).Utils.createSelectorSignal;
-local v7 = require(l_script_FirstAncestor_0.Utils.buildSlots);
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_FFlagAXSlotsDesktopRedesign_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXSlotsDesktopRedesign;
-return function(v10) --[[ Line: 30 ]] --[[ Name: createSlotBasedEditorStore ]]
-    -- upvalues: l_createSelectorSignal_0 (copy), l_DeviceOrientationMode_0 (copy), l_FFlagAXSlotsDesktopRedesign_0 (copy), v5 (copy), v2 (copy), v7 (copy), v4 (copy)
-    local v12 = l_createSelectorSignal_0(v10, function(v11) --[[ Line: 32 ]]
-        -- upvalues: l_DeviceOrientationMode_0 (ref)
-        return v11.DeviceOrientation == l_DeviceOrientationMode_0.Portrait;
-    end);
-    local v13 = if l_FFlagAXSlotsDesktopRedesign_0 then if v12(false) then v5.Avatars else v5.All else if v12(false) then v5.Avatars else v5.Body;
-    local v14, v15 = v2.createSignal(v13);
-    local v16, v17 = v2.createSignal(1);
-    local v19 = l_createSelectorSignal_0(v10, function(v18) --[[ Line: 45 ]]
-        return v18.AvatarExperience.AvatarEditor.Character.EquippedAssets or {};
-    end);
-    local v21 = v2.createComputed(function(v20) --[[ Line: 52 ]]
-        -- upvalues: v7 (ref), v4 (ref), v14 (copy), v19 (copy)
-        return v7(v4.SlotEditorCategories[v14(v20)].slots, v19(v20));
-    end);
-    return {
-        getSlotCategory = v14, 
-        setSlotCategory = v15, 
-        getSlotIndex = v16, 
-        setSlotIndex = v17, 
-        getSlots = v21
-    };
-end;
+local AvatarExperienceSlotBasedEditor = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor")
+local AvatarExperienceSlotBasedEditorParent = AvatarExperienceSlotBasedEditor.Parent
+local Signals = require(AvatarExperienceSlotBasedEditorParent.Signals)
+local DeviceOrientationMode = require(AvatarExperienceSlotBasedEditorParent.RobloxAppEnums).DeviceOrientationMode
+local Constants = require(AvatarExperienceSlotBasedEditor.Constants)
+local Categories = require(AvatarExperienceSlotBasedEditor.Enums.Categories)
+local createSelectorSignal = require(AvatarExperienceSlotBasedEditorParent.AXCommon).Utils.createSelectorSignal
+local buildSlots = require(AvatarExperienceSlotBasedEditor.Utils.buildSlots)
+
+require(AvatarExperienceSlotBasedEditor.Types)
+
+local FFlagAXSlotsDesktopRedesign = require(AvatarExperienceSlotBasedEditorParent.AvatarExperienceFlags).FFlagAXSlotsDesktopRedesign
+
+local function createSlotBasedEditorStore(p1) -- line: 30
+	-- upvalues: createSelectorSignal (copy), DeviceOrientationMode (copy), FFlagAXSlotsDesktopRedesign (copy), Categories (copy), Signals (copy), buildSlots (copy), Constants (copy)
+	local v12 = createSelectorSignal(p1, function(p2) -- line: 32
+		-- upvalues: DeviceOrientationMode (copy)
+		return p2.DeviceOrientation == DeviceOrientationMode.Portrait
+	end)
+	local v13 = if not FFlagAXSlotsDesktopRedesign then if not v12(false) then Categories.Body else Categories.Avatars else if not v12(false) then Categories.All else Categories.Avatars
+	local v14, v15 = Signals.createSignal(v13)
+	local v16, v17 = Signals.createSignal(1)
+	local v18 = createSelectorSignal(p1, function(p3) -- line: 45
+		return p3.AvatarExperience.AvatarEditor.Character.EquippedAssets or {}
+	end)
+	local v19 = Signals.createComputed(function(p4) -- line: 52
+		-- upvalues: buildSlots (copy), Constants (copy), v14 (copy), v18 (copy)
+		return buildSlots(Constants.SlotEditorCategories[v14(p4)].slots, v18(p4))
+	end)
+
+	return {
+		getSlotCategory = v14,
+		setSlotCategory = v15,
+		getSlotIndex = v16,
+		setSlotIndex = v17,
+		getSlots = v19
+	}
+end
+
+return createSlotBasedEditorStore

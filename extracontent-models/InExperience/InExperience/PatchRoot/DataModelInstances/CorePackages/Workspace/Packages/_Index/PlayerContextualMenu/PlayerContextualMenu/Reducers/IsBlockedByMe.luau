@@ -1,29 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlayerContextualMenu");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_Parent_0.Dash);
-local v4 = require(l_script_FirstAncestor_0.Http.Blocking);
-return v2.createReducer({}, {
-    [v4.GetBlockedUsers.Succeeded.name] = function(_, v6) --[[ Line: 12 ]]
-        local v7 = v6.responseBody and v6.responseBody.blockedUsers or {};
-        local v8 = {};
-        for _, v10 in ipairs(v7) do
-            v8[tostring(v10.userId)] = true;
-        end;
-        return v8;
-    end, 
-    [v4.BlockUserById.Succeeded.name] = function(v11, v12) --[[ Line: 21 ]]
-        -- upvalues: v3 (copy)
-        local v13 = tostring(v12.namedIds.users);
-        return v3.join(v11, {
-            [v13] = true
-        });
-    end, 
-    [v4.UnblockUserById.Succeeded.name] = function(v14, v15) --[[ Line: 27 ]]
-        -- upvalues: v3 (copy)
-        local v16 = tostring(v15.namedIds.users);
-        return v3.join(v14, {
-            [v16] = false
-        });
-    end
-});
+local PlayerContextualMenu = script:FindFirstAncestor("PlayerContextualMenu")
+local PlayerContextualMenuParent = PlayerContextualMenu.Parent
+local Rodux = require(PlayerContextualMenuParent.Rodux)
+local Dash = require(PlayerContextualMenuParent.Dash)
+local Blocking = require(PlayerContextualMenu.Http.Blocking)
+
+return Rodux.createReducer({}, {
+	[Blocking.GetBlockedUsers.Succeeded.name] = function(_, p2) -- line: 12
+		local v8 = p2.responseBody and p2.responseBody.blockedUsers or {}
+		local t1 = {}
+
+		for _, v in ipairs(v8) do
+			t1[tostring(v.userId)] = true
+		end
+
+		return t1
+	end,
+	[Blocking.BlockUserById.Succeeded.name] = function(p3, p4) -- line: 21
+		-- upvalues: Dash (copy)
+		local str = tostring(p4.namedIds.users)
+
+		return Dash.join(p3, {
+			[str] = true
+		})
+	end,
+	[Blocking.UnblockUserById.Succeeded.name] = function(p5, p6) -- line: 27
+		-- upvalues: Dash (copy)
+		local str = tostring(p6.namedIds.users)
+
+		return Dash.join(p5, {
+			[str] = false
+		})
+	end
+})

@@ -1,4 +1,5 @@
-game:DefineFastFlag("SongbirdPopoverSubmenu2", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("SongbirdPopoverSubmenu2");
-end;
+game:DefineFastFlag("SongbirdPopoverSubmenu2", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("SongbirdPopoverSubmenu2")
+end

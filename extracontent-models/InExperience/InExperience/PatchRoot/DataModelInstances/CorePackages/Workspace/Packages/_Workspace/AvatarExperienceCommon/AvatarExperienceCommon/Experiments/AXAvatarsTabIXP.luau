@@ -1,30 +1,31 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v2 = require(l_Parent_0.IXPUtils);
-local v3 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXAvatarsTabIXP_0 = v3.FFlagAXAvatarsTabIXP;
-local l_FFlagAXAvatarsTabIXPEnabledForAll_0 = v3.FFlagAXAvatarsTabIXPEnabledForAll;
-return v2.defineIXPTest({
-    name = "AvatarExperience.UA.MarketplaceView.AvatarsTab", 
-    layer = l_AppUserLayers_0.AvatarExperienceUAMarketplaceView, 
-    recordExposure = false, 
-    getIsUserInExperiment = function(v6) --[[ Line: 27 ]] --[[ Name: getIsUserInExperiment ]]
-        return v6.IsAvatarsTabEnabled ~= nil;
-    end, 
-    getDependentFlagsEnabled = function() --[[ Line: 31 ]] --[[ Name: getDependentFlagsEnabled ]]
-        return true;
-    end, 
-    getEnabledFlag = function() --[[ Line: 35 ]] --[[ Name: getEnabledFlag ]]
-        -- upvalues: l_FFlagAXAvatarsTabIXP_0 (copy)
-        return l_FFlagAXAvatarsTabIXP_0;
-    end, 
-    getEnabledForAllFlag = function() --[[ Line: 39 ]] --[[ Name: getEnabledForAllFlag ]]
-        -- upvalues: l_FFlagAXAvatarsTabIXPEnabledForAll_0 (copy)
-        return l_FFlagAXAvatarsTabIXPEnabledForAll_0;
-    end, 
-    variables = {
-        EnabledForUser = function(v7, v8) --[[ Line: 44 ]] --[[ Name: EnabledForUser ]]
-            return v8 or v7.IsAvatarsTabEnabled or false;
-        end
-    }
-});
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local IXPUtils = require(Parent.IXPUtils)
+local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local FFlagAXAvatarsTabIXP = AvatarExperienceFlags.FFlagAXAvatarsTabIXP
+local FFlagAXAvatarsTabIXPEnabledForAll = AvatarExperienceFlags.FFlagAXAvatarsTabIXPEnabledForAll
+
+return IXPUtils.defineIXPTest({
+	name = "AvatarExperience.UA.MarketplaceView.AvatarsTab",
+	recordExposure = false,
+	layer = AppUserLayers.AvatarExperienceUAMarketplaceView,
+	getIsUserInExperiment = function(p1) -- line: 27
+		return p1.IsAvatarsTabEnabled ~= nil
+	end,
+	getDependentFlagsEnabled = function() -- line: 31
+		return true
+	end,
+	getEnabledFlag = function() -- line: 35
+		-- upvalues: FFlagAXAvatarsTabIXP (copy)
+		return FFlagAXAvatarsTabIXP
+	end,
+	getEnabledForAllFlag = function() -- line: 39
+		-- upvalues: FFlagAXAvatarsTabIXPEnabledForAll (copy)
+		return FFlagAXAvatarsTabIXPEnabledForAll
+	end,
+	variables = {
+		EnabledForUser = function(p2, p3) -- line: 44
+			return p3 or (p2.IsAvatarsTabEnabled or false)
+		end
+	}
+})

@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableQuestIAPAnalytics", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableQuestIAPAnalytics");
-end;
+game:DefineFastFlag("EnableQuestIAPAnalytics", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableQuestIAPAnalytics")
+end

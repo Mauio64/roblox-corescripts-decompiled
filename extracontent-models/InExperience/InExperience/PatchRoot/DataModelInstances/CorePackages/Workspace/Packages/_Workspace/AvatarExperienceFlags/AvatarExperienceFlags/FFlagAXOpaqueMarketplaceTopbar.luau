@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXOpaqueMarketplaceTopbar", false);
+return game:DefineFastFlag("AXOpaqueMarketplaceTopbar", false)

@@ -1,117 +1,133 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Packages.RoactRodux);
-local v6 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v8 = require(l_Parent_0.Actions.SetPlayerListVisibility);
-local v9 = require(l_Parent_0.Actions.ClosePlayerDropDown);
-local v10 = require(l_Parent_0.Flags.FFlagPlayerListReduceRerenders);
-local l_FFlagAddNewPlayerListMobileFocusNav_0 = v6.Flags.FFlagAddNewPlayerListMobileFocusNav;
-local l_FFlagPlayerListUseMobileOnSmallDisplay_0 = v6.Flags.FFlagPlayerListUseMobileOnSmallDisplay;
-local v13 = v3.PureComponent:extend("ContextActionsBinder");
-local v14 = {
-    Enum.UserInputType.Gamepad1, 
-    Enum.UserInputType.Gamepad2, 
-    Enum.UserInputType.Gamepad3, 
-    Enum.UserInputType.Gamepad4, 
-    Enum.UserInputType.Gamepad5, 
-    Enum.UserInputType.Gamepad6, 
-    Enum.UserInputType.Gamepad7, 
-    Enum.UserInputType.Gamepad8
-};
-v13.init = function(v15) --[[ Line: 37 ]] --[[ Name: init ]]
-    v15.boundPlayerListActions = false;
-end;
-v13.bindActions = function(v16) --[[ Line: 41 ]] --[[ Name: bindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy), l_FFlagPlayerListUseMobileOnSmallDisplay_0 (copy), l_GuiService_0 (copy), v14 (copy), l_FFlagAddNewPlayerListMobileFocusNav_0 (copy)
-    l_ContextActionService_0:BindCoreAction("RbxPlayerListToggle", function(_, v18, _) --[[ Line: 42 ]]
-        -- upvalues: l_FFlagPlayerListUseMobileOnSmallDisplay_0 (ref), v16 (copy), l_GuiService_0 (ref)
-        if l_FFlagPlayerListUseMobileOnSmallDisplay_0 and v16.props.displayOptions.isSmallTouchDevice then
-            return Enum.ContextActionResult.Pass;
-        elseif l_GuiService_0.MenuIsOpen then
-            return Enum.ContextActionResult.Pass;
-        elseif v18 ~= Enum.UserInputState.Begin then
-            return Enum.ContextActionResult.Pass;
-        else
-            v16.props.setVisibility(not v16.props.displayOptions.isVisible);
-            return Enum.ContextActionResult.Sink;
-        end;
-    end, false, Enum.KeyCode.Tab);
-    l_ContextActionService_0:BindCoreAction("RbxPlayerListStopMovement", function(_, _, _) --[[ Line: 59 ]]
-        -- upvalues: v16 (copy)
-        if v16.props.displayOptions.isVisible and v16.props.displayOptions.isTenFootInterface then
-            return Enum.ContextActionResult.Sink;
-        else
-            return Enum.ContextActionResult.Pass;
-        end;
-    end, false, unpack(v14));
-    l_ContextActionService_0:BindCoreAction("RbxPlayerListGamepadClose", function(_, v24, _) --[[ Line: 66 ]]
-        -- upvalues: v16 (copy), l_FFlagAddNewPlayerListMobileFocusNav_0 (ref)
-        if v24 ~= Enum.UserInputState.Begin then
-            return Enum.ContextActionResult.Pass;
-        elseif not v16.props.displayOptions.isTenFootInterface and (not l_FFlagAddNewPlayerListMobileFocusNav_0 or not v16.props.displayOptions.isSmallTouchDevice) then
-            return Enum.ContextActionResult.Pass;
-        elseif l_FFlagAddNewPlayerListMobileFocusNav_0 and v16.props.playerDropDown.isVisible then
-            v16.props.closePlayerDropDown();
-            return Enum.ContextActionResult.Sink;
-        else
-            if l_FFlagAddNewPlayerListMobileFocusNav_0 then
-                if v16.props.displayOptions.isVisible then
-                    v16.props.setVisibility(false);
-                    return Enum.ContextActionResult.Sink;
-                end;
-            elseif v16.props.displayOptions.isVisible and v16.props.displayOptions.isTenFootInterface then
-                v16.props.setVisibility(false);
-                return Enum.ContextActionResult.Sink;
-            end;
-            return Enum.ContextActionResult.Pass;
-        end;
-    end, false, Enum.KeyCode.ButtonB, if l_FFlagAddNewPlayerListMobileFocusNav_0 then Enum.KeyCode.ButtonB else Enum.KeyCode.ButtonStart);
-    v16.boundPlayerListActions = true;
-end;
-v13.unbindActions = function(v26) --[[ Line: 101 ]] --[[ Name: unbindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("RbxPlayerListToggle");
-    l_ContextActionService_0:UnbindCoreAction("RbxPlayerListStopMovement");
-    l_ContextActionService_0:UnbindCoreAction("RbxPlayerListGamepadClose");
-    v26.boundPlayerListActions = false;
-end;
-v13.didMount = function(v27) --[[ Line: 108 ]] --[[ Name: didMount ]]
-    v27:bindActions();
-end;
-v13.render = function(_) --[[ Line: 112 ]] --[[ Name: render ]]
-    return nil;
-end;
-v13.willUnmount = function(v29) --[[ Line: 116 ]] --[[ Name: willUnmount ]]
-    if v29.boundPlayerListActions then
-        v29:unbindActions();
-    end;
-end;
-local function v31(v30) --[[ Line: 122 ]] --[[ Name: mapStateToProps ]]
-    -- upvalues: l_FFlagAddNewPlayerListMobileFocusNav_0 (copy)
-    return {
-        displayOptions = v30.displayOptions, 
-        playerDropDown = if l_FFlagAddNewPlayerListMobileFocusNav_0 then v30.playerDropDown else nil
-    };
-end;
-local function v34(v32) --[[ Line: 129 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v8 (copy), l_FFlagAddNewPlayerListMobileFocusNav_0 (copy), v9 (copy)
-    return {
-        setVisibility = function(v33) --[[ Line: 131 ]] --[[ Name: setVisibility ]]
-            -- upvalues: v32 (copy), v8 (ref)
-            return v32(v8(v33));
-        end, 
-        closePlayerDropDown = l_FFlagAddNewPlayerListMobileFocusNav_0 and function() --[[ Line: 135 ]]
-            -- upvalues: v32 (copy), v9 (ref)
-            return v32(v9());
-        end or nil
-    };
-end;
-if v10 then
-    return v4.memo(v5.connect(v31, v34)(v13));
-else
-    return v5.connect(v31, v34)(v13);
-end;
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local Roact = require(CorePackages.Packages.Roact)
+local React = require(CorePackages.Packages.React)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+local ParentParent = script.Parent.Parent.Parent
+local SetPlayerListVisibility = require(ParentParent.Actions.SetPlayerListVisibility)
+local ClosePlayerDropDown = require(ParentParent.Actions.ClosePlayerDropDown)
+local FFlagPlayerListReduceRerenders = require(ParentParent.Flags.FFlagPlayerListReduceRerenders)
+local FFlagAddNewPlayerListMobileFocusNav = PlayerList.Flags.FFlagAddNewPlayerListMobileFocusNav
+local FFlagPlayerListUseMobileOnSmallDisplay = PlayerList.Flags.FFlagPlayerListUseMobileOnSmallDisplay
+local v14 = Roact.PureComponent:extend("ContextActionsBinder")
+local t1 = {
+	Enum.UserInputType.Gamepad1,
+	Enum.UserInputType.Gamepad2,
+	Enum.UserInputType.Gamepad3,
+	Enum.UserInputType.Gamepad4,
+	Enum.UserInputType.Gamepad5,
+	Enum.UserInputType.Gamepad6,
+	Enum.UserInputType.Gamepad7,
+	Enum.UserInputType.Gamepad8
+}
+
+function v14.init(p1) -- line: 37
+	p1.boundPlayerListActions = false
+end
+function v14.bindActions(p2) -- line: 41
+	-- upvalues: ContextActionService (copy), FFlagPlayerListUseMobileOnSmallDisplay (copy), GuiService (copy), t1 (copy), FFlagAddNewPlayerListMobileFocusNav (copy)
+	ContextActionService:BindCoreAction("RbxPlayerListToggle", function(_, p4, _) -- line: 42
+		-- upvalues: FFlagPlayerListUseMobileOnSmallDisplay (copy), p2 (copy), GuiService (copy)
+		if FFlagPlayerListUseMobileOnSmallDisplay and p2.props.displayOptions.isSmallTouchDevice then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if GuiService.MenuIsOpen then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if p4 ~= Enum.UserInputState.Begin then
+			return Enum.ContextActionResult.Pass
+		end
+
+		p2.props.setVisibility(not p2.props.displayOptions.isVisible)
+
+		return Enum.ContextActionResult.Sink
+	end, false, Enum.KeyCode.Tab)
+	ContextActionService:BindCoreAction("RbxPlayerListStopMovement", function(_, _, _) -- line: 59
+		-- upvalues: p2 (copy)
+		if p2.props.displayOptions.isVisible and p2.props.displayOptions.isTenFootInterface then
+			return Enum.ContextActionResult.Sink
+		end
+
+		return Enum.ContextActionResult.Pass
+	end, false, unpack(t1))
+	ContextActionService:BindCoreAction("RbxPlayerListGamepadClose", function(_, p10, _) -- line: 66
+		-- upvalues: p2 (copy), FFlagAddNewPlayerListMobileFocusNav (copy)
+		if p10 ~= Enum.UserInputState.Begin then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if not p2.props.displayOptions.isTenFootInterface and (not FFlagAddNewPlayerListMobileFocusNav or not p2.props.displayOptions.isSmallTouchDevice) then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if FFlagAddNewPlayerListMobileFocusNav and p2.props.playerDropDown.isVisible then
+			p2.props.closePlayerDropDown()
+
+			return Enum.ContextActionResult.Sink
+		end
+
+		if FFlagAddNewPlayerListMobileFocusNav then
+			if p2.props.displayOptions.isVisible then
+				p2.props.setVisibility(false)
+
+				return Enum.ContextActionResult.Sink
+			end
+		elseif p2.props.displayOptions.isVisible and p2.props.displayOptions.isTenFootInterface then
+			p2.props.setVisibility(false)
+
+			return Enum.ContextActionResult.Sink
+		end
+
+		return Enum.ContextActionResult.Pass
+	end, false, Enum.KeyCode.ButtonB, if not FFlagAddNewPlayerListMobileFocusNav then Enum.KeyCode.ButtonStart else Enum.KeyCode.ButtonB)
+	p2.boundPlayerListActions = true
+end
+function v14.unbindActions(p12) -- line: 101
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("RbxPlayerListToggle")
+	ContextActionService:UnbindCoreAction("RbxPlayerListStopMovement")
+	ContextActionService:UnbindCoreAction("RbxPlayerListGamepadClose")
+	p12.boundPlayerListActions = false
+end
+function v14.didMount(p13) -- line: 108
+	p13:bindActions()
+end
+function v14.render(_) -- line: 112
+	return nil
+end
+function v14.willUnmount(p15) -- line: 116
+	if p15.boundPlayerListActions then
+		p15:unbindActions()
+	end
+end
+
+local function mapStateToProps(p16) -- line: 122
+	-- upvalues: FFlagAddNewPlayerListMobileFocusNav (copy)
+	return {
+		displayOptions = p16.displayOptions,
+		playerDropDown = if not FFlagAddNewPlayerListMobileFocusNav then nil else p16.playerDropDown
+	}
+end
+local function mapDispatchToProps(p17) -- line: 129
+	-- upvalues: SetPlayerListVisibility (copy), FFlagAddNewPlayerListMobileFocusNav (copy), ClosePlayerDropDown (copy)
+	return {
+		setVisibility = function(p18) -- line: 131
+			-- upvalues: p17 (copy), SetPlayerListVisibility (copy)
+			return p17(SetPlayerListVisibility(p18))
+		end,
+		closePlayerDropDown = if not FFlagAddNewPlayerListMobileFocusNav then nil else function() -- line: 135
+			-- upvalues: p17 (copy), ClosePlayerDropDown (copy)
+			return p17(ClosePlayerDropDown())
+		end
+	}
+end
+
+if FFlagPlayerListReduceRerenders then
+	return React.memo(RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v14))
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v14)

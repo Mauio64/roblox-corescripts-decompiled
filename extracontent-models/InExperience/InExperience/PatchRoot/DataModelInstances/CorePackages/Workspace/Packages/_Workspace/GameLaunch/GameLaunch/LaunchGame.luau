@@ -1,20 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("GameLaunch").Parent;
-local l_default_0 = require(l_Parent_0.LoggingProtocol).default;
-local v2 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.ExperienceService);
-local l_ExperienceService_0 = require(l_Parent_0.ExperienceService).ExperienceService;
-local l_GetFFlagMoveLuaExpLaunchBegin_0 = require(l_Parent_0.ExperienceService).Flags.GetFFlagMoveLuaExpLaunchBegin;
-return function(v6, v7, v8, _, v10, v11) --[[ Line: 10 ]] --[[ Name: LaunchGame ]]
-    -- upvalues: l_GetFFlagMoveLuaExpLaunchBegin_0 (copy), l_default_0 (copy), v2 (copy), l_ExperienceService_0 (copy)
-    if not l_GetFFlagMoveLuaExpLaunchBegin_0() then
-        l_default_0:logEvent("experience_launch_begin");
-    end;
-    local v12 = {
-        placeId = tonumber(v6), 
-        referralPage = v7
-    };
-    if v8 then
-        v12 = v2.Dictionary.join(v12, v8);
-    end;
-    l_ExperienceService_0:LaunchExperience(v12, v10, v11);
-end;
+local Parent = script:FindFirstAncestor("GameLaunch").Parent
+local default = require(Parent.LoggingProtocol).default
+local Cryo = require(Parent.Cryo)
+
+require(Parent.ExperienceService)
+
+local ExperienceService = require(Parent.ExperienceService).ExperienceService
+local GetFFlagMoveLuaExpLaunchBegin = require(Parent.ExperienceService).Flags.GetFFlagMoveLuaExpLaunchBegin
+
+local function LaunchGame(s1: string?, s2: string?, t1: {[any]: any}?, _, s3: string?, p2: ((...any) -> ...any)?) -- line: 10
+	-- upvalues: GetFFlagMoveLuaExpLaunchBegin (copy), default (copy), Cryo (copy), ExperienceService (copy)
+	if not GetFFlagMoveLuaExpLaunchBegin() then
+		default:logEvent("experience_launch_begin")
+	end
+
+	local t2 = {
+		placeId = tonumber(s1),
+		referralPage = s2
+	}
+
+	if t1 then
+		t2 = Cryo.Dictionary.join(t2, t1)
+	end
+
+	ExperienceService:LaunchExperience(t2, s3, p2)
+end
+
+return LaunchGame

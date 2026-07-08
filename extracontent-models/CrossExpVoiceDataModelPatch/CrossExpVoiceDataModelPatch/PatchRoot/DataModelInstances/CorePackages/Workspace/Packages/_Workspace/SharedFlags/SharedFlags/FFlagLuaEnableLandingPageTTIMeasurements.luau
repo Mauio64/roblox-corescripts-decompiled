@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaEnableLandingPageTTIMeasurements", false);
+return game:DefineFastFlag("LuaEnableLandingPageTTIMeasurements", false)

@@ -1,15 +1,18 @@
-local function v3(v0, v1) --[[ Line: 7 ]] --[[ Name: invalidKey ]]
-    local v2 = ("%q (%s) is not a valid member of %s"):format(tostring(v1), typeof(v1), (tostring(v0)));
-    error(v2, 2);
-end;
-return function(v4, v5) --[[ Line: 13 ]] --[[ Name: strict ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable(v4, {
-        __index = v3, 
-        __newindex = v3, 
-        __tostring = function() --[[ Line: 17 ]] --[[ Name: __tostring ]]
-            -- upvalues: v5 (copy)
-            return v5;
-        end
-    }));
-end;
+local function invalidKey(p1, p2) -- line: 7
+	local v5 = ("%q (%s) is not a valid member of %s"):format(tostring(p2), typeof(p2), (tostring(p1)))
+
+	error(v5, 2)
+end
+local function strict(p3, p4) -- line: 13
+	-- upvalues: invalidKey (copy)
+	return (setmetatable(p3, {
+		__index = invalidKey,
+		__newindex = invalidKey,
+		__tostring = function() -- line: 17
+			-- upvalues: p4 (copy)
+			return p4
+		end
+	}))
+end
+
+return strict

@@ -2,16 +2,25 @@ local Parent = script:FindFirstAncestor("Foundation").Parent
 local React = require(Parent.React)
 local FullBleed = require(script.Parent.FullBleed)
 
-return function(p1) --[[ childrenHasFullBleed ]] -- line: 15
-	-- upvalues: React (copy), FullBleed (copy)
-	local u6 = false
+local function getElementType(p1) -- line: 8
+	if type(p1) ~= "table" then
+		return nil
+	end
 
-	React.Children.forEach(p1, function(p2) -- line: 17
-		-- upvalues: FullBleed (copy), u6 (ref)
-		if ((if type(p2) == "table" then p2.type else nil)) == FullBleed then
-			u6 = true
+	return p1.type
+end
+local function childrenHasFullBleed(p2) -- line: 15
+	-- upvalues: React (copy), FullBleed (copy)
+	local u8 = false
+
+	React.Children.forEach(p2, function(p3) -- line: 17
+		-- upvalues: FullBleed (copy), u8 (ref)
+		if ((if type(p3) == "table" then p3.type else nil)) == FullBleed then
+			u8 = true
 		end
 	end)
 
-	return u6
+	return u8
 end
+
+return childrenHasFullBleed

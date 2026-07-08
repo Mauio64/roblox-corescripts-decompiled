@@ -1,5 +1,6 @@
-local _ = require(script.RoactServicesTypes);
+require(script.RoactServicesTypes)
+
 return {
-    RoactServices = require(script.RoactServices), 
-    RoactServicesContext = require(script.RoactServicesContext)
-};
+	RoactServices = require(script.RoactServices),
+	RoactServicesContext = require(script.RoactServicesContext)
+}

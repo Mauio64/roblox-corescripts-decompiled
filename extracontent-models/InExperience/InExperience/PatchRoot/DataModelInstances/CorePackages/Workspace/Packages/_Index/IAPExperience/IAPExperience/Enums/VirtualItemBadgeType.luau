@@ -1,3 +1,3 @@
 return {
-    Popular = "Popular"
-};
+	Popular = "Popular"
+}

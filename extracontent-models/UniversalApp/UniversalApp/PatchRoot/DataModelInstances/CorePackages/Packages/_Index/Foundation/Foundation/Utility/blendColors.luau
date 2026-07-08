@@ -1,22 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v2, v3) --[[ Line: 14 ]] --[[ Name: blendColors ]]
-    local v4 = 1 - (v3.Transparency or 0);
-    local v5 = 1 - (v2.Transparency or 0);
-    if v4 == 1 or v5 == 0 or v2.Color3 == nil then
-        return v3;
-    elseif v4 == 0 then
-        return v2;
-    else
-        local v6 = 1 - v4;
-        local v7 = v4 + v5 * v6;
-        local v8 = v7 > 0 and 1 / v7 or 0;
-        local v9 = (v3.Color3.R * v4 + v2.Color3.R * (v5 * v6)) * v8;
-        local v10 = (v3.Color3.G * v4 + v2.Color3.G * (v5 * v6)) * v8;
-        local v11 = (v3.Color3.B * v4 + v2.Color3.B * (v5 * v6)) * v8;
-        return {
-            Color3 = Color3.new(v9, v10, v11), 
-            Transparency = 1 - v7
-        };
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Components.Types)
+
+local function blendColors(p1, t1: {[any]: any}) -- line: 14
+	local v5 = 1 - (t1.Transparency or 0)
+	local v6 = 1 - (p1.Transparency or 0)
+
+	if v5 == 1 or (v6 == 0 or p1.Color3 == nil) then
+		return t1
+	end
+
+	if v5 == 0 then
+		return p1
+	end
+
+	local v7 = 1 - v5
+	local v8 = v5 + v6 * v7
+	local v9 = v8 > 0 and 1 / v8 or 0
+	local v10 = (t1.Color3.R * v5 + p1.Color3.R * (v6 * v7)) * v9
+	local v11 = (t1.Color3.G * v5 + p1.Color3.G * (v6 * v7)) * v9
+	local v12 = (t1.Color3.B * v5 + p1.Color3.B * (v6 * v7)) * v9
+
+	return {
+		Color3 = Color3.new(v10, v11, v12),
+		Transparency = 1 - v8
+	}
+end
+
+return blendColors

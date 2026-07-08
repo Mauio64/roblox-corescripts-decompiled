@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLastLoginMethodTracking", false) and game:GetEngineFeature("LastSuccessfulSignInMethodKeyAvailable");
+return game:DefineFastFlag("EnableLastLoginMethodTracking", false) and game:GetEngineFeature("LastSuccessfulSignInMethodKeyAvailable")

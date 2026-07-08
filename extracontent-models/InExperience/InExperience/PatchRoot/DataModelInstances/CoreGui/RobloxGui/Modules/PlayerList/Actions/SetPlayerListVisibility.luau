@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerListVisibility", function(v0) --[[ Line: 5 ]]
-    return {
-        isVisible = v0
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetPlayerListVisibility", function(p1) -- line: 5
+	return {
+		isVisible = p1
+	}
+end)

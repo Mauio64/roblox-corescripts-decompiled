@@ -1,23 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_FriendsNetworking_0 = require(l_script_FirstAncestor_0.dependencies).FriendsNetworking;
-return function(v2) --[[ Line: 6 ]]
-    -- upvalues: l_FriendsNetworking_0 (copy)
-    return {
-        fetchFriends = function(v3) --[[ Line: 8 ]] --[[ Name: fetchFriends ]]
-            -- upvalues: v2 (copy), l_FriendsNetworking_0 (ref)
-            return v2(l_FriendsNetworking_0.GetFriendsFromUserId.API(v3));
-        end, 
-        getFriendRequestsCount = function() --[[ Line: 11 ]] --[[ Name: getFriendRequestsCount ]]
-            -- upvalues: v2 (copy), l_FriendsNetworking_0 (ref)
-            return v2(l_FriendsNetworking_0.GetFriendRequestsCount.API());
-        end, 
-        getInactiveFriends = function(v4) --[[ Line: 14 ]] --[[ Name: getInactiveFriends ]]
-            -- upvalues: v2 (copy), l_FriendsNetworking_0 (ref)
-            return v2(l_FriendsNetworking_0.GetInactiveFriends.API(v4));
-        end, 
-        unfriendTargetUser = function(v5) --[[ Line: 17 ]] --[[ Name: unfriendTargetUser ]]
-            -- upvalues: v2 (copy), l_FriendsNetworking_0 (ref)
-            return v2(l_FriendsNetworking_0.UnfriendTargetUserId.API(v5));
-        end
-    };
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local FriendsNetworking = require(FriendsLanding.dependencies).FriendsNetworking
+
+return function(p1) -- line: 6
+	-- upvalues: FriendsNetworking (copy)
+	return {
+		fetchFriends = function(p2) -- line: 8
+			-- upvalues: p1 (copy), FriendsNetworking (copy)
+			return p1(FriendsNetworking.GetFriendsFromUserId.API(p2))
+		end,
+		getFriendRequestsCount = function() -- line: 11
+			-- upvalues: p1 (copy), FriendsNetworking (copy)
+			return p1(FriendsNetworking.GetFriendRequestsCount.API())
+		end,
+		getInactiveFriends = function(p3) -- line: 14
+			-- upvalues: p1 (copy), FriendsNetworking (copy)
+			return p1(FriendsNetworking.GetInactiveFriends.API(p3))
+		end,
+		unfriendTargetUser = function(p4) -- line: 17
+			-- upvalues: p1 (copy), FriendsNetworking (copy)
+			return p1(FriendsNetworking.UnfriendTargetUserId.API(p4))
+		end
+	}
+end

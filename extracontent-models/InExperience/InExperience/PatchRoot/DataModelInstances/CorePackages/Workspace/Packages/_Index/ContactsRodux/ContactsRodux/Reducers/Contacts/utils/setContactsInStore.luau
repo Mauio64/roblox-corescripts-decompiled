@@ -1,16 +1,23 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Types_0 = l_Parent_0.Types;
-local _ = require(l_Types_0.ReducerTypes);
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Types_0.ActionTypes);
-local v5 = require(l_Parent_1.Dash);
-return function(v6) --[[ Line: 8 ]]
-    -- upvalues: v5 (copy)
-    local l_userContactIds_0 = v6.responseBody.userContactIds;
-    local v8 = {};
-    v5.forEach(l_userContactIds_0, function(v9) --[[ Line: 12 ]]
-        -- upvalues: v8 (copy)
-        v8[v9] = {};
-    end);
-    return v8;
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Types = ParentParent.Types
+
+require(Types.ReducerTypes)
+
+local ParentParentParent = ParentParent.Parent
+
+require(Types.ActionTypes)
+
+local Dash = require(ParentParentParent.Dash)
+
+return function(p1) -- line: 8
+	-- upvalues: Dash (copy)
+	local userContactIds = p1.responseBody.userContactIds
+	local t1 = {}
+
+	Dash.forEach(userContactIds, function(p2) -- line: 12
+		-- upvalues: t1 (copy)
+		t1[p2] = {}
+	end)
+
+	return t1
+end

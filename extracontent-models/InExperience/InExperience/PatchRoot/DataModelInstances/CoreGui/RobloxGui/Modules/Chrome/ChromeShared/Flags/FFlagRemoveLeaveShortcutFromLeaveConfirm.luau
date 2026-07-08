@@ -1,2 +1,3 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls and game:DefineFastFlag("RemoveLeaveShortcutFromLeaveConfirm", false);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls and game:DefineFastFlag("RemoveLeaveShortcutFromLeaveConfirm", false)

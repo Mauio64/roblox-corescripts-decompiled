@@ -13,13 +13,13 @@ local checkQrSession = require(ProfilePlatform.Networking.checkQrSession)
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
 local useLocalUserId = require(ProfilePlatformParent.RobloxAppHooks).useLocalUserId
-local dependencyArray = RoactUtils.Hooks.dependencyArray
 local useSignalState = require(ProfilePlatformParent.SignalsReact).useSignalState
 local ProfileRefreshSignal = require(ProfilePlatformParent.ProfilePlatformCommon).Signals.ProfileRefreshSignal
 local parseComponentsFromJson = require(ProfilePlatform.Components.ProfilePlatformPage.parseComponentsFromJson)
 local useAvailableComponents = require(ProfilePlatform.Hooks.useAvailableComponents)
 local useProfileJson = require(ProfilePlatform.Hooks.useProfileJson)
 local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
+local useIsMeTab = require(ProfilePlatform.Hooks.useIsMeTab)
 local ProfilePlatformEventReceiver = require(script.Parent.ProfilePlatformEventReceiver)
 local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
@@ -27,154 +27,145 @@ local Enums = require(ProfilePlatform.Common.Enums)
 local getFriendStatusFromProfileResponse = require(script.Parent.getFriendStatusFromProfileResponse)
 local getIsTrustedConnectionsStatusFromProfileResponse = require(script.Parent.getIsTrustedConnectionsStatusFromProfileResponse)
 local refreshProfilePlatformActionInfo = require(ProfilePlatform.Networking.refreshProfilePlatformActionInfo)
+local useActionsComponentRequest = require(ProfilePlatform.Hooks.useActionsComponentRequest)
 local LoadingStages = SocialLuaAnalytics.Analytics.Enums.LoadingStages
 local LoadingStagesExtension = require(ProfilePlatform.Analytics.LoadingStagesExtension)
 local FFlagProfilePlatformEnableVR = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableVR)
 local FFlagProfilePlatformEnableLazyLoadingComponents = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableLazyLoadingComponents)
+local FFlagProfilePlatformRefreshActionsRespectPolicies = require(ProfilePlatform.Flags.FFlagProfilePlatformRefreshActionsRespectPolicies)
+local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
 local FFlagProfilePlatformTrustedConnectionsMVP = SharedFlags.FFlagProfilePlatformTrustedConnectionsMVP
-local FFlagTCUnifyNavigationEntry = SharedFlags.FFlagTCUnifyNavigationEntry
-local v36 = game:DefineFastString("SocialProfilePeekViewLayer", "Social.ProfilePeekView")
-local v37 = game:DefineFastString("SocialProfilePeekViewSecondaryLayer", "Social.ProfilePeekView.Secondary")
-local v38 = game:DefineFastString("SocialSelfProfileViewLayer", "Social.SelfProfileView")
+local FFlagAXEnableProfileTab = SharedFlags.FFlagAXEnableProfileTab
+local v39 = game:DefineFastString("SocialProfilePeekViewLayer", "Social.ProfilePeekView")
+local v40 = game:DefineFastString("SocialProfilePeekViewSecondaryLayer", "Social.ProfilePeekView.Secondary")
+local v41 = game:DefineFastString("SocialSelfProfileViewLayer", "Social.SelfProfileView")
 local IXPService = game:GetService("IXPService")
-local v40 = game:DefineFastFlag("EnableSocialProfilePeekViewExposureEvents", false)
-local v41 = game:DefineFastFlag("ProfilePlatformEnableRefreshSignal", false)
-local v42 = game:DefineFastFlag("ProfilePlatformEnableSessionization", false)
-local v43 = if not v42 then nil else game:GetService("SessionService")
-local v44 = if not v42 then nil else require(ProfilePlatformParent.RobloxAppSessionization).SessionType
+local v43 = game:DefineFastFlag("EnableSocialProfilePeekViewExposureEvents", false)
+local v44 = game:DefineFastFlag("ProfilePlatformEnableRefreshSignal", false)
+local v45 = game:DefineFastFlag("ProfilePlatformEnableSessionization", false)
+local v46 = if not v45 then nil else game:GetService("SessionService")
+local v47 = if not v45 then nil else require(ProfilePlatformParent.RobloxAppSessionization).SessionType
 local FFlagPPVBackgroundPrefetchAvatar = SharedFlags.FFlagPPVBackgroundPrefetchAvatar
-local v46 = if not FFlagPPVBackgroundPrefetchAvatar then nil else require(ProfilePlatformParent.EditProfileBackground).AvatarModelPrefetch
+local v49 = if not FFlagPPVBackgroundPrefetchAvatar then nil else require(ProfilePlatformParent.EditProfileBackground).AvatarModelPrefetch
 local ProfilePlatformPage = require(script.Parent.ProfilePlatformPage)
 local getProfilePlatform = require(ProfilePlatform.Networking.getProfilePlatform)
-local FFlagRemoveDependencyArrayAntipattern = require(ProfilePlatformParent.SharedFlags).FFlagRemoveDependencyArrayAntipattern
 
-return function() -- line: 69
-	-- upvalues: React (copy), useProfileWrapperContext (copy), useProfileAnalyticsContext (copy), useLocalUserId (copy), useDispatch (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), Navigation (copy), useProfileJson (copy), useAvailableComponents (copy), SocialStopwatch (copy), EventNames (copy), LoadingStages (copy), getProfilePlatform (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), FFlagProfilePlatformEnableVR (copy), getDeepValue (copy), Enums (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), checkQrSession (copy), FFlagTCUnifyNavigationEntry (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy), LoadingStagesExtension (copy), FFlagPPVBackgroundPrefetchAvatar (copy), useEffectOnMount (copy), v46 (copy), v41 (copy), useSignalState (copy), ProfileRefreshSignal (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), v40 (copy), IXPService (copy), v36 (copy), v37 (copy), v38 (copy), v42 (copy), v43 (copy), v44 (copy), Cryo (copy), parseComponentsFromJson (copy), ProfilePlatformEventReceiver (copy), ProfilePlatformPage (copy)
-	local v50, v51 = React.useState(true)
-	local v52 = useProfileWrapperContext()
-	local v53 = useProfileAnalyticsContext()
-	local profileId = v52.profileId
-	local profileType = v52.profileType
-	local v56 = useLocalUserId()
-	local v57 = tostring(profileId) == tostring(v56)
-	local v58 = useDispatch()
-	local v59 = if not FFlagProfilePlatformTrustedConnectionsMVP then nil else Navigation.useNavigation()
-	local v60 = useProfileJson()
-	local v61 = useAvailableComponents()
-	local v62 = React.useRef(0)
+return function() -- line: 71
+	-- upvalues: React (copy), useProfileWrapperContext (copy), useProfileAnalyticsContext (copy), FFlagAXEnableProfileTab (copy), useIsMeTab (copy), useLocalUserId (copy), useDispatch (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), Navigation (copy), useProfileJson (copy), useAvailableComponents (copy), FFlagProfilePlatformRefreshActionsRespectPolicies (copy), useActionsComponentRequest (copy), SocialStopwatch (copy), EventNames (copy), LoadingStages (copy), getProfilePlatform (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), FFlagProfilePlatformEnableVR (copy), getDeepValue (copy), Enums (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), checkQrSession (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy), LoadingStagesExtension (copy), FFlagPPVBackgroundPrefetchAvatar (copy), useEffectOnMount (copy), v49 (copy), v44 (copy), useSignalState (copy), ProfileRefreshSignal (copy), v43 (copy), IXPService (copy), v39 (copy), v40 (copy), v41 (copy), v45 (copy), v46 (copy), v47 (copy), FFlagProfilePlatformEnableMoments (copy), Cryo (copy), parseComponentsFromJson (copy), ProfilePlatformEventReceiver (copy), ProfilePlatformPage (copy)
+	local v52, v53 = React.useState(true)
+	local v54 = useProfileWrapperContext()
+	local v55 = useProfileAnalyticsContext()
+	local profileId = v54.profileId
+	local profileType = v54.profileType
+	local v58 = if not FFlagAXEnableProfileTab then nil else useIsMeTab()
+	local v59 = useLocalUserId()
+	local v60 = tostring(profileId) == tostring(v59)
+	local v61 = useDispatch()
+	local v62 = if not FFlagProfilePlatformTrustedConnectionsMVP then nil else Navigation.useNavigation()
+	local v63 = useProfileJson()
+	local v64 = useAvailableComponents()
+	local v65 = if not FFlagProfilePlatformRefreshActionsRespectPolicies then nil else useActionsComponentRequest()
+	local v66 = React.useRef(0)
 
-	local function v63(n1: number?) -- line: 90
-		-- upvalues: SocialStopwatch (copy), v53 (copy), EventNames (copy), LoadingStages (copy), v58 (copy), getProfilePlatform (copy), profileId (copy), profileType (copy), v61 (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), v51 (copy), FFlagProfilePlatformEnableVR (copy), getDeepValue (copy), Enums (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), v52 (copy), checkQrSession (copy), FFlagTCUnifyNavigationEntry (copy), v59 (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy), LoadingStagesExtension (copy)
-		local v68 = SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.ProfileOpened)
+	local function v67(n1: number?) -- line: 96
+		-- upvalues: SocialStopwatch (copy), v55 (copy), EventNames (copy), LoadingStages (copy), v61 (copy), getProfilePlatform (copy), profileId (copy), profileType (copy), v64 (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), v53 (copy), FFlagProfilePlatformEnableVR (copy), getDeepValue (copy), Enums (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), v54 (copy), checkQrSession (copy), v62 (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy), v65 (copy), LoadingStagesExtension (copy)
+		local v73 = SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.ProfileOpened)
 
-		v53.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
-			statValue = if not v68 then nil else v68.timeElapsed,
-			status = LoadingStages.Fetching,
-			isProfilePlatform = true
+		v55.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
+			isProfilePlatform = true,
+			statValue = if not v73 then nil else v73.timeElapsed,
+			status = LoadingStages.Fetching
 		})
-		v58(getProfilePlatform.API({
+		v61(getProfilePlatform.API({
+			includeComponentOrdering = true,
 			profileId = profileId,
 			profileType = profileType,
-			components = v61,
-			includeComponentOrdering = true,
+			components = v64,
 			onlyEssentialComponents = not not FFlagProfilePlatformEnableLazyLoadingComponents or nil
-		})):andThen(function(p1) -- line: 106
-			-- upvalues: FFlagProfilePlatformEnableLazyLoadingComponents (copy), v51 (copy), FFlagProfilePlatformEnableVR (copy), n1 (copy), v53 (copy), EventNames (copy), getDeepValue (copy), Enums (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), v52 (copy), v58 (copy), checkQrSession (copy), profileId (copy), FFlagTCUnifyNavigationEntry (copy), v59 (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy)
+		})):andThen(function(p1) -- line: 112
+			-- upvalues: FFlagProfilePlatformEnableLazyLoadingComponents (copy), v53 (copy), FFlagProfilePlatformEnableVR (copy), n1 (copy), v55 (copy), EventNames (copy), getDeepValue (copy), Enums (copy), FFlagProfilePlatformTrustedConnectionsMVP (copy), getFriendStatusFromProfileResponse (copy), getIsTrustedConnectionsStatusFromProfileResponse (copy), v54 (copy), v61 (copy), checkQrSession (copy), profileId (copy), v62 (copy), RobloxAppEnums (copy), refreshProfilePlatformActionInfo (copy), v65 (copy)
 			if FFlagProfilePlatformEnableLazyLoadingComponents then
-				v51(false)
+				v53(false)
 			end
 
 			if FFlagProfilePlatformEnableVR and n1 > 1 then
-				v53.fireAnalyticsEvent(EventNames.ProfilePlatformPageReloaded, {
+				v55.fireAnalyticsEvent(EventNames.ProfilePlatformPageReloaded, {
 					reloadCount = n1
 				})
 
 				return
 			end
 
-			local v73 = getDeepValue(p1, `responseBody.components.{ Enums.Components.Actions }.buttons`)
-			local v74 = if not v73 or not v73[1] then nil else v73[1].type
+			local v78 = getDeepValue(p1, `responseBody.components.{ Enums.Components.Actions }.buttons`)
+			local v79 = if not v78 or not v78[1] then nil else v78[1].type
 
-			if FFlagProfilePlatformTrustedConnectionsMVP and getFriendStatusFromProfileResponse(p1) == Enums.FriendStatus.Friends and not getIsTrustedConnectionsStatusFromProfileResponse(p1) and v52.sourceInfo.source == Enums.Sources.QrCode then
-				v58(checkQrSession.API(profileId)):andThen(function(p2) -- line: 128
-					-- upvalues: FFlagTCUnifyNavigationEntry (copy), v59 (copy), RobloxAppEnums (copy), profileId (copy), v58 (copy), refreshProfilePlatformActionInfo (copy)
+			if FFlagProfilePlatformTrustedConnectionsMVP and getFriendStatusFromProfileResponse(p1) == Enums.FriendStatus.Friends and not getIsTrustedConnectionsStatusFromProfileResponse(p1) and v54.sourceInfo.source == Enums.Sources.QrCode then
+				v61(checkQrSession.API(profileId)):andThen(function(p2) -- line: 134
+					-- upvalues: v62 (copy), RobloxAppEnums (copy), profileId (copy), v61 (copy), refreshProfilePlatformActionInfo (copy), v65 (copy)
 					if p2.responseBody == true then
-						if FFlagTCUnifyNavigationEntry then
-							v59.push(RobloxAppEnums.AppPage.TrustedContactsModal, {
-								props = {
-									userId = profileId,
-									sentFromQrCode = true,
-									onRequestSent = function() --[[ onRequestSent ]] -- line: 135
-										-- upvalues: v58 (copy), refreshProfilePlatformActionInfo (copy), profileId (copy)
-										return v58(refreshProfilePlatformActionInfo(profileId))
-									end
-								}
-							})
-
-							return
-						end
-
-						v59.push(RobloxAppEnums.AppPage.TrustedContactsModal, {
-							userId = profileId,
-							sentFromQrCode = true,
-							onRequestSent = function() --[[ onRequestSent ]] -- line: 144
-								-- upvalues: v58 (copy), refreshProfilePlatformActionInfo (copy), profileId (copy)
-								return v58(refreshProfilePlatformActionInfo(profileId))
-							end
+						v62.push(RobloxAppEnums.AppPage.TrustedContactsModal, {
+							props = {
+								sentFromQrCode = true,
+								userId = profileId,
+								onRequestSent = function() -- line: 140
+									-- upvalues: v61 (copy), refreshProfilePlatformActionInfo (copy), profileId (copy), v65 (copy)
+									return v61(refreshProfilePlatformActionInfo(profileId, v65))
+								end
+							}
 						})
 					end
 				end)
 			end
 
-			v53.fireAnalyticsEvent(EventNames.ProfilePageLoadedWithData, {
+			v55.fireAnalyticsEvent(EventNames.ProfilePageLoadedWithData, {
 				friendStatus = getFriendStatusFromProfileResponse(p1),
-				absolutePosition = v52.sourceInfo.homepageCarouselAbsolutePosition,
-				isHomePageCarousel = v52.sourceInfo.source == Enums.Sources.HomepageFriendsCarousel,
-				source = v52.sourceInfo.source,
-				isRecommendation = v52.sourceInfo.isRecommendation,
-				v52.sourceInfo.recommendationContextType,
-				recommendationRank = v52.sourceInfo.recommendationRank,
-				recommendationSessionId = v52.sourceInfo.recommendationSessionId,
-				shareLinkId = v52.sourceInfo.shareLinkId,
-				primaryAction = v74
+				absolutePosition = v54.sourceInfo.homepageCarouselAbsolutePosition,
+				isHomePageCarousel = v54.sourceInfo.source == Enums.Sources.HomepageFriendsCarousel,
+				source = v54.sourceInfo.source,
+				isRecommendation = v54.sourceInfo.isRecommendation,
+				v54.sourceInfo.recommendationContextType,
+				recommendationRank = v54.sourceInfo.recommendationRank,
+				recommendationSessionId = v54.sourceInfo.recommendationSessionId,
+				shareLinkId = v54.sourceInfo.shareLinkId,
+				primaryAction = v79
 			})
-		end):catch(function(_) -- line: 168
-			-- upvalues: v53 (copy), EventNames (copy), v68 (copy), LoadingStages (copy)
-			v53.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
-				statValue = if not v68 then nil else v68.timeElapsed,
-				status = LoadingStages.Failed,
-				isProfilePlatform = true
+		end):catch(function(_) -- line: 166
+			-- upvalues: v55 (copy), EventNames (copy), v73 (copy), LoadingStages (copy)
+			v55.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
+				isProfilePlatform = true,
+				statValue = if not v73 then nil else v73.timeElapsed,
+				status = LoadingStages.Failed
 			})
 		end)
 
 		if FFlagProfilePlatformEnableLazyLoadingComponents then
-			v58(getProfilePlatform.API({
+			v61(getProfilePlatform.API({
+				includeComponentOrdering = true,
+				onlyEssentialComponents = false,
 				profileId = profileId,
 				profileType = profileType,
-				components = v61,
-				includeComponentOrdering = true,
-				onlyEssentialComponents = false
-			})):andThen(function(_) -- line: 184
-				-- upvalues: v53 (copy), EventNames (copy), v68 (copy), LoadingStagesExtension (copy)
-				v53.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
-					statValue = if not v68 then nil else v68.timeElapsed,
-					status = LoadingStagesExtension.LazyLoaded,
-					isProfilePlatform = true
+				components = v64
+			})):andThen(function(_) -- line: 182
+				-- upvalues: v55 (copy), EventNames (copy), v73 (copy), LoadingStagesExtension (copy)
+				v55.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
+					isProfilePlatform = true,
+					statValue = if not v73 then nil else v73.timeElapsed,
+					status = LoadingStagesExtension.LazyLoaded
 				})
-			end):catch(function(_) -- line: 191
-				-- upvalues: v53 (copy), EventNames (copy), v68 (copy), LoadingStages (copy)
-				v53.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
-					statValue = if not v68 then nil else v68.timeElapsed,
-					status = LoadingStages.Failed,
-					isProfilePlatform = true
+			end):catch(function(_) -- line: 189
+				-- upvalues: v55 (copy), EventNames (copy), v73 (copy), LoadingStages (copy)
+				v55.fireAnalyticsEvent(EventNames.ProfileLoadingStage, {
+					isProfilePlatform = true,
+					statValue = if not v73 then nil else v73.timeElapsed,
+					status = LoadingStages.Failed
 				})
 			end)
 		end
 	end
 
 	if FFlagPPVBackgroundPrefetchAvatar then
-		useEffectOnMount(function() -- line: 202
-			-- upvalues: profileType (copy), Enums (copy), profileId (copy), v46 (copy)
+		useEffectOnMount(function() -- line: 200
+			-- upvalues: profileType (copy), Enums (copy), profileId (copy), v49 (copy)
 			if profileType ~= Enums.ProfileTypes.User then
 				return
 			end
@@ -182,102 +173,106 @@ return function() -- line: 69
 			local num = tonumber(profileId)
 
 			if num then
-				v46.prefetch(num)
+				v49.prefetch(num)
 			end
 		end)
 	end
 
-	if v41 then
-		local v64 = useSignalState(ProfileRefreshSignal.getProfileRefreshSignal)
-		local v65 = React.useRef(0)
+	if v44 then
+		local v68 = useSignalState(ProfileRefreshSignal.getProfileRefreshSignal)
+		local v69 = React.useRef(0)
 
-		React.useEffect(function() -- line: 218
-			-- upvalues: v57 (copy), v64 (copy), v65 (copy), v63 (copy)
-			if v57 and v64 > v65.current then
-				v65.current = v64
-				v63()
+		React.useEffect(function() -- line: 215
+			-- upvalues: v60 (copy), v68 (copy), v69 (copy), v67 (copy)
+			if v60 and v68 > v69.current then
+				v69.current = v68
+				v67()
 			end
-		end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v64, v57, profileId, v63) else {
-			v64,
-			v57,
+		end, {
+			v68,
+			v60,
 			profileId,
-			v63
+			v67
 		})
 	end
 
 	if FFlagProfilePlatformEnableVR then
-		React.useEffect(function() -- line: 231
-			-- upvalues: v62 (copy), v63 (copy)
-			local v70 = v62.current + 1
+		React.useEffect(function() -- line: 224
+			-- upvalues: v66 (copy), v67 (copy)
+			local v75 = v66.current + 1
 
-			v62.current = v70
-			v63(v70)
-		end, { v61 })
+			v66.current = v75
+			v67(v75)
+		end, { v64 })
 	else
-		useEffectOnMount(function() -- line: 237
-			-- upvalues: v63 (copy)
-			v63()
+		useEffectOnMount(function() -- line: 230
+			-- upvalues: v67 (copy)
+			v67()
 		end)
 	end
 
-	React.useEffect(function() -- line: 242
-		-- upvalues: SocialStopwatch (copy), v53 (copy), EventNames (copy)
-		return function() -- line: 243
-			-- upvalues: SocialStopwatch (copy), v53 (copy), EventNames (copy)
+	React.useEffect(function() -- line: 235
+		-- upvalues: SocialStopwatch (copy), v55 (copy), EventNames (copy)
+		return function() -- line: 236
+			-- upvalues: SocialStopwatch (copy), v55 (copy), EventNames (copy)
 			SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.ProfileOpened)
-			v53.fireAnalyticsEvent(EventNames.ProfileClosed)
+			v55.fireAnalyticsEvent(EventNames.ProfileClosed)
 		end
 	end, {})
 
-	if v40 then
-		useEffectOnMount(function() -- line: 251
-			-- upvalues: IXPService (copy), v36 (copy), v37 (copy), v57 (copy), v38 (copy)
-			IXPService:LogFlagLinkedUserLayerExposure(v36)
-			IXPService:LogFlagLinkedUserLayerExposure(v37)
+	if v43 then
+		useEffectOnMount(function() -- line: 244
+			-- upvalues: IXPService (copy), v39 (copy), v40 (copy), v60 (copy), v41 (copy)
+			IXPService:LogFlagLinkedUserLayerExposure(v39)
+			IXPService:LogFlagLinkedUserLayerExposure(v40)
 
-			if v57 then
-				IXPService:LogFlagLinkedUserLayerExposure(v38)
+			if v60 then
+				IXPService:LogFlagLinkedUserLayerExposure(v41)
 			end
 		end)
 	end
 
-	if v42 then
-		React.useEffect(function() -- line: 261
-			-- upvalues: v43 (copy), v44 (copy), v52 (copy)
+	if v45 then
+		React.useEffect(function() -- line: 254
+			-- upvalues: v46 (copy), v47 (copy), v54 (copy)
 			local Metadata = nil
 
-			if v43:SessionExists(v44.StructuralIdentifier.ProfilePlatformPage) then
-				Metadata = v43:GetMetadata(v44.StructuralIdentifier.ProfilePlatformPage, v44.Metadata.ProfilePlatformPage.ProfileSessionId)
+			if v46:SessionExists(v47.StructuralIdentifier.ProfilePlatformPage) then
+				Metadata = v46:GetMetadata(v47.StructuralIdentifier.ProfilePlatformPage, v47.Metadata.ProfilePlatformPage.ProfileSessionId)
 			else
-				v43:SetSession(v44.StructuralIdentifier.Level2a, v44.StructuralIdentifier.ProfilePlatformPage, v44.StructuralIdentifier.ProfilePlatformPage)
+				v46:SetSession(v47.StructuralIdentifier.Level2a, v47.StructuralIdentifier.ProfilePlatformPage, v47.StructuralIdentifier.ProfilePlatformPage)
 			end
 
-			v43:SetMetadata(v44.StructuralIdentifier.ProfilePlatformPage, v44.Metadata.ProfilePlatformPage.ProfileSessionId, v52.profileSessionId)
+			v46:SetMetadata(v47.StructuralIdentifier.ProfilePlatformPage, v47.Metadata.ProfilePlatformPage.ProfileSessionId, v54.profileSessionId)
 
-			return function() -- line: 281
-				-- upvalues: Metadata (ref), v43 (copy), v44 (copy)
+			return function() -- line: 274
+				-- upvalues: Metadata (ref), v46 (copy), v47 (copy)
 				if Metadata ~= nil then
-					v43:SetMetadata(v44.StructuralIdentifier.ProfilePlatformPage, v44.Metadata.ProfilePlatformPage.ProfileSessionId, Metadata)
+					v46:SetMetadata(v47.StructuralIdentifier.ProfilePlatformPage, v47.Metadata.ProfilePlatformPage.ProfileSessionId, Metadata)
 
 					return
 				end
 
-				v43:RemoveSession(v44.StructuralIdentifier.ProfilePlatformPage)
+				v46:RemoveSession(v47.StructuralIdentifier.ProfilePlatformPage)
 			end
 		end, {})
 	end
 
-	local v66 = React.useMemo(function() -- line: 297
-		-- upvalues: Cryo (copy), parseComponentsFromJson (copy), v60 (copy), profileType (copy), React (copy), ProfilePlatformEventReceiver (copy)
-		return Cryo.Dictionary.union(parseComponentsFromJson(v60.components, v60.componentOrdering, profileType), {
+	local v70 = if not FFlagProfilePlatformEnableMoments then nil else v54.sourceInfo.source
+	local v71 = React.useMemo(function() -- line: 290
+		-- upvalues: Cryo (copy), parseComponentsFromJson (copy), v63 (copy), profileType (copy), v70 (copy), FFlagAXEnableProfileTab (copy), v58 (copy), React (copy), ProfilePlatformEventReceiver (copy)
+		return Cryo.Dictionary.union(parseComponentsFromJson(v63.components, v63.componentOrdering, profileType, v70, if not FFlagAXEnableProfileTab then nil else v58), {
 			ProfilePlatformEventReceiver = React.createElement(ProfilePlatformEventReceiver)
 		})
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v60.components, v60.componentOrdering) else {
-		v60.components,
-		v60.componentOrdering
+	end, {
+		v63.components,
+		v63.componentOrdering,
+		v70,
+		if not FFlagAXEnableProfileTab then nil else v58,
+		profileType
 	})
 
 	return React.createElement(ProfilePlatformPage, {
-		children = if not FFlagProfilePlatformEnableLazyLoadingComponents or not v50 then v66 else {}
+		children = if not FFlagProfilePlatformEnableLazyLoadingComponents or not v52 then v71 else {}
 	})
 end

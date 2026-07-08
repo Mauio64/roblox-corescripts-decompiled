@@ -1,1 +1,1 @@
-return game:DefineFastFlag("HideBackButtonOnSignUpPage2", false);
+return game:DefineFastFlag("HideBackButtonOnSignUpPage2", false)

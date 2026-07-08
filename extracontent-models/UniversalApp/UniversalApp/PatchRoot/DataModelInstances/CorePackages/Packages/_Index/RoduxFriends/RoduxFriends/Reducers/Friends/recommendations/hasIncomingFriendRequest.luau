@@ -1,57 +1,68 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local v3 = require(l_Parent_1.llama);
-local l_Actions_0 = l_Parent_0.Actions;
-local v5 = require(l_Actions_0.RecommendationCreated);
-local v6 = require(l_Actions_0.FriendRequestDeclined);
-local _ = require(l_Parent_0.roduxFriendsTypes);
-local v8 = {};
-return function(v9) --[[ Line: 17 ]]
-    -- upvalues: v2 (copy), v8 (copy), v5 (copy), v3 (copy), v6 (copy)
-    local l_friendsNetworking_0 = v9.friendsNetworking;
-    return v2.createReducer(v8, {
-        [v5.name] = function(v11, v12) --[[ Line: 21 ]]
-            -- upvalues: v3 (ref)
-            local l_recommendedUser_0 = v12.payload.recommendedUser;
-            local v14 = tostring(l_recommendedUser_0.id);
-            local v15 = l_recommendedUser_0.hasIncomingFriendRequest and true or false;
-            return v3.Dictionary.join(v11, {
-                [v14] = v15
-            });
-        end, 
-        [l_friendsNetworking_0.GetFriendRecommendationsFromUserId.Succeeded.name] = function(v16, v17) --[[ Line: 33 ]]
-            -- upvalues: v3 (ref)
-            local v19 = v3.List.filter(v17.responseBody.data, function(v18) --[[ Line: 37 ]]
-                return v18.contextType ~= "Contacts";
-            end, {});
-            local v22 = v3.List.reduce(v19, function(v20, v21) --[[ Line: 41 ]]
-                v20[tostring(v21.id)] = v21.friendRequest and true or false;
-                return v20;
-            end, {});
-            return v3.Dictionary.join(v16, v22);
-        end, 
-        [l_friendsNetworking_0.DeclineFriendRequestFromUserId.Succeeded.name] = function(v23, v24) --[[ Line: 50 ]]
-            -- upvalues: v3 (ref)
-            local l_ids_0 = v24.ids;
-            local v28 = v3.List.reduce(l_ids_0, function(v26, v27) --[[ Line: 55 ]]
-                v26[tostring(v27)] = false;
-                return v26;
-            end, {});
-            return v3.Dictionary.join(v23, v28);
-        end, 
-        [v6.name] = function(v29, v30) --[[ Line: 63 ]]
-            -- upvalues: v3 (ref)
-            local l_ids_1 = v30.ids;
-            local v34 = v3.List.reduce(l_ids_1, function(v32, v33) --[[ Line: 68 ]]
-                v32[tostring(v33)] = false;
-                return v32;
-            end, {});
-            return v3.Dictionary.join(v29, v34);
-        end, 
-        [l_friendsNetworking_0.DeclineAllFriendRequests.Succeeded.name] = function(_) --[[ Line: 76 ]]
-            -- upvalues: v8 (ref)
-            return v8;
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+local llama = require(ParentParentParent.llama)
+local Actions = ParentParent.Actions
+local RecommendationCreated = require(Actions.RecommendationCreated)
+local FriendRequestDeclined = require(Actions.FriendRequestDeclined)
+
+require(ParentParent.roduxFriendsTypes)
+
+local t1 = {}
+
+return function(p1) -- line: 17
+	-- upvalues: Rodux (copy), t1 (copy), RecommendationCreated (copy), llama (copy), FriendRequestDeclined (copy)
+	local friendsNetworking = p1.friendsNetworking
+
+	return Rodux.createReducer(t1, {
+		[RecommendationCreated.name] = function(p2, p3) -- line: 21
+			-- upvalues: llama (copy)
+			local recommendedUser = p3.payload.recommendedUser
+			local str = tostring(recommendedUser.id)
+			local v15 = not not recommendedUser.hasIncomingFriendRequest
+
+			return llama.Dictionary.join(p2, {
+				[str] = v15
+			})
+		end,
+		[friendsNetworking.GetFriendRecommendationsFromUserId.Succeeded.name] = function(p4, p5) -- line: 33
+			-- upvalues: llama (copy)
+			local v18 = llama.List.filter(p5.responseBody.data, function(p6) -- line: 37
+				return p6.contextType ~= "Contacts"
+			end, {})
+			local v19 = llama.List.reduce(v18, function(p7, p8) -- line: 41
+				p7[tostring(p8.id)] = not not p8.friendRequest
+
+				return p7
+			end, {})
+
+			return llama.Dictionary.join(p4, v19)
+		end,
+		[friendsNetworking.DeclineFriendRequestFromUserId.Succeeded.name] = function(p9, p10) -- line: 50
+			-- upvalues: llama (copy)
+			local ids = p10.ids
+			local v23 = llama.List.reduce(ids, function(p11, p12) -- line: 55
+				p11[tostring(p12)] = false
+
+				return p11
+			end, {})
+
+			return llama.Dictionary.join(p9, v23)
+		end,
+		[FriendRequestDeclined.name] = function(p13, p14) -- line: 63
+			-- upvalues: llama (copy)
+			local ids = p14.ids
+			local v27 = llama.List.reduce(ids, function(p15, p16) -- line: 68
+				p15[tostring(p16)] = false
+
+				return p15
+			end, {})
+
+			return llama.Dictionary.join(p13, v27)
+		end,
+		[friendsNetworking.DeclineAllFriendRequests.Succeeded.name] = function(_) -- line: 76
+			-- upvalues: t1 (copy)
+			return t1
+		end
+	})
+end

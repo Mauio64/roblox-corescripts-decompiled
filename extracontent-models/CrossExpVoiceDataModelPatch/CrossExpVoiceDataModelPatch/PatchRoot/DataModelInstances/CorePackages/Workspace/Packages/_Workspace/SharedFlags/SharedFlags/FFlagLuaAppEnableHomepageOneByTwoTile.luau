@@ -1,0 +1,3 @@
+local FFlagLuaAppEnableNxMRoduxApportioning = require(script.Parent.FFlagLuaAppEnableNxMRoduxApportioning)
+
+return game:DefineFastFlag("LuaAppEnableHomepageOneByTwoTileDev", false) and FFlagLuaAppEnableNxMRoduxApportioning

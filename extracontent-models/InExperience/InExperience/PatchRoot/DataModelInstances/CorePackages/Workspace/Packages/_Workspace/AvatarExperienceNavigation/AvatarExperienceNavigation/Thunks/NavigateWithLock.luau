@@ -1,21 +1,36 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceNavigation").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.NavigationRodux);
-local l_ApplySetNavigationLocked_0 = v2.Actions.ApplySetNavigationLocked;
-local l_Selectors_0 = v2.Selectors;
-local l_FFlagUseNavigationSelectors_0 = require(l_Parent_0.SharedFlags).FFlagUseNavigationSelectors;
-return function(v6) --[[ Line: 19 ]]
-    -- upvalues: v1 (copy), l_FFlagUseNavigationSelectors_0 (copy), l_Selectors_0 (copy), l_ApplySetNavigationLocked_0 (copy)
-    v1.isType(v6, "function", "navigationCallback");
-    return function(v7) --[[ Line: 21 ]]
-        -- upvalues: l_FFlagUseNavigationSelectors_0 (ref), l_Selectors_0 (ref), l_ApplySetNavigationLocked_0 (ref), v6 (copy)
-        local v8 = v7:getState();
-        if if l_FFlagUseNavigationSelectors_0 then l_Selectors_0.selectNavigationLocked(v8) else v8.Navigation.lockNavigationActions then
-            return;
-        else
-            v7:dispatch(l_ApplySetNavigationLocked_0(true));
-            v6();
-            return;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceNavigation").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local NavigationRodux = require(Parent.NavigationRodux)
+local ApplySetNavigationLocked = NavigationRodux.Actions.ApplySetNavigationLocked
+local Selectors = NavigationRodux.Selectors
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagUseNavigationSelectors = SharedFlags.FFlagUseNavigationSelectors
+local FFlagSignalsNavP2NavigationPrimitives = SharedFlags.FFlagSignalsNavP2NavigationPrimitives
+local v9 = if not FFlagSignalsNavP2NavigationPrimitives then nil else require(Parent.RobloxAppNavigation).AppNavigationRegistry
+
+return function(p1) -- line: 25
+	-- upvalues: ArgCheck (copy), FFlagSignalsNavP2NavigationPrimitives (copy), v9 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), ApplySetNavigationLocked (copy)
+	ArgCheck.isType(p1, "function", "navigationCallback")
+
+	return function(p2) -- line: 27
+		-- upvalues: FFlagSignalsNavP2NavigationPrimitives (copy), v9 (copy), p1 (copy), FFlagUseNavigationSelectors (copy), Selectors (copy), ApplySetNavigationLocked (copy)
+		if FFlagSignalsNavP2NavigationPrimitives then
+			if v9.get().getIsNavigating(false) then
+				return
+			end
+
+			p1()
+
+			return
+		end
+
+		local v12 = p2:getState()
+
+		if if not FFlagUseNavigationSelectors then v12.Navigation.lockNavigationActions else Selectors.selectNavigationLocked(v12) then
+			return
+		end
+
+		p2:dispatch(ApplySetNavigationLocked(true))
+		p1()
+	end
+end

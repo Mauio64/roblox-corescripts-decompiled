@@ -1,118 +1,135 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local l_RunService_0 = game:GetService("RunService");
-local v5 = v1.PureComponent:extend("ObjectViewport");
-v5.validateProps = v2.strictInterface({
-    model = v2.instanceOf("Model")
-});
-local function _(v6, v7) --[[ Line: 23 ]] --[[ Name: getCameraDistance ]]
-    local l_X_0 = v7.X;
-    local l_Y_0 = v7.Y;
-    local l_Z_0 = v7.Z;
-    local v11 = math.max(l_X_0, l_Y_0, l_Z_0);
-    local v12 = 1 / math.tan(math.rad(v6) / 2);
-    return v11 / 2 * v12 + l_Z_0 / 2;
-end;
-local function _(v14, v15, v16) --[[ Line: 33 ]] --[[ Name: rotateVectorAround ]]
-    return CFrame.fromAxisAngle(v16, v15):VectorToWorldSpace(v14);
-end;
-v5.init = function(v18) --[[ Line: 37 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v18.cameraRef = v1.createRef();
-    v18.worldModelRef = v1.createRef();
-    local v19, v20 = v1.createBinding(CFrame.new());
-    v18.cameraCFrameBinding = v19;
-    v18.updateCameraCFrameBinding = v20;
-    v19, v20 = v1.createBinding(0);
-    v18.cameraRotationBinding = v19;
-    v18.updateCameraRotationBinding = v20;
-    v19, v20 = v1.createBinding(CFrame.new());
-    v18.cameraFocusBinding = v19;
-    v18.updateCameraFocusBinding = v20;
-    v18:OnModelChanged();
-end;
-v5.OnModelChanged = function(v21) --[[ Line: 49 ]] --[[ Name: OnModelChanged ]]
-    if v21.props.model ~= nil then
-        v21.modelCFrame = v21.props.model:GetModelCFrame();
-        v21.initialLookVector = v21.modelCFrame.lookVector;
-        v21.modelExtentsSize = v21.props.model:GetExtentsSize();
-        local l_modelExtentsSize_0 = v21.modelExtentsSize;
-        local l_X_1 = l_modelExtentsSize_0.X;
-        local l_Y_1 = l_modelExtentsSize_0.Y;
-        local l_Z_1 = l_modelExtentsSize_0.Z;
-        v21.cameraDistance = math.max(l_X_1, l_Y_1, l_Z_1) / 2 * 1.4281480067421146 + l_Z_1 / 2;
-    end;
-end;
-v5.render = function(v26) --[[ Line: 58 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), l_ExternalEventConnection_0 (copy), l_RunService_0 (copy)
-    return v1.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Position = UDim2.fromScale(0, 0), 
-        AnchorPoint = Vector2.new(0, 0), 
-        Size = UDim2.fromScale(1, 1)
-    }, {
-        AspectRatioConstraint = v1.createElement("UIAspectRatioConstraint", {
-            AspectRatio = 1, 
-            AspectType = Enum.AspectType.FitWithinMaxSize, 
-            DominantAxis = Enum.DominantAxis.Width
-        }), 
-        ViewportFrame = v1.createElement("ViewportFrame", {
-            BackgroundTransparency = 0, 
-            BackgroundColor3 = Color3.new(0, 0, 0), 
-            Size = UDim2.fromScale(1, 1), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            LightColor = Color3.fromRGB(240, 240, 240), 
-            LightDirection = Vector3.new(1, 1, 1, 0), 
-            Ambient = Color3.fromRGB(240, 240, 240), 
-            CurrentCamera = v26.cameraRef
-        }, {
-            Camera = v1.createElement("Camera", {
-                CameraType = Enum.CameraType.Scriptable, 
-                FieldOfView = 70, 
-                CFrame = v26.cameraCFrameBinding, 
-                Focus = v26.cameraFocusBinding, 
-                [v1.Ref] = v26.cameraRef
-            }), 
-            WorldModel = v1.createElement("WorldModel", {
-                [v1.Ref] = v26.worldModelRef
-            }), 
-            RenderSteppedConnection = v1.createElement(l_ExternalEventConnection_0, {
-                event = l_RunService_0.RenderStepped, 
-                callback = function() --[[ Line: 99 ]] --[[ Name: callback ]]
-                    -- upvalues: v26 (copy)
-                    v26.updateCameraRotationBinding(v26.cameraRotationBinding:getValue() + 0.01);
-                    local l_initialLookVector_0 = v26.initialLookVector;
-                    local v28 = v26.cameraRotationBinding:getValue();
-                    local v29 = CFrame.fromAxisAngle(Vector3.new(0, 1, 0, 0), v28):VectorToWorldSpace(l_initialLookVector_0);
-                    l_initialLookVector_0 = CFrame.new(v26.modelCFrame.p + v29 * v26.cameraDistance, v26.modelCFrame.p);
-                    v26.updateCameraCFrameBinding(l_initialLookVector_0);
-                end
-            })
-        })
-    });
-end;
-v5.didMount = function(v30) --[[ Line: 112 ]] --[[ Name: didMount ]]
-    if v30.worldModelRef:getValue() and v30.props.model ~= nil then
-        v30.props.model.Parent = v30.worldModelRef:getValue();
-    end;
-end;
-v5.willUnmount = function(v31) --[[ Line: 118 ]] --[[ Name: willUnmount ]]
-    if v31.props.model then
-        v31.props.model.Parent = nil;
-    end;
-end;
-v5.didUpdate = function(v32, v33) --[[ Line: 124 ]] --[[ Name: didUpdate ]]
-    if v32.props.model ~= v33.model then
-        if v33.model ~= nil then
-            v33.model.Parent = nil;
-        end;
-        if v32.props.model ~= nil then
-            v32.props.model.Parent = v32.worldModelRef:getValue();
-        end;
-        v32:OnModelChanged();
-    end;
-end;
-return v5;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local RunService = game:GetService("RunService")
+local v6 = Roact.PureComponent:extend("ObjectViewport")
+
+v6.validateProps = t.strictInterface({
+	model = t.instanceOf("Model")
+})
+
+local function getCameraDistance(p1, p2) -- line: 23
+	local p2X = p2.X
+	local p2Y = p2.Y
+	local p2Z = p2.Z
+	local v14 = math.max(p2X, p2Y, p2Z)
+	local v15 = 1 / math.tan(math.rad(p1) / 2)
+
+	return v14 / 2 * v15 + p2Z / 2
+end
+local function rotateVectorAround(p3, p4, p5) -- line: 33
+	return CFrame.fromAxisAngle(p5, p4):VectorToWorldSpace(p3)
+end
+
+function v6.init(p6) -- line: 37
+	-- upvalues: Roact (copy)
+	p6.cameraRef = Roact.createRef()
+	p6.worldModelRef = Roact.createRef()
+
+	local v20, v21 = Roact.createBinding(CFrame.new())
+
+	p6.cameraCFrameBinding = v20
+	p6.updateCameraCFrameBinding = v21
+
+	local v22, v23 = Roact.createBinding(0)
+
+	p6.cameraRotationBinding = v22
+	p6.updateCameraRotationBinding = v23
+
+	local v24, v25 = Roact.createBinding(CFrame.new())
+
+	p6.cameraFocusBinding = v24
+	p6.updateCameraFocusBinding = v25
+	p6:OnModelChanged()
+end
+function v6.OnModelChanged(p7) -- line: 49
+	if p7.props.model ~= nil then
+		p7.modelCFrame = p7.props.model:GetModelCFrame()
+		p7.initialLookVector = p7.modelCFrame.lookVector
+		p7.modelExtentsSize = p7.props.model:GetExtentsSize()
+
+		local modelExtentsSize = p7.modelExtentsSize
+		local modelExtentsSizeX = modelExtentsSize.X
+		local modelExtentsSizeY = modelExtentsSize.Y
+		local modelExtentsSizeZ = modelExtentsSize.Z
+
+		p7.cameraDistance = math.max(modelExtentsSizeX, modelExtentsSizeY, modelExtentsSizeZ) / 2 * 1.4281480067421146 + modelExtentsSizeZ / 2
+	end
+end
+function v6.render(p8) -- line: 58
+	-- upvalues: Roact (copy), ExternalEventConnection (copy), RunService (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0, 0),
+		AnchorPoint = Vector2.new(0, 0),
+		Size = UDim2.fromScale(1, 1)
+	}, {
+		AspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+			AspectRatio = 1,
+			AspectType = Enum.AspectType.FitWithinMaxSize,
+			DominantAxis = Enum.DominantAxis.Width
+		}),
+		ViewportFrame = Roact.createElement("ViewportFrame", {
+			BackgroundTransparency = 0,
+			LightDirection = Vector3.new(1, 1, 1),
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			Size = UDim2.fromScale(1, 1),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			LightColor = Color3.fromRGB(240, 240, 240),
+			Ambient = Color3.fromRGB(240, 240, 240),
+			CurrentCamera = p8.cameraRef
+		}, {
+			Camera = Roact.createElement("Camera", {
+				CameraType = Enum.CameraType.Scriptable,
+				FieldOfView = 70,
+				CFrame = p8.cameraCFrameBinding,
+				Focus = p8.cameraFocusBinding,
+				[Roact.Ref] = p8.cameraRef
+			}),
+			WorldModel = Roact.createElement("WorldModel", {
+				[Roact.Ref] = p8.worldModelRef
+			}),
+			RenderSteppedConnection = Roact.createElement(ExternalEventConnection, {
+				event = RunService.RenderStepped,
+				callback = function() -- line: 99
+					-- upvalues: p8 (copy)
+					p8.updateCameraRotationBinding(p8.cameraRotationBinding:getValue() + 0.01)
+
+					local initialLookVector = p8.initialLookVector
+					local v37 = p8.cameraRotationBinding:getValue()
+					local v38 = CFrame.fromAxisAngle(Vector3.new(0, 1, 0), v37):VectorToWorldSpace(initialLookVector)
+					local cFrame = CFrame.new(p8.modelCFrame.p + v38 * p8.cameraDistance, p8.modelCFrame.p)
+
+					p8.updateCameraCFrameBinding(cFrame)
+				end
+			})
+		})
+	})
+end
+function v6.didMount(p9) -- line: 112
+	if p9.worldModelRef:getValue() and p9.props.model ~= nil then
+		p9.props.model.Parent = p9.worldModelRef:getValue()
+	end
+end
+function v6.willUnmount(p10) -- line: 118
+	if p10.props.model then
+		p10.props.model.Parent = nil
+	end
+end
+function v6.didUpdate(p11, p12) -- line: 124
+	if p11.props.model ~= p12.model then
+		if p12.model ~= nil then
+			p12.model.Parent = nil
+		end
+
+		if p11.props.model ~= nil then
+			p11.props.model.Parent = p11.worldModelRef:getValue()
+		end
+
+		p11:OnModelChanged()
+	end
+end
+
+return v6

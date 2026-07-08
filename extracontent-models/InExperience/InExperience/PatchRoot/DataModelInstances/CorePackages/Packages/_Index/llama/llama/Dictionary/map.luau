@@ -1,12 +1,21 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: map ]]
-    local v2 = type(v0);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    local v3 = type(v1);
-    assert(v3 == "function", "expected a function for second argument, got " .. v3);
-    local v4 = {};
-    for v5, v6 in pairs(v0) do
-        local v7, v8 = v1(v6, v5);
-        v4[v8 or v5] = v7;
-    end;
-    return v4;
-end;
+local function map(p1, p2) -- line: 2
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	local v5 = type(p2)
+
+	assert(v5 == "function", "expected a function for second argument, got " .. v5)
+
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		local v9, v10 = p2(v, k)
+
+		t1[v10 or k] = v9
+	end
+
+	return t1
+end
+
+return map

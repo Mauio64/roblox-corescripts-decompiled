@@ -1,27 +1,31 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = {
-    overlayType = nil, 
-    overlayProps = {}
-};
-return function() --[[ Line: 32 ]] --[[ Name: createOverlayStore ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v3, v4 = v1.createSignal(table.clone(v2));
-    local v5, v6 = v1.createSignal({});
-    return {
-        getCurrentOverlay = v3, 
-        showOverlay = function(v7, v8) --[[ Line: 38 ]] --[[ Name: showOverlay ]]
-            -- upvalues: v4 (copy)
-            v4({
-                overlayType = v7, 
-                overlayProps = v8
-            });
-        end, 
-        dismissOverlay = function() --[[ Line: 44 ]] --[[ Name: dismissOverlay ]]
-            -- upvalues: v4 (copy), v2 (ref)
-            v4(table.clone(v2));
-        end, 
-        getOverlayDefaultProps = v5, 
-        setOverlayDefaultProps = v6
-    };
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Signals = require(Parent.Signals)
+local t1 = {
+	overlayType = nil,
+	overlayProps = {}
+}
+
+local function createOverlayStore() -- line: 32
+	-- upvalues: Signals (copy), t1 (copy)
+	local v5, v6 = Signals.createSignal(table.clone(t1))
+	local v7, v8 = Signals.createSignal({})
+
+	return {
+		getCurrentOverlay = v5,
+		showOverlay = function(s1: string, p1) -- line: 38
+			-- upvalues: v6 (copy)
+			v6({
+				overlayType = s1,
+				overlayProps = p1
+			})
+		end,
+		dismissOverlay = function() -- line: 44
+			-- upvalues: v6 (copy), t1 (copy)
+			v6(table.clone(t1))
+		end,
+		getOverlayDefaultProps = v7,
+		setOverlayDefaultProps = v8
+	}
+end
+
+return createOverlayStore

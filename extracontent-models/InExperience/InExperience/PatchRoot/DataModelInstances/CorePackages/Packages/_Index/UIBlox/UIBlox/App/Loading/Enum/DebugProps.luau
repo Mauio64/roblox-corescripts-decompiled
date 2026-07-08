@@ -1,5 +1,6 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)("debugProps", {
-    "forceLoading", 
-    "forceFailed"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)("debugProps", {
+	"forceLoading",
+	"forceFailed"
+})

@@ -1,207 +1,259 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.GameTile);
-local _ = require(l_Parent_0.GraphQLServer);
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local l_ImpressionsTagUtility_0 = require(l_Parent_0.Impressions).ImpressionsTagUtility;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v9 = require(l_Parent_0.GamePlayButton);
-local v10 = require(l_Parent_0.NotificationModalsManager);
-local v11 = require(l_Parent_0.Style);
-local l_useTextSizeOffset_0 = require(l_Parent_0.UIBlox).Core.Style.useTextSizeOffset;
-local l_useDesignTokens_0 = v11.useDesignTokens;
-local l_HoldDetector_0 = require(l_Parent_0.HoldToPlay).HoldDetector;
-local l_FocusNavigationEventNameEnum_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigationEventNameEnum;
-local l_GameTileView_0 = v3.GameTileView;
-local l_GridTileTextFooter_0 = v3.GridTileTextFooter;
-local l_GameTileThumbnailBadges_0 = v3.GameTileThumbnailBadges;
-local l_FooterCornerButtonStyle_0 = v3.FooterCornerButtonStyle;
-local l_usePlayButtonState_0 = v9.usePlayButtonState;
-local l_PlayButtonStates_0 = v9.PlayButtonStates;
-local v22 = require(l_script_FirstAncestor_0.Common.formatDateLocalized);
-local v23 = require(l_script_FirstAncestor_0.Common.getVirtualEventDates);
-local v24 = require(l_script_FirstAncestor_0.Common.fetchEventThumbnail);
-local v25 = require(l_script_FirstAncestor_0.Components.EventsListCarousel.EventWideFooterButton);
-local l_useEffect_0 = v2.useEffect;
-local l_useState_0 = v2.useState;
-local l_useMemo_0 = v2.useMemo;
-local l_useCallback_0 = v2.useCallback;
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-return function(v31) --[[ Line: 56 ]]
-    -- upvalues: l_useDesignTokens_0 (copy), l_useTextSizeOffset_0 (copy), v23 (copy), l_useMemo_0 (copy), l_FooterCornerButtonStyle_0 (copy), l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), l_usePlayButtonState_0 (copy), l_PlayButtonStates_0 (copy), l_GetFFlagIsSquadEnabled_0 (copy), l_useLocalization_0 (copy), l_useCallback_0 (copy), v2 (copy), l_useEffect_0 (copy), v22 (copy), v10 (copy), l_useState_0 (copy), v24 (copy), l_ImpressionsTagUtility_0 (copy), l_FocusNavigationEventNameEnum_0 (copy), l_GameTileView_0 (copy), l_GridTileTextFooter_0 (copy), l_GameTileThumbnailBadges_0 (copy), v25 (copy), l_HoldDetector_0 (copy)
-    local v32 = l_useDesignTokens_0();
-    local v33 = l_useTextSizeOffset_0();
-    local l_Event_0 = v31.Event;
-    local v35 = v23(l_Event_0);
-    local v36 = DateTime.now().UnixTimestamp >= v35.startDate.UnixTimestamp;
-    local v37 = l_Event_0.userRsvpStatus == "going";
-    local v38 = l_useMemo_0(function() --[[ Line: 64 ]]
-        -- upvalues: v36 (copy), l_FooterCornerButtonStyle_0 (ref), v37 (copy)
-        if v36 then
-            return l_FooterCornerButtonStyle_0.Play;
-        elseif v37 then
-            return l_FooterCornerButtonStyle_0.Following;
-        else
-            return l_FooterCornerButtonStyle_0.Follow;
-        end;
-    end, {
-        v36, 
-        v37
-    });
-    local v39 = l_useRoactService_0(l_RoactNetworking_0);
-    local v40 = l_usePlayButtonState_0(v39, v31.Event.universeId or "");
-    local v41 = true;
-    if v40.playButtonState ~= l_PlayButtonStates_0.Playable then
-        v41 = l_GetFFlagIsSquadEnabled_0() and v40.playButtonState == l_PlayButtonStates_0.PlayableWithParty;
-    end;
-    local v42 = l_useLocalization_0({
-        HappeningNow = "Feature.Home.Label.HappeningNow", 
-        DateAtTime = "Feature.VirtualEvents.Label.DateAtTime", 
-        ToastText = "Feature.VirtualEvents.Label.ReminderSetForEventTime"
-    });
-    local v44 = l_useCallback_0(function() --[[ Line: 85 ]]
-        -- upvalues: v41 (copy), v36 (copy), v31 (copy), l_Event_0 (copy)
-        if not v41 then
-            return;
-        elseif v36 then
-            v31.onJoinEvent(l_Event_0);
-            return;
-        else
-            local v43 = nil;
-            v43 = l_Event_0.userRsvpStatus ~= "going" and "going" or "notGoing";
-            if v31.onRsvpChanged then
-                v31.onRsvpChanged(l_Event_0, v43);
-            end;
-            return;
-        end;
-    end, {
-        v36, 
-        v31.onJoinEvent, 
-        v31.onRsvpChanged, 
-        l_Event_0.userRsvpStatus, 
-        l_Event_0, 
-        v41
-    });
-    local v45 = v2.useRef(l_Event_0.userRsvpStatus);
-    l_useEffect_0(function() --[[ Line: 107 ]]
-        -- upvalues: v45 (copy), l_Event_0 (copy), v22 (ref), v42 (copy), v35 (copy), v10 (ref)
-        if v45.current and v45.current ~= "going" and l_Event_0.userRsvpStatus == "going" then
-            local v46 = v22(v42.DateAtTime, v35.startDate);
-            local v47 = v42.ToastText:gsub("{(.-)}", {
-                eventName = l_Event_0.displayTitle, 
-                eventTime = v46
-            });
-            v10.SetUIBloxToast({
-                toastTitle = v47, 
-                sequenceNumber = DateTime.now().UnixTimestamp
-            });
-        end;
-        v45.current = l_Event_0.userRsvpStatus;
-    end, {
-        l_Event_0.userRsvpStatus, 
-        l_Event_0.displayTitle, 
-        v35.startDate, 
-        v42.DateAtTime, 
-        v42.ToastText
-    });
-    local v48, v49 = l_useState_0(nil);
-    l_useEffect_0(function() --[[ Line: 133 ]]
-        -- upvalues: v24 (ref), v39 (copy), l_Event_0 (copy), v31 (copy), v49 (copy)
-        local v50 = true;
-        v24(v39, l_Event_0.id, v31.DefaultThumbnail):andThen(function(v51) --[[ Line: 135 ]]
-            -- upvalues: v50 (ref), v49 (ref)
-            if v50 then
-                v49(v51);
-            end;
-        end);
-        return function() --[[ Line: 140 ]]
-            -- upvalues: v50 (ref)
-            v50 = false;
-        end;
-    end, {
-        l_Event_0.id, 
-        v31.DefaultThumbnail
-    });
-    local v52 = v2.useRef(nil);
-    v2.useEffect(function() --[[ Line: 146 ]]
-        -- upvalues: l_ImpressionsTagUtility_0 (ref), v52 (copy), v31 (copy)
-        l_ImpressionsTagUtility_0.AddTag(v52, v31.impressionsTag, v31.layoutOrder);
-        return function() --[[ Line: 148 ]]
-            -- upvalues: l_ImpressionsTagUtility_0 (ref), v52 (ref), v31 (ref)
-            l_ImpressionsTagUtility_0.RemoveTag(v52, v31.impressionsTag, v31.layoutOrder);
-        end;
-    end, {
-        v52, 
-        v31.impressionsTag, 
-        v31.layoutOrder
-    });
-    local v53 = nil;
-    local v54 = v2.useRef(nil);
-    local v55 = v2.useRef(false);
-    local v57 = v2.useCallback(function(v56) --[[ Line: 157 ]]
-        -- upvalues: v55 (copy)
-        v55.current = v56;
-    end, {});
-    v53 = if v38 == l_FooterCornerButtonStyle_0.Follow then l_FocusNavigationEventNameEnum_0.HoldToNotifyMe else if v38 == l_FooterCornerButtonStyle_0.Following then l_FocusNavigationEventNameEnum_0.HoldToUnfollowEvent else l_FocusNavigationEventNameEnum_0.HoldToJoinEvent;
-    local v58 = l_useCallback_0(function() --[[ Line: 169 ]]
-        -- upvalues: v55 (copy), v31 (copy)
-        if v55.current then
-            return;
-        else
-            v31.onTileActivated(v31.Event);
-            return;
-        end;
-    end, {
-        v31.onTileActivated, 
-        v31.Event
-    });
-    return v2.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        LayoutOrder = v31.layoutOrder, 
-        Size = v31.size, 
-        ref = v52
-    }, {
-        GameTile = v2.createElement(l_GameTileView_0, {
-            forwardRef = v54, 
-            imageAspectRatio = 1.7777777777777777, 
-            image = v48, 
-            isContained = true, 
-            Size = UDim2.fromScale(1, 1), 
-            title = l_Event_0.displayTitle or "", 
-            onActivated = v58, 
-            footerMetadata = v2.createElement(l_GridTileTextFooter_0, {
-                text = l_Event_0.displaySubtitle or l_Event_0.displayDescription or "", 
-                useLargerFont = true
-            }), 
-            thumbnailOverlay = v2.createElement(l_GameTileThumbnailBadges_0, {
-                tileBadgesByPosition = {
-                    ImageTopLeft = {
-                        {
-                            tileBadgeType = "Text", 
-                            text = if v36 then v42.HappeningNow else v22(v42.DateAtTime, v35.startDate)
-                        }
-                    }
-                }
-            }), 
-            hidePlayButton = true, 
-            isHovered = false, 
-            extraFooterSpace = if not v31.disableButtons then v32.Global.Size_350 + v32.Global.Space_100 else nil, 
-            extraFooterContent = if not v31.disableButtons then v2.createElement(v25, {
-                buttonStyle = v38, 
-                disabled = not v41, 
-                onActivated = v44, 
-                key = "WideFooterButton"
-            }) else nil, 
-            textSizeOffset = v33
-        }), 
-        HoldDetector = if v54 and v54.current then v2.createElement(l_HoldDetector_0, {
-            guiObject = v54.current, 
-            onHoldDetected = v44, 
-            setDisabledForHold = v57, 
-            keyCode = Enum.KeyCode.ButtonA, 
-            focusNavigationEventName = v53
-        }) else nil
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local VirtualEventsParent = VirtualEvents.Parent
+local React = require(VirtualEventsParent.React)
+local GameTile = require(VirtualEventsParent.GameTile)
+
+require(VirtualEventsParent.GraphQLServer)
+
+local RoactNetworking = require(VirtualEventsParent.RoactServiceTags).RoactNetworking
+local ImpressionsTagUtility = require(VirtualEventsParent.Impressions).ImpressionsTagUtility
+local useRoactService = require(VirtualEventsParent.RobloxAppHooks).useRoactService
+local useLocalization = require(VirtualEventsParent.Localization).Hooks.useLocalization
+local GamePlayButton = require(VirtualEventsParent.GamePlayButton)
+local NotificationModalsManager = require(VirtualEventsParent.NotificationModalsManager)
+local Style = require(VirtualEventsParent.Style)
+local useTextSizeOffset = require(VirtualEventsParent.UIBlox).Core.Style.useTextSizeOffset
+local useDesignTokens = Style.useDesignTokens
+local HoldDetector = require(VirtualEventsParent.HoldToPlay).HoldDetector
+local FocusNavigationEventNameEnum = require(VirtualEventsParent.FocusNavigationUtils).FocusNavigationEventNameEnum
+local GameTileView = GameTile.GameTileView
+local GridTileTextFooter = GameTile.GridTileTextFooter
+local GameTileThumbnailBadges = GameTile.GameTileThumbnailBadges
+local FooterCornerButtonStyle = GameTile.FooterCornerButtonStyle
+local usePlayButtonState = GamePlayButton.usePlayButtonState
+local PlayButtonStates = GamePlayButton.PlayButtonStates
+local formatDateLocalized = require(VirtualEvents.Common.formatDateLocalized)
+local getVirtualEventDates = require(VirtualEvents.Common.getVirtualEventDates)
+local fetchEventThumbnail = require(VirtualEvents.Common.fetchEventThumbnail)
+local getEventCtaButtonState = require(VirtualEvents.Common.getEventCtaButtonState)
+local EventWideFooterButton = require(VirtualEvents.Components.EventsListCarousel.EventWideFooterButton)
+local useEffect = React.useEffect
+local useState = React.useState
+local useMemo = React.useMemo
+local useCallback = React.useCallback
+local GetFFlagIsSquadEnabled = require(VirtualEventsParent.SharedFlags).GetFFlagIsSquadEnabled
+local FFlagLuaAppSduiEventDetailsEnabled = require(VirtualEventsParent.SharedFlags).FFlagLuaAppSduiEventDetailsEnabled
+local FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable = require(VirtualEventsParent.SharedFlags).FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable
+
+local function v34() -- line: 63
+end
+
+return function(t1: {[any]: any}) -- line: 67
+	-- upvalues: useDesignTokens (copy), useTextSizeOffset (copy), getVirtualEventDates (copy), useMemo (copy), FooterCornerButtonStyle (copy), useRoactService (copy), RoactNetworking (copy), usePlayButtonState (copy), PlayButtonStates (copy), GetFFlagIsSquadEnabled (copy), useLocalization (copy), useCallback (copy), React (copy), useEffect (copy), FFlagLuaAppSduiEventDetailsEnabled (copy), formatDateLocalized (copy), NotificationModalsManager (copy), useState (copy), fetchEventThumbnail (copy), ImpressionsTagUtility (copy), FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable (copy), getEventCtaButtonState (copy), FocusNavigationEventNameEnum (copy), v34 (copy), GameTileView (copy), GridTileTextFooter (copy), GameTileThumbnailBadges (copy), EventWideFooterButton (copy), HoldDetector (copy)
+	local v36 = useDesignTokens()
+	local v37 = useTextSizeOffset()
+	local Event = t1.Event
+	local v39 = getVirtualEventDates(Event)
+	local v40 = DateTime.now().UnixTimestamp >= v39.startDate.UnixTimestamp
+	local v41 = Event.userRsvpStatus == "going"
+	local v42 = useMemo(function() -- line: 75
+		-- upvalues: v40 (copy), FooterCornerButtonStyle (copy), v41 (copy)
+		if v40 then
+			return FooterCornerButtonStyle.Play
+		end
+
+		if v41 then
+			return FooterCornerButtonStyle.Following
+		end
+
+		return FooterCornerButtonStyle.Follow
+	end, {
+		v40,
+		v41
+	})
+	local v43 = useRoactService(RoactNetworking)
+	local v44 = usePlayButtonState(v43, t1.Event.universeId or "")
+	local v45 = v44.playButtonState == PlayButtonStates.Playable or GetFFlagIsSquadEnabled() and v44.playButtonState == PlayButtonStates.PlayableWithParty
+	local v46 = useLocalization({
+		HappeningNow = "Feature.Home.Label.HappeningNow",
+		DateAtTime = "Feature.VirtualEvents.Label.DateAtTime",
+		ToastText = "Feature.VirtualEvents.Label.ReminderSetForEventTime"
+	})
+	local v47 = useCallback(function() -- line: 96
+		-- upvalues: v45 (copy), v40 (copy), t1 (copy), Event (copy)
+		if not v45 then
+			return
+		end
+
+		if v40 then
+			t1.onJoinEvent(Event)
+
+			return
+		end
+
+		local v62 = Event.userRsvpStatus == "going" and "notGoing" or "going"
+
+		if t1.onRsvpChanged then
+			t1.onRsvpChanged(Event, v62)
+		end
+	end, {
+		v40,
+		t1.onJoinEvent,
+		t1.onRsvpChanged,
+		Event.userRsvpStatus,
+		Event,
+		v45
+	})
+	local v48 = React.useRef(Event.userRsvpStatus)
+
+	useEffect(function() -- line: 118
+		-- upvalues: FFlagLuaAppSduiEventDetailsEnabled (copy), t1 (copy), v48 (copy), Event (copy), formatDateLocalized (copy), v46 (copy), v39 (copy), NotificationModalsManager (copy)
+		if (not FFlagLuaAppSduiEventDetailsEnabled or not t1.suppressRsvpReminderToastBecauseEventDetailsFocused) and (v48.current and v48.current ~= "going" and Event.userRsvpStatus == "going") then
+			local v63 = formatDateLocalized(v46.DateAtTime, v39.startDate)
+			local v64 = v46.ToastText:gsub("{(.-)}", {
+				eventName = Event.displayTitle,
+				eventTime = v63
+			})
+
+			NotificationModalsManager.SetUIBloxToast({
+				toastTitle = v64,
+				sequenceNumber = DateTime.now().UnixTimestamp
+			})
+		end
+
+		v48.current = Event.userRsvpStatus
+	end, {
+		Event.userRsvpStatus,
+		Event.displayTitle,
+		v39.startDate,
+		v46.DateAtTime,
+		v46.ToastText,
+		if not FFlagLuaAppSduiEventDetailsEnabled then nil else t1.suppressRsvpReminderToastBecauseEventDetailsFocused
+	})
+
+	local v49, v50 = useState(nil)
+
+	useEffect(function() -- line: 152
+		-- upvalues: fetchEventThumbnail (copy), v43 (copy), Event (copy), t1 (copy), v50 (copy)
+		local u65 = true
+
+		fetchEventThumbnail(v43, Event.id, t1.DefaultThumbnail):andThen(function(p1) -- line: 154
+			-- upvalues: u65 (ref), v50 (copy)
+			if u65 then
+				v50(p1)
+			end
+		end)
+
+		return function() -- line: 159
+			-- upvalues: u65 (ref)
+			u65 = false
+		end
+	end, {
+		Event.id,
+		t1.DefaultThumbnail
+	})
+
+	local v51 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 165
+		-- upvalues: ImpressionsTagUtility (copy), v51 (copy), t1 (copy)
+		ImpressionsTagUtility.AddTag(v51, t1.impressionsTag, t1.layoutOrder)
+
+		return function() -- line: 167
+			-- upvalues: ImpressionsTagUtility (copy), v51 (copy), t1 (copy)
+			ImpressionsTagUtility.RemoveTag(v51, t1.impressionsTag, t1.layoutOrder)
+		end
+	end, {
+		v51,
+		t1.impressionsTag,
+		t1.layoutOrder
+	})
+
+	local v52 = React.useRef(nil)
+	local v53 = React.useRef(false)
+	local v54 = React.useCallback(function(b1: boolean) -- line: 176
+		-- upvalues: v53 (copy)
+		v53.current = b1
+	end, {})
+	local isRsvpDisabled = nil
+	local isJoinEventDisabled = nil
+
+	if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
+		local v57 = getEventCtaButtonState(v44)
+
+		isJoinEventDisabled = v57.isJoinEventDisabled
+		isRsvpDisabled = v57.isRsvpDisabled
+	end
+
+	local v58 = nil
+	local HoldToNotifyMe
+
+	if v42 == FooterCornerButtonStyle.Follow then
+		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToNotifyMe
+
+		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
+			v58 = isRsvpDisabled
+		end
+	elseif v42 == FooterCornerButtonStyle.Following then
+		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToUnfollowEvent
+
+		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
+			v58 = isRsvpDisabled
+		end
+	else
+		HoldToNotifyMe = FocusNavigationEventNameEnum.HoldToJoinEvent
+
+		if FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then
+			v58 = isJoinEventDisabled
+		end
+	end
+
+	local v60 = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable or not v58 then v47 else v34
+	local v61 = useCallback(function() -- line: 213
+		-- upvalues: v53 (copy), t1 (copy)
+		if v53.current then
+			return
+		end
+
+		t1.onTileActivated(t1.Event)
+	end, {
+		t1.onTileActivated,
+		t1.Event
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = t1.layoutOrder,
+		Size = t1.size,
+		ref = v51
+	}, {
+		GameTile = React.createElement(GameTileView, {
+			imageAspectRatio = 1.7777777777777777,
+			isContained = true,
+			hidePlayButton = true,
+			isHovered = false,
+			forwardRef = v52,
+			image = v49,
+			Size = UDim2.fromScale(1, 1),
+			title = Event.displayTitle or "",
+			onActivated = v61,
+			footerMetadata = React.createElement(GridTileTextFooter, {
+				useLargerFont = true,
+				text = Event.displaySubtitle or (Event.displayDescription or "")
+			}),
+			thumbnailOverlay = React.createElement(GameTileThumbnailBadges, {
+				tileBadgesByPosition = {
+					ImageTopLeft = {{
+						tileBadgeType = "Text",
+						text = if not v40 then formatDateLocalized(v46.DateAtTime, v39.startDate) else v46.HappeningNow
+					}}
+				}
+			}),
+			extraFooterSpace = if t1.disableButtons then nil else v36.Size.Size_700 + v36.Size.Size_200,
+			extraFooterContent = if t1.disableButtons then nil else React.createElement(EventWideFooterButton, {
+				key = "WideFooterButton",
+				buttonStyle = v42,
+				disabled = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then not v45 else v58,
+				onActivated = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v47 else v60
+			}),
+			textSizeOffset = v37
+		}),
+		HoldDetector = if not v52 or not v52.current then nil else React.createElement(HoldDetector, {
+			guiObject = v52.current,
+			onHoldDetected = if not FFlagLuaAppEventDetailsPageDisableCtaOnUnplayable then v47 else v60,
+			setDisabledForHold = v54,
+			keyCode = Enum.KeyCode.ButtonA,
+			focusNavigationEventName = HoldToNotifyMe
+		})
+	})
+end

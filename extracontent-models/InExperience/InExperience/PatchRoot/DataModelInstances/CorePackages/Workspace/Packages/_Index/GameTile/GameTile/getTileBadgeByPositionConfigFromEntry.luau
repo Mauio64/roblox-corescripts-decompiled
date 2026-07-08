@@ -2,7 +2,7 @@ local GameTile = script:FindFirstAncestor("GameTile")
 
 require(GameTile.GameTileTypes)
 
-return function(t1: {[any]: any}) --[[ getTileBadgeByPositionConfigFromEntry ]] -- line: 14
+local function getTileBadgeByPositionConfigFromEntry(t1: {[any]: any}) -- line: 14
 	if t1.badgePosition and (t1.badgeAnalyticsId and t1.badgeType) and (t1.badgeText or t1.badgeIcon) then
 		return {
 			[t1.badgePosition] = {{
@@ -17,3 +17,5 @@ return function(t1: {[any]: any}) --[[ getTileBadgeByPositionConfigFromEntry ]] 
 
 	return nil
 end
+
+return getTileBadgeByPositionConfigFromEntry

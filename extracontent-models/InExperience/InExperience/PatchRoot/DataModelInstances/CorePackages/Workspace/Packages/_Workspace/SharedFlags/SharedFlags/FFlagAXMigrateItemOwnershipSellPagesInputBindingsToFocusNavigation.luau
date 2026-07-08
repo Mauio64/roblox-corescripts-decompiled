@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateItemOwnershipSellPagesInputBindingsToFocusNavigation", false);
+return game:DefineFastFlag("AXMigrateItemOwnershipSellPagesInputBindingsToFocusNavigation", false)

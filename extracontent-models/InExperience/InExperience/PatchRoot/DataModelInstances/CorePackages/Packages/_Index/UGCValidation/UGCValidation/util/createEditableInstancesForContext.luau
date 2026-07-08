@@ -1,191 +1,252 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = {};
-local v2 = require(l_Parent_0.flags.getFFlagUGCValidationMakeupSupport);
-local l_AssetService_0 = game:GetService("AssetService");
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local _ = require(l_Parent_0.util.Types);
-local v6 = require(l_Parent_0.util.destroyEditableInstances);
-local l_game_EngineFeature_0 = game:GetEngineFeature("EngineCreateEditableImageOriginalSizeEnabled");
-local function _(v8, v9, v10, v11, v12) --[[ Line: 18 ]] --[[ Name: addEditableInstance ]]
-    local l_editableMeshes_0 = v8.editableMeshes;
-    if v12 == "EditableImage" then
-        l_editableMeshes_0 = v8.editableImages;
-    end;
-    if not l_editableMeshes_0[v9] then
-        l_editableMeshes_0[v9] = {};
-    end;
-    l_editableMeshes_0[v9][v10] = v11;
-end;
-local function v20(v15, v16, v17) --[[ Line: 31 ]] --[[ Name: createEditableInstanceFromId ]]
-    -- upvalues: l_AssetService_0 (copy), l_game_EngineFeature_0 (copy), l_UGCValidationService_0 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 32 ]]
-        -- upvalues: v17 (copy), l_AssetService_0 (ref), v15 (copy), l_game_EngineFeature_0 (ref), l_UGCValidationService_0 (ref)
-        if v17 == "EditableMesh" then
-            return l_AssetService_0:CreateEditableMeshAsync(v15);
-        elseif l_game_EngineFeature_0 then
-            return l_UGCValidationService_0:CreateEditableImageOriginalSizeAsync(v15.Uri);
-        else
-            return (l_AssetService_0:CreateEditableImageAsync(v15));
-        end;
-    end);
-    if not l_status_0 then
-        return l_status_0, l_result_0;
-    else
-        v16[v15.Uri] = l_result_0;
-        return true, {
-            created = true, 
-            instance = l_result_0
-        };
-    end;
-end;
-v1.getEditableInstanceInfo = function(v21, v22, v23, v24) --[[ Line: 55 ]] --[[ Name: getEditableInstanceInfo ]]
-    -- upvalues: v20 (copy)
-    local v25 = nil;
-    if v24 then
-        v25 = v21.Object;
-    end;
-    if not v25 then
-        local l_Uri_0 = v21.Uri;
-        if l_Uri_0 and l_Uri_0 ~= "" then
-            v25 = v22[l_Uri_0];
-            if not v25 then
-                return v20(v21, v22, v23);
-            end;
-        end;
-    end;
-    return true, {
-        instance = v25, 
-        created = false
-    };
-end;
-local function _(v27, v28, v29, v30) --[[ Line: 81 ]] --[[ Name: addContent ]]
-    v27[v28] = {
-        content = v29, 
-        contentType = v30
-    };
-end;
-local function v34(v32, v33) --[[ Line: 88 ]] --[[ Name: getTextureContentMap ]]
-    -- upvalues: v2 (copy)
-    if v32:IsA("MeshPart") then
-        v33.TextureID = {
-            content = v32.TextureContent, 
-            contentType = "EditableImage"
-        };
-        return;
-    elseif v32:IsA("SpecialMesh") then
-        v33.TextureId = {
-            content = Content.fromUri(v32.TextureId), 
-            contentType = "EditableImage"
-        };
-        return;
-    else
-        if v32:IsA("SurfaceAppearance") or v2() and v32:IsA("Decal") then
-            v33.ColorMap = {
-                content = v32.ColorMapContent, 
-                contentType = "EditableImage"
-            };
-            v33.MetalnessMap = {
-                content = v32.MetalnessMapContent, 
-                contentType = "EditableImage"
-            };
-            v33.NormalMap = {
-                content = v32.NormalMapContent, 
-                contentType = "EditableImage"
-            };
-            v33.RoughnessMap = {
-                content = v32.RoughnessMapContent, 
-                contentType = "EditableImage"
-            };
-        end;
-        return;
-    end;
-end;
-local function _(v35) --[[ Line: 127 ]] --[[ Name: getCageMeshContent ]]
-    return v35.CageMeshContent;
-end;
-local function v39(v37, v38) --[[ Line: 131 ]] --[[ Name: getMeshContentMap ]]
-    -- upvalues: v2 (copy)
-    if v37:IsA("MeshPart") then
-        v38.MeshId = {
-            content = v37.MeshContent, 
-            contentType = "EditableMesh"
-        };
-        return;
-    elseif v37:IsA("WrapTarget") then
-        v38.CageMeshId = {
-            content = v37.CageMeshContent, 
-            contentType = "EditableMesh"
-        };
-        return;
-    elseif v37:IsA("WrapLayer") then
-        v38.CageMeshId = {
-            content = v37.CageMeshContent, 
-            contentType = "EditableMesh"
-        };
-        v38.ReferenceMeshId = {
-            content = v37.ReferenceMeshContent, 
-            contentType = "EditableMesh"
-        };
-        return;
-    elseif v37:IsA("SpecialMesh") then
-        v38.MeshId = {
-            content = Content.fromUri(v37.MeshId), 
-            contentType = "EditableMesh"
-        };
-        return;
-    else
-        if v2() and v37:IsA("WrapTextureTransfer") then
-            v38.ReferenceCageMeshContent = {
-                content = v37.ReferenceCageMeshContent, 
-                contentType = "EditableMesh"
-            };
-        end;
-        return;
-    end;
-end;
-v1.getOrCreateEditableInstances = function(v40, v41, v42, v43) --[[ Line: 152 ]] --[[ Name: getOrCreateEditableInstances ]]
-    -- upvalues: v39 (copy), v34 (copy), v1 (copy)
-    local v44 = {};
-    v39(v40, v44);
-    v34(v40, v44);
-    for v45, v46 in v44 do
-        local l_contentType_0 = v46.contentType;
-        local v48, v49 = v1.getEditableInstanceInfo(v46.content, v41, l_contentType_0, v43);
-        if not v48 then
-            return v48, v49;
-        else
-            local l_editableMeshes_1 = v42.editableMeshes;
-            if l_contentType_0 == "EditableImage" then
-                l_editableMeshes_1 = v42.editableImages;
-            end;
-            if not l_editableMeshes_1[v40] then
-                l_editableMeshes_1[v40] = {};
-            end;
-            l_editableMeshes_1[v40][v45] = v49;
-        end;
-    end;
-    return true;
-end;
-v1.processAll = function(v51, v52) --[[ Line: 180 ]] --[[ Name: processAll ]]
-    -- upvalues: v1 (copy), v6 (copy)
-    local v53 = {
-        editableMeshes = {}, 
-        editableImages = {}
-    };
-    local v54 = {};
-    for _, v56 in v51 do
-        local l_v56_Descendants_0 = v56:GetDescendants();
-        table.insert(l_v56_Descendants_0, v56);
-        for _, v59 in pairs(l_v56_Descendants_0) do
-            local v60, v61 = v1.getOrCreateEditableInstances(v59, v54, v53, v52);
-            if not v60 then
-                v6(v53.editableMeshes, v53.editableImages);
-                return false, {
-                    v61
-                };
-            end;
-        end;
-    end;
-    return true, v53;
-end;
-return v1;
+local ParentParent = script.Parent.Parent
+local t1 = {}
+local AssetService = game:GetService("AssetService")
+local UGCValidationService = game:GetService("UGCValidationService")
+
+require(ParentParent.util.Types)
+
+local destroyEditableInstances = require(ParentParent.util.destroyEditableInstances)
+
+local function addEditableInstance(p1, p2, p3, p4, p5) -- line: 13
+	local editableMeshes = p1.editableMeshes
+
+	if p5 == "EditableImage" then
+		editableMeshes = p1.editableImages
+	end
+
+	if not editableMeshes[p2] then
+		editableMeshes[p2] = {}
+	end
+
+	editableMeshes[p2][p3] = p4
+end
+local function createEditableInstanceFromId(p6, p7, p8) -- line: 26
+	-- upvalues: AssetService (copy), UGCValidationService (copy)
+	local ok, result = pcall(function() -- line: 27
+		-- upvalues: p8 (copy), AssetService (copy), p6 (copy), UGCValidationService (copy)
+		if p8 == "EditableMesh" then
+			return AssetService:CreateEditableMeshAsync(p6)
+		end
+
+		return UGCValidationService:CreateEditableImageOriginalSizeAsync(p6.Uri)
+	end)
+
+	if not ok then
+		return ok, result
+	end
+
+	p7[p6.Uri] = result
+
+	return true, {
+		created = true,
+		instance = result
+	}
+end
+
+function t1.getEditableInstanceInfo(p9, p10, p11, p12) -- line: 46
+	-- upvalues: createEditableInstanceFromId (copy)
+	local Object = nil
+
+	if p12 then
+		Object = p9.Object
+	end
+
+	if not Object then
+		local Uri = p9.Uri
+
+		if Uri and Uri ~= "" then
+			Object = p10[Uri]
+
+			if not Object then
+				return createEditableInstanceFromId(p9, p10, p11)
+			end
+		end
+	end
+
+	return true, {
+		created = false,
+		instance = Object
+	}
+end
+
+local function addContent(p13, p14, p15, p16) -- line: 72
+	p13[p14] = {
+		content = p15,
+		contentType = p16
+	}
+end
+local function getTextureContentMap(p17, p18) -- line: 79
+	if p17:IsA("MeshPart") then
+		local TextureContent = p17.TextureContent
+
+		p18.TextureID = {
+			contentType = "EditableImage",
+			content = TextureContent
+		}
+
+		return
+	end
+
+	if p17:IsA("SpecialMesh") then
+		local v36 = Content.fromUri(p17.TextureId)
+
+		p18.TextureId = {
+			contentType = "EditableImage",
+			content = v36
+		}
+
+		return
+	end
+
+	if p17:IsA("SurfaceAppearance") or p17:IsA("Decal") then
+		local ColorMapContent = p17.ColorMapContent
+
+		p18.ColorMap = {
+			contentType = "EditableImage",
+			content = ColorMapContent
+		}
+
+		local MetalnessMapContent = p17.MetalnessMapContent
+
+		p18.MetalnessMap = {
+			contentType = "EditableImage",
+			content = MetalnessMapContent
+		}
+
+		local NormalMapContent = p17.NormalMapContent
+
+		p18.NormalMap = {
+			contentType = "EditableImage",
+			content = NormalMapContent
+		}
+
+		local RoughnessMapContent = p17.RoughnessMapContent
+
+		p18.RoughnessMap = {
+			contentType = "EditableImage",
+			content = RoughnessMapContent
+		}
+	end
+end
+local function getCageMeshContent(p19) -- line: 118
+	return p19.CageMeshContent
+end
+local function getMeshContentMap(p20, p21) -- line: 122
+	if p20:IsA("MeshPart") then
+		local MeshContent = p20.MeshContent
+
+		p21.MeshId = {
+			contentType = "EditableMesh",
+			content = MeshContent
+		}
+
+		return
+	end
+
+	if p20:IsA("WrapTarget") then
+		local CageMeshContent = p20.CageMeshContent
+
+		p21.CageMeshId = {
+			contentType = "EditableMesh",
+			content = CageMeshContent
+		}
+
+		return
+	end
+
+	if p20:IsA("WrapLayer") then
+		local CageMeshContent = p20.CageMeshContent
+
+		p21.CageMeshId = {
+			contentType = "EditableMesh",
+			content = CageMeshContent
+		}
+
+		local ReferenceMeshContent = p20.ReferenceMeshContent
+
+		p21.ReferenceMeshId = {
+			contentType = "EditableMesh",
+			content = ReferenceMeshContent
+		}
+
+		return
+	end
+
+	if p20:IsA("SpecialMesh") then
+		local v48 = Content.fromUri(p20.MeshId)
+
+		p21.MeshId = {
+			contentType = "EditableMesh",
+			content = v48
+		}
+
+		return
+	end
+
+	if p20:IsA("WrapTextureTransfer") then
+		local ReferenceCageMeshContent = p20.ReferenceCageMeshContent
+
+		p21.ReferenceCageMeshContent = {
+			contentType = "EditableMesh",
+			content = ReferenceCageMeshContent
+		}
+	end
+end
+
+function t1.getOrCreateEditableInstances(p22, p23, p24, p25) -- line: 143
+	-- upvalues: getMeshContentMap (copy), getTextureContentMap (copy), t1 (copy)
+	local t2 = {}
+
+	getMeshContentMap(p22, t2)
+	getTextureContentMap(p22, t2)
+
+	for v55, v56 in t2 do
+		local contentType = v56.contentType
+		local v58, v59 = t1.getEditableInstanceInfo(v56.content, p23, contentType, p25)
+
+		if not v58 then
+			return v58, v59
+		end
+
+		local editableMeshes = p24.editableMeshes
+
+		if contentType == "EditableImage" then
+			editableMeshes = p24.editableImages
+		end
+
+		if not editableMeshes[p22] then
+			editableMeshes[p22] = {}
+		end
+
+		editableMeshes[p22][v55] = v59
+	end
+
+	return true
+end
+function t1.processAll(t3: {[any]: any}, b1: boolean?) -- line: 171
+	-- upvalues: t1 (copy), destroyEditableInstances (copy)
+	local t4 = {
+		editableMeshes = {},
+		editableImages = {}
+	}
+
+	for _, v65 in t3 do
+		local descendants = v65:GetDescendants()
+
+		table.insert(descendants, v65)
+
+		for _, v in pairs(descendants) do
+			local v69, v70 = t1.getOrCreateEditableInstances(v, {}, t4, b1)
+
+			if not v69 then
+				destroyEditableInstances(t4.editableMeshes, t4.editableImages)
+
+				return false, { v70 }
+			end
+		end
+	end
+
+	return true, t4
+end
+
+return t1

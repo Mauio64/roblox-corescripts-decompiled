@@ -1,7 +1,7 @@
-return function(v0, v1, v2) --[[ Line: 5 ]]
-    if v0 and v1 and v2 and v2 ~= "" and v0[v2] and v1[v2] and v0[v2] == v1[v2] then
-        return true;
-    else
-        return false;
-    end;
-end;
+return function(p1, p2, p3) -- line: 5
+	if p1 and (p2 and p3 and p3 ~= "" and p1[p3] and p2[p3] and p1[p3] == p2[p3]) then
+		return true
+	end
+
+	return false
+end

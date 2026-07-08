@@ -1,5 +1,5 @@
 return {
-    Default = "Default", 
-    Loading = "Loading", 
-    NoMoreNotifications = "NoMoreNotifications"
-};
+	Default = "Default",
+	Loading = "Loading",
+	NoMoreNotifications = "NoMoreNotifications"
+}

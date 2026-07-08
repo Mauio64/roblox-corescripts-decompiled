@@ -1,330 +1,392 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local _ = game:GetService("Workspace");
-local v5 = require(l_CorePackages_0.Packages.Roact);
-local v6 = require(l_CorePackages_0.Packages.RoactRodux);
-local v7 = require(l_CorePackages_0.Packages.t);
-local v8 = require(l_CorePackages_0.Packages.Signals);
-local v9 = require(l_CorePackages_0.Workspace.Packages.Display);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v11 = require(l_Parent_0.Constants);
-local v12 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local v13 = require(l_RobloxGui_0.Modules.TenFootInterface);
-local v14 = require(l_Parent_0.Actions.SetKeepOutArea);
-local v15 = require(l_Parent_0.Actions.RemoveKeepOutArea);
-local _ = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local l_FFlagTopBarSignalizeHealthBar_0 = v12.Flags.FFlagTopBarSignalizeHealthBar;
-local l_FFlagTopBarSignalizeKeepOutAreas_0 = v12.Flags.FFlagTopBarSignalizeKeepOutAreas;
-local l_FFlagTopBarSignalizeScreenSize_0 = v12.Flags.FFlagTopBarSignalizeScreenSize;
-local l_FFlagClampHealthPercentage_0 = v12.Flags.FFlagClampHealthPercentage;
-local l_Chrome_0 = l_Parent_0.Parent.Chrome;
-local l_Enabled_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled;
-local _ = if l_Enabled_0() then require(l_Chrome_0.Service) else nil;
-local v24 = l_Enabled_0();
-local v25 = UDim2.new(0, 80, 0, 6);
-if v24 then
-    v25 = UDim2.new(0, 125, 0, 20);
-end;
-local v26 = UDim2.new(0, 50, 0, 16);
-local v27 = UDim2.new(0, 80, 0, 20);
-local v28 = UDim2.new(0, 220, 0, 16);
-local v29 = v5.PureComponent:extend("HealthBar");
-v29.validateProps = v7.strictInterface({
-    layoutOrder = v7.optional(v7.integer), 
-    screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v7.Vector2, 
-    healthEnabled = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v7.boolean, 
-    health = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v7.number, 
-    maxHealth = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v7.number, 
-    setKeepOutArea = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else v7.callback, 
-    removeKeepOutArea = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else v7.callback
-});
-local function _(v30) --[[ Line: 64 ]] --[[ Name: color3ToVector3 ]]
-    return (Vector3.new(v30.r, v30.g, v30.b));
-end;
-local v32 = {};
-local l_HealthRedColor_0 = v11.HealthRedColor;
-v32[Vector3.new(l_HealthRedColor_0.r, l_HealthRedColor_0.g, l_HealthRedColor_0.b)] = 0.1;
-l_HealthRedColor_0 = v11.HealthYellowColor;
-v32[Vector3.new(l_HealthRedColor_0.r, l_HealthRedColor_0.g, l_HealthRedColor_0.b)] = 0.5;
-l_HealthRedColor_0 = v11.HealthGreenColor;
-v32[Vector3.new(l_HealthRedColor_0.r, l_HealthRedColor_0.g, l_HealthRedColor_0.b)] = 0.8;
-local l_HealthRedColor_1 = v11.HealthRedColor;
-l_HealthRedColor_0 = v11.HealthGreenColor;
-local function v43(v35) --[[ Line: 78 ]] --[[ Name: getHealthBarColor ]]
-    -- upvalues: l_HealthRedColor_1 (copy), l_HealthRedColor_0 (copy), v32 (copy)
-    if v35 <= 0.1 then
-        return l_HealthRedColor_1;
-    elseif v35 >= 0.8 then
-        return l_HealthRedColor_0;
-    else
-        local v36 = Vector3.new(0, 0, 0, 0);
-        local v37 = 0;
-        for v38, v39 in pairs(v32) do
-            local v40 = v35 - v39;
-            if v40 == 0 then
-                return Color3.new(v38.x, v38.y, v38.z);
-            else
-                local v41 = 1 / (v40 * v40);
-                v36 = v36 + v41 * v38;
-                v37 = v37 + v41;
-            end;
-        end;
-        local v42 = v36 / v37;
-        return Color3.new(v42.x, v42.y, v42.z);
-    end;
-end;
-v29.init = function(v44) --[[ Line: 103 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), l_FFlagTopBarSignalizeHealthBar_0 (copy), v11 (copy), l_FFlagClampHealthPercentage_0 (copy), v12 (copy), v8 (copy), l_StarterGui_0 (copy), l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), v9 (copy), v13 (copy), v28 (copy), v24 (copy), v26 (copy), v27 (copy), v25 (ref)
-    v44.rootRef = v5.createRef();
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        local v45, v46 = v5.createBinding(v11.InitialHealth);
-        v44.health = v45;
-        v44.setHealth = v46;
-        v45, v46 = v5.createBinding(v11.InitialHealth);
-        v44.maxHealth = v45;
-        v44.setMaxHealth = v46;
-        v45, v46 = v5.createBinding(false);
-        v44.isDead = v45;
-        v44.setIsDead = v46;
-        v44.healthPercent = v5.joinBindings({
-            v44.health, 
-            v44.maxHealth, 
-            v44.isDead
-        }):map(function(v47) --[[ Line: 109 ]]
-            -- upvalues: l_FFlagClampHealthPercentage_0 (ref)
-            local v48 = v47[1];
-            local v49 = v47[2];
-            local v50 = v47[3];
-            local v51 = 1;
-            if v50 then
-                return 0;
-            else
-                if v49 > 0 then
-                    if l_FFlagClampHealthPercentage_0 then
-                        return (math.clamp(v48 / v49, 0, 1));
-                    else
-                        v51 = v48 / v49;
-                    end;
-                end;
-                return v51;
-            end;
-        end);
-        v44.healthVisible = v5.joinBindings({
-            v44.health, 
-            v44.maxHealth
-        }):map(function(v52) --[[ Line: 127 ]]
-            return v52[1] < v52[2];
-        end);
-        if v12.Stores.GetLocalHumanoidStore then
-            v44.localHumanoidStore = v12.Stores.GetLocalHumanoidStore(false);
-            v44.disposeHealthConnection = v8.createEffect(function(v53) --[[ Line: 133 ]]
-                -- upvalues: v44 (copy), v11 (ref)
-                local v54 = v44.localHumanoidStore.getHealthValue(v53);
-                v44.setHealth(v54.health or v11.InitialHealth);
-                v44.setMaxHealth(v54.maxHealth or v11.InitialHealth);
-                v44.setIsDead(v54.isDead);
-            end);
-        end;
-        v45 = function() --[[ Line: 142 ]] --[[ Name: getHealthEnabled ]]
-            -- upvalues: l_StarterGui_0 (ref)
-            return l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.Health);
-        end;
-        v44.coreGuiChangedSignalConn = l_StarterGui_0.CoreGuiChangedSignal:Connect(function(v55, v56) --[[ Line: 147 ]]
-            -- upvalues: v44 (copy)
-            if v55 == Enum.CoreGuiType.Health or v55 == Enum.CoreGuiType.All then
-                v44:setState({
-                    mountHealthBar = v56
-                });
-            end;
-        end);
-        v44:setState({
-            mountHealthBar = l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
-        });
-    end;
-    if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-        v44.keepOutAreasStore = v12.Stores.GetKeepOutAreasStore(false);
-    end;
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        local l_getViewportSize_0 = v9.GetDisplayStore(false).getViewportSize;
-        local v58, v59 = v5.createBinding(l_getViewportSize_0(false));
-        v44.screenSizeBinding = v58;
-        v44.setScreenSizeBinding = v59;
-        v44.disposeScreenSize = v8.createEffect(function(v60) --[[ Line: 167 ]]
-            -- upvalues: v44 (copy), l_getViewportSize_0 (copy)
-            v44.setScreenSizeBinding(l_getViewportSize_0(v60));
-        end);
-        v44.healthbarSizeBinding = v44.screenSizeBinding:map(function(v61) --[[ Line: 171 ]]
-            -- upvalues: v13 (ref), v28 (ref), v24 (ref), v26 (ref), v27 (ref), v25 (ref)
-            if v13:IsEnabled() then
-                return v28;
-            elseif v24 and v61.X <= 320 then
-                return v26;
-            elseif v24 and v61.X <= 393 then
-                return v27;
-            else
-                return v25;
-            end;
-        end);
-    end;
-end;
-v29.onUnmount = function(v62) --[[ Line: 185 ]] --[[ Name: onUnmount ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        v62.coreGuiChangedSignalConn:Disconnect();
-        v62.disposeHealthConnection();
-    end;
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        v62.disposeScreenSize();
-    end;
-end;
-v29.renderHealth = function(v63) --[[ Line: 194 ]] --[[ Name: renderHealth ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy), l_FFlagClampHealthPercentage_0 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), v24 (copy), v26 (copy), v27 (copy), v25 (ref), v13 (copy), v28 (copy), l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), v11 (copy), v43 (copy), v5 (copy), l_Enabled_0 (copy)
-    local v64 = nil;
-    if not l_FFlagTopBarSignalizeHealthBar_0 then
-        v64 = v63.props.healthEnabled and v63.props.health < v63.props.maxHealth;
-    end;
-    local v65 = 1;
-    if not l_FFlagTopBarSignalizeHealthBar_0 then
-        if v63.props.isDead then
-            v65 = 0;
-        elseif v63.props.maxHealth > 0 then
-            v65 = if l_FFlagClampHealthPercentage_0 then math.clamp(v63.props.health / v63.props.maxHealth, 0, 1) else v63.props.health / v63.props.maxHealth;
-        end;
-    end;
-    local v66 = nil;
-    if not l_FFlagTopBarSignalizeScreenSize_0 then
-        if v24 then
-            v66 = if v63.props.screenSize.X <= 320 then v26 else if v63.props.screenSize.X <= 393 then v27 else v25;
-            if v13:IsEnabled() then
-                v66 = v28;
-            end;
-        else
-            v66 = v25;
-            if v13:IsEnabled() then
-                v66 = v28;
-            end;
-        end;
-    end;
-    local v67 = 4;
-    if v13:IsEnabled() then
-        v67 = 0;
-    end;
-    local v68 = nil;
-    local v69 = nil;
-    local v70 = nil;
-    if v24 then
-        v68 = "rbxasset://textures/ui/TopBar/HealthBarBaseTV.png";
-        v69 = "rbxasset://textures/ui/TopBar/HealthBarTV.png";
-        v70 = Rect.new(8, 8, 9, 9);
-    else
-        v68 = "rbxasset://textures/ui/TopBar/HealthBarBase.png";
-        v69 = "rbxasset://textures/ui/TopBar/HealthBar.png";
-        v70 = Rect.new(3, 3, 4, 4);
-        if v13:IsEnabled() then
-            v68 = "rbxasset://textures/ui/TopBar/HealthBarBaseTV.png";
-            v69 = "rbxasset://textures/ui/TopBar/HealthBarTV.png";
-            v70 = Rect.new(8, 8, 9, 9);
-        end;
-    end;
-    local function v72(v71) --[[ Line: 258 ]]
-        -- upvalues: v24 (ref), l_FFlagTopBarSignalizeHealthBar_0 (ref), v63 (copy), v64 (ref), l_FFlagTopBarSignalizeKeepOutAreas_0 (ref), v11 (ref)
-        if not v24 then
-            if (l_FFlagTopBarSignalizeHealthBar_0 and v63.healthVisible or not l_FFlagTopBarSignalizeHealthBar_0 and v64) and v71 then
-                if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-                    v63.keepOutAreasStore.setKeepOutArea(v11.HealthBarKeepOutAreaId, v71.AbsolutePosition, v71.AbsoluteSize);
-                    return;
-                else
-                    v63.props.setKeepOutArea(v11.HealthBarKeepOutAreaId, v71.AbsolutePosition, v71.AbsoluteSize);
-                    return;
-                end;
-            elseif l_FFlagTopBarSignalizeKeepOutAreas_0 then
-                v63.keepOutAreasStore.removeKeepOutArea(v11.HealthBarKeepOutAreaId);
-                return;
-            else
-                v63.props.removeKeepOutArea(v11.HealthBarKeepOutAreaId);
-            end;
-        end;
-    end;
-    if v63.rootRef.current then
-        v72(v63.rootRef.current);
-    end;
-    local v73 = if l_FFlagTopBarSignalizeHealthBar_0 then v63.healthPercent:map(v43) else v43(v65);
-    return v5.createElement("Frame", {
-        AnchorPoint = if v24 then Vector2.new(1, 0) else nil, 
-        Position = if v24 then UDim2.new(1, 0, 0, 0) else nil, 
-        Visible = if l_FFlagTopBarSignalizeHealthBar_0 then v63.healthVisible else v64, 
-        BackgroundTransparency = 1, 
-        Size = if l_FFlagTopBarSignalizeScreenSize_0 then v63.healthbarSizeBinding:map(function(v74) --[[ Line: 286 ]]
-            return UDim2.new(v74.X, UDim.new(1, 0));
-        end) else UDim2.new(v66.X, UDim.new(1, 0)), 
-        LayoutOrder = v63.props.layoutOrder, 
-        [v5.Change.AbsoluteSize] = v72, 
-        [v5.Change.AbsolutePosition] = v72, 
-        [v5.Ref] = v63.rootRef
-    }, {
-        Padding = not l_Enabled_0 and v5.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, v67)
-        }) or nil, 
-        HealthBar = v5.createElement("ImageLabel", {
-            BackgroundTransparency = 1, 
-            Image = v68, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = v70, 
-            Size = if l_FFlagTopBarSignalizeScreenSize_0 then v63.healthbarSizeBinding else v66, 
-            Position = UDim2.fromScale(0, 0.5), 
-            AnchorPoint = Vector2.new(0, 0.5)
-        }, {
-            Fill = v5.createElement("ImageLabel", {
-                BackgroundTransparency = 1, 
-                Image = v69, 
-                ImageColor3 = v73, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = v70, 
-                Size = if l_FFlagTopBarSignalizeHealthBar_0 then v63.healthPercent:map(function(v75) --[[ Line: 314 ]]
-                    return UDim2.fromScale(v75, 1);
-                end) else UDim2.fromScale(v65, 1)
-            })
-        })
-    });
-end;
-v29.render = function(v76) --[[ Line: 322 ]] --[[ Name: render ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy)
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        if v76.state.mountHealthBar then
-            return (v76:renderHealth());
-        else
-            return nil;
-        end;
-    else
-        return v76:renderHealth();
-    end;
-end;
-local function v78(v77) --[[ Line: 330 ]] --[[ Name: mapStateToProps ]]
-    -- upvalues: l_FFlagTopBarSignalizeScreenSize_0 (copy), l_FFlagTopBarSignalizeHealthBar_0 (copy)
-    return {
-        screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v77.displayOptions.screenSize, 
-        health = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v77.health.currentHealth, 
-        maxHealth = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v77.health.maxHealth, 
-        healthEnabled = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v77.coreGuiEnabled[Enum.CoreGuiType.Health]
-    };
-end;
-local function v84(v79) --[[ Line: 339 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: l_FFlagTopBarSignalizeKeepOutAreas_0 (copy), v14 (copy), v15 (copy)
-    if l_FFlagTopBarSignalizeKeepOutAreas_0 then
-        return {};
-    else
-        return {
-            setKeepOutArea = function(v80, v81, v82) --[[ Line: 344 ]] --[[ Name: setKeepOutArea ]]
-                -- upvalues: v79 (copy), v14 (ref)
-                return v79(v14(v80, v81, v82));
-            end, 
-            removeKeepOutArea = function(v83) --[[ Line: 347 ]] --[[ Name: removeKeepOutArea ]]
-                -- upvalues: v79 (copy), v15 (ref)
-                return v79(v15(v83));
-            end
-        };
-    end;
-end;
-return v6.UNSTABLE_connect2(v78, if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else v84)(v29);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local StarterGui = game:GetService("StarterGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+
+game:GetService("Workspace")
+
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local Signals = require(CorePackages.Packages.Signals)
+local Display = require(CorePackages.Workspace.Packages.Display)
+local ParentParent = script.Parent.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local SetKeepOutArea = require(ParentParent.Actions.SetKeepOutArea)
+local RemoveKeepOutArea = require(ParentParent.Actions.RemoveKeepOutArea)
+
+require(CorePackages.Workspace.Packages.SharedFlags)
+
+local FFlagTopBarSignalizeHealthBar = CoreGuiCommon.Flags.FFlagTopBarSignalizeHealthBar
+local FFlagTopBarSignalizeKeepOutAreas = CoreGuiCommon.Flags.FFlagTopBarSignalizeKeepOutAreas
+local FFlagTopBarSignalizeScreenSize = CoreGuiCommon.Flags.FFlagTopBarSignalizeScreenSize
+local Chrome = ParentParent.Parent.Chrome
+local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+
+if Enabled() then
+	require(Chrome.Service)
+end
+
+local v21 = Enabled()
+local uDim2 = UDim2.new(0, 80, 0, 6)
+
+if v21 then
+	uDim2 = UDim2.new(0, 125, 0, 20)
+end
+
+local uDim2_2 = UDim2.new(0, 50, 0, 16)
+local uDim2_3 = UDim2.new(0, 80, 0, 20)
+local uDim2_4 = UDim2.new(0, 220, 0, 16)
+local v26 = Roact.PureComponent:extend("HealthBar")
+
+v26.validateProps = t.strictInterface({
+	layoutOrder = t.optional(t.integer),
+	screenSize = if not FFlagTopBarSignalizeScreenSize then t.Vector2 else nil,
+	healthEnabled = if not FFlagTopBarSignalizeHealthBar then t.boolean else nil,
+	health = if not FFlagTopBarSignalizeHealthBar then t.number else nil,
+	maxHealth = if not FFlagTopBarSignalizeHealthBar then t.number else nil,
+	setKeepOutArea = if not FFlagTopBarSignalizeKeepOutAreas then t.callback else nil,
+	removeKeepOutArea = if not FFlagTopBarSignalizeKeepOutAreas then t.callback else nil
+})
+
+local function color3ToVector3(p1) -- line: 63
+	return (Vector3.new(p1.r, p1.g, p1.b))
+end
+
+local t1 = {}
+local HealthRedColor = Constants.HealthRedColor
+
+t1[Vector3.new(HealthRedColor.r, HealthRedColor.g, HealthRedColor.b)] = 0.1
+
+local HealthYellowColor = Constants.HealthYellowColor
+
+t1[Vector3.new(HealthYellowColor.r, HealthYellowColor.g, HealthYellowColor.b)] = 0.5
+
+local HealthGreenColor = Constants.HealthGreenColor
+
+t1[Vector3.new(HealthGreenColor.r, HealthGreenColor.g, HealthGreenColor.b)] = 0.8
+
+local HealthRedColor2 = Constants.HealthRedColor
+local HealthGreenColor2 = Constants.HealthGreenColor
+
+local function getHealthBarColor(p2) -- line: 77
+	-- upvalues: HealthRedColor2 (copy), HealthGreenColor2 (copy), t1 (copy)
+	if p2 <= 0.1 then
+		return HealthRedColor2
+	end
+
+	if p2 >= 0.8 then
+		return HealthGreenColor2
+	end
+
+	local vector3 = Vector3.new(0, 0, 0)
+	local n1 = 0
+
+	for k, v in pairs(t1) do
+		local v43 = p2 - v
+
+		if v43 == 0 then
+			return Color3.new(k.x, k.y, k.z)
+		end
+
+		local v44 = 1 / (v43 * v43)
+
+		vector3 += v44 * k
+		n1 += v44
+	end
+
+	local v45 = vector3 / n1
+
+	return Color3.new(v45.x, v45.y, v45.z)
+end
+
+function v26.init(p3) -- line: 102
+	-- upvalues: Roact (copy), FFlagTopBarSignalizeHealthBar (copy), Constants (copy), CoreGuiCommon (copy), Signals (copy), StarterGui (copy), FFlagTopBarSignalizeKeepOutAreas (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), TenFootInterface (copy), uDim2_4 (copy), v21 (copy), uDim2_2 (copy), uDim2_3 (copy), uDim2 (ref)
+	p3.rootRef = Roact.createRef()
+
+	if FFlagTopBarSignalizeHealthBar then
+		local v47, v48 = Roact.createBinding(Constants.InitialHealth)
+
+		p3.health = v47
+		p3.setHealth = v48
+
+		local v49, v50 = Roact.createBinding(Constants.InitialHealth)
+
+		p3.maxHealth = v49
+		p3.setMaxHealth = v50
+
+		local v51, v52 = Roact.createBinding(false)
+
+		p3.isDead = v51
+		p3.setIsDead = v52
+		p3.healthPercent = Roact.joinBindings({
+			p3.health,
+			p3.maxHealth,
+			p3.isDead
+		}):map(function(p4) -- line: 108
+			local v72 = p4[1]
+			local v73 = p4[2]
+			local n2 = 1
+
+			if p4[3] then
+				return 0
+			end
+
+			if v73 > 0 then
+				n2 = math.clamp(v72 / v73, 0, 1)
+			end
+
+			return n2
+		end)
+		p3.healthVisible = Roact.joinBindings({
+			p3.health,
+			p3.maxHealth
+		}):map(function(p5) -- line: 122
+			return p5[1] < p5[2]
+		end)
+
+		if CoreGuiCommon.Stores.GetLocalHumanoidStore then
+			p3.localHumanoidStore = CoreGuiCommon.Stores.GetLocalHumanoidStore(false)
+			p3.disposeHealthConnection = Signals.createEffect(function(p6) -- line: 128
+				-- upvalues: p3 (copy), Constants (copy)
+				local v77 = p3.localHumanoidStore.getHealthValue(p6)
+
+				p3.setHealth(v77.health or Constants.InitialHealth)
+				p3.setMaxHealth(v77.maxHealth or Constants.InitialHealth)
+				p3.setIsDead(v77.isDead)
+			end)
+		end
+
+		local function getHealthEnabled() -- line: 137
+			-- upvalues: StarterGui (copy)
+			return StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
+		end
+
+		p3.coreGuiChangedSignalConn = StarterGui.CoreGuiChangedSignal:Connect(function(p7, b1: boolean) -- line: 142
+			-- upvalues: p3 (copy)
+			if p7 == Enum.CoreGuiType.Health or p7 == Enum.CoreGuiType.All then
+				p3:setState({
+					mountHealthBar = b1
+				})
+			end
+		end)
+		p3:setState({
+			mountHealthBar = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
+		})
+	end
+
+	if FFlagTopBarSignalizeKeepOutAreas then
+		p3.keepOutAreasStore = CoreGuiCommon.Stores.GetKeepOutAreasStore(false)
+	end
+
+	if FFlagTopBarSignalizeScreenSize then
+		local getViewportSize = Display.GetDisplayStore(false).getViewportSize
+		local v55, v56 = Roact.createBinding(getViewportSize(false))
+
+		p3.screenSizeBinding = v55
+		p3.setScreenSizeBinding = v56
+		p3.disposeScreenSize = Signals.createEffect(function(p8) -- line: 162
+			-- upvalues: p3 (copy), getViewportSize (copy)
+			p3.setScreenSizeBinding(getViewportSize(p8))
+		end)
+		p3.healthbarSizeBinding = p3.screenSizeBinding:map(function(p9) -- line: 166
+			-- upvalues: TenFootInterface (copy), uDim2_4 (copy), v21 (copy), uDim2_2 (copy), uDim2_3 (copy), uDim2 (ref)
+			if TenFootInterface:IsEnabled() then
+				return uDim2_4
+			end
+
+			if v21 and p9.X <= 320 then
+				return uDim2_2
+			end
+
+			if v21 and p9.X <= 393 then
+				return uDim2_3
+			end
+
+			return uDim2
+		end)
+	end
+end
+function v26.onUnmount(p10) -- line: 180
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy), FFlagTopBarSignalizeScreenSize (copy)
+	if FFlagTopBarSignalizeHealthBar then
+		p10.coreGuiChangedSignalConn:Disconnect()
+		p10.disposeHealthConnection()
+	end
+
+	if FFlagTopBarSignalizeScreenSize then
+		p10.disposeScreenSize()
+	end
+end
+function v26.renderHealth(p11) -- line: 189
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy), FFlagTopBarSignalizeScreenSize (copy), v21 (copy), uDim2_2 (copy), uDim2_3 (copy), uDim2 (ref), TenFootInterface (copy), uDim2_4 (copy), FFlagTopBarSignalizeKeepOutAreas (copy), Constants (copy), getHealthBarColor (copy), Roact (copy), Enabled (copy)
+	local u59 = nil
+
+	if not FFlagTopBarSignalizeHealthBar then
+		u59 = p11.props.healthEnabled and p11.props.health < p11.props.maxHealth
+	end
+
+	local n3 = 1
+
+	if not FFlagTopBarSignalizeHealthBar then
+		if p11.props.isDead then
+			n3 = 0
+		elseif p11.props.maxHealth > 0 then
+			n3 = math.clamp(p11.props.health / p11.props.maxHealth, 0, 1)
+		end
+	end
+
+	local v61 = nil
+
+	if not FFlagTopBarSignalizeScreenSize then
+		if v21 then
+			v61 = if not (p11.props.screenSize.X <= 320) then if not (p11.props.screenSize.X <= 393) then uDim2 else uDim2_3 else uDim2_2
+
+			if TenFootInterface:IsEnabled() then
+				v61 = uDim2_4
+			end
+		else
+			v61 = uDim2
+
+			if TenFootInterface:IsEnabled() then
+				v61 = uDim2_4
+			end
+		end
+	end
+
+	local n4 = 4
+
+	if TenFootInterface:IsEnabled() then
+		n4 = 0
+	end
+
+	local s1, s2, rect
+
+	if v21 then
+		s1 = "rbxasset://textures/ui/TopBar/HealthBarBaseTV.png"
+		s2 = "rbxasset://textures/ui/TopBar/HealthBarTV.png"
+		rect = Rect.new(8, 8, 9, 9)
+	else
+		s1 = "rbxasset://textures/ui/TopBar/HealthBarBase.png"
+		s2 = "rbxasset://textures/ui/TopBar/HealthBar.png"
+		rect = Rect.new(3, 3, 4, 4)
+
+		if TenFootInterface:IsEnabled() then
+			s1 = "rbxasset://textures/ui/TopBar/HealthBarBaseTV.png"
+			s2 = "rbxasset://textures/ui/TopBar/HealthBarTV.png"
+			rect = Rect.new(8, 8, 9, 9)
+		end
+	end
+
+	local function v66(p12) -- line: 249
+		-- upvalues: v21 (copy), FFlagTopBarSignalizeHealthBar (copy), p11 (copy), u59 (ref), FFlagTopBarSignalizeKeepOutAreas (copy), Constants (copy)
+		if not v21 then
+			if (FFlagTopBarSignalizeHealthBar and p11.healthVisible or not FFlagTopBarSignalizeHealthBar and u59) and p12 then
+				if FFlagTopBarSignalizeKeepOutAreas then
+					p11.keepOutAreasStore.setKeepOutArea(Constants.HealthBarKeepOutAreaId, p12.AbsolutePosition, p12.AbsoluteSize)
+
+					return
+				end
+
+				p11.props.setKeepOutArea(Constants.HealthBarKeepOutAreaId, p12.AbsolutePosition, p12.AbsoluteSize)
+
+				return
+			end
+
+			if FFlagTopBarSignalizeKeepOutAreas then
+				p11.keepOutAreasStore.removeKeepOutArea(Constants.HealthBarKeepOutAreaId)
+
+				return
+			end
+
+			p11.props.removeKeepOutArea(Constants.HealthBarKeepOutAreaId)
+		end
+	end
+
+	if p11.rootRef.current then
+		v66(p11.rootRef.current)
+	end
+
+	local v67 = if not FFlagTopBarSignalizeHealthBar then getHealthBarColor(n3) else p11.healthPercent:map(getHealthBarColor)
+
+	return Roact.createElement("Frame", {
+		AnchorPoint = if not v21 then nil else Vector2.new(1, 0),
+		Position = if not v21 then nil else UDim2.new(1, 0, 0, 0),
+		Visible = if not FFlagTopBarSignalizeHealthBar then u59 else p11.healthVisible,
+		BackgroundTransparency = 1,
+		Size = if not FFlagTopBarSignalizeScreenSize then UDim2.new(v61.X, UDim.new(1, 0)) else p11.healthbarSizeBinding:map(function(p13) -- line: 277
+			return UDim2.new(p13.X, UDim.new(1, 0))
+		end),
+		LayoutOrder = p11.props.layoutOrder,
+		[Roact.Change.AbsoluteSize] = v66,
+		[Roact.Change.AbsolutePosition] = v66,
+		[Roact.Ref] = p11.rootRef
+	}, {
+		Padding = not Enabled and Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, n4)
+		}) or nil,
+		HealthBar = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = s1,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = rect,
+			Size = if not FFlagTopBarSignalizeScreenSize then v61 else p11.healthbarSizeBinding,
+			Position = UDim2.fromScale(0, 0.5),
+			AnchorPoint = Vector2.new(0, 0.5)
+		}, {
+			Fill = Roact.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Image = s2,
+				ImageColor3 = v67,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = rect,
+				Size = if not FFlagTopBarSignalizeHealthBar then UDim2.fromScale(n3, 1) else p11.healthPercent:map(function(p14) -- line: 305
+					return UDim2.fromScale(p14, 1)
+				end)
+			})
+		})
+	})
+end
+function v26.render(p15) -- line: 313
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy)
+	if FFlagTopBarSignalizeHealthBar then
+		if p15.state.mountHealthBar then
+			return (p15:renderHealth())
+		end
+
+		return nil
+	end
+
+	return p15:renderHealth()
+end
+
+local function mapStateToProps(p16) -- line: 321
+	-- upvalues: FFlagTopBarSignalizeScreenSize (copy), FFlagTopBarSignalizeHealthBar (copy)
+	return {
+		screenSize = if not FFlagTopBarSignalizeScreenSize then p16.displayOptions.screenSize else nil,
+		health = if not FFlagTopBarSignalizeHealthBar then p16.health.currentHealth else nil,
+		maxHealth = if not FFlagTopBarSignalizeHealthBar then p16.health.maxHealth else nil,
+		healthEnabled = if not FFlagTopBarSignalizeHealthBar then p16.coreGuiEnabled[Enum.CoreGuiType.Health] else nil
+	}
+end
+local function mapDispatchToProps(p17) -- line: 330
+	-- upvalues: FFlagTopBarSignalizeKeepOutAreas (copy), SetKeepOutArea (copy), RemoveKeepOutArea (copy)
+	if FFlagTopBarSignalizeKeepOutAreas then
+		return {}
+	end
+
+	return {
+		setKeepOutArea = function(p18, p19, p20) -- line: 335
+			-- upvalues: p17 (copy), SetKeepOutArea (copy)
+			return p17(SetKeepOutArea(p18, p19, p20))
+		end,
+		removeKeepOutArea = function(p21) -- line: 338
+			-- upvalues: p17 (copy), RemoveKeepOutArea (copy)
+			return p17(RemoveKeepOutArea(p21))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, (if not FFlagTopBarSignalizeKeepOutAreas then mapDispatchToProps else nil))(v26)

@@ -1,5 +1,5 @@
 return {
-    PrivateServer = "PrivateServer", 
-    ReservedServer = "ReservedServer", 
-    StandardServer = "StandardServer"
-};
+	PrivateServer = "PrivateServer",
+	ReservedServer = "ReservedServer",
+	StandardServer = "StandardServer"
+}

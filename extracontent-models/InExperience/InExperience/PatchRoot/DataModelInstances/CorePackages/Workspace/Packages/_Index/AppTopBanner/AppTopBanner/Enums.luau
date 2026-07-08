@@ -1,3 +1,3 @@
 return {
-    AppTopBannerType = require(script.AppTopBannerType)
-};
+	AppTopBannerType = require(script.AppTopBannerType)
+}

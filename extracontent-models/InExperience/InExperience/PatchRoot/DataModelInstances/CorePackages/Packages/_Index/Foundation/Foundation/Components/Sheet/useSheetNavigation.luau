@@ -1,3 +1,4 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(script.Parent.SheetContext);
-return require(l_script_FirstAncestor_0.Utility.createUseModalNavigation)(v1);
+local Foundation = script:FindFirstAncestor("Foundation")
+local SheetContext = require(script.Parent.SheetContext)
+
+return require(Foundation.Utility.createUseModalNavigation)(SheetContext)

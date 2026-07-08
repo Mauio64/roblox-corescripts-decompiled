@@ -1,6 +1,7 @@
-local v0 = require(script.UpdateContactImporterModalLogic);
-local v1 = require(script.UpdateIsDiscoverabilityUnset);
+local UpdateContactImporterModalLogic = require(script.UpdateContactImporterModalLogic)
+local UpdateIsDiscoverabilityUnset = require(script.UpdateIsDiscoverabilityUnset)
+
 return {
-    UpdateContactImporterModalLogic = v0, 
-    UpdateIsDiscoverabilityUnset = v1
-};
+	UpdateContactImporterModalLogic = UpdateContactImporterModalLogic,
+	UpdateIsDiscoverabilityUnset = UpdateIsDiscoverabilityUnset
+}

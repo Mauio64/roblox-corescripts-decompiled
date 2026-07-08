@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MigrateAllOsaMessagingToCentralService", false);
+return game:DefineFastFlag("MigrateAllOsaMessagingToCentralService", false)

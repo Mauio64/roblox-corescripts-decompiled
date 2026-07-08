@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 5 ]]
-    return {
-        feedStoreKey = v1
-    };
-end);
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string) -- line: 9
+	return {
+		feedStoreKey = s1
+	}
+end)

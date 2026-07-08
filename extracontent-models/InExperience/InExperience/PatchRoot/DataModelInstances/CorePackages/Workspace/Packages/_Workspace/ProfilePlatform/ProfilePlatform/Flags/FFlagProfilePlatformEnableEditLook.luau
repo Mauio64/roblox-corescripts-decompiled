@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableEditLook", false);
+return game:DefineFastFlag("ProfilePlatformEnableEditLook", false)

@@ -1,54 +1,66 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_Parent_0.Constants);
-local function _() --[[ Line: 9 ]] --[[ Name: getLocalPlayerCharacter ]]
-    -- upvalues: l_Players_0 (copy)
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    if not l_LocalPlayer_0 then
-        return nil;
-    else
-        return l_LocalPlayer_0.Character;
-    end;
-end;
-return function(v5) --[[ Line: 18 ]]
-    -- upvalues: l_Players_0 (copy), v2 (copy)
-    local v6 = {};
-    local v7 = {};
-    if not v5 then
-        local l_LocalPlayer_1 = l_Players_0.LocalPlayer;
-        v5 = if not l_LocalPlayer_1 then nil else l_LocalPlayer_1.Character;
-    end;
-    if not v5 then
-        return v6;
-    else
-        local l_Humanoid_0 = v5:FindFirstChildOfClass("Humanoid");
-        if not l_Humanoid_0 then
-            return v6;
-        else
-            local l_HumanoidDescription_0 = l_Humanoid_0:FindFirstChildOfClass("HumanoidDescription");
-            if not l_HumanoidDescription_0 then
-                return v6;
-            else
-                for v11, v12 in v2.AssetTypeIdStringToHumanoidDescriptionProp do
-                    if v2.AssetTypeIdToAccessoryTypeEnum[v11] == nil then
-                        local v13 = l_HumanoidDescription_0[v12] or "";
-                        for _, v15 in string.split(v13) do
-                            local v16 = tonumber(v15);
-                            if v16 and v16 ~= 0 and not v7[v16] then
-                                v7[v16] = true;
-                                table.insert(v6, v16);
-                            end;
-                        end;
-                    end;
-                end;
-                for _, v18 in (l_HumanoidDescription_0:GetAccessories(true)) do
-                    if v18.AssetId and v18.AssetId ~= 0 and not v7[v18.AssetId] then
-                        v7[v18.AssetId] = true;
-                        table.insert(v6, v18.AssetId);
-                    end;
-                end;
-                return v6;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Players = game:GetService("Players")
+local Constants = require(ParentParent.Constants)
+
+local function getLocalPlayerCharacter() -- line: 9
+	-- upvalues: Players (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if not LocalPlayer then
+		return nil
+	end
+
+	return LocalPlayer.Character
+end
+
+return function(p1) -- line: 18
+	-- upvalues: Players (copy), Constants (copy)
+	local t1 = {}
+	local t2 = {}
+
+	if not p1 then
+		local LocalPlayer = Players.LocalPlayer
+
+		p1 = if LocalPlayer then LocalPlayer.Character else nil
+	end
+
+	if not p1 then
+		return t1
+	end
+
+	local Humanoid = p1:FindFirstChildOfClass("Humanoid")
+
+	if not Humanoid then
+		return t1
+	end
+
+	local HumanoidDescription = Humanoid:FindFirstChildOfClass("HumanoidDescription")
+
+	if not HumanoidDescription then
+		return t1
+	end
+
+	for v12, v13 in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[v12] == nil then
+			local v14 = HumanoidDescription[v13] or ""
+
+			for _, v16 in string.split(v14) do
+				local num = tonumber(v16)
+
+				if num and num ~= 0 and not t2[num] then
+					t2[num] = true
+					table.insert(t1, num)
+				end
+			end
+		end
+	end
+
+	for _, v19 in (HumanoidDescription:GetAccessories(true)) do
+		if v19.AssetId and v19.AssetId ~= 0 and not t2[v19.AssetId] then
+			t2[v19.AssetId] = true
+			table.insert(t1, v19.AssetId)
+		end
+	end
+
+	return t1
+end

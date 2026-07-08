@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFilterOutShopOnlyItemsOnBulkPurchase2", false);
+return game:DefineFastFlag("AXFilterOutShopOnlyItemsOnBulkPurchase2", false)

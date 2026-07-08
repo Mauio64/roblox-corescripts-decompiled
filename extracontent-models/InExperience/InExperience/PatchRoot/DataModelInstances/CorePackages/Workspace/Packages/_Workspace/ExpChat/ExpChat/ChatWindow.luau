@@ -1,1 +1,1 @@
-return require(script.ChatWindowApp);
+return require(script.ChatWindowApp)

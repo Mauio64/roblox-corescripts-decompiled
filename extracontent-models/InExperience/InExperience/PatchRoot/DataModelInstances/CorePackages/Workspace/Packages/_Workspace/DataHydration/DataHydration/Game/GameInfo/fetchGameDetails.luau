@@ -1,15 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.Http);
-local v2 = require(l_Parent_0.HttpRequest);
-local l_Url_0 = v1.Url;
-return function(v4) --[[ Line: 11 ]] --[[ Name: requestGameDetails ]]
-    -- upvalues: l_Url_0 (copy), v2 (copy)
-    local v5 = table.concat(v4, ",");
-    local v6 = string.format("%sv1/games?universeIds=%s", l_Url_0.GAME_URL, v5);
-    return v2.config({
-        requestFunction = function(v7, v8, v9) --[[ Line: 17 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v2 (ref)
-            return v2.requestFunctions.HttpRbxApi(v7, v8, v9);
-        end
-    })(v6, "GET");
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local Http = require(Parent.Http)
+local HttpRequest = require(Parent.HttpRequest)
+local Url = Http.Url
+
+local function requestGameDetails(t1: {[any]: any}) -- line: 11
+	-- upvalues: Url (copy), HttpRequest (copy)
+	local v7 = table.concat(t1, ",")
+	local v8 = string.format("%sv1/games?universeIds=%s", Url.GAME_URL, v7)
+
+	return HttpRequest.config({
+		requestFunction = function(s1: string, s2: string, p1) -- line: 17
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.HttpRbxApi(s1, s2, p1)
+		end
+	})(v8, "GET")
+end
+
+return requestGameDetails

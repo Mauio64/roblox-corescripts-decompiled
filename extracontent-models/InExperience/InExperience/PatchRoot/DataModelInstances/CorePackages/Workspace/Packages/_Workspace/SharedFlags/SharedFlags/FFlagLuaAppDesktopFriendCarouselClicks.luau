@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppDesktopFriendCarouselClicks", false);
+return game:DefineFastFlag("LuaAppDesktopFriendCarouselClicks", false)

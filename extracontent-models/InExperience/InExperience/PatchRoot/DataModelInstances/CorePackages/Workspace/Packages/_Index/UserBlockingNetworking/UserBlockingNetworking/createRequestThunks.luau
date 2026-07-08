@@ -1,14 +1,15 @@
-local l_networkRequests_0 = script.Parent.networkRequests;
-local v1 = require(l_networkRequests_0.createGetBlockedUsers);
-local v2 = require(l_networkRequests_0.createBlockUserById);
-local v3 = require(l_networkRequests_0.createUnblockUserById);
-local v4 = require(l_networkRequests_0.createIsBlockedById);
-return function(v5) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy)
-    return {
-        GetBlockedUsers = v1(v5), 
-        BlockUserById = v2(v5), 
-        UnblockUserById = v3(v5), 
-        IsBlockedById = v4(v5)
-    };
-end;
+local networkRequests = script.Parent.networkRequests
+local createGetBlockedUsers = require(networkRequests.createGetBlockedUsers)
+local createBlockUserById = require(networkRequests.createBlockUserById)
+local createUnblockUserById = require(networkRequests.createUnblockUserById)
+local createIsBlockedById = require(networkRequests.createIsBlockedById)
+
+return function(t1: {[any]: any}) -- line: 8
+	-- upvalues: createGetBlockedUsers (copy), createBlockUserById (copy), createUnblockUserById (copy), createIsBlockedById (copy)
+	return {
+		GetBlockedUsers = createGetBlockedUsers(t1),
+		BlockUserById = createBlockUserById(t1),
+		UnblockUserById = createUnblockUserById(t1),
+		IsBlockedById = createIsBlockedById(t1)
+	}
+end

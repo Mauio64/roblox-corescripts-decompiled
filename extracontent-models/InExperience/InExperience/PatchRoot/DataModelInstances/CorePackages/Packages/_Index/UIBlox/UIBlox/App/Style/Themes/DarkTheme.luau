@@ -1,176 +1,177 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Colors);
+local ParentParent = script.Parent.Parent
+local Colors = require(ParentParent.Colors)
+
 return {
-    BackgroundDefault = {
-        Color = v1.Slate, 
-        Transparency = 0
-    }, 
-    BackgroundContrast = {
-        Color = v1.Carbon, 
-        Transparency = 0
-    }, 
-    BackgroundMuted = {
-        Color = v1.Obsidian, 
-        Transparency = 0
-    }, 
-    BackgroundUIDefault = {
-        Color = v1.Flint, 
-        Transparency = 0
-    }, 
-    BackgroundUIContrast = {
-        Color = v1.Black, 
-        Transparency = 0.3
-    }, 
-    BackgroundOnHover = {
-        Color = v1.White, 
-        Transparency = 0.9
-    }, 
-    BackgroundOnPress = {
-        Color = v1.Black, 
-        Transparency = 0.7
-    }, 
-    UIDefault = {
-        Color = v1.Graphite, 
-        Transparency = 0
-    }, 
-    UIMuted = {
-        Color = v1.Obsidian, 
-        Transparency = 0.2
-    }, 
-    UIEmphasis = {
-        Color = v1.White, 
-        Transparency = 0.7
-    }, 
-    ContextualPrimaryDefault = {
-        Color = v1.Green, 
-        Transparency = 0
-    }, 
-    ContextualPrimaryOnHover = {
-        Color = v1.Green, 
-        Transparency = 0
-    }, 
-    ContextualPrimaryContent = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    SystemPrimaryDefault = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    SystemPrimaryOnHover = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    SystemPrimaryContent = {
-        Color = v1.Flint, 
-        Transparency = 0
-    }, 
-    SecondaryDefault = {
-        Color = v1.White, 
-        Transparency = 0.3
-    }, 
-    SecondaryOnHover = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    SecondaryContent = {
-        Color = v1.White, 
-        Transparency = 0.3
-    }, 
-    IconDefault = {
-        Color = v1.White, 
-        Transparency = 0.3
-    }, 
-    IconEmphasis = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    IconOnHover = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    TextEmphasis = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    TextDefault = {
-        Color = v1.Pumice, 
-        Transparency = 0
-    }, 
-    TextMuted = {
-        Color = v1.White, 
-        Transparency = 0.3
-    }, 
-    TextLink = {
-        Color = v1.Blue, 
-        Transparency = 0
-    }, 
-    Divider = {
-        Color = v1.White, 
-        Transparency = 0.8
-    }, 
-    Overlay = {
-        Color = v1.Black, 
-        Transparency = 0.5
-    }, 
-    DropShadow = {
-        Color = v1.Black, 
-        Transparency = 0.5
-    }, 
-    NavigationBar = {
-        Color = v1.Carbon, 
-        Transparency = 0
-    }, 
-    PlaceHolder = {
-        Color = v1.Flint, 
-        Transparency = 0.5
-    }, 
-    OnlineStatus = {
-        Color = v1.Green, 
-        Transparency = 0
-    }, 
-    OfflineStatus = {
-        Color = v1.White, 
-        Transparency = 0.3
-    }, 
-    Success = {
-        Color = v1.Green, 
-        Transparency = 0
-    }, 
-    Alert = {
-        Color = v1.Red, 
-        Transparency = 0
-    }, 
-    Badge = {
-        Color = v1.White, 
-        Transparency = 0
-    }, 
-    BadgeContent = {
-        Color = v1.Flint, 
-        Transparency = 0
-    }, 
-    SelectionCursor = {
-        Color = v1.White, 
-        Transparency = 0, 
-        AnimatedColor = v1.White, 
-        GradientRotationSpeed = 2, 
-        GradientColorSequence = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)), 
-            ColorSequenceKeypoint.new(1, Color3.new(0.336, 0.336, 0.336))
-        }), 
-        GradientTransparencySequence = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 0), 
-            NumberSequenceKeypoint.new(1, 0)
-        })
-    }, 
-    PlayerBackgroundDefault = {
-        Color = v1.White, 
-        Transparency = 0, 
-        Image = "component_assets/avatarBG_dark"
-    }, 
-    ItemBackgroundDefault = {
-        Color = v1.Black, 
-        Transparency = 0, 
-        Image = "component_assets/itemBG_dark"
-    }
-};
+	BackgroundDefault = {
+		Transparency = 0,
+		Color = Colors.Slate
+	},
+	BackgroundContrast = {
+		Transparency = 0,
+		Color = Colors.Carbon
+	},
+	BackgroundMuted = {
+		Transparency = 0,
+		Color = Colors.Obsidian
+	},
+	BackgroundUIDefault = {
+		Transparency = 0,
+		Color = Colors.Flint
+	},
+	BackgroundUIContrast = {
+		Transparency = 0.3,
+		Color = Colors.Black
+	},
+	BackgroundOnHover = {
+		Transparency = 0.9,
+		Color = Colors.White
+	},
+	BackgroundOnPress = {
+		Transparency = 0.7,
+		Color = Colors.Black
+	},
+	UIDefault = {
+		Transparency = 0,
+		Color = Colors.Graphite
+	},
+	UIMuted = {
+		Transparency = 0.2,
+		Color = Colors.Obsidian
+	},
+	UIEmphasis = {
+		Transparency = 0.7,
+		Color = Colors.White
+	},
+	ContextualPrimaryDefault = {
+		Transparency = 0,
+		Color = Colors.Green
+	},
+	ContextualPrimaryOnHover = {
+		Transparency = 0,
+		Color = Colors.Green
+	},
+	ContextualPrimaryContent = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	SystemPrimaryDefault = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	SystemPrimaryOnHover = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	SystemPrimaryContent = {
+		Transparency = 0,
+		Color = Colors.Flint
+	},
+	SecondaryDefault = {
+		Transparency = 0.3,
+		Color = Colors.White
+	},
+	SecondaryOnHover = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	SecondaryContent = {
+		Transparency = 0.3,
+		Color = Colors.White
+	},
+	IconDefault = {
+		Transparency = 0.3,
+		Color = Colors.White
+	},
+	IconEmphasis = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	IconOnHover = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	TextEmphasis = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	TextDefault = {
+		Transparency = 0,
+		Color = Colors.Pumice
+	},
+	TextMuted = {
+		Transparency = 0.3,
+		Color = Colors.White
+	},
+	TextLink = {
+		Transparency = 0,
+		Color = Colors.Blue
+	},
+	Divider = {
+		Transparency = 0.8,
+		Color = Colors.White
+	},
+	Overlay = {
+		Transparency = 0.5,
+		Color = Colors.Black
+	},
+	DropShadow = {
+		Transparency = 0.5,
+		Color = Colors.Black
+	},
+	NavigationBar = {
+		Transparency = 0,
+		Color = Colors.Carbon
+	},
+	PlaceHolder = {
+		Transparency = 0.5,
+		Color = Colors.Flint
+	},
+	OnlineStatus = {
+		Transparency = 0,
+		Color = Colors.Green
+	},
+	OfflineStatus = {
+		Transparency = 0.3,
+		Color = Colors.White
+	},
+	Success = {
+		Transparency = 0,
+		Color = Colors.Green
+	},
+	Alert = {
+		Transparency = 0,
+		Color = Colors.Red
+	},
+	Badge = {
+		Transparency = 0,
+		Color = Colors.White
+	},
+	BadgeContent = {
+		Transparency = 0,
+		Color = Colors.Flint
+	},
+	SelectionCursor = {
+		Transparency = 0,
+		GradientRotationSpeed = 2,
+		Color = Colors.White,
+		AnimatedColor = Colors.White,
+		GradientColorSequence = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+			ColorSequenceKeypoint.new(1, Color3.new(0.336, 0.336, 0.336))
+		}),
+		GradientTransparencySequence = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0),
+			NumberSequenceKeypoint.new(1, 0)
+		})
+	},
+	PlayerBackgroundDefault = {
+		Transparency = 0,
+		Image = "component_assets/avatarBG_dark",
+		Color = Colors.White
+	},
+	ItemBackgroundDefault = {
+		Transparency = 0,
+		Image = "component_assets/itemBG_dark",
+		Color = Colors.Black
+	}
+}

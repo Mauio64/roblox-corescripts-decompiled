@@ -1,878 +1,996 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Url_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).Url;
-local l_Players_0 = game:GetService("Players");
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-local v8 = require(l_RobloxGui_0.Modules.Settings.Utility);
-local v9 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local v10 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_game_EngineFeature_0 = game:GetEngineFeature("UgcLocaleFromGameJoinEnabled");
-return function(v12, v13, v14) --[[ Line: 23 ]]
-    -- upvalues: l_Players_0 (copy), l_Url_0 (copy), l_HttpService_0 (copy), v8 (copy), v10 (copy), v9 (copy), l_game_EngineFeature_0 (copy), l_LocalPlayer_0 (copy), l_RunService_0 (copy)
-    local v15 = 1;
-    local v16 = 1;
-    local v17 = false;
-    local v18 = nil;
-    local v19 = l_Players_0.LocalPlayer.LocaleId:gsub("-", "_");
-    local v20 = nil;
-    local v21 = {};
-    local v22 = {};
-    local v23 = {};
-    local v24 = {};
-    local v25 = {
-        sq = "sq_al", 
-        ar = "ar_001", 
-        bn = "bn_bd", 
-        nb = "nb_no", 
-        bs = "bs_ba", 
-        bg = "bg_bg", 
-        my = "my_mm", 
-        ["zh-hans"] = "zh_cn", 
-        ["zh-hant"] = "zh_tw", 
-        hr = "hr_hr", 
-        cs = "cs_cz", 
-        da = "da_dk", 
-        nl = "nl_nl", 
-        en = "en_us", 
-        et = "et_ee", 
-        fil = "fil_ph", 
-        fi = "fi_fi", 
-        fr = "fr_fr", 
-        ka = "ka_ge", 
-        de = "de_de", 
-        el = "el_gr", 
-        hi = "hi_in", 
-        hu = "hu_hu", 
-        id = "id_id", 
-        it = "it_it", 
-        ja = "ja_jp", 
-        kk = "kk_kz", 
-        km = "km_kh", 
-        ko = "ko_kr", 
-        lv = "lv_lv", 
-        lt = "lt_lt", 
-        ms = "ms_my", 
-        pl = "pl_pl", 
-        pt = "pt_br", 
-        ro = "ro_ro", 
-        ru = "ru_ru", 
-        sr = "sr_rs", 
-        si = "si_lk", 
-        sk = "sk_sk", 
-        sl = "sl_sl", 
-        es = "es_es", 
-        sv = "sv_se", 
-        th = "th_th", 
-        tr = "tr_tr", 
-        uk = "uk_ua", 
-        vi = "vi_vn"
-    };
-    local v26 = {};
-    local v27 = {};
-    local v28 = l_Url_0.LOCALE_URL .. string.format("v1/locales?displayValueLocale=%s", l_Players_0.LocalPlayer.LocaleId:gsub("-", "_"));
-    local v29 = l_HttpService_0:RequestInternal({
-        Url = v28, 
-        Method = "GET"
-    });
-    local v30 = l_Url_0.GAME_INTERNATIONALIZATION_URL .. string.format("v1/source-language/games/%d", game.GameId);
-    local v31 = l_HttpService_0:RequestInternal({
-        Url = v30, 
-        Method = "GET"
-    });
-    local v32 = l_Url_0.GAME_INTERNATIONALIZATION_URL .. string.format("v1/supported-languages/games/%d/in-experience-language-selection", game.GameId);
-    local v33 = l_HttpService_0:RequestInternal({
-        Url = v32, 
-        Method = "GET"
-    });
-    local v34 = l_Url_0.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId);
-    local v35 = l_HttpService_0:RequestInternal({
-        Url = v34, 
-        Method = "GET"
-    });
-    local function _(v36, v37) --[[ Line: 135 ]] --[[ Name: tryGetErrorMessage ]]
-        local v38 = nil;
-        if not v36 or not v37 or not v37.StatusCode then
-            return "Connection error";
-        elseif v37.StatusCode == 401 then
-            return "Unauthorized";
-        else
-            if v37.StatusCode < 200 or v37.StatusCode >= 400 then
-                v38 = v37.StatusCode;
-            end;
-            return v38;
-        end;
-    end;
-    local function v46() --[[ Line: 148 ]] --[[ Name: createSessionDormantLanguageSwitcherRow ]]
-        -- upvalues: v12 (copy), v8 (ref), v10 (ref), v13 (copy)
-        local l_v12_0 = v12;
-        local l_v12_1 = v12;
-        local l_v12_2 = v12;
-        local v43, v44, v45 = v8:AddNewRow(v12, v10:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", {
-            v10:FormatByKey("Feature.SettingsHub.LanguageSelection.Unavailable")
-        }, 1);
-        l_v12_0.LanguageSelectorFrame = v43;
-        l_v12_1.LanguageSelectorLabel = v44;
-        l_v12_2.LanguageSelectorMode = v45;
-        v12.LanguageSelectorMode:SetInteractable(false);
-        v12.LanguageSelectorFrame.LayoutOrder = v13.LanguageSelectorFrame;
-    end;
-    local function v79(v47, v48) --[[ Line: 164 ]] --[[ Name: userExperienceLanguageSettingsCallback ]]
-        -- upvalues: v9 (ref), v46 (copy), v22 (copy), v20 (ref), v18 (ref), v27 (copy), v23 (copy), v21 (copy), v15 (ref), v16 (ref), v12 (copy), v8 (ref), v10 (ref), v13 (copy), l_game_EngineFeature_0 (ref), l_LocalPlayer_0 (ref), v14 (copy), l_Url_0 (ref), l_HttpService_0 (ref), v17 (ref), l_RunService_0 (ref)
-        if not v47 then
-            if v48 == nil then
-                v48 = "Execution path did not set earliest error to non-nil value.";
-            end;
-            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v48);
-            v46();
-            return;
-        else
-            local v49 = false;
-            for _, v51 in v22 do
-                if v51 == v20 then
-                    v49 = true;
-                end;
-                if v51 ~= v18 then
-                    table.insert(v27, v23[v51].localeName);
-                end;
-            end;
-            table.sort(v27);
-            local v52 = true;
-            if v18 == nil or v23[v18].localeName == nil then
-                v52 = false;
-            end;
-            if not v52 then
-                v46();
-                return;
-            else
-                table.insert(v27, 1, v23[v18].localeName .. " (Original)");
-                if v49 == true then
-                    for v53, v54 in v27 do
-                        if v53 ~= 1 and v21[v54] == v20 then
-                            v15 = v53;
-                            v16 = v53;
-                        end;
-                    end;
-                end;
-                local l_v12_3 = v12;
-                local l_v12_4 = v12;
-                local l_v12_5 = v12;
-                local v58, v59, v60 = v8:AddNewRow(v12, v10:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", v27, v15);
-                l_v12_3.LanguageSelectorFrame = v58;
-                l_v12_4.LanguageSelectorLabel = v59;
-                l_v12_5.LanguageSelectorMode = v60;
-                v12.LanguageSelectorFrame.LayoutOrder = v13.LanguageSelectorFrame;
-                if not l_game_EngineFeature_0 then
-                    if v15 == 1 then
-                        l_LocalPlayer_0:SetExperienceSettingsLocaleId(v18);
-                    else
-                        l_v12_3 = v21[v27[v15]];
-                        l_LocalPlayer_0:SetExperienceSettingsLocaleId(l_v12_3);
-                    end;
-                end;
-                v12.LanguageSelectorMode.CurrentLocale = v12.LanguageSelectorMode.DropDownFrame.DropDownFrameTextLabel.Text;
-                l_v12_3 = function(v61) --[[ Line: 252 ]] --[[ Name: toggleTranslation ]]
-                    -- upvalues: v12 (ref), v23 (ref), v18 (ref), v21 (ref), v27 (ref), v14 (ref), l_Url_0 (ref), l_HttpService_0 (ref), v16 (ref), l_LocalPlayer_0 (ref), v9 (ref), v17 (ref), l_RunService_0 (ref)
-                    v12.LanguageSelectorMode:SetInteractable(false);
-                    local v62 = nil;
-                    v62 = if v61 == 1 and v23[v18] ~= nil then v23[v18].localeId else v23[v21[v27[v61]]].localeId;
-                    local l_CurrentLocale_0 = v12.LanguageSelectorMode.CurrentLocale;
-                    local v64 = v27[v61];
-                    if l_CurrentLocale_0 ~= v64 then
-                        v12.LanguageSelectorMode.CurrentLocale = v64;
-                        v14("experience_locale", l_CurrentLocale_0, v64);
-                    end;
-                    local v65 = {
-                        settingValue = {
-                            settingType = "SupportedLocale", 
-                            settingTargetId = v62
-                        }
-                    };
-                    local v66 = l_Url_0.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId);
-                    local v67 = l_HttpService_0:RequestInternal({
-                        Url = v66, 
-                        Method = "POST", 
-                        Headers = {
-                            ["Content-Type"] = "application/json"
-                        }, 
-                        Body = l_HttpService_0:JSONEncode(v65)
-                    });
-                    local function v71(v68, v69) --[[ Line: 301 ]] --[[ Name: userExperienceLanguageSettingsUpdateCallback ]]
-                        -- upvalues: v16 (ref), v61 (copy), l_LocalPlayer_0 (ref), v18 (ref), v21 (ref), v27 (ref), v9 (ref), v17 (ref), v12 (ref)
-                        if v68 then
-                            v16 = v61;
-                            if v61 == 1 then
-                                l_LocalPlayer_0:SetExperienceSettingsLocaleId(v18);
-                            else
-                                local v70 = v21[v27[v61]];
-                                l_LocalPlayer_0:SetExperienceSettingsLocaleId(v70);
-                            end;
-                        else
-                            v9:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. v69);
-                            v17 = true;
-                            v12.LanguageSelectorMode:SetSelectionIndex(v16);
-                        end;
-                        v12.LanguageSelectorMode:SetInteractable(true);
-                    end;
-                    if l_RunService_0:IsStudio() then
-                        v16 = v61;
-                        if v61 == 1 then
-                            l_LocalPlayer_0:SetExperienceSettingsLocaleId(v18);
-                        else
-                            local v72 = v21[v27[v61]];
-                            l_LocalPlayer_0:SetExperienceSettingsLocaleId(v72);
-                        end;
-                        v12.LanguageSelectorMode:SetInteractable(true);
-                        return;
-                    elseif v17 then
-                        v17 = false;
-                        v16 = v61;
-                        if v61 == 1 then
-                            l_LocalPlayer_0:SetExperienceSettingsLocaleId(v18);
-                        else
-                            local v73 = v21[v27[v61]];
-                            l_LocalPlayer_0:SetExperienceSettingsLocaleId(v73);
-                        end;
-                        v12.LanguageSelectorMode:SetInteractable(true);
-                        return;
-                    elseif v62 == nil then
-                        v9:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. nil);
-                        v17 = true;
-                        v12.LanguageSelectorMode:SetSelectionIndex(v16);
-                        v12.LanguageSelectorMode:SetInteractable(true);
-                        return;
-                    else
-                        v67:Start(function(v74, v75) --[[ Line: 345 ]]
-                            -- upvalues: v9 (ref), v66 (copy), v71 (copy)
-                            local v76 = false;
-                            local v77 = nil;
-                            local v78 = nil;
-                            if not v74 or not v75 or not v75.StatusCode then
-                                v78 = "Connection error";
-                            elseif v75.StatusCode == 401 then
-                                v78 = "Unauthorized";
-                            elseif v75.StatusCode < 200 or v75.StatusCode >= 400 then
-                                v78 = v75.StatusCode;
-                            end;
-                            v77 = v78;
-                            if v77 ~= nil then
-                                v77 = "User Experience Language Settings Update Request: " .. v77;
-                                v9:warning("GameSettings language selector toggle: Failed to update user experience language status from GameInternationalization API for " .. v66 .. " with error message: " .. v77);
-                            else
-                                v9:info("User Experience Language Settings Update Request: " .. "Succeeded with code - " .. v75.StatusCode);
-                                v76 = true;
-                            end;
-                            v71(v76, v77);
-                        end);
-                        return;
-                    end;
-                end;
-                v12.LanguageSelectorMode.IndexChanged:connect(l_v12_3);
-                return;
-            end;
-        end;
-    end;
-    local function _(v80, v81) --[[ Line: 374 ]] --[[ Name: experienceSourceLanguageCallback ]]
-        -- upvalues: v35 (copy), l_HttpService_0 (ref), v20 (ref), v19 (copy), v18 (ref), v26 (copy), v24 (copy), v9 (ref), v34 (copy), v79 (copy), v46 (copy)
-        if v80 then
-            v35:Start(function(v82, v83) --[[ Line: 376 ]]
-                -- upvalues: l_HttpService_0 (ref), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref), v9 (ref), v34 (ref), v79 (ref)
-                local v84 = false;
-                local v85 = nil;
-                local v86 = nil;
-                if not v82 or not v83 or not v83.StatusCode then
-                    v86 = "Connection error";
-                elseif v83.StatusCode == 401 then
-                    v86 = "Unauthorized";
-                elseif v83.StatusCode < 200 or v83.StatusCode >= 400 then
-                    v86 = v83.StatusCode;
-                end;
-                v85 = v86;
-                if v85 ~= nil then
-                    v85 = "User Experience Language Setting Get Request: " .. v85;
-                else
-                    local v87;
-                    v86, v87 = pcall(function() --[[ Line: 385 ]]
-                        -- upvalues: l_HttpService_0 (ref), v83 (copy), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref)
-                        local l_userUniverseLocalizationSettingValue_0 = l_HttpService_0:JSONDecode(v83.Body).userUniverseLocalizationSettingValue;
-                        if l_userUniverseLocalizationSettingValue_0 == nil then
-                            v20 = v19;
-                            return;
-                        else
-                            local l_settingTargetId_0 = l_userUniverseLocalizationSettingValue_0.settingTargetId;
-                            local l_settingType_0 = l_userUniverseLocalizationSettingValue_0.settingType;
-                            if l_settingTargetId_0 == nil then
-                                v20 = v19;
-                            end;
-                            if l_settingType_0 == "SourceOrTranslation" then
-                                if l_settingTargetId_0 == 1 then
-                                    v20 = v18;
-                                    return;
-                                else
-                                    v20 = v19;
-                                    return;
-                                end;
-                            elseif l_settingType_0 == "LanguageFamily" then
-                                if v26[l_settingTargetId_0] == nil then
-                                    v20 = v19;
-                                    return;
-                                else
-                                    v20 = v24[v26[l_settingTargetId_0]];
-                                    return;
-                                end;
-                            else
-                                if l_settingType_0 == "SupportedLocale" then
-                                    if v24[l_settingTargetId_0] == nil then
-                                        v20 = v19;
-                                        return;
-                                    else
-                                        v20 = v24[l_settingTargetId_0];
-                                    end;
-                                end;
-                                return;
-                            end;
-                        end;
-                    end);
-                    v84 = v86;
-                    v85 = v87;
-                end;
-                if not v84 then
-                    v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v34 .. " with error message: " .. v85);
-                end;
-                v79(v84, v85);
-            end);
-            return;
-        else
-            local l_v81_0 = v81;
-            if l_v81_0 == nil then
-                l_v81_0 = "Execution path did not set earliest error to non-nil value.";
-            end;
-            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_v81_0);
-            v46();
-            return;
-        end;
-    end;
-    local function _(v93, v94) --[[ Line: 451 ]] --[[ Name: experienceSupportedLanguagesCallback ]]
-        -- upvalues: v31 (copy), l_HttpService_0 (ref), v18 (ref), v25 (copy), v9 (ref), v30 (copy), v35 (copy), v20 (ref), v19 (copy), v26 (copy), v24 (copy), v34 (copy), v79 (copy), v46 (copy)
-        if v93 then
-            v31:Start(function(v95, v96) --[[ Line: 453 ]]
-                -- upvalues: l_HttpService_0 (ref), v18 (ref), v25 (ref), v9 (ref), v30 (ref), v94 (ref), v93 (copy), v35 (ref), v20 (ref), v19 (ref), v26 (ref), v24 (ref), v34 (ref), v79 (ref), v46 (ref)
-                local v97 = false;
-                local v98 = nil;
-                local v99 = nil;
-                if not v95 or not v96 or not v96.StatusCode then
-                    v99 = "Connection error";
-                elseif v96.StatusCode == 401 then
-                    v99 = "Unauthorized";
-                elseif v96.StatusCode < 200 or v96.StatusCode >= 400 then
-                    v99 = v96.StatusCode;
-                end;
-                v98 = v99;
-                if v98 ~= nil then
-                    v98 = "Experience Source Language Request: " .. v98;
-                else
-                    local v100;
-                    v99, v100 = pcall(function() --[[ Line: 462 ]]
-                        -- upvalues: l_HttpService_0 (ref), v96 (copy), v18 (ref), v25 (ref)
-                        v18 = v25[l_HttpService_0:JSONDecode(v96.Body).languageCode];
-                    end);
-                    v97 = v99;
-                    v98 = v100;
-                end;
-                if not v97 then
-                    v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v30 .. " with error message: " .. v98);
-                end;
-                if v94 == nil then
-                    v94 = v98;
-                end;
-                v99 = v97 and v93;
-                local l_v94_0 = v94;
-                if v99 then
-                    v35:Start(function(v102, v103) --[[ Line: 376 ]]
-                        -- upvalues: l_HttpService_0 (ref), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref), v9 (ref), v34 (ref), v79 (ref)
-                        local v104 = false;
-                        local v105 = nil;
-                        local v106 = nil;
-                        if not v102 or not v103 or not v103.StatusCode then
-                            v106 = "Connection error";
-                        elseif v103.StatusCode == 401 then
-                            v106 = "Unauthorized";
-                        elseif v103.StatusCode < 200 or v103.StatusCode >= 400 then
-                            v106 = v103.StatusCode;
-                        end;
-                        v105 = v106;
-                        if v105 ~= nil then
-                            v105 = "User Experience Language Setting Get Request: " .. v105;
-                        else
-                            local v107;
-                            v106, v107 = pcall(function() --[[ Line: 385 ]]
-                                -- upvalues: l_HttpService_0 (ref), v103 (copy), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref)
-                                local l_userUniverseLocalizationSettingValue_1 = l_HttpService_0:JSONDecode(v103.Body).userUniverseLocalizationSettingValue;
-                                if l_userUniverseLocalizationSettingValue_1 == nil then
-                                    v20 = v19;
-                                    return;
-                                else
-                                    local l_settingTargetId_1 = l_userUniverseLocalizationSettingValue_1.settingTargetId;
-                                    local l_settingType_1 = l_userUniverseLocalizationSettingValue_1.settingType;
-                                    if l_settingTargetId_1 == nil then
-                                        v20 = v19;
-                                    end;
-                                    if l_settingType_1 == "SourceOrTranslation" then
-                                        if l_settingTargetId_1 == 1 then
-                                            v20 = v18;
-                                            return;
-                                        else
-                                            v20 = v19;
-                                            return;
-                                        end;
-                                    elseif l_settingType_1 == "LanguageFamily" then
-                                        if v26[l_settingTargetId_1] == nil then
-                                            v20 = v19;
-                                            return;
-                                        else
-                                            v20 = v24[v26[l_settingTargetId_1]];
-                                            return;
-                                        end;
-                                    else
-                                        if l_settingType_1 == "SupportedLocale" then
-                                            if v24[l_settingTargetId_1] == nil then
-                                                v20 = v19;
-                                                return;
-                                            else
-                                                v20 = v24[l_settingTargetId_1];
-                                            end;
-                                        end;
-                                        return;
-                                    end;
-                                end;
-                            end);
-                            v104 = v106;
-                            v105 = v107;
-                        end;
-                        if not v104 then
-                            v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v34 .. " with error message: " .. v105);
-                        end;
-                        v79(v104, v105);
-                    end);
-                    return;
-                else
-                    local l_l_v94_0_0 = l_v94_0;
-                    if l_l_v94_0_0 == nil then
-                        l_l_v94_0_0 = "Execution path did not set earliest error to non-nil value.";
-                    end;
-                    v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_v94_0_0);
-                    v46();
-                    return;
-                end;
-            end);
-        else
-            local l_v94_1 = v94;
-            if l_v94_1 == nil then
-                l_v94_1 = "Execution path did not set earliest error to non-nil value.";
-            end;
-            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_v94_1);
-            v46();
-        end;
-    end;
-    local _ = function(v114, v115) --[[ Line: 493 ]] --[[ Name: localeInformationCallback ]]
-        -- upvalues: v33 (copy), l_HttpService_0 (ref), v23 (copy), v22 (copy), v9 (ref), v32 (copy), v31 (copy), v18 (ref), v25 (copy), v30 (copy), v35 (copy), v20 (ref), v19 (copy), v26 (copy), v24 (copy), v34 (copy), v79 (copy), v46 (copy)
-        if v114 then
-            v33:Start(function(v116, v117) --[[ Line: 495 ]]
-                -- upvalues: l_HttpService_0 (ref), v23 (ref), v22 (ref), v9 (ref), v32 (ref), v115 (ref), v114 (copy), v31 (ref), v18 (ref), v25 (ref), v30 (ref), v35 (ref), v20 (ref), v19 (ref), v26 (ref), v24 (ref), v34 (ref), v79 (ref), v46 (ref)
-                local v118 = false;
-                local v119 = nil;
-                local v120 = nil;
-                if not v116 or not v117 or not v117.StatusCode then
-                    v120 = "Connection error";
-                elseif v117.StatusCode == 401 then
-                    v120 = "Unauthorized";
-                elseif v117.StatusCode < 200 or v117.StatusCode >= 400 then
-                    v120 = v117.StatusCode;
-                end;
-                v119 = v120;
-                if v119 ~= nil then
-                    v119 = "Experience Supported Language Language Request: " .. v119;
-                else
-                    local v121;
-                    v120, v121 = pcall(function() --[[ Line: 503 ]]
-                        -- upvalues: l_HttpService_0 (ref), v117 (copy), v23 (ref), v22 (ref)
-                        local v122 = l_HttpService_0:JSONDecode(v117.Body);
-                        local v123 = {};
-                        for v124, v125 in pairs(v122.data) do
-                            v123[v124] = v125.languageCode;
-                        end;
-                        for _, v127 in v123 do
-                            for v128, v129 in v23 do
-                                if v129.languageCode == v127 then
-                                    table.insert(v22, v128);
-                                end;
-                            end;
-                        end;
-                    end);
-                    v118 = v120;
-                    v119 = v121;
-                end;
-                if not v118 then
-                    v9:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v32 .. " with error message: " .. v119);
-                end;
-                if v115 == nil then
-                    v115 = v119;
-                end;
-                v120 = v118 and v114;
-                local l_v115_0 = v115;
-                if v120 then
-                    v31:Start(function(v131, v132) --[[ Line: 453 ]]
-                        -- upvalues: l_HttpService_0 (ref), v18 (ref), v25 (ref), v9 (ref), v30 (ref), l_v115_0 (ref), v120 (copy), v35 (ref), v20 (ref), v19 (ref), v26 (ref), v24 (ref), v34 (ref), v79 (ref), v46 (ref)
-                        local v133 = false;
-                        local v134 = nil;
-                        local v135 = nil;
-                        if not v131 or not v132 or not v132.StatusCode then
-                            v135 = "Connection error";
-                        elseif v132.StatusCode == 401 then
-                            v135 = "Unauthorized";
-                        elseif v132.StatusCode < 200 or v132.StatusCode >= 400 then
-                            v135 = v132.StatusCode;
-                        end;
-                        v134 = v135;
-                        if v134 ~= nil then
-                            v134 = "Experience Source Language Request: " .. v134;
-                        else
-                            local v136;
-                            v135, v136 = pcall(function() --[[ Line: 462 ]]
-                                -- upvalues: l_HttpService_0 (ref), v132 (copy), v18 (ref), v25 (ref)
-                                v18 = v25[l_HttpService_0:JSONDecode(v132.Body).languageCode];
-                            end);
-                            v133 = v135;
-                            v134 = v136;
-                        end;
-                        if not v133 then
-                            v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v30 .. " with error message: " .. v134);
-                        end;
-                        if l_v115_0 == nil then
-                            l_v115_0 = v134;
-                        end;
-                        v135 = v133 and v120;
-                        local l_l_v115_0_0 = l_v115_0;
-                        if v135 then
-                            v35:Start(function(v138, v139) --[[ Line: 376 ]]
-                                -- upvalues: l_HttpService_0 (ref), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref), v9 (ref), v34 (ref), v79 (ref)
-                                local v140 = false;
-                                local v141 = nil;
-                                local v142 = nil;
-                                if not v138 or not v139 or not v139.StatusCode then
-                                    v142 = "Connection error";
-                                elseif v139.StatusCode == 401 then
-                                    v142 = "Unauthorized";
-                                elseif v139.StatusCode < 200 or v139.StatusCode >= 400 then
-                                    v142 = v139.StatusCode;
-                                end;
-                                v141 = v142;
-                                if v141 ~= nil then
-                                    v141 = "User Experience Language Setting Get Request: " .. v141;
-                                else
-                                    local v143;
-                                    v142, v143 = pcall(function() --[[ Line: 385 ]]
-                                        -- upvalues: l_HttpService_0 (ref), v139 (copy), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref)
-                                        local l_userUniverseLocalizationSettingValue_2 = l_HttpService_0:JSONDecode(v139.Body).userUniverseLocalizationSettingValue;
-                                        if l_userUniverseLocalizationSettingValue_2 == nil then
-                                            v20 = v19;
-                                            return;
-                                        else
-                                            local l_settingTargetId_2 = l_userUniverseLocalizationSettingValue_2.settingTargetId;
-                                            local l_settingType_2 = l_userUniverseLocalizationSettingValue_2.settingType;
-                                            if l_settingTargetId_2 == nil then
-                                                v20 = v19;
-                                            end;
-                                            if l_settingType_2 == "SourceOrTranslation" then
-                                                if l_settingTargetId_2 == 1 then
-                                                    v20 = v18;
-                                                    return;
-                                                else
-                                                    v20 = v19;
-                                                    return;
-                                                end;
-                                            elseif l_settingType_2 == "LanguageFamily" then
-                                                if v26[l_settingTargetId_2] == nil then
-                                                    v20 = v19;
-                                                    return;
-                                                else
-                                                    v20 = v24[v26[l_settingTargetId_2]];
-                                                    return;
-                                                end;
-                                            else
-                                                if l_settingType_2 == "SupportedLocale" then
-                                                    if v24[l_settingTargetId_2] == nil then
-                                                        v20 = v19;
-                                                        return;
-                                                    else
-                                                        v20 = v24[l_settingTargetId_2];
-                                                    end;
-                                                end;
-                                                return;
-                                            end;
-                                        end;
-                                    end);
-                                    v140 = v142;
-                                    v141 = v143;
-                                end;
-                                if not v140 then
-                                    v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v34 .. " with error message: " .. v141);
-                                end;
-                                v79(v140, v141);
-                            end);
-                            return;
-                        else
-                            local l_l_l_v115_0_0_0 = l_l_v115_0_0;
-                            if l_l_l_v115_0_0_0 == nil then
-                                l_l_l_v115_0_0_0 = "Execution path did not set earliest error to non-nil value.";
-                            end;
-                            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_l_v115_0_0_0);
-                            v46();
-                            return;
-                        end;
-                    end);
-                else
-                    local l_l_v115_0_1 = l_v115_0;
-                    if l_l_v115_0_1 == nil then
-                        l_l_v115_0_1 = "Execution path did not set earliest error to non-nil value.";
-                    end;
-                    v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_v115_0_1);
-                    v46();
-                end;
-            end);
-        else
-            local l_v115_1 = v115;
-            if l_v115_1 == nil then
-                l_v115_1 = "Execution path did not set earliest error to non-nil value.";
-            end;
-            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_v115_1);
-            v46();
-            --[[ close >= 2 ]]
-        end;
-    end;
-    v29:Start(function(v151, v152) --[[ Line: 542 ]]
-        -- upvalues: l_HttpService_0 (ref), v25 (copy), v26 (copy), v23 (copy), v24 (copy), v21 (copy), v9 (ref), v28 (copy), v33 (copy), v22 (copy), v32 (copy), v31 (copy), v18 (ref), v30 (copy), v35 (copy), v20 (ref), v19 (copy), v34 (copy), v79 (copy), v46 (copy)
-        local v153 = false;
-        local v154 = nil;
-        local v155 = nil;
-        if not v151 or not v152 or not v152.StatusCode then
-            v155 = "Connection error";
-        elseif v152.StatusCode == 401 then
-            v155 = "Unauthorized";
-        elseif v152.StatusCode < 200 or v152.StatusCode >= 400 then
-            v155 = v152.StatusCode;
-        end;
-        v154 = v155;
-        if v154 ~= nil then
-            v154 = "Locale Information Request: " .. v154;
-        else
-            local v156;
-            v155, v156 = pcall(function() --[[ Line: 551 ]]
-                -- upvalues: l_HttpService_0 (ref), v152 (copy), v25 (ref), v26 (ref), v23 (ref), v24 (ref), v21 (ref)
-                local v157 = l_HttpService_0:JSONDecode(v152.Body);
-                for _, v159 in pairs(v157.data) do
-                    local l_languageCode_0 = v159.locale.language.languageCode;
-                    local l_id_0 = v159.locale.language.id;
-                    local l_name_0 = v159.locale.language.name;
-                    local l_locale_0 = v159.locale.locale;
-                    local l_id_1 = v159.locale.id;
-                    local l_name_1 = v159.locale.name;
-                    if v25[l_languageCode_0] == l_locale_0 then
-                        v26[l_id_0] = l_id_1;
-                    end;
-                    v23[l_locale_0] = {
-                        localeName = l_name_1, 
-                        localeId = l_id_1, 
-                        languageName = l_name_0, 
-                        languageId = l_id_0, 
-                        languageCode = l_languageCode_0
-                    };
-                    v24[l_id_1] = l_locale_0;
-                    v21[l_name_1] = l_locale_0;
-                end;
-            end);
-            v153 = v155;
-            v154 = v156;
-        end;
-        if not v153 then
-            v9:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v28 .. " with error message: " .. v154);
-        end;
-        v155 = v153;
-        local l_v154_0 = v154;
-        if v155 then
-            v33:Start(function(v167, v168) --[[ Line: 495 ]]
-                -- upvalues: l_HttpService_0 (ref), v23 (ref), v22 (ref), v9 (ref), v32 (ref), l_v154_0 (ref), v155 (copy), v31 (ref), v18 (ref), v25 (ref), v30 (ref), v35 (ref), v20 (ref), v19 (ref), v26 (ref), v24 (ref), v34 (ref), v79 (ref), v46 (ref)
-                local v169 = false;
-                local v170 = nil;
-                local v171 = nil;
-                if not v167 or not v168 or not v168.StatusCode then
-                    v171 = "Connection error";
-                elseif v168.StatusCode == 401 then
-                    v171 = "Unauthorized";
-                elseif v168.StatusCode < 200 or v168.StatusCode >= 400 then
-                    v171 = v168.StatusCode;
-                end;
-                v170 = v171;
-                if v170 ~= nil then
-                    v170 = "Experience Supported Language Language Request: " .. v170;
-                else
-                    local v172;
-                    v171, v172 = pcall(function() --[[ Line: 503 ]]
-                        -- upvalues: l_HttpService_0 (ref), v168 (copy), v23 (ref), v22 (ref)
-                        local v173 = l_HttpService_0:JSONDecode(v168.Body);
-                        local v174 = {};
-                        for v175, v176 in pairs(v173.data) do
-                            v174[v175] = v176.languageCode;
-                        end;
-                        for _, v178 in v174 do
-                            for v179, v180 in v23 do
-                                if v180.languageCode == v178 then
-                                    table.insert(v22, v179);
-                                end;
-                            end;
-                        end;
-                    end);
-                    v169 = v171;
-                    v170 = v172;
-                end;
-                if not v169 then
-                    v9:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v32 .. " with error message: " .. v170);
-                end;
-                if l_v154_0 == nil then
-                    l_v154_0 = v170;
-                end;
-                v171 = v169 and v155;
-                local l_l_v154_0_0 = l_v154_0;
-                if v171 then
-                    v31:Start(function(v182, v183) --[[ Line: 453 ]]
-                        -- upvalues: l_HttpService_0 (ref), v18 (ref), v25 (ref), v9 (ref), v30 (ref), l_l_v154_0_0 (ref), v171 (copy), v35 (ref), v20 (ref), v19 (ref), v26 (ref), v24 (ref), v34 (ref), v79 (ref), v46 (ref)
-                        local v184 = false;
-                        local v185 = nil;
-                        local v186 = nil;
-                        if not v182 or not v183 or not v183.StatusCode then
-                            v186 = "Connection error";
-                        elseif v183.StatusCode == 401 then
-                            v186 = "Unauthorized";
-                        elseif v183.StatusCode < 200 or v183.StatusCode >= 400 then
-                            v186 = v183.StatusCode;
-                        end;
-                        v185 = v186;
-                        if v185 ~= nil then
-                            v185 = "Experience Source Language Request: " .. v185;
-                        else
-                            local v187;
-                            v186, v187 = pcall(function() --[[ Line: 462 ]]
-                                -- upvalues: l_HttpService_0 (ref), v183 (copy), v18 (ref), v25 (ref)
-                                v18 = v25[l_HttpService_0:JSONDecode(v183.Body).languageCode];
-                            end);
-                            v184 = v186;
-                            v185 = v187;
-                        end;
-                        if not v184 then
-                            v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v30 .. " with error message: " .. v185);
-                        end;
-                        if l_l_v154_0_0 == nil then
-                            l_l_v154_0_0 = v185;
-                        end;
-                        v186 = v184 and v171;
-                        local l_l_l_v154_0_0_0 = l_l_v154_0_0;
-                        if v186 then
-                            v35:Start(function(v189, v190) --[[ Line: 376 ]]
-                                -- upvalues: l_HttpService_0 (ref), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref), v9 (ref), v34 (ref), v79 (ref)
-                                local v191 = false;
-                                local v192 = nil;
-                                local v193 = nil;
-                                if not v189 or not v190 or not v190.StatusCode then
-                                    v193 = "Connection error";
-                                elseif v190.StatusCode == 401 then
-                                    v193 = "Unauthorized";
-                                elseif v190.StatusCode < 200 or v190.StatusCode >= 400 then
-                                    v193 = v190.StatusCode;
-                                end;
-                                v192 = v193;
-                                if v192 ~= nil then
-                                    v192 = "User Experience Language Setting Get Request: " .. v192;
-                                else
-                                    local v194;
-                                    v193, v194 = pcall(function() --[[ Line: 385 ]]
-                                        -- upvalues: l_HttpService_0 (ref), v190 (copy), v20 (ref), v19 (ref), v18 (ref), v26 (ref), v24 (ref)
-                                        local l_userUniverseLocalizationSettingValue_3 = l_HttpService_0:JSONDecode(v190.Body).userUniverseLocalizationSettingValue;
-                                        if l_userUniverseLocalizationSettingValue_3 == nil then
-                                            v20 = v19;
-                                            return;
-                                        else
-                                            local l_settingTargetId_3 = l_userUniverseLocalizationSettingValue_3.settingTargetId;
-                                            local l_settingType_3 = l_userUniverseLocalizationSettingValue_3.settingType;
-                                            if l_settingTargetId_3 == nil then
-                                                v20 = v19;
-                                            end;
-                                            if l_settingType_3 == "SourceOrTranslation" then
-                                                if l_settingTargetId_3 == 1 then
-                                                    v20 = v18;
-                                                    return;
-                                                else
-                                                    v20 = v19;
-                                                    return;
-                                                end;
-                                            elseif l_settingType_3 == "LanguageFamily" then
-                                                if v26[l_settingTargetId_3] == nil then
-                                                    v20 = v19;
-                                                    return;
-                                                else
-                                                    v20 = v24[v26[l_settingTargetId_3]];
-                                                    return;
-                                                end;
-                                            else
-                                                if l_settingType_3 == "SupportedLocale" then
-                                                    if v24[l_settingTargetId_3] == nil then
-                                                        v20 = v19;
-                                                        return;
-                                                    else
-                                                        v20 = v24[l_settingTargetId_3];
-                                                    end;
-                                                end;
-                                                return;
-                                            end;
-                                        end;
-                                    end);
-                                    v191 = v193;
-                                    v192 = v194;
-                                end;
-                                if not v191 then
-                                    v9:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v34 .. " with error message: " .. v192);
-                                end;
-                                v79(v191, v192);
-                            end);
-                            return;
-                        else
-                            local l_l_l_l_v154_0_0_0_0 = l_l_l_v154_0_0_0;
-                            if l_l_l_l_v154_0_0_0_0 == nil then
-                                l_l_l_l_v154_0_0_0_0 = "Execution path did not set earliest error to non-nil value.";
-                            end;
-                            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_l_l_v154_0_0_0_0);
-                            v46();
-                            return;
-                        end;
-                    end);
-                else
-                    local l_l_l_v154_0_0_1 = l_l_v154_0_0;
-                    if l_l_l_v154_0_0_1 == nil then
-                        l_l_l_v154_0_0_1 = "Execution path did not set earliest error to non-nil value.";
-                    end;
-                    v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_l_v154_0_0_1);
-                    v46();
-                end;
-            end);
-        else
-            local l_l_v154_0_1 = l_v154_0;
-            if l_l_v154_0_1 == nil then
-                l_l_v154_0_1 = "Execution path did not set earliest error to non-nil value.";
-            end;
-            v9:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. l_l_v154_0_1);
-            v46();
-            --[[ close >= 6 ]]
-        end;
-    end);
-end;
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Utility = require(RobloxGui.Modules.Settings.Utility)
+local v10 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local EngineFeature = game:GetEngineFeature("UgcLocaleFromGameJoinEnabled")
+local t1 = {
+	sq = "sq_al",
+	ar = "ar_001",
+	bn = "bn_bd",
+	nb = "nb_no",
+	bs = "bs_ba",
+	bg = "bg_bg",
+	my = "my_mm",
+	["zh-hans"] = "zh_cn",
+	["zh-hant"] = "zh_tw",
+	hr = "hr_hr",
+	cs = "cs_cz",
+	da = "da_dk",
+	nl = "nl_nl",
+	en = "en_us",
+	et = "et_ee",
+	fil = "fil_ph",
+	fi = "fi_fi",
+	fr = "fr_fr",
+	ka = "ka_ge",
+	de = "de_de",
+	el = "el_gr",
+	hi = "hi_in",
+	hu = "hu_hu",
+	id = "id_id",
+	it = "it_it",
+	ja = "ja_jp",
+	kk = "kk_kz",
+	km = "km_kh",
+	ko = "ko_kr",
+	lv = "lv_lv",
+	lt = "lt_lt",
+	ms = "ms_my",
+	pl = "pl_pl",
+	pt = "pt_br",
+	ro = "ro_ro",
+	ru = "ru_ru",
+	sr = "sr_rs",
+	si = "si_lk",
+	sk = "sk_sk",
+	sl = "sl_sl",
+	es = "es_es",
+	sv = "sv_se",
+	th = "th_th",
+	tr = "tr_tr",
+	uk = "uk_ua",
+	vi = "vi_vn"
+}
+
+return function(p1, p2, p3) -- line: 76
+	-- upvalues: Players (copy), Url (copy), HttpService (copy), Utility (copy), RobloxTranslator (copy), v10 (copy), EngineFeature (copy), LocalPlayer (copy), RunService (copy), t1 (copy)
+	local n1 = 1
+	local n2 = 1
+	local u19 = false
+	local u20 = nil
+	local v21 = Players.LocalPlayer.LocaleId:gsub("-", "_")
+	local u22 = nil
+	local t2 = {}
+	local t3 = {}
+	local t4 = {}
+	local t5 = {}
+	local t6 = {}
+	local t7 = {}
+	local v29 = Url.LOCALE_URL .. string.format("v1/locales?displayValueLocale=%s", Players.LocalPlayer.LocaleId:gsub("-", "_"))
+	local v30 = HttpService:RequestInternal({
+		Method = "GET",
+		Url = v29
+	})
+	local v31 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/source-language/games/%d", game.GameId)
+	local v32 = HttpService:RequestInternal({
+		Method = "GET",
+		Url = v31
+	})
+	local v33 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/supported-languages/games/%d/in-experience-language-selection", game.GameId)
+	local v34 = HttpService:RequestInternal({
+		Method = "GET",
+		Url = v33
+	})
+	local v35 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId)
+	local v36 = HttpService:RequestInternal({
+		Method = "GET",
+		Url = v35
+	})
+
+	local function tryGetErrorMessage(p4, p5) -- line: 135
+		local StatusCode = nil
+
+		if not p4 or (not p5 or not p5.StatusCode) then
+			return "Connection error"
+		end
+
+		if p5.StatusCode == 401 then
+			return "Unauthorized"
+		end
+
+		if p5.StatusCode < 200 or p5.StatusCode >= 400 then
+			StatusCode = p5.StatusCode
+		end
+
+		return StatusCode
+	end
+	local function createSessionDormantLanguageSwitcherRow() -- line: 148
+		-- upvalues: p1 (copy), Utility (copy), RobloxTranslator (copy), p2 (copy)
+		local v46 = p1
+		local v47 = p1
+		local v48 = p1
+		local v49, v50, v51 = Utility:AddNewRow(p1, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", { RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.Unavailable") }, 1)
+
+		v46.LanguageSelectorFrame = v49
+		v47.LanguageSelectorLabel = v50
+		v48.LanguageSelectorMode = v51
+		p1.LanguageSelectorMode:SetInteractable(false)
+		p1.LanguageSelectorFrame.LayoutOrder = p2.LanguageSelectorFrame
+	end
+	local function userExperienceLanguageSettingsCallback(p6, p7) -- line: 164
+		-- upvalues: v10 (copy), createSessionDormantLanguageSwitcherRow (copy), t3 (copy), u22 (ref), u20 (ref), t7 (copy), t4 (copy), t2 (copy), n1 (ref), n2 (ref), p1 (copy), Utility (copy), RobloxTranslator (copy), p2 (copy), EngineFeature (copy), LocalPlayer (copy), p3 (copy), Url (copy), HttpService (copy), u19 (ref), RunService (copy)
+		if not p6 then
+			if p7 == nil then
+				p7 = "Execution path did not set earliest error to non-nil value."
+			end
+
+			v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. p7)
+			createSessionDormantLanguageSwitcherRow()
+
+			return
+		end
+
+		local v54 = false
+
+		for _, v56 in t3 do
+			if v56 == u22 then
+				v54 = true
+			end
+
+			if v56 ~= u20 then
+				table.insert(t7, t4[v56].localeName)
+			end
+		end
+
+		table.sort(t7)
+
+		local v57 = true
+
+		if u20 == nil or t4[u20].localeName == nil then
+			v57 = false
+		end
+
+		if not v57 then
+			createSessionDormantLanguageSwitcherRow()
+
+			return
+		end
+
+		table.insert(t7, 1, t4[u20].localeName .. " (Original)")
+
+		if v54 == true then
+			for v58, v59 in t7 do
+				if v58 ~= 1 and t2[v59] == u22 then
+					n1 = v58
+					n2 = v58
+				end
+			end
+		end
+
+		local v60 = p1
+		local v61 = p1
+		local v62 = p1
+		local v63, v64, v65 = Utility:AddNewRow(p1, RobloxTranslator:FormatByKey("Feature.SettingsHub.LanguageSelection.SettingLabel"), "DropDown", t7, n1)
+
+		v60.LanguageSelectorFrame = v63
+		v61.LanguageSelectorLabel = v64
+		v62.LanguageSelectorMode = v65
+		p1.LanguageSelectorFrame.LayoutOrder = p2.LanguageSelectorFrame
+
+		if not EngineFeature then
+			if n1 == 1 then
+				LocalPlayer:SetExperienceSettingsLocaleId(u20)
+			else
+				local v66 = t2[t7[n1]]
+
+				LocalPlayer:SetExperienceSettingsLocaleId(v66)
+			end
+		end
+
+		p1.LanguageSelectorMode.CurrentLocale = p1.LanguageSelectorMode.DropDownFrame.DropDownFrameTextLabel.Text
+
+		local function toggleTranslation(p8) -- line: 252
+			-- upvalues: p1 (copy), t4 (copy), u20 (ref), t2 (copy), t7 (copy), p3 (copy), Url (copy), HttpService (copy), n2 (ref), LocalPlayer (copy), v10 (copy), u19 (ref), RunService (copy)
+			p1.LanguageSelectorMode:SetInteractable(false)
+
+			local v87 = if p8 ~= 1 or t4[u20] == nil then t4[t2[t7[p8]]].localeId else t4[u20].localeId
+			local CurrentLocale = p1.LanguageSelectorMode.CurrentLocale
+			local v89 = t7[p8]
+
+			if CurrentLocale ~= v89 then
+				p1.LanguageSelectorMode.CurrentLocale = v89
+				p3("experience_locale", CurrentLocale, v89)
+			end
+
+			local t8 = {
+				settingValue = {
+					settingType = "SupportedLocale",
+					settingTargetId = v87
+				}
+			}
+			local v91 = Url.GAME_INTERNATIONALIZATION_URL .. string.format("v1/user-localization-settings/universe/%d", game.GameId)
+			local v92 = HttpService:RequestInternal({
+				Method = "POST",
+				Url = v91,
+				Headers = {
+					["Content-Type"] = "application/json"
+				},
+				Body = HttpService:JSONEncode(t8)
+			})
+
+			local function userExperienceLanguageSettingsUpdateCallback(p9, p10) -- line: 301
+				-- upvalues: n2 (ref), p8 (copy), LocalPlayer (copy), u20 (ref), t2 (copy), t7 (copy), v10 (copy), u19 (ref), p1 (copy)
+				if p9 then
+					n2 = p8
+
+					if p8 == 1 then
+						LocalPlayer:SetExperienceSettingsLocaleId(u20)
+					else
+						local v135 = t2[t7[p8]]
+
+						LocalPlayer:SetExperienceSettingsLocaleId(v135)
+					end
+				else
+					v10:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. p10)
+					u19 = true
+					p1.LanguageSelectorMode:SetSelectionIndex(n2)
+				end
+
+				p1.LanguageSelectorMode:SetInteractable(true)
+			end
+
+			if RunService:IsStudio() then
+				n2 = p8
+
+				if p8 == 1 then
+					LocalPlayer:SetExperienceSettingsLocaleId(u20)
+				else
+					local v94 = t2[t7[p8]]
+
+					LocalPlayer:SetExperienceSettingsLocaleId(v94)
+				end
+
+				p1.LanguageSelectorMode:SetInteractable(true)
+
+				return
+			end
+
+			if u19 then
+				u19 = false
+				n2 = p8
+
+				if p8 == 1 then
+					LocalPlayer:SetExperienceSettingsLocaleId(u20)
+				else
+					local v95 = t2[t7[p8]]
+
+					LocalPlayer:SetExperienceSettingsLocaleId(v95)
+				end
+
+				p1.LanguageSelectorMode:SetInteractable(true)
+
+				return
+			end
+
+			if v87 == nil then
+				v10:warning("Request to update user experience language status failed, keeping language toggle disabled for the remainder of the session. Error: " .. nil)
+				u19 = true
+				p1.LanguageSelectorMode:SetSelectionIndex(n2)
+				p1.LanguageSelectorMode:SetInteractable(true)
+
+				return
+			end
+
+			v92:Start(function(p11, p12) -- line: 345
+				-- upvalues: v10 (copy), v91 (copy), userExperienceLanguageSettingsUpdateCallback (copy)
+				local v138 = false
+				local s1 = nil
+
+				if not p11 or (not p12 or not p12.StatusCode) then
+					s1 = "Connection error"
+				elseif p12.StatusCode == 401 then
+					s1 = "Unauthorized"
+				elseif p12.StatusCode < 200 or p12.StatusCode >= 400 then
+					s1 = p12.StatusCode
+				end
+
+				if s1 ~= nil then
+					s1 = "User Experience Language Settings Update Request: " .. s1
+					v10:warning("GameSettings language selector toggle: Failed to update user experience language status from GameInternationalization API for " .. v91 .. " with error message: " .. s1)
+				else
+					v10:info("User Experience Language Settings Update Request: " .. "Succeeded with code - " .. p12.StatusCode)
+					v138 = true
+				end
+
+				userExperienceLanguageSettingsUpdateCallback(v138, s1)
+			end)
+		end
+
+		p1.LanguageSelectorMode.IndexChanged:connect(toggleTranslation)
+	end
+	local function experienceSourceLanguageCallback(p13, p14) -- line: 374
+		-- upvalues: v36 (copy), HttpService (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy), v10 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+		if p13 then
+			v36:Start(function(p15, p16) -- line: 376
+				-- upvalues: HttpService (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy), v10 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy)
+				local v98 = false
+				local s2 = nil
+
+				if not p15 or (not p16 or not p16.StatusCode) then
+					s2 = "Connection error"
+				elseif p16.StatusCode == 401 then
+					s2 = "Unauthorized"
+				elseif p16.StatusCode < 200 or p16.StatusCode >= 400 then
+					s2 = p16.StatusCode
+				end
+
+				local v100
+
+				if s2 ~= nil then
+					v100 = "User Experience Language Setting Get Request: " .. s2
+				else
+					v98, v100 = pcall(function() -- line: 385
+						-- upvalues: HttpService (copy), p16 (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy)
+						local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p16.Body).userUniverseLocalizationSettingValue
+
+						if userUniverseLocalizationSettingValue == nil then
+							u22 = v21
+
+							return
+						end
+
+						local settingTargetId = userUniverseLocalizationSettingValue.settingTargetId
+						local settingType = userUniverseLocalizationSettingValue.settingType
+
+						if settingTargetId == nil then
+							u22 = v21
+						end
+
+						if settingType == "SourceOrTranslation" then
+							if settingTargetId == 1 then
+								u22 = u20
+
+								return
+							end
+
+							u22 = v21
+
+							return
+						end
+
+						if settingType == "LanguageFamily" then
+							if t6[settingTargetId] == nil then
+								u22 = v21
+
+								return
+							end
+
+							u22 = t5[t6[settingTargetId]]
+
+							return
+						end
+
+						if settingType == "SupportedLocale" then
+							if t5[settingTargetId] == nil then
+								u22 = v21
+
+								return
+							end
+
+							u22 = t5[settingTargetId]
+						end
+					end)
+				end
+
+				if not v98 then
+					v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v35 .. " with error message: " .. v100)
+				end
+
+				userExperienceLanguageSettingsCallback(v98, v100)
+			end)
+
+			return
+		end
+
+		if p14 == nil then
+			p14 = "Execution path did not set earliest error to non-nil value."
+		end
+
+		v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. p14)
+		createSessionDormantLanguageSwitcherRow()
+	end
+	local function experienceSupportedLanguagesCallback(p17, p18) -- line: 451
+		-- upvalues: v32 (copy), HttpService (copy), u20 (ref), t1 (copy), v10 (copy), v31 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+		if p17 then
+			v32:Start(function(p19, p20) -- line: 453
+				-- upvalues: HttpService (copy), u20 (ref), t1 (copy), v10 (copy), v31 (copy), p18 (ref), p17 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+				local v103 = false
+				local s3 = nil
+
+				if not p19 or (not p20 or not p20.StatusCode) then
+					s3 = "Connection error"
+				elseif p20.StatusCode == 401 then
+					s3 = "Unauthorized"
+				elseif p20.StatusCode < 200 or p20.StatusCode >= 400 then
+					s3 = p20.StatusCode
+				end
+
+				local v105
+
+				if s3 ~= nil then
+					v105 = "Experience Source Language Request: " .. s3
+				else
+					v103, v105 = pcall(function() -- line: 462
+						-- upvalues: HttpService (copy), p20 (copy), u20 (ref), t1 (copy)
+						u20 = t1[HttpService:JSONDecode(p20.Body).languageCode]
+					end)
+				end
+
+				if not v103 then
+					v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v31 .. " with error message: " .. v105)
+				end
+
+				if p18 == nil then
+					p18 = v105
+				end
+
+				local v106 = v103 and p17
+				local v107 = p18
+
+				if v106 then
+					v36:Start(function(p21, p22) -- line: 376
+						-- upvalues: HttpService (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy), v10 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy)
+						local v145 = false
+						local s4 = nil
+
+						if not p21 or (not p22 or not p22.StatusCode) then
+							s4 = "Connection error"
+						elseif p22.StatusCode == 401 then
+							s4 = "Unauthorized"
+						elseif p22.StatusCode < 200 or p22.StatusCode >= 400 then
+							s4 = p22.StatusCode
+						end
+
+						local v147
+
+						if s4 ~= nil then
+							v147 = "User Experience Language Setting Get Request: " .. s4
+						else
+							v145, v147 = pcall(function() -- line: 385
+								-- upvalues: HttpService (copy), p22 (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy)
+								local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p22.Body).userUniverseLocalizationSettingValue
+
+								if userUniverseLocalizationSettingValue == nil then
+									u22 = v21
+
+									return
+								end
+
+								local settingTargetId = userUniverseLocalizationSettingValue.settingTargetId
+								local settingType = userUniverseLocalizationSettingValue.settingType
+
+								if settingTargetId == nil then
+									u22 = v21
+								end
+
+								if settingType == "SourceOrTranslation" then
+									if settingTargetId == 1 then
+										u22 = u20
+
+										return
+									end
+
+									u22 = v21
+
+									return
+								end
+
+								if settingType == "LanguageFamily" then
+									if t6[settingTargetId] == nil then
+										u22 = v21
+
+										return
+									end
+
+									u22 = t5[t6[settingTargetId]]
+
+									return
+								end
+
+								if settingType == "SupportedLocale" then
+									if t5[settingTargetId] == nil then
+										u22 = v21
+
+										return
+									end
+
+									u22 = t5[settingTargetId]
+								end
+							end)
+						end
+
+						if not v145 then
+							v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v35 .. " with error message: " .. v147)
+						end
+
+						userExperienceLanguageSettingsCallback(v145, v147)
+					end)
+
+					return
+				end
+
+				if v107 == nil then
+					v107 = "Execution path did not set earliest error to non-nil value."
+				end
+
+				v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v107)
+				createSessionDormantLanguageSwitcherRow()
+			end)
+		else
+			local v73 = p18
+
+			if v73 == nil then
+				v73 = "Execution path did not set earliest error to non-nil value."
+			end
+
+			v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v73)
+			createSessionDormantLanguageSwitcherRow()
+		end
+	end
+	local function localeInformationCallback(p23, p24) -- line: 493
+		-- upvalues: v34 (copy), HttpService (copy), t4 (copy), t3 (copy), v10 (copy), v33 (copy), v32 (copy), u20 (ref), t1 (copy), v31 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+		if p23 then
+			v34:Start(function(p25, p26) -- line: 495
+				-- upvalues: HttpService (copy), t4 (copy), t3 (copy), v10 (copy), v33 (copy), p24 (ref), p23 (copy), v32 (copy), u20 (ref), t1 (copy), v31 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+				local v110 = false
+				local s5 = nil
+
+				if not p25 or (not p26 or not p26.StatusCode) then
+					s5 = "Connection error"
+				elseif p26.StatusCode == 401 then
+					s5 = "Unauthorized"
+				elseif p26.StatusCode < 200 or p26.StatusCode >= 400 then
+					s5 = p26.StatusCode
+				end
+
+				local v112
+
+				if s5 ~= nil then
+					v112 = "Experience Supported Language Language Request: " .. s5
+				else
+					v110, v112 = pcall(function() -- line: 503
+						-- upvalues: HttpService (copy), p26 (copy), t4 (copy), t3 (copy)
+						local data = HttpService:JSONDecode(p26.Body)
+						local t9 = {}
+
+						for k, v in pairs(data.data) do
+							t9[k] = v.languageCode
+						end
+
+						for _, v153 in t9 do
+							for v154, v155 in t4 do
+								if v153 == v155.languageCode then
+									table.insert(t3, v154)
+								end
+							end
+						end
+					end)
+				end
+
+				if not v110 then
+					v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v33 .. " with error message: " .. v112)
+				end
+
+				if p24 == nil then
+					p24 = v112
+				end
+
+				local v113 = v110 and p23
+				local u114 = p24
+
+				if v113 then
+					v32:Start(function(p27, p28) -- line: 453
+						-- upvalues: HttpService (copy), u20 (ref), t1 (copy), v10 (copy), v31 (copy), u114 (ref), v113 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+						local v158 = false
+						local s6 = nil
+
+						if not p27 or (not p28 or not p28.StatusCode) then
+							s6 = "Connection error"
+						elseif p28.StatusCode == 401 then
+							s6 = "Unauthorized"
+						elseif p28.StatusCode < 200 or p28.StatusCode >= 400 then
+							s6 = p28.StatusCode
+						end
+
+						local v160
+
+						if s6 ~= nil then
+							v160 = "Experience Source Language Request: " .. s6
+						else
+							v158, v160 = pcall(function() -- line: 462
+								-- upvalues: HttpService (copy), p28 (copy), u20 (ref), t1 (copy)
+								u20 = t1[HttpService:JSONDecode(p28.Body).languageCode]
+							end)
+						end
+
+						if not v158 then
+							v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v31 .. " with error message: " .. v160)
+						end
+
+						if u114 == nil then
+							u114 = v160
+						end
+
+						local v161 = v158 and v113
+						local v162 = u114
+
+						if v161 then
+							v36:Start(function(p29, p30) -- line: 376
+								-- upvalues: HttpService (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy), v10 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy)
+								local v183 = false
+								local s7 = nil
+
+								if not p29 or (not p30 or not p30.StatusCode) then
+									s7 = "Connection error"
+								elseif p30.StatusCode == 401 then
+									s7 = "Unauthorized"
+								elseif p30.StatusCode < 200 or p30.StatusCode >= 400 then
+									s7 = p30.StatusCode
+								end
+
+								local v185
+
+								if s7 ~= nil then
+									v185 = "User Experience Language Setting Get Request: " .. s7
+								else
+									v183, v185 = pcall(function() -- line: 385
+										-- upvalues: HttpService (copy), p30 (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy)
+										local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p30.Body).userUniverseLocalizationSettingValue
+
+										if userUniverseLocalizationSettingValue == nil then
+											u22 = v21
+
+											return
+										end
+
+										local settingTargetId = userUniverseLocalizationSettingValue.settingTargetId
+										local settingType = userUniverseLocalizationSettingValue.settingType
+
+										if settingTargetId == nil then
+											u22 = v21
+										end
+
+										if settingType == "SourceOrTranslation" then
+											if settingTargetId == 1 then
+												u22 = u20
+
+												return
+											end
+
+											u22 = v21
+
+											return
+										end
+
+										if settingType == "LanguageFamily" then
+											if t6[settingTargetId] == nil then
+												u22 = v21
+
+												return
+											end
+
+											u22 = t5[t6[settingTargetId]]
+
+											return
+										end
+
+										if settingType == "SupportedLocale" then
+											if t5[settingTargetId] == nil then
+												u22 = v21
+
+												return
+											end
+
+											u22 = t5[settingTargetId]
+										end
+									end)
+								end
+
+								if not v183 then
+									v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v35 .. " with error message: " .. v185)
+								end
+
+								userExperienceLanguageSettingsCallback(v183, v185)
+							end)
+
+							return
+						end
+
+						if v162 == nil then
+							v162 = "Execution path did not set earliest error to non-nil value."
+						end
+
+						v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v162)
+						createSessionDormantLanguageSwitcherRow()
+					end)
+				else
+					local v115 = u114
+
+					if v115 == nil then
+						v115 = "Execution path did not set earliest error to non-nil value."
+					end
+
+					v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v115)
+					createSessionDormantLanguageSwitcherRow()
+				end
+			end)
+		else
+			local v77 = p24
+
+			if v77 == nil then
+				v77 = "Execution path did not set earliest error to non-nil value."
+			end
+
+			v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v77)
+			createSessionDormantLanguageSwitcherRow()
+		end
+	end
+
+	v30:Start(function(p31, p32) -- line: 542
+		-- upvalues: HttpService (copy), t1 (copy), t6 (copy), t4 (copy), t5 (copy), t2 (copy), v10 (copy), v29 (copy), v34 (copy), t3 (copy), v33 (copy), v32 (copy), u20 (ref), v31 (copy), v36 (copy), u22 (ref), v21 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+		local v80 = false
+		local s8 = nil
+
+		if not p31 or (not p32 or not p32.StatusCode) then
+			s8 = "Connection error"
+		elseif p32.StatusCode == 401 then
+			s8 = "Unauthorized"
+		elseif p32.StatusCode < 200 or p32.StatusCode >= 400 then
+			s8 = p32.StatusCode
+		end
+
+		local v82
+
+		if s8 ~= nil then
+			v82 = "Locale Information Request: " .. s8
+		else
+			v80, v82 = pcall(function() -- line: 551
+				-- upvalues: HttpService (copy), p32 (copy), t1 (copy), t6 (copy), t4 (copy), t5 (copy), t2 (copy)
+				local data = HttpService:JSONDecode(p32.Body)
+
+				for _, v in pairs(data.data) do
+					local languageCode = v.locale.language.languageCode
+					local id = v.locale.language.id
+					local name = v.locale.language.name
+					local locale = v.locale.locale
+					local id2 = v.locale.id
+					local name2 = v.locale.name
+
+					if locale == t1[languageCode] then
+						t6[id] = id2
+					end
+
+					t4[locale] = {
+						localeName = name2,
+						localeId = id2,
+						languageName = name,
+						languageId = id,
+						languageCode = languageCode
+					}
+					t5[id2] = locale
+					t2[name2] = locale
+				end
+			end)
+		end
+
+		if not v80 then
+			v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v29 .. " with error message: " .. v82)
+		end
+
+		local v83 = v80
+		local u84 = v82
+
+		if v83 then
+			v34:Start(function(p33, p34) -- line: 495
+				-- upvalues: HttpService (copy), t4 (copy), t3 (copy), v10 (copy), v33 (copy), u84 (ref), v83 (copy), v32 (copy), u20 (ref), t1 (copy), v31 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+				local v127 = false
+				local s9 = nil
+
+				if not p33 or (not p34 or not p34.StatusCode) then
+					s9 = "Connection error"
+				elseif p34.StatusCode == 401 then
+					s9 = "Unauthorized"
+				elseif p34.StatusCode < 200 or p34.StatusCode >= 400 then
+					s9 = p34.StatusCode
+				end
+
+				local v129
+
+				if s9 ~= nil then
+					v129 = "Experience Supported Language Language Request: " .. s9
+				else
+					v127, v129 = pcall(function() -- line: 503
+						-- upvalues: HttpService (copy), p34 (copy), t4 (copy), t3 (copy)
+						local data = HttpService:JSONDecode(p34.Body)
+						local t10 = {}
+
+						for k, v in pairs(data.data) do
+							t10[k] = v.languageCode
+						end
+
+						for _, v168 in t10 do
+							for v169, v170 in t4 do
+								if v168 == v170.languageCode then
+									table.insert(t3, v169)
+								end
+							end
+						end
+					end)
+				end
+
+				if not v127 then
+					v10:warning("GameSettings language selector initialization: Failed to get response from Localization API for " .. v33 .. " with error message: " .. v129)
+				end
+
+				if u84 == nil then
+					u84 = v129
+				end
+
+				local v130 = v127 and v83
+				local u131 = u84
+
+				if v130 then
+					v32:Start(function(p35, p36) -- line: 453
+						-- upvalues: HttpService (copy), u20 (ref), t1 (copy), v10 (copy), v31 (copy), u131 (ref), v130 (copy), v36 (copy), u22 (ref), v21 (copy), t6 (copy), t5 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy), createSessionDormantLanguageSwitcherRow (copy)
+						local v173 = false
+						local s10 = nil
+
+						if not p35 or (not p36 or not p36.StatusCode) then
+							s10 = "Connection error"
+						elseif p36.StatusCode == 401 then
+							s10 = "Unauthorized"
+						elseif p36.StatusCode < 200 or p36.StatusCode >= 400 then
+							s10 = p36.StatusCode
+						end
+
+						local v175
+
+						if s10 ~= nil then
+							v175 = "Experience Source Language Request: " .. s10
+						else
+							v173, v175 = pcall(function() -- line: 462
+								-- upvalues: HttpService (copy), p36 (copy), u20 (ref), t1 (copy)
+								u20 = t1[HttpService:JSONDecode(p36.Body).languageCode]
+							end)
+						end
+
+						if not v173 then
+							v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v31 .. " with error message: " .. v175)
+						end
+
+						if u131 == nil then
+							u131 = v175
+						end
+
+						local v176 = v173 and v130
+						local v177 = u131
+
+						if v176 then
+							v36:Start(function(p37, p38) -- line: 376
+								-- upvalues: HttpService (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy), v10 (copy), v35 (copy), userExperienceLanguageSettingsCallback (copy)
+								local v188 = false
+								local s11 = nil
+
+								if not p37 or (not p38 or not p38.StatusCode) then
+									s11 = "Connection error"
+								elseif p38.StatusCode == 401 then
+									s11 = "Unauthorized"
+								elseif p38.StatusCode < 200 or p38.StatusCode >= 400 then
+									s11 = p38.StatusCode
+								end
+
+								local v190
+
+								if s11 ~= nil then
+									v190 = "User Experience Language Setting Get Request: " .. s11
+								else
+									v188, v190 = pcall(function() -- line: 385
+										-- upvalues: HttpService (copy), p38 (copy), u22 (ref), v21 (copy), u20 (ref), t6 (copy), t5 (copy)
+										local userUniverseLocalizationSettingValue = HttpService:JSONDecode(p38.Body).userUniverseLocalizationSettingValue
+
+										if userUniverseLocalizationSettingValue == nil then
+											u22 = v21
+
+											return
+										end
+
+										local settingTargetId = userUniverseLocalizationSettingValue.settingTargetId
+										local settingType = userUniverseLocalizationSettingValue.settingType
+
+										if settingTargetId == nil then
+											u22 = v21
+										end
+
+										if settingType == "SourceOrTranslation" then
+											if settingTargetId == 1 then
+												u22 = u20
+
+												return
+											end
+
+											u22 = v21
+
+											return
+										end
+
+										if settingType == "LanguageFamily" then
+											if t6[settingTargetId] == nil then
+												u22 = v21
+
+												return
+											end
+
+											u22 = t5[t6[settingTargetId]]
+
+											return
+										end
+
+										if settingType == "SupportedLocale" then
+											if t5[settingTargetId] == nil then
+												u22 = v21
+
+												return
+											end
+
+											u22 = t5[settingTargetId]
+										end
+									end)
+								end
+
+								if not v188 then
+									v10:warning("GameSettings language selector initialization: Failed to get response from GameInternationalization API for " .. v35 .. " with error message: " .. v190)
+								end
+
+								userExperienceLanguageSettingsCallback(v188, v190)
+							end)
+
+							return
+						end
+
+						if v177 == nil then
+							v177 = "Execution path did not set earliest error to non-nil value."
+						end
+
+						v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v177)
+						createSessionDormantLanguageSwitcherRow()
+					end)
+				else
+					local v132 = u131
+
+					if v132 == nil then
+						v132 = "Execution path did not set earliest error to non-nil value."
+					end
+
+					v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v132)
+					createSessionDormantLanguageSwitcherRow()
+				end
+			end)
+		else
+			local v85 = u84
+
+			if v85 == nil then
+				v85 = "Execution path did not set earliest error to non-nil value."
+			end
+
+			v10:warning("GameSettings language selector initialization failed to get all required information; defaulting to player locale and disabling language selection toggle. Earliest error message: " .. v85)
+			createSessionDormantLanguageSwitcherRow()
+		end
+	end)
+end

@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-return (require(l_Parent_0.AppCommonLib).Signal.new());
+local ParentParent = script.Parent.Parent.Parent
+
+return (require(ParentParent.AppCommonLib).Signal.new())

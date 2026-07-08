@@ -1,6 +1,7 @@
-identityFunc = function(v0) --[[ Line: 12 ]] --[[ Name: identityFunc ]]
-    return v0;
-end;
+function identityFunc(p1) -- line: 12
+	return p1
+end
+
 return {
-    identityFunc = identityFunc
-};
+	identityFunc = identityFunc
+}

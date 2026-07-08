@@ -1,15 +1,17 @@
-local v0 = require(script.Parent.Parent.CALL_URL);
-local _ = require(script.Parent.Parent.networkingCallTypes);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v0 (copy)
-    return (v2.roduxNetworking.GET({
-        Name = "GetCallHistory"
-    }, function(v3, v4) --[[ Line: 10 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("call"):path("v1"):path("get-call-history"):queryArgs({
-            universeId = if v4 then v4.universeId else nil, 
-            limit = if v4 then v4.limit else nil, 
-            cursor = if v4 then v4.cursor else nil
-        });
-    end));
-end;
+local CALL_URL = require(script.Parent.Parent.CALL_URL)
+
+require(script.Parent.Parent.networkingCallTypes)
+
+return function(p1) -- line: 5
+	-- upvalues: CALL_URL (copy)
+	return (p1.roduxNetworking.GET({
+		Name = "GetCallHistory"
+	}, function(p2, p3) -- line: 10
+		-- upvalues: CALL_URL (copy)
+		return p2(CALL_URL):path("call"):path("v1"):path("get-call-history"):queryArgs({
+			universeId = if not p3 then nil else p3.universeId,
+			limit = if not p3 then nil else p3.limit,
+			cursor = if not p3 then nil else p3.cursor
+		})
+	end))
+end

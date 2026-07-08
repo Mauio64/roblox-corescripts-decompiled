@@ -1,14 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("GameCollections").Parent;
-local l_GameCollectionItemTypes_0 = require(l_Parent_0.DiscoveryTypes).GameCollectionItemTypes;
-local v2 = require(l_Parent_0.React);
-local v4 = v2.memo(function(v3) --[[ Line: 15 ]]
-    -- upvalues: v2 (copy)
-    return v2.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        LayoutOrder = v3.index
-    });
-end);
-return function(v5) --[[ Line: 23 ]]
-    -- upvalues: v2 (copy), v4 (copy), l_GameCollectionItemTypes_0 (copy)
-    return v2.createElement(v4, v5), l_GameCollectionItemTypes_0.GameCollectionItemType.Blank;
-end;
+local Parent = script:FindFirstAncestor("GameCollections").Parent
+local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
+local React = require(Parent.React)
+local v4 = React.memo(function(t1: {[any]: any}) -- line: 15
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = t1.index
+	})
+end)
+
+return function(t2: {[any]: any}) -- line: 23
+	-- upvalues: React (copy), v4 (copy), GameCollectionItemTypes (copy)
+	return React.createElement(v4, t2), GameCollectionItemTypes.GameCollectionItemType.Blank
+end

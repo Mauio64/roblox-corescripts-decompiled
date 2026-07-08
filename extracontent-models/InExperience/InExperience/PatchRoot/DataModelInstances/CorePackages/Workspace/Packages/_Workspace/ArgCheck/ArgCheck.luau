@@ -1,1 +1,1 @@
-return require(script.ArgCheck);
+return require(script.ArgCheck)

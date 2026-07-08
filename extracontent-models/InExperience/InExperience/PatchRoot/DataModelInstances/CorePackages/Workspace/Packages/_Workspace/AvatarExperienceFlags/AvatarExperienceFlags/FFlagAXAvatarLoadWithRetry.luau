@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAvatarLoadWithRetry", false);
+return game:DefineFastFlag("AXAvatarLoadWithRetry", false)

@@ -1,533 +1,541 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local l_FitFrameVertical_0 = require(l_Parent_2.RoactFitComponents).FitFrameVertical;
-local v5 = require(l_Parent_2.UIBlox);
-local l_PartialPageModal_0 = v5.App.Dialog.Modal.PartialPageModal;
-local l_getPartialPageModalMiddleContentWidth_0 = v5.App.Dialog.Modal.getPartialPageModalMiddleContentWidth;
-local l_ButtonType_0 = v5.App.Button.Enum.ButtonType;
-local l_Images_0 = v5.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v5.Core.ImageSet.ImageSetLabel;
-local l_withStyle_0 = v5.Style.withStyle;
-local v12 = require(l_Parent_1.Locale.MultiTextLocalizer);
-local v13 = require(l_Parent_0.BulletPoint);
-local v14 = v3.Component:extend(script.Name);
-v14.init = function(v15) --[[ Line: 47 ]] --[[ Name: init ]]
-    v15.isCondensed = false;
-    v15.contentSize = Vector2.new(0, 0);
-    v15.state = {
-        padding = UDim.new(0, 24), 
-        iconSize = UDim2.new(1, 0, 0, 80)
-    };
-    v15.updateContentSizes = function(v16, v17) --[[ Line: 56 ]]
-        -- upvalues: v15 (copy)
-        if v17.X < 200 or v17.Y > 1000 then
-            return;
-        else
-            local l_contentSize_0 = v15.contentSize;
-            v15.contentSize = v17;
-            if v17.X == 0 and v17.Y == 0 then
-                return;
-            elseif v16.X == 0 and v16.Y == 0 then
-                return;
-            elseif v17 == l_contentSize_0 and v16 == v15.props.screenSize then
-                return;
-            else
-                local v19 = if v15.isCondensed then v16.Y < v17.Y + 120 + 80 - 48 + 24 else v16.Y < v17.Y + 120;
-                v15.isCondensed = v19;
-                v15:setState({
-                    padding = UDim.new(0, v19 and 12 or 24), 
-                    iconSize = UDim2.new(1, 0, 0, v19 and 48 or 80)
-                });
-                return;
-            end;
-        end;
-    end;
-end;
-v14.willUpdate = function(v20, v21) --[[ Line: 98 ]] --[[ Name: willUpdate ]]
-    if v20.props.screenSize ~= v21.screenSize then
-        v20.updateContentSizes(v21.screenSize, v20.contentSize);
-    end;
-end;
-v14.render = function(v22) --[[ Line: 104 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v12 (copy)
-    local l_props_0 = v22.props;
-    return v3.createElement(v12, {
-        keys = {
-            titleLocalizedText = {
-                key = "IAPExperience.SubscriptionPurchasePrompt.Label.GetSubscription"
-            }, 
-            monthlyLocalizedText = {
-                key = "IAPExperience.PremiumUpsell.Action.Subscribe"
-            }, 
-            descLocalizedText = {
-                key = "IAPExperience.PremiumUpsell.Label.PremiumBenefitListDesc"
-            }, 
-            bulletPoint1Text = {
-                key = "IAPExperience.PremiumUpsell.Label.RobuxPerMonth", 
-                params = {
-                    robux = utf8.char(57346) .. tostring(l_props_0.robuxAmount)
-                }
-            }, 
-            bulletPoint2Text = {
-                key = "IAPExperience.PremiumUpsell.Label.PremiumOnlyBenefits"
-            }, 
-            bulletPoint3Text = if l_props_0.isCatalog then {
-                key = "IAPExperience.PremiumUpsell.Label.AvatarShopBenefits"
-            } else {
-                key = "IAPExperience.PremiumUpsell.Body.RobuxDiscount"
-            }, 
-            disclosure = {
-                key = "IAPExperience.PremiumUpsell.Label.Disclosure", 
-                params = {
-                    currencySymbol = l_props_0.currencySymbol, 
-                    price = tostring(l_props_0.robuxPrice)
-                }
-            }, 
-            shortDisclosure = {
-                key = "IAPExperience.PremiumUpsell.Label.ShortDisclosure"
-            }, 
-            priceLocalizedText = {
-                key = "IAPExperience.PremiumUpsell.Label.PremiumPrice", 
-                params = {
-                    currencySymbol = l_props_0.currencySymbol, 
-                    price = tostring(l_props_0.robuxPrice)
-                }
-            }, 
-            headerLocalizedText = {
-                key = "IAPExperience.PremiumUpsell.Label.RobloxPremium"
-            }, 
-            policyLocalizedText = {
-                key = "IAPExperience.PremiumUpsell.Label.PremiumPolicy"
-            }
-        }, 
-        render = function(v24) --[[ Line: 158 ]] --[[ Name: render ]]
-            -- upvalues: v22 (copy)
-            return v22:renderPrompt(v24);
-        end
-    });
-end;
-v14.renderCondensedPremiumInfo = function(_, v26) --[[ Line: 164 ]] --[[ Name: renderCondensedPremiumInfo ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy)
-    return l_withStyle_0(function(v27) --[[ Line: 165 ]]
-        -- upvalues: v3 (ref), l_ImageSetLabel_0 (ref), l_Images_0 (ref), v26 (copy)
-        local l_Theme_0 = v27.Theme;
-        local l_Font_0 = v27.Font;
-        return v3.createElement("Frame", {
-            LayoutOrder = 1, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y
-        }, {
-            Padding = v3.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 12), 
-                PaddingBottom = UDim.new(0, 12)
-            }), 
-            Layout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            IconContainer = v3.createElement("Frame", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, 96, 0, 96), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                AnchorPoint = Vector2.new(0, 0), 
-                Position = UDim2.new(0, 0, 0, 0)
-            }, {
-                Padding = v3.createElement("UIPadding", {
-                    PaddingRight = UDim.new(0, 12)
-                }), 
-                Icon = v3.createElement(l_ImageSetLabel_0, {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    ScaleType = Enum.ScaleType.Fit, 
-                    Image = l_Images_0["icons/graphic/premium_large"]
-                })
-            }), 
-            PremiumInfoContainer = v3.createElement("Frame", {
-                LayoutOrder = 2, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, -80, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                Padding = v3.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 6)
-                }), 
-                ListLayout = v3.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, 12)
-                }), 
-                PremiumHeader = v3.createElement("TextLabel", {
-                    LayoutOrder = 1, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = true, 
-                    Font = l_Font_0.Header2.Font, 
-                    RichText = true, 
-                    Text = v26.headerLocalizedText, 
-                    TextSize = l_Font_0.BaseSize * l_Font_0.Header2.RelativeSize, 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency
-                }), 
-                CostPerMonth = v3.createElement("TextLabel", {
-                    LayoutOrder = 2, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = true, 
-                    Font = l_Font_0.Body.Font, 
-                    RichText = true, 
-                    Text = v26.priceLocalizedText, 
-                    TextSize = l_Font_0.BaseSize, 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency
-                }), 
-                RenewAndCancelText = v3.createElement("TextLabel", {
-                    LayoutOrder = 3, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = true, 
-                    Font = l_Font_0.Body.Font, 
-                    Text = v26.policyLocalizedText, 
-                    TextSize = l_Font_0.BaseSize, 
-                    TextColor3 = l_Theme_0.TextDefault.Color, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency
-                })
-            })
-        });
-    end);
-end;
-v14.renderBulletInfo = function(v30, v31) --[[ Line: 261 ]] --[[ Name: renderBulletInfo ]]
-    -- upvalues: l_withStyle_0 (copy), l_getPartialPageModalMiddleContentWidth_0 (copy), v3 (copy), l_FitFrameVertical_0 (copy), v13 (copy)
-    return l_withStyle_0(function(v32) --[[ Line: 262 ]]
-        -- upvalues: l_getPartialPageModalMiddleContentWidth_0 (ref), v30 (copy), v3 (ref), v31 (copy), l_FitFrameVertical_0 (ref), v13 (ref)
-        local l_Theme_1 = v32.Theme;
-        local l_Font_1 = v32.Font;
-        local v35 = l_getPartialPageModalMiddleContentWidth_0(v30.props.screenSize.X);
-        return v3.createElement("Frame", {
-            LayoutOrder = 2, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y
-        }, {
-            Padding = v3.createElement("UIPadding", {
-                PaddingBottom = UDim.new(0, 12)
-            }), 
-            ListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 12)
-            }), 
-            BulletListText = v3.createElement("TextLabel", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, v35, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                Font = l_Font_1.Body.Font, 
-                Text = v31.descLocalizedText, 
-                TextSize = l_Font_1.BaseSize * l_Font_1.Body.RelativeSize, 
-                TextColor3 = l_Theme_1.TextDefault.Color, 
-                TextTransparency = l_Theme_1.TextDefault.Transparency
-            }), 
-            BulletList = v3.createElement(l_FitFrameVertical_0, {
-                LayoutOrder = 2, 
-                BackgroundTransparency = 1, 
-                width = UDim.new(1, 0), 
-                contentPadding = UDim.new(0, 12)
-            }, {
-                BulletText1 = v3.createElement(v13, {
-                    text = v31.bulletPoint1Text, 
-                    width = v35, 
-                    layoutOrder = 1
-                }), 
-                BulletText2 = v3.createElement(v13, {
-                    text = v31.bulletPoint2Text, 
-                    width = v35, 
-                    layoutOrder = 2
-                }), 
-                BulletText3 = v3.createElement(v13, {
-                    text = v31.bulletPoint3Text, 
-                    width = v35, 
-                    layoutOrder = 3
-                })
-            })
-        });
-    end);
-end;
-v14.renderDisclosure = function(_, v37) --[[ Line: 321 ]] --[[ Name: renderDisclosure ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy)
-    return l_withStyle_0(function(v38) --[[ Line: 322 ]]
-        -- upvalues: v3 (ref), v37 (copy)
-        local l_Theme_2 = v38.Theme;
-        local l_Font_2 = v38.Font;
-        return v3.createElement("Frame", {
-            LayoutOrder = 5, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y
-        }, {
-            Padding = v3.createElement("UIPadding", {
-                PaddingBottom = UDim.new(0, 12)
-            }), 
-            Disclosure = v3.createElement("TextLabel", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                RichText = true, 
-                TextWrapped = true, 
-                Font = l_Font_2.Body.Font, 
-                Text = v37.shortDisclosure, 
-                TextSize = l_Font_2.BaseSize * l_Font_2.Body.RelativeSize, 
-                TextColor3 = l_Theme_2.TextDefault.Color, 
-                TextTransparency = l_Theme_2.TextDefault.Transparency
-            })
-        });
-    end);
-end;
-v14.renderLandscapePrompt = function(v41, v42) --[[ Line: 352 ]] --[[ Name: renderLandscapePrompt ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy), l_PartialPageModal_0 (copy), l_ButtonType_0 (copy)
-    local l_props_1 = v41.props;
-    return l_withStyle_0(function(_) --[[ Line: 355 ]]
-        -- upvalues: v3 (ref), l_PartialPageModal_0 (ref), v42 (copy), l_props_1 (copy), l_ButtonType_0 (ref), v41 (copy)
-        return v3.createElement(l_PartialPageModal_0, {
-            title = v42.titleLocalizedText, 
-            screenSize = l_props_1.screenSize, 
-            buttonStackProps = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = l_props_1.purchasePremiumActivated, 
-                            text = v42.monthlyLocalizedText, 
-                            inputIcon = l_props_1.acceptControllerIcon
-                        }
-                    }
-                }, 
-                buttonHeight = 48
-            }, 
-            onCloseClicked = l_props_1.cancelPurchaseActivated
-        }, {
-            v3.createElement("ScrollingFrame", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, l_props_1.screenSize.Y / 2), 
-                BorderSizePixel = 0, 
-                ZIndex = 2, 
-                ScrollingEnabled = true, 
-                ScrollBarThickness = 5, 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                Selectable = false, 
-                CanvasSize = UDim2.new(1, 0, 0, (math.min(l_props_1.screenSize.Y / 2 + 96 + 12, 450)))
-            }, {
-                Layout = v3.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                IconAndPremiumInfoContainer = v41:renderCondensedPremiumInfo(v42), 
-                BulletList = v41:renderBulletInfo(v42), 
-                Disclosure = v41:renderDisclosure(v42)
-            })
-        });
-    end);
-end;
-v14.renderPortraitPrompt = function(v45, v46) --[[ Line: 403 ]] --[[ Name: renderPortraitPrompt ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy), l_PartialPageModal_0 (copy), l_ButtonType_0 (copy)
-    local l_props_2 = v45.props;
-    return l_withStyle_0(function(_) --[[ Line: 406 ]]
-        -- upvalues: v3 (ref), l_PartialPageModal_0 (ref), v46 (copy), l_props_2 (copy), l_ButtonType_0 (ref), v45 (copy)
-        return v3.createElement(l_PartialPageModal_0, {
-            title = v46.titleLocalizedText, 
-            screenSize = l_props_2.screenSize, 
-            buttonStackProps = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = l_props_2.purchasePremiumActivated, 
-                            text = v46.monthlyLocalizedText, 
-                            inputIcon = l_props_2.acceptControllerIcon
-                        }
-                    }
-                }, 
-                buttonHeight = 48
-            }, 
-            onCloseClicked = l_props_2.cancelPurchaseActivated
-        }, {
-            v3.createElement("Frame", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                Layout = v3.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                IconAndPremiumInfoContainer = v45:renderCondensedPremiumInfo(v46), 
-                BulletList = v45:renderBulletInfo(v46), 
-                Disclosure = v45:renderDisclosure(v46)
-            })
-        });
-    end);
-end;
-v14.renderUpdatedPrompt = function(v49, v50) --[[ Line: 443 ]] --[[ Name: renderUpdatedPrompt ]]
-    -- upvalues: l_withStyle_0 (copy), l_getPartialPageModalMiddleContentWidth_0 (copy), v3 (copy), l_PartialPageModal_0 (copy), l_ButtonType_0 (copy), l_FitFrameVertical_0 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), v13 (copy)
-    local l_props_3 = v49.props;
-    return l_withStyle_0(function(v52) --[[ Line: 446 ]]
-        -- upvalues: l_getPartialPageModalMiddleContentWidth_0 (ref), v49 (copy), v3 (ref), l_PartialPageModal_0 (ref), v50 (copy), l_props_3 (copy), l_ButtonType_0 (ref), l_FitFrameVertical_0 (ref), l_ImageSetLabel_0 (ref), l_Images_0 (ref), v13 (ref)
-        local l_Theme_3 = v52.Theme;
-        local l_Font_3 = v52.Font;
-        local v55 = l_getPartialPageModalMiddleContentWidth_0(v49.props.screenSize.X);
-        return v3.createElement(l_PartialPageModal_0, {
-            title = v50.titleLocalizedText, 
-            screenSize = l_props_3.screenSize, 
-            buttonStackProps = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = l_props_3.purchasePremiumActivated, 
-                            text = v50.monthlyLocalizedText, 
-                            inputIcon = l_props_3.acceptControllerIcon
-                        }
-                    }
-                }, 
-                buttonHeight = 48
-            }, 
-            onCloseClicked = l_props_3.cancelPurchaseActivated
-        }, {
-            v3.createElement(l_FitFrameVertical_0, {
-                BackgroundTransparency = 1, 
-                width = UDim.new(1, 0), 
-                contentPadding = UDim.new(0, 12), 
-                margin = {
-                    top = 12, 
-                    bottom = 12
-                }, 
-                [v3.Change.AbsoluteSize] = function(v56) --[[ Line: 479 ]]
-                    -- upvalues: v49 (ref)
-                    if v49.contentSize.X ~= v56.AbsoluteSize.X or v49.contentSize.Y ~= v56.AbsoluteSize.Y then
-                        v49.updateContentSizes(v49.props.screenSize, v56.AbsoluteSize);
-                    end;
-                end
-            }, {
-                Icon = v3.createElement(l_ImageSetLabel_0, {
-                    LayoutOrder = 1, 
-                    BackgroundTransparency = 1, 
-                    Size = v49.state.iconSize, 
-                    ScaleType = Enum.ScaleType.Fit, 
-                    Image = l_Images_0["icons/graphic/premium_large"]
-                }), 
-                PremiumInfoContainer = v3.createElement("Frame", {
-                    LayoutOrder = 2, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    Padding = v3.createElement("UIPadding", {
-                        PaddingBottom = UDim.new(0, 12)
-                    }), 
-                    ListLayout = v3.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        Padding = UDim.new(0, 12)
-                    }), 
-                    PremiumHeader = v3.createElement("TextLabel", {
-                        LayoutOrder = 1, 
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        AutomaticSize = Enum.AutomaticSize.Y, 
-                        TextXAlignment = Enum.TextXAlignment.Center, 
-                        Font = l_Font_3.Header2.Font, 
-                        RichText = true, 
-                        Text = v50.headerLocalizedText, 
-                        TextSize = l_Font_3.BaseSize * l_Font_3.Header2.RelativeSize, 
-                        TextColor3 = l_Theme_3.TextEmphasis.Color, 
-                        TextTransparency = l_Theme_3.TextDefault.Transparency
-                    }), 
-                    CostPerMonth = v3.createElement("TextLabel", {
-                        LayoutOrder = 2, 
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        AutomaticSize = Enum.AutomaticSize.Y, 
-                        TextXAlignment = Enum.TextXAlignment.Center, 
-                        Font = l_Font_3.Body.Font, 
-                        RichText = true, 
-                        Text = v50.priceLocalizedText, 
-                        TextSize = l_Font_3.BaseSize, 
-                        TextColor3 = l_Theme_3.TextEmphasis.Color, 
-                        TextTransparency = l_Theme_3.TextDefault.Transparency
-                    }), 
-                    CancelText = v3.createElement("TextLabel", {
-                        LayoutOrder = 3, 
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        AutomaticSize = Enum.AutomaticSize.Y, 
-                        TextXAlignment = Enum.TextXAlignment.Center, 
-                        Font = l_Font_3.Body.Font, 
-                        Text = v50.policyLocalizedText, 
-                        TextSize = l_Font_3.BaseSize, 
-                        TextColor3 = l_Theme_3.TextDefault.Color, 
-                        TextTransparency = l_Theme_3.TextDefault.Transparency
-                    })
-                }), 
-                BulletListText = v3.createElement("TextLabel", {
-                    LayoutOrder = 3, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(0, v55, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    Font = l_Font_3.Body.Font, 
-                    Text = v50.descLocalizedText, 
-                    TextSize = l_Font_3.BaseSize * l_Font_3.Body.RelativeSize, 
-                    TextColor3 = l_Theme_3.TextDefault.Color, 
-                    TextTransparency = l_Theme_3.TextDefault.Transparency
-                }), 
-                BulletList = v3.createElement(l_FitFrameVertical_0, {
-                    LayoutOrder = 4, 
-                    BackgroundTransparency = 1, 
-                    width = UDim.new(1, 0), 
-                    contentPadding = UDim.new(0, 12)
-                }, {
-                    BulletText1 = v3.createElement(v13, {
-                        text = v50.bulletPoint1Text, 
-                        width = v55, 
-                        layoutOrder = 1
-                    }), 
-                    BulletText2 = v3.createElement(v13, {
-                        text = v50.bulletPoint2Text, 
-                        width = v55, 
-                        layoutOrder = 2
-                    }), 
-                    BulletText3 = v3.createElement(v13, {
-                        text = v50.bulletPoint3Text, 
-                        width = v55, 
-                        layoutOrder = 3
-                    })
-                }), 
-                Disclosure = v49:renderDisclosure(v50)
-            })
-        });
-    end);
-end;
-v14.renderPrompt = function(v57, v58) --[[ Line: 585 ]] --[[ Name: renderPrompt ]]
-    local l_props_4 = v57.props;
-    if l_props_4.screenSize.Y < 450 then
-        return v57:renderLandscapePrompt(v58);
-    elseif l_props_4.screenSize.X < 450 then
-        return v57:renderPortraitPrompt(v58);
-    else
-        return v57:renderUpdatedPrompt(v58);
-    end;
-end;
-return v14;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Roact = require(scriptParentParentParent.Roact)
+local FitFrameVertical = require(scriptParentParentParent.RoactFitComponents).FitFrameVertical
+local UIBlox = require(scriptParentParentParent.UIBlox)
+local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
+local getPartialPageModalMiddleContentWidth = UIBlox.App.Dialog.Modal.getPartialPageModalMiddleContentWidth
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local withStyle = UIBlox.Style.withStyle
+local MultiTextLocalizer = require(scriptParentParent.Locale.MultiTextLocalizer)
+local BulletPoint = require(scriptParent.BulletPoint)
+local v15 = Roact.Component:extend(script.Name)
+
+function v15.init(p1) -- line: 47
+	p1.isCondensed = false
+	p1.contentSize = Vector2.new(0, 0)
+	p1.state = {
+		padding = UDim.new(0, 24),
+		iconSize = UDim2.new(1, 0, 0, 80)
+	}
+
+	function p1.updateContentSizes(vector2: Vector2, vector2_2: Vector2) -- line: 56
+		-- upvalues: p1 (copy)
+		if vector2_2.X < 200 or vector2_2.Y > 1000 then
+			return
+		end
+
+		local contentSize = p1.contentSize
+
+		p1.contentSize = vector2_2
+
+		if vector2_2.X == 0 and vector2_2.Y == 0 then
+			return
+		end
+
+		if vector2.X == 0 and vector2.Y == 0 then
+			return
+		end
+
+		if vector2_2 == contentSize and vector2 == p1.props.screenSize then
+			return
+		end
+
+		local v42 = if not p1.isCondensed then vector2.Y < vector2_2.Y + 120 else vector2.Y < vector2_2.Y + 120 + 80 - 48 + 24
+
+		p1.isCondensed = v42
+		p1:setState({
+			padding = UDim.new(0, not v42 and 24 or 12),
+			iconSize = UDim2.new(1, 0, 0, not v42 and 80 or 48)
+		})
+	end
+end
+function v15.willUpdate(p2, p3) -- line: 98
+	if p2.props.screenSize ~= p3.screenSize then
+		p2.updateContentSizes(p3.screenSize, p2.contentSize)
+	end
+end
+function v15.render(p4) -- line: 104
+	-- upvalues: Roact (copy), MultiTextLocalizer (copy)
+	local props = p4.props
+
+	return Roact.createElement(MultiTextLocalizer, {
+		keys = {
+			titleLocalizedText = {
+				key = "IAPExperience.SubscriptionPurchasePrompt.Label.GetSubscription"
+			},
+			monthlyLocalizedText = {
+				key = "IAPExperience.PremiumUpsell.Action.Subscribe"
+			},
+			descLocalizedText = {
+				key = "IAPExperience.PremiumUpsell.Label.PremiumBenefitListDesc"
+			},
+			bulletPoint1Text = {
+				key = "IAPExperience.PremiumUpsell.Label.RobuxPerMonth",
+				params = {
+					robux = utf8.char(57346) .. tostring(props.robuxAmount)
+				}
+			},
+			bulletPoint2Text = {
+				key = "IAPExperience.PremiumUpsell.Label.PremiumOnlyBenefits"
+			},
+			bulletPoint3Text = if not props.isCatalog then {
+				key = "IAPExperience.PremiumUpsell.Body.RobuxDiscount"
+			} else {
+				key = "IAPExperience.PremiumUpsell.Label.AvatarShopBenefits"
+			},
+			disclosure = {
+				key = "IAPExperience.PremiumUpsell.Label.Disclosure",
+				params = {
+					currencySymbol = props.currencySymbol,
+					price = tostring(props.robuxPrice)
+				}
+			},
+			shortDisclosure = {
+				key = "IAPExperience.PremiumUpsell.Label.ShortDisclosure"
+			},
+			priceLocalizedText = {
+				key = "IAPExperience.PremiumUpsell.Label.PremiumPrice",
+				params = {
+					currencySymbol = props.currencySymbol,
+					price = tostring(props.robuxPrice)
+				}
+			},
+			headerLocalizedText = {
+				key = "IAPExperience.PremiumUpsell.Label.RobloxPremium"
+			},
+			policyLocalizedText = {
+				key = "IAPExperience.PremiumUpsell.Label.PremiumPolicy"
+			}
+		},
+		render = function(p5) -- line: 158
+			-- upvalues: p4 (copy)
+			return p4:renderPrompt(p5)
+		end
+	})
+end
+function v15.renderCondensedPremiumInfo(_: {[any]: any}, t2: {[any]: any}) -- line: 164
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), Images (copy)
+	return withStyle(function(p6) -- line: 165
+		-- upvalues: Roact (copy), ImageSetLabel (copy), Images (copy), t2 (copy)
+		local Theme = p6.Theme
+		local p6Font = p6.Font
+
+		return Roact.createElement("Frame", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 12),
+				PaddingBottom = UDim.new(0, 12)
+			}),
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			IconContainer = Roact.createElement("Frame", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 96, 0, 96),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				AnchorPoint = Vector2.new(0, 0),
+				Position = UDim2.new(0, 0, 0, 0)
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, 12)
+				}),
+				Icon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					ScaleType = Enum.ScaleType.Fit,
+					Image = Images["icons/graphic/premium_large"]
+				})
+			}),
+			PremiumInfoContainer = Roact.createElement("Frame", {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -80, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 6)
+				}),
+				ListLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 12)
+				}),
+				PremiumHeader = Roact.createElement("TextLabel", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					RichText = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Font = p6Font.Header2.Font,
+					Text = t2.headerLocalizedText,
+					TextSize = p6Font.BaseSize * p6Font.Header2.RelativeSize,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				}),
+				CostPerMonth = Roact.createElement("TextLabel", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					RichText = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Font = p6Font.Body.Font,
+					Text = t2.priceLocalizedText,
+					TextSize = p6Font.BaseSize,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				}),
+				RenewAndCancelText = Roact.createElement("TextLabel", {
+					LayoutOrder = 3,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Font = p6Font.Body.Font,
+					Text = t2.policyLocalizedText,
+					TextSize = p6Font.BaseSize,
+					TextColor3 = Theme.TextDefault.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				})
+			})
+		})
+	end)
+end
+function v15.renderBulletInfo(t3: {[any]: any}, t4: {[any]: any}) -- line: 261
+	-- upvalues: withStyle (copy), getPartialPageModalMiddleContentWidth (copy), Roact (copy), FitFrameVertical (copy), BulletPoint (copy)
+	return withStyle(function(p7) -- line: 262
+		-- upvalues: getPartialPageModalMiddleContentWidth (copy), t3 (copy), Roact (copy), t4 (copy), FitFrameVertical (copy), BulletPoint (copy)
+		local Theme = p7.Theme
+		local p7Font = p7.Font
+		local v50 = getPartialPageModalMiddleContentWidth(t3.props.screenSize.X)
+
+		return Roact.createElement("Frame", {
+			LayoutOrder = 2,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, 12)
+			}),
+			ListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 12)
+			}),
+			BulletListText = Roact.createElement("TextLabel", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, v50, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = p7Font.Body.Font,
+				Text = t4.descLocalizedText,
+				TextSize = p7Font.BaseSize * p7Font.Body.RelativeSize,
+				TextColor3 = Theme.TextDefault.Color,
+				TextTransparency = Theme.TextDefault.Transparency
+			}),
+			BulletList = Roact.createElement(FitFrameVertical, {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				width = UDim.new(1, 0),
+				contentPadding = UDim.new(0, 12)
+			}, {
+				BulletText1 = Roact.createElement(BulletPoint, {
+					layoutOrder = 1,
+					text = t4.bulletPoint1Text,
+					width = v50
+				}),
+				BulletText2 = Roact.createElement(BulletPoint, {
+					layoutOrder = 2,
+					text = t4.bulletPoint2Text,
+					width = v50
+				}),
+				BulletText3 = Roact.createElement(BulletPoint, {
+					layoutOrder = 3,
+					text = t4.bulletPoint3Text,
+					width = v50
+				})
+			})
+		})
+	end)
+end
+function v15.renderDisclosure(_: {[any]: any}, t6: {[any]: any}) -- line: 321
+	-- upvalues: withStyle (copy), Roact (copy)
+	return withStyle(function(p8) -- line: 322
+		-- upvalues: Roact (copy), t6 (copy)
+		local Theme = p8.Theme
+		local p8Font = p8.Font
+
+		return Roact.createElement("Frame", {
+			LayoutOrder = 5,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, 12)
+			}),
+			Disclosure = Roact.createElement("TextLabel", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				RichText = true,
+				TextWrapped = true,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = p8Font.Body.Font,
+				Text = t6.shortDisclosure,
+				TextSize = p8Font.BaseSize * p8Font.Body.RelativeSize,
+				TextColor3 = Theme.TextDefault.Color,
+				TextTransparency = Theme.TextDefault.Transparency
+			})
+		})
+	end)
+end
+function v15.renderLandscapePrompt(t7: {[any]: any}, t8: {[any]: any}) -- line: 352
+	-- upvalues: withStyle (copy), Roact (copy), PartialPageModal (copy), ButtonType (copy)
+	local props = t7.props
+
+	return withStyle(function(_) -- line: 355
+		-- upvalues: Roact (copy), PartialPageModal (copy), t8 (copy), props (copy), ButtonType (copy), t7 (copy)
+		return Roact.createElement(PartialPageModal, {
+			title = t8.titleLocalizedText,
+			screenSize = props.screenSize,
+			buttonStackProps = {
+				buttonHeight = 48,
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props.purchasePremiumActivated,
+						text = t8.monthlyLocalizedText,
+						inputIcon = props.acceptControllerIcon
+					}
+				}}
+			},
+			onCloseClicked = props.cancelPurchaseActivated
+		}, { Roact.createElement("ScrollingFrame", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 2,
+			ScrollingEnabled = true,
+			ScrollBarThickness = 5,
+			Selectable = false,
+			Size = UDim2.new(1, 0, 0, props.screenSize.Y / 2),
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			CanvasSize = UDim2.new(1, 0, 0, (math.min(props.screenSize.Y / 2 + 96 + 12, 450)))
+		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			IconAndPremiumInfoContainer = t7:renderCondensedPremiumInfo(t8),
+			BulletList = t7:renderBulletInfo(t8),
+			Disclosure = t7:renderDisclosure(t8)
+		}) })
+	end)
+end
+function v15.renderPortraitPrompt(t9: {[any]: any}, t10: {[any]: any}) -- line: 403
+	-- upvalues: withStyle (copy), Roact (copy), PartialPageModal (copy), ButtonType (copy)
+	local props = t9.props
+
+	return withStyle(function(_) -- line: 406
+		-- upvalues: Roact (copy), PartialPageModal (copy), t10 (copy), props (copy), ButtonType (copy), t9 (copy)
+		return Roact.createElement(PartialPageModal, {
+			title = t10.titleLocalizedText,
+			screenSize = props.screenSize,
+			buttonStackProps = {
+				buttonHeight = 48,
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props.purchasePremiumActivated,
+						text = t10.monthlyLocalizedText,
+						inputIcon = props.acceptControllerIcon
+					}
+				}}
+			},
+			onCloseClicked = props.cancelPurchaseActivated
+		}, { Roact.createElement("Frame", {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			IconAndPremiumInfoContainer = t9:renderCondensedPremiumInfo(t10),
+			BulletList = t9:renderBulletInfo(t10),
+			Disclosure = t9:renderDisclosure(t10)
+		}) })
+	end)
+end
+function v15.renderUpdatedPrompt(t11: {[any]: any}, t12: {[any]: any}) -- line: 443
+	-- upvalues: withStyle (copy), getPartialPageModalMiddleContentWidth (copy), Roact (copy), PartialPageModal (copy), ButtonType (copy), FitFrameVertical (copy), ImageSetLabel (copy), Images (copy), BulletPoint (copy)
+	local props = t11.props
+
+	return withStyle(function(p11) -- line: 446
+		-- upvalues: getPartialPageModalMiddleContentWidth (copy), t11 (copy), Roact (copy), PartialPageModal (copy), t12 (copy), props (copy), ButtonType (copy), FitFrameVertical (copy), ImageSetLabel (copy), Images (copy), BulletPoint (copy)
+		local Theme = p11.Theme
+		local p11Font = p11.Font
+		local v59 = getPartialPageModalMiddleContentWidth(t11.props.screenSize.X)
+
+		return Roact.createElement(PartialPageModal, {
+			title = t12.titleLocalizedText,
+			screenSize = props.screenSize,
+			buttonStackProps = {
+				buttonHeight = 48,
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = props.purchasePremiumActivated,
+						text = t12.monthlyLocalizedText,
+						inputIcon = props.acceptControllerIcon
+					}
+				}}
+			},
+			onCloseClicked = props.cancelPurchaseActivated
+		}, { Roact.createElement(FitFrameVertical, {
+			BackgroundTransparency = 1,
+			width = UDim.new(1, 0),
+			contentPadding = UDim.new(0, 12),
+			margin = {
+				top = 12,
+				bottom = 12
+			},
+			[Roact.Change.AbsoluteSize] = function(p12) -- line: 479
+				-- upvalues: t11 (copy)
+				if t11.contentSize.X ~= p12.AbsoluteSize.X or t11.contentSize.Y ~= p12.AbsoluteSize.Y then
+					t11.updateContentSizes(t11.props.screenSize, p12.AbsoluteSize)
+				end
+			end
+		}, {
+			Icon = Roact.createElement(ImageSetLabel, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = t11.state.iconSize,
+				ScaleType = Enum.ScaleType.Fit,
+				Image = Images["icons/graphic/premium_large"]
+			}),
+			PremiumInfoContainer = Roact.createElement("Frame", {
+				LayoutOrder = 2,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingBottom = UDim.new(0, 12)
+				}),
+				ListLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 12)
+				}),
+				PremiumHeader = Roact.createElement("TextLabel", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					RichText = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					Font = p11Font.Header2.Font,
+					Text = t12.headerLocalizedText,
+					TextSize = p11Font.BaseSize * p11Font.Header2.RelativeSize,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				}),
+				CostPerMonth = Roact.createElement("TextLabel", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					RichText = true,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					Font = p11Font.Body.Font,
+					Text = t12.priceLocalizedText,
+					TextSize = p11Font.BaseSize,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				}),
+				CancelText = Roact.createElement("TextLabel", {
+					LayoutOrder = 3,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					Font = p11Font.Body.Font,
+					Text = t12.policyLocalizedText,
+					TextSize = p11Font.BaseSize,
+					TextColor3 = Theme.TextDefault.Color,
+					TextTransparency = Theme.TextDefault.Transparency
+				})
+			}),
+			BulletListText = Roact.createElement("TextLabel", {
+				LayoutOrder = 3,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, v59, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Font = p11Font.Body.Font,
+				Text = t12.descLocalizedText,
+				TextSize = p11Font.BaseSize * p11Font.Body.RelativeSize,
+				TextColor3 = Theme.TextDefault.Color,
+				TextTransparency = Theme.TextDefault.Transparency
+			}),
+			BulletList = Roact.createElement(FitFrameVertical, {
+				LayoutOrder = 4,
+				BackgroundTransparency = 1,
+				width = UDim.new(1, 0),
+				contentPadding = UDim.new(0, 12)
+			}, {
+				BulletText1 = Roact.createElement(BulletPoint, {
+					layoutOrder = 1,
+					text = t12.bulletPoint1Text,
+					width = v59
+				}),
+				BulletText2 = Roact.createElement(BulletPoint, {
+					layoutOrder = 2,
+					text = t12.bulletPoint2Text,
+					width = v59
+				}),
+				BulletText3 = Roact.createElement(BulletPoint, {
+					layoutOrder = 3,
+					text = t12.bulletPoint3Text,
+					width = v59
+				})
+			}),
+			Disclosure = t11:renderDisclosure(t12)
+		}) })
+	end)
+end
+function v15.renderPrompt(t13: {[any]: any}, t14: {[any]: any}) -- line: 585
+	local props = t13.props
+
+	if props.screenSize.Y < 450 then
+		return t13:renderLandscapePrompt(t14)
+	end
+
+	if props.screenSize.X < 450 then
+		return t13:renderPortraitPrompt(t14)
+	end
+
+	return t13:renderUpdatedPrompt(t14)
+end
+
+return v15

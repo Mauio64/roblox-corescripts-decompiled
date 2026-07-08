@@ -1,0 +1,3 @@
+local FFlagHomePagePromptsHandlerEnabled = require(script.Parent.FFlagHomePagePromptsHandlerEnabled)
+
+return game:DefineFastFlag("HomepagePromptsPaddingFix", false) and FFlagHomePagePromptsHandlerEnabled

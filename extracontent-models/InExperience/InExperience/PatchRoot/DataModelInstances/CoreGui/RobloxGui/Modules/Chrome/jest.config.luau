@@ -1,13 +1,13 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.JestConfigs);
+local CorePackages = game:GetService("CorePackages")
+local JestConfigs = require(CorePackages.Workspace.Packages.JestConfigs)
+
 return {
-    displayName = "CoreScripts-Chrome", 
-    testMatch = {
-        "**/*.test"
-    }, 
-    setupFilesAfterEnv = {
-        v1.setupFiles.LogHandler, 
-        v1.setupFiles.UIBloxInitializer, 
-        v1.setupFiles.createPromiseRejectionHandler()
-    }
-};
+	displayName = "CoreScripts-Chrome",
+	testMatch = { "**/*.test" },
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.LogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
+	}
+}

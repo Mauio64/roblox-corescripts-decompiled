@@ -1,48 +1,49 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v4 = require(l_Actions_0.ShowMenu);
-local v5 = require(l_Actions_0.HideMenu);
-local v6 = require(l_Actions_0.ShowError);
-local v7 = require(l_Actions_0.HideError);
-local v8 = require(l_Actions_0.SetGuiInset);
-local v9 = {
-    menuVisible = false, 
-    guiInset = 0, 
-    errorVisible = false, 
-    errorText = ""
-};
-return v2.createReducer(v9, {
-    [v4.name] = function(v10, _) --[[ Line: 30 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v10, {
-            menuVisible = true
-        });
-    end, 
-    [v5.name] = function(v12, _) --[[ Line: 36 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v12, {
-            menuVisible = false
-        });
-    end, 
-    [v6.name] = function(v14, v15) --[[ Line: 42 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v14, {
-            errorVisible = true, 
-            errorText = v15.errorText
-        });
-    end, 
-    [v7.name] = function(v16, _) --[[ Line: 49 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v16, {
-            errorVisible = false
-        });
-    end, 
-    [v8.name] = function(v18, v19) --[[ Line: 55 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v18, {
-            guiInset = v19.guiInset
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local Actions = script.Parent.Parent.Actions
+local ShowMenu = require(Actions.ShowMenu)
+local HideMenu = require(Actions.HideMenu)
+local ShowError = require(Actions.ShowError)
+local HideError = require(Actions.HideError)
+local SetGuiInset = require(Actions.SetGuiInset)
+local t1 = {
+	menuVisible = false,
+	guiInset = 0,
+	errorVisible = false,
+	errorText = ""
+}
+
+return Rodux.createReducer(t1, {
+	[ShowMenu.name] = function(p1, _) -- line: 30
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			menuVisible = true
+		})
+	end,
+	[HideMenu.name] = function(p3, _) -- line: 36
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			menuVisible = false
+		})
+	end,
+	[ShowError.name] = function(p5, p6) -- line: 42
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p5, {
+			errorVisible = true,
+			errorText = p6.errorText
+		})
+	end,
+	[HideError.name] = function(p7, _) -- line: 49
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p7, {
+			errorVisible = false
+		})
+	end,
+	[SetGuiInset.name] = function(p9, p10) -- line: 55
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p9, {
+			guiInset = p10.guiInset
+		})
+	end
+})

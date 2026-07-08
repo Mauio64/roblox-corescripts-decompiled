@@ -1,77 +1,76 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(script.Parent.SetNicknameModal);
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.RobloxAppHooks);
-local v5 = require(l_Parent_0.Networking.FriendsNetworking);
-local v6 = require(l_Parent_1.UserProfiles);
-local l_useScreenSize_0 = v4.useScreenSize;
-local l_useDispatch_0 = require(l_Parent_1.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useLocalUserId_0 = require(l_Parent_1.RobloxAppHooks).useLocalUserId;
-local v10 = require(l_Parent_1.RobloxAppNavigation);
-local l_useNavigation_0 = require(l_Parent_1.Navigation).useNavigation;
-local l_useUserProfilesFetch_0 = v6.Hooks.useUserProfilesFetch;
-local l_userProfilesDisplayNameAndUsernameByUserIds_0 = v6.Queries.userProfilesDisplayNameAndUsernameByUserIds;
-return function() --[[ Line: 30 ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useDispatch_0 (copy), l_useLocalUserId_0 (copy), l_useNavigation_0 (copy), v10 (copy), l_useUserProfilesFetch_0 (copy), l_userProfilesDisplayNameAndUsernameByUserIds_0 (copy), v6 (copy), v5 (copy), v3 (copy), v2 (copy)
-    local v14 = l_useScreenSize_0();
-    local v15 = l_useDispatch_0();
-    local v16 = l_useLocalUserId_0();
-    local v17 = l_useNavigation_0();
-    local l_friendRequestParams_0 = v10.useNavigationProps(function(_, v19) --[[ Line: 36 ]]
-        return {
-            friendRequestParams = v19.friendRequestParams
-        };
-    end).friendRequestParams;
-    local v21 = l_useUserProfilesFetch_0({
-        userIds = {
-            l_friendRequestParams_0.targetUserId
-        }, 
-        query = l_userProfilesDisplayNameAndUsernameByUserIds_0
-    });
-    local v22 = nil;
-    v22 = if l_friendRequestParams_0 and v21 and v21.data then v6.Selectors.getDisplayNameFromId(v21.data, l_friendRequestParams_0.targetUserId) else nil;
-    local function v25(v23) --[[ Line: 57 ]]
-        -- upvalues: v16 (copy), v15 (copy), v5 (ref)
-        local v24 = {
-            senderNickname = v23, 
-            currentUserId = v16
-        };
-        return v15(v5.ValidateFriendRequestNickname.API(v24));
-    end;
-    local v26, v27 = v3.useState(false);
-    local v28, v29 = v3.useState(false);
-    local function v31() --[[ Line: 68 ]]
-        -- upvalues: v16 (copy), l_friendRequestParams_0 (copy), v15 (copy), v5 (ref)
-        local v30 = {
-            currentUserId = v16, 
-            targetUserId = l_friendRequestParams_0.targetUserId, 
-            friendshipOriginSourceType = l_friendRequestParams_0.source
-        };
-        return v15(v5.RequestFriendshipFromUserId.API(v30));
-    end;
-    local function v34(v32) --[[ Line: 77 ]]
-        -- upvalues: v16 (copy), l_friendRequestParams_0 (copy), v15 (copy), v5 (ref)
-        local v33 = {
-            currentUserId = v16, 
-            targetUserId = l_friendRequestParams_0.targetUserId, 
-            friendshipOriginSourceType = l_friendRequestParams_0.source, 
-            senderNickname = v32
-        };
-        return v15(v5.RequestFriendshipFromUserId.API(v33));
-    end;
-    return v3.createElement(v2, {
-        friendRequestSource = l_friendRequestParams_0.source, 
-        recipientDisplayName = v22, 
-        screenSize = v14, 
-        navigateBack = v17.goBack, 
-        sendFriendRequest = v31, 
-        sendFriendRequestWithNickname = v34, 
-        validateNickname = v25, 
-        onTextInput = v26, 
-        setOnTextInput = v27, 
-        isSaveButtonEnabled = v28, 
-        setSaveButtonEnabled = v29, 
-        source = l_friendRequestParams_0.source
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local SetNicknameModal = require(script.Parent.SetNicknameModal)
+local React = require(ParentParentParent.React)
+local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
+local FriendsNetworking = require(ParentParent.Networking.FriendsNetworking)
+local UserProfiles = require(ParentParentParent.UserProfiles)
+local useScreenSize = RobloxAppHooks.useScreenSize
+local useDispatch = require(ParentParentParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useLocalUserId = require(ParentParentParent.RobloxAppHooks).useLocalUserId
+local RobloxAppNavigation = require(ParentParentParent.RobloxAppNavigation)
+local useNavigation = require(ParentParentParent.Navigation).useNavigation
+local useUserProfilesFetch = UserProfiles.Hooks.useUserProfilesFetch
+local userProfilesDisplayNameAndUsernameByUserIds = UserProfiles.Queries.userProfilesDisplayNameAndUsernameByUserIds
+
+return function() -- line: 30
+	-- upvalues: useScreenSize (copy), useDispatch (copy), useLocalUserId (copy), useNavigation (copy), RobloxAppNavigation (copy), useUserProfilesFetch (copy), userProfilesDisplayNameAndUsernameByUserIds (copy), UserProfiles (copy), FriendsNetworking (copy), React (copy), SetNicknameModal (copy)
+	local v15 = useScreenSize()
+	local v16 = useDispatch()
+	local v17 = useLocalUserId()
+	local v18 = useNavigation()
+	local friendRequestParams = RobloxAppNavigation.useNavigationProps(function(_, p2) -- line: 36
+		return {
+			friendRequestParams = p2.friendRequestParams
+		}
+	end).friendRequestParams
+	local v20 = useUserProfilesFetch({
+		userIds = { friendRequestParams.targetUserId },
+		query = userProfilesDisplayNameAndUsernameByUserIds
+	})
+	local v21 = if not friendRequestParams or (not v20 or not v20.data) then nil else UserProfiles.Selectors.getDisplayNameFromId(v20.data, friendRequestParams.targetUserId)
+	local v22, v23 = React.useState(false)
+	local v24, v25 = React.useState(false)
+
+	return React.createElement(SetNicknameModal, {
+		friendRequestSource = friendRequestParams.source,
+		recipientDisplayName = v21,
+		screenSize = v15,
+		navigateBack = v18.goBack,
+		sendFriendRequest = function() -- line: 68
+			-- upvalues: v17 (copy), friendRequestParams (copy), v16 (copy), FriendsNetworking (copy)
+			local t1 = {
+				currentUserId = v17,
+				targetUserId = friendRequestParams.targetUserId,
+				friendshipOriginSourceType = friendRequestParams.source
+			}
+
+			return v16(FriendsNetworking.RequestFriendshipFromUserId.API(t1))
+		end,
+		sendFriendRequestWithNickname = function(p3) -- line: 77
+			-- upvalues: v17 (copy), friendRequestParams (copy), v16 (copy), FriendsNetworking (copy)
+			local t2 = {
+				currentUserId = v17,
+				targetUserId = friendRequestParams.targetUserId,
+				friendshipOriginSourceType = friendRequestParams.source,
+				senderNickname = p3
+			}
+
+			return v16(FriendsNetworking.RequestFriendshipFromUserId.API(t2))
+		end,
+		validateNickname = function(p4) -- line: 57
+			-- upvalues: v17 (copy), v16 (copy), FriendsNetworking (copy)
+			local t3 = {
+				senderNickname = p4,
+				currentUserId = v17
+			}
+
+			return v16(FriendsNetworking.ValidateFriendRequestNickname.API(t3))
+		end,
+		onTextInput = v22,
+		setOnTextInput = v23,
+		isSaveButtonEnabled = v24,
+		setSaveButtonEnabled = v25,
+		source = friendRequestParams.source
+	})
+end

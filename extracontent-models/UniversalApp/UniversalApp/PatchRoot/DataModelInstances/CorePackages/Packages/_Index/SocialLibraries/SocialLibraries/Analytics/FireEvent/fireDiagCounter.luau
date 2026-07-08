@@ -1,15 +1,18 @@
-local _ = require(script.Parent.Types);
-local v1 = require(script.Parent.getEventInfo);
-local v2 = require(script.Parent.optionallyLog);
-local v3 = require(script.Parent.Parent.Parent.RoduxTools.compose);
-local v4 = require(script.Parent.reportCounter);
-local function v6(v5) --[[ Line: 8 ]]
-    return "Fired diagCounter: " .. v5.name .. ", count: " .. (v5.count and tostring(v5.count) or "1");
-end;
-return function(v7) --[[ Line: 15 ]]
-    -- upvalues: v3 (copy), v4 (copy), v2 (copy), v6 (copy), v1 (copy)
-    return function(v8) --[[ Line: 16 ]]
-        -- upvalues: v3 (ref), v4 (ref), v7 (copy), v2 (ref), v6 (ref), v1 (ref)
-        return v3(v4(v7.diagImpl), v2(v7.loggerImpl, v6), v1(v7.eventList))(v8);
-    end;
-end;
+require(script.Parent.Types)
+
+local getEventInfo = require(script.Parent.getEventInfo)
+local optionallyLog = require(script.Parent.optionallyLog)
+local compose = require(script.Parent.Parent.Parent.RoduxTools.compose)
+local reportCounter = require(script.Parent.reportCounter)
+
+local function v5(p1) -- line: 8
+	return "Fired diagCounter: " .. p1.name .. ", count: " .. (p1.count and tostring(p1.count) or "1")
+end
+
+return function(t1: {[any]: any}) -- line: 15
+	-- upvalues: compose (copy), reportCounter (copy), optionallyLog (copy), v5 (copy), getEventInfo (copy)
+	return function(p2) -- line: 16
+		-- upvalues: compose (copy), reportCounter (copy), t1 (copy), optionallyLog (copy), v5 (copy), getEventInfo (copy)
+		return compose(reportCounter(t1.diagImpl), optionallyLog(t1.loggerImpl, v5), getEventInfo(t1.eventList))(p2)
+	end
+end

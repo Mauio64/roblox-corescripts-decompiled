@@ -1,5 +1,5 @@
 return {
-    Screenshot = "Screenshot", 
-    Video = "Video", 
-    Temporary = "Temporary"
-};
+	Screenshot = "Screenshot",
+	Video = "Video",
+	Temporary = "Temporary"
+}

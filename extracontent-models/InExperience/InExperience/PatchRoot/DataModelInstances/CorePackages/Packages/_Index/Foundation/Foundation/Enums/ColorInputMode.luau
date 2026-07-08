@@ -1,7 +1,7 @@
 return {
-    RGB = "RGB", 
-    RGBA = "RGBA", 
-    HSV = "HSV", 
-    Hex = "Hex", 
-    Brick = "Brick"
-};
+	RGB = "RGB",
+	RGBA = "RGBA",
+	HSV = "HSV",
+	Hex = "Hex",
+	Brick = "Brick"
+}

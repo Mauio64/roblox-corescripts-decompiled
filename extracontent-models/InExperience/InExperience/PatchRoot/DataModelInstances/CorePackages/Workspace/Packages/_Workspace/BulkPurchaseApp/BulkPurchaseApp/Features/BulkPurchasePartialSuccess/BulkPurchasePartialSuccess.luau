@@ -1,206 +1,194 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v5 = require(l_Parent_0.UIBlox);
-local l_StyledTextLabel_0 = v5.App.Text.StyledTextLabel;
-local l_Button_0 = v5.App.Button.Button;
-local l_ButtonType_0 = v5.App.Button.Enum.ButtonType;
-local v9 = require(l_script_FirstAncestor_0.Components.FullPagePrompt);
-local v10 = require(l_script_FirstAncestor_0.Components.ItemList_DEPRECATED);
-local v11 = require(l_script_FirstAncestor_0.Components.FullPagePromptTwoPanelLayout);
-local v12 = require(l_script_FirstAncestor_0.Components.Divider);
-local v13 = require(l_script_FirstAncestor_0.Components.ItemListHeader);
-local v14 = require(l_script_FirstAncestor_0.Components.FullPagePromptScrollList);
-local v15 = require(l_script_FirstAncestor_0.Components.Box);
-local v16 = require(l_script_FirstAncestor_0.Components.PriceBoxLine);
-local v17 = require(l_script_FirstAncestor_0.Components.ItemStatus);
-local _ = require(l_Parent_0.Style);
-local l_ItemCardThumbnail_0 = require(l_Parent_0.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail;
-local v20 = require(l_script_FirstAncestor_0.Components.ItemList);
-local _ = require(l_Parent_0.AvatarExperienceCommon);
-local v22 = require(l_script_FirstAncestor_0.Enums.ItemStatusToItemStatusKey);
-local v23 = require(l_script_FirstAncestor_0.Enums.ItemStatusKeyToLocalizationKey);
-local v24 = require(l_script_FirstAncestor_0.Flags.FFlagBulkPurchaseUsesCatalogRowItemCard);
-local function _(v25, v26) --[[ Line: 34 ]] --[[ Name: toCardPropsWithId ]]
-    local v27 = table.clone(v25);
-    v27.id = v26;
-    return v27;
-end;
-local v29 = {
-    heading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.Heading", 
-    unsuccessfulHeading = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.ErrorHeading", 
-    notice = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.Notice", 
-    itemListSuccessfulCount = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListSuccessfulCount", 
-    itemListUnsuccessfulCount = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListUnsuccessfulCount", 
-    itemListSuccessfulHeading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListSuccessfulHeading", 
-    itemListUnsuccessfulHeading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListUnsuccessfulHeading", 
-    robuxSpent = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.RobuxSpent", 
-    currentBalance = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.CurrentBalance", 
-    dismissCTA = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.DismissCTA"
-};
-local function v31(v30) --[[ Line: 60 ]] --[[ Name: mapTokens ]]
-    return {
-        boxBackground = v30.Semantic.Color.Background.Contrast.Color3, 
-        boxPadding = v30.Global.Space_300, 
-        boxCornerRadius = v30.Semantic.Radius.Medium, 
-        buttonMarginTop = v30.Global.Space_200, 
-        buttonHeight = v30.Global.Size_450, 
-        lineItemSpacing = v30.Global.Space_50, 
-        noticeFontStyle = v30.Semantic.Typography.Body, 
-        noticeColorStyle = v30.Semantic.Color.Text.Muted, 
-        noticeMarginBottom = v30.Global.Space_300, 
-        successColor = v30.Semantic.Color.Common.Success, 
-        failureColor = v30.Semantic.Color.Common.Alert
-    };
-end;
-local function v36(v32) --[[ Line: 76 ]] --[[ Name: mapBulkPurchasePartialSuccessItemsToPresentation ]]
-    -- upvalues: v2 (copy), v17 (copy)
-    local v33 = {};
-    for _, v35 in v32 do
-        table.insert(v33, {
-            id = v35.id, 
-            image = v35.image, 
-            name = v35.name, 
-            endSlot = v2.createElement(v17, {
-                status = v35.status
-            })
-        });
-    end;
-    return v33;
-end;
-local function v50(v37, v38, v39, v40) --[[ Line: 89 ]] --[[ Name: mapBulkPurchasePartialSuccessItemsToRowPresentation ]]
-    -- upvalues: v22 (copy), v2 (copy), l_ItemCardThumbnail_0 (copy)
-    local v41 = {};
-    for _, v43 in v37 do
-        local v44 = v38[v22[v43.status]];
-        local v45 = if v43.status == Enum.MarketplaceItemPurchaseStatus.Success then v39 else v40;
-        local v46 = {
-            type = "text", 
-            text = v44, 
-            colorStyle = v45
-        };
-        local v47 = {
-            presentationSlot = v2.createElement(l_ItemCardThumbnail_0, {
-                url = v43.image
-            }), 
-            title = v43.name, 
-            priceLineContent = {
-                v46
-            }
-        };
-        local l_id_0 = v43.id;
-        local v49 = table.clone(v47);
-        v49.id = l_id_0;
-        table.insert(v41, v49);
-    end;
-    return v41;
-end;
-return function(v51) --[[ Line: 126 ]] --[[ Name: BulkPurchasePartialSuccess ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v31 (copy), l_useLocalization_0 (copy), v29 (copy), v24 (copy), v23 (copy), v2 (copy), v9 (copy), l_StyledTextLabel_0 (copy), v11 (copy), v14 (copy), v13 (copy), v20 (copy), v50 (copy), v10 (copy), v36 (copy), v12 (copy), v15 (copy), v16 (copy), l_Button_0 (copy), l_ButtonType_0 (copy)
-    local v52 = l_useDesignTokens_0(v31);
-    local v53 = l_useLocalization_0(v29);
-    local v54 = {};
-    if v24 then
-        v54 = l_useLocalization_0(v23);
-    end;
-    local v55, v56 = v2.useBinding(Vector2.new(0, 0));
-    local v57 = #v51.successfulItems > 0;
-    return v2.createElement(v9, {
-        onClose = v51.onDismiss, 
-        title = if v57 then v53.heading else v53.unsuccessfulHeading
-    }, v2.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Top, 
-        Padding = UDim.new(0, v52.noticeMarginBottom)
-    }), v2.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        [v2.Change.AbsoluteSize] = function(v58) --[[ Line: 155 ]]
-            -- upvalues: v56 (copy)
-            v56(v58.AbsoluteSize);
-        end
-    }, v2.createElement(l_StyledTextLabel_0, {
-        fontStyle = v52.noticeFontStyle, 
-        colorStyle = v52.noticeColorStyle, 
-        text = v53.notice, 
-        layoutOrder = 1, 
-        automaticSize = Enum.AutomaticSize.XY
-    })), v2.createElement(v11, {
-        LayoutOrder = 2, 
-        size = v55:map(function(v59) --[[ Line: 169 ]]
-            -- upvalues: v52 (copy)
-            return UDim2.new(1, 0, 1, -(v59.Y + v52.noticeMarginBottom));
-        end), 
-        startSlot = v2.createElement(v14, {
-            LayoutOrder = 1, 
-            size = v2.createBinding(UDim2.fromScale(1, 1))
-        }, v2.createElement(v13, {
-            heading = v53.itemListUnsuccessfulHeading, 
-            itemCount = v53.itemListUnsuccessfulCount:gsub("{.*}", (tostring(#v51.unsuccessfulItems))), 
-            LayoutOrder = 1
-        }), if v24 then v2.createElement(v20, {
-            items = v50(v51.unsuccessfulItems, v54, v52.successColor, v52.failureColor), 
-            LayoutOrder = 2
-        }) else v2.createElement(v10, {
-            items = v36(v51.unsuccessfulItems), 
-            LayoutOrder = 2
-        }), if v57 then v2.createElement(v12, {
-            LayoutOrder = 3
-        }) else nil, if v57 then v2.createElement(v13, {
-            heading = v53.itemListSuccessfulHeading, 
-            itemCount = v53.itemListSuccessfulCount:gsub("{.*}", (tostring(#v51.successfulItems))), 
-            LayoutOrder = 4
-        }) else nil, if v57 then if v24 then v2.createElement(v20, {
-            items = v50(v51.successfulItems, v54, v52.successColor, v52.failureColor), 
-            LayoutOrder = 5
-        }) else v2.createElement(v10, {
-            items = v36(v51.successfulItems), 
-            LayoutOrder = 5
-        }) else nil), 
-        endSlot = v2.createElement("Frame", {
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1
-        }, v2.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            Padding = UDim.new(0, v52.buttonMarginTop)
-        }), v2.createElement(v15, {
-            padding = v52.boxPadding, 
-            cornerRadius = UDim.new(0, v52.boxCornerRadius), 
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundColor3 = v52.boxBackground, 
-            BorderSizePixel = 0
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                Padding = UDim.new(0, v52.lineItemSpacing)
-            }), 
-            RobuxSpent = v2.createElement(v16, {
-                text = v53.robuxSpent, 
-                amount = v51.robuxSpent, 
-                highlight = true, 
-                LayoutOrder = 1
-            }), 
-            CurrentBalance = v2.createElement(v16, {
-                text = v53.currentBalance, 
-                amount = v51.currentBalance, 
-                LayoutOrder = 2
-            })
-        }), v2.createElement(l_Button_0, {
-            text = v53.dismissCTA, 
-            onActivated = v51.onDismiss, 
-            buttonType = l_ButtonType_0.PrimarySystem, 
-            size = UDim2.new(1, 0, 0, v52.buttonHeight)
-        }))
-    }));
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+local useLocalization = require(BulkPurchaseAppParent.Localization).Hooks.useLocalization
+local useDesignTokens = require(BulkPurchaseAppParent.Style).useDesignTokens
+local UIBlox = require(BulkPurchaseAppParent.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(BulkPurchaseAppParent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local Button = UIBlox.App.Button.Button
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local FullPagePrompt = require(BulkPurchaseApp.Components.FullPagePrompt)
+local FullPagePromptTwoPanelLayout = require(BulkPurchaseApp.Components.FullPagePromptTwoPanelLayout)
+local Divider = require(BulkPurchaseApp.Components.Divider)
+local ItemListHeader = require(BulkPurchaseApp.Components.ItemListHeader)
+local FullPagePromptScrollList = require(BulkPurchaseApp.Components.FullPagePromptScrollList)
+local Box = require(BulkPurchaseApp.Components.Box)
+local PriceBoxLine_DEPRECATED = require(BulkPurchaseApp.Components.PriceBoxLine_DEPRECATED)
+
+require(BulkPurchaseAppParent.Style)
+
+local ItemCardThumbnail = require(BulkPurchaseAppParent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
+local ItemList = require(BulkPurchaseApp.Components.ItemList)
+
+require(BulkPurchaseAppParent.AvatarExperienceCommon)
+
+local ItemStatusToItemStatusKey = require(BulkPurchaseApp.Enums.ItemStatusToItemStatusKey)
+local ItemStatusKeyToLocalizationKey = require(BulkPurchaseApp.Enums.ItemStatusKeyToLocalizationKey)
+
+local function toCardPropsWithId(p1, s1: string) -- line: 34
+	local v29 = table.clone(p1)
+
+	v29.id = s1
+
+	return v29
+end
+
+local t1 = {
+	heading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.Heading",
+	unsuccessfulHeading = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.ErrorHeading",
+	notice = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.Notice",
+	itemListSuccessfulCount = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListSuccessfulCount",
+	itemListUnsuccessfulCount = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListUnsuccessfulCount",
+	itemListSuccessfulHeading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListSuccessfulHeading",
+	itemListUnsuccessfulHeading = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.ItemListUnsuccessfulHeading",
+	robuxSpent = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.RobuxSpent",
+	currentBalance = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.CurrentBalance",
+	dismissCTA = "CoreScripts.BulkPurchasePrompt.PartialPurchaseCompletedPrompt.PriceBox.DismissCTA"
+}
+
+local function mapTokens(p2) -- line: 60
+	-- upvalues: FFlagRenameDeprecatedUIBloxTokens (copy)
+	return {
+		boxBackground = ((if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Color.Background.Contrast else p2.Color.Surface.Surface_100)).Color3,
+		boxPadding = if not FFlagRenameDeprecatedUIBloxTokens then p2.Global.Space_300 else p2.Size.Size_600,
+		boxCornerRadius = if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Radius.Medium else p2.Radius.Medium,
+		buttonMarginTop = if not FFlagRenameDeprecatedUIBloxTokens then p2.Global.Space_200 else p2.Size.Size_400,
+		buttonHeight = if not FFlagRenameDeprecatedUIBloxTokens then p2.Global.Size_450 else p2.Size.Size_900,
+		lineItemSpacing = if not FFlagRenameDeprecatedUIBloxTokens then p2.Global.Space_50 else p2.Size.Size_100,
+		noticeFontStyle = if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Typography.Body else p2.Typography.BodyLarge,
+		noticeColorStyle = if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Color.Text.Muted else p2.Color.Content.Muted,
+		noticeMarginBottom = if not FFlagRenameDeprecatedUIBloxTokens then p2.Global.Space_300 else p2.Size.Size_600,
+		successColor = if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Color.Common.Success else p2.Color.System.Success,
+		failureColor = if not FFlagRenameDeprecatedUIBloxTokens then p2.Semantic.Color.Common.Alert else p2.Color.System.Alert
+	}
+end
+local function mapBulkPurchasePartialSuccessItemsToRowPresentation(t2: {[any]: any}, t3: {[any]: any}, p3, p4) -- line: 90
+	-- upvalues: ItemStatusToItemStatusKey (copy), React (copy), ItemCardThumbnail (copy)
+	local t4 = {}
+
+	for _, v37 in t2 do
+		local v38 = t3[ItemStatusToItemStatusKey[v37.status]]
+		local v39 = if v37.status ~= Enum.MarketplaceItemPurchaseStatus.Success then p4 else p3
+		local t5 = {
+			type = "text",
+			text = v38,
+			colorStyle = v39
+		}
+		local t6 = {
+			presentationSlot = React.createElement(ItemCardThumbnail, {
+				url = v37.image
+			}),
+			title = v37.name,
+			priceLineContent = { t5 }
+		}
+		local id = v37.id
+		local v43 = table.clone(t6)
+
+		v43.id = id
+		table.insert(t4, v43)
+	end
+
+	return t4
+end
+local function BulkPurchasePartialSuccess(t7: {[any]: any}) -- line: 127
+	-- upvalues: useDesignTokens (copy), mapTokens (copy), useLocalization (copy), t1 (copy), ItemStatusKeyToLocalizationKey (copy), React (copy), FullPagePrompt (copy), StyledTextLabel (copy), FullPagePromptTwoPanelLayout (copy), FullPagePromptScrollList (copy), ItemListHeader (copy), ItemList (copy), mapBulkPurchasePartialSuccessItemsToRowPresentation (copy), Divider (copy), Box (copy), PriceBoxLine_DEPRECATED (copy), Button (copy), ButtonType (copy)
+	local v45 = useDesignTokens(mapTokens)
+	local v46 = useLocalization(t1)
+	local v47 = useLocalization(ItemStatusKeyToLocalizationKey)
+	local v48, v49 = React.useBinding(Vector2.new(0, 0))
+	local v50 = #t7.successfulItems > 0
+
+	return React.createElement(FullPagePrompt, {
+		onClose = t7.onDismiss,
+		title = if not v50 then v46.unsuccessfulHeading else v46.heading
+	}, React.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		Padding = UDim.new(0, v45.noticeMarginBottom)
+	}), React.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		[React.Change.AbsoluteSize] = function(p5) -- line: 153
+			-- upvalues: v49 (copy)
+			v49(p5.AbsoluteSize)
+		end
+	}, React.createElement(StyledTextLabel, {
+		layoutOrder = 1,
+		fontStyle = v45.noticeFontStyle,
+		colorStyle = v45.noticeColorStyle,
+		text = v46.notice,
+		automaticSize = Enum.AutomaticSize.XY
+	})), React.createElement(FullPagePromptTwoPanelLayout, {
+		LayoutOrder = 2,
+		size = v48:map(function(vector2: Vector2) -- line: 167
+			-- upvalues: v45 (copy)
+			return UDim2.new(1, 0, 1, -(vector2.Y + v45.noticeMarginBottom))
+		end),
+		startSlot = React.createElement(FullPagePromptScrollList, {
+			LayoutOrder = 1,
+			size = React.createBinding(UDim2.fromScale(1, 1))
+		}, React.createElement(ItemListHeader, {
+			LayoutOrder = 1,
+			heading = v46.itemListUnsuccessfulHeading,
+			itemCount = v46.itemListUnsuccessfulCount:gsub("{.*}", (tostring(#t7.unsuccessfulItems)))
+		}), React.createElement(ItemList, {
+			LayoutOrder = 2,
+			items = mapBulkPurchasePartialSuccessItemsToRowPresentation(t7.unsuccessfulItems, v47, v45.successColor, v45.failureColor)
+		}), if not v50 then nil else React.createElement(Divider, {
+			LayoutOrder = 3
+		}), if not v50 then nil else React.createElement(ItemListHeader, {
+			LayoutOrder = 4,
+			heading = v46.itemListSuccessfulHeading,
+			itemCount = v46.itemListSuccessfulCount:gsub("{.*}", (tostring(#t7.successfulItems)))
+		}), if not v50 then nil else React.createElement(ItemList, {
+			LayoutOrder = 5,
+			items = mapBulkPurchasePartialSuccessItemsToRowPresentation(t7.successfulItems, v47, v45.successColor, v45.failureColor)
+		})),
+		endSlot = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, v45.buttonMarginTop)
+		}), React.createElement(Box, {
+			BorderSizePixel = 0,
+			padding = v45.boxPadding,
+			cornerRadius = UDim.new(0, v45.boxCornerRadius),
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundColor3 = v45.boxBackground
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				Padding = UDim.new(0, v45.lineItemSpacing)
+			}),
+			RobuxSpent = React.createElement(PriceBoxLine_DEPRECATED, {
+				highlight = true,
+				LayoutOrder = 1,
+				text = v46.robuxSpent,
+				amount = t7.robuxSpent
+			}),
+			CurrentBalance = React.createElement(PriceBoxLine_DEPRECATED, {
+				LayoutOrder = 2,
+				text = v46.currentBalance,
+				amount = t7.currentBalance
+			})
+		}), React.createElement(Button, {
+			text = v46.dismissCTA,
+			onActivated = t7.onDismiss,
+			buttonType = ButtonType.PrimarySystem,
+			size = UDim2.new(1, 0, 0, v45.buttonHeight)
+		}))
+	}))
+end
+
+return BulkPurchasePartialSuccess

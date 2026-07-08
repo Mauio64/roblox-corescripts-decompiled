@@ -1,409 +1,496 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_TweenService_0 = game:GetService("TweenService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local v6 = Color3.new(0.1, 0, 0);
-local v7 = Color3.new(0, 0, 0);
-local _ = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
-local _ = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
-local v10 = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true, 0);
-local v11 = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
-local v12 = nil;
-local v13 = {};
-local v14 = {};
-local v15 = {};
-local v16 = {};
-local v17 = {};
-local v18 = {};
-local v19 = {};
-local v20 = {};
-local v21 = true;
+local CoreGui = game:GetService("CoreGui")
+local ContextActionService = game:GetService("ContextActionService")
+local TweenService = game:GetService("TweenService")
+local CorePackages = game:GetService("CorePackages")
+
+CoreGui:WaitForChild("RobloxGui")
+
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local color3 = Color3.new(0.1, 0, 0)
+local color3_2 = Color3.new(0, 0, 0)
+
+TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+
+local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, true, 0)
+local tweenInfo2 = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+local u10 = nil
+local t1 = {}
+local t2 = {}
+local t3 = {}
+local t4 = {}
+local t5 = {}
+local t6 = {}
+local t7 = {}
+local t8 = {}
+local u19 = true
 local _ = {
-    BoundInputType = 3, 
-    TableHeader = 2, 
-    BoundAction = 1
-};
-local function v27(v23, v24) --[[ Line: 43 ]] --[[ Name: sortInputTypeRows ]]
-    -- upvalues: v14 (copy)
-    local v25 = v14[v23];
-    local v26 = v14[v24];
-    return tostring(v25) < tostring(v26);
-end;
-local function v36(v28, v29) --[[ Line: 49 ]] --[[ Name: sortActionRows ]]
-    -- upvalues: v16 (copy), v17 (copy)
-    local v30 = v16[v28];
-    local v31 = v16[v29];
-    if v30 and v31 then
-        local v32 = v17[v28];
-        local v33 = v17[v29];
-        if v32 ~= v33 then
-            return tostring(v32) < tostring(v33);
-        elseif v30.isCore and not v31.isCore then
-            return true;
-        elseif not v30.isCore and v31.isCore then
-            return false;
-        else
-            local l_stackOrder_0 = v30.stackOrder;
-            local l_stackOrder_1 = v31.stackOrder;
-            if l_stackOrder_0 and l_stackOrder_1 then
-                return l_stackOrder_1 < l_stackOrder_0;
-            else
-                return true;
-            end;
-        end;
-    else
-        return true;
-    end;
-end;
-local function v41(v37, v38) --[[ Line: 75 ]] --[[ Name: createEmptyRow ]]
-    -- upvalues: l_Create_0 (copy)
-    local v39 = l_Create_0("Frame")({
-        Name = v37, 
-        BackgroundTransparency = 1, 
-        ZIndex = 6, 
-        Size = UDim2.new(1, 0, 0, v38 or 0)
-    });
-    local _ = l_Create_0("UIListLayout")({
-        FillDirection = Enum.FillDirection.Horizontal, 
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        Padding = UDim.new(0, 5), 
-        Parent = v39
-    });
-    return v39;
-end;
-local function v46(v42, v43) --[[ Line: 91 ]] --[[ Name: createButtonRow ]]
-    -- upvalues: l_Create_0 (copy)
-    local v44 = l_Create_0("TextButton")({
-        Name = v42, 
-        BackgroundTransparency = 1, 
-        ZIndex = 6, 
-        Text = "", 
-        Size = UDim2.new(1, 0, 0, v43 or 0)
-    });
-    local _ = l_Create_0("UIListLayout")({
-        FillDirection = Enum.FillDirection.Horizontal, 
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        Padding = UDim.new(0, 5), 
-        Parent = v44
-    });
-    return v44;
-end;
-local function v49(v47, v48) --[[ Line: 108 ]] --[[ Name: createEmptyColumn ]]
-    -- upvalues: l_Create_0 (copy)
-    return (l_Create_0("Frame")({
-        Name = v48, 
-        BackgroundColor3 = Color3.new(0, 0, 0), 
-        BackgroundTransparency = 0.75, 
-        BorderSizePixel = 0, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        ZIndex = 6, 
-        ClipsDescendants = true, 
-        Parent = v47
-    }));
-end;
-local function v58(v50, v51, v52, v53, v54) --[[ Line: 123 ]] --[[ Name: createImageColumn ]]
-    -- upvalues: v49 (copy), l_Create_0 (copy)
-    local v55 = v49(v50, v51);
-    local _ = l_Create_0("UIAspectRatioConstraint")({
-        AspectRatio = v53 or 1, 
-        Parent = v55
-    });
-    local _ = l_Create_0("ImageLabel")({
-        Name = "ColumnImage", 
-        BackgroundTransparency = 1, 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        Size = UDim2.new(v54 or 1, 0, v54 or 1, 0), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        ZIndex = 6, 
-        Image = v52, 
-        Parent = v55
-    });
-    return v55;
-end;
-local function v64(v59, v60, v61) --[[ Line: 145 ]] --[[ Name: createTextColumn ]]
-    -- upvalues: v49 (copy), l_Create_0 (copy)
-    local v62 = v49(v59, v60);
-    local _ = l_Create_0("TextLabel")({
-        Name = "ColumnText", 
-        BackgroundTransparency = 1, 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        Size = UDim2.new(1, -10, 1, -10), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        ZIndex = 6, 
-        Text = v61, 
-        TextSize = 18, 
-        TextColor3 = Color3.new(1, 1, 1), 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        Font = Enum.Font.SourceSans, 
-        Parent = v62
-    });
-    return v62;
-end;
-local function v73(v65, v66) --[[ Line: 166 ]] --[[ Name: createActionColumns ]]
-    -- upvalues: v49 (copy), v64 (copy)
-    local v67 = 0;
-    local v68 = v49(v65, "Inset");
-    v68.LayoutOrder = 0;
-    v68.BackgroundTransparency = 1;
-    v68.Size = UDim2.new(0, 30, 1, 0);
-    v67 = v67 + 30 + 5;
-    local v69 = v64(v65, "Priority", "Priority");
-    v69.LayoutOrder = 1;
-    v69.BackgroundColor3 = v66;
-    v69.Size = UDim2.new(0, 80, 1, 0);
-    v67 = v67 + 80 + 5;
-    local v70 = v64(v65, "Security", "Security");
-    v70.LayoutOrder = 2;
-    v70.BackgroundColor3 = v66;
-    v70.Size = UDim2.new(0, 80, 1, 0);
-    v67 = v67 + 80 + 5;
-    local v71 = v64(v65, "ActionName", "Action Name");
-    v71.LayoutOrder = 3;
-    v71.BackgroundColor3 = v66;
-    v71.Size = UDim2.new(0.25, 0, 1, 0);
-    local v72 = v64(v65, "InputTypes", "Input Types");
-    v72.LayoutOrder = 4;
-    v72.BackgroundColor3 = v66;
-    v72.Size = UDim2.new(0.75, -v67 - 5, 1, 0);
-    return v68, v69, v70, v71, v72;
-end;
-local function v88() --[[ Line: 203 ]] --[[ Name: updateContainerCanvas ]]
-    -- upvalues: v21 (ref), v13 (copy), v27 (copy), v14 (copy), v19 (copy), v15 (copy), v36 (copy)
-    debug.profilebegin("updateContainerCanvas");
-    if v21 then
-        v21 = false;
-        local v74 = 1;
-        local v75 = {};
-        for _, v77 in pairs(v13) do
-            table.insert(v75, v77);
-        end;
-        table.sort(v75, v27);
-        for _, v79 in pairs(v75) do
-            local v80 = v14[v79];
-            v79.LayoutOrder = v74;
-            v74 = v74 + 1;
-            local v81 = v19[v80];
-            if v81 then
-                v81.LayoutOrder = v74;
-                v74 = v74 + 1;
-            end;
-            local v82 = v15[v80];
-            if v82 then
-                local v83 = {};
-                for _, v85 in pairs(v82) do
-                    table.insert(v83, v85);
-                end;
-                table.sort(v83, v36);
-                for _, v87 in pairs(v83) do
-                    v87.LayoutOrder = v74;
-                    v74 = v74 + 1;
-                end;
-            end;
-        end;
-    end;
-    debug.profileend();
-end;
-local function v92(v89) --[[ Line: 245 ]] --[[ Name: scrollContainerToRow ]]
-    -- upvalues: v12 (ref), l_TweenService_0 (copy), v11 (copy)
-    local v90 = v89.AbsolutePosition.Y - v12.AbsolutePosition.Y;
-    local v91 = v12.CanvasPosition + Vector2.new(0, v90);
-    l_TweenService_0:Create(v12, v11, {
-        CanvasPosition = v91
-    }):Play();
-end;
-local v93 = {};
-v93.initializeGui = function(v94) --[[ Line: 253 ]] --[[ Name: initializeGui ]]
-    -- upvalues: l_Create_0 (copy), v12 (ref), v93 (copy), l_ContextActionService_0 (copy), v21 (ref), v88 (copy)
-    local v95 = l_Create_0("ScrollingFrame")({
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        Size = UDim2.new(1, -10, 1, -10), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BorderSizePixel = 0, 
-        ScrollBarThickness = 4, 
-        BackgroundTransparency = 1, 
-        ZIndex = 6, 
-        Parent = v94
-    });
-    v12 = v95;
-    local v96 = l_Create_0("UIListLayout")({
-        Padding = UDim.new(0, 5), 
-        Parent = v95
-    });
-    v96.SortOrder = Enum.SortOrder.LayoutOrder;
-    v96:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --[[ Line: 271 ]]
-        -- upvalues: v12 (ref), v96 (copy)
-        v12.CanvasSize = UDim2.new(0, 0, 0, v96.AbsoluteContentSize.Y);
-    end);
-    v93.updateGuis();
-    l_ContextActionService_0.BoundActionAdded:connect(function(v97, _, v99, v100) --[[ Line: 275 ]]
-        -- upvalues: v93 (ref), v21 (ref), v88 (ref)
-        v99.isCore = v100;
-        v93.updateActionRows(v97, v99);
-        v21 = true;
-        v88();
-    end);
-    l_ContextActionService_0.BoundActionRemoved:connect(function(v101, v102, v103) --[[ Line: 282 ]]
-        -- upvalues: v93 (ref), v21 (ref), v88 (ref)
-        v102.isCore = v103;
-        v93.removeActionRows(v101, v102);
-        v21 = true;
-        v88();
-    end);
-end;
-v93.updateBoundInputTypeRow = function(v104) --[[ Line: 291 ]] --[[ Name: updateBoundInputTypeRow ]]
-    -- upvalues: v13 (copy), v46 (copy), v58 (copy), v64 (copy), v41 (copy), v73 (copy), v7 (copy), v14 (copy), v18 (copy), v19 (copy), v12 (ref), l_TweenService_0 (copy), v10 (copy), v20 (copy), v15 (copy), v88 (copy), v92 (copy)
-    if not v13[v104] then
-        local v105 = v46("BoundInputType", 30);
-        local v106 = v58(v105, "ExpandImage", "rbxasset://textures/ui/ExpandArrowSheet.png", 1, 0.35);
-        v106.ColumnImage.ImageRectSize = Vector2.new(21, 21);
-        v106.ColumnImage.ImageRectOffset = Vector2.new(0, 0);
-        local v107 = v64(v105, "InputType", (tostring(v104)));
-        v107.Size = UDim2.new(1, -35, 1, 0);
-        v107.ColumnText.Font = Enum.Font.SourceSansBold;
-        local v108 = v41("TableHeader", 20);
-        v108.Visible = false;
-        local _, v110, v111, v112, v113 = v73(v108, v7);
-        v110.ColumnText.Font = Enum.Font.SourceSansBold;
-        v111.ColumnText.Font = Enum.Font.SourceSansBold;
-        v112.ColumnText.Font = Enum.Font.SourceSansBold;
-        v113.ColumnText.Font = Enum.Font.SourceSansBold;
-        v13[v104] = v105;
-        v14[v105] = v104;
-        v18[v108] = v104;
-        v19[v104] = v108;
-        v108.Parent = v12;
-        v105.Parent = v12;
-        l_TweenService_0:Create(v107, v10, {
-            BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-        }):Play();
-        v20[v104] = false;
-        v105.MouseButton1Click:connect(function() --[[ Line: 323 ]]
-            -- upvalues: v20 (ref), v104 (copy), v15 (ref), v106 (copy), v108 (copy), v88 (ref), l_TweenService_0 (ref), v107 (copy), v10 (ref), v92 (ref), v105 (copy)
-            v20[v104] = not v20[v104];
-            local v114 = v15[v104];
-            if not v20[v104] then
-                v106.ColumnImage.ImageRectOffset = Vector2.new(0, 0);
-                v108.Visible = false;
-                if v114 then
-                    for _, v116 in pairs(v114) do
-                        v116.Visible = false;
-                    end;
-                end;
-            else
-                v106.ColumnImage.ImageRectOffset = Vector2.new(21, 0);
-                v108.Visible = true;
-                if v114 then
-                    for _, v118 in pairs(v114) do
-                        v118.Visible = true;
-                    end;
-                end;
-            end;
-            v88();
-            if v20[v104] then
-                l_TweenService_0:Create(v107, v10, {
-                    BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-                }):Play();
-                v92(v105);
-            end;
-        end);
-    end;
-end;
-v93.updateActionRowForInputType = function(v119, v120, v121) --[[ Line: 354 ]] --[[ Name: updateActionRowForInputType ]]
-    -- upvalues: v15 (copy), v41 (copy), v20 (copy), v73 (copy), v6 (copy), v7 (copy), v17 (copy), v16 (copy), v12 (ref), l_TweenService_0 (copy), v10 (copy), v13 (copy)
-    local v122 = v15[v121];
-    if not v122 then
-        v122 = {};
-        v15[v121] = v122;
-    end;
-    if not v122[v119] then
-        local v123 = v41("BoundAction", 20);
-        v123.Visible = v20[v121];
-        local v124 = {};
-        for v125, v126 in pairs(v120.inputTypes) do
-            v124[v125] = tostring(v126);
-        end;
-        local _, v128, v129, v130, v131 = v73(v123, v120.isCore and v6 or v7);
-        v128.ColumnText.Text = v120.priorityLevel or "Default";
-        v129.ColumnText.Text = v120.isCore and "Core" or "Developer";
-        v130.ColumnText.Text = v119;
-        v131.ColumnText.Text = table.concat(v124, ", ");
-        if v120.isCore then
-            v128.ColumnText.Font = Enum.Font.SourceSansItalic;
-            v129.ColumnText.Font = Enum.Font.SourceSansItalic;
-            v130.ColumnText.Font = Enum.Font.SourceSansItalic;
-            v131.ColumnText.Font = Enum.Font.SourceSansItalic;
-        end;
-        v122[v119] = v123;
-        v17[v123] = v121;
-        v16[v123] = v120;
-        v123.Parent = v12;
-        if v123.Visible then
-            l_TweenService_0:Create(v130, v10, {
-                BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-            }):Play();
-        else
-            local v132 = v13[v121];
-            if v132 then
-                l_TweenService_0:Create(v132.InputType, v10, {
-                    BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
-                }):Play();
-            end;
-        end;
-        local _ = v123;
-    end;
-end;
-v93.updateActionRows = function(v134, v135) --[[ Line: 402 ]] --[[ Name: updateActionRows ]]
-    -- upvalues: v93 (copy)
-    for _, v137 in pairs(v135.inputTypes) do
-        v93.updateBoundInputTypeRow(v137);
-        v93.updateActionRowForInputType(v134, v135, v137);
-    end;
-end;
-v93.removeActionRows = function(v138, v139) --[[ Line: 409 ]] --[[ Name: removeActionRows ]]
-    -- upvalues: v15 (copy), v13 (copy), v19 (copy), v88 (copy), v12 (ref)
-    for _, v141 in pairs(v139.inputTypes) do
-        local v142 = v15[v141];
-        if v142 then
-            v142[v138]:Destroy();
-            v142[v138] = nil;
-            local v143 = true;
-            for _, _ in pairs(v142) do
-                v143 = false;
-                break;
-            end;
-            if v143 then
-                local v146 = v13[v141];
-                if v146 then
-                    v146:Destroy();
-                    v13[v141] = nil;
-                end;
-                local v147 = v19[v141];
-                if v147 then
-                    v19[v147] = nil;
-                    v147:Destroy();
-                    v19[v141] = nil;
-                end;
-            end;
-        end;
-    end;
-    v88();
-    v12.UIListLayout:ApplyLayout();
-end;
-v93.updateGuis = function() --[[ Line: 446 ]] --[[ Name: updateGuis ]]
-    -- upvalues: l_ContextActionService_0 (copy), v93 (copy), v21 (ref), v88 (copy)
-    local l_l_ContextActionService_0_AllBoundCoreActionInfo_0 = l_ContextActionService_0:GetAllBoundCoreActionInfo();
-    for v149, v150 in pairs(l_l_ContextActionService_0_AllBoundCoreActionInfo_0) do
-        v150.isCore = true;
-        v93.updateActionRows(v149, v150);
-    end;
-    local l_l_ContextActionService_0_AllBoundActionInfo_0 = l_ContextActionService_0:GetAllBoundActionInfo();
-    for v152, v153 in pairs(l_l_ContextActionService_0_AllBoundActionInfo_0) do
-        v153.isCore = false;
-        v93.updateActionRows(v152, v153);
-    end;
-    v21 = true;
-    v88();
-end;
-return v93;
+	BoundInputType = 3,
+	TableHeader = 2,
+	BoundAction = 1
+}
+
+local function sortInputTypeRows(p1, p2) -- line: 43
+	-- upvalues: t2 (copy)
+	local v34 = t2[p1]
+	local v35 = t2[p2]
+
+	return tostring(v34) < tostring(v35)
+end
+local function sortActionRows(p3, p4) -- line: 49
+	-- upvalues: t4 (copy), t5 (copy)
+	local v38 = t4[p3]
+	local v39 = t4[p4]
+
+	if v38 and v39 then
+		local v40 = t5[p3]
+		local v41 = t5[p4]
+
+		if v40 ~= v41 then
+			return tostring(v40) < tostring(v41)
+		end
+
+		if v38.isCore and not v39.isCore then
+			return true
+		end
+
+		if not v38.isCore and v39.isCore then
+			return false
+		end
+
+		local stackOrder = v38.stackOrder
+		local stackOrder2 = v39.stackOrder
+
+		if stackOrder and stackOrder2 then
+			return stackOrder2 < stackOrder
+		end
+
+		return true
+	end
+
+	return true
+end
+local function createEmptyRow(p5, p6) -- line: 75
+	-- upvalues: Create (copy)
+	local v46 = Create("Frame")({
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Name = p5,
+		Size = UDim2.new(1, 0, 0, p6 or 0)
+	})
+
+	Create("UIListLayout")({
+		FillDirection = Enum.FillDirection.Horizontal,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 5),
+		Parent = v46
+	})
+
+	return v46
+end
+local function createButtonRow(p7, p8) -- line: 91
+	-- upvalues: Create (copy)
+	local v49 = Create("TextButton")({
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Text = "",
+		Name = p7,
+		Size = UDim2.new(1, 0, 0, p8 or 0)
+	})
+
+	Create("UIListLayout")({
+		FillDirection = Enum.FillDirection.Horizontal,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 5),
+		Parent = v49
+	})
+
+	return v49
+end
+local function createEmptyColumn(p9, p10) -- line: 108
+	-- upvalues: Create (copy)
+	return (Create("Frame")({
+		BackgroundTransparency = 0.75,
+		BorderSizePixel = 0,
+		ZIndex = 6,
+		ClipsDescendants = true,
+		Name = p10,
+		BackgroundColor3 = Color3.new(0, 0, 0),
+		Size = UDim2.new(1, 0, 1, 0),
+		Parent = p9
+	}))
+end
+local function createImageColumn(p11, p12, p13, p14, p15) -- line: 123
+	-- upvalues: createEmptyColumn (copy), Create (copy)
+	local v57 = createEmptyColumn(p11, p12)
+
+	Create("UIAspectRatioConstraint")({
+		AspectRatio = p14 or 1,
+		Parent = v57
+	})
+	Create("ImageLabel")({
+		Name = "ColumnImage",
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(p15 or 1, 0, p15 or 1, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Image = p13,
+		Parent = v57
+	})
+
+	return v57
+end
+local function createTextColumn(p16, p17, p18) -- line: 145
+	-- upvalues: createEmptyColumn (copy), Create (copy)
+	local v61 = createEmptyColumn(p16, p17)
+
+	Create("TextLabel")({
+		Name = "ColumnText",
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		TextSize = 18,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, -10, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Text = p18,
+		TextColor3 = Color3.new(1, 1, 1),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Font = Enum.Font.SourceSans,
+		Parent = v61
+	})
+
+	return v61
+end
+local function createActionColumns(p19, p20) -- line: 166
+	-- upvalues: createEmptyColumn (copy), createTextColumn (copy)
+	local v64 = createEmptyColumn(p19, "Inset")
+
+	v64.LayoutOrder = 0
+	v64.BackgroundTransparency = 1
+	v64.Size = UDim2.new(0, 30, 1, 0)
+
+	local v65 = 0 + 30 + 5
+	local v66 = createTextColumn(p19, "Priority", "Priority")
+
+	v66.LayoutOrder = 1
+	v66.BackgroundColor3 = p20
+	v66.Size = UDim2.new(0, 80, 1, 0)
+
+	local v67 = v65 + 80 + 5
+	local v68 = createTextColumn(p19, "Security", "Security")
+
+	v68.LayoutOrder = 2
+	v68.BackgroundColor3 = p20
+	v68.Size = UDim2.new(0, 80, 1, 0)
+
+	local v69 = v67 + 80 + 5
+	local v70 = createTextColumn(p19, "ActionName", "Action Name")
+
+	v70.LayoutOrder = 3
+	v70.BackgroundColor3 = p20
+	v70.Size = UDim2.new(0.25, 0, 1, 0)
+
+	local v71 = createTextColumn(p19, "InputTypes", "Input Types")
+
+	v71.LayoutOrder = 4
+	v71.BackgroundColor3 = p20
+	v71.Size = UDim2.new(0.75, -v69 - 5, 1, 0)
+
+	return v64, v66, v68, v70, v71
+end
+local function updateContainerCanvas() -- line: 203
+	-- upvalues: u19 (ref), t1 (copy), sortInputTypeRows (copy), t2 (copy), t7 (copy), t3 (copy), sortActionRows (copy)
+	debug.profilebegin("updateContainerCanvas")
+
+	if u19 then
+		u19 = false
+
+		local n1 = 1
+		local t9 = {}
+
+		for _, v in pairs(t1) do
+			table.insert(t9, v)
+		end
+
+		table.sort(t9, sortInputTypeRows)
+
+		for _, v in pairs(t9) do
+			local v78 = t2[v]
+
+			v.LayoutOrder = n1
+			n1 += 1
+
+			local v79 = t7[v78]
+
+			if v79 then
+				v79.LayoutOrder = n1
+				n1 += 1
+			end
+
+			local v80 = t3[v78]
+
+			if v80 then
+				local t10 = {}
+
+				for _, v2 in pairs(v80) do
+					table.insert(t10, v2)
+				end
+
+				table.sort(t10, sortActionRows)
+
+				for _, v3 in pairs(t10) do
+					v3.LayoutOrder = n1
+					n1 += 1
+				end
+			end
+		end
+	end
+
+	debug.profileend()
+end
+local function scrollContainerToRow(p21) -- line: 245
+	-- upvalues: u10 (ref), TweenService (copy), tweenInfo2 (copy)
+	local v87 = p21.AbsolutePosition.Y - u10.AbsolutePosition.Y
+	local v88 = u10.CanvasPosition + Vector2.new(0, v87)
+
+	TweenService:Create(u10, tweenInfo2, {
+		CanvasPosition = v88
+	}):Play()
+end
+
+local t11 = {}
+
+function t11.initializeGui(p22) -- line: 253
+	-- upvalues: Create (copy), u10 (ref), t11 (copy), ContextActionService (copy), u19 (ref), updateContainerCanvas (copy)
+	local v90 = Create("ScrollingFrame")({
+		BorderSizePixel = 0,
+		ScrollBarThickness = 4,
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, -10, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Parent = p22
+	})
+
+	u10 = v90
+
+	local v91 = Create("UIListLayout")({
+		Padding = UDim.new(0, 5),
+		Parent = v90
+	})
+
+	v91.SortOrder = Enum.SortOrder.LayoutOrder
+	v91:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() -- line: 271
+		-- upvalues: u10 (ref), v91 (copy)
+		u10.CanvasSize = UDim2.new(0, 0, 0, v91.AbsoluteContentSize.Y)
+	end)
+	t11.updateGuis()
+	ContextActionService.BoundActionAdded:connect(function(p23, _, p25, p26) -- line: 275
+		-- upvalues: t11 (copy), u19 (ref), updateContainerCanvas (copy)
+		p25.isCore = p26
+		t11.updateActionRows(p23, p25)
+		u19 = true
+		updateContainerCanvas()
+	end)
+	ContextActionService.BoundActionRemoved:connect(function(p27, p28, p29) -- line: 282
+		-- upvalues: t11 (copy), u19 (ref), updateContainerCanvas (copy)
+		p28.isCore = p29
+		t11.removeActionRows(p27, p28)
+		u19 = true
+		updateContainerCanvas()
+	end)
+end
+function t11.updateBoundInputTypeRow(p30) -- line: 291
+	-- upvalues: t1 (copy), createButtonRow (copy), createImageColumn (copy), createTextColumn (copy), createEmptyRow (copy), createActionColumns (copy), color3_2 (copy), t2 (copy), t6 (copy), t7 (copy), u10 (ref), TweenService (copy), tweenInfo (copy), t8 (copy), t3 (copy), updateContainerCanvas (copy), scrollContainerToRow (copy)
+	if not t1[p30] then
+		local v93 = createButtonRow("BoundInputType", 30)
+		local v94 = createImageColumn(v93, "ExpandImage", "rbxasset://textures/ui/ExpandArrowSheet.png", 1, 0.35)
+
+		v94.ColumnImage.ImageRectSize = Vector2.new(21, 21)
+		v94.ColumnImage.ImageRectOffset = Vector2.new(0, 0)
+
+		local v95 = createTextColumn(v93, "InputType", (tostring(p30)))
+
+		v95.Size = UDim2.new(1, -35, 1, 0)
+		v95.ColumnText.Font = Enum.Font.SourceSansBold
+
+		local v96 = createEmptyRow("TableHeader", 20)
+
+		v96.Visible = false
+
+		local _, v98, v99, v100, v101 = createActionColumns(v96, color3_2)
+
+		v98.ColumnText.Font = Enum.Font.SourceSansBold
+		v99.ColumnText.Font = Enum.Font.SourceSansBold
+		v100.ColumnText.Font = Enum.Font.SourceSansBold
+		v101.ColumnText.Font = Enum.Font.SourceSansBold
+		t1[p30] = v93
+		t2[v93] = p30
+		t6[v96] = p30
+		t7[p30] = v96
+		v96.Parent = u10
+		v93.Parent = u10
+		TweenService:Create(v95, tweenInfo, {
+			BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+		}):Play()
+		t8[p30] = false
+		v93.MouseButton1Click:connect(function() -- line: 323
+			-- upvalues: t8 (copy), p30 (copy), t3 (copy), v94 (copy), v96 (copy), updateContainerCanvas (copy), TweenService (copy), v95 (copy), tweenInfo (copy), scrollContainerToRow (copy), v93 (copy)
+			t8[p30] = not t8[p30]
+
+			local v143 = t3[p30]
+
+			if not t8[p30] then
+				v94.ColumnImage.ImageRectOffset = Vector2.new(0, 0)
+				v96.Visible = false
+
+				if v143 then
+					for _, v in pairs(v143) do
+						v.Visible = false
+					end
+				end
+			else
+				v94.ColumnImage.ImageRectOffset = Vector2.new(21, 0)
+				v96.Visible = true
+
+				if v143 then
+					for _, v in pairs(v143) do
+						v.Visible = true
+					end
+				end
+			end
+
+			updateContainerCanvas()
+
+			if t8[p30] then
+				TweenService:Create(v95, tweenInfo, {
+					BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+				}):Play()
+				scrollContainerToRow(v93)
+			end
+		end)
+	end
+end
+function t11.updateActionRowForInputType(p31, p32, p33) -- line: 354
+	-- upvalues: t3 (copy), createEmptyRow (copy), t8 (copy), createActionColumns (copy), color3 (copy), color3_2 (copy), t5 (copy), t4 (copy), u10 (ref), TweenService (copy), tweenInfo (copy), t1 (copy)
+	local v105 = t3[p33]
+
+	if not v105 then
+		v105 = {}
+		t3[p33] = v105
+	end
+
+	if not v105[p31] then
+		local v106 = createEmptyRow("BoundAction", 20)
+
+		v106.Visible = t8[p33]
+
+		local t12 = {}
+
+		for k, v in pairs(p32.inputTypes) do
+			t12[k] = tostring(v)
+		end
+
+		local _, v111, v112, v113, v114 = createActionColumns(v106, p32.isCore and color3 or color3_2)
+
+		v111.ColumnText.Text = p32.priorityLevel or "Default"
+		v112.ColumnText.Text = not p32.isCore and "Developer" or "Core"
+		v113.ColumnText.Text = p31
+		v114.ColumnText.Text = table.concat(t12, ", ")
+
+		if p32.isCore then
+			v111.ColumnText.Font = Enum.Font.SourceSansItalic
+			v112.ColumnText.Font = Enum.Font.SourceSansItalic
+			v113.ColumnText.Font = Enum.Font.SourceSansItalic
+			v114.ColumnText.Font = Enum.Font.SourceSansItalic
+		end
+
+		v105[p31] = v106
+		t5[v106] = p33
+		t4[v106] = p32
+		v106.Parent = u10
+
+		if v106.Visible then
+			TweenService:Create(v113, tweenInfo, {
+				BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+			}):Play()
+		else
+			local v115 = t1[p33]
+
+			if v115 then
+				TweenService:Create(v115.InputType, tweenInfo, {
+					BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+				}):Play()
+			end
+		end
+	end
+end
+function t11.updateActionRows(p34, p35) -- line: 402
+	-- upvalues: t11 (copy)
+	for _, v in pairs(p35.inputTypes) do
+		t11.updateBoundInputTypeRow(v)
+		t11.updateActionRowForInputType(p34, p35, v)
+	end
+end
+function t11.removeActionRows(p36, p37) -- line: 409
+	-- upvalues: t3 (copy), t1 (copy), t7 (copy), updateContainerCanvas (copy), u10 (ref)
+	for _, v in pairs(p37.inputTypes) do
+		local v124 = t3[v]
+
+		if v124 then
+			v124[p36]:Destroy()
+			v124[p36] = nil
+
+			local v125 = true
+
+			for _, _ in pairs(v124) do
+				v125 = false
+
+				break
+			end
+
+			if v125 then
+				local v128 = t1[v]
+
+				if v128 then
+					v128:Destroy()
+					t1[v] = nil
+				end
+
+				local v129 = t7[v]
+
+				if v129 then
+					t7[v129] = nil
+					v129:Destroy()
+					t7[v] = nil
+				end
+			end
+		end
+	end
+
+	updateContainerCanvas()
+	u10.UIListLayout:ApplyLayout()
+end
+function t11.updateGuis() -- line: 446
+	-- upvalues: ContextActionService (copy), t11 (copy), u19 (ref), updateContainerCanvas (copy)
+	local AllBoundCoreActionInfo = ContextActionService:GetAllBoundCoreActionInfo()
+
+	for k, v in pairs(AllBoundCoreActionInfo) do
+		v.isCore = true
+		t11.updateActionRows(k, v)
+	end
+
+	local AllBoundActionInfo = ContextActionService:GetAllBoundActionInfo()
+
+	for k, v in pairs(AllBoundActionInfo) do
+		v.isCore = false
+		t11.updateActionRows(k, v)
+	end
+
+	u19 = true
+	updateContainerCanvas()
+end
+
+return t11

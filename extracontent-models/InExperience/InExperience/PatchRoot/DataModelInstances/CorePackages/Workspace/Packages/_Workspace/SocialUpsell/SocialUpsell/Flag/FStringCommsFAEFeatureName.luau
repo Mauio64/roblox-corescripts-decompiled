@@ -1,1 +1,1 @@
-return game:DefineFastString("CommsFAEFeatureName", "TriggerAgeVerifyRecourse");
+return game:DefineFastString("CommsFAEFeatureName", "TriggerAgeVerifyRecourse")

@@ -1,1 +1,1 @@
-return game:DefineFastString("LuaMultiPageSignupIxpLayer", "PlayerApp.Signup");
+return game:DefineFastString("LuaMultiPageSignupIxpLayer", "PlayerApp.Signup")

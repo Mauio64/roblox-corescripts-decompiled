@@ -1,16 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlaceInfoRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_ReceivedMultiplePlaceInfos_0 = require(l_script_FirstAncestor_0.Actions).ReceivedMultiplePlaceInfos;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-return function(v4, v5) --[[ Line: 9 ]]
-    -- upvalues: l_ReceivedMultiplePlaceInfos_0 (copy), l_Immutable_0 (copy)
-    v4 = v4 or {};
-    if v5.type == l_ReceivedMultiplePlaceInfos_0.name then
-        local v6 = {};
-        for _, v8 in ipairs(v5.placeInfos) do
-            v6[v8.placeId] = v8;
-        end;
-        v4 = l_Immutable_0.JoinDictionaries(v4, v6);
-    end;
-    return v4;
-end;
+local PlaceInfoRodux = script:FindFirstAncestor("PlaceInfoRodux")
+local PlaceInfoRoduxParent = PlaceInfoRodux.Parent
+local ReceivedMultiplePlaceInfos = require(PlaceInfoRodux.Actions).ReceivedMultiplePlaceInfos
+local Immutable = require(PlaceInfoRoduxParent.AppCommonLib).Immutable
+
+return function(p1, p2) -- line: 9
+	-- upvalues: ReceivedMultiplePlaceInfos (copy), Immutable (copy)
+	local v7 = p1 or {}
+
+	if p2.type == ReceivedMultiplePlaceInfos.name then
+		local t1 = {}
+
+		for _, v in ipairs(p2.placeInfos) do
+			t1[v.placeId] = v
+		end
+
+		v7 = Immutable.JoinDictionaries(v7, t1)
+	end
+
+	return v7
+end

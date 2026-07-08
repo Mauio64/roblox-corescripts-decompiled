@@ -1,8 +1,8 @@
 return {
-    fromProduct = function(v0) --[[ Line: 8 ]] --[[ Name: fromProduct ]]
-        return {
-            basePrice = v0.basePrice, 
-            purchasable = v0.purchasable
-        };
-    end
-};
+	fromProduct = function(p1) -- line: 8
+		return {
+			basePrice = p1.basePrice,
+			purchasable = p1.purchasable
+		}
+	end
+}

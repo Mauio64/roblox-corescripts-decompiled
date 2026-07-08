@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfileStoreEnableFreeItemPriceLabelFix", false);
+return game:DefineFastFlag("ProfileStoreEnableFreeItemPriceLabelFix", false)

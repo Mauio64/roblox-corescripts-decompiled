@@ -1,3 +1,4 @@
-local v0 = require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign);
-local v1 = require(script.Parent.FFlagLuaAppEdpMediaGalleryVideoPreviewIxp);
-return v0 and (game:DefineFastFlag("LuaAppEdpMediaGalleryVideoPreview5", false) or v1);
+local FFlagLuaAppEdpMediaGalleryRedesign = require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign)
+local FFlagLuaAppEdpMediaGalleryVideoPreviewIxp = require(script.Parent.FFlagLuaAppEdpMediaGalleryVideoPreviewIxp)
+
+return FFlagLuaAppEdpMediaGalleryRedesign and (game:DefineFastFlag("LuaAppEdpMediaGalleryVideoPreview5", false) or FFlagLuaAppEdpMediaGalleryVideoPreviewIxp)

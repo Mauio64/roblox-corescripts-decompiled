@@ -1,32 +1,38 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.FocusNavigation);
-local v3 = require(script.Parent.FocusNavigationContext);
-local v4 = require(script.Parent.useComposedRef);
-local v5 = require(script.Parent.useEventLifecycleRef);
-return function(v6, v7) --[[ Line: 13 ]] --[[ Name: useContainerFocusBehavior ]]
-    -- upvalues: v1 (copy), v3 (copy), v5 (copy), v4 (copy)
-    local v8 = v1.useContext(v3);
-    local v10 = v1.useCallback(function(v9) --[[ Line: 16 ]]
-        -- upvalues: v8 (copy), v6 (copy)
-        if v8 then
-            assert(v9:IsA("GuiObject"), "FocusBehaviors can only be applied to GuiObjects");
-            v8:registerFocusBehavior(v9, v6);
-        end;
-    end, {
-        v8, 
-        v6
-    });
-    local v12 = v1.useCallback(function(v11) --[[ Line: 23 ]]
-        -- upvalues: v8 (copy), v6 (copy)
-        if v8 then
-            assert(v11:IsA("GuiObject"), "FocusBehaviors can only be applied to GuiObjects");
-            v8:deregisterFocusBehavior(v11, v6);
-        end;
-    end, {
-        v8, 
-        v6
-    });
-    local v13 = v5(v10, v12);
-    return v4(v13, v7);
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+
+require(ParentParent.FocusNavigation)
+
+local FocusNavigationContext = require(script.Parent.FocusNavigationContext)
+local useComposedRef = require(script.Parent.useComposedRef)
+local useEventLifecycleRef = require(script.Parent.useEventLifecycleRef)
+
+local function useContainerFocusBehavior(p1, p2) -- line: 13
+	-- upvalues: React (copy), FocusNavigationContext (copy), useEventLifecycleRef (copy), useComposedRef (copy)
+	local v9 = React.useContext(FocusNavigationContext)
+	local v10 = React.useCallback(function(p3) -- line: 16
+		-- upvalues: v9 (copy), p1 (copy)
+		if v9 then
+			assert(p3:IsA("GuiObject"), "FocusBehaviors can only be applied to GuiObjects")
+			v9:registerFocusBehavior(p3, p1)
+		end
+	end, {
+		v9,
+		p1
+	})
+	local v11 = React.useCallback(function(p4) -- line: 23
+		-- upvalues: v9 (copy), p1 (copy)
+		if v9 then
+			assert(p4:IsA("GuiObject"), "FocusBehaviors can only be applied to GuiObjects")
+			v9:deregisterFocusBehavior(p4, p1)
+		end
+	end, {
+		v9,
+		p1
+	})
+	local v12 = useEventLifecycleRef(v10, v11)
+
+	return useComposedRef(v12, p2)
+end
+
+return useContainerFocusBehavior

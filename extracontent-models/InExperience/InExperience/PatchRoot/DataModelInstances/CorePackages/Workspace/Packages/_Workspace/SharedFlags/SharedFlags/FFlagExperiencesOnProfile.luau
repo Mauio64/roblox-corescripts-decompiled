@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExperiencesOnProfile_v2", false);
+return game:DefineFastFlag("ExperiencesOnProfile_v2", false)

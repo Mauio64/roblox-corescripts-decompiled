@@ -1,35 +1,38 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ApolloFriends);
-local l_queries_0 = require(l_Parent_0.ApolloLocalState).queries;
-local l_userIdExists_0 = require(l_Parent_0.SocialCommon).Utils.userIdExists;
-local v6 = require(l_Parent_0.ApolloClient);
-local l_useQuery_0 = v6.useQuery;
-local l_useApolloClient_0 = v6.useApolloClient;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v10 = require(l_script_FirstAncestor_0.EventHandlers.handleFriendshipEvent);
-return function() --[[ Line: 22 ]] --[[ Name: useHandleFriendshipEvent ]]
-    -- upvalues: l_useLocalUserId_0 (copy), l_useApolloClient_0 (copy), l_useQuery_0 (copy), l_queries_0 (copy), l_userIdExists_0 (copy), v3 (copy), v2 (copy), v10 (copy)
-    local v11 = l_useLocalUserId_0();
-    local v12 = l_useApolloClient_0();
-    local v13 = l_useQuery_0(l_queries_0.onlineFriendsByUserId, {
-        skip = not l_userIdExists_0(v11), 
-        notifyOnNetworkStatusChange = true, 
-        variables = {
-            userId = v11, 
-            sort = v3.Enums.Sort.FriendshipScore
-        }
-    });
-    return (v2.useCallback(function(v14) --[[ Line: 36 ]]
-        -- upvalues: v10 (ref), v11 (copy), v13 (copy), v12 (copy)
-        v10({
-            localUserId = v11, 
-            onlineFriendsRef = v13, 
-            apolloClient = v12, 
-            friendshipUpdate = v14
-        });
-    end, {
-        v13
-    }));
-end;
+local FriendsCommon = script:FindFirstAncestor("FriendsCommon")
+local FriendsCommonParent = FriendsCommon.Parent
+local React = require(FriendsCommonParent.React)
+local ApolloFriends = require(FriendsCommonParent.ApolloFriends)
+local queries = require(FriendsCommonParent.ApolloLocalState).queries
+local userIdExists = require(FriendsCommonParent.SocialCommon).Utils.userIdExists
+local ApolloClient = require(FriendsCommonParent.ApolloClient)
+local useQuery = ApolloClient.useQuery
+local useApolloClient = ApolloClient.useApolloClient
+local useLocalUserId = require(FriendsCommonParent.RobloxAppHooks).useLocalUserId
+local handleFriendshipEvent = require(FriendsCommon.EventHandlers.handleFriendshipEvent)
+local FFlagFriendSortedByPresenceSignalsImplementation = require(FriendsCommonParent.SharedFlags).FFlagFriendSortedByPresenceSignalsImplementation
+
+local function useHandleFriendshipEvent() -- line: 25
+	-- upvalues: useLocalUserId (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), useApolloClient (copy), useQuery (copy), queries (copy), userIdExists (copy), ApolloFriends (copy), React (copy), handleFriendshipEvent (copy)
+	local v14 = useLocalUserId()
+	local v15 = if not FFlagFriendSortedByPresenceSignalsImplementation then useApolloClient() else nil
+	local v16 = if not FFlagFriendSortedByPresenceSignalsImplementation then useQuery(queries.onlineFriendsByUserId, {
+		notifyOnNetworkStatusChange = true,
+		skip = not userIdExists(v14),
+		variables = {
+			userId = v14,
+			sort = ApolloFriends.Enums.Sort.FriendshipScore
+		}
+	}) else nil
+
+	return (React.useCallback(function(p1) -- line: 41
+		-- upvalues: handleFriendshipEvent (copy), v14 (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), v16 (copy), v15 (copy)
+		handleFriendshipEvent({
+			localUserId = v14,
+			onlineFriendsRef = if not FFlagFriendSortedByPresenceSignalsImplementation then v16 else nil,
+			apolloClient = if not FFlagFriendSortedByPresenceSignalsImplementation then v15 else nil,
+			friendshipUpdate = p1
+		})
+	end, { if not FFlagFriendSortedByPresenceSignalsImplementation then v16 else nil }))
+end
+
+return useHandleFriendshipEvent

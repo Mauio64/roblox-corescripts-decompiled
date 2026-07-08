@@ -1,30 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_IconSize_0 = v2.Enums.IconSize;
-return function(v5) --[[ Line: 32 ]] --[[ Name: Badge ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v2 (copy), l_IconSize_0 (copy)
-    local v6 = l_useTokens_0();
-    return v1.createElement(v2.View, {
-        tag = "auto-xy row align-x-center align-y-center bg-surface-300 radius-circle padding-small gap-xsmall", 
-        BorderSizePixel = 0, 
-        LayoutOrder = v5.LayoutOrder, 
-        Text = "", 
-        onActivated = v5.onActivated
-    }, {
-        Icon = v1.createElement(v2.Icon, {
-            name = v5.icon, 
-            variant = v5.iconVariant, 
-            size = l_IconSize_0.Medium, 
-            style = v6.Color.Content.Default, 
-            LayoutOrder = 1
-        }), 
-        Text = if v5.text then v1.createElement(v2.Text, {
-            tag = "text-caption-large content-emphasis text-align-x-left auto-xy text-truncate-none", 
-            Text = v5.text, 
-            textStyle = v6.Color.Content.Default, 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local IconSize = Foundation.Enums.IconSize
+
+local function Badge(t1: {[any]: any}) -- line: 32
+	-- upvalues: useTokens (copy), React (copy), Foundation (copy), IconSize (copy)
+	local v8 = useTokens()
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy row align-x-center align-y-center bg-surface-300 radius-circle padding-small gap-xsmall",
+		BorderSizePixel = 0,
+		Text = "",
+		LayoutOrder = t1.LayoutOrder,
+		onActivated = t1.onActivated
+	}, {
+		Icon = React.createElement(Foundation.Icon, {
+			LayoutOrder = 1,
+			name = t1.icon,
+			variant = t1.iconVariant,
+			size = IconSize.Medium,
+			style = v8.Color.Content.Default
+		}),
+		Text = if not t1.text then nil else React.createElement(Foundation.Text, {
+			tag = "text-caption-large content-emphasis text-align-x-left auto-xy text-truncate-none",
+			LayoutOrder = 2,
+			Text = t1.text,
+			textStyle = v8.Color.Content.Default
+		})
+	})
+end
+
+return Badge

@@ -1,48 +1,66 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Players_0 = game:GetService("Players");
-local l_Workspace_0 = game:GetService("Workspace");
-local l_Parent_1 = l_Parent_0.Parent;
-local v4 = require(l_Parent_0.Misc.Constants);
-local v5 = require(l_Parent_0.Enums.PurchaseError);
-local l_ProductTypeEnum_0 = require(l_Parent_0.types).ProductTypeEnum;
-local l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 = require(l_Parent_1.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs;
-local v8 = require(l_Parent_0.Flags.GetFFlagEnableCreatorStorePurchasingCutover);
-return function(v9, v10, v11, v12, v13) --[[ Line: 20 ]] --[[ Name: meetsPrerequisites ]]
-    -- upvalues: v4 (copy), v5 (copy), v8 (copy), l_Players_0 (copy), l_Workspace_0 (copy), l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 (copy), l_ProductTypeEnum_0 (copy)
-    local v14 = v9.ProductType == v4.ProductType.CollectibleItem;
-    local v15 = if v9.CollectiblesItemDetails then v9.CollectiblesItemDetails.IsLimited else nil;
-    if v14 then
-        if not v15 and v10 then
-            return false, v5.AlreadyOwn;
-        end;
-    elseif v10 then
-        return false, v5.AlreadyOwn;
-    end;
-    if v13 == nil and not v9.IsForSale and not v9.IsPublicDomain then
-        return false, v5.NotForSale;
-    elseif v8() and v9.IsFiatPriced == true then
-        return false, v5.NotForSale;
-    elseif v13 == nil and v12.GetFFlagEnableRestrictedAssetSaleLocationPurchasePrompt() and v9.CanBeSoldInThisGame == false then
-        return false, v5.NotForSaleHere;
-    elseif v13 == nil and (v14 and v15 or v9.IsLimited or v9.IsLimitedUnique) and (v9.Remaining == nil or v9.Remaining == 0) then
-        return false, v5.Limited;
-    elseif v9.MinimumMembershipLevel == Enum.MembershipType.Premium.Value and l_Players_0.LocalPlayer.MembershipType ~= Enum.MembershipType.Premium then
-        return false, v5.PremiumOnly;
-    elseif v9.ContentRatingTypeId == 1 and l_Players_0.LocalPlayer:GetUnder13() then
-        return false, v5.Under13;
-    else
-        local v16 = true;
-        v16 = if v12.getLuaUseThirdPartyPermissions() then v12.isThirdPartyPurchaseAllowed() else l_Workspace_0.AllowThirdPartySales;
-        local v17 = l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 and v9.ProductType == l_ProductTypeEnum_0.DeveloperSubscription;
-        if v9.ProductType ~= v4.ProductType.DeveloperProduct and not v17 and v11 and not v16 then
-            local v18 = game.CreatorType == Enum.CreatorType.Group;
-            local v19 = v9.Creator.CreatorType == "Group";
-            local v20 = tonumber(v9.Creator.CreatorTargetId);
-            if v20 ~= 1 and (v18 ~= v19 or v20 ~= game.CreatorId) then
-                warn(("AllowThirdPartySales has blocked the purchase prompt for %d created by %d. To sell this asset made by a different %s, you will need to enable AllowThirdPartySales."):format(v9.AssetId, v20, v18 and "group" or "user"));
-                return false, v5.ThirdPartyDisabled;
-            end;
-        end;
-        return true, nil;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ParentParentParent = ParentParent.Parent
+local Constants = require(ParentParent.Misc.Constants)
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local ProductTypeEnum = require(ParentParent.types).ProductTypeEnum
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(ParentParentParent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
+local GetFFlagEnableCreatorStorePurchasingCutover = require(ParentParent.Flags.GetFFlagEnableCreatorStorePurchasingCutover)
+
+local function meetsPrerequisites(p1, p2, p3, p4, p5) -- line: 20
+	-- upvalues: Constants (copy), PurchaseError (copy), GetFFlagEnableCreatorStorePurchasingCutover (copy), Players (copy), Workspace (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), ProductTypeEnum (copy)
+	local v16 = p1.ProductType == Constants.ProductType.CollectibleItem
+	local v17 = if not p1.CollectiblesItemDetails then nil else p1.CollectiblesItemDetails.IsLimited
+
+	if v16 then
+		if not v17 and p2 then
+			return false, PurchaseError.AlreadyOwn
+		end
+	elseif p2 then
+		return false, PurchaseError.AlreadyOwn
+	end
+
+	if p5 == nil and not p1.IsForSale and not p1.IsPublicDomain then
+		return false, PurchaseError.NotForSale
+	end
+
+	if GetFFlagEnableCreatorStorePurchasingCutover() and p1.IsFiatPriced == true then
+		return false, PurchaseError.NotForSale
+	end
+
+	if p5 == nil and p4.GetFFlagEnableRestrictedAssetSaleLocationPurchasePrompt() and p1.CanBeSoldInThisGame == false then
+		return false, PurchaseError.NotForSaleHere
+	end
+
+	if p5 == nil and (v16 and v17 or p1.IsLimited or p1.IsLimitedUnique) and (p1.Remaining == nil or p1.Remaining == 0) then
+		return false, PurchaseError.Limited
+	end
+
+	if p1.MinimumMembershipLevel == Enum.MembershipType.Premium.Value and Players.LocalPlayer.MembershipType ~= Enum.MembershipType.Premium then
+		return false, PurchaseError.PremiumOnly
+	end
+
+	if p1.ContentRatingTypeId == 1 and Players.LocalPlayer:GetUnder13() then
+		return false, PurchaseError.Under13
+	end
+
+	local v18 = if not p4.getLuaUseThirdPartyPermissions() then Workspace.AllowThirdPartySales else p4.isThirdPartyPurchaseAllowed()
+	local v19 = FFlagEnableUnifiedPurchaseFlowForDevSubs and p1.ProductType == ProductTypeEnum.DeveloperSubscription
+
+	if p1.ProductType ~= Constants.ProductType.DeveloperProduct and not v19 and p3 and not v18 then
+		local v20 = game.CreatorType == Enum.CreatorType.Group
+		local v21 = p1.Creator.CreatorType == "Group"
+		local num = tonumber(p1.Creator.CreatorTargetId)
+
+		if num ~= 1 and (v20 ~= v21 or num ~= game.CreatorId) then
+			warn(("AllowThirdPartySales has blocked the purchase prompt for %d created by %d. To sell this asset made by a different %s, you will need to enable AllowThirdPartySales."):format(p1.AssetId, num, not v20 and "user" or "group"))
+
+			return false, PurchaseError.ThirdPartyDisabled
+		end
+	end
+
+	return true, nil
+end
+
+return meetsPrerequisites

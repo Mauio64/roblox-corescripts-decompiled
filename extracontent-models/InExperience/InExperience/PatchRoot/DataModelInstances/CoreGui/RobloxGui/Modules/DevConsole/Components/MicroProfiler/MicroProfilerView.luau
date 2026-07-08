@@ -1,65 +1,68 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(script.Parent.Parent.Parent.Immutable);
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.LocalActionsView);
-local v4 = require(script.Parent.RecentlyCapturedDumpsView);
-local v5 = require(script.Parent.RecordAndDumpView);
-local v6 = v2.Component:extend("Column");
-local v7 = v2.Component:extend("MicroProfilerView");
-v6.render = function(v8) --[[ Line: 13 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v9 = v8.props[v2.Children];
-    return v2.createElement("Frame", {
-        Size = UDim2.new(0, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v8.props.LayoutOrder
-    }, v1.JoinDictionaries({
-        UIListLayout = v2.createElement("UIListLayout", {
-            Padding = UDim.new(0, 12), 
-            FillDirection = Enum.FillDirection.Vertical, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top
-        })
-    }, v9));
-end;
-v7.render = function(v10) --[[ Line: 35 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v6 (copy), v3 (copy), v5 (copy), v4 (copy)
-    return v2.createElement("Frame", {
-        Size = v10.props.Size, 
-        BackgroundTransparency = v10.props.BackgroundTransparency, 
-        LayoutOrder = v10.props.LayoutOrder
-    }, {
-        UIListLayout = v2.createElement("UIListLayout", {
-            Padding = UDim.new(0, 8), 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            HorizontalFlex = Enum.UIFlexAlignment.Fill, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            VerticalFlex = Enum.UIFlexAlignment.Fill
-        }), 
-        UIPadding = v2.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, 0), 
-            PaddingBottom = UDim.new(0, 0), 
-            PaddingLeft = UDim.new(0, 8), 
-            PaddingRight = UDim.new(0, 8)
-        }), 
-        LeftColumn = v2.createElement(v6, {
-            LayoutOrder = 1
-        }, {
-            LocalActionsView = v2.createElement(v3, {
-                LayoutOrder = 1
-            }), 
-            RecordAndDumpView = v2.createElement(v5, {
-                LayoutOrder = 2
-            })
-        }), 
-        RightColumn = v2.createElement(v6, {
-            LayoutOrder = 2
-        }, {
-            RecentlyCapturedDumpsView = v2.createElement(v4)
-        })
-    });
-end;
-return v7;
+local CorePackages = game:GetService("CorePackages")
+local Immutable = require(script.Parent.Parent.Parent.Immutable)
+local Roact = require(CorePackages.Packages.Roact)
+local LocalActionsView = require(script.Parent.LocalActionsView)
+local RecentlyCapturedDumpsView = require(script.Parent.RecentlyCapturedDumpsView)
+local RecordAndDumpView = require(script.Parent.RecordAndDumpView)
+local v7 = Roact.Component:extend("Column")
+local v8 = Roact.Component:extend("MicroProfilerView")
+
+function v7.render(p1) -- line: 13
+	-- upvalues: Roact (copy), Immutable (copy)
+	local v10 = p1.props[Roact.Children]
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 0, 1, 0),
+		LayoutOrder = p1.props.LayoutOrder
+	}, Immutable.JoinDictionaries({
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, 12),
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top
+		})
+	}, v10))
+end
+function v8.render(p2) -- line: 35
+	-- upvalues: Roact (copy), v7 (copy), LocalActionsView (copy), RecordAndDumpView (copy), RecentlyCapturedDumpsView (copy)
+	return Roact.createElement("Frame", {
+		Size = p2.props.Size,
+		BackgroundTransparency = p2.props.BackgroundTransparency,
+		LayoutOrder = p2.props.LayoutOrder
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, 8),
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			HorizontalFlex = Enum.UIFlexAlignment.Fill,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			VerticalFlex = Enum.UIFlexAlignment.Fill
+		}),
+		UIPadding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 0),
+			PaddingBottom = UDim.new(0, 0),
+			PaddingLeft = UDim.new(0, 8),
+			PaddingRight = UDim.new(0, 8)
+		}),
+		LeftColumn = Roact.createElement(v7, {
+			LayoutOrder = 1
+		}, {
+			LocalActionsView = Roact.createElement(LocalActionsView, {
+				LayoutOrder = 1
+			}),
+			RecordAndDumpView = Roact.createElement(RecordAndDumpView, {
+				LayoutOrder = 2
+			})
+		}),
+		RightColumn = Roact.createElement(v7, {
+			LayoutOrder = 2
+		}, {
+			RecentlyCapturedDumpsView = Roact.createElement(RecentlyCapturedDumpsView)
+		})
+	})
+end
+
+return v8

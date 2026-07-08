@@ -1,3 +1,3 @@
-return function(v0, v1, v2) --[[ Line: 1 ]]
-    v0:sendEventDeferred(v1, "switchAccountScrimError", v2);
-end;
+return function(p1, s1: string, p2) -- line: 1
+	p1:sendEventDeferred(s1, "switchAccountScrimError", p2)
+end

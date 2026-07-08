@@ -1,22 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VideoUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_VideoEndReason_0 = require(l_script_FirstAncestor_0.Analytics.Enums).VideoEndReason;
-return function(v4) --[[ Line: 14 ]] --[[ Name: VideoHoverPlaybackDetector ]]
-    -- upvalues: v2 (copy), l_VideoEndReason_0 (copy)
-    v2.useEffect(function() --[[ Line: 16 ]]
-        -- upvalues: v4 (copy), l_VideoEndReason_0 (ref)
-        if v4.isHovered then
-            v4.requestVideoPlayback(false);
-            return;
-        else
-            v4.cancelVideoPlayback(l_VideoEndReason_0.Unhovered);
-            return;
-        end;
-    end, {
-        v4.isHovered, 
-        v4.requestVideoPlayback, 
-        v4.cancelVideoPlayback
-    });
-    return nil;
-end;
+local VideoUtils = script:FindFirstAncestor("VideoUtils")
+local VideoUtilsParent = VideoUtils.Parent
+local React = require(VideoUtilsParent.React)
+local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
+
+local function VideoHoverPlaybackDetector(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), VideoEndReason (copy)
+	React.useEffect(function() -- line: 16
+		-- upvalues: t1 (copy), VideoEndReason (copy)
+		if t1.isHovered then
+			t1.requestVideoPlayback(false)
+
+			return
+		end
+
+		t1.cancelVideoPlayback(VideoEndReason.Unhovered)
+	end, {
+		t1.isHovered,
+		t1.requestVideoPlayback,
+		t1.cancelVideoPlayback
+	})
+
+	return nil
+end
+
+return VideoHoverPlaybackDetector

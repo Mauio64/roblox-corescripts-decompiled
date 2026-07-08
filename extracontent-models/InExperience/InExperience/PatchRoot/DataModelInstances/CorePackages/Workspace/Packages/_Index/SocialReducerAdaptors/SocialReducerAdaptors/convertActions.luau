@@ -1,17 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialReducerAdaptors");
-local l_llama_0 = require(l_script_FirstAncestor_0.dependencies).llama;
-return function(v2, v3, v4) --[[ Line: 14 ]]
-    -- upvalues: l_llama_0 (copy)
-    return function(v5, v6) --[[ Line: 15 ]]
-        -- upvalues: v4 (copy), v3 (copy), l_llama_0 (ref), v2 (copy)
-        v5 = v5 or v4;
-        local v7 = {
-            v6
-        };
-        local v8 = v3[v6.type];
-        if v8 then
-            v7 = v8(v6);
-        end;
-        return l_llama_0.List.reduce(v7, v2, v5);
-    end;
-end;
+local SocialReducerAdaptors = script:FindFirstAncestor("SocialReducerAdaptors")
+local llama = require(SocialReducerAdaptors.dependencies).llama
+
+return function(p1, t1: {[any]: any}, p2) -- line: 14
+	-- upvalues: llama (copy)
+	return function(p3, t2: {[any]: any}) -- line: 15
+		-- upvalues: p2 (copy), t1 (copy), llama (copy), p1 (copy)
+		local v8 = p3 or p2
+		local t3 = { t2 }
+		local v10 = t1[t2.type]
+
+		if v10 then
+			t3 = v10(t2)
+		end
+
+		return llama.List.reduce(t3, p1, v8)
+	end
+end

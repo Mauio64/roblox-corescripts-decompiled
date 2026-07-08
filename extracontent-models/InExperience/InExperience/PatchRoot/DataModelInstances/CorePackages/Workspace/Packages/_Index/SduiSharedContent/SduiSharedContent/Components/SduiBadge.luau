@@ -1,21 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.SduiCompat);
-local l_Badge_0 = v2.Badge;
-return v1.memo(function(v5) --[[ Line: 28 ]] --[[ Name: SduiBadge ]]
-    -- upvalues: v1 (copy), l_Badge_0 (copy)
-    return v1.createElement(l_Badge_0, {
-        text = v5.text, 
-        icon = v5.icon, 
-        variant = v5.variant, 
-        testId = v5.testId, 
-        onAbsoluteSizeChanged = v5.onAbsoluteSizeChanged, 
-        onAbsolutePositionChanged = v5.onAbsolutePositionChanged, 
-        AnchorPoint = v5.anchorPoint, 
-        LayoutOrder = v5.layoutOrder, 
-        Position = v5.position, 
-        Visible = v5.visible, 
-        ZIndex = v5.zIndex
-    });
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+require(Parent.SduiCompat)
+
+local Badge = Foundation.Badge
+
+local function SduiBadge(t1: {[any]: any}) -- line: 28
+	-- upvalues: React (copy), Badge (copy)
+	return React.createElement(Badge, {
+		text = t1.text,
+		icon = t1.icon,
+		variant = t1.variant,
+		testId = t1.testId,
+		onAbsoluteSizeChanged = t1.onAbsoluteSizeChanged,
+		onAbsolutePositionChanged = t1.onAbsolutePositionChanged,
+		AnchorPoint = t1.anchorPoint,
+		LayoutOrder = t1.layoutOrder,
+		Position = t1.position,
+		Visible = t1.visible,
+		ZIndex = t1.zIndex
+	})
+end
+
+return React.memo(SduiBadge)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PeoplePageRemoveSkeletons", false);
+return game:DefineFastFlag("PeoplePageRemoveSkeletons", false)

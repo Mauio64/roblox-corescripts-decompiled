@@ -1,41 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryAnalytics").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = require(l_Parent_0.t);
-local v4 = game:DefineFastInt("DiscoveryVideoLoadEventHundredthsPercent", 0);
-local v5 = v3.strictInterface({
-    videoAssetId = v3.string, 
-    videoPlaybackSessionId = v3.string, 
-    totalDuration = v3.number, 
-    loadTime = v3.number, 
-    universeId = v3.string, 
-    rootPlaceId = v3.string, 
-    gameSetTypeId = v3.optional(v3.string), 
-    sortPos = v3.optional(v3.number)
-});
-local v6 = {
-    eventName = "discoveryVideoLoadEvent", 
-    backends = {
-        v1.TelemetryBackends.Points, 
-        v1.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v4, 
-    lastUpdated = {
-        25, 
-        4, 
-        23
-    }, 
-    description = "Fire when discovery video finishes loading", 
-    links = ""
-};
-return function(v7, v8) --[[ Line: 36 ]] --[[ Name: discoveryVideoLoadEvent ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v1 (copy), v6 (copy)
-    local v9, v10 = v5(v8);
-    if not v9 then
-        l_mutedError_0(v10);
-    end;
-    v1.default:logRobloxTelemetryEvent(v6, {
-        "addSessionInfo", 
-        v1.StandardizedFields.addOsInfo
-    }, v8, v7);
-end;
+local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local mutedError = require(Parent.Loggers).mutedError
+local t = require(Parent.t)
+local v5 = game:DefineFastInt("DiscoveryVideoLoadEventHundredthsPercent", 0)
+local v6 = t.strictInterface({
+	videoAssetId = t.string,
+	videoPlaybackSessionId = t.string,
+	totalDuration = t.number,
+	loadTime = t.number,
+	universeId = t.string,
+	rootPlaceId = t.string,
+	gameSetTypeId = t.optional(t.string),
+	sortPos = t.optional(t.number)
+})
+local t1 = {
+	eventName = "discoveryVideoLoadEvent",
+	description = "Fire when discovery video finishes loading",
+	links = "",
+	backends = {
+		LoggingProtocol.TelemetryBackends.Points,
+		LoggingProtocol.TelemetryBackends.EventIngest
+	},
+	throttlingPercentage = v5,
+	lastUpdated = {
+		25,
+		4,
+		23
+	}
+}
+
+local function discoveryVideoLoadEvent(p1, p2) -- line: 36
+	-- upvalues: v6 (copy), mutedError (copy), LoggingProtocol (copy), t1 (copy)
+	local v11, v12 = v6(p2)
+
+	if not v11 then
+		mutedError(v12)
+	end
+
+	LoggingProtocol.default:logRobloxTelemetryEvent(t1, {
+		"addSessionInfo",
+		LoggingProtocol.StandardizedFields.addOsInfo
+	}, p2, p1)
+end
+
+return discoveryVideoLoadEvent

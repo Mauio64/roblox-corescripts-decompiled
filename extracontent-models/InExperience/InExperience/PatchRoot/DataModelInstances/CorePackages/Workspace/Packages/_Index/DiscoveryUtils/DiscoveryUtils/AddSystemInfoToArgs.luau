@@ -1,24 +1,27 @@
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryUtils").Parent;
-local l_SystemInfoProtocol_0 = require(l_Parent_0.SystemInfoProtocol).SystemInfoProtocol;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = {
-    [l_SystemInfoProtocol_0.InfoNames.MANUFACTURER] = "deviceManufacturer", 
-    [l_SystemInfoProtocol_0.InfoNames.BASE_OS] = "operatingSystemVersion", 
-    [l_SystemInfoProtocol_0.InfoNames.IS_64BIT] = "if64Bit", 
-    [l_SystemInfoProtocol_0.InfoNames.CPU_CORE_COUNT] = "cpuCores"
-};
-return function(v4, v5) --[[ Line: 16 ]]
-    -- upvalues: l_SystemInfoProtocol_0 (copy), v3 (copy), v2 (copy)
-    local v6 = v5 or l_SystemInfoProtocol_0.ALL_INFO_NAMES;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 19 ]]
-        -- upvalues: l_SystemInfoProtocol_0 (ref), v6 (copy)
-        return l_SystemInfoProtocol_0.default:getSystemInfo(v6);
-    end);
-    if l_status_0 and typeof(l_result_0) == "table" then
-        for v9, v10 in pairs(l_result_0) do
-            local v11 = v3[v9] or v9;
-            v2.assert(v4[v11] == nil, "Field '" .. tostring(v11) .. "' already exists in argument table!  Will be overwritten.");
-            v4[v11] = v10;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("DiscoveryUtils").Parent
+local SystemInfoProtocol = require(Parent.SystemInfoProtocol).SystemInfoProtocol
+local ArgCheck = require(Parent.ArgCheck)
+local t1 = {
+	[SystemInfoProtocol.InfoNames.MANUFACTURER] = "deviceManufacturer",
+	[SystemInfoProtocol.InfoNames.BASE_OS] = "operatingSystemVersion",
+	[SystemInfoProtocol.InfoNames.IS_64BIT] = "if64Bit",
+	[SystemInfoProtocol.InfoNames.CPU_CORE_COUNT] = "cpuCores"
+}
+
+return function(t2: {[any]: any}, t3: {[any]: any}?) -- line: 16
+	-- upvalues: SystemInfoProtocol (copy), t1 (copy), ArgCheck (copy)
+	local v7 = t3 or SystemInfoProtocol.ALL_INFO_NAMES
+	local ok, result = pcall(function() -- line: 19
+		-- upvalues: SystemInfoProtocol (copy), v7 (copy)
+		return SystemInfoProtocol.default:getSystemInfo(v7)
+	end)
+
+	if ok and typeof(result) == "table" then
+		for k, v in pairs(result) do
+			local v12 = t1[k] or k
+
+			ArgCheck.assert(t2[v12] == nil, "Field '" .. tostring(v12) .. "' already exists in argument table!  Will be overwritten.")
+			t2[v12] = v
+		end
+	end
+end

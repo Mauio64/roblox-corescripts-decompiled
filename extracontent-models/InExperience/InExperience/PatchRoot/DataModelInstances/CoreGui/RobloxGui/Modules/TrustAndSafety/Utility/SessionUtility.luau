@@ -1,26 +1,28 @@
-local l_SessionService_0 = game:GetService("SessionService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Resources.Constants);
-local v3 = require(l_Parent_0.Flags.GetFFlagEnableARFlowSession);
-local v4 = require(l_Parent_0.Utility.SendAnalytics);
+local SessionService = game:GetService("SessionService")
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Resources.Constants)
+local GetFFlagEnableARFlowSession = require(ParentParent.Flags.GetFFlagEnableARFlowSession)
+local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
+
 return {
-    startAbuseReportSession = function(v5) --[[ Line: 12 ]]
-        -- upvalues: v3 (copy), l_SessionService_0 (copy), v2 (copy), v4 (copy)
-        if v3() then
-            if not l_SessionService_0:SessionExists(v2.Session.StructuralIdentifier.AbuseReport) then
-                l_SessionService_0:SetSession(v2.Session.StructuralIdentifier.Level1, v2.Session.StructuralIdentifier.AbuseReport, v2.Session.StructuralIdentifier.AbuseReport);
-            end;
-            l_SessionService_0:SetMetadata(v2.Session.StructuralIdentifier.AbuseReport, v2.Session.Metadata.EntryPoint, v5);
-            l_SessionService_0:SetMetadata(v2.Session.StructuralIdentifier.AbuseReport, v2.Session.Metadata.DeleteOnGameLeave, "True");
-            v4(v2.Analytics.ReportFlowOpened, v2.Analytics.ReportFlowOpened, {
-                source = v5
-            });
-        end;
-    end, 
-    endAbuseReportSession = function() --[[ Line: 43 ]]
-        -- upvalues: v3 (copy), l_SessionService_0 (copy), v2 (copy)
-        if v3() and l_SessionService_0:SessionExists(v2.Session.StructuralIdentifier.AbuseReport) then
-            l_SessionService_0:RemoveSession(v2.Session.StructuralIdentifier.AbuseReport);
-        end;
-    end
-};
+	startAbuseReportSession = function(p1) -- line: 12
+		-- upvalues: GetFFlagEnableARFlowSession (copy), SessionService (copy), Constants (copy), SendAnalytics (copy)
+		if GetFFlagEnableARFlowSession() then
+			if not SessionService:SessionExists(Constants.Session.StructuralIdentifier.AbuseReport) then
+				SessionService:SetSession(Constants.Session.StructuralIdentifier.Level1, Constants.Session.StructuralIdentifier.AbuseReport, Constants.Session.StructuralIdentifier.AbuseReport)
+			end
+
+			SessionService:SetMetadata(Constants.Session.StructuralIdentifier.AbuseReport, Constants.Session.Metadata.EntryPoint, p1)
+			SessionService:SetMetadata(Constants.Session.StructuralIdentifier.AbuseReport, Constants.Session.Metadata.DeleteOnGameLeave, "True")
+			SendAnalytics(Constants.Analytics.ReportFlowOpened, Constants.Analytics.ReportFlowOpened, {
+				source = p1
+			})
+		end
+	end,
+	endAbuseReportSession = function() -- line: 43
+		-- upvalues: GetFFlagEnableARFlowSession (copy), SessionService (copy), Constants (copy)
+		if GetFFlagEnableARFlowSession() and SessionService:SessionExists(Constants.Session.StructuralIdentifier.AbuseReport) then
+			SessionService:RemoveSession(Constants.Session.StructuralIdentifier.AbuseReport)
+		end
+	end
+}

@@ -1,96 +1,97 @@
-local v0 = require(script.Parent.Parent.Parent.ContactImporter.Common.Constants);
-local l_game_EngineFeature_0 = game:GetEngineFeature(v0.UNIVERSAL_APP_CONTACT_IMPORTER_STORAGE_KEYS);
+local Constants = require(script.Parent.Parent.Parent.ContactImporter.Common.Constants)
+local EngineFeature = game:GetEngineFeature(Constants.UNIVERSAL_APP_CONTACT_IMPORTER_STORAGE_KEYS)
+
 return {
-    addSeenCount = function(_, v3, v4) --[[ Line: 9 ]] --[[ Name: addSeenCount ]]
-        -- upvalues: l_game_EngineFeature_0 (copy), v0 (copy)
-        if not l_game_EngineFeature_0 then
-            return;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 13 ]]
-                -- upvalues: v3 (copy), v0 (ref)
-                return v3:GetItem(v0.LOCAL_STORAGE_KEY_MODAL_DISPLAY_COUNT);
-            end);
-            if l_status_0 then
-                local v7 = "";
-                if l_result_0 == "" then
-                    v7 = v4 .. ":" .. "1";
-                else
-                    local v8 = false;
-                    for v9 in string.gmatch(l_result_0 or "", "([^,]+)") do
-                        local v10 = string.split(v9, ":");
-                        local v11 = v10[1];
-                        local v12 = tonumber(v10[2]) or 0;
-                        if v11 == v4 then
-                            v8 = true;
-                            v12 = v12 + 1;
-                        end;
-                        local v13 = v11 .. ":" .. tostring(v12);
-                        if v7 ~= "" then
-                            v7 = v7 .. "," .. v13;
-                        else
-                            v7 = v13;
-                        end;
-                    end;
-                    if not v8 then
-                        v7 = v7 .. "," .. v4 .. ":" .. "1";
-                    end;
-                end;
-                do
-                    local l_v7_0 = v7;
-                    pcall(function() --[[ Line: 44 ]]
-                        -- upvalues: v3 (copy), v0 (ref), l_v7_0 (ref)
-                        v3:SetItem(v0.LOCAL_STORAGE_KEY_MODAL_DISPLAY_COUNT, l_v7_0);
-                        v3:Flush();
-                    end);
-                end;
-            end;
-            return;
-        end;
-    end, 
-    updateTimestamp = function(_, v16, v17, v18) --[[ Line: 51 ]] --[[ Name: updateTimestamp ]]
-        -- upvalues: l_game_EngineFeature_0 (copy), v0 (copy)
-        if not l_game_EngineFeature_0 then
-            return;
-        else
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 60 ]]
-                -- upvalues: v16 (copy), v0 (ref)
-                return v16:GetItem(v0.LOCAL_STORAGE_KEY_MODAL_TIMESTAMP);
-            end);
-            if l_status_1 then
-                local v21 = "";
-                if l_result_1 == "" then
-                    v21 = v17 .. ":" .. tostring(v18);
-                else
-                    local v22 = false;
-                    for v23 in string.gmatch(l_result_1 or "", "([^,]+)") do
-                        local v24 = string.split(v23, ":");
-                        local v25 = v24[1];
-                        local v26 = v24[2];
-                        if v25 == v17 then
-                            v26 = tostring(v18);
-                            v22 = true;
-                        end;
-                        local v27 = v25 .. ":" .. tostring(v26);
-                        if v21 ~= "" then
-                            v21 = v21 .. "," .. v27;
-                        else
-                            v21 = v27;
-                        end;
-                    end;
-                    if not v22 then
-                        v21 = v21 .. "," .. v17 .. ":" .. tostring(v18);
-                    end;
-                end;
-                do
-                    local l_v21_0 = v21;
-                    pcall(function() --[[ Line: 92 ]]
-                        -- upvalues: v16 (copy), v0 (ref), l_v21_0 (ref)
-                        v16:SetItem(v0.LOCAL_STORAGE_KEY_MODAL_TIMESTAMP, l_v21_0);
-                        v16:Flush();
-                    end);
-                end;
-            end;
-            return;
-        end;
-    end
-};
+	addSeenCount = function(_: {[any]: any}, p1, s1: string) -- line: 9
+		-- upvalues: EngineFeature (copy), Constants (copy)
+		if not EngineFeature then
+			return
+		end
+
+		local ok, result = pcall(function() -- line: 13
+			-- upvalues: p1 (copy), Constants (copy)
+			return p1:GetItem(Constants.LOCAL_STORAGE_KEY_MODAL_DISPLAY_COUNT)
+		end)
+
+		if ok then
+			local s2 = ""
+
+			if result == "" then
+				s2 = s1 .. ":" .. "1"
+			else
+				local v9 = false
+
+				for match in string.gmatch(result or "", "([^,]+)") do
+					local parts = string.split(match, ":")
+					local v12 = parts[1]
+					local v13 = tonumber(parts[2]) or 0
+
+					if v12 == s1 then
+						v9 = true
+						v13 += 1
+					end
+
+					local v14 = v12 .. ":" .. tostring(v13)
+
+					s2 = if s2 == "" then v14 else s2 .. "," .. v14
+				end
+
+				if not v9 then
+					s2 ..= "," .. s1 .. ":" .. "1"
+				end
+			end
+
+			pcall(function() -- line: 44
+				-- upvalues: p1 (copy), Constants (copy), s2 (ref)
+				p1:SetItem(Constants.LOCAL_STORAGE_KEY_MODAL_DISPLAY_COUNT, s2)
+				p1:Flush()
+			end)
+		end
+	end,
+	updateTimestamp = function(_: {[any]: any}, p2, s3: string, n1: number) -- line: 51
+		-- upvalues: EngineFeature (copy), Constants (copy)
+		if not EngineFeature then
+			return
+		end
+
+		local ok, result = pcall(function() -- line: 60
+			-- upvalues: p2 (copy), Constants (copy)
+			return p2:GetItem(Constants.LOCAL_STORAGE_KEY_MODAL_TIMESTAMP)
+		end)
+
+		if ok then
+			local s4 = ""
+
+			if result == "" then
+				s4 = s3 .. ":" .. tostring(n1)
+			else
+				local v22 = false
+
+				for match in string.gmatch(result or "", "([^,]+)") do
+					local parts = string.split(match, ":")
+					local v25 = parts[1]
+					local v26 = parts[2]
+
+					if v25 == s3 then
+						v26 = tostring(n1)
+						v22 = true
+					end
+
+					local v27 = v25 .. ":" .. tostring(v26)
+
+					s4 = if s4 == "" then v27 else s4 .. "," .. v27
+				end
+
+				if not v22 then
+					s4 ..= "," .. s3 .. ":" .. tostring(n1)
+				end
+			end
+
+			pcall(function() -- line: 92
+				-- upvalues: p2 (copy), Constants (copy), s4 (ref)
+				p2:SetItem(Constants.LOCAL_STORAGE_KEY_MODAL_TIMESTAMP, s4)
+				p2:Flush()
+			end)
+		end
+	end
+}

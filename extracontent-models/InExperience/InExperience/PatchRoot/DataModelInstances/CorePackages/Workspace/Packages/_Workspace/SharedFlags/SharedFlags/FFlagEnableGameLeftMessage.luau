@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableGameLeftMessage", false);
+return game:DefineFastFlag("EnableGameLeftMessage", false)

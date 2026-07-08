@@ -1,20 +1,25 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.getDeepValue);
-local _ = require(l_Parent_0.roduxFriendsTypes);
-local v3 = require(script.Parent.filterByKeys);
-return function(v4) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    local l_keyPath_0 = v4.keyPath;
-    return function(v6) --[[ Line: 12 ]]
-        -- upvalues: v1 (ref), l_keyPath_0 (copy), v3 (ref)
-        return function(v7, v8) --[[ Line: 13 ]]
-            -- upvalues: v1 (ref), v6 (copy), l_keyPath_0 (ref), v3 (ref)
-            local v9 = v1(v6, string.format("%s.recommendations.byUserId.%s", l_keyPath_0, v7 or "")) or {};
-            if v8 then
-                return (v3(v8, v9));
-            else
-                return v9;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local getDeepValue = require(ParentParent.getDeepValue)
+
+require(ParentParent.roduxFriendsTypes)
+
+local filterByKeys = require(script.Parent.filterByKeys)
+
+return function(p1) -- line: 10
+	-- upvalues: getDeepValue (copy), filterByKeys (copy)
+	local keyPath = p1.keyPath
+
+	return function(p2) -- line: 12
+		-- upvalues: getDeepValue (copy), keyPath (copy), filterByKeys (copy)
+		return function(s1: string, t1: {[any]: any}?) -- line: 13
+			-- upvalues: getDeepValue (copy), p2 (copy), keyPath (copy), filterByKeys (copy)
+			local v9 = getDeepValue(p2, string.format("%s.recommendations.byUserId.%s", keyPath, s1 or "")) or {}
+
+			if t1 then
+				return (filterByKeys(t1, v9))
+			end
+
+			return v9
+		end
+	end
+end

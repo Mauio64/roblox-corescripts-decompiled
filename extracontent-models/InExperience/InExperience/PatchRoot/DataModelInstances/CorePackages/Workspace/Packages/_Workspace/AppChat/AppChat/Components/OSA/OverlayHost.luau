@@ -1,55 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SignalsReact);
-local l_ProviderContainer_0 = require(l_Parent_0.RoactUtils).Components.ProviderContainer;
-local v6 = require(l_script_FirstAncestor_0.Components.OSA.GroupOSADialog);
-local v7 = require(l_script_FirstAncestor_0.Stores.GetOverlayStore);
-local v8 = require(l_script_FirstAncestor_0.Flags.FFlagSupportViewingUserProfileOnOSA);
-local l_FFlagAppChatShowOSAOnPageEntry_0 = require(l_Parent_0.SharedFlags).FFlagAppChatShowOSAOnPageEntry;
-local v10 = {
-    GroupOSADialog = v6
-};
-return function(v11) --[[ Line: 35 ]] --[[ Name: OverlayHost ]]
-    -- upvalues: v7 (copy), v4 (copy), v8 (copy), v3 (copy), v10 (copy), v2 (copy), l_FFlagAppChatShowOSAOnPageEntry_0 (copy), l_ProviderContainer_0 (copy)
-    local v12 = v7(false);
-    local v13 = v4.useSignalState(v12.getCurrentOverlay);
-    local v14 = if v8 then v4.useSignalState(v12.getOverlayDefaultProps) else nil;
-    local v15 = v3.useCallback(function() --[[ Line: 43 ]]
-        -- upvalues: v12 (copy)
-        v12.dismissOverlay();
-    end, {});
-    local v16 = v13 and v13.overlayType;
-    local v17 = v16 and v10[v16];
-    if not v17 then
-        return nil;
-    else
-        local v18 = if v8 then v2.Dictionary.union(v14 or {}, v13.overlayProps or {}) else table.clone(v13.overlayProps or {});
-        if l_FFlagAppChatShowOSAOnPageEntry_0 then
-            local l_onClose_0 = v18.onClose;
-            local l_l_onClose_0_0 = l_onClose_0 --[[ copy: 8 -> 9 ]];
-            v18.onClose = function() --[[ Line: 58 ]]
-                -- upvalues: l_l_onClose_0_0 (copy), v15 (copy)
-                if l_l_onClose_0_0 then
-                    l_l_onClose_0_0();
-                end;
-                v15();
-            end;
-        else
-            v18.onClose = v15;
-        end;
-        v18.hasBackdrop = true;
-        v18.disablePortal = false;
-        local v21 = v3.createElement(v17, v18);
-        if v11.providers and #v11.providers > 0 then
-            return v3.createElement(l_ProviderContainer_0, {
-                providers = v11.providers
-            }, {
-                Overlay = v21
-            });
-        else
-            return v21;
-        end;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local SignalsReact = require(AppChatParent.SignalsReact)
+local ProviderContainer = require(AppChatParent.RoactUtils).Components.ProviderContainer
+local GroupOSADialog = require(AppChat.Components.OSA.GroupOSADialog)
+local GetOverlayStore = require(AppChat.Stores.GetOverlayStore)
+local FFlagSupportViewingUserProfileOnOSA = require(AppChat.Flags.FFlagSupportViewingUserProfileOnOSA)
+local FFlagAppChatShowOSAOnPageEntry = require(AppChatParent.SharedFlags).FFlagAppChatShowOSAOnPageEntry
+local t1 = {
+	GroupOSADialog = GroupOSADialog
+}
+
+local function OverlayHost(t2: {[any]: any}) -- line: 35
+	-- upvalues: GetOverlayStore (copy), SignalsReact (copy), FFlagSupportViewingUserProfileOnOSA (copy), React (copy), t1 (copy), Cryo (copy), FFlagAppChatShowOSAOnPageEntry (copy), ProviderContainer (copy)
+	local v14 = GetOverlayStore(false)
+	local v15 = SignalsReact.useSignalState(v14.getCurrentOverlay)
+	local v16 = if not FFlagSupportViewingUserProfileOnOSA then nil else SignalsReact.useSignalState(v14.getOverlayDefaultProps)
+	local v17 = React.useCallback(function() -- line: 43
+		-- upvalues: v14 (copy)
+		v14.dismissOverlay()
+	end, {})
+	local v18 = v15 and v15.overlayType
+	local v19 = v18 and t1[v18]
+
+	if not v19 then
+		return nil
+	end
+
+	local v20 = if not FFlagSupportViewingUserProfileOnOSA then table.clone(v15.overlayProps or {}) else Cryo.Dictionary.union(v16 or {}, v15.overlayProps or {})
+
+	if FFlagAppChatShowOSAOnPageEntry then
+		local onClose = v20.onClose
+
+		function v20.onClose() -- line: 58
+			-- upvalues: onClose (copy), v17 (copy)
+			if onClose then
+				onClose()
+			end
+
+			v17()
+		end
+	else
+		v20.onClose = v17
+	end
+
+	v20.hasBackdrop = true
+	v20.disablePortal = false
+
+	local v22 = React.createElement(v19, v20)
+
+	if t2.providers and #t2.providers > 0 then
+		return React.createElement(ProviderContainer, {
+			providers = t2.providers
+		}, {
+			Overlay = v22
+		})
+	end
+
+	return v22
+end
+
+return OverlayHost

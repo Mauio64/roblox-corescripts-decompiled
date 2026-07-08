@@ -1,7 +1,9 @@
-local _ = require(script.Parent.types);
-local v1 = require(script.Parent.Parent.Commands.RBXClearCommand);
+require(script.Parent.types)
+
+local RBXClearCommand = require(script.Parent.Parent.Commands.RBXClearCommand)
+
 return {
-    name = script.Name, 
-    alias = v1.alias, 
-    clientRun = v1.clientRun
-};
+	name = script.Name,
+	alias = RBXClearCommand.alias,
+	clientRun = RBXClearCommand.clientRun
+}

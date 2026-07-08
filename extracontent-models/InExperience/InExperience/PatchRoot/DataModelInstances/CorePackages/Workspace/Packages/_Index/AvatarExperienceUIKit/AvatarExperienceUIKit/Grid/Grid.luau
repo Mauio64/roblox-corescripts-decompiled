@@ -1,88 +1,97 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = game:DefineFastFlag("AXDebugGridShouldErrorOnInvalidRowCount", false);
-local function v8(v4) --[[ Line: 21 ]] --[[ Name: GridRow ]]
-    -- upvalues: v1 (copy)
-    local v5 = {
-        GridRowLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    };
-    for v6, v7 in v4.items do
-        v5[("item-%*-%*"):format(v4.getItemId(v7), v6)] = v1.createElement("Frame", {
-            Size = UDim2.new(UDim.new(1 / v4.itemsPerRow, 0), UDim.new(0, 0)), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v6
-        }, {
-            Padding = v1.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v4.gapHorizontal / 2), 
-                PaddingRight = UDim.new(0, v4.gapHorizontal / 2)
-            }), 
-            Content = v4.renderItem({
-                item = v7, 
-                index = (v4.rowIndex - 1) * v4.itemsPerRow + v6, 
-                gridInformation = {
-                    row = v4.rowIndex, 
-                    column = (v6 - 1) % v4.itemsPerRow + 1
-                }
-            })
-        });
-    end;
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v4.LayoutOrder
-    }, v5);
-end;
-return (v1.forwardRef(function(v9, v10) --[[ Line: 80 ]]
-    -- upvalues: v3 (copy), l_mutedError_0 (copy), v1 (copy), v8 (copy)
-    local v11 = v9.itemsPerRow <= 0 and 1 or v9.itemsPerRow;
-    if v3 and v9.itemsPerRow <= 0 then
-        l_mutedError_0((("itemsPerRow must be a positive number greater than 0, received %*"):format(v11)));
-    end;
-    local v12 = v9.gapVertical or 0;
-    local v13 = v9.gapHorizontal or 0;
-    local v14 = math.ceil(#v9.items / v11);
-    local v15 = {
-        GridLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, v12)
-        }), 
-        Padding = v1.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, -v13 / 2), 
-            PaddingRight = UDim.new(0, -v13 / 2)
-        })
-    };
-    for v16 = 1, v14 do
-        local v17 = (v16 - 1) * v11 + 1;
-        local v18 = {};
-        table.move(v9.items, v17, v17 + v11 - 1, v17, v18);
-        v15["row-" .. tostring(v16)] = v1.createElement(v8, {
-            items = v18, 
-            itemsPerRow = v11, 
-            renderItem = v9.renderItem, 
-            getItemId = v9.getItemId, 
-            LayoutOrder = v16, 
-            gapHorizontal = v13, 
-            rowIndex = v16
-        });
-    end;
-    return v1.createElement("Frame", {
-        Size = v9.Size or UDim2.fromScale(1, 1), 
-        AutomaticSize = v9.AutomaticSize, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v9.LayoutOrder, 
-        ref = v10
-    }, v15);
-end));
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local mutedError = require(Parent.Loggers).mutedError
+local v4 = game:DefineFastFlag("AXDebugGridShouldErrorOnInvalidRowCount", false)
+
+local function GridRow(t1: {[any]: any}) -- line: 21
+	-- upvalues: React (copy)
+	local t2 = {
+		GridRowLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}
+
+	for v8, v9 in t1.items do
+		t2[`item-{ t1.getItemId(v9) }-{ v8 }`] = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(UDim.new(1 / t1.itemsPerRow, 0), UDim.new(0, 0)),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = v8
+		}, {
+			Padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, t1.gapHorizontal / 2),
+				PaddingRight = UDim.new(0, t1.gapHorizontal / 2)
+			}),
+			Content = t1.renderItem({
+				item = v9,
+				index = (t1.rowIndex - 1) * t1.itemsPerRow + v8,
+				gridInformation = {
+					row = t1.rowIndex,
+					column = (v8 - 1) % t1.itemsPerRow + 1
+				}
+			})
+		})
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t1.LayoutOrder
+	}, t2)
+end
+
+return (React.forwardRef(function(t3: {[any]: any}, p1) -- line: 80
+	-- upvalues: v4 (copy), mutedError (copy), React (copy), GridRow (copy)
+	local v12 = if not (t3.itemsPerRow <= 0) then t3.itemsPerRow else 1
+
+	if v4 and t3.itemsPerRow <= 0 then
+		mutedError(`itemsPerRow must be a positive number greater than 0, received { v12 }`)
+	end
+
+	local v13 = t3.gapVertical or 0
+	local v14 = t3.gapHorizontal or 0
+	local v15 = math.ceil(#t3.items / v12)
+	local t4 = {
+		GridLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, v13)
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, -v14 / 2),
+			PaddingRight = UDim.new(0, -v14 / 2)
+		})
+	}
+
+	for i = 1, v15 do
+		local v18 = (i - 1) * v12 + 1
+		local t5 = {}
+
+		table.move(t3.items, v18, v18 + v12 - 1, v18, t5)
+		t4["row-" .. tostring(i)] = React.createElement(GridRow, {
+			items = t5,
+			itemsPerRow = v12,
+			renderItem = t3.renderItem,
+			getItemId = t3.getItemId,
+			LayoutOrder = i,
+			gapHorizontal = v14,
+			rowIndex = i
+		})
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = t3.Size or UDim2.fromScale(1, 1),
+		AutomaticSize = t3.AutomaticSize,
+		LayoutOrder = t3.LayoutOrder,
+		ref = p1
+	}, t4)
+end))

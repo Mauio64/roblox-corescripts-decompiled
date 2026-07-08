@@ -1,24 +1,27 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(l_Parent_0.Promise);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local function _() --[[ Line: 10 ]] --[[ Name: getChangePasswordUrl ]]
-    -- upvalues: l_Url_0 (copy)
-    return string.format("%sv2/user/passwords/change", l_Url_0.AUTH_URL);
-end;
-return function(v5, v6) --[[ Line: 22 ]]
-    -- upvalues: l_HttpService_0 (copy), l_Url_0 (copy), v2 (copy)
-    local v7 = l_HttpService_0:JSONEncode({
-        currentPassword = nil, 
-        newPassword = v6
-    });
-    return v5(string.format("%sv2/user/passwords/change", l_Url_0.AUTH_URL), "POST", {
-        postBody = v7
-    }):andThen(function(v8) --[[ Line: 24 ]]
-        -- upvalues: v2 (ref)
-        return v2.resolve(v8);
-    end, function(v9) --[[ Line: 26 ]]
-        -- upvalues: v2 (ref)
-        return v2.reject(v9);
-    end);
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local HttpService = game:GetService("HttpService")
+local Promise = require(Parent.Promise)
+local Url = require(Parent.Http).Url
+
+local function getChangePasswordUrl() -- line: 10
+	-- upvalues: Url (copy)
+	return string.format("%sv2/user/passwords/change", Url.AUTH_URL)
+end
+
+return function(p1, p2) -- line: 22
+	-- upvalues: HttpService (copy), Url (copy), Promise (copy)
+	local json = HttpService:JSONEncode({
+		currentPassword = nil,
+		newPassword = p2
+	})
+
+	return p1(string.format("%sv2/user/passwords/change", Url.AUTH_URL), "POST", {
+		postBody = json
+	}):andThen(function(p3) -- line: 24
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p3)
+	end, function(p4) -- line: 26
+		-- upvalues: Promise (copy)
+		return Promise.reject(p4)
+	end)
+end

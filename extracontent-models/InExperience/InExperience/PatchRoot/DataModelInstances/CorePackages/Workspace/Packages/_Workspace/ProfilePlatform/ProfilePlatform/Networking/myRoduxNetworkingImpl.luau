@@ -1,18 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_httpRequest_0 = require(l_Parent_0.LuaSocialLibrariesDeps).httpRequest;
-local l_RODUX_KEY_0 = require(l_script_FirstAncestor_0.Common.Constants).RODUX_KEY;
-local v4 = require(l_Parent_0.Lumberyak).Logger.new(nil, l_RODUX_KEY_0):new(l_RODUX_KEY_0 .. " Networking");
-local v5 = game:DefineFastInt("ProfilePlatformHttpRetryCount", 3);
-return (l_httpRequest_0.config({
-    requestFunction = function(v6, v7, v8) --[[ Line: 13 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v4 (copy), l_httpRequest_0 (copy)
-        v4:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v7, v6));
-        return l_httpRequest_0.requestFunctions.RequestInternal(v6, v7, v8);
-    end, 
-    postRequestFunction = function(v9, v10) --[[ Line: 17 ]] --[[ Name: postRequestFunction ]]
-        -- upvalues: v4 (copy)
-        v4:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", v10.requestMethod, v10.url, v9.StatusCode, v9.Body));
-    end, 
-    maxRetryCount = v5
-}));
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local httpRequest = require(ProfilePlatformParent.LuaSocialLibrariesDeps).httpRequest
+local RODUX_KEY = require(ProfilePlatform.Common.Constants).RODUX_KEY
+local v5 = require(ProfilePlatformParent.Lumberyak).Logger.new(nil, RODUX_KEY):new(RODUX_KEY .. " Networking")
+local v6 = game:DefineFastInt("ProfilePlatformHttpRetryCount", 3)
+
+return (httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 13
+		-- upvalues: v5 (copy), httpRequest (copy)
+		v5:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		return httpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+	end,
+	postRequestFunction = function(p4, p5) -- line: 17
+		-- upvalues: v5 (copy)
+		v5:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", p5.requestMethod, p5.url, p4.StatusCode, p4.Body))
+	end,
+	maxRetryCount = v6
+}))

@@ -1,9 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_List_0 = require(l_Parent_0.Cryo).List;
-return function(v2, v3) --[[ Line: 5 ]] --[[ Name: isUserInList ]]
-    -- upvalues: l_List_0 (copy)
-    return l_List_0.findWhere(v2, function(v4) --[[ Line: 6 ]]
-        -- upvalues: v3 (copy)
-        return v4.id == v3;
-    end) ~= nil;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local List = require(Parent.Cryo).List
+
+local function isUserInList(p1, p2) -- line: 5
+	-- upvalues: List (copy)
+	return List.findWhere(p1, function(p3) -- line: 6
+		-- upvalues: p2 (copy)
+		return p3.id == p2
+	end) ~= nil
+end
+
+return isUserInList

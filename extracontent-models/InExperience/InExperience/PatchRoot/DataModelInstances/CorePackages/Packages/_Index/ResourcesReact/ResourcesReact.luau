@@ -1,3 +1,3 @@
 return {
-    useResource = require(script.useResource)
-};
+	useResource = require(script.useResource)
+}

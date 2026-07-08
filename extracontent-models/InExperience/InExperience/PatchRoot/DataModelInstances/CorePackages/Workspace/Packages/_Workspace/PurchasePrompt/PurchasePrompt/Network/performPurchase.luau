@@ -1,32 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local v1 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v2 = require(l_script_FirstAncestor_0.Misc.Constants);
-local v3 = require(l_script_FirstAncestor_0.Promise);
-local v4 = require(l_script_FirstAncestor_0.Utils.isGenericChallengeResponse);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_isEconomicRestrictionResponse_0 = require(l_Parent_0.IAPExperience).Utility.isEconomicRestrictionResponse;
-local l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 = require(l_Parent_0.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow;
-return function(v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18) --[[ Line: 16 ]] --[[ Name: performPurchase ]]
-    -- upvalues: l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (copy), v3 (copy), v2 (copy), v1 (copy), v4 (copy), l_isEconomicRestrictionResponse_0 (copy)
-    return v8.performPurchase(v9, v10, v11, v12, v13, v14, v15, v16, v17, if l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 then v18 else nil):andThen(function(v19) --[[ Line: 42 ]]
-        -- upvalues: v3 (ref), v2 (ref), v1 (ref), v4 (ref), l_isEconomicRestrictionResponse_0 (ref)
-        if v19.purchased or v19.reason == "AlreadyOwned" then
-            return v3.resolve(v19);
-        elseif v19.reason == v2.PurchaseFailureReason.EconomyDisabled then
-            return v3.reject(v1.PurchaseDisabled);
-        elseif v19.reason == v2.PurchaseFailureReason.TwoStepVerificationRequired then
-            return v3.reject(v1.TwoFactorNeeded);
-        elseif v19.transactionStatus == 24 then
-            return v3.reject(v1.TwoFactorNeeded);
-        elseif v4(v19) then
-            return v3.reject(v19);
-        elseif l_isEconomicRestrictionResponse_0(v19) then
-            return v3.reject(v19);
-        else
-            return v3.reject(v1.UnknownFailure);
-        end;
-    end, function(_) --[[ Line: 65 ]]
-        -- upvalues: v3 (ref), v1 (ref)
-        return v3.reject(v1.UnknownFailure);
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local Constants = require(PurchasePrompt.Misc.Constants)
+local Promise = require(PurchasePrompt.Promise)
+local isGenericChallengeResponse = require(PurchasePrompt.Utils.isGenericChallengeResponse)
+local PurchasePromptParent = PurchasePrompt.Parent
+local isEconomicRestrictionResponse = require(PurchasePromptParent.IAPExperience).Utility.isEconomicRestrictionResponse
+local SharedFlags = require(PurchasePromptParent.SharedFlags)
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = SharedFlags.FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+local FFlagEnablePurchasePayloadInExperienceShop = SharedFlags.FFlagEnablePurchasePayloadInExperienceShop
+local FFlagEnablePriceChangedErrorHandling = require(PurchasePrompt.Flags.FFlagEnablePriceChangedErrorHandling)
+
+local function performPurchase(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13) -- line: 20
+	-- upvalues: FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), FFlagEnablePurchasePayloadInExperienceShop (copy), Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
+	return p1.performPurchase(p2, p3, p4, p5, p6, p7, p8, p9, p10, (if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then nil else p11), (if not FFlagEnablePurchasePayloadInExperienceShop then nil else p12), p13):andThen(function(p14) -- line: 50
+		-- upvalues: Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
+		if p14.purchased or p14.reason == "AlreadyOwned" then
+			return Promise.resolve(p14)
+		end
+
+		if p14.reason == Constants.PurchaseFailureReason.EconomyDisabled then
+			return Promise.reject(PurchaseError.PurchaseDisabled)
+		end
+
+		if p14.reason == Constants.PurchaseFailureReason.TwoStepVerificationRequired then
+			return Promise.reject(PurchaseError.TwoFactorNeeded)
+		end
+
+		if p14.transactionStatus == 24 then
+			return Promise.reject(PurchaseError.TwoFactorNeeded)
+		end
+
+		if isGenericChallengeResponse(p14) then
+			return Promise.reject(p14)
+		end
+
+		if isEconomicRestrictionResponse(p14) then
+			return Promise.reject(p14)
+		end
+
+		if FFlagEnablePriceChangedErrorHandling and p14.reason == Constants.PurchaseFailureReason.PriceChanged then
+			return Promise.reject(PurchaseError.PriceChanged)
+		end
+
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end, function(_) -- line: 78
+		-- upvalues: Promise (copy), PurchaseError (copy)
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end)
+end
+
+return performPurchase

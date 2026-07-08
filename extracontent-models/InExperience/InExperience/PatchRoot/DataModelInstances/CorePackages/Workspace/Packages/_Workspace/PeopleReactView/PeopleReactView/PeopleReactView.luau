@@ -1,121 +1,176 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.RobloxAppEnums);
-local v4 = require(l_Parent_1.RobloxAppHooks);
-local v5 = require(l_Parent_1.Foundation);
-local v6 = require(l_Parent_1.PeopleService);
-local l_useDeviceOrientation_0 = v4.useDeviceOrientation;
-local v8 = require(l_Parent_0.Hooks.useGetPeopleService);
-local v9 = require(l_Parent_0.Hooks.useScrollingFrameStore);
-local l_View_0 = v5.View;
-local v11 = require(l_Parent_0.Components.PeopleList);
-local v12 = require(l_Parent_0.Components.PeopleCards);
-local v13 = require(l_Parent_0.Components.CoreButtonRow);
-local v14 = require(l_Parent_0.Components.MenuButtonsWrapper);
-local v15 = require(l_Parent_0.Components.TitleBar);
-local l_GameSettings_0 = UserSettings().GameSettings;
-local v17 = v6.getService("Flags");
-local l_GetFFlagAddPeoplePageCardLayout_0 = v17.GetFFlagAddPeoplePageCardLayout;
-local l_GetFFlagPeoplePageLazyRenderCards_0 = v17.GetFFlagPeoplePageLazyRenderCards;
-local l_GetFFlagPeoplePagePostponeInitialRender_0 = v17.GetFFlagPeoplePagePostponeInitialRender;
-local l_FFlagEnablePeopleListLazyRender_0 = v17.FFlagEnablePeopleListLazyRender;
-local l_FFlagPeoplePageRemoveUseMemoElements_0 = v17.FFlagPeoplePageRemoveUseMemoElements;
-local l_FFlagPeopleCardsEnableVirtualizedGrid_0 = v17.FFlagPeopleCardsEnableVirtualizedGrid;
-return function(v24) --[[ Line: 40 ]] --[[ Name: _createPageView ]]
-    -- upvalues: l_GetFFlagAddPeoplePageCardLayout_0 (copy), v8 (copy), v2 (copy), v6 (copy), l_useDeviceOrientation_0 (copy), v3 (copy), l_GameSettings_0 (copy), l_GetFFlagPeoplePagePostponeInitialRender_0 (copy), l_GetFFlagPeoplePageLazyRenderCards_0 (copy), l_FFlagEnablePeopleListLazyRender_0 (copy), l_FFlagPeopleCardsEnableVirtualizedGrid_0 (copy), v9 (copy), l_FFlagPeoplePageRemoveUseMemoElements_0 (copy), v12 (copy), v11 (copy), l_View_0 (copy), v14 (copy), v13 (copy), v15 (copy)
-    local v25 = if l_GetFFlagAddPeoplePageCardLayout_0() then v8("PeopleAnalyticsManager") else nil;
-    local v26 = nil;
-    v26 = if l_GetFFlagAddPeoplePageCardLayout_0() then v8("PeopleBlockingModalManager") else v2.useMemo(function() --[[ Line: 61 ]]
-        -- upvalues: v6 (ref)
-        return v6.getService("PeopleBlockingModalManager");
-    end, {});
-    local v27 = v2.useMemo(function() --[[ Line: 67 ]]
-        -- upvalues: v26 (ref), v24 (copy)
-        return v26.getModalManager(v24.blockingModalScreen, v24.blockingFlags);
-    end, {
-        v26, 
-        v24.blockingModalScreen, 
-        v24.blockingFlags
-    });
-    local v28 = l_useDeviceOrientation_0() == v3.DeviceOrientationMode.Portrait;
-    local v29 = nil;
-    local v30 = nil;
-    if l_GetFFlagAddPeoplePageCardLayout_0() then
-        local v31, v32 = v2.useState(l_GameSettings_0.PeoplePageLayout);
-        v29 = v31;
-        v30 = v32;
-    end;
-    local v33 = nil;
-    local v34 = nil;
-    if l_GetFFlagPeoplePagePostponeInitialRender_0() then
-        local v35, v36 = v2.useState(false);
-        v33 = v35;
-        v34 = v36;
-    end;
-    local v37 = if not not l_GetFFlagPeoplePageLazyRenderCards_0() or l_FFlagEnablePeopleListLazyRender_0 or l_FFlagPeopleCardsEnableVirtualizedGrid_0 then v9(v24.scrollingFrame) else nil;
-    local v39 = if l_GetFFlagAddPeoplePageCardLayout_0() then v2.useCallback(function(v38) --[[ Line: 91 ]]
-        -- upvalues: v25 (copy), v30 (ref)
-        v25:trackPeoplePageLayoutChanged(v38);
-        v30(v38);
-    end, {}) else nil;
-    local v40 = nil;
-    v40 = if l_FFlagPeoplePageRemoveUseMemoElements_0 then if v29 == Enum.PeoplePageLayout.Card then v2.createElement(v12, {
-        getUniversesExposedTo = v24.getUniversesExposedTo, 
-        addUniverseToExposureList = v24.addUniverseToExposureList, 
-        scrollingFrameStore = if v24.scrollingFrame then v37 else nil, 
-        LayoutOrder = 3
-    }) else v2.createElement(v11, {
-        scrollingFrameStore = if l_FFlagEnablePeopleListLazyRender_0 and v24.scrollingFrame then v37 else nil, 
-        LayoutOrder = 3
-    }) else if l_GetFFlagAddPeoplePageCardLayout_0() then v2.useMemo(function() --[[ Line: 117 ]]
-        -- upvalues: v29 (ref), v2 (ref), v12 (ref), v24 (copy), v37 (copy), v11 (ref), l_FFlagEnablePeopleListLazyRender_0 (ref)
-        if v29 == Enum.PeoplePageLayout.Card then
-            return (v2.createElement(v12, {
-                getUniversesExposedTo = v24.getUniversesExposedTo, 
-                addUniverseToExposureList = v24.addUniverseToExposureList, 
-                scrollingFrameStore = if v24.scrollingFrame then v37 else nil, 
-                LayoutOrder = 3
-            }));
-        else
-            return (v2.createElement(v11, {
-                scrollingFrameStore = if l_FFlagEnablePeopleListLazyRender_0 and v24.scrollingFrame then v37 else nil, 
-                LayoutOrder = 3
-            }));
-        end;
-    end, {
-        v29, 
-        v37, 
-        v24.scrollingFrame, 
-        v24.getUniversesExposedTo, 
-        v24.addUniverseToExposureList
-    }) else nil;
-    if l_GetFFlagPeoplePagePostponeInitialRender_0() then
-        v2.useEffect(function() --[[ Line: 146 ]]
-            -- upvalues: v34 (ref)
-            v34(true);
-        end, {});
-    end;
-    return v2.createElement(l_View_0, {
-        tag = {
-            ["size-full col gap-large padding-bottom-small"] = true, 
-            ["padding-x-medium"] = not v28
-        }, 
-        testId = "mainView"
-    }, {
-        MenuButtonsWrapper = v2.createElement(v14), 
-        CoreButtonRow = v2.createElement(v13, {
-            chromeEnabled = v24.chromeEnabled, 
-            LayoutOrder = l_GetFFlagAddPeoplePageCardLayout_0() and 1 or nil
-        }), 
-        TitleBar = if l_GetFFlagAddPeoplePageCardLayout_0() then v2.createElement(v15, {
-            layout = v29, 
-            setLayout = v39, 
-            LayoutOrder = 2
-        }) else nil, 
-        People = if not l_GetFFlagPeoplePagePostponeInitialRender_0() or v33 then if l_GetFFlagAddPeoplePageCardLayout_0() then v40 else v2.createElement(v11, {
-            scrollingFrameStore = if l_FFlagEnablePeopleListLazyRender_0 and v24.scrollingFrame then v37 else nil
-        }) else nil, 
-        BlockingModalManager = v2.createElement(v27)
-    });
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local React = require(scriptParentParent.React)
+local RobloxAppEnums = require(scriptParentParent.RobloxAppEnums)
+local RobloxAppHooks = require(scriptParentParent.RobloxAppHooks)
+local Foundation = require(scriptParentParent.Foundation)
+local PeopleService = require(scriptParentParent.PeopleService)
+local useDeviceOrientation = RobloxAppHooks.useDeviceOrientation
+local useGetPeopleService = require(scriptParent.Hooks.useGetPeopleService)
+local useScrollingFrameStore = require(scriptParent.Hooks.useScrollingFrameStore)
+local View = Foundation.View
+local PeopleList = require(scriptParent.Components.PeopleList)
+local PeopleCards = require(scriptParent.Components.PeopleCards)
+local CoreButtonRow = require(scriptParent.Components.CoreButtonRow)
+local MenuButtonsWrapper = require(scriptParent.Components.MenuButtonsWrapper)
+local TitleBar = require(scriptParent.Components.TitleBar)
+local SwitchServerConfirmation = require(scriptParent.Components.SwitchServerConfirmation)
+local Constants = require(scriptParent.Constants)
+local GameSettings = UserSettings().GameSettings
+local FFlagEnableSideSheet = require(scriptParentParent.SharedFlags).FFlagEnableSideSheet
+local v21 = PeopleService.getService("Flags")
+local GetFFlagAddPeoplePageCardLayout = v21.GetFFlagAddPeoplePageCardLayout
+local GetFFlagPeoplePageLazyRenderCards = v21.GetFFlagPeoplePageLazyRenderCards
+local GetFFlagPeoplePagePostponeInitialRender = v21.GetFFlagPeoplePagePostponeInitialRender
+local FFlagEnablePeopleListLazyRender = v21.FFlagEnablePeopleListLazyRender
+local FFlagPeoplePageRemoveUseMemoElements = v21.FFlagPeoplePageRemoveUseMemoElements
+local FFlagPeopleCardsEnableVirtualizedGrid = v21.FFlagPeopleCardsEnableVirtualizedGrid
+local FFlagFixVirtualizedGridNumItems = v21.FFlagFixVirtualizedGridNumItems
+local FFlagShowSwitchServerButton = v21.FFlagShowSwitchServerButton
+
+local function _createPageView(t1: {[any]: any}) -- line: 47
+	-- upvalues: GetFFlagAddPeoplePageCardLayout (copy), useGetPeopleService (copy), React (copy), PeopleService (copy), useDeviceOrientation (copy), RobloxAppEnums (copy), GameSettings (copy), GetFFlagPeoplePagePostponeInitialRender (copy), GetFFlagPeoplePageLazyRenderCards (copy), FFlagEnablePeopleListLazyRender (copy), FFlagPeopleCardsEnableVirtualizedGrid (copy), useScrollingFrameStore (copy), FFlagFixVirtualizedGridNumItems (copy), FFlagPeoplePageRemoveUseMemoElements (copy), PeopleCards (copy), PeopleList (copy), FFlagShowSwitchServerButton (copy), FFlagEnableSideSheet (copy), MenuButtonsWrapper (copy), CoreButtonRow (copy), Constants (copy), TitleBar (copy), View (copy), SwitchServerConfirmation (copy)
+	local v32 = if not GetFFlagAddPeoplePageCardLayout() then nil else useGetPeopleService("PeopleAnalyticsManager")
+	local u33 = if not GetFFlagAddPeoplePageCardLayout() then React.useMemo(function() -- line: 68
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("PeopleBlockingModalManager")
+	end, {}) else useGetPeopleService("PeopleBlockingModalManager")
+	local v34 = React.useMemo(function() -- line: 74
+		-- upvalues: u33 (ref), t1 (copy)
+		return u33.getModalManager(t1.blockingModalScreen, t1.blockingFlags)
+	end, {
+		u33,
+		t1.blockingModalScreen,
+		t1.blockingFlags
+	})
+	local v35 = useDeviceOrientation() == RobloxAppEnums.DeviceOrientationMode.Portrait
+	local u36 = nil
+	local u37 = nil
+
+	if GetFFlagAddPeoplePageCardLayout() then
+		local v38, v39 = React.useState(GameSettings.PeoplePageLayout)
+
+		u36 = v38
+		u37 = v39
+	end
+
+	local v40 = nil
+	local u41 = nil
+
+	if GetFFlagPeoplePagePostponeInitialRender() then
+		local v42
+
+		v40, v42 = React.useState(false)
+		u41 = v42
+	end
+
+	local v43 = if not GetFFlagPeoplePageLazyRenderCards() and (not FFlagEnablePeopleListLazyRender and not FFlagPeopleCardsEnableVirtualizedGrid) then nil else useScrollingFrameStore(t1.scrollingFrame)
+	local v44 = if not FFlagFixVirtualizedGridNumItems then nil else React.useCallback(function(p1) -- line: 98
+		-- upvalues: v43 (copy)
+		if v43 then
+			v43.setCanvasPositionYOffset(-p1.AbsoluteSize.Y)
+		end
+	end, { v43 })
+	local v45 = if not GetFFlagAddPeoplePageCardLayout() then nil else React.useCallback(function(p2) -- line: 106
+		-- upvalues: v32 (copy), u37 (ref)
+		v32:trackPeoplePageLayoutChanged(p2)
+		u37(p2)
+	end, {})
+	local v46 = if not FFlagPeoplePageRemoveUseMemoElements then if not GetFFlagAddPeoplePageCardLayout() then nil else React.useMemo(function() -- line: 132
+		-- upvalues: u36 (ref), React (copy), PeopleCards (copy), t1 (copy), v43 (copy), PeopleList (copy), FFlagEnablePeopleListLazyRender (copy)
+		if u36 == Enum.PeoplePageLayout.Card then
+			return (React.createElement(PeopleCards, {
+				LayoutOrder = 3,
+				getUniversesExposedTo = t1.getUniversesExposedTo,
+				addUniverseToExposureList = t1.addUniverseToExposureList,
+				scrollingFrameStore = if not t1.scrollingFrame then nil else v43
+			}))
+		end
+
+		return (React.createElement(PeopleList, {
+			LayoutOrder = 3,
+			scrollingFrameStore = if not FFlagEnablePeopleListLazyRender or not t1.scrollingFrame then nil else v43
+		}))
+	end, {
+		u36,
+		v43,
+		t1.scrollingFrame,
+		t1.getUniversesExposedTo,
+		t1.addUniverseToExposureList
+	}) else if u36 ~= Enum.PeoplePageLayout.Card then React.createElement(PeopleList, {
+		LayoutOrder = 3,
+		scrollingFrameStore = if not FFlagEnablePeopleListLazyRender or not t1.scrollingFrame then nil else v43
+	}) else React.createElement(PeopleCards, {
+		LayoutOrder = 3,
+		getUniversesExposedTo = t1.getUniversesExposedTo,
+		addUniverseToExposureList = t1.addUniverseToExposureList,
+		scrollingFrameStore = if not t1.scrollingFrame then nil else v43
+	})
+
+	if GetFFlagPeoplePagePostponeInitialRender() then
+		React.useEffect(function() -- line: 161
+			-- upvalues: u41 (ref)
+			u41(true)
+		end, {})
+	end
+
+	local v47 = nil
+	local u48 = nil
+
+	if FFlagShowSwitchServerButton then
+		local v49
+
+		v47, v49 = React.useState(false)
+		u48 = v49
+	end
+
+	local v50 = React.createElement(React.Fragment, {}, {
+		MenuButtonsWrapper = if not FFlagEnableSideSheet then React.createElement(MenuButtonsWrapper) else nil,
+		CoreButtonRow = React.createElement(CoreButtonRow, {
+			chromeEnabled = t1.chromeEnabled,
+			LayoutOrder = if not GetFFlagAddPeoplePageCardLayout() then nil else 1,
+			buttonActivatedTable = if not FFlagShowSwitchServerButton then nil else {
+				[Constants.PEOPLEPAGE.BUTTON_ACTIVATED_TABLE_KEYS.SWITCH_SERVER] = function() -- line: 180
+					-- upvalues: u48 (ref)
+					u48(true)
+				end
+			}
+		}),
+		TitleBar = if not GetFFlagAddPeoplePageCardLayout() then nil else React.createElement(TitleBar, {
+			LayoutOrder = 2,
+			layout = u36,
+			setLayout = v45
+		})
+	})
+
+	if FFlagFixVirtualizedGridNumItems then
+		v50 = React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-large padding-bottom-large",
+			LayoutOrder = 1,
+			onAbsoluteSizeChanged = v44
+		}, v50)
+	end
+
+	return React.createElement(View, {
+		testId = "mainView",
+		tag = {
+			["size-full col padding-bottom-small"] = FFlagFixVirtualizedGridNumItems,
+			["size-full col gap-large padding-bottom-small"] = not FFlagFixVirtualizedGridNumItems,
+			["padding-x-medium"] = not v35
+		}
+	}, {
+		PeopleHeader = v50,
+		People = if not not GetFFlagPeoplePagePostponeInitialRender() and not v40 then nil else if not GetFFlagAddPeoplePageCardLayout() then React.createElement(PeopleList, {
+			scrollingFrameStore = if not FFlagEnablePeopleListLazyRender or not t1.scrollingFrame then nil else v43
+		}) else v46,
+		BlockingModalManager = React.createElement(v34),
+		SwitchServerConfirmation = if not FFlagShowSwitchServerButton or not v47 then nil else React.createElement(SwitchServerConfirmation, {
+			onClose = function() -- line: 224
+				-- upvalues: u48 (ref)
+				u48(false)
+			end
+		})
+	})
+end
+
+return _createPageView

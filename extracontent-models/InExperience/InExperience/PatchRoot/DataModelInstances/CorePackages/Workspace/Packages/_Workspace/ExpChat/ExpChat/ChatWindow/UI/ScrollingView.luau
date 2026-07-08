@@ -1,1 +1,1 @@
-return require(script.ScrollingView);
+return require(script.ScrollingView)

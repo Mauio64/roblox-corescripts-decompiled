@@ -1,74 +1,89 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Common.Constants);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.UserList);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useNavigationProps_0 = require(l_Parent_0.RobloxAppNavigation).useNavigationProps;
-local v7 = require(l_Parent_0.RobloxAppHooks);
-local v8 = require(l_Parent_0.RoactUtils);
-local v9 = require(l_Parent_0.InputUi);
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v12 = require(l_script_FirstAncestor_0.Common.Enums);
-local v13 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_UserListViewAdaptor_0 = v4.Components.UserListViewAdaptor;
-local l_useScreenSize_0 = v7.useScreenSize;
-local l_useSelector_0 = v8.Hooks.RoactRodux.useSelector;
-local l_useDispatch_0 = v8.Hooks.RoactRodux.useDispatch;
-local l_getSafeAreaSize_0 = v9.getSafeAreaSize;
-local v19 = require(l_script_FirstAncestor_0.Hooks.useProfileCardWidth);
-local l_useProfileCardWidth_0 = require(l_Parent_0.ProfilePlatformCommon).Hooks.useProfileCardWidth;
-local v21 = require(l_script_FirstAncestor_0.Hooks.useProfileFormFactor);
-local l_FFlagProfilePlatformNewProfileHeader_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformNewProfileHeader;
-local l_FFlagSwitchProfileWidthHookToSocialCommon_0 = require(l_Parent_0.SharedFlags).FFlagSwitchProfileWidthHookToSocialCommon;
-return function(_) --[[ Line: 30 ]] --[[ Name: MutualConnectionList ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useNavigationProps_0 (copy), l_useScreenSize_0 (copy), l_useSelector_0 (copy), l_getSafeAreaSize_0 (copy), l_FFlagProfilePlatformNewProfileHeader_0 (copy), v21 (copy), v12 (copy), l_FFlagSwitchProfileWidthHookToSocialCommon_0 (copy), l_useProfileCardWidth_0 (copy), v19 (copy), v2 (copy), l_useLocalization_0 (copy), v13 (copy), v3 (copy), l_UserListViewAdaptor_0 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy)
-    local v25 = l_useDispatch_0();
-    local v28 = l_useNavigationProps_0(function(_, v27) --[[ Line: 32 ]]
-        return {
-            mutualFriendIds = v27.mutualFriendIds
-        };
-    end);
-    local v29 = l_useScreenSize_0();
-    local v31 = l_useSelector_0(function(v30) --[[ Line: 40 ]]
-        return v30.GlobalGuiInset;
-    end);
-    local v32 = l_getSafeAreaSize_0(v29, v31);
-    local v33 = if l_FFlagProfilePlatformNewProfileHeader_0 then v21().formFactor == v12.ProfileFormFactor.Wide else false;
-    local v34 = (if l_FFlagProfilePlatformNewProfileHeader_0 then if l_FFlagSwitchProfileWidthHookToSocialCommon_0 then l_useProfileCardWidth_0() else v19(v33) else math.min(v32.X.Offset, v2.MAXIMUM_CONTAINER_WIDTH)) / v32.X.Offset;
-    local v35 = {
-        position = UDim2.fromScale(1, 0), 
-        size = UDim2.fromScale(v34, 1), 
-        anchorPoint = Vector2.new(1, 0)
-    };
-    local l_mutualFriendIds_0 = v28.mutualFriendIds;
-    local v37 = l_useLocalization_0({
-        mutualConnections = {
-            v13.MutualConnectionsTitle; 
-            numConnections = #l_mutualFriendIds_0
-        }, 
-        mutualConnection = v13.MutualConnectionTitle
-    });
-    if #l_mutualFriendIds_0 == 0 then
-        return nil;
-    else
-        local v38 = if #l_mutualFriendIds_0 == 1 then v37.mutualConnection else v37.mutualConnections;
-        return v3.createElement(l_UserListViewAdaptor_0, {
-            users = l_mutualFriendIds_0, 
-            title = v38, 
-            wideModePeekViewLayout = v35, 
-            onUserSelected = function(v39) --[[ Line: 80 ]] --[[ Name: onUserSelected ]]
-                -- upvalues: v25 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v12 (ref)
-                v25(l_NavigateDown_0({
-                    name = l_AppPage_0.ProfilePlatform, 
-                    detail = v39, 
-                    extraProps = {
-                        profileType = v12.ProfileTypes.User, 
-                        source = v12.Sources.MutualConnectionsList
-                    }
-                }));
-            end
-        });
-    end;
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local Constants = require(ProfilePlatform.Common.Constants)
+local React = require(ProfilePlatformParent.React)
+local UserList = require(ProfilePlatformParent.UserList)
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local useNavigationProps = require(ProfilePlatformParent.RobloxAppNavigation).useNavigationProps
+local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local InputUi = require(ProfilePlatformParent.InputUi)
+local NavigateDown = require(ProfilePlatformParent.NavigationRodux).Thunks.NavigateDown
+local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
+local Enums = require(ProfilePlatform.Common.Enums)
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local UserListViewAdaptor = UserList.Components.UserListViewAdaptor
+local useScreenSize = RobloxAppHooks.useScreenSize
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local getSafeAreaSize = InputUi.getSafeAreaSize
+local useProfileCardWidth = require(ProfilePlatform.Hooks.useProfileCardWidth)
+local useProfileCardWidth2 = require(ProfilePlatformParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
+local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
+local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
+local FFlagSwitchProfileWidthHookToSocialCommon = require(ProfilePlatformParent.SharedFlags).FFlagSwitchProfileWidthHookToSocialCommon
+local FFlagSignalsNavP3Dispatch = require(ProfilePlatformParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v26 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
+
+local function MutualConnectionList(_) -- line: 34
+	-- upvalues: useDispatch (copy), useNavigationProps (copy), useScreenSize (copy), useSelector (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), useProfileFormFactor (copy), Enums (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), useLocalization (copy), TextKeys (copy), React (copy), UserListViewAdaptor (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), NavigateDown (copy)
+	local v29 = useDispatch()
+	local v30 = useNavigationProps(function(_, p3) -- line: 36
+		return {
+			mutualFriendIds = p3.mutualFriendIds
+		}
+	end)
+	local v31 = useScreenSize()
+	local v32 = useSelector(function(p4) -- line: 44
+		return p4.GlobalGuiInset
+	end)
+	local v33 = getSafeAreaSize(v31, v32)
+	local v34 = not not FFlagProfilePlatformNewProfileHeader and useProfileFormFactor().formFactor == Enums.ProfileFormFactor.Wide
+	local v35 = ((if not FFlagProfilePlatformNewProfileHeader then math.min(v33.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else (if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v34) else useProfileCardWidth2()))) / v33.X.Offset
+	local t1 = {
+		position = UDim2.fromScale(1, 0),
+		size = UDim2.fromScale(v35, 1),
+		anchorPoint = Vector2.new(1, 0)
+	}
+	local mutualFriendIds = v30.mutualFriendIds
+	local v38 = useLocalization({
+		mutualConnections = {
+			TextKeys.MutualConnectionsTitle,
+			numConnections = #mutualFriendIds
+		},
+		mutualConnection = TextKeys.MutualConnectionTitle
+	})
+
+	if #mutualFriendIds == 0 then
+		return nil
+	end
+
+	local v39 = if #mutualFriendIds ~= 1 then v38.mutualConnections else v38.mutualConnection
+
+	return React.createElement(UserListViewAdaptor, {
+		users = mutualFriendIds,
+		title = v39,
+		wideModePeekViewLayout = t1,
+		onUserSelected = function(p5) -- line: 84
+			-- upvalues: AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v26 (copy), v29 (copy), NavigateDown (copy)
+			local t2 = {
+				name = AppPage.ProfilePlatform,
+				detail = p5,
+				extraProps = {
+					profileType = Enums.ProfileTypes.User,
+					source = Enums.Sources.MutualConnectionsList
+				}
+			}
+
+			if FFlagSignalsNavP3Dispatch then
+				v26.down(v26.fromLegacyPage(t2))
+
+				return
+			end
+
+			v29(NavigateDown(t2))
+		end
+	})
+end
+
+return MutualConnectionList

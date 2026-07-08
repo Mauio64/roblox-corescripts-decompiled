@@ -1,213 +1,213 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PhoneUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local l_InteractiveAlert_0 = v3.App.Dialog.Alert.InteractiveAlert;
-local v8 = require(l_script_FirstAncestor_0.Utils.mergeProps);
-local l_LinkButton_0 = v3.App.Button.LinkButton;
-local l_Checkbox_0 = v3.App.InputButton.Checkbox;
-local l_GetFFlagDisablePVUpsellDataConsent_0 = require(l_Parent_0.SharedFlags).GetFFlagDisablePVUpsellDataConsent;
-local function v12() --[[ Line: 49 ]] --[[ Name: noOp ]]
+local PhoneUpsell = script:FindFirstAncestor("PhoneUpsell")
+local PhoneUpsellParent = PhoneUpsell.Parent
+local React = require(PhoneUpsellParent.React)
+local UIBlox = require(PhoneUpsellParent.UIBlox)
+local Checkbox = require(PhoneUpsellParent.Foundation).Checkbox
+local useStyle = UIBlox.Core.Style.useStyle
+local useLocalization = require(PhoneUpsellParent.Localization).Hooks.useLocalization
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local mergeProps = require(PhoneUpsell.Utils.mergeProps)
+local LinkButton = UIBlox.App.Button.LinkButton
+local GetFFlagDisablePVUpsellDataConsent = require(PhoneUpsellParent.SharedFlags).GetFFlagDisablePVUpsellDataConsent
 
-end;
-local v13 = {
-    onClose = v12, 
-    isButtonDisabled = false, 
-    onExtraButtonClick = v12, 
-    isExtraButtonDisabled = false, 
-    alwaysShowLegalText = false, 
-    requireLegalTextCheckbox = false, 
-    legalTextKey = "Feature.VerificationUpsell.Description.ShortCodeLegalDisclaimerUA", 
-    prefix = "1"
-};
-local function v22(v14, v15, v16, v17, v18, v19, v20) --[[ Line: 62 ]] --[[ Name: getButtonStackProps ]]
-    -- upvalues: l_ButtonType_0 (copy)
-    local v21 = {
-        {
-            buttonType = l_ButtonType_0.PrimarySystem, 
-            props = {
-                onActivated = v16, 
-                text = v14, 
-                isDisabled = v17
-            }
-        }
-    };
-    if v18 and v18 ~= "" then
-        table.insert(v21, 1, {
-            buttonType = l_ButtonType_0.Secondary, 
-            props = {
-                onActivated = v19, 
-                text = v18, 
-                isDisabled = v20
-            }
-        });
-    end;
-    return {
-        buttonHeight = v15, 
-        buttons = v21
-    };
-end;
-return function(v23) --[[ Line: 98 ]] --[[ Name: InGameEntryView ]]
-    -- upvalues: v8 (copy), v13 (copy), v2 (copy), l_useStyle_0 (copy), l_useLocalization_0 (copy), l_InteractiveAlert_0 (copy), v22 (copy), l_GetFFlagDisablePVUpsellDataConsent_0 (copy), l_Checkbox_0 (copy), l_LinkButton_0 (copy)
-    local v24 = v8(v13, v23);
-    local v25, v26 = v2.useState(false);
-    local v27 = {
-        phoneNumberKey = "Feature.VerificationUpsell.Label.PhoneNumber", 
-        phonePrivacyDisclaimerKey = "Feature.VerificationUpsell.Description.PhoneNumberNeverPublic", 
-        termsOfUseKey = "Feature.VerificationUpsell.Action.TermsOfUse", 
-        privacyPolicyKey = "Feature.VerificationUpsell.Action.PrivacyPolicy", 
-        titleKey = v24.titleKey, 
-        descriptionKey = v24.descriptionKey, 
-        buttonKey = v24.buttonKey, 
-        legalTextKey = v24.legalTextKey
-    };
-    if v24.extraButtonKey and v24.extraButtonKey ~= "" then
-        v27.extraButtonKey = v24.extraButtonKey;
-    end;
-    local v28 = l_useStyle_0();
-    local l_BaseSize_0 = v28.Font.BaseSize;
-    local l_RelativeSize_0 = v28.Font.CaptionHeader.RelativeSize;
-    local l_Space_75_0 = v28.Tokens.Global.Space_75;
-    local v32 = l_useLocalization_0(v27);
-    v32.legalTextKey = v32.legalTextKey:gsub("{buttonText}", v32.buttonKey);
-    return v2.createElement(l_InteractiveAlert_0, {
-        title = v32.titleKey, 
-        screenSize = v24.screenSize, 
-        buttonStackInfo = v22(v32.buttonKey, v28.Tokens.Global.Size_600, v24.onButtonClick, v24.isButtonDisabled, v32.extraButtonKey, v24.onExtraButtonClick, v24.isExtraButtonDisabled), 
-        onCloseClicked = v24.onClose, 
-        middleContent = function() --[[ Line: 137 ]] --[[ Name: middleContent ]]
-            -- upvalues: v2 (ref), v32 (copy), l_BaseSize_0 (copy), v28 (copy)
-            return v2.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.new(1, 0, 0, 0)
-            }, {
-                BodyText = v2.createElement("TextLabel", {
-                    LayoutOrder = 0, 
-                    BackgroundTransparency = 1, 
-                    Text = v32.descriptionKey, 
-                    TextSize = l_BaseSize_0, 
-                    TextColor3 = v28.Theme.TextDefault.Color, 
-                    TextTransparency = v28.Theme.TextDefault.Transparency, 
-                    Font = v28.Font.Body.Font, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = true, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    RichText = true
-                })
-            });
-        end, 
-        footerContent = not l_GetFFlagDisablePVUpsellDataConsent_0() and function() --[[ Line: 160 ]]
-            -- upvalues: v2 (ref), v28 (copy), v24 (copy), l_Space_75_0 (copy), l_Checkbox_0 (ref), v26 (copy), v25 (copy), v32 (copy), l_BaseSize_0 (copy), l_RelativeSize_0 (copy), l_LinkButton_0 (ref)
-            local l_createElement_0 = v2.createElement;
-            local v34 = "Frame";
-            local v35 = {
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.new(1, 0, 0, 0)
-            };
-            local v36 = {
-                ContentPadding = v2.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, v28.Tokens.Global.Space_150)
-                }), 
-                ListLayout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    Padding = UDim.new(0, v28.Tokens.Global.Space_75)
-                }), 
-                LegalTextContainer = if v24.requireLegalTextCheckbox then v2.createElement("Frame", {
-                    LayoutOrder = 3, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        Padding = UDim.new(0, l_Space_75_0)
-                    }), 
-                    LegalCheckbox = v2.createElement(l_Checkbox_0, {
-                        onActivated = v26, 
-                        isSelected = v25, 
-                        text = ""
-                    }), 
-                    LegalText = v2.createElement("TextLabel", {
-                        BackgroundTransparency = 1, 
-                        Text = v32.legalTextKey, 
-                        TextSize = l_BaseSize_0 * l_RelativeSize_0, 
-                        TextColor3 = v28.Theme.TextDefault.Color, 
-                        TextTransparency = v28.Theme.TextDefault.Transparency, 
-                        Font = v28.Font.Body.Font, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextWrapped = true, 
-                        Size = UDim2.new(1, -(26 + l_Space_75_0), 0, 0), 
-                        AutomaticSize = Enum.AutomaticSize.Y
-                    })
-                }) else (v24.alwaysShowLegalText or v24.countryCode.prefix == "1") and v2.createElement("TextLabel", {
-                    LayoutOrder = 3, 
-                    BackgroundTransparency = 1, 
-                    Text = v32.legalTextKey, 
-                    TextSize = l_BaseSize_0 * l_RelativeSize_0, 
-                    TextColor3 = v28.Theme.TextDefault.Color, 
-                    TextTransparency = v28.Theme.TextDefault.Transparency, 
-                    Font = v28.Font.Body.Font, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = true, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                })
-            };
-            local v37 = false;
-            if v24.countryCode.prefix == "1" then
-                v37 = v2.createElement("Frame", {
-                    LayoutOrder = 4, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        VerticalAlignment = Enum.VerticalAlignment.Center, 
-                        Padding = UDim.new(0, 5)
-                    }), 
-                    TermsOfUseButton = v2.createElement(l_LinkButton_0, {
-                        text = v32.termsOfUseKey, 
-                        onActivated = v24.onTermsOfUseClick, 
-                        layoutOrder = 5, 
-                        fontStyle = "CaptionBody", 
-                        size = UDim2.fromScale(0.2, 0.2)
-                    }), 
-                    TextButtonDivider = v2.createElement("TextLabel", {
-                        LayoutOrder = 6, 
-                        BackgroundTransparency = 1, 
-                        Text = "-", 
-                        TextSize = l_BaseSize_0 * l_RelativeSize_0, 
-                        TextColor3 = v28.Theme.TextDefault.Color, 
-                        TextTransparency = v28.Theme.TextDefault.Transparency, 
-                        Font = v28.Font.Body.Font, 
-                        TextXAlignment = Enum.TextXAlignment.Center, 
-                        TextWrapped = true, 
-                        AutomaticSize = Enum.AutomaticSize.XY
-                    }), 
-                    PrivacyPolicyButton = v2.createElement(l_LinkButton_0, {
-                        text = v32.privacyPolicyKey, 
-                        onActivated = v24.onPrivacyPolicyClick, 
-                        layoutOrder = 7, 
-                        fontStyle = "CaptionBody"
-                    })
-                });
-            end;
-            v36.LegalButtonsContainer = v37;
-            return l_createElement_0(v34, v35, v36);
-        end or function() --[[ Line: 265 ]]
-            return nil;
-        end
-    });
-end;
+local function noOp() -- line: 51
+end
+
+local t1 = {
+	isButtonDisabled = false,
+	isExtraButtonDisabled = false,
+	alwaysShowLegalText = false,
+	requireLegalTextCheckbox = false,
+	legalTextKey = "Feature.VerificationUpsell.Description.ShortCodeLegalDisclaimerUA",
+	prefix = "1",
+	onClose = noOp,
+	onExtraButtonClick = noOp
+}
+
+local function getButtonStackProps(s1: string, n1: number, p1: ((...any) -> ...any), b1: boolean, s2: string, p2: ((...any) -> ...any), b2: boolean) -- line: 64
+	-- upvalues: ButtonType (copy)
+	local t2 = {{
+		buttonType = ButtonType.PrimarySystem,
+		props = {
+			onActivated = p1,
+			text = s1,
+			isDisabled = b1
+		}
+	}}
+
+	if s2 and s2 ~= "" then
+		table.insert(t2, 1, {
+			buttonType = ButtonType.Secondary,
+			props = {
+				onActivated = p2,
+				text = s2,
+				isDisabled = b2
+			}
+		})
+	end
+
+	return {
+		buttonHeight = n1,
+		buttons = t2
+	}
+end
+local function InGameEntryView(t3: {[any]: any}) -- line: 100
+	-- upvalues: mergeProps (copy), t1 (copy), React (copy), useStyle (copy), useLocalization (copy), InteractiveAlert (copy), getButtonStackProps (copy), GetFFlagDisablePVUpsellDataConsent (copy), Checkbox (copy), LinkButton (copy)
+	local v26 = mergeProps(t1, t3)
+	local v27, v28 = React.useState(false)
+	local t4 = {
+		phoneNumberKey = "Feature.VerificationUpsell.Label.PhoneNumber",
+		phonePrivacyDisclaimerKey = "Feature.VerificationUpsell.Description.PhoneNumberNeverPublic",
+		termsOfUseKey = "Feature.VerificationUpsell.Action.TermsOfUse",
+		privacyPolicyKey = "Feature.VerificationUpsell.Action.PrivacyPolicy",
+		titleKey = v26.titleKey,
+		descriptionKey = v26.descriptionKey,
+		buttonKey = v26.buttonKey,
+		legalTextKey = v26.legalTextKey
+	}
+
+	if v26.extraButtonKey and v26.extraButtonKey ~= "" then
+		t4.extraButtonKey = v26.extraButtonKey
+	end
+
+	local v30 = useStyle()
+	local BaseSize = v30.Font.BaseSize
+	local RelativeSize = v30.Font.CaptionHeader.RelativeSize
+	local Size_150 = v30.Tokens.Size.Size_150
+	local v34 = useLocalization(t4)
+
+	v34.legalTextKey = v34.legalTextKey:gsub("{buttonText}", v34.buttonKey)
+
+	return React.createElement(InteractiveAlert, {
+		title = v34.titleKey,
+		screenSize = v26.screenSize,
+		buttonStackInfo = getButtonStackProps(v34.buttonKey, v30.Tokens.Size.Size_1200, v26.onButtonClick, v26.isButtonDisabled, v34.extraButtonKey, v26.onExtraButtonClick, v26.isExtraButtonDisabled),
+		onCloseClicked = v26.onClose,
+		middleContent = function() -- line: 139
+			-- upvalues: React (copy), v34 (copy), BaseSize (copy), v30 (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			}, {
+				BodyText = React.createElement("TextLabel", {
+					LayoutOrder = 0,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					RichText = true,
+					Text = v34.descriptionKey,
+					TextSize = BaseSize,
+					TextColor3 = v30.Theme.TextDefault.Color,
+					TextTransparency = v30.Theme.TextDefault.Transparency,
+					Font = v30.Font.Body.Font,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				})
+			})
+		end,
+		footerContent = GetFFlagDisablePVUpsellDataConsent() and function() -- line: 267
+			return nil
+		end or function() -- line: 162
+			-- upvalues: React (copy), v30 (copy), v26 (copy), Size_150 (copy), Checkbox (copy), v28 (copy), v27 (copy), v34 (copy), BaseSize (copy), RelativeSize (copy), LinkButton (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			}, {
+				ContentPadding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, v30.Tokens.Size.Size_300)
+				}),
+				ListLayout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					Padding = UDim.new(0, v30.Tokens.Size.Size_150)
+				}),
+				LegalTextContainer = if not v26.requireLegalTextCheckbox then (v26.alwaysShowLegalText or v26.countryCode.prefix == "1") and React.createElement("TextLabel", {
+					LayoutOrder = 3,
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					Text = v34.legalTextKey,
+					TextSize = BaseSize * RelativeSize,
+					TextColor3 = v30.Theme.TextDefault.Color,
+					TextTransparency = v30.Theme.TextDefault.Transparency,
+					Font = v30.Font.Body.Font,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}) else React.createElement("Frame", {
+					LayoutOrder = 3,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						Padding = UDim.new(0, Size_150)
+					}),
+					LegalCheckbox = React.createElement(Checkbox, {
+						label = "",
+						onActivated = v28,
+						isChecked = v27
+					}),
+					LegalText = React.createElement("TextLabel", {
+						BackgroundTransparency = 1,
+						TextWrapped = true,
+						Text = v34.legalTextKey,
+						TextSize = BaseSize * RelativeSize,
+						TextColor3 = v30.Theme.TextDefault.Color,
+						TextTransparency = v30.Theme.TextDefault.Transparency,
+						Font = v30.Font.Body.Font,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						Size = UDim2.new(1, -(26 + Size_150), 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y
+					})
+				}),
+				LegalButtonsContainer = v26.countryCode.prefix == "1" and React.createElement("Frame", {
+					LayoutOrder = 4,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						VerticalAlignment = Enum.VerticalAlignment.Center,
+						Padding = UDim.new(0, 5)
+					}),
+					TermsOfUseButton = React.createElement(LinkButton, {
+						layoutOrder = 5,
+						fontStyle = "CaptionBody",
+						text = v34.termsOfUseKey,
+						onActivated = v26.onTermsOfUseClick,
+						size = UDim2.fromScale(0.2, 0.2)
+					}),
+					TextButtonDivider = React.createElement("TextLabel", {
+						LayoutOrder = 6,
+						BackgroundTransparency = 1,
+						Text = "-",
+						TextWrapped = true,
+						TextSize = BaseSize * RelativeSize,
+						TextColor3 = v30.Theme.TextDefault.Color,
+						TextTransparency = v30.Theme.TextDefault.Transparency,
+						Font = v30.Font.Body.Font,
+						TextXAlignment = Enum.TextXAlignment.Center,
+						AutomaticSize = Enum.AutomaticSize.XY
+					}),
+					PrivacyPolicyButton = React.createElement(LinkButton, {
+						layoutOrder = 7,
+						fontStyle = "CaptionBody",
+						text = v34.privacyPolicyKey,
+						onActivated = v26.onPrivacyPolicyClick
+					})
+				})
+			})
+		end
+	})
+end
+
+return InGameEntryView

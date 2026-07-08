@@ -1,113 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = require(l_Parent_0.React);
-local l_OmniFeedPropsKey_0 = require(l_Parent_0.DiscoveryTypes).OmniFeedPropsKey;
-local l_usePageSideMargin_0 = require(l_Parent_0.CollectionViews).usePageSideMargin;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v7 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiErrors_0 = v7.SduiErrors;
-local l_getSduiComponentWrapper_0 = v7.getSduiComponentWrapper;
-local l_FIntLuaAppDelayImpressionsMaxUpdates_0 = require(l_Parent_0.SharedFlags).FIntLuaAppDelayImpressionsMaxUpdates;
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local l_FFlagLuaAppCompositionAlways_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionAlways;
-local l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone;
-local v14 = game:DefineFastInt("SduiOmniFeedItemLogDelayMs", 500) / 1000;
-local v15 = require(l_script_FirstAncestor_0.DataStore.useSduiItemCollectionSignal);
-return v3.memo(function(v16) --[[ Line: 45 ]] --[[ Name: SduiOmniFeedItem ]]
-    -- upvalues: l_OmniFeedPropsKey_0 (copy), l_FFlagLuaAppCompositionAlways_0 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), v2 (copy), v3 (copy), l_usePageSideMargin_0 (copy), l_AppPage_0 (copy), v15 (copy), v14 (copy), l_SduiErrors_0 (copy), l_getSduiComponentWrapper_0 (copy), l_FIntLuaAppDelayImpressionsMaxUpdates_0 (copy), l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 (copy)
-    local l_appPage_0 = v16[l_OmniFeedPropsKey_0].appPage;
-    local l_feedItemStartRow_0 = v16[l_OmniFeedPropsKey_0].feedItemStartRow;
-    local l_verticalScrollingFrameRef_0 = v16[l_OmniFeedPropsKey_0].verticalScrollingFrameRef;
-    local l_scrollViewPositionChangedSignal_0 = v16[l_OmniFeedPropsKey_0].scrollViewPositionChangedSignal;
-    local l_sduiContext_0 = v16[l_OmniFeedPropsKey_0].sduiContext;
-    local l_selectionOrderBase_0 = v16[l_OmniFeedPropsKey_0].selectionOrderBase;
-    local v23 = l_FFlagLuaAppCompositionAlways_0 and true or if l_FFlagLuaAppCompositionSupport_0 then v16[l_OmniFeedPropsKey_0].appCompositionEnabled else nil;
-    v2.assert(l_appPage_0 ~= nil, "appPage must exist");
-    v2.assert(v16.topicId ~= nil, "topicId id must exist");
-    v2.assert(v16.sortIndex ~= nil, "sortIndex id must exist");
-    local v24 = v3.useRef(false);
-    v3.useEffect(function() --[[ Line: 62 ]]
-        -- upvalues: v24 (copy)
-        v24.current = true;
-        return function() --[[ Line: 64 ]]
-            -- upvalues: v24 (ref)
-            v24.current = false;
-        end;
-    end, {});
-    local v25 = if not l_FFlagLuaAppCompositionAlways_0 then l_usePageSideMargin_0(l_verticalScrollingFrameRef_0.current) else nil;
-    local v26 = v3.useMemo(function() --[[ Line: 72 ]]
-        -- upvalues: l_appPage_0 (copy), l_AppPage_0 (ref), v16 (copy)
-        if l_appPage_0 == l_AppPage_0.SearchPage and v16.searchUuid then
-            return (("%*_%*"):format(l_appPage_0, v16.searchUuid));
-        else
-            return nil;
-        end;
-    end, {
-        l_appPage_0, 
-        v16.searchUuid
-    });
-    local v27 = v15(l_appPage_0, v16.topicId, v16.sortIndex, v26);
-    local v28 = v27 and v27.sduiConfig or nil;
-    local v29 = v3.useMemo(function() --[[ Line: 83 ]]
-        -- upvalues: v16 (copy)
-        return {
-            collectionPosition = v16.sortIndex
-        };
-    end, {
-        v16.sortIndex
-    });
-    local v30 = ("SduiOmniFeedItem-%*"):format(v16.topicId);
-    local v31 = v3.useRef(v28);
-    v31.current = v28;
-    if v28 == nil then
-        task.delay(v14, function() --[[ Line: 94 ]]
-            -- upvalues: v24 (copy), v31 (copy), l_sduiContext_0 (copy), l_SduiErrors_0 (ref), v30 (copy), v16 (copy)
-            if v24.current and v31.current == nil then
-                l_sduiContext_0.dependencies.logger.reportError(l_SduiErrors_0.SduiErrorType.NilComponentConfig, {
-                    name = v30, 
-                    message = ("Unable to render omni feed item for sdui. CollectionId: %*"):format(v16.topicId)
-                }, l_sduiContext_0.appPage);
-            end;
-        end);
-    end;
-    return (v3.useMemo(function() --[[ Line: 106 ]]
-        -- upvalues: v28 (copy), l_getSduiComponentWrapper_0 (ref), v3 (ref), v30 (copy), l_sduiContext_0 (copy), l_scrollViewPositionChangedSignal_0 (copy), l_verticalScrollingFrameRef_0 (copy), v16 (copy), v23 (copy), v25 (copy), l_feedItemStartRow_0 (copy), l_FIntLuaAppDelayImpressionsMaxUpdates_0 (ref), l_selectionOrderBase_0 (copy), l_FFlagLuaAppCompositionSupport_0 (ref), l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 (ref), l_OmniFeedPropsKey_0 (ref), v29 (copy)
-        if v28 == nil then
-            return nil;
-        else
-            local v32 = l_getSduiComponentWrapper_0(v28);
-            return v3.createElement(v32, {
-                debugName = v30, 
-                componentConfig = v28, 
-                sduiContext = l_sduiContext_0, 
-                extraLocalProps = {
-                    scrollViewPositionChangedSignal = l_scrollViewPositionChangedSignal_0, 
-                    verticalScrollingFrameRef = l_verticalScrollingFrameRef_0, 
-                    index = v16.sortIndex, 
-                    collectionPosition = v16.sortIndex, 
-                    pageSideMargin = if v23 then nil else v25, 
-                    startRow = l_feedItemStartRow_0, 
-                    numUpdatesToDelayImpressions = l_FIntLuaAppDelayImpressionsMaxUpdates_0, 
-                    selectionOrderBase = l_selectionOrderBase_0, 
-                    appCompositionEnabled = if l_FFlagLuaAppCompositionSupport_0 then v23 else nil, 
-                    onTileImageLoaded = if l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 then v16[l_OmniFeedPropsKey_0].onTileImageLoaded else nil
-                }, 
-                localAnalyticsData = v29
-            });
-        end;
-    end, {
-        v28, 
-        v30, 
-        v29, 
-        l_feedItemStartRow_0, 
-        v25, 
-        v16.topicId, 
-        v16.sortIndex, 
-        l_scrollViewPositionChangedSignal_0, 
-        l_verticalScrollingFrameRef_0, 
-        l_sduiContext_0, 
-        l_selectionOrderBase_0, 
-        if l_FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone_0 then v16[l_OmniFeedPropsKey_0].onTileImageLoaded else nil
-    }));
-end);
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local ArgCheck = require(ServerDrivenUiParent.ArgCheck)
+local React = require(ServerDrivenUiParent.React)
+local OmniFeedPropsKey = require(ServerDrivenUiParent.DiscoveryTypes).OmniFeedPropsKey
+local usePageSideMargin = require(ServerDrivenUiParent.CollectionViews).usePageSideMargin
+local AppPage = require(ServerDrivenUiParent.RobloxAppEnums).AppPage
+local SduiCoreSystem = require(ServerDrivenUiParent.SduiCoreSystem)
+local SduiErrors = SduiCoreSystem.SduiErrors
+local getSduiComponentWrapper = SduiCoreSystem.getSduiComponentWrapper
+local FIntLuaAppDelayImpressionsMaxUpdates = require(ServerDrivenUiParent.SharedFlags).FIntLuaAppDelayImpressionsMaxUpdates
+local FFlagLuaAppCompositionAlways = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppCompositionAlways
+local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
+local v14 = game:DefineFastInt("SduiOmniFeedItemLogDelayMs", 500) / 1000
+local useSduiItemCollectionSignal = require(ServerDrivenUi.DataStore.useSduiItemCollectionSignal)
+
+local function SduiOmniFeedItem(t1: {[any]: any}) -- line: 48
+	-- upvalues: OmniFeedPropsKey (copy), FFlagLuaAppCompositionAlways (copy), ArgCheck (copy), React (copy), usePageSideMargin (copy), AppPage (copy), useSduiItemCollectionSignal (copy), v14 (copy), SduiErrors (copy), getSduiComponentWrapper (copy), FIntLuaAppDelayImpressionsMaxUpdates (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy)
+	local appPage = t1[OmniFeedPropsKey].appPage
+	local feedItemStartRow = t1[OmniFeedPropsKey].feedItemStartRow
+	local verticalScrollingFrameRef = t1[OmniFeedPropsKey].verticalScrollingFrameRef
+	local scrollViewPositionChangedSignal = t1[OmniFeedPropsKey].scrollViewPositionChangedSignal
+	local sduiContext = t1[OmniFeedPropsKey].sduiContext
+	local selectionOrderBase = t1[OmniFeedPropsKey].selectionOrderBase
+	local v24 = not not FFlagLuaAppCompositionAlways or t1[OmniFeedPropsKey].appCompositionEnabled
+
+	ArgCheck.assert(appPage ~= nil, "appPage must exist")
+	ArgCheck.assert(t1.topicId ~= nil, "topicId id must exist")
+	ArgCheck.assert(t1.sortIndex ~= nil, "sortIndex id must exist")
+
+	local v25 = React.useRef(false)
+
+	React.useEffect(function() -- line: 64
+		-- upvalues: v25 (copy)
+		v25.current = true
+
+		return function() -- line: 66
+			-- upvalues: v25 (copy)
+			v25.current = false
+		end
+	end, {})
+
+	local v26 = if FFlagLuaAppCompositionAlways then nil else usePageSideMargin(verticalScrollingFrameRef.current)
+	local v27 = React.useMemo(function() -- line: 74
+		-- upvalues: appPage (copy), AppPage (copy), t1 (copy)
+		if appPage == AppPage.SearchPage and t1.searchUuid then
+			return `{ appPage }_{ t1.searchUuid }`
+		end
+
+		return nil
+	end, {
+		appPage,
+		t1.searchUuid
+	})
+	local v28 = useSduiItemCollectionSignal(appPage, t1.topicId, t1.sortIndex, v27)
+	local v29 = v28 and v28.sduiConfig or nil
+	local v30 = React.useMemo(function() -- line: 85
+		-- upvalues: t1 (copy)
+		return {
+			collectionPosition = t1.sortIndex
+		}
+	end, { t1.sortIndex })
+	local v31 = `SduiOmniFeedItem-{ t1.topicId }`
+	local v32 = React.useRef(v29)
+
+	v32.current = v29
+
+	if v29 == nil then
+		task.delay(v14, function() -- line: 96
+			-- upvalues: v25 (copy), v32 (copy), sduiContext (copy), SduiErrors (copy), v31 (copy), t1 (copy)
+			if v25.current and v32.current == nil then
+				sduiContext.dependencies.logger.reportError(SduiErrors.SduiErrorType.NilComponentConfig, {
+					name = v31,
+					message = `Unable to render omni feed item for sdui. CollectionId: { t1.topicId }`
+				}, sduiContext.appPage)
+			end
+		end)
+	end
+
+	return (React.useMemo(function() -- line: 108
+		-- upvalues: v29 (copy), getSduiComponentWrapper (copy), React (copy), v31 (copy), sduiContext (copy), scrollViewPositionChangedSignal (copy), verticalScrollingFrameRef (copy), t1 (copy), v24 (copy), v26 (copy), feedItemStartRow (copy), FIntLuaAppDelayImpressionsMaxUpdates (copy), selectionOrderBase (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), OmniFeedPropsKey (copy), v30 (copy)
+		if v29 == nil then
+			return nil
+		end
+
+		local v33 = getSduiComponentWrapper(v29)
+
+		return React.createElement(v33, {
+			debugName = v31,
+			componentConfig = v29,
+			sduiContext = sduiContext,
+			extraLocalProps = {
+				scrollViewPositionChangedSignal = scrollViewPositionChangedSignal,
+				verticalScrollingFrameRef = verticalScrollingFrameRef,
+				index = t1.sortIndex,
+				collectionPosition = t1.sortIndex,
+				pageSideMargin = if not v24 then v26 else nil,
+				startRow = feedItemStartRow,
+				numUpdatesToDelayImpressions = FIntLuaAppDelayImpressionsMaxUpdates,
+				selectionOrderBase = selectionOrderBase,
+				appCompositionEnabled = v24,
+				onTileImageLoaded = if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else t1[OmniFeedPropsKey].onTileImageLoaded
+			},
+			localAnalyticsData = v30
+		})
+	end, {
+		v29,
+		v31,
+		v30,
+		feedItemStartRow,
+		v26,
+		t1.topicId,
+		t1.sortIndex,
+		scrollViewPositionChangedSignal,
+		verticalScrollingFrameRef,
+		sduiContext,
+		selectionOrderBase,
+		if not FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone then nil else t1[OmniFeedPropsKey].onTileImageLoaded
+	}))
+end
+
+return React.memo(SduiOmniFeedItem)

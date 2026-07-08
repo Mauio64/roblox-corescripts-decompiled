@@ -1,22 +1,27 @@
-local function v1(_) --[[ Line: 12 ]]
+local function u1(_: string?) -- line: 12
+end
 
-end;
 if _G.__DEV__ then
-    v1 = function(v2) --[[ Line: 15 ]]
-        if v2 == nil then
-            error("invariant requires an error message argument");
-        end;
-    end;
-end;
-return function(v3, v4, ...) --[[ Line: 22 ]] --[[ Name: invariant ]]
-    -- upvalues: v1 (ref)
-    v1(v4);
-    if not v3 then
-        if v4 == nil then
-            error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.", 2);
-            return;
-        else
-            error(string.format(v4, ...), 2);
-        end;
-    end;
-end;
+	function u1(s2: string?) -- line: 15
+		if s2 == nil then
+			error("invariant requires an error message argument")
+		end
+	end
+end
+
+local function invariant(b1: boolean, s3: string?, ...) -- line: 22
+	-- upvalues: u1 (ref)
+	u1(s3)
+
+	if not b1 then
+		if s3 == nil then
+			error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.", 2)
+
+			return
+		end
+
+		error(string.format(s3, ...), 2)
+	end
+end
+
+return invariant

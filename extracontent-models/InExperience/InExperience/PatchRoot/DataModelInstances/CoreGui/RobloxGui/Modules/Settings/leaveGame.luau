@@ -1,66 +1,90 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RunService_0 = game:GetService("RunService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Players_0 = game:GetService("Players");
-local l_FFlagEnableGameLeftMessage_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableGameLeftMessage;
-local l_game_EngineFeature_0 = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId");
-local v9 = require(l_RobloxGui_0.Modules.Common.PerfUtils);
-local v10 = require(l_CorePackages_0.Packages.Cryo);
-local l_MessageBus_0 = require(l_CorePackages_0.Workspace.Packages.MessageBus).MessageBus;
-local v12 = require(script:FindFirstAncestor("Settings").Analytics.CoreGuiFinalStateAnalytics).new();
-l_RobloxGui_0:WaitForChild("Modules"):WaitForChild("TenFootInterface");
-local v13 = require(l_RobloxGui_0.Modules.Common.Flags.GetFFlagEnableInGameMenuDurationLogger);
-local v14 = require(l_RobloxGui_0.Modules.Chrome.Flags.FFlagLeaveActionChromeShortcutTelemetry);
-local l_GetDefaultQualityLevel_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).GetDefaultQualityLevel;
-local l_Constants_0 = require(l_RobloxGui_0.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"));
-local v17 = require(l_RobloxGui_0.Modules.Common.ReactSchedulingTracker);
-return function(v18, v19) --[[ Line: 40 ]]
-    -- upvalues: l_FFlagEnableGameLeftMessage_0 (copy), l_MessageBus_0 (copy), l_Constants_0 (copy), v13 (copy), v9 (copy), v17 (copy), l_CorePackages_0 (copy), l_GuiService_0 (copy), l_game_EngineFeature_0 (copy), l_RbxAnalyticsService_0 (copy), v14 (copy), v10 (copy), l_Players_0 (copy), v12 (copy), l_RunService_0 (copy), l_GetDefaultQualityLevel_0 (copy)
-    if l_FFlagEnableGameLeftMessage_0 then
-        l_MessageBus_0.publish(l_Constants_0.OnAppRatingPromptEventDescriptor, {
-            gameTime = game:getGameTime()
-        });
-    end;
-    if v13() then
-        v9.leavingGame();
-    end;
-    v17:reportSession();
-    local v20 = require(l_CorePackages_0.Workspace.Packages.Memory).MemoryTracker();
-    if v20 then
-        v20:destroy();
-    end;
-    l_GuiService_0.SelectedCoreObject = nil;
-    local v21 = "";
-    if l_game_EngineFeature_0 then
-        v21 = l_RbxAnalyticsService_0:GetPlaySessionId();
-    end;
-    local v22 = {
-        confirmed = l_Constants_0.AnalyticsConfirmedName, 
-        universeid = tostring(game.GameId), 
-        source = l_Constants_0.AnalyticsLeaveGameSource, 
-        playsessionid = v21
-    };
-    if v14 and v19 and v19.telemetryFields then
-        v22 = v10.Dictionary.join(v22, v19.telemetryFields);
-    end;
-    l_RbxAnalyticsService_0:SetRBXEventStream(l_Constants_0.AnalyticsTargetName, l_Constants_0.AnalyticsInGameMenuName, l_Constants_0.AnalyticsLeaveGameName, v22);
-    if v18 then
-        local v23 = {
-            chromeSeenCount = tostring(0)
-        };
-        local v24 = tostring(l_Players_0.LocalPlayer.UserId);
-        l_MessageBus_0.publish(l_Constants_0.OnSurveyEventDescriptor, {
-            eventType = l_Constants_0.SurveyEventType, 
-            userId = v24, 
-            customProps = v23
-        });
-    end;
-    v12:sendCoreGuiFinalAnalytic();
-    l_RunService_0.RenderStepped:wait();
-    l_RunService_0.RenderStepped:wait();
-    game:Shutdown();
-    settings().Rendering.QualityLevel = l_GetDefaultQualityLevel_0();
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Players = game:GetService("Players")
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableGameLeftMessage = SharedFlags.FFlagEnableGameLeftMessage
+local FFlagSurvBloxEventTypeEnabled = SharedFlags.FFlagSurvBloxEventTypeEnabled
+local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local PerfUtils = require(RobloxGui.Modules.Common.PerfUtils)
+local Cryo = require(CorePackages.Packages.Cryo)
+local MessageBus = require(CorePackages.Workspace.Packages.MessageBus).MessageBus
+local SurveyEventPublisher = require(CorePackages.Workspace.Packages.OnPlatformSurveys.SurveyEventPublisher)
+local WebViewEventType = require(CorePackages.Workspace.Packages.OnPlatformSurveys.WebViewEventType)
+local v17 = require(script:FindFirstAncestor("Settings").Analytics.CoreGuiFinalStateAnalytics).new()
+
+RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
+
+local GetFFlagEnableInGameMenuDurationLogger = require(RobloxGui.Modules.Common.Flags.GetFFlagEnableInGameMenuDurationLogger)
+local FFlagLeaveActionChromeShortcutTelemetry = require(RobloxGui.Modules.Chrome.Flags.FFlagLeaveActionChromeShortcutTelemetry)
+local GetDefaultQualityLevel = require(CorePackages.Workspace.Packages.AppCommonLib).GetDefaultQualityLevel
+local Constants = require(RobloxGui.Modules:WaitForChild("InGameMenu"):WaitForChild("Resources"):WaitForChild("Constants"))
+local ReactSchedulingTracker = require(RobloxGui.Modules.Common.ReactSchedulingTracker)
+
+return function(b1: boolean, t1: {[any]: any}?) -- line: 43
+	-- upvalues: FFlagEnableGameLeftMessage (copy), MessageBus (copy), Constants (copy), GetFFlagEnableInGameMenuDurationLogger (copy), PerfUtils (copy), ReactSchedulingTracker (copy), CorePackages (copy), GuiService (copy), EngineFeature (copy), RbxAnalyticsService (copy), FFlagLeaveActionChromeShortcutTelemetry (copy), Cryo (copy), FFlagSurvBloxEventTypeEnabled (copy), SurveyEventPublisher (copy), WebViewEventType (copy), Players (copy), v17 (copy), RunService (copy), GetDefaultQualityLevel (copy)
+	if FFlagEnableGameLeftMessage then
+		MessageBus.publish(Constants.OnAppRatingPromptEventDescriptor, {
+			gameTime = game:getGameTime()
+		})
+	end
+
+	if GetFFlagEnableInGameMenuDurationLogger() then
+		PerfUtils.leavingGame()
+	end
+
+	ReactSchedulingTracker:reportSession()
+
+	local v25 = require(CorePackages.Workspace.Packages.Memory).MemoryTracker()
+
+	if v25 then
+		v25:destroy()
+	end
+
+	GuiService.SelectedCoreObject = nil
+
+	local s1 = ""
+
+	if EngineFeature then
+		s1 = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	local t2 = {
+		confirmed = Constants.AnalyticsConfirmedName,
+		universeid = tostring(game.GameId),
+		source = Constants.AnalyticsLeaveGameSource,
+		playsessionid = s1
+	}
+
+	if FFlagLeaveActionChromeShortcutTelemetry and t1 and t1.telemetryFields then
+		t2 = Cryo.Dictionary.join(t2, t1.telemetryFields)
+	end
+
+	RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, Constants.AnalyticsInGameMenuName, Constants.AnalyticsLeaveGameName, t2)
+
+	if b1 then
+		if FFlagSurvBloxEventTypeEnabled then
+			SurveyEventPublisher.publishSurveyEvent(WebViewEventType.LeaveButtonClick)
+		else
+			local t3 = {
+				chromeSeenCount = tostring(0)
+			}
+			local str = tostring(Players.LocalPlayer.UserId)
+
+			MessageBus.publish(Constants.OnSurveyEventDescriptor, {
+				eventType = Constants.SurveyEventType,
+				userId = str,
+				customProps = t3
+			})
+		end
+	end
+
+	v17:sendCoreGuiFinalAnalytic()
+	RunService.RenderStepped:wait()
+	RunService.RenderStepped:wait()
+	game:Shutdown()
+	settings().Rendering.QualityLevel = GetDefaultQualityLevel()
+end

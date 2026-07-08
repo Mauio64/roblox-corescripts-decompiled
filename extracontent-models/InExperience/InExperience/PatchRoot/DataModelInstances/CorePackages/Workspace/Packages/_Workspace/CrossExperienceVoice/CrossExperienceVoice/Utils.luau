@@ -1,3 +1,3 @@
 return {
-    debounce = require(script.debounce)
-};
+	debounce = require(script.debounce)
+}

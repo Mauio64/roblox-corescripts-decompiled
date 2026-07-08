@@ -1,3 +1,3 @@
 return {
-    mergeResolvers = require(script.mergeResolvers)
-};
+	mergeResolvers = require(script.mergeResolvers)
+}

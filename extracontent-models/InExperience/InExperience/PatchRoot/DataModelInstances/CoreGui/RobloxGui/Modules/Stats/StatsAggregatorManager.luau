@@ -1,44 +1,54 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v1 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsUtils);
-local v2 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsAggregator);
-local v3 = require(l_CoreGui_0.RobloxGui.Modules.Flags.GetFFlagLazyPerfStatsInit);
-local v4 = {};
-v4.__index = v4;
-v4.SecondsBetweenUpdate = 1;
-v4.NumSamplesToKeep = 20;
-local v5 = nil;
-v4.getSingleton = function() --[[ Line: 26 ]] --[[ Name: getSingleton ]]
-    -- upvalues: v5 (ref), v4 (copy), v3 (copy)
-    if v5 == nil then
-        v5 = v4.__new();
-        if not v3() then
-            v5:StartListening();
-        end;
-    end;
-    return v5;
-end;
-v4.__new = function() --[[ Line: 36 ]] --[[ Name: __new ]]
-    -- upvalues: v4 (copy), v1 (copy), v2 (copy)
-    local v6 = {};
-    setmetatable(v6, v4);
-    v6._statsAggregators = {};
-    for _, v8 in ipairs(v1.AllStatTypes) do
-        local v9 = v2.new(v8, v4.NumSamplesToKeep, v4.SecondsBetweenUpdate);
-        v6._statsAggregators[v8] = v9;
-    end;
-    return v6;
-end;
-v4.StartListening = function(v10) --[[ Line: 53 ]] --[[ Name: StartListening ]]
-    for _, v12 in pairs(v10._statsAggregators) do
-        v12:StartListening();
-    end;
-end;
-v4.StopListening = function(v13) --[[ Line: 59 ]] --[[ Name: StopListening ]]
-    for _, v15 in pairs(v13._statsAggregators) do
-        v15:StopListening();
-    end;
-end;
-v4.GetAggregator = function(v16, v17) --[[ Line: 65 ]] --[[ Name: GetAggregator ]]
-    return v16._statsAggregators[v17];
-end;
-return v4;
+local CoreGui = game:GetService("CoreGui")
+local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
+local StatsAggregator = require(CoreGui.RobloxGui.Modules.Stats.StatsAggregator)
+local GetFFlagLazyPerfStatsInit = require(CoreGui.RobloxGui.Modules.Flags.GetFFlagLazyPerfStatsInit)
+local t1 = {}
+
+t1.__index = t1
+t1.SecondsBetweenUpdate = 1
+t1.NumSamplesToKeep = 20
+
+local u6 = nil
+
+function t1.getSingleton() -- line: 26
+	-- upvalues: u6 (ref), t1 (copy), GetFFlagLazyPerfStatsInit (copy)
+	if u6 == nil then
+		u6 = t1.__new()
+
+		if not GetFFlagLazyPerfStatsInit() then
+			u6:StartListening()
+		end
+	end
+
+	return u6
+end
+function t1.__new() -- line: 36
+	-- upvalues: t1 (copy), StatsUtils (copy), StatsAggregator (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._statsAggregators = {}
+
+	for _, v in ipairs(StatsUtils.AllStatTypes) do
+		local v10 = StatsAggregator.new(v, t1.NumSamplesToKeep, t1.SecondsBetweenUpdate)
+
+		t2._statsAggregators[v] = v10
+	end
+
+	return t2
+end
+function t1.StartListening(p1) -- line: 53
+	for _, v in pairs(p1._statsAggregators) do
+		v:StartListening()
+	end
+end
+function t1.StopListening(p2) -- line: 59
+	for _, v in pairs(p2._statsAggregators) do
+		v:StopListening()
+	end
+end
+function t1.GetAggregator(p3, p4) -- line: 65
+	return p3._statsAggregators[p4]
+end
+
+return t1

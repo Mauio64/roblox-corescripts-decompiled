@@ -1,39 +1,45 @@
-local l_Workspace_0 = game:GetService("Workspace");
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v3 = require(l_Parent_0.Roact);
-local v4 = Rect.new(1, 0, 2, 3);
-local v5 = v3.Component:extend("LoadingBar");
-v5.init = function(v6) --[[ Line: 16 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy)
-    v6.barRef = v3.createRef();
-end;
-v5.render = function(v7) --[[ Line: 20 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    local l_ZIndex_0 = v7.props.ZIndex;
-    return v3.createElement("ImageLabel", {
-        Image = "rbxasset://textures/ui/LuaApp/9-slice/gr-loading-indicator.png", 
-        ScaleType = "Slice", 
-        SliceCenter = v4, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        ZIndex = l_ZIndex_0, 
-        [v3.Ref] = v7.barRef
-    });
-end;
-v5.didMount = function(v9) --[[ Line: 34 ]] --[[ Name: didMount ]]
-    -- upvalues: l_RunService_0 (copy), l_Workspace_0 (copy)
-    v9.connection = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 35 ]]
-        -- upvalues: l_Workspace_0 (ref), v9 (copy)
-        local l_DistributedGameTime_0 = l_Workspace_0.DistributedGameTime;
-        local l_current_0 = v9.barRef.current;
-        local v12 = (1 - math.cos(2 * l_DistributedGameTime_0 * 5.026548245743669)) * 7.5;
-        l_current_0.Size = UDim2.new(0, v12 + 4, 0, 4);
-        local v13 = math.cos(l_DistributedGameTime_0 * 5.026548245743669) * 40;
-        l_current_0.Position = UDim2.new(0.5, v13 - v12 / 2 - 2, 0.5, 0);
-    end);
-end;
-v5.willUnmount = function(v14) --[[ Line: 48 ]] --[[ Name: willUnmount ]]
-    v14.connection:Disconnect();
-end;
-return v5;
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local Roact = require(Parent.Roact)
+local rect = Rect.new(1, 0, 2, 3)
+local v6 = Roact.Component:extend("LoadingBar")
+
+function v6.init(p1) -- line: 16
+	-- upvalues: Roact (copy)
+	p1.barRef = Roact.createRef()
+end
+function v6.render(p2) -- line: 20
+	-- upvalues: Roact (copy), rect (copy)
+	local propsZIndex = p2.props.ZIndex
+
+	return Roact.createElement("ImageLabel", {
+		Image = "rbxasset://textures/ui/LuaApp/9-slice/gr-loading-indicator.png",
+		ScaleType = "Slice",
+		SliceCenter = rect,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = propsZIndex,
+		[Roact.Ref] = p2.barRef
+	})
+end
+function v6.didMount(p3) -- line: 34
+	-- upvalues: RunService (copy), Workspace (copy)
+	p3.connection = RunService.RenderStepped:Connect(function() -- line: 35
+		-- upvalues: Workspace (copy), p3 (copy)
+		local DistributedGameTime = Workspace.DistributedGameTime
+		local current = p3.barRef.current
+		local v14 = (1 - math.cos(2 * DistributedGameTime * 5.026548245743669)) * 7.5
+
+		current.Size = UDim2.new(0, v14 + 4, 0, 4)
+
+		local v15 = math.cos(DistributedGameTime * 5.026548245743669) * 40
+
+		current.Position = UDim2.new(0.5, v15 - v14 / 2 - 2, 0.5, 0)
+	end)
+end
+function v6.willUnmount(p4) -- line: 48
+	p4.connection:Disconnect()
+end
+
+return v6

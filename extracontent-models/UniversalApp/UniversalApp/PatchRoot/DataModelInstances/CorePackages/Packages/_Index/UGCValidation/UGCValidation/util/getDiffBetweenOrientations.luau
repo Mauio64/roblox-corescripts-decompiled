@@ -1,4 +1,7 @@
-return function(v0, v1) --[[ Line: 3 ]] --[[ Name: getDiffBetweenOrientations ]]
-    local _, v3 = (v0 * v1:Inverse()):ToAxisAngle();
-    return (math.deg(v3));
-end;
+local function getDiffBetweenOrientations(cFrame: CFrame, cFrame2: CFrame) -- line: 3
+	local _, v5 = (cFrame * cFrame2:Inverse()):ToAxisAngle()
+
+	return (math.deg(v5))
+end
+
+return getDiffBetweenOrientations

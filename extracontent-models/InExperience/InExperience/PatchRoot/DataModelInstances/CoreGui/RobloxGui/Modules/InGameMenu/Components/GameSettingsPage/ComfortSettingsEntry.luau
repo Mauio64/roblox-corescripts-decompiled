@@ -1,120 +1,129 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GameSettings_0 = UserSettings().GameSettings;
-local v2 = require(l_CorePackages_0.Packages.LuauPolyfill);
-local v3 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local l_t_0 = v3.t;
-local l_SegmentedControl_0 = v3.UIBlox.App.Control.SegmentedControl;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v8 = require(l_Parent_0.Components.ThemedTextLabel);
-local l_l_GameSettings_0_PropertyChangedSignal_0 = l_GameSettings_0:GetPropertyChangedSignal("VRComfortSetting");
-local v10 = require(l_Parent_0.Utility.ExternalEventConnection);
-local v11 = require(l_Parent_0.Localization.withLocalization);
-local v12 = require(l_Parent_0.Utility.SendAnalytics);
-local v13 = require(l_Parent_0.Resources.Constants);
-local v14 = {
-    Description = "CoreScripts.InGameMenu.GameSettings.ComfortSettingsDescription", 
-    ["Enum.VRComfortSetting.Comfort"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingComfort", 
-    ["Enum.VRComfortSetting.Normal"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingNormal", 
-    ["Enum.VRComfortSetting.Expert"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingExpert", 
-    ["Enum.VRComfortSetting.Custom"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingCustom"
-};
-local l_EnumItems_0 = Enum.VRComfortSetting:GetEnumItems();
-local function _(v16) --[[ Line: 40 ]] --[[ Name: getComfortSettingIndex ]]
-    -- upvalues: v2 (copy), l_EnumItems_0 (copy)
-    return v2.Array.indexOf(l_EnumItems_0, v16);
-end;
-local function _(v18) --[[ Line: 44 ]] --[[ Name: setComfortSettingByIndex ]]
-    -- upvalues: l_EnumItems_0 (copy), l_GameSettings_0 (copy), v12 (copy), v13 (copy)
-    local v19 = l_EnumItems_0[v18];
-    l_GameSettings_0.VRComfortSetting = v19;
-    v12(v13.AnalyticsSettingsChangeName, v13.AnalyticsSettingsVRComfortSettingChangeName, {
-        mode = tostring(v19)
-    });
-end;
-local v21 = v4.PureComponent:extend("ComfortSettingsEntry");
-v21.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.optional(l_t_0.integer)
-});
-v21.init = function(v22) --[[ Line: 57 ]] --[[ Name: init ]]
-    -- upvalues: l_GameSettings_0 (copy), v2 (copy), l_EnumItems_0 (copy)
-    local v23 = {};
-    local l_VRComfortSetting_0 = l_GameSettings_0.VRComfortSetting;
-    v23.selectedMode = v2.Array.indexOf(l_EnumItems_0, l_VRComfortSetting_0);
-    v22:setState(v23);
-end;
-v21.render = function(v25) --[[ Line: 63 ]] --[[ Name: render ]]
-    -- upvalues: v11 (copy), v14 (copy), v4 (copy), v10 (copy), l_l_GameSettings_0_PropertyChangedSignal_0 (copy), l_GameSettings_0 (copy), v2 (copy), l_EnumItems_0 (copy), v8 (copy), l_SegmentedControl_0 (copy), v12 (copy), v13 (copy)
-    return v11(v14)(function(v26) --[[ Line: 64 ]]
-        -- upvalues: v4 (ref), v10 (ref), l_l_GameSettings_0_PropertyChangedSignal_0 (ref), v25 (copy), l_GameSettings_0 (ref), v2 (ref), l_EnumItems_0 (ref), v8 (ref), l_SegmentedControl_0 (ref), v12 (ref), v13 (ref)
-        return v4.createFragment({
-            VRComfortSettingListener = v4.createElement(v10, {
-                event = l_l_GameSettings_0_PropertyChangedSignal_0, 
-                callback = function() --[[ Line: 68 ]] --[[ Name: callback ]]
-                    -- upvalues: v25 (ref), l_GameSettings_0 (ref), v2 (ref), l_EnumItems_0 (ref)
-                    local l_v25_0 = v25;
-                    local v28 = {};
-                    local l_VRComfortSetting_1 = l_GameSettings_0.VRComfortSetting;
-                    v28.selectedMode = v2.Array.indexOf(l_EnumItems_0, l_VRComfortSetting_1);
-                    l_v25_0:setState(v28);
-                end
-            }), 
-            ComfortSettingEntrySelector = v4.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = v25.props.LayoutOrder, 
-                ZIndex = 2
-            }, {
-                Padding = v4.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, 24), 
-                    PaddingRight = UDim.new(0, 24), 
-                    PaddingBottom = UDim.new(0, 15), 
-                    PaddingTop = UDim.new(0, 15)
-                }), 
-                ListLayout = v4.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, 20)
-                }), 
-                InputDescription = v4.createElement(v8, {
-                    themeKey = "TextDefault", 
-                    fontKey = "CaptionHeader", 
-                    Text = v26.Description, 
-                    Size = UDim2.new(0.9, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    TextWrapped = true, 
-                    LayoutOrder = 1, 
-                    TextXAlignment = Enum.TextXAlignment.Left
-                }), 
-                Frame = v4.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2
-                }, {
-                    SegmentedControl = v4.createElement(l_SegmentedControl_0, {
-                        width = UDim.new(1, 0), 
-                        selectedTabIndex = v25.state.selectedMode, 
-                        onTabActivated = function(v30) --[[ Line: 113 ]] --[[ Name: onTabActivated ]]
-                            -- upvalues: l_EnumItems_0 (ref), l_GameSettings_0 (ref), v12 (ref), v13 (ref)
-                            local v31 = l_EnumItems_0[v30];
-                            l_GameSettings_0.VRComfortSetting = v31;
-                            v12(v13.AnalyticsSettingsChangeName, v13.AnalyticsSettingsVRComfortSettingChangeName, {
-                                mode = tostring(v31)
-                            });
-                        end, 
-                        tabs = v2.Array.map(l_EnumItems_0, function(v32, _) --[[ Line: 116 ]]
-                            -- upvalues: v26 (copy)
-                            return {
-                                tabName = v26[tostring(v32)]
-                            };
-                        end)
-                    })
-                })
-            })
-        });
-    end);
-end;
-return v21;
+local CorePackages = game:GetService("CorePackages")
+local GameSettings = UserSettings().GameSettings
+local LuauPolyfill = require(CorePackages.Packages.LuauPolyfill)
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = require(CorePackages.Packages.Roact)
+local t = InGameMenuDependencies.t
+local SegmentedControl = InGameMenuDependencies.UIBlox.App.Control.SegmentedControl
+local ParentParent = script.Parent.Parent.Parent
+local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
+local PropertyChangedSignal = GameSettings:GetPropertyChangedSignal("VRComfortSetting")
+local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
+local Constants = require(ParentParent.Resources.Constants)
+local t1 = {
+	Description = "CoreScripts.InGameMenu.GameSettings.ComfortSettingsDescription",
+	["Enum.VRComfortSetting.Comfort"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingComfort",
+	["Enum.VRComfortSetting.Normal"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingNormal",
+	["Enum.VRComfortSetting.Expert"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingExpert",
+	["Enum.VRComfortSetting.Custom"] = "CoreScripts.InGameMenu.GameSettings.ComfortSettingCustom"
+}
+local EnumItems = Enum.VRComfortSetting:GetEnumItems()
+
+local function getComfortSettingIndex(p1) -- line: 40
+	-- upvalues: LuauPolyfill (copy), EnumItems (copy)
+	return LuauPolyfill.Array.indexOf(EnumItems, p1)
+end
+local function setComfortSettingByIndex(p2) -- line: 44
+	-- upvalues: EnumItems (copy), GameSettings (copy), SendAnalytics (copy), Constants (copy)
+	local v22 = EnumItems[p2]
+
+	GameSettings.VRComfortSetting = v22
+	SendAnalytics(Constants.AnalyticsSettingsChangeName, Constants.AnalyticsSettingsVRComfortSettingChangeName, {
+		mode = tostring(v22)
+	})
+end
+
+local v19 = Roact.PureComponent:extend("ComfortSettingsEntry")
+
+v19.validateProps = t.strictInterface({
+	LayoutOrder = t.optional(t.integer)
+})
+
+function v19.init(p3) -- line: 57
+	-- upvalues: GameSettings (copy), LuauPolyfill (copy), EnumItems (copy)
+	local t2 = {}
+	local VRComfortSetting = GameSettings.VRComfortSetting
+
+	t2.selectedMode = LuauPolyfill.Array.indexOf(EnumItems, VRComfortSetting)
+	p3:setState(t2)
+end
+function v19.render(p4) -- line: 63
+	-- upvalues: withLocalization (copy), t1 (copy), Roact (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy), GameSettings (copy), LuauPolyfill (copy), EnumItems (copy), ThemedTextLabel (copy), SegmentedControl (copy), SendAnalytics (copy), Constants (copy)
+	return withLocalization(t1)(function(p5) -- line: 64
+		-- upvalues: Roact (copy), ExternalEventConnection (copy), PropertyChangedSignal (copy), p4 (copy), GameSettings (copy), LuauPolyfill (copy), EnumItems (copy), ThemedTextLabel (copy), SegmentedControl (copy), SendAnalytics (copy), Constants (copy)
+		return Roact.createFragment({
+			VRComfortSettingListener = Roact.createElement(ExternalEventConnection, {
+				event = PropertyChangedSignal,
+				callback = function() -- line: 68
+					-- upvalues: p4 (copy), GameSettings (copy), LuauPolyfill (copy), EnumItems (copy)
+					local v28 = p4
+					local t3 = {}
+					local VRComfortSetting = GameSettings.VRComfortSetting
+
+					t3.selectedMode = LuauPolyfill.Array.indexOf(EnumItems, VRComfortSetting)
+					v28:setState(t3)
+				end
+			}),
+			ComfortSettingEntrySelector = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				ZIndex = 2,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = p4.props.LayoutOrder
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 24),
+					PaddingRight = UDim.new(0, 24),
+					PaddingBottom = UDim.new(0, 15),
+					PaddingTop = UDim.new(0, 15)
+				}),
+				ListLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 20)
+				}),
+				InputDescription = Roact.createElement(ThemedTextLabel, {
+					themeKey = "TextDefault",
+					fontKey = "CaptionHeader",
+					TextWrapped = true,
+					LayoutOrder = 1,
+					Text = p5.Description,
+					Size = UDim2.new(0.9, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}),
+				Frame = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					SegmentedControl = Roact.createElement(SegmentedControl, {
+						width = UDim.new(1, 0),
+						selectedTabIndex = p4.state.selectedMode,
+						onTabActivated = function(p6) -- line: 113
+							-- upvalues: EnumItems (copy), GameSettings (copy), SendAnalytics (copy), Constants (copy)
+							local v32 = EnumItems[p6]
+
+							GameSettings.VRComfortSetting = v32
+							SendAnalytics(Constants.AnalyticsSettingsChangeName, Constants.AnalyticsSettingsVRComfortSettingChangeName, {
+								mode = tostring(v32)
+							})
+						end,
+						tabs = LuauPolyfill.Array.map(EnumItems, function(p7, _) -- line: 116
+							-- upvalues: p5 (copy)
+							return {
+								tabName = p5[tostring(p7)]
+							}
+						end)
+					})
+				})
+			})
+		})
+	end)
+end
+
+return v19

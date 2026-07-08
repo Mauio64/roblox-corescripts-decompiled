@@ -1,40 +1,46 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Common.Constants);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Foundation);
-local l_View_0 = v4.View;
-local l_InputLabel_0 = v4.InputLabel;
-local l_InputLabelSize_0 = v4.Enums.InputLabelSize;
-local l_FFlagEnableGlobalChatAbuseReporting_0 = require(l_Parent_0.SharedFlags).FFlagEnableGlobalChatAbuseReporting;
-local function _(v9, v10) --[[ Line: 20 ]] --[[ Name: getEyebrowText ]]
-    -- upvalues: v2 (copy)
-    if string.match(v9, v2.ChannelTypes.Whisper) then
-        return v10.localizedText.ChatEyebrowSentPrivately;
-    else
-        return v10.localizedText.ChatEyebrowSentInAnotherChat;
-    end;
-end;
-return function(v12) --[[ Line: 28 ]] --[[ Name: ChatLineReportEyebrow ]]
-    -- upvalues: l_FFlagEnableGlobalChatAbuseReporting_0 (copy), v2 (copy), v3 (copy), l_View_0 (copy), l_InputLabel_0 (copy), l_InputLabelSize_0 (copy)
-    if (not l_FFlagEnableGlobalChatAbuseReporting_0 or v12.message.textChannel) and v12.message.textChannel.Name ~= v2.ChannelTypes.General then
-        local l_createElement_0 = v3.createElement;
-        local l_l_View_0_0 = l_View_0;
-        local v15 = {
-            tag = "auto-xy bg-shift-200 padding-left-xsmall padding-right-xsmall radius-small", 
-            LayoutOrder = 1
-        };
-        local v16 = {};
-        local l_createElement_1 = v3.createElement;
-        local l_l_InputLabel_0_0 = l_InputLabel_0;
-        local v19 = {};
-        local l_Name_0 = v12.message.textChannel.Name;
-        v19.Text = if string.match(l_Name_0, v2.ChannelTypes.Whisper) then v12.localizedText.ChatEyebrowSentPrivately else v12.localizedText.ChatEyebrowSentInAnotherChat;
-        v19.RichText = true;
-        v19.size = l_InputLabelSize_0.Small;
-        v16.eyebrowLabel = l_createElement_1(l_l_InputLabel_0_0, v19);
-        return (l_createElement_0(l_l_View_0_0, v15, v16));
-    else
-        return nil;
-    end;
-end;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local Constants = require(ChatLineReporting.Common.Constants)
+local React = require(ChatLineReportingParent.React)
+local Foundation = require(ChatLineReportingParent.Foundation)
+local View = Foundation.View
+local InputLabel = Foundation.InputLabel
+local InputLabelSize = Foundation.Enums.InputLabelSize
+local FFlagEnableGlobalChatAbuseReporting = require(ChatLineReportingParent.SharedFlags).FFlagEnableGlobalChatAbuseReporting
+
+local function getEyebrowText(s1: string, t1: {[any]: any}) -- line: 20
+	-- upvalues: Constants (copy)
+	if string.match(s1, Constants.ChannelTypes.Whisper) then
+		return t1.localizedText.ChatEyebrowSentPrivately
+	end
+
+	return t1.localizedText.ChatEyebrowSentInAnotherChat
+end
+local function ChatLineReportEyebrow(t2: {[any]: any}) -- line: 28
+	-- upvalues: FFlagEnableGlobalChatAbuseReporting (copy), Constants (copy), React (copy), View (copy), InputLabel (copy), InputLabelSize (copy)
+	if (not FFlagEnableGlobalChatAbuseReporting or t2.message.textChannel) and t2.message.textChannel.Name ~= Constants.ChannelTypes.General then
+		local createElement = React.createElement
+		local v16 = View
+		local t3 = {
+			tag = "auto-xy bg-shift-200 padding-left-xsmall padding-right-xsmall radius-small",
+			LayoutOrder = 1
+		}
+		local t4 = {}
+		local createElement2 = React.createElement
+		local v20 = InputLabel
+		local t5 = {
+			RichText = true
+		}
+		local textChannelName = t2.message.textChannel.Name
+
+		t5.Text = if not string.match(textChannelName, Constants.ChannelTypes.Whisper) then t2.localizedText.ChatEyebrowSentInAnotherChat else t2.localizedText.ChatEyebrowSentPrivately
+		t5.size = InputLabelSize.Small
+		t4.eyebrowLabel = createElement2(v20, t5)
+
+		return (createElement(v16, t3, t4))
+	end
+
+	return nil
+end
+
+return ChatLineReportEyebrow

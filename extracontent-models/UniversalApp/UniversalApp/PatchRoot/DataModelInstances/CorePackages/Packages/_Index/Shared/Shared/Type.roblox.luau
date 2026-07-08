@@ -1,22 +1,27 @@
-local v0 = require(script.Parent["Symbol.roblox"]);
-local v1 = newproxy(true);
-local v2 = {};
-local function _(v3) --[[ Line: 32 ]] --[[ Name: addType ]]
-    -- upvalues: v2 (copy), v0 (copy)
-    v2[v3] = v0.named("Roact" .. v3);
-end;
-v2.HostChangeEvent = v0.named("RoactHostChangeEvent");
-v2.HostEvent = v0.named("RoactHostEvent");
-v2.of = function(v5) --[[ Line: 39 ]] --[[ Name: of ]]
-    -- upvalues: v1 (copy)
-    if typeof(v5) ~= "table" then
-        return nil;
-    else
-        return v5[v1];
-    end;
-end;
-getmetatable(v1).__index = v2;
-getmetatable(v1).__tostring = function() --[[ Line: 49 ]]
-    return "RoactType";
-end;
-return v1;
+local lib = require(script.Parent["Symbol.roblox"])
+local v2 = newproxy(true)
+local t1 = {}
+
+local function addType(p1) -- line: 32
+	-- upvalues: t1 (copy), lib (copy)
+	t1[p1] = lib.named("Roact" .. p1)
+end
+
+t1.HostChangeEvent = lib.named("RoactHostChangeEvent")
+t1.HostEvent = lib.named("RoactHostEvent")
+
+function t1.of(p2) -- line: 39
+	-- upvalues: v2 (copy)
+	if typeof(p2) ~= "table" then
+		return nil
+	end
+
+	return p2[v2]
+end
+
+getmetatable(v2).__index = t1
+getmetatable(v2).__tostring = function() -- line: 49
+	return "RoactType"
+end
+
+return v2

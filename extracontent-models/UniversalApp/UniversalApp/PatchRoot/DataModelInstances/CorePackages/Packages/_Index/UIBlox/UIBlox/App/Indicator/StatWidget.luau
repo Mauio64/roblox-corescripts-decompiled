@@ -1,96 +1,102 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("App");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Cryo);
-local _ = require(l_script_FirstAncestor_0.ImageSet.ImagesTypes);
-local _ = require(l_script_FirstAncestor_0.Style.StyleTypes);
-local v7 = require(l_script_FirstAncestor_0.ImageSet.Enum.IconSize);
-local v8 = require(l_script_FirstAncestor_0.ImageSet.getIconSize);
-local l_Label_0 = require(l_Parent_0.Core.ImageSet.ImageSetComponent).Label;
-local v10 = require(l_Parent_0.Core.Text.GenericTextLabel.GenericTextLabel);
-local v11 = require(l_Parent_0.Core.Style.useStyle);
-local v12 = {
-    containerPaddingLeft = 12, 
-    containerPaddingRight = 12, 
-    containerGap = 12, 
-    iconSize = v8(v7.Large), 
-    dataGap = 0
-};
-return function(v13) --[[ Line: 65 ]] --[[ Name: StatWidget ]]
-    -- upvalues: v11 (copy), v4 (copy), v12 (copy), v3 (copy), l_Label_0 (copy), v10 (copy)
-    local v14 = v11();
-    local v15 = v4.Dictionary.join(v12, v13.styleProps or {});
-    local l_containerPaddingLeft_0 = v15.containerPaddingLeft;
-    local l_containerPaddingRight_0 = v15.containerPaddingRight;
-    local l_containerGap_0 = v15.containerGap;
-    local l_iconSize_0 = v15.iconSize;
-    local v20 = v15.iconContentColor or v14.Theme.IconEmphasis;
-    local l_dataGap_0 = v15.dataGap;
-    local v22 = v15.dataContentColor or v14.Theme.TextEmphasis;
-    local v23 = v15.dataLabelContentColor or v14.Theme.TextEmphasis;
-    return v3.createElement("Frame", {
-        Position = v13.position, 
-        AnchorPoint = v13.anchorPoint, 
-        Size = v13.size, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v13.layoutOrder
-    }, {
-        ListLayout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalAlignment = v13.horizontalAlignment, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            Padding = UDim.new(0, l_containerGap_0)
-        }), 
-        Padding = v3.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, l_containerPaddingLeft_0), 
-            PaddingRight = UDim.new(0, l_containerPaddingRight_0)
-        }), 
-        Icon = v3.createElement(l_Label_0, {
-            Size = UDim2.new(0, l_iconSize_0, 0, l_iconSize_0), 
-            Image = v13.icon, 
-            ImageColor3 = v20.Color, 
-            Position = UDim2.new(0, 0, 0, 0), 
-            BackgroundTransparency = 1
-        }), 
-        TextSection = v3.createElement("Frame", {
-            Size = UDim2.fromScale(0, 0), 
-            AutomaticSize = Enum.AutomaticSize.XY, 
-            BackgroundTransparency = 1, 
-            Position = UDim2.new(0, l_iconSize_0 + l_containerGap_0, 0, 0)
-        }, {
-            ListLayout = v3.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                Padding = UDim.new(0, l_dataGap_0)
-            }), 
-            Number = v3.createElement(v10, {
-                Size = UDim2.fromScale(0, 0), 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = 1, 
-                Text = v13.countText, 
-                fluidSizing = true, 
-                TextWrapped = false, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                colorStyle = v22, 
-                fontStyle = v14.Font.Title, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                BackgroundTransparency = 1
-            }), 
-            Label = v3.createElement(v10, {
-                Size = UDim2.fromScale(0, 0), 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = 2, 
-                Text = v13.labelText, 
-                fluidSizing = true, 
-                TextWrapped = false, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                colorStyle = v23, 
-                fontStyle = v14.Font.CaptionHeader, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                BackgroundTransparency = 1
-            })
-        })
-    });
-end;
+local App = script:FindFirstAncestor("App")
+local AppParent = App.Parent
+local AppParentParent = AppParent.Parent
+local React = require(AppParentParent.React)
+local Cryo = require(AppParentParent.Cryo)
+
+require(App.ImageSet.ImagesTypes)
+require(App.Style.StyleTypes)
+
+local IconSize = require(App.ImageSet.Enum.IconSize)
+local getIconSize = require(App.ImageSet.getIconSize)
+local Label = require(AppParent.Core.ImageSet.ImageSetComponent).Label
+local GenericTextLabel = require(AppParent.Core.Text.GenericTextLabel.GenericTextLabel)
+local useStyle = require(AppParent.Core.Style.useStyle)
+local t1 = {
+	containerPaddingLeft = 12,
+	containerPaddingRight = 12,
+	containerGap = 12,
+	dataGap = 0,
+	iconSize = getIconSize(IconSize.Large)
+}
+
+local function StatWidget(t2: {[any]: any}) -- line: 65
+	-- upvalues: useStyle (copy), Cryo (copy), t1 (copy), React (copy), Label (copy), GenericTextLabel (copy)
+	local v14 = useStyle()
+	local v15 = Cryo.Dictionary.join(t1, t2.styleProps or {})
+	local containerPaddingLeft = v15.containerPaddingLeft
+	local containerPaddingRight = v15.containerPaddingRight
+	local containerGap = v15.containerGap
+	local iconSize = v15.iconSize
+	local v20 = v15.iconContentColor or v14.Theme.IconEmphasis
+	local dataGap = v15.dataGap
+	local v22 = v15.dataContentColor or v14.Theme.TextEmphasis
+	local v23 = v15.dataLabelContentColor or v14.Theme.TextEmphasis
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Position = t2.position,
+		AnchorPoint = t2.anchorPoint,
+		Size = t2.size,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t2.layoutOrder
+	}, {
+		ListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = t2.horizontalAlignment,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, containerGap)
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, containerPaddingLeft),
+			PaddingRight = UDim.new(0, containerPaddingRight)
+		}),
+		Icon = React.createElement(Label, {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, iconSize, 0, iconSize),
+			Image = t2.icon,
+			ImageColor3 = v20.Color,
+			Position = UDim2.new(0, 0, 0, 0)
+		}),
+		TextSection = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Position = UDim2.new(0, iconSize + containerGap, 0, 0)
+		}, {
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				Padding = UDim.new(0, dataGap)
+			}),
+			Number = React.createElement(GenericTextLabel, {
+				LayoutOrder = 1,
+				fluidSizing = true,
+				TextWrapped = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Text = t2.countText,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				colorStyle = v22,
+				fontStyle = v14.Font.Title,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			}),
+			Label = React.createElement(GenericTextLabel, {
+				LayoutOrder = 2,
+				fluidSizing = true,
+				TextWrapped = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Text = t2.labelText,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				colorStyle = v23,
+				fontStyle = v14.Font.CaptionHeader,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			})
+		})
+	})
+end
+
+return StatWidget

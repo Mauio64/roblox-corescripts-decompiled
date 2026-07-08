@@ -1,12 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlayerContextualMenu");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Rodux.UserBlocking);
-local v4 = require(l_script_FirstAncestor_0.Flags.FFlagUserBlockingApiPlayerContextMenuEnabled);
-return function() --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    return v2.combineReducers({
-        IsBlockedByMe = if not v4 then require(script.Parent.IsBlockedByMe) else nil, 
-        UserBlocking = if v4 then v3.installReducer() else nil
-    });
-end;
+local PlayerContextualMenu = script:FindFirstAncestor("PlayerContextualMenu")
+local PlayerContextualMenuParent = PlayerContextualMenu.Parent
+local Rodux = require(PlayerContextualMenuParent.Rodux)
+local UserBlocking = require(PlayerContextualMenu.Rodux.UserBlocking)
+local FFlagUserBlockingApiPlayerContextMenuEnabled = require(PlayerContextualMenu.Flags.FFlagUserBlockingApiPlayerContextMenuEnabled)
+
+return function() -- line: 9
+	-- upvalues: Rodux (copy), FFlagUserBlockingApiPlayerContextMenuEnabled (copy), UserBlocking (copy)
+	return Rodux.combineReducers({
+		IsBlockedByMe = if FFlagUserBlockingApiPlayerContextMenuEnabled then nil else require(script.Parent.IsBlockedByMe),
+		UserBlocking = if not FFlagUserBlockingApiPlayerContextMenuEnabled then nil else UserBlocking.installReducer()
+	})
+end

@@ -1,4 +1,7 @@
-game:DefineFastFlag("OverridePlayerVerifiedBadge", false);
-return function() --[[ Line: 15 ]] --[[ Name: getFFlagOverridePlayerVerifiedBadge ]]
-    return game:GetFastFlag("OverridePlayerVerifiedBadge");
-end;
+game:DefineFastFlag("OverridePlayerVerifiedBadge", false)
+
+local function getFFlagOverridePlayerVerifiedBadge() -- line: 15
+	return game:GetFastFlag("OverridePlayerVerifiedBadge")
+end
+
+return getFFlagOverridePlayerVerifiedBadge

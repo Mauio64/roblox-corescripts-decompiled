@@ -1,11 +1,18 @@
-local v0 = require(script.Parent.copy);
-return function(v1, ...) --[[ Line: 4 ]] --[[ Name: removeKey ]]
-    -- upvalues: v0 (copy)
-    local v2 = type(v1);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    local v3 = v0(v1);
-    for v4 = 1, select("#", ...) do
-        v3[select(v4, ...)] = nil;
-    end;
-    return v3;
-end;
+local copy = require(script.Parent.copy)
+
+local function removeKey(p1, ...) -- line: 4
+	-- upvalues: copy (copy)
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	local v5 = copy(p1)
+
+	for i = 1, select("#", ...) do
+		v5[select(i, ...)] = nil
+	end
+
+	return v5
+end
+
+return removeKey

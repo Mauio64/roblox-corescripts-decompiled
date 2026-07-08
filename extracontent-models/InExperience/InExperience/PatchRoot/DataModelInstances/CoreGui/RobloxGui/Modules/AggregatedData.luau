@@ -1,32 +1,43 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function() --[[ Line: 4 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v1 = {};
-    setmetatable(v1, v0);
-    return v1;
-end;
-local function _(v2) --[[ Line: 10 ]] --[[ Name: isRbxAssetId ]]
-    return v2:find("rbxassetid://");
-end;
-v0.addPlay = function(v4, v5, v6, v7) --[[ Line: 14 ]] --[[ Name: addPlay ]]
-    if not v5:find("rbxassetid://") then
-        return;
-    else
-        v5 = v5:sub(14);
-        if v4[v5] == nil then
-            v4[v5] = {
-                playtime = v6, 
-                loopcount = v7
-            };
-            return;
-        else
-            local v8 = v4[v5];
-            v8.playtime = v8.playtime + v6;
-            v8 = v4[v5];
-            v8.loopcount = v8.loopcount + v7;
-            return;
-        end;
-    end;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 4
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+
+local function isRbxAssetId(s1: string) -- line: 10
+	return s1:find("rbxassetid://")
+end
+
+function t1.addPlay(t3: {[any]: any}, s2: string, n1: number, n2: number) -- line: 14
+	if not s2:find("rbxassetid://") then
+		return
+	end
+
+	local v9 = s2:sub(14)
+
+	if t3[v9] == nil then
+		t3[v9] = {
+			playtime = n1,
+			loopcount = n2
+		}
+
+		return
+	end
+
+	local v10 = t3[v9]
+
+	v10.playtime = v10.playtime + n1
+
+	local v11 = t3[v9]
+
+	v11.loopcount = v11.loopcount + n2
+end
+
+return t1

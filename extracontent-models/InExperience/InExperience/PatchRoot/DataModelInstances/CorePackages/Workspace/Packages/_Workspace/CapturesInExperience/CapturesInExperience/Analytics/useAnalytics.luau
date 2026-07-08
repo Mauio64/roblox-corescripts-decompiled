@@ -1,10 +1,11 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Context.CapturesContext);
-return function() --[[ Line: 10 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return {
-        fireEvent = v2.useContext(v3).fireAnalyticsEvent
-    };
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local CapturesContext = require(ParentParent.Context.CapturesContext)
+
+return function() -- line: 10
+	-- upvalues: React (copy), CapturesContext (copy)
+	return {
+		fireEvent = React.useContext(CapturesContext).fireAnalyticsEvent
+	}
+end

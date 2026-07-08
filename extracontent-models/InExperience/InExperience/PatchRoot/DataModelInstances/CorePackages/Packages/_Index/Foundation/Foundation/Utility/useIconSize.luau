@@ -1,63 +1,50 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v2 = require(l_script_FirstAncestor_0.Enums.IconSize);
-local v3 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local function _(v4) --[[ Line: 11 ]] --[[ Name: isNumber ]]
-    local v5 = true;
-    if typeof(v4) ~= "number" then
-        v5 = false;
-        if typeof(v4) == "table" then
-            v5 = typeof(v4:getValue()) == "number";
-        end;
-    end;
-    return v5;
-end;
-return function(v7, v8, v9) --[[ Line: 15 ]] --[[ Name: useIconSize ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v10 = v3();
-    local v11 = if v8 then {
-        [v2.XSmall] = if v9 then v10.Size.Size_400 else v10.Size.Size_300, 
-        [v2.Small] = if v9 then v10.Size.Size_500 else v10.Size.Size_400, 
-        [v2.Medium] = if v9 then v10.Size.Size_600 else v10.Size.Size_500, 
-        [v2.Large] = if v9 then v10.Size.Size_700 else v10.Size.Size_600, 
-        [v2.XLarge] = if v9 then v10.Size.Size_800 else v10.Size.Size_700, 
-        [v2.XXLarge] = if v9 then v10.Size.Size_900 else v10.Size.Size_800
-    } else {
-        [v2.XSmall] = v10.Size.Size_200, 
-        [v2.Small] = v10.Size.Size_400, 
-        [v2.Medium] = v10.Size.Size_900, 
-        [v2.Large] = v10.Size.Size_1200, 
-        [v2.XLarge] = v10.Size.Size_2400, 
-        [v2.XXLarge] = 24 * v10.Size.Size_200
-    };
-    local v12 = true;
-    if typeof(v7) ~= "number" then
-        v12 = false;
-        if typeof(v7) == "table" then
-            v12 = typeof(v7:getValue()) == "number";
-        end;
-    end;
-    local v13 = if v12 then v7 else v11[v7];
-    if not v8 then
-        v12 = true;
-        if typeof(v7) ~= "number" then
-            v12 = false;
-            if typeof(v7) == "table" then
-                v12 = typeof(v7:getValue()) == "number";
-            end;
-        end;
-        if v12 then
-            v13 = nil;
-        end;
-    end;
-    if v13 == nil then
-        error("Invalid icon size: " .. tostring(v7));
-    end;
-    if typeof(v13) == "table" then
-        return (v13:map(function(v14) --[[ Line: 51 ]]
-            return UDim2.fromOffset(v14, v14);
-        end));
-    else
-        return (UDim2.fromOffset(v13, v13));
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Components.Types)
+
+local IconSize = require(Foundation.Enums.IconSize)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+
+local function isNumber(p1) -- line: 11
+	return typeof(p1) == "number" or typeof(p1) == "table" and typeof(p1:getValue()) == "number"
+end
+local function useIconSize(p2, b1: boolean, b2: boolean?) -- line: 15
+	-- upvalues: useTokens (copy), IconSize (copy)
+	local v10 = useTokens()
+	local v11 = if not b1 then {
+		[IconSize.XSmall] = v10.Size.Size_200,
+		[IconSize.Small] = v10.Size.Size_400,
+		[IconSize.Medium] = v10.Size.Size_900,
+		[IconSize.Large] = v10.Size.Size_1200,
+		[IconSize.XLarge] = v10.Size.Size_2400,
+		[IconSize.XXLarge] = 24 * v10.Size.Size_200
+	} else {
+		[IconSize.XSmall] = if not b2 then v10.Size.Size_300 else v10.Size.Size_400,
+		[IconSize.Small] = if not b2 then v10.Size.Size_400 else v10.Size.Size_500,
+		[IconSize.Medium] = if not b2 then v10.Size.Size_500 else v10.Size.Size_600,
+		[IconSize.Large] = if not b2 then v10.Size.Size_600 else v10.Size.Size_700,
+		[IconSize.XLarge] = if not b2 then v10.Size.Size_700 else v10.Size.Size_800,
+		[IconSize.XXLarge] = if not b2 then v10.Size.Size_800 else v10.Size.Size_900
+	}
+	local v12 = nil
+
+	if b1 and (typeof(p2) == "number" or typeof(p2) == "table" and typeof(p2:getValue()) == "number") then
+		v12 = p2
+	elseif typeof(p2) ~= "number" and (typeof(p2) ~= "table" or typeof(p2:getValue()) ~= "number") then
+		v12 = v11[p2]
+	end
+
+	if v12 == nil then
+		error("Invalid icon size: " .. tostring(p2))
+	end
+
+	if typeof(v12) == "table" then
+		return (v12:map(function(p3) -- line: 52
+			return UDim2.fromOffset(p3, p3)
+		end))
+	end
+
+	return (UDim2.fromOffset(v12, v12))
+end
+
+return useIconSize

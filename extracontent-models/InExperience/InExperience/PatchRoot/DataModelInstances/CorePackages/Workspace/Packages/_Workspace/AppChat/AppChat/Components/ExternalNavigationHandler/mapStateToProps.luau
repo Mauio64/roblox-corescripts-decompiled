@@ -1,8 +1,8 @@
-return function(v0, _) --[[ Line: 1 ]]
-    return {
-        screen = v0.ChatAppReducer.ExternalNavigationRequest.screen, 
-        params = v0.ChatAppReducer.ExternalNavigationRequest.params, 
-        requestId = v0.ChatAppReducer.ExternalNavigationRequest.requestId, 
-        completedRequestId = v0.ChatAppReducer.ExternalNavigationRequest.completedRequestId
-    };
-end;
+return function(p1, _) -- line: 1
+	return {
+		screen = p1.ChatAppReducer.ExternalNavigationRequest.screen,
+		params = p1.ChatAppReducer.ExternalNavigationRequest.params,
+		requestId = p1.ChatAppReducer.ExternalNavigationRequest.requestId,
+		completedRequestId = p1.ChatAppReducer.ExternalNavigationRequest.completedRequestId
+	}
+end

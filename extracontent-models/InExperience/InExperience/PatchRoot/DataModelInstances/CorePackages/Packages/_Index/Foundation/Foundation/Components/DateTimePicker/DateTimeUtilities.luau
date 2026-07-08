@@ -88,7 +88,7 @@ end
 return {
 	DATE_COMPOSITE_TOKEN = "L",
 	TIME_COMPOSITE_TOKEN = "LT",
-	formatLocalTime = function(p1, b1: boolean?) --[[ formatLocalTime ]] -- line: 229
+	formatLocalTime = function(p1, b1: boolean?) -- line: 229
 		-- upvalues: LocalizationService (copy)
 		local v55 = p1:FormatLocalTime("L", LocalizationService.RobloxLocaleId)
 
@@ -99,7 +99,7 @@ return {
 		return v55
 	end,
 	getDaysInMonth = getDaysInMonth,
-	getFirstDayOfWeek = function(n3: number, n4: number) --[[ getFirstDayOfWeek ]] -- line: 48
+	getFirstDayOfWeek = function(n3: number, n4: number) -- line: 48
 		local dateTime = DateTime.fromLocalTime(n4, n3, 1)
 
 		if dateTime then
@@ -108,7 +108,7 @@ return {
 
 		return 0
 	end,
-	getLastDayOfWeek = function(n5: number, n6: number) --[[ getLastDayOfWeek ]] -- line: 60
+	getLastDayOfWeek = function(n5: number, n6: number) -- line: 60
 		-- upvalues: getDaysInMonth (copy)
 		local dateTime = DateTime.fromLocalTime(n6, n5, (getDaysInMonth(n5, n6)))
 
@@ -118,21 +118,21 @@ return {
 
 		return 0
 	end,
-	getNextMonthInfo = function(n7: number, n8: number) --[[ getNextMonthInfo ]] -- line: 222
+	getNextMonthInfo = function(n7: number, n8: number) -- line: 222
 		if n7 == 12 then
 			return 1, n8 + 1
 		end
 
 		return n7 + 1, n8
 	end,
-	getPrevMonthInfo = function(n9: number, n10: number) --[[ getPrevMonthInfo ]] -- line: 215
+	getPrevMonthInfo = function(n9: number, n10: number) -- line: 215
 		if n9 == 1 then
 			return 12, n10 - 1
 		end
 
 		return n9 - 1, n10
 	end,
-	isDateWithinRange = function(p2, t3: {[any]: any}) --[[ isDateWithinRange ]] -- line: 84
+	isDateWithinRange = function(p2, t3: {[any]: any}) -- line: 84
 		local v22 = t3.startDate:ToLocalTime()
 		local UnixTimestamp = DateTime.fromLocalTime(v22.Year, v22.Month, v22.Day).UnixTimestamp
 		local v24 = t3.endDate:ToLocalTime()
@@ -142,7 +142,7 @@ return {
 
 		return UnixTimestamp <= UnixTimestamp3 and UnixTimestamp3 <= UnixTimestamp2
 	end,
-	getDateTimeFromText = function(s2: string) --[[ getDateTimeFromText ]] -- line: 159
+	getDateTimeFromText = function(s2: string) -- line: 159
 		-- upvalues: getHoursAndMinutesFromString (copy)
 		local v41
 
@@ -192,12 +192,12 @@ return {
 		return nil
 	end,
 	monthMap = t1,
-	roundDownToNearestMinute = function(p3) --[[ roundDownToNearestMinute ]] -- line: 78
+	roundDownToNearestMinute = function(p3) -- line: 78
 		local v19 = p3:ToLocalTime()
 
 		return DateTime.fromLocalTime(v19.Year, v19.Month, v19.Day, v19.Hour, v19.Minute, 0)
 	end,
-	roundToStartOfDay = function(p4) --[[ roundToStartOfDay ]] -- line: 72
+	roundToStartOfDay = function(p4) -- line: 72
 		local v17 = p4:ToLocalTime()
 
 		return DateTime.fromLocalTime(v17.Year, v17.Month, v17.Day).UnixTimestamp

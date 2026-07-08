@@ -1,10 +1,11 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetView);
-local v4 = require(l_Parent_0.Constants);
-return v1.createReducer(v4.View.Wide, {
-    [v3.name] = function(_, v6) --[[ Line: 8 ]]
-        return v6.view;
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetView = require(ParentParent.Actions.SetView)
+local Constants = require(ParentParent.Constants)
+
+return Rodux.createReducer(Constants.View.Wide, {
+	[SetView.name] = function(_, p2) -- line: 8
+		return p2.view
+	end
+})

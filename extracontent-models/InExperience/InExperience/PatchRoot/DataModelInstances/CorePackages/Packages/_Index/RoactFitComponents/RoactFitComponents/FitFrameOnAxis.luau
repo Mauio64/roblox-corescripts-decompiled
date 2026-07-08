@@ -1,166 +1,182 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Cryo);
-local v3 = require(l_Parent_1.Roact);
-local v4 = require(l_Parent_0.isRoact17);
-local v5 = require(l_Parent_0.Rect);
-local v6 = {
-    Horizontal = {}, 
-    Vertical = {}, 
-    Both = {}
-};
-local v7 = v3.PureComponent:extend("FitFrameOnAxis");
-v7.defaultProps = {
-    axis = v6.Vertical, 
-    minimumSize = UDim2.new(UDim.new(0, 0), UDim.new(0, 0)), 
-    margin = v5.square(0), 
-    FillDirection = Enum.FillDirection.Vertical, 
-    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-    ImageSet = {}, 
-    VerticalAlignment = Enum.VerticalAlignment.Top, 
-    contentPadding = UDim.new(0, 0), 
-    textProps = nil
-};
-v7.init = function(v8) --[[ Line: 31 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    v8.layoutRef = v3.createRef();
-    if v4() then
-        v8.frameRef = v8.props.forwardedRef or v3.createRef();
-    else
-        v8.frameRef = v8.props[v3.Ref] or v3.createRef();
-    end;
-    v8.onResize = function() --[[ Line: 39 ]]
-        -- upvalues: v8 (copy)
-        local l_current_0 = v8.layoutRef.current;
-        local l_current_1 = v8.frameRef.current;
-        if not l_current_1 or not l_current_0 then
-            return;
-        else
-            l_current_1.Size = v8:__getSize(l_current_0);
-            return;
-        end;
-    end;
-end;
-v7.render = function(v11) --[[ Line: 50 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    assert(v11.props.Size == nil, "Size is not a valid property of FitFrameOnAxis. Did you mean `minimumSize`?");
-    local v12 = v11.props[v3.Children] or {};
-    local v13 = v11:__getFilteredProps();
-    local v14 = v11.props.onActivated and "ImageButton" or "ImageLabel";
-    v12 = v2.Dictionary.join(v12, {
-        ["$layout"] = v3.createElement("UIListLayout", {
-            FillDirection = v11.props.FillDirection, 
-            HorizontalAlignment = v11.props.HorizontalAlignment, 
-            Padding = v11.props.contentPadding, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = v11.props.VerticalAlignment, 
-            [v3.Change.AbsoluteContentSize] = v11.onResize, 
-            [v3.Ref] = v11.layoutRef
-        }), 
-        ["$margin"] = v3.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v11.props.margin.left), 
-            PaddingRight = UDim.new(0, v11.props.margin.right), 
-            PaddingTop = UDim.new(0, v11.props.margin.top), 
-            PaddingBottom = UDim.new(0, v11.props.margin.bottom)
-        })
-    });
-    if v11.props.textProps then
-        return v3.createElement(v14, v13, {
-            TextLabel = v3.createElement("TextLabel", v2.Dictionary.join(v11.props.textProps, {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1)
-            })), 
-            ChildFrame = v3.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1)
-            }, v12)
-        });
-    else
-        return v3.createElement(v14, v13, v12);
-    end;
-end;
-v7.didMount = function(v15) --[[ Line: 93 ]] --[[ Name: didMount ]]
-    v15.onResize();
-end;
-v7.didUpdate = function(v16) --[[ Line: 97 ]] --[[ Name: didUpdate ]]
-    v16.onResize();
-end;
-v7.__getFilteredProps = function(v17) --[[ Line: 101 ]] --[[ Name: __getFilteredProps ]]
-    -- upvalues: v2 (copy), v3 (copy), v7 (copy)
-    local v18 = v2.Dictionary.join(v17.props.ImageSet, {
-        [v3.Ref] = v17.frameRef, 
-        [v3.Event.Activated] = v17.props.onActivated
-    });
-    for v19, _ in pairs(v7.defaultProps) do
-        v18[v19] = v2.None;
-    end;
-    v18.textProps = v2.None;
-    return v2.Dictionary.join(v17.props, v18, {
-        onActivated = v2.None, 
-        forwardedRef = v2.None, 
-        [v3.Children] = v2.None
-    });
-end;
-v7.__getSize = function(v21, v22) --[[ Line: 124 ]] --[[ Name: __getSize ]]
-    -- upvalues: v6 (copy)
-    if v21.props.axis == v6.Both then
-        return v21:__getBothAxisSize(v22);
-    else
-        local v23 = v21:__getAxisUDim(v22.AbsoluteContentSize);
-        local v24 = v21:__getOtherUDim();
-        if v21.props.axis == v6.Vertical then
-            return UDim2.new(v24, v23);
-        elseif v21.props.axis == v6.Horizontal then
-            return UDim2.new(v23, v24);
-        else
-            return;
-        end;
-    end;
-end;
-v7.__getBothAxisSize = function(v25, v26) --[[ Line: 141 ]] --[[ Name: __getBothAxisSize ]]
-    local l_minimumSize_0 = v25.props.minimumSize;
-    local l_AbsoluteContentSize_0 = v26.AbsoluteContentSize;
-    local v29 = UDim.new(l_minimumSize_0.X.Scale, l_AbsoluteContentSize_0.X + v25:__getHorizontalMargin());
-    local v30 = UDim.new(l_minimumSize_0.Y.Scale, l_AbsoluteContentSize_0.Y + v25:__getVerticalMargin());
-    return UDim2.new(v29, v30);
-end;
-v7.__getAxisUDim = function(v31, v32) --[[ Line: 151 ]] --[[ Name: __getAxisUDim ]]
-    -- upvalues: v6 (copy)
-    local l_minimumSize_1 = v31.props.minimumSize;
-    local v34 = nil;
-    local v35 = nil;
-    if v31.props.axis == v6.Vertical then
-        v34 = l_minimumSize_1.Y;
-        v35 = v32.Y + v31:__getVerticalMargin();
-    elseif v31.props.axis == v6.Horizontal then
-        v34 = l_minimumSize_1.X;
-        v35 = v32.X + v31:__getHorizontalMargin();
-    end;
-    return UDim.new(v34.Scale, (math.max(v35, v34.Offset)));
-end;
-v7.__getVerticalMargin = function(v36) --[[ Line: 169 ]] --[[ Name: __getVerticalMargin ]]
-    return v36.props.margin.top + v36.props.margin.bottom;
-end;
-v7.__getHorizontalMargin = function(v37) --[[ Line: 173 ]] --[[ Name: __getHorizontalMargin ]]
-    return v37.props.margin.left + v37.props.margin.right;
-end;
-v7.__getOtherUDim = function(v38) --[[ Line: 177 ]] --[[ Name: __getOtherUDim ]]
-    -- upvalues: v6 (copy)
-    local l_minimumSize_2 = v38.props.minimumSize;
-    if v38.props.axis == v6.Vertical then
-        return l_minimumSize_2.X;
-    elseif v38.props.axis == v6.Horizontal then
-        return l_minimumSize_2.Y;
-    else
-        return;
-    end;
-end;
-local v40 = nil;
-v40 = if v4() then v3.forwardRef(function(v41, v42) --[[ Line: 191 ]]
-    -- upvalues: v3 (copy), v7 (copy), v2 (copy)
-    return v3.createElement(v7, v2.Dictionary.join(v41, {
-        forwardedRef = v42
-    }));
-end) else v7;
-v40.Axis = v6;
-return v40;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Cryo = require(scriptParentParent.Cryo)
+local Roact = require(scriptParentParent.Roact)
+local isRoact17 = require(scriptParent.isRoact17)
+local Rect = require(scriptParent.Rect)
+local t1 = {
+	Horizontal = {},
+	Vertical = {},
+	Both = {}
+}
+local v8 = Roact.PureComponent:extend("FitFrameOnAxis")
+
+v8.defaultProps = {
+	textProps = nil,
+	axis = t1.Vertical,
+	minimumSize = UDim2.new(UDim.new(0, 0), UDim.new(0, 0)),
+	margin = Rect.square(0),
+	FillDirection = Enum.FillDirection.Vertical,
+	HorizontalAlignment = Enum.HorizontalAlignment.Left,
+	ImageSet = {},
+	VerticalAlignment = Enum.VerticalAlignment.Top,
+	contentPadding = UDim.new(0, 0)
+}
+
+function v8.init(p1) -- line: 31
+	-- upvalues: Roact (copy), isRoact17 (copy)
+	p1.layoutRef = Roact.createRef()
+
+	if isRoact17() then
+		p1.frameRef = p1.props.forwardedRef or Roact.createRef()
+	else
+		p1.frameRef = p1.props[Roact.Ref] or Roact.createRef()
+	end
+
+	function p1.onResize() -- line: 39
+		-- upvalues: p1 (copy)
+		local current = p1.layoutRef.current
+		local current2 = p1.frameRef.current
+
+		if not current2 or not current then
+			return
+		end
+
+		current2.Size = p1:__getSize(current)
+	end
+end
+function v8.render(p2) -- line: 50
+	-- upvalues: Roact (copy), Cryo (copy)
+	assert(p2.props.Size == nil, "Size is not a valid property of FitFrameOnAxis. Did you mean `minimumSize`?")
+
+	local v12 = p2.props[Roact.Children] or {}
+	local v13 = p2:__getFilteredProps()
+	local v14 = not p2.props.onActivated and "ImageLabel" or "ImageButton"
+	local v15 = Cryo.Dictionary.join(v12, {
+		["$layout"] = Roact.createElement("UIListLayout", {
+			FillDirection = p2.props.FillDirection,
+			HorizontalAlignment = p2.props.HorizontalAlignment,
+			Padding = p2.props.contentPadding,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = p2.props.VerticalAlignment,
+			[Roact.Change.AbsoluteContentSize] = p2.onResize,
+			[Roact.Ref] = p2.layoutRef
+		}),
+		["$margin"] = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, p2.props.margin.left),
+			PaddingRight = UDim.new(0, p2.props.margin.right),
+			PaddingTop = UDim.new(0, p2.props.margin.top),
+			PaddingBottom = UDim.new(0, p2.props.margin.bottom)
+		})
+	})
+
+	if p2.props.textProps then
+		return Roact.createElement(v14, v13, {
+			TextLabel = Roact.createElement("TextLabel", Cryo.Dictionary.join(p2.props.textProps, {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			})),
+			ChildFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, v15)
+		})
+	end
+
+	return Roact.createElement(v14, v13, v15)
+end
+function v8.didMount(p3) -- line: 93
+	p3.onResize()
+end
+function v8.didUpdate(p4) -- line: 97
+	p4.onResize()
+end
+function v8.__getFilteredProps(p5) -- line: 101
+	-- upvalues: Cryo (copy), Roact (copy), v8 (copy)
+	local v19 = Cryo.Dictionary.join(p5.props.ImageSet, {
+		[Roact.Ref] = p5.frameRef,
+		[Roact.Event.Activated] = p5.props.onActivated
+	})
+
+	for k, _ in pairs(v8.defaultProps) do
+		v19[k] = Cryo.None
+	end
+
+	v19.textProps = Cryo.None
+
+	return Cryo.Dictionary.join(p5.props, v19, {
+		onActivated = Cryo.None,
+		forwardedRef = Cryo.None,
+		[Roact.Children] = Cryo.None
+	})
+end
+function v8.__getSize(p6, p7) -- line: 124
+	-- upvalues: t1 (copy)
+	if p6.props.axis == t1.Both then
+		return p6:__getBothAxisSize(p7)
+	end
+
+	local v24 = p6:__getAxisUDim(p7.AbsoluteContentSize)
+	local v25 = p6:__getOtherUDim()
+
+	if p6.props.axis == t1.Vertical then
+		return UDim2.new(v25, v24)
+	end
+
+	if p6.props.axis == t1.Horizontal then
+		return UDim2.new(v24, v25)
+	end
+end
+function v8.__getBothAxisSize(p8, p9) -- line: 141
+	local minimumSize = p8.props.minimumSize
+	local AbsoluteContentSize = p9.AbsoluteContentSize
+	local uDim = UDim.new(minimumSize.X.Scale, AbsoluteContentSize.X + p8:__getHorizontalMargin())
+	local uDim2 = UDim.new(minimumSize.Y.Scale, AbsoluteContentSize.Y + p8:__getVerticalMargin())
+
+	return UDim2.new(uDim, uDim2)
+end
+function v8.__getAxisUDim(p10, p11) -- line: 151
+	-- upvalues: t1 (copy)
+	local minimumSize = p10.props.minimumSize
+	local minimumSizeY = nil
+	local v36 = nil
+
+	if p10.props.axis == t1.Vertical then
+		minimumSizeY = minimumSize.Y
+		v36 = p11.Y + p10:__getVerticalMargin()
+	elseif p10.props.axis == t1.Horizontal then
+		minimumSizeY = minimumSize.X
+		v36 = p11.X + p10:__getHorizontalMargin()
+	end
+
+	return UDim.new(minimumSizeY.Scale, (math.max(v36, minimumSizeY.Offset)))
+end
+function v8.__getVerticalMargin(p12) -- line: 169
+	return p12.props.margin.top + p12.props.margin.bottom
+end
+function v8.__getHorizontalMargin(p13) -- line: 173
+	return p13.props.margin.left + p13.props.margin.right
+end
+function v8.__getOtherUDim(p14) -- line: 177
+	-- upvalues: t1 (copy)
+	local minimumSize = p14.props.minimumSize
+
+	if p14.props.axis == t1.Vertical then
+		return minimumSize.X
+	end
+
+	if p14.props.axis == t1.Horizontal then
+		return minimumSize.Y
+	end
+end
+
+local v9 = if not isRoact17() then v8 else Roact.forwardRef(function(p15, p16) -- line: 191
+	-- upvalues: Roact (copy), v8 (copy), Cryo (copy)
+	return Roact.createElement(v8, Cryo.Dictionary.join(p15, {
+		forwardedRef = p16
+	}))
+end)
+
+v9.Axis = t1
+
+return v9

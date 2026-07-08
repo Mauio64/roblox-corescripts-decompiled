@@ -1,488 +1,554 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_Object_0 = v2.Object;
-local l_Array_0 = v2.Array;
-local l_inspect_0 = v2.util.inspect;
-local l___DEV___0 = v1.__DEV__;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local _ = require(l_Parent_0.Shared);
-local _ = require(script.Parent.ReactInternalTypes);
-local v10 = require(script.Parent.ReactRootTags);
-local v11 = require(script.Parent.ReactWorkTags);
-local v12 = require(script.Parent.ReactTypeOfMode);
-local v13 = require(script.Parent.ReactFiberLane);
-local _ = require(script.Parent.ReactFiberHostConfig);
-local _ = require(script.Parent.ReactFiberOffscreenComponent);
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_enableProfilerTimer_0 = require(l_Parent_0.Shared).ReactFeatureFlags.enableProfilerTimer;
-local v18 = require(script.Parent.ReactFiberFlags);
-local l_NoFlags_0 = v18.NoFlags;
-local l_Placement_0 = v18.Placement;
-local l_StaticMask_0 = v18.StaticMask;
-local l_ConcurrentRoot_0 = v10.ConcurrentRoot;
-local l_BlockingRoot_0 = v10.BlockingRoot;
-local l_IndeterminateComponent_0 = v11.IndeterminateComponent;
-local l_ClassComponent_0 = v11.ClassComponent;
-local l_HostRoot_0 = v11.HostRoot;
-local l_HostComponent_0 = v11.HostComponent;
-local l_HostText_0 = v11.HostText;
-local l_HostPortal_0 = v11.HostPortal;
-local l_ForwardRef_0 = v11.ForwardRef;
-local l_Fragment_0 = v11.Fragment;
-local l_Mode_0 = v11.Mode;
-local l_ContextProvider_0 = v11.ContextProvider;
-local l_ContextConsumer_0 = v11.ContextConsumer;
-local l_Profiler_0 = v11.Profiler;
-local l_SuspenseComponent_0 = v11.SuspenseComponent;
-local l_SuspenseListComponent_0 = v11.SuspenseListComponent;
-local l_DehydratedFragment_0 = v11.DehydratedFragment;
-local l_FunctionComponent_0 = v11.FunctionComponent;
-local l_MemoComponent_0 = v11.MemoComponent;
-local l_SimpleMemoComponent_0 = v11.SimpleMemoComponent;
-local l_LazyComponent_0 = v11.LazyComponent;
-local l_FundamentalComponent_0 = v11.FundamentalComponent;
-local l_ScopeComponent_0 = v11.ScopeComponent;
-local l_OffscreenComponent_0 = v11.OffscreenComponent;
-local l_LegacyHiddenComponent_0 = v11.LegacyHiddenComponent;
-local l_getComponentName_0 = require(l_Parent_0.Shared).getComponentName;
-local l_isDevToolsPresent_0 = require(script.Parent["ReactFiberDevToolsHook.new"]).isDevToolsPresent;
-local v49 = require(script.Parent["ReactFiberHotReloading.new"]);
-local l_resolveClassForHotReloading_0 = v49.resolveClassForHotReloading;
-local l_resolveFunctionForHotReloading_0 = v49.resolveFunctionForHotReloading;
-local l_resolveForwardRefForHotReloading_0 = v49.resolveForwardRefForHotReloading;
-local l_NoLanes_0 = v13.NoLanes;
-local l_NoMode_0 = v12.NoMode;
-local l_ConcurrentMode_0 = v12.ConcurrentMode;
-local l_DebugTracingMode_0 = v12.DebugTracingMode;
-local l_ProfileMode_0 = v12.ProfileMode;
-local l_StrictMode_0 = v12.StrictMode;
-local l_BlockingMode_0 = v12.BlockingMode;
-local l_ReactSymbols_0 = require(l_Parent_0.Shared).ReactSymbols;
-local l_REACT_FORWARD_REF_TYPE_0 = l_ReactSymbols_0.REACT_FORWARD_REF_TYPE;
-local l_REACT_FRAGMENT_TYPE_0 = l_ReactSymbols_0.REACT_FRAGMENT_TYPE;
-local l_REACT_ELEMENT_TYPE_0 = l_ReactSymbols_0.REACT_ELEMENT_TYPE;
-local l_REACT_DEBUG_TRACING_MODE_TYPE_0 = l_ReactSymbols_0.REACT_DEBUG_TRACING_MODE_TYPE;
-local l_REACT_STRICT_MODE_TYPE_0 = l_ReactSymbols_0.REACT_STRICT_MODE_TYPE;
-local l_REACT_PROFILER_TYPE_0 = l_ReactSymbols_0.REACT_PROFILER_TYPE;
-local l_REACT_PROVIDER_TYPE_0 = l_ReactSymbols_0.REACT_PROVIDER_TYPE;
-local l_REACT_CONTEXT_TYPE_0 = l_ReactSymbols_0.REACT_CONTEXT_TYPE;
-local l_REACT_SUSPENSE_TYPE_0 = l_ReactSymbols_0.REACT_SUSPENSE_TYPE;
-local l_REACT_SUSPENSE_LIST_TYPE_0 = l_ReactSymbols_0.REACT_SUSPENSE_LIST_TYPE;
-local l_REACT_MEMO_TYPE_0 = l_ReactSymbols_0.REACT_MEMO_TYPE;
-local l_REACT_LAZY_TYPE_0 = l_ReactSymbols_0.REACT_LAZY_TYPE;
-local l_REACT_OFFSCREEN_TYPE_0 = l_ReactSymbols_0.REACT_OFFSCREEN_TYPE;
-local l_REACT_LEGACY_HIDDEN_TYPE_0 = l_ReactSymbols_0.REACT_LEGACY_HIDDEN_TYPE;
-local v75 = nil;
-local v76 = nil;
-local v77 = nil;
-local v78 = nil;
-local v79 = nil;
-local v80 = nil;
-local v81 = nil;
-local v82 = nil;
-local v83 = 1;
-local function v93(v84, v85, v86, v87, v88, v89, v90, v91) --[[ Line: 167 ]] --[[ Name: createFiber ]]
-    -- upvalues: l_NoFlags_0 (copy), l_NoLanes_0 (copy), l_enableProfilerTimer_0 (copy), l___DEV___0 (copy), v83 (ref)
-    local v92 = {
-        tag = v84, 
-        key = v86, 
-        elementType = v88, 
-        type = v89, 
-        stateNode = v90, 
-        index = 1, 
-        pendingProps = v85, 
-        mode = v87, 
-        flags = l_NoFlags_0, 
-        subtreeFlags = l_NoFlags_0, 
-        lanes = v91 or l_NoLanes_0, 
-        childLanes = l_NoLanes_0
-    };
-    if l_enableProfilerTimer_0 then
-        v92.actualDuration = 0;
-        v92.actualStartTime = -1;
-        v92.selfBaseDuration = 0;
-        v92.treeBaseDuration = 0;
-    end;
-    if l___DEV___0 then
-        v92._debugID = v83;
-        v83 = v83 + 1;
-        v92._debugSource = nil;
-        v92._debugOwner = nil;
-        v92._debugNeedsRemount = false;
-        v92._debugHookTypes = nil;
-    end;
-    return v92;
-end;
-_shouldConstruct = function(v94) --[[ Line: 267 ]] --[[ Name: _shouldConstruct ]]
-    local v95 = false;
-    if type(v94) ~= "function" then
-        v95 = not not v94.isReactComponent;
-    end;
-    return v95;
-end;
-local function v97(v96) --[[ Line: 274 ]] --[[ Name: isSimpleFunctionComponent ]]
-    return type(v96) == "function";
-end;
-local function v101(v98) --[[ Line: 282 ]] --[[ Name: resolveLazyComponentTag ]]
-    -- upvalues: l_FunctionComponent_0 (copy), l_ClassComponent_0 (copy), l_REACT_FORWARD_REF_TYPE_0 (copy), l_ForwardRef_0 (copy), l_REACT_MEMO_TYPE_0 (copy), l_MemoComponent_0 (copy), l_IndeterminateComponent_0 (copy)
-    local v99 = typeof(v98);
-    if v99 == "function" then
-        return l_FunctionComponent_0;
-    else
-        if v99 == "table" then
-            if v98.isReactComponent then
-                return l_ClassComponent_0;
-            else
-                local v100 = v98["$$typeof"];
-                if v100 == l_REACT_FORWARD_REF_TYPE_0 then
-                    return l_ForwardRef_0;
-                elseif v100 == l_REACT_MEMO_TYPE_0 then
-                    return l_MemoComponent_0;
-                end;
-            end;
-        end;
-        return l_IndeterminateComponent_0;
-    end;
-end;
-local function v106(v102, v103) --[[ Line: 305 ]] --[[ Name: createWorkInProgress ]]
-    -- upvalues: v93 (copy), l___DEV___0 (copy), l_NoFlags_0 (copy), l_enableProfilerTimer_0 (copy), l_StaticMask_0 (copy), l_IndeterminateComponent_0 (copy), l_FunctionComponent_0 (copy), l_SimpleMemoComponent_0 (copy), l_resolveFunctionForHotReloading_0 (copy), l_ClassComponent_0 (copy), l_resolveClassForHotReloading_0 (copy), l_ForwardRef_0 (copy), l_resolveForwardRefForHotReloading_0 (copy)
-    local l_alternate_0 = v102.alternate;
-    if l_alternate_0 == nil then
-        l_alternate_0 = v93(v102.tag, v103, v102.key, v102.mode, v102.elementType, v102.type, v102.stateNode);
-        if l___DEV___0 then
-            l_alternate_0._debugID = v102._debugID;
-            l_alternate_0._debugSource = v102._debugSource;
-            l_alternate_0._debugOwner = v102._debugOwner;
-            l_alternate_0._debugHookTypes = v102._debugHookTypes;
-        end;
-        l_alternate_0.alternate = v102;
-        v102.alternate = l_alternate_0;
-    else
-        l_alternate_0.pendingProps = v103;
-        l_alternate_0.type = v102.type;
-        l_alternate_0.flags = l_NoFlags_0;
-        l_alternate_0.subtreeFlags = l_NoFlags_0;
-        l_alternate_0.deletions = nil;
-        if l_enableProfilerTimer_0 then
-            l_alternate_0.actualDuration = 0;
-            l_alternate_0.actualStartTime = -1;
-        end;
-    end;
-    l_alternate_0.flags = bit32.band(v102.flags, l_StaticMask_0);
-    l_alternate_0.childLanes = v102.childLanes;
-    l_alternate_0.lanes = v102.lanes;
-    l_alternate_0.child = v102.child;
-    l_alternate_0.memoizedProps = v102.memoizedProps;
-    l_alternate_0.memoizedState = v102.memoizedState;
-    l_alternate_0.updateQueue = v102.updateQueue;
-    local l_dependencies_0 = v102.dependencies;
-    if l_dependencies_0 == nil then
-        l_alternate_0.dependencies = nil;
-    else
-        l_alternate_0.dependencies = {
-            lanes = l_dependencies_0.lanes, 
-            firstContext = l_dependencies_0.firstContext
-        };
-    end;
-    l_alternate_0.sibling = v102.sibling;
-    l_alternate_0.index = v102.index;
-    l_alternate_0.ref = v102.ref;
-    if l_enableProfilerTimer_0 then
-        l_alternate_0.selfBaseDuration = v102.selfBaseDuration;
-        l_alternate_0.treeBaseDuration = v102.treeBaseDuration;
-    end;
-    if l___DEV___0 then
-        l_alternate_0._debugNeedsRemount = v102._debugNeedsRemount;
-        if l_alternate_0.tag == l_IndeterminateComponent_0 or l_alternate_0.tag == l_FunctionComponent_0 or l_alternate_0.tag == l_SimpleMemoComponent_0 then
-            l_alternate_0.type = l_resolveFunctionForHotReloading_0(v102.type);
-            return l_alternate_0;
-        elseif l_alternate_0.tag == l_ClassComponent_0 then
-            l_alternate_0.type = l_resolveClassForHotReloading_0(v102.type);
-            return l_alternate_0;
-        elseif l_alternate_0.tag == l_ForwardRef_0 then
-            l_alternate_0.type = l_resolveForwardRefForHotReloading_0(v102.type);
-        end;
-    end;
-    return l_alternate_0;
-end;
-local function v111(v107, v108) --[[ Line: 409 ]] --[[ Name: resetWorkInProgress ]]
-    -- upvalues: l_StaticMask_0 (copy), l_Placement_0 (copy), l_NoLanes_0 (copy), l_NoFlags_0 (copy), l_enableProfilerTimer_0 (copy)
-    v107.flags = bit32.band(v107.flags, (bit32.bor(l_StaticMask_0, l_Placement_0)));
-    local l_alternate_1 = v107.alternate;
-    if l_alternate_1 == nil then
-        v107.childLanes = l_NoLanes_0;
-        v107.lanes = v108;
-        v107.child = nil;
-        v107.subtreeFlags = l_NoFlags_0;
-        v107.memoizedProps = nil;
-        v107.memoizedState = nil;
-        v107.updateQueue = nil;
-        v107.dependencies = nil;
-        v107.stateNode = nil;
-        if l_enableProfilerTimer_0 then
-            v107.selfBaseDuration = 0;
-            v107.treeBaseDuration = 0;
-            return v107;
-        end;
-    else
-        v107.childLanes = l_alternate_1.childLanes;
-        v107.lanes = l_alternate_1.lanes;
-        v107.child = l_alternate_1.child;
-        v107.subtreeFlags = l_alternate_1.subtreeFlags;
-        v107.deletions = nil;
-        v107.memoizedProps = l_alternate_1.memoizedProps;
-        v107.memoizedState = l_alternate_1.memoizedState;
-        v107.updateQueue = l_alternate_1.updateQueue;
-        v107.type = l_alternate_1.type;
-        local l_dependencies_1 = l_alternate_1.dependencies;
-        if l_dependencies_1 == nil then
-            v107.dependencies = nil;
-        else
-            v107.dependencies = {
-                lanes = l_dependencies_1.lanes, 
-                firstContext = l_dependencies_1.firstContext
-            };
-        end;
-        if l_enableProfilerTimer_0 then
-            v107.selfBaseDuration = l_alternate_1.selfBaseDuration;
-            v107.treeBaseDuration = l_alternate_1.treeBaseDuration;
-        end;
-    end;
-    return v107;
-end;
-local function v114(v112) --[[ Line: 484 ]] --[[ Name: createHostRootFiber ]]
-    -- upvalues: l_ConcurrentRoot_0 (copy), l_ConcurrentMode_0 (copy), l_BlockingMode_0 (copy), l_StrictMode_0 (copy), l_BlockingRoot_0 (copy), l_NoMode_0 (copy), l_enableProfilerTimer_0 (copy), l_isDevToolsPresent_0 (copy), l_ProfileMode_0 (copy), v93 (copy), l_HostRoot_0 (copy)
-    local v113 = nil;
-    v113 = if v112 == l_ConcurrentRoot_0 then bit32.bor(l_ConcurrentMode_0, l_BlockingMode_0, l_StrictMode_0) else if v112 == l_BlockingRoot_0 then bit32.bor(l_BlockingMode_0, l_StrictMode_0) else l_NoMode_0;
-    if l_enableProfilerTimer_0 and l_isDevToolsPresent_0() then
-        v113 = bit32.bor(v113, l_ProfileMode_0);
-    end;
-    return (v93(l_HostRoot_0, nil, nil, v113));
-end;
-local function v130(v115, v116, v117, v118, v119, v120) --[[ Line: 505 ]] --[[ Name: createFiberFromTypeAndProps ]]
-    -- upvalues: l_IndeterminateComponent_0 (copy), l___DEV___0 (copy), l_resolveFunctionForHotReloading_0 (copy), l_ClassComponent_0 (copy), l_resolveClassForHotReloading_0 (copy), l_HostComponent_0 (copy), l_REACT_FRAGMENT_TYPE_0 (copy), v77 (ref), l_REACT_DEBUG_TRACING_MODE_TYPE_0 (copy), l_Mode_0 (copy), l_DebugTracingMode_0 (copy), l_REACT_STRICT_MODE_TYPE_0 (copy), l_StrictMode_0 (copy), l_REACT_PROFILER_TYPE_0 (copy), v76 (ref), l_REACT_SUSPENSE_TYPE_0 (copy), v79 (ref), l_REACT_OFFSCREEN_TYPE_0 (copy), v80 (ref), l_REACT_LEGACY_HIDDEN_TYPE_0 (copy), v81 (ref), l_REACT_PROVIDER_TYPE_0 (copy), l_ContextProvider_0 (copy), l_REACT_CONTEXT_TYPE_0 (copy), l_ContextConsumer_0 (copy), l_REACT_FORWARD_REF_TYPE_0 (copy), l_ForwardRef_0 (copy), l_resolveForwardRefForHotReloading_0 (copy), l_REACT_MEMO_TYPE_0 (copy), l_MemoComponent_0 (copy), l_REACT_LAZY_TYPE_0 (copy), l_LazyComponent_0 (copy), l_Object_0 (copy), l_inspect_0 (copy), l_getComponentName_0 (copy), l_Array_0 (copy), l_REACT_ELEMENT_TYPE_0 (copy), l_invariant_0 (copy), v93 (copy)
-    local l_l_IndeterminateComponent_0_0 = l_IndeterminateComponent_0;
-    local l_v115_0 = v115;
-    local v123 = type(v115);
-    if v123 == "function" then
-        if l___DEV___0 then
-            l_v115_0 = l_resolveFunctionForHotReloading_0(l_v115_0);
-        end;
-    elseif v123 == "table" and v115.isReactComponent then
-        l_l_IndeterminateComponent_0_0 = l_ClassComponent_0;
-        if l___DEV___0 then
-            l_v115_0 = l_resolveClassForHotReloading_0(l_v115_0);
-        end;
-    elseif v123 == "string" then
-        l_l_IndeterminateComponent_0_0 = l_HostComponent_0;
-    elseif v115 == l_REACT_FRAGMENT_TYPE_0 then
-        return v77(v117.children, v119, v120, v116);
-    elseif v115 == l_REACT_DEBUG_TRACING_MODE_TYPE_0 then
-        l_l_IndeterminateComponent_0_0 = l_Mode_0;
-        v119 = bit32.bor(v119, l_DebugTracingMode_0);
-    elseif v115 == l_REACT_STRICT_MODE_TYPE_0 then
-        l_l_IndeterminateComponent_0_0 = l_Mode_0;
-        v119 = bit32.bor(v119, l_StrictMode_0);
-    elseif v115 == l_REACT_PROFILER_TYPE_0 then
-        return v76(v117, v119, v120, v116);
-    elseif v115 == l_REACT_SUSPENSE_TYPE_0 then
-        return v79(v117, v119, v120, v116);
-    elseif v115 == l_REACT_OFFSCREEN_TYPE_0 then
-        return v80(v117, v119, v120, v116);
-    elseif v115 == l_REACT_LEGACY_HIDDEN_TYPE_0 then
-        return v81(v117, v119, v120, v116);
-    else
-        local v124 = false;
-        local v125 = nil;
-        if v123 == "table" then
-            v125 = v115["$$typeof"];
-            if v125 == l_REACT_PROVIDER_TYPE_0 then
-                l_l_IndeterminateComponent_0_0 = l_ContextProvider_0;
-                v124 = true;
-            elseif v125 == l_REACT_CONTEXT_TYPE_0 then
-                l_l_IndeterminateComponent_0_0 = l_ContextConsumer_0;
-                v124 = true;
-            elseif v125 == l_REACT_FORWARD_REF_TYPE_0 then
-                l_l_IndeterminateComponent_0_0 = l_ForwardRef_0;
-                if l___DEV___0 then
-                    l_v115_0 = l_resolveForwardRefForHotReloading_0(l_v115_0);
-                end;
-                v124 = true;
-            elseif v125 == l_REACT_MEMO_TYPE_0 then
-                l_l_IndeterminateComponent_0_0 = l_MemoComponent_0;
-                v124 = true;
-            elseif v125 == l_REACT_LAZY_TYPE_0 then
-                l_l_IndeterminateComponent_0_0 = l_LazyComponent_0;
-                l_v115_0 = nil;
-                v124 = true;
-            end;
-        end;
-        if not v124 then
-            local v126 = "";
-            if l___DEV___0 then
-                if v115 == nil or v123 == "table" and #l_Object_0.keys(v115) == 0 then
-                    v126 = v126 .. " You likely forgot to export your component from the file " .. "it's defined in, or you might have mixed up default and " .. "named imports.";
-                elseif v115 ~= nil and v123 == "table" then
-                    v126 = v126 .. "\n" .. l_inspect_0(v115);
-                end;
-                local v127 = nil;
-                if v118 then
-                    v127 = l_getComponentName_0(v118.type);
-                end;
-                if v127 ~= nil and v127 ~= "" then
-                    v126 = v126 .. "\n\nCheck the render method of `" .. v127 .. "`.";
-                elseif v118 then
-                    v126 = v126 .. "\n" .. l_inspect_0(v118);
-                end;
-            end;
-            local v128 = nil;
-            if v115 == nil then
-                v128 = "nil";
-            elseif l_Array_0.isArray(v115) then
-                v128 = "array";
-            elseif v123 == "table" and v125 == l_REACT_ELEMENT_TYPE_0 then
-                v128 = string.format("<%s />", l_getComponentName_0(v115.type) or "Unknown");
-                v126 = " Did you accidentally export a JSX literal or Element instead of a component?";
-            else
-                v128 = v123;
-            end;
-            l_invariant_0(false, "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", v128, v126);
-        end;
-    end;
-    local v129 = v93(l_l_IndeterminateComponent_0_0, v117, v116, v119, v115, l_v115_0, nil, v120);
-    if l___DEV___0 then
-        v129._debugOwner = v118;
-    end;
-    return v129;
-end;
-local function v139(v131, v132, v133) --[[ Line: 659 ]] --[[ Name: createFiberFromElement ]]
-    -- upvalues: l___DEV___0 (copy), v130 (copy)
-    local v134 = nil;
-    if l___DEV___0 then
-        v134 = v131._owner;
-    end;
-    local l_type_0 = v131.type;
-    local l_key_0 = v131.key;
-    local l_props_0 = v131.props;
-    local v138 = v130(l_type_0, l_key_0, l_props_0, v134, v132, v133);
-    if l___DEV___0 then
-        v138._debugSource = v131._source;
-        v138._debugOwner = v131._owner;
-    end;
-    return v138;
-end;
-v77 = function(v140, v141, v142, v143) --[[ Line: 687 ]] --[[ Name: createFiberFromFragment ]]
-    -- upvalues: v93 (copy), l_Fragment_0 (copy)
-    return (v93(l_Fragment_0, v140, v143, v141, nil, nil, nil, v142));
-end;
-v78 = function(v144, v145, v146, v147, v148) --[[ Line: 700 ]] --[[ Name: createFiberFromFundamental ]]
-    -- upvalues: v93 (copy), l_FundamentalComponent_0 (copy)
-    return (v93(l_FundamentalComponent_0, v145, v148, v146, v144, v144, nil, v147));
-end;
-v75 = function(v149, v150, v151, v152, v153) --[[ Line: 725 ]] --[[ Name: createFiberFromScope ]]
-    -- upvalues: v93 (copy), l_ScopeComponent_0 (copy)
-    return (v93(l_ScopeComponent_0, v150, v153, v151, v149, v149, nil, v152));
-end;
-v76 = function(v154, v155, v156, v157) --[[ Line: 742 ]] --[[ Name: createFiberFromProfiler ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), v93 (copy), l_Profiler_0 (copy), l_ProfileMode_0 (copy), l_REACT_PROFILER_TYPE_0 (copy), l_enableProfilerTimer_0 (copy)
-    if l___DEV___0 and typeof(v154.id) ~= "string" then
-        l_console_0.error("Profiler must specify an \"id\" as a prop");
-    end;
-    return (v93(l_Profiler_0, v154, v157, bit32.bor(v155, l_ProfileMode_0), l_REACT_PROFILER_TYPE_0, l_REACT_PROFILER_TYPE_0, if l_enableProfilerTimer_0 then {
-        effectDuration = 0, 
-        passiveEffectDuration = 0
-    } else nil, v156));
-end;
-v79 = function(v158, v159, v160, v161) --[[ Line: 786 ]] --[[ Name: createFiberFromSuspense ]]
-    -- upvalues: v93 (copy), l_SuspenseComponent_0 (copy), l_REACT_SUSPENSE_TYPE_0 (copy)
-    return (v93(l_SuspenseComponent_0, v158, v161, v159, l_REACT_SUSPENSE_TYPE_0, l_REACT_SUSPENSE_TYPE_0, nil, v160));
-end;
-v82 = function(v162, v163, v164, v165) --[[ Line: 815 ]] --[[ Name: createFiberFromSuspenseList ]]
-    -- upvalues: v93 (copy), l_SuspenseListComponent_0 (copy), l_REACT_SUSPENSE_LIST_TYPE_0 (copy), l___DEV___0 (copy)
-    return (v93(l_SuspenseListComponent_0, v162, v165, v163, l_REACT_SUSPENSE_LIST_TYPE_0, if l___DEV___0 then l_REACT_SUSPENSE_LIST_TYPE_0 else nil, nil, v164));
-end;
-v80 = function(v166, v167, v168, v169) --[[ Line: 844 ]] --[[ Name: createFiberFromOffscreen ]]
-    -- upvalues: v93 (copy), l_OffscreenComponent_0 (copy), l_REACT_OFFSCREEN_TYPE_0 (copy), l___DEV___0 (copy)
-    return (v93(l_OffscreenComponent_0, v166, v169, v167, l_REACT_OFFSCREEN_TYPE_0, if l___DEV___0 then l_REACT_OFFSCREEN_TYPE_0 else nil, nil, v168));
-end;
-v81 = function(v170, v171, v172, v173) --[[ Line: 873 ]] --[[ Name: createFiberFromLegacyHidden ]]
-    -- upvalues: v93 (copy), l_LegacyHiddenComponent_0 (copy), l_REACT_LEGACY_HIDDEN_TYPE_0 (copy), l___DEV___0 (copy)
-    return (v93(l_LegacyHiddenComponent_0, v170, v173, v171, l_REACT_LEGACY_HIDDEN_TYPE_0, if l___DEV___0 then l_REACT_LEGACY_HIDDEN_TYPE_0 else nil, nil, v172));
-end;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Object = LuauPolyfill.Object
+local Array = LuauPolyfill.Array
+local inspect = LuauPolyfill.util.inspect
+local __DEV__ = ReactGlobals.__DEV__
+local console = require(ParentParent.Shared).console
+
+require(ParentParent.Shared)
+require(script.Parent.ReactInternalTypes)
+
+local ReactRootTags = require(script.Parent.ReactRootTags)
+local ReactWorkTags = require(script.Parent.ReactWorkTags)
+local ReactTypeOfMode = require(script.Parent.ReactTypeOfMode)
+local ReactFiberLane = require(script.Parent.ReactFiberLane)
+
+require(script.Parent.ReactFiberHostConfig)
+require(script.Parent.ReactFiberOffscreenComponent)
+
+local invariant = require(ParentParent.Shared).invariant
+local enableProfilerTimer = require(ParentParent.Shared).ReactFeatureFlags.enableProfilerTimer
+local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
+local NoFlags = ReactFiberFlags.NoFlags
+local Placement = ReactFiberFlags.Placement
+local StaticMask = ReactFiberFlags.StaticMask
+local ConcurrentRoot = ReactRootTags.ConcurrentRoot
+local BlockingRoot = ReactRootTags.BlockingRoot
+local IndeterminateComponent = ReactWorkTags.IndeterminateComponent
+local ClassComponent = ReactWorkTags.ClassComponent
+local HostRoot = ReactWorkTags.HostRoot
+local HostComponent = ReactWorkTags.HostComponent
+local HostText = ReactWorkTags.HostText
+local HostPortal = ReactWorkTags.HostPortal
+local ForwardRef = ReactWorkTags.ForwardRef
+local Fragment = ReactWorkTags.Fragment
+local ReactWorkTagsMode = ReactWorkTags.Mode
+local ContextProvider = ReactWorkTags.ContextProvider
+local ContextConsumer = ReactWorkTags.ContextConsumer
+local Profiler = ReactWorkTags.Profiler
+local SuspenseComponent = ReactWorkTags.SuspenseComponent
+local SuspenseListComponent = ReactWorkTags.SuspenseListComponent
+local DehydratedFragment = ReactWorkTags.DehydratedFragment
+local FunctionComponent = ReactWorkTags.FunctionComponent
+local MemoComponent = ReactWorkTags.MemoComponent
+local SimpleMemoComponent = ReactWorkTags.SimpleMemoComponent
+local LazyComponent = ReactWorkTags.LazyComponent
+local FundamentalComponent = ReactWorkTags.FundamentalComponent
+local ScopeComponent = ReactWorkTags.ScopeComponent
+local OffscreenComponent = ReactWorkTags.OffscreenComponent
+local LegacyHiddenComponent = ReactWorkTags.LegacyHiddenComponent
+local getComponentName = require(ParentParent.Shared).getComponentName
+local isDevToolsPresent = require(script.Parent["ReactFiberDevToolsHook.new"]).isDevToolsPresent
+local lib = require(script.Parent["ReactFiberHotReloading.new"])
+local resolveClassForHotReloading = lib.resolveClassForHotReloading
+local resolveFunctionForHotReloading = lib.resolveFunctionForHotReloading
+local resolveForwardRefForHotReloading = lib.resolveForwardRefForHotReloading
+local NoLanes = ReactFiberLane.NoLanes
+local NoMode = ReactTypeOfMode.NoMode
+local ConcurrentMode = ReactTypeOfMode.ConcurrentMode
+local DebugTracingMode = ReactTypeOfMode.DebugTracingMode
+local ProfileMode = ReactTypeOfMode.ProfileMode
+local StrictMode = ReactTypeOfMode.StrictMode
+local BlockingMode = ReactTypeOfMode.BlockingMode
+local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local REACT_FORWARD_REF_TYPE = ReactSymbols.REACT_FORWARD_REF_TYPE
+local REACT_FRAGMENT_TYPE = ReactSymbols.REACT_FRAGMENT_TYPE
+local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
+local REACT_DEBUG_TRACING_MODE_TYPE = ReactSymbols.REACT_DEBUG_TRACING_MODE_TYPE
+local REACT_STRICT_MODE_TYPE = ReactSymbols.REACT_STRICT_MODE_TYPE
+local REACT_PROFILER_TYPE = ReactSymbols.REACT_PROFILER_TYPE
+local REACT_PROVIDER_TYPE = ReactSymbols.REACT_PROVIDER_TYPE
+local REACT_CONTEXT_TYPE = ReactSymbols.REACT_CONTEXT_TYPE
+local REACT_SUSPENSE_TYPE = ReactSymbols.REACT_SUSPENSE_TYPE
+local REACT_SUSPENSE_LIST_TYPE = ReactSymbols.REACT_SUSPENSE_LIST_TYPE
+local REACT_MEMO_TYPE = ReactSymbols.REACT_MEMO_TYPE
+local REACT_LAZY_TYPE = ReactSymbols.REACT_LAZY_TYPE
+local REACT_OFFSCREEN_TYPE = ReactSymbols.REACT_OFFSCREEN_TYPE
+local REACT_LEGACY_HIDDEN_TYPE = ReactSymbols.REACT_LEGACY_HIDDEN_TYPE
+local createFiberFromProfiler = nil
+local createFiberFromFragment = nil
+local createFiberFromSuspense = nil
+local createFiberFromOffscreen = nil
+local createFiberFromLegacyHidden = nil
+local n1 = 1
+
+local function createFiber(p1, p2, p3, p4, p5, p6, p7, p8) -- line: 167
+	-- upvalues: NoFlags (copy), NoLanes (copy), enableProfilerTimer (copy), __DEV__ (copy), n1 (ref)
+	local t1 = {
+		index = 1,
+		tag = p1,
+		key = p3,
+		elementType = p5,
+		type = p6,
+		stateNode = p7,
+		pendingProps = p2,
+		mode = p4,
+		flags = NoFlags,
+		subtreeFlags = NoFlags,
+		lanes = p8 or NoLanes,
+		childLanes = NoLanes
+	}
+
+	if enableProfilerTimer then
+		t1.actualDuration = 0
+		t1.actualStartTime = -1
+		t1.selfBaseDuration = 0
+		t1.treeBaseDuration = 0
+	end
+
+	if __DEV__ then
+		t1._debugID = n1
+		n1 += 1
+		t1._debugSource = nil
+		t1._debugOwner = nil
+		t1._debugNeedsRemount = false
+		t1._debugHookTypes = nil
+	end
+
+	return t1
+end
+
+function _shouldConstruct(p9) -- line: 267
+	return type(p9) ~= "function" and not not p9.isReactComponent
+end
+
+local function createFiberFromTypeAndProps(p10, s1: string?, p11, p12, p13, p14) -- line: 505
+	-- upvalues: IndeterminateComponent (copy), __DEV__ (copy), resolveFunctionForHotReloading (copy), ClassComponent (copy), resolveClassForHotReloading (copy), HostComponent (copy), REACT_FRAGMENT_TYPE (copy), createFiberFromFragment (ref), REACT_DEBUG_TRACING_MODE_TYPE (copy), ReactWorkTagsMode (copy), DebugTracingMode (copy), REACT_STRICT_MODE_TYPE (copy), StrictMode (copy), REACT_PROFILER_TYPE (copy), createFiberFromProfiler (ref), REACT_SUSPENSE_TYPE (copy), createFiberFromSuspense (ref), REACT_OFFSCREEN_TYPE (copy), createFiberFromOffscreen (ref), REACT_LEGACY_HIDDEN_TYPE (copy), createFiberFromLegacyHidden (ref), REACT_PROVIDER_TYPE (copy), ContextProvider (copy), REACT_CONTEXT_TYPE (copy), ContextConsumer (copy), REACT_FORWARD_REF_TYPE (copy), ForwardRef (copy), resolveForwardRefForHotReloading (copy), REACT_MEMO_TYPE (copy), MemoComponent (copy), REACT_LAZY_TYPE (copy), LazyComponent (copy), Object (copy), inspect (copy), getComponentName (copy), Array (copy), REACT_ELEMENT_TYPE (copy), invariant (copy), createFiber (copy)
+	local v111 = IndeterminateComponent
+	local v112 = p10
+	local v113 = type(p10)
+
+	if v113 == "function" then
+		if __DEV__ then
+			v112 = resolveFunctionForHotReloading(v112)
+		end
+	elseif v113 == "table" and p10.isReactComponent then
+		v111 = ClassComponent
+
+		if __DEV__ then
+			v112 = resolveClassForHotReloading(v112)
+		end
+	elseif v113 == "string" then
+		v111 = HostComponent
+	else
+		if p10 == REACT_FRAGMENT_TYPE then
+			return createFiberFromFragment(p11.children, p13, p14, s1)
+		end
+
+		if p10 == REACT_DEBUG_TRACING_MODE_TYPE then
+			v111 = ReactWorkTagsMode
+			p13 = bit32.bor(p13, DebugTracingMode)
+		elseif p10 == REACT_STRICT_MODE_TYPE then
+			v111 = ReactWorkTagsMode
+			p13 = bit32.bor(p13, StrictMode)
+		else
+			if p10 == REACT_PROFILER_TYPE then
+				return createFiberFromProfiler(p11, p13, p14, s1)
+			end
+
+			if p10 == REACT_SUSPENSE_TYPE then
+				return createFiberFromSuspense(p11, p13, p14, s1)
+			end
+
+			if p10 == REACT_OFFSCREEN_TYPE then
+				return createFiberFromOffscreen(p11, p13, p14, s1)
+			end
+
+			if p10 == REACT_LEGACY_HIDDEN_TYPE then
+				return createFiberFromLegacyHidden(p11, p13, p14, s1)
+			end
+
+			local v114 = false
+			local v115 = nil
+
+			if v113 == "table" then
+				v115 = p10["$$typeof"]
+
+				if v115 == REACT_PROVIDER_TYPE then
+					v111 = ContextProvider
+					v114 = true
+				elseif v115 == REACT_CONTEXT_TYPE then
+					v111 = ContextConsumer
+					v114 = true
+				elseif v115 == REACT_FORWARD_REF_TYPE then
+					v111 = ForwardRef
+
+					if __DEV__ then
+						v112 = resolveForwardRefForHotReloading(v112)
+					end
+
+					v114 = true
+				elseif v115 == REACT_MEMO_TYPE then
+					v111 = MemoComponent
+					v114 = true
+				elseif v115 == REACT_LAZY_TYPE then
+					v111 = LazyComponent
+					v112 = nil
+					v114 = true
+				end
+			end
+
+			if not v114 then
+				local s2 = ""
+
+				if __DEV__ then
+					if p10 == nil or v113 == "table" and #Object.keys(p10) == 0 then
+						s2 ..= " You likely forgot to export your component from the file " .. "it's defined in, or you might have mixed up default and " .. "named imports."
+					elseif p10 ~= nil and v113 == "table" then
+						s2 ..= "\n" .. inspect(p10)
+					end
+
+					local v117 = nil
+
+					if p12 then
+						v117 = getComponentName(p12.type)
+					end
+
+					if v117 ~= nil and v117 ~= "" then
+						s2 ..= "\n\nCheck the render method of `" .. v117 .. "`."
+					elseif p12 then
+						s2 ..= "\n" .. inspect(p12)
+					end
+				end
+
+				if p10 == nil then
+					v113 = "nil"
+				elseif Array.isArray(p10) then
+					v113 = "array"
+				elseif v113 == "table" and v115 == REACT_ELEMENT_TYPE then
+					v113 = string.format("<%s />", getComponentName(p10.type) or "Unknown")
+					s2 = " Did you accidentally export a JSX literal or Element instead of a component?"
+				end
+
+				invariant(false, "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: %s.%s", v113, s2)
+			end
+		end
+	end
+
+	local v118 = createFiber(v111, p11, s1, p13, p10, v112, nil, p14)
+
+	if __DEV__ then
+		v118._debugOwner = p12
+	end
+
+	return v118
+end
+
+function createFiberFromFragment(p15, p16, p17, s3: string?) -- line: 687
+	-- upvalues: createFiber (copy), Fragment (copy)
+	return (createFiber(Fragment, p15, s3, p16, nil, nil, nil, p17))
+end
+
+local function createFiberFromScope(p18, p19, p20, p21, s4: string?) -- line: 725
+	-- upvalues: createFiber (copy), ScopeComponent (copy)
+	return (createFiber(ScopeComponent, p19, s4, p20, p18, p18, nil, p21))
+end
+
+function createFiberFromProfiler(p22, p23, p24, s5: string?) -- line: 742
+	-- upvalues: __DEV__ (copy), console (copy), createFiber (copy), Profiler (copy), ProfileMode (copy), REACT_PROFILER_TYPE (copy), enableProfilerTimer (copy)
+	if __DEV__ and typeof(p22.id) ~= "string" then
+		console.error("Profiler must specify an \"id\" as a prop")
+	end
+
+	return (createFiber(Profiler, p22, s5, bit32.bor(p23, ProfileMode), REACT_PROFILER_TYPE, REACT_PROFILER_TYPE, if not enableProfilerTimer then nil else {
+		effectDuration = 0,
+		passiveEffectDuration = 0
+	}, p24))
+end
+function createFiberFromSuspense(p25, p26, p27, s6: string?) -- line: 786
+	-- upvalues: createFiber (copy), SuspenseComponent (copy), REACT_SUSPENSE_TYPE (copy)
+	return (createFiber(SuspenseComponent, p25, s6, p26, REACT_SUSPENSE_TYPE, REACT_SUSPENSE_TYPE, nil, p27))
+end
+function createFiberFromOffscreen(p28, p29, p30, s7: string?) -- line: 844
+	-- upvalues: createFiber (copy), OffscreenComponent (copy), REACT_OFFSCREEN_TYPE (copy), __DEV__ (copy)
+	return (createFiber(OffscreenComponent, p28, s7, p29, REACT_OFFSCREEN_TYPE, if not __DEV__ then nil else REACT_OFFSCREEN_TYPE, nil, p30))
+end
+function createFiberFromLegacyHidden(p31, p32, p33, s8: string?) -- line: 873
+	-- upvalues: createFiber (copy), LegacyHiddenComponent (copy), REACT_LEGACY_HIDDEN_TYPE (copy), __DEV__ (copy)
+	return (createFiber(LegacyHiddenComponent, p31, s8, p32, REACT_LEGACY_HIDDEN_TYPE, if not __DEV__ then nil else REACT_LEGACY_HIDDEN_TYPE, nil, p33))
+end
+
 return {
-    isSimpleFunctionComponent = v97, 
-    resolveLazyComponentTag = v101, 
-    createWorkInProgress = v106, 
-    resetWorkInProgress = v111, 
-    createHostRootFiber = v114, 
-    createFiberFromTypeAndProps = v130, 
-    createFiberFromElement = v139, 
-    createFiberFromFragment = v77, 
-    createFiberFromFundamental = v78, 
-    createFiberFromSuspense = v79, 
-    createFiberFromSuspenseList = v82, 
-    createFiberFromOffscreen = v80, 
-    createFiberFromLegacyHidden = v81, 
-    createFiberFromText = function(v174, v175, v176) --[[ Line: 902 ]] --[[ Name: createFiberFromText ]]
-        -- upvalues: v93 (copy), l_HostText_0 (copy)
-        return (v93(l_HostText_0, v174, nil, v175, nil, nil, nil, v176));
-    end, 
-    createFiberFromHostInstanceForDeletion = function() --[[ Line: 910 ]] --[[ Name: createFiberFromHostInstanceForDeletion ]]
-        -- upvalues: v93 (copy), l_HostComponent_0 (copy), l_NoMode_0 (copy)
-        return (v93(l_HostComponent_0, nil, nil, l_NoMode_0, "DELETED", "DELETED"));
-    end, 
-    createFiberFromDehydratedFragment = function(v177) --[[ Line: 920 ]] --[[ Name: createFiberFromDehydratedFragment ]]
-        -- upvalues: v93 (copy), l_DehydratedFragment_0 (copy), l_NoMode_0 (copy)
-        return (v93(l_DehydratedFragment_0, nil, nil, l_NoMode_0, nil, nil, v177));
-    end, 
-    createFiberFromPortal = function(v178, v179, v180) --[[ Line: 929 ]] --[[ Name: createFiberFromPortal ]]
-        -- upvalues: v93 (copy), l_HostPortal_0 (copy)
-        local v181 = if v178.children ~= nil then v178.children else {};
-        return (v93(l_HostPortal_0, v181, v178.key, v179, nil, nil, {
-            containerInfo = v178.containerInfo, 
-            pendingChildren = nil, 
-            implementation = v178.implementation
-        }, v180));
-    end, 
-    assignFiberPropertiesInDEV = function(v182, v183) --[[ Line: 953 ]] --[[ Name: assignFiberPropertiesInDEV ]]
-        -- upvalues: v93 (copy), l_IndeterminateComponent_0 (copy), l_NoMode_0 (copy), l_enableProfilerTimer_0 (copy)
-        if v182 == nil then
-            v182 = v93(l_IndeterminateComponent_0, nil, nil, l_NoMode_0);
-        end;
-        v182.tag = v183.tag;
-        v182.key = v183.key;
-        v182.elementType = v183.elementType;
-        v182.type = v183.type;
-        v182.stateNode = v183.stateNode;
-        v182.return_ = v183.return_;
-        v182.child = v183.child;
-        v182.sibling = v183.sibling;
-        v182.index = v183.index;
-        v182.ref = v183.ref;
-        v182.pendingProps = v183.pendingProps;
-        v182.memoizedProps = v183.memoizedProps;
-        v182.updateQueue = v183.updateQueue;
-        v182.memoizedState = v183.memoizedState;
-        v182.dependencies = v183.dependencies;
-        v182.mode = v183.mode;
-        v182.flags = v183.flags;
-        v182.subtreeFlags = v183.subtreeFlags;
-        v182.deletions = v183.deletions;
-        v182.lanes = v183.lanes;
-        v182.childLanes = v183.childLanes;
-        v182.alternate = v183.alternate;
-        if l_enableProfilerTimer_0 then
-            v182.actualDuration = v183.actualDuration;
-            v182.actualStartTime = v183.actualStartTime;
-            v182.selfBaseDuration = v183.selfBaseDuration;
-            v182.treeBaseDuration = v183.treeBaseDuration;
-        end;
-        v182._debugID = v183._debugID;
-        v182._debugSource = v183._debugSource;
-        v182._debugOwner = v183._debugOwner;
-        v182._debugNeedsRemount = v183._debugNeedsRemount;
-        v182._debugHookTypes = v183._debugHookTypes;
-        return v182;
-    end
-};
+	isSimpleFunctionComponent = function(p34) -- line: 274
+		return type(p34) == "function"
+	end,
+	resolveLazyComponentTag = function(p35) -- line: 282
+		-- upvalues: FunctionComponent (copy), ClassComponent (copy), REACT_FORWARD_REF_TYPE (copy), ForwardRef (copy), REACT_MEMO_TYPE (copy), MemoComponent (copy), IndeterminateComponent (copy)
+		local v93 = typeof(p35)
+
+		if v93 == "function" then
+			return FunctionComponent
+		end
+
+		if v93 == "table" then
+			if p35.isReactComponent then
+				return ClassComponent
+			end
+
+			local v94 = p35["$$typeof"]
+
+			if v94 == REACT_FORWARD_REF_TYPE then
+				return ForwardRef
+			end
+
+			if v94 == REACT_MEMO_TYPE then
+				return MemoComponent
+			end
+		end
+
+		return IndeterminateComponent
+	end,
+	createWorkInProgress = function(p36, p37) -- line: 305
+		-- upvalues: createFiber (copy), __DEV__ (copy), NoFlags (copy), enableProfilerTimer (copy), StaticMask (copy), IndeterminateComponent (copy), FunctionComponent (copy), SimpleMemoComponent (copy), resolveFunctionForHotReloading (copy), ClassComponent (copy), resolveClassForHotReloading (copy), ForwardRef (copy), resolveForwardRefForHotReloading (copy)
+		local alternate = p36.alternate
+
+		if alternate == nil then
+			alternate = createFiber(p36.tag, p37, p36.key, p36.mode, p36.elementType, p36.type, p36.stateNode)
+
+			if __DEV__ then
+				alternate._debugID = p36._debugID
+				alternate._debugSource = p36._debugSource
+				alternate._debugOwner = p36._debugOwner
+				alternate._debugHookTypes = p36._debugHookTypes
+			end
+
+			alternate.alternate = p36
+			p36.alternate = alternate
+		else
+			alternate.pendingProps = p37
+			alternate.type = p36.type
+			alternate.flags = NoFlags
+			alternate.subtreeFlags = NoFlags
+			alternate.deletions = nil
+
+			if enableProfilerTimer then
+				alternate.actualDuration = 0
+				alternate.actualStartTime = -1
+			end
+		end
+
+		alternate.flags = bit32.band(p36.flags, StaticMask)
+		alternate.childLanes = p36.childLanes
+		alternate.lanes = p36.lanes
+		alternate.child = p36.child
+		alternate.memoizedProps = p36.memoizedProps
+		alternate.memoizedState = p36.memoizedState
+		alternate.updateQueue = p36.updateQueue
+
+		local dependencies = p36.dependencies
+
+		if dependencies == nil then
+			alternate.dependencies = nil
+		else
+			alternate.dependencies = {
+				lanes = dependencies.lanes,
+				firstContext = dependencies.firstContext
+			}
+		end
+
+		alternate.sibling = p36.sibling
+		alternate.index = p36.index
+		alternate.ref = p36.ref
+
+		if enableProfilerTimer then
+			alternate.selfBaseDuration = p36.selfBaseDuration
+			alternate.treeBaseDuration = p36.treeBaseDuration
+		end
+
+		if __DEV__ then
+			alternate._debugNeedsRemount = p36._debugNeedsRemount
+
+			if alternate.tag == IndeterminateComponent or alternate.tag == FunctionComponent or alternate.tag == SimpleMemoComponent then
+				alternate.type = resolveFunctionForHotReloading(p36.type)
+
+				return alternate
+			end
+
+			if alternate.tag == ClassComponent then
+				alternate.type = resolveClassForHotReloading(p36.type)
+
+				return alternate
+			end
+
+			if alternate.tag == ForwardRef then
+				alternate.type = resolveForwardRefForHotReloading(p36.type)
+			end
+		end
+
+		return alternate
+	end,
+	resetWorkInProgress = function(p38, p39) -- line: 409
+		-- upvalues: StaticMask (copy), Placement (copy), NoLanes (copy), NoFlags (copy), enableProfilerTimer (copy)
+		p38.flags = bit32.band(p38.flags, (bit32.bor(StaticMask, Placement)))
+
+		local alternate = p38.alternate
+
+		if alternate == nil then
+			p38.childLanes = NoLanes
+			p38.lanes = p39
+			p38.child = nil
+			p38.subtreeFlags = NoFlags
+			p38.memoizedProps = nil
+			p38.memoizedState = nil
+			p38.updateQueue = nil
+			p38.dependencies = nil
+			p38.stateNode = nil
+
+			if enableProfilerTimer then
+				p38.selfBaseDuration = 0
+				p38.treeBaseDuration = 0
+
+				return p38
+			end
+		else
+			p38.childLanes = alternate.childLanes
+			p38.lanes = alternate.lanes
+			p38.child = alternate.child
+			p38.subtreeFlags = alternate.subtreeFlags
+			p38.deletions = nil
+			p38.memoizedProps = alternate.memoizedProps
+			p38.memoizedState = alternate.memoizedState
+			p38.updateQueue = alternate.updateQueue
+			p38.type = alternate.type
+
+			local dependencies = alternate.dependencies
+
+			if dependencies == nil then
+				p38.dependencies = nil
+			else
+				p38.dependencies = {
+					lanes = dependencies.lanes,
+					firstContext = dependencies.firstContext
+				}
+			end
+
+			if enableProfilerTimer then
+				p38.selfBaseDuration = alternate.selfBaseDuration
+				p38.treeBaseDuration = alternate.treeBaseDuration
+			end
+		end
+
+		return p38
+	end,
+	createHostRootFiber = function(p40) -- line: 484
+		-- upvalues: ConcurrentRoot (copy), ConcurrentMode (copy), BlockingMode (copy), StrictMode (copy), BlockingRoot (copy), NoMode (copy), enableProfilerTimer (copy), isDevToolsPresent (copy), ProfileMode (copy), createFiber (copy), HostRoot (copy)
+		local v104 = if p40 ~= ConcurrentRoot then if p40 ~= BlockingRoot then NoMode else bit32.bor(BlockingMode, StrictMode) else bit32.bor(ConcurrentMode, BlockingMode, StrictMode)
+
+		if enableProfilerTimer and isDevToolsPresent() then
+			v104 = bit32.bor(v104, ProfileMode)
+		end
+
+		return (createFiber(HostRoot, nil, nil, v104))
+	end,
+	createFiberFromTypeAndProps = createFiberFromTypeAndProps,
+	createFiberFromElement = function(p41, p42, p43) -- line: 659
+		-- upvalues: __DEV__ (copy), createFiberFromTypeAndProps (copy)
+		local _owner = nil
+
+		if __DEV__ then
+			_owner = p41._owner
+		end
+
+		local type2 = p41.type
+		local key = p41.key
+		local props = p41.props
+		local v126 = createFiberFromTypeAndProps(type2, key, props, _owner, p42, p43)
+
+		if __DEV__ then
+			v126._debugSource = p41._source
+			v126._debugOwner = p41._owner
+		end
+
+		return v126
+	end,
+	createFiberFromFragment = createFiberFromFragment,
+	createFiberFromFundamental = function(p44, p45, p46, p47, s9: string?) -- line: 700
+		-- upvalues: createFiber (copy), FundamentalComponent (copy)
+		return (createFiber(FundamentalComponent, p45, s9, p46, p44, p44, nil, p47))
+	end,
+	createFiberFromSuspense = createFiberFromSuspense,
+	createFiberFromSuspenseList = function(p48, p49, p50, s10: string?) -- line: 815
+		-- upvalues: createFiber (copy), SuspenseListComponent (copy), REACT_SUSPENSE_LIST_TYPE (copy), __DEV__ (copy)
+		return (createFiber(SuspenseListComponent, p48, s10, p49, REACT_SUSPENSE_LIST_TYPE, if not __DEV__ then nil else REACT_SUSPENSE_LIST_TYPE, nil, p50))
+	end,
+	createFiberFromOffscreen = createFiberFromOffscreen,
+	createFiberFromLegacyHidden = createFiberFromLegacyHidden,
+	createFiberFromText = function(s11: string, p51, p52) -- line: 902
+		-- upvalues: createFiber (copy), HostText (copy)
+		return (createFiber(HostText, s11, nil, p51, nil, nil, nil, p52))
+	end,
+	createFiberFromHostInstanceForDeletion = function() -- line: 910
+		-- upvalues: createFiber (copy), HostComponent (copy), NoMode (copy)
+		return (createFiber(HostComponent, nil, nil, NoMode, "DELETED", "DELETED"))
+	end,
+	createFiberFromDehydratedFragment = function(p53) -- line: 920
+		-- upvalues: createFiber (copy), DehydratedFragment (copy), NoMode (copy)
+		return (createFiber(DehydratedFragment, nil, nil, NoMode, nil, nil, p53))
+	end,
+	createFiberFromPortal = function(p54, p55, p56) -- line: 929
+		-- upvalues: createFiber (copy), HostPortal (copy)
+		local v168 = if p54.children == nil then {} else p54.children
+
+		return (createFiber(HostPortal, v168, p54.key, p55, nil, nil, {
+			pendingChildren = nil,
+			containerInfo = p54.containerInfo,
+			implementation = p54.implementation
+		}, p56))
+	end,
+	assignFiberPropertiesInDEV = function(p57, p58) -- line: 953
+		-- upvalues: createFiber (copy), IndeterminateComponent (copy), NoMode (copy), enableProfilerTimer (copy)
+		if p57 == nil then
+			p57 = createFiber(IndeterminateComponent, nil, nil, NoMode)
+		end
+
+		p57.tag = p58.tag
+		p57.key = p58.key
+		p57.elementType = p58.elementType
+		p57.type = p58.type
+		p57.stateNode = p58.stateNode
+		p57.return_ = p58.return_
+		p57.child = p58.child
+		p57.sibling = p58.sibling
+		p57.index = p58.index
+		p57.ref = p58.ref
+		p57.pendingProps = p58.pendingProps
+		p57.memoizedProps = p58.memoizedProps
+		p57.updateQueue = p58.updateQueue
+		p57.memoizedState = p58.memoizedState
+		p57.dependencies = p58.dependencies
+		p57.mode = p58.mode
+		p57.flags = p58.flags
+		p57.subtreeFlags = p58.subtreeFlags
+		p57.deletions = p58.deletions
+		p57.lanes = p58.lanes
+		p57.childLanes = p58.childLanes
+		p57.alternate = p58.alternate
+
+		if enableProfilerTimer then
+			p57.actualDuration = p58.actualDuration
+			p57.actualStartTime = p58.actualStartTime
+			p57.selfBaseDuration = p58.selfBaseDuration
+			p57.treeBaseDuration = p58.treeBaseDuration
+		end
+
+		p57._debugID = p58._debugID
+		p57._debugSource = p58._debugSource
+		p57._debugOwner = p58._debugOwner
+		p57._debugNeedsRemount = p58._debugNeedsRemount
+		p57._debugHookTypes = p58._debugHookTypes
+
+		return p57
+	end
+}

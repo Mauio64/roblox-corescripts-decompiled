@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddOnRobloxSubscriptionUpsellSuccessCallbackToUnifiedPurchaseModal", false);
+return game:DefineFastFlag("AddOnRobloxSubscriptionUpsellSuccessCallbackToUnifiedPurchaseModal", false)

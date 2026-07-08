@@ -1,83 +1,119 @@
-local l_Parent_0 = script:FindFirstAncestor("PeopleService").Parent;
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Signals);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v6 = require(script.Parent.Parent.onPersonBlockButtonActivated);
-local v7 = require(script.Parent.Parent.Analytics.PeopleAnalyticsManager);
-local v8 = require(script.Parent.Parent.FocusNavigationService);
-return ((function() --[[ Line: 28 ]] --[[ Name: createPeopleBlockingModalManager ]]
-    -- upvalues: l_Players_0 (copy), v4 (copy), v8 (copy), l_ContextActionService_0 (copy), v6 (copy), v7 (copy), l_useSignalState_0 (copy), v3 (copy)
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    local v10, v11 = v4.createSignal(false);
-    local v12, v13 = v4.createSignal(nil);
-    local v14 = nil;
-    local function v15() --[[ Line: 40 ]] --[[ Name: closeModal ]]
-        -- upvalues: v8 (ref), v11 (copy), v13 (copy), l_ContextActionService_0 (ref)
-        v8.setBlockingModalRestoreMode(true);
-        v11(false);
-        v13(nil);
-        l_ContextActionService_0:UnbindCoreAction("BlockingModalScreen");
-    end;
-    local function v20(v16, v17, v18) --[[ Line: 47 ]] --[[ Name: openModal ]]
-        -- upvalues: v8 (ref), v6 (ref), v7 (ref), l_LocalPlayer_0 (copy), v14 (ref), v11 (copy), v13 (copy), l_ContextActionService_0 (ref)
-        v8.saveScrollPosition();
-        local v19 = v6(v16, v7, l_LocalPlayer_0.UserId, v17, v14, v18);
-        v19.modalProps.closeModal = function() --[[ Line: 59 ]]
-            -- upvalues: v19 (copy), v8 (ref), v11 (ref), v13 (ref), l_ContextActionService_0 (ref)
-            v19.resolvePromise();
-            v8.setBlockingModalRestoreMode(true);
-            v11(false);
-            v13(nil);
-            l_ContextActionService_0:UnbindCoreAction("BlockingModalScreen");
-        end;
-        v13(v19.modalProps);
-        v11(true);
-        return v19.promise;
-    end;
-    local function v25(v21, v22) --[[ Line: 70 ]] --[[ Name: getModalManager ]]
-        -- upvalues: v14 (ref), l_useSignalState_0 (ref), v10 (copy), v3 (ref), v12 (copy), l_ContextActionService_0 (ref), v8 (ref), v11 (copy), v13 (copy)
-        v14 = v22;
-        return function() --[[ Line: 74 ]] --[[ Name: BlockingModalManager ]]
-            -- upvalues: l_useSignalState_0 (ref), v10 (ref), v3 (ref), v12 (ref), l_ContextActionService_0 (ref), v8 (ref), v11 (ref), v13 (ref), v21 (copy)
-            local v23 = l_useSignalState_0(v10);
-            local v24 = v3.useMemo(function() --[[ Line: 77 ]]
-                -- upvalues: v12 (ref)
-                return v12(false);
-            end, {
-                v23
-            });
-            v3.useEffect(function() --[[ Line: 82 ]]
-                -- upvalues: v23 (copy), l_ContextActionService_0 (ref), v8 (ref), v11 (ref), v13 (ref)
-                if v23 then
-                    l_ContextActionService_0:BindCoreAction("BlockingModalScreen", function() --[[ Line: 84 ]]
-                        -- upvalues: v8 (ref), v11 (ref), v13 (ref), l_ContextActionService_0 (ref)
-                        v8.setBlockingModalRestoreMode(true);
-                        v11(false);
-                        v13(nil);
-                        l_ContextActionService_0:UnbindCoreAction("BlockingModalScreen");
-                    end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape);
-                else
-                    l_ContextActionService_0:UnbindCoreAction("BlockingModalScreen");
-                end;
-                return function() --[[ Line: 91 ]]
-                    -- upvalues: l_ContextActionService_0 (ref)
-                    l_ContextActionService_0:UnbindCoreAction("BlockingModalScreen");
-                end;
-            end, {
-                v23
-            });
-            if not v23 or not v24 then
-                return nil;
-            else
-                return v3.createElement(v21, v24);
-            end;
-        end;
-    end;
-    return {
-        closeModal = v15, 
-        openModal = v20, 
-        getModalManager = v25
-    };
-end)());
+local Parent = script:FindFirstAncestor("PeopleService").Parent
+local ContextActionService = game:GetService("ContextActionService")
+local Players = game:GetService("Players")
+local React = require(Parent.React)
+local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
+local Signals = require(Parent.Signals)
+local useSignalState = require(Parent.SignalsReact).useSignalState
+local FFlagIEMFocusNavPeoplePageToButtons = require(Parent.SharedFlags).FFlagIEMFocusNavPeoplePageToButtons
+local onPersonBlockButtonActivated = require(script.Parent.Parent.onPersonBlockButtonActivated)
+local PeopleAnalyticsManager = require(script.Parent.Parent.Analytics.PeopleAnalyticsManager)
+local FocusNavigationService = require(script.Parent.Parent.FocusNavigationService)
+local SettingsHubService = require(script.Parent.SettingsHubService)
+
+local function createPeopleBlockingModalManager() -- line: 34
+	-- upvalues: Players (copy), Signals (copy), FocusNavigationService (copy), ContextActionService (copy), onPersonBlockButtonActivated (copy), PeopleAnalyticsManager (copy), useSignalState (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), React (copy), ReactFocusNavigation (copy), SettingsHubService (copy)
+	local LocalPlayer = Players.LocalPlayer
+	local v15, v16 = Signals.createSignal(false)
+	local v17, v18 = Signals.createSignal(nil)
+	local u19 = nil
+
+	return {
+		closeModal = function() -- line: 46
+			-- upvalues: FocusNavigationService (copy), v16 (copy), v18 (copy), ContextActionService (copy)
+			FocusNavigationService.setBlockingModalRestoreMode(true)
+			v16(false)
+			v18(nil)
+			ContextActionService:UnbindCoreAction("BlockingModalScreen")
+		end,
+		openModal = function(p1, p2, p3) -- line: 53
+			-- upvalues: FocusNavigationService (copy), onPersonBlockButtonActivated (copy), PeopleAnalyticsManager (copy), LocalPlayer (copy), u19 (ref), v16 (copy), v18 (copy), ContextActionService (copy)
+			FocusNavigationService.saveScrollPosition()
+
+			local v23 = onPersonBlockButtonActivated(p1, PeopleAnalyticsManager, LocalPlayer.UserId, p2, u19, p3)
+
+			function v23.modalProps.closeModal() -- line: 65
+				-- upvalues: v23 (copy), FocusNavigationService (copy), v16 (copy), v18 (copy), ContextActionService (copy)
+				v23.resolvePromise()
+				FocusNavigationService.setBlockingModalRestoreMode(true)
+				v16(false)
+				v18(nil)
+				ContextActionService:UnbindCoreAction("BlockingModalScreen")
+			end
+
+			v18(v23.modalProps)
+			v16(true)
+
+			return v23.promise
+		end,
+		getModalManager = function(p4, p5) -- line: 76
+			-- upvalues: u19 (ref), useSignalState (copy), v15 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), React (copy), ReactFocusNavigation (copy), v17 (copy), ContextActionService (copy), FocusNavigationService (copy), v16 (copy), v18 (copy), SettingsHubService (copy)
+			u19 = p5
+
+			local function BlockingModalManager() -- line: 80
+				-- upvalues: useSignalState (copy), v15 (copy), FFlagIEMFocusNavPeoplePageToButtons (copy), React (copy), ReactFocusNavigation (copy), v17 (copy), ContextActionService (copy), FocusNavigationService (copy), v16 (copy), v18 (copy), SettingsHubService (copy), p4 (copy)
+				local v27 = useSignalState(v15)
+				local u28 = nil
+				local u29 = nil
+
+				if FFlagIEMFocusNavPeoplePageToButtons then
+					u28 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+					u29 = React.useRef(false)
+				end
+
+				local v30 = React.useMemo(function() -- line: 89
+					-- upvalues: v17 (copy)
+					return v17(false)
+				end, { v27 })
+
+				React.useEffect(function() -- line: 94
+					-- upvalues: v27 (copy), ContextActionService (copy), FocusNavigationService (copy), v16 (copy), v18 (copy)
+					if v27 then
+						ContextActionService:BindCoreAction("BlockingModalScreen", function() -- line: 96
+							-- upvalues: FocusNavigationService (copy), v16 (copy), v18 (copy), ContextActionService (copy)
+							FocusNavigationService.setBlockingModalRestoreMode(true)
+							v16(false)
+							v18(nil)
+							ContextActionService:UnbindCoreAction("BlockingModalScreen")
+						end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape)
+					else
+						ContextActionService:UnbindCoreAction("BlockingModalScreen")
+					end
+
+					return function() -- line: 103
+						-- upvalues: ContextActionService (copy)
+						ContextActionService:UnbindCoreAction("BlockingModalScreen")
+					end
+				end, { v27 })
+
+				if FFlagIEMFocusNavPeoplePageToButtons then
+					React.useEffect(function() -- line: 114
+						-- upvalues: u29 (ref), v27 (copy), SettingsHubService (copy), u28 (ref)
+						if u29.current and not v27 then
+							local v31 = SettingsHubService.pageRef()
+
+							if u28 and v31 then
+								u28:focusGuiObject(v31, true)
+							end
+						end
+
+						u29.current = v27
+					end, {
+						v27,
+						u28
+					})
+				end
+
+				if not v27 or not v30 then
+					return nil
+				end
+
+				return React.createElement(p4, v30)
+			end
+
+			return BlockingModalManager
+		end
+	}
+end
+
+return (createPeopleBlockingModalManager())

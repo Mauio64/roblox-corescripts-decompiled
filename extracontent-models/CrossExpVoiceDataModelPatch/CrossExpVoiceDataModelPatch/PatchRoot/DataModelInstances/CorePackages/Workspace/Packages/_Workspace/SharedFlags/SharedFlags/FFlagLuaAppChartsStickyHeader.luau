@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppChartsStickyHeader", false);
+return game:DefineFastFlag("LuaAppChartsStickyHeader", false)

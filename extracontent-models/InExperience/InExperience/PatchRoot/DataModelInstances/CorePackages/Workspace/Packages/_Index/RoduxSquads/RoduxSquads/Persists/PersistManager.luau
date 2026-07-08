@@ -1,4 +1,4 @@
 return {
-    createInternalPersistManager = require(script.createInternalPersistManager), 
-    createPersistManager = require(script.createPersistManager)
-};
+	createInternalPersistManager = require(script.createInternalPersistManager),
+	createPersistManager = require(script.createPersistManager)
+}

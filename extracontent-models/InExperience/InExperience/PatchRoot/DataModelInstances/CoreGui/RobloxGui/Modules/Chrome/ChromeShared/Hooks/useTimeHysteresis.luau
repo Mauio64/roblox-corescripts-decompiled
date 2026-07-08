@@ -1,111 +1,100 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-return function(v2, v3, v4, v5, _) --[[ Line: 32 ]]
-    -- upvalues: v1 (copy)
-    if not v4 then
-        v4 = v3;
-    end;
-    local v7, v8 = v1.useState(v5 or false);
-    local v9, v10 = v1.useState(false);
-    local v11 = v1.useRef(v5 or 0);
-    local v12 = v1.useRef(false);
-    v1.useEffect(function() --[[ Line: 48 ]]
-        -- upvalues: v11 (copy), v10 (copy), v9 (copy), v7 (copy), v3 (copy), v2 (copy), v12 (copy), v4 (ref)
-        local v13 = tick();
-        local v14 = nil;
-        local v15 = false;
-        local function _(v16, v17, v18) --[[ Line: 53 ]]
-            -- upvalues: v14 (ref), v15 (ref), v11 (ref), v10 (ref), v9 (ref)
-            if v16 > 0 then
-                v14 = task.delay(v16, function() --[[ Line: 55 ]]
-                    -- upvalues: v15 (ref), v14 (ref), v11 (ref), v18 (copy), v10 (ref), v17 (copy)
-                    v15 = true;
-                    v14 = nil;
-                    v11.current = v18;
-                    v10(v17);
-                end);
-                return;
-            else
-                if v9 ~= v17 then
-                    v15 = true;
-                    v10(v17);
-                end;
-                return;
-            end;
-        end;
-        if v7 then
-            local v20 = v3 - v11.current;
-            local l_v3_0 = v3;
-            if v20 > 0 then
-                local l_delay_0 = task.delay;
-                local l_v20_0 = v20;
-                local v24 = true;
-                v14 = l_delay_0(l_v20_0, function() --[[ Line: 55 ]]
-                    -- upvalues: v15 (ref), v14 (ref), v11 (ref), l_v3_0 (copy), v10 (ref), v24 (copy)
-                    v15 = true;
-                    v14 = nil;
-                    v11.current = l_v3_0;
-                    v10(v24);
-                end);
-            elseif v9 ~= true then
-                v15 = true;
-                v10(true);
-            end;
-        else
-            local v25 = v11.current - v2;
-            local l_v2_0 = v2;
-            if v25 > 0 then
-                local l_delay_1 = task.delay;
-                local l_v25_0 = v25;
-                local v29 = false;
-                v14 = l_delay_1(l_v25_0, function() --[[ Line: 55 ]]
-                    -- upvalues: v15 (ref), v14 (ref), v11 (ref), l_v2_0 (copy), v10 (ref), v29 (copy)
-                    v15 = true;
-                    v14 = nil;
-                    v11.current = l_v2_0;
-                    v10(v29);
-                end);
-            elseif v9 ~= false then
-                v15 = true;
-                v10(false);
-            end;
-        end;
-        local l_v7_0 = v7;
-        return function() --[[ Line: 74 ]]
-            -- upvalues: v15 (ref), v14 (ref), v12 (ref), v13 (copy), l_v7_0 (copy), v11 (ref), v4 (ref)
-            if not v15 then
-                if v14 then
-                    task.cancel(v14);
-                end;
-                if not v12.current then
-                    local v31 = tick() - v13;
-                    if not l_v7_0 then
-                        v31 = v31 * -1;
-                    end;
-                    v11.current = math.clamp(v11.current + v31, 0, v4);
-                end;
-            end;
-            v12.current = false;
-        end;
-    end, {
-        v7, 
-        v9, 
-        v2, 
-        v3, 
-        v4
-    });
-    return v9, (v1.useCallback(function(v32, v33) --[[ Line: 91 ]]
-        -- upvalues: v12 (copy), v11 (copy), v4 (ref), v8 (copy)
-        v12.current = v33;
-        if v33 then
-            if v32 then
-                v11.current = v4;
-            else
-                v11.current = 0;
-            end;
-        end;
-        v8(v32);
-    end, {
-        v8
-    }));
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+
+return function(n1: number, n2: number, n3: number?, b1: boolean?, _: number?) -- line: 32
+	-- upvalues: React (copy)
+	local u8 = n3 or n2
+	local v9, v10 = React.useState(b1 or false)
+	local v11, v12 = React.useState(false)
+	local v13 = React.useRef(b1 or 0)
+	local v14 = React.useRef(false)
+
+	React.useEffect(function() -- line: 48
+		-- upvalues: v13 (copy), v12 (copy), v11 (copy), v9 (copy), n2 (copy), n1 (copy), v14 (copy), u8 (ref)
+		local timestamp = tick()
+		local u16 = nil
+		local u17 = false
+
+		if v9 then
+			local v18 = n2 - v13.current
+			local v19 = n2
+
+			if v18 > 0 then
+				local v20 = true
+
+				u16 = task.delay(v18, function() -- line: 55
+					-- upvalues: u17 (ref), u16 (ref), v13 (copy), v19 (copy), v12 (copy), v20 (copy)
+					u17 = true
+					u16 = nil
+					v13.current = v19
+					v12(v20)
+				end)
+			elseif v11 ~= true then
+				u17 = true
+				v12(true)
+			end
+		else
+			local v21 = v13.current - n1
+			local v22 = n1
+
+			if v21 > 0 then
+				local v23 = false
+
+				u16 = task.delay(v21, function() -- line: 55
+					-- upvalues: u17 (ref), u16 (ref), v13 (copy), v22 (copy), v12 (copy), v23 (copy)
+					u17 = true
+					u16 = nil
+					v13.current = v22
+					v12(v23)
+				end)
+			elseif v11 ~= false then
+				u17 = true
+				v12(false)
+			end
+		end
+
+		local v24 = v9
+
+		return function() -- line: 74
+			-- upvalues: u17 (ref), u16 (ref), v14 (copy), timestamp (copy), v24 (copy), v13 (copy), u8 (ref)
+			if not u17 then
+				if u16 then
+					task.cancel(u16)
+				end
+
+				if not v14.current then
+					local v30 = tick() - timestamp
+
+					if not v24 then
+						v30 *= -1
+					end
+
+					v13.current = math.clamp(v13.current + v30, 0, u8)
+				end
+			end
+
+			v14.current = false
+		end
+	end, {
+		v9,
+		v11,
+		n1,
+		n2,
+		u8
+	})
+
+	return v11, (React.useCallback(function(b2: boolean, b3: boolean?) -- line: 91
+		-- upvalues: v14 (copy), v13 (copy), u8 (ref), v10 (copy)
+		v14.current = b3
+
+		if b3 then
+			if b2 then
+				v13.current = u8
+			else
+				v13.current = 0
+			end
+		end
+
+		v10(b2)
+	end, { v10 }))
+end

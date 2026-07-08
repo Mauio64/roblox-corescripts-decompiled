@@ -1,11 +1,15 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local l_v0_Descendants_0 = v0:GetDescendants();
-    table.insert(l_v0_Descendants_0, v0);
-    local v3 = {};
-    for _, v5 in l_v0_Descendants_0 do
-        if v5.Name == v1 then
-            table.insert(v3, v5);
-        end;
-    end;
-    return v3;
-end;
+return function(p1, s1: string) -- line: 1
+	local descendants = p1:GetDescendants()
+
+	table.insert(descendants, p1)
+
+	local t1 = {}
+
+	for _, v6 in descendants do
+		if s1 == v6.Name then
+			table.insert(t1, v6)
+		end
+	end
+
+	return t1
+end

@@ -1,59 +1,56 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.PromptType);
-local v5 = require(l_Parent_0.Actions.CloseOpenPrompt);
-local v6 = require(l_Parent_0.Actions.OpenPrompt);
-local v7 = require(l_Parent_0.Actions.CreateOutfitConfirmed);
-local v8 = {
-    promptType = nil, 
-    humanoidDescription = nil, 
-    rigType = nil, 
-    itemId = nil, 
-    itemType = nil, 
-    itemName = nil, 
-    isFavorited = nil, 
-    queue = {}, 
-    infoQueue = {}
-};
-return (v1.createReducer(v8, {
-    [v5.name] = function(v9, _) --[[ Line: 32 ]]
-        -- upvalues: v2 (copy)
-        if v2.isEmpty(v9.queue) then
-            return {
-                queue = v9.queue, 
-                infoQueue = v9.infoQueue
-            };
-        else
-            return v2.Dictionary.join(v9.infoQueue[1], {
-                promptType = v9.queue[1], 
-                queue = v2.List.removeIndex(v9.queue, 1), 
-                infoQueue = v2.List.removeIndex(v9.infoQueue, 1)
-            });
-        end;
-    end, 
-    [v6.name] = function(v11, v12) --[[ Line: 47 ]]
-        -- upvalues: v2 (copy)
-        if v11.promptType == nil then
-            return v2.Dictionary.join(v11, {
-                promptType = v12.promptType
-            }, v12.promptInfo);
-        else
-            return v2.Dictionary.join(v11, {
-                queue = v2.List.join(v11.queue, {
-                    v12.promptType
-                }), 
-                infoQueue = v2.List.join(v11.infoQueue, {
-                    v12.promptInfo
-                })
-            });
-        end;
-    end, 
-    [v7.name] = function(v13, _) --[[ Line: 60 ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        return v2.Dictionary.join(v13, {
-            promptType = v4.EnterOutfitName
-        });
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+local PromptType = require(ParentParent.PromptType)
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+local OpenPrompt = require(ParentParent.Actions.OpenPrompt)
+local CreateOutfitConfirmed = require(ParentParent.Actions.CreateOutfitConfirmed)
+local t1 = {
+	promptType = nil,
+	humanoidDescription = nil,
+	rigType = nil,
+	itemId = nil,
+	itemType = nil,
+	itemName = nil,
+	isFavorited = nil,
+	queue = {},
+	infoQueue = {}
+}
+
+return (Rodux.createReducer(t1, {
+	[CloseOpenPrompt.name] = function(p1, _) -- line: 32
+		-- upvalues: Cryo (copy)
+		if Cryo.isEmpty(p1.queue) then
+			return {
+				queue = p1.queue,
+				infoQueue = p1.infoQueue
+			}
+		end
+
+		return Cryo.Dictionary.join(p1.infoQueue[1], {
+			promptType = p1.queue[1],
+			queue = Cryo.List.removeIndex(p1.queue, 1),
+			infoQueue = Cryo.List.removeIndex(p1.infoQueue, 1)
+		})
+	end,
+	[OpenPrompt.name] = function(p3, p4) -- line: 47
+		-- upvalues: Cryo (copy)
+		if p3.promptType == nil then
+			return Cryo.Dictionary.join(p3, {
+				promptType = p4.promptType
+			}, p4.promptInfo)
+		end
+
+		return Cryo.Dictionary.join(p3, {
+			queue = Cryo.List.join(p3.queue, { p4.promptType }),
+			infoQueue = Cryo.List.join(p3.infoQueue, { p4.promptInfo })
+		})
+	end,
+	[CreateOutfitConfirmed.name] = function(p5, _) -- line: 60
+		-- upvalues: Cryo (copy), PromptType (copy)
+		return Cryo.Dictionary.join(p5, {
+			promptType = PromptType.EnterOutfitName
+		})
+	end
+}))

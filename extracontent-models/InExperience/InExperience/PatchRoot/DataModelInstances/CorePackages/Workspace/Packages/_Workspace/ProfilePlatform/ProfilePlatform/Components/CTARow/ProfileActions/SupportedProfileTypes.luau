@@ -3,15 +3,14 @@ local ProfilePlatformParent = ProfilePlatform.Parent
 local SharedFlags = require(ProfilePlatformParent.SharedFlags)
 local Enums = require(ProfilePlatform.Common.Enums)
 local ProfileTypes = Enums.ProfileTypes
-local FFlagProfilePlatformEnableCommunityProfilePage = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableCommunityProfilePage)
 local FFlagProfilePlatformUpdateUXForNonSocialCommunities = require(ProfilePlatform.Flags.FFlagProfilePlatformUpdateUXForNonSocialCommunities)
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
 local FFlagProfilePlatformEnableEditLook = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditLook)
 local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
 local FFlagEnablePlatformProfileContextualMenuOption = SharedFlags.FFlagEnablePlatformProfileContextualMenuOption
 local FFlagProfilePlatformEnableCurrencyTransfer = SharedFlags.FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagProfilePlatformAddTC = SharedFlags.FFlagProfilePlatformAddTC
-local FFlagTCShareLinkSenderUI = SharedFlags.FFlagTCShareLinkSenderUI
 local FFlagPendingIncomingTrustedConnection = require(ProfilePlatform.Flags.FFlagPendingIncomingTrustedConnection)
 local FFlagProfilePlatformEnableUnlockChat = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableUnlockChat)
 local t1 = {
@@ -43,6 +42,10 @@ if FFlagProfilePlatformEnableEditAppearanceMenu then
 	table.insert(t1, Enums.ProfileActions.EditAppearance)
 	table.insert(t1, Enums.ProfileActions.EditEmotes)
 	table.insert(t1, Enums.ProfileActions.SwitchAvatar)
+
+	if FFlagProfilePlatformEditBackgroundMenuItem then
+		table.insert(t1, Enums.ProfileActions.EditBackground)
+	end
 end
 
 if FFlagProfilePlatformEnableEditLook then
@@ -59,9 +62,7 @@ if FFlagProfilePlatformAddTC then
 	table.insert(t1, Enums.ProfileActions.PendingTrustedConnection)
 end
 
-if FFlagTCShareLinkSenderUI then
-	table.insert(t1, Enums.ProfileActions.AddTrustedConnectionViaLink)
-end
+table.insert(t1, Enums.ProfileActions.AddTrustedConnectionViaLink)
 
 if FFlagPendingIncomingTrustedConnection then
 	table.insert(t1, Enums.ProfileActions.PendingIncomingTrustedConnection)
@@ -77,16 +78,14 @@ end
 
 local t2 = {}
 
-if FFlagProfilePlatformEnableCommunityProfilePage then
-	table.insert(t2, Enums.ProfileActions.CopyLink)
-	table.insert(t2, Enums.ProfileActions.JoinCommunity)
-	table.insert(t2, Enums.ProfileActions.CancelJoinCommunityRequest)
-	table.insert(t2, Enums.ProfileActions.ViewCommunity)
-	table.insert(t2, Enums.ProfileActions.LeaveCommunity)
-	table.insert(t2, Enums.ProfileActions.MakePrimaryCommunity)
-	table.insert(t2, Enums.ProfileActions.RemovePrimaryCommunity)
-	table.insert(t2, Enums.ProfileActions.Report)
-end
+table.insert(t2, Enums.ProfileActions.CopyLink)
+table.insert(t2, Enums.ProfileActions.JoinCommunity)
+table.insert(t2, Enums.ProfileActions.CancelJoinCommunityRequest)
+table.insert(t2, Enums.ProfileActions.ViewCommunity)
+table.insert(t2, Enums.ProfileActions.LeaveCommunity)
+table.insert(t2, Enums.ProfileActions.MakePrimaryCommunity)
+table.insert(t2, Enums.ProfileActions.RemovePrimaryCommunity)
+table.insert(t2, Enums.ProfileActions.Report)
 
 if FFlagProfilePlatformUpdateUXForNonSocialCommunities then
 	table.insert(t2, Enums.ProfileActions.ViewFullProfile)

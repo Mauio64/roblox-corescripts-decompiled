@@ -21,6 +21,10 @@ local t1 = {
 	DressSkirtAccessory = "Dresses & Skirts"
 }
 
+local function isBundle(p1) -- line: 38
+	-- upvalues: Enums (copy)
+	return p1.itemType == Enums.ItemTypes.Bundle or p1.itemType == "Bundle"
+end
 local function getAssetTypeDisplayName(s1: string?, t2: {[any]: any}?) -- line: 47
 	-- upvalues: t1 (copy)
 	if not s1 then
@@ -37,9 +41,9 @@ local function getAssetTypeDisplayName(s1: string?, t2: {[any]: any}?) -- line: 
 		return t1[s1] or s1
 	end
 
-	for _, v23 in Enum.AvatarAssetType:GetEnumItems() do
-		if num == v23.Value then
-			return t1[v23.Name] or v23.Name:gsub("(%l)(%u)", "%1 %2")
+	for _, v24 in Enum.AvatarAssetType:GetEnumItems() do
+		if num == v24.Value then
+			return t1[v24.Name] or v24.Name:gsub("(%l)(%u)", "%1 %2")
 		end
 	end
 
@@ -47,52 +51,52 @@ local function getAssetTypeDisplayName(s1: string?, t2: {[any]: any}?) -- line: 
 end
 
 return {
-	isPurchasableStatus = function(s2: string) --[[ isPurchasableStatus ]] -- line: 32
+	isPurchasableStatus = function(s2: string) -- line: 32
 		-- upvalues: PriceStatus (copy)
 		return s2 == PriceStatus.Free or (s2 == PriceStatus.PurchaseFromRoblox or s2 == PriceStatus.PurchaseFromResale)
 	end,
-	getPriceStatus = function(p1) --[[ getPriceStatus ]] -- line: 96
+	getPriceStatus = function(p2) -- line: 96
 		-- upvalues: getPriceStatusInShop (copy)
-		return getPriceStatusInShop(p1)
+		return getPriceStatusInShop(p2)
 	end,
 	PriceStatusEnum = PriceStatus,
-	getThumbnailUrl = function(p2) --[[ getThumbnailUrl ]] -- line: 42
+	getThumbnailUrl = function(p3) -- line: 42
 		-- upvalues: Enums (copy), BundleThumbnail (copy), Asset (copy), getRbxthumbWithTypeSizeAndOptions (copy)
-		local v18 = if not (p2.itemType == Enums.ItemTypes.Bundle or p2.itemType == "Bundle") then Asset else BundleThumbnail
+		local v19 = if not (p3.itemType == Enums.ItemTypes.Bundle or p3.itemType == "Bundle") then Asset else BundleThumbnail
 
-		return getRbxthumbWithTypeSizeAndOptions(p2.id, v18, 150)
+		return getRbxthumbWithTypeSizeAndOptions(p3.id, v19, 150)
 	end,
-	getItemTypeDisplayName = function(p3, p4) --[[ getItemTypeDisplayName ]] -- line: 69
+	getItemTypeDisplayName = function(p4, p5) -- line: 69
 		-- upvalues: Enums (copy), getAssetTypeDisplayName (copy)
-		if p3.taxonomyName then
-			return p3.taxonomyName
+		if p4.taxonomyName then
+			return p4.taxonomyName
 		end
 
-		local assetTypeNames = p4.assetTypeNames
+		local assetTypeNames = p5.assetTypeNames
 
-		if p3.itemType == Enums.ItemTypes.Bundle or p3.itemType == "Bundle" then
-			if p3.itemSubType and assetTypeNames and assetTypeNames[p3.itemSubType] then
-				return assetTypeNames[p3.itemSubType]
+		if p4.itemType == Enums.ItemTypes.Bundle or p4.itemType == "Bundle" then
+			if p4.itemSubType and assetTypeNames and assetTypeNames[p4.itemSubType] then
+				return assetTypeNames[p4.itemSubType]
 			end
 
-			if p4 and p4.bundle then
-				return p4.bundle
+			if p5 and p5.bundle then
+				return p5.bundle
 			end
 
 			return "Bundle"
 		end
 
-		return (getAssetTypeDisplayName(p3.itemSubType, assetTypeNames))
+		return (getAssetTypeDisplayName(p4.itemSubType, assetTypeNames))
 	end,
-	shouldShowBundleParts = function(p5) --[[ shouldShowBundleParts ]] -- line: 86
+	shouldShowBundleParts = function(p6) -- line: 86
 		-- upvalues: getPriceStatusInShop (copy), PriceStatus (copy)
-		local v28 = getPriceStatusInShop(p5)
+		local v29 = getPriceStatusInShop(p6)
 
-		if p5.isOwned or v28 ~= PriceStatus.Free and (v28 ~= PriceStatus.PurchaseFromRoblox and v28 ~= PriceStatus.PurchaseFromResale) then
+		if p6.isOwned or v29 ~= PriceStatus.Free and (v29 ~= PriceStatus.PurchaseFromRoblox and v29 ~= PriceStatus.PurchaseFromResale) then
 			return false
 		end
 
-		return p5.bundlePartsCount ~= nil and p5.bundlePartsCount > 0
+		return p6.bundlePartsCount ~= nil and p6.bundlePartsCount > 0
 	end,
 	ASSET_TYPE_LOCALIZATION_KEYS = Constants.AssetLocalizationKeys,
 	BUNDLE_TYPE_LOCALIZATION_KEYS = Constants.BundleLocalizationKeys,

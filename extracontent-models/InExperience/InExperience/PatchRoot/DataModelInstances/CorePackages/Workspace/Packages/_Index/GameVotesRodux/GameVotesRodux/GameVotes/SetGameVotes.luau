@@ -1,11 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("GameVotesRodux").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2, v3) --[[ Line: 11 ]]
-    assert(type(v1) == "string", "SetGameVotes: universeId must be a string");
-    assert(type(v2) == "number", "SetGameVotes: upVotes must be a number");
-    assert(type(v3) == "number", "SetGameVotes: downVotes must be a number");
-    return {
-        universeId = v1, 
-        upVotes = v2, 
-        downVotes = v3
-    };
-end);
+local Parent = script:FindFirstAncestor("GameVotesRodux").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2, p3) -- line: 11
+	assert(type(p1) == "string", "SetGameVotes: universeId must be a string")
+	assert(type(p2) == "number", "SetGameVotes: upVotes must be a number")
+	assert(type(p3) == "number", "SetGameVotes: downVotes must be a number")
+
+	return {
+		universeId = p1,
+		upVotes = p2,
+		downVotes = p3
+	}
+end)

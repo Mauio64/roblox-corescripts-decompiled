@@ -1,124 +1,125 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Shell_0 = l_CoreGui_0:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell");
-local l_LocalizedStrings_0 = require(l_Shell_0:FindFirstChild("LocalizedStrings"));
-local l_FFlagAppShellMigrateLocales_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagAppShellMigrateLocales;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local Shell = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
+local LocalizedStrings = require(Shell:FindFirstChild("LocalizedStrings"))
+local FFlagAppShellMigrateLocales = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAppShellMigrateLocales
+
 return {
-    Default = {
-        Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.AlertOccurredTitle") else l_LocalizedStrings_0:LocalizedString("AlertOccurredTitle"), 
-        Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.DefaultAlertPhrase") else l_LocalizedStrings_0:LocalizedString("DefaultAlertPhrase"), 
-        Id = 0
-    }, 
-    UnlockedUGC = {
-        Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.UnlockedUGCTitle") else l_LocalizedStrings_0:LocalizedString("UnlockedUGCTitle"), 
-        Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.UnlockedUGCPhrase") else l_LocalizedStrings_0:LocalizedString("UnlockedUGCPhrase"), 
-        Id = 101
-    }, 
-    LostConnection = {
-        Controller = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ControllerLostConnectionTitle") else l_LocalizedStrings_0:LocalizedString("ControllerLostConnectionTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ControllerLostConnectionPhrase") else l_LocalizedStrings_0:LocalizedString("ControllerLostConnectionPhrase"), 
-            Id = 201
-        }, 
-        ActiveUser = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ActiveUserLostConnectionTitle") else l_LocalizedStrings_0:LocalizedString("ActiveUserLostConnectionTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ActiveUserLostConnectionPhrase") else l_LocalizedStrings_0:LocalizedString("ActiveUserLostConnectionPhrase"), 
-            Id = 202
-        }
-    }, 
-    PlayMyPlaceMoreGames = {
-        Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.PlayMyPlaceMoreGamesTitle") else l_LocalizedStrings_0:LocalizedString("PlayMyPlaceMoreGamesTitle"), 
-        Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.PlayMyPlaceMoreGamesPhrase") else l_LocalizedStrings_0:LocalizedString("PlayMyPlaceMoreGamesPhrase"), 
-        Id = 301
-    }, 
-    CrossPlatformPlayWelcome = {
-        Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.CPPWelcomeTitle") else l_LocalizedStrings_0:LocalizedString("CPPWelcomeTitle"), 
-        Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.CPPWelcomePhrase") else l_LocalizedStrings_0:LocalizedString("CPPWelcomePhrase"), 
-        Id = 401
-    }, 
-    Reauthentication = {
-        [0] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.AlertOccurredTitle") else l_LocalizedStrings_0:LocalizedString("AlertOccurredTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnknownPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthUnknownPhrase"), 
-            Id = 1001
-        }, 
-        [1] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutTitle") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutPhrase"), 
-            Id = 1002
-        }, 
-        [2] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1003
-        }, 
-        [3] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutTitle") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthInvalidSessionPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthInvalidSessionPhrase"), 
-            Id = 1004
-        }, 
-        [4] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnlinkTitle") else l_LocalizedStrings_0:LocalizedString("ReauthUnlinkTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnlinkPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthUnlinkPhrase"), 
-            Id = 1005
-        }, 
-        [5] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1006
-        }, 
-        [6] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1007
-        }, 
-        [7] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1008
-        }
-    }, 
-    SignOut = {
-        [0] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.AlertOccurredTitle") else l_LocalizedStrings_0:LocalizedString("AlertOccurredTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnknownPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthUnknownPhrase"), 
-            Id = 1001
-        }, 
-        [1] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutTitle") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutPhrase"), 
-            Id = 1002
-        }, 
-        [2] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthSignedOutTitle") else l_LocalizedStrings_0:LocalizedString("ReauthSignedOutTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthInvalidSessionPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthInvalidSessionPhrase"), 
-            Id = 1003
-        }, 
-        [3] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnlinkTitle") else l_LocalizedStrings_0:LocalizedString("ReauthUnlinkTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthUnlinkPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthUnlinkPhrase"), 
-            Id = 1004
-        }, 
-        [4] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1005
-        }, 
-        [5] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedTitle") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthRemovedPhrase") else l_LocalizedStrings_0:LocalizedString("ReauthRemovedPhrase"), 
-            Id = 1006
-        }, 
-        [6] = nil, 
-        [7] = {
-            Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthMaintenanceTitle") else l_LocalizedStrings_0:LocalizedString("ReauthMaintenanceTitle"), 
-            Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.ReauthMaintenancePhrase") else l_LocalizedStrings_0:LocalizedString("ReauthMaintenancePhrase"), 
-            Id = 1007
-        }
-    }, 
-    PlatformLink = {
-        Title = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.PlatformLinkInfoTitle") else l_LocalizedStrings_0:LocalizedString("PlatformLinkInfoTitle"), 
-        Msg = if l_FFlagAppShellMigrateLocales_0 then l_LocalizedStrings_0:LocStringUA("Xbox.Old.PlatformLinkInfoMessage") else l_LocalizedStrings_0:LocalizedString("PlatformLinkInfoMessage"), 
-        Id = 1201
-    }
-};
+	Default = {
+		Id = 0,
+		Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("AlertOccurredTitle") else LocalizedStrings:LocStringUA("Xbox.Old.AlertOccurredTitle"),
+		Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("DefaultAlertPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.DefaultAlertPhrase")
+	},
+	UnlockedUGC = {
+		Id = 101,
+		Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("UnlockedUGCTitle") else LocalizedStrings:LocStringUA("Xbox.Old.UnlockedUGCTitle"),
+		Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("UnlockedUGCPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.UnlockedUGCPhrase")
+	},
+	LostConnection = {
+		Controller = {
+			Id = 201,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ControllerLostConnectionTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ControllerLostConnectionTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ControllerLostConnectionPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ControllerLostConnectionPhrase")
+		},
+		ActiveUser = {
+			Id = 202,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ActiveUserLostConnectionTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ActiveUserLostConnectionTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ActiveUserLostConnectionPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ActiveUserLostConnectionPhrase")
+		}
+	},
+	PlayMyPlaceMoreGames = {
+		Id = 301,
+		Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("PlayMyPlaceMoreGamesTitle") else LocalizedStrings:LocStringUA("Xbox.Old.PlayMyPlaceMoreGamesTitle"),
+		Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("PlayMyPlaceMoreGamesPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.PlayMyPlaceMoreGamesPhrase")
+	},
+	CrossPlatformPlayWelcome = {
+		Id = 401,
+		Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("CPPWelcomeTitle") else LocalizedStrings:LocStringUA("Xbox.Old.CPPWelcomeTitle"),
+		Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("CPPWelcomePhrase") else LocalizedStrings:LocStringUA("Xbox.Old.CPPWelcomePhrase")
+	},
+	Reauthentication = {
+		[0] = {
+			Id = 1001,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("AlertOccurredTitle") else LocalizedStrings:LocStringUA("Xbox.Old.AlertOccurredTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnknownPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnknownPhrase")
+		},
+		[1] = {
+			Id = 1002,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutPhrase")
+		},
+		[2] = {
+			Id = 1003,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		},
+		[3] = {
+			Id = 1004,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthInvalidSessionPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthInvalidSessionPhrase")
+		},
+		[4] = {
+			Id = 1005,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnlinkTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnlinkTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnlinkPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnlinkPhrase")
+		},
+		[5] = {
+			Id = 1006,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		},
+		[6] = {
+			Id = 1007,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		},
+		[7] = {
+			Id = 1008,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		}
+	},
+	SignOut = {
+		[0] = {
+			Id = 1001,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("AlertOccurredTitle") else LocalizedStrings:LocStringUA("Xbox.Old.AlertOccurredTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnknownPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnknownPhrase")
+		},
+		[1] = {
+			Id = 1002,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutPhrase")
+		},
+		[2] = {
+			Id = 1003,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthSignedOutTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthSignedOutTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthInvalidSessionPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthInvalidSessionPhrase")
+		},
+		[3] = {
+			Id = 1004,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnlinkTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnlinkTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthUnlinkPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthUnlinkPhrase")
+		},
+		[4] = {
+			Id = 1005,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		},
+		[5] = {
+			Id = 1006,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthRemovedPhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthRemovedPhrase")
+		},
+		[6] = nil,
+		[7] = {
+			Id = 1007,
+			Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthMaintenanceTitle") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthMaintenanceTitle"),
+			Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("ReauthMaintenancePhrase") else LocalizedStrings:LocStringUA("Xbox.Old.ReauthMaintenancePhrase")
+		}
+	},
+	PlatformLink = {
+		Id = 1201,
+		Title = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("PlatformLinkInfoTitle") else LocalizedStrings:LocStringUA("Xbox.Old.PlatformLinkInfoTitle"),
+		Msg = if not FFlagAppShellMigrateLocales then LocalizedStrings:LocalizedString("PlatformLinkInfoMessage") else LocalizedStrings:LocStringUA("Xbox.Old.PlatformLinkInfoMessage")
+	}
+}

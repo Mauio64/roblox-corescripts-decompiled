@@ -1,25 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v4 = require(l_script_FirstAncestor_0.Common.Enums);
-local v5 = {
-    [v4.DisabledReasons.BannedFromCommunity] = v3.BannedFromGroup, 
-    [v4.DisabledReasons.CommunityIsClosed] = v3.GroupClosed, 
-    [v4.DisabledReasons.MaxCommunitiesJoined] = v3.PremiumMaxGroups, 
-    [v4.DisabledReasons.AccountCreatedLessThanOneDay] = v3.RequiresAccountTenureTooltipOneDay, 
-    [v4.DisabledReasons.AccountCreatedLessThanThreeDays] = v3.RequiresAccountTenureTooltipThreeDays, 
-    [v4.DisabledReasons.AccountCreatedLessThanOneWeek] = v3.RequiresAccountTenureTooltipOneWeek, 
-    [v4.DisabledReasons.AccountCreatedLessThanOneMonth] = v3.RequiresAccountTenureTooltipOneMonth, 
-    [v4.DisabledReasons.AccountCreatedLessThanThreeMonths] = v3.RequiresAccountTenureTooltipThreeMonths, 
-    [v4.DisabledReasons.InsufficientVerificationLevelHigh] = nil, 
-    [v4.DisabledReasons.InsufficientVerificationLevelMedium] = nil, 
-    [v4.DisabledReasons.InsufficientVerificationLevelLow] = nil
-};
-return function(v6) --[[ Line: 24 ]]
-    -- upvalues: v5 (copy), l_useLocalization_0 (copy)
-    local v7 = if v6 then v5[v6] else nil;
-    return l_useLocalization_0({
-        disabledReasonText = v7
-    }).disabledReasonText;
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local Enums = require(ProfilePlatform.Common.Enums)
+local t1 = {
+	[Enums.DisabledReasons.BannedFromCommunity] = TextKeys.BannedFromGroup,
+	[Enums.DisabledReasons.CommunityIsClosed] = TextKeys.GroupClosed,
+	[Enums.DisabledReasons.MaxCommunitiesJoined] = TextKeys.PremiumMaxGroups,
+	[Enums.DisabledReasons.AccountCreatedLessThanOneDay] = TextKeys.RequiresAccountTenureTooltipOneDay,
+	[Enums.DisabledReasons.AccountCreatedLessThanThreeDays] = TextKeys.RequiresAccountTenureTooltipThreeDays,
+	[Enums.DisabledReasons.AccountCreatedLessThanOneWeek] = TextKeys.RequiresAccountTenureTooltipOneWeek,
+	[Enums.DisabledReasons.AccountCreatedLessThanOneMonth] = TextKeys.RequiresAccountTenureTooltipOneMonth,
+	[Enums.DisabledReasons.AccountCreatedLessThanThreeMonths] = TextKeys.RequiresAccountTenureTooltipThreeMonths,
+	[Enums.DisabledReasons.InsufficientVerificationLevelHigh] = nil,
+	[Enums.DisabledReasons.InsufficientVerificationLevelMedium] = nil,
+	[Enums.DisabledReasons.InsufficientVerificationLevelLow] = nil
+}
+
+return function(p1) -- line: 24
+	-- upvalues: t1 (copy), useLocalization (copy)
+	local v8 = if not p1 then nil else t1[p1]
+
+	return useLocalization({
+		disabledReasonText = v8
+	}).disabledReasonText
+end

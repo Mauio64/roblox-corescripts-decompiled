@@ -1,11 +1,12 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local l_Actions_0 = l_Parent_0.Actions;
-local v4 = require(l_Actions_0.SetLocale);
-local v5 = require(l_Parent_0.Constants);
-return v1.createReducer(v5.FallbackLocale, {
-    [v4.name] = function(_, v7) --[[ Line: 14 ]]
-        return v7.locale;
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local Actions = ParentParent.Actions
+local SetLocale = require(Actions.SetLocale)
+local Constants = require(ParentParent.Constants)
+
+return Rodux.createReducer(Constants.FallbackLocale, {
+	[SetLocale.name] = function(_, p2) -- line: 14
+		return p2.locale
+	end
+})

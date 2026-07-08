@@ -1,15 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperience");
-local v1 = require(l_script_FirstAncestor_0.Constants);
-local v2 = require(l_script_FirstAncestor_0.Utils.observeCurrentContextId);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v4 = nil;
-    v2(function(v5) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), v4 (ref), v3 (copy)
-        local v6 = v5 == v1.AUDIO_FOCUS_MANAGEMENT.CEV.CONTEXT_ID;
-        if v6 ~= v4 then
-            v4 = v6;
-            v3(v4);
-        end;
-    end);
-end;
+local CrossExperience = script:FindFirstAncestor("CrossExperience")
+local Constants = require(CrossExperience.Constants)
+local observeCurrentContextId = require(CrossExperience.Utils.observeCurrentContextId)
+
+return function(p1: ((...any) -> ...any)) -- line: 6
+	-- upvalues: observeCurrentContextId (copy), Constants (copy)
+	local u5 = nil
+
+	observeCurrentContextId(function(p2) -- line: 8
+		-- upvalues: Constants (copy), u5 (ref), p1 (copy)
+		local v7 = p2 == Constants.AUDIO_FOCUS_MANAGEMENT.CEV.CONTEXT_ID
+
+		if v7 ~= u5 then
+			u5 = v7
+			p1(u5)
+		end
+	end)
+end

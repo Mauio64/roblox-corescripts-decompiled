@@ -7,69 +7,72 @@ local View = Foundation.View
 local LoadableImage = require(ProfilePlatformParent.UIBlox).App.Loading.LoadableImage
 local Enums = require(ProfilePlatform.Common.Enums)
 
-return function(t1: {[any]: any}) --[[ CoverPhoto ]] -- line: 34
+local function interpolateHeight(n1: number, n2: number, n3: number) -- line: 30
+	return n1 + (n2 - n1) * n3
+end
+local function CoverPhoto(t1: {[any]: any}) -- line: 34
 	-- upvalues: Enums (copy), useScreenSize (copy), React (copy), View (copy), LoadableImage (copy)
-	local v13 = t1.profileFormFactorInfo.formFactor == Enums.ProfileFormFactor.Wide
-	local v14 = t1.profileFormFactorInfo.formFactor == Enums.ProfileFormFactor.PeekView
+	local v15 = t1.profileFormFactorInfo.formFactor == Enums.ProfileFormFactor.Wide
+	local v16 = t1.profileFormFactorInfo.formFactor == Enums.ProfileFormFactor.PeekView
 	local isFullView = t1.profileFormFactorInfo.isFullView
-	local v16 = useScreenSize()
-	local v17 = React.useMemo(function() -- line: 40
-		-- upvalues: v14 (copy)
-		if v14 then
+	local v18 = useScreenSize()
+	local v19 = React.useMemo(function() -- line: 40
+		-- upvalues: v16 (copy)
+		if v16 then
 			return 393
 		end
 
 		return 456
 	end, {
-		v14,
+		v16,
 		isFullView,
 		t1.peekViewOpenPercent
 	})
-	local v18 = React.useMemo(function() -- line: 48
-		-- upvalues: v14 (copy), isFullView (copy), t1 (copy), v17 (copy)
-		if v14 and not isFullView then
+	local v20 = React.useMemo(function() -- line: 48
+		-- upvalues: v16 (copy), isFullView (copy), t1 (copy), v19 (copy)
+		if v16 and not isFullView then
 			return t1.peekViewOpenPercent * 98 + 295
 		end
 
-		return v17
+		return v19
 	end, {
-		v14,
+		v16,
 		isFullView,
 		t1.peekViewOpenPercent,
-		v17
+		v19
 	})
-	local v19 = v18 - 100
-	local v20 = v18 - t1.parallaxOffset
-	local v21 = v19 - t1.parallaxOffset
-	local v22 = if not isFullView then UDim.new(1, 0) else UDim.new(0, v16.X)
+	local v21 = v20 - 100
+	local v22 = v20 - t1.parallaxOffset
+	local v23 = v21 - t1.parallaxOffset
+	local v24 = if not isFullView then UDim.new(1, 0) else UDim.new(0, v18.X)
 
 	return React.createElement(View, {
+		ZIndex = -1,
 		LayoutOrder = t1.layoutOrder,
-		Size = UDim2.new(v22, UDim.new(0, v19)),
-		ZIndex = -1
+		Size = UDim2.new(v24, UDim.new(0, v21))
 	}, {
 		ParallaxWrapper = React.createElement(View, {
-			Size = UDim2.new(1, 0, 0, v21),
+			Size = UDim2.new(1, 0, 0, v23),
 			Position = UDim2.new(0, 0, 0, t1.parallaxOffset)
 		}, {
 			CoverPhotoWrapper = React.createElement(View, {
-				Size = UDim2.new(1, 0, 0, v20),
-				ClipsDescendants = true
+				ClipsDescendants = true,
+				Size = UDim2.new(1, 0, 0, v22)
 			}, {
 				CoverPhoto = React.createElement(LoadableImage, {
-					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
+					useShimmerAnimationWhileLoading = true,
+					AnchorPoint = Vector2.new(0.5, 0.5),
 					Image = t1.coverPhotoThumbnail,
 					Position = UDim2.fromScale(0.5, 0.5),
 					ScaleType = Enum.ScaleType.Crop,
-					Size = UDim2.new(1, 0, 0, v17),
-					useShimmerAnimationWhileLoading = true
+					Size = UDim2.new(1, 0, 0, v19)
 				})
 			}),
 			GradientWrapper = React.createElement(View, {
 				Size = UDim2.new(1, 0, 0, 100),
-				Position = UDim2.new(0, 0, 0, v21),
-				tag = not v13 and not isFullView and "bg-surface-100" or "bg-surface-0"
+				Position = UDim2.new(0, 0, 0, v23),
+				tag = not v15 and not isFullView and "bg-surface-100" or "bg-surface-0"
 			}, {
 				Gradient = React.createElement("UIGradient", {
 					Rotation = 270,
@@ -85,3 +88,5 @@ return function(t1: {[any]: any}) --[[ CoverPhoto ]] -- line: 34
 		})
 	})
 end
+
+return CoverPhoto

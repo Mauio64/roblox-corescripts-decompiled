@@ -1,6 +1,9 @@
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v1 = string.gsub(l_ContentProvider_0.BaseUrl:lower(), "/m.", "/www.");
-return function() --[[ Line: 4 ]] --[[ Name: getRobuxStoreUrl ]]
-    -- upvalues: v1 (copy)
-    return ("%sUpgrades/Robux.aspx"):format(v1);
-end;
+local ContentProvider = game:GetService("ContentProvider")
+local v2 = string.gsub(ContentProvider.BaseUrl:lower(), "/m.", "/www.")
+
+local function getRobuxStoreUrl() -- line: 4
+	-- upvalues: v2 (copy)
+	return ("%sUpgrades/Robux.aspx"):format(v2)
+end
+
+return getRobuxStoreUrl

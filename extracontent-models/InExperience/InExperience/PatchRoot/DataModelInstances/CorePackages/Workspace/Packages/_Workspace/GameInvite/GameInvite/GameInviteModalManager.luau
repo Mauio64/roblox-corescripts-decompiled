@@ -1,155 +1,151 @@
-local l_Players_0 = game:GetService("Players");
-local l_SocialService_0 = game:GetService("SocialService");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameInvite");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_utils_0 = l_script_FirstAncestor_0.utils;
-local v6 = require(l_Parent_0.SharedFlags);
-local _ = require(l_script_FirstAncestor_0.gameInviteModalType);
-local v8 = require(l_Parent_0.Cryo);
-local v9 = require(l_script_FirstAncestor_0.analytics.GameInviteAnalyticsManager);
-local v10 = require(l_utils_0.getCustomizedInvitePromptParams);
-local v11 = require(l_utils_0.getCanSendAndCanCustomizeInvites);
-local l_isTriggerDDI_0 = require(l_utils_0.gameInviteModalHelper).isTriggerDDI;
-game:DefineFastFlag("GameInviteModalAnalyticsEmptyEventContextFix", false);
-local l_FFlagHideCloseButtonEdp_0 = v6.FFlagHideCloseButtonEdp;
-local v14 = {};
-v14.__index = v14;
-v14.new = function() --[[ Line: 25 ]] --[[ Name: new ]]
-    -- upvalues: v14 (copy)
-    return (setmetatable({}, v14));
-end;
-v14.ToggleGameInviteModalEvent = Instance.new("BindableEvent");
-v14.isModalOpen = false;
-v14.openTrigger = nil;
-v14.customParams = nil;
-v14.placeId = nil;
-v14.openModal = function(v15, v16, v17) --[[ Line: 39 ]] --[[ Name: openModal ]]
-    -- upvalues: l_isTriggerDDI_0 (copy), v10 (copy), v11 (copy), v8 (copy), v9 (copy), l_FFlagHideCloseButtonEdp_0 (copy), l_ContextActionService_0 (copy)
-    if not v15.isModalOpen then
-        v15.isModalOpen = true;
-        v15.openTrigger = v16.trigger;
-        v15.placeId = v16.rootPlaceId or tostring(game.PlaceId);
-        local v18 = false;
-        local v19 = false;
-        local v20 = false;
-        if l_isTriggerDDI_0(v16.trigger) then
-            v15.ToggleGameInviteModalEvent:Fire(true, true, v16);
-            local v21 = v10(v17, v16.trigger, v11);
-            v15.customParams = v21;
-            if v21 then
-                local v22 = false;
-                if v21.launchData ~= nil then
-                    v22 = v21.launchData ~= "";
-                end;
-                v18 = v22;
-                v22 = false;
-                if v21.promptMessage ~= nil then
-                    v22 = v21.promptMessage ~= "";
-                end;
-                v19 = v22;
-                v22 = false;
-                if v21.inviteMessageId ~= nil then
-                    v22 = v21.inviteMessageId ~= "";
-                end;
-                v20 = v22;
-                v15.ToggleGameInviteModalEvent:Fire(true, false, v8.Dictionary.join(v16, v21));
-                if game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
-                    v9:sendGameInviteModalEvent(v16.trigger, {
-                        action_type = v9.ActionType.ModalOpen, 
-                        is_launch_data_provided = v18, 
-                        is_prompt_customized = v19, 
-                        is_invite_message_id_provided = v20, 
-                        place_id = v16.rootPlaceId, 
-                        hideCloseButton = if l_FFlagHideCloseButtonEdp_0 then v16.hideCloseButton else nil
-                    });
-                end;
-            else
-                v15:closeModal();
-            end;
-        else
-            v15.ToggleGameInviteModalEvent:Fire(true, false, v16);
-            if game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
-                v9:sendGameInviteModalEvent(v16.trigger, {
-                    action_type = v9.ActionType.ModalOpen, 
-                    is_launch_data_provided = v18, 
-                    is_prompt_customized = v19, 
-                    is_invite_message_id_provided = v20, 
-                    place_id = v16.rootPlaceId
-                });
-            end;
-        end;
-        if not game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
-            v9:sendGameInviteModalEvent(v16.trigger, {
-                action_type = v9.ActionType.ModalOpen, 
-                is_launch_data_provided = v18, 
-                is_prompt_customized = v19, 
-                is_invite_message_id_provided = v20, 
-                place_id = v16.rootPlaceId
-            });
-        end;
-        l_ContextActionService_0:BindCoreAction("hideGameInviteModal", function(_, v24) --[[ Line: 98 ]]
-            -- upvalues: v15 (copy)
-            if v24 == Enum.UserInputState.Begin then
-                v15:closeModal();
-            end;
-        end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Backspace);
-        return;
-    else
-        if l_isTriggerDDI_0(v16.trigger) then
-            v15:invokeGameInvitePromptClosed();
-        end;
-        return;
-    end;
-end;
-v14.closeModal = function(v25, v26) --[[ Line: 111 ]] --[[ Name: closeModal ]]
-    -- upvalues: l_isTriggerDDI_0 (copy), v9 (copy), l_ContextActionService_0 (copy)
-    if v25.isModalOpen then
-        local v27 = false;
-        local v28 = false;
-        local v29 = false;
-        if l_isTriggerDDI_0(v25.openTrigger) then
-            if v25.customParams then
-                local v30 = false;
-                if v25.customParams.launchData ~= nil then
-                    v30 = v25.customParams.launchData ~= "";
-                end;
-                v27 = v30;
-                v30 = false;
-                if v25.customParams.promptMessage ~= nil then
-                    v30 = v25.customParams.promptMessage ~= "";
-                end;
-                v28 = v30;
-                v30 = false;
-                if v25.customParams.inviteMessageId ~= nil then
-                    v30 = v25.customParams.inviteMessageId ~= "";
-                end;
-                v29 = v30;
-            end;
-            v25:invokeGameInvitePromptClosed();
-        end;
-        v9:sendGameInviteModalEvent(v25.openTrigger, {
-            action_type = v9.ActionType.ModalClose, 
-            is_launch_data_provided = v27, 
-            is_prompt_customized = v28, 
-            is_invite_message_id_provided = v29, 
-            max_recipient_row_number = v26, 
-            place_id = v25.placeId
-        });
-        l_ContextActionService_0:UnbindCoreAction("hideGameInviteModal");
-        v25.isModalOpen = false;
-        v25.openTrigger = nil;
-        v25.placeId = nil;
-    end;
-    v25.ToggleGameInviteModalEvent:Fire(false);
-end;
-v14.isGameModalOpen = function(v31) --[[ Line: 145 ]] --[[ Name: isGameModalOpen ]]
-    return v31.isModalOpen;
-end;
-v14.invokeGameInvitePromptClosed = function(_) --[[ Line: 149 ]] --[[ Name: invokeGameInvitePromptClosed ]]
-    -- upvalues: l_SocialService_0 (copy), l_Players_0 (copy)
-    if l_SocialService_0 and l_Players_0.LocalPlayer then
-        l_SocialService_0:InvokeGameInvitePromptClosed(l_Players_0.LocalPlayer, {});
-    end;
-end;
-return v14.new();
+local Players = game:GetService("Players")
+local SocialService = game:GetService("SocialService")
+local ContextActionService = game:GetService("ContextActionService")
+local GameInvite = script:FindFirstAncestor("GameInvite")
+local GameInviteParent = GameInvite.Parent
+local utils = GameInvite.utils
+
+require(GameInvite.gameInviteModalType)
+
+local Cryo = require(GameInviteParent.Cryo)
+local GameInviteAnalyticsManager = require(GameInvite.analytics.GameInviteAnalyticsManager)
+local getCustomizedInvitePromptParams = require(utils.getCustomizedInvitePromptParams)
+local getCanSendAndCanCustomizeInvites = require(utils.getCanSendAndCanCustomizeInvites)
+local isTriggerDDI = require(utils.gameInviteModalHelper).isTriggerDDI
+
+game:DefineFastFlag("GameInviteModalAnalyticsEmptyEventContextFix", false)
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 23
+	-- upvalues: t1 (copy)
+	return (setmetatable({}, t1))
+end
+
+t1.ToggleGameInviteModalEvent = Instance.new("BindableEvent")
+t1.isModalOpen = false
+t1.openTrigger = nil
+t1.customParams = nil
+t1.placeId = nil
+
+function t1.openModal(p1, p2, p3) -- line: 37
+	-- upvalues: isTriggerDDI (copy), getCustomizedInvitePromptParams (copy), getCanSendAndCanCustomizeInvites (copy), Cryo (copy), GameInviteAnalyticsManager (copy), ContextActionService (copy)
+	if not p1.isModalOpen then
+		p1.isModalOpen = true
+		p1.openTrigger = p2.trigger
+		p1.placeId = p2.rootPlaceId or tostring(game.PlaceId)
+
+		local v16 = false
+		local v17 = false
+		local v18 = false
+
+		if isTriggerDDI(p2.trigger) then
+			p1.ToggleGameInviteModalEvent:Fire(true, true, p2)
+
+			local v19 = getCustomizedInvitePromptParams(p3, p2.trigger, getCanSendAndCanCustomizeInvites)
+
+			p1.customParams = v19
+
+			if v19 then
+				v16 = v19.launchData ~= nil and v19.launchData ~= ""
+				v17 = v19.promptMessage ~= nil and v19.promptMessage ~= ""
+				v18 = v19.inviteMessageId ~= nil and v19.inviteMessageId ~= ""
+				p1.ToggleGameInviteModalEvent:Fire(true, false, Cryo.Dictionary.join(p2, v19))
+
+				if game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
+					GameInviteAnalyticsManager:sendGameInviteModalEvent(p2.trigger, {
+						action_type = GameInviteAnalyticsManager.ActionType.ModalOpen,
+						is_launch_data_provided = v16,
+						is_prompt_customized = v17,
+						is_invite_message_id_provided = v18,
+						place_id = p2.rootPlaceId,
+						hideCloseButton = p2.hideCloseButton
+					})
+				end
+			else
+				p1:closeModal()
+			end
+		else
+			p1.ToggleGameInviteModalEvent:Fire(true, false, p2)
+
+			if game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
+				GameInviteAnalyticsManager:sendGameInviteModalEvent(p2.trigger, {
+					action_type = GameInviteAnalyticsManager.ActionType.ModalOpen,
+					is_launch_data_provided = v16,
+					is_prompt_customized = v17,
+					is_invite_message_id_provided = v18,
+					place_id = p2.rootPlaceId
+				})
+			end
+		end
+
+		if not game:GetFastFlag("GameInviteModalAnalyticsEmptyEventContextFix") then
+			GameInviteAnalyticsManager:sendGameInviteModalEvent(p2.trigger, {
+				action_type = GameInviteAnalyticsManager.ActionType.ModalOpen,
+				is_launch_data_provided = v16,
+				is_prompt_customized = v17,
+				is_invite_message_id_provided = v18,
+				place_id = p2.rootPlaceId
+			})
+		end
+
+		ContextActionService:BindCoreAction("hideGameInviteModal", function(_, p5) -- line: 96
+			-- upvalues: p1 (copy)
+			if p5 == Enum.UserInputState.Begin then
+				p1:closeModal()
+			end
+		end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Backspace)
+
+		return
+	end
+
+	if isTriggerDDI(p2.trigger) then
+		p1:invokeGameInvitePromptClosed()
+	end
+end
+function t1.closeModal(t2: {[any]: any}, n1: number?) -- line: 109
+	-- upvalues: isTriggerDDI (copy), GameInviteAnalyticsManager (copy), ContextActionService (copy)
+	if t2.isModalOpen then
+		local v22 = false
+		local v23 = false
+		local v24 = false
+
+		if isTriggerDDI(t2.openTrigger) then
+			if t2.customParams then
+				v22 = t2.customParams.launchData ~= nil and t2.customParams.launchData ~= ""
+				v23 = t2.customParams.promptMessage ~= nil and t2.customParams.promptMessage ~= ""
+				v24 = t2.customParams.inviteMessageId ~= nil and t2.customParams.inviteMessageId ~= ""
+			end
+
+			t2:invokeGameInvitePromptClosed()
+		end
+
+		GameInviteAnalyticsManager:sendGameInviteModalEvent(t2.openTrigger, {
+			action_type = GameInviteAnalyticsManager.ActionType.ModalClose,
+			is_launch_data_provided = v22,
+			is_prompt_customized = v23,
+			is_invite_message_id_provided = v24,
+			max_recipient_row_number = n1,
+			place_id = t2.placeId
+		})
+		ContextActionService:UnbindCoreAction("hideGameInviteModal")
+		t2.isModalOpen = false
+		t2.openTrigger = nil
+		t2.placeId = nil
+	end
+
+	t2.ToggleGameInviteModalEvent:Fire(false)
+end
+function t1.isGameModalOpen(p6) -- line: 143
+	return p6.isModalOpen
+end
+function t1.invokeGameInvitePromptClosed(_) -- line: 147
+	-- upvalues: SocialService (copy), Players (copy)
+	if SocialService and Players.LocalPlayer then
+		SocialService:InvokeGameInvitePromptClosed(Players.LocalPlayer, {})
+	end
+end
+
+return t1.new()

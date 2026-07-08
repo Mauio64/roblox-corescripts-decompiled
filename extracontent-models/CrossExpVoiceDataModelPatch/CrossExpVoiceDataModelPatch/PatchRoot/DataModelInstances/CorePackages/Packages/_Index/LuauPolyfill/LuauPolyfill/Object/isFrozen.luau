@@ -1,5 +1,7 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.types);
-return function(v2) --[[ Line: 7 ]]
-    return table.isfrozen(v2);
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.types)
+
+return function(p1) -- line: 7
+	return table.isfrozen(p1)
+end

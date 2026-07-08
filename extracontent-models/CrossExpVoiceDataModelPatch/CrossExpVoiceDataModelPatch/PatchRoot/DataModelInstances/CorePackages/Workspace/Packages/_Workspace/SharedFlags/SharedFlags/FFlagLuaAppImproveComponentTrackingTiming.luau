@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppImproveComponentTrackingTiming", false);
+return game:DefineFastFlag("LuaAppImproveComponentTrackingTiming", false)

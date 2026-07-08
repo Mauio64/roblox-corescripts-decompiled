@@ -1,192 +1,251 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.flags.getFFlagUGCValidationEnableFolderStructure);
-local v2 = require(l_Parent_0.flags.getFFlagUGCValidationCombineEntrypointResults);
-local v3 = require(l_Parent_0.flags.getFFlagUGCValidationExtendSchemaToIgnoreDescendants);
-local _ = function(v4, v5) --[[ Line: 9 ]] --[[ Name: checkName ]]
-    if type(v4) == "table" then
-        for _, v7 in pairs(v4) do
-            if v7 == v5 then
-                return true;
-            end;
-        end;
-    elseif type(v4) == "string" then
-        return v4 == v5;
-    end;
-    return false;
-end;
-local function _(v9) --[[ Line: 22 ]] --[[ Name: getReadableName ]]
-    if type(v9) == "table" then
-        return table.concat(v9, " or ");
-    elseif type(v9) == "string" then
-        return v9;
-    else
-        return "*";
-    end;
-end;
-local function v11(v12, v13, v14) --[[ Line: 31 ]] --[[ Name: validateWithSchemaHelper ]]
-    -- upvalues: v3 (copy), v11 (copy)
-    local v15 = false;
-    local v16 = false;
-    if v13.ClassName == v12.ClassName then
-        if v12.Name ~= nil then
-            local l_Name_0 = v12.Name;
-            local l_Name_1 = v13.Name;
-            local v19;
-            if type(l_Name_0) == "table" then
-                for _, v21 in pairs(l_Name_0) do
-                    if v21 == l_Name_1 then
-                        v19 = true;
-                        v16 = true;
-                    end;
-                    if v16 then
-                        break;
-                    end;
-                end;
-            elseif type(l_Name_0) == "string" then
-                v19 = l_Name_0 == l_Name_1;
-                v16 = true;
-            end;
-            if not v16 then
-                if not v16 then
-                    v19 = false;
-                end;
-            end;
-            v16 = false;
-            v15 = not v19;
-        end;
-        if not v15 then
-            if v3() and v12._ignoreDescendants then
-                assert(not v12._children, "if _ignoreDescendants is true, there should be no descendants in the schema as they would be ignored anyway");
-                for _, v23 in v13:GetDescendants() do
-                    v14[v23] = true;
-                end;
-                v14[v13] = true;
-                return {
-                    success = true
-                };
-            else
-                if v12._children then
-                    for _, v25 in pairs(v12._children) do
-                        local v26 = false;
-                        local v27 = nil;
-                        for _, v29 in pairs(v13:GetChildren()) do
-                            if not v3() or not v14[v29] then
-                                local v30 = v11(v25, v29, v14);
-                                if v30.success then
-                                    v26 = true;
-                                    break;
-                                elseif v30.message then
-                                    v27 = v30;
-                                end;
-                            end;
-                        end;
-                        if not v26 and not v25._optional then
-                            if v27 then
-                                return v27;
-                            else
-                                local v31 = {
-                                    success = false
-                                };
-                                local v32 = "Could not find a ";
-                                local l_ClassName_0 = v25.ClassName;
-                                local v34 = " called ";
-                                local l_Name_2 = v25.Name;
-                                v31.message = v32 .. l_ClassName_0 .. v34 .. (if type(l_Name_2) == "table" then table.concat(l_Name_2, " or ") else if type(l_Name_2) == "string" then l_Name_2 else "*") .. " inside " .. v13.Name;
-                                return v31;
-                            end;
-                        end;
-                    end;
-                end;
-                v14[v13] = true;
-                return {
-                    success = true
-                };
-            end;
-        end;
-    end;
-    v15 = false;
-    return {
-        success = false
-    };
-end;
-return function(v36, v37, _) --[[ Line: 92 ]] --[[ Name: validateWithSchema ]]
-    -- upvalues: v11 (copy), v1 (copy), v2 (copy)
-    local v39 = false;
-    local v40 = false;
-    if v37.ClassName == v36.ClassName then
-        if v36.Name ~= nil then
-            local l_Name_3 = v36.Name;
-            local l_Name_4 = v37.Name;
-            local v43;
-            if type(l_Name_3) == "table" then
-                for _, v45 in pairs(l_Name_3) do
-                    if v45 == l_Name_4 then
-                        v43 = true;
-                        v40 = true;
-                    end;
-                    if v40 then
-                        break;
-                    end;
-                end;
-            elseif type(l_Name_3) == "string" then
-                v43 = l_Name_3 == l_Name_4;
-                v40 = true;
-            end;
-            if not v40 then
-                if not v40 then
-                    v43 = false;
-                end;
-            end;
-            v40 = false;
-            v39 = not v43;
-        end;
-        if not v39 then
-            local v46 = {};
-            local v47 = v11(v36, v37, v46);
-            if not v47.success then
-                if v1() and v2() then
-                    return {
-                        success = false, 
-                        message = ""
-                    };
-                else
-                    return v47;
-                end;
-            else
-                local v48 = {};
-                for _, v50 in pairs(v37:GetDescendants()) do
-                    if v46[v50] == nil then
-                        v48[#v48 + 1] = v50:GetFullName();
-                    end;
-                end;
-                if #v48 > 0 then
-                    if v1() and v2() then
-                        return {
-                            success = false, 
-                            message = ""
-                        };
-                    else
-                        return {
-                            success = false, 
-                            message = "Unexpected Descendants:\n" .. table.concat(v48, "\n")
-                        };
-                    end;
-                else
-                    return {
-                        success = true
-                    };
-                end;
-            end;
-        end;
-    end;
-    v39 = false;
-    local v51 = {
-        success = false
-    };
-    local v52 = "Expected top-level instance to be a ";
-    local l_ClassName_1 = v36.ClassName;
-    local v54 = " named ";
-    local l_Name_5 = v36.Name;
-    v51.message = v52 .. l_ClassName_1 .. v54 .. if type(l_Name_5) == "table" then table.concat(l_Name_5, " or ") else if type(l_Name_5) == "string" then l_Name_5 else "*";
-    return v51;
-end;
+local ParentParent = script.Parent.Parent
+local getFFlagUGCValidationEnableFolderStructure = require(ParentParent.flags.getFFlagUGCValidationEnableFolderStructure)
+local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
+local getFFlagUGCValidationExtendSchemaToIgnoreDescendants = require(ParentParent.flags.getFFlagUGCValidationExtendSchemaToIgnoreDescendants)
+
+local function checkName(p1, p2) -- line: 9
+	if type(p1) == "table" then
+		for _, v in pairs(p1) do
+			if v == p2 then
+				return true
+			end
+		end
+	elseif type(p1) == "string" then
+		return p1 == p2
+	end
+
+	return false
+end
+local function getReadableName(p3) -- line: 22
+	if type(p3) == "table" then
+		return table.concat(p3, " or ")
+	end
+
+	if type(p3) == "string" then
+		return p3
+	end
+
+	return "*"
+end
+local function validateWithSchemaHelper(p4, p5, p6) -- line: 31
+	-- upvalues: getFFlagUGCValidationExtendSchemaToIgnoreDescendants (copy), validateWithSchemaHelper (copy)
+	if p5.ClassName ~= p4.ClassName then
+		return {
+			success = false
+		}
+	end
+
+	local g17 = nil
+	local g35 = nil
+	local v34 = nil
+
+	repeat
+		if g17 or p4.Name == nil then
+			g17 = false
+
+			if getFFlagUGCValidationExtendSchemaToIgnoreDescendants() and p4._ignoreDescendants then
+				assert(not p4._children, "if _ignoreDescendants is true, there should be no descendants in the schema as they would be ignored anyway")
+
+				for _, descendant in p5:GetDescendants() do
+					p6[descendant] = true
+				end
+
+				p6[p5] = true
+
+				return {
+					success = true
+				}
+			end
+
+			if p4._children then
+				for _, v in pairs(p4._children) do
+					local v22 = false
+					local v23 = nil
+
+					for _, child in pairs(p5:GetChildren()) do
+						if getFFlagUGCValidationExtendSchemaToIgnoreDescendants() and p6[child] then
+							continue
+						end
+
+						local v26 = validateWithSchemaHelper(v, child, p6)
+
+						if v26.success then
+							v22 = true
+
+							break
+						end
+
+						if v26.message then
+							v23 = v26
+						end
+					end
+
+					if not v22 and not v._optional then
+						if v23 then
+							return v23
+						end
+
+						local t1 = {
+							success = false
+						}
+						local ClassName = v.ClassName
+						local vName = v.Name
+
+						t1.message = "Could not find a " .. ClassName .. " called " .. ((if type(vName) ~= "table" then type(vName) ~= "string" and "*" or vName else table.concat(vName, " or "))) .. " inside " .. p5.Name
+
+						return t1
+					end
+				end
+			end
+
+			p6[p5] = true
+
+			return {
+				success = true
+			}
+		end
+
+		local p4Name = p4.Name
+		local p5Name = p5.Name
+
+		if type(p4Name) == "table" then
+			for _, v in pairs(p4Name) do
+				if v == p5Name then
+					v34 = true
+					g35 = true
+				end
+
+				if g35 then
+					break
+				end
+			end
+		elseif type(p4Name) == "string" then
+			v34 = p4Name == p5Name
+			g35 = true
+		end
+
+		if not g35 then
+			if not g35 then
+				v34 = false
+			end
+		end
+
+		g35 = false
+
+		if not v34 then
+			return {
+				success = false
+			}
+		end
+
+		g17 = true
+	until not g17
+end
+local function validateWithSchema(p7, p8, _) -- line: 92
+	-- upvalues: validateWithSchemaHelper (copy), getFFlagUGCValidationEnableFolderStructure (copy), getFFlagUGCValidationCombineEntrypointResults (copy)
+	local g39 = nil
+	local g43 = nil
+	local g54 = nil
+	local v53 = nil
+
+	repeat
+		if g39 or p8.ClassName ~= p7.ClassName then
+			g39 = false
+
+			local t2 = {
+				success = false
+			}
+			local ClassName = p7.ClassName
+			local p7Name = p7.Name
+
+			t2.message = "Expected top-level instance to be a " .. ClassName .. " named " .. if type(p7Name) ~= "table" then type(p7Name) ~= "string" and "*" or p7Name else table.concat(p7Name, " or ")
+
+			return t2
+		end
+
+		repeat
+			if g43 or p7.Name == nil then
+				g43 = false
+
+				local t3 = {}
+				local v45 = validateWithSchemaHelper(p7, p8, t3)
+
+				if not v45.success then
+					if getFFlagUGCValidationEnableFolderStructure() and getFFlagUGCValidationCombineEntrypointResults() then
+						return {
+							success = false,
+							message = ""
+						}
+					end
+
+					return v45
+				end
+
+				local t4 = {}
+
+				for _, descendant in pairs(p8:GetDescendants()) do
+					if t3[descendant] == nil then
+						t4[#t4 + 1] = descendant:GetFullName()
+					end
+				end
+
+				if #t4 > 0 then
+					if getFFlagUGCValidationEnableFolderStructure() and getFFlagUGCValidationCombineEntrypointResults() then
+						return {
+							success = false,
+							message = ""
+						}
+					end
+
+					return {
+						success = false,
+						message = "Unexpected Descendants:\n" .. table.concat(t4, "\n")
+					}
+				end
+
+				return {
+					success = true
+				}
+			end
+
+			local p7Name = p7.Name
+			local p8Name = p8.Name
+
+			if type(p7Name) == "table" then
+				for _, v in pairs(p7Name) do
+					if v == p8Name then
+						v53 = true
+						g54 = true
+					end
+
+					if g54 then
+						break
+					end
+				end
+			elseif type(p7Name) == "string" then
+				v53 = p7Name == p8Name
+				g54 = true
+			end
+
+			if not g54 then
+				if not g54 then
+					v53 = false
+				end
+			end
+
+			g54 = false
+
+			if not v53 then
+				g39 = true
+			end
+
+			if g39 then
+				break
+			end
+
+			g43 = true
+		until not g43
+	until not g39
+end
+
+return validateWithSchema

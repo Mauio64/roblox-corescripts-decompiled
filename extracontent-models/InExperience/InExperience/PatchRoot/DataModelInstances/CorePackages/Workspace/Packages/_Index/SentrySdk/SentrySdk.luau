@@ -1,5 +1,6 @@
-local v0 = require(script.Client);
+local Client = require(script.Client)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    Client = v0
-};
+	["jest.config"] = script["jest.config"],
+	Client = Client
+}

@@ -1,1 +1,1 @@
-return game:DefineFastString("CapturesIXPLayer", "Experience.Menu");
+return game:DefineFastString("CapturesIXPLayer", "Experience.Menu")

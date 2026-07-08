@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppLimitEventThumbnailToOne", false);
+return game:DefineFastFlag("LuaAppLimitEventThumbnailToOne", false)

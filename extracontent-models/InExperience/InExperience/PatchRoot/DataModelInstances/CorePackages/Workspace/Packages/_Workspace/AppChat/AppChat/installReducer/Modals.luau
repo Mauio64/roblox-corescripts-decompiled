@@ -264,18 +264,21 @@ return Rodux.createReducer(t1, {
 				modal_variant = AppChatNetworking.Constants.ChatLandingModalVariant.ChatLandingAgeVerifiedCommsTimedModal,
 				modal_layout = {
 					id = "asdf",
+					dismissible = true,
+					seen_record_action = "none",
+					dismissed_record_action = "none",
 					header = {
 						text = "FAE Title",
 						additional_content = {{
-							type = AppChatNetworking.Constants.ModalContentType.Countdown,
-							text = "14 days left"
+							text = "14 days left",
+							type = AppChatNetworking.Constants.ModalContentType.Countdown
 						}}
 					},
 					body = {
 						text = "FAE debug Body",
 						additional_content = {{
-							type = AppChatNetworking.Constants.ModalContentType.Link,
-							text = "Learn more"
+							text = "Learn more",
+							type = AppChatNetworking.Constants.ModalContentType.Link
 						}}
 					},
 					buttons = {
@@ -291,10 +294,7 @@ return Rodux.createReducer(t1, {
 								type = "open_fae_view_details"
 							}
 						}
-					},
-					dismissible = true,
-					seen_record_action = "none",
-					dismissed_record_action = "none"
+					}
 				}
 			}
 		})
@@ -306,6 +306,8 @@ return Rodux.createReducer(t1, {
 				modal_variant = AppChatNetworking.Constants.ChatLandingModalVariant.AgeAssuranceUpsell,
 				modal_layout = {
 					id = "asdf",
+					seen_record_action = "none",
+					dismissed_record_action = "none",
 					label = {
 						text = "New"
 					},
@@ -315,15 +317,13 @@ return Rodux.createReducer(t1, {
 					body = {
 						text = "FAE debug Body",
 						additional_content = {{
-							type = AppChatNetworking.Constants.ModalContentType.Link,
-							text = "Learn more"
+							text = "Learn more",
+							type = AppChatNetworking.Constants.ModalContentType.Link
 						}}
 					},
 					buttons = {{
 						text = "Continue"
-					}},
-					seen_record_action = "none",
-					dismissed_record_action = "none"
+					}}
 				}
 			}
 		})
@@ -351,14 +351,14 @@ return Rodux.createReducer(t1, {
 					modal_variant = p11.modalVariant,
 					modal_layout = {
 						id = "",
+						seen_record_action = "none",
+						dismissed_record_action = "none",
 						body = {
 							text = "Add Trusted Connection"
 						},
 						buttons = {{
 							text = "Add"
-						}},
-						seen_record_action = "none",
-						dismissed_record_action = "none"
+						}}
 					}
 				}
 			})

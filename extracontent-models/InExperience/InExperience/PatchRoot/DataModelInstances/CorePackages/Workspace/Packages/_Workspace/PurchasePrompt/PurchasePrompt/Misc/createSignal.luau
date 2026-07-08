@@ -1,57 +1,68 @@
-local _ = function(v0, v1, v2) --[[ Line: 16 ]] --[[ Name: addToMap ]]
-    local _ = {};
-    local v4 = table.clone(v0);
-    v4[v1] = v2;
-    return v4;
-end;
-local function _(v6, v7) --[[ Line: 26 ]] --[[ Name: removeFromMap ]]
-    local v8 = {};
-    for v9, v10 in pairs(v6) do
-        if v9 ~= v7 then
-            v8[v9] = v10;
-        end;
-    end;
-    return v8;
-end;
-return function() --[[ Line: 38 ]] --[[ Name: createSignal ]]
-    local v12 = {};
-    local function v24(_, v14) --[[ Line: 41 ]] --[[ Name: subscribe ]]
-        -- upvalues: v12 (ref)
-        assert(typeof(v14) == "function", "Can only subscribe to signals with a function.");
-        local v15 = {
-            callback = v14, 
-            disconnected = false
-        };
-        local l_v12_0 = v12;
-        local _ = {};
-        local v18 = table.clone(l_v12_0);
-        v18[v14] = v15;
-        v12 = v18;
-        return function() --[[ Line: 51 ]] --[[ Name: disconnect ]]
-            -- upvalues: v15 (copy), v12 (ref), v14 (copy)
-            assert(not v15.disconnected, "Listeners can only be disconnected once.");
-            v15.disconnected = true;
-            local l_v12_1 = v12;
-            local l_v14_0 = v14;
-            local v21 = {};
-            for v22, v23 in pairs(l_v12_1) do
-                if v22 ~= l_v14_0 then
-                    v21[v22] = v23;
-                end;
-            end;
-            v12 = v21;
-        end;
-    end;
-    local function v28(_, ...) --[[ Line: 61 ]] --[[ Name: fire ]]
-        -- upvalues: v12 (ref)
-        for v26, v27 in pairs(v12) do
-            if not v27.disconnected then
-                v26(...);
-            end;
-        end;
-    end;
-    return {
-        subscribe = v24, 
-        fire = v28
-    };
-end;
+local function addToMap(p1, p2, p3) -- line: 16
+	local v7 = table.clone(p1)
+
+	v7[p2] = p3
+
+	return v7
+end
+local function removeFromMap(p4, p5) -- line: 26
+	local t1 = {}
+
+	for k, v in pairs(p4) do
+		if k ~= p5 then
+			t1[k] = v
+		end
+	end
+
+	return t1
+end
+local function createSignal() -- line: 38
+	local t2 = {}
+
+	return {
+		subscribe = function(_, p7) -- line: 41
+			-- upvalues: t2 (ref)
+			assert(typeof(p7) == "function", "Can only subscribe to signals with a function.")
+
+			local t3 = {
+				disconnected = false,
+				callback = p7
+			}
+			local v17 = t2
+			local v18 = table.clone(v17)
+
+			v18[p7] = t3
+			t2 = v18
+
+			local function disconnect() -- line: 51
+				-- upvalues: t3 (copy), t2 (ref), p7 (copy)
+				assert(not t3.disconnected, "Listeners can only be disconnected once.")
+				t3.disconnected = true
+
+				local v23 = t2
+				local v24 = p7
+				local t4 = {}
+
+				for k, v in pairs(v23) do
+					if k ~= v24 then
+						t4[k] = v
+					end
+				end
+
+				t2 = t4
+			end
+
+			return disconnect
+		end,
+		fire = function(_, ...) -- line: 61
+			-- upvalues: t2 (ref)
+			for k, v in pairs(t2) do
+				if not v.disconnected then
+					k(...)
+				end
+			end
+		end
+	}
+end
+
+return createSignal

@@ -1,12 +1,14 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.UpdateStoreId);
-local v4 = 0;
-return v1.createReducer("0", {
-    [v3.name] = function(_, _) --[[ Line: 11 ]]
-        -- upvalues: v4 (ref)
-        v4 = v4 + 1;
-        return (tostring(v4));
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local UpdateStoreId = require(ParentParent.Actions.UpdateStoreId)
+local n1 = 0
+
+return Rodux.createReducer("0", {
+	[UpdateStoreId.name] = function(_, _) -- line: 11
+		-- upvalues: n1 (ref)
+		n1 += 1
+
+		return (tostring(n1))
+	end
+})

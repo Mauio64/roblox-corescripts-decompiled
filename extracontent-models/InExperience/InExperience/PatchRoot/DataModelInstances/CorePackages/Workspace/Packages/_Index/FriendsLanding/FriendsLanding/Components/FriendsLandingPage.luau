@@ -1,1 +1,1 @@
-return require(script.FriendsLandingPage2);
+return require(script.FriendsLandingPage2)

@@ -1,37 +1,43 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_CorePackages_0.Packages.RoactRodux);
-local v7 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v9 = require(l_RobloxGui_0.Modules.TenFootInterface);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v11 = require(l_Parent_0.Flags.FFlagPlayerListReduceRerenders);
-local l_FFlagEnableMobilePlayerListOnConsole_0 = v7.Flags.FFlagEnableMobilePlayerListOnConsole;
-local v13 = game:DefineFastFlag("PlayerListTopStatCheckGamepad", false);
-local v14 = nil;
-local v15 = not v13 or l_UserInputService_0.PreferredInput == Enum.PreferredInput.Gamepad;
-if if l_FFlagEnableMobilePlayerListOnConsole_0 then l_GuiService_0.ViewportDisplaySize == Enum.DisplaySize.Large and v15 else v9:IsEnabled() then
-    v14 = v9:SetupTopStat();
-end;
-local v16 = v4.PureComponent:extend("TopStatConnector");
-v16.render = function(v17) --[[ Line: 33 ]] --[[ Name: render ]]
-    -- upvalues: v14 (ref)
-    if v14 then
-        v14:SetTopStatEnabled(v17.props.displayOptions.playerlistCoreGuiEnabled);
-    end;
-    return nil;
-end;
-local function v19(v18) --[[ Line: 40 ]] --[[ Name: mapStateToProps ]]
-    return {
-        displayOptions = v18.displayOptions
-    };
-end;
-if v11 then
-    return v5.memo(v6.connect(v19, nil)(v16));
-else
-    return v6.connect(v19, nil)(v16);
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
+local Roact = require(CorePackages.Packages.Roact)
+local React = require(CorePackages.Packages.React)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local ParentParent = script.Parent.Parent.Parent
+local FFlagPlayerListReduceRerenders = require(ParentParent.Flags.FFlagPlayerListReduceRerenders)
+local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
+local v14 = game:DefineFastFlag("PlayerListTopStatCheckGamepad", false)
+local u15 = nil
+local v16 = not v14 or UserInputService.PreferredInput == Enum.PreferredInput.Gamepad
+
+if if not FFlagEnableMobilePlayerListOnConsole then TenFootInterface:IsEnabled() else GuiService.ViewportDisplaySize == Enum.DisplaySize.Large and v16 then
+	u15 = TenFootInterface:SetupTopStat()
+end
+
+local v17 = Roact.PureComponent:extend("TopStatConnector")
+
+function v17.render(p1) -- line: 33
+	-- upvalues: u15 (ref)
+	if u15 then
+		u15:SetTopStatEnabled(p1.props.displayOptions.playerlistCoreGuiEnabled)
+	end
+
+	return nil
+end
+
+local function mapStateToProps(p2) -- line: 40
+	return {
+		displayOptions = p2.displayOptions
+	}
+end
+
+if FFlagPlayerListReduceRerenders then
+	return React.memo(RoactRodux.connect(mapStateToProps, nil)(v17))
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(v17)

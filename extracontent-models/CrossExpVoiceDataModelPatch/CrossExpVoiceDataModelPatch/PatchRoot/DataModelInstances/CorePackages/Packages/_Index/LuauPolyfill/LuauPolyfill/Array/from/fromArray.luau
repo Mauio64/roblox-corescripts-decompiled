@@ -1,19 +1,22 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.types);
-return function(v2, v3, v4) --[[ Line: 11 ]]
-    local v5 = {};
-    if v3 then
-        local v6 = #v2;
-        v5 = table.create(v6);
-        for v7 = 1, v6 do
-            if v4 ~= nil then
-                v5[v7] = v3(v4, v2[v7], v7);
-            else
-                v5[v7] = v3(v2[v7], v7);
-            end;
-        end;
-        return v5;
-    else
-        return (table.clone(v2));
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.types)
+
+return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 11
+	if p2 then
+		local v5 = #p1
+		local t1 = table.create(v5)
+
+		for i = 1, v5 do
+			if p3 ~= nil then
+				t1[i] = p2(p3, p1[i], i)
+			else
+				t1[i] = p2(p1[i], i)
+			end
+		end
+
+		return t1
+	end
+
+	return (table.clone(p1))
+end

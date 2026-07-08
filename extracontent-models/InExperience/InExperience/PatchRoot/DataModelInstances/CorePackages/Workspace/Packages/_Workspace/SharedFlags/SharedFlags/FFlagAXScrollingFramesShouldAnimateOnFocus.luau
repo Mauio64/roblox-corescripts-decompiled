@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXScrollingFramesShouldAnimateOnFocus3", false);
+return game:DefineFastFlag("AXScrollingFramesShouldAnimateOnFocus3", false)

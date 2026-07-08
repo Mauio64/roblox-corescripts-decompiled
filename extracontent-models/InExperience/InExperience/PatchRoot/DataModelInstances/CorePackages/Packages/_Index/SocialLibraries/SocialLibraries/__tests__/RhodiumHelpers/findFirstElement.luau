@@ -1,12 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Packages");
-local l_Element_0 = require(l_script_FirstAncestor_0.Dev.Rhodium).Element;
-local v2 = require(script.Parent.findFirstInstance);
-return function(v3, v4) --[[ Line: 12 ]]
-    -- upvalues: v2 (copy), l_Element_0 (copy)
-    local v5 = v2(v3, v4);
-    if v5 then
-        return l_Element_0.new("game." .. v5:GetFullName());
-    else
-        return nil;
-    end;
-end;
+local Packages = script:FindFirstAncestor("Packages")
+local Element = require(Packages.Dev.Rhodium).Element
+local findFirstInstance = require(script.Parent.findFirstInstance)
+
+return function(p1, p2) -- line: 12
+	-- upvalues: findFirstInstance (copy), Element (copy)
+	local v6 = findFirstInstance(p1, p2)
+
+	if v6 then
+		return Element.new("game." .. v6:GetFullName())
+	end
+
+	return nil
+end

@@ -1,15 +1,19 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = script.Parent.Parent;
-local _ = require(l_Parent_1.AnalyticsTypes);
-local v3 = require(l_Parent_0.Utils.getDeepValue);
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: v3 (copy)
-    local l_keyPath_0 = v4.keyPath;
-    return function(v6) --[[ Line: 9 ]]
-        -- upvalues: v3 (ref), l_keyPath_0 (copy)
-        return function(v7) --[[ Line: 10 ]]
-            -- upvalues: v3 (ref), v6 (copy), l_keyPath_0 (ref)
-            return v3(v6, string.format("%s.bySessionKey.%s", l_keyPath_0, v7));
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParent2 = script.Parent.Parent
+
+require(ParentParent2.AnalyticsTypes)
+
+local getDeepValue = require(ParentParent.Utils.getDeepValue)
+
+return function(p1) -- line: 7
+	-- upvalues: getDeepValue (copy)
+	local keyPath = p1.keyPath
+
+	return function(p2) -- line: 9
+		-- upvalues: getDeepValue (copy), keyPath (copy)
+		return function(p3) -- line: 10
+			-- upvalues: getDeepValue (copy), p2 (copy), keyPath (copy)
+			return getDeepValue(p2, string.format("%s.bySessionKey.%s", keyPath, p3))
+		end
+	end
+end

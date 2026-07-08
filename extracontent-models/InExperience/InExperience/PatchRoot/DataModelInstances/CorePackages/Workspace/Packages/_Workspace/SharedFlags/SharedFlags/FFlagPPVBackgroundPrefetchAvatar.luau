@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PPVBackgroundPrefetchAvatar", false);
+return game:DefineFastFlag("PPVBackgroundPrefetchAvatar", false)

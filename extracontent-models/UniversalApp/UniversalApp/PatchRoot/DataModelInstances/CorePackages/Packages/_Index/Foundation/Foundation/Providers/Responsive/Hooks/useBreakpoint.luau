@@ -1,114 +1,131 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local l_usePrevious_0 = require(l_Parent_0.ReactUtils).usePrevious;
-local l_Instance_0 = require(l_script_FirstAncestor_0.Utility.Wrappers).Instance;
-local _ = require(l_script_FirstAncestor_0.Enums.Breakpoint);
-local v7 = require(l_script_FirstAncestor_0.Constants);
-local _ = require(l_script_FirstAncestor_0.Providers.Responsive.ResponsiveContext);
-local v9 = require(l_script_FirstAncestor_0.Providers.Responsive.useResponsive);
-local v10 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = function(v11, v12) --[[ Line: 28 ]] --[[ Name: calculateBreakpointFromWidth ]]
-    local v13 = v11.order[#v11.order];
-    for _, v15 in v11.order do
-        if v12 <= v11.widths[v15] then
-            return v15;
-        end;
-    end;
-    return v13;
-end;
-local function _(v17, v18) --[[ Line: 41 ]] --[[ Name: getBreakpointIndex ]]
-    -- upvalues: v2 (copy)
-    return v2.findIndex(v17.order, function(v19) --[[ Line: 42 ]]
-        -- upvalues: v18 (copy)
-        return v19 == v18;
-    end);
-end;
-local function _(v21, v22, v23, v24) --[[ Line: 47 ]] --[[ Name: shouldChangeBreakpoint ]]
-    -- upvalues: v2 (copy)
-    if not v24 then
-        return true;
-    elseif v23 == v24 then
-        return false;
-    elseif v2.findIndex(v21.order, function(v25) --[[ Line: 42 ]]
-        -- upvalues: v24 (copy)
-        return v25 == v24;
-    end) < v2.findIndex(v21.order, function(v26) --[[ Line: 42 ]]
-        -- upvalues: v23 (copy)
-        return v26 == v23;
-    end) then
-        return v21.widths[v24] + 5 < v22;
-    else
-        return v22 < v21.widths[v23] - 5;
-    end;
-end;
-return function(v28, v29) --[[ Line: 74 ]] --[[ Name: useBreakpoint ]]
-    -- upvalues: v10 (copy), v7 (copy), v9 (copy), v3 (copy), l_usePrevious_0 (copy), v2 (copy), l_Instance_0 (copy)
-    local v30 = v10(v29 or {}, {
-        throttleTime = v7.DEFAULT_DELAY_TIME
-    });
-    local l_breakpoint_0 = v9().config.breakpoint;
-    local v32, v33 = v3.useState(Vector2.zero);
-    local l_X_0 = v32.X;
-    local v35 = l_breakpoint_0.order[#l_breakpoint_0.order];
-    for _, v37 in l_breakpoint_0.order do
-        if l_X_0 <= l_breakpoint_0.widths[v37] then
-            v35 = v37;
-            break;
-        end;
-    end;
-    local l_v35_0 = v35;
-    l_X_0, v35 = v3.useState(l_v35_0);
-    local v39 = l_usePrevious_0(l_X_0);
-    local v40 = v3.useMemo(function() --[[ Line: 87 ]]
-        -- upvalues: v2 (ref), v33 (copy), v30 (copy)
-        return v2.throttle(v33, v30.throttleTime, {
-            leading = true, 
-            trailing = true
-        });
-    end, {
-        v30.throttleTime
-    });
-    v3.useEffect(function() --[[ Line: 94 ]]
-        -- upvalues: v28 (copy), l_Instance_0 (ref), v40 (copy), v33 (copy)
-        local v41 = nil;
-        if v28 then
-            v41 = l_Instance_0.GetPropertyChangedSignal(v28, "AbsoluteSize"):Connect(function() --[[ Line: 98 ]]
-                -- upvalues: v40 (ref), v28 (ref)
-                v40(v28.AbsoluteSize);
-            end);
-            v33(v28.AbsoluteSize);
-        end;
-        return function() --[[ Line: 104 ]]
-            -- upvalues: v41 (ref)
-            if v41 then
-                v41:Disconnect();
-            end;
-        end;
-    end, {
-        v28
-    });
-    v3.useEffect(function() --[[ Line: 111 ]]
-        -- upvalues: l_breakpoint_0 (copy), v32 (copy), l_v35_0 (copy), v39 (copy), v2 (ref), v35 (copy)
-        local l_l_breakpoint_0_0 = l_breakpoint_0;
-        local l_X_1 = v32.X;
-        local l_l_v35_0_0 = l_v35_0;
-        local l_v39_0 = v39;
-        if not l_v39_0 or not (l_l_v35_0_0 == l_v39_0) and if v2.findIndex(l_l_breakpoint_0_0.order, function(v46) --[[ Line: 42 ]]
-            -- upvalues: l_v39_0 (copy)
-            return v46 == l_v39_0;
-        end) < v2.findIndex(l_l_breakpoint_0_0.order, function(v47) --[[ Line: 42 ]]
-            -- upvalues: l_l_v35_0_0 (copy)
-            return v47 == l_l_v35_0_0;
-        end) then l_l_breakpoint_0_0.widths[l_v39_0] + 5 < l_X_1 else l_X_1 < l_l_breakpoint_0_0.widths[l_l_v35_0_0] - 5 then
-            v35(l_v35_0);
-        end;
-    end, {
-        l_breakpoint_0, 
-        v32.X, 
-        l_v35_0, 
-        v39
-    });
-    return l_X_0, v32;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+local usePrevious = require(FoundationParent.ReactUtils).usePrevious
+local Instance = require(Foundation.Utility.Wrappers).Instance
+
+require(Foundation.Enums.Breakpoint)
+
+local Constants = require(Foundation.Constants)
+
+require(Foundation.Providers.Responsive.ResponsiveContext)
+
+local useResponsive = require(Foundation.Providers.Responsive.useResponsive)
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+local function calculateBreakpointFromWidth(p1, n1: number) -- line: 28
+	local v16 = p1.order[#p1.order]
+
+	for _, v18 in p1.order do
+		if n1 <= p1.widths[v18] then
+			return v18
+		end
+	end
+
+	return v16
+end
+local function getBreakpointIndex(p2, p3) -- line: 41
+	-- upvalues: Dash (copy)
+	return Dash.findIndex(p2.order, function(p4) -- line: 42
+		-- upvalues: p3 (copy)
+		return p4 == p3
+	end)
+end
+local function shouldChangeBreakpoint(p5, n2: number, p6, p7) -- line: 47
+	-- upvalues: Dash (copy)
+	if not p7 then
+		return true
+	end
+
+	if p6 == p7 then
+		return false
+	end
+
+	if Dash.findIndex(p5.order, function(p8) -- line: 42
+		-- upvalues: p7 (copy)
+		return p8 == p7
+	end) < Dash.findIndex(p5.order, function(p9) -- line: 42
+		-- upvalues: p6 (copy)
+		return p9 == p6
+	end) then
+		return n2 > p5.widths[p7] + 5
+	end
+
+	return n2 < p5.widths[p6] - 5
+end
+local function useBreakpoint(p10, t1: {[any]: any}?) -- line: 74
+	-- upvalues: withDefaults (copy), Constants (copy), useResponsive (copy), React (copy), usePrevious (copy), Dash (copy), Instance (copy)
+	local v27 = withDefaults(t1 or {}, {
+		throttleTime = Constants.DEFAULT_DELAY_TIME
+	})
+	local breakpoint = useResponsive().config.breakpoint
+	local v29, v30 = React.useState(Vector2.zero)
+	local X = v29.X
+	local v32 = breakpoint.order[#breakpoint.order]
+
+	for _, v34 in breakpoint.order do
+		if X <= breakpoint.widths[v34] then
+			v32 = v34
+
+			break
+		end
+	end
+
+	local v35 = v32
+	local v36, v37 = React.useState(v35)
+	local v38 = usePrevious(v36)
+	local v39 = React.useMemo(function() -- line: 87
+		-- upvalues: Dash (copy), v30 (copy), v27 (copy)
+		return Dash.throttle(v30, v27.throttleTime, {
+			leading = true,
+			trailing = true
+		})
+	end, { v27.throttleTime })
+
+	React.useEffect(function() -- line: 94
+		-- upvalues: p10 (copy), Instance (copy), v39 (copy), v30 (copy)
+		local connection = nil
+
+		if p10 then
+			connection = Instance.GetPropertyChangedSignal(p10, "AbsoluteSize"):Connect(function() -- line: 98
+				-- upvalues: v39 (copy), p10 (copy)
+				v39(p10.AbsoluteSize)
+			end)
+			v30(p10.AbsoluteSize)
+		end
+
+		return function() -- line: 104
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { p10 })
+	React.useEffect(function() -- line: 111
+		-- upvalues: breakpoint (copy), v29 (copy), v35 (copy), v38 (copy), Dash (copy), v37 (copy)
+		local v44 = breakpoint
+		local X2 = v29.X
+		local v46 = v35
+		local v47 = v38
+
+		if not v47 or v46 ~= v47 and if not (Dash.findIndex(v44.order, function(p11) -- line: 42
+			-- upvalues: v47 (copy)
+			return p11 == v47
+		end) < Dash.findIndex(v44.order, function(p12) -- line: 42
+			-- upvalues: v46 (copy)
+			return p12 == v46
+		end)) then X2 < v44.widths[v46] - 5 else X2 > v44.widths[v47] + 5 then
+			v37(v35)
+		end
+	end, {
+		breakpoint,
+		v29.X,
+		v35,
+		v38
+	})
+
+	return v36, v29
+end
+
+return useBreakpoint

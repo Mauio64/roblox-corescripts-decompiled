@@ -1,16 +1,20 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: pop ]]
-    local v2 = type(v0);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    v1 = v1 or 1;
-    local v3 = type(v1);
-    local v4 = false;
-    if v3 == "number" then
-        v4 = v1 % 1 == 0;
-    end;
-    assert(v4, "expected an integer for second argument, got " .. v3);
-    local v5 = {};
-    for v6 = 1, #v0 - v1 do
-        v5[v6] = v0[v6];
-    end;
-    return v5;
-end;
+local function pop(p1, p2) -- line: 2
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	local v5 = p2 or 1
+	local v6 = type(v5)
+
+	assert(v6 == "number" and v5 % 1 == 0, "expected an integer for second argument, got " .. v6)
+
+	local t1 = {}
+
+	for i = 1, #p1 - v5 do
+		t1[i] = p1[i]
+	end
+
+	return t1
+end
+
+return pop

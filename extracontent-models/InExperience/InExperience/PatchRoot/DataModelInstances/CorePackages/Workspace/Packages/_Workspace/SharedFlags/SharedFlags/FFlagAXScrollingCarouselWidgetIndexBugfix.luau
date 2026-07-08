@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXScrollingCarouselWidgetIndexBugfix", false);
+return game:DefineFastFlag("AXScrollingCarouselWidgetIndexBugfix", false)

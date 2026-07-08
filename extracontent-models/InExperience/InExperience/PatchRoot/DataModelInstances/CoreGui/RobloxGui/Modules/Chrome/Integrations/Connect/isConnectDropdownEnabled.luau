@@ -1,8 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GetFFlagEnableAppChatInExperience_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagEnableAppChatInExperience;
-local v3 = require(l_script_FirstAncestor_0.Flags.GetShouldShowPlatformChatBasedOnPolicy);
-return function() --[[ Line: 9 ]]
-    -- upvalues: l_GetFFlagEnableAppChatInExperience_0 (copy), v3 (copy)
-    return l_GetFFlagEnableAppChatInExperience_0() and v3();
-end;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local GetFFlagEnableAppChatInExperience = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableAppChatInExperience
+local GetShouldShowPlatformChatBasedOnPolicy = require(Chrome.Flags.GetShouldShowPlatformChatBasedOnPolicy)
+
+return function() -- line: 9
+	-- upvalues: GetFFlagEnableAppChatInExperience (copy), GetShouldShowPlatformChatBasedOnPolicy (copy)
+	return GetFFlagEnableAppChatInExperience() and GetShouldShowPlatformChatBasedOnPolicy()
+end

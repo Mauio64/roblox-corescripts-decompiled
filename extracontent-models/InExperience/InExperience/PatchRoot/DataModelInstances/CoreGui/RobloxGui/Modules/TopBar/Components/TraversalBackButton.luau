@@ -25,223 +25,225 @@ local _ = Traversal.Flags.FFlagUseLocalTraversalHistory
 local FFlagAddTraversalBackButtonAnimation = Traversal.Flags.FFlagAddTraversalBackButtonAnimation
 local v26 = game:DefineFastFlag("FixTraversalBackButtonAnimation", false)
 
-return React.memo(function(_: {[any]: any}) --[[ TraversalBackButton ]] -- line: 36
+local function TraversalBackButton(_: {[any]: any}) -- line: 36
 	-- upvalues: useTokens (copy), React (copy), TeleportService (copy), Constants (copy), SettingsShowSignal (copy), TraversalTelemetry (copy), useLocalization (copy), getGameInfoStore (copy), DataHydrationTypes (copy), SignalsReact (copy), v26 (copy), FFlagAddTraversalBackButtonAnimation (copy), ReactOtter (copy), UserGameSettings (copy), View (copy), TeleportBackButton (copy)
-	local v28 = useTokens()
-	local v29 = React.useRef(nil)
-	local v30, v31 = TeleportService:GetThirdPartyTeleportInfo(false)
+	local v29 = useTokens()
+	local v30 = React.useRef(nil)
+	local v31, v32 = TeleportService:GetThirdPartyTeleportInfo(false)
 
-	if v30 <= Constants.NO_UNIVERSE_ID or v31 <= Constants.NO_PLACE_ID then
+	if v31 <= Constants.NO_UNIVERSE_ID or v32 <= Constants.NO_PLACE_ID then
 		return nil
 	end
 
-	local v32, v33 = React.useState(false)
+	local v33, v34 = React.useState(false)
 
 	React.useEffect(function() -- line: 46
-		-- upvalues: SettingsShowSignal (copy), v33 (copy)
-		local v48 = SettingsShowSignal:connect(function(p1) -- line: 47
-			-- upvalues: v33 (copy)
-			v33(p1)
+		-- upvalues: SettingsShowSignal (copy), v34 (copy)
+		local v49 = SettingsShowSignal:connect(function(p1) -- line: 47
+			-- upvalues: v34 (copy)
+			v34(p1)
 		end)
 
 		return function() -- line: 50
-			-- upvalues: v48 (copy)
-			v48:Disconnect()
+			-- upvalues: v49 (copy)
+			v49:Disconnect()
 		end
 	end, {})
 	React.useEffect(function() -- line: 55
-		-- upvalues: v32 (copy), TraversalTelemetry (copy), v30 (copy)
-		if v32 then
+		-- upvalues: v33 (copy), TraversalTelemetry (copy), v31 (copy)
+		if v33 then
 			TraversalTelemetry.sendBackButtonActionEvent({
 				integration_id = "back_button",
-				destination_universe_id = v30,
-				event_type = "impression"
+				event_type = "impression",
+				destination_universe_id = v31
 			})
 		end
 	end, {
-		v32,
-		v30
+		v33,
+		v31
 	})
 
-	local v34 = useLocalization({
+	local v35 = useLocalization({
 		defaultBackButtonText = "CoreScripts.TopBar.Traversal.BackButtonDefault"
 	})
-	local v35 = React.useCallback(function(p2) -- line: 69
-		-- upvalues: getGameInfoStore (copy), v30 (copy), DataHydrationTypes (copy), v34 (copy)
-		local v50 = getGameInfoStore(p2).getAndFetchGameInfo((tostring(v30)))
-		local v51 = v50.data(p2)
-		local v52 = v50.status(p2)
+	local v36 = React.useCallback(function(p2) -- line: 69
+		-- upvalues: getGameInfoStore (copy), v31 (copy), DataHydrationTypes (copy), v35 (copy)
+		local v51 = getGameInfoStore(p2).getAndFetchGameInfo((tostring(v31)))
+		local v52 = v51.data(p2)
+		local v53 = v51.status(p2)
 
-		if not v51 or v52 ~= DataHydrationTypes.DataStatus.Ready then
-			return v34.defaultBackButtonText
+		if not v52 or v53 ~= DataHydrationTypes.DataStatus.Ready then
+			return v35.defaultBackButtonText
 		end
 
-		return v51.name
+		return v52.name
 	end, {
-		v30,
+		v31,
 		getGameInfoStore
 	})
-	local v36 = SignalsReact.useSignalState(v35)
-	local u37 = nil
+	local v37 = SignalsReact.useSignalState(v36)
+	local u38 = nil
 
 	if v26 then
-		u37 = React.useRef(nil)
+		u38 = React.useRef(nil)
 	end
 
-	local v38 = v28.Size.Size_2500 * 2
-	local u39 = nil
+	local v39 = v29.Size.Size_2500 * 2
 	local u40 = nil
 	local u41 = nil
-	local v42 = nil
-	local u43 = nil
-	local v44 = nil
+	local u42 = nil
+	local v43 = nil
+	local u44 = nil
 	local v45 = nil
+	local v46 = nil
 
 	if FFlagAddTraversalBackButtonAnimation then
-		u39 = React.useRef(nil)
 		u40 = React.useRef(nil)
+		u41 = React.useRef(nil)
 
 		if v26 then
-			u41 = React.useRef(nil)
+			u42 = React.useRef(nil)
 		end
 
-		local v46 = React.useMemo(function() -- line: 100
-			-- upvalues: v28 (copy)
+		local v47 = React.useMemo(function() -- line: 100
+			-- upvalues: v29 (copy)
 			return {
-				duration = v28.Time.Time_300,
-				easingStyle = v28.Ease.StandardOut
+				duration = v29.Time.Time_300,
+				easingStyle = v29.Ease.StandardOut
 			}
-		end, { v28 })
-		local v47
+		end, { v29 })
+		local v48
 
-		v42, v47 = ReactOtter.useAnimatedBinding(0, function(n1: number) -- line: 106
-			-- upvalues: u39 (ref), v26 (copy), u41 (ref), u40 (ref)
-			u39.current = nil
+		v43, v48 = ReactOtter.useAnimatedBinding(0, function(n1: number) -- line: 106
+			-- upvalues: u40 (ref), v26 (copy), u42 (ref), u41 (ref)
+			u40.current = nil
 
 			if v26 then
-				if not u41.current and u40.current and n1 == 1 then
-					u41.current = u40.current
+				if not u42.current and u41.current and n1 == 1 then
+					u42.current = u41.current
 				end
 
 				if n1 == 0 then
-					u40.current = 0
+					u41.current = 0
 
 					return
 				end
 			else
-				u40.current = nil
+				u41.current = nil
 			end
 		end)
-		u43 = v47
+		u44 = v48
 		React.useEffect(function() -- line: 119
-			-- upvalues: v32 (copy), v26 (copy), u37 (ref), v36 (copy), u41 (ref), v29 (copy), u43 (ref), ReactOtter (copy), v46 (copy)
-			if v32 then
+			-- upvalues: v33 (copy), v26 (copy), u38 (ref), v37 (copy), u42 (ref), v30 (copy), u44 (ref), ReactOtter (copy), v47 (copy)
+			if v33 then
 				if v26 then
-					if u37.current ~= v36 then
-						u41.current = nil
-						u37.current = v36
+					if u38.current ~= v37 then
+						u42.current = nil
+						u38.current = v37
 
-						if v29.current then
-							u43(ReactOtter.ease(0.99, v46))
+						if v30.current then
+							u44(ReactOtter.ease(0.99, v47))
 						end
 					else
-						u43(ReactOtter.ease(1, v46))
+						u44(ReactOtter.ease(1, v47))
 					end
 				else
-					u43(ReactOtter.ease(1, v46))
+					u44(ReactOtter.ease(1, v47))
 				end
 			else
-				u43(ReactOtter.ease(0, v46))
+				u44(ReactOtter.ease(0, v47))
 			end
 
-			if v26 and u37.current == nil then
-				u37.current = v36
+			if v26 and u38.current == nil then
+				u38.current = v37
 			end
 		end, {
-			v32,
-			v46,
-			v36
+			v33,
+			v47,
+			v37
 		})
-		v44 = React.useCallback(function(n2: number) -- line: 142
-			-- upvalues: v26 (copy), u41 (ref), v32 (copy), v29 (copy), u39 (ref), u40 (ref), v38 (copy)
+		v45 = React.useCallback(function(n2: number) -- line: 142
+			-- upvalues: v26 (copy), u42 (ref), v33 (copy), v30 (copy), u40 (ref), u41 (ref), v39 (copy)
 			if v26 then
-				if u41.current then
-					return UDim2.new(0, n2 * u41.current, 0, 0)
+				if u42.current then
+					return UDim2.new(0, n2 * u42.current, 0, 0)
 				end
 
-				local v56
+				local v57
 
-				if v32 and v29.current then
-					local AbsoluteSizeX = v29.current.AbsoluteSize.X
+				if v33 and v30.current then
+					local AbsoluteSizeX = v30.current.AbsoluteSize.X
 
-					if not u39.current then
-						u39.current = v29.current.AbsoluteSize.X
+					if not u40.current then
+						u40.current = v30.current.AbsoluteSize.X
 					end
 
-					if u40.current and AbsoluteSizeX <= u40.current then
-						return UDim2.new(0, if not v26 then u40.current else AbsoluteSizeX, 0, 0)
+					if u41.current and AbsoluteSizeX <= u41.current then
+						return UDim2.new(0, if not v26 then u41.current else AbsoluteSizeX, 0, 0)
 					end
 
-					if u39.current and AbsoluteSizeX ~= u39.current then
-						u40.current = AbsoluteSizeX
+					if u40.current and AbsoluteSizeX ~= u40.current then
+						u41.current = AbsoluteSizeX
 					end
 
-					v56 = n2 * v38
+					v57 = n2 * v39
 				else
-					v56 = n2 * (u40.current or v38)
+					v57 = n2 * (u41.current or v39)
 				end
 
-				return UDim2.new(0, v56, 0, 0)
+				return UDim2.new(0, v57, 0, 0)
 			end
 
-			if v32 and v29.current then
-				local AbsoluteSizeX = v29.current.AbsoluteSize.X
+			if v33 and v30.current then
+				local AbsoluteSizeX = v30.current.AbsoluteSize.X
 
-				if not u39.current then
-					u39.current = v29.current.AbsoluteSize.X
+				if not u40.current then
+					u40.current = v30.current.AbsoluteSize.X
 				end
 
-				if u40.current and AbsoluteSizeX <= u40.current then
-					return UDim2.new(0, u40.current, 0, 0)
+				if u41.current and AbsoluteSizeX <= u41.current then
+					return UDim2.new(0, u41.current, 0, 0)
 				end
 
-				if u39.current and AbsoluteSizeX ~= u39.current then
-					u40.current = AbsoluteSizeX
+				if u40.current and AbsoluteSizeX ~= u40.current then
+					u41.current = AbsoluteSizeX
 				end
 			end
 
-			local v58 = n2 * v38
+			local v59 = n2 * v39
 
-			return UDim2.new(0, v58, 0, 0)
-		end, { v32 })
-		v45 = React.useCallback(function(p3) -- line: 182
-			-- upvalues: v32 (copy)
-			return p3 > 0 or v32
-		end, { v32 })
+			return UDim2.new(0, v59, 0, 0)
+		end, { v33 })
+		v46 = React.useCallback(function(p3) -- line: 182
+			-- upvalues: v33 (copy)
+			return p3 > 0 or v33
+		end, { v33 })
 	end
 
 	if FFlagAddTraversalBackButtonAnimation and not UserGameSettings.ReducedMotion then
 		return React.createElement(View, {
 			tag = "auto-y",
-			Visible = v42:map(v45),
-			Size = v42:map(v44),
-			ZIndex = -1
+			ZIndex = -1,
+			Visible = v43:map(v46),
+			Size = v43:map(v45)
 		}, {
 			TraversalBackButton = React.createElement(TeleportBackButton, {
-				text = v36,
-				textLimitWidth = v38,
-				ref = v29
+				text = v37,
+				textLimitWidth = v39,
+				ref = v30
 			})
 		})
 	end
 
-	return v32 and React.createElement(View, {
+	return v33 and React.createElement(View, {
 		tag = "auto-xy shrink"
 	}, {
 		TraversalBackButton = React.createElement(TeleportBackButton, {
-			text = v36,
-			textLimitWidth = v38,
-			ref = v29
+			text = v37,
+			textLimitWidth = v39,
+			ref = v30
 		})
 	})
-end)
+end
+
+return React.memo(TraversalBackButton)

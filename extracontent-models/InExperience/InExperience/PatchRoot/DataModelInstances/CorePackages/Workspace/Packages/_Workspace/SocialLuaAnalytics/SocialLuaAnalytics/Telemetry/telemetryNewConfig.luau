@@ -1,31 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLuaAnalytics");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.Analytics.Enums.SupportedTelemetryBackends);
-local v4 = require(l_script_FirstAncestor_0.Telemetry.formatEventStreamFields);
-local _ = require(l_script_FirstAncestor_0.Analytics.Enums.Contexts);
-return function(v6) --[[ Line: 26 ]] --[[ Name: telemetryConfig ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    return {
-        name = v6.name, 
-        description = v6.description, 
-        eventStreamCtx = v6.eventStreamCtx, 
-        lastUpdated = v6.lastUpdated, 
-        backendsList = v2.List.map(v6.backendsList, function(v7) --[[ Line: 32 ]]
-            -- upvalues: v4 (ref), v2 (ref)
-            if v7.type == "EventIngest" then
-                local function v9(...) --[[ Line: 35 ]]
-                    -- upvalues: v7 (copy), v4 (ref)
-                    local v8 = v7.format(...);
-                    return v4(v8);
-                end;
-                return v2.Dictionary.join(v7, {
-                    format = v9
-                });
-            else
-                return v7;
-            end;
-        end), 
-        throttlingThousandths = v6.throttlingThousandths
-    };
-end;
+local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
+local SocialLuaAnalyticsParent = SocialLuaAnalytics.Parent
+local Cryo = require(SocialLuaAnalyticsParent.Cryo)
+
+require(SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends)
+
+local formatEventStreamFields = require(SocialLuaAnalytics.Telemetry.formatEventStreamFields)
+
+require(SocialLuaAnalytics.Analytics.Enums.Contexts)
+
+local function telemetryConfig(t1: {[any]: any}) -- line: 32
+	-- upvalues: Cryo (copy), formatEventStreamFields (copy)
+	return {
+		name = t1.name,
+		description = t1.description,
+		eventStreamCtx = t1.eventStreamCtx,
+		lastUpdated = t1.lastUpdated,
+		backendsList = Cryo.List.map(t1.backendsList, function(p1) -- line: 38
+			-- upvalues: formatEventStreamFields (copy), Cryo (copy)
+			if p1.type == "EventIngest" then
+				return Cryo.Dictionary.join(p1, {
+					format = function(...) -- line: 41
+						-- upvalues: p1 (copy), formatEventStreamFields (copy)
+						local v8 = p1.format(...)
+
+						return formatEventStreamFields(v8)
+					end
+				})
+			end
+
+			return p1
+		end),
+		throttlingThousandths = t1.throttlingThousandths
+	}
+end
+
+return telemetryConfig

@@ -1,6 +1,7 @@
-local v0 = require(script.Parent.AnalyticsService);
-local v1 = require(script.Parent.UnifiedEventLogConstants);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    v0.EventStream:sendTelemetryEvent(v1.EVENT_NAME, v1.EVENT_NAME, v2);
-end;
+local AnalyticsService = require(script.Parent.AnalyticsService)
+local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+
+return function(p1) -- line: 4
+	-- upvalues: AnalyticsService (copy), UnifiedEventLogConstants (copy)
+	AnalyticsService.EventStream:sendTelemetryEvent(UnifiedEventLogConstants.EVENT_NAME, UnifiedEventLogConstants.EVENT_NAME, p1)
+end

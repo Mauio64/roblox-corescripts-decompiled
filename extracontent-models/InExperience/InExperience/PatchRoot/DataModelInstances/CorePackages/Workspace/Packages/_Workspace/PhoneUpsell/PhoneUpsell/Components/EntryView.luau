@@ -1,105 +1,114 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PhoneUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local l_PartialPageModal_0 = v3.App.Dialog.Modal.PartialPageModal;
-local l_getPartialPageModalMiddleContentWidth_0 = v3.App.Dialog.Modal.getPartialPageModalMiddleContentWidth;
-local v9 = require(l_script_FirstAncestor_0.Utils.mergeProps);
-local function v10() --[[ Line: 31 ]] --[[ Name: noOp ]]
+local PhoneUpsell = script:FindFirstAncestor("PhoneUpsell")
+local PhoneUpsellParent = PhoneUpsell.Parent
+local React = require(PhoneUpsellParent.React)
+local UIBlox = require(PhoneUpsellParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local useLocalization = require(PhoneUpsellParent.Localization).Hooks.useLocalization
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local PartialPageModal = UIBlox.App.Dialog.Modal.PartialPageModal
+local getPartialPageModalMiddleContentWidth = UIBlox.App.Dialog.Modal.getPartialPageModalMiddleContentWidth
+local mergeProps = require(PhoneUpsell.Utils.mergeProps)
 
-end;
-local v11 = {
-    onClose = v10, 
-    isButtonDisabled = false, 
-    onExtraButtonClick = v10, 
-    isExtraButtonDisabled = false
-};
-local function v19(v12, v13, v14, v15, v16, v17) --[[ Line: 40 ]] --[[ Name: getButtonStackProps ]]
-    -- upvalues: l_ButtonType_0 (copy)
-    local v18 = {
-        {
-            buttonType = l_ButtonType_0.PrimarySystem, 
-            props = {
-                onActivated = v13, 
-                text = v12, 
-                isDisabled = v14
-            }
-        }
-    };
-    if v15 and v15 ~= "" then
-        table.insert(v18, 1, {
-            buttonType = l_ButtonType_0.Secondary, 
-            props = {
-                onActivated = v16, 
-                text = v15, 
-                isDisabled = v17
-            }
-        });
-    end;
-    return {
-        buttonHeight = 48, 
-        forcedFillDirection = Enum.FillDirection.Vertical, 
-        buttons = v18
-    };
-end;
-return function(v20) --[[ Line: 76 ]] --[[ Name: EntryView ]]
-    -- upvalues: v9 (copy), v11 (copy), l_getPartialPageModalMiddleContentWidth_0 (copy), l_useStyle_0 (copy), l_useLocalization_0 (copy), v2 (copy), l_PartialPageModal_0 (copy), v19 (copy)
-    local v21 = v9(v11, v20);
-    local v22 = l_getPartialPageModalMiddleContentWidth_0(v21.screenSize.X);
-    local v23 = {
-        titleKey = v21.titleKey, 
-        descriptionKey = v21.descriptionKey, 
-        buttonKey = v21.buttonKey
-    };
-    if v21.extraButtonKey and v21.extraButtonKey ~= "" then
-        v23.extraButtonKey = v21.extraButtonKey;
-    end;
-    local v24 = l_useStyle_0();
-    local v25 = l_useLocalization_0(v23);
-    v25 = {
-        titleKey = "Before you leave", 
-        descriptionKey = "This experience would be even more exciting with Voice Chat turned on. Unlock now before your next session.", 
-        buttonKey = "Unlock voice chat", 
-        extraButtonKey = "Leave experience"
-    };
-    local l_BaseSize_0 = v24.Font.BaseSize;
-    return v2.createElement(l_PartialPageModal_0, {
-        title = v25.titleKey, 
-        screenSize = v21.screenSize, 
-        buttonStackProps = v19(v25.buttonKey, v21.onButtonClick, v21.isButtonDisabled, v25.extraButtonKey, v21.onExtraButtonClick, v21.isExtraButtonDisabled), 
-        onCloseClicked = v21.onClose
-    }, {
-        Middle = v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.new(1, 0, 0, 0)
-        }, {
-            ContentPadding = v2.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 12), 
-                PaddingBottom = UDim.new(0, 24)
-            }), 
-            ListLayout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 6)
-            }), 
-            BodyText = v2.createElement("TextLabel", {
-                LayoutOrder = 0, 
-                BackgroundTransparency = 1, 
-                Text = v25.descriptionKey, 
-                TextSize = l_BaseSize_0, 
-                TextColor3 = v24.Theme.TextDefault.Color, 
-                TextTransparency = v24.Theme.TextDefault.Transparency, 
-                Font = v24.Font.Body.Font, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextWrapped = true, 
-                Size = UDim2.new(0, v22, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                RichText = true
-            })
-        })
-    });
-end;
+local function noOp() -- line: 31
+end
+
+local t1 = {
+	isButtonDisabled = false,
+	isExtraButtonDisabled = false,
+	onClose = noOp,
+	onExtraButtonClick = noOp
+}
+
+local function getButtonStackProps(s1: string, p1: ((...any) -> ...any), b1: boolean, s2: string, p2: ((...any) -> ...any), b2: boolean) -- line: 40
+	-- upvalues: ButtonType (copy)
+	local t2 = {{
+		buttonType = ButtonType.PrimarySystem,
+		props = {
+			onActivated = p1,
+			text = s1,
+			isDisabled = b1
+		}
+	}}
+
+	if s2 and s2 ~= "" then
+		table.insert(t2, 1, {
+			buttonType = ButtonType.Secondary,
+			props = {
+				onActivated = p2,
+				text = s2,
+				isDisabled = b2
+			}
+		})
+	end
+
+	return {
+		buttonHeight = 48,
+		forcedFillDirection = Enum.FillDirection.Vertical,
+		buttons = t2
+	}
+end
+local function EntryView(t3: {[any]: any}) -- line: 76
+	-- upvalues: mergeProps (copy), t1 (copy), getPartialPageModalMiddleContentWidth (copy), useStyle (copy), useLocalization (copy), React (copy), PartialPageModal (copy), getButtonStackProps (copy)
+	local v23 = mergeProps(t1, t3)
+	local v24 = getPartialPageModalMiddleContentWidth(v23.screenSize.X)
+	local t4 = {
+		titleKey = v23.titleKey,
+		descriptionKey = v23.descriptionKey,
+		buttonKey = v23.buttonKey
+	}
+
+	if v23.extraButtonKey and v23.extraButtonKey ~= "" then
+		t4.extraButtonKey = v23.extraButtonKey
+	end
+
+	local v26 = useStyle()
+
+	useLocalization(t4)
+
+	local t5 = {
+		titleKey = "Before you leave",
+		descriptionKey = "This experience would be even more exciting with Voice Chat turned on. Unlock now before your next session.",
+		buttonKey = "Unlock voice chat",
+		extraButtonKey = "Leave experience"
+	}
+	local BaseSize = v26.Font.BaseSize
+
+	return React.createElement(PartialPageModal, {
+		title = t5.titleKey,
+		screenSize = v23.screenSize,
+		buttonStackProps = getButtonStackProps(t5.buttonKey, v23.onButtonClick, v23.isButtonDisabled, t5.extraButtonKey, v23.onExtraButtonClick, v23.isExtraButtonDisabled),
+		onCloseClicked = v23.onClose
+	}, {
+		Middle = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0)
+		}, {
+			ContentPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 12),
+				PaddingBottom = UDim.new(0, 24)
+			}),
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 6)
+			}),
+			BodyText = React.createElement("TextLabel", {
+				LayoutOrder = 0,
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				RichText = true,
+				Text = t5.descriptionKey,
+				TextSize = BaseSize,
+				TextColor3 = v26.Theme.TextDefault.Color,
+				TextTransparency = v26.Theme.TextDefault.Transparency,
+				Font = v26.Font.Body.Font,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				Size = UDim2.new(0, v24, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			})
+		})
+	})
+end
+
+return EntryView

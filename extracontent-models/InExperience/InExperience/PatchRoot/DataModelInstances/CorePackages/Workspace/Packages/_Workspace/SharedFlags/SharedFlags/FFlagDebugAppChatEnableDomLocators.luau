@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugAppChatEnableDomLocators", false);
+return game:DefineFastFlag("DebugAppChatEnableDomLocators", false)

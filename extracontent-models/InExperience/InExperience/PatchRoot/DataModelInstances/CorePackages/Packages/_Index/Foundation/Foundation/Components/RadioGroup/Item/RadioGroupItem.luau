@@ -1,57 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local v5 = require(l_Components_0.InternalInput);
-local _ = require(l_Components_0.Types);
-local v7 = require(l_Components_0.View);
-local v8 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v9 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v10 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v11 = require(script.Parent.useRadioGroupItemVariants);
-local v12 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v13 = require(l_script_FirstAncestor_0.Enums.InputPlacement);
-local v14 = require(script.Parent.Parent.useRadioGroup);
-local v15 = {
-    size = v12.Medium, 
-    isDisabled = false, 
-    placement = v13.Start
-};
-return v2.memo(v2.forwardRef(function(v16, v17) --[[ Line: 47 ]] --[[ Name: RadioGroupItem ]]
-    -- upvalues: v10 (copy), v15 (copy), v14 (copy), v8 (copy), v2 (copy), v11 (copy), v5 (copy), v9 (copy), v3 (copy), v7 (copy)
-    local v18 = v10(v16, v15);
-    local l_isDisabled_0 = v18.isDisabled;
-    local v20 = v14();
-    local v21 = v20.value == v18.value;
-    local v22 = v18.label or v18.value;
-    local v23 = v8();
-    local v24 = v2.useCallback(function() --[[ Line: 57 ]]
-        -- upvalues: v20 (copy), v18 (copy)
-        v20.onValueChanged(v18.value);
-    end, {
-        l_isDisabled_0, 
-        v18.value, 
-        v20.onValueChanged
-    });
-    local v25 = v11(v23, v18.size);
-    v18.testId = ("%*--item-%*"):format(v20.testId, v18.value);
-    return v2.createElement(v5, v9(v18, {
-        isChecked = v21, 
-        isDisabled = l_isDisabled_0, 
-        onActivated = v24, 
-        label = {
-            text = v22, 
-            position = v3.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v18.placement]
-        }, 
-        customVariantProps = v25.input, 
-        size = v18.size, 
-        Selectable = v20.Selectable, 
-        ref = v17
-    }), {
-        Center = if v21 then v2.createElement(v7, {
-            tag = v25.checkmark.tag, 
-            backgroundStyle = v25.checkmark.style
-        }) else nil
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Constants = require(Foundation.Constants)
+local Components = Foundation.Components
+local InternalInput = require(Components.InternalInput)
+
+require(Components.Types)
+
+local View = require(Components.View)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useRadioGroupItemVariants = require(script.Parent.useRadioGroupItemVariants)
+local InputSize = require(Foundation.Enums.InputSize)
+local InputPlacement = require(Foundation.Enums.InputPlacement)
+local useRadioGroup = require(script.Parent.Parent.useRadioGroup)
+local t1 = {
+	isDisabled = false,
+	size = InputSize.Medium,
+	placement = InputPlacement.Start
+}
+
+local function RadioGroupItem(p1, p2) -- line: 47
+	-- upvalues: withDefaults (copy), t1 (copy), useRadioGroup (copy), useTokens (copy), React (copy), useRadioGroupItemVariants (copy), InternalInput (copy), withCommonProps (copy), Constants (copy), View (copy)
+	local v19 = withDefaults(p1, t1)
+	local isDisabled = v19.isDisabled
+	local v21 = useRadioGroup()
+	local v22 = v21.value == v19.value
+	local v23 = v19.label or v19.value
+	local v24 = useTokens()
+	local v25 = React.useCallback(function() -- line: 57
+		-- upvalues: v21 (copy), v19 (copy)
+		v21.onValueChanged(v19.value)
+	end, {
+		isDisabled,
+		v19.value,
+		v21.onValueChanged
+	})
+	local v26 = useRadioGroupItemVariants(v24, v19.size)
+
+	v19.testId = `{ v21.testId }--item-{ v19.value }`
+
+	return React.createElement(InternalInput, withCommonProps(v19, {
+		isChecked = v22,
+		isDisabled = isDisabled,
+		onActivated = v25,
+		label = {
+			text = v23,
+			position = Constants.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v19.placement]
+		},
+		customVariantProps = v26.input,
+		size = v19.size,
+		Selectable = v21.Selectable,
+		ref = p2
+	}), {
+		Center = if not v22 then nil else React.createElement(View, {
+			tag = v26.checkmark.tag,
+			backgroundStyle = v26.checkmark.style
+		})
+	})
+end
+
+return React.memo(React.forwardRef(RadioGroupItem))

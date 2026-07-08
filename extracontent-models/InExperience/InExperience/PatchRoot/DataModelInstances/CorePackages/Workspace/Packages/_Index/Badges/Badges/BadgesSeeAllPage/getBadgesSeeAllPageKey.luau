@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getBadgesSeeAllPageKey ]]
-    return (("BadgesSeeAll_%*"):format(v0));
-end;
+local function getBadgesSeeAllPageKey(s1: string) -- line: 1
+	return `BadgesSeeAll_{ s1 }`
+end
+
+return getBadgesSeeAllPageKey

@@ -1,4 +1,4 @@
 return {
-    PlaceInfoModel = require(script.PlaceInfoModel), 
-    MockPlaceInfoModel = require(script.MockPlaceInfoModel)
-};
+	PlaceInfoModel = require(script.PlaceInfoModel),
+	MockPlaceInfoModel = require(script.MockPlaceInfoModel)
+}

@@ -1,8 +1,10 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local _ = require(script.Parent.Parent.AnalyticsTypes);
-return v1.Rodux.makeActionCreator(script.Name, function(v3) --[[ Line: 7 ]]
-    return {
-        payload = v3
-    };
-end);
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+
+require(script.Parent.Parent.AnalyticsTypes)
+
+return dependencies.Rodux.makeActionCreator(script.Name, function(p1) -- line: 7
+	return {
+		payload = p1
+	}
+end)

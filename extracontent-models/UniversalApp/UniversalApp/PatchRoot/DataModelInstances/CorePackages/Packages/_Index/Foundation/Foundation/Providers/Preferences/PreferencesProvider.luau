@@ -1,23 +1,27 @@
-local l_Parent_0 = script.Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_1 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_0.PreferencesContext);
-local v5 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v6 = {
-    preferredTextSize = Enum.PreferredTextSize.Medium, 
-    preferredTransparency = 1, 
-    reducedMotion = false, 
-    scale = 1
-};
-return function(v7) --[[ Line: 30 ]] --[[ Name: PreferencesProvider ]]
-    -- upvalues: v5 (copy), v6 (copy), v3 (copy), v4 (copy)
-    local v8 = v5({
-        preferredTextSize = v7.preferredTextSize, 
-        preferredTransparency = v7.preferredTransparency, 
-        reducedMotion = v7.reducedMotion
-    }, v6);
-    return v3.createElement(v4.Provider, {
-        value = v8
-    }, v7.children);
-end;
+local scriptParent = script.Parent
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local PreferencesContext = require(scriptParent.PreferencesContext)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local t1 = {
+	preferredTransparency = 1,
+	reducedMotion = false,
+	scale = 1,
+	preferredTextSize = Enum.PreferredTextSize.Medium
+}
+
+local function PreferencesProvider(p1) -- line: 30
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), PreferencesContext (copy)
+	local v10 = withDefaults({
+		preferredTextSize = p1.preferredTextSize,
+		preferredTransparency = p1.preferredTransparency,
+		reducedMotion = p1.reducedMotion
+	}, t1)
+
+	return React.createElement(PreferencesContext.Provider, {
+		value = v10
+	}, p1.children)
+end
+
+return PreferencesProvider

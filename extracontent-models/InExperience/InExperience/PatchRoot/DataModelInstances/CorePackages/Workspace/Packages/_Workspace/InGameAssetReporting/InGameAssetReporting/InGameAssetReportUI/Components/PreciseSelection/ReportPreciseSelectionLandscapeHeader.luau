@@ -1,191 +1,200 @@
-local l_Parent_0 = script:FindFirstAncestor("InGameAssetReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local v3 = require(l_Parent_0.Foundation);
-local l_Button_0 = v3.Button;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_InputSize_0 = v3.Enums.InputSize;
-local l_HeaderBar_0 = v2.App.Bar.HeaderBar;
-local l_IconButton_0 = v2.App.Button.IconButton;
-local l_IconSize_0 = v2.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v2.App.ImageSet.Images;
-local l_withStyle_0 = v2.Style.withStyle;
-local function _(v12) --[[ Line: 32 ]] --[[ Name: renderHeaderBarCenter ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy)
-    return function() --[[ Line: 33 ]]
-        -- upvalues: l_withStyle_0 (ref), v1 (ref), v12 (copy)
-        return l_withStyle_0(function(v13) --[[ Line: 34 ]]
-            -- upvalues: v1 (ref), v12 (ref)
-            local l_Theme_0 = v13.Theme;
-            local l_Font_0 = v13.Font;
-            return v1.createElement("TextLabel", {
-                Text = v12, 
-                Font = l_Font_0.Header2.Font, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                TextSize = 20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1
-            });
-        end);
-    end;
-end;
-local function _(v17) --[[ Line: 54 ]] --[[ Name: renderHeaderBarLeft ]]
-    -- upvalues: v1 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy)
-    return function() --[[ Line: 55 ]]
-        -- upvalues: v1 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), v17 (copy)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 120, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            BackButton = v1.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/pushBack"], 
-                layoutOrder = 1, 
-                onActivated = v17
-            })
-        });
-    end;
-end;
-local function _(v19, v20, v21, v22, v23, v24) --[[ Line: 76 ]] --[[ Name: renderHeaderBarRight ]]
-    -- upvalues: v1 (copy), v3 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy)
-    return function() --[[ Line: 84 ]]
-        -- upvalues: v1 (ref), v3 (ref), v21 (copy), v22 (copy), v23 (copy), v24 (copy), l_Button_0 (ref), l_ButtonVariant_0 (ref), l_InputSize_0 (ref), v19 (copy), v20 (copy)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 144, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            CoachmarkWrapper = v1.createElement(v3.Coachmark, {
-                title = v21, 
-                text = v22, 
-                isOpen = v23 or false, 
-                side = v3.Enums.PopoverSide.Bottom, 
-                align = v3.Enums.PopoverAlign.End, 
-                onClose = v24
-            }, {
-                NextButton = v1.createElement(l_Button_0, {
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    inputSize = l_InputSize_0.Large, 
-                    onActivated = v19, 
-                    text = v20, 
-                    width = UDim.new(0, 144)
-                })
-            })
-        });
-    end;
-end;
-return function(v26) --[[ Line: 114 ]] --[[ Name: LandscapeModeHeader ]]
-    -- upvalues: v1 (copy), l_HeaderBar_0 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy), v3 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy), l_withStyle_0 (copy)
-    local l_createElement_0 = v1.createElement;
-    local v28 = "Frame";
-    local v29 = {
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 0.1, 
-        BackgroundColor3 = Color3.fromHex("#000000"), 
-        LayoutOrder = 1, 
-        Size = UDim2.new(1, 0, 0, 71), 
-        ZIndex = 2
-    };
-    local v30 = {};
-    local l_createElement_1 = v1.createElement;
-    local l_l_HeaderBar_0_0 = l_HeaderBar_0;
-    local v33 = {
-        backgroundTransparency = 1, 
-        barHeight = 72
-    };
-    local l_backAction_0 = v26.backAction;
-    local l_l_backAction_0_0 = l_backAction_0 --[[ copy: 9 -> 15 ]];
-    v33.renderLeft = function() --[[ Line: 55 ]]
-        -- upvalues: v1 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), l_l_backAction_0_0 (copy)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 120, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            BackButton = v1.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/pushBack"], 
-                layoutOrder = 1, 
-                onActivated = l_l_backAction_0_0
-            })
-        });
-    end;
-    l_backAction_0 = v26.nextAction;
-    local l_nextText_0 = v26.nextText;
-    local l_coachmarkTitle_0 = v26.coachmarkTitle;
-    local l_coachmarkText_0 = v26.coachmarkText;
-    local l_isCoachmarkOpen_0 = v26.isCoachmarkOpen;
-    local l_onCoachmarkClose_0 = v26.onCoachmarkClose;
-    local l_l_backAction_0_1 = l_backAction_0 --[[ copy: 9 -> 16 ]];
-    v33.renderRight = function() --[[ Line: 84 ]]
-        -- upvalues: v1 (ref), v3 (ref), l_coachmarkTitle_0 (copy), l_coachmarkText_0 (copy), l_isCoachmarkOpen_0 (copy), l_onCoachmarkClose_0 (copy), l_Button_0 (ref), l_ButtonVariant_0 (ref), l_InputSize_0 (ref), l_l_backAction_0_1 (copy), l_nextText_0 (copy)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 144, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            CoachmarkWrapper = v1.createElement(v3.Coachmark, {
-                title = l_coachmarkTitle_0, 
-                text = l_coachmarkText_0, 
-                isOpen = l_isCoachmarkOpen_0 or false, 
-                side = v3.Enums.PopoverSide.Bottom, 
-                align = v3.Enums.PopoverAlign.End, 
-                onClose = l_onCoachmarkClose_0
-            }, {
-                NextButton = v1.createElement(l_Button_0, {
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    inputSize = l_InputSize_0.Large, 
-                    onActivated = l_l_backAction_0_1, 
-                    text = l_nextText_0, 
-                    width = UDim.new(0, 144)
-                })
-            })
-        });
-    end;
-    l_backAction_0 = v26.titleText;
-    v33.renderCenter = function() --[[ Line: 33 ]]
-        -- upvalues: l_withStyle_0 (ref), v1 (ref), l_backAction_0 (copy)
-        return l_withStyle_0(function(v42) --[[ Line: 34 ]]
-            -- upvalues: v1 (ref), l_backAction_0 (ref)
-            local l_Theme_1 = v42.Theme;
-            local l_Font_1 = v42.Font;
-            return v1.createElement("TextLabel", {
-                Text = l_backAction_0, 
-                Font = l_Font_1.Header2.Font, 
-                TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                TextTransparency = l_Theme_1.TextEmphasis.Transparency, 
-                TextSize = 20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1
-            });
-        end);
-    end;
-    v30.Bar = l_createElement_1(l_l_HeaderBar_0_0, v33);
-    return l_createElement_0(v28, v29, v30);
-end;
+local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local withStyle = UIBlox.Style.withStyle
+
+local function renderHeaderBarCenter(p1) -- line: 32
+	-- upvalues: withStyle (copy), React (copy)
+	return function() -- line: 33
+		-- upvalues: withStyle (copy), React (copy), p1 (copy)
+		return withStyle(function(p2) -- line: 34
+			-- upvalues: React (copy), p1 (copy)
+			local Theme = p2.Theme
+			local p2Font = p2.Font
+
+			return React.createElement("TextLabel", {
+				TextSize = 20,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = p1,
+				Font = p2Font.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0)
+			})
+		end)
+	end
+end
+local function renderHeaderBarLeft(p3) -- line: 54
+	-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy)
+	return function() -- line: 55
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), p3 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 120, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			BackButton = React.createElement(IconButton, {
+				layoutOrder = 1,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = p3
+			})
+		})
+	end
+end
+local function renderHeaderBarRight(p4, p5, p6, p7, p8, p9) -- line: 76
+	-- upvalues: React (copy), Foundation (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
+	return function() -- line: 84
+		-- upvalues: React (copy), Foundation (copy), p6 (copy), p7 (copy), p8 (copy), p9 (copy), Button (copy), ButtonVariant (copy), InputSize (copy), p4 (copy), p5 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 144, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			CoachmarkWrapper = React.createElement(Foundation.Coachmark, {
+				title = p6,
+				text = p7,
+				isOpen = p8 or false,
+				side = Foundation.Enums.PopoverSide.Bottom,
+				align = Foundation.Enums.PopoverAlign.End,
+				onClose = p9
+			}, {
+				NextButton = React.createElement(Button, {
+					variant = ButtonVariant.Emphasis,
+					inputSize = InputSize.Large,
+					onActivated = p4,
+					text = p5,
+					width = UDim.new(0, 144)
+				})
+			})
+		})
+	end
+end
+local function LandscapeModeHeader(t1: {[any]: any}) -- line: 114
+	-- upvalues: React (copy), HeaderBar (copy), IconButton (copy), IconSize (copy), Images (copy), Foundation (copy), Button (copy), ButtonVariant (copy), InputSize (copy), withStyle (copy)
+	local createElement = React.createElement
+	local t2 = {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 0.1,
+		LayoutOrder = 1,
+		ZIndex = 2,
+		BackgroundColor3 = Color3.fromHex("#000000"),
+		Size = UDim2.new(1, 0, 0, 71)
+	}
+	local t3 = {}
+	local createElement2 = React.createElement
+	local v30 = HeaderBar
+	local t4 = {
+		backgroundTransparency = 1,
+		barHeight = 72
+	}
+	local backAction = t1.backAction
+
+	function t4.renderLeft() -- line: 55
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), backAction (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 120, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			BackButton = React.createElement(IconButton, {
+				layoutOrder = 1,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = backAction
+			})
+		})
+	end
+
+	local nextAction = t1.nextAction
+	local nextText = t1.nextText
+	local coachmarkTitle = t1.coachmarkTitle
+	local coachmarkText = t1.coachmarkText
+	local isCoachmarkOpen = t1.isCoachmarkOpen
+	local onCoachmarkClose = t1.onCoachmarkClose
+
+	function t4.renderRight() -- line: 84
+		-- upvalues: React (copy), Foundation (copy), coachmarkTitle (copy), coachmarkText (copy), isCoachmarkOpen (copy), onCoachmarkClose (copy), Button (copy), ButtonVariant (copy), InputSize (copy), nextAction (copy), nextText (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 144, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			CoachmarkWrapper = React.createElement(Foundation.Coachmark, {
+				title = coachmarkTitle,
+				text = coachmarkText,
+				isOpen = isCoachmarkOpen or false,
+				side = Foundation.Enums.PopoverSide.Bottom,
+				align = Foundation.Enums.PopoverAlign.End,
+				onClose = onCoachmarkClose
+			}, {
+				NextButton = React.createElement(Button, {
+					variant = ButtonVariant.Emphasis,
+					inputSize = InputSize.Large,
+					onActivated = nextAction,
+					text = nextText,
+					width = UDim.new(0, 144)
+				})
+			})
+		})
+	end
+
+	local titleText = t1.titleText
+
+	function t4.renderCenter() -- line: 33
+		-- upvalues: withStyle (copy), React (copy), titleText (copy)
+		return withStyle(function(p10) -- line: 34
+			-- upvalues: React (copy), titleText (copy)
+			local Theme = p10.Theme
+			local p10Font = p10.Font
+
+			return React.createElement("TextLabel", {
+				TextSize = 20,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = titleText,
+				Font = p10Font.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0)
+			})
+		end)
+	end
+
+	t3.Bar = createElement2(v30, t4)
+
+	return createElement("Frame", t2, t3)
+end
+
+return LandscapeModeHeader

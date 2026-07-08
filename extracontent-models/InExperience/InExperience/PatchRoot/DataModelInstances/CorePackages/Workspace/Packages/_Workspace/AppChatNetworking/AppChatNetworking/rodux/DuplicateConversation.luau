@@ -1,19 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local v1 = require(l_script_FirstAncestor_0.url.CHAT_PLATFORM_BASE_URL);
-local v2 = require(script.Parent.RoduxNetworking);
-local _ = require(l_script_FirstAncestor_0.responses.SharedTypes);
-return v2.POST(script.Name, function(v4, v5, v6) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy)
-    return v4(v1):path("v1"):path("create-conversations"):body({
-        conversations = {
-            {
-                conversation_to_duplicate = v5, 
-                moderation_type = v6, 
-                type = "group", 
-                participant_user_ids = {}
-            }
-        }
-    }):setStatusIds({
-        v5
-    });
-end);
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+require(AppChatNetworking.responses.SharedTypes)
+
+return RoduxNetworking.POST(script.Name, function(p1, s1: string, p2) -- line: 10
+	-- upvalues: CHAT_PLATFORM_BASE_URL (copy)
+	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("create-conversations"):body({
+		conversations = {{
+			type = "group",
+			conversation_to_duplicate = s1,
+			moderation_type = p2,
+			participant_user_ids = {}
+		}}
+	}):setStatusIds({ s1 })
+end)

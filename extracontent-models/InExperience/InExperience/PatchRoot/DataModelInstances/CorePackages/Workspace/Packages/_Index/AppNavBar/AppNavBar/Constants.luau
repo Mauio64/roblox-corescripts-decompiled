@@ -1,12 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_FFlagAppIaHomeSubTab_0 = require(l_Parent_0.SharedFlags).FFlagAppIaHomeSubTab;
+local ParentParent = script.Parent.Parent
+local AppPage = require(ParentParent.RobloxAppEnums).AppPage
+local FFlagAppIaHomeSubTab = require(ParentParent.SharedFlags).FFlagAppIaHomeSubTab
+
 return {
-    STUDIO_CTA_EVENT_CONTEXT = "StudioCTA", 
-    STUDIO_CTA_EVENT_NAME_OPEN = "OpenStudioCreatePage", 
-    STUDIO_CTA_EVENT_NAME_MOUNT = "MountStudioButton", 
-    HOME_CONTAINER_SUB_TAB_PAGES = if l_FFlagAppIaHomeSubTab_0 then {
-        l_AppPage_0.Home, 
-        l_AppPage_0.Games
-    } else nil
-};
+	STUDIO_CTA_EVENT_CONTEXT = "StudioCTA",
+	STUDIO_CTA_EVENT_NAME_OPEN = "OpenStudioCreatePage",
+	STUDIO_CTA_EVENT_NAME_MOUNT = "MountStudioButton",
+	HOME_CONTAINER_SUB_TAB_PAGES = if not FFlagAppIaHomeSubTab then nil else {
+		AppPage.Home,
+		AppPage.Games
+	}
+}

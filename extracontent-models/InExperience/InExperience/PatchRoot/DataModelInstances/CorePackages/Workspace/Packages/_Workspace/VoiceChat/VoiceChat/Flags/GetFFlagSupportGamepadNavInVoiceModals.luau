@@ -1,4 +1,5 @@
-game:DefineFastFlag("SupportGamepadNavInVoiceModals", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("SupportGamepadNavInVoiceModals");
-end;
+game:DefineFastFlag("SupportGamepadNavInVoiceModals", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("SupportGamepadNavInVoiceModals")
+end

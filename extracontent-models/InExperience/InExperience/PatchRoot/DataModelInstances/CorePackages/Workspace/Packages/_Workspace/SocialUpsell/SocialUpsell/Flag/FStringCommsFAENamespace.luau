@@ -1,1 +1,1 @@
-return game:DefineFastString("CommsFAENamespace", "social/Upsells");
+return game:DefineFastString("CommsFAENamespace", "social/Upsells")

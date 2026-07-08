@@ -1,19 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.LoggingProtocol);
-local v3 = require(l_script_FirstAncestor_0.Enums.SurfaceName);
-local v4 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local _ = require(l_script_FirstAncestor_0.types);
-local _ = require(l_script_FirstAncestor_0.Enums.ErrorReason);
-logRobloxSubscriptionUpsellCounter = function(v7) --[[ Line: 14 ]] --[[ Name: logRobloxSubscriptionUpsellCounter ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy)
-    local v8 = v4.get();
-    local v9 = v8.getEntryContext();
-    local v10 = v8.getErrorReason();
-    local v11 = if v9 then v9.surfaceName else v3.Unspecified;
-    v2.default:logRobloxTelemetryCounter(v7, 1, {
-        surface = v11, 
-        errorReason = v10 and tostring(v10) or nil
-    });
-end;
-return logRobloxSubscriptionUpsellCounter;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local LoggingProtocol = require(RobloxSubscriptionPurchaseAppParent.LoggingProtocol)
+local SurfaceName = require(RobloxSubscriptionPurchaseApp.Enums.SurfaceName)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+
+require(RobloxSubscriptionPurchaseApp.types)
+require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+
+function logRobloxSubscriptionUpsellCounter(p1) -- line: 14
+	-- upvalues: RobloxSubscriptionStore (copy), SurfaceName (copy), LoggingProtocol (copy)
+	local v7 = RobloxSubscriptionStore.get()
+	local v8 = v7.getEntryContext()
+	local v9 = v7.getErrorReason()
+	local v10 = if not v8 then SurfaceName.Unspecified else v8.surfaceName
+
+	LoggingProtocol.default:logRobloxTelemetryCounter(p1, 1, {
+		surface = v10,
+		errorReason = v9 and tostring(v9) or nil
+	})
+end
+
+return logRobloxSubscriptionUpsellCounter

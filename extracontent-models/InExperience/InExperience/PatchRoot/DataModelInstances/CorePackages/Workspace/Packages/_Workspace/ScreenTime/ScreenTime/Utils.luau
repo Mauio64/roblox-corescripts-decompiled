@@ -1,30 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("ScreenTime").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local l_Logging_0 = require(l_Parent_0.AppCommonLib).Logging;
+local Parent = script:FindFirstAncestor("ScreenTime").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local Logging = require(Parent.AppCommonLib).Logging
+
 return {
-    globalGetter = nil, 
-    globalSetter = nil, 
-    new = function(v3, v4) --[[ Line: 30 ]] --[[ Name: new ]]
-        -- upvalues: v1 (copy)
-        v1.isType(v4.globalGetter, "function", "globalGetter");
-        v1.isType(v4.globalSetter, "function", "globalSetter");
-        local v5 = {
-            globalGetter = v4.globalGetter, 
-            globalSetter = v4.globalSetter
-        };
-        setmetatable(v5, v3);
-        v3.__index = v3;
-        return v5;
-    end, 
-    isLockedOut = function(v6) --[[ Line: 45 ]] --[[ Name: isLockedOut ]]
-        -- upvalues: v1 (copy)
-        v1.isType(v6.globalGetter, "function", "globalGetter");
-        return v6.globalGetter("ScreenTime.lockedOut") == "true";
-    end, 
-    setLockedOut = function(v7) --[[ Line: 54 ]] --[[ Name: setLockedOut ]]
-        -- upvalues: l_Logging_0 (copy), v1 (copy)
-        l_Logging_0.warn("Utils setLockedOut");
-        v1.isType(v7.globalSetter, "function", "globalSetter");
-        v7.globalSetter("ScreenTime.lockedOut", "true");
-    end
-};
+	globalGetter = nil,
+	globalSetter = nil,
+	new = function(p1, p2) -- line: 30
+		-- upvalues: ArgCheck (copy)
+		ArgCheck.isType(p2.globalGetter, "function", "globalGetter")
+		ArgCheck.isType(p2.globalSetter, "function", "globalSetter")
+
+		local t1 = {
+			globalGetter = p2.globalGetter,
+			globalSetter = p2.globalSetter
+		}
+
+		setmetatable(t1, p1)
+		p1.__index = p1
+
+		return t1
+	end,
+	isLockedOut = function(p3) -- line: 45
+		-- upvalues: ArgCheck (copy)
+		ArgCheck.isType(p3.globalGetter, "function", "globalGetter")
+
+		return p3.globalGetter("ScreenTime.lockedOut") == "true"
+	end,
+	setLockedOut = function(p4) -- line: 54
+		-- upvalues: Logging (copy), ArgCheck (copy)
+		Logging.warn("Utils setLockedOut")
+		ArgCheck.isType(p4.globalSetter, "function", "globalSetter")
+		p4.globalSetter("ScreenTime.lockedOut", "true")
+	end
+}

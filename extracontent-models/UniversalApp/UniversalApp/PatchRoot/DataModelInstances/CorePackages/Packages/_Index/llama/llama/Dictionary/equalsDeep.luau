@@ -1,34 +1,44 @@
-local v0 = require(script.Parent.Parent.equalObjects);
-local function v1(v2, v3) --[[ Line: 4 ]] --[[ Name: equalsDeepOneWay ]]
-    -- upvalues: v1 (copy)
-    if type(v2) == "table" and type(v3) == "table" then
-        for v4, v5 in pairs(v2) do
-            if not v1(v5, v3[v4]) then
-                return false;
-            end;
-        end;
-    elseif v2 ~= v3 then
-        return false;
-    end;
-    return true;
-end;
-return function(...) --[[ Line: 20 ]] --[[ Name: equalsDeep ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    if v0(...) then
-        return true;
-    else
-        local v6 = select("#", ...);
-        for v7 = 1, v6 do
-            local v8 = select(v7, ...);
-            for v9 = 1, v6 do
-                if v9 ~= v7 then
-                    local v10 = select(v9, ...);
-                    if not v1(v8, v10) then
-                        return false;
-                    end;
-                end;
-            end;
-        end;
-        return true;
-    end;
-end;
+local equalObjects = require(script.Parent.Parent.equalObjects)
+
+local function equalsDeepOneWay(p1, p2) -- line: 4
+	-- upvalues: equalsDeepOneWay (copy)
+	if type(p1) == "table" and type(p2) == "table" then
+		for k, v in pairs(p1) do
+			if not equalsDeepOneWay(v, p2[k]) then
+				return false
+			end
+		end
+	elseif p1 ~= p2 then
+		return false
+	end
+
+	return true
+end
+local function equalsDeep(...) -- line: 20
+	-- upvalues: equalObjects (copy), equalsDeepOneWay (copy)
+	if equalObjects(...) then
+		return true
+	end
+
+	local v8 = select("#", ...)
+
+	for i = 1, v8 do
+		local v10 = select(i, ...)
+
+		for j = 1, v8 do
+			if j == i then
+				continue
+			end
+
+			local v12 = select(j, ...)
+
+			if not equalsDeepOneWay(v10, v12) then
+				return false
+			end
+		end
+	end
+
+	return true
+end
+
+return equalsDeep

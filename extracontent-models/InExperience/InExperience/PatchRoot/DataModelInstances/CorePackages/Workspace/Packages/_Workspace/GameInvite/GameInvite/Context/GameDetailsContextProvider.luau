@@ -1,18 +1,20 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_0.GameDetailsContext);
-local v4 = require(l_Parent_2.React);
-local _ = require(l_Parent_1.gameInviteModalType);
-return function(v6) --[[ Line: 17 ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    return v4.createElement(v3.Provider, {
-        value = {
-            gameDetails = v6.gameDetails or {}, 
-            serverType = v6.serverType or "", 
-            promptMessage = v6.promptMessage or "", 
-            trigger = v6.trigger or "", 
-            isCoreScript = v6.isCoreScript or false
-        }
-    }, v6.children);
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local GameDetailsContext = require(scriptParent.GameDetailsContext)
+local React = require(scriptParentParentParent.React)
+
+require(scriptParentParent.gameInviteModalType)
+
+return function(t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy), GameDetailsContext (copy)
+	return React.createElement(GameDetailsContext.Provider, {
+		value = {
+			gameDetails = t1.gameDetails or {},
+			serverType = t1.serverType or "",
+			promptMessage = t1.promptMessage or "",
+			trigger = t1.trigger or "",
+			isCoreScript = t1.isCoreScript or false
+		}
+	}, t1.children)
+end

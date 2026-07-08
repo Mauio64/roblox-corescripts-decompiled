@@ -1,3 +1,3 @@
 return {
-    GameSortLoadSource = require(script.GameSortLoadSource)
-};
+	GameSortLoadSource = require(script.GameSortLoadSource)
+}

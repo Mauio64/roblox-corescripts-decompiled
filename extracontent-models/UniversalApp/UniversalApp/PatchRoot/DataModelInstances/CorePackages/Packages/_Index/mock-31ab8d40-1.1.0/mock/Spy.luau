@@ -1,48 +1,56 @@
-local v0 = require(script.Parent.symbols);
-local v1 = require(script.Parent.isAMagicMock);
-local v2 = {};
-v2.__index = v2;
-v2.__call = function(v3, ...) --[[ Line: 9 ]]
-    return v3.inner(...);
-end;
-local v4 = {};
-setmetatable(v4, {
-    __mode = "kv"
-});
-v2.new = function(v5) --[[ Line: 16 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v2 (copy), v4 (copy)
-    local v6 = {
-        [v0.isSpy] = true, 
-        [v0.Calls] = {}
-    };
-    setmetatable(v6, v2);
-    local function v8(...) --[[ Line: 23 ]]
-        -- upvalues: v5 (copy), v6 (copy), v0 (ref)
-        local v7 = {
-            args = table.pack(...), 
-            result = table.pack(v5(...))
-        };
-        table.insert(v6[v0.Calls], v7);
-        return table.unpack(v7.result);
-    end;
-    v6.inner = v8;
-    v4[v8] = v6;
-    return v6, v8;
-end;
-v2.lookup = function(v9) --[[ Line: 38 ]] --[[ Name: lookup ]]
-    -- upvalues: v4 (copy)
-    return v4[v9];
-end;
-v2.is = function(v10) --[[ Line: 42 ]] --[[ Name: is ]]
-    -- upvalues: v1 (copy), v0 (copy)
-    if not v1(v10) then
-        local v11 = false;
-        if type(v10) == "table" then
-            v11 = v10[v0.isSpy] ~= nil;
-        end;
-        return v11;
-    else
-        return false;
-    end;
-end;
-return v2;
+local symbols = require(script.Parent.symbols)
+local isAMagicMock = require(script.Parent.isAMagicMock)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.__call(p1, ...) -- line: 9
+	return p1.inner(...)
+end
+
+local t2 = {}
+
+setmetatable(t2, {
+	__mode = "kv"
+})
+
+function t1.new(p2) -- line: 16
+	-- upvalues: symbols (copy), t1 (copy), t2 (copy)
+	local t3 = {
+		[symbols.isSpy] = true,
+		[symbols.Calls] = {}
+	}
+
+	setmetatable(t3, t1)
+
+	local function v8(...) -- line: 23
+		-- upvalues: p2 (copy), t3 (copy), symbols (copy)
+		local t4 = {
+			args = table.pack(...),
+			result = table.pack(p2(...))
+		}
+
+		table.insert(t3[symbols.Calls], t4)
+
+		return table.unpack(t4.result)
+	end
+
+	t3.inner = v8
+	t2[v8] = t3
+
+	return t3, v8
+end
+function t1.lookup(p3) -- line: 38
+	-- upvalues: t2 (copy)
+	return t2[p3]
+end
+function t1.is(p4) -- line: 42
+	-- upvalues: isAMagicMock (copy), symbols (copy)
+	if not isAMagicMock(p4) then
+		return type(p4) == "table" and p4[symbols.isSpy] ~= nil
+	end
+
+	return false
+end
+
+return t1

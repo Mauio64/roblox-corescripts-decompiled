@@ -1,34 +1,41 @@
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExperienceLoadingScript");
-local v2 = require(l_script_FirstAncestor_0.Actions.SetGameProductInfo);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: l_MarketplaceService_0 (copy), v2 (copy)
-    return function(v4) --[[ Line: 7 ]]
-        -- upvalues: v3 (copy), l_MarketplaceService_0 (ref), v2 (ref)
-        coroutine.wrap(function() --[[ Line: 8 ]]
-            -- upvalues: v3 (ref), l_MarketplaceService_0 (ref), v4 (copy), v2 (ref)
-            local l_v3_0 = v3;
-            if not l_v3_0 or l_v3_0 <= 0 then
-                while game.PlaceId <= 0 do
-                    wait();
-                end;
-                l_v3_0 = game.PlaceId;
-            end;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 16 ]]
-                -- upvalues: l_MarketplaceService_0 (ref), l_v3_0 (ref), v4 (ref), v2 (ref)
-                if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                    local l_l_MarketplaceService_0_ProductInfoAsync_0 = l_MarketplaceService_0:GetProductInfoAsync(l_v3_0);
-                    v4:dispatch(v2(l_l_MarketplaceService_0_ProductInfoAsync_0));
-                    return;
-                else
-                    local l_l_MarketplaceService_0_ProductInfo_0 = l_MarketplaceService_0:GetProductInfo(l_v3_0);
-                    v4:dispatch(v2(l_l_MarketplaceService_0_ProductInfo_0));
-                    return;
-                end;
-            end);
-            if not l_status_0 then
-                print("LoadingScreen:GetGameProductInfo: %s", l_result_0);
-            end;
-        end)();
-    end;
-end;
+local MarketplaceService = game:GetService("MarketplaceService")
+local ExperienceLoadingScript = script:FindFirstAncestor("ExperienceLoadingScript")
+local SetGameProductInfo = require(ExperienceLoadingScript.Actions.SetGameProductInfo)
+
+return function(p1) -- line: 6
+	-- upvalues: MarketplaceService (copy), SetGameProductInfo (copy)
+	return function(p2) -- line: 7
+		-- upvalues: p1 (copy), MarketplaceService (copy), SetGameProductInfo (copy)
+		coroutine.wrap(function() -- line: 8
+			-- upvalues: p1 (copy), MarketplaceService (copy), p2 (copy), SetGameProductInfo (copy)
+			local u6 = p1
+
+			if not u6 or u6 <= 0 then
+				while game.PlaceId <= 0 do
+					wait()
+				end
+
+				u6 = game.PlaceId
+			end
+
+			local ok, result = pcall(function() -- line: 16
+				-- upvalues: MarketplaceService (copy), u6 (ref), p2 (copy), SetGameProductInfo (copy)
+				if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+					local ProductInfoAsync = MarketplaceService:GetProductInfoAsync(u6)
+
+					p2:dispatch(SetGameProductInfo(ProductInfoAsync))
+
+					return
+				end
+
+				local ProductInfo = MarketplaceService:GetProductInfo(u6)
+
+				p2:dispatch(SetGameProductInfo(ProductInfo))
+			end)
+
+			if not ok then
+				print("LoadingScreen:GetGameProductInfo: %s", result)
+			end
+		end)()
+	end
+end

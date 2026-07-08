@@ -1,3 +1,3 @@
 return {
-    FriendshipOriginSourceType = require(script.FriendshipOriginSourceType)
-};
+	FriendshipOriginSourceType = require(script.FriendshipOriginSourceType)
+}

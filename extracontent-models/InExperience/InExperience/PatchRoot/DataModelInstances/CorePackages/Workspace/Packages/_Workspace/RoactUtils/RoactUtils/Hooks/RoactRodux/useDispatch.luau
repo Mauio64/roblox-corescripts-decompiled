@@ -1,13 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.useStore);
-return function() --[[ Line: 10 ]] --[[ Name: useDispatch ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v3 = v2();
-    return (v1.useCallback(function(...) --[[ Line: 13 ]]
-        -- upvalues: v3 (copy)
-        return v3:dispatch(...);
-    end, {
-        v3
-    }));
-end;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(Parent.React)
+local useStore = require(script.Parent.useStore)
+
+local function useDispatch() -- line: 10
+	-- upvalues: useStore (copy), React (copy)
+	local v5 = useStore()
+
+	return (React.useCallback(function(...) -- line: 13
+		-- upvalues: v5 (copy)
+		return v5:dispatch(...)
+	end, { v5 }))
+end
+
+return useDispatch

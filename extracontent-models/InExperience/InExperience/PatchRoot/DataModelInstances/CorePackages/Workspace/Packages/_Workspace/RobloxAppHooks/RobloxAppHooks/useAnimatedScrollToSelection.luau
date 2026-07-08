@@ -1,56 +1,59 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxAppHooks").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = {
-    dampingRatio = 1, 
-    frequency = 3
-};
-local function _(v4, v5, v6, v7, v8) --[[ Line: 10 ]] --[[ Name: calculateTargetScrollOffset ]]
-    local v9 = if v6 == Enum.ScrollingDirection.X then v4.CanvasPosition.X + (v5.AbsolutePosition.X - v4.AbsolutePosition.X) else v4.CanvasPosition.Y + (v5.AbsolutePosition.Y - v4.AbsolutePosition.Y);
-    if v9 < v8 then
-        return 0;
-    else
-        return (math.max(v9 - v7, 0));
-    end;
-end;
-return function(v11, v12, v13, v14) --[[ Line: 28 ]] --[[ Name: useAnimatedScrollToSelection ]]
-    -- upvalues: v3 (copy), v2 (copy), v1 (copy)
-    local v15 = v12 or 0;
-    local v16 = v13 or 0;
-    local v17 = v14 or v3;
-    local v18, v19 = v2.useAnimatedBinding(0);
-    local v29 = v1.useCallback(function(v20, v21, _, v23) --[[ Line: 41 ]]
-        -- upvalues: v11 (copy), v15 (copy), v16 (copy), v19 (copy), v2 (ref), v17 (copy)
-        if v21 then
-            return;
-        else
-            if v23 and v23:IsDescendantOf(v20) then
-                local l_v11_0 = v11;
-                local l_v15_0 = v15;
-                local l_v16_0 = v16;
-                local v27 = if l_v11_0 == Enum.ScrollingDirection.X then v20.CanvasPosition.X + (v23.AbsolutePosition.X - v20.AbsolutePosition.X) else v20.CanvasPosition.Y + (v23.AbsolutePosition.Y - v20.AbsolutePosition.Y);
-                local v28 = v27 < l_v16_0 and 0 or math.max(v27 - l_v15_0, 0);
-                v19(v2.spring(v28, v17));
-            end;
-            return;
-        end;
-    end, {
-        v15, 
-        v11, 
-        v16, 
-        v17
-    });
-    return v1.useMemo(function() --[[ Line: 59 ]]
-        -- upvalues: v18 (copy), v11 (copy)
-        return v18:map(function(v30) --[[ Line: 60 ]]
-            -- upvalues: v11 (ref)
-            if v11 == Enum.ScrollingDirection.X then
-                return (Vector2.new(v30, 0));
-            else
-                return (Vector2.new(0, v30));
-            end;
-        end);
-    end, {
-        v11
-    }), v29;
-end;
+local Parent = script:FindFirstAncestor("RobloxAppHooks").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 3
+}
+
+local function calculateTargetScrollOffset(p1, p2, p3, n1: number, n2: number) -- line: 10
+	local v12 = if p3 ~= Enum.ScrollingDirection.X then p1.CanvasPosition.Y + (p2.AbsolutePosition.Y - p1.AbsolutePosition.Y) else p1.CanvasPosition.X + (p2.AbsolutePosition.X - p1.AbsolutePosition.X)
+
+	if v12 < n2 then
+		return 0
+	end
+
+	return (math.max(v12 - n1, 0))
+end
+local function useAnimatedScrollToSelection(p4, n3: number?, n4: number?, p5) -- line: 28
+	-- upvalues: t1 (copy), ReactOtter (copy), React (copy)
+	local v17 = n3 or 0
+	local v18 = n4 or 0
+	local v19 = p5 or t1
+	local v20, v21 = ReactOtter.useAnimatedBinding(0)
+	local v22 = React.useCallback(function(p6, b1: boolean, _, p8) -- line: 41
+		-- upvalues: p4 (copy), v17 (copy), v18 (copy), v21 (copy), ReactOtter (copy), v19 (copy)
+		if b1 then
+			return
+		end
+
+		if p8 and p8:IsDescendantOf(p6) then
+			local v27 = p4
+			local v28 = v17
+			local v29 = v18
+			local v30 = if v27 ~= Enum.ScrollingDirection.X then p6.CanvasPosition.Y + (p8.AbsolutePosition.Y - p6.AbsolutePosition.Y) else p6.CanvasPosition.X + (p8.AbsolutePosition.X - p6.AbsolutePosition.X)
+			local v31 = if not (v30 < v29) then math.max(v30 - v28, 0) else 0
+
+			v21(ReactOtter.spring(v31, v19))
+		end
+	end, {
+		v17,
+		p4,
+		v18,
+		v19
+	})
+
+	return React.useMemo(function() -- line: 59
+		-- upvalues: v20 (copy), p4 (copy)
+		return v20:map(function(n5: number) -- line: 60
+			-- upvalues: p4 (copy)
+			if p4 == Enum.ScrollingDirection.X then
+				return (Vector2.new(n5, 0))
+			end
+
+			return (Vector2.new(0, n5))
+		end)
+	end, { p4 }), v22
+end
+
+return useAnimatedScrollToSelection

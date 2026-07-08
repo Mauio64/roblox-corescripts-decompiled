@@ -1,23 +1,32 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.None);
-local _ = require(l_Parent_0.Types);
-local v3 = require(l_Parent_0.forEach);
-local function v4(v5, v6) --[[ Line: 21 ]] --[[ Name: joinDeep ]]
-    -- upvalues: v3 (copy), v4 (copy), v1 (copy)
-    local v7 = table.clone(v5);
-    v3(v6, function(v8, v9) --[[ Line: 24 ]]
-        -- upvalues: v5 (copy), v7 (copy), v4 (ref), v1 (ref)
-        if typeof(v5[v9]) == "table" and typeof(v8) == "table" then
-            v7[v9] = v4(v5[v9], v8);
-            return;
-        elseif v8 == v1 then
-            v7[v9] = nil;
-            return;
-        else
-            v7[v9] = v8;
-            return;
-        end;
-    end);
-    return v7;
-end;
-return v4;
+local scriptParent = script.Parent
+local None = require(scriptParent.None)
+
+require(scriptParent.Types)
+
+local forEach = require(scriptParent.forEach)
+
+local function joinDeep(t1: {[any]: any}, t2: {[any]: any}) -- line: 21
+	-- upvalues: forEach (copy), joinDeep (copy), None (copy)
+	local v7 = table.clone(t1)
+
+	forEach(t2, function(p1, p2) -- line: 24
+		-- upvalues: t1 (copy), v7 (copy), joinDeep (copy), None (copy)
+		if typeof(t1[p2]) == "table" and typeof(p1) == "table" then
+			v7[p2] = joinDeep(t1[p2], p1)
+
+			return
+		end
+
+		if p1 == None then
+			v7[p2] = nil
+
+			return
+		end
+
+		v7[p2] = p1
+	end)
+
+	return v7
+end
+
+return joinDeep

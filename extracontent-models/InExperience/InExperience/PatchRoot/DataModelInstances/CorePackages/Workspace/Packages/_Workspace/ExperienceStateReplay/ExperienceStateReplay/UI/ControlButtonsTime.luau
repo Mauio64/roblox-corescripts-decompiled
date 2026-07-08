@@ -1,88 +1,100 @@
-local l_ExperienceStateRecordingService_0 = game:GetService("ExperienceStateRecordingService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage");
-local l_Parent_0 = script.Parent;
-local v4 = require(l_Parent_0.ButtonAssets);
-local v5 = require(l_Parent_0.CreateButtonsTime);
+local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local scriptParent = script.Parent
+local ButtonAssets = require(scriptParent.ButtonAssets)
+local CreateButtonsTime = require(scriptParent.CreateButtonsTime)
+
 return {
-    setupControl = function(v6) --[[ Line: 12 ]] --[[ Name: setupControl ]]
-        -- upvalues: v4 (copy), l_ExperienceStateRecordingService_0 (copy), v5 (copy), l_ReplicatedStorage_0 (copy), l_UserInputService_0 (copy)
-        v6.connections = {};
-        v6.SetPlaying = function() --[[ Line: 15 ]] --[[ Name: SetPlaying ]]
-            -- upvalues: v6 (copy), v4 (ref), l_ExperienceStateRecordingService_0 (ref)
-            v6.state.Playing = true;
-            v6.PlayButton.Image = v4.PauseButton;
-            l_ExperienceStateRecordingService_0:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Playing);
-        end;
-        v6.SetPaused = function() --[[ Line: 22 ]] --[[ Name: SetPaused ]]
-            -- upvalues: v6 (copy), v4 (ref), l_ExperienceStateRecordingService_0 (ref)
-            v6.state.Playing = false;
-            v6.PlayButton.Image = v4.PlayButton;
-            l_ExperienceStateRecordingService_0:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Stopped);
-        end;
-        v6.ControlButtons = function(v7) --[[ Line: 29 ]] --[[ Name: ControlButtons ]]
-            -- upvalues: v6 (copy), v5 (ref), l_ReplicatedStorage_0 (ref), l_ExperienceStateRecordingService_0 (ref)
-            v6.StopButton.ImageColor3 = v5.regularColor;
-            v6.StopButton:SetAttribute("useHoverColor", true);
-            v6.ReverseButton.ImageColor3 = v5.regularColor;
-            v6.ReverseButton:SetAttribute("useHoverColor", true);
-            v6.state.Reversing = false;
-            if v7 ~= v6.PlayButton then
-                v6.PlayButton.ImageColor3 = v5.regularColor;
-            end;
-            if v7 == v6.PlayButton then
-                if v6.state.Playing then
-                    v6.SetPaused();
-                    return;
-                else
-                    v6.SetPlaying();
-                    return;
-                end;
-            elseif v7 == v6.StopButton then
-                v6.StopButton:SetAttribute("useHoverColor", false);
-                v6.StopButton.ImageColor3 = v5.clickColor;
-                v6.LoadingOverlay.Visible = true;
-                v6.LoadingLabel.Text = "Returning To Replay Browser";
-                v6.state.Loading = true;
-                l_ReplicatedStorage_0:WaitForChild("TeleportRequest"):FireServer();
-                return;
-            else
-                if v7 == v6.ReverseButton then
-                    v6.state.Reversing = true;
-                    v6.SetPaused();
-                    v6.ReverseButton:SetAttribute("useHoverColor", false);
-                    v6.ReverseButton.ImageColor3 = v5.clickColor;
-                    l_ExperienceStateRecordingService_0:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Rewinding);
-                end;
-                return;
-            end;
-        end;
-        v6.connections.PlayListener = v6.PlayButton.MouseButton1Click:Connect(function() --[[ Line: 64 ]]
-            -- upvalues: v6 (copy)
-            v6.ControlButtons(v6.PlayButton);
-        end);
-        v6.connections.StopListener = v6.StopButton.MouseButton1Click:Connect(function() --[[ Line: 69 ]]
-            -- upvalues: v6 (copy)
-            v6.ControlButtons(v6.StopButton);
-        end);
-        v6.connections.ReverseListener = v6.ReverseButton.MouseButton1Click:Connect(function() --[[ Line: 74 ]]
-            -- upvalues: v6 (copy)
-            v6.ControlButtons(v6.ReverseButton);
-        end);
-        l_UserInputService_0.InputBegan:Connect(function(v8, _) --[[ Line: 79 ]]
-            -- upvalues: v6 (copy)
-            if v8.KeyCode == Enum.KeyCode.Space then
-                v6.ControlButtons(v6.PlayButton);
-                return;
-            elseif v8.KeyCode == Enum.KeyCode.R then
-                v6.ControlButtons(v6.ReverseButton);
-                return;
-            else
-                if v8.KeyCode == Enum.KeyCode.X then
-                    v6.ControlButtons(v6.StopButton);
-                end;
-                return;
-            end;
-        end);
-    end
-};
+	setupControl = function(p1) -- line: 12
+		-- upvalues: ButtonAssets (copy), ExperienceStateRecordingService (copy), CreateButtonsTime (copy), ReplicatedStorage (copy), UserInputService (copy)
+		p1.connections = {}
+
+		function p1.SetPlaying() -- line: 15
+			-- upvalues: p1 (copy), ButtonAssets (copy), ExperienceStateRecordingService (copy)
+			p1.state.Playing = true
+			p1.PlayButton.Image = ButtonAssets.PauseButton
+			ExperienceStateRecordingService:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Playing)
+		end
+		function p1.SetPaused() -- line: 22
+			-- upvalues: p1 (copy), ButtonAssets (copy), ExperienceStateRecordingService (copy)
+			p1.state.Playing = false
+			p1.PlayButton.Image = ButtonAssets.PlayButton
+			ExperienceStateRecordingService:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Stopped)
+		end
+		function p1.ControlButtons(p2) -- line: 29
+			-- upvalues: p1 (copy), CreateButtonsTime (copy), ReplicatedStorage (copy), ExperienceStateRecordingService (copy)
+			p1.StopButton.ImageColor3 = CreateButtonsTime.regularColor
+			p1.StopButton:SetAttribute("useHoverColor", true)
+			p1.ReverseButton.ImageColor3 = CreateButtonsTime.regularColor
+			p1.ReverseButton:SetAttribute("useHoverColor", true)
+			p1.state.Reversing = false
+
+			if p2 ~= p1.PlayButton then
+				p1.PlayButton.ImageColor3 = CreateButtonsTime.regularColor
+			end
+
+			if p2 == p1.PlayButton then
+				if p1.state.Playing then
+					p1.SetPaused()
+
+					return
+				end
+
+				p1.SetPlaying()
+
+				return
+			end
+
+			if p2 == p1.StopButton then
+				p1.StopButton:SetAttribute("useHoverColor", false)
+				p1.StopButton.ImageColor3 = CreateButtonsTime.clickColor
+				p1.LoadingOverlay.Visible = true
+				p1.LoadingLabel.Text = "Returning To Replay Browser"
+				p1.state.Loading = true
+				ReplicatedStorage:WaitForChild("TeleportRequest"):FireServer()
+
+				return
+			end
+
+			if p2 == p1.ReverseButton then
+				p1.state.Reversing = true
+				p1.SetPaused()
+				p1.ReverseButton:SetAttribute("useHoverColor", false)
+				p1.ReverseButton.ImageColor3 = CreateButtonsTime.clickColor
+				ExperienceStateRecordingService:SetPlaybackMode(Enum.ExperienceStateRecordingPlaybackMode.Rewinding)
+			end
+		end
+
+		p1.connections.PlayListener = p1.PlayButton.MouseButton1Click:Connect(function() -- line: 64
+			-- upvalues: p1 (copy)
+			p1.ControlButtons(p1.PlayButton)
+		end)
+		p1.connections.StopListener = p1.StopButton.MouseButton1Click:Connect(function() -- line: 69
+			-- upvalues: p1 (copy)
+			p1.ControlButtons(p1.StopButton)
+		end)
+		p1.connections.ReverseListener = p1.ReverseButton.MouseButton1Click:Connect(function() -- line: 74
+			-- upvalues: p1 (copy)
+			p1.ControlButtons(p1.ReverseButton)
+		end)
+		UserInputService.InputBegan:Connect(function(input, _) -- line: 79
+			-- upvalues: p1 (copy)
+			if input.KeyCode == Enum.KeyCode.Space then
+				p1.ControlButtons(p1.PlayButton)
+
+				return
+			end
+
+			if input.KeyCode == Enum.KeyCode.R then
+				p1.ControlButtons(p1.ReverseButton)
+
+				return
+			end
+
+			if input.KeyCode == Enum.KeyCode.X then
+				p1.ControlButtons(p1.StopButton)
+			end
+		end)
+	end
+}

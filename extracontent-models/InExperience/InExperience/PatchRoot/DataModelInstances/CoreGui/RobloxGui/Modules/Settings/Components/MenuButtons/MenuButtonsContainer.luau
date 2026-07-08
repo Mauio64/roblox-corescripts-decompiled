@@ -1,22 +1,28 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_CorePackages_0.Packages.Signals);
-local l_Localization_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_CorePackages_0.Workspace.Packages.Localization).LocalizationProvider;
-local v6 = require(l_CorePackages_0.Packages.Foundation);
-local l_FoundationProvider_0 = v6.FoundationProvider;
-local v8 = require(script.Parent.MenuButtons);
-return function(v9) --[[ Line: 26 ]] --[[ Name: Container ]]
-    -- upvalues: l_Localization_0 (copy), l_LocalizationService_0 (copy), v2 (copy), l_LocalizationProvider_0 (copy), l_FoundationProvider_0 (copy), v6 (copy), v8 (copy)
-    local v10 = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId);
-    return v2.createElement(l_LocalizationProvider_0, {
-        localization = v10
-    }, {
-        FoundationProvider = v2.createElement(l_FoundationProvider_0, {
-            theme = v6.Enums.Theme.Dark
-        }, {
-            MenuButtons = v2.createElement(v8, v9)
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local LocalizationService = game:GetService("LocalizationService")
+local React = require(CorePackages.Packages.React)
+
+require(CorePackages.Packages.Signals)
+
+local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local LocalizationProvider = require(CorePackages.Workspace.Packages.Localization).LocalizationProvider
+local Foundation = require(CorePackages.Packages.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local MenuButtons = require(script.Parent.MenuButtons)
+
+local function Container(t1: {[any]: any}) -- line: 27
+	-- upvalues: Localization (copy), LocalizationService (copy), React (copy), LocalizationProvider (copy), FoundationProvider (copy), Foundation (copy), MenuButtons (copy)
+	local v11 = Localization.new(LocalizationService.RobloxLocaleId)
+
+	return React.createElement(LocalizationProvider, {
+		localization = v11
+	}, {
+		FoundationProvider = React.createElement(FoundationProvider, {
+			theme = Foundation.Enums.Theme.Dark
+		}, {
+			MenuButtons = React.createElement(MenuButtons, t1)
+		})
+	})
+end
+
+return Container

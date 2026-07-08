@@ -20,6 +20,12 @@ local createConnectionsPlayedStore = require(script.ConnectionsPlayed.createConn
 local GamePass = require(script.GamePass)
 local createGamePassStore = GamePass.createGamePassStore
 local getGamePassStore = GamePass.getGamePassStore
+local GameDeveloperProduct = require(script.GameDeveloperProduct)
+local createGameDeveloperProductStore = GameDeveloperProduct.createGameDeveloperProductStore
+local getGameDeveloperProductStore = GameDeveloperProduct.getGameDeveloperProductStore
+local GameSubscription = require(script.GameSubscription)
+local createGameSubscriptionStore = GameSubscription.createGameSubscriptionStore
+local getGameSubscriptionStore = GameSubscription.getGameSubscriptionStore
 
 require(script.Followings.FollowingsStoreTypes)
 require(script.Votes.VotesStoreTypes)
@@ -36,29 +42,33 @@ require(script.Playability.PlayabilityStoreTypes)
 require(script.GameMedia.GameMediaStoreTypes)
 require(script.Votes.UserVoteFeedbackMetadataStoreTypes)
 require(script.GamePass.GamePassStoreTypes)
+require(script.GameDeveloperProduct.GameDeveloperProductStoreTypes)
+require(script.GameSubscription.GameSubscriptionStoreTypes)
 
-local FFlagLuaAppDataHydrationFollowingsStore = require(Parent.SharedFlags).FFlagLuaAppDataHydrationFollowingsStore
-local FFlagLuaAppDataHydrationUserVoteFeedbackMetadataStore = require(Parent.SharedFlags).FFlagLuaAppDataHydrationUserVoteFeedbackMetadataStore
 local FFlagLuaAppDataHydrationConnectionsPlayedStore = require(Parent.SharedFlags).FFlagLuaAppDataHydrationConnectionsPlayedStore
 
 return {
 	createGamePassStore = createGamePassStore,
 	getGamePassStore = getGamePassStore,
+	createGameDeveloperProductStore = createGameDeveloperProductStore,
+	getGameDeveloperProductStore = getGameDeveloperProductStore,
+	createGameSubscriptionStore = createGameSubscriptionStore,
+	getGameSubscriptionStore = getGameSubscriptionStore,
 	createFavoritesStore = createFavoritesStore,
 	createAgeRecommendationStore = createAgeRecommendationStore,
-	createFollowingsStore = if not FFlagLuaAppDataHydrationFollowingsStore then nil else createFollowingsStore,
+	createFollowingsStore = createFollowingsStore,
 	createGameInfoStore = createGameInfoStore,
 	createPlayabilityStore = createPlayabilityStore,
 	createVotesStore = createVotesStore,
-	createUserVoteFeedbackMetadataStore = if not FFlagLuaAppDataHydrationUserVoteFeedbackMetadataStore then nil else createUserVoteFeedbackMetadataStore,
+	createUserVoteFeedbackMetadataStore = createUserVoteFeedbackMetadataStore,
 	createConnectionsPlayedStore = if not FFlagLuaAppDataHydrationConnectionsPlayedStore then nil else createConnectionsPlayedStore,
 	getFavoritesStore = getFavoritesStore,
 	getAgeRecommendationStore = getAgeRecommendationStore,
-	getFollowingsStore = if not FFlagLuaAppDataHydrationFollowingsStore then nil else getFollowingsStore,
+	getFollowingsStore = getFollowingsStore,
 	getGameInfoStore = getGameInfoStore,
 	getPlayabilityStore = getPlayabilityStore,
 	getVotesStore = getVotesStore,
-	getUserVoteFeedbackMetadataStore = if not FFlagLuaAppDataHydrationUserVoteFeedbackMetadataStore then nil else getUserVoteFeedbackMetadataStore,
+	getUserVoteFeedbackMetadataStore = getUserVoteFeedbackMetadataStore,
 	VotesUtils = VotesUtils,
 	AgeRecommendationUtils = AgeRecommendationUtils,
 	getConnectionsPlayedStore = if not FFlagLuaAppDataHydrationConnectionsPlayedStore then nil else getConnectionsPlayedStore,

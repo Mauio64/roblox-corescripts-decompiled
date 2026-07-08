@@ -1,5 +1,5 @@
 return {
-    Unknown = "Unknown", 
-    Male = "Male", 
-    Female = "Female"
-};
+	Unknown = "Unknown",
+	Male = "Male",
+	Female = "Female"
+}

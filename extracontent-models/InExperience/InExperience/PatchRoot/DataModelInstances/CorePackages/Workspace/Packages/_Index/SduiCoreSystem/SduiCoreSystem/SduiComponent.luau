@@ -1,173 +1,216 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.SduiBuilder);
-local v5 = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiComponentType);
-local v7 = require(l_script_FirstAncestor_0.ConditionalProps.SduiConditionalPropWrapper);
-local v8 = require(l_script_FirstAncestor_0.SduiConfigTypes);
-local v9 = require(l_script_FirstAncestor_0.SduiErrors);
-local l_SduiErrorType_0 = v9.SduiErrorType;
-local l_SduiBuilderProcessingPhase_0 = v5.SduiBuilderProcessingPhase;
-local v12 = require(l_script_FirstAncestor_0.compareSduiProps);
-local v13 = require(l_script_FirstAncestor_0.compareSduiAnalyticsContext);
-local v14 = require(l_Parent_0.SduiCompat);
-local l_mapServerBindingProps_0 = v14.mapServerBindingProps;
-local l_ServerBindingPropMap_0 = v14.ServerBindingPropMap;
-local v17 = require(l_script_FirstAncestor_0.parseProps);
-local v18 = require(l_script_FirstAncestor_0.validateInterface);
-local l_UiComponentInterface_0 = v8.UiComponentInterface;
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-local v21 = {};
-local v22 = nil;
-local function v24(_) --[[ Line: 39 ]] --[[ Name: SduiErrorComponent ]]
-    -- upvalues: v3 (copy)
-    return v3.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0, 100, 0, 100)
-    });
-end;
-local v53 = v3.memo(function(v25) --[[ Line: 47 ]]
-    -- upvalues: l_SduiBuilderProcessingPhase_0 (copy), v3 (copy), v4 (copy), v13 (copy), l_SduiErrorType_0 (copy), v24 (copy), v2 (copy), v21 (copy), l_FFlagSduiServerCompat_0 (copy), l_mapServerBindingProps_0 (copy), l_ServerBindingPropMap_0 (copy), v17 (copy), v18 (copy), v22 (ref)
-    local l___processed_0 = v25.componentConfig.__processed;
-    local v27 = if l___processed_0 then l_SduiBuilderProcessingPhase_0.Render else l_SduiBuilderProcessingPhase_0.Lazy;
-    local l_componentConfig_0 = v25.componentConfig;
-    local l_sduiContext_0 = v25.sduiContext;
-    local l_debugName_0 = v25.debugName;
-    local l_parentAnalyticsContext_0 = v25.parentAnalyticsContext;
-    local l_localAnalyticsData_0 = v25.localAnalyticsData;
-    local l_extraLocalProps_0 = v25.extraLocalProps;
-    local l_conditionalProps_0 = v25.conditionalProps;
-    local l_instrumentation_0 = l_sduiContext_0.dependencies.instrumentation;
-    l_instrumentation_0:startTimerFlow("BuildPropsAndChildren");
-    local v36 = v3.useRef(nil);
-    if v36.current == nil then
-        v36.current = v4.buildAnalyticsContext(l_componentConfig_0, l_parentAnalyticsContext_0, l_localAnalyticsData_0);
-    else
-        local v37 = v4.buildAnalyticsContext(l_componentConfig_0, l_parentAnalyticsContext_0, l_localAnalyticsData_0);
-        if not v13(v36.current, v37) then
-            v36.current = v37;
-        end;
-    end;
-    local l_current_0 = v36.current;
-    local v39 = v4.getComponentType(l_componentConfig_0, l_sduiContext_0);
-    if v39 == nil then
-        l_sduiContext_0.dependencies.logger.reportError(l_SduiErrorType_0.NilComponentType, {
-            message = ("Unable to resolve componentType for component with template %*"):format(l_componentConfig_0 and l_componentConfig_0.templateKey or nil), 
-            name = l_debugName_0
-        }, l_sduiContext_0.appPage);
-        l_instrumentation_0:stopTimerFlow("BuildPropsAndChildren", l_sduiContext_0, true);
-        return v3.createElement(v24);
-    else
-        local v40 = l_sduiContext_0.componentDefinitions:getComponent(v39);
-        if v40 == nil then
-            l_sduiContext_0.dependencies.logger.reportError(l_SduiErrorType_0.NoComponentRegistered, {
-                componentType = v39, 
-                name = l_debugName_0
-            }, l_sduiContext_0.appPage);
-            l_instrumentation_0:stopTimerFlow("BuildPropsAndChildren", l_sduiContext_0, true);
-            return v3.createElement(v24);
-        else
-            local v41 = nil;
-            l_instrumentation_0:startTimerFlow("ParseProps");
-            v41 = v2.Dictionary.join(l_componentConfig_0.props or v21, l_conditionalProps_0 or v21);
-            if l_FFlagSduiServerCompat_0 and not l___processed_0 then
-                local v42, v43 = l_mapServerBindingProps_0(v41, l_ServerBindingPropMap_0);
-                if v42 then
-                    for v44, v45 in v42 do
-                        v41[v44] = v45;
-                    end;
-                end;
-                if v43 then
-                    l_sduiContext_0.dependencies.logger.reportError(l_SduiErrorType_0.UnmappedServerBindingProp, {
-                        componentType = v39, 
-                        name = l_debugName_0, 
-                        message = ("Unmapped PascalCase props detected: %*. These props will not reach the camelCase component."):format((table.concat(v43, ", ")))
-                    }, l_sduiContext_0.appPage);
-                end;
-            end;
-            v17(v39, v41, l_debugName_0, l_sduiContext_0, l_current_0, nil, v27);
-            if l_extraLocalProps_0 then
-                v41 = v2.Dictionary.join(v41, l_extraLocalProps_0);
-            end;
-            v41.componentConfig = l_componentConfig_0;
-            v41.sduiContext = l_sduiContext_0;
-            v41.debugName = l_debugName_0;
-            v41.analyticsContext = l_current_0;
-            if not l___processed_0 then
-                local v46 = l_sduiContext_0.componentDefinitions:getPropInterface(v39);
-                if v46 then
-                    local v47, v48 = v18(v41, v46);
-                    if not v47 then
-                        l_instrumentation_0:stopTimerFlow("ParseProps", l_sduiContext_0, true);
-                        l_sduiContext_0.dependencies.logger.reportError(l_SduiErrorType_0.InvalidProps, {
-                            componentType = v39, 
-                            name = l_debugName_0, 
-                            message = v48
-                        }, l_sduiContext_0.appPage);
-                        return v3.createElement(v24);
-                    end;
-                end;
-            end;
-            l_instrumentation_0:stopTimerFlow("ParseProps", l_sduiContext_0);
-            local v49 = if l_componentConfig_0.children then {} else nil;
-            if l_componentConfig_0.children then
-                assert(v49, "reactChildren must exist");
-                for v50, v51 in l_componentConfig_0.children do
-                    local v52 = ("%*_%*"):format(v51.componentType, v50);
-                    v49[v52] = v3.createElement(v22, {
-                        componentConfig = v51, 
-                        sduiContext = l_sduiContext_0, 
-                        parentAnalyticsContext = l_current_0, 
-                        extraLocalProps = {
-                            index = v50, 
-                            LayoutOrder = if not l_FFlagSduiServerCompat_0 then v50 else nil, 
-                            layoutOrder = if l_FFlagSduiServerCompat_0 then v50 else nil
-                        }, 
-                        debugName = v52
-                    });
-                end;
-            end;
-            l_instrumentation_0:stopTimerFlow("BuildPropsAndChildren", l_sduiContext_0);
-            return v3.createElement(v40, v41, v49);
-        end;
-    end;
-end, v12);
-v22 = function(v54) --[[ Line: 169 ]]
-    -- upvalues: l_SduiErrorType_0 (copy), v3 (copy), v24 (copy), v18 (copy), l_UiComponentInterface_0 (copy), v9 (copy), v7 (copy), v53 (copy)
-    if not v54.componentConfig then
-        v54.sduiContext.dependencies.logger.reportError(l_SduiErrorType_0.NilComponentConfig, {
-            name = v54.debugName
-        }, v54.sduiContext.appPage);
-        return v3.createElement(v24);
-    else
-        if not v54.componentConfig.__processed then
-            if v54.sduiContext.templateRegistry:shouldResolveTemplate(v54.componentConfig) then
-                v54.sduiContext.templateRegistry:resolveTemplateForConfig(v54.componentConfig, v54.sduiContext);
-            end;
-            local v55, v56 = v18(v54.componentConfig, l_UiComponentInterface_0, false);
-            if not v55 then
-                v54.sduiContext.dependencies.logger.reportError(v9.SduiErrorType.InvalidComponentConfig, {
-                    message = ("Invalid config for component. err: %*"):format(v56), 
-                    componentType = v54.componentConfig.componentType, 
-                    name = v54.debugName
-                }, v54.sduiContext.appPage);
-            end;
-        end;
-        if v54.componentConfig.conditionalProps then
-            return v3.createElement(v7, {
-                wrappedComponent = v53, 
-                sduiContext = v54.sduiContext, 
-                parentAnalyticsContext = v54.parentAnalyticsContext, 
-                extraLocalProps = v54.extraLocalProps, 
-                componentConfig = v54.componentConfig, 
-                debugName = v54.debugName, 
-                localAnalyticsData = v54.localAnalyticsData
-            });
-        else
-            return v3.createElement(v53, v54);
-        end;
-    end;
-end;
-return v3.memo(v22, v12);
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local Cryo = require(SduiCoreSystemParent.Cryo)
+local React = require(SduiCoreSystemParent.React)
+local SduiBuilder = require(SduiCoreSystem.SduiBuilder)
+local SduiBuilderTypes = require(SduiCoreSystem.SduiBuilderTypes)
+
+require(SduiCoreSystem.SduiComponentType)
+
+local SduiConditionalPropWrapper = require(SduiCoreSystem.ConditionalProps.SduiConditionalPropWrapper)
+local SduiConfigTypes = require(SduiCoreSystem.SduiConfigTypes)
+local SduiErrors = require(SduiCoreSystem.SduiErrors)
+local SduiErrorType = SduiErrors.SduiErrorType
+local SduiBuilderProcessingPhase = SduiBuilderTypes.SduiBuilderProcessingPhase
+local compareSduiProps = require(SduiCoreSystem.compareSduiProps)
+local compareSduiAnalyticsContext = require(SduiCoreSystem.compareSduiAnalyticsContext)
+local SduiCompat = require(SduiCoreSystemParent.SduiCompat)
+local mapServerBindingProps = SduiCompat.mapServerBindingProps
+local ServerBindingPropMap = SduiCompat.ServerBindingPropMap
+local parseProps = require(SduiCoreSystem.parseProps)
+local validateInterface = require(SduiCoreSystem.validateInterface)
+local UiComponentInterface = SduiConfigTypes.UiComponentInterface
+local SduiUsageRecorder = require(SduiCoreSystem.Analytics.SduiUsageRecorder)
+local recordV1ComponentUsage = require(SduiCoreSystem.Analytics.recordV1ComponentUsage)
+local FFlagSduiUsageTelemetry = require(SduiCoreSystemParent.SharedFlags).FFlagSduiUsageTelemetry
+local t1 = {}
+local u24 = nil
+
+local function SduiErrorComponent(_) -- line: 45
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 100, 0, 100)
+	})
+end
+
+local v26 = React.memo(function(p2) -- line: 53
+	-- upvalues: SduiBuilderProcessingPhase (copy), React (copy), SduiBuilder (copy), compareSduiAnalyticsContext (copy), SduiErrorType (copy), SduiErrorComponent (copy), Cryo (copy), t1 (copy), mapServerBindingProps (copy), ServerBindingPropMap (copy), parseProps (copy), validateInterface (copy), u24 (ref)
+	local __processed = p2.componentConfig.__processed
+	local v30 = if not __processed then SduiBuilderProcessingPhase.Lazy else SduiBuilderProcessingPhase.Render
+	local componentConfig = p2.componentConfig
+	local sduiContext = p2.sduiContext
+	local debugName = p2.debugName
+	local parentAnalyticsContext = p2.parentAnalyticsContext
+	local localAnalyticsData = p2.localAnalyticsData
+	local extraLocalProps = p2.extraLocalProps
+	local conditionalProps = p2.conditionalProps
+	local instrumentation = sduiContext.dependencies.instrumentation
+
+	instrumentation:startTimerFlow("BuildPropsAndChildren")
+
+	local v39 = React.useRef(nil)
+
+	if v39.current == nil then
+		v39.current = SduiBuilder.buildAnalyticsContext(componentConfig, parentAnalyticsContext, localAnalyticsData)
+	else
+		local v40 = SduiBuilder.buildAnalyticsContext(componentConfig, parentAnalyticsContext, localAnalyticsData)
+
+		if not compareSduiAnalyticsContext(v39.current, v40) then
+			v39.current = v40
+		end
+	end
+
+	local current = v39.current
+	local v42 = SduiBuilder.getComponentType(componentConfig, sduiContext)
+
+	if v42 == nil then
+		sduiContext.dependencies.logger.reportError(SduiErrorType.NilComponentType, {
+			message = `Unable to resolve componentType for component with template { componentConfig and componentConfig.templateKey or nil }`,
+			name = debugName
+		}, sduiContext.appPage)
+		instrumentation:stopTimerFlow("BuildPropsAndChildren", sduiContext, true)
+
+		return React.createElement(SduiErrorComponent)
+	end
+
+	local v43 = sduiContext.componentDefinitions:getComponent(v42)
+
+	if v43 == nil then
+		sduiContext.dependencies.logger.reportError(SduiErrorType.NoComponentRegistered, {
+			componentType = v42,
+			name = debugName
+		}, sduiContext.appPage)
+		instrumentation:stopTimerFlow("BuildPropsAndChildren", sduiContext, true)
+
+		return React.createElement(SduiErrorComponent)
+	end
+
+	instrumentation:startTimerFlow("ParseProps")
+
+	local v44 = Cryo.Dictionary.join(componentConfig.props or t1, conditionalProps or t1)
+
+	if not __processed then
+		local v45, v46 = mapServerBindingProps(v44, ServerBindingPropMap)
+
+		if v45 then
+			for v47, v48 in v45 do
+				v44[v47] = v48
+			end
+		end
+
+		if v46 then
+			sduiContext.dependencies.logger.reportError(SduiErrorType.UnmappedServerBindingProp, {
+				componentType = v42,
+				name = debugName,
+				message = `Unmapped PascalCase props detected: { table.concat(v46, ", ") }. These props will not reach the camelCase component.`
+			}, sduiContext.appPage)
+		end
+	end
+
+	parseProps(v42, v44, debugName, sduiContext, current, nil, v30)
+
+	if extraLocalProps then
+		v44 = Cryo.Dictionary.join(v44, extraLocalProps)
+	end
+
+	v44.componentConfig = componentConfig
+	v44.sduiContext = sduiContext
+	v44.debugName = debugName
+	v44.analyticsContext = current
+
+	if not __processed then
+		local v49 = sduiContext.componentDefinitions:getPropInterface(v42)
+
+		if v49 then
+			local v50, v51 = validateInterface(v44, v49)
+
+			if not v50 then
+				instrumentation:stopTimerFlow("ParseProps", sduiContext, true)
+				sduiContext.dependencies.logger.reportError(SduiErrorType.InvalidProps, {
+					componentType = v42,
+					name = debugName,
+					message = v51
+				}, sduiContext.appPage)
+
+				return React.createElement(SduiErrorComponent)
+			end
+		end
+	end
+
+	instrumentation:stopTimerFlow("ParseProps", sduiContext)
+
+	local v52 = if not componentConfig.children then nil else {}
+
+	if componentConfig.children then
+		assert(v52, "reactChildren must exist")
+
+		for v53, v54 in componentConfig.children do
+			local v55 = `{ v54.componentType }_{ v53 }`
+
+			v52[v55] = React.createElement(u24, {
+				componentConfig = v54,
+				sduiContext = sduiContext,
+				parentAnalyticsContext = current,
+				extraLocalProps = {
+					index = v53,
+					layoutOrder = v53
+				},
+				debugName = v55
+			})
+		end
+	end
+
+	instrumentation:stopTimerFlow("BuildPropsAndChildren", sduiContext)
+
+	return React.createElement(v43, v44, v52)
+end, compareSduiProps)
+
+function u24(p3) -- line: 174
+	-- upvalues: SduiErrorType (copy), React (copy), SduiErrorComponent (copy), validateInterface (copy), UiComponentInterface (copy), SduiErrors (copy), FFlagSduiUsageTelemetry (copy), recordV1ComponentUsage (copy), SduiUsageRecorder (copy), SduiConditionalPropWrapper (copy), v26 (copy)
+	if not p3.componentConfig then
+		p3.sduiContext.dependencies.logger.reportError(SduiErrorType.NilComponentConfig, {
+			name = p3.debugName
+		}, p3.sduiContext.appPage)
+
+		return React.createElement(SduiErrorComponent)
+	end
+
+	if not p3.componentConfig.__processed then
+		if p3.sduiContext.templateRegistry:shouldResolveTemplate(p3.componentConfig) then
+			p3.sduiContext.templateRegistry:resolveTemplateForConfig(p3.componentConfig, p3.sduiContext)
+		end
+
+		local v57, v58 = validateInterface(p3.componentConfig, UiComponentInterface, false)
+
+		if not v57 then
+			p3.sduiContext.dependencies.logger.reportError(SduiErrors.SduiErrorType.InvalidComponentConfig, {
+				message = `Invalid config for component. err: { v58 }`,
+				componentType = p3.componentConfig.componentType,
+				name = p3.debugName
+			}, p3.sduiContext.appPage)
+		end
+	end
+
+	if FFlagSduiUsageTelemetry and not p3.componentConfig.__usageRecorded then
+		recordV1ComponentUsage(p3.sduiContext.appPage, p3.componentConfig)
+		p3.componentConfig.__usageRecorded = true
+		SduiUsageRecorder.scheduleFlush()
+	end
+
+	if p3.componentConfig.conditionalProps then
+		return React.createElement(SduiConditionalPropWrapper, {
+			wrappedComponent = v26,
+			sduiContext = p3.sduiContext,
+			parentAnalyticsContext = p3.parentAnalyticsContext,
+			extraLocalProps = p3.extraLocalProps,
+			componentConfig = p3.componentConfig,
+			debugName = p3.debugName,
+			localAnalyticsData = p3.localAnalyticsData
+		})
+	end
+
+	return React.createElement(v26, p3)
+end
+
+return React.memo(u24, compareSduiProps)

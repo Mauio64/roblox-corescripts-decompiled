@@ -1,37 +1,43 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local v7 = require(l_CorePackages_0.Packages.SignalsReact);
-local v8 = require(l_RobloxGui_0.Modules.GameTranslator);
-local l_useLeaderboardStore_0 = v5.Hooks.useLeaderboardStore;
-local v10 = require(l_Parent_0.Components.PresentationCommon.TeamEntryView);
-local l_FFlagPlayerListFixLeaderstatsStacking_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking;
-return v4.memo(function(v12) --[[ Line: 44 ]] --[[ Name: TeamEntryContainer ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), v7 (copy), v8 (copy), l_CoreGui_0 (copy), l_FFlagPlayerListFixLeaderstatsStacking_0 (copy), v4 (copy), v10 (copy)
-    local v13 = l_useLeaderboardStore_0().getGameStatsList();
-    local l_stats_0 = v12.teamData.stats;
-    local v16 = v7.useSignalBinding(function(v15) --[[ Line: 50 ]]
-        -- upvalues: v8 (ref), l_CoreGui_0 (ref), v12 (copy)
-        return v8:TranslateGameText(l_CoreGui_0, v12.teamData.name(v15));
-    end);
-    local v17 = v7.useSignalState(v12.teamData.color);
-    local v18 = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v7.useSignalState(v13.getCount);
-    local v19 = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v7.useSignalState(l_stats_0.getCount);
-    return v4.createElement(v10, {
-        teamName = v16, 
-        teamColor = v17, 
-        gameStatsCount = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v18, 
-        teamStatsCount = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v19, 
-        gameStats = v13, 
-        teamStats = l_stats_0, 
-        size = v12.size, 
-        entrySizeX = v12.entrySizeX, 
-        layoutOrder = v12.layoutOrder, 
-        isSmallTouchDevice = v12.isSmallTouchDevice, 
-        isDirectionalPreferred = v12.isDirectionalPreferred
-    });
-end);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local GameTranslator = require(RobloxGui.Modules.GameTranslator)
+local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
+local TeamEntryView = require(ParentParent.Components.PresentationCommon.TeamEntryView)
+local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+
+local function TeamEntryContainer(t1: {[any]: any}) -- line: 44
+	-- upvalues: useLeaderboardStore (copy), SignalsReact (copy), GameTranslator (copy), CoreGui (copy), FFlagPlayerListFixLeaderstatsStacking (copy), React (copy), TeamEntryView (copy)
+	local v14 = useLeaderboardStore().getGameStatsList()
+	local stats = t1.teamData.stats
+	local v16 = SignalsReact.useSignalBinding(function(p1) -- line: 50
+		-- upvalues: GameTranslator (copy), CoreGui (copy), t1 (copy)
+		return GameTranslator:TranslateGameText(CoreGui, t1.teamData.name(p1))
+	end)
+	local v17 = SignalsReact.useSignalState(t1.teamData.color)
+	local v18 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(v14.getCount) else nil
+	local v19 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(stats.getCount) else nil
+
+	return React.createElement(TeamEntryView, {
+		teamName = v16,
+		teamColor = v17,
+		gameStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v18 else nil,
+		teamStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v19 else nil,
+		gameStats = v14,
+		teamStats = stats,
+		size = t1.size,
+		entrySizeX = t1.entrySizeX,
+		layoutOrder = t1.layoutOrder,
+		isSmallTouchDevice = t1.isSmallTouchDevice,
+		isDirectionalPreferred = t1.isDirectionalPreferred
+	})
+end
+
+return React.memo(TeamEntryContainer)

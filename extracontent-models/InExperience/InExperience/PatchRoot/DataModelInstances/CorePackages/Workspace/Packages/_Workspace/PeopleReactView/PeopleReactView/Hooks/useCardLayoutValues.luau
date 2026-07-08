@@ -1,23 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v4 = require(l_script_FirstAncestor_0.Constants);
-return function() --[[ Line: 11 ]] --[[ Name: useCardLayoutValues ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), v4 (copy)
-    local v5 = l_useTokens_0();
-    local v6, v7 = v2.useBinding(0);
-    local v8, v9 = v2.useBinding(0);
-    local v10, v11 = v2.useBinding(0);
-    return v6, v8, v10, (v2.useCallback(function(v12, v13, v14) --[[ Line: 19 ]]
-        -- upvalues: v4 (ref), v11 (copy), v7 (copy), v9 (copy), v5 (copy)
-        local v15 = math.clamp(math.floor(v13 / v12), v4.PEOPLEPAGE.PEOPLE_CARDS.MIN_CARD_COLUMNS, v4.PEOPLEPAGE.PEOPLE_CARDS.MAX_CARD_COLUMNS);
-        local v16 = math.ceil(v14 * (v15 - 1) / v15);
-        local v17 = math.floor(v13 / v15) - v16;
-        v11(v15);
-        v7(v17);
-        v9(v17 + v5.Size.Size_1400);
-    end, {
-        v5.Size.Size_1400
-    }));
-end;
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local useTokens = require(PeopleReactViewParent.Foundation).Hooks.useTokens
+local Constants = require(PeopleReactView.Constants)
+
+local function useCardLayoutValues() -- line: 11
+	-- upvalues: useTokens (copy), React (copy), Constants (copy)
+	local v7 = useTokens()
+	local v8, v9 = React.useBinding(0)
+	local v10, v11 = React.useBinding(0)
+	local v12, v13 = React.useBinding(0)
+
+	return v8, v10, v12, (React.useCallback(function(n1: number, n2: number, n3: number) -- line: 19
+		-- upvalues: Constants (copy), v13 (copy), v9 (copy), v11 (copy), v7 (copy)
+		local v17 = math.clamp(math.floor(n2 / n1), Constants.PEOPLEPAGE.PEOPLE_CARDS.MIN_CARD_COLUMNS, Constants.PEOPLEPAGE.PEOPLE_CARDS.MAX_CARD_COLUMNS)
+		local v18 = math.ceil(n3 * (v17 - 1) / v17)
+		local v19 = math.floor(n2 / v17) - v18
+
+		v13(v17)
+		v9(v19)
+		v11(v19 + v7.Size.Size_1400)
+	end, { v7.Size.Size_1400 }))
+end
+
+return useCardLayoutValues

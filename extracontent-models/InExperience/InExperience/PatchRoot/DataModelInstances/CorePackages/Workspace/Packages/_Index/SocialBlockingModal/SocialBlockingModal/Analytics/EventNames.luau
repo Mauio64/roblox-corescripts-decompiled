@@ -1,6 +1,6 @@
 return {
-    SocialBlockingModalSeen = "SocialBlockingModalSeen", 
-    SocialBlockingModalBlockPressed = "SocialBlockingModalBlockPressed", 
-    SocialBlockingModalBlockAndReportPressed = "SocialBlockingModalBlockAndReportPressed", 
-    SocialBlockingModalCancelPressed = "SocialBlockingModalCancelPressed"
-};
+	SocialBlockingModalSeen = "SocialBlockingModalSeen",
+	SocialBlockingModalBlockPressed = "SocialBlockingModalBlockPressed",
+	SocialBlockingModalBlockAndReportPressed = "SocialBlockingModalBlockAndReportPressed",
+	SocialBlockingModalCancelPressed = "SocialBlockingModalCancelPressed"
+}

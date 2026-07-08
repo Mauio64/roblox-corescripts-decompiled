@@ -1,75 +1,81 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.UIBlox);
-local v5 = require(l_script_FirstAncestor_0.SocialLibraries);
-local v6 = require(script.Parent.PresenceBubbleCell);
-local l_TestStyle_0 = v5.Components.TestStyle;
-local v8 = {
-    Size = UDim2.new(1, 0, 1, 0), 
-    avatarCirclePresenceImage = nil, 
-    subTitleText = nil, 
-    subTitleIcon = nil, 
-    titleText = "TestUser", 
-    secondaryTitleText = nil, 
-    thumbnails = {}, 
-    childWidth = 0, 
-    style = l_TestStyle_0, 
-    showDivider = true, 
-    boldTitle = true, 
-    shouldMuteTitleColor = false, 
-    isLoading = false, 
-    hideLeftAvatarPadding = false
-};
-return v2.memo(function(v9) --[[ Line: 62 ]] --[[ Name: StyledCell ]]
-    -- upvalues: v3 (copy), v8 (copy), v2 (copy), v6 (copy)
-    local v10 = v3.Dictionary.join(v8, v9);
-    local l_style_0 = v10.style;
-    local l_Theme_0 = l_style_0.Theme;
-    local l_Font_0 = l_style_0.Font;
-    local l_FontSize_100_0 = l_style_0.Tokens.Global.FontSize_100;
-    local l_FontSize_150_0 = l_style_0.Tokens.Global.FontSize_150;
-    local v16 = type(v10.avatarCirclePresenceImage) == "table";
-    return v2.createElement(v6, {
-        childWidth = v10.childWidth, 
-        titleText = v10.titleText, 
-        secondaryTitleText = v10.secondaryTitleText, 
-        subTitleText = v10.subTitleText, 
-        subTitleIcon = v10.subTitleIcon, 
-        avatarCirclePresenceImage = v10.avatarCirclePresenceImage, 
-        thumbnails = v10.thumbnails, 
-        onActivated = v10.onActivated, 
-        onCircleActivated = v10.onCircleActivated, 
-        Size = v10.Size, 
-        isLoading = v10.isLoading, 
-        showNewPresenceImage = v16, 
-        pillText = v10.pillText, 
-        BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-        BackgroundTransparency = l_Theme_0.BackgroundDefault.Transparency, 
-        onPressedBackgroundColor3 = l_Theme_0.BackgroundOnPress.Color, 
-        onPressedBackgroundTransparency = l_Theme_0.BackgroundOnPress.Transparency, 
-        avatarCircleBackgroundColor3 = l_Theme_0.PlaceHolder.Color, 
-        avatarCircleDividerColor3 = l_Theme_0.PlaceHolder.Color, 
-        avatarCircleCellWidth = 72, 
-        avatarCircleSize = 48, 
-        avatarCirclePresenceImageColor3 = if v16 then l_Theme_0.OnlineStatus.Color else nil, 
-        avatarCirclePresenceImageTransparency = if v16 then l_Theme_0.OnlineStatus.Transparency else nil, 
-        subTitleTextFont = l_Font_0.CaptionBody.Font, 
-        subTitleTextTransparency = l_Theme_0.TextDefault.Transparency, 
-        subTitleTextColor3 = l_Theme_0.TextDefault.Color, 
-        subTitleTextSize = l_FontSize_150_0, 
-        titleFont = l_Font_0.Header2.Font, 
-        titleTextTransparency = if not v10.shouldMuteTitleColor and v10.boldTitle then l_Theme_0.TextEmphasis.Transparency else l_Theme_0.TextDefault.Transparency, 
-        titleTextColor3 = if not v10.shouldMuteTitleColor and v10.boldTitle then l_Theme_0.TextEmphasis.Color else l_Theme_0.TextDefault.Color, 
-        titleTextSize = l_FontSize_100_0, 
-        secondaryTitleFont = l_Font_0.Header2.Font, 
-        secondaryTitleTextTransparency = l_Theme_0.TextMuted.Transparency, 
-        secondaryTitleTextColor3 = l_Theme_0.TextMuted.Color, 
-        secondaryTitleTextSize = l_FontSize_100_0, 
-        showDivider = v10.showDivider, 
-        dividerTransparency = l_Theme_0.Divider.Transparency, 
-        dividerColor3 = l_Theme_0.Divider.Color, 
-        hideLeftAvatarPadding = v10.hideLeftAvatarPadding
-    }, v10.children or {});
-end);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Cryo = require(AppChatParent.Cryo)
+
+require(AppChatParent.UIBlox)
+
+local SocialLibraries = require(AppChat.SocialLibraries)
+local PresenceBubbleCell = require(script.Parent.PresenceBubbleCell)
+local TestStyle = SocialLibraries.Components.TestStyle
+local t1 = {
+	avatarCirclePresenceImage = nil,
+	subTitleText = nil,
+	subTitleIcon = nil,
+	titleText = "TestUser",
+	secondaryTitleText = nil,
+	childWidth = 0,
+	showDivider = true,
+	boldTitle = true,
+	shouldMuteTitleColor = false,
+	isLoading = false,
+	hideLeftAvatarPadding = false,
+	Size = UDim2.new(1, 0, 1, 0),
+	thumbnails = {},
+	style = TestStyle
+}
+
+local function StyledCell(t2: {[any]: any}) -- line: 62
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), PresenceBubbleCell (copy)
+	local v11 = Cryo.Dictionary.join(t1, t2)
+	local style = v11.style
+	local Theme = style.Theme
+	local styleFont = style.Font
+	local FontSize_350 = style.Tokens.FontSize.FontSize_350
+	local FontSize_400 = style.Tokens.FontSize.FontSize_400
+	local v17 = type(v11.avatarCirclePresenceImage) == "table"
+
+	return React.createElement(PresenceBubbleCell, {
+		childWidth = v11.childWidth,
+		titleText = v11.titleText,
+		secondaryTitleText = v11.secondaryTitleText,
+		subTitleText = v11.subTitleText,
+		subTitleIcon = v11.subTitleIcon,
+		avatarCirclePresenceImage = v11.avatarCirclePresenceImage,
+		thumbnails = v11.thumbnails,
+		onActivated = v11.onActivated,
+		onCircleActivated = v11.onCircleActivated,
+		Size = v11.Size,
+		isLoading = v11.isLoading,
+		showNewPresenceImage = v17,
+		pillText = v11.pillText,
+		BackgroundColor3 = Theme.BackgroundDefault.Color,
+		BackgroundTransparency = Theme.BackgroundDefault.Transparency,
+		onPressedBackgroundColor3 = Theme.BackgroundOnPress.Color,
+		onPressedBackgroundTransparency = Theme.BackgroundOnPress.Transparency,
+		avatarCircleBackgroundColor3 = Theme.PlaceHolder.Color,
+		avatarCircleDividerColor3 = Theme.PlaceHolder.Color,
+		avatarCircleCellWidth = 72,
+		avatarCircleSize = 48,
+		avatarCirclePresenceImageColor3 = if not v17 then nil else Theme.OnlineStatus.Color,
+		avatarCirclePresenceImageTransparency = if not v17 then nil else Theme.OnlineStatus.Transparency,
+		subTitleTextFont = styleFont.CaptionBody.Font,
+		subTitleTextTransparency = Theme.TextDefault.Transparency,
+		subTitleTextColor3 = Theme.TextDefault.Color,
+		subTitleTextSize = FontSize_400,
+		titleFont = styleFont.Header2.Font,
+		titleTextTransparency = if not v11.shouldMuteTitleColor and v11.boldTitle then Theme.TextEmphasis.Transparency else Theme.TextDefault.Transparency,
+		titleTextColor3 = if not v11.shouldMuteTitleColor and v11.boldTitle then Theme.TextEmphasis.Color else Theme.TextDefault.Color,
+		titleTextSize = FontSize_350,
+		secondaryTitleFont = styleFont.Header2.Font,
+		secondaryTitleTextTransparency = Theme.TextMuted.Transparency,
+		secondaryTitleTextColor3 = Theme.TextMuted.Color,
+		secondaryTitleTextSize = FontSize_350,
+		showDivider = v11.showDivider,
+		dividerTransparency = Theme.Divider.Transparency,
+		dividerColor3 = Theme.Divider.Color,
+		hideLeftAvatarPadding = v11.hideLeftAvatarPadding
+	}, v11.children or {})
+end
+
+return React.memo(StyledCell)

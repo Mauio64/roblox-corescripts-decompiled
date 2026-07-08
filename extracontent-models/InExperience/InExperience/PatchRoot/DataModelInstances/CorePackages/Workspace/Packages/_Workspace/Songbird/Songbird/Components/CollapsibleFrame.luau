@@ -1,73 +1,83 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local v3 = require(l_script_FirstAncestor_0.Parent.ReactUtils);
-local v4 = require(l_script_FirstAncestor_0.Parent.ReactOtter);
-local l_useBinding_0 = v2.useBinding;
-local l_useCallback_0 = v2.useCallback;
-local l_useEffect_0 = v2.useEffect;
-local l_usePrevious_0 = v3.usePrevious;
-local l_useAnimatedBinding_0 = v4.useAnimatedBinding;
-local v10 = {
-    stiffness = 300, 
-    damping = 30, 
-    mass = 1
-};
+local Songbird = script:FindFirstAncestor("Songbird")
+local Foundation = require(Songbird.Parent.Foundation)
+local React = require(Songbird.Parent.React)
+local ReactUtils = require(Songbird.Parent.ReactUtils)
+local ReactOtter = require(Songbird.Parent.ReactOtter)
+local useBinding = React.useBinding
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local usePrevious = ReactUtils.usePrevious
+local useAnimatedBinding = ReactOtter.useAnimatedBinding
+local t1 = {
+	stiffness = 300,
+	damping = 30,
+	mass = 1
+}
 local _ = {
-    isCollapsed = false
-};
-return function(v12) --[[ Line: 31 ]] --[[ Name: CollapsibleFrame ]]
-    -- upvalues: l_usePrevious_0 (copy), l_useBinding_0 (copy), l_useAnimatedBinding_0 (copy), l_useCallback_0 (copy), l_useEffect_0 (copy), v4 (copy), v10 (copy), v2 (copy), v1 (copy)
-    local v13 = l_usePrevious_0(v12.isCollapsed);
-    local v14, v15 = l_useBinding_0(Vector2.new(1e999, 1e999));
-    local v16, v17 = l_useAnimatedBinding_0(v12.isCollapsed and 0 or 1);
-    local v19 = l_useCallback_0(function(v18) --[[ Line: 36 ]]
-        -- upvalues: v15 (copy)
-        v15(v18.AbsoluteCanvasSize);
-    end, {});
-    l_useEffect_0(function() --[[ Line: 40 ]]
-        -- upvalues: v13 (copy), v12 (copy), v17 (copy), v4 (ref), v10 (ref)
-        if v13 ~= nil then
-            if not v12.isCollapsed and v13 then
-                v17(v4.spring(1, v10));
-                return;
-            elseif v12.isCollapsed and not v13 then
-                v17(v4.spring(0, v10));
-            end;
-        end;
-    end, {
-        v12.isCollapsed, 
-        v13
-    });
-    local v22 = v2.joinBindings({
-        maxSize = v14, 
-        alpha = v16
-    }):map(function(v20) --[[ Line: 53 ]]
-        local v21 = math.max(v20.maxSize.Y * v20.alpha, 0);
-        return Vector2.new(1e999, v21);
-    end);
-    return v2.createElement(v1.View, {
-        tag = "size-full clip", 
-        sizeConstraint = {
-            MaxSize = v22
-        }
-    }, {
-        ScrollingFrame = v2.createElement("ScrollingFrame", {
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.XY, 
-            BackgroundTransparency = 1, 
-            CanvasSize = UDim2.fromScale(0, 0), 
-            AutomaticCanvasSize = Enum.AutomaticSize.XY, 
-            ClipsDescendants = true, 
-            ScrollingEnabled = false, 
-            HorizontalScrollBarInset = Enum.ScrollBarInset.None, 
-            ScrollBarImageTransparency = 1, 
-            Selectable = false, 
-            [v2.Change.AbsoluteCanvasSize] = v19
-        }, {
-            Container = v2.createElement(v1.View, {
-                tag = "auto-y size-full-0"
-            }, v12.children)
-        })
-    });
-end;
+	isCollapsed = false
+}
+
+local function CollapsibleFrame(t2: {[any]: any}) -- line: 31
+	-- upvalues: usePrevious (copy), useBinding (copy), useAnimatedBinding (copy), useCallback (copy), useEffect (copy), ReactOtter (copy), t1 (copy), React (copy), Foundation (copy)
+	local v15 = usePrevious(t2.isCollapsed)
+	local v16, v17 = useBinding(Vector2.new(1e999, 1e999))
+	local v18, v19 = useAnimatedBinding(not t2.isCollapsed and 1 or 0)
+	local v20 = useCallback(function(p1) -- line: 36
+		-- upvalues: v17 (copy)
+		v17(p1.AbsoluteCanvasSize)
+	end, {})
+
+	useEffect(function() -- line: 40
+		-- upvalues: v15 (copy), t2 (copy), v19 (copy), ReactOtter (copy), t1 (copy)
+		if v15 ~= nil then
+			if not t2.isCollapsed and v15 then
+				v19(ReactOtter.spring(1, t1))
+
+				return
+			end
+
+			if t2.isCollapsed and not v15 then
+				v19(ReactOtter.spring(0, t1))
+			end
+		end
+	end, {
+		t2.isCollapsed,
+		v15
+	})
+
+	local v21 = React.joinBindings({
+		maxSize = v16,
+		alpha = v18
+	}):map(function(t3: {[any]: any}) -- line: 53
+		local v24 = math.max(t3.maxSize.Y * t3.alpha, 0)
+
+		return Vector2.new(1e999, v24)
+	end)
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full clip",
+		sizeConstraint = {
+			MaxSize = v21
+		}
+	}, {
+		ScrollingFrame = React.createElement("ScrollingFrame", {
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundTransparency = 1,
+			CanvasSize = UDim2.fromScale(0, 0),
+			AutomaticCanvasSize = Enum.AutomaticSize.XY,
+			ClipsDescendants = true,
+			ScrollingEnabled = false,
+			HorizontalScrollBarInset = Enum.ScrollBarInset.None,
+			ScrollBarImageTransparency = 1,
+			Selectable = false,
+			[React.Change.AbsoluteCanvasSize] = v20
+		}, {
+			Container = React.createElement(Foundation.View, {
+				tag = "auto-y size-full-0"
+			}, t2.children)
+		})
+	})
+end
+
+return CollapsibleFrame

@@ -1,4 +1,4 @@
 return {
-    UserModel = require(script.User), 
-    MockUser = require(script.MockUser)
-};
+	UserModel = require(script.User),
+	MockUser = require(script.MockUser)
+}

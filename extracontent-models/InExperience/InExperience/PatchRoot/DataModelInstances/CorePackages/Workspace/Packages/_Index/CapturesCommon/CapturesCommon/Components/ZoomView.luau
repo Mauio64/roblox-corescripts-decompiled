@@ -1,27 +1,30 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Foundation);
-local v3 = require(l_Parent_1.React);
-local l_View_0 = v2.View;
-local v5 = require(l_Parent_0.Hooks.useZoomController);
-return function(v6) --[[ Line: 17 ]]
-    -- upvalues: v5 (copy), v3 (copy), l_View_0 (copy)
-    local v7 = v6.active == nil or v6.active;
-    local v8, v9 = v5(v7);
-    v3.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: v6 (copy), v8 (copy)
-        if v6.onZoomStatusChanged then
-            v6.onZoomStatusChanged(v8);
-        end;
-    end, {
-        v8, 
-        v6.onZoomStatusChanged
-    });
-    return v3.createElement(l_View_0, {
-        ref = v9, 
-        tag = "anchor-center-center position-center-center size-full bg-action-subtle", 
-        ZIndex = 1
-    }, {
-        ZoomItem = v3.createElement(v3.Fragment, nil, v6.children)
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Foundation = require(ParentParentParent.Foundation)
+local React = require(ParentParentParent.React)
+local View = Foundation.View
+local useZoomController = require(ParentParent.Hooks.useZoomController)
+
+return function(t1: {[any]: any}) -- line: 17
+	-- upvalues: useZoomController (copy), React (copy), View (copy)
+	local v8 = t1.active == nil or t1.active
+	local v9, v10 = useZoomController(v8)
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: t1 (copy), v9 (copy)
+		if t1.onZoomStatusChanged then
+			t1.onZoomStatusChanged(v9)
+		end
+	end, {
+		v9,
+		t1.onZoomStatusChanged
+	})
+
+	return React.createElement(View, {
+		tag = "anchor-center-center position-center-center size-full bg-action-subtle",
+		ZIndex = 1,
+		ref = v10
+	}, {
+		ZoomItem = React.createElement(React.Fragment, nil, t1.children)
+	})
+end

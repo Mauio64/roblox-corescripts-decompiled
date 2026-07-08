@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UseBirthdayDropdownForGamepad6", false);
+return game:DefineFastFlag("UseBirthdayDropdownForGamepad6", false)

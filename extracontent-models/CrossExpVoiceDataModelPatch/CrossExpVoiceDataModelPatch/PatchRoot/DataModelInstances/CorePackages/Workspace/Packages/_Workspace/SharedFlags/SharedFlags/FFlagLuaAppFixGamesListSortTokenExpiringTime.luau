@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFixGamesListSortTokenExpiringTime", false);
+return game:DefineFastFlag("LuaAppFixGamesListSortTokenExpiringTime", false)

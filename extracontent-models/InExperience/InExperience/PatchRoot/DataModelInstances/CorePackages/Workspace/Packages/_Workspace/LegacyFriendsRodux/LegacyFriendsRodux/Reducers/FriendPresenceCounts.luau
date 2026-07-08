@@ -1,12 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("LegacyFriendsRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local l_UpdateFriendPresenceCounts_0 = require(l_script_FirstAncestor_0.Actions).UpdateFriendPresenceCounts;
-return function(v4, v5) --[[ Line: 8 ]]
-    -- upvalues: l_UpdateFriendPresenceCounts_0 (copy), v2 (copy)
-    v4 = v4 or {};
-    if v5.type == l_UpdateFriendPresenceCounts_0.name then
-        v4 = v2.Dictionary.join({}, v5.presenceCounts);
-    end;
-    return v4;
-end;
+local LegacyFriendsRodux = script:FindFirstAncestor("LegacyFriendsRodux")
+local LegacyFriendsRoduxParent = LegacyFriendsRodux.Parent
+local Cryo = require(LegacyFriendsRoduxParent.Cryo)
+local UpdateFriendPresenceCounts = require(LegacyFriendsRodux.Actions).UpdateFriendPresenceCounts
+
+return function(p1, p2) -- line: 8
+	-- upvalues: UpdateFriendPresenceCounts (copy), Cryo (copy)
+	local v7 = p1 or {}
+
+	if p2.type == UpdateFriendPresenceCounts.name then
+		v7 = Cryo.Dictionary.join({}, p2.presenceCounts)
+	end
+
+	return v7
+end

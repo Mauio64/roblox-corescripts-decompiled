@@ -1,34 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLuaAnalytics");
-local l_DiagEventTypes_0 = require(l_script_FirstAncestor_0.Analytics.Enums).DiagEventTypes;
-local _ = require(script.Parent.Parent.Types);
-local function _(v3, v4) --[[ Line: 7 ]] --[[ Name: formatValue ]]
-    if type(v3) == "function" then
-        return (v3(v4));
-    else
-        return v3;
-    end;
-end;
-return function() --[[ Line: 11 ]] --[[ Name: getFormattedDiagEventInfo ]]
-    -- upvalues: l_DiagEventTypes_0 (copy)
-    return function(v6, v7) --[[ Line: 12 ]]
-        -- upvalues: l_DiagEventTypes_0 (ref)
-        local l_name_0 = v6.name;
-        local v9 = if type(l_name_0) == "function" then l_name_0(v7) else l_name_0;
-        l_name_0 = v6.type or l_DiagEventTypes_0.Counter;
-        local v10;
-        if l_name_0 == l_DiagEventTypes_0.Stats then
-            local l_stats_0 = v6.stats;
-            v10 = (if type(l_stats_0) == "function" then l_stats_0(v7) else l_stats_0) or 0;
-        else
-            local l_count_0 = v6.count;
-            v10 = (if type(l_count_0) == "function" then l_count_0(v7) else l_count_0) or 1;
-        end;
-        local l_platformSpecificity_0 = v6.platformSpecificity;
-        return {
-            type = l_name_0, 
-            name = v9, 
-            value = v10, 
-            platformSpecificity = l_platformSpecificity_0
-        };
-    end;
-end;
+local SocialLuaAnalytics = script:FindFirstAncestor("SocialLuaAnalytics")
+local DiagEventTypes = require(SocialLuaAnalytics.Analytics.Enums).DiagEventTypes
+
+require(script.Parent.Parent.Types)
+
+local function formatValue(p1, p2) -- line: 7
+	if type(p1) == "function" then
+		return (p1(p2))
+	end
+
+	return p1
+end
+local function getFormattedDiagEventInfo() -- line: 11
+	-- upvalues: DiagEventTypes (copy)
+	return function(p3, p4) -- line: 12
+		-- upvalues: DiagEventTypes (copy)
+		local name = p3.name
+		local v10 = if type(name) ~= "function" then name else name(p4)
+		local v11 = p3.type or DiagEventTypes.Counter
+		local v13
+
+		if v11 == DiagEventTypes.Stats then
+			local stats = p3.stats
+
+			v13 = ((if type(stats) ~= "function" then stats else stats(p4))) or 0
+		else
+			local count = p3.count
+
+			v13 = ((if type(count) ~= "function" then count else count(p4))) or 1
+		end
+
+		local platformSpecificity = p3.platformSpecificity
+
+		return {
+			type = v11,
+			name = v10,
+			value = v13,
+			platformSpecificity = platformSpecificity
+		}
+	end
+end
+
+return getFormattedDiagEventInfo

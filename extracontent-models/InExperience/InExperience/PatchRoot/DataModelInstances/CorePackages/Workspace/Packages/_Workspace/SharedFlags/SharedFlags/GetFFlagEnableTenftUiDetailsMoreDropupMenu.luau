@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableTenftUiDetailsMoreDropupMenu", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableTenftUiDetailsMoreDropupMenu");
-end;
+game:DefineFastFlag("EnableTenftUiDetailsMoreDropupMenu", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableTenftUiDetailsMoreDropupMenu")
+end

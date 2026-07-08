@@ -1,88 +1,116 @@
-local l_Parent_0 = script:FindFirstAncestor("InterventionShared").Parent;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_RunService_0 = game:GetService("RunService");
-local v3 = require(l_Parent_0.React);
-local l_useEffect_0 = v3.useEffect;
-local l_useMemo_0 = v3.useMemo;
-local l_useState_0 = v3.useState;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local function v11(v8) --[[ Line: 39 ]] --[[ Name: formatCountdown ]]
-    -- upvalues: l_LocalizationService_0 (copy)
-    if v8 <= 0 then
-        return nil;
-    else
-        local v9 = math.ceil(v8 / 60) * 60;
-        if v9 >= 86400 then
-            local v10 = math.ceil(v9 / 86400);
-            return (("%* %* left"):format(v10, v10 == 1 and "day" or "days"));
-        else
-            return DateTime.fromUnixTimestamp(v9):FormatUniversalTime("HH:mm", l_LocalizationService_0.RobloxLocaleId) .. " " .. "left";
-        end;
-    end;
-end;
-return function(v12) --[[ Line: 70 ]] --[[ Name: useRestrictionEndDateInfo ]]
-    -- upvalues: l_useMemo_0 (copy), l_LocalizationService_0 (copy), l_dependencyArray_0 (copy), l_useState_0 (copy), v11 (copy), l_useEffect_0 (copy), l_RunService_0 (copy)
-    local v13 = if v12 and v12 ~= "" then DateTime.fromIsoDate(v12) else nil;
-    local v14 = l_useMemo_0(function() --[[ Line: 73 ]]
-        -- upvalues: v13 (copy), l_LocalizationService_0 (ref)
-        if v13 then
-            return (v13:FormatLocalTime("LLL", l_LocalizationService_0.RobloxLocaleId));
-        else
-            return nil;
-        end;
-    end, l_dependencyArray_0(v13));
-    local v16, v17 = l_useState_0(function() --[[ Line: 77 ]]
-        -- upvalues: v13 (copy), v11 (ref)
-        if v13 == nil then
-            return nil;
-        else
-            local v15 = math.max(v13.UnixTimestamp - DateTime.now().UnixTimestamp, 0);
-            return (v11(v15));
-        end;
-    end);
-    l_useEffect_0(function() --[[ Line: 86 ]]
-        -- upvalues: v13 (copy), v17 (copy), v11 (ref), l_RunService_0 (ref)
-        if v13 == nil then
-            v17(nil);
-            return;
-        else
-            local v18 = DateTime.now();
-            local v19 = v13.UnixTimestamp - v18.UnixTimestamp;
-            if v19 <= 0 then
-                v17(nil);
-                return;
-            else
-                v17((v11(v19)));
-                local v20 = 0;
-                local v21 = nil;
-                v21 = l_RunService_0.Heartbeat:Connect(function() --[[ Line: 107 ]]
-                    -- upvalues: v20 (ref), v13 (ref), v17 (ref), v11 (ref), v21 (ref)
-                    local v22 = os.clock();
-                    if v22 - v20 < 1 then
-                        return;
-                    else
-                        v20 = v22;
-                        local v23 = math.max(v13.UnixTimestamp - DateTime.now().UnixTimestamp, 0);
-                        v17((v11(v23)));
-                        if v23 <= 0 and v21 then
-                            v21:Disconnect();
-                            v21 = nil;
-                        end;
-                        return;
-                    end;
-                end);
-                return function() --[[ Line: 125 ]]
-                    -- upvalues: v21 (ref)
-                    if v21 then
-                        v21:Disconnect();
-                        v21 = nil;
-                    end;
-                end;
-            end;
-        end;
-    end, l_dependencyArray_0(v13, v17));
-    return {
-        formattedEndDate = v14, 
-        countdownText = v16
-    };
-end;
+local Parent = script:FindFirstAncestor("InterventionShared").Parent
+local LocalizationService = game:GetService("LocalizationService")
+local RunService = game:GetService("RunService")
+local React = require(Parent.React)
+local useEffect = React.useEffect
+local useMemo = React.useMemo
+local useState = React.useState
+local dependencyArray = require(Parent.RoactUtils).Hooks.dependencyArray
+local v9 = require(Parent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
+
+local function formatCountdown(n1: number) -- line: 37
+	-- upvalues: v9 (copy), LocalizationService (copy)
+	if n1 <= 0 then
+		return nil
+	end
+
+	local v13 = math.ceil(n1 / 60) * 60
+
+	if v13 >= 86400 then
+		local v14 = math.ceil(v13 / 86400)
+
+		if v14 == 1 then
+			return (v9:Format("Feature.InExperienceIntervention.Label.TimeLeft.Day.Singular"))
+		end
+
+		return (v9:Format("Feature.InExperienceIntervention.Label.TimeLeft.Day.Plural", {
+			number = v14
+		}))
+	end
+
+	local v15 = DateTime.fromUnixTimestamp(v13):FormatUniversalTime("HH:mm", LocalizationService.RobloxLocaleId)
+
+	return v9:Format("Feature.InExperienceIntervention.Label.TimeLeft.Hours", {
+		time = v15
+	})
+end
+local function useRestrictionEndDateInfo(s1: string?) -- line: 70
+	-- upvalues: useMemo (copy), LocalizationService (copy), dependencyArray (copy), useState (copy), formatCountdown (copy), useEffect (copy), RunService (copy)
+	local v17 = if not s1 or s1 == "" then nil else DateTime.fromIsoDate(s1)
+	local v18 = useMemo(function() -- line: 73
+		-- upvalues: v17 (copy), LocalizationService (copy)
+		if v17 then
+			return (v17:FormatLocalTime("LLL", LocalizationService.RobloxLocaleId))
+		end
+
+		return nil
+	end, dependencyArray(v17))
+	local v19, v20 = useState(function() -- line: 77
+		-- upvalues: v17 (copy), formatCountdown (copy)
+		if v17 == nil then
+			return nil
+		end
+
+		local v21 = math.max(v17.UnixTimestamp - DateTime.now().UnixTimestamp, 0)
+
+		return formatCountdown(v21)
+	end)
+
+	useEffect(function() -- line: 86
+		-- upvalues: v17 (copy), v20 (copy), formatCountdown (copy), RunService (copy)
+		if v17 == nil then
+			v20(nil)
+
+			return
+		end
+
+		local dateTime = DateTime.now()
+		local v23 = v17.UnixTimestamp - dateTime.UnixTimestamp
+
+		if v23 <= 0 then
+			v20(nil)
+
+			return
+		end
+
+		v20(formatCountdown(v23))
+
+		local n2 = 0
+		local u25 = nil
+
+		u25 = RunService.Heartbeat:Connect(function() -- line: 107
+			-- upvalues: n2 (ref), v17 (copy), v20 (copy), formatCountdown (copy), u25 (ref)
+			local elapsed = os.clock()
+
+			if elapsed - n2 < 1 then
+				return
+			end
+
+			n2 = elapsed
+
+			local v27 = math.max(v17.UnixTimestamp - DateTime.now().UnixTimestamp, 0)
+
+			v20(formatCountdown(v27))
+
+			if v27 <= 0 and u25 then
+				u25:Disconnect()
+				u25 = nil
+			end
+		end)
+
+		return function() -- line: 125
+			-- upvalues: u25 (ref)
+			if u25 then
+				u25:Disconnect()
+				u25 = nil
+			end
+		end
+	end, dependencyArray(v17, v20))
+
+	return {
+		formattedEndDate = v18,
+		countdownText = v19
+	}
+end
+
+return useRestrictionEndDateInfo

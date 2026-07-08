@@ -1,124 +1,154 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v3 = require(l_script_FirstAncestor_0.Parent.Parent.TopBar.Components.GamepadConnector);
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Packages.ReactRoblox);
-local v6 = require(l_CorePackages_0.Packages.UIBlox);
-local v7 = require(l_CorePackages_0.Packages.Foundation);
-local l_ShortcutBar_0 = v6.App.Navigation.ShortcutBar;
-local _ = require(l_script_FirstAncestor_0.Service.Types);
-local v10 = require(l_script_FirstAncestor_0.Unibar.Constants);
-local v11 = require(l_script_FirstAncestor_0.Service.ViewportUtil);
-local v12 = require(l_script_FirstAncestor_0.Hooks.useObservableValue);
-local l_useTokens_0 = v7.Hooks.useTokens;
-local v14 = require(l_script_FirstAncestor_0.Service);
-local l_FFlagEnableConsoleExpControls_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls;
-local l_isSpatial_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).isSpatial;
-local l_FFlagDisableGamepadConnectorInVR_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Flags.FFlagDisableGamepadConnectorInVR;
-ChromeShortcutBar = function(_) --[[ Line: 26 ]] --[[ Name: ChromeShortcutBar ]]
-    -- upvalues: v4 (copy), l_useTokens_0 (copy), v12 (copy), v11 (copy), v14 (copy), l_FFlagDisableGamepadConnectorInVR_0 (copy), l_isSpatial_0 (copy), v3 (copy), l_FFlagEnableConsoleExpControls_0 (copy), v5 (copy), v10 (copy), l_ShortcutBar_0 (copy), l_CoreGui_0 (copy)
-    local v19, v20 = v4.useState({});
-    local v21, v22 = v4.useState({});
-    local v23, v24 = v4.useBinding(false);
-    local v25 = l_useTokens_0();
-    local v26 = v12(v11.screenSize);
-    local v27 = v4.useRef(0);
-    local function v32() --[[ Line: 35 ]] --[[ Name: checkOverflow ]]
-        -- upvalues: v27 (copy), v26 (copy), v19 (copy), v22 (copy)
-        if v27.current > v26.X then
-            local v28 = 1;
-            for v29, v30 in v19 do
-                if v30.displayPriority <= v19[v28].displayPriority then
-                    v28 = v29;
-                end;
-            end;
-            local v31 = table.clone(v19);
-            table.remove(v31, v28);
-            v22(v31);
-        end;
-    end;
-    v4.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v22 (copy), v32 (copy)
-        v22({});
-        v32();
-    end, {
-        v26
-    });
-    v4.useEffect(function() --[[ Line: 57 ]]
-        -- upvalues: v14 (ref), v20 (copy), v22 (copy), l_FFlagDisableGamepadConnectorInVR_0 (ref), l_isSpatial_0 (ref), v3 (ref), l_FFlagEnableConsoleExpControls_0 (ref), v24 (copy)
-        v14:onShortcutBarChanged():connect(function() --[[ Line: 58 ]]
-            -- upvalues: v14 (ref), v20 (ref), v22 (ref)
-            local v33 = v14:getCurrentShortcuts();
-            v20(v33);
-            v22({});
-        end);
-        if not l_FFlagDisableGamepadConnectorInVR_0 or not l_isSpatial_0() then
-            local v34 = v3:getShowTopBar();
-            local v35 = v3:getGamepadActive();
-            if l_FFlagEnableConsoleExpControls_0 then
-                local function v37() --[[ Line: 69 ]] --[[ Name: shouldHideShortcutBar ]]
-                    -- upvalues: v34 (copy), v35 (copy), v14 (ref)
-                    local v36 = not v34:get() or not v35:get();
-                    v14:setHideShortcutBar("TopBar", v36);
-                end;
-                local v38 = not v34:get() or not v35:get();
-                v14:setHideShortcutBar("TopBar", v38);
-                v34:connect(v37);
-                v35:connect(v37);
-                return;
-            else
-                local function v40() --[[ Line: 77 ]] --[[ Name: shouldShowShortcutBar ]]
-                    -- upvalues: v34 (copy), v35 (copy), v24 (ref)
-                    local v39 = v34:get() and v35:get();
-                    v24(v39);
-                end;
-                v34:connect(v40);
-                v35:connect(v40);
-            end;
-        end;
-    end, {});
-    local v41 = if #v21 > 0 then v21 else v19;
-    local v42 = {};
-    for _, v44 in v41 do
-        if v44.label then
-            local v45 = {
-                icon = "", 
-                text = ""
-            };
-            if v44.icon then
-                v45.icon = v44.icon;
-            end;
-            v45.text = v44.label;
-            table.insert(v42, v45);
-        end;
-    end;
-    return v5.createPortal({
-        Name = v4.createElement("ScreenGui", {
-            Name = "ShortcutBar", 
-            DisplayOrder = v10.SHORTCUTBAR_DISPLAYORDER, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-            Enabled = if l_FFlagEnableConsoleExpControls_0 then nil else v23
-        }, {
-            v4.createElement("Frame", {
-                Name = "ShortcutBarWrapper", 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                Position = UDim2.new(0.5, 0, 1, if v25 then -v25.Gap.Medium else 0), 
-                AnchorPoint = Vector2.new(0.5, 1), 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1, 
-                [v4.Change.AbsoluteSize] = function(v46) --[[ Line: 118 ]]
-                    -- upvalues: v27 (copy), v32 (copy)
-                    v27.current = v46.AbsoluteSize.X;
-                    v32();
-                end
-            }, {
-                Layout = v4.createElement("UIListLayout"); 
-                v4.createElement(l_ShortcutBar_0, {
-                    items = v42
-                })
-            })
-        })
-    }, l_CoreGui_0);
-end;
-return ChromeShortcutBar;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local GamepadConnector = require(ChromeShared.Parent.Parent.TopBar.Components.GamepadConnector)
+local React = require(CorePackages.Packages.React)
+local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local ShortcutBar = UIBlox.App.Navigation.ShortcutBar
+
+require(CorePackages.Workspace.Packages.Chrome)
+
+local Constants = require(ChromeShared.Unibar.Constants)
+local ViewportUtil = require(ChromeShared.Service.ViewportUtil)
+local useObservableValue = require(ChromeShared.Hooks.useObservableValue)
+local useTokens = Foundation.Hooks.useTokens
+local Service = require(ChromeShared.Service)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+local FFlagGamepadIconSupportCheck = SharedFlags.FFlagGamepadIconSupportCheck
+
+function ChromeShortcutBar(_) -- line: 28
+	-- upvalues: React (copy), useTokens (copy), useObservableValue (copy), ViewportUtil (copy), FFlagGamepadIconSupportCheck (copy), GamepadConnector (copy), Service (copy), UserInputService (copy), isSpatial (copy), FFlagEnableConsoleExpControls (copy), ReactRoblox (copy), Constants (copy), ShortcutBar (copy), CoreGui (copy)
+	local v21, v22 = React.useState({})
+	local v23, v24 = React.useState({})
+	local v25, v26 = React.useBinding(false)
+	local v27 = useTokens()
+	local v28 = useObservableValue(ViewportUtil.screenSize)
+	local v29 = React.useRef(0)
+
+	local function checkOverflow() -- line: 37
+		-- upvalues: v29 (copy), v28 (copy), v21 (copy), v24 (copy)
+		if v29.current > v28.X then
+			local n1 = 1
+
+			for v36, v37 in v21 do
+				if v37.displayPriority <= v21[n1].displayPriority then
+					n1 = v36
+				end
+			end
+
+			local v38 = table.clone(v21)
+
+			table.remove(v38, n1)
+			v24(v38)
+		end
+	end
+
+	React.useEffect(function() -- line: 54
+		-- upvalues: v24 (copy), checkOverflow (copy)
+		v24({})
+		checkOverflow()
+	end, { v28 })
+	React.useEffect(function() -- line: 59
+		-- upvalues: FFlagGamepadIconSupportCheck (copy), GamepadConnector (copy), Service (copy), v22 (copy), v24 (copy), UserInputService (copy), isSpatial (copy), FFlagEnableConsoleExpControls (copy), v26 (copy)
+		local function updateShortcuts() -- line: 60
+			-- upvalues: FFlagGamepadIconSupportCheck (copy), GamepadConnector (copy), Service (copy), v22 (copy), v24 (copy)
+			if FFlagGamepadIconSupportCheck and not GamepadConnector:getGamepadActive():get() then
+				return
+			end
+
+			local v46 = Service:getCurrentShortcuts()
+
+			v22(v46)
+			v24({})
+		end
+
+		Service:onShortcutBarChanged():connect(updateShortcuts)
+
+		if FFlagGamepadIconSupportCheck then
+			UserInputService.LastInputTypeChanged:Connect(updateShortcuts)
+		end
+
+		if not isSpatial() then
+			local v40 = GamepadConnector:getShowTopBar()
+			local v41 = GamepadConnector:getGamepadActive()
+
+			if FFlagEnableConsoleExpControls then
+				local function shouldHideShortcutBar() -- line: 79
+					-- upvalues: v40 (copy), v41 (copy), Service (copy)
+					local v47 = not v40:get() or not v41:get()
+
+					Service:setHideShortcutBar("TopBar", v47)
+				end
+
+				local v43 = not v40:get() or not v41:get()
+
+				Service:setHideShortcutBar("TopBar", v43)
+				v40:connect(shouldHideShortcutBar)
+				v41:connect(shouldHideShortcutBar)
+
+				return
+			end
+
+			local function shouldShowShortcutBar() -- line: 87
+				-- upvalues: v40 (copy), v41 (copy), v26 (copy)
+				local v48 = v40:get() and v41:get()
+
+				v26(v48)
+			end
+
+			v40:connect(shouldShowShortcutBar)
+			v41:connect(shouldShowShortcutBar)
+		end
+	end, {})
+
+	local t1 = {}
+
+	for _, v33 in if not (#v23 > 0) then v21 else v23 do
+		if v33.label then
+			local t2 = {
+				icon = "",
+				text = ""
+			}
+
+			if v33.icon then
+				t2.icon = v33.icon
+			end
+
+			t2.text = v33.label
+			table.insert(t1, t2)
+		end
+	end
+
+	return ReactRoblox.createPortal({
+		Name = React.createElement("ScreenGui", {
+			Name = "ShortcutBar",
+			DisplayOrder = Constants.SHORTCUTBAR_DISPLAYORDER,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			Enabled = if not FFlagEnableConsoleExpControls then v25 else nil
+		}, { React.createElement("Frame", {
+			Name = "ShortcutBarWrapper",
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Position = UDim2.new(0.5, 0, 1, not v27 and 0 or -v27.Gap.Medium),
+			AnchorPoint = Vector2.new(0.5, 1),
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = function(p2) -- line: 128
+				-- upvalues: v29 (copy), checkOverflow (copy)
+				v29.current = p2.AbsoluteSize.X
+				checkOverflow()
+			end
+		}, {
+			Layout = React.createElement("UIListLayout"),
+			React.createElement(ShortcutBar, {
+				items = t1
+			})
+		}) })
+	}, CoreGui)
+end
+
+return ChromeShortcutBar

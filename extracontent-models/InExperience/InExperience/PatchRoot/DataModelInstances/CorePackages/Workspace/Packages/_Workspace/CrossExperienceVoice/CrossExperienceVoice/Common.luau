@@ -1,4 +1,4 @@
 return {
-    Constants = require(script.Constants), 
-    Types = require(script.Types)
-};
+	Constants = require(script.Constants),
+	Types = require(script.Types)
+}

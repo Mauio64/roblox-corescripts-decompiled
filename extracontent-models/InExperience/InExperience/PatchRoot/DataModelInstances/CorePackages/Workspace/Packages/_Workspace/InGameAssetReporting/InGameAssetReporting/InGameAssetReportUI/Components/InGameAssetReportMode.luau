@@ -1,354 +1,370 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InGameAssetReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Players_0 = game:GetService("Players");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ExperienceStateCaptureService_0 = game:GetService("ExperienceStateCaptureService");
-local v5 = require(l_Parent_0.Cryo);
-local v6 = require(l_Parent_0.React);
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local l_ScreenshotManager_0 = require(l_Parent_0.Screenshot).ScreenshotManager;
-local v9 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.Constants);
-local v10 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.AnalyticsReducer);
-local v11 = require(l_script_FirstAncestor_0.Analysis.SceneAnalysis);
-local v12 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportSubmitDialog);
-local v13 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportErrorModal);
-local v14 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportCompleteModal);
-local v15 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportLandscapeHeader);
-local v16 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.InGameAssetReportPortraitHeaderFooter);
-local v17 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Components.ScreenshotHighlighter);
-local v18 = require(l_script_FirstAncestor_0.Utility.buildReport);
-local v19 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.InGameAssetReportAnalytics);
-local function v21(v20) --[[ Line: 43 ]]
-    return v20.point;
-end;
-local function v23(v22) --[[ Line: 47 ]]
-    return v22.interpretationResult;
-end;
-return function(v24) --[[ Line: 51 ]]
-    -- upvalues: v6 (copy), v10 (copy), v9 (copy), v11 (copy), l_ExperienceStateCaptureService_0 (copy), l_ScreenshotManager_0 (copy), v5 (copy), v23 (copy), v19 (copy), v21 (copy), v18 (copy), l_Players_0 (copy), l_UserInputService_0 (copy), l_withLocalization_0 (copy), v16 (copy), v15 (copy), v17 (copy), v13 (copy), v12 (copy), v14 (copy)
-    local v25, v26 = v6.useState({});
-    local v27, v28 = v6.useState({});
-    local v29, v30 = v6.useState(false);
-    local v31, v32 = v6.useState(false);
-    local v33, v34 = v6.useState(false);
-    local v35, v36 = v6.useState("");
-    local v37, v38 = v6.useState(nil);
-    local v39, v40 = v6.useState(nil);
-    local v41, v42 = v6.useState(true);
-    local v43, v44 = v6.useReducer(v10, v9.AnalyticsInitialState);
-    local v45, v46 = v6.useState(nil);
-    local l_ViewportSize_0 = game.Workspace.CurrentCamera.ViewportSize;
-    local v48 = v24.getIsSmallPortraitMode(l_ViewportSize_0);
-    v6.useEffect(function() --[[ Line: 70 ]]
-        -- upvalues: v44 (copy), v9 (ref)
-        v44({
-            type = v9.AnalyticsActions.AccumulateForTimeSpent, 
-            accumulated_time_ms = workspace:GetServerTimeNow() * 1000
-        });
-        v44({
-            type = v9.AnalyticsActions.SetPlaceId, 
-            place_id = game.PlaceId
-        });
-    end, {});
-    local v56 = v6.useCallback(function(v49, v50) --[[ Line: 82 ]]
-        -- upvalues: v11 (ref), l_ViewportSize_0 (copy), l_ExperienceStateCaptureService_0 (ref), v25 (copy), v35 (copy), l_ScreenshotManager_0 (ref), v36 (copy), v26 (copy), v28 (copy), v44 (copy), v9 (ref)
-        local v51 = {
-            point = v49, 
-            interpretationResult = v11.interpretAnnotation(v49 * l_ViewportSize_0, v50 * math.max(l_ViewportSize_0.X, l_ViewportSize_0.Y), function() --[[ Line: 88 ]]
+local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+local InGameAssetReportingParent = InGameAssetReporting.Parent
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
+local Cryo = require(InGameAssetReportingParent.Cryo)
+local React = require(InGameAssetReportingParent.React)
+local withLocalization = require(InGameAssetReportingParent.Localization).withLocalization
+local ScreenshotManager = require(InGameAssetReportingParent.Screenshot).ScreenshotManager
+local Constants = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants)
+local AnalyticsReducer = require(InGameAssetReporting.InGameAssetReportUI.Resources.AnalyticsReducer)
+local SceneAnalysis = require(InGameAssetReporting.Analysis.SceneAnalysis)
+local InGameAssetReportSubmitDialog = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportSubmitDialog)
+local InGameAssetReportErrorModal = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportErrorModal)
+local InGameAssetReportCompleteModal = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportCompleteModal)
+local InGameAssetReportLandscapeHeader = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportLandscapeHeader)
+local InGameAssetReportPortraitHeaderFooter = require(InGameAssetReporting.InGameAssetReportUI.Components.InGameAssetReportPortraitHeaderFooter)
+local ScreenshotHighlighter = require(InGameAssetReporting.InGameAssetReportUI.Components.ScreenshotHighlighter)
+local buildReport = require(InGameAssetReporting.Utility.buildReport)
+local InGameAssetReportAnalytics = require(InGameAssetReporting.InGameAssetReportUI.Resources.InGameAssetReportAnalytics)
 
-            end)
-        };
-        v51.signalConnection = l_ExperienceStateCaptureService_0.ItemSelectedInCaptureMode:Once(function(v52) --[[ Line: 92 ]]
-            -- upvalues: v51 (copy)
-            v51.engineSignalItem = v52;
-        end);
-        for _, v54 in ipairs(v25) do
-            v54.signalConnection:Disconnect();
-        end;
-        if #v25 == 0 and v35 == "" then
-            l_ScreenshotManager_0:TakeScreenshotWithCallback(v36, nil);
-        end;
-        local v55 = table.clone(v25);
-        table.insert(v55, v51);
-        v26(v55);
-        v28({});
-        v44({
-            type = v9.AnalyticsActions.IncremementAnnotationCount
-        });
-        task.defer(v51.interpretationResult.raycastComputation);
-    end, {
-        v25, 
-        v26, 
-        v28, 
-        v35
-    });
-    local v59 = v6.useCallback(function() --[[ Line: 119 ]]
-        -- upvalues: v25 (copy), v27 (copy), v28 (copy), v26 (copy), v44 (copy), v9 (ref)
-        if #v25 > 0 then
-            local v57 = table.clone(v25);
-            local v58 = table.clone(v27);
-            table.insert(v58, table.remove(v57));
-            v28(v58);
-            v26(v57);
-            v44({
-                type = v9.AnalyticsActions.IncremementAnnotationUndoCount
-            });
-        end;
-    end, {
-        v26, 
-        v25, 
-        v28, 
-        v27
-    });
-    local v62 = v6.useCallback(function() --[[ Line: 136 ]]
-        -- upvalues: v27 (copy), v25 (copy), v28 (copy), v26 (copy), v44 (copy), v9 (ref)
-        if #v27 > 0 then
-            local v60 = table.clone(v25);
-            local v61 = table.clone(v27);
-            table.insert(v60, table.remove(v61));
-            v28(v61);
-            v26(v60);
-            v44({
-                type = v9.AnalyticsActions.IncremementAnnotationRedoCount
-            });
-        end;
-    end, {
-        v25, 
-        v27
-    });
-    local v69 = v6.useCallback(function() --[[ Line: 155 ]]
-        -- upvalues: v25 (copy), v35 (copy), l_ScreenshotManager_0 (ref), v36 (copy), v5 (ref), v11 (ref), v40 (copy), v23 (ref), v38 (copy), v30 (copy), v44 (copy), v9 (ref), l_ViewportSize_0 (copy), v48 (copy)
-        if #v25 == 0 and v35 == "" then
-            l_ScreenshotManager_0:TakeScreenshotWithCallback(v36, nil);
-        end;
-        local v64 = v5.List.map(v25, function(v63) --[[ Line: 161 ]]
-            return v63.engineSignalItem;
-        end);
-        local v65 = v11.interpretInstanceListForGUIObjects(v64);
-        local v66 = v11.extractItemsFromInterpretations({
-            v65
-        }, function() --[[ Line: 167 ]]
+local function v21(p1) -- line: 43
+	return p1.point
+end
+local function v22(p2) -- line: 47
+	return p2.interpretationResult
+end
 
-        end);
-        v40(v66);
-        task.defer(v66.computation);
-        local v67 = v5.List.map(v25, v23);
-        local v68 = v11.extractItemsFromInterpretations(v67, function() --[[ Line: 173 ]]
+return function(t1: {[any]: any}) -- line: 51
+	-- upvalues: React (copy), AnalyticsReducer (copy), Constants (copy), SceneAnalysis (copy), ExperienceStateCaptureService (copy), ScreenshotManager (copy), Cryo (copy), v22 (copy), InGameAssetReportAnalytics (copy), v21 (copy), buildReport (copy), Players (copy), UserInputService (copy), withLocalization (copy), InGameAssetReportPortraitHeaderFooter (copy), InGameAssetReportLandscapeHeader (copy), ScreenshotHighlighter (copy), InGameAssetReportErrorModal (copy), InGameAssetReportSubmitDialog (copy), InGameAssetReportCompleteModal (copy)
+	local v26, v27 = React.useState({})
+	local v28, v29 = React.useState({})
+	local v30, v31 = React.useState(false)
+	local v32, v33 = React.useState(false)
+	local v34, v35 = React.useState(false)
+	local v36, v37 = React.useState("")
+	local v38, v39 = React.useState(nil)
+	local v40, v41 = React.useState(nil)
+	local v42, v43 = React.useState(true)
+	local v44, v45 = React.useReducer(AnalyticsReducer, Constants.AnalyticsInitialState)
+	local v46, v47 = React.useState(nil)
+	local ViewportSize = game.Workspace.CurrentCamera.ViewportSize
+	local v49 = t1.getIsSmallPortraitMode(ViewportSize)
 
-        end);
-        v38(v68);
-        v30(true);
-        v44({
-            type = v9.AnalyticsActions.SetViewportInformation, 
-            viewport_size_x = l_ViewportSize_0.X, 
-            viewport_size_y = l_ViewportSize_0.Y, 
-            is_portrait_mode = v48
-        });
-        v44({
-            type = v9.AnalyticsActions.IncrementNextCount
-        });
-        task.defer(v68.computation);
-    end, {
-        v25, 
-        v30, 
-        v38, 
-        v35, 
-        l_ViewportSize_0, 
-        v48
-    });
-    local v70 = v6.useCallback(function() --[[ Line: 191 ]]
-        -- upvalues: v19 (ref), v43 (copy), v24 (copy)
-        v19(v43, 2);
-        v24.backAction();
-    end, {
-        v24.backAction, 
-        v43
-    });
-    local v71 = v5.List.map(v25, v21);
-    local v76 = v6.useCallback(function(v72, v73, v74) --[[ Line: 203 ]]
-        -- upvalues: v30 (copy), v32 (copy), v44 (copy), v9 (ref), v37 (copy), v25 (copy), v18 (ref), l_Players_0 (ref), v35 (copy), v71 (copy), v39 (copy)
-        v30(false);
-        v32(true);
-        v44({
-            type = v9.AnalyticsActions.SetExtractionResults, 
-            results = v37, 
-            final_annotation_count = #v25
-        });
-        v44({
-            type = v9.AnalyticsActions.SetReasonSelection, 
-            reason_selection = v72
-        });
-        v44({
-            type = v9.AnalyticsActions.SetSurfaceSelection, 
-            surface_selection = v73
-        });
-        v44({
-            type = v9.AnalyticsActions.SetCommentAdded, 
-            comment_added = #v74 > 0
-        });
-        local v75 = v18(l_Players_0.LocalPlayer.UserId, v35, v37, v72, v73, v74, v71, v39);
-        if v75 then
-            l_Players_0:ReportAbuseV3(l_Players_0.LocalPlayer, v75);
-        end;
-    end, {
-        v37, 
-        v39, 
-        v30, 
-        v32, 
-        v35, 
-        v25, 
-        v71
-    });
-    local v77 = v6.useCallback(function() --[[ Line: 255 ]]
-        -- upvalues: v38 (copy), v30 (copy)
-        v38(nil);
-        v30(false);
-    end, {
-        v30, 
-        v38
-    });
-    local v78 = v6.useCallback(function() --[[ Line: 261 ]]
-        -- upvalues: v32 (copy), v19 (ref), v43 (copy), v24 (copy)
-        v32(false);
-        v19(v43, 1);
-        v24.onReportComplete();
-    end, {
-        v24.onReportComplete, 
-        v25, 
-        v32, 
-        v43
-    });
-    local v81 = v6.useCallback(function() --[[ Line: 268 ]]
-        -- upvalues: v25 (copy), v34 (copy)
-        for _, v80 in ipairs(v25) do
-            v80.signalConnection:Disconnect();
-        end;
-        v34(true);
-    end, {
-        v34, 
-        v25
-    });
-    local v82 = v6.useCallback(function() --[[ Line: 279 ]]
-        -- upvalues: v34 (copy)
-        v34(false);
-    end, {});
-    local v83 = v6.useCallback(function() --[[ Line: 283 ]]
-        -- upvalues: v41 (copy), v42 (copy), v44 (copy), v9 (ref), v29 (copy), v26 (copy), v28 (copy)
-        if v41 then
-            v42(false);
-        else
-            v44({
-                type = v9.AnalyticsActions.SetDidUserResize, 
-                did_user_resize = true
-            });
-        end;
-        if not v29 then
-            v26({});
-            v28({});
-        end;
-    end, {
-        v41, 
-        v29
-    });
-    local v84 = #v25 > 0;
-    local v85 = #v27 > 0;
-    v6.useEffect(function() --[[ Line: 305 ]]
-        -- upvalues: v45 (copy), l_UserInputService_0 (ref), v70 (copy), v46 (copy)
-        if v45 then
-            v45:Disconnect();
-        end;
-        local v87 = l_UserInputService_0.InputEnded:Connect(function(v86) --[[ Line: 310 ]]
-            -- upvalues: v70 (ref)
-            if v86.KeyCode == Enum.KeyCode.Escape then
-                v70();
-            end;
-        end);
-        v46(v87);
-    end, {
-        v70
-    });
-    return l_withLocalization_0({
-        mainTitle = "Feature.ReportAbuse.Label.HighlightProblem", 
-        next = "Feature.ReportAbuse.Action.Next"
-    })(function(v88) --[[ Line: 322 ]]
-        -- upvalues: v6 (ref), v83 (copy), v48 (copy), v16 (ref), v70 (copy), v59 (copy), v62 (copy), v85 (copy), v84 (copy), v25 (copy), v15 (ref), v69 (copy), v17 (ref), v71 (copy), v56 (copy), v81 (copy), v33 (copy), v13 (ref), l_ViewportSize_0 (copy), v82 (copy), v29 (copy), v12 (ref), v76 (copy), v77 (copy), v44 (copy), v31 (copy), v14 (ref), v78 (copy)
-        return v6.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            [v6.Change.AbsoluteSize] = v83
-        }, {
-            Header = v6.createElement("TextButton", {
-                Size = UDim2.new(1, 0, 0, 72), 
-                BackgroundTransparency = 1, 
-                ZIndex = 2, 
-                AutoButtonColor = false
-            }, {
-                Layout = v6.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                InGameAssetReportModeHeader = if v48 then v6.createElement(v16.PortraitModeHeader, {
-                    titleText = v88.mainTitle, 
-                    nextText = v88.next, 
-                    backAction = v70, 
-                    undoAnnotationPoints = v59, 
-                    redoAnnotationPoints = v62, 
-                    isRedoEnabled = v85, 
-                    isUndoEnabled = v84, 
-                    annotationPoints = v25
-                }) else v6.createElement(v15, {
-                    titleText = v88.mainTitle, 
-                    nextText = v88.next, 
-                    nextAction = v69, 
-                    backAction = v70, 
-                    undoAnnotationPoints = v59, 
-                    redoAnnotationPoints = v62, 
-                    isRedoEnabled = v85, 
-                    isUndoEnabled = v84, 
-                    annotationPoints = v25
-                })
-            }), 
-            Footer = if v48 then v6.createElement("TextButton", {
-                Size = UDim2.new(1, 0, 0, 60), 
-                Position = UDim2.new(0, 0, 1, -60), 
-                ZIndex = 2, 
-                BackgroundTransparency = 1, 
-                AutoButtonColor = false
-            }, {
-                InGameAssetReportModeFooter = v6.createElement(v16.PortraitModeFooter, {
-                    nextAction = v69, 
-                    annotationPoints = v25, 
-                    nextText = v88.next
-                })
-            }) else nil, 
-            ScreenshotAnnotation = v6.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                LayoutOrder = 2, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ZIndex = 1
-            }, {
-                Highlighter = v6.createElement(v17, {
-                    annotationPoints = v71, 
-                    handleNewAnnotationPoint = v56, 
-                    onExceedMaxAnnotationLimit = v81, 
-                    ZIndex = 2
-                }, {})
-            }), 
-            ErrorStateModal = if v33 then v6.createElement(v13, {
-                screenSize = l_ViewportSize_0, 
-                onBack = v82
-            }) else nil, 
-            SubmitDialog = if v29 then v6.createElement(v12, {
-                screenSize = l_ViewportSize_0, 
-                onSubmit = v76, 
-                onBack = v77, 
-                analyticsDispatch = v44
-            }) else nil, 
-            ReportCompleteModal = if v31 then v6.createElement(v14, {
-                screenSize = l_ViewportSize_0, 
-                onClose = v78
-            }) else nil
-        });
-    end);
-end;
+	React.useEffect(function() -- line: 70
+		-- upvalues: v45 (copy), Constants (copy)
+		v45({
+			type = Constants.AnalyticsActions.AccumulateForTimeSpent,
+			accumulated_time_ms = workspace:GetServerTimeNow() * 1000
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetPlaceId,
+			place_id = game.PlaceId
+		})
+	end, {})
+
+	local v50 = React.useCallback(function(vector2: Vector2, n1: number) -- line: 82
+		-- upvalues: SceneAnalysis (copy), ViewportSize (copy), ExperienceStateCaptureService (copy), v26 (copy), v36 (copy), ScreenshotManager (copy), v37 (copy), v27 (copy), v29 (copy), v45 (copy), Constants (copy)
+		local t2 = {
+			point = vector2,
+			interpretationResult = SceneAnalysis.interpretAnnotation(vector2 * ViewportSize, n1 * math.max(ViewportSize.X, ViewportSize.Y), function() -- line: 88
+			end)
+		}
+
+		t2.signalConnection = ExperienceStateCaptureService.ItemSelectedInCaptureMode:Once(function(p3) -- line: 92
+			-- upvalues: t2 (copy)
+			t2.engineSignalItem = p3
+		end)
+
+		for _, v in ipairs(v26) do
+			v.signalConnection:Disconnect()
+		end
+
+		if #v26 == 0 and v36 == "" then
+			ScreenshotManager:TakeScreenshotWithCallback(v37, nil)
+		end
+
+		local v69 = table.clone(v26)
+
+		table.insert(v69, t2)
+		v27(v69)
+		v29({})
+		v45({
+			type = Constants.AnalyticsActions.IncremementAnnotationCount
+		})
+		task.defer(t2.interpretationResult.raycastComputation)
+	end, {
+		v26,
+		v27,
+		v29,
+		v36
+	})
+	local v51 = React.useCallback(function() -- line: 119
+		-- upvalues: v26 (copy), v28 (copy), v29 (copy), v27 (copy), v45 (copy), Constants (copy)
+		if #v26 > 0 then
+			local v70 = table.clone(v26)
+			local v71 = table.clone(v28)
+
+			table.insert(v71, table.remove(v70))
+			v29(v71)
+			v27(v70)
+			v45({
+				type = Constants.AnalyticsActions.IncremementAnnotationUndoCount
+			})
+		end
+	end, {
+		v27,
+		v26,
+		v29,
+		v28
+	})
+	local v52 = React.useCallback(function() -- line: 136
+		-- upvalues: v28 (copy), v26 (copy), v29 (copy), v27 (copy), v45 (copy), Constants (copy)
+		if #v28 > 0 then
+			local v72 = table.clone(v26)
+			local v73 = table.clone(v28)
+
+			table.insert(v72, table.remove(v73))
+			v29(v73)
+			v27(v72)
+			v45({
+				type = Constants.AnalyticsActions.IncremementAnnotationRedoCount
+			})
+		end
+	end, {
+		v26,
+		v28
+	})
+	local v53 = React.useCallback(function() -- line: 155
+		-- upvalues: v26 (copy), v36 (copy), ScreenshotManager (copy), v37 (copy), Cryo (copy), SceneAnalysis (copy), v41 (copy), v22 (copy), v39 (copy), v31 (copy), v45 (copy), Constants (copy), ViewportSize (copy), v49 (copy)
+		if #v26 == 0 and v36 == "" then
+			ScreenshotManager:TakeScreenshotWithCallback(v37, nil)
+		end
+
+		local v74 = Cryo.List.map(v26, function(p4) -- line: 161
+			return p4.engineSignalItem
+		end)
+		local v75 = SceneAnalysis.interpretInstanceListForGUIObjects(v74)
+		local v76 = SceneAnalysis.extractItemsFromInterpretations({ v75 }, function() -- line: 167
+		end)
+
+		v41(v76)
+		task.defer(v76.computation)
+
+		local v77 = Cryo.List.map(v26, v22)
+		local v78 = SceneAnalysis.extractItemsFromInterpretations(v77, function() -- line: 173
+		end)
+
+		v39(v78)
+		v31(true)
+		v45({
+			type = Constants.AnalyticsActions.SetViewportInformation,
+			viewport_size_x = ViewportSize.X,
+			viewport_size_y = ViewportSize.Y,
+			is_portrait_mode = v49
+		})
+		v45({
+			type = Constants.AnalyticsActions.IncrementNextCount
+		})
+		task.defer(v78.computation)
+	end, {
+		v26,
+		v31,
+		v39,
+		v36,
+		ViewportSize,
+		v49
+	})
+	local v54 = React.useCallback(function() -- line: 191
+		-- upvalues: InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
+		InGameAssetReportAnalytics(v44, 2)
+		t1.backAction()
+	end, {
+		t1.backAction,
+		v44
+	})
+	local v55 = Cryo.List.map(v26, v21)
+	local v56 = React.useCallback(function(s1: string, s2: string, p5) -- line: 203
+		-- upvalues: v31 (copy), v33 (copy), v45 (copy), Constants (copy), v38 (copy), v26 (copy), buildReport (copy), Players (copy), v36 (copy), v55 (copy), v40 (copy)
+		v31(false)
+		v33(true)
+		v45({
+			type = Constants.AnalyticsActions.SetExtractionResults,
+			results = v38,
+			final_annotation_count = #v26
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetReasonSelection,
+			reason_selection = s1
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetSurfaceSelection,
+			surface_selection = s2
+		})
+		v45({
+			type = Constants.AnalyticsActions.SetCommentAdded,
+			comment_added = #p5 > 0
+		})
+
+		local v82 = buildReport(Players.LocalPlayer.UserId, v36, v38, s1, s2, p5, v55, v40)
+
+		if v82 then
+			Players:ReportAbuseV3(Players.LocalPlayer, v82)
+		end
+	end, {
+		v38,
+		v40,
+		v31,
+		v33,
+		v36,
+		v26,
+		v55
+	})
+	local v57 = React.useCallback(function() -- line: 255
+		-- upvalues: v39 (copy), v31 (copy)
+		v39(nil)
+		v31(false)
+	end, {
+		v31,
+		v39
+	})
+	local v58 = React.useCallback(function() -- line: 261
+		-- upvalues: v33 (copy), InGameAssetReportAnalytics (copy), v44 (copy), t1 (copy)
+		v33(false)
+		InGameAssetReportAnalytics(v44, 1)
+		t1.onReportComplete()
+	end, {
+		t1.onReportComplete,
+		v26,
+		v33,
+		v44
+	})
+	local v59 = React.useCallback(function() -- line: 268
+		-- upvalues: v26 (copy), v35 (copy)
+		for _, v in ipairs(v26) do
+			v.signalConnection:Disconnect()
+		end
+
+		v35(true)
+	end, {
+		v35,
+		v26
+	})
+	local v60 = React.useCallback(function() -- line: 279
+		-- upvalues: v35 (copy)
+		v35(false)
+	end, {})
+	local v61 = React.useCallback(function() -- line: 283
+		-- upvalues: v42 (copy), v43 (copy), v45 (copy), Constants (copy), v30 (copy), v27 (copy), v29 (copy)
+		if v42 then
+			v43(false)
+		else
+			v45({
+				did_user_resize = true,
+				type = Constants.AnalyticsActions.SetDidUserResize
+			})
+		end
+
+		if not v30 then
+			v27({})
+			v29({})
+		end
+	end, {
+		v42,
+		v30
+	})
+	local v62 = #v26 > 0
+	local v63 = #v28 > 0
+
+	React.useEffect(function() -- line: 305
+		-- upvalues: v46 (copy), UserInputService (copy), v54 (copy), v47 (copy)
+		if v46 then
+			v46:Disconnect()
+		end
+
+		local connection = UserInputService.InputEnded:Connect(function(input) -- line: 310
+			-- upvalues: v54 (copy)
+			if input.KeyCode == Enum.KeyCode.Escape then
+				v54()
+			end
+		end)
+
+		v47(connection)
+	end, { v54 })
+
+	return withLocalization({
+		mainTitle = "Feature.ReportAbuse.Label.HighlightProblem",
+		next = "Feature.ReportAbuse.Action.Next"
+	})(function(p6) -- line: 322
+		-- upvalues: React (copy), v61 (copy), v49 (copy), InGameAssetReportPortraitHeaderFooter (copy), v54 (copy), v51 (copy), v52 (copy), v63 (copy), v62 (copy), v26 (copy), InGameAssetReportLandscapeHeader (copy), v53 (copy), ScreenshotHighlighter (copy), v55 (copy), v50 (copy), v59 (copy), v34 (copy), InGameAssetReportErrorModal (copy), ViewportSize (copy), v60 (copy), v30 (copy), InGameAssetReportSubmitDialog (copy), v56 (copy), v57 (copy), v45 (copy), v32 (copy), InGameAssetReportCompleteModal (copy), v58 (copy)
+		return React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = v61
+		}, {
+			Header = React.createElement("TextButton", {
+				BackgroundTransparency = 1,
+				ZIndex = 2,
+				AutoButtonColor = false,
+				Size = UDim2.new(1, 0, 0, 72)
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				InGameAssetReportModeHeader = if not v49 then React.createElement(InGameAssetReportLandscapeHeader, {
+					titleText = p6.mainTitle,
+					nextText = p6.next,
+					nextAction = v53,
+					backAction = v54,
+					undoAnnotationPoints = v51,
+					redoAnnotationPoints = v52,
+					isRedoEnabled = v63,
+					isUndoEnabled = v62,
+					annotationPoints = v26
+				}) else React.createElement(InGameAssetReportPortraitHeaderFooter.PortraitModeHeader, {
+					titleText = p6.mainTitle,
+					nextText = p6.next,
+					backAction = v54,
+					undoAnnotationPoints = v51,
+					redoAnnotationPoints = v52,
+					isRedoEnabled = v63,
+					isUndoEnabled = v62,
+					annotationPoints = v26
+				})
+			}),
+			Footer = if not v49 then nil else React.createElement("TextButton", {
+				ZIndex = 2,
+				BackgroundTransparency = 1,
+				AutoButtonColor = false,
+				Size = UDim2.new(1, 0, 0, 60),
+				Position = UDim2.new(0, 0, 1, -60)
+			}, {
+				InGameAssetReportModeFooter = React.createElement(InGameAssetReportPortraitHeaderFooter.PortraitModeFooter, {
+					nextAction = v53,
+					annotationPoints = v26,
+					nextText = p6.next
+				})
+			}),
+			ScreenshotAnnotation = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				ZIndex = 1,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, {
+				Highlighter = React.createElement(ScreenshotHighlighter, {
+					ZIndex = 2,
+					annotationPoints = v55,
+					handleNewAnnotationPoint = v50,
+					onExceedMaxAnnotationLimit = v59
+				}, {})
+			}),
+			ErrorStateModal = if not v34 then nil else React.createElement(InGameAssetReportErrorModal, {
+				screenSize = ViewportSize,
+				onBack = v60
+			}),
+			SubmitDialog = if not v30 then nil else React.createElement(InGameAssetReportSubmitDialog, {
+				screenSize = ViewportSize,
+				onSubmit = v56,
+				onBack = v57,
+				analyticsDispatch = v45
+			}),
+			ReportCompleteModal = if not v32 then nil else React.createElement(InGameAssetReportCompleteModal, {
+				screenSize = ViewportSize,
+				onClose = v58
+			})
+		})
+	end)
+end

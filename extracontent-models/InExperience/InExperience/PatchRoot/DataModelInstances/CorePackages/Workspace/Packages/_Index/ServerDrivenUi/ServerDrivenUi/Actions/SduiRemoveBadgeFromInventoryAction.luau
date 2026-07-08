@@ -1,52 +1,57 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiErrorType_0 = v1.SduiErrors.SduiErrorType;
-local l_SduiActionType_0 = v1.SduiActionType;
-local l_CloseCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Thunks.CloseCentralOverlay;
-local l_SetCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Actions.SetCentralOverlay;
-local l_CentralOverlayType_0 = require(l_Parent_0.RobloxAppEnums).CentralOverlayType;
-local v7 = require(l_Parent_0.DataHydration);
-local l_localizeStrings_0 = require(l_Parent_0.Localization).localizeStrings;
-return function(v9, _, v11, _) --[[ Line: 16 ]]
-    -- upvalues: l_SduiErrorType_0 (copy), l_SduiActionType_0 (copy), l_localizeStrings_0 (copy), l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy), v7 (copy), l_CloseCentralOverlay_0 (copy)
-    local v13 = v9 and v9.actionParams or nil;
-    if v13 == nil then
-        v11.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.RemoveBadgeFromInventory, 
-            message = "Missing action params"
-        }, v11.appPage);
-        return;
-    else
-        assert(v13, "actionParams must exist");
-        if v13.assetId == nil then
-            v11.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-                name = l_SduiActionType_0.RemoveBadgeFromInventory, 
-                message = "Missing actionParam: assetId"
-            }, v11.appPage);
-            return;
-        else
-            local l_assetId_0 = v13.assetId;
-            local l_localization_0 = v11.dependencies.localization;
-            local v16 = l_localizeStrings_0(l_localization_0, {
-                RemoveBadgeTitle = "Feature.Item.Label.DeleteItemUndercase", 
-                RemoveBadgeBody = "Feature.Item.Label.DeleteFromInventoryConfirmUndercaseDelete"
-            });
-            local l_dispatch_0 = v11.dependencies.dispatch;
-            l_dispatch_0(l_SetCentralOverlay_0(l_CentralOverlayType_0.ConfirmationDialog, {
-                title = v16.RemoveBadgeTitle, 
-                body = v16.RemoveBadgeBody, 
-                disablePortal = false, 
-                onConfirm = function() --[[ Line: 53 ]] --[[ Name: onConfirm ]]
-                    -- upvalues: v7 (ref), l_assetId_0 (copy), l_dispatch_0 (copy), l_CloseCentralOverlay_0 (ref)
-                    v7.Badges.getBadgeInfoStore(false).removeBadge((tostring(l_assetId_0)));
-                    l_dispatch_0(l_CloseCentralOverlay_0());
-                end, 
-                onCancel = function() --[[ Line: 58 ]] --[[ Name: onCancel ]]
-                    -- upvalues: l_dispatch_0 (copy), l_CloseCentralOverlay_0 (ref)
-                    l_dispatch_0(l_CloseCentralOverlay_0());
-                end
-            }));
-            return;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+local SduiActionType = SduiCoreSystem.SduiActionType
+local CloseCentralOverlay = require(Parent.CentralOverlay).Thunks.CloseCentralOverlay
+local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
+local DataHydration = require(Parent.DataHydration)
+local localizeStrings = require(Parent.Localization).localizeStrings
+
+return function(p1, _, p3, _) -- line: 16
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), localizeStrings (copy), SetCentralOverlay (copy), CentralOverlayType (copy), DataHydration (copy), CloseCentralOverlay (copy)
+	local v14 = p1 and p1.actionParams or nil
+
+	if v14 == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing action params",
+			name = SduiActionType.RemoveBadgeFromInventory
+		}, p3.appPage)
+
+		return
+	end
+
+	assert(v14, "actionParams must exist")
+
+	if v14.assetId == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing actionParam: assetId",
+			name = SduiActionType.RemoveBadgeFromInventory
+		}, p3.appPage)
+
+		return
+	end
+
+	local assetId = v14.assetId
+	local localization = p3.dependencies.localization
+	local v17 = localizeStrings(localization, {
+		RemoveBadgeTitle = "Feature.Item.Label.DeleteItemUndercase",
+		RemoveBadgeBody = "Feature.Item.Label.DeleteFromInventoryConfirmUndercaseDelete"
+	})
+	local dispatch = p3.dependencies.dispatch
+
+	dispatch(SetCentralOverlay(CentralOverlayType.ConfirmationDialog, {
+		disablePortal = false,
+		title = v17.RemoveBadgeTitle,
+		body = v17.RemoveBadgeBody,
+		onConfirm = function() -- line: 53
+			-- upvalues: DataHydration (copy), assetId (copy), dispatch (copy), CloseCentralOverlay (copy)
+			DataHydration.Badges.getBadgeInfoStore(false).removeBadge((tostring(assetId)))
+			dispatch(CloseCentralOverlay())
+		end,
+		onCancel = function() -- line: 58
+			-- upvalues: dispatch (copy), CloseCentralOverlay (copy)
+			dispatch(CloseCentralOverlay())
+		end
+	}))
+end

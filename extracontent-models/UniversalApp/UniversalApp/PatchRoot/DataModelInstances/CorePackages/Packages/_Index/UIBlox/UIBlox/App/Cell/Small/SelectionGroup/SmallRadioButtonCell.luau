@@ -1,68 +1,72 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local v4 = require(l_Parent_0.UIBlox.App.ImageSet.Images);
-local v5 = require(l_Parent_0.UIBlox.Core.Cell.GenericSelectionCell);
-local v6 = v4["component_assets/circle_24_stroke_1"];
-local v7 = v4["component_assets/circle_16"];
-local v8 = v1.PureComponent:extend("SmallRadioButtonCell");
-v8.validateProps = v3.strictInterface({
-    id = v3.string, 
-    text = v3.optional(v3.string), 
-    onActivated = v3.optional(v3.callback), 
-    isSelected = v3.optional(v3.boolean), 
-    isDisabled = v3.optional(v3.boolean), 
-    useDefaultControlState = v3.optional(v3.boolean), 
-    layoutOrder = v3.optional(v3.number), 
-    controlRef = v3.optional(v3.table), 
-    NextSelectionLeft = v3.optional(v3.table), 
-    NextSelectionRight = v3.optional(v3.table), 
-    NextSelectionUp = v3.optional(v3.table), 
-    NextSelectionDown = v3.optional(v3.table), 
-    SelectionImageObject = v3.optional(v3.table)
-});
-v8.defaultProps = {
-    text = "", 
-    isSelected = false
-};
-v8.init = function(v9) --[[ Line: 59 ]] --[[ Name: init ]]
-    v9.onSetValue = function() --[[ Line: 60 ]]
-        -- upvalues: v9 (copy)
-        v9.props.onActivated(v9.props.id);
-    end;
-end;
-v8.render = function(v10) --[[ Line: 65 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v5 (copy), v6 (copy), v7 (copy)
-    assert(v10.validateProps(v10.props));
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 56), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v10.props.layoutOrder
-    }, {
-        GenericSelectionCell = v1.createElement(v5, {
-            isSelected = v10.props.isSelected, 
-            isDisabled = v10.props.isDisabled, 
-            defaultImage = v6, 
-            selectedImage = v7, 
-            defaultImageSize = 24, 
-            selectedImageSize = 16, 
-            text = v10.props.text, 
-            onActivated = v10.onSetValue, 
-            useDefaultControlState = v10.props.useDefaultControlState, 
-            [v1.Ref] = v10.props.controlRef, 
-            NextSelectionUp = v10.props.NextSelectionUp, 
-            NextSelectionDown = v10.props.NextSelectionDown, 
-            NextSelectionLeft = v10.props.NextSelectionLeft, 
-            NextSelectionRight = v10.props.NextSelectionRight, 
-            SelectionImageObject = v10.props.SelectionImageObject
-        })
-    });
-end;
-return v1.forwardRef(function(v11, v12) --[[ Line: 95 ]]
-    -- upvalues: v1 (copy), v8 (copy), v2 (copy)
-    return v1.createElement(v8, v2.Dictionary.join(v11, {
-        controlRef = v12
-    }));
-end);
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local Cryo = require(ParentParent.Cryo)
+local t = require(ParentParent.t)
+local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
+local GenericSelectionCell = require(ParentParent.UIBlox.Core.Cell.GenericSelectionCell)
+local v7 = Images["component_assets/circle_24_stroke_1"]
+local v8 = Images["component_assets/circle_16"]
+local v9 = Roact.PureComponent:extend("SmallRadioButtonCell")
+
+v9.validateProps = t.strictInterface({
+	id = t.string,
+	text = t.optional(t.string),
+	onActivated = t.optional(t.callback),
+	isSelected = t.optional(t.boolean),
+	isDisabled = t.optional(t.boolean),
+	useDefaultControlState = t.optional(t.boolean),
+	layoutOrder = t.optional(t.number),
+	controlRef = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	SelectionImageObject = t.optional(t.table)
+})
+v9.defaultProps = {
+	text = "",
+	isSelected = false
+}
+
+function v9.init(p1) -- line: 59
+	function p1.onSetValue() -- line: 60
+		-- upvalues: p1 (copy)
+		p1.props.onActivated(p1.props.id)
+	end
+end
+function v9.render(p2) -- line: 65
+	-- upvalues: Roact (copy), GenericSelectionCell (copy), v7 (copy), v8 (copy)
+	assert(p2.validateProps(p2.props))
+
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 56),
+		LayoutOrder = p2.props.layoutOrder
+	}, {
+		GenericSelectionCell = Roact.createElement(GenericSelectionCell, {
+			isSelected = p2.props.isSelected,
+			isDisabled = p2.props.isDisabled,
+			defaultImage = v7,
+			selectedImage = v8,
+			defaultImageSize = 24,
+			selectedImageSize = 16,
+			text = p2.props.text,
+			onActivated = p2.onSetValue,
+			useDefaultControlState = p2.props.useDefaultControlState,
+			[Roact.Ref] = p2.props.controlRef,
+			NextSelectionUp = p2.props.NextSelectionUp,
+			NextSelectionDown = p2.props.NextSelectionDown,
+			NextSelectionLeft = p2.props.NextSelectionLeft,
+			NextSelectionRight = p2.props.NextSelectionRight,
+			SelectionImageObject = p2.props.SelectionImageObject
+		})
+	})
+end
+
+return Roact.forwardRef(function(p3, p4) -- line: 95
+	-- upvalues: Roact (copy), v9 (copy), Cryo (copy)
+	return Roact.createElement(v9, Cryo.Dictionary.join(p3, {
+		controlRef = p4
+	}))
+end)

@@ -1,35 +1,40 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: createSpy ]]
-    local v1 = {
-        callCount = 0, 
-        values = {}, 
-        valuesLength = 0
-    };
-    v1.value = function(...) --[[ Line: 8 ]]
-        -- upvalues: v1 (copy), v0 (copy)
-        v1.callCount = v1.callCount + 1;
-        v1.values = {
-            ...
-        };
-        v1.valuesLength = select("#", ...);
-        if v0 ~= nil then
-            return v0(...);
-        else
-            return;
-        end;
-    end;
-    v1.assertCalledWith = function(_, ...) --[[ Line: 18 ]]
-        -- upvalues: v1 (copy)
-        local v3 = select("#", ...);
-        assert(v1.valuesLength, v3, "length of expected values differs from stored values");
-        for v4 = 1, v3 do
-            local v5 = select(v4, ...);
-            assert(v1.values[v4], v5, "value differs");
-        end;
-    end;
-    setmetatable(v1, {
-        __index = function(_, v7) --[[ Line: 30 ]] --[[ Name: __index ]]
-            error(("%q is not a valid member of spy"):format(v7));
-        end
-    });
-    return v1;
-end;
+local function createSpy(p1) -- line: 1
+	local t1 = {
+		callCount = 0,
+		valuesLength = 0,
+		values = {}
+	}
+
+	function t1.value(...) -- line: 8
+		-- upvalues: t1 (copy), p1 (copy)
+		t1.callCount = t1.callCount + 1
+		t1.values = { ... }
+		t1.valuesLength = select("#", ...)
+
+		if p1 ~= nil then
+			return p1(...)
+		end
+	end
+	function t1.assertCalledWith(_, ...) -- line: 18
+		-- upvalues: t1 (copy)
+		local v5 = select("#", ...)
+
+		assert(t1.valuesLength, v5, "length of expected values differs from stored values")
+
+		for i = 1, v5 do
+			local v7 = select(i, ...)
+
+			assert(t1.values[i], v7, "value differs")
+		end
+	end
+
+	setmetatable(t1, {
+		__index = function(_, p4) -- line: 30
+			error(("%q is not a valid member of spy"):format(p4))
+		end
+	})
+
+	return t1
+end
+
+return createSpy

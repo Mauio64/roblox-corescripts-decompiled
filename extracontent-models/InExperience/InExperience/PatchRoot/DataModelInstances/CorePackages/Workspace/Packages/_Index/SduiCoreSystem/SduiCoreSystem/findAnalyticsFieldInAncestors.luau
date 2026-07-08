@@ -1,18 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-return function(v2, v3, v4) --[[ Line: 9 ]] --[[ Name: findAnalyticsFieldInAncestors ]]
-    if not v3 then
-        return nil;
-    else
-        assert(v3, "analyticsContext must exist");
-        if v3.analyticsData and v3.analyticsData[v2] ~= nil then
-            return v3.analyticsData[v2];
-        elseif v3.ancestorAnalyticsData and v3.ancestorAnalyticsData[v2] ~= nil then
-            return v3.ancestorAnalyticsData[v2];
-        elseif v4 ~= nil then
-            return v4;
-        else
-            return nil;
-        end;
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+
+require(SduiCoreSystem.SduiBuilderTypes)
+
+local function findAnalyticsFieldInAncestors(s1: string, p1, p2) -- line: 9
+	if not p1 then
+		return nil
+	end
+
+	assert(p1, "analyticsContext must exist")
+
+	if p1.analyticsData and p1.analyticsData[s1] ~= nil then
+		return p1.analyticsData[s1]
+	end
+
+	if p1.ancestorAnalyticsData and p1.ancestorAnalyticsData[s1] ~= nil then
+		return p1.ancestorAnalyticsData[s1]
+	end
+
+	if p2 ~= nil then
+		return p2
+	end
+
+	return nil
+end
+
+return findAnalyticsFieldInAncestors

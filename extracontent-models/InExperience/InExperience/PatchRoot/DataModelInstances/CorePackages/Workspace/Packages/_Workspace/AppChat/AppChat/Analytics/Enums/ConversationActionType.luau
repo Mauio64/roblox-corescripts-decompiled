@@ -1,4 +1,4 @@
 return {
-    CloseMoreMenu = "CloseMoreMenu", 
-    OpenMoreMenu = "OpenMoreMenu"
-};
+	CloseMoreMenu = "CloseMoreMenu",
+	OpenMoreMenu = "OpenMoreMenu"
+}

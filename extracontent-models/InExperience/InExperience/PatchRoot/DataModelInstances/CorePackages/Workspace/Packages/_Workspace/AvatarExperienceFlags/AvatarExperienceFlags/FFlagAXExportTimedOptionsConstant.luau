@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXExportTimedOptionsConstant", false);
+return game:DefineFastFlag("AXExportTimedOptionsConstant", false)

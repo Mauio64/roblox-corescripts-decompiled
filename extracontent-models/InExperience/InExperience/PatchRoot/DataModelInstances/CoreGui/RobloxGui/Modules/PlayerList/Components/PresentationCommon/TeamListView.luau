@@ -1,107 +1,116 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local v4 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local l_useLayoutValues_0 = v4.Common.useLayoutValues;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local v8 = require(l_Parent_0.Components.Container.PlayerEntryContainer);
-local v9 = require(l_Parent_0.Components.Container.TeamEntryContainer);
-local l_FFlagReplacePlayerIconRoduxWithSignal_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagReplacePlayerIconRoduxWithSignal;
-local l_FFlagPlayerListUseFocusNavHook_0 = v4.Flags.FFlagPlayerListUseFocusNavHook;
-local l_PlayerIconInfoStore_0 = require(l_CorePackages_0.Workspace.Packages.PlayerIconInfoStore).PlayerIconInfoStore;
-return v2.memo(function(v13) --[[ Line: 61 ]] --[[ Name: TeamListView ]]
-    -- upvalues: l_useLayoutValues_0 (copy), l_useStyle_0 (copy), v2 (copy), v9 (copy), l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), l_PlayerIconInfoStore_0 (copy), v8 (copy), l_FFlagPlayerListUseFocusNavHook_0 (copy)
-    local v14 = l_useLayoutValues_0();
-    local v15 = l_useStyle_0();
-    local v16 = {
-        UIListLayout = v2.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            Padding = if v13.isDirectionalPreferred then UDim.new(0, v14.EntryPadding) else nil
-        })
-    };
-    if v13.showTeamEntry then
-        v16.TeamEntry = v2.createElement(v9, {
-            size = UDim2.new(1, 0, 0, v14.TeamEntrySizeY), 
-            teamData = v13.teamData, 
-            entrySizeX = v13.entrySizeX, 
-            isSmallTouchDevice = v13.isSmallTouchDevice, 
-            isDirectionalPreferred = v13.isDirectionalPreferred, 
-            layoutOrder = -1
-        });
-    end;
-    if v13.teamPlayersCount > 0 then
-        local v17 = 0;
-        if v13.isSmallTouchDevice then
-            v16.BottomDiv = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 1), 
-                Position = UDim2.new(0, 0, 0, 0), 
-                AnchorPoint = Vector2.new(0, 0), 
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
-                BackgroundTransparency = 0.8, 
-                LayoutOrder = v13.teamPlayersCount * 2
-            });
-        end;
-        do
-            local l_v17_0 = v17;
-            v13.teamData.players.iterateData(function(v19, v20) --[[ Line: 100 ]]
-                -- upvalues: l_v17_0 (ref), l_FFlagReplacePlayerIconRoduxWithSignal_0 (ref), l_PlayerIconInfoStore_0 (ref), v13 (copy), v16 (copy), v2 (ref), v8 (ref), v14 (copy), l_FFlagPlayerListUseFocusNavHook_0 (ref), v15 (copy)
-                l_v17_0 = l_v17_0 + 1;
-                local v21 = nil;
-                v21 = if l_FFlagReplacePlayerIconRoduxWithSignal_0 then l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v19.UserId)(false) else v13.playerIconInfos[v20];
-                local v22 = v13.playerRelationships[v20];
-                if not v21 or not v22 then
-                    return;
-                else
-                    v16["PlayerEntry_" .. tostring(v20)] = v2.createElement(v8, {
-                        size = UDim2.new(1, v14.EntryXOffset, 0, v14.PlayerEntrySizeY), 
-                        player = v19, 
-                        titlePlayerEntry = false, 
-                        entrySizeX = v13.entrySizeX, 
-                        playerIconInfo = v21, 
-                        playerRelationship = v22, 
-                        setDropDownPlayerDimensionY = v13.setDropDownPlayerDimensionY, 
-                        firstPlayerRef = v13.firstPlayerRef, 
-                        prevFocusedEntry = v13.prevFocusedEntry, 
-                        destroyedFocusedPlayerId = v13.destroyedFocusedPlayerId, 
-                        registerPlayerInstance = if l_FFlagPlayerListUseFocusNavHook_0 then v13.registerPlayerInstance else nil, 
-                        unregisterPlayerInstance = if l_FFlagPlayerListUseFocusNavHook_0 then v13.unregisterPlayerInstance else nil, 
-                        setSelectedPlayerId = if l_FFlagPlayerListUseFocusNavHook_0 then v13.setSelectedPlayerId else nil
-                    });
-                    if v13.isSmallTouchDevice then
-                        v16["TopDiv_" .. l_v17_0] = v2.createElement("Frame", {
-                            Size = UDim2.new(1, 0, 0, 1), 
-                            Position = UDim2.new(0, 0, 0, 0), 
-                            AnchorPoint = Vector2.new(0, 0), 
-                            BackgroundColor3 = Color3.fromRGB(255, 255, 255), 
-                            BackgroundTransparency = 0.8, 
-                            LayoutOrder = (l_v17_0 - 1) * 2
-                        });
-                    end;
-                    if l_v17_0 < v13.teamPlayersCount and not v13.isSmallTouchDevice and not v13.isDirectionalPreferred then
-                        v16["Divider_" .. l_v17_0] = v2.createElement("Frame", {
-                            Size = UDim2.new(1, 0, 0, 1), 
-                            Position = UDim2.new(0, 0, 1, 0), 
-                            AnchorPoint = Vector2.new(0, 1), 
-                            BackgroundTransparency = v15.Theme.Divider.Transparency, 
-                            BackgroundColor3 = v15.Theme.Divider.Color, 
-                            BorderSizePixel = 0, 
-                            LayoutOrder = l_v17_0 * 2
-                        });
-                    end;
-                    return;
-                end;
-            end, false);
-        end;
-    end;
-    return v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v13.layoutOrder
-    }, v16);
-end);
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local useLayoutValues = PlayerList.Common.useLayoutValues
+local useStyle = UIBlox.Core.Style.useStyle
+local PlayerEntryContainer = require(ParentParent.Components.Container.PlayerEntryContainer)
+local TeamEntryContainer = require(ParentParent.Components.Container.TeamEntryContainer)
+local FFlagReplacePlayerIconRoduxWithSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagReplacePlayerIconRoduxWithSignal
+local FFlagPlayerListUseFocusNavHook = PlayerList.Flags.FFlagPlayerListUseFocusNavHook
+local PlayerIconInfoStore = require(CorePackages.Workspace.Packages.PlayerIconInfoStore).PlayerIconInfoStore
+
+local function TeamListView(t1: {[any]: any}) -- line: 61
+	-- upvalues: useLayoutValues (copy), useStyle (copy), React (copy), TeamEntryContainer (copy), FFlagReplacePlayerIconRoduxWithSignal (copy), PlayerIconInfoStore (copy), PlayerEntryContainer (copy), FFlagPlayerListUseFocusNavHook (copy)
+	local v15 = useLayoutValues()
+	local v16 = useStyle()
+	local t2 = {
+		UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = if not t1.isDirectionalPreferred then nil else UDim.new(0, v15.EntryPadding)
+		})
+	}
+
+	if t1.showTeamEntry then
+		t2.TeamEntry = React.createElement(TeamEntryContainer, {
+			layoutOrder = -1,
+			size = UDim2.new(1, 0, 0, v15.TeamEntrySizeY),
+			teamData = t1.teamData,
+			entrySizeX = t1.entrySizeX,
+			isSmallTouchDevice = t1.isSmallTouchDevice,
+			isDirectionalPreferred = t1.isDirectionalPreferred
+		})
+	end
+
+	if t1.teamPlayersCount > 0 then
+		local n1 = 0
+
+		if t1.isSmallTouchDevice then
+			t2.BottomDiv = React.createElement("Frame", {
+				BackgroundTransparency = 0.8,
+				Size = UDim2.new(1, 0, 0, 1),
+				Position = UDim2.new(0, 0, 0, 0),
+				AnchorPoint = Vector2.new(0, 0),
+				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+				LayoutOrder = t1.teamPlayersCount * 2
+			})
+		end
+
+		t1.teamData.players.iterateData(function(p1, p2) -- line: 100
+			-- upvalues: n1 (ref), FFlagReplacePlayerIconRoduxWithSignal (copy), PlayerIconInfoStore (copy), t1 (copy), t2 (copy), React (copy), PlayerEntryContainer (copy), v15 (copy), FFlagPlayerListUseFocusNavHook (copy), v16 (copy)
+			n1 += 1
+
+			local v21 = if not FFlagReplacePlayerIconRoduxWithSignal then t1.playerIconInfos[p2] else PlayerIconInfoStore.getPlayerIconInfoReactive(p1.UserId)(false)
+			local v22 = t1.playerRelationships[p2]
+
+			if not v21 or not v22 then
+				return
+			end
+
+			t2["PlayerEntry_" .. tostring(p2)] = React.createElement(PlayerEntryContainer, {
+				titlePlayerEntry = false,
+				size = UDim2.new(1, v15.EntryXOffset, 0, v15.PlayerEntrySizeY),
+				player = p1,
+				entrySizeX = t1.entrySizeX,
+				playerIconInfo = v21,
+				playerRelationship = v22,
+				setDropDownPlayerDimensionY = t1.setDropDownPlayerDimensionY,
+				firstPlayerRef = t1.firstPlayerRef,
+				prevFocusedEntry = t1.prevFocusedEntry,
+				destroyedFocusedPlayerId = t1.destroyedFocusedPlayerId,
+				registerPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else t1.registerPlayerInstance,
+				unregisterPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else t1.unregisterPlayerInstance,
+				setSelectedPlayerId = if not FFlagPlayerListUseFocusNavHook then nil else t1.setSelectedPlayerId
+			})
+
+			if t1.isSmallTouchDevice then
+				t2["TopDiv_" .. n1] = React.createElement("Frame", {
+					BackgroundTransparency = 0.8,
+					Size = UDim2.new(1, 0, 0, 1),
+					Position = UDim2.new(0, 0, 0, 0),
+					AnchorPoint = Vector2.new(0, 0),
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					LayoutOrder = (n1 - 1) * 2
+				})
+			end
+
+			if n1 < t1.teamPlayersCount and not t1.isSmallTouchDevice and not t1.isDirectionalPreferred then
+				t2["Divider_" .. n1] = React.createElement("Frame", {
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 0, 1),
+					Position = UDim2.new(0, 0, 1, 0),
+					AnchorPoint = Vector2.new(0, 1),
+					BackgroundTransparency = v16.Theme.Divider.Transparency,
+					BackgroundColor3 = v16.Theme.Divider.Color,
+					LayoutOrder = n1 * 2
+				})
+			end
+		end, false)
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t1.layoutOrder
+	}, t2)
+end
+
+return React.memo(TeamListView)

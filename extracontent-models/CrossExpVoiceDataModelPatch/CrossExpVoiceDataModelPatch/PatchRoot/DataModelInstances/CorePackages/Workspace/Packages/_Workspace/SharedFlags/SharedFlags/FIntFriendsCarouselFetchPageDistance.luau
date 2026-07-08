@@ -1,1 +1,1 @@
-return game:DefineFastInt("FriendsCarouselFetchPageDistance", 5);
+return game:DefineFastInt("FriendsCarouselFetchPageDistance", 5)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAddTextXAlignmentProp", false);
+return game:DefineFastFlag("AXAddTextXAlignmentProp", false)

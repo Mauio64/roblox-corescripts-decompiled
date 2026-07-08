@@ -1,401 +1,430 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.ReactRoblox);
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_TweenService_0 = game:GetService("TweenService");
-local l_VRService_0 = game:GetService("VRService");
-local v8 = require(l_CorePackages_0.Packages.ReactOtter);
-local v9 = require(l_CorePackages_0.Packages.Signals);
-local l_getUIScale_0 = require(l_CorePackages_0.Workspace.Packages.Display).GetDisplayStore(false).getUIScale;
-local v11 = require(l_CorePackages_0.Packages.UIBlox);
-local v12 = require(l_CorePackages_0.Packages.Foundation);
-local l_Interactable_0 = v11.Core.Control.Interactable;
-local l_useStyleSheet_0 = v12.Hooks.useStyleSheet;
-local l_MouseIconOverrideService_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).MouseIconOverrideService;
-local v16 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Symbol.named("SelfieViewCursorOverride");
-local v17 = require(l_script_FirstAncestor_0.Utility.debounce);
-local v18 = require(l_script_FirstAncestor_0.Service);
-local v19 = require(l_script_FirstAncestor_0.Unibar.Constants);
-local _ = require(l_CorePackages_0.Workspace.Packages.Chrome);
-local v21 = require(l_script_FirstAncestor_0.Analytics.ChromeAnalytics);
-local v22 = require(l_script_FirstAncestor_0.Utility.shouldRejectMultiTouch);
-local l_SettingsShowSignal_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).SettingsShowSignal;
-local v24 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local l_FFlagTopBarSignalizeMenuOpen_0 = v24.Flags.FFlagTopBarSignalizeMenuOpen;
-local l_useSelector_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector;
-local v27 = game:DefineFastInt("ChromeWindowLayoutOrder", 2);
-local v28 = game:DefineFastFlag("FixWindowDragError", false);
-local v29 = game:DefineFastFlag("FixWindowDragStaleConnection", false);
-local l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 = require(l_script_FirstAncestor_0.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider;
-local v31 = require(l_script_FirstAncestor_0.Hooks.useWindowSize);
-local v32 = {
-    dampingRatio = 1, 
-    frequency = 3
-};
-local v33 = {
-    INTEGRATION = 1, 
-    CLOSE_BUTTON = 2, 
-    INPUT_SHIELD = 3, 
-    INPUT_WRAPPER = 4
-};
-local v34 = false;
-return function(v35) --[[ Line: 71 ]]
-    -- upvalues: v31 (copy), v2 (copy), l_FFlagTopBarSignalizeMenuOpen_0 (copy), l_useSelector_0 (copy), v8 (copy), v32 (copy), v9 (copy), v24 (copy), l_SettingsShowSignal_0 (copy), v18 (copy), v19 (copy), v21 (copy), l_UserInputService_0 (copy), v22 (copy), l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 (copy), l_getUIScale_0 (copy), l_VRService_0 (copy), v34 (ref), l_MouseIconOverrideService_0 (copy), v16 (copy), v29 (copy), v28 (copy), l_TweenService_0 (copy), v27 (copy), l_useStyleSheet_0 (copy), v3 (copy), v17 (copy), l_Interactable_0 (copy), v33 (copy), l_CoreGui_0 (copy)
-    local v36 = v31(v35.integration.integration);
-    local v37 = v2.useRef(nil);
-    local v38 = v2.useRef(nil);
-    local v39, v40 = v2.useBinding(false);
-    local v41 = 0;
-    local v42 = v2.useMemo(function() --[[ Line: 77 ]]
-        return nil;
-    end, {});
-    local v43, v44 = v2.useBinding(false);
-    local v45, v46 = v2.useBinding(false);
-    local v48 = if l_FFlagTopBarSignalizeMenuOpen_0 then v2.joinBindings({
-        v43, 
-        v45
-    }):map(function(v47) --[[ Line: 85 ]]
-        return v47[1] or v47[2];
-    end) else nil;
-    local v50 = if not l_FFlagTopBarSignalizeMenuOpen_0 then l_useSelector_0(function(v49) --[[ Line: 91 ]]
-        return v49.displayOptions.menuOpen or v49.displayOptions.inspectMenuOpen;
-    end) else nil;
-    local v51, v52 = v2.useBinding(false);
-    local v53, v54 = v8.useAnimatedBinding(v36.X.Offset);
-    local v55, v56 = v8.useAnimatedBinding(v36.Y.Offset);
-    local v57 = v2.useCallback(function() --[[ Line: 102 ]]
-        -- upvalues: v53 (copy), v55 (copy), v35 (copy)
-        return Vector2.new(v53:getValue(), v55:getValue()) * (v35.integration.integration.windowAnchorPoint or Vector2.zero);
-    end, {
-        v53, 
-        v55, 
-        v35.integration
-    });
-    v2.useEffect(function() --[[ Line: 107 ]]
-        -- upvalues: v53 (copy), v54 (copy), v8 (ref), v36 (copy), v32 (ref)
-        if v53:getValue() == 0 then
-            v54((v8.instant(v36.X.Offset)));
-            return;
-        else
-            v54(v8.spring(v36.X.Offset, v32));
-            return;
-        end;
-    end, {
-        v36.X.Offset
-    });
-    v2.useEffect(function() --[[ Line: 115 ]]
-        -- upvalues: v55 (copy), v56 (copy), v8 (ref), v36 (copy), v32 (ref)
-        if v55:getValue() == 0 then
-            v56((v8.instant(v36.Y.Offset)));
-            return;
-        else
-            v56(v8.spring(v36.Y.Offset, v32));
-            return;
-        end;
-    end, {
-        v36.Y.Offset
-    });
-    if l_FFlagTopBarSignalizeMenuOpen_0 then
-        v2.useEffect(function() --[[ Line: 124 ]]
-            -- upvalues: v9 (ref), v24 (ref), v46 (copy), l_SettingsShowSignal_0 (ref), v44 (copy)
-            local v60 = v9.createEffect(function(v58) --[[ Line: 125 ]]
-                -- upvalues: v24 (ref), v46 (ref)
-                local v59 = v24.Stores.GetInspectAndBuyStore(v58).getInspectAndBuyOpen(v58);
-                v46(v59);
-            end);
-            l_SettingsShowSignal_0:connect(function(v61) --[[ Line: 130 ]]
-                -- upvalues: v44 (ref)
-                v44(v61);
-            end);
-            return function() --[[ Line: 134 ]]
-                -- upvalues: v60 (copy)
-                v60();
-            end;
-        end, {});
-    end;
-    v2.useEffect(function() --[[ Line: 144 ]]
-        -- upvalues: v18 (ref), v35 (copy), v37 (copy), v38 (ref), v40 (copy), v54 (copy), v8 (ref), v19 (ref), v56 (copy), v36 (copy), v32 (ref), v21 (ref), l_UserInputService_0 (ref), v22 (ref), l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 (ref), l_getUIScale_0 (ref)
-        local v62 = nil;
-        local v63 = nil;
-        local v64 = v18:dragConnection(v35.integration.id);
-        if v64 then
-            v62 = v64.connection;
-            v63 = v64.inputObject;
-        end;
-        assert(v37.current ~= nil);
-        assert(v37.current.Parent ~= nil);
-        local l_current_0 = v37.current;
-        local l_AbsoluteSize_0 = v37.current:FindFirstAncestorWhichIsA("ScreenGui").AbsoluteSize;
-        if v62 ~= nil then
-            v38 = v62;
-            v40(true);
-            if v38 then
-                v54((v8.instant(v19.WINDOW_ICON_SIZE)));
-                v56((v8.instant(v19.WINDOW_ICON_SIZE)));
-                task.defer(v54, v8.spring(v36.X.Offset, v32));
-                task.defer(v56, v8.spring(v36.Y.Offset, v32));
-                local v67 = Vector3.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y, 0);
-                v21.default:setWindowDefaultPosition(v35.integration.id, Vector2.new(v67.X, v67.Y));
-                v38.current = l_UserInputService_0.InputChanged:Connect(function(v68, _) --[[ Line: 179 ]]
-                    -- upvalues: v22 (ref), v63 (ref), v67 (copy), v67 (copy), l_AbsoluteSize_0 (copy), l_current_0 (copy)
-                    local l_Position_0 = v68.Position;
-                    if v22(v63, v68) then
-                        return;
-                    else
-                        local v71 = l_Position_0 - v67;
-                        local v72 = {
-                            X = math.clamp((v71 + v67).X, 0, l_AbsoluteSize_0.X), 
-                            Y = math.clamp((v71 + v67).Y, 0, l_AbsoluteSize_0.Y)
-                        };
-                        l_current_0.Position = UDim2.fromOffset(v72.X, v72.Y);
-                        return;
-                    end;
-                end);
-            end;
-        else
-            local v73 = nil;
-            if l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 and v35.position then
-                local v74 = l_getUIScale_0(false);
-                local v75 = v74 * v35.position.X.Offset;
-                local v76 = v74 * v35.position.Y.Offset;
-                v73 = UDim2.new(v35.position.X.Scale, v75, v35.position.Y.Scale, v76);
-            else
-                v73 = v35.position or UDim2.new();
-            end;
-            if v35.integration.integration.cachePosition then
-                local v77 = v18:windowPosition(v35.integration.id) or UDim2.new();
-                local v78 = if v77.X.Scale == 1 then l_AbsoluteSize_0.X else 0;
-                l_current_0.Position = UDim2.new(0, v78 + v77.X.Offset, 0, v77.Y.Offset);
-            else
-                local v79 = if v73.X.Scale == 1 then l_AbsoluteSize_0.X else 0;
-                l_current_0.Position = UDim2.new(0, v79 + v73.X.Offset, 0, v73.Y.Offset);
-            end;
-        end;
-    end, {});
-    local v81 = v2.useCallback(function(v80) --[[ Line: 220 ]]
-        -- upvalues: v35 (copy), v18 (ref)
-        if v35.integration.integration.cachePosition then
-            v18:updateWindowPosition(v35.integration.id, v80);
-        end;
-    end, {
-        v35.integration
-    });
-    local v82 = v2.useCallback(function() --[[ Line: 226 ]]
-        -- upvalues: l_VRService_0 (ref), v34 (ref), l_MouseIconOverrideService_0 (ref), v16 (ref)
-        if not l_VRService_0.VREnabled then
-            v34 = true;
-            l_MouseIconOverrideService_0.push(v16, Enum.OverrideMouseIconBehavior.ForceShow);
-        end;
-    end);
-    local v83 = v2.useCallback(function() --[[ Line: 233 ]]
-        -- upvalues: v34 (ref), l_MouseIconOverrideService_0 (ref), v16 (ref)
-        if v34 then
-            v34 = false;
-            l_MouseIconOverrideService_0.pop(v16);
-        end;
-    end);
-    local v97 = v2.useCallback(function(_, v85) --[[ Line: 240 ]]
-        -- upvalues: v37 (copy), v57 (copy), v21 (ref), v35 (copy), v29 (ref), v38 (ref), v40 (copy), v51 (copy), v28 (ref), v53 (copy), v55 (copy), l_UserInputService_0 (ref), v22 (ref), v41 (ref), v19 (ref)
-        assert(v37.current ~= nil);
-        assert(v37.current.Parent ~= nil);
-        local l_current_1 = v37.current;
-        local l_AbsoluteSize_1 = v37.current:FindFirstAncestorWhichIsA("ScreenGui").AbsoluteSize;
-        local v88 = v57();
-        local l_Position_1 = v85.Position;
-        local v90 = Vector3.new(v37.current.AbsolutePosition.X + v88.X, v37.current.AbsolutePosition.Y + v88.Y, 0);
-        if v85.UserInputType == Enum.UserInputType.MouseButton1 or v85.UserInputType == Enum.UserInputType.Touch then
-            v21.default:onWindowTouchBegan(v35.integration.id, Vector2.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y));
-            if v29 and v38.current then
-                v38.current:Disconnect();
-                v38.current = nil;
-                v40(false);
-            end;
-            if (v29 and true or not v38.current) and not v51:getValue() then
-                local v91 = {
-                    X = math.clamp(v90.X, 0, if v28 then math.max(0, l_AbsoluteSize_1.X - (v53:getValue() - v88.X)) else l_AbsoluteSize_1.X - (v53:getValue() - v88.X)), 
-                    Y = math.clamp(v90.Y, 0, if v28 then math.max(0, l_AbsoluteSize_1.Y - (v55:getValue() - v88.Y)) else l_AbsoluteSize_1.Y - (v55:getValue() - v88.Y))
-                };
-                l_current_1.Position = UDim2.fromOffset(v91.X, v91.Y);
-                v38.current = l_UserInputService_0.InputChanged:Connect(function(v92, _) --[[ Line: 300 ]]
-                    -- upvalues: v22 (ref), v85 (copy), l_Position_1 (copy), v41 (ref), v29 (ref), v19 (ref), v40 (ref), v90 (copy), v88 (copy), v28 (ref), l_AbsoluteSize_1 (copy), v53 (ref), v55 (ref), l_current_1 (copy), v21 (ref), v35 (ref)
-                    if v22(v85, v92) then
-                        return;
-                    else
-                        local l_Position_2 = v92.Position;
-                        local v95 = l_Position_2 - l_Position_1;
-                        v41 = if v29 then v95.Magnitude else v41 + v95.Magnitude;
-                        if v41 > v19.WINDOW_MIN_DRAG_DISTANCE then
-                            v40(true);
-                            local v96 = {
-                                X = math.clamp((v95 + v90).X, v88.X, if v28 then math.max(v88.X, l_AbsoluteSize_1.X - (v53:getValue() - v88.X)) else l_AbsoluteSize_1.X - (v53:getValue() - v88.X)), 
-                                Y = math.clamp((v95 + v90).Y, v88.Y, if v28 then math.max(v88.Y, l_AbsoluteSize_1.Y - (v55:getValue() - v88.Y)) else l_AbsoluteSize_1.Y - (v55:getValue() - v88.Y))
-                            };
-                            l_current_1.Position = UDim2.fromOffset(v96.X, v96.Y);
-                            v21.default:onWindowDrag(v35.integration.id, l_Position_2);
-                        end;
-                        return;
-                    end;
-                end);
-            end;
-        end;
-    end, {
-        v57
-    });
-    local function v105(v98) --[[ Line: 346 ]]
-        -- upvalues: v57 (copy), v53 (copy), v55 (copy)
-        local l_Parent_0 = v98.Parent;
-        local l_Offset_0 = v98.Position.X.Offset;
-        local l_Offset_1 = v98.Position.Y.Offset;
-        local v102 = v57();
-        local l_AbsoluteSize_2 = l_Parent_0.AbsoluteSize;
-        local v104 = true;
-        if l_Offset_0 >= v102.X then
-            v104 = true;
-            if l_AbsoluteSize_2.X - (v53:getValue() - v102.X) >= l_Offset_0 then
-                v104 = true;
-                if l_Offset_1 >= v102.Y then
-                    v104 = l_AbsoluteSize_2.Y - (v55:getValue() - v102.Y) < l_Offset_1;
-                end;
-            end;
-        end;
-        return v104;
-    end;
-    local v118 = v2.useCallback(function(v106) --[[ Line: 363 ]]
-        -- upvalues: v37 (copy), v42 (ref), v105 (copy), v57 (copy), v53 (copy), v55 (copy), v81 (copy), v52 (copy), l_TweenService_0 (ref)
-        if v37 == nil or v37.current == nil then
-            return;
-        else
-            assert(v37.current ~= nil);
-            assert(v37.current.Parent ~= nil);
-            local l_current_2 = v37.current;
-            local l_Offset_2 = l_current_2.Position.X.Offset;
-            local l_Offset_3 = l_current_2.Position.Y.Offset;
-            if v42 and v42.PlaybackState == Enum.PlaybackState.Playing then
-                v42:Cancel();
-            end;
-            if v105(l_current_2) then
-                if l_current_2 == nil then
-                    return;
-                else
-                    local l_Parent_1 = v37.current.Parent;
-                    local v111 = v57();
-                    local l_AbsoluteSize_3 = l_Parent_1.AbsoluteSize;
-                    local v113 = 0;
-                    local v114 = 0;
-                    if l_AbsoluteSize_3.X > v53:getValue() then
-                        v113 = math.clamp(l_Offset_2, v111.X, l_AbsoluteSize_3.X - (v53:getValue() - v111.X));
-                    end;
-                    if l_AbsoluteSize_3.Y > v55:getValue() then
-                        v114 = math.clamp(l_Offset_3, v111.Y, l_AbsoluteSize_3.Y - (v55:getValue() - v111.Y));
-                    end;
-                    local v115 = UDim2.new(0, v113, 0, v114);
-                    v81(v115);
-                    if not v106 then
-                        v52(true);
-                        local v116 = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut);
-                        v42 = l_TweenService_0:Create(l_current_2, v116, {
-                            Position = v115
-                        });
-                        assert(v42 ~= nil);
-                        v42.Completed:Connect(function(_) --[[ Line: 417 ]]
-                            -- upvalues: v52 (ref), v42 (ref)
-                            v52(false);
-                            v42 = nil;
-                        end);
-                        v42:Play();
-                        return;
-                    else
-                        l_current_2.Position = v115;
-                        return;
-                    end;
-                end;
-            else
-                v81(UDim2.new(0, l_Offset_2, 0, l_Offset_3));
-                return;
-            end;
-        end;
-    end, {
-        v57
-    });
-    local v121 = v2.useCallback(function(_, v120) --[[ Line: 430 ]]
-        -- upvalues: v41 (ref), v37 (copy), v21 (ref), v35 (copy), v105 (copy), v38 (ref), v40 (copy), v18 (ref), v118 (copy)
-        v41 = 0;
-        if v120.UserInputType == Enum.UserInputType.MouseButton1 or v120.UserInputType == Enum.UserInputType.Touch then
-            if v37.current then
-                v21.default:onWindowTouchEnded(v35.integration.id, Vector2.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y), (v105(v37.current)));
-            end;
-            if v38.current then
-                v38.current:Disconnect();
-                v38.current = nil;
-                v40(false);
-                v18:gesture(v35.integration.id, nil);
-                v118();
-            end;
-        end;
-    end, {});
-    local l_v27_0 = v27;
-    local v123 = l_useStyleSheet_0();
-    return v3.createPortal({
-        Name = v2.createElement("ScreenGui", {
-            Name = v19.WINDOW_HOST_GUI_NAME .. ":" .. v35.integration.id, 
-            [v2.Change.AbsoluteSize] = v17(function() --[[ Line: 463 ]]
-                -- upvalues: v118 (copy)
-                v118();
-            end, 0.2), 
-            DisplayOrder = if l_FFlagTopBarSignalizeMenuOpen_0 and v48 then v48:map(function(v124) --[[ Line: 467 ]]
-                -- upvalues: l_v27_0 (copy)
-                if v124 then
-                    return -1;
-                else
-                    return l_v27_0;
-                end;
-            end) else v50 and -1 or l_v27_0, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        }, {
-            WindowFrame = v2.createElement("Frame", {
-                Size = v2.joinBindings({
-                    v53, 
-                    v55
-                }):map(function(v125) --[[ Line: 475 ]]
-                    -- upvalues: v118 (copy)
-                    v118(true);
-                    return UDim2.fromOffset(v125[1], v125[2]);
-                end), 
-                LayoutOrder = 1, 
-                ref = v37, 
-                BorderSizePixel = 0, 
-                AnchorPoint = if v35.integration.integration.windowAnchorPoint then v35.integration.integration.windowAnchorPoint else nil, 
-                BackgroundTransparency = 1
-            }, {
-                WindowWrapper = v2.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1, 
-                    BorderSizePixel = 0
-                }, {
-                    Integration = v35.integration.component(v35) or nil, 
-                    InputShield = v2.createElement(l_Interactable_0, {
-                        ZIndex = v33.INPUT_SHIELD, 
-                        Size = UDim2.fromScale(1, 1), 
-                        BackgroundTransparency = 1, 
-                        Visible = v39
-                    }), 
-                    InputWrapper = v2.createElement("Frame", {
-                        ZIndex = v33.INPUT_WRAPPER, 
-                        Size = UDim2.fromScale(1, 1), 
-                        BackgroundTransparency = 1, 
-                        [v2.Event.InputBegan] = v97, 
-                        [v2.Event.InputEnded] = v121, 
-                        [v2.Event.MouseEnter] = v82, 
-                        [v2.Event.MouseLeave] = v83, 
-                        [v2.Event.Destroying] = v83
-                    })
-                })
-            }), 
-            FoundationStyleLink = v2.createElement("StyleLink", {
-                StyleSheet = v123
-            })
-        })
-    }, l_CoreGui_0);
-end;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local VRService = game:GetService("VRService")
+local ReactOtter = require(CorePackages.Packages.ReactOtter)
+local Signals = require(CorePackages.Packages.Signals)
+local getUIScale = require(CorePackages.Workspace.Packages.Display).GetDisplayStore(false).getUIScale
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Interactable = UIBlox.Core.Control.Interactable
+local useStyleSheet = Foundation.Hooks.useStyleSheet
+local MouseIconOverrideService = require(CorePackages.Workspace.Packages.CoreScriptsCommon).MouseIconOverrideService
+local v17 = require(CorePackages.Workspace.Packages.AppCommonLib).Symbol.named("SelfieViewCursorOverride")
+local debounce = require(ChromeShared.Utility.debounce)
+local Service = require(ChromeShared.Service)
+local Constants = require(ChromeShared.Unibar.Constants)
+
+require(CorePackages.Workspace.Packages.Chrome)
+
+local ChromeAnalytics = require(ChromeShared.Analytics.ChromeAnalytics)
+local shouldRejectMultiTouch = require(ChromeShared.Utility.shouldRejectMultiTouch)
+local SettingsShowSignal = require(CorePackages.Workspace.Packages.CoreScriptsCommon).SettingsShowSignal
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeMenuOpen = CoreGuiCommon.Flags.FFlagTopBarSignalizeMenuOpen
+local useSelector = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector
+local v27 = game:DefineFastInt("ChromeWindowLayoutOrder", 2)
+local v28 = game:DefineFastFlag("FixWindowDragError", false)
+local v29 = game:DefineFastFlag("FixWindowDragStaleConnection", false)
+local FFlagTokenizeUnibarConstantsWithStyleProvider = require(ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+local useWindowSize = require(ChromeShared.Hooks.useWindowSize)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 3
+}
+local _ = {
+	INTEGRATION = 1,
+	CLOSE_BUTTON = 2,
+	INPUT_SHIELD = 3,
+	INPUT_WRAPPER = 4
+}
+local u34 = false
+
+return function(t2: {[any]: any}) -- line: 71
+	-- upvalues: useWindowSize (copy), React (copy), FFlagTopBarSignalizeMenuOpen (copy), useSelector (copy), ReactOtter (copy), t1 (copy), Signals (copy), CoreGuiCommon (copy), SettingsShowSignal (copy), Service (copy), Constants (copy), ChromeAnalytics (copy), UserInputService (copy), shouldRejectMultiTouch (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), getUIScale (copy), VRService (copy), u34 (ref), MouseIconOverrideService (copy), v17 (copy), v29 (copy), v28 (copy), TweenService (copy), v27 (copy), useStyleSheet (copy), ReactRoblox (copy), debounce (copy), Interactable (copy), CoreGui (copy)
+	local v36 = useWindowSize(t2.integration.integration)
+	local v37 = React.useRef(nil)
+	local u38 = React.useRef(nil)
+	local v39, v40 = React.useBinding(false)
+	local n1 = 0
+	local u42 = React.useMemo(function() -- line: 77
+		return nil
+	end, {})
+	local v43, v44 = React.useBinding(false)
+	local v45, v46 = React.useBinding(false)
+	local v47 = if not FFlagTopBarSignalizeMenuOpen then nil else React.joinBindings({
+		v43,
+		v45
+	}):map(function(p1) -- line: 85
+		return p1[1] or p1[2]
+	end)
+	local v48 = if FFlagTopBarSignalizeMenuOpen then nil else useSelector(function(p2) -- line: 91
+		return p2.displayOptions.menuOpen or p2.displayOptions.inspectMenuOpen
+	end)
+	local v49, v50 = React.useBinding(false)
+	local v51, v52 = ReactOtter.useAnimatedBinding(v36.X.Offset)
+	local v53, v54 = ReactOtter.useAnimatedBinding(v36.Y.Offset)
+	local v55 = React.useCallback(function() -- line: 102
+		-- upvalues: v51 (copy), v53 (copy), t2 (copy)
+		return Vector2.new(v51:getValue(), v53:getValue()) * (t2.integration.integration.windowAnchorPoint or Vector2.zero)
+	end, {
+		v51,
+		v53,
+		t2.integration
+	})
+
+	React.useEffect(function() -- line: 107
+		-- upvalues: v51 (copy), v52 (copy), ReactOtter (copy), v36 (copy), t1 (copy)
+		if v51:getValue() == 0 then
+			v52((ReactOtter.instant(v36.X.Offset)))
+
+			return
+		end
+
+		v52(ReactOtter.spring(v36.X.Offset, t1))
+	end, { v36.X.Offset })
+	React.useEffect(function() -- line: 115
+		-- upvalues: v53 (copy), v54 (copy), ReactOtter (copy), v36 (copy), t1 (copy)
+		if v53:getValue() == 0 then
+			v54((ReactOtter.instant(v36.Y.Offset)))
+
+			return
+		end
+
+		v54(ReactOtter.spring(v36.Y.Offset, t1))
+	end, { v36.Y.Offset })
+
+	if FFlagTopBarSignalizeMenuOpen then
+		React.useEffect(function() -- line: 124
+			-- upvalues: Signals (copy), CoreGuiCommon (copy), v46 (copy), SettingsShowSignal (copy), v44 (copy)
+			local v67 = Signals.createEffect(function(p3) -- line: 125
+				-- upvalues: CoreGuiCommon (copy), v46 (copy)
+				local v112 = CoreGuiCommon.Stores.GetInspectAndBuyStore(p3).getInspectAndBuyOpen(p3)
+
+				v46(v112)
+			end)
+
+			SettingsShowSignal:connect(function(p4) -- line: 130
+				-- upvalues: v44 (copy)
+				v44(p4)
+			end)
+
+			return function() -- line: 134
+				-- upvalues: v67 (copy)
+				v67()
+			end
+		end, {})
+	end
+
+	React.useEffect(function() -- line: 144
+		-- upvalues: Service (copy), t2 (copy), v37 (copy), u38 (ref), v40 (copy), v52 (copy), ReactOtter (copy), Constants (copy), v54 (copy), v36 (copy), t1 (copy), ChromeAnalytics (copy), UserInputService (copy), shouldRejectMultiTouch (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), getUIScale (copy)
+		local connection = nil
+		local inputObject = nil
+		local v70 = Service:dragConnection(t2.integration.id)
+
+		if v70 then
+			connection = v70.connection
+			inputObject = v70.inputObject
+		end
+
+		assert(v37.current ~= nil)
+		assert(v37.current.Parent ~= nil)
+
+		local current = v37.current
+		local AbsoluteSize = v37.current:FindFirstAncestorWhichIsA("ScreenGui").AbsoluteSize
+
+		if connection ~= nil then
+			u38 = connection
+			v40(true)
+
+			if u38 then
+				v52((ReactOtter.instant(Constants.WINDOW_ICON_SIZE)))
+				v54((ReactOtter.instant(Constants.WINDOW_ICON_SIZE)))
+				task.defer(v52, ReactOtter.spring(v36.X.Offset, t1))
+				task.defer(v54, ReactOtter.spring(v36.Y.Offset, t1))
+
+				local vector3 = Vector3.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y, 0)
+
+				ChromeAnalytics.default:setWindowDefaultPosition(t2.integration.id, Vector2.new(vector3.X, vector3.Y))
+				u38.current = UserInputService.InputChanged:Connect(function(input, _) -- line: 179
+					-- upvalues: shouldRejectMultiTouch (copy), inputObject (ref), vector3 (copy), vector3 (copy), AbsoluteSize (copy), current (copy)
+					local inputPosition = input.Position
+
+					if shouldRejectMultiTouch(inputObject, input) then
+						return
+					end
+
+					local v117 = inputPosition - vector3
+					local t3 = {
+						X = math.clamp((v117 + vector3).X, 0, AbsoluteSize.X),
+						Y = math.clamp((v117 + vector3).Y, 0, AbsoluteSize.Y)
+					}
+
+					current.Position = UDim2.fromOffset(t3.X, t3.Y)
+				end)
+			end
+		else
+			local uDim2
+
+			if FFlagTokenizeUnibarConstantsWithStyleProvider and t2.position then
+				local v74 = getUIScale(false)
+				local v75 = v74 * t2.position.X.Offset
+				local v76 = v74 * t2.position.Y.Offset
+
+				uDim2 = UDim2.new(t2.position.X.Scale, v75, t2.position.Y.Scale, v76)
+			else
+				uDim2 = t2.position or UDim2.new()
+			end
+
+			if t2.integration.integration.cachePosition then
+				local v78 = Service:windowPosition(t2.integration.id) or UDim2.new()
+				local v79 = v78.X.Scale ~= 1 and 0 or AbsoluteSize.X
+
+				current.Position = UDim2.new(0, v79 + v78.X.Offset, 0, v78.Y.Offset)
+			else
+				local v80 = uDim2.X.Scale ~= 1 and 0 or AbsoluteSize.X
+
+				current.Position = UDim2.new(0, v80 + uDim2.X.Offset, 0, uDim2.Y.Offset)
+			end
+		end
+	end, {})
+
+	local v56 = React.useCallback(function(uDim2: UDim2) -- line: 220
+		-- upvalues: t2 (copy), Service (copy)
+		if t2.integration.integration.cachePosition then
+			Service:updateWindowPosition(t2.integration.id, uDim2)
+		end
+	end, { t2.integration })
+	local v57 = React.useCallback(function() -- line: 226
+		-- upvalues: VRService (copy), u34 (ref), MouseIconOverrideService (copy), v17 (copy)
+		if not VRService.VREnabled then
+			u34 = true
+			MouseIconOverrideService.push(v17, Enum.OverrideMouseIconBehavior.ForceShow)
+		end
+	end)
+	local v58 = React.useCallback(function() -- line: 233
+		-- upvalues: u34 (ref), MouseIconOverrideService (copy), v17 (copy)
+		if u34 then
+			u34 = false
+			MouseIconOverrideService.pop(v17)
+		end
+	end)
+	local v59 = React.useCallback(function(_, p7) -- line: 240
+		-- upvalues: v37 (copy), v55 (copy), ChromeAnalytics (copy), t2 (copy), v29 (copy), u38 (ref), v40 (copy), v49 (copy), v28 (copy), v51 (copy), v53 (copy), UserInputService (copy), shouldRejectMultiTouch (copy), n1 (ref), Constants (copy)
+		assert(v37.current ~= nil)
+		assert(v37.current.Parent ~= nil)
+
+		local current = v37.current
+		local AbsoluteSize = v37.current:FindFirstAncestorWhichIsA("ScreenGui").AbsoluteSize
+		local v86 = v55()
+		local p7Position = p7.Position
+		local vector3 = Vector3.new(v37.current.AbsolutePosition.X + v86.X, v37.current.AbsolutePosition.Y + v86.Y, 0)
+
+		if p7.UserInputType == Enum.UserInputType.MouseButton1 or p7.UserInputType == Enum.UserInputType.Touch then
+			ChromeAnalytics.default:onWindowTouchBegan(t2.integration.id, Vector2.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y))
+
+			if v29 and u38.current then
+				u38.current:Disconnect()
+				u38.current = nil
+				v40(false)
+			end
+
+			if (v29 or not u38.current) and not v49:getValue() then
+				local t4 = {
+					X = math.clamp(vector3.X, 0, if not v28 then AbsoluteSize.X - (v51:getValue() - v86.X) else math.max(0, AbsoluteSize.X - (v51:getValue() - v86.X))),
+					Y = math.clamp(vector3.Y, 0, if not v28 then AbsoluteSize.Y - (v53:getValue() - v86.Y) else math.max(0, AbsoluteSize.Y - (v53:getValue() - v86.Y)))
+				}
+
+				current.Position = UDim2.fromOffset(t4.X, t4.Y)
+				u38.current = UserInputService.InputChanged:Connect(function(input, _) -- line: 300
+					-- upvalues: shouldRejectMultiTouch (copy), p7 (copy), p7Position (copy), n1 (ref), v29 (copy), Constants (copy), v40 (copy), vector3 (copy), v86 (copy), v28 (copy), AbsoluteSize (copy), v51 (copy), v53 (copy), current (copy), ChromeAnalytics (copy), t2 (copy)
+					if shouldRejectMultiTouch(p7, input) then
+						return
+					end
+
+					local inputPosition = input.Position
+					local v122 = inputPosition - p7Position
+
+					n1 = if not v29 then n1 + v122.Magnitude else v122.Magnitude
+
+					if n1 > Constants.WINDOW_MIN_DRAG_DISTANCE then
+						v40(true)
+
+						local t5 = {
+							X = math.clamp((v122 + vector3).X, v86.X, if not v28 then AbsoluteSize.X - (v51:getValue() - v86.X) else math.max(v86.X, AbsoluteSize.X - (v51:getValue() - v86.X))),
+							Y = math.clamp((v122 + vector3).Y, v86.Y, if not v28 then AbsoluteSize.Y - (v53:getValue() - v86.Y) else math.max(v86.Y, AbsoluteSize.Y - (v53:getValue() - v86.Y)))
+						}
+
+						current.Position = UDim2.fromOffset(t5.X, t5.Y)
+						ChromeAnalytics.default:onWindowDrag(t2.integration.id, inputPosition)
+					end
+				end)
+			end
+		end
+	end, { v55 })
+
+	local function v60(p9) -- line: 346
+		-- upvalues: v55 (copy), v51 (copy), v53 (copy)
+		local p9Parent = p9.Parent
+		local XOffset = p9.Position.X.Offset
+		local YOffset = p9.Position.Y.Offset
+		local v94 = v55()
+		local AbsoluteSize = p9Parent.AbsoluteSize
+
+		return XOffset < v94.X or (XOffset > AbsoluteSize.X - (v51:getValue() - v94.X) or (YOffset < v94.Y or YOffset > AbsoluteSize.Y - (v53:getValue() - v94.Y)))
+	end
+
+	local v61 = React.useCallback(function(b1: boolean?) -- line: 363
+		-- upvalues: v37 (copy), u42 (ref), v60 (copy), v55 (copy), v51 (copy), v53 (copy), v56 (copy), v50 (copy), TweenService (copy)
+		if v37 == nil or v37.current == nil then
+			return
+		end
+
+		assert(v37.current ~= nil)
+		assert(v37.current.Parent ~= nil)
+
+		local current = v37.current
+		local XOffset = current.Position.X.Offset
+		local YOffset = current.Position.Y.Offset
+
+		if u42 and u42.PlaybackState == Enum.PlaybackState.Playing then
+			u42:Cancel()
+		end
+
+		if v60(current) then
+			if current == nil then
+				return
+			end
+
+			local currentParent = v37.current.Parent
+			local v101 = v55()
+			local AbsoluteSize = currentParent.AbsoluteSize
+			local n2 = 0
+			local n3 = 0
+
+			if AbsoluteSize.X > v51:getValue() then
+				n2 = math.clamp(XOffset, v101.X, AbsoluteSize.X - (v51:getValue() - v101.X))
+			end
+
+			if AbsoluteSize.Y > v53:getValue() then
+				n3 = math.clamp(YOffset, v101.Y, AbsoluteSize.Y - (v53:getValue() - v101.Y))
+			end
+
+			local uDim2 = UDim2.new(0, n2, 0, n3)
+
+			v56(uDim2)
+
+			if not b1 then
+				v50(true)
+
+				local tweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+
+				u42 = TweenService:Create(current, tweenInfo, {
+					Position = uDim2
+				})
+				assert(u42 ~= nil)
+				u42.Completed:Connect(function(_) -- line: 417
+					-- upvalues: v50 (copy), u42 (ref)
+					v50(false)
+					u42 = nil
+				end)
+				u42:Play()
+
+				return
+			end
+
+			current.Position = uDim2
+
+			return
+		end
+
+		v56(UDim2.new(0, XOffset, 0, YOffset))
+	end, { v55 })
+	local v62 = React.useCallback(function(_, p12) -- line: 430
+		-- upvalues: n1 (ref), v37 (copy), ChromeAnalytics (copy), t2 (copy), v60 (copy), u38 (ref), v40 (copy), Service (copy), v61 (copy)
+		n1 = 0
+
+		if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
+			if v37.current then
+				ChromeAnalytics.default:onWindowTouchEnded(t2.integration.id, Vector2.new(v37.current.AbsolutePosition.X, v37.current.AbsolutePosition.Y), (v60(v37.current)))
+			end
+
+			if u38.current then
+				u38.current:Disconnect()
+				u38.current = nil
+				v40(false)
+				Service:gesture(t2.integration.id, nil)
+				v61()
+			end
+		end
+	end, {})
+	local v63 = v27
+	local v64 = useStyleSheet()
+
+	return ReactRoblox.createPortal({
+		Name = React.createElement("ScreenGui", {
+			Name = Constants.WINDOW_HOST_GUI_NAME .. ":" .. t2.integration.id,
+			[React.Change.AbsoluteSize] = debounce(function() -- line: 463
+				-- upvalues: v61 (copy)
+				v61()
+			end, 0.2),
+			DisplayOrder = if not FFlagTopBarSignalizeMenuOpen or not v47 then if not v48 then v63 else -1 else v47:map(function(p13) -- line: 467
+				-- upvalues: v63 (copy)
+				if p13 then
+					return -1
+				end
+
+				return v63
+			end),
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		}, {
+			WindowFrame = React.createElement("Frame", {
+				LayoutOrder = 1,
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Size = React.joinBindings({
+					v51,
+					v53
+				}):map(function(p14) -- line: 475
+					-- upvalues: v61 (copy)
+					v61(true)
+
+					return UDim2.fromOffset(p14[1], p14[2])
+				end),
+				ref = v37,
+				AnchorPoint = if not t2.integration.integration.windowAnchorPoint then nil else t2.integration.integration.windowAnchorPoint
+			}, {
+				WindowWrapper = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					Integration = t2.integration.component(t2) or nil,
+					InputShield = React.createElement(Interactable, {
+						ZIndex = 3,
+						BackgroundTransparency = 1,
+						Size = UDim2.fromScale(1, 1),
+						Visible = v39
+					}),
+					InputWrapper = React.createElement("Frame", {
+						ZIndex = 4,
+						Size = UDim2.fromScale(1, 1),
+						BackgroundTransparency = 1,
+						[React.Event.InputBegan] = v59,
+						[React.Event.InputEnded] = v62,
+						[React.Event.MouseEnter] = v57,
+						[React.Event.MouseLeave] = v58,
+						[React.Event.Destroying] = v58
+					})
+				})
+			}),
+			FoundationStyleLink = React.createElement("StyleLink", {
+				StyleSheet = v64
+			})
+		})
+	}, CoreGui)
+end

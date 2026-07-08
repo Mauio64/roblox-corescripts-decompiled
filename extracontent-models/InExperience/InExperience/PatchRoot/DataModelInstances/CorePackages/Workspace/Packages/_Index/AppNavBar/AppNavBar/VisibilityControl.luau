@@ -1,253 +1,426 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Otter);
-local v4 = {
-    dampingRatio = 1, 
-    frequency = 3, 
-    restingVelocityLimit = 0.1, 
-    restingPositionLimit = 0.1
-};
-local v5 = {
-    binding = nil, 
-    motor = nil
-};
-v5.__index = v5;
-v5.create = function(v6) --[[ Line: 33 ]] --[[ Name: create ]]
-    -- upvalues: v2 (copy), v3 (copy), v5 (copy)
-    local v7, v8 = v2.createBinding(v6);
-    local v9 = v3.createSingleMotor(v6);
-    v9:onStep(v8);
-    local v10 = {
-        binding = v7, 
-        motor = v9
-    };
-    setmetatable(v10, v5);
-    return v10;
-end;
-v5.destroy = function(v11) --[[ Line: 47 ]] --[[ Name: destroy ]]
-    v11.motor:destroy();
-end;
-v5.getBinding = function(v12) --[[ Line: 51 ]] --[[ Name: getBinding ]]
-    return v12.binding;
-end;
-v5.show = function(v13) --[[ Line: 55 ]] --[[ Name: show ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    v13.motor:setGoal(v3.spring(1, v4));
-end;
-v5.hide = function(v14) --[[ Line: 59 ]] --[[ Name: hide ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    v14.motor:setGoal(v3.spring(0, v4));
-end;
-v5.update = function(v15, v16) --[[ Line: 63 ]] --[[ Name: update ]]
-    -- upvalues: v3 (copy)
-    local v17 = math.clamp(v15.binding:getValue() + v16, 0, 1);
-    v15.motor:setGoal(v3.instant(v17));
-end;
-v5.finishUp = function(v18) --[[ Line: 69 ]] --[[ Name: finishUp ]]
-    if v18.binding:getValue() < 0.5 then
-        v18:hide();
-        return;
-    else
-        v18:show();
-        return;
-    end;
-end;
-local v19 = {
-    enabled = false, 
-    header = nil, 
-    footer = nil, 
-    footerVisible = false, 
-    connections = nil, 
-    touching = false, 
-    moving = false, 
-    touchPositionY = 0, 
-    scrollDistance = 50
-};
-v19.__index = v19;
-local v20 = nil;
-v19.onTouchMoved = function(v21, v22) --[[ Line: 104 ]] --[[ Name: onTouchMoved ]]
-    local v23 = v22 / v21.scrollDistance;
-    if v21.footerVisible then
-        v21.footer:update(v23);
-    end;
-    v21.header:update(v23);
-end;
-v19.onTouchEnded = function(v24) --[[ Line: 114 ]] --[[ Name: onTouchEnded ]]
-    if v24.footerVisible then
-        v24.footer:finishUp();
-    end;
-    v24.header:finishUp();
-end;
-v19.connectTouch = function(v25) --[[ Line: 123 ]] --[[ Name: connectTouch ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    if v25.connections ~= nil then
-        return;
-    else
-        v25.connections = {};
-        v25.connections.started = l_UserInputService_0.TouchStarted:Connect(function(v26) --[[ Line: 128 ]]
-            -- upvalues: v25 (copy)
-            v25.touching = true;
-            v25.touchPositionY = v26.Position.Y;
-        end);
-        v25.connections.moved = l_UserInputService_0.TouchMoved:Connect(function(v27) --[[ Line: 132 ]]
-            -- upvalues: v25 (copy)
-            if not v25.touching then
-                return;
-            else
-                local l_Y_0 = v27.Position.Y;
-                if not v25.moving then
-                    if math.abs(l_Y_0 - v25.touchPositionY) > 10 then
-                        v25.moving = true;
-                        v25.touchPositionY = l_Y_0;
-                    end;
-                    return;
-                else
-                    local v29 = l_Y_0 - v25.touchPositionY;
-                    v25.touchPositionY = l_Y_0;
-                    v25:onTouchMoved(v29);
-                    return;
-                end;
-            end;
-        end);
-        v25.connections.ended = l_UserInputService_0.TouchEnded:Connect(function(_) --[[ Line: 148 ]]
-            -- upvalues: v25 (copy)
-            if not v25.touching then
-                return;
-            else
-                v25.touching = false;
-                v25.moving = false;
-                v25:onTouchEnded();
-                return;
-            end;
-        end);
-        return;
-    end;
-end;
-v19.disconnectTouch = function(v31) --[[ Line: 158 ]] --[[ Name: disconnectTouch ]]
-    if v31.connections == nil then
-        return;
-    else
-        for _, v33 in pairs(v31.connections) do
-            v33:Disconnect();
-        end;
-        v31.connections = nil;
-        return;
-    end;
-end;
-v19.isEnabled = function(v34) --[[ Line: 171 ]] --[[ Name: isEnabled ]]
-    return v34.enabled;
-end;
-v19.setEnabled = function(v35, v36) --[[ Line: 178 ]] --[[ Name: setEnabled ]]
-    if v35.enabled == v36 then
-        return;
-    else
-        v35.enabled = v36;
-        if v36 then
-            v35:connectTouch();
-            return;
-        else
-            v35:disconnectTouch();
-            return;
-        end;
-    end;
-end;
-v19.setFooterVisible = function(v37, v38) --[[ Line: 193 ]] --[[ Name: setFooterVisible ]]
-    if v37.footerVisible == v38 then
-        return;
-    else
-        v37.footerVisible = v38;
-        if v38 then
-            v37.footer:show();
-            return;
-        else
-            v37.footer:hide();
-            return;
-        end;
-    end;
-end;
-v19.getHeaderBinding = function(v39) --[[ Line: 208 ]] --[[ Name: getHeaderBinding ]]
-    return v39.header:getBinding();
-end;
-v19.getFooterBinding = function(v40) --[[ Line: 215 ]] --[[ Name: getFooterBinding ]]
-    return v40.footer:getBinding();
-end;
-v19.show = function(v41) --[[ Line: 222 ]] --[[ Name: show ]]
-    v41.header:show();
-    if v41.footerVisible then
-        v41.footer:show();
-    end;
-end;
-v19.hide = function(v42) --[[ Line: 232 ]] --[[ Name: hide ]]
-    v42.header:hide();
-    if v42.footerVisible then
-        v42.footer:hide();
-    end;
-end;
-v19.getInstance = function() --[[ Line: 242 ]] --[[ Name: getInstance ]]
-    -- upvalues: v20 (ref), v19 (copy)
-    if not v20 then
-        v20 = {};
-        setmetatable(v20, v19);
-        v20:initialize();
-    end;
-    return v20;
-end;
-v19.initialize = function(v43) --[[ Line: 252 ]] --[[ Name: initialize ]]
-    -- upvalues: v5 (copy)
-    v43.header = v5.create(1);
-    v43.footer = v5.create(0);
-end;
-v19.destroy = function(v44) --[[ Line: 262 ]] --[[ Name: destroy ]]
-    -- upvalues: v20 (ref)
-    v44.header:destroy();
-    v44.footer:destroy();
-    v44:disconnectTouch();
-    v20 = nil;
-end;
-v19.setScrollDistance = function(v45, v46) --[[ Line: 272 ]] --[[ Name: setScrollDistance ]]
-    if v46 == 0 then
-        return;
-    else
-        v45.scrollDistance = v46;
-        return;
-    end;
-end;
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+local Otter = require(ParentParent.Otter)
+local SharedFlags = require(ParentParent.SharedFlags)
+local v6 = game:DefineFastFlag("AppIaScrollAwayIgnoreHorizontal", false)
+local v7 = game:DefineFastInt("AppIaScrollAwayThreshold", 10)
+local FFlagAppIaScrollAwayPinHeader = SharedFlags.FFlagAppIaScrollAwayPinHeader
+local FFlagAppIaScopedScrollAway = SharedFlags.FFlagAppIaScopedScrollAway
+local FFlagEnableScrollAwayContentScrollableFix = SharedFlags.FFlagEnableScrollAwayContentScrollableFix
+local t1 = {
+	dampingRatio = 1,
+	frequency = 3,
+	restingVelocityLimit = 0.1,
+	restingPositionLimit = 0.1
+}
+local t2 = {
+	binding = nil,
+	motor = nil
+}
+
+t2.__index = t2
+
+function t2.create(n1: number) -- line: 40
+	-- upvalues: React (copy), Otter (copy), t2 (copy)
+	local v16, v17 = React.createBinding(n1)
+	local v18 = Otter.createSingleMotor(n1)
+
+	v18:onStep(v17)
+
+	local t3 = {
+		binding = v16,
+		motor = v18
+	}
+
+	setmetatable(t3, t2)
+
+	return t3
+end
+function t2.destroy(p1) -- line: 54
+	p1.motor:destroy()
+end
+function t2.getBinding(p2) -- line: 58
+	return p2.binding
+end
+function t2.show(p3) -- line: 62
+	-- upvalues: Otter (copy), t1 (copy)
+	p3.motor:setGoal(Otter.spring(1, t1))
+end
+function t2.hide(p4) -- line: 66
+	-- upvalues: Otter (copy), t1 (copy)
+	p4.motor:setGoal(Otter.spring(0, t1))
+end
+function t2.update(t4: {[any]: any}, n2: number) -- line: 70
+	-- upvalues: Otter (copy)
+	local v26 = math.clamp(t4.binding:getValue() + n2, 0, 1)
+
+	t4.motor:setGoal(Otter.instant(v26))
+end
+function t2.finishUp(p5) -- line: 76
+	if p5.binding:getValue() < 0.5 then
+		p5:hide()
+
+		return
+	end
+
+	p5:show()
+end
+
+local t5 = {
+	enabled = false,
+	header = nil,
+	footer = nil,
+	footerVisible = false,
+	connections = nil,
+	touching = false,
+	moving = false,
+	touchPositionX = 0,
+	touchPositionY = 0,
+	horizontalLocked = false,
+	scrollDistance = 50,
+	contentScrollable = true,
+	headerScrollAwayDisabled = not FFlagAppIaScrollAwayPinHeader and nil,
+	globalTouchDisabled = not FFlagAppIaScopedScrollAway and nil
+}
+
+t5.__index = t5
+
+local t12 = nil
+
+function t5.onTouchMoved(t6: {[any]: any}, n3: number) -- line: 120
+	-- upvalues: FFlagEnableScrollAwayContentScrollableFix (copy), FFlagAppIaScrollAwayPinHeader (copy)
+	if FFlagEnableScrollAwayContentScrollableFix and not t6.contentScrollable then
+		return
+	end
+
+	local v30 = n3 / t6.scrollDistance
+
+	if t6.footerVisible then
+		t6.footer:update(v30)
+	end
+
+	if FFlagAppIaScrollAwayPinHeader then
+		if not t6.headerScrollAwayDisabled then
+			t6.header:update(v30)
+
+			return
+		end
+	else
+		t6.header:update(v30)
+	end
+end
+function t5.onTouchEnded(p6) -- line: 139
+	-- upvalues: FFlagAppIaScrollAwayPinHeader (copy)
+	if p6.footerVisible then
+		p6.footer:finishUp()
+	end
+
+	if FFlagAppIaScrollAwayPinHeader then
+		if not p6.headerScrollAwayDisabled then
+			p6.header:finishUp()
+
+			return
+		end
+	else
+		p6.header:finishUp()
+	end
+end
+function t5.connectTouch(p7) -- line: 154
+	-- upvalues: UserInputService (copy), v6 (copy), v7 (copy)
+	if p7.connections ~= nil then
+		return
+	end
+
+	p7.connections = {}
+	p7.connections.started = UserInputService.TouchStarted:Connect(function(p8) -- line: 159
+		-- upvalues: p7 (copy), v6 (copy)
+		p7.touching = true
+
+		if v6 then
+			p7.moving = false
+			p7.horizontalLocked = false
+			p7.touchPositionX = p8.Position.X
+		end
+
+		p7.touchPositionY = p8.Position.Y
+	end)
+	p7.connections.moved = UserInputService.TouchMoved:Connect(function(p9) -- line: 168
+		-- upvalues: p7 (copy), v6 (copy), v7 (copy)
+		if not p7.touching then
+			return
+		end
+
+		if v6 and p7.horizontalLocked then
+			return
+		end
+
+		local PositionY = p9.Position.Y
+
+		if not p7.moving then
+			if v6 then
+				local v67 = math.abs(p9.Position.X - p7.touchPositionX)
+				local v68 = math.abs(PositionY - p7.touchPositionY)
+
+				if v67 > v7 and v68 < v67 then
+					p7.horizontalLocked = true
+
+					return
+				end
+
+				if v68 > v7 then
+					p7.moving = true
+					p7.touchPositionY = PositionY
+
+					return
+				end
+			elseif math.abs(PositionY - p7.touchPositionY) > v7 then
+				p7.moving = true
+				p7.touchPositionY = PositionY
+			end
+
+			return
+		end
+
+		local v69 = PositionY - p7.touchPositionY
+
+		p7.touchPositionY = PositionY
+		p7:onTouchMoved(v69)
+	end)
+	p7.connections.ended = UserInputService.TouchEnded:Connect(function(_) -- line: 202
+		-- upvalues: p7 (copy), v6 (copy)
+		if not p7.touching then
+			return
+		end
+
+		p7.touching = false
+		p7.moving = false
+
+		if v6 then
+			p7.horizontalLocked = false
+		end
+
+		p7:onTouchEnded()
+	end)
+end
+function t5.disconnectTouch(p11) -- line: 215
+	if p11.connections == nil then
+		return
+	end
+
+	for _, v in pairs(p11.connections) do
+		v:Disconnect()
+	end
+
+	p11.connections = nil
+end
+function t5.isEnabled(p12) -- line: 228
+	return p12.enabled
+end
+function t5.setEnabled(t7: {[any]: any}, b1: boolean) -- line: 235
+	-- upvalues: FFlagAppIaScopedScrollAway (copy), FFlagEnableScrollAwayContentScrollableFix (copy)
+	if b1 == t7.enabled then
+		return
+	end
+
+	t7.enabled = b1
+
+	if b1 then
+		if not FFlagAppIaScopedScrollAway then
+			t7:connectTouch()
+
+			return
+		end
+
+		if not t7.globalTouchDisabled then
+			t7:connectTouch()
+
+			return
+		end
+	else
+		t7:disconnectTouch()
+
+		if FFlagEnableScrollAwayContentScrollableFix then
+			t7.contentScrollable = true
+		end
+	end
+end
+function t5.setGlobalTouchEnabled(t8: {[any]: any}, b2: boolean) -- line: 261
+	t8.globalTouchDisabled = not b2
+
+	if b2 then
+		if t8.enabled then
+			t8:connectTouch()
+
+			return
+		end
+	else
+		t8:disconnectTouch()
+	end
+end
+function t5.setContentScrollable(t9: {[any]: any}, b3: boolean) -- line: 272
+	if b3 == t9.contentScrollable then
+		return
+	end
+
+	if not b3 then
+		t9:show()
+	end
+
+	t9.contentScrollable = b3
+end
+function t5.setFooterVisible(t10: {[any]: any}, b4: boolean) -- line: 285
+	if b4 == t10.footerVisible then
+		return
+	end
+
+	t10.footerVisible = b4
+
+	if b4 then
+		t10.footer:show()
+
+		return
+	end
+
+	t10.footer:hide()
+end
+function t5.getHeaderBinding(p13) -- line: 300
+	return p13.header:getBinding()
+end
+function t5.getFooterBinding(p14) -- line: 307
+	return p14.footer:getBinding()
+end
+function t5.setHeaderScrollAwayDisabled(t11: {[any]: any}, b5: boolean) -- line: 315
+	-- upvalues: FFlagAppIaScrollAwayPinHeader (copy)
+	if not FFlagAppIaScrollAwayPinHeader then
+		return
+	end
+
+	t11.headerScrollAwayDisabled = b5
+
+	if b5 then
+		t11.header:show()
+	end
+end
+function t5.show(p15) -- line: 328
+	-- upvalues: FFlagEnableScrollAwayContentScrollableFix (copy)
+	if FFlagEnableScrollAwayContentScrollableFix then
+		p15.contentScrollable = true
+	end
+
+	p15.header:show()
+
+	if p15.footerVisible then
+		p15.footer:show()
+	end
+end
+function t5.hide(p16) -- line: 341
+	-- upvalues: FFlagAppIaScrollAwayPinHeader (copy)
+	if FFlagAppIaScrollAwayPinHeader then
+		if not p16.headerScrollAwayDisabled then
+			p16.header:hide()
+		end
+	else
+		p16.header:hide()
+	end
+
+	if p16.footerVisible then
+		p16.footer:hide()
+	end
+end
+function t5.getInstance() -- line: 357
+	-- upvalues: t12 (ref), t5 (copy)
+	if not t12 then
+		t12 = {}
+		setmetatable(t12, t5)
+		t12:initialize()
+	end
+
+	return t12
+end
+function t5.initialize(p17) -- line: 367
+	-- upvalues: t2 (copy)
+	p17.header = t2.create(1)
+	p17.footer = t2.create(0)
+end
+function t5.destroy(p18) -- line: 377
+	-- upvalues: t12 (ref)
+	p18.header:destroy()
+	p18.footer:destroy()
+	p18:disconnectTouch()
+	t12 = nil
+end
+function t5.setScrollDistance(t13: {[any]: any}, n4: number) -- line: 387
+	if n4 == 0 then
+		return
+	end
+
+	t13.scrollDistance = n4
+end
+
 return {
-    isEnabled = function() --[[ Line: 284 ]] --[[ Name: isEnabled ]]
-        -- upvalues: v19 (copy)
-        return v19.getInstance():isEnabled();
-    end, 
-    setEnabled = function(v47) --[[ Line: 287 ]] --[[ Name: setEnabled ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():setEnabled(v47);
-    end, 
-    getHeaderBinding = function() --[[ Line: 290 ]] --[[ Name: getHeaderBinding ]]
-        -- upvalues: v19 (copy)
-        return v19.getInstance():getHeaderBinding();
-    end, 
-    getFooterBinding = function() --[[ Line: 293 ]] --[[ Name: getFooterBinding ]]
-        -- upvalues: v19 (copy)
-        return v19.getInstance():getFooterBinding();
-    end, 
-    setFooterVisible = function(v48) --[[ Line: 296 ]] --[[ Name: setFooterVisible ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():setFooterVisible(v48);
-    end, 
-    show = function() --[[ Line: 299 ]] --[[ Name: show ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():show();
-    end, 
-    hide = function() --[[ Line: 302 ]] --[[ Name: hide ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():hide();
-    end, 
-    destroy = function() --[[ Line: 305 ]] --[[ Name: destroy ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():destroy();
-    end, 
-    setScrollDistance = function(v49) --[[ Line: 308 ]] --[[ Name: setScrollDistance ]]
-        -- upvalues: v19 (copy)
-        v19.getInstance():setScrollDistance(v49);
-    end
-};
+	isEnabled = function() -- line: 399
+		-- upvalues: t5 (copy)
+		return t5.getInstance():isEnabled()
+	end,
+	setEnabled = function(b6: boolean) -- line: 402
+		-- upvalues: t5 (copy)
+		t5.getInstance():setEnabled(b6)
+	end,
+	getHeaderBinding = function() -- line: 405
+		-- upvalues: t5 (copy)
+		return t5.getInstance():getHeaderBinding()
+	end,
+	getFooterBinding = function() -- line: 408
+		-- upvalues: t5 (copy)
+		return t5.getInstance():getFooterBinding()
+	end,
+	setFooterVisible = function(b7: boolean) -- line: 411
+		-- upvalues: t5 (copy)
+		t5.getInstance():setFooterVisible(b7)
+	end,
+	setHeaderScrollAwayDisabled = if not FFlagAppIaScrollAwayPinHeader then nil else function(b8: boolean) -- line: 415
+		-- upvalues: t5 (copy)
+		t5.getInstance():setHeaderScrollAwayDisabled(b8)
+	end,
+	show = function() -- line: 419
+		-- upvalues: t5 (copy)
+		t5.getInstance():show()
+	end,
+	hide = function() -- line: 422
+		-- upvalues: t5 (copy)
+		t5.getInstance():hide()
+	end,
+	destroy = function() -- line: 425
+		-- upvalues: t5 (copy)
+		t5.getInstance():destroy()
+	end,
+	setScrollDistance = function(n5: number) -- line: 428
+		-- upvalues: t5 (copy)
+		t5.getInstance():setScrollDistance(n5)
+	end,
+	setGlobalTouchEnabled = if not FFlagAppIaScopedScrollAway then nil else function(b9: boolean) -- line: 432
+		-- upvalues: t5 (copy)
+		t5.getInstance():setGlobalTouchEnabled(b9)
+	end,
+	onTouchMoved = if not FFlagAppIaScopedScrollAway then nil else function(n6: number) -- line: 437
+		-- upvalues: t5 (copy)
+		local v61 = t5.getInstance()
+
+		if v61.enabled then
+			v61:onTouchMoved(n6)
+		end
+	end,
+	onTouchEnded = if not FFlagAppIaScopedScrollAway then nil else function() -- line: 445
+		-- upvalues: t5 (copy)
+		local v62 = t5.getInstance()
+
+		if v62.enabled then
+			v62:onTouchEnded()
+		end
+	end,
+	setContentScrollable = function(b10: boolean) -- line: 452
+		-- upvalues: t5 (copy)
+		t5.getInstance():setContentScrollable(b10)
+	end
+}

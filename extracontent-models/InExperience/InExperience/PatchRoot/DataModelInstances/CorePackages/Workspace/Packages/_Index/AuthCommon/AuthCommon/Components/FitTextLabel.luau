@@ -1,71 +1,81 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-local v5 = require(l_script_FirstAncestor_0.Components.FitChildren);
-local v6 = v2.PureComponent:extend("FitTextLabel");
-v6.defaultProps = {
-    fitAxis = v5.FitAxis.Height, 
-    maxWidth = nil
-};
-v6.init = function(v7) --[[ Line: 17 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), l_Text_0 (copy)
-    v7.onRef = function(v8) --[[ Line: 18 ]]
-        -- upvalues: v7 (copy)
-        v7.ref = v8;
-    end;
-    v7.resize = function(v9) --[[ Line: 22 ]]
-        -- upvalues: v7 (copy), v5 (ref), l_Text_0 (ref)
-        local l_fitAxis_0 = v7.props.fitAxis;
-        local l_maxWidth_0 = v7.props.maxWidth;
-        if l_fitAxis_0 == v5.FitAxis.Width or l_fitAxis_0 == v5.FitAxis.Both then
-            local v12 = UDim.new(0, l_Text_0.GetTextWidth(v9.Text, v9.Font, v9.TextSize));
-            local v13 = nil;
-            if l_maxWidth_0 ~= nil and l_maxWidth_0 < v12.Offset then
-                v12 = UDim.new(0, l_maxWidth_0);
-                v13 = UDim.new(0, l_Text_0.GetTextHeight(v9.Text, v9.Font, v9.TextSize, v12.Offset));
-            else
-                v13 = l_fitAxis_0 == v5.FitAxis.Both and UDim.new(0, v9.TextSize) or v9.Size.Height;
-            end;
-            v7:setState({
-                width = v12, 
-                height = v13
-            });
-            return;
-        else
-            local v14 = UDim.new(0, l_Text_0.GetTextHeight(v9.Text, v9.Font, v9.TextSize, v9.AbsoluteSize.X));
-            v7:setState({
-                width = v9.Size.Width, 
-                height = v14
-            });
-            return;
-        end;
-    end;
-    v7:setState({
-        width = nil, 
-        height = nil
-    });
-end;
-v6.render = function(v15) --[[ Line: 62 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), l_Immutable_0 (copy), v2 (copy)
-    local v16 = v15.props.fitAxis or v5.FitAxis.Height;
-    local v17 = l_Immutable_0.RemoveFromDictionary(v15.props, "fitAxis", "maxWidth");
-    local l_width_0 = v15.state.width;
-    local l_height_0 = v15.state.height;
-    if l_width_0 and l_height_0 then
-        v17 = l_Immutable_0.JoinDictionaries(v17, {
-            Size = UDim2.new(l_width_0, l_height_0)
-        });
-    end;
-    return v2.createElement("TextLabel", l_Immutable_0.JoinDictionaries(v17, {
-        [v2.Ref] = v15.onRef, 
-        [v2.Change.Text] = v15.resize, 
-        [v2.Change.TextSize] = v15.resize, 
-        [v2.Change.AbsoluteSize] = v16 == v5.FitAxis.Height and v15.resize or nil
-    }));
-end;
-v6.didMount = function(v20) --[[ Line: 85 ]] --[[ Name: didMount ]]
-    v20.resize(v20.ref);
-end;
-return v6;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Roact = require(AuthCommonParent.Roact)
+local Immutable = require(AuthCommonParent.AppCommonLib).Immutable
+local Text = require(AuthCommonParent.AppCommonLib).Text
+local FitChildren = require(AuthCommon.Components.FitChildren)
+local v7 = Roact.PureComponent:extend("FitTextLabel")
+
+v7.defaultProps = {
+	maxWidth = nil,
+	fitAxis = FitChildren.FitAxis.Height
+}
+
+function v7.init(p1) -- line: 17
+	-- upvalues: FitChildren (copy), Text (copy)
+	function p1.onRef(p2) -- line: 18
+		-- upvalues: p1 (copy)
+		p1.ref = p2
+	end
+	function p1.resize(p3) -- line: 22
+		-- upvalues: p1 (copy), FitChildren (copy), Text (copy)
+		local fitAxis = p1.props.fitAxis
+		local maxWidth = p1.props.maxWidth
+
+		if fitAxis == FitChildren.FitAxis.Width or fitAxis == FitChildren.FitAxis.Both then
+			local uDim = UDim.new(0, Text.GetTextWidth(p3.Text, p3.Font, p3.TextSize))
+			local uDim2
+
+			if maxWidth ~= nil and maxWidth < uDim.Offset then
+				uDim = UDim.new(0, maxWidth)
+				uDim2 = UDim.new(0, Text.GetTextHeight(p3.Text, p3.Font, p3.TextSize, uDim.Offset))
+			else
+				uDim2 = fitAxis == FitChildren.FitAxis.Both and UDim.new(0, p3.TextSize) or p3.Size.Height
+			end
+
+			p1:setState({
+				width = uDim,
+				height = uDim2
+			})
+
+			return
+		end
+
+		local uDim = UDim.new(0, Text.GetTextHeight(p3.Text, p3.Font, p3.TextSize, p3.AbsoluteSize.X))
+
+		p1:setState({
+			width = p3.Size.Width,
+			height = uDim
+		})
+	end
+
+	p1:setState({
+		width = nil,
+		height = nil
+	})
+end
+function v7.render(p4) -- line: 62
+	-- upvalues: FitChildren (copy), Immutable (copy), Roact (copy)
+	local v10 = p4.props.fitAxis or FitChildren.FitAxis.Height
+	local v11 = Immutable.RemoveFromDictionary(p4.props, "fitAxis", "maxWidth")
+	local width = p4.state.width
+	local height = p4.state.height
+
+	if width and height then
+		v11 = Immutable.JoinDictionaries(v11, {
+			Size = UDim2.new(width, height)
+		})
+	end
+
+	return Roact.createElement("TextLabel", Immutable.JoinDictionaries(v11, {
+		[Roact.Ref] = p4.onRef,
+		[Roact.Change.Text] = p4.resize,
+		[Roact.Change.TextSize] = p4.resize,
+		[Roact.Change.AbsoluteSize] = v10 == FitChildren.FitAxis.Height and p4.resize or nil
+	}))
+end
+function v7.didMount(p5) -- line: 85
+	p5.resize(p5.ref)
+end
+
+return v7

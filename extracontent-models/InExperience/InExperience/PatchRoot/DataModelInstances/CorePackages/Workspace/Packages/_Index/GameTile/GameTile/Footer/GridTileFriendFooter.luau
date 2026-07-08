@@ -1,158 +1,175 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_Colors_0 = require(l_Parent_0.Style).Colors;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local v7 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v7.Core.Style.useStyle;
-local l_useTextSizeOffset_0 = v7.Core.Style.useTextSizeOffset;
-local l_CoPlayFooter_0 = v7.App.Tile.ExperienceTileMetadata.CoPlayFooter;
-local v11 = require(l_Parent_0.UserProfiles);
-local l_useUserProfilesFetch_0 = v11.Hooks.useUserProfilesFetch;
-local v13 = require(l_script_FirstAncestor_0.sortFriendsByPresenceAndRecencyFactory);
-local l_FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix;
-local function v18(v15) --[[ Line: 37 ]] --[[ Name: getUserIdsForFacePile ]]
-    local v16 = {};
-    for v17 = 1, #v15 do
-        v16[v17] = v15[v17].userId;
-    end;
-    return v16;
-end;
-local function v22(v19, v20) --[[ Line: 46 ]] --[[ Name: getDisplayName ]]
-    -- upvalues: l_Array_0 (copy)
-    return l_Array_0.join(l_Array_0.map(v19, function(v21) --[[ Line: 48 ]]
-        return v21.displayName;
-    end), v20);
-end;
-local function v28(v23) --[[ Line: 55 ]] --[[ Name: useFetchSortedDisplayNames ]]
-    -- upvalues: l_useUserProfilesFetch_0 (copy), v11 (copy), v13 (copy)
-    local v24 = {};
-    local v25 = l_useUserProfilesFetch_0({
-        userIds = v23, 
-        query = v11.Queries.userProfilesCombinedNameByUserIds, 
-        skip = not v23 or #v23 == 0
-    });
-    if v25 and v25.data and v23 then
-        for _, v27 in v23 do
-            table.insert(v24, {
-                userId = v27, 
-                displayName = v11.Selectors.getCombinedNameFromId(v25.data, v27)
-            });
-        end;
-    end;
-    table.sort(v24, v13("displayName"));
-    return v24;
-end;
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local React = require(GameTileParent.React)
+local useDesignTokens = require(GameTileParent.Style).useDesignTokens
+local Colors = require(GameTileParent.Style).Colors
+local useLocalization = require(GameTileParent.Localization).Hooks.useLocalization
+local Array = require(GameTileParent.LuauPolyfill).Array
+local UIBlox = require(GameTileParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local useTextSizeOffset = UIBlox.Core.Style.useTextSizeOffset
+local CoPlayFooter = UIBlox.App.Tile.ExperienceTileMetadata.CoPlayFooter
+local UserProfiles = require(GameTileParent.UserProfiles)
+local useUserProfilesFetch = UserProfiles.Hooks.useUserProfilesFetch
+local sortFriendsByPresenceAndRecencyFactory = require(GameTile.sortFriendsByPresenceAndRecencyFactory)
+local FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix = require(GameTileParent.SharedFlags).FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix
+
+local function useFetchSortedDisplayNames(t1: {[any]: any}) -- line: 55
+	-- upvalues: useUserProfilesFetch (copy), UserProfiles (copy), sortFriendsByPresenceAndRecencyFactory (copy)
+	local t2 = {}
+	local v24 = useUserProfilesFetch({
+		userIds = t1,
+		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds,
+		skip = not t1 or #t1 == 0
+	})
+
+	if v24 and (v24.data and t1) then
+		for _, v26 in t1 do
+			table.insert(t2, {
+				userId = v26,
+				displayName = UserProfiles.Selectors.getCombinedNameFromId(v24.data, v26)
+			})
+		end
+	end
+
+	table.sort(t2, sortFriendsByPresenceAndRecencyFactory("displayName"))
+
+	return t2
+end
+
 return {
-    GridTileFriendFooter = function(v29) --[[ Line: 77 ]] --[[ Name: GridTileFriendFooter ]]
-        -- upvalues: l_useStyle_0 (copy), l_useDesignTokens_0 (copy), l_useTextSizeOffset_0 (copy), l_useLocalization_0 (copy), l_FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix_0 (copy), v28 (copy), v2 (copy), l_CoPlayFooter_0 (copy), l_Array_0 (copy), l_Colors_0 (copy)
-        local v30 = if v29.useLargerFont then l_useStyle_0().Font.Body else l_useStyle_0().Font.CaptionHeader;
-        local l_Global_0 = l_useDesignTokens_0().Global;
-        local v32 = l_useTextSizeOffset_0();
-        local v33 = l_useLocalization_0({
-            friendsSeparator = "Feature.GameDetails.Label.FriendsSeparator"
-        });
-        local l_Space_50_0 = l_Global_0.Space_50;
-        if not v29.showOnlineBorder then
-            l_Space_50_0 = l_Space_50_0 - 3;
-        end;
-        if l_FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix_0 then
-            local v35 = v28(v29.friendUserIds or {});
-            local l_createElement_0 = v2.createElement;
-            local v37 = "TextButton";
-            local v38 = {
-                Size = UDim2.new(1, 0, 0, l_Global_0.Space_250 + v32), 
-                BackgroundTransparency = 1, 
-                Text = "", 
-                AutoButtonColor = false, 
-                [v2.Event.Activated] = v29.onFriendFooterActivated, 
-                Selectable = false
-            };
-            local v39 = {};
-            local l_createElement_1 = v2.createElement;
-            local l_l_CoPlayFooter_0_0 = l_CoPlayFooter_0;
-            local v42 = {};
-            local v43 = {};
-            for v44 = 1, #v35 do
-                v43[v44] = v35[v44].userId;
-            end;
-            v42.users = v43;
-            v43 = v33.friendsSeparator;
-            v42.labelText = l_Array_0.join(l_Array_0.map(v35, function(v45) --[[ Line: 48 ]]
-                return v45.displayName;
-            end), v43);
-            v42.showEmphasisBorder = v29.showOnlineBorder;
-            v42.faceGroupCount = 2;
-            v42.styleProps = {
-                faceWidth = l_Global_0.Size_250, 
-                faceHeight = l_Global_0.Size_250, 
-                faceGroupGap = -l_Global_0.Space_75, 
-                containerGap = l_Space_50_0, 
-                badgeBorderWidth = 3, 
-                badgeHeight = l_Global_0.Size_250, 
-                fontStyle = v30, 
-                badgeSpacingLeading = l_Global_0.Space_50, 
-                badgeSpacingTrailing = l_Global_0.Space_50, 
-                badgeBackgroundColor = {
-                    Color = l_Colors_0.Smoke, 
-                    Transparency = 0
-                }, 
-                badgeContentColor = {
-                    Color = l_Colors_0.White, 
-                    Transparency = 0
-                }
-            };
-            v39.OnlineFriends = l_createElement_1(l_l_CoPlayFooter_0_0, v42);
-            return (l_createElement_0(v37, v38, v39));
-        else
-            local l_createElement_2 = v2.createElement;
-            local v47 = "Frame";
-            local v48 = {
-                Size = UDim2.new(1, 0, 0, l_Global_0.Space_250 + v32), 
-                BackgroundTransparency = 1
-            };
-            local v49 = {};
-            local l_createElement_3 = v2.createElement;
-            local l_l_CoPlayFooter_0_1 = l_CoPlayFooter_0;
-            local v52 = {};
-            local v53 = v29.friends or {};
-            local v54 = {};
-            for v55 = 1, #v53 do
-                v54[v55] = v53[v55].userId;
-            end;
-            v52.users = v54;
-            v53 = v29.friends or {};
-            v54 = v33.friendsSeparator;
-            v52.labelText = l_Array_0.join(l_Array_0.map(v53, function(v56) --[[ Line: 48 ]]
-                return v56.displayName;
-            end), v54);
-            v52.showEmphasisBorder = v29.showOnlineBorder;
-            v52.faceGroupCount = 2;
-            v52.styleProps = {
-                faceWidth = l_Global_0.Size_250, 
-                faceHeight = l_Global_0.Size_250, 
-                faceGroupGap = -l_Global_0.Space_75, 
-                containerGap = l_Space_50_0, 
-                badgeBorderWidth = 3, 
-                badgeHeight = l_Global_0.Size_250, 
-                fontStyle = v30, 
-                badgeSpacingLeading = l_Global_0.Space_50, 
-                badgeSpacingTrailing = l_Global_0.Space_50, 
-                badgeBackgroundColor = {
-                    Color = l_Colors_0.Smoke, 
-                    Transparency = 0
-                }, 
-                badgeContentColor = {
-                    Color = l_Colors_0.White, 
-                    Transparency = 0
-                }
-            };
-            v49.OnlineFriends = l_createElement_3(l_l_CoPlayFooter_0_1, v52);
-            return l_createElement_2(v47, v48, v49);
-        end;
-    end, 
-    getUserIdsForFacePile = v18, 
-    getDisplayName = v22
-};
+	GridTileFriendFooter = function(t3: {[any]: any}) -- line: 77
+		-- upvalues: useStyle (copy), useDesignTokens (copy), useTextSizeOffset (copy), useLocalization (copy), FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix (copy), useFetchSortedDisplayNames (copy), React (copy), CoPlayFooter (copy), Array (copy), Colors (copy)
+		local v28 = if not t3.useLargerFont then useStyle().Font.CaptionHeader else useStyle().Font.Body
+		local Global = useDesignTokens().Global
+		local v30 = useTextSizeOffset()
+		local v31 = useLocalization({
+			friendsSeparator = "Feature.GameDetails.Label.FriendsSeparator"
+		})
+		local Space_50 = Global.Space_50
+
+		if not t3.showOnlineBorder then
+			Space_50 -= 3
+		end
+
+		if FFlagLuaAppMigrateGameTileActiveFriendsHydrationFix then
+			local v33 = useFetchSortedDisplayNames(t3.friendUserIds or {})
+			local createElement = React.createElement
+			local t4 = {
+				Size = UDim2.new(1, 0, 0, Global.Space_250 + v30),
+				BackgroundTransparency = 1,
+				Text = "",
+				AutoButtonColor = false,
+				[React.Event.Activated] = t3.onFriendFooterActivated,
+				Selectable = false
+			}
+			local t5 = {}
+			local createElement2 = React.createElement
+			local v38 = CoPlayFooter
+			local t6 = {
+				faceGroupCount = 2
+			}
+			local t7 = {}
+
+			for i = 1, #v33 do
+				t7[i] = v33[i].userId
+			end
+
+			t6.users = t7
+
+			local friendsSeparator = v31.friendsSeparator
+
+			t6.labelText = Array.join(Array.map(v33, function(p1) -- line: 48
+				return p1.displayName
+			end), friendsSeparator)
+			t6.showEmphasisBorder = t3.showOnlineBorder
+			t6.styleProps = {
+				badgeBorderWidth = 3,
+				faceWidth = Global.Size_250,
+				faceHeight = Global.Size_250,
+				faceGroupGap = -Global.Space_75,
+				containerGap = Space_50,
+				badgeHeight = Global.Size_250,
+				fontStyle = v28,
+				badgeSpacingLeading = Global.Space_50,
+				badgeSpacingTrailing = Global.Space_50,
+				badgeBackgroundColor = {
+					Transparency = 0,
+					Color = Colors.Smoke
+				},
+				badgeContentColor = {
+					Transparency = 0,
+					Color = Colors.White
+				}
+			}
+			t5.OnlineFriends = createElement2(v38, t6)
+
+			return (createElement("TextButton", t4, t5))
+		end
+
+		local createElement = React.createElement
+		local t8 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, Global.Space_250 + v30)
+		}
+		local t9 = {}
+		local createElement3 = React.createElement
+		local v47 = CoPlayFooter
+		local t10 = {
+			faceGroupCount = 2
+		}
+		local v49 = t3.friends or {}
+		local t11 = {}
+
+		for i = 1, #v49 do
+			t11[i] = v49[i].userId
+		end
+
+		t10.users = t11
+
+		local v52 = t3.friends or {}
+		local friendsSeparator = v31.friendsSeparator
+
+		t10.labelText = Array.join(Array.map(v52, function(p2) -- line: 48
+			return p2.displayName
+		end), friendsSeparator)
+		t10.showEmphasisBorder = t3.showOnlineBorder
+		t10.styleProps = {
+			badgeBorderWidth = 3,
+			faceWidth = Global.Size_250,
+			faceHeight = Global.Size_250,
+			faceGroupGap = -Global.Space_75,
+			containerGap = Space_50,
+			badgeHeight = Global.Size_250,
+			fontStyle = v28,
+			badgeSpacingLeading = Global.Space_50,
+			badgeSpacingTrailing = Global.Space_50,
+			badgeBackgroundColor = {
+				Transparency = 0,
+				Color = Colors.Smoke
+			},
+			badgeContentColor = {
+				Transparency = 0,
+				Color = Colors.White
+			}
+		}
+		t9.OnlineFriends = createElement3(v47, t10)
+
+		return createElement("Frame", t8, t9)
+	end,
+	getUserIdsForFacePile = function(t12: {[any]: any}) -- line: 37
+		local t13 = {}
+
+		for i = 1, #t12 do
+			t13[i] = t12[i].userId
+		end
+
+		return t13
+	end,
+	getDisplayName = function(t14: {[any]: any}, s1: string) -- line: 46
+		-- upvalues: Array (copy)
+		return Array.join(Array.map(t14, function(p3) -- line: 48
+			return p3.displayName
+		end), s1)
+	end
+}

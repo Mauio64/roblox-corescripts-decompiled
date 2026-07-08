@@ -1,1 +1,1 @@
-return game:DefineFastInt("LinkingProtocolFetchRetries", 1);
+return game:DefineFastInt("LinkingProtocolFetchRetries", 1)

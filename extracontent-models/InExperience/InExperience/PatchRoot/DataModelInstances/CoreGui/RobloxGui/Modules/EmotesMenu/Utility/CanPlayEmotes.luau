@@ -1,622 +1,834 @@
-local l_Players_0 = game:GetService("Players");
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-if not l_LocalPlayer_0 then
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v2 = {
-    Value = false, 
-    ChangedEvent = Instance.new("BindableEvent")
-};
-local function _(v3) --[[ Line: 15 ]] --[[ Name: getAnimateScript ]]
-    if not v3 then
-        return nil;
-    else
-        local l_Animate_0 = v3:FindFirstChild("Animate");
-        if l_Animate_0 and l_Animate_0:IsA("LocalScript") then
-            return l_Animate_0;
-        elseif l_Animate_0 and l_Animate_0:IsA("Script") and l_Animate_0.RunContext == Enum.RunContext.Client then
-            return l_Animate_0;
-        else
-            return nil;
-        end;
-    end;
-end;
-local function _(v6) --[[ Line: 31 ]] --[[ Name: getPlayEmoteBindable ]]
-    local v7;
-    if not v6 then
-        v7 = nil;
-    else
-        local l_Animate_1 = v6:FindFirstChild("Animate");
-        v7 = if l_Animate_1 and l_Animate_1:IsA("LocalScript") then l_Animate_1 else if l_Animate_1 and l_Animate_1:IsA("Script") and l_Animate_1.RunContext == Enum.RunContext.Client then l_Animate_1 else nil;
-    end;
-    if not v7 then
-        return nil;
-    else
-        local l_PlayEmote_0 = v7:FindFirstChild("PlayEmote");
-        if l_PlayEmote_0 and l_PlayEmote_0:IsA("BindableFunction") then
-            return l_PlayEmote_0;
-        else
-            return nil;
-        end;
-    end;
-end;
-local function _(v11) --[[ Line: 45 ]] --[[ Name: getCanPlayEmotes ]]
-    local v12;
-    if not v11 then
-        v12 = nil;
-    else
-        local l_Animate_2 = v11:FindFirstChild("Animate");
-        v12 = if l_Animate_2 and l_Animate_2:IsA("LocalScript") then l_Animate_2 else if l_Animate_2 and l_Animate_2:IsA("Script") and l_Animate_2.RunContext == Enum.RunContext.Client then l_Animate_2 else nil;
-    end;
-    local v14;
-    if not v12 then
-        v14 = nil;
-    else
-        local l_PlayEmote_1 = v12:FindFirstChild("PlayEmote");
-        v14 = if l_PlayEmote_1 and l_PlayEmote_1:IsA("BindableFunction") then l_PlayEmote_1 else nil;
-    end;
-    return v14 ~= nil;
-end;
-local v17 = nil;
-local v18 = nil;
-local v19 = nil;
-local function _() --[[ Line: 52 ]] --[[ Name: disconnectListeners ]]
-    -- upvalues: v17 (ref), v18 (ref), v19 (ref)
-    if v17 then
-        v17:Disconnect();
-        v17 = nil;
-    end;
-    if v18 then
-        v18:Disconnect();
-        v18 = nil;
-    end;
-    if v19 then
-        v19:Disconnect();
-        v19 = nil;
-    end;
-end;
-local v21 = nil;
-local function _(v22) --[[ Line: 71 ]] --[[ Name: checkUpdate ]]
-    -- upvalues: v2 (copy), v21 (ref)
-    local v23;
-    if not v22 then
-        v23 = nil;
-    else
-        local l_Animate_3 = v22:FindFirstChild("Animate");
-        v23 = if l_Animate_3 and l_Animate_3:IsA("LocalScript") then l_Animate_3 else if l_Animate_3 and l_Animate_3:IsA("Script") and l_Animate_3.RunContext == Enum.RunContext.Client then l_Animate_3 else nil;
-    end;
-    local v25;
-    if not v23 then
-        v25 = nil;
-    else
-        local l_PlayEmote_2 = v23:FindFirstChild("PlayEmote");
-        v25 = if l_PlayEmote_2 and l_PlayEmote_2:IsA("BindableFunction") then l_PlayEmote_2 else nil;
-    end;
-    local v27 = v25 ~= nil;
-    if v2.Value ~= v27 then
-        v2.Value = v27;
-        v2.ChangedEvent:Fire(v27);
-    end;
-    v21(v27, v22);
-end;
-local function _(v29) --[[ Line: 82 ]] --[[ Name: connectAnimateAddedListener ]]
-    -- upvalues: v2 (copy), v21 (ref), v17 (ref)
-    local v30;
-    if not v29 then
-        v30 = nil;
-    else
-        local l_Animate_4 = v29:FindFirstChild("Animate");
-        v30 = if l_Animate_4 and l_Animate_4:IsA("LocalScript") then l_Animate_4 else if l_Animate_4 and l_Animate_4:IsA("Script") and l_Animate_4.RunContext == Enum.RunContext.Client then l_Animate_4 else nil;
-    end;
-    if v30 then
-        local v32;
-        if not v29 then
-            v32 = nil;
-        else
-            local l_Animate_5 = v29:FindFirstChild("Animate");
-            v32 = if l_Animate_5 and l_Animate_5:IsA("LocalScript") then l_Animate_5 else if l_Animate_5 and l_Animate_5:IsA("Script") and l_Animate_5.RunContext == Enum.RunContext.Client then l_Animate_5 else nil;
-        end;
-        local v34;
-        if not v32 then
-            v34 = nil;
-        else
-            local l_PlayEmote_3 = v32:FindFirstChild("PlayEmote");
-            v34 = if l_PlayEmote_3 and l_PlayEmote_3:IsA("BindableFunction") then l_PlayEmote_3 else nil;
-        end;
-        local v36 = v34 ~= nil;
-        if v2.Value ~= v36 then
-            v2.Value = v36;
-            v2.ChangedEvent:Fire(v36);
-        end;
-        v21(v36, v29);
-        return;
-    else
-        v17 = v29.ChildAdded:Connect(function(v37) --[[ Line: 89 ]]
-            -- upvalues: v29 (copy), v2 (ref), v21 (ref)
-            if (v37:IsA("LocalScript") or v37:IsA("Script") and v37.RunContext == Enum.RunContext.Client) and v37.Name == "Animate" then
-                local l_v29_0 = v29;
-                local v39;
-                if not l_v29_0 then
-                    v39 = nil;
-                else
-                    local l_Animate_6 = l_v29_0:FindFirstChild("Animate");
-                    v39 = if l_Animate_6 and l_Animate_6:IsA("LocalScript") then l_Animate_6 else if l_Animate_6 and l_Animate_6:IsA("Script") and l_Animate_6.RunContext == Enum.RunContext.Client then l_Animate_6 else nil;
-                end;
-                local v41;
-                if not v39 then
-                    v41 = nil;
-                else
-                    local l_PlayEmote_4 = v39:FindFirstChild("PlayEmote");
-                    v41 = if l_PlayEmote_4 and l_PlayEmote_4:IsA("BindableFunction") then l_PlayEmote_4 else nil;
-                end;
-                local v43 = v41 ~= nil;
-                if v2.Value ~= v43 then
-                    v2.Value = v43;
-                    v2.ChangedEvent:Fire(v43);
-                end;
-                v21(v43, l_v29_0);
-            end;
-        end);
-        return;
-    end;
-end;
-local function _(v45, v46) --[[ Line: 98 ]] --[[ Name: connectPlayEmoteAddedListener ]]
-    -- upvalues: v2 (copy), v21 (ref), v18 (ref)
-    local v47;
-    if not v45 then
-        v47 = nil;
-    else
-        local l_Animate_7 = v45:FindFirstChild("Animate");
-        v47 = if l_Animate_7 and l_Animate_7:IsA("LocalScript") then l_Animate_7 else if l_Animate_7 and l_Animate_7:IsA("Script") and l_Animate_7.RunContext == Enum.RunContext.Client then l_Animate_7 else nil;
-    end;
-    local v49;
-    if not v47 then
-        v49 = nil;
-    else
-        local l_PlayEmote_5 = v47:FindFirstChild("PlayEmote");
-        v49 = if l_PlayEmote_5 and l_PlayEmote_5:IsA("BindableFunction") then l_PlayEmote_5 else nil;
-    end;
-    if v49 then
-        local v51;
-        if not v45 then
-            v51 = nil;
-        else
-            local l_Animate_8 = v45:FindFirstChild("Animate");
-            v51 = if l_Animate_8 and l_Animate_8:IsA("LocalScript") then l_Animate_8 else if l_Animate_8 and l_Animate_8:IsA("Script") and l_Animate_8.RunContext == Enum.RunContext.Client then l_Animate_8 else nil;
-        end;
-        local v53;
-        if not v51 then
-            v53 = nil;
-        else
-            local l_PlayEmote_6 = v51:FindFirstChild("PlayEmote");
-            v53 = if l_PlayEmote_6 and l_PlayEmote_6:IsA("BindableFunction") then l_PlayEmote_6 else nil;
-        end;
-        v47 = v53 ~= nil;
-        if v2.Value ~= v47 then
-            v2.Value = v47;
-            v2.ChangedEvent:Fire(v47);
-        end;
-        v21(v47, v45);
-        return;
-    else
-        v18 = v46.ChildAdded:Connect(function(v55) --[[ Line: 105 ]]
-            -- upvalues: v45 (copy), v2 (ref), v21 (ref)
-            if v55:IsA("BindableFunction") and v55.Name == "PlayEmote" then
-                local l_v45_0 = v45;
-                local v57;
-                if not l_v45_0 then
-                    v57 = nil;
-                else
-                    local l_Animate_9 = l_v45_0:FindFirstChild("Animate");
-                    v57 = if l_Animate_9 and l_Animate_9:IsA("LocalScript") then l_Animate_9 else if l_Animate_9 and l_Animate_9:IsA("Script") and l_Animate_9.RunContext == Enum.RunContext.Client then l_Animate_9 else nil;
-                end;
-                local v59;
-                if not v57 then
-                    v59 = nil;
-                else
-                    local l_PlayEmote_7 = v57:FindFirstChild("PlayEmote");
-                    v59 = if l_PlayEmote_7 and l_PlayEmote_7:IsA("BindableFunction") then l_PlayEmote_7 else nil;
-                end;
-                local v61 = v59 ~= nil;
-                if v2.Value ~= v61 then
-                    v2.Value = v61;
-                    v2.ChangedEvent:Fire(v61);
-                end;
-                v21(v61, l_v45_0);
-            end;
-        end);
-        return;
-    end;
-end;
-local _ = function(v63) --[[ Line: 112 ]] --[[ Name: connectPlayEmoteRemovedListener ]]
-    -- upvalues: v2 (copy), v21 (ref), v19 (ref)
-    local v64;
-    if not v63 then
-        v64 = nil;
-    else
-        local l_Animate_10 = v63:FindFirstChild("Animate");
-        v64 = if l_Animate_10 and l_Animate_10:IsA("LocalScript") then l_Animate_10 else if l_Animate_10 and l_Animate_10:IsA("Script") and l_Animate_10.RunContext == Enum.RunContext.Client then l_Animate_10 else nil;
-    end;
-    local v66;
-    if not v64 then
-        v66 = nil;
-    else
-        local l_PlayEmote_8 = v64:FindFirstChild("PlayEmote");
-        v66 = if l_PlayEmote_8 and l_PlayEmote_8:IsA("BindableFunction") then l_PlayEmote_8 else nil;
-    end;
-    if not v66 then
-        local v68;
-        if not v63 then
-            v68 = nil;
-        else
-            local l_Animate_11 = v63:FindFirstChild("Animate");
-            v68 = if l_Animate_11 and l_Animate_11:IsA("LocalScript") then l_Animate_11 else if l_Animate_11 and l_Animate_11:IsA("Script") and l_Animate_11.RunContext == Enum.RunContext.Client then l_Animate_11 else nil;
-        end;
-        local v70;
-        if not v68 then
-            v70 = nil;
-        else
-            local l_PlayEmote_9 = v68:FindFirstChild("PlayEmote");
-            v70 = if l_PlayEmote_9 and l_PlayEmote_9:IsA("BindableFunction") then l_PlayEmote_9 else nil;
-        end;
-        v64 = v70 ~= nil;
-        if v2.Value ~= v64 then
-            v2.Value = v64;
-            v2.ChangedEvent:Fire(v64);
-        end;
-        v21(v64, v63);
-        return;
-    else
-        v19 = v66.AncestryChanged:Connect(function(_, v73) --[[ Line: 119 ]]
-            -- upvalues: v66 (copy), v63 (copy), v2 (ref), v21 (ref)
-            if not v73 or not v66:IsDescendantOf(v63) then
-                local l_v63_0 = v63;
-                local v75;
-                if not l_v63_0 then
-                    v75 = nil;
-                else
-                    local l_Animate_12 = l_v63_0:FindFirstChild("Animate");
-                    v75 = if l_Animate_12 and l_Animate_12:IsA("LocalScript") then l_Animate_12 else if l_Animate_12 and l_Animate_12:IsA("Script") and l_Animate_12.RunContext == Enum.RunContext.Client then l_Animate_12 else nil;
-                end;
-                local v77;
-                if not v75 then
-                    v77 = nil;
-                else
-                    local l_PlayEmote_10 = v75:FindFirstChild("PlayEmote");
-                    v77 = if l_PlayEmote_10 and l_PlayEmote_10:IsA("BindableFunction") then l_PlayEmote_10 else nil;
-                end;
-                local v79 = v77 ~= nil;
-                if v2.Value ~= v79 then
-                    v2.Value = v79;
-                    v2.ChangedEvent:Fire(v79);
-                end;
-                v21(v79, l_v63_0);
-            end;
-        end);
-        return;
-    end;
-end;
-v21 = function(v81, v82) --[[ Line: 126 ]]
-    -- upvalues: v17 (ref), v18 (ref), v19 (ref), v2 (copy), v21 (ref)
-    if v17 then
-        v17:Disconnect();
-        v17 = nil;
-    end;
-    if v18 then
-        v18:Disconnect();
-        v18 = nil;
-    end;
-    if v19 then
-        v19:Disconnect();
-        v19 = nil;
-    end;
-    if not v82 then
-        return;
-    elseif v81 then
-        local v83;
-        if not v82 then
-            v83 = nil;
-        else
-            local l_Animate_13 = v82:FindFirstChild("Animate");
-            v83 = if l_Animate_13 and l_Animate_13:IsA("LocalScript") then l_Animate_13 else if l_Animate_13 and l_Animate_13:IsA("Script") and l_Animate_13.RunContext == Enum.RunContext.Client then l_Animate_13 else nil;
-        end;
-        local v85;
-        if not v83 then
-            v85 = nil;
-        else
-            local l_PlayEmote_11 = v83:FindFirstChild("PlayEmote");
-            v85 = if l_PlayEmote_11 and l_PlayEmote_11:IsA("BindableFunction") then l_PlayEmote_11 else nil;
-        end;
-        if not v85 then
-            local v87;
-            if not v82 then
-                v87 = nil;
-            else
-                local l_Animate_14 = v82:FindFirstChild("Animate");
-                v87 = if l_Animate_14 and l_Animate_14:IsA("LocalScript") then l_Animate_14 else if l_Animate_14 and l_Animate_14:IsA("Script") and l_Animate_14.RunContext == Enum.RunContext.Client then l_Animate_14 else nil;
-            end;
-            local v89;
-            if not v87 then
-                v89 = nil;
-            else
-                local l_PlayEmote_12 = v87:FindFirstChild("PlayEmote");
-                v89 = if l_PlayEmote_12 and l_PlayEmote_12:IsA("BindableFunction") then l_PlayEmote_12 else nil;
-            end;
-            v83 = v89 ~= nil;
-            if v2.Value ~= v83 then
-                v2.Value = v83;
-                v2.ChangedEvent:Fire(v83);
-            end;
-            v21(v83, v82);
-            return;
-        else
-            v19 = v85.AncestryChanged:Connect(function(_, v92) --[[ Line: 119 ]]
-                -- upvalues: v85 (copy), v82 (copy), v2 (ref), v21 (ref)
-                if not v92 or not v85:IsDescendantOf(v82) then
-                    local l_v82_0 = v82;
-                    local v94;
-                    if not l_v82_0 then
-                        v94 = nil;
-                    else
-                        local l_Animate_15 = l_v82_0:FindFirstChild("Animate");
-                        v94 = if l_Animate_15 and l_Animate_15:IsA("LocalScript") then l_Animate_15 else if l_Animate_15 and l_Animate_15:IsA("Script") and l_Animate_15.RunContext == Enum.RunContext.Client then l_Animate_15 else nil;
-                    end;
-                    local v96;
-                    if not v94 then
-                        v96 = nil;
-                    else
-                        local l_PlayEmote_13 = v94:FindFirstChild("PlayEmote");
-                        v96 = if l_PlayEmote_13 and l_PlayEmote_13:IsA("BindableFunction") then l_PlayEmote_13 else nil;
-                    end;
-                    local v98 = v96 ~= nil;
-                    if v2.Value ~= v98 then
-                        v2.Value = v98;
-                        v2.ChangedEvent:Fire(v98);
-                    end;
-                    v21(v98, l_v82_0);
-                end;
-            end);
-            return;
-        end;
-    else
-        local v99;
-        if not v82 then
-            v99 = nil;
-        else
-            local l_Animate_16 = v82:FindFirstChild("Animate");
-            v99 = if l_Animate_16 and l_Animate_16:IsA("LocalScript") then l_Animate_16 else if l_Animate_16 and l_Animate_16:IsA("Script") and l_Animate_16.RunContext == Enum.RunContext.Client then l_Animate_16 else nil;
-        end;
-        if v99 then
-            local v101;
-            if not v82 then
-                v101 = nil;
-            else
-                local l_Animate_17 = v82:FindFirstChild("Animate");
-                v101 = if l_Animate_17 and l_Animate_17:IsA("LocalScript") then l_Animate_17 else if l_Animate_17 and l_Animate_17:IsA("Script") and l_Animate_17.RunContext == Enum.RunContext.Client then l_Animate_17 else nil;
-            end;
-            local v103;
-            if not v101 then
-                v103 = nil;
-            else
-                local l_PlayEmote_14 = v101:FindFirstChild("PlayEmote");
-                v103 = if l_PlayEmote_14 and l_PlayEmote_14:IsA("BindableFunction") then l_PlayEmote_14 else nil;
-            end;
-            if v103 then
-                local v105;
-                if not v82 then
-                    v105 = nil;
-                else
-                    local l_Animate_18 = v82:FindFirstChild("Animate");
-                    v105 = if l_Animate_18 and l_Animate_18:IsA("LocalScript") then l_Animate_18 else if l_Animate_18 and l_Animate_18:IsA("Script") and l_Animate_18.RunContext == Enum.RunContext.Client then l_Animate_18 else nil;
-                end;
-                local v107;
-                if not v105 then
-                    v107 = nil;
-                else
-                    local l_PlayEmote_15 = v105:FindFirstChild("PlayEmote");
-                    v107 = if l_PlayEmote_15 and l_PlayEmote_15:IsA("BindableFunction") then l_PlayEmote_15 else nil;
-                end;
-                v101 = v107 ~= nil;
-                if v2.Value ~= v101 then
-                    v2.Value = v101;
-                    v2.ChangedEvent:Fire(v101);
-                end;
-                v21(v101, v82);
-                return;
-            else
-                v18 = v99.ChildAdded:Connect(function(v109) --[[ Line: 105 ]]
-                    -- upvalues: v82 (copy), v2 (ref), v21 (ref)
-                    if v109:IsA("BindableFunction") and v109.Name == "PlayEmote" then
-                        local l_v82_1 = v82;
-                        local v111;
-                        if not l_v82_1 then
-                            v111 = nil;
-                        else
-                            local l_Animate_19 = l_v82_1:FindFirstChild("Animate");
-                            v111 = if l_Animate_19 and l_Animate_19:IsA("LocalScript") then l_Animate_19 else if l_Animate_19 and l_Animate_19:IsA("Script") and l_Animate_19.RunContext == Enum.RunContext.Client then l_Animate_19 else nil;
-                        end;
-                        local v113;
-                        if not v111 then
-                            v113 = nil;
-                        else
-                            local l_PlayEmote_16 = v111:FindFirstChild("PlayEmote");
-                            v113 = if l_PlayEmote_16 and l_PlayEmote_16:IsA("BindableFunction") then l_PlayEmote_16 else nil;
-                        end;
-                        local v115 = v113 ~= nil;
-                        if v2.Value ~= v115 then
-                            v2.Value = v115;
-                            v2.ChangedEvent:Fire(v115);
-                        end;
-                        v21(v115, l_v82_1);
-                    end;
-                end);
-                return;
-            end;
-        else
-            local v116;
-            if not v82 then
-                v116 = nil;
-            else
-                local l_Animate_20 = v82:FindFirstChild("Animate");
-                v116 = if l_Animate_20 and l_Animate_20:IsA("LocalScript") then l_Animate_20 else if l_Animate_20 and l_Animate_20:IsA("Script") and l_Animate_20.RunContext == Enum.RunContext.Client then l_Animate_20 else nil;
-            end;
-            if v116 then
-                local v118;
-                if not v82 then
-                    v118 = nil;
-                else
-                    local l_Animate_21 = v82:FindFirstChild("Animate");
-                    v118 = if l_Animate_21 and l_Animate_21:IsA("LocalScript") then l_Animate_21 else if l_Animate_21 and l_Animate_21:IsA("Script") and l_Animate_21.RunContext == Enum.RunContext.Client then l_Animate_21 else nil;
-                end;
-                local v120;
-                if not v118 then
-                    v120 = nil;
-                else
-                    local l_PlayEmote_17 = v118:FindFirstChild("PlayEmote");
-                    v120 = if l_PlayEmote_17 and l_PlayEmote_17:IsA("BindableFunction") then l_PlayEmote_17 else nil;
-                end;
-                local v122 = v120 ~= nil;
-                if v2.Value ~= v122 then
-                    v2.Value = v122;
-                    v2.ChangedEvent:Fire(v122);
-                end;
-                v21(v122, v82);
-                return;
-            else
-                v17 = v82.ChildAdded:Connect(function(v123) --[[ Line: 89 ]]
-                    -- upvalues: v82 (copy), v2 (ref), v21 (ref)
-                    if (v123:IsA("LocalScript") or v123:IsA("Script") and v123.RunContext == Enum.RunContext.Client) and v123.Name == "Animate" then
-                        local l_v82_2 = v82;
-                        local v125;
-                        if not l_v82_2 then
-                            v125 = nil;
-                        else
-                            local l_Animate_22 = l_v82_2:FindFirstChild("Animate");
-                            v125 = if l_Animate_22 and l_Animate_22:IsA("LocalScript") then l_Animate_22 else if l_Animate_22 and l_Animate_22:IsA("Script") and l_Animate_22.RunContext == Enum.RunContext.Client then l_Animate_22 else nil;
-                        end;
-                        local v127;
-                        if not v125 then
-                            v127 = nil;
-                        else
-                            local l_PlayEmote_18 = v125:FindFirstChild("PlayEmote");
-                            v127 = if l_PlayEmote_18 and l_PlayEmote_18:IsA("BindableFunction") then l_PlayEmote_18 else nil;
-                        end;
-                        local v129 = v127 ~= nil;
-                        if v2.Value ~= v129 then
-                            v2.Value = v129;
-                            v2.ChangedEvent:Fire(v129);
-                        end;
-                        v21(v129, l_v82_2);
-                    end;
-                end);
-                return;
-            end;
-        end;
-    end;
-end;
-local function _(v130) --[[ Line: 146 ]] --[[ Name: onCharacterChanged ]]
-    -- upvalues: v17 (ref), v18 (ref), v19 (ref), v2 (copy), v21 (ref)
-    if v17 then
-        v17:Disconnect();
-        v17 = nil;
-    end;
-    if v18 then
-        v18:Disconnect();
-        v18 = nil;
-    end;
-    if v19 then
-        v19:Disconnect();
-        v19 = nil;
-    end;
-    local v131;
-    if not v130 then
-        v131 = nil;
-    else
-        local l_Animate_23 = v130:FindFirstChild("Animate");
-        v131 = if l_Animate_23 and l_Animate_23:IsA("LocalScript") then l_Animate_23 else if l_Animate_23 and l_Animate_23:IsA("Script") and l_Animate_23.RunContext == Enum.RunContext.Client then l_Animate_23 else nil;
-    end;
-    local v133;
-    if not v131 then
-        v133 = nil;
-    else
-        local l_PlayEmote_19 = v131:FindFirstChild("PlayEmote");
-        v133 = if l_PlayEmote_19 and l_PlayEmote_19:IsA("BindableFunction") then l_PlayEmote_19 else nil;
-    end;
-    local v135 = v133 ~= nil;
-    if v2.Value ~= v135 then
-        v2.Value = v135;
-        v2.ChangedEvent:Fire(v135);
-    end;
-    v21(v135, v130);
-end;
-l_LocalPlayer_0:GetPropertyChangedSignal("Character"):Connect(function() --[[ Line: 151 ]]
-    -- upvalues: l_LocalPlayer_0 (ref), v17 (ref), v18 (ref), v19 (ref), v2 (copy), v21 (ref)
-    local l_Character_0 = l_LocalPlayer_0.Character;
-    if v17 then
-        v17:Disconnect();
-        v17 = nil;
-    end;
-    if v18 then
-        v18:Disconnect();
-        v18 = nil;
-    end;
-    if v19 then
-        v19:Disconnect();
-        v19 = nil;
-    end;
-    local v138;
-    if not l_Character_0 then
-        v138 = nil;
-    else
-        local l_Animate_24 = l_Character_0:FindFirstChild("Animate");
-        v138 = if l_Animate_24 and l_Animate_24:IsA("LocalScript") then l_Animate_24 else if l_Animate_24 and l_Animate_24:IsA("Script") and l_Animate_24.RunContext == Enum.RunContext.Client then l_Animate_24 else nil;
-    end;
-    local v140;
-    if not v138 then
-        v140 = nil;
-    else
-        local l_PlayEmote_20 = v138:FindFirstChild("PlayEmote");
-        v140 = if l_PlayEmote_20 and l_PlayEmote_20:IsA("BindableFunction") then l_PlayEmote_20 else nil;
-    end;
-    local v142 = v140 ~= nil;
-    if v2.Value ~= v142 then
-        v2.Value = v142;
-        v2.ChangedEvent:Fire(v142);
-    end;
-    v21(v142, l_Character_0);
-end);
-local l_Character_1 = l_LocalPlayer_0.Character;
-if v17 then
-    v17:Disconnect();
-    v17 = nil;
-end;
-if v18 then
-    v18:Disconnect();
-    v18 = nil;
-end;
-if v19 then
-    v19:Disconnect();
-    v19 = nil;
-end;
-local v144;
-if not l_Character_1 then
-    v144 = nil;
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if not LocalPlayer then
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local t1 = {
+	Value = false,
+	ChangedEvent = Instance.new("BindableEvent")
+}
+
+local function getAnimateScript(p1) -- line: 15
+	if not p1 then
+		return nil
+	end
+
+	local Animate = p1:FindFirstChild("Animate")
+
+	if Animate and Animate:IsA("LocalScript") then
+		return Animate
+	end
+
+	if Animate and Animate:IsA("Script") and Animate.RunContext == Enum.RunContext.Client then
+		return Animate
+	end
+
+	return nil
+end
+local function getPlayEmoteBindable(p2) -- line: 31
+	local v26
+
+	if not p2 then
+		v26 = nil
+	else
+		local Animate = p2:FindFirstChild("Animate")
+
+		v26 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	if not v26 then
+		return nil
+	end
+
+	local PlayEmote = v26:FindFirstChild("PlayEmote")
+
+	if PlayEmote and PlayEmote:IsA("BindableFunction") then
+		return PlayEmote
+	end
+
+	return nil
+end
+local function getCanPlayEmotes(p3) -- line: 45
+	local v30
+
+	if not p3 then
+		v30 = nil
+	else
+		local Animate = p3:FindFirstChild("Animate")
+
+		v30 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v32
+
+	if not v30 then
+		v32 = nil
+	else
+		local PlayEmote = v30:FindFirstChild("PlayEmote")
+
+		v32 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	return v32 ~= nil
+end
+
+local u7 = nil
+local u8 = nil
+local u9 = nil
+
+local function disconnectListeners() -- line: 52
+	-- upvalues: u7 (ref), u8 (ref), u9 (ref)
+	if u7 then
+		u7:Disconnect()
+		u7 = nil
+	end
+
+	if u8 then
+		u8:Disconnect()
+		u8 = nil
+	end
+
+	if u9 then
+		u9:Disconnect()
+		u9 = nil
+	end
+end
+
+local u11 = nil
+
+local function checkUpdate(p4) -- line: 71
+	-- upvalues: t1 (copy), u11 (ref)
+	local v35
+
+	if not p4 then
+		v35 = nil
+	else
+		local Animate = p4:FindFirstChild("Animate")
+
+		v35 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v37
+
+	if not v35 then
+		v37 = nil
+	else
+		local PlayEmote = v35:FindFirstChild("PlayEmote")
+
+		v37 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	local v39 = v37 ~= nil
+
+	if v39 ~= t1.Value then
+		t1.Value = v39
+		t1.ChangedEvent:Fire(v39)
+	end
+
+	u11(v39, p4)
+end
+local function connectAnimateAddedListener(p5) -- line: 82
+	-- upvalues: t1 (copy), u11 (ref), u7 (ref)
+	local v41
+
+	if not p5 then
+		v41 = nil
+	else
+		local Animate = p5:FindFirstChild("Animate")
+
+		v41 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	if v41 then
+		local v43
+
+		if not p5 then
+			v43 = nil
+		else
+			local Animate = p5:FindFirstChild("Animate")
+
+			v43 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v45
+
+		if not v43 then
+			v45 = nil
+		else
+			local PlayEmote = v43:FindFirstChild("PlayEmote")
+
+			v45 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		local v47 = v45 ~= nil
+
+		if v47 ~= t1.Value then
+			t1.Value = v47
+			t1.ChangedEvent:Fire(v47)
+		end
+
+		u11(v47, p5)
+
+		return
+	end
+
+	u7 = p5.ChildAdded:Connect(function(child) -- line: 89
+		-- upvalues: p5 (copy), t1 (copy), u11 (ref)
+		if (child:IsA("LocalScript") or child:IsA("Script") and child.RunContext == Enum.RunContext.Client) and child.Name == "Animate" then
+			local v113 = p5
+			local v114
+
+			if not v113 then
+				v114 = nil
+			else
+				local Animate = v113:FindFirstChild("Animate")
+
+				v114 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v116
+
+			if not v114 then
+				v116 = nil
+			else
+				local PlayEmote = v114:FindFirstChild("PlayEmote")
+
+				v116 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v118 = v116 ~= nil
+
+			if v118 ~= t1.Value then
+				t1.Value = v118
+				t1.ChangedEvent:Fire(v118)
+			end
+
+			u11(v118, v113)
+		end
+	end)
+end
+local function connectPlayEmoteAddedListener(p6, p7) -- line: 98
+	-- upvalues: t1 (copy), u11 (ref), u8 (ref)
+	local v50
+
+	if not p6 then
+		v50 = nil
+	else
+		local Animate = p6:FindFirstChild("Animate")
+
+		v50 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v52
+
+	if not v50 then
+		v52 = nil
+	else
+		local PlayEmote = v50:FindFirstChild("PlayEmote")
+
+		v52 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	if v52 then
+		local v54
+
+		if not p6 then
+			v54 = nil
+		else
+			local Animate = p6:FindFirstChild("Animate")
+
+			v54 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v56
+
+		if not v54 then
+			v56 = nil
+		else
+			local PlayEmote = v54:FindFirstChild("PlayEmote")
+
+			v56 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		local v58 = v56 ~= nil
+
+		if v58 ~= t1.Value then
+			t1.Value = v58
+			t1.ChangedEvent:Fire(v58)
+		end
+
+		u11(v58, p6)
+
+		return
+	end
+
+	u8 = p7.ChildAdded:Connect(function(child) -- line: 105
+		-- upvalues: p6 (copy), t1 (copy), u11 (ref)
+		if child:IsA("BindableFunction") and child.Name == "PlayEmote" then
+			local v120 = p6
+			local v121
+
+			if not v120 then
+				v121 = nil
+			else
+				local Animate = v120:FindFirstChild("Animate")
+
+				v121 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v123
+
+			if not v121 then
+				v123 = nil
+			else
+				local PlayEmote = v121:FindFirstChild("PlayEmote")
+
+				v123 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v125 = v123 ~= nil
+
+			if v125 ~= t1.Value then
+				t1.Value = v125
+				t1.ChangedEvent:Fire(v125)
+			end
+
+			u11(v125, v120)
+		end
+	end)
+end
+local function connectPlayEmoteRemovedListener(p8) -- line: 112
+	-- upvalues: t1 (copy), u11 (ref), u9 (ref)
+	local v60
+
+	if not p8 then
+		v60 = nil
+	else
+		local Animate = p8:FindFirstChild("Animate")
+
+		v60 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v62
+
+	if not v60 then
+		v62 = nil
+	else
+		local PlayEmote = v60:FindFirstChild("PlayEmote")
+
+		v62 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	local v64 = v62
+
+	if not v64 then
+		local v65
+
+		if not p8 then
+			v65 = nil
+		else
+			local Animate = p8:FindFirstChild("Animate")
+
+			v65 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v67
+
+		if not v65 then
+			v67 = nil
+		else
+			local PlayEmote = v65:FindFirstChild("PlayEmote")
+
+			v67 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		local v69 = v67 ~= nil
+
+		if v69 ~= t1.Value then
+			t1.Value = v69
+			t1.ChangedEvent:Fire(v69)
+		end
+
+		u11(v69, p8)
+
+		return
+	end
+
+	u9 = v64.AncestryChanged:Connect(function(_, parent) -- line: 119
+		-- upvalues: v64 (copy), p8 (copy), t1 (copy), u11 (ref)
+		if not parent or not v64:IsDescendantOf(p8) then
+			local v128 = p8
+			local v129
+
+			if not v128 then
+				v129 = nil
+			else
+				local Animate = v128:FindFirstChild("Animate")
+
+				v129 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v131
+
+			if not v129 then
+				v131 = nil
+			else
+				local PlayEmote = v129:FindFirstChild("PlayEmote")
+
+				v131 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v133 = v131 ~= nil
+
+			if v133 ~= t1.Value then
+				t1.Value = v133
+				t1.ChangedEvent:Fire(v133)
+			end
+
+			u11(v133, v128)
+		end
+	end)
+end
+
+function u11(p10, p11) -- line: 126
+	-- upvalues: u7 (ref), u8 (ref), u9 (ref), t1 (copy), u11 (ref)
+	if u7 then
+		u7:Disconnect()
+		u7 = nil
+	end
+
+	if u8 then
+		u8:Disconnect()
+		u8 = nil
+	end
+
+	if u9 then
+		u9:Disconnect()
+		u9 = nil
+	end
+
+	if not p11 then
+		return
+	end
+
+	if p10 then
+		local v72
+
+		if not p11 then
+			v72 = nil
+		else
+			local Animate = p11:FindFirstChild("Animate")
+
+			v72 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v74
+
+		if not v72 then
+			v74 = nil
+		else
+			local PlayEmote = v72:FindFirstChild("PlayEmote")
+
+			v74 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		local v76 = v74
+
+		if not v76 then
+			local v77
+
+			if not p11 then
+				v77 = nil
+			else
+				local Animate = p11:FindFirstChild("Animate")
+
+				v77 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v79
+
+			if not v77 then
+				v79 = nil
+			else
+				local PlayEmote = v77:FindFirstChild("PlayEmote")
+
+				v79 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v81 = v79 ~= nil
+
+			if v81 ~= t1.Value then
+				t1.Value = v81
+				t1.ChangedEvent:Fire(v81)
+			end
+
+			u11(v81, p11)
+
+			return
+		end
+
+		u9 = v76.AncestryChanged:Connect(function(_, parent) -- line: 119
+			-- upvalues: v76 (copy), p11 (copy), t1 (copy), u11 (ref)
+			if not parent or not v76:IsDescendantOf(p11) then
+				local v136 = p11
+				local v137
+
+				if not v136 then
+					v137 = nil
+				else
+					local Animate = v136:FindFirstChild("Animate")
+
+					v137 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+				end
+
+				local v139
+
+				if not v137 then
+					v139 = nil
+				else
+					local PlayEmote = v137:FindFirstChild("PlayEmote")
+
+					v139 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+				end
+
+				local v141 = v139 ~= nil
+
+				if v141 ~= t1.Value then
+					t1.Value = v141
+					t1.ChangedEvent:Fire(v141)
+				end
+
+				u11(v141, v136)
+			end
+		end)
+
+		return
+	end
+
+	local v82
+
+	if not p11 then
+		v82 = nil
+	else
+		local Animate = p11:FindFirstChild("Animate")
+
+		v82 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	if v82 then
+		local v84
+
+		if not p11 then
+			v84 = nil
+		else
+			local Animate = p11:FindFirstChild("Animate")
+
+			v84 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v86
+
+		if not v84 then
+			v86 = nil
+		else
+			local PlayEmote = v84:FindFirstChild("PlayEmote")
+
+			v86 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		if v86 then
+			local v88
+
+			if not p11 then
+				v88 = nil
+			else
+				local Animate = p11:FindFirstChild("Animate")
+
+				v88 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v90
+
+			if not v88 then
+				v90 = nil
+			else
+				local PlayEmote = v88:FindFirstChild("PlayEmote")
+
+				v90 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v92 = v90 ~= nil
+
+			if v92 ~= t1.Value then
+				t1.Value = v92
+				t1.ChangedEvent:Fire(v92)
+			end
+
+			u11(v92, p11)
+
+			return
+		end
+
+		u8 = v82.ChildAdded:Connect(function(child) -- line: 105
+			-- upvalues: p11 (copy), t1 (copy), u11 (ref)
+			if child:IsA("BindableFunction") and child.Name == "PlayEmote" then
+				local v143 = p11
+				local v144
+
+				if not v143 then
+					v144 = nil
+				else
+					local Animate = v143:FindFirstChild("Animate")
+
+					v144 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+				end
+
+				local v146
+
+				if not v144 then
+					v146 = nil
+				else
+					local PlayEmote = v144:FindFirstChild("PlayEmote")
+
+					v146 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+				end
+
+				local v148 = v146 ~= nil
+
+				if v148 ~= t1.Value then
+					t1.Value = v148
+					t1.ChangedEvent:Fire(v148)
+				end
+
+				u11(v148, v143)
+			end
+		end)
+
+		return
+	end
+
+	local v93
+
+	if not p11 then
+		v93 = nil
+	else
+		local Animate = p11:FindFirstChild("Animate")
+
+		v93 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	if v93 then
+		local v95
+
+		if not p11 then
+			v95 = nil
+		else
+			local Animate = p11:FindFirstChild("Animate")
+
+			v95 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+		end
+
+		local v97
+
+		if not v95 then
+			v97 = nil
+		else
+			local PlayEmote = v95:FindFirstChild("PlayEmote")
+
+			v97 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+		end
+
+		local v99 = v97 ~= nil
+
+		if v99 ~= t1.Value then
+			t1.Value = v99
+			t1.ChangedEvent:Fire(v99)
+		end
+
+		u11(v99, p11)
+
+		return
+	end
+
+	u7 = p11.ChildAdded:Connect(function(child) -- line: 89
+		-- upvalues: p11 (copy), t1 (copy), u11 (ref)
+		if (child:IsA("LocalScript") or child:IsA("Script") and child.RunContext == Enum.RunContext.Client) and child.Name == "Animate" then
+			local v150 = p11
+			local v151
+
+			if not v150 then
+				v151 = nil
+			else
+				local Animate = v150:FindFirstChild("Animate")
+
+				v151 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+			end
+
+			local v153
+
+			if not v151 then
+				v153 = nil
+			else
+				local PlayEmote = v151:FindFirstChild("PlayEmote")
+
+				v153 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+			end
+
+			local v155 = v153 ~= nil
+
+			if v155 ~= t1.Value then
+				t1.Value = v155
+				t1.ChangedEvent:Fire(v155)
+			end
+
+			u11(v155, v150)
+		end
+	end)
+end
+
+local function onCharacterChanged(p13) -- line: 146
+	-- upvalues: u7 (ref), u8 (ref), u9 (ref), t1 (copy), u11 (ref)
+	if u7 then
+		u7:Disconnect()
+		u7 = nil
+	end
+
+	if u8 then
+		u8:Disconnect()
+		u8 = nil
+	end
+
+	if u9 then
+		u9:Disconnect()
+		u9 = nil
+	end
+
+	local v101
+
+	if not p13 then
+		v101 = nil
+	else
+		local Animate = p13:FindFirstChild("Animate")
+
+		v101 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v103
+
+	if not v101 then
+		v103 = nil
+	else
+		local PlayEmote = v101:FindFirstChild("PlayEmote")
+
+		v103 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	local v105 = v103 ~= nil
+
+	if v105 ~= t1.Value then
+		t1.Value = v105
+		t1.ChangedEvent:Fire(v105)
+	end
+
+	u11(v105, p13)
+end
+
+LocalPlayer:GetPropertyChangedSignal("Character"):Connect(function() -- line: 151
+	-- upvalues: LocalPlayer (ref), u7 (ref), u8 (ref), u9 (ref), t1 (copy), u11 (ref)
+	local Character = LocalPlayer.Character
+
+	if u7 then
+		u7:Disconnect()
+		u7 = nil
+	end
+
+	if u8 then
+		u8:Disconnect()
+		u8 = nil
+	end
+
+	if u9 then
+		u9:Disconnect()
+		u9 = nil
+	end
+
+	local v107
+
+	if not Character then
+		v107 = nil
+	else
+		local Animate = Character:FindFirstChild("Animate")
+
+		v107 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+	end
+
+	local v109
+
+	if not v107 then
+		v109 = nil
+	else
+		local PlayEmote = v107:FindFirstChild("PlayEmote")
+
+		v109 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+	end
+
+	local v111 = v109 ~= nil
+
+	if v111 ~= t1.Value then
+		t1.Value = v111
+		t1.ChangedEvent:Fire(v111)
+	end
+
+	u11(v111, Character)
+end)
+
+local Character = LocalPlayer.Character
+
+if u7 then
+	u7:Disconnect()
+	u7 = nil
+end
+
+if u8 then
+	u8:Disconnect()
+	u8 = nil
+end
+
+if u9 then
+	u9:Disconnect()
+	u9 = nil
+end
+
+local v18
+
+if not Character then
+	v18 = nil
 else
-    local l_Animate_25 = l_Character_1:FindFirstChild("Animate");
-    v144 = if l_Animate_25 and l_Animate_25:IsA("LocalScript") then l_Animate_25 else if l_Animate_25 and l_Animate_25:IsA("Script") and l_Animate_25.RunContext == Enum.RunContext.Client then l_Animate_25 else nil;
-end;
-local v146;
-if not v144 then
-    v146 = nil;
+	local Animate = Character:FindFirstChild("Animate")
+
+	v18 = if not Animate or not Animate:IsA("LocalScript") then if not Animate or (not Animate:IsA("Script") or Animate.RunContext ~= Enum.RunContext.Client) then nil else Animate else Animate
+end
+
+local v20
+
+if not v18 then
+	v20 = nil
 else
-    local l_PlayEmote_21 = v144:FindFirstChild("PlayEmote");
-    v146 = if l_PlayEmote_21 and l_PlayEmote_21:IsA("BindableFunction") then l_PlayEmote_21 else nil;
-end;
-local v148 = v146 ~= nil;
-if v2.Value ~= v148 then
-    v2.Value = v148;
-    v2.ChangedEvent:Fire(v148);
-end;
-v21(v148, l_Character_1);
-return v2;
+	local PlayEmote = v18:FindFirstChild("PlayEmote")
+
+	v20 = if not PlayEmote or not PlayEmote:IsA("BindableFunction") then nil else PlayEmote
+end
+
+local v22 = v20 ~= nil
+
+if v22 ~= t1.Value then
+	t1.Value = v22
+	t1.ChangedEvent:Fire(v22)
+end
+
+u11(v22, Character)
+
+return t1

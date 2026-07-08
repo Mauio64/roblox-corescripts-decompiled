@@ -1,40 +1,40 @@
-local v0 = newproxy(false);
-return function(v1) --[[ Line: 10 ]]
-    -- upvalues: v0 (copy)
-    local function v7(v2, v3, ...) --[[ Line: 11 ]] --[[ Name: setTimeout ]]
-        -- upvalues: v0 (ref), v1 (copy)
-        local v4 = {
-            ...
-        };
-        local v5 = {
-            [v0] = 1
-        };
-        if v3 == nil then
-            v3 = 0;
-        end;
-        local v6 = v3 / 1000;
-        v1(v6, function() --[[ Line: 24 ]]
-            -- upvalues: v5 (copy), v0 (ref), v2 (copy), v4 (copy)
-            if v5[v0] == 1 then
-                v2(unpack(v4));
-                v5[v0] = 2;
-            end;
-        end);
-        return v5;
-    end;
-    local function v9(v8) --[[ Line: 34 ]] --[[ Name: clearTimeout ]]
-        -- upvalues: v0 (ref)
-        if v8 == nil then
-            return;
-        else
-            if v8[v0] == 1 then
-                v8[v0] = 3;
-            end;
-            return;
-        end;
-    end;
-    return {
-        setTimeout = v7, 
-        clearTimeout = v9
-    };
-end;
+local v1 = newproxy(false)
+
+return function(p1) -- line: 10
+	-- upvalues: v1 (copy)
+	return {
+		setTimeout = function(p2, n1: number?, ...) -- line: 11
+			-- upvalues: v1 (copy), p1 (copy)
+			local t1 = { ... }
+			local t2 = {
+				[v1] = 1
+			}
+
+			if n1 == nil then
+				n1 = 0
+			end
+
+			local v7 = n1 / 1000
+
+			p1(v7, function() -- line: 24
+				-- upvalues: t2 (copy), v1 (copy), p2 (copy), t1 (copy)
+				if t2[v1] == 1 then
+					p2(unpack(t1))
+					t2[v1] = 2
+				end
+			end)
+
+			return t2
+		end,
+		clearTimeout = function(t3: {[any]: any}) -- line: 34
+			-- upvalues: v1 (copy)
+			if t3 == nil then
+				return
+			end
+
+			if t3[v1] == 1 then
+				t3[v1] = 3
+			end
+		end
+	}
+end

@@ -1,4 +1,4 @@
 return {
-    NormalSearchText = "NormalSearchText", 
-    HotlineSearchText = "HotlineSearchText"
-};
+	NormalSearchText = "NormalSearchText",
+	HotlineSearchText = "HotlineSearchText"
+}

@@ -1,7 +1,5 @@
-return function(v0) --[[ Line: 9 ]] --[[ Name: isCallable ]]
-    local v1 = true;
-    if type(v0) ~= "function" then
-        v1 = type(v0) == "table" and (getmetatable(v0) and getmetatable(v0).__call ~= nil or false);
-    end;
-    return v1;
-end;
+local function isCallable(p1) -- line: 9
+	return type(p1) == "function" or type(p1) == "table" and (not not getmetatable(p1) and (getmetatable(p1).__call ~= nil or false))
+end
+
+return isCallable

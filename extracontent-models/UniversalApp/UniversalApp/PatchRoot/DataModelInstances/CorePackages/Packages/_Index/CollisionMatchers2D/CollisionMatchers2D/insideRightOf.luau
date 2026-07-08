@@ -1,21 +1,21 @@
-local v0 = require(script.Parent.toRect);
-local v1 = require(script.Parent.returnValue);
-return function(v2, v3, v4) --[[ Line: 29 ]] --[[ Name: insideRightOf ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    local v5 = v0(v2);
-    local v6 = v0(v3);
-    local v7 = v5.Min - v6.Min;
-    if v4 then
-        if typeof(v4) == "number" then
-            v4 = NumberRange.new(v4);
-        end;
-        local l_v1_0 = v1;
-        local v9 = false;
-        if v4.Min <= v7.X then
-            v9 = v4.Max >= v7.X;
-        end;
-        return l_v1_0(v9, "Was within range", "Was not within range ( " .. tostring(v4) .. ")");
-    else
-        return v1(v7.X >= 0, "Was not left of the element", "Was too far left of the element");
-    end;
-end;
+local toRect = require(script.Parent.toRect)
+local returnValue = require(script.Parent.returnValue)
+
+local function insideRightOf(p1, p2, p3) -- line: 29
+	-- upvalues: toRect (copy), returnValue (copy)
+	local v7 = toRect(p1)
+	local v8 = toRect(p2)
+	local v9 = v7.Min - v8.Min
+
+	if p3 then
+		if typeof(p3) == "number" then
+			p3 = NumberRange.new(p3)
+		end
+
+		return returnValue(p3.Min <= v9.X and p3.Max >= v9.X, "Was within range", "Was not within range ( " .. tostring(p3) .. ")")
+	end
+
+	return returnValue(v9.X >= 0, "Was not left of the element", "Was too far left of the element")
+end
+
+return insideRightOf

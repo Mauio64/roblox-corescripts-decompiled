@@ -1,10 +1,10 @@
-return function(v0, v1) --[[ Line: 7 ]]
-    return function(v2, ...) --[[ Line: 8 ]]
-        -- upvalues: v1 (copy), v0 (copy)
-        if v2 == v1 then
-            return v0(v1, ...);
-        else
-            return v0(v1, v2, ...);
-        end;
-    end;
-end;
+return function(p1, p2) -- line: 7
+	return function(p3, ...) -- line: 8
+		-- upvalues: p2 (copy), p1 (copy)
+		if p3 == p2 then
+			return p1(p2, ...)
+		end
+
+		return p1(p2, p3, ...)
+	end
+end

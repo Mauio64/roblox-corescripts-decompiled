@@ -1,25 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(script.Parent.ChatBubbleEnum);
-local v4 = {
-    isIncoming = false, 
-    imageColor = Color3.new(0, 0, 0), 
-    imageTransparency = 0
-};
-ChatBubbleTail = function(v5) --[[ Line: 38 ]] --[[ Name: ChatBubbleTail ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy), v1 (copy)
-    local v6 = v2.Dictionary.union(v4, v5);
-    local v7 = if v6.isIncoming then v3.RECEIVED_TAIL else v3.SENT_TAIL;
-    local v8 = if v6.isIncoming then UDim2.new(0, 0, 0, 0) else UDim2.new(1, 0, 0, 0);
-    return v1.createElement("ImageLabel", {
-        AnchorPoint = if v6.isIncoming then Vector2.new(0, 0) else Vector2.new(1, 0), 
-        Size = UDim2.new(0, v3.TAIL_WIDTH, 0, v3.TAIL_WIDTH), 
-        BackgroundTransparency = 1, 
-        ImageColor3 = v6.imageColor, 
-        Position = v8, 
-        Image = v7, 
-        ImageTransparency = v6.imageTransparency
-    });
-end;
-return v1.memo(ChatBubbleTail);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local ChatBubbleEnum = require(script.Parent.ChatBubbleEnum)
+local t1 = {
+	isIncoming = false,
+	imageTransparency = 0,
+	imageColor = Color3.new(0, 0, 0)
+}
+
+function ChatBubbleTail(t2: {[any]: any}) -- line: 38
+	-- upvalues: Cryo (copy), t1 (copy), ChatBubbleEnum (copy), React (copy)
+	local v7 = Cryo.Dictionary.union(t1, t2)
+	local v8 = if not v7.isIncoming then ChatBubbleEnum.SENT_TAIL else ChatBubbleEnum.RECEIVED_TAIL
+	local v9 = if not v7.isIncoming then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 0, 0)
+
+	return React.createElement("ImageLabel", {
+		BackgroundTransparency = 1,
+		AnchorPoint = if not v7.isIncoming then Vector2.new(1, 0) else Vector2.new(0, 0),
+		Size = UDim2.new(0, ChatBubbleEnum.TAIL_WIDTH, 0, ChatBubbleEnum.TAIL_WIDTH),
+		ImageColor3 = v7.imageColor,
+		Position = v9,
+		Image = v8,
+		ImageTransparency = v7.imageTransparency
+	})
+end
+
+return React.memo(ChatBubbleTail)

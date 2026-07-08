@@ -1,16 +1,20 @@
-getUpdatedSelectedCapturesArray = function(v0, v1) --[[ Line: 1 ]] --[[ Name: getUpdatedSelectedCapturesArray ]]
-    local v2 = {};
-    local v3 = false;
-    for _, v5 in ipairs(v0) do
-        if v5 == v1 then
-            v3 = true;
-        else
-            table.insert(v2, v5);
-        end;
-    end;
-    if not v3 then
-        table.insert(v2, v1);
-    end;
-    return v2;
-end;
-return getUpdatedSelectedCapturesArray;
+function getUpdatedSelectedCapturesArray(p1, p2) -- line: 1
+	local t1 = {}
+	local v4 = false
+
+	for _, v in ipairs(p1) do
+		if v == p2 then
+			v4 = true
+		else
+			table.insert(t1, v)
+		end
+	end
+
+	if not v4 then
+		table.insert(t1, p2)
+	end
+
+	return t1
+end
+
+return getUpdatedSelectedCapturesArray

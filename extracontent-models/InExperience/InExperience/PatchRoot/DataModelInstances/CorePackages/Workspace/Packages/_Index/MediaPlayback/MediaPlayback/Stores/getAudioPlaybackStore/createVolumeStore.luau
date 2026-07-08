@@ -1,34 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("MediaPlayback");
-local v1 = require(l_script_FirstAncestor_0.Parent.Signals);
-local l_createSignal_0 = v1.createSignal;
-local l_createComputed_0 = v1.createComputed;
-return function() --[[ Line: 16 ]] --[[ Name: createVolumeStore ]]
-    -- upvalues: l_createSignal_0 (copy), l_createComputed_0 (copy)
-    local v4, v5 = l_createSignal_0(1);
-    local v6, v7 = l_createSignal_0(v4(false));
-    local v9 = l_createComputed_0(function(v8) --[[ Line: 20 ]]
-        -- upvalues: v4 (copy)
-        return v4(v8) <= 0;
-    end);
-    return {
-        getVolume = v4, 
-        setVolume = function(v10) --[[ Line: 24 ]] --[[ Name: setClampedVolume ]]
-            -- upvalues: v5 (copy)
-            v5((math.clamp(v10, 0, 1)));
-        end, 
-        getIsMuted = v9, 
-        mute = function() --[[ Line: 28 ]] --[[ Name: mute ]]
-            -- upvalues: v9 (copy), v7 (copy), v4 (copy), v5 (copy)
-            if not v9(false) then
-                v7(v4(false));
-                v5(0);
-            end;
-        end, 
-        unmute = function() --[[ Line: 35 ]] --[[ Name: unmute ]]
-            -- upvalues: v9 (copy), v5 (copy), v6 (copy)
-            if v9(false) then
-                v5(v6(false));
-            end;
-        end
-    };
-end;
+local MediaPlayback = script:FindFirstAncestor("MediaPlayback")
+local Signals = require(MediaPlayback.Parent.Signals)
+local createSignal = Signals.createSignal
+local createComputed = Signals.createComputed
+
+local function createVolumeStore() -- line: 16
+	-- upvalues: createSignal (copy), createComputed (copy)
+	local v6, v7 = createSignal(1)
+	local v8, v9 = createSignal(v6(false))
+	local v10 = createComputed(function(p1) -- line: 20
+		-- upvalues: v6 (copy)
+		return v6(p1) <= 0
+	end)
+
+	local function setClampedVolume(n1: number) -- line: 24
+		-- upvalues: v7 (copy)
+		v7((math.clamp(n1, 0, 1)))
+	end
+
+	return {
+		getVolume = v6,
+		setVolume = setClampedVolume,
+		getIsMuted = v10,
+		mute = function() -- line: 28
+			-- upvalues: v10 (copy), v9 (copy), v6 (copy), v7 (copy)
+			if not v10(false) then
+				v9(v6(false))
+				v7(0)
+			end
+		end,
+		unmute = function() -- line: 35
+			-- upvalues: v10 (copy), v7 (copy), v8 (copy)
+			if v10(false) then
+				v7(v8(false))
+			end
+		end
+	}
+end
+
+return createVolumeStore

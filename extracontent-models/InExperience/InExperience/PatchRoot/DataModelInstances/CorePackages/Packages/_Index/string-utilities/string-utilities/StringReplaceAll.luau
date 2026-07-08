@@ -1,15 +1,17 @@
-return function(v0, v1) --[[ Line: 9 ]]
-    if type(v0) ~= "string" then
-        return "";
-    elseif type(v1) ~= "table" then
-        return v0;
-    else
-        local l_v0_0 = v0;
-        for v3, v4 in pairs(v1) do
-            if type(v3) == "string" and type(v4) == "string" then
-                l_v0_0 = string.gsub(l_v0_0, v3, v4);
-            end;
-        end;
-        return l_v0_0;
-    end;
-end;
+return function(p1, p2) -- line: 9
+	if type(p1) ~= "string" then
+		return ""
+	end
+
+	if type(p2) ~= "table" then
+		return p1
+	end
+
+	for k, v in pairs(p2) do
+		if type(k) == "string" and type(v) == "string" then
+			p1 = string.gsub(p1, k, v)
+		end
+	end
+
+	return p1
+end

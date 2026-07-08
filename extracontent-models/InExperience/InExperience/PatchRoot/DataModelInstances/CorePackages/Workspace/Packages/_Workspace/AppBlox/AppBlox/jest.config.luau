@@ -1,10 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Dev.JestConfigs);
+local ParentParent = script.Parent.Parent
+local JestConfigs = require(ParentParent.Dev.JestConfigs)
+
 return {
-    displayName = "AppBlox", 
-    setupFilesAfterEnv = {
-        v1.setupFiles.ErrorLogHandler, 
-        v1.setupFiles.UIBloxInitializer, 
-        v1.setupFiles.createPromiseRejectionHandler()
-    }
-};
+	displayName = "AppBlox",
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.ErrorLogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
+	}
+}

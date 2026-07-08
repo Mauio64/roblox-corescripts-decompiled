@@ -1,1 +1,1 @@
-return game:DefineFastFlag("StreamNotificationImpressionLogging", false);
+return game:DefineFastFlag("StreamNotificationImpressionLogging", false)

@@ -1,46 +1,57 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v4) --[[ Line: 28 ]] --[[ Name: useMenuItemHover ]]
-    -- upvalues: v2 (copy)
-    v2.useEffect(function() --[[ Line: 30 ]]
-        -- upvalues: v4 (copy)
-        if v4.itemRef.current == nil then
-            return;
-        elseif typeof(v4.itemRef.current) ~= "Instance" then
-            return;
-        else
-            local v5 = v4.itemRef.current:GetPropertyChangedSignal("GuiState"):Connect(function() --[[ Line: 38 ]]
-                -- upvalues: v4 (ref)
-                if v4.isSubmenu then
-                    if v4.isDisabled then
-                        return;
-                    elseif v4.itemRef.current.GuiState == Enum.GuiState.Hover then
-                        if v4.hoverOpenAtDepth then
-                            v4.hoverOpenAtDepth(v4.depth, v4.id);
-                            return;
-                        end;
-                    elseif v4.hoverCloseAtDepth then
-                        v4.hoverCloseAtDepth(v4.depth);
-                        return;
-                    end;
-                elseif v4.itemRef.current.GuiState == Enum.GuiState.Hover and v4.hoverCloseAtDepth then
-                    v4.hoverCloseAtDepth(v4.depth);
-                end;
-            end);
-            return function() --[[ Line: 64 ]]
-                -- upvalues: v5 (copy)
-                v5:Disconnect();
-            end;
-        end;
-    end, {
-        v4.isSubmenu, 
-        v4.isDisabled, 
-        v4.id, 
-        v4.depth, 
-        v4.hoverCloseAtDepth, 
-        v4.hoverOpenAtDepth, 
-        v4.itemRef
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+
+require(Foundation.Components.Types)
+
+local function useMenuItemHover(t1: {[any]: any}) -- line: 28
+	-- upvalues: React (copy)
+	React.useEffect(function() -- line: 30
+		-- upvalues: t1 (copy)
+		if t1.itemRef.current == nil then
+			return
+		end
+
+		if typeof(t1.itemRef.current) ~= "Instance" then
+			return
+		end
+
+		local connection = t1.itemRef.current:GetPropertyChangedSignal("GuiState"):Connect(function() -- line: 38
+			-- upvalues: t1 (copy)
+			if t1.isSubmenu then
+				if t1.isDisabled then
+					return
+				end
+
+				if t1.itemRef.current.GuiState == Enum.GuiState.Hover then
+					if t1.hoverOpenAtDepth then
+						t1.hoverOpenAtDepth(t1.depth, t1.id)
+
+						return
+					end
+				elseif t1.hoverCloseAtDepth then
+					t1.hoverCloseAtDepth(t1.depth)
+
+					return
+				end
+			elseif t1.itemRef.current.GuiState == Enum.GuiState.Hover and t1.hoverCloseAtDepth then
+				t1.hoverCloseAtDepth(t1.depth)
+			end
+		end)
+
+		return function() -- line: 64
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {
+		t1.isSubmenu,
+		t1.isDisabled,
+		t1.id,
+		t1.depth,
+		t1.hoverCloseAtDepth,
+		t1.hoverOpenAtDepth,
+		t1.itemRef
+	})
+end
+
+return useMenuItemHover

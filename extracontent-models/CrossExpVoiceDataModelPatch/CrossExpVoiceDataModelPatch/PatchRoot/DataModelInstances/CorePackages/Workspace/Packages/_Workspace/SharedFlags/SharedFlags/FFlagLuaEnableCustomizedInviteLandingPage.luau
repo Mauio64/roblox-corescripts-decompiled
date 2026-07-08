@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaEnableCustomizedInviteLandingPage", false);
+return game:DefineFastFlag("LuaEnableCustomizedInviteLandingPage", false)

@@ -1,11 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_FFlagSearchOmniAutocompletePage_0 = require(l_Parent_0.SharedFlags).FFlagSearchOmniAutocompletePage;
+local ParentParent = script.Parent.Parent
+local FFlagSearchOmniAutocompletePage = require(ParentParent.SharedFlags).FFlagSearchOmniAutocompletePage
+
 return {
-    ChatGames = "ChatGames", 
-    Games = "Games", 
-    HomeGames = "HomeGames", 
-    GamesSeeAll = "GamesSeeAll", 
-    GamesList = "GamesList", 
-    UnifiedHomeSorts = "UnifiedHomeSorts", 
-    SearchLandingPage = l_FFlagSearchOmniAutocompletePage_0 and "SearchLandingPage" or nil
-};
+	ChatGames = "ChatGames",
+	Games = "Games",
+	HomeGames = "HomeGames",
+	GamesSeeAll = "GamesSeeAll",
+	GamesList = "GamesList",
+	UnifiedHomeSorts = "UnifiedHomeSorts",
+	SearchLandingPage = if not FFlagSearchOmniAutocompletePage then nil else "SearchLandingPage"
+}

@@ -1,13 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local v2 = require(script.Parent.FavoritesUrlBuilder);
-return function(v3) --[[ Line: 10 ]] --[[ Name: fetchFavorite ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v4 = v2.buildFavoriteUrl(v3);
-    return v1.config({
-        requestFunction = function(v5, v6, v7) --[[ Line: 14 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v1 (ref)
-            return v1.requestFunctions.HttpRbxApi(v5, v6, v7);
-        end
-    })(v4, "GET");
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+local FavoritesUrlBuilder = require(script.Parent.FavoritesUrlBuilder)
+
+local function fetchFavorite(s1: string) -- line: 10
+	-- upvalues: FavoritesUrlBuilder (copy), HttpRequest (copy)
+	local v6 = FavoritesUrlBuilder.buildFavoriteUrl(s1)
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 14
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		end
+	})(v6, "GET")
+end
+
+return fetchFavorite

@@ -1,4 +1,4 @@
 return {
-    propValidation = false, 
-    elementTracing = false
-};
+	propValidation = false,
+	elementTracing = false
+}

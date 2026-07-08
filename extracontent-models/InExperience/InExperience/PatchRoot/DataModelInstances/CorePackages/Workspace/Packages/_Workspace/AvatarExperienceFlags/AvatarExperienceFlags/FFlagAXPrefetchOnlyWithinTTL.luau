@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPrefetchOnlyWithinTTL", false);
+return game:DefineFastFlag("AXPrefetchOnlyWithinTTL", false)

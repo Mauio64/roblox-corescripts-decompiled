@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateEmoteMenuFromRoactGamepad", false);
+return game:DefineFastFlag("AXMigrateEmoteMenuFromRoactGamepad", false)

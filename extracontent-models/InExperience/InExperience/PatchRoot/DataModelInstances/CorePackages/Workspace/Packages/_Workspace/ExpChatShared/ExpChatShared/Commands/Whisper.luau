@@ -1,3 +1,3 @@
 return {
-    RBXWhisperCommand = require(script.RBXWhisperCommand)
-};
+	RBXWhisperCommand = require(script.RBXWhisperCommand)
+}

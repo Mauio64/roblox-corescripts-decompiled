@@ -1,13 +1,14 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Flags.FFlagTopBarDeprecateChatRodux);
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-if v2 then
-    return nil;
-else
-    return (l_makeActionCreator_0(script.Name, function(v4) --[[ Line: 11 ]]
-        return {
-            canChat = v4
-        };
-    end));
-end;
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local FFlagTopBarDeprecateChatRodux = require(ParentParent.Flags.FFlagTopBarDeprecateChatRodux)
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+if FFlagTopBarDeprecateChatRodux then
+	return nil
+end
+
+return (makeActionCreator(script.Name, function(p1) -- line: 11
+	return {
+		canChat = p1
+	}
+end))

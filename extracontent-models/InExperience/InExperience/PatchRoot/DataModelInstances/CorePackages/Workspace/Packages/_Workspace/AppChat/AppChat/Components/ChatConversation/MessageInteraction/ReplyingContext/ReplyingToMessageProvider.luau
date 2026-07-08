@@ -1,15 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.ReplyingToMessageContext);
-local v3 = require(script.Parent.ReplyingToMessageDispatchContext);
-return function(v4) --[[ Line: 13 ]] --[[ Name: ReplyingToMessageProvider ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    local v5, v6 = v1.useState(nil);
-    return v1.createElement(v2.Provider, {
-        value = v5
-    }, {
-        ReplyingToMessageDispatch = v1.createElement(v3.Provider, {
-            value = v6
-        }, v4.children)
-    });
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local ReplyingToMessageContext = require(script.Parent.ReplyingToMessageContext)
+local ReplyingToMessageDispatchContext = require(script.Parent.ReplyingToMessageDispatchContext)
+
+local function ReplyingToMessageProvider(t1: {[any]: any}) -- line: 13
+	-- upvalues: React (copy), ReplyingToMessageContext (copy), ReplyingToMessageDispatchContext (copy)
+	local v7, v8 = React.useState(nil)
+
+	return React.createElement(ReplyingToMessageContext.Provider, {
+		value = v7
+	}, {
+		ReplyingToMessageDispatch = React.createElement(ReplyingToMessageDispatchContext.Provider, {
+			value = v8
+		}, t1.children)
+	})
+end
+
+return ReplyingToMessageProvider

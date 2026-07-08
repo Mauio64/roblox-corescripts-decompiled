@@ -1,1 +1,1 @@
-return require(script.Symbol);
+return require(script.Symbol)

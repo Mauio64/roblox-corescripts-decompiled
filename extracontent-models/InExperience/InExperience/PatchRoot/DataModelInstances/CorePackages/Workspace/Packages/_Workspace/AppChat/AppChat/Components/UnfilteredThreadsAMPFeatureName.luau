@@ -1,1 +1,1 @@
-return "CanAccessPrivateComms";
+return "CanAccessPrivateComms"

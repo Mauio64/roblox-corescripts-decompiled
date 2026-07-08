@@ -1,3 +1,3 @@
-return function(v0) --[[ Line: 1 ]]
-    return string.gsub(v0, "\n\n*", "\n");
-end;
+return function(p1) -- line: 1
+	return string.gsub(p1, "\n\n*", "\n")
+end

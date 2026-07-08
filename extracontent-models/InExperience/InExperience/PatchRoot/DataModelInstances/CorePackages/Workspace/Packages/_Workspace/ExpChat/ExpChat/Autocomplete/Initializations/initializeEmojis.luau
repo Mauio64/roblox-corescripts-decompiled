@@ -1,13 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local l_List_0 = require(l_Parent_0.llama).List;
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local v3 = require(l_Parent_0.EmojiList);
-local v4 = l_Dictionary_0.keys(v3);
-return function(v5) --[[ Line: 9 ]]
-    -- upvalues: l_List_0 (copy), v4 (copy)
-    l_List_0.map(v4, function(v6) --[[ Line: 10 ]]
-        -- upvalues: v5 (copy)
-        v5.trie:insert(v6);
-    end);
-    return v5.trie;
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local List = require(Parent.llama).List
+local Dictionary = require(Parent.llama).Dictionary
+local EmojiList = require(Parent.EmojiList)
+local v5 = Dictionary.keys(EmojiList)
+
+return function(p1) -- line: 9
+	-- upvalues: List (copy), v5 (copy)
+	List.map(v5, function(p2) -- line: 10
+		-- upvalues: p1 (copy)
+		p1.trie:insert(p2)
+	end)
+
+	return p1.trie
+end

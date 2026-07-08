@@ -1,67 +1,72 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.Actions.SetDetailsInformation);
-local v6 = require(l_Parent_0.Actions.SetTryingOnInfo);
-local v7 = require(l_Parent_0.Components.InspectAndBuyContext);
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v9 = require(l_Modules_0.Settings.Theme);
-local v10 = v2.PureComponent:extend("CloseButton");
-v10.render = function(v11) --[[ Line: 19 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v7 (copy), v9 (copy), l_GuiService_0 (copy)
-    local l_view_0 = v11.props.view;
-    local l_viewingDetails_0 = v11.props.detailsInformation.viewingDetails;
-    local l_closeDetails_0 = v11.props.closeDetails;
-    local l_setTryingOnInfo_0 = v11.props.setTryingOnInfo;
-    return v2.createElement(v7.Consumer, {
-        render = function(v16) --[[ Line: 26 ]] --[[ Name: render ]]
-            -- upvalues: l_view_0 (copy), v9 (ref), v2 (ref), l_viewingDetails_0 (copy), l_closeDetails_0 (copy), l_setTryingOnInfo_0 (copy), l_GuiService_0 (ref)
-            local v17 = v16[l_view_0];
-            local v18 = UDim2.new(0, 0, 0, 0);
-            local v19 = 26;
-            if v9.UseInspectAndBuyPanel() then
-                v19 = 18;
-                v18 = UDim2.new(0, v17.BorderPaddingSize, 0, 0);
-            end;
-            return v2.createElement("ImageButton", {
-                Size = UDim2.new(0, v19, 0, v19), 
-                Position = v17.CloseButtonPosition + v18, 
-                BackgroundTransparency = 1, 
-                Selectable = false, 
-                Image = l_viewingDetails_0 and "rbxasset://textures/ui/InspectMenu/caret_tail_left.png" or "rbxasset://textures/ui/InspectMenu/x.png", 
-                ZIndex = 2, 
-                [v2.Event.Activated] = function() --[[ Line: 42 ]]
-                    -- upvalues: l_viewingDetails_0 (ref), l_closeDetails_0 (ref), l_setTryingOnInfo_0 (ref), l_GuiService_0 (ref)
-                    if l_viewingDetails_0 then
-                        l_closeDetails_0();
-                        l_setTryingOnInfo_0(false, nil);
-                        return;
-                    else
-                        l_GuiService_0:CloseInspectMenu();
-                        return;
-                    end;
-                end
-            });
-        end
-    });
-end;
-return v3.UNSTABLE_connect2(function(v20, _) --[[ Line: 55 ]]
-    return {
-        view = v20.view, 
-        detailsInformation = v20.detailsInformation
-    };
-end, function(v22) --[[ Line: 60 ]]
-    -- upvalues: v5 (copy), v6 (copy)
-    return {
-        closeDetails = function() --[[ Line: 62 ]] --[[ Name: closeDetails ]]
-            -- upvalues: v22 (copy), v5 (ref)
-            v22(v5(false, nil));
-        end, 
-        setTryingOnInfo = function(v23, v24) --[[ Line: 65 ]] --[[ Name: setTryingOnInfo ]]
-            -- upvalues: v22 (copy), v6 (ref)
-            v22(v6(v23, v24));
-        end
-    };
-end)(v10);
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local SetDetailsInformation = require(ParentParent.Actions.SetDetailsInformation)
+local SetTryingOnInfo = require(ParentParent.Actions.SetTryingOnInfo)
+local InspectAndBuyContext = require(ParentParent.Components.InspectAndBuyContext)
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Theme = require(Modules.Settings.Theme)
+local v11 = Roact.PureComponent:extend("CloseButton")
+
+function v11.render(p1) -- line: 19
+	-- upvalues: Roact (copy), InspectAndBuyContext (copy), Theme (copy), GuiService (copy)
+	local view = p1.props.view
+	local viewingDetails = p1.props.detailsInformation.viewingDetails
+	local closeDetails = p1.props.closeDetails
+	local setTryingOnInfo = p1.props.setTryingOnInfo
+
+	return Roact.createElement(InspectAndBuyContext.Consumer, {
+		render = function(p2) -- line: 26
+			-- upvalues: view (copy), Theme (copy), Roact (copy), viewingDetails (copy), closeDetails (copy), setTryingOnInfo (copy), GuiService (copy)
+			local v21 = p2[view]
+			local uDim2 = UDim2.new(0, 0, 0, 0)
+			local n1 = 26
+
+			if Theme.UseInspectAndBuyPanel() then
+				n1 = 18
+				uDim2 = UDim2.new(0, v21.BorderPaddingSize, 0, 0)
+			end
+
+			return Roact.createElement("ImageButton", {
+				Size = UDim2.new(0, n1, 0, n1),
+				Position = v21.CloseButtonPosition + uDim2,
+				BackgroundTransparency = 1,
+				Selectable = false,
+				Image = not viewingDetails and "rbxasset://textures/ui/InspectMenu/x.png" or "rbxasset://textures/ui/InspectMenu/caret_tail_left.png",
+				ZIndex = 2,
+				[Roact.Event.Activated] = function() -- line: 42
+					-- upvalues: viewingDetails (copy), closeDetails (copy), setTryingOnInfo (copy), GuiService (copy)
+					if viewingDetails then
+						closeDetails()
+						setTryingOnInfo(false, nil)
+
+						return
+					end
+
+					GuiService:CloseInspectMenu()
+				end
+			})
+		end
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p3, _) -- line: 55
+	return {
+		view = p3.view,
+		detailsInformation = p3.detailsInformation
+	}
+end, function(p5) -- line: 60
+	-- upvalues: SetDetailsInformation (copy), SetTryingOnInfo (copy)
+	return {
+		closeDetails = function() -- line: 62
+			-- upvalues: p5 (copy), SetDetailsInformation (copy)
+			p5(SetDetailsInformation(false, nil))
+		end,
+		setTryingOnInfo = function(p6, p7) -- line: 65
+			-- upvalues: p5 (copy), SetTryingOnInfo (copy)
+			p5(SetTryingOnInfo(p6, p7))
+		end
+	}
+end)(v11)

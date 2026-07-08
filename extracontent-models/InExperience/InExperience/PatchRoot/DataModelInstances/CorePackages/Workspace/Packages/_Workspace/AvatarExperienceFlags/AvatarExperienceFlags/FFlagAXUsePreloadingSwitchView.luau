@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXUsePreloadingSwitchView", false);
+return game:DefineFastFlag("AXUsePreloadingSwitchView", false)

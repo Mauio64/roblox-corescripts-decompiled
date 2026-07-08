@@ -1,4 +1,4 @@
 return {
-    SetSquadPrompt = require(script.SetSquadPrompt), 
-    CloseSquadPrompt = require(script.CloseSquadPrompt)
-};
+	SetSquadPrompt = require(script.SetSquadPrompt),
+	CloseSquadPrompt = require(script.CloseSquadPrompt)
+}

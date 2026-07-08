@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableMicrosoftStorePaymentsPlatform", false);
+return game:DefineFastFlag("EnableMicrosoftStorePaymentsPlatform", false)

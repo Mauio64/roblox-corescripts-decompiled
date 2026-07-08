@@ -1,1 +1,1 @@
-return game:DefineFastInt("SignupMinimumAge", 5);
+return game:DefineFastInt("SignupMinimumAge", 5)

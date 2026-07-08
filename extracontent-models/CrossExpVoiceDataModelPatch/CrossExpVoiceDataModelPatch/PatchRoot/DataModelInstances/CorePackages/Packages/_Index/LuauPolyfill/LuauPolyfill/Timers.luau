@@ -1,3 +1,4 @@
-local v0 = require(script.makeTimerImpl);
-local v1 = require(script.makeIntervalImpl);
-return require(script.Parent.Object.assign)({}, v0(task.delay), v1(task.delay));
+local makeTimerImpl = require(script.makeTimerImpl)
+local makeIntervalImpl = require(script.makeIntervalImpl)
+
+return require(script.Parent.Object.assign)({}, makeTimerImpl(task.delay), makeIntervalImpl(task.delay))

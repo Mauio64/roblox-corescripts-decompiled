@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SearchOmniAutocompletePageIXP5", false);
+return game:DefineFastFlag("SearchOmniAutocompletePageIXP5", false)

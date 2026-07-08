@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppUseAppHttpStore", false);
+return game:DefineFastFlag("LuaAppUseAppHttpStore", false)

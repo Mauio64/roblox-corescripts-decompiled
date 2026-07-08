@@ -1,43 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserLib");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Models.User);
-local v3 = require(l_script_FirstAncestor_0.Actions.AddUsers);
-local l_SetFriendCount_0 = require(l_Parent_0.LegacyFriendsRodux).Actions.SetFriendCount;
-return function(v5) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), v3 (copy), l_SetFriendCount_0 (copy)
-    return function(v6) --[[ Line: 10 ]]
-        -- upvalues: v5 (copy), v2 (ref), v3 (ref), l_SetFriendCount_0 (ref)
-        local v7 = 0;
-        local v8 = {};
-        for _, v10 in pairs(v5) do
-            local v11 = false;
-            local l_id_0 = v10.id;
-            local l_isFriend_0 = v10.isFriend;
-            local v14 = 0;
-            assert(typeof(l_isFriend_0) == "boolean", "Expected isFriend to be a string");
-            local v15 = v6:getState().Users[l_id_0];
-            if v15 then
-                if not v2.compare(v15, v10) then
-                    v11 = true;
-                    if v15.isFriend ~= l_isFriend_0 then
-                        v14 = l_isFriend_0 and 1 or -1;
-                    end;
-                end;
-            else
-                v11 = true;
-                v14 = l_isFriend_0 and 1 or 0;
-            end;
-            if v11 then
-                v7 = v7 + v14;
-                v8[l_id_0] = v10;
-            end;
-        end;
-        if next(v8) then
-            v6:dispatch(v3(v8));
-        end;
-        if v7 ~= 0 then
-            local l_FriendCount_0 = v6:getState().FriendCount;
-            v6:dispatch(l_SetFriendCount_0(l_FriendCount_0 + v7));
-        end;
-    end;
-end;
+local UserLib = script:FindFirstAncestor("UserLib")
+local UserLibParent = UserLib.Parent
+local User = require(UserLib.Models.User)
+local AddUsers = require(UserLib.Actions.AddUsers)
+local SetFriendCount = require(UserLibParent.LegacyFriendsRodux).Actions.SetFriendCount
+
+return function(p1) -- line: 9
+	-- upvalues: User (copy), AddUsers (copy), SetFriendCount (copy)
+	return function(p2) -- line: 10
+		-- upvalues: p1 (copy), User (copy), AddUsers (copy), SetFriendCount (copy)
+		local n1 = 0
+		local t1 = {}
+
+		for _, v in pairs(p1) do
+			local v12 = false
+			local id = v.id
+			local isFriend = v.isFriend
+			local n2 = 0
+
+			assert(typeof(isFriend) == "boolean", "Expected isFriend to be a string")
+
+			local v16 = p2:getState().Users[id]
+
+			if v16 then
+				if not User.compare(v16, v) then
+					v12 = true
+
+					if isFriend ~= v16.isFriend then
+						n2 = not isFriend and -1 or 1
+					end
+				end
+			else
+				v12 = true
+				n2 = not isFriend and 0 or 1
+			end
+
+			if v12 then
+				n1 += n2
+				t1[id] = v
+			end
+		end
+
+		if next(t1) then
+			p2:dispatch(AddUsers(t1))
+		end
+
+		if n1 ~= 0 then
+			local FriendCount = p2:getState().FriendCount
+
+			p2:dispatch(SetFriendCount(FriendCount + n1))
+		end
+	end
+end

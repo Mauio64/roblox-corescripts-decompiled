@@ -1,73 +1,86 @@
-local l_BaseUrl_0 = game:GetService("ContentProvider").BaseUrl;
-l_BaseUrl_0 = string.gsub(l_BaseUrl_0, ".*://", "");
-l_BaseUrl_0 = string.gsub(l_BaseUrl_0, "/.*", "");
-l_BaseUrl_0 = string.gsub(l_BaseUrl_0, "^www%.", "");
-local v7 = {
-    new = function(v1, v2) --[[ Line: 24 ]] --[[ Name: new ]]
-        -- upvalues: l_BaseUrl_0 (ref)
-        assert(type(v1) == "string", "UrlBase.new: `name` should be a string");
-        if v2 == nil then
-            v2 = {};
-        end;
-        if type(v2) == "number" or type(v2) == "string" then
-            v2 = {
-                version = v2
-            };
-        end;
-        assert(type(v2) == "table", "UrlBase.new: `params` should be a table");
-        local l_proto_0 = v2.proto;
-        local l_version_0 = v2.version;
-        local l_path_0 = v2.path;
-        if l_proto_0 == nil then
-            l_proto_0 = v2.secure == false and "http" or "https";
-        end;
-        local l_l_proto_0_0 = l_proto_0;
-        if #l_proto_0 > 0 then
-            l_l_proto_0_0 = l_l_proto_0_0 .. "://";
-        end;
-        l_l_proto_0_0 = l_l_proto_0_0 .. v1;
-        if #v1 > 0 then
-            l_l_proto_0_0 = l_l_proto_0_0 .. ".";
-        end;
-        l_l_proto_0_0 = l_l_proto_0_0 .. l_BaseUrl_0;
-        if l_version_0 ~= nil and #tostring(l_version_0) > 0 then
-            l_l_proto_0_0 = l_l_proto_0_0 .. "/v" .. tostring(l_version_0);
-        end;
-        if l_path_0 ~= nil and #l_path_0 > 0 then
-            l_l_proto_0_0 = l_l_proto_0_0 .. "/" .. l_path_0;
-        end;
-        return l_l_proto_0_0;
-    end
-};
-local v8 = string.sub(l_BaseUrl_0, -6) == "qq.com";
-v7.API = v7.new("api");
-v7.APIS = v7.new("apis");
-v7.APIS_RBXCDN = "https://apis.rbxcdn.com";
-v7.AUTH = v7.new("auth");
-v7.CHAT = v7.new("chat");
-v7.CREATE = v7.new("create");
-v7.FRIENDS = v7.new("friends", 1);
-v7.ASSETGAME = v7.new("assetgame");
-v7.GAMES = v7.new("games", 1);
-v7.NOTIFICATION = v7.new("notification", 2);
-v7.NOTIFICATIONS = v7.new("notifications", 2);
-v7.PRESENCE = v7.new("presence", 1);
-v7.REALTIME = v7.new("realtime");
-v7.WEB = v7.new("web");
-v7.WWW = v7.new("www");
-v7.ADS = v7.new("ads", 1);
-v7.ADCONFIGURATION = v7.new("adconfiguration", 2);
-v7.FOLLOWINGS = v7.new("followings", 1);
-v7.PREMIUM = v7.new("premiumfeatures", 1);
-v7.BLOG = "https://blog.roblox.com";
-v7.CORP = v8 and "https://roblox.qq.com" or "https://corp.roblox.com";
-v7.USERMODERATION = v7.new("usermoderation");
-v7.ACCOUNTINFORMATION = v7.new("accountinformation", 1);
-v7.ACCOUNTSETTINGS = v7.new("accountsettings");
-v7.BADGES = v7.new("badges", 1);
-v7.INVENTORY = v7.new("inventory", 1);
-v7.CATALOG = v7.new("catalog", 1);
-v7.AVATAR = v7.new("avatar", 1);
-v7.MOBILENAV = "roblox://navigation";
-v7.APPSFLYER = "https://ro.blox.com";
-return v7;
+local BaseUrl = game:GetService("ContentProvider").BaseUrl
+local v2 = string.gsub(BaseUrl, ".*://", "")
+local v3 = string.gsub(v2, "/.*", "")
+local u4 = string.gsub(v3, "^www%.", "")
+local t1 = {
+	new = function(p1, p2) -- line: 24
+		-- upvalues: u4 (ref)
+		assert(type(p1) == "string", "UrlBase.new: `name` should be a string")
+
+		if p2 == nil then
+			p2 = {}
+		end
+
+		if type(p2) == "number" or type(p2) == "string" then
+			p2 = {
+				version = p2
+			}
+		end
+
+		assert(type(p2) == "table", "UrlBase.new: `params` should be a table")
+
+		local proto = p2.proto
+		local version = p2.version
+		local path = p2.path
+
+		if proto == nil then
+			proto = p2.secure ~= false and "https" or "http"
+		end
+
+		if #proto > 0 then
+			proto ..= "://"
+		end
+
+		local v12 = proto .. p1
+
+		if #p1 > 0 then
+			v12 ..= "."
+		end
+
+		local v13 = v12 .. u4
+
+		if version ~= nil and #tostring(version) > 0 then
+			v13 ..= "/v" .. tostring(version)
+		end
+
+		if path ~= nil and #path > 0 then
+			v13 ..= "/" .. path
+		end
+
+		return v13
+	end
+}
+local v6 = string.sub(u4, -6) == "qq.com"
+
+t1.API = t1.new("api")
+t1.APIS = t1.new("apis")
+t1.APIS_RBXCDN = "https://apis.rbxcdn.com"
+t1.AUTH = t1.new("auth")
+t1.CHAT = t1.new("chat")
+t1.CREATE = t1.new("create")
+t1.FRIENDS = t1.new("friends", 1)
+t1.ASSETGAME = t1.new("assetgame")
+t1.GAMES = t1.new("games", 1)
+t1.NOTIFICATION = t1.new("notification", 2)
+t1.NOTIFICATIONS = t1.new("notifications", 2)
+t1.PRESENCE = t1.new("presence", 1)
+t1.REALTIME = t1.new("realtime")
+t1.WEB = t1.new("web")
+t1.WWW = t1.new("www")
+t1.ADS = t1.new("ads", 1)
+t1.ADCONFIGURATION = t1.new("adconfiguration", 2)
+t1.FOLLOWINGS = t1.new("followings", 1)
+t1.PREMIUM = t1.new("premiumfeatures", 1)
+t1.BLOG = "https://blog.roblox.com"
+t1.CORP = not v6 and "https://corp.roblox.com" or "https://roblox.qq.com"
+t1.USERMODERATION = t1.new("usermoderation")
+t1.ACCOUNTINFORMATION = t1.new("accountinformation", 1)
+t1.ACCOUNTSETTINGS = t1.new("accountsettings")
+t1.BADGES = t1.new("badges", 1)
+t1.INVENTORY = t1.new("inventory", 1)
+t1.CATALOG = t1.new("catalog", 1)
+t1.AVATAR = t1.new("avatar", 1)
+t1.MOBILENAV = "roblox://navigation"
+t1.APPSFLYER = "https://ro.blox.com"
+
+return t1

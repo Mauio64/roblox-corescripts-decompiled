@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothShareModal", false);
+return game:DefineFastFlag("AXPhotoboothShareModal", false)

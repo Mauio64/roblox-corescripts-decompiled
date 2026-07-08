@@ -1,1 +1,1 @@
-return require(script.TopBanner);
+return require(script.TopBanner)

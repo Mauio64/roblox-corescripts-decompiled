@@ -1,228 +1,275 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local l_NotificationService_0 = game:GetService("NotificationService");
-local l_HttpService_0 = game:GetService("HttpService");
-local v6 = require(l_CorePackages_0.Workspace.Packages.ScreenTime);
-local l_HttpRequests_0 = v6.HttpRequests;
-local l_Constants_0 = v6.Constants;
-local l_GetFFlagScreenTimeSignalR_0 = v6.GetFFlagScreenTimeSignalR;
-local l_Logging_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Logging;
-local v11 = require(l_RobloxGui_0.Modules.ErrorPrompt);
-local function _() --[[ Line: 16 ]] --[[ Name: leaveGame ]]
-    -- upvalues: l_GuiService_0 (copy)
-    l_GuiService_0.SelectedCoreObject = nil;
-    game:Shutdown();
-end;
-local v13 = {
-    Warning = 1, 
-    Lockout = 2, 
-    OpenWebView = 3
-};
-local v14 = l_HttpRequests_0:new(l_HttpService_0);
-local v15 = nil;
-local function _() --[[ Line: 32 ]] --[[ Name: disconnectAndLeaveGame ]]
-    -- upvalues: v15 (ref), l_GuiService_0 (copy)
-    if v15 then
-        v15:Disconnect();
-        v15 = nil;
-    end;
-    l_GuiService_0.SelectedCoreObject = nil;
-    game:Shutdown();
-end;
-local v25 = {
-    pendingResolveMessage = {}, 
-    displaying = nil, 
-    resolvedMessage = {}, 
-    displayMessageCallback = nil, 
-    update = function(v17, v18) --[[ Line: 53 ]] --[[ Name: update ]]
-        for _, v20 in pairs(v18) do
-            local v21 = {
-                id = v20.serialId, 
-                instructionName = v20.instructionName, 
-                message = v20.message, 
-                type = v20.type
-            };
-            table.insert(v17.pendingResolveMessage, v21);
-        end;
-        v17:processNext();
-    end, 
-    processNext = function(v22) --[[ Line: 66 ]] --[[ Name: processNext ]]
-        if v22.displaying then
-            return;
-        else
-            local v23 = table.remove(v22.pendingResolveMessage, 1);
-            if not v23 then
-                return;
-            elseif v22.resolvedMessage[v23.id] then
-                v22:processNext();
-                return;
-            else
-                v22.displaying = v23;
-                if v22.displayMessageCallback then
-                    v22.displayMessageCallback(v23.message);
-                end;
-                return;
-            end;
-        end;
-    end, 
-    resolve = function(v24) --[[ Line: 88 ]] --[[ Name: resolve ]]
-        -- upvalues: v14 (copy)
-        v24.resolvedMessage[v24.displaying.id] = v24.displaying.message;
-        v14:reportExecution(v24.displaying.instructionName, v24.displaying.id);
-        v24.displaying = nil;
-        v24:processNext();
-    end
-};
-local v26 = {
-    MessageTextScaled = true, 
-    HideErrorCode = true, 
-    MenuIsOpenKey = "ScreenTimePrompt"
-};
-local v27 = v11.new("Default", v26);
-v27:setParent(l_RobloxGui_0);
-local function v29(v28) --[[ Line: 108 ]] --[[ Name: displayMessage ]]
-    -- upvalues: v27 (copy)
-    v27:_open(v28);
-end;
-local v30 = {
-    {
-        Text = "OK", 
-        LocalizationKey = "InGame.CommonUI.Button.Ok", 
-        LayoutOrder = 1, 
-        Callback = function() --[[ Line: 112 ]] --[[ Name: resolveMessage ]]
-            -- upvalues: v27 (copy), v25 (copy)
-            v27:_close();
-            v25:resolve();
-        end, 
-        Primary = true
-    }
-};
-v25.displayMessageCallback = v29;
-v27:updateButtons(v30);
-v27:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning");
-local l_X_0 = l_RobloxGui_0.AbsoluteSize.X;
-local l_Y_0 = l_RobloxGui_0.AbsoluteSize.Y;
-local function v35() --[[ Line: 135 ]] --[[ Name: onScreenSizeChanged ]]
-    -- upvalues: v27 (copy), l_RobloxGui_0 (copy), l_X_0 (ref), l_Y_0 (ref)
-    if not v27 then
-        return;
-    else
-        local l_X_1 = l_RobloxGui_0.AbsoluteSize.X;
-        local l_Y_1 = l_RobloxGui_0.AbsoluteSize.Y;
-        if l_X_0 ~= l_X_1 or l_Y_0 ~= l_Y_1 then
-            l_X_0 = l_X_1;
-            l_Y_0 = l_Y_1;
-            v27:resizeWidthAndHeight(l_X_0, l_Y_0);
-        end;
-        return;
-    end;
-end;
-l_RobloxGui_0:GetPropertyChangedSignal("AbsoluteSize"):connect(v35);
-if v27 then
-    local l_X_2 = l_RobloxGui_0.AbsoluteSize.X;
-    local l_Y_2 = l_RobloxGui_0.AbsoluteSize.Y;
-    if l_X_0 ~= l_X_2 or l_Y_0 ~= l_Y_2 then
-        l_X_0 = l_X_2;
-        l_Y_0 = l_Y_2;
-        v27:resizeWidthAndHeight(l_X_0, l_Y_0);
-    end;
-end;
-local function v42(v38) --[[ Line: 151 ]] --[[ Name: screenTimeStatesUpdated ]]
-    -- upvalues: v13 (copy), v15 (ref), l_GuiService_0 (copy), v25 (copy)
-    local v39 = {};
-    for _, v41 in ipairs(v38) do
-        if v41.type == v13.Warning then
-            table.insert(v39, v41);
-        elseif v41.type == v13.Lockout then
-            if v15 then
-                v15:Disconnect();
-                v15 = nil;
-            end;
-            l_GuiService_0.SelectedCoreObject = nil;
-            game:Shutdown();
-            return;
-        elseif v41.type == v13.OpenWebView then
+local GuiService = game:GetService("GuiService")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui.RobloxGui
+local NotificationService = game:GetService("NotificationService")
+local HttpService = game:GetService("HttpService")
+local ScreenTime = require(CorePackages.Workspace.Packages.ScreenTime)
+local HttpRequests = ScreenTime.HttpRequests
+local Constants = ScreenTime.Constants
+local GetFFlagScreenTimeSignalR = ScreenTime.GetFFlagScreenTimeSignalR
+local Logging = require(CorePackages.Workspace.Packages.AppCommonLib).Logging
+local ErrorPrompt = require(RobloxGui.Modules.ErrorPrompt)
 
-        end;
-    end;
-    v25:update(v39);
-end;
-local function _() --[[ Line: 170 ]] --[[ Name: requestInstructions ]]
-    -- upvalues: v14 (copy), v42 (copy), l_Logging_0 (copy)
-    v14:getInstructions(function(v43, v44, v45) --[[ Line: 171 ]]
-        -- upvalues: v42 (ref), l_Logging_0 (ref)
-        if v43 then
-            v42(v45);
-            return;
-        elseif v44 then
-            l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: unauthorized");
-            return;
-        else
-            l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: error");
-            return;
-        end;
-    end);
-end;
-v15 = l_NotificationService_0.RobloxEventReceived:Connect(function(v47) --[[ Line: 183 ]]
-    -- upvalues: l_GetFFlagScreenTimeSignalR_0 (copy), l_Constants_0 (copy), v14 (copy), v42 (copy), l_Logging_0 (copy), v15 (ref), l_GuiService_0 (copy), l_HttpService_0 (copy)
-    if l_GetFFlagScreenTimeSignalR_0() then
-        if v47.namespace == l_Constants_0.SIGNALR_NAMESPACE and v47.detailType == l_Constants_0.SIGNALR_TYPE_NEW_INSTRUCTION then
-            v14:getInstructions(function(v48, v49, v50) --[[ Line: 171 ]]
-                -- upvalues: v42 (ref), l_Logging_0 (ref)
-                if v48 then
-                    v42(v50);
-                    return;
-                elseif v49 then
-                    l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: unauthorized");
-                    return;
-                else
-                    l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: error");
-                    return;
-                end;
-            end);
-            return;
-        end;
-    elseif v47.namespace == l_Constants_0.HEARTBEAT_NOTIFICATIONS_NAMESPACE then
-        if v47.detailType == l_Constants_0.HEARTBEAT_CONSECUTIVE_FAILURE then
-            if v15 then
-                v15:Disconnect();
-                v15 = nil;
-            end;
-            l_GuiService_0.SelectedCoreObject = nil;
-            game:Shutdown();
-            return;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 198 ]]
-                -- upvalues: l_HttpService_0 (ref), v47 (copy)
-                return l_HttpService_0:JSONDecode(v47.detail);
-            end);
-            if not l_status_0 then
-                l_Logging_0.warn("ScreenTimeInGame json decoding failed");
-                return;
-            elseif l_result_0.notifications == nil then
-                l_Logging_0.warn("ScreenTimeInGame empty heartbeat notifications");
-                return;
-            else
-                for _, v54 in ipairs(l_result_0.notifications) do
-                    if v54.type == l_Constants_0.HEARTBEAT_NOTIFICATION_TYPE_NEW_INSTRUCTION then
-                        v14:getInstructions(function(v55, v56, v57) --[[ Line: 171 ]]
-                            -- upvalues: v42 (ref), l_Logging_0 (ref)
-                            if v55 then
-                                v42(v57);
-                                return;
-                            elseif v56 then
-                                l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: unauthorized");
-                                return;
-                            else
-                                l_Logging_0.warn("ScreenTimeInGame requestInstructions failed: error");
-                                return;
-                            end;
-                        end);
-                    end;
-                end;
-            end;
-        end;
-    end;
-end);
+local function leaveGame() -- line: 16
+	-- upvalues: GuiService (copy)
+	GuiService.SelectedCoreObject = nil
+	game:Shutdown()
+end
+
+local _ = {
+	Warning = 1,
+	Lockout = 2,
+	OpenWebView = 3
+}
+local v15 = HttpRequests:new(HttpService)
+local u16 = nil
+
+local function disconnectAndLeaveGame() -- line: 32
+	-- upvalues: u16 (ref), GuiService (copy)
+	if u16 then
+		u16:Disconnect()
+		u16 = nil
+	end
+
+	GuiService.SelectedCoreObject = nil
+	game:Shutdown()
+end
+
+local t2 = {
+	displaying = nil,
+	displayMessageCallback = nil,
+	pendingResolveMessage = {},
+	resolvedMessage = {},
+	update = function(p1, p2) -- line: 53
+		for _, v in pairs(p2) do
+			local t1 = {
+				id = v.serialId,
+				instructionName = v.instructionName,
+				message = v.message,
+				type = v.type
+			}
+
+			table.insert(p1.pendingResolveMessage, t1)
+		end
+
+		p1:processNext()
+	end,
+	processNext = function(p3) -- line: 66
+		if p3.displaying then
+			return
+		end
+
+		local v37 = table.remove(p3.pendingResolveMessage, 1)
+
+		if not v37 then
+			return
+		end
+
+		if p3.resolvedMessage[v37.id] then
+			p3:processNext()
+
+			return
+		end
+
+		p3.displaying = v37
+
+		if p3.displayMessageCallback then
+			p3.displayMessageCallback(v37.message)
+		end
+	end,
+	resolve = function(p4) -- line: 88
+		-- upvalues: v15 (copy)
+		p4.resolvedMessage[p4.displaying.id] = p4.displaying.message
+		v15:reportExecution(p4.displaying.instructionName, p4.displaying.id)
+		p4.displaying = nil
+		p4:processNext()
+	end
+}
+local t3 = {
+	MessageTextScaled = true,
+	HideErrorCode = true,
+	MenuIsOpenKey = "ScreenTimePrompt"
+}
+local v20 = ErrorPrompt.new("Default", t3)
+
+v20:setParent(RobloxGui)
+
+local function displayMessage(p5) -- line: 108
+	-- upvalues: v20 (copy)
+	v20:_open(p5)
+end
+local function resolveMessage() -- line: 112
+	-- upvalues: v20 (copy), t2 (copy)
+	v20:_close()
+	t2:resolve()
+end
+
+local t4 = {{
+	Text = "OK",
+	LocalizationKey = "InGame.CommonUI.Button.Ok",
+	LayoutOrder = 1,
+	Primary = true,
+	Callback = resolveMessage
+}}
+
+t2.displayMessageCallback = displayMessage
+v20:updateButtons(t4)
+v20:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning")
+
+local AbsoluteSizeX = RobloxGui.AbsoluteSize.X
+local AbsoluteSizeY = RobloxGui.AbsoluteSize.Y
+
+local function onScreenSizeChanged() -- line: 135
+	-- upvalues: v20 (copy), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
+	if not v20 then
+		return
+	end
+
+	local AbsoluteSizeX2 = RobloxGui.AbsoluteSize.X
+	local AbsoluteSizeY2 = RobloxGui.AbsoluteSize.Y
+
+	if AbsoluteSizeX2 ~= AbsoluteSizeX or AbsoluteSizeY2 ~= AbsoluteSizeY then
+		AbsoluteSizeX = AbsoluteSizeX2
+		AbsoluteSizeY = AbsoluteSizeY2
+		v20:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+end
+
+RobloxGui:GetPropertyChangedSignal("AbsoluteSize"):connect(onScreenSizeChanged)
+
+if v20 then
+	local AbsoluteSizeX3 = RobloxGui.AbsoluteSize.X
+	local AbsoluteSizeY3 = RobloxGui.AbsoluteSize.Y
+
+	if AbsoluteSizeX3 ~= AbsoluteSizeX or AbsoluteSizeY3 ~= AbsoluteSizeY then
+		AbsoluteSizeX = AbsoluteSizeX3
+		AbsoluteSizeY = AbsoluteSizeY3
+		v20:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+end
+
+local function screenTimeStatesUpdated(p6) -- line: 151
+	-- upvalues: u16 (ref), GuiService (copy), t2 (copy)
+	local t5 = {}
+
+	for _, v in ipairs(p6) do
+		if v.type ~= 1 then
+			if v.type == 2 then
+				if u16 then
+					u16:Disconnect()
+					u16 = nil
+				end
+
+				GuiService.SelectedCoreObject = nil
+				game:Shutdown()
+
+				return
+			end
+
+			if v.type ~= 3 then
+			end
+
+			continue
+		end
+
+		table.insert(t5, v)
+	end
+
+	t2:update(t5)
+end
+local function requestInstructions() -- line: 170
+	-- upvalues: v15 (copy), screenTimeStatesUpdated (copy), Logging (copy)
+	v15:getInstructions(function(p7, p8, p9) -- line: 171
+		-- upvalues: screenTimeStatesUpdated (copy), Logging (copy)
+		if p7 then
+			screenTimeStatesUpdated(p9)
+
+			return
+		end
+
+		if p8 then
+			Logging.warn("ScreenTimeInGame requestInstructions failed: unauthorized")
+
+			return
+		end
+
+		Logging.warn("ScreenTimeInGame requestInstructions failed: error")
+	end)
+end
+
+u16 = NotificationService.RobloxEventReceived:Connect(function(p10) -- line: 183
+	-- upvalues: GetFFlagScreenTimeSignalR (copy), Constants (copy), v15 (copy), screenTimeStatesUpdated (copy), Logging (copy), u16 (ref), GuiService (copy), HttpService (copy)
+	if GetFFlagScreenTimeSignalR() then
+		if p10.namespace == Constants.SIGNALR_NAMESPACE and p10.detailType == Constants.SIGNALR_TYPE_NEW_INSTRUCTION then
+			v15:getInstructions(function(p11, p12, p13) -- line: 171
+				-- upvalues: screenTimeStatesUpdated (copy), Logging (copy)
+				if p11 then
+					screenTimeStatesUpdated(p13)
+
+					return
+				end
+
+				if p12 then
+					Logging.warn("ScreenTimeInGame requestInstructions failed: unauthorized")
+
+					return
+				end
+
+				Logging.warn("ScreenTimeInGame requestInstructions failed: error")
+			end)
+
+			return
+		end
+	elseif p10.namespace == Constants.HEARTBEAT_NOTIFICATIONS_NAMESPACE then
+		if p10.detailType == Constants.HEARTBEAT_CONSECUTIVE_FAILURE then
+			if u16 then
+				u16:Disconnect()
+				u16 = nil
+			end
+
+			GuiService.SelectedCoreObject = nil
+			game:Shutdown()
+
+			return
+		end
+
+		local ok, result = pcall(function() -- line: 198
+			-- upvalues: HttpService (copy), p10 (copy)
+			return HttpService:JSONDecode(p10.detail)
+		end)
+
+		if not ok then
+			Logging.warn("ScreenTimeInGame json decoding failed")
+
+			return
+		end
+
+		if result.notifications == nil then
+			Logging.warn("ScreenTimeInGame empty heartbeat notifications")
+
+			return
+		end
+
+		for _, v in ipairs(result.notifications) do
+			if v.type == Constants.HEARTBEAT_NOTIFICATION_TYPE_NEW_INSTRUCTION then
+				v15:getInstructions(function(p14, p15, p16) -- line: 171
+					-- upvalues: screenTimeStatesUpdated (copy), Logging (copy)
+					if p14 then
+						screenTimeStatesUpdated(p16)
+
+						return
+					end
+
+					if p15 then
+						Logging.warn("ScreenTimeInGame requestInstructions failed: unauthorized")
+
+						return
+					end
+
+					Logging.warn("ScreenTimeInGame requestInstructions failed: error")
+				end)
+			end
+		end
+	end
+end)

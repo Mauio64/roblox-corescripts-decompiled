@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChatShared").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 13 ]]
-    return {
-        team = v1.team, 
-        isChatCoreGuiEnabled = v1.isChatCoreGuiEnabled == nil or v1.isChatCoreGuiEnabled, 
-        isTouchEnabled = v1.isTouchEnabled, 
-        isGamepadEnabled = v1.isGamepadEnabled
-    };
-end);
+local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 13
+	return {
+		team = p1.team,
+		isChatCoreGuiEnabled = p1.isChatCoreGuiEnabled == nil or p1.isChatCoreGuiEnabled,
+		isTouchEnabled = p1.isTouchEnabled,
+		isGamepadEnabled = p1.isGamepadEnabled
+	}
+end)

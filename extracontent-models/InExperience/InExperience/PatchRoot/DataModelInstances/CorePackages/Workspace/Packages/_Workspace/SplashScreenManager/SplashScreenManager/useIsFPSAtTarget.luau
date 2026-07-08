@@ -1,22 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("SplashScreenManager").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.SplashScreenManager);
-return function() --[[ Line: 9 ]] --[[ Name: useIsFPSAtTarget ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v3, v4 = v1.useState(v2.isFPSAtTarget());
-    local v6 = v1.useCallback(function(v5) --[[ Line: 11 ]]
-        -- upvalues: v4 (copy)
-        v4(v5);
-    end, {
-        v4
-    });
-    v1.useEffect(function() --[[ Line: 15 ]]
-        -- upvalues: v2 (ref), v6 (copy)
-        v2.addStatusChangeListener(v6);
-        return function() --[[ Line: 17 ]]
-            -- upvalues: v2 (ref), v6 (ref)
-            v2.removeStatusChangeListener(v6);
-        end;
-    end, {});
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("SplashScreenManager").Parent
+local React = require(Parent.React)
+local SplashScreenManager = require(script.Parent.SplashScreenManager)
+
+local function useIsFPSAtTarget() -- line: 9
+	-- upvalues: React (copy), SplashScreenManager (copy)
+	local v5, v6 = React.useState(SplashScreenManager.isFPSAtTarget())
+	local v7 = React.useCallback(function(p1) -- line: 11
+		-- upvalues: v6 (copy)
+		v6(p1)
+	end, { v6 })
+
+	React.useEffect(function() -- line: 15
+		-- upvalues: SplashScreenManager (copy), v7 (copy)
+		SplashScreenManager.addStatusChangeListener(v7)
+
+		return function() -- line: 17
+			-- upvalues: SplashScreenManager (copy), v7 (copy)
+			SplashScreenManager.removeStatusChangeListener(v7)
+		end
+	end, {})
+
+	return v5
+end
+
+return useIsFPSAtTarget

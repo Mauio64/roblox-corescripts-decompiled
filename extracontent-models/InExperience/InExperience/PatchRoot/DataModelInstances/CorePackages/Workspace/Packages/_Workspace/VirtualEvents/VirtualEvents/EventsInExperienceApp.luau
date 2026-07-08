@@ -1,47 +1,54 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.RoactCompat);
-local l_RoactNetworking_0 = require(l_Parent_1.RoactServiceTags).RoactNetworking;
-local l_RoactServices_0 = require(l_Parent_1.RoactServices).RoactServices;
-local l_requestInternalWrapper_0 = require(l_Parent_1.Http).NetworkLayers.requestInternalWrapper;
-local l_CoreScriptsRootProvider_0 = require(l_Parent_1.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local v9 = require(l_Parent_0.Components.CoreUI.EventInExperiencePrompts);
-local v10 = game:DefineFastFlag("EventsInExperienceAppFixStyleLink", false);
-local v11 = {};
-local function v15(v12, v13) --[[ Line: 29 ]]
-    -- upvalues: v3 (copy), l_CoreScriptsRootProvider_0 (copy), l_RoactServices_0 (copy), l_RoactNetworking_0 (copy), l_requestInternalWrapper_0 (copy), l_HttpService_0 (copy), v10 (copy), v4 (copy)
-    local v14 = v3.createElement(l_CoreScriptsRootProvider_0, {}, {
-        RoactServicesProvider = v3.createElement(l_RoactServices_0.ServiceProvider, {
-            services = {
-                [l_RoactNetworking_0] = l_requestInternalWrapper_0(l_HttpService_0)
-            }
-        }, v13)
-    });
-    if v10 then
-        v14 = v3.createElement("Folder", nil, v14);
-    end;
-    return v4.mount(v14, v12, "EventsInExperienceRoot");
-end;
-v11.createApp = function() --[[ Line: 43 ]] --[[ Name: createApp ]]
-    -- upvalues: v15 (copy), v3 (copy), v9 (copy), v4 (copy)
-    local v16 = {
-        _coreUiHandle = nil
-    };
-    v16.mountCoreUI = function(v17) --[[ Line: 48 ]]
-        -- upvalues: v16 (copy), v15 (ref), v3 (ref), v9 (ref)
-        v16._coreUiHandle = v15(v17, {
-            EventInExperiencePrompts = v3.createElement(v9)
-        });
-    end;
-    v16.unMountCoreUI = function() --[[ Line: 54 ]]
-        -- upvalues: v16 (copy), v4 (ref)
-        if v16._coreUiHandle then
-            v4.unmount(v16._coreUiHandle);
-            v16._coreUiHandle = nil;
-        end;
-    end;
-    return v16;
-end;
-return v11;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local HttpService = game:GetService("HttpService")
+local React = require(scriptParentParent.React)
+local RoactCompat = require(scriptParentParent.RoactCompat)
+local RoactNetworking = require(scriptParentParent.RoactServiceTags).RoactNetworking
+local RoactServices = require(scriptParentParent.RoactServices).RoactServices
+local requestInternalWrapper = require(scriptParentParent.Http).NetworkLayers.requestInternalWrapper
+local CoreScriptsRootProvider = require(scriptParentParent.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local EventInExperiencePrompts = require(scriptParent.Components.CoreUI.EventInExperiencePrompts)
+local v11 = game:DefineFastFlag("EventsInExperienceAppFixStyleLink", false)
+local t1 = {}
+
+local function v13(p1, t2: {[any]: any}) -- line: 29
+	-- upvalues: React (copy), CoreScriptsRootProvider (copy), RoactServices (copy), RoactNetworking (copy), requestInternalWrapper (copy), HttpService (copy), v11 (copy), RoactCompat (copy)
+	local v16 = React.createElement(CoreScriptsRootProvider, {}, {
+		RoactServicesProvider = React.createElement(RoactServices.ServiceProvider, {
+			services = {
+				[RoactNetworking] = requestInternalWrapper(HttpService)
+			}
+		}, t2)
+	})
+
+	if v11 then
+		v16 = React.createElement("Folder", nil, v16)
+	end
+
+	return RoactCompat.mount(v16, p1, "EventsInExperienceRoot")
+end
+
+function t1.createApp() -- line: 43
+	-- upvalues: v13 (copy), React (copy), EventInExperiencePrompts (copy), RoactCompat (copy)
+	local t3 = {
+		_coreUiHandle = nil
+	}
+
+	function t3.mountCoreUI(p2) -- line: 48
+		-- upvalues: t3 (copy), v13 (copy), React (copy), EventInExperiencePrompts (copy)
+		t3._coreUiHandle = v13(p2, {
+			EventInExperiencePrompts = React.createElement(EventInExperiencePrompts)
+		})
+	end
+	function t3.unMountCoreUI() -- line: 54
+		-- upvalues: t3 (copy), RoactCompat (copy)
+		if t3._coreUiHandle then
+			RoactCompat.unmount(t3._coreUiHandle)
+			t3._coreUiHandle = nil
+		end
+	end
+
+	return t3
+end
+
+return t1

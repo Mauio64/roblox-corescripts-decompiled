@@ -1,92 +1,104 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(l_Parent_0.ArgCheck);
-local l_Graphite_0 = require(l_Parent_0.Style).Colors.Graphite;
-local v4 = v1.PureComponent:extend("WindowedListFrame");
-v4.init = function(v5) --[[ Line: 17 ]] --[[ Name: init ]]
-    v5.state = {
-        windowStart = 1, 
-        windowSize = 5, 
-        topPadding = 0
-    };
-    v5.updateWindow = function(v6) --[[ Line: 24 ]]
-        -- upvalues: v5 (copy)
-        local v7 = v5.props.ButtonSizeY + 1;
-        local l_Y_0 = v6.AbsoluteSize.Y;
-        local l_Y_1 = v6.CanvasPosition.Y;
-        if l_Y_0 > 0 then
-            local v10 = math.max(1, math.floor(l_Y_1 / v7) + 1);
-            local v11 = math.floor(l_Y_0 / v7) + 2;
-            if v10 ~= v5.state.windowStart or v11 ~= v5.state.windowSize then
-                v5:setState({
-                    windowStart = v10, 
-                    windowSize = v11, 
-                    topPadding = v7 * (v10 - 1)
-                });
-            end;
-        end;
-    end;
-end;
-v4.defaultProps = {
-    List = {}, 
-    ButtonSizeY = 20, 
-    ScrollingFrameOffset = 0, 
-    ListButtonProps = {}
-};
-v4.render = function(v12) --[[ Line: 52 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v2 (copy), l_Graphite_0 (copy)
-    local l_ListButton_0 = v12.props.ListButton;
-    local l_ListButtonProps_0 = v12.props.ListButtonProps;
-    local l_List_0 = v12.props.List;
-    local v16 = #l_List_0;
-    local v17 = {
-        v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical
-        })
-    };
-    v2.isInTypes(l_ListButton_0, {
-        "function", 
-        "table"
-    }, "ListButton prop in WindowedListFrame");
-    if l_ListButton_0 then
-        local l_windowStart_0 = v12.state.windowStart;
-        local l_windowSize_0 = v12.state.windowSize;
-        for v20 = l_windowStart_0, math.min(#l_List_0, l_windowStart_0 + l_windowSize_0) do
-            local v21 = l_List_0[v20];
-            local v22 = v20 + v20;
-            v17[v22] = v1.createElement(l_ListButton_0, {
-                Size = UDim2.new(1, 0, 0, v12.props.ButtonSizeY), 
-                LayoutOrder = v22, 
-                Data = v21, 
-                ListButtonProps = l_ListButtonProps_0
-            });
-            v22 = v22 + 1;
-            v17[v22] = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 1), 
-                BackgroundColor3 = l_Graphite_0, 
-                LayoutOrder = v22, 
-                BorderSizePixel = 0
-            });
-        end;
-    end;
-    return v1.createElement("ScrollingFrame", {
-        Position = UDim2.new(0, 0, 0, v12.props.ScrollingFrameOffset), 
-        Size = UDim2.new(1, 8, 1, -v12.props.ScrollingFrameOffset), 
-        ScrollBarThickness = 4, 
-        ScrollBarImageColor3 = l_Graphite_0, 
-        ScrollingDirection = Enum.ScrollingDirection.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        CanvasSize = UDim2.new(0, 0, 0, v16 * (v12.props.ButtonSizeY + 1)), 
-        [v1.Change.CanvasPosition] = v12.updateWindow, 
-        [v1.Change.AbsoluteSize] = v12.updateWindow
-    }, {
-        ListHolder = v1.createElement("Frame", {
-            Size = UDim2.new(1, -8, 0, 1), 
-            Position = UDim2.new(0, 0, 0, v12.state.topPadding), 
-            BackgroundTransparency = 1
-        }, v17)
-    });
-end;
-return v4;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local Roact = require(Parent.Roact)
+local ArgCheck = require(Parent.ArgCheck)
+local Graphite = require(Parent.Style).Colors.Graphite
+local v5 = Roact.PureComponent:extend("WindowedListFrame")
+
+function v5.init(p1) -- line: 17
+	p1.state = {
+		windowStart = 1,
+		windowSize = 5,
+		topPadding = 0
+	}
+
+	function p1.updateWindow(p2) -- line: 24
+		-- upvalues: p1 (copy)
+		local v20 = p1.props.ButtonSizeY + 1
+		local AbsoluteSizeY = p2.AbsoluteSize.Y
+		local CanvasPositionY = p2.CanvasPosition.Y
+
+		if AbsoluteSizeY > 0 then
+			local v23 = math.max(1, math.floor(CanvasPositionY / v20) + 1)
+			local v24 = math.floor(AbsoluteSizeY / v20) + 2
+
+			if v23 ~= p1.state.windowStart or v24 ~= p1.state.windowSize then
+				p1:setState({
+					windowStart = v23,
+					windowSize = v24,
+					topPadding = v20 * (v23 - 1)
+				})
+			end
+		end
+	end
+end
+
+v5.defaultProps = {
+	ButtonSizeY = 20,
+	ScrollingFrameOffset = 0,
+	List = {},
+	ListButtonProps = {}
+}
+
+function v5.render(p3) -- line: 52
+	-- upvalues: Roact (copy), ArgCheck (copy), Graphite (copy)
+	local ListButton = p3.props.ListButton
+	local ListButtonProps = p3.props.ListButtonProps
+	local List = p3.props.List
+	local v11 = #List
+	local t1 = { Roact.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = Enum.FillDirection.Vertical
+	}) }
+
+	ArgCheck.isInTypes(ListButton, {
+		"function",
+		"table"
+	}, "ListButton prop in WindowedListFrame")
+
+	if ListButton then
+		local windowStart = p3.state.windowStart
+		local windowSize = p3.state.windowSize
+
+		for i = windowStart, math.min(#List, windowStart + windowSize) do
+			local v16 = List[i]
+			local v17 = i + i
+
+			t1[v17] = Roact.createElement(ListButton, {
+				Size = UDim2.new(1, 0, 0, p3.props.ButtonSizeY),
+				LayoutOrder = v17,
+				Data = v16,
+				ListButtonProps = ListButtonProps
+			})
+
+			local v18 = v17 + 1
+
+			t1[v18] = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, 1),
+				BackgroundColor3 = Graphite,
+				LayoutOrder = v18
+			})
+		end
+	end
+
+	return Roact.createElement("ScrollingFrame", {
+		Position = UDim2.new(0, 0, 0, p3.props.ScrollingFrameOffset),
+		Size = UDim2.new(1, 8, 1, -p3.props.ScrollingFrameOffset),
+		ScrollBarThickness = 4,
+		ScrollBarImageColor3 = Graphite,
+		ScrollingDirection = Enum.ScrollingDirection.Y,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		CanvasSize = UDim2.new(0, 0, 0, v11 * (p3.props.ButtonSizeY + 1)),
+		[Roact.Change.CanvasPosition] = p3.updateWindow,
+		[Roact.Change.AbsoluteSize] = p3.updateWindow
+	}, {
+		ListHolder = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -8, 0, 1),
+			Position = UDim2.new(0, 0, 0, p3.state.topPadding)
+		}, t1)
+	})
+end
+
+return v5

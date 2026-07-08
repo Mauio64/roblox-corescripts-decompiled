@@ -1,29 +1,33 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_SessionService_0 = game:GetService("SessionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserSignals");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_SessionType_0 = require(l_Parent_0.RobloxAppSessionization).SessionType;
-local v5 = require(l_Parent_0.Http);
-local _ = require(l_Parent_0.RobloxAppEnums);
-local l_Url_0 = v5.Url;
-local _ = require(l_script_FirstAncestor_0.UserSignalTypes);
-local l_FFlagLuaAppAddSessionIdToUserSignals_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppAddSessionIdToUserSignals;
-return function(v10, v11, v12, v13, v14) --[[ Line: 82 ]]
-    -- upvalues: l_FFlagLuaAppAddSessionIdToUserSignals_0 (copy), l_SessionService_0 (copy), l_SessionType_0 (copy), l_Url_0 (copy), l_HttpService_0 (copy)
-    local v15 = if l_FFlagLuaAppAddSessionIdToUserSignals_0 then l_SessionService_0:GetMetadata(l_SessionType_0.StructuralIdentifier.HomePageSessionInfo, l_SessionType_0.Metadata.HomePageSessionInfo.OmniSessionId) else nil;
-    local v16 = tostring(DateTime.now().UnixTimestampMillis);
-    return v10(string.format("%suser-signal-http-gateway/v1/user-signal/ingest", l_Url_0.APIS_URL), "POST", {
-        postBody = l_HttpService_0:JSONEncode({
-            userSignalEvents = {
-                {
-                    signalValue = v11, 
-                    timestampMs = v16, 
-                    signalValueType = v13, 
-                    signalEntity = v12, 
-                    signalType = v14, 
-                    omniSessionId = if l_FFlagLuaAppAddSessionIdToUserSignals_0 then v15 else nil
-                }
-            }
-        })
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local SessionService = game:GetService("SessionService")
+local UserSignals = script:FindFirstAncestor("UserSignals")
+local UserSignalsParent = UserSignals.Parent
+local SessionType = require(UserSignalsParent.RobloxAppSessionization).SessionType
+local Http = require(UserSignalsParent.Http)
+
+require(UserSignalsParent.RobloxAppEnums)
+
+local Url = Http.Url
+
+require(UserSignals.UserSignalTypes)
+
+local FFlagLuaAppAddSessionIdToUserSignals = require(UserSignalsParent.SharedFlags).FFlagLuaAppAddSessionIdToUserSignals
+
+return function(p1, t1: {[any]: any}, t2: {[any]: any}, p2, p3) -- line: 82
+	-- upvalues: FFlagLuaAppAddSessionIdToUserSignals (copy), SessionService (copy), SessionType (copy), Url (copy), HttpService (copy)
+	local v14 = if not FFlagLuaAppAddSessionIdToUserSignals then nil else SessionService:GetMetadata(SessionType.StructuralIdentifier.HomePageSessionInfo, SessionType.Metadata.HomePageSessionInfo.OmniSessionId)
+	local str = tostring(DateTime.now().UnixTimestampMillis)
+
+	return p1(string.format("%suser-signal-http-gateway/v1/user-signal/ingest", Url.APIS_URL), "POST", {
+		postBody = HttpService:JSONEncode({
+			userSignalEvents = {{
+				signalValue = t1,
+				timestampMs = str,
+				signalValueType = p2,
+				signalEntity = t2,
+				signalType = p3,
+				omniSessionId = if not FFlagLuaAppAddSessionIdToUserSignals then nil else v14
+			}}
+		})
+	})
+end

@@ -1,123 +1,136 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_language_0 = l_Parent_0.language;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local v3 = require(l_jsutils_0.instanceOf);
-local l_keyMap_0 = require(l_jsutils_0.keyMap).keyMap;
-local l_inspect_0 = require(l_jsutils_0.inspect).inspect;
-local l_didYouMean_0 = require(l_jsutils_0.didYouMean).didYouMean;
-local l_suggestionList_0 = require(l_jsutils_0.suggestionList).suggestionList;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local l_print_0 = require(l_language_0.printer).print;
-local v10 = require(l_Parent_0.type.definition);
-local l_isLeafType_0 = v10.isLeafType;
-local l_isInputObjectType_0 = v10.isInputObjectType;
-local l_isListType_0 = v10.isListType;
-local l_isNonNullType_0 = v10.isNonNullType;
-local l_isRequiredInputField_0 = v10.isRequiredInputField;
-local l_getNullableType_0 = v10.getNullableType;
-local l_getNamedType_0 = v10.getNamedType;
-local v18 = {};
-local v19 = nil;
-v18.ValuesOfCorrectTypeRule = function(v20) --[[ Line: 41 ]]
-    -- upvalues: l_getNullableType_0 (copy), l_isListType_0 (copy), v19 (ref), l_getNamedType_0 (copy), l_isInputObjectType_0 (copy), l_keyMap_0 (copy), l_isRequiredInputField_0 (copy), l_inspect_0 (copy), l_GraphQLError_0 (copy), l_suggestionList_0 (copy), l_didYouMean_0 (copy), l_isNonNullType_0 (copy), l_print_0 (copy)
-    return {
-        ListValue = function(_, v22) --[[ Line: 43 ]] --[[ Name: ListValue ]]
-            -- upvalues: l_getNullableType_0 (ref), v20 (copy), l_isListType_0 (ref), v19 (ref)
-            local v23 = l_getNullableType_0(v20:getParentInputType());
-            if not l_isListType_0(v23) then
-                v19(v20, v22);
-                return false;
-            else
-                return;
-            end;
-        end, 
-        ObjectValue = function(_, v25) --[[ Line: 53 ]] --[[ Name: ObjectValue ]]
-            -- upvalues: l_getNamedType_0 (ref), v20 (copy), l_isInputObjectType_0 (ref), v19 (ref), l_keyMap_0 (ref), l_isRequiredInputField_0 (ref), l_inspect_0 (ref), l_GraphQLError_0 (ref)
-            local v26 = l_getNamedType_0(v20:getInputType());
-            if not l_isInputObjectType_0(v26) then
-                v19(v20, v25);
-                return false;
-            else
-                local v28 = l_keyMap_0(v25.fields, function(v27) --[[ Line: 60 ]]
-                    return v27.name.value;
-                end);
-                for _, v30 in ipairs(v26:getFields():values()) do
-                    if not v28[v30.name] and l_isRequiredInputField_0(v30) then
-                        local v31 = l_inspect_0(v30.type);
-                        v20:reportError(l_GraphQLError_0.new(("Field \"%s.%s\" of required type \"%s\" was not provided."):format(v26.name, v30.name, v31), v25));
-                    end;
-                end;
-                return;
-            end;
-        end, 
-        ObjectField = function(_, v33) --[[ Line: 82 ]] --[[ Name: ObjectField ]]
-            -- upvalues: l_getNamedType_0 (ref), v20 (copy), l_isInputObjectType_0 (ref), l_suggestionList_0 (ref), l_GraphQLError_0 (ref), l_didYouMean_0 (ref)
-            local v34 = l_getNamedType_0(v20:getParentInputType());
-            if not v20:getInputType() and l_isInputObjectType_0(v34) then
-                local v35 = l_suggestionList_0(v33.name.value, v34:getFields():keys());
-                v20:reportError(l_GraphQLError_0.new(("Field \"%s\" is not defined by type \"%s\"."):format(v33.name.value, v34.name) .. l_didYouMean_0(v35), v33));
-            end;
-        end, 
-        NullValue = function(_, v37) --[[ Line: 102 ]] --[[ Name: NullValue ]]
-            -- upvalues: v20 (copy), l_isNonNullType_0 (ref), l_GraphQLError_0 (ref), l_inspect_0 (ref), l_print_0 (ref)
-            local v38 = v20:getInputType();
-            if l_isNonNullType_0(v38) then
-                v20:reportError(l_GraphQLError_0.new(("Expected value of type \"%s\", found %s."):format(l_inspect_0(v38), l_print_0(v37)), v37));
-            end;
-        end, 
-        EnumValue = function(_, v40) --[[ Line: 116 ]] --[[ Name: EnumValue ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            return v19(v20, v40);
-        end, 
-        IntValue = function(_, v42) --[[ Line: 119 ]] --[[ Name: IntValue ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            return v19(v20, v42);
-        end, 
-        FloatValue = function(_, v44) --[[ Line: 122 ]] --[[ Name: FloatValue ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            return v19(v20, v44);
-        end, 
-        StringValue = function(_, v46) --[[ Line: 125 ]] --[[ Name: StringValue ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            return v19(v20, v46);
-        end, 
-        BooleanValue = function(_, v48) --[[ Line: 128 ]] --[[ Name: BooleanValue ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            return v19(v20, v48);
-        end
-    };
-end;
-v19 = function(v49, v50) --[[ Line: 138 ]] --[[ Name: isValidValueNode ]]
-    -- upvalues: l_getNamedType_0 (copy), l_isLeafType_0 (copy), l_inspect_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy), v3 (copy)
-    local v51 = v49:getInputType();
-    if not v51 then
-        return;
-    else
-        local v52 = l_getNamedType_0(v51);
-        if not l_isLeafType_0(v52) then
-            local v53 = l_inspect_0(v51);
-            v49:reportError(l_GraphQLError_0.new(("Expected value of type \"%s\", found %s."):format(v53, l_print_0(v50)), v50));
-            return;
-        else
-            xpcall(function() --[[ Line: 160 ]]
-                -- upvalues: v52 (copy), v50 (copy), l_inspect_0 (ref), v51 (copy), v49 (copy), l_GraphQLError_0 (ref), l_print_0 (ref)
-                if v52:parseLiteral(v50, nil) == nil then
-                    local v54 = l_inspect_0(v51);
-                    v49:reportError(l_GraphQLError_0.new(("Expected value of type \"%s\", found %s."):format(v54, l_print_0(v50)), v50));
-                end;
-            end, function(v55) --[[ Line: 173 ]]
-                -- upvalues: l_inspect_0 (ref), v51 (copy), v3 (ref), l_GraphQLError_0 (ref), v49 (copy), l_print_0 (ref), v50 (copy)
-                local v56 = l_inspect_0(v51);
-                if v3(v55, l_GraphQLError_0) then
-                    v49:reportError(v55);
-                    return;
-                else
-                    v49:reportError(l_GraphQLError_0.new(("Expected value of type \"%s\", found %s; "):format(v56, l_print_0(v50)) .. v55.message, v50, nil, nil, nil, v55));
-                    return;
-                end;
-            end);
-            return;
-        end;
-    end;
-end;
-return v18;
+local ParentParent = script.Parent.Parent.Parent
+local language = ParentParent.language
+local jsutils = ParentParent.jsutils
+local instanceOf = require(jsutils.instanceOf)
+local keyMap = require(jsutils.keyMap).keyMap
+local inspect = require(jsutils.inspect).inspect
+local didYouMean = require(jsutils.didYouMean).didYouMean
+local suggestionList = require(jsutils.suggestionList).suggestionList
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local print = require(language.printer).print
+local definition = require(ParentParent.type.definition)
+local isLeafType = definition.isLeafType
+local isInputObjectType = definition.isInputObjectType
+local isListType = definition.isListType
+local isNonNullType = definition.isNonNullType
+local isRequiredInputField = definition.isRequiredInputField
+local getNullableType = definition.getNullableType
+local getNamedType = definition.getNamedType
+local t1 = {}
+local isValidValueNode = nil
+
+function t1.ValuesOfCorrectTypeRule(p1) -- line: 41
+	-- upvalues: getNullableType (copy), isListType (copy), isValidValueNode (ref), getNamedType (copy), isInputObjectType (copy), keyMap (copy), isRequiredInputField (copy), inspect (copy), GraphQLError (copy), suggestionList (copy), didYouMean (copy), isNonNullType (copy), print (copy)
+	return {
+		ListValue = function(_, p3) -- line: 43
+			-- upvalues: getNullableType (copy), p1 (copy), isListType (copy), isValidValueNode (ref)
+			local v29 = getNullableType(p1:getParentInputType())
+
+			if not isListType(v29) then
+				isValidValueNode(p1, p3)
+
+				return false
+			end
+		end,
+		ObjectValue = function(_, p5) -- line: 53
+			-- upvalues: getNamedType (copy), p1 (copy), isInputObjectType (copy), isValidValueNode (ref), keyMap (copy), isRequiredInputField (copy), inspect (copy), GraphQLError (copy)
+			local v32 = getNamedType(p1:getInputType())
+
+			if not isInputObjectType(v32) then
+				isValidValueNode(p1, p5)
+
+				return false
+			end
+
+			local v33 = keyMap(p5.fields, function(p6) -- line: 60
+				return p6.name.value
+			end)
+
+			for _, v in ipairs(v32:getFields():values()) do
+				if not v33[v.name] and isRequiredInputField(v) then
+					local v36 = inspect(v.type)
+
+					p1:reportError(GraphQLError.new(("Field \"%s.%s\" of required type \"%s\" was not provided."):format(v32.name, v.name, v36), p5))
+				end
+			end
+		end,
+		ObjectField = function(_, p8) -- line: 82
+			-- upvalues: getNamedType (copy), p1 (copy), isInputObjectType (copy), suggestionList (copy), GraphQLError (copy), didYouMean (copy)
+			local v39 = getNamedType(p1:getParentInputType())
+
+			if not p1:getInputType() and isInputObjectType(v39) then
+				local v40 = suggestionList(p8.name.value, v39:getFields():keys())
+
+				p1:reportError(GraphQLError.new(("Field \"%s\" is not defined by type \"%s\"."):format(p8.name.value, v39.name) .. didYouMean(v40), p8))
+			end
+		end,
+		NullValue = function(_, p10) -- line: 102
+			-- upvalues: p1 (copy), isNonNullType (copy), GraphQLError (copy), inspect (copy), print (copy)
+			local v43 = p1:getInputType()
+
+			if isNonNullType(v43) then
+				p1:reportError(GraphQLError.new(("Expected value of type \"%s\", found %s."):format(inspect(v43), print(p10)), p10))
+			end
+		end,
+		EnumValue = function(_, p12) -- line: 116
+			-- upvalues: isValidValueNode (ref), p1 (copy)
+			return isValidValueNode(p1, p12)
+		end,
+		IntValue = function(_, p14) -- line: 119
+			-- upvalues: isValidValueNode (ref), p1 (copy)
+			return isValidValueNode(p1, p14)
+		end,
+		FloatValue = function(_, p16) -- line: 122
+			-- upvalues: isValidValueNode (ref), p1 (copy)
+			return isValidValueNode(p1, p16)
+		end,
+		StringValue = function(_, p18) -- line: 125
+			-- upvalues: isValidValueNode (ref), p1 (copy)
+			return isValidValueNode(p1, p18)
+		end,
+		BooleanValue = function(_, p20) -- line: 128
+			-- upvalues: isValidValueNode (ref), p1 (copy)
+			return isValidValueNode(p1, p20)
+		end
+	}
+end
+function isValidValueNode(p21, p22) -- line: 138
+	-- upvalues: getNamedType (copy), isLeafType (copy), inspect (copy), GraphQLError (copy), print (copy), instanceOf (copy)
+	local v24 = p21:getInputType()
+
+	if not v24 then
+		return
+	end
+
+	local v25 = getNamedType(v24)
+
+	if not isLeafType(v25) then
+		local v26 = inspect(v24)
+
+		p21:reportError(GraphQLError.new(("Expected value of type \"%s\", found %s."):format(v26, print(p22)), p22))
+
+		return
+	end
+
+	xpcall(function() -- line: 160
+		-- upvalues: v25 (copy), p22 (copy), inspect (copy), v24 (copy), p21 (copy), GraphQLError (copy), print (copy)
+		if v25:parseLiteral(p22, nil) == nil then
+			local v54 = inspect(v24)
+
+			p21:reportError(GraphQLError.new(("Expected value of type \"%s\", found %s."):format(v54, print(p22)), p22))
+		end
+	end, function(err) -- line: 173
+		-- upvalues: inspect (copy), v24 (copy), instanceOf (copy), GraphQLError (copy), p21 (copy), print (copy), p22 (copy)
+		local v56 = inspect(v24)
+
+		if instanceOf(err, GraphQLError) then
+			p21:reportError(err)
+
+			return
+		end
+
+		p21:reportError(GraphQLError.new(("Expected value of type \"%s\", found %s; "):format(v56, print(p22)) .. err.message, p22, nil, nil, nil, err))
+	end)
+end
+
+return t1

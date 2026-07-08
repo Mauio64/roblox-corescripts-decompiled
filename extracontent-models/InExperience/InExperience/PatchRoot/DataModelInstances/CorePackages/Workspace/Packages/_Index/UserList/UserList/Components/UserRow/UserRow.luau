@@ -1,50 +1,59 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserList");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_convertToFoundationPresenceEnum_0 = require(l_Parent_0.SocialCommon).Utils.convertToFoundationPresenceEnum;
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-local v6 = require(l_script_FirstAncestor_0.Common.Enums);
-local v7 = require(l_script_FirstAncestor_0.Hooks.useUserDataValues);
-local v8 = require(script.Parent.BaseRow);
-local l_useIsRobloxSubscriber_0 = require(l_Parent_0.UserProfiles).Hooks.useIsRobloxSubscriber;
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagUserListActivatesTCIndicator);
-local l_FFlagEnableBlackbirdCheckDev_0 = require(l_Parent_0.SharedFlags).FFlagEnableBlackbirdCheckDev;
-local l_FFlagHomepagePYMKUseHorizontalUserList_0 = require(l_Parent_0.SharedFlags).FFlagHomepagePYMKUseHorizontalUserList;
-local l_FFlagFixUserRowCombinedName_0 = require(l_Parent_0.SharedFlags).FFlagFixUserRowCombinedName;
-return v2.memo(function(v14) --[[ Line: 43 ]] --[[ Name: UserRow ]]
-    -- upvalues: v7 (copy), l_FFlagEnableBlackbirdCheckDev_0 (copy), l_useIsRobloxSubscriber_0 (copy), l_FFlagFixUserRowCombinedName_0 (copy), v3 (copy), l_convertToFoundationPresenceEnum_0 (copy), l_FFlagHomepagePYMKUseHorizontalUserList_0 (copy), v2 (copy), v8 (copy), v10 (copy), v6 (copy)
-    local v15 = v7(v14.entityId);
-    local v16 = nil;
-    if l_FFlagEnableBlackbirdCheckDev_0 then
-        v16 = l_useIsRobloxSubscriber_0(if v14.entityId then v14.entityId else nil);
-    end;
-    local v17 = if l_FFlagFixUserRowCombinedName_0 then if v15.combinedName ~= "" then v15.combinedName else nil else if v15.displayName ~= "" then v15.displayName else nil;
-    local v18 = if (not v14.configs or not (v14.configs.showSubtitle ~= nil) or v14.configs.showSubtitle) and v15.username ~= "" then ("@%*"):format(v15.username) else nil;
-    local v19 = not v14.configs or not (v14.configs.showPresence ~= nil) or v14.configs.showPresence;
-    local l_None_0 = v3.Enums.UserPresence.None;
-    if v19 and v14.presence then
-        l_None_0 = l_convertToFoundationPresenceEnum_0(v14.presence);
-    end;
-    local v21 = if v14.loadingState and if l_FFlagHomepagePYMKUseHorizontalUserList_0 then v14.loadingState.title ~= nil else v14.loadingState.title then v14.loadingState.title else v15.isLoading;
-    local v22 = if v14.loadingState and if l_FFlagHomepagePYMKUseHorizontalUserList_0 then v14.loadingState.subtitle ~= nil else v14.loadingState.subtitle then v14.loadingState.subtitle else v15.isLoading;
-    local v23 = v14.loadingState and v14.loadingState.contextualInfo;
-    return v2.createElement(v8, {
-        userId = v14.entityId, 
-        userPresenceType = l_None_0, 
-        title = v17, 
-        subtitle = v18, 
-        layoutMode = v14.layoutMode, 
-        onActivated = v14.onActivated, 
-        isTitleLoading = v21, 
-        isSubtitleLoading = v22, 
-        isContextualInfoLoading = v23, 
-        contextualInfo = v14.contextualInfo, 
-        primaryCta = v14.primaryCta, 
-        secondaryCta = v14.secondaryCta, 
-        trailingContent = v14.trailingContent, 
-        layoutOrder = v14.layoutOrder, 
-        trustedConnectionIndicatorEnabled = if v10 then v14.layoutMode == v6.RowLayoutMode.Wide else nil, 
-        isRobloxSubscriber = if l_FFlagEnableBlackbirdCheckDev_0 then v16 else nil
-    });
-end);
+local UserList = script:FindFirstAncestor("UserList")
+local UserListParent = UserList.Parent
+local React = require(UserListParent.React)
+local Foundation = require(UserListParent.Foundation)
+local convertToFoundationPresenceEnum = require(UserListParent.SocialCommon).Utils.convertToFoundationPresenceEnum
+
+require(UserList.Common.Types)
+
+local Enums = require(UserList.Common.Enums)
+local useUserDataValues = require(UserList.Hooks.useUserDataValues)
+local BaseRow = require(script.Parent.BaseRow)
+local useIsRobloxSubscriber = require(UserListParent.UserProfiles).Hooks.useIsRobloxSubscriber
+local FFlagEnableBlackbirdCheck = require(UserListParent.SharedFlags).FFlagEnableBlackbirdCheck
+local FFlagHomepagePYMKUseHorizontalUserList = require(UserListParent.SharedFlags).FFlagHomepagePYMKUseHorizontalUserList
+local FFlagFixUserRowCombinedName = require(UserListParent.SharedFlags).FFlagFixUserRowCombinedName
+
+local function UserRow(t1: {[any]: any}) -- line: 41
+	-- upvalues: useUserDataValues (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), FFlagFixUserRowCombinedName (copy), Foundation (copy), convertToFoundationPresenceEnum (copy), FFlagHomepagePYMKUseHorizontalUserList (copy), React (copy), BaseRow (copy), Enums (copy)
+	local v15 = useUserDataValues(t1.entityId)
+	local v16 = nil
+
+	if FFlagEnableBlackbirdCheck then
+		v16 = useIsRobloxSubscriber(if not t1.entityId then nil else t1.entityId)
+	end
+
+	local v17 = if not FFlagFixUserRowCombinedName then if v15.displayName == "" then nil else v15.displayName else if v15.combinedName == "" then nil else v15.combinedName
+	local v18 = if not (not t1.configs or (t1.configs.showSubtitle == nil or t1.configs.showSubtitle)) or v15.username == "" then nil else `@{ v15.username }`
+	local v19 = not t1.configs or (t1.configs.showPresence == nil or t1.configs.showPresence)
+	local None = Foundation.Enums.UserPresence.None
+
+	if v19 and t1.presence then
+		None = convertToFoundationPresenceEnum(t1.presence)
+	end
+
+	local v21 = if not t1.loadingState or not if not FFlagHomepagePYMKUseHorizontalUserList then t1.loadingState.title else t1.loadingState.title ~= nil then v15.isLoading else t1.loadingState.title
+	local v22 = if not t1.loadingState or not if not FFlagHomepagePYMKUseHorizontalUserList then t1.loadingState.subtitle else t1.loadingState.subtitle ~= nil then v15.isLoading else t1.loadingState.subtitle
+	local v23 = t1.loadingState and t1.loadingState.contextualInfo
+
+	return React.createElement(BaseRow, {
+		userId = t1.entityId,
+		userPresenceType = None,
+		title = v17,
+		subtitle = v18,
+		layoutMode = t1.layoutMode,
+		onActivated = t1.onActivated,
+		isTitleLoading = v21,
+		isSubtitleLoading = v22,
+		isContextualInfoLoading = v23,
+		contextualInfo = t1.contextualInfo,
+		primaryCta = t1.primaryCta,
+		secondaryCta = t1.secondaryCta,
+		trailingContent = t1.trailingContent,
+		layoutOrder = t1.layoutOrder,
+		trustedConnectionIndicatorEnabled = t1.layoutMode == Enums.RowLayoutMode.Wide,
+		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v16
+	})
+end
+
+return React.memo(UserRow)

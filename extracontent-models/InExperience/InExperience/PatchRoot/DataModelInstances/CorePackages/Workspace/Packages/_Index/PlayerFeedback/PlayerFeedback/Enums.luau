@@ -1,3 +1,3 @@
 return {
-    FeedbackChannel = require(script.FeedbackChannel)
-};
+	FeedbackChannel = require(script.FeedbackChannel)
+}

@@ -1,134 +1,134 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.React);
-local v4 = require(l_Parent_1.Core.Style.useStyle);
-local v5 = require(l_Parent_1.Core.ImageSet.ImageSetComponent);
-local v6 = require(l_Parent_2.UIBlox.App.ImageSet.Images);
-local _ = require(l_Parent_0.ImageSet.ImagesTypes);
-local _ = require(l_Parent_1.App.Style.StyleTypes);
-local function v17(v9, v10) --[[ Line: 38 ]] --[[ Name: renderHalfCircle ]]
-    -- upvalues: v3 (copy), v5 (copy)
-    local l_layoutOrder_0 = v9.layoutOrder;
-    local l_isLeft_0 = v9.isLeft;
-    local l_rotation_0 = v9.rotation;
-    local l_progressImage_0 = v9.progressImage;
-    local l_IconDefault_0 = v10.Theme.IconDefault;
-    local l_Divider_0 = v10.Theme.Divider;
-    return v3.createElement("Frame", {
-        LayoutOrder = l_layoutOrder_0, 
-        Size = UDim2.fromScale(0.5, 1), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true
-    }, {
-        CircleImage = v3.createElement(v5.Label, {
-            Size = UDim2.fromScale(2, 1), 
-            AnchorPoint = if l_isLeft_0 then nil else Vector2.new(0.5, 0), 
-            Image = l_progressImage_0, 
-            BackgroundTransparency = 1
-        }, {
-            UIGradient = v3.createElement("UIGradient", {
-                Rotation = l_rotation_0, 
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, l_IconDefault_0.Color), 
-                    ColorSequenceKeypoint.new(0.499, l_IconDefault_0.Color), 
-                    ColorSequenceKeypoint.new(0.5, l_Divider_0.Color), 
-                    ColorSequenceKeypoint.new(1, l_Divider_0.Color)
-                }), 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, l_IconDefault_0.Transparency), 
-                    NumberSequenceKeypoint.new(0.499, l_IconDefault_0.Transparency), 
-                    NumberSequenceKeypoint.new(0.5, l_Divider_0.Transparency), 
-                    NumberSequenceKeypoint.new(1, l_Divider_0.Transparency)
-                })
-            })
-        })
-    });
-end;
-return function(v18) --[[ Line: 79 ]] --[[ Name: ProgressIcon ]]
-    -- upvalues: v6 (copy), v4 (copy), v3 (copy), v17 (copy), v5 (copy)
-    local l_progress_0 = v18.progress;
-    local l_isHolding_0 = v18.isHolding;
-    local v21 = if l_isHolding_0 then v18.iconHolding else v18.icon;
-    local v22 = if l_isHolding_0 then v6["icons/controls/keys/hold_button_assets/hold_Pressed_RadialFill"] else v6["icons/controls/keys/hold_button_assets/hold_Unpressed_RadialFill"];
-    local v23 = if l_isHolding_0 then v6["icons/controls/keys/hold_button_assets/hold_Pressed_Arrow"] else v6["icons/controls/keys/hold_button_assets/hold_Unpressed_Arrow"];
-    local v24 = v4();
-    local v26 = v3.useMemo(function() --[[ Line: 87 ]]
-        -- upvalues: l_progress_0 (copy)
-        return l_progress_0:map(function(v25) --[[ Line: 88 ]]
-            return (math.clamp((v25 or 0) * 314 + 23, 180, 337));
-        end);
-    end, {
-        l_progress_0
-    });
-    local v28 = v3.useMemo(function() --[[ Line: 94 ]]
-        -- upvalues: l_progress_0 (copy)
-        return l_progress_0:map(function(v27) --[[ Line: 95 ]]
-            return (math.clamp((v27 or 0) * 314 + 23, 23, 180));
-        end);
-    end, {
-        l_progress_0
-    });
-    local v30 = v3.useMemo(function() --[[ Line: 101 ]]
-        -- upvalues: l_progress_0 (copy)
-        return l_progress_0:map(function(v29) --[[ Line: 102 ]]
-            if v29 then
-                return (math.clamp(0.8 - v29 * 0.8, 0, 0.8));
-            else
-                return 0;
-            end;
-        end);
-    end, {
-        l_progress_0
-    });
-    return v3.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1
-    }, {
-        Progress = v3.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            ZIndex = 1
-        }, {
-            UIListLayout = v3.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            Left = v17({
-                layoutOrder = 1, 
-                isLeft = true, 
-                progressImage = v22, 
-                rotation = v26
-            }, v24), 
-            Right = v17({
-                layoutOrder = 2, 
-                progressImage = v22, 
-                rotation = v28
-            }, v24)
-        }), 
-        Icon = v3.createElement(v5.Label, {
-            Size = UDim2.fromScale(1, 1), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Image = v21, 
-            ImageColor3 = v24.Theme.IconEmphasis.Color, 
-            ImageTransparency = v30, 
-            BackgroundTransparency = 1, 
-            ZIndex = 2
-        }), 
-        Arrow = v3.createElement(v5.Label, {
-            Size = UDim2.fromScale(1, 1), 
-            AnchorPoint = Vector2.new(0.5, 0), 
-            Position = UDim2.fromScale(0.5, 0), 
-            Image = v23, 
-            ImageColor3 = v24.Theme.IconEmphasis.Color, 
-            ImageTransparency = 0, 
-            BackgroundTransparency = 1, 
-            ZIndex = 3
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local React = require(ParentParentParentParent.React)
+local useStyle = require(ParentParentParent.Core.Style.useStyle)
+local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
+local Images = require(ParentParentParentParent.UIBlox.App.ImageSet.Images)
+
+require(ParentParent.ImageSet.ImagesTypes)
+require(ParentParentParent.App.Style.StyleTypes)
+
+local function renderHalfCircle(t1: {[any]: any}, p1) -- line: 38
+	-- upvalues: React (copy), ImageSetComponent (copy)
+	local layoutOrder = t1.layoutOrder
+	local isLeft = t1.isLeft
+	local rotation = t1.rotation
+	local progressImage = t1.progressImage
+	local IconDefault = p1.Theme.IconDefault
+	local Divider = p1.Theme.Divider
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		LayoutOrder = layoutOrder,
+		Size = UDim2.fromScale(0.5, 1)
+	}, {
+		CircleImage = React.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(2, 1),
+			AnchorPoint = if not isLeft then Vector2.new(0.5, 0) else nil,
+			Image = progressImage
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = rotation,
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, IconDefault.Color),
+					ColorSequenceKeypoint.new(0.499, IconDefault.Color),
+					ColorSequenceKeypoint.new(0.5, Divider.Color),
+					ColorSequenceKeypoint.new(1, Divider.Color)
+				}),
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, IconDefault.Transparency),
+					NumberSequenceKeypoint.new(0.499, IconDefault.Transparency),
+					NumberSequenceKeypoint.new(0.5, Divider.Transparency),
+					NumberSequenceKeypoint.new(1, Divider.Transparency)
+				})
+			})
+		})
+	})
+end
+local function ProgressIcon(t2: {[any]: any}) -- line: 79
+	-- upvalues: Images (copy), useStyle (copy), React (copy), renderHalfCircle (copy), ImageSetComponent (copy)
+	local progress = t2.progress
+	local isHolding = t2.isHolding
+	local v21 = if not isHolding then t2.icon else t2.iconHolding
+	local v22 = if not isHolding then Images["icons/controls/keys/hold_button_assets/hold_Unpressed_RadialFill"] else Images["icons/controls/keys/hold_button_assets/hold_Pressed_RadialFill"]
+	local v23 = if not isHolding then Images["icons/controls/keys/hold_button_assets/hold_Unpressed_Arrow"] else Images["icons/controls/keys/hold_button_assets/hold_Pressed_Arrow"]
+	local v24 = useStyle()
+	local v25 = React.useMemo(function() -- line: 87
+		-- upvalues: progress (copy)
+		return progress:map(function(p2) -- line: 88
+			return (math.clamp((p2 or 0) * 314 + 23, 180, 337))
+		end)
+	end, { progress })
+	local v26 = React.useMemo(function() -- line: 94
+		-- upvalues: progress (copy)
+		return progress:map(function(p3) -- line: 95
+			return (math.clamp((p3 or 0) * 314 + 23, 23, 180))
+		end)
+	end, { progress })
+	local v27 = React.useMemo(function() -- line: 101
+		-- upvalues: progress (copy)
+		return progress:map(function(n1: number?) -- line: 102
+			if n1 then
+				return (math.clamp(0.8 - n1 * 0.8, 0, 0.8))
+			end
+
+			return 0
+		end)
+	end, { progress })
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1)
+	}, {
+		Progress = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			ZIndex = 1,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			Left = renderHalfCircle({
+				layoutOrder = 1,
+				isLeft = true,
+				progressImage = v22,
+				rotation = v25
+			}, v24),
+			Right = renderHalfCircle({
+				layoutOrder = 2,
+				progressImage = v22,
+				rotation = v26
+			}, v24)
+		}),
+		Icon = React.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			Size = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Image = v21,
+			ImageColor3 = v24.Theme.IconEmphasis.Color,
+			ImageTransparency = v27
+		}),
+		Arrow = React.createElement(ImageSetComponent.Label, {
+			ImageTransparency = 0,
+			BackgroundTransparency = 1,
+			ZIndex = 3,
+			Size = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.fromScale(0.5, 0),
+			Image = v23,
+			ImageColor3 = v24.Theme.IconEmphasis.Color
+		})
+	})
+end
+
+return ProgressIcon

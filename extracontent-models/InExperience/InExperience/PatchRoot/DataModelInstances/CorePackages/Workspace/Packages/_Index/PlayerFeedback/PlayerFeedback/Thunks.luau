@@ -1,4 +1,4 @@
 return {
-    GetGamePlayerFeedbackMetadata = require(script.GetGamePlayerFeedbackMetadata), 
-    SubmitGamePlayerFeedback = require(script.SubmitGamePlayerFeedback)
-};
+	GetGamePlayerFeedbackMetadata = require(script.GetGamePlayerFeedbackMetadata),
+	SubmitGamePlayerFeedback = require(script.SubmitGamePlayerFeedback)
+}

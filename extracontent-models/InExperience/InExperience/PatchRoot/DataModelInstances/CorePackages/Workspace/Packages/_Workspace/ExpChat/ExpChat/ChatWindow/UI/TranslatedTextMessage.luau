@@ -1,1 +1,1 @@
-return require(script.TranslatedTextMessage);
+return require(script.TranslatedTextMessage)

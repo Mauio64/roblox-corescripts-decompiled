@@ -1,10 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceNavigation");
-local v1 = require(l_script_FirstAncestor_0.Enums.AvatarRootNavigationAction);
-local _ = require(l_script_FirstAncestor_0.Enums.CustomGetStateForAction);
-return function(v3) --[[ Line: 6 ]] --[[ Name: DeregisterCustomGetStateForAction ]]
-    -- upvalues: v1 (copy)
-    return {
-        type = v1.DeregisterCustomGetStateForAction, 
-        handlerId = v3
-    };
-end;
+local AvatarExperienceNavigation = script:FindFirstAncestor("AvatarExperienceNavigation")
+local AvatarRootNavigationAction = require(AvatarExperienceNavigation.Enums.AvatarRootNavigationAction)
+
+require(AvatarExperienceNavigation.Enums.CustomGetStateForAction)
+
+local function DeregisterCustomGetStateForAction(p1) -- line: 6
+	-- upvalues: AvatarRootNavigationAction (copy)
+	return {
+		type = AvatarRootNavigationAction.DeregisterCustomGetStateForAction,
+		handlerId = p1
+	}
+end
+
+return DeregisterCustomGetStateForAction

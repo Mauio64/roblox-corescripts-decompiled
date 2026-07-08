@@ -1,170 +1,179 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_IXPService_0 = game:GetService("IXPService");
-local v6 = require(l_Parent_0.Localization);
-local v7 = require(l_Parent_0.React);
-local v8 = require(l_Parent_0.RoactUtils);
-local v9 = require(l_Parent_0.SocialCommon);
-local v10 = require(l_Parent_0.UIBlox);
-local v11 = require(l_Parent_0.UniversalAppPolicy);
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v13 = require(l_Parent_0.FocusNavigationUtils);
-local l_HeaderBar_0 = v10.App.Bar.HeaderBar;
-local l_IconButton_0 = v10.App.Button.IconButton;
-local l_IconSize_0 = v10.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v10.App.ImageSet.Images;
-local l_TooltipOrientation_0 = v10.App.Dialog.Enum.TooltipOrientation;
-local l_withTooltip_0 = v10.App.Dialog.TooltipV2.withTooltip;
-local l_makeBackButton_0 = require(l_Parent_0.AppHeaderBar).makeBackButton;
-local l_ExternalEventConnection_0 = v8.ExternalEventConnection;
-local l_InputUtilities_0 = v9.Utils.InputUtilities;
-local v23 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local v24 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v25 = require(l_script_FirstAncestor_0.Analytics.useAnalytics);
-local l_useAppPolicy_0 = v11.useAppPolicy;
-local l_useLocalization_0 = v6.Hooks.useLocalization;
-local l_useLastInputMode_0 = v13.useLastInputMode;
-local v29 = require(l_script_FirstAncestor_0.Flags.FFlagProfileQRCodeFixFocusNavigation);
-local function _(v30) --[[ Line: 42 ]] --[[ Name: getTooltipWasShown ]]
-    -- upvalues: l_AppStorageService_0 (copy)
-    v30 = v30 or l_AppStorageService_0;
-    assert(v30 ~= nil, "AppStorageService is not nil");
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 46 ]]
-        -- upvalues: v30 (ref)
-        return v30:GetItem("QrCodeScannerTooltipSeen");
-    end);
-    if not l_status_0 or l_result_0 == nil then
-        return false;
-    else
-        return l_result_0 == "true";
-    end;
-end;
-local function _(v34, v35) --[[ Line: 57 ]] --[[ Name: setTooltipWasShown ]]
-    -- upvalues: l_AppStorageService_0 (copy)
-    v34 = v34 or l_AppStorageService_0;
-    assert(v34 ~= nil, "AppStorageService is not nil");
-    pcall(function() --[[ Line: 61 ]]
-        -- upvalues: v34 (ref), v35 (copy)
-        v34:SetItem("QrCodeScannerTooltipSeen", (tostring(v35)));
-        v34:Flush();
-    end);
-end;
-return function(v37) --[[ Line: 75 ]]
-    -- upvalues: v29 (copy), l_useLastInputMode_0 (copy), v25 (copy), l_useLocalization_0 (copy), v24 (copy), l_useAppPolicy_0 (copy), v7 (copy), l_AppStorageService_0 (copy), v23 (copy), l_InputUtilities_0 (copy), l_IXPService_0 (copy), l_AppUserLayers_0 (copy), l_CoreGui_0 (copy), l_TooltipOrientation_0 (copy), l_withTooltip_0 (copy), l_IconButton_0 (copy), l_Images_0 (copy), l_IconSize_0 (copy), l_ExternalEventConnection_0 (copy), l_UserInputService_0 (copy), l_makeBackButton_0 (copy), l_HeaderBar_0 (copy)
-    local v38 = if v29 then l_useLastInputMode_0() == "Focus" else nil;
-    local v39 = v25();
-    local v40 = l_useLocalization_0({
-        title = v24.Title, 
-        tooltipBodyText = v24.TooltipText, 
-        tooltipHeaderText = v24.TooltipTitle
-    });
-    local v42 = l_useAppPolicy_0(function(v41) --[[ Line: 84 ]]
-        return v41.getFriendCodeQrCodeScannerEnabled();
-    end);
-    local v43, v44 = v7.useState(false);
-    v7.useEffect(function() --[[ Line: 89 ]]
-        -- upvalues: v37 (copy), l_AppStorageService_0 (ref), v44 (copy), v39 (copy), v23 (ref)
-        local v45 = v37.appStorageService or l_AppStorageService_0;
-        assert(v45 ~= nil, "AppStorageService is not nil");
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 46 ]]
-            -- upvalues: v45 (ref)
-            return v45:GetItem("QrCodeScannerTooltipSeen");
-        end);
-        local v48;
-        if not l_status_1 or l_result_1 == nil then
-            v48 = false;
-            --[[ close >= 1 ]]
-        else
-            v48 = l_result_1 == "true";
-            --[[ close >= 1 ]]
-        end;
-        v44(not v48);
-        if not v48 then
-            v39.fireEvent(v23.QRCodeScannerTooltipShown);
-        end;
-    end, {});
-    local v54 = v7.useCallback(function(v49) --[[ Line: 97 ]]
-        -- upvalues: l_InputUtilities_0 (ref), v43 (copy), v44 (copy), v37 (copy), l_AppStorageService_0 (ref)
-        if l_InputUtilities_0.isActivationInput(v49) and v43 then
-            v44(false);
-            local v50 = v37.appStorageService or l_AppStorageService_0;
-            assert(v50 ~= nil, "AppStorageService is not nil");
-            local l_pcall_0 = pcall;
-            local v52 = true;
-            do
-                local l_v50_0 = v50;
-                l_pcall_0(function() --[[ Line: 61 ]]
-                    -- upvalues: l_v50_0 (ref), v52 (copy)
-                    l_v50_0:SetItem("QrCodeScannerTooltipSeen", (tostring(v52)));
-                    l_v50_0:Flush();
-                end);
-            end;
-        end;
-    end, {
-        v43
-    });
-    local v55 = v7.useCallback(function() --[[ Line: 106 ]]
-        -- upvalues: l_IXPService_0 (ref), l_AppUserLayers_0 (ref), v39 (copy), v23 (ref), v37 (copy)
-        l_IXPService_0:LogUserLayerExposure(l_AppUserLayers_0.ProfileQRCodeScannerLayer);
-        v39.fireEvent(v23.QRCodeScannerOpened);
-        v37.openQrCodeScanner();
-    end, {
-        v37.openQrCodeScanner
-    });
-    local l_tooltipBodyText_0 = v40.tooltipBodyText;
-    local l_tooltipHeaderText_0 = v40.tooltipHeaderText;
-    local v61 = v7.useCallback(function() --[[ Line: 115 ]]
-        -- upvalues: l_tooltipBodyText_0 (copy), l_tooltipHeaderText_0 (copy), v43 (copy), l_CoreGui_0 (ref), l_TooltipOrientation_0 (ref), l_withTooltip_0 (ref), v7 (ref), l_IconButton_0 (ref), l_Images_0 (ref), l_IconSize_0 (ref), v55 (copy), l_ExternalEventConnection_0 (ref), l_UserInputService_0 (ref), v54 (copy)
-        local v58 = {
-            bodyText = l_tooltipBodyText_0, 
-            headerText = l_tooltipHeaderText_0
-        };
-        local v59 = {
-            active = v43, 
-            DisplayOrder = 10, 
-            guiTarget = l_CoreGui_0, 
-            preferredOrientation = l_TooltipOrientation_0.Bottom
-        };
-        return l_withTooltip_0(v58, v59, function(v60) --[[ Line: 128 ]]
-            -- upvalues: v7 (ref), l_IconButton_0 (ref), l_Images_0 (ref), l_IconSize_0 (ref), v55 (ref), l_ExternalEventConnection_0 (ref), l_UserInputService_0 (ref), v54 (ref)
-            return v7.createElement(l_IconButton_0, {
-                icon = l_Images_0["icons/actions/scan"], 
-                iconSize = l_IconSize_0.Medium, 
-                onActivated = v55, 
-                size = UDim2.fromOffset(0, 0), 
-                onAbsolutePositionChanged = v60, 
-                [v7.Change.AbsoluteSize] = v60
-            }, {
-                InputBeganConnection = v7.createElement(l_ExternalEventConnection_0, {
-                    event = l_UserInputService_0.InputBegan, 
-                    callback = v54
-                })
-            });
-        end);
-    end, {
-        v55, 
-        v42, 
-        v43, 
-        l_tooltipBodyText_0, 
-        l_tooltipHeaderText_0
-    });
-    local v62 = l_makeBackButton_0(v37.onClose);
-    return v7.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 56), 
-        LayoutOrder = v37.layoutOrder, 
-        ZIndex = 2
-    }, {
-        headerBar = v7.createElement(l_HeaderBar_0, {
-            isSecondary = true, 
-            title = v40.title, 
-            backgroundTransparency = 1, 
-            barHeight = 56, 
-            renderLeft = if (not v29 or v38) and v29 then nil else v62, 
-            renderRight = if v42 then v61 else nil
-        })
-    });
-end;
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local AppStorageService = game:GetService("AppStorageService")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local IXPService = game:GetService("IXPService")
+local Localization = require(ProfileQRCodeParent.Localization)
+local React = require(ProfileQRCodeParent.React)
+local RoactUtils = require(ProfileQRCodeParent.RoactUtils)
+local SocialCommon = require(ProfileQRCodeParent.SocialCommon)
+local UIBlox = require(ProfileQRCodeParent.UIBlox)
+local UniversalAppPolicy = require(ProfileQRCodeParent.UniversalAppPolicy)
+local AppUserLayers = require(ProfileQRCodeParent.ExperimentLayers).AppUserLayers
+local FocusNavigationUtils = require(ProfileQRCodeParent.FocusNavigationUtils)
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
+local makeBackButton = require(ProfileQRCodeParent.AppHeaderBar).makeBackButton
+local ExternalEventConnection = RoactUtils.ExternalEventConnection
+local InputUtilities = SocialCommon.Utils.InputUtilities
+local EventNames = require(ProfileQRCode.Analytics.EventNames)
+local TextKeys = require(ProfileQRCode.Common.TextKeys)
+local useAnalytics = require(ProfileQRCode.Analytics.useAnalytics)
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local useLocalization = Localization.Hooks.useLocalization
+local useLastInputMode = FocusNavigationUtils.useLastInputMode
+local FFlagProfileQRCodeFixFocusNavigation = require(ProfileQRCode.Flags.FFlagProfileQRCodeFixFocusNavigation)
+
+local function getTooltipWasShown(p1) -- line: 42
+	-- upvalues: AppStorageService (copy)
+	local u34 = p1 or AppStorageService
+
+	assert(u34 ~= nil, "AppStorageService is not nil")
+
+	local ok, result = pcall(function() -- line: 46
+		-- upvalues: u34 (ref)
+		return u34:GetItem("QrCodeScannerTooltipSeen")
+	end)
+
+	if not ok or result == nil then
+		return false
+	end
+
+	return result == "true"
+end
+local function setTooltipWasShown(p2, b1: boolean) -- line: 57
+	-- upvalues: AppStorageService (copy)
+	local u39 = p2 or AppStorageService
+
+	assert(u39 ~= nil, "AppStorageService is not nil")
+	pcall(function() -- line: 61
+		-- upvalues: u39 (ref), b1 (copy)
+		u39:SetItem("QrCodeScannerTooltipSeen", (tostring(b1)))
+		u39:Flush()
+	end)
+end
+
+return function(t1: {[any]: any}) -- line: 75
+	-- upvalues: FFlagProfileQRCodeFixFocusNavigation (copy), useLastInputMode (copy), useAnalytics (copy), useLocalization (copy), TextKeys (copy), useAppPolicy (copy), React (copy), AppStorageService (copy), EventNames (copy), InputUtilities (copy), IXPService (copy), AppUserLayers (copy), CoreGui (copy), TooltipOrientation (copy), withTooltip (copy), IconButton (copy), Images (copy), IconSize (copy), ExternalEventConnection (copy), UserInputService (copy), makeBackButton (copy), HeaderBar (copy)
+	local v41 = if not FFlagProfileQRCodeFixFocusNavigation then nil else useLastInputMode() == "Focus"
+	local v42 = useAnalytics()
+	local v43 = useLocalization({
+		title = TextKeys.Title,
+		tooltipBodyText = TextKeys.TooltipText,
+		tooltipHeaderText = TextKeys.TooltipTitle
+	})
+	local v44 = useAppPolicy(function(p3) -- line: 84
+		return p3.getFriendCodeQrCodeScannerEnabled()
+	end)
+	local v45, v46 = React.useState(false)
+
+	React.useEffect(function() -- line: 89
+		-- upvalues: t1 (copy), AppStorageService (copy), v46 (copy), v42 (copy), EventNames (copy)
+		local u54 = t1.appStorageService or AppStorageService
+
+		assert(u54 ~= nil, "AppStorageService is not nil")
+
+		local ok, result = pcall(function() -- line: 46
+			-- upvalues: u54 (ref)
+			return u54:GetItem("QrCodeScannerTooltipSeen")
+		end)
+		local v57
+
+		if not ok or result == nil then
+			v57 = false
+		else
+			v57 = result == "true"
+		end
+
+		v46(not v57)
+
+		if not v57 then
+			v42.fireEvent(EventNames.QRCodeScannerTooltipShown)
+		end
+	end, {})
+
+	local v47 = React.useCallback(function(p4) -- line: 97
+		-- upvalues: InputUtilities (copy), v45 (copy), v46 (copy), t1 (copy), AppStorageService (copy)
+		if InputUtilities.isActivationInput(p4) and v45 then
+			v46(false)
+
+			local u59 = t1.appStorageService or AppStorageService
+
+			assert(u59 ~= nil, "AppStorageService is not nil")
+
+			local v60 = true
+
+			pcall(function() -- line: 61
+				-- upvalues: u59 (ref), v60 (copy)
+				u59:SetItem("QrCodeScannerTooltipSeen", (tostring(v60)))
+				u59:Flush()
+			end)
+		end
+	end, { v45 })
+	local v48 = React.useCallback(function() -- line: 106
+		-- upvalues: IXPService (copy), AppUserLayers (copy), v42 (copy), EventNames (copy), t1 (copy)
+		IXPService:LogUserLayerExposure(AppUserLayers.ProfileQRCodeScannerLayer)
+		v42.fireEvent(EventNames.QRCodeScannerOpened)
+		t1.openQrCodeScanner()
+	end, { t1.openQrCodeScanner })
+	local tooltipBodyText = v43.tooltipBodyText
+	local tooltipHeaderText = v43.tooltipHeaderText
+	local v51 = React.useCallback(function() -- line: 115
+		-- upvalues: tooltipBodyText (copy), tooltipHeaderText (copy), v45 (copy), CoreGui (copy), TooltipOrientation (copy), withTooltip (copy), React (copy), IconButton (copy), Images (copy), IconSize (copy), v48 (copy), ExternalEventConnection (copy), UserInputService (copy), v47 (copy)
+		local t2 = {
+			bodyText = tooltipBodyText,
+			headerText = tooltipHeaderText
+		}
+		local t3 = {
+			DisplayOrder = 10,
+			active = v45,
+			guiTarget = CoreGui,
+			preferredOrientation = TooltipOrientation.Bottom
+		}
+
+		return withTooltip(t2, t3, function(p5) -- line: 128
+			-- upvalues: React (copy), IconButton (copy), Images (copy), IconSize (copy), v48 (copy), ExternalEventConnection (copy), UserInputService (copy), v47 (copy)
+			return React.createElement(IconButton, {
+				icon = Images["icons/actions/scan"],
+				iconSize = IconSize.Medium,
+				onActivated = v48,
+				size = UDim2.fromOffset(0, 0),
+				onAbsolutePositionChanged = p5,
+				[React.Change.AbsoluteSize] = p5
+			}, {
+				InputBeganConnection = React.createElement(ExternalEventConnection, {
+					event = UserInputService.InputBegan,
+					callback = v47
+				})
+			})
+		end)
+	end, {
+		v48,
+		v44,
+		v45,
+		tooltipBodyText,
+		tooltipHeaderText
+	})
+	local v52 = makeBackButton(t1.onClose)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Size = UDim2.new(1, 0, 0, 56),
+		LayoutOrder = t1.layoutOrder
+	}, {
+		headerBar = React.createElement(HeaderBar, {
+			isSecondary = true,
+			backgroundTransparency = 1,
+			barHeight = 56,
+			title = v43.title,
+			renderLeft = if not (not not FFlagProfileQRCodeFixFocusNavigation and not v41) and FFlagProfileQRCodeFixFocusNavigation then nil else v52,
+			renderRight = if not v44 then nil else v51
+		})
+	})
+end

@@ -1,50 +1,57 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Constants);
-local v5 = v1.PureComponent:extend("SlotNumbers");
-v5.render = function(v6) --[[ Line: 13 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v1 (copy)
-    local v7 = v4.Layouts[v6.props.layout];
-    local v8 = {};
-    for v9 = 1, v4.EmotesPerPage do
-        local v10 = 360 / v4.EmotesPerPage * (v9 - 1) + v4.SegmentsStartRotation;
-        local v11 = v4.InnerCircleSizeRatio / 2;
-        local l_SlotNumberSize_0 = v4.SlotNumberSize;
-        local v13 = l_SlotNumberSize_0 / 2;
-        local v14 = math.cos((math.rad(v10)));
-        local v15 = v11 * v14;
-        local v16 = v13 * v14;
-        local v17 = 0.5 + v15 + v16;
-        local v18 = math.sin((math.rad(v10)));
-        local v19 = v11 * v18;
-        local v20 = v13 * v18;
-        local v21 = 0.5 + v19 + v20;
-        v8[v9] = v1.createElement("TextLabel", {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.new(v17, 0, v21, 0), 
-            Size = UDim2.new(l_SlotNumberSize_0, 0, l_SlotNumberSize_0, 0), 
-            BackgroundTransparency = 1, 
-            TextScaled = true, 
-            TextSize = v7.SlotNumberTextSize, 
-            TextColor3 = v4.Colors.White, 
-            Text = v9, 
-            Font = v7.SlotNumberFont, 
-            ZIndex = 2
-        }, {
-            TextSizeConstraint = v1.createElement("UITextSizeConstraint", {
-                MaxTextSize = v7.SlotNumberTextSize
-            })
-        });
-    end;
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1
-    }, v8);
-end;
-return v2.connect(function(v22) --[[ Line: 61 ]] --[[ Name: mapStateToProps ]]
-    return {
-        layout = v22.layout
-    };
-end, nil)(v5);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local v6 = Roact.PureComponent:extend("SlotNumbers")
+
+function v6.render(p1) -- line: 13
+	-- upvalues: Constants (copy), Roact (copy)
+	local v9 = Constants.Layouts[p1.props.layout]
+	local t1 = {}
+
+	for i = 1, Constants.EmotesPerPage do
+		local v12 = 360 / Constants.EmotesPerPage * (i - 1) + Constants.SegmentsStartRotation
+		local v13 = Constants.InnerCircleSizeRatio / 2
+		local SlotNumberSize = Constants.SlotNumberSize
+		local v15 = SlotNumberSize / 2
+		local v16 = math.cos((math.rad(v12)))
+		local v17 = v13 * v16
+		local v18 = v15 * v16
+		local v19 = 0.5 + v17 + v18
+		local v20 = math.sin((math.rad(v12)))
+		local v21 = v13 * v20
+		local v22 = v15 * v20
+		local v23 = 0.5 + v21 + v22
+
+		t1[i] = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextScaled = true,
+			ZIndex = 2,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(v19, 0, v23, 0),
+			Size = UDim2.new(SlotNumberSize, 0, SlotNumberSize, 0),
+			TextSize = v9.SlotNumberTextSize,
+			TextColor3 = Constants.Colors.White,
+			Text = i,
+			Font = v9.SlotNumberFont
+		}, {
+			TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+				MaxTextSize = v9.SlotNumberTextSize
+			})
+		})
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, t1)
+end
+
+local function mapStateToProps(p2) -- line: 61
+	return {
+		layout = p2.layout
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(v6)

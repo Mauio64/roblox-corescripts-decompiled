@@ -1,20 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CatalogNetworking");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.CATALOG_URL);
-return function(v4) --[[ Line: 12 ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    return v4.roduxNetworking.POST({
-        Name = "GetItemDetails"
-    }, function(v5, v6) --[[ Line: 17 ]]
-        -- upvalues: v3 (ref), v2 (ref)
-        return v5(v3):path("v1"):path("catalog"):path("items"):path("details"):body({
-            items = v2.List.map(v6, function(v7) --[[ Line: 19 ]]
-                return {
-                    itemType = v7.itemType, 
-                    id = v7.assetId
-                };
-            end)
-        });
-    end);
-end;
+local CatalogNetworking = script:FindFirstAncestor("CatalogNetworking")
+local CatalogNetworkingParent = CatalogNetworking.Parent
+local Cryo = require(CatalogNetworkingParent.Cryo)
+local CATALOG_URL = require(CatalogNetworking.CATALOG_URL)
+
+return function(p1) -- line: 12
+	-- upvalues: CATALOG_URL (copy), Cryo (copy)
+	return p1.roduxNetworking.POST({
+		Name = "GetItemDetails"
+	}, function(p2, t1: {[any]: any}) -- line: 17
+		-- upvalues: CATALOG_URL (copy), Cryo (copy)
+		return p2(CATALOG_URL):path("v1"):path("catalog"):path("items"):path("details"):body({
+			items = Cryo.List.map(t1, function(p3) -- line: 19
+				return {
+					itemType = p3.itemType,
+					id = p3.assetId
+				}
+			end)
+		})
+	end)
+end

@@ -1,184 +1,228 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Stores.GetTransparencyStore);
-local v3 = require(l_script_FirstAncestor_0.Stores.GetMessagesStore);
-local v4 = require(l_Parent_0.Roact);
-local v5 = require(l_Parent_0.RoactRodux);
-local l_List_0 = require(l_Parent_0.llama).List;
-local v7 = require(l_Parent_0.ExpChatShared);
-local v8 = require(l_script_FirstAncestor_0.memoize);
-local l_createEffect_0 = require(l_Parent_0.Signals).createEffect;
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagExpChatEnableV2ChatWindow);
-local v11 = require(l_script_FirstAncestor_0.Flags.FFlagExpChatTransparentFocusSupport);
-local l_FFlagEnableVerifiedBadgeStore_0 = require(l_Parent_0.SharedFlags).FFlagEnableVerifiedBadgeStore;
-local l_UI_0 = script.Parent.UI;
-local v14 = require(l_UI_0.ChatWindow);
-local l_FFlagExpChatUseMessagesStore_0 = require(l_Parent_0.SharedFlags).FFlagExpChatUseMessagesStore;
-local l_GetFFlagTextChatEnableUniverseChatTabs_0 = v7.Flags.GetFFlagTextChatEnableUniverseChatTabs;
-local v17 = v4.Component:extend("ChatWindowApp");
-v17.defaultProps = {
-    LayoutOrder = 1, 
-    messages = if v10 then nil else {}, 
-    size = UDim2.fromScale(1, 1)
-};
-local v18 = nil;
-v18 = if l_GetFFlagTextChatEnableUniverseChatTabs_0() then v8(function(v19, v20, v21, v22) --[[ Line: 34 ]]
-    -- upvalues: l_List_0 (copy)
-    if not v20 then
-        return l_List_0.map(v19.windowMessagesInOrder, function(v23) --[[ Line: 36 ]]
-            -- upvalues: v19 (copy)
-            return v19.byMessageId[v23];
-        end);
-    else
-        local l_v22_0 = v22;
-        if v21 and v19.windowMessagesInOrderByTabId[v21.Name] then
-            l_v22_0 = v21.Name;
-        end;
-        if l_v22_0 then
-            return l_List_0.map(v19.windowMessagesInOrderByTabId[l_v22_0] or {}, function(v25) --[[ Line: 45 ]]
-                -- upvalues: v19 (copy)
-                return v19.byMessageId[v25];
-            end);
-        else
-            return {};
-        end;
-    end;
-end) else v8(function(v26, v27, v28) --[[ Line: 54 ]]
-    -- upvalues: l_List_0 (copy)
-    if not v27 then
-        return l_List_0.map(v26.windowMessagesInOrder, function(v29) --[[ Line: 56 ]]
-            -- upvalues: v26 (copy)
-            return v26.byMessageId[v29];
-        end);
-    elseif v28 then
-        return l_List_0.map(v26.windowMessagesInOrderByTabId[v28.Name] or {}, function(v30) --[[ Line: 63 ]]
-            -- upvalues: v26 (copy)
-            return v26.byMessageId[v30];
-        end);
-    else
-        return {};
-    end;
-end);
-if l_FFlagExpChatUseMessagesStore_0 and not v10 then
-    v17.init = function(v31) --[[ Line: 74 ]] --[[ Name: init ]]
-        -- upvalues: v3 (copy)
-        v31.state = {
-            messagesState = nil
-        };
-        v31.MessagesStore = v3(false);
-        v31.disposeEffects = {};
-    end;
-    v17.didMount = function(v32) --[[ Line: 83 ]] --[[ Name: didMount ]]
-        -- upvalues: l_createEffect_0 (copy)
-        if v32.MessagesStore then
-            local v33 = v32.MessagesStore.getByMessageId(false);
-            local v34 = v32.MessagesStore.getWindowMessagesInOrder(false);
-            local v35 = v32.MessagesStore.getWindowMessagesInOrderByTabId(false);
-            local v36 = {
-                byMessageId = v33, 
-                windowMessagesInOrder = v34, 
-                windowMessagesInOrderByTabId = v35
-            };
-            if v36 then
-                v32:setState({
-                    messagesState = v36
-                });
-            end;
-            local v41 = l_createEffect_0(function(v37) --[[ Line: 102 ]]
-                -- upvalues: v32 (copy)
-                local v38 = v32.MessagesStore.getByMessageId(v37);
-                local v39 = v32.MessagesStore.getWindowMessagesInOrder(v37);
-                local v40 = v32.MessagesStore.getWindowMessagesInOrderByTabId(v37);
-                if v38 or v39 or v40 then
-                    v32:setState({
-                        messagesState = {
-                            byMessageId = v38, 
-                            windowMessagesInOrder = v39, 
-                            windowMessagesInOrderByTabId = v40
-                        }
-                    });
-                end;
-            end);
-            table.insert(v32.disposeEffects, v41);
-        end;
-    end;
-    v17.willUnmount = function(v42) --[[ Line: 122 ]] --[[ Name: willUnmount ]]
-        if v42.disposeEffects then
-            for _, v44 in ipairs(v42.disposeEffects) do
-                v44();
-            end;
-            v42.disposeEffects = {};
-        end;
-    end;
-end;
-v17.render = function(v45) --[[ Line: 132 ]] --[[ Name: render ]]
-    -- upvalues: v10 (copy), l_FFlagExpChatUseMessagesStore_0 (copy), l_GetFFlagTextChatEnableUniverseChatTabs_0 (copy), v18 (ref), v4 (copy), v14 (copy)
-    local v46 = nil;
-    if not v10 then
-        if l_FFlagExpChatUseMessagesStore_0 then
-            local l_messagesState_0 = v45.state.messagesState;
-            v46 = if l_messagesState_0 then if l_GetFFlagTextChatEnableUniverseChatTabs_0() then v18(l_messagesState_0, v45.props.isChannelBarVisible, v45.props.targetTextChannel, v45.props.selectedChannelName) else v18(l_messagesState_0, v45.props.isChannelBarVisible, v45.props.targetTextChannel) else {};
-        else
-            v46 = if l_GetFFlagTextChatEnableUniverseChatTabs_0() then v18(v45.props.messages, v45.props.isChannelBarVisible, v45.props.targetTextChannel, v45.props.selectedChannelName) else v18(v45.props.messages, v45.props.isChannelBarVisible, v45.props.targetTextChannel);
-        end;
-    end;
-    return v4.createElement(v14, {
-        LayoutOrder = v45.props.LayoutOrder, 
-        messages = if v10 then nil else v46, 
-        size = v45.props.size, 
-        transparencyValue = v45.props.transparencyValue, 
-        textTransparency = v45.props.textTransparency, 
-        onHovered = v45.props.onHovered, 
-        onUnhovered = v45.props.onUnhovered, 
-        mutedUserIds = if l_FFlagExpChatUseMessagesStore_0 then nil else v45.props.mutedUserIds, 
-        verifiedUserIds = v45.props.verifiedUserIds, 
-        activateWhisperMode = v45.props.activateWhisperMode, 
-        resetTargetChannel = v45.props.resetTargetChannel, 
-        visible = v45.props.visible, 
-        onAbsoluteSizeChanged = v45.props.onAbsoluteSizeChanged, 
-        onAbsolutePositionChanged = v45.props.onAbsolutePositionChanged, 
-        chatWindowSettings = v45.props.chatWindowSettings, 
-        showTranslationButton = v45.props.showTranslationButton, 
-        targetTextChannel = v45.props.targetTextChannel, 
-        selectedChannelName = if l_GetFFlagTextChatEnableUniverseChatTabs_0() then v45.props.selectedChannelName else nil, 
-        isChannelBarVisible = v45.props.isChannelBarVisible, 
-        onFocus = v45.props.onFocus, 
-        onUnfocus = v45.props.onUnfocus
-    });
-end;
-return v5.connect(function(v48) --[[ Line: 193 ]]
-    -- upvalues: l_GetFFlagTextChatEnableUniverseChatTabs_0 (copy), v10 (copy), l_FFlagExpChatUseMessagesStore_0 (copy), l_FFlagEnableVerifiedBadgeStore_0 (copy)
-    local v49 = nil;
-    if l_GetFFlagTextChatEnableUniverseChatTabs_0() then
-        local l_selectedChannelName_0 = v48.TextChannels.selectedChannelName;
-        v49 = if l_selectedChannelName_0 and v48.ChannelTabs and v48.ChannelTabs.allChannelTabs[l_selectedChannelName_0] then l_selectedChannelName_0 else if v48.ChannelTabs then v48.ChannelTabs.selectedTabName or "RBXGeneral" else "RBXGeneral";
-    end;
-    return {
-        chatIntervention = v48.ChatIntervention, 
-        messages = if not not v10 or l_FFlagExpChatUseMessagesStore_0 then nil else v48.Messages, 
-        mutedUserIds = if l_FFlagExpChatUseMessagesStore_0 then nil else v48.MutedUsers, 
-        verifiedUserIds = if l_FFlagEnableVerifiedBadgeStore_0 then nil else v48.VerifiedUsers, 
-        targetTextChannel = v48.TextChannels.targetTextChannel, 
-        selectedChannelName = v49
-    };
-end, function(_) --[[ Line: 214 ]]
-    -- upvalues: v11 (copy), v2 (copy)
-    return {
-        onFocus = function() --[[ Line: 216 ]] --[[ Name: onFocus ]]
-            -- upvalues: v11 (ref), v2 (ref)
-            if v11 then
-                return v2(false).setContextMenuOpen();
-            else
-                return v2(false).setTextboxFocus();
-            end;
-        end, 
-        onUnfocus = function() --[[ Line: 224 ]] --[[ Name: onUnfocus ]]
-            -- upvalues: v11 (ref), v2 (ref)
-            if v11 then
-                return v2(false).clearContextMenuOpen();
-            else
-                return v2(false).clearTextboxFocus();
-            end;
-        end
-    };
-end)(v17);
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local GetTransparencyStore = require(ExpChat.Stores.GetTransparencyStore)
+local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
+local Roact = require(ExpChatParent.Roact)
+local RoactRodux = require(ExpChatParent.RoactRodux)
+local List = require(ExpChatParent.llama).List
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local memoize = require(ExpChat.memoize)
+local createEffect = require(ExpChatParent.Signals).createEffect
+local FFlagExpChatEnableV2ChatWindow = require(ExpChat.Flags.FFlagExpChatEnableV2ChatWindow)
+local FFlagExpChatTransparentFocusSupport = require(ExpChat.Flags.FFlagExpChatTransparentFocusSupport)
+local FFlagEnableVerifiedBadgeStore = require(ExpChatParent.SharedFlags).FFlagEnableVerifiedBadgeStore
+local UI = script.Parent.UI
+local ChatWindow = require(UI.ChatWindow)
+local ChatWindowMessageSource = require(UI.ChatWindow.ChatWindowMessageSource)
+local SharedFlags = require(ExpChatParent.SharedFlags)
+local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+local FFlagExpChatWindowMessageSourceRefactor = SharedFlags.FFlagExpChatWindowMessageSourceRefactor
+local v20 = game:DefineFastFlag("ExpChatMoveMessagesStoreToInit", false)
+local FFlagExpChatChannelTabRefactor = SharedFlags.FFlagExpChatChannelTabRefactor
+local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+local v23 = Roact.Component:extend("ChatWindowApp")
+
+v23.defaultProps = {
+	LayoutOrder = 1,
+	messages = if not FFlagExpChatEnableV2ChatWindow then {} else nil,
+	size = UDim2.fromScale(1, 1)
+}
+
+local u24 = if not GetFFlagTextChatEnableUniverseChatTabs() then memoize(function(p1, p2, p3) -- line: 58
+	-- upvalues: List (copy)
+	if not p2 then
+		return List.map(p1.windowMessagesInOrder, function(p4) -- line: 60
+			-- upvalues: p1 (copy)
+			return p1.byMessageId[p4]
+		end)
+	end
+
+	if p3 then
+		return List.map(p1.windowMessagesInOrderByTabId[p3.Name] or {}, function(p5) -- line: 67
+			-- upvalues: p1 (copy)
+			return p1.byMessageId[p5]
+		end)
+	end
+
+	return {}
+end) else memoize(function(p6, p7, p8, p9) -- line: 38
+	-- upvalues: List (copy)
+	if not p7 then
+		return List.map(p6.windowMessagesInOrder, function(p10) -- line: 40
+			-- upvalues: p6 (copy)
+			return p6.byMessageId[p10]
+		end)
+	end
+
+	if p8 and p6.windowMessagesInOrderByTabId[p8.Name] then
+		p9 = p8.Name
+	end
+
+	if p9 then
+		return List.map(p6.windowMessagesInOrderByTabId[p9] or {}, function(p11) -- line: 49
+			-- upvalues: p6 (copy)
+			return p6.byMessageId[p11]
+		end)
+	end
+
+	return {}
+end)
+
+if FFlagExpChatUseMessagesStore and not FFlagExpChatEnableV2ChatWindow then
+	function v23.init(p12) -- line: 78
+		-- upvalues: GetMessagesStore (copy), v20 (copy)
+		p12.MessagesStore = GetMessagesStore(false)
+		p12.disposeEffects = {}
+
+		if v20 and p12.MessagesStore then
+			p12.state = {
+				messagesState = {
+					byMessageId = p12.MessagesStore.getByMessageId(false),
+					windowMessagesInOrder = p12.MessagesStore.getWindowMessagesInOrder(false),
+					windowMessagesInOrderByTabId = p12.MessagesStore.getWindowMessagesInOrderByTabId(false)
+				}
+			}
+
+			return
+		end
+
+		p12.state = {
+			messagesState = nil
+		}
+	end
+	function v23.didMount(p13) -- line: 97
+		-- upvalues: v20 (copy), createEffect (copy)
+		if p13.MessagesStore then
+			if not v20 then
+				local v34 = p13.MessagesStore.getByMessageId(false)
+				local v35 = p13.MessagesStore.getWindowMessagesInOrder(false)
+				local v36 = p13.MessagesStore.getWindowMessagesInOrderByTabId(false)
+				local t1 = {
+					byMessageId = v34,
+					windowMessagesInOrder = v35,
+					windowMessagesInOrderByTabId = v36
+				}
+
+				if t1 then
+					p13:setState({
+						messagesState = t1
+					})
+				end
+			end
+
+			local v38 = createEffect(function(p14) -- line: 118
+				-- upvalues: p13 (copy)
+				local v55 = p13.MessagesStore.getByMessageId(p14)
+				local v56 = p13.MessagesStore.getWindowMessagesInOrder(p14)
+				local v57 = p13.MessagesStore.getWindowMessagesInOrderByTabId(p14)
+
+				if v55 or (v56 or v57) then
+					p13:setState({
+						messagesState = {
+							byMessageId = v55,
+							windowMessagesInOrder = v56,
+							windowMessagesInOrderByTabId = v57
+						}
+					})
+				end
+			end)
+
+			table.insert(p13.disposeEffects, v38)
+		end
+	end
+	function v23.willUnmount(p15) -- line: 138
+		if p15.disposeEffects then
+			for _, v in ipairs(p15.disposeEffects) do
+				v()
+			end
+
+			p15.disposeEffects = {}
+		end
+	end
+end
+
+function v23.render(p16) -- line: 148
+	-- upvalues: FFlagExpChatEnableV2ChatWindow (copy), FFlagExpChatUseMessagesStore (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), u24 (ref), FFlagExpChatChannelTabRefactor (copy), FFlagExpChatWindowMessageSourceRefactor (copy), Roact (copy), ChatWindowMessageSource (copy), ChatWindow (copy)
+	local v43 = nil
+
+	if not FFlagExpChatEnableV2ChatWindow then
+		if FFlagExpChatUseMessagesStore then
+			local messagesState = p16.state.messagesState
+
+			v43 = if not messagesState then {} else if not GetFFlagTextChatEnableUniverseChatTabs() then u24(messagesState, p16.props.isChannelBarVisible, p16.props.targetTextChannel) else u24(messagesState, p16.props.isChannelBarVisible, p16.props.targetTextChannel, p16.props.selectedChannelName)
+		else
+			v43 = if not GetFFlagTextChatEnableUniverseChatTabs() then u24(p16.props.messages, p16.props.isChannelBarVisible, p16.props.targetTextChannel) else u24(p16.props.messages, p16.props.isChannelBarVisible, p16.props.targetTextChannel, p16.props.selectedChannelName)
+		end
+	end
+
+	local t2 = {
+		LayoutOrder = p16.props.LayoutOrder,
+		messages = if not FFlagExpChatEnableV2ChatWindow then v43 else nil,
+		size = p16.props.size,
+		transparencyValue = p16.props.transparencyValue,
+		textTransparency = p16.props.textTransparency,
+		onHovered = p16.props.onHovered,
+		onUnhovered = p16.props.onUnhovered,
+		mutedUserIds = if not FFlagExpChatUseMessagesStore then p16.props.mutedUserIds else nil,
+		verifiedUserIds = p16.props.verifiedUserIds,
+		activateWhisperMode = p16.props.activateWhisperMode,
+		resetTargetChannel = p16.props.resetTargetChannel,
+		visible = p16.props.visible,
+		onAbsoluteSizeChanged = p16.props.onAbsoluteSizeChanged,
+		onAbsolutePositionChanged = p16.props.onAbsolutePositionChanged,
+		chatWindowSettings = p16.props.chatWindowSettings,
+		showTranslationButton = p16.props.showTranslationButton,
+		targetTextChannel = p16.props.targetTextChannel,
+		selectedChannelName = if not GetFFlagTextChatEnableUniverseChatTabs() and not FFlagExpChatChannelTabRefactor then nil else p16.props.selectedChannelName,
+		scrollResetKey = if not FFlagExpChatChannelTabRefactor then nil else p16.props.selectedChannelName,
+		isChannelBarVisible = p16.props.isChannelBarVisible,
+		onFocus = p16.props.onFocus,
+		onUnfocus = p16.props.onUnfocus
+	}
+
+	if FFlagExpChatWindowMessageSourceRefactor then
+		return Roact.createElement(ChatWindowMessageSource, t2)
+	end
+
+	return Roact.createElement(ChatWindow, t2)
+end
+
+return RoactRodux.connect(function(p17) -- line: 221
+	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatChannelTabRefactor (copy), FFlagExpChatEnableV2ChatWindow (copy), FFlagExpChatUseMessagesStore (copy), FFlagEnableVerifiedBadgeStore (copy)
+	local v47 = nil
+
+	if GetFFlagTextChatEnableUniverseChatTabs() or FFlagExpChatChannelTabRefactor then
+		local selectedChannelName = p17.TextChannels.selectedChannelName
+
+		v47 = if not selectedChannelName or (not p17.ChannelTabs or not p17.ChannelTabs.allChannelTabs[selectedChannelName]) then not p17.ChannelTabs and "RBXGeneral" or (p17.ChannelTabs.selectedTabName or "RBXGeneral") else selectedChannelName
+	end
+
+	return {
+		chatIntervention = p17.ChatIntervention,
+		messages = if not FFlagExpChatEnableV2ChatWindow and not FFlagExpChatUseMessagesStore then p17.Messages else nil,
+		mutedUserIds = if not FFlagExpChatUseMessagesStore then p17.MutedUsers else nil,
+		verifiedUserIds = if not FFlagEnableVerifiedBadgeStore then p17.VerifiedUsers else nil,
+		targetTextChannel = p17.TextChannels.targetTextChannel,
+		selectedChannelName = v47
+	}
+end, function(_) -- line: 242
+	-- upvalues: FFlagExpChatTransparentFocusSupport (copy), GetTransparencyStore (copy)
+	return {
+		onFocus = function() -- line: 244
+			-- upvalues: FFlagExpChatTransparentFocusSupport (copy), GetTransparencyStore (copy)
+			if FFlagExpChatTransparentFocusSupport then
+				return GetTransparencyStore(false).setContextMenuOpen()
+			end
+
+			return GetTransparencyStore(false).setTextboxFocus()
+		end,
+		onUnfocus = function() -- line: 252
+			-- upvalues: FFlagExpChatTransparentFocusSupport (copy), GetTransparencyStore (copy)
+			if FFlagExpChatTransparentFocusSupport then
+				return GetTransparencyStore(false).clearContextMenuOpen()
+			end
+
+			return GetTransparencyStore(false).clearTextboxFocus()
+		end
+	}
+end)(v23)

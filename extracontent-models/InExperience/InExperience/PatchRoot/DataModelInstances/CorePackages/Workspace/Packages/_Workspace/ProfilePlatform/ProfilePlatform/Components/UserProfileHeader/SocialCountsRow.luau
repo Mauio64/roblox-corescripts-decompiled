@@ -1,12 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local v1 = require(l_Parent_0.React);
-local l_HorizontalPageMargin_0 = require(l_Parent_0.UIBlox).App.Container.HorizontalPageMargin;
-return function(v3) --[[ Line: 14 ]] --[[ Name: SocialCountsRow ]]
-    -- upvalues: v1 (copy), l_HorizontalPageMargin_0 (copy)
-    return v1.createElement(l_HorizontalPageMargin_0, {
-        backgroundTransparency = 1, 
-        layoutOrder = v3.layoutOrder, 
-        useAutomaticSizing = true, 
-        size = v3.size
-    }, v3.children);
-end;
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(Parent.React)
+local HorizontalPageMargin = require(Parent.UIBlox).App.Container.HorizontalPageMargin
+
+local function SocialCountsRow(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), HorizontalPageMargin (copy)
+	return React.createElement(HorizontalPageMargin, {
+		backgroundTransparency = 1,
+		useAutomaticSizing = true,
+		layoutOrder = t1.layoutOrder,
+		size = t1.size
+	}, t1.children)
+end
+
+return SocialCountsRow

@@ -1,4 +1,5 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
+local ParentParent = script.Parent.Parent.Parent
+
 return {
-    objectEntries = require(l_Parent_0.LuauPolyfill).Object.entries
-};
+	objectEntries = require(ParentParent.LuauPolyfill).Object.entries
+}

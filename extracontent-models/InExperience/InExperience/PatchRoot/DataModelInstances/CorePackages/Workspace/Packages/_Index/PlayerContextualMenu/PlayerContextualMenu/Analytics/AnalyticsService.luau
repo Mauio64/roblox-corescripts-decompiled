@@ -1,21 +1,24 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local v3 = require(l_Parent_0.Analytics);
-local v4 = v3.Analytics.new(l_RbxAnalyticsService_0);
-local l_getPlatformTarget_0 = v3.getPlatformTarget;
+local ParentParent = script.Parent.Parent.Parent
+local EventIngestService = game:GetService("EventIngestService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Analytics = require(ParentParent.Analytics)
+local v5 = Analytics.Analytics.new(RbxAnalyticsService)
+local getPlatformTarget = Analytics.getPlatformTarget
+
 return {
-    Diag = v4.Diag, 
-    EventStream = {
-        setRBXEventStream = function(_, v7, v8, v9) --[[ Line: 14 ]] --[[ Name: setRBXEventStream ]]
-            -- upvalues: l_EventIngestService_0 (copy), l_getPlatformTarget_0 (copy)
-            local v10 = v9 or {};
-            l_EventIngestService_0:SetRBXEventStream(l_getPlatformTarget_0(), v7, v8, v10);
-        end, 
-        sendEventDeferred = function(_, v12, v13, v14) --[[ Line: 19 ]] --[[ Name: sendEventDeferred ]]
-            -- upvalues: l_EventIngestService_0 (copy), l_getPlatformTarget_0 (copy)
-            local v15 = v14 or {};
-            l_EventIngestService_0:SendEventDeferred(l_getPlatformTarget_0(), v12, v13, v15);
-        end
-    }
-};
+	Diag = v5.Diag,
+	EventStream = {
+		setRBXEventStream = function(_, s1: string, s2: string, t1: {[any]: any}?) -- line: 14
+			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
+			local v11 = t1 or {}
+
+			EventIngestService:SetRBXEventStream(getPlatformTarget(), s1, s2, v11)
+		end,
+		sendEventDeferred = function(_, s3: string, s4: string, t2: {[any]: any}?) -- line: 19
+			-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
+			local v16 = t2 or {}
+
+			EventIngestService:SendEventDeferred(getPlatformTarget(), s3, s4, v16)
+		end
+	}
+}

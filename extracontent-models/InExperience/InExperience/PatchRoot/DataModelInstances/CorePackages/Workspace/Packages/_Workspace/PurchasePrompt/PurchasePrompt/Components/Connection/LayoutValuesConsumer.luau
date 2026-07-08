@@ -1,1 +1,1 @@
-return require(script.Parent.LayoutValuesContext).Consumer;
+return require(script.Parent.LayoutValuesContext).Consumer

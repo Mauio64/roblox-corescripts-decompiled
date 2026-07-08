@@ -1,235 +1,283 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("StreamNotifications");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.StreamNotifications);
-local v4 = require(l_script_FirstAncestor_0.StreamNotificationStore);
-local v5 = require(l_Parent_0.SharedFlags);
-local l_ThirdPartyUserService_0 = game:GetService("ThirdPartyUserService");
-local v7 = require(l_Parent_0.UIBlox);
-local l_Badge_0 = v7.App.Indicator.Badge;
-local l_IconButton_0 = v7.App.Button.IconButton;
-local l_IconSize_0 = v7.App.Constant.IconSize;
-local l_Images_0 = v7.App.ImageSet.Images;
-local l_BadgeVariant_0 = v7.App.Indicator.Enum.BadgeVariant;
-local l_UtilityActionIcon_0 = v7.App.Button.UtilityActionIcon;
-local v14 = require(l_Parent_0.Foundation);
-local l_Popover_0 = v14.Popover;
-local l_PopoverSide_0 = v14.Enums.PopoverSide;
-local l_PopoverAlign_0 = v14.Enums.PopoverAlign;
-local l_useTokens_0 = v14.Hooks.useTokens;
-local l_EventStream_0 = require(l_script_FirstAncestor_0.analytics.analyticsService).EventStream;
-local l_NotificationHelper_0 = require(l_Parent_0.NotificationsCommon).NotificationHelper;
-local l_ixpHelper_0 = require(l_Parent_0.NotificationsCommon).ixpHelper;
-local v22 = require(l_script_FirstAncestor_0.constants);
-local v23 = require(l_script_FirstAncestor_0.analytics.analyticsConstants);
-local l_GetFStringNotificationsStreamNotificationUXLayer_0 = require(l_Parent_0.SharedFlags).GetFStringNotificationsStreamNotificationUXLayer;
-local l_isAppNavEnabled_0 = require(l_Parent_0.SharedFlags).isAppNavEnabled;
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v27 = require(l_script_FirstAncestor_0.StreamNotificationDropdownExperimentation);
-local l_RoactAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).RoactAppPolicy;
-local l_GetFFlagNotificationsComplianceShouldRestrictStream_0 = v5.GetFFlagNotificationsComplianceShouldRestrictStream;
-local l_FFlagEnableNotificationsDeeplink_0 = v5.FFlagEnableNotificationsDeeplink;
-local l_FFlagStreamNotificationBellEntryPoint_0 = v5.FFlagStreamNotificationBellEntryPoint;
-local l_FFlagEnableHeaderBarButtonsUpdate_0 = v5.FFlagEnableHeaderBarButtonsUpdate;
-local v33 = l_Images_0["icons/common/notificationOff"];
-local l_GetFFlagFilterNotificationsForPCGDKEnabled_0 = v5.GetFFlagFilterNotificationsForPCGDKEnabled;
-local function _() --[[ Line: 45 ]] --[[ Name: GetIsFriendCommunicationRestricted ]]
-    -- upvalues: l_GetFFlagFilterNotificationsForPCGDKEnabled_0 (copy), l_ThirdPartyUserService_0 (copy)
-    return l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_ThirdPartyUserService_0 and l_ThirdPartyUserService_0:IsChatRestrictionSupported() and l_ThirdPartyUserService_0.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted;
-end;
-local function v50(v36) --[[ Line: 62 ]]
-    -- upvalues: v2 (copy), l_FFlagEnableNotificationsDeeplink_0 (copy), l_useSignalState_0 (copy), v4 (copy), v27 (copy), l_useTokens_0 (copy), l_NotificationHelper_0 (copy), l_EventStream_0 (copy), v23 (copy), v22 (copy), l_FFlagStreamNotificationBellEntryPoint_0 (copy), v3 (copy), l_GetFFlagNotificationsComplianceShouldRestrictStream_0 (copy), l_GetFFlagFilterNotificationsForPCGDKEnabled_0 (copy), l_ThirdPartyUserService_0 (copy), l_ixpHelper_0 (copy), l_GetFStringNotificationsStreamNotificationUXLayer_0 (copy), l_FFlagEnableHeaderBarButtonsUpdate_0 (copy), v14 (copy), l_isAppNavEnabled_0 (copy), l_Popover_0 (copy), l_PopoverSide_0 (copy), l_PopoverAlign_0 (copy), v33 (copy), l_UtilityActionIcon_0 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Badge_0 (copy), l_BadgeVariant_0 (copy)
-    local v37, v38 = v2.useState(false);
-    if l_FFlagEnableNotificationsDeeplink_0 then
-        v37 = l_useSignalState_0(v4.getStreamPresented);
-    end;
-    local v39 = v27.getDropdownEnabled();
-    local v40 = l_useTokens_0();
-    local v41 = v36.notificationCount and tonumber(v36.notificationCount) or 0;
-    local l_layoutOrder_0 = v36.layoutOrder;
-    local v43 = 44;
-    if v36.compactWidth then
-        v43 = 34;
-    end;
-    v2.useEffect(function() --[[ Line: 82 ]]
-        -- upvalues: v41 (copy), l_NotificationHelper_0 (ref), l_EventStream_0 (ref), v23 (ref), v22 (ref), l_FFlagStreamNotificationBellEntryPoint_0 (ref), v36 (copy)
-        if v41 > 0 then
-            l_NotificationHelper_0.fireEvent(l_EventStream_0, v23.Context.seen, v23.EventNames.openCTAShown, {
-                count = v41, 
-                sendrVersion = v22.SENDRVersion, 
-                entryPoint = if l_FFlagStreamNotificationBellEntryPoint_0 then v36.entryPoint else nil
-            });
-        end;
-    end, {
-        v41
-    });
-    local v44 = v2.useMemo(function() --[[ Line: 97 ]]
-        -- upvalues: v37 (ref), v2 (ref), v3 (ref), l_FFlagEnableNotificationsDeeplink_0 (ref), v4 (ref), v38 (copy)
-        if v37 then
-            return v2.createElement(v3, {
-                displayStream = if l_FFlagEnableNotificationsDeeplink_0 then v4.setStreamPresented else v38
-            });
-        else
-            return nil;
-        end;
-    end, {
-        v37
-    });
-    if l_GetFFlagNotificationsComplianceShouldRestrictStream_0() and v36.shouldRestrictStream then
-        return nil;
-    else
-        local v45 = if l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_ThirdPartyUserService_0 and l_ThirdPartyUserService_0:IsChatRestrictionSupported() and l_ThirdPartyUserService_0.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted then nil else if v41 > 0 then v41 else nil;
-        local function v46() --[[ Line: 122 ]] --[[ Name: onBellActivated ]]
-            -- upvalues: v27 (ref), l_ixpHelper_0 (ref), l_GetFStringNotificationsStreamNotificationUXLayer_0 (ref), v39 (copy), l_FFlagEnableNotificationsDeeplink_0 (ref), v4 (ref), v37 (ref), v38 (copy), l_NotificationHelper_0 (ref), l_EventStream_0 (ref), v23 (ref), v41 (copy), v22 (ref), l_FFlagStreamNotificationBellEntryPoint_0 (ref), v36 (copy)
-            v27.logExposure();
-            l_ixpHelper_0.logUserLayerExposure(l_GetFStringNotificationsStreamNotificationUXLayer_0());
-            if v39 then
-                if l_FFlagEnableNotificationsDeeplink_0 then
-                    v4.setStreamPresented(not v37);
-                else
-                    v38(not v37);
-                end;
-                if v37 then
-                    l_NotificationHelper_0.fireEvent(l_EventStream_0, v23.Context.click, v23.EventNames.closeContent, {
-                        closeMethod = v23.CloseMethod.bellIcon
-                    });
-                    return;
-                else
-                    l_NotificationHelper_0.fireEvent(l_EventStream_0, v23.Context.click, v23.EventNames.openContent, {
-                        countOfUnreadNotification = v41, 
-                        sendrVersion = v22.SENDRVersion, 
-                        entryPoint = if l_FFlagStreamNotificationBellEntryPoint_0 then v36.entryPoint else nil
-                    });
-                    return;
-                end;
-            else
-                if l_FFlagEnableNotificationsDeeplink_0 then
-                    v4.setStreamPresented(true);
-                else
-                    v38(true);
-                end;
-                l_NotificationHelper_0.fireEvent(l_EventStream_0, v23.Context.click, v23.EventNames.openContent, {
-                    countOfUnreadNotification = v41, 
-                    sendrVersion = v22.SENDRVersion, 
-                    entryPoint = if l_FFlagStreamNotificationBellEntryPoint_0 then v36.entryPoint else nil
-                });
-                return;
-            end;
-        end;
-        local function v47() --[[ Line: 178 ]] --[[ Name: onPopoverDismiss ]]
-            -- upvalues: l_FFlagEnableNotificationsDeeplink_0 (ref), v4 (ref), v38 (copy), l_NotificationHelper_0 (ref), l_EventStream_0 (ref), v23 (ref)
-            if l_FFlagEnableNotificationsDeeplink_0 then
-                v4.setStreamPresented(false);
-            else
-                v38(false);
-            end;
-            l_NotificationHelper_0.fireEvent(l_EventStream_0, v23.Context.click, v23.EventNames.closeContent, {
-                closeMethod = v23.CloseMethod.backgroundOverlay
-            });
-        end;
-        if l_FFlagEnableHeaderBarButtonsUpdate_0 then
-            local v48 = v2.createElement(v14.View, {
-                tag = "auto-xy radius-circle", 
-                LayoutOrder = l_layoutOrder_0 or 3, 
-                ref = v36.buttonRef, 
-                testId = v36.testId
-            }, {
-                IconButton = v2.createElement(v14.IconButton, {
-                    ZIndex = 1, 
-                    isCircular = true, 
-                    icon = v14.Enums.IconName.Bell, 
-                    onActivated = v46
-                }), 
-                Badge = if l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_ThirdPartyUserService_0 and l_ThirdPartyUserService_0:IsChatRestrictionSupported() and l_ThirdPartyUserService_0.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted then nil else if v41 > 0 then v2.createElement(v14.StatusIndicator, {
-                    AnchorPoint = Vector2.new(0, 1), 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    ZIndex = 2, 
-                    variant = v14.Enums.StatusIndicatorVariant.Alert, 
-                    value = v41, 
-                    max = 99
-                }) else nil, 
-                DisplayStreamNotifications = if not v39 then v44 else nil
-            });
-            if l_isAppNavEnabled_0() and v39 then
-                return (v2.createElement(l_Popover_0.Root, {
-                    isOpen = v37
-                }, {
-                    Anchor = v2.createElement(l_Popover_0.Anchor, nil, {
-                        BellIcon = v48
-                    }), 
-                    Content = v2.createElement(l_Popover_0.Content, {
-                        side = l_PopoverSide_0.Bottom, 
-                        align = l_PopoverAlign_0.End, 
-                        hasArrow = true, 
-                        onPressedOutside = v47, 
-                        backgroundStyle = v40.Color.Surface.Surface_200
-                    }, {
-                        DisplayStreamNotifications = v44
-                    })
-                }));
-            else
-                return v48;
-            end;
-        elseif l_isAppNavEnabled_0() then
-            local v49 = if v39 and v37 then v22.Dropdown.BellIconOpen else v33;
-            if v39 then
-                return (v2.createElement(l_Popover_0.Root, {
-                    isOpen = v37
-                }, {
-                    Anchor = v2.createElement(l_Popover_0.Anchor, nil, {
-                        BellIcon = v2.createElement(l_UtilityActionIcon_0, {
-                            icon = v49, 
-                            onActivated = v46, 
-                            badgeValue = v45, 
-                            buttonRef = v36.buttonRef
-                        })
-                    }), 
-                    Content = v2.createElement(l_Popover_0.Content, {
-                        side = l_PopoverSide_0.Bottom, 
-                        align = l_PopoverAlign_0.End, 
-                        hasArrow = true, 
-                        onPressedOutside = v47, 
-                        backgroundStyle = v40.Color.Surface.Surface_200
-                    }, {
-                        DisplayStreamNotifications = v44
-                    })
-                }));
-            else
-                return (v2.createElement(l_UtilityActionIcon_0, {
-                    icon = v49, 
-                    onActivated = v46, 
-                    badgeValue = v45, 
-                    buttonRef = v36.buttonRef
-                }, {
-                    DisplayStreamNotifications = v44
-                }));
-            end;
-        else
-            return (v2.createElement(l_IconButton_0, {
-                size = UDim2.new(0, v43, 1, 0), 
-                icon = v33, 
-                iconSize = l_IconSize_0.Medium, 
-                layoutOrder = l_layoutOrder_0 or 3, 
-                onActivated = v46, 
-                buttonRef = v36.buttonRef
-            }, {
-                notificationBadge = if l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_GetFFlagFilterNotificationsForPCGDKEnabled_0() and l_ThirdPartyUserService_0 and l_ThirdPartyUserService_0:IsChatRestrictionSupported() and l_ThirdPartyUserService_0.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted then nil else if v41 > 0 then v2.createElement(l_Badge_0, {
-                    position = UDim2.new(0.5, 0, 0.5, 0), 
-                    anchorPoint = Vector2.new(0, 1), 
-                    value = v41, 
-                    badgeVariant = l_BadgeVariant_0.Alert
-                }) else nil
-            }, {
-                v44
-            }));
-        end;
-    end;
-end;
-if l_GetFFlagNotificationsComplianceShouldRestrictStream_0() then
-    v50 = l_RoactAppPolicy_0.connect(function(v51, _) --[[ Line: 309 ]]
-        return {
-            shouldRestrictStream = v51.getNotificationsCanReceiveStream() or false
-        };
-    end)(v50);
-end;
-return v50;
+local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
+local StreamNotificationsParent = StreamNotifications.Parent
+local React = require(StreamNotificationsParent.React)
+local StreamNotifications2 = require(StreamNotifications.StreamNotifications)
+local StreamNotificationStore = require(StreamNotifications.StreamNotificationStore)
+local SharedFlags = require(StreamNotificationsParent.SharedFlags)
+local ThirdPartyUserService = game:GetService("ThirdPartyUserService")
+local HttpService = game:GetService("HttpService")
+local UIBlox = require(StreamNotificationsParent.UIBlox)
+local Badge = UIBlox.App.Indicator.Badge
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.Constant.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local BadgeVariant = UIBlox.App.Indicator.Enum.BadgeVariant
+local UtilityActionIcon = UIBlox.App.Button.UtilityActionIcon
+local Foundation = require(StreamNotificationsParent.Foundation)
+local Popover = Foundation.Popover
+local PopoverSide = Foundation.Enums.PopoverSide
+local PopoverAlign = Foundation.Enums.PopoverAlign
+local useTokens = Foundation.Hooks.useTokens
+local EventStream = require(StreamNotifications.analytics.analyticsService).EventStream
+local NotificationHelper = require(StreamNotificationsParent.NotificationsCommon).NotificationHelper
+local ixpHelper = require(StreamNotificationsParent.NotificationsCommon).ixpHelper
+local constants = require(StreamNotifications.constants)
+local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
+local GetFStringNotificationsStreamNotificationUXLayer = require(StreamNotificationsParent.SharedFlags).GetFStringNotificationsStreamNotificationUXLayer
+local isAppNavEnabled = require(StreamNotificationsParent.SharedFlags).isAppNavEnabled
+local useSignalState = require(StreamNotificationsParent.SignalsReact).useSignalState
+local StreamNotificationDropdownExperimentation = require(StreamNotifications.StreamNotificationDropdownExperimentation)
+local RoactAppPolicy = require(StreamNotificationsParent.UniversalAppPolicy).RoactAppPolicy
+local GetFFlagNotificationsComplianceShouldRestrictStream = SharedFlags.GetFFlagNotificationsComplianceShouldRestrictStream
+local FFlagEnableNotificationsDeeplink = SharedFlags.FFlagEnableNotificationsDeeplink
+local FFlagStreamNotificationBellEntryPoint = SharedFlags.FFlagStreamNotificationBellEntryPoint
+local FFlagEnableHeaderBarButtonsUpdate = SharedFlags.FFlagEnableHeaderBarButtonsUpdate
+local FFlagStreamNotificationDropdownSingleOwner = SharedFlags.FFlagStreamNotificationDropdownSingleOwner
+local v36 = Images["icons/common/notificationOff"]
+
+local function GetIsFriendCommunicationRestricted() -- line: 45
+	-- upvalues: ThirdPartyUserService (copy)
+	return ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)
+end
+local function v38(t1: {[any]: any}) -- line: 65
+	-- upvalues: React (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), HttpService (copy), FFlagEnableNotificationsDeeplink (copy), useSignalState (copy), StreamNotificationDropdownExperimentation (copy), useTokens (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), StreamNotifications2 (copy), GetFFlagNotificationsComplianceShouldRestrictStream (copy), ThirdPartyUserService (copy), ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), FFlagEnableHeaderBarButtonsUpdate (copy), Foundation (copy), isAppNavEnabled (copy), Popover (copy), PopoverSide (copy), PopoverAlign (copy), v36 (copy), UtilityActionIcon (copy), IconButton (copy), IconSize (copy), Badge (copy), BadgeVariant (copy)
+	local v40, v41 = React.useState(false)
+	local current = nil
+
+	if FFlagStreamNotificationDropdownSingleOwner then
+		local v43 = React.useRef(nil)
+
+		if v43.current == nil then
+			v43.current = if not t1.isPrimary then HttpService:GenerateGUID(false) else StreamNotificationStore.PrimaryBellId
+		end
+
+		current = v43.current
+	end
+
+	local u44 = v40
+
+	if FFlagEnableNotificationsDeeplink then
+		local v45 = useSignalState(StreamNotificationStore.getStreamPresented)
+
+		if FFlagStreamNotificationDropdownSingleOwner then
+			local v46 = useSignalState(StreamNotificationStore.getActiveBellId)
+
+			u44 = StreamNotificationStore.isBellActive(v45, v46, current, t1.isPrimary)
+		else
+			u44 = v45
+		end
+	end
+
+	local v47 = StreamNotificationDropdownExperimentation.getDropdownEnabled()
+	local v48 = useTokens()
+	local v49 = t1.notificationCount and tonumber(t1.notificationCount) or 0
+	local layoutOrder = t1.layoutOrder
+	local n1 = 44
+
+	if t1.compactWidth then
+		n1 = 34
+	end
+
+	React.useEffect(function() -- line: 113
+		-- upvalues: v49 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), t1 (copy)
+		if v49 > 0 then
+			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.seen, analyticsConstants.EventNames.openCTAShown, {
+				count = v49,
+				sendrVersion = constants.SENDRVersion,
+				entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else t1.entryPoint
+			})
+		end
+	end, { v49 })
+
+	local v52 = React.useMemo(function() -- line: 128
+		-- upvalues: u44 (ref), React (copy), StreamNotifications2 (copy), FFlagEnableNotificationsDeeplink (copy), StreamNotificationStore (copy), v41 (copy)
+		if u44 then
+			return React.createElement(StreamNotifications2, {
+				displayStream = if not FFlagEnableNotificationsDeeplink then v41 else StreamNotificationStore.setStreamPresented
+			})
+		end
+
+		return nil
+	end, { u44 })
+
+	if GetFFlagNotificationsComplianceShouldRestrictStream() and t1.shouldRestrictStream then
+		return nil
+	end
+
+	local v53 = if not (ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)) then if not (v49 > 0) then nil else v49 else nil
+
+	local function onBellActivated() -- line: 156
+		-- upvalues: StreamNotificationDropdownExperimentation (copy), ixpHelper (copy), GetFStringNotificationsStreamNotificationUXLayer (copy), v47 (copy), FFlagEnableNotificationsDeeplink (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), u44 (ref), current (ref), v41 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), v49 (copy), constants (copy), FFlagStreamNotificationBellEntryPoint (copy), t1 (copy)
+		StreamNotificationDropdownExperimentation.logExposure()
+		ixpHelper.logUserLayerExposure(GetFStringNotificationsStreamNotificationUXLayer())
+
+		if v47 then
+			if FFlagEnableNotificationsDeeplink then
+				if FFlagStreamNotificationDropdownSingleOwner then
+					StreamNotificationStore.setActiveBellId(if not u44 then current else nil)
+				end
+
+				StreamNotificationStore.setStreamPresented(not u44)
+			else
+				v41(not u44)
+			end
+
+			if u44 then
+				NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.closeContent, {
+					closeMethod = analyticsConstants.CloseMethod.bellIcon
+				})
+
+				return
+			end
+
+			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.openContent, {
+				countOfUnreadNotification = v49,
+				sendrVersion = constants.SENDRVersion,
+				entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else t1.entryPoint
+			})
+
+			return
+		end
+
+		if FFlagEnableNotificationsDeeplink then
+			if FFlagStreamNotificationDropdownSingleOwner then
+				StreamNotificationStore.setActiveBellId(current)
+			end
+
+			StreamNotificationStore.setStreamPresented(true)
+		else
+			v41(true)
+		end
+
+		NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.openContent, {
+			countOfUnreadNotification = v49,
+			sendrVersion = constants.SENDRVersion,
+			entryPoint = if not FFlagStreamNotificationBellEntryPoint then nil else t1.entryPoint
+		})
+	end
+	local function onPopoverDismiss() -- line: 220
+		-- upvalues: FFlagEnableNotificationsDeeplink (copy), FFlagStreamNotificationDropdownSingleOwner (copy), StreamNotificationStore (copy), v41 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy)
+		if FFlagEnableNotificationsDeeplink then
+			if FFlagStreamNotificationDropdownSingleOwner then
+				StreamNotificationStore.setActiveBellId(nil)
+			end
+
+			StreamNotificationStore.setStreamPresented(false)
+		else
+			v41(false)
+		end
+
+		NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, analyticsConstants.EventNames.closeContent, {
+			closeMethod = analyticsConstants.CloseMethod.backgroundOverlay
+		})
+	end
+
+	if FFlagEnableHeaderBarButtonsUpdate then
+		local v56 = React.createElement(Foundation.View, {
+			tag = "auto-xy radius-circle",
+			LayoutOrder = layoutOrder or 3,
+			ref = t1.buttonRef,
+			testId = t1.testId
+		}, {
+			IconButton = React.createElement(Foundation.IconButton, {
+				ZIndex = 1,
+				isCircular = true,
+				icon = Foundation.Enums.IconName.Bell,
+				onActivated = onBellActivated
+			}),
+			Badge = if not (ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)) then if not (v49 > 0) then nil else React.createElement(Foundation.StatusIndicator, {
+				ZIndex = 2,
+				max = 99,
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0.5, 0.5),
+				variant = Foundation.Enums.StatusIndicatorVariant.Alert,
+				value = v49
+			}) else nil,
+			DisplayStreamNotifications = if v47 then nil else v52
+		})
+
+		if isAppNavEnabled() and v47 then
+			return (React.createElement(Popover.Root, {
+				isOpen = u44
+			}, {
+				Anchor = React.createElement(Popover.Anchor, nil, {
+					BellIcon = v56
+				}),
+				Content = React.createElement(Popover.Content, {
+					hasArrow = true,
+					side = PopoverSide.Bottom,
+					align = PopoverAlign.End,
+					onPressedOutside = onPopoverDismiss,
+					backgroundStyle = v48.Color.Surface.Surface_200
+				}, {
+					DisplayStreamNotifications = v52
+				})
+			}))
+		end
+
+		return v56
+	end
+
+	if isAppNavEnabled() then
+		local v57 = if not v47 or not u44 then v36 else constants.Dropdown.BellIconOpen
+
+		if v47 then
+			return (React.createElement(Popover.Root, {
+				isOpen = u44
+			}, {
+				Anchor = React.createElement(Popover.Anchor, nil, {
+					BellIcon = React.createElement(UtilityActionIcon, {
+						icon = v57,
+						onActivated = onBellActivated,
+						badgeValue = v53,
+						buttonRef = t1.buttonRef
+					})
+				}),
+				Content = React.createElement(Popover.Content, {
+					hasArrow = true,
+					side = PopoverSide.Bottom,
+					align = PopoverAlign.End,
+					onPressedOutside = onPopoverDismiss,
+					backgroundStyle = v48.Color.Surface.Surface_200
+				}, {
+					DisplayStreamNotifications = v52
+				})
+			}))
+		end
+
+		return (React.createElement(UtilityActionIcon, {
+			icon = v57,
+			onActivated = onBellActivated,
+			badgeValue = v53,
+			buttonRef = t1.buttonRef
+		}, {
+			DisplayStreamNotifications = v52
+		}))
+	end
+
+	return (React.createElement(IconButton, {
+		size = UDim2.new(0, n1, 1, 0),
+		icon = v36,
+		iconSize = IconSize.Medium,
+		layoutOrder = layoutOrder or 3,
+		onActivated = onBellActivated,
+		buttonRef = t1.buttonRef
+	}, {
+		notificationBadge = if not (ThirdPartyUserService and (ThirdPartyUserService:IsChatRestrictionSupported() and ThirdPartyUserService.FriendCommunicationRestrictionStatus ~= Enum.ChatRestrictionStatus.NotRestricted)) then if not (v49 > 0) then nil else React.createElement(Badge, {
+			position = UDim2.new(0.5, 0, 0.5, 0),
+			anchorPoint = Vector2.new(0, 1),
+			value = v49,
+			badgeVariant = BadgeVariant.Alert
+		}) else nil
+	}, { v52 }))
+end
+
+if GetFFlagNotificationsComplianceShouldRestrictStream() then
+	v38 = RoactAppPolicy.connect(function(p1, _) -- line: 353
+		return {
+			shouldRestrictStream = p1.getNotificationsCanReceiveStream() or false
+		}
+	end)(v38)
+end
+
+return v38

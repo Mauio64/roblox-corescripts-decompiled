@@ -1,1 +1,1 @@
-return require(script.EventsContainer);
+return require(script.EventsContainer)

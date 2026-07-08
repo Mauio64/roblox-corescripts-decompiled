@@ -1,38 +1,68 @@
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local FFlagLuaAppClampBannerPaddingToViewport = require(Parent.SharedFlags).FFlagLuaAppClampBannerPaddingToViewport
+
 return {
-    computeContentTopOffset = function(v0, v1, v2) --[[ Line: 10 ]] --[[ Name: computeContentTopOffset ]]
-        if v0 <= 0 then
-            return 0;
-        else
-            return (math.max(0, v0 / v1 - v2));
-        end;
-    end, 
-    computeInitialScrollY = function(v3, v4, v5, v6) --[[ Line: 26 ]] --[[ Name: computeInitialScrollY ]]
-        return (math.max(0, (v3 <= 0 and 0 or math.max(0, v3 / v4 - v5)) - v6));
-    end, 
-    computeCanvasPaddingTop = function(v7, v8, v9, v10) --[[ Line: 62 ]] --[[ Name: computeCanvasPaddingTop ]]
-        local v11 = math.max(0, v7 - if v8 then v9 else 0);
-        if v11 == 0 then
-            v11 = v10;
-        end;
-        return v11;
-    end, 
-    getNoBannerFadeParams = function(v12) --[[ Line: 40 ]] --[[ Name: getNoBannerFadeParams ]]
-        return (math.max(60, v12 * 1.5));
-    end, 
-    getHeaderFadeParams = function(v13, v14, v15) --[[ Line: 80 ]] --[[ Name: getHeaderFadeParams ]]
-        local v16 = math.max(0, v13 - v15);
-        local v17 = false;
-        if v14 > 0 then
-            v17 = v14 < v13;
-        end;
-        return v16, if v17 then math.max(1, v14 - v16) else math.max(1, (v13 - v16) / 3);
-    end, 
-    shouldShowStickyBar = function(v18, v19, v20, v21) --[[ Line: 48 ]] --[[ Name: shouldShowStickyBar ]]
-        local v22 = v20 + v21 <= v18;
-        local v23 = true;
-        if v19 >= v18 then
-            v23 = v22;
-        end;
-        return v23;
-    end
-};
+	computeContentTopOffset = function(n1: number, n2: number, n3: number) -- line: 16
+		if n1 <= 0 then
+			return 0
+		end
+
+		return (math.max(0, n1 / n2 - n3))
+	end,
+	computeInitialScrollY = function(n4: number, n5: number, n6: number, n7: number) -- line: 32
+		return (math.max(0, ((if not (n4 <= 0) then math.max(0, n4 / n5 - n6) else 0)) - n7))
+	end,
+	computeInitialScrollYForSize = function(vector2: Vector2, t1: {[any]: any}) -- line: 114
+		-- upvalues: FFlagLuaAppClampBannerPaddingToViewport (copy)
+		local fullBleedAspectRatio = t1.fullBleedAspectRatio
+		local headerBarHeight = t1.headerBarHeight
+		local fullBleedOverlapOffset = t1.fullBleedOverlapOffset
+		local hasFullBleed = t1.hasFullBleed
+		local bannerBottomVisiblePercent = t1.bannerBottomVisiblePercent
+		local v32 = vector2.X / fullBleedAspectRatio
+		local v33
+
+		if bannerBottomVisiblePercent ~= nil then
+			v33 = math.max(0, (math.floor(v32 - bannerBottomVisiblePercent * v32)))
+		else
+			local vector2X = vector2.X
+
+			v33 = math.max(0, ((if not (vector2X <= 0) then math.max(0, vector2X / fullBleedAspectRatio - headerBarHeight) else 0)) - fullBleedOverlapOffset)
+		end
+
+		local vector2X = vector2.X
+		local v36 = math.max(0, ((if not (vector2X <= 0) then math.max(0, vector2X / fullBleedAspectRatio - headerBarHeight) else 0)) - (not hasFullBleed and 0 or fullBleedOverlapOffset))
+
+		if v36 == 0 then
+			v36 = headerBarHeight
+		end
+
+		if FFlagLuaAppClampBannerPaddingToViewport then
+			v36 = math.min(v36, vector2.Y * 0.75)
+		end
+
+		return (math.min(v33, (math.max(0, v36 - headerBarHeight))))
+	end,
+	computeCanvasPaddingTop = function(n8: number, b1: boolean, n9: number, n10: number) -- line: 68
+		local v20 = math.max(0, n8 - (not b1 and 0 or n9))
+
+		if v20 == 0 then
+			v20 = n10
+		end
+
+		return v20
+	end,
+	getNoBannerFadeParams = function(n11: number) -- line: 46
+		return (math.max(60, n11 * 1.5))
+	end,
+	getHeaderFadeParams = function(n12: number, n13: number, n14: number) -- line: 86
+		local v24 = math.max(0, n12 - n14)
+
+		return v24, if not (n13 > 0 and n13 < n12) then math.max(1, (n12 - v24) / 3) else math.max(1, n13 - v24)
+	end,
+	shouldShowStickyBar = function(n15: number, n16: number, n17: number, n18: number) -- line: 54
+		local v15 = n15 >= n17 + n18
+
+		return n16 < n15 or v15
+	end
+}

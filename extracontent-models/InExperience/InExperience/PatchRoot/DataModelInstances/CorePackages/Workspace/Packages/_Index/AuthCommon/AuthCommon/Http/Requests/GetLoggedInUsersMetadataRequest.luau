@@ -1,14 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-return function(v3, v4) --[[ Line: 8 ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_HttpService_0 (copy)
-    local v5 = l_UrlBuilder_0.fromString("apis:account-switcher/v1/getLoggedInUsersMetadata");
-    local v6 = l_HttpService_0:JSONEncode({
-        encrypted_users_data_blob = v4, 
-        remove_invalid_active_user = false
-    });
-    return v3(v5(), "POST", {
-        postBody = v6
-    });
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local HttpService = game:GetService("HttpService")
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+
+return function(p1, p2) -- line: 8
+	-- upvalues: UrlBuilder (copy), HttpService (copy)
+	local v6 = UrlBuilder.fromString("apis:account-switcher/v1/getLoggedInUsersMetadata")
+	local json = HttpService:JSONEncode({
+		remove_invalid_active_user = false,
+		encrypted_users_data_blob = p2
+	})
+
+	return p1(v6(), "POST", {
+		postBody = json
+	})
+end

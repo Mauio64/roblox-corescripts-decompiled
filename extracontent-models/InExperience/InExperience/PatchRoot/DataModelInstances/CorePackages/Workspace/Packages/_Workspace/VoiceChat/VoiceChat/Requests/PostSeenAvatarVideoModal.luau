@@ -1,8 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("VoiceChat").Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v2) --[[ Line: 10 ]]
-    -- upvalues: l_Url_0 (copy)
-    return v2(string.format("%s/v1/settings/record-user-seen-avatar-video-upsell-modal", l_Url_0.VOICE_URL), "POST", {
-        postBody = "{}"
-    });
-end;
+local Parent = script:FindFirstAncestor("VoiceChat").Parent
+local Url = require(Parent.Http).Url
+
+return function(p1) -- line: 10
+	-- upvalues: Url (copy)
+	return p1(string.format("%s/v1/settings/record-user-seen-avatar-video-upsell-modal", Url.VOICE_URL), "POST", {
+		postBody = "{}"
+	})
+end

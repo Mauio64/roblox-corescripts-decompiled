@@ -1,17 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Constants);
-return function(v2, v3, v4) --[[ Line: 22 ]] --[[ Name: createHumanoidDescriptionAccessoryInfo ]]
-    -- upvalues: v1 (copy)
-    local v5 = tonumber(v3);
-    assert(v5 ~= nil, "assetIdAsNumber is not nil. Silence type checker.");
-    v4 = v4 or {};
-    return {
-        AssetId = v5, 
-        Order = v4.order, 
-        AccessoryType = v4.type or v1.ASSET_TYPE_TO_ACCESSORY_TYPE[v2], 
-        IsLayered = v4.isLayered, 
-        Position = v4.position, 
-        Rotation = v4.rotation, 
-        Scale = v4.scale
-    };
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local Constants = require(AvatarExperienceCommon.Constants)
+
+local function createHumanoidDescriptionAccessoryInfo(s1: string, s2: string, t1: {[any]: any}) -- line: 22
+	-- upvalues: Constants (copy)
+	local num = tonumber(s2)
+
+	assert(num ~= nil, "assetIdAsNumber is not nil. Silence type checker.")
+
+	local v8 = t1 or {}
+
+	return {
+		AssetId = num,
+		Order = v8.order,
+		AccessoryType = v8.type or Constants.ASSET_TYPE_TO_ACCESSORY_TYPE[s1],
+		IsLayered = v8.isLayered,
+		Position = v8.position,
+		Rotation = v8.rotation,
+		Scale = v8.scale
+	}
+end
+
+return createHumanoidDescriptionAccessoryInfo

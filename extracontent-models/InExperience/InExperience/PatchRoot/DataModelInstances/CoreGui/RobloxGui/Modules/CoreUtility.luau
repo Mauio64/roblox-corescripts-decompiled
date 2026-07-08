@@ -1,30 +1,39 @@
-local v0 = {};
-local v1 = game:DefineFastInt("WaitForChildOfClassTimeout", 0);
-if v1 > 0 then
-    v0.waitForChildOfClass = function(v2, v3) --[[ Line: 5 ]] --[[ Name: waitForChildOfClass ]]
-        -- upvalues: v1 (copy)
-        local l_v2_FirstChildOfClass_0 = v2:FindFirstChildOfClass(v3);
-        local v5 = tick() + v1;
-        while not l_v2_FirstChildOfClass_0 and tick() < v5 do
-            task.wait();
-            l_v2_FirstChildOfClass_0 = v2:FindFirstChildOfClass(v3);
-        end;
-        return l_v2_FirstChildOfClass_0;
-    end;
+local t1 = {}
+local v2 = game:DefineFastInt("WaitForChildOfClassTimeout", 0)
+
+if v2 > 0 then
+	function t1.waitForChildOfClass(p1, p2) -- line: 5
+		-- upvalues: v2 (copy)
+		local p2_2 = p1:FindFirstChildOfClass(p2)
+		local v6 = tick() + v2
+
+		while not p2_2 and v6 > tick() do
+			task.wait()
+			p2_2 = p1:FindFirstChildOfClass(p2)
+		end
+
+		return p2_2
+	end
 else
-    v0.waitForChildOfClass = function(v6, v7) --[[ Line: 15 ]] --[[ Name: waitForChildOfClass ]]
-        local l_v6_FirstChildOfClass_0 = v6:FindFirstChildOfClass(v7);
-        while not l_v6_FirstChildOfClass_0 or l_v6_FirstChildOfClass_0.ClassName ~= v7 do
-            l_v6_FirstChildOfClass_0 = v6.ChildAdded:Wait();
-        end;
-        return l_v6_FirstChildOfClass_0;
-    end;
-end;
-v0.waitForChildWhichIsA = function(v9, v10) --[[ Line: 24 ]] --[[ Name: waitForChildWhichIsA ]]
-    local l_v9_FirstChildWhichIsA_0 = v9:FindFirstChildWhichIsA(v10);
-    while not l_v9_FirstChildWhichIsA_0 or not l_v9_FirstChildWhichIsA_0:IsA(v10) do
-        l_v9_FirstChildWhichIsA_0 = v9.ChildAdded:Wait();
-    end;
-    return l_v9_FirstChildWhichIsA_0;
-end;
-return v0;
+	function t1.waitForChildOfClass(p3, p4) -- line: 15
+		local p4_2 = p3:FindFirstChildOfClass(p4)
+
+		while not p4_2 or p4 ~= p4_2.ClassName do
+			p4_2 = p3.ChildAdded:Wait()
+		end
+
+		return p4_2
+	end
+end
+
+function t1.waitForChildWhichIsA(p5, p6) -- line: 24
+	local p6_2 = p5:FindFirstChildWhichIsA(p6)
+
+	while not p6_2 or not p6_2:IsA(p6) do
+		p6_2 = p5.ChildAdded:Wait()
+	end
+
+	return p6_2
+end
+
+return t1

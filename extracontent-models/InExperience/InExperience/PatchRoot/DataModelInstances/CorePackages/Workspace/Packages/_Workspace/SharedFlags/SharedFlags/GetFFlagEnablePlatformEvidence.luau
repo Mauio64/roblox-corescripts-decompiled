@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnablePlatformEvidence", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnablePlatformEvidence");
-end;
+game:DefineFastFlag("EnablePlatformEvidence", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnablePlatformEvidence")
+end

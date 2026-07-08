@@ -1,512 +1,552 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local l_Boolean_0 = v2.Boolean;
-local l_String_0 = v2.String;
-local v7 = {};
-local v8 = require(l_Parent_1.GraphQL);
-local l_visit_0 = v8.visit;
-local l_REMOVE_0 = v8.REMOVE;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local v12 = require(script.Parent.getFromAST);
-local l_checkDocument_0 = v12.checkDocument;
-local l_getOperationDefinition_0 = v12.getOperationDefinition;
-local l_getFragmentDefinition_0 = v12.getFragmentDefinition;
-local l_getFragmentDefinitions_0 = v12.getFragmentDefinitions;
-local l_getMainDefinition_0 = v12.getMainDefinition;
-local l_filterInPlace_0 = require(script.Parent.Parent.common.filterInPlace).filterInPlace;
-local v19 = require(script.Parent.storeUtils);
-local l_isField_0 = v19.isField;
-local l_isInlineFragment_0 = v19.isInlineFragment;
-local function _(v22) --[[ Line: 58 ]] --[[ Name: createFragmentMap ]]
-    -- upvalues: l_Array_0 (copy)
-    local v23 = {};
-    l_Array_0.forEach(v22, function(v24) --[[ Line: 60 ]]
-        -- upvalues: v23 (copy)
-        v23[v24.name.value] = v24;
-    end);
-    return v23;
-end;
-local v26 = nil;
-local v27 = nil;
-local v28 = nil;
-local v29 = nil;
-local v30 = {
-    kind = "Field", 
-    name = {
-        kind = "Name", 
-        value = "__typename"
-    }
-};
-local function v31(v32, v33) --[[ Line: 90 ]] --[[ Name: isEmpty ]]
-    -- upvalues: l_Array_0 (copy), v31 (copy)
-    return l_Array_0.every(v32.selectionSet.selections, function(v34) --[[ Line: 91 ]]
-        -- upvalues: v31 (ref), v33 (copy)
-        local v35 = false;
-        if v34.kind == "FragmentSpread" then
-            v35 = v31(v33[v34.name.value], v33);
-        end;
-        return v35;
-    end, nil);
-end;
-local function _(v36) --[[ Line: 97 ]] --[[ Name: nullIfDocIsEmpty ]]
-    -- upvalues: l_getOperationDefinition_0 (copy), l_getFragmentDefinition_0 (copy), l_getFragmentDefinitions_0 (copy), l_Array_0 (copy), v31 (copy)
-    local v37 = l_getOperationDefinition_0(v36) or l_getFragmentDefinition_0(v36);
-    local v38 = l_getFragmentDefinitions_0(v36);
-    local v39 = {};
-    l_Array_0.forEach(v38, function(v40) --[[ Line: 60 ]]
-        -- upvalues: v39 (copy)
-        v39[v40.name.value] = v40;
-    end);
-    local l_v39_0 = v39;
-    if l_Array_0.every(v37.selectionSet.selections, function(v42) --[[ Line: 91 ]]
-        -- upvalues: v31 (ref), l_v39_0 (copy)
-        local v43 = false;
-        if v42.kind == "FragmentSpread" then
-            v43 = v31(l_v39_0[v42.name.value], l_v39_0);
-        end;
-        return v43;
-    end, nil) then
-        return nil;
-    else
-        return v36;
-    end;
-end;
-local function _(v45) --[[ Line: 110 ]] --[[ Name: getDirectiveMatcher ]]
-    -- upvalues: l_Array_0 (copy), l_Boolean_0 (copy)
-    return function(v46) --[[ Line: 111 ]]
-        -- upvalues: l_Array_0 (ref), v45 (copy), l_Boolean_0 (ref)
-        return l_Array_0.some(v45, function(v47) --[[ Line: 112 ]]
-            -- upvalues: l_Boolean_0 (ref), v46 (copy)
-            return l_Boolean_0.toJSBoolean(v47.name) and v47.name == v46.name.value or l_Boolean_0.toJSBoolean(v47.test) and v47:test(v46);
-        end);
-    end;
-end;
-local function v88(v49, v50) --[[ Line: 119 ]] --[[ Name: removeDirectivesFromDocument ]]
-    -- upvalues: l_visit_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v29 (ref), l_REMOVE_0 (copy), l_getOperationDefinition_0 (copy), l_getFragmentDefinition_0 (copy), l_getFragmentDefinitions_0 (copy), v31 (copy), l_filterInPlace_0 (copy), v27 (ref), v28 (ref)
-    local v51 = {};
-    local v52 = {};
-    local v53 = {};
-    local v54 = {};
-    local v77 = l_visit_0(v50, {
-        Variable = {
-            enter = function(_, v56, _, v58) --[[ Line: 131 ]] --[[ Name: enter ]]
-                -- upvalues: v51 (copy)
-                if v58.kind ~= "VariableDefinition" then
-                    v51[v56.name.value] = true;
-                end;
-                return nil;
-            end
-        }, 
-        Field = {
-            enter = function(_, v60) --[[ Line: 144 ]] --[[ Name: enter ]]
-                -- upvalues: l_Boolean_0 (ref), v49 (copy), l_Array_0 (ref), v52 (copy), v29 (ref), v54 (copy), l_REMOVE_0 (ref)
-                if l_Boolean_0.toJSBoolean(v49) and l_Boolean_0.toJSBoolean(v60.directives) and l_Array_0.some(v49, function(v61) --[[ Line: 148 ]]
-                    return v61.remove;
-                end) and v60.directives then
-                    local l_some_0 = l_Array_0.some;
-                    local l_directives_0 = v60.directives;
-                    local l_v49_0 = v49;
-                    if l_some_0(l_directives_0, function(v65) --[[ Line: 111 ]]
-                        -- upvalues: l_Array_0 (ref), l_v49_0 (copy), l_Boolean_0 (ref)
-                        return l_Array_0.some(l_v49_0, function(v66) --[[ Line: 112 ]]
-                            -- upvalues: l_Boolean_0 (ref), v65 (copy)
-                            return l_Boolean_0.toJSBoolean(v66.name) and v66.name == v65.name.value or l_Boolean_0.toJSBoolean(v66.test) and v66:test(v65);
-                        end);
-                    end) then
-                        if v60.arguments then
-                            l_Array_0.forEach(v60.arguments, function(v67) --[[ Line: 160 ]]
-                                -- upvalues: v52 (ref)
-                                if v67.value.kind == "Variable" then
-                                    table.insert(v52, {
-                                        name = v67.value.name.value
-                                    });
-                                end;
-                            end);
-                        end;
-                        if v60.selectionSet then
-                            l_Array_0.forEach(v29(v60.selectionSet), function(v68) --[[ Line: 175 ]]
-                                -- upvalues: v54 (ref)
-                                table.insert(v54, {
-                                    name = v68.name.value
-                                });
-                            end);
-                        end;
-                        return l_REMOVE_0;
-                    end;
-                end;
-                return nil;
-            end
-        }, 
-        FragmentSpread = {
-            enter = function(_, v70) --[[ Line: 190 ]] --[[ Name: enter ]]
-                -- upvalues: v53 (copy)
-                v53[v70.name.value] = true;
-            end
-        }, 
-        Directive = {
-            enter = function(_, v72) --[[ Line: 197 ]] --[[ Name: enter ]]
-                -- upvalues: l_Boolean_0 (ref), v49 (copy), l_Array_0 (ref), l_REMOVE_0 (ref)
-                local l_toJSBoolean_0 = l_Boolean_0.toJSBoolean;
-                local l_v49_1 = v49;
-                if l_toJSBoolean_0((function(v75) --[[ Line: 111 ]]
-                    -- upvalues: l_Array_0 (ref), l_v49_1 (copy), l_Boolean_0 (ref)
-                    return l_Array_0.some(l_v49_1, function(v76) --[[ Line: 112 ]]
-                        -- upvalues: l_Boolean_0 (ref), v75 (copy)
-                        return l_Boolean_0.toJSBoolean(v76.name) and v76.name == v75.name.value or l_Boolean_0.toJSBoolean(v76.test) and v76:test(v75);
-                    end);
-                end)(v72)) then
-                    return l_REMOVE_0;
-                else
-                    return nil;
-                end;
-            end
-        }
-    });
-    local v78 = l_getOperationDefinition_0(v77) or l_getFragmentDefinition_0(v77);
-    local v79 = l_getFragmentDefinitions_0(v77);
-    local v80 = {};
-    l_Array_0.forEach(v79, function(v81) --[[ Line: 60 ]]
-        -- upvalues: v80 (copy)
-        v80[v81.name.value] = v81;
-    end);
-    local l_v80_0 = v80;
-    local v85 = if l_Array_0.every(v78.selectionSet.selections, function(v83) --[[ Line: 91 ]]
-        -- upvalues: v31 (ref), l_v80_0 (copy)
-        local v84 = false;
-        if v83.kind == "FragmentSpread" then
-            v84 = v31(l_v80_0[v83.name.value], l_v80_0);
-        end;
-        return v84;
-    end, nil) then nil else v77;
-    if l_Boolean_0.toJSBoolean(v85) and l_Boolean_0.toJSBoolean(#l_filterInPlace_0(v52, function(v86) --[[ Line: 213 ]]
-        -- upvalues: l_Boolean_0 (ref), v51 (copy)
-        return not not l_Boolean_0.toJSBoolean(v86.name) and not v51[v86.name];
-    end)) then
-        v85 = v27(v52, v85);
-    end;
-    if l_Boolean_0.toJSBoolean(v85) and l_Boolean_0.toJSBoolean(#l_filterInPlace_0(v54, function(v87) --[[ Line: 225 ]]
-        -- upvalues: l_Boolean_0 (ref), v53 (copy)
-        return not not l_Boolean_0.toJSBoolean(v87.name) and not v53[v87.name];
-    end)) then
-        v85 = v28(v54, v85);
-    end;
-    return v85;
-end;
-v7.removeDirectivesFromDocument = v88;
-v7.addTypenameToDocument = l_Object_0.assign(setmetatable({}, {
-    __call = function(_, v90) --[[ Line: 238 ]] --[[ Name: __call ]]
-        -- upvalues: l_visit_0 (copy), l_checkDocument_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), l_isField_0 (copy), l_String_0 (copy), l_Object_0 (copy), v30 (copy)
-        return l_visit_0(l_checkDocument_0(v90), {
-            SelectionSet = {
-                enter = function(_, v92, _, v94) --[[ Line: 241 ]] --[[ Name: enter ]]
-                    -- upvalues: l_Boolean_0 (ref), l_Array_0 (ref), l_isField_0 (ref), l_String_0 (ref), l_Object_0 (ref), v30 (ref)
-                    if l_Boolean_0.toJSBoolean(v94) and v94.kind == "OperationDefinition" then
-                        return;
-                    else
-                        local l_selections_0 = v92.selections;
-                        if not l_Boolean_0.toJSBoolean(l_selections_0) then
-                            return;
-                        elseif l_Array_0.some(l_selections_0, function(v96) --[[ Line: 258 ]]
-                            -- upvalues: l_isField_0 (ref), l_String_0 (ref)
-                            return l_isField_0(v96) and (v96.name.value == "__typename" or l_String_0.lastIndexOf(v96.name.value, "__", 1) == 1);
-                        end) then
-                            return;
-                        elseif l_isField_0(v94) and l_Boolean_0.toJSBoolean(v94.directives) and l_Boolean_0.toJSBoolean(l_Array_0.some(v94.directives, function(v97) --[[ Line: 275 ]]
-                            return v97.name.value == "export";
-                        end)) then
-                            return;
-                        else
-                            return l_Object_0.assign({}, v92, {
-                                selections = l_Array_0.concat({}, l_selections_0, {
-                                    v30
-                                })
-                            });
-                        end;
-                    end;
-                end
-            }
-        });
-    end
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local Boolean = LuauPolyfill.Boolean
+local String = LuauPolyfill.String
+local t1 = {}
+local GraphQL = require(ParentParentParent.GraphQL)
+local visit = GraphQL.visit
+local REMOVE = GraphQL.REMOVE
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local getFromAST = require(script.Parent.getFromAST)
+local checkDocument = getFromAST.checkDocument
+local getOperationDefinition = getFromAST.getOperationDefinition
+local getFragmentDefinition = getFromAST.getFragmentDefinition
+local getFragmentDefinitions = getFromAST.getFragmentDefinitions
+local getMainDefinition = getFromAST.getMainDefinition
+local filterInPlace = require(script.Parent.Parent.common.filterInPlace).filterInPlace
+local storeUtils = require(script.Parent.storeUtils)
+local isField = storeUtils.isField
+local isInlineFragment = storeUtils.isInlineFragment
+
+local function createFragmentMap(p1) -- line: 58
+	-- upvalues: Array (copy)
+	local t2 = {}
+
+	Array.forEach(p1, function(p2) -- line: 60
+		-- upvalues: t2 (copy)
+		t2[p2.name.value] = p2
+	end)
+
+	return t2
+end
+
+local hasDirectivesInSelection = nil
+local removeArgumentsFromDocument = nil
+local removeFragmentSpreadFromDocument = nil
+local getAllFragmentSpreadsFromSelectionSet = nil
+local t3 = {
+	kind = "Field",
+	name = {
+		kind = "Name",
+		value = "__typename"
+	}
+}
+
+local function isEmpty(p3, t4: {[any]: any}) -- line: 90
+	-- upvalues: Array (copy), isEmpty (copy)
+	return Array.every(p3.selectionSet.selections, function(p4) -- line: 91
+		-- upvalues: isEmpty (copy), t4 (copy)
+		return p4.kind == "FragmentSpread" and isEmpty(t4[p4.name.value], t4)
+	end, nil)
+end
+local function nullIfDocIsEmpty(p5) -- line: 97
+	-- upvalues: getOperationDefinition (copy), getFragmentDefinition (copy), getFragmentDefinitions (copy), Array (copy), isEmpty (copy)
+	local v41 = getOperationDefinition(p5) or getFragmentDefinition(p5)
+	local v42 = getFragmentDefinitions(p5)
+	local t5 = {}
+
+	Array.forEach(v42, function(p6) -- line: 60
+		-- upvalues: t5 (copy)
+		t5[p6.name.value] = p6
+	end)
+
+	local v44 = t5
+
+	if Array.every(v41.selectionSet.selections, function(p7) -- line: 91
+		-- upvalues: isEmpty (copy), v44 (copy)
+		return p7.kind == "FragmentSpread" and isEmpty(v44[p7.name.value], v44)
+	end, nil) then
+		return nil
+	end
+
+	return p5
+end
+local function getDirectiveMatcher(p8) -- line: 110
+	-- upvalues: Array (copy), Boolean (copy)
+	return function(p9) -- line: 111
+		-- upvalues: Array (copy), p8 (copy), Boolean (copy)
+		return Array.some(p8, function(p10) -- line: 112
+			-- upvalues: Boolean (copy), p9 (copy)
+			return Boolean.toJSBoolean(p10.name) and p10.name == p9.name.value or Boolean.toJSBoolean(p10.test) and p10:test(p9)
+		end)
+	end
+end
+local function removeDirectivesFromDocument(p11, p12) -- line: 119
+	-- upvalues: visit (copy), Boolean (copy), Array (copy), getAllFragmentSpreadsFromSelectionSet (ref), REMOVE (copy), getOperationDefinition (copy), getFragmentDefinition (copy), getFragmentDefinitions (copy), isEmpty (copy), filterInPlace (copy), removeArgumentsFromDocument (ref), removeFragmentSpreadFromDocument (ref)
+	local t6 = {}
+	local t7 = {}
+	local t8 = {}
+	local t9 = {}
+	local v52 = visit(p12, {
+		Variable = {
+			enter = function(_, p14, _, p16) -- line: 131
+				-- upvalues: t6 (copy)
+				if p16.kind ~= "VariableDefinition" then
+					t6[p14.name.value] = true
+				end
+
+				return nil
+			end
+		},
+		Field = {
+			enter = function(_, p18) -- line: 144
+				-- upvalues: Boolean (copy), p11 (copy), Array (copy), t7 (copy), getAllFragmentSpreadsFromSelectionSet (ref), t9 (copy), REMOVE (copy)
+				if Boolean.toJSBoolean(p11) and (Boolean.toJSBoolean(p18.directives) and Array.some(p11, function(p19) -- line: 148
+					return p19.remove
+				end) and p18.directives) then
+					local some = Array.some
+					local directives = p18.directives
+					local v112 = p11
+
+					if some(directives, function(p20) -- line: 111
+						-- upvalues: Array (copy), v112 (copy), Boolean (copy)
+						return Array.some(v112, function(p21) -- line: 112
+							-- upvalues: Boolean (copy), p20 (copy)
+							return Boolean.toJSBoolean(p21.name) and p21.name == p20.name.value or Boolean.toJSBoolean(p21.test) and p21:test(p20)
+						end)
+					end) then
+						if p18.arguments then
+							Array.forEach(p18.arguments, function(p22) -- line: 160
+								-- upvalues: t7 (copy)
+								if p22.value.kind == "Variable" then
+									table.insert(t7, {
+										name = p22.value.name.value
+									})
+								end
+							end)
+						end
+
+						if p18.selectionSet then
+							Array.forEach(getAllFragmentSpreadsFromSelectionSet(p18.selectionSet), function(p23) -- line: 175
+								-- upvalues: t9 (copy)
+								table.insert(t9, {
+									name = p23.name.value
+								})
+							end)
+						end
+
+						return REMOVE
+					end
+				end
+
+				return nil
+			end
+		},
+		FragmentSpread = {
+			enter = function(_, p25) -- line: 190
+				-- upvalues: t8 (copy)
+				t8[p25.name.value] = true
+			end
+		},
+		Directive = {
+			enter = function(_, p27) -- line: 197
+				-- upvalues: Boolean (copy), p11 (copy), Array (copy), REMOVE (copy)
+				local toJSBoolean = Boolean.toJSBoolean
+				local v118 = p11
+
+				if toJSBoolean((function(p28) -- line: 111
+					-- upvalues: Array (copy), v118 (copy), Boolean (copy)
+					return Array.some(v118, function(p29) -- line: 112
+						-- upvalues: Boolean (copy), p28 (copy)
+						return Boolean.toJSBoolean(p29.name) and p29.name == p28.name.value or Boolean.toJSBoolean(p29.test) and p29:test(p28)
+					end)
+				end)(p27)) then
+					return REMOVE
+				end
+
+				return nil
+			end
+		}
+	})
+	local v53 = getOperationDefinition(v52) or getFragmentDefinition(v52)
+	local v54 = getFragmentDefinitions(v52)
+	local t10 = {}
+
+	Array.forEach(v54, function(p30) -- line: 60
+		-- upvalues: t10 (copy)
+		t10[p30.name.value] = p30
+	end)
+
+	local v56 = t10
+	local v57 = if not Array.every(v53.selectionSet.selections, function(p31) -- line: 91
+		-- upvalues: isEmpty (copy), v56 (copy)
+		return p31.kind == "FragmentSpread" and isEmpty(v56[p31.name.value], v56)
+	end, nil) then v52 else nil
+
+	if Boolean.toJSBoolean(v57) and Boolean.toJSBoolean(#filterInPlace(t7, function(p32) -- line: 213
+		-- upvalues: Boolean (copy), t6 (copy)
+		return not not Boolean.toJSBoolean(p32.name) and not t6[p32.name]
+	end)) then
+		v57 = removeArgumentsFromDocument(t7, v57)
+	end
+
+	if Boolean.toJSBoolean(v57) and Boolean.toJSBoolean(#filterInPlace(t9, function(p33) -- line: 225
+		-- upvalues: Boolean (copy), t8 (copy)
+		return not not Boolean.toJSBoolean(p33.name) and not t8[p33.name]
+	end)) then
+		v57 = removeFragmentSpreadFromDocument(t9, v57)
+	end
+
+	return v57
+end
+
+t1.removeDirectivesFromDocument = removeDirectivesFromDocument
+t1.addTypenameToDocument = Object.assign(setmetatable({}, {
+	__call = function(_, p35) -- line: 238
+		-- upvalues: visit (copy), checkDocument (copy), Boolean (copy), Array (copy), isField (copy), String (copy), Object (copy), t3 (copy)
+		return visit(checkDocument(p35), {
+			SelectionSet = {
+				enter = function(_, p37, _, p39) -- line: 241
+					-- upvalues: Boolean (copy), Array (copy), isField (copy), String (copy), Object (copy), t3 (copy)
+					if Boolean.toJSBoolean(p39) and p39.kind == "OperationDefinition" then
+						return
+					end
+
+					local selections = p37.selections
+
+					if not Boolean.toJSBoolean(selections) then
+						return
+					end
+
+					if Array.some(selections, function(p40) -- line: 258
+						-- upvalues: isField (copy), String (copy)
+						return isField(p40) and (p40.name.value == "__typename" or String.lastIndexOf(p40.name.value, "__", 1) == 1)
+					end) then
+						return
+					end
+
+					if isField(p39) and Boolean.toJSBoolean(p39.directives) and Boolean.toJSBoolean(Array.some(p39.directives, function(p41) -- line: 275
+						return p41.name.value == "export"
+					end)) then
+						return
+					end
+
+					return Object.assign({}, p37, {
+						selections = Array.concat({}, selections, { t3 })
+					})
+				end
+			}
+		})
+	end
 }), {
-    added = function(_, v99) --[[ Line: 294 ]] --[[ Name: added ]]
-        -- upvalues: v30 (copy)
-        return v99 == v30;
-    end
-});
-local v104 = {
-    test = function(_, v101) --[[ Line: 302 ]] --[[ Name: test ]]
-        -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy), l_invariant_0 (copy)
-        local v102 = v101.name.value == "connection";
-        if v102 and (not l_Boolean_0.toJSBoolean(v101.arguments) or l_Array_0.some(v101.arguments, function(v103) --[[ Line: 307 ]]
-            return v103.name.value == "key";
-        end)) then
-            l_invariant_0.warn("Removing an @connection directive even though it does not have a key. You may want to use the key parameter to specify a store key.");
-        end;
-        return v102;
-    end
-};
-v7.removeConnectionDirectiveFromDocument = function(v105) --[[ Line: 322 ]] --[[ Name: removeConnectionDirectiveFromDocument ]]
-    -- upvalues: v88 (copy), v104 (copy), l_checkDocument_0 (copy)
-    return (v88({
-        v104
-    }, l_checkDocument_0(v105)));
-end;
-local function _(v106, v107, v108) --[[ Line: 327 ]] --[[ Name: hasDirectivesInSelectionSet ]]
-    -- upvalues: l_Array_0 (copy), v26 (ref)
-    if v108 == nil then
-        v108 = true;
-    end;
-    return v107 and v107.selections and l_Array_0.some(v107.selections, function(v109) --[[ Line: 338 ]]
-        -- upvalues: v26 (ref), v106 (copy), v108 (ref)
-        return v26(v106, v109, v108);
-    end) or false;
-end;
-v26 = function(v111, v112, v113) --[[ Line: 346 ]] --[[ Name: hasDirectivesInSelection ]]
-    -- upvalues: l_isField_0 (copy), l_Array_0 (copy), l_Boolean_0 (copy), v26 (ref)
-    local v114 = false;
-    if v113 == nil then
-        v113 = true;
-    end;
-    if not l_isField_0(v112) then
-        return true;
-    elseif not v112.directives then
-        return false;
-    else
-        local v117 = l_Array_0.some(v112.directives, function(v115) --[[ Line: 111 ]]
-            -- upvalues: l_Array_0 (ref), v111 (copy), l_Boolean_0 (ref)
-            return l_Array_0.some(v111, function(v116) --[[ Line: 112 ]]
-                -- upvalues: l_Boolean_0 (ref), v115 (copy)
-                return l_Boolean_0.toJSBoolean(v116.name) and v116.name == v115.name.value or l_Boolean_0.toJSBoolean(v116.test) and v116:test(v115);
-            end);
-        end);
-        if not v117 then
-            if v113 then
-                local l_selectionSet_0 = v112.selectionSet;
-                local l_v113_0 = v113;
-                if l_v113_0 == nil then
-                    l_v113_0 = true;
-                end;
-                if true then
-                    local l_l_v113_0_0 = l_v113_0;
-                    v117 = l_selectionSet_0 and l_selectionSet_0.selections and l_Array_0.some(l_selectionSet_0.selections, function(v121) --[[ Line: 338 ]]
-                        -- upvalues: v26 (ref), v111 (copy), l_l_v113_0_0 (ref)
-                        return v26(v111, v121, l_l_v113_0_0);
-                    end) or false;
-                end;
-                v114 = v117;
-            end;
-            if not v114 then
-                v117 = false;
-            end;
-        end;
-        v114 = false;
-        return v117;
-    end;
-end;
-local function _(v122) --[[ Line: 375 ]] --[[ Name: getArgumentMatcher ]]
-    -- upvalues: l_Array_0 (copy)
-    return function(v123) --[[ Line: 376 ]]
-        -- upvalues: l_Array_0 (ref), v122 (copy)
-        return l_Array_0.some(v122, function(v124) --[[ Line: 377 ]]
-            -- upvalues: v123 (copy)
-            return if v123.value then v123.value.kind == "Variable" and (v123.value.name and (v124.name == v123.value.name.value or v124.test and v124:test(v123)) or false) else false;
-        end);
-    end;
-end;
-v27 = function(v126, v127) --[[ Line: 398 ]] --[[ Name: removeArgumentsFromDocument ]]
-    -- upvalues: l_Array_0 (copy), l_visit_0 (copy), l_Object_0 (copy), l_REMOVE_0 (copy), l_Boolean_0 (copy), l_getOperationDefinition_0 (copy), l_getFragmentDefinition_0 (copy), l_getFragmentDefinitions_0 (copy), v31 (copy)
-    local function v130(v128) --[[ Line: 376 ]]
-        -- upvalues: l_Array_0 (ref), v126 (copy)
-        return l_Array_0.some(v126, function(v129) --[[ Line: 377 ]]
-            -- upvalues: v128 (copy)
-            return if v128.value then v128.value.kind == "Variable" and (v128.value.name and (v129.name == v128.value.name.value or v129.test and v129:test(v128)) or false) else false;
-        end);
-    end;
-    local v142 = l_visit_0(v127, {
-        OperationDefinition = {
-            enter = function(_, v132) --[[ Line: 403 ]] --[[ Name: enter ]]
-                -- upvalues: l_Object_0 (ref), l_Array_0 (ref), v126 (copy)
-                return l_Object_0.assign({}, v132, {
-                    variableDefinitions = v132.variableDefinitions and l_Array_0.filter(v132.variableDefinitions, function(v133) --[[ Line: 407 ]]
-                        -- upvalues: l_Array_0 (ref), v126 (ref)
-                        return not l_Array_0.some(v126, function(v134) --[[ Line: 408 ]]
-                            -- upvalues: v133 (copy)
-                            return v134.name == v133.variable.name.value;
-                        end);
-                    end) or {}
-                });
-            end
-        }, 
-        Field = {
-            enter = function(_, v136) --[[ Line: 418 ]] --[[ Name: enter ]]
-                -- upvalues: l_Array_0 (ref), v126 (copy), v130 (copy), l_REMOVE_0 (ref)
-                if l_Array_0.some(v126, function(v137) --[[ Line: 421 ]]
-                    return v137.remove;
-                end) then
-                    local v138 = 0;
-                    if v136.arguments then
-                        l_Array_0.forEach(v136.arguments, function(v139) --[[ Line: 428 ]]
-                            -- upvalues: v130 (ref), v138 (ref)
-                            if v130(v139) then
-                                v138 = v138 + 1;
-                            end;
-                        end);
-                    end;
-                    if v138 == 1 then
-                        return l_REMOVE_0;
-                    else
-                        --[[ close >= 3 ]]
-                    end;
-                end;
-                return nil;
-            end
-        }, 
-        Argument = {
-            enter = function(_, v141) --[[ Line: 444 ]] --[[ Name: enter ]]
-                -- upvalues: l_Boolean_0 (ref), v130 (copy), l_REMOVE_0 (ref)
-                if l_Boolean_0.toJSBoolean(v130(v141)) then
-                    return l_REMOVE_0;
-                else
-                    return nil;
-                end;
-            end
-        }
-    });
-    local v143 = l_getOperationDefinition_0(v142) or l_getFragmentDefinition_0(v142);
-    local v144 = l_getFragmentDefinitions_0(v142);
-    local v145 = {};
-    l_Array_0.forEach(v144, function(v146) --[[ Line: 60 ]]
-        -- upvalues: v145 (copy)
-        v145[v146.name.value] = v146;
-    end);
-    local l_v145_0 = v145;
-    if l_Array_0.every(v143.selectionSet.selections, function(v148) --[[ Line: 91 ]]
-        -- upvalues: v31 (ref), l_v145_0 (copy)
-        local v149 = false;
-        if v148.kind == "FragmentSpread" then
-            v149 = v31(l_v145_0[v148.name.value], l_v145_0);
-        end;
-        return v149;
-    end, nil) then
-        return nil;
-    else
-        return v142;
-    end;
-end;
-v7.removeArgumentsFromDocument = v27;
-v28 = function(v150, v151) --[[ Line: 456 ]] --[[ Name: removeFragmentSpreadFromDocument ]]
-    -- upvalues: l_Array_0 (copy), l_REMOVE_0 (copy), l_visit_0 (copy), l_getOperationDefinition_0 (copy), l_getFragmentDefinition_0 (copy), l_getFragmentDefinitions_0 (copy), v31 (copy)
-    local function v155(_, v153) --[[ Line: 460 ]] --[[ Name: enter ]]
-        -- upvalues: l_Array_0 (ref), v150 (copy), l_REMOVE_0 (ref)
-        if l_Array_0.some(v150, function(v154) --[[ Line: 461 ]]
-            -- upvalues: v153 (copy)
-            return v154.name == v153.name.value;
-        end) then
-            return l_REMOVE_0;
-        else
-            return nil;
-        end;
-    end;
-    local v156 = l_visit_0(v151, {
-        FragmentSpread = {
-            enter = v155
-        }, 
-        FragmentDefinition = {
-            enter = v155
-        }
-    });
-    local v157 = l_getOperationDefinition_0(v156) or l_getFragmentDefinition_0(v156);
-    local v158 = l_getFragmentDefinitions_0(v156);
-    local v159 = {};
-    l_Array_0.forEach(v158, function(v160) --[[ Line: 60 ]]
-        -- upvalues: v159 (copy)
-        v159[v160.name.value] = v160;
-    end);
-    local l_v159_0 = v159;
-    if l_Array_0.every(v157.selectionSet.selections, function(v162) --[[ Line: 91 ]]
-        -- upvalues: v31 (ref), l_v159_0 (copy)
-        local v163 = false;
-        if v162.kind == "FragmentSpread" then
-            v163 = v31(l_v159_0[v162.name.value], l_v159_0);
-        end;
-        return v163;
-    end, nil) then
-        return nil;
-    else
-        return v156;
-    end;
-end;
-v7.removeFragmentSpreadFromDocument = v28;
-v29 = function(v164) --[[ Line: 473 ]] --[[ Name: getAllFragmentSpreadsFromSelectionSet ]]
-    -- upvalues: l_Array_0 (copy), l_isField_0 (copy), l_isInlineFragment_0 (copy), v29 (ref)
-    local v165 = {};
-    l_Array_0.forEach(v164.selections, function(v166) --[[ Line: 475 ]]
-        -- upvalues: l_isField_0 (ref), l_isInlineFragment_0 (ref), l_Array_0 (ref), v29 (ref), v165 (copy)
-        if (l_isField_0(v166) or l_isInlineFragment_0(v166)) and v166.selectionSet then
-            l_Array_0.forEach(v29(v166.selectionSet), function(v167) --[[ Line: 486 ]]
-                -- upvalues: v165 (ref)
-                table.insert(v165, v167);
-            end);
-            return;
-        else
-            if v166.kind == "FragmentSpread" then
-                table.insert(v165, v166);
-            end;
-            return;
-        end;
-    end);
-    return v165;
-end;
-v7.buildQueryFromSelectionSet = function(v168) --[[ Line: 501 ]] --[[ Name: buildQueryFromSelectionSet ]]
-    -- upvalues: l_getMainDefinition_0 (copy), l_visit_0 (copy), l_Object_0 (copy)
-    if l_getMainDefinition_0(v168).operation == "query" then
-        return v168;
-    else
-        return (l_visit_0(v168, {
-            OperationDefinition = {
-                enter = function(_, v170) --[[ Line: 513 ]] --[[ Name: enter ]]
-                    -- upvalues: l_Object_0 (ref)
-                    return l_Object_0.assign({}, v170, {
-                        operation = "query"
-                    });
-                end
-            }
-        }));
-    end;
-end;
-v7.removeClientSetsFromDocument = function(v171) --[[ Line: 523 ]] --[[ Name: removeClientSetsFromDocument ]]
-    -- upvalues: l_checkDocument_0 (copy), v88 (copy), l_Boolean_0 (copy), l_visit_0 (copy), l_Array_0 (copy), l_isField_0 (copy), l_REMOVE_0 (copy)
-    l_checkDocument_0(v171);
-    local v174 = v88({
-        {
-            test = function(_, v173) --[[ Line: 528 ]] --[[ Name: test ]]
-                return v173.name.value == "client";
-            end, 
-            remove = true
-        }
-    }, v171);
-    if l_Boolean_0.toJSBoolean(v174) then
-        v174 = l_visit_0(v174, {
-            FragmentDefinition = {
-                enter = function(_, v176) --[[ Line: 542 ]] --[[ Name: enter ]]
-                    -- upvalues: l_Array_0 (ref), l_isField_0 (ref), l_Boolean_0 (ref), l_REMOVE_0 (ref)
-                    if v176.selectionSet then
-                        local v178 = l_Array_0.every(v176.selectionSet.selections, function(v177) --[[ Line: 544 ]]
-                            -- upvalues: l_isField_0 (ref)
-                            return l_isField_0(v177) and v177.name.value == "__typename";
-                        end);
-                        if l_Boolean_0.toJSBoolean(v178) then
-                            return l_REMOVE_0;
-                        end;
-                    end;
-                    return nil;
-                end
-            }
-        });
-    end;
-    return v174;
-end;
-return v7;
+	added = function(_, p43) -- line: 294
+		-- upvalues: t3 (copy)
+		return p43 == t3
+	end
+})
+
+local t11 = {
+	test = function(_, p45) -- line: 302
+		-- upvalues: Boolean (copy), Array (copy), invariant (copy)
+		local v64 = p45.name.value == "connection"
+
+		if v64 and (not Boolean.toJSBoolean(p45.arguments) or Array.some(p45.arguments, function(p46) -- line: 307
+			return p46.name.value == "key"
+		end)) then
+			invariant.warn("Removing an @connection directive even though it does not have a key. You may want to use the key parameter to specify a store key.")
+		end
+
+		return v64
+	end
+}
+
+function t1.removeConnectionDirectiveFromDocument(p47) -- line: 322
+	-- upvalues: removeDirectivesFromDocument (copy), t11 (copy), checkDocument (copy)
+	return (removeDirectivesFromDocument({ t11 }, checkDocument(p47)))
+end
+
+local function hasDirectivesInSelectionSet(p48, p49, b1: boolean?) -- line: 327
+	-- upvalues: Array (copy), hasDirectivesInSelection (ref)
+	if b1 == nil then
+		b1 = true
+	end
+
+	return not not p49 and (not not p49.selections and (Array.some(p49.selections, function(p50) -- line: 338
+		-- upvalues: hasDirectivesInSelection (ref), p48 (copy), b1 (ref)
+		return hasDirectivesInSelection(p48, p50, b1)
+	end) or false))
+end
+
+function hasDirectivesInSelection(p51, p52, b2: boolean?) -- line: 346
+	-- upvalues: isField (copy), Array (copy), Boolean (copy), hasDirectivesInSelection (ref)
+	local g74 = nil
+
+	if b2 == nil then
+		b2 = true
+	end
+
+	if not isField(p52) then
+		return true
+	end
+
+	if not p52.directives then
+		return false
+	end
+
+	local v73 = Array.some(p52.directives, function(p53) -- line: 111
+		-- upvalues: Array (copy), p51 (copy), Boolean (copy)
+		return Array.some(p51, function(p54) -- line: 112
+			-- upvalues: Boolean (copy), p53 (copy)
+			return Boolean.toJSBoolean(p54.name) and p54.name == p53.name.value or Boolean.toJSBoolean(p54.test) and p54:test(p53)
+		end)
+	end)
+
+	if not v73 then
+		repeat
+			if g74 or not b2 then
+				g74 = false
+				v73 = false
+
+				return v73
+			end
+
+			local selectionSet = p52.selectionSet
+			local u76 = b2
+
+			if u76 == nil then
+				u76 = true
+			end
+
+			v73 = not not selectionSet and (not not selectionSet.selections and (Array.some(selectionSet.selections, function(p55) -- line: 338
+				-- upvalues: hasDirectivesInSelection (ref), p51 (copy), u76 (ref)
+				return hasDirectivesInSelection(p51, p55, u76)
+			end) or false))
+
+			if not v73 then
+				g74 = true
+			end
+		until not g74
+	end
+
+	return v73
+end
+
+local function getArgumentMatcher(p56) -- line: 375
+	-- upvalues: Array (copy)
+	return function(p57) -- line: 376
+		-- upvalues: Array (copy), p56 (copy)
+		return Array.some(p56, function(p58) -- line: 377
+			-- upvalues: p57 (copy)
+			return not not p57.value and (p57.value.kind == "Variable" and (not not p57.value.name and (p58.name == p57.value.name.value or not not p58.test and (p58:test(p57) or false))))
+		end)
+	end
+end
+
+function removeArgumentsFromDocument(p59, p60) -- line: 398
+	-- upvalues: Array (copy), visit (copy), Object (copy), REMOVE (copy), Boolean (copy), getOperationDefinition (copy), getFragmentDefinition (copy), getFragmentDefinitions (copy), isEmpty (copy)
+	local function v80(p61) -- line: 376
+		-- upvalues: Array (copy), p59 (copy)
+		return Array.some(p59, function(p62) -- line: 377
+			-- upvalues: p61 (copy)
+			return not not p61.value and (p61.value.kind == "Variable" and (not not p61.value.name and (p62.name == p61.value.name.value or not not p62.test and (p62:test(p61) or false))))
+		end)
+	end
+
+	local v81 = visit(p60, {
+		OperationDefinition = {
+			enter = function(_, p64) -- line: 403
+				-- upvalues: Object (copy), Array (copy), p59 (copy)
+				return Object.assign({}, p64, {
+					variableDefinitions = p64.variableDefinitions and Array.filter(p64.variableDefinitions, function(p65) -- line: 407
+						-- upvalues: Array (copy), p59 (copy)
+						return not Array.some(p59, function(p66) -- line: 408
+							-- upvalues: p65 (copy)
+							return p66.name == p65.variable.name.value
+						end)
+					end) or {}
+				})
+			end
+		},
+		Field = {
+			enter = function(_, p68) -- line: 418
+				-- upvalues: Array (copy), p59 (copy), v80 (copy), REMOVE (copy)
+				if Array.some(p59, function(p69) -- line: 421
+					return p69.remove
+				end) then
+					local n1 = 0
+
+					if p68.arguments then
+						Array.forEach(p68.arguments, function(p70) -- line: 428
+							-- upvalues: v80 (copy), n1 (ref)
+							if v80(p70) then
+								n1 += 1
+							end
+						end)
+					end
+
+					if n1 == 1 then
+						return REMOVE
+					end
+				end
+
+				return nil
+			end
+		},
+		Argument = {
+			enter = function(_, p72) -- line: 444
+				-- upvalues: Boolean (copy), v80 (copy), REMOVE (copy)
+				if Boolean.toJSBoolean(v80(p72)) then
+					return REMOVE
+				end
+
+				return nil
+			end
+		}
+	})
+	local v82 = getOperationDefinition(v81) or getFragmentDefinition(v81)
+	local v83 = getFragmentDefinitions(v81)
+	local t12 = {}
+
+	Array.forEach(v83, function(p73) -- line: 60
+		-- upvalues: t12 (copy)
+		t12[p73.name.value] = p73
+	end)
+
+	local v85 = t12
+
+	if Array.every(v82.selectionSet.selections, function(p74) -- line: 91
+		-- upvalues: isEmpty (copy), v85 (copy)
+		return p74.kind == "FragmentSpread" and isEmpty(v85[p74.name.value], v85)
+	end, nil) then
+		return nil
+	end
+
+	return v81
+end
+
+t1.removeArgumentsFromDocument = removeArgumentsFromDocument
+
+function removeFragmentSpreadFromDocument(p75, p76) -- line: 456
+	-- upvalues: Array (copy), REMOVE (copy), visit (copy), getOperationDefinition (copy), getFragmentDefinition (copy), getFragmentDefinitions (copy), isEmpty (copy)
+	local function enter(_, p78) -- line: 460
+		-- upvalues: Array (copy), p75 (copy), REMOVE (copy)
+		if Array.some(p75, function(p79) -- line: 461
+			-- upvalues: p78 (copy)
+			return p79.name == p78.name.value
+		end) then
+			return REMOVE
+		end
+
+		return nil
+	end
+
+	local v89 = visit(p76, {
+		FragmentSpread = {
+			enter = enter
+		},
+		FragmentDefinition = {
+			enter = enter
+		}
+	})
+	local v90 = getOperationDefinition(v89) or getFragmentDefinition(v89)
+	local v91 = getFragmentDefinitions(v89)
+	local t13 = {}
+
+	Array.forEach(v91, function(p80) -- line: 60
+		-- upvalues: t13 (copy)
+		t13[p80.name.value] = p80
+	end)
+
+	local v93 = t13
+
+	if Array.every(v90.selectionSet.selections, function(p81) -- line: 91
+		-- upvalues: isEmpty (copy), v93 (copy)
+		return p81.kind == "FragmentSpread" and isEmpty(v93[p81.name.value], v93)
+	end, nil) then
+		return nil
+	end
+
+	return v89
+end
+
+t1.removeFragmentSpreadFromDocument = removeFragmentSpreadFromDocument
+
+function getAllFragmentSpreadsFromSelectionSet(p82) -- line: 473
+	-- upvalues: Array (copy), isField (copy), isInlineFragment (copy), getAllFragmentSpreadsFromSelectionSet (ref)
+	local t14 = {}
+
+	Array.forEach(p82.selections, function(p83) -- line: 475
+		-- upvalues: isField (copy), isInlineFragment (copy), Array (copy), getAllFragmentSpreadsFromSelectionSet (ref), t14 (copy)
+		if (isField(p83) or isInlineFragment(p83)) and p83.selectionSet then
+			Array.forEach(getAllFragmentSpreadsFromSelectionSet(p83.selectionSet), function(p84) -- line: 486
+				-- upvalues: t14 (copy)
+				table.insert(t14, p84)
+			end)
+
+			return
+		end
+
+		if p83.kind == "FragmentSpread" then
+			table.insert(t14, p83)
+		end
+	end)
+
+	return t14
+end
+function t1.buildQueryFromSelectionSet(p85) -- line: 501
+	-- upvalues: getMainDefinition (copy), visit (copy), Object (copy)
+	if getMainDefinition(p85).operation == "query" then
+		return p85
+	end
+
+	return (visit(p85, {
+		OperationDefinition = {
+			enter = function(_, p87) -- line: 513
+				-- upvalues: Object (copy)
+				return Object.assign({}, p87, {
+					operation = "query"
+				})
+			end
+		}
+	}))
+end
+function t1.removeClientSetsFromDocument(p88) -- line: 523
+	-- upvalues: checkDocument (copy), removeDirectivesFromDocument (copy), Boolean (copy), visit (copy), Array (copy), isField (copy), REMOVE (copy)
+	checkDocument(p88)
+
+	local v98 = removeDirectivesFromDocument({{
+		remove = true,
+		test = function(_, p90) -- line: 528
+			return p90.name.value == "client"
+		end
+	}}, p88)
+
+	if Boolean.toJSBoolean(v98) then
+		v98 = visit(v98, {
+			FragmentDefinition = {
+				enter = function(_, p92) -- line: 542
+					-- upvalues: Array (copy), isField (copy), Boolean (copy), REMOVE (copy)
+					if p92.selectionSet then
+						local v154 = Array.every(p92.selectionSet.selections, function(p93) -- line: 544
+							-- upvalues: isField (copy)
+							return isField(p93) and p93.name.value == "__typename"
+						end)
+
+						if Boolean.toJSBoolean(v154) then
+							return REMOVE
+						end
+					end
+
+					return nil
+				end
+			}
+		})
+	end
+
+	return v98
+end
+
+return t1

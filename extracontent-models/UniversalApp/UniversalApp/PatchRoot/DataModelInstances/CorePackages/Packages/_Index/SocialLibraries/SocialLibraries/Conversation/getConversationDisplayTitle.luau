@@ -1,10 +1,13 @@
-return function(v0) --[[ Line: 1 ]]
-    if v0 then
-        local v1 = v0.title or v0.titleForViewer;
-        if v1 then
-            local v2 = tostring(v1);
-            return string.gsub(v2, "\n", "");
-        end;
-    end;
-    return "";
-end;
+return function(p1) -- line: 1
+	if p1 then
+		local v2 = p1.title or p1.titleForViewer
+
+		if v2 then
+			local str = tostring(v2)
+
+			return string.gsub(str, "\n", "")
+		end
+	end
+
+	return ""
+end

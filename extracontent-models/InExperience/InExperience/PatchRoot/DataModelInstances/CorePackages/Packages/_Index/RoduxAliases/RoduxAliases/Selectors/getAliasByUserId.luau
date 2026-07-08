@@ -1,11 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.getDeepValue);
-local _ = require(l_Parent_0.RoduxAliasesTypes);
-return function(v3) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy)
-    local l_keyPath_0 = v3.keyPath;
-    return function(v5, v6) --[[ Line: 10 ]]
-        -- upvalues: v1 (ref), l_keyPath_0 (copy)
-        return v1(v5, l_keyPath_0 .. ".byUserId")[v6];
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local getDeepValue = require(ParentParent.getDeepValue)
+
+require(ParentParent.RoduxAliasesTypes)
+
+return function(p1) -- line: 8
+	-- upvalues: getDeepValue (copy)
+	local keyPath = p1.keyPath
+
+	return function(p2, p3) -- line: 10
+		-- upvalues: getDeepValue (copy), keyPath (copy)
+		return getDeepValue(p2, keyPath .. ".byUserId")[p3]
+	end
+end

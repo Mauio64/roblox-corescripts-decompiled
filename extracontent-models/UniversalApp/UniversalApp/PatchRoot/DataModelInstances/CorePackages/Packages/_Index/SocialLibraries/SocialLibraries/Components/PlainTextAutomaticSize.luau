@@ -1,61 +1,66 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local v2 = require(script.Parent.ChatBubbleContainerAutomaticSize);
-local l_Roact_0 = v1.Roact;
-local l_withStyle_0 = v1.UIBlox.Style.withStyle;
-local l_TextService_0 = game:GetService("TextService");
-game:DefineFastFlag("FixPlainTextAutomaticSizeClippingText", false);
-local l_FixPlainTextAutomaticSizeClippingText_0 = game:GetFastFlag("FixPlainTextAutomaticSizeClippingText");
-local v7 = {
-    text = "", 
-    maxWidth = 0, 
-    innerPadding = 0, 
-    isIncoming = false, 
-    hasTail = false, 
-    LayoutOrder = 0, 
-    isPending = false, 
-    [l_Roact_0.Change.AbsoluteSize] = function() --[[ Line: 20 ]]
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local ChatBubbleContainerAutomaticSize = require(script.Parent.ChatBubbleContainerAutomaticSize)
+local Roact = dependencies.Roact
+local withStyle = dependencies.UIBlox.Style.withStyle
+local TextService = game:GetService("TextService")
 
-    end
-};
-return function(v8) --[[ Line: 23 ]] --[[ Name: PlainText ]]
-    -- upvalues: l_withStyle_0 (copy), v7 (copy), l_TextService_0 (copy), l_Roact_0 (copy), v2 (copy), l_FixPlainTextAutomaticSizeClippingText_0 (copy)
-    return l_withStyle_0(function(v9) --[[ Line: 24 ]]
-        -- upvalues: v8 (copy), v7 (ref), l_TextService_0 (ref), l_Roact_0 (ref), v2 (ref), l_FixPlainTextAutomaticSizeClippingText_0 (ref)
-        local v10 = v8.maxWidth or v7.maxWidth;
-        local v11 = v8.innerPadding or v7.innerPadding;
-        local v12 = math.max(0, v10 - v11);
-        local l_Body_0 = v9.Font.Body;
-        local v14 = v8.textSize or v9.Font.BaseSize * l_Body_0.RelativeSize;
-        local v15 = v8.text or v7.text;
-        local v16 = v8.font or l_Body_0.Font;
-        local v17 = Vector2.new(v12, 1e999);
-        local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v15, v14, v16, v17);
-        return l_Roact_0.createElement(v2, {
-            isIncoming = v8.isIncoming or v7.isIncoming, 
-            hasTail = v8.hasTail or v7.hasTail, 
-            isPending = v8.isPending or v7.isPending, 
-            padding = v11, 
-            LayoutOrder = v8.LayoutOrder or v7.LayoutOrder, 
-            [l_Roact_0.Change.AbsoluteSize] = v8[l_Roact_0.Change.AbsoluteSize] or v7[l_Roact_0.Change.AbsoluteSize]
-        }, {
-            textContent = l_Roact_0.createElement("TextLabel", {
-                Text = v15, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                BackgroundTransparency = 1, 
-                TextColor3 = v9.Theme.TextEmphasis.Color, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                Font = v16, 
-                TextSize = v14, 
-                Size = l_FixPlainTextAutomaticSizeClippingText_0 and UDim2.fromOffset(math.ceil(l_l_TextService_0_TextSize_0.X), (math.ceil(l_l_TextService_0_TextSize_0.Y))) or UDim2.new(0, l_l_TextService_0_TextSize_0.X, 0, l_l_TextService_0_TextSize_0.Y), 
-                TextTransparency = v8.isPending and v9.Theme.TextMuted.Transparency or 0, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                TextWrapped = true
-            }, {
-                SizeConstraint = l_Roact_0.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(v12 or v10, 1e999)
-                })
-            })
-        });
-    end);
-end;
+game:DefineFastFlag("FixPlainTextAutomaticSizeClippingText", false)
+
+local FastFlag = game:GetFastFlag("FixPlainTextAutomaticSizeClippingText")
+local t1 = {
+	text = "",
+	maxWidth = 0,
+	innerPadding = 0,
+	isIncoming = false,
+	hasTail = false,
+	LayoutOrder = 0,
+	isPending = false,
+	[Roact.Change.AbsoluteSize] = function() -- line: 20
+	end
+}
+
+local function PlainText(p1) -- line: 23
+	-- upvalues: withStyle (copy), t1 (copy), TextService (copy), Roact (copy), ChatBubbleContainerAutomaticSize (copy), FastFlag (copy)
+	return withStyle(function(p2) -- line: 24
+		-- upvalues: p1 (copy), t1 (copy), TextService (copy), Roact (copy), ChatBubbleContainerAutomaticSize (copy), FastFlag (copy)
+		local v12 = p1.maxWidth or t1.maxWidth
+		local v13 = p1.innerPadding or t1.innerPadding
+		local v14 = math.max(0, v12 - v13)
+		local Body = p2.Font.Body
+		local v16 = p1.textSize or p2.Font.BaseSize * Body.RelativeSize
+		local v17 = p1.text or t1.text
+		local v18 = p1.font or Body.Font
+		local vector2 = Vector2.new(v14, 1e999)
+		local TextSize = TextService:GetTextSize(v17, v16, v18, vector2)
+
+		return Roact.createElement(ChatBubbleContainerAutomaticSize, {
+			isIncoming = p1.isIncoming or t1.isIncoming,
+			hasTail = p1.hasTail or t1.hasTail,
+			isPending = p1.isPending or t1.isPending,
+			padding = v13,
+			LayoutOrder = p1.LayoutOrder or t1.LayoutOrder,
+			[Roact.Change.AbsoluteSize] = p1[Roact.Change.AbsoluteSize] or t1[Roact.Change.AbsoluteSize]
+		}, {
+			textContent = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				Text = v17,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextColor3 = p2.Theme.TextEmphasis.Color,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Font = v18,
+				TextSize = v16,
+				Size = FastFlag and UDim2.fromOffset(math.ceil(TextSize.X), (math.ceil(TextSize.Y))) or UDim2.new(0, TextSize.X, 0, TextSize.Y),
+				TextTransparency = p1.isPending and p2.Theme.TextMuted.Transparency or 0,
+				TextYAlignment = Enum.TextYAlignment.Top
+			}, {
+				SizeConstraint = Roact.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(v14 or v12, 1e999)
+				})
+			})
+		})
+	end)
+end
+
+return PlainText

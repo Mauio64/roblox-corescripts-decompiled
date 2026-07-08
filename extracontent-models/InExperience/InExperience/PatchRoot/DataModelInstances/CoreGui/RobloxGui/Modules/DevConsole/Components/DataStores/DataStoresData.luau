@@ -1,104 +1,122 @@
-local v0 = require(script.Parent.Parent.Parent.CircularBuffer);
-local v1 = require(script.Parent.Parent.Parent.Signal);
-local v2 = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"));
-local v3 = require(script.Parent.Parent.Parent.Util.getClientReplicator);
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 12 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v1 (copy)
-    local v5 = {};
-    setmetatable(v5, v4);
-    v5._dataStoresUpdated = v1.new();
-    v5._dataStoresData = {};
-    v5._dataStoresDataCount = 0;
-    v5._lastUpdateTime = 0;
-    v5._isRunning = false;
-    return v5;
-end;
-v4.Signal = function(v6) --[[ Line: 24 ]] --[[ Name: Signal ]]
-    return v6._dataStoresUpdated;
-end;
-v4.getCurrentData = function(v7) --[[ Line: 28 ]] --[[ Name: getCurrentData ]]
-    return v7._dataStoresData, v7._dataStoresDataCount;
-end;
-v4.updateValue = function(v8, v9, v10) --[[ Line: 32 ]] --[[ Name: updateValue ]]
-    -- upvalues: v0 (copy), v2 (copy)
-    if not v8._dataStoresData[v9] then
-        local v11 = v0.new(v2);
-        v11:push_back({
-            value = v10, 
-            time = v8._lastUpdateTime
-        });
-        v8._dataStoresData[v9] = {
-            max = v10, 
-            min = v10, 
-            dataSet = v11
-        };
-        return;
-    else
-        local v12 = v8._dataStoresData[v9];
-        local l_max_0 = v12.max;
-        local l_min_0 = v12.min;
-        local v15 = {
-            value = v10, 
-            time = v8._lastUpdateTime
-        };
-        local v16 = v8._dataStoresData[v9].dataSet:push_back(v15);
-        if v16 then
-            local v17 = v8._dataStoresData[v9].dataSet:iterator();
-            local v18 = v17:next();
-            if l_max_0 == v16.value then
-                l_max_0 = l_min_0;
-                while v18 do
-                    l_max_0 = v18.value < l_max_0 and l_max_0 or v18.value;
-                    v18 = v17:next();
-                end;
-            end;
-            if l_min_0 == v16.value then
-                l_min_0 = l_max_0;
-                while v18 do
-                    l_min_0 = l_min_0 < v18.value and l_min_0 or v18.value;
-                    v18 = v17:next();
-                end;
-            end;
-        end;
-        v8._dataStoresData[v9].max = l_max_0 < v10 and v10 or l_max_0;
-        v8._dataStoresData[v9].min = l_min_0 < v10 and l_min_0 or v10;
-        return;
-    end;
-end;
-v4.isRunning = function(v19) --[[ Line: 80 ]] --[[ Name: isRunning ]]
-    return v19._isRunning;
-end;
-v4.start = function(v20) --[[ Line: 84 ]] --[[ Name: start ]]
-    -- upvalues: v3 (copy)
-    local v21 = v3();
-    if v21 and not v20._statsListenerConnection then
-        v20._statsListenerConnection = v21.StatsReceived:connect(function(v22) --[[ Line: 87 ]]
-            -- upvalues: v20 (copy)
-            local l_DataStoreBudget_0 = v22.DataStoreBudget;
-            v20._lastUpdateTime = os.time();
-            if l_DataStoreBudget_0 then
-                local v24 = 0;
-                for v25, v26 in pairs(l_DataStoreBudget_0) do
-                    if type(v26) == "number" then
-                        v20:updateValue(v25, v26);
-                        v24 = v24 + 1;
-                    end;
-                end;
-                v20._dataStoresDataCount = v24;
-                v20._dataStoresUpdated:Fire(v20._dataStoresData, v20._dataStoresDataCount);
-            end;
-        end);
-        v21:RequestServerStats(true);
-        v20._isRunning = true;
-    end;
-end;
-v4.stop = function(v27) --[[ Line: 107 ]] --[[ Name: stop ]]
-    if v27._statsListenerConnection then
-        v27._statsListenerConnection:Disconnect();
-        v27._statsListenerConnection = nil;
-    end;
-    v27._isRunning = false;
-end;
-return v4;
+local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local num = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 12
+	-- upvalues: t1 (copy), Signal (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._dataStoresUpdated = Signal.new()
+	t2._dataStoresData = {}
+	t2._dataStoresDataCount = 0
+	t2._lastUpdateTime = 0
+	t2._isRunning = false
+
+	return t2
+end
+function t1.Signal(p1) -- line: 24
+	return p1._dataStoresUpdated
+end
+function t1.getCurrentData(p2) -- line: 28
+	return p2._dataStoresData, p2._dataStoresDataCount
+end
+function t1.updateValue(p3, p4, p5) -- line: 32
+	-- upvalues: CircularBuffer (copy), num (copy)
+	if not p3._dataStoresData[p4] then
+		local v12 = CircularBuffer.new(num)
+
+		v12:push_back({
+			value = p5,
+			time = p3._lastUpdateTime
+		})
+		p3._dataStoresData[p4] = {
+			max = p5,
+			min = p5,
+			dataSet = v12
+		}
+
+		return
+	end
+
+	local v13 = p3._dataStoresData[p4]
+	local max = v13.max
+	local min = v13.min
+	local t3 = {
+		value = p5,
+		time = p3._lastUpdateTime
+	}
+	local v17 = p3._dataStoresData[p4].dataSet:push_back(t3)
+
+	if v17 then
+		local v18 = p3._dataStoresData[p4].dataSet:iterator()
+		local v19 = v18:next()
+
+		if max == v17.value then
+			max = min
+
+			while v19 do
+				max = max > v19.value and max or v19.value
+				v19 = v18:next()
+			end
+		end
+
+		if min == v17.value then
+			min = max
+
+			while v19 do
+				min = min < v19.value and min or v19.value
+				v19 = v18:next()
+			end
+		end
+	end
+
+	p3._dataStoresData[p4].max = max < p5 and p5 or max
+	p3._dataStoresData[p4].min = min < p5 and min or p5
+end
+function t1.isRunning(p6) -- line: 80
+	return p6._isRunning
+end
+function t1.start(p7) -- line: 84
+	-- upvalues: getClientReplicator (copy)
+	local v22 = getClientReplicator()
+
+	if v22 and not p7._statsListenerConnection then
+		p7._statsListenerConnection = v22.StatsReceived:connect(function(p8) -- line: 87
+			-- upvalues: p7 (copy)
+			local DataStoreBudget = p8.DataStoreBudget
+
+			p7._lastUpdateTime = os.time()
+
+			if DataStoreBudget then
+				local n1 = 0
+
+				for k, v in pairs(DataStoreBudget) do
+					if type(v) == "number" then
+						p7:updateValue(k, v)
+						n1 += 1
+					end
+				end
+
+				p7._dataStoresDataCount = n1
+				p7._dataStoresUpdated:Fire(p7._dataStoresData, p7._dataStoresDataCount)
+			end
+		end)
+		v22:RequestServerStats(true)
+		p7._isRunning = true
+	end
+end
+function t1.stop(p9) -- line: 107
+	if p9._statsListenerConnection then
+		p9._statsListenerConnection:Disconnect()
+		p9._statsListenerConnection = nil
+	end
+
+	p9._isRunning = false
+end
+
+return t1

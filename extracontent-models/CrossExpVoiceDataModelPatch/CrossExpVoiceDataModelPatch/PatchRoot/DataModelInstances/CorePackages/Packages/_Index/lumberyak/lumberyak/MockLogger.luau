@@ -1,42 +1,37 @@
-local v0 = {
-    Levels = {
-        Error = "MockError", 
-        Warning = "MockWarning", 
-        Info = "MockInfo", 
-        Debug = "MockDebug", 
-        Trace = "MockTrace", 
-        fromString = function() --[[ Line: 12 ]] --[[ Name: fromString ]]
-            return "MockInfo";
-        end
-    }
-};
-v0.__index = v0;
-v0.new = function() --[[ Line: 19 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    return (setmetatable({}, v0));
-end;
-v0.setParent = function() --[[ Line: 23 ]] --[[ Name: setParent ]]
+local t1 = {
+	Levels = {
+		Error = "MockError",
+		Warning = "MockWarning",
+		Info = "MockInfo",
+		Debug = "MockDebug",
+		Trace = "MockTrace",
+		fromString = function() -- line: 12
+			return "MockInfo"
+		end
+	}
+}
 
-end;
-v0.setContext = function() --[[ Line: 26 ]] --[[ Name: setContext ]]
+t1.__index = t1
 
-end;
-v0.addSink = function() --[[ Line: 29 ]] --[[ Name: addSink ]]
+function t1.new() -- line: 19
+	-- upvalues: t1 (copy)
+	return (setmetatable({}, t1))
+end
+function t1.setParent() -- line: 23
+end
+function t1.setContext() -- line: 26
+end
+function t1.addSink() -- line: 29
+end
+function t1.error() -- line: 32
+end
+function t1.warning() -- line: 35
+end
+function t1.info() -- line: 38
+end
+function t1.debug() -- line: 41
+end
+function t1.trace() -- line: 44
+end
 
-end;
-v0.error = function() --[[ Line: 32 ]] --[[ Name: error ]]
-
-end;
-v0.warning = function() --[[ Line: 35 ]] --[[ Name: warning ]]
-
-end;
-v0.info = function() --[[ Line: 38 ]] --[[ Name: info ]]
-
-end;
-v0.debug = function() --[[ Line: 41 ]] --[[ Name: debug ]]
-
-end;
-v0.trace = function() --[[ Line: 44 ]] --[[ Name: trace ]]
-
-end;
-return v0;
+return t1

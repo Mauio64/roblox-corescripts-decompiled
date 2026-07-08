@@ -1,3 +1,3 @@
 return {
-    RODUX_KEY = "ProfileShareLinks"
-};
+	RODUX_KEY = "ProfileShareLinks"
+}

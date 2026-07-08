@@ -1,4 +1,5 @@
-local _ = require(script.networkingChatTypes);
+require(script.networkingChatTypes)
+
 return {
-    config = require(script.createRequestThunks)
-};
+	config = require(script.createRequestThunks)
+}

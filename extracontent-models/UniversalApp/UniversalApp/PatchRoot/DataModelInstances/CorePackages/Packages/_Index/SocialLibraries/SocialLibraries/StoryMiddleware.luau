@@ -1,28 +1,31 @@
-local v0 = require(script.Parent.dependencies);
-local l_Roact_0 = v0.Roact;
-local l_AppStyleProvider_0 = v0.UIBlox.App.Style.AppStyleProvider;
-local v3 = {
-    Default = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
-return function(v4) --[[ Line: 21 ]] --[[ Name: StoryMiddleware ]]
-    -- upvalues: l_Roact_0 (copy), l_AppStyleProvider_0 (copy), v3 (copy)
-    return function(v5) --[[ Line: 22 ]]
-        -- upvalues: l_Roact_0 (ref), l_AppStyleProvider_0 (ref), v3 (ref), v4 (copy)
-        return l_Roact_0.createElement(l_AppStyleProvider_0, {
-            style = v5 and v3[v5.theme] or v3.Default
-        }, {
-            Child = l_Roact_0.createElement(v4, v5)
-        });
-    end;
-end;
+local dependencies = require(script.Parent.dependencies)
+local Roact = dependencies.Roact
+local AppStyleProvider = dependencies.UIBlox.App.Style.AppStyleProvider
+local t1 = {
+	Default = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+
+local function StoryMiddleware(p1) -- line: 21
+	-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy)
+	return function(p2) -- line: 22
+		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), p1 (copy)
+		return Roact.createElement(AppStyleProvider, {
+			style = p2 and t1[p2.theme] or t1.Default
+		}, {
+			Child = Roact.createElement(p1, p2)
+		})
+	end
+end
+
+return StoryMiddleware

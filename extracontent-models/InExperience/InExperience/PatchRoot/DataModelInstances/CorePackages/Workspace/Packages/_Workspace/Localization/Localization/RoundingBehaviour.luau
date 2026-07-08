@@ -1,5 +1,6 @@
-local l_Parent_0 = script:FindFirstAncestor("Localization").Parent;
-return require(l_Parent_0.enumerate)("RoundingBehaviour", {
-    "RoundToClosest", 
-    "Truncate"
-});
+local Parent = script:FindFirstAncestor("Localization").Parent
+
+return require(Parent.enumerate)("RoundingBehaviour", {
+	"RoundToClosest",
+	"Truncate"
+})

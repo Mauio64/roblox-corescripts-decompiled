@@ -1,4 +1,4 @@
 return {
-    Standard = "Standard", 
-    Utility = "Utility"
-};
+	Standard = "Standard",
+	Utility = "Utility"
+}

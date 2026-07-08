@@ -1,20 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Actions.SetSquadPrompt);
-local v3 = require(l_script_FirstAncestor_0.Actions.CloseSquadPrompt);
-local v4 = require(l_Parent_0.Cryo);
-return require(l_Parent_0.Rodux).createReducer({
-    arguments = {}
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local SetSquadPrompt = require(SquadsCore.Actions.SetSquadPrompt)
+local CloseSquadPrompt = require(SquadsCore.Actions.CloseSquadPrompt)
+local Cryo = require(SquadsCoreParent.Cryo)
+
+return require(SquadsCoreParent.Rodux).createReducer({
+	arguments = {}
 }, {
-    [v2.name] = function(v5, v6) --[[ Line: 13 ]]
-        -- upvalues: v4 (copy)
-        return v4.Dictionary.join(v5, {
-            arguments = v6.arguments or {}
-        });
-    end, 
-    [v3.name] = function(_, _) --[[ Line: 18 ]]
-        return {
-            arguments = {}
-        };
-    end
-});
+	[SetSquadPrompt.name] = function(p1, p2) -- line: 13
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			arguments = p2.arguments or {}
+		})
+	end,
+	[CloseSquadPrompt.name] = function(_, _) -- line: 18
+		return {
+			arguments = {}
+		}
+	end
+})

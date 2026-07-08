@@ -1,148 +1,180 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_TextService_0 = game:GetService("TextService");
-local l_VRService_0 = game:GetService("VRService");
-l_RobloxGui_0:WaitForChild("Modules"):WaitForChild("TenFootInterface");
-local l_Enums_0 = require(l_CorePackages_0.Workspace.Packages.SocialLuaAnalytics).Analytics.Enums;
-local l_EventNames_0 = require(l_CorePackages_0.Workspace.Packages.CapturesInExperience).Analytics.EventNames;
-local v9 = require(l_RobloxGui_0.Modules.Settings.Utility);
-local v10 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local v12 = require(l_CorePackages_0.Packages.BuilderIcons);
-local l_uiblox_0 = v12.Migration.uiblox;
-local v14 = nil;
-local l_Contexts_0 = l_Enums_0.Contexts;
-local l_EventTypes_0 = l_Enums_0.EventTypes;
-v14 = (function() --[[ Line: 37 ]] --[[ Name: Initialize ]]
-    -- upvalues: l_RobloxGui_0 (copy), l_uiblox_0 (copy), v12 (copy), l_VRService_0 (copy), v10 (copy), l_Create_0 (copy), l_TextService_0 (copy), v9 (copy), l_RbxAnalyticsService_0 (copy), l_Contexts_0 (copy), l_EventTypes_0 (copy), l_EventNames_0 (copy), l_CoreGui_0 (copy)
-    local l_NewPage_0 = require(l_RobloxGui_0.Modules.Settings.SettingsPageFactory):CreateNewPage();
-    local v18 = false;
-    local l_BindableEvent_0 = Instance.new("BindableEvent");
-    l_BindableEvent_0.Name = "RecordingEvent";
-    l_NewPage_0.RecordingChanged = l_BindableEvent_0.Event;
-    l_NewPage_0.IsRecording = function(_) --[[ Line: 45 ]] --[[ Name: IsRecording ]]
-        -- upvalues: v18 (ref)
-        return v18;
-    end;
-    local v21 = l_uiblox_0["icons/controls/screenrecord"];
-    l_NewPage_0.TabHeader.TabLabel.Icon.Text = v21.name;
-    l_NewPage_0.TabHeader.TabLabel.Icon.FontFace = v12.Font[v21.variant];
-    l_NewPage_0.TabHeader.Name = "RecordTab";
-    l_NewPage_0.TabHeader.TabLabel.Title.Text = "Record";
-    local function v22() --[[ Line: 55 ]] --[[ Name: onVREnabled ]]
-        -- upvalues: l_NewPage_0 (copy), l_VRService_0 (ref)
-        l_NewPage_0.TabHeader.Visible = not l_VRService_0.VREnabled;
-    end;
-    l_NewPage_0.TabHeader.Visible = not l_VRService_0.VREnabled;
-    l_VRService_0:GetPropertyChangedSignal("VREnabled"):connect(v22);
-    l_NewPage_0.Page.Name = "Record";
-    local function v39(v23, v24, v25, v26, v27) --[[ Line: 64 ]] --[[ Name: makeTextLabel ]]
-        -- upvalues: v10 (ref), l_Create_0 (ref), l_TextService_0 (ref)
-        local v28 = 10;
-        local v29 = 0;
-        local v30 = 10;
-        local v31 = v10.textSize(24);
-        local v32 = v10.font(Enum.Font.SourceSans);
-        if v25 then
-            v28 = 10;
-            v29 = 0;
-            v30 = 0;
-            v31 = v10.textSize(36);
-            v32 = v10.font(Enum.Font.SourceSansBold, "Bold");
-        end;
-        local v33 = l_Create_0("Frame")({
-            Name = v23 .. "Container", 
-            BackgroundTransparency = 1, 
-            ZIndex = 2, 
-            LayoutOrder = v27, 
-            Parent = v26
-        });
-        local v34 = l_Create_0("TextLabel")({
-            Name = v23, 
-            BackgroundTransparency = 1, 
-            Text = v24, 
-            TextWrapped = true, 
-            Font = v32, 
-            TextSize = v31, 
-            TextColor3 = Color3.new(1, 1, 1), 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Top, 
-            Position = UDim2.new(0, v28, 0, 0), 
-            Size = UDim2.new(1, -(v28 + v29), 1, 0), 
-            ZIndex = 2, 
-            Parent = v33
-        });
-        local function v37(v35) --[[ Line: 96 ]] --[[ Name: onResized ]]
-            -- upvalues: l_TextService_0 (ref), v24 (copy), v34 (copy), v26 (copy), v28 (ref), v29 (ref), v33 (copy), v30 (ref)
-            if v35 == "AbsoluteSize" then
-                local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v24, v34.TextSize, v34.Font, Vector2.new(v26.AbsoluteSize.X - v28 - v29, 10000));
-                v33.Size = UDim2.new(1, 0, 0, l_l_TextService_0_TextSize_0.Y + v30);
-            end;
-        end;
-        local l_l_TextService_0_TextSize_1 = l_TextService_0:GetTextSize(v24, v34.TextSize, v34.Font, Vector2.new(v26.AbsoluteSize.X - v28 - v29, 10000));
-        v33.Size = UDim2.new(1, 0, 0, l_l_TextService_0_TextSize_1.Y + v30);
-        v26.Changed:connect(v37);
-        return v34, v33;
-    end;
-    l_NewPage_0.SetHub = function(_, v41) --[[ Line: 110 ]] --[[ Name: SetHub ]]
-        -- upvalues: l_NewPage_0 (copy), v39 (copy), v9 (ref), l_RbxAnalyticsService_0 (ref), l_Contexts_0 (ref), l_EventTypes_0 (ref), v18 (ref), l_EventNames_0 (ref), l_BindableEvent_0 (copy), l_CoreGui_0 (ref)
-        l_NewPage_0.HubRef = v41;
-        local function v42() --[[ Line: 114 ]]
-            -- upvalues: l_NewPage_0 (ref)
-            l_NewPage_0.HubRef:SetVisibility(false, true);
-        end;
-        local _ = v39("ScreenshotTitle", "Screenshot", true, l_NewPage_0.Page, 1);
-        local _ = v39("ScreenshotBody", "By clicking the 'Take Screenshot' button, the menu will close and take a screenshot and save it to your computer.", false, l_NewPage_0.Page, 2);
-        local l_l_NewPage_0_0 = l_NewPage_0;
-        local l_l_NewPage_0_1 = l_NewPage_0;
-        local v47, v48 = v9:AddButtonRow(l_NewPage_0, "ScreenshotButton", "Take Screenshot", UDim2.new(0, 300, 0, 44), v42);
-        l_l_NewPage_0_0.ScreenshotButtonRow = v47;
-        l_l_NewPage_0_1.ScreenshotButton = v48;
-        l_NewPage_0.ScreenshotButtonRow.LayoutOrder = 3;
-        l_l_NewPage_0_0 = v39("VideoTitle", "Video", true, l_NewPage_0.Page, 4);
-        l_l_NewPage_0_1 = v39("VideoBody", "By clicking the 'Record Video' button, the menu will close and start recording your screen.", false, l_NewPage_0.Page, 5);
-        v47, v48 = v9:AddButtonRow(l_NewPage_0, "RecordButton", "Record Video", UDim2.new(0, 300, 0, 44), v42);
-        v47.LayoutOrder = 6;
-        v48.MouseButton1Click:connect(function() --[[ Line: 130 ]]
-            -- upvalues: l_RbxAnalyticsService_0 (ref), l_Contexts_0 (ref), l_EventTypes_0 (ref), v18 (ref), l_EventNames_0 (ref), l_BindableEvent_0 (ref)
-            l_RbxAnalyticsService_0:SendEventDeferred("mobile", l_Contexts_0.Captures, l_EventTypes_0.ButtonClick, {
-                btn = if not v18 then l_EventNames_0.CapturesLegacyVideoRecordActivated else l_EventNames_0.CapturesLegacyVideoRecordDeactivated
-            });
-            l_BindableEvent_0:Fire(not v18);
-        end);
-        local l_FirstChild_0 = settings():FindFirstChild("Game Options");
-        if l_FirstChild_0 then
-            l_FirstChild_0.VideoRecordingChangeRequest:connect(function(v50) --[[ Line: 142 ]]
-                -- upvalues: v18 (ref), v48 (copy)
-                v18 = v50;
-                if v50 then
-                    v48.RecordButtonTextLabel.Text = "Stop Recording";
-                    return;
-                else
-                    v48.RecordButtonTextLabel.Text = "Record Video";
-                    return;
-                end;
-            end);
-        end;
-        v48.Activated:Connect(function() --[[ Line: 152 ]]
-            -- upvalues: l_CoreGui_0 (ref)
-            l_CoreGui_0:ToggleRecording();
-        end);
-        l_NewPage_0.ScreenshotButton.Activated:Connect(function() --[[ Line: 155 ]]
-            -- upvalues: l_CoreGui_0 (ref)
-            l_CoreGui_0:TakeScreenshot();
-        end);
-        l_NewPage_0.Page.Size = UDim2.new(1, 0, 0, 400);
-    end;
-    return l_NewPage_0;
-end)();
-v14.Displayed.Event:connect(function(v51) --[[ Line: 169 ]]
-    -- upvalues: l_GuiService_0 (copy), v14 (ref)
-    if v51 then
-        l_GuiService_0.SelectedCoreObject = v14.ScreenshotButton;
-    end;
-end);
-return v14;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local GuiService = game:GetService("GuiService")
+local TextService = game:GetService("TextService")
+local VRService = game:GetService("VRService")
+
+RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
+
+local Enums = require(CorePackages.Workspace.Packages.SocialLuaAnalytics).Analytics.Enums
+local EventNames = require(CorePackages.Workspace.Packages.CapturesInExperience).Analytics.EventNames
+local Utility = require(RobloxGui.Modules.Settings.Utility)
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local BuilderIcons = require(CorePackages.Packages.BuilderIcons)
+local uiblox = BuilderIcons.Migration.uiblox
+local Contexts = Enums.Contexts
+local EventTypes = Enums.EventTypes
+
+local function Initialize() -- line: 37
+	-- upvalues: RobloxGui (copy), uiblox (copy), BuilderIcons (copy), VRService (copy), Theme (copy), Create (copy), TextService (copy), Utility (copy), RbxAnalyticsService (copy), Contexts (copy), EventTypes (copy), EventNames (copy), CoreGui (copy)
+	local v19 = require(RobloxGui.Modules.Settings.SettingsPageFactory):CreateNewPage()
+	local u20 = false
+	local BindableEvent = Instance.new("BindableEvent")
+
+	BindableEvent.Name = "RecordingEvent"
+	v19.RecordingChanged = BindableEvent.Event
+
+	function v19.IsRecording(_) -- line: 45
+		-- upvalues: u20 (ref)
+		return u20
+	end
+
+	local v22 = uiblox["icons/controls/screenrecord"]
+
+	v19.TabHeader.TabLabel.Icon.Text = v22.name
+	v19.TabHeader.TabLabel.Icon.FontFace = BuilderIcons.Font[v22.variant]
+	v19.TabHeader.Name = "RecordTab"
+	v19.TabHeader.TabLabel.Title.Text = "Record"
+
+	local function onVREnabled() -- line: 55
+		-- upvalues: v19 (copy), VRService (copy)
+		v19.TabHeader.Visible = not VRService.VREnabled
+	end
+
+	v19.TabHeader.Visible = not VRService.VREnabled
+	VRService:GetPropertyChangedSignal("VREnabled"):connect(onVREnabled)
+	v19.Page.Name = "Record"
+
+	local function makeTextLabel(p2, p3, p4, p5, p6) -- line: 64
+		-- upvalues: Theme (copy), Create (copy), TextService (copy)
+		local n1 = 10
+		local n2 = 0
+		local n3 = 10
+		local v35 = Theme.textSize(24)
+		local v36 = Theme.font(Enum.Font.SourceSans)
+
+		if p4 then
+			n1 = 10
+			n2 = 0
+			n3 = 0
+			v35 = Theme.textSize(36)
+			v36 = Theme.font(Enum.Font.SourceSansBold, "Bold")
+		end
+
+		local v37 = Create("Frame")({
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			Name = p2 .. "Container",
+			LayoutOrder = p6,
+			Parent = p5
+		})
+		local v38 = Create("TextLabel")({
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			ZIndex = 2,
+			Name = p2,
+			Text = p3,
+			Font = v36,
+			TextSize = v35,
+			TextColor3 = Color3.new(1, 1, 1),
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			Position = UDim2.new(0, n1, 0, 0),
+			Size = UDim2.new(1, -(n1 + n2), 1, 0),
+			Parent = v37
+		})
+
+		local function onResized(p7) -- line: 96
+			-- upvalues: TextService (copy), p3 (copy), v38 (copy), p5 (copy), n1 (ref), n2 (ref), v37 (copy), n3 (ref)
+			if p7 == "AbsoluteSize" then
+				local TextSize = TextService:GetTextSize(p3, v38.TextSize, v38.Font, Vector2.new(p5.AbsoluteSize.X - n1 - n2, 10000))
+
+				v37.Size = UDim2.new(1, 0, 0, TextSize.Y + n3)
+			end
+		end
+
+		local TextSize = TextService:GetTextSize(p3, v38.TextSize, v38.Font, Vector2.new(p5.AbsoluteSize.X - n1 - n2, 10000))
+
+		v37.Size = UDim2.new(1, 0, 0, TextSize.Y + n3)
+		p5.Changed:connect(onResized)
+
+		return v38, v37
+	end
+
+	function v19.SetHub(_, p9) -- line: 110
+		-- upvalues: v19 (copy), makeTextLabel (copy), Utility (copy), RbxAnalyticsService (copy), Contexts (copy), EventTypes (copy), u20 (ref), EventNames (copy), BindableEvent (copy), CoreGui (copy)
+		v19.HubRef = p9
+
+		local function v43() -- line: 114
+			-- upvalues: v19 (copy)
+			v19.HubRef:SetVisibility(false, true)
+		end
+
+		makeTextLabel("ScreenshotTitle", "Screenshot", true, v19.Page, 1)
+		makeTextLabel("ScreenshotBody", "By clicking the 'Take Screenshot' button, the menu will close and take a screenshot and save it to your computer.", false, v19.Page, 2)
+
+		local v44 = v19
+		local v45 = v19
+		local v46, v47 = Utility:AddButtonRow(v19, "ScreenshotButton", "Take Screenshot", UDim2.new(0, 300, 0, 44), v43)
+
+		v44.ScreenshotButtonRow = v46
+		v45.ScreenshotButton = v47
+		v19.ScreenshotButtonRow.LayoutOrder = 3
+		makeTextLabel("VideoTitle", "Video", true, v19.Page, 4)
+		makeTextLabel("VideoBody", "By clicking the 'Record Video' button, the menu will close and start recording your screen.", false, v19.Page, 5)
+
+		local v48, v49 = Utility:AddButtonRow(v19, "RecordButton", "Record Video", UDim2.new(0, 300, 0, 44), v43)
+
+		v48.LayoutOrder = 6
+		v49.MouseButton1Click:connect(function() -- line: 130
+			-- upvalues: RbxAnalyticsService (copy), Contexts (copy), EventTypes (copy), u20 (ref), EventNames (copy), BindableEvent (copy)
+			RbxAnalyticsService:SendEventDeferred("mobile", Contexts.Captures, EventTypes.ButtonClick, {
+				btn = if u20 then EventNames.CapturesLegacyVideoRecordDeactivated else EventNames.CapturesLegacyVideoRecordActivated
+			})
+			BindableEvent:Fire(not u20)
+		end)
+
+		local v50 = settings():FindFirstChild("Game Options")
+
+		if v50 then
+			v50.VideoRecordingChangeRequest:connect(function(p10) -- line: 142
+				-- upvalues: u20 (ref), v49 (copy)
+				u20 = p10
+
+				if p10 then
+					v49.RecordButtonTextLabel.Text = "Stop Recording"
+
+					return
+				end
+
+				v49.RecordButtonTextLabel.Text = "Record Video"
+			end)
+		end
+
+		v49.Activated:Connect(function() -- line: 152
+			-- upvalues: CoreGui (copy)
+			CoreGui:ToggleRecording()
+		end)
+		v19.ScreenshotButton.Activated:Connect(function() -- line: 155
+			-- upvalues: CoreGui (copy)
+			CoreGui:TakeScreenshot()
+		end)
+		v19.Page.Size = UDim2.new(1, 0, 0, 400)
+	end
+
+	return v19
+end
+
+local u18 = Initialize()
+
+u18.Displayed.Event:connect(function(p11) -- line: 169
+	-- upvalues: GuiService (copy), u18 (ref)
+	if p11 then
+		GuiService.SelectedCoreObject = u18.ScreenshotButton
+	end
+end)
+
+return u18

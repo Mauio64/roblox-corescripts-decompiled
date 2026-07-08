@@ -19,24 +19,24 @@ local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
 local useSegmentedControlVariants = require(script.Parent.useSegmentedControlVariants)
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ Segment ]] -- line: 43
+local function Segment(p1, p2) -- line: 44
 	-- upvalues: useTokens (copy), useSegmentedControlVariants (copy), Flags (copy), React (copy), View (copy), withCommonProps (copy), Icon (copy), Text (copy)
-	local v13 = useTokens()
-	local v14 = useSegmentedControlVariants(v13, p1.size)
+	local v14 = useTokens()
+	local v15 = useSegmentedControlVariants(v14, p1.size, if not Flags.FoundationSegmentedControlCircular then nil else p1.isCircular)
 
 	if _G.__DEV__ == true then
 		assert(p1.text == nil or p1.icon == nil, "Segment: `text` and `icon` are mutually exclusive. Only one can be provided.")
 	end
 
-	local v15 = nil
+	local v16 = nil
 	local name = nil
 	local variant = nil
 	local icon = nil
 
 	if Flags.FoundationSegmentedControlIconSupport then
-		v15 = p1.icon ~= nil
+		v16 = p1.icon ~= nil
 
-		if v15 then
+		if v16 then
 			if typeof(p1.icon) == "table" then
 				local icon2 = p1.icon
 
@@ -46,20 +46,20 @@ return React.memo(React.forwardRef(function(p1, p2) --[[ Segment ]] -- line: 43
 				name = p1.icon
 			end
 
-			icon = v14.icon
+			icon = v15.icon
 		end
 	end
 
 	return React.createElement(View, withCommonProps(p1, {
-		tag = v14.segment.tag,
-		onActivated = function() --[[ onActivated ]] -- line: 80
+		tag = v15.segment.tag,
+		onActivated = function() -- line: 85
 			-- upvalues: p1 (copy)
 			p1.onActivated(p1.id)
 		end,
 		ref = p2
 	}), {
-		Text = if not v15 then React.createElement(Text, {
-			tag = v14.text.tag,
+		Text = if not v16 then React.createElement(Text, {
+			tag = v15.text.tag,
 			Text = p1.text
 		}) else React.createElement(Icon, {
 			name = name,
@@ -68,4 +68,6 @@ return React.memo(React.forwardRef(function(p1, p2) --[[ Segment ]] -- line: 43
 			style = icon.style
 		})
 	})
-end))
+end
+
+return React.memo(React.forwardRef(Segment))

@@ -1,20 +1,22 @@
-local l_responses_0 = script.responses;
-local _ = require(l_responses_0.SharedTypes);
-local _ = require(l_responses_0["create-conversations"]);
-local _ = require(l_responses_0["expand-to-group-conversation"]);
-local _ = require(l_responses_0["get-conversation-messages"]);
-local _ = require(l_responses_0["get-conversations"]);
-local _ = require(l_responses_0["get-user-conversations"]);
-local _ = require(l_responses_0["get-conversations-participants-metadata"]);
-local _ = require(l_responses_0["get-metadata"]);
-local _ = require(l_responses_0["get-conversation-metadata"]);
-local _ = require(l_responses_0["clear-global-unread-count"]);
-local _ = require(l_responses_0["get-chat-moderation-statuses"]);
-local _ = require(l_responses_0["translate-user-message"]);
-local _ = require(script.rodux.GetModalSequence);
+local responses = script.responses
+
+require(responses.SharedTypes)
+require(responses["create-conversations"])
+require(responses["expand-to-group-conversation"])
+require(responses["get-conversation-messages"])
+require(responses["get-conversations"])
+require(responses["get-user-conversations"])
+require(responses["get-conversations-participants-metadata"])
+require(responses["get-metadata"])
+require(responses["get-conversation-metadata"])
+require(responses["clear-global-unread-count"])
+require(responses["get-chat-moderation-statuses"])
+require(responses["translate-user-message"])
+require(script.rodux.GetModalSequence)
+
 return {
-    Constants = require(script.Constants), 
-    http = require(script.http), 
-    rodux = require(script.rodux), 
-    ["jest.config"] = script["jest.config"]
-};
+	Constants = require(script.Constants),
+	http = require(script.http),
+	rodux = require(script.rodux),
+	["jest.config"] = script["jest.config"]
+}

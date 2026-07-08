@@ -1,27 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local _ = require(l_script_FirstAncestor_0.Common.AssetInfo);
-return function(v2, v3) --[[ Line: 5 ]] --[[ Name: sortCurrentlyWearingItems ]]
-    local v4 = {
-        isOffSale = v2.isOffSale or false, 
-        price = v2.price or v2.lowestResalePrice or 0, 
-        favoriteCount = v2.favoriteCount or 0
-    };
-    local v5 = {
-        isOffSale = v3.isOffSale or false, 
-        price = v3.price or v3.lowestResalePrice or 0, 
-        favoriteCount = v3.favoriteCount or 0
-    };
-    if v4.isOffSale ~= v5.isOffSale then
-        return not v4.isOffSale;
-    elseif v4.price ~= v5.price then
-        if v4.price == 0 then
-            return false;
-        elseif v5.price == 0 then
-            return true;
-        else
-            return v4.price > v5.price;
-        end;
-    else
-        return (tonumber(v2.id) or 0) < (tonumber(v3.id) or 0);
-    end;
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+
+require(ProfilePlatform.Common.AssetInfo)
+
+local function sortCurrentlyWearingItems(p1, p2) -- line: 5
+	local t1 = {
+		isOffSale = p1.isOffSale or false,
+		price = p1.price or (p1.lowestResalePrice or 0),
+		favoriteCount = p1.favoriteCount or 0
+	}
+	local t2 = {
+		isOffSale = p2.isOffSale or false,
+		price = p2.price or (p2.lowestResalePrice or 0),
+		favoriteCount = p2.favoriteCount or 0
+	}
+
+	if t1.isOffSale ~= t2.isOffSale then
+		return not t1.isOffSale
+	end
+
+	if t1.price ~= t2.price then
+		if t1.price == 0 then
+			return false
+		end
+
+		if t2.price == 0 then
+			return true
+		end
+
+		return t1.price > t2.price
+	end
+
+	return (tonumber(p1.id) or 0) < (tonumber(p2.id) or 0)
+end
+
+return sortCurrentlyWearingItems

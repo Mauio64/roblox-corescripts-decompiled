@@ -1,25 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("InExperienceSideSheet").Parent;
-local _ = require(l_Parent_0.Chrome);
-local v2 = require(l_Parent_0.SharedFlags);
-local v3 = require(l_Parent_0.Signals);
-local l_FFlagAddIGMToSideSheet_0 = v2.FFlagAddIGMToSideSheet;
-return function() --[[ Line: 22 ]] --[[ Name: createIntegrationsStore ]]
-    -- upvalues: v3 (copy), l_FFlagAddIGMToSideSheet_0 (copy)
-    local v5, v6 = v3.createSignal({});
-    local v7, v8 = v3.createSignal({});
-    local v9 = nil;
-    local v10 = nil;
-    if l_FFlagAddIGMToSideSheet_0 then
-        local v11, v12 = v3.createSignal({});
-        v9 = v11;
-        v10 = v12;
-    end;
-    return {
-        getUnibarIntegrations = v5, 
-        setUnibarIntegrations = v6, 
-        getVerticalIntegrations = v7, 
-        setVerticalIntegrations = v8, 
-        getPageIntegrations = if l_FFlagAddIGMToSideSheet_0 then v9 else nil, 
-        setPageIntegrations = if l_FFlagAddIGMToSideSheet_0 then v10 else nil
-    };
-end;
+local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
+
+require(Parent.Chrome)
+
+local Signals = require(Parent.Signals)
+
+local function createIntegrationsStore() -- line: 21
+	-- upvalues: Signals (copy)
+	local v4, v5 = Signals.createSignal({})
+	local v6, v7 = Signals.createSignal({})
+	local v8, v9 = Signals.createSignal({})
+	local v10, v11 = Signals.createSignal({})
+
+	return {
+		getUnibarIntegrations = v4,
+		setUnibarIntegrations = v5,
+		getToggleIntegrations = v6,
+		setToggleIntegrations = v7,
+		getPageIntegrations = v8,
+		setPageIntegrations = v9,
+		getSessionActionIntegrations = v10,
+		setSessionActionIntegrations = v11
+	}
+end
+
+return createIntegrationsStore

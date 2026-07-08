@@ -1,48 +1,53 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.Button.Button);
-local v4 = require(l_Parent_0.Button.Enum.ButtonType);
-local v5 = require(l_Parent_0.Button.ComboButton);
-local v6 = require(l_Parent_0.ImageSet.Images);
-local function v7() --[[ Line: 21 ]]
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local React = require(ParentParent2.React)
+local Button = require(ParentParent.Button.Button)
+local ButtonType = require(ParentParent.Button.Enum.ButtonType)
+local ComboButton = require(ParentParent.Button.ComboButton)
+local Images = require(ParentParent.ImageSet.Images)
 
-end;
-return function(v8) --[[ Line: 47 ]] --[[ Name: ExperienceActionRow ]]
-    -- upvalues: v2 (copy), v5 (copy), v7 (copy), v6 (copy), v3 (copy), v4 (copy)
-    local l_isActionable_0 = v8.isActionable;
-    local v10 = v8.horizontalPadding or 6;
-    local v11 = v8.verticalPadding or 6;
-    local v12 = v8.height or 48;
-    local l_text_0 = v8.text;
-    local l_icon_0 = v8.icon;
-    if v8.onOverflowPressed then
-        return v2.createElement(v5, {
-            position = UDim2.new(0, v10, 1, -v11 - 36), 
-            size = UDim2.new(1, -2 * v10, 0, v12 - 2 * v11), 
-            button = {
-                text = l_text_0, 
-                icon = l_icon_0, 
-                onActivated = v8.onPlayPressed or v7, 
-                isDisabled = not l_isActionable_0
-            }, 
-            overflow = {
-                icon = v6["icons/actions/truncationCollapse"], 
-                onActivated = v8.onOverflowPressed, 
-                isDisabled = not l_isActionable_0
-            }
-        });
-    else
-        return v2.createElement(v3, {
-            buttonType = if v8.buttonType then v8.buttonType else v4.PrimaryContextual, 
-            text = l_text_0, 
-            icon = l_icon_0, 
-            size = UDim2.new(1, -2 * v10, 0, v12 - 2 * v11), 
-            position = UDim2.new(0, v10, 1, -v11 - 36), 
-            userInteractionEnabled = l_isActionable_0, 
-            onActivated = v8.onPlayPressed or v7, 
-            isDisabled = not l_isActionable_0, 
-            feedbackType = v8.feedbackType
-        });
-    end;
-end;
+local function v8() -- line: 21
+end
+local function ExperienceActionRow(t1: {[any]: any}) -- line: 52
+	-- upvalues: React (copy), ComboButton (copy), v8 (copy), Images (copy), Button (copy), ButtonType (copy)
+	local isActionable = t1.isActionable
+	local v12 = t1.horizontalPadding or 6
+	local v13 = t1.verticalPadding or 6
+	local v14 = t1.height or 48
+	local text = t1.text
+	local icon = t1.icon
+
+	if t1.onOverflowPressed then
+		return React.createElement(ComboButton, {
+			position = UDim2.new(0, v12, 1, -v13 - 36),
+			size = UDim2.new(1, -2 * v12, 0, v14 - 2 * v13),
+			button = {
+				text = text,
+				icon = icon,
+				onActivated = t1.onPlayPressed or v8,
+				isDisabled = not isActionable
+			},
+			overflow = {
+				icon = Images["icons/actions/truncationCollapse"],
+				onActivated = t1.onOverflowPressed,
+				isDisabled = not isActionable
+			}
+		})
+	end
+
+	return React.createElement(Button, {
+		buttonType = if not t1.buttonType then ButtonType.PrimaryContextual else t1.buttonType,
+		text = text,
+		icon = icon,
+		size = UDim2.new(1, -2 * v12, 0, v14 - 2 * v13),
+		position = UDim2.new(0, v12, 1, -v13 - 36),
+		userInteractionEnabled = isActionable,
+		onActivated = t1.onPlayPressed or v8,
+		isDisabled = not isActionable,
+		isLoading = t1.buttonLoading,
+		feedbackType = t1.feedbackType,
+		DO_NOT_USE_useUIBloxButton = t1.DO_NOT_USE_useUIBloxButton
+	})
+end
+
+return ExperienceActionRow

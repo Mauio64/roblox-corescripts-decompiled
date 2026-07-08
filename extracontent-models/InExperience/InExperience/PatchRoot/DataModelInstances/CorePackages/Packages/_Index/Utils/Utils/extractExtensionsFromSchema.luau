@@ -1,97 +1,115 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Boolean_0 = require(l_Parent_0.LuauPolyfill).Boolean;
-local v2 = {};
-local l_mapSchema_0 = require(script.Parent.mapSchema).mapSchema;
-local _ = require(l_Parent_0.GraphQL);
-local _ = require(script.Parent.types);
-local l_MapperKind_0 = require(script.Parent.Interfaces).MapperKind;
-v2.extractExtensionsFromSchema = function(v7) --[[ Line: 42 ]] --[[ Name: extractExtensionsFromSchema ]]
-    -- upvalues: l_Boolean_0 (copy), l_mapSchema_0 (copy), l_MapperKind_0 (copy)
-    local v8 = {
-        schemaExtensions = l_Boolean_0.toJSBoolean(v7.extensions) and v7.extensions or {}, 
-        types = {}
-    };
-    l_mapSchema_0(v7, {
-        [tostring(l_MapperKind_0.OBJECT_TYPE)] = function(v9) --[[ Line: 48 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v9.name)] = {
-                fields = {}, 
-                type = "object", 
-                extensions = l_Boolean_0.toJSBoolean(v9.extensions) and v9.extensions or {}
-            };
-            return v9;
-        end, 
-        [tostring(l_MapperKind_0.INTERFACE_TYPE)] = function(v10) --[[ Line: 59 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v10.name)] = {
-                fields = {}, 
-                type = "interface", 
-                extensions = if l_Boolean_0.toJSBoolean(v10.extensions) then v10.extensions else {}
-            };
-            return v10;
-        end, 
-        [tostring(l_MapperKind_0.FIELD)] = function(v11, v12, v13) --[[ Line: 73 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[v13].fields[v12] = {
-                arguments = {}, 
-                extensions = if l_Boolean_0.toJSBoolean(v11.extensions) then v11.extensions else {}
-            };
-            local l_args_0 = v11.args;
-            if l_args_0 ~= nil then
-                for _, v16 in l_args_0 do
-                    local v17 = table.unpack(v16);
-                    v8.types[v13].fields[v12].arguments[tostring(v17)] = l_Boolean_0.toJSBoolean(l_args_0[tostring(v17)].extensions) and l_args_0[tostring(v17)].extensions or {};
-                end;
-            end;
-            return v11;
-        end, 
-        [tostring(l_MapperKind_0.ENUM_TYPE)] = function(v18) --[[ Line: 110 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v18.name)] = {
-                values = {}, 
-                type = "enum", 
-                extensions = l_Boolean_0.toJSBoolean(v18.extensions) and v18.extensions or {}
-            };
-            return v18;
-        end, 
-        [tostring(l_MapperKind_0.ENUM_VALUE)] = function(v19, v20, _, v22) --[[ Line: 121 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[v20].values[v22] = l_Boolean_0.toJSBoolean(v19.extensions) and v19.extensions or {};
-            return v19;
-        end, 
-        [tostring(l_MapperKind_0.SCALAR_TYPE)] = function(v23) --[[ Line: 135 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v23.name)] = {
-                type = "scalar", 
-                extensions = l_Boolean_0.toJSBoolean(v23.extensions) and v23.extensions or {}
-            };
-            return v23;
-        end, 
-        [tostring(l_MapperKind_0.UNION_TYPE)] = function(v24) --[[ Line: 145 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v24.name)] = {
-                type = "union", 
-                extensions = l_Boolean_0.toJSBoolean(v24.extensions) and v24.extensions or {}
-            };
-            return v24;
-        end, 
-        [tostring(l_MapperKind_0.INPUT_OBJECT_TYPE)] = function(v25) --[[ Line: 155 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[tostring(v25.name)] = {
-                fields = {}, 
-                type = "input", 
-                extensions = l_Boolean_0.toJSBoolean(v25.extensions) and v25.extensions or {}
-            };
-            return v25;
-        end, 
-        [tostring(l_MapperKind_0.INPUT_OBJECT_FIELD)] = function(v26, v27, v28) --[[ Line: 166 ]]
-            -- upvalues: v8 (copy), l_Boolean_0 (ref)
-            v8.types[v28].fields[v27] = {
-                extensions = l_Boolean_0.toJSBoolean(v26.extensions) and v26.extensions or {}
-            };
-            return v26;
-        end
-    });
-    return v8;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local Boolean = require(ParentParent.LuauPolyfill).Boolean
+local t1 = {}
+local mapSchema = require(script.Parent.mapSchema).mapSchema
+
+require(ParentParent.GraphQL)
+require(script.Parent.types)
+
+local MapperKind = require(script.Parent.Interfaces).MapperKind
+
+function t1.extractExtensionsFromSchema(p1) -- line: 42
+	-- upvalues: Boolean (copy), mapSchema (copy), MapperKind (copy)
+	local t2 = {
+		schemaExtensions = Boolean.toJSBoolean(p1.extensions) and p1.extensions or {},
+		types = {}
+	}
+
+	mapSchema(p1, {
+		[tostring(MapperKind.OBJECT_TYPE)] = function(p2) -- line: 48
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p2.name)] = {
+				type = "object",
+				fields = {},
+				extensions = Boolean.toJSBoolean(p2.extensions) and p2.extensions or {}
+			}
+
+			return p2
+		end,
+		[tostring(MapperKind.INTERFACE_TYPE)] = function(p3) -- line: 59
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p3.name)] = {
+				type = "interface",
+				fields = {},
+				extensions = if not Boolean.toJSBoolean(p3.extensions) then {} else p3.extensions
+			}
+
+			return p3
+		end,
+		[tostring(MapperKind.FIELD)] = function(p4, p5, p6) -- line: 73
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[p6].fields[p5] = {
+				arguments = {},
+				extensions = if not Boolean.toJSBoolean(p4.extensions) then {} else p4.extensions
+			}
+
+			local args = p4.args
+
+			if args ~= nil then
+				for _, v15 in args do
+					local v16 = table.unpack(v15)
+
+					t2.types[p6].fields[p5].arguments[tostring(v16)] = Boolean.toJSBoolean(args[tostring(v16)].extensions) and args[tostring(v16)].extensions or {}
+				end
+			end
+
+			return p4
+		end,
+		[tostring(MapperKind.ENUM_TYPE)] = function(p7) -- line: 110
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p7.name)] = {
+				type = "enum",
+				values = {},
+				extensions = Boolean.toJSBoolean(p7.extensions) and p7.extensions or {}
+			}
+
+			return p7
+		end,
+		[tostring(MapperKind.ENUM_VALUE)] = function(p8, p9, _, p11) -- line: 121
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[p9].values[p11] = Boolean.toJSBoolean(p8.extensions) and p8.extensions or {}
+
+			return p8
+		end,
+		[tostring(MapperKind.SCALAR_TYPE)] = function(p12) -- line: 135
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p12.name)] = {
+				type = "scalar",
+				extensions = Boolean.toJSBoolean(p12.extensions) and p12.extensions or {}
+			}
+
+			return p12
+		end,
+		[tostring(MapperKind.UNION_TYPE)] = function(p13) -- line: 145
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p13.name)] = {
+				type = "union",
+				extensions = Boolean.toJSBoolean(p13.extensions) and p13.extensions or {}
+			}
+
+			return p13
+		end,
+		[tostring(MapperKind.INPUT_OBJECT_TYPE)] = function(p14) -- line: 155
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[tostring(p14.name)] = {
+				type = "input",
+				fields = {},
+				extensions = Boolean.toJSBoolean(p14.extensions) and p14.extensions or {}
+			}
+
+			return p14
+		end,
+		[tostring(MapperKind.INPUT_OBJECT_FIELD)] = function(p15, p16, p17) -- line: 166
+			-- upvalues: t2 (copy), Boolean (copy)
+			t2.types[p17].fields[p16] = {
+				extensions = Boolean.toJSBoolean(p15.extensions) and p15.extensions or {}
+			}
+
+			return p15
+		end
+	})
+
+	return t2
+end
+
+return t1

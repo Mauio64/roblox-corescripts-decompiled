@@ -1,28 +1,47 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PaymentPlatform);
-return function(v2) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    if v2 == v1.Web then
-        return "Web";
-    elseif v2 == v1.Apple then
-        return "AppleAppStore";
-    elseif v2 == v1.Google then
-        return "GooglePlayStore";
-    elseif v2 == v1.Amazon then
-        return "AmazonStore";
-    elseif v2 == v1.UWP then
-        return "WindowsStore";
-    elseif v2 == v1.Xbox then
-        return "XboxStore";
-    elseif v2 == v1.Maquettes then
-        return "MaquettesStore";
-    elseif v2 == v1.Palisades then
-        return "PalisadesStore";
-    elseif v2 == v1.Microsoft then
-        return "MicrosoftStore";
-    elseif v2 == v1.MilkyWay then
-        return "MilkyWayStore";
-    else
-        return "None";
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local PaymentPlatform = require(ParentParent.Enums.PaymentPlatform)
+
+return function(p1) -- line: 6
+	-- upvalues: PaymentPlatform (copy)
+	if p1 == PaymentPlatform.Web then
+		return "Web"
+	end
+
+	if p1 == PaymentPlatform.Apple then
+		return "AppleAppStore"
+	end
+
+	if p1 == PaymentPlatform.Google then
+		return "GooglePlayStore"
+	end
+
+	if p1 == PaymentPlatform.Amazon then
+		return "AmazonStore"
+	end
+
+	if p1 == PaymentPlatform.UWP then
+		return "WindowsStore"
+	end
+
+	if p1 == PaymentPlatform.Xbox then
+		return "XboxStore"
+	end
+
+	if p1 == PaymentPlatform.Maquettes then
+		return "MaquettesStore"
+	end
+
+	if p1 == PaymentPlatform.Palisades then
+		return "PalisadesStore"
+	end
+
+	if p1 == PaymentPlatform.Microsoft then
+		return "MicrosoftStore"
+	end
+
+	if p1 == PaymentPlatform.MilkyWay then
+		return "MilkyWayStore"
+	end
+
+	return "None"
+end

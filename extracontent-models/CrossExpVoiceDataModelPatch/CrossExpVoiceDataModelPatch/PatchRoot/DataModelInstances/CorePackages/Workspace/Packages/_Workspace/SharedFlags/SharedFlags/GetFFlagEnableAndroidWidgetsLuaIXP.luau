@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableAndroidWidgetsLuaIXP", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableAndroidWidgetsLuaIXP");
-end;
+game:DefineFastFlag("EnableAndroidWidgetsLuaIXP2", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableAndroidWidgetsLuaIXP2")
+end

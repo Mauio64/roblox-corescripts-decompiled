@@ -1,47 +1,53 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local l_useSelector_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useStyle_0 = require(l_CorePackages_0.Packages.UIBlox).Core.Style.useStyle;
-local v4 = require(l_CorePackages_0.Packages.ReactFocusNavigation);
-local v5 = v4.FocusNavigationService.new(v4.EngineInterface.CoreGui);
-local v6 = require(l_CorePackages_0.Workspace.Packages.FocusNavigationUtils);
-local l_Provider_0 = v6.FocusNavigableSurfaceRegistry.Provider;
-local l_FocusRoot_0 = v6.FocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v6.FocusNavigableSurfaceIdentifierEnum;
-local l_Parent_0 = script.Parent.Parent;
-local v11 = require(l_Parent_0.Colors);
-local v12 = require(l_Parent_0.Components.OverlayComponents);
-local function v14(v13) --[[ Line: 30 ]] --[[ Name: selectOverlayComponent ]]
-    -- upvalues: v12 (copy)
-    return v12[v13.overlay.overlay];
-end;
-local function v16(v15) --[[ Line: 34 ]] --[[ Name: selectOverlayProps ]]
-    return v15.overlay.overlayProps;
-end;
-return function(_) --[[ Line: 38 ]] --[[ Name: Overlay ]]
-    -- upvalues: l_useSelector_0 (copy), v14 (copy), v16 (copy), l_useStyle_0 (copy), v1 (copy), v4 (copy), v5 (copy), l_Provider_0 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), v11 (copy)
-    local v18 = l_useSelector_0(v14);
-    local v19 = l_useSelector_0(v16);
-    local v20 = l_useStyle_0();
-    return v1.createElement(v4.FocusNavigationContext.Provider, {
-        value = v5
-    }, {
-        FocusNavigationRegistryProvider = v1.createElement(l_Provider_0, nil, {
-            FocusNavigationCoreScriptsWrapper = v1.createElement(l_FocusRoot_0, {
-                surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-                isIsolated = true, 
-                isAutoFocusRoot = true
-            }, {
-                OverlayContainer = v1.createElement("Frame", {
-                    BackgroundTransparency = v20.Tokens.Semantic.Color.Common.Overlay.Transparency, 
-                    BackgroundColor3 = v11.Black, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.fromScale(1, 1), 
-                    Visible = v18 ~= nil
-                }, {
-                    Overlay = v18 and v1.createElement(v18, v19) or nil
-                })
-            })
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local useSelector = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(CorePackages.Workspace.Packages.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local useStyle = UIBlox.Core.Style.useStyle
+local ReactFocusNavigation = require(CorePackages.Packages.ReactFocusNavigation)
+local v8 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+local FocusNavigationUtils = require(CorePackages.Workspace.Packages.FocusNavigationUtils)
+local Provider = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local ParentParent = script.Parent.Parent
+local Colors = require(ParentParent.Colors)
+local OverlayComponents = require(ParentParent.Components.OverlayComponents)
+
+local function selectOverlayComponent(p1) -- line: 33
+	-- upvalues: OverlayComponents (copy)
+	return OverlayComponents[p1.overlay.overlay]
+end
+local function selectOverlayProps(p2) -- line: 37
+	return p2.overlay.overlayProps
+end
+local function Overlay(_) -- line: 41
+	-- upvalues: useSelector (copy), selectOverlayComponent (copy), selectOverlayProps (copy), useStyle (copy), React (copy), ReactFocusNavigation (copy), v8 (copy), Provider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Colors (copy)
+	local v22 = useSelector(selectOverlayComponent)
+	local v23 = useSelector(selectOverlayProps)
+	local v24 = useStyle()
+
+	return React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
+		value = v8
+	}, {
+		FocusNavigationRegistryProvider = React.createElement(Provider, nil, {
+			FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
+				isIsolated = true,
+				isAutoFocusRoot = true,
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
+			}, {
+				OverlayContainer = React.createElement("Frame", {
+					BorderSizePixel = 0,
+					BackgroundTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v24.Tokens.Semantic.Color.Common.Overlay else v24.Tokens.Color.Common.Scrim)).Transparency,
+					BackgroundColor3 = Colors.Black,
+					Size = UDim2.fromScale(1, 1),
+					Visible = v22 ~= nil
+				}, {
+					Overlay = v22 and React.createElement(v22, v23) or nil
+				})
+			})
+		})
+	})
+end
+
+return Overlay

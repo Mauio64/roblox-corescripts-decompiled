@@ -1,1 +1,1 @@
-return require(script.ContactsUploadErrorModal);
+return require(script.ContactsUploadErrorModal)

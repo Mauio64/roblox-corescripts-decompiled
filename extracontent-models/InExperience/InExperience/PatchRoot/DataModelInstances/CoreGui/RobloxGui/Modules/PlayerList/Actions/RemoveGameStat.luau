@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("RemoveGameStat", function(v0) --[[ Line: 4 ]]
-    return {
-        statName = v0
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("RemoveGameStat", function(p1) -- line: 4
+	return {
+		statName = p1
+	}
+end)

@@ -1,18 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("Groups").Parent;
-return require(l_Parent_0.React).createContext({
-    navigateTo = {
-        webView = function() --[[ Line: 23 ]] --[[ Name: webView ]]
+local Parent = script:FindFirstAncestor("Groups").Parent
 
-        end, 
-        groupDetails = function() --[[ Line: 24 ]] --[[ Name: groupDetails ]]
-
-        end, 
-        seeAllGroups = function() --[[ Line: 25 ]] --[[ Name: seeAllGroups ]]
-
-        end, 
-        createGroup = function() --[[ Line: 26 ]] --[[ Name: createGroup ]]
-
-        end
-    }, 
-    userId = ""
-});
+return require(Parent.React).createContext({
+	userId = "",
+	navigateTo = {
+		webView = function() -- line: 23
+		end,
+		groupDetails = function() -- line: 24
+		end,
+		seeAllGroups = function() -- line: 25
+		end,
+		createGroup = function() -- line: 26
+		end
+	}
+})

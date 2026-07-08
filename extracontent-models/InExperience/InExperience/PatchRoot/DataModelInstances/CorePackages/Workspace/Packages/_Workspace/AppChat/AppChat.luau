@@ -16,6 +16,7 @@ return {
 	Flags = require(script.Flags),
 	Hooks = {
 		useChatIsVisible = require(script.Hooks.useChatIsVisible),
+		useConversationList = require(script.Hooks.useConversationList),
 		useTopBar = require(script.Hooks.useTopBar)
 	},
 	Http = require(script.Http),
@@ -23,6 +24,7 @@ return {
 	Middleware = require(script.Middleware),
 	Models = require(script.Models),
 	Screens = require(script.EnumScreens),
+	Stores = require(script.Stores),
 	Users = require(script.Users),
 	Utils = require(script.Utils),
 	LegacyAnalytics = require(script.LegacyAnalytics),

@@ -1,1 +1,1 @@
-return require(script.InternalTextInput);
+return require(script.InternalTextInput)

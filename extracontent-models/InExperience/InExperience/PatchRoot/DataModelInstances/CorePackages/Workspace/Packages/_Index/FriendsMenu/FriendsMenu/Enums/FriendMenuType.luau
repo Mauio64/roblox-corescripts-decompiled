@@ -1,4 +1,4 @@
 return {
-    SingleSelect = "SingleSelect", 
-    MultiSelect = "MultiSelect"
-};
+	SingleSelect = "SingleSelect",
+	MultiSelect = "MultiSelect"
+}

@@ -1,17 +1,21 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_useRef_0 = require(l_Parent_1.React).useRef;
-local v4 = require(l_Parent_0.jsutils.equal);
-v0.useDeepMemo = function(v5, v6) --[[ Line: 26 ]] --[[ Name: useDeepMemo ]]
-    -- upvalues: l_useRef_0 (copy), v4 (copy)
-    local v7 = l_useRef_0(nil);
-    if not v7.current or not v4(v6, v7.current.key) then
-        v7.current = {
-            key = v6, 
-            value = v5()
-        };
-    end;
-    return v7.current.value;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local useRef = require(ParentParentParent.React).useRef
+local equal = require(ParentParent.jsutils.equal)
+
+function t1.useDeepMemo(p1: ((...any) -> ...any), p2) -- line: 26
+	-- upvalues: useRef (copy), equal (copy)
+	local v8 = useRef(nil)
+
+	if not v8.current or not equal(p2, v8.current.key) then
+		v8.current = {
+			key = p2,
+			value = p1()
+		}
+	end
+
+	return v8.current.value
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppHomeVngAppUpsell", false);
+return game:DefineFastFlag("LuaAppHomeVngAppUpsell", false)

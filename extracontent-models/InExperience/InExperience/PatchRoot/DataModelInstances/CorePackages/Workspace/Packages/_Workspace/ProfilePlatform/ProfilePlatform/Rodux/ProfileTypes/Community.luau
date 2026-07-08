@@ -1,18 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Common.Enums);
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-local v5 = require(l_script_FirstAncestor_0.Networking.getProfilePlatform);
-local v6 = require(l_script_FirstAncestor_0.Rodux.ProfileTypes.mergeProfileStateAndResponse);
-return v2.createReducer({}, {
-    [v5.Succeeded.name] = function(v7, v8) --[[ Line: 13 ]]
-        -- upvalues: v3 (copy), v6 (copy)
-        local l_responseBody_0 = v8.responseBody;
-        if l_responseBody_0.profileType ~= v3.ProfileTypes.Community then
-            return v7;
-        else
-            return v6(v7, l_responseBody_0);
-        end;
-    end
-});
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local Rodux = require(ProfilePlatformParent.Rodux)
+local Enums = require(ProfilePlatform.Common.Enums)
+
+require(ProfilePlatform.Common.Types)
+
+local getProfilePlatform = require(ProfilePlatform.Networking.getProfilePlatform)
+local mergeProfileStateAndResponse = require(ProfilePlatform.Rodux.ProfileTypes.mergeProfileStateAndResponse)
+
+return Rodux.createReducer({}, {
+	[getProfilePlatform.Succeeded.name] = function(p1, t1: {[any]: any}) -- line: 13
+		-- upvalues: Enums (copy), mergeProfileStateAndResponse (copy)
+		local responseBody = t1.responseBody
+
+		if responseBody.profileType ~= Enums.ProfileTypes.Community then
+			return p1
+		end
+
+		return mergeProfileStateAndResponse(p1, responseBody)
+	end
+})

@@ -1,1 +1,1 @@
-return require(script.userProfilesApi);
+return require(script.userProfilesApi)

@@ -1,117 +1,127 @@
-local v0 = UDim2.new(0, 10, 0.15, 0);
-local v1 = UDim2.new(1, -20, 0.4, 0);
-local v2 = UDim2.new(0, 10, 0.55, 0);
-local v3 = UDim2.new(1, -20, 0.3, 0);
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v5 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsUtils);
-local _ = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsAggregator);
-local v7 = {};
-v7.__index = v7;
-v7.new = function(v8) --[[ Line: 43 ]] --[[ Name: new ]]
-    -- upvalues: v7 (copy), v5 (copy), v1 (copy), v0 (copy), v3 (copy), v2 (copy)
-    local v9 = {};
-    setmetatable(v9, v7);
-    v9._statType = v8;
-    v9._frame = Instance.new("Frame");
-    v9._frame.Name = "StatsMiniTextPanelClass";
-    v9._frame.BackgroundTransparency = 1;
-    v9._frame.ZIndex = v5.TextZIndex;
-    v9._titleLabel = Instance.new("TextLabel");
-    v9._titleLabel.Name = "TitleLabel";
-    v9._valueLabel = Instance.new("TextLabel");
-    v9._valueLabel.Name = "ValueLabel";
-    v5.StyleTextWidget(v9._titleLabel);
-    v5.StyleTextWidget(v9._valueLabel);
-    v9._titleLabel.FontSize = v5.MiniPanelTitleFontSize;
-    v9._titleLabel.Text = v9:_getTitle();
-    v9._titleLabel.Parent = v9._frame;
-    v9._titleLabel.Size = v1;
-    v9._titleLabel.Position = v0;
-    v9._titleLabel.TextXAlignment = Enum.TextXAlignment.Left;
-    v9._valueLabel.FontSize = v5.MiniPanelValueFontSize;
-    v9._valueLabel.Text = "0";
-    v9._valueLabel.Parent = v9._frame;
-    v9._valueLabel.Size = v3;
-    v9._valueLabel.Position = v2;
-    v9._valueLabel.TextXAlignment = Enum.TextXAlignment.Left;
-    return v9;
-end;
-v7.SetZIndex = function(v10, v11) --[[ Line: 80 ]] --[[ Name: SetZIndex ]]
-    v10._frame.ZIndex = v11;
-    v10._titleLabel.ZIndex = v11;
-    v10.ZIndex = v11;
-end;
-v7._getTitle = function(v12) --[[ Line: 86 ]] --[[ Name: _getTitle ]]
-    -- upvalues: v5 (copy)
-    return v5.TypeToShortName[v12._statType];
-end;
-v7.PlaceInParent = function(v13, v14, v15, v16) --[[ Line: 90 ]] --[[ Name: PlaceInParent ]]
-    v13._frame.Position = v16;
-    v13._frame.Size = v15;
-    v13._frame.Parent = v14;
-end;
-v7.SetStatsAggregator = function(v17, v18) --[[ Line: 96 ]] --[[ Name: SetStatsAggregator ]]
-    if v17._aggregator then
-        v17._aggregator:RemoveListener(v17._listenerId);
-        v17._listenerId = nil;
-        v17._aggregator = nil;
-    end;
-    v17._aggregator = v18;
-    v17:_refreshVisibility();
-end;
-v7.SetVisible = function(v19, v20) --[[ Line: 108 ]] --[[ Name: SetVisible ]]
-    v19.frame.Visible = v20;
-    v19:_refreshVisibility();
-end;
-v7._shouldBeVisible = function(v21) --[[ Line: 113 ]] --[[ Name: _shouldBeVisible ]]
-    -- upvalues: v5 (copy)
-    if v5.PerformanceStatsShouldBeVisible() then
-        return v21._frame.Visible;
-    else
-        return false;
-    end;
-end;
-v7._refreshVisibility = function(v22) --[[ Line: 122 ]] --[[ Name: _refreshVisibility ]]
-    if v22:_shouldBeVisible() then
-        v22:_startListening();
-        v22:_updateFromAggregator();
-        return;
-    else
-        v22:_stopListening();
-        return;
-    end;
-end;
-v7._stopListening = function(v23) --[[ Line: 131 ]] --[[ Name: _stopListening ]]
-    if v23._aggregator == nil then
-        return;
-    elseif v23._listenerId == nil then
-        return;
-    else
-        v23._aggregator:RemoveListener(v23._listenerId);
-        v23._listenerId = nil;
-        return;
-    end;
-end;
-v7._startListening = function(v24) --[[ Line: 144 ]] --[[ Name: _startListening ]]
-    if v24._aggregator == nil then
-        return;
-    elseif v24._listenerId ~= nil then
-        return;
-    else
-        v24._listenerId = v24._aggregator:AddListener(function() --[[ Line: 153 ]]
-            -- upvalues: v24 (copy)
-            v24:_updateFromAggregator();
-        end);
-        return;
-    end;
-end;
-v7.OnPerformanceStatsShouldBeVisibleChanged = function(v25) --[[ Line: 158 ]] --[[ Name: OnPerformanceStatsShouldBeVisibleChanged ]]
-    v25:_refreshVisibility();
-end;
-v7._updateFromAggregator = function(v26) --[[ Line: 162 ]] --[[ Name: _updateFromAggregator ]]
-    -- upvalues: v5 (copy)
-    local v27 = nil;
-    v27 = if v26._aggregator ~= nil then v26._aggregator:GetLatestValue() else 0;
-    v26._valueLabel.Text = v5.FormatTypedValue(v27, v26._statType);
-end;
-return v7;
+local uDim2 = UDim2.new(0, 10, 0.15, 0)
+local uDim2_2 = UDim2.new(1, -20, 0.4, 0)
+local uDim2_3 = UDim2.new(0, 10, 0.55, 0)
+local uDim2_4 = UDim2.new(1, -20, 0.3, 0)
+local CoreGui = game:GetService("CoreGui")
+local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
+
+require(CoreGui.RobloxGui.Modules.Stats.StatsAggregator)
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 43
+	-- upvalues: t1 (copy), StatsUtils (copy), uDim2_2 (copy), uDim2 (copy), uDim2_4 (copy), uDim2_3 (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._statType = p1
+	t2._frame = Instance.new("Frame")
+	t2._frame.Name = "StatsMiniTextPanelClass"
+	t2._frame.BackgroundTransparency = 1
+	t2._frame.ZIndex = StatsUtils.TextZIndex
+	t2._titleLabel = Instance.new("TextLabel")
+	t2._titleLabel.Name = "TitleLabel"
+	t2._valueLabel = Instance.new("TextLabel")
+	t2._valueLabel.Name = "ValueLabel"
+	StatsUtils.StyleTextWidget(t2._titleLabel)
+	StatsUtils.StyleTextWidget(t2._valueLabel)
+	t2._titleLabel.FontSize = StatsUtils.MiniPanelTitleFontSize
+	t2._titleLabel.Text = t2:_getTitle()
+	t2._titleLabel.Parent = t2._frame
+	t2._titleLabel.Size = uDim2_2
+	t2._titleLabel.Position = uDim2
+	t2._titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	t2._valueLabel.FontSize = StatsUtils.MiniPanelValueFontSize
+	t2._valueLabel.Text = "0"
+	t2._valueLabel.Parent = t2._frame
+	t2._valueLabel.Size = uDim2_4
+	t2._valueLabel.Position = uDim2_3
+	t2._valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+	return t2
+end
+function t1.SetZIndex(p2, p3) -- line: 80
+	p2._frame.ZIndex = p3
+	p2._titleLabel.ZIndex = p3
+	p2.ZIndex = p3
+end
+function t1._getTitle(p4) -- line: 86
+	-- upvalues: StatsUtils (copy)
+	return StatsUtils.TypeToShortName[p4._statType]
+end
+function t1.PlaceInParent(p5, p6, p7, p8) -- line: 90
+	p5._frame.Position = p8
+	p5._frame.Size = p7
+	p5._frame.Parent = p6
+end
+function t1.SetStatsAggregator(p9, p10) -- line: 96
+	if p9._aggregator then
+		p9._aggregator:RemoveListener(p9._listenerId)
+		p9._listenerId = nil
+		p9._aggregator = nil
+	end
+
+	p9._aggregator = p10
+	p9:_refreshVisibility()
+end
+function t1.SetVisible(p11, p12) -- line: 108
+	p11.frame.Visible = p12
+	p11:_refreshVisibility()
+end
+function t1._shouldBeVisible(p13) -- line: 113
+	-- upvalues: StatsUtils (copy)
+	if StatsUtils.PerformanceStatsShouldBeVisible() then
+		return p13._frame.Visible
+	end
+
+	return false
+end
+function t1._refreshVisibility(p14) -- line: 122
+	if p14:_shouldBeVisible() then
+		p14:_startListening()
+		p14:_updateFromAggregator()
+
+		return
+	end
+
+	p14:_stopListening()
+end
+function t1._stopListening(p15) -- line: 131
+	if p15._aggregator == nil then
+		return
+	end
+
+	if p15._listenerId == nil then
+		return
+	end
+
+	p15._aggregator:RemoveListener(p15._listenerId)
+	p15._listenerId = nil
+end
+function t1._startListening(p16) -- line: 144
+	if p16._aggregator == nil then
+		return
+	end
+
+	if p16._listenerId ~= nil then
+		return
+	end
+
+	p16._listenerId = p16._aggregator:AddListener(function() -- line: 153
+		-- upvalues: p16 (copy)
+		p16:_updateFromAggregator()
+	end)
+end
+function t1.OnPerformanceStatsShouldBeVisibleChanged(p17) -- line: 158
+	p17:_refreshVisibility()
+end
+function t1._updateFromAggregator(p18) -- line: 162
+	-- upvalues: StatsUtils (copy)
+	local v27 = p18._aggregator == nil and 0 or p18._aggregator:GetLatestValue()
+
+	p18._valueLabel.Text = StatsUtils.FormatTypedValue(v27, p18._statType)
+end
+
+return t1

@@ -1,71 +1,86 @@
-local l_Players_0 = game:GetService("Players");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_script_FirstAncestor_0.Http.NetworkingFriends);
-local v4 = require(l_script_FirstAncestor_0.Http.NetworkingPresence);
-local v5 = require(l_Parent_0.Promise);
-local v6 = require(l_script_FirstAncestor_0.Http.RoduxNetworking);
-local l_AddUsers_0 = require(l_Parent_0.UserLib).Actions.AddUsers;
-local l_SetUserIsFriend_0 = require(l_Parent_0.UserLib).Actions.SetUserIsFriend;
-local l_UserModel_0 = require(l_Parent_0.UserLib).Models.UserModel;
-local l_llama_0 = require(l_Parent_0.LuaSocialLibrariesDeps).llama;
-local l_receiveUsersPresence_0 = require(l_Parent_0.UserLib).Utils.receiveUsersPresence;
-return function(v12) --[[ Line: 16 ]]
-    -- upvalues: l_Players_0 (copy), v3 (copy), v6 (copy), v5 (copy), l_UserModel_0 (copy), l_SetUserIsFriend_0 (copy), l_llama_0 (copy), l_AddUsers_0 (copy), v4 (copy), l_receiveUsersPresence_0 (copy)
-    return function(v13) --[[ Line: 17 ]]
-        -- upvalues: l_Players_0 (ref), v3 (ref), v6 (ref), v5 (ref), v12 (copy), l_UserModel_0 (ref), l_SetUserIsFriend_0 (ref), l_llama_0 (ref), l_AddUsers_0 (ref), v4 (ref), l_receiveUsersPresence_0 (ref)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        assert(l_LocalPlayer_0, "Local Player not found");
-        local l_UserId_0 = l_LocalPlayer_0.UserId;
-        if v3.GetFriendsFromUserId.getStatus(v13:getState(), l_UserId_0) == v6.Enum.NetworkStatus.Fetching then
-            return v5.resolve({});
-        else
-            return v13:dispatch(v3.GetFriendsFromUserId.API(l_UserId_0)):andThen(function(v16) --[[ Line: 30 ]]
-                -- upvalues: v13 (copy), v12 (ref), l_UserModel_0 (ref), l_SetUserIsFriend_0 (ref), l_llama_0 (ref), l_AddUsers_0 (ref), v4 (ref), l_receiveUsersPresence_0 (ref)
-                local l_data_0 = v16.responseBody.data;
-                local v18 = v13:getState().Users or {};
-                local v19 = {};
-                local v20 = nil;
-                if v12 then
-                    v20 = {};
-                end;
-                for _, v22 in ipairs(l_data_0) do
-                    local v23 = tostring(v22.id);
-                    if v12 then
-                        table.insert(v20, v23);
-                    end;
-                    if v18[v23] == nil then
-                        v19[v23] = l_UserModel_0.fromDataTable({
-                            id = v22.id, 
-                            name = v22.name, 
-                            displayName = v22.displayName, 
-                            isFriend = true
-                        });
-                    else
-                        v13:dispatch(l_SetUserIsFriend_0(v23, true));
-                    end;
-                end;
-                local v24 = l_llama_0.Dictionary.keys(v19);
-                v13:dispatch(l_AddUsers_0(v19));
-                if v12 then
-                    v13:dispatch(v4.GetPresencesFromUserIds.API(v20)):andThen(function(v25) --[[ Line: 67 ]]
-                        -- upvalues: l_receiveUsersPresence_0 (ref), v13 (ref)
-                        local l_userPresences_0 = v25.responseBody.userPresences;
-                        l_receiveUsersPresence_0(l_userPresences_0, v13);
-                        return v25;
-                    end):catch(function(v27) --[[ Line: 72 ]]
-                        warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(v27));
-                    end);
-                    return v16;
-                else
-                    v13:dispatch(v4.GetPresencesFromUserIds.API(v24)):catch(function(v28) --[[ Line: 78 ]]
-                        warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(v28));
-                    end);
-                    return v16;
-                end;
-            end):catch(function(v29) --[[ Line: 85 ]]
-                warn("NetworkingFriends failure in getAllFriendsAsync, Status: " .. tostring(v29));
-            end);
-        end;
-    end;
-end;
+local Players = game:GetService("Players")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local NetworkingFriends = require(AppChat.Http.NetworkingFriends)
+local NetworkingPresence = require(AppChat.Http.NetworkingPresence)
+local Promise = require(AppChatParent.Promise)
+local RoduxNetworking = require(AppChat.Http.RoduxNetworking)
+local AddUsers = require(AppChatParent.UserLib).Actions.AddUsers
+local SetUserIsFriend = require(AppChatParent.UserLib).Actions.SetUserIsFriend
+local UserModel = require(AppChatParent.UserLib).Models.UserModel
+local llama = require(AppChatParent.LuaSocialLibrariesDeps).llama
+local receiveUsersPresence = require(AppChatParent.UserLib).Utils.receiveUsersPresence
+
+return function(b1: boolean?) -- line: 16
+	-- upvalues: Players (copy), NetworkingFriends (copy), RoduxNetworking (copy), Promise (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
+	return function(p1) -- line: 17
+		-- upvalues: Players (copy), NetworkingFriends (copy), RoduxNetworking (copy), Promise (copy), b1 (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
+		local LocalPlayer = Players.LocalPlayer
+
+		assert(LocalPlayer, "Local Player not found")
+
+		local UserId = LocalPlayer.UserId
+
+		if NetworkingFriends.GetFriendsFromUserId.getStatus(p1:getState(), UserId) == RoduxNetworking.Enum.NetworkStatus.Fetching then
+			return Promise.resolve({})
+		end
+
+		return p1:dispatch(NetworkingFriends.GetFriendsFromUserId.API(UserId)):andThen(function(p2) -- line: 30
+			-- upvalues: p1 (copy), b1 (copy), UserModel (copy), SetUserIsFriend (copy), llama (copy), AddUsers (copy), NetworkingPresence (copy), receiveUsersPresence (copy)
+			local data = p2.responseBody.data
+			local v19 = p1:getState().Users or {}
+			local t1 = {}
+			local t2 = nil
+
+			if b1 then
+				t2 = {}
+			end
+
+			for _, v in ipairs(data) do
+				local str = tostring(v.id)
+
+				if b1 then
+					table.insert(t2, str)
+				end
+
+				if v19[str] == nil then
+					t1[str] = UserModel.fromDataTable({
+						isFriend = true,
+						id = v.id,
+						name = v.name,
+						displayName = v.displayName
+					})
+				else
+					p1:dispatch(SetUserIsFriend(str, true))
+				end
+			end
+
+			local v25 = llama.Dictionary.keys(t1)
+
+			p1:dispatch(AddUsers(t1))
+
+			if b1 then
+				p1:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(t2)):andThen(function(p3) -- line: 67
+					-- upvalues: receiveUsersPresence (copy), p1 (copy)
+					local userPresences = p3.responseBody.userPresences
+
+					receiveUsersPresence(userPresences, p1)
+
+					return p3
+				end):catch(function(p4) -- line: 72
+					warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p4))
+				end)
+
+				return p2
+			end
+
+			p1:dispatch(NetworkingPresence.GetPresencesFromUserIds.API(v25)):catch(function(p5) -- line: 78
+				warn("NetworkingPresence failure in getAllFriendsAsync, Status: " .. tostring(p5))
+			end)
+
+			return p2
+		end):catch(function(p6) -- line: 85
+			warn("NetworkingFriends failure in getAllFriendsAsync, Status: " .. tostring(p6))
+		end)
+	end
+end

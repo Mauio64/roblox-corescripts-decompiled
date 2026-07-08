@@ -96,7 +96,7 @@ local function addRegisteredStyleSheetTags(t4: {[any]: any}, t5: {[any]: any}) -
 end
 
 return {
-	getStyleSheet = function(p5, p6, n2: number?, p7) --[[ getStyleSheet ]] -- line: 139
+	getStyleSheet = function(p5, p6, n2: number?, p7) -- line: 139
 		-- upvalues: Device (copy), t1 (copy), createStyleSheet (copy)
 		local v44 = p6 or Device.Desktop
 		local v45 = n2 or 1
@@ -113,7 +113,7 @@ return {
 
 		return v48.instance
 	end,
-	addStyleTags = function(p8, t6: {[any]: any}) --[[ addStyleTags ]] -- line: 162
+	addStyleTags = function(p8, t6: {[any]: any}) -- line: 162
 		-- upvalues: t1 (copy), addRegisteredStyleSheetTags (copy)
 		local v51 = t1[p8]
 

@@ -1,4 +1,5 @@
-game:DefineFastFlag("DisplayCollectiblesIcon", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("DisplayCollectiblesIcon");
-end;
+game:DefineFastFlag("DisplayCollectiblesIcon", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("DisplayCollectiblesIcon")
+end

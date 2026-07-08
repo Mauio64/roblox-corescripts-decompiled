@@ -1,3 +1,5 @@
-local v0 = require(script.Parent.makeActionCreator);
-local _ = require(script.Parent.Parent.types);
-return v0(script.Name, "purchaseCallbacks");
+local makeActionCreator = require(script.Parent.makeActionCreator)
+
+require(script.Parent.Parent.types)
+
+return makeActionCreator(script.Name, "purchaseCallbacks")

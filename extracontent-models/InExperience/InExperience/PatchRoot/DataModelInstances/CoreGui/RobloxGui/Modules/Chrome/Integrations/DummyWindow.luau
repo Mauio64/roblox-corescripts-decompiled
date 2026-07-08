@@ -1,61 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_script_FirstAncestor_0.Service);
-local v4 = require(l_script_FirstAncestor_0.Integrations.CommonIcon);
-local v5 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.Constants);
-local v6 = require(l_script_FirstAncestor_0.ChromeShared.Service.WindowSizeSignal);
-local v7 = require(l_CorePackages_0.Packages.UIBlox);
-local l_Images_0 = v7.App.ImageSet.Images;
-local l_IconButton_0 = v7.App.Button.IconButton;
-local l_GetFFlagDebugEnableUnibarDummyIntegrations_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagDebugEnableUnibarDummyIntegrations;
-local v11 = l_Images_0["icons/navigation/cycleUp"];
-local v12 = false;
-local v13 = v6.new(v5.DEFAULT_WIDTH, v5.DEFAULT_HEIGHT);
-local v14 = UDim2.new(1, -95, 0, 165);
-return (v3:register({
-    initialAvailability = if l_GetFFlagDebugEnableUnibarDummyIntegrations_0() then v3.AvailabilitySignal.Available else v3.AvailabilitySignal.Unavailable, 
-    id = "dummy_window", 
-    label = "CoreScripts.TopBar.Menu", 
-    draggable = true, 
-    cachePosition = true, 
-    startingWindowPosition = v14, 
-    windowSize = v13, 
-    persistWindowState = true, 
-    components = {
-        Icon = function(_) --[[ Line: 35 ]] --[[ Name: Icon ]]
-            -- upvalues: v4 (copy)
-            return v4("icons/menu/avatar_on");
-        end, 
-        Window = function(_) --[[ Line: 38 ]] --[[ Name: Window ]]
-            -- upvalues: v2 (copy), v5 (copy), l_IconButton_0 (copy), v11 (copy), v12 (ref), v13 (copy)
-            return v2.createElement("Frame", {
-                BackgroundTransparency = 0, 
-                Size = UDim2.new(1, 0, 1, 0)
-            }, {
-                Corner = v2.createElement("UICorner", {
-                    CornerRadius = v5.CORNER_RADIUS
-                }), 
-                SizeIcon = v2.createElement(l_IconButton_0, {
-                    icon = v11, 
-                    iconSize = v5.CLOSE_ICON_SIZE, 
-                    anchorPoint = Vector2.new(0.5, 1), 
-                    position = UDim2.new(0.5, 0, 1, 0), 
-                    backgroundTransparency = 0.5, 
-                    onActivated = function() --[[ Line: 52 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v12 (ref), v13 (ref), v5 (ref)
-                        if v12 then
-                            v13:requestSize(v5.DEFAULT_WIDTH, v5.DEFAULT_HEIGHT);
-                            v12 = false;
-                            return;
-                        else
-                            v13:requestSize(v5.DEFAULT_WIDTH_LARGE, v5.DEFAULT_HEIGHT_LARGE);
-                            v12 = true;
-                            return;
-                        end;
-                    end
-                })
-            });
-        end
-    }
-}));
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local Service = require(Chrome.Service)
+local CommonIcon = require(Chrome.Integrations.CommonIcon)
+local Constants = require(Chrome.ChromeShared.Unibar.Constants)
+local WindowSizeSignal = require(Chrome.ChromeShared.Service.WindowSizeSignal)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local IconButton = UIBlox.App.Button.IconButton
+local GetFFlagDebugEnableUnibarDummyIntegrations = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagDebugEnableUnibarDummyIntegrations
+local v12 = Images["icons/navigation/cycleUp"]
+local u13 = false
+local v14 = WindowSizeSignal.new(Constants.DEFAULT_WIDTH, Constants.DEFAULT_HEIGHT)
+local uDim2 = UDim2.new(1, -95, 0, 165)
+
+return (Service:register({
+	id = "dummy_window",
+	label = "CoreScripts.TopBar.Menu",
+	draggable = true,
+	cachePosition = true,
+	persistWindowState = true,
+	initialAvailability = if not GetFFlagDebugEnableUnibarDummyIntegrations() then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available,
+	startingWindowPosition = uDim2,
+	windowSize = v14,
+	components = {
+		Icon = function(_) -- line: 35
+			-- upvalues: CommonIcon (copy)
+			return CommonIcon("icons/menu/avatar_on")
+		end,
+		Window = function(_) -- line: 38
+			-- upvalues: React (copy), Constants (copy), IconButton (copy), v12 (copy), u13 (ref), v14 (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 0,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, {
+				Corner = React.createElement("UICorner", {
+					CornerRadius = Constants.CORNER_RADIUS
+				}),
+				SizeIcon = React.createElement(IconButton, {
+					backgroundTransparency = 0.5,
+					icon = v12,
+					iconSize = Constants.CLOSE_ICON_SIZE,
+					anchorPoint = Vector2.new(0.5, 1),
+					position = UDim2.new(0.5, 0, 1, 0),
+					onActivated = function() -- line: 52
+						-- upvalues: u13 (ref), v14 (copy), Constants (copy)
+						if u13 then
+							v14:requestSize(Constants.DEFAULT_WIDTH, Constants.DEFAULT_HEIGHT)
+							u13 = false
+
+							return
+						end
+
+						v14:requestSize(Constants.DEFAULT_WIDTH_LARGE, Constants.DEFAULT_HEIGHT_LARGE)
+						u13 = true
+					end
+				})
+			})
+		end
+	}
+}))

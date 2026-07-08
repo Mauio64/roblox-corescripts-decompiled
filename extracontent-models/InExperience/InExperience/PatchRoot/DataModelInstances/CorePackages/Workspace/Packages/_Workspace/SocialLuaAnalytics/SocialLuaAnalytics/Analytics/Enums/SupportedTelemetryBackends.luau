@@ -1,6 +1,6 @@
 return {
-    RobloxTelemetryCounter = "RobloxTelemetryCounter", 
-    RobloxTelemetryStat = "RobloxTelemetryStat", 
-    Points = "Points", 
-    EventIngest = "EventIngest"
-};
+	RobloxTelemetryCounter = "RobloxTelemetryCounter",
+	RobloxTelemetryStat = "RobloxTelemetryStat",
+	Points = "Points",
+	EventIngest = "EventIngest"
+}

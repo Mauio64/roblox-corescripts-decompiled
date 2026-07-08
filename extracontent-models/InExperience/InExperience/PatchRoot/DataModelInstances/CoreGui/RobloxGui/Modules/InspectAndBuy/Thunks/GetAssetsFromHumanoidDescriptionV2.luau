@@ -1,63 +1,71 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Thunk);
-local v2 = require(l_Parent_0.Models.AssetInfo);
-local v3 = require(l_Parent_0.Actions.SetEquippedAssets);
-local v4 = require(l_Parent_0.Constants);
-local v5 = require(l_Parent_0.Thunks.GetAvatarPreview);
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagAXInspectAndBuyMakeupSupport_0 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceFlags).FFlagAXInspectAndBuyMakeupSupport;
-local v8 = {};
-local function v26(v9) --[[ Line: 19 ]] --[[ Name: getAssetIds ]]
-    -- upvalues: v4 (copy), v2 (copy), l_FFlagAXInspectAndBuyMakeupSupport_0 (copy)
-    local v10 = {};
-    local v11 = false;
-    for v12, v13 in v4.AssetTypeIdStringToHumanoidDescriptionProp do
-        if v4.AssetTypeIdToAccessoryTypeEnum[v12] == nil then
-            local v14 = v9[v13] or "";
-            local v15 = true;
-            if v12 ~= tostring(Enum.AssetType.Head.Value) then
-                v15 = v12 == tostring(Enum.AssetType.DynamicHead.Value);
-            end;
-            if not v11 or not v15 then
-                if v15 then
-                    v11 = true;
-                end;
-                for _, v17 in string.split(v14) do
-                    if tonumber(v17) and v17 ~= "0" then
-                        table.insert(v10, v2.fromHumanoidDescription(v17));
-                    end;
-                end;
-            end;
-        end;
-    end;
-    for _, v19 in (v9:GetAccessories(true)) do
-        v10[#v10 + 1] = v2.fromHumanoidDescriptionAccessory(v19);
-    end;
-    for _, v21 in (v9:GetEmotes()) do
-        for _, v23 in v21 do
-            v10[#v10 + 1] = v2.fromHumanoidDescription(v23);
-        end;
-    end;
-    if l_FFlagAXInspectAndBuyMakeupSupport_0 then
-        for _, v25 in v9:GetChildren() do
-            if v25:IsA("MakeupDescription") and v25.AssetId > 0 then
-                v10[#v10 + 1] = v2.fromHumanoidDescription(v25.AssetId);
-            end;
-        end;
-    end;
-    return v10;
-end;
-return function(v27, v28) --[[ Line: 83 ]] --[[ Name: GetAssetsFromHumanoidDescriptionV2 ]]
-    -- upvalues: v1 (copy), v8 (copy), v26 (copy), v5 (copy), v3 (copy)
-    return v1.new(script.Name, v8, function(v29, _) --[[ Line: 84 ]]
-        -- upvalues: v26 (ref), v27 (copy), v28 (copy), v5 (ref), v3 (ref)
-        local v31 = v26(v27);
-        if not v28 then
-            v29:dispatch(v5(v31));
-            return;
-        else
-            v29:dispatch(v3(v31));
-            return;
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local AssetInfo = require(ParentParent.Models.AssetInfo)
+local SetEquippedAssets = require(ParentParent.Actions.SetEquippedAssets)
+local Constants = require(ParentParent.Constants)
+local GetAvatarPreview = require(ParentParent.Thunks.GetAvatarPreview)
+local CorePackages = game:GetService("CorePackages")
+local FFlagAXInspectAndBuyMakeupSupport = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXInspectAndBuyMakeupSupport
+local t1 = {}
+
+local function getAssetIds(p1) -- line: 19
+	-- upvalues: Constants (copy), AssetInfo (copy), FFlagAXInspectAndBuyMakeupSupport (copy)
+	local t2 = {}
+	local v14 = false
+
+	for v15, v16 in Constants.AssetTypeIdStringToHumanoidDescriptionProp do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[v15] == nil then
+			local v17 = p1[v16] or ""
+			local v18 = v15 == tostring(Enum.AssetType.Head.Value) or v15 == tostring(Enum.AssetType.DynamicHead.Value)
+
+			if not v14 or not v18 then
+				if v18 then
+					v14 = true
+				end
+
+				for _, v20 in string.split(v17) do
+					if tonumber(v20) and v20 ~= "0" then
+						table.insert(t2, AssetInfo.fromHumanoidDescription(v20))
+					end
+				end
+			end
+		end
+	end
+
+	for _, v22 in (p1:GetAccessories(true)) do
+		t2[#t2 + 1] = AssetInfo.fromHumanoidDescriptionAccessory(v22)
+	end
+
+	for _, v24 in (p1:GetEmotes()) do
+		for _, v26 in v24 do
+			t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v26)
+		end
+	end
+
+	if FFlagAXInspectAndBuyMakeupSupport then
+		for _, child in p1:GetChildren() do
+			if child:IsA("MakeupDescription") and child.AssetId > 0 then
+				t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(child.AssetId)
+			end
+		end
+	end
+
+	return t2
+end
+local function GetAssetsFromHumanoidDescriptionV2(p2, p3) -- line: 83
+	-- upvalues: Thunk (copy), t1 (copy), getAssetIds (copy), GetAvatarPreview (copy), SetEquippedAssets (copy)
+	return Thunk.new(script.Name, t1, function(p4, _) -- line: 84
+		-- upvalues: getAssetIds (copy), p2 (copy), p3 (copy), GetAvatarPreview (copy), SetEquippedAssets (copy)
+		local v33 = getAssetIds(p2)
+
+		if not p3 then
+			p4:dispatch(GetAvatarPreview(v33))
+
+			return
+		end
+
+		p4:dispatch(SetEquippedAssets(v33))
+	end)
+end
+
+return GetAssetsFromHumanoidDescriptionV2

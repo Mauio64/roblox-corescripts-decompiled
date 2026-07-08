@@ -1,18 +1,22 @@
-local v0 = require(script.Parent.bindableEventQueue);
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return function(v2) --[[ Line: 4 ]] --[[ Name: createEvent ]]
-        -- upvalues: v1 (copy), v0 (ref)
-        return function(...) --[[ Line: 5 ]]
-            -- upvalues: v2 (copy), v1 (ref), v0 (ref)
-            local v3 = v2(...);
-            if v1:GetAttribute("isConnected") ~= true then
-                v0:add(v3);
-                return;
-            else
-                v1:Fire(v3);
-                return;
-            end;
-        end;
-    end;
-end;
+local bindableEventQueue = require(script.Parent.bindableEventQueue)
+
+return function(p1) -- line: 3
+	-- upvalues: bindableEventQueue (copy)
+	local function createEvent(p2) -- line: 4
+		-- upvalues: p1 (copy), bindableEventQueue (copy)
+		return function(...) -- line: 5
+			-- upvalues: p2 (copy), p1 (copy), bindableEventQueue (copy)
+			local v5 = p2(...)
+
+			if p1:GetAttribute("isConnected") ~= true then
+				bindableEventQueue:add(v5)
+
+				return
+			end
+
+			p1:Fire(v5)
+		end
+	end
+
+	return createEvent
+end

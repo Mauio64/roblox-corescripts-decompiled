@@ -1,43 +1,48 @@
-local function v0(...) --[[ Line: 31 ]] --[[ Name: captureSize ]]
-    return {
-        ...
-    }, select("#", ...);
-end;
-return function(v1) --[[ Line: 37 ]] --[[ Name: memoize ]]
-    -- upvalues: v0 (copy)
-    assert(type(v1) == "function", "memoize requires a function to memoize");
-    local v2 = nil;
-    local v3 = nil;
-    local v4 = nil;
-    local v5 = nil;
-    return function(...) --[[ Line: 45 ]]
-        -- upvalues: v3 (ref), v4 (ref), v5 (ref), v0 (ref), v1 (copy), v2 (ref)
-        local v6 = select("#", ...);
-        while v6 > 0 and select(v6, ...) == nil do
-            v6 = v6 - 1;
-        end;
-        if v6 ~= v3 then
-            local v7, v8 = v0(v1(...));
-            v4 = v7;
-            v5 = v8;
-            v2 = {
-                ...
-            };
-            v3 = v6;
-            return unpack(v4, 1, v5);
-        else
-            for v9 = 1, v3 do
-                if select(v9, ...) ~= v2[v9] then
-                    local v10, v11 = v0(v1(...));
-                    v4 = v10;
-                    v5 = v11;
-                    v2 = {
-                        ...
-                    };
-                    break;
-                end;
-            end;
-            return unpack(v4, 1, v5);
-        end;
-    end;
-end;
+local function captureSize(...) -- line: 31
+	return { ... }, select("#", ...)
+end
+local function memoize(p1: ((...any) -> ...any)) -- line: 37
+	-- upvalues: captureSize (copy)
+	assert(type(p1) == "function", "memoize requires a function to memoize")
+
+	local t1 = nil
+	local u5 = nil
+	local u6 = nil
+	local u7 = nil
+
+	return function(...) -- line: 45
+		-- upvalues: u5 (ref), u6 (ref), u7 (ref), captureSize (copy), p1 (copy), t1 (ref)
+		local v8 = select("#", ...)
+
+		while v8 > 0 and select(v8, ...) == nil do
+			v8 -= 1
+		end
+
+		if v8 ~= u5 then
+			local v9, v10 = captureSize(p1(...))
+
+			u6 = v9
+			u7 = v10
+			t1 = { ... }
+			u5 = v8
+
+			return unpack(u6, 1, u7)
+		end
+
+		for i = 1, u5 do
+			if select(i, ...) ~= t1[i] then
+				local v12, v13 = captureSize(p1(...))
+
+				u6 = v12
+				u7 = v13
+				t1 = { ... }
+
+				return unpack(u6, 1, u7)
+			end
+		end
+
+		return unpack(u6, 1, u7)
+	end
+end
+
+return memoize

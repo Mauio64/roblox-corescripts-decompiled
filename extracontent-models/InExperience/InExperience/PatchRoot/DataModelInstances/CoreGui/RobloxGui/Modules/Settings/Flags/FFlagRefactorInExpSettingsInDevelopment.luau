@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RefactorInExpSettingsInDevelopment", false);
+return game:DefineFastFlag("RefactorInExpSettingsInDevelopment", false)

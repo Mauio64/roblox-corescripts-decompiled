@@ -1,30 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 12 ]] --[[ Name: Box ]]
-    -- upvalues: v1 (copy)
-    local v3 = if v2.children then table.clone(v2.children) else {};
-    local v4 = table.clone(v2);
-    v4.cornerRadius = nil;
-    v4.padding = nil;
-    v4.children = nil;
-    local v5 = if typeof(v2.padding) == "number" then {
-        PaddingBottom = UDim.new(0, v2.padding), 
-        PaddingLeft = UDim.new(0, v2.padding), 
-        PaddingRight = UDim.new(0, v2.padding), 
-        PaddingTop = UDim.new(0, v2.padding)
-    } else if typeof(v2.padding) == "table" then {
-        PaddingTop = UDim.new(0, if v2.padding and v2.padding[1] then v2.padding[1] else 0), 
-        PaddingRight = UDim.new(0, if v2.padding and v2.padding[2] then v2.padding[2] else 0), 
-        PaddingBottom = UDim.new(0, if v2.padding and v2.padding[3] then v2.padding[3] else 0), 
-        PaddingLeft = UDim.new(0, if v2.padding and v2.padding[4] then v2.padding[4] else 0)
-    } else nil;
-    if v5 then
-        v3.Padding = v1.createElement("UIPadding", v5);
-    end;
-    if v2.cornerRadius then
-        v3.Radius = v1.createElement("UICorner", {
-            CornerRadius = v2.cornerRadius
-        });
-    end;
-    return v1.createElement("Frame", v4, v3);
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+
+local function Box(t1: {[any]: any}) -- line: 12
+	-- upvalues: React (copy)
+	local v5 = if not t1.children then {} else table.clone(t1.children)
+	local v6 = table.clone(t1)
+
+	v6.cornerRadius = nil
+	v6.padding = nil
+	v6.children = nil
+
+	local v7 = if typeof(t1.padding) ~= "number" then if typeof(t1.padding) ~= "table" then nil else {
+		PaddingTop = UDim.new(0, (not t1.padding or not t1.padding[1]) and 0 or t1.padding[1]),
+		PaddingRight = UDim.new(0, (not t1.padding or not t1.padding[2]) and 0 or t1.padding[2]),
+		PaddingBottom = UDim.new(0, (not t1.padding or not t1.padding[3]) and 0 or t1.padding[3]),
+		PaddingLeft = UDim.new(0, (not t1.padding or not t1.padding[4]) and 0 or t1.padding[4])
+	} else {
+		PaddingBottom = UDim.new(0, t1.padding),
+		PaddingLeft = UDim.new(0, t1.padding),
+		PaddingRight = UDim.new(0, t1.padding),
+		PaddingTop = UDim.new(0, t1.padding)
+	}
+
+	if v7 then
+		v5.Padding = React.createElement("UIPadding", v7)
+	end
+
+	if t1.cornerRadius then
+		v5.Radius = React.createElement("UICorner", {
+			CornerRadius = t1.cornerRadius
+		})
+	end
+
+	return React.createElement("Frame", v6, v5)
+end
+
+return Box

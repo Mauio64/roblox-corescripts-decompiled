@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExperienceMenuGamepadExposureEnabled684", false);
+return game:DefineFastFlag("ExperienceMenuGamepadExposureEnabled684", false)

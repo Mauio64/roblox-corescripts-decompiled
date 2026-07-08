@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChatIntegrationFixShortcut", false);
+return game:DefineFastFlag("ChatIntegrationFixShortcut", false)

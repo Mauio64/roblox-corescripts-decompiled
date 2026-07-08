@@ -1,5 +1,5 @@
 return (require(script.Parent.createEnum)("WindowState", {
-    "Hidden", 
-    "Shown", 
-    "Suspended"
-}));
+	"Hidden",
+	"Shown",
+	"Suspended"
+}))

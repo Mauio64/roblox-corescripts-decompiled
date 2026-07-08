@@ -1,3 +1,3 @@
 return {
-    ApiFetchPlaceInfos = require(script.ApiFetchPlaceInfos)
-};
+	ApiFetchPlaceInfos = require(script.ApiFetchPlaceInfos)
+}

@@ -1,17 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialLuaAnalytics").Parent;
-local v1 = require(l_Parent_0.Dash);
-local _ = require(script.Parent.Parent.Types);
-local v3 = require(script.Parent.getEventInfo);
-local v4 = require(script.Parent.optionallyLog);
-local v5 = require(script.Parent.reportDiagEvent);
-local v6 = require(script.Parent.getFormattedDiagEventInfo);
-local function v8(v7) --[[ Line: 13 ]]
-    return (("Fired Diag %*: %*, %*"):format(v7.type, v7.name, v7.value));
-end;
-return function(v9) --[[ Line: 17 ]]
-    -- upvalues: v1 (copy), v3 (copy), v6 (copy), v5 (copy), v4 (copy), v8 (copy)
-    return function(v10, v11) --[[ Line: 18 ]]
-        -- upvalues: v1 (ref), v3 (ref), v9 (copy), v6 (ref), v5 (ref), v4 (ref), v8 (ref)
-        return v1.pipe(v3(v9.eventList), v6(), v5(v9.diagImpl), v4(v9.loggerImpl, v8))(v10, v11);
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+local Dash = require(Parent.Dash)
+
+require(script.Parent.Parent.Types)
+
+local getEventInfo = require(script.Parent.getEventInfo)
+local optionallyLog = require(script.Parent.optionallyLog)
+local reportDiagEvent = require(script.Parent.reportDiagEvent)
+local getFormattedDiagEventInfo = require(script.Parent.getFormattedDiagEventInfo)
+
+local function v7(p1) -- line: 13
+	return `Fired Diag { p1.type }: { p1.name }, { p1.value }`
+end
+
+return function(t1: {[any]: any}) -- line: 17
+	-- upvalues: Dash (copy), getEventInfo (copy), getFormattedDiagEventInfo (copy), reportDiagEvent (copy), optionallyLog (copy), v7 (copy)
+	return function(p2, p3) -- line: 18
+		-- upvalues: Dash (copy), getEventInfo (copy), t1 (copy), getFormattedDiagEventInfo (copy), reportDiagEvent (copy), optionallyLog (copy), v7 (copy)
+		return Dash.pipe(getEventInfo(t1.eventList), getFormattedDiagEventInfo(), reportDiagEvent(t1.diagImpl), optionallyLog(t1.loggerImpl, v7))(p2, p3)
+	end
+end

@@ -61,11 +61,11 @@ function t1.loadIdleAnimationForAvatar(p3) -- line: 48
 		return nil
 	end
 
-	local v28 = v24:LoadAnimation(Animation)
+	local track = v24:LoadAnimation(Animation)
 
-	v28.Looped = true
+	track.Looped = true
 
-	return v28
+	return track
 end
 function t1.loadAnimationTrackForAvatar(s1: string, p4) -- line: 76
 	local Humanoid = p4:FindFirstChildOfClass("Humanoid")
@@ -160,9 +160,9 @@ local function getAssetIdsInHumanoidDescription(p8) -- line: 147
 	t2[p8.WalkAnimation] = true
 
 	if v7 then
-		for _, v50 in p8:GetChildren() do
-			if v50:IsA("MakeupDescription") then
-				t2[v50.AssetId] = true
+		for _, child in p8:GetChildren() do
+			if child:IsA("MakeupDescription") then
+				t2[child.AssetId] = true
 			end
 		end
 	end

@@ -1,3 +1,3 @@
 return {
-    SquadLobbySessionProvider = require(script.SquadLobbySessionProvider)
-};
+	SquadLobbySessionProvider = require(script.SquadLobbySessionProvider)
+}

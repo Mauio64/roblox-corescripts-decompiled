@@ -1,24 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ContactImporter");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v4 = require(l_script_FirstAncestor_0.Hooks.useBeginContactImporter);
-return function() --[[ Line: 10 ]] --[[ Name: ContactImporterLandingPage ]]
-    -- upvalues: l_useNavigation_0 (copy), v4 (copy), v2 (copy)
-    local l_entryPoint_0 = (l_useNavigation_0().getParam("extraProps") or {}).entryPoint;
-    local _, v7 = v4({
-        entryPoint = l_entryPoint_0
-    });
-    local v8 = v2.useCallback(function() --[[ Line: 17 ]]
-        -- upvalues: v7 (copy)
-        if v7 then
-            v7();
-        end;
-    end, {
-        v7
-    });
-    v2.useEffect(function() --[[ Line: 23 ]]
-        -- upvalues: v8 (copy)
-        v8();
-    end, {});
-end;
+local ContactImporter = script:FindFirstAncestor("ContactImporter")
+local ContactImporterParent = ContactImporter.Parent
+local React = require(ContactImporterParent.React)
+local useNavigation = require(ContactImporterParent.Navigation).useNavigation
+local useBeginContactImporter = require(ContactImporter.Hooks.useBeginContactImporter)
+
+local function ContactImporterLandingPage() -- line: 10
+	-- upvalues: useNavigation (copy), useBeginContactImporter (copy), React (copy)
+	local entryPoint = (useNavigation().getParam("extraProps") or {}).entryPoint
+	local _, v9 = useBeginContactImporter({
+		entryPoint = entryPoint
+	})
+	local v10 = React.useCallback(function() -- line: 17
+		-- upvalues: v9 (copy)
+		if v9 then
+			v9()
+		end
+	end, { v9 })
+
+	React.useEffect(function() -- line: 23
+		-- upvalues: v10 (copy)
+		v10()
+	end, {})
+end
+
+return ContactImporterLandingPage

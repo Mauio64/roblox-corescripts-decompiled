@@ -1,31 +1,33 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local l_None_0 = require(l_Parent_0.llama).None;
-local v4 = require(l_Parent_0.Rodux);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v6 = require(l_Actions_0.VoiceParticipantToggleMuted);
-local v7 = require(l_Actions_0.VoiceParticipantAdded);
-local v8 = require(l_Actions_0.VoiceParticipantRemoved);
-return v4.createReducer({}, {
-    [v7.name] = function(v9, v10) --[[ Line: 19 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        local l_userId_0 = v10.userId;
-        local v12 = v9[l_userId_0] or false;
-        return l_Dictionary_0.set(v9, l_userId_0, v12);
-    end, 
-    [v8.name] = function(v13, v14) --[[ Line: 27 ]]
-        -- upvalues: l_Dictionary_0 (copy), l_None_0 (copy)
-        return l_Dictionary_0.set(v13, v14.userId, l_None_0);
-    end, 
-    [v6.name] = function(v15, v16) --[[ Line: 32 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        if v15[v16.userId] ~= nil then
-            return l_Dictionary_0.join(v15, {
-                [v16.userId] = v16.isMuted
-            });
-        else
-            return v15;
-        end;
-    end
-});
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Dictionary = require(ExpChatParent.llama).Dictionary
+local None = require(ExpChatParent.llama).None
+local Rodux = require(ExpChatParent.Rodux)
+local Actions = ExpChat.Actions
+local VoiceParticipantToggleMuted = require(Actions.VoiceParticipantToggleMuted)
+local VoiceParticipantAdded = require(Actions.VoiceParticipantAdded)
+local VoiceParticipantRemoved = require(Actions.VoiceParticipantRemoved)
+
+return Rodux.createReducer({}, {
+	[VoiceParticipantAdded.name] = function(t1: {[any]: any}, p1) -- line: 19
+		-- upvalues: Dictionary (copy)
+		local userId = p1.userId
+		local v13 = t1[userId] or false
+
+		return Dictionary.set(t1, userId, v13)
+	end,
+	[VoiceParticipantRemoved.name] = function(t2: {[any]: any}, p2) -- line: 27
+		-- upvalues: Dictionary (copy), None (copy)
+		return Dictionary.set(t2, p2.userId, None)
+	end,
+	[VoiceParticipantToggleMuted.name] = function(t3: {[any]: any}, p3) -- line: 32
+		-- upvalues: Dictionary (copy)
+		if t3[p3.userId] ~= nil then
+			return Dictionary.join(t3, {
+				[p3.userId] = p3.isMuted
+			})
+		end
+
+		return t3
+	end
+})

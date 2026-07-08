@@ -1,11 +1,12 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Actions.CloseOpenPrompt);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: l_AvatarEditorService_0 (copy), v2 (copy)
-    return function(v4) --[[ Line: 7 ]]
-        -- upvalues: l_AvatarEditorService_0 (ref), v3 (copy), v2 (ref)
-        l_AvatarEditorService_0:SetAllowInventoryReadAccess(v3);
-        v4:dispatch(v2());
-    end;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local ParentParent = script.Parent.Parent
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+
+return function(p1) -- line: 6
+	-- upvalues: AvatarEditorService (copy), CloseOpenPrompt (copy)
+	return function(p2) -- line: 7
+		-- upvalues: AvatarEditorService (copy), p1 (copy), CloseOpenPrompt (copy)
+		AvatarEditorService:SetAllowInventoryReadAccess(p1)
+		p2:dispatch(CloseOpenPrompt())
+	end
+end

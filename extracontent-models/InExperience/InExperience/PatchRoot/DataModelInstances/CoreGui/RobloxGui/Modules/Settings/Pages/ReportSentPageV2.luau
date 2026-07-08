@@ -36,29 +36,32 @@ local v29 = ReportAbuseAnalytics.new(EventIngest.new(EventIngestService), v8.Dia
 local v30 = BlockingAnalytics.new(LocalPlayer.UserId, {
 	EventStream = RbxAnalyticsService
 })
-local v31 = (function() --[[ Initialize ]] -- line: 57
-	-- upvalues: SettingsPageFactory (copy), Create (copy)
-	local v32 = SettingsPageFactory:CreateNewPage()
 
-	v32.TabHeader = nil
-	v32.PageListLayout.Parent = nil
-	v32.ShouldShowBottomBar = false
-	v32.ShouldShowHubBar = false
-	v32.IsPageClipped = false
-	v32.Page.Name = "ReportSentPageV2"
-	v32.Page.Size = UDim2.fromScale(1, 0)
-	v32.Page.AutomaticSize = Enum.AutomaticSize.Y
-	v32.Root = Create("Frame")({
+local function Initialize() -- line: 57
+	-- upvalues: SettingsPageFactory (copy), Create (copy)
+	local v33 = SettingsPageFactory:CreateNewPage()
+
+	v33.TabHeader = nil
+	v33.PageListLayout.Parent = nil
+	v33.ShouldShowBottomBar = false
+	v33.ShouldShowHubBar = false
+	v33.IsPageClipped = false
+	v33.Page.Name = "ReportSentPageV2"
+	v33.Page.Size = UDim2.fromScale(1, 0)
+	v33.Page.AutomaticSize = Enum.AutomaticSize.Y
+	v33.Root = Create("Frame")({
 		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
 		Name = "ReportSentContents",
-		Parent = v32.Page
+		Size = UDim2.fromScale(1, 1),
+		Parent = v33.Page
 	})
 
-	return v32
-end)()
+	return v33
+end
 
-function v31.UpdateMenu(p1) -- line: 81
+local v32 = Initialize()
+
+function v32.UpdateMenu(p1) -- line: 81
 	-- upvalues: u27 (ref), Roact (copy), v29 (copy), v30 (copy), ReportConfirmationScreen (copy), v22 (copy), CoreScriptsRootProvider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), ReportConfirmationContainer (copy), v24 (copy), FFlagEnableConsoleExpControls (copy), v25 (copy)
 	local ReportedPlayer = p1.ReportedPlayer
 
@@ -92,7 +95,7 @@ function v31.UpdateMenu(p1) -- line: 81
 			Name = ReportedPlayer.Name,
 			DisplayName = ReportedPlayer.DisplayName
 		},
-		closeMenu = function() --[[ closeMenu ]] -- line: 108
+		closeMenu = function() -- line: 108
 			-- upvalues: p1 (copy)
 			p1:HandleDone()
 		end,
@@ -102,14 +105,14 @@ function v31.UpdateMenu(p1) -- line: 81
 		blockingAnalytics = v30,
 		onSizeChanged = BindableEvent.Event
 	}
-	local v37 = Roact.createElement(ReportConfirmationScreen, t1)
+	local v38 = Roact.createElement(ReportConfirmationScreen, t1)
 
 	if v22 then
-		v37 = Roact.createElement(CoreScriptsRootProvider, {}, {
+		v38 = Roact.createElement(CoreScriptsRootProvider, {}, {
 			FocusRoot = Roact.createElement(FocusRoot, {
-				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.RouterView,
 				isIsolated = true,
-				isAutoFocusRoot = true
+				isAutoFocusRoot = true,
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.RouterView
 			}, {
 				ThankYouScreenRoot = Roact.createElement(ReportConfirmationContainer, t1)
 			})
@@ -120,16 +123,16 @@ function v31.UpdateMenu(p1) -- line: 81
 		end
 	end
 
-	u27 = Roact.mount(v37, p1.Root, "ReportSentPageV2")
+	u27 = Roact.mount(v38, p1.Root, "ReportSentPageV2")
 end
-function v31.ShowReportedPlayer(p3, p4, p5) -- line: 142
-	-- upvalues: v31 (copy)
+function v32.ShowReportedPlayer(p3, p4, p5) -- line: 142
+	-- upvalues: v32 (copy)
 	p3.ReportedPlayer = p4
 	p3.isVoiceReport = p5
 	p3:UpdateMenu()
-	p3.HubRef:SwitchToPage(v31, true)
+	p3.HubRef:SwitchToPage(v32, true)
 end
-function v31.HandleDone(p6) -- line: 150
+function v32.HandleDone(p6) -- line: 150
 	-- upvalues: v22 (copy), v24 (copy), FFlagEnableConsoleExpControls (copy), v25 (copy), u27 (ref), Roact (copy)
 	if v22 and (v24 and FFlagEnableConsoleExpControls) then
 		v25:setHideShortcutBar("ReportSentPageV2", false)
@@ -153,4 +156,4 @@ function v31.HandleDone(p6) -- line: 150
 	p6.HubRef:SetVisibility(false, true)
 end
 
-return v31
+return v32

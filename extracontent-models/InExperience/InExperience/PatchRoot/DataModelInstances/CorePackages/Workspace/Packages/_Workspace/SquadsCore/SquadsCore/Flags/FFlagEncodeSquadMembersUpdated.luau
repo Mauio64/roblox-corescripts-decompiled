@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EncodeSquadMembersUpdated", false);
+return game:DefineFastFlag("EncodeSquadMembersUpdated", false)

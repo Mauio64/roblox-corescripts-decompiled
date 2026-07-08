@@ -1,1 +1,1 @@
-return require(script.useMutualFriendsForContextualInfo);
+return require(script.useMutualFriendsForContextualInfo)

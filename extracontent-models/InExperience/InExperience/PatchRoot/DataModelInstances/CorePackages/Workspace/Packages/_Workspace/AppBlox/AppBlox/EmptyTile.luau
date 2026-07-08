@@ -1,21 +1,24 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local l_View_0 = v2.View;
-return v3.memo(function(v5) --[[ Line: 19 ]] --[[ Name: EmptyTile ]]
-    -- upvalues: v3 (copy), l_View_0 (copy), v1 (copy)
-    return v3.createElement(l_View_0, {
-        LayoutOrder = v5.layoutOrder, 
-        ZIndex = v5.ZIndex, 
-        tag = "size-full"
-    }, v1.Dictionary.union(v5.children or {}, {
-        Content = v3.createElement(l_View_0, {
-            aspectRatio = v5.tileAspectRatio, 
-            Size = v5.size, 
-            tag = "bg-surface-100 padding-y-medium padding-x-small radius-medium"
-        }, {
-            ContentOverlay = v5.contentOverlayComponent
-        })
-    }));
-end);
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local Cryo = require(Parent.Cryo)
+local Foundation = require(Parent.Foundation)
+local React = require(Parent.React)
+local View = Foundation.View
+
+local function EmptyTile(t1: {[any]: any}) -- line: 19
+	-- upvalues: React (copy), View (copy), Cryo (copy)
+	return React.createElement(View, {
+		tag = "size-full",
+		LayoutOrder = t1.layoutOrder,
+		ZIndex = t1.ZIndex
+	}, Cryo.Dictionary.union(t1.children or {}, {
+		Content = React.createElement(View, {
+			tag = "bg-surface-100 padding-y-medium padding-x-small radius-medium",
+			aspectRatio = t1.tileAspectRatio,
+			Size = t1.size
+		}, {
+			ContentOverlay = t1.contentOverlayComponent
+		})
+	}))
+end
+
+return React.memo(EmptyTile)

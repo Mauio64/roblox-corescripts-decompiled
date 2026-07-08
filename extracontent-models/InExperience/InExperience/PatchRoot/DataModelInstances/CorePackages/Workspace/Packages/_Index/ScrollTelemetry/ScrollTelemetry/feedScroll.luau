@@ -1,54 +1,60 @@
-local l_Parent_0 = script:FindFirstAncestor("ScrollTelemetry").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v5 = v3.strictInterface({
-    distance = v3.number, 
-    screenSizeX = v3.number, 
-    screenSizeY = v3.number, 
-    scrollAreaSize = v3.number, 
-    scrollDepth = v3.optional(v3.number), 
-    startDepth = v3.optional(v3.number), 
-    startPos = v3.number, 
-    scrollDuration = v3.number
-});
-local v6 = v3.strictInterface({
-    distance = v3.number, 
-    screenSizeX = v3.number, 
-    screenSizeY = v3.number, 
-    scrollAreaSize = v3.number, 
-    scrollDepth = v3.optional(v3.number), 
-    startDepth = v3.optional(v3.number), 
-    startPos = v3.number, 
-    scrollDuration = v3.number, 
-    sortPos = v3.number, 
-    gameSetTypeId = v3.string, 
-    gameSetTargetId = v3.optional(v3.number)
-});
-return function(v7, v8, v9, v10) --[[ Line: 33 ]]
-    -- upvalues: v1 (copy), v5 (copy), v6 (copy), l_mutedError_0 (copy), v2 (copy)
-    v1.isType(v8, "string", "eventContext");
-    local v11 = "unknown";
-    local v12 = nil;
-    if v9 == Enum.ScrollingDirection.Y then
-        v11 = "vertical";
-        v12 = v5;
-    elseif v9 == Enum.ScrollingDirection.X then
-        v11 = "horizontal";
-        v12 = v6;
-    elseif v9 == Enum.ScrollingDirection.XY then
-        l_mutedError_0((("Direction %* is an unsupported option for feedScroll event"):format(v9.Name)));
-    end;
-    if v12 then
-        local v13, v14 = v12(v10);
-        if not v13 then
-            l_mutedError_0(v14);
-        end;
-    else
-        l_mutedError_0((("Missing interface for unknown direction %* to type check feedScroll event parameters"):format(v9.Name)));
-    end;
-    v7:sendEventDeferred(v8, "feedScroll", (v2.Dictionary.join(v10, {
-        direction = v11
-    })));
-end;
+local Parent = script:FindFirstAncestor("ScrollTelemetry").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local Cryo = require(Parent.Cryo)
+local t = require(Parent.t)
+local mutedError = require(Parent.Loggers).mutedError
+local v6 = t.strictInterface({
+	distance = t.number,
+	screenSizeX = t.number,
+	screenSizeY = t.number,
+	scrollAreaSize = t.number,
+	scrollDepth = t.optional(t.number),
+	startDepth = t.optional(t.number),
+	startPos = t.number,
+	scrollDuration = t.number
+})
+local v7 = t.strictInterface({
+	distance = t.number,
+	screenSizeX = t.number,
+	screenSizeY = t.number,
+	scrollAreaSize = t.number,
+	scrollDepth = t.optional(t.number),
+	startDepth = t.optional(t.number),
+	startPos = t.number,
+	scrollDuration = t.number,
+	sortPos = t.number,
+	gameSetTypeId = t.string,
+	gameSetTargetId = t.optional(t.number)
+})
+
+return function(p1, p2, p3, p4) -- line: 33
+	-- upvalues: ArgCheck (copy), v6 (copy), v7 (copy), mutedError (copy), Cryo (copy)
+	ArgCheck.isType(p2, "string", "eventContext")
+
+	local s1 = "unknown"
+	local v13 = nil
+
+	if p3 == Enum.ScrollingDirection.Y then
+		s1 = "vertical"
+		v13 = v6
+	elseif p3 == Enum.ScrollingDirection.X then
+		s1 = "horizontal"
+		v13 = v7
+	elseif p3 == Enum.ScrollingDirection.XY then
+		mutedError(`Direction { p3.Name } is an unsupported option for feedScroll event`)
+	end
+
+	if v13 then
+		local v14, v15 = v13(p4)
+
+		if not v14 then
+			mutedError(v15)
+		end
+	else
+		mutedError(`Missing interface for unknown direction { p3.Name } to type check feedScroll event parameters`)
+	end
+
+	p1:sendEventDeferred(p2, "feedScroll", (Cryo.Dictionary.join(p4, {
+		direction = s1
+	})))
+end

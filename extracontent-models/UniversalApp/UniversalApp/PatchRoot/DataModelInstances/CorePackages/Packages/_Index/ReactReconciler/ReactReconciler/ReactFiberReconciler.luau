@@ -1,1 +1,1 @@
-return require(script.Parent["ReactFiberReconciler.new"]);
+return require(script.Parent["ReactFiberReconciler.new"])

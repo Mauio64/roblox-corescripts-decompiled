@@ -1,27 +1,32 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.FocusNavigationContext);
-return function() --[[ Line: 11 ]] --[[ Name: useCurrentFocus ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v3 = v1.useContext(v2);
-    local v4 = if v3 then v3.focusedGuiObject:getValue() else nil;
-    local v5, v6 = v1.useState(v4);
-    v1.useEffect(function() --[[ Line: 16 ]]
-        -- upvalues: v5 (copy), v4 (copy), v6 (copy), v3 (copy)
-        if v5 ~= v4 then
-            v6(v4);
-        end;
-        if v3 then
-            local v7 = v3.focusedGuiObject:subscribe(v6);
-            return function() --[[ Line: 25 ]]
-                -- upvalues: v7 (copy)
-                v7:unsubscribe();
-            end;
-        else
-            return nil;
-        end;
-    end, {
-        v3
-    });
-    return v5;
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+local FocusNavigationContext = require(script.Parent.FocusNavigationContext)
+
+local function useCurrentFocus() -- line: 11
+	-- upvalues: React (copy), FocusNavigationContext (copy)
+	local v5 = React.useContext(FocusNavigationContext)
+	local v6 = if not v5 then nil else v5.focusedGuiObject:getValue()
+	local v7, v8 = React.useState(v6)
+
+	React.useEffect(function() -- line: 16
+		-- upvalues: v7 (copy), v6 (copy), v8 (copy), v5 (copy)
+		if v7 ~= v6 then
+			v8(v6)
+		end
+
+		if v5 then
+			local v9 = v5.focusedGuiObject:subscribe(v8)
+
+			return function() -- line: 25
+				-- upvalues: v9 (copy)
+				v9:unsubscribe()
+			end
+		end
+
+		return nil
+	end, { v5 })
+
+	return v7
+end
+
+return useCurrentFocus

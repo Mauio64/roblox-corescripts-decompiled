@@ -1,79 +1,89 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_script_FirstAncestor_0.System.useSduiContext);
-local v5 = require(l_script_FirstAncestor_0.DataStore.getSduiFeedStore);
-local v6 = require(l_script_FirstAncestor_0.System.processCollectionConfig);
-local v7 = require(l_script_FirstAncestor_0.DataStore.getItemCollectionKey);
-local _ = require(l_Parent_0.SduiCoreSystem);
-local l_FFlagSduiGetItemCollectionKeys_0 = require(l_script_FirstAncestor_0.Flags).FFlagSduiGetItemCollectionKeys;
-return function(v10, v11, v12) --[[ Line: 19 ]] --[[ Name: useSduiContextFromSignalAndProcessConfigs ]]
-    -- upvalues: v2 (copy), v5 (copy), l_FFlagSduiGetItemCollectionKeys_0 (copy), v3 (copy), v4 (copy), v7 (copy), v6 (copy)
-    local v22 = v2.useMemo(function() --[[ Line: 24 ]]
-        -- upvalues: v12 (copy), v5 (ref), v10 (copy), l_FFlagSduiGetItemCollectionKeys_0 (ref)
-        return function(v13) --[[ Line: 25 ]]
-            -- upvalues: v12 (ref), v5 (ref), v10 (ref), l_FFlagSduiGetItemCollectionKeys_0 (ref)
-            if not v12 then
-                return {};
-            else
-                local v14 = v5(v10);
-                local v15 = v14.getTemplates(v13);
-                local v16 = v14.getDataUpdatedTimestamp(v13);
-                local v17 = if l_FFlagSduiGetItemCollectionKeys_0 and v14.getItemCollectionKeys then v14.getItemCollectionKeys(v13) else {};
-                local v18 = {};
-                for _, v20 in v17 do
-                    local v21 = v14.getItemCollection(v20);
-                    if v21 then
-                        v18[v20] = v21(v13);
-                    end;
-                end;
-                return {
-                    templates = v15, 
-                    dataUpdatedTimestamp = v16, 
-                    unprocessedItemCollections = v18
-                };
-            end;
-        end;
-    end, {
-        v10, 
-        v12
-    });
-    local v23 = v3.useSignalState(v22);
-    local v24 = v4({
-        appPage = v11, 
-        templates = v23.templates, 
-        dataUpdatedTimestamp = v23.dataUpdatedTimestamp
-    });
-    v2.useEffect(function() --[[ Line: 62 ]]
-        -- upvalues: v12 (copy), v5 (ref), v11 (copy), v23 (copy), v7 (ref), v6 (ref), v24 (copy)
-        if not v12 then
-            return;
-        else
-            local v25 = v5(v11);
-            local v26 = {};
-            if v23.unprocessedItemCollections then
-                for _, v28 in v23.unprocessedItemCollections do
-                    v26[v7(v28.topicId, v28.sortIndex)] = {
-                        sduiConfig = v6(v28.componentConfig, v28.topicId, v24), 
-                        dataUpdatedTimestamp = v23.dataUpdatedTimestamp
-                    };
-                end;
-                v25.updateData({
-                    templates = v23.templates, 
-                    itemCollections = v26, 
-                    dataUpdatedTimestamp = v23.dataUpdatedTimestamp
-                });
-            end;
-            return;
-        end;
-    end, {
-        v24, 
-        v23.unprocessedItemCollections, 
-        v23.templates, 
-        v23.dataUpdatedTimestamp, 
-        v11, 
-        v12
-    });
-    return v24;
-end;
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local React = require(ServerDrivenUiParent.React)
+local SignalsReact = require(ServerDrivenUiParent.SignalsReact)
+local useSduiContext = require(ServerDrivenUi.System.useSduiContext)
+local getSduiFeedStore = require(ServerDrivenUi.DataStore.getSduiFeedStore)
+local processCollectionConfig = require(ServerDrivenUi.System.processCollectionConfig)
+local getItemCollectionKey = require(ServerDrivenUi.DataStore.getItemCollectionKey)
+
+require(ServerDrivenUiParent.SduiCoreSystem)
+
+local FFlagSduiGetItemCollectionKeys = require(ServerDrivenUi.Flags).FFlagSduiGetItemCollectionKeys
+
+local function useSduiContextFromSignalAndProcessConfigs(s1: string, s2: string, b1: boolean?) -- line: 23
+	-- upvalues: React (copy), getSduiFeedStore (copy), FFlagSduiGetItemCollectionKeys (copy), SignalsReact (copy), useSduiContext (copy), getItemCollectionKey (copy), processCollectionConfig (copy)
+	local v14 = React.useMemo(function() -- line: 28
+		-- upvalues: b1 (copy), getSduiFeedStore (copy), s1 (copy), FFlagSduiGetItemCollectionKeys (copy)
+		return function(p1) -- line: 29
+			-- upvalues: b1 (copy), getSduiFeedStore (copy), s1 (copy), FFlagSduiGetItemCollectionKeys (copy)
+			if not b1 then
+				return {}
+			end
+
+			local v22 = getSduiFeedStore(s1)
+			local v23 = v22.getTemplates(p1)
+			local v24 = v22.getDataUpdatedTimestamp(p1)
+			local t1 = {}
+
+			for _, v27 in if not FFlagSduiGetItemCollectionKeys or not v22.getItemCollectionKeys then {} else v22.getItemCollectionKeys(p1) do
+				local v28 = v22.getItemCollection(v27)
+
+				if v28 then
+					t1[v27] = v28(p1)
+				end
+			end
+
+			return {
+				templates = v23,
+				dataUpdatedTimestamp = v24,
+				unprocessedItemCollections = t1
+			}
+		end
+	end, {
+		s1,
+		b1
+	})
+	local v15 = SignalsReact.useSignalState(v14)
+	local v16 = useSduiContext({
+		appPage = s2,
+		templates = v15.templates,
+		dataUpdatedTimestamp = v15.dataUpdatedTimestamp
+	})
+
+	React.useEffect(function() -- line: 66
+		-- upvalues: b1 (copy), getSduiFeedStore (copy), s2 (copy), v15 (copy), getItemCollectionKey (copy), processCollectionConfig (copy), v16 (copy)
+		if not b1 then
+			return
+		end
+
+		local v17 = getSduiFeedStore(s2)
+		local t2 = {}
+
+		if v15.unprocessedItemCollections then
+			for _, v20 in v15.unprocessedItemCollections do
+				t2[getItemCollectionKey(v20.topicId, v20.sortIndex)] = {
+					sduiConfig = processCollectionConfig(v20.componentConfig, v20.topicId, v16),
+					dataUpdatedTimestamp = v15.dataUpdatedTimestamp
+				}
+			end
+
+			v17.updateData({
+				templates = v15.templates,
+				itemCollections = t2,
+				dataUpdatedTimestamp = v15.dataUpdatedTimestamp
+			})
+		end
+	end, {
+		v16,
+		v15.unprocessedItemCollections,
+		v15.templates,
+		v15.dataUpdatedTimestamp,
+		s2,
+		b1
+	})
+
+	return v16
+end
+
+return useSduiContextFromSignalAndProcessConfigs

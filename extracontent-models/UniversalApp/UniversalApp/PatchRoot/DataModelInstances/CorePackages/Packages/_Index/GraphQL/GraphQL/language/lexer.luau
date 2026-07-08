@@ -1,508 +1,477 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.LuauPolyfill);
-local l_Number_0 = v3.Number;
-local l_String_0 = v3.String;
-local l_isNaN_0 = l_Number_0.isNaN;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_syntaxError_0 = require(l_Parent_1.error.syntaxError).syntaxError;
-local _ = require(script.Parent.source);
-local v10 = require(l_Parent_0.tokenKind);
-local l_Token_0 = require(l_Parent_0.ast).Token;
-local l_TokenKind_0 = v10.TokenKind;
-local v13 = require(l_Parent_1.luaUtils.toUnicodeString);
-local l_dedentBlockStringValue_0 = require(l_Parent_0.blockString).dedentBlockStringValue;
-local v15 = nil;
-local v16 = nil;
-local v17 = nil;
-local v18 = nil;
-v17 = function(v19, v20, v21, v22) --[[ Line: 88 ]] --[[ Name: uniCharCode ]]
-    -- upvalues: v18 (ref)
-    local v23 = v18(v19);
-    local v24 = v18(v20);
-    local v25 = v18(v21);
-    local v26 = v18(v22);
-    if v23 < 0 or v24 < 0 or v25 < 0 or v26 < 0 then
-        return -1;
-    else
-        return (bit32.bor(bit32.lshift(v23, 12), bit32.lshift(v24, 8), bit32.lshift(v25, 4), v26));
-    end;
-end;
-v18 = function(v27) --[[ Line: 108 ]] --[[ Name: char2hex ]]
-    if v27 >= 48 and v27 <= 57 then
-        return v27 - 48;
-    elseif v27 >= 65 and v27 <= 70 then
-        return v27 - 55;
-    elseif v27 >= 97 and v27 <= 102 then
-        return v27 - 87;
-    else
-        return -1;
-    end;
-end;
-local function v49(v28, v29, v30, v31, v32) --[[ Line: 126 ]] --[[ Name: readName ]]
-    -- upvalues: l_String_0 (copy), l_isNaN_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy)
-    local l_body_0 = v28.body;
-    local v34 = string.len(l_body_0);
-    local v35 = v29 + 1;
-    local v36 = 0;
-    local function _() --[[ Line: 132 ]]
-        -- upvalues: v35 (ref), v34 (copy)
-        return v35 ~= v34 + 1;
-    end;
-    local function _() --[[ Line: 135 ]]
-        -- upvalues: v36 (ref), l_String_0 (ref), l_body_0 (copy), v35 (ref), l_isNaN_0 (ref)
-        v36 = l_String_0.charCodeAt(l_body_0, v35);
-        return not l_isNaN_0(v36);
-    end;
-    local function _() --[[ Line: 139 ]]
-        -- upvalues: v36 (ref)
-        return v36 == 95;
-    end;
-    local function _() --[[ Line: 142 ]]
-        -- upvalues: v36 (ref)
-        local v40 = false;
-        if v36 >= 48 then
-            v40 = v36 <= 57;
-        end;
-        return v40;
-    end;
-    local function _() --[[ Line: 145 ]]
-        -- upvalues: v36 (ref)
-        local v42 = false;
-        if v36 >= 65 then
-            v42 = v36 <= 90;
-        end;
-        return v42;
-    end;
-    local function _() --[[ Line: 148 ]]
-        -- upvalues: v36 (ref)
-        local v44 = false;
-        if v36 >= 97 then
-            v44 = v36 <= 122;
-        end;
-        return v44;
-    end;
-    local function _() --[[ Line: 151 ]]
-        -- upvalues: v36 (ref)
-        local v46 = v36 == 95;
-        if not v46 then
-            v46 = false;
-            if v36 >= 48 then
-                v46 = v36 <= 57;
-            end;
-            if not v46 then
-                v46 = false;
-                if v36 >= 65 then
-                    v46 = v36 <= 90;
-                end;
-                if not v46 then
-                    v46 = false;
-                    if v36 >= 97 then
-                        v46 = v36 <= 122;
-                    end;
-                end;
-            end;
-        end;
-        return v46;
-    end;
-    while v34 + 1 ~= v35 do
-        v36 = l_String_0.charCodeAt(l_body_0, v35);
-        if not l_isNaN_0(v36) then
-            local v48 = v36 == 95;
-            if not v48 then
-                v48 = false;
-                if v36 >= 48 then
-                    v48 = v36 <= 57;
-                end;
-                if not v48 then
-                    v48 = false;
-                    if v36 >= 65 then
-                        v48 = v36 <= 90;
-                    end;
-                    if not v48 then
-                        v48 = false;
-                        if v36 >= 97 then
-                            v48 = v36 <= 122;
-                        end;
-                    end;
-                end;
-            end;
-            if v48 then
-                v35 = v35 + 1;
-            else
-                break;
-            end;
-        else
-            break;
-        end;
-    end;
-    return l_Token_0.new(l_TokenKind_0.NAME, v29, v35, v30, v31, v32, l_String_0.slice(l_body_0, v29, v35));
-end;
-local function v58(v50, v51, v52, v53, v54) --[[ Line: 179 ]] --[[ Name: readComment ]]
-    -- upvalues: l_String_0 (copy), l_isNaN_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy)
-    local l_body_1 = v50.body;
-    local v56 = nil;
-    local l_v51_0 = v51;
-    repeat
-        l_v51_0 = l_v51_0 + 1;
-        v56 = l_String_0.charCodeAt(l_body_1, l_v51_0);
-    until l_isNaN_0(v56) or v56 <= 31 and v56 ~= 9;
-    return l_Token_0.new(l_TokenKind_0.COMMENT, v51, l_v51_0, v52, v53, v54, l_String_0.slice(l_body_1, v51 + 1, l_v51_0));
-end;
-printCharCode = function(v59) --[[ Line: 201 ]] --[[ Name: printCharCode ]]
-    -- upvalues: l_isNaN_0 (copy), l_TokenKind_0 (copy), l_HttpService_0 (copy), v13 (copy)
-    if l_isNaN_0(v59) then
-        return l_TokenKind_0.EOF;
-    elseif v59 < 127 then
-        return l_HttpService_0:JSONEncode((string.char(v59)));
-    else
-        return v13(v59);
-    end;
-end;
-readDigits = function(v60, v61, v62) --[[ Line: 220 ]] --[[ Name: readDigits ]]
-    -- upvalues: l_String_0 (copy), l_syntaxError_0 (copy)
-    local l_body_2 = v60.body;
-    local l_v61_0 = v61;
-    local l_v62_0 = v62;
-    if l_v62_0 >= 48 and l_v62_0 <= 57 then
-        repeat
-            l_v61_0 = l_v61_0 + 1;
-            l_v62_0 = l_String_0.charCodeAt(l_body_2, l_v61_0);
-        until l_v62_0 < 48 or l_v62_0 > 57;
-        return l_v61_0;
-    else
-        error(l_syntaxError_0(v60, l_v61_0, "Invalid number, expected digit but got: " .. printCharCode(l_v62_0) .. "."));
-        return;
-    end;
-end;
-unexpectedCharacterMessage = function(v66) --[[ Line: 245 ]] --[[ Name: unexpectedCharacterMessage ]]
-    if v66 < 32 and v66 ~= 9 and v66 ~= 10 and v66 ~= 13 then
-        return "Cannot contain the invalid character " .. printCharCode(v66) .. ".";
-    elseif v66 == 39 then
-        return "Unexpected single quote character ('), did you mean to use a double quote (\")?";
-    else
-        return "Cannot parse the unexpected character " .. printCharCode(v66) .. ".";
-    end;
-end;
-isNameStart = function(v67) --[[ Line: 259 ]] --[[ Name: isNameStart ]]
-    local v68 = v67 == 95;
-    local v69 = false;
-    if v67 >= 65 then
-        v69 = v67 <= 90;
-    end;
-    local v70 = false;
-    if v67 >= 97 then
-        v70 = v67 <= 122;
-    end;
-    return v68 or v69 or v70;
-end;
-readNumber = function(v71, v72, v73, v74, v75, v76) --[[ Line: 274 ]] --[[ Name: readNumber ]]
-    -- upvalues: l_String_0 (copy), l_syntaxError_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy)
-    local l_body_3 = v71.body;
-    local l_v73_0 = v73;
-    local l_v72_0 = v72;
-    local v80 = false;
-    if l_v73_0 == 45 then
-        l_v72_0 = l_v72_0 + 1;
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-    end;
-    if l_v73_0 == 48 then
-        l_v72_0 = l_v72_0 + 1;
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-        if l_v73_0 >= 48 and l_v73_0 <= 57 then
-            error(l_syntaxError_0(v71, l_v72_0, "Invalid number, unexpected digit after 0: " .. printCharCode(l_v73_0) .. "."));
-        end;
-    else
-        l_v72_0 = readDigits(v71, l_v72_0, l_v73_0);
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-    end;
-    if l_v73_0 == 46 then
-        v80 = true;
-        l_v72_0 = l_v72_0 + 1;
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-        l_v72_0 = readDigits(v71, l_v72_0, l_v73_0);
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-    end;
-    if l_v73_0 == 69 or l_v73_0 == 101 then
-        v80 = true;
-        l_v72_0 = l_v72_0 + 1;
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-        if l_v73_0 == 43 or l_v73_0 == 45 then
-            l_v72_0 = l_v72_0 + 1;
-            l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-        end;
-        l_v72_0 = readDigits(v71, l_v72_0, l_v73_0);
-        l_v73_0 = l_String_0.charCodeAt(l_body_3, l_v72_0);
-    end;
-    if l_v73_0 == 46 or isNameStart(l_v73_0) then
-        error(l_syntaxError_0(v71, l_v72_0, "Invalid number, expected digit but got: " .. printCharCode(l_v73_0) .. "."));
-    end;
-    return l_Token_0.new(v80 and l_TokenKind_0.FLOAT or l_TokenKind_0.INT, v72, l_v72_0, v74, v75, v76, l_String_0.slice(l_body_3, v72, l_v72_0));
-end;
-local function v92(v81, v82) --[[ Line: 359 ]] --[[ Name: readToken ]]
-    -- upvalues: l_String_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy), v58 (copy), v15 (ref), v16 (ref), v49 (copy), l_syntaxError_0 (copy)
-    local l_source_0 = v81.source;
-    local l_body_4 = l_source_0.body;
-    local v85 = utf8.len(l_body_4);
-    assert(v85 ~= nil, "invalid utf8 supplied for token");
-    local l__end_0 = v82._end;
-    while true do
-        if l__end_0 <= v85 then
-            local v87 = l_String_0.charCodeAt(l_body_4, l__end_0);
-            local l_line_0 = v81.line;
-            local v89 = l__end_0 - v81.lineStart;
-            if v87 == 65279 or v87 == 9 or v87 == 32 or v87 == 44 then
-                l__end_0 = l__end_0 + 1;
-            elseif v87 == 10 then
-                l__end_0 = l__end_0 + 1;
-                v81.line = v81.line + 1;
-                v81.lineStart = l__end_0 - 1;
-            elseif v87 == 13 then
-                if l_String_0.charCodeAt(l_body_4, l__end_0 + 1) == 10 then
-                    l__end_0 = l__end_0 + 2;
-                else
-                    l__end_0 = l__end_0 + 1;
-                end;
-                v81.line = v81.line + 1;
-                v81.lineStart = l__end_0 - 1;
-            elseif v87 == 33 then
-                return l_Token_0.new(l_TokenKind_0.BANG, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-            elseif v87 == 35 then
-                return v58(l_source_0, l__end_0, l_line_0, v89, v82);
-            elseif v87 == 36 then
-                return l_Token_0.new(l_TokenKind_0.DOLLAR, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-            elseif v87 == 38 then
-                return l_Token_0.new(l_TokenKind_0.AMP, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-            elseif v87 == 40 then
-                return l_Token_0.new(l_TokenKind_0.PAREN_L, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-            elseif v87 == 41 then
-                return l_Token_0.new(l_TokenKind_0.PAREN_R, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-            else
-                if v87 == 46 then
-                    if l_String_0.charCodeAt(l_body_4, l__end_0 + 1) == 46 and l_String_0.charCodeAt(l_body_4, l__end_0 + 2) == 46 then
-                        return l_Token_0.new(l_TokenKind_0.SPREAD, l__end_0, l__end_0 + 3, l_line_0, v89, v82);
-                    end;
-                elseif v87 == 58 then
-                    return l_Token_0.new(l_TokenKind_0.COLON, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 61 then
-                    return l_Token_0.new(l_TokenKind_0.EQUALS, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 64 then
-                    return l_Token_0.new(l_TokenKind_0.AT, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 91 then
-                    return l_Token_0.new(l_TokenKind_0.BRACKET_L, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 93 then
-                    return l_Token_0.new(l_TokenKind_0.BRACKET_R, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 123 then
-                    return l_Token_0.new(l_TokenKind_0.BRACE_L, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 124 then
-                    return l_Token_0.new(l_TokenKind_0.PIPE, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 125 then
-                    return l_Token_0.new(l_TokenKind_0.BRACE_R, l__end_0, l__end_0 + 1, l_line_0, v89, v82);
-                elseif v87 == 34 then
-                    if l_String_0.charCodeAt(l_body_4, l__end_0 + 1) == 34 and l_String_0.charCodeAt(l_body_4, l__end_0 + 2) == 34 then
-                        return v15(l_source_0, l__end_0, l_line_0, v89, v82, v81);
-                    else
-                        return v16(l_source_0, l__end_0, l_line_0, v89, v82);
-                    end;
-                elseif v87 == 45 or v87 == 48 or v87 == 49 or v87 == 50 or v87 == 51 or v87 == 52 or v87 == 53 or v87 == 54 or v87 == 55 or v87 == 56 or v87 == 57 then
-                    return readNumber(l_source_0, l__end_0, v87, l_line_0, v89, v82);
-                elseif v87 == 65 or v87 == 66 or v87 == 67 or v87 == 68 or v87 == 69 or v87 == 70 or v87 == 71 or v87 == 72 or v87 == 73 or v87 == 74 or v87 == 75 or v87 == 76 or v87 == 77 or v87 == 78 or v87 == 79 or v87 == 80 or v87 == 81 or v87 == 82 or v87 == 83 or v87 == 84 or v87 == 85 or v87 == 86 or v87 == 87 or v87 == 88 or v87 == 89 or v87 == 90 or v87 == 95 or v87 == 97 or v87 == 98 or v87 == 99 or v87 == 100 or v87 == 101 or v87 == 102 or v87 == 103 or v87 == 104 or v87 == 105 or v87 == 106 or v87 == 107 or v87 == 108 or v87 == 109 or v87 == 110 or v87 == 111 or v87 == 112 or v87 == 113 or v87 == 114 or v87 == 115 or v87 == 116 or v87 == 117 or v87 == 118 or v87 == 119 or v87 == 120 or v87 == 121 or v87 == 122 then
-                    return v49(l_source_0, l__end_0, l_line_0, v89, v82);
-                end;
-                error(l_syntaxError_0(l_source_0, l__end_0, unexpectedCharacterMessage(v87)));
-            end;
-        else
-            local l_line_1 = v81.line;
-            local v91 = l__end_0 - v81.lineStart;
-            return l_Token_0.new(l_TokenKind_0.EOF, v85 + 1, v85 + 1, l_line_1, v91, v82);
-        end;
-    end;
-end;
-local v93 = {};
-v93.__index = v93;
-v93.new = function(v94) --[[ Line: 558 ]] --[[ Name: new ]]
-    -- upvalues: l_Token_0 (copy), l_TokenKind_0 (copy), v93 (copy)
-    local v95 = l_Token_0.new(l_TokenKind_0.SOF, 1, 1, 0, 0, nil);
-    return (setmetatable({
-        source = v94, 
-        lastToken = v95, 
-        token = v95, 
-        line = 1, 
-        lineStart = 0
-    }, v93));
-end;
-v93.advance = function(v96) --[[ Line: 571 ]] --[[ Name: advance ]]
-    v96.lastToken = v96.token;
-    v96.token = v96:lookahead();
-    return v96.token;
-end;
-v93.lookahead = function(v97) --[[ Line: 577 ]] --[[ Name: lookahead ]]
-    -- upvalues: l_TokenKind_0 (copy), v92 (copy)
-    local l_token_0 = v97.token;
-    if l_token_0.kind ~= l_TokenKind_0.EOF then
-        repeat
-            if l_token_0.next then
-                l_token_0 = l_token_0.next;
-            else
-                local v99 = v92(v97, l_token_0);
-                l_token_0.next = v99;
-                v99.prev = l_token_0;
-                l_token_0 = v99;
-            end;
-        until l_token_0.kind ~= l_TokenKind_0.COMMENT;
-    end;
-    return l_token_0;
-end;
-local function v102(v100) --[[ Line: 600 ]] --[[ Name: isPunctuatorTokenKind ]]
-    -- upvalues: l_TokenKind_0 (copy)
-    local v101 = true;
-    if v100 ~= l_TokenKind_0.BANG then
-        v101 = true;
-        if v100 ~= l_TokenKind_0.DOLLAR then
-            v101 = true;
-            if v100 ~= l_TokenKind_0.AMP then
-                v101 = true;
-                if v100 ~= l_TokenKind_0.PAREN_L then
-                    v101 = true;
-                    if v100 ~= l_TokenKind_0.PAREN_R then
-                        v101 = true;
-                        if v100 ~= l_TokenKind_0.SPREAD then
-                            v101 = true;
-                            if v100 ~= l_TokenKind_0.COLON then
-                                v101 = true;
-                                if v100 ~= l_TokenKind_0.EQUALS then
-                                    v101 = true;
-                                    if v100 ~= l_TokenKind_0.AT then
-                                        v101 = true;
-                                        if v100 ~= l_TokenKind_0.BRACKET_L then
-                                            v101 = true;
-                                            if v100 ~= l_TokenKind_0.BRACKET_R then
-                                                v101 = true;
-                                                if v100 ~= l_TokenKind_0.BRACE_L then
-                                                    v101 = true;
-                                                    if v100 ~= l_TokenKind_0.PIPE then
-                                                        v101 = v100 == l_TokenKind_0.BRACE_R;
-                                                    end;
-                                                end;
-                                            end;
-                                        end;
-                                    end;
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    return v101;
-end;
-v15 = function(v103, v104, v105, v106, v107, v108) --[[ Line: 623 ]] --[[ Name: readBlockString ]]
-    -- upvalues: l_isNaN_0 (copy), l_String_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy), l_dedentBlockStringValue_0 (copy), l_syntaxError_0 (copy)
-    local l_body_5 = v103.body;
-    local v110 = v104 + 3;
-    local l_v110_0 = v110;
-    local v112 = 0;
-    local v113 = "";
-    while true do
-        if v110 <= string.len(l_body_5) and not l_isNaN_0(l_String_0.charCodeAt(l_body_5, v110)) then
-            v112 = l_String_0.charCodeAt(l_body_5, v110);
-            if v112 == 34 and l_String_0.charCodeAt(l_body_5, v110 + 1) == 34 and l_String_0.charCodeAt(l_body_5, v110 + 2) == 34 then
-                v113 = v113 .. l_String_0.slice(l_body_5, l_v110_0, v110);
-                return l_Token_0.new(l_TokenKind_0.BLOCK_STRING, v104, v110 + 3, v105, v106, v107, l_dedentBlockStringValue_0(v113));
-            else
-                if v112 < 32 and v112 ~= 9 and v112 ~= 10 and v112 ~= 13 then
-                    error(l_syntaxError_0(v103, v110, "Invalid character within String: " .. printCharCode(v112) .. "."));
-                end;
-                if v112 == 10 then
-                    v110 = v110 + 1;
-                    v108.line = v108.line + 1;
-                    v108.lineStart = v110 - 1;
-                elseif v112 == 13 then
-                    if l_String_0.charCodeAt(l_body_5, v110 + 1) == 10 then
-                        v110 = v110 + 2;
-                    else
-                        v110 = v110 + 1;
-                    end;
-                    v108.line = v108.line + 1;
-                    v108.lineStart = v110 - 1;
-                elseif v112 == 92 and l_String_0.charCodeAt(l_body_5, v110 + 1) == 34 and l_String_0.charCodeAt(l_body_5, v110 + 2) == 34 and l_String_0.charCodeAt(l_body_5, v110 + 3) == 34 then
-                    v113 = v113 .. l_String_0.slice(l_body_5, l_v110_0, v110) .. "\"\"\"";
-                    v110 = v110 + 4;
-                    l_v110_0 = v110;
-                else
-                    v110 = v110 + 1;
-                end;
-            end;
-        else
-            error(l_syntaxError_0(v103, v110, "Unterminated string."));
-            return;
-        end;
-    end;
-end;
-v16 = function(v114, v115, v116, v117, v118) --[[ Line: 697 ]] --[[ Name: readString ]]
-    -- upvalues: l_String_0 (copy), l_isNaN_0 (copy), l_Token_0 (copy), l_TokenKind_0 (copy), l_syntaxError_0 (copy), v17 (ref)
-    local l_body_6 = v114.body;
-    local v120 = utf8.len(l_body_6);
-    assert(v120 ~= nil, "invalid utf8 sequence detected");
-    local v121 = v115 + 1;
-    local l_v121_0 = v121;
-    local v123 = "";
-    while v121 <= v120 do
-        local v124 = l_String_0.charCodeAt(l_body_6, v121);
-        if not l_isNaN_0(v124) then
-            if v124 == 34 then
-                v123 = v123 .. l_String_0.slice(l_body_6, l_v121_0, v121);
-                return l_Token_0.new(l_TokenKind_0.STRING, v115, v121 + 1, v116, v117, v118, v123);
-            elseif v124 ~= 10 and v124 ~= 13 then
-                if v124 < 32 and v124 ~= 9 then
-                    error(l_syntaxError_0(v114, v121, "Invalid character within String: " .. printCharCode(v124) .. "."));
-                end;
-                v121 = v121 + 1;
-                if v124 == 92 then
-                    v123 = v123 .. l_String_0.slice(l_body_6, l_v121_0, v121 - 1);
-                    v124 = l_String_0.charCodeAt(l_body_6, v121);
-                    if v124 == 34 then
-                        v123 = v123 .. "\"";
-                    elseif v124 == 47 then
-                        v123 = v123 .. "/";
-                    elseif v124 == 92 then
-                        v123 = v123 .. "\\";
-                    elseif v124 == 98 then
-                        v123 = v123 .. "\b";
-                    elseif v124 == 102 then
-                        v123 = v123 .. "\f";
-                    elseif v124 == 110 then
-                        v123 = v123 .. "\n";
-                    elseif v124 == 114 then
-                        v123 = v123 .. "\r";
-                    elseif v124 == 116 then
-                        v123 = v123 .. "\t";
-                    elseif v124 == 117 then
-                        local v125 = v17(l_String_0.charCodeAt(l_body_6, v121 + 1), l_String_0.charCodeAt(l_body_6, v121 + 2), l_String_0.charCodeAt(l_body_6, v121 + 3), l_String_0.charCodeAt(l_body_6, v121 + 4));
-                        if v125 < 0 then
-                            local v126 = l_String_0.slice(l_body_6, v121 + 1, v121 + 5);
-                            error(l_syntaxError_0(v114, v121, "Invalid character escape sequence: \\u" .. v126 .. "."));
-                        end;
-                        v123 = v123 .. utf8.char(v125);
-                        v121 = v121 + 4;
-                    else
-                        error(l_syntaxError_0(v114, v121, "Invalid character escape sequence: \\" .. utf8.char(v124) .. "."));
-                    end;
-                    v121 = v121 + 1;
-                    l_v121_0 = v121;
-                end;
-            else
-                break;
-            end;
-        else
-            break;
-        end;
-    end;
-    error(l_syntaxError_0(v114, v121, "Unterminated string."));
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local LuauPolyfill = require(scriptParentParentParent.LuauPolyfill)
+local Number = LuauPolyfill.Number
+local String = LuauPolyfill.String
+local isNaN = Number.isNaN
+local HttpService = game:GetService("HttpService")
+local syntaxError = require(scriptParentParent.error.syntaxError).syntaxError
+
+require(script.Parent.source)
+
+local tokenKind = require(scriptParent.tokenKind)
+local Token = require(scriptParent.ast).Token
+local TokenKind = tokenKind.TokenKind
+local toUnicodeString = require(scriptParentParent.luaUtils.toUnicodeString)
+local dedentBlockStringValue = require(scriptParent.blockString).dedentBlockStringValue
+local readBlockString = nil
+local readString = nil
+local char2hex = nil
+
+local function uniCharCode(p1, p2, p3, p4) -- line: 88
+	-- upvalues: char2hex (ref)
+	local v27 = char2hex(p1)
+	local v28 = char2hex(p2)
+	local v29 = char2hex(p3)
+	local v30 = char2hex(p4)
+
+	if v27 < 0 or (v28 < 0 or v29 < 0 or v30 < 0) then
+		return -1
+	end
+
+	return (bit32.bor(bit32.lshift(v27, 12), bit32.lshift(v28, 8), bit32.lshift(v29, 4), v30))
+end
+
+function char2hex(p5) -- line: 108
+	if p5 >= 48 and p5 <= 57 then
+		return p5 - 48
+	end
+
+	if p5 >= 65 and p5 <= 70 then
+		return p5 - 55
+	end
+
+	if p5 >= 97 and p5 <= 102 then
+		return p5 - 87
+	end
+
+	return -1
+end
+
+local function readName(p6, n1: number, n2: number, n3: number, p7) -- line: 126
+	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy)
+	local body = p6.body
+	local v38 = string.len(body)
+	local u39 = n1 + 1
+	local n4 = 0
+
+	while u39 ~= v38 + 1 do
+		n4 = String.charCodeAt(body, u39)
+
+		if not not isNaN(n4) or not (n4 == 95 or (n4 >= 48 and n4 <= 57 or (n4 >= 65 and n4 <= 90 or n4 >= 97 and n4 <= 122))) then
+			break
+		end
+
+		u39 += 1
+	end
+
+	return Token.new(TokenKind.NAME, n1, u39, n2, n3, p7, String.slice(body, n1, u39))
+end
+local function readComment(p8, n5: number, n6: number, n7: number, p9) -- line: 179
+	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy)
+	local body = p8.body
+	local v47 = n5
+
+	repeat
+		v47 += 1
+
+		local v48 = String.charCodeAt(body, v47)
+	until isNaN(v48) or not (v48 > 31) and v48 ~= 9
+
+	return Token.new(TokenKind.COMMENT, n5, v47, n6, n7, p9, String.slice(body, n5 + 1, v47))
+end
+
+function printCharCode(n8: number) -- line: 201
+	-- upvalues: isNaN (copy), TokenKind (copy), HttpService (copy), toUnicodeString (copy)
+	if isNaN(n8) then
+		return TokenKind.EOF
+	end
+
+	if n8 < 127 then
+		return HttpService:JSONEncode((string.char(n8)))
+	end
+
+	return toUnicodeString(n8)
+end
+function readDigits(p10, n9: number, n10: number) -- line: 220
+	-- upvalues: String (copy), syntaxError (copy)
+	local body = p10.body
+
+	if n10 >= 48 and n10 <= 57 then
+		repeat
+			n9 += 1
+
+			local v54 = String.charCodeAt(body, n9)
+		until not (v54 >= 48) or not (v54 <= 57)
+
+		return n9
+	end
+
+	error(syntaxError(p10, n9, "Invalid number, expected digit but got: " .. printCharCode(n10) .. "."))
+end
+function unexpectedCharacterMessage(n11: number) -- line: 245
+	if n11 < 32 and (n11 ~= 9 and n11 ~= 10 and n11 ~= 13) then
+		return "Cannot contain the invalid character " .. printCharCode(n11) .. "."
+	end
+
+	if n11 == 39 then
+		return "Unexpected single quote character ('), did you mean to use a double quote (\")?"
+	end
+
+	return "Cannot parse the unexpected character " .. printCharCode(n11) .. "."
+end
+function isNameStart(n12: number) -- line: 259
+	local v57 = n12 == 95
+	local v58 = n12 >= 65 and n12 <= 90
+	local v59 = n12 >= 97 and n12 <= 122
+
+	return v57 or (v58 or v59)
+end
+function readNumber(p11, n13: number, n14: number, n15: number, n16: number, p12) -- line: 274
+	-- upvalues: String (copy), syntaxError (copy), Token (copy), TokenKind (copy)
+	local body = p11.body
+	local v67 = n13
+	local v68 = false
+
+	if n14 == 45 then
+		v67 += 1
+		n14 = String.charCodeAt(body, v67)
+	end
+
+	local v69, v70
+
+	if n14 == 48 then
+		v69 = v67 + 1
+		v70 = String.charCodeAt(body, v69)
+
+		if v70 >= 48 and v70 <= 57 then
+			error(syntaxError(p11, v69, "Invalid number, unexpected digit after 0: " .. printCharCode(v70) .. "."))
+		end
+	else
+		v69 = readDigits(p11, v67, n14)
+		v70 = String.charCodeAt(body, v69)
+	end
+
+	if v70 == 46 then
+		v68 = true
+
+		local v71 = v69 + 1
+		local v72 = String.charCodeAt(body, v71)
+
+		v69 = readDigits(p11, v71, v72)
+		v70 = String.charCodeAt(body, v69)
+	end
+
+	if v70 == 69 or v70 == 101 then
+		v68 = true
+
+		local v73 = v69 + 1
+		local v74 = String.charCodeAt(body, v73)
+
+		if v74 == 43 or v74 == 45 then
+			v73 += 1
+			v74 = String.charCodeAt(body, v73)
+		end
+
+		v69 = readDigits(p11, v73, v74)
+		v70 = String.charCodeAt(body, v69)
+	end
+
+	if v70 == 46 or isNameStart(v70) then
+		error(syntaxError(p11, v69, "Invalid number, expected digit but got: " .. printCharCode(v70) .. "."))
+	end
+
+	return Token.new(v68 and TokenKind.FLOAT or TokenKind.INT, n13, v69, n15, n16, p12, String.slice(body, n13, v69))
+end
+
+local function readToken(t1: {[any]: any}, p13) -- line: 359
+	-- upvalues: String (copy), Token (copy), TokenKind (copy), readComment (copy), readBlockString (ref), readString (ref), readName (copy), syntaxError (copy)
+	local source = t1.source
+	local body = source.body
+	local v79 = utf8.len(body)
+
+	assert(v79 ~= nil, "invalid utf8 supplied for token")
+
+	local _end = p13._end
+
+	while _end <= v79 do
+		local v81 = String.charCodeAt(body, _end)
+		local line = t1.line
+		local v83 = _end - t1.lineStart
+
+		if v81 == 65279 or v81 == 9 or v81 == 32 or v81 == 44 then
+			_end += 1
+
+			continue
+		end
+
+		if v81 == 10 then
+			_end += 1
+			t1.line = t1.line + 1
+			t1.lineStart = _end - 1
+
+			continue
+		end
+
+		if v81 == 13 then
+			_end = if String.charCodeAt(body, _end + 1) ~= 10 then _end + 1 else _end + 2
+			t1.line = t1.line + 1
+			t1.lineStart = _end - 1
+
+			continue
+		end
+
+		if v81 == 33 then
+			return Token.new(TokenKind.BANG, _end, _end + 1, line, v83, p13)
+		end
+
+		if v81 == 35 then
+			return readComment(source, _end, line, v83, p13)
+		end
+
+		if v81 == 36 then
+			return Token.new(TokenKind.DOLLAR, _end, _end + 1, line, v83, p13)
+		end
+
+		if v81 == 38 then
+			return Token.new(TokenKind.AMP, _end, _end + 1, line, v83, p13)
+		end
+
+		if v81 == 40 then
+			return Token.new(TokenKind.PAREN_L, _end, _end + 1, line, v83, p13)
+		end
+
+		if v81 == 41 then
+			return Token.new(TokenKind.PAREN_R, _end, _end + 1, line, v83, p13)
+		end
+
+		if v81 == 46 then
+			if String.charCodeAt(body, _end + 1) == 46 and String.charCodeAt(body, _end + 2) == 46 then
+				return Token.new(TokenKind.SPREAD, _end, _end + 3, line, v83, p13)
+			end
+		else
+			if v81 == 58 then
+				return Token.new(TokenKind.COLON, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 61 then
+				return Token.new(TokenKind.EQUALS, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 64 then
+				return Token.new(TokenKind.AT, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 91 then
+				return Token.new(TokenKind.BRACKET_L, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 93 then
+				return Token.new(TokenKind.BRACKET_R, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 123 then
+				return Token.new(TokenKind.BRACE_L, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 124 then
+				return Token.new(TokenKind.PIPE, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 125 then
+				return Token.new(TokenKind.BRACE_R, _end, _end + 1, line, v83, p13)
+			end
+
+			if v81 == 34 then
+				if String.charCodeAt(body, _end + 1) == 34 and String.charCodeAt(body, _end + 2) == 34 then
+					return readBlockString(source, _end, line, v83, p13, t1)
+				end
+
+				return readString(source, _end, line, v83, p13)
+			end
+
+			if v81 == 45 or v81 == 48 or v81 == 49 or v81 == 50 or v81 == 51 or v81 == 52 or v81 == 53 or v81 == 54 or v81 == 55 or v81 == 56 or v81 == 57 then
+				return readNumber(source, _end, v81, line, v83, p13)
+			end
+
+			if v81 == 65 or v81 == 66 or v81 == 67 or v81 == 68 or v81 == 69 or v81 == 70 or v81 == 71 or v81 == 72 or v81 == 73 or v81 == 74 or v81 == 75 or v81 == 76 or v81 == 77 or v81 == 78 or v81 == 79 or v81 == 80 or v81 == 81 or v81 == 82 or v81 == 83 or v81 == 84 or v81 == 85 or v81 == 86 or v81 == 87 or v81 == 88 or v81 == 89 or v81 == 90 or v81 == 95 or v81 == 97 or v81 == 98 or v81 == 99 or v81 == 100 or v81 == 101 or v81 == 102 or v81 == 103 or v81 == 104 or v81 == 105 or v81 == 106 or v81 == 107 or v81 == 108 or v81 == 109 or v81 == 110 or v81 == 111 or v81 == 112 or v81 == 113 or v81 == 114 or v81 == 115 or v81 == 116 or v81 == 117 or v81 == 118 or v81 == 119 or v81 == 120 or v81 == 121 or v81 == 122 then
+				return readName(source, _end, line, v83, p13)
+			end
+		end
+
+		error(syntaxError(source, _end, unexpectedCharacterMessage(v81)))
+	end
+
+	local line = t1.line
+	local v85 = _end - t1.lineStart
+
+	return Token.new(TokenKind.EOF, v79 + 1, v79 + 1, line, v85, p13)
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(p14) -- line: 558
+	-- upvalues: Token (copy), TokenKind (copy), t2 (copy)
+	local v87 = Token.new(TokenKind.SOF, 1, 1, 0, 0, nil)
+
+	return (setmetatable({
+		source = p14,
+		lastToken = v87,
+		token = v87,
+		line = 1,
+		lineStart = 0
+	}, t2))
+end
+function t2.advance(p15) -- line: 571
+	p15.lastToken = p15.token
+	p15.token = p15:lookahead()
+
+	return p15.token
+end
+function t2.lookahead(p16) -- line: 577
+	-- upvalues: TokenKind (copy), readToken (copy)
+	local token = p16.token
+
+	if token.kind ~= TokenKind.EOF then
+		repeat
+			if token.next then
+				token = token.next
+			else
+				local v91 = readToken(p16, token)
+
+				token.next = v91
+				v91.prev = token
+				token = v91
+			end
+		until token.kind ~= TokenKind.COMMENT
+	end
+
+	return token
+end
+function readBlockString(p17, p18, p19, p20, p21, p22) -- line: 623
+	-- upvalues: isNaN (copy), String (copy), Token (copy), TokenKind (copy), dedentBlockStringValue (copy), syntaxError (copy)
+	local body = p17.body
+	local v100 = p18 + 3
+	local v101 = v100
+	local s1 = ""
+
+	while v100 <= string.len(body) and not isNaN(String.charCodeAt(body, v100)) do
+		local v103 = String.charCodeAt(body, v100)
+
+		if v103 == 34 and String.charCodeAt(body, v100 + 1) == 34 and String.charCodeAt(body, v100 + 2) == 34 then
+			local v104 = s1 .. String.slice(body, v101, v100)
+
+			return Token.new(TokenKind.BLOCK_STRING, p18, v100 + 3, p19, p20, p21, dedentBlockStringValue(v104))
+		end
+
+		if v103 < 32 and v103 ~= 9 and v103 ~= 10 and v103 ~= 13 then
+			error(syntaxError(p17, v100, "Invalid character within String: " .. printCharCode(v103) .. "."))
+		end
+
+		if v103 == 10 then
+			v100 += 1
+			p22.line = p22.line + 1
+			p22.lineStart = v100 - 1
+		elseif v103 == 13 then
+			v100 = if String.charCodeAt(body, v100 + 1) ~= 10 then v100 + 1 else v100 + 2
+			p22.line = p22.line + 1
+			p22.lineStart = v100 - 1
+		elseif v103 == 92 and String.charCodeAt(body, v100 + 1) == 34 and String.charCodeAt(body, v100 + 2) == 34 and String.charCodeAt(body, v100 + 3) == 34 then
+			s1 ..= String.slice(body, v101, v100) .. "\"\"\""
+			v100 += 4
+			v101 = v100
+		else
+			v100 += 1
+		end
+	end
+
+	error(syntaxError(p17, v100, "Unterminated string."))
+end
+function readString(p23, p24, p25, p26, p27) -- line: 697
+	-- upvalues: String (copy), isNaN (copy), Token (copy), TokenKind (copy), syntaxError (copy), uniCharCode (ref)
+	local body = p23.body
+	local v111 = utf8.len(body)
+
+	assert(v111 ~= nil, "invalid utf8 sequence detected")
+
+	local v112 = p24 + 1
+	local v113 = v112
+	local s2 = ""
+
+	while v112 <= v111 do
+		local v115 = String.charCodeAt(body, v112)
+
+		if isNaN(v115) then
+			break
+		end
+
+		if v115 == 34 then
+			local v116 = s2 .. String.slice(body, v113, v112)
+
+			return Token.new(TokenKind.STRING, p24, v112 + 1, p25, p26, p27, v116)
+		end
+
+		if v115 == 10 or v115 == 13 then
+			break
+		end
+
+		if v115 < 32 and v115 ~= 9 then
+			error(syntaxError(p23, v112, "Invalid character within String: " .. printCharCode(v115) .. "."))
+		end
+
+		v112 += 1
+
+		if v115 == 92 then
+			s2 ..= String.slice(body, v113, v112 - 1)
+
+			local v117 = String.charCodeAt(body, v112)
+
+			if v117 == 34 then
+				s2 ..= "\""
+			elseif v117 == 47 then
+				s2 ..= "/"
+			elseif v117 == 92 then
+				s2 ..= "\\"
+			elseif v117 == 98 then
+				s2 ..= "\b"
+			elseif v117 == 102 then
+				s2 ..= "\f"
+			elseif v117 == 110 then
+				s2 ..= "\n"
+			elseif v117 == 114 then
+				s2 ..= "\r"
+			elseif v117 == 116 then
+				s2 ..= "\t"
+			elseif v117 == 117 then
+				local v118 = uniCharCode(String.charCodeAt(body, v112 + 1), String.charCodeAt(body, v112 + 2), String.charCodeAt(body, v112 + 3), String.charCodeAt(body, v112 + 4))
+
+				if v118 < 0 then
+					local v119 = String.slice(body, v112 + 1, v112 + 5)
+
+					error(syntaxError(p23, v112, "Invalid character escape sequence: \\u" .. v119 .. "."))
+				end
+
+				s2 ..= utf8.char(v118)
+				v112 += 4
+			else
+				error(syntaxError(p23, v112, "Invalid character escape sequence: \\" .. utf8.char(v117) .. "."))
+			end
+
+			v112 += 1
+			v113 = v112
+		end
+	end
+
+	error(syntaxError(p23, v112, "Unterminated string."))
+end
+
 return {
-    Lexer = v93, 
-    isPunctuatorTokenKind = v102
-};
+	Lexer = t2,
+	isPunctuatorTokenKind = function(p28) -- line: 600
+		-- upvalues: TokenKind (copy)
+		return p28 == TokenKind.BANG or (p28 == TokenKind.DOLLAR or (p28 == TokenKind.AMP or (p28 == TokenKind.PAREN_L or (p28 == TokenKind.PAREN_R or (p28 == TokenKind.SPREAD or (p28 == TokenKind.COLON or (p28 == TokenKind.EQUALS or (p28 == TokenKind.AT or (p28 == TokenKind.BRACKET_L or (p28 == TokenKind.BRACKET_R or (p28 == TokenKind.BRACE_L or (p28 == TokenKind.PIPE or p28 == TokenKind.BRACE_R))))))))))))
+	end
+}

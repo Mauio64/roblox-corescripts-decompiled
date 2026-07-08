@@ -1,62 +1,87 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSave");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local _ = require(l_script_FirstAncestor_0.Context.AvatarSaveContext);
-local v4 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXRootSlotBasedEditorFlag and game:DefineFastFlag("AXFixEmptyDictionaryKeysForSaveDict2", false);
-local function v9(v5) --[[ Line: 21 ]] --[[ Name: filterEmptyDicts ]]
-    local v6 = table.clone(v5);
-    for v7, v8 in v6 do
-        if type(v8) == "table" and next(v8) == nil then
-            v6[v7] = nil;
-        end;
-    end;
-    return v6;
-end;
-local function _(v10, v11) --[[ Line: 31 ]] --[[ Name: deepEqualWithoutEmptyDicts ]]
-    -- upvalues: v9 (copy), v2 (copy)
-    local v12 = v9(v10);
-    local v13 = v9(v11);
-    return v2.deepEqual(v12, v13);
-end;
-return function(v15, v16) --[[ Line: 41 ]] --[[ Name: getSaveDict ]]
-    -- upvalues: v4 (copy), v9 (copy), v2 (copy)
-    local l_equipped_0 = v15.equipped;
-    local l_equipped_1 = v16.equipped;
-    if v4 then
-        local v19 = {};
-        local l_BodyColor3s_0 = l_equipped_0.BodyColor3s;
-        local l_BodyColor3s_1 = l_equipped_1.BodyColor3s;
-        local v22 = v9(l_BodyColor3s_0);
-        local v23 = v9(l_BodyColor3s_1);
-        v19.BodyColors = not v2.deepEqual(v22, v23);
-        v19.AvatarType = l_equipped_0.AvatarType ~= l_equipped_1.AvatarType;
-        l_BodyColor3s_0 = l_equipped_0.AvatarScales;
-        l_BodyColor3s_1 = l_equipped_1.AvatarScales;
-        v22 = v9(l_BodyColor3s_0);
-        v23 = v9(l_BodyColor3s_1);
-        v19.Scales = not v2.deepEqual(v22, v23);
-        local l_EquippedAssets_0 = l_equipped_0.EquippedAssets;
-        if l_EquippedAssets_0 then
-            l_BodyColor3s_0 = l_equipped_0.EquippedAssets;
-            l_BodyColor3s_1 = l_equipped_1.EquippedAssets;
-            v22 = v9(l_BodyColor3s_0);
-            v23 = v9(l_BodyColor3s_1);
-            l_EquippedAssets_0 = not v2.deepEqual(v22, v23);
-        end;
-        v19.Assets = l_EquippedAssets_0;
-        l_BodyColor3s_0 = l_equipped_0.EquippedEmotes.slotInfo;
-        l_BodyColor3s_1 = l_equipped_1.EquippedEmotes.slotInfo;
-        v22 = v9(l_BodyColor3s_0);
-        v23 = v9(l_BodyColor3s_1);
-        v19.Emotes = not v2.deepEqual(v22, v23);
-        return v19;
-    else
-        return {
-            BodyColors = not v2.deepEqual(l_equipped_0.BodyColor3s, l_equipped_1.BodyColor3s), 
-            AvatarType = l_equipped_0.AvatarType ~= l_equipped_1.AvatarType, 
-            Scales = not v2.deepEqual(l_equipped_0.AvatarScales, l_equipped_1.AvatarScales), 
-            Assets = l_equipped_0.EquippedAssets and not v2.deepEqual(l_equipped_0.EquippedAssets, l_equipped_1.EquippedAssets), 
-            Emotes = not v2.deepEqual(l_equipped_0.EquippedEmotes.slotInfo, l_equipped_1.EquippedEmotes.slotInfo)
-        };
-    end;
-end;
+local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
+local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+local tutils = require(AvatarExperienceSaveParent.tutils)
+
+require(AvatarExperienceSave.Context.AvatarSaveContext)
+
+local AvatarExperienceFlags = require(AvatarExperienceSaveParent.AvatarExperienceFlags)
+local FFlagAXRootSlotBasedEditorFlag = AvatarExperienceFlags.FFlagAXRootSlotBasedEditorFlag
+local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
+local v7 = FFlagAXRootSlotBasedEditorFlag and game:DefineFastFlag("AXFixEmptyDictionaryKeysForSaveDict2", false)
+
+local function filterEmptyDicts(t1: {[any]: any}) -- line: 23
+	local v12 = table.clone(t1)
+
+	for v13, v14 in v12 do
+		if type(v14) == "table" and next(v14) == nil then
+			v12[v13] = nil
+		end
+	end
+
+	return v12
+end
+local function deepEqualWithoutEmptyDicts(t2: {[any]: any}, t3: {[any]: any}) -- line: 33
+	-- upvalues: filterEmptyDicts (copy), tutils (copy)
+	local v17 = filterEmptyDicts(t2)
+	local v18 = filterEmptyDicts(t3)
+
+	return tutils.deepEqual(v17, v18)
+end
+local function getSaveDict(p1, p2) -- line: 43
+	-- upvalues: FFlagAXBackgroundsPersistence (copy), v7 (copy), filterEmptyDicts (copy), tutils (copy)
+	local equipped = p1.equipped
+	local equipped2 = p2.equipped
+	local v23 = if not FFlagAXBackgroundsPersistence then nil else equipped.BackgroundAssetId ~= equipped2.BackgroundAssetId
+
+	if v7 then
+		local t4 = {}
+		local BodyColor3s = equipped.BodyColor3s
+		local BodyColor3s2 = equipped2.BodyColor3s
+		local v27 = filterEmptyDicts(BodyColor3s)
+		local v28 = filterEmptyDicts(BodyColor3s2)
+
+		t4.BodyColors = not tutils.deepEqual(v27, v28)
+		t4.AvatarType = equipped.AvatarType ~= equipped2.AvatarType
+
+		local AvatarScales = equipped.AvatarScales
+		local AvatarScales2 = equipped2.AvatarScales
+		local v31 = filterEmptyDicts(AvatarScales)
+		local v32 = filterEmptyDicts(AvatarScales2)
+
+		t4.Scales = not tutils.deepEqual(v31, v32)
+
+		local EquippedAssets = equipped.EquippedAssets
+
+		if EquippedAssets then
+			local EquippedAssets2 = equipped.EquippedAssets
+			local EquippedAssets3 = equipped2.EquippedAssets
+			local v36 = filterEmptyDicts(EquippedAssets2)
+			local v37 = filterEmptyDicts(EquippedAssets3)
+
+			EquippedAssets = not tutils.deepEqual(v36, v37)
+		end
+
+		t4.Assets = EquippedAssets
+
+		local slotInfo = equipped.EquippedEmotes.slotInfo
+		local slotInfo2 = equipped2.EquippedEmotes.slotInfo
+		local v40 = filterEmptyDicts(slotInfo)
+		local v41 = filterEmptyDicts(slotInfo2)
+
+		t4.Emotes = not tutils.deepEqual(v40, v41)
+		t4.Background = v23
+
+		return t4
+	end
+
+	return {
+		BodyColors = not tutils.deepEqual(equipped.BodyColor3s, equipped2.BodyColor3s),
+		AvatarType = equipped.AvatarType ~= equipped2.AvatarType,
+		Scales = not tutils.deepEqual(equipped.AvatarScales, equipped2.AvatarScales),
+		Assets = equipped.EquippedAssets and not tutils.deepEqual(equipped.EquippedAssets, equipped2.EquippedAssets),
+		Emotes = not tutils.deepEqual(equipped.EquippedEmotes.slotInfo, equipped2.EquippedEmotes.slotInfo),
+		Background = v23
+	}
+end
+
+return getSaveDict

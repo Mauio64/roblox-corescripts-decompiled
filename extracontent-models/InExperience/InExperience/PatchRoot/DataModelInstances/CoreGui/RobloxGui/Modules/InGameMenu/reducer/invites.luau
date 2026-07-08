@@ -1,16 +1,18 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Cryo_0 = v1.Cryo;
-local l_Rodux_0 = v1.Rodux;
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.Actions.ReceivedUserInviteStatus);
-return l_Rodux_0.createReducer({}, {
-    [v5.name] = function(v6, v7) --[[ Line: 12 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        local l_userId_0 = v7.userId;
-        local l_inviteStatus_0 = v7.inviteStatus;
-        return l_Cryo_0.Dictionary.join(v6, {
-            [l_userId_0] = l_inviteStatus_0
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Cryo = InGameMenuDependencies.Cryo
+local Rodux = InGameMenuDependencies.Rodux
+local ParentParent = script.Parent.Parent
+local ReceivedUserInviteStatus = require(ParentParent.Actions.ReceivedUserInviteStatus)
+
+return Rodux.createReducer({}, {
+	[ReceivedUserInviteStatus.name] = function(p1, p2) -- line: 12
+		-- upvalues: Cryo (copy)
+		local userId = p2.userId
+		local inviteStatus = p2.inviteStatus
+
+		return Cryo.Dictionary.join(p1, {
+			[userId] = inviteStatus
+		})
+	end
+})

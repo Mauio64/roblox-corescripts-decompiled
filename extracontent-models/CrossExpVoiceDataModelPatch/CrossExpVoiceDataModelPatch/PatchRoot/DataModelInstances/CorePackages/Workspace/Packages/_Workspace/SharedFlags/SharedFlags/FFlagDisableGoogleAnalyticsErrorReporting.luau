@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DisableGoogleAnalyticsErrorReporting", false);
+return game:DefineFastFlag("DisableGoogleAnalyticsErrorReporting", false)

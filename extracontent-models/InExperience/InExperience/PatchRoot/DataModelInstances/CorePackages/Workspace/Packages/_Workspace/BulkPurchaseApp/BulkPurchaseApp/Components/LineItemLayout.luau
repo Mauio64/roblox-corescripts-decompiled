@@ -1,37 +1,42 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return function(v3) --[[ Line: 11 ]] --[[ Name: LineItemLayout ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy)
-    local v4 = l_useDesignTokens_0();
-    local v5, v6 = v1.useBinding(Vector2.new(0, 0));
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v3.LayoutOrder
-    }, {
-        Start = v1.createElement("Frame", {
-            AnchorPoint = Vector2.new(0, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = v5:map(function(v7) --[[ Line: 26 ]]
-                -- upvalues: v4 (copy)
-                return UDim2.new(1, -(v7.X + v4.Global.Space_200), 1, 0);
-            end)
-        }, v3.startSlot), 
-        End = v1.createElement("Frame", {
-            AnchorPoint = Vector2.new(1, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = UDim2.new(0, 0, 1, 0), 
-            Position = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.X, 
-            [v1.Change.AbsoluteSize] = function(v8) --[[ Line: 37 ]]
-                -- upvalues: v6 (copy)
-                v6(v8.AbsoluteSize);
-            end
-        }, v3.endSlot)
-    });
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local useDesignTokens = require(Parent.Style).useDesignTokens
+
+local function LineItemLayout(t1: {[any]: any}) -- line: 14
+	-- upvalues: useDesignTokens (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
+	local v7 = useDesignTokens()
+	local v8, v9 = React.useBinding(Vector2.new(0, 0))
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		Start = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0, 0),
+			Size = v8:map(function(vector2: Vector2) -- line: 29
+				-- upvalues: FFlagRenameDeprecatedUIBloxTokens (copy), v7 (copy)
+				return UDim2.new(1, -(vector2.X + if not FFlagRenameDeprecatedUIBloxTokens then v7.Global.Space_200 else v7.Size.Size_400), 1, 0)
+			end)
+		}, t1.startSlot),
+		End = React.createElement("Frame", {
+			AnchorPoint = Vector2.new(1, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, 0, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.X,
+			[React.Change.AbsoluteSize] = function(p1) -- line: 52
+				-- upvalues: v9 (copy)
+				v9(p1.AbsoluteSize)
+			end
+		}, t1.endSlot)
+	})
+end
+
+return LineItemLayout

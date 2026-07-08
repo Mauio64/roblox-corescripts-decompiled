@@ -1,41 +1,46 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.Boolean);
-local v2 = require(l_Parent_0.Collections);
-local v3 = require(l_Parent_0.Console);
-local v4 = require(l_Parent_0.Math);
-local v5 = require(l_Parent_0.Number);
-local v6 = require(l_Parent_0.String);
-local v7 = require(l_Parent_0.Symbol);
-local v8 = require(l_Parent_0.Timers);
-local _ = require(l_Parent_0.ES7Types);
-local v10 = require(script.AssertionError);
-local v11 = require(script.Error);
-local _ = require(script.Promise);
-local v13 = require(script.extends);
-local v14 = require(l_Parent_0.InstanceOf);
+local scriptParent = script.Parent
+local Boolean = require(scriptParent.Boolean)
+local Collections = require(scriptParent.Collections)
+local Console = require(scriptParent.Console)
+local Math = require(scriptParent.Math)
+local Number = require(scriptParent.Number)
+local String = require(scriptParent.String)
+local Symbol = require(scriptParent.Symbol)
+local Timers = require(scriptParent.Timers)
+
+require(scriptParent.ES7Types)
+
+local AssertionError = require(script.AssertionError)
+local Error = require(script.Error)
+
+require(script.Promise)
+
+local extends = require(script.extends)
+local InstanceOf = require(scriptParent.InstanceOf)
+
 return {
-    Array = v2.Array, 
-    AssertionError = v10, 
-    Boolean = v1, 
-    console = v3, 
-    Error = v11, 
-    extends = v13, 
-    instanceof = v14, 
-    Math = v4, 
-    Number = v5, 
-    Object = v2.Object, 
-    Map = v2.Map, 
-    coerceToMap = v2.coerceToMap, 
-    coerceToTable = v2.coerceToTable, 
-    Set = v2.Set, 
-    WeakMap = v2.WeakMap, 
-    String = v6, 
-    Symbol = v7, 
-    setTimeout = v8.setTimeout, 
-    clearTimeout = v8.clearTimeout, 
-    setInterval = v8.setInterval, 
-    clearInterval = v8.clearInterval, 
-    util = {
-        inspect = v2.inspect
-    }
-};
+	Array = Collections.Array,
+	AssertionError = AssertionError,
+	Boolean = Boolean,
+	console = Console,
+	Error = Error,
+	extends = extends,
+	instanceof = InstanceOf,
+	Math = Math,
+	Number = Number,
+	Object = Collections.Object,
+	Map = Collections.Map,
+	coerceToMap = Collections.coerceToMap,
+	coerceToTable = Collections.coerceToTable,
+	Set = Collections.Set,
+	WeakMap = Collections.WeakMap,
+	String = String,
+	Symbol = Symbol,
+	setTimeout = Timers.setTimeout,
+	clearTimeout = Timers.clearTimeout,
+	setInterval = Timers.setInterval,
+	clearInterval = Timers.clearInterval,
+	util = {
+		inspect = Collections.inspect
+	}
+}

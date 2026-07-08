@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AEGIS2UseGuacToShowEnabledMessage", false);
+return game:DefineFastFlag("AEGIS2UseGuacToShowEnabledMessage", false)

@@ -1,434 +1,470 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Boolean_0 = v2.Boolean;
-local l_Object_0 = v2.Object;
-local v6 = require(l_Parent_0.jsUtils.invariant);
-local _ = require(script.Parent.ViewabilityHelper);
-local l_keyExtractor_0 = require(script.Parent.VirtualizeUtils).keyExtractor;
-local v9 = require(l_Parent_0.Components.View.View);
-local v10 = require(script.Parent.VirtualizedList);
-local v11 = require(l_Parent_1.React);
-local v12 = nil;
-local v13 = v11.PureComponent:extend("VirtualizedSectionList");
-v13.init = function(v14) --[[ Line: 206 ]] --[[ Name: init ]]
-    -- upvalues: v6 (copy), l_keyExtractor_0 (copy), l_Object_0 (copy), l_Array_0 (copy), l_Boolean_0 (copy), v11 (copy), v12 (ref)
-    v14._updateHighlightMap = {};
-    v14._updatePropsMap = {};
-    v14._listRef = nil;
-    v14._captureRef = function(v15) --[[ Line: 210 ]]
-        -- upvalues: v14 (copy)
-        v14._listRef = v15;
-    end;
-    v14._keyExtractor = function(_, v17) --[[ Line: 214 ]]
-        -- upvalues: v14 (copy)
-        local v18 = v14:_subExtractor(v17);
-        if v18 then
-            return v18.key;
-        else
-            return (tostring(v17));
-        end;
-    end;
-    v14._convertViewable = function(v19) --[[ Line: 219 ]]
-        -- upvalues: v6 (ref), v14 (copy), l_keyExtractor_0 (ref), l_Object_0 (ref)
-        v6(v19.index ~= nil, "Received a broken ViewToken");
-        local v20 = v14:_subExtractor(v19.index);
-        if not v20 then
-            return nil;
-        else
-            local l_keyExtractor_1 = v20.section.keyExtractor;
-            local v22 = if v14.props.keyExtractor then v14.props.keyExtractor else l_keyExtractor_0;
-            local v23 = if l_keyExtractor_1 ~= nil then l_keyExtractor_1(v19.item, v20.index) else v22(v19.item, v20.index == nil and 1 or v20.index);
-            return l_Object_0.assign({}, v19, {
-                index = v20.index, 
-                key = v23, 
-                section = v20.section
-            });
-        end;
-    end;
-    v14._onViewableItemsChanged = function(v24) --[[ Line: 242 ]]
-        -- upvalues: v14 (copy), l_Array_0 (ref), l_Boolean_0 (ref)
-        local l_viewableItems_0 = v24.viewableItems;
-        local l_changed_0 = v24.changed;
-        local l_onViewableItemsChanged_0 = v14.props.onViewableItemsChanged;
-        if l_onViewableItemsChanged_0 ~= nil then
-            l_onViewableItemsChanged_0({
-                viewableItems = l_Array_0.filter(l_Array_0.map(l_viewableItems_0, v14._convertViewable, v14), l_Boolean_0.toJSBoolean), 
-                changed = l_Array_0.filter(l_Array_0.map(l_changed_0, v14._convertViewable, v14), l_Boolean_0.toJSBoolean)
-            });
-        end;
-    end;
-    v14._renderItem = function(v28) --[[ Line: 259 ]]
-        -- upvalues: v14 (copy), l_Boolean_0 (ref), v6 (ref), v11 (ref), v12 (ref)
-        return function(v29) --[[ Line: 260 ]]
-            -- upvalues: v14 (ref), l_Boolean_0 (ref), v28 (copy), v6 (ref), v11 (ref), v12 (ref)
-            local l_item_0 = v29.item;
-            local l_index_0 = v29.index;
-            local v32 = v14:_subExtractor(l_index_0);
-            if not v32 then
-                return nil;
-            else
-                local l_index_1 = v32.index;
-                if l_index_1 == nil then
-                    local l_section_0 = v32.section;
-                    if v32.header == true then
-                        local l_renderSectionHeader_0 = v14.props.renderSectionHeader;
-                        if l_Boolean_0.toJSBoolean(l_renderSectionHeader_0) then
-                            return (l_renderSectionHeader_0({
-                                section = l_section_0
-                            }));
-                        else
-                            return nil;
-                        end;
-                    else
-                        local l_renderSectionFooter_0 = v14.props.renderSectionFooter;
-                        if l_Boolean_0.toJSBoolean(l_renderSectionFooter_0) then
-                            return (l_renderSectionFooter_0({
-                                section = l_section_0
-                            }));
-                        else
-                            return nil;
-                        end;
-                    end;
-                else
-                    local v37 = v32.section.renderItem or v14.props.renderItem;
-                    local v38 = v14:_getSeparatorComponent(l_index_0, v32, v28);
-                    v6(v37, "no renderItem!");
-                    return v11.createElement(v12, {
-                        SeparatorComponent = v38, 
-                        LeadingSeparatorComponent = if l_index_1 == 1 then v14.props.SectionSeparatorComponent else nil, 
-                        cellKey = v32.key, 
-                        index = l_index_1, 
-                        item = l_item_0, 
-                        leadingItem = v32.leadingItem, 
-                        leadingSection = v32.leadingSection, 
-                        prevCellKey = (v14:_subExtractor(l_index_0 - 1) or {}).key, 
-                        setSelfHighlightCallback = v14._setUpdateHighlightFor, 
-                        setSelfUpdatePropsCallback = v14._setUpdatePropsFor, 
-                        updateHighlightFor = v14._updateHighlightFor, 
-                        updatePropsFor = v14._updatePropsFor, 
-                        renderItem = v37, 
-                        section = v32.section, 
-                        trailingItem = v32.trailingItem, 
-                        trailingSection = v32.trailingSection, 
-                        inverted = l_Boolean_0.toJSBoolean(v14.props.inverted), 
-                        horizontal = v14.props.horizontal
-                    });
-                end;
-            end;
-        end;
-    end;
-    v14._updatePropsFor = function(v39, v40) --[[ Line: 312 ]]
-        -- upvalues: v14 (copy)
-        local v41 = v14._updatePropsMap[v39];
-        if v41 ~= nil then
-            v41(v40);
-        end;
-    end;
-    v14._updateHighlightFor = function(v42, v43) --[[ Line: 319 ]]
-        -- upvalues: v14 (copy)
-        local v44 = v14._updateHighlightMap[v42];
-        if v44 ~= nil then
-            v44(v43);
-        end;
-    end;
-    v14._setUpdateHighlightFor = function(v45, v46) --[[ Line: 326 ]]
-        -- upvalues: v14 (copy)
-        if v46 ~= nil then
-            v14._updateHighlightMap[v45] = v46;
-            return;
-        else
-            v14._updateHighlightMap[v45] = nil;
-            return;
-        end;
-    end;
-    v14._setUpdatePropsFor = function(v47, v48) --[[ Line: 334 ]]
-        -- upvalues: v14 (copy)
-        if v48 ~= nil then
-            v14._updatePropsMap[v47] = v48;
-            return;
-        else
-            v14._updatePropsMap[v47] = nil;
-            return;
-        end;
-    end;
-end;
-v13.scrollToLocation = function(v49, v50) --[[ Line: 343 ]] --[[ Name: scrollToLocation ]]
-    -- upvalues: l_Object_0 (copy)
-    local l_itemIndex_0 = v50.itemIndex;
-    local v52 = 1;
-    while v52 < v50.sectionIndex do
-        l_itemIndex_0 = l_itemIndex_0 + (v49.props.getItemCount(v49.props.sections[v52].data) + 2);
-        v52 = v52 + 1;
-    end;
-    local v53 = v50.viewOffset or 0;
-    if v49._listRef == nil then
-        return;
-    else
-        if v50.itemIndex > 1 and v49.props.stickySectionHeadersEnabled then
-            v53 = v53 + v49._listRef.__getFrameMetricsApprox(l_itemIndex_0 - v50.itemIndex).length;
-        end;
-        local v54 = l_Object_0.assign({}, v50, {
-            viewOffset = v53, 
-            index = l_itemIndex_0
-        });
-        v49._listRef:scrollToIndex(v54);
-        return;
-    end;
-end;
-v13.getListRef = function(v55) --[[ Line: 365 ]] --[[ Name: getListRef ]]
-    return v55._listRef;
-end;
-v13.render = function(v56) --[[ Line: 369 ]] --[[ Name: render ]]
-    -- upvalues: l_Object_0 (copy), v11 (copy), v10 (copy)
-    local _ = v56.props.renderItem;
-    local _ = v56.props.sections;
-    local v59 = l_Object_0.assign({}, v56.props, {
-        ItemSeparatorComponent = l_Object_0.None, 
-        SectionSeparatorComponent = l_Object_0.None, 
-        renderItem = l_Object_0.None, 
-        renderSectionFooter = l_Object_0.None, 
-        renderSectionHeader = l_Object_0.None, 
-        sections = l_Object_0.None, 
-        stickySectionHeadersEnabled = l_Object_0.None
-    });
-    local v60 = v56.props.ListHeaderComponent and 1 or 0;
-    local v61 = if v56.props.stickySectionHeadersEnabled then {} else nil;
-    local v62 = 0;
-    for _, v64 in ipairs(v56.props.sections) do
-        if v61 ~= nil then
-            table.insert(v61, v62 + v60);
-        end;
-        v62 = v62 + 2 + v56.props.getItemCount(v64.data);
-    end;
-    local v65 = v56._renderItem(v62);
-    return v11.createElement(v10, l_Object_0.assign({}, v59, {
-        keyExtractor = v56._keyExtractor, 
-        stickyHeaderIndices = v61, 
-        renderItem = v65, 
-        data = v56.props.sections, 
-        getItem = function(v66, v67) --[[ Line: 406 ]] --[[ Name: getItem ]]
-            -- upvalues: v56 (copy)
-            return v56:_getItem(v56.props, v66, v67);
-        end, 
-        getItemCount = function() --[[ Line: 409 ]] --[[ Name: getItemCount ]]
-            -- upvalues: v62 (ref)
-            return v62;
-        end, 
-        onViewableItemsChanged = if v56.props.onViewableItemsChanged then v56._onViewableItemsChanged else nil, 
-        ref = v56._captureRef
-    }));
-end;
-v13._getItem = function(_, v69, v70, v71) --[[ Line: 418 ]] --[[ Name: _getItem ]]
-    if not v70 then
-        return nil;
-    else
-        local v72 = v71 - 1;
-        local v73 = 1;
-        while true do
-            if v73 <= #v70 then
-                local v74 = v70[v73];
-                local l_data_0 = v74.data;
-                local v76 = v69.getItemCount(l_data_0);
-                if v72 == 0 or v72 == v76 + 1 then
-                    return v74;
-                elseif v72 <= v76 then
-                    return v69.getItem(l_data_0, v72);
-                else
-                    v72 = v72 - (v76 + 2);
-                    v73 = v73 + 1;
-                end;
-            else
-                return nil;
-            end;
-        end;
-    end;
-end;
-v13._subExtractor = function(v77, v78) --[[ Line: 449 ]] --[[ Name: _subExtractor ]]
-    -- upvalues: l_Boolean_0 (copy), l_keyExtractor_0 (copy)
-    local l_v78_0 = v78;
-    local v80 = nil;
-    local v81 = nil;
-    local v82 = nil;
-    local v83 = nil;
-    local l_props_0 = v77.props;
-    v80 = l_props_0.getItem;
-    v81 = l_props_0.getItemCount;
-    v82 = l_props_0.keyExtractor;
-    v83 = l_props_0.sections;
-    l_props_0 = 1;
-    while true do
-        if l_props_0 <= #v83 then
-            local v85 = v83[l_props_0];
-            local l_data_1 = v85.data;
-            local v87 = if l_Boolean_0.toJSBoolean(v85.key) then tostring(v85.key) else tostring(l_props_0);
-            l_v78_0 = l_v78_0 - 1;
-            if v81(l_data_1) + 1 < l_v78_0 then
-                l_v78_0 = l_v78_0 - (v81(l_data_1) + 1);
-                l_props_0 = l_props_0 + 1;
-            elseif l_v78_0 == 0 then
-                return {
-                    section = v85, 
-                    key = v87 .. ":header", 
-                    index = nil, 
-                    header = true, 
-                    trailingSection = v83[l_props_0 + 1]
-                };
-            elseif l_v78_0 == v81(l_data_1) + 1 then
-                return {
-                    section = v85, 
-                    key = v87 .. ":footer", 
-                    index = nil, 
-                    header = false, 
-                    trailingSection = v83[l_props_0 + 1]
-                };
-            else
-                local v88 = v85.keyExtractor or v82 or l_keyExtractor_0;
-                return {
-                    section = v85, 
-                    key = v87 .. ":" .. tostring(v88(v80(l_data_1, l_v78_0), l_v78_0)), 
-                    index = l_v78_0, 
-                    leadingItem = v80(l_data_1, l_v78_0 - 1), 
-                    leadingSection = v83[l_props_0 - 1], 
-                    trailingItem = v80(l_data_1, l_v78_0 + 1), 
-                    trailingSection = v83[l_props_0 + 1]
-                };
-            end;
-        else
-            return nil;
-        end;
-    end;
-end;
-v13._getSeparatorComponent = function(v89, v90, v91, v92) --[[ Line: 511 ]] --[[ Name: _getSeparatorComponent ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if not v91 then
-        v91 = v89:_subExtractor(v90);
-    end;
-    if not v91 then
-        return nil;
-    else
-        local l_v91_0 = v91;
-        local v94 = l_Boolean_0.toJSBoolean(l_v91_0.section.ItemSeparatorComponent) and l_v91_0.section.ItemSeparatorComponent or v89.props.ItemSeparatorComponent;
-        local l_SectionSeparatorComponent_0 = v89.props.SectionSeparatorComponent;
-        local v96 = v90 == v92;
-        local v97 = l_v91_0.index == v89.props.getItemCount(l_v91_0.section.data);
-        if l_SectionSeparatorComponent_0 and v97 then
-            return l_SectionSeparatorComponent_0;
-        elseif v94 and not v97 and not v96 then
-            return v94;
-        else
-            return nil;
-        end;
-    end;
-end;
-v12 = function(v98) --[[ Line: 563 ]] --[[ Name: ItemWithSeparator ]]
-    -- upvalues: v11 (copy), l_Object_0 (copy), v9 (copy)
-    local l_LeadingSeparatorComponent_0 = v98.LeadingSeparatorComponent;
-    local l_SeparatorComponent_0 = v98.SeparatorComponent;
-    local l_cellKey_0 = v98.cellKey;
-    local l_prevCellKey_0 = v98.prevCellKey;
-    local l_setSelfHighlightCallback_0 = v98.setSelfHighlightCallback;
-    local l_updateHighlightFor_0 = v98.updateHighlightFor;
-    local l_setSelfUpdatePropsCallback_0 = v98.setSelfUpdatePropsCallback;
-    local l_updatePropsFor_0 = v98.updatePropsFor;
-    local l_item_1 = v98.item;
-    local l_index_2 = v98.index;
-    local l_section_1 = v98.section;
-    local l_inverted_0 = v98.inverted;
-    local v111, v112 = v11.useState(false);
-    local v113, v114 = v11.useState(false);
-    local v115, v116 = v11.useState({
-        leadingItem = v98.leadingItem, 
-        leadingSection = v98.leadingSection, 
-        section = v98.section, 
-        trailingItem = v98.item, 
-        trailingSection = v98.trailingSection, 
-        LayoutOrder = -1
-    });
-    local v117, v118 = v11.useState({
-        leadingItem = v98.item, 
-        leadingSection = v98.leadingSection, 
-        section = v98.section, 
-        trailingItem = v98.trailingItem, 
-        trailingSection = v98.trailingSection, 
-        LayoutOrder = 1
-    });
-    v11.useEffect(function() --[[ Line: 601 ]]
-        -- upvalues: l_setSelfHighlightCallback_0 (copy), l_cellKey_0 (copy), v114 (copy), l_setSelfUpdatePropsCallback_0 (copy), v118 (copy)
-        l_setSelfHighlightCallback_0(l_cellKey_0, v114);
-        l_setSelfUpdatePropsCallback_0(l_cellKey_0, v118);
-        return function() --[[ Line: 604 ]]
-            -- upvalues: l_setSelfUpdatePropsCallback_0 (ref), l_cellKey_0 (ref), l_setSelfHighlightCallback_0 (ref)
-            l_setSelfUpdatePropsCallback_0(l_cellKey_0, nil);
-            l_setSelfHighlightCallback_0(l_cellKey_0, nil);
-        end;
-    end, {
-        l_cellKey_0, 
-        l_setSelfHighlightCallback_0, 
-        v118, 
-        l_setSelfUpdatePropsCallback_0
-    });
-    local v121 = {
-        highlight = function() --[[ Line: 611 ]] --[[ Name: highlight ]]
-            -- upvalues: v112 (copy), v114 (copy), l_prevCellKey_0 (copy), l_updateHighlightFor_0 (copy)
-            v112(true);
-            v114(true);
-            if l_prevCellKey_0 ~= nil then
-                l_updateHighlightFor_0(l_prevCellKey_0, true);
-            end;
-        end, 
-        unhighlight = function() --[[ Line: 618 ]] --[[ Name: unhighlight ]]
-            -- upvalues: v112 (copy), v114 (copy), l_prevCellKey_0 (copy), l_updateHighlightFor_0 (copy)
-            v112(false);
-            v114(false);
-            if l_prevCellKey_0 ~= nil then
-                l_updateHighlightFor_0(l_prevCellKey_0, false);
-            end;
-        end, 
-        updateProps = function(v119, v120) --[[ Line: 625 ]] --[[ Name: updateProps ]]
-            -- upvalues: l_LeadingSeparatorComponent_0 (copy), v116 (copy), l_Object_0 (ref), v115 (copy), l_prevCellKey_0 (copy), l_updatePropsFor_0 (copy), l_SeparatorComponent_0 (copy), v118 (copy), v117 (copy)
-            if v119 == "leading" then
-                if l_LeadingSeparatorComponent_0 ~= nil then
-                    v116(l_Object_0.assign({}, v115, v120));
-                    return;
-                elseif l_prevCellKey_0 ~= nil then
-                    l_updatePropsFor_0(l_prevCellKey_0, l_Object_0.assign({}, v115, v120));
-                    return;
-                end;
-            elseif v119 == "trailing" and l_SeparatorComponent_0 ~= nil then
-                v118(l_Object_0.assign({}, v117, v120));
-            end;
-        end
-    };
-    local v122 = v98.renderItem({
-        item = l_item_1, 
-        index = l_index_2, 
-        section = l_section_1, 
-        separators = v121
-    });
-    local v123 = false;
-    if l_LeadingSeparatorComponent_0 ~= nil then
-        v123 = v11.createElement(l_LeadingSeparatorComponent_0, l_Object_0.assign({
-            highlighted = v111
-        }, v115));
-    end;
-    local v124 = false;
-    if l_SeparatorComponent_0 ~= nil then
-        v124 = v11.createElement(l_SeparatorComponent_0, l_Object_0.assign({
-            highlighted = v113
-        }, v117));
-    end;
-    if v123 or v124 then
-        return (v11.createElement(v9, {
-            Size = if v98.horizontal then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = if v98.horizontal then Enum.AutomaticSize.X else Enum.AutomaticSize.Y
-        }, v11.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = if v98.horizontal then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical
-        }), if l_inverted_0 == false then v123 else v124, v122, if l_inverted_0 == false then v124 else v123));
-    else
-        return v122;
-    end;
-end;
-return v13;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local invariant = require(ParentParent.jsUtils.invariant)
+
+require(script.Parent.ViewabilityHelper)
+
+local keyExtractor = require(script.Parent.VirtualizeUtils).keyExtractor
+local View = require(ParentParent.Components.View.View)
+local VirtualizedList = require(script.Parent.VirtualizedList)
+local React = require(ParentParentParent.React)
+local ItemWithSeparator = nil
+local v13 = React.PureComponent:extend("VirtualizedSectionList")
+
+function v13.init(p1) -- line: 206
+	-- upvalues: invariant (copy), keyExtractor (copy), Object (copy), Array (copy), Boolean (copy), React (copy), ItemWithSeparator (ref)
+	p1._updateHighlightMap = {}
+	p1._updatePropsMap = {}
+	p1._listRef = nil
+
+	function p1._captureRef(p2) -- line: 210
+		-- upvalues: p1 (copy)
+		p1._listRef = p2
+	end
+	function p1._keyExtractor(_, n1: number) -- line: 214
+		-- upvalues: p1 (copy)
+		local v90 = p1:_subExtractor(n1)
+
+		if v90 then
+			return v90.key
+		end
+
+		return (tostring(n1))
+	end
+	function p1._convertViewable(p4) -- line: 219
+		-- upvalues: invariant (copy), p1 (copy), keyExtractor (copy), Object (copy)
+		invariant(p4.index ~= nil, "Received a broken ViewToken")
+
+		local v92 = p1:_subExtractor(p4.index)
+
+		if not v92 then
+			return nil
+		end
+
+		local keyExtractor2 = v92.section.keyExtractor
+		local v94 = if not p1.props.keyExtractor then keyExtractor else p1.props.keyExtractor
+		local v95 = if keyExtractor2 == nil then v94(p4.item, if v92.index ~= nil then v92.index else 1) else keyExtractor2(p4.item, v92.index)
+
+		return Object.assign({}, p4, {
+			index = v92.index,
+			key = v95,
+			section = v92.section
+		})
+	end
+	function p1._onViewableItemsChanged(t1: {[any]: any}) -- line: 242
+		-- upvalues: p1 (copy), Array (copy), Boolean (copy)
+		local viewableItems = t1.viewableItems
+		local changed = t1.changed
+		local onViewableItemsChanged = p1.props.onViewableItemsChanged
+
+		if onViewableItemsChanged ~= nil then
+			onViewableItemsChanged({
+				viewableItems = Array.filter(Array.map(viewableItems, p1._convertViewable, p1), Boolean.toJSBoolean),
+				changed = Array.filter(Array.map(changed, p1._convertViewable, p1), Boolean.toJSBoolean)
+			})
+		end
+	end
+	function p1._renderItem(n2: number) -- line: 259
+		-- upvalues: p1 (copy), Boolean (copy), invariant (copy), React (copy), ItemWithSeparator (ref)
+		return function(t2: {[any]: any}) -- line: 260
+			-- upvalues: p1 (copy), Boolean (copy), n2 (copy), invariant (copy), React (copy), ItemWithSeparator (ref)
+			local item = t2.item
+			local index = t2.index
+			local v118 = p1:_subExtractor(index)
+
+			if not v118 then
+				return nil
+			end
+
+			local index2 = v118.index
+
+			if index2 == nil then
+				local section = v118.section
+
+				if v118.header == true then
+					local renderSectionHeader = p1.props.renderSectionHeader
+
+					if Boolean.toJSBoolean(renderSectionHeader) then
+						return (renderSectionHeader({
+							section = section
+						}))
+					end
+
+					return nil
+				end
+
+				local renderSectionFooter = p1.props.renderSectionFooter
+
+				if Boolean.toJSBoolean(renderSectionFooter) then
+					return (renderSectionFooter({
+						section = section
+					}))
+				end
+
+				return nil
+			end
+
+			local v123 = v118.section.renderItem or p1.props.renderItem
+			local v124 = p1:_getSeparatorComponent(index, v118, n2)
+
+			invariant(v123, "no renderItem!")
+
+			return React.createElement(ItemWithSeparator, {
+				SeparatorComponent = v124,
+				LeadingSeparatorComponent = if index2 ~= 1 then nil else p1.props.SectionSeparatorComponent,
+				cellKey = v118.key,
+				index = index2,
+				item = item,
+				leadingItem = v118.leadingItem,
+				leadingSection = v118.leadingSection,
+				prevCellKey = (p1:_subExtractor(index - 1) or {}).key,
+				setSelfHighlightCallback = p1._setUpdateHighlightFor,
+				setSelfUpdatePropsCallback = p1._setUpdatePropsFor,
+				updateHighlightFor = p1._updateHighlightFor,
+				updatePropsFor = p1._updatePropsFor,
+				renderItem = v123,
+				section = v118.section,
+				trailingItem = v118.trailingItem,
+				trailingSection = v118.trailingSection,
+				inverted = Boolean.toJSBoolean(p1.props.inverted),
+				horizontal = p1.props.horizontal
+			})
+		end
+	end
+	function p1._updatePropsFor(s1: string, p5) -- line: 312
+		-- upvalues: p1 (copy)
+		local v103 = p1._updatePropsMap[s1]
+
+		if v103 ~= nil then
+			v103(p5)
+		end
+	end
+	function p1._updateHighlightFor(s2: string, b1: boolean) -- line: 319
+		-- upvalues: p1 (copy)
+		local v106 = p1._updateHighlightMap[s2]
+
+		if v106 ~= nil then
+			v106(b1)
+		end
+	end
+	function p1._setUpdateHighlightFor(s3: string, p6: ((...any) -> ...any)?) -- line: 326
+		-- upvalues: p1 (copy)
+		if p6 ~= nil then
+			p1._updateHighlightMap[s3] = p6
+
+			return
+		end
+
+		p1._updateHighlightMap[s3] = nil
+	end
+	function p1._setUpdatePropsFor(s4: string, p7: ((...any) -> ...any)?) -- line: 334
+		-- upvalues: p1 (copy)
+		if p7 ~= nil then
+			p1._updatePropsMap[s4] = p7
+
+			return
+		end
+
+		p1._updatePropsMap[s4] = nil
+	end
+end
+function v13.scrollToLocation(t3: {[any]: any}, t4: {[any]: any}) -- line: 343
+	-- upvalues: Object (copy)
+	local itemIndex = t4.itemIndex
+	local n3 = 1
+
+	while n3 < t4.sectionIndex do
+		itemIndex += t3.props.getItemCount(t3.props.sections[n3].data) + 2
+		n3 += 1
+	end
+
+	local v19 = t4.viewOffset or 0
+
+	if t3._listRef == nil then
+		return
+	end
+
+	if t4.itemIndex > 1 and t3.props.stickySectionHeadersEnabled then
+		v19 += t3._listRef.__getFrameMetricsApprox(itemIndex - t4.itemIndex).length
+	end
+
+	local v20 = Object.assign({}, t4, {
+		viewOffset = v19,
+		index = itemIndex
+	})
+
+	t3._listRef:scrollToIndex(v20)
+end
+function v13.getListRef(p8) -- line: 365
+	return p8._listRef
+end
+function v13.render(p9) -- line: 369
+	-- upvalues: Object (copy), React (copy), VirtualizedList (copy)
+	local _ = p9.props.renderItem
+	local _ = p9.props.sections
+	local v25 = Object.assign({}, p9.props, {
+		ItemSeparatorComponent = Object.None,
+		SectionSeparatorComponent = Object.None,
+		renderItem = Object.None,
+		renderSectionFooter = Object.None,
+		renderSectionHeader = Object.None,
+		sections = Object.None,
+		stickySectionHeadersEnabled = Object.None
+	})
+	local v26 = not p9.props.ListHeaderComponent and 0 or 1
+	local v27 = if not p9.props.stickySectionHeadersEnabled then nil else {}
+	local n4 = 0
+
+	for _, v in ipairs(p9.props.sections) do
+		if v27 ~= nil then
+			table.insert(v27, n4 + v26)
+		end
+
+		n4 = n4 + 2 + p9.props.getItemCount(v.data)
+	end
+
+	local v31 = p9._renderItem(n4)
+
+	return React.createElement(VirtualizedList, Object.assign({}, v25, {
+		keyExtractor = p9._keyExtractor,
+		stickyHeaderIndices = v27,
+		renderItem = v31,
+		data = p9.props.sections,
+		getItem = function(p10, p11) -- line: 406
+			-- upvalues: p9 (copy)
+			return p9:_getItem(p9.props, p10, p11)
+		end,
+		getItemCount = function() -- line: 409
+			-- upvalues: n4 (ref)
+			return n4
+		end,
+		onViewableItemsChanged = if not p9.props.onViewableItemsChanged then nil else p9._onViewableItemsChanged,
+		ref = p9._captureRef
+	}))
+end
+function v13._getItem(_: {[any]: any}, p12, p13, n5: number) -- line: 418
+	if not p13 then
+		return nil
+	end
+
+	local v36 = n5 - 1
+	local n6 = 1
+
+	while n6 <= #p13 do
+		local v38 = p13[n6]
+		local data = v38.data
+		local v40 = p12.getItemCount(data)
+
+		if v36 == 0 or v36 == v40 + 1 then
+			return v38
+		end
+
+		if v36 <= v40 then
+			return p12.getItem(data, v36)
+		end
+
+		v36 -= v40 + 2
+		n6 += 1
+	end
+
+	return nil
+end
+function v13._subExtractor(t6: {[any]: any}, n7: number) -- line: 449
+	-- upvalues: Boolean (copy), keyExtractor (copy)
+	local props = t6.props
+	local getItem = props.getItem
+	local getItemCount = props.getItemCount
+	local keyExtractor3 = props.keyExtractor
+	local sections = props.sections
+	local n8 = 1
+
+	while n8 <= #sections do
+		local v49 = sections[n8]
+		local data = v49.data
+		local v51 = if not Boolean.toJSBoolean(v49.key) then tostring(n8) else tostring(v49.key)
+		local v52 = n7 - 1
+
+		if not (v52 > getItemCount(data) + 1) then
+			if v52 == 0 then
+				return {
+					index = nil,
+					header = true,
+					section = v49,
+					key = v51 .. ":header",
+					trailingSection = sections[n8 + 1]
+				}
+			end
+
+			if v52 == getItemCount(data) + 1 then
+				return {
+					index = nil,
+					header = false,
+					section = v49,
+					key = v51 .. ":footer",
+					trailingSection = sections[n8 + 1]
+				}
+			end
+
+			local v53 = v49.keyExtractor or (keyExtractor3 or keyExtractor)
+
+			return {
+				section = v49,
+				key = v51 .. ":" .. tostring(v53(getItem(data, v52), v52)),
+				index = v52,
+				leadingItem = getItem(data, v52 - 1),
+				leadingSection = sections[n8 - 1],
+				trailingItem = getItem(data, v52 + 1),
+				trailingSection = sections[n8 + 1]
+			}
+		end
+
+		n7 = v52 - (getItemCount(data) + 1)
+		n8 += 1
+	end
+
+	return nil
+end
+function v13._getSeparatorComponent(t7: {[any]: any}, n9: number, p14, n10: number) -- line: 511
+	-- upvalues: Boolean (copy)
+	if not p14 then
+		p14 = t7:_subExtractor(n9)
+	end
+
+	if not p14 then
+		return nil
+	end
+
+	local v58 = Boolean.toJSBoolean(p14.section.ItemSeparatorComponent) and p14.section.ItemSeparatorComponent or t7.props.ItemSeparatorComponent
+	local SectionSeparatorComponent = t7.props.SectionSeparatorComponent
+	local v60 = n9 == n10
+	local v61 = p14.index == t7.props.getItemCount(p14.section.data)
+
+	if SectionSeparatorComponent and v61 then
+		return SectionSeparatorComponent
+	end
+
+	if v58 and not v61 and not v60 then
+		return v58
+	end
+
+	return nil
+end
+function ItemWithSeparator(p15) -- line: 563
+	-- upvalues: React (copy), Object (copy), View (copy)
+	local LeadingSeparatorComponent = p15.LeadingSeparatorComponent
+	local SeparatorComponent = p15.SeparatorComponent
+	local cellKey = p15.cellKey
+	local prevCellKey = p15.prevCellKey
+	local setSelfHighlightCallback = p15.setSelfHighlightCallback
+	local updateHighlightFor = p15.updateHighlightFor
+	local setSelfUpdatePropsCallback = p15.setSelfUpdatePropsCallback
+	local updatePropsFor = p15.updatePropsFor
+	local item = p15.item
+	local index = p15.index
+	local section = p15.section
+	local inverted = p15.inverted
+	local v75, v76 = React.useState(false)
+	local v77, v78 = React.useState(false)
+	local v79, v80 = React.useState({
+		LayoutOrder = -1,
+		leadingItem = p15.leadingItem,
+		leadingSection = p15.leadingSection,
+		section = p15.section,
+		trailingItem = p15.item,
+		trailingSection = p15.trailingSection
+	})
+	local v81, v82 = React.useState({
+		LayoutOrder = 1,
+		leadingItem = p15.item,
+		leadingSection = p15.leadingSection,
+		section = p15.section,
+		trailingItem = p15.trailingItem,
+		trailingSection = p15.trailingSection
+	})
+
+	React.useEffect(function() -- line: 601
+		-- upvalues: setSelfHighlightCallback (copy), cellKey (copy), v78 (copy), setSelfUpdatePropsCallback (copy), v82 (copy)
+		setSelfHighlightCallback(cellKey, v78)
+		setSelfUpdatePropsCallback(cellKey, v82)
+
+		return function() -- line: 604
+			-- upvalues: setSelfUpdatePropsCallback (copy), cellKey (copy), setSelfHighlightCallback (copy)
+			setSelfUpdatePropsCallback(cellKey, nil)
+			setSelfHighlightCallback(cellKey, nil)
+		end
+	end, {
+		cellKey,
+		setSelfHighlightCallback,
+		v82,
+		setSelfUpdatePropsCallback
+	})
+
+	local t8 = {
+		highlight = function() -- line: 611
+			-- upvalues: v76 (copy), v78 (copy), prevCellKey (copy), updateHighlightFor (copy)
+			v76(true)
+			v78(true)
+
+			if prevCellKey ~= nil then
+				updateHighlightFor(prevCellKey, true)
+			end
+		end,
+		unhighlight = function() -- line: 618
+			-- upvalues: v76 (copy), v78 (copy), prevCellKey (copy), updateHighlightFor (copy)
+			v76(false)
+			v78(false)
+
+			if prevCellKey ~= nil then
+				updateHighlightFor(prevCellKey, false)
+			end
+		end,
+		updateProps = function(s5: string, p16) -- line: 625
+			-- upvalues: LeadingSeparatorComponent (copy), v80 (copy), Object (copy), v79 (copy), prevCellKey (copy), updatePropsFor (copy), SeparatorComponent (copy), v82 (copy), v81 (copy)
+			if s5 == "leading" then
+				if LeadingSeparatorComponent ~= nil then
+					v80(Object.assign({}, v79, p16))
+
+					return
+				end
+
+				if prevCellKey ~= nil then
+					updatePropsFor(prevCellKey, Object.assign({}, v79, p16))
+
+					return
+				end
+			elseif s5 == "trailing" and SeparatorComponent ~= nil then
+				v82(Object.assign({}, v81, p16))
+			end
+		end
+	}
+	local v84 = p15.renderItem({
+		item = item,
+		index = index,
+		section = section,
+		separators = t8
+	})
+	local v85 = LeadingSeparatorComponent ~= nil and React.createElement(LeadingSeparatorComponent, Object.assign({
+		highlighted = v75
+	}, v79))
+	local v86 = SeparatorComponent ~= nil and React.createElement(SeparatorComponent, Object.assign({
+		highlighted = v77
+	}, v81))
+
+	if v85 or v86 then
+		return (React.createElement(View, {
+			Size = if not p15.horizontal then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 1, 0),
+			AutomaticSize = if not p15.horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X
+		}, React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = if not p15.horizontal then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal
+		}), if inverted ~= false then v86 else v85, v84, if inverted ~= false then v85 else v86))
+	end
+
+	return v84
+end
+
+return v13

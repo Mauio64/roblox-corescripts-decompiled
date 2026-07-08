@@ -1,47 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Messages_0 = script.Parent.Messages;
-local v3 = require(l_Messages_0.NetworkRequests.getOlderMessages);
-local v4 = require(l_Messages_0.NetworkRequests.markConversationAsRead);
-local v5 = require(l_Messages_0.Thunks.sendTextMessage);
-local v6 = require(l_Messages_0.Thunks.getRemainingOlderMessages);
-local v7 = require(l_Messages_0.NetworkRequests.updateTypingStatus);
-local v8 = require(l_script_FirstAncestor_0.Conversations.Thunks.createFriendConversation);
-local v9 = require(l_script_FirstAncestor_0.Logger);
-local v10 = require(l_Parent_0.AppChatNetworking);
-return function(v11) --[[ Line: 16 ]]
-    -- upvalues: v3 (copy), v6 (copy), v5 (copy), v8 (copy), v4 (copy), v7 (copy), v10 (copy), v9 (copy)
-    local function v16(v12, v13, v14, _) --[[ Line: 17 ]]
-        -- upvalues: v11 (copy), v3 (ref)
-        return v11(v3(v12, v13, v14));
-    end;
-    return {
-        getOlderMessages = function(v17, _) --[[ Line: 22 ]] --[[ Name: getOlderMessages ]]
-            -- upvalues: v11 (copy), v6 (ref), v16 (copy)
-            return v11(v6(v16, v17));
-        end, 
-        sendMessage = function(v19, v20, v21) --[[ Line: 25 ]] --[[ Name: sendMessage ]]
-            -- upvalues: v11 (copy), v5 (ref)
-            return v11(v5(v19, v20, v21));
-        end, 
-        createFriendConversation = function(v22, v23) --[[ Line: 28 ]] --[[ Name: createFriendConversation ]]
-            -- upvalues: v11 (copy), v8 (ref)
-            return v11(v8(v22, v23));
-        end, 
-        markConversationAsRead = function(v24) --[[ Line: 31 ]] --[[ Name: markConversationAsRead ]]
-            -- upvalues: v11 (copy), v4 (ref)
-            v11(v4(v24));
-        end, 
-        postTypingStatus = function(v25, _) --[[ Line: 34 ]] --[[ Name: postTypingStatus ]]
-            -- upvalues: v11 (copy), v7 (ref)
-            return v11(v7(v25));
-        end, 
-        getUnreadConversationCount = function() --[[ Line: 39 ]] --[[ Name: getUnreadConversationCount ]]
-            -- upvalues: v11 (copy), v10 (ref), v9 (ref)
-            return v11(v10.rodux.GetConversationMetadata.API()):catch(function(v27) --[[ Line: 40 ]]
-                -- upvalues: v9 (ref)
-                v9:error((("Failure in GetConversationMetadata. Error: %*"):format((tostring(v27)))));
-            end);
-        end
-    };
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Messages = script.Parent.Messages
+local getOlderMessages = require(Messages.NetworkRequests.getOlderMessages)
+local markConversationAsRead = require(Messages.NetworkRequests.markConversationAsRead)
+local sendTextMessage = require(Messages.Thunks.sendTextMessage)
+local getRemainingOlderMessages = require(Messages.Thunks.getRemainingOlderMessages)
+local updateTypingStatus = require(Messages.NetworkRequests.updateTypingStatus)
+local createFriendConversation = require(AppChat.Conversations.Thunks.createFriendConversation)
+local SendGameLinkMessage = require(AppChat.Conversations.Thunks.SendGameLinkMessage)
+local Logger = require(AppChat.Logger)
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+
+return function(p1) -- line: 17
+	-- upvalues: getOlderMessages (copy), getRemainingOlderMessages (copy), sendTextMessage (copy), SendGameLinkMessage (copy), createFriendConversation (copy), markConversationAsRead (copy), updateTypingStatus (copy), AppChatNetworking (copy), Logger (copy)
+	local function v14(p2, p3, p4, _) -- line: 18
+		-- upvalues: p1 (copy), getOlderMessages (copy)
+		return p1(getOlderMessages(p2, p3, p4))
+	end
+
+	return {
+		getOlderMessages = function(p6, _) -- line: 23
+			-- upvalues: p1 (copy), getRemainingOlderMessages (copy), v14 (copy)
+			return p1(getRemainingOlderMessages(v14, p6))
+		end,
+		sendMessage = function(p8, p9, p10) -- line: 26
+			-- upvalues: p1 (copy), sendTextMessage (copy)
+			return p1(sendTextMessage(p8, p9, p10))
+		end,
+		sendGameLinkChatMessage = function(p11, p12) -- line: 29
+			-- upvalues: p1 (copy), SendGameLinkMessage (copy)
+			return p1(SendGameLinkMessage(p11, p12))
+		end,
+		createFriendConversation = function(p13, p14) -- line: 32
+			-- upvalues: p1 (copy), createFriendConversation (copy)
+			return p1(createFriendConversation(p13, p14))
+		end,
+		markConversationAsRead = function(p15) -- line: 35
+			-- upvalues: p1 (copy), markConversationAsRead (copy)
+			p1(markConversationAsRead(p15))
+		end,
+		postTypingStatus = function(p16, _) -- line: 38
+			-- upvalues: p1 (copy), updateTypingStatus (copy)
+			return p1(updateTypingStatus(p16))
+		end,
+		getUnreadConversationCount = function() -- line: 43
+			-- upvalues: p1 (copy), AppChatNetworking (copy), Logger (copy)
+			return p1(AppChatNetworking.rodux.GetConversationMetadata.API()):catch(function(p18) -- line: 44
+				-- upvalues: Logger (copy)
+				Logger:error(`Failure in GetConversationMetadata. Error: { tostring(p18) }`)
+			end)
+		end
+	}
+end

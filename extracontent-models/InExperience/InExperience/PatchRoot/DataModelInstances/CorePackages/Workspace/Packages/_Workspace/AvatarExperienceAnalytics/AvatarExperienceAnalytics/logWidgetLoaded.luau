@@ -1,32 +1,38 @@
-local v0 = require(script.Parent.UnifiedEventLogEnums);
-local v1 = require(script.Parent.sendUnifiedEventLog);
-return function(v2, v3) --[[ Line: 4 ]] --[[ Name: logWidgetLoaded ]]
-    -- upvalues: v1 (copy), v0 (copy)
-    for v4, v5 in v2 do
-        local v6 = {};
-        local v7 = {};
-        local v8 = {};
-        if v5.content then
-            for _, v10 in v5.content do
-                if v10.type == "Asset" then
-                    table.insert(v6, v10.id);
-                elseif v10.type == "Bundle" then
-                    table.insert(v7, v10.id);
-                end;
-                table.insert(v8, v10.id);
-            end;
-        end;
-        v1({
-            action = v0.MarketplaceUnifiedAction.WIDGET_LOADED, 
-            requestId = v3, 
-            widgetId = v5.id, 
-            widgetType = v5.type, 
-            themeId = v5.tagId, 
-            gridPositionRow = v4, 
-            gridPositionColumn = 1, 
-            assetIds = table.concat(v6, ","), 
-            bundleIds = table.concat(v7, ","), 
-            widgetItemIds = table.concat(v8, ",")
-        });
-    end;
-end;
+local UnifiedEventLogEnums = require(script.Parent.UnifiedEventLogEnums)
+local sendUnifiedEventLog = require(script.Parent.sendUnifiedEventLog)
+
+local function logWidgetLoaded(p1, p2) -- line: 4
+	-- upvalues: sendUnifiedEventLog (copy), UnifiedEventLogEnums (copy)
+	for v6, v7 in p1 do
+		local t1 = {}
+		local t2 = {}
+		local t3 = {}
+
+		if v7.content then
+			for _, v12 in v7.content do
+				if v12.type == "Asset" then
+					table.insert(t1, v12.id)
+				elseif v12.type == "Bundle" then
+					table.insert(t2, v12.id)
+				end
+
+				table.insert(t3, v12.id)
+			end
+		end
+
+		sendUnifiedEventLog({
+			gridPositionColumn = 1,
+			action = UnifiedEventLogEnums.MarketplaceUnifiedAction.WIDGET_LOADED,
+			requestId = p2,
+			widgetId = v7.id,
+			widgetType = v7.type,
+			themeId = v7.tagId,
+			gridPositionRow = v6,
+			assetIds = table.concat(t1, ","),
+			bundleIds = table.concat(t2, ","),
+			widgetItemIds = table.concat(t3, ",")
+		})
+	end
+end
+
+return logWidgetLoaded

@@ -1,111 +1,119 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_withStyle_0 = v3.Core.Style.withStyle;
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v3.Core.ImageSet.ImageSetLabel;
-local v8 = l_Images_0["icons/imageUnavailable"];
-local v9 = l_Images_0["component_assets/circle_17"];
-local v10 = Rect.new(8, 8, 9, 9);
-local v11 = v1.PureComponent:extend("MenuHeader");
-v11.validateProps = v2.strictInterface({
-    gameName = v2.string, 
-    layoutOrder = v2.integer, 
-    height = v2.numberPositive
-});
-v11.render = function(v12) --[[ Line: 38 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), l_ImageSetLabel_0 (copy), v9 (copy), v10 (copy), v8 (copy)
-    return l_withStyle_0(function(v13) --[[ Line: 39 ]]
-        -- upvalues: v1 (ref), l_ImageSetLabel_0 (ref), v9 (ref), v10 (ref), v8 (ref), v12 (copy)
-        local l_Theme_0 = v13.Theme;
-        local l_Font_0 = v13.Font;
-        local v16 = nil;
-        if game.GameId == 0 then
-            v16 = v1.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = v9, 
-                SliceCenter = v10, 
-                ScaleType = Enum.ScaleType.Slice, 
-                Size = UDim2.fromOffset(80, 80), 
-                ImageColor3 = v13.Theme.PlaceHolder.Color, 
-                ImageTransparency = v13.Theme.PlaceHolder.Transparency
-            }, {
-                PlaceholderIcon = v1.createElement(l_ImageSetLabel_0, {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.fromOffset(44, 44), 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    Image = v8, 
-                    ImageColor3 = v13.Theme.UIDefault.Color, 
-                    ImageTransparency = v13.Theme.UIDefault.Transparency, 
-                    AnchorPoint = Vector2.new(0.5, 0.5)
-                })
-            });
-        else
-            local v17 = ("rbxthumb://type=GameIcon&id=%d&w=%d&h=%d"):format(game.GameId, 128, 128);
-            v16 = v1.createElement("ImageLabel", {
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromOffset(80, 80), 
-                Image = v17
-            });
-        end;
-        return v1.createElement("Frame", {
-            LayoutOrder = v12.props.layoutOrder, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, v12.props.height)
-        }, {
-            ContentsFrame = v1.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1)
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    Padding = UDim.new(0, 20)
-                }), 
-                Padding = v1.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, 20), 
-                    PaddingRight = UDim.new(0, 20)
-                }), 
-                GameIcon = v16, 
-                TextFrame = v1.createElement("Frame", {
-                    LayoutOrder = 2, 
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, -100, 1, 0)
-                }, {
-                    TextLabel = v1.createElement("TextLabel", {
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.new(1, 0, 1, -45), 
-                        Position = UDim2.fromOffset(0, 25), 
-                        Font = l_Font_0.Header1.Font, 
-                        Text = v12.props.gameName, 
-                        TextSize = l_Font_0.BaseSize * l_Font_0.Header1.RelativeSize, 
-                        TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                        TextTransparency = l_Theme_0.TextEmphasis.TextTransparency, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextYAlignment = Enum.TextYAlignment.Top, 
-                        TextTruncate = Enum.TextTruncate.AtEnd, 
-                        TextWrapped = true
-                    })
-                })
-            }), 
-            Divider = v1.createElement("Frame", {
-                BorderSizePixel = 0, 
-                Size = UDim2.new(1, 0, 0, 1), 
-                Position = UDim2.fromScale(0, 1), 
-                AnchorPoint = Vector2.new(0, 1), 
-                BackgroundTransparency = l_Theme_0.Divider.Transparency, 
-                BackgroundColor3 = l_Theme_0.Divider.Color
-            })
-        });
-    end);
-end;
-return v4.UNSTABLE_connect2(function(v18) --[[ Line: 138 ]] --[[ Name: mapStateToProps ]]
-    return {
-        gameName = v18.gameInfo.name
-    };
-end, nil)(v11);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local withStyle = UIBlox.Core.Style.withStyle
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v9 = Images["icons/imageUnavailable"]
+local v10 = Images["component_assets/circle_17"]
+local rect = Rect.new(8, 8, 9, 9)
+local v12 = Roact.PureComponent:extend("MenuHeader")
+
+v12.validateProps = t.strictInterface({
+	gameName = t.string,
+	layoutOrder = t.integer,
+	height = t.numberPositive
+})
+
+function v12.render(p1) -- line: 38
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), v10 (copy), rect (copy), v9 (copy)
+	return withStyle(function(p2) -- line: 39
+		-- upvalues: Roact (copy), ImageSetLabel (copy), v10 (copy), rect (copy), v9 (copy), p1 (copy)
+		local Theme = p2.Theme
+		local p2Font = p2.Font
+		local v19
+
+		if game.GameId == 0 then
+			v19 = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = v10,
+				SliceCenter = rect,
+				ScaleType = Enum.ScaleType.Slice,
+				Size = UDim2.fromOffset(80, 80),
+				ImageColor3 = p2.Theme.PlaceHolder.Color,
+				ImageTransparency = p2.Theme.PlaceHolder.Transparency
+			}, {
+				PlaceholderIcon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromOffset(44, 44),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Image = v9,
+					ImageColor3 = p2.Theme.UIDefault.Color,
+					ImageTransparency = p2.Theme.UIDefault.Transparency,
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				})
+			})
+		else
+			local v20 = ("rbxthumb://type=GameIcon&id=%d&w=%d&h=%d"):format(game.GameId, 128, 128)
+
+			v19 = Roact.createElement("ImageLabel", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(80, 80),
+				Image = v20
+			})
+		end
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = p1.props.layoutOrder,
+			Size = UDim2.new(1, 0, 0, p1.props.height)
+		}, {
+			ContentsFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 20)
+				}),
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 20),
+					PaddingRight = UDim.new(0, 20)
+				}),
+				GameIcon = v19,
+				TextFrame = Roact.createElement("Frame", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -100, 1, 0)
+				}, {
+					TextLabel = Roact.createElement("TextLabel", {
+						BackgroundTransparency = 1,
+						TextWrapped = true,
+						Size = UDim2.new(1, 0, 1, -45),
+						Position = UDim2.fromOffset(0, 25),
+						Font = p2Font.Header1.Font,
+						Text = p1.props.gameName,
+						TextSize = p2Font.BaseSize * p2Font.Header1.RelativeSize,
+						TextColor3 = Theme.TextEmphasis.Color,
+						TextTransparency = Theme.TextEmphasis.TextTransparency,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextYAlignment = Enum.TextYAlignment.Top,
+						TextTruncate = Enum.TextTruncate.AtEnd
+					})
+				})
+			}),
+			Divider = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, 1),
+				Position = UDim2.fromScale(0, 1),
+				AnchorPoint = Vector2.new(0, 1),
+				BackgroundTransparency = Theme.Divider.Transparency,
+				BackgroundColor3 = Theme.Divider.Color
+			})
+		})
+	end)
+end
+
+local function mapStateToProps(p3) -- line: 138
+	return {
+		gameName = p3.gameInfo.name
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v12)

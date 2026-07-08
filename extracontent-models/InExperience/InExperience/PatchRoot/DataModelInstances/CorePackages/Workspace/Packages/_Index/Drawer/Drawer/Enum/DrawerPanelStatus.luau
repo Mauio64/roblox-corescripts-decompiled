@@ -1,6 +1,6 @@
 return {
-    Static = "Static", 
-    Movable = "Movable", 
-    Scrollable = "Scrollable", 
-    Closing = "Closing"
-};
+	Static = "Static",
+	Movable = "Movable",
+	Scrollable = "Scrollable",
+	Closing = "Closing"
+}

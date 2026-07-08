@@ -1,13 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v3 = require(l_Parent_0.ArgCheck);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-return function(v6, v7, v8) --[[ Line: 12 ]]
-    -- upvalues: v3 (copy), l_LocalizationService_0 (copy), l_Url_0 (copy)
-    v3.assert(v7, "abuseVector is required");
-    v3.isType(v7, "string", "fetchBeduiData expects abuseVector as a string");
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    return v6(("%*abuse-reporting/v1/dynamic-config?abuseVector=%*&locale=%*&entryPoint=ua&targetId=%*"):format(l_Url_0.APIS_URL, v7, l_RobloxLocaleId_0, v8), "GET");
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local LocalizationService = game:GetService("LocalizationService")
+local ArgCheck = require(GenericAbuseReportingParent.ArgCheck)
+local Url = require(GenericAbuseReportingParent.Http).Url
+
+require(GenericAbuseReporting.Enums.AbuseVector)
+
+local FFlagAbuseReportConfigStoreResolver = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportConfigStoreResolver
+
+return function(p1, p2, s1: string) -- line: 17
+	-- upvalues: ArgCheck (copy), LocalizationService (copy), FFlagAbuseReportConfigStoreResolver (copy), Url (copy)
+	ArgCheck.assert(p2, "abuseVector is required")
+	ArgCheck.isType(p2, "string", "fetchBeduiData expects abuseVector as a string")
+
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local v11 = not FFlagAbuseReportConfigStoreResolver and "" or "&version=2"
+
+	return p1(`{ Url.APIS_URL }abuse-reporting/v1/dynamic-config?abuseVector={ p2 }&locale={ RobloxLocaleId }&entryPoint=ua&targetId={ s1 }{ v11 }`, "GET")
+end

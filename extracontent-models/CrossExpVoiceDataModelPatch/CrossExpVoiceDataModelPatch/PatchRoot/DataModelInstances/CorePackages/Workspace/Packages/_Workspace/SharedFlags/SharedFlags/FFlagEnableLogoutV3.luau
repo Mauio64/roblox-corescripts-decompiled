@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLogoutV3", false);
+return game:DefineFastFlag("EnableLogoutV3", false)

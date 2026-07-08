@@ -1,1 +1,1 @@
-return require(script.InventoryContainer);
+return require(script.InventoryContainer)

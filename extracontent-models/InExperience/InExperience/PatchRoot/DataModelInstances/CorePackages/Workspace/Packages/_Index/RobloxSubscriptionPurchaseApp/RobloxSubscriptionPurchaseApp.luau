@@ -1,25 +1,35 @@
-local l_script_0 = script;
-local v1 = require(l_script_0.Enums.RobloxSubscriptionFlowCompleteReason);
-local v2 = require(l_script_0.Enums.SurfaceName);
-local v3 = require(l_script_0.Enums.SurfaceContext);
-local v4 = require(l_script_0.Components.BlackbirdUpsellBanner);
-local v5 = require(l_script_0.Network.getRobloxSubscriptionProducts);
-local _ = require(l_script_0.types);
-local v7 = require(l_script_0.Store.RobloxSubscriptionSignals);
+local _script = script
+local FFlagRobloxPlusFAEFreeTrial = require(_script.Flags.FFlagRobloxPlusFAEFreeTrial)
+local RobloxSubscriptionFlowCompleteReason = require(_script.Enums.RobloxSubscriptionFlowCompleteReason)
+local SurfaceName = require(_script.Enums.SurfaceName)
+local SurfaceContext = require(_script.Enums.SurfaceContext)
+local PurchaseClientSessionIdType = require(_script.Enums.PurchaseClientSessionIdType)
+local SubscriptionGrantType = require(_script.Enums.SubscriptionGrantType)
+local BlackbirdUpsellBanner = require(_script.Components.BlackbirdUpsellBanner)
+local getRobloxSubscriptionProducts = require(_script.Network.getRobloxSubscriptionProducts)
+
+require(_script.types)
+
+local RobloxSubscriptionSignals = require(_script.Store.RobloxSubscriptionSignals)
+
 return {
-    initiateRobloxSubscriptionPurchase = require(script.Flows.initiateRobloxSubscriptionPurchase), 
-    SurfaceContext = v3, 
-    SurfaceName = v2, 
-    RobloxSubscriptionFlowCompleteReason = v1, 
-    Components = {
-        BlackbirdUpsellBanner = v4
-    }, 
-    Network = {
-        getRobloxSubscriptionProducts = v5
-    }, 
-    RobloxSubscriptionSignals = v7, 
-    Utils = {
-        getSubscriptionPurchaseCloseCallback = require(l_script_0.Utils.getSubscriptionPurchaseCloseCallback)
-    }, 
-    ["jest.config"] = script["jest.config"]
-};
+	FFlagRobloxPlusFAEFreeTrial = FFlagRobloxPlusFAEFreeTrial,
+	initiateRobloxSubscriptionPurchase = require(script.Flows.initiateRobloxSubscriptionPurchase),
+	SurfaceContext = SurfaceContext,
+	SurfaceName = SurfaceName,
+	PurchaseClientSessionIdType = PurchaseClientSessionIdType,
+	RobloxSubscriptionFlowCompleteReason = RobloxSubscriptionFlowCompleteReason,
+	SubscriptionGrantType = SubscriptionGrantType,
+	Components = {
+		BlackbirdUpsellBanner = BlackbirdUpsellBanner
+	},
+	Network = {
+		getRobloxSubscriptionProducts = getRobloxSubscriptionProducts,
+		claimTrial = require(_script.Network.claimTrial)
+	},
+	RobloxSubscriptionSignals = RobloxSubscriptionSignals,
+	Utils = {
+		getSubscriptionPurchaseCloseCallback = require(_script.Utils.getSubscriptionPurchaseCloseCallback)
+	},
+	["jest.config"] = script["jest.config"]
+}

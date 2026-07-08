@@ -1,17 +1,23 @@
-return function(v0, v1, v2, v3) --[[ Line: 1 ]]
-    if v0 then
-        if v1 == "Muted" or v1 == "LOCAL_MUTED" then
-            return v0("Muted", v3);
-        elseif v1 == "Connecting" then
-            return v0("Connecting", v3);
-        elseif v1 == "Inactive" then
-            return v0("Unmuted0", v3);
-        elseif v1 == "Talking" then
-            return v0("Unmuted" .. tostring(math.floor(0.5 + 5 * v2) * 20), v3);
-        else
-            return v0("Error", v3);
-        end;
-    else
-        return "";
-    end;
-end;
+return function(p1, p2, p3, p4) -- line: 1
+	if p1 then
+		if p2 == "Muted" or p2 == "LOCAL_MUTED" then
+			return p1("Muted", p4)
+		end
+
+		if p2 == "Connecting" then
+			return p1("Connecting", p4)
+		end
+
+		if p2 == "Inactive" then
+			return p1("Unmuted0", p4)
+		end
+
+		if p2 == "Talking" then
+			return p1("Unmuted" .. tostring(math.floor(0.5 + 5 * p3) * 20), p4)
+		end
+
+		return p1("Error", p4)
+	end
+
+	return ""
+end

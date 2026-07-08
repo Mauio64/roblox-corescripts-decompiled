@@ -1,19 +1,20 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_Parent_0.AppCommonLib);
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: v3 (copy), l_GuiService_0 (copy), v1 (copy)
-    if v3.IsVRAppBuild() or l_GuiService_0:IsTenFootInterface() then
-        return v4;
-    else
-        return v1.createElement("ScreenGui", {
-            Enabled = true, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Global, 
-            DisplayOrder = 10, 
-            IgnoreGuiInset = true
-        }, {
-            Component = v4
-        });
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local GuiService = game:GetService("GuiService")
+local AppCommonLib = require(ParentParent.AppCommonLib)
+
+return function(p1) -- line: 7
+	-- upvalues: AppCommonLib (copy), GuiService (copy), React (copy)
+	if AppCommonLib.IsVRAppBuild() or GuiService:IsTenFootInterface() then
+		return p1
+	end
+
+	return React.createElement("ScreenGui", {
+		Enabled = true,
+		DisplayOrder = 10,
+		IgnoreGuiInset = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Global
+	}, {
+		Component = p1
+	})
+end

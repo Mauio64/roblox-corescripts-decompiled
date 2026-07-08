@@ -1,68 +1,70 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceControlBar").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_FoundationProvider_0 = v2.FoundationProvider;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_Localization_0 = require(l_Parent_0.Dev.AppLocales).Localization;
-local l_Theme_0 = v2.Enums.Theme;
-local l_Device_0 = v2.Enums.Device;
-local v8 = require(l_Parent_0.Dev.ReactRoblox);
-local v9 = {
-    Light = l_Theme_0.Light, 
-    Dark = l_Theme_0.Dark
-};
-local v10 = {
-    Console = l_Device_0.Console, 
-    Desktop = l_Device_0.Desktop
-};
-local v11 = {
-    Default = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
+local Parent = script:FindFirstAncestor("AvatarExperienceControlBar").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+local Localization = require(Parent.Dev.AppLocales).Localization
+local Theme = Foundation.Enums.Theme
+local Device = Foundation.Enums.Device
+local ReactRoblox = require(Parent.Dev.ReactRoblox)
+local t1 = {
+	Light = Theme.Light,
+	Dark = Theme.Dark
+}
+local t2 = {
+	Console = Device.Console,
+	Desktop = Device.Desktop
+}
+local t3 = {
+	Default = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+
 return {
-    name = "AvatarExperienceControlBar", 
-    roact = v1, 
-    reactRoblox = v8, 
-    mapStory = function(v12) --[[ Line: 38 ]] --[[ Name: mapStory ]]
-        -- upvalues: v9 (copy), v1 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_FoundationProvider_0 (copy), v11 (copy), v10 (copy)
-        return function(v13) --[[ Line: 39 ]]
-            -- upvalues: v9 (ref), v1 (ref), l_LocalizationProvider_0 (ref), l_Localization_0 (ref), l_FoundationProvider_0 (ref), v11 (ref), v10 (ref), v12 (copy)
-            local v14 = v9[v13.theme];
-            return v1.createElement("Frame", {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.fromScale(1, 0), 
-                BackgroundTransparency = 1
-            }, {
-                UIPadding = v1.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 10), 
-                    PaddingBottom = UDim.new(0, 10), 
-                    PaddingLeft = UDim.new(0, 10), 
-                    PaddingRight = UDim.new(0, 10)
-                }), 
-                LocalizationProvider = v1.createElement(l_LocalizationProvider_0, {
-                    localization = l_Localization_0.new("en-us")
-                }, {
-                    FoundationProvider = v1.createElement(l_FoundationProvider_0, {
-                        styleTable = v11, 
-                        theme = v14, 
-                        device = v10[v13.platform], 
-                        preferences = v13.settings, 
-                        DONOTUSE_colorUpdate = true
-                    }, {
-                        Child = v1.createElement(v12, v13)
-                    })
-                })
-            });
-        end;
-    end
-};
+	name = "AvatarExperienceControlBar",
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = function(p1) -- line: 38
+		-- upvalues: t1 (copy), React (copy), LocalizationProvider (copy), Localization (copy), FoundationProvider (copy), t3 (copy), t2 (copy)
+		return function(p2) -- line: 39
+			-- upvalues: t1 (copy), React (copy), LocalizationProvider (copy), Localization (copy), FoundationProvider (copy), t3 (copy), t2 (copy), p1 (copy)
+			local v15 = t1[p2.theme]
+
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(1, 0)
+			}, {
+				UIPadding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10)
+				}),
+				LocalizationProvider = React.createElement(LocalizationProvider, {
+					localization = Localization.new("en-us")
+				}, {
+					FoundationProvider = React.createElement(FoundationProvider, {
+						DONOTUSE_colorUpdate = true,
+						styleTable = t3,
+						theme = v15,
+						device = t2[p2.platform],
+						preferences = p2.settings
+					}, {
+						Child = React.createElement(p1, p2)
+					})
+				})
+			})
+		end
+	end
+}

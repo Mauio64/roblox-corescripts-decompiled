@@ -1,116 +1,118 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericChallenges").Parent;
-local v1 = require(l_Parent_0.React);
-local l_AppLinking_0 = require(l_Parent_0.RoactServiceTags).AppLinking;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_FullscreenPageWithSafeArea_0 = require(l_Parent_0.AppBlox).FullscreenPageWithSafeArea;
-local v6 = require(l_Parent_0.Foundation);
-local l_Dialog_0 = v6.Dialog;
-local l_DialogSize_0 = v6.Enums.DialogSize;
-local l_View_0 = v6.View;
-local l_Button_0 = v6.Button;
-local l_ButtonVariant_0 = v6.Enums.ButtonVariant;
-local l_InputSize_0 = v6.Enums.InputSize;
-local l_FillBehavior_0 = v6.Enums.FillBehavior;
-local l_Loading_0 = v6.Loading;
-local l_Text_0 = v6.Text;
-local v16 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceWrapper_0 = v16.FocusNavigableSurfaceWrapper;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v16.FocusNavigableSurfaceIdentifierEnum;
-return function(v19) --[[ Line: 35 ]] --[[ Name: PersonaLivenessHosted ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppLinking_0 (copy), v1 (copy), l_useLocalization_0 (copy), l_FullscreenPageWithSafeArea_0 (copy), l_FocusNavigableSurfaceWrapper_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), l_Dialog_0 (copy), l_DialogSize_0 (copy), l_View_0 (copy), l_Loading_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy), l_FillBehavior_0 (copy)
-    local l_webLink_0 = v19.webLink;
-    local l_onCancel_0 = v19.onCancel;
-    local l_sessionId_0 = v19.sessionId;
-    local v23 = l_useRoactService_0(l_AppLinking_0);
-    local v24, v25 = v1.useState(false);
-    local v26 = v1.useCallback(function() --[[ Line: 44 ]]
-        -- upvalues: v25 (copy), v23 (copy), l_webLink_0 (copy)
-        v25(true);
-        v23:openURL(l_webLink_0);
-    end, {
-        v23, 
-        l_webLink_0, 
-        l_sessionId_0
-    });
-    local v27 = v1.useCallback(function() --[[ Line: 49 ]]
-        -- upvalues: l_onCancel_0 (copy)
-        l_onCancel_0();
-    end, {
-        l_onCancel_0, 
-        l_sessionId_0
-    });
-    local v28 = l_useLocalization_0({
-        title = "Feature.BiometricChallenge.Title.ConfirmHuman", 
-        bodyText = "Feature.BiometricChallenge.Content.LivenessHostedPrompt", 
-        loadingText = "Feature.BiometricChallenge.Content.Loading", 
-        continueButton = "Feature.BiometricChallenge.Action.Continue", 
-        cancelButton = "Feature.BiometricChallenge.Action.Cancel"
-    });
-    return v1.createElement("ScreenGui", {
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-        DisplayOrder = 200, 
-        IgnoreGuiInset = true
-    }, {
-        Overlay = v1.createElement(l_FullscreenPageWithSafeArea_0, {
-            includeStatusBar = false
-        }, {
-            FocusNavigableSurface = v1.createElement(l_FocusNavigableSurfaceWrapper_0, {
-                surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.ModerationOverlay, 
-                isIsolated = true
-            }, {
-                Dialog = v1.createElement(l_Dialog_0.Root, {
-                    size = l_DialogSize_0.Medium, 
-                    hasBackdrop = true
-                }, {
-                    DialogTitle = not v24 and v1.createElement(l_Dialog_0.Title, {
-                        text = v28.title, 
-                        LayoutOrder = 1
-                    }), 
-                    DialogContent = v1.createElement(l_Dialog_0.Content, nil, {
-                        DialogView = v1.createElement(l_View_0, {
-                            tag = "col fill auto-xy items-center gap-medium"
-                        }, {
-                            Loading = v24 and v1.createElement(l_View_0, {
-                                LayoutOrder = 1, 
-                                tag = "auto-xy margin-top-medium"
-                            }, {
-                                v1.createElement(l_Loading_0, {})
-                            }), 
-                            DialogBody = v24 and v1.createElement(l_Text_0, {
-                                Text = v28.loadingText, 
-                                LayoutOrder = 2, 
-                                tag = "text-wrap auto-y size-full-0 text-body-medium"
-                            }) or v1.createElement(l_Dialog_0.Text, {
-                                Text = v28.bodyText, 
-                                LayoutOrder = 2
-                            }), 
-                            DialogFooter = v1.createElement(l_View_0, {
-                                tag = "row size-full-0 auto-y gap-small", 
-                                LayoutOrder = 3
-                            }, {
-                                CancelButton = v1.createElement(l_Button_0, {
-                                    variant = l_ButtonVariant_0.Standard, 
-                                    size = l_InputSize_0.Medium, 
-                                    text = v28.cancelButton, 
-                                    fillBehavior = l_FillBehavior_0.Fill, 
-                                    onActivated = v27, 
-                                    LayoutOrder = 1
-                                }), 
-                                ContinueButton = not v24 and v1.createElement(l_Button_0, {
-                                    variant = l_ButtonVariant_0.Emphasis, 
-                                    size = l_InputSize_0.Medium, 
-                                    text = v28.continueButton, 
-                                    fillBehavior = l_FillBehavior_0.Fill, 
-                                    onActivated = v26, 
-                                    icon = "icons/navigation/externallink_medium", 
-                                    LayoutOrder = 2
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericChallenges").Parent
+local React = require(Parent.React)
+local AppLinking = require(Parent.RoactServiceTags).AppLinking
+local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local FullscreenPageWithSafeArea = require(Parent.AppBlox).FullscreenPageWithSafeArea
+local Foundation = require(Parent.Foundation)
+local Dialog = Foundation.Dialog
+local DialogSize = Foundation.Enums.DialogSize
+local View = Foundation.View
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local FillBehavior = Foundation.Enums.FillBehavior
+local Loading = Foundation.Loading
+local FoundationText = Foundation.Text
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+
+local function PersonaLivenessHosted(t1: {[any]: any}) -- line: 35
+	-- upvalues: useRoactService (copy), AppLinking (copy), React (copy), useLocalization (copy), FullscreenPageWithSafeArea (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigableSurfaceIdentifierEnum (copy), Dialog (copy), DialogSize (copy), View (copy), Loading (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), InputSize (copy), FillBehavior (copy)
+	local webLink = t1.webLink
+	local onCancel = t1.onCancel
+	local sessionId = t1.sessionId
+	local v25 = useRoactService(AppLinking)
+	local v26, v27 = React.useState(false)
+	local v28 = React.useCallback(function() -- line: 44
+		-- upvalues: v27 (copy), v25 (copy), webLink (copy)
+		v27(true)
+		v25:openURL(webLink)
+	end, {
+		v25,
+		webLink,
+		sessionId
+	})
+	local v29 = React.useCallback(function() -- line: 49
+		-- upvalues: onCancel (copy)
+		onCancel()
+	end, {
+		onCancel,
+		sessionId
+	})
+	local v30 = useLocalization({
+		title = "Feature.BiometricChallenge.Title.ConfirmHuman",
+		bodyText = "Feature.BiometricChallenge.Content.LivenessHostedPrompt",
+		loadingText = "Feature.BiometricChallenge.Content.Loading",
+		continueButton = "Feature.BiometricChallenge.Action.Continue",
+		cancelButton = "Feature.BiometricChallenge.Action.Cancel"
+	})
+
+	return React.createElement("ScreenGui", {
+		DisplayOrder = 200,
+		IgnoreGuiInset = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	}, {
+		Overlay = React.createElement(FullscreenPageWithSafeArea, {
+			includeStatusBar = false
+		}, {
+			FocusNavigableSurface = React.createElement(FocusNavigableSurfaceWrapper, {
+				isIsolated = true,
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ModerationOverlay
+			}, {
+				Dialog = React.createElement(Dialog.Root, {
+					hasBackdrop = true,
+					size = DialogSize.Medium
+				}, {
+					DialogTitle = not v26 and React.createElement(Dialog.Title, {
+						LayoutOrder = 1,
+						text = v30.title
+					}),
+					DialogContent = React.createElement(Dialog.Content, nil, {
+						DialogView = React.createElement(View, {
+							tag = "col fill auto-xy items-center gap-medium"
+						}, {
+							Loading = v26 and React.createElement(View, {
+								LayoutOrder = 1,
+								tag = "auto-xy margin-top-medium"
+							}, { React.createElement(Loading, {}) }),
+							DialogBody = v26 and React.createElement(FoundationText, {
+								LayoutOrder = 2,
+								tag = "text-wrap auto-y size-full-0 text-body-medium",
+								Text = v30.loadingText
+							}) or React.createElement(Dialog.Text, {
+								LayoutOrder = 2,
+								Text = v30.bodyText
+							}),
+							DialogFooter = React.createElement(View, {
+								tag = "row size-full-0 auto-y gap-small",
+								LayoutOrder = 3
+							}, {
+								CancelButton = React.createElement(Button, {
+									LayoutOrder = 1,
+									variant = ButtonVariant.Standard,
+									size = InputSize.Medium,
+									text = v30.cancelButton,
+									fillBehavior = FillBehavior.Fill,
+									onActivated = v29
+								}),
+								ContinueButton = not v26 and React.createElement(Button, {
+									icon = "icons/navigation/externallink_medium",
+									LayoutOrder = 2,
+									variant = ButtonVariant.Emphasis,
+									size = InputSize.Medium,
+									text = v30.continueButton,
+									fillBehavior = FillBehavior.Fill,
+									onActivated = v28
+								})
+							})
+						})
+					})
+				})
+			})
+		})
+	})
+end
+
+return PersonaLivenessHosted

@@ -1,29 +1,34 @@
-local v0 = require(script.Parent.Parent.FireEvent.fireEventStream);
-local v1 = require(script.Parent.Parent.FireEvent.fireDiagCounter);
-local v2 = require(script.Parent.DiagEventList);
-local v3 = require(script.Parent.EventStreamEventList);
-local _ = require(script.Parent.Parent.FireEvent.Types);
-return function(v5) --[[ Line: 8 ]]
-    -- upvalues: v0 (copy), v3 (copy), v1 (copy), v2 (copy)
-    local v6 = v0({
-        eventStreamImpl = v5.analytics.EventStream, 
-        eventList = v3, 
-        loggerImpl = v5.loggerImpl, 
-        infoForAllEvents = v5.infoForAllEvents
-    });
-    local v7 = v1({
-        diagImpl = v5.analytics.Diag, 
-        eventList = v2, 
-        loggerImpl = v5.loggerImpl
-    });
-    return function(v8, v9) --[[ Line: 21 ]]
-        -- upvalues: v3 (ref), v6 (copy), v2 (ref), v7 (copy)
-        if v3[v8] then
-            v6(v8, v9);
-        end;
-        if v2[v8] then
-            v7(v8);
-        end;
-        return DateTime.now();
-    end;
-end;
+local fireEventStream = require(script.Parent.Parent.FireEvent.fireEventStream)
+local fireDiagCounter = require(script.Parent.Parent.FireEvent.fireDiagCounter)
+local DiagEventList = require(script.Parent.DiagEventList)
+local EventStreamEventList = require(script.Parent.EventStreamEventList)
+
+require(script.Parent.Parent.FireEvent.Types)
+
+return function(t1: {[any]: any}) -- line: 8
+	-- upvalues: fireEventStream (copy), EventStreamEventList (copy), fireDiagCounter (copy), DiagEventList (copy)
+	local v6 = fireEventStream({
+		eventStreamImpl = t1.analytics.EventStream,
+		eventList = EventStreamEventList,
+		loggerImpl = t1.loggerImpl,
+		infoForAllEvents = t1.infoForAllEvents
+	})
+	local v7 = fireDiagCounter({
+		diagImpl = t1.analytics.Diag,
+		eventList = DiagEventList,
+		loggerImpl = t1.loggerImpl
+	})
+
+	return function(p1, p2) -- line: 21
+		-- upvalues: EventStreamEventList (copy), v6 (copy), DiagEventList (copy), v7 (copy)
+		if EventStreamEventList[p1] then
+			v6(p1, p2)
+		end
+
+		if DiagEventList[p1] then
+			v7(p1)
+		end
+
+		return DateTime.now()
+	end
+end

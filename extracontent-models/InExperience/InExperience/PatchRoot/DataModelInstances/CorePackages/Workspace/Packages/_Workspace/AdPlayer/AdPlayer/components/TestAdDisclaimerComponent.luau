@@ -1,20 +1,24 @@
-local l_Parent_0 = script:FindFirstAncestor("AdPlayer").Parent;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_Text_0 = v3.Text;
-local v6 = {
-    eligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoEligibleDisclaimer", 
-    ineligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoIneligibleDisclaimer"
-};
-return function(v7) --[[ Line: 18 ]] --[[ Name: TestAdDisclaimerComponent ]]
-    -- upvalues: l_useLocalization_0 (copy), v6 (copy), l_useTokens_0 (copy), v2 (copy), l_Text_0 (copy)
-    local v8 = l_useLocalization_0(v6);
-    local v9 = l_useTokens_0();
-    return v2.createElement(l_Text_0, {
-        tag = "bg-over-media-0 padding-medium radius-medium auto-xy text-body-large anchor-top-center", 
-        Position = UDim2.new(0.5, 0, 0, v9.Gap.XLarge), 
-        Text = if v7.isEligible then v8.eligibleDisclaimer else v8.ineligibleDisclaimer
-    });
-end;
+local Parent = script:FindFirstAncestor("AdPlayer").Parent
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local FoundationText = Foundation.Text
+local t1 = {
+	eligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoEligibleDisclaimer",
+	ineligibleDisclaimer = "CoreScripts.Ads.Label.RewardedVideoIneligibleDisclaimer"
+}
+
+local function TestAdDisclaimerComponent(t2: {[any]: any}) -- line: 18
+	-- upvalues: useLocalization (copy), t1 (copy), useTokens (copy), React (copy), FoundationText (copy)
+	local v10 = useLocalization(t1)
+	local v11 = useTokens()
+
+	return React.createElement(FoundationText, {
+		tag = "bg-over-media-0 padding-medium radius-medium auto-xy text-body-large anchor-top-center",
+		Position = UDim2.new(0.5, 0, 0, v11.Gap.XLarge),
+		Text = if not t2.isEligible then v10.ineligibleDisclaimer else v10.eligibleDisclaimer
+	})
+end
+
+return TestAdDisclaimerComponent

@@ -1,3 +1,3 @@
 return {
-    ConversationCell = require(script.ConversationCell)
-};
+	ConversationCell = require(script.ConversationCell)
+}

@@ -1,6 +1,7 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local Flags = require(Foundation.Utility.Flags)
 local StatusIndicatorVariant = require(Foundation.Enums.StatusIndicatorVariant)
+local StatusIndicatorShape = require(Foundation.Enums.StatusIndicatorShape)
 
 require(Foundation.Components.Types)
 
@@ -9,15 +10,16 @@ local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
 require(Foundation.Providers.Style.Tokens)
 
 local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+local v7 = _G.__DEV__ == true
+local Constants = require(Foundation.Constants)
+local font = Font.new(Constants.BUILDER_SANS_FONT_ASSET, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
 
-function variantsFactory(p1) -- line: 24
-	-- upvalues: StatusIndicatorVariant (copy), Flags (copy)
+function variantsFactory(p1) -- line: 33
+	-- upvalues: Flags (copy), font (copy), StatusIndicatorVariant (copy), StatusIndicatorShape (copy)
 	local t1 = {
-		container = {
-			tag = "radius-circle"
-		},
 		content = {
-			tag = "auto-xy text-caption-small text-align-x-left"
+			tag = not Flags.FoundationStatusIndicatorBeta and "auto-xy text-caption-small text-align-x-left" or "auto-xy text-align-x-left",
+			font = if not Flags.FoundationStatusIndicatorBeta then nil else font
 		}
 	}
 	local t2 = {
@@ -83,6 +85,11 @@ function variantsFactory(p1) -- line: 24
 			content = {
 				style = p1.Inverse.Content.Emphasis
 			}
+		},
+		[StatusIndicatorVariant.Voice] = {
+			container = {
+				backgroundStyle = p1.Color.Extended.Orange.Orange_600
+			}
 		}
 	}
 	local t3 = {
@@ -97,17 +104,38 @@ function variantsFactory(p1) -- line: 24
 			}
 		}
 	}
+	local t4 = {
+		[StatusIndicatorShape.Circle] = {
+			container = {
+				tag = "radius-circle"
+			}
+		},
+		[StatusIndicatorShape.Ring] = {
+			container = {
+				tag = "align-x-center align-y-center radius-circle"
+			},
+			ring = {
+				tag = "size-100-100 radius-circle bg-surface-100"
+			}
+		},
+		[StatusIndicatorShape.Square] = {
+			container = {
+				tag = "radius-none"
+			}
+		}
+	}
 
 	return {
 		common = t1,
 		variants = t2,
-		hasValue = t3
+		hasValue = t3,
+		shape = t4
 	}
 end
 
-return function(p2, p3, b1: boolean) -- line: 110
-	-- upvalues: Flags (copy), StatusIndicatorVariant (copy), VariantsContext (copy), composeStyleVariant (copy)
-	if not Flags.FoundationStatusIndicatorVariantExperiment then
+return function(p2, p3, b1: boolean, p4) -- line: 141
+	-- upvalues: Flags (copy), v7 (copy), StatusIndicatorVariant (copy), VariantsContext (copy), composeStyleVariant (copy)
+	if not Flags.FoundationStatusIndicatorVariantExperiment and v7 then
 		if p3 == StatusIndicatorVariant.Contrast_Experiment then
 			error("Contrast is not a supported StatusIndicator variant.")
 		end
@@ -117,7 +145,7 @@ return function(p2, p3, b1: boolean) -- line: 110
 		end
 	end
 
-	local v13 = VariantsContext.useVariants("StatusIndicator", variantsFactory, p2)
+	local v19 = VariantsContext.useVariants("StatusIndicator", variantsFactory, p2)
 
-	return composeStyleVariant(v13.common, v13.variants[p3], v13.hasValue[b1])
+	return composeStyleVariant(v19.common, v19.variants[p3], v19.hasValue[b1], v19.shape[p4])
 end

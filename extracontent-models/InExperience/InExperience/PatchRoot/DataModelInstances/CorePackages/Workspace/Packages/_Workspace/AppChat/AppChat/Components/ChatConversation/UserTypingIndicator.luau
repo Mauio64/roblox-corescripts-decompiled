@@ -1,132 +1,146 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Roact);
-local l_withStyle_0 = require(l_Parent_0.UIBlox).Style.withStyle;
-local v3 = require(l_Parent_0.Otter);
-local v4 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v4.Core.ImageSet.ImageSetLabel;
-local v7 = v1.PureComponent:extend("UserTypingIndicator");
-local v8 = {
-    dampingRatio = 1.5, 
-    frequency = 1.6
-};
-v7.defaultProps = {
-    AnchorPoint = Vector2.new(0, 0), 
-    LayoutOrder = 1, 
-    Position = UDim2.new(0, 0, 0, 0), 
-    ZIndex = 1, 
-    usersTyping = {}, 
-    oneUserTyping = "PLACEHOLDER {DISPLAY_NAME} is typing...", 
-    twoUsersTyping = "PLACEHOLDER {DISPLAY_NAME_1} and {DISPLAY_NAME_2} are typing...", 
-    severalUsersTyping = "PLACEHOLDER Several users are typing...", 
-    maxCharacterLength = 160, 
-    height = 40
-};
-v7.init = function(v9) --[[ Line: 32 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy), v3 (copy), v8 (copy)
-    v9.getDisplayText = function() --[[ Line: 33 ]]
-        -- upvalues: v9 (copy)
-        if v9.props.usersTyping then
-            if #v9.props.usersTyping == 1 then
-                return v9.props.oneUserTyping;
-            elseif #v9.props.usersTyping == 2 then
-                return v9.props.twoUsersTyping;
-            elseif #v9.props.usersTyping > 2 then
-                return v9.props.severalUsersTyping;
-            end;
-        end;
-        return "";
-    end;
-    local v10, v11 = v1.createBinding(1);
-    v9.motor = v3.createSingleMotor(1);
-    v9.motor:start();
-    v9.motor:onStep(v11);
-    v9.animationProgress = v10;
-    v9.updateAnimationGoal = function() --[[ Line: 54 ]]
-        -- upvalues: v9 (copy), v3 (ref), v8 (ref)
-        local v12 = #v9.props.usersTyping > 0 and 0 or 1;
-        v9.motor:setGoal(v3.spring(v12, v8));
-    end;
-    v9.updateAnimationGoal();
-end;
-v7.didUpdate = function(v13, v14, _) --[[ Line: 62 ]] --[[ Name: didUpdate ]]
-    if #v14.usersTyping ~= #v13.props.usersTyping then
-        v13.updateAnimationGoal();
-    end;
-end;
-v7.render = function(v16) --[[ Line: 68 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy)
-    return l_withStyle_0(function(v17) --[[ Line: 69 ]]
-        -- upvalues: v1 (ref), v16 (copy), l_ImageSetLabel_0 (ref), l_Images_0 (ref)
-        local l_Font_0 = v17.Font;
-        local l_Font_1 = l_Font_0.Footer.Font;
-        local v20 = l_Font_0.BaseSize * l_Font_0.Footer.RelativeSize;
-        return v1.createElement("Frame", {
-            AnchorPoint = v16.props.AnchorPoint, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v16.props.LayoutOrder, 
-            Position = v16.props.Position, 
-            Size = UDim2.new(1, 0, 0, v16.props.height), 
-            ZIndex = v16.props.ZIndex
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
-            }), 
-            Padding = v1.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 4), 
-                PaddingBottom = UDim.new(0, 4)
-            }), 
-            ImageContainer = v1.createElement(l_ImageSetLabel_0, {
-                Size = UDim2.new(0.9, 0, 1, 0), 
-                BackgroundColor3 = v17.Theme.NavigationBar.Color, 
-                BorderColor3 = v17.Theme.Divider.Color, 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(8, 8, 9, 9), 
-                Image = l_Images_0["component_assets/circle_17"], 
-                ImageColor3 = v17.Theme.BackgroundUIDefault.Color, 
-                ImageTransparency = v16.animationProgress:map(function(v21) --[[ Line: 104 ]]
-                    return v21;
-                end), 
-                Position = v16.animationProgress:map(function(v22) --[[ Line: 107 ]]
-                    return UDim2.new(0, 0, v22, 0);
-                end)
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                Padding = v1.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, 12), 
-                    PaddingTop = UDim.new(0, 4), 
-                    PaddingBottom = UDim.new(0, 4), 
-                    PaddingRight = UDim.new(0, 12)
-                }), 
-                TextLabel = v1.createElement("TextLabel", {
-                    Text = v16.getDisplayText(), 
-                    TextSize = v20, 
-                    Font = l_Font_1, 
-                    TextColor3 = v17.Theme.TextMuted.Color, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    BackgroundTransparency = 1, 
-                    TextTransparency = v16.animationProgress:map(function(v23) --[[ Line: 133 ]]
-                        return v23;
-                    end)
-                })
-            })
-        });
-    end);
-end;
-v7.willUnmount = function(v24) --[[ Line: 142 ]] --[[ Name: willUnmount ]]
-    if v24.motor then
-        v24.motor:destroy();
-    end;
-end;
-return v7;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Roact = require(Parent.Roact)
+local withStyle = require(Parent.UIBlox).Style.withStyle
+local Otter = require(Parent.Otter)
+local UIBlox = require(Parent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v8 = Roact.PureComponent:extend("UserTypingIndicator")
+local t1 = {
+	dampingRatio = 1.5,
+	frequency = 1.6
+}
+
+v8.defaultProps = {
+	LayoutOrder = 1,
+	ZIndex = 1,
+	oneUserTyping = "PLACEHOLDER {DISPLAY_NAME} is typing...",
+	twoUsersTyping = "PLACEHOLDER {DISPLAY_NAME_1} and {DISPLAY_NAME_2} are typing...",
+	severalUsersTyping = "PLACEHOLDER Several users are typing...",
+	maxCharacterLength = 160,
+	height = 40,
+	AnchorPoint = Vector2.new(0, 0),
+	Position = UDim2.new(0, 0, 0, 0),
+	usersTyping = {}
+}
+
+function v8.init(p1) -- line: 32
+	-- upvalues: Roact (copy), Otter (copy), t1 (copy)
+	function p1.getDisplayText() -- line: 33
+		-- upvalues: p1 (copy)
+		if p1.props.usersTyping then
+			if #p1.props.usersTyping == 1 then
+				return p1.props.oneUserTyping
+			end
+
+			if #p1.props.usersTyping == 2 then
+				return p1.props.twoUsersTyping
+			end
+
+			if #p1.props.usersTyping > 2 then
+				return p1.props.severalUsersTyping
+			end
+		end
+
+		return ""
+	end
+
+	local v11, v12 = Roact.createBinding(1)
+
+	p1.motor = Otter.createSingleMotor(1)
+	p1.motor:start()
+	p1.motor:onStep(v12)
+	p1.animationProgress = v11
+
+	function p1.updateAnimationGoal() -- line: 54
+		-- upvalues: p1 (copy), Otter (copy), t1 (copy)
+		local v18 = not (#p1.props.usersTyping > 0) and 1 or 0
+
+		p1.motor:setGoal(Otter.spring(v18, t1))
+	end
+
+	p1.updateAnimationGoal()
+end
+function v8.didUpdate(p2, p3, _) -- line: 62
+	if #p3.usersTyping ~= #p2.props.usersTyping then
+		p2.updateAnimationGoal()
+	end
+end
+function v8.render(p5) -- line: 68
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), Images (copy)
+	return withStyle(function(p6) -- line: 69
+		-- upvalues: Roact (copy), p5 (copy), ImageSetLabel (copy), Images (copy)
+		local p6Font = p6.Font
+		local FooterFont = p6Font.Footer.Font
+		local v22 = p6Font.BaseSize * p6Font.Footer.RelativeSize
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AnchorPoint = p5.props.AnchorPoint,
+			LayoutOrder = p5.props.LayoutOrder,
+			Position = p5.props.Position,
+			Size = UDim2.new(1, 0, 0, p5.props.height),
+			ZIndex = p5.props.ZIndex
+		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}),
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 4),
+				PaddingBottom = UDim.new(0, 4)
+			}),
+			ImageContainer = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Size = UDim2.new(0.9, 0, 1, 0),
+				BackgroundColor3 = p6.Theme.NavigationBar.Color,
+				BorderColor3 = p6.Theme.Divider.Color,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(8, 8, 9, 9),
+				Image = Images["component_assets/circle_17"],
+				ImageColor3 = p6.Theme.BackgroundUIDefault.Color,
+				ImageTransparency = p5.animationProgress:map(function(p7) -- line: 104
+					return p7
+				end),
+				Position = p5.animationProgress:map(function(p8) -- line: 107
+					return UDim2.new(0, 0, p8, 0)
+				end)
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 12),
+					PaddingTop = UDim.new(0, 4),
+					PaddingBottom = UDim.new(0, 4),
+					PaddingRight = UDim.new(0, 12)
+				}),
+				TextLabel = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = p5.getDisplayText(),
+					TextSize = v22,
+					Font = FooterFont,
+					TextColor3 = p6.Theme.TextMuted.Color,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					TextTransparency = p5.animationProgress:map(function(p9) -- line: 133
+						return p9
+					end)
+				})
+			})
+		})
+	end)
+end
+function v8.willUnmount(p10) -- line: 142
+	if p10.motor then
+		p10.motor:destroy()
+	end
+end
+
+return v8

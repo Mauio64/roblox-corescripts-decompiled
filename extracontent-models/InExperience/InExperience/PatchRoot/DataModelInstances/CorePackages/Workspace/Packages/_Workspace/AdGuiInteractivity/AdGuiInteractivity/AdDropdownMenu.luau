@@ -1,188 +1,217 @@
-local l_select_0 = select;
-local function v6(v1, v2, ...)
-    local v3, v4 = {
-        ...
-    }, l_select_0("#", ...);
-    for v5 = v2, v2 + v4 - 1 do
-        v1[v5] = v3[v5 - v2 + 1];
-    end;
-end;
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_Parent_0.Roact);
-local v9 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v9.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local l_Interactable_0 = v9.Core.Control.Interactable;
-local v13 = require(l_Parent_0.RobloxTranslator);
-local v14 = v13:FormatByKey("CoreScripts.Ads.Label.WhyThisAd");
-local v15 = v13:FormatByKey("CoreScripts.Ads.Label.ReportAd");
-local v16 = l_Images_0["icons/actions/info"];
-local v17 = l_Images_0["icons/actions/feedback"];
-local v18 = require(script.Parent.Flags).GetAdGuiInteractivityPixelsPerStud() / 50;
-local function _(v19) --[[ Line: 20 ]] --[[ Name: applyScalingUDim ]]
-    -- upvalues: v18 (copy)
-    return UDim.new(v19.Scale, v19.Offset * v18);
-end;
-local function _(v21) --[[ Line: 24 ]] --[[ Name: applyScalingUDim2 ]]
-    -- upvalues: v18 (copy)
-    return UDim2.new(v21.X.Scale, v21.X.Offset * v18, v21.Y.Scale, v21.Y.Offset * v18);
-end;
-local function _(v23) --[[ Line: 28 ]] --[[ Name: applyScalingNumber ]]
-    -- upvalues: v18 (copy)
-    return v23 * v18;
-end;
-local function v34(v25) --[[ Line: 41 ]] --[[ Name: WhyThisAdRow ]]
-    -- upvalues: v8 (copy), l_Interactable_0 (copy), v18 (copy), l_ImageSetLabel_0 (copy), v16 (copy), v14 (copy)
-    local l_createElement_0 = v8.createElement;
-    local l_l_Interactable_0_0 = l_Interactable_0;
-    local v28 = {
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        BackgroundTransparency = 1, 
-        [v8.Event.Activated] = v25.onWhyThisAdActivated, 
-        onStateChanged = function() --[[ Line: 46 ]] --[[ Name: onStateChanged ]]
+local _select = select
 
-        end
-    };
-    local v29 = {};
-    local l_createElement_1 = v8.createElement;
-    local v31 = "UICorner";
-    local v32 = {};
-    local v33 = UDim.new(0, 10);
-    v32.CornerRadius = UDim.new(v33.Scale, v33.Offset * v18);
-    v29.UICorner = l_createElement_1(v31, v32);
-    l_createElement_1 = v8.createElement;
-    v31 = "UIPadding";
-    v32 = {};
-    v33 = UDim.new(0, 16);
-    v32.PaddingTop = UDim.new(v33.Scale, v33.Offset * v18);
-    v33 = UDim.new(0, 8);
-    v32.PaddingBottom = UDim.new(v33.Scale, v33.Offset * v18);
-    v33 = UDim.new(0, 16);
-    v32.PaddingLeft = UDim.new(v33.Scale, v33.Offset * v18);
-    v33 = UDim.new(0, 48);
-    v32.PaddingRight = UDim.new(v33.Scale, v33.Offset * v18);
-    v29.UIPadding = l_createElement_1(v31, v32);
-    l_createElement_1 = v8.createElement;
-    v31 = "UIListLayout";
-    v32 = {
-        FillDirection = Enum.FillDirection.Horizontal, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Center
-    };
-    v33 = UDim.new(0, 16);
-    v32.Padding = UDim.new(v33.Scale, v33.Offset * v18);
-    v29.UIListLayout = l_createElement_1(v31, v32);
-    l_createElement_1 = v8.createElement;
-    v31 = l_ImageSetLabel_0;
-    v32 = {
-        Image = v16
-    };
-    v33 = UDim2.fromOffset(24, 24);
-    v32.Size = UDim2.new(v33.X.Scale, v33.X.Offset * v18, v33.Y.Scale, v33.Y.Offset * v18);
-    v32.BackgroundTransparency = 1;
-    v29.Icon = l_createElement_1(v31, v32);
-    v29.TextLabel = v8.createElement("TextLabel", {
-        Text = v14, 
-        TextColor3 = Color3.new(1, 1, 1), 
-        BackgroundTransparency = 1, 
-        Font = Enum.Font.GothamMedium, 
-        TextSize = 24 * v18, 
-        TextScaled = false, 
-        TextWrapped = true, 
-        AutomaticSize = Enum.AutomaticSize.XY
-    });
-    return l_createElement_0(l_l_Interactable_0_0, v28, v29);
-end;
-local function v44(v35) --[[ Line: 81 ]] --[[ Name: ReportAdRow ]]
-    -- upvalues: v8 (copy), l_Interactable_0 (copy), v18 (copy), l_ImageSetLabel_0 (copy), v17 (copy), v15 (copy)
-    local l_createElement_2 = v8.createElement;
-    local l_l_Interactable_0_1 = l_Interactable_0;
-    local v38 = {
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        BackgroundTransparency = 1, 
-        [v8.Event.Activated] = v35.onReportAdActivated, 
-        onStateChanged = function() --[[ Line: 86 ]] --[[ Name: onStateChanged ]]
+local function v72(tbl, idx, ...)
+	local va = { ... }
 
-        end
-    };
-    local v39 = {};
-    local l_createElement_3 = v8.createElement;
-    local v41 = "UICorner";
-    local v42 = {};
-    local v43 = UDim.new(0, 10);
-    v42.CornerRadius = UDim.new(v43.Scale, v43.Offset * v18);
-    v39.UICorner = l_createElement_3(v41, v42);
-    l_createElement_3 = v8.createElement;
-    v41 = "UIPadding";
-    v42 = {};
-    v43 = UDim.new(0, 8);
-    v42.PaddingTop = UDim.new(v43.Scale, v43.Offset * v18);
-    v43 = UDim.new(0, 16);
-    v42.PaddingBottom = UDim.new(v43.Scale, v43.Offset * v18);
-    v43 = UDim.new(0, 16);
-    v42.PaddingLeft = UDim.new(v43.Scale, v43.Offset * v18);
-    v43 = UDim.new(0, 48);
-    v42.PaddingRight = UDim.new(v43.Scale, v43.Offset * v18);
-    v39.UIPadding = l_createElement_3(v41, v42);
-    l_createElement_3 = v8.createElement;
-    v41 = "UIListLayout";
-    v42 = {
-        FillDirection = Enum.FillDirection.Horizontal, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Center
-    };
-    v43 = UDim.new(0, 16);
-    v42.Padding = UDim.new(v43.Scale, v43.Offset * v18);
-    v39.UIListLayout = l_createElement_3(v41, v42);
-    l_createElement_3 = v8.createElement;
-    v41 = l_ImageSetLabel_0;
-    v42 = {
-        Image = v17
-    };
-    v43 = UDim2.fromOffset(24, 24);
-    v42.Size = UDim2.new(v43.X.Scale, v43.X.Offset * v18, v43.Y.Scale, v43.Y.Offset * v18);
-    v42.BackgroundTransparency = 1;
-    v39.Icon = l_createElement_3(v41, v42);
-    v39.TextLabel = v8.createElement("TextLabel", {
-        Text = v15, 
-        TextColor3 = Color3.new(1, 1, 1), 
-        BackgroundTransparency = 1, 
-        Font = Enum.Font.GothamMedium, 
-        TextSize = 24 * v18, 
-        TextScaled = false, 
-        TextWrapped = true, 
-        AutomaticSize = Enum.AutomaticSize.XY
-    });
-    return l_createElement_2(l_l_Interactable_0_1, v38, v39);
-end;
-AdDropdownMenu = function(v45) --[[ Line: 121 ]] --[[ Name: AdDropdownMenu ]]
-    -- upvalues: v8 (copy), v18 (copy), v34 (copy), v44 (copy)
-    local l_createElement_4 = v8.createElement;
-    local v47 = "Frame";
-    local v48 = {
-        Visible = v45.showDropDownMenu, 
-        Position = v45.Position or UDim2.new(0.5, 0, 0.5, 0), 
-        BackgroundColor3 = Color3.new(0, 0, 0), 
-        BackgroundTransparency = v45.transparency, 
-        AnchorPoint = v45.AnchorPoint or Vector2.new(0.5, 0.5)
-    };
-    local v49 = UDim2.new(0.24, 0, 0.12, 0);
-    v48.Size = UDim2.new(v49.X.Scale, v49.X.Offset * v18, v49.Y.Scale, v49.Y.Offset * v18);
-    v48.AutomaticSize = Enum.AutomaticSize.XY;
-    local v50 = {};
-    local l_createElement_5 = v8.createElement;
-    local v52 = "UICorner";
-    local v53 = {};
-    local v54 = UDim.new(0, 10);
-    v53.CornerRadius = UDim.new(v54.Scale, v54.Offset * v18);
-    v50.UICorner = l_createElement_5(v52, v53);
-    v50.UIListLayout = v8.createElement("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Center
-    });
-    v49 = v34(v45);
-    v6(v50, 1, v49, v44(v45));
-    return l_createElement_4(v47, v48, v50);
-end;
-return AdDropdownMenu;
+	for i = 1, _select("#", ...) do
+		tbl[idx + i - 1] = va[i]
+	end
+end
+
+local ParentParent = script.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local UIBlox = require(ParentParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Interactable = UIBlox.Core.Control.Interactable
+local RobloxTranslator = require(ParentParent.RobloxTranslator)
+local v8 = RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.WhyThisAd")
+local v9 = RobloxTranslator:FormatByKey("CoreScripts.Ads.Label.ReportAd")
+local v10 = Images["icons/actions/info"]
+local v11 = Images["icons/actions/feedback"]
+local v12 = require(script.Parent.Flags).GetAdGuiInteractivityPixelsPerStud() / 50
+
+local function applyScalingUDim(uDim: UDim) -- line: 20
+	-- upvalues: v12 (copy)
+	return UDim.new(uDim.Scale, uDim.Offset * v12)
+end
+local function applyScalingUDim2(uDim2: UDim2) -- line: 24
+	-- upvalues: v12 (copy)
+	return UDim2.new(uDim2.X.Scale, uDim2.X.Offset * v12, uDim2.Y.Scale, uDim2.Y.Offset * v12)
+end
+local function applyScalingNumber(n1: number) -- line: 28
+	-- upvalues: v12 (copy)
+	return n1 * v12
+end
+local function WhyThisAdRow(t1: {[any]: any}) -- line: 41
+	-- upvalues: Roact (copy), Interactable (copy), v12 (copy), ImageSetLabel (copy), v10 (copy), v8 (copy)
+	local createElement = Roact.createElement
+	local v23 = Interactable
+	local t2 = {
+		AutomaticSize = Enum.AutomaticSize.XY,
+		BackgroundTransparency = 1,
+		[Roact.Event.Activated] = t1.onWhyThisAdActivated,
+		onStateChanged = function() -- line: 46
+		end
+	}
+	local t3 = {}
+	local createElement2 = Roact.createElement
+	local t4 = {}
+	local uDim = UDim.new(0, 10)
+
+	t4.CornerRadius = UDim.new(uDim.Scale, uDim.Offset * v12)
+	t3.UICorner = createElement2("UICorner", t4)
+
+	local createElement3 = Roact.createElement
+	local t5 = {}
+	local uDim2 = UDim.new(0, 16)
+
+	t5.PaddingTop = UDim.new(uDim2.Scale, uDim2.Offset * v12)
+
+	local uDim3 = UDim.new(0, 8)
+
+	t5.PaddingBottom = UDim.new(uDim3.Scale, uDim3.Offset * v12)
+
+	local uDim4 = UDim.new(0, 16)
+
+	t5.PaddingLeft = UDim.new(uDim4.Scale, uDim4.Offset * v12)
+
+	local uDim5 = UDim.new(0, 48)
+
+	t5.PaddingRight = UDim.new(uDim5.Scale, uDim5.Offset * v12)
+	t3.UIPadding = createElement3("UIPadding", t5)
+
+	local createElement4 = Roact.createElement
+	local t6 = {
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	}
+	local uDim6 = UDim.new(0, 16)
+
+	t6.Padding = UDim.new(uDim6.Scale, uDim6.Offset * v12)
+	t3.UIListLayout = createElement4("UIListLayout", t6)
+
+	local createElement5 = Roact.createElement
+	local v39 = ImageSetLabel
+	local t7 = {
+		BackgroundTransparency = 1,
+		Image = v10
+	}
+	local uDim2_2 = UDim2.fromOffset(24, 24)
+
+	t7.Size = UDim2.new(uDim2_2.X.Scale, uDim2_2.X.Offset * v12, uDim2_2.Y.Scale, uDim2_2.Y.Offset * v12)
+	t3.Icon = createElement5(v39, t7)
+	t3.TextLabel = Roact.createElement("TextLabel", {
+		BackgroundTransparency = 1,
+		TextScaled = false,
+		TextWrapped = true,
+		Text = v8,
+		TextColor3 = Color3.new(1, 1, 1),
+		Font = Enum.Font.GothamMedium,
+		TextSize = 24 * v12,
+		AutomaticSize = Enum.AutomaticSize.XY
+	})
+
+	return createElement(v23, t2, t3)
+end
+local function ReportAdRow(t8: {[any]: any}) -- line: 81
+	-- upvalues: Roact (copy), Interactable (copy), v12 (copy), ImageSetLabel (copy), v11 (copy), v9 (copy)
+	local createElement = Roact.createElement
+	local v44 = Interactable
+	local t9 = {
+		AutomaticSize = Enum.AutomaticSize.XY,
+		BackgroundTransparency = 1,
+		[Roact.Event.Activated] = t8.onReportAdActivated,
+		onStateChanged = function() -- line: 86
+		end
+	}
+	local t10 = {}
+	local createElement6 = Roact.createElement
+	local t11 = {}
+	local uDim = UDim.new(0, 10)
+
+	t11.CornerRadius = UDim.new(uDim.Scale, uDim.Offset * v12)
+	t10.UICorner = createElement6("UICorner", t11)
+
+	local createElement7 = Roact.createElement
+	local t12 = {}
+	local uDim7 = UDim.new(0, 8)
+
+	t12.PaddingTop = UDim.new(uDim7.Scale, uDim7.Offset * v12)
+
+	local uDim8 = UDim.new(0, 16)
+
+	t12.PaddingBottom = UDim.new(uDim8.Scale, uDim8.Offset * v12)
+
+	local uDim9 = UDim.new(0, 16)
+
+	t12.PaddingLeft = UDim.new(uDim9.Scale, uDim9.Offset * v12)
+
+	local uDim10 = UDim.new(0, 48)
+
+	t12.PaddingRight = UDim.new(uDim10.Scale, uDim10.Offset * v12)
+	t10.UIPadding = createElement7("UIPadding", t12)
+
+	local createElement8 = Roact.createElement
+	local t13 = {
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	}
+	local uDim11 = UDim.new(0, 16)
+
+	t13.Padding = UDim.new(uDim11.Scale, uDim11.Offset * v12)
+	t10.UIListLayout = createElement8("UIListLayout", t13)
+
+	local createElement9 = Roact.createElement
+	local v60 = ImageSetLabel
+	local t14 = {
+		BackgroundTransparency = 1,
+		Image = v11
+	}
+	local uDim2 = UDim2.fromOffset(24, 24)
+
+	t14.Size = UDim2.new(uDim2.X.Scale, uDim2.X.Offset * v12, uDim2.Y.Scale, uDim2.Y.Offset * v12)
+	t10.Icon = createElement9(v60, t14)
+	t10.TextLabel = Roact.createElement("TextLabel", {
+		BackgroundTransparency = 1,
+		TextScaled = false,
+		TextWrapped = true,
+		Text = v9,
+		TextColor3 = Color3.new(1, 1, 1),
+		Font = Enum.Font.GothamMedium,
+		TextSize = 24 * v12,
+		AutomaticSize = Enum.AutomaticSize.XY
+	})
+
+	return createElement(v44, t9, t10)
+end
+
+function AdDropdownMenu(t15: {[any]: any}) -- line: 121
+	-- upvalues: Roact (copy), v12 (copy), WhyThisAdRow (copy), ReportAdRow (copy)
+	local createElement = Roact.createElement
+	local t16 = {
+		Visible = t15.showDropDownMenu,
+		Position = t15.Position or UDim2.new(0.5, 0, 0.5, 0),
+		BackgroundColor3 = Color3.new(0, 0, 0),
+		BackgroundTransparency = t15.transparency,
+		AnchorPoint = t15.AnchorPoint or Vector2.new(0.5, 0.5)
+	}
+	local uDim2 = UDim2.new(0.24, 0, 0.12, 0)
+
+	t16.Size = UDim2.new(uDim2.X.Scale, uDim2.X.Offset * v12, uDim2.Y.Scale, uDim2.Y.Offset * v12)
+	t16.AutomaticSize = Enum.AutomaticSize.XY
+
+	local t17 = {}
+	local createElement10 = Roact.createElement
+	local t18 = {}
+	local uDim = UDim.new(0, 10)
+
+	t18.CornerRadius = UDim.new(uDim.Scale, uDim.Offset * v12)
+	t17.UICorner = createElement10("UICorner", t18)
+	t17.UIListLayout = Roact.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	})
+
+	local v71 = WhyThisAdRow(t15)
+
+	t17[1] = v71
+	v72(t17, 2, ReportAdRow(t15))
+
+	return createElement("Frame", t16, t17)
+end
+
+return AdDropdownMenu

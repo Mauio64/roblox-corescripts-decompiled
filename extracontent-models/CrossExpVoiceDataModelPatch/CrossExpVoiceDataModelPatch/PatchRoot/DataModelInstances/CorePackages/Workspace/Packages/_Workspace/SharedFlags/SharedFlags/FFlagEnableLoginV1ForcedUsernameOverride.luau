@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLoginV1ForcedUsernameOverride", false);
+return game:DefineFastFlag("EnableLoginV1ForcedUsernameOverride", false)

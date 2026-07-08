@@ -1,7 +1,8 @@
-local l_script_0 = script;
+local _script = script
+
 return {
-    GetFStringSocialCommunityAppLayer = require(l_script_0.GetFStringSocialCommunityAppLayer), 
-    GetFStringLuaCommunityListVariant = require(l_script_0.GetFStringLuaCommunityListVariant), 
-    GetFFlagForceEnableLuaCommunityList = require(l_script_0.GetFFlagForceEnableLuaCommunityList), 
-    GetFIntGroupsHttpRetryCount = require(l_script_0.GetFIntGroupsHttpRetryCount)
-};
+	GetFStringSocialCommunityAppLayer = require(_script.GetFStringSocialCommunityAppLayer),
+	GetFStringLuaCommunityListVariant = require(_script.GetFStringLuaCommunityListVariant),
+	GetFFlagForceEnableLuaCommunityList = require(_script.GetFFlagForceEnableLuaCommunityList),
+	GetFIntGroupsHttpRetryCount = require(_script.GetFIntGroupsHttpRetryCount)
+}

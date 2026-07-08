@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppsServerTriggeredModals", false);
+return game:DefineFastFlag("LuaAppsServerTriggeredModals", false)

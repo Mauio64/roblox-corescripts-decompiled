@@ -1,3 +1,3 @@
 return {
-    FIntLuaAppSmallScreenDesignWidth = require(script.FIntLuaAppSmallScreenDesignWidth)
-};
+	FIntLuaAppSmallScreenDesignWidth = require(script.FIntLuaAppSmallScreenDesignWidth)
+}

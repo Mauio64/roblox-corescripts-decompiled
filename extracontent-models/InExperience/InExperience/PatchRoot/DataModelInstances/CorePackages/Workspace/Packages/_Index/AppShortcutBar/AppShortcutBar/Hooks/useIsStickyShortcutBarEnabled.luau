@@ -1,20 +1,24 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("AppShortcutBar").Parent;
-local v3 = require(l_Parent_0.Responsive);
-local l_useProperty_0 = require(l_Parent_0.GuiObjectUtils).useProperty;
-return function(v5, v6) --[[ Line: 11 ]] --[[ Name: useIsStickyShortcutBarEnabled ]]
-    -- upvalues: l_GuiService_0 (copy), l_UserInputService_0 (copy), v3 (copy), l_useProperty_0 (copy)
-    local v7 = v5 or l_GuiService_0;
-    local v8 = v6 or l_UserInputService_0;
-    local v9 = v3.usePreferredInput();
-    local v10 = v3.useOrientation();
-    local v11 = l_useProperty_0(v8, "TouchEnabled");
-    local v12 = l_useProperty_0(v8, "KeyboardEnabled");
-    local v13 = l_useProperty_0(v7, "ViewportDisplaySize");
-    if (v9 == v3.Input.Directional or v12) and v10 == v3.Keys.Landscape and (v11 or v13 ~= Enum.DisplaySize.Large) then
-        return true;
-    else
-        return false;
-    end;
-end;
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("AppShortcutBar").Parent
+local Responsive = require(Parent.Responsive)
+local useProperty = require(Parent.GuiObjectUtils).useProperty
+
+local function useIsStickyShortcutBarEnabled(p1, p2) -- line: 11
+	-- upvalues: GuiService (copy), UserInputService (copy), Responsive (copy), useProperty (copy)
+	local v9 = p1 or GuiService
+	local v10 = p2 or UserInputService
+	local v11 = Responsive.usePreferredInput()
+	local v12 = Responsive.useOrientation()
+	local v13 = useProperty(v10, "TouchEnabled")
+	local v14 = useProperty(v10, "KeyboardEnabled")
+	local v15 = useProperty(v9, "ViewportDisplaySize")
+
+	if (v11 == Responsive.Input.Directional or v14) and v12 == Responsive.Keys.Landscape and (v13 or v15 ~= Enum.DisplaySize.Large) then
+		return true
+	end
+
+	return false
+end
+
+return useIsStickyShortcutBarEnabled

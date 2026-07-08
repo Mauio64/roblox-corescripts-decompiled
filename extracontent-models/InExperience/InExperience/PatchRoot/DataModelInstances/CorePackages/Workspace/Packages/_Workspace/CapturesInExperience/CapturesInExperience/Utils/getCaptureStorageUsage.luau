@@ -1,47 +1,58 @@
-local l_CaptureService_0 = game:GetService("CaptureService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Enums.CaptureType);
-local _ = require(l_Parent_0.Types);
-local v4 = require(l_Parent_0.Flags.FFlagUseRbxstorageInGallery);
-local v5 = require(l_Parent_0.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript);
-formatBytes = function(v6) --[[ Line: 12 ]] --[[ Name: formatBytes ]]
-    local v7 = {
-        "Bytes", 
-        "KB", 
-        "MB", 
-        "GB", 
-        "TB"
-    };
-    local v8 = math.floor(math.log(v6) / 6.931471805599453);
-    local v9 = v6 / math.pow(1024, v8);
-    local v10 = "%.2f%s";
-    if v8 <= 2 then
-        v9 = math.round(v9);
-        v10 = "%d%s";
-    end;
-    if not v7[v8 + 1] then
-        return "";
-    else
-        return string.format(v10, v9, v7[v8 + 1]);
-    end;
-end;
-return function(v11) --[[ Line: 31 ]] --[[ Name: getCaptureStorageUsage ]]
-    -- upvalues: v5 (copy), v4 (copy), v2 (copy), l_CaptureService_0 (copy)
-    if #v11 == 0 then
-        return;
-    else
-        local v12 = {};
-        if not v5 then
-            for _, v14 in ipairs(v11) do
-                if not v4 or v14.type ~= v2.Video then
-                    table.insert(v12, v14.filePath);
-                end;
-            end;
-        end;
-        local _, l_result_0 = pcall(function() --[[ Line: 47 ]]
-            -- upvalues: l_CaptureService_0 (ref), v12 (copy)
-            return l_CaptureService_0:GetCaptureStorageSizeAsync(v12);
-        end);
-        return formatBytes(l_result_0);
-    end;
-end;
+local CaptureService = game:GetService("CaptureService")
+local ParentParent = script.Parent.Parent
+local CaptureType = require(ParentParent.Enums.CaptureType)
+
+require(ParentParent.Types)
+
+local FFlagUseRbxstorageInGallery = require(ParentParent.Flags.FFlagUseRbxstorageInGallery)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+
+function formatBytes(n1: number) -- line: 12
+	local t1 = {
+		"Bytes",
+		"KB",
+		"MB",
+		"GB",
+		"TB"
+	}
+	local v9 = math.floor(math.log(n1) / 6.931471805599453)
+	local v10 = n1 / math.pow(1024, v9)
+	local s1 = "%.2f%s"
+
+	if v9 <= 2 then
+		v10 = math.round(v10)
+		s1 = "%d%s"
+	end
+
+	if not t1[v9 + 1] then
+		return ""
+	end
+
+	return string.format(s1, v10, t1[v9 + 1])
+end
+
+local function getCaptureStorageUsage(t2: {[any]: any}) -- line: 31
+	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), FFlagUseRbxstorageInGallery (copy), CaptureType (copy), CaptureService (copy)
+	if #t2 == 0 then
+		return
+	end
+
+	local t3 = {}
+
+	if not FFlagEnableCapturesGalleryRetrievalCoreScript then
+		for _, v in ipairs(t2) do
+			if not FFlagUseRbxstorageInGallery or v.type ~= CaptureType.Video then
+				table.insert(t3, v.filePath)
+			end
+		end
+	end
+
+	local _, result = pcall(function() -- line: 47
+		-- upvalues: CaptureService (copy), t3 (copy)
+		return CaptureService:GetCaptureStorageSizeAsync(t3)
+	end)
+
+	return formatBytes(result)
+end
+
+return getCaptureStorageUsage

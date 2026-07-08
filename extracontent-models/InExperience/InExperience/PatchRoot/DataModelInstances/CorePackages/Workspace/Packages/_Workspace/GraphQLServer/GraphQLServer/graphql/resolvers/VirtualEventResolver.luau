@@ -1,62 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GraphQLServer");
-local v1 = require(l_script_FirstAncestor_0.graphql.connectors.VirtualEventConnector);
-local l_findVirtualEventById_0 = v1.findVirtualEventById;
-local l_findVirtualEventsByUniverseId_0 = v1.findVirtualEventsByUniverseId;
-local l_findRsvpCountersByVirtualEventId_0 = v1.findRsvpCountersByVirtualEventId;
-local l_findRsvpsByVirtualEventId_0 = v1.findRsvpsByVirtualEventId;
-local l_updateRsvpStatus_0 = v1.updateRsvpStatus;
-local l_neverShowNotificationModalAgain_0 = v1.neverShowNotificationModalAgain;
-local l_enablePushNotifications_0 = v1.enablePushNotifications;
-local v9 = require(l_script_FirstAncestor_0.graphql.connectors.ExperienceConnector);
-local l_findExperienceDetailsByUniverseId_0 = v9.findExperienceDetailsByUniverseId;
-local l_findExperienceMediaByUniverseId_0 = v9.findExperienceMediaByUniverseId;
-local _ = require(l_script_FirstAncestor_0.graphql.generatedTypes);
+local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
+local VirtualEventConnector = require(GraphQLServer.graphql.connectors.VirtualEventConnector)
+local findVirtualEventById = VirtualEventConnector.findVirtualEventById
+local findVirtualEventsByUniverseId = VirtualEventConnector.findVirtualEventsByUniverseId
+local findRsvpCountersByVirtualEventId = VirtualEventConnector.findRsvpCountersByVirtualEventId
+local findRsvpsByVirtualEventId = VirtualEventConnector.findRsvpsByVirtualEventId
+local updateRsvpStatus = VirtualEventConnector.updateRsvpStatus
+local neverShowNotificationModalAgain = VirtualEventConnector.neverShowNotificationModalAgain
+local enablePushNotifications = VirtualEventConnector.enablePushNotifications
+local ExperienceConnector = require(GraphQLServer.graphql.connectors.ExperienceConnector)
+local findExperienceDetailsByUniverseId = ExperienceConnector.findExperienceDetailsByUniverseId
+local findExperienceMediaByUniverseId = ExperienceConnector.findExperienceMediaByUniverseId
+
+require(GraphQLServer.graphql.generatedTypes)
+
 return {
-    VirtualEventMutations = {
-        neverShowNotificationModalAgain = function(_, _, v15) --[[ Line: 19 ]] --[[ Name: neverShowNotificationModalAgain ]]
-            -- upvalues: l_neverShowNotificationModalAgain_0 (copy)
-            return l_neverShowNotificationModalAgain_0(v15.fetchImpl);
-        end, 
-        enablePushNotifications = function(_, _, v18) --[[ Line: 22 ]] --[[ Name: enablePushNotifications ]]
-            -- upvalues: l_enablePushNotifications_0 (copy)
-            return l_enablePushNotifications_0(v18.fetchImpl);
-        end
-    }, 
-    VirtualEvent = {
-        experienceDetails = function(v19, _, v21) --[[ Line: 27 ]] --[[ Name: experienceDetails ]]
-            -- upvalues: l_findExperienceDetailsByUniverseId_0 (copy)
-            return l_findExperienceDetailsByUniverseId_0(tostring(v19.universeId), v21.fetchImpl);
-        end, 
-        media = function(v22, _, v24) --[[ Line: 30 ]] --[[ Name: media ]]
-            -- upvalues: l_findExperienceMediaByUniverseId_0 (copy)
-            return l_findExperienceMediaByUniverseId_0(tostring(v22.universeId), v24.fetchImpl);
-        end, 
-        rsvpCounters = function(v25, _, v27) --[[ Line: 33 ]] --[[ Name: rsvpCounters ]]
-            -- upvalues: l_findRsvpCountersByVirtualEventId_0 (copy)
-            return l_findRsvpCountersByVirtualEventId_0(v25.id, v27.fetchImpl);
-        end, 
-        rsvps = function(v28, _, v30) --[[ Line: 36 ]] --[[ Name: rsvps ]]
-            -- upvalues: l_findRsvpsByVirtualEventId_0 (copy)
-            return l_findRsvpsByVirtualEventId_0(v28.id, v30.fetchImpl);
-        end
-    }, 
-    Mutation = {
-        virtualEvents = function() --[[ Line: 41 ]] --[[ Name: virtualEvents ]]
-            return {};
-        end, 
-        virtualEventRsvp = function(_, v32, v33) --[[ Line: 44 ]] --[[ Name: virtualEventRsvp ]]
-            -- upvalues: l_updateRsvpStatus_0 (copy)
-            return l_updateRsvpStatus_0(v32.id, v32.rsvpStatus, v33.fetchImpl);
-        end
-    }, 
-    Query = {
-        virtualEvent = function(_, v35, v36) --[[ Line: 49 ]] --[[ Name: virtualEvent ]]
-            -- upvalues: l_findVirtualEventById_0 (copy)
-            return l_findVirtualEventById_0(v35.id, v36.fetchImpl);
-        end, 
-        virtualEventsByUniverseId = function(_, v38, v39) --[[ Line: 52 ]] --[[ Name: virtualEventsByUniverseId ]]
-            -- upvalues: l_findVirtualEventsByUniverseId_0 (copy)
-            return l_findVirtualEventsByUniverseId_0(v38.universeId, v38.options, v39.fetchImpl);
-        end
-    }
-};
+	VirtualEventMutations = {
+		neverShowNotificationModalAgain = function(_, _, p3) -- line: 19
+			-- upvalues: neverShowNotificationModalAgain (copy)
+			return neverShowNotificationModalAgain(p3.fetchImpl)
+		end,
+		enablePushNotifications = function(_, _, p6) -- line: 22
+			-- upvalues: enablePushNotifications (copy)
+			return enablePushNotifications(p6.fetchImpl)
+		end
+	},
+	VirtualEvent = {
+		experienceDetails = function(p7, _, p9) -- line: 27
+			-- upvalues: findExperienceDetailsByUniverseId (copy)
+			return findExperienceDetailsByUniverseId(tostring(p7.universeId), p9.fetchImpl)
+		end,
+		media = function(p10, _, p12) -- line: 30
+			-- upvalues: findExperienceMediaByUniverseId (copy)
+			return findExperienceMediaByUniverseId(tostring(p10.universeId), p12.fetchImpl)
+		end,
+		rsvpCounters = function(p13, _, p15) -- line: 33
+			-- upvalues: findRsvpCountersByVirtualEventId (copy)
+			return findRsvpCountersByVirtualEventId(p13.id, p15.fetchImpl)
+		end,
+		rsvps = function(p16, _, p18) -- line: 36
+			-- upvalues: findRsvpsByVirtualEventId (copy)
+			return findRsvpsByVirtualEventId(p16.id, p18.fetchImpl)
+		end
+	},
+	Mutation = {
+		virtualEvents = function() -- line: 41
+			return {}
+		end,
+		virtualEventRsvp = function(_, p20, p21) -- line: 44
+			-- upvalues: updateRsvpStatus (copy)
+			return updateRsvpStatus(p20.id, p20.rsvpStatus, p21.fetchImpl)
+		end
+	},
+	Query = {
+		virtualEvent = function(_, p23, p24) -- line: 49
+			-- upvalues: findVirtualEventById (copy)
+			return findVirtualEventById(p23.id, p24.fetchImpl)
+		end,
+		virtualEventsByUniverseId = function(_, p26, p27) -- line: 52
+			-- upvalues: findVirtualEventsByUniverseId (copy)
+			return findVirtualEventsByUniverseId(p26.universeId, p26.options, p27.fetchImpl)
+		end
+	}
+}

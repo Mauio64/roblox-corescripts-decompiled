@@ -1,22 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_AvatarScreen_0 = require(l_Parent_0.AvatarExperienceNavigation).Enums.AvatarScreen;
-local l_FFlagUseNavigationSelectors_0 = require(l_Parent_0.SharedFlags).FFlagUseNavigationSelectors;
-local l_Selectors_0 = require(l_Parent_0.NavigationRodux).Selectors;
-local v5 = require(l_script_FirstAncestor_0.State.Selectors.selectCurrentAvatarRoute);
-return function(v6) --[[ Line: 8 ]] --[[ Name: selectSearchKeyword ]]
-    -- upvalues: l_FFlagUseNavigationSelectors_0 (copy), l_Selectors_0 (copy), v5 (copy), l_AvatarScreen_0 (copy)
-    local v7 = if l_FFlagUseNavigationSelectors_0 then v6.Navigation and l_Selectors_0.selectCurrentRoactNavigationRoute(v6) else v6.Navigation and v6.Navigation.currentRoute;
-    local v8 = v7 and v7.params and v7.params.searchParams and v7.params.searchParams.searchKeyword;
-    if v8 then
-        return v8;
-    else
-        local v9 = v5(v6);
-        if v9 and v9.name == l_AvatarScreen_0.CatalogSearch then
-            local l_key_0 = v9.key;
-            return v6.Search and v6.Search.SearchesInCatalog and v6.Search.SearchesInCatalog[l_key_0] and v6.Search.SearchesInCatalog[l_key_0].keyword;
-        else
-            return nil;
-        end;
-    end;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local AvatarExperienceCommonParent = AvatarExperienceCommon.Parent
+local AvatarScreen = require(AvatarExperienceCommonParent.AvatarExperienceNavigation).Enums.AvatarScreen
+local FFlagUseNavigationSelectors = require(AvatarExperienceCommonParent.SharedFlags).FFlagUseNavigationSelectors
+local Selectors = require(AvatarExperienceCommonParent.NavigationRodux).Selectors
+local selectCurrentAvatarRoute = require(AvatarExperienceCommon.State.Selectors.selectCurrentAvatarRoute)
+
+local function selectSearchKeyword(p1) -- line: 8
+	-- upvalues: FFlagUseNavigationSelectors (copy), Selectors (copy), selectCurrentAvatarRoute (copy), AvatarScreen (copy)
+	local v9 = if not FFlagUseNavigationSelectors then p1.Navigation and p1.Navigation.currentRoute else p1.Navigation and Selectors.selectCurrentRoactNavigationRoute(p1)
+	local v10 = v9 and (v9.params and (v9.params.searchParams and v9.params.searchParams.searchKeyword))
+
+	if v10 then
+		return v10
+	end
+
+	local v11 = selectCurrentAvatarRoute(p1)
+
+	if v11 and v11.name == AvatarScreen.CatalogSearch then
+		local key = v11.key
+
+		return p1.Search and (p1.Search.SearchesInCatalog and (p1.Search.SearchesInCatalog[key] and p1.Search.SearchesInCatalog[key].keyword))
+	end
+
+	return nil
+end
+
+return selectSearchKeyword

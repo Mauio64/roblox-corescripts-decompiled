@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MediaAccordionAndFullTelemetry", false);
+return game:DefineFastFlag("MediaAccordionAndFullTelemetry", false)

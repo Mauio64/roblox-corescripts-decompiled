@@ -1,6 +1,7 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.RequestType);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    return v2.promptRequest.requestType ~= v1.None;
-end;
+local ParentParent = script.Parent.Parent
+local RequestType = require(ParentParent.Enums.RequestType)
+
+return function(p1) -- line: 5
+	-- upvalues: RequestType (copy)
+	return p1.promptRequest.requestType ~= RequestType.None
+end

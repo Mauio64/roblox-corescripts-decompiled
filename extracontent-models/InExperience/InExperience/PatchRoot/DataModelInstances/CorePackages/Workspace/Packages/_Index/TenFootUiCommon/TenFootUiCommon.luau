@@ -1,7 +1,10 @@
-local v0 = require(script.TenFootUiContext);
-local _ = require(script.TenFootUiTypes);
-local v2 = require(script.TenFootUiRNTypes);
+local TenFootUiContext = require(script.TenFootUiContext)
+
+require(script.TenFootUiTypes)
+
+local TenFootUiRNTypes = require(script.TenFootUiRNTypes)
+
 return {
-    TenFootUiContext = v0, 
-    TenFootUiRNTypes = v2
-};
+	TenFootUiContext = TenFootUiContext,
+	TenFootUiRNTypes = TenFootUiRNTypes
+}

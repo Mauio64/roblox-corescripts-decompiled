@@ -1,4 +1,5 @@
-game:DefineFastFlag("HideNotificationIconForVR", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("HideNotificationIconForVR");
-end;
+game:DefineFastFlag("HideNotificationIconForVR", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("HideNotificationIconForVR")
+end

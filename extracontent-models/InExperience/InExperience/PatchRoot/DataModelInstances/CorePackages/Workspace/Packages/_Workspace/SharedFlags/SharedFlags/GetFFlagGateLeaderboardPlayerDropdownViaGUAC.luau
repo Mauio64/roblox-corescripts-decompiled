@@ -1,4 +1,5 @@
-game:DefineFastFlag("GateLeaderboardPlayerDropdownViaGUAC", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("GateLeaderboardPlayerDropdownViaGUAC");
-end;
+game:DefineFastFlag("GateLeaderboardPlayerDropdownViaGUAC", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("GateLeaderboardPlayerDropdownViaGUAC")
+end

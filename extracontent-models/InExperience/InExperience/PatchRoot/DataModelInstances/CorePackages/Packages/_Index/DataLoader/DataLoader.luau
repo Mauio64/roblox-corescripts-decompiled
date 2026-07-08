@@ -1,321 +1,376 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Map_0 = v1.Map;
-local l_instanceof_0 = v1.instanceof;
-local l_setTimeout_0 = v1.setTimeout;
-local l_Error_0 = v1.Error;
-local l_Error_1 = v1.Error;
-local v9 = require(l_Parent_0.Promise);
-local v10 = {};
-local v11 = nil;
-local v12 = nil;
-local v13 = nil;
-local v14 = nil;
-local v15 = nil;
-local v16 = nil;
-local v17 = nil;
-local v18 = nil;
-local v19 = nil;
-local v20 = nil;
-local v21 = {};
-v21.__index = v21;
-v21.new = function(v22, v23) --[[ Line: 142 ]] --[[ Name: new ]]
-    -- upvalues: v21 (copy), l_Error_0 (copy), v12 (ref), v16 (ref), v17 (ref), v18 (ref), v19 (ref)
-    local v24 = setmetatable({}, v21);
-    if typeof(v22) ~= "function" then
-        error(l_Error_0.new("DataLoader must be constructed with a function which accepts " .. ("Array<key> and returns Promise<Array<value>>, but got: %s."):format((tostring(v22)))));
-    end;
-    v24._batchLoadFn = v22;
-    v24._maxBatchSize = v12(v23);
-    v24._batchScheduleFn = v16(v23);
-    v24._cacheKeyFn = v17(v23);
-    v24._cacheMap = v18(v23);
-    v24._batch = nil;
-    v24.name = v19(v23);
-    return v24;
-end;
-v21.load = function(v25, v26) --[[ Line: 162 ]] --[[ Name: load ]]
-    -- upvalues: l_Error_0 (copy), v11 (ref), l_Boolean_0 (copy), v9 (copy)
-    local v27 = false;
-    if v26 == nil then
-        error(l_Error_0.new("The loader.load() function must be called with a value, " .. ("but got: %s."):format((tostring(v26)))));
-    end;
-    local v28 = v11(v25);
-    local l__cacheMap_0 = v25._cacheMap;
-    local v30 = v25._cacheKeyFn(v26);
-    if l_Boolean_0.toJSBoolean(l__cacheMap_0) then
-        local v31 = l__cacheMap_0:get(v30);
-        if l_Boolean_0.toJSBoolean(v31) then
-            local v32;
-            if l_Boolean_0.toJSBoolean(v28.cacheHits) then
-                v32 = v28.cacheHits;
-                v27 = v32;
-            end;
-            if not v27 then
-                v28.cacheHits = {};
-                v32 = v28.cacheHits;
-            end;
-            v27 = false;
-            return v9.new(function(v33) --[[ Line: 182 ]]
-                -- upvalues: v32 (copy), v31 (copy)
-                table.insert(v32, function() --[[ Line: 183 ]]
-                    -- upvalues: v33 (copy), v31 (ref)
-                    v33(v31);
-                end);
-            end);
-        end;
-    end;
-    table.insert(v28.keys, v26);
-    local v36 = v9.new(function(v34, v35) --[[ Line: 192 ]]
-        -- upvalues: v28 (copy)
-        table.insert(v28.callbacks, {
-            resolve = v34, 
-            reject = v35
-        });
-    end);
-    if l_Boolean_0.toJSBoolean(l__cacheMap_0) then
-        l__cacheMap_0:set(v30, v36);
-    end;
-    return v36;
-end;
-v21.loadMany = function(v37, v38) --[[ Line: 202 ]] --[[ Name: loadMany ]]
-    -- upvalues: l_Boolean_0 (copy), v20 (ref), l_Error_0 (copy), v9 (copy)
-    if not l_Boolean_0.toJSBoolean(v20(v38)) then
-        error(l_Error_0.new("The loader.loadMany() function must be called with Array<key> " .. ("but got: %s."):format((tostring(v38)))));
-    end;
-    local v39 = {};
-    local v40 = 0;
-    while v40 < #v38 do
-        table.insert(v39, v37:load(v38[v40 + 1]):catch(function(v41) --[[ Line: 219 ]]
-            return v41;
-        end));
-        v40 = v40 + 1;
-    end;
-    return v9.all(v39);
-end;
-v21.clear = function(v42, v43) --[[ Line: 230 ]] --[[ Name: clear ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local l__cacheMap_1 = v42._cacheMap;
-    if l_Boolean_0.toJSBoolean(l__cacheMap_1) then
-        l__cacheMap_1:delete((v42._cacheKeyFn(v43)));
-    end;
-    return v42;
-end;
-v21.clearAll = function(v45) --[[ Line: 239 ]] --[[ Name: clearAll ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local l__cacheMap_2 = v45._cacheMap;
-    if l_Boolean_0.toJSBoolean(l__cacheMap_2) then
-        l__cacheMap_2:clear();
-    end;
-    return v45;
-end;
-v21.prime = function(v47, v48, v49) --[[ Line: 247 ]] --[[ Name: prime ]]
-    -- upvalues: l_Boolean_0 (copy), l_instanceof_0 (copy), l_Error_1 (copy), v9 (copy)
-    local l__cacheMap_3 = v47._cacheMap;
-    if l_Boolean_0.toJSBoolean(l__cacheMap_3) then
-        local v51 = v47._cacheKeyFn(v48);
-        if l__cacheMap_3:get(v51) == nil then
-            local v52 = nil;
-            if l_instanceof_0(v49, l_Error_1) then
-                v52 = v9.reject(v49);
-                v52:catch(function() --[[ Line: 260 ]]
+local scriptParent = script.Parent
+local LuauPolyfill = require(scriptParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Map = LuauPolyfill.Map
+local instanceof = LuauPolyfill.instanceof
+local setTimeout = LuauPolyfill.setTimeout
+local Error = LuauPolyfill.Error
+local Error2 = LuauPolyfill.Error
+local Promise = require(scriptParent.Promise)
+local t1 = {}
+local getCurrentBatch = nil
+local getValidMaxBatchSize = nil
+local dispatchBatch = nil
+local failedDispatch = nil
+local resolveCacheHits = nil
+local getValidBatchScheduleFn = nil
+local getValidCacheKeyFn = nil
+local getValidCacheMap = nil
+local getValidName = nil
+local isArrayLike = nil
+local t2 = {}
 
-                end);
-            else
-                v52 = v9.resolve(v49);
-            end;
-            l__cacheMap_3:set(v51, v52);
-        end;
-    end;
-    return v47;
-end;
-local function v54(v53) --[[ Line: 296 ]]
-    -- upvalues: l_setTimeout_0 (copy)
-    l_setTimeout_0(v53);
-end;
-v11 = function(v55) --[[ Line: 316 ]] --[[ Name: getCurrentBatch ]]
-    -- upvalues: l_Boolean_0 (copy), v13 (ref)
-    local l__batch_0 = v55._batch;
-    if l__batch_0 ~= nil and not l_Boolean_0.toJSBoolean(l__batch_0.hasDispatched) and #l__batch_0.keys < v55._maxBatchSize then
-        return l__batch_0;
-    else
-        local v57 = {
-            hasDispatched = false, 
-            keys = {}, 
-            callbacks = {}
-        };
-        v55._batch = v57;
-        v55._batchScheduleFn(function() --[[ Line: 332 ]]
-            -- upvalues: v13 (ref), v55 (copy), v57 (copy)
-            v13(v55, v57);
-        end);
-        return v57;
-    end;
-end;
-v13 = function(v58, v59) --[[ Line: 338 ]] --[[ Name: dispatchBatch ]]
-    -- upvalues: v15 (ref), v14 (ref), l_Error_0 (copy), l_Boolean_0 (copy), v20 (ref), l_instanceof_0 (copy), l_Error_1 (copy)
-    v59.hasDispatched = true;
-    if #v59.keys == 0 then
-        v15(v59);
-        return;
-    else
-        local v60 = nil;
-        local _, v63, v64 = xpcall(function() --[[ Line: 350 ]]
-            -- upvalues: v60 (ref), v58 (copy), v59 (copy)
-            v60 = v58._batchLoadFn(v59.keys);
-        end, function(v61) --[[ Line: 352 ]]
-            -- upvalues: v14 (ref), v58 (copy), v59 (copy), l_Error_0 (ref)
-            return v14(v58, v59, l_Error_0.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function " .. ("errored synchronously: %s."):format((tostring(v61))))), true;
-        end);
-        if v64 then
-            return v63;
-        elseif not l_Boolean_0.toJSBoolean(v60) or typeof(v60.andThen) ~= "function" then
-            return v14(v58, v59, l_Error_0.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. ("not return a Promise: %s."):format((tostring(v60)))));
-        else
-            v60:andThen(function(v65) --[[ Line: 384 ]]
-                -- upvalues: l_Boolean_0 (ref), v20 (ref), l_Error_0 (ref), v59 (copy), v15 (ref), l_instanceof_0 (ref), l_Error_1 (ref)
-                if not l_Boolean_0.toJSBoolean(v20(v65)) then
-                    error(l_Error_0.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. ("not return a Promise of an Array: %s."):format(table.concat(v65, ","))));
-                end;
-                if #v65 ~= #v59.keys then
-                    error(l_Error_0.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. "not return a Promise of an Array of the same length as the Array " .. "of keys." .. ("\n\nKeys:\n%s"):format(table.concat(v59.keys, ",")) .. ("\n\nValues:\n%s"):format(table.concat(v65, ","))));
-                end;
-                v15(v59);
-                local v66 = 0;
-                while v66 < #v59.callbacks do
-                    local v67 = v65[v66 + 1];
-                    if l_instanceof_0(v67, l_Error_1) then
-                        v59.callbacks[v66 + 1].reject(v67);
-                    else
-                        v59.callbacks[v66 + 1].resolve(v67);
-                    end;
-                    v66 = v66 + 1;
-                end;
-            end):catch(function(v68) --[[ Line: 425 ]]
-                -- upvalues: v14 (ref), v58 (copy), v59 (copy)
-                v14(v58, v59, v68);
-            end);
-            return nil;
-        end;
-    end;
-end;
-v14 = function(v69, v70, v71) --[[ Line: 433 ]] --[[ Name: failedDispatch ]]
-    -- upvalues: v15 (ref)
-    v15(v70);
-    local v72 = 0;
-    while v72 < #v70.keys do
-        v69:clear(v70.keys[v72 + 1]);
-        v70.callbacks[v72 + 1].reject(v71);
-        v72 = v72 + 1;
-    end;
-end;
-v15 = function(v73) --[[ Line: 448 ]] --[[ Name: resolveCacheHits ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(v73.cacheHits) then
-        local v74 = 0;
-        while v74 < #v73.cacheHits do
-            v73.cacheHits[v74 + 1]();
-            v74 = v74 + 1;
-        end;
-    end;
-end;
-v12 = function(v75) --[[ Line: 463 ]] --[[ Name: getValidMaxBatchSize ]]
-    -- upvalues: l_Boolean_0 (copy), l_Error_0 (copy)
-    local v76 = not l_Boolean_0.toJSBoolean(v75) or v75.batch ~= false;
-    if not l_Boolean_0.toJSBoolean(v76) then
-        return 1;
-    else
-        local v77 = if l_Boolean_0.toJSBoolean(v75) then v75.maxBatchSize else v75;
-        if v77 == nil then
-            return 1e999;
-        else
-            if typeof(v77) ~= "number" or v77 < 1 then
-                error(l_Error_0.new(("maxBatchSize must be a positive number: %s"):format((tostring(v77)))));
-            end;
-            return v77;
-        end;
-    end;
-end;
-v16 = function(v78) --[[ Line: 481 ]] --[[ Name: getValidBatchScheduleFn ]]
-    -- upvalues: l_Boolean_0 (copy), v54 (copy), l_Error_0 (copy)
-    local v79 = if l_Boolean_0.toJSBoolean(v78) then v78.batchScheduleFn else v78;
-    if v79 == nil then
-        return v54;
-    else
-        if typeof(v79) ~= "function" then
-            error(l_Error_0.new(("batchScheduleFn must be a function: %s"):format((tostring(v79)))));
-        end;
-        return v79;
-    end;
-end;
-v17 = function(v80) --[[ Line: 495 ]] --[[ Name: getValidCacheKeyFn ]]
-    -- upvalues: l_Boolean_0 (copy), l_Error_0 (copy)
-    local v81 = if l_Boolean_0.toJSBoolean(v80) then v80.cacheKeyFn else v80;
-    if v81 == nil then
-        return function(v82) --[[ Line: 498 ]]
-            return v82;
-        end;
-    else
-        if typeof(v81) ~= "function" then
-            error(l_Error_0.new(("cacheKeyFn must be a function: %s"):format((tostring(v81)))));
-        end;
-        return v81;
-    end;
-end;
-v18 = function(v83) --[[ Line: 509 ]] --[[ Name: getValidCacheMap ]]
-    -- upvalues: l_Boolean_0 (copy), l_Map_0 (copy), l_Array_0 (copy), l_Error_0 (copy)
-    local v84 = not l_Boolean_0.toJSBoolean(v83) or v83.cache ~= false;
-    if not l_Boolean_0.toJSBoolean(v84) then
-        return nil;
-    else
-        local v85 = if l_Boolean_0.toJSBoolean(v83) then v83.cacheMap else v83;
-        if v85 == nil then
-            return l_Map_0.new();
-        else
-            if v85 ~= nil then
-                local v87 = l_Array_0.filter({
-                    "get", 
-                    "set", 
-                    "delete", 
-                    "clear"
-                }, function(v86) --[[ Line: 520 ]]
-                    -- upvalues: l_Boolean_0 (ref), v85 (copy)
-                    if l_Boolean_0.toJSBoolean(v85) then
-                        return typeof(v85[tostring(v86)]) ~= "function";
-                    else
-                        return v85;
-                    end;
-                end);
-                if #v87 ~= 0 then
-                    error(l_Error_0.new("Custom cacheMap missing methods: " .. tostring(l_Array_0.join(v87, ", "))));
-                end;
-            end;
-            return v85;
-        end;
-    end;
-end;
-v19 = function(v88) --[[ Line: 530 ]] --[[ Name: getValidName ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(if l_Boolean_0.toJSBoolean(v88) then v88.name else v88) then
-        return v88.name;
-    else
-        return nil;
-    end;
-end;
-v20 = function(v89) --[[ Line: 538 ]] --[[ Name: isArrayLike ]]
-    local v90 = false;
-    if typeof(v89) == "table" then
-        v90 = true;
-        if #v89 ~= 0 then
-            v90 = false;
-            if #v89 > 0 then
-                v90 = v89[#v89] ~= nil;
-            end;
-        end;
-    end;
-    return v90;
-end;
-v10.DataLoader = v21;
-return v10;
+t2.__index = t2
+
+function t2.new(p1: ((...any) -> ...any), t3: {[any]: any}?) -- line: 142
+	-- upvalues: t2 (copy), Error (copy), getValidMaxBatchSize (ref), getValidBatchScheduleFn (ref), getValidCacheKeyFn (ref), getValidCacheMap (ref), getValidName (ref)
+	local self = setmetatable({}, t2)
+
+	if typeof(p1) ~= "function" then
+		error(Error.new("DataLoader must be constructed with a function which accepts " .. ("Array<key> and returns Promise<Array<value>>, but got: %s."):format((tostring(p1)))))
+	end
+
+	self._batchLoadFn = p1
+	self._maxBatchSize = getValidMaxBatchSize(t3)
+	self._batchScheduleFn = getValidBatchScheduleFn(t3)
+	self._cacheKeyFn = getValidCacheKeyFn(t3)
+	self._cacheMap = getValidCacheMap(t3)
+	self._batch = nil
+	self.name = getValidName(t3)
+
+	return self
+end
+function t2.load(p2, p3) -- line: 162
+	-- upvalues: Error (copy), getCurrentBatch (ref), Boolean (copy), Promise (copy)
+	local g34 = nil
+	local cacheHits = nil
+
+	if p3 == nil then
+		error(Error.new("The loader.load() function must be called with a value, " .. ("but got: %s."):format((tostring(p3)))))
+	end
+
+	local v29 = getCurrentBatch(p2)
+	local _cacheMap = p2._cacheMap
+	local v31 = p2._cacheKeyFn(p3)
+
+	if Boolean.toJSBoolean(_cacheMap) then
+		local v32 = _cacheMap:get(v31)
+
+		if Boolean.toJSBoolean(v32) then
+			if Boolean.toJSBoolean(v29.cacheHits) then
+				cacheHits = v29.cacheHits
+
+				if cacheHits then
+					g34 = true
+				end
+			end
+
+			if not g34 then
+				v29.cacheHits = {}
+				cacheHits = v29.cacheHits
+			end
+
+			g34 = false
+
+			local v35 = cacheHits
+
+			return Promise.new(function(resolve) -- line: 182
+				-- upvalues: v35 (copy), v32 (copy)
+				table.insert(v35, function() -- line: 183
+					-- upvalues: resolve (copy), v32 (copy)
+					resolve(v32)
+				end)
+			end)
+		end
+	end
+
+	table.insert(v29.keys, p3)
+
+	local v36 = Promise.new(function(resolve, reject) -- line: 192
+		-- upvalues: v29 (copy)
+		table.insert(v29.callbacks, {
+			resolve = resolve,
+			reject = reject
+		})
+	end)
+
+	if Boolean.toJSBoolean(_cacheMap) then
+		_cacheMap:set(v31, v36)
+	end
+
+	return v36
+end
+function t2.loadMany(p4, p5) -- line: 202
+	-- upvalues: Boolean (copy), isArrayLike (ref), Error (copy), Promise (copy)
+	if not Boolean.toJSBoolean(isArrayLike(p5)) then
+		error(Error.new("The loader.loadMany() function must be called with Array<key> " .. ("but got: %s."):format((tostring(p5)))))
+	end
+
+	local t4 = {}
+	local n1 = 0
+
+	while n1 < #p5 do
+		table.insert(t4, p4:load(p5[n1 + 1]):catch(function(p6) -- line: 219
+			return p6
+		end))
+		n1 += 1
+	end
+
+	return Promise.all(t4)
+end
+function t2.clear(p7, p8) -- line: 230
+	-- upvalues: Boolean (copy)
+	local _cacheMap = p7._cacheMap
+
+	if Boolean.toJSBoolean(_cacheMap) then
+		_cacheMap:delete((p7._cacheKeyFn(p8)))
+	end
+
+	return p7
+end
+function t2.clearAll(p9) -- line: 239
+	-- upvalues: Boolean (copy)
+	local _cacheMap = p9._cacheMap
+
+	if Boolean.toJSBoolean(_cacheMap) then
+		_cacheMap:clear()
+	end
+
+	return p9
+end
+function t2.prime(p10, p11, p12) -- line: 247
+	-- upvalues: Boolean (copy), instanceof (copy), Error2 (copy), Promise (copy)
+	local _cacheMap = p10._cacheMap
+
+	if Boolean.toJSBoolean(_cacheMap) then
+		local v50 = p10._cacheKeyFn(p11)
+
+		if _cacheMap:get(v50) == nil then
+			local v51
+
+			if instanceof(p12, Error2) then
+				v51 = Promise.reject(p12)
+				v51:catch(function() -- line: 260
+				end)
+			else
+				v51 = Promise.resolve(p12)
+			end
+
+			_cacheMap:set(v50, v51)
+		end
+	end
+
+	return p10
+end
+
+local function v23(p13) -- line: 296
+	-- upvalues: setTimeout (copy)
+	setTimeout(p13)
+end
+
+function getCurrentBatch(t5: {[any]: any}) -- line: 316
+	-- upvalues: Boolean (copy), dispatchBatch (ref)
+	local _batch = t5._batch
+
+	if _batch ~= nil and (not Boolean.toJSBoolean(_batch.hasDispatched) and #_batch.keys < t5._maxBatchSize) then
+		return _batch
+	end
+
+	local t6 = {
+		hasDispatched = false,
+		keys = {},
+		callbacks = {}
+	}
+
+	t5._batch = t6
+	t5._batchScheduleFn(function() -- line: 332
+		-- upvalues: dispatchBatch (ref), t5 (copy), t6 (copy)
+		dispatchBatch(t5, t6)
+	end)
+
+	return t6
+end
+function dispatchBatch(t7: {[any]: any}, t8: {[any]: any}) -- line: 338
+	-- upvalues: resolveCacheHits (ref), failedDispatch (ref), Error (copy), Boolean (copy), isArrayLike (ref), instanceof (copy), Error2 (copy)
+	t8.hasDispatched = true
+
+	if #t8.keys == 0 then
+		resolveCacheHits(t8)
+
+		return
+	end
+
+	local u58 = nil
+	local _, result, v61 = xpcall(function() -- line: 350
+		-- upvalues: u58 (ref), t7 (copy), t8 (copy)
+		u58 = t7._batchLoadFn(t8.keys)
+	end, function(err) -- line: 352
+		-- upvalues: failedDispatch (ref), t7 (copy), t8 (copy), Error (copy)
+		return failedDispatch(t7, t8, Error.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function " .. ("errored synchronously: %s."):format((tostring(err))))), true
+	end)
+
+	if v61 then
+		return result
+	end
+
+	if not Boolean.toJSBoolean(u58) or typeof(u58.andThen) ~= "function" then
+		return failedDispatch(t7, t8, Error.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. ("not return a Promise: %s."):format((tostring(u58)))))
+	end
+
+	u58:andThen(function(p14) -- line: 384
+		-- upvalues: Boolean (copy), isArrayLike (ref), Error (copy), t8 (copy), resolveCacheHits (ref), instanceof (copy), Error2 (copy)
+		if not Boolean.toJSBoolean(isArrayLike(p14)) then
+			error(Error.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. ("not return a Promise of an Array: %s."):format(table.concat(p14, ","))))
+		end
+
+		if #p14 ~= #t8.keys then
+			error(Error.new("DataLoader must be constructed with a function which accepts " .. "Array<key> and returns Promise<Array<value>>, but the function did " .. "not return a Promise of an Array of the same length as the Array " .. "of keys." .. ("\n\nKeys:\n%s"):format(table.concat(t8.keys, ",")) .. ("\n\nValues:\n%s"):format(table.concat(p14, ","))))
+		end
+
+		resolveCacheHits(t8)
+
+		local n2 = 0
+
+		while n2 < #t8.callbacks do
+			local v88 = p14[n2 + 1]
+
+			if instanceof(v88, Error2) then
+				t8.callbacks[n2 + 1].reject(v88)
+			else
+				t8.callbacks[n2 + 1].resolve(v88)
+			end
+
+			n2 += 1
+		end
+	end):catch(function(p15) -- line: 425
+		-- upvalues: failedDispatch (ref), t7 (copy), t8 (copy)
+		failedDispatch(t7, t8, p15)
+	end)
+
+	return nil
+end
+function failedDispatch(t9: {[any]: any}, t10: {[any]: any}, p16) -- line: 433
+	-- upvalues: resolveCacheHits (ref)
+	resolveCacheHits(t10)
+
+	local n3 = 0
+
+	while n3 < #t10.keys do
+		t9:clear(t10.keys[n3 + 1])
+		t10.callbacks[n3 + 1].reject(p16)
+		n3 += 1
+	end
+end
+function resolveCacheHits(t11: {[any]: any}) -- line: 448
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(t11.cacheHits) then
+		local n4 = 0
+
+		while n4 < #t11.cacheHits do
+			t11.cacheHits[n4 + 1]()
+			n4 += 1
+		end
+	end
+end
+function getValidMaxBatchSize(t12: {[any]: any}?) -- line: 463
+	-- upvalues: Boolean (copy), Error (copy)
+	local v69 = not Boolean.toJSBoolean(t12) or t12.batch ~= false
+
+	if not Boolean.toJSBoolean(v69) then
+		return 1
+	end
+
+	local v70 = if not Boolean.toJSBoolean(t12) then t12 else t12.maxBatchSize
+
+	if v70 == nil then
+		return 1e999
+	end
+
+	if typeof(v70) ~= "number" or v70 < 1 then
+		error(Error.new(("maxBatchSize must be a positive number: %s"):format((tostring(v70)))))
+	end
+
+	return v70
+end
+function getValidBatchScheduleFn(t13: {[any]: any}?) -- line: 481
+	-- upvalues: Boolean (copy), v23 (copy), Error (copy)
+	local v72 = if not Boolean.toJSBoolean(t13) then t13 else t13.batchScheduleFn
+
+	if v72 == nil then
+		return v23
+	end
+
+	if typeof(v72) ~= "function" then
+		error(Error.new(("batchScheduleFn must be a function: %s"):format((tostring(v72)))))
+	end
+
+	return v72
+end
+function getValidCacheKeyFn(t14: {[any]: any}?) -- line: 495
+	-- upvalues: Boolean (copy), Error (copy)
+	local v74 = if not Boolean.toJSBoolean(t14) then t14 else t14.cacheKeyFn
+
+	if v74 == nil then
+		return function(p17) -- line: 498
+			return p17
+		end
+	end
+
+	if typeof(v74) ~= "function" then
+		error(Error.new(("cacheKeyFn must be a function: %s"):format((tostring(v74)))))
+	end
+
+	return v74
+end
+function getValidCacheMap(t15: {[any]: any}?) -- line: 509
+	-- upvalues: Boolean (copy), Map (copy), Array (copy), Error (copy)
+	local v76 = not Boolean.toJSBoolean(t15) or t15.cache ~= false
+
+	if not Boolean.toJSBoolean(v76) then
+		return nil
+	end
+
+	local v77 = if not Boolean.toJSBoolean(t15) then t15 else t15.cacheMap
+
+	if v77 == nil then
+		return Map.new()
+	end
+
+	if v77 ~= nil then
+		local v78 = Array.filter({
+			"get",
+			"set",
+			"delete",
+			"clear"
+		}, function(p18) -- line: 520
+			-- upvalues: Boolean (copy), v77 (copy)
+			if Boolean.toJSBoolean(v77) then
+				return typeof(v77[tostring(p18)]) ~= "function"
+			end
+
+			return v77
+		end)
+
+		if #v78 ~= 0 then
+			error(Error.new("Custom cacheMap missing methods: " .. tostring(Array.join(v78, ", "))))
+		end
+	end
+
+	return v77
+end
+function getValidName(t16: {[any]: any}?) -- line: 530
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(if not Boolean.toJSBoolean(t16) then t16 else t16.name) then
+		return t16.name
+	end
+
+	return nil
+end
+function isArrayLike(p19) -- line: 538
+	return typeof(p19) == "table" and (#p19 == 0 or #p19 > 0 and p19[#p19] ~= nil)
+end
+
+t1.DataLoader = t2
+
+return t1

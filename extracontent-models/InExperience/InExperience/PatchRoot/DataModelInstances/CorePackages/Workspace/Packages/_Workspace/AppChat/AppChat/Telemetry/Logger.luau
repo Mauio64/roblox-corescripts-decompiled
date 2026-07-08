@@ -1,2 +1,3 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-return require(l_script_FirstAncestor_0.Logger):new("AppChat.Telemetry");
+local AppChat = script:FindFirstAncestor("AppChat")
+
+return require(AppChat.Logger):new("AppChat.Telemetry")

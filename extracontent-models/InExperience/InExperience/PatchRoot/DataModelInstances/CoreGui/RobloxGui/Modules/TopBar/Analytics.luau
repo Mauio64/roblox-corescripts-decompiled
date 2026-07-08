@@ -1,72 +1,85 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("GuiService");
-local _ = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local _ = game:GetService("UserInputService");
-local _ = game:GetService("Players");
-local l_game_EngineFeature_0 = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId");
-local v7 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent;
-local v9 = require(l_Parent_0.Constants);
-local _ = require(l_Parent_0.Flags.GetFFlagEnableTopBarAnalytics)();
-local v11 = {};
-v11.__index = v11;
-v11.new = function() --[[ Line: 42 ]] --[[ Name: new ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), v11 (copy), l_game_EngineFeature_0 (copy), v7 (copy), v9 (copy)
-    local v12 = setmetatable({
-        _target = "client", 
-        _context = "topbar", 
-        _defaultProps = {
-            universeid = tostring(game.GameId), 
-            placeid = tostring(game.PlaceId), 
-            sessionid = l_RbxAnalyticsService_0:GetSessionId()
-        }
-    }, v11);
-    if l_game_EngineFeature_0 then
-        v12._defaultProps.playsessionid = l_RbxAnalyticsService_0:GetPlaySessionId();
-    end;
-    v12._sendEvent = function(v13, v14) --[[ Line: 59 ]]
-        -- upvalues: v7 (ref), v12 (copy), l_RbxAnalyticsService_0 (ref)
-        local v15 = v7.Dictionary.join(v12._defaultProps, v14 or {});
-        l_RbxAnalyticsService_0:SendEventDeferred(v12._target, v12._context, v13, v15);
-        return nil;
-    end;
-    v12._onButtonActivated = function(v16, v17) --[[ Line: 65 ]]
-        -- upvalues: v12 (copy), v9 (ref)
-        return v12._sendEvent(v9.Analytics.EventNameTopBarButtonActivated, {
-            button = v16, 
-            status = if v17 then v9.Analytics.StatusActive else v9.Analytics.StatusInactive
-        });
-    end;
-    return v12;
-end;
-v11.onChatButtonActivated = function(v18, v19) --[[ Line: 75 ]] --[[ Name: onChatButtonActivated ]]
-    -- upvalues: v9 (copy)
-    return v18._onButtonActivated(v9.Analytics.ChatButtonName, v19);
-end;
-v11.onMoreMenuActivated = function(v20) --[[ Line: 79 ]] --[[ Name: onMoreMenuActivated ]]
-    -- upvalues: v9 (copy)
-    return v20._onButtonActivated(v9.Analytics.MoreMenuButtonName, true);
-end;
-v11.onInventoryActivated = function(v21, v22) --[[ Line: 84 ]] --[[ Name: onInventoryActivated ]]
-    -- upvalues: v9 (copy)
-    return v21._onButtonActivated(v9.Analytics.InventoryButtonName, v22);
-end;
-v11.onLeaderboardActivated = function(v23, v24) --[[ Line: 88 ]] --[[ Name: onLeaderboardActivated ]]
-    -- upvalues: v9 (copy)
-    return v23._onButtonActivated(v9.Analytics.LeaderboardButtonName, v24);
-end;
-v11.onEmotesActivated = function(v25, v26) --[[ Line: 92 ]] --[[ Name: onEmotesActivated ]]
-    -- upvalues: v9 (copy)
-    return v25._onButtonActivated(v9.Analytics.EmotesButtonName, v26);
-end;
-v11.onShowGamepadNavigationDialog = function(v27) --[[ Line: 96 ]] --[[ Name: onShowGamepadNavigationDialog ]]
-    -- upvalues: v9 (copy)
-    return v27._sendEvent(v9.Analytics.ShowGamepadNavigationDialog);
-end;
-v11.onDismissGamepadNavigationDialog = function(v28) --[[ Line: 100 ]] --[[ Name: onDismissGamepadNavigationDialog ]]
-    -- upvalues: v9 (copy)
-    return v28._sendEvent(v9.Analytics.DismissGamepadNavigationDialog);
-end;
-v11.default = v11.new();
-return v11;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("GuiService")
+game:GetService("CoreGui"):WaitForChild("RobloxGui")
+game:GetService("UserInputService")
+game:GetService("Players")
+
+local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local Cryo = require(CorePackages.Packages.Cryo)
+local scriptParent = script.Parent
+local Constants = require(scriptParent.Constants)
+
+require(scriptParent.Flags.GetFFlagEnableTopBarAnalytics)()
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 42
+	-- upvalues: RbxAnalyticsService (copy), t1 (copy), EngineFeature (copy), Cryo (copy), Constants (copy)
+	local v8 = setmetatable({
+		_target = "client",
+		_context = "topbar",
+		_defaultProps = {
+			universeid = tostring(game.GameId),
+			placeid = tostring(game.PlaceId),
+			sessionid = RbxAnalyticsService:GetSessionId()
+		}
+	}, t1)
+
+	if EngineFeature then
+		v8._defaultProps.playsessionid = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	function v8._sendEvent(s1: string, p1) -- line: 59
+		-- upvalues: Cryo (copy), v8 (copy), RbxAnalyticsService (copy)
+		local v22 = Cryo.Dictionary.join(v8._defaultProps, p1 or {})
+
+		RbxAnalyticsService:SendEventDeferred(v8._target, v8._context, s1, v22)
+
+		return nil
+	end
+	function v8._onButtonActivated(s2: string, b1: boolean) -- line: 65
+		-- upvalues: v8 (copy), Constants (copy)
+		return v8._sendEvent(Constants.Analytics.EventNameTopBarButtonActivated, {
+			button = s2,
+			status = if not b1 then Constants.Analytics.StatusInactive else Constants.Analytics.StatusActive
+		})
+	end
+
+	return v8
+end
+function t1.onChatButtonActivated(t2: {[any]: any}, b2: boolean) -- line: 75
+	-- upvalues: Constants (copy)
+	return t2._onButtonActivated(Constants.Analytics.ChatButtonName, b2)
+end
+function t1.onMoreMenuActivated(p2) -- line: 79
+	-- upvalues: Constants (copy)
+	return p2._onButtonActivated(Constants.Analytics.MoreMenuButtonName, true)
+end
+function t1.onInventoryActivated(t3: {[any]: any}, b3: boolean) -- line: 84
+	-- upvalues: Constants (copy)
+	return t3._onButtonActivated(Constants.Analytics.InventoryButtonName, b3)
+end
+function t1.onLeaderboardActivated(t4: {[any]: any}, b4: boolean) -- line: 88
+	-- upvalues: Constants (copy)
+	return t4._onButtonActivated(Constants.Analytics.LeaderboardButtonName, b4)
+end
+function t1.onEmotesActivated(t5: {[any]: any}, b5: boolean) -- line: 92
+	-- upvalues: Constants (copy)
+	return t5._onButtonActivated(Constants.Analytics.EmotesButtonName, b5)
+end
+function t1.onShowGamepadNavigationDialog(p3) -- line: 96
+	-- upvalues: Constants (copy)
+	return p3._sendEvent(Constants.Analytics.ShowGamepadNavigationDialog)
+end
+function t1.onDismissGamepadNavigationDialog(p4) -- line: 100
+	-- upvalues: Constants (copy)
+	return p4._sendEvent(Constants.Analytics.DismissGamepadNavigationDialog)
+end
+
+t1.default = t1.new()
+
+return t1

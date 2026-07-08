@@ -1,18 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.Signals);
-local l_PropResultCategory_0 = require(l_script_FirstAncestor_0.ClientBinding.SduiClientBindingTypes).PropResultCategory;
-local v4 = require(l_script_FirstAncestor_0.ClientBinding.PropBuilder.buildDefaultProp);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.ClientBinding.SduiDataBindingContentType);
-local v7 = require(l_script_FirstAncestor_0.ClientBinding.PropBuilder.SduiPropUtils);
-local function v8(v9, v10, v11, v12, v13, v14, v15) --[[ Line: 18 ]] --[[ Name: buildStringProp ]]
-    -- upvalues: v7 (copy), l_PropResultCategory_0 (copy), v4 (copy), v8 (copy)
-    if v9 == "format" then
-        return v7.generateFormatStringPropValue(v10, v11, v13, v12, v15), l_PropResultCategory_0.PropSignal;
-    else
-        local v16, v17 = v4(v9, v10, v11, v12, v13, v14, v15, v8);
-        return v16, v17;
-    end;
-end;
-return v8;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+
+require(SduiCoreSystemParent.Signals)
+
+local PropResultCategory = require(SduiCoreSystem.ClientBinding.SduiClientBindingTypes).PropResultCategory
+local buildDefaultProp = require(SduiCoreSystem.ClientBinding.PropBuilder.buildDefaultProp)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.ClientBinding.SduiDataBindingContentType)
+
+local SduiPropUtils = require(SduiCoreSystem.ClientBinding.PropBuilder.SduiPropUtils)
+local SduiClientBindingParsers = require(SduiCoreSystem.ClientBinding.PropBuilder.SduiClientBindingParsers)
+local FFlagSduiStringPropToString = require(SduiCoreSystemParent.SharedFlags).FFlagSduiStringPropToString
+local FFlagSduiLocalizedLiterals = require(SduiCoreSystemParent.SharedFlags).FFlagSduiLocalizedLiterals
+
+local function buildStringProp(s1: string, p1, p2, p3, p4, p5, p6: ((...any) -> ...any)?) -- line: 22
+	-- upvalues: FFlagSduiStringPropToString (copy), SduiClientBindingParsers (copy), FFlagSduiLocalizedLiterals (copy), PropResultCategory (copy), SduiPropUtils (copy), buildDefaultProp (copy), buildStringProp (copy)
+	local v17 = p6 or if not FFlagSduiStringPropToString then nil else SduiClientBindingParsers.parseToString
+
+	if FFlagSduiLocalizedLiterals and s1 == "translation" then
+		local v18 = p4.resolveLocalizedLiteral(p1)
+
+		if v18 then
+			return if not v17 then v18 else v17(v18), PropResultCategory.Literal
+		end
+
+		return nil, PropResultCategory.Failed
+	end
+
+	if s1 == "format" then
+		return SduiPropUtils.generateFormatStringPropValue(p1, p2, p4, p3, v17), PropResultCategory.PropSignal
+	end
+
+	local v19, v20 = buildDefaultProp(s1, p1, p2, p3, p4, p5, v17, buildStringProp)
+
+	return v19, v20
+end
+
+return buildStringProp

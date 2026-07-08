@@ -1,8 +1,13 @@
-local _ = require(script.Parent.Parent.Types);
-return function(v1) --[[ Line: 4 ]] --[[ Name: buildStringsToLocalize ]]
-    local v2 = {};
-    for _, v4 in v1 do
-        v2[v4.nameTranslationKey] = v4.nameTranslationKey;
-    end;
-    return v2;
-end;
+require(script.Parent.Parent.Types)
+
+local function buildStringsToLocalize(t1: {[any]: any}) -- line: 4
+	local t2 = {}
+
+	for _, v5 in t1 do
+		t2[v5.nameTranslationKey] = v5.nameTranslationKey
+	end
+
+	return t2
+end
+
+return buildStringsToLocalize

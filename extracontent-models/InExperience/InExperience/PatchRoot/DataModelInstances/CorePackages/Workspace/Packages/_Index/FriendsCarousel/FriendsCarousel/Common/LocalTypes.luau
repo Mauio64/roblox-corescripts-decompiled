@@ -1,2 +1,3 @@
-local _ = require(script.Parent.ModelTypes);
-return nil;
+require(script.Parent.ModelTypes)
+
+return nil

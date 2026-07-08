@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatAutotranslationRespectsExperienceChatSetting", false);
+return game:DefineFastFlag("AppChatAutotranslationRespectsExperienceChatSetting", false)

@@ -1,13 +1,16 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Actions.UpdateSelectedCaptures);
-local v2 = require(l_Parent_0.Utils.getUpdatedSelectedCapturesArray);
-local v3 = require(l_Parent_0.Constants);
-local _ = require(l_Parent_0.Types);
-return function(v5) --[[ Line: 9 ]]
-    -- upvalues: v3 (copy), v1 (copy), v2 (copy)
-    return function(v6) --[[ Line: 10 ]]
-        -- upvalues: v3 (ref), v1 (ref), v2 (ref), v5 (copy)
-        local l_SelectedCaptures_0 = v6:getState()[v3.RoduxKey].CaptureManager.SelectedCaptures;
-        v6:dispatch(v1(v2(l_SelectedCaptures_0, v5)));
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local UpdateSelectedCaptures = require(ParentParent.Actions.UpdateSelectedCaptures)
+local getUpdatedSelectedCapturesArray = require(ParentParent.Utils.getUpdatedSelectedCapturesArray)
+local Constants = require(ParentParent.Constants)
+
+require(ParentParent.Types)
+
+return function(p1) -- line: 9
+	-- upvalues: Constants (copy), UpdateSelectedCaptures (copy), getUpdatedSelectedCapturesArray (copy)
+	return function(p2) -- line: 10
+		-- upvalues: Constants (copy), UpdateSelectedCaptures (copy), getUpdatedSelectedCapturesArray (copy), p1 (copy)
+		local SelectedCaptures = p2:getState()[Constants.RoduxKey].CaptureManager.SelectedCaptures
+
+		p2:dispatch(UpdateSelectedCaptures(getUpdatedSelectedCapturesArray(SelectedCaptures, p1)))
+	end
+end

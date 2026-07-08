@@ -1,330 +1,329 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("StreamNotifications");
-local l_components_0 = l_script_FirstAncestor_0.components;
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.constants);
-local v5 = require(l_Parent_0.ReactOtter);
-local v6 = require(l_Parent_0.NotificationsCommon);
-local v7 = require(l_components_0.StreamNotificationAnimationWrapper);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_NotificationHelper_0 = v6.NotificationHelper;
-local v10 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v10.Core.Style.useStyle;
-local l_Images_0 = v10.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v10.Core.ImageSet.ImageSetLabel;
-local v14 = l_Images_0["icons/actions/truncationExpand"];
-local v15 = l_Images_0["icons/actions/truncationCollapse"];
-local v16 = UDim.new(0, 12);
-local v17 = UDim.new(0, 24);
-local v18 = v4.DefaultPadding * 4;
-local v19 = UDim2.fromOffset(24, 24);
-local l_EventStream_0 = require(l_script_FirstAncestor_0.analytics.analyticsService).EventStream;
-local v21 = require(l_script_FirstAncestor_0.analytics.analyticsConstants);
-local v22 = {
-    stiffness = 207, 
-    damping = 24, 
-    mass = 1
-};
-return function(v23) --[[ Line: 54 ]]
-    -- upvalues: l_useStyle_0 (copy), v3 (copy), v5 (copy), l_useLocalization_0 (copy), v4 (copy), l_NotificationHelper_0 (copy), l_EventStream_0 (copy), v21 (copy), v22 (copy), v7 (copy), v16 (copy), v17 (copy), l_ImageSetLabel_0 (copy), v19 (copy), v15 (copy), v18 (copy), v14 (copy)
-    local v24 = l_useStyle_0();
-    local l_Font_0 = v24.Font;
-    local l_Font_1 = l_Font_0.Header1.Font;
-    local v27 = l_Font_0.BaseSize * l_Font_0.CaptionHeader.RelativeSize;
-    local v28, v29 = v3.useState(true);
-    local v30, v31 = v3.useState(74);
-    local v32, v33 = v3.useState(true);
-    local v34, v35 = v5.useAnimatedBinding({
-        shadowHeight = 0, 
-        shadowWidth = 1
-    });
-    local v36 = l_useLocalization_0({
-        moreText = v4.Text.ShowMoreKey, 
-        lessText = v4.Text.ShowLessKey
-    });
-    local v39 = v3.useCallback(function(v37, v38) --[[ Line: 77 ]]
-        -- upvalues: v28 (copy), v31 (copy)
-        if v37 == 1 and v28 then
-            v31(v38);
-        end;
-    end);
-    local function v44(v40) --[[ Line: 83 ]]
-        local v41 = {};
-        for _, v43 in v40 do
-            if v43.id then
-                table.insert(v41, v43.id);
-            end;
-        end;
-        return v41;
-    end;
-    local function v48() --[[ Line: 93 ]]
-        -- upvalues: v29 (copy), l_NotificationHelper_0 (ref), l_EventStream_0 (ref), v21 (ref), v23 (copy), v44 (copy)
-        v29(function(v45) --[[ Line: 94 ]]
-            -- upvalues: l_NotificationHelper_0 (ref), l_EventStream_0 (ref), v21 (ref), v23 (ref), v44 (ref)
-            l_NotificationHelper_0.fireEvent(l_EventStream_0, v21.Context.click, if v45 then v21.EventNames.bundleOpened else v21.EventNames.bundleClosed, {
-                bundleKey = v23.notifications[1].content.bundleKey or nil, 
-                totalNotifications = #v23.notifications or nil, 
-                notificationIds = v44(v23.notifications) or nil
-            });
-            if v45 then
-                for v46, v47 in v23.notifications do
-                    l_NotificationHelper_0.fireEvent(l_EventStream_0, v21.Context.seen, v21.EventNames.notificationViewed, {
-                        notificationId = v47.id or nil, 
-                        notificationType = v47.content.notificationType or nil, 
-                        bundlePosition = v46, 
-                        bundleKey = v47.content.bundleKey or nil, 
-                        clientEventsPayload = v47.content.clientEventsPayload or nil
-                    });
-                end;
-            end;
-            return not v45;
-        end);
-    end;
-    v3.useEffect(function() --[[ Line: 132 ]]
-        -- upvalues: v35 (copy), v5 (ref), v28 (copy), v22 (ref)
-        v35({
-            shadowHeight = v5.spring(v28 and 0 or 1, v22), 
-            shadowWidth = v5.spring(v28 and 1 or 0, v22)
-        });
-    end, {
-        v28
-    });
-    v3.useEffect(function() --[[ Line: 140 ]]
-        -- upvalues: v33 (copy), v23 (copy)
-        v33(#v23.notifications > 1);
-    end, {
-        v23.notifications
-    });
-    return (v3.useMemo(function() --[[ Line: 145 ]]
-        -- upvalues: v23 (copy), v28 (copy), v32 (copy), v3 (ref), v7 (ref), v39 (copy), v34 (copy), v30 (copy), v4 (ref), v24 (copy), v16 (ref), l_Font_1 (copy), v27 (copy), v48 (copy), v17 (ref), v36 (copy), l_ImageSetLabel_0 (ref), v19 (ref), v15 (ref), v18 (ref), v14 (ref)
-        local v49 = {};
-        for v50, v51 in ipairs(v23.notifications) do
-            local v52 = false;
-            local v53 = if v23.impressionMetadataByNotificationId then v23.impressionMetadataByNotificationId[v51.id] else nil;
-            if v28 and v32 then
-                v52 = true;
-            end;
-            v49[v51.id] = v3.createElement(v7, {
-                layoutOrder = v50, 
-                notification = v51, 
-                finishDismissNotification = v23.finishDismissNotification, 
-                handleActions = v23.handleActions, 
-                openMetaActions = v23.openMetaActions, 
-                onHeightChange = v39, 
-                collapsed = v52, 
-                impressionsTag = v23.impressionsTag, 
-                impressionIndex = v53 and v53.impressionIndex or nil
-            });
-        end;
-        v49.UIPadding = v3.createElement("UIPadding", {
-            PaddingTop = if not v28 and v32 then UDim.new(0, 40) else UDim.new(0, 0)
-        });
-        v49.UIListLayout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center
-        });
-        v49.Shadow1 = if v28 and v32 then v3.createElement("Frame", {
-            Size = v34:map(function(v54) --[[ Line: 185 ]]
-                -- upvalues: v30 (ref), v4 (ref)
-                return UDim2.new(1, 0, 0, v54.shadowHeight * v30 + v4.DefaultPadding);
-            end), 
-            LayoutOrder = #v23.notifications + 1, 
-            ZIndex = -(#v23.notifications + 1), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, {
-            v3.createElement("Frame", {
-                Size = v34:map(function(v55) --[[ Line: 194 ]]
-                    -- upvalues: v4 (ref), v30 (ref)
-                    return UDim2.new(1, -(v4.DefaultPadding * 4 * v55.shadowWidth), 0, v30 - v4.DefaultPadding);
-                end), 
-                BackgroundColor3 = v24.Theme.BackgroundDefault.Color, 
-                BackgroundTransparency = 0, 
-                BorderSizePixel = 0, 
-                Position = UDim2.new(0.5, 0, 0, 0), 
-                AnchorPoint = Vector2.new(0.5, 0)
-            }, {
-                UICorner = v3.createElement("UICorner", {
-                    CornerRadius = v16
-                })
-            })
-        }) else nil;
-        v49.Shadow2 = if v28 and v32 then v3.createElement("Frame", {
-            Size = v34:map(function(v56) --[[ Line: 219 ]]
-                -- upvalues: v30 (ref), v4 (ref)
-                return UDim2.new(1, 0, 0, v56.shadowHeight * v30 + v4.DefaultPadding * 2);
-            end), 
-            LayoutOrder = #v23.notifications + 2, 
-            BackgroundTransparency = 1, 
-            ZIndex = -(#v23.notifications + 2), 
-            BorderSizePixel = 0
-        }, {
-            v3.createElement("Frame", {
-                Size = v34:map(function(v57) --[[ Line: 228 ]]
-                    -- upvalues: v4 (ref), v30 (ref)
-                    return UDim2.new(1, -(v4.DefaultPadding * 6 * v57.shadowWidth), 0, v30 - v4.DefaultPadding);
-                end), 
-                BackgroundColor3 = v24.Theme.BackgroundContrast.Color, 
-                BackgroundTransparency = 0, 
-                BorderSizePixel = 0, 
-                Position = UDim2.new(0.5, 0, 0, 0), 
-                AnchorPoint = Vector2.new(0.5, 0)
-            }, {
-                UICorner = v3.createElement("UICorner", {
-                    CornerRadius = v16
-                })
-            })
-        }) else nil;
-        return v3.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v23.layoutOrder
-        }, {
-            UIPadding = v3.createElement("UIPadding", {
-                PaddingBottom = if v28 and v32 then UDim.new(0, v4.DefaultPadding) else UDim.new(0, 0)
-            }), 
-            ShowLessButton = if not v28 and v32 then v3.createElement("TextButton", {
-                Size = UDim2.new(0, 160, 0, 40), 
-                Text = "", 
-                Font = l_Font_1, 
-                TextSize = v27, 
-                [v3.Event.Activated] = v48, 
-                BackgroundTransparency = 1, 
-                BackgroundColor3 = v24.Theme.BackgroundMuted.Color, 
-                AutoButtonColor = false, 
-                LayoutOrder = 1, 
-                ZIndex = 4, 
-                Position = UDim2.new(1, 0, 0, 0), 
-                AnchorPoint = Vector2.new(1, 0), 
-                BorderSizePixel = 0
-            }, {
-                v3.createElement("Frame", {
-                    Size = UDim2.new(1, -v4.DefaultPadding, 1, -v4.DefaultPadding), 
-                    BackgroundTransparency = 0, 
-                    BackgroundColor3 = v24.Theme.BackgroundContrast.Color, 
-                    Position = UDim2.new(1, -v4.DefaultPadding, 0, 0), 
-                    AnchorPoint = Vector2.new(1, 0), 
-                    ZIndex = 10, 
-                    BorderSizePixel = 0
-                }, {
-                    UICorner = v3.createElement("UICorner", {
-                        CornerRadius = v17
-                    }), 
-                    ShowLessTextAndIconFrame = v3.createElement("Frame", {
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        Position = UDim2.new(0.5, 0, 0.5, 0), 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BorderSizePixel = 0, 
-                        BackgroundTransparency = 1
-                    }, {
-                        UIListLayout = v3.createElement("UIListLayout", {
-                            FillDirection = Enum.FillDirection.Horizontal, 
-                            SortOrder = Enum.SortOrder.LayoutOrder, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center
-                        }), 
-                        ShowLessText = v3.createElement("TextLabel", {
-                            Text = v36 and v36.lessText, 
-                            LayoutOrder = 1, 
-                            Font = l_Font_1, 
-                            TextSize = v27, 
-                            BackgroundTransparency = 1, 
-                            TextColor3 = v24.Theme.TextMuted.Color, 
-                            Size = UDim2.new(0, 0, 1, 0), 
-                            AutomaticSize = Enum.AutomaticSize.X
-                        }, {
-                            v3.createElement("UIPadding", {
-                                PaddingRight = UDim.new(0, v4.DefaultPadding)
-                            })
-                        }), 
-                        CollapseIcon = v3.createElement(l_ImageSetLabel_0, {
-                            LayoutOrder = 2, 
-                            AnchorPoint = Vector2.new(0.5, 0.5), 
-                            Position = UDim2.fromScale(0.5, 0.5), 
-                            Size = v19, 
-                            BackgroundTransparency = 1, 
-                            BorderSizePixel = 0, 
-                            Image = v15, 
-                            ImageColor3 = v24.Theme.UIEmphasis.Color
-                        })
-                    })
-                })
-            }) else nil, 
-            InvisibleExpandButton = v3.createElement("TextButton", {
-                Size = UDim2.new(1, 0, 0, if v28 and v32 then v30 + v4.DefaultPadding * 2 else 0), 
-                BackgroundTransparency = 1, 
-                Text = "", 
-                [v3.Event.Activated] = v48, 
-                ZIndex = 5, 
-                BorderSizePixel = 0, 
-                AutoButtonColor = false
-            }), 
-            NumberMoreButton = if v30 ~= 0 and v28 and #v23.notifications > 1 then v3.createElement("Frame", {
-                Size = UDim2.new(0, 125, 0, v18), 
-                AutomaticSize = Enum.AutomaticSize.X, 
-                Position = UDim2.new(0.5, 0, 1, 0), 
-                AnchorPoint = Vector2.new(0.5, 1), 
-                ZIndex = 10, 
-                BackgroundColor3 = v24.Theme.BackgroundContrast.Color, 
-                BackgroundTransparency = 0
-            }, {
-                UICorner = v3.createElement("UICorner", {
-                    CornerRadius = v17
-                }), 
-                NumberedMoreTextAndIconFrame = v3.createElement("Frame", {
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BorderSizePixel = 0, 
-                    BackgroundTransparency = 1
-                }, {
-                    UIListLayout = v3.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Horizontal, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center
-                    }), 
-                    NumberMoreText = v3.createElement("TextLabel", {
-                        Text = v36 and v36.moreText and string.gsub(v36.moreText, "{notificationCount}", (tostring(#v23.notifications - 1))), 
-                        LayoutOrder = 1, 
-                        Font = l_Font_1, 
-                        TextSize = v27, 
-                        BackgroundTransparency = 1, 
-                        TextColor3 = v24.Theme.TextMuted.Color, 
-                        Size = UDim2.new(0, 0, 1, 0), 
-                        AutomaticSize = Enum.AutomaticSize.X
-                    }, {
-                        v3.createElement("UIPadding", {
-                            PaddingRight = UDim.new(0, v4.DefaultPadding)
-                        })
-                    }), 
-                    ExpandIcon = v3.createElement(l_ImageSetLabel_0, {
-                        LayoutOrder = 2, 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        Size = v19, 
-                        BackgroundTransparency = 1, 
-                        BorderSizePixel = 0, 
-                        Image = v14, 
-                        ImageColor3 = v24.Theme.UIEmphasis.Color
-                    })
-                })
-            }) else nil, 
-            ListOfNotifications = v3.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                ZIndex = 3, 
-                BorderSizePixel = 0
-            }, v49)
-        });
-    end, {
-        v23.notifications, 
-        v28, 
-        v30, 
-        v32, 
-        v23.impressionsTag, 
-        v23.impressionMetadataByNotificationId
-    }));
-end;
+local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
+local components = StreamNotifications.components
+local StreamNotificationsParent = StreamNotifications.Parent
+local React = require(StreamNotificationsParent.React)
+local constants = require(StreamNotifications.constants)
+local ReactOtter = require(StreamNotificationsParent.ReactOtter)
+local NotificationsCommon = require(StreamNotificationsParent.NotificationsCommon)
+local StreamNotificationAnimationWrapper = require(components.StreamNotificationAnimationWrapper)
+local useLocalization = require(StreamNotificationsParent.Localization).Hooks.useLocalization
+local NotificationHelper = NotificationsCommon.NotificationHelper
+local UIBlox = require(StreamNotificationsParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v15 = Images["icons/actions/truncationExpand"]
+local v16 = Images["icons/actions/truncationCollapse"]
+local uDim = UDim.new(0, 12)
+local uDim2 = UDim.new(0, 24)
+local v19 = constants.DefaultPadding * 4
+local uDim2_2 = UDim2.fromOffset(24, 24)
+local EventStream = require(StreamNotifications.analytics.analyticsService).EventStream
+local analyticsConstants = require(StreamNotifications.analytics.analyticsConstants)
+local t1 = {
+	stiffness = 207,
+	damping = 24,
+	mass = 1
+}
+
+return function(t2: {[any]: any}) -- line: 54
+	-- upvalues: useStyle (copy), React (copy), ReactOtter (copy), useLocalization (copy), constants (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t1 (copy), StreamNotificationAnimationWrapper (copy), uDim (copy), uDim2 (copy), ImageSetLabel (copy), uDim2_2 (copy), v16 (copy), v19 (copy), v15 (copy)
+	local v25 = useStyle()
+	local Font = v25.Font
+	local Header1Font = Font.Header1.Font
+	local v28 = Font.BaseSize * Font.CaptionHeader.RelativeSize
+	local v29, v30 = React.useState(true)
+	local v31, v32 = React.useState(74)
+	local v33, v34 = React.useState(true)
+	local v35, v36 = ReactOtter.useAnimatedBinding({
+		shadowHeight = 0,
+		shadowWidth = 1
+	})
+	local v37 = useLocalization({
+		moreText = constants.Text.ShowMoreKey,
+		lessText = constants.Text.ShowLessKey
+	})
+	local v38 = React.useCallback(function(n1: number, n2: number) -- line: 77
+		-- upvalues: v29 (copy), v32 (copy)
+		if n1 == 1 and v29 then
+			v32(n2)
+		end
+	end)
+
+	local function v39(p1) -- line: 83
+		local t3 = {}
+
+		for _, v46 in p1 do
+			if v46.id then
+				table.insert(t3, v46.id)
+			end
+		end
+
+		return t3
+	end
+	local function v40() -- line: 93
+		-- upvalues: v30 (copy), NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t2 (copy), v39 (copy)
+		v30(function(p2) -- line: 94
+			-- upvalues: NotificationHelper (copy), EventStream (copy), analyticsConstants (copy), t2 (copy), v39 (copy)
+			NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.click, if not p2 then analyticsConstants.EventNames.bundleClosed else analyticsConstants.EventNames.bundleOpened, {
+				bundleKey = t2.notifications[1].content.bundleKey or nil,
+				totalNotifications = #t2.notifications or nil,
+				notificationIds = v39(t2.notifications) or nil
+			})
+
+			if p2 then
+				for v53, v54 in t2.notifications do
+					NotificationHelper.fireEvent(EventStream, analyticsConstants.Context.seen, analyticsConstants.EventNames.notificationViewed, {
+						notificationId = v54.id or nil,
+						notificationType = v54.content.notificationType or nil,
+						bundlePosition = v53,
+						bundleKey = v54.content.bundleKey or nil,
+						clientEventsPayload = v54.content.clientEventsPayload or nil
+					})
+				end
+			end
+
+			return not p2
+		end)
+	end
+
+	React.useEffect(function() -- line: 132
+		-- upvalues: v36 (copy), ReactOtter (copy), v29 (copy), t1 (copy)
+		v36({
+			shadowHeight = ReactOtter.spring(not v29 and 1 or 0, t1),
+			shadowWidth = ReactOtter.spring(not v29 and 0 or 1, t1)
+		})
+	end, { v29 })
+	React.useEffect(function() -- line: 140
+		-- upvalues: v34 (copy), t2 (copy)
+		v34(#t2.notifications > 1)
+	end, { t2.notifications })
+
+	return (React.useMemo(function() -- line: 145
+		-- upvalues: t2 (copy), v29 (copy), v33 (copy), React (copy), StreamNotificationAnimationWrapper (copy), v38 (copy), v35 (copy), v31 (copy), constants (copy), v25 (copy), uDim (copy), Header1Font (copy), v28 (copy), v40 (copy), uDim2 (copy), v37 (copy), ImageSetLabel (copy), uDim2_2 (copy), v16 (copy), v19 (copy), v15 (copy)
+		local t4 = {}
+
+		for i, v in ipairs(t2.notifications) do
+			local v50 = false
+			local v51 = if not t2.impressionMetadataByNotificationId then nil else t2.impressionMetadataByNotificationId[v.id]
+
+			if v29 and v33 then
+				v50 = true
+			end
+
+			t4[v.id] = React.createElement(StreamNotificationAnimationWrapper, {
+				layoutOrder = i,
+				notification = v,
+				finishDismissNotification = t2.finishDismissNotification,
+				handleActions = t2.handleActions,
+				openMetaActions = t2.openMetaActions,
+				onHeightChange = v38,
+				collapsed = v50,
+				impressionsTag = t2.impressionsTag,
+				impressionIndex = v51 and v51.impressionIndex or nil
+			})
+		end
+
+		t4.UIPadding = React.createElement("UIPadding", {
+			PaddingTop = if v29 or not v33 then UDim.new(0, 0) else UDim.new(0, 40)
+		})
+		t4.UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center
+		})
+		t4.Shadow1 = if not v29 or not v33 then nil else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = v35:map(function(t5: {[any]: any}) -- line: 185
+				-- upvalues: v31 (copy), constants (copy)
+				return UDim2.new(1, 0, 0, t5.shadowHeight * v31 + constants.DefaultPadding)
+			end),
+			LayoutOrder = #t2.notifications + 1,
+			ZIndex = -(#t2.notifications + 1)
+		}, { React.createElement("Frame", {
+			BackgroundTransparency = 0,
+			BorderSizePixel = 0,
+			Size = v35:map(function(t6: {[any]: any}) -- line: 194
+				-- upvalues: constants (copy), v31 (copy)
+				return UDim2.new(1, -(constants.DefaultPadding * 4 * t6.shadowWidth), 0, v31 - constants.DefaultPadding)
+			end),
+			BackgroundColor3 = v25.Theme.BackgroundDefault.Color,
+			Position = UDim2.new(0.5, 0, 0, 0),
+			AnchorPoint = Vector2.new(0.5, 0)
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = uDim
+			})
+		}) })
+		t4.Shadow2 = if not v29 or not v33 then nil else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = v35:map(function(t7: {[any]: any}) -- line: 219
+				-- upvalues: v31 (copy), constants (copy)
+				return UDim2.new(1, 0, 0, t7.shadowHeight * v31 + constants.DefaultPadding * 2)
+			end),
+			LayoutOrder = #t2.notifications + 2,
+			ZIndex = -(#t2.notifications + 2)
+		}, { React.createElement("Frame", {
+			BackgroundTransparency = 0,
+			BorderSizePixel = 0,
+			Size = v35:map(function(t8: {[any]: any}) -- line: 228
+				-- upvalues: constants (copy), v31 (copy)
+				return UDim2.new(1, -(constants.DefaultPadding * 6 * t8.shadowWidth), 0, v31 - constants.DefaultPadding)
+			end),
+			BackgroundColor3 = v25.Theme.BackgroundContrast.Color,
+			Position = UDim2.new(0.5, 0, 0, 0),
+			AnchorPoint = Vector2.new(0.5, 0)
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = uDim
+			})
+		}) })
+
+		return React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = t2.layoutOrder
+		}, {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingBottom = if not v29 or not v33 then UDim.new(0, 0) else UDim.new(0, constants.DefaultPadding)
+			}),
+			ShowLessButton = if v29 or not v33 then nil else React.createElement("TextButton", {
+				Size = UDim2.new(0, 160, 0, 40),
+				Text = "",
+				Font = Header1Font,
+				TextSize = v28,
+				[React.Event.Activated] = v40,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = v25.Theme.BackgroundMuted.Color,
+				AutoButtonColor = false,
+				LayoutOrder = 1,
+				ZIndex = 4,
+				Position = UDim2.new(1, 0, 0, 0),
+				AnchorPoint = Vector2.new(1, 0),
+				BorderSizePixel = 0
+			}, { React.createElement("Frame", {
+				BackgroundTransparency = 0,
+				ZIndex = 10,
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, -constants.DefaultPadding, 1, -constants.DefaultPadding),
+				BackgroundColor3 = v25.Theme.BackgroundContrast.Color,
+				Position = UDim2.new(1, -constants.DefaultPadding, 0, 0),
+				AnchorPoint = Vector2.new(1, 0)
+			}, {
+				UICorner = React.createElement("UICorner", {
+					CornerRadius = uDim2
+				}),
+				ShowLessTextAndIconFrame = React.createElement("Frame", {
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				}, {
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center
+					}),
+					ShowLessText = React.createElement("TextLabel", {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						Text = v37 and v37.lessText,
+						Font = Header1Font,
+						TextSize = v28,
+						TextColor3 = v25.Theme.TextMuted.Color,
+						Size = UDim2.new(0, 0, 1, 0),
+						AutomaticSize = Enum.AutomaticSize.X
+					}, { React.createElement("UIPadding", {
+						PaddingRight = UDim.new(0, constants.DefaultPadding)
+					}) }),
+					CollapseIcon = React.createElement(ImageSetLabel, {
+						LayoutOrder = 2,
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = uDim2_2,
+						Image = v16,
+						ImageColor3 = v25.Theme.UIEmphasis.Color
+					})
+				})
+			}) }),
+			InvisibleExpandButton = React.createElement("TextButton", {
+				Size = UDim2.new(1, 0, 0, (not v29 or not v33) and 0 or v31 + constants.DefaultPadding * 2),
+				BackgroundTransparency = 1,
+				Text = "",
+				[React.Event.Activated] = v40,
+				ZIndex = 5,
+				BorderSizePixel = 0,
+				AutoButtonColor = false
+			}),
+			NumberMoreButton = if v31 == 0 or (not v29 or not (#t2.notifications > 1)) then nil else React.createElement("Frame", {
+				ZIndex = 10,
+				BackgroundTransparency = 0,
+				Size = UDim2.new(0, 125, 0, v19),
+				AutomaticSize = Enum.AutomaticSize.X,
+				Position = UDim2.new(0.5, 0, 1, 0),
+				AnchorPoint = Vector2.new(0.5, 1),
+				BackgroundColor3 = v25.Theme.BackgroundContrast.Color
+			}, {
+				UICorner = React.createElement("UICorner", {
+					CornerRadius = uDim2
+				}),
+				NumberedMoreTextAndIconFrame = React.createElement("Frame", {
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				}, {
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center
+					}),
+					NumberMoreText = React.createElement("TextLabel", {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						Text = v37 and (v37.moreText and string.gsub(v37.moreText, "{notificationCount}", (tostring(#t2.notifications - 1)))),
+						Font = Header1Font,
+						TextSize = v28,
+						TextColor3 = v25.Theme.TextMuted.Color,
+						Size = UDim2.new(0, 0, 1, 0),
+						AutomaticSize = Enum.AutomaticSize.X
+					}, { React.createElement("UIPadding", {
+						PaddingRight = UDim.new(0, constants.DefaultPadding)
+					}) }),
+					ExpandIcon = React.createElement(ImageSetLabel, {
+						LayoutOrder = 2,
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = uDim2_2,
+						Image = v15,
+						ImageColor3 = v25.Theme.UIEmphasis.Color
+					})
+				})
+			}),
+			ListOfNotifications = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				ZIndex = 3,
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, t4)
+		})
+	end, {
+		t2.notifications,
+		v29,
+		v31,
+		v33,
+		t2.impressionsTag,
+		t2.impressionMetadataByNotificationId
+	}))
+end

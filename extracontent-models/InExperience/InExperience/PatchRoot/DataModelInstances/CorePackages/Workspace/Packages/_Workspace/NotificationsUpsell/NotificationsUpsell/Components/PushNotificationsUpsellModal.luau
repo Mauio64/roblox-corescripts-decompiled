@@ -1,127 +1,129 @@
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactRoblox);
-local v4 = require(l_Parent_0.UIBlox);
-local l_default_0 = require(l_Parent_0.PermissionsProtocol).PermissionsProtocol.default;
-local l_default_1 = require(l_Parent_0.LoggingProtocol).default;
-local l_useState_0 = v2.useState;
-local l_useCallback_0 = v2.useCallback;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_sendEventDeferred_0 = require(l_Parent_0.NotificationsCommon).sendEventDeferred;
-local v11 = require(script.Parent.Parent.Analytics.ModalEventConstants);
-local v12 = require(script.Parent.Parent.Analytics.RobloxTelemetryConfigs.PushUpsellEventName);
-local v13 = require(script.Parent.Parent.Util.PushNotificationsUpsellUtils);
-local l_InteractiveAlert_0 = v4.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v4.App.Button.Enum.ButtonType;
-local l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 = require(l_Parent_0.SharedFlags).GetFFlagLuaAppPushUpsellDeprecateOldEvents;
-return function(v17) --[[ Line: 27 ]]
-    -- upvalues: l_useLocalization_0 (copy), l_useCallback_0 (copy), v13 (copy), l_AppStorageService_0 (copy), l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 (copy), l_sendEventDeferred_0 (copy), v11 (copy), l_default_1 (copy), v12 (copy), l_default_0 (copy), l_useState_0 (copy), v2 (copy), v3 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local v18 = l_useLocalization_0(v17.TranslationKeys);
-    local v19 = l_useCallback_0(function() --[[ Line: 29 ]]
-        -- upvalues: v13 (ref), l_AppStorageService_0 (ref), l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 (ref), l_sendEventDeferred_0 (ref), v11 (ref), l_default_1 (ref), v12 (ref), v17 (copy)
-        v13.setPushEduUpsellResponse(l_AppStorageService_0, "Deny");
-        v13.setPushEduUpsellResponseTimestamp(l_AppStorageService_0, os.time());
-        if not l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0() then
-            l_sendEventDeferred_0(v11.ModalContextPushEduUpsell, v11.OptInPushEventName, {
-                [v11.ActionType] = v11.Clicked, 
-                [v11.Button] = v11.Cancel
-            });
-        end;
-        l_default_1:logRobloxTelemetryEvent(v12, {}, {
-            [v11.ActionType] = v11.Clicked, 
-            [v11.Button] = v11.Cancel
-        }, v11.ModalContextPushEduUpsell);
-        v17.CloseModal();
-    end, {
-        v17.CloseModal
-    });
-    local v22 = l_useCallback_0(function() --[[ Line: 47 ]]
-        -- upvalues: l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 (ref), l_sendEventDeferred_0 (ref), v11 (ref), l_default_1 (ref), v12 (ref), v13 (ref), l_AppStorageService_0 (ref), l_default_0 (ref), v17 (copy)
-        if not l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0() then
-            l_sendEventDeferred_0(v11.ModalContextPushEduUpsell, v11.OptInPushEventName, {
-                [v11.ActionType] = v11.Clicked, 
-                [v11.Button] = v11.Confirm
-            });
-        end;
-        l_default_1:logRobloxTelemetryEvent(v12, {}, {
-            [v11.ActionType] = v11.Clicked, 
-            [v11.Button] = v11.Confirm
-        }, v11.ModalContextPushEduUpsell);
-        v13.setPushEduUpsellResponse(l_AppStorageService_0, "Allow");
-        v13.setPushEduUpsellResponseTimestamp(l_AppStorageService_0, os.time());
-        l_default_1:logRobloxTelemetryEvent(v12, {}, {
-            [v11.ActionType] = v11.Opened, 
-            [v11.EntryPoint] = "LuaPushUpsellModal"
-        }, v11.ModalContextSysUpsell);
-        l_default_0:requestPermissions({
-            l_default_0.Permissions.POST_NOTIFICATIONS
-        }):andThen(function(_) --[[ Line: 74 ]]
-            -- upvalues: v13 (ref), l_AppStorageService_0 (ref), l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 (ref), l_sendEventDeferred_0 (ref), v11 (ref), l_default_1 (ref), v12 (ref)
-            v13.setPushSysUpsellPromptTimestamp(l_AppStorageService_0, os.time());
-            if not l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0() then
-                l_sendEventDeferred_0(v11.ModalContextSysUpsell, v11.OptInPushEventName, {
-                    [v11.ActionType] = v11.Opened
-                });
-                l_sendEventDeferred_0(v11.ModalContextSysUpsell, v11.OptInPushEventName, {
-                    [v11.ActionType] = v11.RequestSuccess
-                });
-            end;
-            l_default_1:logRobloxTelemetryEvent(v12, {}, {
-                [v11.ActionType] = v11.RequestSuccess
-            }, v11.ModalContextSysUpsell);
-        end, function(_) --[[ Line: 96 ]]
-            -- upvalues: l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0 (ref), l_sendEventDeferred_0 (ref), v11 (ref), l_default_1 (ref), v12 (ref)
-            if not l_GetFFlagLuaAppPushUpsellDeprecateOldEvents_0() then
-                l_sendEventDeferred_0(v11.ModalContextSysUpsell, v11.OptInPushEventName, {
-                    [v11.ActionType] = v11.RequestFailed
-                });
-            end;
-            l_default_1:logRobloxTelemetryEvent(v12, {}, {
-                [v11.ActionType] = v11.RequestFailed
-            }, v11.ModalContextSysUpsell);
-        end);
-        v17.CloseModal();
-    end, {
-        v17.CloseModal, 
-        v18
-    });
-    local v23, v24 = l_useState_0(Vector2.new(800, 600));
-    local v26 = l_useCallback_0(function(v25) --[[ Line: 120 ]]
-        -- upvalues: v24 (copy)
-        v24(v25.AbsoluteSize);
-    end, {
-        v24
-    });
-    return v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        [v3.Change.AbsoluteSize] = v26
-    }, {
-        ConfirmationPrompt = v2.createElement(l_InteractiveAlert_0, {
-            screenSize = v23, 
-            title = v18.Heading, 
-            bodyText = v18.Body, 
-            richText = true, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        props = {
-                            onActivated = v19, 
-                            text = v18.CancelAction
-                        }, 
-                        isDefaultChild = true
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = v22, 
-                            text = v18.ConfirmAction
-                        }, 
-                        isDefaultChild = false
-                    }
-                }
-            }
-        })
-    });
-end;
+local AppStorageService = game:GetService("AppStorageService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local ReactRoblox = require(ParentParent.ReactRoblox)
+local UIBlox = require(ParentParent.UIBlox)
+local default = require(ParentParent.PermissionsProtocol).PermissionsProtocol.default
+local default2 = require(ParentParent.LoggingProtocol).default
+local useState = React.useState
+local useCallback = React.useCallback
+local useLocalization = require(ParentParent.Localization).Hooks.useLocalization
+local sendEventDeferred = require(ParentParent.NotificationsCommon).sendEventDeferred
+local ModalEventConstants = require(script.Parent.Parent.Analytics.ModalEventConstants)
+local PushUpsellEventName = require(script.Parent.Parent.Analytics.RobloxTelemetryConfigs.PushUpsellEventName)
+local PushNotificationsUpsellUtils = require(script.Parent.Parent.Util.PushNotificationsUpsellUtils)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local GetFFlagLuaAppPushUpsellDeprecateOldEvents = require(ParentParent.SharedFlags).GetFFlagLuaAppPushUpsellDeprecateOldEvents
+
+return function(p1) -- line: 27
+	-- upvalues: useLocalization (copy), useCallback (copy), PushNotificationsUpsellUtils (copy), AppStorageService (copy), GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy), default (copy), useState (copy), React (copy), ReactRoblox (copy), InteractiveAlert (copy), ButtonType (copy)
+	local v19 = useLocalization(p1.TranslationKeys)
+	local v20 = useCallback(function() -- line: 29
+		-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy), p1 (copy)
+		PushNotificationsUpsellUtils.setPushEduUpsellResponse(AppStorageService, "Deny")
+		PushNotificationsUpsellUtils.setPushEduUpsellResponseTimestamp(AppStorageService, os.time())
+
+		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+			sendEventDeferred(ModalEventConstants.ModalContextPushEduUpsell, ModalEventConstants.OptInPushEventName, {
+				[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+				[ModalEventConstants.Button] = ModalEventConstants.Cancel
+			})
+		end
+
+		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+			[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+			[ModalEventConstants.Button] = ModalEventConstants.Cancel
+		}, ModalEventConstants.ModalContextPushEduUpsell)
+		p1.CloseModal()
+	end, { p1.CloseModal })
+	local v21 = useCallback(function() -- line: 47
+		-- upvalues: GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy), PushNotificationsUpsellUtils (copy), AppStorageService (copy), default (copy), p1 (copy)
+		if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+			sendEventDeferred(ModalEventConstants.ModalContextPushEduUpsell, ModalEventConstants.OptInPushEventName, {
+				[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+				[ModalEventConstants.Button] = ModalEventConstants.Confirm
+			})
+		end
+
+		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+			[ModalEventConstants.ActionType] = ModalEventConstants.Clicked,
+			[ModalEventConstants.Button] = ModalEventConstants.Confirm
+		}, ModalEventConstants.ModalContextPushEduUpsell)
+		PushNotificationsUpsellUtils.setPushEduUpsellResponse(AppStorageService, "Allow")
+		PushNotificationsUpsellUtils.setPushEduUpsellResponseTimestamp(AppStorageService, os.time())
+		default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+			[ModalEventConstants.ActionType] = ModalEventConstants.Opened,
+			[ModalEventConstants.EntryPoint] = "LuaPushUpsellModal"
+		}, ModalEventConstants.ModalContextSysUpsell)
+		default:requestPermissions({ default.Permissions.POST_NOTIFICATIONS }):andThen(function(_) -- line: 74
+			-- upvalues: PushNotificationsUpsellUtils (copy), AppStorageService (copy), GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy)
+			PushNotificationsUpsellUtils.setPushSysUpsellPromptTimestamp(AppStorageService, os.time())
+
+			if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+				sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
+					[ModalEventConstants.ActionType] = ModalEventConstants.Opened
+				})
+				sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
+					[ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess
+				})
+			end
+
+			default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+				[ModalEventConstants.ActionType] = ModalEventConstants.RequestSuccess
+			}, ModalEventConstants.ModalContextSysUpsell)
+		end, function(_) -- line: 96
+			-- upvalues: GetFFlagLuaAppPushUpsellDeprecateOldEvents (copy), sendEventDeferred (copy), ModalEventConstants (copy), default2 (copy), PushUpsellEventName (copy)
+			if not GetFFlagLuaAppPushUpsellDeprecateOldEvents() then
+				sendEventDeferred(ModalEventConstants.ModalContextSysUpsell, ModalEventConstants.OptInPushEventName, {
+					[ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed
+				})
+			end
+
+			default2:logRobloxTelemetryEvent(PushUpsellEventName, {}, {
+				[ModalEventConstants.ActionType] = ModalEventConstants.RequestFailed
+			}, ModalEventConstants.ModalContextSysUpsell)
+		end)
+		p1.CloseModal()
+	end, {
+		p1.CloseModal,
+		v19
+	})
+	local v22, v23 = useState(Vector2.new(800, 600))
+	local v24 = useCallback(function(p4) -- line: 120
+		-- upvalues: v23 (copy)
+		v23(p4.AbsoluteSize)
+	end, { v23 })
+
+	return React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		[ReactRoblox.Change.AbsoluteSize] = v24
+	}, {
+		ConfirmationPrompt = React.createElement(InteractiveAlert, {
+			richText = true,
+			screenSize = v22,
+			title = v19.Heading,
+			bodyText = v19.Body,
+			buttonStackInfo = {
+				buttons = {
+					{
+						isDefaultChild = true,
+						props = {
+							onActivated = v20,
+							text = v19.CancelAction
+						}
+					},
+					{
+						isDefaultChild = false,
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							onActivated = v21,
+							text = v19.ConfirmAction
+						}
+					}
+				}
+			}
+		})
+	})
+end

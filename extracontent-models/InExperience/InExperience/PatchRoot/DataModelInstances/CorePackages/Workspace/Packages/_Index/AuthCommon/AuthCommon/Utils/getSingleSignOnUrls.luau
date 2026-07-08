@@ -1,35 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_getAppFeaturePolicies_0 = require(l_Parent_0.UniversalAppPolicy).getAppFeaturePolicies;
-return function(v3) --[[ Line: 26 ]] --[[ Name: getSingleSignOnUrls ]]
-    -- upvalues: l_getAppFeaturePolicies_0 (copy), l_UrlBuilder_0 (copy)
-    local v4 = v3 or l_getAppFeaturePolicies_0();
-    local v5 = v4.getUrlAuthRoutes();
-    local v6 = {};
-    local v7 = v4.getLinkedAuthEndpointsEnabled();
-    if v5.account then
-        v6.account = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.account);
-    end;
-    if v7 and v5.linkedLogin then
-        v6.connect = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.linkedLogin);
-    elseif v5.connect then
-        v6.connect = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.connect);
-    end;
-    if v5.disconnect then
-        v6.disconnect = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.disconnect);
-    end;
-    if v7 and v5.externalLogin then
-        v6.login = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.externalLogin);
-    elseif v5.login then
-        v6.login = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.login);
-    end;
-    if v7 and v5.linkedSignup then
-        v6.signup = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.linkedSignup);
-    elseif v5.signup then
-        v6.signup = l_UrlBuilder_0.fromString("auth" .. ":" .. v5.signup);
-    end;
-    if v7 then
-        v6.linkingPlatform = v4.getLinkingPlatform();
-    end;
-    return v6;
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local getAppFeaturePolicies = require(Parent.UniversalAppPolicy).getAppFeaturePolicies
+
+local function getSingleSignOnUrls(p1) -- line: 26
+	-- upvalues: getAppFeaturePolicies (copy), UrlBuilder (copy)
+	local v6 = p1 or getAppFeaturePolicies()
+	local v7 = v6.getUrlAuthRoutes()
+	local t1 = {}
+	local v9 = v6.getLinkedAuthEndpointsEnabled()
+
+	if v7.account then
+		t1.account = UrlBuilder.fromString("auth" .. ":" .. v7.account)
+	end
+
+	if v9 and v7.linkedLogin then
+		t1.connect = UrlBuilder.fromString("auth" .. ":" .. v7.linkedLogin)
+	elseif v7.connect then
+		t1.connect = UrlBuilder.fromString("auth" .. ":" .. v7.connect)
+	end
+
+	if v7.disconnect then
+		t1.disconnect = UrlBuilder.fromString("auth" .. ":" .. v7.disconnect)
+	end
+
+	if v9 and v7.externalLogin then
+		t1.login = UrlBuilder.fromString("auth" .. ":" .. v7.externalLogin)
+	elseif v7.login then
+		t1.login = UrlBuilder.fromString("auth" .. ":" .. v7.login)
+	end
+
+	if v9 and v7.linkedSignup then
+		t1.signup = UrlBuilder.fromString("auth" .. ":" .. v7.linkedSignup)
+	elseif v7.signup then
+		t1.signup = UrlBuilder.fromString("auth" .. ":" .. v7.signup)
+	end
+
+	if v9 then
+		t1.linkingPlatform = v6.getLinkingPlatform()
+	end
+
+	return t1
+end
+
+return getSingleSignOnUrls

@@ -1,20 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("CollectionViews").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-return function(v2, v3) --[[ Line: 15 ]] --[[ Name: calculateSpacePerItem ]]
-    -- upvalues: v1 (copy)
-    if v2 <= 1 then
-        return {
-            gapOffsetPerItem = 0, 
-            adjustedGap = v3
-        };
-    else
-        v1.assert(v2 >= 2);
-        local v4 = v2 - 1;
-        local v5 = math.floor(v4 / v2 * v3);
-        local v6 = v3 + (v5 * v2 - v3 * v4) / v4;
-        return {
-            gapOffsetPerItem = v5, 
-            adjustedGap = v6
-        };
-    end;
-end;
+local Parent = script:FindFirstAncestor("CollectionViews").Parent
+local ArgCheck = require(Parent.ArgCheck)
+
+local function calculateSpacePerItem(n1: number, n2: number) -- line: 15
+	-- upvalues: ArgCheck (copy)
+	if n1 <= 1 then
+		return {
+			gapOffsetPerItem = 0,
+			adjustedGap = n2
+		}
+	end
+
+	ArgCheck.assert(n1 >= 2)
+
+	local v6 = n1 - 1
+	local v7 = math.floor(v6 / n1 * n2)
+	local v8 = n2 + (v7 * n1 - n2 * v6) / v6
+
+	return {
+		gapOffsetPerItem = v7,
+		adjustedGap = v8
+	}
+end
+
+return calculateSpacePerItem

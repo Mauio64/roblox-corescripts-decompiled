@@ -1,11 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v3 = require(l_script_FirstAncestor_0.Components.ChatLanding.Conversations.Selectors.selectConversations);
-return function() --[[ Line: 7 ]]
-    -- upvalues: l_useSelector_0 (copy), v3 (copy)
-    return l_useSelector_0(function(v4) --[[ Line: 8 ]]
-        -- upvalues: v3 (ref)
-        return v3(v4);
-    end);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local selectConversations = require(AppChat.Components.ChatLanding.Conversations.Selectors.selectConversations)
+
+return function() -- line: 7
+	-- upvalues: useSelector (copy), selectConversations (copy)
+	return useSelector(function(p1) -- line: 8
+		-- upvalues: selectConversations (copy)
+		return selectConversations(p1)
+	end)
+end

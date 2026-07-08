@@ -1,4 +1,4 @@
 return {
-    PeekView = "peekView", 
-    PlayerContextualMenu = "playerContextualMenu"
-};
+	PeekView = "peekView",
+	PlayerContextualMenu = "playerContextualMenu"
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSubscriptionRefetchClearCatalogData", false);
+return game:DefineFastFlag("AXSubscriptionRefetchClearCatalogData", false)

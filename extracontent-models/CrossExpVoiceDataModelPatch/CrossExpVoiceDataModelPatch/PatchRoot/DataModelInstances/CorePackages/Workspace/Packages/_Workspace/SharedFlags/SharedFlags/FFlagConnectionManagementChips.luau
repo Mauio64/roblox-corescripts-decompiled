@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ConnectionManagementChips_V3", false);
+return game:DefineFastFlag("ConnectionManagementChips_V3", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppNavLabelScaling", false);
+return game:DefineFastFlag("AppNavLabelScaling", false)

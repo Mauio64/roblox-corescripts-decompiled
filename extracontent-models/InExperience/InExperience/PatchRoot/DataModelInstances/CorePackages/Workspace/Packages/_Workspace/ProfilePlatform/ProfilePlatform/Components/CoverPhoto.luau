@@ -1,1 +1,1 @@
-return require(script.CoverPhotoContainer);
+return require(script.CoverPhotoContainer)

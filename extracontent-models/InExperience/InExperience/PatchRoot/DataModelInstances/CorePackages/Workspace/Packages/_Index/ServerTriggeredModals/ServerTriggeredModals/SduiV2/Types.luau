@@ -1,2 +1,3 @@
-local _ = require(script.PromptsTypes);
-return {};
+require(script.PromptsTypes)
+
+return {}

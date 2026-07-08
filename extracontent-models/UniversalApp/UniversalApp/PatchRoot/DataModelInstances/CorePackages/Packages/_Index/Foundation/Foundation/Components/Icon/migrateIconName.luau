@@ -1,6 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local l_Migration_0 = require(l_Parent_0.BuilderIcons).Migration;
-return function(v2) --[[ Line: 7 ]] --[[ Name: migrateIconName ]]
-    -- upvalues: l_Migration_0 (copy)
-    return l_Migration_0.uiblox[v2];
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local Migration = require(Parent.BuilderIcons).Migration
+
+local function migrateIconName(s1: string) -- line: 7
+	-- upvalues: Migration (copy)
+	return Migration.uiblox[s1]
+end
+
+return migrateIconName

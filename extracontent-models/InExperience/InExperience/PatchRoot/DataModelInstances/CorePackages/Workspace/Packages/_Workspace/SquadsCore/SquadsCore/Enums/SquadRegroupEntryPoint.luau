@@ -1,4 +1,4 @@
 return {
-    ToastPrompt = "ToastPrompt", 
-    SquadLobbyButton = "SquadLobbyButton"
-};
+	ToastPrompt = "ToastPrompt",
+	SquadLobbyButton = "SquadLobbyButton"
+}

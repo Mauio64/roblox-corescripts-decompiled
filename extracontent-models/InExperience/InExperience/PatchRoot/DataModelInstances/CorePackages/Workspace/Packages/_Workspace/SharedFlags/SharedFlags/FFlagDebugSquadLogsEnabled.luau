@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugSquadLogsEnabled", false);
+return game:DefineFastFlag("DebugSquadLogsEnabled", false)

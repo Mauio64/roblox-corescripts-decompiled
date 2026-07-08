@@ -1,10 +1,10 @@
-return function(v0) --[[ Line: 1 ]]
-    return {
-        isFriendsWith = require(script.isFriendsWith)(v0), 
-        getSortedByRankRecommendations = require(script.getSortedByRankRecommendations)(v0), 
-        selectFriendshipStatusesByUserIds = require(script.selectFriendshipStatusesByUserIds)(v0), 
-        getRecommendationIdsBySource = require(script.getRecommendationIdsBySource)(v0), 
-        selectRecommendationsForUserId = require(script.selectRecommendationsForUserId)(v0), 
-        getSortedByRankRecommendationIds = require(script.getSortedByRankRecommendationIds)(v0)
-    };
-end;
+return function(p1) -- line: 1
+	return {
+		isFriendsWith = require(script.isFriendsWith)(p1),
+		getSortedByRankRecommendations = require(script.getSortedByRankRecommendations)(p1),
+		selectFriendshipStatusesByUserIds = require(script.selectFriendshipStatusesByUserIds)(p1),
+		getRecommendationIdsBySource = require(script.getRecommendationIdsBySource)(p1),
+		selectRecommendationsForUserId = require(script.selectRecommendationsForUserId)(p1),
+		getSortedByRankRecommendationIds = require(script.getSortedByRankRecommendationIds)(p1)
+	}
+end

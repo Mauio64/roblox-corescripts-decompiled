@@ -1,16 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-return function(v2, v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    v1.isType(v2, "string", "patternMatcher.string");
-    v1.isType(v3, "string", "patternMatcher.pattern");
-    local v4, v5 = v2:lower():find(v3);
-    if not v4 then
-        return false, nil;
-    else
-        return true, {
-            prefix = v2:sub(1, v4 - 1), 
-            suffix = v2:sub(v5 + 1)
-        };
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local ArgCheck = require(Parent.ArgCheck)
+
+return function(p1, p2) -- line: 6
+	-- upvalues: ArgCheck (copy)
+	ArgCheck.isType(p1, "string", "patternMatcher.string")
+	ArgCheck.isType(p2, "string", "patternMatcher.pattern")
+
+	local start, stop = p1:lower():find(p2)
+
+	if not start then
+		return false, nil
+	end
+
+	return true, {
+		prefix = p1:sub(1, start - 1),
+		suffix = p1:sub(stop + 1)
+	}
+end

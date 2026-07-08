@@ -1,4 +1,5 @@
-game:DefineFastFlag("AXFPSEventStreamAndCounters", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("AXFPSEventStreamAndCounters");
-end;
+game:DefineFastFlag("AXFPSEventStreamAndCounters", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("AXFPSEventStreamAndCounters")
+end

@@ -1,25 +1,26 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_IXPService_0 = game:GetService("IXPService");
-local l_useUserExperiment_0 = require(l_Parent_1.RoactAppExperiment).useUserExperiment;
-local v4 = require(l_Parent_0.Flags.FStringPVCIAfterSignupLayer);
-local v5 = require(l_Parent_0.Flags.FStringPVCIAfterSignupVariantKey);
-local function v7(v6) --[[ Line: 12 ]]
-    -- upvalues: v4 (copy), v5 (copy)
-    return (v6[v4] or {})[v5];
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local IXPService = game:GetService("IXPService")
+local useUserExperiment = require(ParentParentParent.RoactAppExperiment).useUserExperiment
+local FStringPVCIAfterSignupLayer = require(ParentParent.Flags.FStringPVCIAfterSignupLayer)
+local FStringPVCIAfterSignupVariantKey = require(ParentParent.Flags.FStringPVCIAfterSignupVariantKey)
+
+local function v7(p1) -- line: 12
+	-- upvalues: FStringPVCIAfterSignupLayer (copy), FStringPVCIAfterSignupVariantKey (copy)
+	return (p1[FStringPVCIAfterSignupLayer] or {})[FStringPVCIAfterSignupVariantKey]
+end
+
 return {
-    usePVAndCIAfterSignupVariant = function(v8) --[[ Line: 18 ]] --[[ Name: usePVAndCIAfterSignupVariant ]]
-        -- upvalues: l_useUserExperiment_0 (copy), v4 (copy), v7 (copy)
-        local v9 = v8 or {
-            isExposureEnabled = false
-        };
-        return (l_useUserExperiment_0({
-            v4
-        }, v7, v9.isExposureEnabled));
-    end, 
-    logExposure = function() --[[ Line: 26 ]] --[[ Name: logExposure ]]
-        -- upvalues: l_IXPService_0 (copy), v4 (copy)
-        l_IXPService_0:LogUserLayerExposure(v4);
-    end
-};
+	usePVAndCIAfterSignupVariant = function(t1: {[any]: any}) -- line: 18
+		-- upvalues: useUserExperiment (copy), FStringPVCIAfterSignupLayer (copy), v7 (copy)
+		local v10 = t1 or {
+			isExposureEnabled = false
+		}
+
+		return (useUserExperiment({ FStringPVCIAfterSignupLayer }, v7, v10.isExposureEnabled))
+	end,
+	logExposure = function() -- line: 26
+		-- upvalues: IXPService (copy), FStringPVCIAfterSignupLayer (copy)
+		IXPService:LogUserLayerExposure(FStringPVCIAfterSignupLayer)
+	end
+}

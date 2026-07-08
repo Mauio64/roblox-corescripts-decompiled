@@ -1,1 +1,1 @@
-return require(script.PolicyService);
+return require(script.PolicyService)

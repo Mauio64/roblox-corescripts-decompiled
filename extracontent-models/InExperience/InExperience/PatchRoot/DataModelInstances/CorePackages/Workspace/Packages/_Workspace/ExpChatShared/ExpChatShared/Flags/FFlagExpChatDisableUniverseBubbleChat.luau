@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatDisableUniverseBubbleChat", false);
+return game:DefineFastFlag("ExpChatDisableUniverseBubbleChat2", false)

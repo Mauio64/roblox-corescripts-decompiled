@@ -1,114 +1,174 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local l_Icon_0 = v2.Icon;
-local l_IconName_0 = v2.Enums.IconName;
-local l_InputSize_0 = v2.Enums.InputSize;
-local l_View_0 = v2.View;
-local v8 = require(l_script_FirstAncestor_0.BeduiV2.Components.AbuseReportTooltip);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes);
-local v10 = require(l_script_FirstAncestor_0.BeduiV2.Components.LayoutSlots);
-local v11 = require(l_script_FirstAncestor_0.BeduiV2.Components.SlideTransition);
-local l_useLayoutSlots_0 = v10.useLayoutSlots;
-return v3.memo(function(v13) --[[ Line: 32 ]] --[[ Name: AbuseReportInline ]]
-    -- upvalues: l_useLayoutSlots_0 (copy), v3 (copy), v11 (copy), l_View_0 (copy), l_Icon_0 (copy), l_IconName_0 (copy), l_InputSize_0 (copy), v8 (copy)
-    local l_InlineContainer_0 = l_useLayoutSlots_0().InlineContainer;
-    local l_abuseReportFlow_0 = v13.abuseReportFlow;
-    local l_config_0 = l_abuseReportFlow_0.config;
-    local l_currentPageElement_0 = l_abuseReportFlow_0.currentPageElement;
-    local v18 = v3.createElement(v11, {
-        nodeContent = v3.createElement(l_InlineContainer_0 or v3.Fragment, nil, l_currentPageElement_0), 
-        nodeId = l_abuseReportFlow_0.currentNodeId, 
-        nodeType = l_abuseReportFlow_0.currentNodeType, 
-        direction = l_abuseReportFlow_0.navigationDirection
-    });
-    local v19, v20 = v3.useState(l_config_0.display.titleDisclosure and l_config_0.display.titleDisclosure.openByDefault or false);
-    local v22 = v3.useCallback(function() --[[ Line: 48 ]]
-        -- upvalues: v20 (copy)
-        v20(function(v21) --[[ Line: 49 ]]
-            return not v21;
-        end);
-    end, {});
-    local v23 = v3.useMemo(function() --[[ Line: 54 ]]
-        -- upvalues: v3 (ref), l_View_0 (ref), l_abuseReportFlow_0 (copy), v13 (copy), l_Icon_0 (ref), l_IconName_0 (ref), l_InputSize_0 (ref)
-        return v3.createElement(l_View_0, {
-            isDisabled = not l_abuseReportFlow_0.canGoBack, 
-            onActivated = l_abuseReportFlow_0.goBack, 
-            tag = {
-                ["auto-xy align-x-center padding-medium radius-circle"] = true, 
-                ["anchor-top-left position-top-left"] = v13.shouldUseOverlaidControls
-            }, 
-            LayoutOrder = 1
-        }, v3.createElement(l_Icon_0, {
-            name = l_IconName_0.ChevronLargeLeft, 
-            size = l_InputSize_0.Medium, 
-            style = {
-                Transparency = l_abuseReportFlow_0.canGoBack and 0 or 1
-            }
-        }));
-    end, {
-        l_abuseReportFlow_0.canGoBack, 
-        l_abuseReportFlow_0.goBack, 
-        v13.shouldUseOverlaidControls
-    });
-    local v24 = v3.useMemo(function() --[[ Line: 77 ]]
-        -- upvalues: l_config_0 (copy), v3 (ref), l_View_0 (ref), v22 (copy), v13 (copy), v8 (ref), v19 (copy), l_Icon_0 (ref), l_IconName_0 (ref), l_InputSize_0 (ref)
-        if l_config_0.display.titleDisclosure then
-            return (v3.createElement(l_View_0, {
-                onActivated = v22, 
-                tag = {
-                    ["auto-xy align-x-center padding-medium radius-circle"] = true, 
-                    ["anchor-top-right position-top-right"] = v13.shouldUseOverlaidControls
-                }, 
-                LayoutOrder = 3, 
-                ZIndex = 2
-            }, v3.createElement(v8, {
-                tooltipTitle = l_config_0.display.titleDisclosure.tooltipTitle, 
-                tooltipText = l_config_0.display.titleDisclosure.tooltipText, 
-                buttonLabel = l_config_0.display.titleDisclosure.buttonLabel, 
-                isOpen = v19, 
-                onClose = v22
-            }, v3.createElement(l_Icon_0, {
-                name = l_IconName_0.CircleI, 
-                size = l_InputSize_0.Medium
-            }))));
-        else
-            return nil;
-        end;
-    end, {
-        l_config_0.display.titleDisclosure, 
-        v22, 
-        v19, 
-        v13.shouldUseOverlaidControls
-    });
-    return v3.createElement(l_View_0, {
-        tag = "size-full"
-    }, {
-        OverlaidControlsLayout = v13.shouldUseOverlaidControls and v3.createElement(l_View_0, {
-            tag = "size-full"
-        }, {
-            BackButtonContainer = v23, 
-            Content = v3.createElement(l_View_0, {
-                tag = "col gap-xlarge size-full padding-top-medium", 
-                LayoutOrder = 2
-            }, v18), 
-            AbuseReportTooltipContainer = v24
-        }), 
-        ControlRowLayout = not v13.shouldUseOverlaidControls and v3.createElement(l_View_0, {
-            tag = "col size-full"
-        }, {
-            ControlRow = v3.createElement(l_View_0, {
-                tag = "row flex-between size-full-0 auto-y", 
-                LayoutOrder = 1
-            }, {
-                BackButtonContainer = v23, 
-                AbuseReportTooltipContainer = v24
-            }), 
-            Content = v3.createElement(l_View_0, {
-                tag = "col fill size-full-0 padding-top-medium", 
-                LayoutOrder = 2
-            }, v18)
-        })
-    });
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local FocusNavigationUtils = require(GenericAbuseReportingParent.FocusNavigationUtils)
+local Foundation = require(GenericAbuseReportingParent.Foundation)
+local Motion = require(GenericAbuseReportingParent.Motion)
+local React = require(GenericAbuseReportingParent.React)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local useInExpFocusNavigationRefs = require(GenericAbuseReporting.BeduiV2.Hooks.FocusNavigation.useInExpFocusNavigationRefs)
+local useScrollNavigationBindings = require(GenericAbuseReporting.BeduiV2.Hooks.FocusNavigation.useScrollNavigationBindings)
+local FFlagAbuseReportV2ScrollNavigation = require(GenericAbuseReporting.Flags.FFlagAbuseReportV2ScrollNavigation)
+local FFlagAbuseReportInlineTitleDisclosureFocus = require(GenericAbuseReportingParent.SharedFlags).FFlagAbuseReportInlineTitleDisclosureFocus
+local AnimatePresence = Motion.AnimatePresence
+local Icon = Foundation.Icon
+local IconName = Foundation.Enums.IconName
+local InputSize = Foundation.Enums.InputSize
+local useTokens = Foundation.Hooks.useTokens
+local View = Foundation.View
+local AbuseReportTooltip = require(GenericAbuseReporting.BeduiV2.Components.AbuseReportTooltip)
+
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
+
+local Feedback = require(GenericAbuseReporting.BeduiV2.Components.Feedback)
+local LayoutSlots = require(GenericAbuseReporting.BeduiV2.Components.LayoutSlots)
+local SlideTransition = require(GenericAbuseReporting.BeduiV2.Components.SlideTransition)
+local useArTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.arTranslation).useArTranslation
+local INLINE_LANDSCAPE_WIDTH = LayoutSlots.INLINE_LANDSCAPE_WIDTH
+
+local function AbuseReportInline(t1: {[any]: any}) -- line: 46
+	-- upvalues: useTokens (copy), useArTranslation (copy), React (copy), AnimatePresence (copy), Feedback (copy), INLINE_LANDSCAPE_WIDTH (copy), SlideTransition (copy), View (copy), FFlagAbuseReportV2ScrollNavigation (copy), useScrollNavigationBindings (copy), FFlagAbuseReportInlineTitleDisclosureFocus (copy), useInExpFocusNavigationRefs (copy), FocusNavigableSurfaceIdentifierEnum (copy), Icon (copy), IconName (copy), InputSize (copy), AbuseReportTooltip (copy)
+	local v26 = useTokens()
+	local translateIntoString = useArTranslation().translateIntoString
+	local abuseReportFlow = t1.abuseReportFlow
+	local config = abuseReportFlow.config
+	local currentPageElement = abuseReportFlow.currentPageElement
+	local pendingInlineAlert = abuseReportFlow.pendingInlineAlert
+	local v32 = React.createElement(AnimatePresence, nil, if not pendingInlineAlert then nil else {
+		Alert = React.createElement(Feedback, {
+			layoutOrder = 1,
+			severity = pendingInlineAlert.type,
+			title = translateIntoString(pendingInlineAlert.title),
+			subtitle = if not pendingInlineAlert.subtitle then nil else translateIntoString(pendingInlineAlert.subtitle),
+			onClose = abuseReportFlow.dismissInlineAlert,
+			bottomMargin = if not t1.shouldUseOverlaidControls then v26.Padding.Medium else nil,
+			maxWidth = if not t1.shouldUseOverlaidControls then nil else INLINE_LANDSCAPE_WIDTH * v26.Config.UI.Scale
+		})
+	})
+	local v33 = React.createElement(SlideTransition, {
+		nodeContent = React.createElement(View, {
+			tag = "col align-x-center size-full"
+		}, {
+			FeedbackAlertElement = v32,
+			PageContent = React.createElement(View, {
+				tag = "col fill size-full-0",
+				LayoutOrder = 2
+			}, currentPageElement)
+		}),
+		nodeId = abuseReportFlow.currentNodeId,
+		nodeType = abuseReportFlow.currentNodeType,
+		direction = abuseReportFlow.navigationDirection
+	})
+	local v34, v35 = React.useState(not not config.display.titleDisclosure and (config.display.titleDisclosure.openByDefault or false))
+	local v36 = React.useCallback(function() -- line: 106
+		-- upvalues: v35 (copy)
+		v35(function(p1) -- line: 107
+			return not p1
+		end)
+	end, {})
+	local v37 = nil
+
+	if FFlagAbuseReportV2ScrollNavigation then
+		v37 = useScrollNavigationBindings()
+	end
+
+	local u38 = nil
+
+	if FFlagAbuseReportInlineTitleDisclosureFocus then
+		local v39 = React.useCallback(function() -- line: 119
+			-- upvalues: v35 (copy)
+			v35(false)
+		end, {})
+
+		u38 = useInExpFocusNavigationRefs(FocusNavigableSurfaceIdentifierEnum.CentralOverlay, v39, v34, v34)
+	end
+
+	local v40 = React.useMemo(function() -- line: 136
+		-- upvalues: React (copy), View (copy), t1 (copy), abuseReportFlow (copy), Icon (copy), IconName (copy), InputSize (copy)
+		return React.createElement(View, {
+			LayoutOrder = 1,
+			tag = {
+				["align-x-center auto-xy padding-y-small"] = true,
+				["position-top-left anchor-top-left"] = t1.shouldUseOverlaidControls
+			}
+		}, React.createElement(View, {
+			tag = "auto-xy padding-small radius-circle",
+			isDisabled = not abuseReportFlow.canGoBack,
+			selection = {
+				Selectable = abuseReportFlow.canGoBack
+			},
+			onActivated = abuseReportFlow.goBack
+		}, React.createElement(Icon, {
+			name = IconName.ChevronLargeLeft,
+			size = InputSize.Medium,
+			style = {
+				Transparency = not abuseReportFlow.canGoBack and 1 or 0
+			}
+		})))
+	end, {
+		abuseReportFlow.canGoBack,
+		abuseReportFlow.goBack,
+		t1.shouldUseOverlaidControls
+	})
+	local v41 = React.useMemo(function() -- line: 168
+		-- upvalues: config (copy), React (copy), View (copy), t1 (copy), v36 (copy), AbuseReportTooltip (copy), v34 (copy), FFlagAbuseReportInlineTitleDisclosureFocus (copy), u38 (ref), Icon (copy), IconName (copy), InputSize (copy)
+		if config.display.titleDisclosure then
+			return (React.createElement(View, {
+				LayoutOrder = 3,
+				ZIndex = 2,
+				tag = {
+					["align-x-center auto-xy padding-y-small"] = true,
+					["position-top-right anchor-top-right"] = t1.shouldUseOverlaidControls
+				}
+			}, React.createElement(View, {
+				tag = "auto-xy padding-small radius-circle",
+				onActivated = v36
+			}, React.createElement(AbuseReportTooltip, {
+				tooltipTitle = config.display.titleDisclosure.tooltipTitle,
+				tooltipText = config.display.titleDisclosure.tooltipText,
+				buttonLabel = config.display.titleDisclosure.buttonLabel,
+				isOpen = v34,
+				onClose = v36,
+				ref = if not FFlagAbuseReportInlineTitleDisclosureFocus then nil else u38
+			}, React.createElement(Icon, {
+				name = IconName.CircleI,
+				size = InputSize.Medium
+			})))))
+		end
+
+		return nil
+	end, {
+		config.display.titleDisclosure,
+		if not FFlagAbuseReportInlineTitleDisclosureFocus then nil else u38,
+		v36,
+		v34,
+		t1.shouldUseOverlaidControls
+	})
+
+	return React.createElement(View, {
+		tag = {
+			["size-full"] = t1.shouldUseOverlaidControls,
+			["col size-full"] = not t1.shouldUseOverlaidControls
+		},
+		ref = if not FFlagAbuseReportV2ScrollNavigation then nil else v37
+	}, {
+		TopControlsContainer = React.createElement(View, {
+			LayoutOrder = 1,
+			tag = {
+				["size-full"] = t1.shouldUseOverlaidControls,
+				["row flex-between size-full-0 auto-y"] = not t1.shouldUseOverlaidControls
+			}
+		}, {
+			BackButtonContainer = v40,
+			AbuseReportTooltipContainer = v41
+		}),
+		Content = React.createElement(View, {
+			LayoutOrder = 2,
+			tag = {
+				["col gap-xlarge size-full"] = t1.shouldUseOverlaidControls,
+				["col fill size-full-0 margin-bottom-medium"] = not t1.shouldUseOverlaidControls
+			}
+		}, v33)
+	})
+end
+
+return React.memo(AbuseReportInline)

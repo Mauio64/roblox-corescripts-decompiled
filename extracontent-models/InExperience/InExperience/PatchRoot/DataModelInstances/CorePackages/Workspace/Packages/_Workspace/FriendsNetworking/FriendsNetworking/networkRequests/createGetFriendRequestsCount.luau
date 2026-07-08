@@ -1,11 +1,13 @@
-local v0 = require(script.Parent.Parent.FRIENDS_URL);
-local _ = require(script.Parent.Parent.networkingFriendsTypes);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "GetFriendRequestsCount"
-    }, function(v3, _) --[[ Line: 9 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("v1"):path("user"):path("friend-requests"):path("count");
-    end);
-end;
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+
+require(script.Parent.Parent.networkingFriendsTypes)
+
+return function(p1) -- line: 4
+	-- upvalues: FRIENDS_URL (copy)
+	return p1.roduxNetworking.GET({
+		Name = "GetFriendRequestsCount"
+	}, function(p2, _) -- line: 9
+		-- upvalues: FRIENDS_URL (copy)
+		return p2(FRIENDS_URL):path("v1"):path("user"):path("friend-requests"):path("count")
+	end)
+end

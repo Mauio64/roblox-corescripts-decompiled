@@ -5,6 +5,7 @@ local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMake
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
 local FFlagAXCatalogM41Props = AvatarExperienceFlags.FFlagAXCatalogM41Props
 local FFlagAXAddHDCatalogTab = AvatarExperienceFlags.FFlagAXAddHDCatalogTab
+local FFlagAXCatalogBackgroundsSupport = AvatarExperienceFlags.FFlagAXCatalogBackgroundsSupport
 
 return enumerate(script.Name, {
 	Featured = "Featured",
@@ -15,9 +16,10 @@ return enumerate(script.Name, {
 	Accessories = "Accessories",
 	Head = "Head",
 	Body = "Body",
-	Makeup = if not FFlagAXCustomizeMakeupSupport and not FFlagAXCatalogMakeupSupport then nil else "Makeup",
 	AllAnimations = "AllAnimations",
 	Emotes = "Emotes",
+	Makeup = if not FFlagAXCustomizeMakeupSupport and not FFlagAXCatalogMakeupSupport then nil else "Makeup",
+	Backgrounds = if not FFlagAXCatalogBackgroundsSupport then nil else "Backgrounds",
 	Props = if not FFlagAXCatalogM41Props then nil else "Props",
 	HighDefinition = if not FFlagAXAddHDCatalogTab then nil else "HighDefinition"
 })

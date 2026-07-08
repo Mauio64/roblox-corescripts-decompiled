@@ -1,9 +1,11 @@
-return function(v0, ...) --[[ Line: 6 ]] --[[ Name: omit ]]
-    local v1 = table.clone(v0);
-    for _, v3 in {
-        ...
-    } do
-        v1[v3] = nil;
-    end;
-    return v1;
-end;
+local function omit(t1: {[any]: any}, ...) -- line: 6
+	local v3 = table.clone(t1)
+
+	for _, v5 in { ... } do
+		v3[v5] = nil
+	end
+
+	return v3
+end
+
+return omit

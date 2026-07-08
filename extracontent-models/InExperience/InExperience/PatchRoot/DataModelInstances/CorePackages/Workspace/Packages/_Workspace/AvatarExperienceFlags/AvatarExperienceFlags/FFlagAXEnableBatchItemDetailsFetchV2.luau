@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceFlags").Parent;
-return require(l_Parent_0.SharedFlags).FFlagEnableInspectAndBuyV2RootFlag and game:DefineFastFlag("AXEnableBatchItemDetailsFetchV2", false);
+local Parent = script:FindFirstAncestor("AvatarExperienceFlags").Parent
+
+return require(Parent.SharedFlags).FFlagEnableInspectAndBuyV2RootFlag and game:DefineFastFlag("AXEnableBatchItemDetailsFetchV2", false)

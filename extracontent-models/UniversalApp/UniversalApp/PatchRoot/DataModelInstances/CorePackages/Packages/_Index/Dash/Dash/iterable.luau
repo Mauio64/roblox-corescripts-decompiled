@@ -1,29 +1,38 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-return function(v2) --[[ Line: 11 ]] --[[ Name: iterable ]]
-    local v3 = 1;
-    local v4 = true;
-    local v5 = nil;
-    local _ = nil;
-    return function() --[[ Line: 16 ]]
-        -- upvalues: v4 (ref), v2 (copy), v3 (ref), v5 (ref)
-        if v4 then
-            local v7 = v2[v3];
-            if v7 == nil then
-                v4 = false;
-            else
-                local l_v3_0 = v3;
-                v3 = v3 + 1;
-                return l_v3_0, v7;
-            end;
-        end;
-        repeat
-            v5 = next(v2, v5);
-        until typeof(v5) ~= "number" or v5 <= 0 or v5 >= v3 or v5 % 1 ~= 0;
-        if v5 == nil then
-            return nil;
-        else
-            return v5, v2[v5];
-        end;
-    end;
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local function iterable(t1: {[any]: any}) -- line: 11
+	local n1 = 1
+	local u5 = true
+	local u6 = nil
+
+	return function() -- line: 16
+		-- upvalues: u5 (ref), t1 (copy), n1 (ref), u6 (ref)
+		if u5 then
+			local v7 = t1[n1]
+
+			if v7 ~= nil then
+				local v8 = n1
+
+				n1 += 1
+
+				return v8, v7
+			end
+
+			u5 = false
+		end
+
+		repeat
+			u6 = next(t1, u6)
+		until typeof(u6) ~= "number" or not (u6 > 0) or not (u6 < n1) or u6 % 1 ~= 0
+
+		if u6 == nil then
+			return nil
+		end
+
+		return u6, t1[u6]
+	end
+end
+
+return iterable

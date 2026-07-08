@@ -1,39 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserProfiles");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Signals);
-local v4 = require(l_Parent_0.SignalsReact);
-local l_createComputed_0 = v3.createComputed;
-local l_useSignalState_0 = v4.useSignalState;
-local l_FFlagEnableBlackbirdCheckDev_0 = require(l_Parent_0.SharedFlags).FFlagEnableBlackbirdCheckDev;
-local v8 = require(l_script_FirstAncestor_0.Stores.UserProfileStore);
-return function(v9) --[[ Line: 15 ]] --[[ Name: useIsRobloxSubscriber ]]
-    -- upvalues: l_FFlagEnableBlackbirdCheckDev_0 (copy), v2 (copy), l_createComputed_0 (copy), v8 (copy), l_useSignalState_0 (copy)
-    local v10 = l_FFlagEnableBlackbirdCheckDev_0 and v9 ~= nil and v9 ~= "";
-    local v16 = v2.useMemo(function() --[[ Line: 18 ]]
-        -- upvalues: v10 (copy), l_createComputed_0 (ref), v8 (ref), v9 (copy)
-        if not v10 then
-            return l_createComputed_0(function() --[[ Line: 20 ]]
-                return false;
-            end);
-        else
-            local v11 = v8.get().fetchNamesByUserIds({
-                v9
-            });
-            return l_createComputed_0(function(v12) --[[ Line: 28 ]]
-                -- upvalues: v11 (copy)
-                local l_status_0, l_result_0 = pcall(v11, v12);
-                if l_status_0 and l_result_0.status == "success" and #l_result_0.data > 0 then
-                    local v15 = l_result_0.data[1];
-                    if v15.getHasRobloxSubscription ~= nil then
-                        return (v15.getHasRobloxSubscription(v12));
-                    end;
-                end;
-                return false;
-            end);
-        end;
-    end, {
-        v9
-    });
-    return (l_useSignalState_0(v16));
-end;
+local UserProfiles = script:FindFirstAncestor("UserProfiles")
+local UserProfilesParent = UserProfiles.Parent
+local React = require(UserProfilesParent.React)
+local Signals = require(UserProfilesParent.Signals)
+local SignalsReact = require(UserProfilesParent.SignalsReact)
+local createComputed = Signals.createComputed
+local useSignalState = SignalsReact.useSignalState
+local FFlagEnableBlackbirdCheck = require(UserProfilesParent.SharedFlags).FFlagEnableBlackbirdCheck
+local v9 = game:DefineFastFlag("UserProfilesUseIsRobloxSubscriberGetter", false)
+local UserProfileStore = require(UserProfiles.Stores.UserProfileStore)
+local createIsRobloxSubscriberGetter = require(script.Parent.createIsRobloxSubscriberGetter)
+
+local function useIsRobloxSubscriber(s1: string?) -- line: 20
+	-- upvalues: React (copy), v9 (copy), createIsRobloxSubscriberGetter (copy), FFlagEnableBlackbirdCheck (copy), createComputed (copy), UserProfileStore (copy), useSignalState (copy)
+	local v14 = React.useMemo(function() -- line: 21
+		-- upvalues: v9 (copy), createIsRobloxSubscriberGetter (copy), s1 (copy), FFlagEnableBlackbirdCheck (copy), createComputed (copy), UserProfileStore (copy)
+		if v9 then
+			return createIsRobloxSubscriberGetter(s1)
+		end
+
+		if not FFlagEnableBlackbirdCheck or (s1 == nil or s1 == "") then
+			return createComputed(function() -- line: 28
+				return false
+			end)
+		end
+
+		local v15 = UserProfileStore.get().fetchNamesByUserIds({ s1 })
+
+		return createComputed(function(p1) -- line: 36
+			-- upvalues: v15 (copy)
+			local ok, result = pcall(v15, p1)
+
+			if ok and (result.status == "success" and #result.data > 0) then
+				local v19 = result.data[1]
+
+				if v19.getHasRobloxSubscription ~= nil then
+					return (v19.getHasRobloxSubscription(p1))
+				end
+			end
+
+			return false
+		end)
+	end, { s1 })
+
+	return (useSignalState(v14))
+end
+
+return useIsRobloxSubscriber

@@ -1,16 +1,17 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.API_URL);
-return function(v2) --[[ Line: 14 ]]
-    -- upvalues: v1 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "GetBlockedUsers"
-    }, function(v3, v4) --[[ Line: 17 ]]
-        -- upvalues: v1 (ref)
-        return v3(v1, {
-            currentUserId = v4 and v4.currentUserId or nil
-        }):path("user-blocking-api"):path("v1"):path("users"):path("get-blocked-users"):queryArgs({
-            cursor = v4 and v4.cursor or nil, 
-            count = v4 and v4.count or nil
-        });
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local API_URL = require(ParentParent.API_URL)
+
+return function(t1: {[any]: any}) -- line: 14
+	-- upvalues: API_URL (copy)
+	return t1.roduxNetworking.GET({
+		Name = "GetBlockedUsers"
+	}, function(p1, t2: {[any]: any}?) -- line: 17
+		-- upvalues: API_URL (copy)
+		return p1(API_URL, {
+			currentUserId = t2 and t2.currentUserId or nil
+		}):path("user-blocking-api"):path("v1"):path("users"):path("get-blocked-users"):queryArgs({
+			cursor = t2 and t2.cursor or nil,
+			count = t2 and t2.count or nil
+		})
+	end)
+end

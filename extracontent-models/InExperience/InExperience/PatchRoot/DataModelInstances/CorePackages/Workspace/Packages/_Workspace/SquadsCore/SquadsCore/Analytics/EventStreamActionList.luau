@@ -1,263 +1,264 @@
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v1 = require(l_Parent_0.Dash);
-local l_Enums_0 = require(l_Parent_0.SocialLuaAnalytics).Analytics.Enums;
-local l_Contexts_0 = l_Enums_0.Contexts;
-local l_EventTypes_0 = l_Enums_0.EventTypes;
-local v5 = require(script.Parent.EventNames);
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local Dash = require(Parent.Dash)
+local Enums = require(Parent.SocialLuaAnalytics).Analytics.Enums
+local Contexts = Enums.Contexts
+local EventTypes = Enums.EventTypes
+local EventNames = require(script.Parent.EventNames)
+
 return {
-    [v5.EnterSquadButtonPressed] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.EnterSquadButtonPressed, 
-        formatRulesForAdditionalInfo = {
-            conversationId = v1.identity, 
-            partyAttemptId = v1.identity, 
-            squadButtonSource = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            userIntention = v1.identity
-        }
-    }, 
-    [v5.MultiInviteMenuActionStatus] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.MultiInviteMenuActionStatus, 
-        formatRulesForAdditionalInfo = {
-            actionLocation = v1.identity, 
-            actionType = v1.identity, 
-            activeFriendsPresences = v1.identity, 
-            activeFriendsUserIds = v1.identity, 
-            clientTimeStamp = v1.identity, 
-            numActiveFriends = v1.identity, 
-            numSelectedFriends = v1.identity, 
-            partyAttemptId = v1.identity, 
-            selectedFriendsPresences = v1.identity, 
-            selectedFriendsUserIds = v1.identity, 
-            selectionPageType = v1.identity, 
-            squadId = v1.identity
-        }
-    }, 
-    [v5.NoResponseInviteAgainOrAddOthers] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.NoResponseInviteAgainOrAddOthers, 
-        formatRulesForAdditionalInfo = {
-            actionType = v1.identity, 
-            conversationId = v1.identity, 
-            button = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity
-        }
-    }, 
-    [v5.PartySheetAction] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.PartySheetAction, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            actionType = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            isFtuxTooltipShown = v1.identity, 
-            voiceStatus = v1.identity
-        }
-    }, 
-    [v5.PartyCoplay] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.PartyCoplay, 
-        formatRulesForAdditionalInfo = {
-            partyCoplayEvent = v1.identity, 
-            partyId = v1.identity, 
-            partyPlayersInGameInstanceCount = v1.identity, 
-            partyPlayersInGameInstanceUserIds = v1.identity, 
-            partyTotalSize = v1.identity, 
-            partyTotalSizeUserIds = v1.identity
-        }
-    }, 
-    [v5.SquadInvitePageNavSource] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadInvitePageNavSource, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            inviteNavSource = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity
-        }
-    }, 
-    [v5.SquadExperienceInviteStateChange] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadExperienceInviteStateChange, 
-        formatRulesForAdditionalInfo = {
-            experienceInviteId = v1.identity, 
-            invitationGameInstanceId = v1.identity, 
-            invitationPlaceId = v1.identity, 
-            inviterId = v1.identity, 
-            inviteState = v1.identity, 
-            parentChannelId = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            joinAttemptId = v1.identity
-        }
-    }, 
-    [v5.SquadExperienceInviteApiCall] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadExperienceInviteApiCall, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            errorMessage = v1.identity, 
-            errorType = v1.identity, 
-            experienceInviteId = v1.identity, 
-            invitationPlaceId = v1.identity, 
-            isSuccess = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            squadMembers = v1.identity, 
-            squadMembersCount = v1.identity
-        }
-    }, 
-    [v5.SquadInvite] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadInvite, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            errorMessage = v1.identity, 
-            errorType = v1.identity, 
-            inviteeCount = v1.identity, 
-            inviteeUserIds = v1.identity, 
-            isSuccess = v1.identity, 
-            source = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            userId = v1.identity
-        }
-    }, 
-    [v5.SquadVoteApiCall] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadVoteApiCall, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            errorMessage = v1.identity, 
-            errorType = v1.identity, 
-            experienceInviteId = v1.identity, 
-            isSuccess = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            voteType = v1.identity
-        }
-    }, 
-    [v5.SquadToastActions] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadToastActions, 
-        formatRulesForAdditionalInfo = {
-            experienceInviteId = v1.identity, 
-            parentChannelId = v1.identity, 
-            partyAttemptId = v1.identity, 
-            nudgeId = v1.identity, 
-            nudgeType = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity, 
-            toastAction = v1.identity, 
-            toastType = v1.identity
-        }
-    }, 
-    [v5.SquadTopBannerClicked] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadTopBannerClicked, 
-        formatRulesForAdditionalInfo = {
-            parentChannelId = v1.identity, 
-            squadId = v1.identity, 
-            squadMembers = v1.identity, 
-            timePassedSinceLastStateUpdatedInSec = v1.identity
-        }
-    }, 
-    [v5.SquadCreateOrJoinFromRCC] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadCreateOrJoinFromRCC, 
-        formatRulesForAdditionalInfo = {
-            partySourceType = v1.identity, 
-            nudgeId = v1.identity, 
-            nudgeType = v1.identity, 
-            partyAttemptId = v1.identity, 
-            inviteeUserIds = v1.identity
-        }
-    }, 
-    [v5.SquadPromptResponded] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadPromptResponded, 
-        formatRulesForAdditionalInfo = {
-            promptType = v1.identity, 
-            responseType = v1.identity, 
-            scheduledSquadId = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity
-        }
-    }, 
-    [v5.ScheduledSquadAction] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.ScheduledSquadAction, 
-        formatRulesForAdditionalInfo = {
-            actionType = v1.identity, 
-            conversationId = v1.identity, 
-            scheduledSquadId = v1.identity, 
-            source = v1.identity, 
-            squadId = v1.identity, 
-            squadLocation = v1.identity
-        }
-    }, 
-    [v5.SquadRegroupButtonClicked] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadRegroupButtonClicked, 
-        formatRulesForAdditionalInfo = {
-            clientTimestamp = v1.identity, 
-            squadId = v1.identity, 
-            initiatorId = v1.identity, 
-            gameInstanceId = v1.identity, 
-            rootPlaceId = v1.identity, 
-            placeId = v1.identity, 
-            universeId = v1.identity, 
-            playSessionId = v1.identity, 
-            experienceInviteId = v1.identity, 
-            button = v1.identity, 
-            entryPoint = v1.identity
-        }
-    }, 
-    [v5.SquadRegroupPromptShown] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadRegroupPromptShown, 
-        formatRulesForAdditionalInfo = {
-            clientTimestamp = v1.identity, 
-            squadId = v1.identity, 
-            initiatorId = v1.identity, 
-            gameInstanceId = v1.identity, 
-            rootPlaceId = v1.identity, 
-            placeId = v1.identity, 
-            universeId = v1.identity, 
-            playSessionId = v1.identity, 
-            experienceInviteId = v1.identity, 
-            button = v1.identity, 
-            entryPoint = v1.identity
-        }
-    }, 
-    [v5.SquadRegroupPromptClicked] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadRegroupPromptClicked, 
-        formatRulesForAdditionalInfo = {
-            clientTimestamp = v1.identity, 
-            squadId = v1.identity, 
-            initiatorId = v1.identity, 
-            gameInstanceId = v1.identity, 
-            rootPlaceId = v1.identity, 
-            placeId = v1.identity, 
-            universeId = v1.identity, 
-            playSessionId = v1.identity, 
-            experienceInviteId = v1.identity, 
-            button = v1.identity, 
-            entryPoint = v1.identity
-        }
-    }, 
-    [v5.SquadExperienceInviteImpression] = {
-        context = l_Contexts_0.Squads, 
-        eventType = l_EventTypes_0.SquadExperienceInviteImpression, 
-        formatRulesForAdditionalInfo = {
-            experienceInviteId = v1.identity, 
-            notificationId = v1.identity, 
-            clientTimestamp = v1.identity
-        }
-    }
-};
+	[EventNames.EnterSquadButtonPressed] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.EnterSquadButtonPressed,
+		formatRulesForAdditionalInfo = {
+			conversationId = Dash.identity,
+			partyAttemptId = Dash.identity,
+			squadButtonSource = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			userIntention = Dash.identity
+		}
+	},
+	[EventNames.MultiInviteMenuActionStatus] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.MultiInviteMenuActionStatus,
+		formatRulesForAdditionalInfo = {
+			actionLocation = Dash.identity,
+			actionType = Dash.identity,
+			activeFriendsPresences = Dash.identity,
+			activeFriendsUserIds = Dash.identity,
+			clientTimeStamp = Dash.identity,
+			numActiveFriends = Dash.identity,
+			numSelectedFriends = Dash.identity,
+			partyAttemptId = Dash.identity,
+			selectedFriendsPresences = Dash.identity,
+			selectedFriendsUserIds = Dash.identity,
+			selectionPageType = Dash.identity,
+			squadId = Dash.identity
+		}
+	},
+	[EventNames.NoResponseInviteAgainOrAddOthers] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.NoResponseInviteAgainOrAddOthers,
+		formatRulesForAdditionalInfo = {
+			actionType = Dash.identity,
+			conversationId = Dash.identity,
+			button = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity
+		}
+	},
+	[EventNames.PartySheetAction] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.PartySheetAction,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			actionType = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			isFtuxTooltipShown = Dash.identity,
+			voiceStatus = Dash.identity
+		}
+	},
+	[EventNames.PartyCoplay] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.PartyCoplay,
+		formatRulesForAdditionalInfo = {
+			partyCoplayEvent = Dash.identity,
+			partyId = Dash.identity,
+			partyPlayersInGameInstanceCount = Dash.identity,
+			partyPlayersInGameInstanceUserIds = Dash.identity,
+			partyTotalSize = Dash.identity,
+			partyTotalSizeUserIds = Dash.identity
+		}
+	},
+	[EventNames.SquadInvitePageNavSource] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadInvitePageNavSource,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			inviteNavSource = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity
+		}
+	},
+	[EventNames.SquadExperienceInviteStateChange] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadExperienceInviteStateChange,
+		formatRulesForAdditionalInfo = {
+			experienceInviteId = Dash.identity,
+			invitationGameInstanceId = Dash.identity,
+			invitationPlaceId = Dash.identity,
+			inviterId = Dash.identity,
+			inviteState = Dash.identity,
+			parentChannelId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			joinAttemptId = Dash.identity
+		}
+	},
+	[EventNames.SquadExperienceInviteApiCall] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadExperienceInviteApiCall,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			errorMessage = Dash.identity,
+			errorType = Dash.identity,
+			experienceInviteId = Dash.identity,
+			invitationPlaceId = Dash.identity,
+			isSuccess = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			squadMembers = Dash.identity,
+			squadMembersCount = Dash.identity
+		}
+	},
+	[EventNames.SquadInvite] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadInvite,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			errorMessage = Dash.identity,
+			errorType = Dash.identity,
+			inviteeCount = Dash.identity,
+			inviteeUserIds = Dash.identity,
+			isSuccess = Dash.identity,
+			source = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			userId = Dash.identity
+		}
+	},
+	[EventNames.SquadVoteApiCall] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadVoteApiCall,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			errorMessage = Dash.identity,
+			errorType = Dash.identity,
+			experienceInviteId = Dash.identity,
+			isSuccess = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			voteType = Dash.identity
+		}
+	},
+	[EventNames.SquadToastActions] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadToastActions,
+		formatRulesForAdditionalInfo = {
+			experienceInviteId = Dash.identity,
+			parentChannelId = Dash.identity,
+			partyAttemptId = Dash.identity,
+			nudgeId = Dash.identity,
+			nudgeType = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity,
+			toastAction = Dash.identity,
+			toastType = Dash.identity
+		}
+	},
+	[EventNames.SquadTopBannerClicked] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadTopBannerClicked,
+		formatRulesForAdditionalInfo = {
+			parentChannelId = Dash.identity,
+			squadId = Dash.identity,
+			squadMembers = Dash.identity,
+			timePassedSinceLastStateUpdatedInSec = Dash.identity
+		}
+	},
+	[EventNames.SquadCreateOrJoinFromRCC] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadCreateOrJoinFromRCC,
+		formatRulesForAdditionalInfo = {
+			partySourceType = Dash.identity,
+			nudgeId = Dash.identity,
+			nudgeType = Dash.identity,
+			partyAttemptId = Dash.identity,
+			inviteeUserIds = Dash.identity
+		}
+	},
+	[EventNames.SquadPromptResponded] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadPromptResponded,
+		formatRulesForAdditionalInfo = {
+			promptType = Dash.identity,
+			responseType = Dash.identity,
+			scheduledSquadId = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity
+		}
+	},
+	[EventNames.ScheduledSquadAction] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.ScheduledSquadAction,
+		formatRulesForAdditionalInfo = {
+			actionType = Dash.identity,
+			conversationId = Dash.identity,
+			scheduledSquadId = Dash.identity,
+			source = Dash.identity,
+			squadId = Dash.identity,
+			squadLocation = Dash.identity
+		}
+	},
+	[EventNames.SquadRegroupButtonClicked] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadRegroupButtonClicked,
+		formatRulesForAdditionalInfo = {
+			clientTimestamp = Dash.identity,
+			squadId = Dash.identity,
+			initiatorId = Dash.identity,
+			gameInstanceId = Dash.identity,
+			rootPlaceId = Dash.identity,
+			placeId = Dash.identity,
+			universeId = Dash.identity,
+			playSessionId = Dash.identity,
+			experienceInviteId = Dash.identity,
+			button = Dash.identity,
+			entryPoint = Dash.identity
+		}
+	},
+	[EventNames.SquadRegroupPromptShown] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadRegroupPromptShown,
+		formatRulesForAdditionalInfo = {
+			clientTimestamp = Dash.identity,
+			squadId = Dash.identity,
+			initiatorId = Dash.identity,
+			gameInstanceId = Dash.identity,
+			rootPlaceId = Dash.identity,
+			placeId = Dash.identity,
+			universeId = Dash.identity,
+			playSessionId = Dash.identity,
+			experienceInviteId = Dash.identity,
+			button = Dash.identity,
+			entryPoint = Dash.identity
+		}
+	},
+	[EventNames.SquadRegroupPromptClicked] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadRegroupPromptClicked,
+		formatRulesForAdditionalInfo = {
+			clientTimestamp = Dash.identity,
+			squadId = Dash.identity,
+			initiatorId = Dash.identity,
+			gameInstanceId = Dash.identity,
+			rootPlaceId = Dash.identity,
+			placeId = Dash.identity,
+			universeId = Dash.identity,
+			playSessionId = Dash.identity,
+			experienceInviteId = Dash.identity,
+			button = Dash.identity,
+			entryPoint = Dash.identity
+		}
+	},
+	[EventNames.SquadExperienceInviteImpression] = {
+		context = Contexts.Squads,
+		eventType = EventTypes.SquadExperienceInviteImpression,
+		formatRulesForAdditionalInfo = {
+			experienceInviteId = Dash.identity,
+			notificationId = Dash.identity,
+			clientTimestamp = Dash.identity
+		}
+	}
+}

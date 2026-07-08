@@ -1,33 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_View_0 = v2.View;
-local l_Text_0 = v2.Text;
-local function v8(v5) --[[ Line: 13 ]] --[[ Name: formatTime ]]
-    local v6 = math.floor(v5 / 60);
-    local v7 = math.floor(v5 % 60);
-    return string.format("%02d:%02d", v6, v7);
-end;
-return function(v9) --[[ Line: 19 ]] --[[ Name: TimeDurationOverlay ]]
-    -- upvalues: v1 (copy), v8 (copy), l_View_0 (copy), l_Text_0 (copy)
-    local v10 = v1.useMemo(function() --[[ Line: 20 ]]
-        -- upvalues: v8 (ref), v9 (copy)
-        return v8(v9.timeLength);
-    end, {
-        v9.timeLength
-    });
-    return v1.createElement(l_View_0, {
-        tag = "position-bottom-right anchor-bottom-right padding-bottom-medium padding-right-medium auto-xy", 
-        ZIndex = 20
-    }, {
-        v1.createElement(l_View_0, {
-            tag = "bg-over-media-100 radius-small size-1000-500", 
-            ZIndex = 21
-        }, {
-            DurationText = v1.createElement(l_Text_0, {
-                tag = "text-label-small anchor-center-center position-center-center color-content-emphasis", 
-                Text = v10
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+
+local function formatTime(n1: number) -- line: 13
+	local v9 = math.floor(n1 / 60)
+	local v10 = math.floor(n1 % 60)
+
+	return string.format("%02d:%02d", v9, v10)
+end
+local function TimeDurationOverlay(t1: {[any]: any}) -- line: 19
+	-- upvalues: React (copy), formatTime (copy), View (copy), FoundationText (copy)
+	local v12 = React.useMemo(function() -- line: 20
+		-- upvalues: formatTime (copy), t1 (copy)
+		return formatTime(t1.timeLength)
+	end, { t1.timeLength })
+
+	return React.createElement(View, {
+		tag = "position-bottom-right anchor-bottom-right padding-bottom-medium padding-right-medium auto-xy",
+		ZIndex = 20
+	}, { React.createElement(View, {
+		tag = "bg-over-media-100 radius-small size-1000-500",
+		ZIndex = 21
+	}, {
+		DurationText = React.createElement(FoundationText, {
+			tag = "text-label-small anchor-center-center position-center-center color-content-emphasis",
+			Text = v12
+		})
+	}) })
+end
+
+return TimeDurationOverlay

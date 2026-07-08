@@ -1,54 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsMenu");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Context_0 = l_script_FirstAncestor_0.Context;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.UIBlox);
-local v5 = require(l_Parent_0.Foundation);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local _ = require(l_script_FirstAncestor_0.friendsMenuModalType);
-local v8 = require(l_Context_0.SelectedUsersContext);
-local l_FFlagEnableAppChatFocusableFixes_0 = require(l_Parent_0.SharedFlags).FFlagEnableAppChatFocusableFixes;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v11 = if l_FFlagEnableAppChatFocusableFixes_0 then v5.Checkbox else v4.App.InputButton.Checkbox;
-return function(v12) --[[ Line: 27 ]]
-    -- upvalues: v3 (copy), v8 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy), v11 (copy)
-    local v13 = v3.useContext(v8);
-    local v14 = v3.useCallback(function() --[[ Line: 31 ]]
-        -- upvalues: v13 (copy), v12 (copy)
-        if v13.isFriendSelected(v12.friend.id) then
-            v13.removeFriend(v12.friend.id);
-            return;
-        else
-            v13.addFriend(v12.friend.id, v12.friend.displayName);
-            return;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v13.isFriendSelected(v12.friend.id), 
-        v13.removeFriend, 
-        v13.addFriend, 
-        v12.friend.id
-    } else l_dependencyArray_0(v13.isFriendSelected(v12.friend.id), v13.removeFriend, v13.addFriend, v12.friend.id));
-    return v3.createElement("Frame", {
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        AnchorPoint = v12.anchorPoint, 
-        Position = v12.position, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v12.layoutOrder
-    }, {
-        CheckboxAlignment = v3.createElement("UIListLayout", {
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        }), 
-        Button = if l_FFlagEnableAppChatFocusableFixes_0 then v3.createElement(v11, {
-            onActivated = v14, 
-            isChecked = v13.isFriendSelected(v12.friend.id), 
-            label = "", 
-            isDisabled = v12.isDisabled, 
-            Selectable = v12.selectable
-        }) else v3.createElement(v11, {
-            onActivated = v14, 
-            isSelected = v13.isFriendSelected(v12.friend.id), 
-            text = "", 
-            isDisabled = v12.isDisabled
-        })
-    });
-end;
+local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
+local FriendsMenuParent = FriendsMenu.Parent
+local Context = FriendsMenu.Context
+local React = require(FriendsMenuParent.React)
+local Checkbox = require(FriendsMenuParent.Foundation).Checkbox
+
+require(FriendsMenu.friendsMenuModalType)
+
+local SelectedUsersContext = require(Context.SelectedUsersContext)
+
+return function(t1: {[any]: any}) -- line: 23
+	-- upvalues: React (copy), SelectedUsersContext (copy), Checkbox (copy)
+	local v8 = React.useContext(SelectedUsersContext)
+	local v9 = React.useCallback(function() -- line: 27
+		-- upvalues: v8 (copy), t1 (copy)
+		if v8.isFriendSelected(t1.friend.id) then
+			v8.removeFriend(t1.friend.id)
+
+			return
+		end
+
+		v8.addFriend(t1.friend.id, t1.friend.displayName)
+	end, {
+		v8.isFriendSelected(t1.friend.id),
+		v8.removeFriend,
+		v8.addFriend,
+		t1.friend.id
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		AnchorPoint = t1.anchorPoint,
+		Position = t1.position,
+		LayoutOrder = t1.layoutOrder
+	}, {
+		CheckboxAlignment = React.createElement("UIListLayout", {
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		Button = React.createElement(Checkbox, {
+			label = "",
+			onActivated = v9,
+			isChecked = v8.isFriendSelected(t1.friend.id),
+			isDisabled = t1.isDisabled,
+			Selectable = t1.selectable
+		})
+	})
+end

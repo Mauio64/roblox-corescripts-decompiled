@@ -1,156 +1,160 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NotificationsCommon");
-local l_components_0 = l_script_FirstAncestor_0.components;
-local l_context_0 = l_script_FirstAncestor_0.context;
-local v3 = require(l_script_FirstAncestor_0.dependencies);
-local v4 = require(l_components_0.NotificationStyledText);
-local v5 = require(l_components_0.NotificationThumbnail);
-local _ = require(l_script_FirstAncestor_0.type);
-local l_React_0 = v3.React;
-local l_UIBlox_0 = v3.UIBlox;
-local l_useStyle_0 = l_UIBlox_0.Core.Style.useStyle;
-local v10 = require(l_script_FirstAncestor_0.constants);
-local v11 = require(l_context_0.useNotificationCardState);
-local v12 = require(l_context_0.useNotificationCardData);
-local v13 = require(l_components_0.NotificationActionsFrame);
-local l_IconButton_0 = l_UIBlox_0.App.Button.IconButton;
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local l_IconSize_0 = l_UIBlox_0.App.ImageSet.Enum.IconSize;
-local v17 = l_Images_0["icons/common/overflow"];
-local l_DefaultContentPadding_0 = v10.DefaultContentPadding;
-local l_DefaultTextContentPadding_0 = v10.DefaultTextContentPadding;
-local l_MetaActionsWidth_0 = v10.MetaActionsWidth;
-local l_TimestampWidth_0 = v10.TimestampWidth;
-local l_TimestampHeight_0 = v10.TimestampHeight;
-return function() --[[ Line: 27 ]]
-    -- upvalues: l_useStyle_0 (copy), v12 (copy), v10 (copy), v11 (copy), l_DefaultTextContentPadding_0 (copy), l_MetaActionsWidth_0 (copy), l_TimestampWidth_0 (copy), l_TimestampHeight_0 (copy), l_React_0 (copy), l_DefaultContentPadding_0 (copy), v5 (copy), v4 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), v17 (copy), v13 (copy)
-    local v23 = l_useStyle_0();
-    local v24 = v23.Font.BaseSize * v23.Font.CaptionHeader.RelativeSize;
-    local v25 = v23.Font.BaseSize * v23.Font.CaptionBody.RelativeSize;
-    local v26 = v12();
-    local l_cardSize_0 = v26.cardSize;
-    local l_readOnly_0 = v26.readOnly;
-    local v29 = l_cardSize_0 and l_cardSize_0.thumbnail or v10.CardSizeDefault.thumbnail;
-    local l_openMetaActions_0 = v26.openMetaActions;
-    local l_notificationPayload_0 = v26.notificationPayload;
-    local l_handleActions_0 = v26.handleActions;
-    local v33 = v11("textBody");
-    local v34 = v33 and v33[1];
-    local v35 = v34 and v34.title and {
-        Text = v34.title, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        TextSize = v24, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        LayoutOrder = 1, 
-        Font = v23.Font.CaptionHeader.Font, 
-        TextColor3 = v23.Theme.TextEmphasis.Color
-    };
-    local v36 = v34 and v34.label and {
-        Text = v34.label, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        TextSize = v25, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        LayoutOrder = 2, 
-        Font = v23.Font.CaptionBody.Font, 
-        TextColor3 = v23.Theme.TextEmphasis.Color
-    };
-    local v37 = if l_readOnly_0 then -l_DefaultTextContentPadding_0 else -(l_MetaActionsWidth_0 + l_DefaultTextContentPadding_0);
-    local v38 = l_notificationPayload_0 and l_notificationPayload_0.timestamp and {
-        Text = {
-            text = l_notificationPayload_0.timestamp
-        }, 
-        Size = UDim2.new(0, l_TimestampWidth_0 + l_DefaultTextContentPadding_0, 0, l_TimestampHeight_0), 
-        TextSize = v24, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        TextXAlignment = Enum.TextXAlignment.Right, 
-        AnchorPoint = Vector2.new(1, 0), 
-        Position = UDim2.new(1, v37, 0, 0), 
-        LayoutOrder = 2, 
-        Font = v23.Font.CaptionHeader.Font, 
-        TextColor3 = v23.Theme.TextEmphasis.Color, 
-        TextTransparency = 0
-    };
-    return l_React_0.createElement("TextButton", {
-        Selectable = false, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = 1, 
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        Text = "", 
-        AutoButtonColor = false, 
-        BorderSizePixel = 0, 
-        [l_React_0.Event.Activated] = function() --[[ Line: 97 ]]
-            -- upvalues: l_handleActions_0 (copy), v34 (copy), l_notificationPayload_0 (copy)
-            if l_handleActions_0 and v34 and l_notificationPayload_0 then
-                l_handleActions_0(v34, l_notificationPayload_0);
-            end;
-        end
-    }, {
-        UIListLayout = l_React_0.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            Padding = UDim.new(0, l_DefaultContentPadding_0)
-        }), 
-        NotificationThumbnailFrame = l_React_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.new(0, v29, 0, v29)
-        }, {
-            NotificationThumbnail = l_React_0.createElement(v5)
-        }), 
-        ContentFrame = l_React_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            LayoutOrder = 2, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.new(1, -(v29 + l_DefaultContentPadding_0), 0, 0)
-        }, {
-            UIListLayout = l_React_0.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                Padding = UDim.new(0, l_DefaultTextContentPadding_0)
-            }), 
-            NotificationsBody = l_React_0.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v10.MetaActionsHeight), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1
-            }, {
-                NotificationsText = l_React_0.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, if l_readOnly_0 then -(l_TimestampWidth_0 + l_DefaultTextContentPadding_0) else -(l_MetaActionsWidth_0 + l_TimestampWidth_0 + l_DefaultTextContentPadding_0 * 2), 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    UIPadding = l_React_0.createElement("UIPadding", {
-                        PaddingTop = UDim.new(0, l_DefaultTextContentPadding_0)
-                    }), 
-                    UIListLayout = l_React_0.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        VerticalAlignment = Enum.VerticalAlignment.Top, 
-                        Padding = UDim.new(0, l_DefaultTextContentPadding_0)
-                    }), 
-                    Title = if v35 then l_React_0.createElement(v4, v35) else nil, 
-                    Subtitle = if v36 then l_React_0.createElement(v4, v36) else nil
-                }), 
-                Timestamp = if v38 then l_React_0.createElement(v4, v38) else nil, 
-                MetaActionsButton = if not l_openMetaActions_0 or l_readOnly_0 then nil else l_React_0.createElement(l_IconButton_0, {
-                    anchorPoint = Vector2.new(1, 0), 
-                    position = UDim2.new(1, 0, 0, 0), 
-                    size = UDim2.fromOffset(0, 0), 
-                    iconSize = l_IconSize_0.Medium, 
-                    icon = v17, 
-                    layoutOrder = 3, 
-                    onActivated = function() --[[ Line: 172 ]] --[[ Name: onActivated ]]
-                        -- upvalues: l_openMetaActions_0 (copy), l_notificationPayload_0 (copy)
-                        l_openMetaActions_0(l_notificationPayload_0);
-                    end
-                })
-            }), 
-            NotificationActionsFrame = if not l_readOnly_0 then l_React_0.createElement(v13) else nil
-        })
-    });
-end;
+local NotificationsCommon = script:FindFirstAncestor("NotificationsCommon")
+local components = NotificationsCommon.components
+local context = NotificationsCommon.context
+local dependencies = require(NotificationsCommon.dependencies)
+local NotificationStyledText = require(components.NotificationStyledText)
+local NotificationThumbnail = require(components.NotificationThumbnail)
+
+require(NotificationsCommon.type)
+
+local React = dependencies.React
+local UIBlox = dependencies.UIBlox
+local useStyle = UIBlox.Core.Style.useStyle
+local constants = require(NotificationsCommon.constants)
+local useNotificationCardState = require(context.useNotificationCardState)
+local useNotificationCardData = require(context.useNotificationCardData)
+local NotificationActionsFrame = require(components.NotificationActionsFrame)
+local IconButton = UIBlox.App.Button.IconButton
+local Images = UIBlox.App.ImageSet.Images
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local v17 = Images["icons/common/overflow"]
+local DefaultContentPadding = constants.DefaultContentPadding
+local DefaultTextContentPadding = constants.DefaultTextContentPadding
+local MetaActionsWidth = constants.MetaActionsWidth
+local TimestampWidth = constants.TimestampWidth
+local TimestampHeight = constants.TimestampHeight
+
+return function() -- line: 27
+	-- upvalues: useStyle (copy), useNotificationCardData (copy), constants (copy), useNotificationCardState (copy), DefaultTextContentPadding (copy), MetaActionsWidth (copy), TimestampWidth (copy), TimestampHeight (copy), React (copy), DefaultContentPadding (copy), NotificationThumbnail (copy), NotificationStyledText (copy), IconButton (copy), IconSize (copy), v17 (copy), NotificationActionsFrame (copy)
+	local v23 = useStyle()
+	local v24 = v23.Font.BaseSize * v23.Font.CaptionHeader.RelativeSize
+	local v25 = v23.Font.BaseSize * v23.Font.CaptionBody.RelativeSize
+	local v26 = useNotificationCardData()
+	local cardSize = v26.cardSize
+	local readOnly = v26.readOnly
+	local v29 = cardSize and cardSize.thumbnail or constants.CardSizeDefault.thumbnail
+	local openMetaActions = v26.openMetaActions
+	local notificationPayload = v26.notificationPayload
+	local handleActions = v26.handleActions
+	local v33 = useNotificationCardState("textBody")
+	local v34 = v33 and v33[1]
+	local v35 = v34 and (v34.title and {
+		LayoutOrder = 1,
+		Text = v34.title,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextSize = v24,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Font = v23.Font.CaptionHeader.Font,
+		TextColor3 = v23.Theme.TextEmphasis.Color
+	})
+	local v36 = v34 and (v34.label and {
+		LayoutOrder = 2,
+		Text = v34.label,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextSize = v25,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Font = v23.Font.CaptionBody.Font,
+		TextColor3 = v23.Theme.TextEmphasis.Color
+	})
+	local v37 = if not readOnly then -(MetaActionsWidth + DefaultTextContentPadding) else -DefaultTextContentPadding
+	local v38 = notificationPayload and (notificationPayload.timestamp and {
+		LayoutOrder = 2,
+		TextTransparency = 0,
+		Text = {
+			text = notificationPayload.timestamp
+		},
+		Size = UDim2.new(0, TimestampWidth + DefaultTextContentPadding, 0, TimestampHeight),
+		TextSize = v24,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		TextXAlignment = Enum.TextXAlignment.Right,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, v37, 0, 0),
+		Font = v23.Font.CaptionHeader.Font,
+		TextColor3 = v23.Theme.TextEmphasis.Color
+	})
+
+	return React.createElement("TextButton", {
+		Selectable = false,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		Text = "",
+		AutoButtonColor = false,
+		BorderSizePixel = 0,
+		[React.Event.Activated] = function() -- line: 97
+			-- upvalues: handleActions (copy), v34 (copy), notificationPayload (copy)
+			if handleActions and (v34 and notificationPayload) then
+				handleActions(v34, notificationPayload)
+			end
+		end
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			Padding = UDim.new(0, DefaultContentPadding)
+		}),
+		NotificationThumbnailFrame = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(0, v29, 0, v29)
+		}, {
+			NotificationThumbnail = React.createElement(NotificationThumbnail)
+		}),
+		ContentFrame = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, -(v29 + DefaultContentPadding), 0, 0)
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				Padding = UDim.new(0, DefaultTextContentPadding)
+			}),
+			NotificationsBody = React.createElement("Frame", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, constants.MetaActionsHeight),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				NotificationsText = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, if not readOnly then -(MetaActionsWidth + TimestampWidth + DefaultTextContentPadding * 2) else -(TimestampWidth + DefaultTextContentPadding), 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					UIPadding = React.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, DefaultTextContentPadding)
+					}),
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						VerticalAlignment = Enum.VerticalAlignment.Top,
+						Padding = UDim.new(0, DefaultTextContentPadding)
+					}),
+					Title = if not v35 then nil else React.createElement(NotificationStyledText, v35),
+					Subtitle = if not v36 then nil else React.createElement(NotificationStyledText, v36)
+				}),
+				Timestamp = if not v38 then nil else React.createElement(NotificationStyledText, v38),
+				MetaActionsButton = if not openMetaActions or readOnly then nil else React.createElement(IconButton, {
+					layoutOrder = 3,
+					anchorPoint = Vector2.new(1, 0),
+					position = UDim2.new(1, 0, 0, 0),
+					size = UDim2.fromOffset(0, 0),
+					iconSize = IconSize.Medium,
+					icon = v17,
+					onActivated = function() -- line: 172
+						-- upvalues: openMetaActions (copy), notificationPayload (copy)
+						openMetaActions(notificationPayload)
+					end
+				})
+			}),
+			NotificationActionsFrame = if readOnly then nil else React.createElement(NotificationActionsFrame)
+		})
+	})
+end

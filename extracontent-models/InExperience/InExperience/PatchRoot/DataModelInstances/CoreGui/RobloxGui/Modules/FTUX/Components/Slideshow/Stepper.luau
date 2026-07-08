@@ -1,38 +1,41 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.LuauPolyfill);
-return function(v3) --[[ Line: 11 ]] --[[ Name: Stepper ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local l_numberOfSteps_0 = v3.numberOfSteps;
-    local l_layoutOrder_0 = v3.layoutOrder;
-    local l_numberActivated_0 = v3.numberActivated;
-    local v7 = {};
-    for v8 = 1, l_numberOfSteps_0 do
-        v7[v8] = v8;
-    end;
-    return v1.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0.9, 0, 0.12, 0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        LayoutOrder = l_layoutOrder_0
-    }, v1.createElement("UIListLayout", {
-        Padding = UDim.new(0, 10), 
-        FillDirection = Enum.FillDirection.Horizontal, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        VerticalAlignment = Enum.VerticalAlignment.Center, 
-        SortOrder = Enum.SortOrder.LayoutOrder
-    }), (v2.Array.map(v7, function(_, v10) --[[ Line: 37 ]]
-        -- upvalues: v1 (ref), l_numberActivated_0 (copy), l_numberOfSteps_0 (copy)
-        return v1.createElement("Frame", {
-            LayoutOrder = v10, 
-            BackgroundTransparency = v10 <= l_numberActivated_0 and 0 or 0.7, 
-            Size = UDim2.new(1 / l_numberOfSteps_0, 0, 0.5, 0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        }, {
-            v1.createElement("UICorner", {
-                CornerRadius = UDim.new(0.5, 0)
-            })
-        });
-    end)));
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local LuauPolyfill = require(CorePackages.Packages.LuauPolyfill)
+
+local function Stepper(t1: {[any]: any}) -- line: 11
+	-- upvalues: React (copy), LuauPolyfill (copy)
+	local numberOfSteps = t1.numberOfSteps
+	local layoutOrder = t1.layoutOrder
+	local numberActivated = t1.numberActivated
+	local t2 = {}
+
+	for i = 1, numberOfSteps do
+		t2[i] = i
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.9, 0, 0.12, 0),
+		Position = UDim2.new(0, 0, 0, 0),
+		LayoutOrder = layoutOrder
+	}, React.createElement("UIListLayout", {
+		Padding = UDim.new(0, 10),
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	}), (LuauPolyfill.Array.map(t2, function(_, p2) -- line: 37
+		-- upvalues: React (copy), numberActivated (copy), numberOfSteps (copy)
+		return React.createElement("Frame", {
+			LayoutOrder = p2,
+			BackgroundTransparency = not (p2 <= numberActivated) and 0.7 or 0,
+			Size = UDim2.new(1 / numberOfSteps, 0, 0.5, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		}, { React.createElement("UICorner", {
+			CornerRadius = UDim.new(0.5, 0)
+		}) })
+	end)))
+end
+
+return Stepper

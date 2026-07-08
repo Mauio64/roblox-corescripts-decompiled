@@ -1,38 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-return function() --[[ Line: 5 ]] --[[ Name: useTagsState ]]
-    -- upvalues: v1 (copy)
-    local v2, v3 = v1.useState({});
-    return v2, (v1.useCallback(function(...) --[[ Line: 8 ]]
-        -- upvalues: v3 (copy)
-        local v4 = {};
-        for _, v6 in {
-            ...
-        } do
-            for _, v8 in (string.split(v6, " ")) do
-                table.insert(v4, v8);
-            end;
-        end;
-        v3(function(v9) --[[ Line: 20 ]]
-            -- upvalues: v4 (copy)
-            local v10 = false;
-            for _, v12 in v4 do
-                if v9[v12] ~= true then
-                    v10 = true;
-                    break;
-                end;
-            end;
-            if v10 then
-                local v13 = table.clone(v9);
-                for _, v15 in v4 do
-                    v13[v15] = true;
-                end;
-                return v13;
-            else
-                return v9;
-            end;
-        end);
-    end, {
-        v3
-    }));
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+
+local function useTagsState() -- line: 5
+	-- upvalues: React (copy)
+	local v4, v5 = React.useState({})
+
+	return v4, (React.useCallback(function(...) -- line: 8
+		-- upvalues: v5 (copy)
+		local t1 = {}
+
+		for _, v8 in { ... } do
+			for _, v10 in (string.split(v8, " ")) do
+				table.insert(t1, v10)
+			end
+		end
+
+		v5(function(p1) -- line: 20
+			-- upvalues: t1 (copy)
+			local v12 = false
+
+			for _, v14 in t1 do
+				if p1[v14] ~= true then
+					v12 = true
+
+					break
+				end
+			end
+
+			if v12 then
+				local v15 = table.clone(p1)
+
+				for _, v17 in t1 do
+					v15[v17] = true
+				end
+
+				return v15
+			end
+
+			return p1
+		end)
+	end, { v5 }))
+end
+
+return useTagsState

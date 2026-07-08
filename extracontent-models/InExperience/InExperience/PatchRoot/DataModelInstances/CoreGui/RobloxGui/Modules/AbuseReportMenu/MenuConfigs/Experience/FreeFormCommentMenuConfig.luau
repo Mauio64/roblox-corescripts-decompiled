@@ -1,21 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v2 = require(l_script_FirstAncestor_0.Components.Constants);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+
 return {
-    componentType = "freeComments", 
-    getIsVisible = function(_) --[[ Line: 7 ]] --[[ Name: getIsVisible ]]
-        return true;
-    end, 
-    onUpdate = function(v4, _, v6, v7) --[[ Line: 10 ]] --[[ Name: onUpdate ]]
-        -- upvalues: v2 (copy)
-        v7.analyticsDispatch({
-            type = v2.AnalyticsActions.SetCommentAdded, 
-            commentAdded = #v4 > 0
-        });
-        v6({
-            type = v2.PlayerMenuActions.UpdateComment, 
-            comment = v4
-        });
-    end, 
-    componentName = "FreeComments"
-};
+	componentType = "freeComments",
+	componentName = "FreeComments",
+	getIsVisible = function(_) -- line: 7
+		return true
+	end,
+	onUpdate = function(s1: string, _, p3, p4) -- line: 10
+		-- upvalues: Constants (copy)
+		p4.analyticsDispatch({
+			type = Constants.AnalyticsActions.SetCommentAdded,
+			commentAdded = #s1 > 0
+		})
+		p3({
+			type = Constants.PlayerMenuActions.UpdateComment,
+			comment = s1
+		})
+	end
+}

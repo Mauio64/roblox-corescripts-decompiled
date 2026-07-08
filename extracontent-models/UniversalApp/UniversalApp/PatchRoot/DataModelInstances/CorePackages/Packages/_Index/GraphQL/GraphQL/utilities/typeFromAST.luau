@@ -1,30 +1,41 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_inspect_0 = require(l_Parent_0.jsutils.inspect).inspect;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_language_0 = l_Parent_0.language;
-local _ = require(l_language_0.ast);
-local l_Kind_0 = require(l_Parent_0.language.kinds).Kind;
-local v6 = require(l_Parent_0.type.definition);
-local l_GraphQLList_0 = v6.GraphQLList;
-local l_GraphQLNonNull_0 = v6.GraphQLNonNull;
-local l_type_0 = l_Parent_0.type;
-local _ = require(l_type_0.schema);
-local function v11(v12, v13) --[[ Line: 33 ]] --[[ Name: typeFromAST ]]
-    -- upvalues: l_Kind_0 (copy), v11 (copy), l_GraphQLList_0 (copy), l_GraphQLNonNull_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy)
-    local v14 = nil;
-    if v13.kind == l_Kind_0.LIST_TYPE then
-        v14 = v11(v12, v13.type);
-        return v14 and l_GraphQLList_0.new(v14);
-    elseif v13.kind == l_Kind_0.NON_NULL_TYPE then
-        v14 = v11(v12, v13.type);
-        return v14 and l_GraphQLNonNull_0.new(v14);
-    elseif v13.kind == l_Kind_0.NAMED_TYPE then
-        return v12:getType(v13.name.value);
-    else
-        l_invariant_0(false, "Unexpected type node: " .. l_inspect_0(v13));
-        return nil;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local inspect = require(ParentParent.jsutils.inspect).inspect
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local language = ParentParent.language
+
+require(language.ast)
+
+local Kind = require(ParentParent.language.kinds).Kind
+local definition = require(ParentParent.type.definition)
+local GraphQLList = definition.GraphQLList
+local GraphQLNonNull = definition.GraphQLNonNull
+local type = ParentParent.type
+
+require(type.schema)
+
+local function typeFromAST(p1, p2) -- line: 33
+	-- upvalues: Kind (copy), typeFromAST (copy), GraphQLList (copy), GraphQLNonNull (copy), invariant (copy), inspect (copy)
+	if p2.kind == Kind.LIST_TYPE then
+		local v13 = typeFromAST(p1, p2.type)
+
+		return v13 and GraphQLList.new(v13)
+	end
+
+	if p2.kind == Kind.NON_NULL_TYPE then
+		local v14 = typeFromAST(p1, p2.type)
+
+		return v14 and GraphQLNonNull.new(v14)
+	end
+
+	if p2.kind == Kind.NAMED_TYPE then
+		return p1:getType(p2.name.value)
+	end
+
+	invariant(false, "Unexpected type node: " .. inspect(p2))
+
+	return nil
+end
+
 return {
-    typeFromAST = v11
-};
+	typeFromAST = typeFromAST
+}

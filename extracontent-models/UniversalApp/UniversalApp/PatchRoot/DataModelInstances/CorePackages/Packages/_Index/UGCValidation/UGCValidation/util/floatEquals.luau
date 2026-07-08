@@ -1,3 +1,5 @@
-return function(v0, v1, v2) --[[ Line: 3 ]] --[[ Name: floatEquals ]]
-    return (v2 or 1.0E-12) >= math.abs(v0 - v1);
-end;
+local function floatEquals(n1: number, n2: number, n3: number?) -- line: 3
+	return (n3 or 1E-12) >= math.abs(n1 - n2)
+end
+
+return floatEquals

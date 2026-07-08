@@ -1,5 +1,6 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)("RenderOnFailedStyle", {
-    "EmptyStatePage", 
-    "RetryButton"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)("RenderOnFailedStyle", {
+	"EmptyStatePage",
+	"RetryButton"
+})

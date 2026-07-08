@@ -1,222 +1,216 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = require(l_Parent_0.Foundation);
-local l_View_0 = v3.View;
-local l_IconSize_0 = v3.Enums.IconSize;
-local l_IconButton_0 = v3.IconButton;
-local l_Text_0 = v3.Text;
-local l_Button_0 = v3.Button;
-local l_ButtonSize_0 = v3.Enums.ButtonSize;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_FillBehavior_0 = v3.Enums.FillBehavior;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v13 = {
-    stiffness = 400, 
-    damping = 40, 
-    mass = 1, 
-    restingPositionLimit = 0.5, 
-    restingVelocityLimit = 0.1
-};
-local function _(v14) --[[ Line: 53 ]] --[[ Name: isFullWidth ]]
-    return v14 < 540;
-end;
-local function v17(v16) --[[ Line: 57 ]] --[[ Name: getAnchorPoint ]]
-    if v16.X < 540 then
-        return Vector2.new(0.5, 1);
-    else
-        return Vector2.new(0, 0);
-    end;
-end;
-local function v21(v18, v19, v20) --[[ Line: 65 ]] --[[ Name: getSize ]]
-    if v18.X < 540 then
-        return UDim2.new(0, v18.X, 0, v20);
-    else
-        return UDim2.new(0, v19, 0, v18.Y);
-    end;
-end;
-local function v24(v22, v23) --[[ Line: 73 ]] --[[ Name: getPosition ]]
-    if v22.X < 540 then
-        return UDim2.new(0.5, 0, 1, 0);
-    else
-        return UDim2.new(1, -v23, 0, 0);
-    end;
-end;
-return function(v25) --[[ Line: 81 ]] --[[ Name: SideModal ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v17 (copy), v21 (copy), v24 (copy), v2 (copy), v13 (copy), l_View_0 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Text_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_ButtonSize_0 (copy), l_FillBehavior_0 (copy)
-    local v26 = l_useTokens_0();
-    local v27, v28 = v1.useState(v17(v25.screenSize));
-    local v29, v30 = v1.useState(v21(v25.screenSize, v25.width, v25.height));
-    local v31, v32 = v1.useState(v24(v25.screenSize, v25.width));
-    local v33, v34 = v1.useState(true);
-    local v35, v36 = v1.useState(false);
-    local v37 = v1.useMemo(function() --[[ Line: 90 ]]
-        -- upvalues: v25 (copy)
-        if v25.footerContent then
-            return (v25.footerContent());
-        else
-            return nil;
-        end;
-    end, {
-        v25.footerContent
-    });
-    local v38 = v37 and 35 or 0;
-    local v39, v40 = v2.useAnimatedBinding(1, function() --[[ Line: 95 ]]
-        -- upvalues: v33 (copy), v35 (copy), v25 (copy)
-        if not v33 then
-            if v35 then
-                if v25.buttonProps then
-                    v25.buttonProps.onActivated();
-                    return;
-                end;
-            elseif v25.onAbandon then
-                v25.onAbandon();
-            end;
-        end;
-    end);
-    local v41 = v1.useMemo(function() --[[ Line: 110 ]]
-        -- upvalues: v33 (copy)
-        if v33 then
-            return 0;
-        else
-            return 1;
-        end;
-    end, {
-        v33
-    });
-    v1.useEffect(function() --[[ Line: 114 ]]
-        -- upvalues: v25 (copy), v34 (copy)
-        if v25.closeWithAnimation then
-            v34(false);
-        end;
-    end, {
-        v25.closeWithAnimation
-    });
-    v1.useEffect(function() --[[ Line: 120 ]]
-        -- upvalues: v40 (copy), v2 (ref), v41 (copy), v13 (ref)
-        v40(v2.spring(v41, v13));
-    end, {
-        v41
-    });
-    v1.useEffect(function() --[[ Line: 124 ]]
-        -- upvalues: v28 (copy), v17 (ref), v25 (copy), v30 (copy), v21 (ref), v32 (copy), v24 (ref)
-        v28(v17(v25.screenSize));
-        v30(v21(v25.screenSize, v25.width, v25.height));
-        v32(v24(v25.screenSize, v25.width));
-    end, {
-        v25.screenSize
-    });
-    local v42 = v1.useCallback(function() --[[ Line: 130 ]]
-        -- upvalues: v34 (copy)
-        v34(false);
-    end, {
-        v34
-    });
-    local v43 = v1.useCallback(function() --[[ Line: 134 ]]
-        -- upvalues: v25 (copy), v36 (copy), v34 (copy)
-        if v25.buttonProps and v25.buttonProps.validateState and not v25.buttonProps.validateState() then
-            return;
-        else
-            v36(true);
-            v34(false);
-            return;
-        end;
-    end, {
-        v34, 
-        v36, 
-        v25.buttonProps
-    });
-    return v1.createElement("TextButton", {
-        AutoButtonColor = false, 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = v39:map(function(v44) --[[ Line: 148 ]]
-            return v44 + 0.3;
-        end), 
-        BackgroundColor3 = Color3.fromHex("#000000"), 
-        Text = "", 
-        Size = UDim2.new(1, 0, 1, 0), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        [v1.Event.Activated] = v42
-    }, {
-        SideModalContainer = v1.createElement(l_View_0, {
-            AnchorPoint = Vector2.new(1, 0), 
-            Position = v39:map(function(v45) --[[ Line: 160 ]]
-                -- upvalues: v25 (copy)
-                if v25.screenSize.X < 540 then
-                    return (UDim2.new(1, 0, 0, v25.height * v45));
-                else
-                    return (UDim2.new(1, v25.width * v45, 0, 0));
-                end;
-            end), 
-            tag = "size-full"
-        }, {
-            SideModal = v1.createElement(l_View_0, {
-                AnchorPoint = v27, 
-                Position = v31, 
-                Size = v29, 
-                tag = "bg-surface-300 radius-medium col"
-            }, {
-                IconRow = v1.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 0, 32), 
-                    tag = "padding-left-medium", 
-                    LayoutOrder = 0
-                }, {
-                    IconButton = v1.createElement(l_IconButton_0, {
-                        icon = "icons/navigation/pushBack", 
-                        size = l_IconSize_0.Medium, 
-                        tag = "anchor-center-left position-center-left", 
-                        onActivated = v42
-                    })
-                }), 
-                TitleRow = v1.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 0, 32), 
-                    tag = "auto-xy", 
-                    LayoutOrder = 1
-                }, {
-                    Title = v1.createElement(l_Text_0, {
-                        fontStyle = v26.Typography.TitleLarge, 
-                        textStyle = v26.Color.Content.Emphasis, 
-                        Text = v25.title, 
-                        TextWrapped = true, 
-                        Size = UDim2.new(1, 0, 0, 32), 
-                        tag = "auto-xy"
-                    })
-                }), 
-                Content = v1.createElement(l_View_0, {
-                    ClipsDescendants = true, 
-                    Size = if v25.buttonProps then UDim2.new(1, 0, 1, -116 - v38) else UDim2.new(1, 0, 1, -84 - v38), 
-                    tag = "padding-x-medium", 
-                    LayoutOrder = 2
-                }, {
-                    MiddleContent = v1.createElement(l_View_0, {
-                        tag = "size-full"
-                    }, v25.children)
-                }), 
-                ButtonRow = v25.buttonProps and v1.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 0, 32), 
-                    tag = "padding-x-medium padding-bottom-medium", 
-                    LayoutOrder = 3
-                }, {
-                    Button = v1.createElement(l_Button_0, {
-                        text = v25.buttonProps.text, 
-                        variant = l_ButtonVariant_0.Emphasis, 
-                        onActivated = v43, 
-                        isDisabled = false, 
-                        size = l_ButtonSize_0.Small, 
-                        fillBehavior = l_FillBehavior_0.Fill
-                    })
-                }), 
-                BottomFrame = if v25.footerContent then v1.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 0, 32), 
-                    tag = "padding-x-medium padding-bottom-medium", 
-                    LayoutOrder = 4, 
-                    BackgroundTransparency = 1, 
-                    AutomaticSize = Enum.AutomaticSize.Y
-                }, {
-                    FooterContent = v37
-                }) else nil
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local IconSize = Foundation.Enums.IconSize
+local IconButton = Foundation.IconButton
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local ButtonSize = Foundation.Enums.ButtonSize
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local useTokens = Foundation.Hooks.useTokens
+local t1 = {
+	stiffness = 400,
+	damping = 40,
+	mass = 1,
+	restingPositionLimit = 0.5,
+	restingVelocityLimit = 0.1
+}
+
+local function isFullWidth(n1: number) -- line: 53
+	return n1 < 540
+end
+local function getAnchorPoint(vector2: Vector2) -- line: 57
+	if vector2.X < 540 then
+		return Vector2.new(0.5, 1)
+	end
+
+	return Vector2.new(0, 0)
+end
+local function getSize(vector2: Vector2, n2: number, n3: number) -- line: 65
+	if vector2.X < 540 then
+		return UDim2.new(0, vector2.X, 0, n3)
+	end
+
+	return UDim2.new(0, n2, 0, vector2.Y)
+end
+local function getPosition(vector2: Vector2, n4: number) -- line: 73
+	if vector2.X < 540 then
+		return UDim2.new(0.5, 0, 1, 0)
+	end
+
+	return UDim2.new(1, -n4, 0, 0)
+end
+local function SideModal(t2: {[any]: any}) -- line: 81
+	-- upvalues: useTokens (copy), React (copy), getAnchorPoint (copy), getSize (copy), getPosition (copy), ReactOtter (copy), t1 (copy), View (copy), IconButton (copy), IconSize (copy), FoundationText (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy), FillBehavior (copy)
+	local v28 = useTokens()
+	local v29, v30 = React.useState(getAnchorPoint(t2.screenSize))
+	local v31, v32 = React.useState(getSize(t2.screenSize, t2.width, t2.height))
+	local v33, v34 = React.useState(getPosition(t2.screenSize, t2.width))
+	local v35, v36 = React.useState(true)
+	local v37, v38 = React.useState(false)
+	local v39 = React.useMemo(function() -- line: 90
+		-- upvalues: t2 (copy)
+		if t2.footerContent then
+			return (t2.footerContent())
+		end
+
+		return nil
+	end, { t2.footerContent })
+	local v40 = not v39 and 0 or 35
+	local v41, v42 = ReactOtter.useAnimatedBinding(1, function() -- line: 95
+		-- upvalues: v35 (copy), v37 (copy), t2 (copy)
+		if not v35 then
+			if v37 then
+				if t2.buttonProps then
+					t2.buttonProps.onActivated()
+
+					return
+				end
+			elseif t2.onAbandon then
+				t2.onAbandon()
+			end
+		end
+	end)
+	local v43 = React.useMemo(function() -- line: 110
+		-- upvalues: v35 (copy)
+		if v35 then
+			return 0
+		end
+
+		return 1
+	end, { v35 })
+
+	React.useEffect(function() -- line: 114
+		-- upvalues: t2 (copy), v36 (copy)
+		if t2.closeWithAnimation then
+			v36(false)
+		end
+	end, { t2.closeWithAnimation })
+	React.useEffect(function() -- line: 120
+		-- upvalues: v42 (copy), ReactOtter (copy), v43 (copy), t1 (copy)
+		v42(ReactOtter.spring(v43, t1))
+	end, { v43 })
+	React.useEffect(function() -- line: 124
+		-- upvalues: v30 (copy), getAnchorPoint (copy), t2 (copy), v32 (copy), getSize (copy), v34 (copy), getPosition (copy)
+		v30(getAnchorPoint(t2.screenSize))
+		v32(getSize(t2.screenSize, t2.width, t2.height))
+		v34(getPosition(t2.screenSize, t2.width))
+	end, { t2.screenSize })
+
+	local v44 = React.useCallback(function() -- line: 130
+		-- upvalues: v36 (copy)
+		v36(false)
+	end, { v36 })
+	local v45 = React.useCallback(function() -- line: 134
+		-- upvalues: t2 (copy), v38 (copy), v36 (copy)
+		if t2.buttonProps and (t2.buttonProps.validateState and not t2.buttonProps.validateState()) then
+			return
+		end
+
+		v38(true)
+		v36(false)
+	end, {
+		v36,
+		v38,
+		t2.buttonProps
+	})
+
+	return React.createElement("TextButton", {
+		AutoButtonColor = false,
+		BorderSizePixel = 0,
+		BackgroundTransparency = v41:map(function(n5: number) -- line: 148
+			return n5 + 0.3
+		end),
+		BackgroundColor3 = Color3.fromHex("#000000"),
+		Text = "",
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		[React.Event.Activated] = v44
+	}, {
+		SideModalContainer = React.createElement(View, {
+			tag = "size-full",
+			AnchorPoint = Vector2.new(1, 0),
+			Position = v41:map(function(n6: number) -- line: 160
+				-- upvalues: t2 (copy)
+				if t2.screenSize.X < 540 then
+					return (UDim2.new(1, 0, 0, t2.height * n6))
+				end
+
+				return (UDim2.new(1, t2.width * n6, 0, 0))
+			end)
+		}, {
+			SideModal = React.createElement(View, {
+				tag = "bg-surface-300 radius-medium col",
+				AnchorPoint = v29,
+				Position = v33,
+				Size = v31
+			}, {
+				IconRow = React.createElement(View, {
+					tag = "padding-left-medium",
+					LayoutOrder = 0,
+					Size = UDim2.new(1, 0, 0, 32)
+				}, {
+					IconButton = React.createElement(IconButton, {
+						icon = "icons/navigation/pushBack",
+						tag = "anchor-center-left position-center-left",
+						size = IconSize.Medium,
+						onActivated = v44
+					})
+				}),
+				TitleRow = React.createElement(View, {
+					tag = "auto-xy",
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 0, 32)
+				}, {
+					Title = React.createElement(FoundationText, {
+						TextWrapped = true,
+						tag = "auto-xy",
+						fontStyle = v28.Typography.TitleLarge,
+						textStyle = v28.Color.Content.Emphasis,
+						Text = t2.title,
+						Size = UDim2.new(1, 0, 0, 32)
+					})
+				}),
+				Content = React.createElement(View, {
+					ClipsDescendants = true,
+					tag = "padding-x-medium",
+					LayoutOrder = 2,
+					Size = if not t2.buttonProps then UDim2.new(1, 0, 1, -84 - v40) else UDim2.new(1, 0, 1, -116 - v40)
+				}, {
+					MiddleContent = React.createElement(View, {
+						tag = "size-full"
+					}, t2.children)
+				}),
+				ButtonRow = t2.buttonProps and React.createElement(View, {
+					tag = "padding-x-medium padding-bottom-medium",
+					LayoutOrder = 3,
+					Size = UDim2.new(1, 0, 0, 32)
+				}, {
+					Button = React.createElement(Button, {
+						isDisabled = false,
+						text = t2.buttonProps.text,
+						variant = ButtonVariant.Emphasis,
+						onActivated = v45,
+						size = ButtonSize.Small,
+						fillBehavior = FillBehavior.Fill
+					})
+				}),
+				BottomFrame = if not t2.footerContent then nil else React.createElement(View, {
+					tag = "padding-x-medium padding-bottom-medium",
+					LayoutOrder = 4,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 32),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					FooterContent = v39
+				})
+			})
+		})
+	})
+end
+
+return SideModal

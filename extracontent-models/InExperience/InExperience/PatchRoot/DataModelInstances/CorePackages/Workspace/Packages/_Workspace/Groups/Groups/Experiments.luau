@@ -1,3 +1,5 @@
+local _script = script
+
 return {
-    CommunityListExperimentation = require(script.CommunityListExperimentation)
-};
+	CommunityListExperimentation = require(_script.CommunityListExperimentation)
+}

@@ -1,29 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_StyledTextLabel_0 = require(l_Parent_0.UIBlox).App.Text.StyledTextLabel;
-local v4 = require(script.Parent.LineItemLayout);
-return function(v5) --[[ Line: 16 ]] --[[ Name: ItemListHeader ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy), v4 (copy), l_StyledTextLabel_0 (copy)
-    local v6 = l_useDesignTokens_0();
-    local v7 = {
-        LineHeight = v6.Semantic.Typography.Body.LineHeight, 
-        Font = v6.Semantic.Typography.Subheader.Font, 
-        FontSize = v6.Semantic.Typography.Body.FontSize, 
-        LetterSpacing = v6.Semantic.Typography.Body.LetterSpacing
-    };
-    local l_Emphasis_0 = v6.Semantic.Color.Text.Emphasis;
-    return v1.createElement(v4, {
-        startSlot = v1.createElement(l_StyledTextLabel_0, {
-            fontStyle = v7, 
-            colorStyle = l_Emphasis_0, 
-            text = v5.heading
-        }), 
-        endSlot = v1.createElement(l_StyledTextLabel_0, {
-            fontStyle = v7, 
-            colorStyle = l_Emphasis_0, 
-            text = v5.itemCount
-        }), 
-        LayoutOrder = v5.LayoutOrder
-    });
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local useDesignTokens = require(Parent.Style).useDesignTokens
+local UIBlox = require(Parent.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local LineItemLayout = require(script.Parent.LineItemLayout)
+
+local function ItemListHeader(t1: {[any]: any}) -- line: 19
+	-- upvalues: useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), React (copy), LineItemLayout (copy), StyledTextLabel (copy)
+	local v10 = useDesignTokens()
+	local t2 = {
+		LineHeight = if not FFlagRenameDeprecatedUIBloxTokens then v10.Semantic.Typography.Body.LineHeight else v10.Typography.BodyLarge.LineHeight,
+		Font = if not FFlagRenameDeprecatedUIBloxTokens then v10.Semantic.Typography.Subheader.Font else v10.Typography.TitleLarge.Font,
+		FontSize = if not FFlagRenameDeprecatedUIBloxTokens then v10.Semantic.Typography.Body.FontSize else v10.Typography.BodyLarge.FontSize,
+		LetterSpacing = if not FFlagRenameDeprecatedUIBloxTokens then v10.Semantic.Typography.Body.LetterSpacing else v10.Typography.BodyLarge.LetterSpacing
+	}
+	local v12 = if not FFlagRenameDeprecatedUIBloxTokens then v10.Semantic.Color.Text.Emphasis else v10.Color.Content.Emphasis
+
+	return React.createElement(LineItemLayout, {
+		startSlot = React.createElement(StyledTextLabel, {
+			fontStyle = t2,
+			colorStyle = v12,
+			text = t1.heading
+		}),
+		endSlot = React.createElement(StyledTextLabel, {
+			fontStyle = t2,
+			colorStyle = v12,
+			text = t1.itemCount
+		}),
+		LayoutOrder = t1.LayoutOrder
+	})
+end
+
+return ItemListHeader

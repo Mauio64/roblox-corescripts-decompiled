@@ -1,2 +1,3 @@
-local l__Workspace_0 = script.Parent.Parent.Parent._Workspace;
-return (require(l__Workspace_0.ArgCheck.ArgCheck));
+local _Workspace = script.Parent.Parent.Parent._Workspace
+
+return (require(_Workspace.ArgCheck.ArgCheck))

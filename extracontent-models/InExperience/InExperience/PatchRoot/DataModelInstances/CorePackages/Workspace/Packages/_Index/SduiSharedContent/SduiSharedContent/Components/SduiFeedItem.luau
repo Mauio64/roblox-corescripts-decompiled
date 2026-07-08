@@ -1,20 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useImpressionsTagger_0 = require(l_Parent_0.Impressions).useImpressionsTagger;
-return v1.memo(function(v3) --[[ Line: 17 ]] --[[ Name: SduiFeedItem ]]
-    -- upvalues: v1 (copy), l_useImpressionsTagger_0 (copy)
-    local v4 = v1.useRef(nil);
-    l_useImpressionsTagger_0(v4, v3.impressionsTag, v3.index);
-    return v1.createElement("Frame", {
-        ref = v4, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        SelectionGroup = true, 
-        SelectionBehaviorLeft = v3.selectionBehaviorLeft, 
-        SelectionBehaviorRight = v3.selectionBehaviorRight, 
-        LayoutOrder = v3.layoutOrder, 
-        ZIndex = v3.zIndex
-    }, v3.children);
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local useImpressionsTagger = require(Parent.Impressions).useImpressionsTagger
+
+local function SduiFeedItem(t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy), useImpressionsTagger (copy)
+	local v6 = React.useRef(nil)
+
+	useImpressionsTagger(v6, t1.impressionsTag, t1.index)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		SelectionGroup = true,
+		ref = v6,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		SelectionBehaviorLeft = t1.selectionBehaviorLeft,
+		SelectionBehaviorRight = t1.selectionBehaviorRight,
+		LayoutOrder = t1.layoutOrder,
+		ZIndex = t1.zIndex
+	}, t1.children)
+end
+
+return React.memo(SduiFeedItem)

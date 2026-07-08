@@ -1,18 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-return v1.memo(function(v2) --[[ Line: 13 ]] --[[ Name: StyleRule ]]
-    -- upvalues: v1 (copy)
-    local v4 = v1.useCallback(function(v3) --[[ Line: 14 ]]
-        -- upvalues: v2 (copy)
-        if v3 ~= nil then
-            v3:SetProperties(v2.properties);
-        end;
-    end, {
-        v2.properties
-    });
-    return v1.createElement("StyleRule", {
-        Priority = v2.Priority or 1, 
-        Selector = v2.Selector, 
-        ref = v4
-    });
-end);
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+
+local function StyleRule(t1: {[any]: any}) -- line: 13
+	-- upvalues: React (copy)
+	local v5 = React.useCallback(function(p1) -- line: 14
+		-- upvalues: t1 (copy)
+		if p1 ~= nil then
+			p1:SetProperties(t1.properties)
+		end
+	end, { t1.properties })
+
+	return React.createElement("StyleRule", {
+		Priority = t1.Priority or 1,
+		Selector = t1.Selector,
+		ref = v5
+	})
+end
+
+return React.memo(StyleRule)

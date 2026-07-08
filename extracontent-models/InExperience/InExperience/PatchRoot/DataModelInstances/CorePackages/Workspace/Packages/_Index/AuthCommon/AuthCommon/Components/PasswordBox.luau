@@ -1,313 +1,336 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.RoactRodux);
-local v4 = require(l_Parent_0.RoactAppExperiment);
-local v5 = require(l_Parent_0.Roact);
-local v6 = require(l_Parent_0.UIBlox);
-local l_withStyle_0 = v6.Style.withStyle;
-local l_ImageSetLabel_0 = v6.Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local v10 = require(l_script_FirstAncestor_0.Utils.AreaTest);
-local l_withSelectionCursorProvider_0 = v6.App.SelectionImage.withSelectionCursorProvider;
-local l_CursorKind_0 = v6.App.SelectionImage.CursorKind;
-local l_OpenTypeSupport_0 = v6.Utility.OpenTypeSupport;
-local l_GetFFlagLuaAppFixSelectionCursor_0 = require(l_Parent_0.SharedFlags).GetFFlagLuaAppFixSelectionCursor;
-local l_GetFFlagEnableTextFieldContentType_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableTextFieldContentType;
-local l_GetFFlagLuaAppEnableOpenTypeSupport_0 = require(l_Parent_0.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport;
-local v17 = game:DefineFastFlag("EnableKeyboardVisibilityCheckOnPasswordFocus", false);
-local l_game_EngineFeature_0 = game:GetEngineFeature("EnableAndroidPasswordSuggestion");
-local l_FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass_0 = require(l_Parent_0.SharedFlags).FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass;
-local l_FStringLuaMultiPageSignupIxpLayer_0 = require(l_Parent_0.SharedFlags).FStringLuaMultiPageSignupIxpLayer;
-local v21 = v5.PureComponent:extend("PasswordBox");
-v21.init = function(v22) --[[ Line: 47 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), v10 (copy), v17 (copy), l_UserInputService_0 (copy)
-    v22.state = {
-        hidePassword = true, 
-        containerSize = Vector2.new(0, 0)
-    };
-    v22.getHidePassword = function() --[[ Line: 54 ]]
-        -- upvalues: v22 (copy)
-        if v22.props.hidePassword ~= nil then
-            return v22.props.hidePassword;
-        else
-            return v22.state.hidePassword;
-        end;
-    end;
-    v22.isMounted = false;
-    v22.passwordBoxRef = v5.createRef();
-    local v23 = v5.createRef();
-    v22.getPasswordTextBoxRef = function() --[[ Line: 66 ]]
-        -- upvalues: v22 (copy), v23 (copy)
-        return v22.props.TextBoxRef or v23;
-    end;
-    v22.isTouchPositionInPasswordBox = function(v24) --[[ Line: 70 ]]
-        -- upvalues: v22 (copy), v10 (ref)
-        if not v22.passwordBoxRef.current then
-            return false;
-        else
-            local l_AbsolutePosition_0 = v22.passwordBoxRef.current.AbsolutePosition;
-            local l_AbsoluteSize_0 = v22.passwordBoxRef.current.AbsoluteSize;
-            return v10.IsPointInRect(Rect.new(l_AbsolutePosition_0, l_AbsolutePosition_0 + l_AbsoluteSize_0), v24);
-        end;
-    end;
-    v22.tapBeganInTextbox = false;
-    v22.tapEventBegan = function(v27, _) --[[ Line: 84 ]]
-        -- upvalues: v22 (copy), v17 (ref), l_UserInputService_0 (ref)
-        if v22.props.CentralOverlayBlocksInput and v22.props.centralOverlay and v22.props.centralOverlay.OverlayType ~= nil then
-            return;
-        elseif v17 and not l_UserInputService_0.OnScreenKeyboardVisible then
-            return;
-        else
-            v22.tapBeganInTextbox = v22.isTouchPositionInPasswordBox(v27);
-            local l_current_0 = v22.getPasswordTextBoxRef().current;
-            local l_l_UserInputService_0_FocusedTextBox_0 = l_UserInputService_0:GetFocusedTextBox();
-            if l_current_0 and l_l_UserInputService_0_FocusedTextBox_0 ~= l_current_0 and v22.tapBeganInTextbox and v22.props.CaptureFocusOnTapStart then
-                if l_l_UserInputService_0_FocusedTextBox_0 then
-                    l_l_UserInputService_0_FocusedTextBox_0:ReleaseFocus();
-                end;
-                l_current_0:CaptureFocus();
-            end;
-            return;
-        end;
-    end;
-    v22.tapEventEnded = function(v31, _) --[[ Line: 118 ]]
-        -- upvalues: v22 (copy), l_UserInputService_0 (ref)
-        if v22.tapBeganInTextbox then
-            v22.tapBeganInTextbox = false;
-            return;
-        else
-            local l_l_UserInputService_0_FocusedTextBox_1 = l_UserInputService_0:GetFocusedTextBox();
-            local l_current_1 = v22.getPasswordTextBoxRef().current;
-            if not l_l_UserInputService_0_FocusedTextBox_1 or l_l_UserInputService_0_FocusedTextBox_1 ~= l_current_1 then
-                return;
-            else
-                if not v22.isTouchPositionInPasswordBox(v31) then
-                    l_current_1:ReleaseFocus();
-                end;
-                return;
-            end;
-        end;
-    end;
-    v22.onAbsoluteSizeChanged = function(v35) --[[ Line: 136 ]]
-        -- upvalues: v22 (copy)
-        local l_containerSize_0 = v22.state.containerSize;
-        local l_AbsoluteSize_1 = v35.AbsoluteSize;
-        if l_AbsoluteSize_1.X > 0 and l_AbsoluteSize_1.Y > 0 and l_containerSize_0 ~= l_AbsoluteSize_1 then
-            spawn(function() --[[ Line: 142 ]]
-                -- upvalues: v22 (ref), l_AbsoluteSize_1 (copy)
-                if v22.isMounted then
-                    v22:setState({
-                        containerSize = l_AbsoluteSize_1
-                    });
-                end;
-            end);
-        end;
-    end;
-    v22.onTogglerActivated = function(_) --[[ Line: 152 ]]
-        -- upvalues: v22 (copy)
-        local l_onToggleCallback_0 = v22.props.onToggleCallback;
-        local v40 = v22.getHidePassword();
-        if l_onToggleCallback_0 then
-            l_onToggleCallback_0(v40);
-        end;
-        if v22.isMounted then
-            v22:setState({
-                hidePassword = not v40
-            });
-        end;
-    end;
-    v22.shouldTakeInput = function(v41) --[[ Line: 167 ]]
-        -- upvalues: v22 (copy)
-        if v22.props.Disabled then
-            return false;
-        else
-            local v42 = true;
-            if v41.UserInputType ~= Enum.UserInputType.MouseButton1 then
-                v42 = v41.UserInputType == Enum.UserInputType.Touch;
-            end;
-            return not v22.props.ManualFocusRelease and v42;
-        end;
-    end;
-end;
-v21.defaultProps = {
-    TextXAlignment = Enum.TextXAlignment.Left, 
-    PaddingX = 10, 
-    PaddingY = 7, 
-    ClearTextOnFocus = false, 
-    IsKeyboardOverlayUsed = true
-};
-v21.didMount = function(v43) --[[ Line: 187 ]] --[[ Name: didMount ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    v43.isMounted = true;
-    if v43.props.IsKeyboardOverlayUsed then
-        v43.inputBeganConnection = l_UserInputService_0.InputBegan:connect(function(v44, v45) --[[ Line: 191 ]]
-            -- upvalues: v43 (copy)
-            if v43.shouldTakeInput(v44) then
-                v43.tapEventBegan(v44.Position, v45);
-            end;
-        end);
-        v43.inputEndedConnection = l_UserInputService_0.InputEnded:connect(function(v46, v47) --[[ Line: 197 ]]
-            -- upvalues: v43 (copy)
-            if v43.shouldTakeInput(v46) then
-                v43.tapEventEnded(v46.Position, v47);
-            end;
-        end);
-    end;
-end;
-v21.willUnmount = function(v48) --[[ Line: 205 ]] --[[ Name: willUnmount ]]
-    v48.isMounted = false;
-    if v48.props.IsKeyboardOverlayUsed then
-        if v48.inputBeganConnection then
-            v48.inputBeganConnection:disconnect();
-        end;
-        if v48.inputEndedConnection then
-            v48.inputEndedConnection:disconnect();
-        end;
-    end;
-end;
-v21.render = function(v49) --[[ Line: 217 ]] --[[ Name: render ]]
-    -- upvalues: l_GetFFlagLuaAppFixSelectionCursor_0 (copy), l_withSelectionCursorProvider_0 (copy)
-    if l_GetFFlagLuaAppFixSelectionCursor_0() then
-        return l_withSelectionCursorProvider_0(function(v50) --[[ Line: 219 ]]
-            -- upvalues: v49 (copy)
-            return v49:renderWithSelectionCursor(v50);
-        end);
-    else
-        return v49:renderWithSelectionCursor(nil);
-    end;
-end;
-v21.renderWithSelectionCursor = function(v51, v52) --[[ Line: 228 ]] --[[ Name: renderWithSelectionCursor ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), l_GetFFlagEnableTextFieldContentType_0 (copy), l_withStyle_0 (copy), l_GetFFlagLuaAppFixSelectionCursor_0 (copy), l_CursorKind_0 (copy), v5 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), l_GetFFlagLuaAppEnableOpenTypeSupport_0 (copy), l_OpenTypeSupport_0 (copy)
-    local l_Size_0 = v51.props.Size;
-    local l_Position_0 = v51.props.Position;
-    local l_LayoutOrder_0 = v51.props.LayoutOrder;
-    local l_Text_0 = v51.props.Text;
-    local l_TextSize_0 = v51.props.TextSize;
-    local l_PlaceholderText_0 = v51.props.PlaceholderText;
-    local l_TextXAlignment_0 = v51.props.TextXAlignment;
-    local l_TextColor_0 = v51.props.TextColor;
-    local l_PlaceholderColor_0 = v51.props.PlaceholderColor;
-    local l_ClearTextOnFocus_0 = v51.props.ClearTextOnFocus;
-    local l_Color_0 = v51.props.Color;
-    local l_Transparency_0 = v51.props.Transparency;
-    local l_TextTransparency_0 = v51.props.TextTransparency;
-    local l_ReturnKeyType_0 = v51.props.ReturnKeyType;
-    local l_NextSelectionDown_0 = v51.props.NextSelectionDown;
-    local l_NextSelectionLeft_0 = v51.props.NextSelectionLeft;
-    local l_NextSelectionRight_0 = v51.props.NextSelectionRight;
-    local l_NextSelectionUp_0 = v51.props.NextSelectionUp;
-    local l_PaddingX_0 = v51.props.PaddingX;
-    local l_PaddingY_0 = v51.props.PaddingY;
-    local v73 = v51.getHidePassword();
-    local l_Y_0 = v51.state.containerSize.Y;
-    local l_onFocused_0 = v51.props.onFocused;
-    local l_onFocusLost_0 = v51.props.onFocusLost;
-    local l_onMouseEnter_0 = v51.props.onMouseEnter;
-    local l_onMouseLeave_0 = v51.props.onMouseLeave;
-    local v79 = v51.props.IsNewPassword and v51.props.enablePasswordSuggestion;
-    local v80 = v79 and l_game_EngineFeature_0 and Enum.TextInputType.NewPassword or Enum.TextInputType.Password;
-    local v81 = v79 and l_game_EngineFeature_0 and Enum.TextInputType.NewPasswordShown or l_GetFFlagEnableTextFieldContentType_0() and Enum.TextInputType.PasswordShown or Enum.TextInputType.NoSuggestions;
-    return l_withStyle_0(function(v82) --[[ Line: 275 ]]
-        -- upvalues: l_GetFFlagLuaAppFixSelectionCursor_0 (ref), v52 (copy), l_CursorKind_0 (ref), v5 (ref), l_ImageSetLabel_0 (ref), l_Size_0 (copy), l_Position_0 (copy), l_LayoutOrder_0 (copy), l_GetImageData_0 (ref), l_Color_0 (copy), l_Transparency_0 (copy), v51 (copy), l_Y_0 (copy), l_Text_0 (copy), l_PlaceholderText_0 (copy), l_PlaceholderColor_0 (copy), l_GetFFlagLuaAppEnableOpenTypeSupport_0 (ref), l_OpenTypeSupport_0 (ref), l_TextSize_0 (copy), l_TextColor_0 (copy), l_TextTransparency_0 (copy), l_TextXAlignment_0 (copy), l_ClearTextOnFocus_0 (copy), v73 (copy), v80 (copy), v81 (copy), l_ReturnKeyType_0 (copy), l_NextSelectionDown_0 (copy), l_NextSelectionLeft_0 (copy), l_NextSelectionRight_0 (copy), l_NextSelectionUp_0 (copy), l_onFocused_0 (copy), l_onFocusLost_0 (copy), l_onMouseEnter_0 (copy), l_onMouseLeave_0 (copy), l_PaddingY_0 (copy), l_PaddingX_0 (copy)
-        local v83 = nil;
-        if l_GetFFlagLuaAppFixSelectionCursor_0() then
-            v83 = v52(l_CursorKind_0.InputButton);
-        end;
-        return v5.createElement(l_ImageSetLabel_0, {
-            Size = l_Size_0, 
-            Position = l_Position_0, 
-            LayoutOrder = l_LayoutOrder_0, 
-            BackgroundTransparency = 1, 
-            Image = l_GetImageData_0("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill", 
-            ImageColor3 = l_Color_0, 
-            ImageTransparency = l_Transparency_0, 
-            BorderSizePixel = 0, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(8, 8, 9, 9), 
-            [v5.Ref] = v51.passwordBoxRef, 
-            [v5.Change.AbsoluteSize] = v51.onAbsoluteSizeChanged
-        }, {
-            TextBoxContainer = v5.createElement("Frame", {
-                Size = UDim2.new(1, -l_Y_0, 1, 0), 
-                BackgroundTransparency = 1
-            }, {
-                TextBox = v5.createElement("TextBox", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Text = l_Text_0, 
-                    PlaceholderText = l_PlaceholderText_0, 
-                    PlaceholderColor3 = l_PlaceholderColor_0, 
-                    Font = v82.Font.Body.Font, 
-                    OpenTypeFeatures = if l_GetFFlagLuaAppEnableOpenTypeSupport_0() then l_OpenTypeSupport_0:getPasswordStylisticAlternative() else nil, 
-                    TextSize = l_TextSize_0, 
-                    TextColor3 = l_TextColor_0, 
-                    TextTransparency = l_TextTransparency_0, 
-                    TextXAlignment = l_TextXAlignment_0, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    BackgroundTransparency = 1, 
-                    ClearTextOnFocus = l_ClearTextOnFocus_0, 
-                    OverlayNativeInput = true, 
-                    ManualFocusRelease = v51.props.IsKeyboardOverlayUsed, 
-                    ClipsDescendants = true, 
-                    TextInputType = v73 and v80 or v81, 
-                    ReturnKeyType = l_ReturnKeyType_0, 
-                    NextSelectionDown = l_NextSelectionDown_0, 
-                    NextSelectionLeft = l_NextSelectionLeft_0, 
-                    NextSelectionRight = l_NextSelectionRight_0, 
-                    NextSelectionUp = l_NextSelectionUp_0, 
-                    SelectionImageObject = v83, 
-                    [v5.Ref] = v51.getPasswordTextBoxRef(), 
-                    [v5.Change.Text] = v51.props.onChangeText, 
-                    [v5.Event.ReturnPressedFromOnScreenKeyboard] = v51.props.onReturnPressedFromOnScreenKeyboard, 
-                    [v5.Event.Focused] = l_onFocused_0, 
-                    [v5.Event.FocusLost] = l_onFocusLost_0, 
-                    [v5.Event.MouseEnter] = l_onMouseEnter_0, 
-                    [v5.Event.MouseLeave] = l_onMouseLeave_0
-                }), 
-                UIPadding = v5.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, l_PaddingY_0), 
-                    PaddingBottom = UDim.new(0, l_PaddingY_0), 
-                    PaddingLeft = UDim.new(0, l_PaddingX_0), 
-                    PaddingRight = UDim.new(0, l_PaddingX_0)
-                })
-            }), 
-            Toggler = v5.createElement("TextButton", {
-                Position = UDim2.new(1, 0, 0.5, 0), 
-                Size = UDim2.new(0, l_Y_0, 1, 0), 
-                AnchorPoint = Vector2.new(1, 0.5), 
-                Text = "", 
-                BackgroundTransparency = 1, 
-                SelectionImageObject = v83, 
-                [v5.Event.Activated] = v51.onTogglerActivated
-            }, {
-                ImageLabel = v5.createElement(l_ImageSetLabel_0, {
-                    Size = UDim2.new(0, 16, 0, 16), 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BackgroundTransparency = 1, 
-                    Image = if v73 then l_GetImageData_0("LuaApp/icons/actions_privacy_show") or "LuaApp/icons/actions_privacy_show" else l_GetImageData_0("LuaApp/icons/actions_edit_hide") or "LuaApp/icons/actions_edit_hide", 
-                    ImageColor3 = v82.Theme.IconDefault.Color, 
-                    ImageTransparency = v82.Theme.IconDefault.Transparency
-                })
-            })
-        });
-    end);
-end;
-v21 = v3.connect(function(v84, _) --[[ Line: 366 ]]
-    return {
-        centralOverlay = v84.CentralOverlay
-    };
-end)(v21);
-if l_game_EngineFeature_0 then
-    v21 = v4.connectBrowserTrackerLayer({
-        l_FStringLuaMultiPageSignupIxpLayer_0
-    }, function(v86, _) --[[ Line: 375 ]]
-        -- upvalues: l_FStringLuaMultiPageSignupIxpLayer_0 (copy), l_FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass_0 (copy)
-        return {
-            enablePasswordSuggestion = (v86[l_FStringLuaMultiPageSignupIxpLayer_0] or {}).enablePasswordSuggestion or l_FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass_0 or false
-        };
-    end)(v21);
-end;
-return v21;
+local UserInputService = game:GetService("UserInputService")
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local RoactRodux = require(AuthCommonParent.RoactRodux)
+local RoactAppExperiment = require(AuthCommonParent.RoactAppExperiment)
+local Roact = require(AuthCommonParent.Roact)
+local UIBlox = require(AuthCommonParent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GetImageData = require(AuthCommonParent.RobloxAppAssets).GetImageData
+local AreaTest = require(AuthCommon.Utils.AreaTest)
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local OpenTypeSupport = UIBlox.Utility.OpenTypeSupport
+local GetFFlagLuaAppFixSelectionCursor = require(AuthCommonParent.SharedFlags).GetFFlagLuaAppFixSelectionCursor
+local GetFFlagEnableTextFieldContentType = require(AuthCommonParent.SharedFlags).GetFFlagEnableTextFieldContentType
+local GetFFlagLuaAppEnableOpenTypeSupport = require(AuthCommonParent.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport
+local v18 = game:DefineFastFlag("EnableKeyboardVisibilityCheckOnPasswordFocus", false)
+local EngineFeature = game:GetEngineFeature("EnableAndroidPasswordSuggestion")
+local FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass = require(AuthCommonParent.SharedFlags).FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass
+local FStringLuaMultiPageSignupIxpLayer = require(AuthCommonParent.SharedFlags).FStringLuaMultiPageSignupIxpLayer
+local v22 = Roact.PureComponent:extend("PasswordBox")
+
+function v22.init(p1) -- line: 47
+	-- upvalues: Roact (copy), AreaTest (copy), v18 (copy), UserInputService (copy)
+	p1.state = {
+		hidePassword = true,
+		containerSize = Vector2.new(0, 0)
+	}
+
+	function p1.getHidePassword() -- line: 54
+		-- upvalues: p1 (copy)
+		if p1.props.hidePassword ~= nil then
+			return p1.props.hidePassword
+		end
+
+		return p1.state.hidePassword
+	end
+
+	p1.isMounted = false
+	p1.passwordBoxRef = Roact.createRef()
+
+	local v25 = Roact.createRef()
+
+	function p1.getPasswordTextBoxRef() -- line: 66
+		-- upvalues: p1 (copy), v25 (copy)
+		return p1.props.TextBoxRef or v25
+	end
+	function p1.isTouchPositionInPasswordBox(p2) -- line: 70
+		-- upvalues: p1 (copy), AreaTest (copy)
+		if not p1.passwordBoxRef.current then
+			return false
+		end
+
+		local AbsolutePosition = p1.passwordBoxRef.current.AbsolutePosition
+		local AbsoluteSize = p1.passwordBoxRef.current.AbsoluteSize
+
+		return AreaTest.IsPointInRect(Rect.new(AbsolutePosition, AbsolutePosition + AbsoluteSize), p2)
+	end
+
+	p1.tapBeganInTextbox = false
+
+	function p1.tapEventBegan(p3, _) -- line: 84
+		-- upvalues: p1 (copy), v18 (copy), UserInputService (copy)
+		if p1.props.CentralOverlayBlocksInput and (p1.props.centralOverlay and p1.props.centralOverlay.OverlayType ~= nil) then
+			return
+		end
+
+		if v18 and not UserInputService.OnScreenKeyboardVisible then
+			return
+		end
+
+		p1.tapBeganInTextbox = p1.isTouchPositionInPasswordBox(p3)
+
+		local current = p1.getPasswordTextBoxRef().current
+		local FocusedTextBox = UserInputService:GetFocusedTextBox()
+
+		if current and FocusedTextBox ~= current and p1.tapBeganInTextbox and p1.props.CaptureFocusOnTapStart then
+			if FocusedTextBox then
+				FocusedTextBox:ReleaseFocus()
+			end
+
+			current:CaptureFocus()
+		end
+	end
+	function p1.tapEventEnded(p5, _) -- line: 118
+		-- upvalues: p1 (copy), UserInputService (copy)
+		if p1.tapBeganInTextbox then
+			p1.tapBeganInTextbox = false
+
+			return
+		end
+
+		local FocusedTextBox = UserInputService:GetFocusedTextBox()
+		local current = p1.getPasswordTextBoxRef().current
+
+		if not FocusedTextBox or FocusedTextBox ~= current then
+			return
+		end
+
+		if not p1.isTouchPositionInPasswordBox(p5) then
+			current:ReleaseFocus()
+		end
+	end
+	function p1.onAbsoluteSizeChanged(p7) -- line: 136
+		-- upvalues: p1 (copy)
+		local containerSize = p1.state.containerSize
+		local AbsoluteSize = p7.AbsoluteSize
+
+		if AbsoluteSize.X > 0 and (AbsoluteSize.Y > 0 and containerSize ~= AbsoluteSize) then
+			spawn(function() -- line: 142
+				-- upvalues: p1 (copy), AbsoluteSize (copy)
+				if p1.isMounted then
+					p1:setState({
+						containerSize = AbsoluteSize
+					})
+				end
+			end)
+		end
+	end
+	function p1.onTogglerActivated(_) -- line: 152
+		-- upvalues: p1 (copy)
+		local onToggleCallback = p1.props.onToggleCallback
+		local v80 = p1.getHidePassword()
+
+		if onToggleCallback then
+			onToggleCallback(v80)
+		end
+
+		if p1.isMounted then
+			p1:setState({
+				hidePassword = not v80
+			})
+		end
+	end
+	function p1.shouldTakeInput(p9) -- line: 167
+		-- upvalues: p1 (copy)
+		if p1.props.Disabled then
+			return false
+		end
+
+		local v82 = p9.UserInputType == Enum.UserInputType.MouseButton1 or p9.UserInputType == Enum.UserInputType.Touch
+
+		return not p1.props.ManualFocusRelease and v82
+	end
+end
+
+v22.defaultProps = {
+	PaddingX = 10,
+	PaddingY = 7,
+	ClearTextOnFocus = false,
+	IsKeyboardOverlayUsed = true,
+	TextXAlignment = Enum.TextXAlignment.Left
+}
+
+function v22.didMount(p10) -- line: 187
+	-- upvalues: UserInputService (copy)
+	p10.isMounted = true
+
+	if p10.props.IsKeyboardOverlayUsed then
+		p10.inputBeganConnection = UserInputService.InputBegan:connect(function(p11, p12) -- line: 191
+			-- upvalues: p10 (copy)
+			if p10.shouldTakeInput(p11) then
+				p10.tapEventBegan(p11.Position, p12)
+			end
+		end)
+		p10.inputEndedConnection = UserInputService.InputEnded:connect(function(p13, p14) -- line: 197
+			-- upvalues: p10 (copy)
+			if p10.shouldTakeInput(p13) then
+				p10.tapEventEnded(p13.Position, p14)
+			end
+		end)
+	end
+end
+function v22.willUnmount(p15) -- line: 205
+	p15.isMounted = false
+
+	if p15.props.IsKeyboardOverlayUsed then
+		if p15.inputBeganConnection then
+			p15.inputBeganConnection:disconnect()
+		end
+
+		if p15.inputEndedConnection then
+			p15.inputEndedConnection:disconnect()
+		end
+	end
+end
+function v22.render(p16) -- line: 217
+	-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), withSelectionCursorProvider (copy)
+	if GetFFlagLuaAppFixSelectionCursor() then
+		return withSelectionCursorProvider(function(p17) -- line: 219
+			-- upvalues: p16 (copy)
+			return p16:renderWithSelectionCursor(p17)
+		end)
+	end
+
+	return p16:renderWithSelectionCursor(nil)
+end
+function v22.renderWithSelectionCursor(p18, p19) -- line: 228
+	-- upvalues: EngineFeature (copy), GetFFlagEnableTextFieldContentType (copy), withStyle (copy), GetFFlagLuaAppFixSelectionCursor (copy), CursorKind (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy)
+	local propsSize = p18.props.Size
+	local propsPosition = p18.props.Position
+	local propsLayoutOrder = p18.props.LayoutOrder
+	local propsText = p18.props.Text
+	local propsTextSize = p18.props.TextSize
+	local PlaceholderText = p18.props.PlaceholderText
+	local TextXAlignment = p18.props.TextXAlignment
+	local TextColor = p18.props.TextColor
+	local PlaceholderColor = p18.props.PlaceholderColor
+	local ClearTextOnFocus = p18.props.ClearTextOnFocus
+	local propsColor = p18.props.Color
+	local propsTransparency = p18.props.Transparency
+	local propsTextTransparency = p18.props.TextTransparency
+	local ReturnKeyType = p18.props.ReturnKeyType
+	local NextSelectionDown = p18.props.NextSelectionDown
+	local NextSelectionLeft = p18.props.NextSelectionLeft
+	local NextSelectionRight = p18.props.NextSelectionRight
+	local NextSelectionUp = p18.props.NextSelectionUp
+	local PaddingX = p18.props.PaddingX
+	local PaddingY = p18.props.PaddingY
+	local v51 = p18.getHidePassword()
+	local containerSizeY = p18.state.containerSize.Y
+	local onFocused = p18.props.onFocused
+	local onFocusLost = p18.props.onFocusLost
+	local onMouseEnter = p18.props.onMouseEnter
+	local onMouseLeave = p18.props.onMouseLeave
+	local v57 = p18.props.IsNewPassword and p18.props.enablePasswordSuggestion
+	local v58 = v57 and (not not EngineFeature and Enum.TextInputType.NewPassword) or Enum.TextInputType.Password
+	local v59 = v57 and (not not EngineFeature and Enum.TextInputType.NewPasswordShown) or (GetFFlagEnableTextFieldContentType() and Enum.TextInputType.PasswordShown or Enum.TextInputType.NoSuggestions)
+
+	return withStyle(function(p20) -- line: 275
+		-- upvalues: GetFFlagLuaAppFixSelectionCursor (copy), p19 (copy), CursorKind (copy), Roact (copy), ImageSetLabel (copy), propsSize (copy), propsPosition (copy), propsLayoutOrder (copy), GetImageData (copy), propsColor (copy), propsTransparency (copy), p18 (copy), containerSizeY (copy), propsText (copy), PlaceholderText (copy), PlaceholderColor (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy), propsTextSize (copy), TextColor (copy), propsTextTransparency (copy), TextXAlignment (copy), ClearTextOnFocus (copy), v51 (copy), v58 (copy), v59 (copy), ReturnKeyType (copy), NextSelectionDown (copy), NextSelectionLeft (copy), NextSelectionRight (copy), NextSelectionUp (copy), onFocused (copy), onFocusLost (copy), onMouseEnter (copy), onMouseLeave (copy), PaddingY (copy), PaddingX (copy)
+		local v89 = nil
+
+		if GetFFlagLuaAppFixSelectionCursor() then
+			v89 = p19(CursorKind.InputButton)
+		end
+
+		return Roact.createElement(ImageSetLabel, {
+			Size = propsSize,
+			Position = propsPosition,
+			LayoutOrder = propsLayoutOrder,
+			BackgroundTransparency = 1,
+			Image = GetImageData("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill",
+			ImageColor3 = propsColor,
+			ImageTransparency = propsTransparency,
+			BorderSizePixel = 0,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(8, 8, 9, 9),
+			[Roact.Ref] = p18.passwordBoxRef,
+			[Roact.Change.AbsoluteSize] = p18.onAbsoluteSizeChanged
+		}, {
+			TextBoxContainer = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -containerSizeY, 1, 0)
+			}, {
+				TextBox = Roact.createElement("TextBox", {
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Text = propsText,
+					PlaceholderText = PlaceholderText,
+					PlaceholderColor3 = PlaceholderColor,
+					Font = p20.Font.Body.Font,
+					OpenTypeFeatures = if not GetFFlagLuaAppEnableOpenTypeSupport() then nil else OpenTypeSupport:getPasswordStylisticAlternative(),
+					TextSize = propsTextSize,
+					TextColor3 = TextColor,
+					TextTransparency = propsTextTransparency,
+					TextXAlignment = TextXAlignment,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					BackgroundTransparency = 1,
+					ClearTextOnFocus = ClearTextOnFocus,
+					OverlayNativeInput = true,
+					ManualFocusRelease = p18.props.IsKeyboardOverlayUsed,
+					ClipsDescendants = true,
+					TextInputType = v51 and v58 or v59,
+					ReturnKeyType = ReturnKeyType,
+					NextSelectionDown = NextSelectionDown,
+					NextSelectionLeft = NextSelectionLeft,
+					NextSelectionRight = NextSelectionRight,
+					NextSelectionUp = NextSelectionUp,
+					SelectionImageObject = v89,
+					[Roact.Ref] = p18.getPasswordTextBoxRef(),
+					[Roact.Change.Text] = p18.props.onChangeText,
+					[Roact.Event.ReturnPressedFromOnScreenKeyboard] = p18.props.onReturnPressedFromOnScreenKeyboard,
+					[Roact.Event.Focused] = onFocused,
+					[Roact.Event.FocusLost] = onFocusLost,
+					[Roact.Event.MouseEnter] = onMouseEnter,
+					[Roact.Event.MouseLeave] = onMouseLeave
+				}),
+				UIPadding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, PaddingY),
+					PaddingBottom = UDim.new(0, PaddingY),
+					PaddingLeft = UDim.new(0, PaddingX),
+					PaddingRight = UDim.new(0, PaddingX)
+				})
+			}),
+			Toggler = Roact.createElement("TextButton", {
+				Position = UDim2.new(1, 0, 0.5, 0),
+				Size = UDim2.new(0, containerSizeY, 1, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+				Text = "",
+				BackgroundTransparency = 1,
+				SelectionImageObject = v89,
+				[Roact.Event.Activated] = p18.onTogglerActivated
+			}, {
+				ImageLabel = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 16, 0, 16),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = if not v51 then GetImageData("LuaApp/icons/actions_edit_hide") or "LuaApp/icons/actions_edit_hide" else GetImageData("LuaApp/icons/actions_privacy_show") or "LuaApp/icons/actions_privacy_show",
+					ImageColor3 = p20.Theme.IconDefault.Color,
+					ImageTransparency = p20.Theme.IconDefault.Transparency
+				})
+			})
+		})
+	end)
+end
+
+local v23 = RoactRodux.connect(function(p21, _) -- line: 366
+	return {
+		centralOverlay = p21.CentralOverlay
+	}
+end)(v22)
+
+if EngineFeature then
+	v23 = RoactAppExperiment.connectBrowserTrackerLayer({ FStringLuaMultiPageSignupIxpLayer }, function(p23, _) -- line: 375
+		-- upvalues: FStringLuaMultiPageSignupIxpLayer (copy), FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass (copy)
+		return {
+			enablePasswordSuggestion = (p23[FStringLuaMultiPageSignupIxpLayer] or {}).enablePasswordSuggestion or (FFlagAndroidPasswordSuggestionExperimentEnrollmentBypass or false)
+		}
+	end)(v23)
+end
+
+return v23

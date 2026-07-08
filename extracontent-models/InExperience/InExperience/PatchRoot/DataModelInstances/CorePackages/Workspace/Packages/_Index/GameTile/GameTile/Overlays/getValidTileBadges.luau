@@ -7,22 +7,32 @@ require(GameTile.GameTileTypes)
 
 local TileBadgePositionCalculators = require(GameTile.GameTileConstants).TileBadgePositionCalculators
 
-return function(p1) --[[ getValidTileBadges ]] -- line: 26
+local function isValidTileBadgePosition(p1) -- line: 13
+	-- upvalues: TileBadgePositionCalculators (copy), flaggedMutedError (copy)
+	local v9 = TileBadgePositionCalculators[p1] ~= nil
+
+	if not v9 then
+		flaggedMutedError("GameTileOverlayBadgeInvalidPositionError", `Unsupported game tile badge position: { p1 }`)
+	end
+
+	return v9
+end
+local function getValidTileBadges(p2) -- line: 26
 	-- upvalues: TileBadgePositionCalculators (copy), flaggedMutedError (copy), mutedError (copy)
 	local t1 = {}
 
-	for v10, v11 in p1 do
-		local v12 = TileBadgePositionCalculators[v10] ~= nil
+	for v12, v13 in p2 do
+		local v14 = TileBadgePositionCalculators[v12] ~= nil
 
-		if not v12 then
-			flaggedMutedError("GameTileOverlayBadgeInvalidPositionError", `Unsupported game tile badge position: { v10 }`)
+		if not v14 then
+			flaggedMutedError("GameTileOverlayBadgeInvalidPositionError", `Unsupported game tile badge position: { v12 }`)
 		end
 
-		if v12 and #v11 > 0 then
-			local v13 = v11[1]
+		if v14 and #v13 > 0 then
+			local v15 = v13[1]
 
-			if v13.tileBadgeType and v13.analyticsId then
-				t1[v10] = { v11[1] }
+			if v15.tileBadgeType and v15.analyticsId then
+				t1[v12] = { v13[1] }
 			else
 				mutedError("Invalid tile badge metadata.")
 			end
@@ -31,3 +41,5 @@ return function(p1) --[[ getValidTileBadges ]] -- line: 26
 
 	return t1
 end
+
+return getValidTileBadges

@@ -1,30 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NavigationRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = require(l_script_FirstAncestor_0.Thunks.NavigateDown);
-local v4 = require(l_Parent_0.RobloxAppEnums);
-local v5 = require(l_Parent_0.UrlBuilder);
-local l_AppPage_0 = v4.AppPage;
-local l_UrlBuilder_0 = v5.UrlBuilder;
-return function(v8, v9, v10) --[[ Line: 12 ]]
-    -- upvalues: v2 (copy), v3 (copy), l_AppPage_0 (copy), l_UrlBuilder_0 (copy)
-    v2.isInTypes(v8, {
-        "string", 
-        "number"
-    }, "userId");
-    v2.isInTypes(v9, {
-        "string", 
-        "number"
-    }, "conversationId");
-    v2.isTypeOrNil(v10, "function", "onClose");
-    return v3({
-        name = l_AppPage_0.ReportAbuse, 
-        detail = l_UrlBuilder_0.user.report({
-            userId = v8, 
-            conversationId = v9
-        }), 
-        extraProps = {
-            onClose = v10
-        }
-    });
-end;
+local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
+local NavigationRoduxParent = NavigationRodux.Parent
+local ArgCheck = require(NavigationRoduxParent.ArgCheck)
+local NavigateDown = require(NavigationRodux.Thunks.NavigateDown)
+local RobloxAppEnums = require(NavigationRoduxParent.RobloxAppEnums)
+local UrlBuilder = require(NavigationRoduxParent.UrlBuilder)
+local AppPage = RobloxAppEnums.AppPage
+local UrlBuilder2 = UrlBuilder.UrlBuilder
+
+return function(p1, p2, p3) -- line: 12
+	-- upvalues: ArgCheck (copy), NavigateDown (copy), AppPage (copy), UrlBuilder2 (copy)
+	ArgCheck.isInTypes(p1, {
+		"string",
+		"number"
+	}, "userId")
+	ArgCheck.isInTypes(p2, {
+		"string",
+		"number"
+	}, "conversationId")
+	ArgCheck.isTypeOrNil(p3, "function", "onClose")
+
+	return NavigateDown({
+		name = AppPage.ReportAbuse,
+		detail = UrlBuilder2.user.report({
+			userId = p1,
+			conversationId = p2
+		}),
+		extraProps = {
+			onClose = p3
+		}
+	})
+end

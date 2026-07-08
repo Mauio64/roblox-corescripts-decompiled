@@ -1,20 +1,21 @@
-local v0 = {
-    TopBar = "top bar", 
-    Experiences = {
-        Default = "experiences", 
-        WithFooter = "experiencesWithFooter", 
-        AppGameTile = "AppGameTile", 
-        GridTile = "GridTile", 
-        EventTile = "EventTile"
-    }, 
-    Friends = "friends"
-};
-local v1 = {
-    PaddingRightItems = "PaddingRightItems", 
-    PaddingHorizontal = "margin", 
-    PaddingVertical = "PaddingVertical"
-};
+local t1 = {
+	TopBar = "top bar",
+	Friends = "friends",
+	Experiences = {
+		Default = "experiences",
+		WithFooter = "experiencesWithFooter",
+		AppGameTile = "AppGameTile",
+		GridTile = "GridTile",
+		EventTile = "EventTile"
+	}
+}
+local t2 = {
+	PaddingRightItems = "PaddingRightItems",
+	PaddingHorizontal = "margin",
+	PaddingVertical = "PaddingVertical"
+}
+
 return {
-    Kind = v0, 
-    Keys = v1
-};
+	Kind = t1,
+	Keys = t2
+}

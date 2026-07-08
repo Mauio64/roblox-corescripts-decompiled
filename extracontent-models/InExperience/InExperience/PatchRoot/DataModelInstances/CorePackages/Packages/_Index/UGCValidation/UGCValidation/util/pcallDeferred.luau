@@ -1,8 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.util.tryYield);
-return function(v3, v4) --[[ Line: 11 ]]
-    -- upvalues: v2 (copy)
-    v2(v4);
-    return pcall(v3);
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local tryYield = require(ParentParent.util.tryYield)
+
+return function(p1: ((...any) -> ...any), p2) -- line: 11
+	-- upvalues: tryYield (copy)
+	tryYield(p2)
+
+	return pcall(p1)
+end

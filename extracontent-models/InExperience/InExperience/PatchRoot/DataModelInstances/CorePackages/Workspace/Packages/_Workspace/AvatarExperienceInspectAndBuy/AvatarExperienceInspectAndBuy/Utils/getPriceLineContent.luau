@@ -12,16 +12,16 @@ require(AvatarExperienceInspectAndBuy.Types)
 local FFlagSocialEnableProfileInspectAndBuy = require(AvatarExperienceInspectAndBuyParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
 local v6 = if not FFlagSocialEnableProfileInspectAndBuy then nil else require(AvatarExperienceInspectAndBuy.Utils.getPriceStatusInShop)
 
-return function(p1, p2, t1: {[any]: any}, t2: {[any]: any}?) --[[ getPriceLineContent ]] -- line: 27
+local function getPriceLineContent(p1, p2, t1: {[any]: any}, t2: {[any]: any}?) -- line: 27
 	-- upvalues: FFlagSocialEnableProfileInspectAndBuy (copy), v6 (copy), getPriceStatus (copy), PriceStatus (copy)
 	local t3 = {}
-	local v12
+	local v13
 
 	if FFlagSocialEnableProfileInspectAndBuy and (t2 and t2.isShopContext) then
 		assert(not t2.disableResaleWhenStockIsAvailable, "disableResaleWhenStockIsAvailable is not applicable when isShopContext is true")
-		v12 = v6(p1)
+		v13 = v6(p1)
 	else
-		v12 = getPriceStatus(p1, true)
+		v13 = getPriceStatus(p1, true)
 	end
 
 	local t4 = {
@@ -50,8 +50,8 @@ return function(p1, p2, t1: {[any]: any}, t2: {[any]: any}?) --[[ getPriceLineCo
 		[PriceStatus.PurchaseFromResale] = if not p1.isOffSale then {
 			{
 				type = "price",
-				price = p1.priceInRobux,
-				strikethrough = true
+				strikethrough = true,
+				price = p1.priceInRobux
 			},
 			{
 				type = "price",
@@ -79,9 +79,11 @@ return function(p1, p2, t1: {[any]: any}, t2: {[any]: any}?) --[[ getPriceLineCo
 		}}
 	}
 
-	if t4[v12] then
-		t3 = t4[v12]
+	if t4[v13] then
+		t3 = t4[v13]
 	end
 
 	return t3
 end
+
+return getPriceLineContent

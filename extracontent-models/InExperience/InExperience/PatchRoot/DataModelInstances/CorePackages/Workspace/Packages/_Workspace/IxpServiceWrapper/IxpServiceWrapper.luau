@@ -1,3 +1,3 @@
 return {
-    IXPServiceWrapper = require(script.IXPServiceWrapper)
-};
+	IXPServiceWrapper = require(script.IXPServiceWrapper)
+}

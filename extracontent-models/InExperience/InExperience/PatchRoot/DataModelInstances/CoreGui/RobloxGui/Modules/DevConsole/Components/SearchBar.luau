@@ -1,57 +1,60 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(script.Parent.ScrollingTextBox);
-local v3 = require(script.Parent.Parent.Constants);
-local v4 = v1.Component:extend("SearchBar");
-v4.render = function(v5) --[[ Line: 18 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v3 (copy), v2 (copy)
-    local l_size_0 = v5.props.size;
-    local l_pos_0 = v5.props.pos;
-    local l_frameHeight_0 = v5.props.frameHeight;
-    local l_textSize_0 = v5.props.textSize;
-    local l_font_0 = v5.props.font;
-    local l_searchTerm_0 = v5.props.searchTerm;
-    local l_layoutOrder_0 = v5.props.layoutOrder;
-    local l_visible_0 = v5.props.visible;
-    local l_showClear_0 = v5.props.showClear;
-    local v15 = l_frameHeight_0 * 0.6;
-    return v1.createElement("Frame", {
-        Size = l_size_0, 
-        Position = l_pos_0, 
-        BackgroundColor3 = v3.Color.UnselectedGray, 
-        BorderColor3 = v3.Color.BorderGray, 
-        Visible = l_visible_0, 
-        LayoutOrder = l_layoutOrder_0
-    }, {
-        SearchImage = v1.createElement("ImageLabel", {
-            Name = "SearchIcon", 
-            Size = UDim2.new(0, v15, 0, v15), 
-            Position = UDim2.new(0, 10, 0.5, -v15 / 2), 
-            BackgroundTransparency = 1, 
-            Image = v3.Image.Search
-        }), 
-        ClearButton = l_showClear_0 and v1.createElement("ImageButton", {
-            Size = UDim2.new(0, -v15, 0, v15), 
-            Position = UDim2.new(1, -10, 0.5, -v15 / 2), 
-            BackgroundTransparency = 1, 
-            Image = v3.Image.Clear, 
-            [v1.Event.InputEnded] = v5.props.cancelInput
-        }), 
-        InputField = v1.createElement(v2, {
-            Text = l_searchTerm_0 and l_searchTerm_0 or "", 
-            TextSize = l_textSize_0, 
-            Font = l_font_0, 
-            Size = UDim2.new(1, -(2 * l_frameHeight_0), 1, 0), 
-            Position = UDim2.new(0, 20 + v15, 0, 0), 
-            ShowNativeInput = true, 
-            TextColor3 = v3.Color.Text, 
-            BackgroundTransparency = 1, 
-            TextXAlignment = 0, 
-            ClearTextOnFocus = false, 
-            PlaceholderText = "Search", 
-            [v1.Ref] = v5.props.refForParent, 
-            TextBoxFocusLost = v5.props.focusLost
-        })
-    });
-end;
-return v4;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local ScrollingTextBox = require(script.Parent.ScrollingTextBox)
+local Constants = require(script.Parent.Parent.Constants)
+local v5 = Roact.Component:extend("SearchBar")
+
+function v5.render(p1) -- line: 18
+	-- upvalues: Roact (copy), Constants (copy), ScrollingTextBox (copy)
+	local size = p1.props.size
+	local pos = p1.props.pos
+	local frameHeight = p1.props.frameHeight
+	local textSize = p1.props.textSize
+	local font = p1.props.font
+	local searchTerm = p1.props.searchTerm
+	local layoutOrder = p1.props.layoutOrder
+	local visible = p1.props.visible
+	local showClear = p1.props.showClear
+	local v16 = frameHeight * 0.6
+
+	return Roact.createElement("Frame", {
+		Size = size,
+		Position = pos,
+		BackgroundColor3 = Constants.Color.UnselectedGray,
+		BorderColor3 = Constants.Color.BorderGray,
+		Visible = visible,
+		LayoutOrder = layoutOrder
+	}, {
+		SearchImage = Roact.createElement("ImageLabel", {
+			Name = "SearchIcon",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, v16, 0, v16),
+			Position = UDim2.new(0, 10, 0.5, -v16 / 2),
+			Image = Constants.Image.Search
+		}),
+		ClearButton = showClear and Roact.createElement("ImageButton", {
+			Size = UDim2.new(0, -v16, 0, v16),
+			Position = UDim2.new(1, -10, 0.5, -v16 / 2),
+			BackgroundTransparency = 1,
+			Image = Constants.Image.Clear,
+			[Roact.Event.InputEnded] = p1.props.cancelInput
+		}),
+		InputField = Roact.createElement(ScrollingTextBox, {
+			Text = searchTerm and searchTerm or "",
+			TextSize = textSize,
+			Font = font,
+			Size = UDim2.new(1, -(2 * frameHeight), 1, 0),
+			Position = UDim2.new(0, 20 + v16, 0, 0),
+			ShowNativeInput = true,
+			TextColor3 = Constants.Color.Text,
+			BackgroundTransparency = 1,
+			TextXAlignment = 0,
+			ClearTextOnFocus = false,
+			PlaceholderText = "Search",
+			[Roact.Ref] = p1.props.refForParent,
+			TextBoxFocusLost = p1.props.focusLost
+		})
+	})
+end
+
+return v5

@@ -1,3 +1,3 @@
 return {
-    ThrottleUpdateEventName = "AvatarChatThrottleUpdateEvent"
-};
+	ThrottleUpdateEventName = "AvatarChatThrottleUpdateEvent"
+}

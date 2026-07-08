@@ -1,34 +1,44 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 5 ]] --[[ Name: useDialogSize ]]
-    -- upvalues: v1 (copy)
-    local v3, v4 = v1.useBinding(Vector2.new(0, 0));
-    v1.useEffect(function() --[[ Line: 8 ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        local l_current_0 = v2.current;
-        if not l_current_0 then
-            return;
-        else
-            local function v7() --[[ Line: 14 ]] --[[ Name: updateDialogSize ]]
-                -- upvalues: l_current_0 (copy), v4 (ref)
-                local l_AbsoluteSize_0 = l_current_0.AbsoluteSize;
-                if l_AbsoluteSize_0.X == 0 or l_AbsoluteSize_0.Y == 0 then
-                    return;
-                else
-                    v4(l_AbsoluteSize_0);
-                    return;
-                end;
-            end;
-            local l_AbsoluteSize_1 = l_current_0.AbsoluteSize;
-            if l_AbsoluteSize_1.X ~= 0 and l_AbsoluteSize_1.Y ~= 0 then
-                v4(l_AbsoluteSize_1);
-            end;
-            l_AbsoluteSize_1 = l_current_0:GetPropertyChangedSignal("AbsoluteSize"):Connect(v7);
-            return function() --[[ Line: 26 ]]
-                -- upvalues: l_AbsoluteSize_1 (copy)
-                l_AbsoluteSize_1:Disconnect();
-            end;
-        end;
-    end, {});
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+
+local function useDialogSize(t1: {[any]: any}) -- line: 5
+	-- upvalues: React (copy)
+	local v5, v6 = React.useBinding(Vector2.new(0, 0))
+
+	React.useEffect(function() -- line: 8
+		-- upvalues: t1 (copy), v6 (copy)
+		local current = t1.current
+
+		if not current then
+			return
+		end
+
+		local function updateDialogSize() -- line: 14
+			-- upvalues: current (copy), v6 (copy)
+			local AbsoluteSize = current.AbsoluteSize
+
+			if AbsoluteSize.X == 0 or AbsoluteSize.Y == 0 then
+				return
+			end
+
+			v6(AbsoluteSize)
+		end
+
+		local AbsoluteSize = current.AbsoluteSize
+
+		if AbsoluteSize.X ~= 0 and AbsoluteSize.Y ~= 0 then
+			v6(AbsoluteSize)
+		end
+
+		local connection = current:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateDialogSize)
+
+		return function() -- line: 26
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {})
+
+	return v5
+end
+
+return useDialogSize

@@ -1,23 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UnifiedLogging");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.gameEntryUtils);
-local l_flaggedMutedError_0 = require(l_Parent_0.Loggers).flaggedMutedError;
-return function(v4, v5, v6) --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), l_flaggedMutedError_0 (copy)
-    local v7 = {};
-    local v8 = {};
-    for _, v10 in v4 do
-        local v11 = v5[v10];
-        if v11 ~= nil then
-            local v12 = v2.extractFieldsFromGameEntry(v11);
-            table.insert(v7, v12.universeId or "");
-            table.insert(v8, v12.placeId or "");
-        else
-            l_flaggedMutedError_0("BuildGameMetadataFields", (("Entry at index %* was nil when building game metadata fields for collection %*"):format(v10, v6)));
-        end;
-    end;
-    return {
-        universeId_arr = table.concat(v7, ","), 
-        placeId_arr = table.concat(v8, ",")
-    };
-end;
+local UnifiedLogging = script:FindFirstAncestor("UnifiedLogging")
+local UnifiedLoggingParent = UnifiedLogging.Parent
+local gameEntryUtils = require(UnifiedLogging.gameEntryUtils)
+local flaggedMutedError = require(UnifiedLoggingParent.Loggers).flaggedMutedError
+
+return function(p1, p2, p3) -- line: 8
+	-- upvalues: gameEntryUtils (copy), flaggedMutedError (copy)
+	local t1 = {}
+	local t2 = {}
+
+	for _, v11 in p1 do
+		local v12 = p2[v11]
+
+		if v12 ~= nil then
+			local v13 = gameEntryUtils.extractFieldsFromGameEntry(v12)
+
+			table.insert(t1, v13.universeId or "")
+			table.insert(t2, v13.placeId or "")
+		else
+			flaggedMutedError("BuildGameMetadataFields", `Entry at index { v11 } was nil when building game metadata fields for collection { p3 }`)
+		end
+	end
+
+	return {
+		universeId_arr = table.concat(t1, ","),
+		placeId_arr = table.concat(t2, ",")
+	}
+end

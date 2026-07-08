@@ -1,265 +1,278 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui").RobloxGui;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v4 = require(script.Parent.Parent.Util.setMouseVisibility);
-local v5 = require(l_CorePackages_0.Packages.Roact);
-local v6 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_Parent_0.Constants);
-local l_FrameHeight_0 = v8.TopBarFormatting.FrameHeight;
-local l_WindowPadding_0 = v8.Padding.WindowPadding;
-local l_MinSize_0 = v8.MainWindowInit.MinSize;
-local l_Components_0 = l_Parent_0.Components;
-local v13 = require(l_Components_0.DevConsoleTopBar);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v15 = require(l_Actions_0.ChangeDevConsoleSize);
-local v16 = require(l_Actions_0.SetDevConsoleVisibility);
-local v17 = require(l_Actions_0.SetDevConsoleMinimized);
-local v18 = v5.PureComponent:extend("DevConsoleWindow");
-v18.onMinimizeClicked = function(v19) --[[ Line: 30 ]] --[[ Name: onMinimizeClicked ]]
-    v19.props.dispatchSetDevConsoleMinimized(true);
-end;
-v18.onMaximizeClicked = function(v20) --[[ Line: 34 ]] --[[ Name: onMaximizeClicked ]]
-    v20.props.dispatchSetDevConsoleMinimized(false);
-end;
-v18.onCloseClicked = function(v21) --[[ Line: 38 ]] --[[ Name: onCloseClicked ]]
-    v21.props.onCloseCallback(false);
-    v21.props.dispatchSetDevConsolVisibility(false);
-end;
-v18.init = function(v22) --[[ Line: 43 ]] --[[ Name: init ]]
-    -- upvalues: l_MinSize_0 (copy), l_UserInputService_0 (copy), v5 (copy)
-    v22.setDevConsoleSize = function(v23, v24, v25) --[[ Line: 44 ]]
-        -- upvalues: l_MinSize_0 (ref)
-        local v26 = v25.X - v24.X;
-        local v27 = v25.Y - v24.Y;
-        v26 = v26 < l_MinSize_0.X and l_MinSize_0.X or v26;
-        local v28 = v27 < l_MinSize_0.Y and l_MinSize_0.Y or v27;
-        v23.props.dispatchChangeDevConsoleSize(UDim2.new(0, v26, 0, v28));
-    end;
-    v22.resizeInputBegan = function(_, v30) --[[ Line: 54 ]]
-        -- upvalues: v22 (copy), l_UserInputService_0 (ref)
-        if v30.UserInputType == Enum.UserInputType.MouseButton1 then
-            local v31 = nil;
-            local v32 = nil;
-            local function v36(v33) --[[ Line: 58 ]] --[[ Name: onInputChanged ]]
-                -- upvalues: v22 (ref)
-                local l_AbsolutePosition_0 = v22.ref.current.AbsolutePosition;
-                local l_Position_0 = v33.Position;
-                v22:setDevConsoleSize(l_AbsolutePosition_0, l_Position_0);
-            end;
-            do
-                local l_v31_0, l_v32_0 = v31, v32;
-                local function v40(v39) --[[ Line: 64 ]] --[[ Name: onInputEnded ]]
-                    -- upvalues: l_v31_0 (ref), l_v32_0 (ref)
-                    if v39.UserInputType == Enum.UserInputType.MouseButton1 then
-                        l_v31_0:Disconnect();
-                        l_v32_0:Disconnect();
-                    end;
-                end;
-                l_v31_0 = l_UserInputService_0.InputChanged:Connect(v36);
-                l_v32_0 = l_UserInputService_0.InputEnded:Connect(v40);
-            end;
-        end;
-    end;
-    v22.doGamepadMenuButton = function(v41) --[[ Line: 76 ]]
-        -- upvalues: v22 (copy)
-        if v22.props.isVisible then
-            local v42 = true;
-            if v41.KeyCode ~= Enum.KeyCode.ButtonStart then
-                v42 = v41.KeyCode == Enum.KeyCode.Escape;
-            end;
-            if v42 then
-                v22.props.dispatchSetDevConsolVisibility(false);
-            end;
-        end;
-    end;
-    v22.ref = v5.createRef();
-    v22.state = {
-        resizing = false
-    };
-end;
-v18.didMount = function(v43) --[[ Line: 92 ]] --[[ Name: didMount ]]
-    -- upvalues: v4 (copy), l_UserInputService_0 (copy)
-    delay(0, function() --[[ Line: 96 ]]
-        -- upvalues: v43 (copy)
-        if v43.ref.current then
-            local l_AbsolutePosition_1 = v43.ref.current.AbsolutePosition;
-            local l_AbsolutePosition_2 = v43.ref.current.ResizeButton.AbsolutePosition;
-            v43:setDevConsoleSize(l_AbsolutePosition_1, l_AbsolutePosition_2);
-        end;
-    end);
-    v4(v43.props.isVisible);
-    v43.gamepadMenuListener = l_UserInputService_0.InputBegan:Connect(v43.doGamepadMenuButton);
-end;
-v18.willUnmount = function(v46) --[[ Line: 108 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_GuiService_0 (copy)
-    if l_GuiService_0.SelectedCoreObject == v46.ref.current then
-        l_GuiService_0.SelectedCoreObject = nil;
-    end;
-    v46.gamepadMenuListener:Disconnect();
-end;
-v18.didUpdate = function(v47, v48, _) --[[ Line: 116 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v4 (copy), l_GuiService_0 (copy), l_UserInputService_0 (copy)
-    v4(v47.props.isVisible);
-    if v47.props.isMinimized and l_GuiService_0.SelectedCoreObject == v47.ref.current then
-        l_GuiService_0.SelectedCoreObject = nil;
-        return;
-    else
-        if v47.props.isVisible ~= v48.isVisible or v47.props.currTabIndex ~= v48.currTabIndex then
-            if l_UserInputService_0:GetLastInputType() == Enum.UserInputType.Gamepad1 and v47.props.isVisible then
-                l_GuiService_0.SelectedCoreObject = v47.ref.current;
-                return;
-            else
-                l_GuiService_0.SelectedCoreObject = nil;
-            end;
-        end;
-        return;
-    end;
-end;
-v18.render = function(v50) --[[ Line: 133 ]] --[[ Name: render ]]
-    -- upvalues: v8 (copy), l_RobloxGui_0 (copy), v5 (copy), l_WindowPadding_0 (copy), v13 (copy), l_FrameHeight_0 (copy)
-    local l_isVisible_0 = v50.props.isVisible;
-    local l_formFactor_0 = v50.props.formFactor;
-    local l_isDeveloperView_0 = v50.props.isDeveloperView;
-    local l_currTabIndex_0 = v50.props.currTabIndex;
-    local l_tabList_0 = v50.props.tabList;
-    local l_isMinimized_0 = v50.props.isMinimized;
-    local l_position_0 = v50.props.position;
-    local l_size_0 = v50.props.size;
-    local _ = v50.state.resizing;
-    local l_l_size_0_0 = l_size_0;
-    local v61 = UDim2.new();
-    local v62 = {};
-    local v63 = 16;
-    if l_formFactor_0 ~= v8.FormFactor.Large then
-        local l_AbsoluteSize_0 = l_RobloxGui_0.AbsoluteSize;
-        l_size_0 = UDim2.new(0, l_AbsoluteSize_0.X, 0, l_AbsoluteSize_0.Y);
-        l_position_0 = UDim2.new(0, 0, 0, 0);
-        v61 = UDim2.new(0, 16, 0, 0);
-        l_l_size_0_0 = l_size_0 + UDim2.new(0, -32, 0, 0);
-        v63 = 0;
-    end;
-    v62.UIListLayout = v5.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Top, 
-        Padding = UDim.new(0, l_WindowPadding_0)
-    });
-    if l_isMinimized_0 then
-        v62.TopBar = v5.createElement(v13, {
-            LayoutOrder = 1, 
-            formFactor = l_formFactor_0, 
-            isMinimized = true, 
-            onMinimizeClicked = function() --[[ Line: 176 ]] --[[ Name: onMinimizeClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onMinimizeClicked();
-            end, 
-            onMaximizeClicked = function() --[[ Line: 179 ]] --[[ Name: onMaximizeClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onMaximizeClicked();
-            end, 
-            onCloseClicked = function() --[[ Line: 182 ]] --[[ Name: onCloseClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onCloseClicked();
-            end
-        });
-        return v5.createElement("Frame", {
-            Position = UDim2.new(1, -500, 1, -2 * l_FrameHeight_0), 
-            Size = UDim2.new(0, 500, 0, 2 * l_FrameHeight_0), 
-            BackgroundColor3 = Color3.new(0, 0, 0), 
-            Transparency = v8.MainWindowInit.Transparency, 
-            Active = true, 
-            AutoLocalize = false, 
-            Visible = l_isVisible_0, 
-            Selectable = true, 
-            BorderColor3 = v8.Color.BaseGray, 
-            [v5.Ref] = v50.ref
-        }, v62);
-    else
-        v62.TopBar = v5.createElement(v13, {
-            LayoutOrder = 1, 
-            formFactor = l_formFactor_0, 
-            isMinimized = false, 
-            onMinimizeClicked = function() --[[ Line: 205 ]] --[[ Name: onMinimizeClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onMinimizeClicked();
-            end, 
-            onMaximizeClicked = function() --[[ Line: 208 ]] --[[ Name: onMaximizeClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onMaximizeClicked();
-            end, 
-            onCloseClicked = function() --[[ Line: 211 ]] --[[ Name: onCloseClicked ]]
-                -- upvalues: v50 (copy)
-                v50:onCloseClicked();
-            end
-        });
-        local l_l_l_size_0_0_0 = l_l_size_0_0;
-        local v66 = l_FrameHeight_0 + 2 * l_WindowPadding_0;
-        l_l_l_size_0_0_0 = l_l_l_size_0_0_0 - UDim2.new(0, 0, 0, v66);
-        if v50.ref.current and l_isVisible_0 and l_tabList_0 then
-            local v67 = l_tabList_0[l_currTabIndex_0];
-            if v67 then
-                v62.MainView = v5.createElement(v67.tab, {
-                    size = l_l_l_size_0_0_0, 
-                    formFactor = l_formFactor_0, 
-                    isDeveloperView = l_isDeveloperView_0, 
-                    tabList = l_tabList_0
-                });
-            end;
-        end;
-        return v5.createElement("Frame", {
-            Position = l_position_0, 
-            Size = l_size_0, 
-            Visible = l_isVisible_0, 
-            BackgroundColor3 = Color3.new(0, 0, 0), 
-            Transparency = v8.MainWindowInit.Transparency, 
-            BorderColor3 = v8.Color.BaseGray, 
-            BorderSizePixel = v63, 
-            Active = true, 
-            AutoLocalize = false, 
-            Selectable = false, 
-            [v5.Ref] = v50.ref
-        }, {
-            DevConsoleUI = v5.createElement("Frame", {
-                Size = l_l_size_0_0, 
-                Position = v61, 
-                BackgroundTransparency = 1
-            }, v62), 
-            ResizeButton = v5.createElement("ImageButton", {
-                Position = UDim2.new(1, 0, 1, 0), 
-                Size = UDim2.new(0, v63, 0, v63), 
-                BackgroundColor3 = Color3.new(0, 0, 0), 
-                Modal = true, 
-                [v5.Event.InputBegan] = v50.resizeInputBegan
-            })
-        });
-    end;
-end;
-return v6.UNSTABLE_connect2(function(v68, _) --[[ Line: 266 ]] --[[ Name: mapStateToProps ]]
-    return {
-        isVisible = v68.DisplayOptions.isVisible, 
-        isMinimized = v68.DisplayOptions.isMinimized, 
-        position = v68.DisplayOptions.position, 
-        size = v68.DisplayOptions.size, 
-        isDeveloperView = v68.MainView.isDeveloperView, 
-        currTabIndex = v68.MainView.currTabIndex, 
-        tabList = v68.MainView.tabList
-    };
-end, function(v70) --[[ Line: 278 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v15 (copy), v16 (copy), v17 (copy)
-    return {
-        dispatchChangeDevConsoleSize = function(v71) --[[ Line: 280 ]] --[[ Name: dispatchChangeDevConsoleSize ]]
-            -- upvalues: v70 (copy), v15 (ref)
-            v70(v15(v71));
-        end, 
-        dispatchSetDevConsolVisibility = function(v72) --[[ Line: 283 ]] --[[ Name: dispatchSetDevConsolVisibility ]]
-            -- upvalues: v70 (copy), v16 (ref)
-            v70(v16(v72));
-        end, 
-        dispatchSetDevConsoleMinimized = function(v73) --[[ Line: 286 ]] --[[ Name: dispatchSetDevConsoleMinimized ]]
-            -- upvalues: v70 (copy), v17 (ref)
-            v70(v17(v73));
-        end
-    };
-end)(v18);
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui").RobloxGui
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local setMouseVisibility = require(script.Parent.Parent.Util.setMouseVisibility)
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local FrameHeight = Constants.TopBarFormatting.FrameHeight
+local WindowPadding = Constants.Padding.WindowPadding
+local MinSize = Constants.MainWindowInit.MinSize
+local Components = ParentParent.Components
+local DevConsoleTopBar = require(Components.DevConsoleTopBar)
+local Actions = script.Parent.Parent.Actions
+local ChangeDevConsoleSize = require(Actions.ChangeDevConsoleSize)
+local SetDevConsoleVisibility = require(Actions.SetDevConsoleVisibility)
+local SetDevConsoleMinimized = require(Actions.SetDevConsoleMinimized)
+local v19 = Roact.PureComponent:extend("DevConsoleWindow")
+
+function v19.onMinimizeClicked(p1) -- line: 30
+	p1.props.dispatchSetDevConsoleMinimized(true)
+end
+function v19.onMaximizeClicked(p2) -- line: 34
+	p2.props.dispatchSetDevConsoleMinimized(false)
+end
+function v19.onCloseClicked(p3) -- line: 38
+	p3.props.onCloseCallback(false)
+	p3.props.dispatchSetDevConsolVisibility(false)
+end
+function v19.init(p4) -- line: 43
+	-- upvalues: MinSize (copy), UserInputService (copy), Roact (copy)
+	function p4.setDevConsoleSize(p5, p6, p7) -- line: 44
+		-- upvalues: MinSize (copy)
+		local v55 = p7.X - p6.X
+		local v56 = p7.Y - p6.Y
+		local v57 = v55 < MinSize.X and MinSize.X or v55
+		local v58 = v56 < MinSize.Y and MinSize.Y or v56
+
+		p5.props.dispatchChangeDevConsoleSize(UDim2.new(0, v57, 0, v58))
+	end
+	function p4.resizeInputBegan(_, p9) -- line: 54
+		-- upvalues: p4 (copy), UserInputService (copy)
+		if p9.UserInputType == Enum.UserInputType.MouseButton1 then
+			local connection = nil
+			local connection2 = nil
+
+			local function onInputChanged(p10) -- line: 58
+				-- upvalues: p4 (copy)
+				local AbsolutePosition = p4.ref.current.AbsolutePosition
+				local p10Position = p10.Position
+
+				p4:setDevConsoleSize(AbsolutePosition, p10Position)
+			end
+			local function onInputEnded(p11) -- line: 64
+				-- upvalues: connection (ref), connection2 (ref)
+				if p11.UserInputType == Enum.UserInputType.MouseButton1 then
+					connection:Disconnect()
+					connection2:Disconnect()
+				end
+			end
+
+			connection = UserInputService.InputChanged:Connect(onInputChanged)
+			connection2 = UserInputService.InputEnded:Connect(onInputEnded)
+		end
+	end
+	function p4.doGamepadMenuButton(p12) -- line: 76
+		-- upvalues: p4 (copy)
+		if p4.props.isVisible and (p12.KeyCode == Enum.KeyCode.ButtonStart or p12.KeyCode == Enum.KeyCode.Escape) then
+			p4.props.dispatchSetDevConsolVisibility(false)
+		end
+	end
+
+	p4.ref = Roact.createRef()
+	p4.state = {
+		resizing = false
+	}
+end
+function v19.didMount(p13) -- line: 92
+	-- upvalues: setMouseVisibility (copy), UserInputService (copy)
+	delay(0, function() -- line: 96
+		-- upvalues: p13 (copy)
+		if p13.ref.current then
+			local AbsolutePosition = p13.ref.current.AbsolutePosition
+			local AbsolutePosition2 = p13.ref.current.ResizeButton.AbsolutePosition
+
+			p13:setDevConsoleSize(AbsolutePosition, AbsolutePosition2)
+		end
+	end)
+	setMouseVisibility(p13.props.isVisible)
+	p13.gamepadMenuListener = UserInputService.InputBegan:Connect(p13.doGamepadMenuButton)
+end
+function v19.willUnmount(p14) -- line: 108
+	-- upvalues: GuiService (copy)
+	if GuiService.SelectedCoreObject == p14.ref.current then
+		GuiService.SelectedCoreObject = nil
+	end
+
+	p14.gamepadMenuListener:Disconnect()
+end
+function v19.didUpdate(p15, p16, _) -- line: 116
+	-- upvalues: setMouseVisibility (copy), GuiService (copy), UserInputService (copy)
+	setMouseVisibility(p15.props.isVisible)
+
+	if p15.props.isMinimized and GuiService.SelectedCoreObject == p15.ref.current then
+		GuiService.SelectedCoreObject = nil
+
+		return
+	end
+
+	if p15.props.isVisible ~= p16.isVisible or p15.props.currTabIndex ~= p16.currTabIndex then
+		if UserInputService:GetLastInputType() == Enum.UserInputType.Gamepad1 and p15.props.isVisible then
+			GuiService.SelectedCoreObject = p15.ref.current
+
+			return
+		end
+
+		GuiService.SelectedCoreObject = nil
+	end
+end
+function v19.render(p18) -- line: 133
+	-- upvalues: Constants (copy), RobloxGui (copy), Roact (copy), WindowPadding (copy), DevConsoleTopBar (copy), FrameHeight (copy)
+	local isVisible = p18.props.isVisible
+	local formFactor = p18.props.formFactor
+	local isDeveloperView = p18.props.isDeveloperView
+	local currTabIndex = p18.props.currTabIndex
+	local tabList = p18.props.tabList
+	local isMinimized = p18.props.isMinimized
+	local position = p18.props.position
+	local size = p18.props.size
+	local _ = p18.state.resizing
+	local v41 = size
+	local uDim2 = UDim2.new()
+	local t1 = {}
+	local n1 = 16
+
+	if formFactor ~= Constants.FormFactor.Large then
+		local AbsoluteSize = RobloxGui.AbsoluteSize
+
+		size = UDim2.new(0, AbsoluteSize.X, 0, AbsoluteSize.Y)
+		position = UDim2.new(0, 0, 0, 0)
+		uDim2 = UDim2.new(0, 16, 0, 0)
+		v41 = size + UDim2.new(0, -32, 0, 0)
+		n1 = 0
+	end
+
+	t1.UIListLayout = Roact.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		Padding = UDim.new(0, WindowPadding)
+	})
+
+	if isMinimized then
+		t1.TopBar = Roact.createElement(DevConsoleTopBar, {
+			LayoutOrder = 1,
+			isMinimized = true,
+			formFactor = formFactor,
+			onMinimizeClicked = function() -- line: 176
+				-- upvalues: p18 (copy)
+				p18:onMinimizeClicked()
+			end,
+			onMaximizeClicked = function() -- line: 179
+				-- upvalues: p18 (copy)
+				p18:onMaximizeClicked()
+			end,
+			onCloseClicked = function() -- line: 182
+				-- upvalues: p18 (copy)
+				p18:onCloseClicked()
+			end
+		})
+
+		return Roact.createElement("Frame", {
+			Position = UDim2.new(1, -500, 1, -2 * FrameHeight),
+			Size = UDim2.new(0, 500, 0, 2 * FrameHeight),
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			Transparency = Constants.MainWindowInit.Transparency,
+			Active = true,
+			AutoLocalize = false,
+			Visible = isVisible,
+			Selectable = true,
+			BorderColor3 = Constants.Color.BaseGray,
+			[Roact.Ref] = p18.ref
+		}, t1)
+	end
+
+	t1.TopBar = Roact.createElement(DevConsoleTopBar, {
+		LayoutOrder = 1,
+		isMinimized = false,
+		formFactor = formFactor,
+		onMinimizeClicked = function() -- line: 205
+			-- upvalues: p18 (copy)
+			p18:onMinimizeClicked()
+		end,
+		onMaximizeClicked = function() -- line: 208
+			-- upvalues: p18 (copy)
+			p18:onMaximizeClicked()
+		end,
+		onCloseClicked = function() -- line: 211
+			-- upvalues: p18 (copy)
+			p18:onCloseClicked()
+		end
+	})
+
+	local v46 = FrameHeight + 2 * WindowPadding
+	local v47 = v41 - UDim2.new(0, 0, 0, v46)
+
+	if p18.ref.current and isVisible and tabList then
+		local v48 = tabList[currTabIndex]
+
+		if v48 then
+			t1.MainView = Roact.createElement(v48.tab, {
+				size = v47,
+				formFactor = formFactor,
+				isDeveloperView = isDeveloperView,
+				tabList = tabList
+			})
+		end
+	end
+
+	return Roact.createElement("Frame", {
+		Position = position,
+		Size = size,
+		Visible = isVisible,
+		BackgroundColor3 = Color3.new(0, 0, 0),
+		Transparency = Constants.MainWindowInit.Transparency,
+		BorderColor3 = Constants.Color.BaseGray,
+		BorderSizePixel = n1,
+		Active = true,
+		AutoLocalize = false,
+		Selectable = false,
+		[Roact.Ref] = p18.ref
+	}, {
+		DevConsoleUI = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = v41,
+			Position = uDim2
+		}, t1),
+		ResizeButton = Roact.createElement("ImageButton", {
+			Position = UDim2.new(1, 0, 1, 0),
+			Size = UDim2.new(0, n1, 0, n1),
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			Modal = true,
+			[Roact.Event.InputBegan] = p18.resizeInputBegan
+		})
+	})
+end
+
+local function mapStateToProps(p19, _) -- line: 266
+	return {
+		isVisible = p19.DisplayOptions.isVisible,
+		isMinimized = p19.DisplayOptions.isMinimized,
+		position = p19.DisplayOptions.position,
+		size = p19.DisplayOptions.size,
+		isDeveloperView = p19.MainView.isDeveloperView,
+		currTabIndex = p19.MainView.currTabIndex,
+		tabList = p19.MainView.tabList
+	}
+end
+local function mapDispatchToProps(p21) -- line: 278
+	-- upvalues: ChangeDevConsoleSize (copy), SetDevConsoleVisibility (copy), SetDevConsoleMinimized (copy)
+	return {
+		dispatchChangeDevConsoleSize = function(p22) -- line: 280
+			-- upvalues: p21 (copy), ChangeDevConsoleSize (copy)
+			p21(ChangeDevConsoleSize(p22))
+		end,
+		dispatchSetDevConsolVisibility = function(p23) -- line: 283
+			-- upvalues: p21 (copy), SetDevConsoleVisibility (copy)
+			p21(SetDevConsoleVisibility(p23))
+		end,
+		dispatchSetDevConsoleMinimized = function(p24) -- line: 286
+			-- upvalues: p21 (copy), SetDevConsoleMinimized (copy)
+			p21(SetDevConsoleMinimized(p24))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v19)

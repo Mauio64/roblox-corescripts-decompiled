@@ -1,69 +1,73 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Provider_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Localization_0 = require(l_Parent_0.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local v7 = require(l_Parent_0.React);
-local v8 = require(l_Parent_0.ReactFocusNavigation);
-local v9 = require(l_Parent_0.Roact);
-local l_StyleProviderWithDefaultTheme_0 = require(l_Parent_0.Style).StyleProviderWithDefaultTheme;
-local l_LayerCollectorProvider_0 = require(l_Parent_0.UIBlox).Core.Layout.LayerCollector.LayerCollectorProvider;
-local l_FFlagChatLineReportingFocusFixesEnabled_0 = require(l_Parent_0.SharedFlags).FFlagChatLineReportingFocusFixesEnabled;
-local v13 = require(l_script_FirstAncestor_0.Components.ChatLineReportStepHandler);
-local l_FoundationProvider_0 = require(l_Parent_0.Foundation).FoundationProvider;
-local v15 = nil;
-local v16 = nil;
-local function v17() --[[ Line: 28 ]]
-    -- upvalues: v16 (ref), v9 (copy), l_FFlagChatLineReportingFocusFixesEnabled_0 (copy), v15 (ref)
-    if v16 then
-        v9.unmount(v16);
-        if l_FFlagChatLineReportingFocusFixesEnabled_0 then
-            v15:teardown();
-        end;
-    end;
-end;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local CoreGui = game:GetService("CoreGui")
+local Provider = require(ChatLineReportingParent.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider
+local LocalizationService = game:GetService("LocalizationService")
+local Localization = require(ChatLineReportingParent.InExperienceLocales).Localization
+local LocalizationProvider = require(ChatLineReportingParent.Localization).LocalizationProvider
+local React = require(ChatLineReportingParent.React)
+local ReactFocusNavigation = require(ChatLineReportingParent.ReactFocusNavigation)
+local Roact = require(ChatLineReportingParent.Roact)
+local StyleProviderWithDefaultTheme = require(ChatLineReportingParent.Style).StyleProviderWithDefaultTheme
+local LayerCollectorProvider = require(ChatLineReportingParent.UIBlox).Core.Layout.LayerCollector.LayerCollectorProvider
+local FFlagChatLineReportingFocusFixesEnabled = require(ChatLineReportingParent.SharedFlags).FFlagChatLineReportingFocusFixesEnabled
+local ChatLineReportStepHandler = require(ChatLineReporting.Components.ChatLineReportStepHandler)
+local FoundationProvider = require(ChatLineReportingParent.Foundation).FoundationProvider
+local u16 = nil
+local u17 = nil
+
+local function v18() -- line: 28
+	-- upvalues: u17 (ref), Roact (copy), FFlagChatLineReportingFocusFixesEnabled (copy), u16 (ref)
+	if u17 then
+		Roact.unmount(u17)
+
+		if FFlagChatLineReportingFocusFixesEnabled then
+			u16:teardown()
+		end
+	end
+end
+
 return {
-    initialize = function(v18) --[[ Line: 38 ]]
-        -- upvalues: v7 (copy), l_LayerCollectorProvider_0 (copy), v9 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), l_FoundationProvider_0 (copy), l_StyleProviderWithDefaultTheme_0 (copy), v13 (copy), v17 (copy), l_FFlagChatLineReportingFocusFixesEnabled_0 (copy), v15 (ref), v8 (copy), v16 (ref), l_Provider_0 (copy), l_CoreGui_0 (copy)
-        local v19 = v7.createElement("ScreenGui", {
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = false, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        }, {
-            LayerCollector = v7.createElement(l_LayerCollectorProvider_0, {}, {
-                LocalizationProvider = v9.createElement(l_LocalizationProvider_0, {
-                    localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-                }, {
-                    FoundationProvider = v7.createElement(l_FoundationProvider_0, {
-                        theme = "Dark"
-                    }, {
-                        StyleProvider = v7.createElement(l_StyleProviderWithDefaultTheme_0, {
-                            withDarkTheme = true
-                        }, {
-                            ChatLineReportStepHandler = v7.createElement(v13, {
-                                unmount = v17, 
-                                messages = v18
-                            })
-                        })
-                    })
-                })
-            })
-        });
-        if l_FFlagChatLineReportingFocusFixesEnabled_0 then
-            v15 = v8.FocusNavigationService.new(v8.EngineInterface.CoreGui);
-            v16 = v9.mount(v7.createElement(v8.FocusNavigationContext.Provider, {
-                value = v15
-            }, {
-                FocusNavigationRegistryProvider = v7.createElement(l_Provider_0, nil, {
-                    ChatLineReportRoot = v19
-                })
-            }), l_CoreGui_0, "ChatLineReportRoot");
-            return;
-        else
-            v16 = v9.mount(v19, l_CoreGui_0, "ChatLineReportRoot");
-            return;
-        end;
-    end
-};
+	initialize = function(p1) -- line: 38
+		-- upvalues: React (copy), LayerCollectorProvider (copy), Roact (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), FoundationProvider (copy), StyleProviderWithDefaultTheme (copy), ChatLineReportStepHandler (copy), v18 (copy), FFlagChatLineReportingFocusFixesEnabled (copy), u16 (ref), ReactFocusNavigation (copy), u17 (ref), Provider (copy), CoreGui (copy)
+		local v20 = React.createElement("ScreenGui", {
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = false,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		}, {
+			LayerCollector = React.createElement(LayerCollectorProvider, {}, {
+				LocalizationProvider = Roact.createElement(LocalizationProvider, {
+					localization = Localization.new(LocalizationService.RobloxLocaleId)
+				}, {
+					FoundationProvider = React.createElement(FoundationProvider, {
+						theme = "Dark"
+					}, {
+						StyleProvider = React.createElement(StyleProviderWithDefaultTheme, {
+							withDarkTheme = true
+						}, {
+							ChatLineReportStepHandler = React.createElement(ChatLineReportStepHandler, {
+								unmount = v18,
+								messages = p1
+							})
+						})
+					})
+				})
+			})
+		})
+
+		if FFlagChatLineReportingFocusFixesEnabled then
+			u16 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+			u17 = Roact.mount(React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
+				value = u16
+			}, {
+				FocusNavigationRegistryProvider = React.createElement(Provider, nil, {
+					ChatLineReportRoot = v20
+				})
+			}), CoreGui, "ChatLineReportRoot")
+
+			return
+		end
+
+		u17 = Roact.mount(v20, CoreGui, "ChatLineReportRoot")
+	end
+}

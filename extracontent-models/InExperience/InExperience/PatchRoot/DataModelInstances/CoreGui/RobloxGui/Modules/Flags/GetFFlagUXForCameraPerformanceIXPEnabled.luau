@@ -1,4 +1,5 @@
-game:DefineFastFlag("UXForCameraPerformanceIXPEnabled", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("UXForCameraPerformanceIXPEnabled");
-end;
+game:DefineFastFlag("UXForCameraPerformanceIXPEnabled", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("UXForCameraPerformanceIXPEnabled")
+end

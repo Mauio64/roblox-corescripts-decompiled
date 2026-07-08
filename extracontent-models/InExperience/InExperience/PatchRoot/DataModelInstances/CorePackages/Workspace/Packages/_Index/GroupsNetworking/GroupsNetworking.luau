@@ -1,19 +1,22 @@
-local l_networkRequests_0 = script.networkRequests;
-local v1 = require(l_networkRequests_0.createJoinGroup);
-local v2 = require(l_networkRequests_0.createCancelJoinGroupRequest);
-local v3 = require(l_networkRequests_0.createLeaveGroup);
-local v4 = require(l_networkRequests_0.createMakePrimaryGroup);
-local v5 = require(l_networkRequests_0.createRemovePrimaryGroup);
+local networkRequests = script.networkRequests
+local createJoinGroup = require(networkRequests.createJoinGroup)
+local createCancelJoinGroupRequest = require(networkRequests.createCancelJoinGroupRequest)
+local createLeaveGroup = require(networkRequests.createLeaveGroup)
+local createMakePrimaryGroup = require(networkRequests.createMakePrimaryGroup)
+local createRemovePrimaryGroup = require(networkRequests.createRemovePrimaryGroup)
+
+local function createRequestThunks(t1: {[any]: any}) -- line: 12
+	-- upvalues: createJoinGroup (copy), createCancelJoinGroupRequest (copy), createLeaveGroup (copy), createMakePrimaryGroup (copy), createRemovePrimaryGroup (copy)
+	return {
+		JoinGroup = createJoinGroup(t1),
+		CancelJoinGroupRequest = createCancelJoinGroupRequest(t1),
+		LeaveGroup = createLeaveGroup(t1),
+		MakePrimaryGroup = createMakePrimaryGroup(t1),
+		RemovePrimaryGroup = createRemovePrimaryGroup(t1)
+	}
+end
+
 return {
-    config = function(v6) --[[ Line: 12 ]] --[[ Name: createRequestThunks ]]
-        -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy)
-        return {
-            JoinGroup = v1(v6), 
-            CancelJoinGroupRequest = v2(v6), 
-            LeaveGroup = v3(v6), 
-            MakePrimaryGroup = v4(v6), 
-            RemovePrimaryGroup = v5(v6)
-        };
-    end, 
-    ["jest.config"] = script["jest.config"]
-};
+	config = createRequestThunks,
+	["jest.config"] = script["jest.config"]
+}

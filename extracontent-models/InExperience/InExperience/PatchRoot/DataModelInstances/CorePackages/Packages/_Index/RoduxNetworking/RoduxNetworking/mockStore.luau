@@ -1,21 +1,22 @@
 return {
-    config = function(v0) --[[ Line: 7 ]] --[[ Name: config ]]
-        local v1 = v0 or {};
-        local v2 = v1.state or {};
-        return {
-            dispatch = v1.dispatch or function(v3, v4) --[[ Line: 12 ]]
-                if type(v4) == "function" then
-                    v4(v3);
-                end;
-            end, 
-            getState = function() --[[ Line: 18 ]] --[[ Name: getState ]]
-                -- upvalues: v2 (ref)
-                return v2;
-            end, 
-            setState = function(_, v6) --[[ Line: 22 ]] --[[ Name: setState ]]
-                -- upvalues: v2 (ref)
-                v2 = v6;
-            end
-        };
-    end
-};
+	config = function(t1: {[any]: any}?) -- line: 7
+		local v2 = t1 or {}
+		local u3 = v2.state or {}
+
+		return {
+			dispatch = v2.dispatch or function(p1, p2) -- line: 12
+				if type(p2) == "function" then
+					p2(p1)
+				end
+			end,
+			getState = function() -- line: 18
+				-- upvalues: u3 (ref)
+				return u3
+			end,
+			setState = function(_, p4) -- line: 22
+				-- upvalues: u3 (ref)
+				u3 = p4
+			end
+		}
+	end
+}

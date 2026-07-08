@@ -1,7 +1,10 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_RunService_0 = game:GetService("RunService");
-local v2 = require(l_Parent_0.Enums.RequestType);
-return function(v3) --[[ Line: 11 ]] --[[ Name: isMockingPurchases ]]
-    -- upvalues: l_RunService_0 (copy), v2 (copy)
-    return l_RunService_0:IsStudio() and v3 ~= v2.AvatarCreationFee;
-end;
+local ParentParent = script.Parent.Parent
+local RunService = game:GetService("RunService")
+local RequestType = require(ParentParent.Enums.RequestType)
+
+local function isMockingPurchases(p1) -- line: 11
+	-- upvalues: RunService (copy), RequestType (copy)
+	return RunService:IsStudio() and p1 ~= RequestType.AvatarCreationFee
+end
+
+return isMockingPurchases

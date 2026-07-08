@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "state");
+return require(script.Parent.makeActionCreator)(script.Name, "state")

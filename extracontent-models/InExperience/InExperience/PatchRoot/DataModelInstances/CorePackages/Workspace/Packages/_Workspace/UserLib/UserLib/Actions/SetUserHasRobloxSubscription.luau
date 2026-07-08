@@ -1,7 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("UserLib").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2) --[[ Line: 6 ]]
-    return {
-        userId = v1, 
-        hasRobloxSubscription = v2
-    };
-end);
+local Parent = script:FindFirstAncestor("UserLib").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 6
+	return {
+		userId = p1,
+		hasRobloxSubscription = p2
+	}
+end)

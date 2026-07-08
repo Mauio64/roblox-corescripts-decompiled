@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXCustomGetStateForActionHandler) and game:DefineFastFlag("AXEnableManualSavingBlockingPrompt3", false);
+return require(script.Parent.FFlagAXCustomGetStateForActionHandler) and game:DefineFastFlag("AXEnableManualSavingBlockingPrompt3", false)

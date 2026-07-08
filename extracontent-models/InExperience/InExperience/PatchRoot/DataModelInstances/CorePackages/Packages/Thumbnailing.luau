@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent._Index;
-return (require(l__Index_0.Thumbnailing.Thumbnailing));
+local _Index = script.Parent._Index
+
+return (require(_Index.Thumbnailing.Thumbnailing))

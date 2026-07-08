@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnhancedAvatarHeadsFtuxUseMemStorage", false);
+return game:DefineFastFlag("AXEnhancedAvatarHeadsFtuxUseMemStorage", false)

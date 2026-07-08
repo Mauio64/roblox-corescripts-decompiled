@@ -13,7 +13,7 @@ local t1 = {
 	replyingToUserText = nil,
 	replyingToUserContent = nil,
 	replyingToUserId = nil,
-	onCloseActivated = function() --[[ onCloseActivated ]] -- line: 35
+	onCloseActivated = function() -- line: 35
 	end
 }
 
@@ -29,11 +29,11 @@ function ReplyComposeBar(p1) -- line: 38
 			LayoutOrder = v12.LayoutOrder
 		}, {
 			Avatar = v12.replyingToUserId and React.createElement(Foundation.Avatar, {
+				LayoutOrder = 1,
 				userId = v12.replyingToUserId,
 				userPresence = v14.presence,
 				backgroundStyle = v13.Color.Surface.Surface_200,
-				size = Foundation.Enums.InputSize.Medium,
-				LayoutOrder = 1
+				size = Foundation.Enums.InputSize.Medium
 			}) or nil,
 			Text = React.createElement(ReplyComposeBarText, {
 				layoutOrder = 2,
@@ -41,12 +41,12 @@ function ReplyComposeBar(p1) -- line: 38
 				contentText = v12.replyingToUserContent
 			}),
 			CloseButton = React.createElement(Foundation.IconButton, {
+				isCircular = true,
+				LayoutOrder = 3,
 				onActivated = v12.onCloseActivated,
 				icon = BuilderIcons.Icon.X,
 				variant = Foundation.Enums.ButtonVariant.Utility,
-				size = Foundation.Enums.InputSize.Medium,
-				isCircular = true,
-				LayoutOrder = 3
+				size = Foundation.Enums.InputSize.Medium
 			})
 		}))
 	end
@@ -65,11 +65,11 @@ function ReplyComposeBar(p1) -- line: 38
 			LayoutOrder = 2
 		}, {
 			Avatar = v12.replyingToUserId and React.createElement(Foundation.Avatar, {
+				LayoutOrder = 1,
 				userId = v12.replyingToUserId,
 				userPresence = v14.presence,
 				backgroundStyle = v13.Color.Surface.Surface_100,
-				size = Foundation.Enums.InputSize.Medium,
-				LayoutOrder = 1
+				size = Foundation.Enums.InputSize.Medium
 			}) or nil,
 			Text = React.createElement(ReplyComposeBarText, {
 				layoutOrder = 2,
@@ -77,12 +77,12 @@ function ReplyComposeBar(p1) -- line: 38
 				contentText = v12.replyingToUserContent
 			}),
 			CloseButton = React.createElement(Foundation.IconButton, {
+				isCircular = true,
+				LayoutOrder = 3,
 				onActivated = v12.onCloseActivated,
 				icon = BuilderIcons.Icon.X,
 				variant = Foundation.Enums.ButtonVariant.Utility,
-				size = Foundation.Enums.InputSize.Medium,
-				isCircular = true,
-				LayoutOrder = 3
+				size = Foundation.Enums.InputSize.Medium
 			})
 		})
 	}))

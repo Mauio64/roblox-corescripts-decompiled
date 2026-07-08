@@ -1,72 +1,83 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Constants);
-local v3 = require(l_script_FirstAncestor_0.Utility.Wrappers);
-local l_CoreGui_0 = v3.Services.CoreGui;
-local l_RunService_0 = v3.Services.RunService;
-local l_Players_0 = v3.Services.Players;
-local v7 = if l_Players_0.LocalPlayer and l_RunService_0:IsRunning() then l_Players_0.LocalPlayer:WaitForChild("PlayerGui", 3) else nil;
-local v8 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v9 = require(l_script_FirstAncestor_0.Utility.isPluginSecurity);
-local v10 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local l_useStyleSheet_0 = require(l_script_FirstAncestor_0.Providers.Style.StyleSheetContext).useStyleSheet;
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v13 = require(script.Parent.OverlayContext);
-local v14 = require(script.Parent.useKeyboardAwareSize);
-local v15 = require(l_Parent_0.React);
-local v16 = require(l_Parent_0.ReactRoblox);
-local v17 = {
-    DisplayOrder = v2.MAX_LAYOUT_ORDER - 1
-};
-local v18 = if v9() then l_CoreGui_0 else v7;
-return function(v19) --[[ Line: 38 ]] --[[ Name: OverlayProvider ]]
-    -- upvalues: v8 (copy), v10 (copy), v17 (copy), v15 (copy), v14 (copy), l_useStyleSheet_0 (copy), v18 (copy), v13 (copy), v16 (copy), v2 (copy)
-    local v20 = if v8.FoundationOverlayDisplayOrder then v10(v19, v17) else v19;
-    local v21, v22 = v15.useState(v20.gui);
-    local v23, v24 = v15.useState(false);
-    local v25 = if v8.FoundationOverlayKeyboardAwareness then v14(v21) else nil;
-    local v26 = l_useStyleSheet_0();
-    local v27 = v15.useCallback(function() --[[ Line: 45 ]]
-        -- upvalues: v20 (copy), v24 (copy)
-        if v20.gui == nil then
-            v24(true);
-        end;
-    end, {
-        v20.gui
-    });
-    local v28 = false;
-    if v20.gui == nil then
-        v28 = false;
-        if v18 ~= nil then
-            v28 = v23;
-        end;
-    end;
-    local v29 = if v20.gui ~= nil then v20.gui else v21;
-    return v15.createElement(v13.Provider, {
-        value = {
-            requestOverlay = v27, 
-            instance = v29
-        }
-    }, {
-        FoundationOverlay = if v28 then v16.createPortal(v15.createElement("ScreenGui", {
-            Enabled = true, 
-            DisplayOrder = if v8.FoundationOverlayDisplayOrder then v20.DisplayOrder else v2.MAX_LAYOUT_ORDER - 1, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-            ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets, 
-            SafeAreaCompatibility = Enum.SafeAreaCompatibility.None, 
-            ClipToDeviceSafeArea = false, 
-            ref = if not v8.FoundationOverlayKeyboardAwareness then v22 else nil
-        }, {
-            SafeAreaFrame = if v8.FoundationOverlayKeyboardAwareness then v15.createElement("Frame", {
-                Size = v25, 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                ref = v22
-            }) else nil, 
-            FoundationStyleLink = v15.createElement("StyleLink", {
-                StyleSheet = v26
-            })
-        }), v18) else nil, 
-        Children = v15.createElement(v15.Fragment, nil, v20.children)
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Constants = require(Foundation.Constants)
+local Wrappers = require(Foundation.Utility.Wrappers)
+local CoreGui = Wrappers.Services.CoreGui
+local RunService = Wrappers.Services.RunService
+local Players = Wrappers.Services.Players
+local Flags = require(Foundation.Utility.Flags)
+local v9 = nil
+
+if not Flags.FoundationUseMainGuiUtility then
+	v9 = if not Players.LocalPlayer or not RunService:IsRunning() then nil else Players.LocalPlayer:WaitForChild("PlayerGui", 3)
+end
+
+local getMainGui = require(Foundation.Utility.getMainGui)
+local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useStyleSheet = require(Foundation.Providers.Style.StyleSheetContext).useStyleSheet
+
+require(Foundation.Components.Types)
+
+local OverlayContext = require(script.Parent.OverlayContext)
+local useKeyboardAwareSize = require(script.Parent.useKeyboardAwareSize)
+local React = require(FoundationParent.React)
+local ReactRoblox = require(FoundationParent.ReactRoblox)
+local t1 = {
+	DisplayOrder = Constants.MAX_LAYOUT_ORDER - 1
+}
+local v19 = if not Flags.FoundationUseMainGuiUtility then if not isPluginSecurity() then v9 else CoreGui else getMainGui()
+
+local function OverlayProvider(p1) -- line: 45
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), Flags (copy), useKeyboardAwareSize (copy), useStyleSheet (copy), v19 (copy), OverlayContext (copy), ReactRoblox (copy)
+	local v22 = withDefaults(p1, t1)
+	local v23, v24 = React.useState(v22.gui)
+	local v25, v26 = React.useState(false)
+	local v27 = if not Flags.FoundationOverlayKeyboardAwarenessHardened or v22.gui then nil else v23 and v23.Parent
+	local v28 = if not Flags.FoundationOverlayKeyboardAwareness then nil else useKeyboardAwareSize(if not Flags.FoundationOverlayKeyboardAwarenessHardened then v23 else v27)
+	local v29 = useStyleSheet()
+	local v30 = React.useCallback(function() -- line: 57
+		-- upvalues: v22 (copy), v26 (copy)
+		if v22.gui == nil then
+			v26(true)
+		end
+	end, { v22.gui })
+	local v31 = v22.gui == nil and (v19 ~= nil and v25)
+	local v32 = if v22.gui == nil then v23 else v22.gui
+	local v33 = nil
+
+	if Flags.FoundationOverlayKeyboardAwarenessHardened then
+		v33 = if v22.gui == nil then v27 else v22.gui
+	end
+
+	return React.createElement(OverlayContext.Provider, {
+		value = {
+			requestOverlay = v30,
+			instance = v32,
+			screen = v33
+		}
+	}, {
+		FoundationOverlay = if not v31 then nil else ReactRoblox.createPortal(React.createElement("ScreenGui", {
+			Enabled = true,
+			ClipToDeviceSafeArea = false,
+			DisplayOrder = v22.DisplayOrder,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
+			SafeAreaCompatibility = Enum.SafeAreaCompatibility.None,
+			ref = if Flags.FoundationOverlayKeyboardAwareness then nil else v24
+		}, {
+			SafeAreaFrame = if not Flags.FoundationOverlayKeyboardAwareness then nil else React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Size = v28,
+				ref = v24
+			}),
+			FoundationStyleLink = React.createElement("StyleLink", {
+				StyleSheet = v29
+			})
+		}), v19),
+		Children = React.createElement(React.Fragment, nil, v22.children)
+	})
+end
+
+return OverlayProvider

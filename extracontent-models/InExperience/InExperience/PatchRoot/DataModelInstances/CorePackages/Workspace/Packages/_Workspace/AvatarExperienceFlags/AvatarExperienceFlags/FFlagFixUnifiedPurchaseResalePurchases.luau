@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixUnifiedPurchaseResalePurchases", false);
+return game:DefineFastFlag("FixUnifiedPurchaseResalePurchases", false)

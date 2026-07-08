@@ -1,137 +1,142 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Cryo);
-local l_useState_0 = v3.useState;
-local v6 = require(l_Parent_0.Components.CoreUI.PromptConnections);
-local v7 = require(l_Parent_0.Components.CoreUI.RsvpPrompt);
-local v8 = require(l_Parent_1.FocusNavigationUtils);
-local l_FocusRoot_0 = v8.FocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v8.FocusNavigableSurfaceIdentifierEnum;
-local v11 = game:DefineFastFlag("FixFocusWhenInGameMenuIsOpen", false);
-local v12 = {
-    PromptRsvp = "PromptRsvp"
-};
-local v13 = {
-    [v12.PromptRsvp] = v7
-};
-return function(v14) --[[ Line: 52 ]]
-    -- upvalues: l_useState_0 (copy), v3 (copy), v4 (copy), v13 (copy), v12 (copy), v11 (copy), l_GuiService_0 (copy), v6 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    local v15, v16 = l_useState_0({
-        promptType = nil, 
-        promptData = nil, 
-        promptQueue = {}
-    });
-    local l_promptData_0 = v15.promptData;
-    local l_promptType_0 = v15.promptType;
-    local v19 = v3.useCallback(function() --[[ Line: 62 ]]
-        -- upvalues: v4 (ref), v15 (copy), v16 (copy)
-        if not v4.isEmpty(v15.promptQueue) then
-            v16(v4.Dictionary.join(v15, {
-                promptType = v15.promptQueue[1].promptType, 
-                promptData = v15.promptQueue[1].promptData, 
-                promptQueue = v4.List.removeIndex(v15.promptQueue, 1)
-            }));
-            return;
-        else
-            v16({
-                promptType = nil, 
-                promptData = {}, 
-                promptQueue = {}
-            });
-            return;
-        end;
-    end, {
-        v15, 
-        v16
-    });
-    local v20 = nil;
-    if l_promptType_0 then
-        local v21 = v13[l_promptType_0];
-        if v21 then
-            v20 = v3.createElement(v21, {
-                enableInputDelayed = v14.enableInputDelayed, 
-                promptData = l_promptData_0, 
-                closePrompt = v19, 
-                overrideUseWideMode = v14.overrideUseWideMode
-            });
-        else
-            error((("Unexpected prompt type: %*!"):format(l_promptType_0)));
-        end;
-    end;
-    local v24 = v3.useCallback(function(v22, v23) --[[ Line: 93 ]]
-        -- upvalues: v15 (copy), v16 (copy), v4 (ref), v12 (ref)
-        if v15.promptType ~= nil then
-            v16(v4.Dictionary.join(v15, {
-                promptQueue = v4.List.join(v15.promptQueue, {
-                    {
-                        promptType = v12.PromptRsvp, 
-                        promptData = {
-                            eventId = v22, 
-                            eventDetails = v23
-                        }
-                    }
-                })
-            }));
-            return;
-        else
-            v16({
-                promptType = v12.PromptRsvp, 
-                promptData = {
-                    eventId = v22, 
-                    eventDetails = v23
-                }, 
-                promptQueue = {}
-            });
-            return;
-        end;
-    end, {
-        v15, 
-        v16
-    });
-    local v25 = nil;
-    local v26 = nil;
-    if v11 then
-        local v27, v28 = v3.useState(l_GuiService_0.MenuIsOpen);
-        v25 = v27;
-        v26 = v28;
-        v3.useEffect(function() --[[ Line: 123 ]]
-            -- upvalues: v20 (ref), v26 (ref), l_GuiService_0 (ref)
-            if not v20 then
-                return;
-            else
-                v26(l_GuiService_0.MenuIsOpen);
-                local v29 = l_GuiService_0.MenuOpened:Connect(function() --[[ Line: 131 ]]
-                    -- upvalues: v26 (ref)
-                    v26(true);
-                end);
-                local v30 = l_GuiService_0.MenuClosed:Connect(function() --[[ Line: 134 ]]
-                    -- upvalues: v26 (ref)
-                    v26(false);
-                end);
-                return function() --[[ Line: 137 ]]
-                    -- upvalues: v29 (copy), v30 (copy)
-                    v29:Disconnect();
-                    v30:Disconnect();
-                end;
-            end;
-        end, {
-            v20
-        });
-    end;
-    return v3.createElement(v3.Fragment, {}, {
-        PromptConnections = v3.createElement(v6, {
-            openRsvpPrompt = v24, 
-            closePrompt = v19
-        }), 
-        FocusNavigationCoreScriptsWrapper = if v20 then v3.createElement(l_FocusRoot_0, {
-            surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-            isIsolated = true, 
-            isAutoFocusRoot = true, 
-            isFocusable = if v11 then not v25 else nil
-        }, {
-            Prompt = v20
-        }) else nil
-    });
-end;
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Cryo = require(ParentParentParent.Cryo)
+local useState = React.useState
+local PromptConnections = require(ParentParent.Components.CoreUI.PromptConnections)
+local RsvpPrompt = require(ParentParent.Components.CoreUI.RsvpPrompt)
+local FocusNavigationUtils = require(ParentParentParent.FocusNavigationUtils)
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local v12 = game:DefineFastFlag("FixFocusWhenInGameMenuIsOpen", false)
+local _ = {
+	PromptRsvp = "PromptRsvp"
+}
+local t1 = {
+	PromptRsvp = RsvpPrompt
+}
+
+return function(t2: {[any]: any}) -- line: 52
+	-- upvalues: useState (copy), React (copy), Cryo (copy), t1 (copy), v12 (copy), GuiService (copy), PromptConnections (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v16, v17 = useState({
+		promptType = nil,
+		promptData = nil,
+		promptQueue = {}
+	})
+	local promptData = v16.promptData
+	local promptType = v16.promptType
+	local v20 = React.useCallback(function() -- line: 62
+		-- upvalues: Cryo (copy), v16 (copy), v17 (copy)
+		if not Cryo.isEmpty(v16.promptQueue) then
+			v17(Cryo.Dictionary.join(v16, {
+				promptType = v16.promptQueue[1].promptType,
+				promptData = v16.promptQueue[1].promptData,
+				promptQueue = Cryo.List.removeIndex(v16.promptQueue, 1)
+			}))
+
+			return
+		end
+
+		v17({
+			promptType = nil,
+			promptData = {},
+			promptQueue = {}
+		})
+	end, {
+		v16,
+		v17
+	})
+	local u21 = nil
+
+	if promptType then
+		local v22 = t1[promptType]
+
+		if v22 then
+			u21 = React.createElement(v22, {
+				enableInputDelayed = t2.enableInputDelayed,
+				promptData = promptData,
+				closePrompt = v20,
+				overrideUseWideMode = t2.overrideUseWideMode
+			})
+		else
+			error(`Unexpected prompt type: { promptType }!`)
+		end
+	end
+
+	local v23 = React.useCallback(function(s1: string, t3: {[any]: any}) -- line: 93
+		-- upvalues: v16 (copy), v17 (copy), Cryo (copy)
+		if v16.promptType ~= nil then
+			v17(Cryo.Dictionary.join(v16, {
+				promptQueue = Cryo.List.join(v16.promptQueue, {{
+					promptType = "PromptRsvp",
+					promptData = {
+						eventId = s1,
+						eventDetails = t3
+					}
+				}})
+			}))
+
+			return
+		end
+
+		v17({
+			promptType = "PromptRsvp",
+			promptData = {
+				eventId = s1,
+				eventDetails = t3
+			},
+			promptQueue = {}
+		})
+	end, {
+		v16,
+		v17
+	})
+	local v24 = nil
+	local u25 = nil
+
+	if v12 then
+		local v26
+
+		v24, v26 = React.useState(GuiService.MenuIsOpen)
+		u25 = v26
+		React.useEffect(function() -- line: 123
+			-- upvalues: u21 (ref), u25 (ref), GuiService (copy)
+			if not u21 then
+				return
+			end
+
+			u25(GuiService.MenuIsOpen)
+
+			local connection = GuiService.MenuOpened:Connect(function() -- line: 131
+				-- upvalues: u25 (ref)
+				u25(true)
+			end)
+			local connection2 = GuiService.MenuClosed:Connect(function() -- line: 134
+				-- upvalues: u25 (ref)
+				u25(false)
+			end)
+
+			return function() -- line: 137
+				-- upvalues: connection (copy), connection2 (copy)
+				connection:Disconnect()
+				connection2:Disconnect()
+			end
+		end, { u21 })
+	end
+
+	return React.createElement(React.Fragment, {}, {
+		PromptConnections = React.createElement(PromptConnections, {
+			openRsvpPrompt = v23,
+			closePrompt = v20
+		}),
+		FocusNavigationCoreScriptsWrapper = if not u21 then nil else React.createElement(FocusRoot, {
+			isIsolated = true,
+			isAutoFocusRoot = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+			isFocusable = if not v12 then nil else not v24
+		}, {
+			Prompt = u21
+		})
+	})
+end

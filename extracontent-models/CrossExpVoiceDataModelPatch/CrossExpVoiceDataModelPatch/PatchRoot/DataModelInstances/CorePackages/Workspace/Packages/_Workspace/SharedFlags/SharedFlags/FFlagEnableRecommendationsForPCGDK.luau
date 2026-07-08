@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableRecommendationsForPCGDK", false);
+return game:DefineFastFlag("EnableRecommendationsForPCGDK", false)

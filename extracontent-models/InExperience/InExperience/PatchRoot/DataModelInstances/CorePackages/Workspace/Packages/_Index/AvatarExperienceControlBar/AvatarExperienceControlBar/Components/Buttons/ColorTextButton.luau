@@ -1,55 +1,57 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.Localization);
-local v5 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local l_useLocalization_0 = v4.Hooks.useLocalization;
-local v7 = require(l_script_FirstAncestor_0.Hooks.useHoverBinding);
-local v8 = require(l_script_FirstAncestor_0.Components.Items.ColorItem);
-return (v2.forwardRef(function(v9, v10) --[[ Line: 27 ]]
-    -- upvalues: v5 (copy), v7 (copy), l_useLocalization_0 (copy), v2 (copy), v3 (copy), v8 (copy)
-    local v11 = v5();
-    local v12, v13 = v7();
-    local v14 = if v9.radius then v9.radius else v11.defaultIconTextButtonRadius;
-    local v15 = l_useLocalization_0({
-        text = v9.localizedTextKey
-    });
-    local v16 = if v15.text then v15.text else v9.text;
-    return v2.createElement(v3.View, {
-        onActivated = v9.onActivated, 
-        isDisabled = v9.disabled, 
-        tag = "auto-xy size-full-0 clip row gap-xsmall items-center", 
-        ref = v10, 
-        onStateChanged = v13, 
-        backgroundStyle = v12:map(function(v17) --[[ Line: 44 ]]
-            -- upvalues: v11 (copy)
-            return {
-                Color3 = v11.hoverIconBackgroundStyle.Color3, 
-                Transparency = if v17 then v11.hoverIconBackgroundStyle.Transparency else 1
-            };
-        end), 
-        padding = {
-            left = UDim.new(0, v11.textButtonPaddingLeft), 
-            right = UDim.new(0, v11.textButtonPaddingRight), 
-            top = UDim.new(0, v11.textButtonPaddingY), 
-            bottom = UDim.new(0, v11.textButtonPaddingY)
-        }, 
-        cornerRadius = UDim.new(0, v14), 
-        Visible = v9.Visible, 
-        LayoutOrder = v9.LayoutOrder
-    }, {
-        Color = v2.createElement(v8, {
-            colors = v9.colors, 
-            size = v9.size, 
-            colorSize = v9.colorSize, 
-            disabled = true, 
-            onActivated = v9.onActivated, 
-            Selectable = false
-        }), 
-        Text = v2.createElement(v3.Text, {
-            Text = v16, 
-            tag = "auto-xy text-title-medium content-emphasis"
-        })
-    });
-end));
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local Localization = require(AvatarExperienceControlBarParent.Localization)
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useLocalization = Localization.Hooks.useLocalization
+local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+local ColorItem = require(AvatarExperienceControlBar.Components.Items.ColorItem)
+
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 27
+	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), useLocalization (copy), React (copy), Foundation (copy), ColorItem (copy)
+	local v12 = useSemanticTokens()
+	local v13, v14 = useHoverBinding()
+	local v15 = if not t1.radius then v12.defaultIconTextButtonRadius else t1.radius
+	local v16 = useLocalization({
+		text = t1.localizedTextKey
+	})
+	local v17 = if not v16.text then t1.text else v16.text
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy size-full-0 clip row gap-xsmall items-center",
+		onActivated = t1.onActivated,
+		isDisabled = t1.disabled,
+		ref = p1,
+		onStateChanged = v14,
+		backgroundStyle = v13:map(function(p2) -- line: 44
+			-- upvalues: v12 (copy)
+			return {
+				Color3 = v12.hoverIconBackgroundStyle.Color3,
+				Transparency = not p2 and 1 or v12.hoverIconBackgroundStyle.Transparency
+			}
+		end),
+		padding = {
+			left = UDim.new(0, v12.textButtonPaddingLeft),
+			right = UDim.new(0, v12.textButtonPaddingRight),
+			top = UDim.new(0, v12.textButtonPaddingY),
+			bottom = UDim.new(0, v12.textButtonPaddingY)
+		},
+		cornerRadius = UDim.new(0, v15),
+		Visible = t1.Visible,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		Color = React.createElement(ColorItem, {
+			disabled = true,
+			Selectable = false,
+			colors = t1.colors,
+			size = t1.size,
+			colorSize = t1.colorSize,
+			onActivated = t1.onActivated
+		}),
+		Text = React.createElement(Foundation.Text, {
+			tag = "auto-xy text-title-medium content-emphasis",
+			Text = v17
+		})
+	})
+end))

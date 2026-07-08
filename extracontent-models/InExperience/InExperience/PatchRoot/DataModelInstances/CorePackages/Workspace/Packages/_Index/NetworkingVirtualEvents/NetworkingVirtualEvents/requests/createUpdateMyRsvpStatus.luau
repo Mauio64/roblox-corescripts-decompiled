@@ -1,12 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NetworkingVirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.Http);
-local _ = require(l_script_FirstAncestor_0.types);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    return (v3.POST(script.Name, function(v4, v5, v6) --[[ Line: 9 ]]
-        -- upvalues: v1 (ref)
-        return (v4(v1.Url.APIS_URL):path("virtual-events"):path("v1"):path("virtual-events"):id(v5):path("rsvps"):body({
-            rsvpStatus = v6
-        }));
-    end));
-end;
+local NetworkingVirtualEvents = script:FindFirstAncestor("NetworkingVirtualEvents")
+local Http = require(NetworkingVirtualEvents.Parent.Http)
+
+require(NetworkingVirtualEvents.types)
+
+return function(p1) -- line: 6
+	-- upvalues: Http (copy)
+	return (p1.POST(script.Name, function(p2, s1: string, p3) -- line: 9
+		-- upvalues: Http (copy)
+		return (p2(Http.Url.APIS_URL):path("virtual-events"):path("v1"):path("virtual-events"):id(s1):path("rsvps"):body({
+			rsvpStatus = p3
+		}))
+	end))
+end

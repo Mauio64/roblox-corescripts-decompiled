@@ -1,5 +1,6 @@
-local l_script_FirstAncestorWhichIsA_0 = script:FindFirstAncestorWhichIsA("Plugin");
+local Plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
 return {
-    context = l_script_FirstAncestorWhichIsA_0 and "plugin" or "unknown", 
-    plugin_name = if l_script_FirstAncestorWhichIsA_0 then l_script_FirstAncestorWhichIsA_0.Name else nil
-};
+	context = not Plugin and "unknown" or "plugin",
+	plugin_name = if not Plugin then nil else Plugin.Name
+}

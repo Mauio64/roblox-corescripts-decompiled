@@ -1,11 +1,17 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: findAnalyticsField ]]
-    if not v1 then
-        return nil;
-    elseif v1 and v1[v0] ~= nil then
-        return v1[v0];
-    elseif v2 ~= nil then
-        return v2;
-    else
-        return nil;
-    end;
-end;
+local function findAnalyticsField(s1: string, t1: {[any]: any}?, p1) -- line: 2
+	if not t1 then
+		return nil
+	end
+
+	if t1 and t1[s1] ~= nil then
+		return t1[s1]
+	end
+
+	if p1 ~= nil then
+		return p1
+	end
+
+	return nil
+end
+
+return findAnalyticsField

@@ -1,46 +1,48 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_context_0 = l_Parent_1.context;
-local v3 = require(l_Parent_1.dependencies);
-local l_React_0 = v3.React;
-local l_UIBlox_0 = v3.UIBlox;
-local v6 = require(l_Parent_0.NotificationContentFrame);
-local l_useStyle_0 = l_UIBlox_0.Core.Style.useStyle;
-local v8 = require(l_Parent_1.constants);
-local v9 = require(l_context_0.useNotificationCardData);
-local l_DefaultCardPadding_0 = v8.Padding.DefaultCardPadding;
-local l_DefaultContentPadding_0 = v8.DefaultContentPadding;
-local l_DefaultCardCornerRadius_0 = v8.DefaultCardCornerRadius;
-return function(v13) --[[ Line: 20 ]]
-    -- upvalues: v9 (copy), v8 (copy), l_DefaultCardPadding_0 (copy), l_useStyle_0 (copy), l_React_0 (copy), l_DefaultCardCornerRadius_0 (copy), l_DefaultContentPadding_0 (copy), v6 (copy)
-    local v14 = v9();
-    local l_cardSize_0 = v14.cardSize;
-    local v16 = if v14.cardTransparency then v14.cardTransparency else v8.CardTransparency.Default;
-    local v17 = if l_cardSize_0 and l_cardSize_0.cardPadding then l_cardSize_0.cardPadding else l_DefaultCardPadding_0;
-    local v18 = l_useStyle_0();
-    return l_React_0.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 0), 
-        BackgroundColor3 = v18.Theme.BackgroundUIDefault.Color, 
-        BackgroundTransparency = v16, 
-        BorderSizePixel = 0, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = v13.layoutOrder
-    }, {
-        UICorner = l_React_0.createElement("UICorner", {
-            CornerRadius = l_DefaultCardCornerRadius_0
-        }), 
-        UIListLayout = l_React_0.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            Padding = UDim.new(0, l_DefaultContentPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        }), 
-        UIPadding = l_React_0.createElement("UIPadding", {
-            PaddingBottom = UDim.new(0, v17), 
-            PaddingLeft = UDim.new(0, v17), 
-            PaddingRight = UDim.new(0, v17), 
-            PaddingTop = UDim.new(0, v17)
-        }), 
-        NotificationContentFrame = l_React_0.createElement(v6)
-    });
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local context = scriptParentParent.context
+local dependencies = require(scriptParentParent.dependencies)
+local React = dependencies.React
+local UIBlox = dependencies.UIBlox
+local NotificationContentFrame = require(scriptParent.NotificationContentFrame)
+local useStyle = UIBlox.Core.Style.useStyle
+local constants = require(scriptParentParent.constants)
+local useNotificationCardData = require(context.useNotificationCardData)
+local DefaultCardPadding = constants.Padding.DefaultCardPadding
+local DefaultContentPadding = constants.DefaultContentPadding
+local DefaultCardCornerRadius = constants.DefaultCardCornerRadius
+
+return function(t1: {[any]: any}) -- line: 20
+	-- upvalues: useNotificationCardData (copy), constants (copy), DefaultCardPadding (copy), useStyle (copy), React (copy), DefaultCardCornerRadius (copy), DefaultContentPadding (copy), NotificationContentFrame (copy)
+	local v15 = useNotificationCardData()
+	local cardSize = v15.cardSize
+	local v17 = if not v15.cardTransparency then constants.CardTransparency.Default else v15.cardTransparency
+	local v18 = if not cardSize or not cardSize.cardPadding then DefaultCardPadding else cardSize.cardPadding
+	local v19 = useStyle()
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, 0),
+		BackgroundColor3 = v19.Theme.BackgroundUIDefault.Color,
+		BackgroundTransparency = v17,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t1.layoutOrder
+	}, {
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = DefaultCardCornerRadius
+		}),
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			Padding = UDim.new(0, DefaultContentPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		UIPadding = React.createElement("UIPadding", {
+			PaddingBottom = UDim.new(0, v18),
+			PaddingLeft = UDim.new(0, v18),
+			PaddingRight = UDim.new(0, v18),
+			PaddingTop = UDim.new(0, v18)
+		}),
+		NotificationContentFrame = React.createElement(NotificationContentFrame)
+	})
+end

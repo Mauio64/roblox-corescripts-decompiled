@@ -1,4 +1,6 @@
-local l_Parent_0 = script:FindFirstAncestor("PageLoadTracker").Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(script.Parent.createPageTracker);
-return v1.createContext(nil);
+local Parent = script:FindFirstAncestor("PageLoadTracker").Parent
+local React = require(Parent.React)
+
+require(script.Parent.createPageTracker)
+
+return React.createContext(nil)

@@ -1,3 +1,3 @@
 return {
-    createPersistReducer = require(script.createPersistReducer)
-};
+	createPersistReducer = require(script.createPersistReducer)
+}

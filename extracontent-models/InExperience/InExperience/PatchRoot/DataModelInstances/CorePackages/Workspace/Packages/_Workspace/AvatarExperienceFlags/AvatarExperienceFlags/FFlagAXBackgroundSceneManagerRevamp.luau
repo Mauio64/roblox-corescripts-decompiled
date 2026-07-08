@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXBackgroundSceneManagerRevamp3", false);
+return game:DefineFastFlag("AXBackgroundSceneManagerRevamp3", false)

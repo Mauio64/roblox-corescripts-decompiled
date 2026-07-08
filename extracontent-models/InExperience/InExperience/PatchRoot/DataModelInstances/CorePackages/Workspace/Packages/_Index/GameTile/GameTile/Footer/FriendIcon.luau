@@ -1,66 +1,72 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(l_Parent_0.UserLib);
-local l_Constants_0 = v2.Utils.Constants;
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v2.Utils.getRbxthumbWithTypeSizeAndOptions;
-local l_Constants_1 = require(l_Parent_0.AppChat).Constants;
-local l_ImageSetLabel_0 = require(l_Parent_0.UIBlox).Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local l_Colors_0 = require(l_Parent_0.Style).Colors;
-local v9 = v1.PureComponent:extend("FriendIcon");
-v9.defaultProps = {
-    layoutOrder = 0, 
-    maskColor = l_Colors_0.White, 
-    showBackground = true
-};
-v9.render = function(v10) --[[ Line: 25 ]] --[[ Name: render ]]
-    -- upvalues: l_Constants_1 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), l_Constants_0 (copy), v1 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy)
-    local l_user_0 = v10.props.user;
-    local l_dotSize_0 = v10.props.dotSize;
-    local l_itemSize_0 = v10.props.itemSize;
-    local l_layoutOrder_0 = v10.props.layoutOrder;
-    local l_showBackground_0 = v10.props.showBackground;
-    local l_maskColor_0 = v10.props.maskColor;
-    local v17 = l_dotSize_0 ~= nil;
-    local l_l_Constants_1_PresenceIndicatorSizeKey_0 = l_Constants_1:GetPresenceIndicatorSizeKey(l_dotSize_0);
-    local v19 = nil;
-    local v20 = nil;
-    if l_user_0 then
-        if v17 then
-            v20 = l_Constants_1.PresenceIndicatorImagesBySize[l_l_Constants_1_PresenceIndicatorSizeKey_0][l_user_0.presence];
-        end;
-        v19 = l_getRbxthumbWithTypeSizeAndOptions_0(l_user_0.id, l_Constants_0.RbxthumbTypes.AvatarHeadShot, 48);
-    end;
-    return v1.createElement("Frame", {
-        BackgroundColor3 = Color3.fromRGB(209, 209, 209), 
-        BackgroundTransparency = l_showBackground_0 and 0 or 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = l_layoutOrder_0, 
-        Size = UDim2.new(0, l_itemSize_0, 0, l_itemSize_0)
-    }, {
-        Profile = v1.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Image = l_GetImageData_0(v19) or v19, 
-            Size = UDim2.new(0, l_itemSize_0, 0, l_itemSize_0), 
-            ZIndex = 1
-        }), 
-        Mask = l_showBackground_0 and v1.createElement("ImageLabel", {
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Image = "rbxasset://textures/ui/LuaApp/graphic/gr-avatar-frame-36x36.png", 
-            ImageColor3 = l_maskColor_0, 
-            Size = UDim2.new(0, l_itemSize_0, 0, l_itemSize_0), 
-            ZIndex = 2
-        }) or nil, 
-        Dot = l_showBackground_0 and v17 and v1.createElement("ImageLabel", {
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Image = v20, 
-            Position = UDim2.new(1, -l_dotSize_0, 1, -l_dotSize_0), 
-            Size = UDim2.new(0, l_dotSize_0, 0, l_dotSize_0), 
-            ZIndex = 3
-        }) or nil
-    });
-end;
-return v9;
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local Roact = require(Parent.Roact)
+local UserLib = require(Parent.UserLib)
+local Constants = UserLib.Utils.Constants
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local Constants2 = require(Parent.AppChat.Constants)
+local ImageSetLabel = require(Parent.UIBlox).Core.ImageSet.ImageSetLabel
+local GetImageData = require(Parent.RobloxAppAssets).GetImageData
+local Colors = require(Parent.Style).Colors
+local v10 = Roact.PureComponent:extend("FriendIcon")
+
+v10.defaultProps = {
+	layoutOrder = 0,
+	showBackground = true,
+	maskColor = Colors.White
+}
+
+function v10.render(p1) -- line: 25
+	-- upvalues: Constants2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy)
+	local user = p1.props.user
+	local dotSize = p1.props.dotSize
+	local itemSize = p1.props.itemSize
+	local layoutOrder = p1.props.layoutOrder
+	local showBackground = p1.props.showBackground
+	local maskColor = p1.props.maskColor
+	local v18 = dotSize ~= nil
+	local PresenceIndicatorSizeKey = Constants2:GetPresenceIndicatorSizeKey(dotSize)
+	local v20 = nil
+	local v21 = nil
+
+	if user then
+		if v18 then
+			v21 = Constants2.PresenceIndicatorImagesBySize[PresenceIndicatorSizeKey][user.presence]
+		end
+
+		v20 = getRbxthumbWithTypeSizeAndOptions(user.id, Constants.RbxthumbTypes.AvatarHeadShot, 48)
+	end
+
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundColor3 = Color3.fromRGB(209, 209, 209),
+		BackgroundTransparency = not showBackground and 1 or 0,
+		LayoutOrder = layoutOrder,
+		Size = UDim2.new(0, itemSize, 0, itemSize)
+	}, {
+		Profile = Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 1,
+			Image = GetImageData(v20) or v20,
+			Size = UDim2.new(0, itemSize, 0, itemSize)
+		}),
+		Mask = showBackground and Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Image = "rbxasset://textures/ui/LuaApp/graphic/gr-avatar-frame-36x36.png",
+			ZIndex = 2,
+			ImageColor3 = maskColor,
+			Size = UDim2.new(0, itemSize, 0, itemSize)
+		}) or nil,
+		Dot = showBackground and (not not v18 and Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			Image = v21,
+			Position = UDim2.new(1, -dotSize, 1, -dotSize),
+			Size = UDim2.new(0, dotSize, 0, dotSize)
+		})) or nil
+	})
+end
+
+return v10

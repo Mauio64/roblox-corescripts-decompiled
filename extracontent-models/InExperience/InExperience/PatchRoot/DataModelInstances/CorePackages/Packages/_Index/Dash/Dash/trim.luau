@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 7 ]] --[[ Name: trim ]]
-    return (v0:match("^%s*(.-)%s*$"));
-end;
+local function trim(s1: string) -- line: 7
+	return (s1:match("^%s*(.-)%s*$"))
+end
+
+return trim

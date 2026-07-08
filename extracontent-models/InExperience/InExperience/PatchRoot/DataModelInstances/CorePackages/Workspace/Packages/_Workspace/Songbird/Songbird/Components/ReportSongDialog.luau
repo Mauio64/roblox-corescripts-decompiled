@@ -1,170 +1,165 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_script_FirstAncestor_0.Parent.AssetFavorites);
-local v4 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local v5 = require(l_script_FirstAncestor_0.Parent.GenericAbuseReporting);
-local v6 = require(l_script_FirstAncestor_0.Parent.React);
-local v7 = require(l_script_FirstAncestor_0.Parent.FocusNavigationUtils);
-local v8 = require(l_script_FirstAncestor_0.logger);
-local _ = require(l_script_FirstAncestor_0.types);
-local l_FocusRoot_0 = v7.FocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v7.FocusNavigableSurfaceIdentifierEnum;
-local l_DefaultTwoStepReportFlow_0 = v5.UXFlows.DefaultTwoStepReportFlow;
-local l_AbuseCategory_0 = v5.Enums.AbuseCategory;
-local l_AbuseEntrypoint_0 = v5.Enums.AbuseEntrypoint;
-local l_useCallback_0 = v6.useCallback;
-local l_useLocalUserId_0 = v3.useLocalUserId;
-local v17 = {
-    {
-        localizationKey = "Feature.SongDetails.Label.InappropriateAudio", 
-        value = "InappropriateAudio"
-    }, 
-    {
-        localizationKey = "Feature.SongDetails.Label.InappropriateThumbnail", 
-        value = "InappropriateThumbnail"
-    }
-};
-local v18 = {
-    Audio = "audio", 
-    Image = "image"
-};
-local function v23(v19) --[[ Line: 58 ]] --[[ Name: buildReport ]]
-    -- upvalues: l_AbuseEntrypoint_0 (copy), l_AbuseCategory_0 (copy), l_HttpService_0 (copy)
-    local v20 = {
-        tags = {
-            ENTRY_POINT = {
-                valueList = {
-                    {
-                        data = l_AbuseEntrypoint_0.APP
-                    }
-                }
-            }, 
-            SUBMITTER_USER_ID = {
-                valueList = {
-                    {
-                        data = tostring(v19.userId)
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_CATEGORY = {
-                valueList = {
-                    {
-                        data = l_AbuseCategory_0.ABUSE_CATEGORY_INAPT_CONTENT
-                    }
-                }
-            }, 
-            REPORTER_COMMENT = {
-                valueList = {
-                    {
-                        data = v19.comment
-                    }
-                }
-            }, 
-            REPORT_TARGET_ASSET_ID = {
-                valueList = {
-                    {
-                        data = v19.assetId
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_VECTOR = {
-                valueList = {
-                    {
-                        data = v19.abuseVector
-                    }
-                }
-            }, 
-            VARIANT = {
-                valueList = {
-                    {
-                        data = v19.variant
-                    }
-                }
-            }
-        }
-    };
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 111 ]]
-        -- upvalues: l_HttpService_0 (ref), v20 (copy)
-        return l_HttpService_0:JSONEncode(v20);
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return nil;
-    end;
-end;
-return v6.memo(function(v24) --[[ Line: 118 ]] --[[ Name: ReportSongDialog ]]
-    -- upvalues: l_useLocalUserId_0 (copy), l_useCallback_0 (copy), v17 (copy), v23 (copy), v18 (copy), l_Players_0 (copy), v8 (copy), v6 (copy), v4 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), l_DefaultTwoStepReportFlow_0 (copy)
-    local v25 = l_useLocalUserId_0();
-    local v26 = l_useCallback_0(function() --[[ Line: 121 ]]
-        -- upvalues: v24 (copy)
-        if v24.onClose then
-            v24.onClose();
-        end;
-    end, {
-        v24.onClose
-    });
-    local v35 = l_useCallback_0(function(v27, v28) --[[ Line: 127 ]]
-        -- upvalues: v17 (ref), v24 (copy), v23 (ref), v25 (copy), v18 (ref), l_Players_0 (ref), v8 (ref)
-        local v29 = v27 == v17[1].value;
-        local v30 = if v29 then v24.audio.assetId else v24.audio.thumbnailAssetId;
-        if v30 then
-            local v31 = v23({
-                userId = v25, 
-                comment = v28, 
-                assetId = v30, 
-                abuseVector = if v29 then v18.Audio else v18.Image, 
-                variant = v24.analyticsSource
-            });
-            if v31 then
-                local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-                if l_LocalPlayer_0 then
-                    local l_status_1, l_result_1 = pcall(function() --[[ Line: 143 ]]
-                        -- upvalues: l_Players_0 (ref), l_LocalPlayer_0 (copy), v31 (copy)
-                        l_Players_0:ReportAbuseV3(l_LocalPlayer_0, v31);
-                    end);
-                    if l_status_1 then
-                        v8:info((("Abuse report sent for asset [%*] with reason [%*] and comment [%*]"):format(v30, v27, v28)));
-                    else
-                        v8:warning((("Failed to submit abuse report for asset %*: %*"):format(v30, l_result_1)));
-                    end;
-                end;
-            end;
-        end;
-        return true;
-    end, {
-        v24.analyticsSource, 
-        v24.audio.assetId, 
-        v24.audio.thumbnailAssetId, 
-        v25
-    });
-    return v6.createElement(v4.View, {
-        tag = "size-full-0 auto-y", 
-        selectionGroup = true
-    }, {
-        FocusRoot = v6.createElement(l_FocusRoot_0, {
-            surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-            isIsolated = true, 
-            isAutoFocusRoot = true
-        }, {
-            AbuseReportFlow = v6.createElement(l_DefaultTwoStepReportFlow_0, {
-                analyticsContext = v24.analyticsSource, 
-                onCloseProps = {
-                    hasPreviousSteps = false, 
-                    onAbandon = v26
-                }, 
-                onSubmitProps = {
-                    hasNextSteps = false, 
-                    onSubmit = v35
-                }, 
-                onComplete = v26, 
-                reportCategories = v17, 
-                reportCategoryDefaultKey = v17[1].value, 
-                localizationKeys = {
-                    formTitle = "Feature.SongDetails.Action.ReportAudio"
-                }
-            })
-        })
-    });
-end);
+local Songbird = script:FindFirstAncestor("Songbird")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local AssetFavorites = require(Songbird.Parent.AssetFavorites)
+local Foundation = require(Songbird.Parent.Foundation)
+local React = require(Songbird.Parent.React)
+local FocusNavigationUtils = require(Songbird.Parent.FocusNavigationUtils)
+local logger = require(Songbird.logger)
+
+require(Songbird.types)
+
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local DefaultTwoStepReportFlow = require(Songbird.Parent.GenericAbuseReporting.DefaultTwoStepReportFlow)
+local AbuseCategory = require(Songbird.Parent.GenericAbuseReporting.AbuseCategory)
+local AbuseEntrypoint = require(Songbird.Parent.GenericAbuseReporting.AbuseEntrypoint)
+local useCallback = React.useCallback
+local useLocalUserId = AssetFavorites.useLocalUserId
+local t1 = {
+	{
+		localizationKey = "Feature.SongDetails.Label.InappropriateAudio",
+		value = "InappropriateAudio"
+	},
+	{
+		localizationKey = "Feature.SongDetails.Label.InappropriateThumbnail",
+		value = "InappropriateThumbnail"
+	}
+}
+local _ = {
+	Audio = "audio",
+	Image = "image"
+}
+
+local function buildReport(t2: {[any]: any}) -- line: 57
+	-- upvalues: AbuseEntrypoint (copy), AbuseCategory (copy), HttpService (copy)
+	local t3 = {
+		tags = {
+			ENTRY_POINT = {
+				valueList = {{
+					data = AbuseEntrypoint.APP
+				}}
+			},
+			SUBMITTER_USER_ID = {
+				valueList = {{
+					data = tostring(t2.userId)
+				}}
+			},
+			REPORTED_ABUSE_CATEGORY = {
+				valueList = {{
+					data = AbuseCategory.ABUSE_CATEGORY_INAPT_CONTENT
+				}}
+			},
+			REPORTER_COMMENT = {
+				valueList = {{
+					data = t2.comment
+				}}
+			},
+			REPORT_TARGET_ASSET_ID = {
+				valueList = {{
+					data = t2.assetId
+				}}
+			},
+			REPORTED_ABUSE_VECTOR = {
+				valueList = {{
+					data = t2.abuseVector
+				}}
+			},
+			VARIANT = {
+				valueList = {{
+					data = t2.variant
+				}}
+			}
+		}
+	}
+	local ok, result = pcall(function() -- line: 110
+		-- upvalues: HttpService (copy), t3 (copy)
+		return HttpService:JSONEncode(t3)
+	end)
+
+	if ok then
+		return result
+	end
+
+	return nil
+end
+local function ReportSongDialog(t4: {[any]: any}) -- line: 117
+	-- upvalues: useLocalUserId (copy), useCallback (copy), t1 (copy), buildReport (copy), Players (copy), logger (copy), React (copy), Foundation (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), DefaultTwoStepReportFlow (copy)
+	local v25 = useLocalUserId()
+	local v26 = useCallback(function() -- line: 120
+		-- upvalues: t4 (copy)
+		if t4.onClose then
+			t4.onClose()
+		end
+	end, { t4.onClose })
+	local v27 = useCallback(function(s1: string, s2: string) -- line: 126
+		-- upvalues: t1 (copy), t4 (copy), buildReport (copy), v25 (copy), Players (copy), logger (copy)
+		local v30 = s1 == t1[1].value
+		local v31 = if not v30 then t4.audio.thumbnailAssetId else t4.audio.assetId
+
+		if v31 then
+			local v32 = buildReport({
+				userId = v25,
+				comment = s2,
+				assetId = v31,
+				abuseVector = not v30 and "image" or "audio",
+				variant = t4.analyticsSource
+			})
+
+			if v32 then
+				local LocalPlayer = Players.LocalPlayer
+
+				if LocalPlayer then
+					local ok, result = pcall(function() -- line: 142
+						-- upvalues: Players (copy), LocalPlayer (copy), v32 (copy)
+						Players:ReportAbuseV3(LocalPlayer, v32)
+					end)
+
+					if ok then
+						logger:info(`Abuse report sent for asset [{ v31 }] with reason [{ s1 }] and comment [{ s2 }]`)
+					else
+						logger:warning(`Failed to submit abuse report for asset { v31 }: { result }`)
+					end
+				end
+			end
+		end
+
+		return true
+	end, {
+		t4.analyticsSource,
+		t4.audio.assetId,
+		t4.audio.thumbnailAssetId,
+		v25
+	})
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full-0 auto-y",
+		selectionGroup = true
+	}, {
+		FocusRoot = React.createElement(FocusRoot, {
+			isIsolated = true,
+			isAutoFocusRoot = true,
+			surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
+		}, {
+			AbuseReportFlow = React.createElement(DefaultTwoStepReportFlow, {
+				analyticsContext = t4.analyticsSource,
+				onCloseProps = {
+					hasPreviousSteps = false,
+					onAbandon = v26
+				},
+				onSubmitProps = {
+					hasNextSteps = false,
+					onSubmit = v27
+				},
+				onComplete = v26,
+				reportCategories = t1,
+				reportCategoryDefaultKey = t1[1].value,
+				localizationKeys = {
+					formTitle = "Feature.SongDetails.Action.ReportAudio"
+				}
+			})
+		})
+	})
+end
+
+return React.memo(ReportSongDialog)

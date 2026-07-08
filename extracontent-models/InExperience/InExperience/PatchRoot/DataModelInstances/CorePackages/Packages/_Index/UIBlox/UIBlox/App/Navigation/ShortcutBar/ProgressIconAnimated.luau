@@ -1,195 +1,216 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-local v3 = require(l_Parent_0.React);
-local _ = require(script.Parent.Types);
-local v5 = require(script.Parent.ProgressIcon);
-local function v29(v6, v7, v8) --[[ Line: 33 ]] --[[ Name: useRenderStepped ]]
-    -- upvalues: v3 (copy), l_RunService_0 (copy)
-    local v9 = v3.useRef(0);
-    local v10 = v3.useRef(0);
-    local l_isAnimationRunning_0 = v6.isAnimationRunning;
-    local l_isKeyPressed_0 = v6.isKeyPressed;
-    local l_isKeyHolding_0 = v6.isKeyHolding;
-    local l_onKeyHolding_0 = v7.onKeyHolding;
-    local l_onAnimationRunning_0 = v7.onAnimationRunning;
-    local l_onComplete_0 = v7.onComplete;
-    local l_onReset_0 = v7.onReset;
-    local l_animationTriggerTime_0 = v8.animationTriggerTime;
-    local l_animationKeyHoldingTime_0 = v8.animationKeyHoldingTime;
-    local l_animationCoolDownTime_0 = v8.animationCoolDownTime;
-    local v22 = v3.useCallback(function(v21) --[[ Line: 54 ]]
-        -- upvalues: v10 (copy), l_animationTriggerTime_0 (copy), l_onKeyHolding_0 (copy)
-        v10.current = v10.current + v21;
-        if v10.current >= l_animationTriggerTime_0 then
-            l_onKeyHolding_0();
-        end;
-    end, {
-        l_onKeyHolding_0, 
-        l_animationTriggerTime_0
-    });
-    local v24 = v3.useCallback(function(v23) --[[ Line: 61 ]]
-        -- upvalues: v9 (copy), l_animationKeyHoldingTime_0 (copy), l_onAnimationRunning_0 (copy), l_onComplete_0 (copy)
-        v9.current = math.clamp(v9.current + v23 / l_animationKeyHoldingTime_0, 0, 1);
-        l_onAnimationRunning_0(v9.current);
-        if v9.current >= 1 then
-            l_onComplete_0();
-        end;
-    end, {
-        l_onAnimationRunning_0, 
-        l_animationKeyHoldingTime_0, 
-        l_onComplete_0
-    });
-    local v26 = v3.useCallback(function(v25) --[[ Line: 69 ]]
-        -- upvalues: v9 (copy), l_animationCoolDownTime_0 (copy), l_onAnimationRunning_0 (copy), l_onReset_0 (copy)
-        v9.current = math.clamp(v9.current - v25 / l_animationCoolDownTime_0, 0, 1);
-        l_onAnimationRunning_0(v9.current);
-        if v9.current <= 0 then
-            l_onReset_0();
-        end;
-    end, {
-        l_onAnimationRunning_0, 
-        l_animationCoolDownTime_0, 
-        l_onReset_0
-    });
-    v3.useEffect(function() --[[ Line: 77 ]]
-        -- upvalues: l_isKeyHolding_0 (copy), v9 (copy), v24 (copy), l_isKeyPressed_0 (copy), v22 (copy), l_isAnimationRunning_0 (copy), v26 (copy), l_RunService_0 (ref), v10 (copy)
-        local v27 = nil;
-        local v28 = nil;
-        if l_isKeyHolding_0 then
-            v9.current = 0;
-            v28 = v24;
-        elseif l_isKeyPressed_0 then
-            v28 = v22;
-        elseif l_isAnimationRunning_0 then
-            v28 = v26;
-        end;
-        if v28 then
-            v27 = l_RunService_0.RenderStepped:Connect(v28);
-        end;
-        if v27 then
-            return function() --[[ Line: 94 ]]
-                -- upvalues: l_isKeyPressed_0 (ref), v10 (ref), v27 (ref)
-                if l_isKeyPressed_0 then
-                    v10.current = 0;
-                end;
-                v27:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 102 ]]
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
 
-            end;
-        end;
-    end, {
-        l_isKeyPressed_0, 
-        l_isKeyHolding_0, 
-        l_isAnimationRunning_0, 
-        v22, 
-        v24, 
-        v26
-    });
-end;
-return function(v30) --[[ Line: 113 ]] --[[ Name: ProgressIconAnimated ]]
-    -- upvalues: v3 (copy), v29 (copy), l_UserInputService_0 (copy), v5 (copy)
-    local v31, v32 = v3.useState(false);
-    local v33, v34 = v3.useState(false);
-    local v35, v36 = v3.useState(false);
-    local v37, v38 = v3.useState(false);
-    local v39, v40 = v3.useBinding(nil);
-    local v41 = v3.useCallback(function() --[[ Line: 121 ]]
-        -- upvalues: v34 (copy), v36 (copy)
-        v34(true);
-        v36(true);
-    end, {});
-    local v43 = v3.useCallback(function(v42) --[[ Line: 126 ]]
-        -- upvalues: v40 (copy)
-        v40(v42);
-    end, {});
-    local v44 = v3.useCallback(function() --[[ Line: 130 ]]
-        -- upvalues: v32 (copy), v34 (copy), v36 (copy), v38 (copy), v30 (copy)
-        v32(false);
-        v34(false);
-        v36(false);
-        v38(true);
-        if v30.onHoldComplete then
-            v30.onHoldComplete();
-        end;
-    end, {
-        v30.onHoldComplete
-    });
-    local v45 = v3.useCallback(function() --[[ Line: 140 ]]
-        -- upvalues: v36 (copy), v40 (copy)
-        v36(false);
-        v40(nil);
-    end, {});
-    v29({
-        isKeyPressed = v31, 
-        isKeyHolding = v33, 
-        isAnimationRunning = v35
-    }, {
-        onKeyHolding = v41, 
-        onAnimationRunning = v43, 
-        onComplete = v44, 
-        onReset = v45
-    }, {
-        animationTriggerTime = v30.animationTriggerTime, 
-        animationKeyHoldingTime = v30.animationKeyHoldingTime, 
-        animationCoolDownTime = v30.animationCoolDownTime
-    });
-    local v47 = v3.useCallback(function(v46) --[[ Line: 160 ]]
-        -- upvalues: v30 (copy), v32 (copy), v38 (copy), v35 (copy), v34 (copy), v40 (copy)
-        if v46.UserInputType ~= Enum.UserInputType.Keyboard and v46.UserInputType ~= Enum.UserInputType.Gamepad1 then
-            return;
-        else
-            if v46.KeyCode == v30.keyCode then
-                if v46.UserInputState == Enum.UserInputState.Begin then
-                    v32(true);
-                    v38(false);
-                    if v35 then
-                        v34(true);
-                        return;
-                    else
-                        v40(nil);
-                        return;
-                    end;
-                elseif v46.UserInputState == Enum.UserInputState.End then
-                    v32(false);
-                    v34(false);
-                end;
-            end;
-            return;
-        end;
-    end, {
-        v30.keyCode, 
-        v35
-    });
-    v3.useEffect(function() --[[ Line: 184 ]]
-        -- upvalues: v30 (copy), l_UserInputService_0 (ref), v47 (copy)
-        if v30.progress then
-            return function() --[[ Line: 186 ]]
+require(script.Parent.Types)
 
-            end;
-        else
-            local v48 = l_UserInputService_0.InputBegan:Connect(v47);
-            local v49 = l_UserInputService_0.InputEnded:Connect(v47);
-            return function() --[[ Line: 191 ]]
-                -- upvalues: v48 (copy), v49 (copy)
-                v48:Disconnect();
-                v49:Disconnect();
-            end;
-        end;
-    end, {
-        v47, 
-        v30.progress
-    });
-    local v50 = false;
-    if v30.progress or v33 or v35 or v37 then
-        v50 = true;
-    end;
-    return v3.createElement(v5, {
-        progress = v30.progress or v39, 
-        icon = v30.icon, 
-        iconHolding = v30.iconHolding, 
-        isHolding = v50
-    });
-end;
+local ProgressIcon = require(script.Parent.ProgressIcon)
+
+local function useRenderStepped(t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 33
+	-- upvalues: React (copy), RunService (copy)
+	local v11 = React.useRef(0)
+	local v12 = React.useRef(0)
+	local isAnimationRunning = t1.isAnimationRunning
+	local isKeyPressed = t1.isKeyPressed
+	local isKeyHolding = t1.isKeyHolding
+	local onKeyHolding = t2.onKeyHolding
+	local onAnimationRunning = t2.onAnimationRunning
+	local onComplete = t2.onComplete
+	local onReset = t2.onReset
+	local animationTriggerTime = t3.animationTriggerTime
+	local animationKeyHoldingTime = t3.animationKeyHoldingTime
+	local animationCoolDownTime = t3.animationCoolDownTime
+	local v23 = React.useCallback(function(n1: number) -- line: 54
+		-- upvalues: v12 (copy), animationTriggerTime (copy), onKeyHolding (copy)
+		v12.current = v12.current + n1
+
+		if v12.current >= animationTriggerTime then
+			onKeyHolding()
+		end
+	end, {
+		onKeyHolding,
+		animationTriggerTime
+	})
+	local v24 = React.useCallback(function(n2: number) -- line: 61
+		-- upvalues: v11 (copy), animationKeyHoldingTime (copy), onAnimationRunning (copy), onComplete (copy)
+		v11.current = math.clamp(v11.current + n2 / animationKeyHoldingTime, 0, 1)
+		onAnimationRunning(v11.current)
+
+		if v11.current >= 1 then
+			onComplete()
+		end
+	end, {
+		onAnimationRunning,
+		animationKeyHoldingTime,
+		onComplete
+	})
+	local v25 = React.useCallback(function(n3: number) -- line: 69
+		-- upvalues: v11 (copy), animationCoolDownTime (copy), onAnimationRunning (copy), onReset (copy)
+		v11.current = math.clamp(v11.current - n3 / animationCoolDownTime, 0, 1)
+		onAnimationRunning(v11.current)
+
+		if v11.current <= 0 then
+			onReset()
+		end
+	end, {
+		onAnimationRunning,
+		animationCoolDownTime,
+		onReset
+	})
+
+	React.useEffect(function() -- line: 77
+		-- upvalues: isKeyHolding (copy), v11 (copy), v24 (copy), isKeyPressed (copy), v23 (copy), isAnimationRunning (copy), v25 (copy), RunService (copy), v12 (copy)
+		local connection = nil
+		local v47 = nil
+
+		if isKeyHolding then
+			v11.current = 0
+			v47 = v24
+		elseif isKeyPressed then
+			v47 = v23
+		elseif isAnimationRunning then
+			v47 = v25
+		end
+
+		if v47 then
+			connection = RunService.RenderStepped:Connect(v47)
+		end
+
+		if connection then
+			return function() -- line: 94
+				-- upvalues: isKeyPressed (copy), v12 (copy), connection (ref)
+				if isKeyPressed then
+					v12.current = 0
+				end
+
+				connection:Disconnect()
+			end
+		end
+
+		return function() -- line: 102
+		end
+	end, {
+		isKeyPressed,
+		isKeyHolding,
+		isAnimationRunning,
+		v23,
+		v24,
+		v25
+	})
+end
+local function ProgressIconAnimated(p1) -- line: 113
+	-- upvalues: React (copy), useRenderStepped (copy), UserInputService (copy), ProgressIcon (copy)
+	local v27, v28 = React.useState(false)
+	local v29, v30 = React.useState(false)
+	local v31, v32 = React.useState(false)
+	local v33, v34 = React.useState(false)
+	local v35, v36 = React.useBinding(nil)
+	local v37 = React.useCallback(function() -- line: 121
+		-- upvalues: v30 (copy), v32 (copy)
+		v30(true)
+		v32(true)
+	end, {})
+	local v38 = React.useCallback(function(p2) -- line: 126
+		-- upvalues: v36 (copy)
+		v36(p2)
+	end, {})
+	local v39 = React.useCallback(function() -- line: 130
+		-- upvalues: v28 (copy), v30 (copy), v32 (copy), v34 (copy), p1 (copy)
+		v28(false)
+		v30(false)
+		v32(false)
+		v34(true)
+
+		if p1.onHoldComplete then
+			p1.onHoldComplete()
+		end
+	end, { p1.onHoldComplete })
+	local v40 = React.useCallback(function() -- line: 140
+		-- upvalues: v32 (copy), v36 (copy)
+		v32(false)
+		v36(nil)
+	end, {})
+
+	useRenderStepped({
+		isKeyPressed = v27,
+		isKeyHolding = v29,
+		isAnimationRunning = v31
+	}, {
+		onKeyHolding = v37,
+		onAnimationRunning = v38,
+		onComplete = v39,
+		onReset = v40
+	}, {
+		animationTriggerTime = p1.animationTriggerTime,
+		animationKeyHoldingTime = p1.animationKeyHoldingTime,
+		animationCoolDownTime = p1.animationCoolDownTime
+	})
+
+	local v41 = React.useCallback(function(p3) -- line: 160
+		-- upvalues: p1 (copy), v28 (copy), v34 (copy), v31 (copy), v30 (copy), v36 (copy)
+		if p3.UserInputType ~= Enum.UserInputType.Keyboard and p3.UserInputType ~= Enum.UserInputType.Gamepad1 then
+			return
+		end
+
+		if p3.KeyCode == p1.keyCode then
+			if p3.UserInputState == Enum.UserInputState.Begin then
+				v28(true)
+				v34(false)
+
+				if v31 then
+					v30(true)
+
+					return
+				end
+
+				v36(nil)
+
+				return
+			end
+
+			if p3.UserInputState == Enum.UserInputState.End then
+				v28(false)
+				v30(false)
+			end
+		end
+	end, {
+		p1.keyCode,
+		v31
+	})
+
+	React.useEffect(function() -- line: 184
+		-- upvalues: p1 (copy), UserInputService (copy), v41 (copy)
+		if p1.progress then
+			return function() -- line: 186
+			end
+		end
+
+		local connection = UserInputService.InputBegan:Connect(v41)
+		local connection2 = UserInputService.InputEnded:Connect(v41)
+
+		return function() -- line: 191
+			-- upvalues: connection (copy), connection2 (copy)
+			connection:Disconnect()
+			connection2:Disconnect()
+		end
+	end, {
+		v41,
+		p1.progress
+	})
+
+	local v42 = false
+
+	if p1.progress or (v29 or v31 or v33) then
+		v42 = true
+	end
+
+	return React.createElement(ProgressIcon, {
+		progress = p1.progress or v35,
+		icon = p1.icon,
+		iconHolding = p1.iconHolding,
+		isHolding = v42
+	})
+end
+
+return ProgressIconAnimated

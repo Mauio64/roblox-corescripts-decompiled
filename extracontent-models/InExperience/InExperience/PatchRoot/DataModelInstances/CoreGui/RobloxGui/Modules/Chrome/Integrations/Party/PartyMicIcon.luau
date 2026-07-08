@@ -1,117 +1,119 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_RunService_0 = game:GetService("RunService");
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local v6 = require(l_CorePackages_0.Workspace.Packages.CrossExperienceVoice);
-local v7 = require(l_CorePackages_0.Workspace.Packages.VoiceChat);
-local l_useParticipant_0 = v6.Hooks.useParticipant;
-local l_useIsVoiceConnected_0 = v6.Hooks.useIsVoiceConnected;
-local l_useIsActiveParticipant_0 = v6.Hooks.useIsActiveParticipant;
-local l_useIsParticipantMuted_0 = v6.Hooks.useIsParticipantMuted;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_UnibarStyle_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).UnibarStyle;
-local l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 = require(l_Parent_0.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider;
-local l_ImageSetLabel_0 = v5.Core.ImageSet.ImageSetLabel;
-local v16 = game:DefineFastInt("PartyMicVoiceIndicatorFrameBuffer", 3);
-local function v22(v17, v18, v19, v20, v21) --[[ Line: 28 ]] --[[ Name: getLoadingIndicatorIcon ]]
-    -- upvalues: v7 (copy)
-    if not v19 or not v17 or v18 then
-        return v7.Utils.GetIcon("Muted", "MicLight");
-    elseif v20 then
-        return v7.Utils.GetIcon("Unmuted", "MicLight", v21);
-    else
-        return v7.Utils.GetIcon("Unmuted0", "MicLight");
-    end;
-end;
-PartyMicIcon = function(v23) --[[ Line: 44 ]] --[[ Name: PartyMicIcon ]]
-    -- upvalues: l_Players_0 (copy), l_useIsVoiceConnected_0 (copy), l_useParticipant_0 (copy), l_useIsActiveParticipant_0 (copy), v4 (copy), l_useIsParticipantMuted_0 (copy), l_HttpService_0 (copy), l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 (copy), l_UnibarStyle_0 (copy), v16 (copy), l_RunService_0 (copy), v22 (copy), l_ImageSetLabel_0 (copy)
-    local v24 = l_Players_0 and l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId or -1;
-    local v25 = l_useIsVoiceConnected_0();
-    local v26 = l_useParticipant_0(v24);
-    local v27 = l_useIsActiveParticipant_0(v24);
-    local v28 = v4.useRef(v27);
-    local v29 = l_useIsParticipantMuted_0(v24) == true;
-    local v30 = v4.useRef(0);
-    local v31, v32 = v4.useState(0);
-    local v33 = v4.useMemo(function() --[[ Line: 53 ]]
-        -- upvalues: l_HttpService_0 (ref)
-        return l_HttpService_0:GenerateGUID();
-    end, {});
-    local _ = nil;
-    local v35 = nil;
-    v35 = if l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 then l_UnibarStyle_0.use().ICON_SIZE else 36;
-    v4.useEffect(function() --[[ Line: 66 ]]
-        -- upvalues: v26 (copy), v23 (copy)
-        if v26 then
-            v23.isLocalPlayerMutedSignal:fire(v26.isMuted);
-        end;
-    end, {
-        v26
-    });
-    v4.useEffect(function() --[[ Line: 72 ]]
-        -- upvalues: v23 (copy), v25 (copy)
-        v23.isVoiceConnectedSignal:fire(v25);
-    end, {
-        v25
-    });
-    local v36 = v4.useCallback(function() --[[ Line: 76 ]]
-        -- upvalues: v28 (copy), v30 (copy), v16 (ref), v32 (copy)
-        if v28.current then
-            if v30.current > v16 then
-                v32(math.random());
-                v30.current = 0;
-                return;
-            else
-                v30.current = v30.current + 1;
-            end;
-        end;
-    end, {});
-    v4.useEffect(function() --[[ Line: 87 ]]
-        -- upvalues: v28 (copy), v27 (copy)
-        v28.current = v27;
-    end, {
-        v27
-    });
-    v4.useEffect(function() --[[ Line: 91 ]]
-        -- upvalues: l_RunService_0 (ref), v33 (copy), v36 (copy)
-        l_RunService_0:BindToRenderStep(v33, 1, v36);
-        return function() --[[ Line: 94 ]]
-            -- upvalues: l_RunService_0 (ref), v33 (ref)
-            l_RunService_0:UnbindFromRenderStep(v33);
-        end;
-    end, {});
-    local v37 = v4.useMemo(function() --[[ Line: 99 ]]
-        -- upvalues: v22 (ref), v26 (copy), v29 (copy), v25 (copy), v27 (copy), v31 (copy)
-        return v22(v26, v29, v25, v27, v31);
-    end, {
-        v26, 
-        v29, 
-        v25, 
-        v27, 
-        v31
-    });
-    return v4.createElement("Frame", {
-        Size = UDim2.new(0, v35, 0, v35), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1
-    }, {
-        UICorner = v4.createElement("UICorner", {
-            CornerRadius = UDim.new(1, 0)
-        }), 
-        Icon = v4.createElement(l_ImageSetLabel_0, {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Size = UDim2.fromOffset(v35, v35), 
-            BackgroundTransparency = 1, 
-            Image = v37
-        }, {
-            v4.createElement("UICorner", {
-                Name = "Corner", 
-                CornerRadius = UDim.new(1, 0)
-            })
-        })
-    });
-end;
-return PartyMicIcon;
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
+local VoiceChat = require(CorePackages.Workspace.Packages.VoiceChat)
+local useParticipant = CrossExperienceVoice.Hooks.useParticipant
+local useIsVoiceConnected = CrossExperienceVoice.Hooks.useIsVoiceConnected
+local useIsActiveParticipant = CrossExperienceVoice.Hooks.useIsActiveParticipant
+local useIsParticipantMuted = CrossExperienceVoice.Hooks.useIsParticipantMuted
+local ParentParent = script.Parent.Parent.Parent
+local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
+local FFlagTokenizeUnibarConstantsWithStyleProvider = require(ParentParent.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v17 = game:DefineFastInt("PartyMicVoiceIndicatorFrameBuffer", 3)
+
+local function getLoadingIndicatorIcon(p1, b1: boolean, b2: boolean, b3: boolean?, n1: number?) -- line: 28
+	-- upvalues: VoiceChat (copy)
+	if not b2 or (not p1 or b1) then
+		return VoiceChat.Utils.GetIcon("Muted", "MicLight")
+	end
+
+	if b3 then
+		return VoiceChat.Utils.GetIcon("Unmuted", "MicLight", n1)
+	end
+
+	return VoiceChat.Utils.GetIcon("Unmuted0", "MicLight")
+end
+
+function PartyMicIcon(p2) -- line: 44
+	-- upvalues: Players (copy), useIsVoiceConnected (copy), useParticipant (copy), useIsActiveParticipant (copy), React (copy), useIsParticipantMuted (copy), HttpService (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), v17 (copy), RunService (copy), getLoadingIndicatorIcon (copy), ImageSetLabel (copy)
+	local v25 = Players and (not not Players.LocalPlayer and Players.LocalPlayer.UserId) or -1
+	local v26 = useIsVoiceConnected()
+	local v27 = useParticipant(v25)
+	local v28 = useIsActiveParticipant(v25)
+	local v29 = React.useRef(v28)
+	local v30 = useIsParticipantMuted(v25) == true
+	local v31 = React.useRef(0)
+	local v32, v33 = React.useState(0)
+	local v34 = React.useMemo(function() -- line: 53
+		-- upvalues: HttpService (copy)
+		return HttpService:GenerateGUID()
+	end, {})
+	local v35 = not FFlagTokenizeUnibarConstantsWithStyleProvider and 36 or UnibarStyle.use().ICON_SIZE
+
+	React.useEffect(function() -- line: 66
+		-- upvalues: v27 (copy), p2 (copy)
+		if v27 then
+			p2.isLocalPlayerMutedSignal:fire(v27.isMuted)
+		end
+	end, { v27 })
+	React.useEffect(function() -- line: 72
+		-- upvalues: p2 (copy), v26 (copy)
+		p2.isVoiceConnectedSignal:fire(v26)
+	end, { v26 })
+
+	local v36 = React.useCallback(function() -- line: 76
+		-- upvalues: v29 (copy), v31 (copy), v17 (copy), v33 (copy)
+		if v29.current then
+			if v31.current > v17 then
+				v33(math.random())
+				v31.current = 0
+
+				return
+			end
+
+			v31.current = v31.current + 1
+		end
+	end, {})
+
+	React.useEffect(function() -- line: 87
+		-- upvalues: v29 (copy), v28 (copy)
+		v29.current = v28
+	end, { v28 })
+	React.useEffect(function() -- line: 91
+		-- upvalues: RunService (copy), v34 (copy), v36 (copy)
+		RunService:BindToRenderStep(v34, 1, v36)
+
+		return function() -- line: 94
+			-- upvalues: RunService (copy), v34 (copy)
+			RunService:UnbindFromRenderStep(v34)
+		end
+	end, {})
+
+	local v37 = React.useMemo(function() -- line: 99
+		-- upvalues: getLoadingIndicatorIcon (copy), v27 (copy), v30 (copy), v26 (copy), v28 (copy), v32 (copy)
+		return getLoadingIndicatorIcon(v27, v30, v26, v28, v32)
+	end, {
+		v27,
+		v30,
+		v26,
+		v28,
+		v32
+	})
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, v35, 0, v35)
+	}, {
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(1, 0)
+		}),
+		Icon = React.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(v35, v35),
+			Image = v37
+		}, { React.createElement("UICorner", {
+			Name = "Corner",
+			CornerRadius = UDim.new(1, 0)
+		}) })
+	})
+end
+
+return PartyMicIcon

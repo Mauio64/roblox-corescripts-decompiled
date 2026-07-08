@@ -1,65 +1,71 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Dash);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return function(v4) --[[ Line: 22 ]] --[[ Name: FlexLayout ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy), v2 (copy)
-    local v5 = l_useDesignTokens_0();
-    local v6 = if v4.flexSlot and v4.rigidSlot then v4.margin or v5.Global.Space_200 else 0;
-    local v7 = v4.flexDirection or Enum.FillDirection.Horizontal;
-    local v8 = v4.reverse or false;
-    local v9, v10 = v1.useBinding(Vector2.new(0, 0));
-    local v12 = v1.useCallback(function(v11) --[[ Line: 30 ]]
-        -- upvalues: v7 (copy), v6 (copy)
-        if v7 == Enum.FillDirection.Horizontal then
-            return UDim2.new(1, -(v11.X + v6), 1, 0);
-        else
-            return UDim2.new(1, 0, 1, -(v11.Y + v6));
-        end;
-    end, {
-        v7, 
-        v6
-    });
-    local v13 = table.clone(v4);
-    v13.flexDirection = nil;
-    v13.reverse = nil;
-    v13.rigidSlot = nil;
-    v13.flexSlot = nil;
-    v13.margin = nil;
-    v13.padding = nil;
-    return v1.createElement("Frame", v2.join({
-        Size = if v7 == Enum.FillDirection.Horizontal then UDim2.fromScale(1, 0) else UDim2.fromScale(0, 1), 
-        AutomaticSize = if v7 == Enum.FillDirection.Horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0
-    }, v13), {
-        UILayout = v1.createElement("UIListLayout", {
-            FillDirection = v7, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, v6)
-        }), 
-        Padding = if v4.padding then v1.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, v4.padding.top or 0), 
-            PaddingRight = UDim.new(0, v4.padding.right or 0), 
-            PaddingBottom = UDim.new(0, v4.padding.bottom or 0), 
-            PaddingLeft = UDim.new(0, v4.padding.left or 0)
-        }) else nil, 
-        Flex = if v4.flexSlot then v1.createElement("Frame", {
-            LayoutOrder = v8 and 1 or 0, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = v9:map(v12)
-        }, v4.flexSlot) else nil, 
-        Rigid = if v4.rigidSlot then v1.createElement("Frame", {
-            LayoutOrder = v8 and 0 or 1, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = if v7 == Enum.FillDirection.Horizontal then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.XY, 
-            [v1.Change.AbsoluteSize] = function(v14) --[[ Line: 89 ]]
-                -- upvalues: v10 (copy)
-                v10(v14.AbsoluteSize);
-            end
-        }, v4.rigidSlot) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local Dash = require(Parent.Dash)
+local useDesignTokens = require(Parent.Style).useDesignTokens
+
+local function FlexLayout(t1: {[any]: any}) -- line: 25
+	-- upvalues: useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), React (copy), Dash (copy)
+	local v8 = useDesignTokens()
+	local v9 = (not t1.flexSlot or not t1.rigidSlot) and 0 or (t1.margin or if not FFlagRenameDeprecatedUIBloxTokens then v8.Global.Space_200 else v8.Size.Size_400)
+	local v10 = t1.flexDirection or Enum.FillDirection.Horizontal
+	local v11 = t1.reverse or false
+	local v12, v13 = React.useBinding(Vector2.new(0, 0))
+	local v14 = React.useCallback(function(vector2: Vector2) -- line: 37
+		-- upvalues: v10 (copy), v9 (copy)
+		if v10 == Enum.FillDirection.Horizontal then
+			return UDim2.new(1, -(vector2.X + v9), 1, 0)
+		end
+
+		return UDim2.new(1, 0, 1, -(vector2.Y + v9))
+	end, {
+		v10,
+		v9
+	})
+	local v15 = table.clone(t1)
+
+	v15.flexDirection = nil
+	v15.reverse = nil
+	v15.rigidSlot = nil
+	v15.flexSlot = nil
+	v15.margin = nil
+	v15.padding = nil
+
+	return React.createElement("Frame", Dash.join({
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = if v10 ~= Enum.FillDirection.Horizontal then UDim2.fromScale(0, 1) else UDim2.fromScale(1, 0),
+		AutomaticSize = if v10 ~= Enum.FillDirection.Horizontal then Enum.AutomaticSize.X else Enum.AutomaticSize.Y
+	}, v15), {
+		UILayout = React.createElement("UIListLayout", {
+			FillDirection = v10,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, v9)
+		}),
+		Padding = if not t1.padding then nil else React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, t1.padding.top or 0),
+			PaddingRight = UDim.new(0, t1.padding.right or 0),
+			PaddingBottom = UDim.new(0, t1.padding.bottom or 0),
+			PaddingLeft = UDim.new(0, t1.padding.left or 0)
+		}),
+		Flex = if not t1.flexSlot then nil else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = not v11 and 0 or 1,
+			Size = v12:map(v14)
+		}, t1.flexSlot),
+		Rigid = if not t1.rigidSlot then nil else React.createElement("Frame", {
+			LayoutOrder = not v11 and 1 or 0,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = if v10 ~= Enum.FillDirection.Horizontal then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 1, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			[React.Change.AbsoluteSize] = function(p1) -- line: 96
+				-- upvalues: v13 (copy)
+				v13(p1.AbsoluteSize)
+			end
+		}, t1.rigidSlot)
+	})
+end
+
+return FlexLayout

@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXToGlobalAutofocus) and game:DefineFastFlag("AXMigrateQuickButtonsToGlobalAutoFocus", false);
+return game:DefineFastFlag("AXMigrateQuickButtonsToGlobalAutoFocus", false)

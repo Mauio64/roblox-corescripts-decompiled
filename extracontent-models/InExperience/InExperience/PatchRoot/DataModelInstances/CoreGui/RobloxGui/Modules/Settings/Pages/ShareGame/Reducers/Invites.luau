@@ -1,12 +1,15 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ShareGame_0 = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame;
-local l_Immutable_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Immutable;
-local v3 = require(l_ShareGame_0.Actions.ReceivedUserInviteStatus);
-return function(v4, v5) --[[ Line: 9 ]]
-    -- upvalues: v3 (copy), l_Immutable_0 (copy)
-    v4 = v4 or {};
-    if v5.type == v3.name then
-        v4 = l_Immutable_0.Set(v4, v5.userId, v5.inviteStatus);
-    end;
-    return v4;
-end;
+local CorePackages = game:GetService("CorePackages")
+local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
+local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+local ReceivedUserInviteStatus = require(ShareGame.Actions.ReceivedUserInviteStatus)
+
+return function(p1, p2) -- line: 9
+	-- upvalues: ReceivedUserInviteStatus (copy), Immutable (copy)
+	local v7 = p1 or {}
+
+	if p2.type == ReceivedUserInviteStatus.name then
+		v7 = Immutable.Set(v7, p2.userId, p2.inviteStatus)
+	end
+
+	return v7
+end

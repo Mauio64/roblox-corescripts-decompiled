@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppHeaderButtonText", false);
+return game:DefineFastFlag("LuaAppHeaderButtonText", false)

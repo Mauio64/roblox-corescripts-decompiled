@@ -1,20 +1,27 @@
-return function(v0, v1) --[[ Line: 10 ]] --[[ Name: zip ]]
-    local v2 = nil;
-    local v3 = nil;
-    local v4 = nil;
-    local v5 = nil;
-    return function() --[[ Line: 12 ]]
-        -- upvalues: v2 (ref), v4 (ref), v0 (copy), v3 (ref), v5 (ref), v1 (copy)
-        local v6, v7 = next(v0, v2);
-        v2 = v6;
-        v4 = v7;
-        v6, v7 = next(v1, v3);
-        v3 = v6;
-        v5 = v7;
-        if not v4 or not v5 then
-            return nil;
-        else
-            return v4, v5;
-        end;
-    end;
-end;
+local function zip(t1: {[any]: any}, t2: {[any]: any}) -- line: 10
+	local u4 = nil
+	local u5 = nil
+	local u6 = nil
+	local u7 = nil
+
+	return function() -- line: 12
+		-- upvalues: u4 (ref), u6 (ref), t1 (copy), u5 (ref), u7 (ref), t2 (copy)
+		local v8, v9 = next(t1, u4)
+
+		u4 = v8
+		u6 = v9
+
+		local v10, v11 = next(t2, u5)
+
+		u5 = v10
+		u7 = v11
+
+		if not u6 or not u7 then
+			return nil
+		end
+
+		return u6, u7
+	end
+end
+
+return zip

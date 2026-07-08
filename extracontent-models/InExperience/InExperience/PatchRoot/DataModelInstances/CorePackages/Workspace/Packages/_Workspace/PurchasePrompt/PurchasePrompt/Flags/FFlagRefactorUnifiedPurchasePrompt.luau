@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RefactorUnifiedPurchasePrompt", false);
+return game:DefineFastFlag("RefactorUnifiedPurchasePrompt", false)

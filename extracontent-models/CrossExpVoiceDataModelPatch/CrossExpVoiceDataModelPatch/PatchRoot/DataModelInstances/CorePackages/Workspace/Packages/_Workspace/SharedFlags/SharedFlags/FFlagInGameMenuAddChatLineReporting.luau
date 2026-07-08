@@ -1,1 +1,1 @@
-return game:DefineFastFlag("InGameMenuAddChatLineReporting6", false);
+return game:DefineFastFlag("InGameMenuAddChatLineReporting6", false)

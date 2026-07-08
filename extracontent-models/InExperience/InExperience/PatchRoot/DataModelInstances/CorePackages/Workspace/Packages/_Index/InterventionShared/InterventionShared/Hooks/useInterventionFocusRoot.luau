@@ -1,94 +1,111 @@
-local l_Parent_0 = script:FindFirstAncestor("InterventionShared").Parent;
-local l_useMemo_0 = require(l_Parent_0.React).useMemo;
-local v2 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigationEventNameEnum_0 = v2.FocusNavigationEventNameEnum;
-local v4 = require(l_Parent_0.InputHandlers);
-local l_useFocusedGuiObject_0 = require(l_Parent_0.ReactFocusNavigation).useFocusedGuiObject;
-local l_useFocusRoot_0 = v2.useFocusRoot;
-local v7 = {
-    [Enum.KeyCode.ButtonB] = l_FocusNavigationEventNameEnum_0.NavigateBack, 
-    [Enum.KeyCode.Escape] = l_FocusNavigationEventNameEnum_0.NavigateBack, 
-    [Enum.KeyCode.PageUp] = l_FocusNavigationEventNameEnum_0.ScrollUp, 
-    [Enum.KeyCode.LeftBracket] = l_FocusNavigationEventNameEnum_0.ScrollUp, 
-    [Enum.KeyCode.PageDown] = l_FocusNavigationEventNameEnum_0.ScrollDown, 
-    [Enum.KeyCode.RightBracket] = l_FocusNavigationEventNameEnum_0.ScrollDown
-};
-local function _(v8) --[[ Line: 31 ]] --[[ Name: getScrollableAncestor ]]
-    if v8 == nil then
-        return nil;
-    elseif v8:IsA("ScrollingFrame") then
-        return v8;
-    else
-        return v8:FindFirstAncestorWhichIsA("ScrollingFrame");
-    end;
-end;
-local function _(v10, v11) --[[ Line: 44 ]] --[[ Name: scrollTo ]]
-    if v10 ~= nil then
-        local v12 = v10.AbsoluteCanvasSize.Y - v10.AbsoluteWindowSize.Y;
-        if v11 > 0 and v10.CanvasPosition.Y >= v12 - 350 then
-            v10.CanvasPosition = Vector2.new(0, v12);
-            return;
-        elseif v11 < 0 and v10.CanvasPosition.Y <= 350 then
-            v10.CanvasPosition = Vector2.new(0, 0);
-            return;
-        else
-            v10.CanvasPosition = v10.CanvasPosition + Vector2.new(0, v11);
-        end;
-    end;
-end;
-return function(v14) --[[ Line: 73 ]] --[[ Name: useInterventionFocusRoot ]]
-    -- upvalues: l_useFocusedGuiObject_0 (copy), l_useMemo_0 (copy), l_FocusNavigationEventNameEnum_0 (copy), v4 (copy), l_useFocusRoot_0 (copy), v7 (copy)
-    local v15 = l_useFocusedGuiObject_0();
-    local v16 = if v15 == nil then nil else if v15:IsA("ScrollingFrame") then v15 else v15:FindFirstAncestorWhichIsA("ScrollingFrame");
-    local v25 = l_useMemo_0(function() --[[ Line: 77 ]]
-        -- upvalues: l_FocusNavigationEventNameEnum_0 (ref), v4 (ref), v16 (copy)
-        local v18 = {
-            [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                handler = v4.onPress(function(v17) --[[ Line: 80 ]]
-                    v17:cancel();
-                end)
-            }
-        };
-        if v16 then
-            v18[l_FocusNavigationEventNameEnum_0.ScrollDown] = {
-                handler = v4.onRelease(function(_) --[[ Line: 88 ]]
-                    -- upvalues: v16 (ref)
-                    local l_v16_0 = v16;
-                    if l_v16_0 ~= nil then
-                        local v21 = l_v16_0.AbsoluteCanvasSize.Y - l_v16_0.AbsoluteWindowSize.Y;
-                        if l_v16_0.CanvasPosition.Y >= v21 - 350 then
-                            l_v16_0.CanvasPosition = Vector2.new(0, v21);
-                            return;
-                        else
-                            l_v16_0.CanvasPosition = l_v16_0.CanvasPosition + Vector2.new(0, 300);
-                        end;
-                    end;
-                end)
-            };
-            v18[l_FocusNavigationEventNameEnum_0.ScrollUp] = {
-                handler = v4.onRelease(function(_) --[[ Line: 93 ]]
-                    -- upvalues: v16 (ref)
-                    local l_v16_1 = v16;
-                    if l_v16_1 ~= nil then
-                        local _ = l_v16_1.AbsoluteCanvasSize.Y - l_v16_1.AbsoluteWindowSize.Y;
-                        if l_v16_1.CanvasPosition.Y <= 350 then
-                            l_v16_1.CanvasPosition = Vector2.new(0, 0);
-                            return;
-                        else
-                            l_v16_1.CanvasPosition = l_v16_1.CanvasPosition + Vector2.new(0, -300);
-                        end;
-                    end;
-                end)
-            };
-        end;
-        return v18;
-    end, {
-        v16
-    });
-    return l_useFocusRoot_0({
-        surfaceIdentifier = v14.surfaceIdentifier, 
-        isAutoFocusRoot = v14.isAutoFocusRoot == nil or v14.isAutoFocusRoot, 
-        eventMap = v7, 
-        eventHandlers = v25
-    });
-end;
+local Parent = script:FindFirstAncestor("InterventionShared").Parent
+local useMemo = require(Parent.React).useMemo
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local InputHandlers = require(Parent.InputHandlers)
+local useFocusedGuiObject = require(Parent.ReactFocusNavigation).useFocusedGuiObject
+local useFocusRoot = FocusNavigationUtils.useFocusRoot
+local t1 = {
+	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.PageUp] = FocusNavigationEventNameEnum.ScrollUp,
+	[Enum.KeyCode.LeftBracket] = FocusNavigationEventNameEnum.ScrollUp,
+	[Enum.KeyCode.PageDown] = FocusNavigationEventNameEnum.ScrollDown,
+	[Enum.KeyCode.RightBracket] = FocusNavigationEventNameEnum.ScrollDown
+}
+
+local function getScrollableAncestor(p1) -- line: 31
+	if p1 == nil then
+		return nil
+	end
+
+	if p1:IsA("ScrollingFrame") then
+		return p1
+	end
+
+	return p1:FindFirstAncestorWhichIsA("ScrollingFrame")
+end
+local function scrollTo(p2, n1: number) -- line: 44
+	if p2 ~= nil then
+		local v15 = p2.AbsoluteCanvasSize.Y - p2.AbsoluteWindowSize.Y
+
+		if n1 > 0 and p2.CanvasPosition.Y >= v15 - 350 then
+			p2.CanvasPosition = Vector2.new(0, v15)
+
+			return
+		end
+
+		if n1 < 0 and p2.CanvasPosition.Y <= 350 then
+			p2.CanvasPosition = Vector2.new(0, 0)
+
+			return
+		end
+
+		p2.CanvasPosition = p2.CanvasPosition + Vector2.new(0, n1)
+	end
+end
+local function useInterventionFocusRoot(t2: {[any]: any}) -- line: 73
+	-- upvalues: useFocusedGuiObject (copy), useMemo (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useFocusRoot (copy), t1 (copy)
+	local v17 = useFocusedGuiObject()
+	local v18 = if v17 ~= nil then if not v17:IsA("ScrollingFrame") then v17:FindFirstAncestorWhichIsA("ScrollingFrame") else v17 else nil
+	local v19 = useMemo(function() -- line: 77
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v18 (copy)
+		local t3 = {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onPress(function(p3) -- line: 80
+					p3:cancel()
+				end)
+			}
+		}
+
+		if v18 then
+			t3[FocusNavigationEventNameEnum.ScrollDown] = {
+				handler = InputHandlers.onRelease(function(_) -- line: 88
+					-- upvalues: v18 (copy)
+					local v23 = v18
+
+					if v23 ~= nil then
+						local v24 = v23.AbsoluteCanvasSize.Y - v23.AbsoluteWindowSize.Y
+
+						if v23.CanvasPosition.Y >= v24 - 350 then
+							v23.CanvasPosition = Vector2.new(0, v24)
+
+							return
+						end
+
+						v23.CanvasPosition = v23.CanvasPosition + Vector2.new(0, 300)
+					end
+				end)
+			}
+			t3[FocusNavigationEventNameEnum.ScrollUp] = {
+				handler = InputHandlers.onRelease(function(_) -- line: 93
+					-- upvalues: v18 (copy)
+					local v26 = v18
+
+					if v26 ~= nil then
+						local _ = v26.AbsoluteCanvasSize.Y - v26.AbsoluteWindowSize.Y
+
+						if v26.CanvasPosition.Y <= 350 then
+							v26.CanvasPosition = Vector2.new(0, 0)
+
+							return
+						end
+
+						v26.CanvasPosition = v26.CanvasPosition + Vector2.new(0, -300)
+					end
+				end)
+			}
+		end
+
+		return t3
+	end, { v18 })
+
+	return useFocusRoot({
+		surfaceIdentifier = t2.surfaceIdentifier,
+		isAutoFocusRoot = t2.isAutoFocusRoot == nil or t2.isAutoFocusRoot,
+		eventMap = t1,
+		eventHandlers = v19
+	})
+end
+
+return useInterventionFocusRoot

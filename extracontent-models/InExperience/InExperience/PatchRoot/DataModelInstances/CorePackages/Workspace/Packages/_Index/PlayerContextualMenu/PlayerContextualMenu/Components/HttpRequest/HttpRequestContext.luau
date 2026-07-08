@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("PlayerContextualMenu").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.DefaultHttpRequestInstance);
-return v1.createContext(v2);
+local Parent = script:FindFirstAncestor("PlayerContextualMenu").Parent
+local React = require(Parent.React)
+local DefaultHttpRequestInstance = require(script.Parent.DefaultHttpRequestInstance)
+
+return React.createContext(DefaultHttpRequestInstance)

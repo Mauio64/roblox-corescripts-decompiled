@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatUseNewSelectChatMembersIxpEnabled2", false);
+return game:DefineFastFlag("AppChatUseNewSelectChatMembersIxpEnabled2", false)

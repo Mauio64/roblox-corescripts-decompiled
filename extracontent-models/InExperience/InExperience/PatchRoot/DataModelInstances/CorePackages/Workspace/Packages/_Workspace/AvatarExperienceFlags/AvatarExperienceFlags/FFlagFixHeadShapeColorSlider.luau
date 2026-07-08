@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("FixHeadShapeColorSlider", false);
+return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("FixHeadShapeColorSlider", false)

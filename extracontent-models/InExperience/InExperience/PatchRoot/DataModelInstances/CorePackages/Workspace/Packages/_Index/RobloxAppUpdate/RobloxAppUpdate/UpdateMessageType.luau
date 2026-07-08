@@ -1,5 +1,5 @@
 return {
-    Default = "default", 
-    InternalChannel = "internalChannel", 
-    BetaProgram = "betaProgram"
-};
+	Default = "default",
+	InternalChannel = "internalChannel",
+	BetaProgram = "betaProgram"
+}

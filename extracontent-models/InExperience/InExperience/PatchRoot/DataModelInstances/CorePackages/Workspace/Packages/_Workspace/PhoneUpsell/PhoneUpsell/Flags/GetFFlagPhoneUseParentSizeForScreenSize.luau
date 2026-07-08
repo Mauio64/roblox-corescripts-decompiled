@@ -1,4 +1,5 @@
-game:DefineFastFlag("PhoneUseParentSizeForScreenSize", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("PhoneUseParentSizeForScreenSize");
-end;
+game:DefineFastFlag("PhoneUseParentSizeForScreenSize", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("PhoneUseParentSizeForScreenSize")
+end

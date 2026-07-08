@@ -1,10 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v1 = require(l_Parent_0.RegExp)("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-return function(v2) --[[ Line: 9 ]] --[[ Name: validateSquadId ]]
-    -- upvalues: v1 (copy)
-    if v2 and v2 ~= "" and v1:exec(v2) then
-        return true;
-    else
-        return false;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local v2 = require(Parent.RegExp)("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+
+local function validateSquadId(s1: string) -- line: 9
+	-- upvalues: v2 (copy)
+	if s1 and (s1 ~= "" and v2:exec(s1)) then
+		return true
+	end
+
+	return false
+end
+
+return validateSquadId

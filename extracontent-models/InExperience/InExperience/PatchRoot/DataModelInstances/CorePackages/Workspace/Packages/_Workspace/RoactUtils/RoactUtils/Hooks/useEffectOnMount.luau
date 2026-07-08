@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy)
-    v1.useEffect(function() --[[ Line: 11 ]]
-        -- upvalues: v2 (copy)
-        v2();
-    end, {});
-end;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(Parent.React)
+
+return function(p1: ((...any) -> ...any)) -- line: 10
+	-- upvalues: React (copy)
+	React.useEffect(function() -- line: 11
+		-- upvalues: p1 (copy)
+		p1()
+	end, {})
+end

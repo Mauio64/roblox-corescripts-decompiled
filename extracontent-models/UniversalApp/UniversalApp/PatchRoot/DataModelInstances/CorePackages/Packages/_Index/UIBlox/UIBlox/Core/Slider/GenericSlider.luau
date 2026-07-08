@@ -1,673 +1,725 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v4 = require(l_Parent_2.Roact);
-local v5 = require(l_Parent_2.Cryo);
-local v6 = require(l_Parent_2.t);
-local v7 = require(l_Parent_2.RoactGamepad);
-local v8 = require(l_Parent_0.ImageSet.ImageSetComponent);
-local v9 = require(l_Parent_1.App.SelectionCursor.useCursorByType);
-local v10 = require(l_Parent_1.App.SelectionCursor.CursorType);
-local v11 = require(l_Parent_1.Utility.lerp);
-local v12 = require(l_Parent_1.App.SelectionImage.withSelectionCursorProvider);
-local v13 = v4.PureComponent:extend("GenericSlider");
-v13.validateProps = v6.strictInterface({
-    lowerValue = v6.number, 
-    upperValue = v6.optional(v6.number), 
-    min = v6.number, 
-    max = v6.number, 
-    stepInterval = v6.numberPositive, 
-    isDisabled = v6.optional(v6.boolean), 
-    onValueChanged = v6.callback, 
-    onDragStartLower = v6.optional(v6.callback), 
-    onDragStartUpper = v6.optional(v6.callback), 
-    onDragEnd = v6.optional(v6.callback), 
-    trackImage = v6.union(v6.string, v6.table), 
-    trackColor = v6.union(v6.Color3, v6.table), 
-    trackTransparency = v6.union(v6.number, v6.table), 
-    trackSliceCenter = v6.optional(v6.Rect), 
-    trackFillImage = v6.union(v6.string, v6.table), 
-    trackFillColor = v6.union(v6.Color3, v6.table), 
-    trackFillTransparency = v6.union(v6.number, v6.table), 
-    trackFillSliceCenter = v6.optional(v6.Rect), 
-    knobImage = v6.union(v6.string, v6.table), 
-    knobColorLower = v6.union(v6.Color3, v6.table), 
-    knobColorUpper = v6.optional(v6.union(v6.Color3, v6.table)), 
-    knobTransparency = v6.union(v6.number, v6.table), 
-    knobImagePadding = v6.optional(v6.numberMin(0)), 
-    knobShadowImage = v6.union(v6.string, v6.table), 
-    knobShadowTransparencyLower = v6.union(v6.number, v6.table), 
-    knobShadowTransparencyUpper = v6.optional(v6.union(v6.number, v6.table)), 
-    width = v6.optional(v6.UDim), 
-    position = v6.optional(v6.UDim2), 
-    anchorPoint = v6.optional(v6.Vector2), 
-    layoutOrder = v6.optional(v6.integer), 
-    imageButtonRef = v6.optional(v6.table), 
-    NextSelectionUp = v6.optional(v6.table), 
-    NextSelectionDown = v6.optional(v6.table), 
-    focusController = v6.optional(v6.table), 
-    containerRef = v6.optional(v6.table), 
-    customTrack = v6.optional(v6.table), 
-    customKnobHeight = v6.optional(v6.number), 
-    customKnobBorderColor = v6.optional(v6.Color3), 
-    customKnobBorderSize = v6.optional(v6.number), 
-    selectedCursor = v6.table, 
-    unselectedCursor = v6.table
-});
-v13.defaultProps = {
-    width = UDim.new(1, 0), 
-    knobImagePadding = 0, 
-    customKnobBorderColor = Color3.new(0, 0, 0)
-};
-v13.init = function(v14) --[[ Line: 103 ]] --[[ Name: init ]]
-    -- upvalues: v4 (copy)
-    v14.rootRef = v14.props.imageButtonRef or v4.createRef();
-    v14.lowerKnobRef = v4.createRef();
-    v14.upperKnobRef = v4.createRef();
-    v14.moveDirection = 0;
-    v14.lowerKnobDrag = false;
-    v14.upperKnobDrag = false;
-    v14.totalMoveTime = 0;
-    v14.isFirstMove = true;
-    v14.unhandledTime = 0;
-    v14.state = {
-        lowerKnobIsSelected = false, 
-        upperKnobIsSelected = false
-    };
-end;
-v13.getKnobVisibleHeight = function(v15) --[[ Line: 121 ]] --[[ Name: getKnobVisibleHeight ]]
-    if v15.props.customKnobHeight then
-        return (44 - v15.props.knobImagePadding * 2) / 44 * v15.props.customKnobHeight;
-    else
-        return 44 - v15.props.knobImagePadding * 2;
-    end;
-end;
-v13.getKnobHeight = function(v16) --[[ Line: 130 ]] --[[ Name: getKnobHeight ]]
-    if v16.props.customKnobHeight then
-        return 44 / (44 - v16.props.knobImagePadding * 2) * v16.props.customKnobHeight;
-    else
-        return 44;
-    end;
-end;
-v13.onMoveStep = function(v17, v18, v19) --[[ Line: 140 ]] --[[ Name: onMoveStep ]]
-    if not v17.state.lowerKnobIsSelected and not v17.state.upperKnobIsSelected then
-        return;
-    else
-        local l_Position_0 = v18[Enum.KeyCode.Thumbstick1].Position;
-        local v21 = l_Position_0.Magnitude > 0.2;
-        local v22 = 0;
-        local v23 = nil;
-        local v24 = nil;
-        local v25 = nil;
-        v17.totalMoveTime = v17.totalMoveTime + v19;
-        if v21 then
-            v24 = l_Position_0.x > 0 and 1 or -1;
-            v23 = 0.2;
-            v25 = 12;
-        else
-            v24 = (v18[Enum.KeyCode.DPadLeft].UserInputState == Enum.UserInputState.Begin and -1 or 0) + (v18[Enum.KeyCode.DPadRight].UserInputState == Enum.UserInputState.Begin and 1 or 0);
-            v23 = 0.5;
-            v25 = 8;
-        end;
-        if v24 ~= 0 then
-            if v17.isFirstMove then
-                v17.isFirstMove = false;
-                v17.totalMoveTime = 0;
-                v17.unhandledTime = 0;
-                v22 = 1;
-            elseif v23 < v17.totalMoveTime then
-                local v26 = v19 - math.max(v23 - v17.totalMoveTime - v19, 0) + v17.unhandledTime;
-                v22 = math.floor(v25 * v26);
-                v17.unhandledTime = v26 - v22 / v25;
-            else
-                v22 = 0;
-                v17.unhandledTime = 0;
-            end;
-        else
-            v17.totalMoveTime = 0;
-            v17.isFirstMove = true;
-        end;
-        if v22 > 0 then
-            v17:processGamepadInput(v24, v22);
-        end;
-        return;
-    end;
-end;
-v13.processGamepadInput = function(v27, v28, v29) --[[ Line: 194 ]] --[[ Name: processGamepadInput ]]
-    if v27:hasTwoKnobs() then
-        v27:processTwoKnobGamepadInput(v28, v29);
-        return;
-    else
-        v27:processOneKnobGamepadInput(v28, v29);
-        return;
-    end;
-end;
-v13.processTwoKnobGamepadInput = function(v30, v31, v32) --[[ Line: 202 ]] --[[ Name: processTwoKnobGamepadInput ]]
-    local v33 = v30.props.stepInterval * v31;
-    local l_lowerValue_0 = v30.props.lowerValue;
-    local l_upperValue_0 = v30.props.upperValue;
-    if l_lowerValue_0 == l_upperValue_0 and not v30.state.processingGamepad then
-        if v30.state.lowerKnobIsSelected and v31 == 1 and l_lowerValue_0 ~= v30.props.max then
-            v30:setState({
-                lowerKnobIsSelected = false, 
-                upperKnobIsSelected = true, 
-                processingGamepad = true
-            });
-            v30.props.focusController.moveFocusTo(v30.upperKnobRef);
-        elseif v30.state.upperKnobIsSelected and v31 == -1 and l_upperValue_0 ~= v30.props.min then
-            v30:setState({
-                lowerKnobIsSelected = true, 
-                upperKnobIsSelected = false, 
-                processingGamepad = true
-            });
-            v30.props.focusController.moveFocusTo(v30.lowerKnobRef);
-        end;
-    elseif not v30.state.processingGamepad then
-        v30:setState({
-            processingGamepad = true
-        });
-    end;
-    if v30.state.lowerKnobIsSelected then
-        local v36 = math.max(math.min(l_lowerValue_0 + v33 * v32, v30.props.max), v30.props.min);
-        l_lowerValue_0 = if v36 <= l_upperValue_0 then v36 else l_upperValue_0;
-    elseif v30.state.upperKnobIsSelected then
-        local v37 = math.max(math.min(l_upperValue_0 + v33 * v32, v30.props.max), v30.props.min);
-        l_upperValue_0 = if l_lowerValue_0 <= v37 then v37 else l_lowerValue_0;
-    end;
-    if l_upperValue_0 ~= v30.props.upperValue or l_lowerValue_0 ~= v30.props.lowerValue then
-        v30.props.onValueChanged(l_lowerValue_0, l_upperValue_0);
-    end;
-end;
-v13.processOneKnobGamepadInput = function(v38, v39, v40) --[[ Line: 256 ]] --[[ Name: processOneKnobGamepadInput ]]
-    local v41 = v38.props.stepInterval * v39;
-    local l_lowerValue_1 = v38.props.lowerValue;
-    if v38.state.lowerKnobIsSelected then
-        l_lowerValue_1 = math.max(math.min(l_lowerValue_1 + v41 * v40, v38.props.max), v38.props.min);
-    end;
-    if l_lowerValue_1 ~= v38.props.lowerValue then
-        v38.props.onValueChanged(l_lowerValue_1);
-    end;
-end;
-v13.renderTrack = function(v43, v44, v45, v46) --[[ Line: 269 ]] --[[ Name: renderTrack ]]
-    -- upvalues: v4 (copy), v8 (copy)
-    if v43.props.customTrack then
-        return v43.props.customTrack;
-    else
-        return v4.createElement(v8.Label, {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ImageColor3 = v43.props.trackColor, 
-            ImageTransparency = v43.props.trackTransparency, 
-            Image = v43.props.trackImage, 
-            Size = UDim2.new(1, 0, 0, 4), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = v43.props.trackSliceCenter
-        }, {
-            TrackFill = v4.createElement(v8.Label, {
-                BackgroundTransparency = 1, 
-                ImageColor3 = v43.props.trackFillColor, 
-                ImageTransparency = v43.props.trackFillTransparency, 
-                Image = v43.props.trackFillImage, 
-                Size = v44, 
-                Position = v45 and UDim2.new(v46, 0, 0, 0) or UDim2.new(0, 0, 0, 0), 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = v43.props.trackFillSliceCenter
-            })
-        });
-    end;
-end;
-v13.wrapKnobWithBorder = function(v47, v48, v49) --[[ Line: 298 ]] --[[ Name: wrapKnobWithBorder ]]
-    -- upvalues: v4 (copy)
-    local v50 = if v47.props.customKnobHeight then v47.props.customKnobHeight else v47:getKnobVisibleHeight();
-    return v4.createElement("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Size = UDim2.fromOffset(v50, v50), 
-        Position = v49, 
-        BackgroundColor3 = v47.props.customKnobBorderColor, 
-        ZIndex = 3
-    }, {
-        UICorner = v4.createElement("UICorner", {
-            CornerRadius = UDim.new(0.5, 0)
-        }), 
-        KnobContent = v48
-    });
-end;
-v13.renderUpperKnob = function(v51, v52, v53, v54, _) --[[ Line: 315 ]] --[[ Name: renderUpperKnob ]]
-    -- upvalues: v4 (copy), v7 (copy), v8 (copy)
-    if not v54 then
-        return nil;
-    else
-        local v56 = v51:getKnobHeight();
-        local l_v52_0 = v52;
-        if v51.props.customKnobBorderSize and v51.props.customKnobBorderSize > 0 then
-            v56 = v56 - 2 * (v51.props.customKnobBorderSize + 2);
-            l_v52_0 = UDim2.fromScale(0.5, 0.5);
-        end;
-        local v63 = v4.createElement(v7.Focusable[v8.Button], {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ImageColor3 = v51.props.knobColorUpper, 
-            ImageTransparency = v51.props.knobTransparency, 
-            Image = v51.props.knobImage, 
-            Size = UDim2.fromOffset(v56, v56), 
-            Position = l_v52_0, 
-            ZIndex = 3, 
-            NextSelectionLeft = not v53 and v51.props.upperValue ~= v51.props.lowerValue and v51.lowerKnobRef or nil, 
-            NextSelectionRight = v53 and v51.upperKnobRef or nil, 
-            NextSelectionUp = v53 and v51.upperKnobRef or nil, 
-            NextSelectionDown = v53 and v51.upperKnobRef or nil, 
-            SelectionImageObject = v53 and v51.props.selectedCursor or v51.props.unselectedCursor, 
-            [v4.Ref] = v51.upperKnobRef, 
-            [v4.Event.InputBegan] = function(_, v59) --[[ Line: 345 ]]
-                -- upvalues: v51 (copy)
-                if v51.props.isDisabled then
-                    return;
-                else
-                    v51:onInputBegan(v59, true);
-                    return;
-                end;
-            end, 
-            inputBindings = {
-                OnMoveStep = v7.Input.onMoveStep(function(v60, v61) --[[ Line: 353 ]]
-                    -- upvalues: v51 (copy)
-                    v51:onMoveStep(v60, v61);
-                end), 
-                SelectUpperKnob = v7.Input.onBegin(Enum.KeyCode.ButtonA, function() --[[ Line: 356 ]]
-                    -- upvalues: v51 (copy)
-                    v51:setState(function(v62) --[[ Line: 357 ]]
-                        return {
-                            upperKnobIsSelected = not v62.upperKnobIsSelected, 
-                            processingGamepad = false
-                        };
-                    end);
-                end), 
-                UnselectUpperKnob = v53 and v7.Input.onBegin(Enum.KeyCode.ButtonB, function() --[[ Line: 364 ]]
-                    -- upvalues: v51 (copy)
-                    v51:setState({
-                        upperKnobIsSelected = false, 
-                        processingGamepad = false
-                    });
-                end) or nil
-            }
-        });
-        if v51.props.customKnobBorderSize and v51.props.customKnobBorderSize > 0 then
-            return v51:wrapKnobWithBorder(v63, v52);
-        else
-            return v63;
-        end;
-    end;
-end;
-v13.renderLowerKnob = function(v64, v65, v66, v67, _) --[[ Line: 380 ]] --[[ Name: renderLowerKnob ]]
-    -- upvalues: v4 (copy), v7 (copy), v8 (copy)
-    local v69 = v64:getKnobHeight();
-    local l_v65_0 = v65;
-    if v64.props.customKnobBorderSize and v64.props.customKnobBorderSize > 0 then
-        v69 = v69 - 2 * (v64.props.customKnobBorderSize + 2);
-        l_v65_0 = UDim2.fromScale(0.5, 0.5);
-    end;
-    local v76 = v4.createElement(v7.Focusable[v8.Button], {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundTransparency = 1, 
-        ImageColor3 = v64.props.knobColorLower, 
-        ImageTransparency = v64.props.knobTransparency, 
-        Image = v64.props.knobImage, 
-        Size = UDim2.fromOffset(v69, v69), 
-        Position = l_v65_0, 
-        ZIndex = 3, 
-        inputBindings = {
-            OnMoveStep = v7.Input.onMoveStep(function(v71, v72) --[[ Line: 398 ]]
-                -- upvalues: v64 (copy)
-                v64:onMoveStep(v71, v72);
-            end), 
-            SelectLowerKnob = v7.Input.onBegin(Enum.KeyCode.ButtonA, function() --[[ Line: 401 ]]
-                -- upvalues: v64 (copy)
-                v64:setState(function(v73) --[[ Line: 402 ]]
-                    return {
-                        lowerKnobIsSelected = not v73.lowerKnobIsSelected, 
-                        processingGamepad = false
-                    };
-                end);
-            end), 
-            UnselectLowerKnob = v66 and v7.Input.onBegin(Enum.KeyCode.ButtonB, function() --[[ Line: 409 ]]
-                -- upvalues: v64 (copy)
-                v64:setState({
-                    lowerKnobIsSelected = false, 
-                    processingGamepad = false
-                });
-            end) or nil
-        }, 
-        NextSelectionLeft = v66 and v64.lowerKnobRef or nil, 
-        NextSelectionRight = not (not v67 or v66) and v64.props.upperValue ~= v64.props.lowerValue and v64.upperKnobRef or nil, 
-        NextSelectionUp = v66 and v64.lowerKnobRef or nil, 
-        NextSelectionDown = v66 and v64.lowerKnobRef or nil, 
-        SelectionImageObject = v66 and v64.props.selectedCursor or v64.props.unselectedCursor, 
-        [v4.Ref] = v64.lowerKnobRef, 
-        [v4.Event.InputBegan] = function(_, v75) --[[ Line: 424 ]]
-            -- upvalues: v64 (copy)
-            if v64.props.isDisabled then
-                return;
-            else
-                v64:onInputBegan(v75, true);
-                return;
-            end;
-        end
-    });
-    if v64.props.customKnobBorderSize and v64.props.customKnobBorderSize > 0 then
-        return v64:wrapKnobWithBorder(v76, v65);
-    else
-        return v76;
-    end;
-end;
-v13.renderKnobShadow = function(v77, v78, v79) --[[ Line: 440 ]] --[[ Name: renderKnobShadow ]]
-    -- upvalues: v4 (copy), v8 (copy)
-    return v4.createElement(v8.Label, {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundTransparency = 1, 
-        ImageTransparency = v78, 
-        Image = v77.props.knobShadowImage, 
-        Size = UDim2.fromOffset(v77:getKnobHeight(), v77:getKnobHeight()), 
-        Position = v79, 
-        ZIndex = 2
-    });
-end;
-v13.render = function(v80) --[[ Line: 452 ]] --[[ Name: render ]]
-    -- upvalues: v11 (copy), v12 (copy), v4 (copy), v7 (copy), v8 (copy)
-    local v81 = v80.state.lowerKnobIsSelected or v80.state.upperKnobIsSelected;
-    local v82 = v80:hasTwoKnobs();
-    local v83 = (v80.props.lowerValue - v80.props.min) / (v80.props.max - v80.props.min);
-    local v84 = v82 and (v80.props.upperValue - v80.props.min) / (v80.props.max - v80.props.min) or nil;
-    local v85 = v80:getKnobVisibleHeight();
-    local v86 = v11(v85 / 2, -v85 / 2, v83);
-    local v87 = v82 and v11(v85 / 2, -v85 / 2, v84) or nil;
-    local v88 = UDim2.new(v83, v86, 0.5, 0);
-    local v89 = v82 and UDim2.new(v84, v87, 0.5, 0) or nil;
-    local v90 = v82 and UDim2.fromScale(v84 - v83, 1) or UDim2.fromScale(v83, 1);
-    local v91 = v80.state.lowerKnobIsSelected or v80.state.upperKnobIsSelected;
-    return v12(function(v92) --[[ Line: 467 ]]
-        -- upvalues: v4 (ref), v7 (ref), v8 (ref), v80 (copy), v91 (copy), v90 (copy), v82 (copy), v83 (copy), v88 (copy), v81 (copy), v89 (copy)
-        return v4.createElement(v7.Focusable[v8.Button], {
-            BackgroundTransparency = 1, 
-            AnchorPoint = v80.props.anchorPoint, 
-            Size = UDim2.new(v80.props.width.Scale, v80.props.width.Offset, 0, 36), 
-            LayoutOrder = v80.props.layoutOrder, 
-            Position = v80.props.position, 
-            [v4.Event.InputBegan] = function(_, v94) --[[ Line: 474 ]]
-                -- upvalues: v80 (ref)
-                if v80.props.isDisabled then
-                    return;
-                else
-                    v80:onInputBegan(v94, false);
-                    return;
-                end;
-            end, 
-            [v4.Ref] = v80.rootRef, 
-            NextSelectionLeft = v91 and v80.rootRef or nil, 
-            NextSelectionRight = v91 and v80.rootRef or nil, 
-            NextSelectionUp = not v91 and v80.props.NextSelectionUp or v80.rootRef, 
-            NextSelectionDown = not v91 and v80.props.NextSelectionDown or v80.rootRef, 
-            defaultChild = v80.props.upperValue ~= v80.props.min and v80.lowerKnobRef or v80.upperKnobRef or nil, 
-            onFocusLost = function() --[[ Line: 491 ]] --[[ Name: onFocusLost ]]
-                -- upvalues: v80 (ref)
-                if v80.state.lowerKnobIsSelected or v80.state.upperKnobIsSelected then
-                    v80:setState({
-                        lowerKnobIsSelected = false, 
-                        upperKnobIsSelected = false
-                    });
-                end;
-            end
-        }, {
-            Track = v80:renderTrack(v90, v82, v83), 
-            LowerKnob = v80:renderLowerKnob(v88, v81, v82, v92), 
-            LowerKnobShadow = v80:renderKnobShadow(v80.props.knobShadowTransparencyLower, v88), 
-            UpperKnob = v80:renderUpperKnob(v89, v81, v82, v92), 
-            UpperKnobShadow = v82 and v80:renderKnobShadow(v80.props.knobShadowTransparencyUpper, v89) or nil
-        });
-    end);
-end;
-v13.didMount = function(v95) --[[ Line: 511 ]] --[[ Name: didMount ]]
-    local l_current_0 = v95.rootRef.current;
-    local v97 = nil;
-    local function v98() --[[ Line: 519 ]] --[[ Name: checkAncestry ]]
-        -- upvalues: l_current_0 (copy), v97 (ref), v95 (copy)
-        if not l_current_0:IsDescendantOf(game) then
-            return;
-        else
-            v97:Disconnect();
-            v95.canUseUserInputService = l_current_0:FindFirstAncestorWhichIsA("PluginGui") == nil;
-            return;
-        end;
-    end;
-    v97 = l_current_0.AncestryChanged:Connect(v98);
-    if l_current_0:IsDescendantOf(game) then
-        v97:Disconnect();
-        v95.canUseUserInputService = l_current_0:FindFirstAncestorWhichIsA("PluginGui") == nil;
-    end;
-end;
-v13.didUpdate = function(v99, _, v101) --[[ Line: 537 ]] --[[ Name: didUpdate ]]
-    if v99.props.disabled then
-        v99:stopListeningForDrag();
-    end;
-    local v102 = v101.lowerKnobIsSelected and not v99.state.lowerKnobIsSelected;
-    local v103 = v101.upperKnobIsSelected and not v99.state.upperKnobIsSelected;
-    if v99.props.onDragEnd ~= nil and (v102 or v103) then
-        v99.props.onDragEnd();
-        return;
-    elseif v99.props.onDragStartLower ~= nil and not v101.lowerKnobIsSelected and v99.state.lowerKnobIsSelected then
-        v99.props.onDragStartLower();
-        return;
-    else
-        if v99.props.onDragStartUpper ~= nil and not v101.upperKnobIsSelected and v99.state.upperKnobIsSelected then
-            v99.props.onDragStartUpper();
-        end;
-        return;
-    end;
-end;
-v13.willUnmount = function(v104) --[[ Line: 560 ]] --[[ Name: willUnmount ]]
-    v104:stopListeningForDrag();
-end;
-v13.onInputBegan = function(v105, v106, v107) --[[ Line: 564 ]] --[[ Name: onInputBegan ]]
-    if v105.props.disabled then
-        return;
-    elseif v106.UserInputState ~= Enum.UserInputState.Begin then
-        return;
-    else
-        local l_UserInputType_0 = v106.UserInputType;
-        if l_UserInputType_0 ~= Enum.UserInputType.MouseButton1 and l_UserInputType_0 ~= Enum.UserInputType.Touch then
-            return;
-        elseif l_UserInputType_0 == Enum.UserInputType.Touch and not v107 then
-            return;
-        else
-            v105:processDrag(v106.Position.X);
-            v105:startListeningForDrag();
-            return;
-        end;
-    end;
-end;
-v13.startListeningForDrag = function(v109) --[[ Line: 588 ]] --[[ Name: startListeningForDrag ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    local l_current_1 = v109.rootRef.current;
-    if l_current_1 == nil then
-        return;
-    elseif v109.dragging then
-        return;
-    else
-        if v109.canUseUserInputService then
-            local function v113(v111) --[[ Line: 603 ]]
-                -- upvalues: v109 (copy)
-                if not v109.dragging then
-                    return;
-                else
-                    local l_UserInputType_1 = v111.UserInputType;
-                    if l_UserInputType_1 ~= Enum.UserInputType.MouseMovement and l_UserInputType_1 ~= Enum.UserInputType.Touch then
-                        return;
-                    elseif v111.UserInputState ~= Enum.UserInputState.Change then
-                        return;
-                    else
-                        v109:processDrag(v111.Position.X);
-                        return;
-                    end;
-                end;
-            end;
-            if v109.props.containerRef then
-                v109.moveConnection = v109.props.containerRef.current.InputChanged:Connect(v113);
-            else
-                v109.moveConnection = l_UserInputService_0.InputChanged:Connect(v113);
-            end;
-            v109.releaseConnection = l_UserInputService_0.InputEnded:Connect(function(v114) --[[ Line: 632 ]]
-                -- upvalues: v109 (copy)
-                local l_UserInputType_2 = v114.UserInputType;
-                if l_UserInputType_2 ~= Enum.UserInputType.MouseButton1 and l_UserInputType_2 ~= Enum.UserInputType.Touch then
-                    return;
-                else
-                    v109:stopListeningForDrag();
-                    if not v109.props.containerRef then
-                        v109:processOneKnobDrag(v114.Position.X);
-                    end;
-                    return;
-                end;
-            end);
-            v109.focusLostConnection = l_UserInputService_0.WindowFocusReleased:Connect(function() --[[ Line: 655 ]]
-                -- upvalues: v109 (copy)
-                v109:stopListeningForDrag();
-            end);
-        else
-            local l_l_current_1_FirstAncestorWhichIsA_0 = l_current_1:FindFirstAncestorWhichIsA("PluginGui");
-            local l_ImageButton_0 = Instance.new("ImageButton");
-            l_ImageButton_0.BackgroundTransparency = 1;
-            l_ImageButton_0.Image = "";
-            l_ImageButton_0.Name = "SliderPluginGuiInputCapturer";
-            l_ImageButton_0.Size = UDim2.new(1, 0, 1, 0);
-            l_ImageButton_0.ZIndex = 100000;
-            v109.moveConnection = l_ImageButton_0.MouseMoved:Connect(function(v118) --[[ Line: 675 ]]
-                -- upvalues: v109 (copy)
-                v109:processDrag(v118);
-            end);
-            v109.releaseConnection = l_ImageButton_0.MouseButton1Up:Connect(function(v119) --[[ Line: 679 ]]
-                -- upvalues: v109 (copy)
-                v109:stopListeningForDrag();
-                v109:processOneKnobDrag(v119);
-            end);
-            v109.focusLostConnection = l_ImageButton_0.MouseLeave:Connect(function(v120) --[[ Line: 684 ]]
-                -- upvalues: v109 (copy)
-                v109:stopListeningForDrag();
-                v109:processOneKnobDrag(v120);
-            end);
-            l_ImageButton_0.Parent = l_l_current_1_FirstAncestorWhichIsA_0;
-            v109.inputCapturerButton = l_ImageButton_0;
-        end;
-        v109.dragging = true;
-        if v109.lowerKnobDrag and v109.props.onDragStartLower ~= nil then
-            v109.props.onDragStartLower();
-        end;
-        if v109.upperKnobDrag and v109.props.onDragStartUpper ~= nil then
-            v109.props.onDragStartUpper();
-        end;
-        return;
-    end;
-end;
-v13.getSteppedValue = function(v121, v122) --[[ Line: 704 ]] --[[ Name: getSteppedValue ]]
-    local l_current_2 = v121.rootRef.current;
-    if l_current_2 == nil then
-        return 0;
-    else
-        local l_min_0 = v121.props.min;
-        local l_max_0 = v121.props.max;
-        local l_stepInterval_0 = v121.props.stepInterval;
-        local l_X_0 = l_current_2.AbsoluteSize.X;
-        return math.floor((math.clamp(v122 - l_current_2.AbsolutePosition.X, 0, l_X_0) / l_X_0 * (l_max_0 - l_min_0) + l_min_0) / l_stepInterval_0 + 0.5) * l_stepInterval_0;
-    end;
-end;
-v13.processDrag = function(v128, v129) --[[ Line: 722 ]] --[[ Name: processDrag ]]
-    if v128:hasTwoKnobs() then
-        v128:processTwoKnobDrag(v129);
-        return;
-    else
-        v128:processOneKnobDrag(v129);
-        return;
-    end;
-end;
-v13.processOneKnobDrag = function(v130, v131) --[[ Line: 730 ]] --[[ Name: processOneKnobDrag ]]
-    if v130:hasTwoKnobs() then
-        return;
-    else
-        local v132 = v130:getSteppedValue(v131);
-        v130.lowerKnobDrag = true;
-        if v132 ~= v130.props.lowerValue then
-            v130.props.onValueChanged(v132);
-        end;
-        return;
-    end;
-end;
-v13.processTwoKnobDrag = function(v133, v134) --[[ Line: 743 ]] --[[ Name: processTwoKnobDrag ]]
-    local v135 = v133:getSteppedValue(v134);
-    local l_lowerValue_2 = v133.props.lowerValue;
-    local l_upperValue_1 = v133.props.upperValue;
-    if not v133.lowerKnobDrag and not v133.upperKnobDrag then
-        if v135 == l_lowerValue_2 then
-            v133.lowerKnobDrag = true;
-        end;
-        if v135 == l_upperValue_1 then
-            v133.upperKnobDrag = true;
-        end;
-    elseif v133.lowerKnobDrag and v133.upperKnobDrag then
-        if l_upperValue_1 <= v135 - v133.props.stepInterval then
-            v133.upperKnobDrag = true;
-            v133.lowerKnobDrag = false;
-            l_upperValue_1 = v135;
-        elseif v135 + v133.props.stepInterval <= l_lowerValue_2 then
-            v133.upperKnobDrag = false;
-            v133.lowerKnobDrag = true;
-            l_lowerValue_2 = v135;
-        end;
-    elseif v133.lowerKnobDrag then
-        if v135 <= l_upperValue_1 then
-            l_lowerValue_2 = v135;
-        end;
-    elseif v133.upperKnobDrag and l_lowerValue_2 <= v135 then
-        l_upperValue_1 = v135;
-    end;
-    if l_upperValue_1 ~= v133.props.upperValue or l_lowerValue_2 ~= v133.props.lowerValue then
-        v133.props.onValueChanged(l_lowerValue_2, l_upperValue_1);
-    end;
-end;
-v13.stopListeningForDrag = function(v138) --[[ Line: 784 ]] --[[ Name: stopListeningForDrag ]]
-    if v138.moveConnection ~= nil then
-        v138.moveConnection:Disconnect();
-        v138.moveConnection = nil;
-    end;
-    if v138.releaseConnection ~= nil then
-        v138.releaseConnection:Disconnect();
-        v138.releaseConnection = nil;
-    end;
-    if v138.focusLostConnection ~= nil then
-        v138.focusLostConnection:Disconnect();
-        v138.focusLostConnection = nil;
-    end;
-    if v138.inputCapturerButton ~= nil then
-        v138.inputCapturerButton:Destroy();
-        v138.inputCapturerButton = nil;
-    end;
-    v138.dragging = false;
-    v138.lowerKnobDrag = false;
-    v138.upperKnobDrag = false;
-    if v138.props.onDragEnd ~= nil then
-        v138.props.onDragEnd();
-    end;
-end;
-v13.hasTwoKnobs = function(v139) --[[ Line: 814 ]] --[[ Name: hasTwoKnobs ]]
-    return v139.props.upperValue ~= nil;
-end;
-return v4.forwardRef(function(v140, v141) --[[ Line: 818 ]]
-    -- upvalues: v9 (copy), v10 (copy), v5 (copy), v4 (copy), v13 (copy)
-    local v142 = v9(v10.SelectedKnob);
-    local v143 = v9(v10.UnselectedKnob);
-    v140 = v5.Dictionary.join(v140, {
-        selectedCursor = v142, 
-        unselectedCursor = v143
-    });
-    return v4.createElement(v13, v5.Dictionary.join(v140, {
-        imageButtonRef = v141
-    }));
-end);
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Roact = require(ParentParentParentParent.Roact)
+local Cryo = require(ParentParentParentParent.Cryo)
+local t = require(ParentParentParentParent.t)
+local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
+local ImageSetComponent = require(ParentParent.ImageSet.ImageSetComponent)
+local useCursorByType = require(ParentParentParent.App.SelectionCursor.useCursorByType)
+local CursorType = require(ParentParentParent.App.SelectionCursor.CursorType)
+local lerp = require(ParentParentParent.Utility.lerp)
+local withSelectionCursorProvider = require(ParentParentParent.App.SelectionImage.withSelectionCursorProvider)
+local v14 = Roact.PureComponent:extend("GenericSlider")
+
+v14.validateProps = t.strictInterface({
+	lowerValue = t.number,
+	upperValue = t.optional(t.number),
+	min = t.number,
+	max = t.number,
+	stepInterval = t.numberPositive,
+	isDisabled = t.optional(t.boolean),
+	onValueChanged = t.callback,
+	onDragStartLower = t.optional(t.callback),
+	onDragStartUpper = t.optional(t.callback),
+	onDragEnd = t.optional(t.callback),
+	trackImage = t.union(t.string, t.table),
+	trackColor = t.union(t.Color3, t.table),
+	trackTransparency = t.union(t.number, t.table),
+	trackSliceCenter = t.optional(t.Rect),
+	trackFillImage = t.union(t.string, t.table),
+	trackFillColor = t.union(t.Color3, t.table),
+	trackFillTransparency = t.union(t.number, t.table),
+	trackFillSliceCenter = t.optional(t.Rect),
+	knobImage = t.union(t.string, t.table),
+	knobColorLower = t.union(t.Color3, t.table),
+	knobColorUpper = t.optional(t.union(t.Color3, t.table)),
+	knobTransparency = t.union(t.number, t.table),
+	knobImagePadding = t.optional(t.numberMin(0)),
+	knobShadowImage = t.union(t.string, t.table),
+	knobShadowTransparencyLower = t.union(t.number, t.table),
+	knobShadowTransparencyUpper = t.optional(t.union(t.number, t.table)),
+	width = t.optional(t.UDim),
+	position = t.optional(t.UDim2),
+	anchorPoint = t.optional(t.Vector2),
+	layoutOrder = t.optional(t.integer),
+	imageButtonRef = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	focusController = t.optional(t.table),
+	containerRef = t.optional(t.table),
+	customTrack = t.optional(t.table),
+	customKnobHeight = t.optional(t.number),
+	customKnobBorderColor = t.optional(t.Color3),
+	customKnobBorderSize = t.optional(t.number),
+	selectedCursor = t.table,
+	unselectedCursor = t.table
+})
+v14.defaultProps = {
+	knobImagePadding = 0,
+	width = UDim.new(1, 0),
+	customKnobBorderColor = Color3.new(0, 0, 0)
+}
+
+function v14.init(p1) -- line: 103
+	-- upvalues: Roact (copy)
+	p1.rootRef = p1.props.imageButtonRef or Roact.createRef()
+	p1.lowerKnobRef = Roact.createRef()
+	p1.upperKnobRef = Roact.createRef()
+	p1.moveDirection = 0
+	p1.lowerKnobDrag = false
+	p1.upperKnobDrag = false
+	p1.totalMoveTime = 0
+	p1.isFirstMove = true
+	p1.unhandledTime = 0
+	p1.state = {
+		lowerKnobIsSelected = false,
+		upperKnobIsSelected = false
+	}
+end
+function v14.getKnobVisibleHeight(p2) -- line: 121
+	if p2.props.customKnobHeight then
+		return (44 - p2.props.knobImagePadding * 2) / 44 * p2.props.customKnobHeight
+	end
+
+	return 44 - p2.props.knobImagePadding * 2
+end
+function v14.getKnobHeight(p3) -- line: 130
+	if p3.props.customKnobHeight then
+		return 44 / (44 - p3.props.knobImagePadding * 2) * p3.props.customKnobHeight
+	end
+
+	return 44
+end
+function v14.onMoveStep(p4, p5, p6) -- line: 140
+	if not p4.state.lowerKnobIsSelected and not p4.state.upperKnobIsSelected then
+		return
+	end
+
+	local Position = p5[Enum.KeyCode.Thumbstick1].Position
+	local v22 = Position.Magnitude > 0.2
+	local n1 = 0
+
+	p4.totalMoveTime = p4.totalMoveTime + p6
+
+	local v24, n2, n3
+
+	if v22 then
+		v24 = not (Position.x > 0) and -1 or 1
+		n2 = 0.2
+		n3 = 12
+	else
+		v24 = (p5[Enum.KeyCode.DPadLeft].UserInputState ~= Enum.UserInputState.Begin and 0 or -1) + (p5[Enum.KeyCode.DPadRight].UserInputState ~= Enum.UserInputState.Begin and 0 or 1)
+		n2 = 0.5
+		n3 = 8
+	end
+
+	if v24 ~= 0 then
+		if p4.isFirstMove then
+			p4.isFirstMove = false
+			p4.totalMoveTime = 0
+			p4.unhandledTime = 0
+			n1 = 1
+		elseif n2 < p4.totalMoveTime then
+			local v27 = p6 - math.max(n2 - p4.totalMoveTime - p6, 0) + p4.unhandledTime
+
+			n1 = math.floor(n3 * v27)
+			p4.unhandledTime = v27 - n1 / n3
+		else
+			n1 = 0
+			p4.unhandledTime = 0
+		end
+	else
+		p4.totalMoveTime = 0
+		p4.isFirstMove = true
+	end
+
+	if n1 > 0 then
+		p4:processGamepadInput(v24, n1)
+	end
+end
+function v14.processGamepadInput(p7, p8, p9) -- line: 194
+	if p7:hasTwoKnobs() then
+		p7:processTwoKnobGamepadInput(p8, p9)
+
+		return
+	end
+
+	p7:processOneKnobGamepadInput(p8, p9)
+end
+function v14.processTwoKnobGamepadInput(p10, p11, p12) -- line: 202
+	local v34 = p10.props.stepInterval * p11
+	local lowerValue = p10.props.lowerValue
+	local upperValue = p10.props.upperValue
+
+	if lowerValue == upperValue and not p10.state.processingGamepad then
+		if p10.state.lowerKnobIsSelected and p11 == 1 and lowerValue ~= p10.props.max then
+			p10:setState({
+				lowerKnobIsSelected = false,
+				upperKnobIsSelected = true,
+				processingGamepad = true
+			})
+			p10.props.focusController.moveFocusTo(p10.upperKnobRef)
+		elseif p10.state.upperKnobIsSelected and p11 == -1 and upperValue ~= p10.props.min then
+			p10:setState({
+				lowerKnobIsSelected = true,
+				upperKnobIsSelected = false,
+				processingGamepad = true
+			})
+			p10.props.focusController.moveFocusTo(p10.lowerKnobRef)
+		end
+	elseif not p10.state.processingGamepad then
+		p10:setState({
+			processingGamepad = true
+		})
+	end
+
+	if p10.state.lowerKnobIsSelected then
+		local v37 = math.max(math.min(lowerValue + v34 * p12, p10.props.max), p10.props.min)
+
+		lowerValue = if not (v37 <= upperValue) then upperValue else v37
+	elseif p10.state.upperKnobIsSelected then
+		local v38 = math.max(math.min(upperValue + v34 * p12, p10.props.max), p10.props.min)
+
+		upperValue = if not (lowerValue <= v38) then lowerValue else v38
+	end
+
+	if upperValue ~= p10.props.upperValue or lowerValue ~= p10.props.lowerValue then
+		p10.props.onValueChanged(lowerValue, upperValue)
+	end
+end
+function v14.processOneKnobGamepadInput(p13, p14, p15) -- line: 256
+	local v42 = p13.props.stepInterval * p14
+	local lowerValue = p13.props.lowerValue
+
+	if p13.state.lowerKnobIsSelected then
+		lowerValue = math.max(math.min(lowerValue + v42 * p15, p13.props.max), p13.props.min)
+	end
+
+	if lowerValue ~= p13.props.lowerValue then
+		p13.props.onValueChanged(lowerValue)
+	end
+end
+function v14.renderTrack(p16, p17, p18, p19) -- line: 269
+	-- upvalues: Roact (copy), ImageSetComponent (copy)
+	if p16.props.customTrack then
+		return p16.props.customTrack
+	end
+
+	return Roact.createElement(ImageSetComponent.Label, {
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		ImageColor3 = p16.props.trackColor,
+		ImageTransparency = p16.props.trackTransparency,
+		Image = p16.props.trackImage,
+		Size = UDim2.new(1, 0, 0, 4),
+		Position = UDim2.fromScale(0.5, 0.5),
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = p16.props.trackSliceCenter
+	}, {
+		TrackFill = Roact.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			ImageColor3 = p16.props.trackFillColor,
+			ImageTransparency = p16.props.trackFillTransparency,
+			Image = p16.props.trackFillImage,
+			Size = p17,
+			Position = p18 and UDim2.new(p19, 0, 0, 0) or UDim2.new(0, 0, 0, 0),
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = p16.props.trackFillSliceCenter
+		})
+	})
+end
+function v14.wrapKnobWithBorder(p20, p21, p22) -- line: 298
+	-- upvalues: Roact (copy)
+	local v51 = if not p20.props.customKnobHeight then p20:getKnobVisibleHeight() else p20.props.customKnobHeight
+
+	return Roact.createElement("Frame", {
+		ZIndex = 3,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Size = UDim2.fromOffset(v51, v51),
+		Position = p22,
+		BackgroundColor3 = p20.props.customKnobBorderColor
+	}, {
+		UICorner = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0.5, 0)
+		}),
+		KnobContent = p21
+	})
+end
+function v14.renderUpperKnob(p23, p24, p25, p26, _) -- line: 315
+	-- upvalues: Roact (copy), RoactGamepad (copy), ImageSetComponent (copy)
+	if not p26 then
+		return nil
+	end
+
+	local v57 = p23:getKnobHeight()
+	local v58 = p24
+
+	if p23.props.customKnobBorderSize and p23.props.customKnobBorderSize > 0 then
+		v57 -= 2 * (p23.props.customKnobBorderSize + 2)
+		v58 = UDim2.fromScale(0.5, 0.5)
+	end
+
+	local v59 = Roact.createElement(RoactGamepad.Focusable[ImageSetComponent.Button], {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		ImageColor3 = p23.props.knobColorUpper,
+		ImageTransparency = p23.props.knobTransparency,
+		Image = p23.props.knobImage,
+		Size = UDim2.fromOffset(v57, v57),
+		Position = v58,
+		ZIndex = 3,
+		NextSelectionLeft = not p25 and (p23.props.upperValue ~= p23.props.lowerValue and p23.lowerKnobRef) or nil,
+		NextSelectionRight = p25 and p23.upperKnobRef or nil,
+		NextSelectionUp = p25 and p23.upperKnobRef or nil,
+		NextSelectionDown = p25 and p23.upperKnobRef or nil,
+		SelectionImageObject = p25 and p23.props.selectedCursor or p23.props.unselectedCursor,
+		[Roact.Ref] = p23.upperKnobRef,
+		[Roact.Event.InputBegan] = function(_, p29) -- line: 345
+			-- upvalues: p23 (copy)
+			if p23.props.isDisabled then
+				return
+			end
+
+			p23:onInputBegan(p29, true)
+		end,
+		inputBindings = {
+			OnMoveStep = RoactGamepad.Input.onMoveStep(function(p30, p31) -- line: 353
+				-- upvalues: p23 (copy)
+				p23:onMoveStep(p30, p31)
+			end),
+			SelectUpperKnob = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, function() -- line: 356
+				-- upvalues: p23 (copy)
+				p23:setState(function(p32) -- line: 357
+					return {
+						processingGamepad = false,
+						upperKnobIsSelected = not p32.upperKnobIsSelected
+					}
+				end)
+			end),
+			UnselectUpperKnob = p25 and RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonB, function() -- line: 364
+				-- upvalues: p23 (copy)
+				p23:setState({
+					upperKnobIsSelected = false,
+					processingGamepad = false
+				})
+			end) or nil
+		}
+	})
+
+	if p23.props.customKnobBorderSize and p23.props.customKnobBorderSize > 0 then
+		return p23:wrapKnobWithBorder(v59, p24)
+	end
+
+	return v59
+end
+function v14.renderLowerKnob(p33, p34, p35, p36, _) -- line: 380
+	-- upvalues: Roact (copy), RoactGamepad (copy), ImageSetComponent (copy)
+	local v65 = p33:getKnobHeight()
+	local v66 = p34
+
+	if p33.props.customKnobBorderSize and p33.props.customKnobBorderSize > 0 then
+		v65 -= 2 * (p33.props.customKnobBorderSize + 2)
+		v66 = UDim2.fromScale(0.5, 0.5)
+	end
+
+	local v67 = Roact.createElement(RoactGamepad.Focusable[ImageSetComponent.Button], {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		ImageColor3 = p33.props.knobColorLower,
+		ImageTransparency = p33.props.knobTransparency,
+		Image = p33.props.knobImage,
+		Size = UDim2.fromOffset(v65, v65),
+		Position = v66,
+		ZIndex = 3,
+		inputBindings = {
+			OnMoveStep = RoactGamepad.Input.onMoveStep(function(p38, p39) -- line: 398
+				-- upvalues: p33 (copy)
+				p33:onMoveStep(p38, p39)
+			end),
+			SelectLowerKnob = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, function() -- line: 401
+				-- upvalues: p33 (copy)
+				p33:setState(function(p40) -- line: 402
+					return {
+						processingGamepad = false,
+						lowerKnobIsSelected = not p40.lowerKnobIsSelected
+					}
+				end)
+			end),
+			UnselectLowerKnob = p35 and RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonB, function() -- line: 409
+				-- upvalues: p33 (copy)
+				p33:setState({
+					lowerKnobIsSelected = false,
+					processingGamepad = false
+				})
+			end) or nil
+		},
+		NextSelectionLeft = p35 and p33.lowerKnobRef or nil,
+		NextSelectionRight = p36 and (not p35 and (p33.props.upperValue ~= p33.props.lowerValue and p33.upperKnobRef)) or nil,
+		NextSelectionUp = p35 and p33.lowerKnobRef or nil,
+		NextSelectionDown = p35 and p33.lowerKnobRef or nil,
+		SelectionImageObject = p35 and p33.props.selectedCursor or p33.props.unselectedCursor,
+		[Roact.Ref] = p33.lowerKnobRef,
+		[Roact.Event.InputBegan] = function(_, p42) -- line: 424
+			-- upvalues: p33 (copy)
+			if p33.props.isDisabled then
+				return
+			end
+
+			p33:onInputBegan(p42, true)
+		end
+	})
+
+	if p33.props.customKnobBorderSize and p33.props.customKnobBorderSize > 0 then
+		return p33:wrapKnobWithBorder(v67, p34)
+	end
+
+	return v67
+end
+function v14.renderKnobShadow(p43, p44, p45) -- line: 440
+	-- upvalues: Roact (copy), ImageSetComponent (copy)
+	return Roact.createElement(ImageSetComponent.Label, {
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		ImageTransparency = p44,
+		Image = p43.props.knobShadowImage,
+		Size = UDim2.fromOffset(p43:getKnobHeight(), p43:getKnobHeight()),
+		Position = p45
+	})
+end
+function v14.render(p46) -- line: 452
+	-- upvalues: lerp (copy), withSelectionCursorProvider (copy), Roact (copy), RoactGamepad (copy), ImageSetComponent (copy)
+	local v72 = p46.state.lowerKnobIsSelected or p46.state.upperKnobIsSelected
+	local v73 = p46:hasTwoKnobs()
+	local v74 = (p46.props.lowerValue - p46.props.min) / (p46.props.max - p46.props.min)
+	local v75 = v73 and (p46.props.upperValue - p46.props.min) / (p46.props.max - p46.props.min) or nil
+	local v76 = p46:getKnobVisibleHeight()
+	local v77 = lerp(v76 / 2, -v76 / 2, v74)
+	local v78 = v73 and lerp(v76 / 2, -v76 / 2, v75) or nil
+	local uDim2 = UDim2.new(v74, v77, 0.5, 0)
+	local v80 = v73 and UDim2.new(v75, v78, 0.5, 0) or nil
+	local v81 = v73 and UDim2.fromScale(v75 - v74, 1) or UDim2.fromScale(v74, 1)
+	local v82 = p46.state.lowerKnobIsSelected or p46.state.upperKnobIsSelected
+
+	return withSelectionCursorProvider(function(p47) -- line: 467
+		-- upvalues: Roact (copy), RoactGamepad (copy), ImageSetComponent (copy), p46 (copy), v82 (copy), v81 (copy), v73 (copy), v74 (copy), uDim2 (copy), v72 (copy), v80 (copy)
+		return Roact.createElement(RoactGamepad.Focusable[ImageSetComponent.Button], {
+			BackgroundTransparency = 1,
+			AnchorPoint = p46.props.anchorPoint,
+			Size = UDim2.new(p46.props.width.Scale, p46.props.width.Offset, 0, 36),
+			LayoutOrder = p46.props.layoutOrder,
+			Position = p46.props.position,
+			[Roact.Event.InputBegan] = function(_, p49) -- line: 474
+				-- upvalues: p46 (copy)
+				if p46.props.isDisabled then
+					return
+				end
+
+				p46:onInputBegan(p49, false)
+			end,
+			[Roact.Ref] = p46.rootRef,
+			NextSelectionLeft = v82 and p46.rootRef or nil,
+			NextSelectionRight = v82 and p46.rootRef or nil,
+			NextSelectionUp = not v82 and p46.props.NextSelectionUp or p46.rootRef,
+			NextSelectionDown = not v82 and p46.props.NextSelectionDown or p46.rootRef,
+			defaultChild = p46.props.upperValue ~= p46.props.min and p46.lowerKnobRef or (p46.upperKnobRef or nil),
+			onFocusLost = function() -- line: 491
+				-- upvalues: p46 (copy)
+				if p46.state.lowerKnobIsSelected or p46.state.upperKnobIsSelected then
+					p46:setState({
+						lowerKnobIsSelected = false,
+						upperKnobIsSelected = false
+					})
+				end
+			end
+		}, {
+			Track = p46:renderTrack(v81, v73, v74),
+			LowerKnob = p46:renderLowerKnob(uDim2, v72, v73, p47),
+			LowerKnobShadow = p46:renderKnobShadow(p46.props.knobShadowTransparencyLower, uDim2),
+			UpperKnob = p46:renderUpperKnob(v80, v72, v73, p47),
+			UpperKnobShadow = v73 and p46:renderKnobShadow(p46.props.knobShadowTransparencyUpper, v80) or nil
+		})
+	end)
+end
+function v14.didMount(p50) -- line: 511
+	local current = p50.rootRef.current
+	local connection = nil
+
+	local function checkAncestry() -- line: 519
+		-- upvalues: current (copy), connection (ref), p50 (copy)
+		if not current:IsDescendantOf(game) then
+			return
+		end
+
+		connection:Disconnect()
+		p50.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
+	end
+
+	connection = current.AncestryChanged:Connect(checkAncestry)
+
+	if current:IsDescendantOf(game) then
+		connection:Disconnect()
+		p50.canUseUserInputService = current:FindFirstAncestorWhichIsA("PluginGui") == nil
+	end
+end
+function v14.didUpdate(p51, _, p53) -- line: 537
+	if p51.props.disabled then
+		p51:stopListeningForDrag()
+	end
+
+	local v90 = p53.lowerKnobIsSelected and not p51.state.lowerKnobIsSelected
+	local v91 = p53.upperKnobIsSelected and not p51.state.upperKnobIsSelected
+
+	if p51.props.onDragEnd ~= nil and (v90 or v91) then
+		p51.props.onDragEnd()
+
+		return
+	end
+
+	if p51.props.onDragStartLower ~= nil and not p53.lowerKnobIsSelected and p51.state.lowerKnobIsSelected then
+		p51.props.onDragStartLower()
+
+		return
+	end
+
+	if p51.props.onDragStartUpper ~= nil and not p53.upperKnobIsSelected and p51.state.upperKnobIsSelected then
+		p51.props.onDragStartUpper()
+	end
+end
+function v14.willUnmount(p54) -- line: 560
+	p54:stopListeningForDrag()
+end
+function v14.onInputBegan(p55, p56, p57) -- line: 564
+	if p55.props.disabled then
+		return
+	end
+
+	if p56.UserInputState ~= Enum.UserInputState.Begin then
+		return
+	end
+
+	local UserInputType = p56.UserInputType
+
+	if UserInputType ~= Enum.UserInputType.MouseButton1 and UserInputType ~= Enum.UserInputType.Touch then
+		return
+	end
+
+	if UserInputType == Enum.UserInputType.Touch and not p57 then
+		return
+	end
+
+	p55:processDrag(p56.Position.X)
+	p55:startListeningForDrag()
+end
+function v14.startListeningForDrag(p58) -- line: 588
+	-- upvalues: UserInputService (copy)
+	local current = p58.rootRef.current
+
+	if current == nil then
+		return
+	end
+
+	if p58.dragging then
+		return
+	end
+
+	if p58.canUseUserInputService then
+		local function v99(p59) -- line: 603
+			-- upvalues: p58 (copy)
+			if not p58.dragging then
+				return
+			end
+
+			local UserInputType = p59.UserInputType
+
+			if UserInputType ~= Enum.UserInputType.MouseMovement and UserInputType ~= Enum.UserInputType.Touch then
+				return
+			end
+
+			if p59.UserInputState ~= Enum.UserInputState.Change then
+				return
+			end
+
+			p58:processDrag(p59.Position.X)
+		end
+
+		if p58.props.containerRef then
+			p58.moveConnection = p58.props.containerRef.current.InputChanged:Connect(v99)
+		else
+			p58.moveConnection = UserInputService.InputChanged:Connect(v99)
+		end
+
+		p58.releaseConnection = UserInputService.InputEnded:Connect(function(input) -- line: 632
+			-- upvalues: p58 (copy)
+			local UserInputType = input.UserInputType
+
+			if UserInputType ~= Enum.UserInputType.MouseButton1 and UserInputType ~= Enum.UserInputType.Touch then
+				return
+			end
+
+			p58:stopListeningForDrag()
+
+			if not p58.props.containerRef then
+				p58:processOneKnobDrag(input.Position.X)
+			end
+		end)
+		p58.focusLostConnection = UserInputService.WindowFocusReleased:Connect(function() -- line: 655
+			-- upvalues: p58 (copy)
+			p58:stopListeningForDrag()
+		end)
+	else
+		local PluginGui = current:FindFirstAncestorWhichIsA("PluginGui")
+		local ImageButton = Instance.new("ImageButton")
+
+		ImageButton.BackgroundTransparency = 1
+		ImageButton.Image = ""
+		ImageButton.Name = "SliderPluginGuiInputCapturer"
+		ImageButton.Size = UDim2.new(1, 0, 1, 0)
+		ImageButton.ZIndex = 100000
+		p58.moveConnection = ImageButton.MouseMoved:Connect(function(p60) -- line: 675
+			-- upvalues: p58 (copy)
+			p58:processDrag(p60)
+		end)
+		p58.releaseConnection = ImageButton.MouseButton1Up:Connect(function(p61) -- line: 679
+			-- upvalues: p58 (copy)
+			p58:stopListeningForDrag()
+			p58:processOneKnobDrag(p61)
+		end)
+		p58.focusLostConnection = ImageButton.MouseLeave:Connect(function(x) -- line: 684
+			-- upvalues: p58 (copy)
+			p58:stopListeningForDrag()
+			p58:processOneKnobDrag(x)
+		end)
+		ImageButton.Parent = PluginGui
+		p58.inputCapturerButton = ImageButton
+	end
+
+	p58.dragging = true
+
+	if p58.lowerKnobDrag and p58.props.onDragStartLower ~= nil then
+		p58.props.onDragStartLower()
+	end
+
+	if p58.upperKnobDrag and p58.props.onDragStartUpper ~= nil then
+		p58.props.onDragStartUpper()
+	end
+end
+function v14.getSteppedValue(p62, p63) -- line: 704
+	local current = p62.rootRef.current
+
+	if current == nil then
+		return 0
+	end
+
+	local min = p62.props.min
+	local max = p62.props.max
+	local stepInterval = p62.props.stepInterval
+	local AbsoluteSizeX = current.AbsoluteSize.X
+
+	return math.floor((math.clamp(p63 - current.AbsolutePosition.X, 0, AbsoluteSizeX) / AbsoluteSizeX * (max - min) + min) / stepInterval + 0.5) * stepInterval
+end
+function v14.processDrag(p64, p65) -- line: 722
+	if p64:hasTwoKnobs() then
+		p64:processTwoKnobDrag(p65)
+
+		return
+	end
+
+	p64:processOneKnobDrag(p65)
+end
+function v14.processOneKnobDrag(p66, p67) -- line: 730
+	if p66:hasTwoKnobs() then
+		return
+	end
+
+	local v113 = p66:getSteppedValue(p67)
+
+	p66.lowerKnobDrag = true
+
+	if v113 ~= p66.props.lowerValue then
+		p66.props.onValueChanged(v113)
+	end
+end
+function v14.processTwoKnobDrag(p68, p69) -- line: 743
+	local v116 = p68:getSteppedValue(p69)
+	local lowerValue = p68.props.lowerValue
+	local upperValue = p68.props.upperValue
+
+	if not p68.lowerKnobDrag and not p68.upperKnobDrag then
+		if v116 == lowerValue then
+			p68.lowerKnobDrag = true
+		end
+
+		if v116 == upperValue then
+			p68.upperKnobDrag = true
+		end
+	elseif p68.lowerKnobDrag and p68.upperKnobDrag then
+		if upperValue <= v116 - p68.props.stepInterval then
+			p68.upperKnobDrag = true
+			p68.lowerKnobDrag = false
+			upperValue = v116
+		elseif lowerValue >= v116 + p68.props.stepInterval then
+			p68.upperKnobDrag = false
+			p68.lowerKnobDrag = true
+			lowerValue = v116
+		end
+	elseif p68.lowerKnobDrag then
+		if v116 <= upperValue then
+			lowerValue = v116
+		end
+	elseif p68.upperKnobDrag and lowerValue <= v116 then
+		upperValue = v116
+	end
+
+	if upperValue ~= p68.props.upperValue or lowerValue ~= p68.props.lowerValue then
+		p68.props.onValueChanged(lowerValue, upperValue)
+	end
+end
+function v14.stopListeningForDrag(p70) -- line: 784
+	if p70.moveConnection ~= nil then
+		p70.moveConnection:Disconnect()
+		p70.moveConnection = nil
+	end
+
+	if p70.releaseConnection ~= nil then
+		p70.releaseConnection:Disconnect()
+		p70.releaseConnection = nil
+	end
+
+	if p70.focusLostConnection ~= nil then
+		p70.focusLostConnection:Disconnect()
+		p70.focusLostConnection = nil
+	end
+
+	if p70.inputCapturerButton ~= nil then
+		p70.inputCapturerButton:Destroy()
+		p70.inputCapturerButton = nil
+	end
+
+	p70.dragging = false
+	p70.lowerKnobDrag = false
+	p70.upperKnobDrag = false
+
+	if p70.props.onDragEnd ~= nil then
+		p70.props.onDragEnd()
+	end
+end
+function v14.hasTwoKnobs(p71) -- line: 814
+	return p71.props.upperValue ~= nil
+end
+
+return Roact.forwardRef(function(p72, p73) -- line: 818
+	-- upvalues: useCursorByType (copy), CursorType (copy), Cryo (copy), Roact (copy), v14 (copy)
+	local v123 = useCursorByType(CursorType.SelectedKnob)
+	local v124 = useCursorByType(CursorType.UnselectedKnob)
+	local v125 = Cryo.Dictionary.join(p72, {
+		selectedCursor = v123,
+		unselectedCursor = v124
+	})
+
+	return Roact.createElement(v14, Cryo.Dictionary.join(v125, {
+		imageButtonRef = p73
+	}))
+end)

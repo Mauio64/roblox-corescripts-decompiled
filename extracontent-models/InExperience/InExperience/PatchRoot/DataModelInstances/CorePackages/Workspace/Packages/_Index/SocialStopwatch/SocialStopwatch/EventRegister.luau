@@ -1,37 +1,41 @@
-local v0 = require(script.Parent.Events);
-local v1 = require(script.Parent.EventModes);
+local Events = require(script.Parent.Events)
+local EventModes = require(script.Parent.EventModes)
+
 return {
-    [v0.TestEvent] = {
-        mode = v1.Default
-    }, 
-    [v0.TestStrictEvent] = {
-        mode = v1.Strict
-    }, 
-    [v0.CaptureShared] = {
-        mode = v1.Default
-    }, 
-    [v0.CaptureTaken] = {
-        mode = v1.Default
-    }, 
-    [v0.EditProfileOpened] = {
-        mode = v1.Default
-    }, 
-    [v0.ProfileOpened] = {
-        mode = v1.Default
-    }, 
-    [v0.JoinGameCardOpened] = {
-        mode = v1.Default
-    }, 
-    [v0.PYMKCarouselLoaded] = {
-        mode = v1.Default
-    }, 
-    [v0.CustomizeNameOpened] = {
-        mode = v1.Default
-    }, 
-    [v0.StaticShareLinkOpened] = {
-        mode = v1.Default
-    }, 
-    [v0.ShareLinkOpened] = {
-        mode = v1.Default
-    }
-};
+	[Events.TestEvent] = {
+		mode = EventModes.Default
+	},
+	[Events.TestStrictEvent] = {
+		mode = EventModes.Strict
+	},
+	[Events.CaptureShared] = {
+		mode = EventModes.Default
+	},
+	[Events.CaptureTaken] = {
+		mode = EventModes.Default
+	},
+	[Events.EditProfileOpened] = {
+		mode = EventModes.Default
+	},
+	[Events.ProfileOpened] = {
+		mode = EventModes.Default
+	},
+	[Events.JoinGameCardOpened] = {
+		mode = EventModes.Default
+	},
+	[Events.PYMKCarouselLoaded] = {
+		mode = EventModes.Default
+	},
+	[Events.AFPUserTileLoadFromHomeCarousel] = {
+		mode = EventModes.Default
+	},
+	[Events.CustomizeNameOpened] = {
+		mode = EventModes.Default
+	},
+	[Events.StaticShareLinkOpened] = {
+		mode = EventModes.Default
+	},
+	[Events.ShareLinkOpened] = {
+		mode = EventModes.Default
+	}
+}

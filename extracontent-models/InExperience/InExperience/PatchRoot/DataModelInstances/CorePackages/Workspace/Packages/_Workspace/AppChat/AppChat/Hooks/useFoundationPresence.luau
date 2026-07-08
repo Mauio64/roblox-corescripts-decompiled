@@ -29,54 +29,60 @@ local t3 = {
 	ingameStatusLabel = "Common.Presence.Label.InExperience"
 }
 
-return function(s1: string) --[[ useFoundationPresence ]] -- line: 43
+local function useFoundationPresence(s1: string) -- line: 43
 	-- upvalues: useLocalization (copy), t3 (copy), React (copy), useSelector (copy), RoduxPresence (copy), PresenceType (copy), t2 (copy), t1 (copy)
-	local v12 = useLocalization(t3)
-	local v13, v14 = React.useBinding(v12.offlinePresenceText)
-	local v15, v16 = React.useState("None")
-	local v17 = useSelector(function(p1) -- line: 49
+	local v13 = useLocalization(t3)
+	local v14, v15 = React.useBinding(v13.offlinePresenceText)
+	local v16, v17 = React.useState("None")
+	local v18 = useSelector(function(p1) -- line: 49
 		-- upvalues: s1 (copy), RoduxPresence (copy)
 		if not s1 or s1 == "" then
+			return nil
+		end
+
+		if p1 == nil or p1.ChatAppReducer == nil or p1.ChatAppReducer.Presence == nil or p1.ChatAppReducer.Presence.byUserId == nil then
 			return nil
 		end
 
 		return RoduxPresence.Selectors.getUserPresenceByUserId(p1, s1)
 	end)
 
-	React.useEffect(function() -- line: 56
-		-- upvalues: v12 (copy), PresenceType (copy), v17 (copy), t2 (copy), t1 (copy), v16 (copy), v14 (copy)
-		local offlinePresenceText = v12.offlinePresenceText
+	React.useEffect(function() -- line: 64
+		-- upvalues: v13 (copy), PresenceType (copy), v18 (copy), t2 (copy), t1 (copy), v17 (copy), v15 (copy)
+		local offlinePresenceText = v13.offlinePresenceText
 		local Offline = PresenceType.Offline
 
-		if v17 then
-			Offline = v17.userPresenceType
+		if v18 then
+			Offline = v18.userPresenceType
 
-			local lastLocation = v17.lastLocation
+			local lastLocation = v18.lastLocation
 
-			offlinePresenceText = v12[t2[Offline]]
+			offlinePresenceText = v13[t2[Offline]]
 
 			if Offline == PresenceType.InGame and lastLocation and lastLocation ~= "" then
 				offlinePresenceText = lastLocation
 			end
 		end
 
-		local v22 = t1
+		local v23 = t1
 
-		v16(v22[Offline] or "None")
-		v14(offlinePresenceText)
+		v17(v23[Offline] or "None")
+		v15(offlinePresenceText)
 	end, {
-		v17,
-		v12
-	})
-
-	return React.useMemo(function() -- line: 76
-		-- upvalues: v15 (copy), v13 (copy)
-		return {
-			presence = v15,
-			presenceText = v13
-		}
-	end, {
-		v15,
+		v18,
 		v13
 	})
+
+	return React.useMemo(function() -- line: 84
+		-- upvalues: v16 (copy), v14 (copy)
+		return {
+			presence = v16,
+			presenceText = v14
+		}
+	end, {
+		v16,
+		v14
+	})
 end
+
+return useFoundationPresence

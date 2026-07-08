@@ -1,13 +1,15 @@
-local v0 = require(script.Parent.Parent.Immutable);
-local v1 = require(script.Parent.Parent.Actions.ServerStatsUpdateSearchFilter);
-return function(v2, v3) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v0 (copy)
-    local v4 = v2 or {
-        statsSearchTerm = ""
-    };
-    if v3.type == v1.name then
-        return (v0.Set(v4, "statsSearchTerm", v3.searchTerm));
-    else
-        return v4;
-    end;
-end;
+local Immutable = require(script.Parent.Parent.Immutable)
+local ServerStatsUpdateSearchFilter = require(script.Parent.Parent.Actions.ServerStatsUpdateSearchFilter)
+
+return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 9
+	-- upvalues: ServerStatsUpdateSearchFilter (copy), Immutable (copy)
+	local v5 = t1 or {
+		statsSearchTerm = ""
+	}
+
+	if t2.type == ServerStatsUpdateSearchFilter.name then
+		return (Immutable.Set(v5, "statsSearchTerm", t2.searchTerm))
+	end
+
+	return v5
+end

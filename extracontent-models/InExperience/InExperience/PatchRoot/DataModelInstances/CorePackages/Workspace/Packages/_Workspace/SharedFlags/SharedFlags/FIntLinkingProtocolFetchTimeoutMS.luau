@@ -1,1 +1,1 @@
-return game:DefineFastInt("LinkingProtocolFetchTimeoutMS", 1);
+return game:DefineFastInt("LinkingProtocolFetchTimeoutMS", 1)

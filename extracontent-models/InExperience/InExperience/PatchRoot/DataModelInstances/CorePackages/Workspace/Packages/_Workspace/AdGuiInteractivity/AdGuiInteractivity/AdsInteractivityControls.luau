@@ -1,419 +1,448 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_0.FadeController);
-local v4 = require(l_Parent_0.AdLabel);
-local v5 = require(l_Parent_0.CircularButton);
-local v6 = require(l_Parent_0.LivePreviewWatermark);
-local v7 = require(script.Parent.Flags);
-local v8 = require(l_Parent_1.SharedFlags);
-local v9 = require(l_Parent_1.UIBlox);
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local l_AppStyleProvider_0 = v9.App.Style.AppStyleProvider;
-local l_Images_0 = v9.App.ImageSet.Images;
-local v13 = l_Images_0["icons/controls/speakerMute"];
-local v14 = l_Images_0["icons/controls/speaker"];
-local v15 = l_Images_0["icons/actions/previewExpand"];
-local v16 = l_Images_0["icons/actions/previewShrink"];
-local v17 = l_Images_0["icons/controls/media-play-large"];
-local v18 = l_Images_0["icons/controls/media-pause-large"];
-local v19 = l_Images_0["icons/navigation/close"];
-local v20 = l_Images_0["component_assets/circle_42_stroke_3"];
-local v21 = v7.GetFFlagEnableReportAdDropdown();
-local v22 = v7.GetEnableHideReportAdModalDuringScreenshot();
-local l_FFlagInExperienceUseAppStyleProvider_0 = v8.FFlagInExperienceUseAppStyleProvider;
-local v24 = if v21 then require(l_Parent_0.ReportAdPopup) else nil;
-local v25 = if v21 then require(l_Parent_0.AdDropdownMenu) else nil;
-local v26 = require(l_Parent_0.AdsInteractivityTelemetry);
-local v27 = v2.PureComponent:extend("AdsInteractivityControls");
-local function _(v28) --[[ Line: 39 ]] --[[ Name: opacityToTransparency ]]
-    return 1 - v28;
-end;
-local v30 = v7.GetAdGuiInteractivityPixelsPerStud();
-local function _(v31) --[[ Line: 46 ]] --[[ Name: getAdornee ]]
-    if v31 == nil then
-        return nil;
-    elseif v31.Adornee ~= nil then
-        return v31.Adornee;
-    elseif v31.Parent ~= nil and v31.Parent:IsA("BasePart") then
-        return v31.Parent;
-    else
-        return nil;
-    end;
-end;
-v27.init = function(v33) --[[ Line: 61 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    if game:GetEngineFeature("DeprecateCpv15") then
-        v33.state = {
-            adUIType = Enum.AdUIType.None, 
-            adGuiRectStuds = Vector2.new(0, 0), 
-            isViewable = false, 
-            videoPlaying = false, 
-            isFullscreen = false, 
-            eudsaPromptActive = false, 
-            isDropDownOpen = false, 
-            isReportAdPopupOpen = false, 
-            hideLivePreviewWatermark = false
-        };
-    else
-        v33.state = {
-            adUIType = Enum.AdUIType.None, 
-            adGuiRectStuds = Vector2.new(0, 0), 
-            isViewable = false, 
-            videoPlaying = false, 
-            isFullscreen = false, 
-            isClickToPlay = false, 
-            eudsaPromptActive = false, 
-            isDropDownOpen = false, 
-            isReportAdPopupOpen = false, 
-            hideLivePreviewWatermark = false
-        };
-    end;
-    local function v37() --[[ Line: 89 ]] --[[ Name: onAdorneeChanged ]]
-        -- upvalues: v33 (copy)
-        local l_v33_0 = v33;
-        local v35 = {};
-        local l_adGui_0 = v33.props.adGui;
-        v35.adornee = if l_adGui_0 == nil then nil else if l_adGui_0.Adornee ~= nil then l_adGui_0.Adornee else if l_adGui_0.Parent ~= nil and l_adGui_0.Parent:IsA("BasePart") then l_adGui_0.Parent else nil;
-        l_v33_0:setState(v35);
-    end;
-    v33.signalConnections = {
-        v33.props.adGui:GetPropertyChangedSignal("Adornee"):Connect(v37), 
-        v33.props.adGui:GetPropertyChangedSignal("Parent"):Connect(v37)
-    };
-    v33.props.adGui.adGuiStateChanged:Connect(function(v38) --[[ Line: 100 ]]
-        -- upvalues: v33 (copy)
-        v33:setState(v38);
-    end);
-    v33.fadeController = v3.new();
-    local v39, v40 = v2.createBinding(1);
-    v33.controlsOpacity = v39;
-    v33.updateControlsOpacity = v40;
-    v33.fadeController:subscribe(function(v41) --[[ Line: 107 ]]
-        -- upvalues: v33 (copy)
-        v33.updateControlsOpacity(v41);
-    end);
-    v33.props.adGui:forwardStateToLuaUI();
-end;
-v27.willUnmount = function(v42) --[[ Line: 114 ]] --[[ Name: willUnmount ]]
-    for _, v44 in ipairs(v42.signalConnections) do
-        v44:Disconnect();
-    end;
-end;
-v27.render = function(v45) --[[ Line: 120 ]] --[[ Name: render ]]
-    -- upvalues: v18 (copy), v17 (copy), v14 (copy), v13 (copy), v16 (copy), v15 (copy), v2 (copy), v21 (copy), v30 (copy), v26 (copy), v24 (copy), v22 (copy), v25 (copy), v4 (copy), v5 (copy), v19 (copy), l_ImageSetLabel_0 (copy), v20 (copy), v6 (copy)
-    if not v45.props.adGui then
-        return nil;
-    else
-        local v46 = v45.state.adUIType == Enum.AdUIType.Video;
-        local v47 = v45.state.adUIType == Enum.AdUIType.None;
-        local v48 = nil;
-        if game:GetEngineFeature("DeprecateCpv15") then
-            if v46 and v45.state.isFullscreen then
-                v48 = if v45.state.videoPlaying then v18 else v17;
-            end;
-        elseif v46 then
-            if v45.state.isFullscreen and not v45.state.videoPlaying or v45.state.isClickToPlay and not v45.state.isFullscreen then
-                v48 = v17;
-            elseif v45.state.isFullscreen and v45.state.videoPlaying then
-                v48 = v18;
-            end;
-        end;
-        local v49 = v46 and v45.state.isFullscreen;
-        local v50 = nil;
-        v50 = if game:GetEngineFeature("DeprecateCpv15") then v46 and not v45.state.isFullscreen and v45.state.videoPlaying else v46 and not v45.state.isFullscreen and not v45.state.isClickToPlay and v45.state.videoPlaying;
-        local v51 = v45.state.volumeEnabled and v14 or v13;
-        local v52 = v45.state.isFullscreen and v16 or v15;
-        local v53 = Vector2.new(0.10038949275, 0.17847020934);
-        if not v45.state.isFullscreen then
-            v53 = v53 * 1.5;
-        end;
-        local v56 = v45.controlsOpacity:map(function(v54) --[[ Line: 166 ]]
-            -- upvalues: v48 (ref), v17 (ref)
-            if v48 == v17 then
-                return true;
-            else
-                local v55 = false;
-                if v48 ~= nil then
-                    v55 = v54 and v54 > 0;
-                end;
-                return v55;
-            end;
-        end);
-        if not v45.state.isViewable then
-            v56 = false;
-        end;
-        local v58 = v45.controlsOpacity:map(function(v57) --[[ Line: 177 ]]
-            -- upvalues: v48 (ref), v17 (ref)
-            if v48 == v17 then
-                return 0.19999999999999996;
-            else
-                return 1 - v57 * 0.8;
-            end;
-        end);
-        local l_createElement_0 = v2.createElement;
-        local v60 = "SurfaceGui";
-        local v61 = {
-            ZOffset = 1, 
-            ZIndexBehavior = if v21 then Enum.ZIndexBehavior.Sibling else Enum.ZIndexBehavior.Global, 
-            LightInfluence = 0, 
-            SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud, 
-            PixelsPerStud = v30
-        };
-        local l_adGui_1 = v45.props.adGui;
-        v61.Adornee = if l_adGui_1 == nil then nil else if l_adGui_1.Adornee ~= nil then l_adGui_1.Adornee else if l_adGui_1.Parent ~= nil and l_adGui_1.Parent:IsA("BasePart") then l_adGui_1.Parent else nil;
-        v61.Face = v45.props.adGui.Face;
-        v61.AlwaysOnTop = v45.state.isFullscreen;
-        v61.Brightness = 2;
-        return l_createElement_0(v60, v61, {
-            InteractiveArea = v2.createElement("TextButton", {
-                Size = UDim2.fromOffset(v45.state.adGuiRectStuds.X * v30, v45.state.adGuiRectStuds.Y * v30), 
-                Position = UDim2.new(0.5, 0, 0.5, 0), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundColor3 = Color3.new(0, 0, 0), 
-                BackgroundTransparency = v45.controlsOpacity:map(function(v63) --[[ Line: 204 ]]
-                    -- upvalues: v48 (ref), v17 (ref)
-                    if v48 == v17 then
-                        return 0.7;
-                    else
-                        return 1 - v63 * 0.3;
-                    end;
-                end), 
-                Text = "", 
-                [v2.Event.MouseMoved] = function(_, _) --[[ Line: 213 ]]
-                    -- upvalues: v46 (copy), v45 (copy)
-                    if v46 and v45.state.isFullscreen then
-                        v45.fadeController:updateLastInputTime();
-                    end;
-                end, 
-                [v2.Event.Activated] = function(_, v67) --[[ Line: 218 ]]
-                    -- upvalues: v21 (ref), v45 (copy), v26 (ref), v46 (copy)
-                    if v21 and v45.state.isDropDownOpen then
-                        v45:setState({
-                            isDropDownOpen = false
-                        });
-                        v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                        v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                        v26.logAdMenuEvent("close");
-                        return;
-                    else
-                        if v46 then
-                            if not v45.state.isFullscreen then
-                                if v45.state.isViewable then
-                                    v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.FullscreenButtonClicked);
-                                    return;
-                                end;
-                            elseif v45.state.videoPlaying then
-                                if v67.UserInputType == Enum.UserInputType.Touch then
-                                    if v45.fadeController:inProgress() and not v45.fadeController:isFading() then
-                                        v45.fadeController:skipToFade();
-                                        return;
-                                    else
-                                        v45.fadeController:updateLastInputTime();
-                                        return;
-                                    end;
-                                else
-                                    v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked);
-                                    return;
-                                end;
-                            else
-                                v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                            end;
-                        end;
-                        return;
-                    end;
-                end
-            }, {
-                AbuseReportingModal = v21 and v24 and v45.state.isReportAdPopupOpen and v2.createElement(v24, {
-                    showReportAdPopup = v45.state.isReportAdPopupOpen, 
-                    onClose = function() --[[ Line: 256 ]] --[[ Name: onClose ]]
-                        -- upvalues: v45 (copy)
-                        v45:setState({
-                            isReportAdPopupOpen = false
-                        });
-                    end, 
-                    onOpen = v22 and function() --[[ Line: 262 ]]
-                        -- upvalues: v45 (copy), v26 (ref)
-                        v45:setState({
-                            isReportAdPopupOpen = true
-                        });
-                        v26.logReportAdEvent("open");
-                    end or nil, 
-                    adInfo = v45.props.adGui:GetSingleReportAdInfo()
-                }) or nil, 
-                AdDropdownMenu = if v21 and v25 then v2.createElement(v25, {
-                    showDropDownMenu = v45.state.isDropDownOpen, 
-                    onWhyThisAdActivated = function() --[[ Line: 276 ]] --[[ Name: onWhyThisAdActivated ]]
-                        -- upvalues: v45 (copy), v26 (ref)
-                        v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.WhyThisAdClicked);
-                        v26.logWhyThisAdEvent();
-                    end, 
-                    onReportAdActivated = function() --[[ Line: 281 ]] --[[ Name: onReportAdActivated ]]
-                        -- upvalues: v45 (copy)
-                        v45:setState({
-                            isReportAdPopupOpen = true
-                        });
-                    end, 
-                    transparency = 0.19999999999999996
-                }) else nil, 
-                AdLabel = v2.createElement(v4, {
-                    onActivated = v21 and function() --[[ Line: 291 ]]
-                        -- upvalues: v45 (copy), v26 (ref)
-                        v45:setState({
-                            isDropDownOpen = not v45.state.isDropDownOpen
-                        });
-                        if v45.state.isDropDownOpen then
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                        else
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseEventTriggered);
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked);
-                        end;
-                        v26.logAdMenuEvent(v45.state.isDropDownOpen and "open" or "close");
-                    end or function() --[[ Line: 305 ]]
-                        -- upvalues: v45 (copy)
-                        v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.AdLabelClicked);
-                    end, 
-                    isMenuOpen = v45.state.isDropDownOpen, 
-                    Visible = not v47
-                }), 
-                CloseButton = v2.createElement(v5, {
-                    HorizontalScale = 0.06884057971, 
-                    Position = UDim2.fromScale(0.995, 0.005), 
-                    AnchorPoint = Vector2.new(1, 0), 
-                    ImageSize = UDim2.fromScale(0.8, 0.8), 
-                    Image = v19, 
-                    Visible = v49, 
-                    Transparency = v58, 
-                    AutoButtonColor = not v21 or not v45.state.isDropDownOpen or false, 
-                    onActivated = function() --[[ Line: 320 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v21 (ref), v45 (copy), v26 (ref)
-                        if v21 and v45.state.isDropDownOpen then
-                            v45:setState({
-                                isDropDownOpen = false
-                            });
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                            v26.logAdMenuEvent("close");
-                            return;
-                        else
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.CloseButtonClicked);
-                            return;
-                        end;
-                    end
-                }), 
-                PlayPauseButton = v2.createElement("ImageButton", {
-                    BackgroundTransparency = 1, 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    Size = UDim2.fromScale(v53.X, v53.Y), 
-                    Visible = v56, 
-                    AutoButtonColor = not v21 or not v45.state.isDropDownOpen or false, 
-                    [v2.Event.Activated] = function() --[[ Line: 341 ]]
-                        -- upvalues: v21 (ref), v45 (copy), v26 (ref), v48 (ref), v17 (ref), v18 (ref)
-                        if v21 and v45.state.isDropDownOpen then
-                            v45:setState({
-                                isDropDownOpen = false
-                            });
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                            v26.logAdMenuEvent("close");
-                            return;
-                        elseif v48 == v17 then
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked);
-                            return;
-                        else
-                            if v48 == v18 then
-                                v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked);
-                            end;
-                            return;
-                        end;
-                    end
-                }, {
-                    circle = v2.createElement(l_ImageSetLabel_0, {
-                        Image = v20, 
-                        Size = UDim2.fromScale(1, 1), 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundTransparency = 1, 
-                        ImageTransparency = v58
-                    }), 
-                    icon = v2.createElement(l_ImageSetLabel_0, {
-                        Image = v48, 
-                        Size = UDim2.fromScale(0.6, 0.6), 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundTransparency = 1, 
-                        ImageTransparency = v58
-                    })
-                }), 
-                VolumeButton = v2.createElement(v5, {
-                    Visible = v50, 
-                    Position = UDim2.fromScale(0.075, 0.75), 
-                    HorizontalScale = 0.12, 
-                    Image = v51, 
-                    ImageSize = UDim2.fromScale(0.8, 0.8), 
-                    AutoButtonColor = not v21 or not v45.state.isDropDownOpen or false, 
-                    onActivated = function() --[[ Line: 383 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v21 (ref), v45 (copy), v26 (ref)
-                        if v21 and v45.state.isDropDownOpen then
-                            v45:setState({
-                                isDropDownOpen = false
-                            });
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                            v26.logAdMenuEvent("close");
-                            return;
-                        else
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.VolumeButtonClicked);
-                            return;
-                        end;
-                    end, 
-                    Transparency = 0.19999999999999996
-                }), 
-                FullscreenButton = v2.createElement(v5, {
-                    Visible = v50, 
-                    Position = UDim2.fromScale(0.87625, 0.75), 
-                    AnchorPoint = Vector2.new(1, 0), 
-                    HorizontalScale = 0.12, 
-                    Image = v52, 
-                    ImageSize = UDim2.fromScale(0.7, 0.7), 
-                    AutoButtonColor = not v21 or not v45.state.isDropDownOpen or false, 
-                    onActivated = function() --[[ Line: 405 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v21 (ref), v45 (copy), v26 (ref)
-                        if v21 and v45.state.isDropDownOpen then
-                            v45:setState({
-                                isDropDownOpen = false
-                            });
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered);
-                            v26.logAdMenuEvent("close");
-                            return;
-                        else
-                            v45.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.FullscreenButtonClicked);
-                            return;
-                        end;
-                    end, 
-                    Transparency = 0.19999999999999996
-                }), 
-                LivePreviewWatermark = v2.createElement(v6, {
-                    IsVisible = not v45.state.hideLivePreviewWatermark
-                } or nil) or nil
-            })
-        });
-    end;
-end;
-local function v70(v68) --[[ Line: 427 ]] --[[ Name: AdsInteractivityFunctionalWrapper ]]
-    -- upvalues: v9 (copy), v2 (copy), l_AppStyleProvider_0 (copy), v27 (copy)
-    local l_Dark_0 = v9.App.Style.Constants.ThemeName.Dark;
-    return v2.createElement(l_AppStyleProvider_0, {
-        style = {
-            themeName = l_Dark_0
-        }
-    }, {
-        AdsInteractivityControls = v2.createElement(v27, v68)
-    });
-end;
-if l_FFlagInExperienceUseAppStyleProvider_0 then
-    return v70;
-else
-    return v27;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Roact = require(scriptParentParent.Roact)
+local FadeController = require(scriptParent.FadeController)
+local AdLabel = require(scriptParent.AdLabel)
+local CircularButton = require(scriptParent.CircularButton)
+local LivePreviewWatermark = require(scriptParent.LivePreviewWatermark)
+local Flags = require(script.Parent.Flags)
+local SharedFlags = require(scriptParentParent.SharedFlags)
+local UIBlox = require(scriptParentParent.UIBlox)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Images = UIBlox.App.ImageSet.Images
+local v14 = Images["icons/controls/speakerMute"]
+local v15 = Images["icons/controls/speaker"]
+local v16 = Images["icons/actions/previewExpand"]
+local v17 = Images["icons/actions/previewShrink"]
+local v18 = Images["icons/controls/media-play-large"]
+local v19 = Images["icons/controls/media-pause-large"]
+local v20 = Images["icons/navigation/close"]
+local v21 = Images["component_assets/circle_42_stroke_3"]
+local v22 = Flags.GetFFlagEnableReportAdDropdown()
+local v23 = Flags.GetEnableHideReportAdModalDuringScreenshot()
+local FFlagInExperienceUseAppStyleProvider = SharedFlags.FFlagInExperienceUseAppStyleProvider
+local v25 = if not v22 then nil else require(scriptParent.ReportAdPopup)
+local v26 = if not v22 then nil else require(scriptParent.AdDropdownMenu)
+local AdsInteractivityTelemetry = require(scriptParent.AdsInteractivityTelemetry)
+local v28 = Roact.PureComponent:extend("AdsInteractivityControls")
+
+local function opacityToTransparency(p1) -- line: 39
+	return 1 - p1
+end
+
+local v30 = Flags.GetAdGuiInteractivityPixelsPerStud()
+
+local function getAdornee(p2) -- line: 46
+	if p2 == nil then
+		return nil
+	end
+
+	if p2.Adornee ~= nil then
+		return p2.Adornee
+	end
+
+	if p2.Parent ~= nil and p2.Parent:IsA("BasePart") then
+		return p2.Parent
+	end
+
+	return nil
+end
+
+function v28.init(p3) -- line: 61
+	-- upvalues: FadeController (copy), Roact (copy)
+	if game:GetEngineFeature("DeprecateCpv15") then
+		p3.state = {
+			isViewable = false,
+			videoPlaying = false,
+			isFullscreen = false,
+			eudsaPromptActive = false,
+			isDropDownOpen = false,
+			isReportAdPopupOpen = false,
+			hideLivePreviewWatermark = false,
+			adUIType = Enum.AdUIType.None,
+			adGuiRectStuds = Vector2.new(0, 0)
+		}
+	else
+		p3.state = {
+			isViewable = false,
+			videoPlaying = false,
+			isFullscreen = false,
+			isClickToPlay = false,
+			eudsaPromptActive = false,
+			isDropDownOpen = false,
+			isReportAdPopupOpen = false,
+			hideLivePreviewWatermark = false,
+			adUIType = Enum.AdUIType.None,
+			adGuiRectStuds = Vector2.new(0, 0)
+		}
+	end
+
+	local function onAdorneeChanged() -- line: 89
+		-- upvalues: p3 (copy)
+		local v58 = p3
+		local t1 = {}
+		local adGui = p3.props.adGui
+
+		t1.adornee = if adGui ~= nil then if adGui.Adornee == nil then if adGui.Parent == nil or not adGui.Parent:IsA("BasePart") then nil else adGui.Parent else adGui.Adornee else nil
+		v58:setState(t1)
+	end
+
+	p3.signalConnections = {
+		p3.props.adGui:GetPropertyChangedSignal("Adornee"):Connect(onAdorneeChanged),
+		p3.props.adGui:GetPropertyChangedSignal("Parent"):Connect(onAdorneeChanged)
+	}
+	p3.props.adGui.adGuiStateChanged:Connect(function(p4) -- line: 100
+		-- upvalues: p3 (copy)
+		p3:setState(p4)
+	end)
+	p3.fadeController = FadeController.new()
+
+	local v37, v38 = Roact.createBinding(1)
+
+	p3.controlsOpacity = v37
+	p3.updateControlsOpacity = v38
+	p3.fadeController:subscribe(function(p5) -- line: 107
+		-- upvalues: p3 (copy)
+		p3.updateControlsOpacity(p5)
+	end)
+	p3.props.adGui:forwardStateToLuaUI()
+end
+function v28.willUnmount(p6) -- line: 114
+	for _, v in ipairs(p6.signalConnections) do
+		v:Disconnect()
+	end
+end
+function v28.render(p7) -- line: 120
+	-- upvalues: v19 (copy), v18 (copy), v15 (copy), v14 (copy), v17 (copy), v16 (copy), Roact (copy), v22 (copy), v30 (copy), AdsInteractivityTelemetry (copy), v25 (copy), v23 (copy), v26 (copy), AdLabel (copy), CircularButton (copy), v20 (copy), ImageSetLabel (copy), v21 (copy), LivePreviewWatermark (copy)
+	if not p7.props.adGui then
+		return nil
+	end
+
+	local v43 = p7.state.adUIType == Enum.AdUIType.Video
+	local v44 = p7.state.adUIType == Enum.AdUIType.None
+	local u45 = nil
+
+	if game:GetEngineFeature("DeprecateCpv15") then
+		if v43 and p7.state.isFullscreen then
+			u45 = if not p7.state.videoPlaying then v18 else v19
+		end
+	elseif v43 then
+		if p7.state.isFullscreen and not p7.state.videoPlaying or p7.state.isClickToPlay and not p7.state.isFullscreen then
+			u45 = v18
+		elseif p7.state.isFullscreen and p7.state.videoPlaying then
+			u45 = v19
+		end
+	end
+
+	local v46 = v43 and p7.state.isFullscreen
+	local v47 = if not game:GetEngineFeature("DeprecateCpv15") then v43 and (not p7.state.isFullscreen and (not p7.state.isClickToPlay and p7.state.videoPlaying)) else v43 and (not p7.state.isFullscreen and p7.state.videoPlaying)
+	local v48 = p7.state.volumeEnabled and v15 or v14
+	local v49 = p7.state.isFullscreen and v17 or v16
+	local vector2 = Vector2.new(0.10038949275, 0.17847020934)
+
+	if not p7.state.isFullscreen then
+		vector2 *= 1.5
+	end
+
+	local v51 = p7.controlsOpacity:map(function(n1: number) -- line: 166
+		-- upvalues: u45 (ref), v18 (copy)
+		if u45 == v18 then
+			return true
+		end
+
+		return u45 ~= nil and (n1 and n1 > 0)
+	end)
+
+	if not p7.state.isViewable then
+		v51 = false
+	end
+
+	local v52 = p7.controlsOpacity:map(function(n2: number) -- line: 177
+		-- upvalues: u45 (ref), v18 (copy)
+		if u45 == v18 then
+			return 0.19999999999999996
+		end
+
+		return 1 - n2 * 0.8
+	end)
+	local createElement = Roact.createElement
+	local t2 = {
+		ZOffset = 1,
+		LightInfluence = 0,
+		Brightness = 2,
+		ZIndexBehavior = if not v22 then Enum.ZIndexBehavior.Global else Enum.ZIndexBehavior.Sibling,
+		SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud,
+		PixelsPerStud = v30
+	}
+	local adGui = p7.props.adGui
+
+	t2.Adornee = if adGui ~= nil then if adGui.Adornee == nil then if adGui.Parent == nil or not adGui.Parent:IsA("BasePart") then nil else adGui.Parent else adGui.Adornee else nil
+	t2.Face = p7.props.adGui.Face
+	t2.AlwaysOnTop = p7.state.isFullscreen
+
+	return createElement("SurfaceGui", t2, {
+		InteractiveArea = Roact.createElement("TextButton", {
+			Size = UDim2.fromOffset(p7.state.adGuiRectStuds.X * v30, p7.state.adGuiRectStuds.Y * v30),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = p7.controlsOpacity:map(function(n3: number) -- line: 204
+				-- upvalues: u45 (ref), v18 (copy)
+				if u45 == v18 then
+					return 0.7
+				end
+
+				return 1 - n3 * 0.3
+			end),
+			Text = "",
+			[Roact.Event.MouseMoved] = function(_, _) -- line: 213
+				-- upvalues: v43 (copy), p7 (copy)
+				if v43 and p7.state.isFullscreen then
+					p7.fadeController:updateLastInputTime()
+				end
+			end,
+			[Roact.Event.Activated] = function(_, p11) -- line: 218
+				-- upvalues: v22 (copy), p7 (copy), AdsInteractivityTelemetry (copy), v43 (copy)
+				if v22 and p7.state.isDropDownOpen then
+					p7:setState({
+						isDropDownOpen = false
+					})
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+					AdsInteractivityTelemetry.logAdMenuEvent("close")
+
+					return
+				end
+
+				if v43 then
+					if not p7.state.isFullscreen then
+						if p7.state.isViewable then
+							p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.FullscreenButtonClicked)
+
+							return
+						end
+					else
+						if p7.state.videoPlaying then
+							if p11.UserInputType == Enum.UserInputType.Touch then
+								if p7.fadeController:inProgress() and not p7.fadeController:isFading() then
+									p7.fadeController:skipToFade()
+
+									return
+								end
+
+								p7.fadeController:updateLastInputTime()
+
+								return
+							end
+
+							p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked)
+
+							return
+						end
+
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+					end
+				end
+			end
+		}, {
+			AbuseReportingModal = v22 and (not not v25 and (not not p7.state.isReportAdPopupOpen and Roact.createElement(v25, {
+				showReportAdPopup = p7.state.isReportAdPopupOpen,
+				onClose = function() -- line: 256
+					-- upvalues: p7 (copy)
+					p7:setState({
+						isReportAdPopupOpen = false
+					})
+				end,
+				onOpen = if not v23 then nil else function() -- line: 262
+					-- upvalues: p7 (copy), AdsInteractivityTelemetry (copy)
+					p7:setState({
+						isReportAdPopupOpen = true
+					})
+					AdsInteractivityTelemetry.logReportAdEvent("open")
+				end,
+				adInfo = p7.props.adGui:GetSingleReportAdInfo()
+			}))) or nil,
+			AdDropdownMenu = if not v22 or not v26 then nil else Roact.createElement(v26, {
+				showDropDownMenu = p7.state.isDropDownOpen,
+				onWhyThisAdActivated = function() -- line: 276
+					-- upvalues: p7 (copy), AdsInteractivityTelemetry (copy)
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.WhyThisAdClicked)
+					AdsInteractivityTelemetry.logWhyThisAdEvent()
+				end,
+				onReportAdActivated = function() -- line: 281
+					-- upvalues: p7 (copy)
+					p7:setState({
+						isReportAdPopupOpen = true
+					})
+				end,
+				transparency = 0.19999999999999996
+			}),
+			AdLabel = Roact.createElement(AdLabel, {
+				onActivated = not v22 and function() -- line: 305
+					-- upvalues: p7 (copy)
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.AdLabelClicked)
+				end or function() -- line: 291
+					-- upvalues: p7 (copy), AdsInteractivityTelemetry (copy)
+					p7:setState({
+						isDropDownOpen = not p7.state.isDropDownOpen
+					})
+
+					if p7.state.isDropDownOpen then
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+					else
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseEventTriggered)
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked)
+					end
+
+					AdsInteractivityTelemetry.logAdMenuEvent(not p7.state.isDropDownOpen and "close" or "open")
+				end,
+				isMenuOpen = p7.state.isDropDownOpen,
+				Visible = not v44
+			}),
+			CloseButton = Roact.createElement(CircularButton, {
+				HorizontalScale = 0.06884057971,
+				Position = UDim2.fromScale(0.995, 0.005),
+				AnchorPoint = Vector2.new(1, 0),
+				ImageSize = UDim2.fromScale(0.8, 0.8),
+				Image = v20,
+				Visible = v46,
+				Transparency = v52,
+				AutoButtonColor = not v22 or not p7.state.isDropDownOpen,
+				onActivated = function() -- line: 320
+					-- upvalues: v22 (copy), p7 (copy), AdsInteractivityTelemetry (copy)
+					if v22 and p7.state.isDropDownOpen then
+						p7:setState({
+							isDropDownOpen = false
+						})
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+						AdsInteractivityTelemetry.logAdMenuEvent("close")
+
+						return
+					end
+
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.CloseButtonClicked)
+				end
+			}),
+			PlayPauseButton = Roact.createElement("ImageButton", {
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+				Size = UDim2.fromScale(vector2.X, vector2.Y),
+				Visible = v51,
+				AutoButtonColor = not v22 or not p7.state.isDropDownOpen,
+				[Roact.Event.Activated] = function() -- line: 341
+					-- upvalues: v22 (copy), p7 (copy), AdsInteractivityTelemetry (copy), u45 (ref), v18 (copy), v19 (copy)
+					if v22 and p7.state.isDropDownOpen then
+						p7:setState({
+							isDropDownOpen = false
+						})
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+						AdsInteractivityTelemetry.logAdMenuEvent("close")
+
+						return
+					end
+
+					if u45 == v18 then
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayButtonClicked)
+
+						return
+					end
+
+					if u45 == v19 then
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PauseButtonClicked)
+					end
+				end
+			}, {
+				circle = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Image = v21,
+					Size = UDim2.fromScale(1, 1),
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					ImageTransparency = v52
+				}),
+				icon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Image = u45,
+					Size = UDim2.fromScale(0.6, 0.6),
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					ImageTransparency = v52
+				})
+			}),
+			VolumeButton = Roact.createElement(CircularButton, {
+				HorizontalScale = 0.12,
+				Visible = v47,
+				Position = UDim2.fromScale(0.075, 0.75),
+				Image = v48,
+				ImageSize = UDim2.fromScale(0.8, 0.8),
+				AutoButtonColor = not v22 or not p7.state.isDropDownOpen,
+				onActivated = function() -- line: 383
+					-- upvalues: v22 (copy), p7 (copy), AdsInteractivityTelemetry (copy)
+					if v22 and p7.state.isDropDownOpen then
+						p7:setState({
+							isDropDownOpen = false
+						})
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+						AdsInteractivityTelemetry.logAdMenuEvent("close")
+
+						return
+					end
+
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.VolumeButtonClicked)
+				end,
+				Transparency = 0.19999999999999996
+			}),
+			FullscreenButton = Roact.createElement(CircularButton, {
+				HorizontalScale = 0.12,
+				Visible = v47,
+				Position = UDim2.fromScale(0.87625, 0.75),
+				AnchorPoint = Vector2.new(1, 0),
+				Image = v49,
+				ImageSize = UDim2.fromScale(0.7, 0.7),
+				AutoButtonColor = not v22 or not p7.state.isDropDownOpen,
+				onActivated = function() -- line: 405
+					-- upvalues: v22 (copy), p7 (copy), AdsInteractivityTelemetry (copy)
+					if v22 and p7.state.isDropDownOpen then
+						p7:setState({
+							isDropDownOpen = false
+						})
+						p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.PlayEventTriggered)
+						AdsInteractivityTelemetry.logAdMenuEvent("close")
+
+						return
+					end
+
+					p7.props.adGui:HandleLuaUIEvent(Enum.AdUIEventType.FullscreenButtonClicked)
+				end,
+				Transparency = 0.19999999999999996
+			}),
+			LivePreviewWatermark = Roact.createElement(LivePreviewWatermark, {
+				IsVisible = not p7.state.hideLivePreviewWatermark
+			} or nil) or nil
+		})
+	})
+end
+
+local function AdsInteractivityFunctionalWrapper(p12) -- line: 427
+	-- upvalues: UIBlox (copy), Roact (copy), AppStyleProvider (copy), v28 (copy)
+	local Dark = UIBlox.App.Style.Constants.ThemeName.Dark
+
+	return Roact.createElement(AppStyleProvider, {
+		style = {
+			themeName = Dark
+		}
+	}, {
+		AdsInteractivityControls = Roact.createElement(v28, p12)
+	})
+end
+
+if FFlagInExperienceUseAppStyleProvider then
+	return AdsInteractivityFunctionalWrapper
+end
+
+return v28

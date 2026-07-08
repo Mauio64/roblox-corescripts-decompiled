@@ -219,9 +219,9 @@ return function(p2) -- line: 109
 	})
 
 	return React.createElement(Dialog.Root, {
-		size = DialogSize.Medium,
 		hasBackdrop = true,
 		closeOnClickOutside = true,
+		size = DialogSize.Medium,
 		onClose = v58,
 		ref = v49
 	}, {
@@ -232,8 +232,8 @@ return function(p2) -- line: 109
 			}, {
 				Image = if not v42.imageId or not v55 then nil else React.createElement(FoundationImage, {
 					tag = "size-full-full self-center content-emphasis",
-					Image = v42.imageId,
 					aspectRatio = 1.7777777777777777,
+					Image = v42.imageId,
 					sizeConstraint = {
 						MaxSize = vector2
 					}
@@ -257,14 +257,14 @@ return function(p2) -- line: 109
 						LayoutOrder = 2
 					}, {
 						TitleText = React.createElement(FoundationText, {
-							Text = v42.title,
-							tag = "size-full-0 auto-y content-emphasis text-wrap text-align-x-left text-heading-medium"
+							tag = "size-full-0 auto-y content-emphasis text-wrap text-align-x-left text-heading-medium",
+							Text = v42.title
 						})
 					}),
 					BodyText = if not v42.bodyText then nil else React.createElement(FoundationText, {
 						tag = "size-full-0 auto-y text-wrap text-align-x-left text-body-medium",
-						Text = v42.bodyText,
-						LayoutOrder = 3
+						LayoutOrder = 3,
+						Text = v42.bodyText
 					})
 				})
 			})

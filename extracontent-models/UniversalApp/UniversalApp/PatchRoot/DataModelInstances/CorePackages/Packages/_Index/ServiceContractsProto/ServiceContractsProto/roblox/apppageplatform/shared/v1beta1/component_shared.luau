@@ -1,313 +1,457 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.hydration_data_spec);
-local v4 = require(script.Parent.ui_component_type);
-local v5 = require(script.Parent.analytics_data);
-local v6 = require(script.Parent.prop_types);
-local v7 = {};
-v7.__index = v7;
-local l_v7_0 = v7 --[[ copy: 7 -> 8 ]];
-v7.new = function(v9) --[[ Line: 80 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), l_v7_0 (copy)
-    return (setmetatable({
-        component_type = if not (v9 ~= nil) or v9.component_type == nil then assert(v4.UiComponentType.fromNumber(0), "Enum has no 0 default") else v9.component_type, 
-        data = if not (v9 ~= nil) or v9.data == nil then {} else v9.data, 
-        analytics_data = if not (v9 ~= nil) or v9.analytics_data == nil then {} else v9.analytics_data, 
-        is_component_filtered = if not (v9 ~= nil) or v9.is_component_filtered == nil then nil else v9.is_component_filtered
-    }, l_v7_0));
-end;
-v7.encode = function(v10) --[[ Line: 96 ]] --[[ Name: encode ]]
-    -- upvalues: v4 (copy), v0 (copy)
-    local v11 = buffer.create(0);
-    local v12 = 0;
-    if v10.component_type ~= nil and (v10.component_type ~= nil and v10.component_type ~= 0 or v10.component_type ~= v4.UiComponentType.fromNumber(0)) then
-        local v13, v14 = v0.writeTag(v11, v12, 1, v0.wireTypes.varint);
-        v13, v14 = v0.writeVarInt(v13, v14, v4.UiComponentType.toNumber(v10.component_type));
-        v11 = v13;
-        v12 = v14;
-    end;
-    if v10.data ~= nil and #v10.data > 0 then
-        for _, v16 in v10.data do
-            local v17 = v16:encode();
-            local v18, v19 = v0.writeTag(v11, v12, 2, v0.wireTypes.lengthDelimited);
-            v18, v19 = v0.writeBuffer(v18, v19, v17, buffer.len(v17));
-            v11 = v18;
-            v12 = v19;
-        end;
-    end;
-    if v10.analytics_data ~= nil and next(v10.analytics_data) ~= nil then
-        for v20, v21 in v10.analytics_data do
-            local v22 = buffer.create(0);
-            local v23, v24 = v0.writeTag(v22, 0, 1, v0.wireTypes.lengthDelimited);
-            v23, v24 = v0.writeString(v23, v24, v20);
-            v22 = v23;
-            local l_v24_0 = v24;
-            v23 = v21:encode();
-            local v26;
-            v24, v26 = v0.writeTag(v22, l_v24_0, 2, v0.wireTypes.lengthDelimited);
-            v24, v26 = v0.writeBuffer(v24, v26, v23, buffer.len(v23));
-            v22 = v24;
-            l_v24_0 = v26;
-            v24, v26 = v0.writeTag(v11, v12, 3, v0.wireTypes.lengthDelimited);
-            v24, v26 = v0.writeBuffer(v24, v26, v22, l_v24_0);
-            v11 = v24;
-            v12 = v26;
-        end;
-    end;
-    if v10.is_component_filtered ~= nil then
-        local v27 = v10.is_component_filtered:encode();
-        local v28, v29 = v0.writeTag(v11, v12, 4, v0.wireTypes.lengthDelimited);
-        v28, v29 = v0.writeBuffer(v28, v29, v27, buffer.len(v27));
-        v11 = v28;
-        v12 = v29;
-    end;
-    local v30 = buffer.create(v12);
-    buffer.copy(v30, 0, v11, 0, v12);
-    return v30;
-end;
-v7.decode = function(v31) --[[ Line: 151 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_0 (copy), v0 (copy), v4 (copy), v3 (copy), v2 (copy), v5 (copy), v6 (copy)
-    local v32 = l_v7_0.new();
-    local v33 = 0;
-    while v33 < buffer.len(v31) do
-        local v34 = nil;
-        local v35 = nil;
-        local v36, v37, v38 = v0.readTag(v31, v33);
-        v34 = v36;
-        v35 = v37;
-        v33 = v38;
-        if v35 == v0.wireTypes.varint then
-            if v34 == 1 then
-                v36 = nil;
-                v37, v38 = v0.readVarIntI32(v31, v33);
-                v36 = v37;
-                v33 = v38;
-                v32.component_type = v4.UiComponentType.fromNumber(v36) or v36;
-            else
-                v36 = nil;
-                v37, v38 = v0.readVarInt(v31, v33);
-                v36 = v37;
-                v33 = v38;
-            end;
-        elseif v35 == v0.wireTypes.lengthDelimited then
-            if v34 == 2 then
-                v36 = nil;
-                v37, v38 = v0.readBuffer(v31, v33);
-                v36 = v37;
-                v33 = v38;
-                table.insert(v32.data, v3.HydrationDataSpec.decode(v36));
-            elseif v34 == 3 then
-                v36 = nil;
-                v37, v38 = v0.readBuffer(v31, v33);
-                v36 = v37;
-                v33 = v38;
-                v37 = v2.ComponentShared_AnalyticsDataEntry.decode(v36);
-                v38 = v5.AnalyticsDataField.new();
-                v32.analytics_data[v37.key or ""] = v37.value or v38;
-            elseif v34 == 4 then
-                v36 = nil;
-                v37, v38 = v0.readBuffer(v31, v33);
-                v36 = v37;
-                v33 = v38;
-                v32.is_component_filtered = v6.BoolProp.decode(v36);
-            else
-                v36 = nil;
-                v37, v38 = v0.readVarInt(v31, v33);
-                v33 = v38 + v37;
-            end;
-        elseif v35 == v0.wireTypes.i32 then
-            v36 = nil;
-            v37, v38 = v0.readFixed32(v31, v33);
-            v36 = v37;
-            v33 = v38;
-        elseif v35 == v0.wireTypes.i64 then
-            v36 = nil;
-            v37, v38 = v0.readFixed64(v31, v33);
-            v36 = v37;
-            v33 = v38;
-        else
-            error("Unsupported wire type: " .. v35);
-        end;
-    end;
-    return v32;
-end;
-v7.jsonEncode = function(v39) --[[ Line: 223 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v4 (copy)
-    local v40 = {};
-    if v39.component_type ~= nil and (v39.component_type ~= nil and v39.component_type ~= 0 or v39.component_type ~= v4.UiComponentType.fromNumber(0)) then
-        v40.componentType = if typeof(v39.component_type) == "number" then v39.component_type else v4.UiComponentType.toNumber(v39.component_type);
-    end;
-    if v39.data ~= nil and #v39.data > 0 then
-        local v41 = {};
-        for _, v43 in v39.data do
-            table.insert(v41, v43:jsonEncode());
-        end;
-        v40.data = v41;
-    end;
-    if v39.analytics_data ~= nil and next(v39.analytics_data) ~= nil then
-        local v44 = {};
-        for v45, v46 in v39.analytics_data do
-            v44[v45] = v46:jsonEncode();
-        end;
-        v40.analyticsData = v44;
-    end;
-    if v39.is_component_filtered ~= nil then
-        v40.isComponentFiltered = v39.is_component_filtered:jsonEncode();
-    end;
-    return v40;
-end;
-v7.jsonDecode = function(v47) --[[ Line: 264 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_0 (copy), v4 (copy), v3 (copy), v5 (copy), v6 (copy)
-    local v48 = l_v7_0.new();
-    if v47.component_type ~= nil then
-        v48.component_type = if typeof(v47.component_type) == "number" then v4.UiComponentType.fromNumber(v47.component_type) or v47.component_type else v4.UiComponentType.fromName(v47.component_type) or v47.component_type;
-    end;
-    if v47.componentType ~= nil then
-        v48.component_type = if typeof(v47.componentType) == "number" then v4.UiComponentType.fromNumber(v47.componentType) or v47.componentType else v4.UiComponentType.fromName(v47.componentType) or v47.componentType;
-    end;
-    if v47.data ~= nil then
-        local v49 = {};
-        for _, v51 in v47.data do
-            table.insert(v49, v3.HydrationDataSpec.jsonDecode(v51));
-        end;
-        v48.data = v49;
-    end;
-    if v47.analytics_data ~= nil then
-        local v52 = {};
-        for v53, v54 in v47.analytics_data do
-            v52[v53] = v5.AnalyticsDataField.jsonDecode(v54);
-        end;
-        v48.analytics_data = v52;
-    end;
-    if v47.analyticsData ~= nil then
-        local v55 = {};
-        for v56, v57 in v47.analyticsData do
-            v55[v56] = v5.AnalyticsDataField.jsonDecode(v57);
-        end;
-        v48.analytics_data = v55;
-    end;
-    if v47.is_component_filtered ~= nil then
-        v48.is_component_filtered = v6.BoolProp.jsonDecode(v47.is_component_filtered);
-    end;
-    if v47.isComponentFiltered ~= nil then
-        v48.is_component_filtered = v6.BoolProp.jsonDecode(v47.isComponentFiltered);
-    end;
-    return v48;
-end;
-v7.descriptor = {
-    name = "ComponentShared", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.ComponentShared"
-};
-v2.ComponentShared = v7;
-v1.default:register(v2.ComponentShared);
-v7 = {};
-v7.__index = v7;
-v7.new = function(v58) --[[ Line: 346 ]] --[[ Name: new ]]
-    -- upvalues: v7 (copy)
-    return (setmetatable({
-        key = (not (v58 ~= nil) or v58.key == nil) and "" or v58.key, 
-        value = if not (v58 ~= nil) or v58.value == nil then nil else v58.value
-    }, v7));
-end;
-v7.encode = function(v59) --[[ Line: 355 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v60 = buffer.create(0);
-    local v61 = 0;
-    if v59.key ~= nil and v59.key ~= "" then
-        local v62, v63 = v0.writeTag(v60, v61, 1, v0.wireTypes.lengthDelimited);
-        v62, v63 = v0.writeString(v62, v63, v59.key);
-        v60 = v62;
-        v61 = v63;
-    end;
-    if v59.value ~= nil then
-        local v64 = v59.value:encode();
-        local v65, v66 = v0.writeTag(v60, v61, 2, v0.wireTypes.lengthDelimited);
-        v65, v66 = v0.writeBuffer(v65, v66, v64, buffer.len(v64));
-        v60 = v65;
-        v61 = v66;
-    end;
-    local v67 = buffer.create(v61);
-    buffer.copy(v67, 0, v60, 0, v61);
-    return v67;
-end;
-v7.decode = function(v68) --[[ Line: 375 ]] --[[ Name: decode ]]
-    -- upvalues: v7 (copy), v0 (copy), v5 (copy)
-    local v69 = v7.new();
-    local v70 = 0;
-    while v70 < buffer.len(v68) do
-        local v71 = nil;
-        local v72 = nil;
-        local v73, v74, v75 = v0.readTag(v68, v70);
-        v71 = v73;
-        v72 = v74;
-        v70 = v75;
-        if v72 == v0.wireTypes.varint then
-            v73 = nil;
-            v74, v75 = v0.readVarInt(v68, v70);
-            v73 = v74;
-            v70 = v75;
-        elseif v72 == v0.wireTypes.lengthDelimited then
-            if v71 == 1 then
-                v73 = nil;
-                v74, v75 = v0.readBuffer(v68, v70);
-                v73 = v74;
-                v70 = v75;
-                v69.key = buffer.tostring(v73);
-            elseif v71 == 2 then
-                v73 = nil;
-                v74, v75 = v0.readBuffer(v68, v70);
-                v73 = v74;
-                v70 = v75;
-                v69.value = v5.AnalyticsDataField.decode(v73);
-            else
-                v73 = nil;
-                v74, v75 = v0.readVarInt(v68, v70);
-                v70 = v75 + v74;
-            end;
-        elseif v72 == v0.wireTypes.i32 then
-            v73 = nil;
-            v74, v75 = v0.readFixed32(v68, v70);
-            v73 = v74;
-            v70 = v75;
-        elseif v72 == v0.wireTypes.i64 then
-            v73 = nil;
-            v74, v75 = v0.readFixed64(v68, v70);
-            v73 = v74;
-            v70 = v75;
-        else
-            error("Unsupported wire type: " .. v72);
-        end;
-    end;
-    return v69;
-end;
-v7.jsonEncode = function(v76) --[[ Line: 423 ]] --[[ Name: jsonEncode ]]
-    local v77 = {};
-    if v76.key ~= nil and v76.key ~= "" then
-        v77.key = v76.key;
-    end;
-    if v76.value ~= nil then
-        v77.value = v76.value:jsonEncode();
-    end;
-    return v77;
-end;
-v7.jsonDecode = function(v78) --[[ Line: 437 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v7 (copy), v5 (copy)
-    local v79 = v7.new();
-    if v78.key ~= nil then
-        v79.key = v78.key;
-    end;
-    if v78.value ~= nil then
-        v79.value = v5.AnalyticsDataField.jsonDecode(v78.value);
-    end;
-    return v79;
-end;
-v7.descriptor = {
-    name = "ComponentShared_AnalyticsDataEntry", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.AnalyticsDataEntry"
-};
-v2.ComponentShared_AnalyticsDataEntry = v7;
-v1.default:register(v2.ComponentShared_AnalyticsDataEntry);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local hydration_data_spec = require(script.Parent.hydration_data_spec)
+local ui_component_type = require(script.Parent.ui_component_type)
+local analytics_data = require(script.Parent.analytics_data)
+local prop_types = require(script.Parent.prop_types)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 104
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		hidden = if t3 ~= nil and t3.hidden ~= nil then t3.hidden else nil
+	}, t2))
+end
+function t2.encode(p1) -- line: 110
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.hidden ~= nil then
+		local v15 = p1.hidden:encode()
+		local v16, v17 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v16, v17, v15, buffer.len(v15))
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 125
+	-- upvalues: t2 (copy), proto (copy), prop_types (copy)
+	local v20 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v22, v23
+
+		v22, v23, n2 = proto.readTag(p2, n2)
+
+		if v23 == proto.wireTypes.varint then
+			local v24
+
+			v24, n2 = proto.readVarInt(p2, n2)
+		elseif v23 == proto.wireTypes.lengthDelimited then
+			if v22 == 1 then
+				local v25
+
+				v25, n2 = proto.readBuffer(p2, n2)
+				v20.hidden = prop_types.BoolProp.decode(v25)
+			else
+				local v26, v27 = proto.readVarInt(p2, n2)
+
+				n2 = v27 + v26
+			end
+		elseif v23 == proto.wireTypes.i32 then
+			local v28
+
+			v28, n2 = proto.readFixed32(p2, n2)
+		elseif v23 == proto.wireTypes.i64 then
+			local v29
+
+			v29, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v23)
+		end
+	end
+
+	return v20
+end
+function t2.jsonEncode(p3) -- line: 168
+	local t4 = {}
+
+	if p3.hidden ~= nil then
+		t4.hidden = p3.hidden:jsonEncode()
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 178
+	-- upvalues: t2 (copy), prop_types (copy)
+	local v33 = t2.new()
+
+	if t5.hidden ~= nil then
+		v33.hidden = prop_types.BoolProp.jsonDecode(t5.hidden)
+	end
+
+	return v33
+end
+
+t2.descriptor = {
+	name = "AccessibilityProps",
+	fullName = "roblox.apppageplatform.shared.v1beta1.AccessibilityProps"
+}
+t1.AccessibilityProps = t2
+typeRegistry.default:register(t1.AccessibilityProps)
+
+local t6 = {}
+
+t6.__index = t6
+
+function t6.new(t7: {[any]: any}?) -- line: 202
+	-- upvalues: ui_component_type (copy), t6 (copy)
+	return (setmetatable({
+		component_type = if t7 ~= nil and t7.component_type ~= nil then t7.component_type else assert(ui_component_type.UiComponentType.fromNumber(0), "Enum has no 0 default"),
+		data = if t7 ~= nil and t7.data ~= nil then t7.data else {},
+		analytics_data = if t7 ~= nil and t7.analytics_data ~= nil then t7.analytics_data else {},
+		is_component_filtered = if t7 ~= nil and t7.is_component_filtered ~= nil then t7.is_component_filtered else nil,
+		accessibility = if t7 ~= nil and t7.accessibility ~= nil then t7.accessibility else nil
+	}, t6))
+end
+function t6.encode(p4) -- line: 219
+	-- upvalues: ui_component_type (copy), proto (copy)
+	local buf = buffer.create(0)
+	local n3 = 0
+
+	if p4.component_type ~= nil and (p4.component_type ~= nil and p4.component_type ~= 0 or p4.component_type ~= ui_component_type.UiComponentType.fromNumber(0)) then
+		local v38, v39 = proto.writeTag(buf, n3, 1, proto.wireTypes.varint)
+
+		buf, n3 = proto.writeVarInt(v38, v39, ui_component_type.UiComponentType.toNumber(p4.component_type))
+	end
+
+	if p4.data ~= nil and #p4.data > 0 then
+		for _, v41 in p4.data do
+			local v42 = v41:encode()
+			local v43, v44 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v43, v44, v42, buffer.len(v42))
+		end
+	end
+
+	if p4.analytics_data ~= nil and next(p4.analytics_data) ~= nil then
+		for v45, v46 in p4.analytics_data do
+			local buf3 = buffer.create(0)
+			local v48, v49 = proto.writeTag(buf3, 0, 1, proto.wireTypes.lengthDelimited)
+			local v50, v51 = proto.writeString(v48, v49, v45)
+			local v52 = v46:encode()
+			local v53, v54 = proto.writeTag(v50, v51, 2, proto.wireTypes.lengthDelimited)
+			local v55, v56 = proto.writeBuffer(v53, v54, v52, buffer.len(v52))
+			local v57, v58 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v57, v58, v55, v56)
+		end
+	end
+
+	if p4.is_component_filtered ~= nil then
+		local v59 = p4.is_component_filtered:encode()
+		local v60, v61 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n3 = proto.writeBuffer(v60, v61, v59, buffer.len(v59))
+	end
+
+	if p4.accessibility ~= nil then
+		local v62 = p4.accessibility:encode()
+		local v63, v64 = proto.writeTag(buf, n3, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n3 = proto.writeBuffer(v63, v64, v62, buffer.len(v62))
+	end
+
+	local buf4 = buffer.create(n3)
+
+	buffer.copy(buf4, 0, buf, 0, n3)
+
+	return buf4
+end
+function t6.decode(p5: buffer) -- line: 280
+	-- upvalues: t6 (copy), proto (copy), ui_component_type (copy), hydration_data_spec (copy), t1 (copy), analytics_data (copy), prop_types (copy)
+	local v67 = t6.new()
+	local n4 = 0
+
+	while n4 < buffer.len(p5) do
+		local v69, v70
+
+		v69, v70, n4 = proto.readTag(p5, n4)
+
+		if v70 == proto.wireTypes.varint then
+			if v69 == 1 then
+				local v71
+
+				v71, n4 = proto.readVarIntI32(p5, n4)
+				v67.component_type = ui_component_type.UiComponentType.fromNumber(v71) or v71
+			else
+				local v72
+
+				v72, n4 = proto.readVarInt(p5, n4)
+			end
+		elseif v70 == proto.wireTypes.lengthDelimited then
+			if v69 == 2 then
+				local v73
+
+				v73, n4 = proto.readBuffer(p5, n4)
+				table.insert(v67.data, hydration_data_spec.HydrationDataSpec.decode(v73))
+			elseif v69 == 3 then
+				local v74
+
+				v74, n4 = proto.readBuffer(p5, n4)
+
+				local v75 = t1.ComponentShared_AnalyticsDataEntry.decode(v74)
+				local v76 = analytics_data.AnalyticsDataField.new()
+
+				v67.analytics_data[v75.key or ""] = v75.value or v76
+			elseif v69 == 4 then
+				local v77
+
+				v77, n4 = proto.readBuffer(p5, n4)
+				v67.is_component_filtered = prop_types.BoolProp.decode(v77)
+			elseif v69 == 5 then
+				local v78
+
+				v78, n4 = proto.readBuffer(p5, n4)
+				v67.accessibility = t1.AccessibilityProps.decode(v78)
+			else
+				local v79, v80 = proto.readVarInt(p5, n4)
+
+				n4 = v80 + v79
+			end
+		elseif v70 == proto.wireTypes.i32 then
+			local v81
+
+			v81, n4 = proto.readFixed32(p5, n4)
+		elseif v70 == proto.wireTypes.i64 then
+			local v82
+
+			v82, n4 = proto.readFixed64(p5, n4)
+		else
+			error("Unsupported wire type: " .. v70)
+		end
+	end
+
+	return v67
+end
+function t6.jsonEncode(p6) -- line: 357
+	-- upvalues: ui_component_type (copy)
+	local t8 = {}
+
+	if p6.component_type ~= nil and (p6.component_type ~= nil and p6.component_type ~= 0 or p6.component_type ~= ui_component_type.UiComponentType.fromNumber(0)) then
+		t8.componentType = if typeof(p6.component_type) ~= "number" then ui_component_type.UiComponentType.toNumber(p6.component_type) else p6.component_type
+	end
+
+	if p6.data ~= nil and #p6.data > 0 then
+		local t9 = {}
+
+		for _, v87 in p6.data do
+			table.insert(t9, v87:jsonEncode())
+		end
+
+		t8.data = t9
+	end
+
+	if p6.analytics_data ~= nil and next(p6.analytics_data) ~= nil then
+		local t10 = {}
+
+		for v89, v90 in p6.analytics_data do
+			t10[v89] = v90:jsonEncode()
+		end
+
+		t8.analyticsData = t10
+	end
+
+	if p6.is_component_filtered ~= nil then
+		t8.isComponentFiltered = p6.is_component_filtered:jsonEncode()
+	end
+
+	if p6.accessibility ~= nil then
+		t8.accessibility = p6.accessibility:jsonEncode()
+	end
+
+	return t8
+end
+function t6.jsonDecode(t11: {[any]: any}) -- line: 402
+	-- upvalues: t6 (copy), ui_component_type (copy), hydration_data_spec (copy), analytics_data (copy), prop_types (copy), t1 (copy)
+	local v92 = t6.new()
+
+	if t11.component_type ~= nil then
+		v92.component_type = if typeof(t11.component_type) ~= "number" then ui_component_type.UiComponentType.fromName(t11.component_type) or t11.component_type else ui_component_type.UiComponentType.fromNumber(t11.component_type) or t11.component_type
+	end
+
+	if t11.componentType ~= nil then
+		v92.component_type = if typeof(t11.componentType) ~= "number" then ui_component_type.UiComponentType.fromName(t11.componentType) or t11.componentType else ui_component_type.UiComponentType.fromNumber(t11.componentType) or t11.componentType
+	end
+
+	if t11.data ~= nil then
+		local t12 = {}
+
+		for _, v95 in t11.data do
+			table.insert(t12, hydration_data_spec.HydrationDataSpec.jsonDecode(v95))
+		end
+
+		v92.data = t12
+	end
+
+	if t11.analytics_data ~= nil then
+		local t13 = {}
+
+		for v97, v98 in t11.analytics_data do
+			t13[v97] = analytics_data.AnalyticsDataField.jsonDecode(v98)
+		end
+
+		v92.analytics_data = t13
+	end
+
+	if t11.analyticsData ~= nil then
+		local t14 = {}
+
+		for v100, v101 in t11.analyticsData do
+			t14[v100] = analytics_data.AnalyticsDataField.jsonDecode(v101)
+		end
+
+		v92.analytics_data = t14
+	end
+
+	if t11.is_component_filtered ~= nil then
+		v92.is_component_filtered = prop_types.BoolProp.jsonDecode(t11.is_component_filtered)
+	end
+
+	if t11.isComponentFiltered ~= nil then
+		v92.is_component_filtered = prop_types.BoolProp.jsonDecode(t11.isComponentFiltered)
+	end
+
+	if t11.accessibility ~= nil then
+		v92.accessibility = t1.AccessibilityProps.jsonDecode(t11.accessibility)
+	end
+
+	return v92
+end
+
+t6.descriptor = {
+	name = "ComponentShared",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ComponentShared"
+}
+t1.ComponentShared = t6
+typeRegistry.default:register(t1.ComponentShared)
+
+local t15 = {}
+
+t15.__index = t15
+
+function t15.new(t16: {[any]: any}?) -- line: 488
+	-- upvalues: t15 (copy)
+	return (setmetatable({
+		key = if t16 ~= nil and t16.key ~= nil then t16.key else "",
+		value = if t16 ~= nil and t16.value ~= nil then t16.value else nil
+	}, t15))
+end
+function t15.encode(p7) -- line: 497
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n5 = 0
+
+	if p7.key ~= nil and p7.key ~= "" then
+		local v106, v107 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeString(v106, v107, p7.key)
+	end
+
+	if p7.value ~= nil then
+		local v108 = p7.value:encode()
+		local v109, v110 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeBuffer(v109, v110, v108, buffer.len(v108))
+	end
+
+	local buf5 = buffer.create(n5)
+
+	buffer.copy(buf5, 0, buf, 0, n5)
+
+	return buf5
+end
+function t15.decode(p8: buffer) -- line: 517
+	-- upvalues: t15 (copy), proto (copy), analytics_data (copy)
+	local v113 = t15.new()
+	local n6 = 0
+
+	while n6 < buffer.len(p8) do
+		local v115, v116
+
+		v115, v116, n6 = proto.readTag(p8, n6)
+
+		if v116 == proto.wireTypes.varint then
+			local v117
+
+			v117, n6 = proto.readVarInt(p8, n6)
+		elseif v116 == proto.wireTypes.lengthDelimited then
+			if v115 == 1 then
+				local v118
+
+				v118, n6 = proto.readBuffer(p8, n6)
+				v113.key = buffer.tostring(v118)
+			elseif v115 == 2 then
+				local v119
+
+				v119, n6 = proto.readBuffer(p8, n6)
+				v113.value = analytics_data.AnalyticsDataField.decode(v119)
+			else
+				local v120, v121 = proto.readVarInt(p8, n6)
+
+				n6 = v121 + v120
+			end
+		elseif v116 == proto.wireTypes.i32 then
+			local v122
+
+			v122, n6 = proto.readFixed32(p8, n6)
+		elseif v116 == proto.wireTypes.i64 then
+			local v123
+
+			v123, n6 = proto.readFixed64(p8, n6)
+		else
+			error("Unsupported wire type: " .. v116)
+		end
+	end
+
+	return v113
+end
+function t15.jsonEncode(p9) -- line: 565
+	local t17 = {}
+
+	if p9.key ~= nil and p9.key ~= "" then
+		t17.key = p9.key
+	end
+
+	if p9.value ~= nil then
+		t17.value = p9.value:jsonEncode()
+	end
+
+	return t17
+end
+function t15.jsonDecode(t18: {[any]: any}) -- line: 579
+	-- upvalues: t15 (copy), analytics_data (copy)
+	local v127 = t15.new()
+
+	if t18.key ~= nil then
+		v127.key = t18.key
+	end
+
+	if t18.value ~= nil then
+		v127.value = analytics_data.AnalyticsDataField.jsonDecode(t18.value)
+	end
+
+	return v127
+end
+
+t15.descriptor = {
+	name = "ComponentShared_AnalyticsDataEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.AnalyticsDataEntry"
+}
+t1.ComponentShared_AnalyticsDataEntry = t15
+typeRegistry.default:register(t1.ComponentShared_AnalyticsDataEntry)
+
 return {
-    ComponentShared = v2.ComponentShared
-};
+	AccessibilityProps = t1.AccessibilityProps,
+	ComponentShared = t1.ComponentShared
+}

@@ -1,2 +1,3 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-return require(l_script_FirstAncestor_0.dependencies).Roact.createContext(nil);
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+
+return require(FriendsLanding.dependencies).Roact.createContext(nil)

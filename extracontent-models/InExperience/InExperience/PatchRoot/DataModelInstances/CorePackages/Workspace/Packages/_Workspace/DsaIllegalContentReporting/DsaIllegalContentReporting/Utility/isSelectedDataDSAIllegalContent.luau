@@ -1,15 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DsaIllegalContentReporting");
-local v1 = require(l_script_FirstAncestor_0.Utility.Constants);
-return function(v2) --[[ Line: 6 ]] --[[ Name: isSelectedDataDSAIllegalContent ]]
-    -- upvalues: v1 (copy)
-    if v2 == nil then
-        return false;
-    else
-        local v3 = v2[#v2];
-        local v4 = false;
-        if v3 ~= nil then
-            v4 = v3.tagValues[1] == v1.DSA_TAG_VALUE;
-        end;
-        return v4;
-    end;
-end;
+local DsaIllegalContentReporting = script:FindFirstAncestor("DsaIllegalContentReporting")
+local Constants = require(DsaIllegalContentReporting.Utility.Constants)
+
+local function isSelectedDataDSAIllegalContent(t1: {[any]: any}) -- line: 6
+	-- upvalues: Constants (copy)
+	if t1 == nil then
+		return false
+	end
+
+	local v5 = t1[#t1]
+
+	return v5 ~= nil and v5.tagValues[1] == Constants.DSA_TAG_VALUE
+end
+
+return isSelectedDataDSAIllegalContent

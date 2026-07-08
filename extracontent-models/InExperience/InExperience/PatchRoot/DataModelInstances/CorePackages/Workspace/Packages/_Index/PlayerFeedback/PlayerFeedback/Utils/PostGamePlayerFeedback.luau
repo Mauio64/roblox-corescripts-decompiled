@@ -1,18 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlayerFeedback");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GetFStringEdpPlayerFeedbackServiceRoute_0 = require(l_Parent_0.SharedFlags).GetFStringEdpPlayerFeedbackServiceRoute;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v5, v6, v7, v8, v9, v10) --[[ Line: 16 ]]
-    -- upvalues: l_Url_0 (copy), l_GetFStringEdpPlayerFeedbackServiceRoute_0 (copy), l_HttpService_0 (copy)
-    assert(type(v6) == "string", "PostGamePlayerFeedback request expects channelId to be a string");
-    assert(type(v7) == "string", "PostGamePlayerFeedback request expects assetId to be a string");
-    assert(type(v8) == "string", "PostGamePlayerFeedback request expects a valid category type");
-    return v5(string.format("%s%s/v1/channels/%s/assets/%s/reviews", l_Url_0.APIS_URL, l_GetFStringEdpPlayerFeedbackServiceRoute_0(), v6, v7), "POST", {
-        postBody = l_HttpService_0:JSONEncode({
-            category_type = v8, 
-            category_option_ids = v9, 
-            comment = v10
-        })
-    });
-end;
+local PlayerFeedback = script:FindFirstAncestor("PlayerFeedback")
+local HttpService = game:GetService("HttpService")
+local PlayerFeedbackParent = PlayerFeedback.Parent
+local GetFStringEdpPlayerFeedbackServiceRoute = require(PlayerFeedbackParent.SharedFlags).GetFStringEdpPlayerFeedbackServiceRoute
+local Url = require(PlayerFeedbackParent.Http).Url
+
+return function(p1, s1: string, s2: string, s3: string, t1: {[any]: any}, s4: string) -- line: 16
+	-- upvalues: Url (copy), GetFStringEdpPlayerFeedbackServiceRoute (copy), HttpService (copy)
+	assert(type(s1) == "string", "PostGamePlayerFeedback request expects channelId to be a string")
+	assert(type(s2) == "string", "PostGamePlayerFeedback request expects assetId to be a string")
+	assert(type(s3) == "string", "PostGamePlayerFeedback request expects a valid category type")
+
+	return p1(string.format("%s%s/v1/channels/%s/assets/%s/reviews", Url.APIS_URL, GetFStringEdpPlayerFeedbackServiceRoute(), s1, s2), "POST", {
+		postBody = HttpService:JSONEncode({
+			category_type = s3,
+			category_option_ids = t1,
+			comment = s4
+		})
+	})
+end

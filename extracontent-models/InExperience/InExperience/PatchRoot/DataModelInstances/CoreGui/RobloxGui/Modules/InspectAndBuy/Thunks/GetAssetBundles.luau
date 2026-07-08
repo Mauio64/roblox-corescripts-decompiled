@@ -1,63 +1,72 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_PerformFetch_0 = require(l_CorePackages_0.Workspace.Packages.Http).PerformFetch;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Thunk);
-local v4 = require(l_Parent_0.Services.Network);
-local v5 = require(l_Parent_0.Models.BundleInfo);
-local v6 = require(l_Parent_0.Actions.SetBundles);
-local v7 = require(l_Parent_0.Thunks.GetProductInfo);
-local v8 = require(l_Parent_0.createInspectAndBuyKeyMapper);
-local v9 = require(l_Parent_0.Actions.SetAssetToBundlesMapping);
-local v10 = require(l_Parent_0.Thunks.SendCounter);
-local v11 = require(l_Parent_0.Constants);
-local v12 = {
-    v4
-};
-local v13 = v8("getAssetBundles");
-return function(v14) --[[ Line: 23 ]] --[[ Name: GetAssetBundles ]]
-    -- upvalues: v3 (copy), v12 (copy), v4 (copy), v13 (copy), l_PerformFetch_0 (copy), v5 (copy), v7 (copy), v6 (copy), v9 (copy), v10 (copy), v11 (copy)
-    return v3.new(script.Name, v12, function(v15, v16) --[[ Line: 24 ]]
-        -- upvalues: v4 (ref), v13 (ref), v14 (copy), l_PerformFetch_0 (ref), v5 (ref), v7 (ref), v6 (ref), v9 (ref), v10 (ref), v11 (ref)
-        local v17 = v16[v4];
-        local v18 = v13(v15:getState().storeId, v14);
-        return l_PerformFetch_0.Single(v18, function(_) --[[ Line: 29 ]]
-            -- upvalues: v17 (copy), v14 (ref), v5 (ref), v15 (copy), v7 (ref), v6 (ref), v9 (ref), v10 (ref), v11 (ref)
-            return v17.getAssetBundles(v14):andThen(function(v20) --[[ Line: 30 ]]
-                -- upvalues: v5 (ref), v15 (ref), v7 (ref), v6 (ref), v9 (ref), v14 (ref), v10 (ref), v11 (ref)
-                local v21 = {};
-                local v22 = {};
-                for _, v24 in pairs(v20.data) do
-                    local v25 = v5.fromGetAssetBundles(v24);
-                    table.insert(v22, v25);
-                    table.insert(v21, (tostring(v25.bundleId)));
-                    local v26 = false;
-                    for _, v28 in pairs(v24.items) do
-                        if v28.type == "UserOutfit" then
-                            v26 = true;
-                            break;
-                        end;
-                    end;
-                    if not v26 then
-                        for _, v30 in pairs(v24.items) do
-                            if not v15:getState().assets[v30.id] then
-                                coroutine.wrap(function() --[[ Line: 54 ]]
-                                    -- upvalues: v15 (ref), v7 (ref), v30 (copy)
-                                    v15:dispatch(v7(v30.id));
-                                end)();
-                            end;
-                        end;
-                    end;
-                end;
-                v15:dispatch(v6(v22));
-                v15:dispatch(v9(tostring(v14), v21));
-                v15:dispatch(v10(v11.Counters.GetAssetBundles .. v11.CounterSuffix.RequestSucceeded));
-            end, function(_) --[[ Line: 69 ]]
-                -- upvalues: v15 (ref), v10 (ref), v11 (ref)
-                v15:dispatch(v10(v11.Counters.GetAssetBundles .. v11.CounterSuffix.RequestRejected));
-            end);
-        end)(v15):catch(function(_) --[[ Line: 74 ]]
-            -- upvalues: v15 (copy), v10 (ref), v11 (ref)
-            v15:dispatch(v10(v11.Counters.GetAssetBundles .. v11.CounterSuffix.RequestFailed));
-        end);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local Network = require(ParentParent.Services.Network)
+local BundleInfo = require(ParentParent.Models.BundleInfo)
+local SetBundles = require(ParentParent.Actions.SetBundles)
+local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
+local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
+local SetAssetToBundlesMapping = require(ParentParent.Actions.SetAssetToBundlesMapping)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local Constants = require(ParentParent.Constants)
+local t1 = { Network }
+local v14 = createInspectAndBuyKeyMapper("getAssetBundles")
+
+local function GetAssetBundles(p1) -- line: 23
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v14 (copy), PerformFetch (copy), BundleInfo (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 24
+		-- upvalues: Network (copy), v14 (copy), p1 (copy), PerformFetch (copy), BundleInfo (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
+		local v19 = p3[Network]
+		local v20 = v14(p2:getState().storeId, p1)
+
+		return PerformFetch.Single(v20, function(_) -- line: 29
+			-- upvalues: v19 (copy), p1 (copy), BundleInfo (copy), p2 (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), SendCounter (copy), Constants (copy)
+			return v19.getAssetBundles(p1):andThen(function(p5) -- line: 30
+				-- upvalues: BundleInfo (copy), p2 (copy), GetProductInfo (copy), SetBundles (copy), SetAssetToBundlesMapping (copy), p1 (copy), SendCounter (copy), Constants (copy)
+				local t2 = {}
+				local t3 = {}
+
+				for _, v in pairs(p5.data) do
+					local v28 = BundleInfo.fromGetAssetBundles(v)
+
+					table.insert(t3, v28)
+					table.insert(t2, (tostring(v28.bundleId)))
+
+					local v29 = false
+
+					for _, v2 in pairs(v.items) do
+						if v2.type == "UserOutfit" then
+							v29 = true
+
+							break
+						end
+					end
+
+					if not v29 then
+						for _, v3 in pairs(v.items) do
+							if not p2:getState().assets[v3.id] then
+								coroutine.wrap(function() -- line: 54
+									-- upvalues: p2 (copy), GetProductInfo (copy), v3 (copy)
+									p2:dispatch(GetProductInfo(v3.id))
+								end)()
+							end
+						end
+					end
+				end
+
+				p2:dispatch(SetBundles(t3))
+				p2:dispatch(SetAssetToBundlesMapping(tostring(p1), t2))
+				p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_) -- line: 69
+				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+				p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestRejected))
+			end)
+		end)(p2):catch(function(_) -- line: 74
+			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+			p2:dispatch(SendCounter(Constants.Counters.GetAssetBundles .. Constants.CounterSuffix.RequestFailed))
+		end)
+	end)
+end
+
+return GetAssetBundles

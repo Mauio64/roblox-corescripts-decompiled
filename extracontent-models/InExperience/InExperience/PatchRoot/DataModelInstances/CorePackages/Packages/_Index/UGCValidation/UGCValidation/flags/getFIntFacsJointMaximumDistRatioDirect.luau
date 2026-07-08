@@ -1,4 +1,5 @@
-game:DefineFastInt("FacsJointMaximumDistRatioDirect", 100);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("FacsJointMaximumDistRatioDirect");
-end;
+game:DefineFastInt("FacsJointMaximumDistRatioDirect", 100)
+
+return function() -- line: 3
+	return game:GetFastInt("FacsJointMaximumDistRatioDirect")
+end

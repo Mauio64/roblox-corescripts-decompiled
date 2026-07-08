@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 3 ]] --[[ Name: isErrorReasonPrefixWithEconomicRestrictions ]]
-    return string.sub(v0, 1, 20) == "EconomicRestrictions";
-end;
+local function isErrorReasonPrefixWithEconomicRestrictions(s1: string) -- line: 3
+	return string.sub(s1, 1, 20) == "EconomicRestrictions"
+end
+
+return isErrorReasonPrefixWithEconomicRestrictions

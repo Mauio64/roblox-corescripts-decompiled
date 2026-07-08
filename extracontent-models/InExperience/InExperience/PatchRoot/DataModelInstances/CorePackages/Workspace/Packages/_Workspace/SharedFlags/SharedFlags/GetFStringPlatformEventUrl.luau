@@ -1,4 +1,5 @@
-game:DefineFastString("PlatformEventUrl", "");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("PlatformEventUrl");
-end;
+game:DefineFastString("PlatformEventUrl", "")
+
+return function() -- line: 3
+	return game:GetFastString("PlatformEventUrl")
+end

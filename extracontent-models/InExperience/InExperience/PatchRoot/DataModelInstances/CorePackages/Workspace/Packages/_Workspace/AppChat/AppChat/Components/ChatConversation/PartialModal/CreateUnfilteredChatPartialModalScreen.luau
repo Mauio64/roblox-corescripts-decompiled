@@ -1,58 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.EnumScreens);
-local v4 = require(l_Parent_0.React);
-local l_useCallback_0 = v4.useCallback;
-local l_useEffectOnMount_0 = require(l_Parent_0.RoactUtils).Hooks.useEffectOnMount;
-local v7 = require(script.Parent.CreateUnfilteredChatPartialModalContainer);
-local v8 = require(script.Parent.Logger);
-local v9 = {};
-return function(v10) --[[ Line: 19 ]] --[[ Name: CreateUnfilteredChatPartialModalScreen ]]
-    -- upvalues: v2 (copy), v9 (copy), l_useEffectOnMount_0 (copy), v8 (copy), l_useCallback_0 (copy), v3 (copy), v4 (copy), v7 (copy)
-    local v11 = v2.Dictionary.union(v9, v10);
-    local l_navigation_0 = v11.navigation;
-    assert(type(l_navigation_0) ~= "nil", "CreateUnfilteredChatPartialModalScreen should be wrapped with React Navigation");
-    local v13 = l_navigation_0 and l_navigation_0.getParam and l_navigation_0.getParam("conversationId", nil);
-    l_useEffectOnMount_0(function() --[[ Line: 25 ]]
-        -- upvalues: v8 (ref)
-        v8:info("LearnMorePartialModalScreen mounted");
-    end);
-    local v14 = l_useCallback_0(function() --[[ Line: 29 ]]
-        -- upvalues: l_navigation_0 (copy)
-        l_navigation_0.goBack();
-    end, {
-        l_navigation_0
-    });
-    local v16 = l_useCallback_0(function(v15) --[[ Line: 33 ]]
-        -- upvalues: l_navigation_0 (copy), v3 (ref)
-        l_navigation_0.navigate(v3.ChatConversation, {
-            conversationId = v15
-        });
-    end, {
-        l_navigation_0
-    });
-    local v18 = l_useCallback_0(function(v17) --[[ Line: 37 ]]
-        -- upvalues: v11 (copy), v3 (ref)
-        v11.navigation.navigate(v3.RoactChatToast, {
-            toastProps = {
-                toastContent = {
-                    toastTitle = v17
-                }
-            }
-        });
-    end, {
-        l_navigation_0
-    });
-    if v13 == nil then
-        v8:warning("ConversationId is required to open CreateUnfilteredChatPartialModalScreen");
-        return nil;
-    else
-        return v4.createElement(v7, {
-            conversationId = v13, 
-            onDismissed = v14, 
-            navigateToConversation = v16, 
-            navigateToToast = v18
-        });
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local EnumScreens = require(AppChat.EnumScreens)
+local React = require(AppChatParent.React)
+local useCallback = React.useCallback
+local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
+local CreateUnfilteredChatPartialModalContainer = require(script.Parent.CreateUnfilteredChatPartialModalContainer)
+local Logger = require(script.Parent.Logger)
+local t1 = {}
+
+local function CreateUnfilteredChatPartialModalScreen(t2: {[any]: any}) -- line: 19
+	-- upvalues: Cryo (copy), t1 (copy), useEffectOnMount (copy), Logger (copy), useCallback (copy), EnumScreens (copy), React (copy), CreateUnfilteredChatPartialModalContainer (copy)
+	local v13 = Cryo.Dictionary.union(t1, t2)
+	local navigation = v13.navigation
+
+	assert(type(navigation) ~= "nil", "CreateUnfilteredChatPartialModalScreen should be wrapped with React Navigation")
+
+	local v15 = navigation and (navigation.getParam and navigation.getParam("conversationId", nil))
+
+	useEffectOnMount(function() -- line: 25
+		-- upvalues: Logger (copy)
+		Logger:info("LearnMorePartialModalScreen mounted")
+	end)
+
+	local v16 = useCallback(function() -- line: 29
+		-- upvalues: navigation (copy)
+		navigation.goBack()
+	end, { navigation })
+	local v17 = useCallback(function(p1) -- line: 33
+		-- upvalues: navigation (copy), EnumScreens (copy)
+		navigation.navigate(EnumScreens.ChatConversation, {
+			conversationId = p1
+		})
+	end, { navigation })
+	local v18 = useCallback(function(p2) -- line: 37
+		-- upvalues: v13 (copy), EnumScreens (copy)
+		v13.navigation.navigate(EnumScreens.RoactChatToast, {
+			toastProps = {
+				toastContent = {
+					toastTitle = p2
+				}
+			}
+		})
+	end, { navigation })
+
+	if v15 == nil then
+		Logger:warning("ConversationId is required to open CreateUnfilteredChatPartialModalScreen")
+
+		return nil
+	end
+
+	return React.createElement(CreateUnfilteredChatPartialModalContainer, {
+		conversationId = v15,
+		onDismissed = v16,
+		navigateToConversation = v17,
+		navigateToToast = v18
+	})
+end
+
+return CreateUnfilteredChatPartialModalScreen

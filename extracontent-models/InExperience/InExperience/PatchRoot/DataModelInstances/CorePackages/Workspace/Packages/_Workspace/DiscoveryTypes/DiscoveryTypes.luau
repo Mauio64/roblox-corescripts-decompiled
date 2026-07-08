@@ -25,10 +25,10 @@ return {
 		GAME_CAROUSEL_PADDING = 15,
 		GAME_CAROUSEL_SIDE_COMPACT_PADDING = 24,
 		GAME_CAROUSEL_SIDE_WIDE_PADDING = 48,
-		GAME_DETAILS_ACTION_BAR_HEIGHT = not FFlagLuaAppUnifyPlayButtonMobileEdp and not GetFFlagUIBloxUseFoundationButton() and 48 or 50,
 		GAME_GRID_CHILD_PADDING = 12,
 		GAME_GRID_PADDING = 15,
 		GAME_GRID_TILE_FOOTER_HEIGHT = 70,
+		GAME_DETAILS_ACTION_BAR_HEIGHT = not FFlagLuaAppUnifyPlayButtonMobileEdp and not GetFFlagUIBloxUseFoundationButton() and 48 or 50,
 		MAX_RECOMMENDED_GAMES_FETCH_COUNT = GetFIntLuaAppRecommendedGamesCount()
 	},
 	DataSourceType = {
@@ -36,9 +36,9 @@ return {
 		ExploreApi = "ExploreApi",
 		GamesApi = "GamesApi",
 		Local = "Local",
-		OmniAutocompleteApi = if not FFlagSearchOmniAutocompletePage then nil else "OmniAutocompleteApi",
 		SearchApi = "SearchApi",
-		Unknown = "Unknown"
+		Unknown = "Unknown",
+		OmniAutocompleteApi = if not FFlagSearchOmniAutocompletePage then nil else "OmniAutocompleteApi"
 	},
 	ExperienceDetailsNoticeType = {
 		InExperiencePurchase = "InExperiencePurchase"

@@ -1,7 +1,9 @@
-return function(v0, v1, v2) --[[ Line: 4 ]] --[[ Name: foldRight ]]
-    local l_v2_0 = v2;
-    for v4 = #v0, 1, -1 do
-        l_v2_0 = v1(l_v2_0, v0[v4], v4);
-    end;
-    return l_v2_0;
-end;
+local function foldRight(p1, p2, p3) -- line: 4
+	for i = #p1, 1, -1 do
+		p3 = p2(p3, p1[i], i)
+	end
+
+	return p3
+end
+
+return foldRight

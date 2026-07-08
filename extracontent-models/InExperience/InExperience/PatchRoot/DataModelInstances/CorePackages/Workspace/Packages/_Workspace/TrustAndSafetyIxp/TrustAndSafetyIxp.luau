@@ -1,3 +1,3 @@
 return {
-    TrustAndSafetyIXPManager = require(script.TrustAndSafetyIXPManager)
-};
+	TrustAndSafetyIXPManager = require(script.TrustAndSafetyIXPManager)
+}

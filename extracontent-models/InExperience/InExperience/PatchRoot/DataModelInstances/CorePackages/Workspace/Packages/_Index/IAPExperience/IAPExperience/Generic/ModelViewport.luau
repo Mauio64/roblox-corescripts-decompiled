@@ -1,93 +1,137 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local l_CharacterUtility_0 = require(l_Parent_0.Thumbnailing).CharacterUtility;
-local l_CameraUtility_0 = require(l_Parent_0.Thumbnailing).CameraUtility;
-local l_CFrameUtility_0 = require(l_Parent_0.Thumbnailing).CFrameUtility;
-local l_EmoteUtility_0 = require(l_Parent_0.Thumbnailing).EmoteUtility;
-return function(v7) --[[ Line: 25 ]] --[[ Name: ModelViewport ]]
-    -- upvalues: v2 (copy), l_EmoteUtility_0 (copy), l_RunService_0 (copy), l_CFrameUtility_0 (copy), l_CharacterUtility_0 (copy), l_CameraUtility_0 (copy)
-    local v8 = v2.useRef(nil);
-    local v9, v10 = v2.useBinding(nil);
-    local v11 = v2.useRef(false);
-    v2.useEffect(function() --[[ Line: 30 ]]
-        -- upvalues: v11 (copy)
-        v11.current = true;
-        return function() --[[ Line: 32 ]]
-            -- upvalues: v11 (ref)
-            v11.current = false;
-        end;
-    end, {});
-    v2.useEffect(function() --[[ Line: 37 ]]
-        -- upvalues: v7 (copy), v8 (copy), l_EmoteUtility_0 (ref), l_RunService_0 (ref), v11 (copy), l_CFrameUtility_0 (ref), l_CharacterUtility_0 (ref), l_CameraUtility_0 (ref), v10 (copy)
-        task.spawn(function() --[[ Line: 39 ]]
-            -- upvalues: v7 (ref), v8 (ref), l_EmoteUtility_0 (ref), l_RunService_0 (ref), v11 (ref), l_CFrameUtility_0 (ref), l_CharacterUtility_0 (ref), l_CameraUtility_0 (ref), v10 (ref)
-            local v12 = v7.model:Clone();
-            local l_Camera_0 = Instance.new("Camera");
-            l_Camera_0.CameraType = Enum.CameraType.Scriptable;
-            l_Camera_0.Parent = v8.current;
-            l_Camera_0.HeadLocked = true;
-            l_Camera_0.VRTiltAndRollEnabled = true;
-            v12.Parent = v8.current;
-            if v12:IsA("Model") and v12.PrimaryPart then
-                v12:MoveTo((Vector3.new(0, 0, 0, 0)));
-                l_EmoteUtility_0.SetPlayerCharacterPoseWithMoodFallback(v12);
-                l_RunService_0.PostSimulation:Wait();
-                if not v11.current then
-                    return;
-                else
-                    local v14 = nil;
-                    local v15 = l_CFrameUtility_0.CalculateTargetCFrame(v12.Head.CFrame);
-                    v14 = v15 - v15.Position + v12.PrimaryPart.CFrame.Position;
-                    local v16, v17 = l_CharacterUtility_0.CalculateModelExtents(v12, v14);
-                    local v18 = {
-                        optFieldOfView = 30, 
-                        targetCFrame = v14, 
-                        minExtent = v16, 
-                        maxExtent = v17, 
-                        extentScale = 1, 
-                        optCameraXRot = l_CameraUtility_0.XRotForFullBody, 
-                        optCameraDistanceScale = l_CameraUtility_0.DistanceScaleForFullBody, 
-                        extentScale = l_CameraUtility_0.DefaultBodyMarginScale
-                    };
-                    l_CameraUtility_0.SetupCamera(l_Camera_0, v18);
-                    v10(l_Camera_0);
-                    return;
-                end;
-            elseif not v11.current then
-                return;
-            else
-                local l_v12_0 = v12;
-                if not v12:IsA("Model") then
-                    l_v12_0 = Instance.new("Model");
-                    v12.Parent = l_v12_0;
-                    l_v12_0.Parent = v8.current;
-                end;
-                l_CameraUtility_0.SetupAccessoryCamera(l_v12_0, l_Camera_0);
-                v10(l_Camera_0);
-                return;
-            end;
-        end);
-    end, {});
-    return v2.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = v7.Size, 
-        Position = v7.Position, 
-        LayoutOrder = v7.LayoutOrder
-    }, {
-        ViewportFrame = v2.createElement("ViewportFrame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromScale(1, 1), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            LightColor = Color3.fromRGB(240, 240, 240), 
-            Ambient = Color3.fromRGB(160, 160, 160), 
-            LightDirection = Vector3.new(9.5, -12, 7.5, 0), 
-            CurrentCamera = v9
-        }, {
-            WorldModel = v2.createElement("WorldModel", {
-                ref = v8
-            })
-        })
-    });
-end;
+local RunService = game:GetService("RunService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local CharacterUtility = require(ParentParent.Thumbnailing).CharacterUtility
+local CameraUtility = require(ParentParent.Thumbnailing).CameraUtility
+local CFrameUtility = require(ParentParent.Thumbnailing).CFrameUtility
+local EmoteUtility = require(ParentParent.Thumbnailing).EmoteUtility
+local v8 = game:DefineFastFlag("PurchasePromptPreviewMakeupHead", false)
+
+local function ModelViewport(t1: {[any]: any}) -- line: 27
+	-- upvalues: React (copy), EmoteUtility (copy), RunService (copy), CFrameUtility (copy), CharacterUtility (copy), CameraUtility (copy), v8 (copy)
+	local v11 = React.useRef(nil)
+	local v12, v13 = React.useBinding(nil)
+	local v14 = React.useRef(false)
+
+	React.useEffect(function() -- line: 32
+		-- upvalues: v14 (copy)
+		v14.current = true
+
+		return function() -- line: 34
+			-- upvalues: v14 (copy)
+			v14.current = false
+		end
+	end, {})
+	React.useEffect(function() -- line: 39
+		-- upvalues: t1 (copy), v11 (copy), EmoteUtility (copy), RunService (copy), v14 (copy), CFrameUtility (copy), CharacterUtility (copy), CameraUtility (copy), v13 (copy), v8 (copy)
+		task.spawn(function() -- line: 41
+			-- upvalues: t1 (copy), v11 (copy), EmoteUtility (copy), RunService (copy), v14 (copy), CFrameUtility (copy), CharacterUtility (copy), CameraUtility (copy), v13 (copy), v8 (copy)
+			local clone = t1.model:Clone()
+			local Camera = Instance.new("Camera")
+
+			Camera.CameraType = Enum.CameraType.Scriptable
+			Camera.Parent = v11.current
+			Camera.HeadLocked = true
+			Camera.VRTiltAndRollEnabled = true
+			clone.Parent = v11.current
+
+			if clone:IsA("Model") and clone.PrimaryPart then
+				clone:MoveTo((Vector3.new(0, 0, 0)))
+				EmoteUtility.SetPlayerCharacterPoseWithMoodFallback(clone)
+				RunService.PostSimulation:Wait()
+
+				if not v14.current then
+					return
+				end
+
+				local v17 = CFrameUtility.CalculateTargetCFrame(clone.Head.CFrame)
+				local v18 = v17 - v17.Position + clone.PrimaryPart.CFrame.Position
+				local v19, v20 = CharacterUtility.CalculateModelExtents(clone, v18)
+				local t2 = {
+					optFieldOfView = 30,
+					extentScale = 1,
+					targetCFrame = v18,
+					minExtent = v19,
+					maxExtent = v20,
+					optCameraXRot = CameraUtility.XRotForFullBody,
+					optCameraDistanceScale = CameraUtility.DistanceScaleForFullBody,
+					extentScale = CameraUtility.DefaultBodyMarginScale
+				}
+
+				CameraUtility.SetupCamera(Camera, t2)
+				v13(Camera)
+
+				return
+			end
+
+			if not v14.current then
+				return
+			end
+
+			local v22 = clone
+
+			if not clone:IsA("Model") then
+				v22 = Instance.new("Model")
+				clone.Parent = v22
+				v22.Parent = v11.current
+			end
+
+			if v8 then
+				local Head = v22:FindFirstChild("Head")
+
+				if Head and Head:IsA("MeshPart") then
+					Head.CFrame = CFrame.new()
+
+					local HeadCFrame = Head.CFrame
+					local v25, v26 = CharacterUtility.CalculateModelExtents(v22, HeadCFrame)
+					local t3 = {
+						optFieldOfView = 30,
+						extentScale = 1.2,
+						optCameraXRot = 5,
+						optCameraYRot = 20,
+						targetCFrame = HeadCFrame,
+						minExtent = v25,
+						maxExtent = v26
+					}
+
+					CameraUtility.SetupCamera(Camera, t3)
+					v13(Camera)
+
+					return
+				end
+
+				CameraUtility.SetupAccessoryCamera(v22, Camera)
+				v13(Camera)
+
+				return
+			end
+
+			CameraUtility.SetupAccessoryCamera(v22, Camera)
+			v13(Camera)
+		end)
+	end, {})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = t1.Size,
+		Position = t1.Position,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		ViewportFrame = React.createElement("ViewportFrame", {
+			BackgroundTransparency = 1,
+			LightDirection = Vector3.new(9.5, -12, 7.5),
+			Size = UDim2.fromScale(1, 1),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			LightColor = Color3.fromRGB(240, 240, 240),
+			Ambient = Color3.fromRGB(160, 160, 160),
+			CurrentCamera = v12
+		}, {
+			WorldModel = React.createElement("WorldModel", {
+				ref = v11
+			})
+		})
+	})
+end
+
+return ModelViewport

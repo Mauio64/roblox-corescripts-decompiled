@@ -1,88 +1,93 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetScreenSize);
-local v5 = require(script.Parent.EventConnection);
-local v6 = v1.PureComponent:extend("ScreenSizeConnector");
-v6.init = function(v7) --[[ Line: 15 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v7.state = {
-        layerCollector = nil
-    };
-    v7.folderRef = v1.createRef();
-end;
-v6.render = function(v8) --[[ Line: 23 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v5 (copy)
-    if v8.state.layerCollector then
-        local l_AbsoluteSize_0 = v8.state.layerCollector.AbsoluteSize;
-        v8.props.setScreenSize(l_AbsoluteSize_0.X, l_AbsoluteSize_0.Y);
-        return v1.createElement(v5, {
-            event = v8.state.layerCollector:GetPropertyChangedSignal("AbsoluteSize"), 
-            callback = function() --[[ Line: 29 ]] --[[ Name: callback ]]
-                -- upvalues: l_AbsoluteSize_0 (ref), v8 (copy)
-                l_AbsoluteSize_0 = v8.state.layerCollector.AbsoluteSize;
-                v8.props.setScreenSize(l_AbsoluteSize_0.X, l_AbsoluteSize_0.Y);
-            end
-        });
-    else
-        return v1.createElement("Folder", {
-            [v1.Ref] = v8.folderRef
-        });
-    end;
-end;
-v6.watchFolderAncestery = function(v10) --[[ Line: 41 ]] --[[ Name: watchFolderAncestery ]]
-    if v10.folderRef.current and v10.ancesteryConnection == nil then
-        local l_FirstAncestorWhichIsA_0 = v10.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector");
-        do
-            local l_l_FirstAncestorWhichIsA_0_0 = l_FirstAncestorWhichIsA_0;
-            if l_l_FirstAncestorWhichIsA_0_0 then
-                v10:setState({
-                    layerCollector = l_l_FirstAncestorWhichIsA_0_0
-                });
-            else
-                v10.ancesteryConnection = v10.folderRef.current.AncestryChanged:Connect(function() --[[ Line: 49 ]]
-                    -- upvalues: v10 (copy), l_l_FirstAncestorWhichIsA_0_0 (ref)
-                    if v10.folderRef.current then
-                        l_l_FirstAncestorWhichIsA_0_0 = v10.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector");
-                        if l_l_FirstAncestorWhichIsA_0_0 then
-                            v10:setState({
-                                layerCollector = l_l_FirstAncestorWhichIsA_0_0
-                            });
-                        end;
-                    end;
-                end);
-            end;
-        end;
-    end;
-end;
-v6.didMount = function(v13) --[[ Line: 63 ]] --[[ Name: didMount ]]
-    v13:watchFolderAncestery();
-end;
-v6.didUpdate = function(v14) --[[ Line: 67 ]] --[[ Name: didUpdate ]]
-    if not v14.state.layerCollector then
-        v14:watchFolderAncestery();
-        return;
-    else
-        if v14.ancesteryConnection then
-            v14.ancesteryConnection:Disconnect();
-            v14.ancesteryConnection = nil;
-        end;
-        return;
-    end;
-end;
-v6.willUnmount = function(v15) --[[ Line: 76 ]] --[[ Name: willUnmount ]]
-    if v15.ancesteryConnection then
-        v15.ancesteryConnection:Disconnect();
-        v15.ancesteryConnection = nil;
-    end;
-end;
-return v2.connect(nil, function(v16) --[[ Line: 83 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v4 (copy)
-    return {
-        setScreenSize = function(v17, v18) --[[ Line: 85 ]] --[[ Name: setScreenSize ]]
-            -- upvalues: v16 (copy), v4 (ref)
-            return v16(v4(v17, v18));
-        end
-    };
-end)(v6);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent.Parent
+local SetScreenSize = require(ParentParent.Actions.SetScreenSize)
+local EventConnection = require(script.Parent.EventConnection)
+local v7 = Roact.PureComponent:extend("ScreenSizeConnector")
+
+function v7.init(p1) -- line: 15
+	-- upvalues: Roact (copy)
+	p1.state = {
+		layerCollector = nil
+	}
+	p1.folderRef = Roact.createRef()
+end
+function v7.render(p2) -- line: 23
+	-- upvalues: Roact (copy), EventConnection (copy)
+	if p2.state.layerCollector then
+		local AbsoluteSize = p2.state.layerCollector.AbsoluteSize
+
+		p2.props.setScreenSize(AbsoluteSize.X, AbsoluteSize.Y)
+
+		return Roact.createElement(EventConnection, {
+			event = p2.state.layerCollector:GetPropertyChangedSignal("AbsoluteSize"),
+			callback = function() -- line: 29
+				-- upvalues: AbsoluteSize (ref), p2 (copy)
+				AbsoluteSize = p2.state.layerCollector.AbsoluteSize
+				p2.props.setScreenSize(AbsoluteSize.X, AbsoluteSize.Y)
+			end
+		})
+	end
+
+	return Roact.createElement("Folder", {
+		[Roact.Ref] = p2.folderRef
+	})
+end
+function v7.watchFolderAncestery(p3) -- line: 41
+	if p3.folderRef.current and p3.ancesteryConnection == nil then
+		local LayerCollector = p3.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
+
+		if LayerCollector then
+			p3:setState({
+				layerCollector = LayerCollector
+			})
+		else
+			p3.ancesteryConnection = p3.folderRef.current.AncestryChanged:Connect(function() -- line: 49
+				-- upvalues: p3 (copy), LayerCollector (ref)
+				if p3.folderRef.current then
+					LayerCollector = p3.folderRef.current:FindFirstAncestorWhichIsA("LayerCollector")
+
+					if LayerCollector then
+						p3:setState({
+							layerCollector = LayerCollector
+						})
+					end
+				end
+			end)
+		end
+	end
+end
+function v7.didMount(p4) -- line: 63
+	p4:watchFolderAncestery()
+end
+function v7.didUpdate(p5) -- line: 67
+	if not p5.state.layerCollector then
+		p5:watchFolderAncestery()
+
+		return
+	end
+
+	if p5.ancesteryConnection then
+		p5.ancesteryConnection:Disconnect()
+		p5.ancesteryConnection = nil
+	end
+end
+function v7.willUnmount(p6) -- line: 76
+	if p6.ancesteryConnection then
+		p6.ancesteryConnection:Disconnect()
+		p6.ancesteryConnection = nil
+	end
+end
+
+local function mapDispatchToProps(p7) -- line: 83
+	-- upvalues: SetScreenSize (copy)
+	return {
+		setScreenSize = function(p8, p9) -- line: 85
+			-- upvalues: p7 (copy), SetScreenSize (copy)
+			return p7(SetScreenSize(p8, p9))
+		end
+	}
+end
+
+return RoactRodux.connect(nil, mapDispatchToProps)(v7)

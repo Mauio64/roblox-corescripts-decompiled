@@ -1,36 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Enums.IconSize);
-local v4 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-return function(v5, v6) --[[ Line: 11 ]] --[[ Name: useIconButtonPadding ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-    local v7 = v4();
-    local v8 = v2.useMemo(function() --[[ Line: 14 ]]
-        -- upvalues: v6 (copy), v3 (ref), v7 (copy)
-        if v6 then
-            return {
-                [v3.XSmall] = v7.Size.Size_150, 
-                [v3.Small] = v7.Size.Size_200, 
-                [v3.Medium] = v7.Size.Size_250, 
-                [v3.Large] = v7.Size.Size_350
-            };
-        else
-            return {
-                [v3.XSmall] = v7.Size.Size_50, 
-                [v3.Small] = v7.Size.Size_50, 
-                [v3.Medium] = v7.Size.Size_100, 
-                [v3.Large] = v7.Size.Size_150, 
-                [v3.XLarge] = v7.Size.Size_200, 
-                [v3.XXLarge] = v7.Size.Size_250
-            };
-        end;
-    end, {
-        v7, 
-        v6
-    })[v5];
-    if v8 == nil then
-        error("Invalid icon button size: " .. v5);
-    end;
-    return v8;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local IconSize = require(Foundation.Enums.IconSize)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+
+local function useIconButtonPadding(p1, b1: boolean) -- line: 11
+	-- upvalues: useTokens (copy), React (copy), IconSize (copy)
+	local v9 = useTokens()
+	local v10 = React.useMemo(function() -- line: 14
+		-- upvalues: b1 (copy), IconSize (copy), v9 (copy)
+		if b1 then
+			return {
+				[IconSize.XSmall] = v9.Size.Size_150,
+				[IconSize.Small] = v9.Size.Size_200,
+				[IconSize.Medium] = v9.Size.Size_250,
+				[IconSize.Large] = v9.Size.Size_350
+			}
+		end
+
+		return {
+			[IconSize.XSmall] = v9.Size.Size_50,
+			[IconSize.Small] = v9.Size.Size_50,
+			[IconSize.Medium] = v9.Size.Size_100,
+			[IconSize.Large] = v9.Size.Size_150,
+			[IconSize.XLarge] = v9.Size.Size_200,
+			[IconSize.XXLarge] = v9.Size.Size_250
+		}
+	end, {
+		v9,
+		b1
+	})[p1]
+
+	if v10 == nil then
+		error("Invalid icon button size: " .. p1)
+	end
+
+	return v10
+end
+
+return useIconButtonPadding

@@ -1,233 +1,279 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_Players_0 = game:GetService("Players");
-local l_VRService_0 = game:GetService("VRService");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_AvatarUtil_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).AvatarUtil;
-local l_ConnectionUtil_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).ConnectionUtil;
-local v8 = game:DefineFastInt("VRAvatarGesturesAnalyticsThrottleHundrethsPercent", 0);
-local v9 = {};
-v9.__index = v9;
-v9.new = function() --[[ Line: 20 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy), l_ConnectionUtil_0 (copy), l_VRService_0 (copy)
-    local v10 = setmetatable({}, v9);
-    v10.connections = l_ConnectionUtil_0.new();
-    v10.VRPlayers = {};
-    v10.connections:connect("AvatarGestures", l_VRService_0:GetPropertyChangedSignal("AvatarGestures"), function() --[[ Line: 28 ]]
-        -- upvalues: v10 (copy)
-        v10:onAvatarGesturesChanged();
-    end);
-    if l_VRService_0.AvatarGestures then
-        v10:onAvatarGesturesChanged();
-    end;
-    return v10;
-end;
-cleanCharacter = function(v11) --[[ Line: 35 ]] --[[ Name: cleanCharacter ]]
-    if v11.Character then
-        local l_Humanoid_0 = v11.Character:FindFirstChild("Humanoid");
-        if l_Humanoid_0 then
-            for _, v14 in pairs({
-                "TrackedIKLeftHand", 
-                "TrackedIKRightHand", 
-                "TrackedIKHead"
-            }) do
-                local l_l_Humanoid_0_FirstChild_0 = l_Humanoid_0:FindFirstChild(v14);
-                if l_l_Humanoid_0_FirstChild_0 then
-                    l_l_Humanoid_0_FirstChild_0:Destroy();
-                end;
-            end;
-        end;
-        for _, v17 in pairs({
-            "TrackedLeftHand", 
-            "TrackedRightHand", 
-            "TrackedHead"
-        }) do
-            local l_FirstChild_0 = v11.Character:FindFirstChild(v17);
-            if l_FirstChild_0 then
-                l_FirstChild_0:Destroy();
-            end;
-        end;
-    end;
-end;
-v9.onPlayerChanged = function(v19, v20, v21) --[[ Line: 62 ]] --[[ Name: onPlayerChanged ]]
-    -- upvalues: l_AvatarUtil_0 (copy)
-    v19.VRPlayers[v20] = v21 or nil;
-    if v21 then
-        if not v19.avatarUtil then
-            v19.avatarUtil = l_AvatarUtil_0.new();
-        end;
-        v19.avatarUtil:connectPlayerCharacterChanges(v20, function(v22) --[[ Line: 71 ]]
-            -- upvalues: v19 (copy)
-            v19:onCharacterChanged(v22);
-        end);
-        return;
-    else
-        cleanCharacter(v20);
-        return;
-    end;
-end;
-v9.onPlayerAdded = function(v23, v24) --[[ Line: 79 ]] --[[ Name: onPlayerAdded ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), v8 (copy)
-    if next(v23.VRPlayers) ~= nil then
-        l_RbxAnalyticsService_0:ReportInfluxSeries("VRAvatarGestures", {
-            placeId = game.PlaceId, 
-            calledFrom = "ServerPlayerAddedWithVRPlayer", 
-            playerUserID = v24.UserId
-        }, v8);
-    end;
-end;
-v9.onAvatarGesturesChanged = function(v25) --[[ Line: 90 ]] --[[ Name: onAvatarGesturesChanged ]]
-    -- upvalues: l_VRService_0 (copy), l_RobloxReplicatedStorage_0 (copy), l_Players_0 (copy)
-    if l_VRService_0.AvatarGestures then
-        local l_AvatarGesturesVRPlayer_0 = l_RobloxReplicatedStorage_0:FindFirstChild("AvatarGesturesVRPlayer");
-        if not l_AvatarGesturesVRPlayer_0 then
-            l_AvatarGesturesVRPlayer_0 = Instance.new("RemoteEvent");
-            l_AvatarGesturesVRPlayer_0.Name = "AvatarGesturesVRPlayer";
-            l_AvatarGesturesVRPlayer_0.Parent = l_RobloxReplicatedStorage_0;
-        end;
-        v25.connections:connect("VRPlayerOnServerEvent", l_AvatarGesturesVRPlayer_0.OnServerEvent, function(v27, v28) --[[ Line: 101 ]]
-            -- upvalues: v25 (copy)
-            v25:onPlayerChanged(v27, v28);
-        end);
-        v25.connections:connect("PlayerAdded", l_Players_0.PlayerAdded, function(v29) --[[ Line: 104 ]]
-            -- upvalues: v25 (copy)
-            v25:onPlayerAdded(v29);
-        end);
-        v25.connections:connect("PlayerRemoving", l_Players_0.PlayerRemoving, function(v30) --[[ Line: 107 ]]
-            -- upvalues: v25 (copy)
-            v25:onPlayerChanged(v30, false);
-        end);
-        return;
-    else
-        for v31 in pairs(v25.VRPlayers) do
-            v25:onPlayerChanged(v31, false);
-        end;
-        v25.connections:disconnectAll();
-        v25.connections:connect("AvatarGestures", l_VRService_0:GetPropertyChangedSignal("AvatarGestures"), function() --[[ Line: 115 ]]
-            -- upvalues: v25 (copy)
-            v25:onAvatarGesturesChanged();
-        end);
-        return;
-    end;
-end;
-v9.findOrCreateColliders = function(_, v33, v34) --[[ Line: 121 ]] --[[ Name: findOrCreateColliders ]]
-    -- upvalues: l_Players_0 (copy)
-    local l_l_Players_0_PlayerFromCharacter_0 = l_Players_0:GetPlayerFromCharacter(v34);
-    local v36 = "Tracked" .. v33;
-    local l_v34_FirstChild_0 = v34:FindFirstChild(v36);
-    if not l_v34_FirstChild_0 then
-        l_v34_FirstChild_0 = Instance.new("Part");
-        l_v34_FirstChild_0.Name = v36;
-        l_v34_FirstChild_0.Transparency = 1;
-        l_v34_FirstChild_0.CanCollide = false;
-        l_v34_FirstChild_0.Parent = v34;
-        l_v34_FirstChild_0:SetNetworkOwner(l_l_Players_0_PlayerFromCharacter_0);
-    end;
-    local l_l_v34_FirstChild_0_FirstChild_0 = l_v34_FirstChild_0:FindFirstChild(v36 .. "Attachment");
-    if not l_l_v34_FirstChild_0_FirstChild_0 then
-        l_l_v34_FirstChild_0_FirstChild_0 = Instance.new("Attachment");
-        l_l_v34_FirstChild_0_FirstChild_0.Name = v36 .. "Attachment";
-        l_l_v34_FirstChild_0_FirstChild_0.Parent = l_v34_FirstChild_0;
-    end;
-    local l_l_v34_FirstChild_0_FirstChild_1 = l_v34_FirstChild_0:FindFirstChild(v36 .. "AlignPosition");
-    if not l_l_v34_FirstChild_0_FirstChild_1 then
-        l_l_v34_FirstChild_0_FirstChild_1 = Instance.new("AlignPosition");
-        l_l_v34_FirstChild_0_FirstChild_1.Name = v36 .. "AlignPosition";
-        l_l_v34_FirstChild_0_FirstChild_1.Mode = Enum.PositionAlignmentMode.OneAttachment;
-        l_l_v34_FirstChild_0_FirstChild_1.Attachment0 = l_l_v34_FirstChild_0_FirstChild_0;
-        l_l_v34_FirstChild_0_FirstChild_1.RigidityEnabled = true;
-        l_l_v34_FirstChild_0_FirstChild_1.Parent = l_v34_FirstChild_0;
-    end;
-    local l_l_v34_FirstChild_0_FirstChild_2 = l_v34_FirstChild_0:FindFirstChild(v36 .. "AlignOrientation");
-    if not l_l_v34_FirstChild_0_FirstChild_2 then
-        l_l_v34_FirstChild_0_FirstChild_2 = Instance.new("AlignOrientation");
-        l_l_v34_FirstChild_0_FirstChild_2.Name = v36 .. "AlignOrientation";
-        l_l_v34_FirstChild_0_FirstChild_2.Mode = Enum.OrientationAlignmentMode.OneAttachment;
-        l_l_v34_FirstChild_0_FirstChild_2.Attachment0 = l_l_v34_FirstChild_0_FirstChild_0;
-        l_l_v34_FirstChild_0_FirstChild_2.RigidityEnabled = true;
-        l_l_v34_FirstChild_0_FirstChild_2.Parent = l_v34_FirstChild_0;
-    end;
-    local l_v34_FirstChild_1 = v34:FindFirstChild(v33);
-    if l_v34_FirstChild_1 then
-        l_v34_FirstChild_0.Size = l_v34_FirstChild_1.Size;
-        l_v34_FirstChild_0.CFrame = l_v34_FirstChild_1.CFrame;
-        l_l_v34_FirstChild_0_FirstChild_1.Position = l_v34_FirstChild_1.Position;
-        l_l_v34_FirstChild_0_FirstChild_2.CFrame = l_v34_FirstChild_1.CFrame;
-    else
-        l_v34_FirstChild_0.Size = Vector3.new(1, 1, 1, 0);
-        l_v34_FirstChild_0.CFrame = v34.WorldPivot;
-        l_l_v34_FirstChild_0_FirstChild_1.Position = v34.WorldPivot.Position;
-        l_l_v34_FirstChild_0_FirstChild_2.CFrame = v34.WorldPivot;
-    end;
-    local l_Humanoid_1 = v34:FindFirstChild("Humanoid");
-    if l_Humanoid_1 then
-        local v43 = "TrackedIK" .. v33;
-        local l_l_Humanoid_1_FirstChild_0 = l_Humanoid_1:FindFirstChild(v43);
-        if not l_l_Humanoid_1_FirstChild_0 then
-            l_l_Humanoid_1_FirstChild_0 = Instance.new("IKControl");
-            l_l_Humanoid_1_FirstChild_0.Name = v43;
-        end;
-        l_l_Humanoid_1_FirstChild_0.SmoothTime = 0.1;
-        l_l_Humanoid_1_FirstChild_0.Parent = l_Humanoid_1;
-        l_l_Humanoid_1_FirstChild_0.Target = l_v34_FirstChild_0;
-    end;
-end;
-v9.createHandCollider = function(v45, v46, v47) --[[ Line: 196 ]] --[[ Name: createHandCollider ]]
-    v45:findOrCreateColliders(v46 .. "Hand", v47);
-    local l_v47_FirstChild_0 = v47:FindFirstChild(v46 .. "Hand");
-    local l_Humanoid_2 = v47:FindFirstChild("Humanoid");
-    if l_Humanoid_2 then
-        local l_l_Humanoid_2_FirstChild_0 = l_Humanoid_2:FindFirstChild("TrackedIK" .. v46 .. "Hand");
-        if l_l_Humanoid_2_FirstChild_0 then
-            l_l_Humanoid_2_FirstChild_0.Type = Enum.IKControlType.Transform;
-            local l_v47_FirstChild_1 = v47:FindFirstChild(v46 .. "UpperArm");
-            if l_v47_FirstChild_1 then
-                l_l_Humanoid_2_FirstChild_0.ChainRoot = l_v47_FirstChild_0;
-                coroutine.wrap(function() --[[ Line: 213 ]]
-                    -- upvalues: l_l_Humanoid_2_FirstChild_0 (copy), l_v47_FirstChild_1 (copy)
-                    task.wait(0.1);
-                    l_l_Humanoid_2_FirstChild_0.ChainRoot = l_v47_FirstChild_1;
-                end)();
-            end;
-            if l_v47_FirstChild_0 then
-                l_l_Humanoid_2_FirstChild_0.EndEffector = l_v47_FirstChild_0;
-            end;
-            l_l_Humanoid_2_FirstChild_0.Priority = 1;
-        end;
-    end;
-    if l_v47_FirstChild_0 then
-        local l_RagdollBallSocket_0 = l_v47_FirstChild_0:FindFirstChild("RagdollBallSocket");
-        if l_RagdollBallSocket_0 then
-            l_RagdollBallSocket_0.LimitsEnabled = false;
-        end;
-    end;
-end;
-v9.createHeadCollider = function(v53, v54) --[[ Line: 234 ]] --[[ Name: createHeadCollider ]]
-    v53:findOrCreateColliders("Head", v54);
-    local l_Head_0 = v54:FindFirstChild("Head");
-    local l_Humanoid_3 = v54:FindFirstChild("Humanoid");
-    if l_Humanoid_3 then
-        local l_TrackedIKHead_0 = l_Humanoid_3:FindFirstChild("TrackedIKHead");
-        if l_TrackedIKHead_0 then
-            l_TrackedIKHead_0.Type = Enum.IKControlType.Rotation;
-            local l_UpperTorso_0 = v54:FindFirstChild("UpperTorso");
-            if l_UpperTorso_0 then
-                l_TrackedIKHead_0.ChainRoot = l_UpperTorso_0;
-            end;
-            if l_Head_0 then
-                l_TrackedIKHead_0.EndEffector = l_Head_0;
-            end;
-        end;
-    end;
-end;
-v9.onCharacterChanged = function(v59, v60) --[[ Line: 260 ]] --[[ Name: onCharacterChanged ]]
-    -- upvalues: l_Players_0 (copy), l_VRService_0 (copy)
-    local l_l_Players_0_PlayerFromCharacter_1 = l_Players_0:GetPlayerFromCharacter(v60);
-    if v59.VRPlayers[l_l_Players_0_PlayerFromCharacter_1] and l_VRService_0.AvatarGestures then
-        v59:createHandCollider("Left", v60);
-        v59:createHandCollider("Right", v60);
-        v59:createHeadCollider(v60);
-    end;
-end;
-return v9;
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local Players = game:GetService("Players")
+local VRService = game:GetService("VRService")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local AvatarUtil = require(CorePackages.Workspace.Packages.CoreScriptsCommon).AvatarUtil
+local ConnectionUtil = require(CorePackages.Workspace.Packages.CoreScriptsCommon).ConnectionUtil
+local v8 = game:DefineFastInt("VRAvatarGesturesAnalyticsThrottleHundrethsPercent", 0)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 20
+	-- upvalues: t1 (copy), ConnectionUtil (copy), VRService (copy)
+	local self = setmetatable({}, t1)
+
+	self.connections = ConnectionUtil.new()
+	self.VRPlayers = {}
+	self.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function() -- line: 28
+		-- upvalues: self (copy)
+		self:onAvatarGesturesChanged()
+	end)
+
+	if VRService.AvatarGestures then
+		self:onAvatarGesturesChanged()
+	end
+
+	return self
+end
+function cleanCharacter(p1) -- line: 35
+	if p1.Character then
+		local Humanoid = p1.Character:FindFirstChild("Humanoid")
+
+		if Humanoid then
+			for _, v in pairs({
+				"TrackedIKLeftHand",
+				"TrackedIKRightHand",
+				"TrackedIKHead"
+			}) do
+				local v2 = Humanoid:FindFirstChild(v)
+
+				if v2 then
+					v2:Destroy()
+				end
+			end
+		end
+
+		for _, v in pairs({
+			"TrackedLeftHand",
+			"TrackedRightHand",
+			"TrackedHead"
+		}) do
+			local v3 = p1.Character:FindFirstChild(v)
+
+			if v3 then
+				v3:Destroy()
+			end
+		end
+	end
+end
+function t1.onPlayerChanged(p2, p3, p4) -- line: 62
+	-- upvalues: AvatarUtil (copy)
+	p2.VRPlayers[p3] = p4 or nil
+
+	if p4 then
+		if not p2.avatarUtil then
+			p2.avatarUtil = AvatarUtil.new()
+		end
+
+		p2.avatarUtil:connectPlayerCharacterChanges(p3, function(p5) -- line: 71
+			-- upvalues: p2 (copy)
+			p2:onCharacterChanged(p5)
+		end)
+
+		return
+	end
+
+	cleanCharacter(p3)
+end
+function t1.onPlayerAdded(p6, p7) -- line: 79
+	-- upvalues: RbxAnalyticsService (copy), v8 (copy)
+	if next(p6.VRPlayers) ~= nil then
+		RbxAnalyticsService:ReportInfluxSeries("VRAvatarGestures", {
+			calledFrom = "ServerPlayerAddedWithVRPlayer",
+			placeId = game.PlaceId,
+			playerUserID = p7.UserId
+		}, v8)
+	end
+end
+function t1.onAvatarGesturesChanged(p8) -- line: 90
+	-- upvalues: VRService (copy), RobloxReplicatedStorage (copy), Players (copy)
+	if VRService.AvatarGestures then
+		local AvatarGesturesVRPlayer = RobloxReplicatedStorage:FindFirstChild("AvatarGesturesVRPlayer")
+
+		if not AvatarGesturesVRPlayer then
+			AvatarGesturesVRPlayer = Instance.new("RemoteEvent")
+			AvatarGesturesVRPlayer.Name = "AvatarGesturesVRPlayer"
+			AvatarGesturesVRPlayer.Parent = RobloxReplicatedStorage
+		end
+
+		p8.connections:connect("VRPlayerOnServerEvent", AvatarGesturesVRPlayer.OnServerEvent, function(p9, p10) -- line: 101
+			-- upvalues: p8 (copy)
+			p8:onPlayerChanged(p9, p10)
+		end)
+		p8.connections:connect("PlayerAdded", Players.PlayerAdded, function(p11) -- line: 104
+			-- upvalues: p8 (copy)
+			p8:onPlayerAdded(p11)
+		end)
+		p8.connections:connect("PlayerRemoving", Players.PlayerRemoving, function(p12) -- line: 107
+			-- upvalues: p8 (copy)
+			p8:onPlayerChanged(p12, false)
+		end)
+
+		return
+	end
+
+	for k in pairs(p8.VRPlayers) do
+		p8:onPlayerChanged(k, false)
+	end
+
+	p8.connections:disconnectAll()
+	p8.connections:connect("AvatarGestures", VRService:GetPropertyChangedSignal("AvatarGestures"), function() -- line: 115
+		-- upvalues: p8 (copy)
+		p8:onAvatarGesturesChanged()
+	end)
+end
+function t1.findOrCreateColliders(_, p14, p15) -- line: 121
+	-- upvalues: Players (copy)
+	local player = Players:GetPlayerFromCharacter(p15)
+	local v31 = "Tracked" .. p14
+	local v32 = p15:FindFirstChild(v31)
+
+	if not v32 then
+		v32 = Instance.new("Part")
+		v32.Name = v31
+		v32.Transparency = 1
+		v32.CanCollide = false
+		v32.Parent = p15
+		v32:SetNetworkOwner(player)
+	end
+
+	local v33 = v32:FindFirstChild(v31 .. "Attachment")
+
+	if not v33 then
+		v33 = Instance.new("Attachment")
+		v33.Name = v31 .. "Attachment"
+		v33.Parent = v32
+	end
+
+	local v34 = v32:FindFirstChild(v31 .. "AlignPosition")
+
+	if not v34 then
+		v34 = Instance.new("AlignPosition")
+		v34.Name = v31 .. "AlignPosition"
+		v34.Mode = Enum.PositionAlignmentMode.OneAttachment
+		v34.Attachment0 = v33
+		v34.RigidityEnabled = true
+		v34.Parent = v32
+	end
+
+	local v35 = v32:FindFirstChild(v31 .. "AlignOrientation")
+
+	if not v35 then
+		v35 = Instance.new("AlignOrientation")
+		v35.Name = v31 .. "AlignOrientation"
+		v35.Mode = Enum.OrientationAlignmentMode.OneAttachment
+		v35.Attachment0 = v33
+		v35.RigidityEnabled = true
+		v35.Parent = v32
+	end
+
+	local p14_2 = p15:FindFirstChild(p14)
+
+	if p14_2 then
+		v32.Size = p14_2.Size
+		v32.CFrame = p14_2.CFrame
+		v34.Position = p14_2.Position
+		v35.CFrame = p14_2.CFrame
+	else
+		v32.Size = Vector3.new(1, 1, 1)
+		v32.CFrame = p15.WorldPivot
+		v34.Position = p15.WorldPivot.Position
+		v35.CFrame = p15.WorldPivot
+	end
+
+	local Humanoid = p15:FindFirstChild("Humanoid")
+
+	if Humanoid then
+		local v38 = "TrackedIK" .. p14
+		local v39 = Humanoid:FindFirstChild(v38)
+
+		if not v39 then
+			v39 = Instance.new("IKControl")
+			v39.Name = v38
+		end
+
+		v39.SmoothTime = 0.1
+		v39.Parent = Humanoid
+		v39.Target = v32
+	end
+end
+function t1.createHandCollider(p16, p17, p18) -- line: 196
+	p16:findOrCreateColliders(p17 .. "Hand", p18)
+
+	local v43 = p18:FindFirstChild(p17 .. "Hand")
+	local Humanoid = p18:FindFirstChild("Humanoid")
+
+	if Humanoid then
+		local v45 = Humanoid:FindFirstChild("TrackedIK" .. p17 .. "Hand")
+
+		if v45 then
+			v45.Type = Enum.IKControlType.Transform
+
+			local v46 = p18:FindFirstChild(p17 .. "UpperArm")
+
+			if v46 then
+				v45.ChainRoot = v43
+				coroutine.wrap(function() -- line: 213
+					-- upvalues: v45 (copy), v46 (copy)
+					task.wait(0.1)
+					v45.ChainRoot = v46
+				end)()
+			end
+
+			if v43 then
+				v45.EndEffector = v43
+			end
+
+			v45.Priority = 1
+		end
+	end
+
+	if v43 then
+		local RagdollBallSocket = v43:FindFirstChild("RagdollBallSocket")
+
+		if RagdollBallSocket then
+			RagdollBallSocket.LimitsEnabled = false
+		end
+	end
+end
+function t1.createHeadCollider(p19, p20) -- line: 234
+	p19:findOrCreateColliders("Head", p20)
+
+	local Head = p20:FindFirstChild("Head")
+	local Humanoid = p20:FindFirstChild("Humanoid")
+
+	if Humanoid then
+		local TrackedIKHead = Humanoid:FindFirstChild("TrackedIKHead")
+
+		if TrackedIKHead then
+			TrackedIKHead.Type = Enum.IKControlType.Rotation
+
+			local UpperTorso = p20:FindFirstChild("UpperTorso")
+
+			if UpperTorso then
+				TrackedIKHead.ChainRoot = UpperTorso
+			end
+
+			if Head then
+				TrackedIKHead.EndEffector = Head
+			end
+		end
+	end
+end
+function t1.onCharacterChanged(p21, p22) -- line: 260
+	-- upvalues: Players (copy), VRService (copy)
+	local player = Players:GetPlayerFromCharacter(p22)
+
+	if p21.VRPlayers[player] and VRService.AvatarGestures then
+		p21:createHandCollider("Left", p22)
+		p21:createHandCollider("Right", p22)
+		p21:createHeadCollider(p22)
+	end
+end
+
+return t1

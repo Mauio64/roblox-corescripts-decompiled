@@ -1,97 +1,108 @@
-local l_Parent_0 = script:FindFirstAncestor("EditProfile").Parent;
-local v1 = require(l_Parent_0.React);
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v3 = require(l_Parent_0.RoactUtils);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_useSelector_0 = v3.Hooks.RoactRodux.useSelector;
-local l_useSelectedTheme_0 = v3.Hooks.useSelectedTheme;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_getDisplayBackgroundId_0 = require(l_Parent_0.EditProfileBackground).BackgroundUtils.getDisplayBackgroundId;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v10 = Color3.fromRGB(185, 185, 185);
-local v11 = Color3.fromRGB(200, 200, 200);
-local l_InsertService_0 = game:GetService("InsertService");
-return function(v13) --[[ Line: 40 ]] --[[ Name: EditProfileBackgroundViewport ]]
-    -- upvalues: v1 (copy), l_useSelectedTheme_0 (copy), l_useLocalUserId_0 (copy), l_useSelector_0 (copy), l_InsertService_0 (copy), l_getDisplayBackgroundId_0 (copy), v10 (copy), v11 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_View_0 (copy)
-    local v14 = v1.useRef(nil);
-    local v15 = v1.useRef(nil);
-    local v16 = v1.useRef(nil);
-    local v17 = l_useSelectedTheme_0();
-    local v18 = l_useLocalUserId_0();
-    local v21 = l_useSelector_0(function(v19) --[[ Line: 47 ]]
-        -- upvalues: v18 (copy)
-        if v19.ProfilePlatform and v19.ProfilePlatform.Profiles and v18 then
-            local v20 = v19.ProfilePlatform.Profiles.User[tostring(v18)];
-            if v20 and v20.components and v20.components.ProfileBackground then
-                return v20.components.ProfileBackground.assetId;
-            end;
-        end;
-        return -1;
-    end);
-    v1.useEffect(function() --[[ Line: 58 ]]
-        -- upvalues: v21 (copy), l_InsertService_0 (ref), l_getDisplayBackgroundId_0 (ref), v17 (copy), v15 (copy), v14 (copy), v10 (ref), v11 (ref)
-        task.defer(function() --[[ Line: 60 ]]
-            -- upvalues: v21 (ref), l_InsertService_0 (ref), l_getDisplayBackgroundId_0 (ref), v17 (ref), v15 (ref), v14 (ref), v10 (ref), v11 (ref)
-            if not v21 then
-                return;
-            else
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 65 ]]
-                    -- upvalues: l_InsertService_0 (ref), l_getDisplayBackgroundId_0 (ref), v21 (ref), v17 (ref)
-                    return l_InsertService_0:LoadAsset(l_getDisplayBackgroundId_0(v21, v17));
-                end);
-                if l_status_0 and l_result_0 then
-                    if v15.current then
-                        for _, v25 in pairs(v15.current:GetChildren()) do
-                            v25:Destroy();
-                        end;
-                    end;
-                    local l_Model_0 = Instance.new("Model");
-                    l_Model_0.Name = "BackgroundModel";
-                    l_Model_0.Parent = v15.current;
-                    for _, v28 in pairs(l_result_0:GetChildren()) do
-                        v28.Parent = l_Model_0;
-                    end;
-                    l_Model_0:PivotTo(CFrame.new(0, 7, -4.5));
-                    l_result_0:Destroy();
-                    local l_current_0 = v14.current;
-                    if l_current_0 then
-                        l_current_0.Ambient = v10;
-                        l_current_0.LightColor = v11;
-                        l_current_0.LightDirection = Vector3.new(0, 0.20000000298023224, 0.20000000298023224, 0);
-                    end;
-                end;
-                return;
-            end;
-        end);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v21, 
-        v17
-    } else l_dependencyArray_0(v21, v17));
-    v1.useEffect(function() --[[ Line: 102 ]]
-        -- upvalues: v14 (copy), v16 (copy)
-        if v14.current and v16.current then
-            v14.current.CurrentCamera = v16.current;
-        end;
-    end);
-    return v1.createElement(l_View_0, {
-        Size = UDim2.new(1, 0, 0, v13.height)
-    }, {
-        Background = v1.createElement("ViewportFrame", {
-            Size = UDim2.fromScale(1, 1), 
-            ZIndex = 1, 
-            ref = v14, 
-            Ambient = v10, 
-            LightColor = v11, 
-            BackgroundTransparency = 1
-        }, {
-            WorldModel = v1.createElement("WorldModel", {
-                ref = v15
-            }), 
-            Camera = v1.createElement("Camera", {
-                CameraType = Enum.CameraType.Scriptable, 
-                CFrame = CFrame.lookAt(Vector3.new(0, 7, 4, 0), (Vector3.new(0, 7, 10, 0))), 
-                ref = v16
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("EditProfile").Parent
+local React = require(Parent.React)
+local View = require(Parent.Foundation).View
+local RoactUtils = require(Parent.RoactUtils)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useSelectedTheme = RoactUtils.Hooks.useSelectedTheme
+local useLocalUserId = require(Parent.RobloxAppHooks).useLocalUserId
+local getDisplayBackgroundId = require(Parent.EditProfileBackground).BackgroundUtils.getDisplayBackgroundId
+local color3 = Color3.fromRGB(185, 185, 185)
+local color3_2 = Color3.fromRGB(200, 200, 200)
+local InsertService = game:GetService("InsertService")
+
+local function EditProfileBackgroundViewport(t1: {[any]: any}) -- line: 37
+	-- upvalues: React (copy), useSelectedTheme (copy), useLocalUserId (copy), useSelector (copy), InsertService (copy), getDisplayBackgroundId (copy), color3 (copy), color3_2 (copy), View (copy)
+	local v14 = React.useRef(nil)
+	local v15 = React.useRef(nil)
+	local v16 = React.useRef(nil)
+	local v17 = useSelectedTheme()
+	local v18 = useLocalUserId()
+	local v19 = useSelector(function(p1) -- line: 44
+		-- upvalues: v18 (copy)
+		if p1.ProfilePlatform and (p1.ProfilePlatform.Profiles and v18) then
+			local v21 = p1.ProfilePlatform.Profiles.User[tostring(v18)]
+
+			if v21 and v21.components and v21.components.ProfileBackground then
+				return v21.components.ProfileBackground.assetId
+			end
+		end
+
+		return -1
+	end)
+
+	React.useEffect(function() -- line: 54
+		-- upvalues: v19 (copy), InsertService (copy), getDisplayBackgroundId (copy), v17 (copy), v15 (copy), v14 (copy), color3 (copy), color3_2 (copy)
+		task.defer(function() -- line: 56
+			-- upvalues: v19 (copy), InsertService (copy), getDisplayBackgroundId (copy), v17 (copy), v15 (copy), v14 (copy), color3 (copy), color3_2 (copy)
+			if not v19 then
+				return
+			end
+
+			local ok, result = pcall(function() -- line: 61
+				-- upvalues: InsertService (copy), getDisplayBackgroundId (copy), v19 (copy), v17 (copy)
+				return InsertService:LoadAsset(getDisplayBackgroundId(v19, v17))
+			end)
+
+			if ok and result then
+				if v15.current then
+					for _, child in pairs(v15.current:GetChildren()) do
+						child:Destroy()
+					end
+				end
+
+				local Model = Instance.new("Model")
+
+				Model.Name = "BackgroundModel"
+				Model.Parent = v15.current
+
+				for _, child in pairs(result:GetChildren()) do
+					child.Parent = Model
+				end
+
+				Model:PivotTo(CFrame.new(0, 7, -4.5))
+				result:Destroy()
+
+				local current = v14.current
+
+				if current then
+					current.Ambient = color3
+					current.LightColor = color3_2
+					current.LightDirection = Vector3.new(0, 0.20000000298023224, 0.20000000298023224)
+				end
+			end
+		end)
+	end, {
+		v19,
+		v17
+	})
+	React.useEffect(function() -- line: 94
+		-- upvalues: v14 (copy), v16 (copy)
+		if v14.current and v16.current then
+			v14.current.CurrentCamera = v16.current
+		end
+	end)
+
+	return React.createElement(View, {
+		Size = UDim2.new(1, 0, 0, t1.height)
+	}, {
+		Background = React.createElement("ViewportFrame", {
+			ZIndex = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			ref = v14,
+			Ambient = color3,
+			LightColor = color3_2
+		}, {
+			WorldModel = React.createElement("WorldModel", {
+				ref = v15
+			}),
+			Camera = React.createElement("Camera", {
+				CameraType = Enum.CameraType.Scriptable,
+				CFrame = CFrame.lookAt(Vector3.new(0, 7, 4), (Vector3.new(0, 7, 10))),
+				ref = v16
+			})
+		})
+	})
+end
+
+return EditProfileBackgroundViewport

@@ -1,1 +1,1 @@
-return require(script.ProfileQRCodePageWrapper);
+return require(script.ProfileQRCodePageWrapper)

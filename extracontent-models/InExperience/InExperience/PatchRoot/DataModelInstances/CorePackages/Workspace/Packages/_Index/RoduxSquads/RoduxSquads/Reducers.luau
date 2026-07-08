@@ -1,10 +1,11 @@
-local v0 = require(script.currentSquad);
-local v1 = require(script.currentExperienceInvite);
-local v2 = require(script.currentExperienceInviteStatus);
-local v3 = require(script.partialSquads);
+local currentSquad = require(script.currentSquad)
+local currentExperienceInvite = require(script.currentExperienceInvite)
+local currentExperienceInviteStatus = require(script.currentExperienceInviteStatus)
+local partialSquads = require(script.partialSquads)
+
 return {
-    currentSquad = v0, 
-    currentExperienceInvite = v1, 
-    currentExperienceInviteStatus = v2, 
-    partialSquads = v3
-};
+	currentSquad = currentSquad,
+	currentExperienceInvite = currentExperienceInvite,
+	currentExperienceInviteStatus = currentExperienceInviteStatus,
+	partialSquads = partialSquads
+}

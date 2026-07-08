@@ -1,127 +1,141 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_Checkbox_0 = v2.Checkbox;
-local l_Image_0 = v2.Image;
-local l_ScaleType_0 = Enum.ScaleType;
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local _ = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes);
-local v12 = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-local v13 = require(l_script_FirstAncestor_0.Bedui.Components.ComponentSubtext);
-local v14 = require(l_script_FirstAncestor_0.Bedui.Utils.getPlaceMediaAssetIds);
-local v15 = require(l_script_FirstAncestor_0.Bedui.Provider.useFormData);
-local v16 = UDim2.fromOffset(180, 101);
-local v17 = {
-    [v12.Place] = "THUMBNAIL_IDS"
-};
-return v3.memo(function(v18) --[[ Line: 38 ]] --[[ Name: Selector ]]
-    -- upvalues: v3 (copy), v15 (copy), l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), v12 (copy), v14 (copy), v17 (copy), l_View_0 (copy), l_Checkbox_0 (copy), l_Image_0 (copy), l_ScaleType_0 (copy), v16 (copy), l_Text_0 (copy), v13 (copy)
-    local v19, v20 = v3.useState({});
-    local v21, v22 = v3.useState({});
-    local l_custom_0 = v15().custom;
-    local l_updateForm_0 = v15().updateForm;
-    local l_updateAdditionalReportTags_0 = v15().updateAdditionalReportTags;
-    local v26 = l_useRoactService_0(l_RoactNetworking_0);
-    local v27 = v3.useRef((("selector-%*"):format((DateTime.now()))));
-    v3.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v18 (copy), v12 (ref), v14 (ref), v26 (copy), l_custom_0 (copy), v20 (copy)
-        if v18.abuseVector == v12.Place then
-            v14(v26, (tostring(l_custom_0 and l_custom_0.universeId))):andThen(function(v28) --[[ Line: 54 ]]
-                -- upvalues: v20 (ref)
-                v20(v28);
-            end);
-        end;
-    end, {
-        v18.abuseVector, 
-        v14, 
-        v26, 
-        l_custom_0 and l_custom_0.universeId
-    });
-    local v34 = v3.useCallback(function(v29) --[[ Line: 61 ]]
-        -- upvalues: v22 (copy), v18 (copy), v12 (ref), l_updateAdditionalReportTags_0 (copy), v27 (copy), v17 (ref)
-        v22(function(v30) --[[ Line: 62 ]]
-            -- upvalues: v29 (copy), v18 (ref), v12 (ref), l_updateAdditionalReportTags_0 (ref), v27 (ref), v17 (ref)
-            local v31 = table.clone(v30);
-            local v32 = table.find(v31, v29);
-            if v32 then
-                table.remove(v31, v32);
-            else
-                table.insert(v31, v29);
-            end;
-            if v18.abuseVector == v12.Place then
-                local v33 = table.concat(v31, ",");
-                if l_updateAdditionalReportTags_0 then
-                    l_updateAdditionalReportTags_0(v27.current, {
-                        tagKey = v17[v18.abuseVector], 
-                        tagValue = v33
-                    });
-                end;
-            end;
-            return v31;
-        end);
-    end, {
-        v18.component, 
-        v18.abuseVector, 
-        l_updateForm_0
-    });
-    local v38 = v3.useMemo(function() --[[ Line: 85 ]]
-        -- upvalues: v19 (copy), v3 (ref), l_View_0 (ref), l_Checkbox_0 (ref), v21 (copy), v34 (copy), l_Image_0 (ref), l_ScaleType_0 (ref), v16 (ref)
-        local v35 = {};
-        for v36, v37 in ipairs(v19) do
-            table.insert(v35, v3.createElement(l_View_0, {
-                tag = "size-0-0 auto-xy row gap-small self-center border-radius-medium padding-small", 
-                LayoutOrder = v36
-            }, {
-                Checkbox = v3.createElement(l_Checkbox_0, {
-                    label = "", 
-                    isChecked = table.find(v21, v37) ~= nil, 
-                    onActivated = function() --[[ Line: 97 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v34 (ref), v37 (copy)
-                        v34(v37);
-                    end
-                }), 
-                Image = v3.createElement(l_Image_0, {
-                    Image = ("rbxthumb://type=Asset&id=%*&w=768&h=432"):format(v37), 
-                    ScaleType = l_ScaleType_0.Fit, 
-                    Size = v16, 
-                    onActivated = function() --[[ Line: 105 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v34 (ref), v37 (copy)
-                        v34(v37);
-                    end
-                })
-            }));
-        end;
-        return v35;
-    end, {
-        v19, 
-        v21
-    });
-    if #v19 ~= 0 then
-        return (v3.createElement(l_View_0, {
-            tag = "size-full-0 auto-y col gap-small", 
-            LayoutOrder = v18.layoutOrder
-        }, {
-            Prompt = v3.createElement(l_Text_0, {
-                Text = v18.component.selector.prompt, 
-                tag = "auto-xy", 
-                LayoutOrder = 0
-            }), 
-            CheckboxGroup = v3.createElement(l_View_0, {
-                tag = "size-full-0 auto-y col", 
-                LayoutOrder = 1
-            }, v38), 
-            ComponentSubtext = v3.createElement(v13, {
-                isErrorState = v18.isErrorState, 
-                isOptional = v18.component.isOptional, 
-                requirementMessage = v18.component.requirementMessage, 
-                layoutOrder = 2
-            })
-        }));
-    else
-        return nil;
-    end;
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local Foundation = require(GenericAbuseReportingParent.Foundation)
+local React = require(GenericAbuseReportingParent.React)
+local RoactNetworking = require(GenericAbuseReportingParent.RoactServiceTags).RoactNetworking
+local useRoactService = require(GenericAbuseReportingParent.RobloxAppHooks).useRoactService
+local Checkbox = Foundation.Checkbox
+local FoundationImage = Foundation.Image
+local EnumScaleType = Enum.ScaleType
+local FoundationText = Foundation.Text
+local View = Foundation.View
+
+require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
+
+local AbuseVector = require(GenericAbuseReporting.Enums.AbuseVector)
+local ComponentSubtext = require(GenericAbuseReporting.Bedui.Components.ComponentSubtext)
+local getPlaceMediaAssetIds = require(GenericAbuseReporting.Bedui.Utils.getPlaceMediaAssetIds)
+local useFormData = require(GenericAbuseReporting.Bedui.Provider.useFormData)
+local uDim2 = UDim2.fromOffset(180, 101)
+local t1 = {
+	[AbuseVector.Place] = "THUMBNAIL_IDS"
+}
+
+local function Selector(t2: {[any]: any}) -- line: 38
+	-- upvalues: React (copy), useFormData (copy), useRoactService (copy), RoactNetworking (copy), AbuseVector (copy), getPlaceMediaAssetIds (copy), t1 (copy), View (copy), Checkbox (copy), FoundationImage (copy), EnumScaleType (copy), uDim2 (copy), FoundationText (copy), ComponentSubtext (copy)
+	local v20, v21 = React.useState({})
+	local v22, v23 = React.useState({})
+	local custom = useFormData().custom
+	local updateForm = useFormData().updateForm
+	local updateAdditionalReportTags = useFormData().updateAdditionalReportTags
+	local v27 = useRoactService(RoactNetworking)
+	local v28 = React.useRef(`selector-{ DateTime.now() }`)
+
+	React.useEffect(function() -- line: 52
+		-- upvalues: t2 (copy), AbuseVector (copy), getPlaceMediaAssetIds (copy), v27 (copy), custom (copy), v21 (copy)
+		if t2.abuseVector == AbuseVector.Place then
+			getPlaceMediaAssetIds(v27, (tostring(custom and custom.universeId))):andThen(function(p1) -- line: 54
+				-- upvalues: v21 (copy)
+				v21(p1)
+			end)
+		end
+	end, {
+		t2.abuseVector,
+		getPlaceMediaAssetIds,
+		v27,
+		custom and custom.universeId
+	})
+
+	local v29 = React.useCallback(function(s1: string) -- line: 61
+		-- upvalues: v23 (copy), t2 (copy), AbuseVector (copy), updateAdditionalReportTags (copy), v28 (copy), t1 (copy)
+		v23(function(p2) -- line: 62
+			-- upvalues: s1 (copy), t2 (copy), AbuseVector (copy), updateAdditionalReportTags (copy), v28 (copy), t1 (copy)
+			local v37 = table.clone(p2)
+			local v38 = table.find(v37, s1)
+
+			if v38 then
+				table.remove(v37, v38)
+			else
+				table.insert(v37, s1)
+			end
+
+			if t2.abuseVector == AbuseVector.Place then
+				local v39 = table.concat(v37, ",")
+
+				if updateAdditionalReportTags then
+					updateAdditionalReportTags(v28.current, {
+						tagKey = t1[t2.abuseVector],
+						tagValue = v39
+					})
+				end
+			end
+
+			return v37
+		end)
+	end, {
+		t2.component,
+		t2.abuseVector,
+		updateForm
+	})
+	local v30 = React.useMemo(function() -- line: 85
+		-- upvalues: v20 (copy), React (copy), View (copy), Checkbox (copy), v22 (copy), v29 (copy), FoundationImage (copy), EnumScaleType (copy), uDim2 (copy)
+		local t3 = {}
+
+		for i, v in ipairs(v20) do
+			table.insert(t3, React.createElement(View, {
+				tag = "size-0-0 auto-xy row gap-small self-center border-radius-medium padding-small",
+				LayoutOrder = i
+			}, {
+				Checkbox = React.createElement(Checkbox, {
+					label = "",
+					isChecked = table.find(v22, v) ~= nil,
+					onActivated = function() -- line: 97
+						-- upvalues: v29 (copy), v (copy)
+						v29(v)
+					end
+				}),
+				Image = React.createElement(FoundationImage, {
+					Image = `rbxthumb://type=Asset&id={ v }&w=768&h=432`,
+					ScaleType = EnumScaleType.Fit,
+					Size = uDim2,
+					onActivated = function() -- line: 105
+						-- upvalues: v29 (copy), v (copy)
+						v29(v)
+					end
+				})
+			}))
+		end
+
+		return t3
+	end, {
+		v20,
+		v22
+	})
+
+	if #v20 ~= 0 then
+		return (React.createElement(View, {
+			tag = "size-full-0 auto-y col gap-small",
+			LayoutOrder = t2.layoutOrder
+		}, {
+			Prompt = React.createElement(FoundationText, {
+				tag = "auto-xy",
+				LayoutOrder = 0,
+				Text = t2.component.selector.prompt
+			}),
+			CheckboxGroup = React.createElement(View, {
+				tag = "size-full-0 auto-y col",
+				LayoutOrder = 1
+			}, v30),
+			ComponentSubtext = React.createElement(ComponentSubtext, {
+				layoutOrder = 2,
+				isErrorState = t2.isErrorState,
+				isOptional = t2.component.isOptional,
+				requirementMessage = t2.component.requirementMessage
+			})
+		}))
+	end
+
+	return nil
+end
+
+return React.memo(Selector)

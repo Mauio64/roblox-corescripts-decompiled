@@ -1,109 +1,164 @@
-local l_script_0 = script;
-local l_Parent_0 = l_script_0.Parent;
-local v2 = require(l_Parent_0.PurchasePromptDeps);
-local l_RunService_0 = game:GetService("RunService");
-local l_Roact_0 = v2.Roact;
-local l_Rodux_0 = v2.Rodux;
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v7 = require(script.Components.PurchasePromptApp);
-local v8 = require(l_script_0.Reducers.Reducer);
-local v9 = require(l_script_0.Services.ABTest);
-local v10 = require(l_script_0.Services.Network);
-local v11 = require(l_script_0.Services.Analytics);
-local v12 = require(l_script_0.Services.PlatformInterface);
-local v13 = require(l_script_0.Services.ExternalSettings);
-local v14 = require(l_script_0.Services.PublicBindables);
-local v15 = require(l_script_0.Thunk);
-local v16 = require(l_script_0.Thunks.initiateAvatarCreationFeePurchase);
-local v17 = require(l_script_0.Components.UnifiedPurchasePrompt);
-local l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 = require(l_script_0.Parent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow;
-local _ = require(l_script_0.types);
-local l_FFlagEnableUnifiedProductPurchaseFlow_0 = require(l_script_0.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow;
-local l_FFlagPurchasePromptSubtitleForTimedOptions_0 = require(l_script_0.Parent.SharedFlags).FFlagPurchasePromptSubtitleForTimedOptions;
-local v22 = require(l_script_0.Enums.WindowState);
-local v23 = require(l_script_0.Enums.PromptState);
-local v24 = require(l_script_0.Utils.PublishAssetAnalytics);
-local v25 = nil;
-local v26 = nil;
-local l_BindableEvent_0 = Instance.new("BindableEvent");
-local l_BindableEvent_1 = Instance.new("BindableEvent");
-local function v37() --[[ Line: 44 ]] --[[ Name: createStore ]]
-    -- upvalues: v9 (copy), v10 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), l_BindableEvent_0 (copy), v26 (ref), l_Rodux_0 (copy), v8 (copy), v15 (copy), v22 (copy), v23 (copy), l_BindableEvent_1 (copy)
-    local v29 = v9.new();
-    local v30 = v10.new();
-    local v31 = v11.new();
-    local v32 = v12.new();
-    local v33 = v13.new();
-    local v34 = v14.new({
-        windowStateChangedBindable = l_BindableEvent_0
-    });
-    v26 = l_Rodux_0.Store.new(v8, {}, {
-        v15.middleware({
-            [v9] = v29, 
-            [v10] = v30, 
-            [v11] = v31, 
-            [v12] = v32, 
-            [v13] = v33, 
-            [v14] = v34
-        })
-    });
-    v26.changed:connect(function(v35, v36) --[[ Line: 66 ]]
-        -- upvalues: l_BindableEvent_0 (ref), v22 (ref), v23 (ref), l_BindableEvent_1 (ref)
-        if v36.windowState ~= v35.windowState then
-            l_BindableEvent_0:Fire({
-                isShown = v35.windowState == v22.Shown, 
-                hasCompletedPurchase = v35.hasCompletedPurchase
-            });
-        end;
-        if v36.promptState ~= v35.promptState and v35.promptState == v23.None then
-            l_BindableEvent_1:Fire();
-        end;
-    end);
-end;
-local function v39() --[[ Line: 82 ]]
-    -- upvalues: l_RunService_0 (copy), v25 (ref), v37 (copy), l_Roact_0 (copy), v7 (copy), v26 (ref), l_CoreGui_0 (copy)
-    if l_RunService_0:IsStudio() and l_RunService_0:IsEdit() or v25 then
-        return nil;
-    else
-        v37();
-        local v38 = l_Roact_0.createElement("ScreenGui", {
-            AutoLocalize = false, 
-            IgnoreGuiInset = true
-        }, {
-            l_Roact_0.createElement(v7, {
-                store = v26
-            })
-        });
-        v25 = l_Roact_0.mount(v38, l_CoreGui_0, "PurchasePromptApp");
-        return v25;
-    end;
-end;
-local function v44(v40, v41, v42, v43) --[[ Line: 104 ]] --[[ Name: initiateAvatarCreationFeePurchase ]]
-    -- upvalues: v26 (ref), v16 (copy)
-    if not v26 then
-        error("initiateAvatarCreationFeePurchase cannot be called when the PurchasePrompt has not been mounted");
-    end;
-    v26:dispatch(v16(v40, v41, v42, v43));
-end;
-local function v46(v45) --[[ Line: 123 ]] --[[ Name: UnifiedPurchasePromptContainer ]]
-    -- upvalues: v37 (copy), l_Roact_0 (copy), v17 (copy), v26 (ref), l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (copy), l_FFlagPurchasePromptSubtitleForTimedOptions_0 (copy)
-    v37();
-    return l_Roact_0.createElement(v17, {
-        store = v26, 
-        productPayload = v45.productPayload, 
-        purchaseCallbacks = v45.purchaseCallbacks, 
-        postPurchaseActions = v45.postPurchaseActions, 
-        purchaseAnalyticsMetadata = v45.purchaseAnalyticsMetadata, 
-        purchaseOptions = if l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 then v45.purchaseOptions else nil, 
-        subtitleView = if l_FFlagPurchasePromptSubtitleForTimedOptions_0 then v45.subtitleView else nil
-    });
-end;
+local _script = script
+local _scriptParent = _script.Parent
+local PurchasePromptDeps = require(_scriptParent.PurchasePromptDeps)
+local PurchasePromptLite = require(_scriptParent.PurchasePromptLite)
+local RunService = game:GetService("RunService")
+local SharedFlags = require(_scriptParent.SharedFlags)
+local Roact = PurchasePromptDeps.Roact
+local Rodux = PurchasePromptDeps.Rodux
+local CoreGui = game:GetService("CoreGui")
+local PurchasePromptApp = require(script.Components.PurchasePromptApp)
+local Reducer = require(_script.Reducers.Reducer)
+local ABTest = require(_script.Services.ABTest)
+local Network = require(_script.Services.Network)
+local Analytics = require(_script.Services.Analytics)
+local PlatformInterface = require(_script.Services.PlatformInterface)
+local ExternalSettings = require(_script.Services.ExternalSettings)
+local PublicBindables = require(_script.Services.PublicBindables)
+local Thunk = require(_script.Thunk)
+local initiateAvatarCreationFeePurchase = require(_script.Thunks.initiateAvatarCreationFeePurchase)
+local UnifiedPurchasePrompt = require(_script.Components.UnifiedPurchasePrompt)
+local dispatchPurchaseForProductPayload = require(_script.Utils.dispatchPurchaseForProductPayload)
+local SetProductPayload = require(_script.Actions.SetProductPayload)
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = require(_script.Parent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+local FFlagPurchasePromptCartPricingEnabled = require(_script.Flags.FFlagPurchasePromptCartPricingEnabled)
+local FFlagEnablePurchasePayloadInExperienceShop = SharedFlags.FFlagEnablePurchasePayloadInExperienceShop
+
+require(_script.types)
+
+local FFlagEnableUnifiedProductPurchaseFlow = require(_script.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
+local FFlagPurchasePromptSubtitleForTimedOptions = require(_script.Parent.SharedFlags).FFlagPurchasePromptSubtitleForTimedOptions
+local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
+local FFlagEnableRobuxInExperienceShop = SharedFlags.FFlagEnableRobuxInExperienceShop
+local v30 = game:DefineFastFlag("PurchasePromptElevateDisplayOrder", false)
+local WindowState = require(_script.Enums.WindowState)
+local PromptState = require(_script.Enums.PromptState)
+local PublishAssetAnalytics = require(_script.Utils.PublishAssetAnalytics)
+local u34 = nil
+local u35 = nil
+local u36 = nil
+local BindableEvent = Instance.new("BindableEvent")
+local BindableEvent2 = Instance.new("BindableEvent")
+
+local function createStore() -- line: 58
+	-- upvalues: ABTest (copy), Network (copy), FFlagPurchasePromptCartPricingEnabled (copy), u36 (ref), Analytics (copy), PlatformInterface (copy), ExternalSettings (copy), PublicBindables (copy), BindableEvent (copy), u35 (ref), Rodux (copy), Reducer (copy), Thunk (copy), WindowState (copy), PromptState (copy), BindableEvent2 (copy), PurchasePromptLite (copy)
+	local v41 = ABTest.new()
+	local v42 = Network.new()
+
+	if FFlagPurchasePromptCartPricingEnabled then
+		u36 = v42
+	end
+
+	local v43 = Analytics.new()
+	local v44 = PlatformInterface.new()
+	local v45 = ExternalSettings.new()
+	local v46 = PublicBindables.new({
+		windowStateChangedBindable = BindableEvent
+	})
+
+	u35 = Rodux.Store.new(Reducer, {}, { Thunk.middleware({
+		[ABTest] = v41,
+		[Network] = if not FFlagPurchasePromptCartPricingEnabled then v42 else u36,
+		[Analytics] = v43,
+		[PlatformInterface] = v44,
+		[ExternalSettings] = v45,
+		[PublicBindables] = v46
+	}) })
+	u35.changed:connect(function(p1, p2) -- line: 84
+		-- upvalues: BindableEvent (copy), WindowState (copy), PromptState (copy), BindableEvent2 (copy), FFlagPurchasePromptCartPricingEnabled (copy), PurchasePromptLite (copy)
+		if p2.windowState ~= p1.windowState then
+			BindableEvent:Fire({
+				isShown = p1.windowState == WindowState.Shown,
+				hasCompletedPurchase = p1.hasCompletedPurchase
+			})
+		end
+
+		if p2.promptState ~= p1.promptState and p1.promptState == PromptState.None then
+			BindableEvent2:Fire()
+		end
+
+		if FFlagPurchasePromptCartPricingEnabled and not p2.hasCompletedPurchase and p1.hasCompletedPurchase then
+			PurchasePromptLite.Events.firePurchaseCompleted()
+		end
+	end)
+end
+local function UnifiedPurchasePromptContainer(t1: {[any]: any}) -- line: 208
+	-- upvalues: createStore (copy), Roact (copy), UnifiedPurchasePrompt (copy), u35 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u36 (ref), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), FFlagPurchasePromptSubtitleForTimedOptions (copy)
+	createStore()
+
+	return Roact.createElement(UnifiedPurchasePrompt, {
+		store = u35,
+		network = if not FFlagPurchasePromptCartPricingEnabled then nil else u36,
+		productPayload = t1.productPayload,
+		purchaseCallbacks = t1.purchaseCallbacks,
+		postPurchaseActions = t1.postPurchaseActions,
+		purchaseAnalyticsMetadata = t1.purchaseAnalyticsMetadata,
+		purchaseOptions = if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then nil else t1.purchaseOptions,
+		subtitleView = if not FFlagPurchasePromptSubtitleForTimedOptions then nil else t1.subtitleView
+	})
+end
+
 return {
-    mountPurchasePrompt = v39, 
-    initiateAvatarCreationFeePurchase = v44, 
-    windowStateChangedEvent = l_BindableEvent_0.Event, 
-    promptStateSetToNoneEvent = l_BindableEvent_1.Event, 
-    PublishAssetAnalytics = v24, 
-    UnifiedPurchasePromptContainer = if l_FFlagEnableUnifiedProductPurchaseFlow_0 then v46 else nil, 
-    ["jest.config"] = script["jest.config"]
-};
+	mountPurchasePrompt = function() -- line: 114
+		-- upvalues: RunService (copy), u34 (ref), createStore (copy), v30 (copy), Roact (copy), PurchasePromptApp (copy), u35 (ref), FFlagPurchasePromptCartPricingEnabled (copy), u36 (ref), CoreGui (copy)
+		if RunService:IsStudio() and RunService:IsEdit() or u34 then
+			return nil
+		end
+
+		createStore()
+
+		local t2 = {
+			AutoLocalize = false,
+			IgnoreGuiInset = true
+		}
+
+		if v30 then
+			t2.DisplayOrder = 10
+		end
+
+		local v48 = Roact.createElement("ScreenGui", t2, { Roact.createElement(PurchasePromptApp, {
+			store = u35,
+			network = if not FFlagPurchasePromptCartPricingEnabled then nil else u36
+		}) })
+
+		u34 = Roact.mount(v48, CoreGui, "PurchasePromptApp")
+
+		return u34
+	end,
+	initiateAvatarCreationFeePurchase = function(p3, p4, p5, p6) -- line: 148
+		-- upvalues: u35 (ref), initiateAvatarCreationFeePurchase (copy)
+		if not u35 then
+			error("initiateAvatarCreationFeePurchase cannot be called when the PurchasePrompt has not been mounted")
+		end
+
+		u35:dispatch(initiateAvatarCreationFeePurchase(p3, p4, p5, p6))
+	end,
+	initiatePurchaseForProductPayload = function(p7) -- line: 175
+		-- upvalues: u35 (ref), FFlagEnablePurchasePayloadInExperienceShop (copy), SetProductPayload (copy), dispatchPurchaseForProductPayload (copy)
+		if not u35 then
+			warn("initiatePurchaseForProductPayload called before mountPurchasePrompt; ignoring.")
+
+			return
+		end
+
+		if FFlagEnablePurchasePayloadInExperienceShop then
+			u35:dispatch(SetProductPayload(p7))
+		end
+
+		dispatchPurchaseForProductPayload(function(p8) -- line: 191
+			-- upvalues: u35 (ref)
+			u35:dispatch(p8)
+		end, p7, nil, false)
+	end,
+	windowStateChangedEvent = BindableEvent.Event,
+	promptStateSetToNoneEvent = BindableEvent2.Event,
+	Utils = if not FFlagAXMISWithBlackbird then {} else {
+		getBlackbirdUpsellBannerProductInfo = require(_script.Utils.getBlackbirdUpsellBannerProductInfo)
+	},
+	PublishAssetAnalytics = PublishAssetAnalytics,
+	UnifiedPurchasePromptContainer = if not FFlagEnableUnifiedProductPurchaseFlow then nil else UnifiedPurchasePromptContainer,
+	launchRobuxPackagePurchase = if not FFlagEnableRobuxInExperienceShop then nil else require(_script.launchRobuxPackagePurchase),
+	["jest.config"] = script["jest.config"],
+	["jest.main.config"] = script["jest.main.config"],
+	["jest.mockDataModel.config"] = script["jest.mockDataModel.config"]
+}

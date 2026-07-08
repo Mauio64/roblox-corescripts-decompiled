@@ -1,17 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Common.Enums);
-local v4 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local v5 = require(l_script_FirstAncestor_0.Components.ContactProfileHeader.ContactProfileHeader);
-return function(v6) --[[ Line: 18 ]] --[[ Name: ContactProfileHeaderContainer ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy), v5 (copy)
-    local v7 = v4(v3.Components.ContactProfileHeader);
-    local l_contactName_0 = v7.contactName;
-    local l_avatarThumbnailUrl_0 = v7.avatarThumbnailUrl;
-    return v2.createElement(v5, {
-        layoutOrder = v6.layoutOrder, 
-        contactName = l_contactName_0, 
-        avatarThumbnailUrl = l_avatarThumbnailUrl_0
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local Enums = require(ProfilePlatform.Common.Enums)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local ContactProfileHeader = require(ProfilePlatform.Components.ContactProfileHeader.ContactProfileHeader)
+
+local function ContactProfileHeaderContainer(t1: {[any]: any}) -- line: 18
+	-- upvalues: useProfileJsonComponent (copy), Enums (copy), React (copy), ContactProfileHeader (copy)
+	local v9 = useProfileJsonComponent(Enums.Components.ContactProfileHeader)
+	local contactName = v9.contactName
+	local avatarThumbnailUrl = v9.avatarThumbnailUrl
+
+	return React.createElement(ContactProfileHeader, {
+		layoutOrder = t1.layoutOrder,
+		contactName = contactName,
+		avatarThumbnailUrl = avatarThumbnailUrl
+	})
+end
+
+return ContactProfileHeaderContainer

@@ -1,19 +1,28 @@
-local v0 = require(script.Parent.join);
-local function v1(v2, v3) --[[ Line: 4 ]] --[[ Name: flatMap ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    local v4 = type(v2);
-    assert(v4 == "table", "expected a table for first argument, got " .. v4);
-    local v5 = type(v3);
-    assert(v5 == "function", "expected a function for second argument, got " .. v5);
-    local v6 = {};
-    for v7, v8 in pairs(v2) do
-        if type(v8) == "table" then
-            v6 = v0(v1(v8, v3), v6);
-        else
-            local v9, v10 = v3(v8, v7);
-            v6[v10 or v7] = v9;
-        end;
-    end;
-    return v6;
-end;
-return v1;
+local join = require(script.Parent.join)
+
+local function flatMap(p1, p2) -- line: 4
+	-- upvalues: join (copy), flatMap (copy)
+	local v5 = type(p1)
+
+	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+
+	local v6 = type(p2)
+
+	assert(v6 == "function", "expected a function for second argument, got " .. v6)
+
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		if type(v) == "table" then
+			t1 = join(flatMap(v, p2), t1)
+		else
+			local v10, v11 = p2(v, k)
+
+			t1[v11 or k] = v10
+		end
+	end
+
+	return t1
+end
+
+return flatMap

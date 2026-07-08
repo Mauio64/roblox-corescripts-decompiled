@@ -1,23 +1,25 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_script_FirstAncestor_0.Hooks.useGetPeopleService);
-return function(v5, v6) --[[ Line: 9 ]] --[[ Name: useInExperienceCombinedName ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-    local v7 = v4("PeopleListStore");
-    local v8 = v2.useMemo(function() --[[ Line: 12 ]]
-        -- upvalues: v7 (copy), v5 (copy)
-        return v7.getProfile(v5);
-    end, {
-        v5
-    });
-    return v3.useSignalBinding(v8):map(function(v9) --[[ Line: 18 ]]
-        -- upvalues: v6 (copy)
-        if v9 and string.len(v9) > 0 then
-            return v9;
-        else
-            return v6;
-        end;
-    end);
-end;
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
+
+local function useInExperienceCombinedName(n1: number, s1: string) -- line: 9
+	-- upvalues: useGetPeopleService (copy), React (copy), SignalsReact (copy)
+	local v9 = useGetPeopleService("PeopleListStore")
+	local v10 = React.useMemo(function() -- line: 12
+		-- upvalues: v9 (copy), n1 (copy)
+		return v9.getProfile(n1)
+	end, { n1 })
+
+	return SignalsReact.useSignalBinding(v10):map(function(p1) -- line: 18
+		-- upvalues: s1 (copy)
+		if p1 and string.len(p1) > 0 then
+			return p1
+		end
+
+		return s1
+	end)
+end
+
+return useInExperienceCombinedName

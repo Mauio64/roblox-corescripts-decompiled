@@ -28,7 +28,8 @@ local t5 = {
 	FRIENDS = "friends",
 	NONFRIENDS = "nonfriends"
 }
-local _, _, v9 = (function() --[[ parseBaseUrlInformation ]] -- line: 54
+
+local function parseBaseUrlInformation() -- line: 54
 	-- upvalues: ContentProvider (copy)
 	local BaseUrl = ContentProvider.BaseUrl
 
@@ -40,9 +41,11 @@ local _, _, v9 = (function() --[[ parseBaseUrlInformation ]] -- line: 54
 	local start, stop2 = BaseUrl:find("%.", stop + 1)
 
 	return BaseUrl, BaseUrl:sub(stop + 1, start - 1), (BaseUrl:sub(stop2 + 1))
-end)()
-local v10 = string.format("https://voice.%s", v9)
-local v11 = string.format("https://apis.%supsellcard", v9)
+end
+
+local _, _, v10 = parseBaseUrlInformation()
+local v11 = string.format("https://voice.%s", v10)
+local v12 = string.format("https://apis.%supsellcard", v10)
 local t6 = {
 	CONTROL = "control",
 	VARIANT1 = "variant1",
@@ -63,16 +66,13 @@ local t8 = {
 local t9 = {
 	Control = "Control",
 	OnlyConnectDisconnect = "V2-Variant-1",
-	HearingWithoutMicPermissions = "V2-Variant-2",
-	LikelySpeakingBubblesRemoved = "V2-Variant-3"
+	HearingWithoutMicPermissions = "V2-Variant-2"
 }
 local t10 = {
 	Control = "Control",
 	ConnectDisconnect = "ConnectDisconnect",
 	HearingWithoutMicPermissions = "HearingWithoutMicPermissions",
-	LikelySpeakingBubblesRemoved = "LikelySpeakingBubblesRemoved",
 	JoinVoiceIsMutedMic = "JoinVoiceIsMutedMic",
-	ReducedCooldownLikelySpeakingBubbles = "ReducedCooldownLikelySpeakingBubbles",
 	JoinVoiceTooltip = "JoinVoiceTooltip",
 	InitialJoinVoice = "InitialJoinVoice",
 	DeferConnection = "DeferConnection",
@@ -81,9 +81,20 @@ local t10 = {
 
 return {
 	MIN_VOICE_CHAT_API_VERSION = 3,
-	VOICE_JOIN_PROGRESS = t4,
 	MIN_VOICE_CHAT_API_VERSION_LOCAL_MIC_ACTIVITY = 9,
 	MIN_VOICE_CHAT_API_VERSION_IS_CONTEXT_ENABLED = 10,
+	IN_EXP_PHONE_UPSELL_IXP_LAYER = "InExperience.UpsellCard",
+	EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER = "ExitConfirmation.UpsellCard",
+	VOICE_CONNECT_DISCONNECT_KEY = "InExpVoiceUIVisibility",
+	VOICE_CONNECT_DISCONNECT_KEY_V2 = "SeamlessConnectToVoice",
+	VOICE_CONNECT_DISCONNECT_KEY_V3 = "ConnectToVoice",
+	SEAMLESS_VOICE_FTUX_KEY = "SeamlessVoiceFTUX",
+	VOICE_REWARM_KEY = "VoiceRewarmOffered",
+	REWARDED_VIDEO_AD_STARTED = "RewardedVideoAdStarted",
+	REWARDED_VIDEO_AD_ENDED = "RewardedVideoAdEnded",
+	FAE_ENABLED = "Enabled",
+	FAE_SETTINGS_TOAST = "SettingsToast",
+	VOICE_JOIN_PROGRESS = t4,
 	VOICE_CHAT_AVAILABILITY = t1,
 	WATCHED_NAMESPACES = t2,
 	VOICE_GROUP_TYPE = t5,
@@ -94,22 +105,11 @@ return {
 		"VoiceReverseNudgeIconColorChange"
 	},
 	PERMISSION_STATE = t3,
-	VOICE_URL = v10,
-	UPSELL_CARD_URL = v11,
+	VOICE_URL = v11,
+	UPSELL_CARD_URL = v12,
 	IN_EXP_UPSELL_VARIANT = t6,
-	IN_EXP_PHONE_UPSELL_IXP_LAYER = "InExperience.UpsellCard",
-	EXIT_CONFIRMATION_PHONE_UPSELL_IXP_LAYER = "ExitConfirmation.UpsellCard",
 	PHONE_UPSELL_VOICE_CHAT_PROP = t7,
-	VOICE_CONNECT_DISCONNECT_KEY = "InExpVoiceUIVisibility",
-	VOICE_CONNECT_DISCONNECT_KEY_V2 = "SeamlessConnectToVoice",
-	VOICE_CONNECT_DISCONNECT_KEY_V3 = "ConnectToVoice",
-	SEAMLESS_VOICE_FTUX_KEY = "SeamlessVoiceFTUX",
-	VOICE_REWARM_KEY = "VoiceRewarmOffered",
 	SeamlessVoiceStatus = t8,
 	SeamlessVoiceVariants = t9,
-	SeamlessVoiceFeatures = t10,
-	REWARDED_VIDEO_AD_STARTED = "RewardedVideoAdStarted",
-	REWARDED_VIDEO_AD_ENDED = "RewardedVideoAdEnded",
-	FAE_ENABLED = "Enabled",
-	FAE_SETTINGS_TOAST = "SettingsToast"
+	SeamlessVoiceFeatures = t10
 }

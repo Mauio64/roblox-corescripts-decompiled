@@ -1,1 +1,1 @@
-return (require(script.EditProfileTopBar));
+return (require(script.EditProfileTopBar))

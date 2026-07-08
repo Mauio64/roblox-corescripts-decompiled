@@ -1,75 +1,86 @@
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_RunService_0 = game:GetService("RunService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local l_Network_0 = l_Parent_0.Network;
-local v5 = require(l_CorePackages_0.Workspace.Packages.AppChatNetworking);
-local v6 = require(l_Network_0.httpRequest);
-local v7 = require(l_Network_0.Requests.GetPlaceInfos);
-local v8 = require(l_Parent_0.Utility.constructGameLinkUrl);
-local v9 = v6(l_HttpRbxApiService_0);
-local l_InviteStatus_0 = require(l_Parent_0.Resources.Constants).InviteStatus;
-local v11 = require(l_Parent_0.Actions.ReceivedUserInviteStatus);
-return function(v12, v13) --[[ Line: 25 ]]
-    -- upvalues: l_InviteStatus_0 (copy), v11 (copy), l_RunService_0 (copy), v7 (copy), v9 (copy), v8 (copy), v5 (copy)
-    return function(v14) --[[ Line: 26 ]]
-        -- upvalues: v12 (copy), l_InviteStatus_0 (ref), v11 (ref), l_RunService_0 (ref), v7 (ref), v9 (ref), v13 (copy), v8 (ref), v5 (ref)
-        if v14:getState().invites[tostring(v12)] == l_InviteStatus_0.Pending then
-            return;
-        else
-            v14:dispatch(v11(v12, l_InviteStatus_0.Pending));
-            if l_RunService_0:IsStudio() then
-                spawn(function() --[[ Line: 36 ]]
-                    -- upvalues: v14 (copy), v11 (ref), v12 (ref), l_InviteStatus_0 (ref)
-                    v14:dispatch(v11(v12, l_InviteStatus_0.Failed));
-                end);
-                return;
-            else
-                return v7(v9, {
-                    v13
-                }):andThen(function(v15) --[[ Line: 42 ]]
-                    local v16 = v15.responseBody[1];
-                    assert(v16, "Error fetching placeInfos");
-                    v16.placeId = tostring(v16.placeId);
-                    v16.universeId = tostring(v16.universeId);
-                    return v16;
-                end):andThen(function(v17) --[[ Line: 52 ]]
-                    -- upvalues: v8 (ref), v5 (ref), v12 (ref)
-                    local v18 = string.format("Come join me in %s", v17.name);
-                    assert(v17.universeRootPlaceId, "Failed to get universe root place id");
-                    v18 = v18 .. "\n" .. v8(v17.universeRootPlaceId);
-                    return v5.http.CreateConversation(nil, "one_to_one", {
-                        v12
-                    }):andThen(function(v19) --[[ Line: 56 ]]
-                        -- upvalues: v5 (ref), v18 (ref), v17 (copy)
-                        local v20 = v19.responseBody.conversations[1];
-                        assert(v20, "Failed to create conversation");
-                        return v5.http.SendChatTextMessage(nil, v20.id, v18):andThen(function(v21) --[[ Line: 59 ]]
-                            -- upvalues: v20 (copy), v17 (ref)
-                            local v22 = v21.responseBody.messages[1];
-                            assert(v22, "Failed to send message");
-                            return {
-                                resultType = v22.status == "success" and "Success" or "Failed", 
-                                conversationId = v20.id, 
-                                placeId = v17.universeRootPlaceId
-                            };
-                        end);
-                    end):catch(function(v23) --[[ Line: 72 ]]
-                        warn("Failed to send invite: " .. tostring(v23));
-                    end);
-                end):andThen(function(v24) --[[ Line: 75 ]]
-                    -- upvalues: l_InviteStatus_0 (ref), v14 (copy), v11 (ref), v12 (ref)
-                    local v25, v26 = v24:await();
-                    assert(v25, "Failed to unroll promise after friend invitation: " .. tostring(v26));
-                    v24 = v26;
-                    local v27 = l_InviteStatus_0[v24.resultType] or l_InviteStatus_0.Failed;
-                    v14:dispatch(v11(v12, v27));
-                    return v24;
-                end, function(_) --[[ Line: 88 ]]
-                    -- upvalues: v14 (copy), v11 (ref), v12 (ref), l_InviteStatus_0 (ref)
-                    v14:dispatch(v11(v12, l_InviteStatus_0.Failed));
-                end);
-            end;
-        end;
-    end;
-end;
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local RunService = game:GetService("RunService")
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local Network = ParentParent.Network
+local AppChatNetworking = require(CorePackages.Workspace.Packages.AppChatNetworking)
+local httpRequest = require(Network.httpRequest)
+local GetPlaceInfos = require(Network.Requests.GetPlaceInfos)
+local constructGameLinkUrl = require(ParentParent.Utility.constructGameLinkUrl)
+local v10 = httpRequest(HttpRbxApiService)
+local InviteStatus = require(ParentParent.Resources.Constants).InviteStatus
+local ReceivedUserInviteStatus = require(ParentParent.Actions.ReceivedUserInviteStatus)
+
+return function(p1, p2) -- line: 25
+	-- upvalues: InviteStatus (copy), ReceivedUserInviteStatus (copy), RunService (copy), GetPlaceInfos (copy), v10 (copy), constructGameLinkUrl (copy), AppChatNetworking (copy)
+	return function(p3) -- line: 26
+		-- upvalues: p1 (copy), InviteStatus (copy), ReceivedUserInviteStatus (copy), RunService (copy), GetPlaceInfos (copy), v10 (copy), p2 (copy), constructGameLinkUrl (copy), AppChatNetworking (copy)
+		if p3:getState().invites[tostring(p1)] == InviteStatus.Pending then
+			return
+		end
+
+		p3:dispatch(ReceivedUserInviteStatus(p1, InviteStatus.Pending))
+
+		if RunService:IsStudio() then
+			spawn(function() -- line: 36
+				-- upvalues: p3 (copy), ReceivedUserInviteStatus (copy), p1 (copy), InviteStatus (copy)
+				p3:dispatch(ReceivedUserInviteStatus(p1, InviteStatus.Failed))
+			end)
+
+			return
+		end
+
+		return GetPlaceInfos(v10, { p2 }):andThen(function(p4) -- line: 42
+			local v17 = p4.responseBody[1]
+
+			assert(v17, "Error fetching placeInfos")
+			v17.placeId = tostring(v17.placeId)
+			v17.universeId = tostring(v17.universeId)
+
+			return v17
+		end):andThen(function(p5) -- line: 52
+			-- upvalues: constructGameLinkUrl (copy), AppChatNetworking (copy), p1 (copy)
+			local v19 = string.format("Come join me in %s", p5.name)
+
+			assert(p5.universeRootPlaceId, "Failed to get universe root place id")
+
+			local u20 = v19 .. "\n" .. constructGameLinkUrl(p5.universeRootPlaceId)
+
+			return AppChatNetworking.http.CreateConversation(nil, "one_to_one", { p1 }):andThen(function(p6) -- line: 56
+				-- upvalues: AppChatNetworking (copy), u20 (ref), p5 (copy)
+				local v27 = p6.responseBody.conversations[1]
+
+				assert(v27, "Failed to create conversation")
+
+				return AppChatNetworking.http.SendChatTextMessage(nil, v27.id, u20):andThen(function(p7) -- line: 59
+					-- upvalues: v27 (copy), p5 (copy)
+					local v30 = p7.responseBody.messages[1]
+
+					assert(v30, "Failed to send message")
+
+					return {
+						resultType = v30.status ~= "success" and "Failed" or "Success",
+						conversationId = v27.id,
+						placeId = p5.universeRootPlaceId
+					}
+				end)
+			end):catch(function(p8) -- line: 72
+				warn("Failed to send invite: " .. tostring(p8))
+			end)
+		end):andThen(function(p9) -- line: 75
+			-- upvalues: InviteStatus (copy), p3 (copy), ReceivedUserInviteStatus (copy), p1 (copy)
+			local v22, v23 = p9:await()
+
+			assert(v22, "Failed to unroll promise after friend invitation: " .. tostring(v23))
+
+			local v24 = InviteStatus[v23.resultType] or InviteStatus.Failed
+
+			p3:dispatch(ReceivedUserInviteStatus(p1, v24))
+
+			return v23
+		end, function(_) -- line: 88
+			-- upvalues: p3 (copy), ReceivedUserInviteStatus (copy), p1 (copy), InviteStatus (copy)
+			p3:dispatch(ReceivedUserInviteStatus(p1, InviteStatus.Failed))
+		end)
+	end
+end

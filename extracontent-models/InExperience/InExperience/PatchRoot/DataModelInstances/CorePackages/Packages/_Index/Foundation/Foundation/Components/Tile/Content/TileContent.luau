@@ -1,25 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.View);
-local v4 = require(l_script_FirstAncestor_0.Components.Tile.useTile);
-local v5 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v6 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v7 = {
-    LayoutOrder = 2
-};
-return function(v8) --[[ Line: 20 ]] --[[ Name: TileContent ]]
-    -- upvalues: v6 (copy), v7 (copy), v5 (copy), v4 (copy), v2 (copy), v3 (copy)
-    local v9 = v6(v8, v7);
-    local v10 = v5();
-    local v11 = v4();
-    return v2.createElement(v3, {
-        tag = "size-full col gap-small align-y-top", 
-        flexItem = {
-            FlexMode = Enum.UIFlexMode.Shrink
-        }, 
-        padding = if v11.isContained then v10.Padding.Small else nil, 
-        LayoutOrder = v9.LayoutOrder, 
-        testId = ("%*--content"):format(v11.testId)
-    }, v9.children);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local View = require(Foundation.Components.View)
+local useTile = require(Foundation.Components.Tile.useTile)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local t1 = {
+	LayoutOrder = 2
+}
+
+local function TileContent(t2: {[any]: any}) -- line: 20
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTile (copy), React (copy), View (copy)
+	local v11 = withDefaults(t2, t1)
+	local v12 = useTokens()
+	local v13 = useTile()
+
+	return React.createElement(View, {
+		tag = "col align-y-top gap-small size-full",
+		flexItem = {
+			FlexMode = Enum.UIFlexMode.Shrink
+		},
+		padding = if not v13.isContained then nil else v12.Padding.Small,
+		LayoutOrder = v11.LayoutOrder,
+		testId = `{ v13.testId }--content`
+	}, v11.children)
+end
+
+return TileContent

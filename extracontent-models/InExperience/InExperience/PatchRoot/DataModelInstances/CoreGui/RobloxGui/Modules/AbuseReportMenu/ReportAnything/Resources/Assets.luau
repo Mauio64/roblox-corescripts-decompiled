@@ -1,34 +1,35 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.UIBlox);
-local l_Images_0 = v1.App.ImageSet.Images;
-local l_getIconSize_0 = v1.App.ImageSet.getIconSize;
-local l_IconSize_0 = v1.App.ImageSet.Enum.IconSize;
+local CorePackages = game:GetService("CorePackages")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local getIconSize = UIBlox.App.ImageSet.getIconSize
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+
 return {
-    Images = {
-        MuteIcon = {
-            Size = UDim2.fromOffset(l_getIconSize_0(l_IconSize_0.Medium), l_getIconSize_0(l_IconSize_0.Medium)), 
-            Image = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Unmuted0.png"
-        }, 
-        BlockIcon = {
-            Size = UDim2.fromOffset(l_getIconSize_0(l_IconSize_0.Medium), l_getIconSize_0(l_IconSize_0.Medium)), 
-            Image = l_Images_0["icons/actions/block"]
-        }, 
-        VoiceChatIcon = {
-            Size = UDim2.fromOffset(l_getIconSize_0(l_IconSize_0.Medium), l_getIconSize_0(l_IconSize_0.Medium)), 
-            Image = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Unmuted0.png"
-        }, 
-        TextChatIcon = {
-            Size = UDim2.fromOffset(l_getIconSize_0(l_IconSize_0.Medium), l_getIconSize_0(l_IconSize_0.Medium)), 
-            Image = "rbxasset://textures/ui/TopBar/chatOff.png"
-        }, 
-        OtherIcon = {
-            Size = UDim2.fromOffset(l_getIconSize_0(l_IconSize_0.Medium), l_getIconSize_0(l_IconSize_0.Medium)), 
-            Image = l_Images_0["icons/menu/help"]
-        }, 
-        RoundedRect = {
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(8, 8, 9, 9), 
-            Image = l_Images_0["component_assets/circle_17"]
-        }
-    }
-};
+	Images = {
+		MuteIcon = {
+			Image = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Unmuted0.png",
+			Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium))
+		},
+		BlockIcon = {
+			Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium)),
+			Image = Images["icons/actions/block"]
+		},
+		VoiceChatIcon = {
+			Image = "rbxasset://textures/ui/VoiceChat/SpeakerLight/Unmuted0.png",
+			Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium))
+		},
+		TextChatIcon = {
+			Image = "rbxasset://textures/ui/TopBar/chatOff.png",
+			Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium))
+		},
+		OtherIcon = {
+			Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium)),
+			Image = Images["icons/menu/help"]
+		},
+		RoundedRect = {
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(8, 8, 9, 9),
+			Image = Images["component_assets/circle_17"]
+		}
+	}
+}

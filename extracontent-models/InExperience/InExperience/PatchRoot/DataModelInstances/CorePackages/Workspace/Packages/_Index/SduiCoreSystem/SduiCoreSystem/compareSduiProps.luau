@@ -1,29 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local v4 = {
-    extraLocalProps = true, 
-    localAnalyticsData = true, 
-    parentAnalyticsContext = true, 
-    conditionalProps = true
-};
-return function(v5, v6) --[[ Line: 20 ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    if v5 == v6 then
-        return true;
-    else
-        for v7 in v4 do
-            local v8 = v5[v7];
-            local v9 = v6[v7];
-            if typeof(v8) == "table" and typeof(v9) == "table" then
-                if not v2.shallowEqual(v8, v9) then
-                    return false;
-                end;
-            elseif v8 and not v9 or v9 and not v8 then
-                return false;
-            end;
-        end;
-        return v2.shallowEqual(v5, v6, v4);
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local tutils = require(SduiCoreSystemParent.tutils)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+
+local FFlagSduiPoolBackedFeed = require(SduiCoreSystemParent.SharedFlags).FFlagSduiPoolBackedFeed
+local t1 = {
+	extraLocalProps = true,
+	localAnalyticsData = true,
+	parentAnalyticsContext = true,
+	conditionalProps = true
+}
+
+if FFlagSduiPoolBackedFeed then
+	t1.extraLocalPropSignals = true
+end
+
+return function(p1, p2) -- line: 25
+	-- upvalues: t1 (copy), tutils (copy)
+	if p1 == p2 then
+		return true
+	end
+
+	for v8 in t1 do
+		local v9 = p1[v8]
+		local v10 = p2[v8]
+
+		if typeof(v9) ~= "table" or typeof(v10) ~= "table" then
+			if (not v9 or v10) and (not v10 or v9) then
+				continue
+			end
+
+			return false
+		end
+
+		if not tutils.shallowEqual(v9, v10) then
+			return false
+		end
+	end
+
+	return tutils.shallowEqual(p1, p2, t1)
+end

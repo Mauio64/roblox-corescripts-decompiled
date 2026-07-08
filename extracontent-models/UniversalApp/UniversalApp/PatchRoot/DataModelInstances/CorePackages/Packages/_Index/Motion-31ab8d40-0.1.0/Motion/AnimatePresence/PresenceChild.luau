@@ -1,55 +1,69 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local l_useIdFallback_0 = require(script.Parent.utils).useIdFallback;
-local v3 = require(script.Parent.PresenceContext);
-local function _() --[[ Line: 36 ]] --[[ Name: newChildrenMap ]]
-    return {};
-end;
-return function(v5) --[[ Line: 40 ]] --[[ Name: PresenceChild ]]
-    -- upvalues: v1 (copy), l_useIdFallback_0 (copy), v3 (copy)
-    if not v5.children or typeof(v5.children) == "string" then
-        error("PresenceChild: children must be a React.Element");
-    end;
-    if not v5.children.type then
-        error("PresenceChild: children must be a React.Element");
-    end;
-    if v5.onExitComplete and typeof(v5.onExitComplete) ~= "function" and not v5.onExitComplete._isMockFunction then
-        error("PresenceChild: onExitComplete must be a function");
-    end;
-    local l_children_0 = v5.children;
-    local l_isPresent_0 = v5.isPresent;
-    local l_onExitComplete_0 = v5.onExitComplete;
-    local l_passThroughData_0 = v5.passThroughData;
-    local l_presenceId_0 = v5.presenceId;
-    local l_current_0 = v1.useRef({}).current;
-    local v12 = l_presenceId_0 or l_useIdFallback_0();
-    local function v17(v13) --[[ Line: 76 ]] --[[ Name: handleExitComplete ]]
-        -- upvalues: l_current_0 (copy), l_onExitComplete_0 (copy)
-        l_current_0[v13] = true;
-        local v14 = true;
-        for _, v16 in pairs(l_current_0) do
-            if not v16 then
-                v14 = false;
-                break;
-            end;
-        end;
-        if v14 and l_onExitComplete_0 then
-            l_onExitComplete_0();
-        end;
-    end;
-    local v18 = l_isPresent_0 ~= false;
-    local v19 = {
-        id = v12, 
-        isPresent = v18, 
-        passThroughData = l_passThroughData_0, 
-        onExitComplete = v17
-    };
-    if l_isPresent_0 ~= nil then
-        for v20, _ in pairs(l_current_0) do
-            l_current_0[v20] = false;
-        end;
-    end;
-    return v1.createElement(v3.Provider, {
-        value = v19
-    }, l_children_0);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local useIdFallback = require(script.Parent.utils).useIdFallback
+local PresenceContext = require(script.Parent.PresenceContext)
+
+local function newChildrenMap() -- line: 36
+	return {}
+end
+local function PresenceChild(t1: {[any]: any}) -- line: 40
+	-- upvalues: React (copy), useIdFallback (copy), PresenceContext (copy)
+	if not t1.children or typeof(t1.children) == "string" then
+		error("PresenceChild: children must be a React.Element")
+	end
+
+	if not t1.children.type then
+		error("PresenceChild: children must be a React.Element")
+	end
+
+	if t1.onExitComplete and typeof(t1.onExitComplete) ~= "function" and not t1.onExitComplete._isMockFunction then
+		error("PresenceChild: onExitComplete must be a function")
+	end
+
+	local children = t1.children
+	local isPresent = t1.isPresent
+	local onExitComplete = t1.onExitComplete
+	local passThroughData = t1.passThroughData
+	local presenceId = t1.presenceId
+	local current = React.useRef({}).current
+	local v14 = presenceId or useIdFallback()
+
+	local function handleExitComplete(s1: string) -- line: 76
+		-- upvalues: current (copy), onExitComplete (copy)
+		current[s1] = true
+
+		local v21 = true
+
+		for _, v in pairs(current) do
+			if not v then
+				v21 = false
+
+				break
+			end
+		end
+
+		if v21 and onExitComplete then
+			onExitComplete()
+		end
+	end
+
+	local v16 = isPresent ~= false
+	local t2 = {
+		id = v14,
+		isPresent = v16,
+		passThroughData = passThroughData,
+		onExitComplete = handleExitComplete
+	}
+
+	if isPresent ~= nil then
+		for k, _ in pairs(current) do
+			current[k] = false
+		end
+	end
+
+	return React.createElement(PresenceContext.Provider, {
+		value = t2
+	}, children)
+end
+
+return PresenceChild

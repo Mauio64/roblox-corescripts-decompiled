@@ -1,35 +1,44 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v3 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
-local v4 = require(l_Parent_0.util.getAllInstancesIsA);
-local v5 = require(l_Parent_0.util.getAllInstancesWithName);
-local v6 = require(l_Parent_0.util.R15plusUtils);
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
+local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
+local getAllInstancesWithName = require(ParentParent.util.getAllInstancesWithName)
+local R15plusUtils = require(ParentParent.util.R15plusUtils)
+
 return {
-    categories = {
-        v2.UploadCategory.TORSO_AND_LIMBS, 
-        v2.UploadCategory.DYNAMIC_HEAD
-    }, 
-    requiredData = {
-        v2.SharedDataMember.rootInstance
-    }, 
-    fflag = v6.checkFlagEnabledForAllowHrd, 
-    run = function(v7, v8) --[[ Line: 16 ]]
-        -- upvalues: v4 (copy), v6 (copy), v5 (copy), v3 (copy)
-        local l_rootInstance_0 = v8.rootInstance;
-        for _, v11 in v4(l_rootInstance_0, "MeshPart") do
-            local v12 = v6.getAvatarBoneSchema(v11.Name);
-            for v13, v14 in (v6.getNameWhitelistOfClassInSchema(v12, "Attachment")) do
-                if v14 then
-                    local v15 = v5(v11, v13);
-                    if #v15 ~= 1 or v15[1].ClassName ~= "Attachment" then
-                        v7:fail(v3.Keys.MissingRequiredAttachment, {
-                            attName = v13, 
-                            partName = v11.Name
-                        });
-                    end;
-                end;
-            end;
-        end;
-    end
-};
+	categories = {
+		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+		ValidationEnums.UploadCategory.DYNAMIC_HEAD
+	},
+	requiredData = { ValidationEnums.SharedDataMember.rootInstance },
+	fflag = R15plusUtils.checkFlagEnabledForAllowHrd,
+	run = function(p1, p2) -- line: 18
+		-- upvalues: getAllInstancesIsA (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), R15plusUtils (copy), getAllInstancesWithName (copy), ErrorSourceStrings (copy)
+		local rootInstance = p2.rootInstance
+
+		for _, v12 in getAllInstancesIsA(rootInstance, "MeshPart") do
+			if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
+				p1:setReportingInstance(v12)
+			end
+
+			local v13 = R15plusUtils.getAvatarBoneSchema(v12.Name)
+
+			for v14, v15 in (R15plusUtils.getNameWhitelistOfClassInSchema(v13, "Attachment")) do
+				if v15 then
+					local v16 = getAllInstancesWithName(v12, v14)
+
+					if #v16 ~= 1 or v16[1].ClassName ~= "Attachment" then
+						p1:fail(ErrorSourceStrings.Keys.MissingRequiredAttachment, {
+							attName = v14,
+							partName = v12.Name
+						})
+					end
+				end
+			end
+		end
+	end
+}

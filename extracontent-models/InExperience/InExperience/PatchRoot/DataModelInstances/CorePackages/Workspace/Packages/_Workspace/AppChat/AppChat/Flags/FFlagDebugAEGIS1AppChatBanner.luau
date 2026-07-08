@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugAEGIS1AppChatBanner", false);
+return game:DefineFastFlag("DebugAEGIS1AppChatBanner", false)

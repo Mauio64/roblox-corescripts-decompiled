@@ -1,1368 +1,1531 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Error_0 = v2.Error;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local l_describeError_0 = require(l_Parent_0.Shared).describeError;
-local l___DEV___0 = v1.__DEV__;
-local v8 = require(l_Parent_0.SafeFlags).createGetFFlag("ReactPreventAssigningKeyToChildren")();
-local _ = require(l_Parent_0.Shared);
-local _ = require(l_Parent_0.React);
-local _ = require(script.Parent.ReactInternalTypes);
-local _ = require(script.Parent.ReactFiberLane);
-local l_getComponentName_0 = require(l_Parent_0.Shared).getComponentName;
-local v14 = require(script.Parent.ReactFiberFlags);
-local l_Placement_0 = v14.Placement;
-local l_Deletion_0 = v14.Deletion;
-local l_ReactSymbols_0 = require(l_Parent_0.Shared).ReactSymbols;
-local l_getIteratorFn_0 = l_ReactSymbols_0.getIteratorFn;
-local l_REACT_ELEMENT_TYPE_0 = l_ReactSymbols_0.REACT_ELEMENT_TYPE;
-local l_REACT_FRAGMENT_TYPE_0 = l_ReactSymbols_0.REACT_FRAGMENT_TYPE;
-local l_REACT_PORTAL_TYPE_0 = l_ReactSymbols_0.REACT_PORTAL_TYPE;
-local l_REACT_LAZY_TYPE_0 = l_ReactSymbols_0.REACT_LAZY_TYPE;
-local l_REACT_BLOCK_TYPE_0 = l_ReactSymbols_0.REACT_BLOCK_TYPE;
-local v24 = require(script.Parent.ReactWorkTags);
-local _ = v24.FunctionComponent;
-local _ = v24.ClassComponent;
-local l_HostText_0 = v24.HostText;
-local l_HostPortal_0 = v24.HostPortal;
-local _ = v24.ForwardRef;
-local l_Fragment_0 = v24.Fragment;
-local _ = v24.SimpleMemoComponent;
-local l_Block_0 = v24.Block;
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_ReactFeatureFlags_0 = require(l_Parent_0.Shared).ReactFeatureFlags;
-local l_enableLazyElements_0 = l_ReactFeatureFlags_0.enableLazyElements;
-local l_enableBlocksAPI_0 = l_ReactFeatureFlags_0.enableBlocksAPI;
-local v37 = require(script.Parent["ReactFiber.new"]);
-local l_createWorkInProgress_0 = v37.createWorkInProgress;
-local l_resetWorkInProgress_0 = v37.resetWorkInProgress;
-local l_createFiberFromElement_0 = v37.createFiberFromElement;
-local l_createFiberFromFragment_0 = v37.createFiberFromFragment;
-local l_createFiberFromText_0 = v37.createFiberFromText;
-local l_createFiberFromPortal_0 = v37.createFiberFromPortal;
-local l_isCompatibleFamilyForHotReloading_0 = require(script.Parent["ReactFiberHotReloading.new"]).isCompatibleFamilyForHotReloading;
-local v45 = {};
-local v46 = nil;
-local v47 = nil;
-local v48 = nil;
-local function v51(_, _) --[[ Line: 97 ]]
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local console = require(ParentParent.Shared).console
+local describeError = require(ParentParent.Shared).describeError
+local __DEV__ = ReactGlobals.__DEV__
+local v9 = require(ParentParent.SafeFlags).createGetFFlag("ReactPreventAssigningKeyToChildren")()
 
-end;
-if l___DEV___0 then
-    v46 = false;
-    v47 = {};
-    v48 = {};
-    v51 = function(v52, v53) --[[ Line: 119 ]]
-        -- upvalues: l_invariant_0 (copy), l_getComponentName_0 (copy), v47 (ref), l_console_0 (copy)
-        if v52 == nil or type(v52) ~= "table" then
-            return;
-        elseif not v52._store or v52._store.validated or v52.key ~= nil then
-            return;
-        else
-            local l_l_invariant_0_0 = l_invariant_0;
-            local v55 = false;
-            if v52._store ~= nil then
-                v55 = type(v52._store) == "table";
-            end;
-            l_l_invariant_0_0(v55, "React Component in warnForMissingKey should have a _store. This error is likely caused by a bug in React. Please file an issue.");
-            v52._store.validated = true;
-            l_l_invariant_0_0 = l_getComponentName_0(v53.type) or "Component";
-            if v47[l_l_invariant_0_0] then
-                return;
-            else
-                v47[l_l_invariant_0_0] = true;
-                l_console_0.error("Each child in a list should have a unique \"key\" prop. See https://reactjs.org/link/warning-keys for more information.");
-                return;
-            end;
-        end;
-    end;
-end;
-local l_isArray_0 = l_Array_0.isArray;
-coerceRef = function(v57, _, v59) --[[ Line: 150 ]] --[[ Name: coerceRef ]]
-    -- upvalues: l___DEV___0 (copy), l_getComponentName_0 (copy), l_Error_0 (copy)
-    local l_ref_0 = v59.ref;
-    if l_ref_0 ~= nil and type(l_ref_0) == "string" then
-        if not v59._owner or not v59._self or v59._owner.stateNode == v59._self then
-            local v61 = nil;
-            v61 = if l___DEV___0 then l_getComponentName_0(v57.type) or "Component" else "<enable __DEV__ mode for component names>";
-            error(l_Error_0.new(string.format("Component \"%s\" contains the string ref \"%s\". Support for string refs has been removed. We recommend using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref", v61, (tostring(l_ref_0)))));
-        end;
-        if not v59._owner then
-            error("Expected ref to be a function or an object returned by React.createRef(), or nil.");
-        end;
-    end;
-    return l_ref_0;
-end;
-local function _(v62) --[[ Line: 323 ]] --[[ Name: warnOnFunctionType ]]
-    -- upvalues: l___DEV___0 (copy), l_getComponentName_0 (copy), v48 (ref), l_console_0 (copy)
-    if l___DEV___0 then
-        local v63 = l_getComponentName_0(v62.type) or "Component";
-        if v48[v63] then
-            return;
-        else
-            v48[v63] = true;
-            l_console_0.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.");
-        end;
-    end;
-end;
-resolveLazyType = function(v65) --[[ Line: 342 ]] --[[ Name: resolveLazyType ]]
-    -- upvalues: l_describeError_0 (copy)
-    local l__payload_0 = v65._payload;
-    local l__init_0 = v65._init;
-    local v68, v69 = xpcall(l__init_0, l_describeError_0, l__payload_0);
-    if not v68 then
-        return v65;
-    else
-        return v69;
-    end;
-end;
-local function v387(v70) --[[ Line: 360 ]] --[[ Name: ChildReconciler ]]
-    -- upvalues: l_Deletion_0 (copy), l_createWorkInProgress_0 (copy), l_Placement_0 (copy), l_HostText_0 (copy), l_createFiberFromText_0 (copy), l___DEV___0 (copy), l_isCompatibleFamilyForHotReloading_0 (copy), l_enableBlocksAPI_0 (copy), l_Block_0 (copy), l_REACT_LAZY_TYPE_0 (copy), l_REACT_BLOCK_TYPE_0 (copy), l_createFiberFromElement_0 (copy), l_HostPortal_0 (copy), l_createFiberFromPortal_0 (copy), l_Fragment_0 (copy), l_createFiberFromFragment_0 (copy), l_REACT_ELEMENT_TYPE_0 (copy), l_REACT_PORTAL_TYPE_0 (copy), l_enableLazyElements_0 (copy), l_getComponentName_0 (copy), v48 (ref), l_console_0 (copy), l_REACT_FRAGMENT_TYPE_0 (copy), v51 (ref), v8 (copy), v46 (ref), l_isArray_0 (copy), l_getIteratorFn_0 (copy)
-    local function _(v71, v72) --[[ Line: 361 ]] --[[ Name: deleteChild ]]
-        -- upvalues: v70 (copy), l_Deletion_0 (ref)
-        if not v70 then
-            return;
-        else
-            local l_deletions_0 = v71.deletions;
-            if l_deletions_0 == nil then
-                v71.deletions = {
-                    v72
-                };
-                v71.flags = bit32.bor(v71.flags, l_Deletion_0);
-                return;
-            else
-                table.insert(l_deletions_0, v72);
-                return;
-            end;
-        end;
-    end;
-    local function _(v75, v76) --[[ Line: 375 ]] --[[ Name: deleteRemainingChildren ]]
-        -- upvalues: v70 (copy), l_Deletion_0 (ref)
-        if not v70 then
-            return nil;
-        else
-            local l_v76_0 = v76;
-            while l_v76_0 ~= nil do
-                local l_l_v76_0_0 = l_v76_0;
-                if v70 then
-                    local l_deletions_1 = v75.deletions;
-                    if l_deletions_1 == nil then
-                        v75.deletions = {
-                            l_l_v76_0_0
-                        };
-                        v75.flags = bit32.bor(v75.flags, l_Deletion_0);
-                    else
-                        table.insert(l_deletions_1, l_l_v76_0_0);
-                    end;
-                end;
-                l_v76_0 = l_v76_0.sibling;
-            end;
-            return nil;
-        end;
-    end;
-    local function v85(_, v82) --[[ Line: 394 ]] --[[ Name: mapRemainingChildren ]]
-        local v83 = {};
-        local l_v82_0 = v82;
-        while l_v82_0 ~= nil do
-            if l_v82_0.key ~= nil then
-                v83[l_v82_0.key] = l_v82_0;
-            else
-                v83[l_v82_0.index] = l_v82_0;
-            end;
-            l_v82_0 = l_v82_0.sibling;
-        end;
-        return v83;
-    end;
-    local function _(v86, v87) --[[ Line: 416 ]] --[[ Name: useFiber ]]
-        -- upvalues: l_createWorkInProgress_0 (ref)
-        local v88 = l_createWorkInProgress_0(v86, v87);
-        v88.index = 1;
-        v88.sibling = nil;
-        return v88;
-    end;
-    local function _(v90, v91, v92) --[[ Line: 426 ]] --[[ Name: placeChild ]]
-        -- upvalues: v70 (copy), l_Placement_0 (ref)
-        v90.index = v92;
-        if not v70 then
-            return v91;
-        else
-            local l_alternate_0 = v90.alternate;
-            if l_alternate_0 ~= nil then
-                local l_index_0 = l_alternate_0.index;
-                if l_index_0 < v91 then
-                    v90.flags = bit32.bor(v90.flags, l_Placement_0);
-                    return v91;
-                else
-                    return l_index_0;
-                end;
-            else
-                v90.flags = bit32.bor(v90.flags, l_Placement_0);
-                return v91;
-            end;
-        end;
-    end;
-    local function _(v96) --[[ Line: 454 ]] --[[ Name: placeSingleChild ]]
-        -- upvalues: v70 (copy), l_Placement_0 (ref)
-        if v70 and v96.alternate == nil then
-            v96.flags = bit32.bor(v96.flags, l_Placement_0);
-        end;
-        return v96;
-    end;
-    local function _(v98, v99, v100, v101) --[[ Line: 463 ]] --[[ Name: updateTextNode ]]
-        -- upvalues: l_HostText_0 (ref), l_createFiberFromText_0 (ref), l_createWorkInProgress_0 (ref)
-        if v99 == nil or v99.tag ~= l_HostText_0 then
-            local v102 = l_createFiberFromText_0(v100, v98.mode, v101);
-            v102.return_ = v98;
-            return v102;
-        else
-            local v103 = l_createWorkInProgress_0(v99, v100);
-            v103.index = 1;
-            v103.sibling = nil;
-            local l_v103_0 = v103;
-            l_v103_0.return_ = v98;
-            return l_v103_0;
-        end;
-    end;
-    local function v118(v106, v107, v108, v109) --[[ Line: 483 ]] --[[ Name: updateElement ]]
-        -- upvalues: l___DEV___0 (ref), l_isCompatibleFamilyForHotReloading_0 (ref), l_createWorkInProgress_0 (ref), l_enableBlocksAPI_0 (ref), l_Block_0 (ref), l_REACT_LAZY_TYPE_0 (ref), l_REACT_BLOCK_TYPE_0 (ref), l_createFiberFromElement_0 (ref)
-        if v107 ~= nil then
-            if v107.elementType == v108.type or l___DEV___0 and l_isCompatibleFamilyForHotReloading_0(v107, v108) then
-                local l_props_0 = v108.props;
-                local v111 = l_createWorkInProgress_0(v107, l_props_0);
-                v111.index = 1;
-                v111.sibling = nil;
-                local l_v111_0 = v111;
-                l_v111_0.ref = coerceRef(v106, v107, v108);
-                l_v111_0.return_ = v106;
-                if l___DEV___0 then
-                    l_v111_0._debugSource = v108._source;
-                    l_v111_0._debugOwner = v108._owner;
-                end;
-                return l_v111_0;
-            elseif l_enableBlocksAPI_0 and v107.tag == l_Block_0 then
-                local l_type_0 = v108.type;
-                if type(l_type_0) == "table" and l_type_0["$$typeof"] == l_REACT_LAZY_TYPE_0 then
-                    l_type_0 = resolveLazyType(l_type_0);
-                end;
-                if l_type_0["$$typeof"] == l_REACT_BLOCK_TYPE_0 and l_type_0._render == v107.type._render then
-                    local l_props_1 = v108.props;
-                    local v115 = l_createWorkInProgress_0(v107, l_props_1);
-                    v115.index = 1;
-                    v115.sibling = nil;
-                    local l_v115_0 = v115;
-                    l_v115_0.return_ = v106;
-                    l_v115_0.type = l_type_0;
-                    if l___DEV___0 then
-                        l_v115_0._debugSource = v108._source;
-                        l_v115_0._debugOwner = v108._owner;
-                    end;
-                    return l_v115_0;
-                end;
-            end;
-        end;
-        local v117 = l_createFiberFromElement_0(v108, v106.mode, v109);
-        v117.ref = coerceRef(v106, v107, v108);
-        v117.return_ = v106;
-        return v117;
-    end;
-    local function v127(v119, v120, v121, v122) --[[ Line: 534 ]] --[[ Name: updatePortal ]]
-        -- upvalues: l_HostPortal_0 (ref), l_createFiberFromPortal_0 (ref), l_createWorkInProgress_0 (ref)
-        if v120 == nil or v120.tag ~= l_HostPortal_0 or v120.stateNode.containerInfo ~= v121.containerInfo or v120.stateNode.implementation ~= v121.implementation then
-            local v123 = l_createFiberFromPortal_0(v121, v119.mode, v122);
-            v123.return_ = v119;
-            return v123;
-        else
-            local v124 = v121.children or {};
-            local v125 = l_createWorkInProgress_0(v120, v124);
-            v125.index = 1;
-            v125.sibling = nil;
-            local l_v125_0 = v125;
-            l_v125_0.return_ = v119;
-            return l_v125_0;
-        end;
-    end;
-    local function _(v128, v129, v130, v131, v132) --[[ Line: 559 ]] --[[ Name: updateFragment ]]
-        -- upvalues: l_Fragment_0 (ref), l_createFiberFromFragment_0 (ref), l_createWorkInProgress_0 (ref)
-        if v129 == nil or v129.tag ~= l_Fragment_0 then
-            local v133 = l_createFiberFromFragment_0(v130, v128.mode, v131, v132);
-            v133.return_ = v128;
-            return v133;
-        else
-            local v134 = l_createWorkInProgress_0(v129, v130);
-            v134.index = 1;
-            v134.sibling = nil;
-            local l_v134_0 = v134;
-            l_v134_0.return_ = v128;
-            return l_v134_0;
-        end;
-    end;
-    local function _(v137, v138) --[[ Line: 586 ]] --[[ Name: assignStableKey ]]
-        if v138.key == nil then
-            local v139 = type(v137);
-            if v139 == "string" or v139 == "number" then
-                v138.key = v137;
-                return;
-            elseif v139 == "table" then
-                v138.key = tostring(v137);
-            end;
-        end;
-    end;
-    local function v141(v142, v143, v144, v145) --[[ Line: 605 ]] --[[ Name: createChild ]]
-        -- upvalues: l_REACT_ELEMENT_TYPE_0 (ref), l_createFiberFromElement_0 (ref), l_REACT_PORTAL_TYPE_0 (ref), l_createFiberFromPortal_0 (ref), l_REACT_LAZY_TYPE_0 (ref), l_enableLazyElements_0 (ref), v141 (copy), l_createFiberFromFragment_0 (ref), l_createFiberFromText_0 (ref), l___DEV___0 (ref), l_getComponentName_0 (ref), v48 (ref), l_console_0 (ref)
-        if v143 == nil then
-            return nil;
-        else
-            local v146 = type(v143);
-            if v146 == "table" then
-                if v143.key == nil then
-                    local v147 = type(v145);
-                    if v147 == "string" or v147 == "number" then
-                        v143.key = v145;
-                    elseif v147 == "table" then
-                        v143.key = tostring(v145);
-                    end;
-                end;
-                local v148 = v143["$$typeof"];
-                if v148 == l_REACT_ELEMENT_TYPE_0 then
-                    local v149 = l_createFiberFromElement_0(v143, v142.mode, v144);
-                    v149.ref = coerceRef(v142, nil, v143);
-                    v149.return_ = v142;
-                    return v149;
-                elseif v148 == l_REACT_PORTAL_TYPE_0 then
-                    local v150 = l_createFiberFromPortal_0(v143, v142.mode, v144);
-                    v150.return_ = v142;
-                    return v150;
-                elseif v148 == l_REACT_LAZY_TYPE_0 and l_enableLazyElements_0 then
-                    local l__payload_1 = v143._payload;
-                    local l__init_1 = v143._init;
-                    return v141(v142, l__init_1(l__payload_1), v144);
-                else
-                    local v153 = l_createFiberFromFragment_0(v143, v142.mode, v144, nil);
-                    v153.return_ = v142;
-                    return v153;
-                end;
-            elseif v146 == "string" or v146 == "number" then
-                local v154 = l_createFiberFromText_0(tostring(v143), v142.mode, v144);
-                v154.return_ = v142;
-                return v154;
-            else
-                if l___DEV___0 and v146 == "function" and l___DEV___0 then
-                    local v155 = l_getComponentName_0(v142.type) or "Component";
-                    if not v48[v155] then
-                        v48[v155] = true;
-                        l_console_0.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.");
-                    end;
-                end;
-                return nil;
-            end;
-        end;
-    end;
-    local function v156(v157, v158, v159, v160, v161) --[[ Line: 676 ]] --[[ Name: updateSlot ]]
-        -- upvalues: l_REACT_ELEMENT_TYPE_0 (ref), l_REACT_FRAGMENT_TYPE_0 (ref), l_Fragment_0 (ref), l_createFiberFromFragment_0 (ref), l_createWorkInProgress_0 (ref), v118 (copy), l_REACT_PORTAL_TYPE_0 (ref), v127 (copy), l_REACT_LAZY_TYPE_0 (ref), l_enableLazyElements_0 (ref), v156 (copy), l_HostText_0 (ref), l_createFiberFromText_0 (ref), l___DEV___0 (ref), l_getComponentName_0 (ref), v48 (ref), l_console_0 (ref)
-        if v159 == nil then
-            return nil;
-        else
-            local v162 = if v158 ~= nil then v158.key else nil;
-            local v163 = type(v159);
-            if v163 == "table" then
-                if v159.key == nil then
-                    local v164 = type(v161);
-                    if v164 == "string" or v164 == "number" then
-                        v159.key = v161;
-                    elseif v164 == "table" then
-                        v159.key = tostring(v161);
-                    end;
-                end;
-                local v165 = v159["$$typeof"];
-                if v165 == l_REACT_ELEMENT_TYPE_0 then
-                    if v159.key == v162 then
-                        if v159.type == l_REACT_FRAGMENT_TYPE_0 then
-                            local l_children_0 = v159.props.children;
-                            if v158 == nil or v158.tag ~= l_Fragment_0 then
-                                local v167 = l_createFiberFromFragment_0(l_children_0, v157.mode, v160, v162);
-                                v167.return_ = v157;
-                                return v167;
-                            else
-                                local v168 = l_createWorkInProgress_0(v158, l_children_0);
-                                v168.index = 1;
-                                v168.sibling = nil;
-                                local l_v168_0 = v168;
-                                l_v168_0.return_ = v157;
-                                return l_v168_0;
-                            end;
-                        else
-                            return (v118(v157, v158, v159, v160));
-                        end;
-                    else
-                        return nil;
-                    end;
-                elseif v165 == l_REACT_PORTAL_TYPE_0 then
-                    if v159.key == v162 then
-                        return (v127(v157, v158, v159, v160));
-                    else
-                        return nil;
-                    end;
-                elseif v165 == l_REACT_LAZY_TYPE_0 and l_enableLazyElements_0 then
-                    local l__payload_2 = v159._payload;
-                    local l__init_2 = v159._init;
-                    return v156(v157, v158, l__init_2(l__payload_2), v160);
-                elseif v162 ~= nil then
-                    return nil;
-                elseif v158 == nil or v158.tag ~= l_Fragment_0 then
-                    local v172 = l_createFiberFromFragment_0(v159, v157.mode, v160, nil);
-                    v172.return_ = v157;
-                    return v172;
-                else
-                    local v173 = l_createWorkInProgress_0(v158, v159);
-                    v173.index = 1;
-                    v173.sibling = nil;
-                    local l_v173_0 = v173;
-                    l_v173_0.return_ = v157;
-                    return l_v173_0;
-                end;
-            elseif v163 == "string" or v163 == "number" then
-                if v162 ~= nil then
-                    return nil;
-                else
-                    local v175 = tostring(v159);
-                    if v158 == nil or v158.tag ~= l_HostText_0 then
-                        local v176 = l_createFiberFromText_0(v175, v157.mode, v160);
-                        v176.return_ = v157;
-                        return v176;
-                    else
-                        local v177 = l_createWorkInProgress_0(v158, v175);
-                        v177.index = 1;
-                        v177.sibling = nil;
-                        local l_v177_0 = v177;
-                        l_v177_0.return_ = v157;
-                        return l_v177_0;
-                    end;
-                end;
-            else
-                if l___DEV___0 and v163 == "function" and l___DEV___0 then
-                    local v179 = l_getComponentName_0(v157.type) or "Component";
-                    if not v48[v179] then
-                        v48[v179] = true;
-                        l_console_0.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.");
-                    end;
-                end;
-                return nil;
-            end;
-        end;
-    end;
-    local function v180(v181, v182, v183, v184, v185, v186) --[[ Line: 764 ]] --[[ Name: updateFromMap ]]
-        -- upvalues: l_REACT_ELEMENT_TYPE_0 (ref), l_REACT_FRAGMENT_TYPE_0 (ref), l_Fragment_0 (ref), l_createFiberFromFragment_0 (ref), l_createWorkInProgress_0 (ref), v118 (copy), l_REACT_PORTAL_TYPE_0 (ref), v127 (copy), l_REACT_LAZY_TYPE_0 (ref), l_enableLazyElements_0 (ref), v180 (copy), l_HostText_0 (ref), l_createFiberFromText_0 (ref), l___DEV___0 (ref), l_getComponentName_0 (ref), v48 (ref), l_console_0 (ref)
-        if v184 == nil then
-            return nil;
-        else
-            local v187 = type(v184);
-            if v187 == "table" then
-                if v184.key == nil then
-                    local v188 = type(v186);
-                    if v188 == "string" or v188 == "number" then
-                        v184.key = v186;
-                    elseif v188 == "table" then
-                        v184.key = tostring(v186);
-                    end;
-                end;
-                local _ = nil;
-                local v190 = v184["$$typeof"];
-                if v190 == l_REACT_ELEMENT_TYPE_0 then
-                    local v191 = v181[if v184.key == nil then v183 else v184.key];
-                    if v184.type == l_REACT_FRAGMENT_TYPE_0 then
-                        local l_children_1 = v184.props.children;
-                        local l_key_0 = v184.key;
-                        if v191 == nil or v191.tag ~= l_Fragment_0 then
-                            local v194 = l_createFiberFromFragment_0(l_children_1, v182.mode, v185, l_key_0);
-                            v194.return_ = v182;
-                            return v194;
-                        else
-                            local v195 = l_createWorkInProgress_0(v191, l_children_1);
-                            v195.index = 1;
-                            v195.sibling = nil;
-                            local l_v195_0 = v195;
-                            l_v195_0.return_ = v182;
-                            return l_v195_0;
-                        end;
-                    else
-                        return (v118(v182, v191, v184, v185));
-                    end;
-                elseif v190 == l_REACT_PORTAL_TYPE_0 then
-                    local v197 = v181[if v184.key == nil then v183 else v184.key];
-                    return (v127(v182, v197, v184, v185));
-                elseif v190 == l_REACT_LAZY_TYPE_0 and l_enableLazyElements_0 then
-                    local l__payload_3 = v184._payload;
-                    local l__init_3 = v184._init;
-                    return v180(v181, v182, v183, l__init_3(l__payload_3), v185);
-                else
-                    local v200 = v181[v183];
-                    if v200 == nil or v200.tag ~= l_Fragment_0 then
-                        local v201 = l_createFiberFromFragment_0(v184, v182.mode, v185, nil);
-                        v201.return_ = v182;
-                        return v201;
-                    else
-                        local v202 = l_createWorkInProgress_0(v200, v184);
-                        v202.index = 1;
-                        v202.sibling = nil;
-                        local l_v202_0 = v202;
-                        l_v202_0.return_ = v182;
-                        return l_v202_0;
-                    end;
-                end;
-            elseif v187 == "string" or v187 == "number" then
-                local v204 = v181[v183] or nil;
-                local v205 = tostring(v184);
-                if v204 == nil or v204.tag ~= l_HostText_0 then
-                    local v206 = l_createFiberFromText_0(v205, v182.mode, v185);
-                    v206.return_ = v182;
-                    return v206;
-                else
-                    local v207 = l_createWorkInProgress_0(v204, v205);
-                    v207.index = 1;
-                    v207.sibling = nil;
-                    local l_v207_0 = v207;
-                    l_v207_0.return_ = v182;
-                    return l_v207_0;
-                end;
-            else
-                if l___DEV___0 and v187 == "function" and l___DEV___0 then
-                    local v209 = l_getComponentName_0(v182.type) or "Component";
-                    if not v48[v209] then
-                        v48[v209] = true;
-                        l_console_0.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.");
-                    end;
-                end;
-                return nil;
-            end;
-        end;
-    end;
-    local function v210(v211, v212, v213) --[[ Line: 858 ]] --[[ Name: warnOnInvalidKey ]]
-        -- upvalues: l___DEV___0 (ref), l_REACT_ELEMENT_TYPE_0 (ref), l_REACT_PORTAL_TYPE_0 (ref), v51 (ref), l_console_0 (ref), l_REACT_LAZY_TYPE_0 (ref), l_enableLazyElements_0 (ref), v210 (copy)
-        if l___DEV___0 then
-            if v211 == nil or type(v211) ~= "table" then
-                return v212;
-            else
-                local v214 = v211["$$typeof"];
-                if v214 == l_REACT_ELEMENT_TYPE_0 or v214 == l_REACT_PORTAL_TYPE_0 then
-                    v51(v211, v213);
-                    local l_key_1 = v211.key;
-                    if type(l_key_1) ~= "string" then
-                        return v212;
-                    elseif v212 == nil then
-                        return {
-                            [l_key_1] = true
-                        };
-                    elseif not v212[l_key_1] then
-                        v212[l_key_1] = true;
-                        return v212;
-                    else
-                        l_console_0.error("Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted \226\128\148 the behavior is unsupported and could change in a future version.", l_key_1);
-                        return v212;
-                    end;
-                elseif v214 == l_REACT_LAZY_TYPE_0 and l_enableLazyElements_0 then
-                    local l__payload_4 = v211._payload;
-                    local l__init_4 = v211._init;
-                    v210(l__init_4(l__payload_4), v212, v213);
-                end;
-            end;
-        end;
-        return v212;
-    end;
-    local function v260(v218, v219, v220, v221) --[[ Line: 900 ]] --[[ Name: reconcileChildrenArray ]]
-        -- upvalues: l___DEV___0 (ref), v210 (copy), v156 (copy), v70 (copy), l_Deletion_0 (ref), l_Placement_0 (ref), v141 (copy), v85 (copy), v8 (ref), v180 (copy)
-        if l___DEV___0 then
-            local v222 = nil;
-            for _, v224 in v220 do
-                v222 = v210(v224, v222, v218);
-            end;
-        end;
-        local v225 = nil;
-        local v226 = nil;
-        local l_v219_0 = v219;
-        local v228 = 1;
-        local v229 = 1;
-        local v230 = nil;
-        local v231 = #v220;
-        while l_v219_0 ~= nil and v229 <= v231 do
-            if v229 < l_v219_0.index then
-                v230 = l_v219_0;
-                l_v219_0 = nil;
-            else
-                v230 = l_v219_0.sibling;
-            end;
-            local v232 = nil;
-            local v233 = v220[v229];
-            v232 = if v233 ~= nil and type(v233) == "table" and v233["$$typeof"] ~= nil then v156(v218, l_v219_0, v233, v221, v229) else v156(v218, l_v219_0, v233, v221);
-            if v232 == nil then
-                if l_v219_0 == nil then
-                    l_v219_0 = v230;
-                    break;
-                else
-                    break;
-                end;
-            else
-                if v70 and l_v219_0 and v232.alternate == nil then
-                    local l_l_v219_0_0 = l_v219_0;
-                    if v70 then
-                        local l_deletions_2 = v218.deletions;
-                        if l_deletions_2 == nil then
-                            v218.deletions = {
-                                l_l_v219_0_0
-                            };
-                            v218.flags = bit32.bor(v218.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_2, l_l_v219_0_0);
-                        end;
-                    end;
-                end;
-                local l_v232_0 = v232;
-                local l_v228_0 = v228;
-                l_v232_0.index = v229;
-                if not v70 then
-                    v228 = l_v228_0;
-                else
-                    local l_alternate_1 = l_v232_0.alternate;
-                    if l_alternate_1 ~= nil then
-                        local l_index_1 = l_alternate_1.index;
-                        if l_index_1 < l_v228_0 then
-                            l_v232_0.flags = bit32.bor(l_v232_0.flags, l_Placement_0);
-                            v228 = l_v228_0;
-                        else
-                            v228 = l_index_1;
-                        end;
-                    else
-                        l_v232_0.flags = bit32.bor(l_v232_0.flags, l_Placement_0);
-                        v228 = l_v228_0;
-                    end;
-                end;
-                if v226 == nil then
-                    v225 = v232;
-                else
-                    v226.sibling = v232;
-                end;
-                v226 = v232;
-                l_v219_0 = v230;
-                v229 = v229 + 1;
-            end;
-        end;
-        if v231 < v229 then
-            local l_l_v219_0_1 = l_v219_0;
-            if not v70 then
-                return v225;
-            else
-                local l_l_l_v219_0_1_0 = l_l_v219_0_1;
-                while l_l_l_v219_0_1_0 ~= nil do
-                    local l_l_l_l_v219_0_1_0_0 = l_l_l_v219_0_1_0;
-                    if v70 then
-                        local l_deletions_3 = v218.deletions;
-                        if l_deletions_3 == nil then
-                            v218.deletions = {
-                                l_l_l_l_v219_0_1_0_0
-                            };
-                            v218.flags = bit32.bor(v218.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_3, l_l_l_l_v219_0_1_0_0);
-                        end;
-                    end;
-                    l_l_l_v219_0_1_0 = l_l_l_v219_0_1_0.sibling;
-                end;
-                return v225;
-            end;
-        elseif l_v219_0 == nil then
-            while v229 <= v231 do
-                local v244 = nil;
-                local v245 = v220[v229];
-                v244 = if v245 ~= nil and type(v245) == "table" and v245["$$typeof"] ~= nil then v141(v218, v245, v221, v229) else v141(v218, v245, v221);
-                if v244 == nil then
-                    v229 = v229 + 1;
-                else
-                    local l_v244_0 = v244;
-                    local l_v228_1 = v228;
-                    l_v244_0.index = v229;
-                    if not v70 then
-                        v228 = l_v228_1;
-                    else
-                        local l_alternate_2 = l_v244_0.alternate;
-                        if l_alternate_2 ~= nil then
-                            local l_index_2 = l_alternate_2.index;
-                            if l_index_2 < l_v228_1 then
-                                l_v244_0.flags = bit32.bor(l_v244_0.flags, l_Placement_0);
-                                v228 = l_v228_1;
-                            else
-                                v228 = l_index_2;
-                            end;
-                        else
-                            l_v244_0.flags = bit32.bor(l_v244_0.flags, l_Placement_0);
-                            v228 = l_v228_1;
-                        end;
-                    end;
-                    if v226 == nil then
-                        v225 = v244;
-                    else
-                        v226.sibling = v244;
-                    end;
-                    v226 = v244;
-                    v229 = v229 + 1;
-                end;
-            end;
-            return v225;
-        else
-            local v250 = v85(v218, l_v219_0);
-            while v229 <= v231 do
-                local v251 = nil;
-                local v252 = v220[v229];
-                v251 = if not v8 or v252 ~= nil and type(v252) == "table" and v252["$$typeof"] ~= nil then v180(v250, v218, v229, v252, v221, v229) else v180(v250, v218, v229, v252, v221);
-                if v251 ~= nil then
-                    if v70 and v251.alternate ~= nil then
-                        v250[if v251.key == nil then v229 else v251.key] = nil;
-                    end;
-                    local l_v251_0 = v251;
-                    local l_v228_2 = v228;
-                    l_v251_0.index = v229;
-                    if not v70 then
-                        v228 = l_v228_2;
-                    else
-                        local l_alternate_3 = l_v251_0.alternate;
-                        if l_alternate_3 ~= nil then
-                            local l_index_3 = l_alternate_3.index;
-                            if l_index_3 < l_v228_2 then
-                                l_v251_0.flags = bit32.bor(l_v251_0.flags, l_Placement_0);
-                                v228 = l_v228_2;
-                            else
-                                v228 = l_index_3;
-                            end;
-                        else
-                            l_v251_0.flags = bit32.bor(l_v251_0.flags, l_Placement_0);
-                            v228 = l_v228_2;
-                        end;
-                    end;
-                    if v226 == nil then
-                        v225 = v251;
-                    else
-                        v226.sibling = v251;
-                    end;
-                    v226 = v251;
-                end;
-                v229 = v229 + 1;
-            end;
-            if v70 then
-                for _, v258 in v250 do
-                    if v70 then
-                        local l_deletions_4 = v218.deletions;
-                        if l_deletions_4 == nil then
-                            v218.deletions = {
-                                v258
-                            };
-                            v218.flags = bit32.bor(v218.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_4, v258);
-                        end;
-                    end;
-                end;
-            end;
-            return v225;
-        end;
-    end;
-    local function v300(v261, v262, v263, v264, v265) --[[ Line: 1127 ]] --[[ Name: reconcileChildrenIterator ]]
-        -- upvalues: l___DEV___0 (ref), v46 (ref), l_console_0 (ref), v210 (copy), v156 (copy), v70 (copy), l_Deletion_0 (ref), l_Placement_0 (ref), v141 (copy), v85 (copy), v180 (copy)
-        if l___DEV___0 then
-            if v263.entries == v265 then
-                if not v46 then
-                    l_console_0.error("Using Maps as children is not supported. Use an array of keyed ReactElements instead.");
-                end;
-                v46 = true;
-            end;
-            local v266 = v265(v263);
-            if v266 then
-                local v267 = nil;
-                local v268 = v266.next();
-                while not v268.done do
-                    v268 = v266.next();
-                    local l_value_0 = v268.value;
-                    v267 = v210(l_value_0, v267, v261);
-                end;
-            end;
-        end;
-        local v270 = v265(v263);
-        local v271 = nil;
-        local v272 = nil;
-        local l_v262_0 = v262;
-        local v274 = 1;
-        local v275 = 1;
-        local v276 = nil;
-        local v277 = v270.next();
-        while l_v262_0 ~= nil and not v277.done do
-            if v275 < l_v262_0.index then
-                v276 = l_v262_0;
-                l_v262_0 = nil;
-            else
-                v276 = l_v262_0.sibling;
-            end;
-            local v278 = v156(v261, l_v262_0, v277.value, v264, v277.key);
-            if v278 == nil then
-                if l_v262_0 == nil then
-                    l_v262_0 = v276;
-                    break;
-                else
-                    break;
-                end;
-            else
-                if v70 and l_v262_0 and v278.alternate == nil then
-                    local l_l_v262_0_0 = l_v262_0;
-                    if v70 then
-                        local l_deletions_5 = v261.deletions;
-                        if l_deletions_5 == nil then
-                            v261.deletions = {
-                                l_l_v262_0_0
-                            };
-                            v261.flags = bit32.bor(v261.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_5, l_l_v262_0_0);
-                        end;
-                    end;
-                end;
-                local l_v274_0 = v274;
-                v278.index = v275;
-                if not v70 then
-                    v274 = l_v274_0;
-                else
-                    local l_alternate_4 = v278.alternate;
-                    if l_alternate_4 ~= nil then
-                        local l_index_4 = l_alternate_4.index;
-                        if l_index_4 < l_v274_0 then
-                            v278.flags = bit32.bor(v278.flags, l_Placement_0);
-                            v274 = l_v274_0;
-                        else
-                            v274 = l_index_4;
-                        end;
-                    else
-                        v278.flags = bit32.bor(v278.flags, l_Placement_0);
-                        v274 = l_v274_0;
-                    end;
-                end;
-                if v272 == nil then
-                    v271 = v278;
-                else
-                    v272.sibling = v278;
-                end;
-                v272 = v278;
-                l_v262_0 = v276;
-                v275 = v275 + 1;
-                v277 = v270.next();
-            end;
-        end;
-        if v277.done then
-            local l_l_v262_0_1 = l_v262_0;
-            if not v70 then
-                return v271;
-            else
-                local l_l_l_v262_0_1_0 = l_l_v262_0_1;
-                while l_l_l_v262_0_1_0 ~= nil do
-                    local l_l_l_l_v262_0_1_0_0 = l_l_l_v262_0_1_0;
-                    if v70 then
-                        local l_deletions_6 = v261.deletions;
-                        if l_deletions_6 == nil then
-                            v261.deletions = {
-                                l_l_l_l_v262_0_1_0_0
-                            };
-                            v261.flags = bit32.bor(v261.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_6, l_l_l_l_v262_0_1_0_0);
-                        end;
-                    end;
-                    l_l_l_v262_0_1_0 = l_l_l_v262_0_1_0.sibling;
-                end;
-                return v271;
-            end;
-        elseif l_v262_0 == nil then
-            while not v277.done do
-                local v288 = v141(v261, v277.value, v264, v277.key);
-                if v288 == nil then
-                    v275 = v275 + 1;
-                    v277 = v270.next();
-                else
-                    local l_v274_1 = v274;
-                    v288.index = v275;
-                    if not v70 then
-                        v274 = l_v274_1;
-                    else
-                        local l_alternate_5 = v288.alternate;
-                        if l_alternate_5 ~= nil then
-                            local l_index_5 = l_alternate_5.index;
-                            if l_index_5 < l_v274_1 then
-                                v288.flags = bit32.bor(v288.flags, l_Placement_0);
-                                v274 = l_v274_1;
-                            else
-                                v274 = l_index_5;
-                            end;
-                        else
-                            v288.flags = bit32.bor(v288.flags, l_Placement_0);
-                            v274 = l_v274_1;
-                        end;
-                    end;
-                    if v272 == nil then
-                        v271 = v288;
-                    else
-                        v272.sibling = v288;
-                    end;
-                    v272 = v288;
-                    v275 = v275 + 1;
-                    v277 = v270.next();
-                end;
-            end;
-            return v271;
-        else
-            local v292 = nil;
-            while not v277.done do
-                if not v292 then
-                    v292 = v85(v261, l_v262_0);
-                end;
-                local v293 = v180(v292, v261, v275, v277.value, v264, v277.key);
-                if v293 ~= nil then
-                    if v70 and v293.alternate ~= nil then
-                        if v293.key == nil then
-                            v292[v275] = nil;
-                        else
-                            v292[v293.key] = nil;
-                        end;
-                    end;
-                    local l_v274_2 = v274;
-                    v293.index = v275;
-                    if not v70 then
-                        v274 = l_v274_2;
-                    else
-                        local l_alternate_6 = v293.alternate;
-                        if l_alternate_6 ~= nil then
-                            local l_index_6 = l_alternate_6.index;
-                            if l_index_6 < l_v274_2 then
-                                v293.flags = bit32.bor(v293.flags, l_Placement_0);
-                                v274 = l_v274_2;
-                            else
-                                v274 = l_index_6;
-                            end;
-                        else
-                            v293.flags = bit32.bor(v293.flags, l_Placement_0);
-                            v274 = l_v274_2;
-                        end;
-                    end;
-                    if v272 == nil then
-                        v271 = v293;
-                    else
-                        v272.sibling = v293;
-                    end;
-                    v272 = v293;
-                end;
-                v275 = v275 + 1;
-                v277 = v270.next();
-            end;
-            if v70 then
-                for _, v298 in v292 do
-                    if v70 then
-                        local l_deletions_7 = v261.deletions;
-                        if l_deletions_7 == nil then
-                            v261.deletions = {
-                                v298
-                            };
-                            v261.flags = bit32.bor(v261.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_7, v298);
-                        end;
-                    end;
-                end;
-            end;
-            return v271;
-        end;
-    end;
-    local function v314(v301, v302, v303, v304) --[[ Line: 1340 ]] --[[ Name: reconcileSingleTextNode ]]
-        -- upvalues: l_HostText_0 (ref), v70 (copy), l_Deletion_0 (ref), l_createWorkInProgress_0 (ref), l_createFiberFromText_0 (ref)
-        if v302 ~= nil and v302.tag == l_HostText_0 then
-            local l_sibling_0 = v302.sibling;
-            if v70 then
-                local l_l_sibling_0_0 = l_sibling_0;
-                while l_l_sibling_0_0 ~= nil do
-                    local l_l_l_sibling_0_0_0 = l_l_sibling_0_0;
-                    if v70 then
-                        local l_deletions_8 = v301.deletions;
-                        if l_deletions_8 == nil then
-                            v301.deletions = {
-                                l_l_l_sibling_0_0_0
-                            };
-                            v301.flags = bit32.bor(v301.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_8, l_l_l_sibling_0_0_0);
-                        end;
-                    end;
-                    l_l_sibling_0_0 = l_l_sibling_0_0.sibling;
-                end;
-            end;
-            local v309 = l_createWorkInProgress_0(v302, v303);
-            v309.index = 1;
-            v309.sibling = nil;
-            l_sibling_0 = v309;
-            l_sibling_0.return_ = v301;
-            return l_sibling_0;
-        else
-            if v70 then
-                local l_v302_0 = v302;
-                while l_v302_0 ~= nil do
-                    local l_l_v302_0_0 = l_v302_0;
-                    if v70 then
-                        local l_deletions_9 = v301.deletions;
-                        if l_deletions_9 == nil then
-                            v301.deletions = {
-                                l_l_v302_0_0
-                            };
-                            v301.flags = bit32.bor(v301.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_9, l_l_v302_0_0);
-                        end;
-                    end;
-                    l_v302_0 = l_v302_0.sibling;
-                end;
-            end;
-            local v313 = l_createFiberFromText_0(v303, v301.mode, v304);
-            v313.return_ = v301;
-            return v313;
-        end;
-    end;
-    local function v344(v315, v316, v317, v318) --[[ Line: 1365 ]] --[[ Name: reconcileSingleElement ]]
-        -- upvalues: l_Fragment_0 (ref), l_REACT_FRAGMENT_TYPE_0 (ref), v70 (copy), l_Deletion_0 (ref), l_createWorkInProgress_0 (ref), l___DEV___0 (ref), l_isCompatibleFamilyForHotReloading_0 (ref), l_createFiberFromFragment_0 (ref), l_createFiberFromElement_0 (ref)
-        local v319 = false;
-        local l_key_2 = v317.key;
-        local l_v316_0 = v316;
-        while l_v316_0 ~= nil do
-            if l_v316_0.key == l_key_2 then
-                if l_v316_0.tag == l_Fragment_0 then
-                    if v317.type == l_REACT_FRAGMENT_TYPE_0 then
-                        local l_sibling_1 = l_v316_0.sibling;
-                        if v70 then
-                            local l_l_sibling_1_0 = l_sibling_1;
-                            while l_l_sibling_1_0 ~= nil do
-                                local l_l_l_sibling_1_0_0 = l_l_sibling_1_0;
-                                if v70 then
-                                    local l_deletions_10 = v315.deletions;
-                                    if l_deletions_10 == nil then
-                                        v315.deletions = {
-                                            l_l_l_sibling_1_0_0
-                                        };
-                                        v315.flags = bit32.bor(v315.flags, l_Deletion_0);
-                                    else
-                                        table.insert(l_deletions_10, l_l_l_sibling_1_0_0);
-                                    end;
-                                end;
-                                l_l_sibling_1_0 = l_l_sibling_1_0.sibling;
-                            end;
-                        end;
-                        local l_l_v316_0_0 = l_v316_0;
-                        local l_children_2 = v317.props.children;
-                        local v328 = l_createWorkInProgress_0(l_l_v316_0_0, l_children_2);
-                        v328.index = 1;
-                        v328.sibling = nil;
-                        l_sibling_1 = v328;
-                        l_sibling_1.return_ = v315;
-                        if l___DEV___0 then
-                            l_sibling_1._debugSource = v317._source;
-                            l_sibling_1._debugOwner = v317._owner;
-                        end;
-                        return l_sibling_1;
-                    end;
-                elseif l_v316_0.elementType == v317.type or l___DEV___0 and l_isCompatibleFamilyForHotReloading_0(l_v316_0, v317) then
-                    local l_sibling_2 = l_v316_0.sibling;
-                    if v70 then
-                        local l_l_sibling_2_0 = l_sibling_2;
-                        while l_l_sibling_2_0 ~= nil do
-                            local l_l_l_sibling_2_0_0 = l_l_sibling_2_0;
-                            if v70 then
-                                local l_deletions_11 = v315.deletions;
-                                if l_deletions_11 == nil then
-                                    v315.deletions = {
-                                        l_l_l_sibling_2_0_0
-                                    };
-                                    v315.flags = bit32.bor(v315.flags, l_Deletion_0);
-                                else
-                                    table.insert(l_deletions_11, l_l_l_sibling_2_0_0);
-                                end;
-                            end;
-                            l_l_sibling_2_0 = l_l_sibling_2_0.sibling;
-                        end;
-                    end;
-                    local l_l_v316_0_1 = l_v316_0;
-                    local l_props_2 = v317.props;
-                    local v335 = l_createWorkInProgress_0(l_l_v316_0_1, l_props_2);
-                    v335.index = 1;
-                    v335.sibling = nil;
-                    l_sibling_2 = v335;
-                    l_sibling_2.ref = coerceRef(v315, l_v316_0, v317);
-                    l_sibling_2.return_ = v315;
-                    if l___DEV___0 then
-                        l_sibling_2._debugSource = v317._source;
-                        l_sibling_2._debugOwner = v317._owner;
-                    end;
-                    return l_sibling_2;
-                end;
-                local l_l_v316_0_2 = l_v316_0;
-                if v70 then
-                    local l_l_l_v316_0_2_0 = l_l_v316_0_2;
-                    repeat
-                        if l_l_l_v316_0_2_0 ~= nil then
-                            local l_l_l_l_v316_0_2_0_0 = l_l_l_v316_0_2_0;
-                            if v70 then
-                                local l_deletions_12 = v315.deletions;
-                                if l_deletions_12 == nil then
-                                    v315.deletions = {
-                                        l_l_l_l_v316_0_2_0_0
-                                    };
-                                    v315.flags = bit32.bor(v315.flags, l_Deletion_0);
-                                else
-                                    table.insert(l_deletions_12, l_l_l_l_v316_0_2_0_0);
-                                end;
-                            end;
-                            l_l_l_v316_0_2_0 = l_l_l_v316_0_2_0.sibling;
-                        else
-                            v319 = true;
-                        end;
-                    until v319;
-                else
-                    break;
-                end;
-            else
-                local l_l_v316_0_3 = l_v316_0;
-                if v70 then
-                    local l_deletions_13 = v315.deletions;
-                    if l_deletions_13 == nil then
-                        v315.deletions = {
-                            l_l_v316_0_3
-                        };
-                        v315.flags = bit32.bor(v315.flags, l_Deletion_0);
-                    else
-                        table.insert(l_deletions_13, l_l_v316_0_3);
-                    end;
-                end;
-                l_v316_0 = l_v316_0.sibling;
-            end;
-            if v319 then
-                break;
-            end;
-        end;
-        v319 = false;
-        if v317.type == l_REACT_FRAGMENT_TYPE_0 then
-            local v342 = l_createFiberFromFragment_0(v317.props.children, v315.mode, v318, v317.key);
-            v342.return_ = v315;
-            return v342;
-        else
-            local v343 = l_createFiberFromElement_0(v317, v315.mode, v318);
-            v343.ref = coerceRef(v315, v316, v317);
-            v343.return_ = v315;
-            return v343;
-        end;
-    end;
-    local function v366(v345, v346, v347, v348) --[[ Line: 1460 ]] --[[ Name: reconcileSinglePortal ]]
-        -- upvalues: l_HostPortal_0 (ref), v70 (copy), l_Deletion_0 (ref), l_createWorkInProgress_0 (ref), l_createFiberFromPortal_0 (ref)
-        local v349 = false;
-        local l_key_3 = v347.key;
-        local l_v346_0 = v346;
-        while l_v346_0 ~= nil do
-            if l_v346_0.key == l_key_3 then
-                if l_v346_0.tag == l_HostPortal_0 and l_v346_0.stateNode.containerInfo == v347.containerInfo and l_v346_0.stateNode.implementation == v347.implementation then
-                    local l_sibling_3 = l_v346_0.sibling;
-                    if v70 then
-                        local l_l_sibling_3_0 = l_sibling_3;
-                        while l_l_sibling_3_0 ~= nil do
-                            local l_l_l_sibling_3_0_0 = l_l_sibling_3_0;
-                            if v70 then
-                                local l_deletions_14 = v345.deletions;
-                                if l_deletions_14 == nil then
-                                    v345.deletions = {
-                                        l_l_l_sibling_3_0_0
-                                    };
-                                    v345.flags = bit32.bor(v345.flags, l_Deletion_0);
-                                else
-                                    table.insert(l_deletions_14, l_l_l_sibling_3_0_0);
-                                end;
-                            end;
-                            l_l_sibling_3_0 = l_l_sibling_3_0.sibling;
-                        end;
-                    end;
-                    local l_l_v346_0_0 = l_v346_0;
-                    local v357 = v347.children or {};
-                    local v358 = l_createWorkInProgress_0(l_l_v346_0_0, v357);
-                    v358.index = 1;
-                    v358.sibling = nil;
-                    l_sibling_3 = v358;
-                    l_sibling_3.return_ = v345;
-                    return l_sibling_3;
-                else
-                    local l_l_v346_0_1 = l_v346_0;
-                    if v70 then
-                        local l_l_l_v346_0_1_0 = l_l_v346_0_1;
-                        repeat
-                            if l_l_l_v346_0_1_0 ~= nil then
-                                local l_l_l_l_v346_0_1_0_0 = l_l_l_v346_0_1_0;
-                                if v70 then
-                                    local l_deletions_15 = v345.deletions;
-                                    if l_deletions_15 == nil then
-                                        v345.deletions = {
-                                            l_l_l_l_v346_0_1_0_0
-                                        };
-                                        v345.flags = bit32.bor(v345.flags, l_Deletion_0);
-                                    else
-                                        table.insert(l_deletions_15, l_l_l_l_v346_0_1_0_0);
-                                    end;
-                                end;
-                                l_l_l_v346_0_1_0 = l_l_l_v346_0_1_0.sibling;
-                            else
-                                v349 = true;
-                            end;
-                        until v349;
-                    else
-                        break;
-                    end;
-                end;
-            else
-                local l_l_v346_0_2 = l_v346_0;
-                if v70 then
-                    local l_deletions_16 = v345.deletions;
-                    if l_deletions_16 == nil then
-                        v345.deletions = {
-                            l_l_v346_0_2
-                        };
-                        v345.flags = bit32.bor(v345.flags, l_Deletion_0);
-                    else
-                        table.insert(l_deletions_16, l_l_v346_0_2);
-                    end;
-                end;
-                l_v346_0 = l_v346_0.sibling;
-            end;
-            if v349 then
-                break;
-            end;
-        end;
-        v349 = false;
-        local v365 = l_createFiberFromPortal_0(v347, v345.mode, v348);
-        v365.return_ = v345;
-        return v365;
-    end;
-    local function v367(v368, v369, v370, v371) --[[ Line: 1499 ]] --[[ Name: reconcileChildFibers ]]
-        -- upvalues: l_REACT_FRAGMENT_TYPE_0 (ref), l_isArray_0 (ref), l_REACT_ELEMENT_TYPE_0 (ref), v344 (copy), v70 (copy), l_Placement_0 (ref), l_REACT_PORTAL_TYPE_0 (ref), v366 (copy), l_REACT_LAZY_TYPE_0 (ref), l_enableLazyElements_0 (ref), v367 (copy), v260 (copy), v314 (copy), l_getIteratorFn_0 (ref), v300 (copy), l___DEV___0 (ref), l_getComponentName_0 (ref), v48 (ref), l_console_0 (ref), l_Deletion_0 (ref)
-        local v372 = type(v370);
-        local v373 = false;
-        if v370 ~= nil then
-            v373 = false;
-            if v372 == "table" then
-                v373 = false;
-                if v370.type == l_REACT_FRAGMENT_TYPE_0 then
-                    v373 = v370.key == nil;
-                end;
-            end;
-        end;
-        if v373 then
-            v370 = v370.props.children;
-            v372 = type(v370);
-        end;
-        local v374 = l_isArray_0(v370);
-        local v375 = false;
-        if v370 ~= nil then
-            v375 = false;
-            if v372 == "table" then
-                v375 = not v374;
-            end;
-        end;
-        if v375 then
-            local v376 = v370["$$typeof"];
-            if v376 == l_REACT_ELEMENT_TYPE_0 then
-                local v377 = v344(v368, v369, v370, v371);
-                if v70 and v377.alternate == nil then
-                    v377.flags = bit32.bor(v377.flags, l_Placement_0);
-                end;
-                return v377;
-            elseif v376 == l_REACT_PORTAL_TYPE_0 then
-                local v378 = v366(v368, v369, v370, v371);
-                if v70 and v378.alternate == nil then
-                    v378.flags = bit32.bor(v378.flags, l_Placement_0);
-                end;
-                return v378;
-            elseif v376 == l_REACT_LAZY_TYPE_0 and l_enableLazyElements_0 then
-                local l__payload_5 = v370._payload;
-                local l__init_5 = v370._init;
-                return v367(v368, v369, l__init_5(l__payload_5), v371);
-            end;
-        elseif v374 then
-            return (v260(v368, v369, v370, v371));
-        elseif v372 == "string" or v372 == "number" then
-            local v381 = v314(v368, v369, tostring(v370), v371);
-            if v70 and v381.alternate == nil then
-                v381.flags = bit32.bor(v381.flags, l_Placement_0);
-            end;
-            return v381;
-        end;
-        local v382 = l_getIteratorFn_0(v370);
-        if v382 then
-            return (v300(v368, v369, v370, v371, v382));
-        else
-            if l___DEV___0 and v372 == "function" and l___DEV___0 then
-                local v383 = l_getComponentName_0(v368.type) or "Component";
-                if not v48[v383] then
-                    v48[v383] = true;
-                    l_console_0.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.");
-                end;
-            end;
-            if v370 ~= nil or not v373 then
+require(ParentParent.Shared)
+require(ParentParent.React)
+require(script.Parent.ReactInternalTypes)
+require(script.Parent.ReactFiberLane)
 
-            end;
-            if not v70 then
-                return nil;
-            else
-                local l_v369_0 = v369;
-                while l_v369_0 ~= nil do
-                    local l_l_v369_0_0 = l_v369_0;
-                    if v70 then
-                        local l_deletions_17 = v368.deletions;
-                        if l_deletions_17 == nil then
-                            v368.deletions = {
-                                l_l_v369_0_0
-                            };
-                            v368.flags = bit32.bor(v368.flags, l_Deletion_0);
-                        else
-                            table.insert(l_deletions_17, l_l_v369_0_0);
-                        end;
-                    end;
-                    l_v369_0 = l_v369_0.sibling;
-                end;
-                return nil;
-            end;
-        end;
-    end;
-    return v367;
-end;
-v45.reconcileChildFibers = v387(true);
-v45.mountChildFibers = v387(false);
-v45.cloneChildFibers = function(_, v389) --[[ Line: 1647 ]]
-    -- upvalues: l_createWorkInProgress_0 (copy)
-    if v389.child == nil then
-        return;
-    else
-        local l_child_0 = v389.child;
-        local v391 = l_createWorkInProgress_0(l_child_0, l_child_0.pendingProps);
-        v389.child = v391;
-        v391.return_ = v389;
-        while l_child_0.sibling ~= nil do
-            l_child_0 = l_child_0.sibling;
-            v391.sibling = l_createWorkInProgress_0(l_child_0, l_child_0.pendingProps);
-            v391 = v391.sibling;
-            v391.return_ = v389;
-        end;
-        v391.sibling = nil;
-        return;
-    end;
-end;
-v45.resetChildFibers = function(v392, v393) --[[ Line: 1674 ]]
-    -- upvalues: l_resetWorkInProgress_0 (copy)
-    local l_child_1 = v392.child;
-    while l_child_1 ~= nil do
-        l_resetWorkInProgress_0(l_child_1, v393);
-        l_child_1 = l_child_1.sibling;
-    end;
-end;
-return v45;
+local getComponentName = require(ParentParent.Shared).getComponentName
+local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
+local Placement = ReactFiberFlags.Placement
+local Deletion = ReactFiberFlags.Deletion
+local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local getIteratorFn = ReactSymbols.getIteratorFn
+local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
+local REACT_FRAGMENT_TYPE = ReactSymbols.REACT_FRAGMENT_TYPE
+local REACT_PORTAL_TYPE = ReactSymbols.REACT_PORTAL_TYPE
+local REACT_LAZY_TYPE = ReactSymbols.REACT_LAZY_TYPE
+local REACT_BLOCK_TYPE = ReactSymbols.REACT_BLOCK_TYPE
+local ReactWorkTags = require(script.Parent.ReactWorkTags)
+local _ = ReactWorkTags.FunctionComponent
+local _ = ReactWorkTags.ClassComponent
+local HostText = ReactWorkTags.HostText
+local HostPortal = ReactWorkTags.HostPortal
+local _ = ReactWorkTags.ForwardRef
+local Fragment = ReactWorkTags.Fragment
+local _ = ReactWorkTags.SimpleMemoComponent
+local Block = ReactWorkTags.Block
+local invariant = require(ParentParent.Shared).invariant
+local ReactFeatureFlags = require(ParentParent.Shared).ReactFeatureFlags
+local enableLazyElements = ReactFeatureFlags.enableLazyElements
+local enableBlocksAPI = ReactFeatureFlags.enableBlocksAPI
+local lib = require(script.Parent["ReactFiber.new"])
+local createWorkInProgress = lib.createWorkInProgress
+local resetWorkInProgress = lib.resetWorkInProgress
+local createFiberFromElement = lib.createFiberFromElement
+local createFiberFromFragment = lib.createFiberFromFragment
+local createFiberFromText = lib.createFiberFromText
+local createFiberFromPortal = lib.createFiberFromPortal
+local isCompatibleFamilyForHotReloading = require(script.Parent["ReactFiberHotReloading.new"]).isCompatibleFamilyForHotReloading
+local t1 = {}
+local u43 = nil
+local t2 = nil
+local t3 = nil
+
+local function u46(_, _) -- line: 97
+end
+
+if __DEV__ then
+	u43 = false
+	t2 = {}
+	t3 = {}
+
+	function u46(p3, p4) -- line: 119
+		-- upvalues: invariant (copy), getComponentName (copy), t2 (ref), console (copy)
+		if p3 == nil or type(p3) ~= "table" then
+			return
+		end
+
+		if not p3._store or p3._store.validated or p3.key ~= nil then
+			return
+		end
+
+		invariant(p3._store ~= nil and type(p3._store) == "table", "React Component in warnForMissingKey should have a _store. This error is likely caused by a bug in React. Please file an issue.")
+		p3._store.validated = true
+
+		local v54 = getComponentName(p4.type) or "Component"
+
+		if t2[v54] then
+			return
+		end
+
+		t2[v54] = true
+		console.error("Each child in a list should have a unique \"key\" prop. See https://reactjs.org/link/warning-keys for more information.")
+	end
+end
+
+local isArray = Array.isArray
+
+function coerceRef(p5, _, p7) -- line: 150
+	-- upvalues: __DEV__ (copy), getComponentName (copy), Error (copy)
+	local ref = p7.ref
+
+	if ref ~= nil and type(ref) == "string" then
+		if not p7._owner or not p7._self or p7._owner.stateNode == p7._self then
+			local v59 = not __DEV__ and "<enable __DEV__ mode for component names>" or (getComponentName(p5.type) or "Component")
+
+			error(Error.new(string.format("Component \"%s\" contains the string ref \"%s\". Support for string refs has been removed. We recommend using useRef() or createRef() instead. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-string-ref", v59, (tostring(ref)))))
+		end
+
+		if not p7._owner then
+			error("Expected ref to be a function or an object returned by React.createRef(), or nil.")
+		end
+	end
+
+	return ref
+end
+
+local function warnOnFunctionType(p8) -- line: 323
+	-- upvalues: __DEV__ (copy), getComponentName (copy), t3 (ref), console (copy)
+	if __DEV__ then
+		local v61 = getComponentName(p8.type) or "Component"
+
+		if t3[v61] then
+			return
+		end
+
+		t3[v61] = true
+		console.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.")
+	end
+end
+
+function resolveLazyType(p9) -- line: 342
+	-- upvalues: describeError (copy)
+	local _payload = p9._payload
+	local _init = p9._init
+	local ok, result = xpcall(_init, describeError, _payload)
+
+	if not ok then
+		return p9
+	end
+
+	return result
+end
+
+local function ChildReconciler(p10) -- line: 360
+	-- upvalues: Deletion (copy), createWorkInProgress (copy), Placement (copy), HostText (copy), createFiberFromText (copy), __DEV__ (copy), isCompatibleFamilyForHotReloading (copy), enableBlocksAPI (copy), Block (copy), REACT_LAZY_TYPE (copy), REACT_BLOCK_TYPE (copy), createFiberFromElement (copy), HostPortal (copy), createFiberFromPortal (copy), Fragment (copy), createFiberFromFragment (copy), REACT_ELEMENT_TYPE (copy), REACT_PORTAL_TYPE (copy), enableLazyElements (copy), getComponentName (copy), t3 (ref), console (copy), REACT_FRAGMENT_TYPE (copy), u46 (ref), v9 (copy), u43 (ref), isArray (copy), getIteratorFn (copy)
+	local function deleteChild(p11, p12) -- line: 361
+		-- upvalues: p10 (copy), Deletion (copy)
+		if not p10 then
+			return
+		end
+
+		local deletions = p11.deletions
+
+		if deletions == nil then
+			p11.deletions = { p12 }
+			p11.flags = bit32.bor(p11.flags, Deletion)
+
+			return
+		end
+
+		table.insert(deletions, p12)
+	end
+	local function deleteRemainingChildren(p13, p14) -- line: 375
+		-- upvalues: p10 (copy), Deletion (copy)
+		if not p10 then
+			return nil
+		end
+
+		while p14 ~= nil do
+			if p10 then
+				local deletions = p13.deletions
+
+				if deletions == nil then
+					p13.deletions = { p14 }
+					p13.flags = bit32.bor(p13.flags, Deletion)
+				else
+					table.insert(deletions, p14)
+				end
+			end
+
+			p14 = p14.sibling
+		end
+
+		return nil
+	end
+	local function mapRemainingChildren(_, p16) -- line: 394
+		local t4 = {}
+
+		while p16 ~= nil do
+			if p16.key ~= nil then
+				t4[p16.key] = p16
+			else
+				t4[p16.index] = p16
+			end
+
+			p16 = p16.sibling
+		end
+
+		return t4
+	end
+	local function useFiber(p17, p18) -- line: 416
+		-- upvalues: createWorkInProgress (copy)
+		local v107 = createWorkInProgress(p17, p18)
+
+		v107.index = 1
+		v107.sibling = nil
+
+		return v107
+	end
+	local function placeChild(p19, n1: number, n2: number) -- line: 426
+		-- upvalues: p10 (copy), Placement (copy)
+		p19.index = n2
+
+		if not p10 then
+			return n1
+		end
+
+		local alternate = p19.alternate
+
+		if alternate ~= nil then
+			local index = alternate.index
+
+			if index < n1 then
+				p19.flags = bit32.bor(p19.flags, Placement)
+
+				return n1
+			end
+
+			return index
+		end
+
+		p19.flags = bit32.bor(p19.flags, Placement)
+
+		return n1
+	end
+	local function placeSingleChild(p20) -- line: 454
+		-- upvalues: p10 (copy), Placement (copy)
+		if p10 and p20.alternate == nil then
+			p20.flags = bit32.bor(p20.flags, Placement)
+		end
+
+		return p20
+	end
+	local function updateTextNode(p21, p22, s1: string, p23) -- line: 463
+		-- upvalues: HostText (copy), createFiberFromText (copy), createWorkInProgress (copy)
+		if p22 == nil or p22.tag ~= HostText then
+			local v118 = createFiberFromText(s1, p21.mode, p23)
+
+			v118.return_ = p21
+
+			return v118
+		end
+
+		local v119 = createWorkInProgress(p22, s1)
+
+		v119.index = 1
+		v119.sibling = nil
+		v119.return_ = p21
+
+		return v119
+	end
+	local function updateElement(p24, p25, p26, p27) -- line: 483
+		-- upvalues: __DEV__ (copy), isCompatibleFamilyForHotReloading (copy), createWorkInProgress (copy), enableBlocksAPI (copy), Block (copy), REACT_LAZY_TYPE (copy), REACT_BLOCK_TYPE (copy), createFiberFromElement (copy)
+		if p25 ~= nil then
+			if p25.elementType == p26.type or __DEV__ and isCompatibleFamilyForHotReloading(p25, p26) then
+				local props = p26.props
+				local v125 = createWorkInProgress(p25, props)
+
+				v125.index = 1
+				v125.sibling = nil
+				v125.ref = coerceRef(p24, p25, p26)
+				v125.return_ = p24
+
+				if __DEV__ then
+					v125._debugSource = p26._source
+					v125._debugOwner = p26._owner
+				end
+
+				return v125
+			end
+
+			if enableBlocksAPI and p25.tag == Block then
+				local type2 = p26.type
+
+				if type(type2) == "table" and type2["$$typeof"] == REACT_LAZY_TYPE then
+					type2 = resolveLazyType(type2)
+				end
+
+				if type2["$$typeof"] == REACT_BLOCK_TYPE and type2._render == p25.type._render then
+					local props = p26.props
+					local v128 = createWorkInProgress(p25, props)
+
+					v128.index = 1
+					v128.sibling = nil
+					v128.return_ = p24
+					v128.type = type2
+
+					if __DEV__ then
+						v128._debugSource = p26._source
+						v128._debugOwner = p26._owner
+					end
+
+					return v128
+				end
+			end
+		end
+
+		local v129 = createFiberFromElement(p26, p24.mode, p27)
+
+		v129.ref = coerceRef(p24, p25, p26)
+		v129.return_ = p24
+
+		return v129
+	end
+	local function updatePortal(p28, p29, p30, p31) -- line: 534
+		-- upvalues: HostPortal (copy), createFiberFromPortal (copy), createWorkInProgress (copy)
+		if p29 == nil or (p29.tag ~= HostPortal or p29.stateNode.containerInfo ~= p30.containerInfo or p29.stateNode.implementation ~= p30.implementation) then
+			local v134 = createFiberFromPortal(p30, p28.mode, p31)
+
+			v134.return_ = p28
+
+			return v134
+		end
+
+		local v135 = p30.children or {}
+		local v136 = createWorkInProgress(p29, v135)
+
+		v136.index = 1
+		v136.sibling = nil
+		v136.return_ = p28
+
+		return v136
+	end
+	local function updateFragment(p32, p33, p34, p35, s2: string?) -- line: 559
+		-- upvalues: Fragment (copy), createFiberFromFragment (copy), createWorkInProgress (copy)
+		if p33 == nil or p33.tag ~= Fragment then
+			local v142 = createFiberFromFragment(p34, p32.mode, p35, s2)
+
+			v142.return_ = p32
+
+			return v142
+		end
+
+		local v143 = createWorkInProgress(p33, p34)
+
+		v143.index = 1
+		v143.sibling = nil
+		v143.return_ = p32
+
+		return v143
+	end
+	local function assignStableKey(p36, t5: {[any]: any}) -- line: 586
+		if t5.key == nil then
+			local v146 = type(p36)
+
+			if v146 == "string" or v146 == "number" then
+				t5.key = p36
+
+				return
+			end
+
+			if v146 == "table" then
+				t5.key = tostring(p36)
+			end
+		end
+	end
+	local function createChild(p37, p38, p39, p40) -- line: 605
+		-- upvalues: REACT_ELEMENT_TYPE (copy), createFiberFromElement (copy), REACT_PORTAL_TYPE (copy), createFiberFromPortal (copy), REACT_LAZY_TYPE (copy), enableLazyElements (copy), createChild (copy), createFiberFromFragment (copy), createFiberFromText (copy), __DEV__ (copy), getComponentName (copy), t3 (ref), console (copy)
+		if p38 == nil then
+			return nil
+		end
+
+		local v151 = type(p38)
+
+		if v151 == "table" then
+			if p38.key == nil then
+				local v152 = type(p40)
+
+				if v152 == "string" or v152 == "number" then
+					p38.key = p40
+				elseif v152 == "table" then
+					p38.key = tostring(p40)
+				end
+			end
+
+			local v153 = p38["$$typeof"]
+
+			if v153 == REACT_ELEMENT_TYPE then
+				local v154 = createFiberFromElement(p38, p37.mode, p39)
+
+				v154.ref = coerceRef(p37, nil, p38)
+				v154.return_ = p37
+
+				return v154
+			end
+
+			if v153 == REACT_PORTAL_TYPE then
+				local v155 = createFiberFromPortal(p38, p37.mode, p39)
+
+				v155.return_ = p37
+
+				return v155
+			end
+
+			if v153 == REACT_LAZY_TYPE and enableLazyElements then
+				local _payload = p38._payload
+				local _init = p38._init
+
+				return createChild(p37, _init(_payload), p39)
+			end
+
+			local v158 = createFiberFromFragment(p38, p37.mode, p39, nil)
+
+			v158.return_ = p37
+
+			return v158
+		end
+
+		if v151 == "string" or v151 == "number" then
+			local v159 = createFiberFromText(tostring(p38), p37.mode, p39)
+
+			v159.return_ = p37
+
+			return v159
+		end
+
+		if __DEV__ and v151 == "function" and __DEV__ then
+			local v160 = getComponentName(p37.type) or "Component"
+
+			if not t3[v160] then
+				t3[v160] = true
+				console.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.")
+			end
+		end
+
+		return nil
+	end
+	local function updateSlot(p41, p42, p43, p44, p45) -- line: 676
+		-- upvalues: REACT_ELEMENT_TYPE (copy), REACT_FRAGMENT_TYPE (copy), Fragment (copy), createFiberFromFragment (copy), createWorkInProgress (copy), updateElement (copy), REACT_PORTAL_TYPE (copy), updatePortal (copy), REACT_LAZY_TYPE (copy), enableLazyElements (copy), updateSlot (copy), HostText (copy), createFiberFromText (copy), __DEV__ (copy), getComponentName (copy), t3 (ref), console (copy)
+		if p43 == nil then
+			return nil
+		end
+
+		local v166 = if p42 == nil then nil else p42.key
+		local v167 = type(p43)
+
+		if v167 == "table" then
+			if p43.key == nil then
+				local v168 = type(p45)
+
+				if v168 == "string" or v168 == "number" then
+					p43.key = p45
+				elseif v168 == "table" then
+					p43.key = tostring(p45)
+				end
+			end
+
+			local v169 = p43["$$typeof"]
+
+			if v169 == REACT_ELEMENT_TYPE then
+				if v166 == p43.key then
+					if p43.type == REACT_FRAGMENT_TYPE then
+						local children = p43.props.children
+
+						if p42 == nil or p42.tag ~= Fragment then
+							local v171 = createFiberFromFragment(children, p41.mode, p44, v166)
+
+							v171.return_ = p41
+
+							return v171
+						end
+
+						local v172 = createWorkInProgress(p42, children)
+
+						v172.index = 1
+						v172.sibling = nil
+						v172.return_ = p41
+
+						return v172
+					end
+
+					return (updateElement(p41, p42, p43, p44))
+				end
+
+				return nil
+			end
+
+			if v169 == REACT_PORTAL_TYPE then
+				if v166 == p43.key then
+					return (updatePortal(p41, p42, p43, p44))
+				end
+
+				return nil
+			end
+
+			if v169 == REACT_LAZY_TYPE and enableLazyElements then
+				local _payload = p43._payload
+				local _init = p43._init
+
+				return updateSlot(p41, p42, _init(_payload), p44)
+			end
+
+			if v166 ~= nil then
+				return nil
+			end
+
+			if p42 == nil or p42.tag ~= Fragment then
+				local v175 = createFiberFromFragment(p43, p41.mode, p44, nil)
+
+				v175.return_ = p41
+
+				return v175
+			end
+
+			local v176 = createWorkInProgress(p42, p43)
+
+			v176.index = 1
+			v176.sibling = nil
+			v176.return_ = p41
+
+			return v176
+		end
+
+		if v167 == "string" or v167 == "number" then
+			if v166 ~= nil then
+				return nil
+			end
+
+			local str = tostring(p43)
+
+			if p42 == nil or p42.tag ~= HostText then
+				local v178 = createFiberFromText(str, p41.mode, p44)
+
+				v178.return_ = p41
+
+				return v178
+			end
+
+			local v179 = createWorkInProgress(p42, str)
+
+			v179.index = 1
+			v179.sibling = nil
+			v179.return_ = p41
+
+			return v179
+		end
+
+		if __DEV__ and v167 == "function" and __DEV__ then
+			local v180 = getComponentName(p41.type) or "Component"
+
+			if not t3[v180] then
+				t3[v180] = true
+				console.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.")
+			end
+		end
+
+		return nil
+	end
+	local function updateFromMap(t6: {[any]: any}, p46, n3: number, p47, p48, p49) -- line: 764
+		-- upvalues: REACT_ELEMENT_TYPE (copy), REACT_FRAGMENT_TYPE (copy), Fragment (copy), createFiberFromFragment (copy), createWorkInProgress (copy), updateElement (copy), REACT_PORTAL_TYPE (copy), updatePortal (copy), REACT_LAZY_TYPE (copy), enableLazyElements (copy), updateFromMap (copy), HostText (copy), createFiberFromText (copy), __DEV__ (copy), getComponentName (copy), t3 (ref), console (copy)
+		if p47 == nil then
+			return nil
+		end
+
+		local v187 = type(p47)
+
+		if v187 == "table" then
+			if p47.key == nil then
+				local v188 = type(p49)
+
+				if v188 == "string" or v188 == "number" then
+					p47.key = p49
+				elseif v188 == "table" then
+					p47.key = tostring(p49)
+				end
+			end
+
+			local v189 = p47["$$typeof"]
+
+			if v189 == REACT_ELEMENT_TYPE then
+				local v190 = t6[if p47.key ~= nil then p47.key else n3]
+
+				if p47.type == REACT_FRAGMENT_TYPE then
+					local children = p47.props.children
+					local key = p47.key
+
+					if v190 == nil or v190.tag ~= Fragment then
+						local v193 = createFiberFromFragment(children, p46.mode, p48, key)
+
+						v193.return_ = p46
+
+						return v193
+					end
+
+					local v194 = createWorkInProgress(v190, children)
+
+					v194.index = 1
+					v194.sibling = nil
+					v194.return_ = p46
+
+					return v194
+				end
+
+				return (updateElement(p46, v190, p47, p48))
+			end
+
+			if v189 == REACT_PORTAL_TYPE then
+				local v195 = t6[if p47.key ~= nil then p47.key else n3]
+
+				return (updatePortal(p46, v195, p47, p48))
+			end
+
+			if v189 == REACT_LAZY_TYPE and enableLazyElements then
+				local _payload = p47._payload
+				local _init = p47._init
+
+				return updateFromMap(t6, p46, n3, _init(_payload), p48)
+			end
+
+			local v198 = t6[n3]
+
+			if v198 == nil or v198.tag ~= Fragment then
+				local v199 = createFiberFromFragment(p47, p46.mode, p48, nil)
+
+				v199.return_ = p46
+
+				return v199
+			end
+
+			local v200 = createWorkInProgress(v198, p47)
+
+			v200.index = 1
+			v200.sibling = nil
+			v200.return_ = p46
+
+			return v200
+		end
+
+		if v187 == "string" or v187 == "number" then
+			local v201 = t6[n3] or nil
+			local str = tostring(p47)
+
+			if v201 == nil or v201.tag ~= HostText then
+				local v203 = createFiberFromText(str, p46.mode, p48)
+
+				v203.return_ = p46
+
+				return v203
+			end
+
+			local v204 = createWorkInProgress(v201, str)
+
+			v204.index = 1
+			v204.sibling = nil
+			v204.return_ = p46
+
+			return v204
+		end
+
+		if __DEV__ and v187 == "function" and __DEV__ then
+			local v205 = getComponentName(p46.type) or "Component"
+
+			if not t3[v205] then
+				t3[v205] = true
+				console.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.")
+			end
+		end
+
+		return nil
+	end
+	local function warnOnInvalidKey(p50, t7: {[any]: any}?, p51) -- line: 858
+		-- upvalues: __DEV__ (copy), REACT_ELEMENT_TYPE (copy), REACT_PORTAL_TYPE (copy), u46 (ref), console (copy), REACT_LAZY_TYPE (copy), enableLazyElements (copy), warnOnInvalidKey (copy)
+		if __DEV__ then
+			if p50 == nil or type(p50) ~= "table" then
+				return t7
+			end
+
+			local v209 = p50["$$typeof"]
+
+			if v209 == REACT_ELEMENT_TYPE or v209 == REACT_PORTAL_TYPE then
+				u46(p50, p51)
+
+				local key = p50.key
+
+				if type(key) ~= "string" then
+					return t7
+				end
+
+				if t7 == nil then
+					return {
+						[key] = true
+					}
+				end
+
+				if not t7[key] then
+					t7[key] = true
+
+					return t7
+				end
+
+				console.error("Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.", key)
+
+				return t7
+			end
+
+			if v209 == REACT_LAZY_TYPE and enableLazyElements then
+				local _payload = p50._payload
+				local _init = p50._init
+
+				warnOnInvalidKey(_init(_payload), t7, p51)
+			end
+		end
+
+		return t7
+	end
+	local function reconcileChildrenArray(p52, p53, t8: {[any]: any}, p54) -- line: 900
+		-- upvalues: __DEV__ (copy), warnOnInvalidKey (copy), updateSlot (copy), p10 (copy), Deletion (copy), Placement (copy), createChild (copy), mapRemainingChildren (copy), v9 (copy), updateFromMap (copy)
+		if __DEV__ then
+			local v217 = nil
+
+			for _, v219 in t8 do
+				v217 = warnOnInvalidKey(v219, v217, p52)
+			end
+		end
+
+		local v220 = nil
+		local v221 = nil
+		local n4 = 1
+		local n5 = 1
+		local v224 = #t8
+
+		while p53 ~= nil and n5 <= v224 do
+			local v225
+
+			if n5 < p53.index then
+				v225 = p53
+				p53 = nil
+			else
+				v225 = p53.sibling
+			end
+
+			local v226 = t8[n5]
+			local v227 = if v226 == nil or (type(v226) ~= "table" or v226["$$typeof"] == nil) then updateSlot(p52, p53, v226, p54) else updateSlot(p52, p53, v226, p54, n5)
+
+			if v227 == nil then
+				if p53 == nil then
+					p53 = v225
+				end
+
+				break
+			end
+
+			if p10 and p53 and v227.alternate == nil then
+				if p10 then
+					local deletions = p52.deletions
+
+					if deletions == nil then
+						p52.deletions = { p53 }
+						p52.flags = bit32.bor(p52.flags, Deletion)
+					else
+						table.insert(deletions, p53)
+					end
+				end
+			end
+
+			v227.index = n5
+
+			if not p10 then
+			else
+				local alternate = v227.alternate
+
+				if alternate ~= nil then
+					local index = alternate.index
+
+					if index < n4 then
+						v227.flags = bit32.bor(v227.flags, Placement)
+					else
+						n4 = index
+					end
+				else
+					v227.flags = bit32.bor(v227.flags, Placement)
+				end
+			end
+
+			if v221 == nil then
+				v220 = v227
+			else
+				v221.sibling = v227
+			end
+
+			v221 = v227
+			p53 = v225
+			n5 += 1
+		end
+
+		if v224 < n5 then
+			if not p10 then
+				return v220
+			end
+
+			while p53 ~= nil do
+				if p10 then
+					local deletions = p52.deletions
+
+					if deletions == nil then
+						p52.deletions = { p53 }
+						p52.flags = bit32.bor(p52.flags, Deletion)
+					else
+						table.insert(deletions, p53)
+					end
+				end
+
+				p53 = p53.sibling
+			end
+
+			return v220
+		end
+
+		if p53 == nil then
+			while n5 <= v224 do
+				local v232 = t8[n5]
+				local v233 = if v232 == nil or (type(v232) ~= "table" or v232["$$typeof"] == nil) then createChild(p52, v232, p54) else createChild(p52, v232, p54, n5)
+
+				if v233 == nil then
+					n5 += 1
+				else
+					v233.index = n5
+
+					if not p10 then
+					else
+						local alternate = v233.alternate
+
+						if alternate ~= nil then
+							local index = alternate.index
+
+							if index < n4 then
+								v233.flags = bit32.bor(v233.flags, Placement)
+							else
+								n4 = index
+							end
+						else
+							v233.flags = bit32.bor(v233.flags, Placement)
+						end
+					end
+
+					if v221 == nil then
+						v220 = v233
+					else
+						v221.sibling = v233
+					end
+
+					v221 = v233
+					n5 += 1
+				end
+			end
+
+			return v220
+		end
+
+		local v236 = mapRemainingChildren(p52, p53)
+
+		while n5 <= v224 do
+			local v237 = t8[n5]
+			local v238 = if not not v9 and (v237 == nil or (type(v237) ~= "table" or v237["$$typeof"] == nil)) then updateFromMap(v236, p52, n5, v237, p54) else updateFromMap(v236, p52, n5, v237, p54, n5)
+
+			if v238 ~= nil then
+				if p10 and v238.alternate ~= nil then
+					v236[if v238.key ~= nil then v238.key else n5] = nil
+				end
+
+				v238.index = n5
+
+				if not p10 then
+				else
+					local alternate = v238.alternate
+
+					if alternate ~= nil then
+						local index = alternate.index
+
+						if index < n4 then
+							v238.flags = bit32.bor(v238.flags, Placement)
+						else
+							n4 = index
+						end
+					else
+						v238.flags = bit32.bor(v238.flags, Placement)
+					end
+				end
+
+				if v221 == nil then
+					v220 = v238
+				else
+					v221.sibling = v238
+				end
+
+				v221 = v238
+			end
+
+			n5 += 1
+		end
+
+		if p10 then
+			for _, v242 in v236 do
+				if p10 then
+					local deletions = p52.deletions
+
+					if deletions == nil then
+						p52.deletions = { v242 }
+						p52.flags = bit32.bor(p52.flags, Deletion)
+					else
+						table.insert(deletions, v242)
+					end
+				end
+			end
+		end
+
+		return v220
+	end
+	local function reconcileChildrenIterator(p55, p56, p57, p58, p59: ((...any) -> ...any)) -- line: 1127
+		-- upvalues: __DEV__ (copy), u43 (ref), console (copy), warnOnInvalidKey (copy), updateSlot (copy), p10 (copy), Deletion (copy), Placement (copy), createChild (copy), mapRemainingChildren (copy), updateFromMap (copy)
+		if __DEV__ then
+			if p59 == p57.entries then
+				if not u43 then
+					console.error("Using Maps as children is not supported. Use an array of keyed ReactElements instead.")
+				end
+
+				u43 = true
+			end
+
+			local v249 = p59(p57)
+
+			if v249 then
+				local v250 = nil
+				local v251 = v249.next()
+
+				while not v251.done do
+					v251 = v249.next()
+
+					local value = v251.value
+
+					v250 = warnOnInvalidKey(value, v250, p55)
+				end
+			end
+		end
+
+		local v253 = p59(p57)
+		local v254 = nil
+		local v255 = nil
+		local n6 = 1
+		local n7 = 1
+		local v258 = v253.next()
+
+		while p56 ~= nil and not v258.done do
+			local v259
+
+			if n7 < p56.index then
+				v259 = p56
+				p56 = nil
+			else
+				v259 = p56.sibling
+			end
+
+			local v260 = updateSlot(p55, p56, v258.value, p58, v258.key)
+
+			if v260 == nil then
+				if p56 == nil then
+					p56 = v259
+				end
+
+				break
+			end
+
+			if p10 and p56 and v260.alternate == nil then
+				if p10 then
+					local deletions = p55.deletions
+
+					if deletions == nil then
+						p55.deletions = { p56 }
+						p55.flags = bit32.bor(p55.flags, Deletion)
+					else
+						table.insert(deletions, p56)
+					end
+				end
+			end
+
+			v260.index = n7
+
+			if not p10 then
+			else
+				local alternate = v260.alternate
+
+				if alternate ~= nil then
+					local index = alternate.index
+
+					if index < n6 then
+						v260.flags = bit32.bor(v260.flags, Placement)
+					else
+						n6 = index
+					end
+				else
+					v260.flags = bit32.bor(v260.flags, Placement)
+				end
+			end
+
+			if v255 == nil then
+				v254 = v260
+			else
+				v255.sibling = v260
+			end
+
+			v255 = v260
+			p56 = v259
+			n7 += 1
+			v258 = v253.next()
+		end
+
+		if v258.done then
+			if not p10 then
+				return v254
+			end
+
+			while p56 ~= nil do
+				if p10 then
+					local deletions = p55.deletions
+
+					if deletions == nil then
+						p55.deletions = { p56 }
+						p55.flags = bit32.bor(p55.flags, Deletion)
+					else
+						table.insert(deletions, p56)
+					end
+				end
+
+				p56 = p56.sibling
+			end
+
+			return v254
+		end
+
+		if p56 == nil then
+			while not v258.done do
+				local v265 = createChild(p55, v258.value, p58, v258.key)
+
+				if v265 == nil then
+					n7 += 1
+					v258 = v253.next()
+				else
+					v265.index = n7
+
+					if not p10 then
+					else
+						local alternate = v265.alternate
+
+						if alternate ~= nil then
+							local index = alternate.index
+
+							if index < n6 then
+								v265.flags = bit32.bor(v265.flags, Placement)
+							else
+								n6 = index
+							end
+						else
+							v265.flags = bit32.bor(v265.flags, Placement)
+						end
+					end
+
+					if v255 == nil then
+						v254 = v265
+					else
+						v255.sibling = v265
+					end
+
+					v255 = v265
+					n7 += 1
+					v258 = v253.next()
+				end
+			end
+
+			return v254
+		end
+
+		local v268 = nil
+
+		while not v258.done do
+			if not v268 then
+				v268 = mapRemainingChildren(p55, p56)
+			end
+
+			local v269 = updateFromMap(v268, p55, n7, v258.value, p58, v258.key)
+
+			if v269 ~= nil then
+				if p10 and v269.alternate ~= nil then
+					if v269.key == nil then
+						v268[n7] = nil
+					else
+						v268[v269.key] = nil
+					end
+				end
+
+				v269.index = n7
+
+				if not p10 then
+				else
+					local alternate = v269.alternate
+
+					if alternate ~= nil then
+						local index = alternate.index
+
+						if index < n6 then
+							v269.flags = bit32.bor(v269.flags, Placement)
+						else
+							n6 = index
+						end
+					else
+						v269.flags = bit32.bor(v269.flags, Placement)
+					end
+				end
+
+				if v255 == nil then
+					v254 = v269
+				else
+					v255.sibling = v269
+				end
+
+				v255 = v269
+			end
+
+			n7 += 1
+			v258 = v253.next()
+		end
+
+		if p10 then
+			for _, v273 in v268 do
+				if p10 then
+					local deletions = p55.deletions
+
+					if deletions == nil then
+						p55.deletions = { v273 }
+						p55.flags = bit32.bor(p55.flags, Deletion)
+					else
+						table.insert(deletions, v273)
+					end
+				end
+			end
+		end
+
+		return v254
+	end
+	local function reconcileSingleTextNode(p60, p61, s3: string, p62) -- line: 1340
+		-- upvalues: HostText (copy), p10 (copy), Deletion (copy), createWorkInProgress (copy), createFiberFromText (copy)
+		if p61 ~= nil and p61.tag == HostText then
+			local sibling = p61.sibling
+
+			if p10 then
+				while sibling ~= nil do
+					if p10 then
+						local deletions = p60.deletions
+
+						if deletions == nil then
+							p60.deletions = { sibling }
+							p60.flags = bit32.bor(p60.flags, Deletion)
+						else
+							table.insert(deletions, sibling)
+						end
+					end
+
+					sibling = sibling.sibling
+				end
+			end
+
+			local v281 = createWorkInProgress(p61, s3)
+
+			v281.index = 1
+			v281.sibling = nil
+			v281.return_ = p60
+
+			return v281
+		end
+
+		if p10 then
+			while p61 ~= nil do
+				if p10 then
+					local deletions = p60.deletions
+
+					if deletions == nil then
+						p60.deletions = { p61 }
+						p60.flags = bit32.bor(p60.flags, Deletion)
+					else
+						table.insert(deletions, p61)
+					end
+				end
+
+				p61 = p61.sibling
+			end
+		end
+
+		local v283 = createFiberFromText(s3, p60.mode, p62)
+
+		v283.return_ = p60
+
+		return v283
+	end
+	local function reconcileSingleElement(p63, p64, p65, p66) -- line: 1365
+		-- upvalues: Fragment (copy), REACT_FRAGMENT_TYPE (copy), p10 (copy), Deletion (copy), createWorkInProgress (copy), __DEV__ (copy), isCompatibleFamilyForHotReloading (copy), createFiberFromFragment (copy), createFiberFromElement (copy)
+		local key = p65.key
+		local v289 = p64
+
+		while v289 ~= nil do
+			if key == v289.key then
+				if v289.tag == Fragment then
+					if p65.type == REACT_FRAGMENT_TYPE then
+						local sibling = v289.sibling
+
+						if p10 then
+							while sibling ~= nil do
+								if p10 then
+									local deletions = p63.deletions
+
+									if deletions == nil then
+										p63.deletions = { sibling }
+										p63.flags = bit32.bor(p63.flags, Deletion)
+									else
+										table.insert(deletions, sibling)
+									end
+								end
+
+								sibling = sibling.sibling
+							end
+						end
+
+						local children = p65.props.children
+						local v293 = createWorkInProgress(v289, children)
+
+						v293.index = 1
+						v293.sibling = nil
+						v293.return_ = p63
+
+						if __DEV__ then
+							v293._debugSource = p65._source
+							v293._debugOwner = p65._owner
+						end
+
+						return v293
+					end
+				elseif v289.elementType == p65.type or __DEV__ and isCompatibleFamilyForHotReloading(v289, p65) then
+					local sibling = v289.sibling
+
+					if p10 then
+						while sibling ~= nil do
+							if p10 then
+								local deletions = p63.deletions
+
+								if deletions == nil then
+									p63.deletions = { sibling }
+									p63.flags = bit32.bor(p63.flags, Deletion)
+								else
+									table.insert(deletions, sibling)
+								end
+							end
+
+							sibling = sibling.sibling
+						end
+					end
+
+					local props = p65.props
+					local v297 = createWorkInProgress(v289, props)
+
+					v297.index = 1
+					v297.sibling = nil
+					v297.ref = coerceRef(p63, v289, p65)
+					v297.return_ = p63
+
+					if __DEV__ then
+						v297._debugSource = p65._source
+						v297._debugOwner = p65._owner
+					end
+
+					return v297
+				end
+
+				if p10 then
+					while v289 ~= nil do
+						if p10 then
+							local deletions = p63.deletions
+
+							if deletions == nil then
+								p63.deletions = { v289 }
+								p63.flags = bit32.bor(p63.flags, Deletion)
+							else
+								table.insert(deletions, v289)
+							end
+						end
+
+						v289 = v289.sibling
+					end
+				end
+
+				break
+			end
+
+			if p10 then
+				local deletions = p63.deletions
+
+				if deletions == nil then
+					p63.deletions = { v289 }
+					p63.flags = bit32.bor(p63.flags, Deletion)
+				else
+					table.insert(deletions, v289)
+				end
+			end
+
+			v289 = v289.sibling
+		end
+
+		if p65.type == REACT_FRAGMENT_TYPE then
+			local v300 = createFiberFromFragment(p65.props.children, p63.mode, p66, p65.key)
+
+			v300.return_ = p63
+
+			return v300
+		end
+
+		local v301 = createFiberFromElement(p65, p63.mode, p66)
+
+		v301.ref = coerceRef(p63, p64, p65)
+		v301.return_ = p63
+
+		return v301
+	end
+	local function reconcileSinglePortal(p67, p68, p69, p70) -- line: 1460
+		-- upvalues: HostPortal (copy), p10 (copy), Deletion (copy), createWorkInProgress (copy), createFiberFromPortal (copy)
+		local key = p69.key
+
+		while p68 ~= nil do
+			if key == p68.key then
+				if p68.tag == HostPortal and p68.stateNode.containerInfo == p69.containerInfo and p68.stateNode.implementation == p69.implementation then
+					local sibling = p68.sibling
+
+					if p10 then
+						while sibling ~= nil do
+							if p10 then
+								local deletions = p67.deletions
+
+								if deletions == nil then
+									p67.deletions = { sibling }
+									p67.flags = bit32.bor(p67.flags, Deletion)
+								else
+									table.insert(deletions, sibling)
+								end
+							end
+
+							sibling = sibling.sibling
+						end
+					end
+
+					local v309 = p69.children or {}
+					local v310 = createWorkInProgress(p68, v309)
+
+					v310.index = 1
+					v310.sibling = nil
+					v310.return_ = p67
+
+					return v310
+				end
+
+				if p10 then
+					while p68 ~= nil do
+						if p10 then
+							local deletions = p67.deletions
+
+							if deletions == nil then
+								p67.deletions = { p68 }
+								p67.flags = bit32.bor(p67.flags, Deletion)
+							else
+								table.insert(deletions, p68)
+							end
+						end
+
+						p68 = p68.sibling
+					end
+				end
+
+				break
+			end
+
+			if p10 then
+				local deletions = p67.deletions
+
+				if deletions == nil then
+					p67.deletions = { p68 }
+					p67.flags = bit32.bor(p67.flags, Deletion)
+				else
+					table.insert(deletions, p68)
+				end
+			end
+
+			p68 = p68.sibling
+		end
+
+		local v313 = createFiberFromPortal(p69, p67.mode, p70)
+
+		v313.return_ = p67
+
+		return v313
+	end
+	local function reconcileChildFibers(p71, p72, p73, p74) -- line: 1499
+		-- upvalues: REACT_FRAGMENT_TYPE (copy), isArray (copy), REACT_ELEMENT_TYPE (copy), reconcileSingleElement (copy), p10 (copy), Placement (copy), REACT_PORTAL_TYPE (copy), reconcileSinglePortal (copy), REACT_LAZY_TYPE (copy), enableLazyElements (copy), reconcileChildFibers (copy), reconcileChildrenArray (copy), reconcileSingleTextNode (copy), getIteratorFn (copy), reconcileChildrenIterator (copy), __DEV__ (copy), getComponentName (copy), t3 (ref), console (copy), Deletion (copy)
+		local v318 = type(p73)
+		local v319 = p73 ~= nil and (v318 == "table" and (p73.type == REACT_FRAGMENT_TYPE and p73.key == nil))
+
+		if v319 then
+			p73 = p73.props.children
+			v318 = type(p73)
+		end
+
+		local v320 = isArray(p73)
+
+		if p73 ~= nil and (v318 == "table" and not v320) then
+			local v321 = p73["$$typeof"]
+
+			if v321 == REACT_ELEMENT_TYPE then
+				local v322 = reconcileSingleElement(p71, p72, p73, p74)
+
+				if p10 and v322.alternate == nil then
+					v322.flags = bit32.bor(v322.flags, Placement)
+				end
+
+				return v322
+			end
+
+			if v321 == REACT_PORTAL_TYPE then
+				local v323 = reconcileSinglePortal(p71, p72, p73, p74)
+
+				if p10 and v323.alternate == nil then
+					v323.flags = bit32.bor(v323.flags, Placement)
+				end
+
+				return v323
+			end
+
+			if v321 == REACT_LAZY_TYPE and enableLazyElements then
+				local _payload = p73._payload
+				local _init = p73._init
+
+				return reconcileChildFibers(p71, p72, _init(_payload), p74)
+			end
+		else
+			if v320 then
+				return (reconcileChildrenArray(p71, p72, p73, p74))
+			end
+
+			if v318 == "string" or v318 == "number" then
+				local v326 = reconcileSingleTextNode(p71, p72, tostring(p73), p74)
+
+				if p10 and v326.alternate == nil then
+					v326.flags = bit32.bor(v326.flags, Placement)
+				end
+
+				return v326
+			end
+		end
+
+		local v327 = getIteratorFn(p73)
+
+		if v327 then
+			return (reconcileChildrenIterator(p71, p72, p73, p74, v327))
+		end
+
+		if __DEV__ and v318 == "function" and __DEV__ then
+			local v328 = getComponentName(p71.type) or "Component"
+
+			if not t3[v328] then
+				t3[v328] = true
+				console.error("Functions are not valid as a React child. This may happen if you return a Component instead of <Component /> from render. Or maybe you meant to call this function rather than return it.")
+			end
+		end
+
+		if p73 == nil then
+			if v319 then
+			end
+		end
+
+		if not p10 then
+			return nil
+		end
+
+		while p72 ~= nil do
+			if p10 then
+				local deletions = p71.deletions
+
+				if deletions == nil then
+					p71.deletions = { p72 }
+					p71.flags = bit32.bor(p71.flags, Deletion)
+				else
+					table.insert(deletions, p72)
+				end
+			end
+
+			p72 = p72.sibling
+		end
+
+		return nil
+	end
+
+	return reconcileChildFibers
+end
+
+t1.reconcileChildFibers = ChildReconciler(true)
+t1.mountChildFibers = ChildReconciler(false)
+
+function t1.cloneChildFibers(_, p76) -- line: 1647
+	-- upvalues: createWorkInProgress (copy)
+	if p76.child == nil then
+		return
+	end
+
+	local child = p76.child
+	local v92 = createWorkInProgress(child, child.pendingProps)
+
+	p76.child = v92
+	v92.return_ = p76
+
+	while child.sibling ~= nil do
+		child = child.sibling
+		v92.sibling = createWorkInProgress(child, child.pendingProps)
+		v92 = v92.sibling
+		v92.return_ = p76
+	end
+
+	v92.sibling = nil
+end
+function t1.resetChildFibers(p77, p78) -- line: 1674
+	-- upvalues: resetWorkInProgress (copy)
+	local child = p77.child
+
+	while child ~= nil do
+		resetWorkInProgress(child, p78)
+		child = child.sibling
+	end
+end
+
+return t1

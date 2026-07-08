@@ -1,6 +1,7 @@
-local l_script_0 = script;
+local _script = script
+
 return {
-    useGroupsListData = require(l_script_0.useGroupsListData), 
-    useMembersFollowersLabel = require(l_script_0.useMembersFollowersLabel), 
-    useGroupsAnalytics = require(l_script_0.useGroupsAnalytics)
-};
+	useGroupsListData = require(_script.useGroupsListData),
+	useMembersFollowersLabel = require(_script.useMembersFollowersLabel),
+	useGroupsAnalytics = require(_script.useGroupsAnalytics)
+}

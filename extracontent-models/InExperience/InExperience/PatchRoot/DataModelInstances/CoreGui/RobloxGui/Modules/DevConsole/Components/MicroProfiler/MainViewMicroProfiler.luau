@@ -1,211 +1,220 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("LogService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_GameSettings_0 = UserSettings().GameSettings;
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v6 = require(l_Components_0.UtilAndTab);
-local v7 = require(script.Parent.ServerProfilerInterface);
-local v8 = require(script.Parent.MicroProfilerView);
-local v9 = require(script.Parent.Parent.Parent.Constants);
-local l_MainRowPadding_0 = v9.GeneralFormatting.MainRowPadding;
-local l_ButtonWidth_0 = v9.MicroProfilerFormatting.ButtonWidth;
-local l_ButtonTextSize_0 = v9.MicroProfilerFormatting.ButtonTextSize;
-local _ = v9.Font.MainWindow;
-local l_MainWindowHeader_0 = v9.Font.MainWindowHeader;
-local l_UnselectedGray_0 = v9.Color.UnselectedGray;
-local l_SelectedBlue_0 = v9.Color.SelectedBlue;
-local l_UnselectedGray_1 = v9.Color.UnselectedGray;
-local v18 = require(script.Parent.Flags.FFlagDevConsoleMicroProfilerImproveWording);
-local v19 = game:DefineFastFlag("DevConsoleMicroProfilerNewLayout", false);
-local v20 = v4.Component:extend("MainViewProfiler");
-v20.init = function(v21) --[[ Line: 35 ]] --[[ Name: init ]]
-    -- upvalues: l_GameSettings_0 (copy), l_RbxAnalyticsService_0 (copy), v4 (copy)
-    v21.onUtilTabHeightChanged = function(v22) --[[ Line: 36 ]]
-        -- upvalues: v21 (copy)
-        v21:setState({
-            utilTabHeight = v22
-        });
-    end;
-    v21.changeProfilerState = function(v23) --[[ Line: 42 ]]
-        -- upvalues: l_GameSettings_0 (ref), v21 (copy), l_RbxAnalyticsService_0 (ref)
-        return function() --[[ Line: 43 ]]
-            -- upvalues: l_GameSettings_0 (ref), v23 (copy), v21 (ref), l_RbxAnalyticsService_0 (ref)
-            l_GameSettings_0.OnScreenProfilerEnabled = v23;
-            v21:setState({
-                clientProfilerEnabled = v23
-            });
-            l_RbxAnalyticsService_0:ReportCounter("MicroprofilerDevConsolePressed");
-        end;
-    end;
-    v21.microProfilerChangedConnection = l_GameSettings_0:GetPropertyChangedSignal("OnScreenProfilerEnabled"):Connect(function() --[[ Line: 54 ]]
-        -- upvalues: v21 (copy), l_GameSettings_0 (ref)
-        v21:setState({
-            clientProfilerEnabled = l_GameSettings_0.OnScreenProfilerEnabled
-        });
-    end);
-    v21.utilRef = v4.createRef();
-    v21.state = {
-        utilTabHeight = 0
-    };
-end;
-v20.didMount = function(v24) --[[ Line: 67 ]] --[[ Name: didMount ]]
-    v24:setState({
-        utilTabHeight = v24.utilRef.current.Size.Y.Offset
-    });
-end;
-v20.willUnmount = function(v25) --[[ Line: 75 ]] --[[ Name: willUnmount ]]
-    if v25.microProfilerChangedConnection then
-        v25.microProfilerChangedConnection:Disconnect();
-        v25.microProfilerChangedConnection = nil;
-    end;
-end;
-v20.didUpdate = function(v26) --[[ Line: 82 ]] --[[ Name: didUpdate ]]
-    local l_Size_0 = v26.utilRef.current.Size;
-    if l_Size_0.Y.Offset ~= v26.state.utilTabHeight then
-        v26:setState({
-            utilTabHeight = l_Size_0.Y.Offset
-        });
-    end;
-end;
-v20.renderNewLayout = function(v28) --[[ Line: 91 ]] --[[ Name: renderNewLayout ]]
-    -- upvalues: v4 (copy), v9 (copy), l_MainRowPadding_0 (copy), v6 (copy), v8 (copy)
-    local l_size_0 = v28.props.size;
-    local l_formFactor_0 = v28.props.formFactor;
-    local l_tabList_0 = v28.props.tabList;
-    local l_utilTabHeight_0 = v28.state.utilTabHeight;
-    return v4.createElement("Frame", {
-        Size = l_size_0, 
-        BackgroundColor3 = v9.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 3
-    }, {
-        UIListLayout = v4.createElement("UIListLayout", {
-            Padding = UDim.new(0, l_MainRowPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        UtilAndTab = v4.createElement(v6, {
-            windowWidth = l_size_0.X.Offset, 
-            formFactor = l_formFactor_0, 
-            tabList = l_tabList_0, 
-            layoutOrder = 1, 
-            refForParent = v28.utilRef, 
-            onHeightChanged = v28.onUtilTabHeightChanged
-        }), 
-        MicroProfilerView = v4.createElement(v8, {
-            Size = UDim2.new(1, 0, 1, -l_utilTabHeight_0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 2
-        })
-    });
-end;
-v20.render = function(v33) --[[ Line: 123 ]] --[[ Name: render ]]
-    -- upvalues: v19 (copy), l_ButtonWidth_0 (copy), v4 (copy), v9 (copy), l_MainRowPadding_0 (copy), v6 (copy), v18 (copy), l_MainWindowHeader_0 (copy), l_ButtonTextSize_0 (copy), l_UnselectedGray_1 (copy), l_UnselectedGray_0 (copy), l_SelectedBlue_0 (copy), v7 (copy)
-    if v19 then
-        return v33:renderNewLayout();
-    else
-        local l_size_1 = v33.props.size;
-        local l_formFactor_1 = v33.props.formFactor;
-        local l_tabList_1 = v33.props.tabList;
-        local l_utilTabHeight_1 = v33.state.utilTabHeight;
-        local _ = v33.state.frameRate;
-        local _ = v33.state.timeFrame;
-        local _ = v33.state.waitingForData;
-        local l_clientProfilerEnabled_0 = v33.state.clientProfilerEnabled;
-        local _ = v33.state.outputPath;
-        local _ = UDim2.new(0.8, -l_ButtonWidth_0, 0, 30);
-        local _ = UDim2.new(0.6, l_ButtonWidth_0, 0, 0);
-        return v4.createElement("Frame", {
-            Size = l_size_1, 
-            BackgroundColor3 = v9.Color.BaseGray, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 3
-        }, {
-            UIListLayout = v4.createElement("UIListLayout", {
-                Padding = UDim.new(0, l_MainRowPadding_0), 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            UtilAndTab = v4.createElement(v6, {
-                windowWidth = l_size_1.X.Offset, 
-                formFactor = l_formFactor_1, 
-                tabList = l_tabList_1, 
-                layoutOrder = 1, 
-                refForParent = v33.utilRef, 
-                onHeightChanged = v33.onUtilTabHeightChanged
-            }), 
-            MainFrame = v4.createElement("ScrollingFrame", {
-                Size = UDim2.new(1, 0, 1, -l_utilTabHeight_1), 
-                CanvasSize = UDim2.new(1, 0, 1, -l_utilTabHeight_1), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 2
-            }, {
-                UIListLayout = v4.createElement("UIListLayout", {
-                    Padding = UDim.new(0, l_MainRowPadding_0 * 2), 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                MicroProfilerRow = v4.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, 90), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2
-                }, {
-                    Label = v4.createElement("TextLabel", {
-                        Size = UDim2.new(0, l_ButtonWidth_0, 0, 30), 
-                        Position = UDim2.new(0.1, 0, 0, 0), 
-                        Text = v18 and "Client MicroProfiler" or "MicroProfiler", 
-                        Font = l_MainWindowHeader_0, 
-                        TextSize = l_ButtonTextSize_0, 
-                        TextColor3 = v9.Color.Text, 
-                        TextXAlignment = Enum.TextXAlignment.Left, 
-                        TextYAlignment = Enum.TextYAlignment.Center, 
-                        BackgroundColor3 = l_UnselectedGray_1, 
-                        BackgroundTransparency = 1
-                    }), 
-                    HorizontalLine = v4.createElement("Frame", {
-                        Size = UDim2.new(1, 0, 0, 1), 
-                        Position = UDim2.new(0, 0, 0, 30)
-                    }), 
-                    ToggleButton = v4.createElement("TextLabel", {
-                        Size = UDim2.new(0.8, -l_ButtonWidth_0, 0, 30), 
-                        Position = UDim2.new(0.09999999999999998, l_ButtonWidth_0, 0, 37.5), 
-                        BackgroundTransparency = 1
-                    }, {
-                        OffButton = v4.createElement("TextButton", {
-                            Size = UDim2.new(0.5, 0, 1, 0), 
-                            Text = "Off", 
-                            Font = l_MainWindowHeader_0, 
-                            TextSize = l_ButtonTextSize_0, 
-                            TextColor3 = v9.Color.Text, 
-                            TextXAlignment = Enum.TextXAlignment.Center, 
-                            TextYAlignment = Enum.TextYAlignment.Center, 
-                            BackgroundColor3 = l_clientProfilerEnabled_0 and l_UnselectedGray_0 or l_SelectedBlue_0, 
-                            [v4.Event.Activated] = v33.changeProfilerState(false)
-                        }), 
-                        ClientButton = v4.createElement("TextButton", {
-                            Size = UDim2.new(0.5, 0, 1, 0), 
-                            Position = UDim2.new(0.5, 0, 0, 0), 
-                            Text = v18 and "On" or "Client", 
-                            Font = l_MainWindowHeader_0, 
-                            TextSize = l_ButtonTextSize_0, 
-                            TextColor3 = v9.Color.Text, 
-                            TextXAlignment = Enum.TextXAlignment.Center, 
-                            TextYAlignment = Enum.TextYAlignment.Center, 
-                            BackgroundColor3 = l_clientProfilerEnabled_0 and l_SelectedBlue_0 or l_UnselectedGray_0, 
-                            [v4.Event.Activated] = v33.changeProfilerState(true)
-                        })
-                    })
-                }), 
-                HorizontalLine = v4.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, l_MainRowPadding_0), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 3
-                }), 
-                ServerProfiler = v4.createElement(v7, {
-                    Size = UDim2.new(1, 0, 0, 135), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 4
-                })
-            })
-        });
-    end;
-end;
-return v20;
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("LogService")
+
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local GameSettings = UserSettings().GameSettings
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local UtilAndTab = require(Components.UtilAndTab)
+local ServerProfilerInterface = require(script.Parent.ServerProfilerInterface)
+local MicroProfilerView = require(script.Parent.MicroProfilerView)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+local ButtonWidth = Constants.MicroProfilerFormatting.ButtonWidth
+local ButtonTextSize = Constants.MicroProfilerFormatting.ButtonTextSize
+local _ = Constants.Font.MainWindow
+local MainWindowHeader = Constants.Font.MainWindowHeader
+local UnselectedGray = Constants.Color.UnselectedGray
+local SelectedBlue = Constants.Color.SelectedBlue
+local UnselectedGray2 = Constants.Color.UnselectedGray
+local FFlagDevConsoleMicroProfilerImproveWording = require(script.Parent.Flags.FFlagDevConsoleMicroProfilerImproveWording)
+local v19 = game:DefineFastFlag("DevConsoleMicroProfilerNewLayout", false)
+local v20 = Roact.Component:extend("MainViewProfiler")
+
+function v20.init(p1) -- line: 35
+	-- upvalues: GameSettings (copy), RbxAnalyticsService (copy), Roact (copy)
+	function p1.onUtilTabHeightChanged(p2) -- line: 36
+		-- upvalues: p1 (copy)
+		p1:setState({
+			utilTabHeight = p2
+		})
+	end
+	function p1.changeProfilerState(p3) -- line: 42
+		-- upvalues: GameSettings (copy), p1 (copy), RbxAnalyticsService (copy)
+		return function() -- line: 43
+			-- upvalues: GameSettings (copy), p3 (copy), p1 (copy), RbxAnalyticsService (copy)
+			GameSettings.OnScreenProfilerEnabled = p3
+			p1:setState({
+				clientProfilerEnabled = p3
+			})
+			RbxAnalyticsService:ReportCounter("MicroprofilerDevConsolePressed")
+		end
+	end
+
+	p1.microProfilerChangedConnection = GameSettings:GetPropertyChangedSignal("OnScreenProfilerEnabled"):Connect(function() -- line: 54
+		-- upvalues: p1 (copy), GameSettings (copy)
+		p1:setState({
+			clientProfilerEnabled = GameSettings.OnScreenProfilerEnabled
+		})
+	end)
+	p1.utilRef = Roact.createRef()
+	p1.state = {
+		utilTabHeight = 0
+	}
+end
+function v20.didMount(p4) -- line: 67
+	p4:setState({
+		utilTabHeight = p4.utilRef.current.Size.Y.Offset
+	})
+end
+function v20.willUnmount(p5) -- line: 75
+	if p5.microProfilerChangedConnection then
+		p5.microProfilerChangedConnection:Disconnect()
+		p5.microProfilerChangedConnection = nil
+	end
+end
+function v20.didUpdate(p6) -- line: 82
+	local currentSize = p6.utilRef.current.Size
+
+	if currentSize.Y.Offset ~= p6.state.utilTabHeight then
+		p6:setState({
+			utilTabHeight = currentSize.Y.Offset
+		})
+	end
+end
+function v20.renderNewLayout(p7) -- line: 91
+	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy), UtilAndTab (copy), MicroProfilerView (copy)
+	local size = p7.props.size
+	local formFactor = p7.props.formFactor
+	local tabList = p7.props.tabList
+	local utilTabHeight = p7.state.utilTabHeight
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = Roact.createElement(UtilAndTab, {
+			layoutOrder = 1,
+			windowWidth = size.X.Offset,
+			formFactor = formFactor,
+			tabList = tabList,
+			refForParent = p7.utilRef,
+			onHeightChanged = p7.onUtilTabHeightChanged
+		}),
+		MicroProfilerView = Roact.createElement(MicroProfilerView, {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 1, -utilTabHeight)
+		})
+	})
+end
+function v20.render(p8) -- line: 123
+	-- upvalues: v19 (copy), ButtonWidth (copy), Roact (copy), Constants (copy), MainRowPadding (copy), UtilAndTab (copy), FFlagDevConsoleMicroProfilerImproveWording (copy), MainWindowHeader (copy), ButtonTextSize (copy), UnselectedGray2 (copy), UnselectedGray (copy), SelectedBlue (copy), ServerProfilerInterface (copy)
+	if v19 then
+		return p8:renderNewLayout()
+	end
+
+	local size = p8.props.size
+	local formFactor = p8.props.formFactor
+	local tabList = p8.props.tabList
+	local utilTabHeight = p8.state.utilTabHeight
+	local _ = p8.state.frameRate
+	local _ = p8.state.timeFrame
+	local _ = p8.state.waitingForData
+	local clientProfilerEnabled = p8.state.clientProfilerEnabled
+	local _ = p8.state.outputPath
+
+	UDim2.new(0.8, -ButtonWidth, 0, 30)
+	UDim2.new(0.6, ButtonWidth, 0, 0)
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = Roact.createElement(UtilAndTab, {
+			layoutOrder = 1,
+			windowWidth = size.X.Offset,
+			formFactor = formFactor,
+			tabList = tabList,
+			refForParent = p8.utilRef,
+			onHeightChanged = p8.onUtilTabHeightChanged
+		}),
+		MainFrame = Roact.createElement("ScrollingFrame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 1, -utilTabHeight),
+			CanvasSize = UDim2.new(1, 0, 1, -utilTabHeight)
+		}, {
+			UIListLayout = Roact.createElement("UIListLayout", {
+				Padding = UDim.new(0, MainRowPadding * 2),
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			MicroProfilerRow = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 90)
+			}, {
+				Label = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, ButtonWidth, 0, 30),
+					Position = UDim2.new(0.1, 0, 0, 0),
+					Text = not FFlagDevConsoleMicroProfilerImproveWording and "MicroProfiler" or "Client MicroProfiler",
+					Font = MainWindowHeader,
+					TextSize = ButtonTextSize,
+					TextColor3 = Constants.Color.Text,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					BackgroundColor3 = UnselectedGray2
+				}),
+				HorizontalLine = Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 0, 1),
+					Position = UDim2.new(0, 0, 0, 30)
+				}),
+				ToggleButton = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0.8, -ButtonWidth, 0, 30),
+					Position = UDim2.new(0.09999999999999998, ButtonWidth, 0, 37.5)
+				}, {
+					OffButton = Roact.createElement("TextButton", {
+						Size = UDim2.new(0.5, 0, 1, 0),
+						Text = "Off",
+						Font = MainWindowHeader,
+						TextSize = ButtonTextSize,
+						TextColor3 = Constants.Color.Text,
+						TextXAlignment = Enum.TextXAlignment.Center,
+						TextYAlignment = Enum.TextYAlignment.Center,
+						BackgroundColor3 = clientProfilerEnabled and UnselectedGray or SelectedBlue,
+						[Roact.Event.Activated] = p8.changeProfilerState(false)
+					}),
+					ClientButton = Roact.createElement("TextButton", {
+						Size = UDim2.new(0.5, 0, 1, 0),
+						Position = UDim2.new(0.5, 0, 0, 0),
+						Text = not FFlagDevConsoleMicroProfilerImproveWording and "Client" or "On",
+						Font = MainWindowHeader,
+						TextSize = ButtonTextSize,
+						TextColor3 = Constants.Color.Text,
+						TextXAlignment = Enum.TextXAlignment.Center,
+						TextYAlignment = Enum.TextYAlignment.Center,
+						BackgroundColor3 = clientProfilerEnabled and SelectedBlue or UnselectedGray,
+						[Roact.Event.Activated] = p8.changeProfilerState(true)
+					})
+				})
+			}),
+			HorizontalLine = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 0, MainRowPadding)
+			}),
+			ServerProfiler = Roact.createElement(ServerProfilerInterface, {
+				BackgroundTransparency = 1,
+				LayoutOrder = 4,
+				Size = UDim2.new(1, 0, 0, 135)
+			})
+		})
+	})
+end
+
+return v20

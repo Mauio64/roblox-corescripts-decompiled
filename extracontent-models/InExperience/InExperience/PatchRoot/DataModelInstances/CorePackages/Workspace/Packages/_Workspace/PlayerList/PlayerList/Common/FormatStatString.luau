@@ -1,19 +1,22 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.Localization);
-local l_NumberLocalization_0 = v2.NumberLocalization;
-local l_RoundingBehaviour_0 = v2.RoundingBehaviour;
-return function(v5) --[[ Line: 12 ]]
-    -- upvalues: l_NumberLocalization_0 (copy), l_LocalizationService_0 (copy), l_RoundingBehaviour_0 (copy)
-    if v5 == nil then
-        return "-";
-    elseif type(v5) == "number" then
-        if tostring(v5):len() >= 7 then
-            return l_NumberLocalization_0.abbreviate(v5, l_LocalizationService_0.RobloxLocaleId, l_RoundingBehaviour_0.Truncate);
-        else
-            return l_NumberLocalization_0.localize(v5, l_LocalizationService_0.RobloxLocaleId);
-        end;
-    else
-        return (tostring(v5));
-    end;
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local ParentParent = script.Parent.Parent.Parent
+local Localization = require(ParentParent.Localization)
+local NumberLocalization = Localization.NumberLocalization
+local RoundingBehaviour = Localization.RoundingBehaviour
+
+return function(p1) -- line: 12
+	-- upvalues: NumberLocalization (copy), LocalizationService (copy), RoundingBehaviour (copy)
+	if p1 == nil then
+		return "-"
+	end
+
+	if type(p1) == "number" then
+		if tostring(p1):len() >= 7 then
+			return NumberLocalization.abbreviate(p1, LocalizationService.RobloxLocaleId, RoundingBehaviour.Truncate)
+		end
+
+		return NumberLocalization.localize(p1, LocalizationService.RobloxLocaleId)
+	end
+
+	return (tostring(p1))
+end

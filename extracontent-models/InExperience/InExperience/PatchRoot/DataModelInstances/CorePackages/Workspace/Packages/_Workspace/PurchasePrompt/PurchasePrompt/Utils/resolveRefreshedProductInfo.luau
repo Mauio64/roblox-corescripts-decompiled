@@ -1,7 +1,7 @@
 local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
 local mapCatalogDiscountInfoToPriceDiscountDetails = require(PurchasePrompt.Utils.mapCatalogDiscountInfoToPriceDiscountDetails)
 
-return function(p1, p2, s1: string?, n1: number?) --[[ resolveRefreshedProductInfo ]] -- line: 11
+local function resolveRefreshedProductInfo(p1, p2, s1: string?, n1: number?) -- line: 11
 	-- upvalues: mapCatalogDiscountInfoToPriceDiscountDetails (copy)
 	if s1 and s1 ~= "" then
 		local price = nil
@@ -22,10 +22,10 @@ return function(p1, p2, s1: string?, n1: number?) --[[ resolveRefreshedProductIn
 
 		if price then
 			return {
-				refreshedExpectedPrice = price,
-				PriceInRobux = price,
 				UserBasePriceInRobux = nil,
-				PriceDiscountDetails = nil
+				PriceDiscountDetails = nil,
+				refreshedExpectedPrice = price,
+				PriceInRobux = price
 			}
 		end
 	elseif n1 and n1 ~= 0 then
@@ -55,3 +55,5 @@ return function(p1, p2, s1: string?, n1: number?) --[[ resolveRefreshedProductIn
 
 	return nil
 end
+
+return resolveRefreshedProductInfo

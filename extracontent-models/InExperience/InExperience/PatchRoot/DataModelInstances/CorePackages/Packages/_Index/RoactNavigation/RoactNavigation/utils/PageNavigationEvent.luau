@@ -1,31 +1,34 @@
-local v0 = require(script.Parent.invariant);
-local v1 = {};
-v1.__index = v1;
-v1.new = function(v2, v3) --[[ Line: 6 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    v0(type(v2) == "string", "pageName should be string");
-    v0(typeof(v3) == "userdata", "event should be RoactNavigation.Event");
-    local v4 = {
-        event = v3, 
-        pageName = v2
-    };
-    setmetatable(v4, v1);
-    return v4;
-end;
-v1.isPageNavigationEvent = function(v5) --[[ Line: 19 ]] --[[ Name: isPageNavigationEvent ]]
-    -- upvalues: v1 (copy)
-    return getmetatable(v5).__index == v1;
-end;
-v1.__tostring = function(v6) --[[ Line: 23 ]]
-    return string.format("%-15s - %s", tostring(v6.event), v6.pageName);
-end;
-v1.equalTo = function(v7, v8) --[[ Line: 27 ]] --[[ Name: equalTo ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    v0(v1.isPageNavigationEvent(v8), "should be PageNavigationEvent");
-    local v9 = false;
-    if v7.pageName == v8.pageName then
-        v9 = v7.event == v8.event;
-    end;
-    return v9;
-end;
-return v1;
+local invariant = require(script.Parent.invariant)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2) -- line: 6
+	-- upvalues: invariant (copy), t1 (copy)
+	invariant(type(p1) == "string", "pageName should be string")
+	invariant(typeof(p2) == "userdata", "event should be RoactNavigation.Event")
+
+	local t2 = {
+		event = p2,
+		pageName = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.isPageNavigationEvent(p3) -- line: 19
+	-- upvalues: t1 (copy)
+	return getmetatable(p3).__index == t1
+end
+function t1.__tostring(p4) -- line: 23
+	return string.format("%-15s - %s", tostring(p4.event), p4.pageName)
+end
+function t1.equalTo(p5, p6) -- line: 27
+	-- upvalues: invariant (copy), t1 (copy)
+	invariant(t1.isPageNavigationEvent(p6), "should be PageNavigationEvent")
+
+	return p5.pageName == p6.pageName and p5.event == p6.event
+end
+
+return t1

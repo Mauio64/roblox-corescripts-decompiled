@@ -1,28 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(l_script_FirstAncestor_0.Enums.SquadPromptType);
-return function(v3) --[[ Line: 7 ]]
-    -- upvalues: l_HttpService_0 (copy), v2 (copy)
-    return function(v4) --[[ Line: 15 ]]
-        -- upvalues: v3 (copy), l_HttpService_0 (ref), v2 (ref)
-        v4:dispatch(v3.squadContext.createConversation(v3.conversationType, v3.userIds, nil, v3.source)):andThen(function(v5) --[[ Line: 20 ]]
-            -- upvalues: v3 (ref)
-            if v3.onSuccessCallback then
-                v3.onSuccessCallback(v5.id);
-            end;
-        end):catch(function(v6) --[[ Line: 25 ]]
-            -- upvalues: l_HttpService_0 (ref), v3 (ref), v4 (copy), v2 (ref)
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 26 ]]
-                -- upvalues: l_HttpService_0 (ref), v6 (copy)
-                return l_HttpService_0:JSONDecode(v6.Body);
-            end);
-            v3.squadContext.setSquadPrompt(v4, {
-                hideCancelButton = true, 
-                promptType = if l_status_0 and l_result_0 and l_result_0.reason_code == "participant_chat_disabled" then v2.ParticipantChatDisabled else v2.Error
-            });
-            if v3.onErrorCallback then
-                v3.onErrorCallback();
-            end;
-        end);
-    end;
-end;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local HttpService = game:GetService("HttpService")
+local SquadPromptType = require(SquadsCore.Enums.SquadPromptType)
+
+return function(t1: {[any]: any}) -- line: 7
+	-- upvalues: HttpService (copy), SquadPromptType (copy)
+	return function(p1) -- line: 15
+		-- upvalues: t1 (copy), HttpService (copy), SquadPromptType (copy)
+		p1:dispatch(t1.squadContext.createConversation(t1.conversationType, t1.userIds, nil, t1.source)):andThen(function(p2) -- line: 20
+			-- upvalues: t1 (copy)
+			if t1.onSuccessCallback then
+				t1.onSuccessCallback(p2.id)
+			end
+		end):catch(function(p3) -- line: 25
+			-- upvalues: HttpService (copy), t1 (copy), p1 (copy), SquadPromptType (copy)
+			local ok, result = pcall(function() -- line: 26
+				-- upvalues: HttpService (copy), p3 (copy)
+				return HttpService:JSONDecode(p3.Body)
+			end)
+
+			t1.squadContext.setSquadPrompt(p1, {
+				hideCancelButton = true,
+				promptType = if not ok or (not result or result.reason_code ~= "participant_chat_disabled") then SquadPromptType.Error else SquadPromptType.ParticipantChatDisabled
+			})
+
+			if t1.onErrorCallback then
+				t1.onErrorCallback()
+			end
+		end)
+	end
+end

@@ -1,83 +1,96 @@
-local v0 = require(script.dependencies);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.t);
-local l_GetTokenGenerators_0 = v0.GetTokenGenerators;
-local l_Validators_0 = v0.SchemaPackage.Validators;
-local l_GetFoundationTokens_0 = v0.GetFoundationTokens;
-local v7 = require(l_Parent_0.UIBloxConfig);
-local v8 = require(script.Types);
-local v9 = require(script.Parent.Constants);
-local function _(v10, v11) --[[ Line: 19 ]] --[[ Name: getPlatformScale ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    if v7.disableTokenScaling then
-        return 1;
-    else
-        if v11 == nil then
-            v11 = 1;
-        end;
-        v11 = math.clamp(v11, 0, 1e999);
-        local v12 = 1;
-        if v10 == v9.DeviceType.Console then
-            v12 = 1.5;
-        end;
-        return v12 * v11;
-    end;
-end;
+local dependencies = require(script.dependencies)
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local t = require(ParentParentParent.t)
+local GetTokenGenerators = dependencies.GetTokenGenerators
+local Validators = dependencies.SchemaPackage.Validators
+local GetFoundationTokens = dependencies.GetFoundationTokens
+local UIBloxConfig = require(ParentParent.UIBloxConfig)
+local Types = require(script.Types)
+local Constants = require(script.Parent.Constants)
+
+local function getPlatformScale(p1, n1: number?) -- line: 19
+	-- upvalues: UIBloxConfig (copy), Constants (copy)
+	if UIBloxConfig.disableTokenScaling then
+		return 1
+	end
+
+	if n1 == nil then
+		n1 = 1
+	end
+
+	local v14 = math.clamp(n1, 0, 1e999)
+	local n2 = 1
+
+	if p1 == Constants.DeviceType.Console then
+		n2 = 1.5
+	end
+
+	return n2 * v14
+end
+
 return {
-    getTokens = function(v14, v15, v16) --[[ Line: 39 ]] --[[ Name: getTokens ]]
-        -- upvalues: l_GetTokenGenerators_0 (copy), v9 (copy), v7 (copy)
-        local v17 = l_GetTokenGenerators_0(v15) or l_GetTokenGenerators_0(v9.DefaultThemeName);
-        local l_v16_0 = v16;
-        local v19;
-        if v7.disableTokenScaling then
-            v19 = 1;
-        else
-            if l_v16_0 == nil then
-                l_v16_0 = 1;
-            end;
-            l_v16_0 = math.clamp(l_v16_0, 0, 1e999);
-            local v20 = 1;
-            if v14 == v9.DeviceType.Console then
-                v20 = 1.5;
-            end;
-            v19 = v20 * l_v16_0;
-        end;
-        return {
-            Global = require(v17.Global)(v19), 
-            Semantic = require(v17.Semantic)(v19), 
-            Component = require(v17.Component)(v19)
-        };
-    end, 
-    validateTokens = v3.strictInterface({
-        Global = v3.strictInterface(l_Validators_0.Global), 
-        Semantic = v3.strictInterface(l_Validators_0.Semantic), 
-        Component = v3.strictInterface(l_Validators_0.Component)
-    }), 
-    Types = v8, 
-    getFoundationTokens = function(v21, v22, v23) --[[ Line: 55 ]] --[[ Name: getFoundationTokens ]]
-        -- upvalues: l_GetFoundationTokens_0 (copy), v9 (copy), v7 (copy)
-        local v24 = l_GetFoundationTokens_0(v22) or l_GetFoundationTokens_0(v9.DefaultThemeName);
-        local l_v23_0 = v23;
-        local v26;
-        if v7.disableTokenScaling then
-            v26 = 1;
-        else
-            if l_v23_0 == nil then
-                l_v23_0 = 1;
-            end;
-            l_v23_0 = math.clamp(l_v23_0, 0, 1e999);
-            local v27 = 1;
-            if v21 == v9.DeviceType.Console then
-                v27 = 1.5;
-            end;
-            v26 = v27 * l_v23_0;
-        end;
-        return v24(v26);
-    end, 
-    getFoundationTokensDefaultScale = function(v28) --[[ Line: 61 ]] --[[ Name: getFoundationTokensDefaultScale ]]
-        -- upvalues: l_GetFoundationTokens_0 (copy), v9 (copy)
-        return (l_GetFoundationTokens_0(v28) or l_GetFoundationTokens_0(v9.DefaultThemeName))(1);
-    end, 
-    Mappers = require(script.mappers)
-};
+	getTokens = function(p2, p3, n3: number?) -- line: 39
+		-- upvalues: GetTokenGenerators (copy), Constants (copy), UIBloxConfig (copy)
+		local v19 = GetTokenGenerators(p3) or GetTokenGenerators(Constants.DefaultThemeName)
+		local n4
+
+		if UIBloxConfig.disableTokenScaling then
+			n4 = 1
+		else
+			if n3 == nil then
+				n3 = 1
+			end
+
+			local v21 = math.clamp(n3, 0, 1e999)
+			local n5 = 1
+
+			if p2 == Constants.DeviceType.Console then
+				n5 = 1.5
+			end
+
+			n4 = n5 * v21
+		end
+
+		return {
+			Global = require(v19.Global)(n4),
+			Semantic = require(v19.Semantic)(n4),
+			Component = require(v19.Component)(n4)
+		}
+	end,
+	validateTokens = t.interface({
+		Global = t.strictInterface(Validators.Global),
+		Semantic = t.strictInterface(Validators.Semantic),
+		Component = t.strictInterface(Validators.Component)
+	}),
+	Types = Types,
+	getFoundationTokens = function(p4, p5, n6: number?) -- line: 55
+		-- upvalues: GetFoundationTokens (copy), Constants (copy), UIBloxConfig (copy)
+		local v26 = GetFoundationTokens(p5) or GetFoundationTokens(Constants.DefaultThemeName)
+		local n7
+
+		if UIBloxConfig.disableTokenScaling then
+			n7 = 1
+		else
+			if n6 == nil then
+				n6 = 1
+			end
+
+			local v28 = math.clamp(n6, 0, 1e999)
+			local n8 = 1
+
+			if p4 == Constants.DeviceType.Console then
+				n8 = 1.5
+			end
+
+			n7 = n8 * v28
+		end
+
+		return v26(n7)
+	end,
+	getFoundationTokensDefaultScale = function(p6) -- line: 65
+		-- upvalues: GetFoundationTokens (copy), Constants (copy)
+		return (GetFoundationTokens(p6) or GetFoundationTokens(Constants.DefaultThemeName))(1)
+	end,
+	Mappers = require(script.mappers)
+}

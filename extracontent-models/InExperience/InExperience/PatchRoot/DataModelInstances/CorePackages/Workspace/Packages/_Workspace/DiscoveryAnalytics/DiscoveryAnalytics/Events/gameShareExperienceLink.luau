@@ -1,41 +1,41 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryAnalytics").Parent;
-local v2 = require(l_Parent_0.t);
-local l_DiscoveryEventErrorLogger_0 = require(l_Parent_0.DiscoveryUtils).DiscoveryEventErrorLogger;
-local v4 = game:DefineFastInt("GameShareExperienceLinkThrottleHundrethsPercent", 10000);
-local v5 = v2.strictInterface({
-    placeId = v2.string, 
-    uid = v2.string, 
-    ctx = v2.string, 
-    shortShareLinkFailed = v2.optional(v2.boolean), 
-    shareToAppsflyer = v2.optional(v2.boolean), 
-    stamp = v2.optional(v2.string), 
-    linkId = v2.optional(v2.string)
-});
-return function(v6, v7) --[[ Line: 21 ]]
-    -- upvalues: v5 (copy), l_DiscoveryEventErrorLogger_0 (copy), v4 (copy), l_TelemetryService_0 (copy)
-    local v8, v9 = v5(v6);
-    if not v8 then
-        l_DiscoveryEventErrorLogger_0.reportError("GameShareExperienceLinkInvalidInterface", v9);
-    end;
-    local v10 = {
-        eventName = "shareExperienceLink", 
-        backends = {
-            "EventIngest"
-        }, 
-        throttlingPercentage = v4, 
-        lastUpdated = {
-            25, 
-            11, 
-            11
-        }, 
-        description = "User has shared an experience link"
-    };
-    l_TelemetryService_0:LogEvent(v10, {
-        eventContext = v7, 
-        standardizedFields = {
-            "addSessionInfo"
-        }, 
-        customFields = v6
-    });
-end;
+local TelemetryService = game:GetService("TelemetryService")
+local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(Parent.t)
+local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
+local v5 = game:DefineFastInt("GameShareExperienceLinkThrottleHundrethsPercent", 10000)
+local v6 = t.strictInterface({
+	placeId = t.string,
+	uid = t.string,
+	ctx = t.string,
+	shortShareLinkFailed = t.optional(t.boolean),
+	shareToAppsflyer = t.optional(t.boolean),
+	stamp = t.optional(t.string),
+	linkId = t.optional(t.string)
+})
+
+return function(p1, s1: string) -- line: 21
+	-- upvalues: v6 (copy), DiscoveryEventErrorLogger (copy), v5 (copy), TelemetryService (copy)
+	local v9, v10 = v6(p1)
+
+	if not v9 then
+		DiscoveryEventErrorLogger.reportError("GameShareExperienceLinkInvalidInterface", v10)
+	end
+
+	local t1 = {
+		eventName = "shareExperienceLink",
+		description = "User has shared an experience link",
+		backends = { "EventIngest" },
+		throttlingPercentage = v5,
+		lastUpdated = {
+			25,
+			11,
+			11
+		}
+	}
+
+	TelemetryService:LogEvent(t1, {
+		eventContext = s1,
+		standardizedFields = { "addSessionInfo" },
+		customFields = p1
+	})
+end

@@ -1,31 +1,34 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Parent_0 = script:FindFirstAncestor("FocusNavigationUtils").Parent;
-local v2 = require(l_Parent_0.React);
-local l_useCursor_0 = require(l_Parent_0.UIBlox).App.SelectionCursor.useCursor;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return function() --[[ Line: 10 ]] --[[ Name: useGlobalDefaultSelectionCursor ]]
-    -- upvalues: l_useDesignTokens_0 (copy), l_useCursor_0 (copy), v2 (copy), l_CoreGui_0 (copy)
-    local v6 = l_useDesignTokens_0(function(v5) --[[ Line: 11 ]]
-        return {
-            width = v5.Global.Size_25, 
-            radius = UDim.new(0, v5.Semantic.Radius.Medium), 
-            offset = v5.Global.Space_25
-        };
-    end);
-    local v7 = l_useCursor_0(v6.radius, v6.offset, v6.width);
-    local v8 = if v7 then v7.current else nil;
-    v2.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: l_CoreGui_0 (ref), v8 (copy)
-        if l_CoreGui_0.SelectionImageObject == nil and v8 ~= nil then
-            l_CoreGui_0.SelectionImageObject = v8;
-            return function() --[[ Line: 26 ]]
-                -- upvalues: l_CoreGui_0 (ref)
-                l_CoreGui_0.SelectionImageObject = nil;
-            end;
-        else
-            return nil;
-        end;
-    end, {
-        v8
-    });
-end;
+local CoreGui = game:GetService("CoreGui")
+local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
+local React = require(Parent.React)
+local useCursor = require(Parent.UIBlox).App.SelectionCursor.useCursor
+local useDesignTokens = require(Parent.Style).useDesignTokens
+
+local function useGlobalDefaultSelectionCursor() -- line: 10
+	-- upvalues: useDesignTokens (copy), useCursor (copy), React (copy), CoreGui (copy)
+	local v7 = useDesignTokens(function(p1) -- line: 11
+		return {
+			width = p1.Size.Size_50,
+			radius = UDim.new(0, p1.Radius.Medium),
+			offset = p1.Size.Size_50
+		}
+	end)
+	local v8 = useCursor(v7.radius, v7.offset, v7.width)
+	local v9 = if not v8 then nil else v8.current
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: CoreGui (copy), v9 (copy)
+		if CoreGui.SelectionImageObject == nil and v9 ~= nil then
+			CoreGui.SelectionImageObject = v9
+
+			return function() -- line: 26
+				-- upvalues: CoreGui (copy)
+				CoreGui.SelectionImageObject = nil
+			end
+		end
+
+		return nil
+	end, { v9 })
+end
+
+return useGlobalDefaultSelectionCursor

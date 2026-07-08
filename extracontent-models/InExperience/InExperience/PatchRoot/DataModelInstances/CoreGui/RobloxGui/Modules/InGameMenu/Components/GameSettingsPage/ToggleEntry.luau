@@ -1,97 +1,101 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_t_0 = v2.t;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v6 = require(l_Parent_0.Components.ToggleSwitch);
-local v7 = require(script.Parent.InputLabel);
-local v8 = require(script.Parent.DeveloperLockLabel);
-local v9 = require(l_Parent_0.Components.ThemedTextLabel);
-local v10 = require(l_Parent_0.Localization.withLocalization);
-local v11 = l_Roact_0.PureComponent:extend("ToggleEntry");
-v11.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.integer, 
-    labelKey = l_t_0.string, 
-    lockedToOff = l_t_0.optional(l_t_0.boolean), 
-    isDisabled = l_t_0.optional(l_t_0.boolean), 
-    subtextEnabled = l_t_0.optional(l_t_0.boolean), 
-    subtextKey = l_t_0.optional(l_t_0.string), 
-    checked = l_t_0.boolean, 
-    onToggled = l_t_0.callback, 
-    buttonRef = l_t_0.optional(l_t_0.table), 
-    NextSelectionUp = l_t_0.optional(l_t_0.union(l_t_0.Instance, l_t_0.table))
-});
-v11.init = function(v12) --[[ Line: 31 ]] --[[ Name: init ]]
-    v12.state = {
-        isSelectable = true
-    };
-end;
-v11.render = function(v13) --[[ Line: 37 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), l_GuiService_0 (copy), v7 (copy), v8 (copy), v10 (copy), v9 (copy), v6 (copy)
-    local v14 = v13.props.buttonRef or l_Roact_0.createRef();
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        LayoutOrder = v13.props.LayoutOrder, 
-        Size = UDim2.new(1, 0, 0, 56), 
-        Selectable = v13.state.isSelectable, 
-        [l_Roact_0.Event.SelectionGained] = function() --[[ Line: 45 ]]
-            -- upvalues: l_GuiService_0 (ref), v14 (copy), v13 (copy)
-            l_GuiService_0.SelectedCoreObject = v14:getValue();
-            v13:setState({
-                isSelectable = false
-            });
-        end
-    }, {
-        Padding = l_Roact_0.createElement("UIPadding", {
-            PaddingRight = UDim.new(0, 30), 
-            PaddingLeft = UDim.new(0, 24)
-        }), 
-        ControlLabel = l_Roact_0.createElement(v7, {
-            localizationKey = v13.props.labelKey
-        }), 
-        LockedLabel = v13.props.lockedToOff and l_Roact_0.createElement(v8, {
-            Size = UDim2.new(1, -72, 0.25, 0), 
-            Position = UDim2.new(0, 0, 1, 0), 
-            AnchorPoint = Vector2.new(0, 1)
-        }), 
-        SubtextLabel = v13.props.subtextEnabled and v10({
-            text = v13.props.subtextKey
-        })(function(v15) --[[ Line: 66 ]]
-            -- upvalues: l_Roact_0 (ref), v9 (ref)
-            return l_Roact_0.createElement(v9, {
-                Text = v15.text, 
-                themeKey = "TextDefault", 
-                fontKey = "CaptionBody", 
-                TextTransparency = 0.5, 
-                Size = UDim2.new(1, -72, 0.25, 0), 
-                Position = UDim2.new(0, 0, 1, 0), 
-                AnchorPoint = Vector2.new(0, 1), 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextYAlignment = Enum.TextYAlignment.Bottom
-            });
-        end), 
-        Toggle = l_Roact_0.createElement(v6, {
-            Position = UDim2.new(1, 0, 0.5, 0), 
-            AnchorPoint = Vector2.new(1, 0.5), 
-            checked = v13.props.checked and not v13.props.lockedToOff, 
-            onToggled = v13.props.onToggled, 
-            disabled = v13.props.lockedToOff or v13.props.isDisabled, 
-            buttonRef = v14, 
-            onSelectionLost = function() --[[ Line: 86 ]] --[[ Name: onSelectionLost ]]
-                -- upvalues: v13 (copy)
-                v13:setState({
-                    isSelectable = true
-                });
-            end, 
-            onSelectionGained = function() --[[ Line: 91 ]] --[[ Name: onSelectionGained ]]
-                -- upvalues: v13 (copy)
-                v13:setState({
-                    isSelectable = false
-                });
-            end, 
-            NextSelectionUp = v13.props.NextSelectionUp
-        })
-    });
-end;
-return v11;
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local ParentParent = script.Parent.Parent.Parent
+local ToggleSwitch = require(ParentParent.Components.ToggleSwitch)
+local InputLabel = require(script.Parent.InputLabel)
+local DeveloperLockLabel = require(script.Parent.DeveloperLockLabel)
+local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local v12 = Roact.PureComponent:extend("ToggleEntry")
+
+v12.validateProps = t.strictInterface({
+	LayoutOrder = t.integer,
+	labelKey = t.string,
+	lockedToOff = t.optional(t.boolean),
+	isDisabled = t.optional(t.boolean),
+	subtextEnabled = t.optional(t.boolean),
+	subtextKey = t.optional(t.string),
+	checked = t.boolean,
+	onToggled = t.callback,
+	buttonRef = t.optional(t.table),
+	NextSelectionUp = t.optional(t.union(t.Instance, t.table))
+})
+
+function v12.init(p1) -- line: 31
+	p1.state = {
+		isSelectable = true
+	}
+end
+function v12.render(p2) -- line: 37
+	-- upvalues: Roact (copy), GuiService (copy), InputLabel (copy), DeveloperLockLabel (copy), withLocalization (copy), ThemedTextLabel (copy), ToggleSwitch (copy)
+	local v15 = p2.props.buttonRef or Roact.createRef()
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = p2.props.LayoutOrder,
+		Size = UDim2.new(1, 0, 0, 56),
+		Selectable = p2.state.isSelectable,
+		[Roact.Event.SelectionGained] = function() -- line: 45
+			-- upvalues: GuiService (copy), v15 (copy), p2 (copy)
+			GuiService.SelectedCoreObject = v15:getValue()
+			p2:setState({
+				isSelectable = false
+			})
+		end
+	}, {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingRight = UDim.new(0, 30),
+			PaddingLeft = UDim.new(0, 24)
+		}),
+		ControlLabel = Roact.createElement(InputLabel, {
+			localizationKey = p2.props.labelKey
+		}),
+		LockedLabel = p2.props.lockedToOff and Roact.createElement(DeveloperLockLabel, {
+			Size = UDim2.new(1, -72, 0.25, 0),
+			Position = UDim2.new(0, 0, 1, 0),
+			AnchorPoint = Vector2.new(0, 1)
+		}),
+		SubtextLabel = p2.props.subtextEnabled and withLocalization({
+			text = p2.props.subtextKey
+		})(function(p3) -- line: 66
+			-- upvalues: Roact (copy), ThemedTextLabel (copy)
+			return Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "CaptionBody",
+				TextTransparency = 0.5,
+				Text = p3.text,
+				Size = UDim2.new(1, -72, 0.25, 0),
+				Position = UDim2.new(0, 0, 1, 0),
+				AnchorPoint = Vector2.new(0, 1),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Bottom
+			})
+		end),
+		Toggle = Roact.createElement(ToggleSwitch, {
+			Position = UDim2.new(1, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(1, 0.5),
+			checked = p2.props.checked and not p2.props.lockedToOff,
+			onToggled = p2.props.onToggled,
+			disabled = p2.props.lockedToOff or p2.props.isDisabled,
+			buttonRef = v15,
+			onSelectionLost = function() -- line: 86
+				-- upvalues: p2 (copy)
+				p2:setState({
+					isSelectable = true
+				})
+			end,
+			onSelectionGained = function() -- line: 91
+				-- upvalues: p2 (copy)
+				p2:setState({
+					isSelectable = false
+				})
+			end,
+			NextSelectionUp = p2.props.NextSelectionUp
+		})
+	})
+end
+
+return v12

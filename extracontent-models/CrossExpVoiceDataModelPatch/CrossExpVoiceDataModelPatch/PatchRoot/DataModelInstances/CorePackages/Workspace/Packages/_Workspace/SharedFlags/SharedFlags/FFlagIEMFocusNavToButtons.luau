@@ -1,1 +1,1 @@
-return game:DefineFastFlag("IEMFocusNavToButtons", false);
+return game:DefineFastFlag("IEMFocusNavToButtons", false)

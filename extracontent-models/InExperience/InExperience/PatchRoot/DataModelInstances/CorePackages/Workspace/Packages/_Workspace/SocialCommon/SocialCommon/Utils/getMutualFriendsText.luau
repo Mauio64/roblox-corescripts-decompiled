@@ -1,9 +1,11 @@
-return function(v0) --[[ Line: 14 ]]
-    if v0.mutualFriendsCount == 0 then
-        return "";
-    elseif v0.mutualFriendsCount == 1 then
-        return v0.localized.singularMutualConnection;
-    else
-        return v0.localized.mutualConnections;
-    end;
-end;
+return function(t1: {[any]: any}) -- line: 14
+	if t1.mutualFriendsCount == 0 then
+		return ""
+	end
+
+	if t1.mutualFriendsCount == 1 then
+		return t1.localized.singularMutualConnection
+	end
+
+	return t1.localized.mutualConnections
+end

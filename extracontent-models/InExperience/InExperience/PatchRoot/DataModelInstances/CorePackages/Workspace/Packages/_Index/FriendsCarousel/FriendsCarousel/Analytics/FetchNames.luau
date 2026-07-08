@@ -1,5 +1,5 @@
 return {
-    AllFriends = "allFriends", 
-    OnlineFriends = "onlineFriends", 
-    OldAllFriends = "oldAllFriends"
-};
+	AllFriends = "allFriends",
+	OnlineFriends = "onlineFriends",
+	OldAllFriends = "oldAllFriends"
+}

@@ -1,3 +1,3 @@
 return {
-    SwitchTabHint = require(script.SwitchTabHint)
-};
+	SwitchTabHint = require(script.SwitchTabHint)
+}

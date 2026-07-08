@@ -45,62 +45,64 @@ local t4 = {
 	[ConversationBottomModal.NudgeToBottomChatUpsell] = "padding-large align-x-center auto-y size-full-0 stroke-standard stroke-default bg-shift-100"
 }
 
-return React.memo(function(t5: {[any]: any}) --[[ AppChatFAEBanner ]] -- line: 71
+local function AppChatFAEBanner(t5: {[any]: any}) -- line: 71
 	-- upvalues: useDispatch (copy), useIsInExperience (copy), useCallback (copy), fetchChatMetadata (copy), t2 (copy), t1 (copy), useSocialUpsellOverlayController (copy), React (copy), startFacialAgeEstimation (copy), SocialUpsell (copy), UpsellComponent (copy), createBannerConfigFromModalConfiguration (copy), v9 (copy), t3 (copy), t4 (copy), Foundation (copy), UpsellBanner (copy)
-	local v25 = useDispatch()
-	local v26 = useIsInExperience()
-	local v27 = useCallback(function() -- line: 74
-		-- upvalues: v25 (copy), fetchChatMetadata (copy)
-		v25(fetchChatMetadata())
+	local v26 = useDispatch()
+	local v27 = useIsInExperience()
+	local v28 = useCallback(function() -- line: 74
+		-- upvalues: v26 (copy), fetchChatMetadata (copy)
+		v26(fetchChatMetadata())
 	end, {
-		v25,
+		v26,
 		fetchChatMetadata
 	})
 	local modalConfiguration = t5.modalConfiguration
-	local v29 = if not v26 then t1[modalConfiguration.modal_variant] else t2[modalConfiguration.modal_variant]
-	local v30 = useSocialUpsellOverlayController(v26)
-	local v31 = React.useCallback(function(_: string) -- line: 84
-		-- upvalues: v25 (copy), startFacialAgeEstimation (copy), SocialUpsell (copy), v29 (copy), v27 (copy), v26 (copy)
-		v25(startFacialAgeEstimation(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation .. v29, v27, nil, v29, v26))
+	local v30 = if not v27 then t1[modalConfiguration.modal_variant] else t2[modalConfiguration.modal_variant]
+	local v31 = useSocialUpsellOverlayController(v27)
+	local v32 = React.useCallback(function(_: string) -- line: 84
+		-- upvalues: v26 (copy), startFacialAgeEstimation (copy), SocialUpsell (copy), v30 (copy), v28 (copy), v27 (copy)
+		v26(startFacialAgeEstimation(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation .. v30, v28, nil, v30, v27))
 	end, {
-		v25,
-		v29,
-		v26
+		v26,
+		v30,
+		v27
 	})
-	local v32 = React.useCallback(function(s2: string) -- line: 95
-		-- upvalues: v30 (copy), SocialUpsell (copy), v29 (copy), UpsellComponent (copy)
-		v30.openSocialOverlay(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation, {
-			upsellEntrySurface = v29,
+	local v33 = React.useCallback(function(s2: string) -- line: 95
+		-- upvalues: v31 (copy), SocialUpsell (copy), v30 (copy), UpsellComponent (copy)
+		v31.openSocialOverlay(SocialUpsell.Enums.SocialUpsellType.FacialAgeEstimation, {
+			upsellEntrySurface = v30,
 			upsellEntryComponent = UpsellComponent.Banner,
 			impressionId = s2
 		})
 	end, {
-		v30.openSocialOverlay,
-		v29
+		v31.openSocialOverlay,
+		v30
 	})
-	local v33 = createBannerConfigFromModalConfiguration(modalConfiguration)
-	local v34 = React.useCallback(function(_: string) -- line: 105
-		-- upvalues: v33 (copy), v9 (copy)
-		if not v33.isDismissable then
+	local v34 = createBannerConfigFromModalConfiguration(modalConfiguration)
+	local v35 = React.useCallback(function(_: string) -- line: 105
+		-- upvalues: v34 (copy), v9 (copy)
+		if not v34.isDismissable then
 			v9:warning("attempt to call AppChatFAEBanner onDismiss not provided and banner is not dismissable")
 		end
 	end, {})
-	local v35 = t5.onDismiss or v34
-	local v36 = t3[modalConfiguration.modal_variant]
-	local v37 = t4[modalConfiguration.modal_variant]
+	local v36 = t5.onDismiss or v35
+	local v37 = t3[modalConfiguration.modal_variant]
+	local v38 = t4[modalConfiguration.modal_variant]
 
 	return React.createElement(Foundation.View, {
-		tag = v37
+		tag = v38
 	}, {
 		UpsellBanner = React.createElement(UpsellBanner, {
-			config = v33,
-			isContained = v36,
-			onPrimaryAction = v31,
-			onSecondaryAction = v32,
-			onDismiss = v35,
-			upsellEntrySurface = v29,
+			config = v34,
+			isContained = v37,
+			onPrimaryAction = v32,
+			onSecondaryAction = v33,
+			onDismiss = v36,
+			upsellEntrySurface = v30,
 			upsellEntryComponent = UpsellComponent.Banner,
 			conversationId = t5.conversationId
 		})
 	})
-end)
+end
+
+return React.memo(AppChatFAEBanner)

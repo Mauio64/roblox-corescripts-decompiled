@@ -1,62 +1,123 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local v1 = require(l_script_FirstAncestor_0.ClientBinding.SduiDataBinderTransformUtils);
-local l_snakeToCamel_0 = v1.snakeToCamel;
-local l_protobufTimestampToLocalTimeString_0 = v1.protobufTimestampToLocalTimeString;
-local v4 = {
-    DataStatus = {
-        Ready = "Ready", 
-        NotReady = "NotReady", 
-        Failed = "Failed"
-    }
-};
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiDataBinderTransformUtils = require(SduiCoreSystem.ClientBinding.SduiDataBinderTransformUtils)
+local snakeToCamel = SduiDataBinderTransformUtils.snakeToCamel
+local protobufTimestampToLocalTimeString = SduiDataBinderTransformUtils.protobufTimestampToLocalTimeString
+local t1 = {
+	DataStatus = {
+		Ready = "Ready",
+		NotReady = "NotReady",
+		Failed = "Failed"
+	}
+}
+
 return {
-    createDataHydrationMock = function(v5) --[[ Line: 30 ]] --[[ Name: createDataHydrationMock ]]
-        -- upvalues: v4 (copy)
-        local v6 = {
-            Badges = v5 and v5.Badges or {
-                getBadgeInfoStore = function() --[[ Line: 38 ]] --[[ Name: getBadgeInfoStore ]]
-                    return {
-                        getBadgeInfo = function() --[[ Line: 40 ]] --[[ Name: getBadgeInfo ]]
-                            return {
-                                data = function() --[[ Line: 42 ]] --[[ Name: data ]]
-                                    return nil;
-                                end, 
-                                status = function() --[[ Line: 45 ]] --[[ Name: status ]]
-                                    return "NotReady";
-                                end
-                            };
-                        end, 
-                        getBadgeInfos = function() --[[ Line: 50 ]] --[[ Name: getBadgeInfos ]]
-                            return {};
-                        end, 
-                        clear = function() --[[ Line: 53 ]] --[[ Name: clear ]]
+	createDataHydrationMock = function(t2: {[any]: any}?) -- line: 30
+		-- upvalues: t1 (copy)
+		local t3 = {
+			Badges = t2 and t2.Badges or {
+				getBadgeInfoStore = function() -- line: 46
+					return {
+						getBadgeInfo = function() -- line: 48
+							return {
+								data = function() -- line: 50
+									return nil
+								end,
+								status = function() -- line: 53
+									return "NotReady"
+								end
+							}
+						end,
+						getBadgeInfos = function() -- line: 58
+							return {}
+						end,
+						clear = function() -- line: 61
+						end,
+						dispose = function() -- line: 62
+						end
+					}
+				end
+			},
+			Game = t2 and t2.Game or nil,
+			SocialLink = t2 and t2.SocialLink or nil,
+			MarketplaceCatalogCategory = t2 and t2.MarketplaceCatalogCategory or {
+				getMarketplaceCatalogCategoryStore = function() -- line: 69
+					return {
+						getMarketplaceCatalogCategory = function() -- line: 71
+							return {
+								data = function() -- line: 73
+									return nil
+								end,
+								status = function() -- line: 76
+									return "NotReady"
+								end
+							}
+						end,
+						getMarketplaceCatalogCategories = function() -- line: 81
+							return {}
+						end,
+						updateMarketplaceCatalogCategories = function() -- line: 84
+						end,
+						updateMarketplaceCatalogCategory = function() -- line: 85
+						end,
+						clear = function() -- line: 86
+						end,
+						dispose = function() -- line: 87
+						end
+					}
+				end
+			},
+			MarketplaceCatalogSort = t2 and t2.MarketplaceCatalogSort or {
+				getMarketplaceCatalogSortStore = function() -- line: 92
+					return {
+						getMarketplaceCatalogSort = function() -- line: 94
+							return {
+								data = function() -- line: 96
+									return nil
+								end,
+								status = function() -- line: 99
+									return "NotReady"
+								end
+							}
+						end,
+						getMarketplaceCatalogSorts = function() -- line: 104
+							return {}
+						end,
+						updateMarketplaceCatalogSorts = function() -- line: 107
+						end,
+						updateMarketplaceCatalogSort = function() -- line: 108
+						end,
+						clear = function() -- line: 109
+						end,
+						dispose = function() -- line: 110
+						end
+					}
+				end
+			},
+			Song = t2 and t2.Song or nil,
+			MarketplaceAsset = t2 and t2.MarketplaceAsset or nil,
+			MarketplaceBundle = t2 and t2.MarketplaceBundle or nil,
+			MarketplaceLook = t2 and t2.MarketplaceLook or nil,
+			MediaAsset = t2 and t2.MediaAsset or nil,
+			UserProfile = t2 and t2.UserProfile or nil,
+			DataHydrationTypes = t1
+		}
 
-                        end, 
-                        dispose = function() --[[ Line: 54 ]] --[[ Name: dispose ]]
+		if t2 and t2.extraFields then
+			for v8, v9 in t2.extraFields do
+				t3[v8] = v9
+			end
+		end
 
-                        end
-                    };
-                end
-            }, 
-            Game = v5 and v5.Game or nil, 
-            SocialLink = v5 and v5.SocialLink or nil, 
-            DataHydrationTypes = v4
-        };
-        if v5 and v5.extraFields then
-            for v7, v8 in v5.extraFields do
-                v6[v7] = v8;
-            end;
-        end;
-        return v6;
-    end, 
-    createSduiDataBinderTransformUtilsMock = function() --[[ Line: 77 ]] --[[ Name: createSduiDataBinderTransformUtilsMock ]]
-        -- upvalues: l_snakeToCamel_0 (copy), l_protobufTimestampToLocalTimeString_0 (copy)
-        return {
-            snakeToCamel = l_snakeToCamel_0, 
-            protobufTimestampToLocalTimeString = l_protobufTimestampToLocalTimeString_0
-        };
-    end, 
-    snakeToCamel = l_snakeToCamel_0, 
-    protobufTimestampToLocalTimeString = l_protobufTimestampToLocalTimeString_0, 
-    DataHydrationTypesMock = v4
-};
+		return t3
+	end,
+	createSduiDataBinderTransformUtilsMock = function() -- line: 137
+		-- upvalues: snakeToCamel (copy), protobufTimestampToLocalTimeString (copy)
+		return {
+			snakeToCamel = snakeToCamel,
+			protobufTimestampToLocalTimeString = protobufTimestampToLocalTimeString
+		}
+	end,
+	snakeToCamel = snakeToCamel,
+	protobufTimestampToLocalTimeString = protobufTimestampToLocalTimeString,
+	DataHydrationTypesMock = t1
+}

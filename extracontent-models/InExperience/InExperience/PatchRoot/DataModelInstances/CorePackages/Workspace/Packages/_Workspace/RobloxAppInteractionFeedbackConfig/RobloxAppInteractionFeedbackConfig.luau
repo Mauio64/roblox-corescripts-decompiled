@@ -1,3 +1,3 @@
 return {
-    AppInteractionFeedbackProvider = require(script.AppInteractionFeedbackProvider)
-};
+	AppInteractionFeedbackProvider = require(script.AppInteractionFeedbackProvider)
+}

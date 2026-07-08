@@ -1,58 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local _ = require(l_script_FirstAncestor_0.Telemetry.Layers.AppTelemetryLayer);
-local v2 = require(l_script_FirstAncestor_0.Components.ModalTelemetry);
+local AppChat = script:FindFirstAncestor("AppChat")
+
+require(AppChat.Telemetry.Layers.AppTelemetryLayer)
+
+local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
+
 return {
-    Events = {
-        ModalRendered = v2.Events.modalRenderedWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationListOverlay, 
-            counterFormat = function(v3, _) --[[ Line: 12 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v3.modalVariant
-                };
-            end, 
-            eventStreamFormat = function(v5, _) --[[ Line: 17 ]] --[[ Name: eventStreamFormat ]]
-                return {
-                    modalVariant = v5.modalVariant, 
-                    conversationId = v5.conversationId, 
-                    impressionId = v5.impressionId
-                };
-            end
-        }), 
-        ModalAction = v2.Events.modalActionWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationListOverlay, 
-            counterFormat = function(v7, _) --[[ Line: 27 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v7.modalVariant, 
-                    action = v7.action
-                };
-            end, 
-            eventStreamFormat = function(v9, _) --[[ Line: 36 ]] --[[ Name: eventStreamFormat ]]
-                return {
-                    modalVariant = v9.modalVariant, 
-                    action = v9.action, 
-                    conversationId = v9.conversationId, 
-                    impressionId = v9.impressionId
-                };
-            end
-        }), 
-        ModalActionResult = v2.Events.modalActionResultWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationListOverlay, 
-            counterFormat = function(v11, _) --[[ Line: 52 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v11.modalVariant, 
-                    action = v11.action, 
-                    actionResult = v11.actionResult
-                };
-            end, 
-            eventStreamFormat = function(v13, _) --[[ Line: 65 ]] --[[ Name: eventStreamFormat ]]
-                return {
-                    modalVariant = v13.modalVariant, 
-                    action = v13.action, 
-                    actionResult = v13.actionResult, 
-                    conversationId = v13.conversationId, 
-                    impressionId = v13.impressionId
-                };
-            end
-        })
-    }
-};
+	Events = {
+		ModalRendered = ModalTelemetry.Events.modalRenderedWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationListOverlay,
+			counterFormat = function(p1, _) -- line: 12
+				return {
+					modalVariant = p1.modalVariant
+				}
+			end,
+			eventStreamFormat = function(p3, _) -- line: 17
+				return {
+					modalVariant = p3.modalVariant,
+					conversationId = p3.conversationId,
+					impressionId = p3.impressionId
+				}
+			end
+		}),
+		ModalAction = ModalTelemetry.Events.modalActionWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationListOverlay,
+			counterFormat = function(p5, _) -- line: 27
+				return {
+					modalVariant = p5.modalVariant,
+					action = p5.action
+				}
+			end,
+			eventStreamFormat = function(p7, _) -- line: 36
+				return {
+					modalVariant = p7.modalVariant,
+					action = p7.action,
+					conversationId = p7.conversationId,
+					impressionId = p7.impressionId
+				}
+			end
+		}),
+		ModalActionResult = ModalTelemetry.Events.modalActionResultWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationListOverlay,
+			counterFormat = function(p9, _) -- line: 52
+				return {
+					modalVariant = p9.modalVariant,
+					action = p9.action,
+					actionResult = p9.actionResult
+				}
+			end,
+			eventStreamFormat = function(p11, _) -- line: 65
+				return {
+					modalVariant = p11.modalVariant,
+					action = p11.action,
+					actionResult = p11.actionResult,
+					conversationId = p11.conversationId,
+					impressionId = p11.impressionId
+				}
+			end
+		})
+	}
+}

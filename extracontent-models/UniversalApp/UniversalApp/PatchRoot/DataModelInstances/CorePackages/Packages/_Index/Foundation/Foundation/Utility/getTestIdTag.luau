@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 9 ]] --[[ Name: getTestIdTag ]]
-    if v0 == nil then
-        return nil;
-    elseif v1 then
-        return (("data-testid=%*--%*"):format(v0, v1));
-    else
-        return (("data-testid=%*"):format(v0));
-    end;
-end;
+local function getTestIdTag(s1: string?, s2: string?) -- line: 9
+	if s1 == nil then
+		return nil
+	end
+
+	if s2 then
+		return `data-testid={ s1 }--{ s2 }`
+	end
+
+	return `data-testid={ s1 }`
+end
+
+return getTestIdTag

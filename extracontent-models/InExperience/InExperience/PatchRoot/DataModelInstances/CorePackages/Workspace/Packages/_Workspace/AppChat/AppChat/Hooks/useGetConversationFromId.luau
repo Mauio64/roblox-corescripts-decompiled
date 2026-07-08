@@ -1,11 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v3 = require(l_script_FirstAncestor_0.Utils.getDeepValue);
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: l_useSelector_0 (copy), v3 (copy)
-    return l_useSelector_0(function(v5) --[[ Line: 8 ]]
-        -- upvalues: v3 (ref), v4 (copy)
-        return v3(v5, (("ChatAppReducer.Conversations.%*"):format(v4)));
-    end);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local getDeepValue = require(AppChat.Utils.getDeepValue)
+
+return function(s1: string?) -- line: 7
+	-- upvalues: useSelector (copy), getDeepValue (copy)
+	return useSelector(function(p1) -- line: 8
+		-- upvalues: getDeepValue (copy), s1 (copy)
+		return getDeepValue(p1, `ChatAppReducer.Conversations.{ s1 }`)
+	end)
+end

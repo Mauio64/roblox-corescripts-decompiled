@@ -1,69 +1,77 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Core_0 = l_Parent_0.Core;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.t);
-local v4 = require(l_Parent_1.Roact);
-local v5 = require(l_Core_0.Style.withStyle);
-local v6 = v4.PureComponent:extend("ListTable");
-v6.validateProps = v3.strictInterface({
-    layoutOrder = v3.optional(v3.integer), 
-    size = v3.optional(v3.UDim2), 
-    showDividers = v3.optional(v3.boolean), 
-    dividerStartOffset = v3.optional(v3.number), 
-    anchorPoint = v3.optional(v3.Vector2), 
-    position = v3.optional(v3.UDim2), 
-    automaticSize = v3.optional(v3.enum(Enum.AutomaticSize)), 
-    cells = v3.array(v3.table)
-});
-v6.defaultProps = {
-    showDividers = true, 
-    dividerStartOffset = 24
-};
-v6.render = function(v7) --[[ Line: 49 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v4 (copy)
-    return v5(function(v8) --[[ Line: 50 ]]
-        -- upvalues: v7 (copy), v4 (ref)
-        local l_size_0 = v7.props.size;
-        local l_automaticSize_0 = v7.props.automaticSize;
-        if not l_size_0 then
-            l_size_0 = if l_automaticSize_0 then if l_automaticSize_0 == Enum.AutomaticSize.X then UDim2.fromScale(0, 1) else if l_automaticSize_0 == Enum.AutomaticSize.Y then UDim2.fromScale(1, 0) else if l_automaticSize_0 == Enum.AutomaticSize.XY then UDim2.fromScale(0, 0) else UDim2.fromScale(1, 1) else UDim2.fromScale(1, 1);
-        end;
-        local v11 = {
-            ListLayout = v4.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical
-            })
-        };
-        local l_cells_0 = v7.props.cells;
-        for v13, v14 in ipairs(l_cells_0) do
-            local v15 = "Cell " .. v13;
-            local v16 = v7.props.showDividers and v13 < #l_cells_0;
-            v11[v15] = v4.createElement("Frame", {
-                LayoutOrder = v13, 
-                Size = UDim2.fromScale(1, 0), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                Content = v14, 
-                Divider = v16 and v4.createElement("Frame", {
-                    Size = UDim2.new(1, -v7.props.dividerStartOffset, 0, 1), 
-                    Position = UDim2.new(0, v7.props.dividerStartOffset, 1, -1), 
-                    BorderSizePixel = 0, 
-                    BackgroundColor3 = v8.Theme.Divider.Color, 
-                    BackgroundTransparency = v8.Theme.Divider.Transparency, 
-                    ZIndex = 100
-                }) or nil
-            });
-        end;
-        return v4.createElement("Frame", {
-            LayoutOrder = v7.props.layoutOrder, 
-            Size = l_size_0, 
-            AutomaticSize = l_automaticSize_0, 
-            AnchorPoint = v7.props.anchorPoint, 
-            Position = v7.props.position, 
-            BackgroundTransparency = 1
-        }, v11);
-    end);
-end;
-return v6;
+local ParentParent = script.Parent.Parent.Parent
+local Core = ParentParent.Core
+local ParentParentParent = ParentParent.Parent
+local t = require(ParentParentParent.t)
+local Roact = require(ParentParentParent.Roact)
+local withStyle = require(Core.Style.withStyle)
+local v7 = Roact.PureComponent:extend("ListTable")
+
+v7.validateProps = t.strictInterface({
+	layoutOrder = t.optional(t.integer),
+	size = t.optional(t.UDim2),
+	showDividers = t.optional(t.boolean),
+	dividerStartOffset = t.optional(t.number),
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	automaticSize = t.optional(t.enum(Enum.AutomaticSize)),
+	cells = t.array(t.table)
+})
+v7.defaultProps = {
+	showDividers = true,
+	dividerStartOffset = 24
+}
+
+function v7.render(p1) -- line: 49
+	-- upvalues: withStyle (copy), Roact (copy)
+	return withStyle(function(p2) -- line: 50
+		-- upvalues: p1 (copy), Roact (copy)
+		local size = p1.props.size
+		local automaticSize = p1.props.automaticSize
+
+		if not size then
+			size = if not automaticSize then UDim2.fromScale(1, 1) else if automaticSize ~= Enum.AutomaticSize.X then if automaticSize ~= Enum.AutomaticSize.Y then if automaticSize ~= Enum.AutomaticSize.XY then UDim2.fromScale(1, 1) else UDim2.fromScale(0, 0) else UDim2.fromScale(1, 0) else UDim2.fromScale(0, 1)
+		end
+
+		local t1 = {
+			ListLayout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical
+			})
+		}
+		local cells = p1.props.cells
+
+		for i, v in ipairs(cells) do
+			local v16 = "Cell " .. i
+			local v17 = p1.props.showDividers and i < #cells
+
+			t1[v16] = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = i,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				Content = v,
+				Divider = v17 and Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					ZIndex = 100,
+					Size = UDim2.new(1, -p1.props.dividerStartOffset, 0, 1),
+					Position = UDim2.new(0, p1.props.dividerStartOffset, 1, -1),
+					BackgroundColor3 = p2.Theme.Divider.Color,
+					BackgroundTransparency = p2.Theme.Divider.Transparency
+				}) or nil
+			})
+		end
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = p1.props.layoutOrder,
+			Size = size,
+			AutomaticSize = automaticSize,
+			AnchorPoint = p1.props.anchorPoint,
+			Position = p1.props.position
+		}, t1)
+	end)
+end
+
+return v7

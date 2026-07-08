@@ -15,7 +15,7 @@ require(SduiCoreSystem.SduiComponentType)
 local FFlagSduiImprovedErrorDimensions = require(SduiCoreSystemParent.SharedFlags).FFlagSduiImprovedErrorDimensions
 local t1 = {}
 local t2 = {
-	__index = function(p1, p2) --[[ __index ]] -- line: 33
+	__index = function(p1, p2) -- line: 33
 		if p2 == "analyticsData" then
 			return p1.getAnalyticsDataSnapshot()
 		end
@@ -28,7 +28,7 @@ local t2 = {
 	end
 }
 
-return function(p3, t3: {[any]: any}?, p4, p5) --[[ buildAnalyticsContextForClientBinding ]] -- line: 66
+local function buildAnalyticsContextForClientBinding(p3, t3: {[any]: any}?, p4, p5) -- line: 66
 	-- upvalues: FFlagSduiImprovedErrorDimensions (copy), t1 (copy), SduiLogger (copy), SduiErrors (copy), Cryo (copy), t2 (copy)
 	local currentComponentType = nil
 	local currentParserName = nil
@@ -38,17 +38,17 @@ return function(p3, t3: {[any]: any}?, p4, p5) --[[ buildAnalyticsContextForClie
 		currentParserName = p5.currentParserName
 	end
 
-	local u17 = nil
+	local u18 = nil
 	local t4 = {
-		getAnalyticsDataSnapshot = function() --[[ getAnalyticsDataSnapshot ]] -- line: 91
-			-- upvalues: p3 (copy), t1 (copy), t3 (copy), SduiLogger (copy), SduiErrors (copy), p5 (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref), currentParserName (ref), u17 (ref), Cryo (copy)
-			local v19 = table.clone(p3 or t1)
+		getAnalyticsDataSnapshot = function() -- line: 91
+			-- upvalues: p3 (copy), t1 (copy), t3 (copy), SduiLogger (copy), SduiErrors (copy), p5 (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref), currentParserName (ref), u18 (ref), Cryo (copy)
+			local v20 = table.clone(p3 or t1)
 
 			if t3 then
 				xpcall(function() -- line: 94
-					-- upvalues: t3 (copy), v19 (copy)
-					for v23, v24 in t3 do
-						v19[v23] = v24(false).data
+					-- upvalues: t3 (copy), v20 (copy)
+					for v24, v25 in t3 do
+						v20[v24] = v25(false).data
 					end
 				end, function(err) -- line: 98
 					-- upvalues: SduiLogger (copy), SduiErrors (copy), p5 (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref), currentParserName (ref)
@@ -61,28 +61,28 @@ return function(p3, t3: {[any]: any}?, p4, p5) --[[ buildAnalyticsContextForClie
 				end)
 			end
 
-			if u17 then
-				return (Cryo.Dictionary.join(v19, u17))
+			if u18 then
+				return (Cryo.Dictionary.join(v20, u18))
 			end
 
-			return v19
+			return v20
 		end,
-		getAncestorAnalyticsDataSnapshot = function() --[[ getAncestorAnalyticsDataSnapshot ]] -- line: 118
+		getAncestorAnalyticsDataSnapshot = function() -- line: 118
 			-- upvalues: p4 (copy), t1 (copy), Cryo (copy)
 			if p4 then
-				local v20 = p4.ancestorAnalyticsData or t1
-				local v21 = p4.analyticsData or t1
+				local v21 = p4.ancestorAnalyticsData or t1
+				local v22 = p4.analyticsData or t1
 
-				return Cryo.Dictionary.join(v20, v21)
+				return Cryo.Dictionary.join(v21, v22)
 			end
 
 			return t1
 		end,
-		setLocalAnalyticsData = function(p6) --[[ setLocalAnalyticsData ]] -- line: 135
-			-- upvalues: u17 (ref)
-			u17 = p6
+		setLocalAnalyticsData = function(p6) -- line: 135
+			-- upvalues: u18 (ref)
+			u18 = p6
 		end,
-		getCollectionData = function() --[[ getCollectionData ]] -- line: 147
+		getCollectionData = function() -- line: 147
 			-- upvalues: p4 (copy)
 			if p4 and p4.getCollectionData then
 				return p4.getCollectionData()
@@ -96,3 +96,5 @@ return function(p3, t3: {[any]: any}?, p4, p5) --[[ buildAnalyticsContextForClie
 
 	return t4
 end
+
+return buildAnalyticsContextForClientBinding

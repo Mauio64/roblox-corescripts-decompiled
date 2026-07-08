@@ -1,13 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.API_URL);
-return function(v2) --[[ Line: 13 ]]
-    -- upvalues: v1 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "IsBlockedById"
-    }, function(v3, v4) --[[ Line: 16 ]]
-        -- upvalues: v1 (ref)
-        return v3(v1, {
-            currentUserId = v4.currentUserId
-        }):path("user-blocking-api"):path("v1"):path("users"):id(v4.userId):path("is-blocked");
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local API_URL = require(ParentParent.API_URL)
+
+return function(t1: {[any]: any}) -- line: 13
+	-- upvalues: API_URL (copy)
+	return t1.roduxNetworking.GET({
+		Name = "IsBlockedById"
+	}, function(p1, t2: {[any]: any}) -- line: 16
+		-- upvalues: API_URL (copy)
+		return p1(API_URL, {
+			currentUserId = t2.currentUserId
+		}):path("user-blocking-api"):path("v1"):path("users"):id(t2.userId):path("is-blocked")
+	end)
+end

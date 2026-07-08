@@ -1,242 +1,251 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.SquadsCore);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_useStore_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useStore;
-local l_AvatarGroup_0 = v4.AvatarGroup;
-local l_AvatarGroupType_0 = v4.Enums.AvatarGroupType;
-local l_Button_0 = v4.Button;
-local l_ButtonVariant_0 = v4.Enums.ButtonVariant;
-local l_InputSize_0 = v4.Enums.InputSize;
-local l_Loading_0 = v4.Loading;
-local l_Sheet_0 = v4.Sheet;
-local l_Text_0 = v4.Text;
-local l_useTokens_0 = v4.Hooks.useTokens;
-local l_View_0 = v4.View;
-local l_getSubscribedScheduledSquads_0 = v6.NetworkRequests.getSubscribedScheduledSquads;
-local l_SquadExternalContractContext_0 = v6.SquadExternalContractProvider.SquadExternalContractContext;
-local l_SquadPromptType_0 = v6.Enums.SquadPromptType;
-local l_EventNames_0 = v6.Analytics.EventNames;
-local l_subscribeToScheduledSquad_0 = v6.NetworkRequests.subscribeToScheduledSquad;
-local l_unsubscribeFromScheduledSquad_0 = v6.NetworkRequests.unsubscribeFromScheduledSquad;
-local l_useCurrentSquadId_0 = v6.Hooks.useCurrentSquadId;
-local v28 = require(l_script_FirstAncestor_0.Enums.ScheduledSquadActionEnum);
-local v29 = require(l_script_FirstAncestor_0.Enums.ScheduledSquadActionSourceEnum);
-return function(v30) --[[ Line: 44 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), l_useNavigation_0 (copy), l_useTokens_0 (copy), l_useStore_0 (copy), v5 (copy), l_SquadExternalContractContext_0 (copy), l_useCurrentSquadId_0 (copy), l_useLocalization_0 (copy), l_getSubscribedScheduledSquads_0 (copy), l_SquadPromptType_0 (copy), v3 (copy), l_View_0 (copy), l_EventNames_0 (copy), v28 (copy), v29 (copy), l_Text_0 (copy), l_LocalizationService_0 (copy), l_AvatarGroup_0 (copy), l_AvatarGroupType_0 (copy), l_InputSize_0 (copy), l_Button_0 (copy), l_unsubscribeFromScheduledSquad_0 (copy), l_subscribeToScheduledSquad_0 (copy), l_ButtonVariant_0 (copy), l_Sheet_0 (copy), l_Loading_0 (copy)
-    local v31 = l_useLocalUserId_0();
-    local v32 = l_useNavigation_0();
-    local v33 = l_useTokens_0();
-    local v34 = l_useStore_0();
-    local v35 = v5.useContext(l_SquadExternalContractContext_0);
-    local v36 = l_useCurrentSquadId_0();
-    local v37 = l_useLocalization_0({
-        editText = "Feature.Squads.Action.Edit", 
-        goingText = "Feature.Squads.Description.Going", 
-        interestedText = "Feature.Squads.Description.Interested", 
-        noScheduledSquadsText = "Feature.Squads.Description.YouHaveNoScheduledParties", 
-        scheduledPartyText = "Feature.Squads.Label.ScheduledParty", 
-        upcomingPartiesText = "Feature.Squads.Label.UpcomingParties"
-    });
-    local v38, v39 = v5.useState(true);
-    local v40, v41 = v5.useState({});
-    local v42 = v5.useCallback(function() --[[ Line: 64 ]]
-        -- upvalues: v30 (copy)
-        if v30.onClose then
-            v30.onClose();
-        end;
-    end, {
-        v30.onClose
-    });
-    v5.useEffect(function() --[[ Line: 71 ]]
-        -- upvalues: v30 (copy), l_getSubscribedScheduledSquads_0 (ref), v39 (copy), v41 (copy), v35 (copy), v34 (copy), l_SquadPromptType_0 (ref), v42 (copy)
-        if v30.isOpen then
-            l_getSubscribedScheduledSquads_0(function(v43) --[[ Line: 73 ]]
-                -- upvalues: v39 (ref), v41 (ref)
-                v39(false);
-                v41(v43.scheduledGroupUps);
-            end, function() --[[ Line: 76 ]]
-                -- upvalues: v35 (ref), v34 (ref), l_SquadPromptType_0 (ref), v42 (ref)
-                v35.setSquadPrompt(v34, {
-                    hideCancelButton = true, 
-                    promptType = l_SquadPromptType_0.Error
-                });
-                v42();
-            end);
-        end;
-    end, {
-        l_getSubscribedScheduledSquads_0, 
-        v30.isOpen, 
-        v42, 
-        v39, 
-        v41, 
-        v35.setSquadPrompt, 
-        v34
-    });
-    local v44 = v5.useCallback(function() --[[ Line: 96 ]]
-        -- upvalues: v35 (copy), v34 (copy), l_SquadPromptType_0 (ref)
-        v35.setSquadPrompt(v34, {
-            hideCancelButton = true, 
-            promptType = l_SquadPromptType_0.Error
-        });
-    end, {
-        v35.setSquadPrompt, 
-        v34
-    });
-    local v57 = v5.useMemo(function() --[[ Line: 103 ]]
-        -- upvalues: v40 (copy), v31 (copy), v3 (ref), v5 (ref), l_View_0 (ref), v42 (copy), v32 (copy), v35 (copy), l_EventNames_0 (ref), v28 (ref), v29 (ref), v36 (copy), l_Text_0 (ref), v37 (copy), l_LocalizationService_0 (ref), l_AvatarGroup_0 (ref), v33 (copy), l_AvatarGroupType_0 (ref), l_InputSize_0 (ref), l_Button_0 (ref), v34 (copy), l_SquadPromptType_0 (ref), l_unsubscribeFromScheduledSquad_0 (ref), v41 (copy), v44 (copy), l_subscribeToScheduledSquad_0 (ref), l_ButtonVariant_0 (ref)
-        local v45 = {};
-        for v46, v47 in v40 do
-            local v48 = tostring(v47.initiatorId) == tostring(v31);
-            local v50 = v3.List.map(v47.subscribers, function(v49) --[[ Line: 109 ]]
-                return v49.userId;
-            end);
-            local v52 = v48 or v3.List.findWhere(v50, function(v51) --[[ Line: 114 ]]
-                -- upvalues: v31 (ref)
-                return tostring(v51) == tostring(v31);
-            end) ~= nil;
-            local v53 = DateTime.fromIsoDate(v47.startTime);
-            table.insert(v45, v5.createElement(l_View_0, {
-                LayoutOrder = #v45 + 1, 
-                onActivated = function() --[[ Line: 125 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v42 (ref), v32 (ref), v47 (copy), v35 (ref), l_EventNames_0 (ref), v28 (ref), v29 (ref), v36 (ref)
-                    v42();
-                    v32.navigate("ChatConversation", {
-                        conversationId = v47.parentChannelId
-                    });
-                    v35.fireSquadAnalytics(l_EventNames_0.ScheduledSquadAction, {
-                        actionType = v28.NavigateToAssociatedChat, 
-                        conversationId = v47.parentChannelId, 
-                        scheduledSquadId = v47.scheduledGroupUpId, 
-                        source = v29.SubscribedScheduledSquadsListSheet, 
-                        squadId = v36, 
-                        squadLocation = v35.squadLocation
-                    });
-                end, 
-                tag = "size-full-0 auto-y col gap-xsmall radius-large padding-y-small padding-x-medium"
-            }, {
-                TitleText = v5.createElement(l_Text_0, {
-                    LayoutOrder = 1, 
-                    tag = "size-full-0 auto-y text-title-large text-align-x-left text-truncate-end", 
-                    Text = v37.scheduledPartyText
-                }), 
-                DateTimeText = v5.createElement(l_Text_0, {
-                    LayoutOrder = 2, 
-                    tag = "size-full-0 auto-y text-body-medium text-align-x-left text-truncate-end", 
-                    Text = if v53 then v53:FormatLocalTime("LLL", l_LocalizationService_0.RobloxLocaleId) else ""
-                }), 
-                SubscribedContainer = v5.createElement(l_View_0, {
-                    LayoutOrder = 3, 
-                    tag = "size-full-0 auto-y row gap-small padding-y-xsmall align-y-center align-x-left"
-                }, {
-                    AvatarGroup = v5.createElement(l_AvatarGroup_0, {
-                        avatars = v50, 
-                        backplateStyle = {
-                            Color3 = v33.Color.Shift.Shift_200.Color3, 
-                            Transparency = v33.Color.Shift.Shift_200.Transparency
-                        }, 
-                        LayoutOrder = 1, 
-                        max = 3, 
-                        type = l_AvatarGroupType_0.Stacked, 
-                        size = l_InputSize_0.XSmall
-                    }), 
-                    NumberSubscribed = v5.createElement(l_Text_0, {
-                        LayoutOrder = 2, 
-                        tag = "size-full-0 auto-y text-caption-medium text-align-x-left", 
-                        Text = ("%*"):format(v37.goingText)
-                    })
-                }), 
-                ActionButton = v5.createElement(l_Button_0, {
-                    LayoutOrder = 4, 
-                    onActivated = function() --[[ Line: 175 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v48 (copy), v42 (ref), v35 (ref), v34 (ref), v47 (copy), l_SquadPromptType_0 (ref), v52 (copy), l_unsubscribeFromScheduledSquad_0 (ref), v3 (ref), v31 (ref), v41 (ref), v40 (ref), v46 (copy), v44 (ref), l_subscribeToScheduledSquad_0 (ref), l_EventNames_0 (ref), v28 (ref), v29 (ref), v36 (ref)
-                        if v48 then
-                            v42();
-                            v35.setSquadPrompt(v34, {
-                                additionalInfo = v47, 
-                                conversationId = v47.parentChannelId, 
-                                promptType = l_SquadPromptType_0.ScheduleSquad
-                            });
-                        elseif v52 then
-                            l_unsubscribeFromScheduledSquad_0({
-                                scheduledGroupUpId = v47.scheduledGroupUpId
-                            }, function() --[[ Line: 189 ]]
-                                -- upvalues: v3 (ref), v47 (ref), v31 (ref), v41 (ref), v40 (ref), v46 (ref)
-                                local v55 = v3.Dictionary.join(v47, {
-                                    subscribers = v3.List.filter(v47.subscribers, function(v54) --[[ Line: 193 ]]
-                                        -- upvalues: v31 (ref)
-                                        return tostring(v54.userId) ~= tostring(v31);
-                                    end)
-                                });
-                                v41(v3.List.replaceIndex(v40, v46, v55));
-                            end, v44);
-                        else
-                            l_subscribeToScheduledSquad_0({
-                                scheduledGroupUpId = v47.scheduledGroupUpId
-                            }, function() --[[ Line: 207 ]]
-                                -- upvalues: v3 (ref), v47 (ref), v31 (ref), v41 (ref), v40 (ref), v46 (ref)
-                                local v56 = v3.Dictionary.join(v47, {
-                                    subscribers = v3.List.join(v47.subscribers, {
-                                        {
-                                            userId = v31
-                                        }
-                                    })
-                                });
-                                v41(v3.List.replaceIndex(v40, v46, v56));
-                            end, v44);
-                        end;
-                        v35.fireSquadAnalytics(l_EventNames_0.ScheduledSquadAction, {
-                            actionType = if v48 then v28.Edit else if v52 then v28.Unsubscribe else v28.Subscribe, 
-                            conversationId = v47.parentChannelId, 
-                            scheduledSquadId = v47.scheduledGroupUpId, 
-                            source = v29.SubscribedScheduledSquadsListSheet, 
-                            squadId = v36, 
-                            squadLocation = v35.squadLocation
-                        });
-                    end, 
-                    text = if v48 then v37.editText else v37.interestedText, 
-                    variant = if not not v48 or v52 then l_ButtonVariant_0.Standard else l_ButtonVariant_0.Emphasis, 
-                    width = UDim.new(1, 0)
-                })
-            }));
-        end;
-        return v45;
-    end, {
-        v40, 
-        v42, 
-        v44
-    });
-    return v5.createElement(l_Sheet_0.Root, {
-        onClose = v42, 
-        isOpen = v30.isOpen, 
-        preferCenterSheet = true, 
-        snapPoints = {
-            0.4, 
-            0.7
-        }
-    }, {
-        Header = v5.createElement(l_Sheet_0.Header, {}, {
-            Title = v5.createElement(l_Text_0, {
-                LayoutOrder = 1, 
-                Text = v37.upcomingPartiesText, 
-                tag = "size-full-0 auto-y text-wrap text-heading-medium text-align-x-left"
-            })
-        }), 
-        Content = v5.createElement(l_Sheet_0.Content, {}, {
-            Loading = if v38 then v5.createElement(l_Loading_0, {}) else nil, 
-            ScheduledSquadsList = if not v38 and #v3.Dictionary.keys(v40) > 0 then v5.createElement(l_View_0, {
-                tag = "auto-y size-full-0 col gap-xsmall"
-            }, unpack(v57)) else nil, 
-            NoUpcomingScheduledSquads = if not v38 and #v3.Dictionary.keys(v40) == 0 then v5.createElement(l_Text_0, {
-                Text = v37.noScheduledSquadsText, 
-                tag = "size-full-0 auto-y text-label-medium text-align-x-left"
-            }) else nil
-        })
-    });
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local Squads = script:FindFirstAncestor("Squads")
+local SquadsParent = Squads.Parent
+local Cryo = require(SquadsParent.Cryo)
+local Foundation = require(SquadsParent.Foundation)
+local React = require(SquadsParent.React)
+local SquadExternalContractProvider = require(SquadsParent.SquadsCore.SquadExternalContractProvider)
+
+require(SquadsParent.SquadsCore.Types)
+
+local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
+local useLocalization = require(SquadsParent.Localization).Hooks.useLocalization
+local useNavigation = require(SquadsParent.Navigation).useNavigation
+local useStore = require(SquadsParent.RoactUtils).Hooks.RoactRodux.useStore
+local AvatarGroup = Foundation.AvatarGroup
+local AvatarGroupType = Foundation.Enums.AvatarGroupType
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local Loading = Foundation.Loading
+local Sheet = Foundation.Sheet
+local FoundationText = Foundation.Text
+local useTokens = Foundation.Hooks.useTokens
+local View = Foundation.View
+local getSubscribedScheduledSquads = require(SquadsParent.SquadsCore.NetworkRequests).getSubscribedScheduledSquads
+local SquadExternalContractContext = SquadExternalContractProvider.SquadExternalContractContext
+local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
+local subscribeToScheduledSquad = require(SquadsParent.SquadsCore.NetworkRequests).subscribeToScheduledSquad
+local unsubscribeFromScheduledSquad = require(SquadsParent.SquadsCore.NetworkRequests).unsubscribeFromScheduledSquad
+local useCurrentSquadId = require(SquadsParent.SquadsCore.Hooks).useCurrentSquadId
+local ScheduledSquadActionEnum = require(Squads.Enums.ScheduledSquadActionEnum)
+local ScheduledSquadActionSourceEnum = require(Squads.Enums.ScheduledSquadActionSourceEnum)
+
+return function(t1: {[any]: any}) -- line: 45
+	-- upvalues: useLocalUserId (copy), useNavigation (copy), useTokens (copy), useStore (copy), React (copy), SquadExternalContractContext (copy), useCurrentSquadId (copy), useLocalization (copy), getSubscribedScheduledSquads (copy), SquadPromptType (copy), Cryo (copy), View (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), FoundationText (copy), LocalizationService (copy), AvatarGroup (copy), AvatarGroupType (copy), InputSize (copy), Button (copy), unsubscribeFromScheduledSquad (copy), subscribeToScheduledSquad (copy), ButtonVariant (copy), Sheet (copy), Loading (copy)
+	local v32 = useLocalUserId()
+	local v33 = useNavigation()
+	local v34 = useTokens()
+	local v35 = useStore()
+	local v36 = React.useContext(SquadExternalContractContext)
+	local v37 = useCurrentSquadId()
+	local v38 = useLocalization({
+		editText = "Feature.Squads.Action.Edit",
+		goingText = "Feature.Squads.Description.Going",
+		interestedText = "Feature.Squads.Description.Interested",
+		noScheduledSquadsText = "Feature.Squads.Description.YouHaveNoScheduledParties",
+		scheduledPartyText = "Feature.Squads.Label.ScheduledParty",
+		upcomingPartiesText = "Feature.Squads.Label.UpcomingParties"
+	})
+	local v39, v40 = React.useState(true)
+	local v41, v42 = React.useState({})
+	local v43 = React.useCallback(function() -- line: 65
+		-- upvalues: t1 (copy)
+		if t1.onClose then
+			t1.onClose()
+		end
+	end, { t1.onClose })
+
+	React.useEffect(function() -- line: 72
+		-- upvalues: t1 (copy), getSubscribedScheduledSquads (copy), v40 (copy), v42 (copy), v36 (copy), v35 (copy), SquadPromptType (copy), v43 (copy)
+		if t1.isOpen then
+			getSubscribedScheduledSquads(function(p1) -- line: 74
+				-- upvalues: v40 (copy), v42 (copy)
+				v40(false)
+				v42(p1.scheduledGroupUps)
+			end, function() -- line: 77
+				-- upvalues: v36 (copy), v35 (copy), SquadPromptType (copy), v43 (copy)
+				v36.setSquadPrompt(v35, {
+					hideCancelButton = true,
+					promptType = SquadPromptType.Error
+				})
+				v43()
+			end)
+		end
+	end, {
+		getSubscribedScheduledSquads,
+		t1.isOpen,
+		v43,
+		v40,
+		v42,
+		v36.setSquadPrompt,
+		v35
+	})
+
+	local v44 = React.useCallback(function() -- line: 97
+		-- upvalues: v36 (copy), v35 (copy), SquadPromptType (copy)
+		v36.setSquadPrompt(v35, {
+			hideCancelButton = true,
+			promptType = SquadPromptType.Error
+		})
+	end, {
+		v36.setSquadPrompt,
+		v35
+	})
+	local v45 = React.useMemo(function() -- line: 104
+		-- upvalues: v41 (copy), v32 (copy), Cryo (copy), React (copy), View (copy), v43 (copy), v33 (copy), v36 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), v37 (copy), FoundationText (copy), v38 (copy), LocalizationService (copy), AvatarGroup (copy), v34 (copy), AvatarGroupType (copy), InputSize (copy), Button (copy), v35 (copy), SquadPromptType (copy), unsubscribeFromScheduledSquad (copy), v42 (copy), v44 (copy), subscribeToScheduledSquad (copy), ButtonVariant (copy)
+		local t2 = {}
+
+		for v47, v48 in v41 do
+			local v49 = tostring(v48.initiatorId) == tostring(v32)
+			local v50 = Cryo.List.map(v48.subscribers, function(p2) -- line: 110
+				return p2.userId
+			end)
+			local v51 = v49 or Cryo.List.findWhere(v50, function(p3) -- line: 115
+				-- upvalues: v32 (copy)
+				return tostring(p3) == tostring(v32)
+			end) ~= nil
+			local dateTime = DateTime.fromIsoDate(v48.startTime)
+
+			table.insert(t2, React.createElement(View, {
+				tag = "size-full-0 auto-y col gap-xsmall radius-large padding-y-small padding-x-medium",
+				LayoutOrder = #t2 + 1,
+				onActivated = function() -- line: 126
+					-- upvalues: v43 (copy), v33 (copy), v48 (copy), v36 (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), v37 (copy)
+					v43()
+					v33.navigate("ChatConversation", {
+						conversationId = v48.parentChannelId
+					})
+					v36.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+						actionType = ScheduledSquadActionEnum.NavigateToAssociatedChat,
+						conversationId = v48.parentChannelId,
+						scheduledSquadId = v48.scheduledGroupUpId,
+						source = ScheduledSquadActionSourceEnum.SubscribedScheduledSquadsListSheet,
+						squadId = v37,
+						squadLocation = v36.squadLocation
+					})
+				end
+			}, {
+				TitleText = React.createElement(FoundationText, {
+					LayoutOrder = 1,
+					tag = "size-full-0 auto-y text-title-large text-align-x-left text-truncate-end",
+					Text = v38.scheduledPartyText
+				}),
+				DateTimeText = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					tag = "size-full-0 auto-y text-body-medium text-align-x-left text-truncate-end",
+					Text = not dateTime and "" or dateTime:FormatLocalTime("LLL", LocalizationService.RobloxLocaleId)
+				}),
+				SubscribedContainer = React.createElement(View, {
+					LayoutOrder = 3,
+					tag = "size-full-0 auto-y row gap-small padding-y-xsmall align-y-center align-x-left"
+				}, {
+					AvatarGroup = React.createElement(AvatarGroup, {
+						LayoutOrder = 1,
+						max = 3,
+						avatars = v50,
+						backplateStyle = {
+							Color3 = v34.Color.Shift.Shift_200.Color3,
+							Transparency = v34.Color.Shift.Shift_200.Transparency
+						},
+						type = AvatarGroupType.Stacked,
+						size = InputSize.XSmall
+					}),
+					NumberSubscribed = React.createElement(FoundationText, {
+						LayoutOrder = 2,
+						tag = "size-full-0 auto-y text-caption-medium text-align-x-left",
+						Text = `{ v38.goingText }`
+					})
+				}),
+				ActionButton = React.createElement(Button, {
+					LayoutOrder = 4,
+					onActivated = function() -- line: 176
+						-- upvalues: v49 (copy), v43 (copy), v36 (copy), v35 (copy), v48 (copy), SquadPromptType (copy), v51 (copy), unsubscribeFromScheduledSquad (copy), Cryo (copy), v32 (copy), v42 (copy), v41 (copy), v47 (copy), v44 (copy), subscribeToScheduledSquad (copy), EventNames (copy), ScheduledSquadActionEnum (copy), ScheduledSquadActionSourceEnum (copy), v37 (copy)
+						if v49 then
+							v43()
+							v36.setSquadPrompt(v35, {
+								additionalInfo = v48,
+								conversationId = v48.parentChannelId,
+								promptType = SquadPromptType.ScheduleSquad
+							})
+						elseif v51 then
+							unsubscribeFromScheduledSquad({
+								scheduledGroupUpId = v48.scheduledGroupUpId
+							}, function() -- line: 190
+								-- upvalues: Cryo (copy), v48 (copy), v32 (copy), v42 (copy), v41 (copy), v47 (copy)
+								local v56 = Cryo.Dictionary.join(v48, {
+									subscribers = Cryo.List.filter(v48.subscribers, function(p4) -- line: 194
+										-- upvalues: v32 (copy)
+										return tostring(p4.userId) ~= tostring(v32)
+									end)
+								})
+
+								v42(Cryo.List.replaceIndex(v41, v47, v56))
+							end, v44)
+						else
+							subscribeToScheduledSquad({
+								scheduledGroupUpId = v48.scheduledGroupUpId
+							}, function() -- line: 208
+								-- upvalues: Cryo (copy), v48 (copy), v32 (copy), v42 (copy), v41 (copy), v47 (copy)
+								local v57 = Cryo.Dictionary.join(v48, {
+									subscribers = Cryo.List.join(v48.subscribers, {{
+										userId = v32
+									}})
+								})
+
+								v42(Cryo.List.replaceIndex(v41, v47, v57))
+							end, v44)
+						end
+
+						v36.fireSquadAnalytics(EventNames.ScheduledSquadAction, {
+							actionType = if not v49 then if not v51 then ScheduledSquadActionEnum.Subscribe else ScheduledSquadActionEnum.Unsubscribe else ScheduledSquadActionEnum.Edit,
+							conversationId = v48.parentChannelId,
+							scheduledSquadId = v48.scheduledGroupUpId,
+							source = ScheduledSquadActionSourceEnum.SubscribedScheduledSquadsListSheet,
+							squadId = v37,
+							squadLocation = v36.squadLocation
+						})
+					end,
+					text = if not v49 then v38.interestedText else v38.editText,
+					variant = if not v49 and not v51 then ButtonVariant.Emphasis else ButtonVariant.Standard,
+					width = UDim.new(1, 0)
+				})
+			}))
+		end
+
+		return t2
+	end, {
+		v41,
+		v43,
+		v44
+	})
+
+	return React.createElement(Sheet.Root, {
+		preferCenterSheet = true,
+		onClose = v43,
+		isOpen = t1.isOpen,
+		snapPoints = {
+			0.4,
+			0.7
+		}
+	}, {
+		Header = React.createElement(Sheet.Header, {}, {
+			Title = React.createElement(FoundationText, {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y text-wrap text-heading-medium text-align-x-left",
+				Text = v38.upcomingPartiesText
+			})
+		}),
+		Content = React.createElement(Sheet.Content, {}, {
+			Loading = if not v39 then nil else React.createElement(Loading, {}),
+			ScheduledSquadsList = if v39 or not (#Cryo.Dictionary.keys(v41) > 0) then nil else React.createElement(View, {
+				tag = "auto-y size-full-0 col gap-xsmall"
+			}, unpack(v45)),
+			NoUpcomingScheduledSquads = if v39 or #Cryo.Dictionary.keys(v41) ~= 0 then nil else React.createElement(FoundationText, {
+				tag = "size-full-0 auto-y text-label-medium text-align-x-left",
+				Text = v38.noScheduledSquadsText
+			})
+		})
+	})
+end

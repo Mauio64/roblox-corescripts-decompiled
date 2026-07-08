@@ -1,12 +1,17 @@
-return function(v0, v1) --[[ Line: 7 ]] --[[ Name: filterMap ]]
-    local v2 = {};
-    local v3 = 1;
-    for v4 = 1, #v0 do
-        local v5 = v1(v0[v4], v4);
-        if v5 ~= nil then
-            v2[v3] = v5;
-            v3 = v3 + 1;
-        end;
-    end;
-    return v2;
-end;
+local function filterMap(p1, p2) -- line: 7
+	local t1 = {}
+	local n1 = 1
+
+	for i = 1, #p1 do
+		local v7 = p2(p1[i], i)
+
+		if v7 ~= nil then
+			t1[n1] = v7
+			n1 += 1
+		end
+	end
+
+	return t1
+end
+
+return filterMap

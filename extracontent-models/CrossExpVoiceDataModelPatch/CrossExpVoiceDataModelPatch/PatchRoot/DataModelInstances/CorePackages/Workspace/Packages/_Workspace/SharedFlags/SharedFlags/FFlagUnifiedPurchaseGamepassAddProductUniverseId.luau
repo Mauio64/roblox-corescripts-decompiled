@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnifiedPurchaseGamepassAddProductUniverseId", false);
+return game:DefineFastFlag("UnifiedPurchaseGamepassAddProductUniverseId", false)

@@ -2,18 +2,20 @@ local Parent = script:FindFirstAncestor("GameCollections").Parent
 local GameCollectionItemTypes = require(Parent.DiscoveryTypes).GameCollectionItemTypes
 local FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone = require(Parent.SharedFlags).FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone
 local FFlagLuaAppHomeTouchAutoplay = require(Parent.SharedFlags).FFlagLuaAppHomeTouchAutoplay
+local FFlagLuaAppFixCustomTileBugs = require(Parent.SharedFlags).FFlagLuaAppFixCustomTileBugs
 local React = require(Parent.React)
 local EmphasisGameTile = require(Parent.GameTile).EmphasisGameTile
 
 require(Parent.VideoUtils)
 
-local v7 = React.memo(function(t1: {[any]: any}) -- line: 50
-	-- upvalues: React (copy), EmphasisGameTile (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppHomeTouchAutoplay (copy)
+local v8 = React.memo(function(t1: {[any]: any}) -- line: 53
+	-- upvalues: React (copy), EmphasisGameTile (copy), FFlagLuaAppFixCustomTileBugs (copy), FFlagLuaAppHomeFirstTileThumbnailLoadedMilestone (copy), FFlagLuaAppHomeTouchAutoplay (copy)
 	return React.createElement(EmphasisGameTile, {
 		size = t1.item.sizeOverride,
 		index = t1.index,
 		layoutOrder = t1.index,
-		selectionOrder = t1.selectionOrder,
+		selectionOrder = if not FFlagLuaAppFixCustomTileBugs then t1.selectionOrder else nil,
+		SelectionOrder = if not FFlagLuaAppFixCustomTileBugs then nil else t1.SelectionOrder,
 		isDisabled = t1.isDisabled,
 		onSelectionGained = t1.onHoldableFocused,
 		onSelectionLost = t1.onHoldableUnfocused,
@@ -40,7 +42,7 @@ local v7 = React.memo(function(t1: {[any]: any}) -- line: 50
 	})
 end)
 
-return function(t2: {[any]: any}) -- line: 83
-	-- upvalues: React (copy), v7 (copy), GameCollectionItemTypes (copy)
-	return React.createElement(v7, t2), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
+return function(t2: {[any]: any}) -- line: 87
+	-- upvalues: React (copy), v8 (copy), GameCollectionItemTypes (copy)
+	return React.createElement(v8, t2), GameCollectionItemTypes.GameCollectionItemType.EmphasisTile
 end

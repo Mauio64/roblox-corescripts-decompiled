@@ -1,1 +1,1 @@
-return require(script.AddFriendsTileContainer);
+return require(script.AddFriendsTileContainer)

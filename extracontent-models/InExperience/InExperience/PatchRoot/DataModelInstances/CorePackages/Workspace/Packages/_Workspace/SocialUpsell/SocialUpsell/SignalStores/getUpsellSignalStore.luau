@@ -1,75 +1,90 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Signals);
-local _ = require(l_script_FirstAncestor_0.Analytics.Enum.UpsellEntrySurfaceType);
-local _ = require(l_script_FirstAncestor_0.Enum.SocialUpsellType);
-local _ = require(l_script_FirstAncestor_0.Types);
-local v7 = nil;
-local function v29() --[[ Line: 37 ]] --[[ Name: createUpsellSignalStore ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v8 = {};
-    local function _(v9) --[[ Line: 40 ]] --[[ Name: getOrCreateUpsellBannerDataStore ]]
-        -- upvalues: v8 (copy), v3 (ref)
-        local v10 = v8[v9];
-        if v10 == nil then
-            local v11, v12 = v3.createSignal(nil);
-            v10 = {
-                getBannerData = v11, 
-                setBannerData = v12
-            };
-            v8[v9] = v10;
-        end;
-        return v10;
-    end;
-    local function v18(v14) --[[ Line: 53 ]] --[[ Name: getUpsellBannerDataGetter ]]
-        -- upvalues: v8 (copy), v3 (ref)
-        local v15 = v8[v14];
-        if v15 == nil then
-            local v16, v17 = v3.createSignal(nil);
-            v15 = {
-                getBannerData = v16, 
-                setBannerData = v17
-            };
-            v8[v14] = v15;
-        end;
-        return v15.getBannerData;
-    end;
-    local function v28(v19, v20, v21) --[[ Line: 57 ]] --[[ Name: setUpsellBannerData ]]
-        -- upvalues: v8 (copy), v3 (ref), v2 (ref)
-        local v22 = v8[v19];
-        if v22 == nil then
-            local v23, v24 = v3.createSignal(nil);
-            v22 = {
-                getBannerData = v23, 
-                setBannerData = v24
-            };
-            v8[v19] = v22;
-        end;
-        v22.setBannerData(function(v25) --[[ Line: 62 ]]
-            -- upvalues: v21 (copy), v2 (ref), v20 (copy)
-            local v26 = if v21 ~= nil then {
-                isVisible = true
-            } else v2.None;
-            local v27 = v2.Dictionary.join(v25 or {}, {
-                [v20] = v26
-            });
-            if next(v27) == nil then
-                return nil;
-            else
-                return v27;
-            end;
-        end);
-    end;
-    return {
-        getUpsellBannerDataGetter = v18, 
-        setUpsellBannerData = v28
-    };
-end;
-return function() --[[ Line: 75 ]]
-    -- upvalues: v7 (ref), v3 (copy), v29 (copy)
-    if v7 == nil then
-        v7 = v3.createComputed(v29)(false);
-    end;
-    return v7;
-end;
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+local SocialUpsellParent = SocialUpsell.Parent
+local Cryo = require(SocialUpsellParent.Cryo)
+local Signals = require(SocialUpsellParent.Signals)
+
+require(SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType)
+require(SocialUpsell.Enum.SocialUpsellType)
+require(SocialUpsell.Types)
+
+local u5 = nil
+
+local function createUpsellSignalStore() -- line: 37
+	-- upvalues: Signals (copy), Cryo (copy)
+	local t1 = {}
+
+	local function getOrCreateUpsellBannerDataStore(p1) -- line: 40
+		-- upvalues: t1 (copy), Signals (copy)
+		local v10 = t1[p1]
+
+		if v10 == nil then
+			local v11, v12 = Signals.createSignal(nil)
+
+			v10 = {
+				getBannerData = v11,
+				setBannerData = v12
+			}
+			t1[p1] = v10
+		end
+
+		return v10
+	end
+
+	return {
+		getUpsellBannerDataGetter = function(p2) -- line: 53
+			-- upvalues: t1 (copy), Signals (copy)
+			local v14 = t1[p2]
+
+			if v14 == nil then
+				local v15, v16 = Signals.createSignal(nil)
+
+				v14 = {
+					getBannerData = v15,
+					setBannerData = v16
+				}
+				t1[p2] = v14
+			end
+
+			return v14.getBannerData
+		end,
+		setUpsellBannerData = function(p3, p4, p5) -- line: 57
+			-- upvalues: t1 (copy), Signals (copy), Cryo (copy)
+			local v20 = t1[p3]
+
+			if v20 == nil then
+				local v21, v22 = Signals.createSignal(nil)
+
+				v20 = {
+					getBannerData = v21,
+					setBannerData = v22
+				}
+				t1[p3] = v20
+			end
+
+			v20.setBannerData(function(p6) -- line: 62
+				-- upvalues: p5 (copy), Cryo (copy), p4 (copy)
+				local v24 = if p5 == nil then Cryo.None else {
+					isVisible = true
+				}
+				local v25 = Cryo.Dictionary.join(p6 or {}, {
+					[p4] = v24
+				})
+
+				if next(v25) == nil then
+					return nil
+				end
+
+				return v25
+			end)
+		end
+	}
+end
+
+return function() -- line: 75
+	-- upvalues: u5 (ref), Signals (copy), createUpsellSignalStore (copy)
+	if u5 == nil then
+		u5 = Signals.createComputed(createUpsellSignalStore)(false)
+	end
+
+	return u5
+end

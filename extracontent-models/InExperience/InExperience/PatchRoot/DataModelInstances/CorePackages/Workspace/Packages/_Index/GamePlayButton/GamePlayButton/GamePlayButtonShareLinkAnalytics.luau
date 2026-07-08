@@ -1,17 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("GamePlayButton").Parent;
-local v1 = require(l_Parent_0.t);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v3 = v1.strictInterface({
-    placeId = v1.string, 
-    playButtonState = v1.string, 
-    universeId = v1.string
-});
-return function(v4, v5) --[[ Line: 16 ]]
-    -- upvalues: v3 (copy), l_mutedError_0 (copy)
-    local v6, v7 = v3(v5);
-    if not v6 then
-        l_mutedError_0(v7);
-    end;
-    v4.EventStream:setRBXEventStream("GamePlayButton", "shareLinkGameJoin", v5);
-    v4.Diag:reportCounter("shareLinkGameJoin", 1);
-end;
+local Parent = script:FindFirstAncestor("GamePlayButton").Parent
+local t = require(Parent.t)
+local mutedError = require(Parent.Loggers).mutedError
+local v4 = t.strictInterface({
+	placeId = t.string,
+	playButtonState = t.string,
+	universeId = t.string
+})
+
+return function(p1, p2) -- line: 16
+	-- upvalues: v4 (copy), mutedError (copy)
+	local v7, v8 = v4(p2)
+
+	if not v7 then
+		mutedError(v8)
+	end
+
+	p1.EventStream:setRBXEventStream("GamePlayButton", "shareLinkGameJoin", p2)
+	p1.Diag:reportCounter("shareLinkGameJoin", 1)
+end

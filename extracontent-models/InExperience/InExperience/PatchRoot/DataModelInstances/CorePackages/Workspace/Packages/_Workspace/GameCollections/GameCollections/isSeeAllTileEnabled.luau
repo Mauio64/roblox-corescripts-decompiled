@@ -1,11 +1,17 @@
-return function(v0, v1, v2, v3, v4) --[[ Line: 4 ]] --[[ Name: isSeeAllTileEnabled ]]
-    if v0 then
-        return false;
-    elseif not v4 then
-        return false;
-    elseif v1 == nil or v1 <= v2 or v3 <= v2 then
-        return false;
-    else
-        return true;
-    end;
-end;
+local function isSeeAllTileEnabled(b1: boolean?, n1: number?, n2: number, n3: number, p1: ((...any) -> ...any)?) -- line: 4
+	if b1 then
+		return false
+	end
+
+	if not p1 then
+		return false
+	end
+
+	if n1 == nil or n1 <= n2 or n3 <= n2 then
+		return false
+	end
+
+	return true
+end
+
+return isSeeAllTileEnabled

@@ -1,5 +1,5 @@
 return {
-    ScreenshotCapture = "ScreenshotCapture", 
-    VideoCaptureStart = "VideoCaptureStart", 
-    VideoCaptureStop = "VideoCaptureStop"
-};
+	ScreenshotCapture = "ScreenshotCapture",
+	VideoCaptureStart = "VideoCaptureStart",
+	VideoCaptureStop = "VideoCaptureStop"
+}

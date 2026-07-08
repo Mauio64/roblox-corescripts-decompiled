@@ -1,1 +1,1 @@
-return game:DefineFastFlag("InExperienceRequestProfileSettings", false);
+return game:DefineFastFlag("InExperienceRequestProfileSettings", false)

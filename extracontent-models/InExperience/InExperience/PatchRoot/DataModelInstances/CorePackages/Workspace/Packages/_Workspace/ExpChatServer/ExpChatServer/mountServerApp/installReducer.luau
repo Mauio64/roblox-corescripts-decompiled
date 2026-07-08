@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChatServer").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local v2 = require(l_Parent_0.ExpChatShared);
-return v1.combineReducers({
-    Players = v2.Reducers.Players
-});
+local Parent = script:FindFirstAncestor("ExpChatServer").Parent
+local Rodux = require(Parent.Rodux)
+local ExpChatShared = require(Parent.ExpChatShared)
+
+return Rodux.combineReducers({
+	Players = ExpChatShared.Reducers.Players
+})

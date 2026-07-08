@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("SetIsUsingGamepad", function(v0) --[[ Line: 4 ]]
-    return {
-        isUsingGamepad = v0
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetIsUsingGamepad", function(p1) -- line: 4
+	return {
+		isUsingGamepad = p1
+	}
+end)

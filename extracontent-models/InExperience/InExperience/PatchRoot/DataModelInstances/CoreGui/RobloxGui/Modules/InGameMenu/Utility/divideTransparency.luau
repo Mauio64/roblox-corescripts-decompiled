@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 11 ]] --[[ Name: divideTransparency ]]
-    return 1 - (1 - v0) / v1;
-end;
+local function divideTransparency(p1, p2) -- line: 11
+	return 1 - (1 - p1) / p2
+end
+
+return divideTransparency

@@ -1,25 +1,30 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3) --[[ Line: 14 ]] --[[ Name: useRefs ]]
-    -- upvalues: v1 (copy)
-    local v4 = v1.useRef({});
-    local v5 = v1.useRef(v2);
-    if #v4.current < v2 then
-        for _ = 1, v2 - #v4.current do
-            local v7 = v1.createRef();
-            v7.current = v3;
-            table.insert(v4.current, v7);
-        end;
-    elseif v2 < v5.current then
-        for v8 = v2 + 1, v5.current do
-            v4.current[v8].current = v3;
-        end;
-    end;
-    v5.current = v2;
-    return (v1.useMemo(function() --[[ Line: 33 ]]
-        -- upvalues: v4 (copy), v2 (copy)
-        return table.move(v4.current, 1, v2, 1, {});
-    end, {
-        v2
-    }));
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useRefs(n1: number, p1) -- line: 14
+	-- upvalues: React (copy)
+	local v6 = React.useRef({})
+	local v7 = React.useRef(n1)
+
+	if n1 > #v6.current then
+		for _ = 1, n1 - #v6.current do
+			local v9 = React.createRef()
+
+			v9.current = p1
+			table.insert(v6.current, v9)
+		end
+	elseif n1 < v7.current then
+		for i = n1 + 1, v7.current do
+			v6.current[i].current = p1
+		end
+	end
+
+	v7.current = n1
+
+	return (React.useMemo(function() -- line: 33
+		-- upvalues: v6 (copy), n1 (copy)
+		return table.move(v6.current, 1, n1, 1, {})
+	end, { n1 }))
+end
+
+return useRefs

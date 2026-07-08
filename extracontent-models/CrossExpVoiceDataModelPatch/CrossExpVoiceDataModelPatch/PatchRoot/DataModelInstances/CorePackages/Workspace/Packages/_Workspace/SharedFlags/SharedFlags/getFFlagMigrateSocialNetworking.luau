@@ -1,4 +1,5 @@
-game:DefineFastFlag("MigrateSocialNetworking", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("MigrateSocialNetworking");
-end;
+game:DefineFastFlag("MigrateSocialNetworking", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("MigrateSocialNetworking")
+end

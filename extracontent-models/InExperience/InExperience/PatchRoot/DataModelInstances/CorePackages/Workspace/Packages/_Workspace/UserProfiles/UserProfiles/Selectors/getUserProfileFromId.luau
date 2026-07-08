@@ -1,10 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("UserProfiles").Parent;
-local v1 = require(l_Parent_0.Cryo);
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local v6 = v1.List.findWhere(v2.userProfiles, function(v4, _) --[[ Line: 6 ]]
-        -- upvalues: v3 (copy)
-        return v4.id == tostring(v3);
-    end);
-    return v2.userProfiles[v6] or {};
-end;
+local Parent = script:FindFirstAncestor("UserProfiles").Parent
+local Cryo = require(Parent.Cryo)
+
+return function(p1, p2) -- line: 5
+	-- upvalues: Cryo (copy)
+	local v5 = Cryo.List.findWhere(p1.userProfiles, function(p3, _) -- line: 6
+		-- upvalues: p2 (copy)
+		return p3.id == tostring(p2)
+	end)
+
+	return p1.userProfiles[v5] or {}
+end

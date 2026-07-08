@@ -1,14 +1,17 @@
-local v0 = {
-    ["<"] = "&lt;", 
-    [">"] = "&gt;", 
-    ["\""] = "&quot;", 
-    ["'"] = "&apos;"
-};
-return function(v1) --[[ Line: 11 ]]
-    -- upvalues: v0 (copy)
-    local v2 = v1:gsub("&", "&amp;");
-    for v3, v4 in pairs(v0) do
-        v2 = v2:gsub(v3, v4);
-    end;
-    return v2;
-end;
+local t1 = {
+	["<"] = "&lt;",
+	[">"] = "&gt;",
+	["\""] = "&quot;",
+	["'"] = "&apos;"
+}
+
+return function(s1: string) -- line: 11
+	-- upvalues: t1 (copy)
+	local v3 = s1:gsub("&", "&amp;")
+
+	for k, v in pairs(t1) do
+		v3 = v3:gsub(k, v)
+	end
+
+	return v3
+end

@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent;
-return require(l_Parent_0.ReactReconciler)((require(script.Parent.client.ReactRobloxHostConfig)));
+local ParentParent = script.Parent.Parent
+
+return require(ParentParent.ReactReconciler)((require(script.Parent.client.ReactRobloxHostConfig)))

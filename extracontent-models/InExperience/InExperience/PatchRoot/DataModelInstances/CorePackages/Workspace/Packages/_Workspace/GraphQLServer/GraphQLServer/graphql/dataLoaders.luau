@@ -1,3 +1,3 @@
 return {
-    userProfilesDataLoader = require(script.userProfilesDataLoader)
-};
+	userProfilesDataLoader = require(script.userProfilesDataLoader)
+}

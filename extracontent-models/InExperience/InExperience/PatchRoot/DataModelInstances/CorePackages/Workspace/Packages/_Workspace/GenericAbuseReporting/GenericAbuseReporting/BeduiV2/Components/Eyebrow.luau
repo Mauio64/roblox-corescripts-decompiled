@@ -1,17 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.BeduiV2.Utils.Translate.TextWithTranslation);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Utils.Translate.translate);
-return v2.memo(function(v5) --[[ Line: 20 ]] --[[ Name: Eyebrow ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    if not v5.eyebrow then
-        return nil;
-    else
-        return v2.createElement(v3, {
-            input = v5.eyebrow, 
-            tag = "size-full-0 auto-y text-label-large", 
-            LayoutOrder = v5.layoutOrder
-        });
-    end;
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.TextWithTranslation)
+
+require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+
+local function Eyebrow(t1: {[any]: any}) -- line: 20
+	-- upvalues: React (copy), TextWithTranslation (copy)
+	if not t1.eyebrow then
+		return nil
+	end
+
+	return React.createElement(TextWithTranslation, {
+		tag = "size-full-0 auto-y text-label-large",
+		input = t1.eyebrow,
+		LayoutOrder = t1.layoutOrder
+	})
+end
+
+return React.memo(Eyebrow)

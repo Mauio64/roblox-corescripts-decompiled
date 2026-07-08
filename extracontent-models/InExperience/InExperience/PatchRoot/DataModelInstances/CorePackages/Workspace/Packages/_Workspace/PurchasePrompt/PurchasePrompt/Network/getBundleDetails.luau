@@ -44,10 +44,9 @@ local function normalizeBundleFields(p2) -- line: 36
 
 	return p2
 end
-
-return function(p3, p4, t2: {[any]: any}?) --[[ getBundleDetails ]] -- line: 57
+local function getBundleDetails(p3, p4, t2: {[any]: any}?) -- line: 57
 	-- upvalues: Promise (copy), normalizeBundleFields (copy), PurchaseError (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), getCatalogItemDetails (copy), getResellers (copy), FFlagFixTimedOptionRefresh (copy), resolveRefreshedProductInfo (copy), resolveRefreshedExpectedPrice (copy)
-	local v22 = p3.getBundleDetails(p4):andThen(function(p5) -- line: 60
+	local v23 = p3.getBundleDetails(p4):andThen(function(p5) -- line: 60
 		-- upvalues: Promise (copy), normalizeBundleFields (copy)
 		return Promise.resolve((normalizeBundleFields(p5)))
 	end):catch(function(_) -- line: 63
@@ -56,12 +55,12 @@ return function(p3, p4, t2: {[any]: any}?) --[[ getBundleDetails ]] -- line: 57
 	end)
 
 	if not FFlagRefreshPriceOnRetryAfterUpsell or not t2 then
-		return v22
+		return v23
 	end
 
 	local collectibleItemId = t2.collectibleItemId
 	local collectibleItemInstanceId = t2.collectibleItemInstanceId
-	local v25 = Promise.all({
+	local v26 = Promise.all({
 		catalogItemDetails = getCatalogItemDetails(p3, p4, "bundle"):catch(function() -- line: 76
 			return nil
 		end),
@@ -78,8 +77,8 @@ return function(p3, p4, t2: {[any]: any}?) --[[ getBundleDetails ]] -- line: 57
 	end)
 
 	return Promise.all({
-		bundleDetails = v22,
-		refreshedExpectedPrice = v25
+		bundleDetails = v23,
+		refreshedExpectedPrice = v26
 	}):andThen(function(p8) -- line: 107
 		-- upvalues: FFlagFixTimedOptionRefresh (copy)
 		local bundleDetails = p8.bundleDetails
@@ -101,3 +100,5 @@ return function(p3, p4, t2: {[any]: any}?) --[[ getBundleDetails ]] -- line: 57
 		return bundleDetails
 	end)
 end
+
+return getBundleDetails

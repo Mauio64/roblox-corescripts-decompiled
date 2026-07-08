@@ -1,7 +1,9 @@
-local v0 = require(script.Parent.GetFFlagLuaEnableShowUpsellMethod);
-local v1 = require(script.Parent.GetFFlagLuaAppPushSystemUpsellDevOverride);
-game:DefineFastFlag("LuaAppEnablePushUpsellOnFirstTime", false);
-return function() --[[ Line: 5 ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    return v0() and game:GetFastFlag("LuaAppEnablePushUpsellOnFirstTime") or v1();
-end;
+local GetFFlagLuaEnableShowUpsellMethod = require(script.Parent.GetFFlagLuaEnableShowUpsellMethod)
+local GetFFlagLuaAppPushSystemUpsellDevOverride = require(script.Parent.GetFFlagLuaAppPushSystemUpsellDevOverride)
+
+game:DefineFastFlag("LuaAppEnablePushUpsellOnFirstTime", false)
+
+return function() -- line: 5
+	-- upvalues: GetFFlagLuaEnableShowUpsellMethod (copy), GetFFlagLuaAppPushSystemUpsellDevOverride (copy)
+	return GetFFlagLuaEnableShowUpsellMethod() and game:GetFastFlag("LuaAppEnablePushUpsellOnFirstTime") or GetFFlagLuaAppPushSystemUpsellDevOverride()
+end

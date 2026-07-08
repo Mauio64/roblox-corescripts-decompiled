@@ -1,11 +1,13 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getScoreValue ]]
-    if typeof(v0) == "boolean" then
-        if v0 then
-            return 1;
-        else
-            return 0;
-        end;
-    else
-        return v0;
-    end;
-end;
+local function getScoreValue(p1) -- line: 1
+	if typeof(p1) == "boolean" then
+		if p1 then
+			return 1
+		end
+
+		return 0
+	end
+
+	return p1
+end
+
+return getScoreValue

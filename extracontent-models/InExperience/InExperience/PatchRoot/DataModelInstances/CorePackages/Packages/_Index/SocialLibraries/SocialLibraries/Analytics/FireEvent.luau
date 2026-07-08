@@ -1,4 +1,4 @@
 return {
-    fireDiagCounter = require(script.fireDiagCounter), 
-    fireEventStream = require(script.fireEventStream)
-};
+	fireDiagCounter = require(script.fireDiagCounter),
+	fireEventStream = require(script.fireEventStream)
+}

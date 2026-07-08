@@ -1,6 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VerifiedBadges");
-local v1 = require(l_script_FirstAncestor_0.constants);
-return function(v2) --[[ Line: 9 ]] --[[ Name: appendPremiumBadge ]]
-    -- upvalues: v1 (copy)
-    return v2 .. v1.PREMIUM_EMOJI;
-end;
+local VerifiedBadges = script:FindFirstAncestor("VerifiedBadges")
+local constants = require(VerifiedBadges.constants)
+
+local function appendPremiumBadge(s1: string) -- line: 9
+	-- upvalues: constants (copy)
+	return s1 .. constants.PREMIUM_EMOJI
+end
+
+return appendPremiumBadge

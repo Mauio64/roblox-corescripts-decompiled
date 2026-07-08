@@ -1,14 +1,16 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.Network.Url);
-return function(v3, v4, v5, v6) --[[ Line: 7 ]]
-    -- upvalues: l_HttpService_0 (copy), v2 (copy)
-    local v7 = l_HttpService_0:JSONEncode({
-        conversationId = v4, 
-        message = v5, 
-        decorators = v6
-    });
-    return v3(string.format("%s/send-message", v2.CHAT_URL), "POST", {
-        postBody = v7
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local ParentParent = script.Parent.Parent.Parent
+local Url = require(ParentParent.Network.Url)
+
+return function(p1, p2, p3, p4) -- line: 7
+	-- upvalues: HttpService (copy), Url (copy)
+	local json = HttpService:JSONEncode({
+		conversationId = p2,
+		message = p3,
+		decorators = p4
+	})
+
+	return p1(string.format("%s/send-message", Url.CHAT_URL), "POST", {
+		postBody = json
+	})
+end

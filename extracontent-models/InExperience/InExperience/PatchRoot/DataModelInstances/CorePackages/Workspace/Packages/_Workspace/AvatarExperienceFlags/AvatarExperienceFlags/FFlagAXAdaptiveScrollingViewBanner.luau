@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAdaptiveScrollingViewBanner", false);
+return game:DefineFastFlag("AXAdaptiveScrollingViewBanner", false)

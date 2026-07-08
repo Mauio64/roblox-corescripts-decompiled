@@ -1,46 +1,24 @@
-local v0 = require(script.Parent.toRect);
-local v1 = require(script.Parent.returnValue);
-local function _(v2, v3) --[[ Line: 4 ]] --[[ Name: isPointInside ]]
-    local v4 = false;
-    if v2.X >= v3.Min.X then
-        v4 = false;
-        if v2.X <= v3.Max.X then
-            v4 = false;
-            if v2.Y >= v3.Min.Y then
-                v4 = v2.Y <= v3.Max.Y;
-            end;
-        end;
-    end;
-    return v4;
-end;
-return function(v6, v7) --[[ Line: 26 ]] --[[ Name: inside ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    local v8 = v0(v6);
-    local v9 = v0(v7);
-    local l_v1_0 = v1;
-    local l_Min_0 = v8.Min;
-    local v12 = false;
-    if l_Min_0.X >= v9.Min.X then
-        v12 = false;
-        if l_Min_0.X <= v9.Max.X then
-            v12 = false;
-            if l_Min_0.Y >= v9.Min.Y then
-                v12 = l_Min_0.Y <= v9.Max.Y;
-            end;
-        end;
-    end;
-    if v12 then
-        l_Min_0 = v8.Max;
-        v12 = false;
-        if l_Min_0.X >= v9.Min.X then
-            v12 = false;
-            if l_Min_0.X <= v9.Max.X then
-                v12 = false;
-                if l_Min_0.Y >= v9.Min.Y then
-                    v12 = l_Min_0.Y <= v9.Max.Y;
-                end;
-            end;
-        end;
-    end;
-    return l_v1_0(v12, "Is inside the element", "Is not inside the element");
-end;
+local toRect = require(script.Parent.toRect)
+local returnValue = require(script.Parent.returnValue)
+
+local function isPointInside(p1, p2) -- line: 4
+	return p1.X >= p2.Min.X and (p1.X <= p2.Max.X and (p1.Y >= p2.Min.Y and p1.Y <= p2.Max.Y))
+end
+local function inside(p3, p4) -- line: 26
+	-- upvalues: toRect (copy), returnValue (copy)
+	local v9 = toRect(p3)
+	local v10 = toRect(p4)
+	local v11 = returnValue
+	local Min = v9.Min
+	local v13 = Min.X >= v10.Min.X and (Min.X <= v10.Max.X and (Min.Y >= v10.Min.Y and Min.Y <= v10.Max.Y))
+
+	if v13 then
+		local Max = v9.Max
+
+		v13 = Max.X >= v10.Min.X and (Max.X <= v10.Max.X and (Max.Y >= v10.Min.Y and Max.Y <= v10.Max.Y))
+	end
+
+	return v11(v13, "Is inside the element", "Is not inside the element")
+end
+
+return inside

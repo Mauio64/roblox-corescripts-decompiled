@@ -1,27 +1,31 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_withLocalization_0 = v1.withLocalization;
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local v6 = require(l_Parent_0.Common.TextKeys);
-local v7 = require(l_Parent_0.ContactsList.Components.ContactsInformationModal);
-local v8 = l_Roact_0.PureComponent:extend("ContactsEmptyList");
-v8.defaultProps = {
-    errorTextKey = v6.EMPTY_STATE
-};
-v8.render = function(v9) --[[ Line: 23 ]] --[[ Name: render ]]
-    -- upvalues: l_withLocalization_0 (copy), l_Roact_0 (copy), v7 (copy), l_Images_0 (copy)
-    local l_props_0 = v9.props;
-    return l_withLocalization_0({
-        emptyState = l_props_0.errorTextKey
-    })(function(v11) --[[ Line: 28 ]]
-        -- upvalues: l_Roact_0 (ref), v7 (ref), l_Images_0 (ref), l_props_0 (copy)
-        return l_Roact_0.createElement(v7, {
-            image = l_Images_0["icons/status/oof_xlarge"], 
-            layoutOrder = l_props_0.layoutOrder, 
-            text = v11.emptyState
-        });
-    end);
-end;
-return v8;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local withLocalization = dependencies.withLocalization
+local Images = UIBlox.App.ImageSet.Images
+local TextKeys = require(ParentParent.Common.TextKeys)
+local ContactsInformationModal = require(ParentParent.ContactsList.Components.ContactsInformationModal)
+local v9 = Roact.PureComponent:extend("ContactsEmptyList")
+
+v9.defaultProps = {
+	errorTextKey = TextKeys.EMPTY_STATE
+}
+
+function v9.render(p1) -- line: 23
+	-- upvalues: withLocalization (copy), Roact (copy), ContactsInformationModal (copy), Images (copy)
+	local props = p1.props
+
+	return withLocalization({
+		emptyState = props.errorTextKey
+	})(function(p2) -- line: 28
+		-- upvalues: Roact (copy), ContactsInformationModal (copy), Images (copy), props (copy)
+		return Roact.createElement(ContactsInformationModal, {
+			image = Images["icons/status/oof_xlarge"],
+			layoutOrder = props.layoutOrder,
+			text = p2.emptyState
+		})
+	end)
+end
+
+return v9

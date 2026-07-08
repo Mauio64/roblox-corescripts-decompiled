@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RenameRespawnConfirmationPage", false);
+return game:DefineFastFlag("RenameRespawnConfirmationPage", false)

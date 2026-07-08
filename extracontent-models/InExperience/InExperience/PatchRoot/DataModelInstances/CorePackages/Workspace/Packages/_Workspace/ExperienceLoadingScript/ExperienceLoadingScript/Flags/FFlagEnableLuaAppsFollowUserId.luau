@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLuaAppsFollowUserId", false);
+return game:DefineFastFlag("EnableLuaAppsFollowUserId", false)

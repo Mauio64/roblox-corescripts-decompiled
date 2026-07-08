@@ -1,14 +1,15 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Flags.FFlagTopBarDeprecateCoreGuiRodux);
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-if v2 then
-    return nil;
-else
-    return (l_makeActionCreator_0(script.Name, function(v4, v5) --[[ Line: 11 ]]
-        return {
-            coreGuiType = v4, 
-            enabled = v5
-        };
-    end));
-end;
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local FFlagTopBarDeprecateCoreGuiRodux = require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+if FFlagTopBarDeprecateCoreGuiRodux then
+	return nil
+end
+
+return (makeActionCreator(script.Name, function(p1, p2) -- line: 11
+	return {
+		coreGuiType = p1,
+		enabled = p2
+	}
+end))

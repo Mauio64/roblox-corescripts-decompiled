@@ -1,50 +1,55 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v1.Roact;
-local l_Cryo_0 = v1.Cryo;
-local l_UIBlox_0 = v1.UIBlox;
-local l_t_0 = v1.t;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_Parent_0.GlobalConfig);
-local v9 = l_t_0.strictInterface({
-    themeKey = l_t_0.optional(l_t_0.string), 
-    fontKey = l_t_0.optional(l_t_0.string), 
-    AnchorPoint = l_t_0.optional(l_t_0.Vector2), 
-    LayoutOrder = l_t_0.optional(l_t_0.integer), 
-    Position = l_t_0.optional(l_t_0.UDim2), 
-    Size = l_t_0.optional(l_t_0.UDim2), 
-    Text = l_t_0.string, 
-    TextColor3 = l_t_0.optional(l_t_0.Color3), 
-    TextTransparency = l_t_0.optional(l_t_0.numberConstrained(0, 1)), 
-    TextWrapped = l_t_0.optional(l_t_0.boolean), 
-    TextXAlignment = l_t_0.optional(l_t_0.enum(Enum.TextXAlignment)), 
-    TextYAlignment = l_t_0.optional(l_t_0.enum(Enum.TextYAlignment)), 
-    TextTruncate = l_t_0.optional(l_t_0.enum(Enum.TextTruncate)), 
-    Visible = l_t_0.optional(l_t_0.boolean), 
-    ZIndex = l_t_0.optional(l_t_0.integer), 
-    AutomaticSize = l_t_0.optional(l_t_0.enum(Enum.AutomaticSize)), 
-    [l_Roact_0.Children] = l_t_0.optional(l_t_0.table)
-});
-return function(v10) --[[ Line: 34 ]] --[[ Name: ThemedTextLabel ]]
-    -- upvalues: v8 (copy), v9 (copy), l_withStyle_0 (copy), l_Cryo_0 (copy), l_Roact_0 (copy)
-    if v8.propValidation then
-        assert(v9(v10));
-    end;
-    return l_withStyle_0(function(v11) --[[ Line: 39 ]]
-        -- upvalues: v10 (copy), l_Cryo_0 (ref), l_Roact_0 (ref)
-        local v12 = v11.Theme[v10.themeKey or "TextDefault"];
-        local v13 = v11.Font[v10.fontKey or "Body"];
-        local v14 = l_Cryo_0.Dictionary.join({
-            TextColor3 = v12.Color, 
-            TextTransparency = v12.Transparency
-        }, v10, {
-            fontKey = l_Cryo_0.None, 
-            themeKey = l_Cryo_0.None, 
-            BackgroundTransparency = 1, 
-            Font = v13.Font, 
-            TextSize = v13.RelativeSize * v11.Font.BaseSize
-        });
-        return l_Roact_0.createElement("TextLabel", v14);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local Cryo = InGameMenuDependencies.Cryo
+local UIBlox = InGameMenuDependencies.UIBlox
+local t = InGameMenuDependencies.t
+local withStyle = UIBlox.Core.Style.withStyle
+local ParentParent = script.Parent.Parent
+local GlobalConfig = require(ParentParent.GlobalConfig)
+local v10 = t.strictInterface({
+	themeKey = t.optional(t.string),
+	fontKey = t.optional(t.string),
+	AnchorPoint = t.optional(t.Vector2),
+	LayoutOrder = t.optional(t.integer),
+	Position = t.optional(t.UDim2),
+	Size = t.optional(t.UDim2),
+	Text = t.string,
+	TextColor3 = t.optional(t.Color3),
+	TextTransparency = t.optional(t.numberConstrained(0, 1)),
+	TextWrapped = t.optional(t.boolean),
+	TextXAlignment = t.optional(t.enum(Enum.TextXAlignment)),
+	TextYAlignment = t.optional(t.enum(Enum.TextYAlignment)),
+	TextTruncate = t.optional(t.enum(Enum.TextTruncate)),
+	Visible = t.optional(t.boolean),
+	ZIndex = t.optional(t.integer),
+	AutomaticSize = t.optional(t.enum(Enum.AutomaticSize)),
+	[Roact.Children] = t.optional(t.table)
+})
+
+local function ThemedTextLabel(p1) -- line: 34
+	-- upvalues: GlobalConfig (copy), v10 (copy), withStyle (copy), Cryo (copy), Roact (copy)
+	if GlobalConfig.propValidation then
+		assert(v10(p1))
+	end
+
+	return withStyle(function(p2) -- line: 39
+		-- upvalues: p1 (copy), Cryo (copy), Roact (copy)
+		local v14 = p2.Theme[p1.themeKey or "TextDefault"]
+		local v15 = p2.Font[p1.fontKey or "Body"]
+		local v16 = Cryo.Dictionary.join({
+			TextColor3 = v14.Color,
+			TextTransparency = v14.Transparency
+		}, p1, {
+			BackgroundTransparency = 1,
+			fontKey = Cryo.None,
+			themeKey = Cryo.None,
+			Font = v15.Font,
+			TextSize = v15.RelativeSize * p2.Font.BaseSize
+		})
+
+		return Roact.createElement("TextLabel", v16)
+	end)
+end
+
+return ThemedTextLabel

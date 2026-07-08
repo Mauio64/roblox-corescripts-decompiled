@@ -1,7 +1,10 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Roact_0 = require(l_CorePackages_0.Packages.InGameMenuDependencies).Roact;
-local v2 = require(script.Parent.KeyboardControls);
-return function(v3) --[[ Line: 8 ]] --[[ Name: TouchControls ]]
-    -- upvalues: l_Roact_0 (copy), v2 (copy)
-    return l_Roact_0.createElement(v2, v3);
-end;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.InGameMenuDependencies).Roact
+local KeyboardControls = require(script.Parent.KeyboardControls)
+
+local function TouchControls(p1) -- line: 8
+	-- upvalues: Roact (copy), KeyboardControls (copy)
+	return Roact.createElement(KeyboardControls, p1)
+end
+
+return TouchControls

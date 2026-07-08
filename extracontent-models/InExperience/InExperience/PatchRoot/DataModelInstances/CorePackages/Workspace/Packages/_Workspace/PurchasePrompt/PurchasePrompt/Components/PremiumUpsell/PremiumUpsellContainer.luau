@@ -1,139 +1,165 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Roact_0 = require(l_Parent_0.PurchasePromptDeps).Roact;
-local v4 = require(l_Parent_0.React);
-local l_CoreGui_0 = game:GetService("CoreGui");
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_CoreScriptsRootProvider_0 = require(l_Parent_0.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local v8 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusRoot_0 = v8.FocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v8.FocusNavigableSurfaceIdentifierEnum;
-local v11 = require(l_script_FirstAncestor_0.Enums.RequestType);
-local v12 = require(l_script_FirstAncestor_0.Thunks.completeRequest);
-local v13 = require(l_script_FirstAncestor_0.Thunks.launchPremiumUpsell);
-local v14 = require(l_script_FirstAncestor_0.Thunks.sendEvent);
-local v15 = require(l_script_FirstAncestor_0.connectToStore);
-local v16 = require(l_script_FirstAncestor_0.Thunks.initiatePremiumPrecheck);
-local v17 = require(l_script_FirstAncestor_0.Components.Connection.ExternalEventConnection);
-local v18 = require(script.Parent.PremiumUpsellOverlay);
-local v19 = require(l_script_FirstAncestor_0.Flags.GetFFLagUseCoreScriptsRootProviderForUpsellModal);
-local v20 = l_Roact_0.Component:extend(script.Name);
-v20.init = function(v21) --[[ Line: 33 ]] --[[ Name: init ]]
-    v21.state = {
-        screenSize = Vector2.new(0, 0)
-    };
-    v21.changeScreenSize = function(v22) --[[ Line: 38 ]]
-        -- upvalues: v21 (copy)
-        if v21.state.screenSize ~= v22.AbsoluteSize then
-            v21:setState({
-                screenSize = v22.AbsoluteSize
-            });
-        end;
-    end;
-    v21.savedSelectedCoreObject = nil;
-    v21.endPurchase = function() --[[ Line: 46 ]]
-        -- upvalues: v21 (copy)
-        v21:restoreSelectedObject();
-        v21.props.completeRequest();
-    end;
-end;
-v20.saveSelectedObject = function(v23) --[[ Line: 52 ]] --[[ Name: saveSelectedObject ]]
-    -- upvalues: l_GuiService_0 (copy)
-    v23.savedSelectedCoreObject = l_GuiService_0.SelectedCoreObject;
-    l_GuiService_0.SelectedCoreObject = nil;
-end;
-v20.restoreSelectedObject = function(v24) --[[ Line: 57 ]] --[[ Name: restoreSelectedObject ]]
-    -- upvalues: l_CoreGui_0 (copy), l_GuiService_0 (copy)
-    if v24.savedSelectedCoreObject == nil or v24.savedSelectedCoreObject:IsDescendantOf(l_CoreGui_0) then
-        l_GuiService_0.SelectedCoreObject = v24.savedSelectedCoreObject;
-    end;
-end;
-v20.createElement = function(v25) --[[ Line: 64 ]] --[[ Name: createElement ]]
-    -- upvalues: v11 (copy), l_Roact_0 (copy), v18 (copy), v17 (copy), l_GuiService_0 (copy)
-    local l_props_0 = v25.props;
-    local l_state_0 = v25.state;
-    if l_props_0.requestType ~= v11.Premium then
-        return nil;
-    else
-        v25:saveSelectedObject();
-        return l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            [l_Roact_0.Change.AbsoluteSize] = v25.changeScreenSize, 
-            BackgroundTransparency = 1
-        }, {
-            Prompt = l_Roact_0.createElement(v18, {
-                screenSize = l_state_0.screenSize, 
-                promptState = l_props_0.promptState, 
-                purchaseError = l_props_0.purchaseError, 
-                economicRestrictionError = l_props_0.economicRestrictionError, 
-                currencySymbol = l_props_0.premiumProductInfo.currencySymbol, 
-                robuxPrice = l_props_0.premiumProductInfo.price, 
-                robuxAmount = l_props_0.premiumProductInfo.robuxAmount, 
-                isGamepadEnabled = l_props_0.isGamepadEnabled, 
-                promptPremiumPurchase = l_props_0.promptPremiumPurchase, 
-                dispatchPremiumPrecheck = l_props_0.dispatchPremiumPrecheck, 
-                endPurchase = v25.endPurchase, 
-                onAnalyticEvent = l_props_0.onAnalyticEvent
-            }), 
-            ModalFix = l_Roact_0.createElement("ImageButton", {
-                BackgroundTransparency = 0, 
-                Modal = true, 
-                Size = UDim2.new(0, 0, 0, 0)
-            }), 
-            OnCoreGuiMenuOpened = l_Roact_0.createElement(v17, {
-                event = l_GuiService_0.MenuOpened, 
-                callback = function() --[[ Line: 106 ]] --[[ Name: callback ]]
-                    -- upvalues: l_props_0 (copy)
-                    l_props_0.completeRequest();
-                end
-            })
-        });
-    end;
-end;
-v20.render = function(v28) --[[ Line: 113 ]] --[[ Name: render ]]
-    -- upvalues: v19 (copy), l_Roact_0 (copy), l_CoreScriptsRootProvider_0 (copy), v4 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    if v19() then
-        return l_Roact_0.createElement(l_CoreScriptsRootProvider_0, {}, {
-            FocusNavigationCoreScriptsWrapper = v4.createElement(l_FocusRoot_0, {
-                surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-                isIsolated = true, 
-                isAutoFocusRoot = true
-            }, {
-                PremiumUpsellContainer = v28:createElement()
-            })
-        });
-    else
-        return v28:createElement();
-    end;
-end;
-return (v15(function(v29) --[[ Line: 129 ]]
-    return {
-        requestType = v29.promptRequest.requestType, 
-        promptState = v29.promptState, 
-        purchaseError = v29.purchaseError, 
-        economicRestrictionError = v29.economicRestrictionError, 
-        premiumProductInfo = v29.premiumProductInfo, 
-        isGamepadEnabled = v29.gamepadEnabled
-    };
-end, function(v30) --[[ Line: 141 ]]
-    -- upvalues: v13 (copy), v12 (copy), v14 (copy), v16 (copy)
-    return {
-        promptPremiumPurchase = function() --[[ Line: 143 ]] --[[ Name: promptPremiumPurchase ]]
-            -- upvalues: v30 (copy), v13 (ref)
-            return v30(v13());
-        end, 
-        completeRequest = function() --[[ Line: 146 ]] --[[ Name: completeRequest ]]
-            -- upvalues: v30 (copy), v12 (ref)
-            return v30(v12());
-        end, 
-        onAnalyticEvent = function(v31, v32) --[[ Line: 149 ]] --[[ Name: onAnalyticEvent ]]
-            -- upvalues: v30 (copy), v14 (ref)
-            return v30(v14(v31, v32));
-        end, 
-        dispatchPremiumPrecheck = function() --[[ Line: 152 ]] --[[ Name: dispatchPremiumPrecheck ]]
-            -- upvalues: v30 (copy), v16 (ref)
-            return v30(v16());
-        end
-    };
-end)(v20));
+local GuiService = game:GetService("GuiService")
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Roact = require(PurchasePromptParent.PurchasePromptDeps).Roact
+local React = require(PurchasePromptParent.React)
+local CoreGui = game:GetService("CoreGui")
+
+CoreGui:WaitForChild("RobloxGui")
+
+local CoreScriptsRootProvider = require(PurchasePromptParent.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local FocusNavigationUtils = require(PurchasePromptParent.FocusNavigationUtils)
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local RequestType = require(PurchasePrompt.Enums.RequestType)
+local completeRequest = require(PurchasePrompt.Thunks.completeRequest)
+local launchPremiumUpsell = require(PurchasePrompt.Thunks.launchPremiumUpsell)
+local sendEvent = require(PurchasePrompt.Thunks.sendEvent)
+local connectToStore = require(PurchasePrompt.connectToStore)
+local initiatePremiumPrecheck = require(PurchasePrompt.Thunks.initiatePremiumPrecheck)
+local ExternalEventConnection = require(PurchasePrompt.Components.Connection.ExternalEventConnection)
+local PremiumUpsellOverlay = require(script.Parent.PremiumUpsellOverlay)
+local GetFFLagUseCoreScriptsRootProviderForUpsellModal = require(PurchasePrompt.Flags.GetFFLagUseCoreScriptsRootProviderForUpsellModal)
+local FFlagSetMenuOnPurchasePrompt = require(PurchasePrompt.Flags.FFlagSetMenuOnPurchasePrompt)
+local v21 = Roact.Component:extend(script.Name)
+
+function v21.init(p1) -- line: 34
+	p1.state = {
+		screenSize = Vector2.new(0, 0)
+	}
+
+	function p1.changeScreenSize(p2) -- line: 39
+		-- upvalues: p1 (copy)
+		if p1.state.screenSize ~= p2.AbsoluteSize then
+			p1:setState({
+				screenSize = p2.AbsoluteSize
+			})
+		end
+	end
+
+	p1.savedSelectedCoreObject = nil
+
+	function p1.endPurchase() -- line: 47
+		-- upvalues: p1 (copy)
+		p1:restoreSelectedObject()
+		p1.props.completeRequest()
+	end
+end
+function v21.saveSelectedObject(p3) -- line: 53
+	-- upvalues: GuiService (copy)
+	p3.savedSelectedCoreObject = GuiService.SelectedCoreObject
+	GuiService.SelectedCoreObject = nil
+end
+function v21.restoreSelectedObject(p4) -- line: 58
+	-- upvalues: CoreGui (copy), GuiService (copy)
+	if p4.savedSelectedCoreObject == nil or p4.savedSelectedCoreObject:IsDescendantOf(CoreGui) then
+		GuiService.SelectedCoreObject = p4.savedSelectedCoreObject
+	end
+end
+function v21.createElement(p5) -- line: 65
+	-- upvalues: RequestType (copy), Roact (copy), PremiumUpsellOverlay (copy), ExternalEventConnection (copy), GuiService (copy), FFlagSetMenuOnPurchasePrompt (copy)
+	local props = p5.props
+	local state = p5.state
+
+	if props.requestType ~= RequestType.Premium then
+		return nil
+	end
+
+	p5:saveSelectedObject()
+
+	return Roact.createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		[Roact.Change.AbsoluteSize] = p5.changeScreenSize,
+		BackgroundTransparency = 1
+	}, {
+		Prompt = Roact.createElement(PremiumUpsellOverlay, {
+			screenSize = state.screenSize,
+			promptState = props.promptState,
+			purchaseError = props.purchaseError,
+			economicRestrictionError = props.economicRestrictionError,
+			currencySymbol = props.premiumProductInfo.currencySymbol,
+			robuxPrice = props.premiumProductInfo.price,
+			robuxAmount = props.premiumProductInfo.robuxAmount,
+			isGamepadEnabled = props.isGamepadEnabled,
+			promptPremiumPurchase = props.promptPremiumPurchase,
+			dispatchPremiumPrecheck = props.dispatchPremiumPrecheck,
+			endPurchase = p5.endPurchase,
+			onAnalyticEvent = props.onAnalyticEvent
+		}),
+		ModalFix = Roact.createElement("ImageButton", {
+			BackgroundTransparency = 0,
+			Modal = true,
+			Size = UDim2.new(0, 0, 0, 0)
+		}),
+		OnCoreGuiMenuOpened = Roact.createElement(ExternalEventConnection, {
+			event = GuiService.MenuOpened,
+			callback = function() -- line: 107
+				-- upvalues: FFlagSetMenuOnPurchasePrompt (copy), p5 (copy), props (copy)
+				if FFlagSetMenuOnPurchasePrompt and p5.menuOpenedBySelf then
+					p5.menuOpenedBySelf = false
+
+					return
+				end
+
+				props.completeRequest()
+			end
+		})
+	})
+end
+function v21.render(p6) -- line: 118
+	-- upvalues: FFlagSetMenuOnPurchasePrompt (copy), GuiService (copy), GetFFLagUseCoreScriptsRootProviderForUpsellModal (copy), Roact (copy), CoreScriptsRootProvider (copy), React (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v29 = p6:createElement()
+
+	if FFlagSetMenuOnPurchasePrompt then
+		if v29 ~= nil then
+			p6.menuOpenedBySelf = true
+		end
+
+		GuiService:SetMenuIsOpen(v29 ~= nil, "PremiumUpsellContainer")
+	end
+
+	if GetFFLagUseCoreScriptsRootProviderForUpsellModal() then
+		return Roact.createElement(CoreScriptsRootProvider, {}, {
+			FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
+				isIsolated = true,
+				isAutoFocusRoot = true,
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
+			}, {
+				PremiumUpsellContainer = v29
+			})
+		})
+	end
+
+	return v29
+end
+
+return (connectToStore(function(p7) -- line: 142
+	return {
+		requestType = p7.promptRequest.requestType,
+		promptState = p7.promptState,
+		purchaseError = p7.purchaseError,
+		economicRestrictionError = p7.economicRestrictionError,
+		premiumProductInfo = p7.premiumProductInfo,
+		isGamepadEnabled = p7.gamepadEnabled
+	}
+end, function(p8) -- line: 154
+	-- upvalues: launchPremiumUpsell (copy), completeRequest (copy), sendEvent (copy), initiatePremiumPrecheck (copy)
+	return {
+		promptPremiumPurchase = function() -- line: 156
+			-- upvalues: p8 (copy), launchPremiumUpsell (copy)
+			return p8(launchPremiumUpsell())
+		end,
+		completeRequest = function() -- line: 159
+			-- upvalues: p8 (copy), completeRequest (copy)
+			return p8(completeRequest())
+		end,
+		onAnalyticEvent = function(p9, p10) -- line: 162
+			-- upvalues: p8 (copy), sendEvent (copy)
+			return p8(sendEvent(p9, p10))
+		end,
+		dispatchPremiumPrecheck = function() -- line: 165
+			-- upvalues: p8 (copy), initiatePremiumPrecheck (copy)
+			return p8(initiatePremiumPrecheck())
+		end
+	}
+end)(v21))

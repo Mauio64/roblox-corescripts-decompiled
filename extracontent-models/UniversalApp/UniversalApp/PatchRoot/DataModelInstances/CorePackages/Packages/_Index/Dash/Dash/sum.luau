@@ -1,8 +1,11 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.reduce);
-return function(v2) --[[ Line: 16 ]] --[[ Name: sum ]]
-    -- upvalues: v1 (copy)
-    return v1(v2, function(v3, v4) --[[ Line: 17 ]]
-        return v3 + v4;
-    end, 0);
-end;
+local scriptParent = script.Parent
+local reduce = require(scriptParent.reduce)
+
+local function sum(t1: {[any]: any}) -- line: 16
+	-- upvalues: reduce (copy)
+	return reduce(t1, function(n1: number, p1) -- line: 17
+		return n1 + p1
+	end, 0)
+end
+
+return sum

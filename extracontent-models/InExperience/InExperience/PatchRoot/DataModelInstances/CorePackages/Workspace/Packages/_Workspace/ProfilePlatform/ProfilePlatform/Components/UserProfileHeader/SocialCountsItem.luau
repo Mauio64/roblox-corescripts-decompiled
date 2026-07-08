@@ -1,44 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Interactable_0 = require(l_Parent_0.UIBlox).Core.Control.Interactable;
-local v3 = require(l_Parent_0.Foundation);
-local l_Text_0 = v3.Text;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local function v6() --[[ Line: 19 ]] --[[ Name: NOOP ]]
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local React = require(Parent.React)
+local Interactable = require(Parent.UIBlox).Core.Control.Interactable
+local Foundation = require(Parent.Foundation)
+local FoundationText = Foundation.Text
+local useTokens = Foundation.Hooks.useTokens
 
-end;
-return function(v7) --[[ Line: 21 ]] --[[ Name: SocialCountsItem ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_Interactable_0 (copy), v6 (copy), l_Text_0 (copy)
-    local v8 = l_useTokens_0();
-    local v9 = not v7.isDisabled and v7.count ~= "0";
-    local v10 = v9 and v8.Color.Content.Emphasis or v8.Color.Content.Muted;
-    return v1.createElement(l_Interactable_0, {
-        Size = UDim2.fromScale(0.25, 0), 
-        BackgroundTransparency = 1, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        [v1.Event.Activated] = if v9 then v7.onActivated else v6, 
-        onStateChanged = v6, 
-        LayoutOrder = v7.layoutOrder, 
-        Active = v9
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        Count = v1.createElement(l_Text_0, {
-            Text = v7.count, 
-            tag = "text-align-y-bottom auto-xy", 
-            fontStyle = v8.Typography.HeadingSmall, 
-            textStyle = v10, 
-            LayoutOrder = 1
-        }), 
-        Text = v1.createElement(l_Text_0, {
-            Text = v7.text, 
-            tag = "text-align-y-top auto-xy", 
-            fontStyle = v8.Typography.CaptionMedium, 
-            textStyle = v10, 
-            LayoutOrder = 2
-        })
-    });
-end;
+local function NOOP() -- line: 19
+end
+local function SocialCountsItem(t1: {[any]: any}) -- line: 21
+	-- upvalues: useTokens (copy), React (copy), Interactable (copy), NOOP (copy), FoundationText (copy)
+	local v10 = useTokens()
+	local v11 = not t1.isDisabled and t1.count ~= "0"
+	local v12 = v11 and v10.Color.Content.Emphasis or v10.Color.Content.Muted
+
+	return React.createElement(Interactable, {
+		Size = UDim2.fromScale(0.25, 0),
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		[React.Event.Activated] = if not v11 then NOOP else t1.onActivated,
+		onStateChanged = NOOP,
+		LayoutOrder = t1.layoutOrder,
+		Active = v11
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Count = React.createElement(FoundationText, {
+			tag = "text-align-y-bottom auto-xy",
+			LayoutOrder = 1,
+			Text = t1.count,
+			fontStyle = v10.Typography.HeadingSmall,
+			textStyle = v12
+		}),
+		Text = React.createElement(FoundationText, {
+			tag = "text-align-y-top auto-xy",
+			LayoutOrder = 2,
+			Text = t1.text,
+			fontStyle = v10.Typography.CaptionMedium,
+			textStyle = v12
+		})
+	})
+end
+
+return SocialCountsItem

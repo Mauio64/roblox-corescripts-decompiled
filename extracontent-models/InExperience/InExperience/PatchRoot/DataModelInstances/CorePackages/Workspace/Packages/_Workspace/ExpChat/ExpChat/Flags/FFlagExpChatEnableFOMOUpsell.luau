@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatEnableFOMOUpsell", false) and game:GetEngineFeature("TextChatUserMessageIntentSent");
+return game:DefineFastFlag("ExpChatEnableFOMOUpsell", false) and game:GetEngineFeature("TextChatUserMessageIntentSent")

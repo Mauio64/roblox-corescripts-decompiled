@@ -1,20 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(_) --[[ Line: 13 ]]
-    -- upvalues: l_useDispatch_0 (copy), v2 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy)
-    local v8 = l_useDispatch_0();
-    return v2.useCallback(function(v9) --[[ Line: 15 ]]
-        -- upvalues: v8 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref)
-        v8(l_NavigateDown_0({
-            name = l_AppPage_0.GenericWebPage, 
-            detail = v9
-        }));
-    end, {
-        v8
-    });
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+local InlineRichTextParent = InlineRichText.Parent
+local React = require(InlineRichTextParent.React)
+local useDispatch = require(InlineRichTextParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local NavigateDown = require(InlineRichTextParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(InlineRichTextParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v7 = if not FFlagSignalsNavP3Dispatch then nil else require(InlineRichTextParent.RobloxAppNavigation).NavigationCommands
+local AppPage = require(InlineRichTextParent.RobloxAppEnums).AppPage
+
+require(InlineRichText.Types)
+
+local FFlagInlineRichTextUseWebViewService = require(InlineRichTextParent.SharedFlags).FFlagInlineRichTextUseWebViewService
+local openWebView = require(InlineRichText.Utils.openWebView)
+
+return function(_: nil) -- line: 20
+	-- upvalues: FFlagInlineRichTextUseWebViewService (copy), React (copy), openWebView (copy), useDispatch (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), NavigateDown (copy)
+	if FFlagInlineRichTextUseWebViewService then
+		return React.useCallback(function(s1: string) -- line: 22
+			-- upvalues: openWebView (copy)
+			openWebView(s1)
+		end, {})
+	end
+
+	local v12 = useDispatch()
+
+	return React.useCallback(function(s2: string) -- line: 27
+		-- upvalues: AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), v12 (copy), NavigateDown (copy)
+		local t1 = {
+			name = AppPage.GenericWebPage,
+			detail = s2
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v7.down(v7.fromLegacyPage(t1))
+
+			return
+		end
+
+		v12(NavigateDown(t1))
+	end, { v12 })
+end

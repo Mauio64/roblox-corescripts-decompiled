@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.Action)(script.Name, function(v0, v1, v2) --[[ Line: 4 ]]
-    return {
-        rootNode = v0, 
-        rootFunc = v1, 
-        rootNodeName = v2
-    };
-end);
+return require(script.Parent.Parent.Action)(script.Name, function(p1, p2, p3) -- line: 4
+	return {
+		rootNode = p1,
+		rootFunc = p2,
+		rootNodeName = p3
+	}
+end)

@@ -1,4 +1,5 @@
-game:DefineFastFlag("ValidateDescription", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ValidateDescription");
-end;
+game:DefineFastFlag("ValidateDescription", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ValidateDescription")
+end

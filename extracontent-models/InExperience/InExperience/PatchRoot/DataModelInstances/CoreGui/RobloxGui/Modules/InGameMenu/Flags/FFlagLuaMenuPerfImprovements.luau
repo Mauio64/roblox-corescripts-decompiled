@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaMenuPerfImprovements", false);
+return game:DefineFastFlag("LuaMenuPerfImprovements", false)

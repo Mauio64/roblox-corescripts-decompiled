@@ -1,117 +1,156 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("IAPExperience");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_Accordion_0 = v3.Accordion;
-local l_View_0 = v3.View;
-local l_Divider_0 = v3.Divider;
-local l_IconName_0 = v3.Enums.IconName;
-local v8 = require(l_script_FirstAncestor_0.Utility.formatNumber);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v10 = require(l_script_FirstAncestor_0.Generic.Hooks.usePlaceholderLocalization);
-local v11 = require(l_script_FirstAncestor_0.Generic.Hooks.useRobuxText);
-local l_DiscountType_0 = require(l_script_FirstAncestor_0.ProductPurchase.PricingTypes).DiscountType;
-local v13 = require(l_script_FirstAncestor_0.Generic.DiscountRow);
-local v14 = require(l_script_FirstAncestor_0.Generic.PriceLineItem);
-local v15 = utf8.char(57346);
-return function(v16) --[[ Line: 33 ]] --[[ Name: DiscountSummary ]]
-    -- upvalues: l_LocalizationService_0 (copy), v11 (copy), v2 (copy), v13 (copy), v10 (copy), v15 (copy), v8 (copy), l_DiscountType_0 (copy), v14 (copy), l_View_0 (copy), l_Accordion_0 (copy), l_IconName_0 (copy), l_Divider_0 (copy)
-    local l_itemPrice_0 = v16.itemPrice;
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    local l_discounts_0 = l_itemPrice_0.discounts;
-    local v20 = v11(l_itemPrice_0.basePriceInRobux);
-    local v21 = v11(l_itemPrice_0.priceInRobux);
-    local v26, v27 = v2.useMemo(function() --[[ Line: 41 ]]
-        -- upvalues: l_discounts_0 (copy), v2 (ref), v13 (ref)
-        local v22 = 0;
-        local v23 = {};
-        for v24, v25 in ipairs(l_discounts_0) do
-            if v25.amountInRobux > 0 then
-                v22 = v22 + v25.amountInRobux;
-                v23["DiscountRow_" .. tostring(v24)] = v2.createElement(v13, {
-                    discount = v25, 
-                    LayoutOrder = v24 + 1
-                });
-            end;
-        end;
-        return v22, v23;
-    end, {
-        l_discounts_0
-    });
-    local v28 = v10({
-        Subtotal = "IAPExperience.PurchasePrompt.Label.Subtotal", 
-        Total = "IAPExperience.PurchasePrompt.Label.Total", 
-        BlackbirdSummary = {
-            "IAPExperience.PurchasePrompt.Label.BlackbirdSummary"; 
-            robuxIcon = v15, 
-            savingsAmount = v8(l_RobloxLocaleId_0, v26)
-        }
-    });
-    local v31 = v2.useMemo(function() --[[ Line: 67 ]]
-        -- upvalues: l_discounts_0 (copy), l_DiscountType_0 (ref)
-        for _, v30 in ipairs(l_discounts_0) do
-            if v30.type == l_DiscountType_0.BlackbirdSubscription then
-                return true;
-            end;
-        end;
-        return false;
-    end, {
-        l_discounts_0
-    });
-    local v35 = v2.useMemo(function() --[[ Line: 76 ]]
-        -- upvalues: v2 (ref), v14 (ref), v28 (copy), v20 (copy), v27 (copy)
-        local v32 = {
-            SubtotalRow = v2.createElement(v14, {
-                label = v28.Subtotal, 
-                amount = v20, 
-                LayoutOrder = 1
-            })
-        };
-        for v33, v34 in pairs(v27) do
-            v32[v33] = v34;
-        end;
-        return v32;
-    end, {
-        v28.Subtotal, 
-        v20, 
-        v27
-    });
-    if not v31 or l_itemPrice_0.basePriceInRobux == l_itemPrice_0.priceInRobux then
-        return nil;
-    else
-        return v2.createElement(l_View_0, {
-            tag = "size-full-0 auto-y stroke-default radius-medium padding-x-small"
-        }, {
-            AccordionContent = v2.createElement(l_Accordion_0.Root, {
-                width = UDim.new(1, 0), 
-                size = "Small"
-            }, {
-                SavingsItem = v2.createElement(l_Accordion_0.Item, {
-                    leadingIcon = l_IconName_0.PaperAirplane, 
-                    text = v28.BlackbirdSummary, 
-                    id = "discount", 
-                    isExpanded = false, 
-                    hasDivider = false, 
-                    LayoutOrder = 1
-                }, v2.createElement(l_View_0, {
-                    tag = "col size-full-0 auto-y gap-xsmall"
-                }, {
-                    BreakdownSection = v2.createElement(l_View_0, {
-                        LayoutOrder = 1, 
-                        tag = "col size-full-0 auto-y gap-xsmall padding-y-xsmall"
-                    }, v35), 
-                    BreakdownDivider = v2.createElement(l_Divider_0, {
-                        LayoutOrder = 2
-                    }), 
-                    TotalRow = v2.createElement(v14, {
-                        label = v28.Total, 
-                        amount = v21, 
-                        textStyle = "text-caption-medium", 
-                        tag = "row size-full-0 auto-y align-y-center padding-x-xsmall padding-top-small", 
-                        LayoutOrder = 3
-                    })
-                }))
-            })
-        });
-    end;
-end;
+local IAPExperience = script:FindFirstAncestor("IAPExperience")
+local IAPExperienceParent = IAPExperience.Parent
+local React = require(IAPExperienceParent.React)
+local SharedFlags = require(IAPExperienceParent.SharedFlags)
+local Foundation = require(IAPExperienceParent.Foundation)
+local Accordion = Foundation.Accordion
+local View = Foundation.View
+local Divider = Foundation.Divider
+local IconName = Foundation.Enums.IconName
+local formatNumber = require(IAPExperience.Utility.formatNumber)
+local LocalizationService = game:GetService("LocalizationService")
+local useLocalization = require(IAPExperienceParent.Localization).Hooks.useLocalization
+local useRobuxText = require(IAPExperience.Generic.Hooks.useRobuxText)
+local useDiscountAccordionConfig = require(IAPExperience.Generic.Hooks.useDiscountAccordionConfig)
+local DiscountType = require(IAPExperience.ProductPurchase.PricingTypes).DiscountType
+local DiscountRow = require(IAPExperience.Generic.DiscountRow)
+local PriceLineItem = require(IAPExperience.Generic.PriceLineItem)
+local FFlagPurchasePromptFetchCartPricing = SharedFlags.FFlagPurchasePromptFetchCartPricing
+local v19 = utf8.char(57346)
+
+local function DiscountSummary(t1: {[any]: any}) -- line: 37
+	-- upvalues: LocalizationService (copy), useRobuxText (copy), React (copy), DiscountRow (copy), FFlagPurchasePromptFetchCartPricing (copy), useLocalization (copy), v19 (copy), formatNumber (copy), DiscountType (copy), useDiscountAccordionConfig (copy), PriceLineItem (copy), View (copy), Accordion (copy), IconName (copy), Divider (copy)
+	local itemPrice = t1.itemPrice
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local discounts = itemPrice.discounts
+	local v25 = useRobuxText(itemPrice.basePriceInRobux)
+	local v26 = useRobuxText(itemPrice.priceInRobux)
+	local v27, v28 = React.useMemo(function() -- line: 45
+		-- upvalues: discounts (copy), React (copy), DiscountRow (copy), FFlagPurchasePromptFetchCartPricing (copy)
+		local n1 = 0
+		local t2 = {}
+
+		for i, v in ipairs(discounts) do
+			if v.amountInRobux > 0 then
+				n1 += v.amountInRobux
+				t2["DiscountRow_" .. tostring(i)] = React.createElement(DiscountRow, {
+					discount = v,
+					label = if not FFlagPurchasePromptFetchCartPricing then nil else v.localizedDiscountAttribution,
+					LayoutOrder = i + 1
+				})
+			end
+		end
+
+		return n1, t2
+	end, { discounts })
+	local v29 = useLocalization({
+		Subtotal = "IAPExperience.PurchasePrompt.Label.Subtotal",
+		Total = "IAPExperience.PurchasePrompt.Label.Total",
+		BlackbirdSummary = {
+			"IAPExperience.PurchasePrompt.Label.BlackbirdSummary",
+			robuxIcon = v19,
+			savingsAmount = formatNumber(RobloxLocaleId, v27)
+		}
+	})
+	local v30 = React.useMemo(function() -- line: 72
+		-- upvalues: discounts (copy), DiscountType (copy)
+		for _, v in ipairs(discounts) do
+			if v.type == DiscountType.BlackbirdSubscription or v.type == DiscountType.RobloxPlusSubscription then
+				return true
+			end
+		end
+
+		return false
+	end, { discounts })
+	local showAccordion = nil
+	local accordionHeaderText = nil
+	local accordionLeadingIcon = nil
+
+	if FFlagPurchasePromptFetchCartPricing then
+		local v34 = useDiscountAccordionConfig({
+			itemPrice = itemPrice,
+			hasSubscriptionDiscount = v30,
+			blackbirdSummaryText = v29.BlackbirdSummary,
+			savingsSummary = t1.savingsSummary
+		})
+
+		showAccordion = v34.showAccordion
+		accordionHeaderText = v34.accordionHeaderText
+		accordionLeadingIcon = v34.accordionLeadingIcon
+	end
+
+	local v35 = React.useMemo(function() -- line: 98
+		-- upvalues: React (copy), PriceLineItem (copy), v29 (copy), v25 (copy), v28 (copy)
+		local t3 = {
+			SubtotalRow = React.createElement(PriceLineItem, {
+				LayoutOrder = 1,
+				label = v29.Subtotal,
+				amount = v25
+			})
+		}
+
+		for k, v in pairs(v28) do
+			t3[k] = v
+		end
+
+		return t3
+	end, {
+		v29.Subtotal,
+		v25,
+		v28
+	})
+
+	if FFlagPurchasePromptFetchCartPricing and not showAccordion then
+		return nil
+	end
+
+	if not FFlagPurchasePromptFetchCartPricing and (not v30 or itemPrice.basePriceInRobux == itemPrice.priceInRobux) then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = {
+			["size-full-0 auto-y padding-x-small stroke-default radius-medium"] = FFlagPurchasePromptFetchCartPricing,
+			["size-full-0 auto-y stroke-default radius-medium padding-x-small"] = not FFlagPurchasePromptFetchCartPricing
+		}
+	}, {
+		AccordionContent = React.createElement(Accordion.Root, {
+			size = "Small",
+			width = UDim.new(1, 0)
+		}, {
+			SavingsItem = React.createElement(Accordion.Item, {
+				id = "discount",
+				isExpanded = false,
+				hasDivider = false,
+				LayoutOrder = 1,
+				leadingIcon = if not FFlagPurchasePromptFetchCartPricing then IconName.RobloxPlus else accordionLeadingIcon,
+				text = if not FFlagPurchasePromptFetchCartPricing then v29.BlackbirdSummary else accordionHeaderText
+			}, React.createElement(View, {
+				tag = {
+					["col gap-xsmall size-full-0 auto-y"] = FFlagPurchasePromptFetchCartPricing,
+					["col size-full-0 auto-y gap-xsmall"] = not FFlagPurchasePromptFetchCartPricing
+				}
+			}, {
+				BreakdownSection = React.createElement(View, {
+					LayoutOrder = 1,
+					tag = {
+						["col gap-xsmall size-full-0 auto-y padding-y-xsmall"] = FFlagPurchasePromptFetchCartPricing,
+						["col size-full-0 auto-y gap-xsmall padding-y-xsmall"] = not FFlagPurchasePromptFetchCartPricing
+					}
+				}, v35),
+				BreakdownDivider = React.createElement(Divider, {
+					LayoutOrder = 2
+				}),
+				TotalRow = React.createElement(PriceLineItem, {
+					textStyle = "text-caption-medium",
+					tag = "row size-full-0 auto-y align-y-center padding-x-xsmall padding-top-small",
+					LayoutOrder = 3,
+					label = v29.Total,
+					amount = v26
+				})
+			}))
+		})
+	})
+end
+
+return DiscountSummary

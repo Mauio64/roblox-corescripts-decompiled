@@ -1,96 +1,113 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_NotificationType_0 = require(l_Parent_0.RobloxAppEnums).NotificationType;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v6 = require(l_Parent_0.Promise);
-local l_ExperienceService_0 = require(l_Parent_0.ExperienceService).ExperienceService;
-local l_GameParams_0 = require(l_Parent_0.ExperienceService).GameParams;
-local v9 = require(l_Parent_0.SharedFlags);
-local l_FFlagEnableLuaAccountSwitch_0 = v9.FFlagEnableLuaAccountSwitch;
-local l_FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues_0 = v9.FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues;
-local v12 = require(l_script_FirstAncestor_0.Utils.AppStorageUtilities);
-local v13 = require(l_script_FirstAncestor_0.Thunks.User);
-local v14 = require(l_script_FirstAncestor_0.Common.AccountSwitcherConstants);
-local function _(v15) --[[ Line: 22 ]] --[[ Name: castStringToInferredType ]]
-    local v16 = tonumber(v15);
-    if v16 then
-        return v16;
-    elseif v15 == "true" then
-        return true;
-    elseif v15 == "false" then
-        return false;
-    else
-        return v15;
-    end;
-end;
-local function v28(v18) --[[ Line: 41 ]] --[[ Name: parsePlaceLauncherUrl ]]
-    if not v18 or v18 == "" then
-        return {};
-    else
-        local v20 = v18:gsub("%%(%x%x)", function(v19) --[[ Line: 47 ]]
-            return (string.char((tonumber(v19, 16))));
-        end);
-        local v21 = {};
-        local _, v23 = string.find(v20, "?");
-        if not v23 then
-            return v21;
-        else
-            local v24 = string.sub(v20, v23 + 1);
-            for v25 in string.gmatch(v24, "[^&]+") do
-                local v26, v27 = string.match(v25, "([^=]+)=?(.*)");
-                if v26 then
-                    v21[v26] = v27;
-                end;
-            end;
-            return v21;
-        end;
-    end;
-end;
-return function(v29, v30, v31, v32, v33) --[[ Line: 72 ]]
-    -- upvalues: l_Url_0 (copy), l_HttpService_0 (copy), l_FFlagEnableLuaAccountSwitch_0 (copy), v12 (copy), v28 (copy), l_GameParams_0 (copy), v13 (copy), v6 (copy), l_FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues_0 (copy), v14 (copy), l_GuiService_0 (copy), l_NotificationType_0 (copy), l_ExperienceService_0 (copy)
-    return v29(string.format("%sv1/authentication-ticket/redeem", l_Url_0.AUTH_URL), "POST", {
-        postBody = l_HttpService_0:JSONEncode({
-            authenticationTicket = v30, 
-            retainCurrentSession = true, 
-            accountBlob = l_FFlagEnableLuaAccountSwitch_0 and v12.getAccountBlob() or nil
-        })
-    }):andThen(function(v34) --[[ Line: 81 ]]
-        -- upvalues: v28 (ref), v31 (copy), l_GameParams_0 (ref), v12 (ref), v13 (ref), l_FFlagEnableLuaAccountSwitch_0 (ref), v6 (ref), v33 (copy), l_FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues_0 (ref), v14 (ref), l_GuiService_0 (ref), l_NotificationType_0 (ref), v32 (copy), l_ExperienceService_0 (ref)
-        local v35 = v28(v31);
-        local v36 = tonumber(v35.placeId);
-        if v36 then
-            local v37 = l_GameParams_0.fromPlaceId(v36);
-            for v38, v39 in pairs(v35) do
-                if v38 ~= "placeId" then
-                    v37[v38] = tonumber(v39) or v39 == "true" or not (v39 == "false") and v39;
-                end;
-            end;
-            local v40 = v12.getAccountBlob();
-            local v41 = v13.fromLocalStorage().userId ~= -1;
-            if l_FFlagEnableLuaAccountSwitch_0 and (v41 or v40 ~= "") then
-                v6.resolve(v33()):andThen(function() --[[ Line: 98 ]]
-                    -- upvalues: l_FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues_0 (ref), v14 (ref), v12 (ref), v34 (copy), v35 (copy), l_GuiService_0 (ref), l_NotificationType_0 (ref)
-                    local v42 = if l_FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues_0 then v14.AccountSwitcherSwitchedFromLoginStatus else v14.AccountSwitcherSwitchedStatus;
-                    v12.setAccountSwitchStatus(v42);
-                    v12.setAccountBlob(v34.responseBody.accountBlob);
-                    v12.setAccountSwitchStartupQueryParams(v35);
-                    v12.flush();
-                    l_GuiService_0:BroadcastNotification("", l_NotificationType_0.DID_SWITCH_ACCOUNT);
-                end, function(v43) --[[ Line: 108 ]]
-                    print("error: ", v43);
-                end);
-            else
-                return v6.resolve(v32()):andThen(function() --[[ Line: 112 ]]
-                    -- upvalues: l_ExperienceService_0 (ref), v37 (copy)
-                    l_ExperienceService_0:LaunchExperience(v37, "AuthTicket", nil);
-                end);
-            end;
-        end;
-        return v6.resolve();
-    end, function(v44) --[[ Line: 119 ]]
-        -- upvalues: v6 (ref)
-        return v6.reject(v44);
-    end);
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local HttpService = game:GetService("HttpService")
+local GuiService = game:GetService("GuiService")
+local NotificationType = require(AuthCommonParent.RobloxAppEnums).NotificationType
+local Url = require(AuthCommonParent.Http).Url
+local Promise = require(AuthCommonParent.Promise)
+local ExperienceService = require(AuthCommonParent.ExperienceService).ExperienceService
+local GameParams = require(AuthCommonParent.ExperienceService).GameParams
+local SharedFlags = require(AuthCommonParent.SharedFlags)
+local FFlagEnableLuaAccountSwitch = SharedFlags.FFlagEnableLuaAccountSwitch
+local FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues = SharedFlags.FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues
+local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
+local User = require(AuthCommon.Thunks.User)
+local AccountSwitcherConstants = require(AuthCommon.Common.AccountSwitcherConstants)
+
+local function castStringToInferredType(s1: string) -- line: 22
+	local num = tonumber(s1)
+
+	if num then
+		return num
+	end
+
+	if s1 == "true" then
+		return true
+	end
+
+	if s1 == "false" then
+		return false
+	end
+
+	return s1
+end
+local function parsePlaceLauncherUrl(s2: string) -- line: 41
+	if not s2 or s2 == "" then
+		return {}
+	end
+
+	local v21 = s2:gsub("%%(%x%x)", function(p1) -- line: 47
+		return (string.char((tonumber(p1, 16))))
+	end)
+	local t1 = {}
+	local _, stop = string.find(v21, "?")
+
+	if not stop then
+		return t1
+	end
+
+	local v25 = string.sub(v21, stop + 1)
+
+	for match in string.gmatch(v25, "[^&]+") do
+		local v27, v28 = string.match(match, "([^=]+)=?(.*)")
+
+		if v27 then
+			t1[v27] = v28
+		end
+	end
+
+	return t1
+end
+
+return function(p2, p3, p4, p5, p6) -- line: 72
+	-- upvalues: Url (copy), HttpService (copy), FFlagEnableLuaAccountSwitch (copy), AppStorageUtilities (copy), parsePlaceLauncherUrl (copy), GameParams (copy), User (copy), Promise (copy), FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues (copy), AccountSwitcherConstants (copy), GuiService (copy), NotificationType (copy), ExperienceService (copy)
+	return p2(string.format("%sv1/authentication-ticket/redeem", Url.AUTH_URL), "POST", {
+		postBody = HttpService:JSONEncode({
+			retainCurrentSession = true,
+			authenticationTicket = p3,
+			accountBlob = FFlagEnableLuaAccountSwitch and AppStorageUtilities.getAccountBlob() or nil
+		})
+	}):andThen(function(p7) -- line: 81
+		-- upvalues: parsePlaceLauncherUrl (copy), p4 (copy), GameParams (copy), AppStorageUtilities (copy), User (copy), FFlagEnableLuaAccountSwitch (copy), Promise (copy), p6 (copy), FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues (copy), AccountSwitcherConstants (copy), GuiService (copy), NotificationType (copy), p5 (copy), ExperienceService (copy)
+		local v36 = parsePlaceLauncherUrl(p4)
+		local num = tonumber(v36.placeId)
+
+		if num then
+			local v38 = GameParams.fromPlaceId(num)
+
+			for k, v in pairs(v36) do
+				if k ~= "placeId" then
+					v38[k] = tonumber(v) or (v == "true" or v ~= "false" and v)
+				end
+			end
+
+			local v41 = AppStorageUtilities.getAccountBlob()
+			local v42 = User.fromLocalStorage().userId ~= -1
+
+			if not FFlagEnableLuaAccountSwitch or not v42 and v41 == "" then
+				return Promise.resolve(p5()):andThen(function() -- line: 112
+					-- upvalues: ExperienceService (copy), v38 (copy)
+					ExperienceService:LaunchExperience(v38, "AuthTicket", nil)
+				end)
+			end
+
+			Promise.resolve(p6()):andThen(function() -- line: 98
+				-- upvalues: FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues (copy), AccountSwitcherConstants (copy), AppStorageUtilities (copy), p7 (copy), v36 (copy), GuiService (copy), NotificationType (copy)
+				local v44 = if not FFlagLuaEnableLoginAndSignupDifferentiatedStatusValues then AccountSwitcherConstants.AccountSwitcherSwitchedStatus else AccountSwitcherConstants.AccountSwitcherSwitchedFromLoginStatus
+
+				AppStorageUtilities.setAccountSwitchStatus(v44)
+				AppStorageUtilities.setAccountBlob(p7.responseBody.accountBlob)
+				AppStorageUtilities.setAccountSwitchStartupQueryParams(v36)
+				AppStorageUtilities.flush()
+				GuiService:BroadcastNotification("", NotificationType.DID_SWITCH_ACCOUNT)
+			end, function(p8) -- line: 108
+				print("error: ", p8)
+			end)
+		end
+
+		return Promise.resolve()
+	end, function(p9) -- line: 119
+		-- upvalues: Promise (copy)
+		return Promise.reject(p9)
+	end)
+end

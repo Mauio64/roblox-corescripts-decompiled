@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getItemCollectionKey ]]
-    return (("%*_%*"):format(v0, v1));
-end;
+local function getItemCollectionKey(p1, p2) -- line: 5
+	return `{ p1 }_{ p2 }`
+end
+
+return getItemCollectionKey

@@ -1,94 +1,109 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Signals);
-local l_createSignal_0 = v1.createSignal;
-return function() --[[ Line: 38 ]]
-    -- upvalues: l_createSignal_0 (copy), v1 (copy)
-    local v3, v4 = l_createSignal_0(0);
-    local v5, v6 = l_createSignal_0(0);
-    local v7, v8 = l_createSignal_0(0);
-    local v9, v10 = l_createSignal_0(0);
-    local v11, v12 = l_createSignal_0(0);
-    local v13, v14 = l_createSignal_0("unknown");
-    local v15, v16 = l_createSignal_0("unknown");
-    local v17 = 0;
-    local v18 = 0;
-    local v19 = 0;
-    local v20 = 0;
-    local v21, v22 = l_createSignal_0({
-        openDuration = 0, 
-        closedDuration = 0, 
-        textIdleDuration = 0, 
-        backgroundIdleDuration = 0
-    });
-    local v28 = v1.createEffect(function(v23) --[[ Line: 63 ]]
-        -- upvalues: v3 (copy), v5 (copy), v7 (copy), v9 (copy), v16 (copy), v13 (copy), v14 (copy), v12 (copy)
-        local v24 = v3(v23);
-        local v25 = v5(v23);
-        local v26 = v7(v23);
-        local v27 = v9(v23);
-        v16(v13(false));
-        if v27 < v26 and v25 < v26 and v24 < v26 then
-            v14("open");
-            v12(v26);
-            return;
-        elseif v25 < v27 and v24 < v27 then
-            v14("closed");
-            v12(v27);
-            return;
-        elseif v24 < v25 then
-            v14("textIdle");
-            v12(v25);
-            return;
-        elseif v24 > 0 then
-            v14("backgroundIdle");
-            v12(v24);
-            return;
-        else
-            v14("unknown");
-            return;
-        end;
-    end);
-    local v33 = v1.createEffect(function(v29) --[[ Line: 93 ]]
-        -- upvalues: v15 (copy), v11 (copy), v17 (ref), v7 (copy), v18 (ref), v9 (copy), v19 (ref), v5 (copy), v20 (ref), v3 (copy), v22 (copy)
-        local v30 = v15(v29);
-        local v31 = v11(v29);
-        if v30 == "open" then
-            v17 = v31 - v7(v29);
-        elseif v30 == "closed" then
-            v18 = v31 - v9(v29);
-        elseif v30 == "textIdle" then
-            v19 = v31 - v5(v29);
-        elseif v30 == "backgroundIdle" then
-            v20 = v31 - v3(v29);
-        end;
-        v22(function(v32) --[[ Line: 105 ]]
-            -- upvalues: v17 (ref), v18 (ref), v19 (ref), v20 (ref)
-            return {
-                openDuration = v32.openDuration + v17, 
-                closedDuration = v32.closedDuration + v18, 
-                textIdleDuration = v32.textIdleDuration + v19, 
-                backgroundIdleDuration = v32.backgroundIdleDuration + v20
-            };
-        end);
-    end);
-    return {
-        getBackgroundTimerStarted = v3, 
-        getTextTimerStarted = v5, 
-        getOpenTimerStarted = v7, 
-        getClosedTimerStarted = v9, 
-        getPreviousChatWindowStateTimerExpired = v11, 
-        getCurrentChatWindowState = v13, 
-        getPreviousChatWindowState = v15, 
-        getDurationUpdates = v21, 
-        setBackgroundTimerStarted = v4, 
-        setTextTimerStarted = v6, 
-        setOpenTimerStarted = v8, 
-        setClosedTimerStarted = v10, 
-        setPreviousChatWindowStateTimerExpired = v12, 
-        setCurrentChatWindowState = v14, 
-        setPreviousChatWindowState = v16, 
-        setDurationUpdates = v22, 
-        newStateEffect = v28, 
-        changingWindowStateEffect = v33
-    };
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(Parent.Signals)
+local createSignal = Signals.createSignal
+
+return function() -- line: 38
+	-- upvalues: createSignal (copy), Signals (copy)
+	local v4, v5 = createSignal(0)
+	local v6, v7 = createSignal(0)
+	local v8, v9 = createSignal(0)
+	local v10, v11 = createSignal(0)
+	local v12, v13 = createSignal(0)
+	local v14, v15 = createSignal("unknown")
+	local v16, v17 = createSignal("unknown")
+	local n1 = 0
+	local n2 = 0
+	local n3 = 0
+	local n4 = 0
+	local v22, v23 = createSignal({
+		openDuration = 0,
+		closedDuration = 0,
+		textIdleDuration = 0,
+		backgroundIdleDuration = 0
+	})
+	local v24 = Signals.createEffect(function(p1) -- line: 63
+		-- upvalues: v4 (copy), v6 (copy), v8 (copy), v10 (copy), v17 (copy), v14 (copy), v15 (copy), v13 (copy)
+		local v27 = v4(p1)
+		local v28 = v6(p1)
+		local v29 = v8(p1)
+		local v30 = v10(p1)
+
+		v17(v14(false))
+
+		if v30 < v29 and (v28 < v29 and v27 < v29) then
+			v15("open")
+			v13(v29)
+
+			return
+		end
+
+		if v28 < v30 and v27 < v30 then
+			v15("closed")
+			v13(v30)
+
+			return
+		end
+
+		if v27 < v28 then
+			v15("textIdle")
+			v13(v28)
+
+			return
+		end
+
+		if v27 > 0 then
+			v15("backgroundIdle")
+			v13(v27)
+
+			return
+		end
+
+		v15("unknown")
+	end)
+	local v25 = Signals.createEffect(function(p2) -- line: 93
+		-- upvalues: v16 (copy), v12 (copy), n1 (ref), v8 (copy), n2 (ref), v10 (copy), n3 (ref), v6 (copy), n4 (ref), v4 (copy), v23 (copy)
+		local v32 = v16(p2)
+		local v33 = v12(p2)
+
+		if v32 == "open" then
+			n1 = v33 - v8(p2)
+		elseif v32 == "closed" then
+			n2 = v33 - v10(p2)
+		elseif v32 == "textIdle" then
+			n3 = v33 - v6(p2)
+		elseif v32 == "backgroundIdle" then
+			n4 = v33 - v4(p2)
+		end
+
+		v23(function(p3) -- line: 105
+			-- upvalues: n1 (ref), n2 (ref), n3 (ref), n4 (ref)
+			return {
+				openDuration = p3.openDuration + n1,
+				closedDuration = p3.closedDuration + n2,
+				textIdleDuration = p3.textIdleDuration + n3,
+				backgroundIdleDuration = p3.backgroundIdleDuration + n4
+			}
+		end)
+	end)
+
+	return {
+		getBackgroundTimerStarted = v4,
+		getTextTimerStarted = v6,
+		getOpenTimerStarted = v8,
+		getClosedTimerStarted = v10,
+		getPreviousChatWindowStateTimerExpired = v12,
+		getCurrentChatWindowState = v14,
+		getPreviousChatWindowState = v16,
+		getDurationUpdates = v22,
+		setBackgroundTimerStarted = v5,
+		setTextTimerStarted = v7,
+		setOpenTimerStarted = v9,
+		setClosedTimerStarted = v11,
+		setPreviousChatWindowStateTimerExpired = v13,
+		setCurrentChatWindowState = v15,
+		setPreviousChatWindowState = v17,
+		setDurationUpdates = v23,
+		newStateEffect = v24,
+		changingWindowStateEffect = v25
+	}
+end

@@ -1,5 +1,5 @@
 return {
-    propValidation = false, 
-    elementTracing = false, 
-    typeChecks = false
-};
+	propValidation = false,
+	elementTracing = false,
+	typeChecks = false
+}

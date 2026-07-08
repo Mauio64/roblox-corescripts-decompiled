@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixUpsellVerificationToNavigateToOverlays", false);
+return game:DefineFastFlag("FixUpsellVerificationToNavigateToOverlays", false)

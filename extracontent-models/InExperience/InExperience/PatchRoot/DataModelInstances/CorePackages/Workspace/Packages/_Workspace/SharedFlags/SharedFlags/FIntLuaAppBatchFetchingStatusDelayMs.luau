@@ -1,1 +1,1 @@
-return game:DefineFastInt("LuaAppBatchFetchingStatusDelayMs", 0);
+return game:DefineFastInt("LuaAppBatchFetchingStatusDelayMs", 0)

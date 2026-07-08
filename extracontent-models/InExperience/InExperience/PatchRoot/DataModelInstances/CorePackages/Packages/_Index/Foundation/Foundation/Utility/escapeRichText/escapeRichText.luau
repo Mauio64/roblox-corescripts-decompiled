@@ -1,9 +1,11 @@
-return function(v0) --[[ Line: 5 ]] --[[ Name: escapeRichText ]]
-    return v0:gsub("[&<>\"']", {
-        ["&"] = "&amp;", 
-        ["<"] = "&lt;", 
-        [">"] = "&gt;", 
-        ["\""] = "&quot;", 
-        ["'"] = "&apos;"
-    });
-end;
+local function escapeRichText(s1: string) -- line: 5
+	return s1:gsub("[&<>\"']", {
+		["&"] = "&amp;",
+		["<"] = "&lt;",
+		[">"] = "&gt;",
+		["\""] = "&quot;",
+		["'"] = "&apos;"
+	})
+end
+
+return escapeRichText

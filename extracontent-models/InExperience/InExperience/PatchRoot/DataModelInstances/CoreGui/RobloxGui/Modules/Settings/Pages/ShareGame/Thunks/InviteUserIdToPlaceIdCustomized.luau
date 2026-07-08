@@ -1,42 +1,47 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ShareGame_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui").Modules.Settings.Pages.ShareGame;
-local l_GameInviteEvents_0 = require(l_CorePackages_0.Workspace.Packages.GameInvite).GameInviteEvents;
-local v3 = require(l_CorePackages_0.Packages.Promise);
-local v4 = require(l_ShareGame_0.Actions.ReceivedUserInviteStatus);
-local l_InviteStatus_0 = require(l_ShareGame_0.Constants).InviteStatus;
-local l_PostSendExperienceInvite_0 = require(l_CorePackages_0.Workspace.Packages.GameInvite).PostSendExperienceInvite;
-return function(v7, v8, v9, v10, v11, v12, v13) --[[ Line: 18 ]]
-    -- upvalues: v4 (copy), l_InviteStatus_0 (copy), v3 (copy), l_PostSendExperienceInvite_0 (copy), l_GameInviteEvents_0 (copy)
-    return function(v14) --[[ Line: 27 ]]
-        -- upvalues: v9 (copy), v4 (ref), v8 (copy), l_InviteStatus_0 (ref), v3 (ref), l_PostSendExperienceInvite_0 (ref), v7 (copy), v11 (copy), v12 (copy), v13 (copy), v10 (copy), l_GameInviteEvents_0 (ref)
-        if v9 == "0" then
-            warn("Game Invite failed to send. Cannot send invite to unpublished Place.");
-            v14:dispatch(v4(v8, l_InviteStatus_0.Failed));
-            return v3.reject();
-        else
-            local v15 = v14:getState();
-            return v3.new(function(v16, v17) --[[ Line: 36 ]]
-                -- upvalues: v15 (copy), v8 (ref), l_InviteStatus_0 (ref)
-                if v15.Invites[v8] == l_InviteStatus_0.Pending then
-                    v17();
-                    return;
-                else
-                    v16();
-                    return;
-                end;
-            end):andThen(function() --[[ Line: 44 ]]
-                -- upvalues: v14 (copy), v4 (ref), v8 (ref), l_InviteStatus_0 (ref), l_PostSendExperienceInvite_0 (ref), v7 (ref), v9 (ref), v11 (ref), v12 (ref), v13 (ref)
-                v14:dispatch(v4(v8, l_InviteStatus_0.Pending));
-                return l_PostSendExperienceInvite_0(v7, v8, v9, v11, v12, v13);
-            end):andThen(function(v18) --[[ Line: 48 ]]
-                -- upvalues: v14 (copy), v4 (ref), v8 (ref), l_InviteStatus_0 (ref)
-                v14:dispatch(v4(v8, l_InviteStatus_0.Success));
-                return v18;
-            end, function() --[[ Line: 51 ]]
-                -- upvalues: v10 (ref), v11 (ref), l_GameInviteEvents_0 (ref), v14 (copy), v4 (ref), v8 (ref), l_InviteStatus_0 (ref)
-                v10:sendEvent(v11, l_GameInviteEvents_0.ErrorShown);
-                v14:dispatch(v4(v8, l_InviteStatus_0.Failed));
-            end);
-        end;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local ShareGame = game:GetService("CoreGui"):WaitForChild("RobloxGui").Modules.Settings.Pages.ShareGame
+local GameInviteEvents = require(CorePackages.Workspace.Packages.GameInvite).GameInviteEvents
+local Promise = require(CorePackages.Packages.Promise)
+local ReceivedUserInviteStatus = require(ShareGame.Actions.ReceivedUserInviteStatus)
+local InviteStatus = require(ShareGame.Constants).InviteStatus
+local PostSendExperienceInvite = require(CorePackages.Workspace.Packages.GameInvite).PostSendExperienceInvite
+
+return function(p1, s1: string, s2: string, p2, s3: string, s4: string?, s5: string?) -- line: 18
+	-- upvalues: ReceivedUserInviteStatus (copy), InviteStatus (copy), Promise (copy), PostSendExperienceInvite (copy), GameInviteEvents (copy)
+	return function(p3) -- line: 27
+		-- upvalues: s2 (copy), ReceivedUserInviteStatus (copy), s1 (copy), InviteStatus (copy), Promise (copy), PostSendExperienceInvite (copy), p1 (copy), s3 (copy), s4 (copy), s5 (copy), p2 (copy), GameInviteEvents (copy)
+		if s2 == "0" then
+			warn("Game Invite failed to send. Cannot send invite to unpublished Place.")
+			p3:dispatch(ReceivedUserInviteStatus(s1, InviteStatus.Failed))
+
+			return Promise.reject()
+		end
+
+		local v16 = p3:getState()
+
+		return Promise.new(function(resolve, reject) -- line: 36
+			-- upvalues: v16 (copy), s1 (copy), InviteStatus (copy)
+			if v16.Invites[s1] == InviteStatus.Pending then
+				reject()
+
+				return
+			end
+
+			resolve()
+		end):andThen(function() -- line: 44
+			-- upvalues: p3 (copy), ReceivedUserInviteStatus (copy), s1 (copy), InviteStatus (copy), PostSendExperienceInvite (copy), p1 (copy), s2 (copy), s3 (copy), s4 (copy), s5 (copy)
+			p3:dispatch(ReceivedUserInviteStatus(s1, InviteStatus.Pending))
+
+			return PostSendExperienceInvite(p1, s1, s2, s3, s4, s5)
+		end):andThen(function(p4) -- line: 48
+			-- upvalues: p3 (copy), ReceivedUserInviteStatus (copy), s1 (copy), InviteStatus (copy)
+			p3:dispatch(ReceivedUserInviteStatus(s1, InviteStatus.Success))
+
+			return p4
+		end, function() -- line: 51
+			-- upvalues: p2 (copy), s3 (copy), GameInviteEvents (copy), p3 (copy), ReceivedUserInviteStatus (copy), s1 (copy), InviteStatus (copy)
+			p2:sendEvent(s3, GameInviteEvents.ErrorShown)
+			p3:dispatch(ReceivedUserInviteStatus(s1, InviteStatus.Failed))
+		end)
+	end
+end

@@ -1,73 +1,79 @@
-local l_Parent_0 = script:FindFirstAncestor("UserList").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.RobloxAppHooks);
-local v3 = require(l_Parent_0.PeekView);
-local l_PeekViewWithTopBar_0 = v3.PeekViewWithTopBar;
-local l_PeekViewState_0 = v3.PeekViewState;
-local v6 = require(l_Parent_0.RoactUtils);
-local l_NavigateBack_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateBack;
-local l_useDispatch_0 = v6.Hooks.RoactRodux.useDispatch;
-local v9 = require(script.Parent.UserList);
-local v10 = require(l_Parent_0.Foundation);
-local l_Button_0 = v10.Button;
-local l_useTopBarHeight_0 = v2.useTopBarHeight;
-local v13 = require(script.Parent.UserListPeekViewTopBar);
-local l_View_0 = v10.View;
-local l_Text_0 = v10.Text;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function(v17) --[[ Line: 30 ]]
-    -- upvalues: l_useTopBarHeight_0 (copy), l_useDispatch_0 (copy), v1 (copy), l_NavigateBack_0 (copy), l_PeekViewState_0 (copy), l_useLocalization_0 (copy), l_PeekViewWithTopBar_0 (copy), v13 (copy), l_View_0 (copy), l_Text_0 (copy), v9 (copy), l_Button_0 (copy)
-    local v18 = UDim.new(0.55, 0);
-    local v19 = l_useTopBarHeight_0();
-    local v20 = l_useDispatch_0();
-    local v21 = v1.useCallback(function() --[[ Line: 35 ]]
-        -- upvalues: v20 (copy), l_NavigateBack_0 (ref)
-        v20(l_NavigateBack_0(true));
-    end, {
-        v20
-    });
-    local v25 = v1.useCallback(function(v22, _, _) --[[ Line: 39 ]]
-        -- upvalues: l_PeekViewState_0 (ref), v21 (copy)
-        if v22 == l_PeekViewState_0.Closed then
-            v21();
-        end;
-    end, {
-        v21
-    });
-    local v26 = l_useLocalization_0({
-        showMore = "Feature.Friends.Action.ShowMore"
-    });
-    return v1.createElement(l_PeekViewWithTopBar_0, {
-        briefViewContentHeight = v18, 
-        fullViewContentHeight = UDim.new(1, -v19), 
-        onViewStateChanged = v25, 
-        topBarHeight = v19, 
-        topBarSlot = v1.createElement(v13, {
-            navigateBack = v21
-        }), 
-        contentSlot = v1.createElement(l_View_0, {
-            Size = UDim2.new(1, 0, 1, -v19), 
-            tag = "auto-y align-x-center col padding-top-xlarge padding-x-xlarge padding-bottom-large gap-large"
-        }, {
-            Title = if v17.title then v1.createElement(l_Text_0, {
-                LayoutOrder = 1, 
-                tag = "text-heading-small size-full-0 text-align-x-left content-emphasis auto-y", 
-                Text = v17.title
-            }) else nil, 
-            UserList = v1.createElement(v9, {
-                userIds = v17.users, 
-                onUserSelected = v17.onUserSelected, 
-                layoutOrder = 2
-            }), 
-            ButtonContainer = v1.createElement(l_View_0, {
-                LayoutOrder = 3, 
-                tag = "size-full-0 auto-y align-x-center col padding-top-xlarge padding-x-xlarge padding-bottom-large gap-large"
-            }, {
-                ShowMoreButton = if v17.hasMore and v17.onLoadMore then v1.createElement(l_Button_0, {
-                    onActivated = v17.onLoadMore, 
-                    text = v26.showMore
-                }) else nil
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("UserList").Parent
+local React = require(Parent.React)
+local RobloxAppHooks = require(Parent.RobloxAppHooks)
+local PeekView = require(Parent.PeekView)
+local PeekViewWithTopBar = PeekView.PeekViewWithTopBar
+local PeekViewState = PeekView.PeekViewState
+local RoactUtils = require(Parent.RoactUtils)
+local NavigateBack = require(Parent.NavigationRodux).Thunks.NavigateBack
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v10 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local UserList = require(script.Parent.UserList)
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local useTopBarHeight = RobloxAppHooks.useTopBarHeight
+local UserListPeekViewTopBar = require(script.Parent.UserListPeekViewTopBar)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+
+return function(t1: {[any]: any}) -- line: 34
+	-- upvalues: useTopBarHeight (copy), useDispatch (copy), React (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), NavigateBack (copy), PeekViewState (copy), useLocalization (copy), PeekViewWithTopBar (copy), UserListPeekViewTopBar (copy), View (copy), FoundationText (copy), UserList (copy), Button (copy)
+	local uDim = UDim.new(0.55, 0)
+	local v22 = useTopBarHeight()
+	local v23 = useDispatch()
+	local v24 = React.useCallback(function() -- line: 39
+		-- upvalues: FFlagSignalsNavP3Dispatch (copy), v10 (copy), v23 (copy), NavigateBack (copy)
+		if FFlagSignalsNavP3Dispatch then
+			v10.back(true)
+
+			return
+		end
+
+		v23(NavigateBack(true))
+	end, { v23 })
+	local v25 = React.useCallback(function(p1, _, _) -- line: 47
+		-- upvalues: PeekViewState (copy), v24 (copy)
+		if p1 == PeekViewState.Closed then
+			v24()
+		end
+	end, { v24 })
+	local v26 = useLocalization({
+		showMore = "Feature.Friends.Action.ShowMore"
+	})
+
+	return React.createElement(PeekViewWithTopBar, {
+		briefViewContentHeight = uDim,
+		fullViewContentHeight = UDim.new(1, -v22),
+		onViewStateChanged = v25,
+		topBarHeight = v22,
+		topBarSlot = React.createElement(UserListPeekViewTopBar, {
+			navigateBack = v24
+		}),
+		contentSlot = React.createElement(View, {
+			tag = "auto-y align-x-center col padding-top-xlarge padding-x-xlarge padding-bottom-large gap-large",
+			Size = UDim2.new(1, 0, 1, -v22)
+		}, {
+			Title = if not t1.title then nil else React.createElement(FoundationText, {
+				LayoutOrder = 1,
+				tag = "text-heading-small size-full-0 text-align-x-left content-emphasis auto-y",
+				Text = t1.title
+			}),
+			UserList = React.createElement(UserList, {
+				layoutOrder = 2,
+				userIds = t1.users,
+				onUserSelected = t1.onUserSelected
+			}),
+			ButtonContainer = React.createElement(View, {
+				LayoutOrder = 3,
+				tag = "size-full-0 auto-y align-x-center col padding-top-xlarge padding-x-xlarge padding-bottom-large gap-large"
+			}, {
+				ShowMoreButton = if not t1.hasMore or not t1.onLoadMore then nil else React.createElement(Button, {
+					onActivated = t1.onLoadMore,
+					text = v26.showMore
+				})
+			})
+		})
+	})
+end

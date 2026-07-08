@@ -1,12 +1,19 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: some ]]
-    local v2 = type(v0);
-    assert(v2 == "table", "expected a table for first argument, got " .. v2);
-    local v3 = type(v1);
-    assert(v3 == "function", "expected a function for second argument, got " .. v3);
-    for v4 = 1, #v0 do
-        if v1(v0[v4], v4) then
-            return true;
-        end;
-    end;
-    return false;
-end;
+local function some(p1, p2) -- line: 2
+	local v4 = type(p1)
+
+	assert(v4 == "table", "expected a table for first argument, got " .. v4)
+
+	local v5 = type(p2)
+
+	assert(v5 == "function", "expected a function for second argument, got " .. v5)
+
+	for i = 1, #p1 do
+		if p2(p1[i], i) then
+			return true
+		end
+	end
+
+	return false
+end
+
+return some

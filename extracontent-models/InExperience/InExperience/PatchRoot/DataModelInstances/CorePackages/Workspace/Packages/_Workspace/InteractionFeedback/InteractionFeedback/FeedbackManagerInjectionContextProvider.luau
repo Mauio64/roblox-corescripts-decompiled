@@ -1,11 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("InteractionFeedback").Parent;
-local l_FeedbackManagerInjectionContext_0 = require(l_Parent_0.UIBlox).Core.Control.FeedbackManagerInjectionContext;
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.Parent.useTriggerFeedback);
-return function(v4) --[[ Line: 7 ]] --[[ Name: FeedbackManagerInjectionContextProvider ]]
-    -- upvalues: v3 (copy), v2 (copy), l_FeedbackManagerInjectionContext_0 (copy)
-    local v5 = v3();
-    return v2.createElement(l_FeedbackManagerInjectionContext_0.Provider, {
-        value = v5
-    }, v4.children);
-end;
+local Parent = script:FindFirstAncestor("InteractionFeedback").Parent
+local FeedbackManagerInjectionContext = require(Parent.UIBlox).Core.Control.FeedbackManagerInjectionContext
+local React = require(Parent.React)
+local useTriggerFeedback = require(script.Parent.useTriggerFeedback)
+
+local function FeedbackManagerInjectionContextProvider(p1) -- line: 7
+	-- upvalues: useTriggerFeedback (copy), React (copy), FeedbackManagerInjectionContext (copy)
+	local v7 = useTriggerFeedback()
+
+	return React.createElement(FeedbackManagerInjectionContext.Provider, {
+		value = v7
+	}, p1.children)
+end
+
+return FeedbackManagerInjectionContextProvider

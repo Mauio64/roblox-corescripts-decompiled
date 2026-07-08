@@ -1,56 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSave");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local _ = require(l_script_FirstAncestor_0.Context.AvatarSaveContext);
-local v4 = require(l_Parent_0.AvatarExperienceFlags);
-local v5 = game:DefineFastFlag("AXPickStateInsteadOfOmit", false);
-local l_FFlagAXCustomizeMakeupSupport_0 = v4.FFlagAXCustomizeMakeupSupport;
-return function(v7, v8) --[[ Line: 26 ]] --[[ Name: getSubstateToTrackForChanges ]]
-    -- upvalues: l_FFlagAXCustomizeMakeupSupport_0 (copy), v2 (copy), v5 (copy)
-    local v9 = if l_FFlagAXCustomizeMakeupSupport_0 then {} else nil;
-    if l_FFlagAXCustomizeMakeupSupport_0 and v7.tryOn.OutfitTryOn.TryOnItems then
-        for v10, v11 in v7.tryOn.OutfitTryOn.TryOnItems do
-            v9[v10] = if v8 then v2.omit(v11, {
-                "order"
-            }) else v11;
-        end;
-    end;
-    local v12 = if l_FFlagAXCustomizeMakeupSupport_0 then {} else nil;
-    if l_FFlagAXCustomizeMakeupSupport_0 and v7.equipped.EquippedAssets then
-        for v13, v14 in v7.equipped.EquippedAssets do
-            v12[v13] = {};
-            for v15, v16 in v14 do
-                v12[v13][v15] = if v8 then v2.omit(v16, {
-                    "order"
-                }) else v16;
-            end;
-        end;
-    end;
-    return {
-        OutfitTryOn = if v5 then {
-            TryOnItems = if l_FFlagAXCustomizeMakeupSupport_0 then v9 else v7.tryOn.OutfitTryOn.TryOnItems, 
-            LookId = v7.tryOn.OutfitTryOn.LookId, 
-            LookType = v7.tryOn.OutfitTryOn.LookType, 
-            BodyColor3s = v7.tryOn.OutfitTryOn.BodyColor3s, 
-            BodyPartColorRangeIds = v7.tryOn.OutfitTryOn.BodyPartColorRangeIds, 
-            Scale = v7.tryOn.OutfitTryOn.Scale
-        } else v2.omit(v7.tryOn.OutfitTryOn, {
-            "OutfitIdMap", 
-            "LastAnimOrEmoteToggledItem", 
-            "LastToggledItem", 
-            "LookAnalyticsInfo", 
-            "DefaultTryOnBodyColorsToggled"
-        }), 
-        LastSavedTriedOnOutfit = v7.tryOn.LastSavedTriedOnOutfit, 
-        AvatarType = v7.equipped.AvatarType, 
-        AvatarScales = v7.equipped.AvatarScales, 
-        BodyColor3s = v7.equipped.BodyColor3s, 
-        BodyPartRangeIds = v7.equipped.BodyPartRangeIds, 
-        EquippedAssets = if l_FFlagAXCustomizeMakeupSupport_0 then v12 else v7.equipped.EquippedAssets, 
-        EquippedEmotes = if v5 then {
-            slotInfo = v7.equipped.EquippedEmotes.slotInfo
-        } else v2.omit(v7.equipped.EquippedEmotes, {
-            "selectedSlot"
-        })
-    };
-end;
+local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
+local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+local Dash = require(AvatarExperienceSaveParent.Dash)
+
+require(AvatarExperienceSave.Context.AvatarSaveContext)
+
+local AvatarExperienceFlags = require(AvatarExperienceSaveParent.AvatarExperienceFlags)
+local v5 = game:DefineFastFlag("AXPickStateInsteadOfOmit", false)
+local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMakeupSupport
+local FFlagAXBackgroundsPersistence = AvatarExperienceFlags.FFlagAXBackgroundsPersistence
+
+local function getSubstateToTrackForChanges(p1, b1: boolean?) -- line: 27
+	-- upvalues: FFlagAXCustomizeMakeupSupport (copy), Dash (copy), v5 (copy), FFlagAXBackgroundsPersistence (copy)
+	local v11 = if not FFlagAXCustomizeMakeupSupport then nil else {}
+
+	if FFlagAXCustomizeMakeupSupport and p1.tryOn.OutfitTryOn.TryOnItems then
+		for v12, v13 in p1.tryOn.OutfitTryOn.TryOnItems do
+			v11[v12] = if not b1 then v13 else Dash.omit(v13, { "order" })
+		end
+	end
+
+	local v14 = if not FFlagAXCustomizeMakeupSupport then nil else {}
+
+	if FFlagAXCustomizeMakeupSupport and p1.equipped.EquippedAssets then
+		for v15, v16 in p1.equipped.EquippedAssets do
+			v14[v15] = {}
+
+			for v17, v18 in v16 do
+				v14[v15][v17] = if not b1 then v18 else Dash.omit(v18, { "order" })
+			end
+		end
+	end
+
+	return {
+		OutfitTryOn = if not v5 then Dash.omit(p1.tryOn.OutfitTryOn, {
+			"OutfitIdMap",
+			"LastAnimOrEmoteToggledItem",
+			"LastToggledItem",
+			"LookAnalyticsInfo",
+			"DefaultTryOnBodyColorsToggled"
+		}) else {
+			TryOnItems = if not FFlagAXCustomizeMakeupSupport then p1.tryOn.OutfitTryOn.TryOnItems else v11,
+			LookId = p1.tryOn.OutfitTryOn.LookId,
+			LookType = p1.tryOn.OutfitTryOn.LookType,
+			BodyColor3s = p1.tryOn.OutfitTryOn.BodyColor3s,
+			BodyPartColorRangeIds = p1.tryOn.OutfitTryOn.BodyPartColorRangeIds,
+			Scale = p1.tryOn.OutfitTryOn.Scale
+		},
+		LastSavedTriedOnOutfit = p1.tryOn.LastSavedTriedOnOutfit,
+		AvatarType = p1.equipped.AvatarType,
+		AvatarScales = p1.equipped.AvatarScales,
+		BodyColor3s = p1.equipped.BodyColor3s,
+		BodyPartRangeIds = p1.equipped.BodyPartRangeIds,
+		EquippedAssets = if not FFlagAXCustomizeMakeupSupport then p1.equipped.EquippedAssets else v14,
+		EquippedEmotes = if not v5 then Dash.omit(p1.equipped.EquippedEmotes, { "selectedSlot" }) else {
+			slotInfo = p1.equipped.EquippedEmotes.slotInfo
+		},
+		BackgroundAssetId = if not FFlagAXBackgroundsPersistence then nil else p1.equipped.BackgroundAssetId
+	}
+end
+
+return getSubstateToTrackForChanges

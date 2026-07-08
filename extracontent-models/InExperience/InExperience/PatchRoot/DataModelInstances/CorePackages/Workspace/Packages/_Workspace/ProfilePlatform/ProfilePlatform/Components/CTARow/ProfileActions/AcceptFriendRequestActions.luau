@@ -40,23 +40,23 @@ return {
 					})):andThen(function() -- line: 42
 						-- upvalues: p1 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 						p1.dispatch(SetCurrentToastMessage({
+							isLocalized = true,
 							toastMessage = p1.localized.friendAcceptedToast,
-							toastIcon = Images["icons/actions/friends/friendAdd"],
-							isLocalized = true
+							toastIcon = Images["icons/actions/friends/friendAdd"]
 						}))
 
-						return p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId))
+						return p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId, p1.actionsComponentRequest))
 					end)
 				end
 			}
 		}
 	end,
-	[Enums.ProfileActions.AcceptOffNetworkFriendRequest] = function(p2) -- line: 55
+	[Enums.ProfileActions.AcceptOffNetworkFriendRequest] = function(p2) -- line: 57
 		-- upvalues: Enums (copy), ProfileTypes (copy), EventNames (copy), NetworkingFriends (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 		return {
 			text = p2.localized[Enums.ProfileActions.AcceptOffNetworkFriendRequest],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 59
+				[ProfileTypes.User] = function() -- line: 61
 					-- upvalues: p2 (copy), EventNames (copy), NetworkingFriends (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 					p2.analytics.fireAnalyticsEvent(EventNames.CTAButtonAddFriendFromContacts, {
 						shareLinkId = p2.profileWrapperContext.sourceInfo.shareLinkId
@@ -66,15 +66,15 @@ return {
 						targetUserId = p2.profileId,
 						currentUserId = p2.localUserId,
 						friendingToken = p2.profileWrapperContext.offNetworkFriendRequestToken
-					})):andThen(function() -- line: 69
+					})):andThen(function() -- line: 71
 						-- upvalues: p2 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 						p2.dispatch(SetCurrentToastMessage({
+							isLocalized = true,
 							toastMessage = p2.localized.friendAcceptedToast,
-							toastIcon = Images["icons/actions/friends/friendAdd"],
-							isLocalized = true
+							toastIcon = Images["icons/actions/friends/friendAdd"]
 						}))
 
-						return p2.dispatch(refreshProfilePlatformActionInfo(p2.profileId))
+						return p2.dispatch(refreshProfilePlatformActionInfo(p2.profileId, p2.actionsComponentRequest))
 					end)
 				end
 			}

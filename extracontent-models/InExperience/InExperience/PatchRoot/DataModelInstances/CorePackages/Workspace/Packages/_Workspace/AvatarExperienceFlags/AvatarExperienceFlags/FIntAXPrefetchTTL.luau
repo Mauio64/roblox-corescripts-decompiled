@@ -1,1 +1,1 @@
-return game:DefineFastInt("AXPrefetchTTL", 300);
+return game:DefineFastInt("AXPrefetchTTL", 300)

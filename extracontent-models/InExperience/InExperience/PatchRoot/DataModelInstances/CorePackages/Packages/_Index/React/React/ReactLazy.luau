@@ -1,100 +1,106 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local l_console_0 = require(l_Parent_0.Shared).console;
-local l_inspect_0 = require(l_Parent_0.LuauPolyfill).util.inspect;
-local _ = require(l_Parent_0.Shared);
-local l_REACT_LAZY_TYPE_0 = require(l_Parent_0.Shared).ReactSymbols.REACT_LAZY_TYPE;
-lazyInitializer = function(v6) --[[ Line: 73 ]] --[[ Name: lazyInitializer ]]
-    -- upvalues: v1 (copy), l_console_0 (copy), l_inspect_0 (copy)
-    if v6._status == -1 then
-        local v7 = v6._result();
-        v6._status = 0;
-        v6._result = v7;
-        v7:andThen(function(v8) --[[ Line: 81 ]]
-            -- upvalues: v6 (copy), v1 (ref), l_console_0 (ref), l_inspect_0 (ref)
-            if v6._status == 0 then
-                local l_default_0 = v8.default;
-                if v1.__DEV__ and l_default_0 == nil then
-                    l_console_0.error("lazy: Expected the result of a dynamic import() call. Instead received: `%s`\n\nYour code should look like: \n  local MyComponent = lazy(function() return reqquire(script.Parent.MyComponent) end)", l_inspect_0(v8));
-                end;
-                local l_v6_0 = v6;
-                l_v6_0._status = 1;
-                l_v6_0._result = l_default_0;
-            end;
-        end, function(v11) --[[ Line: 102 ]]
-            -- upvalues: v6 (copy)
-            if v6._status == 0 then
-                local l_v6_1 = v6;
-                l_v6_1._status = 2;
-                l_v6_1._result = v11;
-            end;
-        end);
-    end;
-    if v6._status == 1 then
-        return v6._result;
-    else
-        error(v6._result);
-        return;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local console = require(ParentParent.Shared).console
+local inspect = require(ParentParent.LuauPolyfill).util.inspect
+
+require(ParentParent.Shared)
+
+local REACT_LAZY_TYPE = require(ParentParent.Shared).ReactSymbols.REACT_LAZY_TYPE
+
+function lazyInitializer(p1) -- line: 73
+	-- upvalues: ReactGlobals (copy), console (copy), inspect (copy)
+	if p1._status == -1 then
+		local v7 = p1._result()
+
+		p1._status = 0
+		p1._result = v7
+		v7:andThen(function(p2) -- line: 81
+			-- upvalues: p1 (copy), ReactGlobals (copy), console (copy), inspect (copy)
+			if p1._status == 0 then
+				local default = p2.default
+
+				if ReactGlobals.__DEV__ and default == nil then
+					console.error("lazy: Expected the result of a dynamic import() call. Instead received: `%s`\n\nYour code should look like: \n  local MyComponent = lazy(function() return reqquire(script.Parent.MyComponent) end)", inspect(p2))
+				end
+
+				local v15 = p1
+
+				v15._status = 1
+				v15._result = default
+			end
+		end, function(p3) -- line: 102
+			-- upvalues: p1 (copy)
+			if p1._status == 0 then
+				local v17 = p1
+
+				v17._status = 2
+				v17._result = p3
+			end
+		end)
+	end
+
+	if p1._status == 1 then
+		return p1._result
+	end
+
+	error(p1._result)
+end
+
 return {
-    lazy = function(v13) --[[ Line: 128 ]]
-        -- upvalues: l_REACT_LAZY_TYPE_0 (copy), v1 (copy), l_console_0 (copy)
-        local v14 = {
-            _status = -1, 
-            _result = v13
-        };
-        local v15 = {
-            ["$$typeof"] = l_REACT_LAZY_TYPE_0, 
-            _payload = v14, 
-            _init = lazyInitializer
-        };
-        if v1.__DEV__ then
-            local v16 = nil;
-            local v17 = nil;
-            do
-                local l_v16_0, l_v17_0 = v16, v17;
-                setmetatable(v15, {
-                    __index = function(_, v21) --[[ Line: 150 ]] --[[ Name: __index ]]
-                        -- upvalues: l_v16_0 (ref), l_v17_0 (ref)
-                        if v21 == "defaultProps" then
-                            return l_v16_0;
-                        elseif v21 == "propTypes" then
-                            return l_v17_0;
-                        else
-                            return;
-                        end;
-                    end, 
-                    __newindex = function(v22, v23, v24) --[[ Line: 159 ]] --[[ Name: __newindex ]]
-                        -- upvalues: l_console_0 (ref), l_v16_0 (ref), l_v17_0 (ref)
-                        if v23 == "defaultProps" then
-                            l_console_0.error("React.lazy(...): It is not supported to assign `defaultProps` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it.");
-                            l_v16_0 = v24;
-                            setmetatable(v22, {
-                                __index = function() --[[ Line: 170 ]] --[[ Name: __index ]]
+	lazy = function(p4: ((...any) -> ...any)) -- line: 128
+		-- upvalues: REACT_LAZY_TYPE (copy), ReactGlobals (copy), console (copy)
+		local t1 = {
+			_status = -1,
+			_result = p4
+		}
+		local t2 = {
+			["$$typeof"] = REACT_LAZY_TYPE,
+			_payload = t1,
+			_init = lazyInitializer
+		}
 
-                                end, 
-                                __newindex = function() --[[ Line: 171 ]] --[[ Name: __newindex ]]
+		if ReactGlobals.__DEV__ then
+			local u11 = nil
+			local u12 = nil
 
-                                end
-                            });
-                        end;
-                        if v23 == "propTypes" then
-                            l_console_0.error("React.lazy(...): It is not supported to assign `propTypes` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it.");
-                            l_v17_0 = v24;
-                            setmetatable(v22, {
-                                __index = function() --[[ Line: 184 ]] --[[ Name: __index ]]
+			setmetatable(t2, {
+				__index = function(_, p6) -- line: 150
+					-- upvalues: u11 (ref), u12 (ref)
+					if p6 == "defaultProps" then
+						return u11
+					end
 
-                                end, 
-                                __newindex = function() --[[ Line: 185 ]] --[[ Name: __newindex ]]
+					if p6 == "propTypes" then
+						return u12
+					end
+				end,
+				__newindex = function(p7, p8, p9) -- line: 159
+					-- upvalues: console (copy), u11 (ref), u12 (ref)
+					if p8 == "defaultProps" then
+						console.error("React.lazy(...): It is not supported to assign `defaultProps` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it.")
+						u11 = p9
+						setmetatable(p7, {
+							__index = function() -- line: 170
+							end,
+							__newindex = function() -- line: 171
+							end
+						})
+					end
 
-                                end
-                            });
-                        end;
-                    end
-                });
-            end;
-        end;
-        return v15;
-    end
-};
+					if p8 == "propTypes" then
+						console.error("React.lazy(...): It is not supported to assign `propTypes` to a lazy component import. Either specify them where the component is defined, or create a wrapping component around it.")
+						u12 = p9
+						setmetatable(p7, {
+							__index = function() -- line: 184
+							end,
+							__newindex = function() -- line: 185
+							end
+						})
+					end
+				end
+			})
+		end
+
+		return t2
+	end
+}

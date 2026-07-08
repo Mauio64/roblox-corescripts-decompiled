@@ -1,14 +1,18 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.ReactRoblox);
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local ReactRoblox = require(Parent.ReactRoblox)
+
+local function waitForEvents() -- line: 6
+	task.wait(0)
+end
+local function actWaitForEvents() -- line: 13
+	-- upvalues: ReactRoblox (copy)
+	ReactRoblox.act(function() -- line: 14
+		task.wait(0)
+	end)
+end
+
 return (setmetatable({
-    act = function() --[[ Line: 13 ]] --[[ Name: actWaitForEvents ]]
-        -- upvalues: v1 (copy)
-        v1.act(function() --[[ Line: 14 ]]
-            task.wait(0);
-        end);
-    end
+	act = actWaitForEvents
 }, {
-    __call = function() --[[ Line: 6 ]] --[[ Name: waitForEvents ]]
-        task.wait(0);
-    end
-}));
+	__call = waitForEvents
+}))

@@ -1,59 +1,109 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppComposition");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Breakpoint_0 = require(l_Parent_0.Foundation).Enums.Breakpoint;
-local l_HardwareSafeAreaInsets_0 = require(l_Parent_0.Responsive).HardwareSafeAreaInsets;
-local _ = require(l_script_FirstAncestor_0.AppCompositionTypes);
-local l_FFlagEnableLeftNavOnConsole_0 = require(l_Parent_0.SharedFlags).FFlagEnableLeftNavOnConsole;
+local AppComposition = script:FindFirstAncestor("AppComposition")
+local AppCompositionParent = AppComposition.Parent
+local Breakpoint = require(AppCompositionParent.Foundation).Enums.Breakpoint
+local HardwareSafeAreaInsets = require(AppCompositionParent.Responsive).HardwareSafeAreaInsets
+
+require(AppComposition.AppCompositionTypes)
+
+local AppCompositionEnums = require(AppComposition.AppCompositionEnums)
+local SharedFlags = require(AppCompositionParent.SharedFlags)
+local FFlagEnableLeftNavOnConsole = SharedFlags.FFlagEnableLeftNavOnConsole
+local FFlagEnableSplitPane = SharedFlags.FFlagEnableSplitPane
+local RegionName = AppCompositionEnums.RegionName
+
+local function getRegionOverrides(p1) -- line: 27
+	-- upvalues: RegionName (copy)
+	if p1 == RegionName.SupportRegion then
+		return {
+			width = 532,
+			minWidth = 224,
+			maxWidth = 640
+		}
+	end
+
+	return nil
+end
+local function getBaseConfig(p2, p3) -- line: 38
+	-- upvalues: Breakpoint (copy), FFlagEnableLeftNavOnConsole (copy), HardwareSafeAreaInsets (copy)
+	local t1
+
+	if p2 == Breakpoint.XSmall then
+		local Size_300 = p3.Size.Size_300
+		local Small = p3.Gutter.Small
+		local v19 = 2 * Size_300
+
+		t1 = {
+			columns = 3,
+			margin = Size_300,
+			gutter = Small,
+			carouselPeek = v19
+		}
+	elseif p2 == Breakpoint.Small then
+		local Small = p3.Margin.Small
+		local Medium = p3.Gutter.Medium
+		local v23 = 2 * Small
+
+		t1 = {
+			columns = 6,
+			margin = Small,
+			gutter = Medium,
+			carouselPeek = v23
+		}
+	else
+		t1 = if p2 ~= Breakpoint.Medium then if p2 ~= Breakpoint.Large then if p2 ~= Breakpoint.XLarge then {
+			columns = 12,
+			carouselPeek = 0,
+			margin = p3.Size.Size_1600,
+			gutter = p3.Gutter.XLarge
+		} else {
+			columns = 12,
+			carouselPeek = 0,
+			margin = p3.Size.Size_1600,
+			gutter = p3.Gutter.XLarge
+		} else {
+			columns = 12,
+			carouselPeek = 0,
+			margin = p3.Size.Size_800,
+			gutter = p3.Gutter.Large
+		} else {
+			columns = 12,
+			carouselPeek = 0,
+			margin = p3.Size.Size_800,
+			gutter = p3.Gutter.Large
+		}
+	end
+
+	if not FFlagEnableLeftNavOnConsole and HardwareSafeAreaInsets.hasExtraPlatformInset() then
+		t1.margin = HardwareSafeAreaInsets.deviceInsets().left
+	end
+
+	return t1
+end
+local function resolveLayout(p4, p5) -- line: 97
+	-- upvalues: getBaseConfig (copy)
+	return (getBaseConfig(p4, p5))
+end
+local function getRegionLayout(p6, p7, p8) -- line: 101
+	-- upvalues: getBaseConfig (copy), RegionName (copy)
+	local v29 = getBaseConfig(p7, p8)
+	local v30 = if p6 ~= RegionName.SupportRegion then nil else {
+		width = 532,
+		minWidth = 224,
+		maxWidth = 640
+	}
+
+	if v30 then
+		v29.width = v30.width
+		v29.minWidth = v30.minWidth
+		v29.maxWidth = v30.maxWidth
+	end
+
+	return v29
+end
+
 return {
-    getBaseConfig = function(v6, v7) --[[ Line: 20 ]] --[[ Name: getBaseConfig ]]
-        -- upvalues: l_Breakpoint_0 (copy), l_FFlagEnableLeftNavOnConsole_0 (copy), l_HardwareSafeAreaInsets_0 (copy)
-        local v8 = nil;
-        if v6 == l_Breakpoint_0.XSmall then
-            local l_Size_300_0 = v7.Size.Size_300;
-            local l_Small_0 = v7.Gutter.Small;
-            local v11 = 2 * l_Size_300_0;
-            v8 = {
-                margin = l_Size_300_0, 
-                gutter = l_Small_0, 
-                columns = 3, 
-                carouselPeek = v11
-            };
-        elseif v6 == l_Breakpoint_0.Small then
-            local l_Small_1 = v7.Margin.Small;
-            local l_Medium_0 = v7.Gutter.Medium;
-            local v14 = 2 * l_Small_1;
-            v8 = {
-                margin = l_Small_1, 
-                gutter = l_Medium_0, 
-                columns = 6, 
-                carouselPeek = v14
-            };
-        else
-            v8 = if v6 == l_Breakpoint_0.Medium then {
-                margin = v7.Size.Size_800, 
-                gutter = v7.Gutter.Large, 
-                columns = 12, 
-                carouselPeek = 0
-            } else if v6 == l_Breakpoint_0.Large then {
-                margin = v7.Size.Size_800, 
-                gutter = v7.Gutter.Large, 
-                columns = 12, 
-                carouselPeek = 0
-            } else if v6 == l_Breakpoint_0.XLarge then {
-                margin = v7.Size.Size_1600, 
-                gutter = v7.Gutter.XLarge, 
-                columns = 12, 
-                carouselPeek = 0
-            } else {
-                margin = v7.Size.Size_1600, 
-                gutter = v7.Gutter.XLarge, 
-                columns = 12, 
-                carouselPeek = 0
-            };
-        end;
-        if not l_FFlagEnableLeftNavOnConsole_0 and l_HardwareSafeAreaInsets_0.hasExtraPlatformInset() then
-            v8.margin = l_HardwareSafeAreaInsets_0.deviceInsets().left;
-        end;
-        return v8;
-    end
-};
+	getBaseConfig = getBaseConfig,
+	resolveLayout = if not FFlagEnableSplitPane then nil else resolveLayout,
+	getRegionOverrides = if not FFlagEnableSplitPane then nil else getRegionOverrides,
+	getRegionLayout = if not FFlagEnableSplitPane then nil else getRegionLayout
+}

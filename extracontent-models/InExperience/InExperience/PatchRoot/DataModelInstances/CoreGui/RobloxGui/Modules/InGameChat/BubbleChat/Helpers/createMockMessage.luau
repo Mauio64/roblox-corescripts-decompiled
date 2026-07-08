@@ -1,14 +1,18 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = 0;
-return function(v3) --[[ Line: 7 ]] --[[ Name: createMockMessage ]]
-    -- upvalues: v2 (ref), v1 (copy)
-    v2 = v2 + 1;
-    return v1.Dictionary.join({
-        name = "Foo", 
-        id = tostring(v2), 
-        userId = "1", 
-        text = "Hello, World!", 
-        timestamp = v2
-    }, v3);
-end;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local n1 = 0
+
+local function createMockMessage(p1) -- line: 7
+	-- upvalues: n1 (ref), Cryo (copy)
+	n1 += 1
+
+	return Cryo.Dictionary.join({
+		name = "Foo",
+		userId = "1",
+		text = "Hello, World!",
+		id = tostring(n1),
+		timestamp = n1
+	}, p1)
+end
+
+return createMockMessage

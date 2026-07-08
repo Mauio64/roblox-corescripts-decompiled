@@ -1,12 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChatShared");
-local v1 = require(l_script_FirstAncestor_0.Analytics);
-return function(v2, v3, v4) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    v2.Error:Connect(function(_, v6, v7) --[[ Line: 5 ]]
-        -- upvalues: v3 (copy), v4 (copy), v1 (ref)
-        if v7 == v3 or v6 and string.find(v6, "ExpChat") then
-            local v8 = v4 and "expChatErrorCountServer" or "expChatErrorCountClient";
-            v1.reportCounter(v8);
-        end;
-    end);
-end;
+local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
+local Analytics = require(ExpChatShared.Analytics)
+
+return function(p1, p2, p3) -- line: 4
+	-- upvalues: Analytics (copy)
+	p1.Error:Connect(function(_, p5, p6) -- line: 5
+		-- upvalues: p2 (copy), p3 (copy), Analytics (copy)
+		if p6 == p2 or p5 and string.find(p5, "ExpChat") then
+			local v9 = not p3 and "expChatErrorCountClient" or "expChatErrorCountServer"
+
+			Analytics.reportCounter(v9)
+		end
+	end)
+end

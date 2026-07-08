@@ -1,3 +1,3 @@
 return {
-    PresenceType = require(script.PresenceType)
-};
+	PresenceType = require(script.PresenceType)
+}

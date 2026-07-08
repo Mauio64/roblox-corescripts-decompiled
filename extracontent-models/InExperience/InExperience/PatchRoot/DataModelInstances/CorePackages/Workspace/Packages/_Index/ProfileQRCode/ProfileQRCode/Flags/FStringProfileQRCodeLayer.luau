@@ -1,1 +1,1 @@
-return game:DefineFastString("ProfileQRCodeLayer", "ProfileQRCodeLayer");
+return game:DefineFastString("ProfileQRCodeLayer", "ProfileQRCodeLayer")

@@ -1,14 +1,20 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local l_Observable_0 = require(script.Parent.Observable).Observable;
-v0.fixObservableSubclass = function(v4) --[[ Line: 30 ]] --[[ Name: fixObservableSubclass ]]
-    -- upvalues: l_Observable_0 (copy)
-    local function _(v5) --[[ Line: 32 ]] --[[ Name: set ]]
-        -- upvalues: v4 (copy), l_Observable_0 (ref)
-        v4[v5] = l_Observable_0;
-    end;
-    v4["@@species"] = l_Observable_0;
-    return v4;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+
+local Observable = require(script.Parent.Observable).Observable
+
+function t1.fixObservableSubclass(p1) -- line: 30
+	-- upvalues: Observable (copy)
+	local function set(p2) -- line: 32
+		-- upvalues: p1 (copy), Observable (copy)
+		p1[p2] = Observable
+	end
+
+	p1["@@species"] = Observable
+
+	return p1
+end
+
+return t1

@@ -1,32 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_script_FirstAncestor_0.Service.ChromeUtils);
-return function(v4, v5) --[[ Line: 7 ]]
-    -- upvalues: v2 (copy)
-    if not v4 then
-        warn("observableValue undefined");
-        return v2.useBinding(nil);
-    else
-        local v6 = nil;
-        v6 = v5 or function(v7) --[[ Line: 17 ]]
-            return v7;
-        end;
-        local v8, v9 = v2.useBinding(v6(v4:get()));
-        v2.useEffect(function() --[[ Line: 24 ]]
-            -- upvalues: v4 (copy), v9 (copy), v6 (ref)
-            local v10 = v4:connect(function() --[[ Line: 25 ]]
-                -- upvalues: v9 (ref), v6 (ref), v4 (ref)
-                v9(v6(v4:get()));
-            end);
-            v9(v6(v4:get()));
-            return function() --[[ Line: 31 ]]
-                -- upvalues: v10 (copy)
-                v10:disconnect();
-            end;
-        end, {
-            v4
-        });
-        return v8;
-    end;
-end;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+
+require(ChromeShared.Service.ChromeUtils)
+
+return function(p1, p2: ((...any) -> ...any)?) -- line: 7
+	-- upvalues: React (copy)
+	if not p1 then
+		warn("observableValue undefined")
+
+		return React.useBinding(nil)
+	end
+
+	local u6 = p2 or function(p3) -- line: 17
+		return p3
+	end
+	local v7, v8 = React.useBinding(u6(p1:get()))
+
+	React.useEffect(function() -- line: 24
+		-- upvalues: p1 (copy), v8 (copy), u6 (ref)
+		local v10 = p1:connect(function() -- line: 25
+			-- upvalues: v8 (copy), u6 (ref), p1 (copy)
+			v8(u6(p1:get()))
+		end)
+
+		v8(u6(p1:get()))
+
+		return function() -- line: 31
+			-- upvalues: v10 (copy)
+			v10:disconnect()
+		end
+	end, { p1 })
+
+	return v7
+end

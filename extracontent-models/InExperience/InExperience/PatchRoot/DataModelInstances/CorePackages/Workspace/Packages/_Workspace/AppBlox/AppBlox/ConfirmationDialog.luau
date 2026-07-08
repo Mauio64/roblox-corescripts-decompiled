@@ -1,41 +1,43 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_Parent_0.Foundation);
-local l_Dialog_0 = v3.Dialog;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-return function(v6) --[[ Line: 34 ]]
-    -- upvalues: l_useLocalization_0 (copy), v1 (copy), l_Dialog_0 (copy), l_ButtonVariant_0 (copy)
-    local v7 = l_useLocalization_0({
-        confirmButtonText = "CommonUI.Controls.Action.Confirm", 
-        cancelButtonText = "CommonUI.Controls.Action.Cancel"
-    });
-    return v1.createElement(l_Dialog_0.Root, {
-        hasBackdrop = true, 
-        disablePortal = v6.disablePortal, 
-        onClose = if v6.showCloseButton then v6.onCancel else nil
-    }, {
-        DialogTitle = v1.createElement(l_Dialog_0.Title, {
-            text = v6.title
-        }), 
-        DialogContent = v1.createElement(l_Dialog_0.Content, nil, {
-            DialogText = v1.createElement(l_Dialog_0.Text, {
-                Text = v6.body
-            })
-        }), 
-        DialogActions = v1.createElement(l_Dialog_0.Actions, {
-            actions = {
-                {
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    text = v6.confirmButtonText or v7.confirmButtonText, 
-                    onActivated = v6.onConfirm
-                }, 
-                {
-                    variant = l_ButtonVariant_0.Standard, 
-                    text = v6.cancelButtonText or v7.cancelButtonText, 
-                    onActivated = v6.onCancel
-                }
-            }
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local React = require(Parent.React)
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Foundation = require(Parent.Foundation)
+local Dialog = Foundation.Dialog
+local ButtonVariant = Foundation.Enums.ButtonVariant
+
+return function(t1: {[any]: any}) -- line: 34
+	-- upvalues: useLocalization (copy), React (copy), Dialog (copy), ButtonVariant (copy)
+	local v8 = useLocalization({
+		confirmButtonText = "CommonUI.Controls.Action.Confirm",
+		cancelButtonText = "CommonUI.Controls.Action.Cancel"
+	})
+
+	return React.createElement(Dialog.Root, {
+		hasBackdrop = true,
+		disablePortal = t1.disablePortal,
+		onClose = if not t1.showCloseButton then nil else t1.onCancel
+	}, {
+		DialogTitle = React.createElement(Dialog.Title, {
+			text = t1.title
+		}),
+		DialogContent = React.createElement(Dialog.Content, nil, {
+			DialogText = React.createElement(Dialog.Text, {
+				Text = t1.body
+			})
+		}),
+		DialogActions = React.createElement(Dialog.Actions, {
+			actions = {
+				{
+					variant = ButtonVariant.Emphasis,
+					text = t1.confirmButtonText or v8.confirmButtonText,
+					onActivated = t1.onConfirm
+				},
+				{
+					variant = ButtonVariant.Standard,
+					text = t1.cancelButtonText or v8.cancelButtonText,
+					onActivated = t1.onCancel
+				}
+			}
+		})
+	})
+end

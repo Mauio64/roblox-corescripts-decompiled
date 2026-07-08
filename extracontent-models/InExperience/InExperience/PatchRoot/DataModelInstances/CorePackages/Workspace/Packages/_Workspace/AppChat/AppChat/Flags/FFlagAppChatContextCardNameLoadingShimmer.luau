@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatContextCardNameLoadingShimmer", false);
+return game:DefineFastFlag("AppChatContextCardNameLoadingShimmer", false)

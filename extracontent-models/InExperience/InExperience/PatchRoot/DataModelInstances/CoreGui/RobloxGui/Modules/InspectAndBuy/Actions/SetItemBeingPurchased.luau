@@ -1,7 +1,8 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function(v1, v2) --[[ Line: 4 ]]
-    return {
-        itemId = v1, 
-        itemType = v2
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2) -- line: 4
+	return {
+		itemId = p1,
+		itemType = p2
+	}
+end)

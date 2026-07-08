@@ -1,27 +1,33 @@
-local l_Parent_0 = script:FindFirstAncestor("Loggers").Parent;
-local v1 = require(l_Parent_0.RobloxAppEvents);
-local l_FFlagDebugUnmuteLuaErrors_0 = require(l_Parent_0.SharedFlags).Debug.FFlagDebugUnmuteLuaErrors;
-local function _() --[[ Line: 20 ]] --[[ Name: IsRunningInStudio ]]
-    return game:GetService("RunService"):IsStudio();
-end;
-return function(v4, v5) --[[ Line: 24 ]]
-    -- upvalues: l_FFlagDebugUnmuteLuaErrors_0 (copy), v1 (copy)
-    if type(v4) ~= "string" then
-        warn("mutedError: errorMessage should be a string!");
-        local l_status_0, _ = pcall(function() --[[ Line: 28 ]]
-            -- upvalues: v4 (ref)
-            v4 = tostring(v4);
-        end);
-        if not l_status_0 then
-            v4 = "mutedError";
-        end;
-    end;
-    if l_FFlagDebugUnmuteLuaErrors_0 or game:GetService("RunService"):IsStudio() or _G.__TESTEZ_RUNNING_TEST__ then
-        error(v4);
-    else
-        if type(v5) == "table" and type(v5.stacks) == "table" then
-            table.insert(v5.stacks, debug.traceback());
-        end;
-        v1.ReportMutedError:fire(v4, debug.traceback(), script, v5);
-    end;
-end;
+local Parent = script:FindFirstAncestor("Loggers").Parent
+local RobloxAppEvents = require(Parent.RobloxAppEvents)
+local FFlagDebugUnmuteLuaErrors = require(Parent.SharedFlags).Debug.FFlagDebugUnmuteLuaErrors
+
+local function IsRunningInStudio() -- line: 20
+	return game:GetService("RunService"):IsStudio()
+end
+
+return function(s1: string, p1) -- line: 24
+	-- upvalues: FFlagDebugUnmuteLuaErrors (copy), RobloxAppEvents (copy)
+	if type(s1) ~= "string" then
+		warn("mutedError: errorMessage should be a string!")
+
+		local ok, _ = pcall(function() -- line: 28
+			-- upvalues: s1 (ref)
+			s1 = tostring(s1)
+		end)
+
+		if not ok then
+			s1 = "mutedError"
+		end
+	end
+
+	if FFlagDebugUnmuteLuaErrors or game:GetService("RunService"):IsStudio() or _G.__TESTEZ_RUNNING_TEST__ then
+		error(s1)
+	else
+		if type(p1) == "table" and type(p1.stacks) == "table" then
+			table.insert(p1.stacks, debug.traceback())
+		end
+
+		RobloxAppEvents.ReportMutedError:fire(s1, debug.traceback(), script, p1)
+	end
+end

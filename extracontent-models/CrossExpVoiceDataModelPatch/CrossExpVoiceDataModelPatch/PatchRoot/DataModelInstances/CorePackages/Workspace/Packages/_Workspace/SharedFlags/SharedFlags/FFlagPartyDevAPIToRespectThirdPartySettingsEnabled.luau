@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PartyDevAPIToRespectThirdPartySettingsEnabled", false);
+return game:DefineFastFlag("PartyDevAPIToRespectThirdPartySettingsEnabled", false)

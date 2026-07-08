@@ -1,53 +1,60 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("LegacyFriendsRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local l_RetrievalStatus_0 = require(l_Parent_0.Http).Enum.RetrievalStatus;
-local l_FetchUserFriendsStarted_0 = require(l_script_FirstAncestor_0.Actions).FetchUserFriendsStarted;
-local l_FetchUserFriendsFailed_0 = require(l_script_FirstAncestor_0.Actions).FetchUserFriendsFailed;
-local l_FetchUserFriendsCompleted_0 = require(l_script_FirstAncestor_0.Actions).FetchUserFriendsCompleted;
-local function v12(v7, v8, v9, v10) --[[ Line: 11 ]] --[[ Name: setFieldPerUser ]]
-    -- upvalues: l_Immutable_0 (copy)
-    local v11 = v7[v8] or {};
-    return l_Immutable_0.JoinDictionaries(v7, {
-        [v8] = l_Immutable_0.JoinDictionaries(v11, {
-            [v9] = v10
-        })
-    });
-end;
-local function _(v13, v14, v15) --[[ Line: 20 ]] --[[ Name: setRetrievalStatus ]]
-    -- upvalues: v12 (copy)
-    return v12(v13, "retrievalStatus", v14, v15);
-end;
-local function _(v17, v18, v19) --[[ Line: 24 ]] --[[ Name: setRetrievalFailureResponse ]]
-    -- upvalues: v12 (copy)
-    return v12(v17, "retrievalFailureResponse", v18, v19);
-end;
-return function(v21, v22) --[[ Line: 28 ]]
-    -- upvalues: l_FetchUserFriendsStarted_0 (copy), l_RetrievalStatus_0 (copy), v12 (copy), l_FetchUserFriendsFailed_0 (copy), l_FetchUserFriendsCompleted_0 (copy)
-    v21 = v21 or {
-        retrievalStatus = {}, 
-        retrievalFailureResponse = {}
-    };
-    if v22.type == l_FetchUserFriendsStarted_0.name then
-        local l_v21_0 = v21;
-        local l_userId_0 = v22.userId;
-        local l_Fetching_0 = l_RetrievalStatus_0.Fetching;
-        return (v12(l_v21_0, "retrievalStatus", l_userId_0, l_Fetching_0));
-    elseif v22.type == l_FetchUserFriendsFailed_0.name then
-        local l_v21_1 = v21;
-        local l_userId_1 = v22.userId;
-        local l_Failed_0 = l_RetrievalStatus_0.Failed;
-        l_v21_1 = v12(l_v21_1, "retrievalStatus", l_userId_1, l_Failed_0);
-        l_userId_1 = v22.userId;
-        l_Failed_0 = v22.response;
-        return (v12(l_v21_1, "retrievalFailureResponse", l_userId_1, l_Failed_0));
-    else
-        if v22.type == l_FetchUserFriendsCompleted_0.name then
-            local l_v21_2 = v21;
-            local l_userId_2 = v22.userId;
-            local l_Done_0 = l_RetrievalStatus_0.Done;
-            v21 = v12(l_v21_2, "retrievalStatus", l_userId_2, l_Done_0);
-        end;
-        return v21;
-    end;
-end;
+local LegacyFriendsRodux = script:FindFirstAncestor("LegacyFriendsRodux")
+local LegacyFriendsRoduxParent = LegacyFriendsRodux.Parent
+local Immutable = require(LegacyFriendsRoduxParent.AppCommonLib).Immutable
+local RetrievalStatus = require(LegacyFriendsRoduxParent.Http).Enum.RetrievalStatus
+local FetchUserFriendsStarted = require(LegacyFriendsRodux.Actions).FetchUserFriendsStarted
+local FetchUserFriendsFailed = require(LegacyFriendsRodux.Actions).FetchUserFriendsFailed
+local FetchUserFriendsCompleted = require(LegacyFriendsRodux.Actions).FetchUserFriendsCompleted
+
+local function setFieldPerUser(p1, p2, p3, p4) -- line: 11
+	-- upvalues: Immutable (copy)
+	local v15 = p1[p2] or {}
+
+	return Immutable.JoinDictionaries(p1, {
+		[p2] = Immutable.JoinDictionaries(v15, {
+			[p3] = p4
+		})
+	})
+end
+local function setRetrievalStatus(p5, p6, p7) -- line: 20
+	-- upvalues: setFieldPerUser (copy)
+	return setFieldPerUser(p5, "retrievalStatus", p6, p7)
+end
+local function setRetrievalFailureResponse(p8, p9, p10) -- line: 24
+	-- upvalues: setFieldPerUser (copy)
+	return setFieldPerUser(p8, "retrievalFailureResponse", p9, p10)
+end
+
+return function(p11, p12) -- line: 28
+	-- upvalues: FetchUserFriendsStarted (copy), RetrievalStatus (copy), setFieldPerUser (copy), FetchUserFriendsFailed (copy), FetchUserFriendsCompleted (copy)
+	local v24 = p11 or {
+		retrievalStatus = {},
+		retrievalFailureResponse = {}
+	}
+
+	if p12.type == FetchUserFriendsStarted.name then
+		local userId = p12.userId
+		local Fetching = RetrievalStatus.Fetching
+
+		return (setFieldPerUser(v24, "retrievalStatus", userId, Fetching))
+	end
+
+	if p12.type == FetchUserFriendsFailed.name then
+		local userId = p12.userId
+		local Failed = RetrievalStatus.Failed
+		local v29 = setFieldPerUser(v24, "retrievalStatus", userId, Failed)
+		local userId2 = p12.userId
+		local response = p12.response
+
+		return (setFieldPerUser(v29, "retrievalFailureResponse", userId2, response))
+	end
+
+	if p12.type == FetchUserFriendsCompleted.name then
+		local userId = p12.userId
+		local Done = RetrievalStatus.Done
+
+		v24 = setFieldPerUser(v24, "retrievalStatus", userId, Done)
+	end
+
+	return v24
+end

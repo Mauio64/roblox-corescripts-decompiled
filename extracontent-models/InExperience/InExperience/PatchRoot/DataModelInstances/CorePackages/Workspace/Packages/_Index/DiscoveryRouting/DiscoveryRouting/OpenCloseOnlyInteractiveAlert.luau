@@ -1,16 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryRouting").Parent;
-local l_CentralOverlayType_0 = require(l_Parent_0.RobloxAppEnums).CentralOverlayType;
-local l_SetCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Actions.SetCentralOverlay;
-return function(v3, v4, v5, v6, v7) --[[ Line: 6 ]]
-    -- upvalues: l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy)
-    return function(v8) --[[ Line: 7 ]]
-        -- upvalues: l_SetCentralOverlay_0 (ref), l_CentralOverlayType_0 (ref), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy)
-        v8:dispatch(l_SetCentralOverlay_0(l_CentralOverlayType_0.CloseOnlyInteractiveAlert, {
-            title = v3, 
-            body = v4, 
-            closeAlert = v5, 
-            buttonText = v6, 
-            showCloseButton = v7
-        }));
-    end;
-end;
+local Parent = script:FindFirstAncestor("DiscoveryRouting").Parent
+local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
+local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+
+return function(s1: string, s2: string, p1: ((...any) -> ...any), s3: string?, b1: boolean?) -- line: 6
+	-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
+	return function(p2) -- line: 7
+		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), s1 (copy), s2 (copy), p1 (copy), s3 (copy), b1 (copy)
+		p2:dispatch(SetCentralOverlay(CentralOverlayType.CloseOnlyInteractiveAlert, {
+			title = s1,
+			body = s2,
+			closeAlert = p1,
+			buttonText = s3,
+			showCloseButton = b1
+		}))
+	end
+end

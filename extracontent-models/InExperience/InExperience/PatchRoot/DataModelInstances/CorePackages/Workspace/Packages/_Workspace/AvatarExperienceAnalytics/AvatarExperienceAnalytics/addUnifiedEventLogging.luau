@@ -1,36 +1,41 @@
-local l_CollectionService_0 = game:GetService("CollectionService");
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent;
-local v2 = require(script.Parent.UnifiedEventLogConstants);
-local l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents;
-local v4 = {
-    table = true, 
-    string = true, 
-    number = true, 
-    boolean = true
-};
-return function(v5, v6, v7) --[[ Line: 23 ]]
-    -- upvalues: l_CollectionService_0 (copy), v2 (copy), l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 (copy), v4 (copy)
-    if not v5.current then
-        return;
-    else
-        l_CollectionService_0:AddTag(v5.current, v2.TAG_NAME);
-        if v7 and v7.hasDeferredActions then
-            v5.current:SetAttribute(v2.HAS_DEFERRED_ACTION, true);
-        end;
-        if l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 and v7 and v7.isSelected ~= nil then
-            v5.current:SetAttribute(v2.IS_SELECTED, v7.isSelected);
-        end;
-        if v7 and v7.sessionTagName then
-            v5.current:SetAttribute(v2.SESSION_TAG_NAME, v7.sessionTagName);
-        end;
-        if v6 then
-            for v8, _ in v6 do
-                if v4[type(v6[v8])] then
-                    local v10 = if type(v6[v8]) == "table" then table.concat(v6[v8], ",") else v6[v8];
-                    v5.current:SetAttribute(v2.ATTRIBUTE_PREFIX .. v8, v10);
-                end;
-            end;
-        end;
-        return;
-    end;
-end;
+local CollectionService = game:GetService("CollectionService")
+local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+local FFlagAXMISEnableMultiShoppingUnifiedEvents = require(Parent.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents
+local t1 = {
+	table = true,
+	string = true,
+	number = true,
+	boolean = true
+}
+
+return function(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}?) -- line: 23
+	-- upvalues: CollectionService (copy), UnifiedEventLogConstants (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), t1 (copy)
+	if not t2.current then
+		return
+	end
+
+	CollectionService:AddTag(t2.current, UnifiedEventLogConstants.TAG_NAME)
+
+	if t4 and t4.hasDeferredActions then
+		t2.current:SetAttribute(UnifiedEventLogConstants.HAS_DEFERRED_ACTION, true)
+	end
+
+	if FFlagAXMISEnableMultiShoppingUnifiedEvents and t4 and t4.isSelected ~= nil then
+		t2.current:SetAttribute(UnifiedEventLogConstants.IS_SELECTED, t4.isSelected)
+	end
+
+	if t4 and t4.sessionTagName then
+		t2.current:SetAttribute(UnifiedEventLogConstants.SESSION_TAG_NAME, t4.sessionTagName)
+	end
+
+	if t3 then
+		for v9, _ in t3 do
+			if t1[type(t3[v9])] then
+				local v11 = if type(t3[v9]) ~= "table" then t3[v9] else table.concat(t3[v9], ",")
+
+				t2.current:SetAttribute(UnifiedEventLogConstants.ATTRIBUTE_PREFIX .. v9, v11)
+			end
+		end
+	end
+end

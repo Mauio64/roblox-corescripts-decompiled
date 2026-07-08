@@ -11,25 +11,28 @@ local FFlagAXEditorSubcategoryFilters = AvatarExperienceFlags.FFlagAXEditorSubca
 local FFlagAXMISEnableMultiShopping = AvatarExperienceFlags.FFlagAXMISEnableMultiShopping
 local FFlagAXEnableExpiredUserLookCheckout = AvatarExperienceFlags.FFlagAXEnableExpiredUserLookCheckout
 local FFlagAXFixGamepadNavigationOnOutfitManagement = AvatarExperienceFlags.FFlagAXFixGamepadNavigationOnOutfitManagement
-local v11 = game:DefineFastFlag("AXEnableMultiTryOnUI", false)
-local v12 = game:DefineFastFlag("AXKeepTryOnsInAvatarEditor", false)
+local FFlagAXOutfitPageRevamp = AvatarExperienceFlags.FFlagAXOutfitPageRevamp
+local v12 = game:DefineFastFlag("AXEnableMultiTryOnUI", false)
+local v13 = game:DefineFastFlag("AXKeepTryOnsInAvatarEditor", false)
 local FFlagAXFixAvatarScreenVR = AvatarExperienceFlags.FFlagAXFixAvatarScreenVR
 local FFlagAXMakeupReleaseFTUX = AvatarExperienceFlags.FFlagAXMakeupReleaseFTUX
 local FFlagAXCatalogMakeupSupport = AvatarExperienceFlags.FFlagAXCatalogMakeupSupport
+local FFlagAXFixTryOnItemVR = AvatarExperienceFlags.FFlagAXFixTryOnItemVR
+local FFlagAXEnableProfileTab = require(AvatarExperienceNavigationParent.SharedFlags).FFlagAXEnableProfileTab
 local t1 = {
 	isTransparent = false,
 	coversSceneWhenExpanded = false,
-	isMultiTryOn = not not FFlagAXMISEnableMultiShopping and nil,
 	isTryOnOutfitResetPage = false,
 	isRefinementPage = false,
 	refinementButtonVisible = false,
 	VRPanelRoundedCorners = false,
-	VRPanelPlacement = "Center"
+	VRPanelPlacement = "Center",
+	isMultiTryOn = not not FFlagAXMISEnableMultiShopping and nil
 }
 local t2 = {
 	[AvatarScreen.AccessoryAdjustment] = {
 		isRefinementPage = true,
-		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v11 else nil,
+		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v12 else nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
 		}
@@ -45,7 +48,7 @@ local t2 = {
 		refinementButtonVisible = true,
 		VRPanelPlacement = "None",
 		VRPanelRoundedCorners = true,
-		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v11 else nil,
+		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v12 else nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.CATALOG
 		}
@@ -57,7 +60,7 @@ local t2 = {
 		refinementButtonVisible = true,
 		VRPanelPlacement = "None",
 		VRPanelRoundedCorners = true,
-		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v11 else nil,
+		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v12 else nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.SEARCH_RESULTS
 		}
@@ -66,7 +69,7 @@ local t2 = {
 		refinementButtonVisible = true,
 		VRPanelPlacement = "None",
 		VRPanelRoundedCorners = true,
-		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v11 else nil,
+		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v12 else nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.SEARCH_LANDING_PAGE
 		}
@@ -101,7 +104,7 @@ local t2 = {
 	[AvatarScreen.LayeredClothingSort] = {
 		isRefinementPage = true,
 		VRPanelPlacement = "Center",
-		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v11 else nil,
+		isMultiTryOn = if not FFlagAXMISEnableMultiShopping then v12 else nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
 		}
@@ -110,10 +113,10 @@ local t2 = {
 		VRPanelPlacement = "Right"
 	},
 	[AvatarScreen.AvatarEditor] = {
-		isTryOnOutfitResetPage = not v12,
 		refinementButtonVisible = true,
 		VRPanelPlacement = "None",
 		VRPanelRoundedCorners = true,
+		isTryOnOutfitResetPage = not v13,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
 		}
@@ -158,6 +161,8 @@ local t2 = {
 	},
 	[AvatarScreen.TryOnItem] = {
 		isTransparent = false,
+		VRPanelPlacement = if not FFlagAXFixTryOnItemVR then nil else "Right",
+		VRPanelRoundedCorners = not not FFlagAXFixTryOnItemVR or nil,
 		analyticsData = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.ITEM_DETAILS
 		}
@@ -200,6 +205,11 @@ local t2 = {
 			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
 		}
 	},
+	[AvatarScreen.FavoritesSaved] = {
+		refinementButtonVisible = true,
+		VRPanelPlacement = "None",
+		VRPanelRoundedCorners = true
+	},
 	[AvatarScreen.CommunityAvatarEntryMenu] = {
 		VRPanelPlacement = "Left"
 	},
@@ -233,6 +243,33 @@ local t2 = {
 		}
 	}
 }
+
+if FFlagAXOutfitPageRevamp then
+	t2[AvatarScreen.AddOutfitDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Left",
+		VRPanelRoundedCorners = true,
+		analyticsData = {
+			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
+		}
+	}
+	t2[AvatarScreen.DuplicateOutfitDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Left"
+	}
+	t2[AvatarScreen.DuplicateOutfitNameDialog] = {
+		isTransparent = false,
+		VRPanelPlacement = "Left"
+	}
+	t2[AvatarScreen.ManageOutfitsPage] = {
+		isTransparent = false,
+		VRPanelPlacement = "Left",
+		VRPanelRoundedCorners = true,
+		analyticsData = {
+			unifiedLoggingSurface = UnifiedLoggingSurface.CUSTOMIZE
+		}
+	}
+end
 
 if FFlagAXFixAvatarScreenVR then
 	if FFlagAXCatalogMakeupSupport then
@@ -271,6 +308,15 @@ if FFlagAXMISEnableMultiShopping then
 	}
 end
 
+if FFlagAXEnableProfileTab then
+	t2[AvatarScreen.Profile] = {
+		refinementButtonVisible = true,
+		isTryOnOutfitResetPage = true,
+		VRPanelPlacement = "None",
+		VRPanelRoundedCorners = true
+	}
+end
+
 if FFlagAXEnableExpiredUserLookCheckout then
 	t2[AvatarScreen.ExpiredUserLookActionBar] = {
 		isTransparent = true,
@@ -290,8 +336,8 @@ end
 
 local t3 = {}
 
-for _, v20 in AvatarScreen do
-	t3[v20] = Cryo.Dictionary.join(t1, t2[v20] or {})
+for _, v23 in AvatarScreen do
+	t3[v23] = Cryo.Dictionary.join(t1, t2[v23] or {})
 end
 
 return t3

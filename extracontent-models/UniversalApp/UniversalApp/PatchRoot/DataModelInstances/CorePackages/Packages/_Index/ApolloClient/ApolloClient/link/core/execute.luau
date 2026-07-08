@@ -1,3 +1,3 @@
 return {
-    execute = require(script.Parent.ApolloLink).ApolloLink.execute
-};
+	execute = require(script.Parent.ApolloLink).ApolloLink.execute
+}

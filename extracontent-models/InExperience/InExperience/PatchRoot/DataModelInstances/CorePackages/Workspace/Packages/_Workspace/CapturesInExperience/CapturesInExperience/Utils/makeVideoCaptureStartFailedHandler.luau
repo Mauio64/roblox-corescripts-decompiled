@@ -1,24 +1,35 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.CapturesToastType);
-local v2 = require(l_Parent_0.Actions.ToastTriggered);
-return function(v3) --[[ Line: 6 ]] --[[ Name: makeVideoCaptureStartFailedHandler ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return function(v4) --[[ Line: 7 ]] --[[ Name: videoCaptureStartFailedHandler ]]
-        -- upvalues: v3 (copy), v2 (ref), v1 (ref)
-        if v4 == Enum.VideoCaptureStartedResult.CapturingAlready then
-            v3(v2(v1.VideoCaptureInitializationCapturingAlreadyError));
-            return;
-        elseif v4 == Enum.VideoCaptureStartedResult.NoDeviceSupport then
-            v3(v2(v1.VideoCaptureInitializationNoDeviceSupportError));
-            return;
-        elseif v4 == Enum.VideoCaptureStartedResult.NoSpaceOnDevice then
-            v3(v2(v1.VideoCaptureInitializationNoSpaceOnDeviceError));
-            return;
-        else
-            if v4 == Enum.VideoCaptureStartedResult.OtherError then
-                v3(v2(v1.VideoCaptureInitializationOtherError));
-            end;
-            return;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
+local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+
+local function makeVideoCaptureStartFailedHandler(p1) -- line: 6
+	-- upvalues: ToastTriggered (copy), CapturesToastType (copy)
+	local function videoCaptureStartFailedHandler(p2) -- line: 7
+		-- upvalues: p1 (copy), ToastTriggered (copy), CapturesToastType (copy)
+		if p2 == Enum.VideoCaptureStartedResult.CapturingAlready then
+			p1(ToastTriggered(CapturesToastType.VideoCaptureInitializationCapturingAlreadyError))
+
+			return
+		end
+
+		if p2 == Enum.VideoCaptureStartedResult.NoDeviceSupport then
+			p1(ToastTriggered(CapturesToastType.VideoCaptureInitializationNoDeviceSupportError))
+
+			return
+		end
+
+		if p2 == Enum.VideoCaptureStartedResult.NoSpaceOnDevice then
+			p1(ToastTriggered(CapturesToastType.VideoCaptureInitializationNoSpaceOnDeviceError))
+
+			return
+		end
+
+		if p2 == Enum.VideoCaptureStartedResult.OtherError then
+			p1(ToastTriggered(CapturesToastType.VideoCaptureInitializationOtherError))
+		end
+	end
+
+	return videoCaptureStartFailedHandler
+end
+
+return makeVideoCaptureStartFailedHandler

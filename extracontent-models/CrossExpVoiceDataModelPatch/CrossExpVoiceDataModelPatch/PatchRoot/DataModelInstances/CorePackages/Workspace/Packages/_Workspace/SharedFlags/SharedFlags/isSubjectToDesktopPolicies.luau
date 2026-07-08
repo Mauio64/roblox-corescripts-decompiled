@@ -1,12 +1,6 @@
-local l_Platform_0 = game:GetService("UserInputService"):GetPlatform();
-return function() --[[ Line: 4 ]]
-    -- upvalues: l_Platform_0 (copy)
-    local v1 = true;
-    if l_Platform_0 ~= Enum.Platform.Windows then
-        v1 = true;
-        if l_Platform_0 ~= Enum.Platform.OSX then
-            v1 = l_Platform_0 == Enum.Platform.UWP;
-        end;
-    end;
-    return v1;
-end;
+local Platform = game:GetService("UserInputService"):GetPlatform()
+
+return function() -- line: 4
+	-- upvalues: Platform (copy)
+	return Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP)
+end

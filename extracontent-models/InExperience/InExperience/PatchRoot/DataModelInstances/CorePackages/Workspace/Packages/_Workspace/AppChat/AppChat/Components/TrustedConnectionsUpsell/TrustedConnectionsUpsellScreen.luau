@@ -1,35 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v4 = require(l_script_FirstAncestor_0.EnumScreens);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v6 = require(script.Parent.TrustedConnectionsUpsellContainer);
-return function(_) --[[ Line: 13 ]]
-    -- upvalues: l_useNavigation_0 (copy), v2 (copy), v4 (copy), v3 (copy), v6 (copy)
-    local v8 = l_useNavigation_0();
-    local v9 = v8 and v8.getParam("conversationId", nil);
-    local v10 = v8 and v8.getParam("modalVariant", nil);
-    local v11 = v2.useCallback(function() --[[ Line: 17 ]]
-        -- upvalues: v8 (copy), v4 (ref)
-        if v8 and v8.state.routeName == v4.TrustedConnectionsUpsell then
-            v8.goBack(v8.state.key);
-        end;
-    end, {
-        v8
-    });
-    if not v10 or not v9 then
-        v3:error("TrustedConnectionsUpsellScreen: Missing required parameters", {
-            conversationId = v9, 
-            modalVariant = v10
-        });
-        v8.goBack();
-        return nil;
-    else
-        return v2.createElement(v6, {
-            conversationId = v9, 
-            dismissModal = v11, 
-            modalVariant = v10
-        });
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local v4 = require(AppChat.Logger):new(script.Name)
+local EnumScreens = require(AppChat.EnumScreens)
+local useNavigation = require(AppChatParent.Navigation).useNavigation
+local TrustedConnectionsUpsellContainer = require(script.Parent.TrustedConnectionsUpsellContainer)
+
+return function(_: {[any]: any}) -- line: 13
+	-- upvalues: useNavigation (copy), React (copy), EnumScreens (copy), v4 (copy), TrustedConnectionsUpsellContainer (copy)
+	local v9 = useNavigation()
+	local v10 = v9 and v9.getParam("conversationId", nil)
+	local v11 = v9 and v9.getParam("modalVariant", nil)
+	local v12 = React.useCallback(function() -- line: 17
+		-- upvalues: v9 (copy), EnumScreens (copy)
+		if v9 and v9.state.routeName == EnumScreens.TrustedConnectionsUpsell then
+			v9.goBack(v9.state.key)
+		end
+	end, { v9 })
+
+	if not v11 or not v10 then
+		v4:error("TrustedConnectionsUpsellScreen: Missing required parameters", {
+			conversationId = v10,
+			modalVariant = v11
+		})
+		v9.goBack()
+
+		return nil
+	end
+
+	return React.createElement(TrustedConnectionsUpsellContainer, {
+		conversationId = v10,
+		dismissModal = v12,
+		modalVariant = v11
+	})
+end

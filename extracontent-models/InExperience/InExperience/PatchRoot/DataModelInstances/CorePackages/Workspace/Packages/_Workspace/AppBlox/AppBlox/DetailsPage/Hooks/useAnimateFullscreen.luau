@@ -1,31 +1,37 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-return function(v3, v4, v5) --[[ Line: 7 ]] --[[ Name: useAnimateFullscreen ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v6 = v4 ~= nil;
-    local v7 = v3 and v6 and 0 or 1;
-    local v8, v9 = v1.useState(v7);
-    local v10, v11 = v1.useState(false);
-    local v12 = v1.useCallback(function() --[[ Line: 17 ]]
-        -- upvalues: v11 (copy)
-        v11(false);
-    end, {});
-    local v13, v14 = v2.useAnimatedBinding(v7, v12);
-    v1.useEffect(function() --[[ Line: 23 ]]
-        -- upvalues: v7 (copy), v8 (copy), v9 (copy), v11 (copy), v14 (copy), v2 (ref), v5 (copy)
-        if v7 == v8 then
-            return nil;
-        else
-            v9(v7);
-            v11(true);
-            v14(v2.spring(v7, v5));
-            return nil;
-        end;
-    end, {
-        v7, 
-        v8, 
-        v5
-    });
-    return (not not v10 or v3) and v6, v13;
-end;
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+
+local function useAnimateFullscreen(b1: boolean, p1: ((...any) -> ...any), p2) -- line: 7
+	-- upvalues: React (copy), ReactOtter (copy)
+	local v8 = p1 ~= nil
+	local v9 = (not b1 or not v8) and 1 or 0
+	local v10, v11 = React.useState(v9)
+	local v12, v13 = React.useState(false)
+	local v14 = React.useCallback(function() -- line: 17
+		-- upvalues: v13 (copy)
+		v13(false)
+	end, {})
+	local v15, v16 = ReactOtter.useAnimatedBinding(v9, v14)
+
+	React.useEffect(function() -- line: 23
+		-- upvalues: v9 (copy), v10 (copy), v11 (copy), v13 (copy), v16 (copy), ReactOtter (copy), p2 (copy)
+		if v9 == v10 then
+			return nil
+		end
+
+		v11(v9)
+		v13(true)
+		v16(ReactOtter.spring(v9, p2))
+
+		return nil
+	end, {
+		v9,
+		v10,
+		p2
+	})
+
+	return (v12 or b1) and v8, v15
+end
+
+return useAnimateFullscreen

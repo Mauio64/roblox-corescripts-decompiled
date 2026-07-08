@@ -1,1 +1,1 @@
-return require(script.UnibarMenuWrapper);
+return require(script.UnibarMenuWrapper)

@@ -1,69 +1,74 @@
-local l_Parent_0 = script:FindFirstAncestor("InlineRichText").Parent;
-local v1 = require(l_Parent_0.React);
-local l_ProviderContainer_0 = require(l_Parent_0.RoactUtils).Components.ProviderContainer;
-local v3 = require(l_Parent_0.Style);
-local l_StyleProviderWithDefaultTheme_0 = v3.StyleProviderWithDefaultTheme;
-local l_FoundationProvider_0 = require(l_Parent_0.Foundation).FoundationProvider;
-local v6 = require(l_Parent_0.Cryo);
-local v7 = require(l_Parent_0.Rodux);
-local v8 = require(l_Parent_0.RoactRodux);
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local v10 = require(l_Parent_0.NavigationRodux);
-local v11 = {
-    withUiModeSupport = false
-};
-return function(v12) --[[ Line: 31 ]] --[[ Name: MockProviders ]]
-    -- upvalues: v6 (copy), v11 (copy), l_FoundationProvider_0 (copy), v8 (copy), v7 (copy), v10 (copy), l_StyleProviderWithDefaultTheme_0 (copy), v3 (copy), l_LocalizationProvider_0 (copy), v1 (copy), l_ProviderContainer_0 (copy)
-    local v13 = v6.Dictionary.union(v11, v12);
-    local v14 = {};
-    table.insert(v14, {
-        class = l_FoundationProvider_0, 
-        props = {
-            device = "Desktop", 
-            theme = v13.themeName
-        }
-    });
-    table.insert(v14, {
-        class = v8.StoreProvider, 
-        props = {
-            store = v7.Store.new(function(v15, _) --[[ Line: 47 ]]
-                return v15;
-            end, {
-                Navigation = {
-                    lockNavigationActions = false
-                }
-            }, {
-                v7.thunkMiddleware, 
-                v10.Thunks.RNAdapterThunk.middleware(function(v17) --[[ Line: 55 ]]
-                    print((("[Mock Providers Debug] Navigating to %* with detail %*"):format(v17.routeName, v17.params.detail)));
-                end)
-            })
-        }
-    });
-    table.insert(v14, {
-        class = l_StyleProviderWithDefaultTheme_0, 
-        props = {
-            withDarkTheme = v13.themeName ~= "Light", 
-            withUiModeSupport = v13.withUiModeSupport
-        }
-    });
-    table.insert(v14, {
-        class = v3.DesignTokenProvider, 
-        props = {
-            tokenMappers = {}
-        }
-    });
-    table.insert(v14, {
-        class = l_LocalizationProvider_0, 
-        props = {
-            localization = {
-                Format = function(_, v19) --[[ Line: 81 ]] --[[ Name: Format ]]
-                    return v19;
-                end
-            }
-        }
-    });
-    return v1.createElement(l_ProviderContainer_0, {
-        providers = v14
-    }, v13.children);
-end;
+local Parent = script:FindFirstAncestor("InlineRichText").Parent
+local React = require(Parent.React)
+local ProviderContainer = require(Parent.RoactUtils).Components.ProviderContainer
+local Style = require(Parent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local FoundationProvider = require(Parent.Foundation).FoundationProvider
+local Cryo = require(Parent.Cryo)
+local Rodux = require(Parent.Rodux)
+local RoactRodux = require(Parent.RoactRodux)
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+local NavigationRodux = require(Parent.NavigationRodux)
+local t1 = {
+	withUiModeSupport = false
+}
+
+local function MockProviders(t2: {[any]: any}) -- line: 31
+	-- upvalues: Cryo (copy), t1 (copy), FoundationProvider (copy), RoactRodux (copy), Rodux (copy), NavigationRodux (copy), StyleProviderWithDefaultTheme (copy), Style (copy), LocalizationProvider (copy), React (copy), ProviderContainer (copy)
+	local v15 = Cryo.Dictionary.union(t1, t2)
+	local t3 = {}
+
+	table.insert(t3, {
+		class = FoundationProvider,
+		props = {
+			device = "Desktop",
+			theme = v15.themeName
+		}
+	})
+	table.insert(t3, {
+		class = RoactRodux.StoreProvider,
+		props = {
+			store = Rodux.Store.new(function(p1, _) -- line: 47
+				return p1
+			end, {
+				Navigation = {
+					lockNavigationActions = false
+				}
+			}, {
+				Rodux.thunkMiddleware,
+				NavigationRodux.Thunks.RNAdapterThunk.middleware(function(p3) -- line: 55
+					print(`[Mock Providers Debug] Navigating to { p3.routeName } with detail { p3.params.detail }`)
+				end)
+			})
+		}
+	})
+	table.insert(t3, {
+		class = StyleProviderWithDefaultTheme,
+		props = {
+			withDarkTheme = v15.themeName ~= "Light",
+			withUiModeSupport = v15.withUiModeSupport
+		}
+	})
+	table.insert(t3, {
+		class = Style.DesignTokenProvider,
+		props = {
+			tokenMappers = {}
+		}
+	})
+	table.insert(t3, {
+		class = LocalizationProvider,
+		props = {
+			localization = {
+				Format = function(_, s1: string) -- line: 81
+					return s1
+				end
+			}
+		}
+	})
+
+	return React.createElement(ProviderContainer, {
+		providers = t3
+	}, v15.children)
+end
+
+return MockProviders

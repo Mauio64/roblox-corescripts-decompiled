@@ -1,432 +1,484 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Boolean_0 = v3.Boolean;
-local l_Object_0 = v3.Object;
-local l_String_0 = v3.String;
-local l_Number_0 = v3.Number;
-local v9 = require(l_Parent_1.RegExp);
-local function _(v10) --[[ Line: 28 ]] --[[ Name: TypeError ]]
-    return v10;
-end;
-local function v13(v12) --[[ Line: 32 ]] --[[ Name: encodeURIComponent ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return l_HttpService_0:UrlEncode(v12);
-end;
-local function v16(v14) --[[ Line: 36 ]] --[[ Name: strictUriEncode ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return l_HttpService_0:UrlEncode(v14):gsub("[!'%(%)%*]", function(v15) --[[ Line: 37 ]]
-        return ("%%%x"):format(v15:byte()):upper();
-    end);
-end;
-local v17 = require(l_Parent_0.decodeURIComponent);
-local v18 = require(l_Parent_0.splitOnFirst);
-local v19 = nil;
-local v20 = nil;
-local v21 = {};
-local function _(v22) --[[ Line: 51 ]] --[[ Name: newNumber ]]
-    return tonumber(v22) or (0/0);
-end;
-local function v39(v24) --[[ Line: 55 ]] --[[ Name: encoderForArrayFormat ]]
-    -- upvalues: l_Array_0 (copy), v19 (ref)
-    local l_arrayFormat_0 = v24.arrayFormat;
-    if l_arrayFormat_0 == "index" then
-        return function(v26) --[[ Line: 58 ]]
-            -- upvalues: v24 (copy), l_Array_0 (ref), v19 (ref)
-            return function(v27, v28) --[[ Line: 59 ]]
-                -- upvalues: v24 (ref), l_Array_0 (ref), v19 (ref), v26 (copy)
-                local v29 = #v27;
-                if v24.skipNull and v28 == nil then
-                    return v27;
-                elseif v28 == nil then
-                    return l_Array_0.concat(v27, {
-                        table.concat({
-                            v19(v26, v24), 
-                            "[", 
-                            v29, 
-                            "]"
-                        }, "")
-                    });
-                else
-                    return l_Array_0.concat(v27, {
-                        table.concat({
-                            v19(v26, v24), 
-                            "[", 
-                            v19(v29, v24), 
-                            "]=", 
-                            v19(v28, v24)
-                        }, "")
-                    });
-                end;
-            end;
-        end;
-    elseif l_arrayFormat_0 == "bracket" then
-        return function(v30) --[[ Line: 88 ]]
-            -- upvalues: v24 (copy), l_Array_0 (ref), v19 (ref)
-            return function(v31, v32) --[[ Line: 89 ]]
-                -- upvalues: v24 (ref), l_Array_0 (ref), v19 (ref), v30 (copy)
-                if v24.skipNull and v32 == nil then
-                    return v31;
-                elseif v32 == nil then
-                    return l_Array_0.concat(v31, {
-                        table.concat({
-                            v19(v30, v24), 
-                            "[]"
-                        }, "")
-                    });
-                else
-                    return l_Array_0.concat(v31, {
-                        table.concat({
-                            v19(v30, v24), 
-                            "[]=", 
-                            v19(v32, v24)
-                        }, "")
-                    });
-                end;
-            end;
-        end;
-    elseif l_arrayFormat_0 == "comma" or l_arrayFormat_0 == "separator" then
-        return function(v33) --[[ Line: 106 ]]
-            -- upvalues: v19 (ref), v24 (copy)
-            return function(v34, v35) --[[ Line: 107 ]]
-                -- upvalues: v19 (ref), v33 (copy), v24 (ref)
-                if v35 == nil or #v35 == 0 then
-                    return v34;
-                elseif #v34 == 0 then
-                    return {
-                        table.concat({
-                            v19(v33, v24), 
-                            "=", 
-                            v19(v33, v24)
-                        }, "")
-                    };
-                else
-                    return {
-                        table.concat({
-                            v34, 
-                            v19(v33, v24)
-                        }, v24.arrayFormatSeparator)
-                    };
-                end;
-            end;
-        end;
-    else
-        return function(v36) --[[ Line: 124 ]]
-            -- upvalues: v24 (copy), l_Array_0 (ref), v19 (ref)
-            return function(v37, v38) --[[ Line: 125 ]]
-                -- upvalues: v24 (ref), l_Array_0 (ref), v19 (ref), v36 (copy)
-                if v24.skipNull and v38 == nil then
-                    return v37;
-                elseif v38 == nil then
-                    return l_Array_0.concat(v37, {
-                        v19(v36, v24)
-                    });
-                else
-                    return l_Array_0.concat(v37, {
-                        table.concat({
-                            v19(v36, v24), 
-                            "=", 
-                            v19(v38, v24)
-                        }, "")
-                    });
-                end;
-            end;
-        end;
-    end;
-end;
-local function v58(v40) --[[ Line: 142 ]] --[[ Name: parserForArrayFormat ]]
-    -- upvalues: v9 (copy), l_Array_0 (copy), v20 (ref)
-    local v41 = nil;
-    local l_arrayFormat_1 = v40.arrayFormat;
-    if l_arrayFormat_1 == "index" then
-        return function(v43, v44, v45) --[[ Line: 146 ]]
-            -- upvalues: v41 (ref), v9 (ref)
-            v41 = v9("\\[(\\d*)\\]$"):exec(v43);
-            v43 = v43:gsub("%[%d*%]$", "");
-            if not v41 then
-                v45[v43] = v44;
-                return;
-            else
-                if v45[v43] == nil then
-                    v45[v43] = {};
-                end;
-                v45[v43][v41[2]] = v44;
-                return;
-            end;
-        end;
-    elseif l_arrayFormat_1 == "bracket" then
-        return function(v46, v47, v48) --[[ Line: 163 ]]
-            -- upvalues: v41 (ref), v9 (ref), l_Array_0 (ref)
-            v41 = v9("(\\[\\])$"):exec(v46);
-            v46 = v46:gsub("%[%]$", "");
-            if not v41 then
-                v48[v46] = v47;
-                return;
-            elseif v48[v46] == nil then
-                v48[v46] = {
-                    v47
-                };
-                return;
-            else
-                v48[v46] = l_Array_0.concat({}, v48[v46], v47);
-                return;
-            end;
-        end;
-    elseif l_arrayFormat_1 == "comma" or l_arrayFormat_1 == "separator" then
-        return function(v49, v50, v51) --[[ Line: 180 ]]
-            -- upvalues: v40 (copy), l_Array_0 (ref), v20 (ref)
-            local v52 = false;
-            if type(v50) == "string" then
-                v52 = string.find(v50, v40.arrayFormatSeparator, 1, true) ~= nil;
-            end;
-            local v53 = nil;
-            if v52 then
-                v53 = l_Array_0.map(v50:split(v40.arrayFormatSeparator), function(v54) --[[ Line: 185 ]]
-                    -- upvalues: v20 (ref), v40 (ref)
-                    return v20(v54, v40);
-                end);
-            elseif v50 ~= nil then
-                v53 = v20(v50, v40);
-            end;
-            v51[v49] = v53;
-        end;
-    else
-        return function(v55, v56, v57) --[[ Line: 196 ]]
-            -- upvalues: l_Array_0 (ref)
-            if v57[v55] == nil then
-                v57[v55] = v56;
-                return;
-            else
-                v57[v55] = l_Array_0.concat({}, v57[v55], v56);
-                return;
-            end;
-        end;
-    end;
-end;
-local function _(v59) --[[ Line: 207 ]] --[[ Name: validateArrayFormatSeparator ]]
-    if type(v59) ~= "string" or #v59 ~= 1 then
-        error("arrayFormatSeparator must be single character string");
-    end;
-end;
-v19 = function(v61, v62) --[[ Line: 213 ]] --[[ Name: encode ]]
-    -- upvalues: v16 (copy), v13 (copy)
-    if v62.encode then
-        if v62.strict then
-            return v16(v61);
-        else
-            return v13(v61);
-        end;
-    else
-        return v61;
-    end;
-end;
-v20 = function(v63, v64) --[[ Line: 225 ]] --[[ Name: decode ]]
-    -- upvalues: v17 (copy)
-    if v64.decode then
-        return v17(v63);
-    else
-        return v63;
-    end;
-end;
-local function v65(v66) --[[ Line: 233 ]] --[[ Name: keysSorter ]]
-    -- upvalues: l_Array_0 (copy), v65 (copy), l_Object_0 (copy)
-    if l_Array_0.isArray(v66) then
-        return l_Array_0.sort(v66);
-    elseif type(v66) == "table" then
-        return l_Array_0.map(l_Array_0.sort(v65(l_Object_0.keys(v66)), function(v67, v68) --[[ Line: 239 ]]
-            return (tonumber(v67) or (0/0)) - (tonumber(v68) or (0/0));
-        end), function(v69) --[[ Line: 242 ]]
-            -- upvalues: v66 (copy)
-            return v66[v69];
-        end);
-    else
-        return v66;
-    end;
-end;
-local function _(v70) --[[ Line: 251 ]] --[[ Name: removeHash ]]
-    local v71 = v70:find("#");
-    if v71 ~= nil then
-        v70 = v70:sub(1, v71 - 1);
-    end;
-    return v70;
-end;
-local function _(v73) --[[ Line: 260 ]] --[[ Name: getHash ]]
-    local v74 = "";
-    local v75 = v73:find("#");
-    if v75 ~= nil then
-        v74 = v73:sub(v75);
-    end;
-    return v74;
-end;
-local function v80(v77) --[[ Line: 270 ]] --[[ Name: extract ]]
-    local l_v77_0 = v77;
-    local v79 = l_v77_0:find("#");
-    if v79 ~= nil then
-        l_v77_0 = l_v77_0:sub(1, v79 - 1);
-    end;
-    v77 = l_v77_0;
-    l_v77_0 = v77:find("?", 1, true);
-    if l_v77_0 == nil then
-        return "";
-    else
-        return v77:sub(l_v77_0 + 1);
-    end;
-end;
-local function v83(v81, v82) --[[ Line: 280 ]] --[[ Name: parseValue ]]
-    -- upvalues: l_Number_0 (copy), l_String_0 (copy)
-    if v82.parseNumbers and not l_Number_0.isNaN(tonumber(v81) or (0/0)) and type(v81) == "string" and l_String_0.trim(v81) ~= "" then
-        return tonumber(v81) or (0/0);
-    else
-        if v82.parseBooleans and v81 ~= nil and (string.lower(v81) == "true" or string.lower(v81) == "false") then
-            v81 = string.lower(v81) == "true";
-        end;
-        return v81;
-    end;
-end;
-local function v100(v84, v85) --[[ Line: 299 ]] --[[ Name: parse ]]
-    -- upvalues: l_Object_0 (copy), v58 (copy), l_String_0 (copy), v18 (copy), v20 (ref), v83 (copy), l_Array_0 (copy), l_Boolean_0 (copy), v65 (copy)
-    v85 = l_Object_0.assign({
-        decode = true, 
-        sort = true, 
-        arrayFormat = "none", 
-        arrayFormatSeparator = ",", 
-        parseNumbers = false, 
-        parseBooleans = false
-    }, v85);
-    local l_arrayFormatSeparator_0 = v85.arrayFormatSeparator;
-    if type(l_arrayFormatSeparator_0) ~= "string" or #l_arrayFormatSeparator_0 ~= 1 then
-        error("arrayFormatSeparator must be single character string");
-    end;
-    l_arrayFormatSeparator_0 = v58(v85);
-    local v87 = {};
-    if type(v84) ~= "string" then
-        return v87;
-    else
-        v84 = string.gsub(l_String_0.trim(v84), "^[%?#&]", "");
-        if v84 == "" then
-            return v87;
-        else
-            for _, v89 in v84:split("&") do
-                local v90 = v18(if v85.decode then string.gsub(v89, "%+", " ") else v89, "=");
-                local v91 = v90[1];
-                local v92 = v90[2];
-                if v92 ~= nil and v85.arrayFormat ~= "comma" then
-                    v92 = v20(v92, v85);
-                end;
-                l_arrayFormatSeparator_0(v20(v91, v85), v92, v87);
-            end;
-            for v93 in v87 do
-                local v94 = v87[v93];
-                if type(v94) == "table" then
-                    for v95 in v94 do
-                        v94[v95] = v83(v94[v95], v85);
-                    end;
-                else
-                    v87[v93] = v83(v94, v85);
-                end;
-            end;
-            if v85.sort == false then
-                return v87;
-            else
-                local v96 = nil;
-                v96 = if v85.sort == true then l_Array_0.sort(l_Object_0.keys(v87)) else l_Array_0.sort(l_Object_0.keys(v87), v85.sort);
-                return l_Array_0.reduce(v96, function(v97, v98) --[[ Line: 363 ]]
-                    -- upvalues: v87 (copy), l_Boolean_0 (ref), l_Array_0 (ref), v65 (ref)
-                    local v99 = v87[v98];
-                    if l_Boolean_0.toJSBoolean(v99) and type(v99) == "table" and not l_Array_0.isArray(v99) then
-                        v97[v98] = v65(v99);
-                        return v97;
-                    else
-                        v97[v98] = v99;
-                        return v97;
-                    end;
-                end, {});
-            end;
-        end;
-    end;
-end;
-v21.extract = v80;
-v21.parse = v100;
-v21.stringify = function(v101, v102) --[[ Line: 380 ]] --[[ Name: stringify ]]
-    -- upvalues: l_Object_0 (copy), v39 (copy), l_Array_0 (copy), v19 (ref)
-    if not v101 then
-        return "";
-    else
-        v102 = l_Object_0.assign({
-            encode = true, 
-            strict = true, 
-            arrayFormat = "none", 
-            arrayFormatSeparator = ","
-        }, v102);
-        local l_arrayFormatSeparator_1 = v102.arrayFormatSeparator;
-        if type(l_arrayFormatSeparator_1) ~= "string" or #l_arrayFormatSeparator_1 ~= 1 then
-            error("arrayFormatSeparator must be single character string");
-        end;
-        l_arrayFormatSeparator_1 = v39(v102);
-        local v104 = table.clone(v101);
-        local v105 = l_Object_0.keys(v104);
-        if v102.sort ~= false then
-            l_Array_0.sort(v105, v102.sort);
-        end;
-        return table.concat(l_Array_0.filter(l_Array_0.map(v105, function(v106) --[[ Line: 414 ]]
-            -- upvalues: v101 (copy), v19 (ref), v102 (ref), l_Array_0 (ref), l_arrayFormatSeparator_1 (copy)
-            local v107 = v101[v106];
-            if v107 == nil then
-                return v19(v106, v102);
-            elseif l_Array_0.isArray(v107) then
-                return table.concat(l_Array_0.reduce(v107, l_arrayFormatSeparator_1(v106), {}), "&");
-            else
-                return v19(v106, v102) + "=" + v19(v107, v102);
-            end;
-        end), function(v108) --[[ Line: 430 ]]
-            return v108.length > 0;
-        end), "&");
-    end;
-end;
-v21.parseUrl = function(v109, v110) --[[ Line: 438 ]] --[[ Name: parseUrl ]]
-    -- upvalues: v100 (copy)
-    local v111 = {};
-    local l_v109_0 = v109;
-    local v113 = l_v109_0:find("#");
-    if v113 ~= nil then
-        l_v109_0 = l_v109_0:sub(1, v113 - 1);
-    end;
-    v111.url = l_v109_0:split("?")[1] or "";
-    local l_v100_0 = v100;
-    l_v109_0 = v109;
-    v113 = l_v109_0:find("#");
-    if v113 ~= nil then
-        l_v109_0 = l_v109_0:sub(1, v113 - 1);
-    end;
-    local l_l_v109_0_0 = l_v109_0;
-    l_v109_0 = l_l_v109_0_0:find("?", 1, true);
-    v111.query = l_v100_0(l_v109_0 == nil and "" or l_l_v109_0_0:sub(l_v109_0 + 1), v110);
-    return v111;
-end;
-v21.stringifyUrl = function(v116, v117) --[[ Line: 445 ]] --[[ Name: stringifyUrl ]]
-    -- upvalues: v21 (copy), l_Object_0 (copy)
-    local l_url_0 = v116.url;
-    local v119 = l_url_0:find("#");
-    if v119 ~= nil then
-        l_url_0 = l_url_0:sub(1, v119 - 1);
-    end;
-    local v120 = l_url_0:split("?")[1] or "";
-    local v121 = v21.extract(v116.url);
-    local v122 = v21.parse(v121);
-    v119 = v116.url;
-    local v123 = "";
-    local v124 = v119:find("#");
-    if v124 ~= nil then
-        v123 = v119:sub(v124);
-    end;
-    l_url_0 = v123;
-    v119 = l_Object_0.assign(v122, v116.query);
-    v123 = v21.stringify(v119, v117);
-    if v123 then
-        v123 = ("?%s"):format(v123);
-    end;
-    return ("%s%s%s"):format(v120, v123, l_url_0);
-end;
-return v21;
+local HttpService = game:GetService("HttpService")
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local String = LuauPolyfill.String
+local Number = LuauPolyfill.Number
+local RegExp = require(ParentParent.RegExp)
+
+local function TypeError(p1) -- line: 28
+	return p1
+end
+local function encodeURIComponent(p2) -- line: 32
+	-- upvalues: HttpService (copy)
+	return HttpService:UrlEncode(p2)
+end
+local function strictUriEncode(s1: string) -- line: 36
+	-- upvalues: HttpService (copy)
+	return HttpService:UrlEncode(s1):gsub("[!'%(%)%*]", function(p3) -- line: 37
+		return ("%%%x"):format(p3:byte()):upper()
+	end)
+end
+
+local decodeURIComponent = require(scriptParent.decodeURIComponent)
+local splitOnFirst = require(scriptParent.splitOnFirst)
+local encode = nil
+local decode = nil
+local t1 = {}
+
+local function newNumber(p4) -- line: 51
+	return tonumber(p4) or (0/0)
+end
+local function encoderForArrayFormat(p5) -- line: 55
+	-- upvalues: Array (copy), encode (ref)
+	local arrayFormat = p5.arrayFormat
+
+	if arrayFormat == "index" then
+		return function(p6) -- line: 58
+			-- upvalues: p5 (copy), Array (copy), encode (ref)
+			return function(p7, p8) -- line: 59
+				-- upvalues: p5 (copy), Array (copy), encode (ref), p6 (copy)
+				local v127 = #p7
+
+				if p5.skipNull and p8 == nil then
+					return p7
+				end
+
+				if p8 == nil then
+					return Array.concat(p7, { table.concat({
+						encode(p6, p5),
+						"[",
+						v127,
+						"]"
+					}, "") })
+				end
+
+				return Array.concat(p7, { table.concat({
+					encode(p6, p5),
+					"[",
+					encode(v127, p5),
+					"]=",
+					encode(p8, p5)
+				}, "") })
+			end
+		end
+	end
+
+	if arrayFormat == "bracket" then
+		return function(p9) -- line: 88
+			-- upvalues: p5 (copy), Array (copy), encode (ref)
+			return function(p10, p11) -- line: 89
+				-- upvalues: p5 (copy), Array (copy), encode (ref), p9 (copy)
+				if p5.skipNull and p11 == nil then
+					return p10
+				end
+
+				if p11 == nil then
+					return Array.concat(p10, { table.concat({
+						encode(p9, p5),
+						"[]"
+					}, "") })
+				end
+
+				return Array.concat(p10, { table.concat({
+					encode(p9, p5),
+					"[]=",
+					encode(p11, p5)
+				}, "") })
+			end
+		end
+	end
+
+	if arrayFormat == "comma" or arrayFormat == "separator" then
+		return function(p12) -- line: 106
+			-- upvalues: encode (ref), p5 (copy)
+			return function(p13, p14) -- line: 107
+				-- upvalues: encode (ref), p12 (copy), p5 (copy)
+				if p14 == nil or #p14 == 0 then
+					return p13
+				end
+
+				if #p13 == 0 then
+					return { table.concat({
+						encode(p12, p5),
+						"=",
+						encode(p12, p5)
+					}, "") }
+				end
+
+				return { table.concat({
+					p13,
+					encode(p12, p5)
+				}, p5.arrayFormatSeparator) }
+			end
+		end
+	end
+
+	return function(p15) -- line: 124
+		-- upvalues: p5 (copy), Array (copy), encode (ref)
+		return function(p16, p17) -- line: 125
+			-- upvalues: p5 (copy), Array (copy), encode (ref), p15 (copy)
+			if p5.skipNull and p17 == nil then
+				return p16
+			end
+
+			if p17 == nil then
+				return Array.concat(p16, { encode(p15, p5) })
+			end
+
+			return Array.concat(p16, { table.concat({
+				encode(p15, p5),
+				"=",
+				encode(p17, p5)
+			}, "") })
+		end
+	end
+end
+local function parserForArrayFormat(p18) -- line: 142
+	-- upvalues: RegExp (copy), Array (copy), decode (ref)
+	local u35 = nil
+	local arrayFormat = p18.arrayFormat
+
+	if arrayFormat == "index" then
+		return function(p19, p20, p21) -- line: 146
+			-- upvalues: u35 (ref), RegExp (copy)
+			u35 = RegExp("\\[(\\d*)\\]$"):exec(p19)
+
+			local v104 = p19:gsub("%[%d*%]$", "")
+
+			if not u35 then
+				p21[v104] = p20
+
+				return
+			end
+
+			if p21[v104] == nil then
+				p21[v104] = {}
+			end
+
+			p21[v104][u35[2]] = p20
+		end
+	end
+
+	if arrayFormat == "bracket" then
+		return function(p22, p23, p24) -- line: 163
+			-- upvalues: u35 (ref), RegExp (copy), Array (copy)
+			u35 = RegExp("(\\[\\])$"):exec(p22)
+
+			local v108 = p22:gsub("%[%]$", "")
+
+			if not u35 then
+				p24[v108] = p23
+
+				return
+			end
+
+			if p24[v108] == nil then
+				p24[v108] = { p23 }
+
+				return
+			end
+
+			p24[v108] = Array.concat({}, p24[v108], p23)
+		end
+	end
+
+	if arrayFormat == "comma" or arrayFormat == "separator" then
+		return function(p25, p26, p27) -- line: 180
+			-- upvalues: p18 (copy), Array (copy), decode (ref)
+			local v112 = nil
+
+			if type(p26) == "string" and string.find(p26, p18.arrayFormatSeparator, 1, true) ~= nil then
+				v112 = Array.map(p26:split(p18.arrayFormatSeparator), function(p28) -- line: 185
+					-- upvalues: decode (ref), p18 (copy)
+					return decode(p28, p18)
+				end)
+			elseif p26 ~= nil then
+				v112 = decode(p26, p18)
+			end
+
+			p27[p25] = v112
+		end
+	end
+
+	return function(p29, p30, p31) -- line: 196
+		-- upvalues: Array (copy)
+		if p31[p29] == nil then
+			p31[p29] = p30
+
+			return
+		end
+
+		p31[p29] = Array.concat({}, p31[p29], p30)
+	end
+end
+local function validateArrayFormatSeparator(p32) -- line: 207
+	if type(p32) ~= "string" or #p32 ~= 1 then
+		error("arrayFormatSeparator must be single character string")
+	end
+end
+
+function encode(p33, p34) -- line: 213
+	-- upvalues: strictUriEncode (copy), encodeURIComponent (copy)
+	if p34.encode then
+		if p34.strict then
+			return strictUriEncode(p33)
+		end
+
+		return encodeURIComponent(p33)
+	end
+
+	return p33
+end
+function decode(p35, p36) -- line: 225
+	-- upvalues: decodeURIComponent (copy)
+	if p36.decode then
+		return decodeURIComponent(p35)
+	end
+
+	return p35
+end
+
+local function keysSorter(p37) -- line: 233
+	-- upvalues: Array (copy), keysSorter (copy), Object (copy)
+	if Array.isArray(p37) then
+		return Array.sort(p37)
+	end
+
+	if type(p37) == "table" then
+		return Array.map(Array.sort(keysSorter(Object.keys(p37)), function(p38, p39) -- line: 239
+			return (tonumber(p38) or (0/0)) - (tonumber(p39) or (0/0))
+		end), function(p40) -- line: 242
+			-- upvalues: p37 (copy)
+			return p37[p40]
+		end)
+	end
+
+	return p37
+end
+local function removeHash(p41) -- line: 251
+	local v44 = p41:find("#")
+
+	if v44 ~= nil then
+		p41 = p41:sub(1, v44 - 1)
+	end
+
+	return p41
+end
+local function getHash(p42) -- line: 260
+	local s2 = ""
+	local v47 = p42:find("#")
+
+	if v47 ~= nil then
+		s2 = p42:sub(v47)
+	end
+
+	return s2
+end
+local function parseValue(p43, p44) -- line: 280
+	-- upvalues: Number (copy), String (copy)
+	if p44.parseNumbers and (not Number.isNaN(tonumber(p43) or (0/0)) and type(p43) == "string" and String.trim(p43) ~= "") then
+		return tonumber(p43) or (0/0)
+	end
+
+	if p44.parseBooleans and p43 ~= nil and (string.lower(p43) == "true" or string.lower(p43) == "false") then
+		p43 = string.lower(p43) == "true"
+	end
+
+	return p43
+end
+local function parse(p45, p46) -- line: 299
+	-- upvalues: Object (copy), parserForArrayFormat (copy), String (copy), splitOnFirst (copy), decode (ref), parseValue (copy), Array (copy), Boolean (copy), keysSorter (copy)
+	local v55 = Object.assign({
+		decode = true,
+		sort = true,
+		arrayFormat = "none",
+		arrayFormatSeparator = ",",
+		parseNumbers = false,
+		parseBooleans = false
+	}, p46)
+	local arrayFormatSeparator = v55.arrayFormatSeparator
+
+	if type(arrayFormatSeparator) ~= "string" or #arrayFormatSeparator ~= 1 then
+		error("arrayFormatSeparator must be single character string")
+	end
+
+	local v57 = parserForArrayFormat(v55)
+	local t2 = {}
+
+	if type(p45) ~= "string" then
+		return t2
+	end
+
+	local v59 = string.gsub(String.trim(p45), "^[%?#&]", "")
+
+	if v59 == "" then
+		return t2
+	end
+
+	for _, v61 in v59:split("&") do
+		local v62 = splitOnFirst(if not v55.decode then v61 else string.gsub(v61, "%+", " "), "=")
+		local v63 = v62[1]
+		local v64 = v62[2]
+
+		if v64 ~= nil and v55.arrayFormat ~= "comma" then
+			v64 = decode(v64, v55)
+		end
+
+		v57(decode(v63, v55), v64, t2)
+	end
+
+	for v65 in t2 do
+		local v66 = t2[v65]
+
+		if type(v66) == "table" then
+			for v67 in v66 do
+				v66[v67] = parseValue(v66[v67], v55)
+			end
+		else
+			t2[v65] = parseValue(v66, v55)
+		end
+	end
+
+	if v55.sort == false then
+		return t2
+	end
+
+	local v68 = if v55.sort ~= true then Array.sort(Object.keys(t2), v55.sort) else Array.sort(Object.keys(t2))
+
+	return Array.reduce(v68, function(p47, p48) -- line: 363
+		-- upvalues: t2 (copy), Boolean (copy), Array (copy), keysSorter (copy)
+		local v121 = t2[p48]
+
+		if Boolean.toJSBoolean(v121) and type(v121) == "table" and not Array.isArray(v121) then
+			p47[p48] = keysSorter(v121)
+
+			return p47
+		end
+
+		p47[p48] = v121
+
+		return p47
+	end, {})
+end
+
+function t1.extract(p49) -- line: 270
+	local v49 = p49:find("#")
+
+	if v49 ~= nil then
+		p49 = p49:sub(1, v49 - 1)
+	end
+
+	local v50 = p49:find("?", 1, true)
+
+	if v50 == nil then
+		return ""
+	end
+
+	return p49:sub(v50 + 1)
+end
+
+t1.parse = parse
+
+function t1.stringify(p50, p51) -- line: 380
+	-- upvalues: Object (copy), encoderForArrayFormat (copy), Array (copy), encode (ref)
+	if not p50 then
+		return ""
+	end
+
+	local u71 = Object.assign({
+		encode = true,
+		strict = true,
+		arrayFormat = "none",
+		arrayFormatSeparator = ","
+	}, p51)
+	local arrayFormatSeparator = u71.arrayFormatSeparator
+
+	if type(arrayFormatSeparator) ~= "string" or #arrayFormatSeparator ~= 1 then
+		error("arrayFormatSeparator must be single character string")
+	end
+
+	local v73 = encoderForArrayFormat(u71)
+	local v74 = table.clone(p50)
+	local v75 = Object.keys(v74)
+
+	if u71.sort ~= false then
+		Array.sort(v75, u71.sort)
+	end
+
+	return table.concat(Array.filter(Array.map(v75, function(p52) -- line: 414
+		-- upvalues: p50 (copy), encode (ref), u71 (ref), Array (copy), v73 (copy)
+		local v123 = p50[p52]
+
+		if v123 == nil then
+			return encode(p52, u71)
+		end
+
+		if Array.isArray(v123) then
+			return table.concat(Array.reduce(v123, v73(p52), {}), "&")
+		end
+
+		return encode(p52, u71) + "=" + encode(v123, u71)
+	end), function(p53) -- line: 430
+		return p53.length > 0
+	end), "&")
+end
+function t1.parseUrl(p54, p55) -- line: 438
+	-- upvalues: parse (copy)
+	local t3 = {}
+	local v79 = p54
+	local v80 = v79:find("#")
+
+	if v80 ~= nil then
+		v79 = v79:sub(1, v80 - 1)
+	end
+
+	t3.url = v79:split("?")[1] or ""
+
+	local v81 = parse
+	local v82 = p54:find("#")
+
+	if v82 ~= nil then
+		p54 = p54:sub(1, v82 - 1)
+	end
+
+	local v83 = p54:find("?", 1, true)
+
+	t3.query = v81(if v83 ~= nil then p54:sub(v83 + 1) else "", p55)
+
+	return t3
+end
+function t1.stringifyUrl(p56, p57) -- line: 445
+	-- upvalues: t1 (copy), Object (copy)
+	local url = p56.url
+	local v87 = url:find("#")
+
+	if v87 ~= nil then
+		url = url:sub(1, v87 - 1)
+	end
+
+	local v88 = url:split("?")[1] or ""
+	local v89 = t1.extract(p56.url)
+	local v90 = t1.parse(v89)
+	local url2 = p56.url
+	local s3 = ""
+	local v93 = url2:find("#")
+
+	if v93 ~= nil then
+		s3 = url2:sub(v93)
+	end
+
+	local v94 = Object.assign(v90, p56.query)
+	local v95 = t1.stringify(v94, p57)
+
+	if v95 then
+		v95 = ("?%s"):format(v95)
+	end
+
+	return ("%s%s%s"):format(v88, v95, s3)
+end
+
+return t1

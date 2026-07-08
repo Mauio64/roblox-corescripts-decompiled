@@ -1,5 +1,5 @@
 return {
-    Asset = "Asset", 
-    Outfit = "Outfit", 
-    Unknown = "Unknown"
-};
+	Asset = "Asset",
+	Outfit = "Outfit",
+	Unknown = "Unknown"
+}

@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableAbuseReportMutedError", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableAbuseReportMutedError");
-end;
+game:DefineFastFlag("EnableAbuseReportMutedError", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableAbuseReportMutedError")
+end

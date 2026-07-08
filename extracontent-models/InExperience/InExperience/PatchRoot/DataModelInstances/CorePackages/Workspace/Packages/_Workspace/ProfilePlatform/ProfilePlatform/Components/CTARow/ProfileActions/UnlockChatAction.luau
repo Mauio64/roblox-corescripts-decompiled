@@ -12,15 +12,16 @@ require(ProfilePlatform.Components.CTARow.Types)
 
 local EventNames = require(ProfilePlatform.Analytics.EventNames)
 local ProfileTypes = Enums.ProfileTypes
+local FFlagProfilePlatformEnableUnlockChat = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableUnlockChat)
 
 return {
-	[Enums.ProfileActions.UnlockChat] = function(p1) -- line: 18
+	[Enums.ProfileActions.UnlockChat] = if not FFlagProfilePlatformEnableUnlockChat then nil else function(p1) -- line: 21
 		-- upvalues: ButtonVariant (copy), Enums (copy), ProfileTypes (copy), EventNames (copy), startFacialAgeEstimation (copy), SocialUpsellType (copy), UpsellEntrySurfaceType (copy)
 		return {
 			variant = ButtonVariant.Emphasis,
 			text = p1.localized[Enums.ProfileActions.UnlockChat],
 			onActivated = {
-				[ProfileTypes.User] = function() -- line: 23
+				[ProfileTypes.User] = function() -- line: 26
 					-- upvalues: p1 (copy), EventNames (copy), startFacialAgeEstimation (copy), SocialUpsellType (copy), UpsellEntrySurfaceType (copy)
 					p1.analytics.fireAnalyticsEvent(EventNames.CTAButtonUnlockChat, {
 						buttonSurface = p1.buttonSurface

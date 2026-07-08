@@ -1,29 +1,32 @@
-local l_Parent_0 = script:FindFirstAncestor("Drawer").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(l_Parent_0.SignalsReact);
-return function() --[[ Line: 14 ]] --[[ Name: createDrawerVisibleStore ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v3, v4 = v1.createSignal(false);
-    local v5, v6 = v1.createSignal(false);
-    local function v7() --[[ Line: 18 ]] --[[ Name: useDrawerVisible ]]
-        -- upvalues: v2 (ref), v3 (copy)
-        return v2.useSignalState(v3);
-    end;
-    local function v8() --[[ Line: 22 ]] --[[ Name: useDrawerShouldMount ]]
-        -- upvalues: v2 (ref), v5 (copy)
-        return v2.useSignalState(v5);
-    end;
-    return {
-        getDrawerVisible = v3, 
-        setDrawerVisible = function(v9) --[[ Line: 26 ]]
-            -- upvalues: v4 (copy), v6 (copy)
-            v4(v9);
-            if v9 then
-                v6(true);
-            end;
-        end, 
-        setDrawerShouldMount = v6, 
-        useDrawerVisible = v7, 
-        useDrawerShouldMount = v8
-    };
-end;
+local Parent = script:FindFirstAncestor("Drawer").Parent
+local Signals = require(Parent.Signals)
+local SignalsReact = require(Parent.SignalsReact)
+
+local function createDrawerVisibleStore() -- line: 14
+	-- upvalues: Signals (copy), SignalsReact (copy)
+	local v5, v6 = Signals.createSignal(false)
+	local v7, v8 = Signals.createSignal(false)
+
+	return {
+		getDrawerVisible = v5,
+		setDrawerVisible = function(b1: boolean) -- line: 26
+			-- upvalues: v6 (copy), v8 (copy)
+			v6(b1)
+
+			if b1 then
+				v8(true)
+			end
+		end,
+		setDrawerShouldMount = v8,
+		useDrawerVisible = function() -- line: 18
+			-- upvalues: SignalsReact (copy), v5 (copy)
+			return SignalsReact.useSignalState(v5)
+		end,
+		useDrawerShouldMount = function() -- line: 22
+			-- upvalues: SignalsReact (copy), v7 (copy)
+			return SignalsReact.useSignalState(v7)
+		end
+	}
+end
+
+return createDrawerVisibleStore

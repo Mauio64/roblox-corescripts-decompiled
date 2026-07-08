@@ -1,4 +1,4 @@
 return {
-    AutoSyncContacts = require(script.AutoSyncContacts), 
-    FetchContactImporterParams = require(script.FetchContactImporterParams)
-};
+	AutoSyncContacts = require(script.AutoSyncContacts),
+	FetchContactImporterParams = require(script.FetchContactImporterParams)
+}

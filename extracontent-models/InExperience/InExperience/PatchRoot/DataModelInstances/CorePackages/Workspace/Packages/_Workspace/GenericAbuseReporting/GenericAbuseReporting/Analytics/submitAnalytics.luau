@@ -1,32 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_EventIngest_0 = require(l_Parent_0.Analytics).AnalyticsReporters.EventIngest;
-local v5 = require(l_Parent_0.Analytics).Analytics.new(l_RbxAnalyticsService_0);
-local v6 = require(l_Parent_0.Cryo);
-local _ = require(script.Parent.AnalyticsReducer);
-local v8 = require(l_script_FirstAncestor_0.Logger):new("AbuseReport Analytics");
-local v9 = {
-    ReportTimeSpent = game:DefineFastString("GenericAbuseReportingTimeSpentStat", "TimeSpent"), 
-    SubmittedAbuseType = game:DefineFastString("GenericAbuseReportingSubmittedAbuseTypeStat", "SubmittedAbuseType")
-};
-local v10 = {
-    "Unspecified", 
-    "Submit", 
-    "Abandon"
-};
-return function(v11, v12) --[[ Line: 22 ]] --[[ Name: submitAnalytics ]]
-    -- upvalues: v5 (copy), v9 (copy), v6 (copy), v10 (copy), l_EventIngest_0 (copy), l_EventIngestService_0 (copy), v8 (copy)
-    local l_Diag_0 = v5.Diag;
-    l_Diag_0:reportStats(v11.context .. "_" .. v9.ReportTimeSpent, v11.accumulated_time_ms);
-    local v14 = v11.context .. "_" .. v9.SubmittedAbuseType .. "_" .. v11.reason_selection;
-    l_Diag_0:reportCounter(v14, 1);
-    local v15 = math.floor(workspace:GetServerTimeNow() * 1000 - v11.accumulated_time_ms);
-    local v16 = v6.Dictionary.union(v11, {
-        accumulated_time_ms = v15, 
-        interaction_type = (table.find(v10, v12) or 1) - 1
-    });
-    l_EventIngest_0.new(l_EventIngestService_0):sendEventDeferred(v11.context, v11.event_type, v16);
-    v8:info("Submitted. context: {} interaction_type: {} abuseTypeCategory: {} timeSpent (ms): {}", v11.context, v12, v14, v15);
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local EventIngestService = game:GetService("EventIngestService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local EventIngest = require(GenericAbuseReportingParent.Analytics).AnalyticsReporters.EventIngest
+local v6 = require(GenericAbuseReportingParent.Analytics).Analytics.new(RbxAnalyticsService)
+local Cryo = require(GenericAbuseReportingParent.Cryo)
+
+require(script.Parent.AnalyticsReducer)
+
+local v8 = require(GenericAbuseReporting.Logger):new("AbuseReport Analytics")
+local t1 = {
+	ReportTimeSpent = game:DefineFastString("GenericAbuseReportingTimeSpentStat", "TimeSpent"),
+	SubmittedAbuseType = game:DefineFastString("GenericAbuseReportingSubmittedAbuseTypeStat", "SubmittedAbuseType")
+}
+local t2 = {
+	"Unspecified",
+	"Submit",
+	"Abandon"
+}
+
+local function submitAnalytics(p1, s1: string) -- line: 22
+	-- upvalues: v6 (copy), t1 (copy), Cryo (copy), t2 (copy), EventIngest (copy), EventIngestService (copy), v8 (copy)
+	local Diag = v6.Diag
+
+	Diag:reportStats(p1.context .. "_" .. t1.ReportTimeSpent, p1.accumulated_time_ms)
+
+	local v15 = p1.context .. "_" .. t1.SubmittedAbuseType .. "_" .. p1.reason_selection
+
+	Diag:reportCounter(v15, 1)
+
+	local v16 = math.floor(workspace:GetServerTimeNow() * 1000 - p1.accumulated_time_ms)
+	local v17 = Cryo.Dictionary.union(p1, {
+		accumulated_time_ms = v16,
+		interaction_type = (table.find(t2, s1) or 1) - 1
+	})
+
+	EventIngest.new(EventIngestService):sendEventDeferred(p1.context, p1.event_type, v17)
+	v8:info("Submitted. context: {} interaction_type: {} abuseTypeCategory: {} timeSpent (ms): {}", p1.context, s1, v15, v16)
+end
+
+return submitAnalytics

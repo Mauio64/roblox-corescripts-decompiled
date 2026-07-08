@@ -1,35 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("Style").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.RobloxAppHooks);
-local _ = require(l_Parent_0.RobloxAppEnums);
-local l_useUiModeInfo_0 = v4.useUiModeInfo;
-local l_Context_0 = require(l_Parent_0.UIBlox).Style.Context;
-local v8 = require(script.Parent.DesignTokenContext);
-return function(v9) --[[ Line: 27 ]] --[[ Name: DesignTokenProvider ]]
-    -- upvalues: v3 (copy), l_Context_0 (copy), l_useUiModeInfo_0 (copy), v2 (copy), v1 (copy), v8 (copy)
-    local v10 = v3.useContext(l_Context_0);
-    local v11 = l_useUiModeInfo_0();
-    v11 = v9.uiModeInfo or v11;
-    local l_tokenMappers_0 = v9.tokenMappers;
-    local v13 = v2.Dictionary.keys(l_tokenMappers_0);
-    local l_Tokens_0 = v10.style.Tokens;
-    v1.assert(l_Tokens_0, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.");
-    if not l_Tokens_0.LuaApps then
-        l_Tokens_0 = v2.Dictionary.join(l_Tokens_0, {
-            LuaApps = {}
-        });
-    end;
-    l_Tokens_0 = v2.List.foldLeft(v13, function(v15, v16) --[[ Line: 42 ]]
-        -- upvalues: l_tokenMappers_0 (copy), v11 (ref), l_Tokens_0 (ref), v2 (ref)
-        local v17 = table.clone(v15.LuaApps);
-        v17[v16] = l_tokenMappers_0[v16](v11, l_Tokens_0);
-        return v2.Dictionary.join(v15, {
-            LuaApps = v17
-        });
-    end, l_Tokens_0);
-    return v3.createElement(v8.Provider, {
-        value = l_Tokens_0
-    }, v9.children);
-end;
+local Parent = script:FindFirstAncestor("Style").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+local RobloxAppHooks = require(Parent.RobloxAppHooks)
+
+require(Parent.RobloxAppEnums)
+
+local useUiModeInfo = RobloxAppHooks.useUiModeInfo
+local Context = require(Parent.UIBlox).Style.Context
+local DesignTokenContext = require(script.Parent.DesignTokenContext)
+
+local function DesignTokenProvider(t1: {[any]: any}) -- line: 27
+	-- upvalues: React (copy), Context (copy), useUiModeInfo (copy), Cryo (copy), ArgCheck (copy), DesignTokenContext (copy)
+	local v11 = React.useContext(Context)
+	local v12 = useUiModeInfo()
+	local u13 = t1.uiModeInfo or v12
+	local tokenMappers = t1.tokenMappers
+	local v15 = Cryo.Dictionary.keys(tokenMappers)
+	local Tokens = v11.style.Tokens
+
+	ArgCheck.assert(Tokens, "Design Tokens not found, ensure AppStyleProvider has been configured correctly.")
+
+	if not Tokens.LuaApps then
+		Tokens = Cryo.Dictionary.join(Tokens, {
+			LuaApps = {}
+		})
+	end
+
+	Tokens = Cryo.List.foldLeft(v15, function(p1, p2) -- line: 42
+		-- upvalues: tokenMappers (copy), u13 (ref), Tokens (ref), Cryo (copy)
+		local v19 = table.clone(p1.LuaApps)
+
+		v19[p2] = tokenMappers[p2](u13, Tokens)
+
+		return Cryo.Dictionary.join(p1, {
+			LuaApps = v19
+		})
+	end, Tokens)
+
+	return React.createElement(DesignTokenContext.Provider, {
+		value = Tokens
+	}, t1.children)
+end
+
+return DesignTokenProvider

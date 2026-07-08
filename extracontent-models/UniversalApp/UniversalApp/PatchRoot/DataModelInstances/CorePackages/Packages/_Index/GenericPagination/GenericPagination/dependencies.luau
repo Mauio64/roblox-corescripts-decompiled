@@ -1,7 +1,8 @@
-local l_Parent_0 = script.Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Packages");
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+
 return {
-    t = require(l_script_FirstAncestor_0.t), 
-    LinkedList = require(l_Parent_0.LinkedList), 
-    Promise = require(l_script_FirstAncestor_0.Promise)
-};
+	t = require(scriptParentParent.t),
+	LinkedList = require(scriptParent.LinkedList),
+	Promise = require(scriptParentParent.Promise)
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("HomePhoneVerificationUpsellNewCopy", false);
+return game:DefineFastFlag("HomePhoneVerificationUpsellNewCopy", false)

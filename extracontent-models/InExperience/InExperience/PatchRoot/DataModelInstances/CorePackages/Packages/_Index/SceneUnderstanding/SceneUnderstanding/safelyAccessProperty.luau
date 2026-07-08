@@ -1,11 +1,14 @@
-return function(v0, v1, v2) --[[ Line: 15 ]] --[[ Name: safelyAccessProperty ]]
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 16 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        return v0[v1];
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return v2;
-    end;
-end;
+local function safelyAccessProperty(p1, s1: string, p2) -- line: 15
+	local ok, result = pcall(function() -- line: 16
+		-- upvalues: p1 (copy), s1 (copy)
+		return p1[s1]
+	end)
+
+	if ok then
+		return result
+	end
+
+	return p2
+end
+
+return safelyAccessProperty

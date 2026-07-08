@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 12 ]] --[[ Name: mapFirst ]]
-    for v2, v3 in ipairs(v0) do
-        local v4 = v1(v3, v2);
-        if v4 ~= nil then
-            return v4;
-        end;
-    end;
-    return nil;
-end;
+local function mapFirst(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 12
+	for i, v in ipairs(t1) do
+		local v6 = p1(v, i)
+
+		if v6 ~= nil then
+			return v6
+		end
+	end
+
+	return nil
+end
+
+return mapFirst

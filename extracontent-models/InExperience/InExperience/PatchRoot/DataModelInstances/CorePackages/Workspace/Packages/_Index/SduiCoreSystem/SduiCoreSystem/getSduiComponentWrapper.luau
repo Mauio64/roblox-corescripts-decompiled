@@ -1,26 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.SduiComponent);
-local v4 = require(l_script_FirstAncestor_0.SduiFastPathComponent);
-local v5 = require(l_script_FirstAncestor_0.ClientBinding.createSduiClientBindingWrappers);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiConfigTypes);
-local l_FFlagSduiComponentFiltering_0 = require(l_Parent_0.SharedFlags).FFlagSduiComponentFiltering;
-local v9 = nil;
-local function v11(v10) --[[ Line: 33 ]]
-    -- upvalues: l_FFlagSduiComponentFiltering_0 (copy), v9 (ref), v4 (copy), v3 (copy)
-    if v10 and v10.__isClientBinding then
-        if v10.propSignals or l_FFlagSduiComponentFiltering_0 and v10.isComponentFilteredSignal ~= nil then
-            return v9.SduiDataBindingWrapper;
-        else
-            return v9.SduiClientBindingThinWrapper;
-        end;
-    elseif v10 and v10.__processed and v10.conditionalProps == nil and v10.children == nil and (v10.templateKey == nil or v10.templateKey == "NONE") then
-        return v4;
-    else
-        return v3;
-    end;
-end;
-v9 = v5(v11);
-return v11;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+
+require(SduiCoreSystemParent.React)
+
+local SduiComponent = require(SduiCoreSystem.SduiComponent)
+local SduiFastPathComponent = require(SduiCoreSystem.SduiFastPathComponent)
+local createSduiClientBindingWrappers = require(SduiCoreSystem.ClientBinding.createSduiClientBindingWrappers)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.SduiConfigTypes)
+
+local FFlagSduiPoolBackedFeed = require(SduiCoreSystemParent.SharedFlags).FFlagSduiPoolBackedFeed
+local u7 = nil
+
+local function v8(p1) -- line: 32
+	-- upvalues: FFlagSduiPoolBackedFeed (copy), u7 (ref), SduiFastPathComponent (copy), SduiComponent (copy)
+	if p1 and p1.__isClientBinding then
+		if p1.propSignals or p1.isComponentFilteredSignal ~= nil or FFlagSduiPoolBackedFeed and p1._requiresDataBinding == true then
+			return u7.SduiDataBindingWrapper
+		end
+
+		return u7.SduiClientBindingThinWrapper
+	end
+
+	if p1 and p1.__processed and p1.conditionalProps == nil and p1.children == nil and (p1.templateKey == nil or p1.templateKey == "NONE") then
+		return SduiFastPathComponent
+	end
+
+	return SduiComponent
+end
+
+u7 = createSduiClientBindingWrappers(v8)
+
+return v8

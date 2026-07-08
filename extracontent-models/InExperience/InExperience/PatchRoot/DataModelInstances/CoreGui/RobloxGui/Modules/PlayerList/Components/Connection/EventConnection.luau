@@ -1,24 +1,26 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact).Component:extend("EventConnection");
-v1.init = function(v2) --[[ Line: 7 ]] --[[ Name: init ]]
-    v2.connection = nil;
-end;
-v1.didMount = function(v3) --[[ Line: 11 ]] --[[ Name: didMount ]]
-    v3.connection = v3.props.event:Connect(v3.props.callback);
-end;
-v1.render = function(_) --[[ Line: 15 ]] --[[ Name: render ]]
-    return nil;
-end;
-v1.didUpdate = function(v5, v6) --[[ Line: 19 ]] --[[ Name: didUpdate ]]
-    if v5.props.event ~= v6.event or v5.props.callback ~= v6.callback then
-        v5.connection:Disconnect();
-        v5.connection = v5.props.event:Connect(v5.props.callback);
-    end;
-end;
-v1.willUnmount = function(v7) --[[ Line: 27 ]] --[[ Name: willUnmount ]]
-    if v7.connection then
-        v7.connection:Disconnect();
-        v7.connection = nil;
-    end;
-end;
-return v1;
+local CorePackages = game:GetService("CorePackages")
+local v2 = require(CorePackages.Packages.Roact).Component:extend("EventConnection")
+
+function v2.init(p1) -- line: 7
+	p1.connection = nil
+end
+function v2.didMount(p2) -- line: 11
+	p2.connection = p2.props.event:Connect(p2.props.callback)
+end
+function v2.render(_) -- line: 15
+	return nil
+end
+function v2.didUpdate(p4, p5) -- line: 19
+	if p4.props.event ~= p5.event or p4.props.callback ~= p5.callback then
+		p4.connection:Disconnect()
+		p4.connection = p4.props.event:Connect(p4.props.callback)
+	end
+end
+function v2.willUnmount(p6) -- line: 27
+	if p6.connection then
+		p6.connection:Disconnect()
+		p6.connection = nil
+	end
+end
+
+return v2

@@ -1,177 +1,194 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Components.Button);
-local v5 = require(l_script_FirstAncestor_0.Components.CloseAffordance);
-local v6 = require(l_script_FirstAncestor_0.Enums.CloseAffordanceVariant);
-local v7 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local v8 = require(l_script_FirstAncestor_0.Enums.FillBehavior);
-local v9 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v10 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v11 = require(l_script_FirstAncestor_0.Enums.PopoverAlign);
-local v12 = require(l_script_FirstAncestor_0.Enums.PopoverSide);
-local v13 = require(l_script_FirstAncestor_0.Providers.Style.PresentationContext);
-local v14 = require(l_script_FirstAncestor_0.Enums.Radius);
-local v15 = require(l_script_FirstAncestor_0.Components.Text);
-local v16 = require(l_script_FirstAncestor_0.Utility.Localization.Translator);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v18 = require(l_script_FirstAncestor_0.Components.View);
-local v19 = require(l_script_FirstAncestor_0.Utility.useScaledValue);
-local v20 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v21 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v22 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v23 = require(l_script_FirstAncestor_0.Components.Popover);
-local v24 = {
-    isOpen = false, 
-    align = v11.Start, 
-    side = v12.Right, 
-    testId = "--foundation-coachmark"
-};
-local function _(v25, v26) --[[ Line: 72 ]] --[[ Name: stepsText ]]
-    -- upvalues: v16 (copy)
-    return v16:FormatByKey("CommonUI.Controls.Label.PageCount", {
-        current = v25, 
-        total = v26
-    });
-end;
-return v3.memo(v3.forwardRef(function(v28, v29) --[[ Line: 76 ]] --[[ Name: Coachmark ]]
-    -- upvalues: v22 (copy), v24 (copy), v20 (copy), v19 (copy), v3 (copy), v10 (copy), v9 (copy), v8 (copy), v2 (copy), v4 (copy), v23 (copy), v21 (copy), v14 (copy), v13 (copy), v7 (copy), v18 (copy), v5 (copy), v6 (copy), v15 (copy), v16 (copy)
-    local v30 = v22(v28, v24);
-    local v31 = v20();
-    local v32 = v19(320);
-    local v33 = if v30.onClose then {
-        MaxSize = Vector2.new(v32 - v31.Size.Size_1200, 1e999)
-    } else nil;
-    local v39 = v3.useMemo(function() --[[ Line: 87 ]]
-        -- upvalues: v30 (copy), v10 (ref), v9 (ref), v8 (ref), v2 (ref), v3 (ref), v4 (ref)
-        local v34 = {};
-        if not v30.actions then
-            return v34;
-        else
-            for v35, v36 in v30.actions do
-                if v35 > 2 then
-                    v10:warning((("Coachmark only supports up to %* actions"):format(2)));
-                    return v34;
-                else
-                    local v37 = {
-                        LayoutOrder = v35, 
-                        size = v9.Medium, 
-                        fillBehavior = v8.Fill, 
-                        testId = ("%*--action-%*"):format(v30.testId, v35)
-                    };
-                    local v38 = v2.union(v36, v37);
-                    v34["CoachmarkButton" .. v35] = v3.createElement(v4, v38);
-                end;
-            end;
-            return v34;
-        end;
-    end, {
-        v30.actions
-    });
-    local l_createElement_0 = v3.createElement;
-    local l_Root_0 = v23.Root;
-    local v42 = {
-        isOpen = v30.isOpen, 
-        testId = v30.testId
-    };
-    local v43 = {
-        Anchor = v3.createElement(v23.Anchor, v21(v30, {
-            anchorRef = v30.anchorRef
-        }), v30.children)
-    };
-    local l_createElement_1 = v3.createElement;
-    local l_Content_0 = v23.Content;
-    local v46 = {
-        hasArrow = true, 
-        align = v30.align, 
-        side = {
-            position = v30.side, 
-            offset = v31.Size.Size_200
-        }, 
-        radius = v14.Medium, 
-        backgroundStyle = v31.Inverse.Surface.Surface_0, 
-        selection = v30.selection, 
-        selectionGroup = v30.selectionGroup, 
-        ref = v29
-    };
-    local l_createElement_2 = v3.createElement;
-    local l_Provider_0 = v13.Provider;
-    local v49 = {
-        value = {
-            colorMode = v7.Inverse
-        }
-    };
-    local l_createElement_3 = v3.createElement;
-    local l_v18_0 = v18;
-    local v52 = {
-        tag = "col auto-xy gap-medium padding-bottom-medium", 
-        sizeConstraint = {
-            MaxSize = Vector2.new(v32, 1e999)
-        }
-    };
-    local v53 = {
-        CloseAffordanceContainer = if v30.onClose then v3.createElement("Folder", {}, {
-            CloseAffordance = v3.createElement(v5, {
-                onActivated = v30.onClose, 
-                size = v9.Small, 
-                variant = v6.Utility, 
-                Position = UDim2.new(1, -v31.Padding.Small, 0, v31.Padding.Small), 
-                AnchorPoint = Vector2.new(1, 0), 
-                testId = ("%*--close-affordance"):format(v30.testId)
-            })
-        }) else nil, 
-        Media = if v30.media then v3.createElement(v18, {
-            LayoutOrder = 1, 
-            tag = "size-full-0 auto-y"
-        }, v30.media) else nil
-    };
-    local l_createElement_4 = v3.createElement;
-    local l_v18_1 = v18;
-    local v56 = {
-        LayoutOrder = 2, 
-        tag = "col gap-xsmall auto-xy padding-top-medium padding-x-medium padding-bottom-xsmall"
-    };
-    local v57 = {};
-    local v58;
-    if v30.steps then
-        v58 = v3.createElement;
-        local l_v15_0 = v15;
-        local v60 = {
-            LayoutOrder = 1
-        };
-        local l_current_0 = v30.steps.current;
-        local l_total_0 = v30.steps.total;
-        v60.Text = v16:FormatByKey("CommonUI.Controls.Label.PageCount", {
-            current = l_current_0, 
-            total = l_total_0
-        });
-        v60.tag = "auto-xy text-label-small text-align-x-left content-inverse-default text-truncate-end";
-        v60.sizeConstraint = v33;
-        v60.testId = ("%*--step-indicator"):format(v30.testId);
-        v58 = v58(l_v15_0, v60);
-    else
-        v58 = nil;
-    end;
-    v57.StepIndicator = v58;
-    v57.Header = v3.createElement(v15, {
-        LayoutOrder = 2, 
-        Text = v30.title, 
-        tag = "auto-xy text-title-large text-align-x-left content-inverse-emphasis text-truncate-split", 
-        sizeConstraint = v33, 
-        testId = ("%*--header"):format(v30.testId)
-    });
-    v57.Text = if v30.text and v30.text ~= "" then v3.createElement(v15, {
-        LayoutOrder = 3, 
-        Text = v30.text, 
-        tag = "size-full-0 auto-y text-wrap text-align-x-left text-body-medium content-inverse-default", 
-        testId = ("%*--text"):format(v30.testId)
-    }) else nil;
-    v53.ContentSection = l_createElement_4(l_v18_1, v56, v57);
-    v53.Actions = if v30.actions and #v30.actions > 0 then v3.createElement(v18, {
-        LayoutOrder = 3, 
-        tag = "row gap-small auto-y padding-x-medium size-full-0"
-    }, v39) else nil;
-    v43.Content = l_createElement_1(l_Content_0, v46, l_createElement_2(l_Provider_0, v49, l_createElement_3(l_v18_0, v52, v53)));
-    return l_createElement_0(l_Root_0, v42, v43);
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+local Button = require(Foundation.Components.Button)
+local CloseAffordance = require(Foundation.Components.CloseAffordance)
+local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
+local ColorMode = require(Foundation.Enums.ColorMode)
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+local Flags = require(Foundation.Utility.Flags)
+local InputSize = require(Foundation.Enums.InputSize)
+local Logger = require(Foundation.Utility.Logger)
+local PopoverAlign = require(Foundation.Enums.PopoverAlign)
+local PopoverSide = require(Foundation.Enums.PopoverSide)
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local Radius = require(Foundation.Enums.Radius)
+local Text = require(Foundation.Components.Text)
+local Translator = require(Foundation.Utility.Localization.Translator)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useScaledValue = require(Foundation.Utility.useScaledValue)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local Popover = require(Foundation.Components.Popover)
+local t1 = {
+	isOpen = false,
+	testId = "--foundation-coachmark",
+	align = PopoverAlign.Start,
+	side = PopoverSide.Right
+}
+
+local function stepsText(n1: number, n2: number) -- line: 75
+	-- upvalues: Translator (copy)
+	return Translator:FormatByKey("CommonUI.Controls.Label.PageCount", {
+		current = n1,
+		total = n2
+	})
+end
+local function Coachmark(p1, p2) -- line: 79
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useScaledValue (copy), React (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), Button (copy), Popover (copy), withCommonProps (copy), Flags (copy), Radius (copy), PresentationContext (copy), ColorMode (copy), View (copy), CloseAffordance (copy), CloseAffordanceVariant (copy), Text (copy), Translator (copy)
+	local v32 = withDefaults(p1, t1)
+	local v33 = useTokens()
+	local v34 = useScaledValue(320)
+	local v35 = if not v32.onClose then nil else {
+		MaxSize = Vector2.new(v34 - v33.Size.Size_1200, 1e999)
+	}
+	local v36 = React.useMemo(function() -- line: 90
+		-- upvalues: v32 (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), React (copy), Button (copy)
+		local t2 = {}
+
+		if not v32.actions then
+			return t2
+		end
+
+		for v62, v63 in v32.actions do
+			if v62 > 2 then
+				Logger:warning(`Coachmark only supports up to { 2 } actions`)
+
+				return t2
+			end
+
+			local t3 = {
+				LayoutOrder = v62,
+				size = InputSize.Medium,
+				fillBehavior = FillBehavior.Fill,
+				testId = `{ v32.testId }--action-{ v62 }`
+			}
+			local v65 = Dash.union(v63, t3)
+
+			t2["CoachmarkButton" .. v62] = React.createElement(Button, v65)
+		end
+
+		return t2
+	end, {
+		v32.actions,
+		v32.testId
+	})
+	local createElement = React.createElement
+	local Root = Popover.Root
+	local t4 = {
+		isOpen = v32.isOpen,
+		testId = v32.testId
+	}
+	local t5 = {
+		Anchor = React.createElement(Popover.Anchor, withCommonProps(v32, {
+			anchorRef = v32.anchorRef
+		}), v32.children)
+	}
+	local createElement2 = React.createElement
+	local Content = Popover.Content
+	local t6 = {
+		hasArrow = true,
+		align = v32.align,
+		DO_NOT_USE_hasContentInputSink = Flags.FoundationCoachmarkInteractionFixes,
+		side = {
+			position = v32.side,
+			offset = v33.Size.Size_200
+		},
+		radius = Radius.Medium,
+		backgroundStyle = v33.Inverse.Surface.Surface_0,
+		selection = v32.selection,
+		selectionGroup = v32.selectionGroup,
+		ref = p2
+	}
+	local createElement3 = React.createElement
+	local Provider = PresentationContext.Provider
+	local t7 = {
+		value = {
+			colorMode = ColorMode.Inverse
+		}
+	}
+	local createElement4 = React.createElement
+	local v48 = View
+	local t8 = {
+		tag = "col gap-medium auto-xy padding-bottom-medium",
+		sizeConstraint = {
+			MaxSize = Vector2.new(v34, 1e999)
+		}
+	}
+	local t9 = {
+		CloseAffordanceContainer = if not v32.onClose then nil else React.createElement("Folder", {}, {
+			CloseAffordance = React.createElement(CloseAffordance, {
+				onActivated = v32.onClose,
+				size = InputSize.Small,
+				variant = CloseAffordanceVariant.Utility,
+				Position = UDim2.new(1, -v33.Padding.Small, 0, v33.Padding.Small),
+				AnchorPoint = Vector2.new(1, 0),
+				ZIndex = if not Flags.FoundationCoachmarkInteractionFixes then nil else 2,
+				testId = `{ v32.testId }--close-affordance`
+			})
+		}),
+		Media = if not v32.media then nil else React.createElement(View, {
+			LayoutOrder = 1,
+			tag = "size-full-0 auto-y"
+		}, v32.media)
+	}
+	local createElement5 = React.createElement
+	local v52 = View
+	local t10 = {
+		LayoutOrder = 2,
+		tag = "col gap-xsmall auto-xy padding-x-medium padding-bottom-xsmall padding-top-medium"
+	}
+	local t11 = {}
+	local v60
+
+	if v32.steps then
+		local createElement6 = React.createElement
+		local v56 = Text
+		local t12 = {
+			LayoutOrder = 1,
+			tag = "auto-xy text-label-small text-align-x-left text-truncate-end content-inverse-default"
+		}
+		local current = v32.steps.current
+		local total = v32.steps.total
+
+		t12.Text = Translator:FormatByKey("CommonUI.Controls.Label.PageCount", {
+			current = current,
+			total = total
+		})
+		t12.sizeConstraint = v35
+		t12.testId = `{ v32.testId }--step-indicator`
+		v60 = createElement6(v56, t12)
+	else
+		v60 = nil
+	end
+
+	t11.StepIndicator = v60
+	t11.Header = if v32.title == "" then nil else React.createElement(Text, {
+		LayoutOrder = 2,
+		tag = "auto-xy text-title-large text-align-x-left text-truncate-split content-inverse-emphasis",
+		Text = v32.title,
+		sizeConstraint = v35,
+		testId = `{ v32.testId }--header`
+	})
+	t11.Text = if not v32.text or v32.text == "" then nil else React.createElement(Text, {
+		LayoutOrder = 3,
+		tag = "size-full-0 auto-y text-body-medium text-wrap text-align-x-left content-inverse-default",
+		Text = v32.text,
+		testId = `{ v32.testId }--text`
+	})
+	t9.ContentSection = createElement5(v52, t10, t11)
+	t9.Actions = if not v32.actions or not (#v32.actions > 0) then nil else React.createElement(View, {
+		LayoutOrder = 3,
+		tag = "row gap-small size-full-0 auto-y padding-x-medium"
+	}, v36)
+	t5.Content = createElement2(Content, t6, createElement3(Provider, t7, createElement4(v48, t8, t9)))
+
+	return createElement(Root, t4, t5)
+end
+
+return React.memo(React.forwardRef(Coachmark))

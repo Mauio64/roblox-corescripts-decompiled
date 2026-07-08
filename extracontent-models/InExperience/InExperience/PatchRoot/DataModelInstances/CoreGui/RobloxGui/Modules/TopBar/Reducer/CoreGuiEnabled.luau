@@ -1,41 +1,43 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-if require(l_Parent_0.Flags.FFlagTopBarDeprecateCoreGuiRodux) then
-    return nil;
-else
-    local l_Actions_0 = l_Parent_0.Actions;
-    local v6 = require(l_Actions_0.UpdateCoreGuiEnabled);
-    local v7 = require(l_RobloxGui_0.Modules.Flags.FFlagMountCoreGuiBackpack);
-    local v8 = nil;
-    v8 = if v7 then {
-        [Enum.CoreGuiType.PlayerList] = true, 
-        [Enum.CoreGuiType.Health] = true, 
-        [Enum.CoreGuiType.Chat] = true, 
-        [Enum.CoreGuiType.EmotesMenu] = true
-    } else {
-        [Enum.CoreGuiType.PlayerList] = true, 
-        [Enum.CoreGuiType.Health] = true, 
-        [Enum.CoreGuiType.Backpack] = true, 
-        [Enum.CoreGuiType.Chat] = true, 
-        [Enum.CoreGuiType.EmotesMenu] = true
-    };
-    return (v2.createReducer(v8, {
-        [v6.name] = function(v9, v10) --[[ Line: 41 ]]
-            -- upvalues: v3 (copy)
-            if v10.coreGuiType == Enum.CoreGuiType.All then
-                local v11 = {};
-                for v12, _ in pairs(v9) do
-                    v11[v12] = v10.enabled;
-                end;
-                return v11;
-            else
-                return v3.Dictionary.join(v9, {
-                    [v10.coreGuiType] = v10.enabled
-                });
-            end;
-        end
-    }));
-end;
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+
+if require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux) then
+	return nil
+end
+
+local Actions = ParentParent.Actions
+local UpdateCoreGuiEnabled = require(Actions.UpdateCoreGuiEnabled)
+local v8 = if not require(RobloxGui.Modules.Flags.FFlagMountCoreGuiBackpack) then {
+	[Enum.CoreGuiType.PlayerList] = true,
+	[Enum.CoreGuiType.Health] = true,
+	[Enum.CoreGuiType.Backpack] = true,
+	[Enum.CoreGuiType.Chat] = true,
+	[Enum.CoreGuiType.EmotesMenu] = true
+} else {
+	[Enum.CoreGuiType.PlayerList] = true,
+	[Enum.CoreGuiType.Health] = true,
+	[Enum.CoreGuiType.Chat] = true,
+	[Enum.CoreGuiType.EmotesMenu] = true
+}
+
+return (Rodux.createReducer(v8, {
+	[UpdateCoreGuiEnabled.name] = function(p1, p2) -- line: 41
+		-- upvalues: Cryo (copy)
+		if p2.coreGuiType == Enum.CoreGuiType.All then
+			local t1 = {}
+
+			for k, _ in pairs(p1) do
+				t1[k] = p2.enabled
+			end
+
+			return t1
+		end
+
+		return Cryo.Dictionary.join(p1, {
+			[p2.coreGuiType] = p2.enabled
+		})
+	end
+}))

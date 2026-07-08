@@ -1,16 +1,20 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_DEV_0 = require(l_Parent_0.utilities).DEV;
-l_invariant_0(typeof(l_DEV_0) == "boolean", (tostring(l_DEV_0)));
-v0.empty = require(script.empty).empty;
-v0.from = require(script.from).from;
-v0.split = require(script.split).split;
-v0.concat = require(script.concat).concat;
-v0.execute = require(script.execute).execute;
-v0.ApolloLink = require(script.ApolloLink).ApolloLink;
-local v6 = require(script.types);
-l_Object_0.assign(v0, v6);
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Object = require(ParentParentParent.LuauPolyfill).Object
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local DEV = require(ParentParent.utilities).DEV
+
+invariant(typeof(DEV) == "boolean", (tostring(DEV)))
+t1.empty = require(script.empty).empty
+t1.from = require(script.from).from
+t1.split = require(script.split).split
+t1.concat = require(script.concat).concat
+t1.execute = require(script.execute).execute
+t1.ApolloLink = require(script.ApolloLink).ApolloLink
+
+local types = require(script.types)
+
+Object.assign(t1, types)
+
+return t1

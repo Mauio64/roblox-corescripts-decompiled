@@ -1,348 +1,388 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local l_Boolean_0 = v2.Boolean;
-local l_String_0 = v2.String;
-local v7 = require(l_Parent_1.Promise);
-local l_NULL_0 = require(l_Parent_0.utilities.globals.null).NULL;
-local v9 = {};
-local v10 = require(l_Parent_1.GraphQL);
-local l_visit_0 = v10.visit;
-local l_BREAK_0 = v10.BREAK;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local _ = require(script.Parent.Parent.cache);
-local v15 = require(script.Parent.Parent.utilities);
-local l_argumentsObjectFromField_0 = v15.argumentsObjectFromField;
-local l_buildQueryFromSelectionSet_0 = v15.buildQueryFromSelectionSet;
-local l_createFragmentMap_0 = v15.createFragmentMap;
-local l_getFragmentDefinitions_0 = v15.getFragmentDefinitions;
-local l_getMainDefinition_0 = v15.getMainDefinition;
-local l_hasDirectives_0 = v15.hasDirectives;
-local l_isField_0 = v15.isField;
-local l_isInlineFragment_0 = v15.isInlineFragment;
-local l_mergeDeep_0 = v15.mergeDeep;
-local l_mergeDeepArray_0 = v15.mergeDeepArray;
-local l_removeClientSetsFromDocument_0 = v15.removeClientSetsFromDocument;
-local l_resultKeyNameFromField_0 = v15.resultKeyNameFromField;
-local l_shouldInclude_0 = v15.shouldInclude;
-local _ = require(script.Parent.ApolloClient_types);
-local _ = require(script.Parent.types);
-local _ = require(script.Parent.Parent.link.core);
-local l_cacheSlot_0 = require(script.Parent.Parent.cache).cacheSlot;
-local v33 = {};
-v33.__index = v33;
-v33.new = function(v34) --[[ Line: 185 ]] --[[ Name: new ]]
-    -- upvalues: v33 (copy)
-    local v35 = setmetatable({}, v33);
-    local l_cache_0 = v34.cache;
-    local l_client_0 = v34.client;
-    local l_resolvers_0 = v34.resolvers;
-    local l_fragmentMatcher_0 = v34.fragmentMatcher;
-    v35.cache = l_cache_0;
-    if l_client_0 ~= nil then
-        v35.client = l_client_0;
-    end;
-    if l_resolvers_0 ~= nil then
-        v35:addResolvers(l_resolvers_0);
-    end;
-    if l_fragmentMatcher_0 ~= nil then
-        v35:setFragmentMatcher(l_fragmentMatcher_0);
-    end;
-    return v35;
-end;
-v33.addResolvers = function(v40, v41) --[[ Line: 206 ]] --[[ Name: addResolvers ]]
-    -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy), l_mergeDeep_0 (copy)
-    v40.resolvers = l_Boolean_0.toJSBoolean(v40.resolvers) and v40.resolvers or {};
-    if l_Array_0.isArray(v41) then
-        l_Array_0.forEach(v41, function(v42) --[[ Line: 209 ]]
-            -- upvalues: v40 (copy), l_mergeDeep_0 (ref)
-            v40.resolvers = l_mergeDeep_0(v40.resolvers, v42);
-        end);
-        return;
-    else
-        v40.resolvers = l_mergeDeep_0(v40.resolvers, v41);
-        return;
-    end;
-end;
-v33.setResolvers = function(v43, v44) --[[ Line: 217 ]] --[[ Name: setResolvers ]]
-    v43.resolvers = {};
-    v43:addResolvers(v44);
-end;
-v33.getResolvers = function(v45) --[[ Line: 222 ]] --[[ Name: getResolvers ]]
-    -- upvalues: l_Boolean_0 (copy)
-    return l_Boolean_0.toJSBoolean(v45.resolvers) and v45.resolvers or {};
-end;
-v33.runResolvers = function(v46, v47) --[[ Line: 230 ]] --[[ Name: runResolvers ]]
-    -- upvalues: l_Boolean_0 (copy), l_Object_0 (copy), v7 (copy)
-    local l_document_0 = v47.document;
-    local l_remoteResult_0 = v47.remoteResult;
-    local l_context_0 = v47.context;
-    local l_variables_0 = v47.variables;
-    local l_onlyRunForcedResolvers_0 = v47.onlyRunForcedResolvers;
-    if v47.onlyRunForcedResolvers == nil then
-        l_onlyRunForcedResolvers_0 = false;
-    end;
-    if l_Boolean_0.toJSBoolean(l_document_0) then
-        return v46:resolveDocument(l_document_0, l_remoteResult_0.data, l_context_0, l_variables_0, v46.fragmentMatcher, l_onlyRunForcedResolvers_0):andThen(function(v53) --[[ Line: 251 ]]
-            -- upvalues: l_Object_0 (ref), l_remoteResult_0 (copy)
-            return l_Object_0.assign({}, l_remoteResult_0, {
-                data = v53.result
-            });
-        end);
-    else
-        return v7.resolve(l_remoteResult_0);
-    end;
-end;
-v33.setFragmentMatcher = function(v54, v55) --[[ Line: 259 ]] --[[ Name: setFragmentMatcher ]]
-    v54.fragmentMatcher = v55;
-end;
-v33.getFragmentMatcher = function(v56) --[[ Line: 263 ]] --[[ Name: getFragmentMatcher ]]
-    return v56.fragmentMatcher;
-end;
-v33.clientQuery = function(v57, v58) --[[ Line: 269 ]] --[[ Name: clientQuery ]]
-    -- upvalues: l_hasDirectives_0 (copy), l_Boolean_0 (copy), l_NULL_0 (copy)
-    if l_hasDirectives_0({
-        "client"
-    }, v58) and l_Boolean_0.toJSBoolean(v57.resolvers) then
-        return v58;
-    else
-        return l_NULL_0;
-    end;
-end;
-v33.serverQuery = function(_, v60) --[[ Line: 279 ]] --[[ Name: serverQuery ]]
-    -- upvalues: l_removeClientSetsFromDocument_0 (copy)
-    return l_removeClientSetsFromDocument_0(v60);
-end;
-v33.prepareContext = function(v61, v62) --[[ Line: 283 ]] --[[ Name: prepareContext ]]
-    -- upvalues: l_Object_0 (copy)
-    local l_cache_1 = v61.cache;
-    return l_Object_0.assign({}, v62, {
-        cache = l_cache_1, 
-        getCacheKey = function(_, v65) --[[ Line: 291 ]] --[[ Name: getCacheKey ]]
-            -- upvalues: l_cache_1 (copy)
-            return l_cache_1:identify(v65);
-        end
-    });
-end;
-v33.addExportedVariables = function(v66, v67, v68, v69) --[[ Line: 300 ]] --[[ Name: addExportedVariables ]]
-    -- upvalues: l_Boolean_0 (copy), l_Object_0 (copy), v7 (copy)
-    if v68 == nil then
-        v68 = {};
-    end;
-    if v69 == nil then
-        v69 = {};
-    end;
-    if l_Boolean_0.toJSBoolean(v67) then
-        local v70 = v66:buildRootValueFromCache(v67, v68);
-        return v66:resolveDocument(v67, l_Boolean_0.toJSBoolean(v70) and v70 or {}, v66:prepareContext(v69), v68):andThen(function(v71) --[[ Line: 319 ]]
-            -- upvalues: l_Object_0 (ref), v68 (ref)
-            return l_Object_0.assign({}, v68, v71.exportedVariables);
-        end);
-    else
-        return v7.resolve(l_Object_0.assign({}, v68));
-    end;
-end;
-v33.shouldForceResolvers = function(_, v73) --[[ Line: 327 ]] --[[ Name: shouldForceResolvers ]]
-    -- upvalues: l_visit_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), l_BREAK_0 (copy)
-    local v74 = false;
-    l_visit_0(v73, {
-        Directive = {
-            enter = function(_, v76) --[[ Line: 331 ]] --[[ Name: enter ]]
-                -- upvalues: l_Boolean_0 (ref), v74 (ref), l_Array_0 (ref), l_BREAK_0 (ref)
-                if v76.name.value == "client" and l_Boolean_0.toJSBoolean(v76.arguments) then
-                    v74 = l_Array_0.some(v76.arguments, function(v77) --[[ Line: 333 ]]
-                        local v78 = false;
-                        if v77.name.value == "always" then
-                            v78 = false;
-                            if v77.value.kind == "BooleanValue" then
-                                v78 = v77.value.value == true;
-                            end;
-                        end;
-                        return v78;
-                    end);
-                    if v74 then
-                        return l_BREAK_0;
-                    end;
-                end;
-                return nil;
-            end
-        }
-    });
-    return v74;
-end;
-v33.buildRootValueFromCache = function(v79, v80, v81) --[[ Line: 350 ]] --[[ Name: buildRootValueFromCache ]]
-    -- upvalues: l_buildQueryFromSelectionSet_0 (copy)
-    return v79.cache:diff({
-        query = l_buildQueryFromSelectionSet_0(v80), 
-        variables = v81, 
-        returnPartialData = true, 
-        optimistic = false
-    }).result;
-end;
-v33.resolveDocument = function(v82, v83, v84, v85, v86, v87, v88) --[[ Line: 359 ]] --[[ Name: resolveDocument ]]
-    -- upvalues: l_getMainDefinition_0 (copy), l_getFragmentDefinitions_0 (copy), l_createFragmentMap_0 (copy), l_Boolean_0 (copy), l_String_0 (copy), l_Object_0 (copy)
-    if v85 == nil then
-        v85 = {};
-    end;
-    if v86 == nil then
-        v86 = {};
-    end;
-    if v87 == nil then
-        v87 = function() --[[ Line: 377 ]]
-            return true;
-        end;
-    end;
-    if v88 == nil then
-        v88 = false;
-    end;
-    local v89 = l_getMainDefinition_0(v83);
-    local v90 = l_getFragmentDefinitions_0(v83);
-    local v91 = l_createFragmentMap_0(v90);
-    local l_operation_0 = v89.operation;
-    local v93 = nil;
-    v93 = if l_Boolean_0.toJSBoolean(l_operation_0) then string.upper((string.sub(l_operation_0, 1, 1))) .. l_String_0.slice(l_operation_0, 2) else "Query";
-    local l_cache_2 = v82.cache;
-    local l_client_1 = v82.client;
-    local v96 = {
-        fragmentMap = v91, 
-        context = l_Object_0.assign({}, v85, {
-            cache = l_cache_2, 
-            client = l_client_1
-        }), 
-        variables = v86, 
-        fragmentMatcher = v87, 
-        defaultOperationType = v93, 
-        exportedVariables = {}, 
-        onlyRunForcedResolvers = v88
-    };
-    return v82:resolveSelectionSet(v89.selectionSet, v84, v96):andThen(function(v97) --[[ Line: 413 ]]
-        -- upvalues: v96 (copy)
-        return {
-            result = v97, 
-            exportedVariables = v96.exportedVariables
-        };
-    end);
-end;
-v33.resolveSelectionSet = function(v98, v99, v100, v101) --[[ Line: 418 ]] --[[ Name: resolveSelectionSet ]]
-    -- upvalues: l_Boolean_0 (copy), l_shouldInclude_0 (copy), v7 (copy), l_isField_0 (copy), l_resultKeyNameFromField_0 (copy), l_isInlineFragment_0 (copy), l_invariant_0 (copy), l_Array_0 (copy), l_mergeDeepArray_0 (copy)
-    local l_fragmentMap_0 = v101.fragmentMap;
-    local l_context_1 = v101.context;
-    local l_variables_1 = v101.variables;
-    local v105 = {
-        v100
-    };
-    local function v111(v106) --[[ Line: 426 ]] --[[ Name: execute ]]
-        -- upvalues: l_Boolean_0 (ref), l_shouldInclude_0 (ref), l_variables_1 (copy), v7 (ref), l_isField_0 (ref), v98 (copy), v100 (copy), v101 (copy), v105 (copy), l_resultKeyNameFromField_0 (ref), l_isInlineFragment_0 (ref), l_fragmentMap_0 (copy), l_invariant_0 (ref), l_context_1 (copy)
-        if not l_Boolean_0.toJSBoolean(l_shouldInclude_0(v106, l_variables_1)) then
-            return v7.resolve(nil);
-        elseif l_isField_0(v106) then
-            return v98:resolveField(v106, v100, v101):andThen(function(v107) --[[ Line: 433 ]]
-                -- upvalues: v105 (ref), l_resultKeyNameFromField_0 (ref), v106 (copy)
-                if typeof(v107) ~= "nil" then
-                    table.insert(v105, {
-                        [l_resultKeyNameFromField_0(v106)] = v107
-                    });
-                end;
-            end);
-        else
-            local v108 = nil;
-            if l_isInlineFragment_0(v106) then
-                v108 = v106;
-            else
-                v108 = l_fragmentMap_0[v106.name.value];
-                l_invariant_0(v108, ("No fragment named %s"):format(v106.name.value));
-            end;
-            if v108 and v108.typeCondition ~= nil then
-                local l_value_0 = v108.typeCondition.name.value;
-                if l_Boolean_0.toJSBoolean(v101:fragmentMatcher(v100, l_value_0, l_context_1)) then
-                    return v98:resolveSelectionSet(v108.selectionSet, v100, v101):andThen(function(v110) --[[ Line: 454 ]]
-                        -- upvalues: v105 (ref)
-                        table.insert(v105, v110);
-                    end);
-                end;
-            end;
-            return v7.resolve(nil);
-        end;
-    end;
-    return v7.all(l_Array_0.map(v99.selections, v111)):andThen(function() --[[ Line: 462 ]]
-        -- upvalues: l_mergeDeepArray_0 (ref), v105 (copy)
-        return l_mergeDeepArray_0(v105);
-    end);
-end;
-v33.resolveField = function(v112, v113, v114, v115) --[[ Line: 467 ]] --[[ Name: resolveField ]]
-    -- upvalues: l_resultKeyNameFromField_0 (copy), l_Boolean_0 (copy), v7 (copy), l_cacheSlot_0 (copy), l_argumentsObjectFromField_0 (copy), l_Array_0 (copy), l_NULL_0 (copy)
-    local l_variables_2 = v115.variables;
-    local l_value_1 = v113.name.value;
-    local v118 = l_resultKeyNameFromField_0(v113);
-    local v119 = l_value_1 ~= v118;
-    local v120 = l_Boolean_0.toJSBoolean(v114[v118]) and v114[v118] or v114[l_value_1];
-    local v121 = v7.resolve(v120);
-    if not v115.onlyRunForcedResolvers or v112:shouldForceResolvers(v113) then
-        local v122 = l_Boolean_0.toJSBoolean(v114.__typename) and v114.__typename or v115.defaultOperationType;
-        local v123 = nil;
-        v123 = if l_Boolean_0.toJSBoolean(v112.resolvers) then v112.resolvers[tostring(v122)] else v112.resolvers;
-        if l_Boolean_0.toJSBoolean(v123) then
-            local v124 = v123[if v119 then l_value_1 else v118];
-            if l_Boolean_0.toJSBoolean(v124) then
-                v121 = v7.resolve(l_cacheSlot_0:withValue(v112.cache, v124, {
-                    v114, 
-                    l_argumentsObjectFromField_0(v113, l_variables_2), 
-                    v115.context, 
-                    {
-                        field = v113, 
-                        fragmentMap = v115.fragmentMap
-                    }
-                }));
-            end;
-        end;
-    end;
-    return v121:andThen(function(v125) --[[ Line: 512 ]]
-        -- upvalues: v120 (copy), v113 (copy), l_Array_0 (ref), l_Boolean_0 (ref), v115 (copy), l_NULL_0 (ref), v112 (copy)
-        if v125 == nil then
-            v125 = v120;
-        end;
-        if v113.directives ~= nil then
-            l_Array_0.forEach(v113.directives, function(v126) --[[ Line: 519 ]]
-                -- upvalues: l_Boolean_0 (ref), l_Array_0 (ref), v115 (ref), v125 (ref)
-                if v126.name.value == "export" and l_Boolean_0.toJSBoolean(v126.arguments) then
-                    l_Array_0.forEach(v126.arguments, function(v127) --[[ Line: 521 ]]
-                        -- upvalues: v115 (ref), v125 (ref)
-                        if v127.name.value == "as" and v127.value.kind == "StringValue" then
-                            v115.exportedVariables[v127.value.value] = v125;
-                        end;
-                    end);
-                end;
-            end);
-        end;
-        if not l_Boolean_0.toJSBoolean(v113.selectionSet) then
-            return v125;
-        elseif v125 == nil or v125 == l_NULL_0 then
-            return v125;
-        elseif l_Array_0.isArray(v125) then
-            return v112:resolveSubSelectedArray(v113, v125, v115);
-        elseif l_Boolean_0.toJSBoolean(v113.selectionSet) then
-            return v112:resolveSelectionSet(v113.selectionSet, v125, v115);
-        else
-            return nil;
-        end;
-    end);
-end;
-v33.resolveSubSelectedArray = function(v128, v129, v130, v131) --[[ Line: 554 ]] --[[ Name: resolveSubSelectedArray ]]
-    -- upvalues: v7 (copy), l_Array_0 (copy), l_NULL_0 (copy), l_Boolean_0 (copy)
-    return v7.all(l_Array_0.map(v130, function(v132) --[[ Line: 555 ]]
-        -- upvalues: l_NULL_0 (ref), l_Array_0 (ref), v128 (copy), v129 (copy), v131 (copy), l_Boolean_0 (ref)
-        if v132 == l_NULL_0 then
-            return l_NULL_0;
-        elseif l_Array_0.isArray(v132) then
-            return v128:resolveSubSelectedArray(v129, v132, v131);
-        elseif l_Boolean_0.toJSBoolean(v129.selectionSet) then
-            return v128:resolveSelectionSet(v129.selectionSet, v132, v131);
-        else
-            return nil;
-        end;
-    end));
-end;
-v9.LocalState = v33;
-return v9;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local Boolean = LuauPolyfill.Boolean
+local String = LuauPolyfill.String
+local Promise = require(ParentParentParent.Promise)
+local NULL = require(ParentParent.utilities.globals.null).NULL
+local t1 = {}
+local GraphQL = require(ParentParentParent.GraphQL)
+local visit = GraphQL.visit
+local BREAK = GraphQL.BREAK
+local invariant = require(ParentParent.jsutils.invariant).invariant
+
+require(script.Parent.Parent.cache)
+
+local utilities = require(script.Parent.Parent.utilities)
+local argumentsObjectFromField = utilities.argumentsObjectFromField
+local buildQueryFromSelectionSet = utilities.buildQueryFromSelectionSet
+local createFragmentMap = utilities.createFragmentMap
+local getFragmentDefinitions = utilities.getFragmentDefinitions
+local getMainDefinition = utilities.getMainDefinition
+local hasDirectives = utilities.hasDirectives
+local isField = utilities.isField
+local isInlineFragment = utilities.isInlineFragment
+local mergeDeep = utilities.mergeDeep
+local mergeDeepArray = utilities.mergeDeepArray
+local removeClientSetsFromDocument = utilities.removeClientSetsFromDocument
+local resultKeyNameFromField = utilities.resultKeyNameFromField
+local shouldInclude = utilities.shouldInclude
+
+require(script.Parent.ApolloClient_types)
+require(script.Parent.types)
+require(script.Parent.Parent.link.core)
+
+local cacheSlot = require(script.Parent.Parent.cache).cacheSlot
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}) -- line: 185
+	-- upvalues: t2 (copy)
+	local self = setmetatable({}, t2)
+	local cache = t3.cache
+	local client = t3.client
+	local resolvers = t3.resolvers
+	local fragmentMatcher = t3.fragmentMatcher
+
+	self.cache = cache
+
+	if client ~= nil then
+		self.client = client
+	end
+
+	if resolvers ~= nil then
+		self:addResolvers(resolvers)
+	end
+
+	if fragmentMatcher ~= nil then
+		self:setFragmentMatcher(fragmentMatcher)
+	end
+
+	return self
+end
+function t2.addResolvers(p1, p2) -- line: 206
+	-- upvalues: Boolean (copy), Array (copy), mergeDeep (copy)
+	p1.resolvers = Boolean.toJSBoolean(p1.resolvers) and p1.resolvers or {}
+
+	if Array.isArray(p2) then
+		Array.forEach(p2, function(p3) -- line: 209
+			-- upvalues: p1 (copy), mergeDeep (copy)
+			p1.resolvers = mergeDeep(p1.resolvers, p3)
+		end)
+
+		return
+	end
+
+	p1.resolvers = mergeDeep(p1.resolvers, p2)
+end
+function t2.setResolvers(p4, p5) -- line: 217
+	p4.resolvers = {}
+	p4:addResolvers(p5)
+end
+function t2.getResolvers(p6) -- line: 222
+	-- upvalues: Boolean (copy)
+	return Boolean.toJSBoolean(p6.resolvers) and p6.resolvers or {}
+end
+function t2.runResolvers(t4: {[any]: any}, t5: {[any]: any}) -- line: 230
+	-- upvalues: Boolean (copy), Object (copy), Promise (copy)
+	local document = t5.document
+	local remoteResult = t5.remoteResult
+	local context = t5.context
+	local variables = t5.variables
+	local onlyRunForcedResolvers = t5.onlyRunForcedResolvers
+
+	if t5.onlyRunForcedResolvers == nil then
+		onlyRunForcedResolvers = false
+	end
+
+	if Boolean.toJSBoolean(document) then
+		return t4:resolveDocument(document, remoteResult.data, context, variables, t4.fragmentMatcher, onlyRunForcedResolvers):andThen(function(p7) -- line: 251
+			-- upvalues: Object (copy), remoteResult (copy)
+			return Object.assign({}, remoteResult, {
+				data = p7.result
+			})
+		end)
+	end
+
+	return Promise.resolve(remoteResult)
+end
+function t2.setFragmentMatcher(t6: {[any]: any}, p8: ((...any) -> ...any)) -- line: 259
+	t6.fragmentMatcher = p8
+end
+function t2.getFragmentMatcher(p9) -- line: 263
+	return p9.fragmentMatcher
+end
+function t2.clientQuery(p10, p11) -- line: 269
+	-- upvalues: hasDirectives (copy), Boolean (copy), NULL (copy)
+	if hasDirectives({ "client" }, p11) and Boolean.toJSBoolean(p10.resolvers) then
+		return p11
+	end
+
+	return NULL
+end
+function t2.serverQuery(_, p13) -- line: 279
+	-- upvalues: removeClientSetsFromDocument (copy)
+	return removeClientSetsFromDocument(p13)
+end
+function t2.prepareContext(t7: {[any]: any}, t8: {[any]: any}?) -- line: 283
+	-- upvalues: Object (copy)
+	local cache = t7.cache
+
+	return Object.assign({}, t8, {
+		cache = cache,
+		getCacheKey = function(_, p15) -- line: 291
+			-- upvalues: cache (copy)
+			return cache:identify(p15)
+		end
+	})
+end
+function t2.addExportedVariables(p16, p17, p18, p19) -- line: 300
+	-- upvalues: Boolean (copy), Object (copy), Promise (copy)
+	if p18 == nil then
+		p18 = {}
+	end
+
+	if p19 == nil then
+		p19 = {}
+	end
+
+	if Boolean.toJSBoolean(p17) then
+		local v64 = p16:buildRootValueFromCache(p17, p18)
+
+		return p16:resolveDocument(p17, Boolean.toJSBoolean(v64) and v64 or {}, p16:prepareContext(p19), p18):andThen(function(p20) -- line: 319
+			-- upvalues: Object (copy), p18 (ref)
+			return Object.assign({}, p18, p20.exportedVariables)
+		end)
+	end
+
+	return Promise.resolve(Object.assign({}, p18))
+end
+function t2.shouldForceResolvers(_, p22) -- line: 327
+	-- upvalues: visit (copy), Boolean (copy), Array (copy), BREAK (copy)
+	local u67 = false
+
+	visit(p22, {
+		Directive = {
+			enter = function(_, p24) -- line: 331
+				-- upvalues: Boolean (copy), u67 (ref), Array (copy), BREAK (copy)
+				if p24.name.value == "client" and Boolean.toJSBoolean(p24.arguments) then
+					u67 = Array.some(p24.arguments, function(p25) -- line: 333
+						return p25.name.value == "always" and (p25.value.kind == "BooleanValue" and p25.value.value == true)
+					end)
+
+					if u67 then
+						return BREAK
+					end
+				end
+
+				return nil
+			end
+		}
+	})
+
+	return u67
+end
+function t2.buildRootValueFromCache(t9: {[any]: any}, p26, t10: {[any]: any}?) -- line: 350
+	-- upvalues: buildQueryFromSelectionSet (copy)
+	return t9.cache:diff({
+		returnPartialData = true,
+		optimistic = false,
+		query = buildQueryFromSelectionSet(p26),
+		variables = t10
+	}).result
+end
+function t2.resolveDocument(t11: {[any]: any}, p27, p28, p29, t12: {[any]: any}?, p30: ((...any) -> ...any)?, b1: boolean?) -- line: 359
+	-- upvalues: getMainDefinition (copy), getFragmentDefinitions (copy), createFragmentMap (copy), Boolean (copy), String (copy), Object (copy)
+	if p29 == nil then
+		p29 = {}
+	end
+
+	if t12 == nil then
+		t12 = {}
+	end
+
+	if p30 == nil then
+		function p30() -- line: 377
+			return true
+		end
+	end
+
+	if b1 == nil then
+		b1 = false
+	end
+
+	local v78 = getMainDefinition(p27)
+	local v79 = getFragmentDefinitions(p27)
+	local v80 = createFragmentMap(v79)
+	local operation = v78.operation
+	local v82 = not Boolean.toJSBoolean(operation) and "Query" or string.upper((string.sub(operation, 1, 1))) .. String.slice(operation, 2)
+	local cache = t11.cache
+	local client = t11.client
+	local t13 = {
+		fragmentMap = v80,
+		context = Object.assign({}, p29, {
+			cache = cache,
+			client = client
+		}),
+		variables = t12,
+		fragmentMatcher = p30,
+		defaultOperationType = v82,
+		exportedVariables = {},
+		onlyRunForcedResolvers = b1
+	}
+
+	return t11:resolveSelectionSet(v78.selectionSet, p28, t13):andThen(function(p31) -- line: 413
+		-- upvalues: t13 (copy)
+		return {
+			result = p31,
+			exportedVariables = t13.exportedVariables
+		}
+	end)
+end
+function t2.resolveSelectionSet(t14: {[any]: any}, p32, p33, t15: {[any]: any}) -- line: 418
+	-- upvalues: Boolean (copy), shouldInclude (copy), Promise (copy), isField (copy), resultKeyNameFromField (copy), isInlineFragment (copy), invariant (copy), Array (copy), mergeDeepArray (copy)
+	local fragmentMap = t15.fragmentMap
+	local context = t15.context
+	local variables = t15.variables
+	local t16 = { p33 }
+
+	local function execute(p34) -- line: 426
+		-- upvalues: Boolean (copy), shouldInclude (copy), variables (copy), Promise (copy), isField (copy), t14 (copy), p33 (copy), t15 (copy), t16 (copy), resultKeyNameFromField (copy), isInlineFragment (copy), fragmentMap (copy), invariant (copy), context (copy)
+		if not Boolean.toJSBoolean(shouldInclude(p34, variables)) then
+			return Promise.resolve(nil)
+		end
+
+		if isField(p34) then
+			return t14:resolveField(p34, p33, t15):andThen(function(p35) -- line: 433
+				-- upvalues: t16 (copy), resultKeyNameFromField (copy), p34 (copy)
+				if typeof(p35) ~= "nil" then
+					table.insert(t16, {
+						[resultKeyNameFromField(p34)] = p35
+					})
+				end
+			end)
+		end
+
+		local v121
+
+		if isInlineFragment(p34) then
+			v121 = p34
+		else
+			v121 = fragmentMap[p34.name.value]
+			invariant(v121, ("No fragment named %s"):format(p34.name.value))
+		end
+
+		if v121 and v121.typeCondition ~= nil then
+			local value = v121.typeCondition.name.value
+
+			if Boolean.toJSBoolean(t15:fragmentMatcher(p33, value, context)) then
+				return t14:resolveSelectionSet(v121.selectionSet, p33, t15):andThen(function(p36) -- line: 454
+					-- upvalues: t16 (copy)
+					table.insert(t16, p36)
+				end)
+			end
+		end
+
+		return Promise.resolve(nil)
+	end
+
+	return Promise.all(Array.map(p32.selections, execute)):andThen(function() -- line: 462
+		-- upvalues: mergeDeepArray (copy), t16 (copy)
+		return mergeDeepArray(t16)
+	end)
+end
+function t2.resolveField(t17: {[any]: any}, p37, p38, t18: {[any]: any}) -- line: 467
+	-- upvalues: resultKeyNameFromField (copy), Boolean (copy), Promise (copy), cacheSlot (copy), argumentsObjectFromField (copy), Array (copy), NULL (copy)
+	local variables = t18.variables
+	local value = p37.name.value
+	local v101 = resultKeyNameFromField(p37)
+	local v102 = value ~= v101
+	local v103 = Boolean.toJSBoolean(p38[v101]) and p38[v101] or p38[value]
+	local v104 = Promise.resolve(v103)
+
+	if not t18.onlyRunForcedResolvers or t17:shouldForceResolvers(p37) then
+		local v105 = Boolean.toJSBoolean(p38.__typename) and p38.__typename or t18.defaultOperationType
+		local v106 = if not Boolean.toJSBoolean(t17.resolvers) then t17.resolvers else t17.resolvers[tostring(v105)]
+
+		if Boolean.toJSBoolean(v106) then
+			local v107 = v106[if not v102 then v101 else value]
+
+			if Boolean.toJSBoolean(v107) then
+				v104 = Promise.resolve(cacheSlot:withValue(t17.cache, v107, {
+					p38,
+					argumentsObjectFromField(p37, variables),
+					t18.context,
+					{
+						field = p37,
+						fragmentMap = t18.fragmentMap
+					}
+				}))
+			end
+		end
+	end
+
+	return v104:andThen(function(p39) -- line: 512
+		-- upvalues: v103 (copy), p37 (copy), Array (copy), Boolean (copy), t18 (copy), NULL (copy), t17 (copy)
+		if p39 == nil then
+			p39 = v103
+		end
+
+		if p37.directives ~= nil then
+			Array.forEach(p37.directives, function(p40) -- line: 519
+				-- upvalues: Boolean (copy), Array (copy), t18 (copy), p39 (ref)
+				if p40.name.value == "export" and Boolean.toJSBoolean(p40.arguments) then
+					Array.forEach(p40.arguments, function(p41) -- line: 521
+						-- upvalues: t18 (copy), p39 (ref)
+						if p41.name.value == "as" and p41.value.kind == "StringValue" then
+							t18.exportedVariables[p41.value.value] = p39
+						end
+					end)
+				end
+			end)
+		end
+
+		if not Boolean.toJSBoolean(p37.selectionSet) then
+			return p39
+		end
+
+		if p39 == nil or p39 == NULL then
+			return p39
+		end
+
+		if Array.isArray(p39) then
+			return t17:resolveSubSelectedArray(p37, p39, t18)
+		end
+
+		if Boolean.toJSBoolean(p37.selectionSet) then
+			return t17:resolveSelectionSet(p37.selectionSet, p39, t18)
+		end
+
+		return nil
+	end)
+end
+function t2.resolveSubSelectedArray(t19: {[any]: any}, p42, p43, t20: {[any]: any}) -- line: 554
+	-- upvalues: Promise (copy), Array (copy), NULL (copy), Boolean (copy)
+	return Promise.all(Array.map(p43, function(p44) -- line: 555
+		-- upvalues: NULL (copy), Array (copy), t19 (copy), p42 (copy), t20 (copy), Boolean (copy)
+		if p44 == NULL then
+			return NULL
+		end
+
+		if Array.isArray(p44) then
+			return t19:resolveSubSelectedArray(p42, p44, t20)
+		end
+
+		if Boolean.toJSBoolean(p42.selectionSet) then
+			return t19:resolveSelectionSet(p42.selectionSet, p44, t20)
+		end
+
+		return nil
+	end))
+end
+
+t1.LocalState = t2
+
+return t1

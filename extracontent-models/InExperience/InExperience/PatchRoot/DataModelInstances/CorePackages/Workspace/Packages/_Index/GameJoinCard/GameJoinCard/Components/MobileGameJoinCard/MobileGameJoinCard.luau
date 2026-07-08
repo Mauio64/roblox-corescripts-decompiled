@@ -1,170 +1,220 @@
-local l_Parent_0 = script:FindFirstAncestor("GameJoinCard").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.UserTile);
-local l_UserTile_0 = v3.UserTile;
-local l_LayoutMode_0 = v3.LayoutMode;
-local l_OverlayProvider_0 = v2.OverlayProvider;
-local l_Sheet_0 = v2.Sheet;
-local l_View_0 = v2.View;
-local l_Button_0 = v2.Button;
-local l_ButtonVariant_0 = v2.Enums.ButtonVariant;
-local l_InputSize_0 = v2.Enums.InputSize;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_Image_0 = v2.Image;
-local l_Skeleton_0 = v2.Skeleton;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_GuiService_0 = game:GetService("GuiService");
-local v17 = require(script.Parent.Parent.Parent.Analytics.AnalyticsConstants);
-local l_viewEDPsourceValues_0 = v17.viewEDPsourceValues;
-local l_viewProfileSourceValues_0 = v17.viewProfileSourceValues;
-local v20 = game:DefineFastFlag("GameJoinCardBannerClick", false);
-return function(v21) --[[ Line: 53 ]] --[[ Name: MobileGameJoinCard ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v2 (copy), l_GuiService_0 (copy), l_viewProfileSourceValues_0 (copy), l_viewEDPsourceValues_0 (copy), l_useLocalization_0 (copy), l_OverlayProvider_0 (copy), l_Sheet_0 (copy), l_View_0 (copy), v20 (copy), l_Image_0 (copy), l_Skeleton_0 (copy), l_UserTile_0 (copy), l_LayoutMode_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy)
-    local v22 = l_useTokens_0();
-    local v23, v24 = v1.useState(false);
-    local v25, v26 = v1.useState(nil);
-    local v27 = v2.Hooks.useOverlay();
-    local v28 = not v27 or v27.AbsoluteSize.X > v27.AbsoluteSize.Y;
-    local v29 = false;
-    if l_GuiService_0.ViewportDisplaySize == Enum.DisplaySize.Small then
-        v29 = not v28;
-    end;
-    local v30 = not v29;
-    v29 = v1.useCallback(function(v31) --[[ Line: 61 ]]
-        -- upvalues: v24 (copy)
-        if v31 == Enum.AssetFetchStatus.Success then
-            v24(true);
-        end;
-    end, {});
-    local v32 = v1.useCallback(function() --[[ Line: 67 ]]
-        -- upvalues: v21 (copy), l_viewProfileSourceValues_0 (ref)
-        v21.onViewProfile(l_viewProfileSourceValues_0.UserTile);
-    end, {
-        v21
-    });
-    local v33 = v1.useCallback(function() --[[ Line: 71 ]]
-        -- upvalues: v21 (copy), l_viewProfileSourceValues_0 (ref)
-        v21.onViewProfile(l_viewProfileSourceValues_0.ViewProfileButton);
-    end, {
-        v21
-    });
-    local v34 = v1.useCallback(function() --[[ Line: 75 ]]
-        -- upvalues: v21 (copy), l_viewEDPsourceValues_0 (ref)
-        v21.onViewExperienceDetails(l_viewEDPsourceValues_0.Title);
-    end, {
-        v21
-    });
-    local v35 = v1.useCallback(function() --[[ Line: 79 ]]
-        -- upvalues: v21 (copy), l_viewEDPsourceValues_0 (ref)
-        v21.onViewExperienceDetails(l_viewEDPsourceValues_0.Thumbnail);
-    end, {
-        v21
-    });
-    local v36 = 88 + (v22.Typography.TitleMedium.FontSize * v22.Typography.TitleMedium.LineHeight + v22.Typography.BodyMedium.FontSize * v22.Typography.BodyMedium.LineHeight + v22.Padding.Small);
-    local v37 = l_useLocalization_0({
-        playingExperience = {
-            "Feature.Profile.Label.PlayingExperience"; 
-            experienceName = v21.experienceName
-        }, 
-        join = "Feature.Profile.Action.JoinGame", 
-        viewProfile = "Feature.Profile.Action.ViewProfile"
-    });
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1), 
-        BackgroundTransparency = 1, 
-        ref = v26
-    }, {
-        SheetProvider = v25 and v1.createElement(l_OverlayProvider_0, {
-            gui = v25
-        }, {
-            SheetRoot = v1.createElement(l_Sheet_0.Root, {
-                preferCenterSheet = true, 
-                onClose = v21.onClose
-            }, {
-                Content = v1.createElement(l_Sheet_0.Content, nil, {
-                    BottomPadding = if v30 then v1.createElement("UIPadding", {
-                        PaddingBottom = UDim.new(0, v22.Padding.Medium)
-                    }) else nil, 
-                    Layout = v1.createElement(l_View_0, {
-                        tag = "col gap-medium size-full-0 auto-y"
-                    }, {
-                        BannerImageContainer = v1.createElement(l_View_0, {
-                            tag = "size-full-0", 
-                            Size = UDim2.new(1, 0, 0, 111), 
-                            LayoutOrder = 1
-                        }, {
-                            BannerImageClipper = v1.createElement(l_View_0, {
-                                tag = "clip", 
-                                Position = UDim2.new(0, -v22.Padding.XLarge, 0, -v22.Padding.XLarge), 
-                                Size = UDim2.new(1, 40, 0, 187), 
-                                onActivated = if v20 then v35 else nil
-                            }, {
-                                BannerImageCanvas = v1.createElement("CanvasGroup", {
-                                    Size = UDim2.new(1, 0, 0, 202), 
-                                    BackgroundTransparency = 1, 
-                                    GroupTransparency = 0
-                                }, {
-                                    Corner = v1.createElement("UICorner", {
-                                        CornerRadius = UDim.new(0, 15)
-                                    }), 
-                                    BannerImage = v1.createElement(l_Image_0, {
-                                        BackgroundTransparency = 1, 
-                                        Image = v21.bannerImageUrl, 
-                                        Size = UDim2.fromScale(1, 1), 
-                                        ScaleType = Enum.ScaleType.Crop, 
-                                        ZIndex = 2, 
-                                        onLoaded = v29
-                                    }), 
-                                    BannerSkeleton = if not v23 then v1.createElement(l_Skeleton_0, {
-                                        Size = UDim2.fromScale(1, 1), 
-                                        ZIndex = 1
-                                    }) else nil
-                                })
-                            })
-                        }), 
-                        UserTileWrapper = if v21.userId then v1.createElement(l_View_0, {
-                            Size = UDim2.new(1, 0, 0, v36), 
-                            ZIndex = 2, 
-                            LayoutOrder = 2
-                        }, {
-                            Tile = v1.createElement(l_UserTile_0, {
-                                userId = v21.userId, 
-                                title = v21.playerName, 
-                                subtitle = v37.playingExperience, 
-                                layoutMode = l_LayoutMode_0.compact, 
-                                avatarSize = UDim2.fromOffset(88, 88), 
-                                backplateStyle = v22.Color.Surface.Surface_100, 
-                                onActivated = v32, 
-                                onSubtitleClicked = v34
-                            })
-                        }) else nil, 
-                        Buttons = v1.createElement(l_View_0, {
-                            tag = "col gap-small size-full-0 auto-y", 
-                            LayoutOrder = 3
-                        }, {
-                            PrimaryButton = v1.createElement(l_Button_0, {
-                                text = v37.join, 
-                                onActivated = v21.onJoin, 
-                                variant = l_ButtonVariant_0.Emphasis, 
-                                inputSize = l_InputSize_0.Medium, 
-                                isLoading = v21.isLoading, 
-                                isDisabled = not v21.isInExperience, 
-                                width = UDim.new(1, 0), 
-                                LayoutOrder = 1
-                            }), 
-                            SecondaryButton = v1.createElement(l_Button_0, {
-                                text = v37.viewProfile, 
-                                onActivated = v33, 
-                                variant = l_ButtonVariant_0.Standard, 
-                                inputSize = l_InputSize_0.Medium, 
-                                width = UDim.new(1, 0), 
-                                LayoutOrder = 2
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GameJoinCard").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local UserTile = require(Parent.UserTile)
+local UserTile2 = UserTile.UserTile
+local LayoutMode = UserTile.LayoutMode
+local OverlayProvider = Foundation.OverlayProvider
+local Sheet = Foundation.Sheet
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local FoundationImage = Foundation.Image
+local Skeleton = Foundation.Skeleton
+local useTokens = Foundation.Hooks.useTokens
+local GuiService = game:GetService("GuiService")
+local AnalyticsConstants = require(script.Parent.Parent.Parent.Analytics.AnalyticsConstants)
+local viewProfileSourceValues = AnalyticsConstants.viewProfileSourceValues
+local CtaType = AnalyticsConstants.CtaType
+local useJoinCardCtaLoadTime = require(script.Parent.Parent.Parent.Analytics.useJoinCardCtaLoadTime)
+local FFlagJoinCardAgeCheckUpsell = require(Parent.SharedFlags).FFlagJoinCardAgeCheckUpsell
+local AgeCheckUpsellCTA = require(script.Parent.Parent.AgeCheckUpsellCTA)
+local GameJoinCardTTI = require(script.Parent.Parent.Parent.Telemetry.GameJoinCardTTI)
+local v26 = game:DefineFastFlag("MobileGameJoinCardHideUserAvatar", false)
+local v27 = game:DefineFastFlag("MobileGameJoinCardShowExperienceNameOnly", false)
+
+local function MobileGameJoinCard(t1: {[any]: any}) -- line: 67
+	-- upvalues: useTokens (copy), React (copy), Foundation (copy), GuiService (copy), GameJoinCardTTI (copy), viewProfileSourceValues (copy), FFlagJoinCardAgeCheckUpsell (copy), useJoinCardCtaLoadTime (copy), CtaType (copy), useLocalization (copy), OverlayProvider (copy), Sheet (copy), View (copy), v26 (copy), FoundationImage (copy), Skeleton (copy), v27 (copy), FoundationText (copy), UserTile2 (copy), LayoutMode (copy), AgeCheckUpsellCTA (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
+	local v30 = useTokens()
+	local v31, v32 = React.useState(false)
+	local v33, v34 = React.useState(nil)
+	local v35 = Foundation.Hooks.useOverlay()
+	local v36 = not v35 or v35.AbsoluteSize.X > v35.AbsoluteSize.Y
+	local v37 = GuiService.ViewportDisplaySize == Enum.DisplaySize.Small and not v36
+	local v38 = React.useCallback(function(p1) -- line: 75
+		-- upvalues: v32 (copy), GameJoinCardTTI (copy)
+		if p1 == Enum.AssetFetchStatus.Success then
+			v32(true)
+			GameJoinCardTTI.trackBannerLoaded()
+		end
+	end, {})
+
+	React.useEffect(function() -- line: 82
+		-- upvalues: GameJoinCardTTI (copy)
+		GameJoinCardTTI.trackCardMounted()
+	end, {})
+
+	local v39 = React.useCallback(function() -- line: 86
+		-- upvalues: t1 (copy), viewProfileSourceValues (copy)
+		t1.onViewProfile(viewProfileSourceValues.UserTile)
+	end, { t1 })
+	local v40 = React.useCallback(function() -- line: 90
+		-- upvalues: t1 (copy), viewProfileSourceValues (copy)
+		t1.onViewProfile(viewProfileSourceValues.ViewProfileButton)
+	end, { t1 })
+	local v41 = v30.Typography.TitleMedium.FontSize * v30.Typography.TitleMedium.LineHeight
+	local v42 = v41 + v30.Typography.BodyMedium.FontSize * v30.Typography.BodyMedium.LineHeight + v30.Padding.Small
+	local v43 = 88 + v42
+	local v44 = FFlagJoinCardAgeCheckUpsell and t1.ageCheckRequired == true
+
+	if FFlagJoinCardAgeCheckUpsell then
+		useJoinCardCtaLoadTime({
+			isLoading = t1.isLoading,
+			ctaType = if not v44 then CtaType.Join else CtaType.AgeCheckUnlock,
+			wasCached = t1.wasPlayabilityCached
+		})
+	end
+
+	local v45 = useLocalization({
+		join = "Feature.Profile.Action.JoinGame",
+		viewProfile = "Feature.Profile.Action.ViewProfile",
+		chat = "Feature.Profile.Action.Chat",
+		playingExperience = {
+			"Feature.Profile.Label.PlayingExperience",
+			experienceName = t1.experienceName
+		},
+		userIsPlayingExperience = {
+			"Feature.Profile.Label.UserIsPlayingExperience",
+			userName = t1.playerName,
+			experienceName = t1.experienceName
+		},
+		chatWithName = {
+			"Feature.Home.PeopleList.ChatWith",
+			username = t1.playerName
+		}
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		ref = v34
+	}, {
+		SheetProvider = v33 and React.createElement(OverlayProvider, {
+			gui = v33
+		}, {
+			SheetRoot = React.createElement(Sheet.Root, {
+				preferCenterSheet = true,
+				onClose = t1.onClose
+			}, {
+				Content = React.createElement(Sheet.Content, nil, {
+					BottomPadding = if not not v37 then nil else React.createElement("UIPadding", {
+						PaddingBottom = UDim.new(0, v30.Padding.Medium)
+					}),
+					Layout = React.createElement(View, {
+						tag = "col gap-medium size-full-0 auto-y"
+					}, {
+						BannerImageContainer = React.createElement(View, {
+							tag = "size-full-0",
+							LayoutOrder = 1,
+							Size = if not v26 then UDim2.new(1, 0, 0, 111) else UDim2.new(1, 0, 0, 187 - v30.Padding.XLarge)
+						}, {
+							BannerImageClipper = React.createElement(View, {
+								tag = "clip",
+								Position = UDim2.new(0, -v30.Padding.XLarge, 0, -v30.Padding.XLarge),
+								Size = UDim2.new(1, 40, 0, 187)
+							}, {
+								BannerImageCanvas = React.createElement("CanvasGroup", {
+									BackgroundTransparency = 1,
+									GroupTransparency = 0,
+									Size = UDim2.new(1, 0, 0, 202)
+								}, {
+									Corner = React.createElement("UICorner", {
+										CornerRadius = UDim.new(0, 15)
+									}),
+									BannerImage = React.createElement(FoundationImage, {
+										BackgroundTransparency = 1,
+										ZIndex = 2,
+										Image = t1.bannerImageUrl,
+										Size = UDim2.fromScale(1, 1),
+										ScaleType = Enum.ScaleType.Crop,
+										onLoaded = v38
+									}),
+									BannerSkeleton = if v31 then nil else React.createElement(Skeleton, {
+										ZIndex = 1,
+										Size = UDim2.fromScale(1, 1)
+									})
+								})
+							})
+						}),
+						UserTileWrapper = if not t1.userId then nil else React.createElement(View, {
+							ZIndex = 2,
+							LayoutOrder = 2,
+							Size = if not v27 then if not v26 then UDim2.new(1, 0, 0, v43) else UDim2.new(1, 0, 0, v42) else UDim2.new(1, 0, 0, v41)
+						}, {
+							Tile = if not v27 then if not v26 then React.createElement(UserTile2, {
+								userId = t1.userId,
+								title = t1.playerName,
+								subtitle = v45.playingExperience,
+								layoutMode = LayoutMode.compact,
+								avatarSize = UDim2.fromOffset(88, 88),
+								backplateStyle = v30.Color.Surface.Surface_100,
+								onActivated = v39
+							}) else React.createElement(View, {
+								tag = "col align-x-center align-y-center size-full"
+							}, {
+								CombinedText = React.createElement(FoundationText, {
+									tag = "shrink auto-xy text-wrap text-align-x-center content-default",
+									LayoutOrder = 1,
+									RichText = true,
+									fontStyle = v30.Typography.BodyMedium,
+									Text = v45.userIsPlayingExperience
+								})
+							}) else React.createElement(View, {
+								tag = "row align-x-center align-y-center size-full"
+							}, {
+								ExperienceText = React.createElement(FoundationText, {
+									tag = "shrink auto-xy text-align-x-center content-emphasis",
+									LayoutOrder = 1,
+									RichText = true,
+									fontStyle = v30.Typography.TitleMedium,
+									Text = t1.experienceName,
+									TextTruncate = Enum.TextTruncate.AtEnd
+								})
+							})
+						}),
+						Buttons = React.createElement(View, {
+							tag = "col gap-small size-full-0 auto-y",
+							LayoutOrder = 3
+						}, {
+							PrimaryButton = if not v44 then React.createElement(Button, {
+								LayoutOrder = 1,
+								text = v45.join,
+								onActivated = t1.onJoin,
+								variant = ButtonVariant.Emphasis,
+								inputSize = InputSize.Medium,
+								isLoading = t1.isLoading,
+								isDisabled = not t1.isInExperience,
+								width = UDim.new(1, 0)
+							}) else React.createElement(AgeCheckUpsellCTA, {
+								LayoutOrder = 1,
+								onUnlockPressed = t1.onAgeCheckPressed or function() -- line: 242
+								end
+							}),
+							ChatButton = if not t1.canUsePlatformChat then nil else React.createElement(Button, {
+								LayoutOrder = 2,
+								text = if not v27 then v45.chat else v45.chatWithName,
+								onActivated = t1.onChat,
+								variant = ButtonVariant.Standard,
+								inputSize = InputSize.Medium,
+								width = UDim.new(1, 0)
+							}),
+							SecondaryButton = React.createElement(Button, {
+								LayoutOrder = 3,
+								text = v45.viewProfile,
+								onActivated = v40,
+								variant = ButtonVariant.Utility,
+								inputSize = InputSize.Medium,
+								width = UDim.new(1, 0)
+							})
+						})
+					})
+				})
+			})
+		})
+	})
+end
+
+return MobileGameJoinCard

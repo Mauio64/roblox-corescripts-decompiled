@@ -1,23 +1,27 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Types_0 = l_Parent_0.Types;
-local v3 = require(l_Parent_1.Rodux);
-local v4 = require(script.Parent.utils.setContactsInStore);
-local v5 = require(script.Parent.utils.updateContactsInStore);
-local _ = require(l_Types_0.ActionTypes);
-local _ = require(l_Types_0.ReducerTypes);
-local v8 = {};
-return function(v9) --[[ Line: 13 ]]
-    -- upvalues: v3 (copy), v8 (copy), v4 (copy), v5 (copy)
-    local l_networkingContacts_0 = v9.networkingContacts;
-    return v3.createReducer(v8, {
-        [l_networkingContacts_0.FindContactFriends.Succeeded.name] = function(_, v12) --[[ Line: 17 ]]
-            -- upvalues: v4 (ref)
-            return v4(v12);
-        end, 
-        [l_networkingContacts_0.GetContactEntitiesByContactId.Succeeded.name] = function(v13, v14) --[[ Line: 27 ]]
-            -- upvalues: v5 (ref)
-            return v5(v13, v14);
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Types = ParentParent.Types
+local Rodux = require(ParentParentParent.Rodux)
+local setContactsInStore = require(script.Parent.utils.setContactsInStore)
+local updateContactsInStore = require(script.Parent.utils.updateContactsInStore)
+
+require(Types.ActionTypes)
+require(Types.ReducerTypes)
+
+local t1 = {}
+
+return function(p1) -- line: 13
+	-- upvalues: Rodux (copy), t1 (copy), setContactsInStore (copy), updateContactsInStore (copy)
+	local networkingContacts = p1.networkingContacts
+
+	return Rodux.createReducer(t1, {
+		[networkingContacts.FindContactFriends.Succeeded.name] = function(_, p3) -- line: 17
+			-- upvalues: setContactsInStore (copy)
+			return setContactsInStore(p3)
+		end,
+		[networkingContacts.GetContactEntitiesByContactId.Succeeded.name] = function(p4, p5) -- line: 27
+			-- upvalues: updateContactsInStore (copy)
+			return updateContactsInStore(p4, p5)
+		end
+	})
+end

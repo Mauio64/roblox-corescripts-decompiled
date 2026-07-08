@@ -1,37 +1,46 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(script.Parent.UrlMatcher);
-local v2 = require(script.Parent.UrlValidation);
-local _ = require(script.Parent.Types);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = {};
-v5.__index = v5;
-v5.new = function(v6, v7) --[[ Line: 32 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v1 (copy), v5 (copy)
-    local v8 = v4.Dictionary.union(v6 or {}, {
-        pathPatterns = v4.Dictionary.keys(v7)
-    });
-    local v9 = {
-        _urlMatcher = v1.new(v8), 
-        _urlMap = v7
-    };
-    setmetatable(v9, v5);
-    return v9;
-end;
-v5.process = function(v10, v11) --[[ Line: 48 ]] --[[ Name: process ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    local v12 = v10._urlMatcher:match(v11);
-    return v4.List.filterMap(v12, function(v13) --[[ Line: 50 ]]
-        -- upvalues: v2 (ref), v10 (copy)
-        local v14, v15 = v2.validateUrlMatch(v13, v10._urlMap);
-        if v14 then
-            return {
-                startIndex = v13.startIndex, 
-                endIndex = v13.endIndex, 
-                result = v15
-            };
-        else
-            return nil;
-        end;
-    end);
-end;
-return v5;
+local ParentParent = script.Parent.Parent
+local UrlMatcher = require(script.Parent.UrlMatcher)
+local UrlValidation = require(script.Parent.UrlValidation)
+
+require(script.Parent.Types)
+
+local Cryo = require(ParentParent.Cryo)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2) -- line: 32
+	-- upvalues: Cryo (copy), UrlMatcher (copy), t1 (copy)
+	local v8 = Cryo.Dictionary.union(p1 or {}, {
+		pathPatterns = Cryo.Dictionary.keys(p2)
+	})
+	local t2 = {
+		_urlMatcher = UrlMatcher.new(v8),
+		_urlMap = p2
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.process(t3: {[any]: any}, s1: string) -- line: 48
+	-- upvalues: Cryo (copy), UrlValidation (copy)
+	local v12 = t3._urlMatcher:match(s1)
+
+	return Cryo.List.filterMap(v12, function(p3) -- line: 50
+		-- upvalues: UrlValidation (copy), t3 (copy)
+		local v14, v15 = UrlValidation.validateUrlMatch(p3, t3._urlMap)
+
+		if v14 then
+			return {
+				startIndex = p3.startIndex,
+				endIndex = p3.endIndex,
+				result = v15
+			}
+		end
+
+		return nil
+	end)
+end
+
+return t1

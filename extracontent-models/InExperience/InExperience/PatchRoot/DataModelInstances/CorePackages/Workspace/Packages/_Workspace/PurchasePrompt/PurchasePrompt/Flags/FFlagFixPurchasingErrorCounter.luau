@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixPurchasingErrorCounter", false);
+return game:DefineFastFlag("FixPurchasingErrorCounter", false)

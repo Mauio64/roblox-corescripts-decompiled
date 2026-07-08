@@ -1,239 +1,270 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = {};
-v2.__index = v2;
-v2.Levels = {
-    Error = "Error", 
-    Warning = "Warning", 
-    Info = "Info", 
-    Debug = "Debug", 
-    Trace = "Trace"
-};
-local v3 = {
-    v2.Levels.Error, 
-    v2.Levels.Warning, 
-    v2.Levels.Info, 
-    v2.Levels.Debug, 
-    v2.Levels.Trace
-};
-local v4 = {};
-for v5, v6 in pairs(v3) do
-    v4[v6] = v5;
-end;
-v2.Levels.fromString = function(v7) --[[ Line: 28 ]] --[[ Name: fromString ]]
-    -- upvalues: v3 (copy)
-    if type(v7) ~= "string" then
-        return nil;
-    else
-        for _, v9 in pairs(v3) do
-            if string.lower(v9) == string.lower(v7) then
-                return v9;
-            end;
-        end;
-        return nil;
-    end;
-end;
-v2.new = function(v10, v11) --[[ Line: 40 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    local v12 = {
-        name = v11, 
-        sinks = {}, 
-        children = {}, 
-        parent = v10, 
-        context = {}, 
-        dirty = true, 
-        active = {}, 
-        cache = {
-            sinks = {}, 
-            context = {}
-        }
-    };
-    for v13, _ in pairs(v2.Levels) do
-        if v10 then
-            v12.active[v13] = v10.active[v13];
-        else
-            v12.active[v13] = false;
-        end;
-    end;
-    if v10 then
-        v10.children[v12] = true;
-    end;
-    setmetatable(v12, v2);
-    return v12;
-end;
-local function v15(v16, v17) --[[ Line: 72 ]] --[[ Name: setActive ]]
-    -- upvalues: v4 (copy), v3 (copy), v15 (copy)
-    local v18 = v4[v16];
-    if v18 then
-        for v19 = 1, v18 do
-            v17.active[v3[v19]] = true;
-        end;
-        for v20, _ in pairs(v17.children) do
-            v15(v16, v20);
-        end;
-    end;
-end;
-local function v22(v23) --[[ Line: 85 ]] --[[ Name: setDirty ]]
-    -- upvalues: v22 (copy)
-    v23.dirty = true;
-    for v24, _ in pairs(v23.children) do
-        v22(v24);
-    end;
-end;
-local function v26(v27) --[[ Line: 93 ]] --[[ Name: updateCache ]]
-    -- upvalues: v26 (copy), v1 (copy)
-    if not v27.dirty then
-        return;
-    elseif not v27.parent then
-        v27.cache.context = v27.context;
-        v27.cache.sinks = v27.sinks;
-        v27.dirty = false;
-        return;
-    else
-        v26(v27.parent);
-        v27.cache.context = v1.Dictionary.join(v27.parent.cache.context, v27.context);
-        if v27.parent.cache.context.prefix and v27.context.prefix then
-            v27.cache.context.prefix = v27.parent.cache.context.prefix .. v27.context.prefix;
-        end;
-        v27.cache.sinks = v1.List.join(v27.parent.cache.sinks, v27.sinks);
-        v27.dirty = false;
-        return;
-    end;
-end;
-v2.setParent = function(v28, v29) --[[ Line: 117 ]] --[[ Name: setParent ]]
-    -- upvalues: v26 (copy), v4 (copy), v15 (copy), v3 (copy), v22 (copy)
-    if v28.parent then
-        v28.parent.children[v28] = nil;
-    end;
-    v26(v29);
-    v28.parent = v29;
-    v28.parent.children[v28] = true;
-    local v30 = -1;
-    for _, v32 in pairs(v29.cache.sinks) do
-        if v4[v32.maxLevel] then
-            v30 = math.max(v30, v4[v32.maxLevel]);
-        end;
-    end;
-    if v30 > -1 then
-        v15(v3[v30], v28);
-    end;
-    v28.dirty = true;
-    for v33, _ in pairs(v28.children) do
-        v22(v33);
-    end;
-end;
-v2.addSink = function(v35, v36) --[[ Line: 141 ]] --[[ Name: addSink ]]
-    -- upvalues: v15 (copy), v22 (copy)
-    v15(v36.maxLevel, v35);
-    table.insert(v35.sinks, v36);
-    v35.dirty = true;
-    for v37, _ in pairs(v35.children) do
-        v22(v37);
-    end;
-end;
-v2.setContext = function(v39, v40) --[[ Line: 147 ]] --[[ Name: setContext ]]
-    -- upvalues: v22 (copy)
-    v39.context = v40;
-    v39.dirty = true;
-    for v41, _ in pairs(v39.children) do
-        v22(v41);
-    end;
-end;
-local function v57(v43, v44, v45) --[[ Line: 152 ]] --[[ Name: log ]]
-    -- upvalues: v26 (copy), v4 (copy)
-    if v44.dirty then
-        v26(v44);
-    end;
-    local v46 = {
-        level = v43, 
-        rawMessage = v45, 
-        loggerName = v44.name
-    };
-    for v47, v48 in pairs(v44.cache.context) do
-        if type(v48) == "function" then
-            v46[v47] = v48();
-        else
-            v46[v47] = v48;
-        end;
-    end;
-    local v49 = nil;
-    v49 = v45.n == 0 and "LUMBERYAK INTERNAL: No log message given" or v45[1];
-    if v46.prefix then
-        v49 = v46.prefix .. v49;
-    end;
-    if v49:find("{") then
-        local v50 = 1;
-        do
-            local l_v50_0 = v50;
-            v49 = v49:gsub("{(.-)}", function(v52) --[[ Line: 186 ]]
-                -- upvalues: l_v50_0 (ref), v45 (copy), v46 (copy)
-                if v52 == "" then
-                    l_v50_0 = l_v50_0 + 1;
-                    return (tostring(v45[l_v50_0]));
-                else
-                    local v53 = v46[v52];
-                    return v53 and tostring(v53);
-                end;
-            end);
-            if l_v50_0 < v45.n then
-                v49 = v49 .. "\nLUMBERYAK INTERNAL: Too many arguments given for format string";
-            elseif v45.n < l_v50_0 then
-                v49 = v49 .. "\nLUMBERYAK INTERNAL: Too few arguments given for format string";
-            end;
-        end;
-    elseif v45.n > 1 then
-        v49 = v49 .. "\nLUMBERYAK INTERNAL: Too many arguments given for format string";
-    end;
-    local v54 = v4[v43];
-    for _, v56 in pairs(v44.cache.sinks) do
-        if v4[v56.maxLevel] and v54 <= v4[v56.maxLevel] then
-            v56:log(v49, v46);
-        end;
-    end;
-end;
-v2.error = function(v58, ...) --[[ Line: 213 ]] --[[ Name: error ]]
-    -- upvalues: v2 (copy), v57 (copy)
-    if not v58.active[v2.Levels.Error] then
-        return;
-    else
-        v57(v2.Levels.Error, v58, table.pack(...));
-        return;
-    end;
-end;
-v2.warning = function(v59, ...) --[[ Line: 220 ]] --[[ Name: warning ]]
-    -- upvalues: v2 (copy), v57 (copy)
-    if not v59.active[v2.Levels.Warning] then
-        return;
-    else
-        v57(v2.Levels.Warning, v59, table.pack(...));
-        return;
-    end;
-end;
-v2.info = function(v60, ...) --[[ Line: 227 ]] --[[ Name: info ]]
-    -- upvalues: v2 (copy), v57 (copy)
-    if not v60.active[v2.Levels.Info] then
-        return;
-    else
-        v57(v2.Levels.Info, v60, table.pack(...));
-        return;
-    end;
-end;
-v2.debug = function(v61, ...) --[[ Line: 234 ]] --[[ Name: debug ]]
-    -- upvalues: v2 (copy), v57 (copy)
-    if not v61.active[v2.Levels.Debug] then
-        return;
-    else
-        v57(v2.Levels.Debug, v61, table.pack(...));
-        return;
-    end;
-end;
-v2.trace = function(v62, ...) --[[ Line: 241 ]] --[[ Name: trace ]]
-    -- upvalues: v2 (copy), v57 (copy)
-    if not v62.active[v2.Levels.Trace] then
-        return;
-    else
-        v57(v2.Levels.Trace, v62, table.pack(...));
-        return;
-    end;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+local Cryo = require(ParentParent.Cryo)
+local t1 = {}
+
+t1.__index = t1
+t1.Levels = {
+	Error = "Error",
+	Warning = "Warning",
+	Info = "Info",
+	Debug = "Debug",
+	Trace = "Trace"
+}
+
+local t2 = {
+	t1.Levels.Error,
+	t1.Levels.Warning,
+	t1.Levels.Info,
+	t1.Levels.Debug,
+	t1.Levels.Trace
+}
+local t3 = {}
+
+for k, v in pairs(t2) do
+	t3[v] = k
+end
+
+function t1.Levels.fromString(p1) -- line: 28
+	-- upvalues: t2 (copy)
+	if type(p1) ~= "string" then
+		return nil
+	end
+
+	for _, v in pairs(t2) do
+		if string.lower(v) == string.lower(p1) then
+			return v
+		end
+	end
+
+	return nil
+end
+function t1.new(p2, p3) -- line: 40
+	-- upvalues: t1 (copy)
+	local t4 = {
+		dirty = true,
+		name = p3,
+		sinks = {},
+		children = {},
+		parent = p2,
+		context = {},
+		active = {},
+		cache = {
+			sinks = {},
+			context = {}
+		}
+	}
+
+	for k, _ in pairs(t1.Levels) do
+		if p2 then
+			t4.active[k] = p2.active[k]
+		else
+			t4.active[k] = false
+		end
+	end
+
+	if p2 then
+		p2.children[t4] = true
+	end
+
+	setmetatable(t4, t1)
+
+	return t4
+end
+
+local function setActive(p4, p5) -- line: 72
+	-- upvalues: t3 (copy), t2 (copy), setActive (copy)
+	local v22 = t3[p4]
+
+	if v22 then
+		for i = 1, v22 do
+			p5.active[t2[i]] = true
+		end
+
+		for k, _ in pairs(p5.children) do
+			setActive(p4, k)
+		end
+	end
+end
+local function setDirty(p6) -- line: 85
+	-- upvalues: setDirty (copy)
+	p6.dirty = true
+
+	for k, _ in pairs(p6.children) do
+		setDirty(k)
+	end
+end
+local function updateCache(p7) -- line: 93
+	-- upvalues: updateCache (copy), Cryo (copy)
+	if not p7.dirty then
+		return
+	end
+
+	if not p7.parent then
+		p7.cache.context = p7.context
+		p7.cache.sinks = p7.sinks
+		p7.dirty = false
+
+		return
+	end
+
+	updateCache(p7.parent)
+	p7.cache.context = Cryo.Dictionary.join(p7.parent.cache.context, p7.context)
+
+	if p7.parent.cache.context.prefix and p7.context.prefix then
+		p7.cache.context.prefix = p7.parent.cache.context.prefix .. p7.context.prefix
+	end
+
+	p7.cache.sinks = Cryo.List.join(p7.parent.cache.sinks, p7.sinks)
+	p7.dirty = false
+end
+
+function t1.setParent(p8, p9) -- line: 117
+	-- upvalues: updateCache (copy), t3 (copy), setActive (copy), t2 (copy), setDirty (copy)
+	if p8.parent then
+		p8.parent.children[p8] = nil
+	end
+
+	updateCache(p9)
+	p8.parent = p9
+	p8.parent.children[p8] = true
+
+	local n1 = -1
+
+	for _, v in pairs(p9.cache.sinks) do
+		if t3[v.maxLevel] then
+			n1 = math.max(n1, t3[v.maxLevel])
+		end
+	end
+
+	if n1 > -1 then
+		setActive(t2[n1], p8)
+	end
+
+	p8.dirty = true
+
+	for k, _ in pairs(p8.children) do
+		setDirty(k)
+	end
+end
+function t1.addSink(p10, p11) -- line: 141
+	-- upvalues: setActive (copy), setDirty (copy)
+	setActive(p11.maxLevel, p10)
+	table.insert(p10.sinks, p11)
+	p10.dirty = true
+
+	for k, _ in pairs(p10.children) do
+		setDirty(k)
+	end
+end
+function t1.setContext(p12, p13) -- line: 147
+	-- upvalues: setDirty (copy)
+	p12.context = p13
+	p12.dirty = true
+
+	for k, _ in pairs(p12.children) do
+		setDirty(k)
+	end
+end
+
+local function log(p14, p15, p16) -- line: 152
+	-- upvalues: updateCache (copy), t3 (copy)
+	if p15.dirty then
+		updateCache(p15)
+	end
+
+	local t5 = {
+		level = p14,
+		rawMessage = p16,
+		loggerName = p15.name
+	}
+
+	for k, v in pairs(p15.cache.context) do
+		if type(v) == "function" then
+			t5[k] = v()
+		else
+			t5[k] = v
+		end
+	end
+
+	local v51 = if p16.n ~= 0 then p16[1] else "LUMBERYAK INTERNAL: No log message given"
+
+	if t5.prefix then
+		v51 = t5.prefix .. v51
+	end
+
+	if v51:find("{") then
+		local n2 = 1
+
+		v51 = v51:gsub("{(.-)}", function(p17) -- line: 186
+			-- upvalues: n2 (ref), p16 (copy), t5 (copy)
+			if p17 == "" then
+				n2 += 1
+
+				return (tostring(p16[n2]))
+			end
+
+			local v62 = t5[p17]
+
+			return v62 and tostring(v62)
+		end)
+
+		if n2 < p16.n then
+			v51 ..= "\nLUMBERYAK INTERNAL: Too many arguments given for format string"
+		elseif p16.n < n2 then
+			v51 ..= "\nLUMBERYAK INTERNAL: Too few arguments given for format string"
+		end
+	elseif p16.n > 1 then
+		v51 ..= "\nLUMBERYAK INTERNAL: Too many arguments given for format string"
+	end
+
+	local v53 = t3[p14]
+
+	for _, v in pairs(p15.cache.sinks) do
+		if t3[v.maxLevel] and v53 <= t3[v.maxLevel] then
+			v:log(v51, t5)
+		end
+	end
+end
+
+function t1.error(p18, ...) -- line: 213
+	-- upvalues: t1 (copy), log (copy)
+	if not p18.active[t1.Levels.Error] then
+		return
+	end
+
+	log(t1.Levels.Error, p18, table.pack(...))
+end
+function t1.warning(p19, ...) -- line: 220
+	-- upvalues: t1 (copy), log (copy)
+	if not p19.active[t1.Levels.Warning] then
+		return
+	end
+
+	log(t1.Levels.Warning, p19, table.pack(...))
+end
+function t1.info(p20, ...) -- line: 227
+	-- upvalues: t1 (copy), log (copy)
+	if not p20.active[t1.Levels.Info] then
+		return
+	end
+
+	log(t1.Levels.Info, p20, table.pack(...))
+end
+function t1.debug(p21, ...) -- line: 234
+	-- upvalues: t1 (copy), log (copy)
+	if not p21.active[t1.Levels.Debug] then
+		return
+	end
+
+	log(t1.Levels.Debug, p21, table.pack(...))
+end
+function t1.trace(p22, ...) -- line: 241
+	-- upvalues: t1 (copy), log (copy)
+	if not p22.active[t1.Levels.Trace] then
+		return
+	end
+
+	log(t1.Levels.Trace, p22, table.pack(...))
+end
+
+return t1

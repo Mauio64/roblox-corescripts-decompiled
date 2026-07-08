@@ -1,94 +1,99 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_VRConstants_0 = require(l_Parent_0.VrCompatibility).VRConstants;
-local l_Panel3D_0 = v3.Core.VR.Panel3D;
-local l_Constants_0 = v3.Core.VR.Constants;
-local v7 = game:DefineFastFlag("RepositionInExperienceVRToasts", false);
-return function(v8) --[[ Line: 28 ]]
-    -- upvalues: v2 (copy), l_GuiService_0 (copy), l_VRConstants_0 (copy), v7 (copy), l_Constants_0 (copy), l_Panel3D_0 (copy)
-    local l_isConfirmModalOpen_0 = v8.isConfirmModalOpen;
-    local l_isToastOpen_0 = v8.isToastOpen;
-    local l_isCoreScript_0 = v8.isCoreScript;
-    local l_ToastComponent_0 = v8.ToastComponent;
-    local l_ConfirmationModalComponent_0 = v8.ConfirmationModalComponent;
-    local v14 = v2.useRef(nil);
-    local v15 = l_GuiService_0.CoreGuiFolder and l_GuiService_0.CoreGuiFolder:FindFirstChild(l_VRConstants_0.PositionLockedPanelName);
-    if v15 then
-        v14.current = v15;
-    else
-        v15 = v14.current;
-    end;
-    local v16 = if v15 then v15.Size.Y else 2.45;
-    local v17 = {
-        partSize = l_VRConstants_0.ToastSize, 
-        offset = CFrame.lookAt(l_VRConstants_0.ToastPosition, l_VRConstants_0.DefaultCameraPosition), 
-        virtualScreenSize = l_VRConstants_0.ToastResolution, 
-        curvature = l_VRConstants_0.ToastCurvature, 
-        panelName = "ToastNotifications", 
-        hidden = not l_isToastOpen_0
-    };
-    if l_isCoreScript_0 then
-        local v19 = v2.useCallback(function(v18) --[[ Line: 62 ]]
-            -- upvalues: v15 (ref), v7 (ref), v16 (copy)
-            if v15 then
-                if v7 then
-                    return v15.CFrame * CFrame.new(0, v16 * -0.53, v16 * -0.15) * CFrame.Angles(0.25, 0, 0);
-                else
-                    return v15.CFrame * CFrame.new(0, v16 * -0.45, v16 * -0.15) * CFrame.Angles(0.2, 0, 0);
-                end;
-            else
-                return v18.panelCFrame;
-            end;
-        end, {
-            v15, 
-            v16
-        });
-        v17 = {
-            panelName = "ToastNotifications", 
-            partSize = if v7 then Vector3.new(1, 0.5, 0, 0) else Vector3.new(1.2000000476837158, 0.6000000238418579, 0, 0), 
-            virtualScreenSize = Vector2.new(300, 150), 
-            lerp = false, 
-            tilt = 0, 
-            anchoring = l_Constants_0.AnchoringTypes.Head, 
-            faceCamera = true, 
-            curvature = 0, 
-            alwaysOnTop = true, 
-            parent = l_GuiService_0.CoreGuiFolder, 
-            hidden = not l_isToastOpen_0, 
-            tiltCallback = v19
-        };
-    end;
-    local v21 = v2.useCallback(function(v20) --[[ Line: 93 ]]
-        -- upvalues: v15 (ref)
-        if v15 then
-            return v15.CFrame * CFrame.new(0, 0, -0.1);
-        else
-            return v20.panelCFrame;
-        end;
-    end, {
-        v15
-    });
-    return v2.createElement(v2.Fragment, nil, {
-        v2.createElement(l_Panel3D_0, v17, {
-            Toast = l_ToastComponent_0
-        }), 
-        v2.createElement(l_Panel3D_0, {
-            panelName = "ConfirmationModal", 
-            partSize = Vector3.new(3, 3, 0, 0), 
-            virtualScreenSize = Vector2.new(600, 600), 
-            lerp = false, 
-            tilt = 0, 
-            anchoring = l_Constants_0.AnchoringTypes.Head, 
-            faceCamera = true, 
-            curvature = 0, 
-            alwaysOnTop = true, 
-            parent = l_GuiService_0.CoreGuiFolder, 
-            hidden = not l_isConfirmModalOpen_0, 
-            tiltCallback = v21
-        }, {
-            DeeplinkConfirmationModal = l_ConfirmationModalComponent_0
-        })
-    });
-end;
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local UIBlox = require(ParentParent.UIBlox)
+local VRConstants = require(ParentParent.VrCompatibility).VRConstants
+local Panel3D = UIBlox.Core.VR.Panel3D
+local Constants = UIBlox.Core.VR.Constants
+local v8 = game:DefineFastFlag("RepositionInExperienceVRToasts", false)
+
+return function(p1) -- line: 28
+	-- upvalues: React (copy), GuiService (copy), VRConstants (copy), v8 (copy), Constants (copy), Panel3D (copy)
+	local isConfirmModalOpen = p1.isConfirmModalOpen
+	local isToastOpen = p1.isToastOpen
+	local isCoreScript = p1.isCoreScript
+	local ToastComponent = p1.ToastComponent
+	local ConfirmationModalComponent = p1.ConfirmationModalComponent
+	local v15 = React.useRef(nil)
+	local u16 = GuiService.CoreGuiFolder and GuiService.CoreGuiFolder:FindFirstChild(VRConstants.PositionLockedPanelName)
+
+	if u16 then
+		v15.current = u16
+	else
+		u16 = v15.current
+	end
+
+	local v17 = not u16 and 2.45 or u16.Size.Y
+	local t1 = {
+		panelName = "ToastNotifications",
+		partSize = VRConstants.ToastSize,
+		offset = CFrame.lookAt(VRConstants.ToastPosition, VRConstants.DefaultCameraPosition),
+		virtualScreenSize = VRConstants.ToastResolution,
+		curvature = VRConstants.ToastCurvature,
+		hidden = not isToastOpen
+	}
+
+	if isCoreScript then
+		local v19 = React.useCallback(function(p2) -- line: 62
+			-- upvalues: u16 (ref), v8 (copy), v17 (copy)
+			if u16 then
+				if v8 then
+					return u16.CFrame * CFrame.new(0, v17 * -0.53, v17 * -0.15) * CFrame.Angles(0.25, 0, 0)
+				end
+
+				return u16.CFrame * CFrame.new(0, v17 * -0.45, v17 * -0.15) * CFrame.Angles(0.2, 0, 0)
+			end
+
+			return p2.panelCFrame
+		end, {
+			u16,
+			v17
+		})
+
+		t1 = {
+			panelName = "ToastNotifications",
+			lerp = false,
+			tilt = 0,
+			faceCamera = true,
+			curvature = 0,
+			alwaysOnTop = true,
+			partSize = if not v8 then Vector3.new(1.2000000476837158, 0.6000000238418579, 0) else Vector3.new(1, 0.5, 0),
+			virtualScreenSize = Vector2.new(300, 150),
+			anchoring = Constants.AnchoringTypes.Head,
+			parent = GuiService.CoreGuiFolder,
+			hidden = not isToastOpen,
+			tiltCallback = v19
+		}
+	end
+
+	local v20 = React.useCallback(function(p3) -- line: 93
+		-- upvalues: u16 (ref)
+		if u16 then
+			return u16.CFrame * CFrame.new(0, 0, -0.1)
+		end
+
+		return p3.panelCFrame
+	end, { u16 })
+
+	return React.createElement(React.Fragment, nil, {
+		React.createElement(Panel3D, t1, {
+			Toast = ToastComponent
+		}),
+		React.createElement(Panel3D, {
+			panelName = "ConfirmationModal",
+			partSize = Vector3.new(3, 3, 0),
+			lerp = false,
+			tilt = 0,
+			faceCamera = true,
+			curvature = 0,
+			alwaysOnTop = true,
+			virtualScreenSize = Vector2.new(600, 600),
+			anchoring = Constants.AnchoringTypes.Head,
+			parent = GuiService.CoreGuiFolder,
+			hidden = not isConfirmModalOpen,
+			tiltCallback = v20
+		}, {
+			DeeplinkConfirmationModal = ConfirmationModalComponent
+		})
+	})
+end

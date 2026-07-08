@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixEditorCategoryRenavigation", false);
+return game:DefineFastFlag("AXFixEditorCategoryRenavigation", false)

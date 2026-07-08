@@ -1,291 +1,293 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialCommon").Parent;
-local l_MessageBusService_0 = game:GetService("MessageBusService");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.UIBlox);
-local l_useScreenSize_0 = require(l_Parent_0.RobloxAppHooks).useScreenSize;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v9 = require(l_Parent_0.LinkingProtocol);
-local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-local v11 = require(l_Parent_0.SocialLuaAnalytics);
-local v12 = require(l_Parent_0.Dash);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_PermissionsProtocol_0 = require(l_Parent_0.PermissionsProtocol).PermissionsProtocol;
-local l_default_0 = v9.LinkingProtocol.default;
-local l_SettingsRoute_0 = v9.Enums.SettingsRoute;
-local l_InteractiveAlert_0 = v4.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v4.App.Button.Enum.ButtonType;
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_useStyle_0 = v4.Core.Style.useStyle;
-local l_StyledTextLabel_0 = v4.App.Text.StyledTextLabel;
-local l_AnalyticsFactory_0 = v11.Analytics.AnalyticsFactory;
-local l_DefaultAnalyticsService_0 = v11.Analytics.DefaultAnalyticsService;
-local l_EventTypes_0 = v11.Analytics.Enums.EventTypes;
-local l_FFlagEnableRetryForLinkingProtocolFetch_0 = require(l_Parent_0.SharedFlags).FFlagEnableRetryForLinkingProtocolFetch;
-local l_FIntLinkingProtocolFetchRetries_0 = require(l_Parent_0.SharedFlags).FIntLinkingProtocolFetchRetries;
-local l_FIntLinkingProtocolFetchTimeoutMS_0 = require(l_Parent_0.SharedFlags).FIntLinkingProtocolFetchTimeoutMS;
-local l_FFlagQRInSearchScanner_0 = require(l_Parent_0.SharedFlags).FFlagQRInSearchScanner;
-local l_FFlagRegisterQRCodeKeyInEngine_0 = require(l_Parent_0.SharedFlags).FFlagRegisterQRCodeKeyInEngine;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v31 = l_FFlagRegisterQRCodeKeyInEngine_0 and "ProfileQrCodeCameraSettingsModalSeen" or "ScreenshotEventTracking";
-local l_l_MessageBusService_0_MessageId_0 = l_MessageBusService_0:GetMessageId("Realtime", "appResume");
-local v33 = {
-    SettingsPermissionInteractiveAlertButtonClick = {
-        context = "settingsPermissionInteractiveAlert", 
-        eventType = l_EventTypes_0.ButtonClick, 
-        formatRulesForAdditionalInfo = {
-            settingsRoute = v12.identity, 
-            btn = v12.identity
-        }
-    }, 
-    SettingsPermissionInteractiveAlertImpression = {
-        context = "settingsPermissionInteractiveAlert", 
-        eventType = l_EventTypes_0.SettingsPermissionInteractiveAlertImpression, 
-        formatRulesForAdditionalInfo = {
-            settingsRoute = v12.identity, 
-            settingsAppAvailable = v12.identity
-        }
-    }
-};
-local v34 = {
-    [l_SettingsRoute_0.Camera] = l_PermissionsProtocol_0.Permissions.CAMERA_ACCESS, 
-    [l_SettingsRoute_0.Contacts] = l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-};
-return function(v35) --[[ Line: 88 ]] --[[ Name: SettingsPermissionInteractiveAlert ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useDispatch_0 (copy), l_useStyle_0 (copy), v3 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_AnalyticsFactory_0 (copy), v33 (copy), l_DefaultAnalyticsService_0 (copy), l_FFlagQRInSearchScanner_0 (copy), l_FFlagEnableRetryForLinkingProtocolFetch_0 (copy), l_FIntLinkingProtocolFetchRetries_0 (copy), l_default_0 (copy), l_FIntLinkingProtocolFetchTimeoutMS_0 (copy), l_AppStorageService_0 (copy), v31 (copy), l_MessageBusService_0 (copy), l_l_MessageBusService_0_MessageId_0 (copy), l_PermissionsProtocol_0 (copy), v34 (copy), l_useAppPolicy_0 (copy), l_useLocalization_0 (copy), l_SettingsRoute_0 (copy), l_Images_0 (copy), l_ButtonType_0 (copy), l_StyledTextLabel_0 (copy), l_Text_0 (copy), l_InteractiveAlert_0 (copy)
-    local v36 = l_useScreenSize_0();
-    local v37 = l_useDispatch_0();
-    local v38 = l_useStyle_0();
-    local v39 = v35.settingsRoute or v35.navigation and v35.navigation.getParam("settingsRoute");
-    local v40 = v35.source or v35.navigation and v35.navigation.getParam("source");
-    local v41 = v3.useCallback(function() --[[ Line: 98 ]]
-        -- upvalues: v35 (copy), v37 (copy)
-        if v35.closeCentralOverlayThunk then
-            return (v37(v35.closeCentralOverlayThunk()));
-        else
-            return v35.navigation and v35.navigation.pop();
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v37, 
-        v35.closeCentralOverlayThunk, 
-        v35.navigation
-    } else l_dependencyArray_0(v37, v35.closeCentralOverlayThunk, v35.navigation));
-    local v42 = v3.useMemo(function() --[[ Line: 109 ]]
-        -- upvalues: l_AnalyticsFactory_0 (ref), v33 (ref), l_DefaultAnalyticsService_0 (ref), l_FFlagQRInSearchScanner_0 (ref), v40 (copy)
-        return l_AnalyticsFactory_0.setUpAnalyticsFactory({
-            eventLists = {
-                EventStream = v33
-            }, 
-            analyticsImpl = {
-                EventStream = l_DefaultAnalyticsService_0.EventStream
-            }, 
-            staticInfoForAllEvents = if l_FFlagQRInSearchScanner_0 then {
-                source = v40
-            } else nil
-        })();
-    end);
-    local v43 = false;
-    local v44 = nil;
-    local v45 = nil;
-    if v45 == nil then
-        if l_FFlagEnableRetryForLinkingProtocolFetch_0 then
-            for _ = 0, l_FIntLinkingProtocolFetchRetries_0 do
-                local v49 = task.spawn(function() --[[ Line: 139 ]]
-                    -- upvalues: v43 (ref), v44 (ref), l_default_0 (ref), v39 (copy)
-                    local v47, v48 = l_default_0:supportsSwitchToSettingsApp(v39):await();
-                    v43 = v47;
-                    v44 = v48;
-                end);
-                task.wait(l_FIntLinkingProtocolFetchTimeoutMS_0 / 1000);
-                task.cancel(v49);
-                if v44 ~= nil then
-                    break;
-                end;
-            end;
-        else
-            local v50, v51 = l_default_0:supportsSwitchToSettingsApp(v39):await();
-            v43 = v50;
-            v44 = v51;
-        end;
-        v45 = v43 and v44;
-    end;
-    v3.useEffect(function() --[[ Line: 156 ]]
-        -- upvalues: v42 (copy), v39 (copy), v45 (ref), l_AppStorageService_0 (ref), v31 (ref), l_MessageBusService_0 (ref), l_l_MessageBusService_0_MessageId_0 (ref), l_PermissionsProtocol_0 (ref), v34 (ref), v41 (copy)
-        v42.fireAnalyticsEvent("SettingsPermissionInteractiveAlertImpression", {
-            settingsRoute = v39, 
-            settingsAppAvailable = v45
-        });
-        l_AppStorageService_0:SetItem(v31, "true");
-        l_AppStorageService_0:Flush();
-        local v53 = l_MessageBusService_0:Subscribe(l_l_MessageBusService_0_MessageId_0, function() --[[ Line: 165 ]]
-            -- upvalues: l_PermissionsProtocol_0 (ref), v34 (ref), v39 (ref), v41 (ref)
-            l_PermissionsProtocol_0.default:hasPermissions({
-                v34[v39]
-            }):andThen(function(v52) --[[ Line: 170 ]]
-                -- upvalues: l_PermissionsProtocol_0 (ref), v41 (ref)
-                if v52 and v52.status == l_PermissionsProtocol_0.Status.AUTHORIZED then
-                    v41();
-                end;
-            end);
-        end, false, true);
-        return function() --[[ Line: 177 ]]
-            -- upvalues: v53 (copy)
-            v53:Disconnect();
-        end;
-    end, {});
-    local v55 = l_useAppPolicy_0(function(v54) --[[ Line: 182 ]]
-        return v54.getShouldShowSettingsPermissionsAdditionalInstructions();
-    end);
-    local v56 = l_useLocalization_0({
-        notNow = "Feature.SettingsHub.Action.NotNow", 
-        ok = "Feature.SettingsHub.Action.Ok", 
-        openSettings = "Feature.SettingsHub.Action.OpenSettings", 
-        titleCamera = "Feature.SettingsHub.Prompt.NeedCameraAccess", 
-        titleContacts = "Feature.SettingsHub.Prompt.NeedContactsAccess", 
-        bodyTextCamera = "Feature.SettingsHub.Description.QRCodeCameraPermissionIOS", 
-        bodyTextContacts = "Feature.SettingsHub.Description.ContactsPermissionIOS", 
-        additionalInstructionsContactsDeeplinkSupported = "Feature.SettingsHub.Description.ContactsPermissionAndroid", 
-        additionalInstructionsContactsDeeplinkNotSupported = "Feature.SettingsHub.Description.ContactsPermissionAndroidDeeplinkNotSupported", 
-        additionalInstructionsCameraDeeplinkSupported = "Feature.SettingsHub.Description.QRCodeCameraPermissionAndroid", 
-        additionalInstructionsCameraDeeplinkNotSupported = "Feature.SettingsHub.Description.QRCodeCameraPermissionAndroidDeeplinkNotSupported"
-    });
-    local v57 = {
-        [l_SettingsRoute_0.Camera] = l_Images_0["icons/controls/cameraOff"], 
-        [l_SettingsRoute_0.Contacts] = l_Images_0["icons/menu/contacts_large"]
-    };
-    local v58 = {
-        [l_SettingsRoute_0.Camera] = v56.titleCamera, 
-        [l_SettingsRoute_0.Contacts] = v56.titleContacts
-    };
-    local v59 = {
-        [l_SettingsRoute_0.Camera] = v56.bodyTextCamera, 
-        [l_SettingsRoute_0.Contacts] = v56.bodyTextContacts
-    };
-    local v60 = "<b>" .. ({
-        [l_SettingsRoute_0.Contacts] = {
-            deepLinkSupported = v56.additionalInstructionsContactsDeeplinkSupported, 
-            deepLinkNotSupported = v56.additionalInstructionsContactsDeeplinkNotSupported
-        }, 
-        [l_SettingsRoute_0.Camera] = {
-            deepLinkSupported = v56.additionalInstructionsCameraDeeplinkSupported, 
-            deepLinkNotSupported = v56.additionalInstructionsCameraDeeplinkNotSupported
-        }
-    })[v39][v45 and "deepLinkSupported" or "deepLinkNotSupported"] .. "</b>";
-    local v61 = v3.useCallback(function() --[[ Line: 232 ]]
-        -- upvalues: v42 (copy), v39 (copy), v41 (copy)
-        v42.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
-            settingsRoute = v39, 
-            btn = "notNow"
-        });
-        return v41();
-    end, {
-        v35.navigation
-    });
-    local v62 = {
-        buttonType = l_ButtonType_0.Secondary, 
-        props = {
-            onActivated = v61, 
-            text = v56.notNow
-        }
-    };
-    local v63 = v3.useCallback(function() --[[ Line: 247 ]]
-        -- upvalues: v42 (copy), v39 (copy), v41 (copy)
-        v42.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
-            settingsRoute = v39, 
-            btn = "ok"
-        });
-        return v41();
-    end, {
-        v35.navigation
-    });
-    local v64 = {
-        buttonType = l_ButtonType_0.PrimarySystem, 
-        props = {
-            onActivated = v63, 
-            text = v56.ok
-        }
-    };
-    local v65 = v3.useCallback(function() --[[ Line: 262 ]]
-        -- upvalues: v42 (copy), v39 (copy), l_default_0 (ref)
-        v42.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
-            settingsRoute = v39, 
-            btn = "openSettings"
-        });
-        return l_default_0:switchToSettingsApp(v39);
-    end, {
-        v35.navigation
-    });
-    local v66 = {
-        buttonType = l_ButtonType_0.PrimarySystem, 
-        props = {
-            onActivated = v65, 
-            text = v56.openSettings
-        }
-    };
-    local v67 = {
-        buttons = if v45 then {
-            v62, 
-            v66
-        } else {
-            v64
-        }
-    };
-    local v68 = v3.useCallback(function() --[[ Line: 282 ]]
-        -- upvalues: v3 (ref), l_StyledTextLabel_0 (ref), v38 (copy), v59 (copy), v39 (copy), v55 (copy), l_Text_0 (ref), v60 (copy)
-        return v3.createElement("Frame", {
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, {
-            Layout = v3.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left
-            }), 
-            DeepLinkInstructions = v3.createElement(l_StyledTextLabel_0, {
-                automaticSize = Enum.AutomaticSize.Y, 
-                fontStyle = v38.Font.Body, 
-                colorStyle = v38.Theme.TextDefault, 
-                size = UDim2.fromScale(1, 0), 
-                text = v59[v39], 
-                lineHeight = 1, 
-                fluidSizing = false, 
-                layoutOrder = 1
-            }), 
-            additionalInstructionsFrame = if v55 then v3.createElement("Frame", {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 2
-            }, {
-                UIPadding = v3.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, l_Text_0.GetTextHeight("", v38.Font.Body.Font, v38.Font.BaseSize * v38.Font.Body.RelativeSize)), 
-                    PaddingLeft = UDim.new(0, 5)
-                }), 
-                AdditionalInstructions = v3.createElement(l_StyledTextLabel_0, {
-                    automaticSize = Enum.AutomaticSize.Y, 
-                    fontStyle = v38.Font.Body, 
-                    colorStyle = v38.Theme.TextDefault, 
-                    size = UDim2.fromScale(1, 0), 
-                    text = v60, 
-                    fluidSizing = false, 
-                    lineHeight = 1
-                })
-            }) else nil
-        });
-    end, {
-        v35.navigation
-    });
-    return v3.createElement(l_InteractiveAlert_0, {
-        richText = true, 
-        screenSize = v36, 
-        title = v58[v39], 
-        titleIcon = v57[v39], 
-        middleContent = v68, 
-        buttonStackInfo = v67
-    });
-end;
+local Parent = script:FindFirstAncestor("SocialCommon").Parent
+local MessageBusService = game:GetService("MessageBusService")
+local AppStorageService = game:GetService("AppStorageService")
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local useScreenSize = require(Parent.RobloxAppHooks).useScreenSize
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
+local LinkingProtocol = require(Parent.LinkingProtocol)
+local Text = require(Parent.AppCommonLib).Text
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local Dash = require(Parent.Dash)
+local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
+local PermissionsProtocol = require(Parent.PermissionsProtocol).PermissionsProtocol
+local default = LinkingProtocol.LinkingProtocol.default
+local SettingsRoute = LinkingProtocol.Enums.SettingsRoute
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local Images = UIBlox.App.ImageSet.Images
+local useStyle = UIBlox.Core.Style.useStyle
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EventTypes = SocialLuaAnalytics.Analytics.Enums.EventTypes
+local FFlagEnableRetryForLinkingProtocolFetch = require(Parent.SharedFlags).FFlagEnableRetryForLinkingProtocolFetch
+local FIntLinkingProtocolFetchRetries = require(Parent.SharedFlags).FIntLinkingProtocolFetchRetries
+local FIntLinkingProtocolFetchTimeoutMS = require(Parent.SharedFlags).FIntLinkingProtocolFetchTimeoutMS
+local FFlagQRInSearchScanner = require(Parent.SharedFlags).FFlagQRInSearchScanner
+local v29 = not require(Parent.SharedFlags).FFlagRegisterQRCodeKeyInEngine and "ScreenshotEventTracking" or "ProfileQrCodeCameraSettingsModalSeen"
+local MessageId = MessageBusService:GetMessageId("Realtime", "appResume")
+local t1 = {
+	SettingsPermissionInteractiveAlertButtonClick = {
+		context = "settingsPermissionInteractiveAlert",
+		eventType = EventTypes.ButtonClick,
+		formatRulesForAdditionalInfo = {
+			settingsRoute = Dash.identity,
+			btn = Dash.identity
+		}
+	},
+	SettingsPermissionInteractiveAlertImpression = {
+		context = "settingsPermissionInteractiveAlert",
+		eventType = EventTypes.SettingsPermissionInteractiveAlertImpression,
+		formatRulesForAdditionalInfo = {
+			settingsRoute = Dash.identity,
+			settingsAppAvailable = Dash.identity
+		}
+	}
+}
+local t2 = {
+	[SettingsRoute.Camera] = PermissionsProtocol.Permissions.CAMERA_ACCESS,
+	[SettingsRoute.Contacts] = PermissionsProtocol.Permissions.CONTACTS_ACCESS
+}
+
+local function SettingsPermissionInteractiveAlert(t3: {[any]: any}) -- line: 86
+	-- upvalues: useScreenSize (copy), useDispatch (copy), useStyle (copy), React (copy), AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy), FFlagQRInSearchScanner (copy), FFlagEnableRetryForLinkingProtocolFetch (copy), FIntLinkingProtocolFetchRetries (copy), default (copy), FIntLinkingProtocolFetchTimeoutMS (copy), AppStorageService (copy), v29 (copy), MessageBusService (copy), MessageId (copy), PermissionsProtocol (copy), t2 (copy), useAppPolicy (copy), useLocalization (copy), SettingsRoute (copy), Images (copy), ButtonType (copy), StyledTextLabel (copy), Text (copy), InteractiveAlert (copy)
+	local v35 = useScreenSize()
+	local v36 = useDispatch()
+	local v37 = useStyle()
+	local v38 = t3.settingsRoute or t3.navigation and t3.navigation.getParam("settingsRoute")
+	local v39 = t3.source or t3.navigation and t3.navigation.getParam("source")
+	local v40 = React.useCallback(function() -- line: 95
+		-- upvalues: t3 (copy), v36 (copy)
+		if t3.closeCentralOverlayThunk then
+			return (v36(t3.closeCentralOverlayThunk()))
+		end
+
+		return t3.navigation and t3.navigation.pop()
+	end, {
+		v36,
+		t3.closeCentralOverlayThunk,
+		t3.navigation
+	})
+	local v41 = React.useMemo(function() -- line: 102
+		-- upvalues: AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy), FFlagQRInSearchScanner (copy), v39 (copy)
+		return AnalyticsFactory.setUpAnalyticsFactory({
+			eventLists = {
+				EventStream = t1
+			},
+			analyticsImpl = {
+				EventStream = DefaultAnalyticsService.EventStream
+			},
+			staticInfoForAllEvents = if not FFlagQRInSearchScanner then nil else {
+				source = v39
+			}
+		})()
+	end)
+	local u42 = false
+	local u43 = nil
+	local u44 = nil
+
+	if u44 == nil then
+		if FFlagEnableRetryForLinkingProtocolFetch then
+			for _ = 0, FIntLinkingProtocolFetchRetries do
+				local thread = task.spawn(function() -- line: 132
+					-- upvalues: u42 (ref), u43 (ref), default (copy), v38 (copy)
+					local v63, v64 = default:supportsSwitchToSettingsApp(v38):await()
+
+					u42 = v63
+					u43 = v64
+				end)
+
+				task.wait(FIntLinkingProtocolFetchTimeoutMS / 1000)
+				task.cancel(thread)
+
+				if u43 ~= nil then
+					break
+				end
+			end
+		else
+			local v47, v48 = default:supportsSwitchToSettingsApp(v38):await()
+
+			u42 = v47
+			u43 = v48
+		end
+
+		u44 = u42 and u43
+	end
+
+	React.useEffect(function() -- line: 149
+		-- upvalues: v41 (copy), v38 (copy), u44 (ref), AppStorageService (copy), v29 (copy), MessageBusService (copy), MessageId (copy), PermissionsProtocol (copy), t2 (copy), v40 (copy)
+		v41.fireAnalyticsEvent("SettingsPermissionInteractiveAlertImpression", {
+			settingsRoute = v38,
+			settingsAppAvailable = u44
+		})
+		AppStorageService:SetItem(v29, "true")
+		AppStorageService:Flush()
+
+		local v65 = MessageBusService:Subscribe(MessageId, function() -- line: 158
+			-- upvalues: PermissionsProtocol (copy), t2 (copy), v38 (copy), v40 (copy)
+			PermissionsProtocol.default:hasPermissions({ t2[v38] }):andThen(function(p1) -- line: 163
+				-- upvalues: PermissionsProtocol (copy), v40 (copy)
+				if p1 and p1.status == PermissionsProtocol.Status.AUTHORIZED then
+					v40()
+				end
+			end)
+		end, false, true)
+
+		return function() -- line: 170
+			-- upvalues: v65 (copy)
+			v65:Disconnect()
+		end
+	end, {})
+
+	local v49 = useAppPolicy(function(p2) -- line: 175
+		return p2.getShouldShowSettingsPermissionsAdditionalInstructions()
+	end)
+	local v50 = useLocalization({
+		notNow = "Feature.SettingsHub.Action.NotNow",
+		ok = "Feature.SettingsHub.Action.Ok",
+		openSettings = "Feature.SettingsHub.Action.OpenSettings",
+		titleCamera = "Feature.SettingsHub.Prompt.NeedCameraAccess",
+		titleContacts = "Feature.SettingsHub.Prompt.NeedContactsAccess",
+		bodyTextCamera = "Feature.SettingsHub.Description.QRCodeCameraPermissionIOS",
+		bodyTextContacts = "Feature.SettingsHub.Description.ContactsPermissionIOS",
+		additionalInstructionsContactsDeeplinkSupported = "Feature.SettingsHub.Description.ContactsPermissionAndroid",
+		additionalInstructionsContactsDeeplinkNotSupported = "Feature.SettingsHub.Description.ContactsPermissionAndroidDeeplinkNotSupported",
+		additionalInstructionsCameraDeeplinkSupported = "Feature.SettingsHub.Description.QRCodeCameraPermissionAndroid",
+		additionalInstructionsCameraDeeplinkNotSupported = "Feature.SettingsHub.Description.QRCodeCameraPermissionAndroidDeeplinkNotSupported"
+	})
+	local t4 = {
+		[SettingsRoute.Camera] = Images["icons/controls/cameraOff"],
+		[SettingsRoute.Contacts] = Images["icons/menu/contacts_large"]
+	}
+	local t5 = {
+		[SettingsRoute.Camera] = v50.titleCamera,
+		[SettingsRoute.Contacts] = v50.titleContacts
+	}
+	local t6 = {
+		[SettingsRoute.Camera] = v50.bodyTextCamera,
+		[SettingsRoute.Contacts] = v50.bodyTextContacts
+	}
+	local v54 = "<b>" .. ({
+		[SettingsRoute.Contacts] = {
+			deepLinkSupported = v50.additionalInstructionsContactsDeeplinkSupported,
+			deepLinkNotSupported = v50.additionalInstructionsContactsDeeplinkNotSupported
+		},
+		[SettingsRoute.Camera] = {
+			deepLinkSupported = v50.additionalInstructionsCameraDeeplinkSupported,
+			deepLinkNotSupported = v50.additionalInstructionsCameraDeeplinkNotSupported
+		}
+	})[v38][not u44 and "deepLinkNotSupported" or "deepLinkSupported"] .. "</b>"
+	local v55 = React.useCallback(function() -- line: 225
+		-- upvalues: v41 (copy), v38 (copy), v40 (copy)
+		v41.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
+			btn = "notNow",
+			settingsRoute = v38
+		})
+
+		return v40()
+	end, { t3.navigation })
+	local t7 = {
+		buttonType = ButtonType.Secondary,
+		props = {
+			onActivated = v55,
+			text = v50.notNow
+		}
+	}
+	local v57 = React.useCallback(function() -- line: 240
+		-- upvalues: v41 (copy), v38 (copy), v40 (copy)
+		v41.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
+			btn = "ok",
+			settingsRoute = v38
+		})
+
+		return v40()
+	end, { t3.navigation })
+	local t8 = {
+		buttonType = ButtonType.PrimarySystem,
+		props = {
+			onActivated = v57,
+			text = v50.ok
+		}
+	}
+	local v59 = React.useCallback(function() -- line: 255
+		-- upvalues: v41 (copy), v38 (copy), default (copy)
+		v41.fireAnalyticsEvent("SettingsPermissionInteractiveAlertButtonClick", {
+			btn = "openSettings",
+			settingsRoute = v38
+		})
+
+		return default:switchToSettingsApp(v38)
+	end, { t3.navigation })
+	local t9 = {
+		buttonType = ButtonType.PrimarySystem,
+		props = {
+			onActivated = v59,
+			text = v50.openSettings
+		}
+	}
+	local t10 = {
+		buttons = if not u44 then { t8 } else {
+			t7,
+			t9
+		}
+	}
+	local v62 = React.useCallback(function() -- line: 275
+		-- upvalues: React (copy), StyledTextLabel (copy), v37 (copy), t6 (copy), v38 (copy), v49 (copy), Text (copy), v54 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.new(1, 0, 0, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}),
+			DeepLinkInstructions = React.createElement(StyledTextLabel, {
+				lineHeight = 1,
+				fluidSizing = false,
+				layoutOrder = 1,
+				automaticSize = Enum.AutomaticSize.Y,
+				fontStyle = v37.Font.Body,
+				colorStyle = v37.Theme.TextDefault,
+				size = UDim2.fromScale(1, 0),
+				text = t6[v38]
+			}),
+			additionalInstructionsFrame = if not v49 then nil else React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			}, {
+				UIPadding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, Text.GetTextHeight("", v37.Font.Body.Font, v37.Font.BaseSize * v37.Font.Body.RelativeSize)),
+					PaddingLeft = UDim.new(0, 5)
+				}),
+				AdditionalInstructions = React.createElement(StyledTextLabel, {
+					fluidSizing = false,
+					lineHeight = 1,
+					automaticSize = Enum.AutomaticSize.Y,
+					fontStyle = v37.Font.Body,
+					colorStyle = v37.Theme.TextDefault,
+					size = UDim2.fromScale(1, 0),
+					text = v54
+				})
+			})
+		})
+	end, { t3.navigation })
+
+	return React.createElement(InteractiveAlert, {
+		richText = true,
+		screenSize = v35,
+		title = t5[v38],
+		titleIcon = t4[v38],
+		middleContent = v62,
+		buttonStackInfo = t10
+	})
+end
+
+return SettingsPermissionInteractiveAlert

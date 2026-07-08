@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixDeselectOutfitInManage", false);
+return game:DefineFastFlag("AXFixDeselectOutfitInManage", false)

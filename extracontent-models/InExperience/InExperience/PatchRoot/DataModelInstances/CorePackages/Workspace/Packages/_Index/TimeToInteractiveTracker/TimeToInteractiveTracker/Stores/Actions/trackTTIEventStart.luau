@@ -1,29 +1,53 @@
-local l_Parent_0 = script:FindFirstAncestor("TimeToInteractiveTracker").Parent;
-local l_FFlagAXTTIEnableColdWarmDetection_0 = require(l_Parent_0.SharedFlags).FFlagAXTTIEnableColdWarmDetection;
-local _ = require(script.Parent.Parent.types);
-local v3 = require(script.Parent.Parent.Parent.Utils.now);
-return function(v4) --[[ Line: 16 ]]
-    -- upvalues: v3 (copy), l_FFlagAXTTIEnableColdWarmDetection_0 (copy)
-    local v5 = {};
-    return function(v6, v7) --[[ Line: 22 ]]
-        -- upvalues: v4 (copy), v3 (ref), l_FFlagAXTTIEnableColdWarmDetection_0 (ref), v5 (copy)
-        v4(function(v8) --[[ Line: 23 ]]
-            -- upvalues: v6 (copy), v3 (ref), l_FFlagAXTTIEnableColdWarmDetection_0 (ref), v7 (copy), v5 (ref)
-            local v9 = v8[v6];
-            local v10 = v3();
-            local v11 = table.clone(v8);
-            v11[v6] = {
-                startTime = v10, 
-                endTime = nil, 
-                deltaMs = nil, 
-                sent = nil, 
-                metadata = if v9 ~= nil then table.clone(v9.metadata) else {}
-            };
-            if l_FFlagAXTTIEnableColdWarmDetection_0 and v7 then
-                v11[v6].metadata.coldStart = not v5[v6];
-                v5[v6] = true;
-            end;
-            return v11;
-        end);
-    end;
-end;
+local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTracker")
+local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
+local FFlagAXTTIEnableColdWarmDetection = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagAXTTIEnableColdWarmDetection
+
+require(script.Parent.Parent.types)
+
+local now = require(script.Parent.Parent.Parent.Utils.now)
+local FFlagTTITrackerMemoryTracking = require(TimeToInteractiveTracker.Utils.FFlagTTITrackerMemoryTracking)
+
+return function(p1) -- line: 18
+	-- upvalues: FFlagTTITrackerMemoryTracking (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy)
+	local t1 = {}
+
+	return function(s1: string, p2) -- line: 24
+		-- upvalues: FFlagTTITrackerMemoryTracking (copy), p1 (copy), now (copy), FFlagAXTTIEnableColdWarmDetection (copy), t1 (copy)
+		local u10 = nil
+		local u12
+
+		if FFlagTTITrackerMemoryTracking then
+			local v11 = if type(p2) ~= "boolean" then p2 else {
+				autoDetectColdVsWarm = p2
+			}
+
+			u12 = if not v11 then nil else v11.autoDetectColdVsWarm
+			u10 = if not v11 then nil else v11.trackMemory
+		else
+			u12 = if type(p2) ~= "boolean" then nil else p2
+		end
+
+		p1(function(p3) -- line: 39
+			-- upvalues: s1 (copy), now (copy), u10 (ref), FFlagAXTTIEnableColdWarmDetection (copy), u12 (ref), t1 (copy)
+			local v14 = p3[s1]
+			local v15 = now()
+			local v16 = table.clone(p3)
+
+			v16[s1] = {
+				endTime = nil,
+				deltaMs = nil,
+				sent = nil,
+				startTime = v15,
+				trackMemory = u10,
+				metadata = if v14 == nil then {} else table.clone(v14.metadata)
+			}
+
+			if FFlagAXTTIEnableColdWarmDetection and u12 then
+				v16[s1].metadata.coldStart = not t1[s1]
+				t1[s1] = true
+			end
+
+			return v16
+		end)
+	end
+end

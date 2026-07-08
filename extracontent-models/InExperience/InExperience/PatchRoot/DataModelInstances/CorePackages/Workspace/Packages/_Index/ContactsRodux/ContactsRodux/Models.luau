@@ -1,3 +1,3 @@
 return {
-    DeviceContact = require(script.DeviceContact)
-};
+	DeviceContact = require(script.DeviceContact)
+}

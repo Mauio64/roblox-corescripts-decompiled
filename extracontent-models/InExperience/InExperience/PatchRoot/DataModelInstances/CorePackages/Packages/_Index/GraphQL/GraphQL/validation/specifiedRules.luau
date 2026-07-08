@@ -1,84 +1,85 @@
-local l_rules_0 = script.Parent.rules;
-local l_ExecutableDefinitionsRule_0 = require(l_rules_0.ExecutableDefinitionsRule).ExecutableDefinitionsRule;
-local l_UniqueOperationNamesRule_0 = require(l_rules_0.UniqueOperationNamesRule).UniqueOperationNamesRule;
-local l_LoneAnonymousOperationRule_0 = require(l_rules_0.LoneAnonymousOperationRule).LoneAnonymousOperationRule;
-local l_SingleFieldSubscriptionsRule_0 = require(l_rules_0.SingleFieldSubscriptionsRule).SingleFieldSubscriptionsRule;
-local l_KnownTypeNamesRule_0 = require(l_rules_0.KnownTypeNamesRule).KnownTypeNamesRule;
-local l_FragmentsOnCompositeTypesRule_0 = require(l_rules_0.FragmentsOnCompositeTypesRule).FragmentsOnCompositeTypesRule;
-local l_VariablesAreInputTypesRule_0 = require(l_rules_0.VariablesAreInputTypesRule).VariablesAreInputTypesRule;
-local l_ScalarLeafsRule_0 = require(l_rules_0.ScalarLeafsRule).ScalarLeafsRule;
-local l_FieldsOnCorrectTypeRule_0 = require(l_rules_0.FieldsOnCorrectTypeRule).FieldsOnCorrectTypeRule;
-local l_UniqueFragmentNamesRule_0 = require(l_rules_0.UniqueFragmentNamesRule).UniqueFragmentNamesRule;
-local l_KnownFragmentNamesRule_0 = require(l_rules_0.KnownFragmentNamesRule).KnownFragmentNamesRule;
-local l_NoUnusedFragmentsRule_0 = require(l_rules_0.NoUnusedFragmentsRule).NoUnusedFragmentsRule;
-local l_PossibleFragmentSpreadsRule_0 = require(l_rules_0.PossibleFragmentSpreadsRule).PossibleFragmentSpreadsRule;
-local l_NoFragmentCyclesRule_0 = require(l_rules_0.NoFragmentCyclesRule).NoFragmentCyclesRule;
-local l_UniqueVariableNamesRule_0 = require(l_rules_0.UniqueVariableNamesRule).UniqueVariableNamesRule;
-local l_NoUndefinedVariablesRule_0 = require(l_rules_0.NoUndefinedVariablesRule).NoUndefinedVariablesRule;
-local l_NoUnusedVariablesRule_0 = require(l_rules_0.NoUnusedVariablesRule).NoUnusedVariablesRule;
-local l_KnownDirectivesRule_0 = require(l_rules_0.KnownDirectivesRule).KnownDirectivesRule;
-local l_UniqueDirectivesPerLocationRule_0 = require(l_rules_0.UniqueDirectivesPerLocationRule).UniqueDirectivesPerLocationRule;
-local v20 = require(l_rules_0.KnownArgumentNamesRule);
-local l_KnownArgumentNamesRule_0 = v20.KnownArgumentNamesRule;
-local l_KnownArgumentNamesOnDirectivesRule_0 = v20.KnownArgumentNamesOnDirectivesRule;
-local l_UniqueArgumentNamesRule_0 = require(l_rules_0.UniqueArgumentNamesRule).UniqueArgumentNamesRule;
-local l_ValuesOfCorrectTypeRule_0 = require(l_rules_0.ValuesOfCorrectTypeRule).ValuesOfCorrectTypeRule;
-local v25 = require(l_rules_0.ProvidedRequiredArgumentsRule);
-local l_ProvidedRequiredArgumentsRule_0 = v25.ProvidedRequiredArgumentsRule;
-local l_ProvidedRequiredArgumentsOnDirectivesRule_0 = v25.ProvidedRequiredArgumentsOnDirectivesRule;
-local l_VariablesInAllowedPositionRule_0 = require(l_rules_0.VariablesInAllowedPositionRule).VariablesInAllowedPositionRule;
-local l_OverlappingFieldsCanBeMergedRule_0 = require(l_rules_0.OverlappingFieldsCanBeMergedRule).OverlappingFieldsCanBeMergedRule;
-local l_UniqueInputFieldNamesRule_0 = require(l_rules_0.UniqueInputFieldNamesRule).UniqueInputFieldNamesRule;
-local l_LoneSchemaDefinitionRule_0 = require(l_rules_0.LoneSchemaDefinitionRule).LoneSchemaDefinitionRule;
-local l_UniqueOperationTypesRule_0 = require(l_rules_0.UniqueOperationTypesRule).UniqueOperationTypesRule;
-local l_UniqueTypeNamesRule_0 = require(l_rules_0.UniqueTypeNamesRule).UniqueTypeNamesRule;
-local l_UniqueEnumValueNamesRule_0 = require(l_rules_0.UniqueEnumValueNamesRule).UniqueEnumValueNamesRule;
-local l_UniqueFieldDefinitionNamesRule_0 = require(l_rules_0.UniqueFieldDefinitionNamesRule).UniqueFieldDefinitionNamesRule;
-local l_UniqueDirectiveNamesRule_0 = require(l_rules_0.UniqueDirectiveNamesRule).UniqueDirectiveNamesRule;
-local l_PossibleTypeExtensionsRule_0 = require(l_rules_0.PossibleTypeExtensionsRule).PossibleTypeExtensionsRule;
+local rules = script.Parent.rules
+local ExecutableDefinitionsRule = require(rules.ExecutableDefinitionsRule).ExecutableDefinitionsRule
+local UniqueOperationNamesRule = require(rules.UniqueOperationNamesRule).UniqueOperationNamesRule
+local LoneAnonymousOperationRule = require(rules.LoneAnonymousOperationRule).LoneAnonymousOperationRule
+local SingleFieldSubscriptionsRule = require(rules.SingleFieldSubscriptionsRule).SingleFieldSubscriptionsRule
+local KnownTypeNamesRule = require(rules.KnownTypeNamesRule).KnownTypeNamesRule
+local FragmentsOnCompositeTypesRule = require(rules.FragmentsOnCompositeTypesRule).FragmentsOnCompositeTypesRule
+local VariablesAreInputTypesRule = require(rules.VariablesAreInputTypesRule).VariablesAreInputTypesRule
+local ScalarLeafsRule = require(rules.ScalarLeafsRule).ScalarLeafsRule
+local FieldsOnCorrectTypeRule = require(rules.FieldsOnCorrectTypeRule).FieldsOnCorrectTypeRule
+local UniqueFragmentNamesRule = require(rules.UniqueFragmentNamesRule).UniqueFragmentNamesRule
+local KnownFragmentNamesRule = require(rules.KnownFragmentNamesRule).KnownFragmentNamesRule
+local NoUnusedFragmentsRule = require(rules.NoUnusedFragmentsRule).NoUnusedFragmentsRule
+local PossibleFragmentSpreadsRule = require(rules.PossibleFragmentSpreadsRule).PossibleFragmentSpreadsRule
+local NoFragmentCyclesRule = require(rules.NoFragmentCyclesRule).NoFragmentCyclesRule
+local UniqueVariableNamesRule = require(rules.UniqueVariableNamesRule).UniqueVariableNamesRule
+local NoUndefinedVariablesRule = require(rules.NoUndefinedVariablesRule).NoUndefinedVariablesRule
+local NoUnusedVariablesRule = require(rules.NoUnusedVariablesRule).NoUnusedVariablesRule
+local KnownDirectivesRule = require(rules.KnownDirectivesRule).KnownDirectivesRule
+local UniqueDirectivesPerLocationRule = require(rules.UniqueDirectivesPerLocationRule).UniqueDirectivesPerLocationRule
+local KnownArgumentNamesRule = require(rules.KnownArgumentNamesRule)
+local KnownArgumentNamesRule2 = KnownArgumentNamesRule.KnownArgumentNamesRule
+local KnownArgumentNamesOnDirectivesRule = KnownArgumentNamesRule.KnownArgumentNamesOnDirectivesRule
+local UniqueArgumentNamesRule = require(rules.UniqueArgumentNamesRule).UniqueArgumentNamesRule
+local ValuesOfCorrectTypeRule = require(rules.ValuesOfCorrectTypeRule).ValuesOfCorrectTypeRule
+local ProvidedRequiredArgumentsRule = require(rules.ProvidedRequiredArgumentsRule)
+local ProvidedRequiredArgumentsRule2 = ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsRule
+local ProvidedRequiredArgumentsOnDirectivesRule = ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsOnDirectivesRule
+local VariablesInAllowedPositionRule = require(rules.VariablesInAllowedPositionRule).VariablesInAllowedPositionRule
+local OverlappingFieldsCanBeMergedRule = require(rules.OverlappingFieldsCanBeMergedRule).OverlappingFieldsCanBeMergedRule
+local UniqueInputFieldNamesRule = require(rules.UniqueInputFieldNamesRule).UniqueInputFieldNamesRule
+local LoneSchemaDefinitionRule = require(rules.LoneSchemaDefinitionRule).LoneSchemaDefinitionRule
+local UniqueOperationTypesRule = require(rules.UniqueOperationTypesRule).UniqueOperationTypesRule
+local UniqueTypeNamesRule = require(rules.UniqueTypeNamesRule).UniqueTypeNamesRule
+local UniqueEnumValueNamesRule = require(rules.UniqueEnumValueNamesRule).UniqueEnumValueNamesRule
+local UniqueFieldDefinitionNamesRule = require(rules.UniqueFieldDefinitionNamesRule).UniqueFieldDefinitionNamesRule
+local UniqueDirectiveNamesRule = require(rules.UniqueDirectiveNamesRule).UniqueDirectiveNamesRule
+local PossibleTypeExtensionsRule = require(rules.PossibleTypeExtensionsRule).PossibleTypeExtensionsRule
+
 return {
-    specifiedRules = {
-        l_ExecutableDefinitionsRule_0, 
-        l_UniqueOperationNamesRule_0, 
-        l_LoneAnonymousOperationRule_0, 
-        l_SingleFieldSubscriptionsRule_0, 
-        l_KnownTypeNamesRule_0, 
-        l_FragmentsOnCompositeTypesRule_0, 
-        l_VariablesAreInputTypesRule_0, 
-        l_ScalarLeafsRule_0, 
-        l_FieldsOnCorrectTypeRule_0, 
-        l_UniqueFragmentNamesRule_0, 
-        l_KnownFragmentNamesRule_0, 
-        l_NoUnusedFragmentsRule_0, 
-        l_PossibleFragmentSpreadsRule_0, 
-        l_NoFragmentCyclesRule_0, 
-        l_UniqueVariableNamesRule_0, 
-        l_NoUndefinedVariablesRule_0, 
-        l_NoUnusedVariablesRule_0, 
-        l_KnownDirectivesRule_0, 
-        l_UniqueDirectivesPerLocationRule_0, 
-        l_KnownArgumentNamesRule_0, 
-        l_UniqueArgumentNamesRule_0, 
-        l_ValuesOfCorrectTypeRule_0, 
-        l_ProvidedRequiredArgumentsRule_0, 
-        l_VariablesInAllowedPositionRule_0, 
-        l_OverlappingFieldsCanBeMergedRule_0, 
-        l_UniqueInputFieldNamesRule_0
-    }, 
-    specifiedSDLRules = {
-        l_LoneSchemaDefinitionRule_0, 
-        l_UniqueOperationTypesRule_0, 
-        l_UniqueTypeNamesRule_0, 
-        l_UniqueEnumValueNamesRule_0, 
-        l_UniqueFieldDefinitionNamesRule_0, 
-        l_UniqueDirectiveNamesRule_0, 
-        l_KnownTypeNamesRule_0, 
-        l_KnownDirectivesRule_0, 
-        l_UniqueDirectivesPerLocationRule_0, 
-        l_PossibleTypeExtensionsRule_0, 
-        l_KnownArgumentNamesOnDirectivesRule_0, 
-        l_UniqueArgumentNamesRule_0, 
-        l_UniqueInputFieldNamesRule_0, 
-        l_ProvidedRequiredArgumentsOnDirectivesRule_0
-    }
-};
+	specifiedRules = {
+		ExecutableDefinitionsRule,
+		UniqueOperationNamesRule,
+		LoneAnonymousOperationRule,
+		SingleFieldSubscriptionsRule,
+		KnownTypeNamesRule,
+		FragmentsOnCompositeTypesRule,
+		VariablesAreInputTypesRule,
+		ScalarLeafsRule,
+		FieldsOnCorrectTypeRule,
+		UniqueFragmentNamesRule,
+		KnownFragmentNamesRule,
+		NoUnusedFragmentsRule,
+		PossibleFragmentSpreadsRule,
+		NoFragmentCyclesRule,
+		UniqueVariableNamesRule,
+		NoUndefinedVariablesRule,
+		NoUnusedVariablesRule,
+		KnownDirectivesRule,
+		UniqueDirectivesPerLocationRule,
+		KnownArgumentNamesRule2,
+		UniqueArgumentNamesRule,
+		ValuesOfCorrectTypeRule,
+		ProvidedRequiredArgumentsRule2,
+		VariablesInAllowedPositionRule,
+		OverlappingFieldsCanBeMergedRule,
+		UniqueInputFieldNamesRule
+	},
+	specifiedSDLRules = {
+		LoneSchemaDefinitionRule,
+		UniqueOperationTypesRule,
+		UniqueTypeNamesRule,
+		UniqueEnumValueNamesRule,
+		UniqueFieldDefinitionNamesRule,
+		UniqueDirectiveNamesRule,
+		KnownTypeNamesRule,
+		KnownDirectivesRule,
+		UniqueDirectivesPerLocationRule,
+		PossibleTypeExtensionsRule,
+		KnownArgumentNamesOnDirectivesRule,
+		UniqueArgumentNamesRule,
+		UniqueInputFieldNamesRule,
+		ProvidedRequiredArgumentsOnDirectivesRule
+	}
+}

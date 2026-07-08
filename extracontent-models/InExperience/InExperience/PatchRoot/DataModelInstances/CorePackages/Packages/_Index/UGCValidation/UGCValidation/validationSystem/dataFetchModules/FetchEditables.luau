@@ -1,231 +1,264 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.util.createEditableInstancesForContext);
-local v2 = require(l_Parent_0.util.getMeshSize);
-local l_SharedDataMember_0 = require(l_Parent_0.validationSystem.ValidationEnums).SharedDataMember;
-local _ = require(l_Parent_0.util.Types);
-local v5 = require(l_Parent_0.flags.getFFlagUGCValidationAddPBRToSharedData);
-local v11 = {
-    cleanup = function(v6) --[[ Line: 19 ]] --[[ Name: cleanup ]]
-        -- upvalues: v5 (copy)
-        for v7, v8 in v6 do
-            if v8.createdInValidation then
-                v8.editable:Destroy();
-            end;
-            if v5() and v8.isPBR ~= nil then
-                for _, v10 in v8 do
-                    if typeof(v10) == "table" and v10.createdInValidation then
-                        v10.editable:Destroy();
-                    end;
-                end;
-            end;
-            v6[v7] = nil;
-        end;
-    end
-};
-local function v20(v12, v13, v14) --[[ Line: 44 ]] --[[ Name: getMeshData ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v15 = v12:IsA("MeshPart") and v12.MeshContent or Content.fromUri(v12.MeshId);
-    local v16, v17 = v1.getEditableInstanceInfo(v15, v14, "EditableMesh", v13);
-    if not v16 then
-        return false;
-    else
-        local v18 = nil;
-        local v19 = nil;
-        if v12:IsA("MeshPart") then
-            if v12.MeshContent.SourceType == Enum.ContentSourceType.Object then
-                v18 = v2({
-                    editableMesh = v17.instance
-                });
-                v19 = Vector3.new(1, 1, 1, 0);
-            else
-                v18 = v12.MeshSize;
-                v19 = v12.Size / v12.MeshSize;
-            end;
-        elseif v12:IsA("SpecialMesh") then
-            v18 = v2({
-                editableMesh = v17.instance
-            });
-            v19 = v12.Scale;
-        end;
-        return true, {
-            editable = v17.instance, 
-            createdInValidation = v17.created, 
-            originalSize = v18, 
-            scale = v19
-        };
-    end;
-end;
-local function v27(v21, v22, v23) --[[ Line: 84 ]] --[[ Name: getTextureData_deprecated ]]
-    -- upvalues: v1 (copy)
-    local v24 = nil;
-    v24 = if v21:IsA("MeshPart") then v21.TextureContent else Content.fromUri(v21.TextureId);
-    local v25, v26 = v1.getEditableInstanceInfo(v24, v23, "EditableImage", v22);
-    if v25 then
-        return true, {
-            editable = v26.instance, 
-            createdInValidation = v26.created
-        };
-    else
-        return false;
-    end;
-end;
-local function v39(v28, v29, v30) --[[ Line: 112 ]] --[[ Name: getTextureData ]]
-    -- upvalues: v1 (copy), v11 (copy)
-    local l_SurfaceAppearance_0 = v28:FindFirstChildWhichIsA("SurfaceAppearance");
-    local v32 = {};
-    if l_SurfaceAppearance_0 ~= nil then
-        v32 = {
-            isPBR = true, 
-            ColorMap = l_SurfaceAppearance_0.ColorMapContent, 
-            MetalnessMap = l_SurfaceAppearance_0.MetalnessMapContent, 
-            NormalMap = l_SurfaceAppearance_0.NormalMapContent, 
-            RoughnessMap = l_SurfaceAppearance_0.RoughnessMapContent
-        };
-    else
-        local v33 = nil;
-        v33 = if v28:IsA("MeshPart") then v28.TextureContent else Content.fromUri(v28.TextureId);
-        v32 = {
-            isPBR = false, 
-            Texture = v33
-        };
-    end;
-    local v34 = {
-        isPBR = v32.isPBR
-    };
-    for v35, v36 in v32 do
-        if v35 ~= "isPBR" and v36.SourceType ~= Enum.ContentSourceType.None then
-            local v37, v38 = v1.getEditableInstanceInfo(v36, v30, "EditableImage", v29);
-            if not v37 then
-                v11.cleanup(v34);
-                return false;
-            else
-                v34[v35] = {
-                    editable = v38.instance, 
-                    createdInValidation = v38.created
-                };
-            end;
-        end;
-    end;
-    return true, v34;
-end;
-local function v48(v40, v41, v42, v43) --[[ Line: 168 ]] --[[ Name: getCageData ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v44 = nil;
-    local v45 = nil;
-    if not v41 and v40.ClassName == "WrapLayer" then
-        v44 = v40.ReferenceMeshContent;
-        v45 = v40.ReferenceOrigin;
-    else
-        v44 = v40.CageMeshContent;
-        v45 = v40.CageOrigin;
-    end;
-    local v46, v47 = v1.getEditableInstanceInfo(v44, v43, "EditableMesh", v42);
-    if v46 then
-        return true, {
-            editable = v47.instance, 
-            createdInValidation = v47.created, 
-            originalSize = v2({
-                editableMesh = v47.instance
-            }), 
-            origin = v45
-        };
-    else
-        return false;
-    end;
-end;
-local function v53(v49, v50) --[[ Line: 202 ]] --[[ Name: getDataInstance_deprecated ]]
-    -- upvalues: l_SharedDataMember_0 (copy)
-    if v49:IsA("MeshPart") or v49:IsA("Part") and v49:FindFirstChildOfClass("SpecialMesh") then
-        local v51 = v49:IsA("MeshPart") and v49 or v49:FindFirstChildOfClass("SpecialMesh");
-        if v50 == l_SharedDataMember_0.meshTextures and (v51.ClassName == "MeshPart" and v51.TextureContent.SourceType == Enum.ContentSourceType.None or v51.ClassName == "SpecialMesh" and v51.TextureId == "") then
-            return false;
-        elseif v50 == l_SharedDataMember_0.renderMeshesData or v50 == l_SharedDataMember_0.meshTextures then
-            return true, v51;
-        else
-            local l_BaseWrap_0 = v49:FindFirstChildWhichIsA("BaseWrap");
-            if v50 == l_SharedDataMember_0.outerCagesData then
-                return true, l_BaseWrap_0;
-            elseif v50 == l_SharedDataMember_0.innerCagesData and l_BaseWrap_0 and l_BaseWrap_0.ClassName == "WrapLayer" then
-                return true, l_BaseWrap_0;
-            end;
-        end;
-    end;
-    return false;
-end;
-local function v61(v54, v55) --[[ Line: 237 ]] --[[ Name: getDataInstance ]]
-    -- upvalues: l_SharedDataMember_0 (copy)
-    local v56 = v54:IsA("MeshPart") and v54 or v54:FindFirstChildOfClass("SpecialMesh");
-    if v56 then
-        local l_BaseWrap_1 = v54:FindFirstChildWhichIsA("BaseWrap");
-        if v55 == l_SharedDataMember_0.renderMeshesData then
-            return true, v56;
-        elseif v55 == l_SharedDataMember_0.meshTextures then
-            local v58 = v56:FindFirstChildWhichIsA("SurfaceAppearance") ~= nil;
-            local v59 = false;
-            if v56.ClassName == "SpecialMesh" then
-                v59 = v56.TextureId ~= "";
-            end;
-            local v60 = false;
-            if v56.ClassName == "MeshPart" then
-                v60 = v56.TextureContent.SourceType ~= Enum.ContentSourceType.None;
-            end;
-            return v60 or v58 or v59, v56;
-        elseif v55 == l_SharedDataMember_0.outerCagesData and l_BaseWrap_1 then
-            return l_BaseWrap_1.CageMeshContent.SourceType ~= Enum.ContentSourceType.None, l_BaseWrap_1;
-        elseif v55 == l_SharedDataMember_0.innerCagesData and l_BaseWrap_1 and l_BaseWrap_1.ClassName == "WrapLayer" then
-            return l_BaseWrap_1.ReferenceMeshContent.SourceType ~= Enum.ContentSourceType.None, l_BaseWrap_1;
-        end;
-    end;
-    return false;
-end;
-v11.getDatas = function(v62, v63, v64, v65, v66) --[[ Line: 267 ]] --[[ Name: getDatas ]]
-    -- upvalues: v5 (copy), v61 (copy), v53 (copy), l_SharedDataMember_0 (copy), v20 (copy), v48 (copy), v39 (copy), v27 (copy), v11 (copy)
-    local v67 = {};
-    local l_v62_Descendants_0 = v62:GetDescendants();
-    table.insert(l_v62_Descendants_0, v62);
-    for _, v70 in l_v62_Descendants_0 do
-        local v71 = nil;
-        local v72 = nil;
-        if v5() then
-            local v73, v74 = v61(v70, v63);
-            v71 = v73;
-            v72 = v74;
-        else
-            local v75, v76 = v53(v70, v63);
-            v71 = v75;
-            v72 = v76;
-        end;
-        if v71 then
-            local v77 = nil;
-            local v78 = nil;
-            if v63 == l_SharedDataMember_0.renderMeshesData then
-                local v79, v80 = v20(v72, v64, v65);
-                v77 = v79;
-                v78 = v80;
-            elseif v63 == l_SharedDataMember_0.innerCagesData or v63 == l_SharedDataMember_0.outerCagesData then
-                local v81 = v63 == l_SharedDataMember_0.outerCagesData;
-                local v82, v83 = v48(v72, v81, v64, v65);
-                v77 = v82;
-                v78 = v83;
-            elseif v63 == l_SharedDataMember_0.meshTextures then
-                if v5() then
-                    local v84, v85 = v39(v72, v64, v66);
-                    v77 = v84;
-                    v78 = v85;
-                else
-                    local v86, v87 = v27(v72, v64, v66);
-                    v77 = v86;
-                    v78 = v87;
-                end;
-            end;
-            if not v77 or v78 == nil then
-                v11.cleanup(v67);
-                return;
-            else
-                v67[v70.Name] = v78;
-            end;
-        end;
-    end;
-    return v67;
-end;
-return v11;
+local ParentParent = script.Parent.Parent.Parent
+local createEditableInstancesForContext = require(ParentParent.util.createEditableInstancesForContext)
+local getMeshSize = require(ParentParent.util.getMeshSize)
+local SharedDataMember = require(ParentParent.validationSystem.ValidationEnums).SharedDataMember
+
+require(ParentParent.util.Types)
+
+local getFFlagUGCValidationAddPBRToSharedData = require(ParentParent.flags.getFFlagUGCValidationAddPBRToSharedData)
+local getFFlagUGCValidateAllowEmissives = require(ParentParent.flags.getFFlagUGCValidateAllowEmissives)
+local t2 = {
+	cleanup = function(t1: {[any]: any}) -- line: 20
+		-- upvalues: getFFlagUGCValidationAddPBRToSharedData (copy)
+		for v15, v16 in t1 do
+			if v16.createdInValidation then
+				v16.editable:Destroy()
+			end
+
+			if getFFlagUGCValidationAddPBRToSharedData() and v16.isPBR ~= nil then
+				for _, v18 in v16 do
+					if typeof(v18) == "table" and v18.createdInValidation then
+						v18.editable:Destroy()
+					end
+				end
+			end
+
+			t1[v15] = nil
+		end
+	end
+}
+
+local function getMeshData(p1, b1: boolean, t3: {[any]: any}) -- line: 45
+	-- upvalues: createEditableInstancesForContext (copy), getMeshSize (copy)
+	local v22 = p1:IsA("MeshPart") and p1.MeshContent or Content.fromUri(p1.MeshId)
+	local v23, v24 = createEditableInstancesForContext.getEditableInstanceInfo(v22, t3, "EditableMesh", b1)
+
+	if not v23 then
+		return false
+	end
+
+	local v25 = nil
+	local vector3 = nil
+
+	if p1:IsA("MeshPart") then
+		if p1.MeshContent.SourceType == Enum.ContentSourceType.Object then
+			v25 = getMeshSize({
+				editableMesh = v24.instance
+			})
+			vector3 = Vector3.new(1, 1, 1)
+		else
+			v25 = p1.MeshSize
+			vector3 = p1.Size / p1.MeshSize
+		end
+	elseif p1:IsA("SpecialMesh") then
+		v25 = getMeshSize({
+			editableMesh = v24.instance
+		})
+		vector3 = p1.Scale
+	end
+
+	return true, {
+		editable = v24.instance,
+		createdInValidation = v24.created,
+		originalSize = v25,
+		scale = vector3
+	}
+end
+local function getTextureData_deprecated(p2, b2: boolean, t4: {[any]: any}) -- line: 85
+	-- upvalues: createEditableInstancesForContext (copy)
+	local v30 = if not p2:IsA("MeshPart") then Content.fromUri(p2.TextureId) else p2.TextureContent
+	local v31, v32 = createEditableInstancesForContext.getEditableInstanceInfo(v30, t4, "EditableImage", b2)
+
+	if v31 then
+		return true, {
+			editable = v32.instance,
+			createdInValidation = v32.created
+		}
+	end
+
+	return false
+end
+local function getTextureData(p3, b3: boolean, t5: {[any]: any}) -- line: 113
+	-- upvalues: getFFlagUGCValidateAllowEmissives (copy), createEditableInstancesForContext (copy), t2 (copy)
+	local SurfaceAppearance = p3:FindFirstChildWhichIsA("SurfaceAppearance")
+	local t6
+
+	if SurfaceAppearance ~= nil then
+		t6 = {
+			isPBR = true,
+			ColorMap = SurfaceAppearance.ColorMapContent,
+			MetalnessMap = SurfaceAppearance.MetalnessMapContent,
+			NormalMap = SurfaceAppearance.NormalMapContent,
+			RoughnessMap = SurfaceAppearance.RoughnessMapContent
+		}
+
+		if getFFlagUGCValidateAllowEmissives() then
+			t6.EmissiveMask = SurfaceAppearance.EmissiveMaskContent
+		end
+	else
+		local v38 = if not p3:IsA("MeshPart") then Content.fromUri(p3.TextureId) else p3.TextureContent
+
+		t6 = {
+			isPBR = false,
+			Texture = v38
+		}
+	end
+
+	local t7 = {
+		isPBR = t6.isPBR
+	}
+
+	for v40, v41 in t6 do
+		if v40 == "isPBR" or v41.SourceType == Enum.ContentSourceType.None then
+			continue
+		end
+
+		local v42, v43 = createEditableInstancesForContext.getEditableInstanceInfo(v41, t5, "EditableImage", b3)
+
+		if not v42 then
+			t2.cleanup(t7)
+
+			return false
+		end
+
+		t7[v40] = {
+			editable = v43.instance,
+			createdInValidation = v43.created
+		}
+	end
+
+	return true, t7
+end
+local function getCageData(p4, b4: boolean, b5: boolean, t8: {[any]: any}) -- line: 172
+	-- upvalues: createEditableInstancesForContext (copy), getMeshSize (copy)
+	local ReferenceMeshContent, ReferenceOrigin
+
+	if not b4 and p4.ClassName == "WrapLayer" then
+		ReferenceMeshContent = p4.ReferenceMeshContent
+		ReferenceOrigin = p4.ReferenceOrigin
+	else
+		ReferenceMeshContent = p4.CageMeshContent
+		ReferenceOrigin = p4.CageOrigin
+	end
+
+	local v50, v51 = createEditableInstancesForContext.getEditableInstanceInfo(ReferenceMeshContent, t8, "EditableMesh", b5)
+
+	if v50 then
+		return true, {
+			editable = v51.instance,
+			createdInValidation = v51.created,
+			originalSize = getMeshSize({
+				editableMesh = v51.instance
+			}),
+			origin = ReferenceOrigin
+		}
+	end
+
+	return false
+end
+local function getDataInstance_deprecated(p5, s1: string) -- line: 206
+	-- upvalues: SharedDataMember (copy)
+	if p5:IsA("MeshPart") or p5:IsA("Part") and p5:FindFirstChildOfClass("SpecialMesh") then
+		local v54 = p5:IsA("MeshPart") and p5 or p5:FindFirstChildOfClass("SpecialMesh")
+
+		if s1 == SharedDataMember.meshTextures and (v54.ClassName == "MeshPart" and v54.TextureContent.SourceType == Enum.ContentSourceType.None or v54.ClassName == "SpecialMesh" and v54.TextureId == "") then
+			return false
+		end
+
+		if s1 == SharedDataMember.renderMeshesData or s1 == SharedDataMember.meshTextures then
+			return true, v54
+		end
+
+		local BaseWrap = p5:FindFirstChildWhichIsA("BaseWrap")
+
+		if s1 == SharedDataMember.outerCagesData then
+			return true, BaseWrap
+		end
+
+		if s1 == SharedDataMember.innerCagesData and BaseWrap and BaseWrap.ClassName == "WrapLayer" then
+			return true, BaseWrap
+		end
+	end
+
+	return false
+end
+local function getDataInstance(p6, s2: string) -- line: 241
+	-- upvalues: SharedDataMember (copy)
+	local v58 = p6:IsA("MeshPart") and p6 or p6:FindFirstChildOfClass("SpecialMesh")
+
+	if v58 then
+		local BaseWrap = p6:FindFirstChildWhichIsA("BaseWrap")
+
+		if s2 == SharedDataMember.renderMeshesData then
+			return true, v58
+		end
+
+		if s2 == SharedDataMember.meshTextures then
+			local v60 = v58:FindFirstChildWhichIsA("SurfaceAppearance") ~= nil
+			local v61 = v58.ClassName == "SpecialMesh" and v58.TextureId ~= ""
+
+			return v58.ClassName == "MeshPart" and v58.TextureContent.SourceType ~= Enum.ContentSourceType.None or (v60 or v61), v58
+		end
+
+		if s2 == SharedDataMember.outerCagesData and BaseWrap then
+			return BaseWrap.CageMeshContent.SourceType ~= Enum.ContentSourceType.None, BaseWrap
+		end
+
+		if s2 == SharedDataMember.innerCagesData and BaseWrap and BaseWrap.ClassName == "WrapLayer" then
+			return BaseWrap.ReferenceMeshContent.SourceType ~= Enum.ContentSourceType.None, BaseWrap
+		end
+	end
+
+	return false
+end
+
+function t2.getDatas(p7, s3: string, b6: boolean, t9: {[any]: any}, t10: {[any]: any}) -- line: 271
+	-- upvalues: getFFlagUGCValidationAddPBRToSharedData (copy), getDataInstance (copy), getDataInstance_deprecated (copy), SharedDataMember (copy), getMeshData (copy), getCageData (copy), getTextureData (copy), getTextureData_deprecated (copy), t2 (copy)
+	local t11 = {}
+	local descendants = p7:GetDescendants()
+
+	table.insert(descendants, p7)
+
+	for _, v70 in descendants do
+		local v71, v72
+
+		if getFFlagUGCValidationAddPBRToSharedData() then
+			v71, v72 = getDataInstance(v70, s3)
+		else
+			v71, v72 = getDataInstance_deprecated(v70, s3)
+		end
+
+		if not v71 then
+			continue
+		end
+
+		local v73 = nil
+		local v74 = nil
+
+		if s3 == SharedDataMember.renderMeshesData then
+			v73, v74 = getMeshData(v72, b6, t9)
+		elseif s3 == SharedDataMember.innerCagesData or s3 == SharedDataMember.outerCagesData then
+			local v75 = s3 == SharedDataMember.outerCagesData
+
+			v73, v74 = getCageData(v72, v75, b6, t9)
+		elseif s3 == SharedDataMember.meshTextures then
+			if getFFlagUGCValidationAddPBRToSharedData() then
+				v73, v74 = getTextureData(v72, b6, t10)
+			else
+				v73, v74 = getTextureData_deprecated(v72, b6, t10)
+			end
+		end
+
+		if not v73 or v74 == nil then
+			t2.cleanup(t11)
+
+			return
+		end
+
+		t11[v70.Name] = v74
+	end
+
+	return t11
+end
+
+return t2

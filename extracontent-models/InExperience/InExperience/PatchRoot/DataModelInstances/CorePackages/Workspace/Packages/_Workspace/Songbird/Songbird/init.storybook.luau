@@ -1,21 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Dev.RoactCompat);
-local v2 = require(l_script_FirstAncestor_0.Parent.Dev.MusicTestingUtils);
+local Songbird = script:FindFirstAncestor("Songbird")
+local RoactCompat = require(Songbird.Parent.Dev.RoactCompat)
+local MusicTestingUtils = require(Songbird.Parent.Dev.MusicTestingUtils)
+
 return {
-    name = l_script_FirstAncestor_0.Name, 
-    roact = v1, 
-    storyRoots = {
-        l_script_FirstAncestor_0.Components
-    }, 
-    mapStory = function(v3) --[[ Line: 12 ]] --[[ Name: mapStory ]]
-        -- upvalues: v1 (copy), v2 (copy)
-        return function(v4) --[[ Line: 13 ]]
-            -- upvalues: v1 (ref), v2 (ref), v3 (copy)
-            return v1.createElement(v2.ContextProviders, {
-                theme = v4.theme, 
-                overlayGui = v4.focus, 
-                host = v4.host
-            }, v1.createElement(v3, v4));
-        end;
-    end
-};
+	name = Songbird.Name,
+	roact = RoactCompat,
+	storyRoots = { Songbird.Components },
+	mapStory = function(p1) -- line: 12
+		-- upvalues: RoactCompat (copy), MusicTestingUtils (copy)
+		return function(p2) -- line: 13
+			-- upvalues: RoactCompat (copy), MusicTestingUtils (copy), p1 (copy)
+			return RoactCompat.createElement(MusicTestingUtils.ContextProviders, {
+				theme = p2.theme,
+				overlayGui = p2.focus,
+				host = p2.host
+			}, RoactCompat.createElement(p1, p2))
+		end
+	end
+}

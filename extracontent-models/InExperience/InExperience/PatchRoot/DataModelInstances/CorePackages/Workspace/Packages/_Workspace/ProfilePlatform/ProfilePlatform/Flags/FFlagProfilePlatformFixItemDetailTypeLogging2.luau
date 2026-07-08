@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformFixItemDetailTypeLogging2", false);
+return game:DefineFastFlag("ProfilePlatformFixItemDetailTypeLogging2", false)

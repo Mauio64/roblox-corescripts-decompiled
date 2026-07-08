@@ -1,5 +1,6 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Signals);
-local v3 = require(l_Parent_0.createHttpStore);
-return v2.createComputed(v3);
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Signals = require(scriptParentParent.Signals)
+local createHttpStore = require(scriptParent.createHttpStore)
+
+return Signals.createComputed(createHttpStore)

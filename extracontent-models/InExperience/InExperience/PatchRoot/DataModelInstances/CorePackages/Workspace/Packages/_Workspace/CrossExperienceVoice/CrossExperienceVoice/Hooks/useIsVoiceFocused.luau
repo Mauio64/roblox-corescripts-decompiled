@@ -1,8 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local l_AUDIO_FOCUS_MANAGEMENT_0 = require(l_script_FirstAncestor_0.dependencies).CrossExperience.Constants.AUDIO_FOCUS_MANAGEMENT;
-local v2 = require(l_script_FirstAncestor_0.Hooks.useAudioCurrentContextId);
-local l_CONTEXT_ID_0 = l_AUDIO_FOCUS_MANAGEMENT_0.CEV.CONTEXT_ID;
-return function() --[[ Line: 10 ]]
-    -- upvalues: v2 (copy), l_CONTEXT_ID_0 (copy)
-    return v2() == l_CONTEXT_ID_0;
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local AUDIO_FOCUS_MANAGEMENT = require(CrossExperienceVoice.dependencies).CrossExperience.Constants.AUDIO_FOCUS_MANAGEMENT
+local useAudioCurrentContextId = require(CrossExperienceVoice.Hooks.useAudioCurrentContextId)
+local CONTEXT_ID = AUDIO_FOCUS_MANAGEMENT.CEV.CONTEXT_ID
+
+return function() -- line: 10
+	-- upvalues: useAudioCurrentContextId (copy), CONTEXT_ID (copy)
+	return useAudioCurrentContextId() == CONTEXT_ID
+end

@@ -1,1 +1,1 @@
-return require(script.InputField);
+return require(script.InputField)

@@ -1,30 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_IconName_0 = v3.Enums.IconName;
-local l_IconSize_0 = v3.Enums.IconSize;
-local l_IconVariant_0 = v3.Enums.IconVariant;
-local _ = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils);
-local v9 = require(l_script_FirstAncestor_0.ChromeShared.Hooks.useMappedSignal);
-local v10 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.SubMenuContext);
-return function(v11) --[[ Line: 20 ]] --[[ Name: AvatarSwitcherIcon ]]
-    -- upvalues: v9 (copy), v2 (copy), v10 (copy), l_useTokens_0 (copy), v3 (copy), l_IconName_0 (copy), l_IconSize_0 (copy), l_IconVariant_0 (copy)
-    local v12 = v9(v11.isActive);
-    local v13 = v2.useContext(v10);
-    local v14 = l_useTokens_0();
-    local v16 = if v13 then v13:map(function(v15) --[[ Line: 26 ]]
-        -- upvalues: v14 (copy)
-        return {
-            Color3 = v14.Color.Content.Default.Color3, 
-            Transparency = math.lerp(1, v14.Color.Content.Default.Transparency, v15)
-        };
-    end) else v14.Color.Content.Default;
-    return v2.createElement(v3.Icon, {
-        name = l_IconName_0.CirclePerson, 
-        size = l_IconSize_0.Large, 
-        variant = if v12 then l_IconVariant_0.Filled else l_IconVariant_0.Regular, 
-        style = v16
-    });
-end;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local Foundation = require(CorePackages.Packages.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local IconName = Foundation.Enums.IconName
+local IconSize = Foundation.Enums.IconSize
+local IconVariant = Foundation.Enums.IconVariant
+
+require(Chrome.ChromeShared.Service.ChromeUtils)
+
+local useMappedSignal = require(CorePackages.Workspace.Packages.Chrome).Hooks.useMappedSignal
+local SubMenuContext = require(Chrome.ChromeShared.Unibar.SubMenuContext)
+
+local function AvatarSwitcherIcon(t1: {[any]: any}) -- line: 20
+	-- upvalues: useMappedSignal (copy), React (copy), SubMenuContext (copy), useTokens (copy), Foundation (copy), IconName (copy), IconSize (copy), IconVariant (copy)
+	local v13 = useMappedSignal(t1.isActive)
+	local v14 = React.useContext(SubMenuContext)
+	local v15 = useTokens()
+	local v16 = if not v14 then v15.Color.Content.Default else v14:map(function(p1) -- line: 26
+		-- upvalues: v15 (copy)
+		return {
+			Color3 = v15.Color.Content.Default.Color3,
+			Transparency = math.lerp(1, v15.Color.Content.Default.Transparency, p1)
+		}
+	end)
+
+	return React.createElement(Foundation.Icon, {
+		name = IconName.CirclePerson,
+		size = IconSize.Large,
+		variant = if not v13 then IconVariant.Regular else IconVariant.Filled,
+		style = v16
+	})
+end
+
+return AvatarSwitcherIcon

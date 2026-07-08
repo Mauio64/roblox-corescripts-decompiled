@@ -1,40 +1,45 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v3 = require(script.Parent.Common.renderWithCoreScriptsStyleProvider);
-local l_Localization_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_CorePackages_0.Workspace.Packages.Localization).LocalizationProvider;
-local v6 = require(l_CorePackages_0.Packages.Roact);
-local v7 = require(l_CorePackages_0.Packages.Rodux);
-local v8 = require(l_CorePackages_0.Packages.RoactRodux);
-local v9 = require(script.Components.PublishAssetPromptApp);
-local v10 = require(script.Reducer);
-local v11 = require(script.ConnectAssetServiceEvents);
-local v12 = {};
-v12.__index = v12;
-v12.new = function() --[[ Line: 24 ]] --[[ Name: new ]]
-    -- upvalues: v12 (copy), v6 (copy), v9 (copy), v7 (copy), v10 (copy), v8 (copy), v3 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), l_CoreGui_0 (copy), v11 (copy)
-    local v13 = setmetatable({}, v12);
-    local v14 = v6.createElement(v9);
-    v13.store = v7.Store.new(v10, nil, {
-        v7.thunkMiddleware
-    });
-    local v15 = v6.createElement(v8.StoreProvider, {
-        store = v13.store
-    }, {
-        ThemeProvider = v3({
-            LocalizationProvider = v6.createElement(l_LocalizationProvider_0, {
-                localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-            }, {
-                PublishAssetPromptApp = v14
-            })
-        })
-    });
-    v13.root = v6.createElement("Folder", {
-        Name = "PublishAssetPrompt"
-    }, v15);
-    v13.element = v6.mount(v13.root, l_CoreGui_0, "PublishAssetPrompt");
-    v13.serviceConnections = v11(v13.store);
-    return v13;
-end;
-return v12.new();
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local LocalizationService = game:GetService("LocalizationService")
+local renderWithCoreScriptsStyleProvider = require(script.Parent.Common.renderWithCoreScriptsStyleProvider)
+local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local LocalizationProvider = require(CorePackages.Workspace.Packages.Localization).LocalizationProvider
+local Roact = require(CorePackages.Packages.Roact)
+local Rodux = require(CorePackages.Packages.Rodux)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local PublishAssetPromptApp = require(script.Components.PublishAssetPromptApp)
+local Reducer = require(script.Reducer)
+local ConnectAssetServiceEvents = require(script.ConnectAssetServiceEvents)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 24
+	-- upvalues: t1 (copy), Roact (copy), PublishAssetPromptApp (copy), Rodux (copy), Reducer (copy), RoactRodux (copy), renderWithCoreScriptsStyleProvider (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), CoreGui (copy), ConnectAssetServiceEvents (copy)
+	local self = setmetatable({}, t1)
+	local v15 = Roact.createElement(PublishAssetPromptApp)
+
+	self.store = Rodux.Store.new(Reducer, nil, { Rodux.thunkMiddleware })
+
+	local v16 = Roact.createElement(RoactRodux.StoreProvider, {
+		store = self.store
+	}, {
+		ThemeProvider = renderWithCoreScriptsStyleProvider({
+			LocalizationProvider = Roact.createElement(LocalizationProvider, {
+				localization = Localization.new(LocalizationService.RobloxLocaleId)
+			}, {
+				PublishAssetPromptApp = v15
+			})
+		})
+	})
+
+	self.root = Roact.createElement("Folder", {
+		Name = "PublishAssetPrompt"
+	}, v16)
+	self.element = Roact.mount(self.root, CoreGui, "PublishAssetPrompt")
+	self.serviceConnections = ConnectAssetServiceEvents(self.store)
+
+	return self
+end
+
+return t1.new()

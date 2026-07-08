@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 16 ]] --[[ Name: startsWith ]]
-    return v0:sub(1, v1:len()) == v1;
-end;
+local function startsWith(s1: string, s2: string) -- line: 16
+	return s2 == s1:sub(1, s2:len())
+end
+
+return startsWith

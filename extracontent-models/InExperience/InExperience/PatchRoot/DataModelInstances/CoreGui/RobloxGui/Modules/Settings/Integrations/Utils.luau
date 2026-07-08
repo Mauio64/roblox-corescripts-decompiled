@@ -1,25 +1,28 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.RobloxAppEnums);
-local v2 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib);
-local l_DeviceOrientationMode_0 = v1.DeviceOrientationMode;
+local CorePackages = game:GetService("CorePackages")
+local RobloxAppEnums = require(CorePackages.Workspace.Packages.RobloxAppEnums)
+local AppCommonLib = require(CorePackages.Workspace.Packages.AppCommonLib)
+local DeviceOrientationMode = RobloxAppEnums.DeviceOrientationMode
+
 return {
-    getDeviceType = function() --[[ Line: 26 ]] --[[ Name: getDeviceType ]]
-        -- upvalues: v2 (copy), l_DeviceOrientationMode_0 (copy)
-        local l_getDeviceType_0 = v2.getDeviceType;
-        local l_ViewportSize_0 = workspace.CurrentCamera.ViewportSize;
-        return l_getDeviceType_0(if l_ViewportSize_0.X > l_ViewportSize_0.Y then l_DeviceOrientationMode_0.Landscape else l_DeviceOrientationMode_0.Portrait);
-    end, 
-    DeviceTypes = v1.DeviceType, 
-    getDeviceOrientation = function() --[[ Line: 19 ]] --[[ Name: getDeviceOrientation ]]
-        -- upvalues: l_DeviceOrientationMode_0 (copy)
-        local l_ViewportSize_1 = workspace.CurrentCamera.ViewportSize;
-        if l_ViewportSize_1.X > l_ViewportSize_1.Y then
-            return l_DeviceOrientationMode_0.Landscape;
-        else
-            return l_DeviceOrientationMode_0.Portrait;
-        end;
-    end, 
-    getViewportSize = function() --[[ Line: 14 ]] --[[ Name: getViewportSize ]]
-        return workspace.CurrentCamera.ViewportSize;
-    end
-};
+	getDeviceType = function() -- line: 26
+		-- upvalues: AppCommonLib (copy), DeviceOrientationMode (copy)
+		local getDeviceType = AppCommonLib.getDeviceType
+		local ViewportSize = workspace.CurrentCamera.ViewportSize
+
+		return getDeviceType(if not (ViewportSize.X > ViewportSize.Y) then DeviceOrientationMode.Portrait else DeviceOrientationMode.Landscape)
+	end,
+	DeviceTypes = RobloxAppEnums.DeviceType,
+	getDeviceOrientation = function() -- line: 19
+		-- upvalues: DeviceOrientationMode (copy)
+		local ViewportSize = workspace.CurrentCamera.ViewportSize
+
+		if ViewportSize.X > ViewportSize.Y then
+			return DeviceOrientationMode.Landscape
+		end
+
+		return DeviceOrientationMode.Portrait
+	end,
+	getViewportSize = function() -- line: 14
+		return workspace.CurrentCamera.ViewportSize
+	end
+}

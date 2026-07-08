@@ -1,106 +1,121 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_TextService_0 = game:GetService("TextService");
-local v3 = require(l_CorePackages_0.Packages.Cryo);
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = v4.Component:extend("ScrollingTextBox");
-v5.init = function(v6, v7) --[[ Line: 12 ]] --[[ Name: init ]]
-    -- upvalues: l_TextService_0 (copy), v4 (copy)
-    local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize("A", v7.TextSize, v7.Font, Vector2.new(0, 0));
-    v6.adjustOffset = function() --[[ Line: 15 ]]
-        -- upvalues: v6 (copy)
-        if v6.clipBox.current and v6.textboxRef.current then
-            local l_fontDims_0 = v6.state.fontDims;
-            local v10 = v6.textboxRef.current.CursorPosition - 1;
-            local v11 = v10 - math.ceil(v6.state.innerXOffset / l_fontDims_0.X);
-            local v12 = math.floor(v6.clipBox.current.AbsoluteSize.X * 0.9 / l_fontDims_0.X);
-            if v12 < v11 then
-                local v13 = (v10 - v12) * l_fontDims_0.X;
-                v6:setState({
-                    innerXOffset = v13
-                });
-                return;
-            elseif v11 < 0 then
-                local v14 = v10 * l_fontDims_0.X;
-                v6:setState({
-                    innerXOffset = v14
-                });
-            end;
-        end;
-    end;
-    v6.clipBox = v4.createRef();
-    v6.textboxRef = v6.props.forwardRef or v4.createRef();
-    v6.state = {
-        fontDims = l_l_TextService_0_TextSize_0, 
-        innerXOffset = 0
-    };
-end;
-v5.didMount = function(v15) --[[ Line: 49 ]] --[[ Name: didMount ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    if not v15.onFocusConnection then
-        v15.onFocusConnection = l_UserInputService_0.InputBegan:Connect(function(v16) --[[ Line: 51 ]]
-            -- upvalues: v15 (copy)
-            if v15.textboxRef.current and v15.textboxRef.current:IsFocused() then
-                if v16.KeyCode == Enum.KeyCode.Home then
-                    v15.textboxRef.current.CursorPosition = 0;
-                    return;
-                elseif v16.KeyCode == Enum.KeyCode.End then
-                    v15.textboxRef.current.CursorPosition = #v15.textboxRef.current.text + 1;
-                    return;
-                else
-                    v15.adjustOffset();
-                end;
-            end;
-        end);
-    end;
-end;
-v5.willUnmount = function(v17) --[[ Line: 66 ]] --[[ Name: willUnmount ]]
-    if v17.onFocusConnection then
-        v17.onFocusConnection:Disconnect();
-        v17.onFocusConnection = nil;
-    end;
-end;
-v5.render = function(v18) --[[ Line: 73 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy)
-    local l_Position_0 = v18.props.Position;
-    local l_Size_0 = v18.props.Size;
-    local l_PlaceholderText_0 = v18.props.PlaceholderText;
-    local l_TextColor3_0 = v18.props.TextColor3;
-    local l_TextSize_0 = v18.props.TextSize;
-    local l_Font_0 = v18.props.Font;
-    local l_Text_0 = v18.props.Text;
-    local l_ClearTextOnFocus_0 = v18.props.ClearTextOnFocus;
-    local l_ShowNativeInput_0 = v18.props.ShowNativeInput;
-    local l_TextBoxFocusLost_0 = v18.props.TextBoxFocusLost;
-    local l_innerXOffset_0 = v18.state.innerXOffset;
-    return v4.createElement("Frame", {
-        Position = l_Position_0, 
-        Size = l_Size_0, 
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true, 
-        [v4.Ref] = v18.clipBox
-    }, {
-        TextBox = v4.createElement("TextBox", {
-            Position = UDim2.new(0, -l_innerXOffset_0, 0, 0), 
-            Size = UDim2.new(1, l_innerXOffset_0, 1, 0), 
-            BackgroundTransparency = 1, 
-            ShowNativeInput = l_ShowNativeInput_0, 
-            ClearTextOnFocus = l_ClearTextOnFocus_0, 
-            TextColor3 = l_TextColor3_0, 
-            TextXAlignment = 0, 
-            TextSize = l_TextSize_0, 
-            Text = l_Text_0, 
-            Font = l_Font_0, 
-            PlaceholderText = l_PlaceholderText_0, 
-            [v4.Ref] = v18.textboxRef, 
-            [v4.Change.CursorPosition] = v18.adjustOffset, 
-            [v4.Event.FocusLost] = l_TextBoxFocusLost_0
-        })
-    });
-end;
-return v4.forwardRef(function(v30, v31) --[[ Line: 119 ]]
-    -- upvalues: v4 (copy), v5 (copy), v3 (copy)
-    return v4.createElement(v5, v3.Dictionary.join(v30, {
-        forwardRef = v31
-    }));
-end);
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local TextService = game:GetService("TextService")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Roact = require(CorePackages.Packages.Roact)
+local v6 = Roact.Component:extend("ScrollingTextBox")
+
+function v6.init(p1, p2) -- line: 12
+	-- upvalues: TextService (copy), Roact (copy)
+	local TextSize = TextService:GetTextSize("A", p2.TextSize, p2.Font, Vector2.new(0, 0))
+
+	function p1.adjustOffset() -- line: 15
+		-- upvalues: p1 (copy)
+		if p1.clipBox.current and p1.textboxRef.current then
+			local fontDims = p1.state.fontDims
+			local v27 = p1.textboxRef.current.CursorPosition - 1
+			local v28 = v27 - math.ceil(p1.state.innerXOffset / fontDims.X)
+			local v29 = math.floor(p1.clipBox.current.AbsoluteSize.X * 0.9 / fontDims.X)
+
+			if v29 < v28 then
+				local v30 = (v27 - v29) * fontDims.X
+
+				p1:setState({
+					innerXOffset = v30
+				})
+
+				return
+			end
+
+			if v28 < 0 then
+				local v31 = v27 * fontDims.X
+
+				p1:setState({
+					innerXOffset = v31
+				})
+			end
+		end
+	end
+
+	p1.clipBox = Roact.createRef()
+	p1.textboxRef = p1.props.forwardRef or Roact.createRef()
+	p1.state = {
+		innerXOffset = 0,
+		fontDims = TextSize
+	}
+end
+function v6.didMount(p3) -- line: 49
+	-- upvalues: UserInputService (copy)
+	if not p3.onFocusConnection then
+		p3.onFocusConnection = UserInputService.InputBegan:Connect(function(input) -- line: 51
+			-- upvalues: p3 (copy)
+			if p3.textboxRef.current and p3.textboxRef.current:IsFocused() then
+				if input.KeyCode == Enum.KeyCode.Home then
+					p3.textboxRef.current.CursorPosition = 0
+
+					return
+				end
+
+				if input.KeyCode == Enum.KeyCode.End then
+					p3.textboxRef.current.CursorPosition = #p3.textboxRef.current.text + 1
+
+					return
+				end
+
+				p3.adjustOffset()
+			end
+		end)
+	end
+end
+function v6.willUnmount(p4) -- line: 66
+	if p4.onFocusConnection then
+		p4.onFocusConnection:Disconnect()
+		p4.onFocusConnection = nil
+	end
+end
+function v6.render(p5) -- line: 73
+	-- upvalues: Roact (copy)
+	local propsPosition = p5.props.Position
+	local propsSize = p5.props.Size
+	local PlaceholderText = p5.props.PlaceholderText
+	local propsTextColor3 = p5.props.TextColor3
+	local propsTextSize = p5.props.TextSize
+	local propsFont = p5.props.Font
+	local propsText = p5.props.Text
+	local ClearTextOnFocus = p5.props.ClearTextOnFocus
+	local ShowNativeInput = p5.props.ShowNativeInput
+	local TextBoxFocusLost = p5.props.TextBoxFocusLost
+	local innerXOffset = p5.state.innerXOffset
+
+	return Roact.createElement("Frame", {
+		Position = propsPosition,
+		Size = propsSize,
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		[Roact.Ref] = p5.clipBox
+	}, {
+		TextBox = Roact.createElement("TextBox", {
+			Position = UDim2.new(0, -innerXOffset, 0, 0),
+			Size = UDim2.new(1, innerXOffset, 1, 0),
+			BackgroundTransparency = 1,
+			ShowNativeInput = ShowNativeInput,
+			ClearTextOnFocus = ClearTextOnFocus,
+			TextColor3 = propsTextColor3,
+			TextXAlignment = 0,
+			TextSize = propsTextSize,
+			Text = propsText,
+			Font = propsFont,
+			PlaceholderText = PlaceholderText,
+			[Roact.Ref] = p5.textboxRef,
+			[Roact.Change.CursorPosition] = p5.adjustOffset,
+			[Roact.Event.FocusLost] = TextBoxFocusLost
+		})
+	})
+end
+
+return Roact.forwardRef(function(p6, p7) -- line: 119
+	-- upvalues: Roact (copy), v6 (copy), Cryo (copy)
+	return Roact.createElement(v6, Cryo.Dictionary.join(p6, {
+		forwardRef = p7
+	}))
+end)

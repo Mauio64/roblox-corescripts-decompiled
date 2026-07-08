@@ -1,26 +1,32 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.ES7Types);
-return function(v2) --[[ Line: 24 ]]
-    assert(v2 ~= nil, "cannot get entries from a nil value");
-    local v3 = typeof(v2);
-    local v4 = {};
-    if v3 == "table" then
-        for v5, v6 in pairs(v2) do
-            table.insert(v4, {
-                v5, 
-                v6
-            });
-        end;
-        return v4;
-    else
-        if v3 == "string" then
-            for v7 = 1, string.len(v2) do
-                v4[v7] = {
-                    tostring(v7), 
-                    (string.sub(v2, v7, v7))
-                };
-            end;
-        end;
-        return v4;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+return function(p1) -- line: 24
+	assert(p1 ~= nil, "cannot get entries from a nil value")
+
+	local v3 = typeof(p1)
+	local t1 = {}
+
+	if v3 == "table" then
+		for k, v in pairs(p1) do
+			table.insert(t1, {
+				k,
+				v
+			})
+		end
+
+		return t1
+	end
+
+	if v3 == "string" then
+		for i = 1, string.len(p1) do
+			t1[i] = {
+				tostring(i),
+				(string.sub(p1, i, i))
+			}
+		end
+	end
+
+	return t1
+end

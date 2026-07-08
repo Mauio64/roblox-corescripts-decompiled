@@ -1,1 +1,1 @@
-return game:DefineFastInt("BulkPurchaseRequestLimit", 20);
+return game:DefineFastInt("BulkPurchaseRequestLimit", 20)

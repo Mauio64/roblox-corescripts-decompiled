@@ -1,9 +1,10 @@
-local v0 = require(script.Actions.UpdateShowChatFeedbackModalAction);
-local v1 = require(script.Actions.UpdateShowChatFeedbackPillAction);
-local v2 = require(script.Reducers.ChatInterventionReducer);
+local UpdateShowChatFeedbackModalAction = require(script.Actions.UpdateShowChatFeedbackModalAction)
+local UpdateShowChatFeedbackPillAction = require(script.Actions.UpdateShowChatFeedbackPillAction)
+local ChatInterventionReducer = require(script.Reducers.ChatInterventionReducer)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    UpdateShowChatFeedbackModalAction = v0, 
-    UpdateShowChatFeedbackPillAction = v1, 
-    ChatInterventionReducer = v2
-};
+	["jest.config"] = script["jest.config"],
+	UpdateShowChatFeedbackModalAction = UpdateShowChatFeedbackModalAction,
+	UpdateShowChatFeedbackPillAction = UpdateShowChatFeedbackPillAction,
+	ChatInterventionReducer = ChatInterventionReducer
+}

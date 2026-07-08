@@ -1,17 +1,22 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDrawerVisible_0 = require(l_Parent_0.Drawer).Hooks.useDrawerVisible;
-return function(v3) --[[ Line: 11 ]] --[[ Name: FlyoutStatusListener ]]
-    -- upvalues: l_useDrawerVisible_0 (copy), v1 (copy)
-    local v4 = l_useDrawerVisible_0();
-    v1.useEffect(function() --[[ Line: 13 ]]
-        -- upvalues: v3 (copy), v4 (copy)
-        if v3.onVisibleChanged then
-            v3.onVisibleChanged(v4);
-        end;
-    end, {
-        v4, 
-        v3.onVisibleChanged
-    });
-    return nil;
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local useDrawerVisible = require(Parent.Drawer).Hooks.useDrawerVisible
+
+local function FlyoutStatusListener(t1: {[any]: any}) -- line: 11
+	-- upvalues: useDrawerVisible (copy), React (copy)
+	local v6 = useDrawerVisible()
+
+	React.useEffect(function() -- line: 13
+		-- upvalues: t1 (copy), v6 (copy)
+		if t1.onVisibleChanged then
+			t1.onVisibleChanged(v6)
+		end
+	end, {
+		v6,
+		t1.onVisibleChanged
+	})
+
+	return nil
+end
+
+return FlyoutStatusListener

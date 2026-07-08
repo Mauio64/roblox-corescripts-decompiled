@@ -1,18 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("ApolloLocalState").Parent;
-local l_GetFFlagEnableMergeOmniFeedSorts_0 = require(script.Parent.Parent.Flags).GetFFlagEnableMergeOmniFeedSorts;
-local _ = require(l_Parent_0.ApolloClient);
-local v3 = require(script.Parent.utils.makeMergeOverlappingArraysPolicy);
-local v4 = require(script.Parent.utils.makeDefaultReadPolicy);
+local Parent = script:FindFirstAncestor("ApolloLocalState").Parent
+local GetFFlagEnableMergeOmniFeedSorts = require(script.Parent.Parent.Flags).GetFFlagEnableMergeOmniFeedSorts
+
+require(Parent.ApolloClient)
+
+local makeMergeOverlappingArraysPolicy = require(script.Parent.utils.makeMergeOverlappingArraysPolicy)
+local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
+
 return {
-    fields = {
-        topicLayoutData = {
-            read = v4({})
-        }, 
-        recommendations = {
-            read = v4({}), 
-            merge = if l_GetFFlagEnableMergeOmniFeedSorts_0() then v3("contentId") else nil
-        }, 
-        experiences = {}, 
-        hasMoreRows = {}
-    }
-};
+	fields = {
+		topicLayoutData = {
+			read = makeDefaultReadPolicy({})
+		},
+		recommendations = {
+			read = makeDefaultReadPolicy({}),
+			merge = if not GetFFlagEnableMergeOmniFeedSorts() then nil else makeMergeOverlappingArraysPolicy("contentId")
+		},
+		experiences = {},
+		hasMoreRows = {}
+	}
+}

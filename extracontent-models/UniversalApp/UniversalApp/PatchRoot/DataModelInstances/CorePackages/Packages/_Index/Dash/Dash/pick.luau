@@ -1,11 +1,17 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-return function(v2, v3) --[[ Line: 12 ]] --[[ Name: pick ]]
-    local v4 = {};
-    for v5, v6 in v2 do
-        if v3(v6, v5) then
-            v4[v5] = v6;
-        end;
-    end;
-    return v4;
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local function pick(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 12
+	local t2 = {}
+
+	for v6, v7 in t1 do
+		if p1(v7, v6) then
+			t2[v6] = v7
+		end
+	end
+
+	return t2
+end
+
+return pick

@@ -1,1 +1,1 @@
-return require(script.AspectRatio);
+return require(script.AspectRatio)

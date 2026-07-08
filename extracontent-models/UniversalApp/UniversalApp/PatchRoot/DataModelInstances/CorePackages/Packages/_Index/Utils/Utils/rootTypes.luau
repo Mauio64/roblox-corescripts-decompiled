@@ -1,69 +1,87 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local l_Map_0 = v1.Map;
-local l_Set_0 = v1.Set;
-local v7 = {};
-local _ = require(l_Parent_0.GraphQL);
-local l_memoize1_0 = require(script.Parent.memoize).memoize1;
-local v10 = nil;
-local v11 = nil;
-v7.getDefinedRootType = function(v12, v13) --[[ Line: 32 ]] --[[ Name: getDefinedRootType ]]
-    -- upvalues: v10 (ref), l_Error_0 (copy)
-    local v14 = v10(v12):get(v13);
-    if v14 == nil then
-        error(l_Error_0.new(("Root type for operation \"%s\" not defined by the given schema."):format((tostring(v13)))));
-    end;
-    return v14;
-end;
-local function _(v15) --[[ Line: 47 ]] --[[ Name: setToArray ]]
-    local v16 = {};
-    v15:forEach(function(v17) --[[ Line: 49 ]]
-        -- upvalues: v16 (copy)
-        table.insert(v16, v17);
-    end);
-    return v16;
-end;
-v7.getRootTypeNames = l_memoize1_0(function(v19) --[[ Line: 55 ]]
-    -- upvalues: v11 (ref), l_Set_0 (copy), l_Array_0 (copy)
-    local v20 = v11(v19);
-    local l_new_0 = l_Set_0.new;
-    local l_map_0 = l_Array_0.map;
-    local l_concat_0 = l_Array_0.concat;
-    local v24 = {};
-    local v25 = {};
-    v20:forEach(function(v26) --[[ Line: 49 ]]
-        -- upvalues: v25 (copy)
-        table.insert(v25, v26);
-    end);
-    return l_new_0(l_map_0(l_concat_0(v24, v25), function(v27) --[[ Line: 59 ]]
-        return v27.name;
-    end));
-end);
-v11 = l_memoize1_0(function(v28) --[[ Line: 67 ]]
-    -- upvalues: v10 (ref), l_Set_0 (copy)
-    local v29 = v10(v28);
-    return l_Set_0.new(v29:values());
-end);
-v7.getRootTypes = v11;
-v10 = l_memoize1_0(function(v30) --[[ Line: 75 ]]
-    -- upvalues: l_Map_0 (copy), l_Boolean_0 (copy)
-    local v31 = l_Map_0.new();
-    local v32 = v30:getQueryType();
-    if l_Boolean_0.toJSBoolean(v32) then
-        v31:set("query", v32);
-    end;
-    local v33 = v30:getMutationType();
-    if l_Boolean_0.toJSBoolean(v33) then
-        v31:set("mutation", v33);
-    end;
-    local v34 = v30:getSubscriptionType();
-    if l_Boolean_0.toJSBoolean(v34) then
-        v31:set("subscription", v34);
-    end;
-    return v31;
-end);
-v7.getRootTypeMap = v10;
-return v7;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local Map = LuauPolyfill.Map
+local Set = LuauPolyfill.Set
+local t1 = {}
+
+require(ParentParent.GraphQL)
+
+local memoize1 = require(script.Parent.memoize).memoize1
+local u10 = nil
+local u11 = nil
+
+function t1.getDefinedRootType(p1, p2) -- line: 32
+	-- upvalues: u10 (ref), Error (copy)
+	local v15 = u10(p1):get(p2)
+
+	if v15 == nil then
+		error(Error.new(("Root type for operation \"%s\" not defined by the given schema."):format((tostring(p2)))))
+	end
+
+	return v15
+end
+
+local function setToArray(p3) -- line: 47
+	local t2 = {}
+
+	p3:forEach(function(p4) -- line: 49
+		-- upvalues: t2 (copy)
+		table.insert(t2, p4)
+	end)
+
+	return t2
+end
+
+t1.getRootTypeNames = memoize1(function(p5) -- line: 55
+	-- upvalues: u11 (ref), Set (copy), Array (copy)
+	local v19 = u11(p5)
+	local new = Set.new
+	local map = Array.map
+	local concat = Array.concat
+	local t3 = {}
+
+	v19:forEach(function(p6) -- line: 49
+		-- upvalues: t3 (copy)
+		table.insert(t3, p6)
+	end)
+
+	return new(map(concat({}, t3), function(p7) -- line: 59
+		return p7.name
+	end))
+end)
+u11 = memoize1(function(p8) -- line: 67
+	-- upvalues: u10 (ref), Set (copy)
+	local v25 = u10(p8)
+
+	return Set.new(v25:values())
+end)
+t1.getRootTypes = u11
+u10 = memoize1(function(p9) -- line: 75
+	-- upvalues: Map (copy), Boolean (copy)
+	local v27 = Map.new()
+	local v28 = p9:getQueryType()
+
+	if Boolean.toJSBoolean(v28) then
+		v27:set("query", v28)
+	end
+
+	local v29 = p9:getMutationType()
+
+	if Boolean.toJSBoolean(v29) then
+		v27:set("mutation", v29)
+	end
+
+	local v30 = p9:getSubscriptionType()
+
+	if Boolean.toJSBoolean(v30) then
+		v27:set("subscription", v30)
+	end
+
+	return v27
+end)
+t1.getRootTypeMap = u10
+
+return t1

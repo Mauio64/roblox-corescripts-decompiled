@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppDataHydrationVotesStoreTrackOptimisticVotes", false);
+return game:DefineFastFlag("LuaAppDataHydrationVotesStoreTrackOptimisticVotes", false)

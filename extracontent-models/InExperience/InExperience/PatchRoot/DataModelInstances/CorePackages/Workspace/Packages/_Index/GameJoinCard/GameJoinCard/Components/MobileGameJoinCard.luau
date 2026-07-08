@@ -1,1 +1,1 @@
-return require(script.MobileGameJoinCardContainer);
+return require(script.MobileGameJoinCardContainer)

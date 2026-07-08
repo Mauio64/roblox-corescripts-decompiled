@@ -1,2 +1,3 @@
-local v0 = require(script.Parent.FFlagDynamicHeadsMigration);
-return game:DefineFastFlag("AXAddFacesToHeadList", false) and v0;
+local FFlagDynamicHeadsMigration = require(script.Parent.FFlagDynamicHeadsMigration)
+
+return game:DefineFastFlag("AXAddFacesToHeadList", false) and FFlagDynamicHeadsMigration

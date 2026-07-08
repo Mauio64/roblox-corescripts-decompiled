@@ -1,3 +1,3 @@
 return {
-    compose = require(script.compose)
-};
+	compose = require(script.compose)
+}

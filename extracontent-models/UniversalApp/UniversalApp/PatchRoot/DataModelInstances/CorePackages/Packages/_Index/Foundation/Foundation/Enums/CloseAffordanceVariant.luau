@@ -1,4 +1,4 @@
 return {
-    Utility = "Utility", 
-    OverMedia = "OverMedia"
-};
+	Utility = "Utility",
+	OverMedia = "OverMedia"
+}

@@ -1,5 +1,6 @@
-local l_Parent_0 = script.Parent;
-local l_Object_0 = require(l_Parent_0.Collections).Object;
-local v2 = require(script.makeTimerImpl);
-local v3 = require(script.makeIntervalImpl);
-return l_Object_0.assign({}, v2(task.delay), v3(task.delay));
+local scriptParent = script.Parent
+local Object = require(scriptParent.Collections).Object
+local makeTimerImpl = require(script.makeTimerImpl)
+local makeIntervalImpl = require(script.makeIntervalImpl)
+
+return Object.assign({}, makeTimerImpl(task.delay), makeIntervalImpl(task.delay))

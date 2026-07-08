@@ -1,104 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_script_FirstAncestor_0.Rodux.AddSduiRootConfig);
-local v5 = require(l_script_FirstAncestor_0.Rodux.RemoveSduiRootConfig);
-local v6 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiErrors_0 = v6.SduiErrors;
-local l_SduiLogger_0 = v6.SduiLogger;
-local v9 = require(l_script_FirstAncestor_0.DataStore.getItemCollectionKey);
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local ArgCheck = require(ServerDrivenUiParent.ArgCheck)
+local Cryo = require(ServerDrivenUiParent.Cryo)
+local AddSduiRootConfig = require(ServerDrivenUi.Rodux.AddSduiRootConfig)
+local RemoveSduiRootConfig = require(ServerDrivenUi.Rodux.RemoveSduiRootConfig)
+local SduiCoreSystem = require(ServerDrivenUiParent.SduiCoreSystem)
+local SduiErrors = SduiCoreSystem.SduiErrors
+local SduiLogger = SduiCoreSystem.SduiLogger
+local getItemCollectionKey = require(ServerDrivenUi.DataStore.getItemCollectionKey)
+
 return {
-    key = "SduiConfigKey", 
-    reducer = function(v10, v11) --[[ Line: 26 ]]
-        -- upvalues: v2 (copy), v4 (copy), l_SduiLogger_0 (copy), l_SduiErrors_0 (copy), v9 (copy), v3 (copy), v5 (copy)
-        v10 = v10 or {};
-        assert(v10, "state must exist");
-        v2.assert(typeof(v10) == "table", "state must be a table");
-        if v11.type == v4.name then
-            local v12 = v11.customFeedStoreKey or v11.page;
-            local v13 = v10[v12];
-            local v14 = v13 and v13.itemCollections or {};
-            local v15 = {
-                rootConfig = v11.rootConfig, 
-                dataUpdatedTimestamp = v11.dataUpdatedTimestamp, 
-                itemCollections = v14
-            };
-            local v16 = v11.rootConfig.feed or v11.rootConfig or nil;
-            if typeof(v16) ~= "table" then
-                l_SduiLogger_0.reportError(l_SduiErrors_0.SduiErrorType.InvalidFeedInResponse, {
-                    message = ("Invalid sdui.feed in response of type %*"):format((typeof(v16)))
-                }, v11.page);
-                return v10;
-            else
-                local v17 = v16.props and v16.props.feedItems or nil;
-                if v17 then
-                    for _, v19 in v17 do
-                        local l_feedItemKey_0 = v19.feedItemKey;
-                        if l_feedItemKey_0 then
-                            if v15.itemCollections[l_feedItemKey_0] ~= nil then
-                                l_SduiLogger_0.reportError(l_SduiErrors_0.SduiErrorType.DuplicateFeedItemKey, {
-                                    message = ("Multiple item collections with same feedItemKey %*"):format(l_feedItemKey_0)
-                                }, v11.page);
-                            end;
-                            if v11.expectedSduiFeedItems then
-                                local v21 = nil;
-                                local v22 = nil;
-                                for _, v24 in v11.expectedSduiFeedItems do
-                                    if v24.feedItemKey == l_feedItemKey_0 then
-                                        v21 = v24.topicId;
-                                        v22 = v24.sortIndex;
-                                        break;
-                                    end;
-                                end;
-                                if v21 == nil or v22 == nil then
-                                    l_SduiLogger_0.reportError(l_SduiErrors_0.SduiErrorType.FailedToFindCollectionId, {
-                                        message = ("Missing topicId or sortIndex for %* in ConfigReducer. sortIndex = %* topicId = %*"):format(l_feedItemKey_0, v22, v21)
-                                    }, v11.page);
-                                end;
-                                local v25 = v9(v21, v22);
-                                v15.itemCollections[v25] = {
-                                    sduiConfig = v19, 
-                                    dataUpdatedTimestamp = v11.dataUpdatedTimestamp, 
-                                    topicId = v21, 
-                                    sortIndex = v22
-                                };
-                            else
-                                v15.itemCollections[l_feedItemKey_0] = {
-                                    sduiConfig = v19, 
-                                    dataUpdatedTimestamp = v11.dataUpdatedTimestamp
-                                };
-                            end;
-                        else
-                            l_SduiLogger_0.reportError(l_SduiErrors_0.SduiErrorType.NilFeedItemKey, {
-                                message = "Missing feedItemKey for itemCollection in ConfigReducer"
-                            }, v11.page);
-                        end;
-                    end;
-                end;
-                if v11.expectedSduiFeedItems then
-                    for _, v27 in v11.expectedSduiFeedItems do
-                        local v28 = v9(v27.topicId, v27.sortIndex);
-                        if v15.itemCollections[v28] == nil then
-                            l_SduiLogger_0.reportError(l_SduiErrors_0.SduiErrorType.NilItemCollection, {
-                                message = ("Missing item collection data for an sdui feed item for topic: %* sortIndex: %*"):format(v27.topicId, v27.sortIndex), 
-                                name = v27.topicId
-                            }, v11.page);
-                        end;
-                    end;
-                end;
-                return (v3.Dictionary.union(v10, {
-                    [v12] = v15
-                }));
-            end;
-        else
-            if v11.type == v5.name then
-                local l_feedStoreKey_0 = v11.feedStoreKey;
-                if v10[l_feedStoreKey_0] then
-                    v10 = v3.Dictionary.omit(v10, l_feedStoreKey_0);
-                end;
-            end;
-            return v10;
-        end;
-    end
-};
+	key = "SduiConfigKey",
+	reducer = function(t1: {[any]: any}?, p1) -- line: 30
+		-- upvalues: ArgCheck (copy), AddSduiRootConfig (copy), SduiLogger (copy), SduiErrors (copy), getItemCollectionKey (copy), Cryo (copy), RemoveSduiRootConfig (copy)
+		local v13 = t1 or {}
+
+		assert(v13, "state must exist")
+		ArgCheck.assert(typeof(v13) == "table", "state must be a table")
+
+		if p1.type == AddSduiRootConfig.name then
+			local v14 = p1.customFeedStoreKey or p1.page
+			local v15 = v13[v14]
+			local v16 = v15 and v15.itemCollections or {}
+			local t2 = {
+				rootConfig = p1.rootConfig,
+				dataUpdatedTimestamp = p1.dataUpdatedTimestamp,
+				itemCollections = v16
+			}
+			local v18 = p1.rootConfig.feed or (p1.rootConfig or nil)
+
+			if typeof(v18) ~= "table" then
+				SduiLogger.reportError(SduiErrors.SduiErrorType.InvalidFeedInResponse, {
+					message = `Invalid sdui.feed in response of type { typeof(v18) }`
+				}, p1.page)
+
+				return v13
+			end
+
+			local v19 = v18.props and v18.props.feedItems or nil
+
+			if v19 then
+				for _, v21 in v19 do
+					local feedItemKey = v21.feedItemKey
+
+					if feedItemKey then
+						if t2.itemCollections[feedItemKey] ~= nil then
+							SduiLogger.reportError(SduiErrors.SduiErrorType.DuplicateFeedItemKey, {
+								message = `Multiple item collections with same feedItemKey { feedItemKey }`
+							}, p1.page)
+						end
+
+						if p1.expectedSduiFeedItems then
+							local topicId = nil
+							local sortIndex = nil
+
+							for _, v26 in p1.expectedSduiFeedItems do
+								if feedItemKey == v26.feedItemKey then
+									topicId = v26.topicId
+									sortIndex = v26.sortIndex
+
+									break
+								end
+							end
+
+							if topicId == nil or sortIndex == nil then
+								SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToFindCollectionId, {
+									message = `Missing topicId or sortIndex for { feedItemKey } in ConfigReducer. sortIndex = { sortIndex } topicId = { topicId }`
+								}, p1.page)
+							end
+
+							local v27 = getItemCollectionKey(topicId, sortIndex)
+
+							t2.itemCollections[v27] = {
+								sduiConfig = v21,
+								dataUpdatedTimestamp = p1.dataUpdatedTimestamp,
+								topicId = topicId,
+								sortIndex = sortIndex
+							}
+						else
+							t2.itemCollections[feedItemKey] = {
+								sduiConfig = v21,
+								dataUpdatedTimestamp = p1.dataUpdatedTimestamp
+							}
+						end
+					else
+						SduiLogger.reportError(SduiErrors.SduiErrorType.NilFeedItemKey, {
+							message = "Missing feedItemKey for itemCollection in ConfigReducer"
+						}, p1.page)
+					end
+				end
+			end
+
+			if p1.expectedSduiFeedItems then
+				for _, v29 in p1.expectedSduiFeedItems do
+					local v30 = getItemCollectionKey(v29.topicId, v29.sortIndex)
+
+					if t2.itemCollections[v30] == nil then
+						SduiLogger.reportError(SduiErrors.SduiErrorType.NilItemCollection, {
+							message = `Missing item collection data for an sdui feed item for topic: { v29.topicId } sortIndex: { v29.sortIndex }`,
+							name = v29.topicId
+						}, p1.page)
+					end
+				end
+			end
+
+			return (Cryo.Dictionary.union(v13, {
+				[v14] = t2
+			}))
+		end
+
+		if p1.type == RemoveSduiRootConfig.name then
+			local feedStoreKey = p1.feedStoreKey
+
+			if v13[feedStoreKey] then
+				v13 = Cryo.Dictionary.omit(v13, feedStoreKey)
+			end
+		end
+
+		return v13
+	end
+}

@@ -1,3 +1,3 @@
 return {
-    ProfileShareLinkActivated = "ProfileShareLinkActivated"
-};
+	ProfileShareLinkActivated = "ProfileShareLinkActivated"
+}

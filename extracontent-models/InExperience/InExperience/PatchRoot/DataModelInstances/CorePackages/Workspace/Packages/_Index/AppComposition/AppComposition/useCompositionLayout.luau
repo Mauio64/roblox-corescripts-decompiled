@@ -1,21 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppComposition");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SignalsReact);
-local _ = require(l_script_FirstAncestor_0.AppCompositionTypes);
-local v6 = require(l_script_FirstAncestor_0.CompositionConfig);
-local v7 = require(l_script_FirstAncestor_0.getGlobalViewportBreakpoint);
-local l_useTokens_0 = v2.Hooks.useTokens;
-return function() --[[ Line: 16 ]] --[[ Name: useCompositionLayout ]]
-    -- upvalues: l_useTokens_0 (copy), v4 (copy), v7 (copy), v3 (copy), v6 (copy)
-    local v9 = l_useTokens_0();
-    local v10 = v4.useSignalState(v7);
-    return v3.useMemo(function() --[[ Line: 20 ]]
-        -- upvalues: v6 (ref), v10 (copy), v9 (copy)
-        return v6.getBaseConfig(v10, v9);
-    end, {
-        v10, 
-        v9
-    });
-end;
+local AppComposition = script:FindFirstAncestor("AppComposition")
+local AppCompositionParent = AppComposition.Parent
+local Foundation = require(AppCompositionParent.Foundation)
+local React = require(AppCompositionParent.React)
+local SignalsReact = require(AppCompositionParent.SignalsReact)
+
+require(AppComposition.AppCompositionTypes)
+
+local CompositionConfig = require(AppComposition.CompositionConfig)
+local getGlobalViewportBreakpoint = require(AppComposition.getGlobalViewportBreakpoint)
+local useTokens = Foundation.Hooks.useTokens
+
+local function useCompositionLayout() -- line: 16
+	-- upvalues: useTokens (copy), SignalsReact (copy), getGlobalViewportBreakpoint (copy), React (copy), CompositionConfig (copy)
+	local v10 = useTokens()
+	local v11 = SignalsReact.useSignalState(getGlobalViewportBreakpoint)
+
+	return React.useMemo(function() -- line: 20
+		-- upvalues: CompositionConfig (copy), v11 (copy), v10 (copy)
+		return CompositionConfig.getBaseConfig(v11, v10)
+	end, {
+		v11,
+		v10
+	})
+end
+
+return useCompositionLayout

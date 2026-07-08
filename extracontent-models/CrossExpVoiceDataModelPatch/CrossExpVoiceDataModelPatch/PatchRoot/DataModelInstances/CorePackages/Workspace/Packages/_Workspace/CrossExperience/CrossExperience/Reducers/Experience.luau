@@ -1,86 +1,96 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperience");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_Cryo_0 = v1.Cryo;
-local l_SharedFlags_0 = v1.SharedFlags;
-local l_ExperienceJoined_0 = require(l_script_FirstAncestor_0.Actions).ExperienceJoined;
-local l_ExperienceLeft_0 = require(l_script_FirstAncestor_0.Actions).ExperienceLeft;
-local l_RestoreState_0 = require(l_script_FirstAncestor_0.Actions).RestoreState;
-local l_VoiceStatusChanged_0 = require(l_script_FirstAncestor_0.Actions).VoiceStatusChanged;
-local _ = require(l_script_FirstAncestor_0.Types);
-local v10 = require(l_script_FirstAncestor_0.Constants);
-local l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 = l_SharedFlags_0.FStringTimeoutLoadingLocalPlayerInBackgroundDM;
-local l_VOICE_STATUS_0 = v10.VOICE_STATUS;
-local v13 = {
-    jobId = nil, 
-    gameId = nil, 
-    placeId = nil, 
-    voiceStatus = l_VOICE_STATUS_0.DISCONNECTED, 
-    voiceChannelId = nil, 
-    voiceSessionId = nil
-};
-local function _(v14, v15) --[[ Line: 29 ]] --[[ Name: isAllowedVoiceStatusTransition ]]
-    -- upvalues: l_SharedFlags_0 (copy), l_VOICE_STATUS_0 (copy)
-    if l_SharedFlags_0.GetFFlagFixPartyVoiceGetPermissions() and v14 == l_VOICE_STATUS_0.ERROR_VOICE_MIC_REJECTED then
-        return v15 == l_VOICE_STATUS_0.VOICE_CONNECTING;
-    else
-        return v14 ~= v15;
-    end;
-end;
-return function(v17) --[[ Line: 43 ]]
-    -- upvalues: l_Rodux_0 (copy), v13 (copy), l_ExperienceJoined_0 (copy), l_Cryo_0 (copy), l_ExperienceLeft_0 (copy), v10 (copy), l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 (copy), l_RestoreState_0 (copy), l_VoiceStatusChanged_0 (copy), l_SharedFlags_0 (copy), l_VOICE_STATUS_0 (copy)
-    return l_Rodux_0.createReducer(v17 or v13, {
-        [l_ExperienceJoined_0.name] = function(v18, v19) --[[ Line: 46 ]]
-            -- upvalues: l_Cryo_0 (ref)
-            local l_payload_0 = v19.payload;
-            return l_Cryo_0.Dictionary.join(v18, {
-                jobId = l_payload_0.jobId, 
-                gameId = l_payload_0.gameId, 
-                placeId = l_payload_0.placeId
-            });
-        end, 
-        [l_ExperienceLeft_0.name] = function(v21) --[[ Line: 55 ]]
-            -- upvalues: v10 (ref), l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 (ref)
-            local l_voiceStatus_0 = v21.voiceStatus;
-            local l_voiceStatus_1 = v21.voiceStatus;
-            if l_voiceStatus_0 ~= v10.VOICE_STATUS.ERROR_VOICE_DISCONNECTED and l_voiceStatus_0 ~= v10.VOICE_STATUS.ERROR_START_BACKGROUND_DM and l_voiceStatus_0 ~= v10.VOICE_STATUS.ERROR_RCC_CONNECTING and l_voiceStatus_0 ~= v10.VOICE_STATUS.ERROR_RCC_TIMEOUT and (l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 == v10.LOCAL_PLAYER_LOADING_TIMEOUT_ENUM.Disable or l_voiceStatus_0 ~= v10.VOICE_STATUS.ERROR_BACKGROUND_DM_LOAD_LOCALPLAYER_TIMEOUT) then
-                l_voiceStatus_1 = v10.VOICE_STATUS.DISCONNECTED;
-            end;
-            return {
-                jobId = nil, 
-                gameId = nil, 
-                placeId = nil, 
-                voiceChannelId = nil, 
-                voiceSessionId = nil, 
-                voiceStatus = l_voiceStatus_1
-            };
-        end, 
-        [l_RestoreState_0.name] = function(v24, v25) --[[ Line: 84 ]]
-            -- upvalues: l_Cryo_0 (ref)
-            if v25.payload.Experience then
-                return l_Cryo_0.Dictionary.join({}, v25.payload.Experience);
-            else
-                return v24;
-            end;
-        end, 
-        [l_VoiceStatusChanged_0.name] = function(v26, v27) --[[ Line: 91 ]]
-            -- upvalues: l_SharedFlags_0 (ref), l_VOICE_STATUS_0 (ref), l_Cryo_0 (ref)
-            local l_voiceStatus_2 = v26.voiceStatus;
-            local l_status_0 = v27.payload.status;
-            if if l_SharedFlags_0.GetFFlagFixPartyVoiceGetPermissions() and l_voiceStatus_2 == l_VOICE_STATUS_0.ERROR_VOICE_MIC_REJECTED then l_status_0 == l_VOICE_STATUS_0.VOICE_CONNECTING else l_voiceStatus_2 ~= l_status_0 then
-                local v30 = l_Cryo_0.Dictionary.join(v26, {
-                    voiceStatus = v27.payload.status
-                });
-                if v27.payload.status == l_VOICE_STATUS_0.VOICE_CONNECTED then
-                    v30 = l_Cryo_0.Dictionary.join(v30, {
-                        voiceChannelId = v27.payload.voiceChannelId, 
-                        voiceSessionId = v27.payload.voiceSessionId
-                    });
-                end;
-                return v30;
-            else
-                return v26;
-            end;
-        end
-    });
-end;
+local CrossExperience = script:FindFirstAncestor("CrossExperience")
+local dependencies = require(CrossExperience.dependencies)
+local Rodux = dependencies.Rodux
+local Cryo = dependencies.Cryo
+local SharedFlags = dependencies.SharedFlags
+local ExperienceJoined = require(CrossExperience.Actions).ExperienceJoined
+local ExperienceLeft = require(CrossExperience.Actions).ExperienceLeft
+local RestoreState = require(CrossExperience.Actions).RestoreState
+local VoiceStatusChanged = require(CrossExperience.Actions).VoiceStatusChanged
+
+require(CrossExperience.Types)
+
+local Constants = require(CrossExperience.Constants)
+local FStringTimeoutLoadingLocalPlayerInBackgroundDM = SharedFlags.FStringTimeoutLoadingLocalPlayerInBackgroundDM
+local VOICE_STATUS = Constants.VOICE_STATUS
+local t1 = {
+	jobId = nil,
+	gameId = nil,
+	placeId = nil,
+	voiceChannelId = nil,
+	voiceSessionId = nil,
+	voiceStatus = VOICE_STATUS.DISCONNECTED
+}
+
+local function isAllowedVoiceStatusTransition(p1, p2) -- line: 29
+	-- upvalues: SharedFlags (copy), VOICE_STATUS (copy)
+	if SharedFlags.GetFFlagFixPartyVoiceGetPermissions() and p1 == VOICE_STATUS.ERROR_VOICE_MIC_REJECTED then
+		return p2 == VOICE_STATUS.VOICE_CONNECTING
+	end
+
+	return p1 ~= p2
+end
+
+return function(p3) -- line: 43
+	-- upvalues: Rodux (copy), t1 (copy), ExperienceJoined (copy), Cryo (copy), ExperienceLeft (copy), Constants (copy), FStringTimeoutLoadingLocalPlayerInBackgroundDM (copy), RestoreState (copy), VoiceStatusChanged (copy), SharedFlags (copy), VOICE_STATUS (copy)
+	return Rodux.createReducer(p3 or t1, {
+		[ExperienceJoined.name] = function(p4, p5) -- line: 46
+			-- upvalues: Cryo (copy)
+			local payload = p5.payload
+
+			return Cryo.Dictionary.join(p4, {
+				jobId = payload.jobId,
+				gameId = payload.gameId,
+				placeId = payload.placeId
+			})
+		end,
+		[ExperienceLeft.name] = function(p6) -- line: 55
+			-- upvalues: Constants (copy), FStringTimeoutLoadingLocalPlayerInBackgroundDM (copy)
+			local voiceStatus = p6.voiceStatus
+			local voiceStatus2 = p6.voiceStatus
+
+			if voiceStatus ~= Constants.VOICE_STATUS.ERROR_VOICE_DISCONNECTED and (voiceStatus ~= Constants.VOICE_STATUS.ERROR_START_BACKGROUND_DM and voiceStatus ~= Constants.VOICE_STATUS.ERROR_RCC_CONNECTING and voiceStatus ~= Constants.VOICE_STATUS.ERROR_RCC_TIMEOUT) and (FStringTimeoutLoadingLocalPlayerInBackgroundDM == Constants.LOCAL_PLAYER_LOADING_TIMEOUT_ENUM.Disable or voiceStatus ~= Constants.VOICE_STATUS.ERROR_BACKGROUND_DM_LOAD_LOCALPLAYER_TIMEOUT) then
+				voiceStatus2 = Constants.VOICE_STATUS.DISCONNECTED
+			end
+
+			return {
+				jobId = nil,
+				gameId = nil,
+				placeId = nil,
+				voiceChannelId = nil,
+				voiceSessionId = nil,
+				voiceStatus = voiceStatus2
+			}
+		end,
+		[RestoreState.name] = function(p7, p8) -- line: 84
+			-- upvalues: Cryo (copy)
+			if p8.payload.Experience then
+				return Cryo.Dictionary.join({}, p8.payload.Experience)
+			end
+
+			return p7
+		end,
+		[VoiceStatusChanged.name] = function(p9, p10) -- line: 91
+			-- upvalues: SharedFlags (copy), VOICE_STATUS (copy), Cryo (copy)
+			local voiceStatus = p9.voiceStatus
+			local status = p10.payload.status
+
+			if if not SharedFlags.GetFFlagFixPartyVoiceGetPermissions() or voiceStatus ~= VOICE_STATUS.ERROR_VOICE_MIC_REJECTED then voiceStatus ~= status else status == VOICE_STATUS.VOICE_CONNECTING then
+				local v30 = Cryo.Dictionary.join(p9, {
+					voiceStatus = p10.payload.status
+				})
+
+				if p10.payload.status == VOICE_STATUS.VOICE_CONNECTED then
+					v30 = Cryo.Dictionary.join(v30, {
+						voiceChannelId = p10.payload.voiceChannelId,
+						voiceSessionId = p10.payload.voiceSessionId
+					})
+				end
+
+				return v30
+			end
+
+			return p9
+		end
+	})
+end

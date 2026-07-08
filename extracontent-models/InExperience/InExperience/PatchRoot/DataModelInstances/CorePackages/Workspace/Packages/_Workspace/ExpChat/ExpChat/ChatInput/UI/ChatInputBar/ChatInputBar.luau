@@ -1,1191 +1,1570 @@
-local l_Players_0 = game:GetService("Players");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v6 = require(l_Parent_0.FocusNavigationUtils);
-local v7 = require(l_Parent_0.React);
-local v8 = require(l_Parent_0.ReactFocusNavigation);
-local v9 = require(l_Parent_0.ExpChatShared);
-local l_FocusUtils_0 = require(l_Parent_0.Chrome).FocusUtils;
-local v11 = require(l_script_FirstAncestor_0.Stores.GetMessagesStore);
-local v12 = require(l_Parent_0.UIBlox);
-local v13 = require(l_Parent_0.Promise);
-local v14 = require(l_Parent_0.Signals);
-local v15 = require(l_Parent_0.SignalsReact);
-local l_List_0 = require(l_Parent_0.llama).List;
-local l_Images_0 = v12.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v12.Core.ImageSet.ImageSetLabel;
-local l_useCursor_0 = v12.App.SelectionCursor.useCursor;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v21 = require(l_script_FirstAncestor_0.ClientSettings.useInterpolatedClientSettings);
-local v22 = require(l_script_FirstAncestor_0.Config);
-local v23 = require(l_script_FirstAncestor_0.Stores.GetFocusNavigationStore);
-local v24 = v9.Logger:new("ExpChat/" .. script.Name);
-local l_autoCastCommand_0 = v9.Commands.autoCastCommand;
-local l_RBXWhisperCommand_0 = v9.Commands.Whisper.RBXWhisperCommand;
-local l_RBXTeamCommand_0 = v9.Commands.RBXTeamCommand;
-local v28 = require(l_script_FirstAncestor_0.Localization);
-local v29 = require(l_script_FirstAncestor_0.getOtherDisplayNameInWhisperChannel);
-local v30 = require(script.Parent.ChannelChip);
-local v31 = require(l_script_FirstAncestor_0.Autocomplete.AutocompleteText);
-local v32 = require(l_script_FirstAncestor_0.Autocomplete.Initializations.initializeEmojis);
-local v33 = require(l_script_FirstAncestor_0.Autocomplete.Initializations.initializeCommands);
-local v34 = require(l_script_FirstAncestor_0.Autocomplete.Initializations.initializeGlobalCommands);
-local v35 = require(l_script_FirstAncestor_0.Autocomplete.Initializations.initialCommands);
-local v36 = require(l_script_FirstAncestor_0.Autocomplete.SortingCallbacks.sortEmojiResultsCallback);
-local v37 = require(l_script_FirstAncestor_0.Autocomplete.SortingCallbacks.sortCommandResultsCallback);
-local l_script_FirstAncestor_1 = script:FindFirstAncestor("ChatInput");
-local v39 = require(l_script_FirstAncestor_1.UI.AutocompleteDropdown);
-local v40 = require(l_script_FirstAncestor_0.Flags.getEnableChatInputBarConfigurationAutocompleteEnabled);
-local v41 = require(l_Parent_0.SharedFlags);
-local l_FFlagExpChatUseMessagesStore_0 = v41.FFlagExpChatUseMessagesStore;
-local l_FFlagEnableConsoleExpControls_0 = v41.FFlagEnableConsoleExpControls;
-local l_FFlagChromeChatGamepadSupportFix_0 = v41.FFlagChromeChatGamepadSupportFix;
-local l_FFlagConsoleChatUseChromeFocusUtils_0 = v41.FFlagConsoleChatUseChromeFocusUtils;
-local v46 = require(l_script_FirstAncestor_0.Flags.FFlagExpChatEnableFocusNavigation);
-local v47 = require(l_script_FirstAncestor_0.Flags.FFlagExpChatFocusViaLastModeFix);
-local v48 = game:DefineFastFlag("ChatOptimizeCommandProcessing", false);
-local v49 = game:DefineFastFlag("ExpChatFocusablePlaceholderText", false);
-local v50 = require(l_script_FirstAncestor_0.Flags.getFFlagExpChatConnectInitCommands);
-local v51 = game:DefineFastFlag("ExpChatTextChatCommandRemoved", false);
-local v52 = game:DefineFastFlag("ExpChatCheckForNilInputObj", false);
-local v53 = game:DefineFastFlag("ExpChatDoNotSetCursorPosition", false);
-local l_GetFFlagTextChatEnableUniverseChatTabs_0 = v9.Flags.GetFFlagTextChatEnableUniverseChatTabs;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v41.FFlagRemoveDependencyArrayAntipattern;
-local l_ActionBindableEvent_0 = v9.ActionBindableEvent;
-local v57 = v23(false);
-local function v61(v58, v59) --[[ Line: 78 ]] --[[ Name: setTransparency ]]
-    return v59:map(function(v60) --[[ Line: 79 ]]
-        -- upvalues: v58 (copy)
-        return v58 + v60 * (1 - v58);
-    end);
-end;
-local v62 = nil;
-local v63 = nil;
-local v64 = nil;
-local v65 = nil;
-local v66 = nil;
-local function v77(v67, v68, v69) --[[ Line: 90 ]] --[[ Name: onChatInputBarFocusLost ]]
-    -- upvalues: l_UserInputService_0 (copy), v52 (copy), l_GuiService_0 (copy)
-    local v70 = {
-        Enum.KeyCode.ButtonB
-    };
-    local v71 = v68 or v70;
-    local v72 = nil;
-    v72 = l_UserInputService_0.InputBegan:Connect(function(v73) --[[ Line: 94 ]]
-        -- upvalues: v52 (ref), v71 (copy), l_GuiService_0 (ref), v69 (copy), v67 (copy), v72 (ref)
-        local v74 = if not v52 or v73 then v73.KeyCode else nil;
-        for _, v76 in v71 do
-            if v74 == v76 then
-                l_GuiService_0:SetMenuIsOpen(false, "ExperienceChat");
-                v69();
-                if v67 then
-                    v67();
-                else
-                    l_GuiService_0.SelectedCoreObject = nil;
-                end;
-                if v72 then
-                    v72:Disconnect();
-                    v72 = nil;
-                    return;
-                else
-                    break;
-                end;
-            end;
-        end;
-    end);
-    return v72;
-end;
-local function v96(v78, v79, v80, v81, v82) --[[ Line: 118 ]] --[[ Name: useEffectChatInputBarFocus ]]
-    -- upvalues: l_FFlagConsoleChatUseChromeFocusUtils_0 (copy), v7 (copy), v46 (copy), v14 (copy), v57 (copy), v49 (copy), l_GuiService_0 (copy), l_UserInputService_0 (copy), v52 (copy), l_FocusUtils_0 (copy), l_FFlagChromeChatGamepadSupportFix_0 (copy), l_FFlagEnableConsoleExpControls_0 (copy), v77 (copy), l_ActionBindableEvent_0 (copy)
-    if l_FFlagConsoleChatUseChromeFocusUtils_0 then
-        v7.useEffect(function() --[[ Line: 120 ]]
-            -- upvalues: v46 (ref), v14 (ref), v57 (ref), v79 (copy), v78 (copy), v49 (ref), v80 (copy), l_GuiService_0 (ref), v81 (copy), l_UserInputService_0 (ref), v52 (ref), l_FocusUtils_0 (ref), v82 (copy)
-            local v83 = {
-                [Enum.KeyCode.DPadUp] = not v46 or nil
-            };
-            local v84 = nil;
-            local v89 = v14.createEffect(function(v85) --[[ Line: 126 ]]
-                -- upvalues: v57 (ref), v79 (ref), v78 (ref), v49 (ref), v80 (ref), l_GuiService_0 (ref), v81 (ref), v84 (ref), l_UserInputService_0 (ref), v52 (ref), v83 (copy), l_FocusUtils_0 (ref), v82 (ref)
-                local v86 = v57.getChatInputBarFocused(v85);
-                local v87 = if v79.current then v79.current else v78.current;
-                if v49 then
-                    v87 = v87 or v80.current;
-                end;
-                if not v87 then
-                    return;
-                else
-                    if v86 then
-                        l_GuiService_0:SetMenuIsOpen(true, "ExperienceChat");
-                        v81();
-                        l_GuiService_0.SelectedCoreObject = v87;
-                        if not v84 then
-                            v84 = l_UserInputService_0.InputBegan:Connect(function(v88) --[[ Line: 148 ]]
-                                -- upvalues: v52 (ref), v83 (ref), l_FocusUtils_0 (ref), v57 (ref)
-                                if (not v52 or v88) and v83[v88.KeyCode] then
-                                    l_FocusUtils_0.FocusOnChrome(function() --[[ Line: 151 ]]
-                                        -- upvalues: v57 (ref)
-                                        v57.unfocusChatInputBar();
-                                    end, "chat");
-                                end;
-                            end);
-                            return;
-                        end;
-                    elseif l_GuiService_0.MenuIsOpen then
-                        l_GuiService_0:SetMenuIsOpen(false, "ExperienceChat");
-                        v82();
-                        if v84 then
-                            v84:Disconnect();
-                            v84 = nil;
-                        end;
-                    end;
-                    return;
-                end;
-            end);
-            return function() --[[ Line: 167 ]]
-                -- upvalues: v89 (copy), v84 (ref)
-                v89();
-                if v84 then
-                    v84:Disconnect();
-                    v84 = nil;
-                end;
-            end;
-        end, {});
-        return;
-    else
-        if l_FFlagChromeChatGamepadSupportFix_0 then
-            v7.useEffect(function() --[[ Line: 177 ]]
-                -- upvalues: v79 (copy), v78 (copy), l_FFlagEnableConsoleExpControls_0 (ref), l_GuiService_0 (ref), v81 (copy), v77 (ref), v82 (copy), l_ActionBindableEvent_0 (ref)
-                local v90 = nil;
-                local v91 = nil;
-                local function v94(v92) --[[ Line: 181 ]]
-                    -- upvalues: v79 (ref), v78 (ref), l_FFlagEnableConsoleExpControls_0 (ref), l_GuiService_0 (ref), v81 (ref), v91 (ref), v90 (ref), v77 (ref), v82 (ref)
-                    local v93 = if v79.current then v79.current else v78.current;
-                    if l_FFlagEnableConsoleExpControls_0 and v92.type == "ChatTopBarFocusSelect" and v93 then
-                        l_GuiService_0:SetMenuIsOpen(true, "ExperienceChat");
-                        v81();
-                        l_GuiService_0.SelectedCoreObject = v93;
-                        v91 = task.delay(0, function() --[[ Line: 193 ]]
-                            -- upvalues: v91 (ref), v90 (ref), v77 (ref), v92 (copy), v82 (ref)
-                            v91 = nil;
-                            if v90 then
-                                v90:Disconnect();
-                            end;
-                            v90 = v77(v92.onSelectionLost, v92.keybinds, v82);
-                        end);
-                    end;
-                end;
-                local v95 = l_ActionBindableEvent_0.Event:Connect(v94);
-                return function() --[[ Line: 207 ]]
-                    -- upvalues: v95 (copy), v91 (ref), v90 (ref)
-                    v95:disconnect();
-                    if v91 then
-                        task.cancel(v91);
-                        v91 = nil;
-                    end;
-                    if v90 then
-                        v90:Disconnect();
-                        v90 = nil;
-                    end;
-                end;
-            end, {
-                v78.current, 
-                v79.current
-            });
-        end;
-        return;
-    end;
-end;
-local function v284(v97) --[[ Line: 223 ]] --[[ Name: ChatInputBar ]]
-    -- upvalues: v7 (copy), v46 (copy), v8 (copy), v47 (copy), v6 (copy), v15 (copy), v57 (copy), l_FFlagExpChatUseMessagesStore_0 (copy), v11 (copy), l_TextChatService_0 (copy), v63 (ref), v31 (copy), v33 (copy), v51 (copy), v40 (copy), v62 (ref), v32 (copy), l_GetFFlagTextChatEnableUniverseChatTabs_0 (copy), v64 (ref), v34 (copy), v50 (copy), v35 (copy), v24 (copy), v53 (copy), v52 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v22 (copy), l_Players_0 (copy), l_FFlagEnableConsoleExpControls_0 (copy), l_FFlagChromeChatGamepadSupportFix_0 (copy), l_GuiService_0 (copy), v77 (copy), l_ActionBindableEvent_0 (copy), v96 (copy), v37 (copy), v36 (copy), l_List_0 (copy), v65 (ref), l_RBXTeamCommand_0 (copy), v66 (ref), l_RBXWhisperCommand_0 (copy), v48 (copy), l_autoCastCommand_0 (copy), v13 (copy), l_useCursor_0 (copy), v21 (copy), v39 (copy), v61 (copy), v30 (copy), v49 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy)
-    local v98 = v7.useRef("");
-    local v99 = nil;
-    local v100 = nil;
-    local v101 = nil;
-    local v102 = nil;
-    local v103, v104 = v7.useState("");
-    local v105, v106 = v7.useState(0);
-    v99 = v105;
-    v100 = v106;
-    v105, v106 = v7.useState(0);
-    v101 = v105;
-    v102 = v106;
-    v105, v106 = v7.useState(false);
-    local v107, _ = v7.useState(true);
-    local v109, v110 = v7.useBinding(0);
-    local v111 = v7.useRef(false);
-    local v112 = v7.useRef(nil);
-    local v113 = v7.useRef(nil);
-    local v114 = v7.useRef(nil);
-    local v115 = v7.useRef(nil);
-    local v116 = v7.useRef(nil);
-    local v117 = v7.useRef(nil);
-    local v118 = v7.useRef(false);
-    local v119 = if v46 then v8.useFocusGuiObject() else nil;
-    local v120 = if not v46 or v47 then nil else v6.useLastInputMode();
-    local v121 = if v47 then v15.useSignalState(v57.getChatInputBarFocused) else nil;
-    local v122 = nil;
-    local v123 = nil;
-    if l_FFlagExpChatUseMessagesStore_0 then
-        v123 = v11(false);
-        v122 = v15.useSignalState(v123.getCanLocalUserChat);
-    end;
-    local v124 = v7.useRef(false);
-    v7.useEffect(function() --[[ Line: 270 ]]
-        -- upvalues: v113 (copy), v97 (copy)
-        v113.current = v97.chatInputBarSettings.TextBox;
-    end, {
-        if v97.chatInputBarSettings.TextBox ~= nil then v97.chatInputBarSettings.TextBox else "nil"
-    });
-    v7.useEffect(function() --[[ Line: 275 ]]
-        -- upvalues: v97 (copy), l_TextChatService_0 (ref), v63 (ref), v31 (ref), v33 (ref), v51 (ref), v40 (ref), v62 (ref), v32 (ref), l_GetFFlagTextChatEnableUniverseChatTabs_0 (ref), v64 (ref), v34 (ref), v50 (ref), v35 (ref)
-        if not v97.autocompleteEnabled then
-            return;
-        else
-            local v125 = {};
-            local v128 = l_TextChatService_0.DescendantAdded:Connect(function(v126) --[[ Line: 280 ]]
-                -- upvalues: v63 (ref), v31 (ref), v33 (ref), v125 (copy)
-                if v126:IsA("TextChatCommand") and string.sub(v126.PrimaryAlias, 1, 1) == "/" then
-                    v63 = v31.new(v33);
-                    local v127 = v126:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() --[[ Line: 286 ]]
-                        -- upvalues: v63 (ref), v31 (ref), v33 (ref)
-                        v63 = v31.new(v33);
-                    end);
-                    table.insert(v125, v127);
-                end;
-            end);
-            local v130 = if v51 then l_TextChatService_0.DescendantRemoving:Connect(function(v129) --[[ Line: 294 ]]
-                -- upvalues: v63 (ref), v31 (ref), v33 (ref)
-                if v129:IsA("TextChatCommand") and string.sub(v129.PrimaryAlias, 1, 1) == "/" then
-                    v63 = v31.new(v33);
-                end;
-            end) else nil;
-            if v40() then
-                v63 = v31.new(v33);
-                v62 = v31.new(v32);
-                if l_GetFFlagTextChatEnableUniverseChatTabs_0() then
-                    v64 = v31.new(v34);
-                end;
-                if v50() then
-                    local v131 = v35();
-                    if v131 then
-                        for _, v133 in v131 do
-                            table.insert(v125, (v133:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() --[[ Line: 313 ]]
-                                -- upvalues: v63 (ref), v31 (ref), v33 (ref)
-                                v63 = v31.new(v33);
-                            end)));
-                        end;
-                    end;
-                end;
-            end;
-            return function() --[[ Line: 322 ]]
-                -- upvalues: v51 (ref), v130 (copy), v128 (copy), v125 (copy)
-                if v51 and v130 then
-                    v130:Disconnect();
-                end;
-                v128:Disconnect();
-                for _, v135 in ipairs(v125) do
-                    v135:Disconnect();
-                end;
-                table.clear(v125);
-            end;
-        end;
-    end, {});
-    local v138 = v7.useCallback(function() --[[ Line: 335 ]]
-        -- upvalues: v24 (ref), v103 (copy), l_FFlagExpChatUseMessagesStore_0 (ref), v111 (copy), v122 (ref), v97 (copy), v112 (copy), v113 (copy), l_GetFFlagTextChatEnableUniverseChatTabs_0 (ref), v104 (copy), v118 (copy)
-        v24:trace("onSendActivated with input text: '{}'", v103);
-        if l_FFlagExpChatUseMessagesStore_0 then
-            if not v111.current or not v122 then
-                v24:debug("onSendActivated could not send message. isMounted: {} canLocalUserChat: {}", tostring(v111.current), v122);
-                return;
-            end;
-        elseif not v111.current or not v97.canLocalUserChat then
-            v24:debug("onSendActivated could not send message. isMounted: {} canLocalUserChat: {}", tostring(v111.current), v97.canLocalUserChat);
-            return;
-        end;
-        if v112.current or v113.current then
-            local v136 = if v113.current then v113.current.Text else v112.current.Text;
-            local v137 = if l_GetFFlagTextChatEnableUniverseChatTabs_0() and v97.isGlobalChatTabActive and v97.onSendGlobalChat then v97.onSendGlobalChat else v97.onSendChat;
-            if v137 and string.find(v136, "%S") ~= nil then
-                v137(v136);
-            elseif l_FFlagExpChatUseMessagesStore_0 then
-                v24:debug("onSendActivated could not send message. text: '{}' canLocalUserChat: {}", v136, v122);
-            else
-                v24:debug("onSendActivated could not send message. text: '{}' canLocalUserChat: {}", v136, v97.canLocalUserChat);
-            end;
-            if v113.current then
-                v113.current.Text = "";
-                v113.current:ReleaseFocus();
-            end;
-            if v112.current then
-                v112.current.Text = "";
-                v112.current:ReleaseFocus();
-            end;
-            v104("");
-            if v97.targetTextChannel and v97.targetTextChannelDisplayName ~= "" then
-                v118.current = true;
-                return;
-            end;
-        else
-            v24:debug("onSendActivated could not send message because textBoxRef.current was nil");
-        end;
-    end, if l_GetFFlagTextChatEnableUniverseChatTabs_0() then {
-        v103, 
-        v113.current, 
-        v97.isGlobalChatTabActive, 
-        v97.onSendGlobalChat or false, 
-        v97.onSendChat or false, 
-        v122, 
-        v97.canLocalUserChat, 
-        v97.targetTextChannel, 
-        v97.targetTextChannelDisplayName
-    } else {
-        v103, 
-        v113.current
-    });
-    local v147 = v7.useCallback(function(v139) --[[ Line: 421 ]]
-        -- upvalues: v97 (copy), v113 (copy), v112 (copy), v99 (ref), v104 (copy), v111 (copy), v47 (ref), v121 (copy), v119 (copy), v120 (copy), v53 (ref), v24 (ref)
-        v97.autocompleteDropdownActivated(false);
-        v97.autocompleteDropdownResultsChanged({});
-        local v140 = if v113.current then v113.current else v112.current;
-        if v140 then
-            local l_Text_0 = v140.Text;
-            local v142 = string.sub(l_Text_0, 1, v99 - 1);
-            local v143 = string.sub(l_Text_0, v99, #l_Text_0);
-            local v144 = "";
-            if v97.autocompleteDropdownReducer.autocompleteType == "emojis" then
-                local l_Text_1 = v139.EmojiLabel.Text;
-                v144 = string.gsub(v142, ":[^:]*$", l_Text_1);
-            elseif v97.autocompleteDropdownReducer.autocompleteType == "commands" then
-                local l_Text_2 = v139.TextLabel.Text;
-                v144 = string.gsub(v142, "(/.*)", l_Text_2);
-            end;
-            if v143 ~= "" then
-                v144 = v144 .. v143;
-            end;
-            v140.Text = v144;
-            v104(v144);
-            if v111.current then
-                v140:CaptureFocus();
-                if v47 then
-                    if v121 then
-                        v119(v140);
-                    end;
-                elseif v120 == "Focus" then
-                    v119(v140);
-                end;
-                if v143 ~= "" and not v53 then
-                    v140.CursorPosition = #v144 - #v143 + 1;
-                end;
-            end;
-            v97.autocompleteDropdownDeactivated();
-            return;
-        else
-            v24:error("Could not find textBox");
-            return;
-        end;
-    end, if v46 then {
-        if v47 then v121 else nil, 
-        v119, 
-        v107, 
-        v99, 
-        if v47 then nil else v120, 
-        v97.autocompleteDropdownActivated, 
-        v97.autocompleteDropdownDeactivated, 
-        v97.autocompleteDropdownReducer and v97.autocompleteDropdownReducer.autocompleteType, 
-        v97.autocompleteDropdownResultsChanged
-    } else nil);
-    v7.useEffect(function() --[[ Line: 492 ]]
-        -- upvalues: v111 (copy), v113 (copy), v112 (copy), v24 (ref)
-        if v111.current then
-            local v148 = if v113.current then v113.current else v112.current;
-            if v148 then
-                v148:CaptureFocus();
-                return;
-            else
-                v24:error("Could not focus chat input bar because textBox not found");
-            end;
-        end;
-    end, {
-        v97.shouldFocusChatInputBar, 
-        v113.current
-    });
-    v7.useEffect(function() --[[ Line: 503 ]]
-        -- upvalues: v24 (ref), v111 (copy)
-        v24:trace("Mounted");
-        v111.current = true;
-        return function() --[[ Line: 507 ]]
-            -- upvalues: v24 (ref), v111 (ref)
-            v24:trace("Unmounting");
-            v111.current = false;
-        end;
-    end, {});
-    v7.useEffect(function() --[[ Line: 513 ]]
-        -- upvalues: v97 (copy), v113 (copy), v112 (copy), v100 (ref)
-        local v149 = nil;
-        if v97.autocompleteEnabled then
-            local v150 = if v113.current then v113.current else v112.current;
-            if v150 then
-                v149 = v150:GetPropertyChangedSignal("CursorPosition"):Connect(function() --[[ Line: 518 ]]
-                    -- upvalues: v150 (copy), v100 (ref)
-                    local l_CursorPosition_0 = v150.CursorPosition;
-                    if l_CursorPosition_0 and l_CursorPosition_0 ~= -1 then
-                        v100(l_CursorPosition_0);
-                    end;
-                end);
-            end;
-        end;
-        return function() --[[ Line: 527 ]]
-            -- upvalues: v149 (ref)
-            if v149 then
-                v149:Disconnect();
-            end;
-        end;
-    end, {
-        v113.current
-    });
-    v7.useEffect(function() --[[ Line: 535 ]]
-        -- upvalues: v97 (copy), v117 (copy), v52 (ref)
-        if v97.autocompleteEnabled then
-            v117.current = v97.userInputService.InputBegan:connect(function(v152, _) --[[ Line: 537 ]]
-                -- upvalues: v97 (ref), v52 (ref)
-                local v154 = v97.autocompleteDropdownReducer.activated and (Enum.KeyCode.Up or Enum.KeyCode.Down);
-                local v155 = not v52 or v152;
-                if v154 then
-                    if v155 and v152.KeyCode == Enum.KeyCode.Up and v97.autocompleteDropdownReducer.selectedIndex > 1 then
-                        v97.autocompleteDropdownSelectionChanged(v97.autocompleteDropdownReducer.selectedIndex - 1);
-                    end;
-                    if v155 and v152.KeyCode == Enum.KeyCode.Down and v97.autocompleteDropdownReducer.selectedIndex < #v97.autocompleteDropdownReducer.results then
-                        v97.autocompleteDropdownSelectionChanged(v97.autocompleteDropdownReducer.selectedIndex + 1);
-                    end;
-                end;
-            end);
-            return function() --[[ Line: 560 ]]
-                -- upvalues: v117 (ref)
-                local l_current_0 = v117.current;
-                if l_current_0 and l_current_0.Connected then
-                    l_current_0:Disconnect();
-                end;
-                v117.current = nil;
-            end;
-        else
-            return function() --[[ Line: 568 ]]
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local FocusNavigationUtils = require(ExpChatParent.FocusNavigationUtils)
+local React = require(ExpChatParent.React)
+local ReactFocusNavigation = require(ExpChatParent.ReactFocusNavigation)
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local FocusUtils = require(ExpChatParent.Chrome).FocusUtils
+local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
+local IXPServiceWrapper = require(ExpChat.IXPServiceWrapper)
+local GetChatTooltipStore = require(ExpChat.Stores.GetChatTooltipStore)
+local UIBlox = require(ExpChatParent.UIBlox)
+local Promise = require(ExpChatParent.Promise)
+local Signals = require(ExpChatParent.Signals)
+local SignalsReact = require(ExpChatParent.SignalsReact)
+local List = require(ExpChatParent.llama).List
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local useCursor = UIBlox.App.SelectionCursor.useCursor
+local useInterpolatedClientSettings = require(ExpChat.ClientSettings.useInterpolatedClientSettings)
+local Config = require(ExpChat.Config)
+local GetFocusNavigationStore = require(ExpChat.Stores.GetFocusNavigationStore)
+local GetPresetChatStore = require(ExpChat.Stores.GetPresetChatStore)
+local v27 = ExpChatShared.Logger:new("ExpChat/" .. script.Name)
+local autoCastCommand = ExpChatShared.Commands.autoCastCommand
+local RBXWhisperCommand = ExpChatShared.Commands.Whisper.RBXWhisperCommand
+local RBXTeamCommand = ExpChatShared.Commands.RBXTeamCommand
+local Localization = require(ExpChat.Localization)
+local getOtherDisplayNameInWhisperChannel = require(ExpChat.getOtherDisplayNameInWhisperChannel)
+local ChannelChip = require(script.Parent.ChannelChip)
+local AutocompleteText = require(ExpChat.Autocomplete.AutocompleteText)
+local initializeEmojis = require(ExpChat.Autocomplete.Initializations.initializeEmojis)
+local initializeCommands = require(ExpChat.Autocomplete.Initializations.initializeCommands)
+local initializeGlobalCommands = require(ExpChat.Autocomplete.Initializations.initializeGlobalCommands)
+local initialCommands = require(ExpChat.Autocomplete.Initializations.initialCommands)
+local sortEmojiResultsCallback = require(ExpChat.Autocomplete.SortingCallbacks.sortEmojiResultsCallback)
+local sortCommandResultsCallback = require(ExpChat.Autocomplete.SortingCallbacks.sortCommandResultsCallback)
+local ChatInput = script:FindFirstAncestor("ChatInput")
+local AutocompleteDropdown = require(ChatInput.UI.AutocompleteDropdown)
+local ChatInputBarV2 = require(script.Parent.ChatInputBarV2)
+local ChatInputBarV2Dictation = require(script.Parent.ChatInputBarV2Dictation)
+local FFlagExpChatPresetChatEnabled = ExpChatShared.Flags.FFlagExpChatPresetChatEnabled
+local FFlagExpChatUseUnifiedTooltipStore = ExpChatShared.Flags.FFlagExpChatUseUnifiedTooltipStore
+local FFlagExpChatNewInputBar = require(ExpChat.Flags.FFlagExpChatNewInputBar)
+local FFlagExpChatNewInputBarDictation = require(ExpChat.Flags.FFlagExpChatNewInputBarDictation)
+local FFlagExpChatPresetChatGamepadEnabled = require(ExpChat.Flags.FFlagExpChatPresetChatGamepadEnabled)
+local v50 = game:DefineFastFlag("ExpChatPresetChatIXPExposure", false)
+local v51 = game:DefineFastString("ExpChatPresetChatIXPLayerName", "UniverseChat.PresetChat")
+local v52 = game:DefineFastFlag("ExpChatDictationIXPExposure", false)
+local v53 = game:DefineFastString("ExpChatDictationIXPLayerName", "UniverseChat.Dictation")
+local getEnableChatInputBarConfigurationAutocompleteEnabled = require(ExpChat.Flags.getEnableChatInputBarConfigurationAutocompleteEnabled)
+local SharedFlags = require(ExpChatParent.SharedFlags)
+local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagChromeChatGamepadSupportFix = SharedFlags.FFlagChromeChatGamepadSupportFix
+local FFlagConsoleChatUseChromeFocusUtils = SharedFlags.FFlagConsoleChatUseChromeFocusUtils
+local FFlagExpChatEnableFocusNavigation = require(ExpChat.Flags.FFlagExpChatEnableFocusNavigation)
+local FFlagExpChatFocusViaLastModeFix = require(ExpChat.Flags.FFlagExpChatFocusViaLastModeFix)
+local v62 = game:DefineFastFlag("ChatOptimizeCommandProcessing", false)
+local v63 = game:DefineFastFlag("ExpChatFocusablePlaceholderText", false)
+local v64 = game:DefineFastFlag("ExpChatDoNotSetCursorPosition", false)
+local FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs = require(ExpChat.Flags.FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs)
+local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+local FFlagExpChatDictation = SharedFlags.FFlagExpChatDictation
+local FFlagExpChatContinuousDictation = SharedFlags.FFlagExpChatContinuousDictation
+local v69 = FFlagExpChatDictation or FFlagExpChatContinuousDictation
+local DictationInputBar = require(script.Parent.Dictation.DictationInputBar)
+local useSendTelemetry = require(script.Parent.Dictation.useSendTelemetry)
+local ActionBindableEvent = ExpChatShared.ActionBindableEvent
+local v73 = GetFocusNavigationStore(false)
 
-            end;
-        end;
-    end, {
-        v97.userInputService, 
-        v97.autocompleteDropdownReducer
-    });
-    v7.useEffect(function() --[[ Line: 573 ]]
-        -- upvalues: v116 (copy), v97 (copy), v52 (ref), v113 (copy), v112 (copy), v118 (copy), v24 (ref), v103 (copy)
-        v116.current = v97.userInputService.InputEnded:connect(function(v157, _) --[[ Line: 574 ]]
-            -- upvalues: v52 (ref), v113 (ref), v112 (ref), v118 (ref), v97 (ref), v24 (ref), v103 (ref)
-            local v159 = not v52 or v157;
-            if if v113.current then v113.current and v113.current:IsFocused() and v159 and v157.KeyCode == Enum.KeyCode.Backspace else v112.current and v112.current:IsFocused() and v159 and v157.KeyCode == Enum.KeyCode.Backspace then
-                if v118.current and not v97.isChannelBarVisible then
-                    v97.resetTargetChannel();
-                    v24:debug("ChatInputBar ChatInputBarResetTargetChannel()");
-                    v118.current = false;
-                    return;
-                elseif v103 == "" and v97.targetTextChannelDisplayName ~= "" then
-                    v118.current = true;
-                end;
-            end;
-        end);
-        return function() --[[ Line: 602 ]]
-            -- upvalues: v116 (ref)
-            local l_current_1 = v116.current;
-            if l_current_1 and l_current_1.Connected then
-                l_current_1:Disconnect();
-            end;
-            v116.current = nil;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v97.userInputService, 
-        v113.current, 
-        v97.isChannelBarVisible, 
-        v97.targetTextChannelDisplayName, 
-        v97.resetTargetChannel
-    } else l_dependencyArray_0(v97.userInputService, v113.current, v97.isChannelBarVisible, v97.targetTextChannelDisplayName, v97.resetTargetChannel));
-    v7.useEffect(function() --[[ Line: 628 ]]
-        -- upvalues: v97 (copy), v52 (ref), v22 (ref), v113 (copy), v112 (copy), v124 (copy)
-        local function v165(_, v162, v163) --[[ Line: 629 ]] --[[ Name: handleAction ]]
-            -- upvalues: v97 (ref), v52 (ref), v22 (ref), v113 (ref), v112 (ref), v124 (ref)
-            if v97.isChatHotkeyEnabled and (not v52 or v163) and (v163.KeyCode == v22.ChatInputBarDefaultFocusKeyCode or v163.KeyCode == v97.devDefinedFocusKeyCode) then
-                local v164 = if v113.current then v113.current else v112.current;
-                if v164 and v162 == Enum.UserInputState.Begin and v164 and not v164:IsFocused() then
-                    task.delay(0, function() --[[ Line: 651 ]]
-                        -- upvalues: v164 (copy)
-                        v164:CaptureFocus();
-                    end);
-                    v97.focusChatHotKeyActivated();
-                    v124.current = true;
-                    return Enum.ContextActionResult.Sink;
-                end;
-            end;
-            return Enum.ContextActionResult.Pass;
-        end;
-        v97.contextActionService:BindCoreAction("FocusChat", v165, false, Enum.UserInputType.Keyboard);
-        return function() --[[ Line: 675 ]]
-            -- upvalues: v97 (ref)
-            v97.contextActionService:UnbindCoreAction("FocusChat");
-        end;
-    end, {
-        v97.isChatHotkeyEnabled, 
-        v97.devDefinedFocusKeyCode, 
-        v124.current, 
-        v113.current
-    });
-    local function _(v166) --[[ Line: 682 ]]
-        -- upvalues: l_TextChatService_0 (ref)
-        local l_ChatInputBarConfiguration_0 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-        if l_ChatInputBarConfiguration_0 then
-            l_ChatInputBarConfiguration_0.IsFocusedWrite = v166;
-        end;
-    end;
-    local v170 = v7.useCallback(function() --[[ Line: 689 ]]
-        -- upvalues: v106 (copy), v97 (copy), l_TextChatService_0 (ref)
-        v106(true);
-        v97.onFocus();
-        local l_ChatInputBarConfiguration_1 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-        if l_ChatInputBarConfiguration_1 then
-            l_ChatInputBarConfiguration_1.IsFocusedWrite = true;
-        end;
-    end, {
-        v97.onFocus
-    });
-    local v188 = v7.useCallback(function(_, v172, v173) --[[ Line: 695 ]]
-        -- upvalues: v24 (ref), v115 (copy), v46 (ref), v97 (copy), v147 (copy), v138 (copy), v111 (copy), v52 (ref), v113 (copy), v112 (copy), v99 (ref), v53 (ref), v106 (copy), l_TextChatService_0 (ref), v124 (copy), l_Players_0 (ref)
-        v24:debug("Focus lost with enter: {}", (tostring(v172)));
-        local l_current_2 = v115.current;
-        if v172 or v46 and v173 and (v173.KeyCode == Enum.KeyCode.Return or v173.KeyCode == Enum.KeyCode.KeypadEnter) then
-            if v97.autocompleteEnabled and l_current_2 and v97.autocompleteDropdownReducer.activated and #v97.autocompleteDropdownReducer.results > 0 then
-                local l_OffsetFrame_0 = l_current_2.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame;
-                for _, v177 in ipairs(l_OffsetFrame_0:GetChildren()) do
-                    if v177.ClassName == "Frame" and v177.LayoutOrder == v97.autocompleteDropdownReducer.selectedIndex then
-                        v147(v177.TextLabelButton);
-                        return;
-                    end;
-                end;
-            else
-                v138();
-            end;
-        end;
-        if v111.current then
-            if v97.autocompleteEnabled and l_current_2 and v97.autocompleteDropdownReducer.activated then
-                if not v52 or v173 then
-                    if v173.KeyCode == Enum.KeyCode.Escape then
-                        v97.autocompleteDropdownActivated(false);
-                        local v178 = if v113.current then v113.current else v112.current;
-                        if v178 then
-                            local l_v99_0 = v99;
-                            v178:CaptureFocus();
-                            if not v53 then
-                                v178.CursorPosition = l_v99_0;
-                            end;
-                            return;
-                        else
-                            v24:error("Could not focus chat input bar because textBox not found");
-                        end;
-                    else
-                        local l_X_0 = v173.Position.X;
-                        local l_Y_0 = v173.Position.Y;
-                        local l_X_1 = l_current_2.AbsolutePosition.X;
-                        local v183 = l_X_1 + l_current_2.AbsoluteSize.X;
-                        local l_Y_1 = l_current_2.AbsolutePosition.Y;
-                        local v185 = l_Y_1 + l_current_2.AbsoluteSize.Y;
-                        if l_X_0 < l_X_1 or v183 < l_X_0 or l_Y_0 < l_Y_1 or v185 < l_Y_0 then
-                            v97.autocompleteDropdownActivated(false);
-                        end;
-                    end;
-                end;
-            else
-                v106(false);
-            end;
-        end;
-        v97.onUnfocus();
-        local l_ChatInputBarConfiguration_2 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-        if l_ChatInputBarConfiguration_2 then
-            l_ChatInputBarConfiguration_2.IsFocusedWrite = false;
-        end;
-        if v124.current then
-            l_ChatInputBarConfiguration_2 = l_Players_0.LocalPlayer;
-            if l_ChatInputBarConfiguration_2 then
-                local l_TextBox_0 = Instance.new("TextBox");
-                l_TextBox_0.Visible = false;
-                l_TextBox_0.Parent = l_ChatInputBarConfiguration_2:FindFirstChildOfClass("PlayerGui");
-                l_TextBox_0:CaptureFocus();
-                l_TextBox_0:ReleaseFocus();
-                l_TextBox_0:Destroy();
-            end;
-            v124.current = false;
-        end;
-    end);
-    v7.useEffect(function() --[[ Line: 800 ]]
-        -- upvalues: l_FFlagEnableConsoleExpControls_0 (ref), v113 (copy), v112 (copy), l_FFlagChromeChatGamepadSupportFix_0 (ref), l_GuiService_0 (ref), v170 (copy), v77 (ref), v188 (copy), l_ActionBindableEvent_0 (ref)
-        local v189 = nil;
-        local v190 = nil;
-        local function v193(v191) --[[ Line: 804 ]]
-            -- upvalues: l_FFlagEnableConsoleExpControls_0 (ref), v113 (ref), v112 (ref), l_FFlagChromeChatGamepadSupportFix_0 (ref), l_GuiService_0 (ref), v170 (ref), v190 (ref), v189 (ref), v77 (ref), v188 (ref)
-            local v192 = nil;
-            if l_FFlagEnableConsoleExpControls_0 then
-                v192 = if v113.current then v113.current else v112.current;
-            end;
-            if v191.type == "ChatTopBarFocusActivated" then
-                if not l_FFlagEnableConsoleExpControls_0 then
-                    v192 = if v113.current then v113.current else v112.current;
-                end;
-                if v192 then
-                    task.delay(0, function() --[[ Line: 815 ]]
-                        -- upvalues: v192 (ref)
-                        v192:CaptureFocus();
-                    end);
-                end;
-            elseif not l_FFlagChromeChatGamepadSupportFix_0 and l_FFlagEnableConsoleExpControls_0 and v191.type == "ChatTopBarFocusSelect" and v192 then
-                l_GuiService_0:SetMenuIsOpen(true, "ExperienceChat");
-                v170();
-                l_GuiService_0.SelectedCoreObject = v192;
-                v190 = task.delay(0, function() --[[ Line: 830 ]]
-                    -- upvalues: v190 (ref), v189 (ref), v77 (ref), v191 (copy), v188 (ref)
-                    v190 = nil;
-                    if v189 then
-                        v189:Disconnect();
-                    end;
-                    v189 = v77(v191.onSelectionLost, v191.keybinds, v188);
-                end);
-            end;
-        end;
-        local v194 = l_ActionBindableEvent_0.Event:Connect(v193);
-        return function() --[[ Line: 844 ]]
-            -- upvalues: v194 (copy), v190 (ref), v189 (ref)
-            v194:disconnect();
-            if v190 then
-                task.cancel(v190);
-                v190 = nil;
-            end;
-            if v189 then
-                v189:Disconnect();
-                v189 = nil;
-            end;
-        end;
-    end, {
-        v112.current, 
-        v113.current
-    });
-    v96(v112, v113, v114, v170, v188);
-    local function v214(v195, v196, v197) --[[ Line: 862 ]] --[[ Name: handleAutocomplete ]]
-        -- upvalues: v97 (copy), v64 (ref), v63 (ref), v37 (ref), v62 (ref), v36 (ref), v101 (ref), l_List_0 (ref), v104 (copy), v53 (ref), v115 (copy), v147 (copy), v102 (ref)
-        if v197 == "/" and v195.CursorPosition == 2 or v97.autocompleteDropdownReducer.autocompleteType == "commands" and v197 ~= ":" then
-            v97.autocompleteDropdownTypeChanged("commands");
-            v97.autocompleteDropdownActivated(true);
-            if v197 ~= "" and v197 ~= " " then
-                local v198 = string.sub(v196, 1, v195.CursorPosition - 1):lower();
-                local v199 = (if v97.isGlobalChatTabActive and v64 then v64 else v63):getResults(v198, v37);
-                v97.autocompleteDropdownResultsChanged(v199);
-                if v198 == v199[1] then
-                    v97.autocompleteDropdownActivated(false);
-                    v97.autocompleteDropdownResultsChanged({});
-                    return;
-                end;
-            else
-                v97.autocompleteDropdownDeactivated();
-            end;
-            return;
-        elseif (v97.autocompleteDropdownReducer.activated or #v97.autocompleteDropdownReducer.results > 0) and v97.autocompleteDropdownReducer.autocompleteType == "emojis" then
-            v97.autocompleteDropdownActivated(true);
-            local v200 = string.sub(v196, 1, v195.CursorPosition - 1);
-            local v201 = string.find(v200, ":[^:]*$");
-            if v197 ~= "" and v197 ~= ":" and v197 ~= " " and v201 then
-                local v202 = string.sub(v196, v201 + 1, v195.CursorPosition - 1):lower();
-                local v203 = {};
-                if v202 and string.len(v202) > 1 then
-                    v203 = v62:getResults(v202, v36);
-                end;
-                v97.autocompleteDropdownResultsChanged(v203);
-                return;
-            elseif v197 == ":" then
-                if v201 ~= v101 then
-                    local v204 = string.sub(v196, v101 + 1, v195.CursorPosition - 2):lower();
-                    if l_List_0.includes(v97.autocompleteDropdownReducer.results, v204) then
-                        local v205 = string.sub(v196, v195.CursorPosition, #v196);
-                        local v206 = string.sub(v196, 1, v195.CursorPosition - 2) .. v205;
-                        v195.Text = v206;
-                        v104(v206);
-                        if not v53 then
-                            v195.CursorPosition = v195.CursorPosition - 1;
-                        end;
-                        local l_current_3 = v115.current;
-                        if l_current_3 then
-                            local l_OffsetFrame_1 = l_current_3.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame;
-                            for _, v210 in ipairs(l_OffsetFrame_1:GetChildren()) do
-                                if v210.ClassName == "Frame" then
-                                    local l_TextLabelButton_0 = v210:FindFirstChild("TextLabelButton");
-                                    if l_TextLabelButton_0 then
-                                        local l_TextLabel_0 = l_TextLabelButton_0:FindFirstChild("TextLabel");
-                                        if l_TextLabel_0 and l_TextLabel_0.Text and l_TextLabel_0.Text == v204 then
-                                            v147(l_TextLabelButton_0);
-                                            return;
-                                        end;
-                                    end;
-                                end;
-                            end;
-                            return;
-                        end;
-                    else
-                        v97.autocompleteDropdownActivated(false);
-                        v97.autocompleteDropdownResultsChanged({});
-                    end;
-                    return;
-                else
-                    v97.autocompleteDropdownResultsChanged({});
-                    return;
-                end;
-            elseif v197 == " " then
-                v97.autocompleteDropdownActivated(false);
-                v97.autocompleteDropdownResultsChanged({});
-                return;
-            else
-                v97.autocompleteDropdownDeactivated();
-                v102(0);
-                return;
-            end;
-        else
-            local v213 = string.find(v196, ":[^:]*$");
-            if v197 == ":" then
-                v97.autocompleteDropdownTypeChanged("emojis");
-                v97.autocompleteDropdownActivated(true);
-                v97.autocompleteDropdownResultsChanged({});
-                v102(v213);
-            end;
-            return;
-        end;
-    end;
-    if v51 then
-        v7.useEffect(function() --[[ Line: 981 ]]
-            -- upvalues: l_TextChatService_0 (ref), v65 (ref), l_RBXTeamCommand_0 (ref), v66 (ref), l_RBXWhisperCommand_0 (ref)
-            if l_TextChatService_0.CreateDefaultCommands then
-                v65 = l_TextChatService_0:FindFirstChild(l_RBXTeamCommand_0.name, true);
-                v66 = l_TextChatService_0:FindFirstChild(l_RBXWhisperCommand_0.name, true);
-            end;
-        end, {});
-    end;
-    local v226 = v7.useCallback(function(v215) --[[ Line: 989 ]]
-        -- upvalues: v97 (copy), v104 (copy), v24 (ref), v103 (copy), v40 (ref), v214 (copy), v118 (copy), v48 (ref), v98 (copy), v51 (ref), l_autoCastCommand_0 (ref), l_RBXTeamCommand_0 (ref), l_RBXWhisperCommand_0 (ref), v65 (ref), v66 (ref), v13 (ref)
-        local l_Text_3 = v215.Text;
-        if v97.autocompleteEnabled then
-            local v217 = string.find(l_Text_3, "\r");
-            local v218 = v215.CursorPosition < #l_Text_3 + 1;
-            if v217 then
-                local v219 = string.gsub(l_Text_3, "\r", "");
-                v215.Text = v219;
-                v104(v219);
-                if v218 then
-                    v215.CursorPosition = v215.CursorPosition - 1;
-                end;
-                return;
-            end;
-        end;
-        local v220 = string.sub(l_Text_3, v215.CursorPosition - 1, v215.CursorPosition - 1);
-        v24:trace("Input: {}", l_Text_3);
-        local v221 = if utf8.len(l_Text_3) then utf8.len(utf8.nfcnormalize(l_Text_3)) else string.len(l_Text_3);
-        if v221 and v97.messageCharacterLimit < v221 then
-            v24:debug("Message is over the character limit of {}", (tostring(v97.messageCharacterLimit)));
-            v215.Text = v103;
-            return;
-        else
-            v104(l_Text_3);
-            if v40() and v97.autocompleteEnabled then
-                v214(v215, l_Text_3, v220);
-            end;
-            local l_v118_0 = v118;
-            local v223 = false;
-            if #l_Text_3 == 0 then
-                v223 = v118.current;
-            end;
-            l_v118_0.current = v223;
-            if v48 then
-                if string.sub(l_Text_3, 1, 1) == "/" and v97.localPlayer and l_Text_3 ~= v98.current then
-                    v98.current = l_Text_3;
-                    l_v118_0 = v97.localPlayer.UserId;
-                    v223 = if v51 then {} else {
-                        l_autoCastCommand_0(l_RBXTeamCommand_0, l_v118_0, l_Text_3), 
-                        l_autoCastCommand_0(l_RBXWhisperCommand_0, l_v118_0, l_Text_3)
-                    };
-                    if v51 then
-                        if v65 and v65.Enabled then
-                            table.insert(v223, l_autoCastCommand_0(l_RBXTeamCommand_0, l_v118_0, l_Text_3));
-                        end;
-                        if v66 and v66.Enabled then
-                            table.insert(v223, l_autoCastCommand_0(l_RBXWhisperCommand_0, l_v118_0, l_Text_3));
-                        end;
-                        if #v223 == 0 then
-                            v223 = {
-                                v13.reject()
-                            };
-                        end;
-                    end;
-                    v13.any(v223):andThen(function() --[[ Line: 1053 ]]
-                        -- upvalues: v215 (copy), v104 (ref), v118 (ref)
-                        v215.Text = "";
-                        v104("");
-                        v118.current = true;
-                    end):catch(function(v224) --[[ Line: 1059 ]]
-                        -- upvalues: v24 (ref)
-                        v24:trace("Could not send autoCastCommand. Error: {}", v224);
-                    end);
-                    return;
-                elseif string.sub(l_Text_3, 1, 1) ~= "/" then
-                    v98.current = "";
-                    return;
-                end;
-            elseif v97.localPlayer then
-                l_v118_0 = v97.localPlayer.UserId;
-                v223 = if v51 then {} else {
-                    l_autoCastCommand_0(l_RBXTeamCommand_0, l_v118_0, l_Text_3), 
-                    l_autoCastCommand_0(l_RBXWhisperCommand_0, l_v118_0, l_Text_3)
-                };
-                if v51 then
-                    if v65 and v65.Enabled then
-                        table.insert(v223, l_autoCastCommand_0(l_RBXTeamCommand_0, l_v118_0, l_Text_3));
-                    end;
-                    if v66 and v66.Enabled then
-                        table.insert(v223, l_autoCastCommand_0(l_RBXWhisperCommand_0, l_v118_0, l_Text_3));
-                    end;
-                    if #v223 == 0 then
-                        v223 = {
-                            v13.reject()
-                        };
-                    end;
-                end;
-                v13.any(v223):andThen(function() --[[ Line: 1090 ]]
-                    -- upvalues: v215 (copy), v104 (ref), v118 (ref)
-                    v215.Text = "";
-                    v104("");
-                    v118.current = true;
-                end):catch(function(v225) --[[ Line: 1096 ]]
-                    -- upvalues: v24 (ref)
-                    v24:trace("Could not send autoCastCommand. Error: {}", v225);
-                end);
-            end;
-            return;
-        end;
-    end);
-    local v228 = v7.useCallback(function() --[[ Line: 1103 ]]
-        -- upvalues: v113 (copy), v112 (copy)
-        local v227 = if v113.current then v113.current else v112.current;
-        if v227 then
-            v227:ReleaseFocus(true);
-        end;
-    end, {
-        v112.current, 
-        v113.current
-    });
-    local v230 = v7.useCallback(function(v229) --[[ Line: 1110 ]]
-        -- upvalues: v110 (copy)
-        v110(v229.Visible and v229.AbsoluteSize.X or 0);
-    end);
-    local v231 = if v46 then l_useCursor_0() else nil;
-    local v233 = v7.useCallback(function(v232) --[[ Line: 1117 ]]
-        -- upvalues: v97 (copy)
-        v97.autocompleteDropdownSelectionChanged(v232.LayoutOrder);
-    end);
-    local v234 = v103 == "";
-    local v235 = v234 and not v105;
-    local l_chatInputBarSettings_0 = v97.chatInputBarSettings;
-    local l_chatWindowSettings_0 = v97.chatWindowSettings;
-    local l_BackgroundTransparency_0 = v21(l_chatInputBarSettings_0).BackgroundTransparency;
-    local l_BackgroundTransparency_1 = v21(l_chatWindowSettings_0).BackgroundTransparency;
-    local l_BackgroundColor3_0 = v21(l_chatWindowSettings_0).BackgroundColor3;
-    local l_isSpatialUIEnabled_0 = v97.isSpatialUIEnabled;
-    local l_createElement_0 = v7.createElement;
-    local v243 = "Frame";
-    local v249 = {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundColor3 = l_BackgroundColor3_0, 
-        BackgroundTransparency = v97.transparencyValue:map(function(v244) --[[ Line: 79 ]]
-            -- upvalues: l_BackgroundTransparency_1 (copy)
-            return l_BackgroundTransparency_1 + v244 * (1 - l_BackgroundTransparency_1);
-        end), 
-        BorderSizePixel = 0, 
-        LayoutOrder = v97.LayoutOrder, 
-        Size = v97.size, 
-        Visible = v97.visible, 
-        ZIndex = 2, 
-        [v7.Event.MouseEnter] = v97.onHovered, 
-        [v7.Event.MouseLeave] = v97.onUnhovered, 
-        [v7.Change.AbsoluteSize] = v7.useCallback(function(v245) --[[ Line: 1143 ]]
-            -- upvalues: l_TextChatService_0 (ref), v97 (copy)
-            local l_ChatInputBarConfiguration_3 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-            if l_ChatInputBarConfiguration_3 and v97.onAbsoluteSizeChanged then
-                v97.onAbsoluteSizeChanged(v245, l_ChatInputBarConfiguration_3);
-            end;
-        end), 
-        [v7.Change.AbsolutePosition] = v7.useCallback(function(v247) --[[ Line: 1149 ]]
-            -- upvalues: l_TextChatService_0 (ref), v97 (copy)
-            local l_ChatInputBarConfiguration_4 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-            if l_ChatInputBarConfiguration_4 and v97.onAbsolutePositionChanged then
-                v97.onAbsolutePositionChanged(v247, l_ChatInputBarConfiguration_4);
-            end;
-        end)
-    };
-    local v250 = {
-        AutocompleteDropdown = v40() and v97.autocompleteEnabled and v7.createElement(v39, {
-            chatInputBarSettings = l_chatInputBarSettings_0, 
-            chatWindowSettings = l_chatWindowSettings_0, 
-            setTransparency = v61, 
-            transparencyValue = v97.transparencyValue, 
-            activated = v97.autocompleteDropdownReducer.activated and v105, 
-            results = v97.autocompleteDropdownReducer.results, 
-            selectedIndex = v97.autocompleteDropdownReducer.selectedIndex, 
-            autocompleteType = v97.autocompleteDropdownReducer.autocompleteType, 
-            onAutocompleteDropdownHover = v233, 
-            onAutocompleteSelected = v147, 
-            autocompleteDropdownRef = v115, 
-            textBoxRef = if l_chatInputBarSettings_0.TextBox then v113 else v112
-        }) or nil, 
-        UISizeConstraint = v7.createElement("UISizeConstraint", {
-            MaxSize = Vector2.new(v22.ChatWindowMaxWidth, 1e999)
-        }), 
-        UIPadding = v7.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, 8), 
-            PaddingRight = UDim.new(0, 8), 
-            PaddingTop = v97.addTopPadding and UDim.new(0, 8) or UDim.new(0, 0), 
-            PaddingBottom = UDim.new(0, 1)
-        })
-    };
-    local l_createElement_1 = v7.createElement;
-    local v252 = "Frame";
-    local v254 = {
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        BackgroundColor3 = l_chatInputBarSettings_0.BackgroundColor3, 
-        BackgroundTransparency = v97.transparencyValue:map(function(v253) --[[ Line: 79 ]]
-            -- upvalues: l_BackgroundTransparency_0 (copy)
-            return l_BackgroundTransparency_0 + v253 * (1 - l_BackgroundTransparency_0);
-        end), 
-        Size = UDim2.new(1, 0, 0, 0)
-    };
-    local v255 = {};
-    local l_createElement_2 = v7.createElement;
-    local v257 = "UIStroke";
-    local v258 = {
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border, 
-        Color = v22.ChatInputBarBorderColor3
-    };
-    local l_ChatInputBarBorderTransparency_0 = v22.ChatInputBarBorderTransparency;
-    local l_l_ChatInputBarBorderTransparency_0_0 = l_ChatInputBarBorderTransparency_0 --[[ copy: 59 -> 72 ]];
-    v258.Transparency = v97.transparencyValue:map(function(v261) --[[ Line: 79 ]]
-        -- upvalues: l_l_ChatInputBarBorderTransparency_0_0 (copy)
-        return l_l_ChatInputBarBorderTransparency_0_0 + v261 * (1 - l_l_ChatInputBarBorderTransparency_0_0);
-    end);
-    v255.Border = l_createElement_2(v257, v258);
-    v255.Corner = v7.createElement("UICorner", {
-        CornerRadius = UDim.new(0, 3)
-    });
-    l_createElement_2 = v7.createElement;
-    v257 = "Frame";
-    v258 = {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Size = UDim2.fromScale(1, 0), 
-        BackgroundTransparency = 1
-    };
-    local v262 = {};
-    l_ChatInputBarBorderTransparency_0 = v7.createElement;
-    local v263 = "Frame";
-    local v264 = {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        SelectionBehaviorDown = if not l_FFlagEnableConsoleExpControls_0 or v46 then nil else Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorLeft = if not l_FFlagEnableConsoleExpControls_0 or v46 then nil else Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorRight = if not l_FFlagEnableConsoleExpControls_0 or v46 then nil else Enum.SelectionBehavior.Stop, 
-        SelectionBehaviorUp = if not l_FFlagEnableConsoleExpControls_0 or v46 then nil else Enum.SelectionBehavior.Stop, 
-        SelectionGroup = l_FFlagEnableConsoleExpControls_0 and not v46 or nil, 
-        Size = UDim2.new(1, -v97.sendButtonContainerWidth, 0, 0)
-    };
-    local v265 = {};
-    local l_createElement_3 = v7.createElement;
-    local l_v30_0 = v30;
-    local v268 = {};
-    local l_transparencyValue_0 = v97.transparencyValue;
-    local v270 = 0;
-    local l_v270_0 = v270 --[[ copy: 71 -> 73 ]];
-    v268.transparency = l_transparencyValue_0:map(function(v272) --[[ Line: 79 ]]
-        -- upvalues: l_v270_0 (copy)
-        return l_v270_0 + v272 * (1 - l_v270_0);
-    end);
-    v268.onAbsoluteSizeChanged = v230;
-    v268.onChannelChipActivated = v97.resetTargetChannel;
-    v268.targetTextChannelDisplayName = v97.targetTextChannelDisplayName or "";
-    v268.isChannelBarVisible = v97.isChannelBarVisible;
-    v268.developerChannelTabsEnabled = v97.developerChannelTabsEnabled;
-    v265.TargetChannelChip = l_createElement_3(l_v30_0, v268);
-    l_createElement_3 = if l_FFlagExpChatUseMessagesStore_0 then not v122 else not v97.canLocalUserChat;
-    if l_createElement_3 then
-        l_createElement_3 = v7.createElement;
-        l_v30_0 = "TextLabel";
-        v268 = {
-            AnchorPoint = Vector2.new(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            Font = v22.ChatInputBarFont, 
-            Text = v97.disabledChatPlaceholderText, 
-            Position = UDim2.fromScale(1, 0), 
-            Size = v109:map(function(v273) --[[ Line: 1242 ]]
-                return UDim2.new(1, -(v273 + 8), 0, 0);
-            end), 
-            TextColor3 = v235 and l_chatInputBarSettings_0.PlaceholderColor3 or l_chatInputBarSettings_0.TextColor3, 
-            TextSize = if l_isSpatialUIEnabled_0 then l_chatInputBarSettings_0.SpatialPanelTextSize else l_chatInputBarSettings_0.TextSize
-        };
-        l_transparencyValue_0 = v235 and 0.5 or 0;
-        local l_l_transparencyValue_0_0 = l_transparencyValue_0 --[[ copy: 67 -> 75 ]];
-        v268.TextTransparency = v97.transparencyValue:map(function(v275) --[[ Line: 79 ]]
-            -- upvalues: l_l_transparencyValue_0_0 (copy)
-            return l_l_transparencyValue_0_0 + v275 * (1 - l_l_transparencyValue_0_0);
-        end);
-        v268.Selectable = v49 and true or nil;
-        v268.SelectionImageObject = if v49 then v231 else nil;
-        v268.TextWrapped = true;
-        v268.TextXAlignment = Enum.TextXAlignment.Left;
-        v268.TextYAlignment = Enum.TextYAlignment.Top;
-        v268.ref = if v49 then v114 else nil;
-        l_createElement_3 = l_createElement_3(l_v30_0, v268);
-    end;
-    v265.DisabledPlaceholderLabel = l_createElement_3;
-    l_createElement_3 = if l_FFlagExpChatUseMessagesStore_0 then v122 else v97.canLocalUserChat;
-    if l_createElement_3 then
-        l_createElement_3 = v7.createElement;
-        l_v30_0 = "Frame";
-        v268 = {
-            AnchorPoint = Vector2.new(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            Position = UDim2.fromScale(1, 0), 
-            Size = v109:map(function(v276) --[[ Line: 1270 ]]
-                return UDim2.new(1, -(v276 + 8), 0, 0);
-            end)
-        };
-        local v277 = {};
-        l_transparencyValue_0 = if l_FFlagExpChatUseMessagesStore_0 then v122 else v97.canLocalUserChat;
-        if l_transparencyValue_0 then
-            l_transparencyValue_0 = v7.createElement;
-            local v278 = "TextBox";
-            local v279 = {
-                AnchorPoint = Vector2.new(0, 0), 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                BackgroundTransparency = 1, 
-                ClearTextOnFocus = false, 
-                FontFace = l_chatInputBarSettings_0.FontFace, 
-                PlaceholderText = v235 and v97.placeholderText or "", 
-                Selectable = l_FFlagEnableConsoleExpControls_0 and true or nil, 
-                SelectionImageObject = v231, 
-                Size = UDim2.fromScale(1, 0), 
-                Text = "", 
-                PlaceholderColor3 = l_chatInputBarSettings_0.PlaceholderColor3, 
-                TextColor3 = l_chatInputBarSettings_0.TextColor3, 
-                TextSize = if l_isSpatialUIEnabled_0 then l_chatInputBarSettings_0.SpatialPanelTextSize else l_chatInputBarSettings_0.TextSize
-            };
-            v270 = v235 and 0.5 or 0;
-            local l_v270_1 = v270 --[[ copy: 71 -> 74 ]];
-            v279.TextTransparency = v97.transparencyValue:map(function(v281) --[[ Line: 79 ]]
-                -- upvalues: l_v270_1 (copy)
-                return l_v270_1 + v281 * (1 - l_v270_1);
-            end);
-            v270 = l_chatInputBarSettings_0.TextStrokeTransparency;
-            v279.TextStrokeTransparency = v97.transparencyValue:map(function(v282) --[[ Line: 79 ]]
-                -- upvalues: v270 (copy)
-                return v270 + v282 * (1 - v270);
-            end);
-            v279.TextStrokeColor3 = l_chatInputBarSettings_0.TextStrokeColor3;
-            v279.TextWrapped = true;
-            v279.TextXAlignment = Enum.TextXAlignment.Left;
-            v279.TextYAlignment = Enum.TextYAlignment.Top;
-            v279.ZIndex = 2;
-            v279[v7.Event.Focused] = v170;
-            v279[v7.Event.FocusLost] = v188;
-            v279[v7.Change.Text] = v226;
-            v279[v7.Event.ReturnPressedFromOnScreenKeyboard] = v228;
-            v279.ref = if l_chatInputBarSettings_0.TextBox then v113 else v112;
-            l_transparencyValue_0 = l_transparencyValue_0(v278, v279);
-        end;
-        v277.TextBox = l_transparencyValue_0;
-        l_createElement_3 = l_createElement_3(l_v30_0, v268, v277);
-    end;
-    v265.TextBoxContainer = l_createElement_3;
-    v265.UIPadding = v7.createElement("UIPadding", {
-        PaddingBottom = UDim.new(0, 10), 
-        PaddingLeft = UDim.new(0, 10), 
-        PaddingRight = UDim.new(0, 10), 
-        PaddingTop = UDim.new(0, 10)
-    });
-    v262.TextContainer = l_ChatInputBarBorderTransparency_0(v263, v264, v265);
-    l_ChatInputBarBorderTransparency_0 = v7.createElement;
-    v263 = "TextButton";
-    v264 = {
-        AnchorPoint = Vector2.new(1, 0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 2, 
-        Position = UDim2.fromScale(1, 0), 
-        Selectable = not v46 and nil, 
-        Size = UDim2.new(0, v97.sendButtonContainerWidth, 1, 0), 
-        Text = "", 
-        [v7.Event.Activated] = v138
-    };
-    v265 = {
-        Layout = v7.createElement("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        })
-    };
-    l_createElement_3 = v7.createElement;
-    l_v30_0 = l_ImageSetLabel_0;
-    v268 = {
-        BackgroundTransparency = 1, 
-        ImageColor3 = v234 and l_chatInputBarSettings_0.PlaceholderColor3 or l_chatInputBarSettings_0.TextColor3
-    };
-    l_transparencyValue_0 = v234 and 0.5 or 0;
-    v268.ImageTransparency = v97.transparencyValue:map(function(v283) --[[ Line: 79 ]]
-        -- upvalues: l_transparencyValue_0 (copy)
-        return l_transparencyValue_0 + v283 * (1 - l_transparencyValue_0);
-    end);
-    v268.Image = l_Images_0["icons/actions/send"];
-    v268.Size = UDim2.new(0, 30, 0, 30);
-    v268.ZIndex = 2;
-    v265.SendIcon = l_createElement_3(l_v30_0, v268);
-    v262.SendButton = l_ChatInputBarBorderTransparency_0(v263, v264, v265);
-    v255.Container = l_createElement_2(v257, v258, v262);
-    v250.Background = l_createElement_1(v252, v254, v255);
-    return l_createElement_0(v243, v249, v250);
-end;
-local v291 = v28.connect(function(v285) --[[ Line: 1355 ]]
-    -- upvalues: v29 (copy)
-    local v286 = nil;
-    if v285.targetTextChannel then
-        local v287 = {
-            RBXTeam = "CoreScripts.TextChat.TeamChat.PrefixText", 
-            RBXWhisper = "CoreScripts.TextChat.WhisperChat.PrefixText.Outgoing"
-        };
-        for v288, v289 in pairs(v287) do
-            if string.match(v285.targetTextChannel.Name, v288) then
-                if v288 == "RBXWhisper" then
-                    local v290 = v29(v285.targetTextChannel, v285.localPlayer);
-                    if v290 then
-                        v286 = {
-                            v289, 
-                            {
-                                RBX_NAME = v290
-                            }
-                        };
-                    end;
-                else
-                    v286 = v289;
-                end;
-            end;
-        end;
-    end;
-    return {
-        targetTextChannelDisplayName = v286
-    };
-end)(v284);
-return v7.memo(v291);
+local function setTransparency(p1, p2) -- line: 98
+	return p2:map(function(n1: number) -- line: 99
+		-- upvalues: p1 (copy)
+		return p1 + n1 * (1 - p1)
+	end)
+end
+
+local u75 = nil
+local u76 = nil
+local u77 = nil
+local RBXTeamCommandname = nil
+local RBXWhisperCommandname = nil
+
+local function onChatInputBarFocusLost(p3: ((...any) -> ...any)?, t1: {[any]: any}?, p4) -- line: 110
+	-- upvalues: UserInputService (copy), GuiService (copy)
+	local t2 = { Enum.KeyCode.ButtonB }
+	local v90 = t1 or t2
+	local u91 = nil
+
+	u91 = UserInputService.InputBegan:Connect(function(input) -- line: 114
+		-- upvalues: v90 (copy), GuiService (copy), p4 (copy), p3 (copy), u91 (ref)
+		local v201 = if not input then nil else input.KeyCode
+
+		for _, v203 in v90 do
+			if v201 == v203 then
+				GuiService:SetMenuIsOpen(false, "ExperienceChat")
+				p4()
+
+				if p3 then
+					p3()
+				else
+					GuiService.SelectedCoreObject = nil
+				end
+
+				if not u91 then
+					return
+				end
+
+				u91:Disconnect()
+				u91 = nil
+
+				return
+			end
+		end
+	end)
+
+	return u91
+end
+local function useEffectChatInputBarFocus(p5, p6, p7, p8, p9) -- line: 138
+	-- upvalues: FFlagConsoleChatUseChromeFocusUtils (copy), React (copy), FFlagExpChatEnableFocusNavigation (copy), Signals (copy), v73 (copy), v63 (copy), GuiService (copy), UserInputService (copy), FocusUtils (copy), FFlagChromeChatGamepadSupportFix (copy), FFlagEnableConsoleExpControls (copy), onChatInputBarFocusLost (copy), ActionBindableEvent (copy)
+	if FFlagConsoleChatUseChromeFocusUtils then
+		React.useEffect(function() -- line: 140
+			-- upvalues: FFlagExpChatEnableFocusNavigation (copy), Signals (copy), v73 (copy), p6 (copy), p5 (copy), v63 (copy), p7 (copy), GuiService (copy), p8 (copy), UserInputService (copy), FocusUtils (copy), p9 (copy)
+			local t3 = {
+				[Enum.KeyCode.DPadUp] = not FFlagExpChatEnableFocusNavigation or nil
+			}
+			local connection = nil
+			local v206 = Signals.createEffect(function(p10) -- line: 146
+				-- upvalues: v73 (copy), p6 (copy), p5 (copy), v63 (copy), p7 (copy), GuiService (copy), p8 (copy), connection (ref), UserInputService (copy), t3 (copy), FocusUtils (copy), p9 (copy)
+				local v313 = v73.getChatInputBarFocused(p10)
+				local v314 = if not p6.current then p5.current else p6.current
+
+				if v63 then
+					v314 = v314 or p7.current
+				end
+
+				if not v314 then
+					return
+				end
+
+				if v313 then
+					GuiService:SetMenuIsOpen(true, "ExperienceChat")
+					p8()
+					GuiService.SelectedCoreObject = v314
+
+					if not connection then
+						connection = UserInputService.InputBegan:Connect(function(input) -- line: 168
+							-- upvalues: t3 (copy), FocusUtils (copy), v73 (copy)
+							if input and t3[input.KeyCode] then
+								FocusUtils.FocusOnChrome(function() -- line: 171
+									-- upvalues: v73 (copy)
+									v73.unfocusChatInputBar()
+								end, "chat")
+							end
+						end)
+
+						return
+					end
+				elseif GuiService.MenuIsOpen then
+					GuiService:SetMenuIsOpen(false, "ExperienceChat")
+					p9()
+
+					if connection then
+						connection:Disconnect()
+						connection = nil
+					end
+				end
+			end)
+
+			return function() -- line: 187
+				-- upvalues: v206 (copy), connection (ref)
+				v206()
+
+				if connection then
+					connection:Disconnect()
+					connection = nil
+				end
+			end
+		end, {})
+
+		return
+	end
+
+	if FFlagChromeChatGamepadSupportFix then
+		React.useEffect(function() -- line: 197
+			-- upvalues: p6 (copy), p5 (copy), FFlagEnableConsoleExpControls (copy), GuiService (copy), p8 (copy), onChatInputBarFocusLost (copy), p9 (copy), ActionBindableEvent (copy)
+			local u207 = nil
+			local u208 = nil
+			local connection = ActionBindableEvent.Event:Connect(function(p11) -- line: 201
+				-- upvalues: p6 (copy), p5 (copy), FFlagEnableConsoleExpControls (copy), GuiService (copy), p8 (copy), u208 (ref), u207 (ref), onChatInputBarFocusLost (copy), p9 (copy)
+				local v316 = if not p6.current then p5.current else p6.current
+
+				if FFlagEnableConsoleExpControls and (p11.type == "ChatTopBarFocusSelect" and v316) then
+					GuiService:SetMenuIsOpen(true, "ExperienceChat")
+					p8()
+					GuiService.SelectedCoreObject = v316
+					u208 = task.delay(0, function() -- line: 213
+						-- upvalues: u208 (ref), u207 (ref), onChatInputBarFocusLost (copy), p11 (copy), p9 (copy)
+						u208 = nil
+
+						if u207 then
+							u207:Disconnect()
+						end
+
+						u207 = onChatInputBarFocusLost(p11.onSelectionLost, p11.keybinds, p9)
+					end)
+				end
+			end)
+
+			return function() -- line: 227
+				-- upvalues: connection (copy), u208 (ref), u207 (ref)
+				connection:disconnect()
+
+				if u208 then
+					task.cancel(u208)
+					u208 = nil
+				end
+
+				if u207 then
+					u207:Disconnect()
+					u207 = nil
+				end
+			end
+		end, {
+			p5.current,
+			p6.current
+		})
+	end
+end
+local function ChatInputBar(p12) -- line: 243
+	-- upvalues: React (copy), FFlagExpChatUseUnifiedTooltipStore (copy), GetChatTooltipStore (copy), v69 (copy), useSendTelemetry (copy), FFlagExpChatEnableFocusNavigation (copy), ReactFocusNavigation (copy), FFlagExpChatFocusViaLastModeFix (copy), FocusNavigationUtils (copy), SignalsReact (copy), v73 (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), FFlagExpChatPresetChatEnabled (copy), GetPresetChatStore (copy), TextChatService (copy), u76 (ref), AutocompleteText (copy), initializeCommands (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), u75 (ref), initializeEmojis (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), u77 (ref), initializeGlobalCommands (copy), initialCommands (copy), v27 (copy), FFlagExpChatDictation (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v64 (copy), v50 (copy), IXPServiceWrapper (copy), v51 (copy), FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs (copy), Config (copy), Players (copy), FFlagEnableConsoleExpControls (copy), FFlagChromeChatGamepadSupportFix (copy), onChatInputBarFocusLost (copy), ActionBindableEvent (copy), useEffectChatInputBarFocus (copy), sortCommandResultsCallback (copy), sortEmojiResultsCallback (copy), List (copy), RBXTeamCommandname (ref), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy), v62 (copy), autoCastCommand (copy), Promise (copy), useCursor (copy), v52 (copy), v53 (copy), useInterpolatedClientSettings (copy), FFlagExpChatNewInputBar (copy), AutocompleteDropdown (copy), setTransparency (copy), FFlagExpChatNewInputBarDictation (copy), ChatInputBarV2Dictation (copy), ChatInputBarV2 (copy), DictationInputBar (copy), v63 (copy), ChannelChip (copy), ImageSetLabel (copy), Images (copy)
+	local v98 = React.useRef("")
+
+	if FFlagExpChatUseUnifiedTooltipStore then
+		local setIsChatInputBarVisible = GetChatTooltipStore(false).setIsChatInputBarVisible
+
+		React.useEffect(function() -- line: 251
+			-- upvalues: p12 (copy), setIsChatInputBarVisible (copy)
+			if p12.visible ~= nil then
+				setIsChatInputBarVisible(p12.visible)
+			else
+				setIsChatInputBarVisible(true)
+			end
+
+			return function() -- line: 260
+				-- upvalues: setIsChatInputBarVisible (copy)
+				setIsChatInputBarVisible(false)
+			end
+		end, {
+			p12.visible,
+			setIsChatInputBarVisible
+		})
+	end
+
+	local v100, v101 = React.useState("")
+	local v102, v103 = React.useState(0)
+	local u104 = v102
+	local u105 = v103
+	local v106, v107 = React.useState(0)
+	local u108 = v106
+	local u109 = v107
+	local v110, v111 = React.useState(false)
+	local v112, _ = React.useState(true)
+	local v114, v115 = React.useBinding(0)
+	local v116 = React.useRef(false)
+	local v117 = React.useRef(nil)
+	local v118 = React.useRef(nil)
+	local v119 = if not v69 then nil else useSendTelemetry({
+		enabled = v69,
+		textBoxRef = v117,
+		customTextBoxRef = v118
+	})
+	local v120 = React.useRef(nil)
+	local v121 = React.useRef(nil)
+	local v122 = React.useRef(nil)
+	local v123 = React.useRef(nil)
+	local v124 = React.useRef(false)
+	local v125 = if not FFlagExpChatEnableFocusNavigation then nil else ReactFocusNavigation.useFocusGuiObject()
+	local v126 = if not FFlagExpChatEnableFocusNavigation or FFlagExpChatFocusViaLastModeFix then nil else FocusNavigationUtils.useLastInputMode()
+	local v127 = if not FFlagExpChatFocusViaLastModeFix then nil else SignalsReact.useSignalState(v73.getChatInputBarFocused)
+	local u128 = nil
+
+	if FFlagExpChatUseMessagesStore then
+		local v129 = GetMessagesStore(false)
+
+		u128 = SignalsReact.useSignalState(v129.getCanLocalUserChat)
+	end
+
+	local v130 = if not FFlagExpChatPresetChatEnabled then nil else SignalsReact.useSignalState(GetPresetChatStore(false).getIsTrayOpen)
+	local v131 = if not FFlagExpChatPresetChatEnabled then nil else SignalsReact.useSignalState(GetPresetChatStore(false).getIsEnabled)
+	local v132 = React.useRef(false)
+
+	React.useEffect(function() -- line: 325
+		-- upvalues: v118 (copy), p12 (copy)
+		v118.current = p12.chatInputBarSettings.TextBox
+	end, { p12.chatInputBarSettings.TextBox == nil and "nil" or p12.chatInputBarSettings.TextBox })
+	React.useEffect(function() -- line: 330
+		-- upvalues: p12 (copy), TextChatService (copy), u76 (ref), AutocompleteText (copy), initializeCommands (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), u75 (ref), initializeEmojis (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), u77 (ref), initializeGlobalCommands (copy), initialCommands (copy)
+		if not p12.autocompleteEnabled then
+			return
+		end
+
+		local t4 = {}
+		local connection = TextChatService.DescendantAdded:Connect(function(descendant) -- line: 335
+			-- upvalues: u76 (ref), AutocompleteText (copy), initializeCommands (copy), t4 (copy)
+			if descendant:IsA("TextChatCommand") and string.sub(descendant.PrimaryAlias, 1, 1) == "/" then
+				u76 = AutocompleteText.new(initializeCommands)
+
+				local connection = descendant:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() -- line: 341
+					-- upvalues: u76 (ref), AutocompleteText (copy), initializeCommands (copy)
+					u76 = AutocompleteText.new(initializeCommands)
+				end)
+
+				table.insert(t4, connection)
+			end
+		end)
+		local connection2 = TextChatService.DescendantRemoving:Connect(function(descendant) -- line: 348
+			-- upvalues: u76 (ref), AutocompleteText (copy), initializeCommands (copy)
+			if descendant:IsA("TextChatCommand") and string.sub(descendant.PrimaryAlias, 1, 1) == "/" then
+				u76 = AutocompleteText.new(initializeCommands)
+			end
+		end)
+
+		if getEnableChatInputBarConfigurationAutocompleteEnabled() then
+			u76 = AutocompleteText.new(initializeCommands)
+			u75 = AutocompleteText.new(initializeEmojis)
+
+			if GetFFlagTextChatEnableUniverseChatTabs() then
+				u77 = AutocompleteText.new(initializeGlobalCommands)
+			end
+
+			local v213 = initialCommands()
+
+			if v213 then
+				for _, v215 in v213 do
+					table.insert(t4, (v215:GetPropertyChangedSignal("AutocompleteVisible"):Connect(function() -- line: 365
+						-- upvalues: u76 (ref), AutocompleteText (copy), initializeCommands (copy)
+						u76 = AutocompleteText.new(initializeCommands)
+					end)))
+				end
+			end
+		end
+
+		return function() -- line: 373
+			-- upvalues: connection2 (copy), connection (copy), t4 (copy)
+			if connection2 then
+				connection2:Disconnect()
+			end
+
+			connection:Disconnect()
+
+			for _, v in ipairs(t4) do
+				v:Disconnect()
+			end
+
+			table.clear(t4)
+		end
+	end, {})
+
+	local v133 = React.useCallback(function() -- line: 386
+		-- upvalues: v27 (copy), v100 (copy), FFlagExpChatUseMessagesStore (copy), u128 (ref), p12 (copy), v116 (copy), v117 (copy), v118 (copy), v119 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatDictation (copy), v101 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v124 (copy)
+		v27:trace("onSendActivated with input text: '{}'", v100)
+
+		local v216 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u128
+
+		if not v116.current or not v216 then
+			v27:debug("onSendActivated could not send message. isMounted: {} canLocalUserChat: {}", tostring(v116.current), v216)
+
+			return
+		end
+
+		if v117.current or v118.current then
+			local v217 = if not v118.current then v117.current.Text else v118.current.Text
+			local v218 = if not v119 then nil else v119.consumeOnSend(v217)
+			local v219 = if not GetFFlagTextChatEnableUniverseChatTabs() or (not p12.isGlobalChatTabActive or not p12.onSendGlobalChat) then p12.onSendChat else p12.onSendGlobalChat
+
+			if v219 and string.find(v217, "%S") ~= nil then
+				if FFlagExpChatDictation then
+					v219(v217, v218, v218 ~= nil)
+				else
+					v219(v217)
+				end
+			else
+				v27:debug("onSendActivated could not send message. text: '{}' canLocalUserChat: {}", v217, v216)
+			end
+
+			if v118.current then
+				v118.current.Text = ""
+				v118.current:ReleaseFocus()
+			end
+
+			if v117.current then
+				v117.current.Text = ""
+				v117.current:ReleaseFocus()
+			end
+
+			v101("")
+
+			if FFlagExpChatPresetChatGamepadEnabled then
+				local v220 = v118.current or v117.current
+
+				if v220 then
+					GuiService.SelectedCoreObject = v220
+				end
+			end
+
+			if p12.targetTextChannel and p12.targetTextChannelDisplayName ~= "" then
+				v124.current = true
+
+				return
+			end
+		else
+			v27:debug("onSendActivated could not send message because textBoxRef.current was nil")
+		end
+	end, {
+		v100,
+		v118.current,
+		u128,
+		p12.canLocalUserChat,
+		p12.isGlobalChatTabActive,
+		p12.onSendChat or false,
+		p12.onSendGlobalChat or false,
+		p12.targetTextChannel or false,
+		p12.targetTextChannelDisplayName,
+		not not v119 and v119.consumeOnSend
+	})
+	local v134 = if not v69 then nil else React.useCallback(function(t5: {[any]: any}?) -- line: 473
+		-- upvalues: FFlagExpChatUseMessagesStore (copy), u128 (ref), p12 (copy), v116 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), v118 (copy), v117 (copy), v101 (copy), FFlagExpChatPresetChatGamepadEnabled (copy), GuiService (copy), v124 (copy)
+		local v222 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u128
+
+		if not v116.current or not v222 then
+			return
+		end
+
+		local v223 = t5 and t5.textSent or ""
+		local v224 = if not GetFFlagTextChatEnableUniverseChatTabs() or (not p12.isGlobalChatTabActive or not p12.onSendGlobalChat) then p12.onSendChat else p12.onSendGlobalChat
+
+		if v224 and string.find(v223, "%S") ~= nil then
+			v224(v223, t5, true)
+		end
+
+		if v118.current then
+			v118.current.Text = ""
+			v118.current:ReleaseFocus()
+		end
+
+		if v117.current then
+			v117.current.Text = ""
+			v117.current:ReleaseFocus()
+		end
+
+		v101("")
+
+		if FFlagExpChatPresetChatGamepadEnabled then
+			local v225 = v118.current or v117.current
+
+			if v225 then
+				GuiService.SelectedCoreObject = v225
+			end
+		end
+
+		if p12.targetTextChannel and p12.targetTextChannelDisplayName ~= "" then
+			v124.current = true
+		end
+	end, {
+		v118.current,
+		u128,
+		p12.canLocalUserChat,
+		p12.isGlobalChatTabActive,
+		p12.onSendChat or false,
+		p12.onSendGlobalChat or false,
+		p12.targetTextChannel or false,
+		p12.targetTextChannelDisplayName
+	})
+	local v135 = React.useCallback(function(p13) -- line: 521
+		-- upvalues: p12 (copy), v118 (copy), v117 (copy), u104 (ref), v101 (copy), v116 (copy), FFlagExpChatFocusViaLastModeFix (copy), v127 (copy), v125 (copy), v126 (copy), v64 (copy), v27 (copy)
+		p12.autocompleteDropdownActivated(false)
+		p12.autocompleteDropdownResultsChanged({})
+
+		local v227 = if not v118.current then v117.current else v118.current
+
+		if v227 then
+			local Text = v227.Text
+			local v229 = string.sub(Text, 1, u104 - 1)
+			local v230 = string.sub(Text, u104, #Text)
+			local s1 = ""
+
+			if p12.autocompleteDropdownReducer.autocompleteType == "emojis" then
+				local EmojiLabelText = p13.EmojiLabel.Text
+
+				s1 = string.gsub(v229, ":[^:]*$", EmojiLabelText)
+			elseif p12.autocompleteDropdownReducer.autocompleteType == "commands" then
+				local TextLabelText = p13.TextLabel.Text
+
+				s1 = string.gsub(v229, "(/.*)", TextLabelText)
+			end
+
+			if v230 ~= "" then
+				s1 ..= v230
+			end
+
+			v227.Text = s1
+			v101(s1)
+
+			if v116.current then
+				v227:CaptureFocus()
+
+				if FFlagExpChatFocusViaLastModeFix then
+					if v127 then
+						v125(v227)
+					end
+				elseif v126 == "Focus" then
+					v125(v227)
+				end
+
+				if v230 ~= "" and not v64 then
+					v227.CursorPosition = #s1 - #v230 + 1
+				end
+			end
+
+			p12.autocompleteDropdownDeactivated()
+
+			return
+		end
+
+		v27:error("Could not find textBox")
+	end, if not FFlagExpChatEnableFocusNavigation then nil else {
+		if not FFlagExpChatFocusViaLastModeFix then nil else v127,
+		v125,
+		v112,
+		u104,
+		if not FFlagExpChatFocusViaLastModeFix then v126 else nil,
+		p12.autocompleteDropdownActivated,
+		p12.autocompleteDropdownDeactivated,
+		p12.autocompleteDropdownReducer and p12.autocompleteDropdownReducer.autocompleteType,
+		p12.autocompleteDropdownResultsChanged
+	})
+
+	React.useEffect(function() -- line: 592
+		-- upvalues: v116 (copy), v118 (copy), v117 (copy), v27 (copy)
+		if v116.current then
+			local v234 = if not v118.current then v117.current else v118.current
+
+			if v234 then
+				v234:CaptureFocus()
+
+				return
+			end
+
+			v27:error("Could not focus chat input bar because textBox not found")
+		end
+	end, {
+		p12.shouldFocusChatInputBar,
+		v118.current
+	})
+
+	if FFlagExpChatPresetChatEnabled then
+		React.useEffect(function() -- line: 604
+			-- upvalues: v130 (copy), v118 (copy), v117 (copy)
+			if not v130 then
+				return
+			end
+
+			local v235 = if not v118.current then v117.current else v118.current
+
+			if v235 and v235:IsFocused() then
+				v235:ReleaseFocus()
+			end
+		end, { v130 })
+	end
+
+	React.useEffect(function() -- line: 615
+		-- upvalues: v27 (copy), v116 (copy), v50 (copy), IXPServiceWrapper (copy), v51 (copy)
+		v27:trace("Mounted")
+		v116.current = true
+
+		if v50 then
+			IXPServiceWrapper:LogUserLayerExposure(v51)
+		end
+
+		return function() -- line: 623
+			-- upvalues: v27 (copy), v116 (copy)
+			v27:trace("Unmounting")
+			v116.current = false
+		end
+	end, {})
+	React.useEffect(function() -- line: 629
+		-- upvalues: p12 (copy), v118 (copy), v117 (copy), u105 (ref)
+		local connection = nil
+
+		if p12.autocompleteEnabled then
+			local v237 = if not v118.current then v117.current else v118.current
+
+			if v237 then
+				connection = v237:GetPropertyChangedSignal("CursorPosition"):Connect(function() -- line: 634
+					-- upvalues: v237 (copy), u105 (ref)
+					local CursorPosition = v237.CursorPosition
+
+					if CursorPosition and CursorPosition ~= -1 then
+						u105(CursorPosition)
+					end
+				end)
+			end
+		end
+
+		return function() -- line: 643
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v118.current })
+	React.useEffect(function() -- line: 651
+		-- upvalues: p12 (copy), v123 (copy)
+		if p12.autocompleteEnabled then
+			v123.current = p12.userInputService.InputBegan:connect(function(p14, _) -- line: 653
+				-- upvalues: p12 (copy)
+				if p12.autocompleteDropdownReducer.activated and (Enum.KeyCode.Up or Enum.KeyCode.Down) then
+					if p14 and p14.KeyCode == Enum.KeyCode.Up and p12.autocompleteDropdownReducer.selectedIndex > 1 then
+						p12.autocompleteDropdownSelectionChanged(p12.autocompleteDropdownReducer.selectedIndex - 1)
+					end
+
+					if p14 and p14.KeyCode == Enum.KeyCode.Down and p12.autocompleteDropdownReducer.selectedIndex < #p12.autocompleteDropdownReducer.results then
+						p12.autocompleteDropdownSelectionChanged(p12.autocompleteDropdownReducer.selectedIndex + 1)
+					end
+				end
+			end)
+
+			return function() -- line: 675
+				-- upvalues: v123 (copy)
+				local current = v123.current
+
+				if current and current.Connected then
+					current:Disconnect()
+				end
+
+				v123.current = nil
+			end
+		end
+
+		return function() -- line: 683
+		end
+	end, {
+		p12.userInputService,
+		p12.autocompleteDropdownReducer
+	})
+	React.useEffect(function() -- line: 687
+		-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), p12 (copy), FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs (copy), v122 (copy), v118 (copy), v117 (copy), v124 (copy), v27 (copy), v100 (copy)
+		local v238 = GetFFlagTextChatEnableUniverseChatTabs() and not p12.developerChannelTabsEnabled
+		local v239 = if not FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then not p12.isChannelBarVisible else not p12.isChannelBarVisible or v238
+
+		v122.current = p12.userInputService.InputEnded:connect(function(p16, _) -- line: 695
+			-- upvalues: v118 (copy), v117 (copy), v124 (copy), v239 (copy), p12 (copy), v27 (copy), v100 (copy)
+			if if not v118.current then v117.current and (v117.current:IsFocused() and (p16 and p16.KeyCode == Enum.KeyCode.Backspace)) else v118.current and (v118.current:IsFocused() and (p16 and p16.KeyCode == Enum.KeyCode.Backspace)) then
+				if v124.current and v239 then
+					p12.resetTargetChannel()
+					v27:debug("ChatInputBar ChatInputBarResetTargetChannel()")
+					v124.current = false
+
+					return
+				end
+
+				if v100 == "" and p12.targetTextChannelDisplayName ~= "" then
+					v124.current = true
+				end
+			end
+		end)
+
+		return function() -- line: 722
+			-- upvalues: v122 (copy)
+			local current = v122.current
+
+			if current and current.Connected then
+				current:Disconnect()
+			end
+
+			v122.current = nil
+		end
+	end, {
+		p12.userInputService,
+		v118.current,
+		p12.isChannelBarVisible,
+		p12.targetTextChannelDisplayName,
+		p12.resetTargetChannel,
+		if not FFlagExpChatBackspaceExitsTargetChannelInGlobalTabs then nil else p12.developerChannelTabsEnabled
+	})
+	React.useEffect(function() -- line: 739
+		-- upvalues: p12 (copy), Config (copy), v118 (copy), v117 (copy), v132 (copy)
+		local function handleAction(_: string, p18, p19) -- line: 740
+			-- upvalues: p12 (copy), Config (copy), v118 (copy), v117 (copy), v132 (copy)
+			if p12.isChatHotkeyEnabled and p19 and (p19.KeyCode == Config.ChatInputBarDefaultFocusKeyCode or p19.KeyCode == p12.devDefinedFocusKeyCode) then
+				local v332 = if not v118.current then v117.current else v118.current
+
+				if v332 and p18 == Enum.UserInputState.Begin and v332 and not v332:IsFocused() then
+					task.delay(0, function() -- line: 762
+						-- upvalues: v332 (copy)
+						v332:CaptureFocus()
+					end)
+					p12.focusChatHotKeyActivated()
+					v132.current = true
+
+					return Enum.ContextActionResult.Sink
+				end
+			end
+
+			return Enum.ContextActionResult.Pass
+		end
+
+		p12.contextActionService:BindCoreAction("FocusChat", handleAction, false, Enum.UserInputType.Keyboard)
+
+		return function() -- line: 786
+			-- upvalues: p12 (copy)
+			p12.contextActionService:UnbindCoreAction("FocusChat")
+		end
+	end, {
+		p12.isChatHotkeyEnabled,
+		p12.devDefinedFocusKeyCode,
+		v132.current,
+		v118.current
+	})
+
+	local v136 = React.useCallback(function() -- line: 800
+		-- upvalues: v111 (copy), p12 (copy), TextChatService (copy)
+		v111(true)
+		p12.onFocus()
+
+		local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+
+		if ChatInputBarConfiguration then
+			ChatInputBarConfiguration.IsFocusedWrite = true
+		end
+	end, { p12.onFocus })
+	local v137 = React.useCallback(function(_, b1: boolean, p21) -- line: 806
+		-- upvalues: v27 (copy), v121 (copy), FFlagExpChatEnableFocusNavigation (copy), p12 (copy), v135 (copy), v133 (copy), v116 (copy), v118 (copy), v117 (copy), u104 (ref), v64 (copy), v111 (copy), TextChatService (copy), v132 (copy), Players (copy)
+		v27:debug("Focus lost with enter: {}", (tostring(b1)))
+
+		local current = v121.current
+
+		if b1 or FFlagExpChatEnableFocusNavigation and p21 and (p21.KeyCode == Enum.KeyCode.Return or p21.KeyCode == Enum.KeyCode.KeypadEnter) then
+			if p12.autocompleteEnabled and current and p12.autocompleteDropdownReducer.activated and #p12.autocompleteDropdownReducer.results > 0 then
+				local OffsetFrame = current.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
+
+				for _, child in ipairs(OffsetFrame:GetChildren()) do
+					if child.ClassName == "Frame" and child.LayoutOrder == p12.autocompleteDropdownReducer.selectedIndex then
+						v135(child.TextLabelButton)
+
+						return
+					end
+				end
+			else
+				v133()
+			end
+		end
+
+		if v116.current then
+			if p12.autocompleteEnabled and current and p12.autocompleteDropdownReducer.activated then
+				if p21 then
+					if p21.KeyCode == Enum.KeyCode.Escape then
+						p12.autocompleteDropdownActivated(false)
+
+						local v251 = if not v118.current then v117.current else v118.current
+
+						if v251 then
+							local v252 = u104
+
+							v251:CaptureFocus()
+
+							if not v64 then
+								v251.CursorPosition = v252
+							end
+
+							return
+						end
+
+						v27:error("Could not focus chat input bar because textBox not found")
+					else
+						local PositionX = p21.Position.X
+						local PositionY = p21.Position.Y
+						local AbsolutePositionX = current.AbsolutePosition.X
+						local v256 = AbsolutePositionX + current.AbsoluteSize.X
+						local AbsolutePositionY = current.AbsolutePosition.Y
+						local v258 = AbsolutePositionY + current.AbsoluteSize.Y
+
+						if PositionX < AbsolutePositionX or v256 < PositionX or PositionY < AbsolutePositionY or v258 < PositionY then
+							p12.autocompleteDropdownActivated(false)
+						end
+					end
+				end
+			else
+				v111(false)
+			end
+		end
+
+		p12.onUnfocus()
+
+		local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+
+		if ChatInputBarConfiguration then
+			ChatInputBarConfiguration.IsFocusedWrite = false
+		end
+
+		if v132.current then
+			local LocalPlayer = Players.LocalPlayer
+
+			if LocalPlayer then
+				local TextBox = Instance.new("TextBox")
+
+				TextBox.Visible = false
+				TextBox.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+				TextBox:CaptureFocus()
+				TextBox:ReleaseFocus()
+				TextBox:Destroy()
+			end
+
+			v132.current = false
+		end
+	end)
+
+	React.useEffect(function() -- line: 911
+		-- upvalues: FFlagEnableConsoleExpControls (copy), v118 (copy), v117 (copy), FFlagChromeChatGamepadSupportFix (copy), GuiService (copy), v136 (copy), onChatInputBarFocusLost (copy), v137 (copy), ActionBindableEvent (copy)
+		local u262 = nil
+		local u263 = nil
+		local connection = ActionBindableEvent.Event:Connect(function(p22) -- line: 915
+			-- upvalues: FFlagEnableConsoleExpControls (copy), v118 (copy), v117 (copy), FFlagChromeChatGamepadSupportFix (copy), GuiService (copy), v136 (copy), u263 (ref), u262 (ref), onChatInputBarFocusLost (copy), v137 (copy)
+			local u334 = nil
+
+			if FFlagEnableConsoleExpControls then
+				u334 = if not v118.current then v117.current else v118.current
+			end
+
+			if p22.type == "ChatTopBarFocusActivated" then
+				if not FFlagEnableConsoleExpControls then
+					u334 = if not v118.current then v117.current else v118.current
+				end
+
+				if u334 then
+					task.delay(0, function() -- line: 926
+						-- upvalues: u334 (ref)
+						u334:CaptureFocus()
+					end)
+				end
+			elseif not FFlagChromeChatGamepadSupportFix and FFlagEnableConsoleExpControls and p22.type == "ChatTopBarFocusSelect" and u334 then
+				GuiService:SetMenuIsOpen(true, "ExperienceChat")
+				v136()
+				GuiService.SelectedCoreObject = u334
+				u263 = task.delay(0, function() -- line: 941
+					-- upvalues: u263 (ref), u262 (ref), onChatInputBarFocusLost (copy), p22 (copy), v137 (copy)
+					u263 = nil
+
+					if u262 then
+						u262:Disconnect()
+					end
+
+					u262 = onChatInputBarFocusLost(p22.onSelectionLost, p22.keybinds, v137)
+				end)
+			end
+		end)
+
+		return function() -- line: 955
+			-- upvalues: connection (copy), u263 (ref), u262 (ref)
+			connection:disconnect()
+
+			if u263 then
+				task.cancel(u263)
+				u263 = nil
+			end
+
+			if u262 then
+				u262:Disconnect()
+				u262 = nil
+			end
+		end
+	end, {
+		v117.current,
+		v118.current
+	})
+	useEffectChatInputBarFocus(v117, v118, v120, v136, v137)
+
+	local function handleAutocomplete(p23, p24, p25) -- line: 973
+		-- upvalues: p12 (copy), u77 (ref), u76 (ref), sortCommandResultsCallback (copy), u75 (ref), sortEmojiResultsCallback (copy), u108 (ref), List (copy), v101 (copy), v64 (copy), v121 (copy), v135 (copy), u109 (ref)
+		if p25 == "/" and p23.CursorPosition == 2 or p12.autocompleteDropdownReducer.autocompleteType == "commands" and p25 ~= ":" then
+			p12.autocompleteDropdownTypeChanged("commands")
+			p12.autocompleteDropdownActivated(true)
+
+			if p25 ~= "" and p25 ~= " " then
+				local v268 = string.sub(p24, 1, p23.CursorPosition - 1):lower()
+				local v269 = ((if not p12.isGlobalChatTabActive or not u77 then u76 else u77)):getResults(v268, sortCommandResultsCallback)
+
+				p12.autocompleteDropdownResultsChanged(v269)
+
+				if v268 == v269[1] then
+					p12.autocompleteDropdownActivated(false)
+					p12.autocompleteDropdownResultsChanged({})
+
+					return
+				end
+			else
+				p12.autocompleteDropdownDeactivated()
+			end
+
+			return
+		end
+
+		if (p12.autocompleteDropdownReducer.activated or #p12.autocompleteDropdownReducer.results > 0) and p12.autocompleteDropdownReducer.autocompleteType == "emojis" then
+			p12.autocompleteDropdownActivated(true)
+
+			local v270 = string.sub(p24, 1, p23.CursorPosition - 1)
+			local v271 = string.find(v270, ":[^:]*$")
+
+			if p25 ~= "" and p25 ~= ":" and p25 ~= " " and v271 then
+				local v272 = string.sub(p24, v271 + 1, p23.CursorPosition - 1):lower()
+				local t6 = {}
+
+				if v272 and string.len(v272) > 1 then
+					t6 = u75:getResults(v272, sortEmojiResultsCallback)
+				end
+
+				p12.autocompleteDropdownResultsChanged(t6)
+
+				return
+			end
+
+			if p25 == ":" then
+				if v271 ~= u108 then
+					local v274 = string.sub(p24, u108 + 1, p23.CursorPosition - 2):lower()
+
+					if List.includes(p12.autocompleteDropdownReducer.results, v274) then
+						local v275 = string.sub(p24, p23.CursorPosition, #p24)
+						local v276 = string.sub(p24, 1, p23.CursorPosition - 2) .. v275
+
+						p23.Text = v276
+						v101(v276)
+
+						if not v64 then
+							p23.CursorPosition = p23.CursorPosition - 1
+						end
+
+						local current = v121.current
+
+						if current then
+							local OffsetFrame = current.ScrollBarFrame.ScrollViewFrame.ScrollView.OffsetFrame
+
+							for _, child in ipairs(OffsetFrame:GetChildren()) do
+								if child.ClassName ~= "Frame" then
+									continue
+								end
+
+								local TextLabelButton = child:FindFirstChild("TextLabelButton")
+
+								if TextLabelButton then
+									local TextLabel = TextLabelButton:FindFirstChild("TextLabel")
+
+									if not TextLabel or not TextLabel.Text or v274 ~= TextLabel.Text then
+										continue
+									end
+
+									v135(TextLabelButton)
+
+									return
+								end
+							end
+
+							return
+						end
+					else
+						p12.autocompleteDropdownActivated(false)
+						p12.autocompleteDropdownResultsChanged({})
+					end
+
+					return
+				end
+
+				p12.autocompleteDropdownResultsChanged({})
+
+				return
+			end
+
+			if p25 == " " then
+				p12.autocompleteDropdownActivated(false)
+				p12.autocompleteDropdownResultsChanged({})
+
+				return
+			end
+
+			p12.autocompleteDropdownDeactivated()
+			u109(0)
+
+			return
+		end
+
+		local v283 = string.find(p24, ":[^:]*$")
+
+		if p25 == ":" then
+			p12.autocompleteDropdownTypeChanged("emojis")
+			p12.autocompleteDropdownActivated(true)
+			p12.autocompleteDropdownResultsChanged({})
+			u109(v283)
+		end
+	end
+
+	React.useEffect(function() -- line: 1090
+		-- upvalues: TextChatService (copy), RBXTeamCommandname (ref), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy)
+		if TextChatService.CreateDefaultCommands then
+			RBXTeamCommandname = TextChatService:FindFirstChild(RBXTeamCommand.name, true)
+			RBXWhisperCommandname = TextChatService:FindFirstChild(RBXWhisperCommand.name, true)
+		end
+	end, {})
+
+	local v139 = React.useCallback(function(p26) -- line: 1097
+		-- upvalues: p12 (copy), v101 (copy), v27 (copy), v100 (copy), getEnableChatInputBarConfigurationAutocompleteEnabled (copy), handleAutocomplete (copy), v124 (copy), v62 (copy), v98 (copy), RBXTeamCommandname (ref), autoCastCommand (copy), RBXTeamCommand (copy), RBXWhisperCommandname (ref), RBXWhisperCommand (copy), Promise (copy)
+		local p26Text = p26.Text
+
+		if p12.autocompleteEnabled then
+			local v286 = string.find(p26Text, "\r")
+			local v287 = p26.CursorPosition < #p26Text + 1
+
+			if v286 then
+				local v288 = string.gsub(p26Text, "\r", "")
+
+				p26.Text = v288
+				v101(v288)
+
+				if v287 then
+					p26.CursorPosition = p26.CursorPosition - 1
+				end
+
+				return
+			end
+		end
+
+		local v289 = string.sub(p26Text, p26.CursorPosition - 1, p26.CursorPosition - 1)
+
+		v27:trace("Input: {}", p26Text)
+
+		local v290 = if not utf8.len(p26Text) then string.len(p26Text) else utf8.len(utf8.nfcnormalize(p26Text))
+
+		if v290 and v290 > p12.messageCharacterLimit then
+			v27:debug("Message is over the character limit of {}", (tostring(p12.messageCharacterLimit)))
+			p26.Text = v100
+
+			return
+		end
+
+		v101(p26Text)
+
+		if getEnableChatInputBarConfigurationAutocompleteEnabled() and p12.autocompleteEnabled then
+			handleAutocomplete(p26, p26Text, v289)
+		end
+
+		v124.current = #p26Text == 0 and v124.current
+
+		if v62 then
+			if string.sub(p26Text, 1, 1) == "/" and p12.localPlayer and p26Text ~= v98.current then
+				v98.current = p26Text
+
+				local UserId = p12.localPlayer.UserId
+				local t7 = {}
+
+				if RBXTeamCommandname and RBXTeamCommandname.Enabled then
+					table.insert(t7, autoCastCommand(RBXTeamCommand, UserId, p26Text))
+				end
+
+				if RBXWhisperCommandname and RBXWhisperCommandname.Enabled then
+					table.insert(t7, autoCastCommand(RBXWhisperCommand, UserId, p26Text))
+				end
+
+				if #t7 == 0 then
+					t7 = { Promise.reject() }
+				end
+
+				Promise.any(t7):andThen(function() -- line: 1153
+					-- upvalues: p26 (copy), v101 (copy), v124 (copy)
+					p26.Text = ""
+					v101("")
+					v124.current = true
+				end):catch(function(p27) -- line: 1159
+					-- upvalues: v27 (copy)
+					v27:trace("Could not send autoCastCommand. Error: {}", p27)
+				end)
+
+				return
+			end
+
+			if string.sub(p26Text, 1, 1) ~= "/" then
+				v98.current = ""
+
+				return
+			end
+		elseif p12.localPlayer then
+			local UserId = p12.localPlayer.UserId
+			local t8 = {}
+
+			if RBXTeamCommandname and RBXTeamCommandname.Enabled then
+				table.insert(t8, autoCastCommand(RBXTeamCommand, UserId, p26Text))
+			end
+
+			if RBXWhisperCommandname and RBXWhisperCommandname.Enabled then
+				table.insert(t8, autoCastCommand(RBXWhisperCommand, UserId, p26Text))
+			end
+
+			if #t8 == 0 then
+				t8 = { Promise.reject() }
+			end
+
+			Promise.any(t8):andThen(function() -- line: 1182
+				-- upvalues: p26 (copy), v101 (copy), v124 (copy)
+				p26.Text = ""
+				v101("")
+				v124.current = true
+			end):catch(function(p28) -- line: 1188
+				-- upvalues: v27 (copy)
+				v27:trace("Could not send autoCastCommand. Error: {}", p28)
+			end)
+		end
+	end)
+	local v140 = React.useCallback(function() -- line: 1195
+		-- upvalues: v118 (copy), v117 (copy)
+		local v295 = if not v118.current then v117.current else v118.current
+
+		if v295 then
+			v295:ReleaseFocus(true)
+		end
+	end, {
+		v117.current,
+		v118.current
+	})
+	local v141 = React.useCallback(function(p29) -- line: 1202
+		-- upvalues: v115 (copy)
+		v115(p29.Visible and p29.AbsoluteSize.X or 0)
+	end)
+	local v142 = if not FFlagExpChatEnableFocusNavigation then nil else useCursor()
+	local v143 = React.useCallback(function(p30) -- line: 1209
+		-- upvalues: p12 (copy)
+		p12.autocompleteDropdownSelectionChanged(p30.LayoutOrder)
+	end)
+	local v144 = v100 == ""
+	local v145 = v144 and not v110
+	local chatInputBarSettings = p12.chatInputBarSettings
+	local chatWindowSettings = p12.chatWindowSettings
+	local v148 = if not FFlagExpChatUseMessagesStore or u128 == nil then p12.canLocalUserChat else u128
+
+	React.useEffect(function() -- line: 1224
+		-- upvalues: v52 (copy), v148 (copy), IXPServiceWrapper (copy), v53 (copy)
+		if v52 and v148 then
+			IXPServiceWrapper:LogUserLayerExposure(v53)
+		end
+	end, { v148 })
+
+	local BackgroundTransparency = useInterpolatedClientSettings(chatInputBarSettings).BackgroundTransparency
+	local BackgroundTransparency2 = useInterpolatedClientSettings(chatWindowSettings).BackgroundTransparency
+	local BackgroundColor3 = useInterpolatedClientSettings(chatWindowSettings).BackgroundColor3
+	local isSpatialUIEnabled = p12.isSpatialUIEnabled
+	local createElement = React.createElement
+	local t9 = {
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundColor3 = BackgroundColor3,
+		BackgroundTransparency = if not FFlagExpChatNewInputBar then p12.transparencyValue:map(function(n2: number) -- line: 99
+			-- upvalues: BackgroundTransparency2 (copy)
+			return BackgroundTransparency2 + n2 * (1 - BackgroundTransparency2)
+		end) else 1,
+		BorderSizePixel = 0,
+		LayoutOrder = p12.LayoutOrder,
+		Size = p12.size,
+		Visible = p12.visible,
+		ZIndex = 2,
+		[React.Event.MouseEnter] = p12.onHovered,
+		[React.Event.MouseLeave] = p12.onUnhovered,
+		[React.Change.AbsoluteSize] = React.useCallback(function(p31) -- line: 1250
+			-- upvalues: TextChatService (copy), p12 (copy)
+			local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+
+			if ChatInputBarConfiguration and p12.onAbsoluteSizeChanged then
+				p12.onAbsoluteSizeChanged(p31, ChatInputBarConfiguration)
+			end
+		end),
+		[React.Change.AbsolutePosition] = React.useCallback(function(p32) -- line: 1256
+			-- upvalues: TextChatService (copy), p12 (copy)
+			local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+
+			if ChatInputBarConfiguration and p12.onAbsolutePositionChanged then
+				p12.onAbsolutePositionChanged(p32, ChatInputBarConfiguration)
+			end
+		end)
+	}
+	local t10 = {
+		AutocompleteDropdown = getEnableChatInputBarConfigurationAutocompleteEnabled() and (not not p12.autocompleteEnabled and React.createElement(AutocompleteDropdown, {
+			chatInputBarSettings = chatInputBarSettings,
+			chatWindowSettings = chatWindowSettings,
+			setTransparency = setTransparency,
+			transparencyValue = p12.transparencyValue,
+			activated = p12.autocompleteDropdownReducer.activated and v110,
+			results = p12.autocompleteDropdownReducer.results,
+			selectedIndex = p12.autocompleteDropdownReducer.selectedIndex,
+			autocompleteType = p12.autocompleteDropdownReducer.autocompleteType,
+			onAutocompleteDropdownHover = v143,
+			onAutocompleteSelected = v135,
+			autocompleteDropdownRef = v121,
+			textBoxRef = if not chatInputBarSettings.TextBox then v117 else v118
+		})) or nil,
+		UISizeConstraint = React.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(Config.ChatWindowMaxWidth, 1e999)
+		}),
+		UIPadding = React.createElement("UIPadding", {
+			PaddingLeft = if not FFlagExpChatNewInputBar then UDim.new(0, 8) else nil,
+			PaddingRight = if not FFlagExpChatNewInputBar then UDim.new(0, 8) else nil,
+			PaddingTop = p12.addTopPadding and UDim.new(0, 8) or UDim.new(0, 0),
+			PaddingBottom = UDim.new(0, 1)
+		}),
+		ChatInputBarV2 = if not FFlagExpChatNewInputBar then nil else if not FFlagExpChatNewInputBarDictation or (not v69 or not v148) then React.createElement(ChatInputBarV2, {
+			transparencyValue = p12.transparencyValue,
+			sendButtonContainerWidth = p12.sendButtonContainerWidth,
+			resetTargetChannel = p12.resetTargetChannel,
+			targetTextChannel = p12.targetTextChannel,
+			targetTextChannelDisplayName = p12.targetTextChannelDisplayName,
+			isChannelBarVisible = p12.isChannelBarVisible,
+			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
+			canLocalUserChat = p12.canLocalUserChat,
+			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
+			placeholderText = p12.placeholderText,
+			setTransparency = setTransparency,
+			chatInputBarSettings = chatInputBarSettings,
+			chatInputBarBackgroundTransparency = BackgroundTransparency,
+			isSpatialUIEnabled = isSpatialUIEnabled,
+			canLocalUserChatDerived = u128,
+			targetChannelWidth = v114,
+			showPlaceholderText = v145,
+			hasEmptyInputText = v144,
+			shouldTruncatePlaceholder = if not FFlagExpChatPresetChatEnabled then nil else v131,
+			cursor = v142,
+			placeholderRef = v120,
+			textBoxRef = v117,
+			customTextBoxRef = v118,
+			onAbsoluteSizeChanged = v141,
+			onFocused = v136,
+			onFocusLost = v137,
+			onTextChanged = v139,
+			onReturnPressedFromOnScreenKeyboard = v140,
+			onSendActivated = v133
+		}) else React.createElement(ChatInputBarV2Dictation, {
+			transparencyValue = p12.transparencyValue,
+			sendButtonContainerWidth = p12.sendButtonContainerWidth,
+			resetTargetChannel = p12.resetTargetChannel,
+			targetTextChannel = p12.targetTextChannel,
+			targetTextChannelDisplayName = p12.targetTextChannelDisplayName,
+			isChannelBarVisible = p12.isChannelBarVisible,
+			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
+			canLocalUserChat = p12.canLocalUserChat,
+			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
+			placeholderText = p12.placeholderText,
+			setTransparency = setTransparency,
+			chatInputBarSettings = chatInputBarSettings,
+			chatInputBarBackgroundTransparency = BackgroundTransparency,
+			isSpatialUIEnabled = isSpatialUIEnabled,
+			canLocalUserChatDerived = u128,
+			targetChannelWidth = v114,
+			showPlaceholderText = v145,
+			hasEmptyInputText = v144,
+			shouldTruncatePlaceholder = if not FFlagExpChatPresetChatEnabled then nil else v131,
+			cursor = v142,
+			placeholderRef = v120,
+			textBoxRef = v117,
+			customTextBoxRef = v118,
+			onAbsoluteSizeChanged = v141,
+			onFocused = v136,
+			onFocusLost = v137,
+			onTextChanged = v139,
+			onReturnPressedFromOnScreenKeyboard = v140,
+			onSendActivated = v133,
+			onSendRecordingTap = v134,
+			onTranscriptionStaged = if not v119 then nil else v119.stageTranscription,
+			inputText = v100,
+			setInputText = v101,
+			isGlobalChatTabActive = p12.isGlobalChatTabActive,
+			onDictationActivityChanged = p12.onDictationActivityChanged
+		})
+	}
+	local v156
+
+	if FFlagExpChatNewInputBar then
+		v156 = nil
+	elseif v69 and v148 then
+		v156 = React.createElement(DictationInputBar, {
+			chatInputBarSettings = chatInputBarSettings,
+			transparencyValue = p12.transparencyValue,
+			chatInputBarBackgroundTransparency = BackgroundTransparency,
+			inputText = v100,
+			setInputText = v101,
+			canLocalUserChat = v148,
+			disabledChatPlaceholderText = p12.disabledChatPlaceholderText,
+			targetChannelWidth = v114,
+			showPlaceholderText = v145,
+			placeholderText = p12.placeholderText,
+			cursor = v142,
+			placeholderRef = if not v63 then nil else v120,
+			textBoxRef = v117,
+			customTextBoxRef = v118,
+			onFocused = v136,
+			onFocusLost = v137,
+			onTextChanged = v139,
+			onReturnPressedFromOnScreenKeyboard = v140,
+			onChannelChipAbsoluteSizeChanged = v141,
+			onChannelChipActivated = p12.resetTargetChannel,
+			targetTextChannel = p12.targetTextChannel,
+			targetTextChannelDisplayName = p12.targetTextChannelDisplayName or "",
+			isChannelBarVisible = p12.isChannelBarVisible,
+			isGlobalChatTabActive = p12.isGlobalChatTabActive,
+			developerChannelTabsEnabled = p12.developerChannelTabsEnabled,
+			onDictationActivityChanged = p12.onDictationActivityChanged,
+			onSendActivated = v133,
+			onSendRecordingTap = v134,
+			onTranscriptionStaged = if not v119 then nil else v119.stageTranscription,
+			isSpatialUIEnabled = isSpatialUIEnabled,
+			isTextBoxSelectable = not not FFlagEnableConsoleExpControls or nil,
+			isPlaceholderSelectable = not not v63 or nil,
+			placeholderSelectionImageObject = if not v63 then nil else v142,
+			selectionBehavior = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
+			selectionGroup = FFlagEnableConsoleExpControls and not FFlagExpChatEnableFocusNavigation or nil
+		})
+	else
+		local createElement2 = React.createElement
+		local t11 = {
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundColor3 = chatInputBarSettings.BackgroundColor3,
+			BackgroundTransparency = if not FFlagExpChatNewInputBar then p12.transparencyValue:map(function(n3: number) -- line: 99
+				-- upvalues: BackgroundTransparency (copy)
+				return BackgroundTransparency + n3 * (1 - BackgroundTransparency)
+			end) else 1,
+			Size = UDim2.new(1, 0, 0, 0)
+		}
+		local t12 = {}
+		local createElement3 = React.createElement
+		local t13 = {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Color = Config.ChatInputBarBorderColor3
+		}
+		local ChatInputBarBorderTransparency = Config.ChatInputBarBorderTransparency
+
+		t13.Transparency = p12.transparencyValue:map(function(n4: number) -- line: 99
+			-- upvalues: ChatInputBarBorderTransparency (copy)
+			return ChatInputBarBorderTransparency + n4 * (1 - ChatInputBarBorderTransparency)
+		end)
+		t12.Border = createElement3("UIStroke", t13)
+		t12.Corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 3)
+		})
+
+		local createElement4 = React.createElement
+		local t14 = {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.fromScale(1, 0)
+		}
+		local t15 = {}
+		local createElement5 = React.createElement
+		local t16 = {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			SelectionBehaviorDown = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
+			SelectionBehaviorLeft = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
+			SelectionBehaviorRight = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
+			SelectionBehaviorUp = if not FFlagEnableConsoleExpControls or FFlagExpChatEnableFocusNavigation then nil else Enum.SelectionBehavior.Stop,
+			SelectionGroup = FFlagEnableConsoleExpControls and not FFlagExpChatEnableFocusNavigation or nil,
+			Size = UDim2.new(1, -p12.sendButtonContainerWidth, 0, 0)
+		}
+		local t17 = {}
+		local createElement6 = React.createElement
+		local v170 = ChannelChip
+		local t18 = {}
+		local n5 = 0
+
+		t18.transparency = p12.transparencyValue:map(function(n6: number) -- line: 99
+			-- upvalues: n5 (copy)
+			return n5 + n6 * (1 - n5)
+		end)
+		t18.onAbsoluteSizeChanged = v141
+		t18.onChannelChipActivated = p12.resetTargetChannel
+		t18.targetTextChannelDisplayName = p12.targetTextChannelDisplayName or ""
+		t18.isChannelBarVisible = p12.isChannelBarVisible
+		t18.developerChannelTabsEnabled = p12.developerChannelTabsEnabled
+		t17.TargetChannelChip = createElement6(v170, t18)
+
+		local v173 = if not FFlagExpChatUseMessagesStore then not p12.canLocalUserChat else not u128
+
+		if v173 then
+			local createElement7 = React.createElement
+			local t19 = {
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				AnchorPoint = Vector2.new(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Font = Config.ChatInputBarFont,
+				Text = p12.disabledChatPlaceholderText,
+				Position = UDim2.fromScale(1, 0),
+				Size = v114:map(function(n7: number) -- line: 1475
+					return UDim2.new(1, -(n7 + 8), 0, 0)
+				end),
+				TextColor3 = v145 and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3,
+				TextSize = if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize
+			}
+			local v176 = not v145 and 0 or 0.5
+
+			t19.TextTransparency = p12.transparencyValue:map(function(n8: number) -- line: 99
+				-- upvalues: v176 (copy)
+				return v176 + n8 * (1 - v176)
+			end)
+			t19.Selectable = not not v63 or nil
+			t19.SelectionImageObject = if not v63 then nil else v142
+			t19.TextXAlignment = Enum.TextXAlignment.Left
+			t19.TextYAlignment = Enum.TextYAlignment.Top
+			t19.ref = if not v63 then nil else v120
+			v173 = createElement7("TextLabel", t19)
+		end
+
+		t17.DisabledPlaceholderLabel = v173
+
+		local v177 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u128
+
+		if v177 then
+			local createElement8 = React.createElement
+			local t20 = {
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Position = UDim2.fromScale(1, 0),
+				Size = v114:map(function(n9: number) -- line: 1503
+					return UDim2.new(1, -(n9 + 8), 0, 0)
+				end)
+			}
+			local t21 = {}
+			local v181 = if not FFlagExpChatUseMessagesStore then p12.canLocalUserChat else u128
+
+			if v181 then
+				local createElement9 = React.createElement
+				local t22 = {
+					AnchorPoint = Vector2.new(0, 0),
+					AutomaticSize = Enum.AutomaticSize.XY,
+					BackgroundTransparency = 1,
+					ClearTextOnFocus = false,
+					FontFace = chatInputBarSettings.FontFace,
+					PlaceholderText = v145 and p12.placeholderText or "",
+					Selectable = not not FFlagEnableConsoleExpControls or nil,
+					SelectionImageObject = v142,
+					Size = UDim2.fromScale(1, 0),
+					Text = "",
+					PlaceholderColor3 = chatInputBarSettings.PlaceholderColor3,
+					TextColor3 = chatInputBarSettings.TextColor3,
+					TextSize = if not isSpatialUIEnabled then chatInputBarSettings.TextSize else chatInputBarSettings.SpatialPanelTextSize
+				}
+				local v184 = not v145 and 0 or 0.5
+
+				t22.TextTransparency = p12.transparencyValue:map(function(n10: number) -- line: 99
+					-- upvalues: v184 (copy)
+					return v184 + n10 * (1 - v184)
+				end)
+
+				local TextStrokeTransparency = chatInputBarSettings.TextStrokeTransparency
+
+				t22.TextStrokeTransparency = p12.transparencyValue:map(function(n11: number) -- line: 99
+					-- upvalues: TextStrokeTransparency (copy)
+					return TextStrokeTransparency + n11 * (1 - TextStrokeTransparency)
+				end)
+				t22.TextStrokeColor3 = chatInputBarSettings.TextStrokeColor3
+				t22.TextWrapped = true
+				t22.TextXAlignment = Enum.TextXAlignment.Left
+				t22.TextYAlignment = Enum.TextYAlignment.Top
+				t22.ZIndex = 2
+				t22[React.Event.Focused] = v136
+				t22[React.Event.FocusLost] = v137
+				t22[React.Change.Text] = v139
+				t22[React.Event.ReturnPressedFromOnScreenKeyboard] = v140
+				t22.ref = if not chatInputBarSettings.TextBox then v117 else v118
+				v181 = createElement9("TextBox", t22)
+			end
+
+			t21.TextBox = v181
+			v177 = createElement8("Frame", t20, t21)
+		end
+
+		t17.TextBoxContainer = v177
+		t17.UIPadding = React.createElement("UIPadding", {
+			PaddingBottom = UDim.new(0, 10),
+			PaddingLeft = UDim.new(0, 10),
+			PaddingRight = UDim.new(0, 10),
+			PaddingTop = UDim.new(0, 10)
+		})
+		t15.TextContainer = createElement5("Frame", t16, t17)
+
+		local createElement10 = React.createElement
+		local t23 = {
+			AnchorPoint = Vector2.new(1, 0),
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Position = UDim2.fromScale(1, 0),
+			Selectable = not FFlagExpChatEnableFocusNavigation and nil,
+			Size = UDim2.new(0, p12.sendButtonContainerWidth, 1, 0),
+			Text = "",
+			[React.Event.Activated] = v133
+		}
+		local t24 = {
+			Layout = React.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			})
+		}
+		local createElement11 = React.createElement
+		local v190 = ImageSetLabel
+		local t25 = {
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			ImageColor3 = v144 and chatInputBarSettings.PlaceholderColor3 or chatInputBarSettings.TextColor3
+		}
+		local v192 = not v144 and 0 or 0.5
+
+		t25.ImageTransparency = p12.transparencyValue:map(function(n12: number) -- line: 99
+			-- upvalues: v192 (copy)
+			return v192 + n12 * (1 - v192)
+		end)
+		t25.Image = Images["icons/actions/send"]
+		t25.Size = UDim2.new(0, 30, 0, 30)
+		t24.SendIcon = createElement11(v190, t25)
+		t15.SendButton = createElement10("TextButton", t23, t24)
+		t12.Container = createElement4("Frame", t14, t15)
+		v156 = createElement2("Frame", t11, t12)
+	end
+
+	t10.Background = v156
+
+	return createElement("Frame", t9, t10)
+end
+
+local v83 = Localization.connect(function(p33) -- line: 1588
+	-- upvalues: getOtherDisplayNameInWhisperChannel (copy)
+	local t27 = nil
+
+	if p33.targetTextChannel then
+		local t26 = {
+			RBXTeam = "CoreScripts.TextChat.TeamChat.PrefixText",
+			RBXWhisper = "CoreScripts.TextChat.WhisperChat.PrefixText.Outgoing"
+		}
+
+		for k, v in pairs(t26) do
+			if string.match(p33.targetTextChannel.Name, k) then
+				if k == "RBXWhisper" then
+					local v198 = getOtherDisplayNameInWhisperChannel(p33.targetTextChannel, p33.localPlayer)
+
+					if v198 then
+						t27 = {
+							v,
+							{
+								RBX_NAME = v198
+							}
+						}
+					end
+				else
+					t27 = v
+				end
+			end
+		end
+	end
+
+	return {
+		targetTextChannelDisplayName = t27
+	}
+end)(ChatInputBar)
+
+return React.memo(v83)

@@ -1,32 +1,41 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.util.pcallDeferred);
-local v4 = require(l_Parent_0.Analytics);
-return function(v5, v6, v7) --[[ Line: 10 ]] --[[ Name: validateMeshVertexColors ]]
-    -- upvalues: v3 (copy), l_UGCValidationService_0 (copy), v4 (copy)
-    local v8 = tick();
-    local l_isServer_0 = v7.isServer;
-    local v10, v11 = v3(function() --[[ Line: 19 ]]
-        -- upvalues: l_UGCValidationService_0 (ref), v5 (copy), v6 (copy)
-        return l_UGCValidationService_0:ValidateEditableMeshVertColors(v5.editableMesh, v6);
-    end, v7);
-    if not v10 then
-        v4.reportFailure(v4.ErrorType.validateMeshVertexColors_FailedToLoadMesh, nil, v7);
-        local v12 = string.format("Failed to load vertex color map for model mesh %s. Make sure it exists and try again.", v5.fullName);
-        if l_isServer_0 ~= nil and l_isServer_0 then
-            error(v12);
-        end;
-        return false, {
-            v12
-        };
-    elseif not v11 then
-        v4.reportFailure(v4.ErrorType.validateMeshVertexColors_NonNeutralVertexColors, nil, v7);
-        return false, {
-            string.format("Invalid vertex color found in mesh model '%s'. You need to edit the color map to be all white %s and try again.", v5.fullName, v6 and "with no transarency" or "")
-        };
-    else
-        v4.recordScriptTime(script.Name, v8, v7);
-        return true;
-    end;
-end;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local Analytics = require(ParentParent.Analytics)
+
+local function validateMeshVertexColors(p1, b1: boolean, p2) -- line: 10
+	-- upvalues: pcallDeferred (copy), UGCValidationService (copy), Analytics (copy)
+	local timestamp = tick()
+	local isServer = p2.isServer
+	local v11, v12 = pcallDeferred(function() -- line: 19
+		-- upvalues: UGCValidationService (copy), p1 (copy), b1 (copy)
+		return UGCValidationService:ValidateEditableMeshVertColors(p1.editableMesh, b1)
+	end, p2)
+
+	if not v11 then
+		Analytics.reportFailure(Analytics.ErrorType.validateMeshVertexColors_FailedToLoadMesh, nil, p2)
+
+		local v13 = string.format("Failed to load vertex color map for model mesh %s. Make sure it exists and try again.", p1.fullName)
+
+		if isServer ~= nil and isServer then
+			error(v13)
+		end
+
+		return false, { v13 }
+	end
+
+	if not v12 then
+		Analytics.reportFailure(Analytics.ErrorType.validateMeshVertexColors_NonNeutralVertexColors, nil, p2)
+
+		return false, { string.format("Invalid vertex color found in mesh model '%s'. You need to edit the color map to be all white %s and try again.", p1.fullName, not b1 and "" or "with no transarency") }
+	end
+
+	Analytics.recordScriptTime(script.Name, timestamp, p2)
+
+	return true
+end
+
+return validateMeshVertexColors

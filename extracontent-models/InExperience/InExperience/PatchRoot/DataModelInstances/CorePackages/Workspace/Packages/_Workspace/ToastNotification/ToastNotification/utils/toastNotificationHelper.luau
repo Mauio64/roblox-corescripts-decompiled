@@ -1,244 +1,271 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.type);
-local v4 = require(l_Parent_0.constants);
-local v5 = require(l_Parent_0.dependencies);
-local v6 = require(l_Parent_0.Logger);
-local l_Cryo_0 = v5.Cryo;
-local l_TimeTrigger_0 = v5.ToastNotificationProtocolEnums.TimeTrigger;
-local function v10(v9) --[[ Line: 21 ]]
-    -- upvalues: v3 (copy)
-    if v9.X > v9.Y then
-        return v3.DeviceOrientationEnum.Landscape;
-    else
-        return v3.DeviceOrientationEnum.Portrait;
-    end;
-end;
-local function v13(v11, v12) --[[ Line: 27 ]]
-    -- upvalues: v4 (copy)
-    if v12 < v4.FullWidthDeviceThreshold then
-        return UDim2.new(0, v12 - 24, 0, 0);
-    elseif v11 then
-        if v12 < v4.CompactCardThreashold then
-            return UDim2.new(0, v4.InExperienceToastWidth, 0, 0);
-        else
-            return UDim2.new(0, v4.InAppToastWidth, 0, 0);
-        end;
-    else
-        return UDim2.new(0, v4.InAppToastWidth, 0, 0);
-    end;
-end;
-local function _(v14, v15) --[[ Line: 41 ]]
-    if v14 then
-        table.insert(v14, v15);
-        return v14;
-    else
-        return {
-            v15
-        };
-    end;
-end;
-local function _(v17) --[[ Line: 53 ]]
-    if v17.button ~= nil then
-        return "button";
-    elseif v17.textBody ~= nil then
-        return "textBody";
-    elseif v17.thumbnail ~= nil then
-        return "thumbnail";
-    elseif v17.metaAction ~= nil then
-        return "metaAction";
-    elseif v17.singleMetaAction ~= nil then
-        return "singleMetaAction";
-    else
-        return "unknown";
-    end;
-end;
-local function v27(v19) --[[ Line: 68 ]]
-    if v19 then
-        local v20 = {
-            button = nil, 
-            textBody = nil, 
-            thumbnail = nil, 
-            metaAction = nil, 
-            singleMetaAction = nil
-        };
-        for _, v22 in ipairs(v19.visualItems) do
-            local v23 = v22.button ~= nil and "button" or v22.textBody ~= nil and "textBody" or v22.thumbnail ~= nil and "thumbnail" or v22.metaAction ~= nil and "metaAction" or v22.singleMetaAction ~= nil and "singleMetaAction" or "unknown";
-            if v23 ~= "unknown" then
-                local v24 = v20[v23];
-                local v25 = v22[v23];
-                local v26;
-                if v24 then
-                    table.insert(v24, v25);
-                    v26 = v24;
-                else
-                    v26 = {
-                        v25
-                    };
-                end;
-                v20[v23] = v26;
-            end;
-        end;
-        return {
-            layoutKey = v19.layoutKey, 
-            name = v19.name, 
-            timeOnScreenMs = v19.timeOnScreenMs, 
-            visualItems = v20
-        };
-    else
-        return nil;
-    end;
-end;
-local function v30(v28) --[[ Line: 95 ]]
-    -- upvalues: v27 (copy)
-    local v29 = {
-        currentState = v28.content.currentState, 
-        notificationType = v28.content.notificationType, 
-        id = v28.content.id, 
-        priority = v28.content.priority, 
-        clientEventsPayload = v28.content.clientEventsPayload, 
-        deliverTimestamp = v28.deliverTimestamp, 
-        notificationReceivedTimestampMs = v28.notificationReceivedTimestampMs, 
-        timers = v28.content.timers, 
-        luaNotifInfo = v28.luaNotifInfo
-    };
-    if v28.content.states then
-        v29.state = v27(v28.content.states[v28.content.currentState]);
-    end;
-    return v29;
-end;
-local function v32(v31) --[[ Line: 118 ]]
-    -- upvalues: v3 (copy)
-    if v31 == v3.DeviceOrientationEnum.Landscape then
-        return true;
-    else
-        return false;
-    end;
-end;
-local v33 = {
-    positionX = 1, 
-    positionXOffset = -5, 
-    positionY = 0, 
-    anchorX = 1, 
-    anchorY = 0
-};
-local v34 = {
-    positionX = 1, 
-    positionXOffset = 20, 
-    positionY = 0, 
-    anchorX = 0, 
-    anchorY = 0
-};
-local v35 = {
-    positionX = 0.5, 
-    positionXOffset = 0, 
-    positionY = 0, 
-    anchorX = 0.5, 
-    anchorY = 0
-};
-local v36 = {
-    positionX = 0.5, 
-    positionXOffset = 0, 
-    positionY = 0, 
-    anchorX = 0.5, 
-    anchorY = 1
-};
+local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local type = require(ParentParent.type)
+local constants = require(ParentParent.constants)
+local dependencies = require(ParentParent.dependencies)
+local Logger = require(ParentParent.Logger)
+local Cryo = dependencies.Cryo
+local TimeTrigger = dependencies.ToastNotificationProtocolEnums.TimeTrigger
+local FFlagFriendshipNotifsUseSendrExperiment = require(ParentParentParent.SharedFlags).FFlagFriendshipNotifsUseSendrExperiment
+
+local function v12(p1) -- line: 70
+	if p1 then
+		local t1 = {
+			button = nil,
+			textBody = nil,
+			thumbnail = nil,
+			metaAction = nil,
+			singleMetaAction = nil
+		}
+
+		for _, v in ipairs(p1.visualItems) do
+			local v29 = if v.button == nil then if v.textBody == nil then if v.thumbnail == nil then if v.metaAction == nil then v.singleMetaAction == nil and "unknown" or "singleMetaAction" else "metaAction" else "thumbnail" else "textBody" else "button"
+
+			if v29 ~= "unknown" then
+				local v30 = t1[v29]
+				local v31 = v[v29]
+
+				if v30 then
+					table.insert(v30, v31)
+				else
+					v30 = { v31 }
+				end
+
+				t1[v29] = v30
+			end
+		end
+
+		return {
+			layoutKey = p1.layoutKey,
+			name = p1.name,
+			timeOnScreenMs = p1.timeOnScreenMs,
+			visualItems = t1
+		}
+	end
+
+	return nil
+end
+
+local t2 = {
+	positionX = 1,
+	positionXOffset = -5,
+	positionY = 0,
+	anchorX = 1,
+	anchorY = 0
+}
+local t3 = {
+	positionX = 1,
+	positionXOffset = 20,
+	positionY = 0,
+	anchorX = 0,
+	anchorY = 0
+}
+local t4 = {
+	positionX = 0.5,
+	positionXOffset = 0,
+	positionY = 0,
+	anchorX = 0.5,
+	anchorY = 0
+}
+local t5 = {
+	positionX = 0.5,
+	positionXOffset = 0,
+	positionY = 0,
+	anchorX = 0.5,
+	anchorY = 1
+}
+local vector2 = Vector2.new(800, 600)
+
+local function v18(b1: boolean, b2: boolean?, vector2_2: Vector2) -- line: 176
+	-- upvalues: constants (copy)
+	local NotificationRightInset = constants.FRRToastPosition.NotificationRightInset
+	local v44 = vector2_2.Y * (constants.FRRToastPosition.NotificationFrameTopScale + constants.FRRToastPosition.NotificationFrameHeightScale) - NotificationRightInset - vector2_2.Y
+	local v45 = -constants.FRRToastPosition.NotificationRightInset
+	local t6 = {
+		positionX = 1,
+		positionY = 1,
+		anchorX = 1,
+		anchorY = 1,
+		positionXOffset = v45,
+		positionYOffset = v44
+	}
+	local t7 = {
+		positionX = 1,
+		positionXOffset = 20,
+		positionY = 1,
+		anchorX = 0,
+		anchorY = 1,
+		positionYOffset = v44
+	}
+
+	if b1 then
+		return t6
+	end
+
+	if b2 then
+		return t6
+	end
+
+	return t7
+end
+
 return {
-    calculateToastPosition = function(v37, v38, v39, v40) --[[ Line: 154 ]]
-        -- upvalues: l_GuiService_0 (copy), l_Cryo_0 (copy), v33 (copy), v35 (copy), v34 (copy), v36 (copy)
-        local v41 = if l_GuiService_0 then l_GuiService_0:GetGuiInset() else Vector2.new(0, 0);
-        local v42 = if l_GuiService_0 then v41.Y + 20 else 60;
-        if v37 then
-            if v38 then
-                return l_Cryo_0.Dictionary.union(v33, {
-                    positionYOffset = v39
-                });
-            else
-                return l_Cryo_0.Dictionary.union(v35, {
-                    positionYOffset = v39 + v41.Y
-                });
-            end;
-        elseif v38 then
-            if v40 then
-                return l_Cryo_0.Dictionary.union(v33, {
-                    positionYOffset = v39
-                });
-            else
-                return l_Cryo_0.Dictionary.union(v34, {
-                    positionYOffset = v39
-                });
-            end;
-        elseif v40 then
-            return l_Cryo_0.Dictionary.union(v35, {
-                positionYOffset = v39 + v41.Y
-            });
-        else
-            return l_Cryo_0.Dictionary.union(v36, {
-                positionYOffset = -1 * v42
-            });
-        end;
-    end, 
-    calculateTimeRemaining = function(v43, v44, v45) --[[ Line: 243 ]] --[[ Name: calculateTimeRemaining ]]
-        -- upvalues: l_TimeTrigger_0 (copy)
-        v44 = v44 or DateTime.now().UnixTimestampMillis;
-        v45 = v45 or DateTime.now().UnixTimestampMillis;
-        local v46 = 0;
-        if v43.trigger == l_TimeTrigger_0.OnReceive then
-            v46 = v43.timespanMs - (DateTime.now().UnixTimestampMillis - v44);
-        elseif v43.trigger == l_TimeTrigger_0.OnDisplay then
-            v46 = v43.timespanMs - (DateTime.now().UnixTimestampMillis - v45);
-        end;
-        return (math.max(v46, 0));
-    end, 
-    getDeviceOrientation = v10, 
-    getNotificationSize = v13, 
-    marshalNotificationData = v30, 
-    isToastToRight = v32, 
-    isDesktopDevice = function() --[[ Line: 197 ]]
-        -- upvalues: l_UserInputService_0 (copy)
-        local l_None_0 = Enum.Platform.None;
-        pcall(function() --[[ Line: 199 ]]
-            -- upvalues: l_None_0 (ref), l_UserInputService_0 (ref)
-            l_None_0 = l_UserInputService_0:GetPlatform();
-        end);
-        local v48 = true;
-        if l_None_0 ~= Enum.Platform.Windows then
-            v48 = true;
-            if l_None_0 ~= Enum.Platform.OSX then
-                v48 = l_None_0 == Enum.Platform.UWP;
-            end;
-        end;
-        return v48;
-    end, 
-    getNearestWholeNumber = function(v49) --[[ Line: 210 ]] --[[ Name: getNearestWholeNumber ]]
-        if v49 % 1 < 0.5 then
-            return (math.floor(v49));
-        else
-            return (math.ceil(v49));
-        end;
-    end, 
-    getTimerFromCardData = function(v50, v51) --[[ Line: 225 ]] --[[ Name: getTimerFromCardData ]]
-        -- upvalues: v6 (copy), l_TimeTrigger_0 (copy)
-        if v50 and v50.timers and v50.timers[v51] then
-            return v50.timers[v51];
-        else
-            v6:warning("timerKey {} not found in list of timers. Using default.", v51);
-            return {
-                timespanMs = 0, 
-                trigger = l_TimeTrigger_0.OnDisplay
-            };
-        end;
-    end, 
-    fireEvent = function(v52, v53) --[[ Line: 191 ]]
-        v52.sendEventDeferred("ToastNotification", "toastNotificationClientEvent", v53);
-    end, 
-    isUserThumbnail = function(v54) --[[ Line: 262 ]]
-        -- upvalues: v3 (copy)
-        local v55 = true;
-        if v54.idType ~= v3.SENDERThumbnailTypeEnum.User then
-            v55 = v54.idType == v3.SENDERThumbnailTypeEnum.AvatarImageUrl;
-        end;
-        return v55;
-    end
-};
+	calculateToastPosition = function(b3: boolean, b4: boolean, n1: number, b5: boolean?, s1: string?, vector2_3: Vector2?) -- line: 210
+		-- upvalues: FFlagFriendshipNotifsUseSendrExperiment (copy), vector2 (copy), v18 (copy), GuiService (copy), Cryo (copy), t2 (copy), t4 (copy), t3 (copy), t5 (copy)
+		if FFlagFriendshipNotifsUseSendrExperiment and s1 == "legacyBottomRight" then
+			local v54 = vector2_3 or (workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or vector2)
+
+			return (v18(b3, b5, v54))
+		end
+
+		local v55 = if not GuiService then Vector2.new(0, 0) else GuiService:GetGuiInset()
+		local v56 = not GuiService and 60 or v55.Y + 20
+
+		if b3 then
+			if b4 then
+				return Cryo.Dictionary.union(t2, {
+					positionYOffset = n1
+				})
+			end
+
+			return Cryo.Dictionary.union(t4, {
+				positionYOffset = n1 + v55.Y
+			})
+		end
+
+		if b4 then
+			if b5 then
+				return Cryo.Dictionary.union(t2, {
+					positionYOffset = n1
+				})
+			end
+
+			return Cryo.Dictionary.union(t3, {
+				positionYOffset = n1
+			})
+		end
+
+		if b5 then
+			return Cryo.Dictionary.union(t4, {
+				positionYOffset = n1 + v55.Y
+			})
+		end
+
+		return Cryo.Dictionary.union(t5, {
+			positionYOffset = -1 * v56
+		})
+	end,
+	getNotificationScript2LegacyToastOffsets = if not FFlagFriendshipNotifsUseSendrExperiment then nil else function(vector2_4: Vector2) -- line: 169
+		-- upvalues: constants (copy)
+		local NotificationRightInset = constants.FRRToastPosition.NotificationRightInset
+		local v39 = vector2_4.Y * (constants.FRRToastPosition.NotificationFrameTopScale + constants.FRRToastPosition.NotificationFrameHeightScale) - NotificationRightInset - vector2_4.Y
+
+		return -constants.FRRToastPosition.NotificationRightInset, v39
+	end,
+	calculateTimeRemaining = function(p2, n2: number?, n3: number?) -- line: 307
+		-- upvalues: TimeTrigger (copy)
+		local v66 = n2 or DateTime.now().UnixTimestampMillis
+		local v67 = n3 or DateTime.now().UnixTimestampMillis
+		local n4 = 0
+
+		if p2.trigger == TimeTrigger.OnReceive then
+			n4 = p2.timespanMs - (DateTime.now().UnixTimestampMillis - v66)
+		elseif p2.trigger == TimeTrigger.OnDisplay then
+			n4 = p2.timespanMs - (DateTime.now().UnixTimestampMillis - v67)
+		end
+
+		return (math.max(n4, 0))
+	end,
+	getDeviceOrientation = function(vector2_5: Vector2) -- line: 23
+		-- upvalues: type (copy)
+		if vector2_5.X > vector2_5.Y then
+			return type.DeviceOrientationEnum.Landscape
+		end
+
+		return type.DeviceOrientationEnum.Portrait
+	end,
+	getNotificationSize = function(b6: boolean, n5: number) -- line: 29
+		-- upvalues: constants (copy)
+		if n5 < constants.FullWidthDeviceThreshold then
+			return UDim2.new(0, n5 - 24, 0, 0)
+		end
+
+		if b6 then
+			if n5 < constants.CompactCardThreashold then
+				return UDim2.new(0, constants.InExperienceToastWidth, 0, 0)
+			end
+
+			return UDim2.new(0, constants.InAppToastWidth, 0, 0)
+		end
+
+		return UDim2.new(0, constants.InAppToastWidth, 0, 0)
+	end,
+	marshalNotificationData = function(p3) -- line: 97
+		-- upvalues: v12 (copy)
+		local t8 = {
+			currentState = p3.content.currentState,
+			notificationType = p3.content.notificationType,
+			id = p3.content.id,
+			priority = p3.content.priority,
+			clientEventsPayload = p3.content.clientEventsPayload,
+			deliverTimestamp = p3.deliverTimestamp,
+			notificationReceivedTimestampMs = p3.notificationReceivedTimestampMs,
+			timers = p3.content.timers,
+			luaNotifInfo = p3.luaNotifInfo
+		}
+
+		if p3.content.states then
+			t8.state = v12(p3.content.states[p3.content.currentState])
+		end
+
+		return t8
+	end,
+	isToastToRight = function(p4) -- line: 120
+		-- upvalues: type (copy)
+		if p4 == type.DeviceOrientationEnum.Landscape then
+			return true
+		end
+
+		return false
+	end,
+	isDesktopDevice = function() -- line: 261
+		-- upvalues: UserInputService (copy)
+		local None = Enum.Platform.None
+
+		pcall(function() -- line: 263
+			-- upvalues: None (ref), UserInputService (copy)
+			None = UserInputService:GetPlatform()
+		end)
+
+		return None == Enum.Platform.Windows or (None == Enum.Platform.OSX or None == Enum.Platform.UWP)
+	end,
+	getNearestWholeNumber = function(n6: number) -- line: 274
+		if n6 % 1 < 0.5 then
+			return (math.floor(n6))
+		end
+
+		return (math.ceil(n6))
+	end,
+	getTimerFromCardData = function(p5, s2: string) -- line: 289
+		-- upvalues: Logger (copy), TimeTrigger (copy)
+		if p5 and (p5.timers and p5.timers[s2]) then
+			return p5.timers[s2]
+		end
+
+		Logger:warning("timerKey {} not found in list of timers. Using default.", s2)
+
+		return {
+			timespanMs = 0,
+			trigger = TimeTrigger.OnDisplay
+		}
+	end,
+	fireEvent = function(p6, t9: {[any]: any}?) -- line: 255
+		p6.sendEventDeferred("ToastNotification", "toastNotificationClientEvent", t9)
+	end,
+	isUserThumbnail = function(p7) -- line: 326
+		-- upvalues: type (copy)
+		return p7.idType == type.SENDERThumbnailTypeEnum.User or p7.idType == type.SENDERThumbnailTypeEnum.AvatarImageUrl
+	end
+}

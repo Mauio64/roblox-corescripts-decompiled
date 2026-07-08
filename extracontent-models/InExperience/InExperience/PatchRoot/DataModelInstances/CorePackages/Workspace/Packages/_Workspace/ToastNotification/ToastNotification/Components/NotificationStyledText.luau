@@ -1,92 +1,109 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_useStyle_0 = v1.UIBlox.Core.Style.useStyle;
-local _ = require(l_Parent_0.type);
-local l_React_0 = v1.React;
-local v6 = {
-    highlight = function(v5) --[[ Line: 44 ]] --[[ Name: highlight ]]
-        return "<b>" .. v5 .. "</b>";
-    end
-};
-local function v25(v7) --[[ Line: 49 ]] --[[ Name: formatString ]]
-    -- upvalues: v6 (copy)
-    local l_text_0 = v7.text;
-    local l_styledElements_0 = v7.styledElements;
-    local v10 = {
-        {
-            Position = 0, 
-            ReferenceCount = 0, 
-            Format = "highlight"
-        }, 
-        {
-            Position = #v7.text, 
-            ReferenceCount = 0, 
-            Format = "highlight"
-        }
-    };
-    if l_styledElements_0 then
-        for _, v12 in pairs(l_styledElements_0) do
-            table.insert(v10, {
-                Position = v12.offset, 
-                ReferenceCount = 1, 
-                Format = v12.styledElementType
-            });
-            table.insert(v10, {
-                Position = v12.offset + v12.length, 
-                ReferenceCount = -1, 
-                Format = v12.styledElementType
-            });
-        end;
-    end;
-    table.sort(v10, function(v13, v14) --[[ Line: 84 ]]
-        return v13.Position < v14.Position;
-    end);
-    local v15 = {};
-    for v16 in pairs(v6) do
-        v15[v16] = 0;
-    end;
-    local v17 = "";
-    for v18 = 1, #v10 - 1 do
-        local v19 = v10[v18];
-        local v20 = v10[v18 + 1];
-        if v19.Format then
-            local l_Format_0 = v19.Format;
-            v15[l_Format_0] = v15[l_Format_0] + v19.ReferenceCount;
-        end;
-        if v19.Position ~= v20.Position then
-            local v22 = l_text_0:sub(v19.Position + 1, v20.Position);
-            for v23, v24 in pairs(v6) do
-                if v15[v23] > 0 then
-                    v22 = v24(v22);
-                end;
-            end;
-            v17 = v17 .. v22;
-        end;
-    end;
-    return v17;
-end;
-return function(v26) --[[ Line: 115 ]]
-    -- upvalues: l_useStyle_0 (copy), v25 (copy), l_React_0 (copy)
-    local v27 = l_useStyle_0();
-    local v28 = if v26.Text then v25(v26.Text) else "";
-    return l_React_0.createElement("TextLabel", {
-        RichText = true, 
-        Text = v28, 
-        BackgroundTransparency = 1, 
-        TextColor3 = v26.TextColor3 or v27.Theme.TextDefault.Color, 
-        TextTransparency = v26.TextTransparency or v27.Theme.TextDefault.Transparency, 
-        Font = v26.Font or v27.Font.Body.Font, 
-        AutomaticSize = v26.AutomaticSize, 
-        Size = v26.Size, 
-        TextSize = v26.TextSize, 
-        Position = v26.Position, 
-        AnchorPoint = v26.AnchorPoint, 
-        TextXAlignment = v26.TextXAlignment, 
-        TextTruncate = Enum.TextTruncate.AtEnd, 
-        TextWrapped = true
-    }, {
-        UISizeConstraint = if v26.MaxSize then l_React_0.createElement("UISizeConstraint", {
-            MaxSize = v26.MaxSize
-        }) else nil
-    });
-end;
+local ParentParent = script.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local useStyle = dependencies.UIBlox.Core.Style.useStyle
+
+require(ParentParent.type)
+
+local React = dependencies.React
+local t1 = {
+	highlight = function(s1: string) -- line: 44
+		return "<b>" .. s1 .. "</b>"
+	end
+}
+
+local function formatString(p1) -- line: 49
+	-- upvalues: t1 (copy)
+	local text = p1.text
+	local styledElements = p1.styledElements
+	local t2 = {
+		{
+			Position = 0,
+			ReferenceCount = 0,
+			Format = "highlight"
+		},
+		{
+			ReferenceCount = 0,
+			Format = "highlight",
+			Position = #p1.text
+		}
+	}
+
+	if styledElements then
+		for _, v in pairs(styledElements) do
+			table.insert(t2, {
+				ReferenceCount = 1,
+				Position = v.offset,
+				Format = v.styledElementType
+			})
+			table.insert(t2, {
+				ReferenceCount = -1,
+				Position = v.offset + v.length,
+				Format = v.styledElementType
+			})
+		end
+	end
+
+	table.sort(t2, function(p2, p3) -- line: 84
+		return p2.Position < p3.Position
+	end)
+
+	local t3 = {}
+
+	for k in pairs(t1) do
+		t3[k] = 0
+	end
+
+	local s2 = ""
+
+	for i = 1, #t2 - 1 do
+		local v18 = t2[i]
+		local v19 = t2[i + 1]
+
+		if v18.Format then
+			local Format = v18.Format
+
+			t3[Format] = t3[Format] + v18.ReferenceCount
+		end
+
+		if v18.Position ~= v19.Position then
+			local v21 = text:sub(v18.Position + 1, v19.Position)
+
+			for k, v in pairs(t1) do
+				if t3[k] > 0 then
+					v21 = v(v21)
+				end
+			end
+
+			s2 ..= v21
+		end
+	end
+
+	return s2
+end
+
+return function(t4: {[any]: any}) -- line: 115
+	-- upvalues: useStyle (copy), formatString (copy), React (copy)
+	local v25 = useStyle()
+	local v26 = not t4.Text and "" or formatString(t4.Text)
+
+	return React.createElement("TextLabel", {
+		RichText = true,
+		BackgroundTransparency = 1,
+		TextWrapped = true,
+		Text = v26,
+		TextColor3 = t4.TextColor3 or v25.Theme.TextDefault.Color,
+		TextTransparency = t4.TextTransparency or v25.Theme.TextDefault.Transparency,
+		Font = t4.Font or v25.Font.Body.Font,
+		AutomaticSize = t4.AutomaticSize,
+		Size = t4.Size,
+		TextSize = t4.TextSize,
+		Position = t4.Position,
+		AnchorPoint = t4.AnchorPoint,
+		TextXAlignment = t4.TextXAlignment,
+		TextTruncate = Enum.TextTruncate.AtEnd
+	}, {
+		UISizeConstraint = if not t4.MaxSize then nil else React.createElement("UISizeConstraint", {
+			MaxSize = t4.MaxSize
+		})
+	})
+end

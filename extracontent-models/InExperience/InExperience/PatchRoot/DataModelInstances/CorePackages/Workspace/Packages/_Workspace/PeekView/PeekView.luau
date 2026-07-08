@@ -1,15 +1,16 @@
-local v0 = require(script.PeekViewState);
-local v1 = require(script.PeekView);
-local v2 = require(script.PeekViewWithTopBar);
-local v3 = require(script.analytics.peekViewDismissedEvent);
-local v4 = require(script.Scrim);
+local PeekViewState = require(script.PeekViewState)
+local PeekView = require(script.PeekView)
+local PeekViewWithTopBar = require(script.PeekViewWithTopBar)
+local peekViewDismissedEvent = require(script.analytics.peekViewDismissedEvent)
+local Scrim = require(script.Scrim)
+
 return {
-    analytics = {
-        peekViewDismissedEvent = v3
-    }, 
-    ["jest.config"] = script["jest.config"], 
-    PeekViewState = v0, 
-    PeekView = v1, 
-    PeekViewWithTopBar = v2, 
-    Scrim = v4
-};
+	analytics = {
+		peekViewDismissedEvent = peekViewDismissedEvent
+	},
+	["jest.config"] = script["jest.config"],
+	PeekViewState = PeekViewState,
+	PeekView = PeekView,
+	PeekViewWithTopBar = PeekViewWithTopBar,
+	Scrim = Scrim
+}

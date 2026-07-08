@@ -1,1 +1,1 @@
-return game:DefineFastFlag("BlendedSerpUserPresenceInLineEnabled", false);
+return game:DefineFastFlag("BlendedSerpUserPresenceInLineEnabled", false)

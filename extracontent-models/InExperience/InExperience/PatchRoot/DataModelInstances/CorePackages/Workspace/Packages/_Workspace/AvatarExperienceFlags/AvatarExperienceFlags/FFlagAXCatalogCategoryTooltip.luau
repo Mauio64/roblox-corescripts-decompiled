@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogCategoryTooltip", false);
+return game:DefineFastFlag("AXCatalogCategoryTooltip", false)

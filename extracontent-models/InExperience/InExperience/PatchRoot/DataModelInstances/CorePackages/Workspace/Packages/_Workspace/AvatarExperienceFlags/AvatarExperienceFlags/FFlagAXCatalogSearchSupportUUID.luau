@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXHttpCatalogV2SearchItemDetails) and game:DefineFastFlag("AXCatalogSearchSupportUUID2", false);
+return game:DefineFastFlag("AXCatalogSearchSupportUUID2", false)

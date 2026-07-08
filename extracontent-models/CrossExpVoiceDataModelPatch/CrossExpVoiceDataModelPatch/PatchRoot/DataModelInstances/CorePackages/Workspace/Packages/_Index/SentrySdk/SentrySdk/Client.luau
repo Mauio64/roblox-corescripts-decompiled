@@ -1,334 +1,375 @@
-local v0 = require(script.Parent.RobloxTransport);
-local v1 = require(script.Parent.Version);
-local v2 = game:GetService("RunService"):IsStudio();
-local function _() --[[ Line: 8 ]] --[[ Name: isBundled ]]
-    return type(_G.LUAUFORGE_BUNDLED_FILE_PATH) == "string";
-end;
-local function _(v4) --[[ Line: 13 ]] --[[ Name: isTableEmpty ]]
-    return next(v4) == nil;
-end;
-local function _(v6, v7) --[[ Line: 18 ]] --[[ Name: parseJSON ]]
-    if type(v7) ~= "string" then
-        return nil, "Input is not a string";
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 23 ]]
-            -- upvalues: v6 (copy), v7 (copy)
-            return v6:JSONDecode(v7);
-        end);
-        if l_status_0 then
-            return l_result_0, nil;
-        else
-            return nil, (tostring(l_result_0));
-        end;
-    end;
-end;
-local _ = function(v11, v12) --[[ Line: 35 ]] --[[ Name: createCallbackWithEventId ]]
-    if not v12 then
-        return nil;
-    else
-        return function(v13, v14) --[[ Line: 46 ]]
-            -- upvalues: v11 (copy), v12 (copy)
-            local v15 = nil;
-            local v16 = nil;
-            if v13 and v14 and v14.body then
-                if type(v14.body) == "table" and v14.body.Body then
-                    local l_v11_0 = v11;
-                    local l_Body_0 = v14.body.Body;
-                    local v19;
-                    if type(l_Body_0) ~= "string" then
-                        v19 = nil;
-                        local _ = "Input is not a string";
-                    else
-                        local l_status_1, l_result_1 = pcall(function() --[[ Line: 23 ]]
-                            -- upvalues: l_v11_0 (copy), l_Body_0 (copy)
-                            return l_v11_0:JSONDecode(l_Body_0);
-                        end);
-                        if l_status_1 then
-                            v19 = l_result_1;
-                            local _ = nil;
-                        else
-                            v19 = nil;
-                            local _ = tostring(l_result_1);
-                        end;
-                    end;
-                    if v19 and v19.id then
-                        v15 = v19.id;
-                    end;
-                end;
-                v16 = v14;
-            elseif v14 then
-                v16 = v14;
-            end;
-            v12(v13, v16, v15);
-        end;
-    end;
-end;
-local v26 = {};
-v26.__index = v26;
-v26.new = function(_, v28, v29) --[[ Line: 148 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v26 (copy)
-    if not v28.dsn then
-        error("DSN is required");
-    end;
-    return (setmetatable({
-        transport = v0:new(v28.dsn, v29), 
-        httpService = v29, 
-        user = nil, 
-        tags = {}, 
-        extra = {}, 
-        breadcrumbs = {}, 
-        config = v28
-    }, v26));
-end;
-v26._buildDebugMeta = function(_) --[[ Line: 179 ]] --[[ Name: _buildDebugMeta ]]
-    local l_LUAUFORGE_SENTRY_DEBUG_IDS_0 = _G.LUAUFORGE_SENTRY_DEBUG_IDS;
-    if type(l_LUAUFORGE_SENTRY_DEBUG_IDS_0) ~= "table" then
-        return nil;
-    else
-        local v32 = {};
-        for v33, v34 in l_LUAUFORGE_SENTRY_DEBUG_IDS_0 do
-            table.insert(v32, {
-                type = "sourcemap", 
-                code_file = v33, 
-                debug_id = v34
-            });
-        end;
-        if #v32 == 0 then
-            return nil;
-        else
-            return {
-                images = v32
-            };
-        end;
-    end;
-end;
-v26.capture_message = function(v35, v36, v37, v38) --[[ Line: 205 ]] --[[ Name: capture_message ]]
-    -- upvalues: v1 (copy)
-    local v39 = v37 or "info";
-    local v40 = {
-        message = {
-            message = v36
-        }, 
-        level = v39, 
-        timestamp = os.time(), 
-        environment = v35.config.environment or "production", 
-        release = v35.config.release or "unknown", 
-        platform = "roblox", 
-        sdk = {
-            name = "sentry.lua", 
-            version = v1.SDK_VERSION
-        }, 
-        server_name = "roblox-server", 
-        user = v35.user, 
-        tags = v35.tags
-    };
-    local l_extra_0 = v35.extra;
-    v40.extra = if next(l_extra_0) == nil then nil else v35.extra;
-    v40.breadcrumbs = v35.breadcrumbs;
-    v40.contexts = {
-        roblox = {
-            version = v1.SDK_VERSION, 
-            place_id = tostring(game.PlaceId), 
-            job_id = game.JobId or "unknown"
-        }
-    };
-    local l_httpService_0 = v35.httpService;
-    local v55 = if not v38 then nil else function(v43, v44) --[[ Line: 46 ]]
-        -- upvalues: l_httpService_0 (copy), v38 (copy)
-        local v45 = nil;
-        local v46 = nil;
-        if v43 and v44 and v44.body then
-            if type(v44.body) == "table" and v44.body.Body then
-                local l_l_httpService_0_0 = l_httpService_0;
-                local l_Body_1 = v44.body.Body;
-                local v49;
-                if type(l_Body_1) ~= "string" then
-                    v49 = nil;
-                    local _ = "Input is not a string";
-                else
-                    local l_status_2, l_result_2 = pcall(function() --[[ Line: 23 ]]
-                        -- upvalues: l_l_httpService_0_0 (copy), l_Body_1 (copy)
-                        return l_l_httpService_0_0:JSONDecode(l_Body_1);
-                    end);
-                    if l_status_2 then
-                        v49 = l_result_2;
-                        local _ = nil;
-                    else
-                        v49 = nil;
-                        local _ = tostring(l_result_2);
-                    end;
-                end;
-                if v49 and v49.id then
-                    v45 = v49.id;
-                end;
-            end;
-            v46 = v44;
-        elseif v44 then
-            v46 = v44;
-        end;
-        v38(v43, v46, v45);
-    end;
-    v35.transport:send(v40, v55);
-end;
-v26.capture_exception = function(v56, v57, v58, v59, v60, v61) --[[ Line: 248 ]] --[[ Name: capture_exception ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v62 = v58 or "error";
-    local v63 = {
-        roblox = {
-            version = v1.SDK_VERSION, 
-            place_id = tostring(game.PlaceId), 
-            job_id = game.JobId or "unknown"
-        }
-    };
-    if v59 then
-        for v64, v65 in pairs(v59) do
-            v63[v64] = v65;
-        end;
-    end;
-    local v66 = {
-        type = v57.type or "RobloxError", 
-        value = v57.message or tostring(v57)
-    };
-    if v57.stacktrace and v57.stacktrace.frames and #v57.stacktrace.frames > 0 then
-        v66.stacktrace = v57.stacktrace;
-        if type(_G.LUAUFORGE_BUNDLED_FILE_PATH) == "string" then
-            for _, v68 in v57.stacktrace.frames do
-                v68.platform = "javascript";
-            end;
-        end;
-    end;
-    local v69 = {
-        values = {
-            v66
-        }
-    };
-    if v2 then
-        print("\240\159\148\141 Exception structure:", v69);
-    end;
-    local v70 = {
-        exception = v69, 
-        level = v62, 
-        timestamp = os.time(), 
-        environment = v56.config.environment or "production", 
-        release = v56.config.release or "unknown", 
-        platform = "roblox", 
-        sdk = {
-            name = "sentry.lua", 
-            version = v1.SDK_VERSION
-        }, 
-        server_name = "roblox-server", 
-        user = v56.user, 
-        tags = v56.tags
-    };
-    local l_extra_1 = v56.extra;
-    v70.extra = if next(l_extra_1) == nil then nil else v56.extra;
-    v70.breadcrumbs = v56.breadcrumbs;
-    v70.contexts = v63;
-    if v60 then
-        v70.threads = v60;
-    end;
-    v70.debug_meta = v56:_buildDebugMeta();
-    local l_httpService_1 = v56.httpService;
-    local v85 = if not v61 then nil else function(v73, v74) --[[ Line: 46 ]]
-        -- upvalues: l_httpService_1 (copy), v61 (copy)
-        local v75 = nil;
-        local v76 = nil;
-        if v73 and v74 and v74.body then
-            if type(v74.body) == "table" and v74.body.Body then
-                local l_l_httpService_1_0 = l_httpService_1;
-                local l_Body_2 = v74.body.Body;
-                local v79;
-                if type(l_Body_2) ~= "string" then
-                    v79 = nil;
-                    local _ = "Input is not a string";
-                else
-                    local l_status_3, l_result_3 = pcall(function() --[[ Line: 23 ]]
-                        -- upvalues: l_l_httpService_1_0 (copy), l_Body_2 (copy)
-                        return l_l_httpService_1_0:JSONDecode(l_Body_2);
-                    end);
-                    if l_status_3 then
-                        v79 = l_result_3;
-                        local _ = nil;
-                    else
-                        v79 = nil;
-                        local _ = tostring(l_result_3);
-                    end;
-                end;
-                if v79 and v79.id then
-                    v75 = v79.id;
-                end;
-            end;
-            v76 = v74;
-        elseif v74 then
-            v76 = v74;
-        end;
-        v61(v73, v76, v75);
-    end;
-    v56.transport:send(v70, v85);
-end;
-v26.send_event_with_attachments = function(v86, v87, v88, v89) --[[ Line: 339 ]] --[[ Name: send_event_with_attachments ]]
-    if not v87 or #v88 == 0 then
-        if v89 then
-            v89(false, {
-                error = "eventId and attachments are required"
-            }, nil);
-        end;
-        return;
-    else
-        local l_httpService_2 = v86.httpService;
-        local v103 = if not v89 then nil else function(v91, v92) --[[ Line: 46 ]]
-            -- upvalues: l_httpService_2 (copy), v89 (copy)
-            local v93 = nil;
-            local v94 = nil;
-            if v91 and v92 and v92.body then
-                if type(v92.body) == "table" and v92.body.Body then
-                    local l_l_httpService_2_0 = l_httpService_2;
-                    local l_Body_3 = v92.body.Body;
-                    local v97;
-                    if type(l_Body_3) ~= "string" then
-                        v97 = nil;
-                        local _ = "Input is not a string";
-                    else
-                        local l_status_4, l_result_4 = pcall(function() --[[ Line: 23 ]]
-                            -- upvalues: l_l_httpService_2_0 (copy), l_Body_3 (copy)
-                            return l_l_httpService_2_0:JSONDecode(l_Body_3);
-                        end);
-                        if l_status_4 then
-                            v97 = l_result_4;
-                            local _ = nil;
-                        else
-                            v97 = nil;
-                            local _ = tostring(l_result_4);
-                        end;
-                    end;
-                    if v97 and v97.id then
-                        v93 = v97.id;
-                    end;
-                end;
-                v94 = v92;
-            elseif v92 then
-                v94 = v92;
-            end;
-            v89(v91, v94, v93);
-        end;
-        v86.transport:send_attachments(v87, v88, v103);
-        return;
-    end;
-end;
-v26.set_user = function(v104, v105) --[[ Line: 361 ]] --[[ Name: set_user ]]
-    v104.user = v105;
-end;
-v26.set_tag = function(v106, v107, v108) --[[ Line: 366 ]] --[[ Name: set_tag ]]
-    v106.tags[v107] = tostring(v108);
-end;
-v26.set_extra = function(v109, v110, v111) --[[ Line: 371 ]] --[[ Name: set_extra ]]
-    v109.extra[v110] = v111;
-end;
-v26.add_breadcrumb = function(v112, v113) --[[ Line: 376 ]] --[[ Name: add_breadcrumb ]]
-    v113.timestamp = os.time();
-    table.insert(v112.breadcrumbs, v113);
-    if #v112.breadcrumbs > 50 then
-        table.remove(v112.breadcrumbs, 1);
-    end;
-end;
-return v26;
+local RobloxTransport = require(script.Parent.RobloxTransport)
+local Version = require(script.Parent.Version)
+local v3 = game:GetService("RunService"):IsStudio()
+
+local function isBundled() -- line: 8
+	return type(_G.LUAUFORGE_BUNDLED_FILE_PATH) == "string"
+end
+local function isTableEmpty(t1: {[any]: any}) -- line: 13
+	return next(t1) == nil
+end
+local function parseJSON(p1, s1: string) -- line: 18
+	if type(s1) ~= "string" then
+		return nil, "Input is not a string"
+	end
+
+	local ok, result = pcall(function() -- line: 23
+		-- upvalues: p1 (copy), s1 (copy)
+		return p1:JSONDecode(s1)
+	end)
+
+	if ok then
+		return result, nil
+	end
+
+	return nil, (tostring(result))
+end
+local function createCallbackWithEventId(p2, p3: ((...any) -> ...any)?) -- line: 35
+	if not p3 then
+		return nil
+	end
+
+	return function(b1: boolean, t2: {[any]: any}?) -- line: 46
+		-- upvalues: p2 (copy), p3 (copy)
+		local id = nil
+		local v70 = nil
+
+		if b1 and (t2 and t2.body) then
+			if type(t2.body) == "table" and t2.body.Body then
+				local v71 = p2
+				local Body = t2.body.Body
+				local v73
+
+				if type(Body) ~= "string" then
+					v73 = nil
+				else
+					local ok, result = pcall(function() -- line: 23
+						-- upvalues: v71 (copy), Body (copy)
+						return v71:JSONDecode(Body)
+					end)
+
+					if ok then
+						v73 = result
+					else
+						v73 = nil
+						tostring(result)
+					end
+				end
+
+				if v73 and v73.id then
+					id = v73.id
+				end
+			end
+
+			v70 = t2
+		elseif t2 then
+			v70 = t2
+		end
+
+		p3(b1, v70, id)
+	end
+end
+
+local t3 = {}
+
+t3.__index = t3
+
+function t3.new(_: {[any]: any}, t5: {[any]: any}, p4) -- line: 148
+	-- upvalues: RobloxTransport (copy), t3 (copy)
+	if not t5.dsn then
+		error("DSN is required")
+	end
+
+	return (setmetatable({
+		user = nil,
+		transport = RobloxTransport:new(t5.dsn, p4),
+		httpService = p4,
+		tags = {},
+		extra = {},
+		breadcrumbs = {},
+		config = t5
+	}, t3))
+end
+function t3._buildDebugMeta(_) -- line: 179
+	local LUAUFORGE_SENTRY_DEBUG_IDS = _G.LUAUFORGE_SENTRY_DEBUG_IDS
+
+	if type(LUAUFORGE_SENTRY_DEBUG_IDS) ~= "table" then
+		return nil
+	end
+
+	local t6 = {}
+
+	for v22, v23 in LUAUFORGE_SENTRY_DEBUG_IDS do
+		table.insert(t6, {
+			type = "sourcemap",
+			code_file = v22,
+			debug_id = v23
+		})
+	end
+
+	if #t6 == 0 then
+		return nil
+	end
+
+	return {
+		images = t6
+	}
+end
+function t3.capture_message(t7: {[any]: any}, s2: string, s3: string?, p6: ((...any) -> ...any)?) -- line: 205
+	-- upvalues: Version (copy)
+	local v28 = s3 or "info"
+	local t8 = {
+		platform = "roblox",
+		server_name = "roblox-server",
+		message = {
+			message = s2
+		},
+		level = v28,
+		timestamp = os.time(),
+		environment = t7.config.environment or "production",
+		release = t7.config.release or "unknown",
+		sdk = {
+			name = "sentry.lua",
+			version = Version.SDK_VERSION
+		},
+		user = t7.user,
+		tags = t7.tags
+	}
+	local extra = t7.extra
+
+	t8.extra = if next(extra) ~= nil then t7.extra else nil
+	t8.breadcrumbs = t7.breadcrumbs
+	t8.contexts = {
+		roblox = {
+			version = Version.SDK_VERSION,
+			place_id = tostring(game.PlaceId),
+			job_id = game.JobId or "unknown"
+		}
+	}
+
+	local httpService = t7.httpService
+	local v32 = p6 and function(b2: boolean, t9: {[any]: any}?) -- line: 46
+		-- upvalues: httpService (copy), p6 (copy)
+		local id = nil
+		local v79 = nil
+
+		if b2 and (t9 and t9.body) then
+			if type(t9.body) == "table" and t9.body.Body then
+				local v80 = httpService
+				local Body = t9.body.Body
+				local v82
+
+				if type(Body) ~= "string" then
+					v82 = nil
+				else
+					local ok, result = pcall(function() -- line: 23
+						-- upvalues: v80 (copy), Body (copy)
+						return v80:JSONDecode(Body)
+					end)
+
+					if ok then
+						v82 = result
+					else
+						v82 = nil
+						tostring(result)
+					end
+				end
+
+				if v82 and v82.id then
+					id = v82.id
+				end
+			end
+
+			v79 = t9
+		elseif t9 then
+			v79 = t9
+		end
+
+		p6(b2, v79, id)
+	end or nil
+
+	t7.transport:send(t8, v32)
+end
+function t3.capture_exception(t10: {[any]: any}, t11: {[any]: any}, s4: string?, t12: {[any]: any}?, p7, p8: ((...any) -> ...any)?) -- line: 248
+	-- upvalues: Version (copy), v3 (copy)
+	local v39 = s4 or "error"
+	local t13 = {
+		roblox = {
+			version = Version.SDK_VERSION,
+			place_id = tostring(game.PlaceId),
+			job_id = game.JobId or "unknown"
+		}
+	}
+
+	if t12 then
+		for k, v in pairs(t12) do
+			t13[k] = v
+		end
+	end
+
+	local t14 = {
+		type = t11.type or "RobloxError",
+		value = t11.message or tostring(t11)
+	}
+
+	if t11.stacktrace and t11.stacktrace.frames and #t11.stacktrace.frames > 0 then
+		t14.stacktrace = t11.stacktrace
+
+		if type(_G.LUAUFORGE_BUNDLED_FILE_PATH) == "string" then
+			for _, v45 in t11.stacktrace.frames do
+				v45.platform = "javascript"
+			end
+		end
+	end
+
+	local t15 = {
+		values = { t14 }
+	}
+
+	if v3 then
+		print("🔍 Exception structure:", t15)
+	end
+
+	local t16 = {
+		platform = "roblox",
+		server_name = "roblox-server",
+		exception = t15,
+		level = v39,
+		timestamp = os.time(),
+		environment = t10.config.environment or "production",
+		release = t10.config.release or "unknown",
+		sdk = {
+			name = "sentry.lua",
+			version = Version.SDK_VERSION
+		},
+		user = t10.user,
+		tags = t10.tags
+	}
+	local extra = t10.extra
+
+	t16.extra = if next(extra) ~= nil then t10.extra else nil
+	t16.breadcrumbs = t10.breadcrumbs
+	t16.contexts = t13
+
+	if p7 then
+		t16.threads = p7
+	end
+
+	t16.debug_meta = t10:_buildDebugMeta()
+
+	local httpService = t10.httpService
+	local v50 = p8 and function(b3: boolean, t17: {[any]: any}?) -- line: 46
+		-- upvalues: httpService (copy), p8 (copy)
+		local id = nil
+		local v88 = nil
+
+		if b3 and (t17 and t17.body) then
+			if type(t17.body) == "table" and t17.body.Body then
+				local v89 = httpService
+				local Body = t17.body.Body
+				local v91
+
+				if type(Body) ~= "string" then
+					v91 = nil
+				else
+					local ok, result = pcall(function() -- line: 23
+						-- upvalues: v89 (copy), Body (copy)
+						return v89:JSONDecode(Body)
+					end)
+
+					if ok then
+						v91 = result
+					else
+						v91 = nil
+						tostring(result)
+					end
+				end
+
+				if v91 and v91.id then
+					id = v91.id
+				end
+			end
+
+			v88 = t17
+		elseif t17 then
+			v88 = t17
+		end
+
+		p8(b3, v88, id)
+	end or nil
+
+	t10.transport:send(t16, v50)
+end
+function t3.send_event_with_attachments(t18: {[any]: any}, s5: string, t19: {[any]: any}, p9: ((...any) -> ...any)?) -- line: 339
+	if not s5 or #t19 == 0 then
+		if p9 then
+			p9(false, {
+				error = "eventId and attachments are required"
+			}, nil)
+		end
+
+		return
+	end
+
+	local httpService = t18.httpService
+	local v56 = p9 and function(b4: boolean, t20: {[any]: any}?) -- line: 46
+		-- upvalues: httpService (copy), p9 (copy)
+		local id = nil
+		local v97 = nil
+
+		if b4 and (t20 and t20.body) then
+			if type(t20.body) == "table" and t20.body.Body then
+				local v98 = httpService
+				local Body = t20.body.Body
+				local v100
+
+				if type(Body) ~= "string" then
+					v100 = nil
+				else
+					local ok, result = pcall(function() -- line: 23
+						-- upvalues: v98 (copy), Body (copy)
+						return v98:JSONDecode(Body)
+					end)
+
+					if ok then
+						v100 = result
+					else
+						v100 = nil
+						tostring(result)
+					end
+				end
+
+				if v100 and v100.id then
+					id = v100.id
+				end
+			end
+
+			v97 = t20
+		elseif t20 then
+			v97 = t20
+		end
+
+		p9(b4, v97, id)
+	end or nil
+
+	t18.transport:send_attachments(s5, t19, v56)
+end
+function t3.set_user(p10, p11) -- line: 361
+	p10.user = p11
+end
+function t3.set_tag(t21: {[any]: any}, s6: string, p12) -- line: 366
+	t21.tags[s6] = tostring(p12)
+end
+function t3.set_extra(t22: {[any]: any}, s7: string, p13) -- line: 371
+	t22.extra[s7] = p13
+end
+function t3.add_breadcrumb(p14, p15) -- line: 376
+	p15.timestamp = os.time()
+	table.insert(p14.breadcrumbs, p15)
+
+	if #p14.breadcrumbs > 50 then
+		table.remove(p14.breadcrumbs, 1)
+	end
+end
+
+return t3

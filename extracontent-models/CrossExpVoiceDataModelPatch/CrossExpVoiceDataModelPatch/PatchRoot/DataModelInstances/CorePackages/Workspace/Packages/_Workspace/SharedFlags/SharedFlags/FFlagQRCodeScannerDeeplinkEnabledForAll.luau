@@ -1,1 +1,1 @@
-return game:DefineFastFlag("QRCodeScannerDeeplinkEnabledForAll", false);
+return game:DefineFastFlag("QRCodeScannerDeeplinkEnabledForAll", false)

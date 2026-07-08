@@ -1,198 +1,225 @@
-local v0 = {
-    Groups = {
-        {
-            GroupId = 1200769, 
-            ChatColor = Color3.new(1, 0.8431372549019608, 0)
-        }
-    }, 
-    Players = {
-        {}
-    }
-};
-local _ = function(v1, v2) --[[ Line: 23 ]] --[[ Name: MakeIsInGroup ]]
-    local v3 = true;
-    if type(v2) ~= "nil" then
-        v3 = type(v2) == "number";
-    end;
-    assert(v3, "requiredRank must be a number or nil");
-    return function(v4) --[[ Line: 26 ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        if v4 and v4.UserId then
-            local _ = v4.UserId;
-            local v6 = false;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 31 ]]
-                -- upvalues: v2 (ref), v6 (ref), v4 (copy), v1 (ref)
-                if v2 then
-                    v6 = v4:GetRankInGroup(v1) > v2;
-                    return;
-                else
-                    v6 = v4:IsInGroup(v1);
-                    return;
-                end;
-            end);
-            if not l_status_0 and l_result_0 then
-                print("Error checking in group: " .. l_result_0);
-            end;
-            return v6;
-        else
-            return false;
-        end;
-    end;
-end;
-(function() --[[ Line: 49 ]] --[[ Name: ConstructIsInGroups ]]
-    -- upvalues: v0 (copy)
-    if v0.Groups then
-        for _, v11 in pairs(v0.Groups) do
-            local l_GroupId_0 = v11.GroupId;
-            local l_Rank_0 = v11.Rank;
-            local v14 = true;
-            if type(l_Rank_0) ~= "nil" then
-                v14 = type(l_Rank_0) == "number";
-            end;
-            assert(v14, "requiredRank must be a number or nil");
-            v11.IsInGroup = function(v15) --[[ Line: 26 ]]
-                -- upvalues: l_Rank_0 (copy), l_GroupId_0 (copy)
-                if v15 and v15.UserId then
-                    local _ = v15.UserId;
-                    local v17 = false;
-                    local l_status_1, l_result_1 = pcall(function() --[[ Line: 31 ]]
-                        -- upvalues: l_Rank_0 (ref), v17 (ref), v15 (copy), l_GroupId_0 (ref)
-                        if l_Rank_0 then
-                            v17 = v15:GetRankInGroup(l_GroupId_0) > l_Rank_0;
-                            return;
-                        else
-                            v17 = v15:IsInGroup(l_GroupId_0);
-                            return;
-                        end;
-                    end);
-                    if not l_status_1 and l_result_1 then
-                        print("Error checking in group: " .. l_result_1);
-                    end;
-                    return v17;
-                else
-                    return false;
-                end;
-            end;
-        end;
-    end;
-end)();
-local l_Players_0 = game:GetService("Players");
-local function v27(v21) --[[ Line: 60 ]] --[[ Name: GetSpecialChatColor ]]
-    -- upvalues: v0 (copy), l_Players_0 (copy)
-    if v0.Players then
-        local l_l_Players_0_FirstChild_0 = l_Players_0:FindFirstChild(v21);
-        if l_l_Players_0_FirstChild_0 then
-            for _, v24 in pairs(v0.Players) do
-                if l_l_Players_0_FirstChild_0.UserId == v24.UserId then
-                    return v24.ChatColor;
-                end;
-            end;
-        end;
-    end;
-    if v0.Groups then
-        for _, v26 in pairs(v0.Groups) do
-            if v26.IsInGroup(l_Players_0:FindFirstChild(v21)) then
-                return v26.ChatColor;
-            end;
-        end;
-    end;
-end;
-return function(v28) --[[ Line: 80 ]] --[[ Name: Run ]]
-    -- upvalues: v27 (copy), l_Players_0 (copy)
-    local v29 = {
-        Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157), 
-        Color3.new(0.00392156862745098, 0.6352941176470588, 1), 
-        Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353), 
-        BrickColor.new("Bright violet").Color, 
-        BrickColor.new("Bright orange").Color, 
-        BrickColor.new("Bright yellow").Color, 
-        BrickColor.new("Light reddish violet").Color, 
-        BrickColor.new("Brick yellow").Color
-    };
-    local function v35(v30) --[[ Line: 93 ]] --[[ Name: GetNameValue ]]
-        local v31 = 0;
-        for v32 = 1, #v30 do
-            local v33 = string.byte((string.sub(v30, v32, v32)));
-            local v34 = #v30 - v32 + 1;
-            if #v30 % 2 == 1 then
-                v34 = v34 - 1;
-            end;
-            if v34 % 4 >= 2 then
-                v33 = -v33;
-            end;
-            v31 = v31 + v33;
-        end;
-        return v31;
-    end;
-    local function _(v36) --[[ Line: 110 ]] --[[ Name: ComputeNameColor ]]
-        -- upvalues: v29 (copy), v35 (copy)
-        return v29[(v35(v36) + 0) % #v29 + 1];
-    end;
-    local function _(v38) --[[ Line: 114 ]] --[[ Name: GetNameColor ]]
-        -- upvalues: v29 (copy), v35 (copy)
-        local l_v38_Player_0 = v38:GetPlayer();
-        if l_v38_Player_0 and l_v38_Player_0.Team ~= nil then
-            return l_v38_Player_0.TeamColor.Color;
-        else
-            local l_Name_0 = v38.Name;
-            return v29[(v35(l_Name_0) + 0) % #v29 + 1];
-        end;
-    end;
-    local function v49(v42) --[[ Line: 124 ]] --[[ Name: onNewSpeaker ]]
-        -- upvalues: v28 (copy), v29 (copy), v35 (copy), v27 (ref)
-        local l_v28_Speaker_0 = v28:GetSpeaker(v42);
-        if not l_v28_Speaker_0:GetExtraData("NameColor") then
-            local v44 = "NameColor";
-            local l_l_v28_Speaker_0_Player_0 = l_v28_Speaker_0:GetPlayer();
-            local v46;
-            if l_l_v28_Speaker_0_Player_0 and l_l_v28_Speaker_0_Player_0.Team ~= nil then
-                v46 = l_l_v28_Speaker_0_Player_0.TeamColor.Color;
-            else
-                local l_Name_1 = l_v28_Speaker_0.Name;
-                v46 = v29[(v35(l_Name_1) + 0) % #v29 + 1];
-            end;
-            l_v28_Speaker_0:SetExtraData(v44, v46);
-        end;
-        if not l_v28_Speaker_0:GetExtraData("ChatColor") then
-            local v48 = v27(v42);
-            if v48 then
-                l_v28_Speaker_0:SetExtraData("ChatColor", v48);
-            end;
-        end;
-        if not l_v28_Speaker_0:GetExtraData("Tags") then
-            l_v28_Speaker_0:SetExtraData("Tags", {});
-        end;
-    end;
-    v28.SpeakerAdded:connect(v49);
-    for _, v51 in pairs(v28:GetSpeakerList()) do
-        v49(v51);
-    end;
-    local v52 = {};
-    l_Players_0.PlayerAdded:connect(function(v53) --[[ Line: 161 ]]
-        -- upvalues: v28 (copy), v29 (copy), v35 (copy), v52 (copy)
-        v52[v53] = v53.Changed:connect(function(v54) --[[ Line: 162 ]]
-            -- upvalues: v28 (ref), v53 (copy), v29 (ref), v35 (ref)
-            local l_v28_Speaker_1 = v28:GetSpeaker(v53.Name);
-            if l_v28_Speaker_1 and (v54 == "TeamColor" or v54 == "Neutral" or v54 == "Team") then
-                local v56 = "NameColor";
-                local l_l_v28_Speaker_1_Player_0 = l_v28_Speaker_1:GetPlayer();
-                local v58;
-                if l_l_v28_Speaker_1_Player_0 and l_l_v28_Speaker_1_Player_0.Team ~= nil then
-                    v58 = l_l_v28_Speaker_1_Player_0.TeamColor.Color;
-                else
-                    local l_Name_2 = l_v28_Speaker_1.Name;
-                    v58 = v29[(v35(l_Name_2) + 0) % #v29 + 1];
-                end;
-                l_v28_Speaker_1:SetExtraData(v56, v58);
-            end;
-        end);
-    end);
-    l_Players_0.PlayerRemoving:connect(function(v60) --[[ Line: 173 ]]
-        -- upvalues: v52 (copy)
-        local v61 = v52[v60];
-        if v61 then
-            v61:Disconnect();
-        end;
-        v52[v60] = nil;
-    end);
-end;
+local t1 = {
+	Groups = {{
+		GroupId = 1200769,
+		ChatColor = Color3.new(1, 0.8431372549019608, 0)
+	}},
+	Players = {{}}
+}
+
+local function MakeIsInGroup(p1, p2) -- line: 23
+	assert(type(p2) == "nil" or type(p2) == "number", "requiredRank must be a number or nil")
+
+	return function(p3) -- line: 26
+		-- upvalues: p2 (copy), p1 (copy)
+		if p3 and p3.UserId then
+			local _ = p3.UserId
+			local u30 = false
+			local ok, result = pcall(function() -- line: 31
+				-- upvalues: p2 (copy), u30 (ref), p3 (copy), p1 (copy)
+				if p2 then
+					u30 = p3:GetRankInGroup(p1) > p2
+
+					return
+				end
+
+				u30 = p3:IsInGroup(p1)
+			end)
+
+			if not ok and result then
+				print("Error checking in group: " .. result)
+			end
+
+			return u30
+		end
+
+		return false
+	end
+end
+local function ConstructIsInGroups() -- line: 49
+	-- upvalues: t1 (copy)
+	if t1.Groups then
+		for _, v in pairs(t1.Groups) do
+			local GroupId = v.GroupId
+			local Rank = v.Rank
+
+			assert(type(Rank) == "nil" or type(Rank) == "number", "requiredRank must be a number or nil")
+
+			function v.IsInGroup(p4) -- line: 26
+				-- upvalues: Rank (copy), GroupId (copy)
+				if p4 and p4.UserId then
+					local _ = p4.UserId
+					local u35 = false
+					local ok, result = pcall(function() -- line: 31
+						-- upvalues: Rank (copy), u35 (ref), p4 (copy), GroupId (copy)
+						if Rank then
+							u35 = p4:GetRankInGroup(GroupId) > Rank
+
+							return
+						end
+
+						u35 = p4:IsInGroup(GroupId)
+					end)
+
+					if not ok and result then
+						print("Error checking in group: " .. result)
+					end
+
+					return u35
+				end
+
+				return false
+			end
+		end
+	end
+end
+
+ConstructIsInGroups()
+
+local Players = game:GetService("Players")
+
+local function GetSpecialChatColor(p5) -- line: 60
+	-- upvalues: t1 (copy), Players (copy)
+	if t1.Players then
+		local p5_2 = Players:FindFirstChild(p5)
+
+		if p5_2 then
+			for _, v in pairs(t1.Players) do
+				if p5_2.UserId == v.UserId then
+					return v.ChatColor
+				end
+			end
+		end
+	end
+
+	if t1.Groups then
+		for _, v in pairs(t1.Groups) do
+			if v.IsInGroup(Players:FindFirstChild(p5)) then
+				return v.ChatColor
+			end
+		end
+	end
+end
+local function Run(p6) -- line: 80
+	-- upvalues: GetSpecialChatColor (copy), Players (copy)
+	local t2 = {
+		Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157),
+		Color3.new(0.00392156862745098, 0.6352941176470588, 1),
+		Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353),
+		BrickColor.new("Bright violet").Color,
+		BrickColor.new("Bright orange").Color,
+		BrickColor.new("Bright yellow").Color,
+		BrickColor.new("Light reddish violet").Color,
+		BrickColor.new("Brick yellow").Color
+	}
+
+	local function GetNameValue(p7) -- line: 93
+		local n1 = 0
+
+		for i = 1, #p7 do
+			local byte = string.byte((string.sub(p7, i, i)))
+			local v42 = #p7 - i + 1
+
+			if #p7 % 2 == 1 then
+				v42 -= 1
+			end
+
+			if v42 % 4 >= 2 then
+				byte = -byte
+			end
+
+			n1 += byte
+		end
+
+		return n1
+	end
+	local function ComputeNameColor(p8) -- line: 110
+		-- upvalues: t2 (copy), GetNameValue (copy)
+		return t2[(GetNameValue(p8) + 0) % #t2 + 1]
+	end
+	local function GetNameColor(p9) -- line: 114
+		-- upvalues: t2 (copy), GetNameValue (copy)
+		local Player = p9:GetPlayer()
+
+		if Player and Player.Team ~= nil then
+			return Player.TeamColor.Color
+		end
+
+		local p9Name = p9.Name
+
+		return t2[(GetNameValue(p9Name) + 0) % #t2 + 1]
+	end
+	local function onNewSpeaker(p10) -- line: 124
+		-- upvalues: p6 (copy), t2 (copy), GetNameValue (copy), GetSpecialChatColor (copy)
+		local Speaker = p6:GetSpeaker(p10)
+
+		if not Speaker:GetExtraData("NameColor") then
+			local Player = Speaker:GetPlayer()
+			local TeamColorColor
+
+			if Player and Player.Team ~= nil then
+				TeamColorColor = Player.TeamColor.Color
+			else
+				local SpeakerName = Speaker.Name
+
+				TeamColorColor = t2[(GetNameValue(SpeakerName) + 0) % #t2 + 1]
+			end
+
+			Speaker:SetExtraData("NameColor", TeamColorColor)
+		end
+
+		if not Speaker:GetExtraData("ChatColor") then
+			local v52 = GetSpecialChatColor(p10)
+
+			if v52 then
+				Speaker:SetExtraData("ChatColor", v52)
+			end
+		end
+
+		if not Speaker:GetExtraData("Tags") then
+			Speaker:SetExtraData("Tags", {})
+		end
+	end
+
+	p6.SpeakerAdded:connect(onNewSpeaker)
+
+	for _, v in pairs(p6:GetSpeakerList()) do
+		onNewSpeaker(v)
+	end
+
+	local t3 = {}
+
+	Players.PlayerAdded:connect(function(p11) -- line: 161
+		-- upvalues: p6 (copy), t2 (copy), GetNameValue (copy), t3 (copy)
+		t3[p11] = p11.Changed:connect(function(p12) -- line: 162
+			-- upvalues: p6 (copy), p11 (copy), t2 (copy), GetNameValue (copy)
+			local Speaker = p6:GetSpeaker(p11.Name)
+
+			if Speaker and (p12 == "TeamColor" or p12 == "Neutral" or p12 == "Team") then
+				local Player = Speaker:GetPlayer()
+				local TeamColorColor
+
+				if Player and Player.Team ~= nil then
+					TeamColorColor = Player.TeamColor.Color
+				else
+					local SpeakerName = Speaker.Name
+
+					TeamColorColor = t2[(GetNameValue(SpeakerName) + 0) % #t2 + 1]
+				end
+
+				Speaker:SetExtraData("NameColor", TeamColorColor)
+			end
+		end)
+	end)
+	Players.PlayerRemoving:connect(function(p13) -- line: 173
+		-- upvalues: t3 (copy)
+		local v55 = t3[p13]
+
+		if v55 then
+			v55:Disconnect()
+		end
+
+		t3[p13] = nil
+	end)
+end
+
+return Run

@@ -1,1 +1,1 @@
-return game:DefineFastInt("SocialCarouselMaxNewRequestsCount", 99);
+return game:DefineFastInt("SocialCarouselMaxNewRequestsCount", 99)

@@ -1,1 +1,1 @@
-return require(script.profileQRCodeApi);
+return require(script.profileQRCodeApi)

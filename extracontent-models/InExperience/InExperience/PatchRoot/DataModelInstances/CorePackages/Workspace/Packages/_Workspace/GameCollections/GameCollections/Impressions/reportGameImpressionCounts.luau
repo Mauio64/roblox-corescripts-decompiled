@@ -1,64 +1,88 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("GameCollections").Parent;
-local l_IsVRAppBuild_0 = require(l_Parent_0.AppCommonLib).IsVRAppBuild;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v4 = "Other";
-pcall(function() --[[ Line: 11 ]]
-    -- upvalues: l_UserInputService_0 (copy), v4 (ref)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    if l_l_UserInputService_0_Platform_0 == Enum.Platform.Android then
-        v4 = "Android";
-        return;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.IOS then
-        v4 = "iOS";
-        return;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.Windows then
-        v4 = "Win";
-        return;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.UWP then
-        v4 = "UWP";
-        return;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.OSX then
-        v4 = "Mac";
-        return;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.XBox360 or l_l_UserInputService_0_Platform_0 == Enum.Platform.XBoxOne then
-        v4 = "XBox";
-        return;
-    else
-        if l_l_UserInputService_0_Platform_0 == Enum.Platform.PS4 or game:GetEngineFeature("PlatformEnumPS5") and l_l_UserInputService_0_Platform_0 == Enum.Platform.PS5 then
-            v4 = "PS";
-        end;
-        return;
-    end;
-end);
-return function(v6, v7, v8, v9) --[[ Line: 32 ]]
-    -- upvalues: l_AppPage_0 (copy), v4 (ref), l_IsVRAppBuild_0 (copy)
-    if not v6 or not v6.Diag then
-        return;
-    elseif not v7 then
-        return;
-    else
-        local v10 = "Other";
-        if v7 == l_AppPage_0.Home or v7 == l_AppPage_0.Games then
-            if v9 == 1 then
-                v10 = "GamesList";
-            elseif v7 == l_AppPage_0.Home then
-                v10 = "Home";
-            else
-                assert(v7 == l_AppPage_0.Games, (("%* should always be Games here"):format(v7)));
-                v10 = "Games";
-            end;
-        elseif v7 == "recommended" then
-            v10 = "GameDetail";
-        elseif v7 == l_AppPage_0.SearchPage then
-            v10 = "SearchPage";
-        end;
-        local l_v4_0 = v4;
-        if l_IsVRAppBuild_0() then
-            l_v4_0 = "VR";
-        end;
-        local v12 = l_v4_0 .. "-GameImps-" .. v10;
-        v6.Diag:reportCounterSimple(v12, v8);
-        return;
-    end;
-end;
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("GameCollections").Parent
+local IsVRAppBuild = require(Parent.AppCommonLib).IsVRAppBuild
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local s1 = "Other"
+
+pcall(function() -- line: 11
+	-- upvalues: UserInputService (copy), s1 (ref)
+	local Platform = UserInputService:GetPlatform()
+
+	if Platform == Enum.Platform.Android then
+		s1 = "Android"
+
+		return
+	end
+
+	if Platform == Enum.Platform.IOS then
+		s1 = "iOS"
+
+		return
+	end
+
+	if Platform == Enum.Platform.Windows then
+		s1 = "Win"
+
+		return
+	end
+
+	if Platform == Enum.Platform.UWP then
+		s1 = "UWP"
+
+		return
+	end
+
+	if Platform == Enum.Platform.OSX then
+		s1 = "Mac"
+
+		return
+	end
+
+	if Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.XBoxOne then
+		s1 = "XBox"
+
+		return
+	end
+
+	if Platform == Enum.Platform.PS4 or game:GetEngineFeature("PlatformEnumPS5") and Platform == Enum.Platform.PS5 then
+		s1 = "PS"
+	end
+end)
+
+return function(p1, s2: string, n1: number, n2: number?) -- line: 32
+	-- upvalues: AppPage (copy), s1 (ref), IsVRAppBuild (copy)
+	if not p1 or not p1.Diag then
+		return
+	end
+
+	if not s2 then
+		return
+	end
+
+	local s3 = "Other"
+
+	if s2 == AppPage.Home or s2 == AppPage.Games then
+		if n2 == 1 then
+			s3 = "GamesList"
+		elseif s2 == AppPage.Home then
+			s3 = "Home"
+		else
+			assert(s2 == AppPage.Games, `{ s2 } should always be Games here`)
+			s3 = "Games"
+		end
+	elseif s2 == "recommended" then
+		s3 = "GameDetail"
+	elseif s2 == AppPage.SearchPage then
+		s3 = "SearchPage"
+	end
+
+	local v12 = s1
+
+	if IsVRAppBuild() then
+		v12 = "VR"
+	end
+
+	local v13 = v12 .. "-GameImps-" .. s3
+
+	p1.Diag:reportCounterSimple(v13, n1)
+end

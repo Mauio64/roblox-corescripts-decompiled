@@ -1,46 +1,54 @@
-local l_Parent_0 = script:FindFirstAncestor("VoiceChat").Parent;
-local v1 = require(l_Parent_0.VoiceChatCore);
-local v2 = require(l_Parent_0.CrossExperienceVoice);
-local v3 = require(l_Parent_0.CrossExperience);
-local v4 = require(l_Parent_0.SharedFlags);
-local l_default_0 = v1.CoreVoiceManager.default;
-local l_default_1 = v2.CrossExperienceVoiceManager.default;
-local l_AUDIO_FOCUS_MANAGEMENT_0 = v3.Constants.AUDIO_FOCUS_MANAGEMENT;
-local v8 = v4.GetFFlagEnableCrossExpVoice();
-local v9 = v4.GetFFlagEnableCrossExperienceVoiceCaptureMute();
-local v10 = {};
-v10.__index = v10;
-v10.new = function() --[[ Line: 38 ]] --[[ Name: new ]]
-    -- upvalues: v10 (copy)
-    local v11 = {};
-    setmetatable(v11, v10);
-    return v11;
-end;
-v10.isPublicVoiceFocused = function(_) --[[ Line: 44 ]] --[[ Name: isPublicVoiceFocused ]]
-    -- upvalues: v8 (copy), l_default_1 (copy), l_AUDIO_FOCUS_MANAGEMENT_0 (copy)
-    return not v8 or l_default_1:getCurrentAudioContext() == l_AUDIO_FOCUS_MANAGEMENT_0.UGC.CONTEXT_ID;
-end;
-v10.isPrivateVoiceFocused = function(_) --[[ Line: 49 ]] --[[ Name: isPrivateVoiceFocused ]]
-    -- upvalues: v8 (copy), l_default_1 (copy), l_AUDIO_FOCUS_MANAGEMENT_0 (copy)
-    return v8 and l_default_1:getCurrentAudioContext() == l_AUDIO_FOCUS_MANAGEMENT_0.CEV.CONTEXT_ID;
-end;
-v10.MuteAll = function(v14, v15) --[[ Line: 54 ]] --[[ Name: MuteAll ]]
-    -- upvalues: v9 (copy), l_default_1 (copy), l_default_0 (copy)
-    if v14:isPrivateVoiceFocused() and v9 then
-        l_default_1:muteAll(v15);
-    end;
-    if v14:isPublicVoiceFocused() and l_default_0:UserVoiceEnabled() and l_default_0:IsInitialized() then
-        l_default_0:MuteAll(true, v15);
-    end;
-end;
-v10.UnmuteAll = function(v16, v17) --[[ Line: 64 ]] --[[ Name: UnmuteAll ]]
-    -- upvalues: v9 (copy), l_default_1 (copy), l_default_0 (copy)
-    if v16:isPrivateVoiceFocused() and v9 then
-        l_default_1:unmuteAll(v17);
-    end;
-    if v16:isPublicVoiceFocused() and l_default_0:UserVoiceEnabled() and l_default_0:IsInitialized() then
-        l_default_0:MuteAll(false, v17);
-    end;
-end;
-v10.default = v10.new();
-return v10;
+local Parent = script:FindFirstAncestor("VoiceChat").Parent
+local VoiceChatCore = require(Parent.VoiceChatCore)
+local CrossExperienceVoice = require(Parent.CrossExperienceVoice)
+local CrossExperience = require(Parent.CrossExperience)
+local SharedFlags = require(Parent.SharedFlags)
+local default = VoiceChatCore.CoreVoiceManager.default
+local default2 = CrossExperienceVoice.CrossExperienceVoiceManager.default
+local AUDIO_FOCUS_MANAGEMENT = CrossExperience.Constants.AUDIO_FOCUS_MANAGEMENT
+local v9 = SharedFlags.GetFFlagEnableCrossExpVoice()
+local v10 = SharedFlags.GetFFlagEnableCrossExperienceVoiceCaptureMute()
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 38
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.isPublicVoiceFocused(_) -- line: 44
+	-- upvalues: v9 (copy), default2 (copy), AUDIO_FOCUS_MANAGEMENT (copy)
+	return not v9 or default2:getCurrentAudioContext() == AUDIO_FOCUS_MANAGEMENT.UGC.CONTEXT_ID
+end
+function t1.isPrivateVoiceFocused(_) -- line: 49
+	-- upvalues: v9 (copy), default2 (copy), AUDIO_FOCUS_MANAGEMENT (copy)
+	return v9 and default2:getCurrentAudioContext() == AUDIO_FOCUS_MANAGEMENT.CEV.CONTEXT_ID
+end
+function t1.MuteAll(t3: {[any]: any}, s1: string?) -- line: 54
+	-- upvalues: v10 (copy), default2 (copy), default (copy)
+	if t3:isPrivateVoiceFocused() and v10 then
+		default2:muteAll(s1)
+	end
+
+	if t3:isPublicVoiceFocused() and default:UserVoiceEnabled() and default:IsInitialized() then
+		default:MuteAll(true, s1)
+	end
+end
+function t1.UnmuteAll(t4: {[any]: any}, s2: string?) -- line: 64
+	-- upvalues: v10 (copy), default2 (copy), default (copy)
+	if t4:isPrivateVoiceFocused() and v10 then
+		default2:unmuteAll(s2)
+	end
+
+	if t4:isPublicVoiceFocused() and default:UserVoiceEnabled() and default:IsInitialized() then
+		default:MuteAll(false, s2)
+	end
+end
+
+t1.default = t1.new()
+
+return t1

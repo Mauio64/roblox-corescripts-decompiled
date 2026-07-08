@@ -1,4 +1,4 @@
 return {
-    Highlight = "Highlight", 
-    Danger = "Danger"
-};
+	Highlight = "Highlight",
+	Danger = "Danger"
+}

@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "subscriptionId", "expectedPrice");
+return require(script.Parent.makeActionCreator)(script.Name, "subscriptionId", "expectedPrice")

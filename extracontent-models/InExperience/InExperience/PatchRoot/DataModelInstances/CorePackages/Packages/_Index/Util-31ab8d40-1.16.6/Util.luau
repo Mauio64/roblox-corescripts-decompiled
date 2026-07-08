@@ -1,3 +1,3 @@
 return {
-    buildApiSiteUrl = require(script.buildApiSiteUrl)
-};
+	buildApiSiteUrl = require(script.buildApiSiteUrl)
+}

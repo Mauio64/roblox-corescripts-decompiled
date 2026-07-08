@@ -1,6 +1,6 @@
-return require(script.Parent.Parent.ActionCreator)("RemovePlayer", function(v0) --[[ Line: 4 ]]
-    return {
-        player = v0, 
-        userId = v0.UserId
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("RemovePlayer", function(p1) -- line: 4
+	return {
+		player = p1,
+		userId = p1.UserId
+	}
+end)

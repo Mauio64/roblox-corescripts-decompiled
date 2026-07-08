@@ -1,22 +1,26 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.types);
-return function(v2, v3, v4) --[[ Line: 11 ]]
-    local v5 = {};
-    local v6 = #v2;
-    v5 = table.create(v6);
-    if v3 then
-        for v7 = 1, v6 do
-            if v4 ~= nil then
-                v5[v7] = v3(v4, string.sub(v2, v7, v7), v7);
-            else
-                v5[v7] = v3(string.sub(v2, v7, v7), v7);
-            end;
-        end;
-        return v5;
-    else
-        for v8 = 1, v6 do
-            v5[v8] = string.sub(v2, v8, v8);
-        end;
-        return v5;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.types)
+
+return function(s1: string, p1: ((...any) -> ...any)?, p2) -- line: 11
+	local v5 = #s1
+	local t1 = table.create(v5)
+
+	if p1 then
+		for i = 1, v5 do
+			if p2 ~= nil then
+				t1[i] = p1(p2, string.sub(s1, i, i), i)
+			else
+				t1[i] = p1(string.sub(s1, i, i), i)
+			end
+		end
+
+		return t1
+	end
+
+	for i = 1, v5 do
+		t1[i] = string.sub(s1, i, i)
+	end
+
+	return t1
+end

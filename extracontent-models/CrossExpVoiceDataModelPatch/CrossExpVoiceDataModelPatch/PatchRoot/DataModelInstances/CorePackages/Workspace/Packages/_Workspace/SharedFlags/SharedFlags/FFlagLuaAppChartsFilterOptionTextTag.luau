@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppChartsFilterOptionTextTag2", false);
+return game:DefineFastFlag("LuaAppChartsFilterOptionTextTag2", false)

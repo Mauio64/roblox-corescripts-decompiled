@@ -1,957 +1,1324 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-local l_v3_0 = v3 --[[ copy: 3 -> 4 ]];
-v3.new = function(v5) --[[ Line: 183 ]] --[[ Name: new ]]
-    -- upvalues: l_v3_0 (copy)
-    return (setmetatable({
-        kind = if not (v5 ~= nil) or v5.kind == nil then nil else v5.kind
-    }, l_v3_0));
-end;
-v3.encode = function(v6) --[[ Line: 189 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v7 = buffer.create(0);
-    local v8 = 0;
-    if v6.kind ~= nil then
-        if v6.kind.type == "comparison" then
-            local v9 = v6.kind.value:encode();
-            local v10, v11 = v0.writeTag(v7, v8, 1, v0.wireTypes.lengthDelimited);
-            v10, v11 = v0.writeBuffer(v10, v11, v9, buffer.len(v9));
-            v7 = v10;
-            v8 = v11;
-        elseif v6.kind.type == "is_null" then
-            local v12 = v6.kind.value:encode();
-            local v13, v14 = v0.writeTag(v7, v8, 2, v0.wireTypes.lengthDelimited);
-            v13, v14 = v0.writeBuffer(v13, v14, v12, buffer.len(v12));
-            v7 = v13;
-            v8 = v14;
-        elseif v6.kind.type == "is_not_null" then
-            local v15 = v6.kind.value:encode();
-            local v16, v17 = v0.writeTag(v7, v8, 3, v0.wireTypes.lengthDelimited);
-            v16, v17 = v0.writeBuffer(v16, v17, v15, buffer.len(v15));
-            v7 = v16;
-            v8 = v17;
-        elseif v6.kind.type == "and_condition" then
-            local v18 = v6.kind.value:encode();
-            local v19, v20 = v0.writeTag(v7, v8, 4, v0.wireTypes.lengthDelimited);
-            v19, v20 = v0.writeBuffer(v19, v20, v18, buffer.len(v18));
-            v7 = v19;
-            v8 = v20;
-        elseif v6.kind.type == "or_condition" then
-            local v21 = v6.kind.value:encode();
-            local v22, v23 = v0.writeTag(v7, v8, 5, v0.wireTypes.lengthDelimited);
-            v22, v23 = v0.writeBuffer(v22, v23, v21, buffer.len(v21));
-            v7 = v22;
-            v8 = v23;
-        end;
-    end;
-    local v24 = buffer.create(v8);
-    buffer.copy(v24, 0, v7, 0, v8);
-    return v24;
-end;
-v3.decode = function(v25) --[[ Line: 222 ]] --[[ Name: decode ]]
-    -- upvalues: l_v3_0 (copy), v0 (copy), v2 (copy)
-    local v26 = l_v3_0.new();
-    local v27 = 0;
-    while v27 < buffer.len(v25) do
-        local v28 = nil;
-        local v29 = nil;
-        local v30, v31, v32 = v0.readTag(v25, v27);
-        v28 = v30;
-        v29 = v31;
-        v27 = v32;
-        if v29 == v0.wireTypes.varint then
-            v30 = nil;
-            v31, v32 = v0.readVarInt(v25, v27);
-            v30 = v31;
-            v27 = v32;
-        elseif v29 == v0.wireTypes.lengthDelimited then
-            if v28 == 1 then
-                v30 = nil;
-                v31, v32 = v0.readBuffer(v25, v27);
-                v30 = v31;
-                v27 = v32;
-                v26.kind = {
-                    type = "comparison", 
-                    value = v2.ComparisonCondition.decode(v30)
-                };
-            elseif v28 == 2 then
-                v30 = nil;
-                v31, v32 = v0.readBuffer(v25, v27);
-                v30 = v31;
-                v27 = v32;
-                v26.kind = {
-                    type = "is_null", 
-                    value = v2.IsNullCondition.decode(v30)
-                };
-            elseif v28 == 3 then
-                v30 = nil;
-                v31, v32 = v0.readBuffer(v25, v27);
-                v30 = v31;
-                v27 = v32;
-                v26.kind = {
-                    type = "is_not_null", 
-                    value = v2.IsNotNullCondition.decode(v30)
-                };
-            elseif v28 == 4 then
-                v30 = nil;
-                v31, v32 = v0.readBuffer(v25, v27);
-                v30 = v31;
-                v27 = v32;
-                v26.kind = {
-                    type = "and_condition", 
-                    value = v2.AndCondition.decode(v30)
-                };
-            elseif v28 == 5 then
-                v30 = nil;
-                v31, v32 = v0.readBuffer(v25, v27);
-                v30 = v31;
-                v27 = v32;
-                v26.kind = {
-                    type = "or_condition", 
-                    value = v2.OrCondition.decode(v30)
-                };
-            else
-                v30 = nil;
-                v31, v32 = v0.readVarInt(v25, v27);
-                v27 = v32 + v31;
-            end;
-        elseif v29 == v0.wireTypes.i32 then
-            v30 = nil;
-            v31, v32 = v0.readFixed32(v25, v27);
-            v30 = v31;
-            v27 = v32;
-        elseif v29 == v0.wireTypes.i64 then
-            v30 = nil;
-            v31, v32 = v0.readFixed64(v25, v27);
-            v30 = v31;
-            v27 = v32;
-        else
-            error("Unsupported wire type: " .. v29);
-        end;
-    end;
-    return v26;
-end;
-v3.jsonEncode = function(v33) --[[ Line: 285 ]] --[[ Name: jsonEncode ]]
-    local v34 = {};
-    if v33.kind ~= nil then
-        if v33.kind.type == "comparison" then
-            v34.comparison = v33.kind.value:jsonEncode();
-            return v34;
-        elseif v33.kind.type == "is_null" then
-            v34.isNull = v33.kind.value:jsonEncode();
-            return v34;
-        elseif v33.kind.type == "is_not_null" then
-            v34.isNotNull = v33.kind.value:jsonEncode();
-            return v34;
-        elseif v33.kind.type == "and_condition" then
-            v34.andCondition = v33.kind.value:jsonEncode();
-            return v34;
-        elseif v33.kind.type == "or_condition" then
-            v34.orCondition = v33.kind.value:jsonEncode();
-        end;
-    end;
-    return v34;
-end;
-v3.jsonDecode = function(v35) --[[ Line: 305 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v3_0 (copy), v2 (copy)
-    local v36 = l_v3_0.new();
-    if v35.comparison ~= nil then
-        v36.kind = {
-            type = "comparison", 
-            value = v2.ComparisonCondition.jsonDecode(v35.comparison)
-        };
-    end;
-    if v35.is_null ~= nil then
-        v36.kind = {
-            type = "is_null", 
-            value = v2.IsNullCondition.jsonDecode(v35.is_null)
-        };
-    end;
-    if v35.isNull ~= nil then
-        v36.kind = {
-            type = "is_null", 
-            value = v2.IsNullCondition.jsonDecode(v35.isNull)
-        };
-    end;
-    if v35.is_not_null ~= nil then
-        v36.kind = {
-            type = "is_not_null", 
-            value = v2.IsNotNullCondition.jsonDecode(v35.is_not_null)
-        };
-    end;
-    if v35.isNotNull ~= nil then
-        v36.kind = {
-            type = "is_not_null", 
-            value = v2.IsNotNullCondition.jsonDecode(v35.isNotNull)
-        };
-    end;
-    if v35.and_condition ~= nil then
-        v36.kind = {
-            type = "and_condition", 
-            value = v2.AndCondition.jsonDecode(v35.and_condition)
-        };
-    end;
-    if v35.andCondition ~= nil then
-        v36.kind = {
-            type = "and_condition", 
-            value = v2.AndCondition.jsonDecode(v35.andCondition)
-        };
-    end;
-    if v35.or_condition ~= nil then
-        v36.kind = {
-            type = "or_condition", 
-            value = v2.OrCondition.jsonDecode(v35.or_condition)
-        };
-    end;
-    if v35.orCondition ~= nil then
-        v36.kind = {
-            type = "or_condition", 
-            value = v2.OrCondition.jsonDecode(v35.orCondition)
-        };
-    end;
-    return v36;
-end;
-v3.descriptor = {
-    name = "PropCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.PropCondition"
-};
-v2.PropCondition = v3;
-v1.default:register(v2.PropCondition);
-v3 = {};
-v3.__index = v3;
-local l_v3_1 = v3 --[[ copy: 3 -> 5 ]];
-v3.new = function(v38) --[[ Line: 361 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), l_v3_1 (copy)
-    return (setmetatable({
-        field = (not (v38 ~= nil) or v38.field == nil) and "" or v38.field, 
-        op = if not (v38 ~= nil) or v38.op == nil then assert(v2.ComparisonCondition_Op.fromNumber(0), "Enum has no 0 default") else v38.op, 
-        kind = if not (v38 ~= nil) or v38.kind == nil then nil else v38.kind
-    }, l_v3_1));
-end;
-v3.encode = function(v39) --[[ Line: 371 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy), v2 (copy)
-    local v40 = buffer.create(0);
-    local v41 = 0;
-    if v39.field ~= nil and v39.field ~= "" then
-        local v42, v43 = v0.writeTag(v40, v41, 1, v0.wireTypes.lengthDelimited);
-        v42, v43 = v0.writeString(v42, v43, v39.field);
-        v40 = v42;
-        v41 = v43;
-    end;
-    if v39.op ~= nil and (v39.op ~= nil and v39.op ~= 0 or v39.op ~= v2.ComparisonCondition_Op.fromNumber(0)) then
-        local v44, v45 = v0.writeTag(v40, v41, 2, v0.wireTypes.varint);
-        v44, v45 = v0.writeVarInt(v44, v45, v2.ComparisonCondition_Op.toNumber(v39.op));
-        v40 = v44;
-        v41 = v45;
-    end;
-    if v39.kind ~= nil then
-        if v39.kind.type == "string_value" then
-            local v46, v47 = v0.writeTag(v40, v41, 3, v0.wireTypes.lengthDelimited);
-            v46, v47 = v0.writeString(v46, v47, v39.kind.value);
-            v40 = v46;
-            v41 = v47;
-        elseif v39.kind.type == "bool_value" then
-            local v48, v49 = v0.writeTag(v40, v41, 4, v0.wireTypes.varint);
-            v48, v49 = v0.writeVarInt(v48, v49, v39.kind.value and 1 or 0);
-            v40 = v48;
-            v41 = v49;
-        elseif v39.kind.type == "int32_value" then
-            local v50, v51 = v0.writeTag(v40, v41, 5, v0.wireTypes.varint);
-            v50, v51 = v0.writeVarInt(v50, v51, v39.kind.value);
-            v40 = v50;
-            v41 = v51;
-        elseif v39.kind.type == "int64_value" then
-            local v52, v53 = v0.writeTag(v40, v41, 6, v0.wireTypes.varint);
-            v52, v53 = v0.writeVarInt(v52, v53, v39.kind.value);
-            v40 = v52;
-            v41 = v53;
-        elseif v39.kind.type == "float_value" then
-            local v54, v55 = v0.writeTag(v40, v41, 7, v0.wireTypes.i32);
-            v54, v55 = v0.writeFloat(v54, v55, v39.kind.value);
-            v40 = v54;
-            v41 = v55;
-        elseif v39.kind.type == "double_value" then
-            local v56, v57 = v0.writeTag(v40, v41, 8, v0.wireTypes.i64);
-            v56, v57 = v0.writeDouble(v56, v57, v39.kind.value);
-            v40 = v56;
-            v41 = v57;
-        end;
-    end;
-    local v58 = buffer.create(v41);
-    buffer.copy(v58, 0, v40, 0, v41);
-    return v58;
-end;
-v3.decode = function(v59) --[[ Line: 415 ]] --[[ Name: decode ]]
-    -- upvalues: l_v3_1 (copy), v0 (copy), v2 (copy)
-    local v60 = l_v3_1.new();
-    local v61 = 0;
-    while v61 < buffer.len(v59) do
-        local v62 = nil;
-        local v63 = nil;
-        local v64, v65, v66 = v0.readTag(v59, v61);
-        v62 = v64;
-        v63 = v65;
-        v61 = v66;
-        if v63 == v0.wireTypes.varint then
-            if v62 == 2 then
-                v64 = nil;
-                v65, v66 = v0.readVarIntI32(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.op = v2.ComparisonCondition_Op.fromNumber(v64) or v64;
-            elseif v62 == 4 then
-                v64 = nil;
-                v65, v66 = v0.readVarInt(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "bool_value", 
-                    value = v64 ~= 0
-                };
-            elseif v62 == 5 then
-                v64 = nil;
-                v65, v66 = v0.readVarIntI32(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "int32_value", 
-                    value = v64
-                };
-            elseif v62 == 6 then
-                v64 = nil;
-                v65, v66 = v0.readVarIntI64(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "int64_value", 
-                    value = v64
-                };
-            else
-                v64 = nil;
-                v65, v66 = v0.readVarInt(v59, v61);
-                v64 = v65;
-                v61 = v66;
-            end;
-        elseif v63 == v0.wireTypes.lengthDelimited then
-            if v62 == 1 then
-                v64 = nil;
-                v65, v66 = v0.readBuffer(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.field = buffer.tostring(v64);
-            elseif v62 == 3 then
-                v64 = nil;
-                v65, v66 = v0.readBuffer(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "string_value", 
-                    value = buffer.tostring(v64)
-                };
-            else
-                v64 = nil;
-                v65, v66 = v0.readVarInt(v59, v61);
-                v61 = v66 + v65;
-            end;
-        elseif v63 == v0.wireTypes.i32 then
-            if v62 == 7 then
-                v64 = nil;
-                v65, v66 = v0.readFloat(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "float_value", 
-                    value = v64
-                };
-            else
-                v64 = nil;
-                v65, v66 = v0.readFixed32(v59, v61);
-                v64 = v65;
-                v61 = v66;
-            end;
-        elseif v63 == v0.wireTypes.i64 then
-            if v62 == 8 then
-                v64 = nil;
-                v65, v66 = v0.readDouble(v59, v61);
-                v64 = v65;
-                v61 = v66;
-                v60.kind = {
-                    type = "double_value", 
-                    value = v64
-                };
-            else
-                v64 = nil;
-                v65, v66 = v0.readFixed64(v59, v61);
-                v64 = v65;
-                v61 = v66;
-            end;
-        else
-            error("Unsupported wire type: " .. v63);
-        end;
-    end;
-    return v60;
-end;
-v3.jsonEncode = function(v67) --[[ Line: 493 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v2 (copy), v0 (copy)
-    local v68 = {};
-    if v67.field ~= nil and v67.field ~= "" then
-        v68.field = v67.field;
-    end;
-    if v67.op ~= nil and (v67.op ~= nil and v67.op ~= 0 or v67.op ~= v2.ComparisonCondition_Op.fromNumber(0)) then
-        v68.op = if typeof(v67.op) == "number" then v67.op else v2.ComparisonCondition_Op.toNumber(v67.op);
-    end;
-    if v67.kind ~= nil then
-        if v67.kind.type == "string_value" then
-            v68.stringValue = v67.kind.value;
-            return v68;
-        elseif v67.kind.type == "bool_value" then
-            v68.boolValue = v67.kind.value;
-            return v68;
-        elseif v67.kind.type == "int32_value" then
-            v68.int32Value = v67.kind.value;
-            return v68;
-        elseif v67.kind.type == "int64_value" then
-            v68.int64Value = v67.kind.value;
-            return v68;
-        elseif v67.kind.type == "float_value" then
-            v68.floatValue = v0.json.serializeNumber(v67.kind.value);
-            return v68;
-        elseif v67.kind.type == "double_value" then
-            v68.doubleValue = v0.json.serializeNumber(v67.kind.value);
-        end;
-    end;
-    return v68;
-end;
-v3.jsonDecode = function(v69) --[[ Line: 528 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v3_1 (copy), v2 (copy), v0 (copy)
-    local v70 = l_v3_1.new();
-    if v69.field ~= nil then
-        v70.field = v69.field;
-    end;
-    if v69.op ~= nil then
-        v70.op = if typeof(v69.op) == "number" then v2.ComparisonCondition_Op.fromNumber(v69.op) or v69.op else v2.ComparisonCondition_Op.fromName(v69.op) or v69.op;
-    end;
-    if v69.string_value ~= nil then
-        v70.kind = {
-            type = "string_value", 
-            value = v69.string_value
-        };
-    end;
-    if v69.stringValue ~= nil then
-        v70.kind = {
-            type = "string_value", 
-            value = v69.stringValue
-        };
-    end;
-    if v69.bool_value ~= nil then
-        v70.kind = {
-            type = "bool_value", 
-            value = v69.bool_value
-        };
-    end;
-    if v69.boolValue ~= nil then
-        v70.kind = {
-            type = "bool_value", 
-            value = v69.boolValue
-        };
-    end;
-    if v69.int32_value ~= nil then
-        v70.kind = {
-            type = "int32_value", 
-            value = v69.int32_value
-        };
-    end;
-    if v69.int32Value ~= nil then
-        v70.kind = {
-            type = "int32_value", 
-            value = v69.int32Value
-        };
-    end;
-    if v69.int64_value ~= nil then
-        v70.kind = {
-            type = "int64_value", 
-            value = v69.int64_value
-        };
-    end;
-    if v69.int64Value ~= nil then
-        v70.kind = {
-            type = "int64_value", 
-            value = v69.int64Value
-        };
-    end;
-    if v69.float_value ~= nil then
-        v70.kind = {
-            type = "float_value", 
-            value = v0.json.deserializeNumber(v69.float_value)
-        };
-    end;
-    if v69.floatValue ~= nil then
-        v70.kind = {
-            type = "float_value", 
-            value = v0.json.deserializeNumber(v69.floatValue)
-        };
-    end;
-    if v69.double_value ~= nil then
-        v70.kind = {
-            type = "double_value", 
-            value = v0.json.deserializeNumber(v69.double_value)
-        };
-    end;
-    if v69.doubleValue ~= nil then
-        v70.kind = {
-            type = "double_value", 
-            value = v0.json.deserializeNumber(v69.doubleValue)
-        };
-    end;
-    return v70;
-end;
-v3.descriptor = {
-    name = "ComparisonCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.ComparisonCondition"
-};
-v2.ComparisonCondition = v3;
-v1.default:register(v2.ComparisonCondition);
-v2.ComparisonCondition_Op = {
-    fromNumber = function(v71) --[[ Line: 603 ]] --[[ Name: fromNumber ]]
-        if v71 == 0 then
-            return "OP_INVALID";
-        elseif v71 == 1 then
-            return "OP_LT";
-        elseif v71 == 2 then
-            return "OP_LTE";
-        elseif v71 == 3 then
-            return "OP_GT";
-        elseif v71 == 4 then
-            return "OP_GTE";
-        elseif v71 == 5 then
-            return "OP_E";
-        elseif v71 == 6 then
-            return "OP_NE";
-        else
-            return nil;
-        end;
-    end, 
-    toNumber = function(v72) --[[ Line: 623 ]] --[[ Name: toNumber ]]
-        if v72 == "OP_INVALID" then
-            return 0;
-        elseif v72 == "OP_LT" then
-            return 1;
-        elseif v72 == "OP_LTE" then
-            return 2;
-        elseif v72 == "OP_GT" then
-            return 3;
-        elseif v72 == "OP_GTE" then
-            return 4;
-        elseif v72 == "OP_E" then
-            return 5;
-        elseif v72 == "OP_NE" then
-            return 6;
-        else
-            return v72;
-        end;
-    end, 
-    fromName = function(v73) --[[ Line: 643 ]] --[[ Name: fromName ]]
-        if v73 == "OP_INVALID" then
-            return "OP_INVALID";
-        elseif v73 == "OP_LT" then
-            return "OP_LT";
-        elseif v73 == "OP_LTE" then
-            return "OP_LTE";
-        elseif v73 == "OP_GT" then
-            return "OP_GT";
-        elseif v73 == "OP_GTE" then
-            return "OP_GTE";
-        elseif v73 == "OP_E" then
-            return "OP_E";
-        elseif v73 == "OP_NE" then
-            return "OP_NE";
-        else
-            return nil;
-        end;
-    end
-};
-v3 = {};
-v3.__index = v3;
-local l_v3_2 = v3 --[[ copy: 3 -> 6 ]];
-v3.new = function(v75) --[[ Line: 668 ]] --[[ Name: new ]]
-    -- upvalues: l_v3_2 (copy)
-    return (setmetatable({
-        field = (not (v75 ~= nil) or v75.field == nil) and "" or v75.field
-    }, l_v3_2));
-end;
-v3.encode = function(v76) --[[ Line: 674 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v77 = buffer.create(0);
-    local v78 = 0;
-    if v76.field ~= nil and v76.field ~= "" then
-        local v79, v80 = v0.writeTag(v77, v78, 1, v0.wireTypes.lengthDelimited);
-        v79, v80 = v0.writeString(v79, v80, v76.field);
-        v77 = v79;
-        v78 = v80;
-    end;
-    local v81 = buffer.create(v78);
-    buffer.copy(v81, 0, v77, 0, v78);
-    return v81;
-end;
-v3.decode = function(v82) --[[ Line: 688 ]] --[[ Name: decode ]]
-    -- upvalues: l_v3_2 (copy), v0 (copy)
-    local v83 = l_v3_2.new();
-    local v84 = 0;
-    while v84 < buffer.len(v82) do
-        local v85 = nil;
-        local v86 = nil;
-        local v87, v88, v89 = v0.readTag(v82, v84);
-        v85 = v87;
-        v86 = v88;
-        v84 = v89;
-        if v86 == v0.wireTypes.varint then
-            v87 = nil;
-            v88, v89 = v0.readVarInt(v82, v84);
-            v87 = v88;
-            v84 = v89;
-        elseif v86 == v0.wireTypes.lengthDelimited then
-            if v85 == 1 then
-                v87 = nil;
-                v88, v89 = v0.readBuffer(v82, v84);
-                v87 = v88;
-                v84 = v89;
-                v83.field = buffer.tostring(v87);
-            else
-                v87 = nil;
-                v88, v89 = v0.readVarInt(v82, v84);
-                v84 = v89 + v88;
-            end;
-        elseif v86 == v0.wireTypes.i32 then
-            v87 = nil;
-            v88, v89 = v0.readFixed32(v82, v84);
-            v87 = v88;
-            v84 = v89;
-        elseif v86 == v0.wireTypes.i64 then
-            v87 = nil;
-            v88, v89 = v0.readFixed64(v82, v84);
-            v87 = v88;
-            v84 = v89;
-        else
-            error("Unsupported wire type: " .. v86);
-        end;
-    end;
-    return v83;
-end;
-v3.jsonEncode = function(v90) --[[ Line: 731 ]] --[[ Name: jsonEncode ]]
-    local v91 = {};
-    if v90.field ~= nil and v90.field ~= "" then
-        v91.field = v90.field;
-    end;
-    return v91;
-end;
-v3.jsonDecode = function(v92) --[[ Line: 741 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v3_2 (copy)
-    local v93 = l_v3_2.new();
-    if v92.field ~= nil then
-        v93.field = v92.field;
-    end;
-    return v93;
-end;
-v3.descriptor = {
-    name = "IsNullCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.IsNullCondition"
-};
-v2.IsNullCondition = v3;
-v1.default:register(v2.IsNullCondition);
-v3 = {};
-v3.__index = v3;
-local l_v3_3 = v3 --[[ copy: 3 -> 7 ]];
-v3.new = function(v95) --[[ Line: 765 ]] --[[ Name: new ]]
-    -- upvalues: l_v3_3 (copy)
-    return (setmetatable({
-        field = (not (v95 ~= nil) or v95.field == nil) and "" or v95.field
-    }, l_v3_3));
-end;
-v3.encode = function(v96) --[[ Line: 771 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v97 = buffer.create(0);
-    local v98 = 0;
-    if v96.field ~= nil and v96.field ~= "" then
-        local v99, v100 = v0.writeTag(v97, v98, 1, v0.wireTypes.lengthDelimited);
-        v99, v100 = v0.writeString(v99, v100, v96.field);
-        v97 = v99;
-        v98 = v100;
-    end;
-    local v101 = buffer.create(v98);
-    buffer.copy(v101, 0, v97, 0, v98);
-    return v101;
-end;
-v3.decode = function(v102) --[[ Line: 785 ]] --[[ Name: decode ]]
-    -- upvalues: l_v3_3 (copy), v0 (copy)
-    local v103 = l_v3_3.new();
-    local v104 = 0;
-    while v104 < buffer.len(v102) do
-        local v105 = nil;
-        local v106 = nil;
-        local v107, v108, v109 = v0.readTag(v102, v104);
-        v105 = v107;
-        v106 = v108;
-        v104 = v109;
-        if v106 == v0.wireTypes.varint then
-            v107 = nil;
-            v108, v109 = v0.readVarInt(v102, v104);
-            v107 = v108;
-            v104 = v109;
-        elseif v106 == v0.wireTypes.lengthDelimited then
-            if v105 == 1 then
-                v107 = nil;
-                v108, v109 = v0.readBuffer(v102, v104);
-                v107 = v108;
-                v104 = v109;
-                v103.field = buffer.tostring(v107);
-            else
-                v107 = nil;
-                v108, v109 = v0.readVarInt(v102, v104);
-                v104 = v109 + v108;
-            end;
-        elseif v106 == v0.wireTypes.i32 then
-            v107 = nil;
-            v108, v109 = v0.readFixed32(v102, v104);
-            v107 = v108;
-            v104 = v109;
-        elseif v106 == v0.wireTypes.i64 then
-            v107 = nil;
-            v108, v109 = v0.readFixed64(v102, v104);
-            v107 = v108;
-            v104 = v109;
-        else
-            error("Unsupported wire type: " .. v106);
-        end;
-    end;
-    return v103;
-end;
-v3.jsonEncode = function(v110) --[[ Line: 828 ]] --[[ Name: jsonEncode ]]
-    local v111 = {};
-    if v110.field ~= nil and v110.field ~= "" then
-        v111.field = v110.field;
-    end;
-    return v111;
-end;
-v3.jsonDecode = function(v112) --[[ Line: 838 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v3_3 (copy)
-    local v113 = l_v3_3.new();
-    if v112.field ~= nil then
-        v113.field = v112.field;
-    end;
-    return v113;
-end;
-v3.descriptor = {
-    name = "IsNotNullCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.IsNotNullCondition"
-};
-v2.IsNotNullCondition = v3;
-v1.default:register(v2.IsNotNullCondition);
-v3 = {};
-v3.__index = v3;
-local l_v3_4 = v3 --[[ copy: 3 -> 8 ]];
-v3.new = function(v115) --[[ Line: 862 ]] --[[ Name: new ]]
-    -- upvalues: l_v3_4 (copy)
-    return (setmetatable({
-        conditions = if not (v115 ~= nil) or v115.conditions == nil then {} else v115.conditions
-    }, l_v3_4));
-end;
-v3.encode = function(v116) --[[ Line: 868 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v117 = buffer.create(0);
-    local v118 = 0;
-    if v116.conditions ~= nil and #v116.conditions > 0 then
-        for _, v120 in v116.conditions do
-            local v121 = v120:encode();
-            local v122, v123 = v0.writeTag(v117, v118, 1, v0.wireTypes.lengthDelimited);
-            v122, v123 = v0.writeBuffer(v122, v123, v121, buffer.len(v121));
-            v117 = v122;
-            v118 = v123;
-        end;
-    end;
-    local v124 = buffer.create(v118);
-    buffer.copy(v124, 0, v117, 0, v118);
-    return v124;
-end;
-v3.decode = function(v125) --[[ Line: 885 ]] --[[ Name: decode ]]
-    -- upvalues: l_v3_4 (copy), v0 (copy), v2 (copy)
-    local v126 = l_v3_4.new();
-    local v127 = 0;
-    while v127 < buffer.len(v125) do
-        local v128 = nil;
-        local v129 = nil;
-        local v130, v131, v132 = v0.readTag(v125, v127);
-        v128 = v130;
-        v129 = v131;
-        v127 = v132;
-        if v129 == v0.wireTypes.varint then
-            v130 = nil;
-            v131, v132 = v0.readVarInt(v125, v127);
-            v130 = v131;
-            v127 = v132;
-        elseif v129 == v0.wireTypes.lengthDelimited then
-            if v128 == 1 then
-                v130 = nil;
-                v131, v132 = v0.readBuffer(v125, v127);
-                v130 = v131;
-                v127 = v132;
-                table.insert(v126.conditions, v2.PropCondition.decode(v130));
-            else
-                v130 = nil;
-                v131, v132 = v0.readVarInt(v125, v127);
-                v127 = v132 + v131;
-            end;
-        elseif v129 == v0.wireTypes.i32 then
-            v130 = nil;
-            v131, v132 = v0.readFixed32(v125, v127);
-            v130 = v131;
-            v127 = v132;
-        elseif v129 == v0.wireTypes.i64 then
-            v130 = nil;
-            v131, v132 = v0.readFixed64(v125, v127);
-            v130 = v131;
-            v127 = v132;
-        else
-            error("Unsupported wire type: " .. v129);
-        end;
-    end;
-    return v126;
-end;
-v3.jsonEncode = function(v133) --[[ Line: 928 ]] --[[ Name: jsonEncode ]]
-    local v134 = {};
-    if v133.conditions ~= nil and #v133.conditions > 0 then
-        local v135 = {};
-        for _, v137 in v133.conditions do
-            table.insert(v135, v137:jsonEncode());
-        end;
-        v134.conditions = v135;
-    end;
-    return v134;
-end;
-v3.jsonDecode = function(v138) --[[ Line: 942 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v3_4 (copy), v2 (copy)
-    local v139 = l_v3_4.new();
-    if v138.conditions ~= nil then
-        local v140 = {};
-        for _, v142 in v138.conditions do
-            table.insert(v140, v2.PropCondition.jsonDecode(v142));
-        end;
-        v139.conditions = v140;
-    end;
-    return v139;
-end;
-v3.descriptor = {
-    name = "AndCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.AndCondition"
-};
-v2.AndCondition = v3;
-v1.default:register(v2.AndCondition);
-v3 = {};
-v3.__index = v3;
-v3.new = function(v143) --[[ Line: 971 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        conditions = if not (v143 ~= nil) or v143.conditions == nil then {} else v143.conditions
-    }, v3));
-end;
-v3.encode = function(v144) --[[ Line: 977 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v145 = buffer.create(0);
-    local v146 = 0;
-    if v144.conditions ~= nil and #v144.conditions > 0 then
-        for _, v148 in v144.conditions do
-            local v149 = v148:encode();
-            local v150, v151 = v0.writeTag(v145, v146, 1, v0.wireTypes.lengthDelimited);
-            v150, v151 = v0.writeBuffer(v150, v151, v149, buffer.len(v149));
-            v145 = v150;
-            v146 = v151;
-        end;
-    end;
-    local v152 = buffer.create(v146);
-    buffer.copy(v152, 0, v145, 0, v146);
-    return v152;
-end;
-v3.decode = function(v153) --[[ Line: 994 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy), v2 (copy)
-    local v154 = v3.new();
-    local v155 = 0;
-    while v155 < buffer.len(v153) do
-        local v156 = nil;
-        local v157 = nil;
-        local v158, v159, v160 = v0.readTag(v153, v155);
-        v156 = v158;
-        v157 = v159;
-        v155 = v160;
-        if v157 == v0.wireTypes.varint then
-            v158 = nil;
-            v159, v160 = v0.readVarInt(v153, v155);
-            v158 = v159;
-            v155 = v160;
-        elseif v157 == v0.wireTypes.lengthDelimited then
-            if v156 == 1 then
-                v158 = nil;
-                v159, v160 = v0.readBuffer(v153, v155);
-                v158 = v159;
-                v155 = v160;
-                table.insert(v154.conditions, v2.PropCondition.decode(v158));
-            else
-                v158 = nil;
-                v159, v160 = v0.readVarInt(v153, v155);
-                v155 = v160 + v159;
-            end;
-        elseif v157 == v0.wireTypes.i32 then
-            v158 = nil;
-            v159, v160 = v0.readFixed32(v153, v155);
-            v158 = v159;
-            v155 = v160;
-        elseif v157 == v0.wireTypes.i64 then
-            v158 = nil;
-            v159, v160 = v0.readFixed64(v153, v155);
-            v158 = v159;
-            v155 = v160;
-        else
-            error("Unsupported wire type: " .. v157);
-        end;
-    end;
-    return v154;
-end;
-v3.jsonEncode = function(v161) --[[ Line: 1037 ]] --[[ Name: jsonEncode ]]
-    local v162 = {};
-    if v161.conditions ~= nil and #v161.conditions > 0 then
-        local v163 = {};
-        for _, v165 in v161.conditions do
-            table.insert(v163, v165:jsonEncode());
-        end;
-        v162.conditions = v163;
-    end;
-    return v162;
-end;
-v3.jsonDecode = function(v166) --[[ Line: 1051 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v167 = v3.new();
-    if v166.conditions ~= nil then
-        local v168 = {};
-        for _, v170 in v166.conditions do
-            table.insert(v168, v2.PropCondition.jsonDecode(v170));
-        end;
-        v167.conditions = v168;
-    end;
-    return v167;
-end;
-v3.descriptor = {
-    name = "OrCondition", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.OrCondition"
-};
-v2.OrCondition = v3;
-v1.default:register(v2.OrCondition);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 231
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		kind = if t3 ~= nil and t3.kind ~= nil then t3.kind else nil
+	}, t2))
+end
+function t2.encode(p1) -- line: 237
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.kind ~= nil then
+		if p1.kind.type == "comparison" then
+			local v16 = p1.kind.value:encode()
+			local v17, v18 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v17, v18, v16, buffer.len(v16))
+		elseif p1.kind.type == "is_null" then
+			local v19 = p1.kind.value:encode()
+			local v20, v21 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v20, v21, v19, buffer.len(v19))
+		elseif p1.kind.type == "is_not_null" then
+			local v22 = p1.kind.value:encode()
+			local v23, v24 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v23, v24, v22, buffer.len(v22))
+		elseif p1.kind.type == "and_condition" then
+			local v25 = p1.kind.value:encode()
+			local v26, v27 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v26, v27, v25, buffer.len(v25))
+		elseif p1.kind.type == "or_condition" then
+			local v28 = p1.kind.value:encode()
+			local v29, v30 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v29, v30, v28, buffer.len(v28))
+		elseif p1.kind.type == "is_empty" then
+			local v31 = p1.kind.value:encode()
+			local v32, v33 = proto.writeTag(buf, n1, 6, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v32, v33, v31, buffer.len(v31))
+		elseif p1.kind.type == "is_not_empty" then
+			local v34 = p1.kind.value:encode()
+			local v35, v36 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeBuffer(v35, v36, v34, buffer.len(v34))
+		end
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 278
+	-- upvalues: t2 (copy), proto (copy), t1 (copy)
+	local v39 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v41, v42
+
+		v41, v42, n2 = proto.readTag(p2, n2)
+
+		if v42 == proto.wireTypes.varint then
+			local v43
+
+			v43, n2 = proto.readVarInt(p2, n2)
+		elseif v42 == proto.wireTypes.lengthDelimited then
+			if v41 == 1 then
+				local v44
+
+				v44, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "comparison",
+					value = t1.ComparisonCondition.decode(v44)
+				}
+			elseif v41 == 2 then
+				local v45
+
+				v45, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "is_null",
+					value = t1.IsNullCondition.decode(v45)
+				}
+			elseif v41 == 3 then
+				local v46
+
+				v46, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "is_not_null",
+					value = t1.IsNotNullCondition.decode(v46)
+				}
+			elseif v41 == 4 then
+				local v47
+
+				v47, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "and_condition",
+					value = t1.AndCondition.decode(v47)
+				}
+			elseif v41 == 5 then
+				local v48
+
+				v48, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "or_condition",
+					value = t1.OrCondition.decode(v48)
+				}
+			elseif v41 == 6 then
+				local v49
+
+				v49, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "is_empty",
+					value = t1.IsEmptyCondition.decode(v49)
+				}
+			elseif v41 == 7 then
+				local v50
+
+				v50, n2 = proto.readBuffer(p2, n2)
+				v39.kind = {
+					type = "is_not_empty",
+					value = t1.IsNotEmptyCondition.decode(v50)
+				}
+			else
+				local v51, v52 = proto.readVarInt(p2, n2)
+
+				n2 = v52 + v51
+			end
+		elseif v42 == proto.wireTypes.i32 then
+			local v53
+
+			v53, n2 = proto.readFixed32(p2, n2)
+		elseif v42 == proto.wireTypes.i64 then
+			local v54
+
+			v54, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v42)
+		end
+	end
+
+	return v39
+end
+function t2.jsonEncode(p3) -- line: 351
+	local t4 = {}
+
+	if p3.kind ~= nil then
+		if p3.kind.type == "comparison" then
+			t4.comparison = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "is_null" then
+			t4.isNull = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "is_not_null" then
+			t4.isNotNull = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "and_condition" then
+			t4.andCondition = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "or_condition" then
+			t4.orCondition = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "is_empty" then
+			t4.isEmpty = p3.kind.value:jsonEncode()
+
+			return t4
+		end
+
+		if p3.kind.type == "is_not_empty" then
+			t4.isNotEmpty = p3.kind.value:jsonEncode()
+		end
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 375
+	-- upvalues: t2 (copy), t1 (copy)
+	local v58 = t2.new()
+
+	if t5.comparison ~= nil then
+		v58.kind = {
+			type = "comparison",
+			value = t1.ComparisonCondition.jsonDecode(t5.comparison)
+		}
+	end
+
+	if t5.is_null ~= nil then
+		v58.kind = {
+			type = "is_null",
+			value = t1.IsNullCondition.jsonDecode(t5.is_null)
+		}
+	end
+
+	if t5.isNull ~= nil then
+		v58.kind = {
+			type = "is_null",
+			value = t1.IsNullCondition.jsonDecode(t5.isNull)
+		}
+	end
+
+	if t5.is_not_null ~= nil then
+		v58.kind = {
+			type = "is_not_null",
+			value = t1.IsNotNullCondition.jsonDecode(t5.is_not_null)
+		}
+	end
+
+	if t5.isNotNull ~= nil then
+		v58.kind = {
+			type = "is_not_null",
+			value = t1.IsNotNullCondition.jsonDecode(t5.isNotNull)
+		}
+	end
+
+	if t5.and_condition ~= nil then
+		v58.kind = {
+			type = "and_condition",
+			value = t1.AndCondition.jsonDecode(t5.and_condition)
+		}
+	end
+
+	if t5.andCondition ~= nil then
+		v58.kind = {
+			type = "and_condition",
+			value = t1.AndCondition.jsonDecode(t5.andCondition)
+		}
+	end
+
+	if t5.or_condition ~= nil then
+		v58.kind = {
+			type = "or_condition",
+			value = t1.OrCondition.jsonDecode(t5.or_condition)
+		}
+	end
+
+	if t5.orCondition ~= nil then
+		v58.kind = {
+			type = "or_condition",
+			value = t1.OrCondition.jsonDecode(t5.orCondition)
+		}
+	end
+
+	if t5.is_empty ~= nil then
+		v58.kind = {
+			type = "is_empty",
+			value = t1.IsEmptyCondition.jsonDecode(t5.is_empty)
+		}
+	end
+
+	if t5.isEmpty ~= nil then
+		v58.kind = {
+			type = "is_empty",
+			value = t1.IsEmptyCondition.jsonDecode(t5.isEmpty)
+		}
+	end
+
+	if t5.is_not_empty ~= nil then
+		v58.kind = {
+			type = "is_not_empty",
+			value = t1.IsNotEmptyCondition.jsonDecode(t5.is_not_empty)
+		}
+	end
+
+	if t5.isNotEmpty ~= nil then
+		v58.kind = {
+			type = "is_not_empty",
+			value = t1.IsNotEmptyCondition.jsonDecode(t5.isNotEmpty)
+		}
+	end
+
+	return v58
+end
+
+t2.descriptor = {
+	name = "PropCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.PropCondition"
+}
+t1.PropCondition = t2
+typeRegistry.default:register(t1.PropCondition)
+
+local t6 = {}
+
+t6.__index = t6
+
+function t6.new(t7: {[any]: any}?) -- line: 447
+	-- upvalues: t1 (copy), t6 (copy)
+	return (setmetatable({
+		field = if t7 ~= nil and t7.field ~= nil then t7.field else "",
+		op = if t7 ~= nil and t7.op ~= nil then t7.op else assert(t1.ComparisonCondition_Op.fromNumber(0), "Enum has no 0 default"),
+		kind = if t7 ~= nil and t7.kind ~= nil then t7.kind else nil
+	}, t6))
+end
+function t6.encode(p4) -- line: 457
+	-- upvalues: proto (copy), t1 (copy)
+	local buf = buffer.create(0)
+	local n3 = 0
+
+	if p4.field ~= nil and p4.field ~= "" then
+		local v63, v64 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n3 = proto.writeString(v63, v64, p4.field)
+	end
+
+	if p4.op ~= nil and (p4.op ~= nil and p4.op ~= 0 or p4.op ~= t1.ComparisonCondition_Op.fromNumber(0)) then
+		local v65, v66 = proto.writeTag(buf, n3, 2, proto.wireTypes.varint)
+
+		buf, n3 = proto.writeVarInt(v65, v66, t1.ComparisonCondition_Op.toNumber(p4.op))
+	end
+
+	if p4.kind ~= nil then
+		if p4.kind.type == "string_value" then
+			local v67, v68 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeString(v67, v68, p4.kind.value)
+		elseif p4.kind.type == "bool_value" then
+			local v69, v70 = proto.writeTag(buf, n3, 4, proto.wireTypes.varint)
+
+			buf, n3 = proto.writeVarInt(v69, v70, not p4.kind.value and 0 or 1)
+		elseif p4.kind.type == "int32_value" then
+			local v71, v72 = proto.writeTag(buf, n3, 5, proto.wireTypes.varint)
+
+			buf, n3 = proto.writeVarInt(v71, v72, p4.kind.value)
+		elseif p4.kind.type == "int64_value" then
+			local v73, v74 = proto.writeTag(buf, n3, 6, proto.wireTypes.varint)
+
+			buf, n3 = proto.writeVarInt(v73, v74, p4.kind.value)
+		elseif p4.kind.type == "float_value" then
+			local v75, v76 = proto.writeTag(buf, n3, 7, proto.wireTypes.i32)
+
+			buf, n3 = proto.writeFloat(v75, v76, p4.kind.value)
+		elseif p4.kind.type == "double_value" then
+			local v77, v78 = proto.writeTag(buf, n3, 8, proto.wireTypes.i64)
+
+			buf, n3 = proto.writeDouble(v77, v78, p4.kind.value)
+		end
+	end
+
+	local buf3 = buffer.create(n3)
+
+	buffer.copy(buf3, 0, buf, 0, n3)
+
+	return buf3
+end
+function t6.decode(p5: buffer) -- line: 501
+	-- upvalues: t6 (copy), proto (copy), t1 (copy)
+	local v81 = t6.new()
+	local n4 = 0
+
+	while n4 < buffer.len(p5) do
+		local v83, v84
+
+		v83, v84, n4 = proto.readTag(p5, n4)
+
+		if v84 == proto.wireTypes.varint then
+			if v83 == 2 then
+				local v85
+
+				v85, n4 = proto.readVarIntI32(p5, n4)
+				v81.op = t1.ComparisonCondition_Op.fromNumber(v85) or v85
+			elseif v83 == 4 then
+				local v86
+
+				v86, n4 = proto.readVarInt(p5, n4)
+				v81.kind = {
+					type = "bool_value",
+					value = v86 ~= 0
+				}
+			elseif v83 == 5 then
+				local v87
+
+				v87, n4 = proto.readVarIntI32(p5, n4)
+				v81.kind = {
+					type = "int32_value",
+					value = v87
+				}
+			elseif v83 == 6 then
+				local v88
+
+				v88, n4 = proto.readVarIntI64(p5, n4)
+				v81.kind = {
+					type = "int64_value",
+					value = v88
+				}
+			else
+				local v89
+
+				v89, n4 = proto.readVarInt(p5, n4)
+			end
+		elseif v84 == proto.wireTypes.lengthDelimited then
+			if v83 == 1 then
+				local v90
+
+				v90, n4 = proto.readBuffer(p5, n4)
+				v81.field = buffer.tostring(v90)
+			elseif v83 == 3 then
+				local v91
+
+				v91, n4 = proto.readBuffer(p5, n4)
+				v81.kind = {
+					type = "string_value",
+					value = buffer.tostring(v91)
+				}
+			else
+				local v92, v93 = proto.readVarInt(p5, n4)
+
+				n4 = v93 + v92
+			end
+		elseif v84 == proto.wireTypes.i32 then
+			if v83 == 7 then
+				local v94
+
+				v94, n4 = proto.readFloat(p5, n4)
+				v81.kind = {
+					type = "float_value",
+					value = v94
+				}
+			else
+				local v95
+
+				v95, n4 = proto.readFixed32(p5, n4)
+			end
+		elseif v84 == proto.wireTypes.i64 then
+			if v83 == 8 then
+				local v96
+
+				v96, n4 = proto.readDouble(p5, n4)
+				v81.kind = {
+					type = "double_value",
+					value = v96
+				}
+			else
+				local v97
+
+				v97, n4 = proto.readFixed64(p5, n4)
+			end
+		else
+			error("Unsupported wire type: " .. v84)
+		end
+	end
+
+	return v81
+end
+function t6.jsonEncode(p6) -- line: 579
+	-- upvalues: t1 (copy), proto (copy)
+	local t8 = {}
+
+	if p6.field ~= nil and p6.field ~= "" then
+		t8.field = p6.field
+	end
+
+	if p6.op ~= nil and (p6.op ~= nil and p6.op ~= 0 or p6.op ~= t1.ComparisonCondition_Op.fromNumber(0)) then
+		t8.op = if typeof(p6.op) ~= "number" then t1.ComparisonCondition_Op.toNumber(p6.op) else p6.op
+	end
+
+	if p6.kind ~= nil then
+		if p6.kind.type == "string_value" then
+			t8.stringValue = p6.kind.value
+
+			return t8
+		end
+
+		if p6.kind.type == "bool_value" then
+			t8.boolValue = p6.kind.value
+
+			return t8
+		end
+
+		if p6.kind.type == "int32_value" then
+			t8.int32Value = p6.kind.value
+
+			return t8
+		end
+
+		if p6.kind.type == "int64_value" then
+			t8.int64Value = p6.kind.value
+
+			return t8
+		end
+
+		if p6.kind.type == "float_value" then
+			t8.floatValue = proto.json.serializeNumber(p6.kind.value)
+
+			return t8
+		end
+
+		if p6.kind.type == "double_value" then
+			t8.doubleValue = proto.json.serializeNumber(p6.kind.value)
+		end
+	end
+
+	return t8
+end
+function t6.jsonDecode(t9: {[any]: any}) -- line: 614
+	-- upvalues: t6 (copy), t1 (copy), proto (copy)
+	local v101 = t6.new()
+
+	if t9.field ~= nil then
+		v101.field = t9.field
+	end
+
+	if t9.op ~= nil then
+		v101.op = if typeof(t9.op) ~= "number" then t1.ComparisonCondition_Op.fromName(t9.op) or t9.op else t1.ComparisonCondition_Op.fromNumber(t9.op) or t9.op
+	end
+
+	if t9.string_value ~= nil then
+		v101.kind = {
+			type = "string_value",
+			value = t9.string_value
+		}
+	end
+
+	if t9.stringValue ~= nil then
+		v101.kind = {
+			type = "string_value",
+			value = t9.stringValue
+		}
+	end
+
+	if t9.bool_value ~= nil then
+		v101.kind = {
+			type = "bool_value",
+			value = t9.bool_value
+		}
+	end
+
+	if t9.boolValue ~= nil then
+		v101.kind = {
+			type = "bool_value",
+			value = t9.boolValue
+		}
+	end
+
+	if t9.int32_value ~= nil then
+		v101.kind = {
+			type = "int32_value",
+			value = t9.int32_value
+		}
+	end
+
+	if t9.int32Value ~= nil then
+		v101.kind = {
+			type = "int32_value",
+			value = t9.int32Value
+		}
+	end
+
+	if t9.int64_value ~= nil then
+		v101.kind = {
+			type = "int64_value",
+			value = t9.int64_value
+		}
+	end
+
+	if t9.int64Value ~= nil then
+		v101.kind = {
+			type = "int64_value",
+			value = t9.int64Value
+		}
+	end
+
+	if t9.float_value ~= nil then
+		v101.kind = {
+			type = "float_value",
+			value = proto.json.deserializeNumber(t9.float_value)
+		}
+	end
+
+	if t9.floatValue ~= nil then
+		v101.kind = {
+			type = "float_value",
+			value = proto.json.deserializeNumber(t9.floatValue)
+		}
+	end
+
+	if t9.double_value ~= nil then
+		v101.kind = {
+			type = "double_value",
+			value = proto.json.deserializeNumber(t9.double_value)
+		}
+	end
+
+	if t9.doubleValue ~= nil then
+		v101.kind = {
+			type = "double_value",
+			value = proto.json.deserializeNumber(t9.doubleValue)
+		}
+	end
+
+	return v101
+end
+
+t6.descriptor = {
+	name = "ComparisonCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ComparisonCondition"
+}
+t1.ComparisonCondition = t6
+typeRegistry.default:register(t1.ComparisonCondition)
+t1.ComparisonCondition_Op = {
+	fromNumber = function(n5: number) -- line: 689
+		if n5 == 0 then
+			return "OP_INVALID"
+		end
+
+		if n5 == 1 then
+			return "OP_LT"
+		end
+
+		if n5 == 2 then
+			return "OP_LTE"
+		end
+
+		if n5 == 3 then
+			return "OP_GT"
+		end
+
+		if n5 == 4 then
+			return "OP_GTE"
+		end
+
+		if n5 == 5 then
+			return "OP_E"
+		end
+
+		if n5 == 6 then
+			return "OP_NE"
+		end
+
+		return nil
+	end,
+	toNumber = function(p7) -- line: 709
+		if p7 == "OP_INVALID" then
+			return 0
+		end
+
+		if p7 == "OP_LT" then
+			return 1
+		end
+
+		if p7 == "OP_LTE" then
+			return 2
+		end
+
+		if p7 == "OP_GT" then
+			return 3
+		end
+
+		if p7 == "OP_GTE" then
+			return 4
+		end
+
+		if p7 == "OP_E" then
+			return 5
+		end
+
+		if p7 == "OP_NE" then
+			return 6
+		end
+
+		return p7
+	end,
+	fromName = function(s1: string) -- line: 729
+		if s1 == "OP_INVALID" then
+			return "OP_INVALID"
+		end
+
+		if s1 == "OP_LT" then
+			return "OP_LT"
+		end
+
+		if s1 == "OP_LTE" then
+			return "OP_LTE"
+		end
+
+		if s1 == "OP_GT" then
+			return "OP_GT"
+		end
+
+		if s1 == "OP_GTE" then
+			return "OP_GTE"
+		end
+
+		if s1 == "OP_E" then
+			return "OP_E"
+		end
+
+		if s1 == "OP_NE" then
+			return "OP_NE"
+		end
+
+		return nil
+	end
+}
+
+local t10 = {}
+
+t10.__index = t10
+
+function t10.new(t11: {[any]: any}?) -- line: 754
+	-- upvalues: t10 (copy)
+	return (setmetatable({
+		field = if t11 ~= nil and t11.field ~= nil then t11.field else ""
+	}, t10))
+end
+function t10.encode(p8) -- line: 760
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n6 = 0
+
+	if p8.field ~= nil and p8.field ~= "" then
+		local v109, v110 = proto.writeTag(buf, n6, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n6 = proto.writeString(v109, v110, p8.field)
+	end
+
+	local buf4 = buffer.create(n6)
+
+	buffer.copy(buf4, 0, buf, 0, n6)
+
+	return buf4
+end
+function t10.decode(p9: buffer) -- line: 774
+	-- upvalues: t10 (copy), proto (copy)
+	local v113 = t10.new()
+	local n7 = 0
+
+	while n7 < buffer.len(p9) do
+		local v115, v116
+
+		v115, v116, n7 = proto.readTag(p9, n7)
+
+		if v116 == proto.wireTypes.varint then
+			local v117
+
+			v117, n7 = proto.readVarInt(p9, n7)
+		elseif v116 == proto.wireTypes.lengthDelimited then
+			if v115 == 1 then
+				local v118
+
+				v118, n7 = proto.readBuffer(p9, n7)
+				v113.field = buffer.tostring(v118)
+			else
+				local v119, v120 = proto.readVarInt(p9, n7)
+
+				n7 = v120 + v119
+			end
+		elseif v116 == proto.wireTypes.i32 then
+			local v121
+
+			v121, n7 = proto.readFixed32(p9, n7)
+		elseif v116 == proto.wireTypes.i64 then
+			local v122
+
+			v122, n7 = proto.readFixed64(p9, n7)
+		else
+			error("Unsupported wire type: " .. v116)
+		end
+	end
+
+	return v113
+end
+function t10.jsonEncode(p10) -- line: 817
+	local t12 = {}
+
+	if p10.field ~= nil and p10.field ~= "" then
+		t12.field = p10.field
+	end
+
+	return t12
+end
+function t10.jsonDecode(t13: {[any]: any}) -- line: 827
+	-- upvalues: t10 (copy)
+	local v126 = t10.new()
+
+	if t13.field ~= nil then
+		v126.field = t13.field
+	end
+
+	return v126
+end
+
+t10.descriptor = {
+	name = "IsNullCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IsNullCondition"
+}
+t1.IsNullCondition = t10
+typeRegistry.default:register(t1.IsNullCondition)
+
+local t14 = {}
+
+t14.__index = t14
+
+function t14.new(t15: {[any]: any}?) -- line: 851
+	-- upvalues: t14 (copy)
+	return (setmetatable({
+		field = if t15 ~= nil and t15.field ~= nil then t15.field else ""
+	}, t14))
+end
+function t14.encode(p11) -- line: 857
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n8 = 0
+
+	if p11.field ~= nil and p11.field ~= "" then
+		local v131, v132 = proto.writeTag(buf, n8, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n8 = proto.writeString(v131, v132, p11.field)
+	end
+
+	local buf5 = buffer.create(n8)
+
+	buffer.copy(buf5, 0, buf, 0, n8)
+
+	return buf5
+end
+function t14.decode(p12: buffer) -- line: 871
+	-- upvalues: t14 (copy), proto (copy)
+	local v135 = t14.new()
+	local n9 = 0
+
+	while n9 < buffer.len(p12) do
+		local v137, v138
+
+		v137, v138, n9 = proto.readTag(p12, n9)
+
+		if v138 == proto.wireTypes.varint then
+			local v139
+
+			v139, n9 = proto.readVarInt(p12, n9)
+		elseif v138 == proto.wireTypes.lengthDelimited then
+			if v137 == 1 then
+				local v140
+
+				v140, n9 = proto.readBuffer(p12, n9)
+				v135.field = buffer.tostring(v140)
+			else
+				local v141, v142 = proto.readVarInt(p12, n9)
+
+				n9 = v142 + v141
+			end
+		elseif v138 == proto.wireTypes.i32 then
+			local v143
+
+			v143, n9 = proto.readFixed32(p12, n9)
+		elseif v138 == proto.wireTypes.i64 then
+			local v144
+
+			v144, n9 = proto.readFixed64(p12, n9)
+		else
+			error("Unsupported wire type: " .. v138)
+		end
+	end
+
+	return v135
+end
+function t14.jsonEncode(p13) -- line: 914
+	local t16 = {}
+
+	if p13.field ~= nil and p13.field ~= "" then
+		t16.field = p13.field
+	end
+
+	return t16
+end
+function t14.jsonDecode(t17: {[any]: any}) -- line: 924
+	-- upvalues: t14 (copy)
+	local v148 = t14.new()
+
+	if t17.field ~= nil then
+		v148.field = t17.field
+	end
+
+	return v148
+end
+
+t14.descriptor = {
+	name = "IsNotNullCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IsNotNullCondition"
+}
+t1.IsNotNullCondition = t14
+typeRegistry.default:register(t1.IsNotNullCondition)
+
+local t18 = {}
+
+t18.__index = t18
+
+function t18.new(t19: {[any]: any}?) -- line: 948
+	-- upvalues: t18 (copy)
+	return (setmetatable({
+		field = if t19 ~= nil and t19.field ~= nil then t19.field else ""
+	}, t18))
+end
+function t18.encode(p14) -- line: 954
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n10 = 0
+
+	if p14.field ~= nil and p14.field ~= "" then
+		local v153, v154 = proto.writeTag(buf, n10, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n10 = proto.writeString(v153, v154, p14.field)
+	end
+
+	local buf6 = buffer.create(n10)
+
+	buffer.copy(buf6, 0, buf, 0, n10)
+
+	return buf6
+end
+function t18.decode(p15: buffer) -- line: 968
+	-- upvalues: t18 (copy), proto (copy)
+	local v157 = t18.new()
+	local n11 = 0
+
+	while n11 < buffer.len(p15) do
+		local v159, v160
+
+		v159, v160, n11 = proto.readTag(p15, n11)
+
+		if v160 == proto.wireTypes.varint then
+			local v161
+
+			v161, n11 = proto.readVarInt(p15, n11)
+		elseif v160 == proto.wireTypes.lengthDelimited then
+			if v159 == 1 then
+				local v162
+
+				v162, n11 = proto.readBuffer(p15, n11)
+				v157.field = buffer.tostring(v162)
+			else
+				local v163, v164 = proto.readVarInt(p15, n11)
+
+				n11 = v164 + v163
+			end
+		elseif v160 == proto.wireTypes.i32 then
+			local v165
+
+			v165, n11 = proto.readFixed32(p15, n11)
+		elseif v160 == proto.wireTypes.i64 then
+			local v166
+
+			v166, n11 = proto.readFixed64(p15, n11)
+		else
+			error("Unsupported wire type: " .. v160)
+		end
+	end
+
+	return v157
+end
+function t18.jsonEncode(p16) -- line: 1011
+	local t20 = {}
+
+	if p16.field ~= nil and p16.field ~= "" then
+		t20.field = p16.field
+	end
+
+	return t20
+end
+function t18.jsonDecode(t21: {[any]: any}) -- line: 1021
+	-- upvalues: t18 (copy)
+	local v170 = t18.new()
+
+	if t21.field ~= nil then
+		v170.field = t21.field
+	end
+
+	return v170
+end
+
+t18.descriptor = {
+	name = "IsEmptyCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IsEmptyCondition"
+}
+t1.IsEmptyCondition = t18
+typeRegistry.default:register(t1.IsEmptyCondition)
+
+local t22 = {}
+
+t22.__index = t22
+
+function t22.new(t23: {[any]: any}?) -- line: 1045
+	-- upvalues: t22 (copy)
+	return (setmetatable({
+		field = if t23 ~= nil and t23.field ~= nil then t23.field else ""
+	}, t22))
+end
+function t22.encode(p17) -- line: 1051
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n12 = 0
+
+	if p17.field ~= nil and p17.field ~= "" then
+		local v175, v176 = proto.writeTag(buf, n12, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n12 = proto.writeString(v175, v176, p17.field)
+	end
+
+	local buf7 = buffer.create(n12)
+
+	buffer.copy(buf7, 0, buf, 0, n12)
+
+	return buf7
+end
+function t22.decode(p18: buffer) -- line: 1065
+	-- upvalues: t22 (copy), proto (copy)
+	local v179 = t22.new()
+	local n13 = 0
+
+	while n13 < buffer.len(p18) do
+		local v181, v182
+
+		v181, v182, n13 = proto.readTag(p18, n13)
+
+		if v182 == proto.wireTypes.varint then
+			local v183
+
+			v183, n13 = proto.readVarInt(p18, n13)
+		elseif v182 == proto.wireTypes.lengthDelimited then
+			if v181 == 1 then
+				local v184
+
+				v184, n13 = proto.readBuffer(p18, n13)
+				v179.field = buffer.tostring(v184)
+			else
+				local v185, v186 = proto.readVarInt(p18, n13)
+
+				n13 = v186 + v185
+			end
+		elseif v182 == proto.wireTypes.i32 then
+			local v187
+
+			v187, n13 = proto.readFixed32(p18, n13)
+		elseif v182 == proto.wireTypes.i64 then
+			local v188
+
+			v188, n13 = proto.readFixed64(p18, n13)
+		else
+			error("Unsupported wire type: " .. v182)
+		end
+	end
+
+	return v179
+end
+function t22.jsonEncode(p19) -- line: 1108
+	local t24 = {}
+
+	if p19.field ~= nil and p19.field ~= "" then
+		t24.field = p19.field
+	end
+
+	return t24
+end
+function t22.jsonDecode(t25: {[any]: any}) -- line: 1118
+	-- upvalues: t22 (copy)
+	local v192 = t22.new()
+
+	if t25.field ~= nil then
+		v192.field = t25.field
+	end
+
+	return v192
+end
+
+t22.descriptor = {
+	name = "IsNotEmptyCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IsNotEmptyCondition"
+}
+t1.IsNotEmptyCondition = t22
+typeRegistry.default:register(t1.IsNotEmptyCondition)
+
+local t26 = {}
+
+t26.__index = t26
+
+function t26.new(t27: {[any]: any}?) -- line: 1142
+	-- upvalues: t26 (copy)
+	return (setmetatable({
+		conditions = if t27 ~= nil and t27.conditions ~= nil then t27.conditions else {}
+	}, t26))
+end
+function t26.encode(p20) -- line: 1148
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n14 = 0
+
+	if p20.conditions ~= nil and #p20.conditions > 0 then
+		for _, v198 in p20.conditions do
+			local v199 = v198:encode()
+			local v200, v201 = proto.writeTag(buf, n14, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n14 = proto.writeBuffer(v200, v201, v199, buffer.len(v199))
+		end
+	end
+
+	local buf8 = buffer.create(n14)
+
+	buffer.copy(buf8, 0, buf, 0, n14)
+
+	return buf8
+end
+function t26.decode(p21: buffer) -- line: 1165
+	-- upvalues: t26 (copy), proto (copy), t1 (copy)
+	local v204 = t26.new()
+	local n15 = 0
+
+	while n15 < buffer.len(p21) do
+		local v206, v207
+
+		v206, v207, n15 = proto.readTag(p21, n15)
+
+		if v207 == proto.wireTypes.varint then
+			local v208
+
+			v208, n15 = proto.readVarInt(p21, n15)
+		elseif v207 == proto.wireTypes.lengthDelimited then
+			if v206 == 1 then
+				local v209
+
+				v209, n15 = proto.readBuffer(p21, n15)
+				table.insert(v204.conditions, t1.PropCondition.decode(v209))
+			else
+				local v210, v211 = proto.readVarInt(p21, n15)
+
+				n15 = v211 + v210
+			end
+		elseif v207 == proto.wireTypes.i32 then
+			local v212
+
+			v212, n15 = proto.readFixed32(p21, n15)
+		elseif v207 == proto.wireTypes.i64 then
+			local v213
+
+			v213, n15 = proto.readFixed64(p21, n15)
+		else
+			error("Unsupported wire type: " .. v207)
+		end
+	end
+
+	return v204
+end
+function t26.jsonEncode(p22) -- line: 1208
+	local t28 = {}
+
+	if p22.conditions ~= nil and #p22.conditions > 0 then
+		local t29 = {}
+
+		for _, v218 in p22.conditions do
+			table.insert(t29, v218:jsonEncode())
+		end
+
+		t28.conditions = t29
+	end
+
+	return t28
+end
+function t26.jsonDecode(t30: {[any]: any}) -- line: 1222
+	-- upvalues: t26 (copy), t1 (copy)
+	local v220 = t26.new()
+
+	if t30.conditions ~= nil then
+		local t31 = {}
+
+		for _, v223 in t30.conditions do
+			table.insert(t31, t1.PropCondition.jsonDecode(v223))
+		end
+
+		v220.conditions = t31
+	end
+
+	return v220
+end
+
+t26.descriptor = {
+	name = "AndCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.AndCondition"
+}
+t1.AndCondition = t26
+typeRegistry.default:register(t1.AndCondition)
+
+local t32 = {}
+
+t32.__index = t32
+
+function t32.new(t33: {[any]: any}?) -- line: 1251
+	-- upvalues: t32 (copy)
+	return (setmetatable({
+		conditions = if t33 ~= nil and t33.conditions ~= nil then t33.conditions else {}
+	}, t32))
+end
+function t32.encode(p23) -- line: 1257
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n16 = 0
+
+	if p23.conditions ~= nil and #p23.conditions > 0 then
+		for _, v229 in p23.conditions do
+			local v230 = v229:encode()
+			local v231, v232 = proto.writeTag(buf, n16, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n16 = proto.writeBuffer(v231, v232, v230, buffer.len(v230))
+		end
+	end
+
+	local buf9 = buffer.create(n16)
+
+	buffer.copy(buf9, 0, buf, 0, n16)
+
+	return buf9
+end
+function t32.decode(p24: buffer) -- line: 1274
+	-- upvalues: t32 (copy), proto (copy), t1 (copy)
+	local v235 = t32.new()
+	local n17 = 0
+
+	while n17 < buffer.len(p24) do
+		local v237, v238
+
+		v237, v238, n17 = proto.readTag(p24, n17)
+
+		if v238 == proto.wireTypes.varint then
+			local v239
+
+			v239, n17 = proto.readVarInt(p24, n17)
+		elseif v238 == proto.wireTypes.lengthDelimited then
+			if v237 == 1 then
+				local v240
+
+				v240, n17 = proto.readBuffer(p24, n17)
+				table.insert(v235.conditions, t1.PropCondition.decode(v240))
+			else
+				local v241, v242 = proto.readVarInt(p24, n17)
+
+				n17 = v242 + v241
+			end
+		elseif v238 == proto.wireTypes.i32 then
+			local v243
+
+			v243, n17 = proto.readFixed32(p24, n17)
+		elseif v238 == proto.wireTypes.i64 then
+			local v244
+
+			v244, n17 = proto.readFixed64(p24, n17)
+		else
+			error("Unsupported wire type: " .. v238)
+		end
+	end
+
+	return v235
+end
+function t32.jsonEncode(p25) -- line: 1317
+	local t34 = {}
+
+	if p25.conditions ~= nil and #p25.conditions > 0 then
+		local t35 = {}
+
+		for _, v249 in p25.conditions do
+			table.insert(t35, v249:jsonEncode())
+		end
+
+		t34.conditions = t35
+	end
+
+	return t34
+end
+function t32.jsonDecode(t36: {[any]: any}) -- line: 1331
+	-- upvalues: t32 (copy), t1 (copy)
+	local v251 = t32.new()
+
+	if t36.conditions ~= nil then
+		local t37 = {}
+
+		for _, v254 in t36.conditions do
+			table.insert(t37, t1.PropCondition.jsonDecode(v254))
+		end
+
+		v251.conditions = t37
+	end
+
+	return v251
+end
+
+t32.descriptor = {
+	name = "OrCondition",
+	fullName = "roblox.apppageplatform.shared.v1beta1.OrCondition"
+}
+t1.OrCondition = t32
+typeRegistry.default:register(t1.OrCondition)
+
 return {
-    PropCondition = v2.PropCondition, 
-    ComparisonCondition = v2.ComparisonCondition, 
-    ComparisonCondition_Op = v2.ComparisonCondition_Op, 
-    IsNullCondition = v2.IsNullCondition, 
-    IsNotNullCondition = v2.IsNotNullCondition, 
-    AndCondition = v2.AndCondition, 
-    OrCondition = v2.OrCondition
-};
+	PropCondition = t1.PropCondition,
+	ComparisonCondition = t1.ComparisonCondition,
+	ComparisonCondition_Op = t1.ComparisonCondition_Op,
+	IsNullCondition = t1.IsNullCondition,
+	IsNotNullCondition = t1.IsNotNullCondition,
+	IsEmptyCondition = t1.IsEmptyCondition,
+	IsNotEmptyCondition = t1.IsNotEmptyCondition,
+	AndCondition = t1.AndCondition,
+	OrCondition = t1.OrCondition
+}

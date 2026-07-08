@@ -1,15 +1,7 @@
-return function(v0, v1) --[[ Line: 3 ]]
-    if v0 == v1 then
-        local v2 = true;
-        if v0 == 0 then
-            v2 = 1 / v0 == 1 / v1;
-        end;
-        return v2;
-    else
-        local v3 = false;
-        if v0 ~= v0 then
-            v3 = v1 ~= v1;
-        end;
-        return v3;
-    end;
-end;
+return function(p1, p2) -- line: 3
+	if p1 == p2 then
+		return p1 ~= 0 or 1 / p1 == 1 / p2
+	end
+
+	return p1 ~= p1 and p2 ~= p2
+end

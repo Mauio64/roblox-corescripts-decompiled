@@ -17,522 +17,515 @@ local Flags = require(Foundation.Utility.Flags)
 local Icon = require(Components.Icon)
 local InputField = require(Components.InputField)
 local InternalTextInput = require(Components.InternalTextInput)
+local Text = require(Components.Text)
 
 require(Components.Types)
 
 local View = require(Components.View)
 local getBindableValue = require(Foundation.Utility.getBindableValue)
 local getInputTextSize = require(Foundation.Utility.getInputTextSize)
+local getMultiLineTextHeight = require(Foundation.Utility.getMultiLineTextHeight)
+local isBuilderIcon = require(Foundation.Utility.isBuilderIcon)
 local joinBindables = require(Foundation.Utility.joinBindables)
 local mapBindable = require(Foundation.Utility.mapBindable)
+local useIconSize = require(Foundation.Utility.useIconSize)
 local useTextInputVariants = require(Components.TextInput.useTextInputVariants)
+local useTextSize = require(Foundation.Utility.useTextSize)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local NumberInputControls = require(script.Parent.NumberInputControls)
 local useNumberInputVariants = require(script.Parent.useNumberInputVariants)
 local calculateNumberInputValueFromPositions = require(script.Parent.calculateNumberInputValueFromPositions)
+
+require(Foundation.Enums.InputFocusBehavior)
+
+local function round(n1: number, n2: number?) -- line: 57
+	local v38 = 10 ^ (n2 or 0)
+
+	return math.floor(n1 * v38 + 0.5) / v38
+end
+local function defaultFormatAsString(n3: number) -- line: 109
+	return (tostring(n3))
+end
+
 local t1 = {
-	variant = if not Flags.FoundationNumberInputVariant then nil else InputVariant.Standard,
-	controlsVariant = NumberInputControlsVariant.Stacked,
-	size = InputSize.Large,
 	minimum = -1e999,
 	maximum = 1e999,
 	step = 1,
 	precision = 3,
 	value = 0,
-	formatAsString = function(n1: number) --[[ defaultFormatAsString ]] -- line: 93
-		return (tostring(n1))
-	end,
 	isScrubbable = false,
-	testId = "--foundation-number-input"
+	testId = "--foundation-number-input",
+	variant = InputVariant.Standard,
+	controlsVariant = NumberInputControlsVariant.Stacked,
+	size = InputSize.Large,
+	formatAsString = defaultFormatAsString
 }
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ NumberInput ]] -- line: 111
-	-- upvalues: withDefaults (copy), t1 (copy), Flags (copy), InputVariant (copy), useTokens (copy), useTextInputVariants (copy), useNumberInputVariants (copy), React (copy), ReactUtils (copy), mapBindable (copy), getBindableValue (copy), OnChangeCallbackReason (copy), NumberInputControls (copy), NumberInputControlsVariant (copy), calculateNumberInputValueFromPositions (copy), ReactIs (copy), InputField (copy), withCommonProps (copy), getInputTextSize (copy), InternalTextInput (copy), joinBindables (copy), View (copy), Icon (copy)
-	local v34 = withDefaults(p1, t1)
-
-	if Flags.FoundationNumberInputVariant and v34.variant == nil then
-		v34.variant = InputVariant.Standard
-	end
-
-	local v35 = useTokens()
-	local v36 = useTextInputVariants(v35, v34.size, if not Flags.FoundationNumberInputVariant then nil else v34.variant)
-	local v37 = useNumberInputVariants(v35, v34.size, v34.controlsVariant)
-	local v38 = React.useRef(nil)
-	local v39 = ReactUtils.useComposedRef(v38, v34.textBoxRef)
-	local v40 = React.useRef(nil)
-	local v41 = React.useCallback(function() -- line: 156
-		-- upvalues: v38 (copy)
-		if v38.current then
-			return (v38.current.getIsFocused())
+local function NumberInput(p1, p2) -- line: 127
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), useNumberInputVariants (copy), React (copy), ReactUtils (copy), mapBindable (copy), getBindableValue (copy), Flags (copy), useTextSize (copy), useIconSize (copy), isBuilderIcon (copy), InputSize (copy), getMultiLineTextHeight (copy), OnChangeCallbackReason (copy), NumberInputControls (copy), NumberInputControlsVariant (copy), calculateNumberInputValueFromPositions (copy), ReactIs (copy), InputField (copy), withCommonProps (copy), getInputTextSize (copy), InternalTextInput (copy), joinBindables (copy), View (copy), Icon (copy), Text (copy)
+	local v42 = withDefaults(p1, t1)
+	local v43 = useTokens()
+	local v44 = useTextInputVariants(v43, v42.size, v42.variant)
+	local v45 = useNumberInputVariants(v43, v42.size, v42.controlsVariant)
+	local v46 = React.useRef(nil)
+	local v47 = ReactUtils.useComposedRef(v46, v42.textBoxRef)
+	local v48 = React.useRef(nil)
+	local v49 = React.useCallback(function() -- line: 170
+		-- upvalues: v46 (copy)
+		if v46.current then
+			return (v46.current.getIsFocused())
 		end
 
 		return false
 	end, {})
-	local v42, v43 = React.useState(false)
-	local v44 = v34.hasError or v42
-	local controlsVariant = v34.controlsVariant
-	local v46 = React.useCallback(function(n2: number) -- line: 164
-		-- upvalues: v34 (copy)
-		return (math.clamp(n2, v34.minimum, v34.maximum))
+	local v50, v51 = React.useState(false)
+	local v52 = v42.hasError or v50
+	local controlsVariant = v42.controlsVariant
+	local v54 = React.useCallback(function(n4: number) -- line: 178
+		-- upvalues: v42 (copy)
+		return (math.clamp(n4, v42.minimum, v42.maximum))
 	end, {
-		v34.minimum,
-		v34.maximum
+		v42.minimum,
+		v42.maximum
 	})
-	local v47 = React.useCallback(function(n3: number, p3: ((...any) -> ...any)) -- line: 168
-		-- upvalues: v34 (copy)
-		return p3(n3 / v34.step) * v34.step
-	end, { v34.step })
-	local v48 = React.useMemo(function() -- line: 172
-		-- upvalues: Flags (copy), mapBindable (copy), v34 (copy), v47 (copy), v46 (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return mapBindable(v34.value, function(p4) -- line: 174
-				-- upvalues: v34 (copy), v47 (copy), v46 (copy)
-				local v114 = 10 ^ (v34.precision or 0)
-				local v115 = math.floor(p4 * v114 + 0.5) / v114
-				local v116 = p4 + v34.step
-				local v117 = 10 ^ (v34.precision or 0)
-				local v118 = math.floor(v116 * v117 + 0.5) / v117
-				local v119 = v47(p4, math.ceil)
-				local v120 = 10 ^ (v34.precision or 0)
-				local v121 = math.floor(v119 * v120 + 0.5) / v120
+	local v55 = React.useCallback(function(n5: number, p3: ((...any) -> ...any)) -- line: 182
+		-- upvalues: v42 (copy)
+		return p3(n5 / v42.step) * v42.step
+	end, { v42.step })
+	local v56 = React.useMemo(function() -- line: 186
+		-- upvalues: mapBindable (copy), v42 (copy), v55 (copy), v54 (copy)
+		return mapBindable(v42.value, function(p4) -- line: 187
+			-- upvalues: v42 (copy), v55 (copy), v54 (copy)
+			local v114 = 10 ^ (v42.precision or 0)
+			local v115 = math.floor(p4 * v114 + 0.5) / v114
+			local v116 = p4 + v42.step
+			local v117 = 10 ^ (v42.precision or 0)
+			local v118 = math.floor(v116 * v117 + 0.5) / v117
+			local v119 = v55(p4, math.ceil)
+			local v120 = 10 ^ (v42.precision or 0)
+			local v121 = math.floor(v119 * v120 + 0.5) / v120
 
-				if v115 ~= v121 then
-					v118 = v121
-				end
+			if v115 ~= v121 then
+				v118 = v121
+			end
 
-				return v46(v118)
-			end)
-		end
-
-		local value = v34.value
-		local v75 = 10 ^ (v34.precision or 0)
-		local v76 = math.floor(value * v75 + 0.5) / v75
-		local v77 = v34.value + v34.step
-		local v78 = 10 ^ (v34.precision or 0)
-		local v79 = math.floor(v77 * v78 + 0.5) / v78
-		local v80 = v47(v34.value, math.ceil)
-		local v81 = 10 ^ (v34.precision or 0)
-		local v82 = math.floor(v80 * v81 + 0.5) / v81
-
-		if v76 ~= v82 then
-			v79 = v82
-		end
-
-		return v46(v79)
+			return v54(v118)
+		end)
 	end, {
-		v34.value,
-		v34.step,
-		v34.precision,
-		v46,
-		v47
+		v42.value,
+		v42.step,
+		v42.precision,
+		v54,
+		v55
 	})
-	local v49 = React.useMemo(function() -- line: 194
-		-- upvalues: Flags (copy), mapBindable (copy), v34 (copy), v47 (copy), v46 (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return mapBindable(v34.value, function(p5) -- line: 196
-				-- upvalues: v34 (copy), v47 (copy), v46 (copy)
-				local v123 = 10 ^ (v34.precision or 0)
-				local v124 = math.floor(p5 * v123 + 0.5) / v123
-				local v125 = p5 - v34.step
-				local v126 = 10 ^ (v34.precision or 0)
-				local v127 = math.floor(v125 * v126 + 0.5) / v126
-				local v128 = v47(p5, math.floor)
-				local v129 = 10 ^ (v34.precision or 0)
-				local v130 = math.floor(v128 * v129 + 0.5) / v129
+	local v57 = React.useMemo(function() -- line: 198
+		-- upvalues: mapBindable (copy), v42 (copy), v55 (copy), v54 (copy)
+		return mapBindable(v42.value, function(p5) -- line: 199
+			-- upvalues: v42 (copy), v55 (copy), v54 (copy)
+			local v123 = 10 ^ (v42.precision or 0)
+			local v124 = math.floor(p5 * v123 + 0.5) / v123
+			local v125 = p5 - v42.step
+			local v126 = 10 ^ (v42.precision or 0)
+			local v127 = math.floor(v125 * v126 + 0.5) / v126
+			local v128 = v55(p5, math.floor)
+			local v129 = 10 ^ (v42.precision or 0)
+			local v130 = math.floor(v128 * v129 + 0.5) / v129
 
-				if v124 ~= v130 then
-					v127 = v130
-				end
+			if v124 ~= v130 then
+				v127 = v130
+			end
 
-				return v46(v127)
-			end)
-		end
-
-		local value = v34.value
-		local v84 = 10 ^ (v34.precision or 0)
-		local v85 = math.floor(value * v84 + 0.5) / v84
-		local v86 = v34.value - v34.step
-		local v87 = 10 ^ (v34.precision or 0)
-		local v88 = math.floor(v86 * v87 + 0.5) / v87
-		local v89 = v47(v34.value, math.floor)
-		local v90 = 10 ^ (v34.precision or 0)
-		local v91 = math.floor(v89 * v90 + 0.5) / v90
-
-		if v85 ~= v91 then
-			v88 = v91
-		end
-
-		return v46(v88)
+			return v54(v127)
+		end)
 	end, {
-		v34.value,
-		v34.step,
-		v34.precision,
-		v46,
-		v47
+		v42.value,
+		v42.step,
+		v42.precision,
+		v54,
+		v55
 	})
-	local v50 = React.useMemo(function() -- line: 216
-		-- upvalues: Flags (copy), mapBindable (copy), v34 (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return (mapBindable(v34.value, function(p6) -- line: 218
-				-- upvalues: v34 (copy)
-				return v34.isDisabled or p6 == v34.maximum
-			end))
-		end
-
-		return v34.isDisabled or v34.value == v34.maximum
+	local v58 = React.useMemo(function() -- line: 210
+		-- upvalues: mapBindable (copy), v42 (copy)
+		return mapBindable(v42.value, function(p6) -- line: 211
+			-- upvalues: v42 (copy)
+			return v42.isDisabled or p6 == v42.maximum
+		end)
 	end, {
-		v34.isDisabled,
-		v34.value,
-		v34.maximum
+		v42.isDisabled,
+		v42.value,
+		v42.maximum
 	})
-	local v51 = React.useMemo(function() -- line: 224
-		-- upvalues: Flags (copy), mapBindable (copy), v34 (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return (mapBindable(v34.value, function(p7) -- line: 226
-				-- upvalues: v34 (copy)
-				return v34.isDisabled or p7 == v34.minimum
-			end))
-		end
-
-		return v34.isDisabled or v34.value == v34.minimum
+	local v59 = React.useMemo(function() -- line: 216
+		-- upvalues: mapBindable (copy), v42 (copy)
+		return mapBindable(v42.value, function(p7) -- line: 217
+			-- upvalues: v42 (copy)
+			return v42.isDisabled or p7 == v42.minimum
+		end)
 	end, {
-		v34.isDisabled,
-		v34.value,
-		v34.minimum
+		v42.isDisabled,
+		v42.value,
+		v42.minimum
 	})
-	local v52 = React.useCallback(function(n4: number) -- line: 232
-		-- upvalues: v34 (copy)
-		local v93 = math.clamp(n4, v34.minimum, v34.maximum)
-		local v94 = 10 ^ (v34.precision or 0)
+	local v60 = React.useCallback(function(n6: number) -- line: 222
+		-- upvalues: v42 (copy)
+		local v93 = math.clamp(n6, v42.minimum, v42.maximum)
+		local v94 = 10 ^ (v42.precision or 0)
 
 		return math.floor(v93 * v94 + 0.5) / v94
 	end, {
-		v34.minimum,
-		v34.maximum,
-		v34.precision
+		v42.minimum,
+		v42.maximum,
+		v42.precision
 	})
-	local v53, v54 = React.useBinding(v34.formatAsString(v52(if not Flags.FoundationNumberInputBindableValue then v34.value else getBindableValue(v34.value))))
-	local v55 = if not v34.width then UDim.new(0, v37.container.width) else v34.width
-	local v56 = if Flags.FoundationNumberInputBindableValue then nil else React.useMemo(function() -- line: 253
-		-- upvalues: v34 (copy), v46 (copy)
-		if v34.value and (v34.maximum and v34.minimum) then
-			local v95 = v46(v34.value)
+	local v61, v62 = React.useBinding(v42.formatAsString(v60(getBindableValue(v42.value))))
+	local u63 = nil
+	local u64 = nil
+	local u65 = nil
 
-			if v34.maximum == v34.minimum then
-				return 1
-			end
+	if Flags.FoundationSupportPrefixSuffixNumberInput then
+		local fontStyle = v44.textBox.fontStyle
+		local FontSize = fontStyle.FontSize
 
-			return (v95 - v34.minimum) / (v34.maximum - v34.minimum)
+		u63 = v42.prefix and v42.prefix ~= "" or v42.suffix and v42.suffix ~= ""
+
+		local v68 = if not v42.prefix then nil else v42.prefix .. " "
+		local v69 = React.useMemo(function() -- line: 243
+			-- upvalues: fontStyle (copy), FontSize (copy)
+			return {
+				Font = fontStyle.Font,
+				FontSize = math.floor(FontSize),
+				LineHeight = fontStyle.LineHeight
+			}
+		end, {
+			fontStyle,
+			FontSize
+		})
+
+		u64 = useTextSize(v68, v69)
+
+		local v70 = useIconSize(v44.icon.size, isBuilderIcon(v42.leadingIcon))
+		local v71 = not v42.leadingIcon and 0 or v70.X.Offset
+		local v72 = if v42.size ~= InputSize.XSmall then if v42.size ~= InputSize.Small then v43.Gap.Large else v43.Gap.Medium else v43.Gap.Small
+		local v73 = not v42.leadingIcon and 0 or v72
+
+		u65 = React.useMemo(function() -- line: 263
+			-- upvalues: getMultiLineTextHeight (copy), FontSize (copy), fontStyle (copy), v44 (copy), v71 (copy), v73 (copy)
+			local v95 = getMultiLineTextHeight(FontSize, 1, fontStyle.LineHeight)
+			local v96 = math.round((v44.container.minHeight - 2 - v95) * 2) / 2
+
+			return {
+				left = UDim.new(0, v44.container.horizontalPadding.Offset + v71 + v73),
+				right = v44.container.horizontalPadding,
+				top = UDim.new(0, math.floor(v96 / 2) + 1),
+				bottom = UDim.new(0, math.ceil(v96 / 2) + 1)
+			}
+		end, {
+			v44.container.minHeight,
+			v44.container.horizontalPadding,
+			fontStyle,
+			v71,
+			v73,
+			FontSize
+		})
+	end
+
+	local v74 = if not v42.width then UDim.new(0, v45.container.width) else v42.width
+	local v75 = React.useCallback(function() -- line: 295
+		-- upvalues: v62 (copy), getBindableValue (copy), v42 (copy)
+		v62((tostring(getBindableValue(v42.value))))
+
+		if v42.onFocusGained then
+			v42.onFocusGained()
 		end
-
-		return 0
 	end, {
-		v34.value,
-		v34.maximum,
-		v34.minimum,
-		v46
+		v42.onFocusGained,
+		v42.value
 	})
-	local v57 = React.useCallback(function() -- line: 266
-		-- upvalues: v54 (copy), Flags (copy), getBindableValue (copy), v34 (copy)
-		v54((tostring(if not Flags.FoundationNumberInputBindableValue then v34.value else getBindableValue(v34.value))))
+	local v76 = React.useCallback(function(n7: number, p8) -- line: 303
+		-- upvalues: v60 (copy), v62 (copy), v49 (copy), v42 (copy)
+		local v99 = v60(n7)
 
-		if v34.onFocusGained then
-			v34.onFocusGained()
+		v62(if not v49() then v42.formatAsString(v99) else tostring(v99))
+		v42.onChanged(v99, p8)
+	end, {
+		v42.onChanged,
+		v42.formatAsString,
+		v60,
+		v49
+	})
+	local v77 = React.useCallback(function(p9) -- line: 309
+		-- upvalues: v51 (copy), v76 (copy), getBindableValue (copy), v42 (copy), OnChangeCallbackReason (copy)
+		v51(false)
+		v76(getBindableValue(v42.value), OnChangeCallbackReason.FocusLost)
+
+		if v42.onFocusLost then
+			v42.onFocusLost(p9)
 		end
 	end, {
-		v34.onFocusGained,
-		v34.value
+		v76,
+		v42.onFocusLost,
+		v42.value,
+		v60
 	})
-	local v58 = React.useCallback(function(n5: number, p8) -- line: 280
-		-- upvalues: v52 (copy), v54 (copy), v41 (copy), v34 (copy)
-		local v98 = v52(n5)
+	local v78 = React.useCallback(function(p10) -- line: 318
+		-- upvalues: v62 (copy), v49 (copy), v51 (copy), v42 (copy), OnChangeCallbackReason (copy)
+		v62(p10)
 
-		v54(if not v41() then v34.formatAsString(v98) else tostring(v98))
-		v34.onChanged(v98, p8)
-	end, {
-		v34.onChanged,
-		v34.formatAsString,
-		v52,
-		v41
-	})
-	local v59 = React.useCallback(function(p9) -- line: 286
-		-- upvalues: v43 (copy), v58 (copy), Flags (copy), getBindableValue (copy), v34 (copy), OnChangeCallbackReason (copy)
-		v43(false)
-		v58(if not Flags.FoundationNumberInputBindableValue then v34.value else getBindableValue(v34.value), OnChangeCallbackReason.FocusLost)
-
-		if v34.onFocusLost then
-			v34.onFocusLost(p9)
-		end
-	end, {
-		v58,
-		v34.onFocusLost,
-		v34.value,
-		v52
-	})
-	local v60 = React.useCallback(function(p10) -- line: 298
-		-- upvalues: v54 (copy), v41 (copy), v43 (copy), v34 (copy), OnChangeCallbackReason (copy)
-		v54(p10)
-
-		if not v41() then
+		if not v49() then
 			return
 		end
 
 		local num = tonumber(p10)
 
 		if num == nil then
-			v43(true)
+			v51(true)
 
 			return
 		end
 
-		v43(false)
-		v34.onChanged(num, OnChangeCallbackReason.Keyboard)
+		v51(false)
+		v42.onChanged(num, OnChangeCallbackReason.Keyboard)
 	end, {
-		v41,
-		v34.onChanged
-	})
-	local v61 = React.useCallback(function() -- line: 314
-		-- upvalues: Flags (copy), getBindableValue (copy), v50 (copy), v58 (copy), v48 (copy), OnChangeCallbackReason (copy)
-		if if not Flags.FoundationNumberInputBindableValue then v50 else getBindableValue(v50) then
-			return
-		end
-
-		v58(if not Flags.FoundationNumberInputBindableValue then v48 else getBindableValue(v48), OnChangeCallbackReason.Activate)
-	end, {
-		v50,
-		v48,
-		v58
-	})
-	local v62 = React.useCallback(function() -- line: 324
-		-- upvalues: Flags (copy), getBindableValue (copy), v51 (copy), v58 (copy), v49 (copy), OnChangeCallbackReason (copy)
-		if if not Flags.FoundationNumberInputBindableValue then v51 else getBindableValue(v51) then
-			return
-		end
-
-		v58(if not Flags.FoundationNumberInputBindableValue then v49 else getBindableValue(v49), OnChangeCallbackReason.Activate)
-	end, {
-		v51,
 		v49,
-		v58
+		v42.onChanged
 	})
-	local v63 = React.createElement(NumberInputControls, {
-		variant = if not Flags.FoundationNumberInputVariant then nil else v34.variant,
+	local v79 = React.useCallback(function() -- line: 334
+		-- upvalues: getBindableValue (copy), v58 (copy), v76 (copy), v56 (copy), OnChangeCallbackReason (copy)
+		if getBindableValue(v58) then
+			return
+		end
+
+		v76(getBindableValue(v56), OnChangeCallbackReason.Activate)
+	end, {
+		v58,
+		v56,
+		v76
+	})
+	local v80 = React.useCallback(function() -- line: 341
+		-- upvalues: getBindableValue (copy), v59 (copy), v76 (copy), v57 (copy), OnChangeCallbackReason (copy)
+		if getBindableValue(v59) then
+			return
+		end
+
+		v76(getBindableValue(v57), OnChangeCallbackReason.Activate)
+	end, {
+		v59,
+		v57,
+		v76
+	})
+	local v81 = React.createElement(NumberInputControls, {
+		variant = v42.variant,
 		controlsVariant = controlsVariant,
-		size = v34.size,
+		size = v42.size,
 		increment = {
-			isDisabled = v50,
-			onClick = v61
+			isDisabled = v58,
+			onClick = v79
 		},
 		decrement = {
-			isDisabled = v51,
-			onClick = v62
+			isDisabled = v59,
+			onClick = v80
 		},
-		testId = v34.testId
+		testId = v42.testId
 	})
-	local v64 = React.useMemo(function() -- line: 350
-		-- upvalues: controlsVariant (copy), NumberInputControlsVariant (copy), v37 (copy), v35 (copy)
+	local v82 = React.useMemo(function() -- line: 364
+		-- upvalues: controlsVariant (copy), NumberInputControlsVariant (copy), v45 (copy), v43 (copy)
 		if controlsVariant == NumberInputControlsVariant.Split then
-			return UDim.new(0, 2 * v37.splitButton.size + 2 * v35.Gap.XSmall)
+			return UDim.new(0, 2 * v45.splitButton.size + 2 * v43.Gap.XSmall)
 		end
 
 		return UDim.new()
 	end, {
-		v35,
+		v43,
 		controlsVariant,
-		v37.splitButton.size,
-		v35.Gap.XSmall
+		v45.splitButton.size,
+		v43.Gap.XSmall
 	})
-	local v65 = React.useCallback(function(_, vector2: Vector2) -- line: 360
-		-- upvalues: v34 (copy), v40 (copy), Flags (copy), getBindableValue (copy)
-		local value = v34.value
+	local v83 = React.useCallback(function(_, vector2: Vector2) -- line: 374
+		-- upvalues: v42 (copy), v48 (copy), getBindableValue (copy)
+		local value = v42.value
 
 		if value then
-			v40.current = {
+			v48.current = {
 				position = vector2.X,
-				value = if not Flags.FoundationNumberInputBindableValue then value else getBindableValue(value)
+				value = getBindableValue(value)
 			}
 		end
-	end, { v34.value })
-	local v66 = React.useCallback(function(_, vector2: Vector2) -- line: 370
-		-- upvalues: v40 (copy), calculateNumberInputValueFromPositions (copy), v34 (copy), v58 (copy), OnChangeCallbackReason (copy)
-		if v40.current then
-			local v107 = calculateNumberInputValueFromPositions(v40.current.value, v40.current.position, vector2.X, v34.step)
+	end, { v42.value })
+	local v84 = React.useCallback(function(_, vector2: Vector2) -- line: 384
+		-- upvalues: v48 (copy), calculateNumberInputValueFromPositions (copy), v42 (copy), v76 (copy), OnChangeCallbackReason (copy)
+		if v48.current then
+			local v108 = calculateNumberInputValueFromPositions(v48.current.value, v48.current.position, vector2.X, v42.step)
 
-			v58(v107, OnChangeCallbackReason.Drag)
+			v76(v108, OnChangeCallbackReason.Drag)
 		end
 	end, {
-		v58,
-		v34.step,
-		v52
+		v76,
+		v42.step,
+		v60
 	})
-	local v67 = React.useCallback(function() -- line: 382
-		-- upvalues: v40 (copy)
-		if v40.current then
-			v40.current = nil
+	local v85 = React.useCallback(function() -- line: 396
+		-- upvalues: v48 (copy)
+		if v48.current then
+			v48.current = nil
 		end
 	end, {})
-	local Shift_300Transparency = v35.Color.Shift.Shift_300.Transparency
-	local Shift_100Transparency = v35.Color.Shift.Shift_100.Transparency
-	local v70 = React.useMemo(function() -- line: 391
-		-- upvalues: Flags (copy), mapBindable (copy), v34 (copy), v46 (copy), Shift_100Transparency (copy), Shift_300Transparency (copy), v56 (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return mapBindable(v34.value, function(p13) -- line: 393
-				-- upvalues: v34 (copy), v46 (copy), Shift_100Transparency (copy), Shift_300Transparency (copy)
-				local n6 = 0
+	local Shift_300Transparency = v43.Color.Shift.Shift_300.Transparency
+	local Shift_100Transparency = v43.Color.Shift.Shift_100.Transparency
+	local v88 = React.useMemo(function() -- line: 405
+		-- upvalues: mapBindable (copy), v42 (copy), v54 (copy), Shift_100Transparency (copy), Shift_300Transparency (copy)
+		return mapBindable(v42.value, function(p13) -- line: 406
+			-- upvalues: v42 (copy), v54 (copy), Shift_100Transparency (copy), Shift_300Transparency (copy)
+			local n8 = 0
 
-				if p13 and (v34.maximum and v34.minimum) then
-					local v135 = v46(p13)
+			if p13 and (v42.maximum and v42.minimum) then
+				local v135 = v54(p13)
 
-					n6 = if v34.maximum ~= v34.minimum then (v135 - v34.minimum) / (v34.maximum - v34.minimum) else 1
-				end
-
-				if n6 == 0 then
-					return NumberSequence.new(Shift_100Transparency)
-				end
-
-				if n6 == 1 then
-					return NumberSequence.new(Shift_300Transparency)
-				end
-
-				if n6 > 0 or n6 < 1 then
-					local t2 = {
-						NumberSequenceKeypoint.new(0, Shift_300Transparency),
-						NumberSequenceKeypoint.new(n6, Shift_300Transparency),
-						NumberSequenceKeypoint.new(math.min(n6 + 0.001, 1), Shift_100Transparency)
-					}
-
-					if n6 < 0.999 then
-						table.insert(t2, NumberSequenceKeypoint.new(1, Shift_100Transparency))
-					end
-
-					return NumberSequence.new(t2)
-				end
-
-				return NumberSequence.new(Shift_100Transparency)
-			end)
-		end
-
-		if v56 == 0 then
-			return NumberSequence.new(Shift_100Transparency)
-		end
-
-		if v56 == 1 then
-			return NumberSequence.new(Shift_300Transparency)
-		end
-
-		if v56 > 0 or v56 < 1 then
-			local t3 = {
-				NumberSequenceKeypoint.new(0, Shift_300Transparency),
-				NumberSequenceKeypoint.new(v56, Shift_300Transparency),
-				NumberSequenceKeypoint.new(math.min(v56 + 0.001, 1), Shift_100Transparency)
-			}
-
-			if v56 < 0.999 then
-				table.insert(t3, NumberSequenceKeypoint.new(1, Shift_100Transparency))
+				n8 = if v42.maximum ~= v42.minimum then (v135 - v42.minimum) / (v42.maximum - v42.minimum) else 1
 			end
 
-			return NumberSequence.new(t3)
-		end
+			if n8 == 0 then
+				return NumberSequence.new(Shift_100Transparency)
+			end
 
-		return NumberSequence.new(Shift_100Transparency)
+			if n8 == 1 then
+				return NumberSequence.new(Shift_300Transparency)
+			end
+
+			if n8 > 0 or n8 < 1 then
+				local t2 = {
+					NumberSequenceKeypoint.new(0, Shift_300Transparency),
+					NumberSequenceKeypoint.new(n8, Shift_300Transparency),
+					NumberSequenceKeypoint.new(math.min(n8 + 0.001, 1), Shift_100Transparency)
+				}
+
+				if n8 < 0.999 then
+					table.insert(t2, NumberSequenceKeypoint.new(1, Shift_100Transparency))
+				end
+
+				return NumberSequence.new(t2)
+			end
+
+			return NumberSequence.new(Shift_100Transparency)
+		end)
 	end, {
 		Shift_300Transparency,
 		Shift_100Transparency,
-		v34.value,
-		v46,
-		v34.maximum,
-		v34.minimum,
-		if not Flags.FoundationNumberInputBindableValue then v56 else nil
+		v42.value,
+		v54,
+		v42.maximum,
+		v42.minimum
 	})
 
-	React.useEffect(function() -- line: 459
-		-- upvalues: Flags (copy), ReactIs (copy), v34 (copy), v41 (copy), v54 (copy), v52 (copy)
-		local v109 = Flags.FoundationNumberInputBindableValue and ReactIs.isBinding(v34.value)
-
-		if not v41() and not v109 then
-			v54(v34.formatAsString(v52(v34.value)))
+	React.useEffect(function() -- line: 449
+		-- upvalues: v49 (copy), ReactIs (copy), v42 (copy), v62 (copy), v60 (copy)
+		if not v49() and not ReactIs.isBinding(v42.value) then
+			v62(v42.formatAsString(v60(v42.value)))
 		end
 	end, {
-		v34.value,
-		v34.formatAsString,
-		v52,
-		v41
+		v42.value,
+		v42.formatAsString,
+		v60,
+		v49
 	})
 
-	return React.createElement(InputField, withCommonProps(v34, {
-		width = v55,
+	return React.createElement(InputField, withCommonProps(v42, {
+		width = v74,
 		ref = p2,
-		hasError = v44,
-		label = v34.label,
-		size = getInputTextSize(v34.size),
-		isRequired = v34.isRequired,
-		isDisabled = if not Flags.FoundationNumberInputDisabledField then nil else v34.isDisabled,
-		hint = v34.hint,
-		textBoxRef = v39,
-		input = function(p14) --[[ input ]] -- line: 478
-			-- upvalues: controlsVariant (copy), NumberInputControlsVariant (copy), React (copy), InternalTextInput (copy), Flags (copy), joinBindables (copy), v53 (copy), v34 (copy), v41 (copy), v52 (copy), v44 (copy), v36 (copy), v60 (copy), v59 (copy), v57 (copy), v65 (copy), v66 (copy), v67 (copy), v70 (copy), v35 (copy), v63 (copy), View (copy), Icon (copy), v55 (copy), v64 (copy)
-			local v111 = controlsVariant == NumberInputControlsVariant.Split
-			local v112 = React.createElement(InternalTextInput, {
-				text = if not Flags.FoundationNumberInputBindableValue then v53:map(function(p15) -- line: 493
-					-- upvalues: v41 (copy), v34 (copy), v52 (copy)
-					if v41() then
-						return p15
+		hasError = v52,
+		label = v42.label,
+		size = getInputTextSize(v42.size),
+		isRequired = v42.isRequired,
+		isDisabled = v42.isDisabled,
+		hint = v42.hint,
+		textBoxRef = v47,
+		input = function(p14) -- line: 467
+			-- upvalues: controlsVariant (copy), NumberInputControlsVariant (copy), React (copy), InternalTextInput (copy), v42 (copy), joinBindables (copy), v61 (copy), v49 (copy), v60 (copy), v52 (copy), Flags (copy), v44 (copy), u64 (ref), p1 (copy), v78 (copy), v77 (copy), v75 (copy), v83 (copy), v84 (copy), v85 (copy), v88 (copy), v43 (copy), v81 (copy), View (copy), Icon (copy), u63 (ref), Text (copy), u65 (ref), v74 (copy), v82 (copy)
+			local v110 = controlsVariant == NumberInputControlsVariant.Split
+			local v111 = React.createElement(InternalTextInput, {
+				inputRef = v42.inputRef,
+				text = joinBindables({
+					text = v61,
+					value = v42.value
+				}, function(p15) -- line: 475
+					-- upvalues: v49 (copy), v42 (copy), v60 (copy)
+					if v49() then
+						return p15.text
 					end
 
-					return v34.formatAsString(v52(v34.value))
-				end) else joinBindables({
-					text = v53,
-					value = v34.value
-				}, function(p16) -- line: 486
-					-- upvalues: v41 (copy), v34 (copy), v52 (copy)
-					if v41() then
-						return p16.text
-					end
-
-					return v34.formatAsString(v52(p16.value))
+					return v42.formatAsString(v60(p15.value))
 				end),
-				hasError = v44,
-				variant = if not Flags.FoundationNumberInputVariant then nil else v34.variant,
-				size = v34.size,
+				hasError = v52,
+				variant = v42.variant,
+				size = v42.size,
+				Selectable = if not Flags.FoundationInputSelectionProps then nil else v42.Selectable,
+				NextSelectionUp = if not Flags.FoundationInputSelectionProps then nil else v42.NextSelectionUp,
+				NextSelectionDown = if not Flags.FoundationInputSelectionProps then nil else v42.NextSelectionDown,
+				NextSelectionLeft = if not Flags.FoundationInputSelectionProps then nil else v42.NextSelectionLeft,
+				NextSelectionRight = if not Flags.FoundationInputSelectionProps then nil else v42.NextSelectionRight,
 				horizontalPadding = {
-					left = ((if not Flags.FoundationInputVariantsConsolidateContainer then v36.innerContainer else v36.container)).horizontalPadding
+					left = v44.container.horizontalPadding,
+					innerLeft = if not Flags.FoundationSupportPrefixSuffixNumberInput then nil else if not u64 or not (u64.X > 0) then nil else UDim.new(0, u64.X)
 				},
-				onChanged = v60,
-				onFocusLost = v59,
-				onFocus = v57,
-				onDragStarted = if not v34.isScrubbable then nil else v65,
-				onDrag = if not v34.isScrubbable then nil else v66,
-				onDragEnded = if not v34.isScrubbable then nil else v67,
-				onReturnPressed = v34.onReturnPressed,
+				focusBehavior = p1.focusBehavior,
+				onChanged = v78,
+				onFocusLost = v77,
+				onFocus = v75,
+				onDragStarted = if not v42.isScrubbable then nil else v83,
+				onDrag = if not v42.isScrubbable then nil else v84,
+				onDragEnded = if not v42.isScrubbable then nil else v85,
+				onReturnPressed = v42.onReturnPressed,
 				ref = p14,
-				backgroundGradient = if not v34.isScrubbable or not v70 then nil else React.createElement("UIGradient", {
-					Color = ColorSequence.new(v35.Color.Shift.Shift_300.Color3),
-					Transparency = v70,
-					Rotation = 0
+				backgroundGradient = if not v42.isScrubbable or not v88 then nil else React.createElement("UIGradient", {
+					Rotation = 0,
+					Color = ColorSequence.new(v43.Color.Shift.Shift_300.Color3),
+					Transparency = v88
 				}),
-				trailingElement = if controlsVariant ~= NumberInputControlsVariant.Stacked then nil else v63,
-				leadingElement = if not v34.leadingIcon then nil else React.createElement(View, {
+				trailingElement = if controlsVariant ~= NumberInputControlsVariant.Stacked then nil else v81,
+				leadingElement = if not v42.leadingIcon then nil else React.createElement(View, {
 					tag = "row align-y-center size-0-full auto-x"
 				}, React.createElement(Icon, {
-					name = v34.leadingIcon,
-					style = v36.icon.style,
-					size = v36.icon.size
+					name = v42.leadingIcon,
+					style = v44.icon.style,
+					size = v44.icon.size
 				})),
-				isDisabled = v34.isDisabled,
-				testId = `{ v34.testId }--field`
+				isDisabled = v42.isDisabled,
+				testId = `{ v42.testId }--field`
+			})
+			local v112 = if not Flags.FoundationSupportPrefixSuffixNumberInput or not u63 then nil else React.createElement(Text, {
+				tag = "size-full text-align-x-left text-align-y-center content-muted",
+				RichText = true,
+				ClipsDescendants = true,
+				fontStyle = v44.textBox.fontStyle,
+				Text = v61:map(function(p16) -- line: 540
+					-- upvalues: v42 (copy)
+					return `{ not v42.prefix and "" or v42.prefix .. " " }<font transparency="1">{ p16 }</font>{ not v42.suffix and "" or " " .. v42.suffix }`
+				end),
+				padding = u65,
+				testId = `{ v42.testId }--units`
 			})
 
-			if v111 then
-				return (React.createElement(View, {
-					Size = UDim2.fromOffset(v55.Offset - v64.Offset, 0),
-					tag = "row align-y-center gap-xsmall auto-y"
+			if Flags.FoundationSupportPrefixSuffixNumberInput then
+				v111 = React.createElement(View, {
+					tag = "size-full-0 auto-y"
 				}, {
-					InputField = v112,
-					Controls = if not v111 then nil else v63
+					Input = v111,
+					Units = v112
+				})
+			end
+
+			if v110 then
+				return (React.createElement(View, {
+					tag = "row align-y-center gap-xsmall auto-y",
+					Size = UDim2.fromOffset(v74.Offset - v82.Offset, 0)
+				}, {
+					InputField = v111,
+					Controls = if not v110 then nil else v81
 				}))
 			end
 
-			return v112
+			return v111
 		end
 	}))
-end))
+end
+
+return React.memo(React.forwardRef(NumberInput))

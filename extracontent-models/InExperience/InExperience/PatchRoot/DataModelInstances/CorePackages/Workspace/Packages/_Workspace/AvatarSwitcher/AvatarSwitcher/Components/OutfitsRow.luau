@@ -1,30 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarSwitcher");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Components.OutfitTile);
-local _ = require(l_script_FirstAncestor_0.types);
-return v2.memo(function(v6) --[[ Line: 22 ]] --[[ Name: OutfitsRow ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    local v7 = {};
-    for v8, v9 in v6.outfits do
-        v7["Outfit" .. (v9.id or v8)] = v2.createElement(v4, {
-            outfitInfo = v9, 
-            disabled = v6.disabled, 
-            LayoutOrder = v8, 
-            gridPosition = {
-                row = v6.rowNumber, 
-                column = v8
-            }
-        });
-    end;
-    for v10 = #v6.outfits + 1, v6.desiredItemsCount do
-        v7["Filler" .. v10] = v2.createElement(v3.View, {
-            tag = "size-full-0", 
-            LayoutOrder = v10
-        });
-    end;
-    return v2.createElement(v3.View, {
-        tag = "row size-full-0 auto-y gap-medium flex-x-fill padding-bottom-large"
-    }, v7);
-end);
+local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
+local AvatarSwitcherParent = AvatarSwitcher.Parent
+local React = require(AvatarSwitcherParent.React)
+local Foundation = require(AvatarSwitcherParent.Foundation)
+local OutfitTile = require(AvatarSwitcher.Components.OutfitTile)
+
+require(AvatarSwitcher.types)
+
+local function OutfitsRow(t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), OutfitTile (copy), Foundation (copy)
+	local t2 = {}
+
+	for v9, v10 in t1.outfits do
+		t2["Outfit" .. (v10.id or v9)] = React.createElement(OutfitTile, {
+			outfitInfo = v10,
+			disabled = t1.disabled,
+			LayoutOrder = v9,
+			gridPosition = {
+				row = t1.rowNumber,
+				column = v9
+			}
+		})
+	end
+
+	for i = #t1.outfits + 1, t1.desiredItemsCount do
+		t2["Filler" .. i] = React.createElement(Foundation.View, {
+			tag = "size-full-0",
+			LayoutOrder = i
+		})
+	end
+
+	return React.createElement(Foundation.View, {
+		tag = "row size-full-0 auto-y gap-medium flex-x-fill padding-bottom-large"
+	}, t2)
+end
+
+return React.memo(OutfitsRow)

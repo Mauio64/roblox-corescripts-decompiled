@@ -1,4 +1,5 @@
-game:DefineFastFlag("ExpChatExcludeFOMORenders", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ExpChatExcludeFOMORenders");
-end;
+game:DefineFastFlag("ExpChatExcludeFOMORenders", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ExpChatExcludeFOMORenders")
+end

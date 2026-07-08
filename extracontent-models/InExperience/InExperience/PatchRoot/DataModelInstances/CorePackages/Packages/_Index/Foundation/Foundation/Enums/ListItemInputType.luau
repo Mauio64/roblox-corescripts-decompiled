@@ -1,5 +1,5 @@
 return {
-    Toggle = "Toggle", 
-    Radio = "Radio", 
-    Checkbox = "Checkbox"
-};
+	Toggle = "Toggle",
+	Radio = "Radio",
+	Checkbox = "Checkbox"
+}

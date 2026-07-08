@@ -1,9 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserLib");
-local v1 = require(l_script_FirstAncestor_0.Utils.receiveUsersPresence);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    return function(v3) --[[ Line: 5 ]]
-        -- upvalues: v1 (ref), v2 (copy)
-        v1(v2, v3);
-    end;
-end;
+local UserLib = script:FindFirstAncestor("UserLib")
+local receiveUsersPresence = require(UserLib.Utils.receiveUsersPresence)
+
+return function(p1) -- line: 4
+	-- upvalues: receiveUsersPresence (copy)
+	return function(p2) -- line: 5
+		-- upvalues: receiveUsersPresence (copy), p1 (copy)
+		receiveUsersPresence(p1, p2)
+	end
+end

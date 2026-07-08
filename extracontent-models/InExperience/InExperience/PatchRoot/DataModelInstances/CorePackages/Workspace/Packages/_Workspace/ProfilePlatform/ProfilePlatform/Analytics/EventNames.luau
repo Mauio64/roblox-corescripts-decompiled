@@ -46,6 +46,7 @@ return {
 	EditAppearanceMenuEditAvatar = "EditAppearanceMenuEditAvatar",
 	EditAppearanceMenuEditEmote = "EditAppearanceMenuEditEmote",
 	EditAppearanceMenuSwitchAvatar = "EditAppearanceMenuSwitchAvatar",
+	EditAppearanceMenuEditBackground = "EditAppearanceMenuEditBackground",
 	FriendsButton = "ProfileFriendsButton",
 	FollowersButton = "ProfileFollowersButton",
 	FollowingsButton = "ProfileFollowingsButton",
@@ -66,5 +67,10 @@ return {
 	EventOpened = "EventOpened",
 	EventRSVP = "EventRSVP",
 	EventJoined = "EventJoined",
-	ProfileImpressionsSent = "ProfileImpressionsSent"
+	ProfileImpressionsSent = "ProfileImpressionsSent",
+	InspectAvatarOpened = "InspectAvatarOpened",
+	InspectAvatarBuyClicked = "InspectAvatarBuyClicked",
+	InspectAvatarPurchaseConfirmed = "InspectAvatarPurchaseConfirmed",
+	MomentsSeeAll = "MomentsSeeAll",
+	MomentOpened = "MomentOpened"
 }

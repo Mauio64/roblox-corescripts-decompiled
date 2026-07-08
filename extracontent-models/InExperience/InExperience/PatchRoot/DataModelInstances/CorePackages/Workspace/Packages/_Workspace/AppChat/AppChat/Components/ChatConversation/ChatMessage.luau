@@ -1,264 +1,245 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-if not require(l_script_FirstAncestor_0.Flags.FFlagAppChatRefactorChatMessage) then
-    return require(script.Parent.ChatMessageDeprecated);
-else
-    local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-    local v2 = require(l_Parent_0.Cryo);
-    local v3 = require(l_Parent_0.React);
-    local v4 = require(l_Parent_0.Roact);
-    local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-    local v6 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatEnableRepliesUI);
-    local v7 = require(script.Parent.PlainTextAutomaticSize);
-    local v8 = require(script.Parent.AssetCardTempAutomaticSize);
-    local v9 = require(script.Parent.HiddenMessage);
-    local v10 = require(l_script_FirstAncestor_0.Components.ChatConversation.EnumMessageTypes);
-    local v11 = require(script.Parent.ChatMessageContainerAutomaticSize);
-    local v12 = require(script.Parent.Logger);
-    local l_pruneConsecutiveNewLines_0 = require(l_script_FirstAncestor_0.SocialLibraries).Utils.pruneConsecutiveNewLines;
-    local v14 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableAutotranslation);
-    local v15 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableHiddenMessages);
-    local v16 = require(l_script_FirstAncestor_0.Models.MessageModel);
-    local v17 = require(l_Parent_0.Foundation);
-    local l_View_0 = v17.View;
-    local l_Image_0 = v17.Image;
-    local v20 = {
-        [v10.PlainText] = {
-            component = v7, 
-            name = "PlainText", 
-            paddingOffset = 0
-        }, 
-        [v10.Link] = {
-            component = v8, 
-            name = "AssetCard", 
-            paddingOffset = 0
-        }
-    };
-    local v21 = {
-        component = v9, 
-        name = "Hidden", 
-        paddingOffset = 0
-    };
-    local function _(v22) --[[ Line: 55 ]] --[[ Name: getMessageComponent ]]
-        -- upvalues: v15 (copy), v16 (copy), v21 (copy), v20 (copy)
-        if v15 and v22 and v22.visibility == v16.VisibilityTypes.Hidden then
-            return v21;
-        else
-            return v20[v22.messageType];
-        end;
-    end;
-    local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-    local v25 = {
-        additionalProps = {
-            shareLink = nil, 
-            placeId = nil, 
-            universeId = nil, 
-            senderUserId = nil, 
-            onDetailsOpened = function() --[[ Line: 118 ]] --[[ Name: onDetailsOpened ]]
+local AppChat = script:FindFirstAncestor("AppChat")
 
-            end, 
-            openGameDetailsPage = function() --[[ Line: 119 ]] --[[ Name: openGameDetailsPage ]]
+if not require(AppChat.Flags.FFlagAppChatRefactorChatMessage) then
+	return require(script.Parent.ChatMessageDeprecated)
+end
 
-            end
-        }, 
-        conversationId = nil, 
-        BackgroundColor3 = nil, 
-        content = "", 
-        debugElement = nil, 
-        displayName = nil, 
-        failed = false, 
-        filteredForReceivers = false, 
-        isIncoming = false, 
-        isNewSender = false, 
-        isSending = false, 
-        isUnfiltered = false, 
-        isLastMessageInMessageGroup = false, 
-        isLastIncomingChatMessage = false, 
-        visibility = nil, 
-        messageType = nil, 
-        moderated = false, 
-        parentWidth = 0, 
-        senderUserId = nil, 
-        sent = nil, 
-        showDateTime = false, 
-        thumbnail = nil, 
-        Transparency = nil, 
-        wideMode = false, 
-        viewProfileOnAvatarPressed = true, 
-        closeKeyboard = function() --[[ Line: 145 ]] --[[ Name: closeKeyboard ]]
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local Text = require(AppChatParent.AppCommonLib).Text
+local PlainTextAutomaticSize = require(script.Parent.PlainTextAutomaticSize)
+local AssetCardTempAutomaticSize = require(script.Parent.AssetCardTempAutomaticSize)
+local HiddenMessage = require(script.Parent.HiddenMessage)
+local EnumMessageTypes = require(AppChat.Components.ChatConversation.EnumMessageTypes)
+local ChatMessageContainerAutomaticSize = require(script.Parent.ChatMessageContainerAutomaticSize)
+local Logger = require(script.Parent.Logger)
+local pruneConsecutiveNewLines = require(AppChat.SocialLibraries).Utils.pruneConsecutiveNewLines
+local FFlagAppChatEnableAutotranslation = require(AppChat.Flags.FFlagAppChatEnableAutotranslation)
+local MessageModel = require(AppChat.Models.MessageModel)
+local Foundation = require(AppChatParent.Foundation)
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local t1 = {
+	[EnumMessageTypes.PlainText] = {
+		name = "PlainText",
+		paddingOffset = 0,
+		component = PlainTextAutomaticSize
+	},
+	[EnumMessageTypes.Link] = {
+		name = "AssetCard",
+		paddingOffset = 0,
+		component = AssetCardTempAutomaticSize
+	}
+}
+local t2 = {
+	name = "Hidden",
+	paddingOffset = 0,
+	component = HiddenMessage
+}
 
-        end, 
-        inputBoxRef = nil, 
-        repliesTo = nil, 
-        translatedText = nil, 
-        autotranslationOriginalTextFontSize = 16, 
-        messageDefaultNoticeText = "PLACEHOLDER Not everyone in this chat can see your message.", 
-        messageModeratedNoticeText = "PLACEHOLDER Your message was moderated and not sent.", 
-        messageHiddenNoticeText = "PLACEHOLDER This message is not available", 
-        unknownUserText = "PLACEHOLDER unknown user"
-    };
-    return function(v26) --[[ Line: 157 ]]
-        -- upvalues: v2 (copy), v25 (copy), l_useTokens_0 (copy), v14 (copy), v3 (copy), l_Text_0 (copy), v15 (copy), v16 (copy), v21 (copy), v20 (copy), l_pruneConsecutiveNewLines_0 (copy), v6 (copy), v12 (copy), l_View_0 (copy), v11 (copy), v4 (copy), l_Image_0 (copy)
-        local v27 = v2.Dictionary.union(v25, v26);
-        local function _(v28) --[[ Line: 162 ]] --[[ Name: getModeratedText ]]
-            return string.gsub(v28, "[^%s]", "#");
-        end;
-        local function v33(v30, v31) --[[ Line: 166 ]] --[[ Name: messageMaxWidth ]]
-            local v32 = 128;
-            if v30 then
-                v32 = v32 + 112;
-            end;
-            return v31 - v32;
-        end;
-        local v34 = l_useTokens_0();
-        local v35 = nil;
-        v35 = if v14 then v3.useCallback(function(v36, v37, v38, v39, v40) --[[ Line: 180 ]]
-            -- upvalues: l_Text_0 (ref), v34 (copy)
-            if v40 then
-                local v41 = l_Text_0.GetTextBounds(v37, v39, v34.Typography.BodySmall.FontSize, Vector2.new(v36, 10000));
-                local v42 = l_Text_0.GetTextBounds(v40, v39, v38, Vector2.new(v36, 10000));
-                return math.max(v41.X, v42.X) + 20;
-            else
-                return l_Text_0.GetTextBounds(v37, v39, v38, Vector2.new(v36, 10000)).X + 20;
-            end;
-        end) else v3.useCallback(function(v43, v44, v45, v46) --[[ Line: 197 ]]
-            -- upvalues: l_Text_0 (ref)
-            return l_Text_0.GetTextBounds(v44, v46, v45, Vector2.new(v43, 10000)).X + 20;
-        end);
-        local v47 = if v15 then if v15 and v27 and v27.visibility == v16.VisibilityTypes.Hidden then v21 else v20[v27.messageType] else v20[v27.messageType];
-        local v51 = v3.useMemo(function() --[[ Line: 206 ]]
-            -- upvalues: v27 (copy)
-            local l_wideMode_0 = v27.wideMode;
-            local l_parentWidth_0 = v27.parentWidth;
-            local v50 = 128;
-            if l_wideMode_0 then
-                v50 = v50 + 112;
-            end;
-            return l_parentWidth_0 - v50;
-        end, {
-            v33, 
-            v27.wideMode, 
-            v27.parentWidth
-        });
-        local l_content_0 = v27.content;
-        l_content_0 = l_pruneConsecutiveNewLines_0(l_content_0);
-        local v53 = v27.moderated and string.gsub(l_content_0, "[^%s]", "#") or l_content_0;
-        local v54 = v6() and v27.repliesTo and v27.repliesTo.messageType and v27.repliesTo.content;
-        local l_BodyLarge_0 = v34.Typography.BodyLarge;
-        local l_FontSize_0 = l_BodyLarge_0.FontSize;
-        local l_BodySmall_0 = v34.Typography.BodySmall;
-        local l_FontSize_1 = l_BodySmall_0.FontSize;
-        if not v47 then
-            v12:warning("ChatMessage doesn't support messageType: {}", v27.messageType);
-            return v3.createElement(l_View_0, {});
-        else
-            return v3.createElement(v11, v2.Dictionary.union(v27, {
-                messageMaxWidth = v51, 
-                messageTypePaddingOffset = v47.paddingOffset, 
-                messageId = v27.messageId, 
-                isPending = if v6() then v27.isSending or v27.moderated or v27.failed else nil, 
-                visibility = if v15 then v27.visibility else nil, 
-                renderMessage = not v6() and function(v59) --[[ Line: 245 ]]
-                    -- upvalues: v4 (ref), v47 (copy), v3 (ref), v2 (ref), v27 (copy), l_BodyLarge_0 (copy), v14 (ref), v35 (ref), v51 (copy), v53 (copy), l_FontSize_0 (copy)
-                    return v4.createFragment({
-                        [v47.name] = v3.createElement(v47.component, v2.Dictionary.union({
-                            additionalProps = v27.additionalProps, 
-                            font = l_BodyLarge_0.Font, 
-                            hasTail = v27.isNewSender, 
-                            innerPadding = 10, 
-                            isIncoming = v27.isIncoming, 
-                            isPending = v27.isSending or v27.moderated or v27.failed, 
-                            isUnfiltered = v27.isUnfiltered, 
-                            isLastMessageInMessageGroup = v27.isLastMessageInMessageGroup, 
-                            maxWidth = if v14 then v35(v51, v53, l_FontSize_0, l_BodyLarge_0.Font, v27.translatedText) else v35(v51, v53, l_FontSize_0, l_BodyLarge_0.Font), 
-                            messageDefaultNoticeText = v27.messageDefaultNoticeText, 
-                            messageModeratedNoticeText = v27.messageModeratedNoticeText, 
-                            parentWidth = v27.parentWidth, 
-                            text = v53, 
-                            textSize = l_FontSize_0, 
-                            wideMode = v27.wideMode, 
-                            translatedText = if v14 then v27.translatedText else nil
-                        }, v59 or {}))
-                    });
-                end or function(v60, v61) --[[ Line: 288 ]]
-                    -- upvalues: v3 (ref), l_Image_0 (ref), v2 (ref), v27 (copy), v54 (copy), v15 (ref), v16 (ref), v21 (ref), v20 (ref), l_BodyLarge_0 (copy), v6 (ref), v51 (copy), v35 (ref), l_FontSize_1 (copy), l_BodySmall_0 (copy), l_View_0 (ref), v47 (copy), v14 (ref), v53 (copy), l_FontSize_0 (copy)
-                    local l_createElement_0 = v3.createElement;
-                    local l_l_Image_0_0 = l_Image_0;
-                    local v64 = v2.Dictionary.union({
-                        tag = {
-                            ["auto-xy gui-object-defaults col align-y-center"] = true, 
-                            ["align-x-left"] = v27.isIncoming, 
-                            ["align-x-right"] = not v27.isIncoming
-                        }, 
-                        layout = {
-                            FillDirection = Enum.FillDirection.Vertical, 
-                            Padding = UDim.new(0, 10)
-                        }
-                    }, v60 or {});
-                    local v65 = {};
-                    local v66;
-                    if v54 then
-                        v66 = v3.createElement;
-                        local v67;
-                        if v15 then
-                            local l_repliesTo_0 = v27.repliesTo;
-                            v67 = (if v15 and l_repliesTo_0 and l_repliesTo_0.visibility == v16.VisibilityTypes.Hidden then v21 else v20[l_repliesTo_0.messageType]).component;
-                        else
-                            v67 = v20[v27.repliesTo.messageType].component;
-                        end;
-                        v66 = v66(v67, {
-                            additionalProps = v27.additionalProps, 
-                            font = l_BodyLarge_0.Font, 
-                            hasTail = false, 
-                            innerPadding = 10, 
-                            isIncoming = v27.isIncoming, 
-                            isPending = false, 
-                            isUnfiltered = v27.isUnfiltered, 
-                            isRepliedTo = true, 
-                            isLastMessageInMessageGroup = v27.isLastMessageInMessageGroup, 
-                            maxWidth = if v6() then v51 else v35(v51, v27.repliesTo.content, l_FontSize_1, l_BodySmall_0.Font), 
-                            messageDefaultNoticeText = v27.messageDefaultNoticeText, 
-                            messageModeratedNoticeText = v27.messageModeratedNoticeText, 
-                            parentWidth = v27.parentWidth, 
-                            text = v27.repliesTo.content, 
-                            textSize = l_FontSize_1, 
-                            wideMode = v27.wideMode, 
-                            LayoutOrder = 1
-                        });
-                    else
-                        v66 = nil;
-                    end;
-                    v65.repliesTo = v66;
-                    v65.mainMessage = v3.createElement(l_View_0, {
-                        tag = "row auto-xy align-y-center gap-xxsmall", 
-                        LayoutOrder = 2, 
-                        ref = if v61 then v61.ref else nil
-                    }, {
-                        Icons = if v61 then v61.Icons else nil, 
-                        [v47.name] = v3.createElement(v47.component, {
-                            additionalProps = v27.additionalProps, 
-                            font = l_BodyLarge_0.Font, 
-                            hasTail = v27.isNewSender == true, 
-                            innerPadding = 10, 
-                            isIncoming = v27.isIncoming, 
-                            isPending = v27.isSending or v27.moderated or v27.failed, 
-                            isUnfiltered = v27.isUnfiltered, 
-                            isLastMessageInMessageGroup = v27.isLastMessageInMessageGroup, 
-                            isLastIncomingChatMessage = v27.isLastIncomingChatMessage, 
-                            isPressed = if v61 then v61.isPressed else nil, 
-                            maxWidth = if v14 then v35(v51, v53, l_FontSize_0, l_BodyLarge_0.Font, v27.translatedText) else v35(v51, v53, l_FontSize_0, l_BodyLarge_0.Font), 
-                            messageDefaultNoticeText = v27.messageDefaultNoticeText, 
-                            messageModeratedNoticeText = v27.messageModeratedNoticeText, 
-                            parentWidth = v27.parentWidth, 
-                            text = v53, 
-                            textSize = l_FontSize_0, 
-                            wideMode = v27.wideMode, 
-                            LayoutOrder = v27.isIncoming and 1 or 2, 
-                            translatedText = if v14 then v27.translatedText else nil
-                        })
-                    });
-                    return l_createElement_0(l_l_Image_0_0, v64, v65);
-                end
-            }));
-        end;
-    end;
-end;
+local function getMessageComponent(p1) -- line: 51
+	-- upvalues: MessageModel (copy), t2 (copy), t1 (copy)
+	if p1 and p1.visibility == MessageModel.VisibilityTypes.Hidden then
+		return t2
+	end
+
+	return t1[p1.messageType]
+end
+
+local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+local t3 = {
+	additionalProps = {
+		shareLink = nil,
+		placeId = nil,
+		universeId = nil,
+		senderUserId = nil,
+		onDetailsOpened = function() -- line: 114
+		end,
+		openGameDetailsPage = function() -- line: 115
+		end
+	},
+	conversationId = nil,
+	BackgroundColor3 = nil,
+	content = "",
+	debugElement = nil,
+	displayName = nil,
+	failed = false,
+	filteredForReceivers = false,
+	isIncoming = false,
+	isNewSender = false,
+	isSending = false,
+	isUnfiltered = false,
+	isLastMessageInMessageGroup = false,
+	isLastIncomingChatMessage = false,
+	visibility = nil,
+	messageType = nil,
+	moderated = false,
+	parentWidth = 0,
+	senderUserId = nil,
+	sent = nil,
+	showDateTime = false,
+	thumbnail = nil,
+	Transparency = nil,
+	wideMode = false,
+	viewProfileOnAvatarPressed = true,
+	closeKeyboard = function() -- line: 141
+	end,
+	inputBoxRef = nil,
+	repliesTo = nil,
+	translatedText = nil,
+	autotranslationOriginalTextFontSize = 16,
+	messageDefaultNoticeText = "PLACEHOLDER Not everyone in this chat can see your message.",
+	messageModeratedNoticeText = "PLACEHOLDER Your message was moderated and not sent.",
+	messageHiddenNoticeText = "PLACEHOLDER This message is not available",
+	unknownUserText = "PLACEHOLDER unknown user"
+}
+
+return function(t4: {[any]: any}) -- line: 153
+	-- upvalues: Cryo (copy), t3 (copy), useTokens (copy), FFlagAppChatEnableAutotranslation (copy), React (copy), Text (copy), MessageModel (copy), t2 (copy), t1 (copy), pruneConsecutiveNewLines (copy), Logger (copy), View (copy), ChatMessageContainerAutomaticSize (copy), FoundationImage (copy)
+	local v25 = Cryo.Dictionary.union(t3, t4)
+
+	local function getModeratedText(p2) -- line: 158
+		return string.gsub(p2, "[^%s]", "#")
+	end
+	local function messageMaxWidth(b1: boolean, n1: number) -- line: 162
+		local n2 = 128
+
+		if b1 then
+			n2 += 112
+		end
+
+		return n1 - n2
+	end
+
+	local v28 = useTokens()
+	local u29 = if not FFlagAppChatEnableAutotranslation then React.useCallback(function(p3, p4, p5, p6) -- line: 193
+		-- upvalues: Text (copy)
+		return Text.GetTextBounds(p4, p6, p5, Vector2.new(p3, 10000)).X + 20
+	end) else React.useCallback(function(p7, p8, p9, p10, p11) -- line: 176
+		-- upvalues: Text (copy), v28 (copy)
+		if p11 then
+			local v48 = Text.GetTextBounds(p8, p10, v28.Typography.BodySmall.FontSize, Vector2.new(p7, 10000))
+			local v49 = Text.GetTextBounds(p11, p10, p9, Vector2.new(p7, 10000))
+
+			return math.max(v48.X, v49.X) + 20
+		end
+
+		return Text.GetTextBounds(p8, p10, p9, Vector2.new(p7, 10000)).X + 20
+	end)
+	local v30 = if not v25 or v25.visibility ~= MessageModel.VisibilityTypes.Hidden then t1[v25.messageType] else t2
+	local v31 = React.useMemo(function() -- line: 200
+		-- upvalues: v25 (copy)
+		local wideMode = v25.wideMode
+		local parentWidth = v25.parentWidth
+		local n3 = 128
+
+		if wideMode then
+			n3 += 112
+		end
+
+		return parentWidth - n3
+	end, {
+		messageMaxWidth,
+		v25.wideMode,
+		v25.parentWidth
+	})
+	local content = v25.content
+	local v33 = pruneConsecutiveNewLines(content)
+	local v34 = v25.moderated and string.gsub(v33, "[^%s]", "#") or v33
+	local v35 = v25.repliesTo and (v25.repliesTo.messageType and v25.repliesTo.content)
+	local BodyLarge = v28.Typography.BodyLarge
+	local FontSize = BodyLarge.FontSize
+	local FontSize2 = v28.Typography.BodySmall.FontSize
+
+	if not v30 then
+		Logger:warning("ChatMessage doesn't support messageType: {}", v25.messageType)
+
+		return React.createElement(View, {})
+	end
+
+	return React.createElement(ChatMessageContainerAutomaticSize, Cryo.Dictionary.union(v25, {
+		messageMaxWidth = v31,
+		messageTypePaddingOffset = v30.paddingOffset,
+		messageId = v25.messageId,
+		isPending = v25.isSending or (v25.moderated or v25.failed),
+		visibility = v25.visibility,
+		renderMessage = function(p12, p13) -- line: 236
+			-- upvalues: React (copy), FoundationImage (copy), Cryo (copy), v25 (copy), v35 (copy), MessageModel (copy), t2 (copy), t1 (copy), BodyLarge (copy), v31 (copy), FontSize2 (copy), View (copy), v30 (copy), FFlagAppChatEnableAutotranslation (copy), u29 (ref), v34 (copy), FontSize (copy)
+			local createElement = React.createElement
+			local v60 = FoundationImage
+			local v61 = Cryo.Dictionary.union({
+				tag = {
+					["auto-xy gui-object-defaults col align-y-center"] = true,
+					["align-x-left"] = v25.isIncoming,
+					["align-x-right"] = not v25.isIncoming
+				},
+				layout = {
+					FillDirection = Enum.FillDirection.Vertical,
+					Padding = UDim.new(0, 10)
+				}
+			}, p12 or {})
+			local t5 = {}
+			local v65
+
+			if v35 then
+				local createElement2 = React.createElement
+				local repliesTo = v25.repliesTo
+
+				v65 = createElement2(((if not repliesTo or repliesTo.visibility ~= MessageModel.VisibilityTypes.Hidden then t1[repliesTo.messageType] else t2)).component, {
+					hasTail = false,
+					innerPadding = 10,
+					isPending = false,
+					isRepliedTo = true,
+					LayoutOrder = 1,
+					additionalProps = v25.additionalProps,
+					font = BodyLarge.Font,
+					isIncoming = v25.isIncoming,
+					isUnfiltered = v25.isUnfiltered,
+					isLastMessageInMessageGroup = v25.isLastMessageInMessageGroup,
+					maxWidth = v31,
+					messageDefaultNoticeText = v25.messageDefaultNoticeText,
+					messageModeratedNoticeText = v25.messageModeratedNoticeText,
+					parentWidth = v25.parentWidth,
+					text = v25.repliesTo.content,
+					textSize = FontSize2,
+					wideMode = v25.wideMode
+				})
+			else
+				v65 = nil
+			end
+
+			t5.repliesTo = v65
+			t5.mainMessage = React.createElement(View, {
+				tag = "row auto-xy align-y-center gap-xxsmall",
+				LayoutOrder = 2,
+				ref = if not p13 then nil else p13.ref
+			}, {
+				Icons = if not p13 then nil else p13.Icons,
+				[v30.name] = React.createElement(v30.component, {
+					innerPadding = 10,
+					additionalProps = v25.additionalProps,
+					font = BodyLarge.Font,
+					hasTail = v25.isNewSender == true,
+					isIncoming = v25.isIncoming,
+					isPending = v25.isSending or (v25.moderated or v25.failed),
+					isUnfiltered = v25.isUnfiltered,
+					isLastMessageInMessageGroup = v25.isLastMessageInMessageGroup,
+					isLastIncomingChatMessage = v25.isLastIncomingChatMessage,
+					isPressed = if not p13 then nil else p13.isPressed,
+					maxWidth = if not FFlagAppChatEnableAutotranslation then u29(v31, v34, FontSize, BodyLarge.Font) else u29(v31, v34, FontSize, BodyLarge.Font, v25.translatedText),
+					messageDefaultNoticeText = v25.messageDefaultNoticeText,
+					messageModeratedNoticeText = v25.messageModeratedNoticeText,
+					parentWidth = v25.parentWidth,
+					text = v34,
+					textSize = FontSize,
+					wideMode = v25.wideMode,
+					LayoutOrder = not v25.isIncoming and 2 or 1,
+					translatedText = if not FFlagAppChatEnableAutotranslation then nil else v25.translatedText
+				})
+			})
+
+			return createElement(v60, v61, t5)
+		end
+	}))
+end

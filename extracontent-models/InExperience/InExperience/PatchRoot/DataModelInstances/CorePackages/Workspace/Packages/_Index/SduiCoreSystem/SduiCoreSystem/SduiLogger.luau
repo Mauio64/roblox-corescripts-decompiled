@@ -1,203 +1,227 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.LoggingProtocol);
-local v4 = require(l_Parent_0.tutils);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiComponentType);
-local _ = require(l_script_FirstAncestor_0.SduiErrors);
-local v8 = game:DefineFastInt("DiscoverySduiErrorHundredthsPercent", 0);
-local v9 = game:DefineFastInt("DiscoverySduiTimerEventsHundredthsPercent", 0);
-local v10 = game:DefineFastInt("DiscoveryFeedStatsHundredthsPercent", 0);
-local v11 = {
-    eventName = "DiscoverySdui_ErrorDetails", 
-    backends = {
-        v3.TelemetryBackends.Points, 
-        v3.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v8, 
-    lastUpdated = {
-        24, 
-        11, 
-        4
-    }, 
-    description = "Error details related to discovery server-driven ui", 
-    links = ""
-};
-local v12 = {
-    eventName = "DiscoverySdui_ErrorCounter", 
-    backends = {
-        v3.TelemetryBackends.Counter
-    }, 
-    throttlingPercentage = 0, 
-    lastUpdated = {
-        24, 
-        12, 
-        14
-    }, 
-    description = "Error related to discovery server-driven ui"
-};
-local v13 = {
-    eventName = "DiscoverySdui_Timers", 
-    backends = {
-        v3.TelemetryBackends.Points, 
-        v3.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v9, 
-    lastUpdated = {
-        25, 
-        3, 
-        14
-    }, 
-    description = "Timers related to discovery server-driven ui", 
-    links = ""
-};
-local v14 = {
-    eventName = "DiscoverySdui_FeedStats", 
-    backends = {
-        v3.TelemetryBackends.Points, 
-        v3.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v10, 
-    lastUpdated = {
-        25, 
-        5, 
-        27
-    }, 
-    description = "Stats for feed response. Number of items per collection", 
-    links = ""
-};
-local function _(v15, v16) --[[ Line: 68 ]] --[[ Name: makeErrorKey ]]
-    return (("%*_%*_%*_%*_%*"):format(v15, v16.name, v16.componentType, v16.parserName, v16.propName));
-end;
-local v18 = {};
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local Cryo = require(SduiCoreSystemParent.Cryo)
+local LoggingProtocol = require(SduiCoreSystemParent.LoggingProtocol)
+local tutils = require(SduiCoreSystemParent.tutils)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.SduiComponentType)
+require(SduiCoreSystem.SduiErrors)
+
+local v6 = game:DefineFastInt("DiscoverySduiErrorHundredthsPercent", 0)
+local v7 = game:DefineFastInt("DiscoverySduiTimerEventsHundredthsPercent", 0)
+local v8 = game:DefineFastInt("DiscoveryFeedStatsHundredthsPercent", 0)
+local v9 = game:DefineFastFlag("LuaAppSduiErrorPage", false)
+local t1 = {
+	eventName = "DiscoverySdui_ErrorDetails",
+	description = "Error details related to discovery server-driven ui",
+	links = "",
+	backends = {
+		LoggingProtocol.TelemetryBackends.Points,
+		LoggingProtocol.TelemetryBackends.EventIngest
+	},
+	throttlingPercentage = v6,
+	lastUpdated = {
+		24,
+		11,
+		4
+	}
+}
+local t2 = {
+	eventName = "DiscoverySdui_ErrorCounter",
+	throttlingPercentage = 0,
+	description = "Error related to discovery server-driven ui",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		24,
+		12,
+		14
+	}
+}
+local t3 = {
+	eventName = "DiscoverySdui_Timers",
+	description = "Timers related to discovery server-driven ui",
+	links = "",
+	backends = {
+		LoggingProtocol.TelemetryBackends.Points,
+		LoggingProtocol.TelemetryBackends.EventIngest
+	},
+	throttlingPercentage = v7,
+	lastUpdated = {
+		25,
+		3,
+		14
+	}
+}
+local t4 = {
+	eventName = "DiscoverySdui_FeedStats",
+	description = "Stats for feed response. Number of items per collection",
+	links = "",
+	backends = {
+		LoggingProtocol.TelemetryBackends.Points,
+		LoggingProtocol.TelemetryBackends.EventIngest
+	},
+	throttlingPercentage = v8,
+	lastUpdated = {
+		25,
+		5,
+		27
+	}
+}
+
+local function makeErrorKey(p1, p2) -- line: 70
+	return `{ p1 }_{ p2.name }_{ p2.componentType }_{ p2.parserName }_{ p2.propName }`
+end
+
+local t5 = {}
+
 return {
-    clearSeenErrors = function() --[[ Line: 74 ]] --[[ Name: clearSeenErrors ]]
-        -- upvalues: v18 (ref)
-        v18 = {};
-    end, 
-    reportError = function(v19, v20, v21, v22) --[[ Line: 78 ]] --[[ Name: reportError ]]
-        -- upvalues: v3 (copy), v18 (ref), v12 (copy), v11 (copy), v2 (copy), v4 (copy)
-        v22 = v22 or v3.default;
-        assert(v22, "loggingProtocol must exist");
-        local v23 = ("%*_%*_%*_%*_%*"):format(v19, v20.name, v20.componentType, v20.parserName, v20.propName);
-        if v18[v23] then
-            return;
-        else
-            v18[v23] = true;
-            v22:logRobloxTelemetryCounter(v12, 1, {
-                errorType = v19, 
-                name = if v20 then v20.name else nil, 
-                componentType = if v20 then v20.componentType else nil, 
-                propName = if v20 then v20.propName else nil, 
-                parserName = if v20 then v20.parserName else nil, 
-                page = v21
-            });
-            v22:logRobloxTelemetryEvent(v11, {
-                "addSessionInfo", 
-                v3.StandardizedFields.addOsInfo
-            }, v2.Dictionary.union({
-                errorType = v19
-            }, v20 or {}), v21);
-            if not _G.__TESTEZ_RUNNING_TEST__ then
-                warn((("Discovery server-driven ui error \n%* \n%*"):format(v19, (v4.toString(v20)))));
-            end;
-            return;
-        end;
-    end, 
-    reportCounter = function(v24, v25, v26, v27) --[[ Line: 125 ]] --[[ Name: reportCounter ]]
-        -- upvalues: v3 (copy), v4 (copy)
-        v27 = v27 or v3.default;
-        assert(v27, "loggingProtocol must exist");
-        v27:logRobloxTelemetryCounter({
-            eventName = ("DiscoverySdui_Counter_%*"):format(v24), 
-            backends = {
-                v3.TelemetryBackends.Counter
-            }, 
-            throttlingPercentage = 0, 
-            lastUpdated = {
-                25, 
-                2, 
-                5
-            }, 
-            description = "Counters related to discovery server-driven ui"
-        }, 1, if v25 then {
-            name = if v25 then v25.name else nil, 
-            componentType = if v25 then v25.componentType else nil, 
-            propName = if v25 then v25.propName else nil, 
-            parserName = if v25 then v25.parserName else nil
-        } else nil);
-        if not v26 and not _G.__TESTEZ_RUNNING_TEST__ and not _G.__TEST_SUITE_PACKAGE__ then
-            warn((("Discovery server-driven ui counter \n%* \n%*"):format(v24, (v4.toString(v25)))));
-        end;
-    end, 
-    reportTimers = function(v28, v29, v30) --[[ Line: 161 ]] --[[ Name: reportTimers ]]
-        -- upvalues: v3 (copy), v13 (copy)
-        v30 = v30 or v3.default;
-        assert(v30, "loggingProtocol must exist");
-        for v31, v32 in v28 do
-            v30:logRobloxTelemetryEvent(v13, {
-                "addSessionInfo", 
-                v3.StandardizedFields.addOsInfo
-            }, {
-                flow = v31, 
-                durationMs = v32.durationMs, 
-                count = v32.count, 
-                failed = v32.failed
-            }, v29);
-        end;
-    end, 
-    reportOmniFeedStats = function(v33, v34, v35, v36, v37) --[[ Line: 187 ]] --[[ Name: reportOmniFeedStats ]]
-        -- upvalues: v3 (copy), v14 (copy)
-        v37 = v37 or v3.default;
-        assert(v37, "loggingProtocol must exist");
-        if not v33 then
-            return;
-        else
-            v34 = v34 or {};
-            local v38 = {};
-            local v39 = {};
-            for _, v41 in v33 do
-                if v41.topicId then
-                    local v42 = v41.treatmentType == "sdui";
-                    v39[v41.topicId] = v42;
-                    if v42 then
-                        local v43 = 0;
-                        local v44 = v34.feed and v34.feed.props and v34.feed.props.feedItems;
-                        if v44 then
-                            for _, v46 in v44 do
-                                if v46.feedItemKey == v41.feedItemKey then
-                                    local v47 = v46.props and v46.props.items;
-                                    if v47 then
-                                        v43 = #v47;
-                                        break;
-                                    elseif v46.props and v46.props.item then
-                                        v43 = 1;
-                                        break;
-                                    else
-                                        break;
-                                    end;
-                                end;
-                            end;
-                        end;
-                        v38[v41.topicId] = (v38[v41.topicId] or 0) + v43;
-                    else
-                        v38[v41.topicId] = (v38[v41.topicId] or 0) + (v41.recommendationList and #v41.recommendationList or 0);
-                    end;
-                end;
-            end;
-            local v48 = {};
-            for v49, v50 in v38 do
-                v48[("%*_item_count"):format(v49)] = v50;
-                v48[("%*_is_sdui"):format(v49)] = v39[v49] and 1 or 0;
-            end;
-            v48.appPage = v35;
-            v48.sduiResponseRequestId = v36;
-            v37:logRobloxTelemetryEvent(v14, {
-                "addSessionInfo", 
-                v3.StandardizedFields.addOsInfo
-            }, v48, v35);
-            return;
-        end;
-    end
-};
+	clearSeenErrors = function() -- line: 76
+		-- upvalues: t5 (ref)
+		t5 = {}
+	end,
+	reportError = function(p3, p4, s1: string, p5) -- line: 80
+		-- upvalues: LoggingProtocol (copy), t5 (ref), t2 (copy), t1 (copy), Cryo (copy), v9 (copy), tutils (copy)
+		local v22 = p5 or LoggingProtocol.default
+
+		assert(v22, "loggingProtocol must exist")
+
+		local v23 = `{ p3 }_{ p4.name }_{ p4.componentType }_{ p4.parserName }_{ p4.propName }`
+
+		if t5[v23] then
+			return
+		end
+
+		t5[v23] = true
+		v22:logRobloxTelemetryCounter(t2, 1, {
+			errorType = p3,
+			name = if not p4 then nil else p4.name,
+			componentType = if not p4 then nil else p4.componentType,
+			propName = if not p4 then nil else p4.propName,
+			parserName = if not p4 then nil else p4.parserName,
+			page = s1
+		})
+		v22:logRobloxTelemetryEvent(t1, {
+			"addSessionInfo",
+			LoggingProtocol.StandardizedFields.addOsInfo
+		}, Cryo.Dictionary.union({
+			errorType = p3,
+			page = if not v9 then nil else s1
+		}, p4 or {}), s1)
+
+		if not _G.__TESTEZ_RUNNING_TEST__ then
+			warn(`Discovery server-driven ui error \n{ p3 } \n{ tutils.toString(p4) }`)
+		end
+	end,
+	reportCounter = function(s2: string, p6, b1: boolean?, p7) -- line: 128
+		-- upvalues: LoggingProtocol (copy), tutils (copy)
+		local v28 = p7 or LoggingProtocol.default
+
+		assert(v28, "loggingProtocol must exist")
+		v28:logRobloxTelemetryCounter({
+			throttlingPercentage = 0,
+			description = "Counters related to discovery server-driven ui",
+			eventName = `DiscoverySdui_Counter_{ s2 }`,
+			backends = { LoggingProtocol.TelemetryBackends.Counter },
+			lastUpdated = {
+				25,
+				2,
+				5
+			}
+		}, 1, if not p6 then nil else {
+			name = if not p6 then nil else p6.name,
+			componentType = if not p6 then nil else p6.componentType,
+			propName = if not p6 then nil else p6.propName,
+			parserName = if not p6 then nil else p6.parserName
+		})
+
+		if not b1 and not _G.__TESTEZ_RUNNING_TEST__ and not _G.__TEST_SUITE_PACKAGE__ then
+			warn(`Discovery server-driven ui counter \n{ s2 } \n{ tutils.toString(p6) }`)
+		end
+	end,
+	reportTimers = function(t6: {[any]: any}, s3: string, p8) -- line: 164
+		-- upvalues: LoggingProtocol (copy), t3 (copy)
+		local v32 = p8 or LoggingProtocol.default
+
+		assert(v32, "loggingProtocol must exist")
+
+		for v33, v34 in t6 do
+			v32:logRobloxTelemetryEvent(t3, {
+				"addSessionInfo",
+				LoggingProtocol.StandardizedFields.addOsInfo
+			}, {
+				flow = v33,
+				durationMs = v34.durationMs,
+				count = v34.count,
+				failed = v34.failed
+			}, s3)
+		end
+	end,
+	reportOmniFeedStats = function(p9, p10, p11, p12, p13) -- line: 190
+		-- upvalues: LoggingProtocol (copy), t4 (copy)
+		local v40 = p13 or LoggingProtocol.default
+
+		assert(v40, "loggingProtocol must exist")
+
+		if not p9 then
+			return
+		end
+
+		local v41 = p10 or {}
+		local t7 = {}
+		local t8 = {}
+
+		for _, v45 in p9 do
+			if v45.topicId then
+				local v46 = v45.treatmentType == "sdui"
+
+				t8[v45.topicId] = v46
+
+				if v46 then
+					local n1 = 0
+					local v48 = v41.feed and (v41.feed.props and v41.feed.props.feedItems)
+
+					if v48 then
+						for _, v50 in v48 do
+							if v50.feedItemKey == v45.feedItemKey then
+								local v51 = v50.props and v50.props.items
+
+								if v51 then
+									n1 = #v51
+
+									break
+								end
+
+								if not v50.props or not v50.props.item then
+									break
+								end
+
+								n1 = 1
+
+								break
+							end
+						end
+					end
+
+					t7[v45.topicId] = (t7[v45.topicId] or 0) + n1
+				else
+					t7[v45.topicId] = (t7[v45.topicId] or 0) + (v45.recommendationList and #v45.recommendationList or 0)
+				end
+			end
+		end
+
+		local t9 = {}
+
+		for v53, v54 in t7 do
+			t9[`{ v53 }_item_count`] = v54
+			t9[`{ v53 }_is_sdui`] = not t8[v53] and 0 or 1
+		end
+
+		t9.appPage = p11
+		t9.sduiResponseRequestId = p12
+		v40:logRobloxTelemetryEvent(t4, {
+			"addSessionInfo",
+			LoggingProtocol.StandardizedFields.addOsInfo
+		}, t9, p11)
+	end
+}

@@ -1,48 +1,48 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local v2 = game:DefineFastInt("TopBarToggledThrottleHundredthsPercent", 0);
-local l_game_EngineFeature_0 = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled");
-local v4 = {
-    eventName = "topbar_toggled", 
-    backends = {
-        "EventIngest"
-    }, 
-    throttlingPercentage = v2, 
-    lastUpdated = {
-        25, 
-        6, 
-        10
-    }, 
-    description = "Event fired every time TopBar is toggled open/close in UI-less mode", 
-    links = "https://github.rbx.com/Roblox/proto-schemas/pull/6270"
-};
-return function(v5) --[[ Line: 22 ]]
-    -- upvalues: l_game_EngineFeature_0 (copy), l_RbxAnalyticsService_0 (copy), l_TelemetryService_0 (copy), v4 (copy)
-    local v6 = nil;
-    local v7 = nil;
-    if l_game_EngineFeature_0 then
-        v6 = {
-            "addPlaceId", 
-            "addUniverseId", 
-            "addPlaySessionId", 
-            "addSessionInfo"
-        };
-        v7 = {
-            is_toggled_on = tostring(v5)
-        };
-    else
-        v6 = {
-            "addPlaceId", 
-            "addUniverseId", 
-            "addSessionInfo"
-        };
-        v7 = {
-            is_toggled_on = tostring(v5), 
-            playsessionid = l_RbxAnalyticsService_0:GetPlaySessionId()
-        };
-    end;
-    l_TelemetryService_0:LogEvent(v4, {
-        standardizedFields = v6, 
-        customFields = v7
-    });
-end;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local TelemetryService = game:GetService("TelemetryService")
+local v3 = game:DefineFastInt("TopBarToggledThrottleHundredthsPercent", 0)
+local EngineFeature = game:GetEngineFeature("TelemetryServicePlaySessionInfoEnabled")
+local t1 = {
+	eventName = "topbar_toggled",
+	description = "Event fired every time TopBar is toggled open/close in UI-less mode",
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6270",
+	backends = { "EventIngest" },
+	throttlingPercentage = v3,
+	lastUpdated = {
+		25,
+		6,
+		10
+	}
+}
+
+return function(b1: boolean) -- line: 22
+	-- upvalues: EngineFeature (copy), RbxAnalyticsService (copy), TelemetryService (copy), t1 (copy)
+	local t2, t3
+
+	if EngineFeature then
+		t2 = {
+			"addPlaceId",
+			"addUniverseId",
+			"addPlaySessionId",
+			"addSessionInfo"
+		}
+		t3 = {
+			is_toggled_on = tostring(b1)
+		}
+	else
+		t2 = {
+			"addPlaceId",
+			"addUniverseId",
+			"addSessionInfo"
+		}
+		t3 = {
+			is_toggled_on = tostring(b1),
+			playsessionid = RbxAnalyticsService:GetPlaySessionId()
+		}
+	end
+
+	TelemetryService:LogEvent(t1, {
+		standardizedFields = t2,
+		customFields = t3
+	})
+end

@@ -1,14 +1,15 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(script.Parent.Parent.Actions.UpdateLastFriend);
-return v2.createReducer({
-    lastRemovedFriendId = ""
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local UpdateLastFriend = require(script.Parent.Parent.Actions.UpdateLastFriend)
+
+return Rodux.createReducer({
+	lastRemovedFriendId = ""
 }, {
-    [v3.name] = function(v4, v5) --[[ Line: 10 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v4, {
-            lastRemovedFriendId = tostring(v5.lastRemovedFriendId) .. tostring(DateTime.now())
-        });
-    end
-});
+	[UpdateLastFriend.name] = function(p1, p2) -- line: 10
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			lastRemovedFriendId = tostring(p2.lastRemovedFriendId) .. tostring(DateTime.now())
+		})
+	end
+})

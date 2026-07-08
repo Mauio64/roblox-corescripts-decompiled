@@ -1,10 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("PurchasePrompt").Parent;
-local v1 = require(l_Parent_0.React);
-local l_StyleProviderWithDefaultTheme_0 = require(l_Parent_0.Style).StyleProviderWithDefaultTheme;
-return function(v3, v4) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy), l_StyleProviderWithDefaultTheme_0 (copy)
-    return v1.createElement(l_StyleProviderWithDefaultTheme_0, {
-        withUiModeSupport = if v4 then v4.withUiModeSupport else false, 
-        withDarkTheme = not v4 or v4.withDarkTheme
-    }, v3);
-end;
+local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+local React = require(Parent.React)
+local StyleProviderWithDefaultTheme = require(Parent.Style).StyleProviderWithDefaultTheme
+
+return function(p1, p2) -- line: 8
+	-- upvalues: React (copy), StyleProviderWithDefaultTheme (copy)
+	return React.createElement(StyleProviderWithDefaultTheme, {
+		withUiModeSupport = not not p2 and p2.withUiModeSupport,
+		withDarkTheme = not p2 or p2.withDarkTheme
+	}, p1)
+end

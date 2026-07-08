@@ -1,21 +1,25 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameVotesRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v4 = require(l_script_FirstAncestor_0.Enums.VoteStatus);
-local v5 = {
-    [v4.VotedUp] = true, 
-    [v4.VotedDown] = false, 
-    [v4.NotVoted] = "null"
-};
-return function(v6, v7, v8) --[[ Line: 22 ]]
-    -- upvalues: v5 (copy), l_Url_0 (copy), l_HttpService_0 (copy)
-    assert(type(v7) == "string", "GamesPatchUserVotes request expects universeId to be a string");
-    local v9 = v5[v8];
-    assert(v9 ~= nil, "GamesPatchUserVotes request expects a valid vote");
-    return v6(string.format("%sv1/games/%s/user-votes", l_Url_0.GAME_URL, v7), "PATCH", {
-        postBody = l_HttpService_0:JSONEncode({
-            vote = v9
-        })
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local GameVotesRodux = script:FindFirstAncestor("GameVotesRodux")
+local GameVotesRoduxParent = GameVotesRodux.Parent
+local Url = require(GameVotesRoduxParent.Http).Url
+local VoteStatus = require(GameVotesRodux.Enums.VoteStatus)
+local t1 = {
+	[VoteStatus.VotedUp] = true,
+	[VoteStatus.VotedDown] = false,
+	[VoteStatus.NotVoted] = "null"
+}
+
+return function(p1, p2, p3) -- line: 22
+	-- upvalues: t1 (copy), Url (copy), HttpService (copy)
+	assert(type(p2) == "string", "GamesPatchUserVotes request expects universeId to be a string")
+
+	local v10 = t1[p3]
+
+	assert(v10 ~= nil, "GamesPatchUserVotes request expects a valid vote")
+
+	return p1(string.format("%sv1/games/%s/user-votes", Url.GAME_URL, p2), "PATCH", {
+		postBody = HttpService:JSONEncode({
+			vote = v10
+		})
+	})
+end

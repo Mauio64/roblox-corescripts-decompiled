@@ -1,14 +1,17 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local v2 = {};
-    if not v0 then
-        return v2;
-    else
-        local v3 = v0[v1];
-        if v3 then
-            for v4, _ in v3 do
-                table.insert(v2, v4);
-            end;
-        end;
-        return v2;
-    end;
-end;
+return function(t1: {[any]: any}, s1: string) -- line: 1
+	local t2 = {}
+
+	if not t1 then
+		return t2
+	end
+
+	local v4 = t1[s1]
+
+	if v4 then
+		for v5, _ in v4 do
+			table.insert(t2, v5)
+		end
+	end
+
+	return t2
+end

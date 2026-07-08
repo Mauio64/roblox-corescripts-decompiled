@@ -1,33 +1,34 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.UserLib);
+local ParentParent = script.Parent.Parent
+local UserLib = require(ParentParent.UserLib)
+
 return {
-    AppBlox = require(l_Parent_0.AppBlox), 
-    Cryo = require(l_Parent_0.Cryo), 
-    Dash = require(l_Parent_0.Dash), 
-    LocalStorage = require(l_Parent_0.LocalStorage), 
-    Rodux = require(l_Parent_0.Rodux), 
-    Roact = require(l_Parent_0.Roact), 
-    RoactRodux = require(l_Parent_0.RoactRodux), 
-    RoactServices = require(l_Parent_0.RoactServices), 
-    React = require(l_Parent_0.React), 
-    ReactRoblox = require(l_Parent_0.ReactRoblox), 
-    UIBlox = require(l_Parent_0.UIBlox), 
-    Localization = require(l_Parent_0.Localization), 
-    NotificationModalsManager = require(l_Parent_0.NotificationModalsManager), 
-    RobloxAppHooks = require(l_Parent_0.RobloxAppHooks), 
-    RobloxAppEnums = require(l_Parent_0.RobloxAppEnums), 
-    RoactServiceTags = require(l_Parent_0.RoactServiceTags), 
-    Hooks = {
-        dependencyArray = require(l_Parent_0.RoactUtils).Hooks.dependencyArray
-    }, 
-    LuauPolyfill = require(l_Parent_0.LuauPolyfill), 
-    t = require(l_Parent_0.t), 
-    ToastNotificationsProtocol = require(l_Parent_0.ToastNotificationsProtocol).ToastNotificationProtocol, 
-    ToastNotificationProtocolEnums = require(l_Parent_0.ToastNotificationsProtocol).ToastNotificationProtocolEnums, 
-    UserLib = v1, 
-    getRbxthumbWithTypeSizeAndOptions = v1.Utils.getRbxthumbWithTypeSizeAndOptions, 
-    UserLibConstants = v1.Utils.Constants, 
-    Lumberyak = require(l_Parent_0.Lumberyak), 
-    SharedFlags = require(l_Parent_0.SharedFlags), 
-    Signal = require(l_Parent_0.AppCommonLib).Signal
-};
+	AppBlox = require(ParentParent.AppBlox),
+	Cryo = require(ParentParent.Cryo),
+	Dash = require(ParentParent.Dash),
+	LocalStorage = require(ParentParent.LocalStorage),
+	Rodux = require(ParentParent.Rodux),
+	Roact = require(ParentParent.Roact),
+	RoactRodux = require(ParentParent.RoactRodux),
+	RoactServices = require(ParentParent.RoactServices),
+	React = require(ParentParent.React),
+	ReactRoblox = require(ParentParent.ReactRoblox),
+	UIBlox = require(ParentParent.UIBlox),
+	Localization = require(ParentParent.Localization),
+	NotificationModalsManager = require(ParentParent.NotificationModalsManager),
+	RobloxAppHooks = require(ParentParent.RobloxAppHooks),
+	RobloxAppEnums = require(ParentParent.RobloxAppEnums),
+	RoactServiceTags = require(ParentParent.RoactServiceTags),
+	Hooks = {
+		dependencyArray = require(ParentParent.RoactUtils).Hooks.dependencyArray
+	},
+	LuauPolyfill = require(ParentParent.LuauPolyfill),
+	t = require(ParentParent.t),
+	ToastNotificationsProtocol = require(ParentParent.ToastNotificationsProtocol).ToastNotificationProtocol,
+	ToastNotificationProtocolEnums = require(ParentParent.ToastNotificationsProtocol).ToastNotificationProtocolEnums,
+	UserLib = UserLib,
+	getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions,
+	UserLibConstants = UserLib.Utils.Constants,
+	Lumberyak = require(ParentParent.Lumberyak),
+	SharedFlags = require(ParentParent.SharedFlags),
+	Signal = require(ParentParent.AppCommonLib).Signal
+}

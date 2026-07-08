@@ -1,20 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local v1 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v2 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local _ = require(l_script_FirstAncestor_0.Enums.ErrorReason);
-local v4 = require(l_script_FirstAncestor_0.Utils.logRobloxSubscriptionUpsellCounter);
-local v5 = require(l_script_FirstAncestor_0.Events.RobloxSubscriptionUpsellTelemetry);
-local v6 = require(l_script_FirstAncestor_0.Utils.RobloxSubscriptionLogger);
-transitionToError = function(v7, v8) --[[ Line: 14 ]] --[[ Name: transitionToError ]]
-    -- upvalues: v1 (copy), v2 (copy), v6 (copy), v4 (copy), v5 (copy)
-    local v9 = v1.get();
-    v9.setErrorReason(v7);
-    v9.setPromptState(v2.Error);
-    v6.debug({
-        message = "Transitioning to error state", 
-        errorReason = tostring(v7), 
-        originalContext = v8 or "Unknown"
-    });
-    v4(v5.RobloxSubscriptionPurchaseErrorShownCounter);
-end;
-return transitionToError;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local HttpService = game:GetService("HttpService")
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local logSubscriptionPurchaseFlowEvent = require(RobloxSubscriptionPurchaseApp.Utils.logSubscriptionPurchaseFlowEvent)
+local FFlagEnableSubscriptionPurchaseFlowEventIngest = require(RobloxSubscriptionPurchaseApp.Flags.FFlagEnableSubscriptionPurchaseFlowEventIngest)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+
+require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+
+local logRobloxSubscriptionUpsellCounter = require(RobloxSubscriptionPurchaseApp.Utils.logRobloxSubscriptionUpsellCounter)
+local RobloxSubscriptionUpsellTelemetry = require(RobloxSubscriptionPurchaseApp.Events.RobloxSubscriptionUpsellTelemetry)
+local RobloxSubscriptionLogger = require(RobloxSubscriptionPurchaseApp.Utils.RobloxSubscriptionLogger)
+
+function transitionToError(p1, s1: string) -- line: 19
+	-- upvalues: RobloxSubscriptionStore (copy), PromptState (copy), RobloxSubscriptionLogger (copy), logRobloxSubscriptionUpsellCounter (copy), RobloxSubscriptionUpsellTelemetry (copy), FFlagEnableSubscriptionPurchaseFlowEventIngest (copy), logSubscriptionPurchaseFlowEvent (copy), HttpService (copy)
+	local v12 = RobloxSubscriptionStore.get()
+
+	v12.setErrorReason(p1)
+	v12.setPromptState(PromptState.Error)
+	RobloxSubscriptionLogger.debug({
+		message = "Transitioning to error state",
+		errorReason = tostring(p1),
+		originalContext = s1 or "Unknown"
+	})
+	logRobloxSubscriptionUpsellCounter(RobloxSubscriptionUpsellTelemetry.RobloxSubscriptionPurchaseErrorShownCounter)
+
+	if FFlagEnableSubscriptionPurchaseFlowEventIngest then
+		logSubscriptionPurchaseFlowEvent("SubscriptionPurchaseErrorShown", {
+			event_metadata = HttpService:JSONEncode({
+				error_reason = tostring(p1),
+				original_context = s1 or ""
+			})
+		})
+	end
+end
+
+return transitionToError

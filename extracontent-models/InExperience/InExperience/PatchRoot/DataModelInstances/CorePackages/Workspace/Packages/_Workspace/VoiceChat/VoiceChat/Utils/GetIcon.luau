@@ -1,11 +1,13 @@
-getIconSrc = function(v0, v1) --[[ Line: 4 ]] --[[ Name: getIconSrc ]]
-    return "rbxasset://textures/ui/VoiceChat/" .. (v1 and v1 .. "/" or "") .. v0 .. ".png";
-end;
-return function(v2, v3, v4) --[[ Line: 9 ]]
-    if v2 == "Unmuted" then
-        local v5 = math.floor(0.5 + 5 * (v4 or math.random())) * 20;
-        return v4 and getIconSrc("Unmuted" .. tostring(v5), v3) or getIconSrc("Blank", v3);
-    else
-        return getIconSrc(v2, v3);
-    end;
-end;
+function getIconSrc(s1: string, s2: string) -- line: 4
+	return "rbxasset://textures/ui/VoiceChat/" .. (s2 and s2 .. "/" or "") .. s1 .. ".png"
+end
+
+return function(s3: string, s4: string, n1: number?) -- line: 9
+	if s3 == "Unmuted" then
+		local v6 = math.floor(0.5 + 5 * (n1 or math.random())) * 20
+
+		return n1 and getIconSrc("Unmuted" .. tostring(v6), s4) or getIconSrc("Blank", s4)
+	end
+
+	return getIconSrc(s3, s4)
+end

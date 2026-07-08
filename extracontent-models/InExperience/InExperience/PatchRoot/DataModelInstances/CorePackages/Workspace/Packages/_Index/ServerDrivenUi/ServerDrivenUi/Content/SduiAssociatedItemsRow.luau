@@ -1,42 +1,71 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.SduiCoreSystem);
-local l_View_0 = v2.View;
-local l_getSduiComponentWrapper_0 = v3.getSduiComponentWrapper;
-local l_FFlagSduiServerCompat_0 = require(l_Parent_0.SharedFlags).FFlagSduiServerCompat;
-return v1.memo(function(v7) --[[ Line: 28 ]] --[[ Name: SduiAssociatedItemsRow ]]
-    -- upvalues: l_FFlagSduiServerCompat_0 (copy), l_getSduiComponentWrapper_0 (copy), v1 (copy), l_View_0 (copy)
-    local v8 = nil;
-    v8 = if l_FFlagSduiServerCompat_0 then v7.layoutOrder else v7.LayoutOrder;
-    local v9 = {};
-    for v10, v11 in v7.items do
-        local v12 = l_getSduiComponentWrapper_0(v11);
-        v9[("Item_$%*"):format(v10)] = v1.createElement(v12, {
-            componentConfig = v11, 
-            sduiContext = v7.sduiContext, 
-            parentAnalyticsContext = v7.analyticsContext, 
-            extraLocalProps = {
-                index = v10, 
-                LayoutOrder = if not l_FFlagSduiServerCompat_0 then v10 else nil, 
-                layoutOrder = if l_FFlagSduiServerCompat_0 then v10 else nil
-            }, 
-            debugName = ("AssociatedItemsRow-Item-$%*"):format(v10)
-        });
-    end;
-    return v1.createElement("ScrollingFrame", {
-        AutomaticCanvasSize = Enum.AutomaticSize.X, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v8, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        ClipsDescendants = false, 
-        ElasticBehavior = Enum.ElasticBehavior.Always, 
-        ScrollBarThickness = 0, 
-        ScrollingDirection = Enum.ScrollingDirection.X
-    }, {
-        ItemsRow = v1.createElement(l_View_0, {
-            tag = "row gap-small auto-xy size-full-0"
-        }, v9)
-    });
-end);
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local View = Foundation.View
+local getSduiComponentWrapper = SduiCoreSystem.getSduiComponentWrapper
+local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+
+local function SduiAssociatedItemsRow(t1: {[any]: any}) -- line: 27
+	-- upvalues: getSduiComponentWrapper (copy), React (copy), FFlagSduiExperienceDetailsSupport (copy), View (copy)
+	local layoutOrder = t1.layoutOrder
+	local t2 = {}
+
+	for v12, v13 in t1.items do
+		local v14 = getSduiComponentWrapper(v13)
+
+		t2[`Item_${ v12 }`] = React.createElement(v14, {
+			componentConfig = v13,
+			sduiContext = t1.sduiContext,
+			parentAnalyticsContext = t1.analyticsContext,
+			extraLocalProps = {
+				index = v12,
+				layoutOrder = v12
+			},
+			debugName = `AssociatedItemsRow-Item-${ v12 }`
+		})
+	end
+
+	if FFlagSduiExperienceDetailsSupport then
+		return React.createElement(View, {
+			tag = "col gap-medium size-full-0 auto-y",
+			LayoutOrder = layoutOrder
+		}, {
+			ItemsScroll = React.createElement("ScrollingFrame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				ClipsDescendants = false,
+				ScrollBarThickness = 0,
+				Selectable = false,
+				AutomaticCanvasSize = Enum.AutomaticSize.X,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				ElasticBehavior = Enum.ElasticBehavior.Always,
+				ScrollingDirection = Enum.ScrollingDirection.X
+			}, {
+				ItemsRow = React.createElement(View, {
+					tag = "row gap-small auto-xy size-full-0"
+				}, t2)
+			}),
+			Footer = t1.footerComponent
+		})
+	end
+
+	return React.createElement("ScrollingFrame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = false,
+		ScrollBarThickness = 0,
+		AutomaticCanvasSize = Enum.AutomaticSize.X,
+		LayoutOrder = layoutOrder,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ElasticBehavior = Enum.ElasticBehavior.Always,
+		ScrollingDirection = Enum.ScrollingDirection.X
+	}, {
+		ItemsRow = React.createElement(View, {
+			tag = "row gap-small auto-xy size-full-0"
+		}, t2)
+	})
+end
+
+return React.memo(SduiAssociatedItemsRow)

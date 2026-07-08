@@ -1,11 +1,17 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isEventValid ]]
-    if v0.title == nil then
-        return false;
-    elseif v0.imageUrl == nil then
-        return false;
-    elseif v0.pagePath == nil then
-        return false;
-    else
-        return true;
-    end;
-end;
+local function isEventValid(t1: {[any]: any}) -- line: 1
+	if t1.title == nil then
+		return false
+	end
+
+	if t1.imageUrl == nil then
+		return false
+	end
+
+	if t1.pagePath == nil then
+		return false
+	end
+
+	return true
+end
+
+return isEventValid

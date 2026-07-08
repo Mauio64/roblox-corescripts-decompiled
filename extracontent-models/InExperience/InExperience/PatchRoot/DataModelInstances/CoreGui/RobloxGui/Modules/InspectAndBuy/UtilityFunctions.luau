@@ -1,91 +1,98 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.Constants);
-local v2 = require(l_Parent_0.Flags.GetFFlagIBEnableCollectiblesSystemSupport);
-local v12 = {
-    getBundleId = function(v3) --[[ Line: 9 ]] --[[ Name: getBundleId ]]
-        if v3.parentBundleId ~= nil then
-            return v3.parentBundleId;
-        else
-            return nil;
-        end;
-    end, 
-    isCollectibles = function(v4) --[[ Line: 17 ]] --[[ Name: isCollectibles ]]
-        -- upvalues: v1 (copy)
-        return v4 and v4.productType and v4.productType == v1.ProductType.CollectibleItem;
-    end, 
-    hasLimitedQuantity = function(v5) --[[ Line: 21 ]] --[[ Name: hasLimitedQuantity ]]
-        -- upvalues: v2 (copy)
-        if not v5 then
-            return nil;
-        else
-            local l_isLimited_0 = v5.isLimited;
-            local v7 = if v2() then v5.isLimitedUnique else nil;
-            local l_collectibleIsLimited_0 = v5.collectibleIsLimited;
-            return l_isLimited_0 or v7 or l_collectibleIsLimited_0;
-        end;
-    end, 
-    isLimited1Point0 = function(v9) --[[ Line: 34 ]] --[[ Name: isLimited1Point0 ]]
-        if not v9 then
-            return nil;
-        else
-            return v9.isLimited or v9.isLimitedUnique;
-        end;
-    end, 
-    isLimited1Point0_LimitedUnique = function(v10) --[[ Line: 43 ]] --[[ Name: isLimited1Point0_LimitedUnique ]]
-        if not v10 then
-            return nil;
-        else
-            return v10.isLimitedUnique;
-        end;
-    end, 
-    isLimited2Point0_Or_LimitedCollectible = function(v11) --[[ Line: 52 ]] --[[ Name: isLimited2Point0_Or_LimitedCollectible ]]
-        if not v11 then
-            return nil;
-        else
-            return v11.collectibleIsLimited;
-        end;
-    end
-};
-v12.isUnlimitedCollectibleAsset = function(v13, v14) --[[ Line: 61 ]] --[[ Name: isUnlimitedCollectibleAsset ]]
-    -- upvalues: v12 (copy), v1 (copy)
-    if not v13 or not v14 then
-        return nil;
-    else
-        local v15 = not v12.hasLimitedQuantity(v14);
-        local v16 = v14.productType == v1.ProductType.CollectibleItem;
-        local v17 = v13 == v1.ItemType.Asset;
-        return v15 and v16 and v17;
-    end;
-end;
-v12.isLimitedBundle = function(v18, v19) --[[ Line: 73 ]] --[[ Name: isLimitedBundle ]]
-    -- upvalues: v1 (copy)
-    if not v18 or not v19 then
-        return nil;
-    else
-        local l_collectibleIsLimited_1 = v19.collectibleIsLimited;
-        local v21 = v18 == v1.ItemType.Bundle;
-        return l_collectibleIsLimited_1 and v21;
-    end;
-end;
-v12.isUnlimitedCollectibleBundle = function(v22, v23) --[[ Line: 84 ]] --[[ Name: isUnlimitedCollectibleBundle ]]
-    -- upvalues: v1 (copy)
-    if not v22 or not v23 then
-        return nil;
-    else
-        local v24 = not v23.collectibleIsLimited;
-        local v25 = v23.productType == v1.ProductType.CollectibleItem;
-        local v26 = v22 == v1.ItemType.Bundle;
-        return v24 and v25 and v26;
-    end;
-end;
-v12.isLimitedCollectible = function(v27) --[[ Line: 96 ]] --[[ Name: isLimitedCollectible ]]
-    -- upvalues: v12 (copy), v1 (copy)
-    if not v27 then
-        return nil;
-    else
-        local v28 = v12.hasLimitedQuantity(v27);
-        local v29 = v27.productType == v1.ProductType.CollectibleItem;
-        return v28 and v29;
-    end;
-end;
-return v12;
+local scriptParent = script.Parent
+local Constants = require(scriptParent.Constants)
+local GetFFlagIBEnableCollectiblesSystemSupport = require(scriptParent.Flags.GetFFlagIBEnableCollectiblesSystemSupport)
+local t1 = {
+	getBundleId = function(p1) -- line: 9
+		if p1.parentBundleId ~= nil then
+			return p1.parentBundleId
+		end
+
+		return nil
+	end,
+	isCollectibles = function(p2) -- line: 17
+		-- upvalues: Constants (copy)
+		return p2 and (p2.productType and p2.productType == Constants.ProductType.CollectibleItem)
+	end,
+	hasLimitedQuantity = function(p3) -- line: 21
+		-- upvalues: GetFFlagIBEnableCollectiblesSystemSupport (copy)
+		if not p3 then
+			return nil
+		end
+
+		local isLimited = p3.isLimited
+		local v9 = if not GetFFlagIBEnableCollectiblesSystemSupport() then nil else p3.isLimitedUnique
+		local collectibleIsLimited = p3.collectibleIsLimited
+
+		return isLimited or (v9 or collectibleIsLimited)
+	end,
+	isLimited1Point0 = function(p4) -- line: 34
+		if not p4 then
+			return nil
+		end
+
+		return p4.isLimited or p4.isLimitedUnique
+	end,
+	isLimited1Point0_LimitedUnique = function(p5) -- line: 43
+		if not p5 then
+			return nil
+		end
+
+		return p5.isLimitedUnique
+	end,
+	isLimited2Point0_Or_LimitedCollectible = function(p6) -- line: 52
+		if not p6 then
+			return nil
+		end
+
+		return p6.collectibleIsLimited
+	end
+}
+
+function t1.isUnlimitedCollectibleAsset(s1: string?, p7) -- line: 61
+	-- upvalues: t1 (copy), Constants (copy)
+	if not s1 or not p7 then
+		return nil
+	end
+
+	local v16 = t1.hasLimitedQuantity(p7)
+	local v17 = p7.productType == Constants.ProductType.CollectibleItem
+	local v18 = s1 == Constants.ItemType.Asset
+
+	return not v16 and (v17 and v18)
+end
+function t1.isLimitedBundle(s2: string?, p8) -- line: 73
+	-- upvalues: Constants (copy)
+	if not s2 or not p8 then
+		return nil
+	end
+
+	local collectibleIsLimited = p8.collectibleIsLimited
+	local v22 = s2 == Constants.ItemType.Bundle
+
+	return collectibleIsLimited and v22
+end
+function t1.isUnlimitedCollectibleBundle(s3: string?, p9) -- line: 84
+	-- upvalues: Constants (copy)
+	if not s3 or not p9 then
+		return nil
+	end
+
+	local collectibleIsLimited = p9.collectibleIsLimited
+	local v26 = p9.productType == Constants.ProductType.CollectibleItem
+	local v27 = s3 == Constants.ItemType.Bundle
+
+	return not collectibleIsLimited and (v26 and v27)
+end
+function t1.isLimitedCollectible(p10) -- line: 96
+	-- upvalues: t1 (copy), Constants (copy)
+	if not p10 then
+		return nil
+	end
+
+	local v29 = t1.hasLimitedQuantity(p10)
+	local v30 = p10.productType == Constants.ProductType.CollectibleItem
+
+	return v29 and v30
+end
+
+return t1

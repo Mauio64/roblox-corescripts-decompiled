@@ -1,146 +1,181 @@
-local l_Parent_0 = script:FindFirstAncestor("GameModels").Parent;
-local v1 = require(l_Parent_0.Result);
-local l_trim_0 = require(l_Parent_0.LuauPolyfill).String.trim;
-local _ = require(l_Parent_0.DiscoveryTypes);
-local l_FFlagSearchOmniAutocompletePage_0 = require(l_Parent_0.SharedFlags).FFlagSearchOmniAutocompletePage;
-local l_FFlagEnableTopSongsSort_0 = require(l_Parent_0.SharedFlags).FFlagEnableTopSongsSort;
-local v11 = {
-    new = function(v6, v7, v8) --[[ Line: 14 ]] --[[ Name: new ]]
-        -- upvalues: l_trim_0 (copy)
-        return {
-            universeId = v6, 
-            placeId = v7, 
-            name = l_trim_0(v8)
-        };
-    end, 
-    _fromSharedJson = function(v9, v10) --[[ Line: 24 ]] --[[ Name: _fromSharedJson ]]
-        v9.ageRecommendationDisplayName = v10.ageRecommendationDisplayName;
-        v9.minimumAge = v10.minimumAge;
-        v9.contentMaturity = v10.contentMaturity;
-        v9.playerCount = v10.playerCount;
-        v9.primaryWideAssetId = if v10.primaryMediaAsset and v10.primaryMediaAsset.wideImageAssetId then tostring(v10.primaryMediaAsset.wideImageAssetId) else nil;
-        v9.primaryWideListId = if v10.primaryMediaAsset and v10.primaryMediaAsset.wideImageListId then tostring(v10.primaryMediaAsset.wideImageListId) else nil;
-        v9.totalDownVotes = v10.totalDownVotes;
-        v9.totalUpVotes = v10.totalUpVotes;
-        v9.defaultLayoutData = v10.defaultLayoutData;
-        v9.layoutDataBySort = v10.layoutDataBySort;
-    end
-};
-v11.mock = function() --[[ Line: 41 ]] --[[ Name: mock ]]
-    -- upvalues: v11 (copy)
-    local v12 = v11.new("149757", "10395446", "test");
-    v11._fromSharedJson(v12, {
-        ageRecommendationDisplayName = "Ages 13+", 
-        minimumAge = 13, 
-        contentMaturity = "moderate", 
-        playerCount = 5, 
-        primaryMediaAsset = {
-            wideImageAssetId = "12046435434"
-        }, 
-        totalDownVotes = 2564, 
-        totalUpVotes = 10970
-    });
-    v12.creatorId = "22915773";
-    v12.creatorName = "Jaegerblox";
-    v12.defaultLayoutData = {};
-    v12.friendActivityTitle = "Friend Activity";
-    v12.friendVisitedString = "1 Friend visited";
-    v12.friendVisits = {
-        {
-            userId = "1894536079"
-        }
-    };
-    v12.layoutDataBySort = {};
-    return v12;
-end;
-v11.fromGamesApi = function(v13) --[[ Line: 73 ]] --[[ Name: fromGamesApi ]]
-    -- upvalues: v1 (copy), v11 (copy)
-    if type(v13.universeId) ~= "number" and type(v13.universeId) ~= "string" then
-        return v1.error("GameInfoModel.fromGamesApi expects universeId to be a number or a string");
-    elseif type(v13.placeId) ~= "number" and type(v13.placeId) ~= "string" then
-        return v1.error("GameInfoModel.fromGamesApi expects placeId to be a number or a string");
-    elseif type(v13.creatorId) ~= "number" and type(v13.creatorId) ~= "string" then
-        return v1.error("GameInfoModel.fromGamesApi expects creatorId to be a number or a string");
-    else
-        local v14 = v11.new(tostring(v13.universeId), tostring(v13.placeId), v13.name);
-        v11._fromSharedJson(v14, v13);
-        v14.creatorId = tostring(v13.creatorId);
-        v14.creatorName = v13.creatorName;
-        return v1.success(v14);
-    end;
-end;
-v11.fromExperienceApi = function(v15) --[[ Line: 92 ]] --[[ Name: fromExperienceApi ]]
-    -- upvalues: v1 (copy), v11 (copy)
-    if type(v15.universeId) ~= "number" and type(v15.universeId) ~= "string" then
-        return v1.error("Game.fromJsonData expects universeId to be a number or a string");
-    elseif type(v15.rootPlaceId) ~= "number" and type(v15.rootPlaceId) ~= "string" then
-        return v1.error("Game.fromJsonData expects placeId to be a number or a string");
-    else
-        local v16 = v11.new(tostring(v15.universeId), tostring(v15.rootPlaceId), v15.name);
-        v11._fromSharedJson(v16, v15);
-        return v1.success(v16);
-    end;
-end;
-v11.fromOmniApi = function(v17) --[[ Line: 106 ]] --[[ Name: fromOmniApi ]]
-    -- upvalues: v1 (copy), v11 (copy)
-    if type(v17.universeId) ~= "number" and type(v17.universeId) ~= "string" then
-        return v1.error("DiscoveryGame.fromJsonData expects universeId to be a number or a string");
-    elseif type(v17.rootPlaceId) ~= "number" and type(v17.rootPlaceId) ~= "string" then
-        return v1.error("DiscoveryGame.fromJsonData expects rootPlaceId to be a number or a string");
-    else
-        local v18 = v11.new(tostring(v17.universeId), tostring(v17.rootPlaceId), v17.name);
-        v11._fromSharedJson(v18, v17);
-        v18.friendActivityTitle = v17.friendActivityTitle;
-        v18.friendVisitedString = v17.friendVisitedString;
-        v18.friendVisits = v17.friendVisits;
-        v18.navigationUniverseId = if v17.navigationUid then tostring(v17.navigationUid) else nil;
-        return v1.success(v18);
-    end;
-end;
-if l_FFlagSearchOmniAutocompletePage_0 then
-    v11.fromOmniAutocompleteApi = function(v19) --[[ Line: 125 ]] --[[ Name: fromOmniAutocompleteApi ]]
-        -- upvalues: v1 (copy), v11 (copy)
-        if type(v19.universeId) ~= "number" and type(v19.universeId) ~= "string" then
-            return v1.error("GameInfoModel.fromOmniAutocompleteApi expects universeId to be a number or a string");
-        elseif type(v19.rootPlaceId) ~= "number" and type(v19.rootPlaceId) ~= "string" then
-            return v1.error("GameInfoModel.fromOmniAutocompleteApi expects placeId to be a number or a string");
-        else
-            local v20 = v11.new(tostring(v19.universeId), tostring(v19.rootPlaceId), v19.name);
-            v11._fromSharedJson(v20, v19);
-            return v1.success(v20);
-        end;
-    end;
-end;
-v11.fromSearchApi = function(v21) --[[ Line: 140 ]] --[[ Name: fromSearchApi ]]
-    -- upvalues: v1 (copy), v11 (copy)
-    if type(v21.universeId) ~= "number" and type(v21.universeId) ~= "string" then
-        return v1.error("GameInfoModel.fromSearchApi expects universeId to be a number or a string");
-    elseif type(v21.rootPlaceId) ~= "number" and type(v21.rootPlaceId) ~= "string" then
-        return v1.error("GameInfoModel.fromSearchApi expects rootPlaceId to be a number or a string");
-    elseif type(v21.creatorId) ~= "number" and type(v21.creatorId) ~= "string" then
-        return v1.error("GameInfoModel.fromSearchApi expects creatorId to be a number or a string");
-    else
-        local v22 = v11.new(tostring(v21.universeId), tostring(v21.rootPlaceId), v21.name);
-        v11._fromSharedJson(v22, v21);
-        v22.creatorId = tostring(v21.creatorId);
-        v22.creatorName = v21.creatorName;
-        return v1.success(v22);
-    end;
-end;
-if l_FFlagEnableTopSongsSort_0 then
-    v11.fromMusicDiscoveryApi = function(v23) --[[ Line: 160 ]] --[[ Name: fromMusicDiscoveryApi ]]
-        -- upvalues: v1 (copy), v11 (copy)
-        if type(v23.universeId) ~= "number" and type(v23.universeId) ~= "string" then
-            return v1.error("GameInfoModel.fromMusicDiscoveryApi expects universeId to be a number or a string");
-        elseif type(v23.rootPlaceId) ~= "number" and type(v23.rootPlaceId) ~= "string" then
-            return v1.error("GameInfoModel.fromMusicDiscoveryApi expects rootPlaceId to be a number or a string");
-        else
-            local v24 = v11.new(tostring(v23.universeId), tostring(v23.rootPlaceId), v23.name);
-            v24.playerCount = v23.playerCount;
-            v24.totalDownVotes = v23.downVotes;
-            v24.totalUpVotes = v23.upVotes;
-            return v1.success(v24);
-        end;
-    end;
-end;
-return v11;
+local Parent = script:FindFirstAncestor("GameModels").Parent
+local Result = require(Parent.Result)
+local trim = require(Parent.LuauPolyfill).String.trim
+
+require(Parent.DiscoveryTypes)
+
+local FFlagSearchOmniAutocompletePage = require(Parent.SharedFlags).FFlagSearchOmniAutocompletePage
+local FFlagEnableTopSongsSort = require(Parent.SharedFlags).FFlagEnableTopSongsSort
+local t1 = {
+	new = function(s1: string, s2: string, s3: string) -- line: 14
+		-- upvalues: trim (copy)
+		return {
+			universeId = s1,
+			placeId = s2,
+			name = trim(s3)
+		}
+	end,
+	_fromSharedJson = function(p1, p2) -- line: 24
+		p1.ageRecommendationDisplayName = p2.ageRecommendationDisplayName
+		p1.minimumAge = p2.minimumAge
+		p1.contentMaturity = p2.contentMaturity
+		p1.playerCount = p2.playerCount
+		p1.primaryWideAssetId = if not p2.primaryMediaAsset or not p2.primaryMediaAsset.wideImageAssetId then nil else tostring(p2.primaryMediaAsset.wideImageAssetId)
+		p1.primaryWideListId = if not p2.primaryMediaAsset or not p2.primaryMediaAsset.wideImageListId then nil else tostring(p2.primaryMediaAsset.wideImageListId)
+		p1.totalDownVotes = p2.totalDownVotes
+		p1.totalUpVotes = p2.totalUpVotes
+		p1.defaultLayoutData = p2.defaultLayoutData
+		p1.layoutDataBySort = p2.layoutDataBySort
+	end
+}
+
+function t1.mock() -- line: 41
+	-- upvalues: t1 (copy)
+	local v12 = t1.new("149757", "10395446", "test")
+
+	t1._fromSharedJson(v12, {
+		ageRecommendationDisplayName = "Ages 13+",
+		minimumAge = 13,
+		contentMaturity = "moderate",
+		playerCount = 5,
+		totalDownVotes = 2564,
+		totalUpVotes = 10970,
+		primaryMediaAsset = {
+			wideImageAssetId = "12046435434"
+		}
+	})
+	v12.creatorId = "22915773"
+	v12.creatorName = "Jaegerblox"
+	v12.defaultLayoutData = {}
+	v12.friendActivityTitle = "Friend Activity"
+	v12.friendVisitedString = "1 Friend visited"
+	v12.friendVisits = {{
+		userId = "1894536079"
+	}}
+	v12.layoutDataBySort = {}
+
+	return v12
+end
+function t1.fromGamesApi(p3) -- line: 73
+	-- upvalues: Result (copy), t1 (copy)
+	if type(p3.universeId) ~= "number" and type(p3.universeId) ~= "string" then
+		return Result.error("GameInfoModel.fromGamesApi expects universeId to be a number or a string")
+	end
+
+	if type(p3.placeId) ~= "number" and type(p3.placeId) ~= "string" then
+		return Result.error("GameInfoModel.fromGamesApi expects placeId to be a number or a string")
+	end
+
+	if type(p3.creatorId) ~= "number" and type(p3.creatorId) ~= "string" then
+		return Result.error("GameInfoModel.fromGamesApi expects creatorId to be a number or a string")
+	end
+
+	local v14 = t1.new(tostring(p3.universeId), tostring(p3.placeId), p3.name)
+
+	t1._fromSharedJson(v14, p3)
+	v14.creatorId = tostring(p3.creatorId)
+	v14.creatorName = p3.creatorName
+
+	return Result.success(v14)
+end
+function t1.fromExperienceApi(p4) -- line: 92
+	-- upvalues: Result (copy), t1 (copy)
+	if type(p4.universeId) ~= "number" and type(p4.universeId) ~= "string" then
+		return Result.error("Game.fromJsonData expects universeId to be a number or a string")
+	end
+
+	if type(p4.rootPlaceId) ~= "number" and type(p4.rootPlaceId) ~= "string" then
+		return Result.error("Game.fromJsonData expects placeId to be a number or a string")
+	end
+
+	local v16 = t1.new(tostring(p4.universeId), tostring(p4.rootPlaceId), p4.name)
+
+	t1._fromSharedJson(v16, p4)
+
+	return Result.success(v16)
+end
+function t1.fromOmniApi(p5) -- line: 106
+	-- upvalues: Result (copy), t1 (copy)
+	if type(p5.universeId) ~= "number" and type(p5.universeId) ~= "string" then
+		return Result.error("DiscoveryGame.fromJsonData expects universeId to be a number or a string")
+	end
+
+	if type(p5.rootPlaceId) ~= "number" and type(p5.rootPlaceId) ~= "string" then
+		return Result.error("DiscoveryGame.fromJsonData expects rootPlaceId to be a number or a string")
+	end
+
+	local v18 = t1.new(tostring(p5.universeId), tostring(p5.rootPlaceId), p5.name)
+
+	t1._fromSharedJson(v18, p5)
+	v18.friendActivityTitle = p5.friendActivityTitle
+	v18.friendVisitedString = p5.friendVisitedString
+	v18.friendVisits = p5.friendVisits
+	v18.navigationUniverseId = if not p5.navigationUid then nil else tostring(p5.navigationUid)
+
+	return Result.success(v18)
+end
+
+if FFlagSearchOmniAutocompletePage then
+	function t1.fromOmniAutocompleteApi(p6) -- line: 125
+		-- upvalues: Result (copy), t1 (copy)
+		if type(p6.universeId) ~= "number" and type(p6.universeId) ~= "string" then
+			return Result.error("GameInfoModel.fromOmniAutocompleteApi expects universeId to be a number or a string")
+		end
+
+		if type(p6.rootPlaceId) ~= "number" and type(p6.rootPlaceId) ~= "string" then
+			return Result.error("GameInfoModel.fromOmniAutocompleteApi expects placeId to be a number or a string")
+		end
+
+		local v20 = t1.new(tostring(p6.universeId), tostring(p6.rootPlaceId), p6.name)
+
+		t1._fromSharedJson(v20, p6)
+
+		return Result.success(v20)
+	end
+end
+
+function t1.fromSearchApi(p7) -- line: 140
+	-- upvalues: Result (copy), t1 (copy)
+	if type(p7.universeId) ~= "number" and type(p7.universeId) ~= "string" then
+		return Result.error("GameInfoModel.fromSearchApi expects universeId to be a number or a string")
+	end
+
+	if type(p7.rootPlaceId) ~= "number" and type(p7.rootPlaceId) ~= "string" then
+		return Result.error("GameInfoModel.fromSearchApi expects rootPlaceId to be a number or a string")
+	end
+
+	if type(p7.creatorId) ~= "number" and type(p7.creatorId) ~= "string" then
+		return Result.error("GameInfoModel.fromSearchApi expects creatorId to be a number or a string")
+	end
+
+	local v22 = t1.new(tostring(p7.universeId), tostring(p7.rootPlaceId), p7.name)
+
+	t1._fromSharedJson(v22, p7)
+	v22.creatorId = tostring(p7.creatorId)
+	v22.creatorName = p7.creatorName
+
+	return Result.success(v22)
+end
+
+if FFlagEnableTopSongsSort then
+	function t1.fromMusicDiscoveryApi(p8) -- line: 160
+		-- upvalues: Result (copy), t1 (copy)
+		if type(p8.universeId) ~= "number" and type(p8.universeId) ~= "string" then
+			return Result.error("GameInfoModel.fromMusicDiscoveryApi expects universeId to be a number or a string")
+		end
+
+		if type(p8.rootPlaceId) ~= "number" and type(p8.rootPlaceId) ~= "string" then
+			return Result.error("GameInfoModel.fromMusicDiscoveryApi expects rootPlaceId to be a number or a string")
+		end
+
+		local v24 = t1.new(tostring(p8.universeId), tostring(p8.rootPlaceId), p8.name)
+
+		v24.playerCount = p8.playerCount
+		v24.totalDownVotes = p8.downVotes
+		v24.totalUpVotes = p8.upVotes
+
+		return Result.success(v24)
+	end
+end
+
+return t1

@@ -1,9 +1,10 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-return (require(l_Parent_0.React).createContext({
-    getCursor = function() --[[ Line: 5 ]] --[[ Name: getCursor ]]
-        return nil;
-    end, 
-    getCursorByType = function() --[[ Line: 8 ]] --[[ Name: getCursorByType ]]
-        return nil;
-    end
-}));
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+return (require(ParentParent.React).createContext({
+	getCursor = function() -- line: 5
+		return nil
+	end,
+	getCursorByType = function() -- line: 8
+		return nil
+	end
+}))

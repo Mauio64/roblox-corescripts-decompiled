@@ -1,1 +1,1 @@
-return game:DefineFastInt("SocialCarouselShowRecsLimit", 6);
+return game:DefineFastInt("SocialCarouselShowRecsLimit", 6)

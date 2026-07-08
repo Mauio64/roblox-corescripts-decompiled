@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AEGIS2EnableGatesForExpChat6", false);
+return game:DefineFastFlag("AEGIS2EnableGatesForExpChat6", false)

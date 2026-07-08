@@ -1,227 +1,240 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local l_Core_0 = l_Parent_2.Core;
-local v5 = require(l_Parent_3.React);
-local v6 = require(l_Parent_3.Cryo);
-local v7 = require(l_Parent_3.RoactGamepad);
-local v8 = require(l_Parent_3.t);
-local v9 = require(l_Parent_3.Foundation);
-local v10 = require(l_Parent_0.FoundationButtonUtils);
-local v11 = require(l_Core_0.ImageSet.Validator.validateImage);
-local v12 = require(l_Core_0.Style.Validator.validateFontInfo);
-local v13 = require(l_Parent_2.Core.Style.Validator.validateTypographyInfo);
-local v14 = require(l_Parent_0.Enum.ButtonType);
-local v15 = require(l_Core_0.Button.Enum.StandardButtonSize);
-local v16 = require(l_Core_0.Button.GenericButton);
-local v17 = require(l_Core_0.Control.Enum.ControlState);
-local v18 = require(l_Parent_2.Utility.isReactTagProp);
-local v19 = require(l_Parent_1.ImageSet.Images);
-local v20 = require(l_Parent_1.SelectionImage.CursorKind);
-local v21 = require(l_Parent_1.SelectionImage.withSelectionCursorProvider);
-local v22 = require(l_Parent_2.App.SelectionCursor.useCursor);
-local v23 = require(l_Parent_2.UIBloxConfig);
-local v24 = v5.PureComponent:extend("Button");
-local v25 = {
-    [v14.Alert] = {
-        [v17.Default] = "Alert"
-    }, 
-    [v14.PrimaryContextual] = {
-        [v17.Default] = "ContextualPrimaryDefault", 
-        [v17.Hover] = "ContextualPrimaryOnHover"
-    }, 
-    [v14.PrimarySystem] = {
-        [v17.Default] = "SystemPrimaryDefault", 
-        [v17.Hover] = "SystemPrimaryOnHover"
-    }, 
-    [v14.Secondary] = {
-        [v17.Default] = "SecondaryDefault", 
-        [v17.Hover] = "SecondaryOnHover"
-    }
-};
-local v26 = {
-    [v14.Alert] = {
-        [v17.Default] = "Alert"
-    }, 
-    [v14.PrimaryContextual] = {
-        [v17.Default] = "ContextualPrimaryContent"
-    }, 
-    [v14.PrimarySystem] = {
-        [v17.Default] = "SystemPrimaryContent"
-    }, 
-    [v14.Secondary] = {
-        [v17.Default] = "SecondaryContent", 
-        [v17.Hover] = "SecondaryOnHover"
-    }
-};
-local v27 = {
-    [v14.Alert] = v19["component_assets/circle_17_stroke_1"], 
-    [v14.PrimaryContextual] = v19["component_assets/circle_17"], 
-    [v14.PrimarySystem] = v19["component_assets/circle_17"], 
-    [v14.Secondary] = v19["component_assets/circle_17_stroke_1"]
-};
-local v28 = {
-    [v14.PrimaryContextual] = v19["component_assets/bulletRight_17"], 
-    [v14.PrimarySystem] = v19["component_assets/bulletRight_17"]
-};
-local v29 = {
-    [v14.Alert] = false, 
-    [v14.PrimaryContextual] = true, 
-    [v14.PrimarySystem] = false, 
-    [v14.Secondary] = false
-};
-local v30 = UDim.new(0, 8);
-v24.validateProps = v8.strictInterface({
-    [v5.Tag] = v18, 
-    buttonType = v8.optional(v14.isEnumValue), 
-    automaticSize = v8.optional(v8.EnumItem), 
-    size = v8.optional(v8.UDim2), 
-    standardSize = v8.optional(v15.isEnumValue), 
-    maxWidth = v8.optional(v8.numberPositive), 
-    fitContent = v8.optional(v8.boolean), 
-    anchorPoint = v8.optional(v8.Vector2), 
-    position = v8.optional(v8.UDim2), 
-    layoutOrder = v8.optional(v8.number), 
-    icon = v8.optional(v11), 
-    text = v8.optional(v8.string), 
-    inputIcon = v8.optional(v11), 
-    fontStyle = v8.optional(v8.union(v8.string, v12, v13)), 
-    buttonTextOverride = v8.optional(v8.table), 
-    isDisabled = v8.optional(v8.boolean), 
-    isLoading = v8.optional(v8.boolean), 
-    isHoverBackgroundEnabled = v8.optional(v8.boolean), 
-    isDelayedInput = v8.optional(v8.boolean), 
-    enableInputDelayed = v8.optional(v8.boolean), 
-    delayInputSeconds = v8.optional(v8.numberPositive), 
-    onActivated = v8.callback, 
-    onStateChanged = v8.optional(v8.callback), 
-    userInteractionEnabled = v8.optional(v8.boolean), 
-    feedbackType = v8.optional(v8.string), 
-    Selectable = v8.optional(v8.boolean), 
-    NextSelectionDown = v8.optional(v8.table), 
-    NextSelectionUp = v8.optional(v8.table), 
-    NextSelectionLeft = v8.optional(v8.table), 
-    NextSelectionRight = v8.optional(v8.table), 
-    buttonRef = v8.optional(v8.union(v8.table, v8.callback)), 
-    isRoactGamepadEnabled = v8.optional(v8.boolean), 
-    cursor = v8.optional(v8.any), 
-    [v5.Change.AbsoluteSize] = v8.optional(v8.callback), 
-    [v5.Change.AbsolutePosition] = v8.optional(v8.callback)
-});
-v24.defaultProps = {
-    buttonType = v14.PrimarySystem, 
-    isDisabled = false, 
-    isLoading = false, 
-    isRoactGamepadEnabled = true
-};
-v24.render = function(v31) --[[ Line: 169 ]] --[[ Name: render ]]
-    -- upvalues: v21 (copy), v5 (copy), v7 (copy), v16 (copy), v20 (copy), v29 (copy), v27 (copy), v28 (copy), v25 (copy), v26 (copy)
-    return v21(function(v32) --[[ Line: 170 ]]
-        -- upvalues: v31 (copy), v5 (ref), v7 (ref), v16 (ref), v20 (ref), v29 (ref), v27 (ref), v28 (ref), v25 (ref), v26 (ref)
-        local l_isRoactGamepadEnabled_0 = v31.props.isRoactGamepadEnabled;
-        return v5.createElement(if l_isRoactGamepadEnabled_0 then v7.Focusable[v16] else v16, {
-            [v5.Tag] = v31.props[v5.Tag], 
-            Size = v31.props.size, 
-            standardSize = v31.props.standardSize, 
-            maxWidth = v31.props.maxWidth, 
-            fitContent = v31.props.fitContent, 
-            AnchorPoint = v31.props.anchorPoint, 
-            Position = v31.props.position, 
-            LayoutOrder = v31.props.layoutOrder, 
-            SelectionImageObject = if v31.props.cursor then v31.props.cursor else v32(v20.RoundedRectNoInset), 
-            icon = v31.props.icon, 
-            text = v31.props.text, 
-            inputIcon = v31.props.inputIcon, 
-            fontStyle = v31.props.fontStyle, 
-            isDisabled = v31.props.isDisabled, 
-            isLoading = v31.props.isLoading, 
-            isHoverBackgroundEnabled = v29[v31.props.buttonType], 
-            isDelayedInput = v31.props.isDelayedInput, 
-            enableInputDelayed = v31.props.enableInputDelayed, 
-            delayInputSeconds = v31.props.delayInputSeconds, 
-            onActivated = v31.props.onActivated, 
-            onStateChanged = v31.props.onStateChanged, 
-            userInteractionEnabled = v31.props.userInteractionEnabled, 
-            buttonImage = v27[v31.props.buttonType], 
-            delayedInputImage = v28[v31.props.buttonType], 
-            buttonStateColorMap = v25[v31.props.buttonType], 
-            contentStateColorMap = v26[v31.props.buttonType], 
-            buttonTextOverride = v31.props.buttonTextOverride, 
-            Selectable = v31.props.Selectable, 
-            NextSelectionUp = v31.props.NextSelectionUp, 
-            NextSelectionDown = v31.props.NextSelectionDown, 
-            NextSelectionLeft = v31.props.NextSelectionLeft, 
-            NextSelectionRight = v31.props.NextSelectionRight, 
-            ref = v31.props.buttonRef, 
-            feedbackType = v31.props.feedbackType, 
-            [v5.Change.AbsoluteSize] = v31.props[v5.Change.AbsoluteSize], 
-            [v5.Change.AbsolutePosition] = v31.props[v5.Change.AbsolutePosition]
-        });
-    end);
-end;
-local function v37(v34) --[[ Line: 223 ]]
-    -- upvalues: v22 (copy), v30 (copy), v6 (copy), v5 (copy), v24 (copy)
-    local v35 = v22(v30);
-    local v36 = v6.Dictionary.join({
-        cursor = v35
-    }, v34);
-    return v5.createElement(v24, v36);
-end;
-local v47 = v5.forwardRef(function(v38, v39) --[[ Line: 231 ]]
-    -- upvalues: v23 (copy), v9 (copy), v6 (copy), v24 (copy), v10 (copy), v5 (copy), v7 (copy), v37 (copy)
-    if v23.useFoundationButton then
-        local v40 = v9.Hooks.useTokens();
-        local v41 = v6.Dictionary.join(v24.defaultProps, v38);
-        local l_isRoactGamepadEnabled_1 = v41.isRoactGamepadEnabled;
-        local v43 = v10.getMaxWidth(v41.standardSize, v41.maxWidth);
-        local v44 = v5.useRef(nil);
-        local v45 = v38.buttonRef or v39 or v44;
-        v5.useLayoutEffect(function() --[[ Line: 242 ]]
-            -- upvalues: v43 (copy), v45 (copy)
-            local v46 = nil;
-            if v43 and v45 and typeof(v45) == "table" and v45.current then
-                v46 = Instance.new("UISizeConstraint");
-                v46.MaxSize = Vector2.new(v43, 1e999);
-                v46.Parent = v45.current;
-            end;
-            return function() --[[ Line: 250 ]]
-                -- upvalues: v46 (ref)
-                if v46 then
-                    v46.Parent = nil;
-                    v46:Destroy();
-                end;
-            end;
-        end, {
-            v43, 
-            v45
-        });
-        return v5.createElement(if l_isRoactGamepadEnabled_1 then v7.Focusable[v9.Button] else v9.Button, {
-            variant = v10.buttonMapping[v41.buttonType], 
-            size = v10.getSizeMapping(v41.standardSize, v41.size, v40), 
-            width = v10.getWidth(v41.standardSize, v41.size, v41.fitContent), 
-            icon = v10.findIcon(v41.icon), 
-            text = v41.text, 
-            isLoading = v41.isLoading, 
-            isDisabled = v41.isDisabled or v41.userInteractionEnabled == false or v41.isDelayedInput and not v41.enableInputDelayed, 
-            inputDelay = if v41.isDelayedInput and v41.enableInputDelayed then v41.delayInputSeconds or 3 else nil, 
-            onActivated = v41.onActivated, 
-            testId = v10.getTestId(v41[v5.Tag]), 
-            ref = v45, 
-            AnchorPoint = v41.anchorPoint, 
-            Position = v41.position, 
-            LayoutOrder = v41.layoutOrder, 
-            Selectable = v41.Selectable, 
-            NextSelectionUp = v41.NextSelectionUp, 
-            NextSelectionDown = v41.NextSelectionDown, 
-            NextSelectionLeft = v41.NextSelectionLeft, 
-            NextSelectionRight = v41.NextSelectionRight
-        });
-    else
-        return v5.createElement(v37, v6.Dictionary.join(v38, {
-            buttonRef = v38.buttonRef or v39
-        }));
-    end;
-end);
-v47.validateProps = v24.validateProps;
-return v47;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local scriptParentParentParentParent = scriptParentParentParent.Parent
+local Core = scriptParentParentParent.Core
+local React = require(scriptParentParentParentParent.React)
+local Cryo = require(scriptParentParentParentParent.Cryo)
+local RoactGamepad = require(scriptParentParentParentParent.RoactGamepad)
+local t = require(scriptParentParentParentParent.t)
+local Foundation = require(scriptParentParentParentParent.Foundation)
+local FoundationButtonUtils = require(scriptParent.FoundationButtonUtils)
+local validateImage = require(Core.ImageSet.Validator.validateImage)
+local validateFontInfo = require(Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(scriptParentParentParent.Core.Style.Validator.validateTypographyInfo)
+local ButtonType = require(scriptParent.Enum.ButtonType)
+local StandardButtonSize = require(Core.Button.Enum.StandardButtonSize)
+local GenericButton = require(Core.Button.GenericButton)
+local ControlState = require(Core.Control.Enum.ControlState)
+local isReactTagProp = require(scriptParentParentParent.Utility.isReactTagProp)
+local Images = require(scriptParentParent.ImageSet.Images)
+local CursorKind = require(scriptParentParent.SelectionImage.CursorKind)
+local withSelectionCursorProvider = require(scriptParentParent.SelectionImage.withSelectionCursorProvider)
+local useCursor = require(scriptParentParentParent.App.SelectionCursor.useCursor)
+local UIBloxConfig = require(scriptParentParentParent.UIBloxConfig)
+local v25 = React.PureComponent:extend("Button")
+local t1 = {
+	[ButtonType.Alert] = {
+		[ControlState.Default] = "Alert"
+	},
+	[ButtonType.PrimaryContextual] = {
+		[ControlState.Default] = "ContextualPrimaryDefault",
+		[ControlState.Hover] = "ContextualPrimaryOnHover"
+	},
+	[ButtonType.PrimarySystem] = {
+		[ControlState.Default] = "SystemPrimaryDefault",
+		[ControlState.Hover] = "SystemPrimaryOnHover"
+	},
+	[ButtonType.Secondary] = {
+		[ControlState.Default] = "SecondaryDefault",
+		[ControlState.Hover] = "SecondaryOnHover"
+	}
+}
+local t2 = {
+	[ButtonType.Alert] = {
+		[ControlState.Default] = "Alert"
+	},
+	[ButtonType.PrimaryContextual] = {
+		[ControlState.Default] = "ContextualPrimaryContent"
+	},
+	[ButtonType.PrimarySystem] = {
+		[ControlState.Default] = "SystemPrimaryContent"
+	},
+	[ButtonType.Secondary] = {
+		[ControlState.Default] = "SecondaryContent",
+		[ControlState.Hover] = "SecondaryOnHover"
+	}
+}
+local t3 = {
+	[ButtonType.Alert] = Images["component_assets/circle_17_stroke_1"],
+	[ButtonType.PrimaryContextual] = Images["component_assets/circle_17"],
+	[ButtonType.PrimarySystem] = Images["component_assets/circle_17"],
+	[ButtonType.Secondary] = Images["component_assets/circle_17_stroke_1"]
+}
+local t4 = {
+	[ButtonType.PrimaryContextual] = Images["component_assets/bulletRight_17"],
+	[ButtonType.PrimarySystem] = Images["component_assets/bulletRight_17"]
+}
+local t5 = {
+	[ButtonType.Alert] = false,
+	[ButtonType.PrimaryContextual] = true,
+	[ButtonType.PrimarySystem] = false,
+	[ButtonType.Secondary] = false
+}
+local uDim = UDim.new(0, 8)
+
+v25.validateProps = t.strictInterface({
+	[React.Tag] = isReactTagProp,
+	buttonType = t.optional(ButtonType.isEnumValue),
+	automaticSize = t.optional(t.EnumItem),
+	size = t.optional(t.UDim2),
+	standardSize = t.optional(StandardButtonSize.isEnumValue),
+	maxWidth = t.optional(t.numberPositive),
+	fitContent = t.optional(t.boolean),
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	layoutOrder = t.optional(t.number),
+	icon = t.optional(validateImage),
+	text = t.optional(t.string),
+	inputIcon = t.optional(validateImage),
+	fontStyle = t.optional(t.union(t.string, validateFontInfo, validateTypographyInfo)),
+	buttonTextOverride = t.optional(t.table),
+	isDisabled = t.optional(t.boolean),
+	isLoading = t.optional(t.boolean),
+	isHoverBackgroundEnabled = t.optional(t.boolean),
+	isDelayedInput = t.optional(t.boolean),
+	enableInputDelayed = t.optional(t.boolean),
+	delayInputSeconds = t.optional(t.numberPositive),
+	onActivated = t.callback,
+	onStateChanged = t.optional(t.callback),
+	userInteractionEnabled = t.optional(t.boolean),
+	feedbackType = t.optional(t.string),
+	Selectable = t.optional(t.boolean),
+	NextSelectionDown = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	buttonRef = t.optional(t.union(t.table, t.callback)),
+	isRoactGamepadEnabled = t.optional(t.boolean),
+	cursor = t.optional(t.any),
+	DO_NOT_USE_useUIBloxButton = t.optional(t.boolean),
+	[React.Change.AbsoluteSize] = t.optional(t.callback),
+	[React.Change.AbsolutePosition] = t.optional(t.callback)
+})
+v25.defaultProps = {
+	isDisabled = false,
+	isLoading = false,
+	isRoactGamepadEnabled = true,
+	buttonType = ButtonType.PrimarySystem
+}
+
+function v25.render(p1) -- line: 173
+	-- upvalues: withSelectionCursorProvider (copy), React (copy), RoactGamepad (copy), GenericButton (copy), CursorKind (copy), t5 (copy), t3 (copy), t4 (copy), t1 (copy), t2 (copy)
+	return withSelectionCursorProvider(function(p2) -- line: 174
+		-- upvalues: p1 (copy), React (copy), RoactGamepad (copy), GenericButton (copy), CursorKind (copy), t5 (copy), t3 (copy), t4 (copy), t1 (copy), t2 (copy)
+		local isRoactGamepadEnabled = p1.props.isRoactGamepadEnabled
+
+		return React.createElement(if not isRoactGamepadEnabled then GenericButton else RoactGamepad.Focusable[GenericButton], {
+			[React.Tag] = p1.props[React.Tag],
+			Size = p1.props.size,
+			standardSize = p1.props.standardSize,
+			maxWidth = p1.props.maxWidth,
+			fitContent = p1.props.fitContent,
+			AnchorPoint = p1.props.anchorPoint,
+			Position = p1.props.position,
+			LayoutOrder = p1.props.layoutOrder,
+			SelectionImageObject = if not p1.props.cursor then p2(CursorKind.RoundedRectNoInset) else p1.props.cursor,
+			icon = p1.props.icon,
+			text = p1.props.text,
+			inputIcon = p1.props.inputIcon,
+			fontStyle = p1.props.fontStyle,
+			isDisabled = p1.props.isDisabled,
+			isLoading = p1.props.isLoading,
+			isHoverBackgroundEnabled = t5[p1.props.buttonType],
+			isDelayedInput = p1.props.isDelayedInput,
+			enableInputDelayed = p1.props.enableInputDelayed,
+			delayInputSeconds = p1.props.delayInputSeconds,
+			onActivated = p1.props.onActivated,
+			onStateChanged = p1.props.onStateChanged,
+			userInteractionEnabled = p1.props.userInteractionEnabled,
+			buttonImage = t3[p1.props.buttonType],
+			delayedInputImage = t4[p1.props.buttonType],
+			buttonStateColorMap = t1[p1.props.buttonType],
+			contentStateColorMap = t2[p1.props.buttonType],
+			buttonTextOverride = p1.props.buttonTextOverride,
+			Selectable = p1.props.Selectable,
+			NextSelectionUp = p1.props.NextSelectionUp,
+			NextSelectionDown = p1.props.NextSelectionDown,
+			NextSelectionLeft = p1.props.NextSelectionLeft,
+			NextSelectionRight = p1.props.NextSelectionRight,
+			ref = p1.props.buttonRef,
+			feedbackType = p1.props.feedbackType,
+			[React.Change.AbsoluteSize] = p1.props[React.Change.AbsoluteSize],
+			[React.Change.AbsolutePosition] = p1.props[React.Change.AbsolutePosition]
+		})
+	end)
+end
+
+local function v32(p3) -- line: 227
+	-- upvalues: useCursor (copy), uDim (copy), Cryo (copy), React (copy), v25 (copy)
+	local v36 = useCursor(uDim)
+	local v37 = Cryo.Dictionary.join({
+		cursor = v36
+	}, p3)
+
+	return React.createElement(v25, v37)
+end
+
+local v33 = React.forwardRef(function(p4, p5) -- line: 235
+	-- upvalues: UIBloxConfig (copy), Foundation (copy), Cryo (copy), v25 (copy), FoundationButtonUtils (copy), React (copy), RoactGamepad (copy), v32 (copy)
+	if UIBloxConfig.useFoundationButton and not p4.DO_NOT_USE_useUIBloxButton then
+		local v40 = Foundation.Hooks.useTokens()
+		local v41 = Cryo.Dictionary.join(v25.defaultProps, p4)
+		local isRoactGamepadEnabled = v41.isRoactGamepadEnabled
+		local v43 = FoundationButtonUtils.getMaxWidth(v41.standardSize, v41.maxWidth)
+		local v44 = React.useRef(nil)
+		local v45 = p4.buttonRef or (p5 or v44)
+
+		React.useLayoutEffect(function() -- line: 246
+			-- upvalues: v43 (copy), v45 (copy)
+			local UISizeConstraint = nil
+
+			if v43 and (v45 and typeof(v45) == "table" and v45.current) then
+				UISizeConstraint = Instance.new("UISizeConstraint")
+				UISizeConstraint.MaxSize = Vector2.new(v43, 1e999)
+				UISizeConstraint.Parent = v45.current
+			end
+
+			return function() -- line: 254
+				-- upvalues: UISizeConstraint (ref)
+				if UISizeConstraint then
+					UISizeConstraint.Parent = nil
+					UISizeConstraint:Destroy()
+				end
+			end
+		end, {
+			v43,
+			v45
+		})
+
+		return React.createElement(if not isRoactGamepadEnabled then Foundation.Button else RoactGamepad.Focusable[Foundation.Button], {
+			variant = FoundationButtonUtils.buttonMapping[v41.buttonType],
+			size = FoundationButtonUtils.getSizeMapping(v41.standardSize, v41.size, v40),
+			width = FoundationButtonUtils.getWidth(v41.standardSize, v41.size, v41.fitContent),
+			icon = FoundationButtonUtils.findIcon(v41.icon),
+			text = v41.text,
+			isLoading = v41.isLoading,
+			isDisabled = v41.isDisabled or (v41.userInteractionEnabled == false or v41.isDelayedInput and not v41.enableInputDelayed),
+			inputDelay = if not v41.isDelayedInput or not v41.enableInputDelayed then nil else v41.delayInputSeconds or 3,
+			onActivated = v41.onActivated,
+			testId = FoundationButtonUtils.getTestId(v41[React.Tag]),
+			ref = v45,
+			AnchorPoint = v41.anchorPoint,
+			Position = v41.position,
+			LayoutOrder = v41.layoutOrder,
+			Selectable = v41.Selectable,
+			NextSelectionUp = v41.NextSelectionUp,
+			NextSelectionDown = v41.NextSelectionDown,
+			NextSelectionLeft = v41.NextSelectionLeft,
+			NextSelectionRight = v41.NextSelectionRight
+		})
+	end
+
+	return React.createElement(v32, Cryo.Dictionary.join(p4, {
+		buttonRef = p4.buttonRef or p5
+	}))
+end)
+
+v33.validateProps = v25.validateProps
+
+return v33

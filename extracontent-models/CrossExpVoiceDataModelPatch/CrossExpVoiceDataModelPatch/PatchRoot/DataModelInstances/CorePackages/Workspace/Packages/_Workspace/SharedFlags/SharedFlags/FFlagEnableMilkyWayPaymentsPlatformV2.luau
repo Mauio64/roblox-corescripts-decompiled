@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableMilkyWayPaymentsPlatformV2", false);
+return game:DefineFastFlag("EnableMilkyWayPaymentsPlatformV2", false)

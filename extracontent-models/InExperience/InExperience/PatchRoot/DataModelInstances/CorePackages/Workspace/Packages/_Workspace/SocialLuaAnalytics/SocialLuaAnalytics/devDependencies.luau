@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialLuaAnalytics").Parent;
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+
 return {
-    RoduxFriends = require(l_Parent_0.Dev.FriendsRodux).config({
-        keyPath = "SocialLuaAnalytics.Friends"
-    })
-};
+	RoduxFriends = require(Parent.Dev.FriendsRodux).config({
+		keyPath = "SocialLuaAnalytics.Friends"
+	})
+}

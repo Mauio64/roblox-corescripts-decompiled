@@ -1,28 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v4 = require(l_script_FirstAncestor_0.Flags.EditProfileIXP);
-local v5 = require(l_script_FirstAncestor_0.Analytics);
-local l_DefaultAnalyticsService_0 = require(l_Parent_0.SocialLuaAnalytics).Analytics.DefaultAnalyticsService;
-local v7 = require(script.Parent.EditDisplayNameModalContainer);
-return function(v8) --[[ Line: 13 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v4 (copy), v2 (copy), v5 (copy), l_DefaultAnalyticsService_0 (copy), v7 (copy)
-    local v9 = l_useLocalUserId_0();
-    if v4.useIsExperimentEnabled() then
-        return v2.createElement(v5.Context.Provider, {
-            value = {
-                fireAnalyticsEvent = v5.setupFireAnalyticsEvents({
-                    analytics = l_DefaultAnalyticsService_0, 
-                    infoForAllEvents = {
-                        uid = v9
-                    }
-                })
-            }
-        }, {
-            v2.createElement(v7, v8)
-        });
-    else
-        return v2.createElement(v7, v8);
-    end;
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local EditProfileIXP = require(EditProfile.Flags.EditProfileIXP)
+local Analytics = require(EditProfile.Analytics)
+local DefaultAnalyticsService = require(EditProfileParent.SocialLuaAnalytics).Analytics.DefaultAnalyticsService
+local EditDisplayNameModalContainer = require(script.Parent.EditDisplayNameModalContainer)
+
+return function(p1) -- line: 13
+	-- upvalues: useLocalUserId (copy), EditProfileIXP (copy), React (copy), Analytics (copy), DefaultAnalyticsService (copy), EditDisplayNameModalContainer (copy)
+	local v10 = useLocalUserId()
+
+	if EditProfileIXP.useIsExperimentEnabled() then
+		return React.createElement(Analytics.Context.Provider, {
+			value = {
+				fireAnalyticsEvent = Analytics.setupFireAnalyticsEvents({
+					analytics = DefaultAnalyticsService,
+					infoForAllEvents = {
+						uid = v10
+					}
+				})
+			}
+		}, { React.createElement(EditDisplayNameModalContainer, p1) })
+	end
+
+	return React.createElement(EditDisplayNameModalContainer, p1)
+end

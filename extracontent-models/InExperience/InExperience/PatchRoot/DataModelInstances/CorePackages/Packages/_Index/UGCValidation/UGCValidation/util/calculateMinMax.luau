@@ -1,17 +1,20 @@
-local function _(v0, v1, v2) --[[ Line: 5 ]] --[[ Name: compare ]]
-    if v0 and v1 then
-        return (Vector3.new(v2(v0.X, v1.X), v2(v0.Y, v1.Y), v2(v0.Z, v1.Z)));
-    else
-        return v0 or v1;
-    end;
-end;
-return function(v4, v5, v6, v7) --[[ Line: 14 ]] --[[ Name: calculateMinMax ]]
-    local l_min_0 = math.min;
-    local v9 = if v4 and v6 then Vector3.new(l_min_0(v4.X, v6.X), l_min_0(v4.Y, v6.Y), (l_min_0(v4.Z, v6.Z))) else v4 or v6;
-    local l_max_0 = math.max;
-    if v5 and v7 then
-        return v9, (Vector3.new(l_max_0(v5.X, v7.X), l_max_0(v5.Y, v7.Y), (l_max_0(v5.Z, v7.Z))));
-    else
-        return v9, v5 or v7;
-    end;
-end;
+local function compare(vector3: Vector3?, vector3_2: Vector3?, p1: ((...any) -> ...any)) -- line: 5
+	if vector3 and vector3_2 then
+		return (Vector3.new(p1(vector3.X, vector3_2.X), p1(vector3.Y, vector3_2.Y), p1(vector3.Z, vector3_2.Z)))
+	end
+
+	return vector3 or vector3_2
+end
+local function calculateMinMax(vector3: Vector3?, vector3_3: Vector3?, vector3_4: Vector3?, vector3_5: Vector3?) -- line: 14
+	local min = math.min
+	local v11 = if not vector3 or not vector3_4 then vector3 or vector3_4 else Vector3.new(min(vector3.X, vector3_4.X), min(vector3.Y, vector3_4.Y), (min(vector3.Z, vector3_4.Z)))
+	local max = math.max
+
+	if vector3_3 and vector3_5 then
+		return v11, (Vector3.new(max(vector3_3.X, vector3_5.X), max(vector3_3.Y, vector3_5.Y), (max(vector3_3.Z, vector3_5.Z))))
+	end
+
+	return v11, vector3_3 or vector3_5
+end
+
+return calculateMinMax

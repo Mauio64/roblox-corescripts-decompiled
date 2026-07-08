@@ -1,3 +1,3 @@
 return {
-    ClearScreens = "ClearScreens"
-};
+	ClearScreens = "ClearScreens"
+}

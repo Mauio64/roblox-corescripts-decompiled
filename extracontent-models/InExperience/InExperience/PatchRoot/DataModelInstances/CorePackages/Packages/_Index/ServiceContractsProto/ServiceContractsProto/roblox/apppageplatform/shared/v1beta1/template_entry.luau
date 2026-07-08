@@ -1,117 +1,126 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.ui_component_schema);
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5) --[[ Line: 43 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    return (setmetatable({
-        template = if not (v5 ~= nil) or v5.template == nil then nil else v5.template, 
-        roblox_component = (not (v5 ~= nil) or v5.roblox_component == nil) and "" or v5.roblox_component
-    }, v4));
-end;
-v4.encode = function(v6) --[[ Line: 50 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v7 = buffer.create(0);
-    local v8 = 0;
-    if v6.template ~= nil then
-        local v9 = v6.template:encode();
-        local v10, v11 = v0.writeTag(v7, v8, 1, v0.wireTypes.lengthDelimited);
-        v10, v11 = v0.writeBuffer(v10, v11, v9, buffer.len(v9));
-        v7 = v10;
-        v8 = v11;
-    end;
-    if v6.roblox_component ~= nil and v6.roblox_component ~= "" then
-        local v12, v13 = v0.writeTag(v7, v8, 2, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v6.roblox_component);
-        v7 = v12;
-        v8 = v13;
-    end;
-    local v14 = buffer.create(v8);
-    buffer.copy(v14, 0, v7, 0, v8);
-    return v14;
-end;
-v4.decode = function(v15) --[[ Line: 70 ]] --[[ Name: decode ]]
-    -- upvalues: v4 (copy), v0 (copy), v3 (copy)
-    local v16 = v4.new();
-    local v17 = 0;
-    while v17 < buffer.len(v15) do
-        local v18 = nil;
-        local v19 = nil;
-        local v20, v21, v22 = v0.readTag(v15, v17);
-        v18 = v20;
-        v19 = v21;
-        v17 = v22;
-        if v19 == v0.wireTypes.varint then
-            v20 = nil;
-            v21, v22 = v0.readVarInt(v15, v17);
-            v20 = v21;
-            v17 = v22;
-        elseif v19 == v0.wireTypes.lengthDelimited then
-            if v18 == 1 then
-                v20 = nil;
-                v21, v22 = v0.readBuffer(v15, v17);
-                v20 = v21;
-                v17 = v22;
-                v16.template = v3.UiComponentSchema.decode(v20);
-            elseif v18 == 2 then
-                v20 = nil;
-                v21, v22 = v0.readBuffer(v15, v17);
-                v20 = v21;
-                v17 = v22;
-                v16.roblox_component = buffer.tostring(v20);
-            else
-                v20 = nil;
-                v21, v22 = v0.readVarInt(v15, v17);
-                v17 = v22 + v21;
-            end;
-        elseif v19 == v0.wireTypes.i32 then
-            v20 = nil;
-            v21, v22 = v0.readFixed32(v15, v17);
-            v20 = v21;
-            v17 = v22;
-        elseif v19 == v0.wireTypes.i64 then
-            v20 = nil;
-            v21, v22 = v0.readFixed64(v15, v17);
-            v20 = v21;
-            v17 = v22;
-        else
-            error("Unsupported wire type: " .. v19);
-        end;
-    end;
-    return v16;
-end;
-v4.jsonEncode = function(v23) --[[ Line: 119 ]] --[[ Name: jsonEncode ]]
-    local v24 = {};
-    if v23.template ~= nil then
-        v24.template = v23.template:jsonEncode();
-    end;
-    if v23.roblox_component ~= nil and v23.roblox_component ~= "" then
-        v24.robloxComponent = v23.roblox_component;
-    end;
-    return v24;
-end;
-v4.jsonDecode = function(v25) --[[ Line: 133 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    local v26 = v4.new();
-    if v25.template ~= nil then
-        v26.template = v3.UiComponentSchema.jsonDecode(v25.template);
-    end;
-    if v25.roblox_component ~= nil then
-        v26.roblox_component = v25.roblox_component;
-    end;
-    if v25.robloxComponent ~= nil then
-        v26.roblox_component = v25.robloxComponent;
-    end;
-    return v26;
-end;
-v4.descriptor = {
-    name = "TemplateEntry", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.TemplateEntry"
-};
-v2.TemplateEntry = v4;
-v1.default:register(v2.TemplateEntry);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local ui_component_schema = require(script.Parent.ui_component_schema)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 43
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		template = if t3 ~= nil and t3.template ~= nil then t3.template else nil,
+		roblox_component = if t3 ~= nil and t3.roblox_component ~= nil then t3.roblox_component else ""
+	}, t2))
+end
+function t2.encode(p1) -- line: 50
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.template ~= nil then
+		local v10 = p1.template:encode()
+		local v11, v12 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v11, v12, v10, buffer.len(v10))
+	end
+
+	if p1.roblox_component ~= nil and p1.roblox_component ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.roblox_component)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 70
+	-- upvalues: t2 (copy), proto (copy), ui_component_schema (copy)
+	local v17 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v19, v20
+
+		v19, v20, n2 = proto.readTag(p2, n2)
+
+		if v20 == proto.wireTypes.varint then
+			local v21
+
+			v21, n2 = proto.readVarInt(p2, n2)
+		elseif v20 == proto.wireTypes.lengthDelimited then
+			if v19 == 1 then
+				local v22
+
+				v22, n2 = proto.readBuffer(p2, n2)
+				v17.template = ui_component_schema.UiComponentSchema.decode(v22)
+			elseif v19 == 2 then
+				local v23
+
+				v23, n2 = proto.readBuffer(p2, n2)
+				v17.roblox_component = buffer.tostring(v23)
+			else
+				local v24, v25 = proto.readVarInt(p2, n2)
+
+				n2 = v25 + v24
+			end
+		elseif v20 == proto.wireTypes.i32 then
+			local v26
+
+			v26, n2 = proto.readFixed32(p2, n2)
+		elseif v20 == proto.wireTypes.i64 then
+			local v27
+
+			v27, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v20)
+		end
+	end
+
+	return v17
+end
+function t2.jsonEncode(p3) -- line: 119
+	local t4 = {}
+
+	if p3.template ~= nil then
+		t4.template = p3.template:jsonEncode()
+	end
+
+	if p3.roblox_component ~= nil and p3.roblox_component ~= "" then
+		t4.robloxComponent = p3.roblox_component
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 133
+	-- upvalues: t2 (copy), ui_component_schema (copy)
+	local v31 = t2.new()
+
+	if t5.template ~= nil then
+		v31.template = ui_component_schema.UiComponentSchema.jsonDecode(t5.template)
+	end
+
+	if t5.roblox_component ~= nil then
+		v31.roblox_component = t5.roblox_component
+	end
+
+	if t5.robloxComponent ~= nil then
+		v31.roblox_component = t5.robloxComponent
+	end
+
+	return v31
+end
+
+t2.descriptor = {
+	name = "TemplateEntry",
+	fullName = "roblox.apppageplatform.shared.v1beta1.TemplateEntry"
+}
+t1.TemplateEntry = t2
+typeRegistry.default:register(t1.TemplateEntry)
+
 return {
-    TemplateEntry = v2.TemplateEntry
-};
+	TemplateEntry = t1.TemplateEntry
+}

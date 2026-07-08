@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAbuseReportRevampProfileAndGroup", false);
+return game:DefineFastFlag("EnableAbuseReportRevampProfileAndGroup", false)

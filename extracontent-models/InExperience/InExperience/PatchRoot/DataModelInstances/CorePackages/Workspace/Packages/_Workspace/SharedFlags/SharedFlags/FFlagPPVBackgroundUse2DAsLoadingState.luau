@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PPVBackgroundUse2DAsLoadingState", false);
+return game:DefineFastFlag("PPVBackgroundUse2DAsLoadingState", false)

@@ -1,3 +1,3 @@
 return {
-    AvatarPolicies = require(script.AvatarPolicies)
-};
+	AvatarPolicies = require(script.AvatarPolicies)
+}

@@ -1,3 +1,3 @@
 return {
-    AttributionTraversal = "AttributionTraversal"
-};
+	AttributionTraversal = "AttributionTraversal"
+}

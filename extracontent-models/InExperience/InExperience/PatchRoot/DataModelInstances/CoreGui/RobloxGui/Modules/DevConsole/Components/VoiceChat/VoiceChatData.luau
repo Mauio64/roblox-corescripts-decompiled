@@ -1,40 +1,46 @@
-local v0 = require(script.Parent.Parent.Parent.Signal);
-local l_VoiceChatService_0 = game:GetService("VoiceChatService");
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 9 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v0 (copy)
-    local v3 = {};
-    setmetatable(v3, v2);
-    v3._statsUpdated = v0.new();
-    v3._statsData = {};
-    v3._isRunning = false;
-    return v3;
-end;
-v2.Signal = function(v4) --[[ Line: 19 ]] --[[ Name: Signal ]]
-    return v4._statsUpdated;
-end;
-v2.getCurrentData = function(v5) --[[ Line: 23 ]] --[[ Name: getCurrentData ]]
-    return v5._statsData;
-end;
-v2.isRunning = function(v6) --[[ Line: 27 ]] --[[ Name: isRunning ]]
-    return v6._isRunning;
-end;
-v2.start = function(v7) --[[ Line: 31 ]] --[[ Name: start ]]
-    -- upvalues: l_VoiceChatService_0 (copy)
-    if l_VoiceChatService_0 and not v7._statsListenerConnection then
-        v7._statsListenerConnection = l_VoiceChatService_0.VoiceChatStatsCollected:Connect(function() --[[ Line: 33 ]]
-            -- upvalues: v7 (copy), l_VoiceChatService_0 (ref)
-            v7._statsData = l_VoiceChatService_0:lastVoiceChatStats();
-            v7._statsUpdated:Fire(v7._statsData);
-        end);
-        v7._isRunning = true;
-    end;
-end;
-v2.stop = function(v8) --[[ Line: 41 ]] --[[ Name: stop ]]
-    v8._isRunning = false;
-    if v8._statsListenerConnection then
-        v8._statsListenerConnection:Disconnect();
-    end;
-end;
-return v2;
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local VoiceChatService = game:GetService("VoiceChatService")
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 9
+	-- upvalues: t1 (copy), Signal (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._statsUpdated = Signal.new()
+	t2._statsData = {}
+	t2._isRunning = false
+
+	return t2
+end
+function t1.Signal(p1) -- line: 19
+	return p1._statsUpdated
+end
+function t1.getCurrentData(p2) -- line: 23
+	return p2._statsData
+end
+function t1.isRunning(p3) -- line: 27
+	return p3._isRunning
+end
+function t1.start(p4) -- line: 31
+	-- upvalues: VoiceChatService (copy)
+	if VoiceChatService and not p4._statsListenerConnection then
+		p4._statsListenerConnection = VoiceChatService.VoiceChatStatsCollected:Connect(function() -- line: 33
+			-- upvalues: p4 (copy), VoiceChatService (copy)
+			p4._statsData = VoiceChatService:lastVoiceChatStats()
+			p4._statsUpdated:Fire(p4._statsData)
+		end)
+		p4._isRunning = true
+	end
+end
+function t1.stop(p5) -- line: 41
+	p5._isRunning = false
+
+	if p5._statsListenerConnection then
+		p5._statsListenerConnection:Disconnect()
+	end
+end
+
+return t1

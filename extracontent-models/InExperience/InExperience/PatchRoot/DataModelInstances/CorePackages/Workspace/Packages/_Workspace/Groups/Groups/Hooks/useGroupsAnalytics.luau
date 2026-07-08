@@ -1,8 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Groups");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Analytics.GroupsAnalyticsContext);
-return function() --[[ Line: 13 ]] --[[ Name: useGroupsAnalytics ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.useContext(v3);
-end;
+local Groups = script:FindFirstAncestor("Groups")
+local GroupsParent = Groups.Parent
+local React = require(GroupsParent.React)
+local GroupsAnalyticsContext = require(Groups.Analytics.GroupsAnalyticsContext)
+
+local function useGroupsAnalytics() -- line: 13
+	-- upvalues: React (copy), GroupsAnalyticsContext (copy)
+	return React.useContext(GroupsAnalyticsContext)
+end
+
+return useGroupsAnalytics

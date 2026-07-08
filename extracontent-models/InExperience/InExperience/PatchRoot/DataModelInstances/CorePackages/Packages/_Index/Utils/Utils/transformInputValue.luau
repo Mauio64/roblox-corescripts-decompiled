@@ -1,79 +1,95 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local v4 = {};
-local v5 = require(l_Parent_0.GraphQL);
-local l_getNullableType_0 = v5.getNullableType;
-local l_isLeafType_0 = v5.isLeafType;
-local l_isListType_0 = v5.isListType;
-local l_isInputObjectType_0 = v5.isInputObjectType;
-local _ = require(script.Parent.types);
-local function v11(v12, v13, v14, v15) --[[ Line: 34 ]] --[[ Name: transformInputValue ]]
-    -- upvalues: l_getNullableType_0 (copy), l_Boolean_0 (copy), l_isLeafType_0 (copy), l_isListType_0 (copy), l_Array_0 (copy), v11 (copy), l_isInputObjectType_0 (copy)
-    local v16 = if v14 ~= nil then v14 else nil;
-    local v17 = if v15 ~= nil then v15 else nil;
-    if v13 == nil then
-        return v13;
-    else
-        local v18 = l_getNullableType_0(v12);
-        if l_Boolean_0.toJSBoolean(l_isLeafType_0(v18)) then
-            if v16 ~= nil then
-                return (v16(v18, v13));
-            else
-                return v13;
-            end;
-        elseif l_Boolean_0.toJSBoolean(l_isListType_0(v18)) then
-            return l_Array_0.map(v13, function(v19) --[[ Line: 61 ]]
-                -- upvalues: v11 (ref), v18 (copy), v16 (copy), v17 (copy)
-                return v11(v18.ofType, v19, v16, v17);
-            end);
-        elseif l_Boolean_0.toJSBoolean(l_isInputObjectType_0(v18)) then
-            local v20 = v18:getFields();
-            local v21 = {};
-            for v22 in v13 do
-                local v23 = v20[tostring(v22)];
-                if v23 ~= nil then
-                    v21[tostring(v22)] = v11(v23.type, v13[tostring(v22)], v16, v17);
-                end;
-            end;
-            if v17 ~= nil then
-                return (v17(v18, v21));
-            else
-                return v21;
-            end;
-        else
-            return nil;
-        end;
-    end;
-end;
-v4.transformInputValue = v11;
-v4.serializeInputValue = function(v24, v25) --[[ Line: 95 ]] --[[ Name: serializeInputValue ]]
-    -- upvalues: v11 (copy)
-    return v11(v24, v25, function(v26, v27) --[[ Line: 96 ]]
-        local l_status_0, l_result_0 = pcall(v26.serialize, v26, v27);
-        if not l_status_0 then
-            return v27;
-        else
-            return l_result_0;
-        end;
-    end);
-end;
-v4.parseInputValue = function(v30, v31) --[[ Line: 117 ]] --[[ Name: parseInputValue ]]
-    -- upvalues: v11 (copy)
-    return v11(v30, v31, function(v32, v33) --[[ Line: 118 ]]
-        local l_status_1, l_result_1 = pcall(v32.parseValue, v32, v33);
-        if not l_status_1 then
-            return v33;
-        else
-            return l_result_1;
-        end;
-    end);
-end;
-v4.parseInputValueLiteral = function(v36, v37) --[[ Line: 139 ]] --[[ Name: parseInputValueLiteral ]]
-    -- upvalues: v11 (copy)
-    return v11(v36, v37, function(v38, v39) --[[ Line: 140 ]]
-        return v38:parseLiteral(v39, {});
-    end);
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local getNullableType = GraphQL.getNullableType
+local isLeafType = GraphQL.isLeafType
+local isListType = GraphQL.isListType
+local isInputObjectType = GraphQL.isInputObjectType
+
+require(script.Parent.types)
+
+local function transformInputValue(p1, p2, p3, p4) -- line: 34
+	-- upvalues: getNullableType (copy), Boolean (copy), isLeafType (copy), isListType (copy), Array (copy), transformInputValue (copy), isInputObjectType (copy)
+	local v16 = if p3 == nil then nil else p3
+	local v17 = if p4 == nil then nil else p4
+
+	if p2 == nil then
+		return p2
+	end
+
+	local v18 = getNullableType(p1)
+
+	if Boolean.toJSBoolean(isLeafType(v18)) then
+		if v16 ~= nil then
+			return (v16(v18, p2))
+		end
+
+		return p2
+	end
+
+	if Boolean.toJSBoolean(isListType(v18)) then
+		return Array.map(p2, function(p5) -- line: 61
+			-- upvalues: transformInputValue (copy), v18 (copy), v16 (copy), v17 (copy)
+			return transformInputValue(v18.ofType, p5, v16, v17)
+		end)
+	end
+
+	if Boolean.toJSBoolean(isInputObjectType(v18)) then
+		local v19 = v18:getFields()
+		local t2 = {}
+
+		for v21 in p2 do
+			local v22 = v19[tostring(v21)]
+
+			if v22 ~= nil then
+				t2[tostring(v21)] = transformInputValue(v22.type, p2[tostring(v21)], v16, v17)
+			end
+		end
+
+		if v17 ~= nil then
+			return (v17(v18, t2))
+		end
+
+		return t2
+	end
+
+	return nil
+end
+
+t1.transformInputValue = transformInputValue
+
+function t1.serializeInputValue(p6, p7) -- line: 95
+	-- upvalues: transformInputValue (copy)
+	return transformInputValue(p6, p7, function(p8, p9) -- line: 96
+		local ok, result = pcall(p8.serialize, p8, p9)
+
+		if not ok then
+			return p9
+		end
+
+		return result
+	end)
+end
+function t1.parseInputValue(p10, p11) -- line: 117
+	-- upvalues: transformInputValue (copy)
+	return transformInputValue(p10, p11, function(p12, p13) -- line: 118
+		local ok, result = pcall(p12.parseValue, p12, p13)
+
+		if not ok then
+			return p13
+		end
+
+		return result
+	end)
+end
+function t1.parseInputValueLiteral(p14, p15) -- line: 139
+	-- upvalues: transformInputValue (copy)
+	return transformInputValue(p14, p15, function(p16, p17) -- line: 140
+		return p16:parseLiteral(p17, {})
+	end)
+end
+
+return t1

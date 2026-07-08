@@ -1,12 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local v1 = require(script.Parent.ContentPosition);
-local v2 = require(l_Parent_0.t);
-return v2.map(v2.string, v2.strictInterface({
-    portraitLayoutOrder = v2.integer, 
-    landscapeLayoutOrder = v2.integer, 
-    landscapePosition = v1.isEnumValue, 
-    renderComponent = v2.callback, 
-    showCornerGradient = v2.optional(v2.boolean), 
-    useSelectionBumper = v2.optional(v2.boolean), 
-    visible = v2.optional(v2.boolean)
-}));
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local ContentPosition = require(script.Parent.ContentPosition)
+local t = require(Parent.t)
+local FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex = require(Parent.SharedFlags).FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex
+
+return t.map(t.string, t.strictInterface({
+	portraitLayoutOrder = t.integer,
+	portraitZIndex = if not FFlagLuaAppFixEdpRecommendedCarouselHoverZIndex then nil else t.optional(t.integer),
+	landscapeLayoutOrder = t.integer,
+	landscapePosition = ContentPosition.isEnumValue,
+	renderComponent = t.callback,
+	showCornerGradient = t.optional(t.boolean),
+	useSelectionBumper = t.optional(t.boolean),
+	visible = t.optional(t.boolean)
+}))

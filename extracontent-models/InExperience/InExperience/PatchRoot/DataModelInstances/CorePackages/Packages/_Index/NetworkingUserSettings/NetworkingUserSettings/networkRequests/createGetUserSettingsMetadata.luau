@@ -1,10 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.API_URL);
-local _ = require(l_Parent_0.Types.networkRequestsTypes);
-return function(v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    return v3.roduxNetworking.GET(script, function(v4) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref)
-        return v4(v1):path("user-settings-api"):path("v1"):path("user-settings"):path("metadata");
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local API_URL = require(ParentParent.API_URL)
+
+require(ParentParent.Types.networkRequestsTypes)
+
+return function(p1) -- line: 5
+	-- upvalues: API_URL (copy)
+	return p1.roduxNetworking.GET(script, function(p2) -- line: 8
+		-- upvalues: API_URL (copy)
+		return p2(API_URL):path("user-settings-api"):path("v1"):path("user-settings"):path("metadata")
+	end)
+end

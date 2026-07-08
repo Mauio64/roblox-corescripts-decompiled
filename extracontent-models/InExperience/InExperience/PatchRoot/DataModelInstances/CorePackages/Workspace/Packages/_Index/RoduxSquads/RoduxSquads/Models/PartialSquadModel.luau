@@ -1,32 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxSquads").Parent;
-local v1 = require(l_Parent_0.t);
-local v2 = {};
-v2.new = function(v3) --[[ Line: 8 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    assert(v2.isValid(v3));
-    v2.__index = v2;
-    setmetatable(v3, v2);
-    return v3;
-end;
-v2.mock = function(v4) --[[ Line: 20 ]] --[[ Name: mock ]]
-    -- upvalues: v2 (copy)
-    v4 = v4 or {};
-    return (v2.new({
-        channelId = v4.channelId or "23456", 
-        members = v4.members or {
-            "12345"
-        }
-    }));
-end;
-v2.format = function(v5) --[[ Line: 31 ]] --[[ Name: format ]]
-    -- upvalues: v2 (copy)
-    return (v2.new({
-        channelId = v5.channelId, 
-        members = v5.members
-    }));
-end;
-v2.isValid = v1.strictInterface({
-    channelId = v1.string, 
-    members = v1.array(v1.string)
-});
-return v2;
+local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+local t = require(Parent.t)
+local t1 = {}
+
+function t1.new(p1) -- line: 8
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 20
+	-- upvalues: t1 (copy)
+	local v6 = p2 or {}
+
+	return (t1.new({
+		channelId = v6.channelId or "23456",
+		members = v6.members or { "12345" }
+	}))
+end
+function t1.format(p3) -- line: 31
+	-- upvalues: t1 (copy)
+	return (t1.new({
+		channelId = p3.channelId,
+		members = p3.members
+	}))
+end
+
+t1.isValid = t.strictInterface({
+	channelId = t.string,
+	members = t.array(t.string)
+})
+
+return t1

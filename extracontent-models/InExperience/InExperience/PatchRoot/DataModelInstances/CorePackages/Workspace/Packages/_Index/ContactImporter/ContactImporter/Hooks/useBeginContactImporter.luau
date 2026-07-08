@@ -1,210 +1,245 @@
-local l_Parent_0 = script:FindFirstAncestor("ContactImporter").Parent;
-local l_IXPService_0 = game:GetService("IXPService");
-local l_MessageBusService_0 = game:GetService("MessageBusService");
-local v3 = require(l_Parent_0.React);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v6 = require(l_Parent_0.SocialModalsCommon);
-local v7 = require(l_Parent_0.Promise);
-local l_PermissionsProtocol_0 = require(l_Parent_0.PermissionsProtocol).PermissionsProtocol;
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v10 = require(l_Parent_0.RoactAppExperiment);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_getDeepValue_0 = require(l_Parent_0.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue;
-local l_default_0 = l_PermissionsProtocol_0.default;
-local v14 = {
-    l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-};
-local l_EnumScreens_0 = v6.EnumScreens;
-local l_SettingsRoute_0 = require(l_Parent_0.LinkingProtocol).Enums.SettingsRoute;
-local v17 = require(l_Parent_0.SharedFlags);
-local l_FFlagCIDeeplinkEnabledForAll_0 = v17.FFlagCIDeeplinkEnabledForAll;
-local l_FFlagCiDeprecateFindFriendsModal_0 = v17.FFlagCiDeprecateFindFriendsModal;
-local v20 = game:DefineFastFlag("RemoveHasJustSetPermissions", false);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v17.FFlagRemoveDependencyArrayAntipattern;
-local l_l_MessageBusService_0_MessageId_0 = l_MessageBusService_0:GetMessageId("Realtime", "appResume");
-return function(v23) --[[ Line: 41 ]] --[[ Name: useBeginContactImporter ]]
-    -- upvalues: l_useNavigation_0 (copy), v3 (copy), v20 (copy), l_useAppPolicy_0 (copy), l_getDeepValue_0 (copy), l_EnumScreens_0 (copy), l_FFlagCIDeeplinkEnabledForAll_0 (copy), v10 (copy), l_AppUserLayers_0 (copy), l_PermissionsProtocol_0 (copy), l_default_0 (copy), v14 (copy), v7 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_FFlagCiDeprecateFindFriendsModal_0 (copy), l_SettingsRoute_0 (copy), l_IXPService_0 (copy), l_MessageBusService_0 (copy), l_l_MessageBusService_0_MessageId_0 (copy)
-    local v24 = l_useNavigation_0();
-    local v25, v26 = v3.useState(false);
-    local v27 = nil;
-    local v28 = nil;
-    if not v20 then
-        local v29, v30 = v3.useState(false);
-        v27 = v29;
-        v28 = v30;
-    end;
-    local v32 = l_useAppPolicy_0(function(v31) --[[ Line: 49 ]]
-        return v31.getContactImporterEnabled();
-    end);
-    local v33 = v23 and v23.entryPoint or nil;
-    local v34 = (l_getDeepValue_0(v24, "state.routeName") or {}) == l_EnumScreens_0.ContactImporter;
-    local v36 = l_useAppPolicy_0(function(v35) --[[ Line: 57 ]]
-        return v35.getContactImporterEncouraged();
-    end);
-    local v37 = nil;
-    if not l_FFlagCIDeeplinkEnabledForAll_0 then
-        v37 = v10.useUserExperiment({
-            l_AppUserLayers_0.ContactImporterDevicePermissionNeededModalExposure
-        }, function(v38) --[[ Line: 67 ]]
-            -- upvalues: l_AppUserLayers_0 (ref)
-            return (v38[l_AppUserLayers_0.ContactImporterDevicePermissionNeededModalExposure] or {}).systemSettingsDeeplinkEnabled;
-        end, false);
-    end;
-    local v39 = not v36;
-    local v42 = v3.useCallback(function(v40) --[[ Line: 76 ]]
-        -- upvalues: l_PermissionsProtocol_0 (ref), v26 (copy), v20 (ref), v28 (ref), v24 (copy), l_EnumScreens_0 (ref), v33 (copy)
-        local v41 = v40.status == l_PermissionsProtocol_0.Status.AUTHORIZED;
-        v26(v41);
-        if not v20 then
-            v28(v41);
-        end;
-        if v41 then
-            v24.navigate(l_EnumScreens_0.ContactsList, {
-                shouldUpdateUserSettings = true, 
-                entrypoint = v33
-            });
-        end;
-    end, {
-        v24, 
-        v33
-    });
-    local v45 = v3.useCallback(function(v43) --[[ Line: 94 ]]
-        -- upvalues: l_PermissionsProtocol_0 (ref), v26 (copy), v36 (copy), l_default_0 (ref), v14 (ref), v42 (copy), v7 (ref)
-        local l_status_0 = v43.status;
-        if l_status_0 == l_PermissionsProtocol_0.Status.AUTHORIZED then
-            v26(true);
-        elseif l_status_0 == l_PermissionsProtocol_0.Status.DENIED and v36 then
-            l_default_0:requestPermissions(v14):andThen(v42);
-        end;
-        return v7.resolve(v43.status);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v42, 
-        v36
-    } else l_dependencyArray_0(v42, v36));
-    local v48 = v3.useCallback(function() --[[ Line: 114 ]]
-        -- upvalues: l_FFlagCiDeprecateFindFriendsModal_0 (ref), v34 (copy), l_default_0 (ref), v14 (ref), l_PermissionsProtocol_0 (ref), v26 (copy), v24 (copy), l_EnumScreens_0 (ref), v33 (copy), l_SettingsRoute_0 (ref), v36 (copy), v25 (copy), l_FFlagCIDeeplinkEnabledForAll_0 (ref), l_IXPService_0 (ref), l_AppUserLayers_0 (ref), v37 (ref), v39 (copy)
-        if l_FFlagCiDeprecateFindFriendsModal_0 and v34 then
-            l_default_0:requestPermissions(v14):andThen(function(v46) --[[ Line: 116 ]]
-                -- upvalues: l_PermissionsProtocol_0 (ref), v26 (ref), v24 (ref), l_EnumScreens_0 (ref), v33 (ref), l_SettingsRoute_0 (ref)
-                if v46.status == l_PermissionsProtocol_0.Status.AUTHORIZED then
-                    v26(true);
-                    v24.replace(l_EnumScreens_0.ContactsList, {
-                        entrypoint = v33
-                    });
-                    return;
-                else
-                    v24.replace(l_EnumScreens_0.SettingsPermissionInteractiveAlert, {
-                        settingsRoute = l_SettingsRoute_0.Contacts
-                    });
-                    return;
-                end;
-            end);
-            return;
-        elseif v36 then
-            if v25 then
-                v24.navigate(l_EnumScreens_0.ContactsList, {
-                    entrypoint = v33
-                });
-                return;
-            else
-                if not l_FFlagCIDeeplinkEnabledForAll_0 then
-                    l_IXPService_0:LogUserLayerExposure(l_AppUserLayers_0.ContactImporterDevicePermissionNeededModalExposure);
-                end;
-                if v37 or l_FFlagCIDeeplinkEnabledForAll_0 then
-                    v24.navigate(l_EnumScreens_0.SettingsPermissionInteractiveAlert, {
-                        settingsRoute = l_SettingsRoute_0.Contacts
-                    });
-                    return;
-                else
-                    v24.navigate(l_EnumScreens_0.ContactsRevokedAccessDialog);
-                    return;
-                end;
-            end;
-        elseif v39 then
-            l_default_0:requestPermissions(v14):andThen(function(v47) --[[ Line: 147 ]]
-                -- upvalues: l_PermissionsProtocol_0 (ref), v24 (ref), l_EnumScreens_0 (ref), v33 (ref), l_FFlagCIDeeplinkEnabledForAll_0 (ref), l_IXPService_0 (ref), l_AppUserLayers_0 (ref), v37 (ref), l_SettingsRoute_0 (ref)
-                if v47.status == l_PermissionsProtocol_0.Status.AUTHORIZED then
-                    v24.navigate(l_EnumScreens_0.ContactsList, {
-                        entrypoint = v33
-                    });
-                    return;
-                else
-                    if not l_FFlagCIDeeplinkEnabledForAll_0 then
-                        l_IXPService_0:LogUserLayerExposure(l_AppUserLayers_0.ContactImporterDevicePermissionNeededModalExposure);
-                    end;
-                    if v37 or l_FFlagCIDeeplinkEnabledForAll_0 then
-                        v24.navigate(l_EnumScreens_0.SettingsPermissionInteractiveAlert, {
-                            settingsRoute = l_SettingsRoute_0.Contacts
-                        });
-                        return;
-                    else
-                        v24.navigate(l_EnumScreens_0.ContactsRevokedAccessDialog);
-                        return;
-                    end;
-                end;
-            end);
-            return;
-        else
-            return;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v25, 
-        if v20 then nil else v27, 
-        v32, 
-        v36, 
-        v39, 
-        v33, 
-        v37
-    } else l_dependencyArray_0(v25, if v20 then nil else v27, v32, v36, v39, v33, v37));
-    v3.useEffect(function() --[[ Line: 193 ]]
-        -- upvalues: l_default_0 (ref), v14 (ref), v32 (copy), v36 (copy), v39 (copy), v45 (copy)
-        local v49 = l_default_0:hasPermissions(v14);
-        if v32 and (v36 or v39) then
-            v49:andThen(v45);
-            return;
-        else
-            return;
-        end;
-    end, {
-        v32, 
-        v36, 
-        v39
-    });
-    v3.useEffect(function() --[[ Line: 203 ]]
-        -- upvalues: v37 (ref), l_FFlagCIDeeplinkEnabledForAll_0 (ref), l_MessageBusService_0 (ref), l_l_MessageBusService_0_MessageId_0 (ref), l_default_0 (ref), v14 (ref), l_PermissionsProtocol_0 (ref), v26 (copy), v20 (ref), v28 (ref)
-        if v37 or l_FFlagCIDeeplinkEnabledForAll_0 then
-            local v51 = l_MessageBusService_0:Subscribe(l_l_MessageBusService_0_MessageId_0, function() --[[ Line: 205 ]]
-                -- upvalues: l_default_0 (ref), v14 (ref), l_PermissionsProtocol_0 (ref), v26 (ref), v20 (ref), v28 (ref)
-                l_default_0:hasPermissions(v14):andThen(function(v50) --[[ Line: 206 ]]
-                    -- upvalues: l_PermissionsProtocol_0 (ref), v26 (ref), v20 (ref), v28 (ref)
-                    if v50 and v50.status == l_PermissionsProtocol_0.Status.AUTHORIZED then
-                        v26(true);
-                        if v20 then
-                            return;
-                        else
-                            v28(true);
-                        end;
-                    end;
-                end);
-            end, false, true);
-            return function() --[[ Line: 218 ]]
-                -- upvalues: v51 (copy)
-                v51:Disconnect();
-            end;
-        else
-            return nil;
-        end;
-    end, {
-        v37
-    });
-    if v32 then
-        if v36 or v39 then
-            return v25, v48;
-        else
-            return nil, nil;
-        end;
-    else
-        return nil, nil;
-    end;
-end;
+local Parent = script:FindFirstAncestor("ContactImporter").Parent
+local IXPService = game:GetService("IXPService")
+local MessageBusService = game:GetService("MessageBusService")
+local React = require(Parent.React)
+local useNavigation = require(Parent.Navigation).useNavigation
+local SocialModalsCommon = require(Parent.SocialModalsCommon)
+local Promise = require(Parent.Promise)
+local PermissionsProtocol = require(Parent.PermissionsProtocol).PermissionsProtocol
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local RoactAppExperiment = require(Parent.RoactAppExperiment)
+local useAppPolicy = require(Parent.UniversalAppPolicy).useAppPolicy
+local getDeepValue = require(Parent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local default = PermissionsProtocol.default
+local t1 = { PermissionsProtocol.Permissions.CONTACTS_ACCESS }
+local EnumScreens = SocialModalsCommon.EnumScreens
+local SettingsRoute = require(Parent.LinkingProtocol).Enums.SettingsRoute
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagCIDeeplinkEnabledForAll = SharedFlags.FFlagCIDeeplinkEnabledForAll
+local FFlagCiDeprecateFindFriendsModal = SharedFlags.FFlagCiDeprecateFindFriendsModal
+local FFlagAddFriendsPageFAEUpsell = SharedFlags.FFlagAddFriendsPageFAEUpsell
+local autoPromptStatus = require(script.Parent.Parent.Signals.autoPromptStatus)
+local MessageId = MessageBusService:GetMessageId("Realtime", "appResume")
+
+local function useBeginContactImporter(t2: {[any]: any}) -- line: 39
+	-- upvalues: useNavigation (copy), React (copy), useAppPolicy (copy), getDeepValue (copy), EnumScreens (copy), FFlagCIDeeplinkEnabledForAll (copy), RoactAppExperiment (copy), AppUserLayers (copy), PermissionsProtocol (copy), FFlagAddFriendsPageFAEUpsell (copy), autoPromptStatus (copy), default (copy), t1 (copy), Promise (copy), FFlagCiDeprecateFindFriendsModal (copy), SettingsRoute (copy), IXPService (copy), MessageBusService (copy), MessageId (copy)
+	local v25 = useNavigation()
+	local v26, v27 = React.useState(false)
+	local v28 = useAppPolicy(function(p1) -- line: 43
+		return p1.getContactImporterEnabled()
+	end)
+	local v29 = t2 and t2.entryPoint or nil
+	local v30 = (getDeepValue(v25, "state.routeName") or {}) == EnumScreens.ContactImporter
+	local v31 = useAppPolicy(function(p2) -- line: 51
+		return p2.getContactImporterEncouraged()
+	end)
+	local u32 = nil
+
+	if not FFlagCIDeeplinkEnabledForAll then
+		u32 = RoactAppExperiment.useUserExperiment({ AppUserLayers.ContactImporterDevicePermissionNeededModalExposure }, function(p3) -- line: 61
+			-- upvalues: AppUserLayers (copy)
+			return (p3[AppUserLayers.ContactImporterDevicePermissionNeededModalExposure] or {}).systemSettingsDeeplinkEnabled
+		end, false)
+	end
+
+	local v33 = not v31
+	local v34 = React.useCallback(function(p4) -- line: 70
+		-- upvalues: PermissionsProtocol (copy), v27 (copy), v25 (copy), EnumScreens (copy), v29 (copy)
+		local v41 = p4.status == PermissionsProtocol.Status.AUTHORIZED
+
+		v27(v41)
+
+		if v41 then
+			v25.navigate(EnumScreens.ContactsList, {
+				shouldUpdateUserSettings = true,
+				entrypoint = v29
+			})
+		end
+	end, {
+		v25,
+		v29
+	})
+	local v35 = React.useCallback(function(p5) -- line: 82
+		-- upvalues: PermissionsProtocol (copy), v27 (copy), FFlagAddFriendsPageFAEUpsell (copy), autoPromptStatus (copy), v31 (copy), default (copy), t1 (copy), v34 (copy), Promise (copy)
+		local status = p5.status
+
+		if status == PermissionsProtocol.Status.AUTHORIZED then
+			v27(true)
+
+			if FFlagAddFriendsPageFAEUpsell then
+				autoPromptStatus.setStatus(false)
+			end
+		elseif status == PermissionsProtocol.Status.DENIED then
+			if v31 then
+				if FFlagAddFriendsPageFAEUpsell then
+					local elapsed = os.clock()
+
+					default:requestPermissions(t1):andThen(function(p6) -- line: 101
+						-- upvalues: elapsed (copy), PermissionsProtocol (copy), autoPromptStatus (copy)
+						local v48 = os.clock() - elapsed >= 0.5 or p6.status == PermissionsProtocol.Status.AUTHORIZED
+
+						autoPromptStatus.setStatus(v48)
+
+						return p6
+					end):andThen(v34)
+				else
+					default:requestPermissions(t1):andThen(v34)
+				end
+			elseif FFlagAddFriendsPageFAEUpsell then
+				autoPromptStatus.setStatus(false)
+			end
+		elseif FFlagAddFriendsPageFAEUpsell then
+			autoPromptStatus.setStatus(false)
+		end
+
+		return Promise.resolve(p5.status)
+	end, {
+		v34,
+		v31
+	})
+	local v36 = React.useCallback(function() -- line: 121
+		-- upvalues: FFlagCiDeprecateFindFriendsModal (copy), v30 (copy), default (copy), t1 (copy), PermissionsProtocol (copy), v27 (copy), v25 (copy), EnumScreens (copy), v29 (copy), SettingsRoute (copy), v31 (copy), v26 (copy), FFlagCIDeeplinkEnabledForAll (copy), IXPService (copy), AppUserLayers (copy), u32 (ref), v33 (copy)
+		if FFlagCiDeprecateFindFriendsModal and v30 then
+			default:requestPermissions(t1):andThen(function(p7) -- line: 123
+				-- upvalues: PermissionsProtocol (copy), v27 (copy), v25 (copy), EnumScreens (copy), v29 (copy), SettingsRoute (copy)
+				if p7.status == PermissionsProtocol.Status.AUTHORIZED then
+					v27(true)
+					v25.replace(EnumScreens.ContactsList, {
+						entrypoint = v29
+					})
+
+					return
+				end
+
+				v25.replace(EnumScreens.SettingsPermissionInteractiveAlert, {
+					settingsRoute = SettingsRoute.Contacts
+				})
+			end)
+
+			return
+		end
+
+		if v31 then
+			if v26 then
+				v25.navigate(EnumScreens.ContactsList, {
+					entrypoint = v29
+				})
+
+				return
+			end
+
+			if not FFlagCIDeeplinkEnabledForAll then
+				IXPService:LogUserLayerExposure(AppUserLayers.ContactImporterDevicePermissionNeededModalExposure)
+			end
+
+			if u32 or FFlagCIDeeplinkEnabledForAll then
+				v25.navigate(EnumScreens.SettingsPermissionInteractiveAlert, {
+					settingsRoute = SettingsRoute.Contacts
+				})
+
+				return
+			end
+
+			v25.navigate(EnumScreens.ContactsRevokedAccessDialog)
+
+			return
+		end
+
+		if v33 then
+			default:requestPermissions(t1):andThen(function(p8) -- line: 154
+				-- upvalues: PermissionsProtocol (copy), v25 (copy), EnumScreens (copy), v29 (copy), FFlagCIDeeplinkEnabledForAll (copy), IXPService (copy), AppUserLayers (copy), u32 (ref), SettingsRoute (copy)
+				if p8.status == PermissionsProtocol.Status.AUTHORIZED then
+					v25.navigate(EnumScreens.ContactsList, {
+						entrypoint = v29
+					})
+
+					return
+				end
+
+				if not FFlagCIDeeplinkEnabledForAll then
+					IXPService:LogUserLayerExposure(AppUserLayers.ContactImporterDevicePermissionNeededModalExposure)
+				end
+
+				if u32 or FFlagCIDeeplinkEnabledForAll then
+					v25.navigate(EnumScreens.SettingsPermissionInteractiveAlert, {
+						settingsRoute = SettingsRoute.Contacts
+					})
+
+					return
+				end
+
+				v25.navigate(EnumScreens.ContactsRevokedAccessDialog)
+			end)
+
+			return
+		end
+	end, {
+		v26,
+		v28,
+		v31,
+		v33,
+		v29,
+		u32
+	})
+
+	React.useEffect(function() -- line: 189
+		-- upvalues: FFlagAddFriendsPageFAEUpsell (copy), autoPromptStatus (copy), default (copy), t1 (copy), v28 (copy), v31 (copy), v33 (copy), v35 (copy)
+		if FFlagAddFriendsPageFAEUpsell then
+			autoPromptStatus.setStatus(nil)
+		end
+
+		local v45 = default:hasPermissions(t1)
+
+		if v28 and (v31 or v33) then
+			v45:andThen(v35)
+		elseif FFlagAddFriendsPageFAEUpsell then
+			autoPromptStatus.setStatus(false)
+		end
+
+		if FFlagAddFriendsPageFAEUpsell then
+			return function() -- line: 203
+				-- upvalues: autoPromptStatus (copy)
+				autoPromptStatus.setStatus(nil)
+			end
+		end
+
+		return nil
+	end, {
+		v28,
+		v31,
+		v33
+	})
+	React.useEffect(function() -- line: 211
+		-- upvalues: u32 (ref), FFlagCIDeeplinkEnabledForAll (copy), MessageBusService (copy), MessageId (copy), default (copy), t1 (copy), PermissionsProtocol (copy), v27 (copy)
+		if u32 or FFlagCIDeeplinkEnabledForAll then
+			local v46 = MessageBusService:Subscribe(MessageId, function() -- line: 213
+				-- upvalues: default (copy), t1 (copy), PermissionsProtocol (copy), v27 (copy)
+				default:hasPermissions(t1):andThen(function(p9) -- line: 214
+					-- upvalues: PermissionsProtocol (copy), v27 (copy)
+					if p9 and p9.status == PermissionsProtocol.Status.AUTHORIZED then
+						v27(true)
+					end
+				end)
+			end, false, true)
+
+			return function() -- line: 221
+				-- upvalues: v46 (copy)
+				v46:Disconnect()
+			end
+		end
+
+		return nil
+	end, { u32 })
+
+	if v28 then
+		if v31 or v33 then
+			return v26, v36
+		end
+
+		return nil, nil
+	end
+
+	return nil, nil
+end
+
+return useBeginContactImporter

@@ -1,5 +1,5 @@
 return {
-    Default = "Default", 
-    Auto = "Auto", 
-    Uniform = "Uniform"
-};
+	Default = "Default",
+	Auto = "Auto",
+	Uniform = "Uniform"
+}

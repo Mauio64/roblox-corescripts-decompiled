@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixLookDetailsContextualMenu", false);
+return game:DefineFastFlag("AXFixLookDetailsContextualMenu", false)

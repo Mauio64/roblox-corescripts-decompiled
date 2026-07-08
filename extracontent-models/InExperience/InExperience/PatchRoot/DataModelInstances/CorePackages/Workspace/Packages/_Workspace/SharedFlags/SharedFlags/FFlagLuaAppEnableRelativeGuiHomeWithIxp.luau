@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableRelativeGuiHomeWithIxp2", false) and game:GetEngineFeature("RelativeGui");
+return game:DefineFastFlag("LuaAppEnableRelativeGuiHomeWithIxp2", false) and game:GetEngineFeature("RelativeGui")

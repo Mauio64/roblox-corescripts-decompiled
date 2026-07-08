@@ -1,43 +1,40 @@
-local l_Parent_0 = script:FindFirstAncestor("PeekView").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v3 = require(l_Parent_0.ReactOtter);
-local v4 = game:DefineFastFlag("RemovePeekViewScrimBorder", false);
-return (v1.forwardRef(function(v5, v6) --[[ Line: 16 ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy), v3 (copy), v4 (copy)
-    local v7 = l_useDesignTokens_0();
-    local v8 = nil;
-    local v9 = nil;
-    local v10 = nil;
-    local v11 = nil;
-    local v12, v13 = v1.useState(true);
-    v8 = v12;
-    v9 = v13;
-    v12, v13 = v3.useAnimatedBinding(1);
-    v10 = v12;
-    v11 = v13;
-    v1.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: v11 (ref), v3 (ref), v8 (ref)
-        v11(v3.spring(v8 and 0.35 or 1));
-    end, {
-        v8
-    });
-    return v1.createElement("TextButton", {
-        ref = v6, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = v10, 
-        BackgroundColor3 = v7.Semantic.Color.Common.Overlay.Color3, 
-        ClipsDescendants = false, 
-        Text = "", 
-        AutoButtonColor = false, 
-        [v1.Event.Activated] = function() --[[ Line: 34 ]]
-            -- upvalues: v5 (copy), v9 (ref), v8 (ref)
-            if v5.onActivated then
-                v5.onActivated();
-            end;
-            v9(not v8);
-        end, 
-        [v1.Change.AbsoluteSize] = v5.onSizeChanged, 
-        BorderSizePixel = v4 and 0 or nil
-    }, v5.children);
-end));
+local Parent = script:FindFirstAncestor("PeekView").Parent
+local React = require(Parent.React)
+local useDesignTokens = require(Parent.Style).useDesignTokens
+local ReactOtter = require(Parent.ReactOtter)
+local v5 = game:DefineFastFlag("RemovePeekViewScrimBorder", false)
+
+return (React.forwardRef(function(t1: {[any]: any}, p1) -- line: 16
+	-- upvalues: useDesignTokens (copy), React (copy), ReactOtter (copy), v5 (copy)
+	local v8 = useDesignTokens()
+	local v9, v10 = React.useState(true)
+	local u11 = v9
+	local u12 = v10
+	local v13, v14 = ReactOtter.useAnimatedBinding(1)
+	local u15 = v14
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: u15 (ref), ReactOtter (copy), u11 (ref)
+		u15(ReactOtter.spring(not u11 and 1 or 0.35))
+	end, { u11 })
+
+	return React.createElement("TextButton", {
+		ref = p1,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = v13,
+		BackgroundColor3 = v8.Color.Common.Scrim.Color3,
+		ClipsDescendants = false,
+		Text = "",
+		AutoButtonColor = false,
+		[React.Event.Activated] = function() -- line: 34
+			-- upvalues: t1 (copy), u12 (ref), u11 (ref)
+			if t1.onActivated then
+				t1.onActivated()
+			end
+
+			u12(not u11)
+		end,
+		[React.Change.AbsoluteSize] = t1.onSizeChanged,
+		BorderSizePixel = if not v5 then nil else 0
+	}, t1.children)
+end))

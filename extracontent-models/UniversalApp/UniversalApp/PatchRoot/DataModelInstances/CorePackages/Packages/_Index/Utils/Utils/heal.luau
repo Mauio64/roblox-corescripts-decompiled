@@ -1,178 +1,222 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local l_console_0 = v1.console;
-local v6 = {};
-local v7 = require(l_Parent_0.GraphQL);
-local l_GraphQLList_0 = v7.GraphQLList;
-local l_GraphQLNonNull_0 = v7.GraphQLNonNull;
-local l_isNamedType_0 = v7.isNamedType;
-local l_isObjectType_0 = v7.isObjectType;
-local l_isInterfaceType_0 = v7.isInterfaceType;
-local l_isUnionType_0 = v7.isUnionType;
-local l_isInputObjectType_0 = v7.isInputObjectType;
-local l_isLeafType_0 = v7.isLeafType;
-local l_isListType_0 = v7.isListType;
-local l_isNonNullType_0 = v7.isNonNullType;
-local l_Map_0 = v1.Map;
-local l_String_0 = v1.String;
-local v20 = nil;
-v6.healSchema = function(v21) --[[ Line: 96 ]] --[[ Name: healSchema ]]
-    -- upvalues: v20 (ref)
-    v20(v21:getTypeMap(), v21:getDirectives());
-    return v21;
-end;
-v20 = function(v22, v23) --[[ Line: 106 ]] --[[ Name: healTypes ]]
-    -- upvalues: l_Boolean_0 (copy), l_isObjectType_0 (copy), l_isInterfaceType_0 (copy), l_isUnionType_0 (copy), l_isInputObjectType_0 (copy), l_isLeafType_0 (copy), l_Error_0 (copy), l_Array_0 (copy), l_isListType_0 (copy), l_GraphQLList_0 (copy), l_isNonNullType_0 (copy), l_GraphQLNonNull_0 (copy), l_isNamedType_0 (copy), l_Map_0 (copy), l_String_0 (copy), l_console_0 (copy)
-    local v24 = nil;
-    local v25 = nil;
-    local v26 = nil;
-    local v27 = nil;
-    local v28 = nil;
-    local v29 = nil;
-    v24 = function(v30) --[[ Line: 187 ]] --[[ Name: healNamedType ]]
-        -- upvalues: l_Boolean_0 (ref), l_isObjectType_0 (ref), v25 (ref), v26 (ref), l_isInterfaceType_0 (ref), l_isUnionType_0 (ref), v28 (ref), l_isInputObjectType_0 (ref), v27 (ref), l_isLeafType_0 (ref), l_Error_0 (ref)
-        if l_Boolean_0.toJSBoolean(l_isObjectType_0(v30)) then
-            v25(v30);
-            v26(v30);
-            return;
-        elseif l_Boolean_0.toJSBoolean(l_isInterfaceType_0(v30)) then
-            v25(v30);
-            if v30.getInterfaces ~= nil then
-                v26(v30);
-            end;
-            return;
-        elseif l_Boolean_0.toJSBoolean(l_isUnionType_0(v30)) then
-            v28(v30);
-            return;
-        elseif l_Boolean_0.toJSBoolean(l_isInputObjectType_0(v30)) then
-            v27(v30);
-            return;
-        elseif l_Boolean_0.toJSBoolean(l_isLeafType_0(v30)) then
-            return;
-        else
-            error(l_Error_0.new(("Unexpected schema type: %s"):format((tostring(v30)))));
-            return;
-        end;
-    end;
-    v25 = function(v31) --[[ Line: 234 ]] --[[ Name: healFields ]]
-        -- upvalues: l_Array_0 (ref), v29 (ref), l_Boolean_0 (ref)
-        local v32 = v31:getFields();
-        for _, v34 in v32:entries() do
-            local v35 = v34[1];
-            local v36 = v34[2];
-            l_Array_0.filter(l_Array_0.map(v36.args, function(v37) --[[ Line: 250 ]]
-                -- upvalues: v29 (ref)
-                v37.type = v29(v37.type);
-                if v37.type == nil then
-                    return nil;
-                else
-                    return v37;
-                end;
-            end), l_Boolean_0.toJSBoolean);
-            v36.type = v29(v36.type);
-            if v36.type == nil then
-                v32[tostring(v35)] = nil;
-            end;
-        end;
-    end;
-    v26 = function(v38) --[[ Line: 267 ]] --[[ Name: healInterfaces ]]
-        -- upvalues: l_Array_0 (ref), v29 (ref), l_Boolean_0 (ref)
-        if v38.getInterfaces ~= nil then
-            local v39 = v38:getInterfaces();
-            v39 = l_Array_0.concat(v39, l_Array_0.filter(l_Array_0.map(l_Array_0.splice(v39, 1), function(v40) --[[ Line: 285 ]]
-                -- upvalues: v29 (ref)
-                return (v29(v40));
-            end), l_Boolean_0.toJSBoolean));
-        end;
-    end;
-    v27 = function(v41) --[[ Line: 296 ]] --[[ Name: healInputFields ]]
-        -- upvalues: v29 (ref)
-        local v42 = v41:getFields();
-        for _, v44 in v42:entries() do
-            local v45 = v44[1];
-            local v46 = v44[2];
-            v46.type = v29(v46.type);
-            if v46.type == nil then
-                v42[tostring(v45)] = nil;
-            end;
-        end;
-    end;
-    v28 = function(v47) --[[ Line: 316 ]] --[[ Name: healUnderlyingTypes ]]
-        -- upvalues: l_Array_0 (ref), v29 (ref), l_Boolean_0 (ref)
-        local v48 = v47:getTypes();
-        v48 = l_Array_0.concat(v48, l_Array_0.filter(l_Array_0.map(l_Array_0.splice(v48, 1), function(v49) --[[ Line: 327 ]]
-            -- upvalues: v29 (ref)
-            return (v29(v49));
-        end), l_Boolean_0.toJSBoolean));
-    end;
-    v29 = function(v50) --[[ Line: 337 ]] --[[ Name: healType ]]
-        -- upvalues: l_Boolean_0 (ref), l_isListType_0 (ref), v29 (ref), l_GraphQLList_0 (ref), l_isNonNullType_0 (ref), l_GraphQLNonNull_0 (ref), l_isNamedType_0 (ref), v22 (copy)
-        if l_Boolean_0.toJSBoolean(l_isListType_0(v50)) then
-            local v51 = v29(v50.ofType);
-            if v51 ~= nil then
-                return (l_GraphQLList_0.new(v51));
-            else
-                return nil;
-            end;
-        elseif l_Boolean_0.toJSBoolean(l_isNonNullType_0(v50)) then
-            local v52 = v29(v50.ofType);
-            if v52 ~= nil then
-                return (l_GraphQLNonNull_0.new(v52));
-            else
-                return nil;
-            end;
-        else
-            if l_Boolean_0.toJSBoolean(l_isNamedType_0(v50)) then
-                local v53 = v22:get(v50.name);
-                if l_Boolean_0.toJSBoolean(if l_Boolean_0.toJSBoolean(v53) then v50 ~= v53 else v53) then
-                    return v53;
-                end;
-            end;
-            return v50;
-        end;
-    end;
-    local v54 = l_Map_0.new();
-    for _, v56 in v22 do
-        local v57 = table.unpack(v56);
-        local v58 = v22:get(v57);
-        if v58 ~= nil and not l_String_0.startsWith(v57, "__") then
-            local l_name_0 = v58.name;
-            if not l_String_0.startsWith(l_name_0, "__") then
-                if v54:get(l_name_0) ~= nil then
-                    l_console_0.warn(("Duplicate schema type name %s found; keeping the existing one found in the schema"):format(l_name_0));
-                else
-                    v54:set(l_name_0, v58);
-                end;
-            end;
-        end;
-    end;
-    for _, v61 in v54 do
-        local v62 = table.unpack(v61);
-        v22:set(v62, (v54:get(v62)));
-    end;
-    for _, v64 in v23 do
-        v64.args = l_Array_0.filter(v64.args, function(v65) --[[ Line: 422 ]]
-            -- upvalues: v29 (ref)
-            v65.type = v29(v65.type);
-            return v65.type ~= nil;
-        end);
-    end;
-    for _, v67 in v22 do
-        local v68 = table.unpack(v67);
-        local v69 = v22:get(v68);
-        if not l_String_0.startsWith(v68, "__") and l_Array_0.indexOf(v54:keys(), v68) ~= -1 and v69 ~= nil then
-            v24(v69);
-        end;
-    end;
-    for _, v71 in v22 do
-        local v72 = table.unpack(v71);
-        if not l_String_0.startsWith(v72, "__") and l_Array_0.indexOf(v54:keys(), v72) == -1 then
-            v22:set(v72, nil);
-        end;
-    end;
-end;
-v6.healTypes = v20;
-return v6;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local console = LuauPolyfill.console
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local GraphQLList = GraphQL.GraphQLList
+local GraphQLNonNull = GraphQL.GraphQLNonNull
+local isNamedType = GraphQL.isNamedType
+local isObjectType = GraphQL.isObjectType
+local isInterfaceType = GraphQL.isInterfaceType
+local isUnionType = GraphQL.isUnionType
+local isInputObjectType = GraphQL.isInputObjectType
+local isLeafType = GraphQL.isLeafType
+local isListType = GraphQL.isListType
+local isNonNullType = GraphQL.isNonNullType
+local Map = LuauPolyfill.Map
+local String = LuauPolyfill.String
+local healTypes = nil
+
+function t1.healSchema(p1) -- line: 96
+	-- upvalues: healTypes (ref)
+	healTypes(p1:getTypeMap(), p1:getDirectives())
+
+	return p1
+end
+function healTypes(p2, p3) -- line: 106
+	-- upvalues: Boolean (copy), isObjectType (copy), isInterfaceType (copy), isUnionType (copy), isInputObjectType (copy), isLeafType (copy), Error (copy), Array (copy), isListType (copy), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), isNamedType (copy), Map (copy), String (copy), console (copy)
+	local healFields = nil
+	local healInterfaces = nil
+	local healInputFields = nil
+	local healUnderlyingTypes = nil
+	local healType = nil
+
+	local function healNamedType(p4) -- line: 187
+		-- upvalues: Boolean (copy), isObjectType (copy), healFields (ref), healInterfaces (ref), isInterfaceType (copy), isUnionType (copy), healUnderlyingTypes (ref), isInputObjectType (copy), healInputFields (ref), isLeafType (copy), Error (copy)
+		if Boolean.toJSBoolean(isObjectType(p4)) then
+			healFields(p4)
+			healInterfaces(p4)
+
+			return
+		end
+
+		if Boolean.toJSBoolean(isInterfaceType(p4)) then
+			healFields(p4)
+
+			if p4.getInterfaces ~= nil then
+				healInterfaces(p4)
+			end
+
+			return
+		end
+
+		if Boolean.toJSBoolean(isUnionType(p4)) then
+			healUnderlyingTypes(p4)
+
+			return
+		end
+
+		if Boolean.toJSBoolean(isInputObjectType(p4)) then
+			healInputFields(p4)
+
+			return
+		end
+
+		if Boolean.toJSBoolean(isLeafType(p4)) then
+			return
+		end
+
+		error(Error.new(("Unexpected schema type: %s"):format((tostring(p4)))))
+	end
+
+	function healFields(p5) -- line: 234
+		-- upvalues: Array (copy), healType (ref), Boolean (copy)
+		local v51 = p5:getFields()
+
+		for _, v53 in v51:entries() do
+			local v54 = v53[1]
+			local v55 = v53[2]
+
+			Array.filter(Array.map(v55.args, function(p6) -- line: 250
+				-- upvalues: healType (ref)
+				p6.type = healType(p6.type)
+
+				if p6.type == nil then
+					return nil
+				end
+
+				return p6
+			end), Boolean.toJSBoolean)
+			v55.type = healType(v55.type)
+
+			if v55.type == nil then
+				v51[tostring(v54)] = nil
+			end
+		end
+	end
+	function healInterfaces(p7) -- line: 267
+		-- upvalues: Array (copy), healType (ref), Boolean (copy)
+		if p7.getInterfaces ~= nil then
+			local v57 = p7:getInterfaces()
+
+			Array.concat(v57, Array.filter(Array.map(Array.splice(v57, 1), function(p8) -- line: 285
+				-- upvalues: healType (ref)
+				return (healType(p8))
+			end), Boolean.toJSBoolean))
+		end
+	end
+	function healInputFields(p9) -- line: 296
+		-- upvalues: healType (ref)
+		local v59 = p9:getFields()
+
+		for _, v61 in v59:entries() do
+			local v62 = v61[1]
+			local v63 = v61[2]
+
+			v63.type = healType(v63.type)
+
+			if v63.type == nil then
+				v59[tostring(v62)] = nil
+			end
+		end
+	end
+	function healUnderlyingTypes(p10) -- line: 316
+		-- upvalues: Array (copy), healType (ref), Boolean (copy)
+		local v65 = p10:getTypes()
+
+		Array.concat(v65, Array.filter(Array.map(Array.splice(v65, 1), function(p11) -- line: 327
+			-- upvalues: healType (ref)
+			return (healType(p11))
+		end), Boolean.toJSBoolean))
+	end
+	function healType(p12) -- line: 337
+		-- upvalues: Boolean (copy), isListType (copy), healType (ref), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), isNamedType (copy), p2 (copy)
+		if Boolean.toJSBoolean(isListType(p12)) then
+			local v67 = healType(p12.ofType)
+
+			if v67 ~= nil then
+				return (GraphQLList.new(v67))
+			end
+
+			return nil
+		end
+
+		if Boolean.toJSBoolean(isNonNullType(p12)) then
+			local v68 = healType(p12.ofType)
+
+			if v68 ~= nil then
+				return (GraphQLNonNull.new(v68))
+			end
+
+			return nil
+		end
+
+		if Boolean.toJSBoolean(isNamedType(p12)) then
+			local v69 = p2:get(p12.name)
+
+			if Boolean.toJSBoolean(if not Boolean.toJSBoolean(v69) then v69 else p12 ~= v69) then
+				return v69
+			end
+		end
+
+		return p12
+	end
+
+	local v31 = Map.new()
+
+	for _, v33 in p2 do
+		local v34 = table.unpack(v33)
+		local v35 = p2:get(v34)
+
+		if v35 ~= nil and not String.startsWith(v34, "__") then
+			local name = v35.name
+
+			if not String.startsWith(name, "__") then
+				if v31:get(name) ~= nil then
+					console.warn(("Duplicate schema type name %s found; keeping the existing one found in the schema"):format(name))
+				else
+					v31:set(name, v35)
+				end
+			end
+		end
+	end
+
+	for _, v38 in v31 do
+		local v39 = table.unpack(v38)
+
+		p2:set(v39, (v31:get(v39)))
+	end
+
+	for _, v41 in p3 do
+		v41.args = Array.filter(v41.args, function(p13) -- line: 422
+			-- upvalues: healType (ref)
+			p13.type = healType(p13.type)
+
+			return p13.type ~= nil
+		end)
+	end
+
+	for _, v43 in p2 do
+		local v44 = table.unpack(v43)
+		local v45 = p2:get(v44)
+
+		if not String.startsWith(v44, "__") and Array.indexOf(v31:keys(), v44) ~= -1 and v45 ~= nil then
+			healNamedType(v45)
+		end
+	end
+
+	for _, v47 in p2 do
+		local v48 = table.unpack(v47)
+
+		if not String.startsWith(v48, "__") and Array.indexOf(v31:keys(), v48) == -1 then
+			p2:set(v48, nil)
+		end
+	end
+end
+
+t1.healTypes = healTypes
+
+return t1

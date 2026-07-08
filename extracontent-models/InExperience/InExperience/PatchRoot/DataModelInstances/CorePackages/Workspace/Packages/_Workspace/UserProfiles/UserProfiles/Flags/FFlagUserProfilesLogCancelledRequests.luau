@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfilesLogCancelledRequests", false);
+return game:DefineFastFlag("UserProfilesLogCancelledRequests", false)

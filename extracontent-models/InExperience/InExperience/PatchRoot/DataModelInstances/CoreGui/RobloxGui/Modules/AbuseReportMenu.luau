@@ -1,11 +1,12 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagAbuseReportMenuV2_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagAbuseReportMenuV2;
-local v2 = require(script.Components.AbuseReportMenuNew);
-local v3 = if l_FFlagAbuseReportMenuV2_0 then require(script.V2.AbuseReportMenu) else nil;
-local v4 = require(script.Analytics.ReportAbuseAnalytics);
+local CorePackages = game:GetService("CorePackages")
+local FFlagAbuseReportMenuV2 = require(CorePackages.Workspace.Packages.SharedFlags).FFlagAbuseReportMenuV2
+local AbuseReportMenuNew = require(script.Components.AbuseReportMenuNew)
+local v4 = if not FFlagAbuseReportMenuV2 then nil else require(script.V2.AbuseReportMenu)
+local ReportAbuseAnalytics = require(script.Analytics.ReportAbuseAnalytics)
+
 return {
-    AbuseReportMenu = v2, 
-    AbuseReportMenuV2 = v3, 
-    ReportAbuseAnalytics = v4, 
-    ["jest.config"] = script["jest.config"]
-};
+	AbuseReportMenu = AbuseReportMenuNew,
+	AbuseReportMenuV2 = v4,
+	ReportAbuseAnalytics = ReportAbuseAnalytics,
+	["jest.config"] = script["jest.config"]
+}

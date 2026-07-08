@@ -1,1 +1,1 @@
-return game:DefineFastString("SpatialRobloxUIIXPSpatialUIVariantValue", "spatial_ui");
+return game:DefineFastString("SpatialRobloxUIIXPSpatialUIVariantValue", "spatial_ui")

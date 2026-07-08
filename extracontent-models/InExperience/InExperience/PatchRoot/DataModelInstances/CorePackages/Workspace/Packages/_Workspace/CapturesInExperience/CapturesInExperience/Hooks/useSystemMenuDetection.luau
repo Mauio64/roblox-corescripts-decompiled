@@ -1,18 +1,23 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useEventConnection_0 = require(l_Parent_0.ReactUtils).useEventConnection;
-local l_useState_0 = v2.useState;
-return function() --[[ Line: 12 ]] --[[ Name: useSystemMenuDetection ]]
-    -- upvalues: l_useState_0 (copy), l_useEventConnection_0 (copy), l_GuiService_0 (copy)
-    local v5, v6 = l_useState_0(false);
-    l_useEventConnection_0(l_GuiService_0.MenuOpened, function() --[[ Line: 15 ]]
-        -- upvalues: v6 (copy)
-        v6(true);
-    end);
-    l_useEventConnection_0(l_GuiService_0.MenuClosed, function() --[[ Line: 19 ]]
-        -- upvalues: v6 (copy)
-        v6(false);
-    end);
-    return v5;
-end;
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local useEventConnection = require(ParentParent.ReactUtils).useEventConnection
+local useState = React.useState
+
+local function useSystemMenuDetection() -- line: 12
+	-- upvalues: useState (copy), useEventConnection (copy), GuiService (copy)
+	local v7, v8 = useState(false)
+
+	useEventConnection(GuiService.MenuOpened, function() -- line: 15
+		-- upvalues: v8 (copy)
+		v8(true)
+	end)
+	useEventConnection(GuiService.MenuClosed, function() -- line: 19
+		-- upvalues: v8 (copy)
+		v8(false)
+	end)
+
+	return v7
+end
+
+return useSystemMenuDetection

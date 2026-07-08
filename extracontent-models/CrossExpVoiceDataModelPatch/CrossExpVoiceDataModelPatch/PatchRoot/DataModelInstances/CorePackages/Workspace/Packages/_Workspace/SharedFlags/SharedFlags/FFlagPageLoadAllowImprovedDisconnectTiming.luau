@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PageLoadAllowImprovedDisconnectTiming", false);
+return game:DefineFastFlag("PageLoadAllowImprovedDisconnectTiming", false)

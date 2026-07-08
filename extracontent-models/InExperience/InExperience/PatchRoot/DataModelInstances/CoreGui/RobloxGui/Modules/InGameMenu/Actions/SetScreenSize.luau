@@ -1,6 +1,7 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator("SET_SCREEN_SIZE", function(v1) --[[ Line: 5 ]]
-    return {
-        newScreenSize = v1
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator("SET_SCREEN_SIZE", function(p1) -- line: 5
+	return {
+		newScreenSize = p1
+	}
+end)

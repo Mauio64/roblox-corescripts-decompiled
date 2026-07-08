@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothExposure", false);
+return game:DefineFastFlag("AXPhotoboothExposure", false)

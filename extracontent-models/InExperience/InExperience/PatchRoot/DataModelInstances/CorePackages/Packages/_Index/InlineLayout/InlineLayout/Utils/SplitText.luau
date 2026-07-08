@@ -1,132 +1,154 @@
-local l_Parent_0 = script:FindFirstAncestor("Utils").Parent;
-local v1 = require(l_Parent_0.Enums.TextSplitBy);
-local function _(v2) --[[ Line: 9 ]] --[[ Name: isWhitespace ]]
-    return v2:match("%s") ~= nil;
-end;
-local function _(v4, v5) --[[ Line: 14 ]] --[[ Name: codepointEnd ]]
-    local v6 = utf8.offset(v4, v5 + 1);
-    if v6 ~= nil then
-        return v6 - 1;
-    else
-        return #v4;
-    end;
-end;
-local v8 = {};
-v8.__index = v8;
-v8.new = function(v9, v10, v11, v12) --[[ Line: 32 ]] --[[ Name: new ]]
-    -- upvalues: v8 (copy)
-    local v13 = setmetatable({}, v8);
-    v13._text = v9;
-    v13._initialGuess = v13:_guessInitialBreak(v10, v11, v12);
-    v13._index = v13._initialGuess;
-    v13:setDirection(1);
-    return v13;
-end;
-v8._guessInitialBreak = function(v14, _, v16, v17) --[[ Line: 44 ]] --[[ Name: _guessInitialBreak ]]
-    return (math.max(math.floor(#v14._text * v17 / v16), 1));
-end;
-v8.findPossibleBreak = function(v18) --[[ Line: 48 ]] --[[ Name: findPossibleBreak ]]
-    local l__index_0 = v18._index;
-    while true do
-        if v18.direction == 1 and l__index_0 <= #v18._text or v18.direction == -1 and l__index_0 > 0 then
-            if v18._text:sub(l__index_0, l__index_0):match("%s") ~= nil then
-                v18._index = l__index_0 + v18._step;
-                return l__index_0 - 1;
-            else
-                l__index_0 = l__index_0 + v18._step;
-            end;
-        else
-            return l__index_0;
-        end;
-    end;
-end;
-v8.setDirection = function(v20, v21) --[[ Line: 63 ]] --[[ Name: setDirection ]]
-    v20.direction = v21;
-    if v21 ~= 1 then
-        v20._index = v20._initialGuess;
-    end;
-    v20._step = v21 == 1 and 1 or -1;
-end;
-local v22 = {};
-v22.__index = v22;
-v22.new = function(v23, v24, v25, v26) --[[ Line: 75 ]] --[[ Name: new ]]
-    -- upvalues: v22 (copy)
-    local v27 = setmetatable({}, v22);
-    v27._text = v23;
-    v27._initialGuess = v27:_guessInitialBreak(v24, v25, v26);
-    v27._codepointIndex = v27._initialGuess;
-    v27._step = 0;
-    return v27;
-end;
-v22._guessInitialBreak = function(_, v29, v30, v31) --[[ Line: 84 ]] --[[ Name: _guessInitialBreak ]]
-    return (math.max(math.floor(v29 * v31 / v30), 1));
-end;
-v22.findPossibleBreak = function(v32) --[[ Line: 88 ]] --[[ Name: findPossibleBreak ]]
-    v32._codepointIndex = v32._codepointIndex + v32._step;
-    local l__text_0 = v32._text;
-    local l__codepointIndex_0 = v32._codepointIndex;
-    local v35 = utf8.offset(l__text_0, l__codepointIndex_0 + 1);
-    if v35 ~= nil then
-        return v35 - 1;
-    else
-        return #l__text_0;
-    end;
-end;
-v22.setDirection = function(v36, v37) --[[ Line: 93 ]] --[[ Name: setDirection ]]
-    v36.direction = v37;
-    v36._step = v37 == 1 and 1 or -1;
-end;
-local function v51(v38, v39, v40, v41, v42, v43) --[[ Line: 98 ]] --[[ Name: splitWith ]]
-    local v44 = v38.new(v40, v41, v42, v43);
-    local v45 = nil;
-    local v46 = nil;
-    local v47 = nil;
-    local v48 = nil;
-    local v49 = nil;
-    v46 = v44:findPossibleBreak();
-    v45 = v40:sub(1, v46);
-    v47 = v43 < v39(v45) and -1 or 1;
-    v49 = v46;
-    v44:setDirection(v47);
-    local v50 = 0;
-    while v50 < v41 do
-        v46 = v44:findPossibleBreak();
-        v45 = v40:sub(1, v46);
-        v48 = v43 < v39(v45) and -1 or 1;
-        if v47 ~= v48 then
-            if v47 == 1 then
-                v46 = v49;
-                return v40:sub(1, v46), v46;
-            else
-                break;
-            end;
-        else
-            v47 = v48;
-            v49 = v46;
-            v50 = v50 + 1;
-        end;
-    end;
-    return v45, v46;
-end;
-return function(v52, v53, v54, v55) --[[ Line: 174 ]] --[[ Name: split ]]
-    -- upvalues: v1 (copy), v8 (copy), v22 (copy), v51 (copy)
-    local v56 = utf8.len(v54);
-    if v56 == nil then
-        warn("Failed to get string length, it is probably malformed or non utf8");
-        return v54;
-    else
-        local v57 = v53(v54);
-        if v57 <= v55 then
-            return v54;
-        else
-            local v58 = nil;
-            v58 = if v52 == v1.Word then v8 else v22;
-            local v59, v60 = v51(v58, v53, v54, v56, v57, v55);
-            if v60 == 0 or v60 == #v54 then
-                return v54;
-            else
-                return v59, (v54:sub(v60 + 1));
-            end;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("Utils").Parent
+local TextSplitBy = require(Parent.Enums.TextSplitBy)
+
+local function isWhitespace(s1: string) -- line: 9
+	return s1:match("%s") ~= nil
+end
+local function codepointEnd(s2: string, n1: number) -- line: 14
+	local v12 = utf8.offset(s2, n1 + 1)
+
+	if v12 ~= nil then
+		return v12 - 1
+	end
+
+	return #s2
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(s3: string, n2: number, n3: number, n4: number) -- line: 32
+	-- upvalues: t1 (copy)
+	local self = setmetatable({}, t1)
+
+	self._text = s3
+	self._initialGuess = self:_guessInitialBreak(n2, n3, n4)
+	self._index = self._initialGuess
+	self:setDirection(1)
+
+	return self
+end
+function t1._guessInitialBreak(t2: {[any]: any}, _: number, n6: number, n7: number) -- line: 44
+	return (math.max(math.floor(#t2._text * n7 / n6), 1))
+end
+function t1.findPossibleBreak(p1) -- line: 48
+	local _index = p1._index
+
+	while p1.direction == 1 and _index <= #p1._text or p1.direction == -1 and _index > 0 do
+		if p1._text:sub(_index, _index):match("%s") ~= nil then
+			p1._index = _index + p1._step
+
+			return _index - 1
+		end
+
+		_index += p1._step
+	end
+
+	return _index
+end
+function t1.setDirection(t3: {[any]: any}, n8: number) -- line: 63
+	t3.direction = n8
+
+	if n8 ~= 1 then
+		t3._index = t3._initialGuess
+	end
+
+	t3._step = n8 ~= 1 and -1 or 1
+end
+
+local t4 = {}
+
+t4.__index = t4
+
+function t4.new(s4: string, n9: number, n10: number, n11: number) -- line: 75
+	-- upvalues: t4 (copy)
+	local self = setmetatable({}, t4)
+
+	self._text = s4
+	self._initialGuess = self:_guessInitialBreak(n9, n10, n11)
+	self._codepointIndex = self._initialGuess
+	self._step = 0
+
+	return self
+end
+function t4._guessInitialBreak(_: {[any]: any}, n12: number, n13: number, n14: number) -- line: 84
+	return (math.max(math.floor(n12 * n14 / n13), 1))
+end
+function t4.findPossibleBreak(p2) -- line: 88
+	p2._codepointIndex = p2._codepointIndex + p2._step
+
+	local _text = p2._text
+	local _codepointIndex = p2._codepointIndex
+	local v38 = utf8.offset(_text, _codepointIndex + 1)
+
+	if v38 ~= nil then
+		return v38 - 1
+	end
+
+	return #_text
+end
+function t4.setDirection(p3, p4) -- line: 93
+	p3.direction = p4
+	p3._step = p4 ~= 1 and -1 or 1
+end
+
+local function splitWith(t6: {[any]: any}, p5: ((...any) -> ...any), s5: string, n15: number, n16: number, n17: number) -- line: 98
+	local v47 = t6.new(s5, n15, n16, n17)
+	local v48 = v47:findPossibleBreak()
+	local v49 = s5:sub(1, v48)
+	local v50 = not (n17 < p5(v49)) and 1 or -1
+	local v51 = v48
+
+	v47:setDirection(v50)
+
+	local n18 = 0
+
+	while n18 < n15 do
+		v48 = v47:findPossibleBreak()
+		v49 = s5:sub(1, v48)
+
+		local v53 = not (n17 < p5(v49)) and 1 or -1
+
+		if v50 ~= v53 then
+			if v50 ~= 1 then
+				return v49, v48
+			end
+
+			return s5:sub(1, v51), v51
+		end
+
+		v50 = v53
+		v51 = v48
+		n18 += 1
+	end
+
+	return v49, v48
+end
+local function split(p6, p7: ((...any) -> ...any), s6: string, n19: number) -- line: 174
+	-- upvalues: TextSplitBy (copy), t1 (copy), t4 (copy), splitWith (copy)
+	local v58 = utf8.len(s6)
+
+	if v58 == nil then
+		warn("Failed to get string length, it is probably malformed or non utf8")
+
+		return s6
+	end
+
+	local v59 = p7(s6)
+
+	if v59 <= n19 then
+		return s6
+	end
+
+	local v60 = if p6 ~= TextSplitBy.Word then t4 else t1
+	local v61, v62 = splitWith(v60, p7, s6, v58, v59, n19)
+
+	if v62 == 0 or v62 == #s6 then
+		return s6
+	end
+
+	return v61, (s6:sub(v62 + 1))
+end
+
+return split

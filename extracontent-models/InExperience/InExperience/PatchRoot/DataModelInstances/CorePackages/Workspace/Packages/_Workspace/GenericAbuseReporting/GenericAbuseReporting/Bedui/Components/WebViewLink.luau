@@ -1,62 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_AppLinking_0 = require(l_Parent_0.RoactServiceTags).AppLinking;
-local v5 = require(l_Parent_0.Foundation);
-local v6 = require(l_Parent_0.React);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_Button_0 = v5.Button;
-local l_ButtonVariant_0 = v5.Enums.ButtonVariant;
-local l_View_0 = v5.View;
-local l_NotificationType_0 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes).NotificationType;
-local l_FFlagChangeWebViewReportButtonToText_0 = require(l_Parent_0.SharedFlags).FFlagChangeWebViewReportButtonToText;
-return v6.memo(function(v14) --[[ Line: 28 ]]
-    -- upvalues: l_FFlagChangeWebViewReportButtonToText_0 (copy), l_useRoactService_0 (copy), l_AppLinking_0 (copy), l_useAppPolicy_0 (copy), v6 (copy), l_HttpService_0 (copy), l_GuiService_0 (copy), l_NotificationType_0 (copy), l_View_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy)
-    local v15 = nil;
-    local v16 = nil;
-    if l_FFlagChangeWebViewReportButtonToText_0 then
-        v15 = l_useRoactService_0(l_AppLinking_0);
-        v16 = l_useAppPolicy_0(function(v17) --[[ Line: 33 ]]
-            return v17.getWebViewSupport();
-        end);
-    else
-        v16 = true;
-    end;
-    local v20 = v6.useCallback(function() --[[ Line: 40 ]]
-        -- upvalues: l_FFlagChangeWebViewReportButtonToText_0 (ref), v16 (ref), v15 (ref), v14 (copy), l_HttpService_0 (ref), l_GuiService_0 (ref), l_NotificationType_0 (ref)
-        if l_FFlagChangeWebViewReportButtonToText_0 and not v16 then
-            v15:openURL(v14.component.link.url);
-            return;
-        else
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 44 ]]
-                -- upvalues: l_HttpService_0 (ref), v14 (ref)
-                return l_HttpService_0:JSONEncode({
-                    title = v14.component.link.label, 
-                    presentationStyle = nil, 
-                    visible = true, 
-                    url = v14.component.link.url
-                });
-            end);
-            if not l_status_0 then
-                warn("Failed to encode notification data for bedui webview link");
-                return;
-            else
-                l_GuiService_0:BroadcastNotification(l_result_0, l_NotificationType_0.OpenCustomWebView);
-                return;
-            end;
-        end;
-    end, {
-        v14.component.link.label, 
-        v14.component.link.url
-    });
-    return v6.createElement(l_View_0, {
-        tag = "size-full-0 auto-y", 
-        LayoutOrder = v14.layoutOrder
-    }, v6.createElement(l_Button_0, {
-        text = v14.component.link.linkButtonLabel, 
-        variant = l_ButtonVariant_0.Text, 
-        onActivated = v20
-    }));
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local GuiService = game:GetService("GuiService")
+local HttpService = game:GetService("HttpService")
+local AppLinking = require(GenericAbuseReportingParent.RoactServiceTags).AppLinking
+local Foundation = require(GenericAbuseReportingParent.Foundation)
+local React = require(GenericAbuseReportingParent.React)
+local useAppPolicy = require(GenericAbuseReportingParent.UniversalAppPolicy).useAppPolicy
+local useRoactService = require(GenericAbuseReportingParent.RobloxAppHooks).useRoactService
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ControlState = Foundation.Enums.ControlState
+local getIconRichText = Foundation.Utility.getIconRichText
+local IconName = Foundation.Enums.IconName
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local NotificationType = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).NotificationType
+local FFlagChangeWebViewReportButtonToText = require(GenericAbuseReportingParent.SharedFlags).FFlagChangeWebViewReportButtonToText
+local v19 = game:DefineFastFlag("FixWebViewLinkCutOff", false)
+
+return React.memo(function(t1: {[any]: any}) -- line: 34
+	-- upvalues: FFlagChangeWebViewReportButtonToText (copy), useRoactService (copy), AppLinking (copy), useAppPolicy (copy), React (copy), HttpService (copy), GuiService (copy), NotificationType (copy), v19 (copy), getIconRichText (copy), IconName (copy), ControlState (copy), View (copy), FoundationText (copy), Button (copy), ButtonVariant (copy)
+	local u21 = nil
+	local u22
+
+	if FFlagChangeWebViewReportButtonToText then
+		u21 = useRoactService(AppLinking)
+		u22 = useAppPolicy(function(p1) -- line: 39
+			return p1.getWebViewSupport()
+		end)
+	else
+		u22 = true
+	end
+
+	local v23 = React.useCallback(function() -- line: 46
+		-- upvalues: FFlagChangeWebViewReportButtonToText (copy), u22 (ref), u21 (ref), t1 (copy), HttpService (copy), GuiService (copy), NotificationType (copy)
+		if FFlagChangeWebViewReportButtonToText and not u22 then
+			u21:openURL(t1.component.link.url)
+
+			return
+		end
+
+		local ok, result = pcall(function() -- line: 50
+			-- upvalues: HttpService (copy), t1 (copy)
+			return HttpService:JSONEncode({
+				presentationStyle = nil,
+				visible = true,
+				title = t1.component.link.label,
+				url = t1.component.link.url
+			})
+		end)
+
+		if not ok then
+			warn("Failed to encode notification data for bedui webview link")
+
+			return
+		end
+
+		GuiService:BroadcastNotification(result, NotificationType.OpenCustomWebView)
+	end, {
+		t1.component.link.label,
+		t1.component.link.url
+	})
+	local v24, v25 = React.useBinding(false)
+	local v26 = if not v19 then nil else React.useMemo(function() -- line: 69
+		-- upvalues: t1 (copy), getIconRichText (copy), IconName (copy)
+		return t1.component.link.linkButtonLabel .. ` { getIconRichText(IconName.ArrowUpRightFromSquare) }`
+	end, { t1.component.link.linkButtonLabel })
+	local v27 = if not v19 then nil else React.useCallback(function(p2) -- line: 75
+		-- upvalues: ControlState (copy), v25 (copy)
+		if p2 == ControlState.Hover then
+			v25(true)
+
+			return
+		end
+
+		v25(false)
+	end, {})
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y",
+		LayoutOrder = t1.layoutOrder
+	}, if not v19 then React.createElement(Button, {
+		text = t1.component.link.linkButtonLabel,
+		variant = ButtonVariant.Text,
+		onActivated = v23
+	}) else React.createElement(FoundationText, {
+		RichText = true,
+		tag = "auto-xy padding-xsmall text-body-small text-wrap text-align-x-left radius-medium",
+		Text = v24:map(function(p3) -- line: 92
+			-- upvalues: v26 (copy)
+			if p3 then
+				return `<u>{ v26 }</u>`
+			end
+
+			return v26
+		end),
+		onActivated = v23,
+		onStateChanged = v27
+	}))
+end)

@@ -1,153 +1,257 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 45 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        id = (not (v4 ~= nil) or v4.id == nil) and "" or v4.id, 
-        media_asset_id = (not (v4 ~= nil) or v4.media_asset_id == nil) and "" or v4.media_asset_id, 
-        title = (not (v4 ~= nil) or v4.title == nil) and "" or v4.title, 
-        artist = (not (v4 ~= nil) or v4.artist == nil) and "" or v4.artist
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 54 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.id ~= nil and v5.id ~= "" then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.lengthDelimited);
-        v8, v9 = v0.writeString(v8, v9, v5.id);
-        v6 = v8;
-        v7 = v9;
-    end;
-    if v5.media_asset_id ~= nil and v5.media_asset_id ~= "" then
-        local v10, v11 = v0.writeTag(v6, v7, 2, v0.wireTypes.lengthDelimited);
-        v10, v11 = v0.writeString(v10, v11, v5.media_asset_id);
-        v6 = v10;
-        v7 = v11;
-    end;
-    if v5.title ~= nil and v5.title ~= "" then
-        local v12, v13 = v0.writeTag(v6, v7, 3, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v5.title);
-        v6 = v12;
-        v7 = v13;
-    end;
-    if v5.artist ~= nil and v5.artist ~= "" then
-        local v14, v15 = v0.writeTag(v6, v7, 4, v0.wireTypes.lengthDelimited);
-        v14, v15 = v0.writeString(v14, v15, v5.artist);
-        v6 = v14;
-        v7 = v15;
-    end;
-    local v16 = buffer.create(v7);
-    buffer.copy(v16, 0, v6, 0, v7);
-    return v16;
-end;
-v3.decode = function(v17) --[[ Line: 83 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v18 = v3.new();
-    local v19 = 0;
-    while v19 < buffer.len(v17) do
-        local v20 = nil;
-        local v21 = nil;
-        local v22, v23, v24 = v0.readTag(v17, v19);
-        v20 = v22;
-        v21 = v23;
-        v19 = v24;
-        if v21 == v0.wireTypes.varint then
-            v22 = nil;
-            v23, v24 = v0.readVarInt(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        elseif v21 == v0.wireTypes.lengthDelimited then
-            if v20 == 1 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.id = buffer.tostring(v22);
-            elseif v20 == 2 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.media_asset_id = buffer.tostring(v22);
-            elseif v20 == 3 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.title = buffer.tostring(v22);
-            elseif v20 == 4 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.artist = buffer.tostring(v22);
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v19 = v24 + v23;
-            end;
-        elseif v21 == v0.wireTypes.i32 then
-            v22 = nil;
-            v23, v24 = v0.readFixed32(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        elseif v21 == v0.wireTypes.i64 then
-            v22 = nil;
-            v23, v24 = v0.readFixed64(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        else
-            error("Unsupported wire type: " .. v21);
-        end;
-    end;
-    return v18;
-end;
-v3.jsonEncode = function(v25) --[[ Line: 141 ]] --[[ Name: jsonEncode ]]
-    local v26 = {};
-    if v25.id ~= nil and v25.id ~= "" then
-        v26.id = v25.id;
-    end;
-    if v25.media_asset_id ~= nil and v25.media_asset_id ~= "" then
-        v26.mediaAssetId = v25.media_asset_id;
-    end;
-    if v25.title ~= nil and v25.title ~= "" then
-        v26.title = v25.title;
-    end;
-    if v25.artist ~= nil and v25.artist ~= "" then
-        v26.artist = v25.artist;
-    end;
-    return v26;
-end;
-v3.jsonDecode = function(v27) --[[ Line: 163 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy)
-    local v28 = v3.new();
-    if v27.id ~= nil then
-        v28.id = v27.id;
-    end;
-    if v27.media_asset_id ~= nil then
-        v28.media_asset_id = v27.media_asset_id;
-    end;
-    if v27.mediaAssetId ~= nil then
-        v28.media_asset_id = v27.mediaAssetId;
-    end;
-    if v27.title ~= nil then
-        v28.title = v27.title;
-    end;
-    if v27.artist ~= nil then
-        v28.artist = v27.artist;
-    end;
-    return v28;
-end;
-v3.descriptor = {
-    name = "SongData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.SongData"
-};
-v2.SongData = v3;
-v1.default:register(v2.SongData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 53
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
+		media_asset_id = if t3 ~= nil and t3.media_asset_id ~= nil then t3.media_asset_id else "",
+		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
+		artist = if t3 ~= nil and t3.artist ~= nil then t3.artist else "",
+		album = if t3 ~= nil and t3.album ~= nil then t3.album else "",
+		album_art_asset_id = if t3 ~= nil and t3.album_art_asset_id ~= nil then t3.album_art_asset_id else 0,
+		is_private = t3 ~= nil and (t3.is_private ~= nil and t3.is_private),
+		duration = if t3 ~= nil and t3.duration ~= nil then t3.duration else 0
+	}, t2))
+end
+function t2.encode(p1) -- line: 66
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.id ~= nil and p1.id ~= "" then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v9, v10, p1.id)
+	end
+
+	if p1.media_asset_id ~= nil and p1.media_asset_id ~= "" then
+		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v11, v12, p1.media_asset_id)
+	end
+
+	if p1.title ~= nil and p1.title ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.title)
+	end
+
+	if p1.artist ~= nil and p1.artist ~= "" then
+		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v15, v16, p1.artist)
+	end
+
+	if p1.album ~= nil and p1.album ~= "" then
+		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v17, v18, p1.album)
+	end
+
+	if p1.album_art_asset_id ~= nil and p1.album_art_asset_id ~= 0 then
+		local v19, v20 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v19, v20, p1.album_art_asset_id)
+	end
+
+	if p1.is_private then
+		local v21, v22 = proto.writeTag(buf, n1, 7, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v21, v22, not p1.is_private and 0 or 1)
+	end
+
+	if p1.duration ~= nil and p1.duration ~= 0 then
+		local v23, v24 = proto.writeTag(buf, n1, 8, proto.wireTypes.i64)
+
+		buf, n1 = proto.writeDouble(v23, v24, p1.duration)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 115
+	-- upvalues: t2 (copy), proto (copy)
+	local v27 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v29, v30
+
+		v29, v30, n2 = proto.readTag(p2, n2)
+
+		if v30 == proto.wireTypes.varint then
+			if v29 == 6 then
+				local v31
+
+				v31, n2 = proto.readVarIntI64(p2, n2)
+				v27.album_art_asset_id = v31
+			elseif v29 == 7 then
+				local v32
+
+				v32, n2 = proto.readVarInt(p2, n2)
+				v27.is_private = v32 ~= 0
+			else
+				local v33
+
+				v33, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v30 == proto.wireTypes.lengthDelimited then
+			if v29 == 1 then
+				local v34
+
+				v34, n2 = proto.readBuffer(p2, n2)
+				v27.id = buffer.tostring(v34)
+			elseif v29 == 2 then
+				local v35
+
+				v35, n2 = proto.readBuffer(p2, n2)
+				v27.media_asset_id = buffer.tostring(v35)
+			elseif v29 == 3 then
+				local v36
+
+				v36, n2 = proto.readBuffer(p2, n2)
+				v27.title = buffer.tostring(v36)
+			elseif v29 == 4 then
+				local v37
+
+				v37, n2 = proto.readBuffer(p2, n2)
+				v27.artist = buffer.tostring(v37)
+			elseif v29 == 5 then
+				local v38
+
+				v38, n2 = proto.readBuffer(p2, n2)
+				v27.album = buffer.tostring(v38)
+			else
+				local v39, v40 = proto.readVarInt(p2, n2)
+
+				n2 = v40 + v39
+			end
+		elseif v30 == proto.wireTypes.i32 then
+			local v41
+
+			v41, n2 = proto.readFixed32(p2, n2)
+		elseif v30 == proto.wireTypes.i64 then
+			if v29 == 8 then
+				local v42
+
+				v42, n2 = proto.readDouble(p2, n2)
+				v27.duration = v42
+			else
+				local v43
+
+				v43, n2 = proto.readFixed64(p2, n2)
+			end
+		else
+			error("Unsupported wire type: " .. v30)
+		end
+	end
+
+	return v27
+end
+function t2.jsonEncode(p3) -- line: 193
+	-- upvalues: proto (copy)
+	local t4 = {}
+
+	if p3.id ~= nil and p3.id ~= "" then
+		t4.id = p3.id
+	end
+
+	if p3.media_asset_id ~= nil and p3.media_asset_id ~= "" then
+		t4.mediaAssetId = p3.media_asset_id
+	end
+
+	if p3.title ~= nil and p3.title ~= "" then
+		t4.title = p3.title
+	end
+
+	if p3.artist ~= nil and p3.artist ~= "" then
+		t4.artist = p3.artist
+	end
+
+	if p3.album ~= nil and p3.album ~= "" then
+		t4.album = p3.album
+	end
+
+	if p3.album_art_asset_id ~= nil and p3.album_art_asset_id ~= 0 then
+		t4.albumArtAssetId = p3.album_art_asset_id
+	end
+
+	if p3.is_private then
+		t4.isPrivate = p3.is_private
+	end
+
+	if p3.duration ~= nil and p3.duration ~= 0 then
+		t4.duration = proto.json.serializeNumber(p3.duration)
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 231
+	-- upvalues: t2 (copy), proto (copy)
+	local v47 = t2.new()
+
+	if t5.id ~= nil then
+		v47.id = t5.id
+	end
+
+	if t5.media_asset_id ~= nil then
+		v47.media_asset_id = t5.media_asset_id
+	end
+
+	if t5.mediaAssetId ~= nil then
+		v47.media_asset_id = t5.mediaAssetId
+	end
+
+	if t5.title ~= nil then
+		v47.title = t5.title
+	end
+
+	if t5.artist ~= nil then
+		v47.artist = t5.artist
+	end
+
+	if t5.album ~= nil then
+		v47.album = t5.album
+	end
+
+	if t5.album_art_asset_id ~= nil then
+		v47.album_art_asset_id = t5.album_art_asset_id
+	end
+
+	if t5.albumArtAssetId ~= nil then
+		v47.album_art_asset_id = t5.albumArtAssetId
+	end
+
+	if t5.is_private ~= nil then
+		v47.is_private = t5.is_private
+	end
+
+	if t5.isPrivate ~= nil then
+		v47.is_private = t5.isPrivate
+	end
+
+	if t5.duration ~= nil then
+		v47.duration = proto.json.deserializeNumber(t5.duration)
+	end
+
+	return v47
+end
+
+t2.descriptor = {
+	name = "SongData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SongData"
+}
+t1.SongData = t2
+typeRegistry.default:register(t1.SongData)
+
 return {
-    SongData = v2.SongData
-};
+	SongData = t1.SongData
+}

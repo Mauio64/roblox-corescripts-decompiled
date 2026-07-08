@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixSlotsManageInCustomizeLink3", false);
+return game:DefineFastFlag("AXFixSlotsManageInCustomizeLink3", false)

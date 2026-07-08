@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AvatarSwitcherCounters", false);
+return game:DefineFastFlag("AvatarSwitcherCounters", false)

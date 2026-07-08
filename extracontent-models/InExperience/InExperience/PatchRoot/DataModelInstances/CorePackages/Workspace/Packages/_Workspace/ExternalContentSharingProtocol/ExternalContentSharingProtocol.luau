@@ -1,4 +1,5 @@
-local _ = require(script.ExternalContentSharingProtocolTypes);
+require(script.ExternalContentSharingProtocolTypes)
+
 return {
-    ExternalContentSharingProtocol = require(script.ExternalContentSharingProtocol)
-};
+	ExternalContentSharingProtocol = require(script.ExternalContentSharingProtocol)
+}

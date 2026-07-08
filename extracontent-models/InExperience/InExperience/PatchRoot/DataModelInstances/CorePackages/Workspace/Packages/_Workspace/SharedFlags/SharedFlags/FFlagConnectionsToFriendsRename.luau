@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ConnectionsToFriendsRename1", false);
+return game:DefineFastFlag("ConnectionsToFriendsRename1", false)

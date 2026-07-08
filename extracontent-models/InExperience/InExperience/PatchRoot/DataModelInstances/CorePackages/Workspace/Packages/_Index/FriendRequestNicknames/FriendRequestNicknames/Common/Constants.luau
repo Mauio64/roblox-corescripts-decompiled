@@ -1,3 +1,3 @@
 return {
-    RODUX_KEY = "FriendRequestNicknames"
-};
+	RODUX_KEY = "FriendRequestNicknames"
+}

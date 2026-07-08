@@ -11,44 +11,49 @@ require(script.Parent.MarketplaceCatalogSortStoreTypes)
 
 local FFlagMarketplaceCatalogSortTrackLastReceived = SharedFlags.FFlagMarketplaceCatalogSortTrackLastReceived
 
-return function() --[[ createMarketplaceCatalogSortStore ]] -- line: 22
+local function createMarketplaceCatalogSortStore() -- line: 22
 	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy), FFlagMarketplaceCatalogSortTrackLastReceived (copy), Signals (copy)
-	local v9 = createDataCache()
-	local v10 = createDataResolver({
-		cache = v9,
-		fetchFn = function(_: {[any]: any}) --[[ fetchFn ]] -- line: 26
+	local v10 = createDataCache()
+	local v11 = createDataResolver({
+		cache = v10,
+		fetchFn = function(_: {[any]: any}) -- line: 26
 			-- upvalues: Promise (copy)
 			return Promise.resolve({})
 		end
 	})
-	local v11 = nil
-	local u12 = nil
+	local v12 = nil
+	local u13 = nil
 
 	if FFlagMarketplaceCatalogSortTrackLastReceived then
-		local v13
+		local v14
 
-		v11, v13 = Signals.createSignal({})
-		u12 = v13
+		v12, v14 = Signals.createSignal({})
+		u13 = v14
+	end
+
+	local function updateMarketplaceCatalogSorts(t2: {[any]: any}) -- line: 41
+		-- upvalues: u13 (ref), v10 (copy)
+		u13(t2)
+		v10.updateItems(t2)
+	end
+	local function clear() -- line: 51
+		-- upvalues: u13 (ref), v11 (copy)
+		if u13 then
+			u13({})
+		end
+
+		v11.clear()
 	end
 
 	return {
-		getMarketplaceCatalogSort = v10.getCachedItem,
-		getMarketplaceCatalogSorts = v10.getCachedItems,
-		updateMarketplaceCatalogSorts = if not FFlagMarketplaceCatalogSortTrackLastReceived then v9.updateItems else function(t2: {[any]: any}) --[[ updateMarketplaceCatalogSorts ]] -- line: 41
-			-- upvalues: u12 (ref), v9 (copy)
-			u12(t2)
-			v9.updateItems(t2)
-		end,
-		updateMarketplaceCatalogSort = v9.updateItem,
-		getLastReceivedSorts = v11,
-		clear = if not FFlagMarketplaceCatalogSortTrackLastReceived then v10.clear else function() --[[ clear ]] -- line: 51
-			-- upvalues: u12 (ref), v10 (copy)
-			if u12 then
-				u12({})
-			end
-
-			v10.clear()
-		end,
-		dispose = v10.dispose
+		getMarketplaceCatalogSort = v11.getCachedItem,
+		getMarketplaceCatalogSorts = v11.getCachedItems,
+		updateMarketplaceCatalogSorts = if not FFlagMarketplaceCatalogSortTrackLastReceived then v10.updateItems else updateMarketplaceCatalogSorts,
+		updateMarketplaceCatalogSort = v10.updateItem,
+		getLastReceivedSorts = v12,
+		clear = if not FFlagMarketplaceCatalogSortTrackLastReceived then v11.clear else clear,
+		dispose = v11.dispose
 	}
 end
+
+return createMarketplaceCatalogSortStore

@@ -1,15 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameDetailRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.AgeRecommendations.SetAgeRecommendationHeaders);
-return function(v4, v5) --[[ Line: 7 ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    v4 = v4 or {};
-    if v5.type == v3.name then
-        v4 = v2.Dictionary.join(v4, {
-            headerDisplayName = v5.headerDisplayName, 
-            headerDisplayNameShort = v5.headerDisplayNameShort
-        });
-    end;
-    return v4;
-end;
+local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
+local GameDetailRoduxParent = GameDetailRodux.Parent
+local Cryo = require(GameDetailRoduxParent.Cryo)
+local SetAgeRecommendationHeaders = require(GameDetailRodux.AgeRecommendations.SetAgeRecommendationHeaders)
+
+return function(p1, p2) -- line: 7
+	-- upvalues: SetAgeRecommendationHeaders (copy), Cryo (copy)
+	local v7 = p1 or {}
+
+	if p2.type == SetAgeRecommendationHeaders.name then
+		v7 = Cryo.Dictionary.join(v7, {
+			headerDisplayName = p2.headerDisplayName,
+			headerDisplayNameShort = p2.headerDisplayNameShort
+		})
+	end
+
+	return v7
+end

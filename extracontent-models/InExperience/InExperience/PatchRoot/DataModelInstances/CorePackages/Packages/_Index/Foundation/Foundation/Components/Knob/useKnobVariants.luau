@@ -1,100 +1,107 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v2 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v5 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v6 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local v7 = require(script.Parent.getKnobSize);
-local v8 = require(l_script_FirstAncestor_0.Enums.IconSize);
-local function v11(v9) --[[ Line: 39 ]] --[[ Name: computeProps ]]
-    local v10 = v9.size.X.Offset + v9.shadowPadding * 2;
-    return {
-        knob = {
-            size = v9.size, 
-            iconSize = v9.iconSize
-        }, 
-        knobShadow = {
-            size = UDim2.fromOffset(v10, v10), 
-            padding = v9.shadowPadding
-        }
-    };
-end;
-local function v16(v12) --[[ Line: 58 ]] --[[ Name: variantsFactory ]]
-    -- upvalues: v5 (copy), v1 (copy), v11 (copy), v8 (copy), v7 (copy)
-    local v13 = {
-        knob = {
-            tag = v5.FoundationToggleVisualUpdate and "auto-xy radius-circle anchor-center-center position-center-center" or "radius-circle anchor-center-center position-center-center"
-        }, 
-        knobShadow = {
-            tag = "anchor-center-center position-center-center"
-        }
-    };
-    local v14 = {
-        [v1.XSmall] = v11({
-            iconSize = v8.XSmall, 
-            size = v7(v12, v1.XSmall), 
-            shadowPadding = v12.Padding.XXSmall
-        }), 
-        [v1.Small] = v11({
-            iconSize = v8.Small, 
-            size = v7(v12, v1.Small), 
-            shadowPadding = v12.Padding.XSmall
-        }), 
-        [v1.Medium] = v11({
-            iconSize = v8.Medium, 
-            size = v7(v12, v1.Medium), 
-            shadowPadding = v12.Padding.Small
-        }), 
-        [v1.Large] = v11({
-            iconSize = v8.Large, 
-            size = v7(v12, v1.Large), 
-            shadowPadding = v12.Padding.Small
-        })
-    };
-    local v15 = if v5.FoundationToggleVisualUpdate then {
-        [false] = {
-            knob = {
-                style = v12.Color.Content.Emphasis
-            }, 
-            iconContainer = {
-                backgroundStyle = v12.Inverse.Content.Emphasis
-            }
-        }, 
-        [true] = {
-            knob = {
-                style = v12.Inverse.Content.Emphasis
-            }, 
-            iconContainer = {
-                backgroundStyle = v12.Color.Content.Emphasis
-            }
-        }
-    } else {
-        [false] = {
-            knob = {
-                style = v12.Color.Extended.White.White_100
-            }, 
-            iconContainer = {
-                backgroundStyle = v12.Inverse.Content.Emphasis
-            }
-        }, 
-        [true] = {
-            knob = {
-                style = v12.Color.Extended.White.White_100
-            }, 
-            iconContainer = {
-                backgroundStyle = v12.Color.Content.Emphasis
-            }
-        }
-    };
-    return {
-        common = v13, 
-        sizes = v14, 
-        isInverse = v15
-    };
-end;
-return function(v17, v18, v19) --[[ Line: 135 ]]
-    -- upvalues: v6 (copy), v16 (copy), v2 (copy)
-    local v20 = v6.useVariants("Knob", v16, v17);
-    return v2(v20.common, v20.sizes[v18], v20.isInverse[v19]);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local InputSize = require(Foundation.Enums.InputSize)
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+
+require(Foundation.Components.Types)
+require(Foundation.Providers.Style.Tokens)
+
+local Flags = require(Foundation.Utility.Flags)
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+local getKnobSize = require(script.Parent.getKnobSize)
+local IconSize = require(Foundation.Enums.IconSize)
+
+local function computeProps(t1: {[any]: any}) -- line: 39
+	local v11 = t1.size.X.Offset + t1.shadowPadding * 2
+
+	return {
+		knob = {
+			size = t1.size,
+			iconSize = t1.iconSize
+		},
+		knobShadow = {
+			size = UDim2.fromOffset(v11, v11),
+			padding = t1.shadowPadding
+		}
+	}
+end
+local function variantsFactory(p1) -- line: 58
+	-- upvalues: Flags (copy), InputSize (copy), computeProps (copy), IconSize (copy), getKnobSize (copy)
+	local t2 = {
+		knob = {
+			tag = not Flags.FoundationToggleVisualUpdate and "position-center-center anchor-center-center radius-circle" or "position-center-center anchor-center-center auto-xy radius-circle"
+		},
+		knobShadow = {
+			tag = "position-center-center anchor-center-center"
+		}
+	}
+	local t3 = {
+		[InputSize.XSmall] = computeProps({
+			iconSize = IconSize.XSmall,
+			size = getKnobSize(p1, InputSize.XSmall),
+			shadowPadding = p1.Padding.XXSmall
+		}),
+		[InputSize.Small] = computeProps({
+			iconSize = IconSize.Small,
+			size = getKnobSize(p1, InputSize.Small),
+			shadowPadding = p1.Padding.XSmall
+		}),
+		[InputSize.Medium] = computeProps({
+			iconSize = IconSize.Medium,
+			size = getKnobSize(p1, InputSize.Medium),
+			shadowPadding = p1.Padding.Small
+		}),
+		[InputSize.Large] = computeProps({
+			iconSize = IconSize.Large,
+			size = getKnobSize(p1, InputSize.Large),
+			shadowPadding = p1.Padding.Small
+		})
+	}
+	local v15 = if not Flags.FoundationToggleVisualUpdate then {
+		[false] = {
+			knob = {
+				style = p1.Color.Extended.White.White_100
+			},
+			iconContainer = {
+				backgroundStyle = p1.Inverse.Content.Emphasis
+			}
+		},
+		[true] = {
+			knob = {
+				style = p1.Color.Extended.White.White_100
+			},
+			iconContainer = {
+				backgroundStyle = p1.Color.Content.Emphasis
+			}
+		}
+	} else {
+		[false] = {
+			knob = {
+				style = p1.Color.Content.Emphasis
+			},
+			iconContainer = {
+				backgroundStyle = p1.Inverse.Content.Emphasis
+			}
+		},
+		[true] = {
+			knob = {
+				style = p1.Inverse.Content.Emphasis
+			},
+			iconContainer = {
+				backgroundStyle = p1.Color.Content.Emphasis
+			}
+		}
+	}
+
+	return {
+		common = t2,
+		sizes = t3,
+		isInverse = v15
+	}
+end
+
+return function(p2, p3, b1: boolean) -- line: 135
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+	local v19 = VariantsContext.useVariants("Knob", variantsFactory, p2)
+
+	return composeStyleVariant(v19.common, v19.sizes[p3], v19.isInverse[b1])
+end

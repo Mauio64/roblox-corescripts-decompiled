@@ -1,19 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("Components").Parent.Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineLayoutElements");
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.BaseTextElement);
-local l_Text_0 = v3.Text;
-local v6 = {};
-mapProps = function(v7) --[[ Line: 17 ]] --[[ Name: mapProps ]]
-    -- upvalues: v2 (copy)
-    return v2.omit(v7, {
-        "id", 
-        "EngineTags"
-    });
-end;
-v6.new = function(v8) --[[ Line: 21 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), l_Text_0 (copy)
-    return v4.new(l_Text_0, v8, mapProps);
-end;
-return v6;
+local ParentParent = script:FindFirstAncestor("Components").Parent.Parent
+local InlineLayoutElements = script:FindFirstAncestor("InlineLayoutElements")
+local Dash = require(ParentParent.Dash)
+local Foundation = require(ParentParent.Foundation)
+local BaseTextElement = require(InlineLayoutElements.BaseTextElement)
+local FoundationText = Foundation.Text
+local t1 = {}
+
+function mapProps(p1) -- line: 17
+	-- upvalues: Dash (copy)
+	return Dash.omit(p1, {
+		"id",
+		"EngineTags"
+	})
+end
+function t1.new(p2) -- line: 21
+	-- upvalues: BaseTextElement (copy), FoundationText (copy)
+	return BaseTextElement.new(FoundationText, p2, mapProps)
+end
+
+return t1

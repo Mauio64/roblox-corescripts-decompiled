@@ -1,39 +1,66 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-game:DefineFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor", false);
-local v2 = require(l_Parent_0.AppChatNetworking);
-local v3 = require(l_Parent_0.Promise);
-local v4 = require(l_script_FirstAncestor_0.Constants);
-local v5 = require(l_script_FirstAncestor_0.Utils.reportToDiagByCountryCode);
-local v6 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local function _(v7) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), v4 (copy)
-    local v8 = tick() - v7;
-    v5(v4.PerformanceMeasurement.LUA_CHAT_RECEIVE_MESSAGE, "MessageReceivedTime", v8);
-end;
-return function(v10, _, v12) --[[ Line: 22 ]]
-    -- upvalues: v6 (copy), v2 (copy), v5 (copy), v4 (copy), v3 (copy)
-    v6:info("Getting new messages for {}", v10);
-    return function(v13) --[[ Line: 24 ]]
-        -- upvalues: v10 (copy), v2 (ref), v6 (ref), v12 (copy), v5 (ref), v4 (ref), v3 (ref)
-        local v14 = {};
-        local v15 = v13:getState().ChatAppReducer.Conversations[v10];
-        if not v15 then
-            table.insert(v14, v13:dispatch(v2.rodux.GetConversationDetails.API(v10)):catch(function(v16) --[[ Line: 31 ]]
-                -- upvalues: v6 (ref)
-                v6:error((("AppChatNetworking failure in GetConversationDetails: %*"):format((tostring(v16)))));
-            end));
-        end;
-        local v17 = if game:GetFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor") then v15 and v15.previousCursor or nil else nil;
-        table.insert(v14, v13:dispatch(v2.rodux.GetNewerMessages.API(v10, v17)):andThen(function() --[[ Line: 46 ]]
-            -- upvalues: v12 (ref), v5 (ref), v4 (ref)
-            local l_v12_0 = v12;
-            local v19 = tick() - l_v12_0;
-            v5(v4.PerformanceMeasurement.LUA_CHAT_RECEIVE_MESSAGE, "MessageReceivedTime", v19);
-        end):catch(function(v20) --[[ Line: 49 ]]
-            -- upvalues: v6 (ref)
-            v6:error((("AppChatNetworking failure in GetNewerMessages: %*"):format((tostring(v20)))));
-        end));
-        return v3.allSettled(v14);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+
+game:DefineFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor", false)
+
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local Promise = require(AppChatParent.Promise)
+local Constants = require(AppChat.Constants)
+local reportToDiagByCountryCode = require(AppChat.Utils.reportToDiagByCountryCode)
+local v7 = require(AppChat.Logger):new(script.Name)
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+
+return function(s1: string, b1: boolean, n1: number) -- line: 25
+	-- upvalues: v7 (copy), AppChatNetworking (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), reportToDiagByCountryCode (copy), Constants (copy), Promise (copy)
+	v7:info("Getting new messages for {}", s1)
+
+	return function(p1) -- line: 27
+		-- upvalues: s1 (copy), AppChatNetworking (copy), v7 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), b1 (copy), AppChatPerfTracker (copy), n1 (copy), reportToDiagByCountryCode (copy), Constants (copy), Promise (copy)
+		local t1 = {}
+		local v18 = p1:getState().ChatAppReducer.Conversations[s1]
+
+		if not v18 then
+			table.insert(t1, p1:dispatch(AppChatNetworking.rodux.GetConversationDetails.API(s1)):catch(function(p2) -- line: 34
+				-- upvalues: v7 (copy)
+				v7:error(`AppChatNetworking failure in GetConversationDetails: { tostring(p2) }`)
+			end))
+		end
+
+		local v19 = if not game:GetFastFlag("AppChatChannelsGetNewerMessagesWithPrevCursor") then nil else v18 and v18.previousCursor or nil
+		local v20 = FFlagAppChatPerfTracking and (FFlagAppChatMessageTTIMilestones and not b1)
+
+		if v20 then
+			local t2 = {
+				conversationId = s1
+			}
+
+			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, t2)
+			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, AppChatPerfTracker.Milestone.PrimaryDataStarted.Subphase.NetworkFetch, t2)
+			AppChatPerfTracker.trackRequest(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, "GetNewerMessages", t2)
+		end
+
+		table.insert(t1, p1:dispatch(AppChatNetworking.rodux.GetNewerMessages.API(s1, v19)):andThen(function() -- line: 74
+			-- upvalues: n1 (copy), reportToDiagByCountryCode (copy), Constants (copy), v20 (copy), s1 (copy), AppChatPerfTracker (copy)
+			local v23 = n1
+			local v24 = tick() - v23
+
+			reportToDiagByCountryCode(Constants.PerformanceMeasurement.LUA_CHAT_RECEIVE_MESSAGE, "MessageReceivedTime", v24)
+
+			if v20 then
+				local t3 = {
+					conversationId = s1
+				}
+
+				AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, t3)
+				AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageReceiveTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived, t3)
+			end
+		end):catch(function(p3) -- line: 91
+			-- upvalues: v7 (copy)
+			v7:error(`AppChatNetworking failure in GetNewerMessages: { tostring(p3) }`)
+		end))
+
+		return Promise.allSettled(t1)
+	end
+end

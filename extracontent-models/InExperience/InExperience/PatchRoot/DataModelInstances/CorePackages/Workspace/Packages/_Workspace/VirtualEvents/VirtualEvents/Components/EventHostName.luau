@@ -1,54 +1,58 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.UIBlox);
-local _ = require(l_script_FirstAncestor_0.Parent.VirtualEventsState);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_EmojiTextLabel_0 = v2.Core.Text.EmojiTextLabel;
-local l_Emoji_0 = v2.App.Emoji.Enum.Emoji;
-return function(v7) --[[ Line: 19 ]] --[[ Name: EventHostName ]]
-    -- upvalues: l_useStyle_0 (copy), l_Emoji_0 (copy), v1 (copy), l_EmojiTextLabel_0 (copy)
-    local v8 = l_useStyle_0();
-    local v9 = if v7.host.hasVerifiedBadge then l_Emoji_0.Verified else nil;
-    local v10, v11 = v1.useState(0);
-    local v13 = v1.useCallback(function(v12) --[[ Line: 25 ]]
-        -- upvalues: v11 (copy)
-        v11(v12.TextSize);
-    end, {
-        v11
-    });
-    return v1.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        AutomaticSize = Enum.AutomaticSize.XY
-    }, {
-        Layout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, 4), 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        }), 
-        UserImage = v1.createElement("ImageLabel", {
-            LayoutOrder = 1, 
-            BackgroundColor3 = v8.Theme.Badge.Color, 
-            BackgroundTransparency = v8.Theme.Badge.Transparency, 
-            Image = string.format("rbxthumb://type=%s&id=%i&w=150&h=150", v7.host.hostType == "group" and "GroupIcon" or "AvatarHeadShot", v7.host.hostId), 
-            Size = if v7.changeHostImageSize then UDim2.fromOffset(32, 32) else UDim2.fromOffset(v10, v10)
-        }, {
-            Corner = v1.createElement("UICorner", {
-                CornerRadius = UDim.new(1, 0)
-            })
-        }), 
-        EmojiName = v1.createElement(l_EmojiTextLabel_0, {
-            Text = v7.host.hostName, 
-            LayoutOrder = 2, 
-            emoji = v9, 
-            fontStyle = v8.Font.Header2, 
-            colorStyle = v8.Theme.TextEmphasis, 
-            [v1.Change.AbsoluteSize] = v13
-        }), 
-        EmojiToArrowMargin = if v9 then v1.createElement("Frame", {
-            LayoutOrder = 3, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromOffset(v10 - 4, 0)
-        }) else nil
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local React = require(VirtualEvents.Parent.React)
+local UIBlox = require(VirtualEvents.Parent.UIBlox)
+
+require(VirtualEvents.Parent.VirtualEventsState)
+
+local useStyle = UIBlox.Core.Style.useStyle
+local EmojiTextLabel = UIBlox.Core.Text.EmojiTextLabel
+local Emoji = UIBlox.App.Emoji.Enum.Emoji
+
+local function EventHostName(t1: {[any]: any}) -- line: 19
+	-- upvalues: useStyle (copy), Emoji (copy), React (copy), EmojiTextLabel (copy)
+	local v9 = useStyle()
+	local v10 = if not t1.host.hasVerifiedBadge then nil else Emoji.Verified
+	local v11, v12 = React.useState(0)
+	local v13 = React.useCallback(function(p1) -- line: 25
+		-- upvalues: v12 (copy)
+		v12(p1.TextSize)
+	end, { v12 })
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY
+	}, {
+		Layout = React.createElement("UIListLayout", {
+			Padding = UDim.new(0, 4),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		UserImage = React.createElement("ImageLabel", {
+			LayoutOrder = 1,
+			BackgroundColor3 = v9.Theme.Badge.Color,
+			BackgroundTransparency = v9.Theme.Badge.Transparency,
+			Image = string.format("rbxthumb://type=%s&id=%i&w=150&h=150", t1.host.hostType ~= "group" and "AvatarHeadShot" or "GroupIcon", t1.host.hostId),
+			Size = if not t1.changeHostImageSize then UDim2.fromOffset(v11, v11) else UDim2.fromOffset(32, 32)
+		}, {
+			Corner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(1, 0)
+			})
+		}),
+		EmojiName = React.createElement(EmojiTextLabel, {
+			Text = t1.host.hostName,
+			LayoutOrder = 2,
+			emoji = v10,
+			fontStyle = v9.Font.Header2,
+			colorStyle = v9.Theme.TextEmphasis,
+			[React.Change.AbsoluteSize] = v13
+		}),
+		EmojiToArrowMargin = if not v10 then nil else React.createElement("Frame", {
+			LayoutOrder = 3,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(v11 - 4, 0)
+		})
+	})
+end
+
+return EventHostName

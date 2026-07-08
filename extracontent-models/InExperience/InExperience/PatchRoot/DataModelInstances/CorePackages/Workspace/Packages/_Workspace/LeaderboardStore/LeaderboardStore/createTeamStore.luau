@@ -1,180 +1,193 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Signals);
-local l_createSignalMap_0 = require(l_Parent_0.CoreScriptsRoactCommon).Utilities.createSignalMap;
-local _ = require(script.Parent.LeaderboardStoreTypes);
-return function(v4, _) --[[ Line: 40 ]] --[[ Name: createTeamStore ]]
-    -- upvalues: l_createSignalMap_0 (copy), v1 (copy)
-    local v6 = {};
-    local v7 = nil;
-    local v8 = nil;
-    local v9 = nil;
-    local v10 = nil;
-    local v11 = nil;
-    local v12 = nil;
-    local v13 = l_createSignalMap_0();
-    local v14 = l_createSignalMap_0();
-    local v15 = {};
-    if v4 == "Neutral" then
-        local v16, v17 = v1.createSignal("Neutral");
-        v7 = v16;
-        v8 = v17;
-        v16, v17 = v1.createSignal(BrickColor.White().Color);
-        v9 = v16;
-        v10 = v17;
-        v16, v17 = v1.createSignal(1000);
-        v11 = v16;
-        v12 = v17;
-    else
-        local v18, v19 = v1.createSignal(v4.Name);
-        v7 = v18;
-        v8 = v19;
-        v18, v19 = v1.createSignal(v4.TeamColor.Color);
-        v9 = v18;
-        v10 = v19;
-        v18, v19 = v1.createSignal(v4.ChildOrder);
-        v11 = v18;
-        v12 = v19;
-        v6.teamPropChanged = v4.Changed:Connect(function(v20) --[[ Line: 72 ]]
-            -- upvalues: v8 (ref), v4 (copy), v10 (ref), v12 (ref)
-            if v20 == "Name" then
-                v8(v4.Name);
-                return;
-            elseif v20 == "TeamColor" then
-                v10(v4.TeamColor.Color);
-                return;
-            else
-                if v20 == "ChildOrder" then
-                    v12(v4.ChildOrder);
-                end;
-                return;
-            end;
-        end);
-    end;
-    local function v30(v21, v22) --[[ Line: 84 ]] --[[ Name: updateStat ]]
-        -- upvalues: v1 (ref), v14 (copy), v13 (copy), v15 (ref)
-        local v29 = v1.createComputed(function(v23) --[[ Line: 85 ]]
-            -- upvalues: v14 (ref), v22 (copy), v21 (copy)
-            local v24 = nil;
-            local v25 = v14.getAllData(v23);
-            if typeof(v25) == "table" then
-                for v26, _ in pairs(v25) do
-                    local v28 = v22(v26, v21, v23);
-                    if v28 and type(v28) == "number" then
-                        if v24 then
-                            v24 = v24 + v28;
-                        else
-                            v24 = v28;
-                        end;
-                    end;
-                end;
-            end;
-            return v24;
-        end);
-        v13.setData(v21, v29, false);
-        v15[v21] = v22;
-    end;
-    local _ = function() --[[ Line: 108 ]] --[[ Name: updateAllStats ]]
-        -- upvalues: v15 (ref), v1 (ref), v14 (copy), v13 (copy)
-        for v31, v32 in pairs(v15) do
-            local v39 = v1.createComputed(function(v33) --[[ Line: 85 ]]
-                -- upvalues: v14 (ref), v32 (copy), v31 (copy)
-                local v34 = nil;
-                local v35 = v14.getAllData(v33);
-                if typeof(v35) == "table" then
-                    for v36, _ in pairs(v35) do
-                        local v38 = v32(v36, v31, v33);
-                        if v38 and type(v38) == "number" then
-                            if v34 then
-                                v34 = v34 + v38;
-                            else
-                                v34 = v38;
-                            end;
-                        end;
-                    end;
-                end;
-                return v34;
-            end);
-            v13.setData(v31, v39, false);
-            v15[v31] = v32;
-        end;
-    end;
-    local function v42(v41) --[[ Line: 115 ]] --[[ Name: removeStat ]]
-        -- upvalues: v13 (copy), v15 (ref)
-        v13.removeData(v41, false);
-        v15[v41] = nil;
-    end;
-    local function v53(v43) --[[ Line: 122 ]] --[[ Name: addPlayer ]]
-        -- upvalues: v14 (copy), v15 (ref), v1 (ref), v13 (copy)
-        v14.setData(v43, v43.UserId, false);
-        for v44, v45 in pairs(v15) do
-            local v52 = v1.createComputed(function(v46) --[[ Line: 85 ]]
-                -- upvalues: v14 (ref), v45 (copy), v44 (copy)
-                local v47 = nil;
-                local v48 = v14.getAllData(v46);
-                if typeof(v48) == "table" then
-                    for v49, _ in pairs(v48) do
-                        local v51 = v45(v49, v44, v46);
-                        if v51 and type(v51) == "number" then
-                            if v47 then
-                                v47 = v47 + v51;
-                            else
-                                v47 = v51;
-                            end;
-                        end;
-                    end;
-                end;
-                return v47;
-            end);
-            v13.setData(v44, v52, false);
-            v15[v44] = v45;
-        end;
-    end;
-    local function v64(v54) --[[ Line: 128 ]] --[[ Name: removePlayer ]]
-        -- upvalues: v14 (copy), v15 (ref), v1 (ref), v13 (copy)
-        v14.removeData(v54, false);
-        for v55, v56 in pairs(v15) do
-            local v63 = v1.createComputed(function(v57) --[[ Line: 85 ]]
-                -- upvalues: v14 (ref), v56 (copy), v55 (copy)
-                local v58 = nil;
-                local v59 = v14.getAllData(v57);
-                if typeof(v59) == "table" then
-                    for v60, _ in pairs(v59) do
-                        local v62 = v56(v60, v55, v57);
-                        if v62 and type(v62) == "number" then
-                            if v58 then
-                                v58 = v58 + v62;
-                            else
-                                v58 = v62;
-                            end;
-                        end;
-                    end;
-                end;
-                return v58;
-            end);
-            v13.setData(v55, v63, false);
-            v15[v55] = v56;
-        end;
-    end;
-    local function v67() --[[ Line: 134 ]] --[[ Name: destroy ]]
-        -- upvalues: v6 (ref), v15 (ref)
-        for _, v66 in pairs(v6) do
-            if v66.Disconnect then
-                v66:Disconnect();
-            end;
-        end;
-        v6 = {};
-        v15 = {};
-    end;
-    return {
-        getName = v7, 
-        getColor = v9, 
-        getOrder = v11, 
-        getStats = v13, 
-        getPlayers = v14, 
-        updateStat = v30, 
-        removeStat = v42, 
-        addPlayer = v53, 
-        removePlayer = v64, 
-        destroy = v67
-    };
-end;
+local ParentParent = script.Parent.Parent
+local Signals = require(ParentParent.Signals)
+local createSignalMap = require(ParentParent.CoreScriptsRoactCommon).Utilities.createSignalMap
+
+require(script.Parent.LeaderboardStoreTypes)
+
+local function createTeamStore(p1, _) -- line: 40
+	-- upvalues: createSignalMap (copy), Signals (copy)
+	local t1 = {}
+	local v8 = createSignalMap()
+	local v9 = createSignalMap()
+	local t2 = {}
+	local v11, u13, v14, u16, v17, u19
+
+	if p1 == "Neutral" then
+		local v12
+
+		v11, v12 = Signals.createSignal("Neutral")
+		u13 = v12
+
+		local v15
+
+		v14, v15 = Signals.createSignal(BrickColor.White().Color)
+		u16 = v15
+
+		local v18
+
+		v17, v18 = Signals.createSignal(1000)
+		u19 = v18
+	else
+		local v20
+
+		v11, v20 = Signals.createSignal(p1.Name)
+		u13 = v20
+
+		local v21
+
+		v14, v21 = Signals.createSignal(p1.TeamColor.Color)
+		u16 = v21
+
+		local v22
+
+		v17, v22 = Signals.createSignal(p1.ChildOrder)
+		u19 = v22
+		t1.teamPropChanged = p1.Changed:Connect(function(property: string) -- line: 72
+			-- upvalues: u13 (ref), p1 (copy), u16 (ref), u19 (ref)
+			if property == "Name" then
+				u13(p1.Name)
+
+				return
+			end
+
+			if property == "TeamColor" then
+				u16(p1.TeamColor.Color)
+
+				return
+			end
+
+			if property == "ChildOrder" then
+				u19(p1.ChildOrder)
+			end
+		end)
+	end
+
+	local function updateAllStats() -- line: 108
+		-- upvalues: t2 (ref), Signals (copy), v9 (copy), v8 (copy)
+		for k, v in pairs(t2) do
+			local v30 = Signals.createComputed(function(p3) -- line: 85
+				-- upvalues: v9 (copy), v (copy), k (copy)
+				local v49 = nil
+				local v50 = v9.getAllData(p3)
+
+				if typeof(v50) == "table" then
+					for k2, _ in pairs(v50) do
+						local v53 = v(k2, k, p3)
+
+						if v53 and type(v53) == "number" then
+							v49 = if not v49 then v53 else v49 + v53
+						end
+					end
+				end
+
+				return v49
+			end)
+
+			v8.setData(k, v30, false)
+			t2[k] = v
+		end
+	end
+
+	return {
+		getName = v11,
+		getColor = v14,
+		getOrder = v17,
+		getStats = v8,
+		getPlayers = v9,
+		updateStat = function(s1: string, p4: ((...any) -> ...any)) -- line: 84
+			-- upvalues: Signals (copy), v9 (copy), v8 (copy), t2 (ref)
+			local v27 = Signals.createComputed(function(p5) -- line: 85
+				-- upvalues: v9 (copy), p4 (copy), s1 (copy)
+				local v43 = nil
+				local v44 = v9.getAllData(p5)
+
+				if typeof(v44) == "table" then
+					for k, _ in pairs(v44) do
+						local v47 = p4(k, s1, p5)
+
+						if v47 and type(v47) == "number" then
+							v43 = if not v43 then v47 else v43 + v47
+						end
+					end
+				end
+
+				return v43
+			end)
+
+			v8.setData(s1, v27, false)
+			t2[s1] = p4
+		end,
+		removeStat = function(s2: string) -- line: 115
+			-- upvalues: v8 (copy), t2 (ref)
+			v8.removeData(s2, false)
+			t2[s2] = nil
+		end,
+		addPlayer = function(p6) -- line: 122
+			-- upvalues: v9 (copy), t2 (ref), Signals (copy), v8 (copy)
+			v9.setData(p6, p6.UserId, false)
+
+			for k, v in pairs(t2) do
+				local v35 = Signals.createComputed(function(p7) -- line: 85
+					-- upvalues: v9 (copy), v (copy), k (copy)
+					local v55 = nil
+					local v56 = v9.getAllData(p7)
+
+					if typeof(v56) == "table" then
+						for k3, _ in pairs(v56) do
+							local v59 = v(k3, k, p7)
+
+							if v59 and type(v59) == "number" then
+								v55 = if not v55 then v59 else v55 + v59
+							end
+						end
+					end
+
+					return v55
+				end)
+
+				v8.setData(k, v35, false)
+				t2[k] = v
+			end
+		end,
+		removePlayer = function(p8) -- line: 128
+			-- upvalues: v9 (copy), t2 (ref), Signals (copy), v8 (copy)
+			v9.removeData(p8, false)
+
+			for k, v in pairs(t2) do
+				local v39 = Signals.createComputed(function(p9) -- line: 85
+					-- upvalues: v9 (copy), v (copy), k (copy)
+					local v61 = nil
+					local v62 = v9.getAllData(p9)
+
+					if typeof(v62) == "table" then
+						for k4, _ in pairs(v62) do
+							local v65 = v(k4, k, p9)
+
+							if v65 and type(v65) == "number" then
+								v61 = if not v61 then v65 else v61 + v65
+							end
+						end
+					end
+
+					return v61
+				end)
+
+				v8.setData(k, v39, false)
+				t2[k] = v
+			end
+		end,
+		destroy = function() -- line: 134
+			-- upvalues: t1 (ref), t2 (ref)
+			for _, v in pairs(t1) do
+				if v.Disconnect then
+					v:Disconnect()
+				end
+			end
+
+			t1 = {}
+			t2 = {}
+		end
+	}
+end
+
+return createTeamStore

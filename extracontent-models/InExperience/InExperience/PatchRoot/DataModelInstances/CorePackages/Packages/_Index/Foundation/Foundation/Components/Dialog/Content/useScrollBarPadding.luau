@@ -1,15 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Utility.isScrollingFrameOverflowingY);
-return function() --[[ Line: 8 ]] --[[ Name: useScrollBarPadding ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v4, v5 = v2.useState(false);
-    local v6, v7 = v2.useState(0);
-    return v4, v6, (v2.useCallback(function(v8) --[[ Line: 12 ]]
-        -- upvalues: v3 (ref), v5 (copy), v7 (copy)
-        local v9 = v3(v8, 1);
-        v5(v9);
-        v7(if v9 then v8.ScrollBarThickness else 0);
-    end, {}));
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local isScrollingFrameOverflowingY = require(Foundation.Utility.isScrollingFrameOverflowingY)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+
+local function useScrollBarPadding() -- line: 9
+	-- upvalues: React (copy), useTokens (copy), isScrollingFrameOverflowingY (copy)
+	local v7, v8 = React.useState(false)
+	local v9 = useTokens()
+	local v10, v11 = React.useBinding(0)
+
+	return v7, v10, (React.useCallback(function(p1) -- line: 14
+		-- upvalues: isScrollingFrameOverflowingY (copy), v8 (copy), v11 (copy), v9 (copy)
+		local v13 = isScrollingFrameOverflowingY(p1, 1)
+
+		v8(v13)
+		v11(not v13 and 0 or v9.Size.Size_150)
+	end, { v9.Size.Size_150 }))
+end
+
+return useScrollBarPadding

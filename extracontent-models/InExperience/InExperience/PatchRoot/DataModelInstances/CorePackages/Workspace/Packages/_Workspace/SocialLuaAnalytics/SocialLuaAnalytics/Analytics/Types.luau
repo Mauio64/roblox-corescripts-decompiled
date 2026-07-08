@@ -1,6 +1,7 @@
-local _ = require(script.Parent.Enums);
-local _ = require(script.Parent.Enums.Contexts);
-local _ = require(script.Parent.Enums.EventTypes);
-local _ = require(script.Parent.Enums.PlatformSpecificity);
-local _ = require(script.Parent.Enums.SupportedTelemetryBackends);
-return {};
+require(script.Parent.Enums)
+require(script.Parent.Enums.Contexts)
+require(script.Parent.Enums.EventTypes)
+require(script.Parent.Enums.PlatformSpecificity)
+require(script.Parent.Enums.SupportedTelemetryBackends)
+
+return {}

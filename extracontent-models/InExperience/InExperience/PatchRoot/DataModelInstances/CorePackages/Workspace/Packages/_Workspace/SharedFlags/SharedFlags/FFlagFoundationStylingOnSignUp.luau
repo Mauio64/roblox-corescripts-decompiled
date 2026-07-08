@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FoundationStylingOnSignUp3", false);
+return game:DefineFastFlag("FoundationStylingOnSignUp3", false)

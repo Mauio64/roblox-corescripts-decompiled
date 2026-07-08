@@ -1,35 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Linker.Behaviors.useNavigateToWebview);
-local v4 = require(l_script_FirstAncestor_0.Linker.Behaviors.useInvokeLinkingProtocol);
-local v5 = require(l_script_FirstAncestor_0.Linker.Behaviors.useShowErrorToast);
-local v6 = require(l_script_FirstAncestor_0.Enums.LinkBehavior);
-local v7 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(v9) --[[ Line: 18 ]] --[[ Name: useLinkerOnActivated ]]
-    -- upvalues: v3 (copy), v4 (copy), v5 (copy), v6 (copy), v2 (copy), v7 (copy)
-    local v10 = v3();
-    local v11 = v4();
-    local v12 = v5({
-        errorToastTextOverride = v9.errorToastTextOverride
-    });
-    local v13 = {
-        [v6.Webview] = v10, 
-        [v6.LinkingProtocol] = v11, 
-        [v6.ErrorToast] = v12
-    };
-    return (v2.useCallback(function(v14) --[[ Line: 31 ]]
-        -- upvalues: v13 (copy), v7 (ref)
-        local v15 = v13[v14.linkBehavior];
-        if v15 then
-            v15(v14.url);
-            return;
-        else
-            v7:error((("Link activation failed with invalid link behavior: %*. This behavior is either invalid or doesn't support activation."):format(v14.linkBehavior)));
-            return;
-        end;
-    end, {
-        v13
-    }));
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+local InlineRichTextParent = InlineRichText.Parent
+local React = require(InlineRichTextParent.React)
+local useNavigateToWebview = require(InlineRichText.Linker.Behaviors.useNavigateToWebview)
+local useInvokeLinkingProtocol = require(InlineRichText.Linker.Behaviors.useInvokeLinkingProtocol)
+local useShowErrorToast = require(InlineRichText.Linker.Behaviors.useShowErrorToast)
+local LinkBehavior = require(InlineRichText.Enums.LinkBehavior)
+local v8 = require(InlineRichText.Logger):new(script.Name)
+
+require(InlineRichText.Types)
+
+local function useLinkerOnActivated(t1: {[any]: any}) -- line: 18
+	-- upvalues: useNavigateToWebview (copy), useInvokeLinkingProtocol (copy), useShowErrorToast (copy), LinkBehavior (copy), React (copy), v8 (copy)
+	local v11 = useNavigateToWebview()
+	local v12 = useInvokeLinkingProtocol()
+	local v13 = useShowErrorToast({
+		errorToastTextOverride = t1.errorToastTextOverride
+	})
+	local t2 = {
+		[LinkBehavior.Webview] = v11,
+		[LinkBehavior.LinkingProtocol] = v12,
+		[LinkBehavior.ErrorToast] = v13
+	}
+
+	return (React.useCallback(function(p1) -- line: 31
+		-- upvalues: t2 (copy), v8 (copy)
+		local v16 = t2[p1.linkBehavior]
+
+		if v16 then
+			v16(p1.url)
+
+			return
+		end
+
+		v8:error(`Link activation failed with invalid link behavior: { p1.linkBehavior }. This behavior is either invalid or doesn't support activation.`)
+	end, { t2 }))
+end
+
+return useLinkerOnActivated

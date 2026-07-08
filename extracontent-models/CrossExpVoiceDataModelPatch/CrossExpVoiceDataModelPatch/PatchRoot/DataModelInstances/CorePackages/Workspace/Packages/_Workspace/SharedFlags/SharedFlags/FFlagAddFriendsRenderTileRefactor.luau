@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagPPVEnabledOnConsole) and game:DefineFastFlag("AddFriendsRenderTileRefactor_v1", false);
+return require(script.Parent.FFlagPPVEnabledOnConsole) and game:DefineFastFlag("AddFriendsRenderTileRefactor_v1", false)

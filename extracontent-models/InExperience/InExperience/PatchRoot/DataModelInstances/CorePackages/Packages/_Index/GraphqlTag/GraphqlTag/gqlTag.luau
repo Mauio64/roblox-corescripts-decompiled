@@ -1,135 +1,158 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_parse_0 = require(l_Parent_0.GraphQL).parse;
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_Map_0 = v2.Map;
-local l_Set_0 = v2.Set;
-local l_String_0 = v2.String;
-local l_Object_0 = v2.Object;
-local l_Array_0 = v2.Array;
-local l_console_0 = v2.console;
-local v9 = l_Map_0.new(nil);
-local v10 = l_Map_0.new(nil);
-local v11 = true;
-local v12 = false;
-local function v15(v13) --[[ Line: 30 ]] --[[ Name: normalize ]]
-    -- upvalues: l_String_0 (copy)
-    local v14 = v13:gsub(",+%s+", " ");
-    return l_String_0.trim(v14);
-end;
-local function _(v16) --[[ Line: 35 ]] --[[ Name: cacheKeyFromLoc ]]
-    -- upvalues: v15 (copy)
-    return v15(v16.source.body:sub(v16.start, v16._end));
-end;
-local function v27(v18) --[[ Line: 39 ]] --[[ Name: processFragments ]]
-    -- upvalues: l_Set_0 (copy), l_String_0 (copy), v10 (copy), v11 (ref), l_console_0 (copy), l_Object_0 (copy)
-    local v19 = l_Set_0.new(nil);
-    local v20 = {};
-    for v21 = 1, #v18.definitions do
-        local v22 = v18.definitions[v21];
-        if v22.kind == "FragmentDefinition" then
-            local l_value_0 = v22.name.value;
-            local l_loc_0 = v22.loc;
-            local v25 = l_loc_0.source.body:sub(l_loc_0.start, l_loc_0._end):gsub(",+%s+", " ");
-            local v26 = l_String_0.trim(v25);
-            l_loc_0 = v10:get(l_value_0);
-            if l_loc_0 and not l_loc_0:has(v26) then
-                if v11 then
-                    l_console_0.warn("Warning: fragment with name " .. l_value_0 .. " already exists.\n" .. "graphql-tag enforces all fragment names across your application to be unique; read more about\n" .. "this in the docs: http://dev.apollodata.com/core/fragments.html#unique-names");
-                end;
-            elseif not l_loc_0 then
-                l_loc_0 = l_Set_0.new();
-                v10:set(l_value_0, l_loc_0);
-            end;
-            l_loc_0:add(v26);
-            if not v19:has(v26) then
-                v19:add(v26);
-                table.insert(v20, v22);
-            end;
-        else
-            table.insert(v20, v22);
-        end;
-    end;
-    return l_Object_0.assign({}, v18, {
-        definitions = v20
-    });
-end;
-local function v35(v28) --[[ Line: 83 ]] --[[ Name: stripLoc ]]
-    -- upvalues: l_Set_0 (copy), l_Object_0 (copy), l_Array_0 (copy)
-    local v29 = l_Set_0.new(nil);
-    for v30 = 1, #v29 do
-        local v31 = v29[v30];
-        if v31.loc then
-            v29:delete(v31.loc);
-        end;
-        for v32 = 1, #l_Object_0.keys(v31) do
-            local v33 = v31[tostring(l_Object_0.keys(v31)[v32])];
-            if v33 and typeof(v33) == "table" and not l_Array_0.isArray(v33) then
-                v29:add(v33);
-            end;
-        end;
-    end;
-    local l_loc_1 = v28.loc;
-    if l_loc_1 then
-        l_loc_1.startToken = nil;
-        l_loc_1.endToken = nil;
-    end;
-    return v28;
-end;
-local function v39(v36) --[[ Line: 107 ]] --[[ Name: parseDocument ]]
-    -- upvalues: l_String_0 (copy), v9 (copy), l_parse_0 (copy), v12 (ref), v35 (copy), v27 (copy)
-    local v37 = v36:gsub(",+%s+", " ");
-    local v38 = l_String_0.trim(v37);
-    if not v9:has(v38) then
-        v37 = l_parse_0(v36, {
-            experimentalFragmentVariables = v12
-        });
-        if not v37 or v37.kind ~= "Document" then
-            error("Not a valid GraphQL document.");
-        end;
-        v9:set(v38, (v35(v27(v37))));
-    end;
-    return (v9:get(v38));
-end;
-local function v41(v40) --[[ Line: 130 ]] --[[ Name: gql ]]
-    -- upvalues: v39 (copy)
-    if typeof(v40) == "string" then
-        return (v39(v40));
-    elseif typeof(v40) == "table" and v40.kind == "Document" then
-        return v40;
-    else
-        error("graphql-tag-lua does not currently support non-strings or Fragments. Please file an issue or PR if you need this feature added.");
-        return;
-    end;
-end;
-resetCaches = function() --[[ Line: 159 ]] --[[ Name: resetCaches ]]
-    -- upvalues: v9 (copy), v10 (copy)
-    v9:clear();
-    v10:clear();
-end;
-disableFragmentWarnings = function() --[[ Line: 164 ]] --[[ Name: disableFragmentWarnings ]]
-    -- upvalues: v11 (ref)
-    v11 = false;
-end;
-enableExperimentalFragmentVariables = function() --[[ Line: 168 ]] --[[ Name: enableExperimentalFragmentVariables ]]
-    -- upvalues: v12 (ref)
-    v12 = true;
-end;
-disableExperimentalFragmentVariables = function() --[[ Line: 172 ]] --[[ Name: disableExperimentalFragmentVariables ]]
-    -- upvalues: v12 (ref)
-    v12 = false;
-end;
-local v42 = {
-    gql = v41, 
-    resetCaches = resetCaches, 
-    disableFragmentWarnings = disableFragmentWarnings, 
-    enableExperimentalFragmentVariables = enableExperimentalFragmentVariables, 
-    disableExperimentalFragmentVariables = disableExperimentalFragmentVariables
-};
+local ParentParent = script.Parent.Parent
+local parse = require(ParentParent.GraphQL).parse
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Map = LuauPolyfill.Map
+local Set = LuauPolyfill.Set
+local String = LuauPolyfill.String
+local Object = LuauPolyfill.Object
+local Array = LuauPolyfill.Array
+local console = LuauPolyfill.console
+local v10 = Map.new(nil)
+local v11 = Map.new(nil)
+local u12 = true
+local u13 = false
+
+local function normalize(s1: string) -- line: 30
+	-- upvalues: String (copy)
+	local v22 = s1:gsub(",+%s+", " ")
+
+	return String.trim(v22)
+end
+local function cacheKeyFromLoc(t1: {[any]: any}) -- line: 35
+	-- upvalues: normalize (copy)
+	return normalize(t1.source.body:sub(t1.start, t1._end))
+end
+local function processFragments(p1) -- line: 39
+	-- upvalues: Set (copy), String (copy), v11 (copy), u12 (ref), console (copy), Object (copy)
+	local v25 = Set.new(nil)
+	local t2 = {}
+
+	for i = 1, #p1.definitions do
+		local v28 = p1.definitions[i]
+
+		if v28.kind == "FragmentDefinition" then
+			local value = v28.name.value
+			local loc = v28.loc
+			local v31 = loc.source.body:sub(loc.start, loc._end):gsub(",+%s+", " ")
+			local v32 = String.trim(v31)
+			local v33 = v11:get(value)
+
+			if v33 and not v33:has(v32) then
+				if u12 then
+					console.warn("Warning: fragment with name " .. value .. " already exists.\n" .. "graphql-tag enforces all fragment names across your application to be unique; read more about\n" .. "this in the docs: http://dev.apollodata.com/core/fragments.html#unique-names")
+				end
+			elseif not v33 then
+				v33 = Set.new()
+				v11:set(value, v33)
+			end
+
+			v33:add(v32)
+
+			if not v25:has(v32) then
+				v25:add(v32)
+				table.insert(t2, v28)
+			end
+		else
+			table.insert(t2, v28)
+		end
+	end
+
+	return Object.assign({}, p1, {
+		definitions = t2
+	})
+end
+local function stripLoc(p2) -- line: 83
+	-- upvalues: Set (copy), Object (copy), Array (copy)
+	local v35 = Set.new(nil)
+
+	for i = 1, #v35 do
+		local v37 = v35[i]
+
+		if v37.loc then
+			v35:delete(v37.loc)
+		end
+
+		for j = 1, #Object.keys(v37) do
+			local v39 = v37[tostring(Object.keys(v37)[j])]
+
+			if v39 and typeof(v39) == "table" and not Array.isArray(v39) then
+				v35:add(v39)
+			end
+		end
+	end
+
+	local loc = p2.loc
+
+	if loc then
+		loc.startToken = nil
+		loc.endToken = nil
+	end
+
+	return p2
+end
+local function parseDocument(s2: string) -- line: 107
+	-- upvalues: String (copy), v10 (copy), parse (copy), u13 (ref), stripLoc (copy), processFragments (copy)
+	local v42 = s2:gsub(",+%s+", " ")
+	local v43 = String.trim(v42)
+
+	if not v10:has(v43) then
+		local v44 = parse(s2, {
+			experimentalFragmentVariables = u13
+		})
+
+		if not v44 or v44.kind ~= "Document" then
+			error("Not a valid GraphQL document.")
+		end
+
+		v10:set(v43, (stripLoc(processFragments(v44))))
+	end
+
+	return (v10:get(v43))
+end
+local function gql(p3) -- line: 130
+	-- upvalues: parseDocument (copy)
+	if typeof(p3) == "string" then
+		return (parseDocument(p3))
+	end
+
+	if typeof(p3) == "table" and p3.kind == "Document" then
+		return p3
+	end
+
+	error("graphql-tag-lua does not currently support non-strings or Fragments. Please file an issue or PR if you need this feature added.")
+end
+
+function resetCaches() -- line: 159
+	-- upvalues: v10 (copy), v11 (copy)
+	v10:clear()
+	v11:clear()
+end
+function disableFragmentWarnings() -- line: 164
+	-- upvalues: u12 (ref)
+	u12 = false
+end
+function enableExperimentalFragmentVariables() -- line: 168
+	-- upvalues: u13 (ref)
+	u13 = true
+end
+function disableExperimentalFragmentVariables() -- line: 172
+	-- upvalues: u13 (ref)
+	u13 = false
+end
+
+local t3 = {
+	gql = gql,
+	resetCaches = resetCaches,
+	disableFragmentWarnings = disableFragmentWarnings,
+	enableExperimentalFragmentVariables = enableExperimentalFragmentVariables,
+	disableExperimentalFragmentVariables = disableExperimentalFragmentVariables
+}
+
 return {
-    default = v41, 
-    gql = v41, 
-    resetCaches = v42.resetCaches, 
-    disableFragmentWarnings = v42.disableFragmentWarnings, 
-    enableExperimentalFragmentVariables = v42.enableExperimentalFragmentVariables, 
-    disableExperimentalFragmentVariables = v42.disableExperimentalFragmentVariables
-};
+	default = gql,
+	gql = gql,
+	resetCaches = t3.resetCaches,
+	disableFragmentWarnings = t3.disableFragmentWarnings,
+	enableExperimentalFragmentVariables = t3.enableExperimentalFragmentVariables,
+	disableExperimentalFragmentVariables = t3.disableExperimentalFragmentVariables
+}

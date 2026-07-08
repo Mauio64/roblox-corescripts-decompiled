@@ -1,3 +1,3 @@
 return {
-    GroupOSADialog = "GroupOSADialog"
-};
+	GroupOSADialog = "GroupOSADialog"
+}

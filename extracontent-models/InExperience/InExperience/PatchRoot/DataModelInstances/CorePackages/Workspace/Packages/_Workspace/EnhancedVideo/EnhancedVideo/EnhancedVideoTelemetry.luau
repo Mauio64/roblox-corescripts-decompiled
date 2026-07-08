@@ -1,32 +1,31 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local v1 = {
-    "addPlaceId", 
-    "addUniverseId", 
-    "addSessionId", 
-    "addOSInfo", 
-    "addSessionInfo"
-};
-local v2 = {
-    eventName = "ServeEnhancedVideoError", 
-    backends = {
-        "Points"
-    }, 
-    throttlingPercentage = game:DefineFastInt("ServeEnhancedVideoErrorTelemetryThrottleHundredthsPercent", 0), 
-    lastUpdated = {
-        26, 
-        3, 
-        20
-    }, 
-    description = "        This is fired when there is an error calling /serve-enhanced-video.\n    "
-};
+local TelemetryService = game:GetService("TelemetryService")
+local t1 = {
+	"addPlaceId",
+	"addUniverseId",
+	"addSessionId",
+	"addOSInfo",
+	"addSessionInfo"
+}
+local t2 = {
+	eventName = "ServeEnhancedVideoError",
+	description = "        This is fired when there is an error calling /serve-enhanced-video.\n    ",
+	backends = { "Points" },
+	throttlingPercentage = game:DefineFastInt("ServeEnhancedVideoErrorTelemetryThrottleHundredthsPercent", 0),
+	lastUpdated = {
+		26,
+		3,
+		20
+	}
+}
+
 return {
-    logServeEnhancedVideoError = function(v3) --[[ Line: 19 ]] --[[ Name: logServeEnhancedVideoError ]]
-        -- upvalues: l_TelemetryService_0 (copy), v2 (copy), v1 (copy)
-        l_TelemetryService_0:LogEvent(v2, {
-            standardizedFields = v1, 
-            customFields = {
-                error = v3
-            }
-        });
-    end
-};
+	logServeEnhancedVideoError = function(s1: string) -- line: 19
+		-- upvalues: TelemetryService (copy), t2 (copy), t1 (copy)
+		TelemetryService:LogEvent(t2, {
+			standardizedFields = t1,
+			customFields = {
+				error = s1
+			}
+		})
+	end
+}

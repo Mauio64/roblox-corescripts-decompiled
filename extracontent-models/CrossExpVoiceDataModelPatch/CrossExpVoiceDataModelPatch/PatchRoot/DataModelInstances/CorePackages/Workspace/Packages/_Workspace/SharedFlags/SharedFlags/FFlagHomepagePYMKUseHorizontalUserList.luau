@@ -1,1 +1,1 @@
-return game:DefineFastFlag("HomepagePYMKUseHorizontalUserList_V7", false);
+return game:DefineFastFlag("HomepagePYMKUseHorizontalUserList_V7", false)

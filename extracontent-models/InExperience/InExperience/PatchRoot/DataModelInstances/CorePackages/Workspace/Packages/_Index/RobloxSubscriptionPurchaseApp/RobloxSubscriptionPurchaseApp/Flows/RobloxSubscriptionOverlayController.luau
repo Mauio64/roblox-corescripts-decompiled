@@ -1,83 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_NotificationService_0 = game:GetService("NotificationService");
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_Parent_0.ReactRoblox);
-local v6 = require(l_Parent_0.Style);
-local v7 = require(l_Parent_0.RoactRodux);
-local v8 = require(l_Parent_0.Rodux);
-local l_Localization_0 = require(l_Parent_0.AppLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_ProviderContainer_0 = require(l_Parent_0.RoactUtils).Components.ProviderContainer;
-local v12 = require(l_script_FirstAncestor_0.Components.RobloxSubscriptionContainer);
-local v13 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local l_Constants_0 = v6.Constants;
-local l_UiModeStyleProvider_0 = v6.UiModeStyleProvider;
-local v16 = nil;
-local function v17() --[[ Line: 37 ]] --[[ Name: close ]]
-    -- upvalues: v16 (ref)
-    if v16 then
-        v16();
-        v16 = nil;
-    end;
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local LocalizationService = game:GetService("LocalizationService")
+local React = require(RobloxSubscriptionPurchaseAppParent.React)
+local ReactRoblox = require(RobloxSubscriptionPurchaseAppParent.ReactRoblox)
+local Style = require(RobloxSubscriptionPurchaseAppParent.Style)
+local RoactRodux = require(RobloxSubscriptionPurchaseAppParent.RoactRodux)
+local Rodux = require(RobloxSubscriptionPurchaseAppParent.Rodux)
+local useSelectedTheme = require(RobloxSubscriptionPurchaseAppParent.RoactUtils).Hooks.useSelectedTheme
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local FoundationProvider = require(RobloxSubscriptionPurchaseAppParent.Foundation).FoundationProvider
+local UIBlox = require(RobloxSubscriptionPurchaseAppParent.UIBlox)
+local SelectionCursorProvider = UIBlox.App.SelectionImage.SelectionCursorProvider
+local CursorProvider = UIBlox.App.SelectionCursor.CursorProvider
+local Localization = require(RobloxSubscriptionPurchaseAppParent.AppLocales).Localization
+local LocalizationProvider = require(RobloxSubscriptionPurchaseAppParent.Localization).LocalizationProvider
+local ProviderContainer = require(RobloxSubscriptionPurchaseAppParent.RoactUtils).Components.ProviderContainer
+local RobloxSubscriptionContainer = require(RobloxSubscriptionPurchaseApp.Components.RobloxSubscriptionContainer)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local u20 = nil
+local t1 = { Rodux.thunkMiddleware }
+
+local function close() -- line: 42
+	-- upvalues: u20 (ref)
+	if u20 then
+		u20()
+		u20 = nil
+	end
+end
+local function ThemedOverlay(t2: {[any]: any}) -- line: 49
+	-- upvalues: useSelectedTheme (copy), React (copy), Rodux (copy), t1 (copy), RoactRodux (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), SelectionCursorProvider (copy), CursorProvider (copy), FoundationProvider (copy), ProviderContainer (copy), RobloxSubscriptionContainer (copy)
+	local v25 = useSelectedTheme()
+	local v26 = React.useMemo(function() -- line: 52
+		-- upvalues: Rodux (copy), t1 (copy)
+		return Rodux.Store.new(Rodux.combineReducers({}), nil, t1)
+	end, {})
+	local v27 = React.useMemo(function() -- line: 56
+		-- upvalues: RoactRodux (copy), v26 (copy), StyleProviderWithDefaultTheme (copy), v25 (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), SelectionCursorProvider (copy), CursorProvider (copy)
+		local t3 = {}
+
+		table.insert(t3, {
+			class = RoactRodux.StoreProvider,
+			props = {
+				store = v26
+			}
+		})
+		table.insert(t3, {
+			class = StyleProviderWithDefaultTheme,
+			props = {
+				withUiModeSupport = false,
+				withDarkTheme = v25 ~= "light"
+			}
+		})
+		table.insert(t3, {
+			class = LocalizationProvider,
+			props = {
+				localization = Localization.new(LocalizationService.RobloxLocaleId)
+			}
+		})
+		table.insert(t3, {
+			class = SelectionCursorProvider,
+			props = {}
+		})
+		table.insert(t3, {
+			class = CursorProvider,
+			props = {}
+		})
+
+		return t3
+	end, {
+		v25,
+		v26
+	})
+	local v28 = v25 ~= "light" and "Dark" or "Light"
+
+	return React.createElement(FoundationProvider, {
+		theme = v28
+	}, {
+		Providers = React.createElement(ProviderContainer, {
+			providers = v27
+		}, {
+			Sheet = React.createElement(RobloxSubscriptionContainer, {
+				title = t2.params and t2.params.title or nil,
+				message = t2.params and t2.params.message or nil,
+				onClose = t2.onClose
+			})
+		})
+	})
+end
+
 return {
-    render = function(v18) --[[ Line: 44 ]] --[[ Name: render ]]
-        -- upvalues: v13 (copy), v4 (copy), v12 (copy), v17 (copy), v8 (copy), v7 (copy), l_NotificationService_0 (copy), l_Constants_0 (copy), l_UiModeStyleProvider_0 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), l_ProviderContainer_0 (copy), v5 (copy), v16 (ref)
-        local v19 = v13.get();
-        v19.triggerUnmountUI();
-        local v20 = v4.createElement(v12, {
-            title = v18 and v18.title or nil, 
-            message = v18 and v18.message or nil, 
-            onClose = v17
-        });
-        local v21 = {};
-        local v22 = {
-            v8.thunkMiddleware
-        };
-        local v23 = v8.Store.new(v8.combineReducers({}), nil, v22);
-        table.insert(v21, {
-            class = v7.StoreProvider, 
-            props = {
-                store = v23
-            }
-        });
-        local l_SelectedTheme_0 = l_NotificationService_0.SelectedTheme;
-        local v25 = type(l_SelectedTheme_0) == "string" and string.lower(l_SelectedTheme_0) == "light" and l_Constants_0.ThemeName.Light or l_Constants_0.ThemeName.Dark;
-        table.insert(v21, {
-            class = l_UiModeStyleProvider_0, 
-            props = {
-                style = {
-                    themeName = v25, 
-                    fontName = l_Constants_0.FontName.Gotham
-                }
-            }
-        });
-        table.insert(v21, {
-            class = l_LocalizationProvider_0, 
-            props = {
-                localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-            }
-        });
-        local v26 = v4.createElement(l_ProviderContainer_0, {
-            providers = v21
-        }, {
-            Sheet = v20
-        });
-        local l_Folder_0 = Instance.new("Folder");
-        l_Folder_0.Name = "RobloxSubscriptionPurchaseOverlay";
-        l_Folder_0.Parent = game:GetService("CoreGui");
-        local v28 = v5.createRoot(l_Folder_0);
-        v28:render(v26);
-        local function v29() --[[ Line: 106 ]] --[[ Name: cleanup ]]
-            -- upvalues: v28 (copy), l_Folder_0 (copy)
-            v28:unmount();
-            l_Folder_0:Destroy();
-        end;
-        v16 = v29;
-        v19.setOnUnmountUI(v29);
-        return v29;
-    end, 
-    close = v17
-};
+	render = function(t4: {[any]: any}?) -- line: 94
+		-- upvalues: RobloxSubscriptionStore (copy), ReactRoblox (copy), React (copy), ThemedOverlay (copy), close (copy), u20 (ref)
+		local v30 = RobloxSubscriptionStore.get()
+
+		v30.triggerUnmountUI()
+
+		local Folder = Instance.new("Folder")
+
+		Folder.Name = "RobloxSubscriptionPurchaseOverlay"
+		Folder.Parent = game:GetService("CoreGui")
+
+		local v32 = ReactRoblox.createRoot(Folder)
+
+		v32:render(React.createElement(ThemedOverlay, {
+			params = t4,
+			onClose = close
+		}))
+
+		local function cleanup() -- line: 108
+			-- upvalues: v32 (copy), Folder (copy)
+			v32:unmount()
+			Folder:Destroy()
+		end
+
+		u20 = cleanup
+		v30.setOnUnmountUI(cleanup)
+
+		return cleanup
+	end,
+	close = close
+}

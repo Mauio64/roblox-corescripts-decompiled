@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableChatMilestones", false);
+return game:DefineFastFlag("LuaAppEnableChatMilestones", false)

@@ -1,9 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CommercePurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local _ = require(l_script_FirstAncestor_0.Enums.ErrorCodeEnum);
-return v2.makeActionCreator("CommercePurchaseFailed", function(v4) --[[ Line: 12 ]]
-    return {
-        errorCode = v4
-    };
-end);
+local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
+local CommercePurchaseAppParent = CommercePurchaseApp.Parent
+local Rodux = require(CommercePurchaseAppParent.Rodux)
+
+require(CommercePurchaseApp.Enums.ErrorCodeEnum)
+
+return Rodux.makeActionCreator("CommercePurchaseFailed", function(p1) -- line: 12
+	return {
+		errorCode = p1
+	}
+end)

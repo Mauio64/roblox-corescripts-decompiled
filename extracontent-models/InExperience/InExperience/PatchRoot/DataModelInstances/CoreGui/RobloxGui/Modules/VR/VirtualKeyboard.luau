@@ -1,1360 +1,1584 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RunService_0 = game:GetService("RunService");
-local _ = game:GetService("UserInputService");
-local _ = game:GetService("GuiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local _ = game:GetService("Players");
-local l_SoundService_0 = game:GetService("SoundService");
-local l_TextService_0 = game:GetService("TextService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local v12 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805);
-local v13 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805);
-local v14 = Color3.new(0, 0.6352941176470588, 1);
-local v15 = Color3.new(0, 0.6352941176470588, 1);
-local v16 = Color3.new(1, 1, 1);
-local v17 = l_HttpService_0:JSONDecode("[\n  [\n    {\n      \"a\": 7,\n      \"w\": 0.8\n    },\n    \"*\",\n    \"Q\",\n    \"W\",\n    \"E\",\n    \"R\",\n    \"T\",\n    \"Y\",\n    \"U\",\n    \"I\",\n    \"O\",\n    \"P\",\n    {\n      \"w\": 1.8\n    },\n    \"Delete\"\n  ],\n  [\n    {\n      \"w\": 1.6\n    },\n    \"Caps\",\n    \"A\",\n    \"S\",\n    \"D\",\n    \"F\",\n    \"G\",\n    \"H\",\n    \"J\",\n    \"K\",\n    \"L\",\n    \"?\",\n    {\n      \"h\": 2,\n      \"w2\": 2.4,\n      \"h2\": 1,\n      \"x2\": -1.4,\n      \"y2\": 1\n    },\n    \"Enter\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"Shift\",\n    \"Z\",\n    \"X\",\n    \"C\",\n    \"V\",\n    \"B\",\n    \"N\",\n    \"M\",\n    \".\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"123/sym\",\n    {\n      \"w\": 8\n    },\n    \"\",\n    {\n      \"w\": 2.4\n    },\n    \"<Speaker>\"\n  ]\n]\n");
-local v18 = l_HttpService_0:JSONDecode("[\n  [\n    {\n      \"a\": 7,\n      \"w\": 0.8\n    },\n    \"*\",\n    \"1\",\n    \"2\",\n    \"3\",\n    \"4\",\n    \"5\",\n    \"6\",\n    \"7\",\n    \"8\",\n    \"9\",\n    \"0\",\n    {\n      \"w\": 1.8\n    },\n    \"Delete\"\n  ],\n  [\n    {\n      \"w\": 1.6\n    },\n    \"!\",\n    \"@\",\n    \"#\",\n    \"$\",\n    \"%\",\n    \"^\",\n    \"&\",\n    \"(\",\n    \")\",\n    \"=\",\n    \"?\",\n    {\n      \"h\": 2,\n      \"w2\": 2.4,\n      \"h2\": 1,\n      \"x2\": -1.4,\n      \"y2\": 1\n    },\n    \"Enter\"\n  ],\n  [\n    {\n      \"w\": 1.2\n    },\n    \"/\",\n    \"-\",\n    \"+\",\n    \"_\",\n    \":\",\n    \";\",\n    \"'\",\n    \"\\\"\",\n    \",\",\n    \".\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"abc\",\n    {\n      \"w\": 8\n    },\n    \"\",\n    {\n      \"w\": 2.4\n    },\n    \"<Speaker>\"\n  ]\n]\n");
-local v19 = {};
-for v20, v21 in pairs({
-    "ASR_STATUS_OK", 
-    "ASR_STATUS_CANCELLED", 
-    "ASR_STATUS_UNKNOWN", 
-    "ASR_STATUS_INVALID_ARGUMENTS", 
-    "ASR_STATUS_DEADLINE_EXCEEDED", 
-    "ASR_STATUS_NOT_FOUND", 
-    "ASR_STATUS_ALREADY_EXISTS", 
-    "ASR_STATUS_PERMISSION_DENIED", 
-    "ASR_STATUS_UNAUTHENTICATED", 
-    "ASR_STATUS_RESOURCE_EXHAUSTED", 
-    "ASR_STATUS_FAILED_PRECONDITION", 
-    "ASR_STATUS_ABORTED", 
-    "ASR_STATUS_OUT_OF_RANGE", 
-    "ASR_STATUS_UNIMPLEMENTED", 
-    "ASR_STATUS_INTERNAL", 
-    "ASR_STATUS_UNAVAILABLE", 
-    "ASR_STATUS_DATA_LOSS", 
-    "ASR_STATUS_NOT_ENABLED", 
-    "ASR_STATUS_LOW_CONFIDENCE", 
-    "ASR_STATUS_INVALID_JSON"
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+
+game:GetService("UserInputService")
+game:GetService("GuiService")
+
+local HttpService = game:GetService("HttpService")
+local ContextActionService = game:GetService("ContextActionService")
+
+game:GetService("Players")
+
+local SoundService = game:GetService("SoundService")
+local TextService = game:GetService("TextService")
+local CorePackages = game:GetService("CorePackages")
+
+CoreGui:WaitForChild("RobloxGui")
+
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local color3 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805)
+local color3_2 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805)
+local color3_3 = Color3.new(0, 0.6352941176470588, 1)
+local color3_4 = Color3.new(0, 0.6352941176470588, 1)
+local color3_5 = Color3.new(1, 1, 1)
+local data = HttpService:JSONDecode("[\n  [\n    {\n      \"a\": 7,\n      \"w\": 0.8\n    },\n    \"*\",\n    \"Q\",\n    \"W\",\n    \"E\",\n    \"R\",\n    \"T\",\n    \"Y\",\n    \"U\",\n    \"I\",\n    \"O\",\n    \"P\",\n    {\n      \"w\": 1.8\n    },\n    \"Delete\"\n  ],\n  [\n    {\n      \"w\": 1.6\n    },\n    \"Caps\",\n    \"A\",\n    \"S\",\n    \"D\",\n    \"F\",\n    \"G\",\n    \"H\",\n    \"J\",\n    \"K\",\n    \"L\",\n    \"?\",\n    {\n      \"h\": 2,\n      \"w2\": 2.4,\n      \"h2\": 1,\n      \"x2\": -1.4,\n      \"y2\": 1\n    },\n    \"Enter\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"Shift\",\n    \"Z\",\n    \"X\",\n    \"C\",\n    \"V\",\n    \"B\",\n    \"N\",\n    \"M\",\n    \".\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"123/sym\",\n    {\n      \"w\": 8\n    },\n    \"\",\n    {\n      \"w\": 2.4\n    },\n    \"<Speaker>\"\n  ]\n]\n")
+local data2 = HttpService:JSONDecode("[\n  [\n    {\n      \"a\": 7,\n      \"w\": 0.8\n    },\n    \"*\",\n    \"1\",\n    \"2\",\n    \"3\",\n    \"4\",\n    \"5\",\n    \"6\",\n    \"7\",\n    \"8\",\n    \"9\",\n    \"0\",\n    {\n      \"w\": 1.8\n    },\n    \"Delete\"\n  ],\n  [\n    {\n      \"w\": 1.6\n    },\n    \"!\",\n    \"@\",\n    \"#\",\n    \"$\",\n    \"%\",\n    \"^\",\n    \"&\",\n    \"(\",\n    \")\",\n    \"=\",\n    \"?\",\n    {\n      \"h\": 2,\n      \"w2\": 2.4,\n      \"h2\": 1,\n      \"x2\": -1.4,\n      \"y2\": 1\n    },\n    \"Enter\"\n  ],\n  [\n    {\n      \"w\": 1.2\n    },\n    \"/\",\n    \"-\",\n    \"+\",\n    \"_\",\n    \":\",\n    \";\",\n    \"'\",\n    \"\\\"\",\n    \",\",\n    \".\"\n  ],\n  [\n    {\n      \"w\": 2.2\n    },\n    \"abc\",\n    {\n      \"w\": 8\n    },\n    \"\",\n    {\n      \"w\": 2.4\n    },\n    \"<Speaker>\"\n  ]\n]\n")
+local t1 = {}
+
+for k, v in pairs({
+	"ASR_STATUS_OK",
+	"ASR_STATUS_CANCELLED",
+	"ASR_STATUS_UNKNOWN",
+	"ASR_STATUS_INVALID_ARGUMENTS",
+	"ASR_STATUS_DEADLINE_EXCEEDED",
+	"ASR_STATUS_NOT_FOUND",
+	"ASR_STATUS_ALREADY_EXISTS",
+	"ASR_STATUS_PERMISSION_DENIED",
+	"ASR_STATUS_UNAUTHENTICATED",
+	"ASR_STATUS_RESOURCE_EXHAUSTED",
+	"ASR_STATUS_FAILED_PRECONDITION",
+	"ASR_STATUS_ABORTED",
+	"ASR_STATUS_OUT_OF_RANGE",
+	"ASR_STATUS_UNIMPLEMENTED",
+	"ASR_STATUS_INTERNAL",
+	"ASR_STATUS_UNAVAILABLE",
+	"ASR_STATUS_DATA_LOSS",
+	"ASR_STATUS_NOT_ENABLED",
+	"ASR_STATUS_LOW_CONFIDENCE",
+	"ASR_STATUS_INVALID_JSON"
 }) do
-    v19[v21] = v20 - 1;
-end;
-local function _(v22, v23) --[[ Line: 223 ]] --[[ Name: tokenizeString ]]
-    local v24 = {};
-    for v25 in string.gmatch(v22, "([^" .. v23 .. "]+)") do
-        table.insert(v24, v25);
-    end;
-    return v24;
-end;
-local function _(v27) --[[ Line: 231 ]] --[[ Name: ConvertFontSizeEnumToInt ]]
-    local v28 = string.match(v27.Name, "%d+");
-    return v28 and tostring(v28) or 12;
-end;
-local function _(v30, v31, v32) --[[ Line: 240 ]] --[[ Name: RayPlaneIntersection ]]
-    v31 = v31.unit;
-    v30 = v30.Unit;
-    local v33 = v31:Dot(v30.Direction);
-    if v33 == 0 then
-        return nil;
-    else
-        local v34 = v31:Dot(v32 - v30.Origin) / v33;
-        if v34 < 0 then
-            return nil;
-        else
-            return v30.Origin + v30.Direction * v34;
-        end;
-    end;
-end;
-Clamp = function(v36, v37, v38) --[[ Line: 261 ]] --[[ Name: Clamp ]]
-    return (math.max(v36, (math.min(v37, v38))));
-end;
-local function _(v39, v40, v41) --[[ Line: 266 ]] --[[ Name: PointInGuiObject ]]
-    local l_AbsolutePosition_0 = v39.AbsolutePosition;
-    local v43 = v39.AbsolutePosition + v39.AbsoluteSize;
-    if l_AbsolutePosition_0.X <= v40 and v40 <= v43.X and l_AbsolutePosition_0.Y <= v41 and v41 <= v43.Y then
-        return true;
-    else
-        return false;
-    end;
-end;
-local function v45(v46, v47) --[[ Line: 275 ]] --[[ Name: FindAncestorOfType ]]
-    -- upvalues: v45 (copy)
-    if not v46 then
-        return nil;
-    else
-        local l_Parent_0 = v46.Parent;
-        if l_Parent_0 and l_Parent_0:IsA(v47) then
-            return l_Parent_0;
-        else
-            return v45(l_Parent_0, v47);
-        end;
-    end;
-end;
-local function v56(v49) --[[ Line: 286 ]] --[[ Name: ExtendedInstance ]]
-    local v50 = {};
-    setmetatable(v50, {
-        __index = function(_, v52) --[[ Line: 291 ]] --[[ Name: __index ]]
-            -- upvalues: v49 (copy)
-            return v49[v52];
-        end, 
-        __newindex = function(_, v54, v55) --[[ Line: 295 ]] --[[ Name: __newindex ]]
-            -- upvalues: v49 (copy)
-            v49[v54] = v55;
-        end
-    });
-    return v50;
-end;
-local function v70(v57) --[[ Line: 304 ]] --[[ Name: CreateVRButton ]]
-    -- upvalues: v56 (copy)
-    local v58 = v56(v57);
-    rawset(v58, "OnEnter", function(_) --[[ Line: 307 ]]
+	t1[v] = k - 1
+end
 
-    end);
-    rawset(v58, "OnLeave", function(_) --[[ Line: 309 ]]
+local function tokenizeString(p1, p2) -- line: 223
+	local t2 = {}
 
-    end);
-    rawset(v58, "OnDown", function(_) --[[ Line: 311 ]]
+	for match in string.gmatch(p1, "([^" .. p2 .. "]+)") do
+		table.insert(t2, match)
+	end
 
-    end);
-    rawset(v58, "OnUp", function(_) --[[ Line: 313 ]]
+	return t2
+end
+local function ConvertFontSizeEnumToInt(p3) -- line: 231
+	local match = string.match(p3.Name, "%d+")
 
-    end);
-    rawset(v58, "ContainsPoint", function(_, v64, v65) --[[ Line: 315 ]]
-        -- upvalues: v57 (copy)
-        local l_v57_0 = v57;
-        local l_AbsolutePosition_1 = l_v57_0.AbsolutePosition;
-        local v68 = l_v57_0.AbsolutePosition + l_v57_0.AbsoluteSize;
-        if l_AbsolutePosition_1.X <= v64 and v64 <= v68.X and l_AbsolutePosition_1.Y <= v65 and v65 <= v68.Y then
-            return true;
-        else
-            return false;
-        end;
-    end);
-    rawset(v58, "Update", function(_) --[[ Line: 318 ]]
+	return match and tostring(match) or 12
+end
+local function RayPlaneIntersection(p4, p5, p6) -- line: 240
+	local unit = p5.unit
+	local Unit = p4.Unit
+	local v51 = unit:Dot(Unit.Direction)
 
-    end);
-    return v58;
-end;
-local _ = l_Create_0("ImageLabel")({
-    Name = "SelectionRing", 
-    Size = UDim2.new(1, -6, 1, -6), 
-    Position = UDim2.new(0, 4, 0, 3), 
-    Image = "rbxasset://textures/ui/menu/buttonHover.png", 
-    ScaleType = Enum.ScaleType.Slice, 
-    SliceCenter = Rect.new(47, 47, 47, 47), 
-    BackgroundTransparency = 1
-});
-local v72 = {
-    ["<Speaker>"] = {
-        Asset = "rbxasset://textures/ui/Keyboard/mic_icon.png", 
-        AspectRatio = 0.615
-    }
-};
-local function v123(v73, v74, v75) --[[ Line: 340 ]] --[[ Name: CreateKeyboardKey ]]
-    -- upvalues: l_Create_0 (copy), v16 (copy), v12 (copy), v70 (copy), v72 (copy), v14 (copy), v13 (copy), v15 (copy)
-    local v76 = v74.width2 and v74.height2 and v74.x2 and v74.y2;
-    local v77 = l_Create_0("ImageButton")({
-        Name = v75[1], 
-        Position = UDim2.new(v74.x, 0, v74.y, 0), 
-        Size = UDim2.new(v74.width, 0, v74.height, 0), 
-        BorderSizePixel = 0, 
-        Image = "", 
-        BackgroundTransparency = 1, 
-        ZIndex = 1
-    });
-    local v78 = l_Create_0("TextLabel")({
-        Name = "KeyText", 
-        Text = v75[#v75], 
-        Position = UDim2.new(0, -10, 0, -10), 
-        Size = UDim2.new(1, 0, 1, 0), 
-        Font = Enum.Font.SourceSansBold, 
-        FontSize = Enum.FontSize.Size96, 
-        TextColor3 = v16, 
-        BackgroundTransparency = 1, 
-        Selectable = true, 
-        ZIndex = 2, 
-        Parent = v77
-    });
-    local v79 = l_Create_0("Frame")({
-        Name = "KeyBackground", 
-        Size = UDim2.new(1, -10, 1, -10), 
-        Position = UDim2.new(0, -5, 0, -5), 
-        BackgroundColor3 = v12, 
-        BackgroundTransparency = 0.3, 
-        BorderSizePixel = 0, 
-        Parent = v77
-    });
-    local v80 = l_Create_0("ImageLabel")({
-        Name = "SelectionObject", 
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png", 
-        ImageTransparency = 0, 
-        ScaleType = Enum.ScaleType.Slice, 
-        SliceCenter = Rect.new(12, 12, 52, 52), 
-        BorderSizePixel = 0
-    });
-    v77.SelectionImageObject = l_Create_0("ImageLabel")({
-        Visible = false
-    });
-    local v81 = nil;
-    local v82 = nil;
-    local v83 = nil;
-    local v84 = nil;
-    if v76 then
-        v81 = l_Create_0("ImageButton")({
-            Name = "KeyBackground", 
-            Position = UDim2.new(v74.x2 / v74.width, -5, v74.y2 / v74.height, -5), 
-            Size = UDim2.new(v74.width2 / v74.width, 0, v74.height2 / v74.height, -10), 
-            BackgroundColor3 = v12, 
-            BackgroundTransparency = 0.3, 
-            BorderSizePixel = 0, 
-            AutoButtonColor = false, 
-            SelectionImageObject = v77.SelectionImageObject, 
-            Parent = v77
-        });
-        if v74.x2 <= 0 then
-            v78.Size = v81.Size - UDim2.new(0, 10, 0, 0);
-            v78.Position = v81.Position;
-            v81.Size = v81.Size - UDim2.new(1, 0, 0, 0);
-        end;
-        v82 = l_Create_0("Frame")({
-            Name = "SpecialSelectionObject", 
-            Size = UDim2.new(1, 0, 0.5, 0), 
-            Position = UDim2.new(0, 0, 0.5, 0), 
-            BackgroundTransparency = 1, 
-            ClipsDescendants = true; 
-            l_Create_0("ImageLabel")({
-                Name = "Borders", 
-                Position = UDim2.new(-1, 0, -1, 0), 
-                Size = UDim2.new(2, 0, 2, 0), 
-                BackgroundTransparency = 1, 
-                Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png", 
-                ImageTransparency = 0, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(12, 12, 52, 52)
-            })
-        });
-        v83 = v82:Clone();
-        v83.Size = UDim2.new(1, 0, 0.5, 5);
-        v83.Position = UDim2.new(0, 0, 0, 0);
-        v83.Borders.Size = UDim2.new(1, 0, 1, 30);
-        v83.Borders.Position = UDim2.new(0, 0, 0, 0);
-        v84 = v82:Clone();
-        v84.Size = UDim2.new(1, 5, 1, 0);
-        v84.Position = UDim2.new(0, 0, 0, 0);
-        v84.Borders.Size = UDim2.new(1, 30, 1, 0);
-        v84.Borders.Position = UDim2.new(0, 0, 0, 0);
-    end;
-    local v85 = v70(v77);
-    local v86 = false;
-    local v87 = false;
-    local v88 = false;
-    if #v75 == 1 then
-        v88 = false;
-        if type(v75[1]) == "string" then
-            v88 = false;
-            if #v75[1] == 1 then
-                v88 = false;
-                if string.byte(v75[1]) >= 65 then
-                    v88 = string.byte(v75[1]) <= 122;
-                end;
-            end;
-        end;
-    end;
-    local v89 = nil;
-    if v75[1] and v72[v75[1]] then
-        v78.Visible = false;
-        v89 = l_Create_0("ImageLabel")({
-            Name = "KeyIcon", 
-            Size = UDim2.new(v72[v75[1]].AspectRatio, -20, 1, -20), 
-            SizeConstraint = Enum.SizeConstraint.RelativeYY, 
-            BackgroundTransparency = 1, 
-            Image = v72[v75[1]].Asset, 
-            Parent = v79
-        });
-        local function v91(v90) --[[ Line: 472 ]] --[[ Name: onChanged ]]
-            -- upvalues: v89 (ref)
-            if v90 == "AbsoluteSize" then
-                v89.Position = UDim2.new(0.5, -v89.AbsoluteSize.X / 2, 0.5, -v89.AbsoluteSize.Y / 2);
-            end;
-        end;
-        v89.Changed:connect(v91);
-        v89.Position = UDim2.new(0.5, -v89.AbsoluteSize.X / 2, 0.5, -v89.AbsoluteSize.Y / 2);
-    end;
-    local function v94() --[[ Line: 481 ]] --[[ Name: onClicked ]]
-        -- upvalues: v85 (copy), v73 (copy), v88 (copy)
-        local v92 = nil;
-        local l_v85_CurrentKeyValue_0 = v85:GetCurrentKeyValue();
-        if l_v85_CurrentKeyValue_0 == "Shift" then
-            v73:SetShift(not v73:GetShift());
-        elseif l_v85_CurrentKeyValue_0 == "Caps" then
-            v73:SetCaps(not v73:GetCaps());
-        elseif l_v85_CurrentKeyValue_0 == "Enter" then
-            v73:SubmitText(true, true);
-        elseif l_v85_CurrentKeyValue_0 == "Delete" then
-            v73:BackspaceAtCursor();
-        elseif l_v85_CurrentKeyValue_0 == "123/sym" then
-            v73:SetCurrentKeyset(2);
-        elseif l_v85_CurrentKeyValue_0 == "abc" then
-            v73:SetCurrentKeyset(1);
-        elseif l_v85_CurrentKeyValue_0 == "<Speaker>" then
-            v73:SetVoiceMode(true);
-        else
-            v92 = l_v85_CurrentKeyValue_0 == "Tab" and "\t" or l_v85_CurrentKeyValue_0;
-        end;
-        if v92 ~= nil then
-            v73:SubmitCharacter(v92, v88);
-        end;
-    end;
-    local function _(v95, v96) --[[ Line: 510 ]] --[[ Name: setKeyColor ]]
-        -- upvalues: v79 (copy), v81 (ref), v76 (copy), v82 (ref), v83 (ref), v84 (ref), v80 (copy)
-        v79.BackgroundColor3 = v95;
-        if v81 then
-            v81.BackgroundColor3 = v95;
-        end;
-        if v76 then
-            v82.Parent = v96 and v79 or nil;
-            v83.Parent = v96 and v79 or nil;
-            v84.Parent = v96 and v81 or nil;
-            return;
-        else
-            v80.Parent = v96 and v79 or nil;
-            return;
-        end;
-    end;
-    local function v105() --[[ Line: 524 ]] --[[ Name: update ]]
-        -- upvalues: v85 (copy), v87 (ref), v14 (ref), v79 (copy), v81 (ref), v76 (copy), v82 (ref), v83 (ref), v84 (ref), v80 (copy), v86 (ref), v13 (ref), v73 (copy), v15 (ref), v12 (ref), v89 (ref), v78 (copy)
-        local l_v85_CurrentKeyValue_1 = v85:GetCurrentKeyValue();
-        if v87 then
-            local l_v14_0 = v14;
-            v79.BackgroundColor3 = l_v14_0;
-            if v81 then
-                v81.BackgroundColor3 = l_v14_0;
-            end;
-            if v76 then
-                v82.Parent = nil;
-                v83.Parent = nil;
-                v84.Parent = nil;
-            else
-                v80.Parent = nil;
-            end;
-        elseif v86 then
-            local l_v13_0 = v13;
-            v79.BackgroundColor3 = l_v13_0;
-            if v81 then
-                v81.BackgroundColor3 = l_v13_0;
-            end;
-            if v76 then
-                v82.Parent = v79 or nil;
-                v83.Parent = v79 or nil;
-                v84.Parent = v81 or nil;
-            else
-                v80.Parent = v79 or nil;
-            end;
-        elseif l_v85_CurrentKeyValue_1 == "Caps" and v73:GetCaps() then
-            local l_v15_0 = v15;
-            v79.BackgroundColor3 = l_v15_0;
-            if v81 then
-                v81.BackgroundColor3 = l_v15_0;
-            end;
-            if v76 then
-                v82.Parent = nil;
-                v83.Parent = nil;
-                v84.Parent = nil;
-            else
-                v80.Parent = nil;
-            end;
-        elseif l_v85_CurrentKeyValue_1 == "Shift" and v73:GetShift() then
-            local l_v15_1 = v15;
-            v79.BackgroundColor3 = l_v15_1;
-            if v81 then
-                v81.BackgroundColor3 = l_v15_1;
-            end;
-            if v76 then
-                v82.Parent = nil;
-                v83.Parent = nil;
-                v84.Parent = nil;
-            else
-                v80.Parent = nil;
-            end;
-        elseif l_v85_CurrentKeyValue_1 == "abc" then
-            local l_v15_2 = v15;
-            v79.BackgroundColor3 = l_v15_2;
-            if v81 then
-                v81.BackgroundColor3 = l_v15_2;
-            end;
-            if v76 then
-                v82.Parent = nil;
-                v83.Parent = nil;
-                v84.Parent = nil;
-            else
-                v80.Parent = nil;
-            end;
-        else
-            local l_v12_0 = v12;
-            v79.BackgroundColor3 = l_v12_0;
-            if v81 then
-                v81.BackgroundColor3 = l_v12_0;
-            end;
-            if v76 then
-                v82.Parent = nil;
-                v83.Parent = nil;
-                v84.Parent = nil;
-            else
-                v80.Parent = nil;
-            end;
-        end;
-        if v89 then
-            v89.ImageTransparency = 0.5;
-        end;
-        v78.Text = v85:GetCurrentKeyValue();
-    end;
-    local v106 = {};
-    rawset(v85, "OnEnter", function(_) --[[ Line: 550 ]]
-        -- upvalues: v86 (ref), v105 (copy)
-        v86 = true;
-        v105();
-    end);
-    rawset(v85, "OnLeave", function(_) --[[ Line: 554 ]]
-        -- upvalues: v106 (copy), v86 (ref), v87 (ref), v105 (copy)
-        if not next(v106) then
-            v86 = false;
-            v87 = false;
-            v105();
-        end;
-    end);
-    rawset(v85, "OnDown", function(_) --[[ Line: 561 ]]
-        -- upvalues: v87 (ref), v105 (copy), v94 (copy)
-        v87 = true;
-        v105();
-        v94();
-    end);
-    rawset(v85, "OnUp", function(_) --[[ Line: 569 ]]
-        -- upvalues: v87 (ref), v105 (copy)
-        v87 = false;
-        v105();
-    end);
-    rawset(v85, "GetCurrentKeyValue", function(_) --[[ Line: 573 ]]
-        -- upvalues: v73 (copy), v88 (copy), v75 (copy)
-        local l_v73_Shift_0 = v73:GetShift();
-        local l_v73_Caps_0 = v73:GetCaps();
-        if v88 then
-            if l_v73_Caps_0 and l_v73_Shift_0 then
-                return string.lower(v75[#v75]);
-            elseif l_v73_Caps_0 or l_v73_Shift_0 then
-                return v75[1];
-            else
-                return string.lower(v75[#v75]);
-            end;
-        elseif l_v73_Shift_0 then
-            return v75[1];
-        else
-            return v75[#v75];
-        end;
-    end);
-    rawset(v85, "ContainsPoint", function(_, v115, v116) --[[ Line: 593 ]]
-        -- upvalues: v79 (copy), v81 (ref)
-        local l_v79_0 = v79;
-        local l_AbsolutePosition_2 = l_v79_0.AbsolutePosition;
-        local v119 = l_v79_0.AbsolutePosition + l_v79_0.AbsoluteSize;
-        local v120 = l_AbsolutePosition_2.X <= v115 and v115 <= v119.X and l_AbsolutePosition_2.Y <= v116 and v116 <= v119.Y;
-        if not v120 then
-            v120 = v81;
-            if v120 then
-                l_v79_0 = v81;
-                l_AbsolutePosition_2 = l_v79_0.AbsolutePosition;
-                v119 = l_v79_0.AbsolutePosition + l_v79_0.AbsoluteSize;
-                if l_AbsolutePosition_2.X <= v115 and v115 <= v119.X and l_AbsolutePosition_2.Y <= v116 and v116 <= v119.Y then
-                    return true;
-                else
-                    v120 = false;
-                end;
-            end;
-        end;
-        return v120;
-    end);
-    rawset(v85, "Update", function(_) --[[ Line: 597 ]]
-        -- upvalues: v105 (copy)
-        v105();
-    end);
-    rawset(v85, "GetInstance", function(_) --[[ Line: 600 ]]
-        -- upvalues: v77 (copy)
-        return v77;
-    end);
-    v77.MouseButton1Down:connect(function() --[[ Line: 604 ]]
-        -- upvalues: v85 (copy)
-        v85:OnDown();
-    end);
-    v77.MouseButton1Up:connect(function() --[[ Line: 605 ]]
-        -- upvalues: v85 (copy)
-        v85:OnUp();
-    end);
-    v77.SelectionGained:connect(function() --[[ Line: 606 ]]
-        -- upvalues: v106 (copy), v77 (copy), v85 (copy)
-        v106[v77] = true;
-        v85:OnEnter();
-    end);
-    v77.SelectionLost:connect(function() --[[ Line: 607 ]]
-        -- upvalues: v106 (copy), v77 (copy), v85 (copy)
-        v106[v77] = nil;
-        v85:OnLeave();
-    end);
-    if v81 then
-        v81.MouseButton1Down:connect(function() --[[ Line: 613 ]]
-            -- upvalues: v85 (copy)
-            v85:OnDown();
-        end);
-        v81.MouseButton1Up:connect(function() --[[ Line: 614 ]]
-            -- upvalues: v85 (copy)
-            v85:OnUp();
-        end);
-        v81.SelectionGained:connect(function() --[[ Line: 615 ]]
-            -- upvalues: v106 (copy), v81 (ref), v85 (copy)
-            v106[v81] = true;
-            v85:OnEnter();
-        end);
-        v81.SelectionLost:connect(function() --[[ Line: 619 ]]
-            -- upvalues: v106 (copy), v81 (ref), v85 (copy)
-            v106[v81] = nil;
-            v85:OnLeave();
-        end);
-    end;
-    v105();
-    return v85;
-end;
-local function v126() --[[ Line: 630 ]] --[[ Name: CreateBaseVoiceState ]]
-    return {
-        Name = "Base", 
-        TransitionFrom = function(_) --[[ Line: 634 ]] --[[ Name: TransitionFrom ]]
+	if v51 == 0 then
+		return nil
+	end
 
-        end, 
-        TransitionTo = function(_) --[[ Line: 636 ]] --[[ Name: TransitionTo ]]
+	local v52 = unit:Dot(p6 - Unit.Origin) / v51
 
-        end
-    };
-end;
-local _ = function() --[[ Line: 642 ]] --[[ Name: CreateListeningVoiceState ]]
-    -- upvalues: v126 (copy), l_SoundService_0 (copy)
-    local v127 = v126();
-    v127.Name = "Listening";
-    v127.TransitionTo = function(_) --[[ Line: 647 ]] --[[ Name: TransitionTo ]]
-        -- upvalues: l_SoundService_0 (ref)
-        pcall(function() --[[ Line: 648 ]]
-            -- upvalues: l_SoundService_0 (ref)
-            l_SoundService_0:BeginRecording();
-        end);
-    end;
-    return v127;
-end;
-local _ = function() --[[ Line: 654 ]] --[[ Name: CreateProcessingVoiceState ]]
-    -- upvalues: v126 (copy), l_SoundService_0 (copy)
-    local v130 = v126();
-    v130.Name = "Processing";
-    local v131 = false;
-    local v132 = nil;
-    v130.TransitionTo = function(_) --[[ Line: 662 ]] --[[ Name: TransitionTo ]]
-        -- upvalues: v132 (ref), l_SoundService_0 (ref), v131 (ref)
-        coroutine.wrap(function() --[[ Line: 663 ]]
-            -- upvalues: v132 (ref), l_SoundService_0 (ref), v131 (ref)
-            pcall(function() --[[ Line: 664 ]]
-                -- upvalues: v132 (ref), l_SoundService_0 (ref)
-                v132 = l_SoundService_0:EndRecording();
-            end);
-            v131 = true;
-        end)();
-    end;
-    v130.GetResultAsync = function(_) --[[ Line: 669 ]] --[[ Name: GetResultAsync ]]
-        -- upvalues: v131 (ref), v132 (ref)
-        while not v131 do
-            wait();
-        end;
-        return v132;
-    end;
-    return v130;
-end;
-local function _() --[[ Line: 679 ]] --[[ Name: CreateWaitingVoiceState ]]
-    -- upvalues: v126 (copy)
-    local v136 = v126();
-    v136.Name = "Waiting";
-    return v136;
-end;
-local v138 = {
-    Listening = {
-        Processing = true
-    }, 
-    Processing = {
-        Waiting = true
-    }, 
-    Waiting = {
-        Listening = true
-    }
-};
-local v139 = {};
-local v140 = v126();
-v140.Name = "Waiting";
-v139.CurrentState = v140;
-local l_BindableEvent_0 = Instance.new("BindableEvent");
-local l_l_BindableEvent_0_0 = l_BindableEvent_0 --[[ copy: 36 -> 40 ]];
-v139.TransitionState = function(v143, v144) --[[ Line: 695 ]] --[[ Name: TransitionState ]]
-    -- upvalues: v138 (copy), l_l_BindableEvent_0_0 (copy)
-    if v138[v143.CurrentState.Name][v144.Name] then
-        v143.CurrentState:TransitionFrom();
-        v143.CurrentState = v144;
-        v143.CurrentState:TransitionTo();
-        l_l_BindableEvent_0_0:Fire(v143.CurrentState);
-        return true;
-    else
-        return false;
-    end;
-end;
-v139.GetCurrentState = function(v145) --[[ Line: 707 ]] --[[ Name: GetCurrentState ]]
-    return v145.CurrentState;
-end;
-v139.StateTransitionedEvent = l_BindableEvent_0.Event;
-l_BindableEvent_0 = function(v146) --[[ Line: 716 ]] --[[ Name: ConstructKeyboardUI ]]
-    -- upvalues: l_CorePackages_0 (copy), l_Create_0 (copy), v15 (copy), v70 (copy), v12 (copy), v16 (copy), l_RunService_0 (copy), v56 (copy), l_TextService_0 (copy), v139 (copy), v126 (copy), l_SoundService_0 (copy), l_ContextActionService_0 (copy), v123 (copy), v19 (copy)
-    local l_Panel3D_0 = require(l_CorePackages_0.Workspace.Packages.VrCommon).Panel3D;
-    local v148 = l_Panel3D_0.Get("Keyboard");
-    v148:SetVisible(false);
-    local v149 = {};
-    local v150 = l_Create_0("Frame")({
-        Name = "VirtualKeyboard", 
-        Size = UDim2.new(1, 0, 1, 0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        BackgroundTransparency = 1, 
-        Active = true, 
-        Visible = false
-    });
-    local v151 = l_Create_0("ImageLabel")({
-        Name = "TextEntryBackground", 
-        Size = UDim2.new(0.5, 0, 0.125, 0), 
-        Position = UDim2.new(0.25, 0, 0, 0), 
-        Image = "", 
-        BackgroundTransparency = 0.5, 
-        BackgroundColor3 = Color3.new(0.12156862745098039, 0.12156862745098039, 0.12156862745098039), 
-        BorderSizePixel = 0, 
-        ClipsDescendants = true, 
-        Parent = v150
-    });
-    local v152 = l_Create_0("Frame")({
-        Name = "TextfieldBackground", 
-        Position = UDim2.new(0, 2, 0, 2), 
-        Size = UDim2.new(1, -4, 1, -4), 
-        BackgroundTransparency = 0, 
-        BackgroundColor3 = Color3.new(0.8196078431372549, 0.8470588235294118, 0.8666666666666667), 
-        BorderSizePixel = 0, 
-        Visible = true, 
-        Parent = v151
-    });
-    local v153 = l_Create_0("TextButton")({
-        Name = "TextEntryField", 
-        Text = "", 
-        Position = UDim2.new(0, 4, 0, 4), 
-        Size = UDim2.new(1, -8, 1, -8), 
-        Font = Enum.Font.SourceSans, 
-        FontSize = Enum.FontSize.Size60, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        Parent = v152
-    });
-    local v154 = l_Create_0("Frame")({
-        Name = "TextfieldCursor", 
-        Size = UDim2.new(0, 5, 0.9, 0), 
-        Position = UDim2.new(0, 0, 0.05, 0), 
-        BackgroundTransparency = 0, 
-        BackgroundColor3 = v15, 
-        BorderSizePixel = 0, 
-        Visible = true, 
-        ZIndex = 2, 
-        Parent = v153
-    });
-    local v155 = l_Create_0("ImageButton")({
-        Name = "CloseButton", 
-        Size = UDim2.new(0.075, -10, 0.198, -10), 
-        Position = UDim2.new(0, -5, 0, -35), 
-        Image = "rbxasset://textures/ui/Keyboard/close_button_background.png", 
-        BackgroundTransparency = 1, 
-        AutoButtonColor = false, 
-        Parent = v150
-    });
-    v155.SelectionImageObject = l_Create_0("ImageLabel")({
-        Name = "Selection", 
-        Size = UDim2.new(0.9, 0, 0.9, 0), 
-        Position = UDim2.new(0.05, 0, 0.05, 0), 
-        Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png", 
-        BackgroundTransparency = 1
-    });
-    l_Create_0("ImageLabel")({
-        Name = "Icon", 
-        Size = UDim2.new(0.5, 0, 0.5, 0), 
-        Position = UDim2.new(0.25, 0, 0.25, 0), 
-        Image = "rbxasset://textures/ui/Keyboard/close_button_icon.png", 
-        BackgroundTransparency = 1, 
-        Parent = v155
-    });
-    local v156 = v70(v155);
-    table.insert(v149, v156);
-    local v157 = l_Create_0("Frame")({
-        Name = "VoiceRecognitionContainer", 
-        Size = UDim2.new(1, 0, 0.85, 0), 
-        Position = UDim2.new(0, 0, 0.15, 0), 
-        BackgroundTransparency = 1, 
-        Active = true, 
-        Visible = false, 
-        Parent = v150
-    });
-    local v158 = l_Create_0("Frame")({
-        Name = "voiceRecognitionBackground1", 
-        Size = UDim2.new(1, 0, 0.75, 0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        BackgroundColor3 = v12, 
-        BackgroundTransparency = 0.3, 
-        BorderSizePixel = 0, 
-        Active = true, 
-        Parent = v157
-    }):Clone();
-    v158.Size = UDim2.new(0.8, 0, 0.25, 0);
-    v158.Position = UDim2.new(0, 0, 0.75, 0);
-    v158.Parent = v157;
-    local v159 = v70(l_Create_0("TextButton")({
-        Name = "DoneButton", 
-        Size = UDim2.new(0.2, -5, 0.25, -5), 
-        Position = UDim2.new(0.8, 5, 0.75, 5), 
-        Text = "Done", 
-        BackgroundColor3 = v15, 
-        Font = Enum.Font.SourceSansBold, 
-        FontSize = Enum.FontSize.Size96, 
-        TextColor3 = v16, 
-        BackgroundTransparency = 0, 
-        AutoButtonColor = false, 
-        BorderSizePixel = 0, 
-        Parent = v157
-    }));
-    table.insert(v149, v159);
-    v158 = l_Create_0("TextLabel")({
-        Name = "VoiceProcessingStatus", 
-        Size = UDim2.new(0, 0, 0, 0), 
-        Position = UDim2.new(0.5, 0, 0.33, 0), 
-        Text = "", 
-        Font = Enum.Font.SourceSansBold, 
-        FontSize = Enum.FontSize.Size96, 
-        TextColor3 = v16, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        Parent = v157
-    });
-    local v169 = (function() --[[ Line: 873 ]] --[[ Name: CreateVoiceVisualizerWidget ]]
-        -- upvalues: l_Create_0 (ref), v16 (ref), l_RunService_0 (ref)
-        local v160 = {};
-        local v161 = {};
-        local v162 = l_Create_0("Frame")({
-            Name = "VoiceVisualizerContainer", 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        });
-        v160.Container = v162;
-        for v163 = 1, 50 do
-            table.insert(v161, (l_Create_0("Frame")({
-                Name = "Bar", 
-                Size = UDim2.new(0.02, -4, 1, 0), 
-                Position = UDim2.new(v163 / 50, 0, 0, 0), 
-                BackgroundTransparency = 0, 
-                BackgroundColor3 = v16, 
-                Parent = v162
-            })));
-        end;
-        v160.StartAnimation = function(_) --[[ Line: 903 ]] --[[ Name: StartAnimation ]]
-            -- upvalues: l_RunService_0 (ref), v161 (copy)
-            l_RunService_0:UnbindFromRenderStep("VoiceVisualizerWidget");
-            l_RunService_0:BindToRenderStep("VoiceVisualizerWidget", Enum.RenderPriority.First.Value, function() --[[ Line: 906 ]]
-                -- upvalues: v161 (ref)
-                for v165, v166 in pairs(v161) do
-                    local v167 = ((math.abs((math.sin(tick() * 2.5 + v165 * 0.5026548245743669))) + math.abs((math.cos(tick() * 2.5 + v165 * 0.5026548245743669)))) / 2 - 0.3) * 1.4285714285714286;
-                    v166.Size = UDim2.new(0.02, -4, v167, 0);
-                    v166.Position = UDim2.new(v165 / 50, 0, (1 - v167) / 2, 0);
-                end;
-            end);
-        end;
-        v160.StopAnimation = function(_) --[[ Line: 917 ]] --[[ Name: StopAnimation ]]
-            -- upvalues: l_RunService_0 (ref)
-            l_RunService_0:UnbindFromRenderStep("VoiceVisualizerWidget");
-        end;
-        return v160;
-    end)();
-    v169.Container.Parent = v157;
-    v169.Container.Size = UDim2.new(0.5, 0, 0.4, 0);
-    v169.Container.Position = UDim2.new(0.25, 0, 0.4, 0);
-    local v170 = v56(v150);
-    local v171 = nil;
-    local v172 = {};
-    local v173 = false;
-    local v174 = false;
-    local v175 = 0;
-    local l_BindableEvent_1 = Instance.new("BindableEvent");
-    local l_BindableEvent_2 = Instance.new("BindableEvent");
-    local v178 = false;
-    local function v184(v179) --[[ Line: 943 ]] --[[ Name: SetTextFieldCursorPosition ]]
-        -- upvalues: v175 (ref), v153 (copy), l_TextService_0 (ref), v154 (copy)
-        v175 = Clamp(0, #v153.Text, v179);
-        if not v153.TextFits then
-            v175 = #v153.Text;
-        end;
-        local l_l_TextService_0_0 = l_TextService_0;
-        local v181 = string.sub(v153.Text, 1, v175);
-        local l_FontSize_0 = v153.FontSize;
-        local v183 = string.match(l_FontSize_0.Name, "%d+");
-        l_l_TextService_0_0 = l_l_TextService_0_0:GetTextSize(v181, v183 and tostring(v183) or 12, v153.Font, v153.AbsoluteSize);
-        v154.Position = UDim2.new(0, l_l_TextService_0_0.x, v154.Position.Y.Scale, v154.Position.Y.Offset);
-    end;
-    local function _(v185) --[[ Line: 957 ]] --[[ Name: UpdateTextEntryFieldText ]]
-        -- upvalues: v153 (copy), v184 (copy), v175 (ref)
-        v153:SetTextFromInput(v185);
-        v184(v175);
-    end;
-    local v187 = "";
-    local function _() --[[ Line: 963 ]] --[[ Name: getBufferText ]]
-        -- upvalues: v171 (ref), v187 (ref)
-        if v171 and v171.TextBox then
-            return v171.TextBox.Text;
-        else
-            return v187;
-        end;
-    end;
-    local function _(v189) --[[ Line: 969 ]] --[[ Name: setBufferText ]]
-        -- upvalues: v171 (ref), v187 (ref), v153 (copy), v184 (copy), v175 (ref)
-        if v171 and v171.TextBox then
-            v171.TextBox.Text = v189;
-            return;
-        else
-            if v187 ~= v189 then
-                v187 = v189;
-                v153:SetTextFromInput(v187);
-                v184(v175);
-            end;
-            return;
-        end;
-    end;
-    local function v198(v191, v192) --[[ Line: 978 ]] --[[ Name: calculateTextCursorPosition ]]
-        -- upvalues: v153 (copy), l_TextService_0 (ref)
-        v191 = v191 - v153.AbsolutePosition.x;
-        v192 = v192 - v153.AbsolutePosition.y;
-        for v193 = 1, #v153.Text do
-            local l_l_TextService_0_1 = l_TextService_0;
-            local v195 = string.sub(v153.Text, 1, v193);
-            local l_FontSize_1 = v153.FontSize;
-            local v197 = string.match(l_FontSize_1.Name, "%d+");
-            if v191 < l_l_TextService_0_1:GetTextSize(v195, v197 and tostring(v197) or 12, v153.Font, v153.AbsoluteSize).x then
-                return v193 - 1;
-            end;
-        end;
-        return #v153.Text;
-    end;
-    local v199 = nil;
-    rawset(v170, "OpenedEvent", l_BindableEvent_1.Event);
-    rawset(v170, "ClosedEvent", l_BindableEvent_2.Event);
-    rawset(v170, "GetCurrentKeyset", function(_) --[[ Line: 1001 ]]
-        -- upvalues: v172 (copy), v199 (ref)
-        return v172[v199];
-    end);
-    rawset(v170, "SetCurrentKeyset", function(_, v202) --[[ Line: 1005 ]]
-        -- upvalues: v199 (ref), v172 (copy)
-        if v202 ~= v199 and v172[v202] ~= nil then
-            if v172[v199] and v172[v199].container then
-                v172[v199].container.Visible = false;
-            end;
-            v199 = v202;
-            if v172[v199] and v172[v199].container then
-                v172[v199].container.Visible = true;
-            end;
-        end;
-    end);
-    rawset(v170, "SetVoiceMode", function(v203, v204) --[[ Line: 1019 ]]
-        -- upvalues: v157 (copy), v139 (ref), v126 (ref), l_SoundService_0 (ref)
-        v204 = false;
-        local l_v203_CurrentKeyset_0 = v203:GetCurrentKeyset();
-        if l_v203_CurrentKeyset_0 and l_v203_CurrentKeyset_0.container then
-            l_v203_CurrentKeyset_0.container.Visible = not v204;
-        end;
-        v157.Visible = v204;
-        if v204 then
-            local l_v139_0 = v139;
-            local v207 = v126();
-            v207.Name = "Listening";
-            v207.TransitionTo = function(_) --[[ Line: 647 ]] --[[ Name: TransitionTo ]]
-                -- upvalues: l_SoundService_0 (ref)
-                pcall(function() --[[ Line: 648 ]]
-                    -- upvalues: l_SoundService_0 (ref)
-                    l_SoundService_0:BeginRecording();
-                end);
-            end;
-            l_v139_0:TransitionState(v207);
-        end;
-    end);
-    rawset(v170, "GetCaps", function(_) --[[ Line: 1035 ]]
-        -- upvalues: v173 (ref)
-        return v173;
-    end);
-    rawset(v170, "SetCaps", function(v210, v211) --[[ Line: 1039 ]]
-        -- upvalues: v173 (ref)
-        v173 = v211;
-        for _, v213 in pairs(v210:GetCurrentKeyset().keys) do
-            v213:Update();
-        end;
-    end);
-    rawset(v170, "GetShift", function(_) --[[ Line: 1046 ]]
-        -- upvalues: v174 (ref)
-        return v174;
-    end);
-    rawset(v170, "SetShift", function(v215, v216) --[[ Line: 1050 ]]
-        -- upvalues: v174 (ref)
-        v174 = v216;
-        for _, v218 in pairs(v215:GetCurrentKeyset().keys) do
-            v218:Update();
-        end;
-    end);
-    local v219 = false;
-    local v220 = nil;
-    local v221 = nil;
-    local v222 = nil;
-    local function _() --[[ Line: 1063 ]] --[[ Name: disconnectKeyboardEvents ]]
-        -- upvalues: v220 (ref), v221 (ref), v222 (ref)
-        if v220 then
-            v220:disconnect();
-        end;
-        v220 = nil;
-        if v221 then
-            v221:disconnect();
-        end;
-        v221 = nil;
-        if v222 then
-            v222:disconnect();
-        end;
-        v222 = nil;
-    end;
-    rawset(v170, "Open", function(v224, v225) --[[ Line: 1072 ]]
-        -- upvalues: v178 (ref), v171 (ref), v150 (copy), v148 (copy), v220 (ref), v221 (ref), v222 (ref), v153 (copy), v184 (copy), v175 (ref), v219 (ref), v187 (ref), l_Panel3D_0 (copy), l_ContextActionService_0 (ref), v199 (ref), v172 (copy), l_BindableEvent_1 (copy)
-        if v178 then
-            return;
-        else
-            v178 = true;
-            v171 = v225;
-            v224:SetCurrentKeyset(1);
-            v224:SetVoiceMode(false);
-            v150.Visible = true;
-            v148:ResizeStuds(5.9, 2.25, 320);
-            local v226 = CFrame.new();
-            if v220 then
-                v220:disconnect();
-            end;
-            v220 = nil;
-            if v221 then
-                v221:disconnect();
-            end;
-            v221 = nil;
-            if v222 then
-                v222:disconnect();
-            end;
-            v222 = nil;
-            if v225.TextBox then
-                v220 = v225.TextBox.Changed:connect(function(v227) --[[ Line: 1088 ]]
-                    -- upvalues: v225 (copy), v153 (ref), v184 (ref), v175 (ref)
-                    if v227 == "Text" then
-                        local l_Text_0 = v225.TextBox.Text;
-                        v153:SetTextFromInput(l_Text_0);
-                        v184(v175);
-                    end;
-                end);
-                v221 = v225.TextBox.FocusLost:connect(function(v229) --[[ Line: 1093 ]]
-                    -- upvalues: v219 (ref), v224 (copy)
-                    if not v219 then
-                        v224:Close(v229);
-                    end;
-                end);
-                if v225.TextBox.ClearTextOnFocus then
-                    if v171 and v171.TextBox then
-                        v171.TextBox.Text = "";
-                    elseif v187 ~= "" then
-                        v187 = "";
-                        v153:SetTextFromInput(v187);
-                        v184(v175);
-                    end;
-                else
-                    local l_Text_1 = v225.TextBox.Text;
-                    v153:SetTextFromInput(l_Text_1);
-                    v184(v175);
-                end;
-                local v231 = l_Panel3D_0.FindContainerOf(v225.TextBox);
-                if v231 then
-                    v222 = l_Panel3D_0.OnPanelClosed.Event:connect(function(v232) --[[ Line: 1107 ]]
-                        -- upvalues: v231 (copy), v224 (copy)
-                        if v232 == v231.name then
-                            v224:Close(false);
-                        end;
-                    end);
-                    local v233 = v225.TextBox.AbsolutePosition + Vector2.new(0.5, 1) * v225.TextBox.AbsoluteSize;
-                    v226 = v231:GetCFrameInCameraSpace() * CFrame.new(v231:GetGuiPositionInPanelSpace(v233)) * CFrame.new(0, -v148.height * 0.65, 0.5) * CFrame.Angles(-0.39269908169872414, 0, 0);
-                else
-                    v226 = l_Panel3D_0.GetHeadLookXZ(true) * CFrame.Angles(0.39269908169872414, 0, 0) * CFrame.new(0, -1, -5);
-                end;
-            elseif v171 and v171.TextBox then
-                v171.TextBox.Text = "";
-            elseif v187 ~= "" then
-                v187 = "";
-                v153:SetTextFromInput(v187);
-                v184(v175);
-            end;
-            l_ContextActionService_0:BindCoreAction("VirtualKeyboardControllerInput", function(_, v235, v236) --[[ Line: 1125 ]]
-                -- upvalues: v184 (ref), v175 (ref), v224 (copy), v199 (ref), v172 (ref)
-                if v235 == Enum.UserInputState.End then
-                    if v236.KeyCode == Enum.KeyCode.ButtonL1 then
-                        v184(v175 - 1);
-                        return;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonR1 then
-                        v184(v175 + 1);
-                        return;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonX then
-                        v224:BackspaceAtCursor();
-                        return;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonY then
-                        v224:SubmitCharacter(" ", false);
-                        return;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonL2 then
-                        if v199 then
-                            v224:SetCurrentKeyset(v199 % #v172 + 1);
-                            return;
-                        end;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonL3 then
-                        v224:SetCaps(not v224:GetCaps());
-                        return;
-                    elseif v236.KeyCode == Enum.KeyCode.ButtonB then
-                        v224:Close(false);
-                    end;
-                end;
-            end, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1, Enum.KeyCode.ButtonL2, Enum.KeyCode.ButtonL3, Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonB);
-            v224.Parent = v148:GetGUI();
-            v148:SetType(l_Panel3D_0.Type.Fixed, {
-                CFrame = v226
-            });
-            v148:SetCanFade(false);
-            v148:SetVisible(true, true);
-            v148:ForceShowUntilLookedAt();
-            v148.OnUpdate = function(_) --[[ Line: 1157 ]] --[[ Name: OnUpdate ]]
+	if v52 < 0 then
+		return nil
+	end
 
-            end;
-            l_BindableEvent_1:Fire();
-            return;
-        end;
-    end);
-    rawset(v170, "Close", function(v238, v239) --[[ Line: 1163 ]]
-        -- upvalues: v178 (ref), v220 (ref), v221 (ref), v222 (ref), l_ContextActionService_0 (ref), v148 (copy), v150 (copy), l_Panel3D_0 (copy), l_BindableEvent_2 (copy)
-        v239 = v239 == true;
-        if not v178 then
-            return;
-        else
-            v178 = false;
-            if v220 then
-                v220:disconnect();
-            end;
-            v220 = nil;
-            if v221 then
-                v221:disconnect();
-            end;
-            v221 = nil;
-            if v222 then
-                v222:disconnect();
-            end;
-            v222 = nil;
-            l_ContextActionService_0:UnbindCoreAction("VirtualKeyboardControllerInput");
-            v148:OnMouseLeave();
-            v148:SetVisible(false, true);
-            v150.Visible = false;
-            l_Panel3D_0.Get("Topbar3D"):SetVisible(true);
-            v238:SubmitText(v239, false);
-            l_BindableEvent_2:Fire();
-            return;
-        end;
-    end);
-    rawset(v170, "SubmitText", function(_, v241, v242) --[[ Line: 1183 ]]
-        -- upvalues: v171 (ref), v187 (ref), l_Panel3D_0 (copy), v148 (copy), v219 (ref)
-        local v243 = v171 and v171.TextBox;
-        if v243 then
-            if v241 then
-                v243.Text = if v171 and v171.TextBox then v171.TextBox.Text else v187;
-            end;
-            local v244 = l_Panel3D_0.FindContainerOf(v243);
-            local v245 = v242 and v244 and v244.linkedTo == v148;
-            if v245 then
-                v219 = true;
-            end;
-            v243:ReleaseFocus(v241);
-            if v245 then
-                v243:CaptureFocus();
-                v219 = false;
-            end;
-        end;
-    end);
-    rawset(v170, "GetCurrentOptions", function(_) --[[ Line: 1206 ]]
-        -- upvalues: v171 (ref)
-        return v171;
-    end);
-    rawset(v170, "BackspaceAtCursor", function(_) --[[ Line: 1210 ]]
-        -- upvalues: v175 (ref), v171 (ref), v187 (ref), v153 (copy), v184 (copy)
-        if v175 >= 1 then
-            local v248 = if v171 and v171.TextBox then v171.TextBox.Text else v187;
-            local v249 = string.sub(v248, 1, v175 - 1) .. string.sub(v248, v175 + 1, #v248);
-            local v250 = v175 - 1;
-            if v171 and v171.TextBox then
-                v171.TextBox.Text = v249;
-            elseif v187 ~= v249 then
-                v187 = v249;
-                v153:SetTextFromInput(v187);
-                v184(v175);
-            end;
-            v184(v250);
-        end;
-    end);
-    rawset(v170, "SubmitCharacter", function(v251, v252, v253) --[[ Line: 1220 ]]
-        -- upvalues: v171 (ref), v187 (ref), v175 (ref), v153 (copy), v184 (copy)
-        local v254 = if v171 and v171.TextBox then v171.TextBox.Text else v187;
-        local v255 = string.sub(v254, 1, v175) .. v252 .. string.sub(v254, v175 + 1, #v254);
-        if v171 and v171.TextBox then
-            v171.TextBox.Text = v255;
-        elseif v187 ~= v255 then
-            v187 = v255;
-            v153:SetTextFromInput(v187);
-            v184(v175);
-        end;
-        v184(v175 + #v252);
-        if v253 and v251:GetShift() then
-            v251:SetShift(false);
-        end;
-    end);
-    for _, v257 in pairs(v146) do
-        local v258 = {};
-        local v259 = l_Create_0("Frame")({
-            Name = "KeyboardSizeConstrainer", 
-            Size = UDim2.new(1, 0, 1, -20), 
-            Position = UDim2.new(0, 0, 0, 20), 
-            BackgroundTransparency = 1, 
-            Parent = v150
-        });
-        local v260 = 0;
-        local v261 = 0;
-        local v262 = 0;
-        for _, v264 in pairs(v257) do
-            local v265 = 0;
-            local v266 = 1;
-            local v267 = 1;
-            local v268 = nil;
-            local v269 = nil;
-            local v270 = nil;
-            local v271 = nil;
-            for _, v273 in pairs(v264) do
-                if type(v273) == "table" then
-                    if v273.w then
-                        v266 = v273.w;
-                    end;
-                    if v273.h then
-                        v267 = v273.h;
-                    end;
-                    if v273.x then
-                        v265 = v265 + v273.x;
-                    end;
-                    if v273.y then
-                        v262 = v262 + v273.y;
-                    end;
-                    if v273.x2 then
-                        v270 = v273.x2;
-                    end;
-                    if v273.y2 then
-                        v271 = v273.y2;
-                    end;
-                    if v273.w2 then
-                        v268 = v273.w2;
-                    end;
-                    if v273.h2 then
-                        v269 = v273.h2;
-                    end;
-                elseif type(v273) == "string" then
-                    if v273 == "" then
-                        v273 = " ";
-                    end;
-                    local l_v123_0 = v123;
-                    local l_v170_0 = v170;
-                    local v276 = {
-                        x = v265, 
-                        y = v262, 
-                        width = v266, 
-                        height = v267, 
-                        x2 = v270, 
-                        y2 = v271, 
-                        width2 = v268, 
-                        height2 = v269
-                    };
-                    local l_v273_0 = v273;
-                    local v278 = {};
-                    for v279 in string.gmatch(l_v273_0, "([^\n]+)") do
-                        table.insert(v278, v279);
-                    end;
-                    table.insert(v258, (l_v123_0(l_v170_0, v276, v278)));
-                    v265 = v265 + v266;
-                    v260 = math.max(v260, v265);
-                    v261 = math.max(v261, v262 + v267);
-                    v266 = 1;
-                    v267 = 1;
-                    v268 = nil;
-                    v269 = nil;
-                    v270 = nil;
-                    v271 = nil;
-                end;
-            end;
-            v262 = v262 + 1;
-        end;
-        for _, v281 in pairs(v258) do
-            v281.Position = UDim2.new(v281.Position.X.Scale / v260, 0, v281.Position.Y.Scale / v261, 0);
-            v281.Size = UDim2.new(v281.Size.X.Scale / v260, 0, v281.Size.Y.Scale / v261, 0);
-            v281.Parent = v259;
-        end;
-        v259.SizeConstraint = Enum.SizeConstraint.RelativeXX;
-        v259.Size = UDim2.new(1, 0, -v261 / v260, 0);
-        v259.Position = UDim2.new(0, 0, 1, 0);
-        v259.Visible = false;
-        table.insert(v172, {
-            keys = v258, 
-            container = v259
-        });
-    end;
-    v170:SetCurrentKeyset(1);
-    v153.MouseButton1Click:connect(function() --[[ Line: 1301 ]]
-        -- upvalues: v184 (copy), v198 (copy), v148 (copy)
-        v184((v198(v148.lookAtPixel.X, v148.lookAtPixel.Y)));
-    end);
-    v156.MouseButton1Click:connect(function() --[[ Line: 1305 ]]
-        -- upvalues: v170 (copy)
-        v170:Close(false);
-    end);
-    v159.MouseButton1Click:connect(function() --[[ Line: 1309 ]]
-        -- upvalues: v139 (ref), v126 (ref), l_SoundService_0 (ref)
-        if v139:GetCurrentState().Name == "Listening" then
-            local l_v139_1 = v139;
-            local v283 = v126();
-            v283.Name = "Processing";
-            local v284 = false;
-            local v285 = nil;
-            local v286;
-            do
-                local l_v284_0, l_v285_0 = v284, v285;
-                v283.TransitionTo = function(_) --[[ Line: 662 ]] --[[ Name: TransitionTo ]]
-                    -- upvalues: l_v285_0 (ref), l_SoundService_0 (ref), l_v284_0 (ref)
-                    coroutine.wrap(function() --[[ Line: 663 ]]
-                        -- upvalues: l_v285_0 (ref), l_SoundService_0 (ref), l_v284_0 (ref)
-                        pcall(function() --[[ Line: 664 ]]
-                            -- upvalues: l_v285_0 (ref), l_SoundService_0 (ref)
-                            l_v285_0 = l_SoundService_0:EndRecording();
-                        end);
-                        l_v284_0 = true;
-                    end)();
-                end;
-                v283.GetResultAsync = function(_) --[[ Line: 669 ]] --[[ Name: GetResultAsync ]]
-                    -- upvalues: l_v284_0 (ref), l_v285_0 (ref)
-                    while not l_v284_0 do
-                        wait();
-                    end;
-                    return l_v285_0;
-                end;
-                v286 = v283;
-            end;
-            l_v139_1:TransitionState(v286);
-        end;
-    end);
-    local function v296(v291) --[[ Line: 1315 ]] --[[ Name: onVoiceProcessingStateChanged ]]
-        -- upvalues: v158 (copy), v169 (copy), v19 (ref), v171 (ref), v187 (ref), v153 (copy), v184 (copy), v175 (ref), v139 (ref), v126 (ref), v170 (copy)
-        if v291.Name == "Listening" then
-            v158.Text = "Listening...";
-        elseif v291.Name == "Processing" then
-            v158.Text = "Processing...";
-        elseif v291.Name == "Waiting" then
-            v158.Text = "Done";
-        end;
-        if v291.Name == "Processing" then
-            coroutine.wrap(function() --[[ Line: 1326 ]]
-                -- upvalues: v169 (ref), v291 (copy), v19 (ref), v171 (ref), v187 (ref), v153 (ref), v184 (ref), v175 (ref), v158 (ref), v139 (ref), v126 (ref)
-                v169:StopAnimation();
-                local l_v291_ResultAsync_0 = v291:GetResultAsync();
-                if l_v291_ResultAsync_0 and l_v291_ResultAsync_0.Status == v19.ASR_STATUS_OK then
-                    local l_Response_0 = l_v291_ResultAsync_0.Response;
-                    if v171 and v171.TextBox then
-                        v171.TextBox.Text = l_Response_0;
-                    elseif v187 ~= l_Response_0 then
-                        v187 = l_Response_0;
-                        v153:SetTextFromInput(v187);
-                        v184(v175);
-                    end;
-                else
-                    v158.Text = "An error occurred, please try again.";
-                    wait(2);
-                end;
-                local l_v139_2 = v139;
-                local v295 = v126();
-                v295.Name = "Waiting";
-                l_v139_2:TransitionState(v295);
-            end)();
-            return;
-        elseif v291.Name == "Listening" then
-            v169:StartAnimation();
-            return;
-        else
-            if v291.Name == "Waiting" then
-                v170:SetVoiceMode(false);
-            end;
-            return;
-        end;
-    end;
-    v139.StateTransitionedEvent:connect(v296);
-    v296(v139:GetCurrentState());
-    return v170;
-end;
-v140 = nil;
-local function _() --[[ Line: 1352 ]] --[[ Name: GetKeyboard ]]
-    -- upvalues: v140 (ref), l_BindableEvent_0 (copy), v17 (copy), v18 (copy)
-    if v140 == nil then
-        v140 = l_BindableEvent_0({
-            v17, 
-            v18
-        });
-    end;
-    return v140;
-end;
-local v303 = {
-    CreateVirtualKeyboardOptions = function(_, v299) --[[ Line: 1363 ]] --[[ Name: CreateVirtualKeyboardOptions ]]
-        return {
-            TextBox = v299
-        };
-    end, 
-    ShowVirtualKeyboard = function(_, _) --[[ Line: 1372 ]] --[[ Name: ShowVirtualKeyboard ]]
+	return Unit.Origin + Unit.Direction * v52
+end
 
-    end, 
-    CloseVirtualKeyboard = function(_) --[[ Line: 1378 ]] --[[ Name: CloseVirtualKeyboard ]]
+function Clamp(p7, p8, p9) -- line: 261
+	return (math.max(p7, (math.min(p8, p9))))
+end
 
-    end
-};
-if v140 == nil then
-    v140 = l_BindableEvent_0({
-        v17, 
-        v18
-    });
-end;
-v303.OpenedEvent = v140.OpenedEvent;
-if v140 == nil then
-    v140 = l_BindableEvent_0({
-        v17, 
-        v18
-    });
-end;
-v303.ClosedEvent = v140.ClosedEvent;
-return v303;
+local function PointInGuiObject(p10, p11, p12) -- line: 266
+	local AbsolutePosition = p10.AbsolutePosition
+	local v60 = p10.AbsolutePosition + p10.AbsoluteSize
+
+	if p11 >= AbsolutePosition.X and (p11 <= v60.X and p12 >= AbsolutePosition.Y and p12 <= v60.Y) then
+		return true
+	end
+
+	return false
+end
+local function FindAncestorOfType(p13, p14) -- line: 275
+	-- upvalues: FindAncestorOfType (copy)
+	if not p13 then
+		return nil
+	end
+
+	local p13Parent = p13.Parent
+
+	if p13Parent and p13Parent:IsA(p14) then
+		return p13Parent
+	end
+
+	return FindAncestorOfType(p13Parent, p14)
+end
+local function ExtendedInstance(p15) -- line: 286
+	local t3 = {}
+
+	setmetatable(t3, {
+		__index = function(_, p17) -- line: 291
+			-- upvalues: p15 (copy)
+			return p15[p17]
+		end,
+		__newindex = function(_, p19, p20) -- line: 295
+			-- upvalues: p15 (copy)
+			p15[p19] = p20
+		end
+	})
+
+	return t3
+end
+local function CreateVRButton(p21) -- line: 304
+	-- upvalues: ExtendedInstance (copy)
+	local v67 = ExtendedInstance(p21)
+
+	rawset(v67, "OnEnter", function(_) -- line: 307
+	end)
+	rawset(v67, "OnLeave", function(_) -- line: 309
+	end)
+	rawset(v67, "OnDown", function(_) -- line: 311
+	end)
+	rawset(v67, "OnUp", function(_) -- line: 313
+	end)
+	rawset(v67, "ContainsPoint", function(_, p27, p28) -- line: 315
+		-- upvalues: p21 (copy)
+		local v179 = p21
+		local AbsolutePosition = v179.AbsolutePosition
+		local v181 = v179.AbsolutePosition + v179.AbsoluteSize
+
+		if p27 >= AbsolutePosition.X and (p27 <= v181.X and p28 >= AbsolutePosition.Y and p28 <= v181.Y) then
+			return true
+		end
+
+		return false
+	end)
+	rawset(v67, "Update", function(_) -- line: 318
+	end)
+
+	return v67
+end
+
+Create("ImageLabel")({
+	Name = "SelectionRing",
+	Image = "rbxasset://textures/ui/menu/buttonHover.png",
+	BackgroundTransparency = 1,
+	Size = UDim2.new(1, -6, 1, -6),
+	Position = UDim2.new(0, 4, 0, 3),
+	ScaleType = Enum.ScaleType.Slice,
+	SliceCenter = Rect.new(47, 47, 47, 47)
+})
+
+local t4 = {
+	["<Speaker>"] = {
+		Asset = "rbxasset://textures/ui/Keyboard/mic_icon.png",
+		AspectRatio = 0.615
+	}
+}
+
+local function CreateKeyboardKey(p30, p31, p32) -- line: 340
+	-- upvalues: Create (copy), color3_5 (copy), color3 (copy), CreateVRButton (copy), t4 (copy), color3_3 (copy), color3_2 (copy), color3_4 (copy)
+	local v71 = p31.width2 and (p31.height2 and (p31.x2 and p31.y2))
+	local v72 = Create("ImageButton")({
+		BorderSizePixel = 0,
+		Image = "",
+		BackgroundTransparency = 1,
+		ZIndex = 1,
+		Name = p32[1],
+		Position = UDim2.new(p31.x, 0, p31.y, 0),
+		Size = UDim2.new(p31.width, 0, p31.height, 0)
+	})
+	local v73 = Create("TextLabel")({
+		Name = "KeyText",
+		BackgroundTransparency = 1,
+		Selectable = true,
+		ZIndex = 2,
+		Text = p32[#p32],
+		Position = UDim2.new(0, -10, 0, -10),
+		Size = UDim2.new(1, 0, 1, 0),
+		Font = Enum.Font.SourceSansBold,
+		FontSize = Enum.FontSize.Size96,
+		TextColor3 = color3_5,
+		Parent = v72
+	})
+	local v74 = Create("Frame")({
+		Name = "KeyBackground",
+		BackgroundTransparency = 0.3,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, -10, 1, -10),
+		Position = UDim2.new(0, -5, 0, -5),
+		BackgroundColor3 = color3,
+		Parent = v72
+	})
+	local v75 = Create("ImageLabel")({
+		Name = "SelectionObject",
+		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png",
+		ImageTransparency = 0,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 1, 0),
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(12, 12, 52, 52)
+	})
+
+	v72.SelectionImageObject = Create("ImageLabel")({
+		Visible = false
+	})
+
+	local u76 = nil
+	local u77 = nil
+	local clone = nil
+	local clone2 = nil
+
+	if v71 then
+		u76 = Create("ImageButton")({
+			Name = "KeyBackground",
+			BackgroundTransparency = 0.3,
+			BorderSizePixel = 0,
+			AutoButtonColor = false,
+			Position = UDim2.new(p31.x2 / p31.width, -5, p31.y2 / p31.height, -5),
+			Size = UDim2.new(p31.width2 / p31.width, 0, p31.height2 / p31.height, -10),
+			BackgroundColor3 = color3,
+			SelectionImageObject = v72.SelectionImageObject,
+			Parent = v72
+		})
+
+		if p31.x2 <= 0 then
+			v73.Size = u76.Size - UDim2.new(0, 10, 0, 0)
+			v73.Position = u76.Position
+			u76.Size = u76.Size - UDim2.new(1, 0, 0, 0)
+		end
+
+		u77 = Create("Frame")({
+			Name = "SpecialSelectionObject",
+			Size = UDim2.new(1, 0, 0.5, 0),
+			Position = UDim2.new(0, 0, 0.5, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = true,
+			Create("ImageLabel")({
+				Name = "Borders",
+				BackgroundTransparency = 1,
+				Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png",
+				ImageTransparency = 0,
+				Position = UDim2.new(-1, 0, -1, 0),
+				Size = UDim2.new(2, 0, 2, 0),
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(12, 12, 52, 52)
+			})
+		})
+		clone = u77:Clone()
+		clone.Size = UDim2.new(1, 0, 0.5, 5)
+		clone.Position = UDim2.new(0, 0, 0, 0)
+		clone.Borders.Size = UDim2.new(1, 0, 1, 30)
+		clone.Borders.Position = UDim2.new(0, 0, 0, 0)
+		clone2 = u77:Clone()
+		clone2.Size = UDim2.new(1, 5, 1, 0)
+		clone2.Position = UDim2.new(0, 0, 0, 0)
+		clone2.Borders.Size = UDim2.new(1, 30, 1, 0)
+		clone2.Borders.Position = UDim2.new(0, 0, 0, 0)
+	end
+
+	local v80 = CreateVRButton(v72)
+	local u81 = false
+	local u82 = false
+	local v83 = #p32 == 1 and (type(p32[1]) == "string" and (#p32[1] == 1 and (string.byte(p32[1]) >= 65 and string.byte(p32[1]) <= 122)))
+	local u84 = nil
+
+	if p32[1] and t4[p32[1]] then
+		v73.Visible = false
+		u84 = Create("ImageLabel")({
+			Name = "KeyIcon",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(t4[p32[1]].AspectRatio, -20, 1, -20),
+			SizeConstraint = Enum.SizeConstraint.RelativeYY,
+			Image = t4[p32[1]].Asset,
+			Parent = v74
+		})
+
+		local function onChanged(p33) -- line: 472
+			-- upvalues: u84 (ref)
+			if p33 == "AbsoluteSize" then
+				u84.Position = UDim2.new(0.5, -u84.AbsoluteSize.X / 2, 0.5, -u84.AbsoluteSize.Y / 2)
+			end
+		end
+
+		u84.Changed:connect(onChanged)
+		u84.Position = UDim2.new(0.5, -u84.AbsoluteSize.X / 2, 0.5, -u84.AbsoluteSize.Y / 2)
+	end
+
+	local function onClicked() -- line: 481
+		-- upvalues: v80 (copy), p30 (copy), v83 (copy)
+		local v184 = nil
+		local CurrentKeyValue = v80:GetCurrentKeyValue()
+
+		if CurrentKeyValue == "Shift" then
+			p30:SetShift(not p30:GetShift())
+		elseif CurrentKeyValue == "Caps" then
+			p30:SetCaps(not p30:GetCaps())
+		elseif CurrentKeyValue == "Enter" then
+			p30:SubmitText(true, true)
+		elseif CurrentKeyValue == "Delete" then
+			p30:BackspaceAtCursor()
+		elseif CurrentKeyValue == "123/sym" then
+			p30:SetCurrentKeyset(2)
+		elseif CurrentKeyValue == "abc" then
+			p30:SetCurrentKeyset(1)
+		elseif CurrentKeyValue == "<Speaker>" then
+			p30:SetVoiceMode(true)
+		else
+			v184 = if CurrentKeyValue ~= "Tab" then CurrentKeyValue else "\t"
+		end
+
+		if v184 ~= nil then
+			p30:SubmitCharacter(v184, v83)
+		end
+	end
+	local function setKeyColor(p34, p35) -- line: 510
+		-- upvalues: v74 (copy), u76 (ref), v71 (copy), u77 (ref), clone (ref), clone2 (ref), v75 (copy)
+		v74.BackgroundColor3 = p34
+
+		if u76 then
+			u76.BackgroundColor3 = p34
+		end
+
+		if v71 then
+			u77.Parent = p35 and v74 or nil
+			clone.Parent = p35 and v74 or nil
+			clone2.Parent = p35 and u76 or nil
+
+			return
+		end
+
+		v75.Parent = p35 and v74 or nil
+	end
+	local function update() -- line: 524
+		-- upvalues: v80 (copy), u82 (ref), color3_3 (copy), v74 (copy), u76 (ref), v71 (copy), u77 (ref), clone (ref), clone2 (ref), v75 (copy), u81 (ref), color3_2 (copy), p30 (copy), color3_4 (copy), color3 (copy), u84 (ref), v73 (copy)
+		local CurrentKeyValue = v80:GetCurrentKeyValue()
+
+		if u82 then
+			local v189 = color3_3
+
+			v74.BackgroundColor3 = v189
+
+			if u76 then
+				u76.BackgroundColor3 = v189
+			end
+
+			if v71 then
+				u77.Parent = nil
+				clone.Parent = nil
+				clone2.Parent = nil
+			else
+				v75.Parent = nil
+			end
+		elseif u81 then
+			local v190 = color3_2
+
+			v74.BackgroundColor3 = v190
+
+			if u76 then
+				u76.BackgroundColor3 = v190
+			end
+
+			if v71 then
+				u77.Parent = v74 or nil
+				clone.Parent = v74 or nil
+				clone2.Parent = u76 or nil
+			else
+				v75.Parent = v74 or nil
+			end
+		elseif CurrentKeyValue == "Caps" and p30:GetCaps() then
+			local v191 = color3_4
+
+			v74.BackgroundColor3 = v191
+
+			if u76 then
+				u76.BackgroundColor3 = v191
+			end
+
+			if v71 then
+				u77.Parent = nil
+				clone.Parent = nil
+				clone2.Parent = nil
+			else
+				v75.Parent = nil
+			end
+		elseif CurrentKeyValue == "Shift" and p30:GetShift() then
+			local v192 = color3_4
+
+			v74.BackgroundColor3 = v192
+
+			if u76 then
+				u76.BackgroundColor3 = v192
+			end
+
+			if v71 then
+				u77.Parent = nil
+				clone.Parent = nil
+				clone2.Parent = nil
+			else
+				v75.Parent = nil
+			end
+		elseif CurrentKeyValue == "abc" then
+			local v193 = color3_4
+
+			v74.BackgroundColor3 = v193
+
+			if u76 then
+				u76.BackgroundColor3 = v193
+			end
+
+			if v71 then
+				u77.Parent = nil
+				clone.Parent = nil
+				clone2.Parent = nil
+			else
+				v75.Parent = nil
+			end
+		else
+			local v194 = color3
+
+			v74.BackgroundColor3 = v194
+
+			if u76 then
+				u76.BackgroundColor3 = v194
+			end
+
+			if v71 then
+				u77.Parent = nil
+				clone.Parent = nil
+				clone2.Parent = nil
+			else
+				v75.Parent = nil
+			end
+		end
+
+		if u84 then
+			u84.ImageTransparency = 0.5
+		end
+
+		v73.Text = v80:GetCurrentKeyValue()
+	end
+
+	local t5 = {}
+
+	rawset(v80, "OnEnter", function(_) -- line: 550
+		-- upvalues: u81 (ref), update (copy)
+		u81 = true
+		update()
+	end)
+	rawset(v80, "OnLeave", function(_) -- line: 554
+		-- upvalues: t5 (copy), u81 (ref), u82 (ref), update (copy)
+		if not next(t5) then
+			u81 = false
+			u82 = false
+			update()
+		end
+	end)
+	rawset(v80, "OnDown", function(_) -- line: 561
+		-- upvalues: u82 (ref), update (copy), onClicked (copy)
+		u82 = true
+		update()
+		onClicked()
+	end)
+	rawset(v80, "OnUp", function(_) -- line: 569
+		-- upvalues: u82 (ref), update (copy)
+		u82 = false
+		update()
+	end)
+	rawset(v80, "GetCurrentKeyValue", function(_) -- line: 573
+		-- upvalues: p30 (copy), v83 (copy), p32 (copy)
+		local Shift = p30:GetShift()
+		local Caps = p30:GetCaps()
+
+		if v83 then
+			if Caps and Shift then
+				return string.lower(p32[#p32])
+			end
+
+			if Caps or Shift then
+				return p32[1]
+			end
+
+			return string.lower(p32[#p32])
+		end
+
+		if Shift then
+			return p32[1]
+		end
+
+		return p32[#p32]
+	end)
+	rawset(v80, "ContainsPoint", function(_, p42, p43) -- line: 593
+		-- upvalues: v74 (copy), u76 (ref)
+		local v205 = v74
+		local AbsolutePosition = v205.AbsolutePosition
+		local v207 = v205.AbsolutePosition + v205.AbsoluteSize
+		local v208 = p42 >= AbsolutePosition.X and (p42 <= v207.X and (p43 >= AbsolutePosition.Y and p43 <= v207.Y))
+
+		if not v208 then
+			v208 = u76
+
+			if v208 then
+				local v209 = u76
+				local AbsolutePosition2 = v209.AbsolutePosition
+				local v211 = v209.AbsolutePosition + v209.AbsoluteSize
+
+				if p42 >= AbsolutePosition2.X and p42 <= v211.X and p43 >= AbsolutePosition2.Y and p43 <= v211.Y then
+					return true
+				end
+
+				v208 = false
+			end
+		end
+
+		return v208
+	end)
+	rawset(v80, "Update", function(_) -- line: 597
+		-- upvalues: update (copy)
+		update()
+	end)
+	rawset(v80, "GetInstance", function(_) -- line: 600
+		-- upvalues: v72 (copy)
+		return v72
+	end)
+	v72.MouseButton1Down:connect(function() -- line: 604
+		-- upvalues: v80 (copy)
+		v80:OnDown()
+	end)
+	v72.MouseButton1Up:connect(function() -- line: 605
+		-- upvalues: v80 (copy)
+		v80:OnUp()
+	end)
+	v72.SelectionGained:connect(function() -- line: 606
+		-- upvalues: t5 (copy), v72 (copy), v80 (copy)
+		t5[v72] = true
+		v80:OnEnter()
+	end)
+	v72.SelectionLost:connect(function() -- line: 607
+		-- upvalues: t5 (copy), v72 (copy), v80 (copy)
+		t5[v72] = nil
+		v80:OnLeave()
+	end)
+
+	if u76 then
+		u76.MouseButton1Down:connect(function() -- line: 613
+			-- upvalues: v80 (copy)
+			v80:OnDown()
+		end)
+		u76.MouseButton1Up:connect(function() -- line: 614
+			-- upvalues: v80 (copy)
+			v80:OnUp()
+		end)
+		u76.SelectionGained:connect(function() -- line: 615
+			-- upvalues: t5 (copy), u76 (ref), v80 (copy)
+			t5[u76] = true
+			v80:OnEnter()
+		end)
+		u76.SelectionLost:connect(function() -- line: 619
+			-- upvalues: t5 (copy), u76 (ref), v80 (copy)
+			t5[u76] = nil
+			v80:OnLeave()
+		end)
+	end
+
+	update()
+
+	return v80
+end
+local function CreateBaseVoiceState() -- line: 630
+	return {
+		Name = "Base",
+		TransitionFrom = function(_) -- line: 634
+		end,
+		TransitionTo = function(_) -- line: 636
+		end
+	}
+end
+local function CreateListeningVoiceState() -- line: 642
+	-- upvalues: CreateBaseVoiceState (copy), SoundService (copy)
+	local v90 = CreateBaseVoiceState()
+
+	v90.Name = "Listening"
+
+	function v90.TransitionTo(_) -- line: 647
+		-- upvalues: SoundService (copy)
+		pcall(function() -- line: 648
+			-- upvalues: SoundService (copy)
+			SoundService:BeginRecording()
+		end)
+	end
+
+	return v90
+end
+local function CreateProcessingVoiceState() -- line: 654
+	-- upvalues: CreateBaseVoiceState (copy), SoundService (copy)
+	local v91 = CreateBaseVoiceState()
+
+	v91.Name = "Processing"
+
+	local u92 = false
+	local u93 = nil
+
+	function v91.TransitionTo(_) -- line: 662
+		-- upvalues: u93 (ref), SoundService (copy), u92 (ref)
+		coroutine.wrap(function() -- line: 663
+			-- upvalues: u93 (ref), SoundService (copy), u92 (ref)
+			pcall(function() -- line: 664
+				-- upvalues: u93 (ref), SoundService (copy)
+				u93 = SoundService:EndRecording()
+			end)
+			u92 = true
+		end)()
+	end
+	function v91.GetResultAsync(_) -- line: 669
+		-- upvalues: u92 (ref), u93 (ref)
+		while not u92 do
+			wait()
+		end
+
+		return u93
+	end
+
+	return v91
+end
+local function CreateWaitingVoiceState() -- line: 679
+	-- upvalues: CreateBaseVoiceState (copy)
+	local v94 = CreateBaseVoiceState()
+
+	v94.Name = "Waiting"
+
+	return v94
+end
+
+local t6 = {
+	Listening = {
+		Processing = true
+	},
+	Processing = {
+		Waiting = true
+	},
+	Waiting = {
+		Listening = true
+	}
+}
+local t7 = {}
+local v34 = CreateBaseVoiceState()
+
+v34.Name = "Waiting"
+t7.CurrentState = v34
+
+local BindableEvent = Instance.new("BindableEvent")
+
+function t7.TransitionState(p51, p52) -- line: 695
+	-- upvalues: t6 (copy), BindableEvent (copy)
+	if t6[p51.CurrentState.Name][p52.Name] then
+		p51.CurrentState:TransitionFrom()
+		p51.CurrentState = p52
+		p51.CurrentState:TransitionTo()
+		BindableEvent:Fire(p51.CurrentState)
+
+		return true
+	end
+
+	return false
+end
+function t7.GetCurrentState(p53) -- line: 707
+	return p53.CurrentState
+end
+
+t7.StateTransitionedEvent = BindableEvent.Event
+
+local function ConstructKeyboardUI(p54) -- line: 716
+	-- upvalues: CorePackages (copy), Create (copy), color3_4 (copy), CreateVRButton (copy), color3 (copy), color3_5 (copy), RunService (copy), ExtendedInstance (copy), TextService (copy), t7 (copy), CreateBaseVoiceState (copy), SoundService (copy), ContextActionService (copy), CreateKeyboardKey (copy), t1 (copy)
+	local Panel3D = require(CorePackages.Workspace.Packages.VrCommon).Panel3D
+	local v100 = Panel3D.Get("Keyboard")
+
+	v100:SetVisible(false)
+
+	local t8 = {}
+	local v102 = Create("Frame")({
+		Name = "VirtualKeyboard",
+		BackgroundTransparency = 1,
+		Active = true,
+		Visible = false,
+		Size = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(0, 0, 0, 0)
+	})
+	local v103 = Create("ImageLabel")({
+		Name = "TextEntryBackground",
+		Image = "",
+		BackgroundTransparency = 0.5,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		Size = UDim2.new(0.5, 0, 0.125, 0),
+		Position = UDim2.new(0.25, 0, 0, 0),
+		BackgroundColor3 = Color3.new(0.12156862745098039, 0.12156862745098039, 0.12156862745098039),
+		Parent = v102
+	})
+	local v104 = Create("Frame")({
+		Name = "TextfieldBackground",
+		BackgroundTransparency = 0,
+		BorderSizePixel = 0,
+		Visible = true,
+		Position = UDim2.new(0, 2, 0, 2),
+		Size = UDim2.new(1, -4, 1, -4),
+		BackgroundColor3 = Color3.new(0.8196078431372549, 0.8470588235294118, 0.8666666666666667),
+		Parent = v103
+	})
+	local v105 = Create("TextButton")({
+		Name = "TextEntryField",
+		Text = "",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Position = UDim2.new(0, 4, 0, 4),
+		Size = UDim2.new(1, -8, 1, -8),
+		Font = Enum.Font.SourceSans,
+		FontSize = Enum.FontSize.Size60,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = v104
+	})
+	local v106 = Create("Frame")({
+		Name = "TextfieldCursor",
+		BackgroundTransparency = 0,
+		BorderSizePixel = 0,
+		Visible = true,
+		ZIndex = 2,
+		Size = UDim2.new(0, 5, 0.9, 0),
+		Position = UDim2.new(0, 0, 0.05, 0),
+		BackgroundColor3 = color3_4,
+		Parent = v105
+	})
+	local v107 = Create("ImageButton")({
+		Name = "CloseButton",
+		Image = "rbxasset://textures/ui/Keyboard/close_button_background.png",
+		BackgroundTransparency = 1,
+		AutoButtonColor = false,
+		Size = UDim2.new(0.075, -10, 0.198, -10),
+		Position = UDim2.new(0, -5, 0, -35),
+		Parent = v102
+	})
+
+	v107.SelectionImageObject = Create("ImageLabel")({
+		Name = "Selection",
+		Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.9, 0, 0.9, 0),
+		Position = UDim2.new(0.05, 0, 0.05, 0)
+	})
+	Create("ImageLabel")({
+		Name = "Icon",
+		Image = "rbxasset://textures/ui/Keyboard/close_button_icon.png",
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0.5, 0, 0.5, 0),
+		Position = UDim2.new(0.25, 0, 0.25, 0),
+		Parent = v107
+	})
+
+	local v108 = CreateVRButton(v107)
+
+	table.insert(t8, v108)
+
+	local v109 = Create("Frame")({
+		Name = "VoiceRecognitionContainer",
+		BackgroundTransparency = 1,
+		Active = true,
+		Visible = false,
+		Size = UDim2.new(1, 0, 0.85, 0),
+		Position = UDim2.new(0, 0, 0.15, 0),
+		Parent = v102
+	})
+	local clone = Create("Frame")({
+		Name = "voiceRecognitionBackground1",
+		BackgroundTransparency = 0.3,
+		BorderSizePixel = 0,
+		Active = true,
+		Size = UDim2.new(1, 0, 0.75, 0),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundColor3 = color3,
+		Parent = v109
+	}):Clone()
+
+	clone.Size = UDim2.new(0.8, 0, 0.25, 0)
+	clone.Position = UDim2.new(0, 0, 0.75, 0)
+	clone.Parent = v109
+
+	local v111 = CreateVRButton(Create("TextButton")({
+		Name = "DoneButton",
+		Text = "Done",
+		BackgroundTransparency = 0,
+		AutoButtonColor = false,
+		BorderSizePixel = 0,
+		Size = UDim2.new(0.2, -5, 0.25, -5),
+		Position = UDim2.new(0.8, 5, 0.75, 5),
+		BackgroundColor3 = color3_4,
+		Font = Enum.Font.SourceSansBold,
+		FontSize = Enum.FontSize.Size96,
+		TextColor3 = color3_5,
+		Parent = v109
+	}))
+
+	table.insert(t8, v111)
+
+	local v112 = Create("TextLabel")({
+		Name = "VoiceProcessingStatus",
+		Text = "",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, 0, 0, 0),
+		Position = UDim2.new(0.5, 0, 0.33, 0),
+		Font = Enum.Font.SourceSansBold,
+		FontSize = Enum.FontSize.Size96,
+		TextColor3 = color3_5,
+		Parent = v109
+	})
+
+	local function CreateVoiceVisualizerWidget() -- line: 873
+		-- upvalues: Create (copy), color3_5 (copy), RunService (copy)
+		local t9 = {}
+		local t10 = {}
+		local v221 = Create("Frame")({
+			Name = "VoiceVisualizerContainer",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		})
+
+		t9.Container = v221
+
+		for i = 1, 50 do
+			table.insert(t10, (Create("Frame")({
+				Name = "Bar",
+				BackgroundTransparency = 0,
+				Size = UDim2.new(0.02, -4, 1, 0),
+				Position = UDim2.new(i / 50, 0, 0, 0),
+				BackgroundColor3 = color3_5,
+				Parent = v221
+			})))
+		end
+
+		function t9.StartAnimation(_) -- line: 903
+			-- upvalues: RunService (copy), t10 (copy)
+			RunService:UnbindFromRenderStep("VoiceVisualizerWidget")
+			RunService:BindToRenderStep("VoiceVisualizerWidget", Enum.RenderPriority.First.Value, function() -- line: 906
+				-- upvalues: t10 (copy)
+				for k, v in pairs(t10) do
+					local v314 = ((math.abs((math.sin(tick() * 2.5 + k * 0.5026548245743669))) + math.abs((math.cos(tick() * 2.5 + k * 0.5026548245743669)))) / 2 - 0.3) * 1.4285714285714286
+
+					v.Size = UDim2.new(0.02, -4, v314, 0)
+					v.Position = UDim2.new(k / 50, 0, (1 - v314) / 2, 0)
+				end
+			end)
+		end
+		function t9.StopAnimation(_) -- line: 917
+			-- upvalues: RunService (copy)
+			RunService:UnbindFromRenderStep("VoiceVisualizerWidget")
+		end
+
+		return t9
+	end
+
+	local v114 = CreateVoiceVisualizerWidget()
+
+	v114.Container.Parent = v109
+	v114.Container.Size = UDim2.new(0.5, 0, 0.4, 0)
+	v114.Container.Position = UDim2.new(0.25, 0, 0.4, 0)
+
+	local v115 = ExtendedInstance(v102)
+	local u116 = nil
+	local t11 = {}
+	local u118 = false
+	local u119 = false
+	local n1 = 0
+	local BindableEvent2 = Instance.new("BindableEvent")
+	local BindableEvent3 = Instance.new("BindableEvent")
+	local u123 = false
+
+	local function SetTextFieldCursorPosition(p57) -- line: 943
+		-- upvalues: n1 (ref), v105 (copy), TextService (copy), v106 (copy)
+		n1 = Clamp(0, #v105.Text, p57)
+
+		if not v105.TextFits then
+			n1 = #v105.Text
+		end
+
+		local v224 = TextService
+		local v225 = string.sub(v105.Text, 1, n1)
+		local FontSize = v105.FontSize
+		local match = string.match(FontSize.Name, "%d+")
+		local TextSize = v224:GetTextSize(v225, match and tostring(match) or 12, v105.Font, v105.AbsoluteSize)
+
+		v106.Position = UDim2.new(0, TextSize.x, v106.Position.Y.Scale, v106.Position.Y.Offset)
+	end
+	local function UpdateTextEntryFieldText(p58) -- line: 957
+		-- upvalues: v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref)
+		v105:SetTextFromInput(p58)
+		SetTextFieldCursorPosition(n1)
+	end
+
+	local s1 = ""
+
+	local function getBufferText() -- line: 963
+		-- upvalues: u116 (ref), s1 (ref)
+		if u116 and u116.TextBox then
+			return u116.TextBox.Text
+		end
+
+		return s1
+	end
+	local function setBufferText(p59) -- line: 969
+		-- upvalues: u116 (ref), s1 (ref), v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref)
+		if u116 and u116.TextBox then
+			u116.TextBox.Text = p59
+
+			return
+		end
+
+		if p59 ~= s1 then
+			s1 = p59
+
+			local v231 = s1
+
+			v105:SetTextFromInput(v231)
+			SetTextFieldCursorPosition(n1)
+		end
+	end
+	local function calculateTextCursorPosition(p60, p61) -- line: 978
+		-- upvalues: v105 (copy), TextService (copy)
+		local v234 = p60 - v105.AbsolutePosition.x
+		local _ = p61 - v105.AbsolutePosition.y
+
+		for i = 1, #v105.Text do
+			local v237 = TextService
+			local v238 = string.sub(v105.Text, 1, i)
+			local FontSize = v105.FontSize
+			local match = string.match(FontSize.Name, "%d+")
+
+			if v234 < v237:GetTextSize(v238, match and tostring(match) or 12, v105.Font, v105.AbsoluteSize).x then
+				return i - 1
+			end
+		end
+
+		return #v105.Text
+	end
+
+	local u130 = nil
+
+	rawset(v115, "OpenedEvent", BindableEvent2.Event)
+	rawset(v115, "ClosedEvent", BindableEvent3.Event)
+	rawset(v115, "GetCurrentKeyset", function(_) -- line: 1001
+		-- upvalues: t11 (copy), u130 (ref)
+		return t11[u130]
+	end)
+	rawset(v115, "SetCurrentKeyset", function(_, p64) -- line: 1005
+		-- upvalues: u130 (ref), t11 (copy)
+		if p64 ~= u130 and t11[p64] ~= nil then
+			if t11[u130] and t11[u130].container then
+				t11[u130].container.Visible = false
+			end
+
+			u130 = p64
+
+			if t11[u130] and t11[u130].container then
+				t11[u130].container.Visible = true
+			end
+		end
+	end)
+	rawset(v115, "SetVoiceMode", function(p65, _) -- line: 1019
+		-- upvalues: v109 (copy), t7 (copy), CreateBaseVoiceState (copy), SoundService (copy)
+		local v246 = false
+		local CurrentKeyset = p65:GetCurrentKeyset()
+
+		if CurrentKeyset and CurrentKeyset.container then
+			CurrentKeyset.container.Visible = not v246
+		end
+
+		v109.Visible = v246
+
+		if v246 then
+			local v248 = t7
+			local v249 = CreateBaseVoiceState()
+
+			v249.Name = "Listening"
+
+			function v249.TransitionTo(_) -- line: 647
+				-- upvalues: SoundService (copy)
+				pcall(function() -- line: 648
+					-- upvalues: SoundService (copy)
+					SoundService:BeginRecording()
+				end)
+			end
+
+			v248:TransitionState(v249)
+		end
+	end)
+	rawset(v115, "GetCaps", function(_) -- line: 1035
+		-- upvalues: u118 (ref)
+		return u118
+	end)
+	rawset(v115, "SetCaps", function(p69, p70) -- line: 1039
+		-- upvalues: u118 (ref)
+		u118 = p70
+
+		for _, v in pairs(p69:GetCurrentKeyset().keys) do
+			v:Update()
+		end
+	end)
+	rawset(v115, "GetShift", function(_) -- line: 1046
+		-- upvalues: u119 (ref)
+		return u119
+	end)
+	rawset(v115, "SetShift", function(p72, p73) -- line: 1050
+		-- upvalues: u119 (ref)
+		u119 = p73
+
+		for _, v in pairs(p72:GetCurrentKeyset().keys) do
+			v:Update()
+		end
+	end)
+
+	local u131 = false
+	local u132 = nil
+	local u133 = nil
+	local u134 = nil
+
+	local function disconnectKeyboardEvents() -- line: 1063
+		-- upvalues: u132 (ref), u133 (ref), u134 (ref)
+		if u132 then
+			u132:disconnect()
+		end
+
+		u132 = nil
+
+		if u133 then
+			u133:disconnect()
+		end
+
+		u133 = nil
+
+		if u134 then
+			u134:disconnect()
+		end
+
+		u134 = nil
+	end
+
+	rawset(v115, "Open", function(p74, p75) -- line: 1072
+		-- upvalues: u123 (ref), u116 (ref), v102 (copy), v100 (copy), u132 (ref), u133 (ref), u134 (ref), v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref), u131 (ref), s1 (ref), Panel3D (copy), ContextActionService (copy), u130 (ref), t11 (copy), BindableEvent2 (copy)
+		if u123 then
+			return
+		end
+
+		u123 = true
+		u116 = p75
+		p74:SetCurrentKeyset(1)
+		p74:SetVoiceMode(false)
+		v102.Visible = true
+		v100:ResizeStuds(5.9, 2.25, 320)
+
+		local cFrame = CFrame.new()
+
+		if u132 then
+			u132:disconnect()
+		end
+
+		u132 = nil
+
+		if u133 then
+			u133:disconnect()
+		end
+
+		u133 = nil
+
+		if u134 then
+			u134:disconnect()
+		end
+
+		u134 = nil
+
+		if p75.TextBox then
+			u132 = p75.TextBox.Changed:connect(function(p76) -- line: 1088
+				-- upvalues: p75 (copy), v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref)
+				if p76 == "Text" then
+					local TextBoxText = p75.TextBox.Text
+
+					v105:SetTextFromInput(TextBoxText)
+					SetTextFieldCursorPosition(n1)
+				end
+			end)
+			u133 = p75.TextBox.FocusLost:connect(function(p77) -- line: 1093
+				-- upvalues: u131 (ref), p74 (copy)
+				if not u131 then
+					p74:Close(p77)
+				end
+			end)
+
+			if p75.TextBox.ClearTextOnFocus then
+				if u116 and u116.TextBox then
+					u116.TextBox.Text = ""
+				elseif s1 ~= "" then
+					s1 = ""
+
+					local v263 = s1
+
+					v105:SetTextFromInput(v263)
+					SetTextFieldCursorPosition(n1)
+				end
+			else
+				local TextBoxText = p75.TextBox.Text
+
+				v105:SetTextFromInput(TextBoxText)
+				SetTextFieldCursorPosition(n1)
+			end
+
+			local v265 = Panel3D.FindContainerOf(p75.TextBox)
+
+			if v265 then
+				u134 = Panel3D.OnPanelClosed.Event:connect(function(p78) -- line: 1107
+					-- upvalues: v265 (copy), p74 (copy)
+					if p78 == v265.name then
+						p74:Close(false)
+					end
+				end)
+
+				local v266 = p75.TextBox.AbsolutePosition + Vector2.new(0.5, 1) * p75.TextBox.AbsoluteSize
+
+				cFrame = v265:GetCFrameInCameraSpace() * CFrame.new(v265:GetGuiPositionInPanelSpace(v266)) * CFrame.new(0, -v100.height * 0.65, 0.5) * CFrame.Angles(-0.39269908169872414, 0, 0)
+			else
+				cFrame = Panel3D.GetHeadLookXZ(true) * CFrame.Angles(0.39269908169872414, 0, 0) * CFrame.new(0, -1, -5)
+			end
+		elseif u116 and u116.TextBox then
+			u116.TextBox.Text = ""
+		elseif s1 ~= "" then
+			s1 = ""
+
+			local v267 = s1
+
+			v105:SetTextFromInput(v267)
+			SetTextFieldCursorPosition(n1)
+		end
+
+		ContextActionService:BindCoreAction("VirtualKeyboardControllerInput", function(_, p80, p81) -- line: 1125
+			-- upvalues: SetTextFieldCursorPosition (copy), n1 (ref), p74 (copy), u130 (ref), t11 (copy)
+			if p80 == Enum.UserInputState.End then
+				if p81.KeyCode == Enum.KeyCode.ButtonL1 then
+					SetTextFieldCursorPosition(n1 - 1)
+
+					return
+				end
+
+				if p81.KeyCode == Enum.KeyCode.ButtonR1 then
+					SetTextFieldCursorPosition(n1 + 1)
+
+					return
+				end
+
+				if p81.KeyCode == Enum.KeyCode.ButtonX then
+					p74:BackspaceAtCursor()
+
+					return
+				end
+
+				if p81.KeyCode == Enum.KeyCode.ButtonY then
+					p74:SubmitCharacter(" ", false)
+
+					return
+				end
+
+				if p81.KeyCode == Enum.KeyCode.ButtonL2 then
+					if u130 then
+						p74:SetCurrentKeyset(u130 % #t11 + 1)
+
+						return
+					end
+				else
+					if p81.KeyCode == Enum.KeyCode.ButtonL3 then
+						p74:SetCaps(not p74:GetCaps())
+
+						return
+					end
+
+					if p81.KeyCode == Enum.KeyCode.ButtonB then
+						p74:Close(false)
+					end
+				end
+			end
+		end, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1, Enum.KeyCode.ButtonL2, Enum.KeyCode.ButtonL3, Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonB)
+		p74.Parent = v100:GetGUI()
+		v100:SetType(Panel3D.Type.Fixed, {
+			CFrame = cFrame
+		})
+		v100:SetCanFade(false)
+		v100:SetVisible(true, true)
+		v100:ForceShowUntilLookedAt()
+
+		function v100.OnUpdate(_) -- line: 1157
+		end
+
+		BindableEvent2:Fire()
+	end)
+	rawset(v115, "Close", function(p83, p84) -- line: 1163
+		-- upvalues: u123 (ref), u132 (ref), u133 (ref), u134 (ref), ContextActionService (copy), v100 (copy), v102 (copy), Panel3D (copy), BindableEvent3 (copy)
+		local v270 = p84 == true
+
+		if not u123 then
+			return
+		end
+
+		u123 = false
+
+		if u132 then
+			u132:disconnect()
+		end
+
+		u132 = nil
+
+		if u133 then
+			u133:disconnect()
+		end
+
+		u133 = nil
+
+		if u134 then
+			u134:disconnect()
+		end
+
+		u134 = nil
+		ContextActionService:UnbindCoreAction("VirtualKeyboardControllerInput")
+		v100:OnMouseLeave()
+		v100:SetVisible(false, true)
+		v102.Visible = false
+		Panel3D.Get("Topbar3D"):SetVisible(true)
+		p83:SubmitText(v270, false)
+		BindableEvent3:Fire()
+	end)
+	rawset(v115, "SubmitText", function(_, p86, p87) -- line: 1183
+		-- upvalues: u116 (ref), s1 (ref), Panel3D (copy), v100 (copy), u131 (ref)
+		local v274 = u116 and u116.TextBox
+
+		if v274 then
+			if p86 then
+				v274.Text = if not u116 or not u116.TextBox then s1 else u116.TextBox.Text
+			end
+
+			local v275 = Panel3D.FindContainerOf(v274)
+			local v276 = p87 and (v275 and v275.linkedTo == v100)
+
+			if v276 then
+				u131 = true
+			end
+
+			v274:ReleaseFocus(p86)
+
+			if v276 then
+				v274:CaptureFocus()
+				u131 = false
+			end
+		end
+	end)
+	rawset(v115, "GetCurrentOptions", function(_) -- line: 1206
+		-- upvalues: u116 (ref)
+		return u116
+	end)
+	rawset(v115, "BackspaceAtCursor", function(_) -- line: 1210
+		-- upvalues: n1 (ref), u116 (ref), s1 (ref), v105 (copy), SetTextFieldCursorPosition (copy)
+		if n1 >= 1 then
+			local v279 = if not u116 or not u116.TextBox then s1 else u116.TextBox.Text
+			local v280 = string.sub(v279, 1, n1 - 1) .. string.sub(v279, n1 + 1, #v279)
+			local v281 = n1 - 1
+
+			if u116 and u116.TextBox then
+				u116.TextBox.Text = v280
+			elseif v280 ~= s1 then
+				s1 = v280
+
+				local v282 = s1
+
+				v105:SetTextFromInput(v282)
+				SetTextFieldCursorPosition(n1)
+			end
+
+			SetTextFieldCursorPosition(v281)
+		end
+	end)
+	rawset(v115, "SubmitCharacter", function(p90, p91, p92) -- line: 1220
+		-- upvalues: u116 (ref), s1 (ref), n1 (ref), v105 (copy), SetTextFieldCursorPosition (copy)
+		local v286 = if not u116 or not u116.TextBox then s1 else u116.TextBox.Text
+		local v287 = string.sub(v286, 1, n1) .. p91 .. string.sub(v286, n1 + 1, #v286)
+
+		if u116 and u116.TextBox then
+			u116.TextBox.Text = v287
+		elseif v287 ~= s1 then
+			s1 = v287
+
+			local v288 = s1
+
+			v105:SetTextFromInput(v288)
+			SetTextFieldCursorPosition(n1)
+		end
+
+		SetTextFieldCursorPosition(n1 + #p91)
+
+		if p92 and p90:GetShift() then
+			p90:SetShift(false)
+		end
+	end)
+
+	for _, v in pairs(p54) do
+		local t12 = {}
+		local v139 = Create("Frame")({
+			Name = "KeyboardSizeConstrainer",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, -20),
+			Position = UDim2.new(0, 0, 0, 20),
+			Parent = v102
+		})
+		local n2 = 0
+		local n3 = 0
+		local n4 = 0
+
+		for _, v2 in pairs(v) do
+			local n5 = 0
+			local n6 = 1
+			local n7 = 1
+			local w2 = nil
+			local h2 = nil
+			local x2 = nil
+			local y2 = nil
+
+			for _, v3 in pairs(v2) do
+				local v154 = v3
+
+				if type(v154) == "table" then
+					if v154.w then
+						n6 = v154.w
+					end
+
+					if v154.h then
+						n7 = v154.h
+					end
+
+					if v154.x then
+						n5 += v154.x
+					end
+
+					if v154.y then
+						n4 += v154.y
+					end
+
+					if v154.x2 then
+						x2 = v154.x2
+					end
+
+					if v154.y2 then
+						y2 = v154.y2
+					end
+
+					if v154.w2 then
+						w2 = v154.w2
+					end
+
+					if v154.h2 then
+						h2 = v154.h2
+					end
+				elseif type(v154) == "string" then
+					if v154 == "" then
+						v154 = " "
+					end
+
+					local v155 = CreateKeyboardKey
+					local t13 = {
+						x = n5,
+						y = n4,
+						width = n6,
+						height = n7,
+						x2 = x2,
+						y2 = y2,
+						width2 = w2,
+						height2 = h2
+					}
+					local t14 = {}
+
+					for match in string.gmatch(v154, "([^\n]+)") do
+						table.insert(t14, match)
+					end
+
+					table.insert(t12, (v155(v115, t13, t14)))
+					n5 += n6
+					n2 = math.max(n2, n5)
+					n3 = math.max(n3, n4 + n7)
+					n6 = 1
+					n7 = 1
+					w2 = nil
+					h2 = nil
+					x2 = nil
+					y2 = nil
+				end
+			end
+
+			n4 += 1
+		end
+
+		for _, v4 in pairs(t12) do
+			v4.Position = UDim2.new(v4.Position.X.Scale / n2, 0, v4.Position.Y.Scale / n3, 0)
+			v4.Size = UDim2.new(v4.Size.X.Scale / n2, 0, v4.Size.Y.Scale / n3, 0)
+			v4.Parent = v139
+		end
+
+		v139.SizeConstraint = Enum.SizeConstraint.RelativeXX
+		v139.Size = UDim2.new(1, 0, -n3 / n2, 0)
+		v139.Position = UDim2.new(0, 0, 1, 0)
+		v139.Visible = false
+		table.insert(t11, {
+			keys = t12,
+			container = v139
+		})
+	end
+
+	v115:SetCurrentKeyset(1)
+	v105.MouseButton1Click:connect(function() -- line: 1301
+		-- upvalues: SetTextFieldCursorPosition (copy), calculateTextCursorPosition (copy), v100 (copy)
+		SetTextFieldCursorPosition((calculateTextCursorPosition(v100.lookAtPixel.X, v100.lookAtPixel.Y)))
+	end)
+	v108.MouseButton1Click:connect(function() -- line: 1305
+		-- upvalues: v115 (copy)
+		v115:Close(false)
+	end)
+	v111.MouseButton1Click:connect(function() -- line: 1309
+		-- upvalues: t7 (copy), CreateBaseVoiceState (copy), SoundService (copy)
+		if t7:GetCurrentState().Name == "Listening" then
+			local v289 = t7
+			local v290 = CreateBaseVoiceState()
+
+			v290.Name = "Processing"
+
+			local u291 = false
+			local u292 = nil
+
+			function v290.TransitionTo(_) -- line: 662
+				-- upvalues: u292 (ref), SoundService (copy), u291 (ref)
+				coroutine.wrap(function() -- line: 663
+					-- upvalues: u292 (ref), SoundService (copy), u291 (ref)
+					pcall(function() -- line: 664
+						-- upvalues: u292 (ref), SoundService (copy)
+						u292 = SoundService:EndRecording()
+					end)
+					u291 = true
+				end)()
+			end
+			function v290.GetResultAsync(_) -- line: 669
+				-- upvalues: u291 (ref), u292 (ref)
+				while not u291 do
+					wait()
+				end
+
+				return u292
+			end
+
+			v289:TransitionState(v290)
+		end
+	end)
+
+	local function onVoiceProcessingStateChanged(p95) -- line: 1315
+		-- upvalues: v112 (copy), v114 (copy), t1 (copy), u116 (ref), s1 (ref), v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref), t7 (copy), CreateBaseVoiceState (copy), v115 (copy)
+		if p95.Name == "Listening" then
+			v112.Text = "Listening..."
+		elseif p95.Name == "Processing" then
+			v112.Text = "Processing..."
+		elseif p95.Name == "Waiting" then
+			v112.Text = "Done"
+		end
+
+		if p95.Name == "Processing" then
+			coroutine.wrap(function() -- line: 1326
+				-- upvalues: v114 (copy), p95 (copy), t1 (copy), u116 (ref), s1 (ref), v105 (copy), SetTextFieldCursorPosition (copy), n1 (ref), v112 (copy), t7 (copy), CreateBaseVoiceState (copy)
+				v114:StopAnimation()
+
+				local ResultAsync = p95:GetResultAsync()
+
+				if ResultAsync and ResultAsync.Status == t1.ASR_STATUS_OK then
+					local Response = ResultAsync.Response
+
+					if u116 and u116.TextBox then
+						u116.TextBox.Text = Response
+					elseif Response ~= s1 then
+						s1 = Response
+
+						local v309 = s1
+
+						v105:SetTextFromInput(v309)
+						SetTextFieldCursorPosition(n1)
+					end
+				else
+					v112.Text = "An error occurred, please try again."
+					wait(2)
+				end
+
+				local v310 = t7
+				local v311 = CreateBaseVoiceState()
+
+				v311.Name = "Waiting"
+				v310:TransitionState(v311)
+			end)()
+
+			return
+		end
+
+		if p95.Name == "Listening" then
+			v114:StartAnimation()
+
+			return
+		end
+
+		if p95.Name == "Waiting" then
+			v115:SetVoiceMode(false)
+		end
+	end
+
+	t7.StateTransitionedEvent:connect(onVoiceProcessingStateChanged)
+	onVoiceProcessingStateChanged(t7:GetCurrentState())
+
+	return v115
+end
+
+local u37 = nil
+
+local function GetKeyboard() -- line: 1352
+	-- upvalues: u37 (ref), ConstructKeyboardUI (copy), data (copy), data2 (copy)
+	if u37 == nil then
+		u37 = ConstructKeyboardUI({
+			data,
+			data2
+		})
+	end
+
+	return u37
+end
+
+local t15 = {
+	CreateVirtualKeyboardOptions = function(_, p97) -- line: 1363
+		return {
+			TextBox = p97
+		}
+	end,
+	ShowVirtualKeyboard = function(_, _) -- line: 1372
+	end,
+	CloseVirtualKeyboard = function(_) -- line: 1378
+	end
+}
+
+if u37 == nil then
+	u37 = ConstructKeyboardUI({
+		data,
+		data2
+	})
+end
+
+t15.OpenedEvent = u37.OpenedEvent
+
+if u37 == nil then
+	u37 = ConstructKeyboardUI({
+		data,
+		data2
+	})
+end
+
+t15.ClosedEvent = u37.ClosedEvent
+
+return t15

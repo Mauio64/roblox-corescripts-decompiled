@@ -1,82 +1,91 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_ButtonType_0 = require(l_CorePackages_0.Packages.UIBlox).App.Button.Enum.ButtonType;
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v7 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v10 = require(l_Parent_0.Prompts.PromptWithTextField);
-local v11 = require(l_Parent_1.Thunks.SignalCreateOutfitPermissionDenied);
-local v12 = require(l_Parent_1.Thunks.PerformCreateOutfit);
-local v13 = v2.PureComponent:extend("EnterOutfitNamePrompt");
-v13.validateProps = v4.strictInterface({
-    screenSize = v4.Vector2, 
-    signalCreateOutfitPermissionDenied = v4.callback, 
-    performCreateOutfit = v4.callback
-});
-v13.init = function(v14) --[[ Line: 33 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    v14:setState({
-        outfitName = "", 
-        alertPosition = UDim2.fromScale(0.5, 0.5)
-    });
-    v14.textBoxRef = v2.createRef();
-    v14.confirmCreateOutfit = function() --[[ Line: 41 ]]
-        -- upvalues: v14 (copy)
-        v14.props.performCreateOutfit(v14.state.outfitName);
-    end;
-    v14.textUpdated = function(v15) --[[ Line: 45 ]]
-        -- upvalues: v14 (copy)
-        v14:setState({
-            outfitName = v15
-        });
-    end;
-end;
-v13.render = function(v16) --[[ Line: 52 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v10 (copy), v7 (copy), l_ButtonType_0 (copy)
-    return v2.createElement(v10, {
-        fieldText = v16.state.outfitName, 
-        onFieldTextUpdated = v16.textUpdated, 
-        title = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptTitle"), 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = v16.props.signalCreateOutfitPermissionDenied, 
-                        text = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptNo")
-                    }, 
-                    isDefaultChild = true
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        isDisabled = v16.state.outfitName == "", 
-                        onActivated = v16.confirmCreateOutfit, 
-                        text = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptYes")
-                    }, 
-                    isDefaultChild = false
-                }
-            }
-        }
-    });
-end;
-return v3.connect(function(v17) --[[ Line: 82 ]] --[[ Name: mapStateToProps ]]
-    return {
-        screenSize = v17.screenSize
-    };
-end, function(v18) --[[ Line: 88 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v11 (copy), v12 (copy)
-    return {
-        signalCreateOutfitPermissionDenied = function() --[[ Line: 90 ]] --[[ Name: signalCreateOutfitPermissionDenied ]]
-            -- upvalues: v18 (copy), v11 (ref)
-            return v18(v11);
-        end, 
-        performCreateOutfit = function(v19) --[[ Line: 94 ]] --[[ Name: performCreateOutfit ]]
-            -- upvalues: v18 (copy), v12 (ref)
-            return v18(v12(v19));
-        end
-    };
-end)(v13);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local ButtonType = require(CorePackages.Packages.UIBlox).App.Button.Enum.ButtonType
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local PromptWithTextField = require(ParentParent.Prompts.PromptWithTextField)
+local SignalCreateOutfitPermissionDenied = require(ParentParentParent.Thunks.SignalCreateOutfitPermissionDenied)
+local PerformCreateOutfit = require(ParentParentParent.Thunks.PerformCreateOutfit)
+local v13 = Roact.PureComponent:extend("EnterOutfitNamePrompt")
+
+v13.validateProps = t.strictInterface({
+	screenSize = t.Vector2,
+	signalCreateOutfitPermissionDenied = t.callback,
+	performCreateOutfit = t.callback
+})
+
+function v13.init(p1) -- line: 33
+	-- upvalues: Roact (copy)
+	p1:setState({
+		outfitName = "",
+		alertPosition = UDim2.fromScale(0.5, 0.5)
+	})
+	p1.textBoxRef = Roact.createRef()
+
+	function p1.confirmCreateOutfit() -- line: 41
+		-- upvalues: p1 (copy)
+		p1.props.performCreateOutfit(p1.state.outfitName)
+	end
+	function p1.textUpdated(p2) -- line: 45
+		-- upvalues: p1 (copy)
+		p1:setState({
+			outfitName = p2
+		})
+	end
+end
+function v13.render(p3) -- line: 52
+	-- upvalues: Roact (copy), PromptWithTextField (copy), RobloxTranslator (copy), ButtonType (copy)
+	return Roact.createElement(PromptWithTextField, {
+		fieldText = p3.state.outfitName,
+		onFieldTextUpdated = p3.textUpdated,
+		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptTitle"),
+		buttonStackInfo = {
+			buttons = {
+				{
+					isDefaultChild = true,
+					props = {
+						onActivated = p3.props.signalCreateOutfitPermissionDenied,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptNo")
+					}
+				},
+				{
+					isDefaultChild = false,
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						isDisabled = p3.state.outfitName == "",
+						onActivated = p3.confirmCreateOutfit,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.EnterOutfitNamePromptYes")
+					}
+				}
+			}
+		}
+	})
+end
+
+local function mapStateToProps(p4) -- line: 82
+	return {
+		screenSize = p4.screenSize
+	}
+end
+local function mapDispatchToProps(p5) -- line: 88
+	-- upvalues: SignalCreateOutfitPermissionDenied (copy), PerformCreateOutfit (copy)
+	return {
+		signalCreateOutfitPermissionDenied = function() -- line: 90
+			-- upvalues: p5 (copy), SignalCreateOutfitPermissionDenied (copy)
+			return p5(SignalCreateOutfitPermissionDenied)
+		end,
+		performCreateOutfit = function(p6) -- line: 94
+			-- upvalues: p5 (copy), PerformCreateOutfit (copy)
+			return p5(PerformCreateOutfit(p6))
+		end
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v13)

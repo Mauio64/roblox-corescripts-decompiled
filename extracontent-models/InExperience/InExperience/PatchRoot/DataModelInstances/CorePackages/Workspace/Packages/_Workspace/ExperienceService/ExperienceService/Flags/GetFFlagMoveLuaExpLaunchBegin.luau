@@ -1,4 +1,5 @@
-game:DefineFastFlag("MoveLuaExpLaunchBegin", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("MoveLuaExpLaunchBegin");
-end;
+game:DefineFastFlag("MoveLuaExpLaunchBegin", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("MoveLuaExpLaunchBegin")
+end

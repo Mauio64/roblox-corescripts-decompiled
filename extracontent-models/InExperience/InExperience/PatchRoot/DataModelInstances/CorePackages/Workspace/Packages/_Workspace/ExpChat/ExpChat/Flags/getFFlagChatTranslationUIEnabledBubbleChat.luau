@@ -1,9 +1,10 @@
-local l_TextChatService_0 = game:GetService("TextChatService");
-return function() --[[ Line: 3 ]]
-    -- upvalues: l_TextChatService_0 (copy)
-    if l_TextChatService_0.ChatVersion == Enum.ChatVersion.LegacyChatService then
-        return false;
-    else
-        return true;
-    end;
-end;
+local TextChatService = game:GetService("TextChatService")
+
+return function() -- line: 3
+	-- upvalues: TextChatService (copy)
+	if TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService then
+		return false
+	end
+
+	return true
+end

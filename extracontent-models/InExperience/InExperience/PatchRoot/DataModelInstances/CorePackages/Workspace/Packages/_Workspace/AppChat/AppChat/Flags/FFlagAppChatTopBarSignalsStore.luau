@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatTopBarSignalsStoreV2", false);
+return game:DefineFastFlag("AppChatTopBarSignalsStoreV2", false)

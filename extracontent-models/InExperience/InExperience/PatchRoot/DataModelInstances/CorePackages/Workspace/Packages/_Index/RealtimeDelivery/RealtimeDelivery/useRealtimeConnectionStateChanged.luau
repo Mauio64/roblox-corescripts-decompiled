@@ -1,40 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RealtimeDelivery");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_List_0 = require(l_Parent_0.Cryo).List;
-local v3 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.RealtimeTypes);
-local v5 = require(script.Parent.useRobloxEventReceiver);
-local v6 = require(script.Parent.useRealtimeNamespace);
-return function(v7, v8, v9) --[[ Line: 12 ]] --[[ Name: useRealtimeConnectionStateChanged ]]
-    -- upvalues: v5 (copy), v3 (copy), v6 (copy), l_List_0 (copy)
-    local v10 = v5();
-    local v11 = v3.useRef(nil);
-    v6(v7, function(v12) --[[ Line: 20 ]]
-        -- upvalues: v11 (copy)
-        local l_SequenceNumber_0 = v12.SequenceNumber;
-        if l_SequenceNumber_0 and (v11.current == nil or v11.current < l_SequenceNumber_0) then
-            v11.current = l_SequenceNumber_0;
-        end;
-    end, l_List_0.join({
-        v7
-    }, v9));
-    v3.useEffect(function() --[[ Line: 29 ]]
-        -- upvalues: v10 (copy), v7 (copy), v11 (copy), v8 (copy)
-        local v19 = v10:observeEvent("signalR", function(v14, _, v16) --[[ Line: 32 ]]
-            -- upvalues: v7 (ref), v11 (ref), v8 (ref)
-            local v17 = v16[v7];
-            local v18 = v17 ~= nil and (v11.current == nil or v11.current ~= v17);
-            if v17 then
-                v11.current = v17;
-            end;
-            v8(v14, v18);
-        end);
-        return function() --[[ Line: 47 ]]
-            -- upvalues: v19 (copy)
-            v19:disconnect();
-        end;
-    end, l_List_0.join({
-        v10, 
-        v11.current
-    }, v9));
-end;
+local RealtimeDelivery = script:FindFirstAncestor("RealtimeDelivery")
+local RealtimeDeliveryParent = RealtimeDelivery.Parent
+local List = require(RealtimeDeliveryParent.Cryo).List
+local React = require(RealtimeDeliveryParent.React)
+
+require(RealtimeDelivery.RealtimeTypes)
+
+local useRobloxEventReceiver = require(script.Parent.useRobloxEventReceiver)
+local useRealtimeNamespace = require(script.Parent.useRealtimeNamespace)
+
+local function useRealtimeConnectionStateChanged(s1: string, p1: ((...any) -> ...any), t1: {[any]: any}) -- line: 12
+	-- upvalues: useRobloxEventReceiver (copy), React (copy), useRealtimeNamespace (copy), List (copy)
+	local v11 = useRobloxEventReceiver()
+	local v12 = React.useRef(nil)
+
+	useRealtimeNamespace(s1, function(p2) -- line: 20
+		-- upvalues: v12 (copy)
+		local SequenceNumber = p2.SequenceNumber
+
+		if SequenceNumber and (v12.current == nil or SequenceNumber > v12.current) then
+			v12.current = SequenceNumber
+		end
+	end, List.join({ s1 }, t1))
+	React.useEffect(function() -- line: 29
+		-- upvalues: v11 (copy), s1 (copy), v12 (copy), p1 (copy)
+		local v15 = v11:observeEvent("signalR", function(p3, _, p5) -- line: 32
+			-- upvalues: s1 (copy), v12 (copy), p1 (copy)
+			local v19 = p5[s1]
+			local v20 = v19 ~= nil and (v12.current == nil or v19 ~= v12.current)
+
+			if v19 then
+				v12.current = v19
+			end
+
+			p1(p3, v20)
+		end)
+
+		return function() -- line: 47
+			-- upvalues: v15 (copy)
+			v15:disconnect()
+		end
+	end, List.join({
+		v11,
+		v12.current
+	}, t1))
+end
+
+return useRealtimeConnectionStateChanged

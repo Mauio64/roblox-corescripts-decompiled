@@ -1,61 +1,59 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v5 = require(script.Parent.ChatConversationTelemetryEvents);
-local v6 = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatConversationTelemetryLayer);
-local v7 = require(l_script_FirstAncestor_0.Telemetry.useTelemetry);
-local v8 = require(l_script_FirstAncestor_0.Components.Cells.ConversationFacePile);
-local v9 = require(l_script_FirstAncestor_0.Hooks.useGetConversationFromId);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useGetUserFromId);
-local v11 = require(l_script_FirstAncestor_0.Models.Conversation);
-local v12 = require(l_script_FirstAncestor_0.Conversations.getOtherParticipants);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v14 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatConversationHeaderTCIndicator);
-return function(v15) --[[ Line: 26 ]]
-    -- upvalues: l_useTokens_0 (copy), v7 (copy), v6 (copy), v2 (copy), v5 (copy), v14 (copy), v9 (copy), l_useLocalUserId_0 (copy), v11 (copy), v12 (copy), v10 (copy), v3 (copy), v8 (copy)
-    local v16 = l_useTokens_0();
-    local v17 = v7(v6.Context);
-    local v18 = v2.useCallback(function() --[[ Line: 29 ]]
-        -- upvalues: v17 (copy), v5 (ref), v15 (copy)
-        v17.emit(v5.ConversationInfoBtnClicked, {});
-        v15.navigateToChatDetails();
-    end, {
-        v15.navigateToChatDetails, 
-        v17
-    });
-    local v19 = nil;
-    local v20 = nil;
-    local l_titleText_0 = v15.titleText;
-    if v14 then
-        local v22 = v9(v15.conversationId);
-        local v23 = l_useLocalUserId_0();
-        local v24 = v22 and v22.conversationType == v11.Type.ONE_TO_ONE_CONVERSATION;
-        local v25 = if v24 then v12(v22, v23)[1] else nil;
-        local v26 = v10(v25);
-        if v26 then
-            l_titleText_0 = v22.title;
-            v19 = ("@%*"):format(v26.name);
-        end;
-        v20 = v24 and true or false;
-    end;
-    return v2.createElement(v3.View, {
-        Size = UDim2.new(1, 0, 1, 0)
-    }, {
-        TitleContainer = v2.createElement(v3.View, {
-            Size = UDim2.new(1, 0, 1, 0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            cornerRadius = UDim.new(0, v16.Radius.Medium)
-        }, {
-            ConversationFacePile = v2.createElement(v8, {
-                conversationId = v15.conversationId, 
-                titleText = l_titleText_0, 
-                titleStyle = v16.Typography.TitleLarge, 
-                onActivated = v18, 
-                subtitleText = v19, 
-                trustedConnectionIndicatorEnabled = v20
-            })
-        })
-    });
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Foundation = require(AppChatParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local ChatConversationTelemetryEvents = require(script.Parent.ChatConversationTelemetryEvents)
+local ChatConversationTelemetryLayer = require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
+local useTelemetry = require(AppChat.Telemetry.useTelemetry)
+local ConversationFacePile = require(AppChat.Components.Cells.ConversationFacePile)
+local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
+local useGetUserFromId = require(AppChat.Hooks.useGetUserFromId)
+local Conversation = require(AppChat.Models.Conversation)
+local getOtherParticipants = require(AppChat.Conversations.getOtherParticipants)
+local useLocalUserId = require(AppChatParent.RobloxAppHooks).useLocalUserId
+
+return function(t1: {[any]: any}) -- line: 24
+	-- upvalues: useTokens (copy), useTelemetry (copy), ChatConversationTelemetryLayer (copy), React (copy), ChatConversationTelemetryEvents (copy), useGetConversationFromId (copy), useLocalUserId (copy), Conversation (copy), getOtherParticipants (copy), useGetUserFromId (copy), Foundation (copy), ConversationFacePile (copy)
+	local v16 = useTokens()
+	local v17 = useTelemetry(ChatConversationTelemetryLayer.Context)
+	local v18 = React.useCallback(function() -- line: 27
+		-- upvalues: v17 (copy), ChatConversationTelemetryEvents (copy), t1 (copy)
+		v17.emit(ChatConversationTelemetryEvents.ConversationInfoBtnClicked, {})
+		t1.navigateToChatDetails()
+	end, {
+		t1.navigateToChatDetails,
+		v17
+	})
+	local v19 = nil
+	local titleText = t1.titleText
+	local v21 = useGetConversationFromId(t1.conversationId)
+	local v22 = useLocalUserId()
+	local v23 = v21 and v21.conversationType == Conversation.Type.ONE_TO_ONE_CONVERSATION
+	local v24 = if not v23 then nil else getOtherParticipants(v21, v22)[1]
+	local v25 = useGetUserFromId(v24)
+
+	if v25 then
+		titleText = v21.title
+		v19 = `@{ v25.name }`
+	end
+
+	return React.createElement(Foundation.View, {
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		TitleContainer = React.createElement(Foundation.View, {
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			cornerRadius = UDim.new(0, v16.Radius.Medium)
+		}, {
+			ConversationFacePile = React.createElement(ConversationFacePile, {
+				conversationId = t1.conversationId,
+				titleText = titleText,
+				titleStyle = v16.Typography.TitleLarge,
+				onActivated = v18,
+				subtitleText = v19,
+				trustedConnectionIndicatorEnabled = not not v23
+			})
+		})
+	})
+end

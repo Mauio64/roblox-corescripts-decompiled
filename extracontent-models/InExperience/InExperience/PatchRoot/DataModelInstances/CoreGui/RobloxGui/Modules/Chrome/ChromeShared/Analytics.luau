@@ -1,17 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_script_FirstAncestor_0.Service.ViewportUtil);
-local v3 = require(l_script_FirstAncestor_0.Hooks.useObservableValue);
-local v4 = require(script.ChromeAnalytics);
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagUnibarLuaOcclusionMetrics();
-local v7 = require(script.OcclusionMetricsManager);
-return function(_) --[[ Line: 14 ]] --[[ Name: ChromeAnalyticsListener ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy), v6 (copy), v5 (copy), v7 (copy)
-    v4.default:setScreenSize((v3(v2.screenSize)));
-    if v6 then
-        return v5.createElement(v7);
-    else
-        return nil;
-    end;
-end;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local ViewportUtil = require(ChromeShared.Service.ViewportUtil)
+local useObservableValue = require(ChromeShared.Hooks.useObservableValue)
+local ChromeAnalytics = require(script.ChromeAnalytics)
+local React = require(CorePackages.Packages.React)
+local v7 = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagUnibarLuaOcclusionMetrics()
+local OcclusionMetricsManager = require(script.OcclusionMetricsManager)
+
+local function ChromeAnalyticsListener(_) -- line: 14
+	-- upvalues: ChromeAnalytics (copy), useObservableValue (copy), ViewportUtil (copy), v7 (copy), React (copy), OcclusionMetricsManager (copy)
+	ChromeAnalytics.default:setScreenSize((useObservableValue(ViewportUtil.screenSize)))
+
+	if v7 then
+		return React.createElement(OcclusionMetricsManager)
+	end
+
+	return nil
+end
+
+return ChromeAnalyticsListener

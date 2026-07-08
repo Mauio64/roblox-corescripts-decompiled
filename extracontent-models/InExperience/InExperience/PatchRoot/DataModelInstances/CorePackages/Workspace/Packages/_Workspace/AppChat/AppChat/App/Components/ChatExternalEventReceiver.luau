@@ -1,73 +1,81 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.RoactUtils);
-local l_SetUserPresences_0 = require(l_Parent_0.UserLib).Thunks.SetUserPresences;
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v3.useEffect;
-local v8 = require(l_script_FirstAncestor_0.Logger):new("AppChat.RealtimeExternal");
-local v9 = require(l_script_FirstAncestor_0.Http.NetworkingPresence);
-local v10 = require(l_script_FirstAncestor_0.App.Thunks.ChatFriendshipDestroyed);
-local v11 = require(l_script_FirstAncestor_0.App.Thunks.ChatFriendshipCreated);
-local v12 = {
-    localUserId = 0
-};
-ChatExternalEventReceiver = function(v13) --[[ Line: 31 ]] --[[ Name: ChatExternalEventReceiver ]]
-    -- upvalues: v2 (copy), v12 (copy), l_useDispatch_0 (copy), l_useEffect_0 (copy), v9 (copy), l_SetUserPresences_0 (copy), v8 (copy), v10 (copy), v11 (copy)
-    local v14 = v2.Dictionary.join(v12, v13);
-    local v15 = l_useDispatch_0();
-    l_useEffect_0(function() --[[ Line: 36 ]]
-        -- upvalues: v14 (copy), v2 (ref), v15 (copy), v9 (ref), l_SetUserPresences_0 (ref), v8 (ref)
-        local v21 = v14.robloxEventReceiver:observeEvent("PresenceBulkNotifications", function(v16) --[[ Line: 37 ]]
-            -- upvalues: v2 (ref), v15 (ref), v9 (ref), l_SetUserPresences_0 (ref), v8 (ref)
-            local v18 = v2.List.map(v16, function(v17) --[[ Line: 38 ]]
-                return (tostring(v17.UserId));
-            end);
-            v15(v9.GetPresencesFromUserIds.API(v18)):andThen(function(v19) --[[ Line: 43 ]]
-                -- upvalues: v15 (ref), l_SetUserPresences_0 (ref)
-                v15(l_SetUserPresences_0(v19.responseBody.userPresences));
-            end):catch(function(v20) --[[ Line: 46 ]]
-                -- upvalues: v8 (ref)
-                v8:warning("NetworkingPresence failure in ChatExternalEventReceiver->PresenceBulkNotifications, Status: " .. tostring(v20));
-            end);
-        end);
-        return function() --[[ Line: 54 ]]
-            -- upvalues: v21 (copy)
-            if v21 and v21.disconnect then
-                v21:disconnect();
-            end;
-        end;
-    end, {
-        v15, 
-        v14.robloxEventReceiver
-    });
-    l_useEffect_0(function() --[[ Line: 62 ]]
-        -- upvalues: v14 (copy), v15 (copy), v10 (ref), v11 (ref)
-        local v24 = v14.robloxEventReceiver:observeEvent("FriendshipNotifications", function(v22) --[[ Line: 63 ]]
-            -- upvalues: v14 (ref), v15 (ref), v10 (ref), v11 (ref)
-            local v23 = tostring(v14.localUserId) == tostring(v22.EventArgs.UserId1) and tostring(v22.EventArgs.UserId2) or tostring(v22.EventArgs.UserId1);
-            if v22.Type == "FriendshipDestroyed" then
-                v15(v10(v23));
-                return;
-            else
-                if v22.Type == "FriendshipCreated" then
-                    v15(v11(v23));
-                end;
-                return;
-            end;
-        end);
-        return function() --[[ Line: 75 ]]
-            -- upvalues: v24 (copy)
-            if v24 and v24.disconnect then
-                v24:disconnect();
-            end;
-        end;
-    end, {
-        v15, 
-        v14.robloxEventReceiver, 
-        v14.localUserId
-    });
-    return nil;
-end;
-return ChatExternalEventReceiver;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local RoactUtils = require(AppChatParent.RoactUtils)
+local SetUserPresences = require(AppChatParent.UserLib).Thunks.SetUserPresences
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local v9 = require(AppChat.Logger):new("AppChat.RealtimeExternal")
+local NetworkingPresence = require(AppChat.Http.NetworkingPresence)
+local ChatFriendshipDestroyed = require(AppChat.App.Thunks.ChatFriendshipDestroyed)
+local ChatFriendshipCreated = require(AppChat.App.Thunks.ChatFriendshipCreated)
+local t1 = {
+	localUserId = 0
+}
+
+function ChatExternalEventReceiver(t2: {[any]: any}) -- line: 31
+	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), useEffect (copy), NetworkingPresence (copy), SetUserPresences (copy), v9 (copy), ChatFriendshipDestroyed (copy), ChatFriendshipCreated (copy)
+	local v15 = Cryo.Dictionary.join(t1, t2)
+	local v16 = useDispatch()
+
+	useEffect(function() -- line: 36
+		-- upvalues: v15 (copy), Cryo (copy), v16 (copy), NetworkingPresence (copy), SetUserPresences (copy), v9 (copy)
+		local v17 = v15.robloxEventReceiver:observeEvent("PresenceBulkNotifications", function(p1) -- line: 37
+			-- upvalues: Cryo (copy), v16 (copy), NetworkingPresence (copy), SetUserPresences (copy), v9 (copy)
+			local v20 = Cryo.List.map(p1, function(p2) -- line: 38
+				return (tostring(p2.UserId))
+			end)
+
+			v16(NetworkingPresence.GetPresencesFromUserIds.API(v20)):andThen(function(p3) -- line: 43
+				-- upvalues: v16 (copy), SetUserPresences (copy)
+				v16(SetUserPresences(p3.responseBody.userPresences))
+			end):catch(function(p4) -- line: 46
+				-- upvalues: v9 (copy)
+				v9:warning("NetworkingPresence failure in ChatExternalEventReceiver->PresenceBulkNotifications, Status: " .. tostring(p4))
+			end)
+		end)
+
+		return function() -- line: 54
+			-- upvalues: v17 (copy)
+			if v17 and v17.disconnect then
+				v17:disconnect()
+			end
+		end
+	end, {
+		v16,
+		v15.robloxEventReceiver
+	})
+	useEffect(function() -- line: 62
+		-- upvalues: v15 (copy), v16 (copy), ChatFriendshipDestroyed (copy), ChatFriendshipCreated (copy)
+		local v18 = v15.robloxEventReceiver:observeEvent("FriendshipNotifications", function(p5) -- line: 63
+			-- upvalues: v15 (copy), v16 (copy), ChatFriendshipDestroyed (copy), ChatFriendshipCreated (copy)
+			local v22 = tostring(v15.localUserId) == tostring(p5.EventArgs.UserId1) and tostring(p5.EventArgs.UserId2) or tostring(p5.EventArgs.UserId1)
+
+			if p5.Type == "FriendshipDestroyed" then
+				v16(ChatFriendshipDestroyed(v22))
+
+				return
+			end
+
+			if p5.Type == "FriendshipCreated" then
+				v16(ChatFriendshipCreated(v22))
+			end
+		end)
+
+		return function() -- line: 75
+			-- upvalues: v18 (copy)
+			if v18 and v18.disconnect then
+				v18:disconnect()
+			end
+		end
+	end, {
+		v16,
+		v15.robloxEventReceiver,
+		v15.localUserId
+	})
+
+	return nil
+end
+
+return ChatExternalEventReceiver

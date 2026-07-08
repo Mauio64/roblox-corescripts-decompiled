@@ -1,82 +1,89 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ReactSceneUnderstanding");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.SceneUnderstanding);
-local v3 = require(l_script_FirstAncestor_0.SceneAnalysisContext);
-local v4 = require(l_script_FirstAncestor_0.useCurrentCamera);
-local v5 = require(l_script_FirstAncestor_0.useCameraState);
-local v6 = require(l_script_FirstAncestor_0.enums);
-local l_getSourceAssetsInView_0 = v2.getSourceAssetsInView;
-local l_getSourceAssetsInRange_0 = v2.getSourceAssetsInRange;
-local l_useCallback_0 = v1.useCallback;
-local l_useEffect_0 = v1.useEffect;
-return function(v11) --[[ Line: 18 ]] --[[ Name: useSourceAssets ]]
-    -- upvalues: v4 (copy), v3 (copy), v5 (copy), l_useCallback_0 (copy), l_getSourceAssetsInView_0 (copy), l_getSourceAssetsInRange_0 (copy), l_useEffect_0 (copy), v2 (copy), v6 (copy)
-    local v12 = v4();
-    local v13 = v3.use();
-    local v14 = v5(v12);
-    local v19 = l_useCallback_0(function(v15, v16) --[[ Line: 27 ]]
-        if #v16 == #v15 then
-            for _, v18 in v15 do
-                if not table.find(v16, v18) then
-                    return true;
-                end;
-            end;
-            return false;
-        else
-            return true;
-        end;
-    end, {});
-    local v24 = l_useCallback_0(function() --[[ Line: 41 ]]
-        -- upvalues: l_getSourceAssetsInView_0 (ref), v12 (copy), v11 (copy), v13 (copy), v19 (copy), l_getSourceAssetsInRange_0 (ref)
-        local v20 = l_getSourceAssetsInView_0(v12, if v11 then v11.viewportQueryOptions else nil);
-        v13.setAssetsInView(function(v21) --[[ Line: 43 ]]
-            -- upvalues: v19 (ref), v20 (copy)
-            if v19(v21, v20) then
-                return v20;
-            else
-                return v21;
-            end;
-        end);
-        local v22 = l_getSourceAssetsInRange_0(v12.CFrame.Position, if v11 then v11.rangeQueryOptions else nil);
-        v13.setAssetsInRange(function(v23) --[[ Line: 49 ]]
-            -- upvalues: v19 (ref), v22 (copy)
-            if v19(v23, v22) then
-                return v22;
-            else
-                return v23;
-            end;
-        end);
-    end, {
-        v12, 
-        v11, 
-        v13
-    });
-    l_useEffect_0(function() --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), v24 (copy)
-        local v26 = workspace.DescendantAdded:Connect(function(v25) --[[ Line: 55 ]]
-            -- upvalues: v2 (ref), v24 (ref)
-            if v2.isSourceAsset(v25) then
-                v24();
-            end;
-        end);
-        v24();
-        return function() --[[ Line: 63 ]]
-            -- upvalues: v26 (copy)
-            v26:Disconnect();
-        end;
-    end, {
-        v24
-    });
-    l_useEffect_0(function() --[[ Line: 68 ]]
-        -- upvalues: v14 (copy), v6 (ref), v24 (copy)
-        if v14 == v6.CameraState.Idle then
-            v24();
-        end;
-    end, {
-        v14
-    });
-    return {
-        assetsInRange = v13.assetsInRange, 
-        assetsInView = v13.assetsInView
-    };
-end;
+local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
+local React = require(ReactSceneUnderstanding.Parent.React)
+local SceneUnderstanding = require(ReactSceneUnderstanding.Parent.SceneUnderstanding)
+local SceneAnalysisContext = require(ReactSceneUnderstanding.SceneAnalysisContext)
+local useCurrentCamera = require(ReactSceneUnderstanding.useCurrentCamera)
+local useCameraState = require(ReactSceneUnderstanding.useCameraState)
+local enums = require(ReactSceneUnderstanding.enums)
+local getSourceAssetsInView = SceneUnderstanding.getSourceAssetsInView
+local getSourceAssetsInRange = SceneUnderstanding.getSourceAssetsInRange
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+
+local function useSourceAssets(t1: {[any]: any}?) -- line: 18
+	-- upvalues: useCurrentCamera (copy), SceneAnalysisContext (copy), useCameraState (copy), useCallback (copy), getSourceAssetsInView (copy), getSourceAssetsInRange (copy), useEffect (copy), SceneUnderstanding (copy), enums (copy)
+	local v14 = useCurrentCamera()
+	local v15 = SceneAnalysisContext.use()
+	local v16 = useCameraState(v14)
+	local v17 = useCallback(function(t2: {[any]: any}, t3: {[any]: any}) -- line: 27
+		if #t3 == #t2 then
+			for _, v22 in t2 do
+				if not table.find(t3, v22) then
+					return true
+				end
+			end
+
+			return false
+		end
+
+		return true
+	end, {})
+	local v18 = useCallback(function() -- line: 41
+		-- upvalues: getSourceAssetsInView (copy), v14 (copy), t1 (copy), v15 (copy), v17 (copy), getSourceAssetsInRange (copy)
+		local v23 = getSourceAssetsInView(v14, if not t1 then nil else t1.viewportQueryOptions)
+
+		v15.setAssetsInView(function(p1) -- line: 43
+			-- upvalues: v17 (copy), v23 (copy)
+			if v17(p1, v23) then
+				return v23
+			end
+
+			return p1
+		end)
+
+		local v24 = getSourceAssetsInRange(v14.CFrame.Position, if not t1 then nil else t1.rangeQueryOptions)
+
+		v15.setAssetsInRange(function(p2) -- line: 49
+			-- upvalues: v17 (copy), v24 (copy)
+			if v17(p2, v24) then
+				return v24
+			end
+
+			return p2
+		end)
+	end, {
+		v14,
+		t1,
+		v15
+	})
+
+	useEffect(function() -- line: 54
+		-- upvalues: SceneUnderstanding (copy), v18 (copy)
+		local connection = workspace.DescendantAdded:Connect(function(descendant) -- line: 55
+			-- upvalues: SceneUnderstanding (copy), v18 (copy)
+			if SceneUnderstanding.isSourceAsset(descendant) then
+				v18()
+			end
+		end)
+
+		v18()
+
+		return function() -- line: 63
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, { v18 })
+	useEffect(function() -- line: 68
+		-- upvalues: v16 (copy), enums (copy), v18 (copy)
+		if v16 == enums.CameraState.Idle then
+			v18()
+		end
+	end, { v16 })
+
+	return {
+		assetsInRange = v15.assetsInRange,
+		assetsInView = v15.assetsInView
+	}
+end
+
+return useSourceAssets

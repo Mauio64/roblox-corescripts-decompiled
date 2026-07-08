@@ -1,61 +1,68 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_0.SceneView);
-local v5 = {
-    keepVisitedScreensMounted = false
-};
-local v6 = v3.Component:extend("RobloxSwitchView");
-v6.getDerivedStateFromProps = function(v7, v8) --[[ Line: 16 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: l_Object_0 (copy), v5 (copy)
-    local l_state_0 = v7.navigation.state;
-    local l_key_0 = l_state_0.routes[l_state_0.index].key;
-    local l_descriptors_0 = v7.descriptors;
-    local l_keepVisitedScreensMounted_0 = l_Object_0.assign(table.clone(v5), v7.navigationConfig or {}).keepVisitedScreensMounted;
-    local v13 = {
-        [l_key_0] = true
-    };
-    if l_keepVisitedScreensMounted_0 and v8.visitedScreenKeys then
-        for v14 in v8.visitedScreenKeys do
-            if l_descriptors_0[v14] ~= nil then
-                v13[v14] = true;
-            end;
-        end;
-    end;
-    return {
-        visitedScreenKeys = v13
-    };
-end;
-v6.init = function(v15) --[[ Line: 44 ]] --[[ Name: init ]]
-    v15.state = {};
-end;
-v6.render = function(v16) --[[ Line: 48 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    local l_state_1 = v16.props.navigation.state;
-    local l_screenProps_0 = v16.props.screenProps;
-    local l_descriptors_1 = v16.props.descriptors;
-    local l_visitedScreenKeys_0 = v16.state.visitedScreenKeys;
-    local l_key_1 = l_state_1.routes[l_state_1.index].key;
-    local v22 = {};
-    for v23, v24 in l_descriptors_1 do
-        local v25 = v23 == l_key_1;
-        if l_visitedScreenKeys_0[v23] == true then
-            v22["card_" .. v23] = v3.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1, 
-                ClipsDescendants = false, 
-                BorderSizePixel = 0, 
-                Visible = v25
-            }, {
-                Content = v3.createElement(v4, {
-                    component = v24.getComponent(), 
-                    navigation = v24.navigation, 
-                    screenProps = l_screenProps_0
-                })
-            });
-        end;
-    end;
-    return v3.createElement("Folder", nil, v22);
-end;
-return v6;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local React = require(ParentParent.React)
+local SceneView = require(scriptParent.SceneView)
+local t1 = {
+	keepVisitedScreensMounted = false
+}
+local v7 = React.Component:extend("RobloxSwitchView")
+
+function v7.getDerivedStateFromProps(p1, p2) -- line: 16
+	-- upvalues: Object (copy), t1 (copy)
+	local state = p1.navigation.state
+	local key = state.routes[state.index].key
+	local descriptors = p1.descriptors
+	local keepVisitedScreensMounted = Object.assign(table.clone(t1), p1.navigationConfig or {}).keepVisitedScreensMounted
+	local t2 = {
+		[key] = true
+	}
+
+	if keepVisitedScreensMounted and p2.visitedScreenKeys then
+		for v15 in p2.visitedScreenKeys do
+			if descriptors[v15] ~= nil then
+				t2[v15] = true
+			end
+		end
+	end
+
+	return {
+		visitedScreenKeys = t2
+	}
+end
+function v7.init(p3) -- line: 44
+	p3.state = {}
+end
+function v7.render(p4) -- line: 48
+	-- upvalues: React (copy), SceneView (copy)
+	local state = p4.props.navigation.state
+	local screenProps = p4.props.screenProps
+	local descriptors = p4.props.descriptors
+	local visitedScreenKeys = p4.state.visitedScreenKeys
+	local key = state.routes[state.index].key
+	local t3 = {}
+
+	for v24, v25 in descriptors do
+		local v26 = v24 == key
+
+		if visitedScreenKeys[v24] == true then
+			t3["card_" .. v24] = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				ClipsDescendants = false,
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 1, 0),
+				Visible = v26
+			}, {
+				Content = React.createElement(SceneView, {
+					component = v25.getComponent(),
+					navigation = v25.navigation,
+					screenProps = screenProps
+				})
+			})
+		end
+	end
+
+	return React.createElement("Folder", nil, t3)
+end
+
+return v7

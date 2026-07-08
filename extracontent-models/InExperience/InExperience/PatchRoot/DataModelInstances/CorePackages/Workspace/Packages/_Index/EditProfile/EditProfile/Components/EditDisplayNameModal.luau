@@ -1,1 +1,1 @@
-return (require(script.EditDisplayNameModalWrapper));
+return (require(script.EditDisplayNameModalWrapper))

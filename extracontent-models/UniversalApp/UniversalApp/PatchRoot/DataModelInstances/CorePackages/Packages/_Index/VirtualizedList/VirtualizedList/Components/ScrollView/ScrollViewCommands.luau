@@ -1,33 +1,36 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local _ = require(l_Parent_0.React);
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+require(ParentParent.React)
+
 return {
-    default = {
-        flashScrollIndicators = function(_) --[[ Line: 59 ]] --[[ Name: flashScrollIndicators ]]
-            warn("flashScrollIndicators not implemented");
-        end, 
-        scrollTo = function(v4, v5, v6, v7) --[[ Line: 62 ]] --[[ Name: scrollTo ]]
-            if v7 then
-                v4._nativeRef.animateScrollTo(v5, v6);
-                return;
-            else
-                v4._nativeRef.current.CanvasPosition = Vector2.new(v5, v6);
-                return;
-            end;
-        end, 
-        scrollToEnd = function(v8, v9) --[[ Line: 69 ]] --[[ Name: scrollToEnd ]]
-            local v10 = v8._nativeRef.current.ScrollingDirection == Enum.ScrollingDirection.Y and 0 or v8._nativeRef.current.AbsoluteCanvasSize.X;
-            local v11 = if v8._nativeRef.current.ScrollingDirection == Enum.ScrollingDirection.Y then v8._nativeRef.current.AbsoluteCanvasSize.Y else 0;
-            if v9 then
-                v8._nativeRef.animateScrollTo(v10, v11);
-                return;
-            else
-                v8._nativeRef.current.CanvasPosition = Vector2.new(v10, v11);
-                return;
-            end;
-        end, 
-        zoomToRect = function(_, _, _) --[[ Line: 83 ]] --[[ Name: zoomToRect ]]
-            warn("zoomToRect not implemented");
-        end
-    }
-};
+	default = {
+		flashScrollIndicators = function(_) -- line: 59
+			warn("flashScrollIndicators not implemented")
+		end,
+		scrollTo = function(p2, n1: number, n2: number, b1: boolean) -- line: 62
+			if b1 then
+				p2._nativeRef.animateScrollTo(n1, n2)
+
+				return
+			end
+
+			p2._nativeRef.current.CanvasPosition = Vector2.new(n1, n2)
+		end,
+		scrollToEnd = function(p3, b2: boolean) -- line: 69
+			local v9 = if p3._nativeRef.current.ScrollingDirection ~= Enum.ScrollingDirection.Y then p3._nativeRef.current.AbsoluteCanvasSize.X else 0
+			local v10 = p3._nativeRef.current.ScrollingDirection ~= Enum.ScrollingDirection.Y and 0 or p3._nativeRef.current.AbsoluteCanvasSize.Y
+
+			if b2 then
+				p3._nativeRef.animateScrollTo(v9, v10)
+
+				return
+			end
+
+			p3._nativeRef.current.CanvasPosition = Vector2.new(v9, v10)
+		end,
+		zoomToRect = function(_, _: {[any]: any}, _: boolean?) -- line: 83
+			warn("zoomToRect not implemented")
+		end
+	}
+}

@@ -1,66 +1,62 @@
-local l_Packages_0 = game:GetService("CorePackages").Packages;
-local v1 = require(l_Packages_0.React);
-local l_VideoCaptureService_0 = game:GetService("VideoCaptureService");
-local l_FaceAnimatorService_0 = game:GetService("FaceAnimatorService");
-local v4 = require(script.Parent.Parent.Utils.FaceChatUtils);
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v6 = require(l_RobloxGui_0.Modules.SelfView.Analytics).new();
-local l_TrackerMode_0 = Enum.TrackerMode;
-local v8 = v4.getTrackerMode();
-local v9 = true;
-if v8 ~= l_TrackerMode_0.Video then
-    v9 = v8 == l_TrackerMode_0.AudioVideo;
-end;
-local v10 = true;
-if v8 ~= l_TrackerMode_0.Audio then
-    v10 = v8 == l_TrackerMode_0.AudioVideo;
-end;
-return function() --[[ Line: 23 ]]
-    -- upvalues: v1 (copy), l_TrackerMode_0 (copy), v4 (copy), v9 (ref), v6 (copy), v10 (ref), l_VideoCaptureService_0 (copy), l_FaceAnimatorService_0 (copy)
-    local v11, v12 = v1.useState(l_TrackerMode_0.None);
-    local v16 = v1.useCallback(function() --[[ Line: 26 ]]
-        -- upvalues: v4 (ref), l_TrackerMode_0 (ref), v9 (ref), v6 (ref), v10 (ref), v12 (copy)
-        local v13 = v4.getTrackerMode();
-        local v14 = true;
-        if v13 ~= l_TrackerMode_0.Video then
-            v14 = v13 == l_TrackerMode_0.AudioVideo;
-        end;
-        if v14 ~= v9 then
-            v6:reportCamState(v14);
-            v9 = v14;
-        end;
-        local v15 = true;
-        if v13 ~= l_TrackerMode_0.Audio then
-            v15 = v13 == l_TrackerMode_0.AudioVideo;
-        end;
-        if v15 ~= v10 then
-            v6:reportMicState(v15);
-            v10 = v15;
-        end;
-        v12(v13);
-    end);
-    v1.useEffect(function() --[[ Line: 45 ]]
-        -- upvalues: l_VideoCaptureService_0 (ref), v16 (copy), l_FaceAnimatorService_0 (ref)
-        if l_VideoCaptureService_0 then
-            v16();
-            local v17 = l_VideoCaptureService_0.Started:Connect(v16);
-            local v18 = l_VideoCaptureService_0.Stopped:Connect(v16);
-            local v19 = l_VideoCaptureService_0.DevicesChanged:Connect(v16);
-            local v20 = l_FaceAnimatorService_0:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(v16);
-            local v21 = l_FaceAnimatorService_0:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(v16);
-            return function() --[[ Line: 55 ]]
-                -- upvalues: v17 (copy), v18 (copy), v19 (copy), v20 (copy), v21 (copy)
-                v17:Disconnect();
-                v18:Disconnect();
-                v19:Disconnect();
-                v20:Disconnect();
-                v21:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 63 ]]
+local Packages = game:GetService("CorePackages").Packages
+local React = require(Packages.React)
+local VideoCaptureService = game:GetService("VideoCaptureService")
+local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local FaceChatUtils = require(script.Parent.Parent.Utils.FaceChatUtils)
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local v7 = require(RobloxGui.Modules.SelfView.Analytics).new()
+local TrackerMode = Enum.TrackerMode
+local v9 = FaceChatUtils.getTrackerMode()
+local u10 = v9 == TrackerMode.Video or v9 == TrackerMode.AudioVideo
+local u11 = v9 == TrackerMode.Audio or v9 == TrackerMode.AudioVideo
 
-            end;
-        end;
-    end, {});
-    return v11;
-end;
+return function() -- line: 23
+	-- upvalues: React (copy), TrackerMode (copy), FaceChatUtils (copy), u10 (ref), v7 (copy), u11 (ref), VideoCaptureService (copy), FaceAnimatorService (copy)
+	local v12, v13 = React.useState(TrackerMode.None)
+	local v14 = React.useCallback(function() -- line: 26
+		-- upvalues: FaceChatUtils (copy), TrackerMode (copy), u10 (ref), v7 (copy), u11 (ref), v13 (copy)
+		local v15 = FaceChatUtils.getTrackerMode()
+		local v16 = v15 == TrackerMode.Video or v15 == TrackerMode.AudioVideo
+
+		if v16 ~= u10 then
+			v7:reportCamState(v16)
+			u10 = v16
+		end
+
+		local v17 = v15 == TrackerMode.Audio or v15 == TrackerMode.AudioVideo
+
+		if v17 ~= u11 then
+			v7:reportMicState(v17)
+			u11 = v17
+		end
+
+		v13(v15)
+	end)
+
+	React.useEffect(function() -- line: 45
+		-- upvalues: VideoCaptureService (copy), v14 (copy), FaceAnimatorService (copy)
+		if VideoCaptureService then
+			v14()
+
+			local connection = VideoCaptureService.Started:Connect(v14)
+			local connection2 = VideoCaptureService.Stopped:Connect(v14)
+			local connection3 = VideoCaptureService.DevicesChanged:Connect(v14)
+			local connection4 = FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(v14)
+			local connection5 = FaceAnimatorService:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(v14)
+
+			return function() -- line: 55
+				-- upvalues: connection (copy), connection2 (copy), connection3 (copy), connection4 (copy), connection5 (copy)
+				connection:Disconnect()
+				connection2:Disconnect()
+				connection3:Disconnect()
+				connection4:Disconnect()
+				connection5:Disconnect()
+			end
+		end
+
+		return function() -- line: 63
+		end
+	end, {})
+
+	return v12
+end

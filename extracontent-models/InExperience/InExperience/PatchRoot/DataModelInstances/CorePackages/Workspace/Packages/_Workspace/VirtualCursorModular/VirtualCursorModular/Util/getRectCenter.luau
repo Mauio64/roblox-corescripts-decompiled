@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: getRectCenter ]]
-    return (v0.Min + v0.Max) / 2;
-end;
+local function getRectCenter(rect: Rect) -- line: 2
+	return (rect.Min + rect.Max) / 2
+end
+
+return getRectCenter

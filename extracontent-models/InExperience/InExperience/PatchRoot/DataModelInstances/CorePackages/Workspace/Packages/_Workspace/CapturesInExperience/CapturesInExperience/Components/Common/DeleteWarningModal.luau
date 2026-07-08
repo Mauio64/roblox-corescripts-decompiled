@@ -1,123 +1,129 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Localization);
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.RoactUtils);
-local v5 = require(l_Parent_1.RobloxAppHooks);
-local v6 = require(l_Parent_1.UIBlox);
-local v7 = require(l_Parent_0.Actions.DeleteWarningModalClosed);
-local v8 = require(l_Parent_0.Utils.recordDeleteWarningModalOptOut);
-local l_useCallback_0 = v3.useCallback;
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v3.useEffect;
-local l_useLocalization_0 = v2.Hooks.useLocalization;
-local l_useScreenSize_0 = v5.useScreenSize;
-local l_useSelector_0 = v4.Hooks.RoactRodux.useSelector;
-local l_useState_0 = v3.useState;
-local l_useStyle_0 = v6.Core.Style.useStyle;
-local v17 = require(l_Parent_0.Constants);
-local v18 = require(l_Parent_0.Analytics.EventNames);
-local v19 = require(l_Parent_0.Analytics.useAnalytics);
-local l_ButtonType_0 = v6.App.Button.Enum.ButtonType;
-local l_Checkbox_0 = v6.App.InputButton.Checkbox;
-local l_InteractiveAlert_0 = v6.App.Dialog.Alert.InteractiveAlert;
-return function(v23) --[[ Line: 35 ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useStyle_0 (copy), v19 (copy), l_useDispatch_0 (copy), l_useLocalization_0 (copy), l_useSelector_0 (copy), v17 (copy), l_useState_0 (copy), l_useEffect_0 (copy), l_useCallback_0 (copy), v7 (copy), v18 (copy), v8 (copy), v3 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy), l_Checkbox_0 (copy)
-    local v24 = l_useScreenSize_0();
-    local v25 = l_useStyle_0();
-    local v26 = v19();
-    local v27 = l_useDispatch_0();
-    local v28 = l_useLocalization_0({
-        alertBody = "Feature.Captures.Label.DeleteCaptureInfo", 
-        alertBodyPlural = "Feature.Captures.Label.DeleteCapturesWarning", 
-        alertTitle = "Feature.Captures.Title.DeleteCaptureWarning", 
-        alertTitlePlural = "Feature.Captures.Title.DeleteMultipleCapturesWarning", 
-        cancelCTA = "Feature.Captures.Action.DeleteCaptureWarningCancel", 
-        deleteCTA = "Feature.Captures.Action.DeleteCaptureWarningConfirm", 
-        optOutText = "Feature.Captures.Label.DeleteCaptureWarningOptOut"
-    });
-    local l_Theme_0 = v25.Theme;
-    local v31 = l_useSelector_0(function(v30) --[[ Line: 54 ]]
-        -- upvalues: v17 (ref)
-        return v30[v17.RoduxKey].Carousel.IsDeleteWarningModalOpen;
-    end);
-    local v33 = l_useSelector_0(function(v32) --[[ Line: 58 ]]
-        -- upvalues: v17 (ref)
-        return v32[v17.RoduxKey].CaptureManager.SelectedCaptures;
-    end);
-    local v34, v35 = l_useState_0(false);
-    l_useEffect_0(function() --[[ Line: 64 ]]
-        -- upvalues: v31 (copy), v35 (copy)
-        if v31 then
-            v35(false);
-        end;
-    end, {
-        v31, 
-        v35
-    });
-    local v36 = l_useCallback_0(function() --[[ Line: 70 ]]
-        -- upvalues: v27 (copy), v7 (ref), v26 (copy), v18 (ref)
-        v27(v7());
-        v26.fireEvent(v18.CapturesDeleteWarningModalCancelPressed);
-    end, {});
-    local v37 = l_useCallback_0(function() --[[ Line: 75 ]]
-        -- upvalues: v23 (copy), v34 (copy), v8 (ref), v26 (copy), v18 (ref), v27 (copy), v7 (ref)
-        v23.deleteItem();
-        if v34 then
-            v8(v26);
-        end;
-        v26.fireEvent(v18.CapturesDeleteWarningModalDeletePressed);
-        v27(v7());
-    end, {
-        v26, 
-        v34, 
-        v23.deleteItem
-    });
-    return v3.createElement("TextButton", {
-        Active = true, 
-        AutoButtonColor = false, 
-        BackgroundColor3 = l_Theme_0.Overlay.Color, 
-        BackgroundTransparency = l_Theme_0.Overlay.Transparency, 
-        Size = UDim2.fromScale(1, 1), 
-        Visible = v31, 
-        ZIndex = v23.zIndex
-    }, {
-        Alert = v3.createElement(l_InteractiveAlert_0, {
-            bodyText = if #v33 > 1 then v28.alertBodyPlural else v28.alertBody, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = {
-                            onActivated = v36, 
-                            text = v28.cancelCTA
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = v37, 
-                            text = v28.deleteCTA
-                        }
-                    }
-                }
-            }, 
-            isMiddleContentFocusable = false, 
-            middleContent = function() --[[ Line: 116 ]] --[[ Name: middleContent ]]
-                -- upvalues: v3 (ref), l_Checkbox_0 (ref), v28 (copy), v34 (copy), v35 (copy)
-                return v3.createElement(l_Checkbox_0, {
-                    text = v28.optOutText, 
-                    isSelected = v34, 
-                    isDisabled = false, 
-                    onActivated = function() --[[ Line: 121 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v35 (ref), v34 (ref)
-                        v35(not v34);
-                    end
-                });
-            end, 
-            position = UDim2.fromScale(0.5, 0.5), 
-            screenSize = v24, 
-            title = if #v33 > 1 then v28.alertTitlePlural else v28.alertTitle
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Localization = require(ParentParentParent.Localization)
+local React = require(ParentParentParent.React)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
+local UIBlox = require(ParentParentParent.UIBlox)
+local Checkbox = require(ParentParentParent.Foundation).Checkbox
+local DeleteWarningModalClosed = require(ParentParent.Actions.DeleteWarningModalClosed)
+local recordDeleteWarningModalOptOut = require(ParentParent.Utils.recordDeleteWarningModalOptOut)
+local useCallback = React.useCallback
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useLocalization = Localization.Hooks.useLocalization
+local useScreenSize = RobloxAppHooks.useScreenSize
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useState = React.useState
+local useStyle = UIBlox.Core.Style.useStyle
+local Constants = require(ParentParent.Constants)
+local EventNames = require(ParentParent.Analytics.EventNames)
+local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+
+return function(t1: {[any]: any}) -- line: 37
+	-- upvalues: useScreenSize (copy), useStyle (copy), useAnalytics (copy), useDispatch (copy), useLocalization (copy), useSelector (copy), Constants (copy), useState (copy), useEffect (copy), useCallback (copy), DeleteWarningModalClosed (copy), EventNames (copy), recordDeleteWarningModalOptOut (copy), React (copy), InteractiveAlert (copy), ButtonType (copy), Checkbox (copy)
+	local v25 = useScreenSize()
+	local v26 = useStyle()
+	local v27 = useAnalytics()
+	local v28 = useDispatch()
+	local v29 = useLocalization({
+		alertBody = "Feature.Captures.Label.DeleteCaptureInfo",
+		alertBodyPlural = "Feature.Captures.Label.DeleteCapturesWarning",
+		alertTitle = "Feature.Captures.Title.DeleteCaptureWarning",
+		alertTitlePlural = "Feature.Captures.Title.DeleteMultipleCapturesWarning",
+		cancelCTA = "Feature.Captures.Action.DeleteCaptureWarningCancel",
+		deleteCTA = "Feature.Captures.Action.DeleteCaptureWarningConfirm",
+		optOutText = "Feature.Captures.Label.DeleteCaptureWarningOptOut"
+	})
+	local Theme = v26.Theme
+	local v31 = useSelector(function(p1) -- line: 56
+		-- upvalues: Constants (copy)
+		return p1[Constants.RoduxKey].Carousel.IsDeleteWarningModalOpen
+	end)
+	local v32 = useSelector(function(p2) -- line: 60
+		-- upvalues: Constants (copy)
+		return p2[Constants.RoduxKey].CaptureManager.SelectedCaptures
+	end)
+	local v33, v34 = useState(false)
+
+	useEffect(function() -- line: 66
+		-- upvalues: v31 (copy), v34 (copy)
+		if v31 then
+			v34(false)
+		end
+	end, {
+		v31,
+		v34
+	})
+
+	local v35 = useCallback(function() -- line: 72
+		-- upvalues: v28 (copy), DeleteWarningModalClosed (copy), v27 (copy), EventNames (copy)
+		v28(DeleteWarningModalClosed())
+		v27.fireEvent(EventNames.CapturesDeleteWarningModalCancelPressed)
+	end, {})
+	local v36 = useCallback(function() -- line: 77
+		-- upvalues: t1 (copy), v33 (copy), recordDeleteWarningModalOptOut (copy), v27 (copy), EventNames (copy), v28 (copy), DeleteWarningModalClosed (copy)
+		t1.deleteItem()
+
+		if v33 then
+			recordDeleteWarningModalOptOut(v27)
+		end
+
+		v27.fireEvent(EventNames.CapturesDeleteWarningModalDeletePressed)
+		v28(DeleteWarningModalClosed())
+	end, {
+		v27,
+		v33,
+		t1.deleteItem
+	})
+
+	return React.createElement("TextButton", {
+		Active = true,
+		AutoButtonColor = false,
+		BackgroundColor3 = Theme.Overlay.Color,
+		BackgroundTransparency = Theme.Overlay.Transparency,
+		Size = UDim2.fromScale(1, 1),
+		Visible = v31,
+		ZIndex = t1.zIndex
+	}, {
+		Alert = React.createElement(InteractiveAlert, {
+			isMiddleContentFocusable = false,
+			bodyText = if not (#v32 > 1) then v29.alertBody else v29.alertBodyPlural,
+			buttonStackInfo = {
+				buttons = {
+					{
+						buttonType = ButtonType.Secondary,
+						props = {
+							onActivated = v35,
+							text = v29.cancelCTA
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							onActivated = v36,
+							text = v29.deleteCTA
+						}
+					}
+				}
+			},
+			middleContent = function() -- line: 118
+				-- upvalues: React (copy), Checkbox (copy), v29 (copy), v33 (copy), v34 (copy)
+				return React.createElement(Checkbox, {
+					isDisabled = false,
+					label = v29.optOutText,
+					isChecked = v33,
+					onActivated = function() -- line: 123
+						-- upvalues: v34 (copy), v33 (copy)
+						v34(not v33)
+					end
+				})
+			end,
+			position = UDim2.fromScale(0.5, 0.5),
+			screenSize = v25,
+			title = if not (#v32 > 1) then v29.alertTitle else v29.alertTitlePlural
+		})
+	})
+end

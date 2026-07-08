@@ -1,5 +1,6 @@
-local v0 = require(script.ObservableValue);
+local ObservableValue = require(script.ObservableValue)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    ObservableValue = v0
-};
+	["jest.config"] = script["jest.config"],
+	ObservableValue = ObservableValue
+}

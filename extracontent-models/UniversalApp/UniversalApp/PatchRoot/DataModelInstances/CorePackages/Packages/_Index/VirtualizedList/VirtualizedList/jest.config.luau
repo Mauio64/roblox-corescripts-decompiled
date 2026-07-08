@@ -1,6 +1,4 @@
 return {
-    displayName = "VirtualizedListLua", 
-    testMatch = {
-        "**/*.spec"
-    }
-};
+	displayName = "VirtualizedListLua",
+	testMatch = { "**/*.spec" }
+}

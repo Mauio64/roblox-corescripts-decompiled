@@ -1,15 +1,16 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local v3 = require(l_Parent_0.React);
-local v4 = v3.createContext({
-    isIconSize = false, 
-    colorMode = v2.Color
-});
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local ColorMode = require(Foundation.Enums.ColorMode)
+local React = require(FoundationParent.React)
+local v5 = React.createContext({
+	isIconSize = false,
+	colorMode = ColorMode.Color
+})
+
 return {
-    Provider = v4.Provider, 
-    usePresentationContext = function() --[[ Line: 19 ]] --[[ Name: usePresentationContext ]]
-        -- upvalues: v3 (copy), v4 (copy)
-        return v3.useContext(v4);
-    end
-};
+	Provider = v5.Provider,
+	usePresentationContext = function() -- line: 19
+		-- upvalues: React (copy), v5 (copy)
+		return React.useContext(v5)
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("TokenizeUnibarConstantsWithStyleProvider", false);
+return game:DefineFastFlag("TokenizeUnibarConstantsWithStyleProvider", false)

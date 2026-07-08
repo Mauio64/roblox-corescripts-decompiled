@@ -1,45 +1,54 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script:FindFirstAncestor("CollectionViews").Parent;
-local v2 = require(l_Parent_0.React);
-return function(v3, v4) --[[ Line: 9 ]] --[[ Name: useCarouselScrollingBinding ]]
-    -- upvalues: v2 (copy), l_RunService_0 (copy)
-    local v5, v6 = v2.useBinding(false);
-    v2.useEffect(function() --[[ Line: 15 ]]
-        -- upvalues: v3 (copy), v4 (copy), v6 (copy), l_RunService_0 (ref)
-        local l_current_0 = v3.current;
-        if not v4 or not l_current_0 then
-            return nil;
-        else
-            assert(l_current_0, "scrollingFrame must exist");
-            local v8 = 0;
-            local v9 = nil;
-            local v10 = l_current_0:GetPropertyChangedSignal("CanvasPosition"):Connect(function() --[[ Line: 25 ]]
-                -- upvalues: v8 (ref), v9 (ref), v6 (ref), l_RunService_0 (ref)
-                v8 = os.clock() + 0.01;
-                if not v9 then
-                    v6(true);
-                    v9 = l_RunService_0.Heartbeat:Connect(function() --[[ Line: 29 ]]
-                        -- upvalues: v8 (ref), v6 (ref), v9 (ref)
-                        if os.clock() >= v8 then
-                            v6(false);
-                            if v9 then
-                                v9:Disconnect();
-                                v9 = nil;
-                            end;
-                        end;
-                    end);
-                end;
-            end);
-            return function() --[[ Line: 41 ]]
-                -- upvalues: v10 (copy), v9 (ref)
-                v10:Disconnect();
-                if v9 then
-                    v9:Disconnect();
-                end;
-            end;
-        end;
-    end, {
-        v3
-    });
-    return v5;
-end;
+local RunService = game:GetService("RunService")
+local Parent = script:FindFirstAncestor("CollectionViews").Parent
+local React = require(Parent.React)
+
+local function useCarouselScrollingBinding(t1: {[any]: any}, b1: boolean) -- line: 9
+	-- upvalues: React (copy), RunService (copy)
+	local v7, v8 = React.useBinding(false)
+
+	React.useEffect(function() -- line: 15
+		-- upvalues: t1 (copy), b1 (copy), v8 (copy), RunService (copy)
+		local current = t1.current
+
+		if not b1 or not current then
+			return nil
+		end
+
+		assert(current, "scrollingFrame must exist")
+
+		local n1 = 0
+		local u11 = nil
+		local connection = current:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 25
+			-- upvalues: n1 (ref), u11 (ref), v8 (copy), RunService (copy)
+			n1 = os.clock() + 0.01
+
+			if not u11 then
+				v8(true)
+				u11 = RunService.Heartbeat:Connect(function() -- line: 29
+					-- upvalues: n1 (ref), v8 (copy), u11 (ref)
+					if os.clock() >= n1 then
+						v8(false)
+
+						if u11 then
+							u11:Disconnect()
+							u11 = nil
+						end
+					end
+				end)
+			end
+		end)
+
+		return function() -- line: 41
+			-- upvalues: connection (copy), u11 (ref)
+			connection:Disconnect()
+
+			if u11 then
+				u11:Disconnect()
+			end
+		end
+	end, { t1 })
+
+	return v7
+end
+
+return useCarouselScrollingBinding

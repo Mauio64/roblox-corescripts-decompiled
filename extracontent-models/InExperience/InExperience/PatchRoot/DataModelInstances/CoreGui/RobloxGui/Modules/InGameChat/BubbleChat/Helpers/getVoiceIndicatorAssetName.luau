@@ -1,17 +1,23 @@
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v1 = require(l_Modules_0.Flags.getFFlagEnableShimmeringIconLegacyChatService);
-return function(v2, v3, v4) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local _ = nil;
-    if v1() and v2 == "Connecting" then
-        return "icons/controls/voice/" .. v4 .. "_0_dark";
-    elseif v2 == "Muted" or v2 == "LOCAL_MUTED" then
-        return "icons/controls/voice/" .. v4 .. "_off_light";
-    elseif v2 == "Inactive" or v2 == "Connecting" then
-        return "icons/controls/voice/" .. v4 .. "_0_light";
-    elseif v2 == "Talking" then
-        return "icons/controls/voice/" .. v4 .. "_" .. tostring(math.floor(v3 * 5 + 0.5) * 20) .. "_light";
-    else
-        return "icons/controls/voice/" .. v4 .. "_error_light";
-    end;
-end;
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local getFFlagEnableShimmeringIconLegacyChatService = require(Modules.Flags.getFFlagEnableShimmeringIconLegacyChatService)
+
+return function(p1, n1: number, s1: string) -- line: 5
+	-- upvalues: getFFlagEnableShimmeringIconLegacyChatService (copy)
+	if getFFlagEnableShimmeringIconLegacyChatService() and p1 == "Connecting" then
+		return "icons/controls/voice/" .. s1 .. "_0_dark"
+	end
+
+	if p1 == "Muted" or p1 == "LOCAL_MUTED" then
+		return "icons/controls/voice/" .. s1 .. "_off_light"
+	end
+
+	if p1 == "Inactive" or p1 == "Connecting" then
+		return "icons/controls/voice/" .. s1 .. "_0_light"
+	end
+
+	if p1 == "Talking" then
+		return "icons/controls/voice/" .. s1 .. "_" .. tostring(math.floor(n1 * 5 + 0.5) * 20) .. "_light"
+	end
+
+	return "icons/controls/voice/" .. s1 .. "_error_light"
+end

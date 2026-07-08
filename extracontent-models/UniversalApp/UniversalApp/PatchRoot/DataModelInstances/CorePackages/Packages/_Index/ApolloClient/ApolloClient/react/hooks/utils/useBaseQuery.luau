@@ -1,108 +1,119 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.Promise);
-local v4 = require(l_Parent_1.LuauPolyfill);
-local l_Boolean_0 = v4.Boolean;
-local l_Object_0 = v4.Object;
-local v7 = require(l_Parent_1.React);
-local l_useContext_0 = v7.useContext;
-local l_useEffect_0 = v7.useEffect;
-local l_useReducer_0 = v7.useReducer;
-local l_useRef_0 = v7.useRef;
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(l_Parent_0.jsutils.typedDocumentNode);
-local _ = require(script.Parent.Parent.Parent.types.types);
-local l_QueryData_0 = require(script.Parent.Parent.Parent.data).QueryData;
-local l_useDeepMemo_0 = require(script.Parent.useDeepMemo).useDeepMemo;
-local _ = require(script.Parent.Parent.Parent.Parent.core);
-local l_getApolloContext_0 = require(script.Parent.Parent.Parent.context).getApolloContext;
-local l_useAfterFastRefresh_0 = require(script.Parent.useAfterFastRefresh).useAfterFastRefresh;
-local v20 = {
-    __value = "nil placeholder"
-};
-v0.useBaseQuery = function(v21, v22, v23) --[[ Line: 48 ]] --[[ Name: useBaseQuery ]]
-    -- upvalues: l_useContext_0 (copy), l_getApolloContext_0 (copy), l_useReducer_0 (copy), l_Boolean_0 (copy), l_Object_0 (copy), l_useRef_0 (copy), l_QueryData_0 (copy), v3 (copy), l_useDeepMemo_0 (copy), l_useAfterFastRefresh_0 (copy), l_useEffect_0 (copy), v20 (copy)
-    if v23 == nil then
-        v23 = false;
-    end;
-    local v24 = l_useContext_0(l_getApolloContext_0());
-    local v26, v27 = l_useReducer_0(function(v25) --[[ Line: 58 ]]
-        return v25 + 1;
-    end, 0);
-    local v28 = l_Boolean_0.toJSBoolean(v22) and l_Object_0.assign({}, v22, {
-        query = v21
-    }) or {
-        query = v21
-    };
-    local v29 = l_useRef_0(nil);
-    local v30 = nil;
-    v30 = v29.current or (function() --[[ Line: 66 ]]
-        -- upvalues: v29 (copy), l_QueryData_0 (ref), v28 (copy), v24 (copy), l_Boolean_0 (ref), v30 (ref), v3 (ref), v27 (copy)
-        v29.current = l_QueryData_0.new({
-            options = v28, 
-            context = v24, 
-            onNewData = function(_) --[[ Line: 70 ]] --[[ Name: onNewData ]]
-                -- upvalues: l_Boolean_0 (ref), v30 (ref), v3 (ref), v29 (ref), v27 (ref)
-                if not l_Boolean_0.toJSBoolean(v30:ssrInitiated()) then
-                    v3.delay(0):andThen(function() --[[ Line: 78 ]]
-                        -- upvalues: v29 (ref), v27 (ref)
-                        if v29.current ~= nil and v29.current.isMounted then
-                            return v27(nil);
-                        else
-                            return;
-                        end;
-                    end);
-                    return;
-                else
-                    v27(nil);
-                    return;
-                end;
-            end
-        });
-        return v29.current;
-    end)();
-    v30:setOptions(v28);
-    v30.context = v24;
-    local v32 = {
-        options = l_Object_0.assign({}, v28, {
-            onError = l_Object_0.None, 
-            onCompleted = l_Object_0.None
-        }), 
-        context = v24, 
-        tick = v26
-    };
-    local v33 = l_useDeepMemo_0(function() --[[ Line: 114 ]]
-        -- upvalues: v23 (ref), v30 (ref)
-        if v23 then
-            return v30:executeLazy();
-        else
-            return v30:execute();
-        end;
-    end, v32);
-    local v34 = if v23 then v33[2] else v33;
-    if _G.__DEV__ then
-        l_useAfterFastRefresh_0(v27);
-    end;
-    l_useEffect_0(function() --[[ Line: 131 ]]
-        -- upvalues: v30 (ref), v29 (copy)
-        return function() --[[ Line: 132 ]]
-            -- upvalues: v30 (ref), v29 (ref)
-            v30:cleanup();
-            v29.current = nil;
-        end;
-    end, {});
-    l_useEffect_0(function() --[[ Line: 140 ]]
-        -- upvalues: v30 (ref), v23 (ref)
-        return v30:afterExecute({
-            lazy = v23
-        });
-    end, {
-        v34.loading ~= nil and v34.loading or v20, 
-        v34.networkStatus ~= nil and v34.networkStatus or v20, 
-        v34.error ~= nil and v34.error or v20, 
-        v34.data ~= nil and v34.data or v20
-    });
-    return v33;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Promise = require(ParentParentParent.Promise)
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local React = require(ParentParentParent.React)
+local useContext = React.useContext
+local useEffect = React.useEffect
+local useReducer = React.useReducer
+local useRef = React.useRef
+
+require(ParentParentParent.GraphQL)
+require(ParentParent.jsutils.typedDocumentNode)
+require(script.Parent.Parent.Parent.types.types)
+
+local QueryData = require(script.Parent.Parent.Parent.data).QueryData
+local useDeepMemo = require(script.Parent.useDeepMemo).useDeepMemo
+
+require(script.Parent.Parent.Parent.Parent.core)
+
+local getApolloContext = require(script.Parent.Parent.Parent.context).getApolloContext
+local useAfterFastRefresh = require(script.Parent.useAfterFastRefresh).useAfterFastRefresh
+local t2 = {
+	__value = "nil placeholder"
+}
+
+function t1.useBaseQuery(p1, p2, b1: boolean?) -- line: 48
+	-- upvalues: useContext (copy), getApolloContext (copy), useReducer (copy), Boolean (copy), Object (copy), useRef (copy), QueryData (copy), Promise (copy), useDeepMemo (copy), useAfterFastRefresh (copy), useEffect (copy), t2 (copy)
+	if b1 == nil then
+		b1 = false
+	end
+
+	local v22 = useContext(getApolloContext())
+	local v23, v24 = useReducer(function(n1: number) -- line: 58
+		return n1 + 1
+	end, 0)
+	local v25 = Boolean.toJSBoolean(p2) and Object.assign({}, p2, {
+		query = p1
+	}) or {
+		query = p1
+	}
+	local v26 = useRef(nil)
+	local u27 = nil
+
+	u27 = v26.current or (function() -- line: 66
+		-- upvalues: v26 (copy), QueryData (copy), v25 (copy), v22 (copy), Boolean (copy), u27 (ref), Promise (copy), v24 (copy)
+		v26.current = QueryData.new({
+			options = v25,
+			context = v22,
+			onNewData = function(_) -- line: 70
+				-- upvalues: Boolean (copy), u27 (ref), Promise (copy), v26 (copy), v24 (copy)
+				if not Boolean.toJSBoolean(u27:ssrInitiated()) then
+					Promise.delay(0):andThen(function() -- line: 78
+						-- upvalues: v26 (copy), v24 (copy)
+						if v26.current ~= nil and v26.current.isMounted then
+							return v24(nil)
+						end
+					end)
+
+					return
+				end
+
+				v24(nil)
+			end
+		})
+
+		return v26.current
+	end)()
+	u27:setOptions(v25)
+	u27.context = v22
+
+	local t3 = {
+		options = Object.assign({}, v25, {
+			onError = Object.None,
+			onCompleted = Object.None
+		}),
+		context = v22,
+		tick = v23
+	}
+	local v29 = useDeepMemo(function() -- line: 114
+		-- upvalues: b1 (ref), u27 (ref)
+		if b1 then
+			return u27:executeLazy()
+		end
+
+		return u27:execute()
+	end, t3)
+	local v30 = if not b1 then v29 else v29[2]
+
+	if _G.__DEV__ then
+		useAfterFastRefresh(v24)
+	end
+
+	useEffect(function() -- line: 131
+		-- upvalues: u27 (ref), v26 (copy)
+		return function() -- line: 132
+			-- upvalues: u27 (ref), v26 (copy)
+			u27:cleanup()
+			v26.current = nil
+		end
+	end, {})
+	useEffect(function() -- line: 140
+		-- upvalues: u27 (ref), b1 (ref)
+		return u27:afterExecute({
+			lazy = b1
+		})
+	end, {
+		v30.loading ~= nil and v30.loading or t2,
+		v30.networkStatus ~= nil and v30.networkStatus or t2,
+		v30.error ~= nil and v30.error or t2,
+		v30.data ~= nil and v30.data or t2
+	})
+
+	return v29
+end
+
+return t1

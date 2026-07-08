@@ -1,24 +1,29 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3, v4) --[[ Line: 7 ]] --[[ Name: useEventConnection ]]
-    -- upvalues: v1 (copy)
-    local v5 = v1.useMemo(function() --[[ Line: 8 ]]
-        -- upvalues: v3 (copy)
-        return v3;
-    end, v4);
-    v1.useEffect(function() --[[ Line: 12 ]]
-        -- upvalues: v2 (copy), v5 (copy)
-        if v2 == nil then
-            return nil;
-        else
-            local v6 = v2:Connect(v5);
-            return function() --[[ Line: 19 ]]
-                -- upvalues: v6 (copy)
-                v6:Disconnect();
-            end;
-        end;
-    end, {
-        v2, 
-        v5
-    });
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useEventConnection(p1, p2: ((...any) -> ...any), t1: {[any]: any}?) -- line: 7
+	-- upvalues: React (copy)
+	local v7 = React.useMemo(function() -- line: 8
+		-- upvalues: p2 (copy)
+		return p2
+	end, t1)
+
+	React.useEffect(function() -- line: 12
+		-- upvalues: p1 (copy), v7 (copy)
+		if p1 == nil then
+			return nil
+		end
+
+		local connection = p1:Connect(v7)
+
+		return function() -- line: 19
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {
+		p1,
+		v7
+	})
+end
+
+return useEventConnection

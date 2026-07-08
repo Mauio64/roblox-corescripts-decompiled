@@ -1,45 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_React_0 = v1.React;
-local l_ReactOtter_0 = v1.ReactOtter;
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-return function(v5) --[[ Line: 11 ]]
-    -- upvalues: l_React_0 (copy), l_ReactOtter_0 (copy)
-    local v6 = l_React_0.useRef(nil);
-    local v7, v8 = l_ReactOtter_0.useAnimatedBinding(v5, function() --[[ Line: 13 ]]
-        -- upvalues: v6 (copy)
-        if v6.current then
-            v6.current();
-            v6.current = nil;
-        end;
-    end);
-    return v7, (l_React_0.useCallback(function(v9, v10) --[[ Line: 20 ]]
-        -- upvalues: v6 (copy), v8 (copy), l_ReactOtter_0 (ref)
-        local function _(v11, v12) --[[ Line: 21 ]] --[[ Name: animateStep ]]
-            -- upvalues: v6 (ref), v8 (ref), l_ReactOtter_0 (ref)
-            v6.current = v12;
-            v8(l_ReactOtter_0.ease(v11.value, {
-                duration = v11.durationInMs / 1000, 
-                easingStyle = v11.easingStyle
-            }));
-        end;
-        local function v14(v15, v16, v17) --[[ Line: 29 ]] --[[ Name: animateImpl ]]
-            -- upvalues: v14 (copy), v6 (ref), v8 (ref), l_ReactOtter_0 (ref)
-            local v18 = v15[v16];
-            if v18 ~= nil then
-                v6.current = function() --[[ Line: 32 ]]
-                    -- upvalues: v17 (copy), v16 (copy), v14 (ref), v15 (copy)
-                    if v17 then
-                        v17(v16);
-                    end;
-                    v14(v15, v16 + 1, v17);
-                end;
-                v8(l_ReactOtter_0.ease(v18.value, {
-                    duration = v18.durationInMs / 1000, 
-                    easingStyle = v18.easingStyle
-                }));
-            end;
-        end;
-        return v14(v9, 1, v10);
-    end, {}));
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local React = dependencies.React
+local ReactOtter = dependencies.ReactOtter
+
+require(CrossExperienceVoice.Common.Types)
+
+return function(n1: number) -- line: 11
+	-- upvalues: React (copy), ReactOtter (copy)
+	local v6 = React.useRef(nil)
+	local v7, v8 = ReactOtter.useAnimatedBinding(n1, function() -- line: 13
+		-- upvalues: v6 (copy)
+		if v6.current then
+			v6.current()
+			v6.current = nil
+		end
+	end)
+
+	return v7, (React.useCallback(function(t1: {[any]: any}, p1: ((...any) -> ...any)?) -- line: 20
+		-- upvalues: v6 (copy), v8 (copy), ReactOtter (copy)
+		local function animateStep(p2, p3: ((...any) -> ...any)) -- line: 21
+			-- upvalues: v6 (copy), v8 (copy), ReactOtter (copy)
+			v6.current = p3
+			v8(ReactOtter.ease(p2.value, {
+				duration = p2.durationInMs / 1000,
+				easingStyle = p2.easingStyle
+			}))
+		end
+		local function animateImpl(t2: {[any]: any}, n2: number, p4: ((...any) -> ...any)?) -- line: 29
+			-- upvalues: animateImpl (copy), v6 (copy), v8 (copy), ReactOtter (copy)
+			local v18 = t2[n2]
+
+			if v18 ~= nil then
+				function v6.current() -- line: 32
+					-- upvalues: p4 (copy), n2 (copy), animateImpl (copy), t2 (copy)
+					if p4 then
+						p4(n2)
+					end
+
+					animateImpl(t2, n2 + 1, p4)
+				end
+
+				v8(ReactOtter.ease(v18.value, {
+					duration = v18.durationInMs / 1000,
+					easingStyle = v18.easingStyle
+				}))
+			end
+		end
+
+		return animateImpl(t1, 1, p1)
+	end, {}))
+end

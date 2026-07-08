@@ -1,4 +1,8 @@
+local IntervalPerformanceTracker = require(script.IntervalPerformanceTracker)
+local createScrollIntervalPerformanceTracker = require(script.createScrollIntervalPerformanceTracker)
+
 return {
-    IntervalPerformanceTracker = require(script.IntervalPerformanceTracker), 
-    ["jest.config"] = script["jest.config"]
-};
+	IntervalPerformanceTracker = IntervalPerformanceTracker,
+	createScrollIntervalPerformanceTracker = createScrollIntervalPerformanceTracker,
+	["jest.config"] = script["jest.config"]
+}

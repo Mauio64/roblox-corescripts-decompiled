@@ -1,11 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 10 ]] --[[ Name: usePrevious ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(nil);
-    v1.useEffect(function() --[[ Line: 12 ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        v3.current = v2;
-    end);
-    return v3.current;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function usePrevious(p1) -- line: 10
+	-- upvalues: React (copy)
+	local v5 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 12
+		-- upvalues: v5 (copy), p1 (copy)
+		v5.current = p1
+	end)
+
+	return v5.current
+end
+
+return usePrevious

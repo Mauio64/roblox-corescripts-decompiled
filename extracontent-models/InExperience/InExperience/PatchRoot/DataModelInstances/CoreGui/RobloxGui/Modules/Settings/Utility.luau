@@ -71,22 +71,22 @@ local function EaseOutQuad(p10, p11, p12, p13) -- line: 121
 		return p11 + p12
 	end
 
-	local v77 = p10 / p13
+	local v84 = p10 / p13
 
-	return p11 - p12 * v77 * (v77 - 2)
+	return p11 - p12 * v84 * (v84 - 2)
 end
 local function EaseInOutQuad(p14, p15, p16, p17) -- line: 130
 	if p17 <= p14 then
 		return p15 + p16
 	end
 
-	local v82 = p14 / p17
+	local v89 = p14 / p17
 
-	if v82 < 0.5 then
-		return 2 * p16 * v82 * v82 + p15
+	if v89 < 0.5 then
+		return 2 * p16 * v89 * v89 + p15
 	end
 
-	return p15 + p16 * (2 * (2 - v82) * v82 - 1)
+	return p15 + p16 * (2 * (2 - v89) * v89 - 1)
 end
 
 function PropertyTweener(p18, p19, p20, p21, p22, p23, p24) -- line: 142
@@ -98,12 +98,26 @@ function PropertyTweener(p18, p19, p20, p21, p22, p23, p24) -- line: 142
 	t2.EndTime = t2.StartTime + p22
 	t2.Cancelled = false
 
-	local u91 = false
+	local u98 = false
 	local n1 = 0
+
+	local function finalize() -- line: 151
+		-- upvalues: p18 (copy), p19 (copy), p23 (copy), p20 (copy), p21 (copy), u98 (ref), n1 (ref), p24 (copy)
+		if p18 then
+			p18[p19] = p23(1, p20, p21 - p20, 1)
+		end
+
+		u98 = true
+		n1 = 1
+
+		if p24 then
+			p24()
+		end
+	end
 
 	p18[p19] = p23(0, p20, p21 - p20, p22)
 	coroutine.wrap(function() -- line: 164
-		-- upvalues: t2 (copy), p18 (copy), p19 (copy), p23 (copy), p20 (copy), p21 (copy), p22 (copy), n1 (ref), RunService (copy), u91 (ref), p24 (copy)
+		-- upvalues: t2 (copy), p18 (copy), p19 (copy), p23 (copy), p20 (copy), p21 (copy), p22 (copy), n1 (ref), RunService (copy), u98 (ref), p24 (copy)
 		local timestamp = tick()
 
 		while timestamp < t2.EndTime and p18 do
@@ -122,7 +136,7 @@ function PropertyTweener(p18, p19, p20, p21, p22, p23, p24) -- line: 142
 				p18[p19] = p23(1, p20, p21 - p20, 1)
 			end
 
-			u91 = true
+			u98 = true
 			n1 = 1
 
 			if p24 then
@@ -140,19 +154,19 @@ function PropertyTweener(p18, p19, p20, p21, p22, p23, p24) -- line: 142
 		return n1
 	end
 	function t2.IsFinished(_) -- line: 188
-		-- upvalues: u91 (ref)
-		return u91
+		-- upvalues: u98 (ref)
+		return u98
 	end
 	function t2.Finish(p28) -- line: 192
-		-- upvalues: u91 (ref), p18 (copy), p19 (copy), p23 (copy), p20 (copy), p21 (copy), n1 (ref), p24 (copy)
-		if not u91 then
+		-- upvalues: u98 (ref), p18 (copy), p19 (copy), p23 (copy), p20 (copy), p21 (copy), n1 (ref), p24 (copy)
+		if not u98 then
 			p28:Cancel()
 
 			if p18 then
 				p18[p19] = p23(1, p20, p21 - p20, 1)
 			end
 
-			u91 = true
+			u98 = true
 			n1 = 1
 
 			if p24 then
@@ -168,41 +182,81 @@ function PropertyTweener(p18, p19, p20, p21, p22, p23, p24) -- line: 142
 	return t2
 end
 
+local function isTouchInput() -- line: 206
+	-- upvalues: UserInputService (copy)
+	return UserInputService.PreferredInput == Enum.PreferredInput.Touch
+end
 local function CreateSignal() -- line: 212
 	local t3 = {}
 	local BindableEvent = Instance.new("BindableEvent")
 	local t4 = nil
-	local u96 = nil
+	local u104 = nil
 
 	function t3.fire(_, ...) -- line: 220
-		-- upvalues: t4 (ref), u96 (ref), BindableEvent (copy)
+		-- upvalues: t4 (ref), u104 (ref), BindableEvent (copy)
 		t4 = { ... }
-		u96 = select("#", ...)
+		u104 = select("#", ...)
 		BindableEvent:Fire()
 	end
 	function t3.connect(_, p32) -- line: 226
-		-- upvalues: BindableEvent (copy), t4 (ref), u96 (ref)
+		-- upvalues: BindableEvent (copy), t4 (ref), u104 (ref)
 		if not p32 then
 			error("connect(nil)", 2)
 		end
 
 		return BindableEvent.Event:Connect(function() -- line: 230
-			-- upvalues: p32 (copy), t4 (ref), u96 (ref)
-			p32(unpack(t4, 1, u96))
+			-- upvalues: p32 (copy), t4 (ref), u104 (ref)
+			p32(unpack(t4, 1, u104))
 		end)
 	end
 	function t3.wait(_) -- line: 235
-		-- upvalues: BindableEvent (copy), t4 (ref), u96 (ref)
+		-- upvalues: BindableEvent (copy), t4 (ref), u104 (ref)
 		BindableEvent.Event:wait()
 
 		if not t4 then
 			error("Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
 		end
 
-		return unpack(t4, 1, u96)
+		return unpack(t4, 1, u104)
 	end
 
 	return t3
+end
+local function getViewportSize() -- line: 246
+	-- upvalues: GuiService (copy)
+	if _G.__TESTEZ_RUNNING_TEST__ then
+		return Vector2.new(1024, 1024)
+	end
+
+	return GuiService:GetHardwareSafeViewport()
+end
+local function isSmallTouchScreen() -- line: 255
+	-- upvalues: GuiService (copy), UserInputService (copy)
+	local v105 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+
+	return UserInputService.TouchEnabled and (v105.Y < 500 or v105.X < 700)
+end
+local function isPortrait() -- line: 260
+	-- upvalues: GuiService (copy)
+	local v106 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+
+	return v106.Y > v106.X
+end
+local function isTenFootInterface() -- line: 265
+	-- upvalues: v38 (copy)
+	return v38
+end
+local function usesSelectedObject() -- line: 269
+	-- upvalues: VRService (copy), UserInputService (copy)
+	if VRService.VREnabled then
+		return false
+	end
+
+	if UserInputService.PreferredInput == Enum.PreferredInput.Touch and not UserInputService.GamepadEnabled then
+		return false
+	end
+
+	return true
 end
 local function addHoverState(p34, p35, p36, p37) -- line: 282
 	local function onNormalButtonStateCallback() -- line: 283
@@ -228,10 +282,10 @@ local function addOnResizedCallback(p38, p39) -- line: 302
 	-- upvalues: t1 (copy), GuiService (copy)
 	t1[p38] = p39
 
-	local v107 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
-	local v108 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v115 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v116 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-	p39(v107, v108.Y > v108.X)
+	p39(v115, v116.Y > v116.X)
 end
 
 local t5 = {
@@ -247,7 +301,7 @@ local t5 = {
 
 local function MakeDefaultButton(p40, p41, p42, p43, p44, p45) -- line: 318
 	-- upvalues: Create (copy), Theme (copy), t5 (copy), UserInputService (copy), GuiService (copy), VRService (copy)
-	local v115 = Create("ImageLabel")({
+	local v123 = Create("ImageLabel")({
 		Image = "",
 		BackgroundTransparency = 1
 	})
@@ -263,98 +317,111 @@ local function MakeDefaultButton(p40, p41, p42, p43, p44, p45) -- line: 318
 		s2 = "ImageButton"
 	end
 
-	local u118 = Create("ImageButton")({
-		Name = p40 .. "Button",
+	local u126 = Create("ImageButton")({
 		AutoButtonColor = false,
+		ZIndex = 2,
+		Name = p40 .. "Button",
 		BackgroundColor3 = Theme.color(s2),
 		BackgroundTransparency = Theme.transparency(s2),
 		Size = p41,
-		ZIndex = 2,
-		SelectionImageObject = v115
+		SelectionImageObject = v123
 	})
 
 	Create("UICorner")({
 		CornerRadius = Theme.DefaultCornerRadius,
-		Parent = u118
+		Parent = u126
 	})
 
-	local v119 = Create("UIStroke")({
+	local v127 = Create("UIStroke")({
 		Name = "Border",
 		Color = Theme.color(s1),
 		Transparency = Theme.transparency(s1),
 		Thickness = Theme.DefaultStokeThickness,
-		Parent = u118
+		Parent = u126
 	})
 
 	Create("BoolValue")({
 		Name = "Enabled",
-		Parent = u118,
-		Value = true
+		Value = true,
+		Parent = u126
 	})
 
 	if p42 then
-		u118.MouseButton1Click:Connect(function() -- line: 365
+		u126.MouseButton1Click:Connect(function() -- line: 365
 			-- upvalues: p42 (copy), t5 (copy), UserInputService (copy)
 			p42(t5[UserInputService:GetLastInputType()] or false)
 		end)
 	else
-		if v119 then
-			v119.Enabled = false
+		if v127 then
+			v127.Enabled = false
 		end
 
-		u118.Selectable = false
+		u126.Selectable = false
 	end
 
-	local u120 = nil
+	local function isPointerInput(p46) -- line: 375
+		return p46.UserInputType == Enum.UserInputType.MouseMovement or p46.UserInputType == Enum.UserInputType.Touch
+	end
 
+	local u129 = nil
+
+	local function setRowRef(p47) -- line: 381
+		-- upvalues: u129 (ref)
+		u129 = p47
+	end
 	local function selectButton() -- line: 385
-		-- upvalues: p44 (copy), p43 (copy), u118 (ref), Theme (copy), u120 (ref)
-		local v414 = p44
+		-- upvalues: p44 (copy), p43 (copy), u126 (ref), Theme (copy), u129 (ref)
+		local v435 = p44
 
-		if v414 == nil and p43 then
-			v414 = p43.HubRef
+		if v435 == nil and p43 then
+			v435 = p43.HubRef
 		end
 
-		if v414 and v414.Active or v414 == nil then
-			u118.BackgroundColor3 = Theme.color("DefaultButtonHover")
-			u118.BackgroundTransparency = Theme.transparency("DefaultButtonHover")
+		if v435 and v435.Active or v435 == nil then
+			u126.BackgroundColor3 = Theme.color("DefaultButtonHover")
+			u126.BackgroundTransparency = Theme.transparency("DefaultButtonHover")
 
-			local v415 = u118
+			local v436 = u126
 
-			if u120 then
-				v415 = u120
+			if u129 then
+				v436 = u129
 			end
 
-			if v414 then
-				v414:ScrollToFrame(v415)
+			if v435 then
+				v435:ScrollToFrame(v436)
 			end
 		end
 	end
+	local function deselectButton() -- line: 407
+		-- upvalues: u126 (ref), Theme (copy), s2 (ref)
+		u126.BackgroundColor3 = Theme.color(s2)
+		u126.BackgroundTransparency = Theme.transparency(s2)
+	end
 
-	u118.InputBegan:Connect(function(input) -- line: 412
-		-- upvalues: u118 (ref), selectButton (copy)
-		if u118.Selectable and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+	u126.InputBegan:Connect(function(input) -- line: 412
+		-- upvalues: u126 (ref), selectButton (copy)
+		if u126.Selectable and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 			selectButton()
 		end
 	end)
-	u118.InputEnded:Connect(function(input) -- line: 417
-		-- upvalues: u118 (ref), GuiService (copy), Theme (copy), s2 (ref)
-		if u118.Selectable and (GuiService.SelectedCoreObject ~= u118 and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch)) then
-			u118.BackgroundColor3 = Theme.color(s2)
-			u118.BackgroundTransparency = Theme.transparency(s2)
+	u126.InputEnded:Connect(function(input) -- line: 417
+		-- upvalues: u126 (ref), GuiService (copy), Theme (copy), s2 (ref)
+		if u126.Selectable and (GuiService.SelectedCoreObject ~= u126 and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch)) then
+			u126.BackgroundColor3 = Theme.color(s2)
+			u126.BackgroundTransparency = Theme.transparency(s2)
 		end
 	end)
-	u118.SelectionGained:Connect(function() -- line: 423
+	u126.SelectionGained:Connect(function() -- line: 423
 		-- upvalues: selectButton (copy)
 		selectButton()
 	end)
-	u118.SelectionLost:Connect(function() -- line: 426
-		-- upvalues: u118 (ref), Theme (copy), s2 (ref)
-		u118.BackgroundColor3 = Theme.color(s2)
-		u118.BackgroundTransparency = Theme.transparency(s2)
+	u126.SelectionLost:Connect(function() -- line: 426
+		-- upvalues: u126 (ref), Theme (copy), s2 (ref)
+		u126.BackgroundColor3 = Theme.color(s2)
+		u126.BackgroundTransparency = Theme.transparency(s2)
 	end)
 	GuiService.Changed:Connect(function(property) -- line: 430
-		-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), u118 (ref), Theme (copy), s2 (ref), selectButton (copy)
+		-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), u126 (ref), Theme (copy), s2 (ref), selectButton (copy)
 		if property ~= "SelectedCoreObject" then
 			return
 		end
@@ -363,30 +430,30 @@ local function MakeDefaultButton(p40, p41, p42, p43, p44, p45) -- line: 318
 			return
 		end
 
-		if GuiService.SelectedCoreObject == nil or GuiService.SelectedCoreObject ~= u118 then
-			u118.BackgroundColor3 = Theme.color(s2)
-			u118.BackgroundTransparency = Theme.transparency(s2)
+		if GuiService.SelectedCoreObject == nil or GuiService.SelectedCoreObject ~= u126 then
+			u126.BackgroundColor3 = Theme.color(s2)
+			u126.BackgroundTransparency = Theme.transparency(s2)
 
 			return
 		end
 
-		if u118.Selectable then
+		if u126.Selectable then
 			selectButton()
 		end
 	end)
 
-	return u118, function(p46) --[[ setRowRef ]] -- line: 381
-		-- upvalues: u120 (ref)
-		u120 = p46
-	end
+	return u126, setRowRef
 end
-local function MakeButton(p47, p48, p49, p50, p51, p52) -- line: 451
+local function MakeButton(p48, p49, p50, p51, p52, p53) -- line: 451
 	-- upvalues: MakeDefaultButton (copy), Create (copy), Theme (copy), GuiService (copy), UserInputService (copy), v38 (copy), EngineFeature2 (copy)
-	local v128, v129 = MakeDefaultButton(p47, p49, p50, p51, p52)
-	local v130 = Create("TextLabel")({
-		Name = p47 .. "TextLabel",
+	local v139, v140 = MakeDefaultButton(p48, p50, p51, p52, p53)
+	local v141 = Create("TextLabel")({
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		TextScaled = false,
+		TextWrapped = true,
+		ZIndex = 2,
+		Name = p48 .. "TextLabel",
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.new(0, 0, 0, 0),
 		TextColor3 = Theme.color("WhiteButtonText", Color3.fromRGB(255, 255, 255)),
@@ -394,112 +461,109 @@ local function MakeButton(p47, p48, p49, p50, p51, p52) -- line: 451
 		TextYAlignment = Enum.TextYAlignment.Center,
 		Font = Theme.font(Enum.Font.SourceSansBold, "Button"),
 		TextSize = Theme.textSize(24, "Button"),
-		Text = p48,
-		TextScaled = false,
-		TextWrapped = true,
-		ZIndex = 2,
-		Parent = v128
+		Text = p49,
+		Parent = v139
 	})
-	local UITextSizeConstraint = Instance.new("UITextSizeConstraint", v130)
-	local v132 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local UITextSizeConstraint = Instance.new("UITextSizeConstraint", v141)
+	local v143 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-	if UserInputService.TouchEnabled and (v132.Y < 500 or v132.X < 700) then
-		v130.TextSize = Theme.textSize(18)
-	elseif v38 and (p47 ~= "FriendStatus" and p47 ~= "BlockButton") then
-		v130.TextSize = Theme.textSize(36)
+	if UserInputService.TouchEnabled and (v143.Y < 500 or v143.X < 700) then
+		v141.TextSize = Theme.textSize(18)
+	elseif v38 and (p48 ~= "FriendStatus" and p48 ~= "BlockButton") then
+		v141.TextSize = Theme.textSize(36)
 	end
 
 	if not EngineFeature2 then
-		UITextSizeConstraint.MaxTextSize = v130.TextSize
+		UITextSizeConstraint.MaxTextSize = v141.TextSize
 	else
-		local u133 = (GuiService.PreferredTextSize.Value - 1) * 3
+		local u144 = (GuiService.PreferredTextSize.Value - 1) * 3
 
-		UITextSizeConstraint.MaxTextSize = v130.TextSize + u133
+		UITextSizeConstraint.MaxTextSize = v141.TextSize + u144
 
-		local TextSize = v130.TextSize
+		local TextSize = v141.TextSize
 
 		GuiService:GetPropertyChangedSignal("PreferredTextSize"):Connect(function() -- line: 487
-			-- upvalues: u133 (ref), GuiService (copy), UITextSizeConstraint (copy), TextSize (copy)
-			u133 = (GuiService.PreferredTextSize.Value - 1) * 3
-			UITextSizeConstraint.MaxTextSize = TextSize + u133
+			-- upvalues: u144 (ref), GuiService (copy), UITextSizeConstraint (copy), TextSize (copy)
+			u144 = (GuiService.PreferredTextSize.Value - 1) * 3
+			UITextSizeConstraint.MaxTextSize = TextSize + u144
 		end)
 	end
 
-	return v128, v130, v129
+	return v139, v141, v140
 end
-local function MakeImageButton(p53, p54, p55, p56, p57, p58, p59, p60) -- line: 496
+local function MakeImageButton(p54, p55, p56, p57, p58, p59, p60, p61) -- line: 496
 	-- upvalues: MakeDefaultButton (copy), Migration (copy), Theme (copy), Create (copy), v30 (copy), BuilderIcons (copy)
-	if not p60 then
-		p60 = "ImageButton"
+	if not p61 then
+		p61 = "ImageButton"
 	end
 
-	local v143, v144 = MakeDefaultButton(p53, p55, p57, p58, p59, p60)
+	local v154, v155 = MakeDefaultButton(p54, p56, p58, p59, p60, p61)
 	local ImageRectOffset = nil
 	local ImageRectSize = nil
-	local v147 = Migration.uiblox[p54] or Migration.luaApps[p54]
+	local v158 = Migration.uiblox[p55] or Migration.luaApps[p55]
 
-	if not string.match(p54, "^rbxasset://") then
-		p54 = Theme.Images[p54]
+	if not string.match(p55, "^rbxasset://") then
+		p55 = Theme.Images[p55]
 	end
 
-	if typeof(p54) == "table" then
-		ImageRectOffset = p54.ImageRectOffset
-		ImageRectSize = p54.ImageRectSize
-		p54 = p54.Image
+	if typeof(p55) == "table" then
+		ImageRectOffset = p55.ImageRectOffset
+		ImageRectSize = p55.ImageRectSize
+		p55 = p55.Image
 	end
 
-	local v148 = if not v147 then Create("ImageLabel")({
-		Name = p53 .. "ImageLabel",
+	local v159 = if not v158 then Create("ImageLabel")({
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
-		Size = p56,
+		ZIndex = 2,
+		Name = p54 .. "ImageLabel",
+		Size = p57,
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Image = p54,
+		Image = p55,
 		ImageRectOffset = ImageRectOffset,
 		ImageRectSize = ImageRectSize,
-		ZIndex = 2,
-		Parent = v143
+		Parent = v154
 	}) else Create("TextLabel")({
-		Name = p53 .. "TextLabel",
 		BackgroundTransparency = 1,
-		Size = p56,
-		TextSize = if not v30 then p56.Y.Offset * 0.6666666666666666 else p56.Y.Offset * 0.8571428571428571,
+		ZIndex = 2,
+		Name = p54 .. "TextLabel",
+		Size = p57,
+		TextSize = if not v30 then p57.Y.Offset * 0.6666666666666666 else p57.Y.Offset * 0.8571428571428571,
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		TextColor3 = Color3.new(1, 1, 1),
-		Text = v147.name,
-		FontFace = BuilderIcons.Font[v147.variant],
-		Parent = v143,
-		ZIndex = 2
+		Text = v158.name,
+		FontFace = BuilderIcons.Font[v158.variant],
+		Parent = v154
 	})
 
-	if p60 == "ImageButton" then
-		v143.Border.Thickness = 0
-		v143.Border.Transparency = 1
+	if p61 == "ImageButton" then
+		v154.Border.Thickness = 0
+		v154.Border.Transparency = 1
 	end
 
-	return v143, v148, v144
+	return v154, v159, v155
 end
-local function AddButtonRow(p61, p62, p63, p64, p65, p66) -- line: 551
+local function AddButtonRow(p62, p63, p64, p65, p66, p67) -- line: 551
 	-- upvalues: MakeButton (copy), Create (copy)
-	local v155, v156, v157 = MakeButton(p62, p63, p64, p65, p61, p66)
-	local v158 = Create("Frame")({
-		Name = p62 .. "Row",
+	local v166, v167, v168 = MakeButton(p63, p64, p65, p66, p62, p67)
+	local v169 = Create("Frame")({
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, 0, p64.Y.Scale, p64.Y.Offset),
-		Parent = p61.Page
+		Name = p63 .. "Row",
+		Size = UDim2.new(1, 0, p65.Y.Scale, p65.Y.Offset),
+		Parent = p62.Page
 	})
 
-	v155.Parent = v158
-	v155.AnchorPoint = Vector2.new(1, 0)
-	v155.Position = UDim2.new(1, -20, 0, 0)
+	v166.Parent = v169
+	v166.AnchorPoint = Vector2.new(1, 0)
+	v166.Position = UDim2.new(1, -20, 0, 0)
 
-	return v158, v155, v156, v157
+	return v169, v166, v167, v168
 end
-local function MakeRoundedRectFocusState(p67, p68) -- line: 567
+local function MakeRoundedRectFocusState(p68, p69) -- line: 567
 	-- upvalues: Create (copy), uDim (copy), Theme (copy), RunService (copy), UserGameSettings (copy)
-	local v161 = Create("Frame")({
+	local v172 = Create("Frame")({
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1, 12, 1, 12),
 		Position = UDim2.fromOffset(-6, -6)
@@ -507,59 +571,59 @@ local function MakeRoundedRectFocusState(p67, p68) -- line: 567
 
 	Create("UICorner")({
 		CornerRadius = uDim,
-		Parent = v161
+		Parent = v172
 	})
 
-	local v162 = Create("UIStroke")({
-		Color = Theme.selectionCursor.AnimatedColor,
+	local v173 = Create("UIStroke")({
 		Transparency = 0,
 		Thickness = 3,
-		Parent = v161
+		Color = Theme.selectionCursor.AnimatedColor,
+		Parent = v172
 	})
-	local v163 = Create("UIGradient")({
+	local v174 = Create("UIGradient")({
 		Rotation = 0,
 		Color = Theme.selectionCursor.GradientColorSequence,
 		Transparency = Theme.selectionCursor.GradientTransparencySequence,
-		Parent = v162
+		Parent = v173
 	})
 
-	RunService:UnbindFromRenderStep(p68)
-	RunService:BindToRenderStep(p68, Enum.RenderPriority.Last.Value, function() -- line: 594
-		-- upvalues: v163 (copy), Theme (copy), UserGameSettings (copy)
-		local v419 = v163.Rotation + 2
+	RunService:UnbindFromRenderStep(p69)
+	RunService:BindToRenderStep(p69, Enum.RenderPriority.Last.Value, function() -- line: 594
+		-- upvalues: v174 (copy), Theme (copy), UserGameSettings (copy)
+		local v440 = v174.Rotation + 2
 		local GradientColorSequence = Theme.selectionCursor.GradientColorSequence
 		local GradientTransparencySequence = Theme.selectionCursor.GradientTransparencySequence
 
 		if UserGameSettings.ReducedMotion then
-			local v422 = (math.sin((math.rad(v419))) + 1) / 2
+			local v443 = (math.sin((math.rad(v440))) + 1) / 2
 			local Value = GradientColorSequence.Keypoints[1].Value
 			local Value2 = GradientColorSequence.Keypoints[#GradientColorSequence.Keypoints].Value
 
-			GradientColorSequence = ColorSequence.new(Value:lerp(Value2, v422))
+			GradientColorSequence = ColorSequence.new(Value:lerp(Value2, v443))
 
 			local Value3 = GradientTransparencySequence.Keypoints[1].Value
 			local Value4 = GradientTransparencySequence.Keypoints[#GradientTransparencySequence.Keypoints].Value
 
-			GradientTransparencySequence = NumberSequence.new(Value3 + (Value4 - Value3) * v422)
+			GradientTransparencySequence = NumberSequence.new(Value3 + (Value4 - Value3) * v443)
 		end
 
-		v163.Rotation = v419
-		v163.Color = GradientColorSequence
-		v163.Transparency = GradientTransparencySequence
+		v174.Rotation = v440
+		v174.Color = GradientColorSequence
+		v174.Transparency = GradientTransparencySequence
 	end)
-	p67.AncestryChanged:Connect(function(_, parent) -- line: 618
-		-- upvalues: RunService (copy), p68 (copy)
+	p68.AncestryChanged:Connect(function(_, parent) -- line: 618
+		-- upvalues: RunService (copy), p69 (copy)
 		if not parent then
-			RunService:UnbindFromRenderStep(p68)
+			RunService:UnbindFromRenderStep(p69)
 		end
 	end)
-	p67.SelectionImageObject = v161
+	p68.SelectionImageObject = v172
 end
-local function CreateDropDown(p70, p71, p72) -- line: 627
+local function CreateDropDown(p71, p72, p73) -- line: 627
 	-- upvalues: Theme (copy), HttpService (copy), GuiService (copy), Create (copy), v21 (copy), CoreGui (copy), VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), UserInputService (copy), ContextActionService (copy), FFlagHideShortcutsWhileIemDropdownActive (copy), v24 (copy), RobloxTranslator (copy), MakeButton (copy)
-	local v167 = Theme.color("SELECTION_TEXT_COLOR_NORMAL", Color3.fromRGB(178, 178, 178))
+	local v178 = Theme.color("SELECTION_TEXT_COLOR_NORMAL", Color3.fromRGB(178, 178, 178))
 	local color3 = Color3.fromRGB(229, 229, 229)
-	local v169 = Theme.color("SELECTION_TEXT_COLOR_HIGHLIGHTED", Color3.fromRGB(255, 255, 255))
+	local v180 = Theme.color("SELECTION_TEXT_COLOR_HIGHLIGHTED", Color3.fromRGB(255, 255, 255))
 	local DropDownFrame = nil
 	local t6 = {
 		CurrentIndex = nil,
@@ -570,7 +634,7 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 
 	Instance.new("BindableEvent").Name = "IndexChanged"
 
-	if type(p70) ~= "table" then
+	if type(p71) ~= "table" then
 		error("CreateDropDown dropDownStringTable (first arg) is not a table", 2)
 
 		return t6
@@ -580,29 +644,29 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 
 	BindableEvent.Name = "IndexChanged"
 
-	local u173 = true
+	local u184 = true
 	local guid = HttpService:GenerateGUID(false)
 	local DropDownFrameEnabled = nil
-	local u176 = p70
-	local v177, _ = GuiService:GetGuiInset()
-	local v179 = Create("ImageButton")({
+	local u187 = p71
+	local v188, _ = GuiService:GetGuiInset()
+	local v190 = Create("ImageButton")({
 		Name = "DropDownFullscreenFrame",
 		BackgroundTransparency = 0.2,
 		BorderSizePixel = 0,
-		Size = UDim2.new(1, 0, 1, not v21 and 0 or v177.Y),
-		Position = if not v21 then nil else UDim2.new(0, 0, 0, -v177.Y),
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		ZIndex = 10,
 		Active = true,
 		Visible = false,
 		Selectable = false,
 		AutoButtonColor = false,
+		Size = UDim2.new(1, 0, 1, not v21 and 0 or v188.Y),
+		Position = if not v21 then nil else UDim2.new(0, 0, 0, -v188.Y),
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		Parent = CoreGui.RobloxGui
 	})
 
-	local function onVREnabled(p73) -- line: 679
-		-- upvalues: VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), v179 (copy), CoreGui (copy), t6 (copy), u176 (ref)
-		if p73 ~= "VREnabled" then
+	local function onVREnabled(p74) -- line: 679
+		-- upvalues: VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), v190 (copy), CoreGui (copy), t6 (copy), u187 (ref)
+		if p74 ~= "VREnabled" then
 			return
 		end
 
@@ -611,28 +675,29 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 				local VrSpatialUi = require(CorePackages2.Workspace.Packages.VrSpatialUi)
 				local PanelType = VrSpatialUi.Constants.PanelType
 
-				v179.Parent = VrSpatialUi.UIManager.getInstance():getPanelObject(PanelType.MoreMenu)
-				v179.BackgroundTransparency = 0.2
+				v190.Parent = VrSpatialUi.UIManager.getInstance():getPanelObject(PanelType.MoreMenu)
+				v190.BackgroundTransparency = 0.2
 			else
-				v179.Parent = require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):GetGUI()
-				v179.BackgroundTransparency = 1
+				v190.Parent = require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):GetGUI()
+				v190.BackgroundTransparency = 1
 			end
 		else
-			v179.Parent = CoreGui.RobloxGui
-			v179.BackgroundTransparency = 0.2
+			v190.Parent = CoreGui.RobloxGui
+			v190.BackgroundTransparency = 0.2
 		end
 
 		if t6.UpdateDropDownList then
-			t6:UpdateDropDownList(u176)
+			t6:UpdateDropDownList(u187)
 		end
 	end
 
 	VRService.Changed:Connect(onVREnabled)
 	onVREnabled("VREnabled")
 
-	local v181 = Create("ImageLabel")({
+	local v192 = Create("ImageLabel")({
 		Name = "DropDownSelectionFrame",
 		Image = "",
+		ZIndex = 10,
 		ScaleType = Enum.ScaleType.Stretch,
 		SliceCenter = Rect.new(8, 6, 46, 44),
 		BackgroundTransparency = Theme.transparency("DropdownListBg", 1),
@@ -640,43 +705,42 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 		Size = UDim2.new(0.6, 0, 0.9, 0),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		ZIndex = 10,
-		Parent = v179
+		Parent = v190
 	})
 
 	Create("UICorner")({
 		CornerRadius = Theme.DefaultCornerRadius,
-		Parent = v181
+		Parent = v192
 	})
 
-	local v182 = Create("ScrollingFrame")({
+	local v193 = Create("ScrollingFrame")({
 		Name = "DropDownScrollingFrame",
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		ZIndex = 10,
 		Size = UDim2.new(1, -20, 1, -25),
 		Position = UDim2.new(0, 10, 0, 10),
-		ZIndex = 10,
 		ScrollBarThickness = Theme.DefaultScrollBarThickness,
 		ScrollingDirection = Enum.ScrollingDirection.Y,
-		Parent = v181
+		Parent = v192
 	})
 	local connection = nil
-	local u184 = false
+	local u195 = false
 
-	local function v185(p74, p75) -- line: 743
-		-- upvalues: t6 (copy), u173 (ref), p72 (copy), v179 (copy), VRService (copy), UserInputService (copy), GuiService (copy), DropDownFrame (ref), connection (ref), ContextActionService (copy), guid (copy), DropDownFrameEnabled (ref), u184 (ref), isInExperienceUIVREnabled (copy), CorePackages2 (copy)
-		if p74 ~= nil and p75 ~= Enum.UserInputState.Begin then
+	local function v196(p75, p76) -- line: 743
+		-- upvalues: t6 (copy), u184 (ref), p73 (copy), v190 (copy), VRService (copy), UserInputService (copy), GuiService (copy), DropDownFrame (ref), connection (ref), ContextActionService (copy), guid (copy), DropDownFrameEnabled (ref), u195 (ref), isInExperienceUIVREnabled (copy), CorePackages2 (copy)
+		if p75 ~= nil and p76 ~= Enum.UserInputState.Begin then
 			return
 		end
 
-		t6.DropDownFrame.Selectable = u173
-		p72:SetActive(true)
+		t6.DropDownFrame.Selectable = u184
+		p73:SetActive(true)
 
-		if v179.Visible and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) then
+		if v190.Visible and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) then
 			GuiService.SelectedCoreObject = DropDownFrame
 		end
 
-		v179.Visible = false
+		v190.Visible = false
 
 		if connection then
 			connection:Disconnect()
@@ -684,31 +748,31 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 
 		ContextActionService:UnbindCoreAction(guid .. "Action")
 		ContextActionService:UnbindCoreAction(guid .. "FreezeAction")
-		DropDownFrameEnabled.Value = u173
-		u184 = false
+		DropDownFrameEnabled.Value = u184
+		u195 = false
 
 		if VRService.VREnabled and not isInExperienceUIVREnabled then
-			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(v179, 0)
+			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(v190, 0)
 		end
 	end
-	local function v186() -- line: 773
+	local function v197() -- line: 773
 	end
 
-	local v187 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.ChooseOne")
+	local v198 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.ChooseOne")
 	local uDim2 = UDim2.new(0.6, 0, 0, 40)
 
-	t6.DropDownFrame = MakeButton("DropDownFrame", v187, uDim2, function() -- line: 775
-		-- upvalues: u173 (ref), t6 (copy), u184 (ref), v179 (copy), VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), DropDownFrame (ref), GuiService (copy), connection (ref), v169 (copy), color3 (copy), v167 (copy), v185 (copy), FFlagHideShortcutsWhileIemDropdownActive (copy), v24 (copy), ContextActionService (copy), guid (copy), v186 (copy), p72 (copy), DropDownFrameEnabled (ref)
-		if not u173 then
+	t6.DropDownFrame = MakeButton("DropDownFrame", v198, uDim2, function() -- line: 775
+		-- upvalues: u184 (ref), t6 (copy), u195 (ref), v190 (copy), VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), DropDownFrame (ref), GuiService (copy), connection (ref), v180 (copy), color3 (copy), v178 (copy), v196 (copy), FFlagHideShortcutsWhileIemDropdownActive (copy), v24 (copy), ContextActionService (copy), guid (copy), v197 (copy), p73 (copy), DropDownFrameEnabled (ref)
+		if not u184 then
 			return
 		end
 
 		t6.DropDownFrame.Selectable = false
-		u184 = true
-		v179.Visible = true
+		u195 = true
+		v190.Visible = true
 
 		if VRService.VREnabled and not isInExperienceUIVREnabled then
-			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(v179, 0.5)
+			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(v190, 0.5)
 		end
 
 		DropDownFrame = t6.DropDownFrame
@@ -720,33 +784,33 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 		end
 
 		connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 798
-			-- upvalues: t6 (copy), GuiService (copy), v169 (copy), VRService (copy), color3 (copy), v167 (copy)
+			-- upvalues: t6 (copy), GuiService (copy), v180 (copy), VRService (copy), color3 (copy), v178 (copy)
 			for i = 1, #t6.Selections do
 				if GuiService.SelectedCoreObject == t6.Selections[i] then
-					t6.Selections[i].TextColor3 = v169
+					t6.Selections[i].TextColor3 = v180
 				else
-					t6.Selections[i].TextColor3 = VRService.VREnabled and color3 or v167
+					t6.Selections[i].TextColor3 = VRService.VREnabled and color3 or v178
 				end
 			end
 		end)
 
-		local v434 = v185
+		local v455 = v196
 
 		if FFlagHideShortcutsWhileIemDropdownActive then
 			v24:setHideShortcutBar("InExperienceMenuDropdown", true)
 
-			function v434(p76, p77) -- line: 812
-				-- upvalues: v185 (copy), v24 (copy)
-				v185(p76, p77)
+			function v455(p77, p78) -- line: 812
+				-- upvalues: v196 (copy), v24 (copy)
+				v196(p77, p78)
 				v24:setHideShortcutBar("InExperienceMenuDropdown", false)
 			end
 		end
 
-		ContextActionService:BindCoreAction(guid .. "FreezeAction", v186, false, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1)
-		ContextActionService:BindCoreAction(guid .. "Action", v434, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape)
-		p72:SetActive(false)
+		ContextActionService:BindCoreAction(guid .. "FreezeAction", v197, false, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1)
+		ContextActionService:BindCoreAction(guid .. "Action", v455, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape)
+		p73:SetActive(false)
 		DropDownFrameEnabled.Value = false
-	end, nil, p72)
+	end, nil, p73)
 	t6.DropDownFrame.Position = UDim2.new(1, 0, 0.5, 0)
 	t6.DropDownFrame.AnchorPoint = Vector2.new(1, 0.5)
 	DropDownFrameEnabled = t6.DropDownFrame.Enabled
@@ -758,87 +822,101 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 	DropDownFrameTextLabel.ClipsDescendants = true
 	DropDownFrameTextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-	local v190 = Create("ImageLabel")({
+	local v201 = Create("ImageLabel")({
 		Name = "DropDownImage",
 		Image = "rbxasset://textures/ui/Settings/DropDown/DropDown.png",
 		BackgroundTransparency = 1,
+		ZIndex = 2,
 		AnchorPoint = Vector2.new(1, 0.5),
 		Size = UDim2.new(0, 15, 0, 10),
 		Position = UDim2.new(1, -12, 0.5, 0),
-		ZIndex = 2,
 		Parent = t6.DropDownFrame
 	})
 
-	t6.DropDownImage = v190
+	t6.DropDownImage = v201
 
-	local function setSelection(p78) -- line: 865
+	local function setSelection(p79) -- line: 865
 		-- upvalues: t6 (copy), DropDownFrameTextLabel (copy), BindableEvent (copy)
-		local v436 = false
+		local v457 = false
 
 		for k, v in pairs(t6.Selections) do
-			if k == p78 then
+			if k == p79 then
 				DropDownFrameTextLabel.Text = v.Text
 				t6.CurrentIndex = k
-				v436 = true
+				v457 = true
 			end
 		end
 
-		if v436 then
-			BindableEvent:Fire(p78)
+		if v457 then
+			BindableEvent:Fire(p79)
 		end
 	end
-	local function setSelectionByValue(p79) -- line: 881
+	local function setSelectionByValue(p80) -- line: 881
 		-- upvalues: t6 (copy), DropDownFrameTextLabel (copy), BindableEvent (copy)
-		local v440 = false
+		local v461 = false
 
 		for k, v in pairs(t6.Selections) do
-			if p79 == v.Text then
+			if p80 == v.Text then
 				DropDownFrameTextLabel.Text = v.Text
 				t6.CurrentIndex = k
-				v440 = true
+				v461 = true
 			end
 		end
 
-		if v440 then
+		if v461 then
 			BindableEvent:Fire(t6.CurrentIndex)
 		end
 
-		return v440
+		return v461
+	end
+	local function setIsFaded(p81) -- line: 898
+		-- upvalues: t6 (copy)
+		if p81 then
+			t6.DropDownFrame.DropDownFrameTextLabel.TextTransparency = 0.5
+			t6.DropDownFrame.ImageTransparency = 0.5
+			t6.DropDownImage.ImageTransparency = 0.5
+
+			return
+		end
+
+		t6.DropDownFrame.DropDownFrameTextLabel.TextTransparency = 0
+		t6.DropDownFrame.ImageTransparency = 0
+		t6.DropDownImage.ImageTransparency = 0
 	end
 
 	t6.IndexChanged = BindableEvent.Event
 
-	function t6.SetSelectionIndex(_, p81) -- line: 913
+	function t6.SetSelectionIndex(_, p83) -- line: 913
 		-- upvalues: setSelection (copy)
-		setSelection(p81)
+		setSelection(p83)
 	end
-	function t6.SetSelectionByValue(_, p83) -- line: 917
+	function t6.SetSelectionByValue(_, p85) -- line: 917
 		-- upvalues: setSelectionByValue (copy)
-		return (setSelectionByValue(p83))
+		return (setSelectionByValue(p85))
 	end
 	function t6.ResetSelectionIndex(_) -- line: 921
-		-- upvalues: t6 (copy), DropDownFrameTextLabel (copy), v187 (copy), v185 (copy)
+		-- upvalues: t6 (copy), DropDownFrameTextLabel (copy), v198 (copy), v196 (copy)
 		t6.CurrentIndex = nil
-		DropDownFrameTextLabel.Text = v187
-		v185()
+		DropDownFrameTextLabel.Text = v198
+		v196()
 	end
 	function t6.GetSelectedIndex(_) -- line: 927
 		-- upvalues: t6 (copy)
 		return t6.CurrentIndex
 	end
-	function t6.SetZIndex(_, p87) -- line: 931
-		-- upvalues: t6 (copy), v190 (copy), DropDownFrameTextLabel (copy)
-		t6.DropDownFrame.ZIndex = p87
-		v190.ZIndex = p87
-		DropDownFrameTextLabel.ZIndex = p87
+	function t6.SetZIndex(_, p89) -- line: 931
+		-- upvalues: t6 (copy), v201 (copy), DropDownFrameTextLabel (copy)
+		t6.DropDownFrame.ZIndex = p89
+		v201.ZIndex = p89
+		DropDownFrameTextLabel.ZIndex = p89
 	end
-	function t6.SetInteractable(_, p89) -- line: 937
-		-- upvalues: u173 (ref), t6 (copy), v185 (copy), VRService (copy), DropDownFrameEnabled (ref), u184 (ref)
-		u173 = p89
-		t6.DropDownFrame.Selectable = u173
+	function t6.SetInteractable(_, p91) -- line: 937
+		-- upvalues: u184 (ref), t6 (copy), v196 (copy), VRService (copy), DropDownFrameEnabled (ref), u195 (ref)
+		u184 = p91
+		t6.DropDownFrame.Selectable = u184
 
-		if not u173 then
-			v185()
+		if not u184 then
+			v196()
 
 			if VRService.VREnabled then
 				t6.DropDownFrame.DropDownFrameTextLabel.TextTransparency = 0.5
@@ -863,10 +941,10 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 			end
 		end
 
-		DropDownFrameEnabled.Value = p89 and not u184
-		t6.DropDownImage.Visible = p89
+		DropDownFrameEnabled.Value = p91 and not u195
+		t6.DropDownImage.Visible = p91
 
-		if p89 then
+		if p91 then
 			t6.DropDownFrame.ImageTransparency = 0
 
 			return
@@ -874,13 +952,13 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 
 		t6.DropDownFrame.ImageTransparency = 0.5
 	end
-	function t6.SetAutoLocalize(_, p91) -- line: 964
-		-- upvalues: v179 (copy)
-		v179.AutoLocalize = p91
+	function t6.SetAutoLocalize(_, p93) -- line: 964
+		-- upvalues: v190 (copy)
+		v190.AutoLocalize = p93
 	end
-	function t6.UpdateDropDownList(_, p93) -- line: 968
-		-- upvalues: u176 (ref), t6 (copy), VRService (copy), Theme (copy), Create (copy), color3 (copy), v167 (copy), v182 (copy), p71 (copy), DropDownFrameTextLabel (copy), v169 (copy), v185 (copy), BindableEvent (copy), UserInputService (copy), GuiService (copy), guid (copy), v179 (copy), v181 (copy)
-		u176 = p93
+	function t6.UpdateDropDownList(_, p95) -- line: 968
+		-- upvalues: u187 (ref), t6 (copy), VRService (copy), Theme (copy), Create (copy), color3 (copy), v178 (copy), v193 (copy), p72 (copy), DropDownFrameTextLabel (copy), v180 (copy), v196 (copy), BindableEvent (copy), UserInputService (copy), GuiService (copy), guid (copy), v190 (copy), v192 (copy)
+		u187 = p95
 
 		if t6.Selections then
 			for i = 1, #t6.Selections do
@@ -892,15 +970,15 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 		t6.SelectionInfo = {}
 
 		local VREnabled = VRService.VREnabled
-		local v460 = VREnabled and Theme.font(Enum.Font.SourceSansBold, "Bold") or Theme.font(Enum.Font.SourceSans, "UtilityText")
-		local v461 = VREnabled and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
-		local v462 = not VREnabled and 50 or 70
-		local v463 = v462 + 1
-		local v464 = not VREnabled and 400 or 600
+		local v481 = VREnabled and Theme.font(Enum.Font.SourceSansBold, "Bold") or Theme.font(Enum.Font.SourceSans, "UtilityText")
+		local v482 = VREnabled and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
+		local v483 = not VREnabled and 50 or 70
+		local v484 = v483 + 1
+		local v485 = not VREnabled and 400 or 600
 		local n2 = 0
 
-		for k, v in pairs(p93) do
-			local v468 = Create("Frame")({
+		for k, v in pairs(p95) do
+			local v489 = Create("Frame")({
 				BackgroundTransparency = 0.7,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 1, 0)
@@ -908,114 +986,114 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 
 			Create("UICorner")({
 				CornerRadius = Theme.DefaultCornerRadius,
-				Parent = v468
+				Parent = v489
 			})
 
-			local v469 = v
+			local v490 = v
 			local s3 = ""
-			local v471 = typeof(v) == "table"
+			local v492 = typeof(v) == "table"
 
-			if v471 then
-				v469 = v.title
+			if v492 then
+				v490 = v.title
 				s3 = v.subtitle
 				n2 += 10
 			end
 
-			local u472
+			local u493
 
-			if v471 then
-				u472 = Create("TextButton")({
-					Name = "Selection" .. tostring(k),
+			if v492 then
+				u493 = Create("TextButton")({
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 					AutoButtonColor = false,
-					TextYAlignment = Enum.TextYAlignment.Top,
-					Size = UDim2.new(1, -28, 0, v462 + 10),
-					Position = UDim2.new(0, 14, 0, (k - 1) * (v463 + 10)),
-					TextColor3 = VRService.VREnabled and color3 or v167,
-					Font = v460,
-					TextSize = v461,
-					Text = v469,
 					ZIndex = 10,
-					SelectionImageObject = v468,
-					Parent = v182
+					Name = "Selection" .. tostring(k),
+					TextYAlignment = Enum.TextYAlignment.Top,
+					Size = UDim2.new(1, -28, 0, v483 + 10),
+					Position = UDim2.new(0, 14, 0, (k - 1) * (v484 + 10)),
+					TextColor3 = VRService.VREnabled and color3 or v178,
+					Font = v481,
+					TextSize = v482,
+					Text = v490,
+					SelectionImageObject = v489,
+					Parent = v193
 				})
 				Create("TextLabel")({
-					Name = "Subtitle" .. tostring(k),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-					Size = UDim2.new(1, -28, 0, v462 * 0.8),
-					Position = UDim2.new(0, 14, 0, 15),
-					TextColor3 = VRService.VREnabled and color3 or v167,
-					Font = v460,
-					TextSize = v461 * 0.8,
-					Text = s3,
 					ZIndex = 10,
-					Parent = u472
+					Name = "Subtitle" .. tostring(k),
+					Size = UDim2.new(1, -28, 0, v483 * 0.8),
+					Position = UDim2.new(0, 14, 0, 15),
+					TextColor3 = VRService.VREnabled and color3 or v178,
+					Font = v481,
+					TextSize = v482 * 0.8,
+					Text = s3,
+					Parent = u493
 				})
 			else
-				u472 = Create("TextButton")({
-					Name = "Selection" .. tostring(k),
+				u493 = Create("TextButton")({
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 					AutoButtonColor = false,
-					Size = UDim2.new(1, -28, 0, v462),
-					Position = UDim2.new(0, 14, 0, (k - 1) * v463),
-					TextColor3 = VRService.VREnabled and color3 or v167,
-					Font = v460,
-					TextSize = v461,
-					Text = v,
 					ZIndex = 10,
-					SelectionImageObject = v468,
-					Parent = v182
+					Name = "Selection" .. tostring(k),
+					Size = UDim2.new(1, -28, 0, v483),
+					Position = UDim2.new(0, 14, 0, (k - 1) * v484),
+					TextColor3 = VRService.VREnabled and color3 or v178,
+					Font = v481,
+					TextSize = v482,
+					Text = v,
+					SelectionImageObject = v489,
+					Parent = v193
 				})
 			end
 
-			if k == p71 then
+			if k == p72 then
 				t6.CurrentIndex = k
-				DropDownFrameTextLabel.Text = v469
-				u472.TextColor3 = v169
-			elseif not p71 and k == 1 then
-				u472.TextColor3 = v169
+				DropDownFrameTextLabel.Text = v490
+				u493.TextColor3 = v180
+			elseif not p72 and k == 1 then
+				u493.TextColor3 = v180
 			end
 
-			local function v473() -- line: 1072
-				-- upvalues: DropDownFrameTextLabel (copy), u472 (ref), v185 (copy), t6 (copy), k (copy), BindableEvent (copy)
-				DropDownFrameTextLabel.Text = u472.Text
-				v185()
+			local function v494() -- line: 1072
+				-- upvalues: DropDownFrameTextLabel (copy), u493 (ref), v196 (copy), t6 (copy), k (copy), BindableEvent (copy)
+				DropDownFrameTextLabel.Text = u493.Text
+				v196()
 				t6.CurrentIndex = k
 				BindableEvent:Fire(k)
 			end
 
-			u472.MouseButton1Click:Connect(v473)
-			u472.MouseEnter:Connect(function() -- line: 1081
-				-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), u472 (ref)
+			u493.MouseButton1Click:Connect(v494)
+			u493.MouseEnter:Connect(function() -- line: 1081
+				-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), u493 (ref)
 				if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-					GuiService.SelectedCoreObject = u472
+					GuiService.SelectedCoreObject = u493
 				end
 			end)
-			t6.Selections[k] = u472
-			t6.SelectionInfo[u472] = {
-				Clicked = v473
+			t6.Selections[k] = u493
+			t6.SelectionInfo[u493] = {
+				Clicked = v494
 			}
 		end
 
 		GuiService:RemoveSelectionGroup(guid)
 		GuiService:AddSelectionTuple(guid, unpack(t6.Selections))
-		v182.CanvasSize = UDim2.new(1, -20, 0, #p93 * v463 + n2)
+		v193.CanvasSize = UDim2.new(1, -20, 0, #p95 * v484 + n2)
 
 		local function updateDropDownSize() -- line: 1097
-			-- upvalues: v182 (copy), v179 (copy), v181 (copy), v464 (copy)
-			if v182.CanvasSize.Y.Offset < v179.AbsoluteSize.Y - 10 then
-				v181.Size = UDim2.new(0, v464, 0, v182.CanvasSize.Y.Offset + 25)
+			-- upvalues: v193 (copy), v190 (copy), v192 (copy), v485 (copy)
+			if v193.CanvasSize.Y.Offset < v190.AbsoluteSize.Y - 10 then
+				v192.Size = UDim2.new(0, v485, 0, v193.CanvasSize.Y.Offset + 25)
 
 				return
 			end
 
-			v181.Size = UDim2.new(0, v464, 0.9, 0)
+			v192.Size = UDim2.new(0, v485, 0.9, 0)
 		end
 
-		v179.Changed:Connect(function(property) -- line: 1110
+		v190.Changed:Connect(function(property) -- line: 1110
 			-- upvalues: updateDropDownSize (copy)
 			if property ~= "AbsoluteSize" then
 				return
@@ -1026,18 +1104,18 @@ local function CreateDropDown(p70, p71, p72) -- line: 627
 		updateDropDownSize()
 	end
 
-	t6:UpdateDropDownList(p70)
-	v179.MouseButton1Click:Connect(v185)
-	p72.PoppedMenu:Connect(function(p94) -- line: 1125
-		-- upvalues: v179 (copy), v185 (copy)
-		if p94 == v179 then
-			v185()
+	t6:UpdateDropDownList(p71)
+	v190.MouseButton1Click:Connect(v196)
+	p73.PoppedMenu:Connect(function(p96) -- line: 1125
+		-- upvalues: v190 (copy), v196 (copy)
+		if p96 == v190 then
+			v196()
 		end
 	end)
 
 	return t6
 end
-local function CreateSelector(p95, p96) -- line: 1134
+local function CreateSelector(p97, p98) -- line: 1134
 	-- upvalues: Create (copy), v42 (copy), Theme (copy), v4 (copy), UserInputService (copy), v5 (copy), addHoverState (copy), VRService (copy), GuiService (copy), EaseOutQuad (copy), EngineFeature (copy), v6 (copy), v38 (copy), v39 (copy), v40 (copy), t1 (copy)
 	local n3 = 0
 	local t7 = {
@@ -1045,7 +1123,7 @@ local function CreateSelector(p95, p96) -- line: 1134
 		SetSelectionIndex = nil
 	}
 
-	if type(p95) ~= "table" then
+	if type(p97) ~= "table" then
 		error("CreateSelector selectionStringTable (first arg) is not a table", 2)
 
 		return t7
@@ -1055,102 +1133,102 @@ local function CreateSelector(p95, p96) -- line: 1134
 
 	BindableEvent.Name = "IndexChanged"
 
-	local u198 = true
+	local u210 = true
 
 	t7.CurrentIndex = 0
 	t7.SelectorFrame = Create("ImageButton")({
 		Name = "Selector",
 		Image = "",
 		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		ZIndex = 2,
 		NextSelectionLeft = t7.SelectorFrame,
 		NextSelectionRight = t7.SelectorFrame,
-		BackgroundTransparency = 1,
 		Size = UDim2.new(0.6, 0, 0, 50),
 		Position = UDim2.new(1, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		ZIndex = 2,
 		SelectionImageObject = v42
 	})
 
-	local v199 = Create("ImageButton")({
+	local v211 = Create("ImageButton")({
 		Name = "LeftButton",
 		BackgroundTransparency = 1,
+		Image = "",
+		ZIndex = 3,
+		Selectable = false,
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 0, 0.5, 0),
 		Size = UDim2.new(0, Theme.SelectorArrowButtonWidth, 0, 50),
-		Image = "",
-		ZIndex = 3,
-		Selectable = false,
 		SelectionImageObject = v42,
 		Parent = t7.SelectorFrame
 	})
-	local v200 = Create("ImageButton")({
+	local v212 = Create("ImageButton")({
 		Name = "RightButton",
 		BackgroundTransparency = 1,
+		Image = "",
+		ZIndex = 3,
+		Selectable = false,
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, 0, 0.5, 0),
 		Size = UDim2.new(0, Theme.SelectorArrowButtonWidth, 0, 50),
-		Image = "",
-		ZIndex = 3,
-		Selectable = false,
 		SelectionImageObject = v42,
 		Parent = t7.SelectorFrame
 	})
-	local v201 = Create("ImageLabel")({
+	local v213 = Create("ImageLabel")({
 		Name = "LeftButton",
 		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/Settings/Slider/Left.png",
+		ZIndex = 4,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Size = UDim2.new(0, 18, 0, 30),
-		Image = "rbxasset://textures/ui/Settings/Slider/Left.png",
 		ImageColor3 = v4,
-		ZIndex = 4,
-		Parent = v199
+		Parent = v211
 	})
-	local v202 = Create("ImageLabel")({
+	local v214 = Create("ImageLabel")({
 		Name = "RightButton",
 		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/Settings/Slider/Right.png",
+		ZIndex = 4,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Size = UDim2.new(0, 18, 0, 30),
-		Image = "rbxasset://textures/ui/Settings/Slider/Right.png",
 		ImageColor3 = v4,
-		ZIndex = 4,
-		Parent = v200
+		Parent = v212
 	})
 
 	if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then
-		local function v203(p97) -- line: 1220
+		local function v215(p99) -- line: 1220
 			-- upvalues: v4 (copy)
-			p97.ImageColor3 = v4
+			p99.ImageColor3 = v4
 		end
-		local function v204(p98) -- line: 1222
+		local function v216(p100) -- line: 1222
 			-- upvalues: v5 (copy)
-			p98.ImageColor3 = v5
+			p100.ImageColor3 = v5
 		end
 
-		addHoverState(v199, v201, v203, v204)
-		addHoverState(v200, v202, v203, v204)
+		addHoverState(v211, v213, v215, v216)
+		addHoverState(v212, v214, v215, v216)
 	end
 
 	t7.Selections = {}
 
 	local t8 = {}
 	local t9 = {}
-	local v207 = Create("ImageButton")({
+	local v219 = Create("ImageButton")({
 		Name = "AutoSelectButton",
 		BackgroundTransparency = 1,
 		Image = "",
-		Position = UDim2.new(0, v199.Size.X.Offset, 0, 0),
-		Size = UDim2.new(1, v199.Size.X.Offset * -2, 1, 0),
-		Parent = t7.SelectorFrame,
 		ZIndex = 2,
+		Position = UDim2.new(0, v211.Size.X.Offset, 0, 0),
+		Size = UDim2.new(1, v211.Size.X.Offset * -2, 1, 0),
+		Parent = t7.SelectorFrame,
 		SelectionImageObject = v42
 	})
 
-	v207.MouseButton1Click:Connect(function() -- line: 1243
-		-- upvalues: u198 (ref), t7 (copy), VRService (copy), UserInputService (copy), GuiService (copy)
-		if not u198 then
+	v219.MouseButton1Click:Connect(function() -- line: 1243
+		-- upvalues: u210 (ref), t7 (copy), VRService (copy), UserInputService (copy), GuiService (copy)
+		if not u210 then
 			return
 		end
 
@@ -1158,36 +1236,36 @@ local function CreateSelector(p95, p96) -- line: 1134
 			return
 		end
 
-		local v478 = t7.CurrentIndex + 1
+		local v499 = t7.CurrentIndex + 1
 
-		if v478 > #t7.Selections then
-			v478 = 1
+		if v499 > #t7.Selections then
+			v499 = 1
 		end
 
-		t7:SetSelectionIndex(v478)
+		t7:SetSelectionIndex(v499)
 
 		if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
 			GuiService.SelectedCoreObject = t7.SelectorFrame
 		end
 	end)
-	t9[v207] = true
+	t9[v219] = true
 
-	local function setSelection(p99, p100) -- line: 1262
-		-- upvalues: t7 (copy), v199 (copy), t8 (ref), EaseOutQuad (copy), EngineFeature (copy), BindableEvent (copy)
+	local function setSelection(p101, p102) -- line: 1262
+		-- upvalues: t7 (copy), v211 (copy), t8 (ref), EaseOutQuad (copy), EngineFeature (copy), BindableEvent (copy)
 		for k, v in pairs(t7.Selections) do
-			local v483 = k == p99
-			local uDim2 = UDim2.new(0, v199.Size.X.Offset, 0, 0)
-			local uDim2_2 = UDim2.new(0, v199.Size.X.Offset * p100 * 3, 0, 0)
+			local v504 = k == p101
+			local uDim2 = UDim2.new(0, v211.Size.X.Offset, 0, 0)
+			local uDim2_2 = UDim2.new(0, v211.Size.X.Offset * p102 * 3, 0, 0)
 
 			if t8[v] then
-				uDim2_2 = UDim2.new(0, v199.Size.X.Offset * -p100 * 3, 0, 0)
+				uDim2_2 = UDim2.new(0, v211.Size.X.Offset * -p102 * 3, 0, 0)
 			end
 
 			if uDim2_2.X.Offset < 0 then
 				uDim2_2 = UDim2.new(0, uDim2_2.X.Offset + v.AbsoluteSize.X / 4, 0, 0)
 			end
 
-			if v483 then
+			if v504 then
 				t8[v] = true
 				v.Position = uDim2_2
 				v.Visible = true
@@ -1204,7 +1282,7 @@ local function CreateSelector(p95, p96) -- line: 1134
 				end
 
 				t7.CurrentIndex = k
-				BindableEvent:Fire(p99)
+				BindableEvent:Fire(p101)
 			elseif t8[v] then
 				t8[v] = false
 				PropertyTweener(v, "TextTransparency", 0, 1, 0.165, EaseOutQuad)
@@ -1221,13 +1299,13 @@ local function CreateSelector(p95, p96) -- line: 1134
 			end
 		end
 	end
-	local function stepFunc(p101, p102) -- line: 1333
-		-- upvalues: u198 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
-		if not u198 then
+	local function stepFunc(p103, p104) -- line: 1333
+		-- upvalues: u210 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
+		if not u210 then
 			return
 		end
 
-		if p101 ~= nil and p101.UserInputType ~= Enum.UserInputType.MouseButton1 and p101.UserInputType ~= Enum.UserInputType.Gamepad1 and p101.UserInputType ~= Enum.UserInputType.Gamepad2 and p101.UserInputType ~= Enum.UserInputType.Gamepad3 and p101.UserInputType ~= Enum.UserInputType.Gamepad4 and p101.UserInputType ~= Enum.UserInputType.Keyboard then
+		if p103 ~= nil and p103.UserInputType ~= Enum.UserInputType.MouseButton1 and p103.UserInputType ~= Enum.UserInputType.Gamepad1 and p103.UserInputType ~= Enum.UserInputType.Gamepad2 and p103.UserInputType ~= Enum.UserInputType.Gamepad3 and p103.UserInputType ~= Enum.UserInputType.Gamepad4 and p103.UserInputType ~= Enum.UserInputType.Keyboard then
 			return
 		end
 
@@ -1235,57 +1313,71 @@ local function CreateSelector(p95, p96) -- line: 1134
 			GuiService.SelectedCoreObject = t7.SelectorFrame
 		end
 
-		local v488 = p102 + t7.CurrentIndex
-		local v489 = not (v488 > t7.CurrentIndex) and -1 or 1
+		local v509 = p104 + t7.CurrentIndex
+		local v510 = not (v509 > t7.CurrentIndex) and -1 or 1
 
-		if v488 > #t7.Selections then
-			v488 = 1
-		elseif v488 < 1 then
-			v488 = #t7.Selections
+		if v509 > #t7.Selections then
+			v509 = 1
+		elseif v509 < 1 then
+			v509 = #t7.Selections
 		end
 
-		setSelection(v488, v489)
+		setSelection(v509, v510)
 	end
 
 	local connection = nil
 
+	local function connectToGuiService() -- line: 1373
+		-- upvalues: connection (ref), GuiService (copy), t7 (copy), t9 (copy), VRService (copy)
+		connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 1374
+			-- upvalues: t7 (copy), GuiService (copy), t9 (copy), VRService (copy)
+			if #t7.Selections <= 0 then
+				return
+			end
+
+			if GuiService.SelectedCoreObject ~= nil and t9[GuiService.SelectedCoreObject] and not VRService.VREnabled then
+				GuiService.SelectedCoreObject = t7.SelectorFrame
+			end
+		end)
+	end
+
 	t7.IndexChanged = BindableEvent.Event
 
-	function t7.SetSelectionIndex(_, p104) -- line: 1387
+	function t7.SetSelectionIndex(_, p106) -- line: 1387
 		-- upvalues: setSelection (copy)
-		setSelection(p104, 1)
+		setSelection(p106, 1)
 	end
 	function t7.GetSelectedIndex(_) -- line: 1391
 		-- upvalues: t7 (copy)
 		return t7.CurrentIndex
 	end
-	function t7.SetZIndex(_, p107) -- line: 1395
-		-- upvalues: v199 (copy), v200 (copy), v201 (copy), v202 (copy), t7 (copy)
-		v199.ZIndex = p107
-		v200.ZIndex = p107
-		v201.ZIndex = p107
-		v202.ZIndex = p107
+	function t7.SetZIndex(_, p109) -- line: 1395
+		-- upvalues: v211 (copy), v212 (copy), v213 (copy), v214 (copy), t7 (copy)
+		v211.ZIndex = p109
+		v212.ZIndex = p109
+		v213.ZIndex = p109
+		v214.ZIndex = p109
 
 		for i = 1, #t7.Selections do
-			t7.Selections[i].ZIndex = p107
+			t7.Selections[i].ZIndex = p109
 		end
 	end
-	function t7.SetInteractable(_, p109) -- line: 1406
-		-- upvalues: u198 (ref), t7 (copy), v199 (copy), v200 (copy), Theme (copy), v201 (copy), v6 (copy), v202 (copy), v4 (copy)
-		u198 = p109
-		t7.SelectorFrame.Selectable = u198
-		v199.Active = u198
-		v200.Active = u198
-		v199.Visible = u198
-		v200.Visible = u198
+	function t7.SetInteractable(_, p111) -- line: 1406
+		-- upvalues: u210 (ref), t7 (copy), v211 (copy), v212 (copy), Theme (copy), v213 (copy), v6 (copy), v214 (copy), v4 (copy)
+		u210 = p111
+		t7.SelectorFrame.Selectable = u210
+		v211.Active = u210
+		v212.Active = u210
+		v211.Visible = u210
+		v212.Visible = u210
 
-		if not u198 then
+		if not u210 then
 			for _, v in pairs(t7.Selections) do
 				v.TextColor3 = Theme.color("NotInteractableSelection", Color3.fromRGB(255, 255, 255))
 			end
 
-			v201.ImageColor3 = v6
-			v202.ImageColor3 = v6
+			v213.ImageColor3 = v6
+			v214.ImageColor3 = v6
 
 			return
 		end
@@ -1294,11 +1386,11 @@ local function CreateSelector(p95, p96) -- line: 1134
 			v.TextColor3 = Color3.fromRGB(255, 255, 255)
 		end
 
-		v201.ImageColor3 = v4
-		v202.ImageColor3 = v4
+		v213.ImageColor3 = v4
+		v214.ImageColor3 = v4
 	end
-	function t7.UpdateOptions(_, p111) -- line: 1431
-		-- upvalues: t7 (copy), t8 (ref), Create (copy), v199 (copy), Theme (copy), v38 (copy), p96 (copy), v200 (copy)
+	function t7.UpdateOptions(_, p113) -- line: 1431
+		-- upvalues: t7 (copy), t8 (ref), Create (copy), v211 (copy), Theme (copy), v38 (copy), p98 (copy), v212 (copy)
 		for _, v in pairs(t7.Selections) do
 			v:Destroy()
 		end
@@ -1306,68 +1398,70 @@ local function CreateSelector(p95, p96) -- line: 1134
 		t8 = {}
 		t7.Selections = {}
 
-		for k, v in pairs(p111) do
-			local v508 = Create("TextLabel")({
-				Name = "Selection" .. tostring(k),
+		for k, v in pairs(p113) do
+			local v529 = Create("TextLabel")({
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				Size = UDim2.new(1, v199.Size.X.Offset * -2, 1, 0),
+				TextWrapped = true,
+				ZIndex = 2,
+				Visible = false,
+				Name = "Selection" .. tostring(k),
+				Size = UDim2.new(1, v211.Size.X.Offset * -2, 1, 0),
 				Position = UDim2.new(1, 0, 0, 0),
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextYAlignment = Enum.TextYAlignment.Center,
 				Font = Theme.font(Enum.Font.SourceSans, "UtilityText"),
 				TextSize = Theme.textSize(24, "UtilityText"),
-				TextWrapped = true,
 				Text = v,
-				ZIndex = 2,
-				Visible = false,
 				Parent = t7.SelectorFrame
 			})
 
 			if v38 then
-				v508.TextSize = Theme.textSize(36)
+				v529.TextSize = Theme.textSize(36)
 			end
 
-			if k == p96 then
+			if k == p98 then
 				t7.CurrentIndex = k
-				v508.Position = UDim2.new(0, v199.Size.X.Offset, 0, 0)
-				v508.Visible = true
-				t8[v508] = true
+				v529.Position = UDim2.new(0, v211.Size.X.Offset, 0, 0)
+				v529.Visible = true
+				t8[v529] = true
 			else
-				t8[v508] = false
+				t8[v529] = false
 			end
 
-			t7.Selections[k] = v508
+			t7.Selections[k] = v529
 		end
 
-		local v509 = #t7.Selections > 1
+		local v530 = #t7.Selections > 1
 
-		v199.Visible = v509
-		v200.Visible = v509
+		v211.Visible = v530
+		v212.Visible = v530
 	end
 
-	VRService.Changed:Connect(function(property) --[[ onVREnabled ]] -- line: 1479
-		-- upvalues: VRService (copy), v199 (copy), v200 (copy), v207 (copy)
-		if property ~= "VREnabled" then
+	local function onVREnabled(p114) -- line: 1479
+		-- upvalues: VRService (copy), v211 (copy), v212 (copy), v219 (copy)
+		if p114 ~= "VREnabled" then
 			return
 		end
 
 		local VREnabled = VRService.VREnabled
 
-		v199.Selectable = VREnabled
-		v200.Selectable = VREnabled
-		v207.Selectable = VREnabled
-	end)
+		v211.Selectable = VREnabled
+		v212.Selectable = VREnabled
+		v219.Selectable = VREnabled
+	end
+
+	VRService.Changed:Connect(onVREnabled)
 
 	local VREnabled = VRService.VREnabled
 
-	v199.Selectable = VREnabled
-	v200.Selectable = VREnabled
-	v207.Selectable = VREnabled
-	v199.InputBegan:Connect(function(input) -- line: 1491
-		-- upvalues: v39 (copy), v40 (copy), u198 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
+	v211.Selectable = VREnabled
+	v212.Selectable = VREnabled
+	v219.Selectable = VREnabled
+	v211.InputBegan:Connect(function(input) -- line: 1491
+		-- upvalues: v39 (copy), v40 (copy), u210 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
 		if v39(false) or v40(false) and input.UserInputType == Enum.UserInputType.MouseButton1 then
-			if not u198 then
+			if not u210 then
 				return
 			end
 
@@ -1375,22 +1469,22 @@ local function CreateSelector(p95, p96) -- line: 1134
 				GuiService.SelectedCoreObject = t7.SelectorFrame
 			end
 
-			local v513 = -1 + t7.CurrentIndex
-			local v514 = not (v513 > t7.CurrentIndex) and -1 or 1
+			local v534 = -1 + t7.CurrentIndex
+			local v535 = not (v534 > t7.CurrentIndex) and -1 or 1
 
-			if v513 > #t7.Selections then
-				v513 = 1
-			elseif v513 < 1 then
-				v513 = #t7.Selections
+			if v534 > #t7.Selections then
+				v534 = 1
+			elseif v534 < 1 then
+				v534 = #t7.Selections
 			end
 
-			setSelection(v513, v514)
+			setSelection(v534, v535)
 		end
 	end)
-	v200.InputBegan:Connect(function(input) -- line: 1497
-		-- upvalues: v39 (copy), v40 (copy), u198 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
+	v212.InputBegan:Connect(function(input) -- line: 1497
+		-- upvalues: v39 (copy), v40 (copy), u210 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t7 (copy), setSelection (copy)
 		if v39(false) or v40(false) and input.UserInputType == Enum.UserInputType.MouseButton1 then
-			if not u198 then
+			if not u210 then
 				return
 			end
 
@@ -1398,29 +1492,29 @@ local function CreateSelector(p95, p96) -- line: 1134
 				GuiService.SelectedCoreObject = t7.SelectorFrame
 			end
 
-			local v516 = 1 + t7.CurrentIndex
-			local v517 = not (v516 > t7.CurrentIndex) and -1 or 1
+			local v537 = 1 + t7.CurrentIndex
+			local v538 = not (v537 > t7.CurrentIndex) and -1 or 1
 
-			if v516 > #t7.Selections then
-				v516 = 1
-			elseif v516 < 1 then
-				v516 = #t7.Selections
+			if v537 > #t7.Selections then
+				v537 = 1
+			elseif v537 < 1 then
+				v537 = #t7.Selections
 			end
 
-			setSelection(v516, v517)
+			setSelection(v537, v538)
 		end
 	end)
 
-	local u212 = true
+	local u226 = true
 
-	t7:UpdateOptions(p95)
+	t7:UpdateOptions(p97)
 	UserInputService.InputBegan:Connect(function(input) -- line: 1507
-		-- upvalues: u198 (ref), u212 (ref), GuiService (copy), t7 (copy), VRService (copy), UserInputService (copy), setSelection (copy)
-		if not u198 then
+		-- upvalues: u210 (ref), u226 (ref), GuiService (copy), t7 (copy), VRService (copy), UserInputService (copy), setSelection (copy)
+		if not u210 then
 			return
 		end
 
-		if not u212 then
+		if not u226 then
 			return
 		end
 
@@ -1433,7 +1527,7 @@ local function CreateSelector(p95, p96) -- line: 1134
 		end
 
 		if input.KeyCode == Enum.KeyCode.DPadLeft or input.KeyCode == Enum.KeyCode.Left or input.KeyCode == Enum.KeyCode.A then
-			if not u198 then
+			if not u210 then
 				return
 			end
 
@@ -1445,22 +1539,22 @@ local function CreateSelector(p95, p96) -- line: 1134
 				GuiService.SelectedCoreObject = t7.SelectorFrame
 			end
 
-			local v519 = -1 + t7.CurrentIndex
-			local v520 = not (v519 > t7.CurrentIndex) and -1 or 1
+			local v540 = -1 + t7.CurrentIndex
+			local v541 = not (v540 > t7.CurrentIndex) and -1 or 1
 
-			if v519 > #t7.Selections then
-				v519 = 1
-			elseif v519 < 1 then
-				v519 = #t7.Selections
+			if v540 > #t7.Selections then
+				v540 = 1
+			elseif v540 < 1 then
+				v540 = #t7.Selections
 			end
 
-			setSelection(v519, v520)
+			setSelection(v540, v541)
 
 			return
 		end
 
 		if input.KeyCode == Enum.KeyCode.DPadRight or input.KeyCode == Enum.KeyCode.Right or input.KeyCode == Enum.KeyCode.D then
-			if not u198 then
+			if not u210 then
 				return
 			end
 
@@ -1472,25 +1566,25 @@ local function CreateSelector(p95, p96) -- line: 1134
 				GuiService.SelectedCoreObject = t7.SelectorFrame
 			end
 
-			local v521 = 1 + t7.CurrentIndex
-			local v522 = not (v521 > t7.CurrentIndex) and -1 or 1
+			local v542 = 1 + t7.CurrentIndex
+			local v543 = not (v542 > t7.CurrentIndex) and -1 or 1
 
-			if v521 > #t7.Selections then
-				v521 = 1
-			elseif v521 < 1 then
-				v521 = #t7.Selections
+			if v542 > #t7.Selections then
+				v542 = 1
+			elseif v542 < 1 then
+				v542 = #t7.Selections
 			end
 
-			setSelection(v521, v522)
+			setSelection(v542, v543)
 		end
 	end)
 	UserInputService.InputChanged:Connect(function(input) -- line: 1540
-		-- upvalues: u198 (ref), u212 (ref), n3 (ref), GuiService (copy), t7 (copy), stepFunc (copy)
-		if not u198 then
+		-- upvalues: u210 (ref), u226 (ref), n3 (ref), GuiService (copy), t7 (copy), stepFunc (copy)
+		if not u210 then
 			return
 		end
 
-		if not u212 then
+		if not u226 then
 			n3 = 0
 
 			return
@@ -1529,10 +1623,10 @@ local function CreateSelector(p95, p96) -- line: 1134
 		end
 	end)
 	t7.SelectorFrame.AncestryChanged:Connect(function(_, parent) -- line: 1581
-		-- upvalues: u212 (ref), connection (ref), GuiService (copy), t7 (copy), t9 (copy), VRService (copy)
-		u212 = parent
+		-- upvalues: u226 (ref), connection (ref), GuiService (copy), t7 (copy), t9 (copy), VRService (copy)
+		u226 = parent
 
-		if not u212 then
+		if not u226 then
 			if connection then
 				connection:Disconnect()
 
@@ -1552,21 +1646,21 @@ local function CreateSelector(p95, p96) -- line: 1134
 		end
 	end)
 
-	local function onResized(_, p114) -- line: 1592
+	local function onResized(_, p117) -- line: 1592
 		-- upvalues: Theme (copy), v38 (copy), t7 (copy)
-		local v529 = if not p114 then v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText") else Theme.textSize(16)
+		local v550 = if not p117 then v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText") else Theme.textSize(16)
 
 		for _, v in pairs(t7.Selections) do
-			v.TextSize = v529
+			v.TextSize = v550
 		end
 	end
 
 	t1[t7.SelectorFrame] = onResized
 
-	local v214 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
-	local v215 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v228 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v229 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-	onResized(v214, v215.Y > v215.X)
+	onResized(v228, v229.Y > v229.X)
 	connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 1374
 		-- upvalues: t7 (copy), GuiService (copy), t9 (copy), VRService (copy)
 		if #t7.Selections <= 0 then
@@ -1580,7 +1674,7 @@ local function CreateSelector(p95, p96) -- line: 1134
 
 	return t7
 end
-local function ShowAlert(p115, p116, p117, p118, p119) -- line: 1611
+local function ShowAlert(p118, p119, p120, p121, p122) -- line: 1611
 	-- upvalues: CoreGui (copy), VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), Create (copy), Theme (copy), HttpService (copy), ContextActionService (copy), GuiService (copy), MakeButton (copy), UserInputService (copy)
 	local RobloxGui2 = CoreGui.RobloxGui
 
@@ -1588,15 +1682,15 @@ local function ShowAlert(p115, p116, p117, p118, p119) -- line: 1611
 		return
 	end
 
-	local u222 = nil
+	local u236 = nil
 
-	local function onVREnabled(p120) -- line: 1622
-		-- upvalues: VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), RobloxGui2 (ref), CoreGui (copy), u222 (ref)
-		if p120 ~= "VREnabled" then
+	local function onVREnabled(p123) -- line: 1622
+		-- upvalues: VRService (copy), isInExperienceUIVREnabled (copy), CorePackages2 (copy), RobloxGui2 (ref), CoreGui (copy), u236 (ref)
+		if p123 ~= "VREnabled" then
 			return
 		end
 
-		local v533 = nil
+		local v554 = nil
 
 		if VRService.VREnabled then
 			if isInExperienceUIVREnabled then
@@ -1605,73 +1699,73 @@ local function ShowAlert(p115, p116, p117, p118, p119) -- line: 1611
 
 				RobloxGui2 = VrSpatialUi.UIManager.getInstance():getPanelObject(PanelType.MoreMenu)
 			else
-				v533 = require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu")
-				RobloxGui2 = v533:GetGUI()
+				v554 = require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu")
+				RobloxGui2 = v554:GetGUI()
 			end
 		else
 			RobloxGui2 = CoreGui.RobloxGui
 		end
 
-		if u222 and u222.Parent ~= nil then
-			u222.Parent = RobloxGui2
+		if u236 and u236.Parent ~= nil then
+			u236.Parent = RobloxGui2
 
 			if VRService.VREnabled and not isInExperienceUIVREnabled then
-				v533:SetSubpanelDepth(u222, 0.5)
+				v554:SetSubpanelDepth(u236, 0.5)
 			end
 		end
 	end
 
 	local connection = VRService.Changed:Connect(onVREnabled)
 
-	u222 = Create("ImageLabel")({
+	u236 = Create("ImageLabel")({
 		Name = "AlertViewBacking",
 		Image = "rbxasset://textures/ui/Settings/MenuBarAssets/MenuButton.png",
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(8, 6, 46, 44),
 		BackgroundTransparency = 1,
 		ImageTransparency = 1,
+		ZIndex = 9,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(8, 6, 46, 44),
 		Size = UDim2.new(0, 400, 0, 350),
 		Position = UDim2.new(0.5, -200, 0.5, -175),
-		ZIndex = 9,
 		Parent = RobloxGui2
 	})
 	onVREnabled("VREnabled")
 
-	if p119 or not isInExperienceUIVREnabled and VRService.VREnabled then
-		u222.ImageTransparency = 0
+	if p122 or not isInExperienceUIVREnabled and VRService.VREnabled then
+		u236.ImageTransparency = 0
 	else
-		u222.Size = UDim2.new(0.8, 0, 0, 350)
-		u222.Position = UDim2.new(0.1, 0, 0.1, 0)
+		u236.Size = UDim2.new(0.8, 0, 0, 350)
+		u236.Position = UDim2.new(0.1, 0, 0.1, 0)
 	end
 
-	if CoreGui.RobloxGui.AbsoluteSize.Y <= u222.Size.Y.Offset then
-		u222.Size = UDim2.new(u222.Size.X.Scale, u222.Size.X.Offset, u222.Size.Y.Scale, CoreGui.RobloxGui.AbsoluteSize.Y)
-		u222.Position = UDim2.new(u222.Position.X.Scale, -u222.Size.X.Offset / 2, 0.5, -u222.Size.Y.Offset / 2)
+	if CoreGui.RobloxGui.AbsoluteSize.Y <= u236.Size.Y.Offset then
+		u236.Size = UDim2.new(u236.Size.X.Scale, u236.Size.X.Offset, u236.Size.Y.Scale, CoreGui.RobloxGui.AbsoluteSize.Y)
+		u236.Position = UDim2.new(u236.Position.X.Scale, -u236.Size.X.Offset / 2, 0.5, -u236.Size.Y.Offset / 2)
 	end
 
-	if not p119 then
+	if not p122 then
 		Create("UICorner")({
 			CornerRadius = Theme.DefaultCornerRadius,
-			Parent = u222
+			Parent = u236
 		})
-		u222.BackgroundColor3 = Theme.color("MenuContainer")
-		u222.BackgroundTransparency = Theme.transparency("MenuContainer")
+		u236.BackgroundColor3 = Theme.color("MenuContainer")
+		u236.BackgroundTransparency = Theme.transparency("MenuContainer")
 	end
 
 	Create("TextLabel")({
 		Name = "AlertViewText",
 		BackgroundTransparency = 1,
+		TextWrapped = true,
+		ZIndex = 10,
 		Size = UDim2.new(0.95, 0, 0.6, 0),
 		Position = UDim2.new(0.025, 0, 0.05, 0),
 		Font = Theme.font(Enum.Font.SourceSansBold, "Bold"),
 		TextSize = Theme.textSize(36),
-		Text = p115,
-		TextWrapped = true,
+		Text = p118,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
-		ZIndex = 10,
-		Parent = u222
+		Parent = u236
 	})
 	Create("ImageLabel")({
 		Image = "",
@@ -1680,32 +1774,32 @@ local function ShowAlert(p115, p116, p117, p118, p119) -- line: 1611
 
 	local guid = HttpService:GenerateGUID(false)
 
-	local function v226(_, p122) -- line: 1721
-		-- upvalues: VRService (copy), u222 (ref), isInExperienceUIVREnabled (copy), CorePackages2 (copy), p118 (copy), ContextActionService (copy), guid (copy), GuiService (copy), p117 (copy), connection (copy)
-		if VRService.VREnabled and (p122 == Enum.UserInputState.Begin or p122 == Enum.UserInputState.Cancel) then
+	local function v240(_, p125) -- line: 1721
+		-- upvalues: VRService (copy), u236 (ref), isInExperienceUIVREnabled (copy), CorePackages2 (copy), p121 (copy), ContextActionService (copy), guid (copy), GuiService (copy), p120 (copy), connection (copy)
+		if VRService.VREnabled and (p125 == Enum.UserInputState.Begin or p125 == Enum.UserInputState.Cancel) then
 			return
 		end
 
-		if not u222 then
+		if not u236 then
 			return
 		end
 
 		if VRService.VREnabled and not isInExperienceUIVREnabled then
-			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(u222, 0)
+			require(CorePackages2.Workspace.Packages.VrCommon).Panel3D.Get("SettingsMenu"):SetSubpanelDepth(u236, 0)
 		end
 
-		u222:Destroy()
-		u222 = nil
+		u236:Destroy()
+		u236 = nil
 
-		if p118 then
-			p118()
+		if p121 then
+			p121()
 		end
 
 		ContextActionService:UnbindCoreAction(guid)
 		GuiService.SelectedCoreObject = nil
 
-		if p117 then
-			p117:ShowBar()
+		if p120 then
+			p120:ShowBar()
 		end
 
 		if connection then
@@ -1716,42 +1810,42 @@ local function ShowAlert(p115, p116, p117, p118, p119) -- line: 1611
 	local uDim2 = UDim2.new(1, -20, 0, 60)
 	local uDim2_3 = UDim2.new(0, 10, 0.65, 0)
 
-	if not p119 then
+	if not p122 then
 		uDim2 = UDim2.new(0, 200, 0, 50)
 		uDim2_3 = UDim2.new(0.5, -100, 0.65, 0)
 	end
 
-	local v229, v230 = MakeButton("AlertViewButton", p116, uDim2, v226)
+	local v243, v244 = MakeButton("AlertViewButton", p119, uDim2, v240)
 
-	v229.Position = uDim2_3
-	v229.NextSelectionLeft = v229
-	v229.NextSelectionRight = v229
-	v229.NextSelectionUp = v229
-	v229.NextSelectionDown = v229
-	v229.ZIndex = 9
-	v230.ZIndex = v229.ZIndex
-	v229.Parent = u222
+	v243.Position = uDim2_3
+	v243.NextSelectionLeft = v243
+	v243.NextSelectionRight = v243
+	v243.NextSelectionUp = v243
+	v243.NextSelectionDown = v243
+	v243.ZIndex = 9
+	v244.ZIndex = v243.ZIndex
+	v243.Parent = u236
 
 	if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-		GuiService.SelectedCoreObject = v229
+		GuiService.SelectedCoreObject = v243
 	end
 
-	GuiService.SelectedCoreObject = v229
-	ContextActionService:BindCoreAction(guid, v226, false, Enum.KeyCode.Escape, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonA)
+	GuiService.SelectedCoreObject = v243
+	ContextActionService:BindCoreAction(guid, v240, false, Enum.KeyCode.Escape, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonA)
 
-	if p117 and (isInExperienceUIVREnabled or not VRService.VREnabled) then
-		p117:HideBar()
-		p117.Pages.CurrentPage:Hide(1, 1)
+	if p120 and (isInExperienceUIVREnabled or not VRService.VREnabled) then
+		p120:HideBar()
+		p120.Pages.CurrentPage:Hide(1, 1)
 	end
 end
-local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
+local function CreateNewSlider(p126, p127, p128, p129, p130) -- line: 1791
 	-- upvalues: HttpService (copy), Signal (copy), Create (copy), v42 (copy), RobloxGui (copy), Theme (copy), UserInputService (copy), v5 (copy), v4 (copy), v5 (copy), addHoverState (copy), v2 (copy), v3 (copy), VRService (copy), GuiService (copy), RunService (copy)
 	local t10 = {}
-	local num = tonumber(p123)
-	local u239 = p124
+	local num = tonumber(p126)
+	local u253 = p127
 	local n4 = 0
 	local timestamp = nil
-	local u242 = true
+	local u256 = true
 	local guid = HttpService:GenerateGUID(false)
 
 	if num <= 0 then
@@ -1760,36 +1854,36 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		return
 	end
 
-	local v244 = p126 or p127
+	local v258 = p129 or p130
 	local BindableEvent = Instance.new("BindableEvent")
 
 	BindableEvent.Name = "ValueChanged"
 
-	local v246 = Signal.new()
+	local v260 = Signal.new()
 
 	t10.SliderFrame = Create("ImageButton")({
 		Name = "Slider",
 		Image = "",
 		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		ZIndex = 2,
 		NextSelectionLeft = t10.SliderFrame,
 		NextSelectionRight = t10.SliderFrame,
-		BackgroundTransparency = 1,
 		Size = UDim2.new(0.6, 0, 0, 50),
-		AutomaticSize = if not v244 then nil else Enum.AutomaticSize.Y,
+		AutomaticSize = if not v258 then nil else Enum.AutomaticSize.Y,
 		Position = UDim2.new(1, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		SelectionImageObject = v42,
-		ZIndex = 2
+		SelectionImageObject = v42
 	})
 
-	local v247 = nil
+	local v261 = nil
 
-	if v244 then
-		v247 = Create("Frame")({
+	if v258 then
+		v261 = Create("Frame")({
 			Name = "StepsAndButtonsContainer",
-			Size = UDim2.new(1, 0, 0, 50),
 			BackgroundTransparency = 1,
 			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, 50),
 			Parent = t10.SliderFrame
 		})
 		Create("UIListLayout")({
@@ -1799,54 +1893,59 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			Parent = t10.SliderFrame
 		})
 
-		local v248 = Create("Frame")({
+		local v262 = Create("Frame")({
 			Name = "SliderLabels",
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
-			Parent = t10.SliderFrame,
-			LayoutOrder = 2
+			Parent = t10.SliderFrame
 		})
 
 		Create("UIPadding")({
 			Name = "UIPadding",
 			PaddingRight = UDim.new(0, 50),
 			PaddingLeft = UDim.new(0, 50),
-			Parent = v248
+			Parent = v262
 		})
 
-		if p126 then
+		local function isWideEnough() -- line: 1873
+			-- upvalues: RobloxGui (copy)
+			return RobloxGui.AbsoluteSize.X > 460
+		end
+
+		if p129 then
 			t10.LeftLabel = Create("TextLabel")({
 				Name = "LeftLabel",
-				Text = p126,
+				TextTransparency = 0.25,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = p129,
 				Font = Theme.font(Enum.Font.SourceSans, "UtilityRow"),
 				TextSize = Theme.textSize(18, "UtilityRow"),
 				TextColor3 = Color3.fromRGB(255, 255, 255),
-				TextTransparency = 0.25,
 				TextXAlignment = Enum.TextXAlignment.Left,
-				TextWrapped = true,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Parent = v248,
+				Parent = v262,
 				Visible = RobloxGui.AbsoluteSize.X > 460
 			})
 		end
 
-		if p127 then
+		if p130 then
 			t10.RightLabel = Create("TextLabel")({
 				Name = "RightLabel",
-				Text = p127,
+				TextTransparency = 0.25,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = p130,
 				Font = Theme.font(Enum.Font.SourceSans, "UtilityRow"),
 				TextSize = Theme.textSize(18, "UtilityRow"),
 				TextColor3 = Color3.fromRGB(255, 255, 255),
-				TextTransparency = 0.25,
 				TextXAlignment = Enum.TextXAlignment.Right,
-				TextWrapped = true,
-				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 0),
 				AutomaticSize = Enum.AutomaticSize.Y,
-				Parent = v248,
+				Parent = v262,
 				Visible = RobloxGui.AbsoluteSize.X > 460
 			})
 		end
@@ -1865,119 +1964,119 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 
 	t10.StepsContainer = Create("Frame")({
 		Name = "StepsContainer",
+		BackgroundTransparency = 1,
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Size = UDim2.new(1, -100, 1, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		BackgroundTransparency = 1,
-		Parent = if not v244 then t10.SliderFrame else v247
+		Parent = if not v258 then t10.SliderFrame else v261
 	})
 
-	local v249 = Create("ImageButton")({
+	local v264 = Create("ImageButton")({
 		Name = "LeftButton",
 		BackgroundTransparency = 1,
+		Image = "",
+		ZIndex = 3,
+		Selectable = false,
+		Active = true,
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, 0, 0.5, 0),
 		Size = UDim2.new(0, Theme.SelectorArrowButtonWidth, 0, 50),
+		SelectionImageObject = v42,
+		Parent = if not v258 then t10.SliderFrame else v261
+	})
+	local v265 = Create("ImageButton")({
+		Name = "RightButton",
+		BackgroundTransparency = 1,
 		Image = "",
 		ZIndex = 3,
 		Selectable = false,
-		SelectionImageObject = v42,
 		Active = true,
-		Parent = if not v244 then t10.SliderFrame else v247
-	})
-	local v250 = Create("ImageButton")({
-		Name = "RightButton",
-		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, 0, 0.5, 0),
 		Size = UDim2.new(0, Theme.SelectorArrowButtonWidth, 0, 50),
-		Image = "",
-		ZIndex = 3,
-		Selectable = false,
 		SelectionImageObject = v42,
-		Active = true,
-		Parent = if not v244 then t10.SliderFrame else v247
+		Parent = if not v258 then t10.SliderFrame else v261
 	})
-	local v251 = Create("ImageLabel")({
+	local v266 = Create("ImageLabel")({
 		Name = "LeftButton",
 		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 30, 0, 30),
 		Image = "rbxasset://textures/ui/Settings/Slider/Less.png",
 		ZIndex = 4,
-		Parent = v249,
-		ImageColor3 = UserInputService.PreferredInput == Enum.PreferredInput.Touch and v5 or v4
-	})
-	local v252 = Create("ImageLabel")({
-		Name = "RightButton",
-		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		Size = UDim2.new(0, 30, 0, 30),
+		Parent = v264,
+		ImageColor3 = UserInputService.PreferredInput == Enum.PreferredInput.Touch and v5 or v4
+	})
+	local v267 = Create("ImageLabel")({
+		Name = "RightButton",
+		BackgroundTransparency = 1,
 		Image = "rbxasset://textures/ui/Settings/Slider/More.png",
 		ZIndex = 4,
-		Parent = v250,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 30, 0, 30),
+		Parent = v265,
 		ImageColor3 = UserInputService.PreferredInput == Enum.PreferredInput.Touch and v5 or v4
 	})
 
 	if UserInputService.PreferredInput ~= Enum.PreferredInput.Touch then
-		local function v253(p128) -- line: 1983
+		local function v268(p131) -- line: 1983
 			-- upvalues: v4 (copy)
-			p128.ImageColor3 = v4
+			p131.ImageColor3 = v4
 		end
-		local function v254(p129) -- line: 1985
+		local function v269(p132) -- line: 1985
 			-- upvalues: v5 (copy)
-			p129.ImageColor3 = v5
+			p132.ImageColor3 = v5
 		end
 
-		addHoverState(v249, v251, v253, v254)
-		addHoverState(v250, v252, v253, v254)
+		addHoverState(v264, v266, v268, v269)
+		addHoverState(v265, v267, v268, v269)
 	end
 
 	t10.Steps = {}
 
-	local v255 = 1 / num
+	local v270 = 1 / num
 
 	for i = 1, num do
-		local v257 = Create("ImageButton")({
-			Name = "Step" .. tostring(i),
-			BackgroundColor3 = v2,
+		local v272 = Create("ImageButton")({
 			BackgroundTransparency = 0,
 			BorderSizePixel = 0,
 			AutoButtonColor = false,
 			Active = false,
-			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new((i - 1) * v255, 2, 0.5, 0),
-			Size = UDim2.new(v255, -4, 0, 24),
 			Image = "",
 			ZIndex = 3,
 			Selectable = false,
 			ImageTransparency = 0.36,
+			Name = "Step" .. tostring(i),
+			BackgroundColor3 = v2,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.new((i - 1) * v270, 2, 0.5, 0),
+			Size = UDim2.new(v270, -4, 0, 24),
 			Parent = t10.StepsContainer,
 			SelectionImageObject = v42
 		})
 
-		if i > u239 then
-			v257.BackgroundColor3 = v3
+		if i > u253 then
+			v272.BackgroundColor3 = v3
 		end
 
 		if i == 1 or i == num then
 			Create("UICorner")({
 				CornerRadius = Theme.DefaultCornerRadius,
-				Parent = v257
+				Parent = v272
 			})
 			Create("Frame")({
 				Name = "Filler",
-				BackgroundColor3 = v257.BackgroundColor3,
-				Parent = v257,
-				Size = UDim2.new(0.25, 0, 1, 0),
 				BorderSizePixel = 0,
+				BackgroundColor3 = v272.BackgroundColor3,
+				Parent = v272,
+				Size = UDim2.new(0.25, 0, 1, 0),
 				Position = if i ~= 1 then UDim2.new(0, 0, 0, 0) else UDim2.new(0.75, 0, 0, 0)
 			})
 		end
 
-		t10.Steps[#t10.Steps + 1] = v257
+		t10.Steps[#t10.Steps + 1] = v272
 	end
 
 	local function hideSelection() -- line: 2039
@@ -1991,9 +2090,9 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 	end
 	local function showSelection() -- line: 2047
-		-- upvalues: num (copy), u239 (ref), t10 (copy), v2 (copy)
+		-- upvalues: num (copy), u253 (ref), t10 (copy), v2 (copy)
 		for i = 1, num do
-			if i > u239 then
+			if i > u253 then
 				return
 			end
 
@@ -2004,53 +2103,60 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			end
 		end
 	end
-	local function setCurrentStep(p130) -- line: 2059
-		-- upvalues: p125 (ref), v249 (copy), v250 (copy), num (copy), u239 (ref), hideSelection (copy), showSelection (copy), timestamp (ref), v246 (copy), BindableEvent (copy)
-		if not p125 then
-			p125 = 0
+	local function setCurrentStep(p133) -- line: 2059
+		-- upvalues: p128 (ref), v264 (copy), v265 (copy), num (copy), u253 (ref), hideSelection (copy), showSelection (copy), timestamp (ref), v260 (copy), BindableEvent (copy)
+		if not p128 then
+			p128 = 0
 		end
 
-		v249.Visible = true
-		v250.Visible = true
+		v264.Visible = true
+		v265.Visible = true
 
-		if p130 <= p125 then
-			p130 = p125
-			v249.Visible = false
+		if p133 <= p128 then
+			p133 = p128
+			v264.Visible = false
 		end
 
-		if p130 >= num then
-			p130 = num
-			v250.Visible = false
+		if p133 >= num then
+			p133 = num
+			v265.Visible = false
 		end
 
-		if p130 == u239 then
+		if p133 == u253 then
 			return
 		end
 
-		u239 = p130
+		u253 = p133
 		hideSelection()
 		showSelection()
 		timestamp = tick()
 
-		if v246 then
-			v246:fire(u239)
+		if v260 then
+			v260:fire(u253)
 
 			return
 		end
 
-		BindableEvent:Fire(u239)
+		BindableEvent:Fire(u253)
 	end
-	local function mouseDownFunc(p131, p132, p133) -- line: 2104
-		-- upvalues: u242 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), u239 (ref), num (copy), setCurrentStep (copy)
-		if not u242 then
+	local function isActivateEvent(p134) -- line: 2093
+		if not p134 then
+			return false
+		end
+
+		return p134.UserInputType == Enum.UserInputType.MouseButton1 or (p134.UserInputType == Enum.UserInputType.Touch or p134.UserInputType == Enum.UserInputType.Gamepad1 and p134.KeyCode == Enum.KeyCode.ButtonA)
+	end
+	local function mouseDownFunc(p135, p136, p137) -- line: 2104
+		-- upvalues: u256 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), u253 (ref), num (copy), setCurrentStep (copy)
+		if not u256 then
 			return
 		end
 
-		if p131 == nil then
+		if p135 == nil then
 			return
 		end
 
-		if not if p131 then p131.UserInputType == Enum.UserInputType.MouseButton1 or (p131.UserInputType == Enum.UserInputType.Touch or p131.UserInputType == Enum.UserInputType.Gamepad1 and p131.KeyCode == Enum.KeyCode.ButtonA) else false then
+		if not if p135 then p135.UserInputType == Enum.UserInputType.MouseButton1 or (p135.UserInputType == Enum.UserInputType.Touch or p135.UserInputType == Enum.UserInputType.Gamepad1 and p135.KeyCode == Enum.KeyCode.ButtonA) else false then
 			return
 		end
 
@@ -2059,8 +2165,8 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 
 		if not VRService.VREnabled then
-			if p133 then
-				n4 = p132 - u239
+			if p137 then
+				n4 = p136 - u253
 			else
 				n4 = 0
 
@@ -2112,30 +2218,42 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			n4 = 0
 		end
 
-		setCurrentStep(p132)
+		setCurrentStep(p136)
+	end
+	local function mouseUpFunc(p138) -- line: 2168
+		-- upvalues: u256 (ref), n4 (ref)
+		if not u256 then
+			return
+		end
+
+		if not if p138 then p138.UserInputType == Enum.UserInputType.MouseButton1 or (p138.UserInputType == Enum.UserInputType.Touch or p138.UserInputType == Enum.UserInputType.Gamepad1 and p138.KeyCode == Enum.KeyCode.ButtonA) else false then
+			return
+		end
+
+		n4 = 0
 	end
 
 	t10.ValueChanged = BindableEvent.Event
 
-	if v246 then
-		t10.ValueChanged = v246
+	if v260 then
+		t10.ValueChanged = v260
 	end
 
-	function t10.SetValue(_, p135) -- line: 2185
+	function t10.SetValue(_, p140) -- line: 2185
 		-- upvalues: setCurrentStep (copy)
-		setCurrentStep(p135)
+		setCurrentStep(p140)
 	end
 	function t10.GetValue(_) -- line: 2189
-		-- upvalues: u239 (ref)
-		return u239
+		-- upvalues: u253 (ref)
+		return u253
 	end
-	function t10.SetInteractable(_, p138) -- line: 2193
-		-- upvalues: n4 (ref), u242 (ref), t10 (copy), hideSelection (copy), showSelection (copy)
+	function t10.SetInteractable(_, p143) -- line: 2193
+		-- upvalues: n4 (ref), u256 (ref), t10 (copy), hideSelection (copy), showSelection (copy)
 		n4 = 0
-		u242 = p138
-		t10.SliderFrame.Selectable = p138
+		u256 = p143
+		t10.SliderFrame.Selectable = p143
 
-		if not u242 then
+		if not u256 then
 			hideSelection()
 
 			return
@@ -2143,39 +2261,39 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 
 		showSelection()
 	end
-	function t10.SetZIndex(_, p140) -- line: 2204
-		-- upvalues: v249 (copy), v250 (copy), v251 (copy), v252 (copy), t10 (copy)
-		v249.ZIndex = p140
-		v250.ZIndex = p140
-		v251.ZIndex = p140
-		v252.ZIndex = p140
+	function t10.SetZIndex(_, p145) -- line: 2204
+		-- upvalues: v264 (copy), v265 (copy), v266 (copy), v267 (copy), t10 (copy)
+		v264.ZIndex = p145
+		v265.ZIndex = p145
+		v266.ZIndex = p145
+		v267.ZIndex = p145
 
 		for i = 1, #t10.Steps do
-			t10.Steps[i].ZIndex = p140
+			t10.Steps[i].ZIndex = p145
 		end
 	end
-	function t10.SetMinStep(_, p142) -- line: 2215
-		-- upvalues: num (copy), p125 (ref), u239 (ref), v249 (copy), v250 (copy)
-		if p142 >= 0 and p142 <= num then
-			p125 = p142
+	function t10.SetMinStep(_, p147) -- line: 2215
+		-- upvalues: num (copy), p128 (ref), u253 (ref), v264 (copy), v265 (copy)
+		if p147 >= 0 and p147 <= num then
+			p128 = p147
 		end
 
-		if u239 <= p125 then
-			u239 = p125
-			v249.Visible = false
+		if u253 <= p128 then
+			u253 = p128
+			v264.Visible = false
 		end
 
-		if u239 >= num then
-			u239 = num
-			v250.Visible = false
+		if u253 >= num then
+			u253 = num
+			v265.Visible = false
 		end
 	end
 
-	v249.InputBegan:Connect(function(input) -- line: 2232
-		-- upvalues: u239 (ref), u242 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), setCurrentStep (copy)
-		local v561 = u239 - 1
+	v264.InputBegan:Connect(function(input) -- line: 2232
+		-- upvalues: u253 (ref), u256 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), setCurrentStep (copy)
+		local v582 = u253 - 1
 
-		if not u242 then
+		if not u256 then
 			return
 		end
 
@@ -2192,16 +2310,16 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 
 		if not VRService.VREnabled then
-			n4 = v561 - u239
+			n4 = v582 - u253
 		else
 			n4 = 0
 		end
 
-		setCurrentStep(v561)
+		setCurrentStep(v582)
 	end)
-	v249.InputEnded:Connect(function(input) -- line: 2235
-		-- upvalues: u242 (ref), n4 (ref)
-		if not u242 then
+	v264.InputEnded:Connect(function(input) -- line: 2235
+		-- upvalues: u256 (ref), n4 (ref)
+		if not u256 then
 			return
 		end
 
@@ -2211,11 +2329,11 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 
 		n4 = 0
 	end)
-	v250.InputBegan:Connect(function(input) -- line: 2238
-		-- upvalues: u239 (ref), u242 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), setCurrentStep (copy)
-		local v564 = u239 + 1
+	v265.InputBegan:Connect(function(input) -- line: 2238
+		-- upvalues: u253 (ref), u256 (ref), VRService (copy), UserInputService (copy), GuiService (copy), t10 (copy), n4 (ref), setCurrentStep (copy)
+		local v585 = u253 + 1
 
-		if not u242 then
+		if not u256 then
 			return
 		end
 
@@ -2232,16 +2350,16 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 
 		if not VRService.VREnabled then
-			n4 = v564 - u239
+			n4 = v585 - u253
 		else
 			n4 = 0
 		end
 
-		setCurrentStep(v564)
+		setCurrentStep(v585)
 	end)
-	v250.InputEnded:Connect(function(input) -- line: 2241
-		-- upvalues: u242 (ref), n4 (ref)
-		if not u242 then
+	v265.InputEnded:Connect(function(input) -- line: 2241
+		-- upvalues: u256 (ref), n4 (ref)
+		if not u256 then
 			return
 		end
 
@@ -2252,28 +2370,28 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		n4 = 0
 	end)
 
-	local function onVREnabled(p143) -- line: 2245
-		-- upvalues: VRService (copy), v249 (copy), u242 (ref), v250 (copy), t10 (copy), num (copy)
-		if p143 ~= "VREnabled" then
+	local function onVREnabled(p148) -- line: 2245
+		-- upvalues: VRService (copy), v264 (copy), u256 (ref), v265 (copy), t10 (copy), num (copy)
+		if p148 ~= "VREnabled" then
 			return
 		end
 
 		if VRService.VREnabled then
-			v249.Selectable = u242
-			v250.Selectable = u242
-			t10.SliderFrame.Selectable = u242
+			v264.Selectable = u256
+			v265.Selectable = u256
+			t10.SliderFrame.Selectable = u256
 
 			for i = 1, num do
-				t10.Steps[i].Selectable = u242
-				t10.Steps[i].Active = u242
+				t10.Steps[i].Selectable = u256
+				t10.Steps[i].Active = u256
 			end
 
 			return
 		end
 
-		v249.Selectable = false
-		v250.Selectable = false
-		t10.SliderFrame.Selectable = u242
+		v264.Selectable = false
+		v265.Selectable = false
+		t10.SliderFrame.Selectable = u256
 
 		for i = 1, num do
 			t10.Steps[i].Selectable = false
@@ -2290,8 +2408,8 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			mouseDownFunc(input, i)
 		end)
 		t10.Steps[i].InputEnded:Connect(function(input) -- line: 2275
-			-- upvalues: u242 (ref), n4 (ref)
-			if not u242 then
+			-- upvalues: u256 (ref), n4 (ref)
+			if not u256 then
 				return
 			end
 
@@ -2304,7 +2422,7 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 	end
 
 	t10.SliderFrame.InputBegan:Connect(function(input) -- line: 2280
-		-- upvalues: VRService (copy), GuiService (copy), t10 (copy), mouseDownFunc (copy), u239 (ref)
+		-- upvalues: VRService (copy), GuiService (copy), t10 (copy), mouseDownFunc (copy), u253 (ref)
 		if VRService.VREnabled then
 			local SelectedCoreObject = GuiService.SelectedCoreObject
 
@@ -2313,10 +2431,10 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			end
 		end
 
-		mouseDownFunc(input, u239)
+		mouseDownFunc(input, u253)
 	end)
 	t10.SliderFrame.InputEnded:Connect(function(input) -- line: 2289
-		-- upvalues: VRService (copy), GuiService (copy), t10 (copy), u242 (ref), n4 (ref)
+		-- upvalues: VRService (copy), GuiService (copy), t10 (copy), u256 (ref), n4 (ref)
 		if VRService.VREnabled then
 			local SelectedCoreObject = GuiService.SelectedCoreObject
 
@@ -2325,7 +2443,7 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 			end
 		end
 
-		if not u242 then
+		if not u256 then
 			return
 		end
 
@@ -2336,18 +2454,18 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		n4 = 0
 	end)
 
-	local function v264() -- line: 2299
-		-- upvalues: timestamp (ref), setCurrentStep (copy), u239 (ref), n4 (ref)
+	local function v281() -- line: 2299
+		-- upvalues: timestamp (ref), setCurrentStep (copy), u253 (ref), n4 (ref)
 		if timestamp == nil then
 			return
 		end
 
 		if tick() - timestamp >= 0.2 then
-			setCurrentStep(u239 + n4)
+			setCurrentStep(u253 + n4)
 		end
 	end
 
-	local u265 = true
+	local u282 = true
 	local t11 = {
 		[Enum.KeyCode.Thumbstick1] = true,
 		[Enum.KeyCode.DPadLeft] = -1,
@@ -2360,12 +2478,12 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 	}
 
 	UserInputService.InputBegan:Connect(function(input) -- line: 2325
-		-- upvalues: u242 (ref), u265 (ref), GuiService (copy), t10 (copy), t11 (copy), n4 (ref), setCurrentStep (copy), u239 (ref)
-		if not u242 then
+		-- upvalues: u256 (ref), u282 (ref), GuiService (copy), t10 (copy), t11 (copy), n4 (ref), setCurrentStep (copy), u253 (ref)
+		if not u256 then
 			return
 		end
 
-		if not u265 then
+		if not u282 then
 			return
 		end
 
@@ -2381,19 +2499,19 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 
 		if t11[input.KeyCode] == -1 then
 			n4 = -1
-			setCurrentStep(u239 - 1)
+			setCurrentStep(u253 - 1)
 
 			return
 		end
 
 		if t11[input.KeyCode] == 1 then
 			n4 = 1
-			setCurrentStep(u239 + 1)
+			setCurrentStep(u253 + 1)
 		end
 	end)
 	UserInputService.InputEnded:Connect(function(input) -- line: 2353
-		-- upvalues: u242 (ref), GuiService (copy), t10 (copy), t11 (copy), n4 (ref)
-		if not u242 then
+		-- upvalues: u256 (ref), GuiService (copy), t10 (copy), t11 (copy), n4 (ref)
+		if not u256 then
 			return
 		end
 
@@ -2412,14 +2530,14 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 	end)
 	UserInputService.InputChanged:Connect(function(input) -- line: 2374
-		-- upvalues: u242 (ref), n4 (ref), u265 (ref), GuiService (copy), t10 (copy), setCurrentStep (copy), u239 (ref)
-		if not u242 then
+		-- upvalues: u256 (ref), n4 (ref), u282 (ref), GuiService (copy), t10 (copy), setCurrentStep (copy), u253 (ref)
+		if not u256 then
 			n4 = 0
 
 			return
 		end
 
-		if not u265 then
+		if not u282 then
 			n4 = 0
 
 			return
@@ -2441,14 +2559,14 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 
 		if input.Position.X > 0.8 and input.Delta.X > 0 and n4 ~= 1 then
 			n4 = 1
-			setCurrentStep(u239 + 1)
+			setCurrentStep(u253 + 1)
 
 			return
 		end
 
 		if input.Position.X < -0.8 and input.Delta.X < 0 and n4 ~= -1 then
 			n4 = -1
-			setCurrentStep(u239 - 1)
+			setCurrentStep(u253 - 1)
 
 			return
 		end
@@ -2458,10 +2576,10 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		end
 	end)
 
-	local u267 = false
+	local u284 = false
 
 	GuiService.Changed:Connect(function(property) -- line: 2415
-		-- upvalues: GuiService (copy), t10 (copy), u267 (ref), timestamp (ref), RunService (copy), guid (copy), v264 (copy)
+		-- upvalues: GuiService (copy), t10 (copy), u284 (ref), timestamp (ref), RunService (copy), guid (copy), v281 (copy)
 		if property ~= "SelectedCoreObject" then
 			return
 		end
@@ -2469,23 +2587,23 @@ local function CreateNewSlider(p123, p124, p125, p126, p127) -- line: 1791
 		local SelectedCoreObject = GuiService.SelectedCoreObject
 
 		if SelectedCoreObject and SelectedCoreObject:IsDescendantOf(t10.SliderFrame.Parent) then
-			if not u267 then
-				u267 = true
+			if not u284 then
+				u284 = true
 				timestamp = tick()
-				RunService:BindToRenderStep(guid, Enum.RenderPriority.Input.Value + 1, v264)
+				RunService:BindToRenderStep(guid, Enum.RenderPriority.Input.Value + 1, v281)
 
 				return
 			end
-		elseif u267 then
-			u267 = false
+		elseif u284 then
+			u284 = false
 			RunService:UnbindFromRenderStep(guid)
 		end
 	end)
 	t10.SliderFrame.AncestryChanged:Connect(function(_, parent) -- line: 2436
-		-- upvalues: u265 (ref)
-		u265 = parent
+		-- upvalues: u282 (ref)
+		u282 = parent
 	end)
-	setCurrentStep(u239)
+	setCurrentStep(u253)
 
 	return t10
 end
@@ -2498,152 +2616,138 @@ end
 
 local t12 = {}
 
-local function AddNewRow(p145, p146, p147, p148, p149, p150, p151, p152, p153, p154) -- line: 2451
+local function AddNewRow(p150, p151, p152, p153, p154, p155, p156, p157, p158, p159) -- line: 2451
 	-- upvalues: t12 (copy), Create (copy), n5 (ref), v42 (copy), Theme (copy), v38 (copy), GuiService (copy), t1 (copy), CreateNewSlider (copy), CreateSelector (copy), CreateDropDown (copy), VRService (copy), UserInputService (copy), CoreGui (copy)
 	local n6 = 0
-	local v279 = p147 ~= "TextBox"
+	local v296 = p152 ~= "TextBox"
 
-	if t12[p145] then
-		n6 = t12[p145]
+	if t12[p150] then
+		n6 = t12[p150]
 	end
 
-	local u280 = Create("ImageButton")({
-		Name = p146 .. "Frame",
+	local u297 = Create("ImageButton")({
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(2, 2, 18, 18),
 		ImageTransparency = 1,
 		Active = false,
 		AutoButtonColor = false,
-		Size = UDim2.new(1, 0, 0, n5),
-		AutomaticSize = if not p151 and (not p152 and not p153) then nil else Enum.AutomaticSize.Y,
-		Position = UDim2.new(0, 0, 0, n6),
 		ZIndex = 2,
 		Selectable = false,
+		Name = p151 .. "Frame",
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(2, 2, 18, 18),
+		Size = UDim2.new(1, 0, 0, n5),
+		AutomaticSize = if not p156 and (not p157 and not p158) then nil else Enum.AutomaticSize.Y,
+		Position = UDim2.new(0, 0, 0, n6),
 		SelectionImageObject = v42,
-		Parent = p145.Page
+		Parent = p150.Page
 	})
 
-	u280.BackgroundColor3 = Theme.color("RowFrameBackground")
-	u280.ImageColor3 = u280.BackgroundColor3
+	u297.BackgroundColor3 = Theme.color("RowFrameBackground")
+	u297.ImageColor3 = u297.BackgroundColor3
 	Create("UICorner")({
 		CornerRadius = Theme.DefaultCornerRadius,
-		Parent = u280
+		Parent = u297
 	})
 
-	if u280 and p150 then
-		u280.Position = UDim2.new(u280.Position.X.Scale, u280.Position.X.Offset, u280.Position.Y.Scale, u280.Position.Y.Offset + p150)
+	if u297 and p155 then
+		u297.Position = UDim2.new(u297.Position.X.Scale, u297.Position.X.Offset, u297.Position.Y.Scale, u297.Position.Y.Offset + p155)
 	end
 
-	local u282
+	local u299
 
-	if p151 then
-		local v281 = Create("Frame")({
-			Name = p146 .. "RowLabelAndDescriptionFrame",
+	if p156 then
+		local v298 = Create("Frame")({
 			BackgroundTransparency = 1,
+			Name = p151 .. "RowLabelAndDescriptionFrame",
 			Position = UDim2.new(0, 10, 0, 0),
 			Size = UDim2.new(0.4, -20, 0, 50),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Parent = u280
+			Parent = u297
 		})
 
-		u282 = Create("TextLabel")({
-			Name = p146 .. "Label",
-			Text = p146,
+		u299 = Create("TextLabel")({
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			ZIndex = 2,
+			LayoutOrder = 1,
+			Name = p151 .. "Label",
+			Text = p151,
 			Font = Theme.font(Enum.Font.SourceSansBold, "UtilityRow"),
 			TextSize = Theme.textSize(16, "UtilityRow"),
 			TextColor3 = Color3.fromRGB(255, 255, 255),
 			TextXAlignment = Enum.TextXAlignment.Left,
-			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			TextWrapped = true,
-			ZIndex = 2,
-			Parent = v281,
-			LayoutOrder = 1
+			Parent = v298
 		})
 		Create("TextLabel")({
-			Name = p146 .. "Description",
-			Text = p151,
+			TextTransparency = 0.25,
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			LayoutOrder = 2,
+			Name = p151 .. "Description",
+			Text = p156,
 			Font = Theme.font(Enum.Font.SourceSans, "UtilityRow"),
 			TextSize = Theme.textSize(18, "UtilityRow"),
 			TextColor3 = Color3.fromRGB(255, 255, 255),
-			TextTransparency = 0.25,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(1, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			ZIndex = 2,
-			Parent = v281,
-			LayoutOrder = 2
+			Parent = v298
 		})
 		Create("UIListLayout")({
-			Name = p146 .. "UIListLayout",
+			Name = p151 .. "UIListLayout",
 			VerticalAlignment = Enum.VerticalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			Padding = UDim.new(0, 8),
-			Parent = v281
+			Parent = v298
 		})
 		Create("UIPadding")({
-			Name = p146 .. "UIListLayout",
+			Name = p151 .. "UIListLayout",
 			PaddingBottom = UDim.new(0, 10),
 			PaddingTop = UDim.new(0, 10),
-			Parent = v281
+			Parent = v298
 		})
 	else
-		u282 = Create("TextLabel")({
-			Name = p146 .. "Label",
-			Text = p146,
+		u299 = Create("TextLabel")({
+			TextWrapped = true,
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			Name = p151 .. "Label",
+			Text = p151,
 			Font = Theme.font(Enum.Font.SourceSansBold, "UtilityRow"),
 			TextSize = Theme.textSize(16, "UtilityRow"),
 			TextColor3 = Color3.fromRGB(255, 255, 255),
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
 			AutomaticSize = Enum.AutomaticSize.Y,
-			BackgroundTransparency = 1,
 			Size = UDim2.new(0.4, -20, 1, 0),
 			Position = UDim2.new(0, 10, 0, 0),
-			ZIndex = 2,
-			Parent = u280
+			Parent = u297
 		})
 		Create("UIPadding")({
-			Name = p146 .. "UIPadding",
+			Name = p151 .. "UIPadding",
 			PaddingBottom = UDim.new(0, 10),
 			PaddingTop = UDim.new(0, 10),
-			Parent = u282
+			Parent = u299
 		})
 	end
 
-	if not v279 then
-		u282.Text = ""
+	if not v296 then
+		u299.Text = ""
 	end
 
-	if _G.__TESTEZ_RUNNING_TEST__ then
-		Vector2.new(1024, 1024)
-	else
-		GuiService:GetHardwareSafeViewport()
-	end
-
-	local v283 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
-
-	if v283.Y > v283.X then
-		u282.TextSize = Theme.textSize(16, "UtilityRow")
-	else
-		u282.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
-	end
-
-	t1[u280] = function(_, p156) --[[ onResized ]] -- line: 2583
-		-- upvalues: u282 (ref), Theme (copy), v38 (copy)
-		if p156 then
-			u282.TextSize = Theme.textSize(16, "UtilityRow")
+	local function onResized(_, p161) -- line: 2583
+		-- upvalues: u299 (ref), Theme (copy), v38 (copy)
+		if p161 then
+			u299.TextSize = Theme.textSize(16, "UtilityRow")
 
 			return
 		end
 
-		u282.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
+		u299.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
 	end
 
 	if _G.__TESTEZ_RUNNING_TEST__ then
@@ -2652,550 +2756,580 @@ local function AddNewRow(p145, p146, p147, p148, p149, p150, p151, p152, p153, p
 		GuiService:GetHardwareSafeViewport()
 	end
 
-	local v284 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v301 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-	if v284.Y > v284.X then
-		u282.TextSize = Theme.textSize(16, "UtilityRow")
+	if v301.Y > v301.X then
+		u299.TextSize = Theme.textSize(16, "UtilityRow")
 	else
-		u282.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
+		u299.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
+	end
+
+	t1[u297] = onResized
+
+	if _G.__TESTEZ_RUNNING_TEST__ then
+		Vector2.new(1024, 1024)
+	else
+		GuiService:GetHardwareSafeViewport()
+	end
+
+	local v302 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+
+	if v302.Y > v302.X then
+		u299.TextSize = Theme.textSize(16, "UtilityRow")
+	else
+		u299.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
 	end
 
 	local SliderFrame = nil
-	local u286 = nil
+	local u304 = nil
 
-	if p147 == "Slider" then
-		u286 = CreateNewSlider(p148, p149, nil, p152, p153)
-		u286.SliderFrame.Parent = u280
-		SliderFrame = u286.SliderFrame
-	elseif p147 == "Selector" then
-		u286 = CreateSelector(p148, p149)
-		u286.SelectorFrame.Parent = u280
-		SliderFrame = u286.SelectorFrame
-	elseif p147 == "DropDown" then
-		u286 = CreateDropDown(p148, p149, p145.HubRef)
-		u286.DropDownFrame.Parent = u280
-		SliderFrame = u286.DropDownFrame
-	elseif p147 == "TextBox" then
-		local v287 = Create("ImageLabel")({
+	if p152 == "Slider" then
+		u304 = CreateNewSlider(p153, p154, nil, p157, p158)
+		u304.SliderFrame.Parent = u297
+		SliderFrame = u304.SliderFrame
+	elseif p152 == "Selector" then
+		u304 = CreateSelector(p153, p154)
+		u304.SelectorFrame.Parent = u297
+		SliderFrame = u304.SelectorFrame
+	elseif p152 == "DropDown" then
+		u304 = CreateDropDown(p153, p154, p150.HubRef)
+		u304.DropDownFrame.Parent = u297
+		SliderFrame = u304.DropDownFrame
+	elseif p152 == "TextBox" then
+		local v305 = Create("ImageLabel")({
 			Image = "",
 			BackgroundTransparency = 1
 		})
 
-		u286 = {
+		u304 = {
 			HubRef = nil
 		}
 
-		local v288 = Create("TextBox")({
+		local v306 = Create("TextBox")({
+			BorderSizePixel = 0,
+			TextWrapped = true,
+			ZIndex = 2,
+			ClearTextOnFocus = false,
 			AnchorPoint = Vector2.new(1, 0.5),
 			Size = UDim2.new(0.6, 0, 1, 0),
 			Position = UDim2.new(1, 0, 0.5, 0),
-			Text = p146,
+			Text = p151,
 			TextColor3 = Color3.fromRGB(49, 49, 49),
 			BackgroundTransparency = Theme.transparency("ControlInputBackground", 0.5),
-			BorderSizePixel = 0,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
 			Font = Theme.font(Enum.Font.SourceSans, "UtilityText"),
 			TextSize = Theme.textSize(24, "UtilityText"),
-			ZIndex = 2,
-			SelectionImageObject = v287,
-			ClearTextOnFocus = false,
-			Interactable = p154,
-			Parent = u280
+			SelectionImageObject = v305,
+			Interactable = p159,
+			Parent = u297
 		})
 
-		SliderFrame = v288
-		v288.Focused:Connect(function() -- line: 2637
-			-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), v288 (copy), p146 (copy)
+		SliderFrame = v306
+		v306.Focused:Connect(function() -- line: 2637
+			-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), v306 (copy), p151 (copy)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				GuiService.SelectedCoreObject = v288
+				GuiService.SelectedCoreObject = v306
 			end
 
-			if v288.Text == p146 then
-				v288.Text = ""
+			if v306.Text == p151 then
+				v306.Text = ""
 			end
 		end)
 
-		if p150 then
-			v288.Position = UDim2.new(v288.Position.X.Scale, v288.Position.X.Offset, v288.Position.Y.Scale, v288.Position.Y.Offset + p150)
+		if p155 then
+			v306.Position = UDim2.new(v306.Position.X.Scale, v306.Position.X.Offset, v306.Position.Y.Scale, v306.Position.Y.Offset + p155)
 		end
 
 		SliderFrame.SelectionGained:Connect(function() -- line: 2655
-			-- upvalues: VRService (copy), UserInputService (copy), v288 (copy), Theme (copy), u286 (ref), SliderFrame (ref)
+			-- upvalues: VRService (copy), UserInputService (copy), v306 (copy), Theme (copy), u304 (ref), SliderFrame (ref)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				v288.BackgroundTransparency = Theme.transparency("ControlInputBackground", 0.1)
+				v306.BackgroundTransparency = Theme.transparency("ControlInputBackground", 0.1)
 
-				if u286.HubRef then
-					u286.HubRef:ScrollToFrame(SliderFrame)
+				if u304.HubRef then
+					u304.HubRef:ScrollToFrame(SliderFrame)
 				end
 			end
 		end)
 		SliderFrame.SelectionLost:Connect(function() -- line: 2664
-			-- upvalues: VRService (copy), UserInputService (copy), v288 (copy), Theme (copy)
+			-- upvalues: VRService (copy), UserInputService (copy), v306 (copy), Theme (copy)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				v288.BackgroundTransparency = Theme.transparency("ControlInputBackground", 0.5)
+				v306.BackgroundTransparency = Theme.transparency("ControlInputBackground", 0.5)
 			end
 		end)
-		v288.MouseEnter:Connect(function() -- line: 2670
-			-- upvalues: CoreGui (copy), SliderFrame (ref), VRService (copy), UserInputService (copy), p145 (copy), GuiService (copy)
+
+		local function processInput(p162) -- line: 2688
+			-- upvalues: GuiService (copy), SliderFrame (ref), v306 (copy)
+			if p162.UserInputState == Enum.UserInputState.Begin and (p162.KeyCode == Enum.KeyCode.Return and GuiService.SelectedCoreObject == SliderFrame) then
+				v306:CaptureFocus()
+			end
+		end
+
+		v306.MouseEnter:Connect(function() -- line: 2670
+			-- upvalues: CoreGui (copy), SliderFrame (ref), VRService (copy), UserInputService (copy), p150 (copy), GuiService (copy)
 			local DropDownFullscreenFrame = CoreGui.RobloxGui:FindFirstChild("DropDownFullscreenFrame")
 
 			if DropDownFullscreenFrame and DropDownFullscreenFrame.Visible then
 				return
 			end
 
-			local v588 = SliderFrame
+			local v609 = SliderFrame
 
-			if v588 and v588.Visible and v588.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p145.Active then
-				GuiService.SelectedCoreObject = v588
+			if v609 and v609.Visible and v609.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p150.Active then
+				GuiService.SelectedCoreObject = v609
 			end
 		end)
-		UserInputService.InputBegan:Connect(function(input) --[[ processInput ]] -- line: 2688
-			-- upvalues: GuiService (copy), SliderFrame (ref), v288 (copy)
-			if input.UserInputState == Enum.UserInputState.Begin and (input.KeyCode == Enum.KeyCode.Return and GuiService.SelectedCoreObject == SliderFrame) then
-				v288:CaptureFocus()
-			end
-		end)
-	elseif p147 == "TextEntry" then
-		local v289 = Create("ImageLabel")({
+		UserInputService.InputBegan:Connect(processInput)
+	elseif p152 == "TextEntry" then
+		local v308 = Create("ImageLabel")({
 			Image = "",
 			BackgroundTransparency = 1
 		})
 
-		u286 = {
+		u304 = {
 			HubRef = nil
 		}
 
-		local v290 = Create("TextBox")({
+		local v309 = Create("TextBox")({
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			TextWrapped = false,
+			ZIndex = 2,
+			ClearTextOnFocus = false,
 			AnchorPoint = Vector2.new(1, 0.5),
 			Size = UDim2.new(0.4, -10, 0, 40),
 			Position = UDim2.new(1, 0, 0.5, 0),
-			Text = p146,
+			Text = p151,
 			TextColor3 = Color3.fromRGB(178, 178, 178),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
 			TextYAlignment = Enum.TextYAlignment.Center,
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextWrapped = false,
 			Font = Theme.font(Enum.Font.SourceSans, "UtilityText"),
 			TextSize = Theme.textSize(24, "UtilityText"),
-			ZIndex = 2,
-			SelectionImageObject = v289,
-			ClearTextOnFocus = false,
-			Parent = u280
+			SelectionImageObject = v308,
+			Parent = u297
 		})
 
-		SliderFrame = v290
-		v290.Focused:Connect(function() -- line: 2729
-			-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), v290 (copy), p146 (copy)
+		SliderFrame = v309
+		v309.Focused:Connect(function() -- line: 2729
+			-- upvalues: VRService (copy), UserInputService (copy), GuiService (copy), v309 (copy), p151 (copy)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				GuiService.SelectedCoreObject = v290
+				GuiService.SelectedCoreObject = v309
 			end
 
-			if v290.Text == p146 then
-				v290.Text = ""
+			if v309.Text == p151 then
+				v309.Text = ""
 			end
 		end)
 
-		if p150 then
-			v290.Position = UDim2.new(v290.Position.X.Scale, v290.Position.X.Offset, v290.Position.Y.Scale, v290.Position.Y.Offset + p150)
+		if p155 then
+			v309.Position = UDim2.new(v309.Position.X.Scale, v309.Position.X.Offset, v309.Position.Y.Scale, v309.Position.Y.Offset + p155)
 		end
 
 		SliderFrame.SelectionGained:Connect(function() -- line: 2747
-			-- upvalues: VRService (copy), UserInputService (copy), v290 (copy), u286 (ref), SliderFrame (ref)
+			-- upvalues: VRService (copy), UserInputService (copy), v309 (copy), u304 (ref), SliderFrame (ref)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				v290.BackgroundTransparency = 0.8
+				v309.BackgroundTransparency = 0.8
 
-				if u286.HubRef then
-					u286.HubRef:ScrollToFrame(SliderFrame)
+				if u304.HubRef then
+					u304.HubRef:ScrollToFrame(SliderFrame)
 				end
 			end
 		end)
 		SliderFrame.SelectionLost:Connect(function() -- line: 2756
-			-- upvalues: VRService (copy), UserInputService (copy), v290 (copy)
+			-- upvalues: VRService (copy), UserInputService (copy), v309 (copy)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				v290.BackgroundTransparency = 1
+				v309.BackgroundTransparency = 1
 			end
 		end)
-		u280.MouseEnter:Connect(function() -- line: 2762
-			-- upvalues: CoreGui (copy), SliderFrame (ref), VRService (copy), UserInputService (copy), p145 (copy), GuiService (copy)
+
+		local function processInput(p163) -- line: 2780
+			-- upvalues: GuiService (copy), SliderFrame (ref), v309 (copy)
+			if p163.UserInputState == Enum.UserInputState.Begin and (p163.KeyCode == Enum.KeyCode.Return and GuiService.SelectedCoreObject == SliderFrame) then
+				v309:CaptureFocus()
+			end
+		end
+
+		u297.MouseEnter:Connect(function() -- line: 2762
+			-- upvalues: CoreGui (copy), SliderFrame (ref), VRService (copy), UserInputService (copy), p150 (copy), GuiService (copy)
 			local DropDownFullscreenFrame = CoreGui.RobloxGui:FindFirstChild("DropDownFullscreenFrame")
 
 			if DropDownFullscreenFrame and DropDownFullscreenFrame.Visible then
 				return
 			end
 
-			local v591 = SliderFrame
+			local v612 = SliderFrame
 
-			if v591 and v591.Visible and v591.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p145.Active then
-				GuiService.SelectedCoreObject = v591
+			if v612 and v612.Visible and v612.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p150.Active then
+				GuiService.SelectedCoreObject = v612
 			end
 		end)
 
-		function u286.SetZIndex(_, p158) -- line: 2791
-			-- upvalues: v290 (copy)
-			v290.ZIndex = p158
+		function u304.SetZIndex(_, p165) -- line: 2791
+			-- upvalues: v309 (copy)
+			v309.ZIndex = p165
 		end
-		function u286.SetInteractable(_, p160) -- line: 2795
-			-- upvalues: v290 (copy)
-			v290.Selectable = p160
+		function u304.SetInteractable(_, p167) -- line: 2795
+			-- upvalues: v309 (copy)
+			v309.Selectable = p167
 
-			if not p160 then
-				v290.TextColor3 = Color3.fromRGB(49, 49, 49)
-				v290.ZIndex = 1
+			if not p167 then
+				v309.TextColor3 = Color3.fromRGB(49, 49, 49)
+				v309.ZIndex = 1
 
 				return
 			end
 
-			v290.TextColor3 = Color3.fromRGB(178, 178, 178)
-			v290.ZIndex = 2
+			v309.TextColor3 = Color3.fromRGB(178, 178, 178)
+			v309.ZIndex = 2
 		end
-		function u286.SetValue(_, p162) -- line: 2806
-			-- upvalues: v290 (copy)
-			v290.Text = p162
+		function u304.SetValue(_, p169) -- line: 2806
+			-- upvalues: v309 (copy)
+			v309.Text = p169
 		end
 
 		local BindableEvent = Instance.new("BindableEvent")
 
 		BindableEvent.Name = "ValueChanged"
-		v290.FocusLost:Connect(function() -- line: 2813
-			-- upvalues: BindableEvent (copy), v290 (copy)
-			BindableEvent:Fire(v290.Text)
+		v309.FocusLost:Connect(function() -- line: 2813
+			-- upvalues: BindableEvent (copy), v309 (copy)
+			BindableEvent:Fire(v309.Text)
 		end)
-		u286.ValueChanged = BindableEvent.Event
-		UserInputService.InputBegan:Connect(function(input) --[[ processInput ]] -- line: 2780
-			-- upvalues: GuiService (copy), SliderFrame (ref), v290 (copy)
-			if input.UserInputState == Enum.UserInputState.Begin and (input.KeyCode == Enum.KeyCode.Return and GuiService.SelectedCoreObject == SliderFrame) then
-				v290:CaptureFocus()
-			end
-		end)
+		u304.ValueChanged = BindableEvent.Event
+		UserInputService.InputBegan:Connect(processInput)
 	end
 
-	u286.Name = p146 .. "ValueChanger"
+	u304.Name = p151 .. "ValueChanger"
 
-	local SetAutoLocalize = u286.SetAutoLocalize
+	local SetAutoLocalize = u304.SetAutoLocalize
 
-	function u286.SetAutoLocalize(p163, p164) -- line: 2825
-		-- upvalues: u280 (ref), SetAutoLocalize (copy)
-		u280.AutoLocalize = p164
+	function u304.SetAutoLocalize(p170, p171) -- line: 2825
+		-- upvalues: u297 (ref), SetAutoLocalize (copy)
+		u297.AutoLocalize = p171
 
 		if SetAutoLocalize then
-			SetAutoLocalize(p163, p164)
+			SetAutoLocalize(p170, p171)
 		end
 	end
 
-	local v293 = n6 + n5
+	local v313 = n6 + n5
 
-	if p150 then
-		v293 += p150
+	if p155 then
+		v313 += p155
 	end
 
-	t12[p145] = v293
+	t12[p150] = v313
 
-	if v279 then
-		u280.MouseEnter:Connect(function() -- line: 2840
-			-- upvalues: CoreGui (copy), u286 (ref), VRService (copy), UserInputService (copy), p145 (copy), GuiService (copy)
+	if v296 then
+		u297.MouseEnter:Connect(function() -- line: 2840
+			-- upvalues: CoreGui (copy), u304 (ref), VRService (copy), UserInputService (copy), p150 (copy), GuiService (copy)
 			local DropDownFullscreenFrame = CoreGui.RobloxGui:FindFirstChild("DropDownFullscreenFrame")
 
 			if DropDownFullscreenFrame and DropDownFullscreenFrame.Visible then
 				return
 			end
 
-			local v602 = u286.SliderFrame or u286.SliderFrame or u286.DropDownFrame or u286.SelectorFrame
+			local v623 = u304.SliderFrame or u304.SliderFrame or u304.DropDownFrame or u304.SelectorFrame
 
-			if v602 and v602.Visible and v602.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p145.Active then
-				GuiService.SelectedCoreObject = v602
+			if v623 and v623.Visible and v623.ZIndex > 1 and (not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false))) and p150.Active then
+				GuiService.SelectedCoreObject = v623
 			end
 		end)
-		VRService.Changed:Connect(function(property) --[[ onVREnabled ]] -- line: 2870
-			-- upvalues: VRService (copy), u280 (ref), SliderFrame (ref), GuiService (copy), Theme (copy)
-			if property == "VREnabled" then
+
+		local function onVREnabled(p172) -- line: 2870
+			-- upvalues: VRService (copy), u297 (ref), SliderFrame (ref), GuiService (copy), Theme (copy)
+			if p172 == "VREnabled" then
 				if VRService.VREnabled then
-					u280.Selectable = true
-					u280.Active = true
+					u297.Selectable = true
+					u297.Active = true
 					SliderFrame.Active = true
-					GuiService.Changed:Connect(function(property2) -- line: 2876
-						-- upvalues: GuiService (copy), u280 (ref), Theme (copy)
-						if property2 == "SelectedCoreObject" then
+					GuiService.Changed:Connect(function(property) -- line: 2876
+						-- upvalues: GuiService (copy), u297 (ref), Theme (copy)
+						if property == "SelectedCoreObject" then
 							local SelectedCoreObject = GuiService.SelectedCoreObject
 
-							if SelectedCoreObject and (SelectedCoreObject == u280 or SelectedCoreObject:IsDescendantOf(u280)) then
-								u280.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
-								u280.BackgroundTransparency = 1
+							if SelectedCoreObject and (SelectedCoreObject == u297 or SelectedCoreObject:IsDescendantOf(u297)) then
+								u297.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
+								u297.BackgroundTransparency = 1
 
 								return
 							end
 
-							u280.ImageTransparency = 1
-							u280.BackgroundTransparency = 1
+							u297.ImageTransparency = 1
+							u297.BackgroundTransparency = 1
 						end
 					end)
 
 					return
 				end
 
-				u280.Selectable = false
-				u280.Active = false
+				u297.Selectable = false
+				u297.Active = false
 			end
-		end)
+		end
+
+		VRService.Changed:Connect(onVREnabled)
 
 		if VRService.VREnabled then
-			u280.Selectable = true
-			u280.Active = true
+			u297.Selectable = true
+			u297.Active = true
 			SliderFrame.Active = true
 			GuiService.Changed:Connect(function(property) -- line: 2876
-				-- upvalues: GuiService (copy), u280 (ref), Theme (copy)
+				-- upvalues: GuiService (copy), u297 (ref), Theme (copy)
 				if property == "SelectedCoreObject" then
 					local SelectedCoreObject = GuiService.SelectedCoreObject
 
-					if SelectedCoreObject and (SelectedCoreObject == u280 or SelectedCoreObject:IsDescendantOf(u280)) then
-						u280.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
-						u280.BackgroundTransparency = 1
+					if SelectedCoreObject and (SelectedCoreObject == u297 or SelectedCoreObject:IsDescendantOf(u297)) then
+						u297.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
+						u297.BackgroundTransparency = 1
 
 						return
 					end
 
-					u280.ImageTransparency = 1
-					u280.BackgroundTransparency = 1
+					u297.ImageTransparency = 1
+					u297.BackgroundTransparency = 1
 				end
 			end)
 		else
-			u280.Selectable = false
-			u280.Active = false
+			u297.Selectable = false
+			u297.Active = false
 		end
 
 		SliderFrame.SelectionGained:Connect(function() -- line: 2897
-			-- upvalues: VRService (copy), UserInputService (copy), u280 (ref), Theme (copy), u286 (ref)
+			-- upvalues: VRService (copy), UserInputService (copy), u297 (ref), Theme (copy), u304 (ref)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
 				if VRService.VREnabled then
-					u280.ImageTransparency = 0.5
-					u280.BackgroundTransparency = 1
+					u297.ImageTransparency = 0.5
+					u297.BackgroundTransparency = 1
 				else
-					u280.ImageTransparency = 1
-					u280.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
+					u297.ImageTransparency = 1
+					u297.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
 				end
 
-				if u286.HubRef then
-					u286.HubRef:ScrollToFrame(u280)
+				if u304.HubRef then
+					u304.HubRef:ScrollToFrame(u297)
 				end
 			end
 		end)
 		SliderFrame.SelectionLost:Connect(function() -- line: 2912
-			-- upvalues: VRService (copy), UserInputService (copy), u280 (ref)
+			-- upvalues: VRService (copy), UserInputService (copy), u297 (ref)
 			if not VRService.VREnabled and (UserInputService.PreferredInput ~= Enum.PreferredInput.Touch or (UserInputService.GamepadEnabled and true or false)) then
-				u280.ImageTransparency = 1
-				u280.BackgroundTransparency = 1
+				u297.ImageTransparency = 1
+				u297.BackgroundTransparency = 1
 			end
 		end)
 	end
 
-	p145:AddRow(u280, u282, u286, p150, false)
-	u286.Selection = SliderFrame
+	p150:AddRow(u297, u299, u304, p155, false)
+	u304.Selection = SliderFrame
 
-	return u280, u282, u286
+	return u297, u299, u304
 end
-local function AddNewRowObject(p165, p166, p167, p168, p169) -- line: 2927
+local function AddNewRowObject(p173, p174, p175, p176, p177) -- line: 2927
 	-- upvalues: t12 (copy), Create (copy), n5 (ref), v42 (copy), Theme (copy), v38 (copy), t1 (copy), GuiService (copy), VRService (copy)
 	local n7 = 0
 
-	if t12[p165] then
-		n7 = t12[p165]
+	if t12[p173] then
+		n7 = t12[p173]
 	end
 
-	local v300 = Create("ImageButton")({
-		Name = p166 .. "Frame",
+	local v321 = Create("ImageButton")({
 		BackgroundTransparency = 1,
-		AutomaticSize = Enum.AutomaticSize.Y,
 		BorderSizePixel = 0,
 		Image = "rbxasset://textures/ui/VR/rectBackgroundWhite.png",
-		ScaleType = Enum.ScaleType.Slice,
-		SliceCenter = Rect.new(10, 10, 10, 10),
 		ImageTransparency = 1,
 		Active = false,
 		AutoButtonColor = false,
-		Size = UDim2.new(1, 0, 0, n5),
-		Position = UDim2.new(0, 0, 0, n7),
 		ZIndex = 2,
 		Selectable = false,
+		Name = p174 .. "Frame",
+		AutomaticSize = Enum.AutomaticSize.Y,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(10, 10, 10, 10),
+		Size = UDim2.new(1, 0, 0, n5),
+		Position = UDim2.new(0, 0, 0, n7),
 		SelectionImageObject = v42,
-		Parent = p165.Page
+		Parent = p173.Page
 	})
 
-	v300.BackgroundColor3 = Theme.color("RowFrameBackground")
-	v300.ImageColor3 = v300.BackgroundColor3
-	v300.SelectionGained:Connect(function() -- line: 2955
-		-- upvalues: v300 (copy), Theme (copy)
-		v300.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
+	v321.BackgroundColor3 = Theme.color("RowFrameBackground")
+	v321.ImageColor3 = v321.BackgroundColor3
+	v321.SelectionGained:Connect(function() -- line: 2955
+		-- upvalues: v321 (copy), Theme (copy)
+		v321.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
 	end)
-	v300.SelectionLost:Connect(function() -- line: 2958
-		-- upvalues: v300 (copy)
-		v300.BackgroundTransparency = 1
+	v321.SelectionLost:Connect(function() -- line: 2958
+		-- upvalues: v321 (copy)
+		v321.BackgroundTransparency = 1
 	end)
 	Create("UICorner")({
 		CornerRadius = Theme.DefaultCornerRadius,
-		Parent = v300
+		Parent = v321
 	})
 
-	local v301 = Create("TextLabel")({
-		Name = p166 .. "Label",
-		Text = p166,
+	local v322 = Create("TextLabel")({
+		TextWrapped = true,
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Name = p174 .. "Label",
+		Text = p174,
 		Font = Theme.font(Enum.Font.SourceSansBold, "UtilityRow"),
 		TextSize = Theme.textSize(16, "UtilityRow"),
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextXAlignment = Enum.TextXAlignment.Left,
-		TextWrapped = true,
-		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(0.4, -20, 1, 0),
 		Position = UDim2.new(0, 10, 0, 0),
-		ZIndex = 2,
-		Parent = v300
+		Parent = v321
 	})
 
 	Create("UIPadding")({
-		Name = p166 .. "UIPadding",
+		Name = p174 .. "UIPadding",
 		PaddingBottom = UDim.new(0, 10),
 		PaddingTop = UDim.new(0, 10),
-		Parent = v301
+		Parent = v322
 	})
 
-	local function onResized(_, p171) -- line: 2990
-		-- upvalues: p169 (copy), v301 (copy), Theme (copy), v38 (copy)
-		if p169 then
+	local function onResized(_, p179) -- line: 2990
+		-- upvalues: p177 (copy), v322 (copy), Theme (copy), v38 (copy)
+		if p177 then
 			UDim2.new(0, 200, 1, 0)
 		end
 
-		if p171 then
-			v301.TextSize = Theme.textSize(16, "UtilityRow")
+		if p179 then
+			v322.TextSize = Theme.textSize(16, "UtilityRow")
 
 			return
 		end
 
-		v301.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
+		v322.TextSize = v38 and Theme.textSize(36) or Theme.textSize(24, "UtilityText")
 	end
 
-	t1[v300] = onResized
+	t1[v321] = onResized
 
-	local v303 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
-	local v304 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v324 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v325 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-	onResized(v303, v304.Y > v304.X)
+	onResized(v324, v325.Y > v325.X)
 
-	if p168 then
-		v300.Position = UDim2.new(v300.Position.X.Scale, v300.Position.X.Offset, v300.Position.Y.Scale, v300.Position.Y.Offset + p168)
+	if p176 then
+		v321.Position = UDim2.new(v321.Position.X.Scale, v321.Position.X.Offset, v321.Position.Y.Scale, v321.Position.Y.Offset + p176)
 	end
 
-	local v305 = n7 + n5
+	local v326 = n7 + n5
 
-	if p168 then
-		v305 += p168
+	if p176 then
+		v326 += p176
 	end
 
-	t12[p165] = v305
-	v300.MouseEnter:Connect(function() -- line: 3018
-		-- upvalues: v300 (copy), GuiService (copy)
-		if v300.Visible then
-			GuiService.SelectedCoreObject = v300
+	t12[p173] = v326
+	v321.MouseEnter:Connect(function() -- line: 3018
+		-- upvalues: v321 (copy), GuiService (copy)
+		if v321.Visible then
+			GuiService.SelectedCoreObject = v321
 		end
 	end)
-	p167.SelectionImageObject = v42
-	p167.SelectionGained:Connect(function() -- line: 3027
-		-- upvalues: VRService (copy), v300 (copy), Theme (copy)
+	p175.SelectionImageObject = v42
+	p175.SelectionGained:Connect(function() -- line: 3027
+		-- upvalues: VRService (copy), v321 (copy), Theme (copy)
 		if VRService.VREnabled then
-			v300.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
-			v300.BackgroundTransparency = 1
+			v321.ImageTransparency = Theme.transparency("RowFrameBackground", 0.5)
+			v321.BackgroundTransparency = 1
 
 			return
 		end
 
-		v300.ImageTransparency = 1
-		v300.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
+		v321.ImageTransparency = 1
+		v321.BackgroundTransparency = Theme.transparency("RowFrameBackground", 0.5)
 	end)
-	p167.SelectionLost:Connect(function() -- line: 3036
-		-- upvalues: v300 (copy)
-		v300.ImageTransparency = 1
-		v300.BackgroundTransparency = 1
+	p175.SelectionLost:Connect(function() -- line: 3036
+		-- upvalues: v321 (copy)
+		v321.ImageTransparency = 1
+		v321.BackgroundTransparency = 1
 	end)
-	p167.Parent = v300
-	p165:AddRow(v300, v301, p167, p168, true)
+	p175.Parent = v321
+	p173:AddRow(v321, v322, p175, p176, true)
 
-	return v300
+	return v321
 end
 
 local t13 = {
-	GetEaseLinear = function(_) --[[ GetEaseLinear ]] -- line: 3050
+	GetEaseLinear = function(_) -- line: 3050
 		-- upvalues: Linear (copy)
 		return Linear
 	end,
-	GetEaseOutQuad = function(_) --[[ GetEaseOutQuad ]] -- line: 3053
+	GetEaseOutQuad = function(_) -- line: 3053
 		-- upvalues: EaseOutQuad (copy)
 		return EaseOutQuad
 	end,
-	GetEaseInOutQuad = function(_) --[[ GetEaseInOutQuad ]] -- line: 3056
+	GetEaseInOutQuad = function(_) -- line: 3056
 		-- upvalues: EaseInOutQuad (copy)
 		return EaseInOutQuad
 	end,
-	CreateNewSlider = function(_, p176, p177, p178, p179, p180) --[[ CreateNewSlider ]] -- line: 3060
+	CreateNewSlider = function(_, p184, p185, p186, p187, p188) -- line: 3060
 		-- upvalues: CreateNewSlider (copy)
-		return CreateNewSlider(p176, p177, p178, p179, p180)
+		return CreateNewSlider(p184, p185, p186, p187, p188)
 	end,
-	CreateNewSelector = function(_, p182, p183) --[[ CreateNewSelector ]] -- line: 3064
+	CreateNewSelector = function(_, p190, p191) -- line: 3064
 		-- upvalues: CreateSelector (copy)
-		return (CreateSelector(p182, p183))
+		return (CreateSelector(p190, p191))
 	end,
-	CreateNewDropDown = function(_, p185, p186) --[[ CreateNewDropDown ]] -- line: 3068
+	CreateNewDropDown = function(_, p193, p194) -- line: 3068
 		-- upvalues: CreateDropDown (copy)
-		return (CreateDropDown(p185, p186, nil))
+		return (CreateDropDown(p193, p194, nil))
 	end,
-	AddNewRow = function(_, p188, p189, p190, p191, p192, p193, p194, p195, p196, p197) --[[ AddNewRow ]] -- line: 3072
+	AddNewRow = function(_, p196, p197, p198, p199, p200, p201, p202, p203, p204, p205) -- line: 3072
 		-- upvalues: AddNewRow (copy)
-		return AddNewRow(p188, p189, p190, p191, p192, p193, p194, p195, p196, p197)
+		return AddNewRow(p196, p197, p198, p199, p200, p201, p202, p203, p204, p205)
 	end,
-	AddNewRowObject = function(_, p199, p200, p201, p202, p203) --[[ AddNewRowObject ]] -- line: 3076
+	AddNewRowObject = function(_, p207, p208, p209, p210, p211) -- line: 3076
 		-- upvalues: AddNewRowObject (copy)
-		return (AddNewRowObject(p199, p200, p201, p202, p203))
+		return (AddNewRowObject(p207, p208, p209, p210, p211))
 	end,
-	ShowAlert = function(_, p205, p206, p207, p208, p209) --[[ ShowAlert ]] -- line: 3080
+	ShowAlert = function(_, p213, p214, p215, p216, p217) -- line: 3080
 		-- upvalues: ShowAlert (copy)
-		ShowAlert(p205, p206, p207, p208, p209)
+		ShowAlert(p213, p214, p215, p216, p217)
 	end,
-	IsSmallTouchScreen = function(_) --[[ IsSmallTouchScreen ]] -- line: 3084
+	IsSmallTouchScreen = function(_) -- line: 3084
 		-- upvalues: GuiService (copy), UserInputService (copy)
-		local v345 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+		local v366 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-		return UserInputService.TouchEnabled and (v345.Y < 500 or v345.X < 700)
+		return UserInputService.TouchEnabled and (v366.Y < 500 or v366.X < 700)
 	end,
-	IsPortrait = function(_) --[[ IsPortrait ]] -- line: 3088
+	IsPortrait = function(_) -- line: 3088
 		-- upvalues: GuiService (copy)
-		local v347 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+		local v368 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
 
-		return v347.Y > v347.X
+		return v368.Y > v368.X
 	end
 }
 
 if FFlagRefactorMenuConfirmationButtons or FFlagAddNextUpContainer then
+	local function isUsingGamepad() -- line: 3093
+		-- upvalues: t5 (copy), UserInputService (copy)
+		return t5[UserInputService:GetLastInputType()] or false
+	end
+
 	function t13.IsUsingGamepad(_) -- line: 3097
 		-- upvalues: t5 (copy), UserInputService (copy)
 		return t5[UserInputService:GetLastInputType()] or false
 	end
 end
 
-function t13.MakeStyledButton(_, p214, p215, p216, p217, p218, p219) -- line: 3102
+function t13.MakeStyledButton(_, p222, p223, p224, p225, p226, p227) -- line: 3102
 	-- upvalues: MakeButton (copy)
-	return MakeButton(p214, p215, p216, p217, p218, p219)
+	return MakeButton(p222, p223, p224, p225, p226, p227)
 end
-function t13.MakeStyledImageButton(_, p221, p222, p223, p224, p225, p226, p227, p228) -- line: 3106
+function t13.MakeStyledImageButton(_, p229, p230, p231, p232, p233, p234, p235, p236) -- line: 3106
 	-- upvalues: MakeImageButton (copy)
-	return MakeImageButton(p221, p222, p223, p224, p225, p226, p227, p228)
+	return MakeImageButton(p229, p230, p231, p232, p233, p234, p235, p236)
 end
-function t13.AddButtonRow(_, p230, p231, p232, p233, p234, p235) -- line: 3110
+function t13.AddButtonRow(_, p238, p239, p240, p241, p242, p243) -- line: 3110
 	-- upvalues: AddButtonRow (copy)
-	return AddButtonRow(p230, p231, p232, p233, p234, p235)
+	return AddButtonRow(p238, p239, p240, p241, p242, p243)
 end
-function t13.MakeFocusState(_, p237, p238) -- line: 3114
+function t13.MakeFocusState(_, p245, p246) -- line: 3114
 	-- upvalues: MakeRoundedRectFocusState (copy)
-	return MakeRoundedRectFocusState(p237, p238)
+	return MakeRoundedRectFocusState(p245, p246)
 end
 function t13.CreateSignal(_) -- line: 3118
 	-- upvalues: CreateSignal (copy)
@@ -3213,32 +3347,32 @@ function t13.UsesSelectedObject(_) -- line: 3122
 
 	return true
 end
-function t13.TweenProperty(_, p242, p243, p244, p245, p246, p247, p248) -- line: 3126
-	return PropertyTweener(p242, p243, p244, p245, p246, p247, p248)
+function t13.TweenProperty(_, p250, p251, p252, p253, p254, p255, p256) -- line: 3126
+	return PropertyTweener(p250, p251, p252, p253, p254, p255, p256)
 end
-function t13.OnResized(_, p250, p251) -- line: 3130
+function t13.OnResized(_, p258, p259) -- line: 3130
 	-- upvalues: addOnResizedCallback (copy)
-	return addOnResizedCallback(p250, p251)
+	return addOnResizedCallback(p258, p259)
 end
 function t13.FireOnResized(_) -- line: 3134
 	-- upvalues: GuiService (copy), t13 (copy), t1 (copy)
-	local v389 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
-	local v390 = t13:IsPortrait()
+	local v410 = if not _G.__TESTEZ_RUNNING_TEST__ then GuiService:GetHardwareSafeViewport() else Vector2.new(1024, 1024)
+	local v411 = t13:IsPortrait()
 
 	for _, v in pairs(t1) do
-		v(v389, v390)
+		v(v410, v411)
 	end
 end
-function t13.Lerp(_, p254, p255, p256) -- line: 3145
-	return (1 - p254) * p255 + p254 * p256
+function t13.Lerp(_, p262, p263, p264) -- line: 3145
+	return (1 - p262) * p263 + p262 * p264
 end
-function t13.Round(_, p258) -- line: 3150
-	return p258 % 1 >= 0.5 and math.ceil(p258) or math.floor(p258)
+function t13.Round(_, p266) -- line: 3150
+	return p266 % 1 >= 0.5 and math.ceil(p266) or math.floor(p266)
 end
-function t13.IsExperienceOlderThanOneWeek(_, p260) -- line: 3154
+function t13.IsExperienceOlderThanOneWeek(_, p268) -- line: 3154
 	-- upvalues: Workspace (copy)
-	if p260 ~= nil and p260.Created ~= nil then
-		local UnixTimestampMillis = DateTime.fromIsoDate(p260.Created).UnixTimestampMillis
+	if p268 ~= nil and p268.Created ~= nil then
+		local UnixTimestampMillis = DateTime.fromIsoDate(p268.Created).UnixTimestampMillis
 
 		if Workspace:GetServerTimeNow() * 1000 - UnixTimestampMillis > 604800000 then
 			return true

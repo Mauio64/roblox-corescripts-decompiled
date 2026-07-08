@@ -1,19 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Constants);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local l_EquippedAssets_0 = v2.AvatarExperience.AvatarEditor.Character.EquippedAssets;
-    if l_EquippedAssets_0 == nil then
-        return {};
-    else
-        local v4 = {};
-        for v5, _ in v1.ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE do
-            if l_EquippedAssets_0[v5] then
-                for _, v8 in l_EquippedAssets_0[v5] do
-                    table.insert(v4, v8);
-                end;
-            end;
-        end;
-        return v4;
-    end;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local Constants = require(AvatarExperienceCommon.Constants)
+
+return function(p1) -- line: 5
+	-- upvalues: Constants (copy)
+	local EquippedAssets = p1.AvatarExperience.AvatarEditor.Character.EquippedAssets
+
+	if EquippedAssets == nil then
+		return {}
+	end
+
+	local t1 = {}
+
+	for v6, _ in Constants.ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE do
+		if EquippedAssets[v6] then
+			for _, v9 in EquippedAssets[v6] do
+				table.insert(t1, v9)
+			end
+		end
+	end
+
+	return t1
+end

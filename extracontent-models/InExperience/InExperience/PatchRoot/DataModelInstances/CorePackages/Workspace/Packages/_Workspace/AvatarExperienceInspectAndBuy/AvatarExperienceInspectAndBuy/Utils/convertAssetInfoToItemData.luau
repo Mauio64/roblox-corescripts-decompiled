@@ -1,52 +1,57 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Types);
-local v3 = require(l_script_FirstAncestor_0.Parent.AXCommon);
-local v4 = require(l_Parent_0.tutils);
-local l_ItemTypeEnum_0 = v3.Enums.ItemTypeEnum;
-local l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXEnableIaBTimedOptionsBulkPurchase;
-return function(v7, v8) --[[ Line: 22 ]]
-    -- upvalues: v4 (copy), l_ItemTypeEnum_0 (copy), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (copy)
-    local v9 = 0;
-    if v8 then
-        v9 = v4.fieldCount(v8);
-    end;
-    return {
-        id = v7.assetId, 
-        name = v7.name, 
-        meta = v7.meta, 
-        description = v7.description, 
-        itemType = l_ItemTypeEnum_0.Asset, 
-        itemSubType = v7.assetTypeId, 
-        creator = {
-            creatorId = v7.creatorId or "", 
-            creatorName = v7.creatorName or "", 
-            creatorHasVerifiedBadge = v7.creatorHasVerifiedBadge or false
-        }, 
-        saleLocationType = v7.saleLocationType, 
-        itemRestrictions = v7.itemRestrictions or {}, 
-        priceInRobux = v7.price, 
-        noPriceStatus = v7.noPriceStatus, 
-        catalogPriceStatus = v7.catalogPriceStatus, 
-        isOwned = v7.owned, 
-        isOffSale = v7.isOffSale, 
-        collectibleItemId = v7.collectibleItemId, 
-        creatingUniverseId = v7.creatingUniverseId, 
-        collectibleItemDetails = {
-            quantityLimitPerUser = v7.collectibleQuantityLimitPerUser, 
-            resellableCount = v7.resellableCount or v9, 
-            collectibleLowestAvailableResaleProductId = v7.collectibleLowestAvailableResaleProductId, 
-            collectibleLowestAvailableResaleItemInstanceId = v7.collectibleLowestAvailableResaleItemInstanceId, 
-            unitsAvailableForConsumption = v7.remaining, 
-            hasResellers = v7.hasResellers or v7.collectibleLowestAvailableResaleProductId ~= nil and (v7.collectibleLowestAvailableResaleProductId ~= "" or false), 
-            lowestResalePrice = v7.collectibleLowestResalePrice or 0, 
-            totalQuantity = v7.collectibleTotalQuantity or 0, 
-            experiences = v7 and v7.saleLocation and v7.saleLocation.UniverseIds or {}
-        }, 
-        favoritesDetails = {
-            numFavorites = v7.numFavorites, 
-            isFavorited = v7.isFavorited
-        }, 
-        timedOptions = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v7.timedOptions else nil
-    };
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local AXCommon = require(AvatarExperienceInspectAndBuy.Parent.AXCommon)
+local tutils = require(AvatarExperienceInspectAndBuyParent.tutils)
+local ItemTypeEnum = AXCommon.Enums.ItemTypeEnum
+local FFlagAXEnableIaBTimedOptionsBulkPurchase = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXEnableIaBTimedOptionsBulkPurchase
+
+return function(p1, t1: {[any]: any}?) -- line: 22
+	-- upvalues: tutils (copy), ItemTypeEnum (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy)
+	local n1 = 0
+
+	if t1 then
+		n1 = tutils.fieldCount(t1)
+	end
+
+	return {
+		id = p1.assetId,
+		name = p1.name,
+		meta = p1.meta,
+		description = p1.description,
+		itemType = ItemTypeEnum.Asset,
+		itemSubType = p1.assetTypeId,
+		creator = {
+			creatorId = p1.creatorId or "",
+			creatorName = p1.creatorName or "",
+			creatorHasVerifiedBadge = p1.creatorHasVerifiedBadge or false
+		},
+		saleLocationType = p1.saleLocationType,
+		itemRestrictions = p1.itemRestrictions or {},
+		priceInRobux = p1.price,
+		noPriceStatus = p1.noPriceStatus,
+		catalogPriceStatus = p1.catalogPriceStatus,
+		isOwned = p1.owned,
+		isOffSale = p1.isOffSale,
+		collectibleItemId = p1.collectibleItemId,
+		creatingUniverseId = p1.creatingUniverseId,
+		collectibleItemDetails = {
+			quantityLimitPerUser = p1.collectibleQuantityLimitPerUser,
+			resellableCount = p1.resellableCount or n1,
+			collectibleLowestAvailableResaleProductId = p1.collectibleLowestAvailableResaleProductId,
+			collectibleLowestAvailableResaleItemInstanceId = p1.collectibleLowestAvailableResaleItemInstanceId,
+			unitsAvailableForConsumption = p1.remaining,
+			hasResellers = p1.hasResellers or p1.collectibleLowestAvailableResaleProductId ~= nil and (p1.collectibleLowestAvailableResaleProductId ~= "" or false),
+			lowestResalePrice = p1.collectibleLowestResalePrice or 0,
+			totalQuantity = p1.collectibleTotalQuantity or 0,
+			experiences = p1 and (not not p1.saleLocation and p1.saleLocation.UniverseIds) or {}
+		},
+		favoritesDetails = {
+			numFavorites = p1.numFavorites,
+			isFavorited = p1.isFavorited
+		},
+		timedOptions = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else p1.timedOptions
+	}
+end

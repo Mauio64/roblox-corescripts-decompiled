@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePreAuthDeepLinkHandler2", false);
+return game:DefineFastFlag("EnablePreAuthDeepLinkHandler2", false)

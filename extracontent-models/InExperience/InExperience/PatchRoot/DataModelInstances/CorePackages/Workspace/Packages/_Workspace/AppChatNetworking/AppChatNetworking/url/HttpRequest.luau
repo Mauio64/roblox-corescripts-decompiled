@@ -1,104 +1,121 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.HttpRequest);
-local l_FFlagLuaAppDefaultHttpRetry_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDefaultHttpRetry;
-local v5 = require(l_Parent_0.Loggers).Logger:new("AppChat.Networking");
-local v6 = require(l_script_FirstAncestor_0.analytics.AppChatNetworkingTelemetry);
-local l_getFFlagDebugUnfilteredThreads_0 = require(l_Parent_0.SharedFlags).getFFlagDebugUnfilteredThreads;
-local l_ChallengeRequestWrapper_0 = require(l_Parent_0.GenericChallenges).Middleware.ChallengeRequestWrapper;
-local v11 = require(l_Parent_0.SocialLuaAnalytics).Telemetry.new({
-    name = "AppChat.NetworkResponse", 
-    description = "Event when a response is received from AppChat's networking layer", 
-    lastUpdated = {
-        2024, 
-        10, 
-        18
-    }, 
-    backendsList = {
-        {
-            type = "RobloxTelemetryCounter", 
-            format = function(v9) --[[ Line: 23 ]] --[[ Name: format ]]
-                local v10 = string.match(v9.url, ".%w+/(.*)");
-                return {
-                    endpoint = string.match(v10 or "", "([^?#]+)") or "unknown", 
-                    statusCode = tostring(v9.statusCode), 
-                    isOK = v9.isOK
-                };
-            end
-        }
-    }
-});
-local function v17(v12) --[[ Line: 41 ]] --[[ Name: chunkAndLogString ]]
-    -- upvalues: v5 (copy)
-    local v13 = {};
-    for v14 = 1, #v12, 800 do
-        table.insert(v13, v12:sub(v14, v14 + 800 - 1));
-    end;
-    for _, v16 in v13 do
-        v5:debug(v16);
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local AppChatNetworkingParent = AppChatNetworking.Parent
+local HttpRequest = require(AppChatNetworkingParent.HttpRequest)
+local FFlagLuaAppDefaultHttpRetry = require(AppChatNetworkingParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
+local v6 = require(AppChatNetworkingParent.Loggers).Logger:new("AppChat.Networking")
+local AppChatNetworkingTelemetry = require(AppChatNetworking.analytics.AppChatNetworkingTelemetry)
+local getFFlagDebugUnfilteredThreads = require(AppChatNetworkingParent.SharedFlags).getFFlagDebugUnfilteredThreads
+local ChallengeRequestWrapper = require(AppChatNetworkingParent.GenericChallenges).Middleware.ChallengeRequestWrapper
+local v10 = require(AppChatNetworkingParent.SocialLuaAnalytics).Telemetry.new({
+	name = "AppChat.NetworkResponse",
+	description = "Event when a response is received from AppChat's networking layer",
+	lastUpdated = {
+		2024,
+		10,
+		18
+	},
+	backendsList = {{
+		type = "RobloxTelemetryCounter",
+		format = function(t1: {[any]: any}) -- line: 23
+			local match = string.match(t1.url, ".%w+/(.*)")
+
+			return {
+				endpoint = string.match(match or "", "([^?#]+)") or "unknown",
+				statusCode = tostring(t1.statusCode),
+				isOK = t1.isOK
+			}
+		end
+	}}
+})
+
+local function chunkAndLogString(p1) -- line: 41
+	-- upvalues: v6 (copy)
+	local t2 = {}
+
+	for i = 1, #p1, 800 do
+		table.insert(t2, p1:sub(i, i + 800 - 1))
+	end
+
+	for _, v18 in t2 do
+		v6:debug(v18)
+	end
+end
+
 return {
-    default = l_ChallengeRequestWrapper_0((v3.config({
-        requestFunction = function(v18, v19, v20) --[[ Line: 53 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v5 (copy), l_getFFlagDebugUnfilteredThreads_0 (copy), v17 (copy), v3 (copy)
-            v5:info((("Fetching: [ requestMethod = \"%*\", url = \"%*\" ]"):format(v19, v18)));
-            if l_getFFlagDebugUnfilteredThreads_0() then
-                local v21 = v20 and v20.postBody or {};
-                if string.find(v18, "get%-conversations") then
-                    local v22 = v21.ids or {};
-                    local v23 = "";
-                    for _, v25 in v22 do
-                        v23 = ("%*, %*"):format(v23, v25);
-                    end;
-                    v17((("FETCHING CONVERSATIONS%*"):format(v23)));
-                elseif string.find(v18, "get%-modal%-sequence") then
-                    local v26 = v21.conversation_id or v21.friend_id;
-                    v5:debug((("FETCHING MODAL SEQUENCE sequence: %* id: %*"):format(v21.modal_sequence, v26)));
-                elseif string.find(v18, "record%-modal%-sequence%-response") then
-                    local l_modal_id_0 = v21.modal_id;
-                    local l_modal_variant_0 = v21.modal_variant;
-                    local v29 = v21.conversation_id or v21.friend_id;
-                    v5:debug((("RECORDING MODAL SEQUENCE RESPONSE action: %* sequence: %* id: %* variant: %* conversationId: %*"):format(v21.action_type, v21.modal_sequence, l_modal_id_0, l_modal_variant_0, v29)));
-                end;
-            end;
-            return v3.requestFunctions.RequestInternal(v18, v19, v20);
-        end, 
-        postRequestFunction = function(v30, v31) --[[ Line: 78 ]] --[[ Name: postRequestFunction ]]
-            -- upvalues: v5 (copy), v6 (copy), v11 (copy), l_getFFlagDebugUnfilteredThreads_0 (copy), l_HttpService_0 (copy), v17 (copy)
-            v5:debug((("Returned: [ requestMethod = \"%*\", url = \"%*\", statusCode = %*%*]"):format(v31.requestMethod, v31.url, v30.StatusCode, v30.HttpError ~= Enum.HttpError.OK and (", HttpError = %*"):format(v30.HttpError) or "")));
-            v6.emit(v11, {
-                url = v31.url, 
-                statusCode = v30.StatusCode, 
-                isOK = v30.HttpError == Enum.HttpError.OK
-            });
-            if l_getFFlagDebugUnfilteredThreads_0() then
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 90 ]]
-                    -- upvalues: l_HttpService_0 (ref), v30 (copy)
-                    return l_HttpService_0:JSONDecode(v30.Body);
-                end);
-                if not l_status_0 then
-                    return;
-                else
-                    local v34 = v31.options and v31.options.postBody and (v31.options.postBody.conversation_id or v31.options.postBody.friend_id);
-                    if string.find(v31.url, "get%-user%-conversations") or string.find(v31.url, "get%-conversations") then
-                        local v35 = l_result_0 and l_result_0.conversations or {};
-                        local v36 = "";
-                        for _, v38 in v35 do
-                            v36 = ("%*, %* %* %*"):format(v36, v38.id, v38.moderation_type, v38.user_pending_status);
-                        end;
-                        v17((("RETURNED CONVERSATIONS%*"):format(v36)));
-                        return;
-                    elseif string.find(v31.url, "get%-modal%-sequence") then
-                        local v39 = l_result_0 and l_result_0.modal_variant;
-                        local v40 = v31.options and v31.options.postBody and v31.options.postBody.modal_sequence;
-                        v5:debug((("RETURNED MODAL VARIANT sequence: %* variant: %* conversationId: %*"):format(v40, v39, v34)));
-                    end;
-                end;
-            end;
-        end, 
-        maxRetryCount = if l_FFlagLuaAppDefaultHttpRetry_0 then game:DefineFastInt("AppChatNetworkingHttpRetryCount", 4) else nil
-    }))), 
-    logger = v5
-};
+	default = ChallengeRequestWrapper((HttpRequest.config({
+		requestFunction = function(p2, p3, p4) -- line: 53
+			-- upvalues: v6 (copy), getFFlagDebugUnfilteredThreads (copy), chunkAndLogString (copy), HttpRequest (copy)
+			v6:info(`Fetching: [ requestMethod = "{ p3 }", url = "{ p2 }" ]`)
+
+			if getFFlagDebugUnfilteredThreads() then
+				local v22 = p4 and p4.postBody or {}
+
+				if string.find(p2, "get%-conversations") then
+					local s1 = ""
+
+					for _, v25 in v22.ids or {} do
+						s1 = `{ s1 }, { v25 }`
+					end
+
+					chunkAndLogString(`FETCHING CONVERSATIONS{ s1 }`)
+				elseif string.find(p2, "get%-modal%-sequence") then
+					local v26 = v22.conversation_id or v22.friend_id
+
+					v6:debug(`FETCHING MODAL SEQUENCE sequence: { v22.modal_sequence } id: { v26 }`)
+				elseif string.find(p2, "record%-modal%-sequence%-response") then
+					local modal_id = v22.modal_id
+					local modal_variant = v22.modal_variant
+					local v29 = v22.conversation_id or v22.friend_id
+
+					v6:debug(`RECORDING MODAL SEQUENCE RESPONSE action: { v22.action_type } sequence: { v22.modal_sequence } id: { modal_id } variant: { modal_variant } conversationId: { v29 }`)
+				end
+			end
+
+			return HttpRequest.requestFunctions.RequestInternal(p2, p3, p4)
+		end,
+		postRequestFunction = function(p5, p6) -- line: 78
+			-- upvalues: v6 (copy), AppChatNetworkingTelemetry (copy), v10 (copy), getFFlagDebugUnfilteredThreads (copy), HttpService (copy), chunkAndLogString (copy)
+			v6:debug(`Returned: [ requestMethod = "{ p6.requestMethod }", url = "{ p6.url }", statusCode = { p5.StatusCode }{ p5.HttpError ~= Enum.HttpError.OK and `, HttpError = { p5.HttpError }` or "" }]`)
+			AppChatNetworkingTelemetry.emit(v10, {
+				url = p6.url,
+				statusCode = p5.StatusCode,
+				isOK = p5.HttpError == Enum.HttpError.OK
+			})
+
+			if getFFlagDebugUnfilteredThreads() then
+				local ok, result = pcall(function() -- line: 90
+					-- upvalues: HttpService (copy), p5 (copy)
+					return HttpService:JSONDecode(p5.Body)
+				end)
+
+				if not ok then
+					return
+				end
+
+				local v34 = p6.options and (p6.options.postBody and (p6.options.postBody.conversation_id or p6.options.postBody.friend_id))
+
+				if string.find(p6.url, "get%-user%-conversations") or string.find(p6.url, "get%-conversations") then
+					local s2 = ""
+
+					for _, v37 in result and result.conversations or {} do
+						s2 = `{ s2 }, { v37.id } { v37.moderation_type } { v37.user_pending_status }`
+					end
+
+					chunkAndLogString(`RETURNED CONVERSATIONS{ s2 }`)
+
+					return
+				end
+
+				if string.find(p6.url, "get%-modal%-sequence") then
+					local v38 = result and result.modal_variant
+					local v39 = p6.options and (p6.options.postBody and p6.options.postBody.modal_sequence)
+
+					v6:debug(`RETURNED MODAL VARIANT sequence: { v39 } variant: { v38 } conversationId: { v34 }`)
+				end
+			end
+		end,
+		maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("AppChatNetworkingHttpRetryCount", 4)
+	}))),
+	logger = v6
+}

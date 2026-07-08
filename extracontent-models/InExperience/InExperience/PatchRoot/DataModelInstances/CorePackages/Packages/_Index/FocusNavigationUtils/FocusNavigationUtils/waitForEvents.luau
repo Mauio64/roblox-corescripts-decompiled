@@ -1,4 +1,6 @@
-return function() --[[ Line: 6 ]] --[[ Name: waitForEvents ]]
-    task.defer(coroutine.running());
-    coroutine.yield();
-end;
+local function waitForEvents() -- line: 6
+	task.defer(coroutine.running())
+	coroutine.yield()
+end
+
+return waitForEvents

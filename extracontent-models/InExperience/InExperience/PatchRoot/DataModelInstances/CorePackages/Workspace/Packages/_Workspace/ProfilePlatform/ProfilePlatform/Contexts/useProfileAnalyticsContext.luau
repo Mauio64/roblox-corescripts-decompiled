@@ -1,7 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local v1 = require(script.Parent.ProfileAnalyticsContext);
-local v2 = require(l_Parent_0.React);
-return function() --[[ Line: 6 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return v2.useContext(v1);
-end;
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local ProfileAnalyticsContext = require(script.Parent.ProfileAnalyticsContext)
+local React = require(Parent.React)
+
+return function() -- line: 6
+	-- upvalues: React (copy), ProfileAnalyticsContext (copy)
+	return React.useContext(ProfileAnalyticsContext)
+end

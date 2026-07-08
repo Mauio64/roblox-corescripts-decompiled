@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("CoreGuiCommon").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createInspectAndBuyStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("CoreGuiCommon").Parent
+local Signals = require(Parent.Signals)
+local createInspectAndBuyStore = require(script.createInspectAndBuyStore)
+
+return Signals.createComputed(createInspectAndBuyStore)

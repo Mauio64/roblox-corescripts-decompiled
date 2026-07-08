@@ -1,24 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local v3 = require(l_script_FirstAncestor_0.Models.GetRobloxSubscriptionProductsModel);
-local _ = require(l_Parent_0.LuauPolyfill);
-local v5 = require(l_script_FirstAncestor_0.Constants);
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-return function() --[[ Line: 15 ]]
-    -- upvalues: v2 (copy), l_MarketplaceService_0 (copy), v5 (copy), v3 (copy)
-    return v2.new(function(v7, v8) --[[ Line: 16 ]]
-        -- upvalues: l_MarketplaceService_0 (ref), v5 (ref), v3 (ref)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 17 ]]
-            -- upvalues: l_MarketplaceService_0 (ref), v5 (ref)
-            return l_MarketplaceService_0:GetAvailableSubscriptionProductsAsync(v5.ROBLOX_SUBSCRIPTION_PRODUCT_TYPE);
-        end);
-        if l_status_0 then
-            v7((v3.format(l_result_0 or {})));
-            return;
-        else
-            v8((tostring(l_result_0)));
-            return;
-        end;
-    end);
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local Promise = require(RobloxSubscriptionPurchaseAppParent.Promise)
+local GetRobloxSubscriptionProductsModel = require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
+
+require(RobloxSubscriptionPurchaseAppParent.LuauPolyfill)
+
+local Constants = require(RobloxSubscriptionPurchaseApp.Constants)
+local MarketplaceService = game:GetService("MarketplaceService")
+
+return function() -- line: 15
+	-- upvalues: Promise (copy), MarketplaceService (copy), Constants (copy), GetRobloxSubscriptionProductsModel (copy)
+	return Promise.new(function(resolve, reject) -- line: 16
+		-- upvalues: MarketplaceService (copy), Constants (copy), GetRobloxSubscriptionProductsModel (copy)
+		local ok, result = pcall(function() -- line: 17
+			-- upvalues: MarketplaceService (copy), Constants (copy)
+			return MarketplaceService:GetAvailableSubscriptionProductsAsync(Constants.ROBLOX_SUBSCRIPTION_PRODUCT_TYPE)
+		end)
+
+		if ok then
+			resolve((GetRobloxSubscriptionProductsModel.format(result or {})))
+
+			return
+		end
+
+		reject((tostring(result)))
+	end)
+end

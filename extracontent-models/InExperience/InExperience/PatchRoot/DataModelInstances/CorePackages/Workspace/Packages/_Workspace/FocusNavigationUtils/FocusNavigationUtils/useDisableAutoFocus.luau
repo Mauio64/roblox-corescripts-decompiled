@@ -1,52 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FocusNavigationUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.useLastInputMethod);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v4 = require(l_Parent_0.Navigation);
-local l_useNavigation_0 = v4.useNavigation;
-local l_getRouteIsFocused_0 = v4.getRouteIsFocused;
-local l_getCurrentNavigationState_0 = v4.getCurrentNavigationState;
-local l_AvatarScreen_0 = require(l_Parent_0.AvatarExperienceNavigation).Enums.AvatarScreen;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v10 = require(l_Parent_0.SharedFlags);
-local l_FFlagAXMigrateCatalogContextMenuFromRoactGamepad_0 = v10.FFlagAXMigrateCatalogContextMenuFromRoactGamepad;
-local l_FFlagAXMigrateSaveOutfitPromptFromRoactGamepad_0 = v10.FFlagAXMigrateSaveOutfitPromptFromRoactGamepad;
-local v13 = {
-    [l_AvatarScreen_0.CatalogContextMenu] = true, 
-    [l_AvatarScreen_0.SaveOutfitPrompt] = l_FFlagAXMigrateSaveOutfitPromptFromRoactGamepad_0 and true or nil, 
-    [l_AvatarScreen_0.ColorAdjustment] = true
-};
-local function _(v14) --[[ Line: 27 ]] --[[ Name: getAvatarRouteIsFocused ]]
-    -- upvalues: l_getRouteIsFocused_0 (copy), l_AppPage_0 (copy)
-    return l_getRouteIsFocused_0(v14, l_AppPage_0.AvatarExperienceRoot);
-end;
-local function _(v16) --[[ Line: 31 ]] --[[ Name: getRouteInGreenList ]]
-    -- upvalues: l_getCurrentNavigationState_0 (copy), v13 (copy)
-    local v17 = l_getCurrentNavigationState_0(v16.state);
-    local v18 = if v17 then v17.routeName else nil;
-    if v18 then
-        return v13[v18];
-    else
-        return false;
-    end;
-end;
-return function() --[[ Line: 38 ]] --[[ Name: useDisableAutoFocus ]]
-    -- upvalues: v2 (copy), l_useNavigation_0 (copy), l_getRouteIsFocused_0 (copy), l_AppPage_0 (copy), l_FFlagAXMigrateCatalogContextMenuFromRoactGamepad_0 (copy), l_getCurrentNavigationState_0 (copy), v13 (copy), l_useSelector_0 (copy)
-    local v20 = v2();
-    local v21 = l_useNavigation_0();
-    local l_state_0 = v21.state;
-    local v23 = l_getRouteIsFocused_0(l_state_0, l_AppPage_0.AvatarExperienceRoot);
-    if v23 then
-        if l_FFlagAXMigrateCatalogContextMenuFromRoactGamepad_0 then
-            local v24 = l_getCurrentNavigationState_0(v21.state);
-            local v25 = if v24 then v24.routeName else nil;
-            v23 = not if v25 then v13[v25] else false;
-        else
-            v23 = true;
-        end;
-    end;
-    l_state_0 = l_useSelector_0(function(v26) --[[ Line: 44 ]]
-        return v26.CentralOverlay.OverlayType ~= nil;
-    end);
-    return v23 and not l_state_0 and v20 == "Gamepad";
-end;
+local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
+local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+local useLastInputMethod = require(FocusNavigationUtils.useLastInputMethod)
+local useSelector = require(FocusNavigationUtilsParent.RoactUtils).Hooks.RoactRodux.useSelector
+local Navigation = require(FocusNavigationUtilsParent.Navigation)
+local useNavigation = Navigation.useNavigation
+local getRouteIsFocused = Navigation.getRouteIsFocused
+local getCurrentNavigationState = Navigation.getCurrentNavigationState
+local AvatarScreen = require(FocusNavigationUtilsParent.AvatarExperienceNavigation).Enums.AvatarScreen
+local AppPage = require(FocusNavigationUtilsParent.RobloxAppEnums).AppPage
+local FFlagAXMigrateSaveOutfitPromptFromRoactGamepad = require(FocusNavigationUtilsParent.SharedFlags).FFlagAXMigrateSaveOutfitPromptFromRoactGamepad
+local t1 = {
+	[AvatarScreen.CatalogContextMenu] = true,
+	[AvatarScreen.SaveOutfitPrompt] = not not FFlagAXMigrateSaveOutfitPromptFromRoactGamepad or nil,
+	[AvatarScreen.ColorAdjustment] = true
+}
+
+local function getAvatarRouteIsFocused(p1) -- line: 26
+	-- upvalues: getRouteIsFocused (copy), AppPage (copy)
+	return getRouteIsFocused(p1, AppPage.AvatarExperienceRoot)
+end
+local function getRouteInGreenList(p2) -- line: 30
+	-- upvalues: getCurrentNavigationState (copy), t1 (copy)
+	local v18 = getCurrentNavigationState(p2.state)
+	local v19 = if not v18 then nil else v18.routeName
+
+	if v19 then
+		return t1[v19]
+	end
+
+	return false
+end
+local function useDisableAutoFocus() -- line: 37
+	-- upvalues: useLastInputMethod (copy), useNavigation (copy), getRouteIsFocused (copy), AppPage (copy), getCurrentNavigationState (copy), t1 (copy), useSelector (copy)
+	local v20 = useLastInputMethod()
+	local v21 = useNavigation()
+	local state = v21.state
+	local v23 = getRouteIsFocused(state, AppPage.AvatarExperienceRoot)
+
+	if v23 then
+		local v24 = getCurrentNavigationState(v21.state)
+		local v25 = if not v24 then nil else v24.routeName
+
+		v23 = not (not not v25 and t1[v25])
+	end
+
+	local v26 = useSelector(function(p3) -- line: 42
+		return p3.CentralOverlay.OverlayType ~= nil
+	end)
+
+	return v23 and (not v26 and v20 == "Gamepad")
+end
+
+return useDisableAutoFocus

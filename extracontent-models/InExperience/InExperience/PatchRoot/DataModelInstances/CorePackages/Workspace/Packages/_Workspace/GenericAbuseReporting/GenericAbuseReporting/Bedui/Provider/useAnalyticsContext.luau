@@ -1,8 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportAnalyticsContext);
-return function() --[[ Line: 7 ]] --[[ Name: useAnalyticsContext ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.useContext(v3);
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+local AbuseReportAnalyticsContext = require(GenericAbuseReporting.Bedui.Provider.AbuseReportAnalyticsContext)
+
+local function useAnalyticsContext() -- line: 7
+	-- upvalues: React (copy), AbuseReportAnalyticsContext (copy)
+	return React.useContext(AbuseReportAnalyticsContext)
+end
+
+return useAnalyticsContext

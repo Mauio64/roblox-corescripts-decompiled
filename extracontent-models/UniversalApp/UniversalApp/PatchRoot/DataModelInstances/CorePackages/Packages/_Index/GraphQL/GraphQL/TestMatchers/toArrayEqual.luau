@@ -1,40 +1,64 @@
-local v0 = require(script.Parent.Parent.luaUtils.deepEqual);
-local v1 = require(script.Parent.Parent.luaUtils.deepContains);
-return function(v2, v3, v4) --[[ Line: 18 ]] --[[ Name: toArrayEqual ]]
-    -- upvalues: v1 (copy), v0 (copy)
-    if not (#v2 == #v3) then
-        return {
-            pass = false, 
-            message = ("Expected array length %s / got length %s"):format(tostring(#v2), (tostring(#v3)))
-        };
-    else
-        for v5 = 1, #v2 do
-            local v6 = nil;
-            local v7 = nil;
-            if v4 then
-                local v8, v9 = v1(v2[v5], v3[v5]);
-                v6 = v8;
-                v7 = v9;
-                if v6 then
-                    continue;
-                end;
-            else
-                local v10, v11 = v0(v2[v5], v3[v5]);
-                v6 = v10;
-                v7 = v11;
-                if v6 then
-                    continue;
-                end;
-            end;
-            local v12 = v7:gsub("{1}", ("{1}[%s]"):format((tostring(v5)))):gsub("{2}", ("{2}[%s]"):format((tostring(v5))));
-            return {
-                pass = false, 
-                message = v12
-            };
-        end;
-        return {
-            pass = true, 
-            message = ""
-        };
-    end;
-end;
+local deepEqual = require(script.Parent.Parent.luaUtils.deepEqual)
+local deepContains = require(script.Parent.Parent.luaUtils.deepContains)
+
+local function toArrayEqual(p1, p2, p3) -- line: 18
+	-- upvalues: deepContains (copy), deepEqual (copy)
+	if #p1 ~= #p2 then
+		return {
+			pass = false,
+			message = ("Expected array length %s / got length %s"):format(tostring(#p1), (tostring(#p2)))
+		}
+	end
+
+	local g8 = nil
+	local v10 = nil
+	local g11 = nil
+
+	for i = 1, #p1 do
+		repeat
+			if g8 or not p3 then
+				if not g8 then
+					local v9
+
+					v9, v10 = deepEqual(p1[i], p2[i])
+
+					if v9 then
+						g11 = true
+
+						break
+					end
+				end
+
+				g8 = false
+
+				local v12 = v10:gsub("{1}", ("{1}[%s]"):format((tostring(i)))):gsub("{2}", ("{2}[%s]"):format((tostring(i))))
+
+				return {
+					pass = false,
+					message = v12
+				}
+			end
+
+			local v13
+
+			v13, v10 = deepContains(p1[i], p2[i])
+
+			if not v13 then
+				g8 = true
+			end
+		until not g8
+
+		if g11 then
+			g11 = false
+
+			continue
+		end
+	end
+
+	return {
+		pass = true,
+		message = ""
+	}
+end
+
+return toArrayEqual

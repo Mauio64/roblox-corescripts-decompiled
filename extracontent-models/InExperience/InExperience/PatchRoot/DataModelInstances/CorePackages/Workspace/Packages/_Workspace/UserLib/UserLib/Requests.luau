@@ -1,3 +1,3 @@
 return {
-    UsersGetPresence = require(script.UsersGetPresence)
-};
+	UsersGetPresence = require(script.UsersGetPresence)
+}

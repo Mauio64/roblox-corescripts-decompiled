@@ -1,184 +1,176 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v4 = require(l_Parent_1.Cryo);
-local v5 = require(l_Parent_1.React);
-local v6 = require(l_Parent_1.RoactGamepad);
-local v7 = require(l_Parent_0.Core.Style.useStyle);
-local v8 = require(script.Parent.CursorContext);
-local v9 = require(script.Parent.CursorComponent);
-local v10 = require(script.Parent.CursorType);
-local function _(v11, v12, v13) --[[ Line: 20 ]]
-    return string.format("%f %f %f %f", v11.Scale, v11.Offset, v12, v13);
-end;
-local function v24(v15) --[[ Line: 24 ]]
-    local v16 = 1e999;
-    local v17 = 1e999;
-    local v18 = 1e999;
-    local v19 = 1e999;
-    for v20, v21 in string.split(v15, " ") do
-        local v22 = tonumber(v21);
-        if v22 ~= nil then
-            if v20 == 1 then
-                v16 = v22;
-            elseif v20 == 2 then
-                v17 = v22;
-            elseif v20 == 3 then
-                v18 = v22;
-            elseif v20 == 4 then
-                v19 = v22;
-            end;
-        end;
-    end;
-    local v23 = false;
-    if v16 ~= 1e999 then
-        v23 = false;
-        if v17 ~= 1e999 then
-            v23 = false;
-            if v18 ~= 1e999 then
-                v23 = v19 ~= 1e999;
-            end;
-        end;
-    end;
-    assert(v23, "Error! Not all parameters are decoded.");
-    return UDim.new(v16, (math.max(0, v17 + v18))), v18, v19;
-end;
-return function(v25) --[[ Line: 53 ]]
-    -- upvalues: v5 (copy), v6 (copy), v7 (copy), v4 (copy), v10 (copy), v24 (copy), v9 (copy), l_CoreGui_0 (copy), l_GuiService_0 (copy), v8 (copy)
-    local v26, v27 = v5.useState({});
-    local v28, v29 = v5.useState({});
-    local v30 = v5.createRef();
-    local v31, v32 = v5.useState(nil);
-    local v33 = v6.useRefCache();
-    local l_SelectionCursor_0 = v7().Tokens.Component.SelectionCursor;
-    local function v43(v35, v36, v37) --[[ Line: 61 ]]
-        -- upvalues: l_SelectionCursor_0 (copy), v26 (copy), v27 (copy), v4 (ref), v33 (copy)
-        warn("UIBlox's SelectionCursor is deprecated and should not be used anymore.");
-        local v38 = UDim.new(0, 0);
-        if v35 ~= nil then
-            v38 = v35;
-        end;
-        local v39 = 0;
-        if v37 ~= nil then
-            assert(v37 > 0, "Error! borderWidth should be larger than 0.");
-            v39 = v37;
-        else
-            v39 = l_SelectionCursor_0.BorderWidth;
-        end;
-        local v40 = 0;
-        v40 = if v36 ~= nil then v36 - v39 else l_SelectionCursor_0.Offset - v39;
-        local l_v38_0 = v38;
-        local v42 = string.format("%f %f %f %f", l_v38_0.Scale, l_v38_0.Offset, v40, v39);
-        if v26[v42] == nil then
-            v27(v4.Dictionary.join(v26, {
-                [v42] = true
-            }));
-        end;
-        return v33[v42];
-    end;
-    local function v45(v44) --[[ Line: 96 ]]
-        -- upvalues: v10 (ref), v28 (copy), v29 (copy), v4 (ref), v33 (copy)
-        assert(v10.isEnumValue(v44), ("Error! expected a CursorType enum, got %s"):format((tostring(v44))));
-        warn("UIBlox's SelectionCursor is deprecated and should not be used anymore.");
-        if v28[v44] == nil then
-            v29(v4.Dictionary.join(v28, {
-                [v44] = true
-            }));
-        end;
-        return v33[v44];
-    end;
-    local function v57() --[[ Line: 112 ]]
-        -- upvalues: v26 (copy), v33 (copy), v31 (copy), v24 (ref), v5 (ref), v9 (ref), v28 (copy)
-        local v46 = {};
-        for v47, _ in pairs(v26) do
-            local v49 = false;
-            if v33[v47] ~= nil then
-                v49 = false;
-                if v31 ~= nil then
-                    v49 = v33[v47].current == v31;
-                end;
-            end;
-            local v50, v51, v52 = v24(v47);
-            v46[v47] = v5.createElement(v9, {
-                ref = v33[v47], 
-                isVisible = v49, 
-                cornerRadius = v50, 
-                offset = v51, 
-                borderWidth = v52
-            });
-        end;
-        for v53, _ in pairs(v28) do
-            local v55 = v53.rawValue();
-            local v56 = false;
-            if v33[v53] ~= nil then
-                v56 = false;
-                if v31 ~= nil then
-                    v56 = v33[v53].current == v31;
-                end;
-            end;
-            v46[v53] = v5.createElement(v55, {
-                ref = v33[v53], 
-                isVisible = v56
-            });
-        end;
-        return v46;
-    end;
-    v5.useEffect(function() --[[ Line: 145 ]]
-        -- upvalues: v30 (copy), l_CoreGui_0 (ref), l_GuiService_0 (ref), v32 (copy)
-        if v30.current == nil or not v30.current:IsDescendantOf(game) then
-            return;
-        else
-            local v58 = v30.current:IsDescendantOf(l_CoreGui_0);
-            local function v59() --[[ Line: 152 ]] --[[ Name: setUpSelectionImageObjectConnection ]]
-                -- upvalues: v58 (copy), l_GuiService_0 (ref), v32 (ref)
-                if v58 then
-                    return l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() --[[ Line: 157 ]]
-                        -- upvalues: l_GuiService_0 (ref), v32 (ref)
-                        if l_GuiService_0.SelectedCoreObject == nil then
-                            v32(nil);
-                            return;
-                        else
-                            v32(l_GuiService_0.SelectedCoreObject.SelectionImageObject);
-                            return;
-                        end;
-                    end);
-                else
-                    return l_GuiService_0:GetPropertyChangedSignal("SelectedObject"):Connect(function() --[[ Line: 165 ]]
-                        -- upvalues: l_GuiService_0 (ref), v32 (ref)
-                        if l_GuiService_0.SelectedObject == nil then
-                            v32(nil);
-                            return;
-                        else
-                            v32(l_GuiService_0.SelectedObject.SelectionImageObject);
-                            return;
-                        end;
-                    end);
-                end;
-            end;
-            local v60 = v59();
-            local v61 = v30.current.AncestryChanged:Connect(function() --[[ Line: 176 ]]
-                -- upvalues: v60 (ref), v59 (copy)
-                v60:Disconnect();
-                v60 = v59();
-            end);
-            return function() --[[ Line: 186 ]]
-                -- upvalues: v60 (ref), v61 (copy)
-                v60:Disconnect();
-                v61:Disconnect();
-            end;
-        end;
-    end, {});
-    return v5.createElement(v8.Provider, {
-        value = {
-            getCursor = v43, 
-            getCursorByType = v45
-        }
-    }, v4.Dictionary.join({
-        InvisibleContainer = v5.createElement("Frame", {
-            Size = UDim2.new(0, 0, 0, 0), 
-            Visible = false, 
-            ref = v30
-        }, (v57()))
-    }, v25.children));
-end;
+local CoreGui = game:GetService("CoreGui")
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Cryo = require(ParentParentParent.Cryo)
+local React = require(ParentParentParent.React)
+local RoactGamepad = require(ParentParentParent.RoactGamepad)
+local useStyle = require(ParentParent.Core.Style.useStyle)
+local CursorContext = require(script.Parent.CursorContext)
+local CursorComponent = require(script.Parent.CursorComponent)
+local CursorType = require(script.Parent.CursorType)
+
+local function v12(s1: string) -- line: 24
+	local n1 = 1e999
+	local n2 = 1e999
+	local n3 = 1e999
+	local n4 = 1e999
+
+	for v21, v22 in string.split(s1, " ") do
+		local num = tonumber(v22)
+
+		if num ~= nil then
+			if v21 == 1 then
+				n1 = num
+			elseif v21 == 2 then
+				n2 = num
+			elseif v21 == 3 then
+				n3 = num
+			elseif v21 == 4 then
+				n4 = num
+			end
+		end
+	end
+
+	assert(n1 ~= 1e999 and (n2 ~= 1e999 and (n3 ~= 1e999 and n4 ~= 1e999)), "Error! Not all parameters are decoded.")
+
+	return UDim.new(n1, (math.max(0, n2 + n3))), n3, n4
+end
+
+return function(t1: {[any]: any}) -- line: 53
+	-- upvalues: React (copy), RoactGamepad (copy), useStyle (copy), Cryo (copy), CursorType (copy), v12 (copy), CursorComponent (copy), CoreGui (copy), GuiService (copy), CursorContext (copy)
+	local v25, v26 = React.useState({})
+	local v27, v28 = React.useState({})
+	local v29 = React.createRef()
+	local v30, v31 = React.useState(nil)
+	local v32 = RoactGamepad.useRefCache()
+	local SelectionCursor = useStyle().Tokens.Component.SelectionCursor
+
+	React.useEffect(function() -- line: 145
+		-- upvalues: v29 (copy), CoreGui (copy), GuiService (copy), v31 (copy)
+		if v29.current == nil or not v29.current:IsDescendantOf(game) then
+			return
+		end
+
+		local v52 = v29.current:IsDescendantOf(CoreGui)
+
+		local function setUpSelectionImageObjectConnection() -- line: 152
+			-- upvalues: v52 (copy), GuiService (copy), v31 (copy)
+			if v52 then
+				return GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 157
+					-- upvalues: GuiService (copy), v31 (copy)
+					if GuiService.SelectedCoreObject == nil then
+						v31(nil)
+
+						return
+					end
+
+					v31(GuiService.SelectedCoreObject.SelectionImageObject)
+				end)
+			end
+
+			return GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function() -- line: 165
+				-- upvalues: GuiService (copy), v31 (copy)
+				if GuiService.SelectedObject == nil then
+					v31(nil)
+
+					return
+				end
+
+				v31(GuiService.SelectedObject.SelectionImageObject)
+			end)
+		end
+
+		local u54 = setUpSelectionImageObjectConnection()
+		local connection = v29.current.AncestryChanged:Connect(function() -- line: 176
+			-- upvalues: u54 (ref), setUpSelectionImageObjectConnection (copy)
+			u54:Disconnect()
+			u54 = setUpSelectionImageObjectConnection()
+		end)
+
+		return function() -- line: 186
+			-- upvalues: u54 (ref), connection (copy)
+			u54:Disconnect()
+			connection:Disconnect()
+		end
+	end, {})
+
+	return React.createElement(CursorContext.Provider, {
+		value = {
+			getCursor = function(uDim: UDim?, n5: number?, n6: number?) -- line: 61
+				-- upvalues: SelectionCursor (copy), v25 (copy), v26 (copy), Cryo (copy), v32 (copy)
+				warn("UIBlox's SelectionCursor is deprecated and should not be used anymore.")
+
+				local uDim2 = UDim.new(0, 0)
+
+				if uDim ~= nil then
+					uDim2 = uDim
+				end
+
+				if n6 ~= nil then
+					assert(n6 > 0, "Error! borderWidth should be larger than 0.")
+				else
+					n6 = SelectionCursor.BorderWidth
+				end
+
+				local v38 = if n5 == nil then SelectionCursor.Offset - n6 else n5 - n6
+				local v39 = string.format("%f %f %f %f", uDim2.Scale, uDim2.Offset, v38, n6)
+
+				if v25[v39] == nil then
+					v26(Cryo.Dictionary.join(v25, {
+						[v39] = true
+					}))
+				end
+
+				return v32[v39]
+			end,
+			getCursorByType = function(p1) -- line: 96
+				-- upvalues: CursorType (copy), v27 (copy), v28 (copy), Cryo (copy), v32 (copy)
+				assert(CursorType.isEnumValue(p1), ("Error! expected a CursorType enum, got %s"):format((tostring(p1))))
+				warn("UIBlox's SelectionCursor is deprecated and should not be used anymore.")
+
+				if v27[p1] == nil then
+					v28(Cryo.Dictionary.join(v27, {
+						[p1] = true
+					}))
+				end
+
+				return v32[p1]
+			end
+		}
+	}, Cryo.Dictionary.join({
+		InvisibleContainer = React.createElement("Frame", {
+			Visible = false,
+			Size = UDim2.new(0, 0, 0, 0),
+			ref = v29
+		}, ((function() -- line: 112
+			-- upvalues: v25 (copy), v32 (copy), v30 (copy), v12 (copy), React (copy), CursorComponent (copy), v27 (copy)
+			local t2 = {}
+
+			for k, _ in pairs(v25) do
+				local v44 = v32[k] ~= nil and (v30 ~= nil and v32[k].current == v30)
+				local v45, v46, v47 = v12(k)
+
+				t2[k] = React.createElement(CursorComponent, {
+					ref = v32[k],
+					isVisible = v44,
+					cornerRadius = v45,
+					offset = v46,
+					borderWidth = v47
+				})
+			end
+
+			for k, _ in pairs(v27) do
+				local v50 = k.rawValue()
+				local v51 = v32[k] ~= nil and (v30 ~= nil and v32[k].current == v30)
+
+				t2[k] = React.createElement(v50, {
+					ref = v32[k],
+					isVisible = v51
+				})
+			end
+
+			return t2
+		end)()))
+	}, t1.children))
+end

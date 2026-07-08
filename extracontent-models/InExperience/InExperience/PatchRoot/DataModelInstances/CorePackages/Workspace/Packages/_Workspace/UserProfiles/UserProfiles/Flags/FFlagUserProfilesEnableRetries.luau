@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfilesEnableRetries", false);
+return game:DefineFastFlag("UserProfilesEnableRetries", false)

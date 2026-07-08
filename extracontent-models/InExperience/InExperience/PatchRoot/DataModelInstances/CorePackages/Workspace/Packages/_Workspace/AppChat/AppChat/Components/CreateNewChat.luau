@@ -1,4 +1,4 @@
 return {
-    logger = require(script.Logger), 
-    screenComponent = require(script.CreateNewChatScreen)
-};
+	logger = require(script.Logger),
+	screenComponent = require(script.CreateNewChatScreen)
+}

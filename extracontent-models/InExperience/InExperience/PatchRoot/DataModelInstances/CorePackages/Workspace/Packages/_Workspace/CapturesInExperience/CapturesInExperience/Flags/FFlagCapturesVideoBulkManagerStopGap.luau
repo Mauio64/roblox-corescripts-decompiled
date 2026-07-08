@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CapturesVideoBulkManagerStopGap", false) and not game:GetEngineFeature("FixCapturesBulkSave");
+return game:DefineFastFlag("CapturesVideoBulkManagerStopGap", false) and not game:GetEngineFeature("FixCapturesBulkSave")

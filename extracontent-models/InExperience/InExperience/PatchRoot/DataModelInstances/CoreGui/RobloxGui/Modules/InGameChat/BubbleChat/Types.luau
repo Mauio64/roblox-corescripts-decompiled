@@ -1,76 +1,79 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.t);
-local v2 = {
-    IMessage = v1.strictInterface({
-        id = v1.string, 
-        name = v1.string, 
-        text = v1.string, 
-        userId = v1.string, 
-        timestamp = v1.number, 
-        adornee = v1.union(v1.instanceIsA("BasePart"), v1.instanceOf("Model"))
-    }), 
-    IMessageData = v1.interface({
-        ID = v1.number, 
-        SpeakerUserId = v1.number, 
-        FromSpeaker = v1.string, 
-        Time = v1.number, 
-        Message = v1.optional(v1.string)
-    })
-};
-local v3 = {
-    BubbleDuration = v1.optional(v1.number), 
-    MaxBubbles = v1.optional(v1.number), 
-    BackgroundColor3 = v1.optional(v1.Color3), 
-    TextColor3 = v1.optional(v1.Color3), 
-    TextSize = v1.optional(v1.number), 
-    Font = v1.optional(v1.enum(Enum.Font)), 
-    Transparency = v1.optional(v1.number), 
-    CornerEnabled = v1.optional(v1.boolean), 
-    CornerRadius = v1.optional(v1.UDim), 
-    TailVisible = v1.optional(v1.boolean), 
-    Padding = v1.optional(v1.number), 
-    MaxWidth = v1.optional(v1.number), 
-    BackgroundImage = v1.optional(v1.strictInterface({
-        Image = v1.optional(v1.string), 
-        ImageColor3 = v1.optional(v1.Color3), 
-        ImageRectOffset = v1.optional(v1.Vector2), 
-        ImageRectSize = v1.optional(v1.Vector2), 
-        ScaleType = v1.optional(v1.enum(Enum.ScaleType)), 
-        SliceCenter = v1.optional(v1.Rect), 
-        SliceScale = v1.optional(v1.number), 
-        TileSize = v1.optional(v1.UDim2)
-    })), 
-    BackgroundGradient = v1.optional(v1.strictInterface({
-        Enabled = v1.optional(v1.boolean), 
-        Color = v1.optional(v1.ColorSequence), 
-        Offset = v1.optional(v1.Vector2), 
-        Rotation = v1.optional(v1.number), 
-        Transparency = v1.optional(v1.NumberSequence)
-    })), 
-    SizeAnimation = v1.optional(v1.strictInterface({
-        Enabled = v1.optional(v1.boolean), 
-        SpringDampingRatio = v1.optional(v1.number), 
-        SpringFrequency = v1.optional(v1.number)
-    })), 
-    TransparencyAnimation = v1.optional(v1.strictInterface({
-        Enabled = v1.optional(v1.boolean), 
-        SpringDampingRatio = v1.optional(v1.number), 
-        SpringFrequency = v1.optional(v1.number)
-    })), 
-    VerticalStudsOffset = v1.optional(v1.number), 
-    LocalPlayerStudsOffset = v1.optional(v1.Vector3), 
-    BubblesSpacing = v1.optional(v1.number), 
-    MinimizeDistance = v1.optional(v1.number), 
-    MaxDistance = v1.optional(v1.number), 
-    AdorneeName = v1.optional(v1.string), 
-    Voice = v1.optional(v1.strictInterface({
-        ShowIndicator = v1.optional(v1.boolean)
-    }))
-};
-local v4 = {};
-for v5, v6 in pairs(v3) do
-    v4[v5] = v6;
-end;
-v3.UserSpecificSettings = v1.optional(v1.map(v1.string, v1.strictInterface(v4)));
-v2.IChatSettings = v1.strictInterface(v3);
-return v2;
+local CorePackages = game:GetService("CorePackages")
+local t = require(CorePackages.Packages.t)
+local t1 = {
+	IMessage = t.strictInterface({
+		id = t.string,
+		name = t.string,
+		text = t.string,
+		userId = t.string,
+		timestamp = t.number,
+		adornee = t.union(t.instanceIsA("BasePart"), t.instanceOf("Model"))
+	}),
+	IMessageData = t.interface({
+		ID = t.number,
+		SpeakerUserId = t.number,
+		FromSpeaker = t.string,
+		Time = t.number,
+		Message = t.optional(t.string)
+	})
+}
+local t2 = {
+	BubbleDuration = t.optional(t.number),
+	MaxBubbles = t.optional(t.number),
+	BackgroundColor3 = t.optional(t.Color3),
+	TextColor3 = t.optional(t.Color3),
+	TextSize = t.optional(t.number),
+	Font = t.optional(t.enum(Enum.Font)),
+	Transparency = t.optional(t.number),
+	CornerEnabled = t.optional(t.boolean),
+	CornerRadius = t.optional(t.UDim),
+	TailVisible = t.optional(t.boolean),
+	Padding = t.optional(t.number),
+	MaxWidth = t.optional(t.number),
+	BackgroundImage = t.optional(t.strictInterface({
+		Image = t.optional(t.string),
+		ImageColor3 = t.optional(t.Color3),
+		ImageRectOffset = t.optional(t.Vector2),
+		ImageRectSize = t.optional(t.Vector2),
+		ScaleType = t.optional(t.enum(Enum.ScaleType)),
+		SliceCenter = t.optional(t.Rect),
+		SliceScale = t.optional(t.number),
+		TileSize = t.optional(t.UDim2)
+	})),
+	BackgroundGradient = t.optional(t.strictInterface({
+		Enabled = t.optional(t.boolean),
+		Color = t.optional(t.ColorSequence),
+		Offset = t.optional(t.Vector2),
+		Rotation = t.optional(t.number),
+		Transparency = t.optional(t.NumberSequence)
+	})),
+	SizeAnimation = t.optional(t.strictInterface({
+		Enabled = t.optional(t.boolean),
+		SpringDampingRatio = t.optional(t.number),
+		SpringFrequency = t.optional(t.number)
+	})),
+	TransparencyAnimation = t.optional(t.strictInterface({
+		Enabled = t.optional(t.boolean),
+		SpringDampingRatio = t.optional(t.number),
+		SpringFrequency = t.optional(t.number)
+	})),
+	VerticalStudsOffset = t.optional(t.number),
+	LocalPlayerStudsOffset = t.optional(t.Vector3),
+	BubblesSpacing = t.optional(t.number),
+	MinimizeDistance = t.optional(t.number),
+	MaxDistance = t.optional(t.number),
+	AdorneeName = t.optional(t.string),
+	Voice = t.optional(t.strictInterface({
+		ShowIndicator = t.optional(t.boolean)
+	}))
+}
+local t3 = {}
+
+for k, v in pairs(t2) do
+	t3[k] = v
+end
+
+t2.UserSpecificSettings = t.optional(t.map(t.string, t.strictInterface(t3)))
+t1.IChatSettings = t.strictInterface(t2)
+
+return t1

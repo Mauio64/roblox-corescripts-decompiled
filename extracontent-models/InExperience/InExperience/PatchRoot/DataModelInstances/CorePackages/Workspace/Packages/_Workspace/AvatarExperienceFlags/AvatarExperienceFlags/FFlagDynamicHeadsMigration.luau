@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DynamicHeadsMigration7", false);
+return game:DefineFastFlag("DynamicHeadsMigration7", false)

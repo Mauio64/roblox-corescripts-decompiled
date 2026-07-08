@@ -1,51 +1,54 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.Roact);
-local l_AppFonts_0 = require(l_Parent_0.Style).AppFonts;
-local l_Colors_0 = require(l_Parent_0.Style).Colors;
-local l_White_0 = l_Colors_0.White;
-local l_Gray2_0 = l_Colors_0.Gray2;
-local v6 = v1.PureComponent:extend("CountryCodeSelectorButton");
-local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-v6.init = function(v8) --[[ Line: 14 ]] --[[ Name: init ]]
-    v8.selectionCallback = function() --[[ Line: 15 ]]
-        -- upvalues: v8 (copy)
-        if v8.props.ListButtonProps.SelectionCallback then
-            v8.props.ListButtonProps.SelectionCallback(v8.props.Data);
-        end;
-    end;
-end;
-v6.render = function(v9) --[[ Line: 22 ]] --[[ Name: render ]]
-    -- upvalues: l_Text_0 (copy), l_AppFonts_0 (copy), v1 (copy), l_White_0 (copy), l_Gray2_0 (copy)
-    local v10 = v9.props.Data.localizedName or "";
-    local v11 = "+" .. (v9.props.Data.prefix or "");
-    local l_TextSize_0 = v9.props.ListButtonProps.TextSize;
-    local v13 = l_Text_0.GetTextWidth(v11, l_AppFonts_0.default:getDefault(), l_TextSize_0);
-    return v1.createElement("TextButton", {
-        Size = v9.props.Size, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v9.props.LayoutOrder, 
-        Text = "", 
-        [v1.Event.Activated] = v9.selectionCallback
-    }, {
-        CountryName = v1.createElement("TextLabel", {
-            Size = UDim2.new(1, -v13, 1, 0), 
-            Text = v10, 
-            BackgroundTransparency = 1, 
-            Font = l_AppFonts_0.default:getDefault(), 
-            TextColor3 = l_White_0, 
-            TextSize = l_TextSize_0, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        }), 
-        CountryPrefix = v1.createElement("TextLabel", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            Text = v11, 
-            BackgroundTransparency = 1, 
-            Font = l_AppFonts_0.default:getDefault(), 
-            TextColor3 = l_Gray2_0, 
-            TextSize = l_TextSize_0, 
-            TextXAlignment = Enum.TextXAlignment.Right
-        })
-    });
-end;
-return v6;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local Roact = require(Parent.Roact)
+local AppFonts = require(Parent.Style).AppFonts
+local Colors = require(Parent.Style).Colors
+local White = Colors.White
+local Gray2 = Colors.Gray2
+local v7 = Roact.PureComponent:extend("CountryCodeSelectorButton")
+local Text = require(Parent.AppCommonLib).Text
+
+function v7.init(p1) -- line: 14
+	function p1.selectionCallback() -- line: 15
+		-- upvalues: p1 (copy)
+		if p1.props.ListButtonProps.SelectionCallback then
+			p1.props.ListButtonProps.SelectionCallback(p1.props.Data)
+		end
+	end
+end
+function v7.render(p2) -- line: 22
+	-- upvalues: Text (copy), AppFonts (copy), Roact (copy), White (copy), Gray2 (copy)
+	local v11 = p2.props.Data.localizedName or ""
+	local v12 = "+" .. (p2.props.Data.prefix or "")
+	local ListButtonPropsTextSize = p2.props.ListButtonProps.TextSize
+	local v14 = Text.GetTextWidth(v12, AppFonts.default:getDefault(), ListButtonPropsTextSize)
+
+	return Roact.createElement("TextButton", {
+		Size = p2.props.Size,
+		BackgroundTransparency = 1,
+		LayoutOrder = p2.props.LayoutOrder,
+		Text = "",
+		[Roact.Event.Activated] = p2.selectionCallback
+	}, {
+		CountryName = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -v14, 1, 0),
+			Text = v11,
+			Font = AppFonts.default:getDefault(),
+			TextColor3 = White,
+			TextSize = ListButtonPropsTextSize,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}),
+		CountryPrefix = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = v12,
+			Font = AppFonts.default:getDefault(),
+			TextColor3 = Gray2,
+			TextSize = ListButtonPropsTextSize,
+			TextXAlignment = Enum.TextXAlignment.Right
+		})
+	})
+end
+
+return v7

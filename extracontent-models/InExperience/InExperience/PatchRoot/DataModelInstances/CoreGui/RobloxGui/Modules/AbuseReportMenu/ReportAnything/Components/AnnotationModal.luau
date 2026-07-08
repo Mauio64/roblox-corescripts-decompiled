@@ -1,120 +1,135 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v5 = require(l_CorePackages_0.Packages.Roact);
-local l_Chrome_0 = l_RobloxGui_0.Modules.Chrome;
-local l_Enabled_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled;
-local v8 = if l_Enabled_0() then require(l_Chrome_0.Service) else nil;
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v10 = require(l_script_FirstAncestor_0.Components.Constants);
-local v11 = require(l_script_FirstAncestor_0.ReportAnything.Components.ScreenshotFlowStepHandlerContainer);
-local _ = require(l_script_FirstAncestor_0.ReportAnything.Utility.ReportAnythingAnalytics);
-local l_FFlagEnableConsoleExpControls_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls;
-local v14 = {
-    annotationPageHandle = nil, 
-    annotationPageFrame = nil, 
-    annotationPageScreenGui = nil
-};
-local function v15() --[[ Line: 28 ]] --[[ Name: unmountAnnotationPage ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), l_Enabled_0 (copy), v8 (copy), v14 (copy), v5 (copy)
-    if l_FFlagEnableConsoleExpControls_0 and if l_FFlagEnableConsoleExpControls_0 then l_Enabled_0() else l_Enabled_0 then
-        v8:setHideShortcutBar("AnnotationModal", false);
-    end;
-    if v14.annotationPageHandle ~= nil then
-        v5.unmount(v14.annotationPageHandle);
-        v14.annotationPageHandle = nil;
-    end;
-    if v14.annotationPageScreenGui ~= nil then
-        v14.annotationPageFrame.Parent = nil;
-        v14.annotationPageFrame = nil;
-        v14.annotationPageScreenGui = nil;
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local GuiService = game:GetService("GuiService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Chrome = RobloxGui.Modules.Chrome
+local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+local v9 = if not Enabled() then nil else require(Chrome.Service)
+
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+local ScreenshotFlowStepHandlerContainer = require(AbuseReportMenu.ReportAnything.Components.ScreenshotFlowStepHandlerContainer)
+
+require(AbuseReportMenu.ReportAnything.Utility.ReportAnythingAnalytics)
+
+local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
+local t1 = {
+	annotationPageHandle = nil,
+	annotationPageFrame = nil,
+	annotationPageScreenGui = nil
+}
+
+local function unmountAnnotationPage() -- line: 28
+	-- upvalues: FFlagEnableConsoleExpControls (copy), Enabled (copy), v9 (copy), t1 (copy), Roact (copy)
+	if FFlagEnableConsoleExpControls and if not FFlagEnableConsoleExpControls then Enabled else Enabled() then
+		v9:setHideShortcutBar("AnnotationModal", false)
+	end
+
+	if t1.annotationPageHandle ~= nil then
+		Roact.unmount(t1.annotationPageHandle)
+		t1.annotationPageHandle = nil
+	end
+
+	if t1.annotationPageScreenGui ~= nil then
+		t1.annotationPageFrame.Parent = nil
+		t1.annotationPageFrame = nil
+		t1.annotationPageScreenGui = nil
+	end
+end
+
 return {
-    mountAnnotationPage = function(v16, v17, v18, v19, v20) --[[ Line: 43 ]] --[[ Name: mountAnnotationPage ]]
-        -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), l_Enabled_0 (copy), v8 (copy), l_GuiService_0 (copy), v14 (copy), l_CoreGui_0 (copy), v10 (copy), v5 (copy), v11 (copy), v15 (copy)
-        if l_FFlagEnableConsoleExpControls_0 and if l_FFlagEnableConsoleExpControls_0 then l_Enabled_0() else l_Enabled_0 then
-            v8:setHideShortcutBar("AnnotationModal", true);
-        end;
-        local l_l_GuiService_0_GuiInset_0, _ = l_GuiService_0:GetGuiInset();
-        if not v14.annotationPageScreenGui then
-            local l_ScreenGui_0 = Instance.new("ScreenGui");
-            l_ScreenGui_0.Name = "AnnotationPageContents";
-            l_ScreenGui_0.DisplayOrder = 7;
-            l_ScreenGui_0.Enabled = true;
-            l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-            l_ScreenGui_0.Parent = l_CoreGui_0:FindFirstChild(v10.AbuseReportMenuPlaceholderFrame, true);
-            v14.annotationPageScreenGui = l_ScreenGui_0;
-            local l_Frame_0 = Instance.new("Frame");
-            l_Frame_0.BackgroundTransparency = 1;
-            l_Frame_0.Position = UDim2.new(0, 0, 0, -l_l_GuiService_0_GuiInset_0.Y);
-            l_Frame_0.Size = UDim2.new(1, 0, 1, l_l_GuiService_0_GuiInset_0.Y);
-            l_Frame_0.Parent = v14.annotationPageScreenGui;
-            v14.annotationPageFrame = l_Frame_0;
-        end;
-        local v29 = v5.createElement(v11, {
-            screenshot = v19.screenshotContentId, 
-            entryPoint = v16, 
-            backAction = function() --[[ Line: 76 ]] --[[ Name: backAction ]]
-                -- upvalues: v15 (ref)
-                v15();
-            end, 
-            dismissAction = function() --[[ Line: 79 ]] --[[ Name: dismissAction ]]
-                -- upvalues: v15 (ref)
-                v15();
-            end, 
-            finishAnnotationAction = function(v25) --[[ Line: 82 ]] --[[ Name: finishAnnotationAction ]]
-                -- upvalues: v15 (ref), v20 (copy), v10 (ref)
-                v15();
-                v20({
-                    type = v10.ReportAnythingActions.SetAnnotationPoints, 
-                    annotationPoints = v25
-                });
-                v20({
-                    type = v10.ReportAnythingActions.CompleteAttachment
-                });
-            end, 
-            restartAction = function() --[[ Line: 92 ]] --[[ Name: restartAction ]]
-                -- upvalues: v15 (ref), v20 (copy), v10 (ref), v17 (copy)
-                v15();
-                v20({
-                    type = v10.ReportAnythingActions.ClearAll
-                });
-                v17();
-            end, 
-            skipAnnotationAction = function() --[[ Line: 102 ]] --[[ Name: skipAnnotationAction ]]
-                -- upvalues: v15 (ref), v20 (copy), v10 (ref)
-                v15();
-                v20({
-                    type = v10.ReportAnythingActions.CompleteAttachment
-                });
-            end, 
-            setAnnotationCircleRadius = function(v26) --[[ Line: 108 ]] --[[ Name: setAnnotationCircleRadius ]]
-                -- upvalues: v20 (copy), v10 (ref)
-                v20({
-                    type = v10.ReportAnythingActions.SetAnnotationCircleRadius, 
-                    radius = v26
-                });
-            end, 
-            setAnnotationAreaDimensions = function(v27, v28) --[[ Line: 114 ]] --[[ Name: setAnnotationAreaDimensions ]]
-                -- upvalues: v20 (copy), v10 (ref)
-                v20({
-                    type = v10.ReportAnythingActions.SetAnnotationAreaDimensions, 
-                    width = v27, 
-                    height = v28
-                });
-            end, 
-            initialAnnotationPoints = {}, 
-            initialPageNumber = 1, 
-            viewportInfo = v19.identificationResults.avatarIDStats.viewportInfo, 
-            reportAnythingAnalytics = v18
-        });
-        v20({
-            type = v10.ReportAnythingActions.SetAnnotationOptionSeen
-        });
-        v14.annotationPageHandle = v5.mount(v29, v14.annotationPageFrame, "AnnotationFlow");
-    end, 
-    unmountAnnotationPage = v15
-};
+	mountAnnotationPage = function(s1: string, p1: ((...any) -> ...any), p2, p3, p4: ((...any) -> ...any)) -- line: 43
+		-- upvalues: FFlagEnableConsoleExpControls (copy), Enabled (copy), v9 (copy), GuiService (copy), t1 (copy), CoreGui (copy), Constants (copy), Roact (copy), ScreenshotFlowStepHandlerContainer (copy), unmountAnnotationPage (copy)
+		if FFlagEnableConsoleExpControls and if not FFlagEnableConsoleExpControls then Enabled else Enabled() then
+			v9:setHideShortcutBar("AnnotationModal", true)
+		end
+
+		local v20, _ = GuiService:GetGuiInset()
+
+		if not t1.annotationPageScreenGui then
+			local ScreenGui = Instance.new("ScreenGui")
+
+			ScreenGui.Name = "AnnotationPageContents"
+			ScreenGui.DisplayOrder = 7
+			ScreenGui.Enabled = true
+			ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			ScreenGui.Parent = CoreGui:FindFirstChild(Constants.AbuseReportMenuPlaceholderFrame, true)
+			t1.annotationPageScreenGui = ScreenGui
+
+			local Frame = Instance.new("Frame")
+
+			Frame.BackgroundTransparency = 1
+			Frame.Position = UDim2.new(0, 0, 0, -v20.Y)
+			Frame.Size = UDim2.new(1, 0, 1, v20.Y)
+			Frame.Parent = t1.annotationPageScreenGui
+			t1.annotationPageFrame = Frame
+		end
+
+		local v24 = Roact.createElement(ScreenshotFlowStepHandlerContainer, {
+			initialPageNumber = 1,
+			screenshot = p3.screenshotContentId,
+			entryPoint = s1,
+			backAction = function() -- line: 76
+				-- upvalues: unmountAnnotationPage (copy)
+				unmountAnnotationPage()
+			end,
+			dismissAction = function() -- line: 79
+				-- upvalues: unmountAnnotationPage (copy)
+				unmountAnnotationPage()
+			end,
+			finishAnnotationAction = function(p5) -- line: 82
+				-- upvalues: unmountAnnotationPage (copy), p4 (copy), Constants (copy)
+				unmountAnnotationPage()
+				p4({
+					type = Constants.ReportAnythingActions.SetAnnotationPoints,
+					annotationPoints = p5
+				})
+				p4({
+					type = Constants.ReportAnythingActions.CompleteAttachment
+				})
+			end,
+			restartAction = function() -- line: 92
+				-- upvalues: unmountAnnotationPage (copy), p4 (copy), Constants (copy), p1 (copy)
+				unmountAnnotationPage()
+				p4({
+					type = Constants.ReportAnythingActions.ClearAll
+				})
+				p1()
+			end,
+			skipAnnotationAction = function() -- line: 102
+				-- upvalues: unmountAnnotationPage (copy), p4 (copy), Constants (copy)
+				unmountAnnotationPage()
+				p4({
+					type = Constants.ReportAnythingActions.CompleteAttachment
+				})
+			end,
+			setAnnotationCircleRadius = function(p6) -- line: 108
+				-- upvalues: p4 (copy), Constants (copy)
+				p4({
+					type = Constants.ReportAnythingActions.SetAnnotationCircleRadius,
+					radius = p6
+				})
+			end,
+			setAnnotationAreaDimensions = function(p7, p8) -- line: 114
+				-- upvalues: p4 (copy), Constants (copy)
+				p4({
+					type = Constants.ReportAnythingActions.SetAnnotationAreaDimensions,
+					width = p7,
+					height = p8
+				})
+			end,
+			initialAnnotationPoints = {},
+			viewportInfo = p3.identificationResults.avatarIDStats.viewportInfo,
+			reportAnythingAnalytics = p2
+		})
+
+		p4({
+			type = Constants.ReportAnythingActions.SetAnnotationOptionSeen
+		})
+		t1.annotationPageHandle = Roact.mount(v24, t1.annotationPageFrame, "AnnotationFlow")
+	end,
+	unmountAnnotationPage = unmountAnnotationPage
+}

@@ -1,7 +1,11 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_CursorType_0 = require(l_Parent_0.Foundation).Enums.CursorType;
-return function(v2, v3) --[[ Line: 5 ]] --[[ Name: mapCursorType ]]
-    -- upvalues: l_CursorType_0 (copy)
-    local v4 = tostring(v2);
-    return l_CursorType_0[string.gsub(v4, v3 and "CursorKind%." or "CursorType%.", "")];
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local CursorType = require(ParentParent.Foundation).Enums.CursorType
+
+local function mapCursorType(p1, b1: boolean?) -- line: 5
+	-- upvalues: CursorType (copy)
+	local str = tostring(p1)
+
+	return CursorType[string.gsub(str, not b1 and "CursorType%." or "CursorKind%.", "")]
+end
+
+return mapCursorType

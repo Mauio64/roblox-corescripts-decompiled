@@ -1,12 +1,17 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.append);
-local v2 = require(l_Parent_0.forEach);
-return function(v3) --[[ Line: 14 ]] --[[ Name: flat ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v4 = {};
-    v2(v3, function(v5) --[[ Line: 16 ]]
-        -- upvalues: v1 (ref), v4 (copy)
-        v1(v4, v5);
-    end);
-    return v4;
-end;
+local scriptParent = script.Parent
+local append = require(scriptParent.append)
+local forEach = require(scriptParent.forEach)
+
+local function flat(t1: {[any]: any}) -- line: 14
+	-- upvalues: forEach (copy), append (copy)
+	local t2 = {}
+
+	forEach(t1, function(t3: {[any]: any}) -- line: 16
+		-- upvalues: append (copy), t2 (copy)
+		append(t2, t3)
+	end)
+
+	return t2
+end
+
+return flat

@@ -1,1 +1,1 @@
-return require(script.EditProfileScreenViewAdapter);
+return require(script.EditProfileScreenViewAdapter)

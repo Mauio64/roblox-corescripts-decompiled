@@ -1,184 +1,189 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Error_0 = v2.Error;
-local l_Map_0 = v2.Map;
-local l_Object_0 = v2.Object;
-local l_coerceToMap_0 = v2.coerceToMap;
-local _ = require(l_Parent_0.jsutils.ObjMap);
-local _ = require(script.Parent.Parent.jsutils.ObjMap);
-local l_inspect_0 = require(script.Parent.Parent.jsutils.inspect).inspect;
-local l_toObjMap_0 = require(script.Parent.Parent.jsutils.toObjMap).toObjMap;
-local l_devAssert_0 = require(script.Parent.Parent.jsutils.devAssert).devAssert;
-local v13 = require(script.Parent.Parent.jsutils.instanceOf);
-local l_isObjectLike_0 = require(script.Parent.Parent.jsutils.isObjectLike).isObjectLike;
-local _ = require(script.Parent.Parent.language.ast);
-local l_DirectiveLocation_0 = require(script.Parent.Parent.language.directiveLocation).DirectiveLocation;
-local v17 = require(script.Parent.definition);
-local v18 = require(script.Parent.scalars);
-local l_GraphQLString_0 = v18.GraphQLString;
-local l_GraphQLBoolean_0 = v18.GraphQLBoolean;
-local l_argsToArgsConfig_0 = v17.argsToArgsConfig;
-local l_GraphQLNonNull_0 = v17.GraphQLNonNull;
-local v23 = nil;
-isDirective = function(v24) --[[ Line: 53 ]] --[[ Name: isDirective ]]
-    -- upvalues: v13 (copy), v23 (ref)
-    return v13(v24, v23);
-end;
-assertDirective = function(v25) --[[ Line: 57 ]] --[[ Name: assertDirective ]]
-    -- upvalues: l_Error_0 (copy), l_inspect_0 (copy)
-    if not isDirective(v25) then
-        error(l_Error_0.new(("Expected %s to be a GraphQL directive."):format(l_inspect_0(v25))));
-    end;
-    return v25;
-end;
-v23 = {};
-v23.__index = v23;
-v23.new = function(v26) --[[ Line: 87 ]] --[[ Name: new ]]
-    -- upvalues: l_toObjMap_0 (copy), l_devAssert_0 (copy), l_Array_0 (copy), l_isObjectLike_0 (copy), v13 (copy), l_Map_0 (copy), l_coerceToMap_0 (copy), v23 (ref)
-    local v27 = {
-        name = v26.name, 
-        description = v26.description, 
-        locations = v26.locations, 
-        isRepeatable = v26.isRepeatable and true or false, 
-        extensions = v26.extensions and l_toObjMap_0(v26.extensions), 
-        astNode = v26.astNode
-    };
-    l_devAssert_0(v26.name, "Directive must be named.");
-    l_devAssert_0(l_Array_0.isArray(v26.locations), ("@%s locations must be an Array."):format(v26.name));
-    local v28 = if v26.args then v26.args else {};
-    l_devAssert_0(l_isObjectLike_0(v28) and not (l_Array_0.isArray(v28) and next(v28) ~= nil) or v13(v28, l_Map_0), ("@%s args must be an object with argument names as keys."):format(v26.name));
-    v27.args = l_Array_0.map(l_coerceToMap_0(v28):entries(), function(v29) --[[ Line: 112 ]]
-        -- upvalues: l_toObjMap_0 (ref)
-        local v30 = v29[1];
-        local v31 = v29[2];
-        return {
-            name = v30, 
-            description = v31.description, 
-            type = v31.type, 
-            defaultValue = v31.defaultValue, 
-            deprecationReason = v31.deprecationReason, 
-            extensions = v31.extensions and l_toObjMap_0(v31.extensions), 
-            astNode = v31.astNode
-        };
-    end);
-    return (setmetatable(v27, v23));
-end;
-v23.toConfig = function(v32) --[[ Line: 129 ]] --[[ Name: toConfig ]]
-    -- upvalues: l_argsToArgsConfig_0 (copy)
-    return {
-        name = v32.name, 
-        description = v32.description, 
-        locations = v32.locations, 
-        args = l_argsToArgsConfig_0(v32.args), 
-        isRepeatable = v32.isRepeatable, 
-        extensions = v32.extensions, 
-        astNode = v32.astNode
-    };
-end;
-v23.__tostring = function(v33) --[[ Line: 141 ]] --[[ Name: __tostring ]]
-    return v33:toString();
-end;
-v23.toString = function(v34) --[[ Line: 145 ]] --[[ Name: toString ]]
-    return "@" .. v34.name;
-end;
-v23.toJSON = function(v35) --[[ Line: 149 ]] --[[ Name: toJSON ]]
-    return v35:toString();
-end;
-local v36 = v23.new({
-    name = "include", 
-    description = "Directs the executor to include this field or fragment only when the `if` argument is true.", 
-    locations = {
-        l_DirectiveLocation_0.FIELD, 
-        l_DirectiveLocation_0.FRAGMENT_SPREAD, 
-        l_DirectiveLocation_0.INLINE_FRAGMENT
-    }, 
-    args = l_Map_0.new({
-        {
-            "if", 
-            {
-                type = l_GraphQLNonNull_0.new(l_GraphQLBoolean_0), 
-                description = "Included when true."
-            }
-        }
-    })
-});
-local v37 = v23.new({
-    name = "skip", 
-    description = "Directs the executor to skip this field or fragment when the `if` argument is true.", 
-    locations = {
-        l_DirectiveLocation_0.FIELD, 
-        l_DirectiveLocation_0.FRAGMENT_SPREAD, 
-        l_DirectiveLocation_0.INLINE_FRAGMENT
-    }, 
-    args = l_Map_0.new({
-        {
-            "if", 
-            {
-                type = l_GraphQLNonNull_0.new(l_GraphQLBoolean_0), 
-                description = "Skipped when true."
-            }
-        }
-    })
-});
-local v38 = v23.new({
-    name = "deprecated", 
-    description = "Marks an element of a GraphQL schema as no longer supported.", 
-    locations = {
-        l_DirectiveLocation_0.FIELD_DEFINITION, 
-        l_DirectiveLocation_0.ARGUMENT_DEFINITION, 
-        l_DirectiveLocation_0.INPUT_FIELD_DEFINITION, 
-        l_DirectiveLocation_0.ENUM_VALUE
-    }, 
-    args = l_Map_0.new({
-        {
-            "reason", 
-            {
-                type = l_GraphQLString_0, 
-                description = "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).", 
-                defaultValue = "No longer supported"
-            }
-        }
-    })
-});
-local v39 = v23.new({
-    name = "specifiedBy", 
-    description = "Exposes a URL that specifies the behaviour of this scalar.", 
-    locations = {
-        l_DirectiveLocation_0.SCALAR
-    }, 
-    args = l_Map_0.new({
-        {
-            "url", 
-            {
-                type = l_GraphQLNonNull_0.new(l_GraphQLString_0), 
-                description = "The URL that specifies the behaviour of this scalar."
-            }
-        }
-    })
-});
-local v40 = l_Object_0.freeze({
-    v36, 
-    v37, 
-    v38, 
-    v39
-});
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local Map = LuauPolyfill.Map
+local Object = LuauPolyfill.Object
+local coerceToMap = LuauPolyfill.coerceToMap
+
+require(ParentParent.jsutils.ObjMap)
+require(script.Parent.Parent.jsutils.ObjMap)
+
+local inspect = require(script.Parent.Parent.jsutils.inspect).inspect
+local toObjMap = require(script.Parent.Parent.jsutils.toObjMap).toObjMap
+local devAssert = require(script.Parent.Parent.jsutils.devAssert).devAssert
+local instanceOf = require(script.Parent.Parent.jsutils.instanceOf)
+local isObjectLike = require(script.Parent.Parent.jsutils.isObjectLike).isObjectLike
+
+require(script.Parent.Parent.language.ast)
+
+local DirectiveLocation = require(script.Parent.Parent.language.directiveLocation).DirectiveLocation
+local definition = require(script.Parent.definition)
+local scalars = require(script.Parent.scalars)
+local GraphQLString = scalars.GraphQLString
+local GraphQLBoolean = scalars.GraphQLBoolean
+local argsToArgsConfig = definition.argsToArgsConfig
+local GraphQLNonNull = definition.GraphQLNonNull
+local t1 = nil
+
+function isDirective(p1) -- line: 53
+	-- upvalues: instanceOf (copy), t1 (ref)
+	return instanceOf(p1, t1)
+end
+function assertDirective(p2) -- line: 57
+	-- upvalues: Error (copy), inspect (copy)
+	if not isDirective(p2) then
+		error(Error.new(("Expected %s to be a GraphQL directive."):format(inspect(p2))))
+	end
+
+	return p2
+end
+
+t1 = {}
+t1.__index = t1
+
+function t1.new(t2: {[any]: any}) -- line: 87
+	-- upvalues: toObjMap (copy), devAssert (copy), Array (copy), isObjectLike (copy), instanceOf (copy), Map (copy), coerceToMap (copy), t1 (ref)
+	local t3 = {
+		name = t2.name,
+		description = t2.description,
+		locations = t2.locations,
+		isRepeatable = not not t2.isRepeatable,
+		extensions = t2.extensions and toObjMap(t2.extensions),
+		astNode = t2.astNode
+	}
+
+	devAssert(t2.name, "Directive must be named.")
+	devAssert(Array.isArray(t2.locations), ("@%s locations must be an Array."):format(t2.name))
+
+	local v31 = if not t2.args then {} else t2.args
+
+	devAssert(isObjectLike(v31) and not (Array.isArray(v31) and next(v31) ~= nil) or instanceOf(v31, Map), ("@%s args must be an object with argument names as keys."):format(t2.name))
+	t3.args = Array.map(coerceToMap(v31):entries(), function(p3) -- line: 112
+		-- upvalues: toObjMap (copy)
+		local v38 = p3[1]
+		local v39 = p3[2]
+
+		return {
+			name = v38,
+			description = v39.description,
+			type = v39.type,
+			defaultValue = v39.defaultValue,
+			deprecationReason = v39.deprecationReason,
+			extensions = v39.extensions and toObjMap(v39.extensions),
+			astNode = v39.astNode
+		}
+	end)
+
+	return (setmetatable(t3, t1))
+end
+function t1.toConfig(p4) -- line: 129
+	-- upvalues: argsToArgsConfig (copy)
+	return {
+		name = p4.name,
+		description = p4.description,
+		locations = p4.locations,
+		args = argsToArgsConfig(p4.args),
+		isRepeatable = p4.isRepeatable,
+		extensions = p4.extensions,
+		astNode = p4.astNode
+	}
+end
+function t1.__tostring(p5) -- line: 141
+	return p5:toString()
+end
+function t1.toString(p6) -- line: 145
+	return "@" .. p6.name
+end
+function t1.toJSON(p7) -- line: 149
+	return p7:toString()
+end
+
+local v22 = t1.new({
+	name = "include",
+	description = "Directs the executor to include this field or fragment only when the `if` argument is true.",
+	locations = {
+		DirectiveLocation.FIELD,
+		DirectiveLocation.FRAGMENT_SPREAD,
+		DirectiveLocation.INLINE_FRAGMENT
+	},
+	args = Map.new({{
+		"if",
+		{
+			description = "Included when true.",
+			type = GraphQLNonNull.new(GraphQLBoolean)
+		}
+	}})
+})
+local v23 = t1.new({
+	name = "skip",
+	description = "Directs the executor to skip this field or fragment when the `if` argument is true.",
+	locations = {
+		DirectiveLocation.FIELD,
+		DirectiveLocation.FRAGMENT_SPREAD,
+		DirectiveLocation.INLINE_FRAGMENT
+	},
+	args = Map.new({{
+		"if",
+		{
+			description = "Skipped when true.",
+			type = GraphQLNonNull.new(GraphQLBoolean)
+		}
+	}})
+})
+local v24 = t1.new({
+	name = "deprecated",
+	description = "Marks an element of a GraphQL schema as no longer supported.",
+	locations = {
+		DirectiveLocation.FIELD_DEFINITION,
+		DirectiveLocation.ARGUMENT_DEFINITION,
+		DirectiveLocation.INPUT_FIELD_DEFINITION,
+		DirectiveLocation.ENUM_VALUE
+	},
+	args = Map.new({{
+		"reason",
+		{
+			description = "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).",
+			defaultValue = "No longer supported",
+			type = GraphQLString
+		}
+	}})
+})
+local v25 = t1.new({
+	name = "specifiedBy",
+	description = "Exposes a URL that specifies the behaviour of this scalar.",
+	locations = { DirectiveLocation.SCALAR },
+	args = Map.new({{
+		"url",
+		{
+			description = "The URL that specifies the behaviour of this scalar.",
+			type = GraphQLNonNull.new(GraphQLString)
+		}
+	}})
+})
+local v26 = Object.freeze({
+	v22,
+	v23,
+	v24,
+	v25
+})
+
 return {
-    isDirective = isDirective, 
-    assertDirective = assertDirective, 
-    GraphQLDirective = v23, 
-    GraphQLIncludeDirective = v36, 
-    GraphQLSkipDirective = v37, 
-    DEFAULT_DEPRECATION_REASON = "No longer supported", 
-    GraphQLDeprecatedDirective = v38, 
-    GraphQLSpecifiedByDirective = v39, 
-    specifiedDirectives = v40, 
-    isSpecifiedDirective = function(v41) --[[ Line: 277 ]] --[[ Name: isSpecifiedDirective ]]
-        -- upvalues: l_Array_0 (copy), v40 (copy)
-        return l_Array_0.some(v40, function(v42) --[[ Line: 278 ]]
-            -- upvalues: v41 (copy)
-            return v42.name == v41.name;
-        end);
-    end
-};
+	DEFAULT_DEPRECATION_REASON = "No longer supported",
+	isDirective = isDirective,
+	assertDirective = assertDirective,
+	GraphQLDirective = t1,
+	GraphQLIncludeDirective = v22,
+	GraphQLSkipDirective = v23,
+	GraphQLDeprecatedDirective = v24,
+	GraphQLSpecifiedByDirective = v25,
+	specifiedDirectives = v26,
+	isSpecifiedDirective = function(t4: {[any]: any}) -- line: 277
+		-- upvalues: Array (copy), v26 (copy)
+		return Array.some(v26, function(p8) -- line: 278
+			-- upvalues: t4 (copy)
+			return p8.name == t4.name
+		end)
+	end
+}

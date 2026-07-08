@@ -1,53 +1,62 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.UrlBuilder);
-local v4 = require(l_Parent_0.t);
-local v5 = require(l_script_FirstAncestor_0.Logger);
-local v6 = require(l_script_FirstAncestor_0.Models.ScheduledSquadModel);
-local v7 = require(l_script_FirstAncestor_0.Utils.serializeTable);
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_UrlBuilder_0 = v3.UrlBuilder;
-local l_UrlBase_0 = v3.UrlBase;
-local v11 = v4.strictInterface({
-    parentChannelId = v4.string, 
-    title = v4.string, 
-    startTime = v4.string
-});
-local v12 = l_UrlBuilder_0.new({
-    base = l_UrlBase_0.APIS, 
-    path = "group-up/v1/create-scheduled-group-up"
-})();
-return function(v13, v14, v15) --[[ Line: 36 ]]
-    -- upvalues: v11 (copy), l_HttpService_0 (copy), v12 (copy), v6 (copy), v5 (copy), v7 (copy)
-    assert(v11(v13));
-    return l_HttpService_0:RequestInternal({
-        Body = l_HttpService_0:JSONEncode({
-            parentChannelId = v13.parentChannelId, 
-            title = v13.title, 
-            startTime = v13.startTime
-        }), 
-        Headers = {
-            ["Content-Type"] = "application/json", 
-            Accept = "application/json"
-        }, 
-        Method = "POST", 
-        Url = v12
-    }):Start(function(_, v17) --[[ Line: 57 ]]
-        -- upvalues: v14 (copy), v6 (ref), l_HttpService_0 (ref), v5 (ref), v7 (ref), v15 (copy)
-        if v17.StatusCode == 200 then
-            local l_Body_0 = v17.Body;
-            if v14 then
-                v14(v6.format(l_HttpService_0:JSONDecode(l_Body_0)));
-            end;
-            v5:debug("Response: {}", v7(l_Body_0));
-            return v17;
-        else
-            if v15 then
-                v15(v17.StatusCode);
-            end;
-            v5:error("Error creating scheduled squad: {}", v17.StatusMessage);
-            return v17;
-        end;
-    end);
-end;
+local HttpService = game:GetService("HttpService")
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local UrlBuilder = require(SquadsCoreParent.UrlBuilder)
+local t = require(SquadsCoreParent.t)
+local Logger = require(SquadsCore.Logger)
+local ScheduledSquadModel = require(SquadsCore.Models.ScheduledSquadModel)
+local serializeTable = require(SquadsCore.Utils.serializeTable)
+
+require(SquadsCore.Types)
+
+local UrlBuilder2 = UrlBuilder.UrlBuilder
+local UrlBase = UrlBuilder.UrlBase
+local v11 = t.strictInterface({
+	parentChannelId = t.string,
+	title = t.string,
+	startTime = t.string
+})
+local v12 = UrlBuilder2.new({
+	path = "group-up/v1/create-scheduled-group-up",
+	base = UrlBase.APIS
+})()
+
+return function(t1: {[any]: any}, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 36
+	-- upvalues: v11 (copy), HttpService (copy), v12 (copy), ScheduledSquadModel (copy), Logger (copy), serializeTable (copy)
+	assert(v11(t1))
+
+	return HttpService:RequestInternal({
+		Method = "POST",
+		Body = HttpService:JSONEncode({
+			parentChannelId = t1.parentChannelId,
+			title = t1.title,
+			startTime = t1.startTime
+		}),
+		Headers = {
+			["Content-Type"] = "application/json",
+			Accept = "application/json"
+		},
+		Url = v12
+	}):Start(function(_, p4) -- line: 57
+		-- upvalues: p1 (copy), ScheduledSquadModel (copy), HttpService (copy), Logger (copy), serializeTable (copy), p2 (copy)
+		if p4.StatusCode == 200 then
+			local Body = p4.Body
+
+			if p1 then
+				p1(ScheduledSquadModel.format(HttpService:JSONDecode(Body)))
+			end
+
+			Logger:debug("Response: {}", serializeTable(Body))
+
+			return p4
+		end
+
+		if p2 then
+			p2(p4.StatusCode)
+		end
+
+		Logger:error("Error creating scheduled squad: {}", p4.StatusMessage)
+
+		return p4
+	end)
+end

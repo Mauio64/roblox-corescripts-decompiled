@@ -1,4 +1,4 @@
 return {
-    EditProfileBackgroundOpened = "EditProfileBackgroundOpened", 
-    BackgroundSelected = "BackgroundSelected"
-};
+	EditProfileBackgroundOpened = "EditProfileBackgroundOpened",
+	BackgroundSelected = "BackgroundSelected"
+}

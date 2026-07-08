@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableCommunityProfileLoadingSkeletons", false);
+return game:DefineFastFlag("EnableCommunityProfileLoadingSkeletons", false)

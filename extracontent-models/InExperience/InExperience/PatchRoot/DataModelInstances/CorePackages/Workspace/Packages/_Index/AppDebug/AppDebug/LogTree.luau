@@ -1,132 +1,149 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppDebug");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.Lumberyak);
-local l_Levels_0 = v3.Logger.Levels;
-local v5 = require(l_script_FirstAncestor_0.SharedSink);
-local v6 = v3.Logger.new(nil, "root");
-local v7 = tick();
-local v8 = {
-    ["*"] = v6
-};
-v6:setContext({
-    tostring = function(v9) --[[ Line: 46 ]] --[[ Name: argToString ]]
-        -- upvalues: v2 (copy)
-        if typeof(v9) == "string" then
-            return v9;
-        else
-            local v10 = getmetatable(v9);
-            if v10 and v10.__tostring then
-                return (tostring(v9));
-            else
-                return v2.pretty(v9);
-            end;
-        end;
-    end
-});
-local function _(v11, v12) --[[ Line: 63 ]] --[[ Name: newLogger ]]
-    -- upvalues: v3 (copy), v8 (copy)
-    local v13 = v3.Logger.new(v11, v12);
-    v8[v12] = v13;
-    return v13;
-end;
-local function v25(v15) --[[ Line: 69 ]] --[[ Name: createLoggerTree ]]
-    -- upvalues: v6 (copy), v8 (copy), v3 (copy)
-    local v16 = v15:split(".");
-    local v17 = "";
-    local l_v6_0 = v6;
-    for v19, v20 in v16 do
-        if v20 == "" then
-            error("Invalid log tag: " .. v15);
-        end;
-        if v19 == 1 then
-            v17 = v20;
-        else
-            v17 = v17 .. "." .. v20;
-        end;
-        local v21 = v8[v17];
-        if not v21 then
-            local l_l_v6_0_0 = l_v6_0;
-            local l_v17_0 = v17;
-            local v24 = v3.Logger.new(l_l_v6_0_0, l_v17_0);
-            v8[l_v17_0] = v24;
-            v21 = v24;
-        end;
-        l_v6_0 = v21;
-    end;
-    return l_v6_0;
-end;
-local function v27(v26) --[[ Line: 88 ]] --[[ Name: logger ]]
-    -- upvalues: v8 (copy), v25 (copy)
-    return v8[v26] or v25(v26);
-end;
-local function _(v28) --[[ Line: 92 ]] --[[ Name: parseTag ]]
-    -- upvalues: v2 (copy), l_Levels_0 (copy)
-    local v29 = v28:split(":");
-    if #v29 ~= 2 then
-        warn("Invalid LogTree value: " .. v28);
-        return nil, nil;
-    else
-        local v30, v31 = table.unpack(v29);
-        return v2.trim(v30), l_Levels_0.fromString(v31);
-    end;
-end;
-local function v39(v33, v34, v35) --[[ Line: 103 ]] --[[ Name: formatLog ]]
-    -- upvalues: v7 (copy)
-    local l_level_0 = v34.level;
-    local v37 = string.format("%s [%s] %s", l_level_0:sub(1, 1), v34.loggerName, v33);
-    if v35 then
-        local v38 = tick() - v7;
-        v37 = string.format("[%0.3f] %s", v38, v37);
-    end;
-    return v37;
-end;
-local function v46(_, v41, v42) --[[ Line: 113 ]] --[[ Name: logToConsole ]]
-    -- upvalues: l_Levels_0 (copy)
-    local l_level_1 = v42.level;
-    local l_level_2 = v42.level;
-    local v45 = string.format("%s [%s] %s", l_level_2:sub(1, 1), v42.loggerName, v41);
-    if l_level_1 == l_Levels_0.Error or l_level_1 == l_Levels_0.Warning then
-        warn(v45);
-        return;
-    else
-        print(v45);
-        return;
-    end;
-end;
-local function _(v47) --[[ Line: 123 ]] --[[ Name: splitNonEmpty ]]
-    -- upvalues: v2 (copy)
-    local v48 = v2.splitOn(v47, "%s+");
-    return v2.filter(v48, function(v49) --[[ Line: 125 ]]
-        return #v49 > 0;
-    end);
-end;
+local AppDebug = script:FindFirstAncestor("AppDebug")
+local AppDebugParent = AppDebug.Parent
+local Dash = require(AppDebugParent.Dash)
+local Lumberyak = require(AppDebugParent.Lumberyak)
+local Levels = Lumberyak.Logger.Levels
+local SharedSink = require(AppDebug.SharedSink)
+local v7 = Lumberyak.Logger.new(nil, "root")
+local timestamp = tick()
+local t1 = {
+	["*"] = v7
+}
+
+local function argToString(p1) -- line: 46
+	-- upvalues: Dash (copy)
+	if typeof(p1) == "string" then
+		return p1
+	end
+
+	local mt = getmetatable(p1)
+
+	if mt and mt.__tostring then
+		return (tostring(p1))
+	end
+
+	return Dash.pretty(p1)
+end
+
+v7:setContext({
+	tostring = argToString
+})
+
+local function newLogger(p2, p3) -- line: 63
+	-- upvalues: Lumberyak (copy), t1 (copy)
+	local v19 = Lumberyak.Logger.new(p2, p3)
+
+	t1[p3] = v19
+
+	return v19
+end
+local function createLoggerTree(s1: string) -- line: 69
+	-- upvalues: v7 (copy), t1 (copy), Lumberyak (copy)
+	local parts = s1:split(".")
+	local s2 = ""
+	local v23 = v7
+
+	for v24, v25 in parts do
+		if v25 == "" then
+			error("Invalid log tag: " .. s1)
+		end
+
+		s2 = if v24 ~= 1 then s2 .. "." .. v25 else v25
+
+		local v26 = t1[s2]
+
+		if not v26 then
+			v26 = Lumberyak.Logger.new(v23, s2)
+			t1[s2] = v26
+		end
+
+		v23 = v26
+	end
+
+	return v23
+end
+local function parseTag(s3: string) -- line: 92
+	-- upvalues: Dash (copy), Levels (copy)
+	local parts = s3:split(":")
+
+	if #parts ~= 2 then
+		warn("Invalid LogTree value: " .. s3)
+
+		return nil, nil
+	end
+
+	local v30, v31 = table.unpack(parts)
+
+	return Dash.trim(v30), Levels.fromString(v31)
+end
+local function splitNonEmpty(s4: string) -- line: 123
+	-- upvalues: Dash (copy)
+	local v45 = Dash.splitOn(s4, "%s+")
+
+	return Dash.filter(v45, function(p4) -- line: 125
+		return #p4 > 0
+	end)
+end
+
 return {
-    logger = v27, 
-    formatLog = v39, 
-    logToConsole = v46, 
-    setLogTags = function(v51, v52) --[[ Line: 130 ]] --[[ Name: setLogTags ]]
-        -- upvalues: v5 (copy), v2 (copy), l_Levels_0 (copy), v8 (copy), v25 (copy)
-        local v53 = v5.new(v52);
-        local v54 = v2.splitOn(v51, "%s+");
-        for _, v57 in (v2.filter(v54, function(v55) --[[ Line: 125 ]]
-            return #v55 > 0;
-        end)) do
-            local v58 = v57:split(":");
-            local v59, v60;
-            if #v58 ~= 2 then
-                warn("Invalid LogTree value: " .. v57);
-                v59 = nil;
-                v60 = nil;
-            else
-                local v61, v62 = table.unpack(v58);
-                v59 = v2.trim(v61);
-                v60 = l_Levels_0.fromString(v62);
-            end;
-            if v59 ~= nil then
-                local v63 = tostring(v59);
-                (v8[v63] or v25(v63)):addSink((v53:newSink(v60)));
-            end;
-        end;
-    end
-};
+	logger = function(s5: string) -- line: 88
+		-- upvalues: t1 (copy), createLoggerTree (copy)
+		return t1[s5] or createLoggerTree(s5)
+	end,
+	formatLog = function(p5, p6, p7) -- line: 103
+		-- upvalues: timestamp (copy)
+		local level = p6.level
+		local v36 = string.format("%s [%s] %s", level:sub(1, 1), p6.loggerName, p5)
+
+		if p7 then
+			local v37 = tick() - timestamp
+
+			v36 = string.format("[%0.3f] %s", v37, v36)
+		end
+
+		return v36
+	end,
+	logToConsole = function(_, p9, p10) -- line: 113
+		-- upvalues: Levels (copy)
+		local level = p10.level
+		local level2 = p10.level
+		local v43 = string.format("%s [%s] %s", level2:sub(1, 1), p10.loggerName, p9)
+
+		if level == Levels.Error or level == Levels.Warning then
+			warn(v43)
+
+			return
+		end
+
+		print(v43)
+	end,
+	setLogTags = function(s6: string, p11) -- line: 130
+		-- upvalues: SharedSink (copy), Dash (copy), Levels (copy), t1 (copy), createLoggerTree (copy)
+		local v48 = SharedSink.new(p11)
+		local v49 = Dash.splitOn(s6, "%s+")
+
+		for _, v51 in (Dash.filter(v49, function(p12) -- line: 125
+			return #p12 > 0
+		end)) do
+			local parts = v51:split(":")
+			local v53, v54
+
+			if #parts ~= 2 then
+				warn("Invalid LogTree value: " .. v51)
+				v53 = nil
+				v54 = nil
+			else
+				local v55, v56 = table.unpack(parts)
+
+				v53 = Dash.trim(v55)
+				v54 = Levels.fromString(v56)
+			end
+
+			if v53 ~= nil then
+				local str = tostring(v53);
+
+				(t1[str] or createLoggerTree(str)):addSink((v48:newSink(v54)))
+			end
+		end
+	end
+}

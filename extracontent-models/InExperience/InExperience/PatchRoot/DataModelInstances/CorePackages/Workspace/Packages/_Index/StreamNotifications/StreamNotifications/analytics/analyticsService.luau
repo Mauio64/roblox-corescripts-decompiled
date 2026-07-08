@@ -1,7 +1,8 @@
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("StreamNotifications");
+local EventIngestService = game:GetService("EventIngestService")
+local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
+
 return {
-    EventStream = {
-        sendEventDeferred = require(l_script_FirstAncestor_0.analytics.sendEventDeferred)(l_EventIngestService_0)
-    }
-};
+	EventStream = {
+		sendEventDeferred = require(StreamNotifications.analytics.sendEventDeferred)(EventIngestService)
+	}
+}

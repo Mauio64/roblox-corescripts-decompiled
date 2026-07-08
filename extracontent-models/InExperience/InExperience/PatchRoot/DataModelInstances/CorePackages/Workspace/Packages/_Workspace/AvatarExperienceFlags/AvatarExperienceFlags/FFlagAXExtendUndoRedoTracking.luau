@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXExtendUndoRedoTracking", false);
+return game:DefineFastFlag("AXExtendUndoRedoTracking", false)

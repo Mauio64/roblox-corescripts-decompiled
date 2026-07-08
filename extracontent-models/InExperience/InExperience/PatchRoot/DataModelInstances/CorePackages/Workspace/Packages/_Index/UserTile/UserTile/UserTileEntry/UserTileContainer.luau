@@ -1,42 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.DataHydration);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v7 = require(l_Parent_0.Signals);
-local v8 = require(l_script_FirstAncestor_0.Components.UserTile);
-local _ = require(script.Parent.Parent.Enums.LayoutMode);
-local v10 = game:DefineFastFlag("TCIndicatorHydration", false);
-local v11 = if v10 then v5.TrustedConnections.TrustedConnectionsStore.get() else nil;
-return function(v12) --[[ Line: 48 ]] --[[ Name: UserTileContainer ]]
-    -- upvalues: v10 (copy), v2 (copy), v7 (copy), v11 (copy), l_useSignalState_0 (copy), v4 (copy), v8 (copy)
-    local v13 = nil;
-    if v10 then
-        local v15 = v2.useMemo(function() --[[ Line: 51 ]]
-            -- upvalues: v7 (ref), v12 (copy), v11 (ref)
-            return v7.createComputed(function(v14) --[[ Line: 52 ]]
-                -- upvalues: v12 (ref), v11 (ref)
-                if v12.userId and v12.userId ~= "" then
-                    return (v11.getIsTrustedConnection(v12.userId).data(v14));
-                else
-                    return nil;
-                end;
-            end);
-        end, {
-            v12.userId
-        });
-        v13 = l_useSignalState_0(v15);
-    end;
-    local v16 = if v10 then v2.useMemo(function() --[[ Line: 64 ]]
-        -- upvalues: v4 (ref), v12 (copy), v13 (ref)
-        return v4.Dictionary.join(v12 or {}, {
-            isTrustedConnection = v13
-        });
-    end, {
-        v12, 
-        v13
-    }) else table.clone(v12);
-    return v2.createElement(v8, v16);
-end;
+local UserTile = script:FindFirstAncestor("UserTile")
+local UserTileParent = UserTile.Parent
+local React = require(UserTileParent.React)
+
+require(UserTileParent.Foundation)
+
+local Cryo = require(UserTileParent.Cryo)
+local DataHydration = require(UserTileParent.DataHydration)
+local useSignalState = require(UserTileParent.SignalsReact).useSignalState
+local Signals = require(UserTileParent.Signals)
+local UserTile2 = require(UserTile.Components.UserTile)
+
+require(script.Parent.Parent.Enums.LayoutMode)
+
+local v9 = game:DefineFastFlag("TCIndicatorHydration", false)
+local v10 = if not v9 then nil else DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+
+local function UserTileContainer(t1: {[any]: any}) -- line: 46
+	-- upvalues: v9 (copy), React (copy), Signals (copy), v10 (copy), useSignalState (copy), Cryo (copy), UserTile2 (copy)
+	local u13 = nil
+
+	if v9 then
+		local v14 = React.useMemo(function() -- line: 49
+			-- upvalues: Signals (copy), t1 (copy), v10 (copy)
+			return Signals.createComputed(function(p1) -- line: 50
+				-- upvalues: t1 (copy), v10 (copy)
+				if t1.userId and t1.userId ~= "" then
+					return (v10.getIsTrustedConnection(t1.userId).data(p1))
+				end
+
+				return nil
+			end)
+		end, { t1.userId })
+
+		u13 = useSignalState(v14)
+	end
+
+	local v15 = if not v9 then table.clone(t1) else React.useMemo(function() -- line: 62
+		-- upvalues: Cryo (copy), t1 (copy), u13 (ref)
+		return Cryo.Dictionary.join(t1 or {}, {
+			isTrustedConnection = u13
+		})
+	end, {
+		t1,
+		u13
+	})
+
+	return React.createElement(UserTile2, v15)
+end
+
+return UserTileContainer

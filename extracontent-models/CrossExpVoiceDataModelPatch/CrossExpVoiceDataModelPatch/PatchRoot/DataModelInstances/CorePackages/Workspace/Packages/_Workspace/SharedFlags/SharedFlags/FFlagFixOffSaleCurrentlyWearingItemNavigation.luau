@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixOffSaleCurrentlyWearingItemNavigation", false);
+return game:DefineFastFlag("FixOffSaleCurrentlyWearingItemNavigation", false)

@@ -1,79 +1,84 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Groups");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Dev.ReactRoblox);
-local v4 = require(l_Parent_0.UIBlox);
-local v5 = require(l_Parent_0.Dev.Rodux);
-local v6 = require(l_Parent_0.Dev.RoactRodux);
-local l_DesignTokenProvider_0 = require(l_Parent_0.Style).DesignTokenProvider;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_FoundationProvider_0 = require(l_Parent_0.Foundation).FoundationProvider;
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-v4.init(require(l_Parent_0.Dev.RobloxAppUIBloxConfig));
-local l_AppStyleProvider_0 = v4.App.Style.AppStyleProvider;
-local function v13() --[[ Line: 27 ]] --[[ Name: createStore ]]
-    -- upvalues: v5 (copy)
-    local v12 = v5.createReducer({}, {});
-    return v5.Store.new(v12, nil, {
-        v5.thunkMiddleware
-    });
-end;
-local v14 = {
-    Default = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
-local v17 = {
-    Format = function(_, v16) --[[ Line: 48 ]] --[[ Name: Format ]]
-        return v16;
-    end, 
-    GetLocale = function() --[[ Line: 51 ]] --[[ Name: GetLocale ]]
-        return "en-us";
-    end, 
-    changed = l_Signal_0.new()
-};
+local Groups = script:FindFirstAncestor("Groups")
+local GroupsParent = Groups.Parent
+local React = require(GroupsParent.React)
+local ReactRoblox = require(GroupsParent.Dev.ReactRoblox)
+local UIBlox = require(GroupsParent.UIBlox)
+local Rodux = require(GroupsParent.Dev.Rodux)
+local RoactRodux = require(GroupsParent.Dev.RoactRodux)
+local DesignTokenProvider = require(GroupsParent.Style).DesignTokenProvider
+local LocalizationProvider = require(GroupsParent.Localization).LocalizationProvider
+local FoundationProvider = require(GroupsParent.Foundation).FoundationProvider
+local Signal = require(GroupsParent.AppCommonLib).Signal
+
+UIBlox.init(require(GroupsParent.Dev.RobloxAppUIBloxConfig))
+
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+
+local function createStore() -- line: 27
+	-- upvalues: Rodux (copy)
+	local v16 = Rodux.createReducer({}, {})
+
+	return Rodux.Store.new(v16, nil, { Rodux.thunkMiddleware })
+end
+
+local t1 = {
+	Default = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+local t2 = {
+	Format = function(_, s1: string) -- line: 48
+		return s1
+	end,
+	GetLocale = function() -- line: 51
+		return "en-us"
+	end,
+	changed = Signal.new()
+}
+
 return {
-    name = l_script_FirstAncestor_0 and l_script_FirstAncestor_0.Name or "Groups", 
-    storyRoot = l_script_FirstAncestor_0, 
-    roact = v2, 
-    reactRoblox = v3, 
-    mapStory = function(v18) --[[ Line: 62 ]] --[[ Name: mapStory ]]
-        -- upvalues: v14 (copy), v2 (copy), l_LocalizationProvider_0 (copy), v17 (copy), l_FoundationProvider_0 (copy), l_AppStyleProvider_0 (copy), v6 (copy), v13 (copy), l_DesignTokenProvider_0 (copy)
-        return function(v19) --[[ Line: 63 ]]
-            -- upvalues: v14 (ref), v2 (ref), l_LocalizationProvider_0 (ref), v17 (ref), l_FoundationProvider_0 (ref), l_AppStyleProvider_0 (ref), v6 (ref), v13 (ref), l_DesignTokenProvider_0 (ref), v18 (copy)
-            local v20 = v19 and v14[v19.theme] or v14.Default;
-            local l_themeName_0 = v20.themeName;
-            return v2.createElement(l_LocalizationProvider_0, {
-                localization = v17
-            }, {
-                FoundationProvider = v2.createElement(l_FoundationProvider_0, {
-                    device = "Desktop", 
-                    theme = l_themeName_0
-                }, {
-                    AppStyleProvider = v2.createElement(l_AppStyleProvider_0, {
-                        style = v20
-                    }, {
-                        StoreProvider = v2.createElement(v6.StoreProvider, {
-                            store = v13()
-                        }, {
-                            DesignTokenProvider = v2.createElement(l_DesignTokenProvider_0, {
-                                tokenMappers = {}
-                            }, {
-                                Child = v2.createElement(v18, v19)
-                            })
-                        })
-                    })
-                })
-            });
-        end;
-    end
-};
+	name = Groups and Groups.Name or "Groups",
+	storyRoot = Groups,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = function(p2) -- line: 62
+		-- upvalues: t1 (copy), React (copy), LocalizationProvider (copy), t2 (copy), FoundationProvider (copy), AppStyleProvider (copy), RoactRodux (copy), createStore (copy), DesignTokenProvider (copy)
+		return function(p3) -- line: 63
+			-- upvalues: t1 (copy), React (copy), LocalizationProvider (copy), t2 (copy), FoundationProvider (copy), AppStyleProvider (copy), RoactRodux (copy), createStore (copy), DesignTokenProvider (copy), p2 (copy)
+			local v21 = p3 and t1[p3.theme] or t1.Default
+			local themeName = v21.themeName
+
+			return React.createElement(LocalizationProvider, {
+				localization = t2
+			}, {
+				FoundationProvider = React.createElement(FoundationProvider, {
+					device = "Desktop",
+					theme = themeName
+				}, {
+					AppStyleProvider = React.createElement(AppStyleProvider, {
+						style = v21
+					}, {
+						StoreProvider = React.createElement(RoactRodux.StoreProvider, {
+							store = createStore()
+						}, {
+							DesignTokenProvider = React.createElement(DesignTokenProvider, {
+								tokenMappers = {}
+							}, {
+								Child = React.createElement(p2, p3)
+							})
+						})
+					})
+				})
+			})
+		end
+	end
+}

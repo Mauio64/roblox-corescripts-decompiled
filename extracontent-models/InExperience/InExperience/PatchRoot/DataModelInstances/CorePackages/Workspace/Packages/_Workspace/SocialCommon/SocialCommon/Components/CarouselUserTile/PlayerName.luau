@@ -1,40 +1,42 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.UIBlox);
-local l_StyledTextLabel_0 = v3.App.Text.StyledTextLabel;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-local v7 = require(script.Parent.Constants);
-local l_FFlagHomepagePYMKPresence_0 = require(l_Parent_0.SharedFlags).FFlagHomepagePYMKPresence;
-local v9 = {
-    width = v7.TILE_SIZE
-};
-return function(v10) --[[ Line: 27 ]]
-    -- upvalues: v2 (copy), v9 (copy), l_useStyle_0 (copy), v1 (copy), l_Text_0 (copy), l_StyledTextLabel_0 (copy), l_FFlagHomepagePYMKPresence_0 (copy)
-    local v11 = v2.Dictionary.join(v9, v10);
-    local v12 = l_useStyle_0();
-    local l_Theme_0 = v12.Theme;
-    local l_Font_0 = v12.Font;
-    local v15 = v1.useMemo(function() --[[ Line: 34 ]]
-        -- upvalues: l_Text_0 (ref), v11 (copy), l_Font_0 (copy)
-        return l_Text_0.GetTextHeight(v11.name, l_Font_0.CaptionHeader.Font, l_Font_0.BaseSize * l_Font_0.CaptionHeader.RelativeSize, 10000);
-    end, {
-        v11.name, 
-        l_Font_0.CaptionHeader.Font, 
-        l_Font_0.BaseSize * l_Font_0.CaptionHeader.RelativeSize
-    });
-    return v1.createElement(l_StyledTextLabel_0, {
-        layoutOrder = v11.layoutOrder, 
-        text = v11.name, 
-        fontStyle = l_Font_0.CaptionHeader, 
-        colorStyle = l_Theme_0.TextEmphasis, 
-        size = UDim2.fromOffset(v11.width, v15), 
-        textTruncate = Enum.TextTruncate.AtEnd, 
-        textXAlignment = Enum.TextXAlignment.Left, 
-        textYAlignment = Enum.TextYAlignment.Center, 
-        lineHeight = 1, 
-        fluidSizing = false, 
-        richText = l_FFlagHomepagePYMKPresence_0 and true or false
-    });
-end;
+local Parent = script:FindFirstAncestor("SocialCommon").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local UIBlox = require(Parent.UIBlox)
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local useStyle = UIBlox.Core.Style.useStyle
+local Text = require(Parent.AppCommonLib).Text
+local Constants = require(script.Parent.Constants)
+local FFlagHomepagePYMKPresence = require(Parent.SharedFlags).FFlagHomepagePYMKPresence
+local t1 = {
+	width = Constants.TILE_SIZE
+}
+
+return function(t2: {[any]: any}) -- line: 27
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), React (copy), Text (copy), StyledTextLabel (copy), FFlagHomepagePYMKPresence (copy)
+	local v12 = Cryo.Dictionary.join(t1, t2)
+	local v13 = useStyle()
+	local Theme = v13.Theme
+	local Font = v13.Font
+	local v16 = React.useMemo(function() -- line: 34
+		-- upvalues: Text (copy), v12 (copy), Font (copy)
+		return Text.GetTextHeight(v12.name, Font.CaptionHeader.Font, Font.BaseSize * Font.CaptionHeader.RelativeSize, 10000)
+	end, {
+		v12.name,
+		Font.CaptionHeader.Font,
+		Font.BaseSize * Font.CaptionHeader.RelativeSize
+	})
+
+	return React.createElement(StyledTextLabel, {
+		lineHeight = 1,
+		fluidSizing = false,
+		layoutOrder = v12.layoutOrder,
+		text = v12.name,
+		fontStyle = Font.CaptionHeader,
+		colorStyle = Theme.TextEmphasis,
+		size = UDim2.fromOffset(v12.width, v16),
+		textTruncate = Enum.TextTruncate.AtEnd,
+		textXAlignment = Enum.TextXAlignment.Left,
+		textYAlignment = Enum.TextYAlignment.Center,
+		richText = not not FFlagHomepagePYMKPresence
+	})
+end

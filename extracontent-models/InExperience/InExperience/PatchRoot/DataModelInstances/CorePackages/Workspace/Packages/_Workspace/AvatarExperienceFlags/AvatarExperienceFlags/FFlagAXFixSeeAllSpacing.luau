@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixSeeAllSpacing", false);
+return game:DefineFastFlag("AXFixSeeAllSpacing", false)

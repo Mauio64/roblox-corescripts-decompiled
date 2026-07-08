@@ -1,242 +1,283 @@
-local _ = require(script.Parent.AppLaunchTrackerTypes);
-local v1 = {
-    __className = "Devtools"
-};
-v1.__index = v1;
-local function _() --[[ Line: 43 ]] --[[ Name: createTable ]]
-    return (table.create(100));
-end;
-v1.new = function(v3, v4, v5) --[[ Line: 48 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy)
-    return (setmetatable({
-        reportTopAction = v3, 
-        reportTopThunk = v4, 
-        startImmediately = v5, 
-        shouldTrack = false, 
-        flushCount = 0, 
-        totalFlushTimeMs = 0, 
-        reduceCount = 0, 
-        totalReduceTimeMs = 0, 
-        maxListenerCount = 0, 
-        totalThunkTimeMs = 0, 
-        thunkCount = 0, 
-        actionCounts = if v3 then table.create(100) else nil, 
-        actionTotalTimes = if v3 then table.create(100) else nil, 
-        thunkCounts = if v4 then table.create(100) else nil, 
-        thunkTotalTimes = if v4 then table.create(100) else nil
-    }, v1));
-end;
-v1._hookIntoStore = function(v6, v7) --[[ Line: 80 ]] --[[ Name: _hookIntoStore ]]
-    v6.store = v7;
-    v6.originalReducer = v7._reducer;
-    v6.originalFlushHandler = v7._flushHandler;
-    if v6.startImmediately then
-        v6:startTracking();
-    end;
-end;
-v1.trackingReducer = function(v8, v9, v10) --[[ Line: 90 ]] --[[ Name: trackingReducer ]]
-    assert(v8.originalReducer, "self.originalReducer must exist");
-    local v11 = os.clock();
-    local v12 = v8.originalReducer(v9, v10);
-    local v13 = (os.clock() - v11) * 1000;
-    v8.totalReduceTimeMs = v8.totalReduceTimeMs + v13;
-    v8.reduceCount = v8.reduceCount + 1;
-    if v8.reportTopAction and v8.actionCounts and v8.actionTotalTimes then
-        local v14 = v10.type or tostring(v10);
-        if v14 then
-            local v15 = (v8.actionCounts[v14] or 0) + 1;
-            v8.actionCounts[v14] = v15;
-            local v16 = (v8.actionTotalTimes[v14] or 0) + v13;
-            v8.actionTotalTimes[v14] = v16;
-        end;
-    end;
-    return v12;
-end;
-v1.trackingFlush = function(v17, ...) --[[ Line: 115 ]] --[[ Name: trackingFlush ]]
-    local v18 = os.clock();
-    v17.originalFlushHandler(...);
-    local v19 = (os.clock() - v18) * 1000;
-    v17.totalFlushTimeMs = v17.totalFlushTimeMs + v19;
-    v17.flushCount = v17.flushCount + 1;
-    local v20 = #v17.store.changed._listeners;
-    if v17.maxListenerCount < v20 then
-        v17.maxListenerCount = v20;
-    end;
-end;
-v1.startTracking = function(v21) --[[ Line: 130 ]] --[[ Name: startTracking ]]
-    v21.store._flushHandler = function(...) --[[ Line: 131 ]]
-        -- upvalues: v21 (copy)
-        return v21:trackingFlush(...);
-    end;
-    v21.store._reducer = function(...) --[[ Line: 134 ]]
-        -- upvalues: v21 (copy)
-        return v21:trackingReducer(...);
-    end;
-    v21.shouldTrack = true;
-end;
-v1.stopTracking = function(v22) --[[ Line: 140 ]] --[[ Name: stopTracking ]]
-    if v22.shouldTrack then
-        v22.shouldTrack = false;
-        v22.store._flushHandler = v22.originalFlushHandler;
-        v22.store._reducer = v22.originalReducer;
-    end;
-end;
-v1.clear = function(v23) --[[ Line: 148 ]] --[[ Name: clear ]]
-    v23.flushCount = 0;
-    v23.totalFlushTimeMs = 0;
-    v23.reduceCount = 0;
-    v23.totalReduceTimeMs = 0;
-    v23.maxListenerCount = 0;
-    v23.totalThunkTimeMs = 0;
-    v23.thunkCount = 0;
-    if v23.reportTopAction then
-        v23.actionCounts = table.create(100);
-        v23.actionTotalTimes = table.create(100);
-    end;
-    if v23.reportTopThunk then
-        v23.thunkCounts = table.create(100);
-        v23.thunkTotalTimes = table.create(100);
-    end;
-end;
-local function v28(v24) --[[ Line: 167 ]] --[[ Name: getRelevantLineFromTrace ]]
-    local v25 = string.split(v24, "\n");
-    for v26 = 3, #v25 do
-        local v27 = v25[v26];
-        if not string.find(v27, "AppLaunchTracker") and not string.find(v27, "_Index.Rodux") and not string.find(v27, "_Index.RoactRodux") and not string.find(v27, "_Index.Promise") and not string.find(v27, ".RoactRodux") then
-            return v27;
-        end;
-    end;
-    return nil;
-end;
-local function _(v29) --[[ Line: 184 ]] --[[ Name: getThunkName ]]
-    -- upvalues: v28 (copy)
-    local v30 = v28(debug.traceback());
-    if v30 then
-        return v30;
-    else
-        return debug.info(v29, "slf");
-    end;
-end;
-v1.makeThunkMiddleware = function(v32, v33) --[[ Line: 192 ]] --[[ Name: makeThunkMiddleware ]]
-    -- upvalues: v28 (copy)
-    local function v35(v34) --[[ Line: 193 ]] --[[ Name: tracebackReporter ]]
-        return debug.traceback(v34);
-    end;
-    return function(v36, v37) --[[ Line: 196 ]] --[[ Name: thunkMiddleware ]]
-        -- upvalues: v32 (copy), v33 (copy), v28 (ref), v35 (copy)
-        return function(v38) --[[ Line: 197 ]]
-            -- upvalues: v32 (ref), v37 (copy), v33 (ref), v28 (ref), v35 (ref), v36 (copy)
-            if typeof(v38) == "function" then
-                local v45, v46 = xpcall(function() --[[ Line: 199 ]]
-                    -- upvalues: v32 (ref), v38 (copy), v37 (ref), v33 (ref), v28 (ref)
-                    if v32.shouldTrack then
-                        local v39 = os.clock();
-                        local v40 = v38(v37, v33);
-                        local v41 = (os.clock() - v39) * 1000;
-                        local l_v32_0 = v32;
-                        l_v32_0.totalThunkTimeMs = l_v32_0.totalThunkTimeMs + v41;
-                        l_v32_0 = v32;
-                        l_v32_0.thunkCount = l_v32_0.thunkCount + 1;
-                        if v32.reportTopThunk and v32.thunkCounts and v32.thunkTotalTimes then
-                            local l_v38_0 = v38;
-                            l_v32_0 = v28(debug.traceback()) or debug.info(l_v38_0, "slf");
-                            l_v38_0 = (v32.thunkCounts[l_v32_0] or 0) + 1;
-                            v32.thunkCounts[l_v32_0] = l_v38_0;
-                            local v44 = (v32.thunkTotalTimes[l_v32_0] or 0) + v41;
-                            v32.thunkTotalTimes[l_v32_0] = v44;
-                        end;
-                        return v40;
-                    else
-                        return v38(v37, v33);
-                    end;
-                end, v35);
-                if not v45 then
-                    v37._errorReporter.reportReducerError(v37:getState(), v38, {
-                        message = "Caught error in thunk", 
-                        thrownValue = v46
-                    });
-                    return nil;
-                else
-                    return v46;
-                end;
-            else
-                return v36(v38);
-            end;
-        end;
-    end;
-end;
-local function _(v47) --[[ Line: 243 ]] --[[ Name: getTopValue ]]
-    local v48 = nil;
-    local v49 = nil;
-    for v50, v51 in v47 do
-        if (v48 or -1) < v51 then
-            v48 = v51;
-            v49 = v50;
-        end;
-    end;
-    return v49, v48;
-end;
-local function _(v53) --[[ Line: 255 ]] --[[ Name: fixThunkName ]]
-    return v53:gsub("CoreGui.RobloxGui.Modules.", ""):gsub("CorePackages.Workspace.Packages._Workspace.", "");
-end;
-v1.getStats = function(v55) --[[ Line: 259 ]] --[[ Name: getStats ]]
-    local v56 = nil;
-    local v57 = nil;
-    local v58 = nil;
-    local v59 = nil;
-    local v60 = nil;
-    local v61 = nil;
-    if v55.reportTopAction and v55.actionCounts and v55.actionTotalTimes then
-        local l_actionTotalTimes_0 = v55.actionTotalTimes;
-        local v63 = nil;
-        local v64 = nil;
-        for v65, v66 in l_actionTotalTimes_0 do
-            if (v63 or -1) < v66 then
-                v63 = v66;
-                v64 = v65;
-            end;
-        end;
-        local l_v64_0 = v64;
-        local l_v63_0 = v63;
-        v56 = l_v64_0;
-        v57 = l_v63_0;
-        if v56 then
-            v58 = v55.actionCounts[v56];
-        end;
-    end;
-    if v55.reportTopThunk and v55.thunkCounts and v55.thunkTotalTimes then
-        local l_thunkTotalTimes_0 = v55.thunkTotalTimes;
-        local v70 = nil;
-        local v71 = nil;
-        for v72, v73 in l_thunkTotalTimes_0 do
-            if (v70 or -1) < v73 then
-                v70 = v73;
-                v71 = v72;
-            end;
-        end;
-        local l_v71_0 = v71;
-        local l_v70_0 = v70;
-        v59 = l_v71_0;
-        v60 = l_v70_0;
-        if v59 then
-            v61 = v55.thunkCounts[v59];
-            v59 = v59:gsub("CoreGui.RobloxGui.Modules.", ""):gsub("CorePackages.Workspace.Packages._Workspace.", "");
-        end;
-    end;
-    return {
-        flushCount = v55.flushCount, 
-        totalFlushTimeMs = v55.totalFlushTimeMs, 
-        reduceCount = v55.reduceCount, 
-        totalReduceTimeMs = v55.totalReduceTimeMs, 
-        maxListenerCount = v55.maxListenerCount, 
-        totalThunkTimeMs = v55.totalThunkTimeMs, 
-        thunkCount = v55.thunkCount, 
-        topActionName = v56, 
-        topActionDurationMs = v57, 
-        topActionCount = v58, 
-        topThunkName = v59, 
-        topThunkDurationMs = v60, 
-        topThunkCount = v61
-    };
-end;
-return v1;
+require(script.Parent.AppLaunchTrackerTypes)
+
+local t1 = {
+	__className = "Devtools"
+}
+
+t1.__index = t1
+
+local function createTable() -- line: 43
+	return (table.create(100))
+end
+
+function t1.new(b1: boolean, b2: boolean, b3: boolean?) -- line: 48
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		shouldTrack = false,
+		flushCount = 0,
+		totalFlushTimeMs = 0,
+		reduceCount = 0,
+		totalReduceTimeMs = 0,
+		maxListenerCount = 0,
+		totalThunkTimeMs = 0,
+		thunkCount = 0,
+		reportTopAction = b1,
+		reportTopThunk = b2,
+		startImmediately = b3,
+		actionCounts = if not b1 then nil else table.create(100),
+		actionTotalTimes = if not b1 then nil else table.create(100),
+		thunkCounts = if not b2 then nil else table.create(100),
+		thunkTotalTimes = if not b2 then nil else table.create(100)
+	}, t1))
+end
+function t1._hookIntoStore(p1, p2) -- line: 80
+	p1.store = p2
+	p1.originalReducer = p2._reducer
+	p1.originalFlushHandler = p2._flushHandler
+
+	if p1.startImmediately then
+		p1:startTracking()
+	end
+end
+function t1.trackingReducer(p3, p4, p5) -- line: 90
+	assert(p3.originalReducer, "self.originalReducer must exist")
+
+	local elapsed = os.clock()
+	local v16 = p3.originalReducer(p4, p5)
+	local v17 = (os.clock() - elapsed) * 1000
+
+	p3.totalReduceTimeMs = p3.totalReduceTimeMs + v17
+	p3.reduceCount = p3.reduceCount + 1
+
+	if p3.reportTopAction and p3.actionCounts and p3.actionTotalTimes then
+		local v18 = p5.type or tostring(p5)
+
+		if v18 then
+			local v19 = (p3.actionCounts[v18] or 0) + 1
+
+			p3.actionCounts[v18] = v19
+
+			local v20 = (p3.actionTotalTimes[v18] or 0) + v17
+
+			p3.actionTotalTimes[v18] = v20
+		end
+	end
+
+	return v16
+end
+function t1.trackingFlush(p6, ...) -- line: 115
+	local elapsed = os.clock()
+
+	p6.originalFlushHandler(...)
+
+	local v23 = (os.clock() - elapsed) * 1000
+
+	p6.totalFlushTimeMs = p6.totalFlushTimeMs + v23
+	p6.flushCount = p6.flushCount + 1
+
+	local v24 = #p6.store.changed._listeners
+
+	if v24 > p6.maxListenerCount then
+		p6.maxListenerCount = v24
+	end
+end
+function t1.startTracking(p7) -- line: 130
+	function p7.store._flushHandler(...) -- line: 131
+		-- upvalues: p7 (copy)
+		return p7:trackingFlush(...)
+	end
+	function p7.store._reducer(...) -- line: 134
+		-- upvalues: p7 (copy)
+		return p7:trackingReducer(...)
+	end
+
+	p7.shouldTrack = true
+end
+function t1.stopTracking(p8) -- line: 140
+	if p8.shouldTrack then
+		p8.shouldTrack = false
+		p8.store._flushHandler = p8.originalFlushHandler
+		p8.store._reducer = p8.originalReducer
+	end
+end
+function t1.clear(p9) -- line: 148
+	p9.flushCount = 0
+	p9.totalFlushTimeMs = 0
+	p9.reduceCount = 0
+	p9.totalReduceTimeMs = 0
+	p9.maxListenerCount = 0
+	p9.totalThunkTimeMs = 0
+	p9.thunkCount = 0
+
+	if p9.reportTopAction then
+		p9.actionCounts = table.create(100)
+		p9.actionTotalTimes = table.create(100)
+	end
+
+	if p9.reportTopThunk then
+		p9.thunkCounts = table.create(100)
+		p9.thunkTotalTimes = table.create(100)
+	end
+end
+
+local function getRelevantLineFromTrace(s1: string) -- line: 167
+	local parts = string.split(s1, "\n")
+
+	for i = 3, #parts do
+		local v31 = parts[i]
+
+		if not string.find(v31, "AppLaunchTracker") and not string.find(v31, "_Index.Rodux") and not string.find(v31, "_Index.RoactRodux") and not string.find(v31, "_Index.Promise") and not string.find(v31, ".RoactRodux") then
+			return v31
+		end
+	end
+
+	return nil
+end
+local function getThunkName(p10) -- line: 184
+	-- upvalues: getRelevantLineFromTrace (copy)
+	local v33 = getRelevantLineFromTrace(debug.traceback())
+
+	if v33 then
+		return v33
+	end
+
+	return debug.info(p10, "slf")
+end
+
+function t1.makeThunkMiddleware(p11, p12) -- line: 192
+	-- upvalues: getRelevantLineFromTrace (copy)
+	local function tracebackReporter(p13) -- line: 193
+		return debug.traceback(p13)
+	end
+	local function thunkMiddleware(p14, p15) -- line: 196
+		-- upvalues: p11 (copy), p12 (copy), getRelevantLineFromTrace (copy), tracebackReporter (copy)
+		return function(p16) -- line: 197
+			-- upvalues: p11 (copy), p15 (copy), p12 (copy), getRelevantLineFromTrace (copy), tracebackReporter (copy), p14 (copy)
+			if typeof(p16) == "function" then
+				local ok, result = xpcall(function() -- line: 199
+					-- upvalues: p11 (copy), p16 (copy), p15 (copy), p12 (copy), getRelevantLineFromTrace (copy)
+					if p11.shouldTrack then
+						local elapsed = os.clock()
+						local v62 = p16(p15, p12)
+						local v63 = (os.clock() - elapsed) * 1000
+						local v64 = p11
+
+						v64.totalThunkTimeMs = v64.totalThunkTimeMs + v63
+
+						local v65 = p11
+
+						v65.thunkCount = v65.thunkCount + 1
+
+						if p11.reportTopThunk and p11.thunkCounts and p11.thunkTotalTimes then
+							local v66 = p16
+							local v67 = getRelevantLineFromTrace(debug.traceback()) or debug.info(v66, "slf")
+							local v68 = (p11.thunkCounts[v67] or 0) + 1
+
+							p11.thunkCounts[v67] = v68
+
+							local v69 = (p11.thunkTotalTimes[v67] or 0) + v63
+
+							p11.thunkTotalTimes[v67] = v69
+						end
+
+						return v62
+					end
+
+					return p16(p15, p12)
+				end, tracebackReporter)
+
+				if not ok then
+					p15._errorReporter.reportReducerError(p15:getState(), p16, {
+						message = "Caught error in thunk",
+						thrownValue = result
+					})
+
+					return nil
+				end
+
+				return result
+			end
+
+			return p14(p16)
+		end
+	end
+
+	return thunkMiddleware
+end
+
+local function getTopValue(t2: {[any]: any}) -- line: 243
+	local v39 = nil
+	local v40 = nil
+
+	for v41, v42 in t2 do
+		if v42 > (v39 or -1) then
+			v39 = v42
+			v40 = v41
+		end
+	end
+
+	return v40, v39
+end
+local function fixThunkName(s2: string) -- line: 255
+	return s2:gsub("CoreGui.RobloxGui.Modules.", ""):gsub("CorePackages.Workspace.Packages._Workspace.", "")
+end
+
+function t1.getStats(p17) -- line: 259
+	local v45 = nil
+	local v46 = nil
+	local v47 = nil
+	local v48 = nil
+	local v49 = nil
+	local v50 = nil
+
+	if p17.reportTopAction and (p17.actionCounts and p17.actionTotalTimes) then
+		v46 = nil
+		v45 = nil
+
+		for v51, v52 in p17.actionTotalTimes do
+			if v52 > (v46 or -1) then
+				v46 = v52
+				v45 = v51
+			end
+		end
+
+		if v45 then
+			v47 = p17.actionCounts[v45]
+		end
+	end
+
+	if p17.reportTopThunk and p17.thunkCounts and p17.thunkTotalTimes then
+		v49 = nil
+		v48 = nil
+
+		for v53, v54 in p17.thunkTotalTimes do
+			if v54 > (v49 or -1) then
+				v49 = v54
+				v48 = v53
+			end
+		end
+
+		if v48 then
+			v50 = p17.thunkCounts[v48]
+			v48 = v48:gsub("CoreGui.RobloxGui.Modules.", ""):gsub("CorePackages.Workspace.Packages._Workspace.", "")
+		end
+	end
+
+	return {
+		flushCount = p17.flushCount,
+		totalFlushTimeMs = p17.totalFlushTimeMs,
+		reduceCount = p17.reduceCount,
+		totalReduceTimeMs = p17.totalReduceTimeMs,
+		maxListenerCount = p17.maxListenerCount,
+		totalThunkTimeMs = p17.totalThunkTimeMs,
+		thunkCount = p17.thunkCount,
+		topActionName = v45,
+		topActionDurationMs = v46,
+		topActionCount = v47,
+		topThunkName = v48,
+		topThunkDurationMs = v49,
+		topThunkCount = v50
+	}
+end
+
+return t1

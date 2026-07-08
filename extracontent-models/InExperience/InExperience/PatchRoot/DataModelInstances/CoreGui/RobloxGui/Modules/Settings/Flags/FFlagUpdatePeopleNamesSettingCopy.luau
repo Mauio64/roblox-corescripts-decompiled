@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UpdatePeopleNamesSettingCopy", false);
+return game:DefineFastFlag("UpdatePeopleNamesSettingCopy", false)

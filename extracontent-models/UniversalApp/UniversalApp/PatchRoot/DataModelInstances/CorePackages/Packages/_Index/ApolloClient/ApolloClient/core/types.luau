@@ -1,12 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.LuauPolyfill);
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(script.Parent.Parent.cache);
-local _ = require(script.Parent.QueryInfo);
-local _ = require(script.Parent.networkStatus);
-local _ = require(script.Parent.ObservableQuery_types);
-local _ = require(script.Parent.watchQueryOptions_types);
-local _ = require(script.Parent.Parent.cache);
-local _ = require(l_Parent_0.jsutils.typedDocumentNode);
-return {};
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+
+require(ParentParentParent.LuauPolyfill)
+require(ParentParentParent.GraphQL)
+require(script.Parent.Parent.cache)
+require(script.Parent.QueryInfo)
+require(script.Parent.networkStatus)
+require(script.Parent.ObservableQuery_types)
+require(script.Parent.watchQueryOptions_types)
+require(script.Parent.Parent.cache)
+require(ParentParent.jsutils.typedDocumentNode)
+
+return {}

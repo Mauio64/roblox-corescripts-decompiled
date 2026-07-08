@@ -1,1 +1,1 @@
-return require(script.BubbleChatList);
+return require(script.BubbleChatList)

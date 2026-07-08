@@ -1,18 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("GameCollections").Parent;
-local v1 = require(l_Parent_0.CollectionViews);
-local l_GameTileViewConfig_0 = require(l_Parent_0.GameTile).GameTileViewConfig;
-local l_CollectionLayoutCalculators_0 = v1.CollectionLayoutCalculators;
-local _ = require(l_Parent_0.Style);
+local Parent = script:FindFirstAncestor("GameCollections").Parent
+local CollectionViews = require(Parent.CollectionViews)
+local GameTileViewConfig = require(Parent.GameTile).GameTileViewConfig
+local CollectionLayoutCalculators = CollectionViews.CollectionLayoutCalculators
+
+require(Parent.Style)
+
 return {
-    calculateNumColumns = l_CollectionLayoutCalculators_0.calculateNumColumns, 
-    calculateTileHeightFromWidth = function(v5, _, v7, v8, v9, v10, v11, v12, v13, v14, v15) --[[ Line: 15 ]] --[[ Name: calculateTileHeightFromWidth ]]
-        -- upvalues: l_GameTileViewConfig_0 (copy)
-        return l_GameTileViewConfig_0.getTileHeight(v8, v5, v7, v9, v10, v11, v12, v13, v14, v15);
-    end, 
-    calculateSideMargin = l_CollectionLayoutCalculators_0.calculateSideMargin, 
-    calculateColumnGap = l_CollectionLayoutCalculators_0.calculateColumnGap, 
-    calculateVerticalPadding = l_CollectionLayoutCalculators_0.calculateVerticalPadding, 
-    calculateFractionalItemAmount = l_CollectionLayoutCalculators_0.calculateFractionalItemAmount, 
-    calculateMaxTilesToShow = l_CollectionLayoutCalculators_0.calculateMaxTilesToShow, 
-    calculateLoadMoreThreshold = l_CollectionLayoutCalculators_0.calculateLoadMoreThreshold
-};
+	calculateNumColumns = CollectionLayoutCalculators.calculateNumColumns,
+	calculateTileHeightFromWidth = function(n1: number, _: boolean?, p1, p2, b2: boolean?, b3: boolean?, b4: boolean?, n2: number?, n3: number?, n4: number?, n5: number?) -- line: 15
+		-- upvalues: GameTileViewConfig (copy)
+		return GameTileViewConfig.getTileHeight(p2, n1, p1, b2, b3, b4, n2, n3, n4, n5)
+	end,
+	calculateSideMargin = CollectionLayoutCalculators.calculateSideMargin,
+	calculateColumnGap = CollectionLayoutCalculators.calculateColumnGap,
+	calculateVerticalPadding = CollectionLayoutCalculators.calculateVerticalPadding,
+	calculateFractionalItemAmount = CollectionLayoutCalculators.calculateFractionalItemAmount,
+	calculateMaxTilesToShow = CollectionLayoutCalculators.calculateMaxTilesToShow,
+	calculateLoadMoreThreshold = CollectionLayoutCalculators.calculateLoadMoreThreshold
+}

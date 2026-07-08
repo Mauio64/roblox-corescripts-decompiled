@@ -1,24 +1,29 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_NaN_0 = require(l_Parent_0.Number).NaN;
-return function(v2, v3) --[[ Line: 24 ]]
-    -- upvalues: l_NaN_0 (copy)
-    if type(v3) ~= "number" then
-        v3 = 1;
-    end;
-    local v4 = string.len(v2);
-    if v3 < 1 or v4 < v3 then
-        return l_NaN_0;
-    else
-        local v5 = utf8.offset(v2, v3);
-        if v5 == nil or v4 < v5 then
-            return l_NaN_0;
-        else
-            local v6 = utf8.codepoint(v2, v5, v5);
-            if v6 == nil then
-                return l_NaN_0;
-            else
-                return v6;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local NaN = require(ParentParent.Number).NaN
+
+return function(s1: string, n1: number) -- line: 24
+	-- upvalues: NaN (copy)
+	if type(n1) ~= "number" then
+		n1 = 1
+	end
+
+	local v5 = string.len(s1)
+
+	if n1 < 1 or v5 < n1 then
+		return NaN
+	end
+
+	local v6 = utf8.offset(s1, n1)
+
+	if v6 == nil or v5 < v6 then
+		return NaN
+	end
+
+	local v7 = utf8.codepoint(s1, v6, v6)
+
+	if v7 == nil then
+		return NaN
+	end
+
+	return v7
+end

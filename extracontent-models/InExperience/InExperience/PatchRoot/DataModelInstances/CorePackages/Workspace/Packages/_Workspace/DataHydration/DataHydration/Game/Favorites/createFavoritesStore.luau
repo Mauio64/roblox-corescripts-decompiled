@@ -1,94 +1,123 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.createDataCache);
-local v3 = require(l_script_FirstAncestor_0.createDataResolver);
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local v5 = require(script.Parent.FavoritesStoreTypes);
-local v6 = require(l_Parent_0.DiscoveryUtils);
-local l_logResponseError_0 = v6.logResponseError;
-local l_DiscoveryEventErrorLogger_0 = v6.DiscoveryEventErrorLogger;
-local v9 = require(script.Parent.fetchFavorite);
-local v10 = require(script.Parent.requestFavoriteUpdate);
-local v11 = require(l_Parent_0.Signals);
-local v12 = require(script.Parent.FavoritesUrlBuilder);
-local _ = require(l_Parent_0.LuauPolyfill);
-local l_FFlagLuaAppDataHydrationUpdateItem_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDataHydrationUpdateItem;
-return function() --[[ Line: 19 ]] --[[ Name: createFavoritesStore ]]
-    -- upvalues: v2 (copy), v3 (copy), l_logResponseError_0 (copy), v12 (copy), v9 (copy), v5 (copy), l_DiscoveryEventErrorLogger_0 (copy), v11 (copy), v10 (copy), l_FFlagLuaAppDataHydrationUpdateItem_0 (copy)
-    local v15 = v2();
-    local v21 = v3({
-        cache = v15, 
-        supportsMultiGet = false, 
-        logError = function(v16) --[[ Line: 24 ]] --[[ Name: logError ]]
-            -- upvalues: l_logResponseError_0 (ref), v12 (ref)
-            l_logResponseError_0(v12.FAVORITE_URL, v16);
-        end, 
-        fetchFn = function(v17, _) --[[ Line: 27 ]] --[[ Name: fetchFn ]]
-            -- upvalues: v9 (ref), v5 (ref), l_DiscoveryEventErrorLogger_0 (ref)
-            return v9(v17):andThen(function(v19) --[[ Line: 31 ]]
-                -- upvalues: v5 (ref), l_DiscoveryEventErrorLogger_0 (ref), v17 (copy)
-                local l_responseBody_0 = v19.responseBody;
-                if not v5.favoriteResponseValidator(l_responseBody_0) then
-                    l_DiscoveryEventErrorLogger_0.reportError("createFavoritesStore", "Invalid favorite response", {
-                        universeId = v17, 
-                        responseBody = l_responseBody_0
-                    });
-                    error({
-                        StatusCode = v19.responseCode
-                    });
-                end;
-                return l_responseBody_0.isFavorited;
-            end);
-        end
-    });
-    local function v31(v22, v23) --[[ Line: 46 ]] --[[ Name: updateFavorite ]]
-        -- upvalues: v11 (ref), v15 (copy), v10 (ref), l_DiscoveryEventErrorLogger_0 (ref), l_logResponseError_0 (ref), v12 (ref)
-        local v24, v25 = v11.createSignal(nil);
-        local v26 = v15.getItem(v22).data(false);
-        v15.updateItem(v22, v23);
-        v10(v22, v23):andThen(function(_) --[[ Line: 61 ]]
-            -- upvalues: v25 (copy), v23 (copy)
-            v25({
-                type = "success", 
-                isFavorited = v23
-            });
-        end):catch(function(v28) --[[ Line: 67 ]]
-            -- upvalues: v15 (ref), v22 (copy), v26 (copy), l_DiscoveryEventErrorLogger_0 (ref), l_logResponseError_0 (ref), v12 (ref), v25 (copy)
-            v15.updateItem(v22, v26);
-            local v29 = if type(v28) == "table" and v28.StatusCode then v28.StatusCode else nil;
-            local v30 = if type(v28) == "table" and v28.StatusMessage then v28.StatusMessage else nil;
-            l_DiscoveryEventErrorLogger_0.reportError("updateFavorite", "Error updating favorite", {
-                universeId = v22, 
-                statusCode = v29, 
-                statusMessage = v30
-            });
-            l_logResponseError_0(v12.FAVORITE_UPDATE_URL, {
-                StatusCode = v29
-            });
-            v25({
-                type = "error", 
-                error = tostring(v28)
-            });
-        end);
-        return v24;
-    end;
-    return {
-        fetchFavorite = v21.fetchItem, 
-        fetchFavorites = v21.fetchItems, 
-        getFavorite = v21.getCachedItem, 
-        getFavorites = v21.getCachedItems, 
-        getAndFetchFavorite = v21.getAndFetchItem, 
-        getAndFetchFavorites = v21.getAndFetchItems, 
-        updateFavorite = v31, 
-        updateItem = if l_FFlagLuaAppDataHydrationUpdateItem_0 then v15.updateItem else nil, 
-        clear = function() --[[ Line: 90 ]] --[[ Name: clear ]]
-            -- upvalues: v15 (copy), v21 (copy)
-            v15.clear();
-            v21.clear();
-        end, 
-        dispose = function() --[[ Line: 95 ]] --[[ Name: dispose ]]
-            -- upvalues: v21 (copy)
-            v21.dispose();
-        end
-    };
-end;
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local createDataCache = require(DataHydration.createDataCache)
+local createDataResolver = require(DataHydration.createDataResolver)
+
+require(DataHydration.DataHydrationTypes)
+
+local FavoritesStoreTypes = require(script.Parent.FavoritesStoreTypes)
+local DiscoveryUtils = require(DataHydrationParent.DiscoveryUtils)
+local logResponseError = DiscoveryUtils.logResponseError
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+local fetchFavorite = require(script.Parent.fetchFavorite)
+local requestFavoriteUpdate = require(script.Parent.requestFavoriteUpdate)
+local Signals = require(DataHydrationParent.Signals)
+local FavoritesUrlBuilder = require(script.Parent.FavoritesUrlBuilder)
+
+require(DataHydrationParent.LuauPolyfill)
+
+local SharedFlags = require(DataHydrationParent.SharedFlags)
+local FFlagLuaAppDataHydrationUpdateItem = SharedFlags.FFlagLuaAppDataHydrationUpdateItem
+local FFlagSduiFavoritesHydrationStructured = SharedFlags.FFlagSduiFavoritesHydrationStructured
+
+local function createFavoritesStore() -- line: 23
+	-- upvalues: createDataCache (copy), createDataResolver (copy), logResponseError (copy), FavoritesUrlBuilder (copy), fetchFavorite (copy), FavoritesStoreTypes (copy), DiscoveryEventErrorLogger (copy), FFlagSduiFavoritesHydrationStructured (copy), Signals (copy), requestFavoriteUpdate (copy), FFlagLuaAppDataHydrationUpdateItem (copy)
+	local v17 = createDataCache()
+	local v18 = createDataResolver({
+		supportsMultiGet = false,
+		cache = v17,
+		logError = function(p1) -- line: 28
+			-- upvalues: logResponseError (copy), FavoritesUrlBuilder (copy)
+			logResponseError(FavoritesUrlBuilder.FAVORITE_URL, p1)
+		end,
+		fetchFn = function(s1: string, _) -- line: 31
+			-- upvalues: fetchFavorite (copy), FavoritesStoreTypes (copy), DiscoveryEventErrorLogger (copy), FFlagSduiFavoritesHydrationStructured (copy)
+			return fetchFavorite(s1):andThen(function(p3) -- line: 35
+				-- upvalues: FavoritesStoreTypes (copy), DiscoveryEventErrorLogger (copy), s1 (copy), FFlagSduiFavoritesHydrationStructured (copy)
+				local responseBody = p3.responseBody
+
+				if not FavoritesStoreTypes.favoriteResponseValidator(responseBody) then
+					DiscoveryEventErrorLogger.reportError("createFavoritesStore", "Invalid favorite response", {
+						universeId = s1,
+						responseBody = responseBody
+					})
+					error({
+						StatusCode = p3.responseCode
+					})
+				end
+
+				if FFlagSduiFavoritesHydrationStructured then
+					return {
+						isFavorited = responseBody.isFavorited
+					}
+				end
+
+				return responseBody.isFavorited
+			end)
+		end
+	})
+
+	return {
+		fetchFavorite = v18.fetchItem,
+		fetchFavorites = v18.fetchItems,
+		getFavorite = v18.getCachedItem,
+		getFavorites = v18.getCachedItems,
+		getAndFetchFavorite = v18.getAndFetchItem,
+		getAndFetchFavorites = v18.getAndFetchItems,
+		updateFavorite = function(s2: string, b1: boolean) -- line: 53
+			-- upvalues: Signals (copy), v17 (copy), FFlagSduiFavoritesHydrationStructured (copy), requestFavoriteUpdate (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy), FavoritesUrlBuilder (copy)
+			local v24, v25 = Signals.createSignal(nil)
+			local v26 = v17.getItem(s2).data(false)
+
+			if FFlagSduiFavoritesHydrationStructured then
+				v17.updateItem(s2, {
+					isFavorited = b1
+				})
+			else
+				v17.updateItem(s2, b1)
+			end
+
+			requestFavoriteUpdate(s2, b1):andThen(function(_) -- line: 72
+				-- upvalues: v25 (copy), b1 (copy)
+				v25({
+					type = "success",
+					isFavorited = b1
+				})
+			end):catch(function(p5) -- line: 78
+				-- upvalues: v17 (copy), s2 (copy), v26 (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy), FavoritesUrlBuilder (copy), v25 (copy)
+				v17.updateItem(s2, v26)
+
+				local v31 = if type(p5) ~= "table" or not p5.StatusCode then nil else p5.StatusCode
+				local v32 = if type(p5) ~= "table" or not p5.StatusMessage then nil else p5.StatusMessage
+
+				DiscoveryEventErrorLogger.reportError("updateFavorite", "Error updating favorite", {
+					universeId = s2,
+					statusCode = v31,
+					statusMessage = v32
+				})
+				logResponseError(FavoritesUrlBuilder.FAVORITE_UPDATE_URL, {
+					StatusCode = v31
+				})
+				v25({
+					type = "error",
+					error = tostring(p5)
+				})
+			end)
+
+			return v24
+		end,
+		updateItem = if not FFlagLuaAppDataHydrationUpdateItem then nil else v17.updateItem,
+		updateItems = if not FFlagSduiFavoritesHydrationStructured then nil else v17.updateItems,
+		clear = function() -- line: 101
+			-- upvalues: v17 (copy), v18 (copy)
+			v17.clear()
+			v18.clear()
+		end,
+		dispose = function() -- line: 106
+			-- upvalues: v18 (copy)
+			v18.dispose()
+		end
+	}
+end
+
+return createFavoritesStore

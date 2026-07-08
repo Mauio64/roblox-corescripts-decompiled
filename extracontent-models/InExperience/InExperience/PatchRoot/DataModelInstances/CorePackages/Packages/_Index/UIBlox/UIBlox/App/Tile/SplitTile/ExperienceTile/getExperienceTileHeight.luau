@@ -1,11 +1,15 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local _ = require(l_Parent_1.Style.StyleTypes);
-local _ = require(l_Parent_0.Constants);
-local _ = require(l_Parent_0.Enum.AspectRatioMode);
-local v5 = require(l_Parent_0.getExperienceTileRelativeHeight);
-return function(v6, v7, v8, v9, v10, v11) --[[ Line: 18 ]]
-    -- upvalues: v5 (copy)
-    local v12 = v5(v6, v8, v9, v10, v11);
-    return (math.floor(v7 * v12.Scale + v12.Offset));
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+
+require(ParentParent.Style.StyleTypes)
+require(scriptParent.Constants)
+require(scriptParent.Enum.AspectRatioMode)
+
+local getExperienceTileRelativeHeight = require(scriptParent.getExperienceTileRelativeHeight)
+
+return function(p1, n1: number, p2, n2: number?, n3: number?, p3) -- line: 18
+	-- upvalues: getExperienceTileRelativeHeight (copy)
+	local v10 = getExperienceTileRelativeHeight(p1, p2, n2, n3, p3)
+
+	return (math.floor(n1 * v10.Scale + v10.Offset))
+end

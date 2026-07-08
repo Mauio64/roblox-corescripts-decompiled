@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaEnableDidSwitchAccount", false);
+return game:DefineFastFlag("LuaEnableDidSwitchAccount", false)

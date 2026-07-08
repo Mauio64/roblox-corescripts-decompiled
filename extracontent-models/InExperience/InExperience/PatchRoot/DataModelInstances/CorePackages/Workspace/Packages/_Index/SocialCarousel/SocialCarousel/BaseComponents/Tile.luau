@@ -1,1 +1,1 @@
-return require(script.Tile);
+return require(script.Tile)

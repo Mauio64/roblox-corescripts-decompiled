@@ -1,229 +1,239 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AdPlayer");
-if not require(l_script_FirstAncestor_0.Flags).GetEnableLuaRewardTimerUI() then
-    return nil;
-else
-    local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-    local v2 = require(l_Parent_0.React);
-    local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-    local v4 = require(l_Parent_0.Foundation);
-    local v5 = require(l_Parent_0.ReactOtter);
-    local l_useTokens_0 = v4.Hooks.useTokens;
-    local l_Text_0 = v4.Text;
-    local l_View_0 = v4.View;
-    local l_Image_0 = v4.Image;
-    local v10 = require(l_script_FirstAncestor_0.components.RadialProgressComponent);
-    local v11 = {
-        getRewardIn = "Features.OnDemandAds.Get_Reward_In", 
-        rewardEarned = "Features.OnDemandAds.Reward_Earned"
-    };
-    local function _(v12) --[[ Line: 37 ]] --[[ Name: linearEaseOptions ]]
-        return {
-            duration = v12, 
-            easingStyle = Enum.EasingStyle.Linear
-        };
-    end;
-    return function(v14) --[[ Line: 44 ]]
-        -- upvalues: v2 (copy), v5 (copy), l_useTokens_0 (copy), l_useLocalization_0 (copy), v11 (copy), l_View_0 (copy), l_Image_0 (copy), l_Text_0 (copy), v10 (copy)
-        local v15 = v2.useRef(nil);
-        local v16, v17 = v2.useState(0);
-        local v18, v19 = v5.useAnimatedBinding(0);
-        local v20, v21 = v5.useAnimatedBinding(0);
-        local v22 = v2.useRef(nil);
-        local v23, v24 = v2.useState(0);
-        local v25, v26 = v5.useAnimatedBinding(1);
-        local v27, v28 = v5.useAnimatedBinding(0);
-        local v29 = l_useTokens_0();
-        local v30 = l_useLocalization_0(v11);
-        local v31, v32 = v5.useAnimatedBinding(0);
-        local v33, v34 = v5.useAnimatedBinding(1);
-        local v35, v36 = v5.useAnimatedBinding(0);
-        local v37, v38 = v5.useAnimatedBinding(0);
-        local v39, v40 = v2.useState(true);
-        local v41, _ = v2.useBinding(1);
-        v2.useEffect(function() --[[ Line: 64 ]]
-            -- upvalues: v39 (copy), v38 (copy), v5 (ref)
-            if v39 then
-                v38(v5.instant(0));
-                return;
-            else
-                local v43 = false;
-                task.delay(3, function() --[[ Line: 71 ]]
-                    -- upvalues: v43 (ref), v38 (ref), v5 (ref)
-                    if not v43 then
-                        v38(v5.ease(1));
-                    end;
-                end);
-                return function() --[[ Line: 77 ]]
-                    -- upvalues: v43 (ref)
-                    v43 = true;
-                end;
-            end;
-        end, {
-            v39
-        });
-        v2.useEffect(function() --[[ Line: 82 ]]
-            -- upvalues: v15 (copy), v17 (copy), v22 (copy), v24 (copy)
-            local l_current_0 = v15.current;
-            if l_current_0 then
-                v17(l_current_0.TextBounds.X);
-            end;
-            local l_current_1 = v22.current;
-            if l_current_1 then
-                v24(l_current_1.TextBounds.X);
-            end;
-        end, {});
-        v2.useEffect(function() --[[ Line: 94 ]]
-            -- upvalues: v39 (copy), v32 (copy), v5 (ref), v16 (copy), v23 (copy)
-            if v39 then
-                v32(v5.instant(24 + v16 + 8 + 20));
-                return;
-            else
-                v32(v5.ease(24 + v23 + 8 + 20 - 4, {
-                    duration = 0.4, 
-                    easingStyle = Enum.EasingStyle.Linear
-                }));
-                return;
-            end;
-        end, {
-            v39, 
-            v16, 
-            v23
-        });
-        v2.useEffect(function() --[[ Line: 114 ]]
-            -- upvalues: v39 (copy), v19 (copy), v5 (ref), v21 (copy), v26 (copy), v28 (copy), v36 (copy), v34 (copy)
-            local v46 = false;
-            if v39 then
-                v19(v5.instant(0));
-                v21(v5.instant(0));
-                v26(v5.instant(1));
-                v28(v5.instant(28));
-                v36(v5.instant(0));
-                v34(v5.instant(1));
-            else
-                v21(v5.ease(24, {
-                    duration = 0.4, 
-                    easingStyle = Enum.EasingStyle.Linear
-                }));
-                v28(v5.ease(0, {
-                    duration = 0.4, 
-                    easingStyle = Enum.EasingStyle.Linear
-                }));
-                v36(v5.ease(1, {
-                    duration = 0.1, 
-                    easingStyle = Enum.EasingStyle.Linear
-                }));
-                task.delay(0.1, function() --[[ Line: 130 ]]
-                    -- upvalues: v46 (ref), v19 (ref), v5 (ref), v26 (ref)
-                    if not v46 then
-                        v19(v5.ease(1, {
-                            duration = 0.1, 
-                            easingStyle = Enum.EasingStyle.Linear
-                        }));
-                        v26(v5.ease(0, {
-                            duration = 0.1, 
-                            easingStyle = Enum.EasingStyle.Linear
-                        }));
-                    end;
-                end);
-                task.delay(0.4, function() --[[ Line: 137 ]]
-                    -- upvalues: v46 (ref), v34 (ref), v5 (ref)
-                    if not v46 then
-                        v34(v5.ease(0, {
-                            duration = 0.1, 
-                            easingStyle = Enum.EasingStyle.Linear
-                        }));
-                    end;
-                end);
-            end;
-            return function() --[[ Line: 144 ]]
-                -- upvalues: v46 (ref)
-                v46 = true;
-            end;
-        end, {
-            v39
-        });
-        return v2.createElement(l_View_0, {
-            tag = "padding-y-xsmall padding-x-medium bg-over-media-300 radius-small clip", 
-            Size = v31:map(function(v47) --[[ Line: 151 ]]
-                return UDim2.fromOffset(v47, 32);
-            end), 
-            GroupTransparency = v37, 
-            Visible = v16 > 0
-        }, {
-            checkIcon = v2.createElement(l_Image_0, {
-                tag = "size-500 anchor-center-left", 
-                Image = "rbxassetid://125702125855534", 
-                imageStyle = {
-                    Transparency = v33
-                }, 
-                LayoutOrder = 1, 
-                Position = UDim2.new(0, -4, 0.5, 0), 
-                Visible = v14.rewardWaitAlpha:map(function(v48) --[[ Line: 165 ]]
-                    -- upvalues: v40 (copy)
-                    v40(v48 < 1);
-                    return v48 == 1;
-                end)
-            }), 
-            getRewardInLabel = v2.createElement(l_Text_0, {
-                tag = "text-label-medium text-align-x-left text-align-y-center", 
-                Text = v30.getRewardIn, 
-                Size = UDim2.new(0, v16, 1, 0), 
-                Position = v20:map(function(v49) --[[ Line: 174 ]]
-                    return UDim2.new(0, v49, 0, 0);
-                end), 
-                textStyle = {
-                    Color3 = v29.Color.ActionEmphasis.Foreground.Color3, 
-                    Transparency = v18
-                }, 
-                ref = v15
-            }), 
-            rewardEarnedLabel = v2.createElement(l_Text_0, {
-                tag = "text-label-medium text-align-x-right text-align-y-center anchor-top-right", 
-                Text = v30.rewardEarned, 
-                Size = UDim2.new(0, v23, 1, 0), 
-                Position = v27:map(function(v50) --[[ Line: 187 ]]
-                    return UDim2.new(1, -v50, 0, 0);
-                end), 
-                textStyle = {
-                    Color3 = v29.Color.ActionEmphasis.Foreground.Color3, 
-                    Transparency = v25
-                }, 
-                ref = v22
-            }), 
-            progressContainer = v2.createElement(l_View_0, {
-                tag = "radius-circle bg-over-media-200 size-500 anchor-center-right position-center-right", 
-                GroupTransparency = v35
-            }, {
-                progressBackground = v2.createElement(v10, {
-                    alpha = v41, 
-                    thickness = 2, 
-                    Size = UDim2.fromScale(1, 1), 
-                    SizeConstraint = Enum.SizeConstraint.RelativeYY, 
-                    BackgroundTransparency = 1, 
-                    ImageColor3 = v29.Color.Content.Muted.Color3, 
-                    LayoutOrder = 3, 
-                    Visible = v14.rewardWaitAlpha:map(function(v51) --[[ Line: 208 ]]
-                        return v51 < 1;
-                    end)
-                }, {
-                    radialProgress = v2.createElement(v10, {
-                        alpha = v14.rewardWaitAlpha, 
-                        thickness = 2, 
-                        Size = UDim2.fromScale(1, 1), 
-                        BackgroundTransparency = 1, 
-                        ImageColor3 = v29.Color.Extended.White.White_0.Color3
-                    }, {
-                        timerLabel = v2.createElement(l_Text_0, {
-                            tag = "size-full-300 anchor-center-center position-center-center content-emphasis text-caption-small text-align-x-center text-align-y-center", 
-                            Text = v14.rewardWaitAlpha:map(function(v52) --[[ Line: 221 ]]
-                                -- upvalues: v14 (copy)
-                                return (tostring((math.ceil(v14.rewardWaitTime - v14.rewardWaitTime * v52))));
-                            end), 
-                            TextScaled = true
-                        })
-                    })
-                })
-            })
-        });
-    end;
-end;
+local AdPlayer = script:FindFirstAncestor("AdPlayer")
+
+if not require(AdPlayer.Flags).GetEnableLuaRewardTimerUI() then
+	return nil
+end
+
+local AdPlayerParent = AdPlayer.Parent
+local React = require(AdPlayerParent.React)
+local useLocalization = require(AdPlayerParent.Localization).Hooks.useLocalization
+local Foundation = require(AdPlayerParent.Foundation)
+local ReactOtter = require(AdPlayerParent.ReactOtter)
+local useTokens = Foundation.Hooks.useTokens
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local RadialProgressComponent = require(AdPlayer.components.RadialProgressComponent)
+local t1 = {
+	getRewardIn = "Features.OnDemandAds.Get_Reward_In",
+	rewardEarned = "Features.OnDemandAds.Reward_Earned"
+}
+
+local function linearEaseOptions(n1: number) -- line: 37
+	return {
+		duration = n1,
+		easingStyle = Enum.EasingStyle.Linear
+	}
+end
+
+return function(t2: {[any]: any}) -- line: 44
+	-- upvalues: React (copy), ReactOtter (copy), useTokens (copy), useLocalization (copy), t1 (copy), View (copy), FoundationImage (copy), FoundationText (copy), RadialProgressComponent (copy)
+	local v16 = React.useRef(nil)
+	local v17, v18 = React.useState(0)
+	local v19, v20 = ReactOtter.useAnimatedBinding(0)
+	local v21, v22 = ReactOtter.useAnimatedBinding(0)
+	local v23 = React.useRef(nil)
+	local v24, v25 = React.useState(0)
+	local v26, v27 = ReactOtter.useAnimatedBinding(1)
+	local v28, v29 = ReactOtter.useAnimatedBinding(0)
+	local v30 = useTokens()
+	local v31 = useLocalization(t1)
+	local v32, v33 = ReactOtter.useAnimatedBinding(0)
+	local v34, v35 = ReactOtter.useAnimatedBinding(1)
+	local v36, v37 = ReactOtter.useAnimatedBinding(0)
+	local v38, v39 = ReactOtter.useAnimatedBinding(0)
+	local v40, v41 = React.useState(true)
+	local v42, _ = React.useBinding(1)
+
+	React.useEffect(function() -- line: 64
+		-- upvalues: v40 (copy), v39 (copy), ReactOtter (copy)
+		if v40 then
+			v39(ReactOtter.instant(0))
+
+			return
+		end
+
+		local u44 = false
+
+		task.delay(3, function() -- line: 71
+			-- upvalues: u44 (ref), v39 (copy), ReactOtter (copy)
+			if not u44 then
+				v39(ReactOtter.ease(1))
+			end
+		end)
+
+		return function() -- line: 77
+			-- upvalues: u44 (ref)
+			u44 = true
+		end
+	end, { v40 })
+	React.useEffect(function() -- line: 82
+		-- upvalues: v16 (copy), v18 (copy), v23 (copy), v25 (copy)
+		local current = v16.current
+
+		if current then
+			v18(current.TextBounds.X)
+		end
+
+		local current2 = v23.current
+
+		if current2 then
+			v25(current2.TextBounds.X)
+		end
+	end, {})
+	React.useEffect(function() -- line: 94
+		-- upvalues: v40 (copy), v33 (copy), ReactOtter (copy), v17 (copy), v24 (copy)
+		if v40 then
+			v33(ReactOtter.instant(24 + v17 + 8 + 20))
+
+			return
+		end
+
+		v33(ReactOtter.ease(24 + v24 + 8 + 20 - 4, {
+			duration = 0.4,
+			easingStyle = Enum.EasingStyle.Linear
+		}))
+	end, {
+		v40,
+		v17,
+		v24
+	})
+	React.useEffect(function() -- line: 114
+		-- upvalues: v40 (copy), v20 (copy), ReactOtter (copy), v22 (copy), v27 (copy), v29 (copy), v37 (copy), v35 (copy)
+		local u47 = false
+
+		if v40 then
+			v20(ReactOtter.instant(0))
+			v22(ReactOtter.instant(0))
+			v27(ReactOtter.instant(1))
+			v29(ReactOtter.instant(28))
+			v37(ReactOtter.instant(0))
+			v35(ReactOtter.instant(1))
+		else
+			v22(ReactOtter.ease(24, {
+				duration = 0.4,
+				easingStyle = Enum.EasingStyle.Linear
+			}))
+			v29(ReactOtter.ease(0, {
+				duration = 0.4,
+				easingStyle = Enum.EasingStyle.Linear
+			}))
+			v37(ReactOtter.ease(1, {
+				duration = 0.1,
+				easingStyle = Enum.EasingStyle.Linear
+			}))
+			task.delay(0.1, function() -- line: 130
+				-- upvalues: u47 (ref), v20 (copy), ReactOtter (copy), v27 (copy)
+				if not u47 then
+					v20(ReactOtter.ease(1, {
+						duration = 0.1,
+						easingStyle = Enum.EasingStyle.Linear
+					}))
+					v27(ReactOtter.ease(0, {
+						duration = 0.1,
+						easingStyle = Enum.EasingStyle.Linear
+					}))
+				end
+			end)
+			task.delay(0.4, function() -- line: 137
+				-- upvalues: u47 (ref), v35 (copy), ReactOtter (copy)
+				if not u47 then
+					v35(ReactOtter.ease(0, {
+						duration = 0.1,
+						easingStyle = Enum.EasingStyle.Linear
+					}))
+				end
+			end)
+		end
+
+		return function() -- line: 144
+			-- upvalues: u47 (ref)
+			u47 = true
+		end
+	end, { v40 })
+
+	return React.createElement(View, {
+		tag = "padding-y-xsmall padding-x-medium bg-over-media-300 radius-small clip",
+		Size = v32:map(function(p1) -- line: 151
+			return UDim2.fromOffset(p1, 32)
+		end),
+		GroupTransparency = v38,
+		Visible = v17 > 0
+	}, {
+		checkIcon = React.createElement(FoundationImage, {
+			tag = "size-500 anchor-center-left",
+			Image = "rbxassetid://125702125855534",
+			LayoutOrder = 1,
+			imageStyle = {
+				Transparency = v34
+			},
+			Position = UDim2.new(0, -4, 0.5, 0),
+			Visible = t2.rewardWaitAlpha:map(function(p2) -- line: 165
+				-- upvalues: v41 (copy)
+				v41(p2 < 1)
+
+				return p2 == 1
+			end)
+		}),
+		getRewardInLabel = React.createElement(FoundationText, {
+			tag = "text-label-medium text-align-x-left text-align-y-center",
+			Text = v31.getRewardIn,
+			Size = UDim2.new(0, v17, 1, 0),
+			Position = v21:map(function(p3) -- line: 174
+				return UDim2.new(0, p3, 0, 0)
+			end),
+			textStyle = {
+				Color3 = v30.Color.ActionEmphasis.Foreground.Color3,
+				Transparency = v19
+			},
+			ref = v16
+		}),
+		rewardEarnedLabel = React.createElement(FoundationText, {
+			tag = "text-label-medium text-align-x-right text-align-y-center anchor-top-right",
+			Text = v31.rewardEarned,
+			Size = UDim2.new(0, v24, 1, 0),
+			Position = v28:map(function(p4) -- line: 187
+				return UDim2.new(1, -p4, 0, 0)
+			end),
+			textStyle = {
+				Color3 = v30.Color.ActionEmphasis.Foreground.Color3,
+				Transparency = v26
+			},
+			ref = v23
+		}),
+		progressContainer = React.createElement(View, {
+			tag = "radius-circle bg-over-media-200 size-500 anchor-center-right position-center-right",
+			GroupTransparency = v36
+		}, {
+			progressBackground = React.createElement(RadialProgressComponent, {
+				thickness = 2,
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				alpha = v42,
+				Size = UDim2.fromScale(1, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeYY,
+				ImageColor3 = v30.Color.Content.Muted.Color3,
+				Visible = t2.rewardWaitAlpha:map(function(p5) -- line: 208
+					return p5 < 1
+				end)
+			}, {
+				radialProgress = React.createElement(RadialProgressComponent, {
+					thickness = 2,
+					BackgroundTransparency = 1,
+					alpha = t2.rewardWaitAlpha,
+					Size = UDim2.fromScale(1, 1),
+					ImageColor3 = v30.Color.Extended.White.White_0.Color3
+				}, {
+					timerLabel = React.createElement(FoundationText, {
+						tag = "size-full-300 anchor-center-center position-center-center content-emphasis text-caption-small text-align-x-center text-align-y-center",
+						TextScaled = true,
+						Text = t2.rewardWaitAlpha:map(function(p6) -- line: 221
+							-- upvalues: t2 (copy)
+							return (tostring((math.ceil(t2.rewardWaitTime - t2.rewardWaitTime * p6))))
+						end)
+					})
+				})
+			})
+		})
+	})
+end

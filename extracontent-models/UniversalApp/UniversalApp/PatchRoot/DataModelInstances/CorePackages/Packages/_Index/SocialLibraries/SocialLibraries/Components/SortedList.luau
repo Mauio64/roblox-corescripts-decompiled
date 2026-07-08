@@ -1,46 +1,55 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local l_Roact_0 = require(l_script_FirstAncestor_0.dependencies).Roact;
-local v2 = l_Roact_0.PureComponent:extend("SortedList");
-v2.defaultProps = {
-    entries = {}, 
-    renderEntry = nil, 
-    entryHeight = 48, 
-    sortComparator = function(_, _) --[[ Line: 12 ]] --[[ Name: sortComparator ]]
-        return true;
-    end, 
-    LayoutOrder = 0
-};
-v2.sortEntries = function(v5) --[[ Line: 19 ]] --[[ Name: sortEntries ]]
-    local v6 = {};
-    for _, v8 in pairs(v5.props.entries) do
-        table.insert(v6, v8);
-    end;
-    table.sort(v6, v5.props.sortComparator);
-    return v6;
-end;
-v2.render = function(v9) --[[ Line: 31 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy)
-    local v10 = v9:sortEntries();
-    local v11 = {
-        layout = l_Roact_0.createElement("UIListLayout", {
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    };
-    for v12, v13 in pairs(v10) do
-        local v14 = v12 == #v10;
-        table.insert(v11, l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v9.props.entryHeight), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v12
-        }, {
-            entry = v9.props.renderEntry(v13, v14)
-        }));
-    end;
-    return l_Roact_0.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, #v9.props.entries * v9.props.entryHeight), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v9.props.LayoutOrder
-    }, v11);
-end;
-return v2;
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local Roact = require(SocialLibraries.dependencies).Roact
+local v3 = Roact.PureComponent:extend("SortedList")
+
+v3.defaultProps = {
+	renderEntry = nil,
+	entryHeight = 48,
+	LayoutOrder = 0,
+	entries = {},
+	sortComparator = function(_, _) -- line: 12
+		return true
+	end
+}
+
+function v3.sortEntries(p3) -- line: 19
+	local t1 = {}
+
+	for _, v in pairs(p3.props.entries) do
+		table.insert(t1, v)
+	end
+
+	table.sort(t1, p3.props.sortComparator)
+
+	return t1
+end
+function v3.render(p4) -- line: 31
+	-- upvalues: Roact (copy)
+	local v11 = p4:sortEntries()
+	local t2 = {
+		layout = Roact.createElement("UIListLayout", {
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}
+
+	for k, v in pairs(v11) do
+		local v15 = k == #v11
+
+		table.insert(t2, Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, p4.props.entryHeight),
+			LayoutOrder = k
+		}, {
+			entry = p4.props.renderEntry(v, v15)
+		}))
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, #p4.props.entries * p4.props.entryHeight),
+		LayoutOrder = p4.props.LayoutOrder
+	}, t2)
+end
+
+return v3

@@ -1,3 +1,3 @@
 return {
-    ProfileRefreshSignal = require(script.ProfileRefreshSignal)
-};
+	ProfileRefreshSignal = require(script.ProfileRefreshSignal)
+}

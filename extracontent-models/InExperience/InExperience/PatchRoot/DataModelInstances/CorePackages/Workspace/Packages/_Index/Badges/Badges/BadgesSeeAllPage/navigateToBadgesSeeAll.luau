@@ -1,16 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Badges");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_SduiLoadTimer_0 = require(l_Parent_0.SduiSharedUtilities).SduiLoadTimer;
-local v4 = require(l_script_FirstAncestor_0.BadgesSeeAllPage.fetchBadgesSeeAllPageIfNeeded);
-return function(v5, v6) --[[ Line: 9 ]] --[[ Name: navigateToBadgesSeeAll ]]
-    -- upvalues: l_SduiLoadTimer_0 (copy), l_AppPage_0 (copy), v4 (copy)
-    local v7 = l_SduiLoadTimer_0.createLoadTimer(l_AppPage_0.BadgesSeeAll);
-    v7.start("navigate");
-    local v8 = v4(v6, v7);
-    v5.navigate(l_AppPage_0.BadgesSeeAll, {
-        universeId = v6, 
-        pageTimer = v7, 
-        url = v8
-    });
-end;
+local Badges = script:FindFirstAncestor("Badges")
+local BadgesParent = Badges.Parent
+local AppPage = require(BadgesParent.RobloxAppEnums).AppPage
+local SduiLoadTimer = require(BadgesParent.SduiSharedUtilities).SduiLoadTimer
+local fetchBadgesSeeAllPageIfNeeded = require(Badges.BadgesSeeAllPage.fetchBadgesSeeAllPageIfNeeded)
+
+local function navigateToBadgesSeeAll(p1, s1: string) -- line: 9
+	-- upvalues: SduiLoadTimer (copy), AppPage (copy), fetchBadgesSeeAllPageIfNeeded (copy)
+	local v9 = SduiLoadTimer.createLoadTimer(AppPage.BadgesSeeAll)
+
+	v9.start("navigate")
+
+	local v10 = fetchBadgesSeeAllPageIfNeeded(s1, v9)
+
+	p1.navigate(AppPage.BadgesSeeAll, {
+		universeId = s1,
+		pageTimer = v9,
+		url = v10
+	})
+end
+
+return navigateToBadgesSeeAll

@@ -1,9 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiCoreSystem").Parent;
-local v1 = require(l_Parent_0.t);
-return function(v2, v3, v4) --[[ Line: 11 ]] --[[ Name: validateInterface ]]
-    -- upvalues: v1 (copy)
-    if v4 == nil then
-        v4 = true;
-    end;
-    return (if v4 then v1.interface(v3) else v1.strictInterface(v3))(v2);
-end;
+local Parent = script:FindFirstAncestor("SduiCoreSystem").Parent
+local t = require(Parent.t)
+
+local function validateInterface(t1: {[any]: any}, t2: {[any]: any}, b1: boolean?) -- line: 11
+	-- upvalues: t (copy)
+	if b1 == nil then
+		b1 = true
+	end
+
+	return ((if not b1 then t.strictInterface(t2) else t.interface(t2)))(t1)
+end
+
+return validateInterface

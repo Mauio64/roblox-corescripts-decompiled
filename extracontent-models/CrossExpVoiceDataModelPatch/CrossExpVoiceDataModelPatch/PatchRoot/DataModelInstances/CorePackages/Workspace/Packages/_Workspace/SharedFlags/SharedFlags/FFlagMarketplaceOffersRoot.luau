@@ -1,0 +1,5 @@
+local FFlagMarketplaceOffersRootLowSpender = require(script.Parent.FFlagMarketplaceOffersRootLowSpender)
+local FFlagMarketplaceOffersRootNoSpender = require(script.Parent.FFlagMarketplaceOffersRootNoSpender)
+local FFlagMarketplaceOffersRootRandom = require(script.Parent.FFlagMarketplaceOffersRootRandom)
+
+return (FFlagMarketplaceOffersRootLowSpender or (FFlagMarketplaceOffersRootNoSpender or FFlagMarketplaceOffersRootRandom)) and game:GetEngineFeature("SupportOfferIdsInCollectiblePurchase")

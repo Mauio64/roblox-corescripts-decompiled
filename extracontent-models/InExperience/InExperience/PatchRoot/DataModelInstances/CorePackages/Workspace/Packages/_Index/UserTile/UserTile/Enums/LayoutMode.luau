@@ -1,4 +1,4 @@
 return {
-    compact = "compact", 
-    wide = "wide"
-};
+	compact = "compact",
+	wide = "wide"
+}

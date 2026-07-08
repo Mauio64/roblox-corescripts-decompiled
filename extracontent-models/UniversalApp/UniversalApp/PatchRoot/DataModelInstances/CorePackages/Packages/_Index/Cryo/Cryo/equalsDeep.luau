@@ -1,35 +1,43 @@
-local v0 = require(script.Parent.equalObjects);
-local function v1(v2, v3) --[[ Line: 4 ]] --[[ Name: compareDeep ]]
-    -- upvalues: v1 (copy)
-    if type(v2) ~= "table" or type(v3) ~= "table" then
-        return v2 == v3;
-    else
-        for v4, v5 in v2 do
-            if not v1(v3[v4], v5) then
-                return false;
-            end;
-        end;
-        for v6, v7 in v3 do
-            if not v1(v2[v6], v7) then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
-return function(...) --[[ Line: 24 ]] --[[ Name: equalsDeep ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    if v0(...) then
-        return true;
-    else
-        local v8 = select("#", ...);
-        local v9 = select(1, ...);
-        for v10 = 2, v8 do
-            local v11 = select(v10, ...);
-            if not v1(v9, v11) then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
+local equalObjects = require(script.Parent.equalObjects)
+
+local function compareDeep(p1, p2) -- line: 4
+	-- upvalues: compareDeep (copy)
+	if type(p1) ~= "table" or type(p2) ~= "table" then
+		return p1 == p2
+	end
+
+	for v6, v7 in p1 do
+		if not compareDeep(p2[v6], v7) then
+			return false
+		end
+	end
+
+	for v8, v9 in p2 do
+		if not compareDeep(p1[v8], v9) then
+			return false
+		end
+	end
+
+	return true
+end
+local function equalsDeep(...) -- line: 24
+	-- upvalues: equalObjects (copy), compareDeep (copy)
+	if equalObjects(...) then
+		return true
+	end
+
+	local v10 = select("#", ...)
+	local v11 = select(1, ...)
+
+	for i = 2, v10 do
+		local v13 = select(i, ...)
+
+		if not compareDeep(v11, v13) then
+			return false
+		end
+	end
+
+	return true
+end
+
+return equalsDeep

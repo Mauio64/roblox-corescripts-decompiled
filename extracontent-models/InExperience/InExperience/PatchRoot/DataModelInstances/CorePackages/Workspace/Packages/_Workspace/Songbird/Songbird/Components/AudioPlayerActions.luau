@@ -18,23 +18,23 @@ local useCallback = React.useCallback
 local useState = React.useState
 local createNextOrder = ReactUtils.createNextOrder
 
-return function(t1: {[any]: any}) --[[ AudioPlayerActions ]] -- line: 37
+local function AudioPlayerActions(t1: {[any]: any}) -- line: 37
 	-- upvalues: useLocalization (copy), useState (copy), createNextOrder (copy), useCallback (copy), sendAudioPlayerAnalytics (copy), AnalyticActions (copy), React (copy), Foundation (copy), GetFFlagSongDetailsPageDesignPass (copy), CustomFoundationChip (copy), ReactRoblox (copy), ReportSongDialog (copy), CoreGui (copy)
-	local v18 = useLocalization({
+	local v19 = useLocalization({
 		favorite = "Feature.SongDetails.Action.Favorite",
 		report = "Feature.SongDetails.Action.Report"
 	})
-	local v19, v20 = useState(false)
-	local v21 = createNextOrder()
-	local v22 = useCallback(function(p1) -- line: 47
+	local v20, v21 = useState(false)
+	local v22 = createNextOrder()
+	local v23 = useCallback(function(p1) -- line: 47
 		-- upvalues: t1 (copy), sendAudioPlayerAnalytics (copy)
-		local v27 = t1.audio.assetId:gsub("rbxassetid://", "")
-		local v28 = if not t1.audio.thumbnailAssetId then nil else t1.audio.thumbnailAssetId:gsub("rbxassetid://", "")
+		local v28 = t1.audio.assetId:gsub("rbxassetid://", "")
+		local v29 = if not t1.audio.thumbnailAssetId then nil else t1.audio.thumbnailAssetId:gsub("rbxassetid://", "")
 
 		sendAudioPlayerAnalytics({
 			action = p1,
-			songId = v27,
-			thumbnailId = v28 or "-1",
+			songId = v28,
+			thumbnailId = v29 or "-1",
 			source = t1.analyticsSource
 		})
 	end, {
@@ -43,33 +43,33 @@ return function(t1: {[any]: any}) --[[ AudioPlayerActions ]] -- line: 37
 		t1.audio.thumbnailAssetId,
 		t1.analyticsSource
 	})
-	local v23 = useCallback(function() -- line: 72
-		-- upvalues: t1 (copy), v22 (copy), AnalyticActions (copy)
+	local v24 = useCallback(function() -- line: 72
+		-- upvalues: t1 (copy), v23 (copy), AnalyticActions (copy)
 		if t1.audio.isLiked then
 			if t1.onUnlike then
-				v22(AnalyticActions.Unlike)
+				v23(AnalyticActions.Unlike)
 				t1.onUnlike()
 
 				return
 			end
 		elseif t1.onLike then
-			v22(AnalyticActions.Like)
+			v23(AnalyticActions.Like)
 			t1.onLike()
 		end
 	end, {
 		t1.audio.isLiked,
 		t1.onLike,
 		t1.onUnlike,
-		v22
+		v23
 	})
-	local v24 = useCallback(function() -- line: 93
-		-- upvalues: v22 (copy), AnalyticActions (copy), v20 (copy)
-		v22(AnalyticActions.StartAudioReport)
-		v20(true)
+	local v25 = useCallback(function() -- line: 93
+		-- upvalues: v23 (copy), AnalyticActions (copy), v21 (copy)
+		v23(AnalyticActions.StartAudioReport)
+		v21(true)
 	end, {})
-	local v25 = useCallback(function() -- line: 98
-		-- upvalues: v20 (copy)
-		v20(false)
+	local v26 = useCallback(function() -- line: 98
+		-- upvalues: v21 (copy)
+		v21(false)
 	end, {})
 
 	return React.createElement(Foundation.View, {
@@ -77,49 +77,51 @@ return function(t1: {[any]: any}) --[[ AudioPlayerActions ]] -- line: 37
 		LayoutOrder = t1.LayoutOrder
 	}, {
 		Favorite = if not GetFFlagSongDetailsPageDesignPass() then React.createElement(CustomFoundationChip, {
-			LayoutOrder = v21(),
-			text = v18.favorite,
+			LayoutOrder = v22(),
+			text = v19.favorite,
 			icon = not t1.audio.isLiked and "icons/actions/favoriteOff" or "icons/actions/favoriteOn",
-			onActivated = v23
+			onActivated = v24
 		}) else React.createElement(Foundation.Chip, {
-			text = v18.favorite,
+			text = v19.favorite,
 			leading = {
 				iconName = Foundation.Enums.IconName.Star,
 				iconVariant = if not t1.audio.isLiked then nil else Foundation.Enums.IconVariant.Filled
 			},
-			onActivated = v23,
-			LayoutOrder = v21()
+			onActivated = v24,
+			LayoutOrder = v22()
 		}),
 		Report = if not GetFFlagSongDetailsPageDesignPass() then React.createElement(CustomFoundationChip, {
-			LayoutOrder = v21(),
-			text = v18.report,
 			icon = "icons/actions/feedback",
-			onActivated = v24
+			LayoutOrder = v22(),
+			text = v19.report,
+			onActivated = v25
 		}) else React.createElement(Foundation.Chip, {
-			text = v18.report,
+			text = v19.report,
 			leading = {
 				iconName = Foundation.Enums.IconName.Flag
 			},
-			onActivated = v24,
-			LayoutOrder = v21()
+			onActivated = v25,
+			LayoutOrder = v22()
 		}),
-		ReportDialog = v19 and ReactRoblox.createPortal(React.createElement("ScreenGui", {
-			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-			DisplayOrder = 2
+		ReportDialog = v20 and ReactRoblox.createPortal(React.createElement("ScreenGui", {
+			DisplayOrder = 2,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		}, {
 			Background = React.createElement(Foundation.View, {
 				tag = "size-full row align-y-center align-x-center bg-over-media-100",
 				stateLayer = {
 					affordance = Foundation.Enums.StateLayerAffordance.None
 				},
-				onActivated = v25
+				onActivated = v26
 			}, {
 				Dialog = React.createElement(ReportSongDialog, {
 					audio = t1.audio,
 					analyticsSource = t1.analyticsSource or "unknown",
-					onClose = v25
+					onClose = v26
 				})
 			})
 		}), CoreGui)
 	})
 end
+
+return AudioPlayerActions

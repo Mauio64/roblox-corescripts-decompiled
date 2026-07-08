@@ -1,11 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GroupsNetworking");
-local v1 = require(l_script_FirstAncestor_0.GROUPS_URL);
-return function(v2) --[[ Line: 14 ]]
-    -- upvalues: v1 (copy)
-    return v2.roduxNetworking.POST({
-        Name = "JoinGroup"
-    }, function(v3, v4) --[[ Line: 17 ]]
-        -- upvalues: v1 (ref)
-        return v3(v1):path("v1"):path("groups"):id(v4.groupId):path("users"):body({});
-    end);
-end;
+local GroupsNetworking = script:FindFirstAncestor("GroupsNetworking")
+local GROUPS_URL = require(GroupsNetworking.GROUPS_URL)
+
+return function(p1) -- line: 14
+	-- upvalues: GROUPS_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "JoinGroup"
+	}, function(p2, t1: {[any]: any}) -- line: 17
+		-- upvalues: GROUPS_URL (copy)
+		return p2(GROUPS_URL):path("v1"):path("groups"):id(t1.groupId):path("users"):body({})
+	end)
+end

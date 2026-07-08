@@ -1,14 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("GraphQLServer").Parent;
-local _ = require(l_Parent_0.GraphQL);
-local _ = require(l_Parent_0.LuauPolyfill);
-return function(v3) --[[ Line: 8 ]] --[[ Name: buildTypeResolver ]]
-    return function(v4, v5, v6, v7) --[[ Line: 9 ]]
-        -- upvalues: v3 (copy)
-        local v8 = v3[v7.name];
-        if type(v8) == "table" and type(v8.__resolveType) == "function" then
-            return v8.__resolveType(v4, v5, v6, v7);
-        else
-            return v7.name;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+
+require(Parent.GraphQL)
+require(Parent.LuauPolyfill)
+
+local function buildTypeResolver(p1) -- line: 8
+	return function(p2, p3, p4, p5) -- line: 9
+		-- upvalues: p1 (copy)
+		local v8 = p1[p5.name]
+
+		if type(v8) == "table" and type(v8.__resolveType) == "function" then
+			return v8.__resolveType(p2, p3, p4, p5)
+		end
+
+		return p5.name
+	end
+end
+
+return buildTypeResolver

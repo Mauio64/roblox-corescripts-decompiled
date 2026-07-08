@@ -1,20 +1,24 @@
-local v0 = require(script.Parent.Parent["Type.roblox"]);
-local v1 = {};
-local v3 = {
-    __tostring = function(v2) --[[ Line: 33 ]] --[[ Name: __tostring ]]
-        return string.format("RoactHostChangeEvent(%s)", v2.name);
-    end
-};
-setmetatable(v1, {
-    __index = function(_, v5) --[[ Line: 39 ]] --[[ Name: __index ]]
-        -- upvalues: v0 (copy), v3 (copy), v1 (copy)
-        local v6 = {
-            [v0] = v0.HostChangeEvent, 
-            name = v5
-        };
-        setmetatable(v6, v3);
-        v1[v5] = v6;
-        return v6;
-    end
-});
-return v1;
+local lib = require(script.Parent.Parent["Type.roblox"])
+local t1 = {}
+local t2 = {
+	__tostring = function(p1) -- line: 33
+		return string.format("RoactHostChangeEvent(%s)", p1.name)
+	end
+}
+
+setmetatable(t1, {
+	__index = function(_, p3) -- line: 39
+		-- upvalues: lib (copy), t2 (copy), t1 (copy)
+		local t3 = {
+			[lib] = lib.HostChangeEvent,
+			name = p3
+		}
+
+		setmetatable(t3, t2)
+		t1[p3] = t3
+
+		return t3
+	end
+})
+
+return t1

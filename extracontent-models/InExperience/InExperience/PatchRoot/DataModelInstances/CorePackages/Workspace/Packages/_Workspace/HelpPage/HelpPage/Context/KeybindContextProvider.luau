@@ -1,16 +1,18 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(script.Parent.KeybindContext);
-local v4 = require(l_Parent_0.Configs.BindingConfigs);
-return v2.memo(function(v5) --[[ Line: 14 ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    local v6, _ = v2.useState(v4.ControlGroups);
-    local v8, _ = v2.useState(v4.Controls);
-    return v2.createElement(v3.Provider, {
-        value = {
-            groups = v6, 
-            controls = v8
-        }
-    }, v5.children);
-end);
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local KeybindContext = require(script.Parent.KeybindContext)
+local BindingConfigs = require(ParentParent.Configs.BindingConfigs)
+
+return React.memo(function(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), BindingConfigs (copy), KeybindContext (copy)
+	local v7, _ = React.useState(BindingConfigs.ControlGroups)
+	local v9, _ = React.useState(BindingConfigs.Controls)
+
+	return React.createElement(KeybindContext.Provider, {
+		value = {
+			groups = v7,
+			controls = v9
+		}
+	}, t1.children)
+end)

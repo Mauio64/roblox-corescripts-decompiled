@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent._Index;
-return (require(l__Index_0.ReactOtter.ReactOtter));
+local _Index = script.Parent._Index
+
+return (require(_Index.ReactOtter.ReactOtter))

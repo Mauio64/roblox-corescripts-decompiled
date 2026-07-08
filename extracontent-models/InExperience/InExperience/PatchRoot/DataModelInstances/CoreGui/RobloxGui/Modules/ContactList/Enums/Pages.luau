@@ -1,4 +1,4 @@
 return {
-    CallHistory = "CallHistory", 
-    FriendList = "FriendList"
-};
+	CallHistory = "CallHistory",
+	FriendList = "FriendList"
+}

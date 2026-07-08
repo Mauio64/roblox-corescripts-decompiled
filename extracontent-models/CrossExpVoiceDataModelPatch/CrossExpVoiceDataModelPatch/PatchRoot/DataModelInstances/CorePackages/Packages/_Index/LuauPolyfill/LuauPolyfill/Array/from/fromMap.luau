@@ -1,22 +1,27 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.types);
-return function(v2, v3, v4) --[[ Line: 11 ]]
-    local v5 = {};
-    if v3 then
-        v5 = {};
-        for v6, v7 in v2 do
-            if v4 ~= nil then
-                v5[v6] = v3(v4, v7, v6);
-            else
-                v5[v6] = v3(v7, v6);
-            end;
-        end;
-        return v5;
-    else
-        v5 = {};
-        for v8, v9 in v2 do
-            v5[v8] = v9;
-        end;
-        return v5;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.types)
+
+return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 11
+	if p2 then
+		local t1 = {}
+
+		for v6, v7 in p1 do
+			if p3 ~= nil then
+				t1[v6] = p2(p3, v7, v6)
+			else
+				t1[v6] = p2(v7, v6)
+			end
+		end
+
+		return t1
+	end
+
+	local t2 = {}
+
+	for v9, v10 in p1 do
+		t2[v9] = v10
+	end
+
+	return t2
+end

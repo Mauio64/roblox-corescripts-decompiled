@@ -1,15 +1,20 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.ES7Types);
-return function(v2) --[[ Line: 22 ]]
-    local v3 = #v2;
-    local v4 = 1;
-    while v4 < v3 do
-        local v5 = v2[v3];
-        local v6 = v2[v4];
-        v2[v4] = v5;
-        v2[v3] = v6;
-        v4 = v4 + 1;
-        v3 = v3 - 1;
-    end;
-    return v2;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+return function(p1) -- line: 22
+	local v3 = #p1
+	local n1 = 1
+
+	while n1 < v3 do
+		local v5 = p1[v3]
+		local v6 = p1[n1]
+
+		p1[n1] = v5
+		p1[v3] = v6
+		n1 += 1
+		v3 -= 1
+	end
+
+	return p1
+end

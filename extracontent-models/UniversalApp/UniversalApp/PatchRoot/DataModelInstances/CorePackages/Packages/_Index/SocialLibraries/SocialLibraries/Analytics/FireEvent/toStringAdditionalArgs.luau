@@ -1,13 +1,15 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_tutils_0 = v1.tutils;
-local l_llama_0 = v1.llama;
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: l_llama_0 (copy), l_tutils_0 (copy)
-    if l_llama_0.isEmpty(v4) then
-        return "{}";
-    else
-        local v5, _ = string.gsub(" args: " .. l_tutils_0.toString(v4), "%s+", " ");
-        return v5;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local tutils = dependencies.tutils
+local llama = dependencies.llama
+
+return function(p1) -- line: 7
+	-- upvalues: llama (copy), tutils (copy)
+	if llama.isEmpty(p1) then
+		return "{}"
+	end
+
+	local result, _ = string.gsub(" args: " .. tutils.toString(p1), "%s+", " ")
+
+	return result
+end

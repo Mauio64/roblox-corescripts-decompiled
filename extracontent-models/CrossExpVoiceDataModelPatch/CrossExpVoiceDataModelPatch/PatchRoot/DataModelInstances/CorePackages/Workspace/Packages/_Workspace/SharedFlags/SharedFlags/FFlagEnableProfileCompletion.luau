@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableProfileCompletion", false);
+return game:DefineFastFlag("EnableProfileCompletion", false)

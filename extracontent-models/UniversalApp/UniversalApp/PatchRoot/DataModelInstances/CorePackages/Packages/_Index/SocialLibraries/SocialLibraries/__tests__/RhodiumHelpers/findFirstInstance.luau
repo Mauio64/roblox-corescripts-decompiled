@@ -1,28 +1,34 @@
-local function _(v0, v1) --[[ Line: 6 ]] --[[ Name: getProperty ]]
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 7 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        return v0[v1];
-    end);
-    return l_status_0 == true and l_result_0 or nil;
-end;
-local function v11(v5, v6) --[[ Line: 14 ]] --[[ Name: propertyMatch ]]
-    for v7, v8 in pairs(v6) do
-        local l_status_1, l_result_1 = pcall(function() --[[ Line: 7 ]]
-            -- upvalues: v5 (copy), v7 (copy)
-            return v5[v7];
-        end);
-        if (l_status_1 == true and l_result_1 or nil) ~= v8 then
-            return false;
-        end;
-    end;
-    return true;
-end;
-return function(v12, v13) --[[ Line: 24 ]] --[[ Name: findFirstInstance ]]
-    -- upvalues: v11 (copy)
-    for _, v15 in ipairs(v12:GetDescendants()) do
-        if v11(v15, v13) then
-            return v15;
-        end;
-    end;
-    return nil;
-end;
+local function getProperty(p1, p2) -- line: 6
+	local ok, result = pcall(function() -- line: 7
+		-- upvalues: p1 (copy), p2 (copy)
+		return p1[p2]
+	end)
+
+	return ok == true and result or nil
+end
+local function propertyMatch(p3, p4) -- line: 14
+	for k, v in pairs(p4) do
+		local ok, result = pcall(function() -- line: 7
+			-- upvalues: p3 (copy), k (copy)
+			return p3[k]
+		end)
+
+		if v ~= (ok == true and result or nil) then
+			return false
+		end
+	end
+
+	return true
+end
+local function findFirstInstance(p5, p6) -- line: 24
+	-- upvalues: propertyMatch (copy)
+	for _, descendant in ipairs(p5:GetDescendants()) do
+		if propertyMatch(descendant, p6) then
+			return descendant
+		end
+	end
+
+	return nil
+end
+
+return findFirstInstance

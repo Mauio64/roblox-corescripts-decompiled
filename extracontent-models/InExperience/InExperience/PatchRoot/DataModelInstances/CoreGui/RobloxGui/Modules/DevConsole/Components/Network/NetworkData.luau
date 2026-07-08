@@ -1,191 +1,218 @@
-local l_LogService_0 = game:GetService("LogService");
-local v1 = require(script.Parent.Parent.Parent.CircularBuffer);
-local v2 = require(script.Parent.Parent.Parent.Signal);
-local l_ChartHeaderNames_0 = require(script.Parent.Parent.Parent.Constants).NetworkFormatting.ChartHeaderNames;
-local v4 = tonumber(settings():GetFVariable("NewDevConsoleMaxHttpCount"));
-local v17 = {
-    [l_ChartHeaderNames_0[1]] = function(v5, v6) --[[ Line: 12 ]]
-        return v5.Num < v6.Num;
-    end, 
-    [l_ChartHeaderNames_0[2]] = function(v7, v8) --[[ Line: 15 ]]
-        return v7.Method < v8.Method;
-    end, 
-    [l_ChartHeaderNames_0[3]] = function(v9, v10) --[[ Line: 18 ]]
-        return v9.Status < v10.Status;
-    end, 
-    [l_ChartHeaderNames_0[4]] = function(v11, v12) --[[ Line: 21 ]]
-        return v11.Time < v12.Time;
-    end, 
-    [l_ChartHeaderNames_0[5]] = function(v13, v14) --[[ Line: 24 ]]
-        return v13.RequestType < v14.RequestType;
-    end, 
-    [l_ChartHeaderNames_0[6]] = function(v15, v16) --[[ Line: 27 ]]
-        return v15.Url < v16.Url;
-    end
-};
-local function _(v18, v19, v20, v21, v22, v23, v24) --[[ Line: 32 ]] --[[ Name: newHttpEntry ]]
-    return {
-        Num = v18, 
-        Method = v19, 
-        Status = v20, 
-        Time = v21, 
-        RequestType = v22, 
-        Url = v23, 
-        Response = v24
-    };
-end;
-local v26 = {};
-v26.__index = v26;
-v26.new = function(v27) --[[ Line: 47 ]] --[[ Name: new ]]
-    -- upvalues: v26 (copy), l_LogService_0 (copy), v2 (copy), v1 (copy), v4 (copy), l_ChartHeaderNames_0 (copy)
-    local v28 = {};
-    setmetatable(v28, v26);
-    v28._isRunning = false;
-    v28._isClient = v27;
-    v28._httpResultSignal = v27 and l_LogService_0.HttpResultOut or l_LogService_0.ServerHttpResultOut;
-    v28._httpEntryAdded = v2.new();
-    v28._httpSummaryTable = {};
-    v28._httpSummaryCount = 0;
-    v28._httpEntryBuffer = v1.new(v4);
-    v28._httpLifeTimeEntryCount = 0;
-    v28._sortType = l_ChartHeaderNames_0[1];
-    return v28;
-end;
-v26.addHttpEntry = function(v29, v30) --[[ Line: 65 ]] --[[ Name: addHttpEntry ]]
-    v29._httpLifeTimeEntryCount = v29._httpLifeTimeEntryCount + 1;
-    local l__httpLifeTimeEntryCount_0 = v29._httpLifeTimeEntryCount;
-    local l_Method_0 = v30.Method;
-    local l_Status_0 = v30.Status;
-    local l_Time_0 = v30.Time;
-    local l_RequestType_0 = v30.RequestType;
-    local l_URL_0 = v30.URL;
-    local l_Response_0 = v30.Response;
-    local v38 = {
-        Num = l__httpLifeTimeEntryCount_0, 
-        Method = l_Method_0, 
-        Status = l_Status_0, 
-        Time = l_Time_0, 
-        RequestType = l_RequestType_0, 
-        Url = l_URL_0, 
-        Response = l_Response_0
-    };
-    v29._httpEntryBuffer:push_back(v38);
-    l__httpLifeTimeEntryCount_0 = v30.RequestType;
-    l_Method_0 = v29._httpSummaryTable[l__httpLifeTimeEntryCount_0];
-    if not l_Method_0 then
-        v29._httpSummaryCount = v29._httpSummaryCount + 1;
-        v29._httpSummaryTable[l__httpLifeTimeEntryCount_0] = {
-            RequestType = l__httpLifeTimeEntryCount_0, 
-            RequestCount = 1, 
-            FailedCount = 0, 
-            AverageTime = v30.Time, 
-            MinTime = v30.Time, 
-            MaxTime = v30.Time
-        };
-        if v30.Status >= 400 then
-            v29._httpSummaryTable[v30.RequestType].FailedCount = 1;
-            return;
-        end;
-    else
-        l_Method_0.RequestCount = l_Method_0.RequestCount + 1;
-        if v30.Status >= 400 then
-            l_Method_0.FailedCount = l_Method_0.FailedCount + 1;
-        end;
-        l_Method_0.AverageTime = (l_Method_0.AverageTime * l_Method_0.RequestCount + v30.Time - l_Method_0.AverageTime) / l_Method_0.RequestCount;
-        if v30.Time < l_Method_0.MinTime then
-            l_Method_0.MinTime = v30.Time;
-        end;
-        if v30.Time > l_Method_0.MaxTime then
-            l_Method_0.MaxTime = v30.Time;
-        end;
-    end;
-end;
-v26.setSortType = function(v39, v40) --[[ Line: 117 ]] --[[ Name: setSortType ]]
-    -- upvalues: v17 (copy)
-    if v17[v40] then
-        v39._sortType = v40;
-        v39._httpEntryAdded:Fire(v39._httpSummaryTable, v39._httpSummaryCount, v39:getSortedEntries());
-        return;
-    else
-        error(string.format("attempted to pass invalid sortType: %s", (tostring(v40))), 2);
-        return;
-    end;
-end;
-v26.getSortType = function(v41) --[[ Line: 130 ]] --[[ Name: getSortType ]]
-    return v41._sortType;
-end;
-v26.resetHttpEntryList = function(v42) --[[ Line: 134 ]] --[[ Name: resetHttpEntryList ]]
-    -- upvalues: l_LogService_0 (copy)
-    v42._httpSummaryTable = {};
-    v42._httpEntryBuffer:reset();
-    v42._httpLifeTimeEntryCount = 0;
-    if v42._isClient then
-        local l_l_LogService_0_HttpResultHistory_0 = l_LogService_0:GetHttpResultHistory();
-        if l_l_LogService_0_HttpResultHistory_0 then
-            for _, v45 in pairs(l_l_LogService_0_HttpResultHistory_0) do
-                v42:addHttpEntry(v45);
-            end;
-        end;
-    end;
-end;
-v26.Signal = function(v46) --[[ Line: 149 ]] --[[ Name: Signal ]]
-    return v46._httpEntryAdded;
-end;
-v26.getSortedEntries = function(v47) --[[ Line: 153 ]] --[[ Name: getSortedEntries ]]
-    -- upvalues: v17 (copy)
-    local v48 = v47._httpEntryBuffer:iterator();
-    local v49 = v48:next();
-    local v50 = {};
-    local v51 = 1;
-    while v49 do
-        v50[v51] = v49;
-        v51 = v51 + 1;
-        v49 = v48:next();
-    end;
-    table.sort(v50, v17[v47._sortType]);
-    return v50;
-end;
-v26.getCurrentData = function(v52) --[[ Line: 170 ]] --[[ Name: getCurrentData ]]
-    return {
-        summaryTable = v52._httpSummaryTable, 
-        summaryCount = v52._httpSummaryCount, 
-        entryList = v52:getSortedEntries()
-    };
-end;
-v26.isRunning = function(v53) --[[ Line: 178 ]] --[[ Name: isRunning ]]
-    return v53._isRunning;
-end;
-v26.start = function(v54) --[[ Line: 182 ]] --[[ Name: start ]]
-    -- upvalues: l_LogService_0 (copy)
-    if not v54._httpResultConnection then
-        if v54._additionHttpSetup then
-            v54._additionHttpSetup();
-        end;
-        v54._httpResultConnection = v54._httpResultSignal:connect(function(v55) --[[ Line: 188 ]]
-            -- upvalues: v54 (copy)
-            v54:addHttpEntry(v55);
-            v54._httpEntryAdded:Fire(v54._httpSummaryTable, v54._httpSummaryCount, v54:getSortedEntries());
-        end);
-        v54:resetHttpEntryList();
-        if not v54._isClient then
-            v54._onHttpResultApprovedConnection = l_LogService_0.OnHttpResultApproved:connect(function(v56) --[[ Line: 200 ]]
-                -- upvalues: l_LogService_0 (ref), v54 (copy)
-                l_LogService_0:RequestHttpResultApproved();
-                if v56 then
-                    v54._onHttpResultApprovedConnection:Disconnect();
-                    v54._onHttpResultApprovedConnection = nil;
-                end;
-            end);
-            l_LogService_0:RequestServerHttpResult();
-        end;
-        v54._isRunning = true;
-    end;
-end;
-v26.stop = function(v57) --[[ Line: 213 ]] --[[ Name: stop ]]
-    if v57._httpResultConnection then
-        v57._httpResultConnection:Disconnect();
-        v57._httpResultConnection = nil;
-    end;
-    v57._isRunning = false;
-end;
-return v26;
+local LogService = game:GetService("LogService")
+local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local ChartHeaderNames = require(script.Parent.Parent.Parent.Constants).NetworkFormatting.ChartHeaderNames
+local num = tonumber(settings():GetFVariable("NewDevConsoleMaxHttpCount"))
+local t1 = {
+	[ChartHeaderNames[1]] = function(p1, p2) -- line: 12
+		return p1.Num < p2.Num
+	end,
+	[ChartHeaderNames[2]] = function(p3, p4) -- line: 15
+		return p3.Method < p4.Method
+	end,
+	[ChartHeaderNames[3]] = function(p5, p6) -- line: 18
+		return p5.Status < p6.Status
+	end,
+	[ChartHeaderNames[4]] = function(p7, p8) -- line: 21
+		return p7.Time < p8.Time
+	end,
+	[ChartHeaderNames[5]] = function(p9, p10) -- line: 24
+		return p9.RequestType < p10.RequestType
+	end,
+	[ChartHeaderNames[6]] = function(p11, p12) -- line: 27
+		return p11.Url < p12.Url
+	end
+}
+
+local function newHttpEntry(p13, p14, p15, p16, p17, p18, p19) -- line: 32
+	return {
+		Num = p13,
+		Method = p14,
+		Status = p15,
+		Time = p16,
+		RequestType = p17,
+		Url = p18,
+		Response = p19
+	}
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(p20) -- line: 47
+	-- upvalues: t2 (copy), LogService (copy), Signal (copy), CircularBuffer (copy), num (copy), ChartHeaderNames (copy)
+	local t3 = {}
+
+	setmetatable(t3, t2)
+	t3._isRunning = false
+	t3._isClient = p20
+	t3._httpResultSignal = p20 and LogService.HttpResultOut or LogService.ServerHttpResultOut
+	t3._httpEntryAdded = Signal.new()
+	t3._httpSummaryTable = {}
+	t3._httpSummaryCount = 0
+	t3._httpEntryBuffer = CircularBuffer.new(num)
+	t3._httpLifeTimeEntryCount = 0
+	t3._sortType = ChartHeaderNames[1]
+
+	return t3
+end
+function t2.addHttpEntry(p21, p22) -- line: 65
+	p21._httpLifeTimeEntryCount = p21._httpLifeTimeEntryCount + 1
+
+	local _httpLifeTimeEntryCount = p21._httpLifeTimeEntryCount
+	local Method = p22.Method
+	local Status = p22.Status
+	local Time = p22.Time
+	local RequestType = p22.RequestType
+	local URL = p22.URL
+	local Response = p22.Response
+	local t4 = {
+		Num = _httpLifeTimeEntryCount,
+		Method = Method,
+		Status = Status,
+		Time = Time,
+		RequestType = RequestType,
+		Url = URL,
+		Response = Response
+	}
+
+	p21._httpEntryBuffer:push_back(t4)
+
+	local RequestType2 = p22.RequestType
+	local v41 = p21._httpSummaryTable[RequestType2]
+
+	if not v41 then
+		p21._httpSummaryCount = p21._httpSummaryCount + 1
+		p21._httpSummaryTable[RequestType2] = {
+			RequestCount = 1,
+			FailedCount = 0,
+			RequestType = RequestType2,
+			AverageTime = p22.Time,
+			MinTime = p22.Time,
+			MaxTime = p22.Time
+		}
+
+		if p22.Status >= 400 then
+			p21._httpSummaryTable[p22.RequestType].FailedCount = 1
+
+			return
+		end
+	else
+		v41.RequestCount = v41.RequestCount + 1
+
+		if p22.Status >= 400 then
+			v41.FailedCount = v41.FailedCount + 1
+		end
+
+		v41.AverageTime = (v41.AverageTime * v41.RequestCount + p22.Time - v41.AverageTime) / v41.RequestCount
+
+		if p22.Time < v41.MinTime then
+			v41.MinTime = p22.Time
+		end
+
+		if p22.Time > v41.MaxTime then
+			v41.MaxTime = p22.Time
+		end
+	end
+end
+function t2.setSortType(p23, p24) -- line: 117
+	-- upvalues: t1 (copy)
+	if t1[p24] then
+		p23._sortType = p24
+		p23._httpEntryAdded:Fire(p23._httpSummaryTable, p23._httpSummaryCount, p23:getSortedEntries())
+
+		return
+	end
+
+	error(string.format("attempted to pass invalid sortType: %s", (tostring(p24))), 2)
+end
+function t2.getSortType(p25) -- line: 130
+	return p25._sortType
+end
+function t2.resetHttpEntryList(p26) -- line: 134
+	-- upvalues: LogService (copy)
+	p26._httpSummaryTable = {}
+	p26._httpEntryBuffer:reset()
+	p26._httpLifeTimeEntryCount = 0
+
+	if p26._isClient then
+		local HttpResultHistory = LogService:GetHttpResultHistory()
+
+		if HttpResultHistory then
+			for _, v in pairs(HttpResultHistory) do
+				p26:addHttpEntry(v)
+			end
+		end
+	end
+end
+function t2.Signal(p27) -- line: 149
+	return p27._httpEntryAdded
+end
+function t2.getSortedEntries(p28) -- line: 153
+	-- upvalues: t1 (copy)
+	local v51 = p28._httpEntryBuffer:iterator()
+	local v52 = v51:next()
+	local t5 = {}
+	local n1 = 1
+
+	while v52 do
+		t5[n1] = v52
+		n1 += 1
+		v52 = v51:next()
+	end
+
+	table.sort(t5, t1[p28._sortType])
+
+	return t5
+end
+function t2.getCurrentData(p29) -- line: 170
+	return {
+		summaryTable = p29._httpSummaryTable,
+		summaryCount = p29._httpSummaryCount,
+		entryList = p29:getSortedEntries()
+	}
+end
+function t2.isRunning(p30) -- line: 178
+	return p30._isRunning
+end
+function t2.start(p31) -- line: 182
+	-- upvalues: LogService (copy)
+	if not p31._httpResultConnection then
+		if p31._additionHttpSetup then
+			p31._additionHttpSetup()
+		end
+
+		p31._httpResultConnection = p31._httpResultSignal:connect(function(p32) -- line: 188
+			-- upvalues: p31 (copy)
+			p31:addHttpEntry(p32)
+			p31._httpEntryAdded:Fire(p31._httpSummaryTable, p31._httpSummaryCount, p31:getSortedEntries())
+		end)
+		p31:resetHttpEntryList()
+
+		if not p31._isClient then
+			p31._onHttpResultApprovedConnection = LogService.OnHttpResultApproved:connect(function(p33) -- line: 200
+				-- upvalues: LogService (copy), p31 (copy)
+				LogService:RequestHttpResultApproved()
+
+				if p33 then
+					p31._onHttpResultApprovedConnection:Disconnect()
+					p31._onHttpResultApprovedConnection = nil
+				end
+			end)
+			LogService:RequestServerHttpResult()
+		end
+
+		p31._isRunning = true
+	end
+end
+function t2.stop(p34) -- line: 213
+	if p34._httpResultConnection then
+		p34._httpResultConnection:Disconnect()
+		p34._httpResultConnection = nil
+	end
+
+	p34._isRunning = false
+end
+
+return t2

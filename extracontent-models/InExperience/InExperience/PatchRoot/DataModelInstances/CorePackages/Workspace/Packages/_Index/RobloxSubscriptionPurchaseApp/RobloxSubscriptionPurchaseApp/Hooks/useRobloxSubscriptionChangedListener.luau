@@ -1,37 +1,55 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Players_0 = game:GetService("Players");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v5 = require(l_script_FirstAncestor_0.Actions.finalizeRobloxSubscriptionUpsellFlow);
-local v6 = require(l_script_FirstAncestor_0.Enums.PromptState);
-return function() --[[ Line: 17 ]] --[[ Name: useMembershipChangedListener ]]
-    -- upvalues: v4 (copy), v3 (copy), l_Players_0 (copy), v6 (copy), v5 (copy)
-    local v7 = v4.get();
-    v3.useEffect(function() --[[ Line: 20 ]]
-        -- upvalues: l_Players_0 (ref), v7 (copy), v6 (ref), v5 (ref)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        if not l_LocalPlayer_0 then
-            return nil;
-        else
-            local function v9() --[[ Line: 26 ]] --[[ Name: onHasRobloxSubscriptionChanged ]]
-                -- upvalues: l_LocalPlayer_0 (copy), v7 (ref), v6 (ref), v5 (ref)
-                if l_LocalPlayer_0.HasRobloxSubscription ~= true then
-                    return;
-                else
-                    if v7.getPromptState() == v6.SubscriptionStatusPolling then
-                        v5(true);
-                    end;
-                    return;
-                end;
-            end;
-            local v10 = l_LocalPlayer_0:GetPropertyChangedSignal("HasRobloxSubscription"):Connect(v9);
-            return function() --[[ Line: 41 ]]
-                -- upvalues: v10 (copy)
-                if v10 then
-                    v10:Disconnect();
-                end;
-            end;
-        end;
-    end, {});
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local Players = game:GetService("Players")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local React = require(RobloxSubscriptionPurchaseAppParent.React)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local finalizeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.finalizeRobloxSubscriptionUpsellFlow)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+
+local function useRobloxSubscriptionChangedListener(p1: ((...any) -> ...any)?) -- line: 18
+	-- upvalues: RobloxSubscriptionStore (copy), React (copy), Players (copy), PromptState (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+	local v10 = RobloxSubscriptionStore.get()
+	local v11 = React.useRef(v10)
+	local v12 = React.useMemo(function() -- line: 22
+		-- upvalues: p1 (copy), Players (copy)
+		if p1 then
+			return p1
+		end
+
+		return function() -- line: 26
+			-- upvalues: Players (copy)
+			return Players.LocalPlayer
+		end
+	end, { p1 })
+
+	React.useEffect(function() -- line: 31
+		-- upvalues: v12 (copy), v11 (copy), PromptState (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+		local v13 = v12()
+
+		if not v13 then
+			return nil
+		end
+
+		local function onHasRobloxSubscriptionChanged() -- line: 37
+			-- upvalues: v13 (copy), v11 (copy), PromptState (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+			if v13.HasRobloxSubscription ~= true then
+				return
+			end
+
+			if v11.current.getPromptState() == PromptState.SubscriptionStatusPolling then
+				finalizeRobloxSubscriptionUpsellFlow(true)
+			end
+		end
+
+		local connection = v13:GetPropertyChangedSignal("HasRobloxSubscription"):Connect(onHasRobloxSubscriptionChanged)
+
+		return function() -- line: 52
+			-- upvalues: connection (copy)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v12 })
+end
+
+return useRobloxSubscriptionChangedListener

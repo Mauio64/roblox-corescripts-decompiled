@@ -1,1 +1,1 @@
-return require(script.ChatSettings);
+return require(script.ChatSettings)

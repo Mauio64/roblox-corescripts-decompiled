@@ -1,52 +1,58 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Dash);
-local v3 = require(l_Parent_1.Rodux);
-local v4 = require(l_Parent_0.Enums.CapturesToastType);
-local v5 = require(l_Parent_0.Actions.ToastDismissed);
-local v6 = require(l_Parent_0.Actions.ToastTriggered);
-local v7 = require(l_Parent_0.Actions.ToastVanished);
-local _ = require(l_Parent_0.Types);
-local v9 = {
-    IsDismissed = false, 
-    ToastType = v4.None, 
-    ToastConfig = nil
-};
-return v3.createReducer(v9, {
-    [v7.name] = function(v10, _) --[[ Line: 26 ]]
-        -- upvalues: v4 (copy)
-        if v10.ToastType == v4.None then
-            return v10;
-        else
-            return {
-                IsDismissed = false, 
-                ToastType = v4.None
-            };
-        end;
-    end, 
-    [v5.name] = function(v12, _) --[[ Line: 37 ]]
-        -- upvalues: v4 (copy), v2 (copy)
-        if v12.IsDismissed then
-            return v12;
-        elseif v12.ToastType == v4.None then
-            return v12;
-        else
-            return v2.join(v12, {
-                IsDismissed = true
-            });
-        end;
-    end, 
-    [v6.name] = function(v14, v15) --[[ Line: 51 ]]
-        -- upvalues: v2 (copy)
-        local v16 = v2.shallowEqual(v14.ToastConfig, v15.toastConfig);
-        if v14.ToastType == v15.toastType and not v14.IsDismissed and v16 then
-            return v14;
-        else
-            return {
-                IsDismissed = false, 
-                ToastType = v15.toastType, 
-                ToastConfig = v15.toastConfig
-            };
-        end;
-    end
-});
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Dash = require(ParentParentParent.Dash)
+local Rodux = require(ParentParentParent.Rodux)
+local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
+local ToastDismissed = require(ParentParent.Actions.ToastDismissed)
+local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+local ToastVanished = require(ParentParent.Actions.ToastVanished)
+
+require(ParentParent.Types)
+
+local t1 = {
+	IsDismissed = false,
+	ToastConfig = nil,
+	ToastType = CapturesToastType.None
+}
+
+return Rodux.createReducer(t1, {
+	[ToastVanished.name] = function(t2: {[any]: any}, _: {[any]: any}) -- line: 26
+		-- upvalues: CapturesToastType (copy)
+		if t2.ToastType == CapturesToastType.None then
+			return t2
+		end
+
+		return {
+			IsDismissed = false,
+			ToastType = CapturesToastType.None
+		}
+	end,
+	[ToastDismissed.name] = function(t4: {[any]: any}, _: {[any]: any}) -- line: 37
+		-- upvalues: CapturesToastType (copy), Dash (copy)
+		if t4.IsDismissed then
+			return t4
+		end
+
+		if t4.ToastType == CapturesToastType.None then
+			return t4
+		end
+
+		return Dash.join(t4, {
+			IsDismissed = true
+		})
+	end,
+	[ToastTriggered.name] = function(t6: {[any]: any}, p1) -- line: 51
+		-- upvalues: Dash (copy)
+		local v16 = Dash.shallowEqual(t6.ToastConfig, p1.toastConfig)
+
+		if t6.ToastType == p1.toastType and (not t6.IsDismissed and v16) then
+			return t6
+		end
+
+		return {
+			IsDismissed = false,
+			ToastType = p1.toastType,
+			ToastConfig = p1.toastConfig
+		}
+	end
+})

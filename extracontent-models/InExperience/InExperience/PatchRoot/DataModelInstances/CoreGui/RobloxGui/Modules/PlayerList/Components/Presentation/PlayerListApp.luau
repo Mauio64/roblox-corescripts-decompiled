@@ -1,293 +1,303 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.RoactRodux);
-local v6 = require(l_CorePackages_0.Packages.Signals);
-local v7 = require(l_CorePackages_0.Packages.SignalsReact);
-local v8 = require(l_CorePackages_0.Packages.Otter);
-local v9 = require(l_CorePackages_0.Packages.Cryo);
-local v10 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local v12 = require(l_CorePackages_0.Workspace.Packages.Display);
-local v13 = require(l_RobloxGui_0.Modules.Stats.StatsUtils);
-local l_Parent_0 = script.Parent;
-local l_PresentationCommon_0 = l_Parent_0.Parent.PresentationCommon;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_useLeaderboardStore_0 = v10.Hooks.useLeaderboardStore;
-local v18 = require(l_Parent_1.Flags.FFlagPlayerListClosedNoRender);
-local v19 = require(l_Parent_1.Flags.FFlagPlayerListClosedNoRenderWithTenFoot);
-local v20 = require(l_Parent_0.PlayerListSorter);
-local v21 = require(l_Parent_1.Components.Container.PlayerEntryContainer);
-local v22 = require(l_Parent_1.Components.Container.PlayerListDisplayContainer);
-local v23 = require(l_Parent_0.PlayerEntry);
-local v24 = require(l_PresentationCommon_0.TenFootSideBar);
-local l_Connection_0 = l_Parent_1.Components.Connection;
-local v26 = require(l_Connection_0.EventConnections);
-local v27 = require(l_Connection_0.ContextActionsBinder);
-local v28 = require(l_Connection_0.TopStatConnector);
-local l_WithLayoutValues_0 = require(l_Connection_0.LayoutValues).WithLayoutValues;
-local v30 = require(l_Parent_1.Flags.FFlagPlayerListReduceRerenders);
-local l_FFlagUseNewPlayerList_0 = v10.Flags.FFlagUseNewPlayerList;
-local l_FFlagAddNewPlayerListFocusNav_0 = v10.Flags.FFlagAddNewPlayerListFocusNav;
-local v33 = {
-    dampingRatio = 1, 
-    frequency = 7
-};
-local v34 = v4.PureComponent:extend("PlayerListApp");
-local _ = function(v35) --[[ Line: 60 ]] --[[ Name: shouldShowNeutralTeam ]]
-    for _, v37 in ipairs(v35) do
-        if v37.Team == nil then
-            return true;
-        end;
-    end;
-    return false;
-end;
-local function v49(v39, v40) --[[ Line: 69 ]] --[[ Name: getTeamCount ]]
-    local v41 = false;
-    local v42 = {};
-    local v43 = 0;
-    for _, v45 in pairs(v39) do
-        if not v42[v45.TeamColor.Number] then
-            v42[v45.TeamColor.Number] = true;
-            v43 = v43 + 1;
-        end;
-    end;
-    if v43 > 0 then
-        local v46;
-        for _, v48 in ipairs(v40) do
-            if v48.Team == nil then
-                v46 = true;
-                v41 = true;
-            end;
-            if v41 then
-                break;
-            end;
-        end;
-        if not v41 then
-            v46 = false;
-        end;
-        v41 = false;
-        if v46 then
-            v43 = v43 + 1;
-        end;
-    end;
-    return v43;
-end;
-v34.init = function(v50) --[[ Line: 84 ]] --[[ Name: init ]]
-    -- upvalues: v4 (copy), v8 (copy), v6 (copy), v12 (copy)
-    v50.state = {
-        visible = true
-    };
-    local v51, v52 = v4.createBinding(UDim2.new(0, 0, 0, 0));
-    v50.positionOffset = v51;
-    v50.updatePositionOffset = v52;
-    v50.positionMotor = v8.createSingleMotor(0);
-    v50.positionMotor:onStep(function(v53) --[[ Line: 92 ]]
-        -- upvalues: v50 (copy)
-        v50.updatePositionOffset(UDim2.new(v53, 0, 0, 0));
-    end);
-    v50.positionMotor:onComplete(function(_) --[[ Line: 95 ]]
-        -- upvalues: v50 (copy)
-        if not v50.props.displayOptions.isVisible then
-            v50:setState({
-                visible = false
-            });
-        end;
-    end);
-    v50.disposeUiScaleEffect = v6.createEffect(function(v55) --[[ Line: 102 ]]
-        -- upvalues: v12 (ref), v50 (copy)
-        local v56 = v12.GetDisplayStore(v55);
-        v50:setState({
-            UiScale = v56.getUIScale(v55)
-        });
-    end);
-end;
-v34.render = function(v57) --[[ Line: 110 ]] --[[ Name: render ]]
-    -- upvalues: v18 (copy), v19 (copy), v4 (copy), v27 (copy), l_FFlagAddNewPlayerListFocusNav_0 (copy), v26 (copy), l_WithLayoutValues_0 (copy), v13 (copy), l_FFlagUseNewPlayerList_0 (copy), l_Players_0 (copy), v49 (copy), v30 (copy), v21 (copy), v23 (copy), v22 (copy), v20 (copy), v28 (copy), v24 (copy)
-    if (v18 or v19) and not v57.state.visible then
-        return v4.createFragment({
-            v4.createElement(v27), 
-            if l_FFlagAddNewPlayerListFocusNav_0 then v4.createElement(v26) else nil
-        });
-    else
-        return l_WithLayoutValues_0(function(v58) --[[ Line: 118 ]]
-            -- upvalues: v57 (copy), v13 (ref), l_FFlagUseNewPlayerList_0 (ref), l_Players_0 (ref), v49 (ref), v30 (ref), v4 (ref), v21 (ref), v23 (ref), v22 (ref), v20 (ref), l_FFlagAddNewPlayerListFocusNav_0 (ref), v26 (ref), v27 (ref), v28 (ref), v24 (ref)
-            local l_ContainerPosition_0 = v58.ContainerPosition;
-            local l_ContainerSize_0 = v58.ContainerSize;
-            local l_AnchorPoint_0 = v58.AnchorPoint;
-            if not v58.IsTenFoot and v57.props.displayOptions.performanceStatsVisible then
-                l_ContainerPosition_0 = l_ContainerPosition_0 + UDim2.fromOffset(0, v13.ButtonHeight);
-            end;
-            l_ContainerPosition_0 = l_ContainerPosition_0 + UDim2.fromOffset(0, v58.TopBarOffset * v57.state.UiScale);
-            local l_MaxLeaderstats_0 = v58.MaxLeaderstats;
-            if v57.props.displayOptions.isSmallTouchDevice then
-                l_MaxLeaderstats_0 = v58.MaxLeaderstatsSmallScreen;
-            end;
-            local v63 = 0;
-            v63 = if l_FFlagUseNewPlayerList_0 then math.min(v57.props.gameStatsCount, l_MaxLeaderstats_0) else math.min(#v57.props.gameStats, l_MaxLeaderstats_0);
-            if v63 > 0 then
-                local v64 = v58.StatEntrySizeX + v58.EntryPadding;
-                l_ContainerSize_0 = l_ContainerSize_0 + UDim2.new(0, v64 * v63, 0, 0);
-            end;
-            local v65 = nil;
-            if v58.IsTenFoot then
-                v65 = v58.EntrySizeX;
-            else
-                v65 = v58.EntryBaseSizeX + math.min(4, v63) * v58.EntrySizeIncreasePerStat;
-                l_ContainerSize_0 = l_ContainerSize_0 + UDim2.new(0, v58.ExtraContainerPadding, 0, 0);
-                local v66 = v58.PlayerDropDownSizeX + v58.PlayerDropDownOffset;
-                local v67 = l_ContainerSize_0.X.Offset + v58.ContainerPadding * 2 + v66;
-                if v57.props.screenSizeX - v67 < v65 then
-                    v65 = v57.props.screenSizeX - v67;
-                end;
-                l_ContainerSize_0 = l_ContainerSize_0 + UDim2.new(0, v65, 0, 0);
-            end;
-            local v68 = 1e999;
-            local v69 = false;
-            if l_Players_0.MaxPlayers >= 6 then
-                v69 = l_Players_0.MaxPlayers <= 12;
-            end;
-            if v69 then
-                v68 = l_Players_0.MaxPlayers * 26 + v49(v57.props.teams, v57.props.players) * 20;
-            end;
-            local v70 = {};
-            if v58.IsTenFoot then
-                local v71 = nil;
-                if v30 then
-                    v71 = {};
-                    for _, v73 in v57.props.gameStats do
-                        table.insert(v71, v73.name);
-                    end;
-                end;
-                for _, v75 in ipairs(v57.props.players) do
-                    if v75 == l_Players_0.LocalPlayer then
-                        v70.TitlePlayerEntry = v4.createElement("Frame", {
-                            Position = UDim2.fromOffset(0, 0), 
-                            Size = UDim2.new(1, v58.EntryXOffset, 0, v58.PlayerEntrySizeY), 
-                            BackgroundTransparency = 1
-                        }, {
-                            PlayerEntry = if l_FFlagUseNewPlayerList_0 then v4.createElement(v21, {
-                                entrySizeX = v65, 
-                                titlePlayerEntry = true, 
-                                player = v75, 
-                                playerIconInfo = v57.props.playerIconInfo[v75.UserId], 
-                                playerRelationship = v57.props.playerRelationship[v75.UserId]
-                            }) else v4.createElement(v23, {
-                                player = v75, 
-                                playerStats = v57.props.playerStats[v75.UserId], 
-                                playerIconInfo = v57.props.playerIconInfo[v75.UserId], 
-                                playerRelationship = v57.props.playerRelationship[v75.UserId], 
-                                titlePlayerEntry = true, 
-                                hasDivider = false, 
-                                gameStats = if v30 then nil else v57.props.gameStats, 
-                                gameStatNames = v71, 
-                                entrySize = v65
-                            })
-                        });
-                        break;
-                    end;
-                end;
-            end;
-            v70.PlayerScrollList = v4.createElement(if l_FFlagUseNewPlayerList_0 then v22 else v20, {
-                screenSizeY = v57.props.screenSizeY, 
-                entrySize = v65, 
-                isVisible = if l_FFlagAddNewPlayerListFocusNav_0 then v57.state.visible else nil
-            });
-            v70.EventConnections = v4.createElement(v26);
-            v70.ContextActionsBindings = v4.createElement(v27);
-            v70.TopStatConnector = v4.createElement(v28);
-            if v57.props.displayOptions.isTenFootInterface then
-                v70.TenFootSideBar = v4.createElement(v24);
-            end;
-            return v4.createElement("Frame", {
-                Position = l_ContainerPosition_0, 
-                AnchorPoint = l_AnchorPoint_0, 
-                Size = l_ContainerSize_0, 
-                BackgroundTransparency = 1, 
-                Visible = v57.state.visible, 
-                ZIndex = v58.IsTenFoot and 2 or 1, 
-                AutoLocalize = false, 
-                [v4.Ref] = v57.rootRef
-            }, {
-                OffsetFrame = v4.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Position = v57.positionOffset, 
-                    BackgroundTransparency = 1
-                }, v70), 
-                UISizeConstraint = v4.createElement("UISizeConstraint", {
-                    MinSize = Vector2.new(0, 0), 
-                    MaxSize = Vector2.new(1e999, v68)
-                }) or nil
-            });
-        end);
-    end;
-end;
-v34.didMount = function(v76) --[[ Line: 253 ]] --[[ Name: didMount ]]
-    v76:setState({
-        visible = v76.props.displayOptions.isVisible
-    });
-end;
-v34.didUpdate = function(v77, v78, _) --[[ Line: 259 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v8 (copy), v33 (copy)
-    if v77.props.displayOptions.isVisible ~= v78.displayOptions.isVisible then
-        if v77.props.displayOptions.isTenFootInterface then
-            v77:setState({
-                visible = v77.props.displayOptions.isVisible
-            });
-            return;
-        elseif v77.props.displayOptions.isVisible then
-            v77:setState({
-                visible = true
-            });
-            v77.positionMotor:setGoal(v8.instant(0.2));
-            v77.positionMotor:step(0);
-            v77.positionMotor:setGoal(v8.spring(0, v33));
-            return;
-        else
-            v77.positionMotor:setGoal(v8.spring(1.1, v33));
-        end;
-    end;
-end;
-v34.willUnmount = function(v80) --[[ Line: 280 ]] --[[ Name: willUnmount ]]
-    v80.positionMotor:destroy();
-    v80.positionMotor = nil;
-    if v80.disposeUiScaleEffect then
-        v80.disposeUiScaleEffect();
-    end;
-end;
-local function v82(v81) --[[ Line: 289 ]] --[[ Name: mapStateToProps ]]
-    return {
-        screenSizeX = v81.screenSize.X, 
-        screenSizeY = v81.screenSize.Y, 
-        displayOptions = v81.displayOptions, 
-        players = v81.players, 
-        playerStats = v81.playerStats, 
-        playerIconInfo = v81.playerIconInfo, 
-        playerRelationship = v81.playerRelationship, 
-        gameStats = v81.gameStats, 
-        teams = v81.teams
-    };
-end;
-local function v88(v83) --[[ Line: 305 ]] --[[ Name: PlayerListAppWithLeaderboardStore ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), v6 (copy), v7 (copy), v4 (copy), v34 (copy), v9 (copy)
-    local v84 = l_useLeaderboardStore_0();
-    local v86 = v6.createComputed(function(v85) --[[ Line: 308 ]]
-        -- upvalues: v84 (copy), v83 (copy)
-        if v84 then
-            return (v84.getGameStatsList().getCount(v85));
-        else
-            return #v83.gameStats;
-        end;
-    end);
-    local v87 = v7.useSignalState(v86);
-    return v4.createElement(v34, v9.Dictionary.join(v83, {
-        gameStatsCount = v87
-    }));
-end;
-if l_FFlagUseNewPlayerList_0 then
-    return v5.connect(v82, nil)(v88);
-else
-    return v5.UNSTABLE_connect2(v82, nil)(v34);
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local Signals = require(CorePackages.Packages.Signals)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local Otter = require(CorePackages.Packages.Otter)
+local Cryo = require(CorePackages.Packages.Cryo)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local Display = require(CorePackages.Workspace.Packages.Display)
+local StatsUtils = require(RobloxGui.Modules.Stats.StatsUtils)
+local scriptParent = script.Parent
+local PresentationCommon = scriptParent.Parent.PresentationCommon
+local ParentParent = scriptParent.Parent.Parent
+local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
+local PlayerEntryContainer = require(ParentParent.Components.Container.PlayerEntryContainer)
+local PlayerListDisplayContainer = require(ParentParent.Components.Container.PlayerListDisplayContainer)
+local TenFootSideBar = require(PresentationCommon.TenFootSideBar)
+local Connection = ParentParent.Components.Connection
+local EventConnections = require(Connection.EventConnections)
+local ContextActionsBinder = require(Connection.ContextActionsBinder)
+local TopStatConnector = require(Connection.TopStatConnector)
+local WithLayoutValues = require(Connection.LayoutValues).WithLayoutValues
+local FFlagAddNewPlayerListFocusNav = PlayerList.Flags.FFlagAddNewPlayerListFocusNav
+local t1 = {
+	dampingRatio = 1,
+	frequency = 7
+}
+local v28 = Roact.PureComponent:extend("PlayerListApp")
+
+local function shouldShowNeutralTeam(p1) -- line: 53
+	for _, v in ipairs(p1) do
+		if v.Team == nil then
+			return true
+		end
+	end
+
+	return false
+end
+local function getTeamCount(p2, p3) -- line: 62
+	local t2 = {}
+	local n1 = 0
+	local g45 = nil
+	local v44 = nil
+
+	for _, v in pairs(p2) do
+		if not t2[v.TeamColor.Number] then
+			t2[v.TeamColor.Number] = true
+			n1 += 1
+		end
+	end
+
+	if n1 > 0 then
+		for _, v in ipairs(p3) do
+			if v.Team == nil then
+				v44 = true
+				g45 = true
+			end
+
+			if g45 then
+				break
+			end
+		end
+
+		if not g45 then
+			v44 = false
+		end
+
+		g45 = false
+
+		if v44 then
+			n1 += 1
+		end
+	end
+
+	return n1
+end
+
+function v28.init(p4) -- line: 77
+	-- upvalues: Roact (copy), Otter (copy), Signals (copy), Display (copy)
+	p4.state = {
+		visible = true
+	}
+
+	local v47, v48 = Roact.createBinding(UDim2.new(0, 0, 0, 0))
+
+	p4.positionOffset = v47
+	p4.updatePositionOffset = v48
+	p4.positionMotor = Otter.createSingleMotor(0)
+	p4.positionMotor:onStep(function(p5) -- line: 85
+		-- upvalues: p4 (copy)
+		p4.updatePositionOffset(UDim2.new(p5, 0, 0, 0))
+	end)
+	p4.positionMotor:onComplete(function(_) -- line: 88
+		-- upvalues: p4 (copy)
+		if not p4.props.displayOptions.isVisible then
+			p4:setState({
+				visible = false
+			})
+		end
+	end)
+	p4.disposeUiScaleEffect = Signals.createEffect(function(p7) -- line: 95
+		-- upvalues: Display (copy), p4 (copy)
+		local v63 = Display.GetDisplayStore(p7)
+
+		p4:setState({
+			UiScale = v63.getUIScale(p7)
+		})
+	end)
+end
+function v28.render(p8) -- line: 103
+	-- upvalues: Roact (copy), ContextActionsBinder (copy), FFlagAddNewPlayerListFocusNav (copy), EventConnections (copy), WithLayoutValues (copy), StatsUtils (copy), Players (copy), getTeamCount (copy), PlayerEntryContainer (copy), PlayerListDisplayContainer (copy), TopStatConnector (copy), TenFootSideBar (copy)
+	if not p8.state.visible then
+		return Roact.createFragment({
+			Roact.createElement(ContextActionsBinder),
+			if not FFlagAddNewPlayerListFocusNav then nil else Roact.createElement(EventConnections)
+		})
+	end
+
+	return WithLayoutValues(function(p9) -- line: 111
+		-- upvalues: p8 (copy), StatsUtils (copy), Players (copy), getTeamCount (copy), Roact (copy), PlayerEntryContainer (copy), PlayerListDisplayContainer (copy), FFlagAddNewPlayerListFocusNav (copy), EventConnections (copy), ContextActionsBinder (copy), TopStatConnector (copy), TenFootSideBar (copy)
+		local ContainerPosition = p9.ContainerPosition
+		local ContainerSize = p9.ContainerSize
+		local p9AnchorPoint = p9.AnchorPoint
+
+		if not p9.IsTenFoot and p8.props.displayOptions.performanceStatsVisible then
+			ContainerPosition += UDim2.fromOffset(0, StatsUtils.ButtonHeight)
+		end
+
+		local v68 = ContainerPosition + UDim2.fromOffset(0, p9.TopBarOffset * p8.state.UiScale)
+		local MaxLeaderstats = p9.MaxLeaderstats
+
+		if p8.props.displayOptions.isSmallTouchDevice then
+			MaxLeaderstats = p9.MaxLeaderstatsSmallScreen
+		end
+
+		local v70 = math.min(p8.props.gameStatsCount, MaxLeaderstats)
+
+		if v70 > 0 then
+			local v71 = p9.StatEntrySizeX + p9.EntryPadding
+
+			ContainerSize += UDim2.new(0, v71 * v70, 0, 0)
+		end
+
+		local EntrySizeX
+
+		if p9.IsTenFoot then
+			EntrySizeX = p9.EntrySizeX
+		else
+			EntrySizeX = p9.EntryBaseSizeX + math.min(4, v70) * p9.EntrySizeIncreasePerStat
+
+			local v73 = ContainerSize + UDim2.new(0, p9.ExtraContainerPadding, 0, 0)
+			local v74 = p9.PlayerDropDownSizeX + p9.PlayerDropDownOffset
+			local v75 = v73.X.Offset + p9.ContainerPadding * 2 + v74
+
+			if EntrySizeX > p8.props.screenSizeX - v75 then
+				EntrySizeX = p8.props.screenSizeX - v75
+			end
+
+			ContainerSize = v73 + UDim2.new(0, EntrySizeX, 0, 0)
+		end
+
+		local n2 = 1e999
+
+		if Players.MaxPlayers >= 6 and Players.MaxPlayers <= 12 then
+			n2 = Players.MaxPlayers * 26 + getTeamCount(p8.props.teams, p8.props.players) * 20
+		end
+
+		local t3 = {}
+
+		if p9.IsTenFoot then
+			for _, v in ipairs(p8.props.players) do
+				if v == Players.LocalPlayer then
+					t3.TitlePlayerEntry = Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						Position = UDim2.fromOffset(0, 0),
+						Size = UDim2.new(1, p9.EntryXOffset, 0, p9.PlayerEntrySizeY)
+					}, {
+						PlayerEntry = Roact.createElement(PlayerEntryContainer, {
+							titlePlayerEntry = true,
+							entrySizeX = EntrySizeX,
+							player = v,
+							playerIconInfo = p8.props.playerIconInfo[v.UserId],
+							playerRelationship = p8.props.playerRelationship[v.UserId]
+						})
+					})
+
+					break
+				end
+			end
+		end
+
+		t3.PlayerScrollList = Roact.createElement(PlayerListDisplayContainer, {
+			screenSizeY = p8.props.screenSizeY,
+			entrySize = EntrySizeX,
+			isVisible = if not FFlagAddNewPlayerListFocusNav then nil else p8.state.visible
+		})
+		t3.EventConnections = Roact.createElement(EventConnections)
+		t3.ContextActionsBindings = Roact.createElement(ContextActionsBinder)
+		t3.TopStatConnector = Roact.createElement(TopStatConnector)
+
+		if p8.props.displayOptions.isTenFootInterface then
+			t3.TenFootSideBar = Roact.createElement(TenFootSideBar)
+		end
+
+		return Roact.createElement("Frame", {
+			Position = v68,
+			AnchorPoint = p9AnchorPoint,
+			Size = ContainerSize,
+			BackgroundTransparency = 1,
+			Visible = p8.state.visible,
+			ZIndex = not p9.IsTenFoot and 1 or 2,
+			AutoLocalize = false,
+			[Roact.Ref] = p8.rootRef
+		}, {
+			OffsetFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = p8.positionOffset
+			}, t3),
+			UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				MinSize = Vector2.new(0, 0),
+				MaxSize = Vector2.new(1e999, n2)
+			}) or nil
+		})
+	end)
+end
+function v28.didMount(p10) -- line: 221
+	p10:setState({
+		visible = p10.props.displayOptions.isVisible
+	})
+end
+function v28.didUpdate(p11, p12, _) -- line: 227
+	-- upvalues: Otter (copy), t1 (copy)
+	if p11.props.displayOptions.isVisible ~= p12.displayOptions.isVisible then
+		if p11.props.displayOptions.isTenFootInterface then
+			p11:setState({
+				visible = p11.props.displayOptions.isVisible
+			})
+
+			return
+		end
+
+		if p11.props.displayOptions.isVisible then
+			p11:setState({
+				visible = true
+			})
+			p11.positionMotor:setGoal(Otter.instant(0.2))
+			p11.positionMotor:step(0)
+			p11.positionMotor:setGoal(Otter.spring(0, t1))
+
+			return
+		end
+
+		p11.positionMotor:setGoal(Otter.spring(1.1, t1))
+	end
+end
+function v28.willUnmount(p14) -- line: 248
+	p14.positionMotor:destroy()
+	p14.positionMotor = nil
+
+	if p14.disposeUiScaleEffect then
+		p14.disposeUiScaleEffect()
+	end
+end
+
+local function mapStateToProps(p15) -- line: 257
+	return {
+		screenSizeX = p15.screenSize.X,
+		screenSizeY = p15.screenSize.Y,
+		displayOptions = p15.displayOptions,
+		players = p15.players,
+		playerStats = p15.playerStats,
+		playerIconInfo = p15.playerIconInfo,
+		playerRelationship = p15.playerRelationship,
+		gameStats = p15.gameStats,
+		teams = p15.teams
+	}
+end
+local function PlayerListAppWithLeaderboardStore(p16) -- line: 273
+	-- upvalues: useLeaderboardStore (copy), Signals (copy), SignalsReact (copy), Roact (copy), v28 (copy), Cryo (copy)
+	local v57 = useLeaderboardStore()
+	local v58 = Signals.createComputed(function(p17) -- line: 276
+		-- upvalues: v57 (copy), p16 (copy)
+		if v57 then
+			return (v57.getGameStatsList().getCount(p17))
+		end
+
+		return #p16.gameStats
+	end)
+	local v59 = SignalsReact.useSignalState(v58)
+
+	return Roact.createElement(v28, Cryo.Dictionary.join(p16, {
+		gameStatsCount = v59
+	}))
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(PlayerListAppWithLeaderboardStore)

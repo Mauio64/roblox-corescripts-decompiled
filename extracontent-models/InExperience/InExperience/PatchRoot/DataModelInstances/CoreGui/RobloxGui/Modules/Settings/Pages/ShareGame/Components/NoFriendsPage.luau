@@ -1,92 +1,100 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_ShareGame_0 = l_RobloxGui_0.Modules.Settings.Pages.ShareGame;
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_ShareGame_0.Constants);
-local v5 = require(l_ShareGame_0.Spritesheets.ShareGameIcons);
-local l_v5_Frame_0 = v5:GetFrame("friends");
-local l_v5_ImagePath_0 = v5:GetImagePath();
-local v8 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local v9 = require(l_ShareGame_0.getTranslator)();
-local v10 = v3.PureComponent:extend("NoFriendsPage");
-v10.render = function(v11) --[[ Line: 23 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), l_v5_ImagePath_0 (copy), l_v5_Frame_0 (copy), v9 (copy), v4 (copy), v8 (copy)
-    local l_LayoutOrder_0 = v11.props.LayoutOrder;
-    local l_ZIndex_0 = v11.props.ZIndex;
-    local l_Position_0 = v11.props.Position;
-    local v15 = 0;
-    local function _() --[[ Line: 29 ]] --[[ Name: incrementLayoutOrder ]]
-        -- upvalues: v15 (ref)
-        v15 = v15 + 1;
-        return v15;
-    end;
-    local l_createElement_0 = v3.createElement;
-    local v18 = "Frame";
-    local v19 = {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 1, 0), 
-        LayoutOrder = l_LayoutOrder_0, 
-        ZIndex = l_ZIndex_0, 
-        Position = l_Position_0
-    };
-    local v20 = {
-        listLayout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    };
-    local l_createElement_1 = v3.createElement;
-    local v22 = "ImageLabel";
-    local v23 = {
-        BackgroundTransparency = 1, 
-        Image = l_v5_ImagePath_0, 
-        ImageRectOffset = l_v5_Frame_0.offset, 
-        ImageRectSize = l_v5_Frame_0.size, 
-        Size = UDim2.new(0, 72, 0, 72)
-    };
-    v15 = v15 + 1;
-    v23.LayoutOrder = v15;
-    v23.ZIndex = l_ZIndex_0;
-    v20.friendsIcon = l_createElement_1(v22, v23);
-    l_createElement_1 = v3.createElement;
-    v22 = "Frame";
-    v23 = {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0, 0, 0, 34)
-    };
-    v15 = v15 + 1;
-    v23.LayoutOrder = v15;
-    v23.ZIndex = l_ZIndex_0;
-    v20.iconToSubtitleSpacer = l_createElement_1(v22, v23);
-    l_createElement_1 = v3.createElement;
-    v22 = "TextLabel";
-    v23 = {
-        BackgroundTransparency = 1, 
-        Text = v9:FormatByKey("Feature.SettingsHub.Label.NoFriendsScreen"), 
-        TextColor3 = v4.Color.GRAY5, 
-        TextTransparency = 0.22, 
-        TextSize = v8.textSize(21), 
-        TextWrapped = true, 
-        Font = v8.font(Enum.Font.SourceSans)
-    };
-    v15 = v15 + 1;
-    v23.LayoutOrder = v15;
-    v23.Size = UDim2.new(0, 280, 0, 42);
-    v23.TextYAlignment = Enum.TextYAlignment.Top;
-    v23.ZIndex = l_ZIndex_0;
-    v20.subtitle = l_createElement_1(v22, v23);
-    l_createElement_1 = v3.createElement;
-    v22 = "Frame";
-    v23 = {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0, 0, 0, 120)
-    };
-    v15 = v15 + 1;
-    v23.LayoutOrder = v15;
-    v23.ZIndex = l_ZIndex_0;
-    v20.bottomSpacer = l_createElement_1(v22, v23);
-    return l_createElement_0(v18, v19, v20);
-end;
-return v10;
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local ShareGame = RobloxGui.Modules.Settings.Pages.ShareGame
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(ShareGame.Constants)
+local ShareGameIcons = require(ShareGame.Spritesheets.ShareGameIcons)
+local Frame = ShareGameIcons:GetFrame("friends")
+local ImagePath = ShareGameIcons:GetImagePath()
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local v10 = require(ShareGame.getTranslator)()
+local v11 = Roact.PureComponent:extend("NoFriendsPage")
+
+function v11.render(p1) -- line: 23
+	-- upvalues: Roact (copy), ImagePath (copy), Frame (copy), v10 (copy), Constants (copy), Theme (copy)
+	local propsLayoutOrder = p1.props.LayoutOrder
+	local propsZIndex = p1.props.ZIndex
+	local propsPosition = p1.props.Position
+	local n1 = 0
+
+	local function incrementLayoutOrder() -- line: 29
+		-- upvalues: n1 (ref)
+		n1 += 1
+
+		return n1
+	end
+
+	local createElement = Roact.createElement
+	local t1 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		LayoutOrder = propsLayoutOrder,
+		ZIndex = propsZIndex,
+		Position = propsPosition
+	}
+	local t2 = {
+		listLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}
+	local createElement2 = Roact.createElement
+	local t3 = {
+		BackgroundTransparency = 1,
+		Image = ImagePath,
+		ImageRectOffset = Frame.offset,
+		ImageRectSize = Frame.size,
+		Size = UDim2.new(0, 72, 0, 72)
+	}
+
+	n1 += 1
+	t3.LayoutOrder = n1
+	t3.ZIndex = propsZIndex
+	t2.friendsIcon = createElement2("ImageLabel", t3)
+
+	local createElement3 = Roact.createElement
+	local t4 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 0, 0, 34)
+	}
+
+	n1 += 1
+	t4.LayoutOrder = n1
+	t4.ZIndex = propsZIndex
+	t2.iconToSubtitleSpacer = createElement3("Frame", t4)
+
+	local createElement4 = Roact.createElement
+	local t5 = {
+		BackgroundTransparency = 1,
+		TextTransparency = 0.22,
+		TextWrapped = true,
+		Text = v10:FormatByKey("Feature.SettingsHub.Label.NoFriendsScreen"),
+		TextColor3 = Constants.Color.GRAY5,
+		TextSize = Theme.textSize(21),
+		Font = Theme.font(Enum.Font.SourceSans)
+	}
+
+	n1 += 1
+	t5.LayoutOrder = n1
+	t5.Size = UDim2.new(0, 280, 0, 42)
+	t5.TextYAlignment = Enum.TextYAlignment.Top
+	t5.ZIndex = propsZIndex
+	t2.subtitle = createElement4("TextLabel", t5)
+
+	local createElement5 = Roact.createElement
+	local t6 = {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 0, 0, 120)
+	}
+
+	n1 += 1
+	t6.LayoutOrder = n1
+	t6.ZIndex = propsZIndex
+	t2.bottomSpacer = createElement5("Frame", t6)
+
+	return createElement("Frame", t1, t2)
+end
+
+return v11

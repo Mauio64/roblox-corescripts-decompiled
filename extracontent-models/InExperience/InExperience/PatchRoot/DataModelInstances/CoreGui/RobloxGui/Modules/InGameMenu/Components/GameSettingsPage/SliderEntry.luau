@@ -1,84 +1,88 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_t_0 = v2.t;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v6 = require(script.Parent.InputLabel);
-local v7 = require(l_Parent_0.Components.SliderWithInput);
-local v8 = l_Roact_0.PureComponent:extend("SliderEntry");
-v8.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.integer, 
-    labelKey = l_t_0.string, 
-    min = l_t_0.number, 
-    max = l_t_0.number, 
-    stepInterval = l_t_0.number, 
-    keyboardInputStepInterval = l_t_0.optional(l_t_0.numberPositive), 
-    value = l_t_0.number, 
-    disabled = l_t_0.optional(l_t_0.boolean), 
-    valueChanged = l_t_0.callback, 
-    canCaptureFocus = l_t_0.optional(l_t_0.boolean), 
-    isMenuOpen = l_t_0.optional(l_t_0.boolean), 
-    buttonRef = l_t_0.optional(l_t_0.table)
-});
-v8.init = function(v9) --[[ Line: 29 ]] --[[ Name: init ]]
-    v9.state = {
-        isFrameSelectable = true
-    };
-end;
-v8.render = function(v10) --[[ Line: 35 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), l_GuiService_0 (copy), v6 (copy), v7 (copy)
-    local v11 = v10.props.buttonRef or l_Roact_0.createRef();
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 92), 
-        LayoutOrder = v10.props.LayoutOrder, 
-        Selectable = v10.state.isFrameSelectable, 
-        [l_Roact_0.Event.SelectionGained] = function() --[[ Line: 45 ]]
-            -- upvalues: l_GuiService_0 (ref), v11 (copy), v10 (copy)
-            l_GuiService_0.SelectedCoreObject = v11:getValue();
-            v10:setState({
-                isFrameSelectable = false
-            });
-        end
-    }, {
-        Padding = l_Roact_0.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, 24), 
-            PaddingTop = UDim.new(0, 12), 
-            PaddingRight = UDim.new(0, 30), 
-            PaddingBottom = UDim.new(0, 24)
-        }), 
-        Label = l_Roact_0.createElement(v6, {
-            Size = UDim2.new(1, 0, 0, 24), 
-            localizationKey = v10.props.labelKey, 
-            Position = UDim2.new(0, 0, 0, 0), 
-            AnchorPoint = Vector2.new(0, 0)
-        }), 
-        Slider = l_Roact_0.createElement(v7, {
-            min = v10.props.min, 
-            max = v10.props.max, 
-            stepInterval = v10.props.stepInterval, 
-            keyboardInputStepInterval = v10.props.keyboardInputStepInterval, 
-            value = v10.props.value, 
-            Position = UDim2.new(0, 0, 0, 32), 
-            disabled = v10.props.disabled, 
-            valueChanged = v10.props.valueChanged, 
-            canCaptureFocus = v10.props.canCaptureFocus, 
-            isMenuOpen = v10.props.isMenuOpen, 
-            sliderDotRef = v11, 
-            onSelectionLost = function() --[[ Line: 81 ]] --[[ Name: onSelectionLost ]]
-                -- upvalues: v10 (copy)
-                v10:setState({
-                    isFrameSelectable = true
-                });
-            end, 
-            onSelectionGained = function() --[[ Line: 86 ]] --[[ Name: onSelectionGained ]]
-                -- upvalues: v10 (copy)
-                v10:setState({
-                    isFrameSelectable = false
-                });
-            end
-        })
-    });
-end;
-return v8;
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local ParentParent = script.Parent.Parent.Parent
+local InputLabel = require(script.Parent.InputLabel)
+local SliderWithInput = require(ParentParent.Components.SliderWithInput)
+local v9 = Roact.PureComponent:extend("SliderEntry")
+
+v9.validateProps = t.strictInterface({
+	LayoutOrder = t.integer,
+	labelKey = t.string,
+	min = t.number,
+	max = t.number,
+	stepInterval = t.number,
+	keyboardInputStepInterval = t.optional(t.numberPositive),
+	value = t.number,
+	disabled = t.optional(t.boolean),
+	valueChanged = t.callback,
+	canCaptureFocus = t.optional(t.boolean),
+	isMenuOpen = t.optional(t.boolean),
+	buttonRef = t.optional(t.table)
+})
+
+function v9.init(p1) -- line: 29
+	p1.state = {
+		isFrameSelectable = true
+	}
+end
+function v9.render(p2) -- line: 35
+	-- upvalues: Roact (copy), GuiService (copy), InputLabel (copy), SliderWithInput (copy)
+	local v12 = p2.props.buttonRef or Roact.createRef()
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 92),
+		LayoutOrder = p2.props.LayoutOrder,
+		Selectable = p2.state.isFrameSelectable,
+		[Roact.Event.SelectionGained] = function() -- line: 45
+			-- upvalues: GuiService (copy), v12 (copy), p2 (copy)
+			GuiService.SelectedCoreObject = v12:getValue()
+			p2:setState({
+				isFrameSelectable = false
+			})
+		end
+	}, {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 24),
+			PaddingTop = UDim.new(0, 12),
+			PaddingRight = UDim.new(0, 30),
+			PaddingBottom = UDim.new(0, 24)
+		}),
+		Label = Roact.createElement(InputLabel, {
+			Size = UDim2.new(1, 0, 0, 24),
+			localizationKey = p2.props.labelKey,
+			Position = UDim2.new(0, 0, 0, 0),
+			AnchorPoint = Vector2.new(0, 0)
+		}),
+		Slider = Roact.createElement(SliderWithInput, {
+			min = p2.props.min,
+			max = p2.props.max,
+			stepInterval = p2.props.stepInterval,
+			keyboardInputStepInterval = p2.props.keyboardInputStepInterval,
+			value = p2.props.value,
+			Position = UDim2.new(0, 0, 0, 32),
+			disabled = p2.props.disabled,
+			valueChanged = p2.props.valueChanged,
+			canCaptureFocus = p2.props.canCaptureFocus,
+			isMenuOpen = p2.props.isMenuOpen,
+			sliderDotRef = v12,
+			onSelectionLost = function() -- line: 81
+				-- upvalues: p2 (copy)
+				p2:setState({
+					isFrameSelectable = true
+				})
+			end,
+			onSelectionGained = function() -- line: 86
+				-- upvalues: p2 (copy)
+				p2:setState({
+					isFrameSelectable = false
+				})
+			end
+		})
+	})
+end
+
+return v9

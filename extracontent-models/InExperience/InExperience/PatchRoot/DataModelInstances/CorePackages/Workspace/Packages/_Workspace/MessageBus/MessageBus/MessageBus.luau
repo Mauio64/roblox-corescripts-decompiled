@@ -1,178 +1,185 @@
-local l_MessageBusService_0 = game:GetService("MessageBusService");
-local _ = require(script.Parent.MessageBusTypes);
-local v2 = game:DefineFastFlag("DisableMessageBusUnSubscribeError", false);
-local v3 = game:DefineFastFlag("EnableMessageBusUnSubscribeErrorTelemetry", false);
-local v4 = {};
-v4.__index = v4;
-v4.publish = function(v5, v6) --[[ Line: 41 ]] --[[ Name: publish ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    assert(v5.validateParams(v6));
-    l_MessageBusService_0:Publish(v5.mid, v6);
-end;
-v4.publishProtocolMethodRequest = function(v7, v8, v9) --[[ Line: 46 ]] --[[ Name: publishProtocolMethodRequest ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    assert(v7.validateParams(v8));
-    l_MessageBusService_0:PublishProtocolMethodRequest(v7.protocolName, v7.methodName, v8, v9);
-end;
-v4.publishProtocolMethodResponse = function(v10, v11, v12, v13) --[[ Line: 55 ]] --[[ Name: publishProtocolMethodResponse ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    assert(v10.validateParams(v11));
-    l_MessageBusService_0:PublishProtocolMethodResponse(v10.protocolName, v10.methodName, v11, v12, v13);
-end;
-v4.getLast = function(v14) --[[ Line: 71 ]] --[[ Name: getLast ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    local l_l_MessageBusService_0_Last_0 = l_MessageBusService_0:GetLast(v14.mid);
-    if l_l_MessageBusService_0_Last_0 == nil then
-        return nil;
-    else
-        assert(v14.validateParams(l_l_MessageBusService_0_Last_0));
-        return l_l_MessageBusService_0_Last_0;
-    end;
-end;
-v4.getMessageId = function(v16, v17) --[[ Line: 80 ]] --[[ Name: getMessageId ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    return l_MessageBusService_0:GetMessageId(v16, v17);
-end;
-v4.getProtocolMethodRequestMessageId = function(v18, v19) --[[ Line: 84 ]] --[[ Name: getProtocolMethodRequestMessageId ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    return l_MessageBusService_0:GetProtocolMethodRequestMessageId(v18, v19);
-end;
-v4.getProtocolMethodResponseMessageId = function(v20, v21) --[[ Line: 88 ]] --[[ Name: getProtocolMethodResponseMessageId ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    return l_MessageBusService_0:GetProtocolMethodResponseMessageId(v20, v21);
-end;
-v4.call = function(v22, v23) --[[ Line: 92 ]] --[[ Name: call ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    assert(v22.validateParams(v23));
-    return l_MessageBusService_0:Call(v22.fid, v23);
-end;
-local v24 = {};
-v24.__index = v24;
-v24.new = function() --[[ Line: 100 ]] --[[ Name: new ]]
-    -- upvalues: v24 (copy)
-    return (setmetatable({
-        connections = {}
-    }, v24));
-end;
-v24.getSubscriptionCount = function(v25) --[[ Line: 107 ]] --[[ Name: getSubscriptionCount ]]
-    local v26 = 0;
-    for _ in pairs(v25.connections) do
-        v26 = v26 + 1;
-    end;
-    return v26;
-end;
-v24.subscribe = function(v28, v29, v30, v31, v32) --[[ Line: 115 ]] --[[ Name: subscribe ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    local v33 = true;
-    if v31 ~= nil then
-        v33 = v31;
-    end;
-    local v34 = false;
-    if v32 ~= nil then
-        v34 = v32;
-    end;
-    local l_mid_0 = v29.mid;
-    if v28.connections[l_mid_0] ~= nil then
-        v28:unsubscribe(v29);
-    end;
-    local v36 = l_MessageBusService_0:Subscribe(l_mid_0, v30, v34, v33);
-    v28.connections[l_mid_0] = v36;
-end;
-v24.subscribeProtocolMethodRequest = function(v37, v38, v39, v40, v41) --[[ Line: 128 ]] --[[ Name: subscribeProtocolMethodRequest ]]
-    -- upvalues: v4 (copy), l_MessageBusService_0 (copy)
-    local v42 = true;
-    if v40 ~= nil then
-        v42 = v40;
-    end;
-    local v43 = false;
-    if v41 ~= nil then
-        v43 = v41;
-    end;
-    local l_protocolName_0 = v38.protocolName;
-    local l_methodName_0 = v38.methodName;
-    local v46 = v4.getProtocolMethodRequestMessageId(l_protocolName_0, l_methodName_0);
-    if v37.connections[v46] ~= nil then
-        v37:unsubscribeWithMsgId(v46);
-    end;
-    local v47 = l_MessageBusService_0:SubscribeToProtocolMethodRequest(l_protocolName_0, l_methodName_0, v39, v43, v42);
-    v37.connections[v46] = v47;
-end;
-v24.subscribeProtocolMethodResponse = function(v48, v49, v50, v51, v52) --[[ Line: 148 ]] --[[ Name: subscribeProtocolMethodResponse ]]
-    -- upvalues: v4 (copy), l_MessageBusService_0 (copy)
-    local v53 = true;
-    if v51 ~= nil then
-        v53 = v51;
-    end;
-    local v54 = false;
-    if v52 ~= nil then
-        v54 = v52;
-    end;
-    local l_protocolName_1 = v49.protocolName;
-    local l_methodName_1 = v49.methodName;
-    local v57 = v4.getProtocolMethodResponseMessageId(l_protocolName_1, l_methodName_1);
-    if v48.connections[v57] ~= nil then
-        v48:unsubscribeWithMsgId(v57);
-    end;
-    local v58 = l_MessageBusService_0:SubscribeToProtocolMethodResponse(l_protocolName_1, l_methodName_1, v50, v54, v53);
-    v48.connections[v57] = v58;
-end;
-v24.unsubscribeToProtocolMethodRequest = function(v59, v60) --[[ Line: 168 ]] --[[ Name: unsubscribeToProtocolMethodRequest ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    v59:unsubscribeWithMsgId(l_MessageBusService_0:GetProtocolMethodRequestMessageId(v60.protocolName, v60.methodName));
-end;
-v24.unsubscribeToProtocolMethodResponse = function(v61, v62) --[[ Line: 172 ]] --[[ Name: unsubscribeToProtocolMethodResponse ]]
-    -- upvalues: l_MessageBusService_0 (copy)
-    v61:unsubscribeWithMsgId(l_MessageBusService_0:GetProtocolMethodResponseMessageId(v62.protocolName, v62.methodName));
-end;
-v24.unsubscribe = function(v63, v64) --[[ Line: 176 ]] --[[ Name: unsubscribe ]]
-    v63:unsubscribeWithMsgId(v64.mid);
-end;
-v24.unsubscribeWithMsgId = function(v65, v66) --[[ Line: 180 ]] --[[ Name: unsubscribeWithMsgId ]]
-    -- upvalues: v2 (copy), v3 (copy), l_MessageBusService_0 (copy)
-    local v67 = v65.connections[v66];
-    if v67 == nil then
-        if v2 then
-            if v3 then
-                local v68 = {
-                    err = "unsubscribing from a message id not subscribed to: " .. v66
-                };
-                local v69 = {
-                    eventType = "RobloxTelemetry", 
-                    config = {
-                        eventName = "MessageBusErrorEvent", 
-                        backends = {
-                            "Points"
-                        }, 
-                        throttlingPercentage = 10000, 
-                        lastUpdated = {
-                            24, 
-                            11, 
-                            20
-                        }, 
-                        description = "Report MessageBus errors to Points\"", 
-                        links = ""
-                    }, 
-                    data = {
-                        standardizedFields = nil, 
-                        customFields = v68, 
-                        eventContext = nil
-                    }
-                };
-                l_MessageBusService_0:Call("Telemetry.logEventFromLua", v69);
-            end;
-            return;
-        else
-            error("unsubscribing from a message id not subscribed to: " .. v66);
-        end;
-    end;
-    v65.connections[v66] = nil;
-    v67:Disconnect();
-end;
-v24.unsubscribeFromAllMessages = function(v70) --[[ Line: 223 ]] --[[ Name: unsubscribeFromAllMessages ]]
-    for v71, v72 in pairs(v70.connections) do
-        v70.connections[v71] = nil;
-        v72:Disconnect();
-    end;
-end;
-v4.Subscriber = v24;
-return v4;
+local MessageBusService = game:GetService("MessageBusService")
+
+require(script.Parent.MessageBusTypes)
+
+local v2 = game:DefineFastFlag("DisableMessageBusUnSubscribeError", false)
+local v3 = game:DefineFastFlag("EnableMessageBusUnSubscribeErrorTelemetry", false)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.publish(p1, p2) -- line: 41
+	-- upvalues: MessageBusService (copy)
+	assert(p1.validateParams(p2))
+	MessageBusService:Publish(p1.mid, p2)
+end
+function t1.publishProtocolMethodRequest(p3, p4, p5) -- line: 46
+	-- upvalues: MessageBusService (copy)
+	assert(p3.validateParams(p4))
+	MessageBusService:PublishProtocolMethodRequest(p3.protocolName, p3.methodName, p4, p5)
+end
+function t1.publishProtocolMethodResponse(p6, p7, n1: number, p8) -- line: 55
+	-- upvalues: MessageBusService (copy)
+	assert(p6.validateParams(p7))
+	MessageBusService:PublishProtocolMethodResponse(p6.protocolName, p6.methodName, p7, n1, p8)
+end
+function t1.getLast(p9) -- line: 71
+	-- upvalues: MessageBusService (copy)
+	local Last = MessageBusService:GetLast(p9.mid)
+
+	if Last == nil then
+		return nil
+	end
+
+	assert(p9.validateParams(Last))
+
+	return Last
+end
+function t1.getMessageId(s1: string, s2: string) -- line: 80
+	-- upvalues: MessageBusService (copy)
+	return MessageBusService:GetMessageId(s1, s2)
+end
+function t1.getProtocolMethodRequestMessageId(s3: string, s4: string) -- line: 84
+	-- upvalues: MessageBusService (copy)
+	return MessageBusService:GetProtocolMethodRequestMessageId(s3, s4)
+end
+function t1.getProtocolMethodResponseMessageId(s5: string, s6: string) -- line: 88
+	-- upvalues: MessageBusService (copy)
+	return MessageBusService:GetProtocolMethodResponseMessageId(s5, s6)
+end
+function t1.call(p10, p11) -- line: 92
+	-- upvalues: MessageBusService (copy)
+	assert(p10.validateParams(p11))
+
+	return MessageBusService:Call(p10.fid, p11)
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new() -- line: 100
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		connections = {}
+	}, t2))
+end
+function t2.getSubscriptionCount(p12) -- line: 107
+	local n2 = 0
+
+	for _ in pairs(p12.connections) do
+		n2 += 1
+	end
+
+	return n2
+end
+function t2.subscribe(t3: {[any]: any}, p13, p14: ((...any) -> ...any), b1: boolean?, b2: boolean?) -- line: 115
+	-- upvalues: MessageBusService (copy)
+	local v33 = b1 == nil or b1
+	local v34 = b2 ~= nil and b2
+	local mid = p13.mid
+
+	if t3.connections[mid] ~= nil then
+		t3:unsubscribe(p13)
+	end
+
+	local v36 = MessageBusService:Subscribe(mid, p14, v34, v33)
+
+	t3.connections[mid] = v36
+end
+function t2.subscribeProtocolMethodRequest(t4: {[any]: any}, p15, p16: ((...any) -> ...any), b3: boolean?, b4: boolean?) -- line: 128
+	-- upvalues: t1 (copy), MessageBusService (copy)
+	local v42 = b3 == nil or b3
+	local v43 = b4 ~= nil and b4
+	local protocolName = p15.protocolName
+	local methodName = p15.methodName
+	local v46 = t1.getProtocolMethodRequestMessageId(protocolName, methodName)
+
+	if t4.connections[v46] ~= nil then
+		t4:unsubscribeWithMsgId(v46)
+	end
+
+	local v47 = MessageBusService:SubscribeToProtocolMethodRequest(protocolName, methodName, p16, v43, v42)
+
+	t4.connections[v46] = v47
+end
+function t2.subscribeProtocolMethodResponse(t5: {[any]: any}, p17, p18: ((...any) -> ...any), b5: boolean?, b6: boolean?) -- line: 148
+	-- upvalues: t1 (copy), MessageBusService (copy)
+	local v53 = b5 == nil or b5
+	local v54 = b6 ~= nil and b6
+	local protocolName = p17.protocolName
+	local methodName = p17.methodName
+	local v57 = t1.getProtocolMethodResponseMessageId(protocolName, methodName)
+
+	if t5.connections[v57] ~= nil then
+		t5:unsubscribeWithMsgId(v57)
+	end
+
+	local v58 = MessageBusService:SubscribeToProtocolMethodResponse(protocolName, methodName, p18, v54, v53)
+
+	t5.connections[v57] = v58
+end
+function t2.unsubscribeToProtocolMethodRequest(p19, p20) -- line: 168
+	-- upvalues: MessageBusService (copy)
+	p19:unsubscribeWithMsgId(MessageBusService:GetProtocolMethodRequestMessageId(p20.protocolName, p20.methodName))
+end
+function t2.unsubscribeToProtocolMethodResponse(p21, p22) -- line: 172
+	-- upvalues: MessageBusService (copy)
+	p21:unsubscribeWithMsgId(MessageBusService:GetProtocolMethodResponseMessageId(p22.protocolName, p22.methodName))
+end
+function t2.unsubscribe(p23, p24) -- line: 176
+	p23:unsubscribeWithMsgId(p24.mid)
+end
+function t2.unsubscribeWithMsgId(t6: {[any]: any}, s7: string) -- line: 180
+	-- upvalues: v2 (copy), v3 (copy), MessageBusService (copy)
+	local v67 = t6.connections[s7]
+
+	if v67 == nil then
+		if v2 then
+			if v3 then
+				local t7 = {
+					err = "unsubscribing from a message id not subscribed to: " .. s7
+				}
+				local t8 = {
+					eventType = "RobloxTelemetry",
+					config = {
+						eventName = "MessageBusErrorEvent",
+						throttlingPercentage = 10000,
+						description = "Report MessageBus errors to Points\"",
+						links = "",
+						backends = { "Points" },
+						lastUpdated = {
+							24,
+							11,
+							20
+						}
+					},
+					data = {
+						standardizedFields = nil,
+						eventContext = nil,
+						customFields = t7
+					}
+				}
+
+				MessageBusService:Call("Telemetry.logEventFromLua", t8)
+			end
+
+			return
+		end
+
+		error("unsubscribing from a message id not subscribed to: " .. s7)
+	end
+
+	t6.connections[s7] = nil
+	v67:Disconnect()
+end
+function t2.unsubscribeFromAllMessages(p25) -- line: 223
+	for k, v in pairs(p25.connections) do
+		p25.connections[k] = nil
+		v:Disconnect()
+	end
+end
+
+t1.Subscriber = t2
+
+return t1

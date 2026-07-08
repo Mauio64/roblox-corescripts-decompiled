@@ -1,5 +1,8 @@
-local v0 = require(script.Parent.Parent.Stores.GetDrawerVisibleStore);
-return function() --[[ Line: 3 ]] --[[ Name: useDrawerShouldMount ]]
-    -- upvalues: v0 (copy)
-    return v0(false).useDrawerShouldMount();
-end;
+local GetDrawerVisibleStore = require(script.Parent.Parent.Stores.GetDrawerVisibleStore)
+
+local function useDrawerShouldMount() -- line: 3
+	-- upvalues: GetDrawerVisibleStore (copy)
+	return GetDrawerVisibleStore(false).useDrawerShouldMount()
+end
+
+return useDrawerShouldMount

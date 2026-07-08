@@ -1,9 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Networking.createOrGetProfileShareUrl);
-return v2.createReducer({}, {
-    [v3.Succeeded.name] = function(_, v5) --[[ Line: 14 ]]
-        return v5.responseBody;
-    end
-});
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local Rodux = require(ProfileQRCodeParent.Rodux)
+local createOrGetProfileShareUrl = require(ProfileQRCode.Networking.createOrGetProfileShareUrl)
+
+return Rodux.createReducer({}, {
+	[createOrGetProfileShareUrl.Succeeded.name] = function(_: {[any]: any}, t2: {[any]: any}) -- line: 14
+		return t2.responseBody
+	end
+})

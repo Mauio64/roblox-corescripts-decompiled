@@ -1,51 +1,59 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.EnumScreens);
-local v3 = require(l_Parent_0.Roact);
-local v4 = require(script.Parent.LeaveGroupDialogContainer);
-local v5 = require(script.Parent.Logger);
-local v6 = v3.PureComponent:extend("LeaveGroupDialogScreen");
-v6.defaultProps = {
-    navigation = nil
-};
-v6.init = function(v7) --[[ Line: 16 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), v2 (copy)
-    v7.onLeaveGroupDialogClose = function() --[[ Line: 17 ]]
-        -- upvalues: v7 (copy)
-        v7.props.navigation.goBack();
-    end;
-    v7.onLeaveGroupSuccess = function() --[[ Line: 21 ]]
-        -- upvalues: v7 (copy), v5 (ref), v2 (ref)
-        local l_navigation_0 = v7.props.navigation;
-        if l_navigation_0.getScreenProps("wideMode", false) then
-            v5:info("Navigate To ChatLanding with EmptyConversation from {screen}");
-            l_navigation_0.navigate(v2.EmptyConversation);
-            return;
-        else
-            v5:info("Navigate To ChatLanding from {screen}");
-            l_navigation_0.navigate(v2.ChatLanding);
-            return;
-        end;
-    end;
-end;
-v6.render = function(v9) --[[ Line: 34 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v3 (copy), v4 (copy)
-    local l_navigation_1 = v9.props.navigation;
-    assert(type(l_navigation_1) ~= "nil", "LeaveGroupDialogScreen should be wrapped with Roact Navigation");
-    local v11 = l_navigation_1.getParam("conversationId", nil);
-    if v11 == nil then
-        v5:warning("ConversationId is required to open {screen}");
-        return nil;
-    else
-        return v3.createElement(v4, {
-            conversationId = v11, 
-            onModalClose = v9.onLeaveGroupDialogClose, 
-            onLeaveSuccess = v9.onLeaveGroupSuccess
-        });
-    end;
-end;
-v6.didMount = function(_) --[[ Line: 51 ]] --[[ Name: didMount ]]
-    -- upvalues: v5 (copy)
-    v5:info("{screen} mounted");
-end;
-return v6;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local EnumScreens = require(AppChat.EnumScreens)
+local Roact = require(AppChatParent.Roact)
+local LeaveGroupDialogContainer = require(script.Parent.LeaveGroupDialogContainer)
+local Logger = require(script.Parent.Logger)
+local v7 = Roact.PureComponent:extend("LeaveGroupDialogScreen")
+
+v7.defaultProps = {
+	navigation = nil
+}
+
+function v7.init(p1) -- line: 16
+	-- upvalues: Logger (copy), EnumScreens (copy)
+	function p1.onLeaveGroupDialogClose() -- line: 17
+		-- upvalues: p1 (copy)
+		p1.props.navigation.goBack()
+	end
+	function p1.onLeaveGroupSuccess() -- line: 21
+		-- upvalues: p1 (copy), Logger (copy), EnumScreens (copy)
+		local navigation = p1.props.navigation
+
+		if navigation.getScreenProps("wideMode", false) then
+			Logger:info("Navigate To ChatLanding with EmptyConversation from {screen}")
+			navigation.navigate(EnumScreens.EmptyConversation)
+
+			return
+		end
+
+		Logger:info("Navigate To ChatLanding from {screen}")
+		navigation.navigate(EnumScreens.ChatLanding)
+	end
+end
+function v7.render(p2) -- line: 34
+	-- upvalues: Logger (copy), Roact (copy), LeaveGroupDialogContainer (copy)
+	local navigation = p2.props.navigation
+
+	assert(type(navigation) ~= "nil", "LeaveGroupDialogScreen should be wrapped with Roact Navigation")
+
+	local v11 = navigation.getParam("conversationId", nil)
+
+	if v11 == nil then
+		Logger:warning("ConversationId is required to open {screen}")
+
+		return nil
+	end
+
+	return Roact.createElement(LeaveGroupDialogContainer, {
+		conversationId = v11,
+		onModalClose = p2.onLeaveGroupDialogClose,
+		onLeaveSuccess = p2.onLeaveGroupSuccess
+	})
+end
+function v7.didMount(_) -- line: 51
+	-- upvalues: Logger (copy)
+	Logger:info("{screen} mounted")
+end
+
+return v7

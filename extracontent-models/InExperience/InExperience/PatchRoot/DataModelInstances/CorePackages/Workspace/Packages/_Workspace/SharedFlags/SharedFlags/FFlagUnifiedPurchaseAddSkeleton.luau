@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnifiedPurchaseAddSkeleton", false);
+return game:DefineFastFlag("UnifiedPurchaseAddSkeleton", false)

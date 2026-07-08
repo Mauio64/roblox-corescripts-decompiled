@@ -1,4 +1,5 @@
-game:DefineFastString("SocialCommunityAppLayer", "Social.CommunityApp");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("SocialCommunityAppLayer");
-end;
+game:DefineFastString("SocialCommunityAppLayer", "Social.CommunityApp")
+
+return function() -- line: 3
+	return game:GetFastString("SocialCommunityAppLayer")
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableEditorCategoryDeepLink", false);
+return game:DefineFastFlag("AXEnableEditorCategoryDeepLink", false)

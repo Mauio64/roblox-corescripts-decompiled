@@ -1,44 +1,53 @@
-print("[CEV] Loading CEVStarterScript");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.CrossExperience);
-local l_getMemStorageKey_0 = v1.Utils.getMemStorageKey;
-local l_logEvent_0 = v1.Analytics.CrossExperienceAnalytics.logEvent;
-local l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FStringTimeoutLoadingLocalPlayerInBackgroundDM;
-local l_LOCAL_PLAYER_LOADING_TIMEOUT_ENUM_0 = v1.Constants.LOCAL_PLAYER_LOADING_TIMEOUT_ENUM;
-l_logEvent_0("partyVoiceCEVStarterScriptLoaded", {
-    cevJoinAttemptId = l_getMemStorageKey_0("cevJoinAttemptId"), 
-    clientTimeStamp = os.time()
-});
-local l_ScriptContext_0 = game:GetService("ScriptContext");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-l_logEvent_0("cevStarterScriptRobloxGuiLoaded", {
-    cevJoinAttemptId = l_getMemStorageKey_0("cevJoinAttemptId"), 
-    clientTimeStamp = os.time()
-});
-l_ScriptContext_0:AddCoreScriptLocal("CoreScripts/CrossExperienceVoiceErrorReporter", l_RobloxGui_0);
-l_logEvent_0("cevStarterScriptErrorReporterLoaded", {
-    cevJoinAttemptId = l_getMemStorageKey_0("cevJoinAttemptId"), 
-    clientTimeStamp = os.time()
-});
-if l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 == l_LOCAL_PLAYER_LOADING_TIMEOUT_ENUM_0.Disable then
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    while not l_LocalPlayer_0 do
-        l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-        l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    end;
-end;
-if l_FStringTimeoutLoadingLocalPlayerInBackgroundDM_0 == l_LOCAL_PLAYER_LOADING_TIMEOUT_ENUM_0.Disable then
-    l_logEvent_0("cevStarterScriptLocalPlayerLoaded", {
-        cevJoinAttemptId = l_getMemStorageKey_0("cevJoinAttemptId"), 
-        clientTimeStamp = os.time()
-    });
-end;
+print("[CEV] Loading CEVStarterScript")
+
+local CorePackages = game:GetService("CorePackages")
+local CrossExperience = require(CorePackages.Workspace.Packages.CrossExperience)
+local getMemStorageKey = CrossExperience.Utils.getMemStorageKey
+local logEvent = CrossExperience.Analytics.CrossExperienceAnalytics.logEvent
+local FStringTimeoutLoadingLocalPlayerInBackgroundDM = require(CorePackages.Workspace.Packages.SharedFlags).FStringTimeoutLoadingLocalPlayerInBackgroundDM
+local LOCAL_PLAYER_LOADING_TIMEOUT_ENUM = CrossExperience.Constants.LOCAL_PLAYER_LOADING_TIMEOUT_ENUM
+
+logEvent("partyVoiceCEVStarterScriptLoaded", {
+	cevJoinAttemptId = getMemStorageKey("cevJoinAttemptId"),
+	clientTimeStamp = os.time()
+})
+
+local ScriptContext = game:GetService("ScriptContext")
+local Players = game:GetService("Players")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+logEvent("cevStarterScriptRobloxGuiLoaded", {
+	cevJoinAttemptId = getMemStorageKey("cevJoinAttemptId"),
+	clientTimeStamp = os.time()
+})
+ScriptContext:AddCoreScriptLocal("CoreScripts/CrossExperienceVoiceErrorReporter", RobloxGui)
+logEvent("cevStarterScriptErrorReporterLoaded", {
+	cevJoinAttemptId = getMemStorageKey("cevJoinAttemptId"),
+	clientTimeStamp = os.time()
+})
+
+if FStringTimeoutLoadingLocalPlayerInBackgroundDM == LOCAL_PLAYER_LOADING_TIMEOUT_ENUM.Disable then
+	local LocalPlayer = Players.LocalPlayer
+
+	while not LocalPlayer do
+		Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+		LocalPlayer = Players.LocalPlayer
+	end
+end
+
+if FStringTimeoutLoadingLocalPlayerInBackgroundDM == LOCAL_PLAYER_LOADING_TIMEOUT_ENUM.Disable then
+	logEvent("cevStarterScriptLocalPlayerLoaded", {
+		cevJoinAttemptId = getMemStorageKey("cevJoinAttemptId"),
+		clientTimeStamp = os.time()
+	})
+end
+
 if game:GetEngineFeature("VoiceChatSupported") then
-    l_ScriptContext_0:AddCoreScriptLocal("CoreScripts/CrossExperienceVoiceDefaultChannel", l_RobloxGui_0);
-end;
-l_logEvent_0("cevStarterScriptCEVDefaultChannelLoaded", {
-    cevJoinAttemptId = l_getMemStorageKey_0("cevJoinAttemptId"), 
-    clientTimeStamp = os.time()
-});
-print("[CEV] CEVStarterScript Loaded");
+	ScriptContext:AddCoreScriptLocal("CoreScripts/CrossExperienceVoiceDefaultChannel", RobloxGui)
+end
+
+logEvent("cevStarterScriptCEVDefaultChannelLoaded", {
+	cevJoinAttemptId = getMemStorageKey("cevJoinAttemptId"),
+	clientTimeStamp = os.time()
+})
+print("[CEV] CEVStarterScript Loaded")

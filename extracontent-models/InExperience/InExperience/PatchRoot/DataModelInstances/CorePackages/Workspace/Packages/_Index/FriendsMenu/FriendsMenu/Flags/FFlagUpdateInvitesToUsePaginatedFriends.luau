@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UpdateInvitesToUsePaginatedFriends", false);
+return game:DefineFastFlag("UpdateInvitesToUsePaginatedFriends", false)

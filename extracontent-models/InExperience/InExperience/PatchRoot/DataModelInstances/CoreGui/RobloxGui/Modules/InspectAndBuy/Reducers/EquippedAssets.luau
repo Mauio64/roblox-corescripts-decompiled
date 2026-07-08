@@ -1,13 +1,16 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetEquippedAssets);
-return v1.createReducer({}, {
-    [v3.name] = function(_, v5) --[[ Line: 11 ]]
-        local v6 = {};
-        for _, v8 in ipairs(v5.equippedAssets) do
-            v6[tostring(v8.assetId)] = true;
-        end;
-        return v6;
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetEquippedAssets = require(ParentParent.Actions.SetEquippedAssets)
+
+return Rodux.createReducer({}, {
+	[SetEquippedAssets.name] = function(_, p2) -- line: 11
+		local t1 = {}
+
+		for _, v in ipairs(p2.equippedAssets) do
+			t1[tostring(v.assetId)] = true
+		end
+
+		return t1
+	end
+})

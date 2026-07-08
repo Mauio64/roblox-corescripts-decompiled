@@ -1,1 +1,1 @@
-return require(script.ContactListContext);
+return require(script.ContactListContext)

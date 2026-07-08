@@ -1,1 +1,1 @@
-return require(script.FriendsLandingContainer2);
+return require(script.FriendsLandingContainer2)

@@ -1,23 +1,24 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Actions.OpenPrompt);
-local v3 = require(l_Parent_0.Network.GetOutfitName);
-local v4 = require(l_Parent_0.PromptType);
-return function(v5, v6, v7) --[[ Line: 10 ]]
-    -- upvalues: v3 (copy), v2 (copy), v4 (copy), l_AvatarEditorService_0 (copy)
-    return function(v8) --[[ Line: 11 ]]
-        -- upvalues: v3 (ref), v5 (copy), v2 (ref), v4 (ref), v6 (copy), v7 (copy), l_AvatarEditorService_0 (ref)
-        v3(v5):andThen(function(v9) --[[ Line: 12 ]]
-            -- upvalues: v8 (copy), v2 (ref), v4 (ref), v5 (ref), v6 (ref), v7 (ref)
-            v8:dispatch(v2(v4.UpdateOutfit, {
-                outfitId = v5, 
-                outfitName = v9, 
-                humanoidDescription = v6, 
-                rigType = v7
-            }));
-        end, function(_) --[[ Line: 19 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref)
-            l_AvatarEditorService_0:SignalUpdateOutfitFailed();
-        end);
-    end;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local ParentParent = script.Parent.Parent
+local OpenPrompt = require(ParentParent.Actions.OpenPrompt)
+local GetOutfitName = require(ParentParent.Network.GetOutfitName)
+local PromptType = require(ParentParent.PromptType)
+
+return function(p1, p2, p3) -- line: 10
+	-- upvalues: GetOutfitName (copy), OpenPrompt (copy), PromptType (copy), AvatarEditorService (copy)
+	return function(p4) -- line: 11
+		-- upvalues: GetOutfitName (copy), p1 (copy), OpenPrompt (copy), PromptType (copy), p2 (copy), p3 (copy), AvatarEditorService (copy)
+		GetOutfitName(p1):andThen(function(p5) -- line: 12
+			-- upvalues: p4 (copy), OpenPrompt (copy), PromptType (copy), p1 (copy), p2 (copy), p3 (copy)
+			p4:dispatch(OpenPrompt(PromptType.UpdateOutfit, {
+				outfitId = p1,
+				outfitName = p5,
+				humanoidDescription = p2,
+				rigType = p3
+			}))
+		end, function(_) -- line: 19
+			-- upvalues: AvatarEditorService (copy)
+			AvatarEditorService:SignalUpdateOutfitFailed()
+		end)
+	end
+end

@@ -1,109 +1,111 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_isSystemMessage_0 = require(l_CorePackages_0.Workspace.Packages.ChatLineReporting).Helpers.isSystemMessage;
-local l_FFlagEnableGlobalChatAbuseReporting_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableGlobalChatAbuseReporting;
-local v5 = require(l_script_FirstAncestor_0.Components.Constants);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local function v13(v7, v8, v9, v10, v11) --[[ Line: 15 ]] --[[ Name: buildReportTags ]]
-    -- upvalues: v5 (copy)
-    local v12 = {
-        tags = {
-            ENTRY_POINT = {
-                valueList = {
-                    {
-                        data = "in-experience"
-                    }
-                }
-            }, 
-            SUBMITTER_USER_ID = {
-                valueList = {
-                    {
-                        data = tostring(v7)
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_CATEGORY = {
-                valueList = {
-                    {
-                        data = v9
-                    }
-                }
-            }, 
-            REPORTER_COMMENT = {
-                valueList = {
-                    {
-                        data = v10
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_VECTOR = {
-                valueList = {
-                    {
-                        data = "chat"
-                    }
-                }
-            }, 
-            REPORT_TARGET_USER_ID = {
-                valueList = {
-                    {
-                        data = v8
-                    }
-                }
-            }, 
-            VARIANT = {
-                valueList = {
-                    {
-                        data = v5.ChatLineReportingVariant.IGM_CLRv1
-                    }
-                }
-            }
-        }
-    };
-    if v11 then
-        v12.tags.REPORT_TARGET_MESSAGE_ID = {
-            valueList = {
-                {
-                    data = v11
-                }
-            }
-        };
-    end;
-    return v12;
-end;
-return function(v14) --[[ Line: 87 ]]
-    -- upvalues: v13 (copy), l_FFlagEnableGlobalChatAbuseReporting_0 (copy), l_isSystemMessage_0 (copy), l_Players_0 (copy)
-    local v15 = v13(v14.localPlayerUserId, v14.reportTargetUser, v14.abuseReason, v14.abuseDescription, v14.selectedMessage.messageId);
-    local v16 = {};
-    for _, v18 in ipairs(v14.orderedMessages) do
-        local v19 = false;
-        if v18.userId ~= nil then
-            v19 = true;
-            if v18.textChannel == nil then
-                v19 = l_FFlagEnableGlobalChatAbuseReporting_0;
-            end;
-        end;
-        if v19 then
-            local v20 = {
-                channel = v18.textChannel, 
-                messageId = v18.messageId
-            };
-            if not l_isSystemMessage_0({
-                userId = v18.userId, 
-                textChannel = v18.textChannel
-            }) then
-                table.insert(v16, v20);
-            end;
-        end;
-    end;
-    local v21 = {
-        {
-            channel = v14.selectedMessage.textChannel, 
-            messageId = v14.selectedMessage.messageId
-        }
-    };
-    task.defer(function() --[[ Line: 123 ]]
-        -- upvalues: l_Players_0 (ref), v16 (copy), v21 (copy), v15 (copy)
-        l_Players_0:ReportChatAbuse(v16, v21, v15);
-    end);
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local ChatLineReporting = require(CorePackages.Workspace.Packages.ChatLineReporting)
+local FFlagExpChatPresetChatEnabled = require(CorePackages.Workspace.Packages.ExpChatShared).Flags.FFlagExpChatPresetChatEnabled
+local isSystemMessage = ChatLineReporting.Helpers.isSystemMessage
+local FFlagEnableGlobalChatAbuseReporting = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableGlobalChatAbuseReporting
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+require(AbuseReportMenu.Components.Types)
+
+local function buildReportTags(n1: number, s1: string, s2: string, s3: string, s4: string?, s5: string?, s6: string?) -- line: 17
+	-- upvalues: Constants (copy), FFlagExpChatPresetChatEnabled (copy)
+	local t1 = {
+		tags = {
+			ENTRY_POINT = {
+				valueList = {{
+					data = "in-experience"
+				}}
+			},
+			SUBMITTER_USER_ID = {
+				valueList = {{
+					data = tostring(n1)
+				}}
+			},
+			REPORTED_ABUSE_CATEGORY = {
+				valueList = {{
+					data = s2
+				}}
+			},
+			REPORTER_COMMENT = {
+				valueList = {{
+					data = s3
+				}}
+			},
+			REPORTED_ABUSE_VECTOR = {
+				valueList = {{
+					data = "chat"
+				}}
+			},
+			REPORT_TARGET_USER_ID = {
+				valueList = {{
+					data = s1
+				}}
+			},
+			VARIANT = {
+				valueList = {{
+					data = Constants.ChatLineReportingVariant.IGM_CLRv1
+				}}
+			}
+		}
+	}
+
+	if s4 then
+		t1.tags.REPORT_TARGET_MESSAGE_ID = {
+			valueList = {{
+				data = s4
+			}}
+		}
+	end
+
+	if FFlagExpChatPresetChatEnabled and s5 and s5 ~= "" then
+		t1.tags.REPORT_TARGET_PRESET_ID = {
+			valueList = {{
+				data = s5
+			}}
+		}
+
+		if s6 and s6 ~= "" then
+			t1.tags.REPORT_TARGET_PRESET_VERSION = {
+				valueList = {{
+					data = s6
+				}}
+			}
+		end
+	end
+
+	return t1
+end
+
+return function(t2: {[any]: any}) -- line: 106
+	-- upvalues: buildReportTags (copy), FFlagEnableGlobalChatAbuseReporting (copy), isSystemMessage (copy), Players (copy)
+	local v19 = buildReportTags(t2.localPlayerUserId, t2.reportTargetUser, t2.abuseReason, t2.abuseDescription, t2.selectedMessage.messageId, t2.selectedMessage.presetId, t2.selectedMessage.presetChatVersion)
+	local t3 = {}
+
+	for _, v in ipairs(t2.orderedMessages) do
+		if v.userId ~= nil and (v.textChannel ~= nil or FFlagEnableGlobalChatAbuseReporting) then
+			local t4 = {
+				channel = v.textChannel,
+				messageId = v.messageId
+			}
+
+			if not isSystemMessage({
+				userId = v.userId,
+				textChannel = v.textChannel
+			}) then
+				table.insert(t3, t4)
+			end
+		end
+	end
+
+	local t5 = {{
+		channel = t2.selectedMessage.textChannel,
+		messageId = t2.selectedMessage.messageId
+	}}
+
+	task.defer(function() -- line: 144
+		-- upvalues: Players (copy), t3 (copy), t5 (copy), v19 (copy)
+		Players:ReportChatAbuse(t3, t5, v19)
+	end)
+end

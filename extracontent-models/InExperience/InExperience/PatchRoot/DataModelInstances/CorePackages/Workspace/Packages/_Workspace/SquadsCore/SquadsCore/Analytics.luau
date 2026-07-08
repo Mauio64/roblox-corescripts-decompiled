@@ -1,31 +1,32 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v2 = require(l_Parent_0.SharedFlags);
-local v3 = require(l_Parent_0.SocialLuaAnalytics);
-local l_AnalyticsFactory_0 = v3.Analytics.AnalyticsFactory;
-local l_DefaultAnalyticsService_0 = v3.Analytics.DefaultAnalyticsService;
-local v6 = require(script.EventNames);
-local v7 = require(script.EventStreamActionList);
-local l_FFlagEnableSquadCoplayAnalytic_0 = v2.FFlagEnableSquadCoplayAnalytic;
-local l_l_RbxAnalyticsService_0_PlaySessionId_0 = l_RbxAnalyticsService_0:GetPlaySessionId();
-local v10 = {
-    playSessionId = if l_l_RbxAnalyticsService_0_PlaySessionId_0 ~= "" then l_l_RbxAnalyticsService_0_PlaySessionId_0 else nil, 
-    placeId = if game.PlaceId > 0 then tostring(game.PlaceId) else nil, 
-    universeId = if game.GameId > 0 then tostring(game.GameId) else nil, 
-    placeInstanceId = if game.JobId ~= "" then tostring(game.JobId) else nil
-};
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local SharedFlags = require(Parent.SharedFlags)
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EventNames = require(script.EventNames)
+local EventStreamActionList = require(script.EventStreamActionList)
+local FFlagEnableSquadCoplayAnalytic = SharedFlags.FFlagEnableSquadCoplayAnalytic
+local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
+local t1 = {
+	playSessionId = if PlaySessionId == "" then nil else PlaySessionId,
+	placeId = if not (game.PlaceId > 0) then nil else tostring(game.PlaceId),
+	universeId = if not (game.GameId > 0) then nil else tostring(game.GameId),
+	placeInstanceId = if game.JobId == "" then nil else tostring(game.JobId)
+}
+
 return {
-    Analytics = l_AnalyticsFactory_0.setUpAnalyticsFactory({
-        eventLists = {
-            EventStream = v7, 
-            Diag = nil
-        }, 
-        analyticsImpl = {
-            EventStream = l_DefaultAnalyticsService_0.EventStream, 
-            Diag = nil
-        }, 
-        staticInfoForAllEvents = v10
-    }), 
-    EventNames = v6, 
-    logInExpCoplayTelemetry = if l_FFlagEnableSquadCoplayAnalytic_0 then require(script.logInExpCoplayTelemetry) else nil
-};
+	Analytics = AnalyticsFactory.setUpAnalyticsFactory({
+		eventLists = {
+			Diag = nil,
+			EventStream = EventStreamActionList
+		},
+		analyticsImpl = {
+			Diag = nil,
+			EventStream = DefaultAnalyticsService.EventStream
+		},
+		staticInfoForAllEvents = t1
+	}),
+	EventNames = EventNames,
+	logInExpCoplayTelemetry = if not FFlagEnableSquadCoplayAnalytic then nil else require(script.logInExpCoplayTelemetry)
+}

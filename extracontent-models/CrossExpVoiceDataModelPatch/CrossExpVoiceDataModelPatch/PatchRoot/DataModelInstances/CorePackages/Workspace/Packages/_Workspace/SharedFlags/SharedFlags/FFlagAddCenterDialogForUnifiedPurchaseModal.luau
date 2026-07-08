@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddCenterDialogForUnifiedPurchaseModal2", false);
+return game:DefineFastFlag("AddCenterDialogForUnifiedPurchaseModal2", false)

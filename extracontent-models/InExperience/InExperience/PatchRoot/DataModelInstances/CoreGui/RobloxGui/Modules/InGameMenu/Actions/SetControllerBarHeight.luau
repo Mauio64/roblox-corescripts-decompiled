@@ -1,6 +1,7 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator("SET_CONTROLLER_BAR_HEIGHT", function(v1) --[[ Line: 5 ]]
-    return {
-        controllerBarHeight = v1
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator("SET_CONTROLLER_BAR_HEIGHT", function(p1) -- line: 5
+	return {
+		controllerBarHeight = p1
+	}
+end)

@@ -1,7 +1,9 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: formatExperienceIcon ]]
-    if v0 then
-        return v0;
-    else
-        return (("rbxthumb://type=GameIcon&id=%*&w=150&h=150"):format(v1));
-    end;
-end;
+local function formatExperienceIcon(s1: string?, s2: string) -- line: 1
+	if s1 then
+		return s1
+	end
+
+	return `rbxthumb://type=GameIcon&id={ s2 }&w=150&h=150`
+end
+
+return formatExperienceIcon

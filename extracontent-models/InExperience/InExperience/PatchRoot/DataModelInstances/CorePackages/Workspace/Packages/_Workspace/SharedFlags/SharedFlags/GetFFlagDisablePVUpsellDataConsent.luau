@@ -1,4 +1,5 @@
-game:DefineFastFlag("DisablePVUpsellDataConsent", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("DisablePVUpsellDataConsent");
-end;
+game:DefineFastFlag("DisablePVUpsellDataConsent", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("DisablePVUpsellDataConsent")
+end

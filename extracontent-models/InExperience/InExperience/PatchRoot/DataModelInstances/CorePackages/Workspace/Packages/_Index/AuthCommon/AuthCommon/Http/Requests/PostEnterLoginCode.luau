@@ -1,14 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-return function(v3, v4) --[[ Line: 7 ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_HttpService_0 (copy)
-    assert(type(v4) == "string", "invalid login code");
-    local v5 = l_UrlBuilder_0.fromString("apis:auth-token-service/v1/login/entercode");
-    local v6 = l_HttpService_0:JSONEncode({
-        code = v4
-    });
-    return v3(v5(), "POST", {
-        postBody = v6
-    });
-end;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local HttpService = game:GetService("HttpService")
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+
+return function(p1, p2) -- line: 7
+	-- upvalues: UrlBuilder (copy), HttpService (copy)
+	assert(type(p2) == "string", "invalid login code")
+
+	local v6 = UrlBuilder.fromString("apis:auth-token-service/v1/login/entercode")
+	local json = HttpService:JSONEncode({
+		code = p2
+	})
+
+	return p1(v6(), "POST", {
+		postBody = json
+	})
+end

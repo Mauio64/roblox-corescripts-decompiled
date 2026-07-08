@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxFriends").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 5 ]]
-    return {
-        ids = v1
-    };
-end);
+local Parent = script:FindFirstAncestor("RoduxFriends").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 5
+	return {
+		ids = t1
+	}
+end)

@@ -1,19 +1,23 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_Parent_0.React);
-return function() --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), l_GuiService_0 (copy)
-    local v3, v4 = v2.useState(l_GuiService_0.TopbarInset.Height);
-    v2.useEffect(function() --[[ Line: 11 ]]
-        -- upvalues: l_GuiService_0 (ref), v4 (copy)
-        local v5 = l_GuiService_0:GetPropertyChangedSignal("TopbarInset"):Connect(function() --[[ Line: 13 ]]
-            -- upvalues: v4 (ref), l_GuiService_0 (ref)
-            v4(l_GuiService_0.TopbarInset.Height);
-        end);
-        return function() --[[ Line: 17 ]]
-            -- upvalues: v5 (copy)
-            v5:Disconnect();
-        end;
-    end, {});
-    return v3;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local GuiService = game:GetService("GuiService")
+local React = require(ParentParent.React)
+
+return function() -- line: 8
+	-- upvalues: React (copy), GuiService (copy)
+	local v4, v5 = React.useState(GuiService.TopbarInset.Height)
+
+	React.useEffect(function() -- line: 11
+		-- upvalues: GuiService (copy), v5 (copy)
+		local connection = GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(function() -- line: 13
+			-- upvalues: v5 (copy), GuiService (copy)
+			v5(GuiService.TopbarInset.Height)
+		end)
+
+		return function() -- line: 17
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {})
+
+	return v4
+end

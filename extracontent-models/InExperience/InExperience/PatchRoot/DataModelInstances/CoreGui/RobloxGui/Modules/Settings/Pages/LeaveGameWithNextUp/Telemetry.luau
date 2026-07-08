@@ -1,80 +1,76 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.LoggingProtocol);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local v3 = require(script.Parent.NextUpState);
-local v4 = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry);
-local l_default_0 = v1.default;
-local v6 = if v4 then {
-    LeaveGame = "LeaveGame", 
-    CloseExitModalClick = "CloseExitModalClick", 
-    CloseExitModalEscape = "CloseExitModalEscape", 
-    JoinGame = "JoinGame"
-} else nil;
-local v7 = {
-    eventName = "InGameNextUpExitMenuSortRequestLatency", 
-    backends = {
-        v1.TelemetryBackends.Stats
-    }, 
-    lastUpdated = {
-        25, 
-        7, 
-        16
-    }, 
-    description = "Request latency for In-Game Exit Page network requests"
-};
-local function v10(v8, v9) --[[ Line: 33 ]] --[[ Name: logRequestLatency ]]
-    -- upvalues: l_default_0 (copy), v7 (copy)
-    l_default_0:logRobloxTelemetryStat(v7, v9, {
-        endpointName = v8
-    });
-end;
-local v11 = {
-    eventName = "InGameNextUpExitMenuSortView", 
-    backends = {
-        v1.TelemetryBackends.Counter
-    }, 
-    lastUpdated = {
-        25, 
-        7, 
-        16
-    }, 
-    description = "Next-up sort views from the In-Game Exit Modal"
-};
-local function v13(v12) --[[ Line: 48 ]] --[[ Name: logNextUpSortView ]]
-    -- upvalues: l_default_0 (copy), v11 (copy)
-    l_default_0:logRobloxTelemetryCounter(v11, 1, {
-        tilesLoaded = tostring(v12)
-    });
-end;
-local v14 = if v4 then {
-    eventName = "InGameNextUpExitMenuSortView", 
-    backends = {
-        v1.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = game:DefineFastInt("InGameNextUpSortViewEventThrottlingPercentage", 0), 
-    lastUpdated = {
-        25, 
-        7, 
-        22
-    }, 
-    description = "Next-up sort views from the In-Game Exit Modal"
-} else nil;
-local v16 = v4 and function(v15) --[[ Line: 67 ]]
-    return v15 * 1000;
-end or nil;
-local v20 = v4 and function(v17) --[[ Line: 73 ]]
-    -- upvalues: v3 (copy), v2 (copy), v16 (copy), l_default_0 (copy), v14 (copy)
-    local v18 = v3.getNextUpComponentSortLatency();
-    local v19 = v2.List.map(v3.getNextUpTileImageTextureLatencies(), v16);
-    l_default_0:logRobloxTelemetryEvent(v14, {}, {
-        action = v17, 
-        sortLatency = if v18 then v16(v18) else nil, 
-        tileLatencies = if #v19 > 0 then table.concat(v19, ",") else nil
-    });
-end or nil;
+local CorePackages = game:GetService("CorePackages")
+local LoggingProtocol = require(CorePackages.Workspace.Packages.LoggingProtocol)
+local Cryo = require(CorePackages.Packages.Cryo)
+local NextUpState = require(script.Parent.NextUpState)
+local FFlagEnableNextUpImageLatencyTelemetry = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry)
+local default = LoggingProtocol.default
+local v7 = if not FFlagEnableNextUpImageLatencyTelemetry then nil else {
+	LeaveGame = "LeaveGame",
+	CloseExitModalClick = "CloseExitModalClick",
+	CloseExitModalEscape = "CloseExitModalEscape",
+	JoinGame = "JoinGame"
+}
+local t1 = {
+	eventName = "InGameNextUpExitMenuSortRequestLatency",
+	description = "Request latency for In-Game Exit Page network requests",
+	backends = { LoggingProtocol.TelemetryBackends.Stats },
+	lastUpdated = {
+		25,
+		7,
+		16
+	}
+}
+local t2 = {
+	eventName = "InGameNextUpExitMenuSortView",
+	description = "Next-up sort views from the In-Game Exit Modal",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		25,
+		7,
+		16
+	}
+}
+
+local function logNextUpSortView(b1: boolean) -- line: 48
+	-- upvalues: default (copy), t2 (copy)
+	default:logRobloxTelemetryCounter(t2, 1, {
+		tilesLoaded = tostring(b1)
+	})
+end
+
+local v11 = if not FFlagEnableNextUpImageLatencyTelemetry then nil else {
+	eventName = "InGameNextUpExitMenuSortView",
+	description = "Next-up sort views from the In-Game Exit Modal",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = game:DefineFastInt("InGameNextUpSortViewEventThrottlingPercentage", 0),
+	lastUpdated = {
+		25,
+		7,
+		22
+	}
+}
+local v12 = if not FFlagEnableNextUpImageLatencyTelemetry then nil else function(n1: number) -- line: 67
+	return n1 * 1000
+end
+
 return {
-    logRequestLatency = v10, 
-    logNextUpSortView = if v4 then nil else v13, 
-    NextUpSortViewActionType = if v4 then v6 else nil, 
-    logNextUpExitModalAction = if v4 then v20 else nil
-};
+	logRequestLatency = function(s1: string, n2: number) -- line: 33
+		-- upvalues: default (copy), t1 (copy)
+		default:logRobloxTelemetryStat(t1, n2, {
+			endpointName = s1
+		})
+	end,
+	logNextUpSortView = if not FFlagEnableNextUpImageLatencyTelemetry then logNextUpSortView else nil,
+	NextUpSortViewActionType = if not FFlagEnableNextUpImageLatencyTelemetry then nil else v7,
+	logNextUpExitModalAction = if not FFlagEnableNextUpImageLatencyTelemetry then nil else if not FFlagEnableNextUpImageLatencyTelemetry then nil else function(s2: string) -- line: 73
+		-- upvalues: NextUpState (copy), Cryo (copy), v12 (copy), default (copy), v11 (copy)
+		local v18 = NextUpState.getNextUpComponentSortLatency()
+		local v19 = Cryo.List.map(NextUpState.getNextUpTileImageTextureLatencies(), v12)
+
+		default:logRobloxTelemetryEvent(v11, {}, {
+			action = s2,
+			sortLatency = if not v18 then nil else v12(v18),
+			tileLatencies = if not (#v19 > 0) then nil else table.concat(v19, ",")
+		})
+	end
+}

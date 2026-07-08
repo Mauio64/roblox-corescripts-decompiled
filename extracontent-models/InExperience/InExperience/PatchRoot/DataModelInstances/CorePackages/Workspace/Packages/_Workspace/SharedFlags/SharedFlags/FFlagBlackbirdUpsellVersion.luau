@@ -1,1 +1,1 @@
-return game:DefineFastFlag("BlackbirdUpsellDev", false);
+return game:DefineFastFlag("BlackbirdUpsellProd2", false)

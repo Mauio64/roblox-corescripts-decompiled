@@ -9,20 +9,22 @@ require(Foundation.Enums.Theme)
 local TokenProcessingUtilities = require(Foundation.Providers.Style.Tokens.TokenProcessingUtilities)
 local Tokens = require(Foundation.Providers.Style.Tokens)
 
-local function emitLeafAttributes(t1: {[any]: any}, s1: string, p1) -- line: 19
+local function tokenPathToAttributeBase(s1: string) -- line: 14
+	return s1:gsub("%.", ""):gsub("_", "")
+end
+local function emitLeafAttributes(t1: {[any]: any}, s2: string, p1) -- line: 19
 	-- upvalues: emitLeafAttributes (copy)
 	if type(p1) == "table" then
-		for v10, v11 in p1 do
-			emitLeafAttributes(t1, s1 .. tostring(v10), v11)
+		for v12, v13 in p1 do
+			emitLeafAttributes(t1, s2 .. tostring(v12), v13)
 		end
 
 		return
 	end
 
-	t1[s1] = p1
+	t1[s2] = p1
 end
-
-return function(p2, p3, p4) --[[ getOverrideAttributes ]] -- line: 39
+local function getOverrideAttributes(p2, p3, p4) -- line: 37
 	-- upvalues: Flags (copy), Tokens (copy), TokenProcessingUtilities (copy), emitLeafAttributes (copy)
 	local t2 = {}
 
@@ -34,15 +36,17 @@ return function(p2, p3, p4) --[[ getOverrideAttributes ]] -- line: 39
 		return t2
 	end
 
-	local v16 = Tokens.getTokens(p2, p3, 1)
+	local v18 = Tokens.getTokens(p2, p3, 1)
 
-	for v17, v18 in p4 do
-		local v19 = TokenProcessingUtilities.getTokenValue(v16, v18)
+	for v19, v20 in p4 do
+		local v21 = TokenProcessingUtilities.resolveTokenOverride(v18, v19, v20)
 
-		if v19 ~= nil then
-			emitLeafAttributes(t2, v17:gsub("%.", ""):gsub("_", ""), v19)
+		if v21 ~= nil then
+			emitLeafAttributes(t2, v19:gsub("%.", ""):gsub("_", ""), v21)
 		end
 	end
 
 	return t2
 end
+
+return getOverrideAttributes

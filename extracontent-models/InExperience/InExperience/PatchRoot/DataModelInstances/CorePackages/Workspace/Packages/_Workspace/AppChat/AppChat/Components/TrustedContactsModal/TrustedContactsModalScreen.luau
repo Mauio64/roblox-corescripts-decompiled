@@ -8,27 +8,29 @@ local SetTabBarVisibleFromChat = AppTabBarRodux.Thunks.SetTabBarVisibleFromChat
 local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
 local TrustedFriendsModalEntry = TrustedContacts.TrustedFriendsModalEntry
 
-return function(t1: {[any]: any}) --[[ TrustedContactsModalScreen ]] -- line: 37
+local function TrustedContactsModalScreen(t1: {[any]: any}) -- line: 37
 	-- upvalues: useDispatch (copy), React (copy), SetTabBarVisibleFromChat (copy), TrustedFriendsModalEntry (copy), Cryo (copy)
 	local navigation = t1.navigation
-	local v12 = navigation.getParam("props")
-	local v13 = useDispatch()
-	local v14 = React.useCallback(function() -- line: 42
+	local v13 = navigation.getParam("props")
+	local v14 = useDispatch()
+	local v15 = React.useCallback(function() -- line: 42
 		-- upvalues: navigation (copy)
 		navigation.pop()
 	end, { navigation })
 
 	React.useEffect(function() -- line: 46
-		-- upvalues: v13 (copy), SetTabBarVisibleFromChat (copy)
-		v13(SetTabBarVisibleFromChat(false))
+		-- upvalues: v14 (copy), SetTabBarVisibleFromChat (copy)
+		v14(SetTabBarVisibleFromChat(false))
 
 		return function() -- line: 48
-			-- upvalues: v13 (copy), SetTabBarVisibleFromChat (copy)
-			v13(SetTabBarVisibleFromChat(true))
+			-- upvalues: v14 (copy), SetTabBarVisibleFromChat (copy)
+			v14(SetTabBarVisibleFromChat(true))
 		end
-	end, { v13 })
+	end, { v14 })
 
-	return React.createElement(TrustedFriendsModalEntry, Cryo.Dictionary.join(v12, {
-		onClosed = v14
+	return React.createElement(TrustedFriendsModalEntry, Cryo.Dictionary.join(v13, {
+		onClosed = v15
 	}))
 end
+
+return TrustedContactsModalScreen

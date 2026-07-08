@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableNotificationsDeeplink", false);
+return game:DefineFastFlag("EnableNotificationsDeeplink", false)

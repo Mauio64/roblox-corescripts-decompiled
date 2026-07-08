@@ -1,40 +1,41 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local v2 = require(l_Parent_0.LuauPolyfill);
-local l_console_0 = v2.console;
-local l_Array_0 = v2.Array;
-local v5 = require(script.Parent.ReactSharedInternals);
-local v6 = nil;
-local v9 = {
-    warn = function(v7, ...) --[[ Line: 26 ]]
-        -- upvalues: v1 (copy), v6 (ref)
-        if v1.__DEV__ then
-            v6("warn", v7, {
-                ...
-            });
-        end;
-    end, 
-    error = function(v8, ...) --[[ Line: 31 ]]
-        -- upvalues: v1 (copy), v6 (ref)
-        if v1.__DEV__ then
-            v6("error", v8, {
-                ...
-            });
-        end;
-    end
-};
-v6 = function(v10, v11, v12) --[[ Line: 37 ]] --[[ Name: printWarning ]]
-    -- upvalues: v1 (copy), v5 (copy), l_Array_0 (copy), l_console_0 (copy)
-    if v1.__DEV__ then
-        local v13 = v5.ReactDebugCurrentFrame.getStackAddendum();
-        if v13 ~= "" then
-            v11 = v11 .. "%s";
-            v12 = l_Array_0.slice(v12, 1);
-            table.insert(v12, v13);
-        end;
-        local v14 = l_Array_0.map(v12, tostring);
-        table.insert(v14, 1, "Warning: " .. v11);
-        l_console_0[v10](unpack(v14));
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local console = LuauPolyfill.console
+local Array = LuauPolyfill.Array
+local ReactSharedInternals = require(script.Parent.ReactSharedInternals)
+local printWarning = nil
+local t1 = {
+	warn = function(p1, ...) -- line: 26
+		-- upvalues: ReactGlobals (copy), printWarning (ref)
+		if ReactGlobals.__DEV__ then
+			printWarning("warn", p1, { ... })
+		end
+	end,
+	error = function(p2, ...) -- line: 31
+		-- upvalues: ReactGlobals (copy), printWarning (ref)
+		if ReactGlobals.__DEV__ then
+			printWarning("error", p2, { ... })
+		end
+	end
+}
+
+function printWarning(p3, p4, p5) -- line: 37
+	-- upvalues: ReactGlobals (copy), ReactSharedInternals (copy), Array (copy), console (copy)
+	if ReactGlobals.__DEV__ then
+		local v14 = ReactSharedInternals.ReactDebugCurrentFrame.getStackAddendum()
+
+		if v14 ~= "" then
+			p4 ..= "%s"
+			p5 = Array.slice(p5, 1)
+			table.insert(p5, v14)
+		end
+
+		local v15 = Array.map(p5, tostring)
+
+		table.insert(v15, 1, "Warning: " .. p4)
+		console[p3](unpack(v15))
+	end
+end
+
+return t1

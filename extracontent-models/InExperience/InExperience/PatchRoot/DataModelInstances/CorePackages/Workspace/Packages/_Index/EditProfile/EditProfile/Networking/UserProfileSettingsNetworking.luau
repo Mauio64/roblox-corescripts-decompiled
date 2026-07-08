@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("EditProfile").Parent;
-local v1 = require(l_Parent_0.UserProfileSettingsNetworking);
-local v2 = require(script.Parent.ProfileRoduxNetworking);
-return (v1.config({
-    roduxNetworking = v2
-}));
+local Parent = script:FindFirstAncestor("EditProfile").Parent
+local UserProfileSettingsNetworking = require(Parent.UserProfileSettingsNetworking)
+local ProfileRoduxNetworking = require(script.Parent.ProfileRoduxNetworking)
+
+return (UserProfileSettingsNetworking.config({
+	roduxNetworking = ProfileRoduxNetworking
+}))

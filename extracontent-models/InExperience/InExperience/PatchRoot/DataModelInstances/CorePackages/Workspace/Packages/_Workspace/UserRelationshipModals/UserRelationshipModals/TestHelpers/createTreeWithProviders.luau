@@ -1,36 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("UserRelationshipModals").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.RoactRodux);
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local v5 = require(l_Parent_0.Rodux);
-local v6 = require(script.Parent.mockLocalization);
-return function(v7, v8) --[[ Line: 12 ]]
-    -- upvalues: v5 (copy), v1 (copy), l_LocalizationProvider_0 (copy), v6 (copy), v2 (copy), v3 (copy)
-    local v9 = if v8 ~= nil then v8.store else v5.Store.new(function() --[[ Line: 15 ]]
-        return {
-            UserRelationshipModals = {
-                LocalUserId = 456, 
-                NetworkStatus = {}
-            }
-        };
-    end, {}, {
-        v5.thunkMiddleware
-    });
-    return v1.createElement(l_LocalizationProvider_0, {
-        localization = v6
-    }, {
-        Provider = v1.createElement(v2.FoundationProvider, {
-            theme = "Dark", 
-            preferences = {
-                reducedMotion = true
-            }
-        }, {
-            v1.createElement(v3.StoreProvider, {
-                store = v9
-            }, {
-                component = v7
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local RoactRodux = require(Parent.RoactRodux)
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+local Rodux = require(Parent.Rodux)
+local mockLocalization = require(script.Parent.mockLocalization)
+
+return function(p1, t1: {[any]: any}?) -- line: 12
+	-- upvalues: Rodux (copy), React (copy), LocalizationProvider (copy), mockLocalization (copy), Foundation (copy), RoactRodux (copy)
+	local v10 = if t1 == nil then Rodux.Store.new(function() -- line: 15
+		return {
+			UserRelationshipModals = {
+				LocalUserId = 456,
+				NetworkStatus = {}
+			}
+		}
+	end, {}, { Rodux.thunkMiddleware }) else t1.store
+
+	return React.createElement(LocalizationProvider, {
+		localization = mockLocalization
+	}, {
+		Provider = React.createElement(Foundation.FoundationProvider, {
+			theme = "Dark",
+			preferences = {
+				reducedMotion = true
+			}
+		}, { React.createElement(RoactRodux.StoreProvider, {
+			store = v10
+		}, {
+			component = p1
+		}) })
+	})
+end

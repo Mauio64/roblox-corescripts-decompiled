@@ -1,32 +1,35 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.CloseOpenPrompt);
-local v4 = require(l_Parent_0.PromptType);
-local l_FFlagAXAvatarTimeoutFlowIE_0 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceFlags).FFlagAXAvatarTimeoutFlowIE;
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: v4 (copy), l_AvatarEditorService_0 (copy), l_FFlagAXAvatarTimeoutFlowIE_0 (copy), v3 (copy)
-    local l_promptType_0 = v6:getState().promptInfo.promptType;
-    if l_promptType_0 == v4.AllowInventoryReadAccess then
-        l_AvatarEditorService_0:SetAllowInventoryReadAccess(false);
-    elseif l_promptType_0 == v4.SaveAvatar then
-        l_AvatarEditorService_0:SignalSaveAvatarPermissionDenied();
-    elseif l_promptType_0 == v4.CreateOutfit then
-        l_AvatarEditorService_0:SignalCreateOutfitPermissionDenied();
-    elseif l_promptType_0 == v4.EnterOutfitName then
-        l_AvatarEditorService_0:SignalCreateOutfitPermissionDenied();
-    elseif l_promptType_0 == v4.SetFavorite then
-        l_AvatarEditorService_0:SignalSetFavoritePermissionDenied();
-    elseif l_promptType_0 == v4.DeleteOutfit then
-        l_AvatarEditorService_0:SignalDeleteOutfitPermissionDenied();
-    elseif l_promptType_0 == v4.RenameOutfit then
-        l_AvatarEditorService_0:SignalRenameOutfitPermissionDenied();
-    elseif l_promptType_0 == v4.UpdateOutfit then
-        l_AvatarEditorService_0:SignalUpdateOutfitPermissionDenied();
-    elseif l_FFlagAXAvatarTimeoutFlowIE_0 and l_promptType_0 == v4.SaveAvatarTimeout then
-        l_AvatarEditorService_0:SignalSaveAvatarPermissionDenied();
-    elseif l_promptType_0 ~= nil then
-        error("CloseOpenPrompt for unhandled prompt type " .. tostring(l_promptType_0));
-    end;
-    v6:dispatch(v3());
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+local PromptType = require(ParentParent.PromptType)
+local FFlagAXAvatarTimeoutFlowIE = require(CorePackages.Workspace.Packages.AvatarExperienceFlags).FFlagAXAvatarTimeoutFlowIE
+
+return function(p1) -- line: 10
+	-- upvalues: PromptType (copy), AvatarEditorService (copy), FFlagAXAvatarTimeoutFlowIE (copy), CloseOpenPrompt (copy)
+	local promptType = p1:getState().promptInfo.promptType
+
+	if promptType == PromptType.AllowInventoryReadAccess then
+		AvatarEditorService:SetAllowInventoryReadAccess(false)
+	elseif promptType == PromptType.SaveAvatar then
+		AvatarEditorService:SignalSaveAvatarPermissionDenied()
+	elseif promptType == PromptType.CreateOutfit then
+		AvatarEditorService:SignalCreateOutfitPermissionDenied()
+	elseif promptType == PromptType.EnterOutfitName then
+		AvatarEditorService:SignalCreateOutfitPermissionDenied()
+	elseif promptType == PromptType.SetFavorite then
+		AvatarEditorService:SignalSetFavoritePermissionDenied()
+	elseif promptType == PromptType.DeleteOutfit then
+		AvatarEditorService:SignalDeleteOutfitPermissionDenied()
+	elseif promptType == PromptType.RenameOutfit then
+		AvatarEditorService:SignalRenameOutfitPermissionDenied()
+	elseif promptType == PromptType.UpdateOutfit then
+		AvatarEditorService:SignalUpdateOutfitPermissionDenied()
+	elseif FFlagAXAvatarTimeoutFlowIE and promptType == PromptType.SaveAvatarTimeout then
+		AvatarEditorService:SignalSaveAvatarPermissionDenied()
+	elseif promptType ~= nil then
+		error("CloseOpenPrompt for unhandled prompt type " .. tostring(promptType))
+	end
+
+	p1:dispatch(CloseOpenPrompt())
+end

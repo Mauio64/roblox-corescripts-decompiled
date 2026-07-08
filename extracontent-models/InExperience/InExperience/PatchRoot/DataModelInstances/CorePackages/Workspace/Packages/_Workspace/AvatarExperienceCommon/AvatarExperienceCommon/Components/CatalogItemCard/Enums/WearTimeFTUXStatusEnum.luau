@@ -1,6 +1,6 @@
 return {
-    Undefined = "", 
-    Displayed = "Displayed", 
-    Dismissed = "Dismissed", 
-    DisplayedTwice = "DisplayedTwice"
-};
+	Undefined = "",
+	Displayed = "Displayed",
+	Dismissed = "Dismissed",
+	DisplayedTwice = "DisplayedTwice"
+}

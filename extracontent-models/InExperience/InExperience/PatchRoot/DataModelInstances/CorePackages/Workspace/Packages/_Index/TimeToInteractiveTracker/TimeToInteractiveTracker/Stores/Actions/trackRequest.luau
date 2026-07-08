@@ -2,73 +2,103 @@ local TimeToInteractiveTracker = script:FindFirstAncestor("TimeToInteractiveTrac
 local TimeToInteractiveTrackerParent = TimeToInteractiveTracker.Parent
 local v3 = require(TimeToInteractiveTracker.Logger):new(script.Name)
 local FFlagLuaAppPerfTrackerUseLogger = require(TimeToInteractiveTrackerParent.SharedFlags).FFlagLuaAppPerfTrackerUseLogger
+local FFlagDebugTimeToInteractiveTracker = require(TimeToInteractiveTracker.Utils.FFlagDebugTimeToInteractiveTracker)
+local FFlagTimeToInteractiveTrackerWarningsRequireDebug = require(TimeToInteractiveTracker.Utils.FFlagTimeToInteractiveTrackerWarningsRequireDebug)
 
 require(script.Parent.Parent.types)
 
 local now = require(TimeToInteractiveTracker.Utils.now)
 local Util = require(TimeToInteractiveTracker.Utils.Util)
 
-return function(p1, p2) -- line: 20
-	-- upvalues: now (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), Util (copy)
-	return function(s1: string, p3, s2: string) -- line: 21
-		-- upvalues: now (copy), p1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), p2 (copy), Util (copy)
-		local v12 = now()
-		local v13 = p1(false)[s1]
+return function(p1, p2) -- line: 23
+	-- upvalues: now (copy), FFlagLuaAppPerfTrackerUseLogger (copy), FFlagTimeToInteractiveTrackerWarningsRequireDebug (copy), FFlagDebugTimeToInteractiveTracker (copy), v3 (copy), Util (copy)
+	return function(s1: string, p3, s2: string) -- line: 24
+		-- upvalues: now (copy), p1 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), FFlagTimeToInteractiveTrackerWarningsRequireDebug (copy), FFlagDebugTimeToInteractiveTracker (copy), v3 (copy), p2 (copy), Util (copy)
+		local v14 = now()
+		local v15 = p1(false)[s1]
 
-		if not v13 or not v13.startTime then
+		if not v15 or not v15.startTime then
 			if FFlagLuaAppPerfTrackerUseLogger then
-				v3:warning(`called before trackStart for eventName={ s1 }`)
+				if not FFlagTimeToInteractiveTrackerWarningsRequireDebug then
+					v3:warning(`called before trackStart for eventName={ s1 }`)
 
-				return
+					return
+				end
+
+				if FFlagDebugTimeToInteractiveTracker then
+					v3:warning(`called before trackStart for eventName={ s1 }`)
+
+					return
+				end
+			elseif FFlagTimeToInteractiveTrackerWarningsRequireDebug then
+				if FFlagDebugTimeToInteractiveTracker then
+					warn(`TimeToInteractiveTracker.trackRequest called before trackStart for eventName={ s1 }`)
+
+					return
+				end
+			else
+				warn(`TimeToInteractiveTracker.trackRequest called before trackStart for eventName={ s1 }`)
 			end
-
-			warn(`TimeToInteractiveTracker.trackRequest called before trackStart for eventName={ s1 }`)
 
 			return
 		end
 
-		local v14 = (v12 - v13.startTime) * 1000
+		local v16 = (v14 - v15.startTime) * 1000
 		local t1 = {
 			name = s2,
-			timestamp = v12,
-			deltaMs = v14
+			timestamp = v14,
+			deltaMs = v16
 		}
 
-		p2(function(p4) -- line: 42
-			-- upvalues: s1 (copy), Util (copy), p3 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), v3 (copy), t1 (copy)
-			local v17 = p4[s1]
+		p2(function(p4) -- line: 57
+			-- upvalues: s1 (copy), Util (copy), p3 (copy), FFlagLuaAppPerfTrackerUseLogger (copy), FFlagTimeToInteractiveTrackerWarningsRequireDebug (copy), FFlagDebugTimeToInteractiveTracker (copy), v3 (copy), t1 (copy)
+			local v19 = p4[s1]
 
-			if not v17 or not v17.milestones then
+			if not v19 or not v19.milestones then
 				return p4
 			end
 
-			local v18 = Util.findLastMilestoneIndex(v17.milestones, p3)
+			local v20 = Util.findLastMilestoneIndex(v19.milestones, p3)
 
-			if not v18 then
+			if not v20 then
 				if FFlagLuaAppPerfTrackerUseLogger then
-					v3:warning(`no milestone "{ p3 }" found for eventName={ s1 }`)
+					if not FFlagTimeToInteractiveTrackerWarningsRequireDebug then
+						v3:warning(`no milestone "{ p3 }" found for eventName={ s1 }`)
 
-					return p4
+						return p4
+					end
+
+					if FFlagDebugTimeToInteractiveTracker then
+						v3:warning(`no milestone "{ p3 }" found for eventName={ s1 }`)
+
+						return p4
+					end
+				elseif FFlagTimeToInteractiveTrackerWarningsRequireDebug then
+					if FFlagDebugTimeToInteractiveTracker then
+						warn(`TimeToInteractiveTracker.trackRequest: no milestone "{ p3 }" found for eventName={ s1 }`)
+
+						return p4
+					end
+				else
+					warn(`TimeToInteractiveTracker.trackRequest: no milestone "{ p3 }" found for eventName={ s1 }`)
 				end
 
-				warn(`TimeToInteractiveTracker.trackRequest: no milestone "{ p3 }" found for eventName={ s1 }`)
-
 				return p4
 			end
 
-			local v19 = table.clone(p4)
-			local v20 = table.clone(v17)
-			local v21 = table.clone(v17.milestones)
-			local v22 = table.clone(v21[v18])
-			local v23 = if not v22.requests then {} else table.clone(v22.requests)
+			local v21 = table.clone(p4)
+			local v22 = table.clone(v19)
+			local v23 = table.clone(v19.milestones)
+			local v24 = table.clone(v23[v20])
+			local v25 = if not v24.requests then {} else table.clone(v24.requests)
 
-			table.insert(v23, t1)
-			v22.requests = v23
-			v21[v18] = v22
-			v20.milestones = v21
-			v19[s1] = v20
+			table.insert(v25, t1)
+			v24.requests = v25
+			v23[v20] = v24
+			v22.milestones = v23
+			v21[s1] = v22
 
-			return v19
+			return v21
 		end)
 	end
 end

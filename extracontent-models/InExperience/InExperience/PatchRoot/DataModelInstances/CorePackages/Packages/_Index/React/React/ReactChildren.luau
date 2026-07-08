@@ -1,176 +1,207 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.Shared);
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_ReactSymbols_0 = require(l_Parent_0.Shared).ReactSymbols;
-local l_getIteratorFn_0 = l_ReactSymbols_0.getIteratorFn;
-local l_REACT_ELEMENT_TYPE_0 = l_ReactSymbols_0.REACT_ELEMENT_TYPE;
-local l_REACT_PORTAL_TYPE_0 = l_ReactSymbols_0.REACT_PORTAL_TYPE;
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local v8 = require(script.Parent.ReactElement);
-local l_isValidElement_0 = v8.isValidElement;
-local l_cloneAndReplaceKey_0 = v8.cloneAndReplaceKey;
-local function _(v11) --[[ Line: 45 ]] --[[ Name: escape ]]
-    local v12 = string.gsub(v11, "=", "=0");
-    return "$" .. string.gsub(v12, ":", "=2");
-end;
-local function _(v14) --[[ Line: 60 ]] --[[ Name: escapeUserProvidedKey ]]
-    return v14;
-end;
-local function _(v16, v17) --[[ Line: 73 ]] --[[ Name: getElementKey ]]
-    if typeof(v16) == "table" and v16 ~= nil and v16.key ~= nil then
-        local v18 = tostring(v16.key);
-        local v19 = string.gsub(v18, "=", "=0");
-        return "$" .. string.gsub(v19, ":", "=2");
-    else
-        return (tostring(v17));
-    end;
-end;
-local function v21(v22, v23, v24, v25, v26) --[[ Line: 86 ]] --[[ Name: mapIntoArray ]]
-    -- upvalues: l_REACT_ELEMENT_TYPE_0 (copy), l_REACT_PORTAL_TYPE_0 (copy), l_Array_0 (copy), v21 (copy), l_isValidElement_0 (copy), l_cloneAndReplaceKey_0 (copy), l_getIteratorFn_0 (copy)
-    local v27 = typeof(v22);
-    if v27 == "nil" or v27 == "boolean" or v27 == "userdata" then
-        v22 = nil;
-    end;
-    local v28 = false;
-    if v22 == nil then
-        v28 = true;
-    elseif v27 == "string" or v27 == "number" then
-        v28 = true;
-    elseif v27 == "table" then
-        local v29 = v22["$$typeof"];
-        if v29 == l_REACT_ELEMENT_TYPE_0 or v29 == l_REACT_PORTAL_TYPE_0 then
-            v28 = true;
-        end;
-    end;
-    if v28 then
-        local l_v22_0 = v22;
-        local v31 = v26(l_v22_0);
-        local v32;
-        if v25 == "" then
-            local v33 = ".";
-            local v34;
-            if typeof(l_v22_0) == "table" and l_v22_0 ~= nil and l_v22_0.key ~= nil then
-                local v35 = tostring(l_v22_0.key);
-                local v36 = string.gsub(v35, "=", "=0");
-                v34 = "$" .. string.gsub(v36, ":", "=2");
-            else
-                v34 = tostring(1);
-            end;
-            v32 = v33 .. v34;
-        else
-            v32 = v25;
-        end;
-        if l_Array_0.isArray(v31) then
-            local v37 = "";
-            if v32 ~= nil then
-                v37 = v32 .. "/";
-            end;
-            v21(v31, v23, v37, "", function(v38) --[[ Line: 135 ]]
-                return v38;
-            end);
-        elseif v31 ~= nil then
-            if l_isValidElement_0(v31) then
-                local l_key_0 = v31.key;
-                v31 = l_cloneAndReplaceKey_0(v31, v24 .. (if l_key_0 and (not l_v22_0 or l_v22_0.key ~= l_key_0) then tostring(l_key_0) .. "/" else "") .. v32);
-            end;
-            table.insert(v23, v31);
-        end;
-        return 1;
-    else
-        local v40 = nil;
-        local v41 = nil;
-        local v42 = 0;
-        local v43 = v25 == "" and "." or v25 .. ":";
-        if l_Array_0.isArray(v22) then
-            for v44 = 1, #v22 do
-                v40 = v22[v44];
-                local l_v43_0 = v43;
-                local l_v40_0 = v40;
-                local v47;
-                if typeof(l_v40_0) == "table" and l_v40_0 ~= nil and l_v40_0.key ~= nil then
-                    local v48 = tostring(l_v40_0.key);
-                    local v49 = string.gsub(v48, "=", "=0");
-                    v47 = "$" .. string.gsub(v49, ":", "=2");
-                else
-                    v47 = tostring(v44);
-                end;
-                v41 = l_v43_0 .. v47;
-                v42 = v42 + v21(v40, v23, v24, v41, v26);
-            end;
-            return v42;
-        else
-            local v50 = l_getIteratorFn_0(v22);
-            if typeof(v50) == "function" then
-                local v51 = v50(v22);
-                local v52 = nil;
-                local v53 = 1;
-                v52 = v51.next();
-                while not v52.done do
-                    v40 = v52.value;
-                    local l_v43_1 = v43;
-                    local l_v40_1 = v40;
-                    local l_v53_0 = v53;
-                    local v57;
-                    if typeof(l_v40_1) == "table" and l_v40_1 ~= nil and l_v40_1.key ~= nil then
-                        local v58 = tostring(l_v40_1.key);
-                        local v59 = string.gsub(v58, "=", "=0");
-                        v57 = "$" .. string.gsub(v59, ":", "=2");
-                    else
-                        v57 = tostring(l_v53_0);
-                    end;
-                    v41 = l_v43_1 .. v57;
-                    v53 = v53 + 1;
-                    v42 = v42 + v21(v40, v23, v24, v41, v26);
-                    v52 = v51.next();
-                end;
-            end;
-            return v42;
-        end;
-    end;
-end;
-local function v67(v60, v61, _) --[[ Line: 253 ]] --[[ Name: mapChildren ]]
-    -- upvalues: v21 (copy)
-    if v60 == nil then
-        return nil;
-    else
-        local v63 = {};
-        local v64 = 1;
-        v21(v60, v63, "", "", function(v65) --[[ Line: 263 ]]
-            -- upvalues: v61 (copy), v64 (ref)
-            local v66 = v61(v65, v64);
-            v64 = v64 + 1;
-            return v66;
-        end);
-        return v63;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.Shared)
+
+local invariant = require(ParentParent.Shared).invariant
+local ReactSymbols = require(ParentParent.Shared).ReactSymbols
+local getIteratorFn = ReactSymbols.getIteratorFn
+local REACT_ELEMENT_TYPE = ReactSymbols.REACT_ELEMENT_TYPE
+local REACT_PORTAL_TYPE = ReactSymbols.REACT_PORTAL_TYPE
+local Array = require(ParentParent.LuauPolyfill).Array
+local ReactElement = require(script.Parent.ReactElement)
+local isValidElement = ReactElement.isValidElement
+local cloneAndReplaceKey = ReactElement.cloneAndReplaceKey
+
+local function escape(s1: string) -- line: 45
+	local v20 = string.gsub(s1, "=", "=0")
+
+	return "$" .. string.gsub(v20, ":", "=2")
+end
+local function escapeUserProvidedKey(s2: string) -- line: 60
+	return s2
+end
+local function getElementKey(p1, n1: number) -- line: 73
+	if typeof(p1) == "table" and (p1 ~= nil and p1.key ~= nil) then
+		local str = tostring(p1.key)
+		local v25 = string.gsub(str, "=", "=0")
+
+		return "$" .. string.gsub(v25, ":", "=2")
+	end
+
+	return (tostring(n1))
+end
+local function mapIntoArray(p2, p3, s3: string, s4: string, p4: ((...any) -> ...any)) -- line: 86
+	-- upvalues: REACT_ELEMENT_TYPE (copy), REACT_PORTAL_TYPE (copy), Array (copy), mapIntoArray (copy), isValidElement (copy), cloneAndReplaceKey (copy), getIteratorFn (copy)
+	local v31 = typeof(p2)
+
+	if v31 == "nil" or (v31 == "boolean" or v31 == "userdata") then
+		p2 = nil
+	end
+
+	local v32 = false
+
+	if p2 == nil then
+		v32 = true
+	elseif v31 == "string" or v31 == "number" then
+		v32 = true
+	elseif v31 == "table" then
+		local v33 = p2["$$typeof"]
+
+		if v33 == REACT_ELEMENT_TYPE or v33 == REACT_PORTAL_TYPE then
+			v32 = true
+		end
+	end
+
+	if v32 then
+		local v34 = p4(p2)
+
+		if s4 == "" then
+			local v37
+
+			if typeof(p2) == "table" and p2 ~= nil and p2.key ~= nil then
+				local str = tostring(p2.key)
+				local v36 = string.gsub(str, "=", "=0")
+
+				v37 = "$" .. string.gsub(v36, ":", "=2")
+			else
+				v37 = tostring(1)
+			end
+
+			s4 = "." .. v37
+		end
+
+		if Array.isArray(v34) then
+			local s5 = ""
+
+			if s4 ~= nil then
+				s5 = s4 .. "/"
+			end
+
+			mapIntoArray(v34, p3, s5, "", function(p5) -- line: 135
+				return p5
+			end)
+		elseif v34 ~= nil then
+			if isValidElement(v34) then
+				local key = v34.key
+
+				v34 = cloneAndReplaceKey(v34, s3 .. ((not key or not not p2 and key == p2.key) and "" or tostring(key) .. "/") .. s4)
+			end
+
+			table.insert(p3, v34)
+		end
+
+		return 1
+	end
+
+	local n2 = 0
+	local v41 = if s4 ~= "" then s4 .. ":" else "."
+
+	if Array.isArray(p2) then
+		for i = 1, #p2 do
+			local v43 = p2[i]
+			local v46
+
+			if typeof(v43) == "table" and v43 ~= nil and v43.key ~= nil then
+				local str = tostring(v43.key)
+				local v45 = string.gsub(str, "=", "=0")
+
+				v46 = "$" .. string.gsub(v45, ":", "=2")
+			else
+				v46 = tostring(i)
+			end
+
+			local v47 = v41 .. v46
+
+			n2 += mapIntoArray(v43, p3, s3, v47, p4)
+		end
+
+		return n2
+	end
+
+	local v48 = getIteratorFn(p2)
+
+	if typeof(v48) == "function" then
+		local v49 = v48(p2)
+		local n3 = 1
+		local v51 = v49.next()
+
+		while not v51.done do
+			local value = v51.value
+			local v55
+
+			if typeof(value) == "table" and value ~= nil and value.key ~= nil then
+				local str = tostring(value.key)
+				local v54 = string.gsub(str, "=", "=0")
+
+				v55 = "$" .. string.gsub(v54, ":", "=2")
+			else
+				v55 = tostring(n3)
+			end
+
+			local v56 = v41 .. v55
+
+			n3 += 1
+			n2 += mapIntoArray(value, p3, s3, v56, p4)
+			v51 = v49.next()
+		end
+	end
+
+	return n2
+end
+local function mapChildren(p6, p7: ((...any) -> ...any), _) -- line: 253
+	-- upvalues: mapIntoArray (copy)
+	if p6 == nil then
+		return nil
+	end
+
+	local t1 = {}
+	local n4 = 1
+
+	mapIntoArray(p6, t1, "", "", function(p9) -- line: 263
+		-- upvalues: p7 (copy), n4 (ref)
+		local v71 = p7(p9, n4)
+
+		n4 += 1
+
+		return v71
+	end)
+
+	return t1
+end
+local function countChildren(p10) -- line: 281
+	-- upvalues: mapChildren (copy)
+	local n5 = 0
+
+	mapChildren(p10, function() -- line: 283
+		-- upvalues: n5 (ref)
+		n5 += 1
+	end)
+
+	return n5
+end
+local function forEachChildren(p11, p12: ((...any) -> ...any), p13) -- line: 305
+	-- upvalues: mapChildren (copy)
+	mapChildren(p11, function(...) -- line: 310
+		-- upvalues: p12 (copy)
+		p12(...)
+	end, p13)
+end
+local function onlyChild(p14) -- line: 345
+	-- upvalues: invariant (copy), isValidElement (copy)
+	invariant(isValidElement(p14), "React.Children.only expected to receive a single React element child.")
+
+	return p14
+end
+
 return {
-    forEach = function(v68, v69, v70) --[[ Line: 305 ]] --[[ Name: forEachChildren ]]
-        -- upvalues: v67 (copy)
-        v67(v68, function(...) --[[ Line: 310 ]]
-            -- upvalues: v69 (copy)
-            v69(...);
-        end, v70);
-    end, 
-    map = v67, 
-    count = function(v71) --[[ Line: 281 ]] --[[ Name: countChildren ]]
-        -- upvalues: v67 (copy)
-        local v72 = 0;
-        v67(v71, function() --[[ Line: 283 ]]
-            -- upvalues: v72 (ref)
-            v72 = v72 + 1;
-        end);
-        return v72;
-    end, 
-    only = function(v73) --[[ Line: 345 ]] --[[ Name: onlyChild ]]
-        -- upvalues: l_invariant_0 (copy), l_isValidElement_0 (copy)
-        l_invariant_0(l_isValidElement_0(v73), "React.Children.only expected to receive a single React element child.");
-        return v73;
-    end, 
-    toArray = function(v74) --[[ Line: 324 ]] --[[ Name: toArray ]]
-        -- upvalues: v67 (copy)
-        return v67(v74, function(v75) --[[ Line: 325 ]]
-            return v75;
-        end) or {};
-    end
-};
+	forEach = forEachChildren,
+	map = mapChildren,
+	count = countChildren,
+	only = onlyChild,
+	toArray = function(p15) -- line: 324
+		-- upvalues: mapChildren (copy)
+		return mapChildren(p15, function(p16) -- line: 325
+			return p16
+		end) or {}
+	end
+}

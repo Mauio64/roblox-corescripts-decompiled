@@ -1,13 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialModalsCommon").Parent;
-local v1 = require(l_Parent_0.Dev.JestConfigs);
+local Parent = script:FindFirstAncestor("SocialModalsCommon").Parent
+local JestConfigs = require(Parent.Dev.JestConfigs)
+
 return {
-    displayName = "SocialModalsCommon", 
-    testMatch = {
-        "**/*.test"
-    }, 
-    setupFilesAfterEnv = {
-        v1.setupFiles.LogHandler, 
-        v1.setupFiles.UIBloxInitializer, 
-        v1.setupFiles.createPromiseRejectionHandler()
-    }
-};
+	displayName = "SocialModalsCommon",
+	testMatch = { "**/*.test" },
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.LogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes
+	}
+}

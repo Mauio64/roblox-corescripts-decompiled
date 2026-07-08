@@ -1,215 +1,259 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Groups");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Signals);
-local v4 = require(l_Parent_0.HttpStore);
-local v5 = require(l_Parent_0.Http);
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-local l_FFlagLuaAppUseAppHttpStore_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppUseAppHttpStore;
-local v8 = require(l_Parent_0.InternalHttpStore);
-local l_GROUPS_URL_0 = v5.Url.GROUPS_URL;
-local v10 = {};
-local function _(v11) --[[ Line: 46 ]] --[[ Name: createApiResponse ]]
-    -- upvalues: v3 (copy), l_HttpService_0 (copy)
-    return v3.createComputed(function(v12) --[[ Line: 47 ]]
-        -- upvalues: v11 (copy), l_HttpService_0 (ref)
-        local v13 = v11(v12);
-        if v13.status == "Success" then
-            local l_status_0, l_result_0 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v13.response.Body);
-            return {
-                status = l_status_0 and "Success" or "Failed", 
-                data = if l_status_0 then l_result_0 else nil, 
-                error = not l_status_0 and "JSON parse error" or nil, 
-                statusCode = v13.response.StatusCode
-            };
-        elseif v13.status == "Failed" then
-            local l_response_0 = v13.response;
-            return {
-                status = "Failed", 
-                data = nil, 
-                error = if l_response_0 then l_response_0.ErrorMessage else "Request failed", 
-                statusCode = if l_response_0 then l_response_0.StatusCode else nil
-            };
-        else
-            return {
-                status = "Loading", 
-                data = nil, 
-                error = nil, 
-                statusCode = nil
-            };
-        end;
-    end);
-end;
-v10.GetUserGroupsWithRoles = function(v18) --[[ Line: 84 ]] --[[ Name: GetUserGroupsWithRoles ]]
-    -- upvalues: l_GROUPS_URL_0 (copy), v8 (copy), l_FFlagLuaAppUseAppHttpStore_0 (copy), v4 (copy), v3 (copy), l_HttpService_0 (copy)
-    local v19 = "GetUserGroupsWithRoles_" .. v18;
-    local v20 = string.format("%sv1/users/%s/groups/roles?includeLocked=true", l_GROUPS_URL_0, v18);
-    local v21 = v8.GetHttpStore();
-    if l_FFlagLuaAppUseAppHttpStore_0 then
-        v21 = v4.Instance.get();
-    end;
-    local v22, v23 = v21.fetch(v19, {
-        Url = v20, 
-        Method = "GET"
-    });
-    return v3.createComputed(function(v24) --[[ Line: 47 ]]
-        -- upvalues: v22 (copy), l_HttpService_0 (ref)
-        local v25 = v22(v24);
-        if v25.status == "Success" then
-            local l_status_1, l_result_1 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v25.response.Body);
-            return {
-                status = l_status_1 and "Success" or "Failed", 
-                data = if l_status_1 then l_result_1 else nil, 
-                error = not l_status_1 and "JSON parse error" or nil, 
-                statusCode = v25.response.StatusCode
-            };
-        elseif v25.status == "Failed" then
-            local l_response_1 = v25.response;
-            return {
-                status = "Failed", 
-                data = nil, 
-                error = if l_response_1 then l_response_1.ErrorMessage else "Request failed", 
-                statusCode = if l_response_1 then l_response_1.StatusCode else nil
-            };
-        else
-            return {
-                status = "Loading", 
-                data = nil, 
-                error = nil, 
-                statusCode = nil
-            };
-        end;
-    end), v23;
-end;
-v10.GetPrimaryGroupRole = function(v29) --[[ Line: 109 ]] --[[ Name: GetPrimaryGroupRole ]]
-    -- upvalues: l_GROUPS_URL_0 (copy), v8 (copy), l_FFlagLuaAppUseAppHttpStore_0 (copy), v4 (copy), v3 (copy), l_HttpService_0 (copy)
-    local v30 = "GetPrimaryGroupRole_" .. v29;
-    local v31 = string.format("%sv1/users/%s/groups/primary/role", l_GROUPS_URL_0, v29);
-    local v32 = v8.GetHttpStore();
-    if l_FFlagLuaAppUseAppHttpStore_0 then
-        v32 = v4.Instance.get();
-    end;
-    local v33, v34 = v32.fetch(v30, {
-        Url = v31, 
-        Method = "GET"
-    });
-    return v3.createComputed(function(v35) --[[ Line: 47 ]]
-        -- upvalues: v33 (copy), l_HttpService_0 (ref)
-        local v36 = v33(v35);
-        if v36.status == "Success" then
-            local l_status_2, l_result_2 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v36.response.Body);
-            return {
-                status = l_status_2 and "Success" or "Failed", 
-                data = if l_status_2 then l_result_2 else nil, 
-                error = not l_status_2 and "JSON parse error" or nil, 
-                statusCode = v36.response.StatusCode
-            };
-        elseif v36.status == "Failed" then
-            local l_response_2 = v36.response;
-            return {
-                status = "Failed", 
-                data = nil, 
-                error = if l_response_2 then l_response_2.ErrorMessage else "Request failed", 
-                statusCode = if l_response_2 then l_response_2.StatusCode else nil
-            };
-        else
-            return {
-                status = "Loading", 
-                data = nil, 
-                error = nil, 
-                statusCode = nil
-            };
-        end;
-    end), v34;
-end;
-v10.GetGroupPolicies = function(v40) --[[ Line: 134 ]] --[[ Name: GetGroupPolicies ]]
-    -- upvalues: l_GROUPS_URL_0 (copy), l_HttpService_0 (copy), v8 (copy), l_FFlagLuaAppUseAppHttpStore_0 (copy), v4 (copy), v3 (copy)
-    local v41 = table.clone(v40);
-    table.sort(v41);
-    local v42 = "GetGroupPolicies_" .. table.concat(v41, "_");
-    local v43 = string.format("%sv1/groups/policies", l_GROUPS_URL_0);
-    local v44 = l_HttpService_0:JSONEncode({
-        groupIds = v40
-    });
-    local v45 = v8.GetHttpStore();
-    if l_FFlagLuaAppUseAppHttpStore_0 then
-        v45 = v4.Instance.get();
-    end;
-    local v46, v47 = v45.fetch(v42, {
-        Url = v43, 
-        Method = "POST", 
-        Body = v44, 
-        Headers = {
-            ["Content-Type"] = "application/json"
-        }
-    });
-    return v3.createComputed(function(v48) --[[ Line: 47 ]]
-        -- upvalues: v46 (copy), l_HttpService_0 (ref)
-        local v49 = v46(v48);
-        if v49.status == "Success" then
-            local l_status_3, l_result_3 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v49.response.Body);
-            return {
-                status = l_status_3 and "Success" or "Failed", 
-                data = if l_status_3 then l_result_3 else nil, 
-                error = not l_status_3 and "JSON parse error" or nil, 
-                statusCode = v49.response.StatusCode
-            };
-        elseif v49.status == "Failed" then
-            local l_response_3 = v49.response;
-            return {
-                status = "Failed", 
-                data = nil, 
-                error = if l_response_3 then l_response_3.ErrorMessage else "Request failed", 
-                statusCode = if l_response_3 then l_response_3.StatusCode else nil
-            };
-        else
-            return {
-                status = "Loading", 
-                data = nil, 
-                error = nil, 
-                statusCode = nil
-            };
-        end;
-    end), v47;
-end;
-v10.GetGroupsMetadata = function() --[[ Line: 166 ]] --[[ Name: GetGroupsMetadata ]]
-    -- upvalues: l_GROUPS_URL_0 (copy), v8 (copy), l_FFlagLuaAppUseAppHttpStore_0 (copy), v4 (copy), v3 (copy), l_HttpService_0 (copy)
-    local v53 = string.format("%sv1/groups/metadata", l_GROUPS_URL_0);
-    local v54 = v8.GetHttpStore();
-    if l_FFlagLuaAppUseAppHttpStore_0 then
-        v54 = v4.Instance.get();
-    end;
-    local v55, v56 = v54.fetch("GetGroupsMetadata", {
-        Url = v53, 
-        Method = "GET"
-    });
-    return v3.createComputed(function(v57) --[[ Line: 47 ]]
-        -- upvalues: v55 (copy), l_HttpService_0 (ref)
-        local v58 = v55(v57);
-        if v58.status == "Success" then
-            local l_status_4, l_result_4 = pcall(l_HttpService_0.JSONDecode, l_HttpService_0, v58.response.Body);
-            return {
-                status = l_status_4 and "Success" or "Failed", 
-                data = if l_status_4 then l_result_4 else nil, 
-                error = not l_status_4 and "JSON parse error" or nil, 
-                statusCode = v58.response.StatusCode
-            };
-        elseif v58.status == "Failed" then
-            local l_response_4 = v58.response;
-            return {
-                status = "Failed", 
-                data = nil, 
-                error = if l_response_4 then l_response_4.ErrorMessage else "Request failed", 
-                statusCode = if l_response_4 then l_response_4.StatusCode else nil
-            };
-        else
-            return {
-                status = "Loading", 
-                data = nil, 
-                error = nil, 
-                statusCode = nil
-            };
-        end;
-    end), v56;
-end;
-return v10;
+local HttpService = game:GetService("HttpService")
+local Groups = script:FindFirstAncestor("Groups")
+local GroupsParent = Groups.Parent
+local Signals = require(GroupsParent.Signals)
+local HttpStore = require(GroupsParent.HttpStore)
+local Http = require(GroupsParent.Http)
+
+require(Groups.Common.Types)
+
+local FFlagLuaAppUseAppHttpStore = require(GroupsParent.SharedFlags).FFlagLuaAppUseAppHttpStore
+local InternalHttpStore = require(GroupsParent.InternalHttpStore)
+local GROUPS_URL = Http.Url.GROUPS_URL
+local t1 = {}
+
+local function createApiResponse(p1) -- line: 46
+	-- upvalues: Signals (copy), HttpService (copy)
+	return Signals.createComputed(function(p2) -- line: 47
+		-- upvalues: p1 (copy), HttpService (copy)
+		local v38 = p1(p2)
+
+		if v38.status == "Success" then
+			local ok, result = pcall(HttpService.JSONDecode, HttpService, v38.response.Body)
+
+			return {
+				status = not ok and "Failed" or "Success",
+				data = if not ok then nil else result,
+				error = if ok then nil else "JSON parse error",
+				statusCode = v38.response.StatusCode
+			}
+		end
+
+		if v38.status == "Failed" then
+			local response = v38.response
+
+			return {
+				status = "Failed",
+				data = nil,
+				error = not response and "Request failed" or response.ErrorMessage,
+				statusCode = if not response then nil else response.StatusCode
+			}
+		end
+
+		return {
+			status = "Loading",
+			data = nil,
+			error = nil,
+			statusCode = nil
+		}
+	end)
+end
+
+function t1.GetUserGroupsWithRoles(s1: string) -- line: 84
+	-- upvalues: GROUPS_URL (copy), InternalHttpStore (copy), FFlagLuaAppUseAppHttpStore (copy), HttpStore (copy), Signals (copy), HttpService (copy)
+	local v14 = "GetUserGroupsWithRoles_" .. s1
+	local v15 = string.format("%sv1/users/%s/groups/roles?includeLocked=true", GROUPS_URL, s1)
+	local v16 = InternalHttpStore.GetHttpStore()
+
+	if FFlagLuaAppUseAppHttpStore then
+		v16 = HttpStore.Instance.get()
+	end
+
+	local v17, v18 = v16.fetch(v14, {
+		Method = "GET",
+		Url = v15
+	})
+
+	return Signals.createComputed(function(p3) -- line: 47
+		-- upvalues: v17 (copy), HttpService (copy)
+		local v43 = v17(p3)
+
+		if v43.status == "Success" then
+			local ok, result = pcall(HttpService.JSONDecode, HttpService, v43.response.Body)
+
+			return {
+				status = not ok and "Failed" or "Success",
+				data = if not ok then nil else result,
+				error = if ok then nil else "JSON parse error",
+				statusCode = v43.response.StatusCode
+			}
+		end
+
+		if v43.status == "Failed" then
+			local response = v43.response
+
+			return {
+				status = "Failed",
+				data = nil,
+				error = not response and "Request failed" or response.ErrorMessage,
+				statusCode = if not response then nil else response.StatusCode
+			}
+		end
+
+		return {
+			status = "Loading",
+			data = nil,
+			error = nil,
+			statusCode = nil
+		}
+	end), v18
+end
+function t1.GetPrimaryGroupRole(s2: string) -- line: 109
+	-- upvalues: GROUPS_URL (copy), InternalHttpStore (copy), FFlagLuaAppUseAppHttpStore (copy), HttpStore (copy), Signals (copy), HttpService (copy)
+	local v20 = "GetPrimaryGroupRole_" .. s2
+	local v21 = string.format("%sv1/users/%s/groups/primary/role", GROUPS_URL, s2)
+	local v22 = InternalHttpStore.GetHttpStore()
+
+	if FFlagLuaAppUseAppHttpStore then
+		v22 = HttpStore.Instance.get()
+	end
+
+	local v23, v24 = v22.fetch(v20, {
+		Method = "GET",
+		Url = v21
+	})
+
+	return Signals.createComputed(function(p4) -- line: 47
+		-- upvalues: v23 (copy), HttpService (copy)
+		local v48 = v23(p4)
+
+		if v48.status == "Success" then
+			local ok, result = pcall(HttpService.JSONDecode, HttpService, v48.response.Body)
+
+			return {
+				status = not ok and "Failed" or "Success",
+				data = if not ok then nil else result,
+				error = if ok then nil else "JSON parse error",
+				statusCode = v48.response.StatusCode
+			}
+		end
+
+		if v48.status == "Failed" then
+			local response = v48.response
+
+			return {
+				status = "Failed",
+				data = nil,
+				error = not response and "Request failed" or response.ErrorMessage,
+				statusCode = if not response then nil else response.StatusCode
+			}
+		end
+
+		return {
+			status = "Loading",
+			data = nil,
+			error = nil,
+			statusCode = nil
+		}
+	end), v24
+end
+function t1.GetGroupPolicies(t2: {[any]: any}) -- line: 134
+	-- upvalues: GROUPS_URL (copy), HttpService (copy), InternalHttpStore (copy), FFlagLuaAppUseAppHttpStore (copy), HttpStore (copy), Signals (copy)
+	local v26 = table.clone(t2)
+
+	table.sort(v26)
+
+	local v27 = "GetGroupPolicies_" .. table.concat(v26, "_")
+	local v28 = string.format("%sv1/groups/policies", GROUPS_URL)
+	local json = HttpService:JSONEncode({
+		groupIds = t2
+	})
+	local v30 = InternalHttpStore.GetHttpStore()
+
+	if FFlagLuaAppUseAppHttpStore then
+		v30 = HttpStore.Instance.get()
+	end
+
+	local v31, v32 = v30.fetch(v27, {
+		Method = "POST",
+		Url = v28,
+		Body = json,
+		Headers = {
+			["Content-Type"] = "application/json"
+		}
+	})
+
+	return Signals.createComputed(function(p5) -- line: 47
+		-- upvalues: v31 (copy), HttpService (copy)
+		local v53 = v31(p5)
+
+		if v53.status == "Success" then
+			local ok, result = pcall(HttpService.JSONDecode, HttpService, v53.response.Body)
+
+			return {
+				status = not ok and "Failed" or "Success",
+				data = if not ok then nil else result,
+				error = if ok then nil else "JSON parse error",
+				statusCode = v53.response.StatusCode
+			}
+		end
+
+		if v53.status == "Failed" then
+			local response = v53.response
+
+			return {
+				status = "Failed",
+				data = nil,
+				error = not response and "Request failed" or response.ErrorMessage,
+				statusCode = if not response then nil else response.StatusCode
+			}
+		end
+
+		return {
+			status = "Loading",
+			data = nil,
+			error = nil,
+			statusCode = nil
+		}
+	end), v32
+end
+function t1.GetGroupsMetadata() -- line: 166
+	-- upvalues: GROUPS_URL (copy), InternalHttpStore (copy), FFlagLuaAppUseAppHttpStore (copy), HttpStore (copy), Signals (copy), HttpService (copy)
+	local v33 = string.format("%sv1/groups/metadata", GROUPS_URL)
+	local v34 = InternalHttpStore.GetHttpStore()
+
+	if FFlagLuaAppUseAppHttpStore then
+		v34 = HttpStore.Instance.get()
+	end
+
+	local v35, v36 = v34.fetch("GetGroupsMetadata", {
+		Method = "GET",
+		Url = v33
+	})
+
+	return Signals.createComputed(function(p6) -- line: 47
+		-- upvalues: v35 (copy), HttpService (copy)
+		local v58 = v35(p6)
+
+		if v58.status == "Success" then
+			local ok, result = pcall(HttpService.JSONDecode, HttpService, v58.response.Body)
+
+			return {
+				status = not ok and "Failed" or "Success",
+				data = if not ok then nil else result,
+				error = if ok then nil else "JSON parse error",
+				statusCode = v58.response.StatusCode
+			}
+		end
+
+		if v58.status == "Failed" then
+			local response = v58.response
+
+			return {
+				status = "Failed",
+				data = nil,
+				error = not response and "Request failed" or response.ErrorMessage,
+				statusCode = if not response then nil else response.StatusCode
+			}
+		end
+
+		return {
+			status = "Loading",
+			data = nil,
+			error = nil,
+			statusCode = nil
+		}
+	end), v36
+end
+
+return t1

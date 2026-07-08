@@ -1,23 +1,29 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.ES7Types);
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 37 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    return (setmetatable({
-        _weakMap = setmetatable({}, {
-            __mode = "k"
-        })
-    }, v2));
-end;
-v2.get = function(v3, v4) --[[ Line: 42 ]] --[[ Name: get ]]
-    return v3._weakMap[v4];
-end;
-v2.set = function(v5, v6, v7) --[[ Line: 46 ]] --[[ Name: set ]]
-    v5._weakMap[v6] = v7;
-    return v5;
-end;
-v2.has = function(v8, v9) --[[ Line: 51 ]] --[[ Name: has ]]
-    return v8._weakMap[v9] ~= nil;
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 37
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		_weakMap = setmetatable({}, {
+			__mode = "k"
+		})
+	}, t1))
+end
+function t1.get(p1, p2) -- line: 42
+	return p1._weakMap[p2]
+end
+function t1.set(p3, p4, p5) -- line: 46
+	p3._weakMap[p4] = p5
+
+	return p3
+end
+function t1.has(p6, p7) -- line: 51
+	return p6._weakMap[p7] ~= nil
+end
+
+return t1

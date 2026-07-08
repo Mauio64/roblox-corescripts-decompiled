@@ -1,104 +1,119 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Achievements");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signal);
-local v3 = require(l_script_FirstAncestor_0.Achievement.Achievement);
-local v4 = require(l_script_FirstAncestor_0.Logger);
-local v5 = require(l_Parent_0.HttpRequest);
-local v6 = require(l_script_FirstAncestor_0.Requests.GetUserRecentExperiences);
-local v7 = require(l_Parent_0.Dash);
-local v8 = require(l_script_FirstAncestor_0.AchievementDataRefresher.TimeRefresher);
-local v9 = require(l_script_FirstAncestor_0.AchievementDataRefresher.FriendCountRefresher);
-local l_FFlagLuaAppDefaultHttpRetry_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDefaultHttpRetry;
-local v14 = v5.config({
-    requestFunction = function(v11, v12, v13) --[[ Line: 19 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v5 (copy)
-        return v5.requestFunctions.HttpRbxApi(v11, v12, v13);
-    end, 
-    maxRetryCount = if l_FFlagLuaAppDefaultHttpRetry_0 then game:DefineFastInt("InExpAchievementManagerHttpRetryCount", 4) else nil
-});
-local v15 = nil;
-pcall(function() --[[ Line: 29 ]]
-    -- upvalues: v15 (ref)
-    v15 = game:GetService("PlatformFriendsService");
-end);
-local v16 = nil;
-pcall(function() --[[ Line: 34 ]]
-    -- upvalues: v16 (ref)
-    v16 = game:GetService("PlatformCloudStorageService");
-end);
-local v17 = nil;
-pcall(function() --[[ Line: 39 ]]
-    -- upvalues: v17 (ref)
-    v17 = game:GetService("AchievementService");
-end);
-local l_Players_0 = game:GetService("Players");
-local v19 = nil;
-pcall(function() --[[ Line: 47 ]]
-    -- upvalues: v19 (ref)
-    v19 = game:GetService("PlatformService");
-end);
-local v37 = {
-    startUp = function(v20) --[[ Line: 56 ]] --[[ Name: startUp ]]
-        -- upvalues: v2 (copy), v8 (copy), v9 (copy), v3 (copy)
-        local v21, v22 = v2.createReadableSignal(0);
-        local v23, v24 = v2.createReadableSignal(0);
-        local v25, v26 = v2.createReadableSignal(0);
-        local v27, v28 = v2.createReadableSignal(0);
-        v8:init(v22, 3600);
-        v9:init(v28, v20.playersService);
-        v20.achievementMarathon = v3.newWithRefresher(v3.NAMES.ACHIEVEMENT_MARATHON, v21, v8, v20.achievementService);
-        v20.achievementFoursCompany = v3.newWithRefresher(v3.NAMES.ACHIEVEMENT_FOURS_COMPANY, v27, v9, v20.achievementService);
-        v20.achievementScout = v3.new(v3.NAMES.ACHIEVEMENT_SCOUT, v23, v20.achievementService);
-        v20.achievementExplorer = v3.new(v3.NAMES.ACHIEVEMENT_EXPLORER, v23, v20.achievementService);
-        v20.achievementTrailblazer = v3.new(v3.NAMES.ACHIEVEMENT_TRAILBLAZER, v23, v20.achievementService);
-        v20.achievementStrengthInNumbers = v3.new(v3.NAMES.ACHIEVEMENT_STRENGTH_IN_NUMBERS, v25, v20.achievementService);
-        v20:_checkStrengthInNumbers(v26);
-        v20:_checkJoinExperienceAchievements(v24);
-    end, 
-    _checkJoinExperienceAchievements = function(v29, v30) --[[ Line: 98 ]] --[[ Name: _checkJoinExperienceAchievements ]]
-        -- upvalues: v7 (copy), v6 (copy), v4 (copy)
-        if v29.achievementScout.hasAchieved == false or v29.achievementExplorer.hasAchieved == false or v29.achievementTrailblazer.hasAchieved == false then
-            if v29.platformCloudStorageService and v29.platformCloudStorageService:IsUserDataAvailable() then
-                local v31 = v29.platformCloudStorageService:GetUserDataAsync("ExperiencesPlayed").data or {};
-                if #v31 < 15 and not v7.includes(v31, game.GameId) then
-                    table.insert(v31, game.GameId);
-                    v29.platformCloudStorageService:SetUserDataAsync("ExperiencesPlayed", {
-                        data = v31
-                    });
-                end;
-                v30(#v31);
-                return;
-            else
-                v6(v29.requestImpl):andThen(function(v32) --[[ Line: 116 ]]
-                    -- upvalues: v30 (copy)
-                    v30(v32);
-                end):catch(function(v33) --[[ Line: 118 ]]
-                    -- upvalues: v4 (ref)
-                    v4:warning(v33);
-                end);
-            end;
-        end;
-    end, 
-    _checkStrengthInNumbers = function(v34, v35) --[[ Line: 125 ]] --[[ Name: _checkStrengthInNumbers ]]
-        if v34.achievementStrengthInNumbers.hasAchieved == false then
-            local l_LocalPlayer_0 = v34.playersService.LocalPlayer;
-            if l_LocalPlayer_0 and l_LocalPlayer_0.FollowUserId ~= 0 and (if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_LocalPlayer_0:IsFriendsWithAsync(l_LocalPlayer_0.FollowUserId) else l_LocalPlayer_0:IsFriendsWith(l_LocalPlayer_0.FollowUserId)) and v34.playersService:GetPlayerByUserId(l_LocalPlayer_0.FollowUserId) then
-                v35(0);
-            end;
-        end;
-    end
-};
-v37.new = function(v38, v39, v40, v41, v42, v43) --[[ Line: 142 ]] --[[ Name: new ]]
-    -- upvalues: v14 (copy), v15 (ref), v16 (ref), v17 (ref), l_Players_0 (copy), v19 (ref), v37 (copy)
-    return (setmetatable({
-        requestImpl = v38 or v14, 
-        platformFriendsService = v39 or v15, 
-        platformCloudStorageService = v40 or v16, 
-        achievementService = v41 or v17, 
-        playersService = v42 or l_Players_0, 
-        platformService = v43 or v19
-    }, {
-        __index = v37
-    }));
-end;
-return v37;
+local Achievements = script:FindFirstAncestor("Achievements")
+local AchievementsParent = Achievements.Parent
+local Signal = require(AchievementsParent.Signal)
+local Achievement = require(Achievements.Achievement.Achievement)
+local Logger = require(Achievements.Logger)
+local HttpRequest = require(AchievementsParent.HttpRequest)
+local GetUserRecentExperiences = require(Achievements.Requests.GetUserRecentExperiences)
+local Dash = require(AchievementsParent.Dash)
+local TimeRefresher = require(Achievements.AchievementDataRefresher.TimeRefresher)
+local FriendCountRefresher = require(Achievements.AchievementDataRefresher.FriendCountRefresher)
+local FFlagLuaAppDefaultHttpRetry = require(AchievementsParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
+local v12 = HttpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 19
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("InExpAchievementManagerHttpRetryCount", 4)
+})
+local PlatformFriendsService = nil
+
+pcall(function() -- line: 29
+	-- upvalues: PlatformFriendsService (ref)
+	PlatformFriendsService = game:GetService("PlatformFriendsService")
+end)
+
+local PlatformCloudStorageService = nil
+
+pcall(function() -- line: 34
+	-- upvalues: PlatformCloudStorageService (ref)
+	PlatformCloudStorageService = game:GetService("PlatformCloudStorageService")
+end)
+
+local AchievementService = nil
+
+pcall(function() -- line: 39
+	-- upvalues: AchievementService (ref)
+	AchievementService = game:GetService("AchievementService")
+end)
+
+local Players = game:GetService("Players")
+local PlatformService = nil
+
+pcall(function() -- line: 47
+	-- upvalues: PlatformService (ref)
+	PlatformService = game:GetService("PlatformService")
+end)
+
+local t1 = {
+	startUp = function(p4) -- line: 56
+		-- upvalues: Signal (copy), TimeRefresher (copy), FriendCountRefresher (copy), Achievement (copy)
+		local v23, v24 = Signal.createReadableSignal(0)
+		local v25, v26 = Signal.createReadableSignal(0)
+		local v27, v28 = Signal.createReadableSignal(0)
+		local v29, v30 = Signal.createReadableSignal(0)
+
+		TimeRefresher:init(v24, 3600)
+		FriendCountRefresher:init(v30, p4.playersService)
+		p4.achievementMarathon = Achievement.newWithRefresher(Achievement.NAMES.ACHIEVEMENT_MARATHON, v23, TimeRefresher, p4.achievementService)
+		p4.achievementFoursCompany = Achievement.newWithRefresher(Achievement.NAMES.ACHIEVEMENT_FOURS_COMPANY, v29, FriendCountRefresher, p4.achievementService)
+		p4.achievementScout = Achievement.new(Achievement.NAMES.ACHIEVEMENT_SCOUT, v25, p4.achievementService)
+		p4.achievementExplorer = Achievement.new(Achievement.NAMES.ACHIEVEMENT_EXPLORER, v25, p4.achievementService)
+		p4.achievementTrailblazer = Achievement.new(Achievement.NAMES.ACHIEVEMENT_TRAILBLAZER, v25, p4.achievementService)
+		p4.achievementStrengthInNumbers = Achievement.new(Achievement.NAMES.ACHIEVEMENT_STRENGTH_IN_NUMBERS, v27, p4.achievementService)
+		p4:_checkStrengthInNumbers(v28)
+		p4:_checkJoinExperienceAchievements(v26)
+	end,
+	_checkJoinExperienceAchievements = function(p5, p6) -- line: 98
+		-- upvalues: Dash (copy), GetUserRecentExperiences (copy), Logger (copy)
+		if p5.achievementScout.hasAchieved == false or (p5.achievementExplorer.hasAchieved == false or p5.achievementTrailblazer.hasAchieved == false) then
+			if p5.platformCloudStorageService and p5.platformCloudStorageService:IsUserDataAvailable() then
+				local v33 = p5.platformCloudStorageService:GetUserDataAsync("ExperiencesPlayed").data or {}
+
+				if #v33 < 15 and not Dash.includes(v33, game.GameId) then
+					table.insert(v33, game.GameId)
+					p5.platformCloudStorageService:SetUserDataAsync("ExperiencesPlayed", {
+						data = v33
+					})
+				end
+
+				p6(#v33)
+
+				return
+			end
+
+			GetUserRecentExperiences(p5.requestImpl):andThen(function(p7) -- line: 116
+				-- upvalues: p6 (copy)
+				p6(p7)
+			end):catch(function(p8) -- line: 118
+				-- upvalues: Logger (copy)
+				Logger:warning(p8)
+			end)
+		end
+	end,
+	_checkStrengthInNumbers = function(p9, p10) -- line: 125
+		if p9.achievementStrengthInNumbers.hasAchieved == false then
+			local LocalPlayer = p9.playersService.LocalPlayer
+
+			if LocalPlayer and LocalPlayer.FollowUserId ~= 0 and (if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then LocalPlayer:IsFriendsWith(LocalPlayer.FollowUserId) else LocalPlayer:IsFriendsWithAsync(LocalPlayer.FollowUserId)) and p9.playersService:GetPlayerByUserId(LocalPlayer.FollowUserId) then
+				p10(0)
+			end
+		end
+	end
+}
+
+function t1.new(p11, p12, p13, p14, p15, p16) -- line: 142
+	-- upvalues: v12 (copy), PlatformFriendsService (ref), PlatformCloudStorageService (ref), AchievementService (ref), Players (copy), PlatformService (ref), t1 (copy)
+	return (setmetatable({
+		requestImpl = p11 or v12,
+		platformFriendsService = p12 or PlatformFriendsService,
+		platformCloudStorageService = p13 or PlatformCloudStorageService,
+		achievementService = p14 or AchievementService,
+		playersService = p15 or Players,
+		platformService = p16 or PlatformService
+	}, {
+		__index = t1
+	}))
+end
+
+return t1

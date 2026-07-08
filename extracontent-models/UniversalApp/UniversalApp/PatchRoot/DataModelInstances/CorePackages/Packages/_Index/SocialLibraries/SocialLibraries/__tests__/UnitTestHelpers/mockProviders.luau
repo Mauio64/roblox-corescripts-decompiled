@@ -1,24 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Packages");
-local v1 = require(l_script_FirstAncestor_0.Dev.RoactRodux);
-local v2 = require(script.Parent.Parent.Parent.dependencies);
-local l_Roact_0 = v2.Roact;
-local l_Rodux_0 = v2.Rodux;
-local v5 = require(script.Parent.mockStyle);
-local v6 = require(script.Parent.mockNavigation);
-local v7 = l_Rodux_0.Store.new(function() --[[ Line: 10 ]]
-    return {};
-end, {}, {
-    l_Rodux_0.thunkMiddleware
-});
-return function(v8, v9) --[[ Line: 14 ]]
-    -- upvalues: v7 (copy), v6 (copy), v5 (copy), l_Roact_0 (copy), v1 (copy)
-    v9 = v9 or {};
-    local v10 = v9.store or v7;
-    local v11 = v9.mockNavigation or v6;
-    local v12 = v5(v11(v8));
-    return l_Roact_0.createElement(v1.StoreProvider, {
-        store = v10
-    }, {
-        children = v12
-    });
-end;
+local Packages = script:FindFirstAncestor("Packages")
+local RoactRodux = require(Packages.Dev.RoactRodux)
+local dependencies = require(script.Parent.Parent.Parent.dependencies)
+local Roact = dependencies.Roact
+local Rodux = dependencies.Rodux
+local mockStyle = require(script.Parent.mockStyle)
+local mockNavigation = require(script.Parent.mockNavigation)
+local v8 = Rodux.Store.new(function() -- line: 10
+	return {}
+end, {}, { Rodux.thunkMiddleware })
+
+return function(p1, p2) -- line: 14
+	-- upvalues: v8 (copy), mockNavigation (copy), mockStyle (copy), Roact (copy), RoactRodux (copy)
+	local v11 = p2 or {}
+	local v12 = v11.store or v8
+	local v13 = v11.mockNavigation or mockNavigation
+	local v14 = mockStyle(v13(p1))
+
+	return Roact.createElement(RoactRodux.StoreProvider, {
+		store = v12
+	}, {
+		children = v14
+	})
+end

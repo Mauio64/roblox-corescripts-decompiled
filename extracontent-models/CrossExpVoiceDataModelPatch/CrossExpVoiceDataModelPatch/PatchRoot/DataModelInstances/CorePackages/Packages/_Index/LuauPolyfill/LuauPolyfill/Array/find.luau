@@ -1,11 +1,15 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.types);
-return function(v2, v3) --[[ Line: 7 ]]
-    for v4 = 1, #v2 do
-        local v5 = v2[v4];
-        if v3(v5, v4, v2) then
-            return v5;
-        end;
-    end;
-    return nil;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.types)
+
+return function(p1, p2: ((...any) -> ...any)) -- line: 7
+	for i = 1, #p1 do
+		local v5 = p1[i]
+
+		if p2(v5, i, p1) then
+			return v5
+		end
+	end
+
+	return nil
+end

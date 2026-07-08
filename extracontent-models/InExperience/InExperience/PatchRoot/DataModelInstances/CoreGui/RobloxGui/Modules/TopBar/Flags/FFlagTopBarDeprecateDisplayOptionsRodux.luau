@@ -1,9 +1,10 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagEnableConsoleExpControls_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls;
-local l_Enabled_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled;
-local v3 = require(script.Parent.FFlagTopBarDeprecateGamepadNavigationDialogRodux);
-local v4 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local l_FFlagTopBarSignalizeMenuOpen_0 = v4.Flags.FFlagTopBarSignalizeMenuOpen;
-local l_FFlagTopBarSignalizeKeepOutAreas_0 = v4.Flags.FFlagTopBarSignalizeKeepOutAreas;
-local l_FFlagTopBarSignalizeScreenSize_0 = v4.Flags.FFlagTopBarSignalizeScreenSize;
-return game:DefineFastFlag("TopBarDeprecateDisplayOptionsRodux2", false) and l_Enabled_0() and l_FFlagEnableConsoleExpControls_0 and v3 and l_FFlagTopBarSignalizeMenuOpen_0 and l_FFlagTopBarSignalizeKeepOutAreas_0 and l_FFlagTopBarSignalizeScreenSize_0;
+local CorePackages = game:GetService("CorePackages")
+local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
+local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+local FFlagTopBarDeprecateGamepadNavigationDialogRodux = require(script.Parent.FFlagTopBarDeprecateGamepadNavigationDialogRodux)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeMenuOpen = CoreGuiCommon.Flags.FFlagTopBarSignalizeMenuOpen
+local FFlagTopBarSignalizeKeepOutAreas = CoreGuiCommon.Flags.FFlagTopBarSignalizeKeepOutAreas
+local FFlagTopBarSignalizeScreenSize = CoreGuiCommon.Flags.FFlagTopBarSignalizeScreenSize
+
+return game:DefineFastFlag("TopBarDeprecateDisplayOptionsRodux2", false) and (Enabled() and (FFlagEnableConsoleExpControls and (FFlagTopBarDeprecateGamepadNavigationDialogRodux and (FFlagTopBarSignalizeMenuOpen and (FFlagTopBarSignalizeKeepOutAreas and FFlagTopBarSignalizeScreenSize)))))

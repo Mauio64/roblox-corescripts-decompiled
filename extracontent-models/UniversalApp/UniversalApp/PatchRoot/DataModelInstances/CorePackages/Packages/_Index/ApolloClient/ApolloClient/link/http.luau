@@ -1,14 +1,16 @@
-local v0 = {
-    parseAndCheckHttpResponse = require(script.parseAndCheckHttpResponse).parseAndCheckHttpResponse, 
-    serializeFetchParameter = require(script.serializeFetchParameter).serializeFetchParameter
-};
-local v1 = require(script.selectHttpOptionsAndBody);
-v0.fallbackHttpConfig = v1.fallbackHttpConfig;
-v0.selectHttpOptionsAndBody = v1.selectHttpOptionsAndBody;
-v0.checkFetcher = require(script.checkFetcher).checkFetcher;
-v0.createSignalIfSupported = require(script.createSignalIfSupported).createSignalIfSupported;
-v0.selectURI = require(script.selectURI).selectURI;
-v0.createHttpLink = require(script.createHttpLink).createHttpLink;
-v0.HttpLink = require(script.HttpLink).HttpLink;
-v0.rewriteURIForGET = require(script.rewriteURIForGET).rewriteURIForGET;
-return v0;
+local t1 = {
+	parseAndCheckHttpResponse = require(script.parseAndCheckHttpResponse).parseAndCheckHttpResponse,
+	serializeFetchParameter = require(script.serializeFetchParameter).serializeFetchParameter
+}
+local selectHttpOptionsAndBody = require(script.selectHttpOptionsAndBody)
+
+t1.fallbackHttpConfig = selectHttpOptionsAndBody.fallbackHttpConfig
+t1.selectHttpOptionsAndBody = selectHttpOptionsAndBody.selectHttpOptionsAndBody
+t1.checkFetcher = require(script.checkFetcher).checkFetcher
+t1.createSignalIfSupported = require(script.createSignalIfSupported).createSignalIfSupported
+t1.selectURI = require(script.selectURI).selectURI
+t1.createHttpLink = require(script.createHttpLink).createHttpLink
+t1.HttpLink = require(script.HttpLink).HttpLink
+t1.rewriteURIForGET = require(script.rewriteURIForGET).rewriteURIForGET
+
+return t1

@@ -1,37 +1,46 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function() --[[ Line: 21 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v1 = setmetatable({}, v0);
-    v1.connections = {};
-    return v1;
-end;
-v0.connect = function(v2, v3, v4, v5) --[[ Line: 27 ]] --[[ Name: connect ]]
-    if v2.connections[v3] then
-        v2.connections[v3]();
-    end;
-    local v6 = v4:Connect(v5);
-    v2.connections[v3] = function() --[[ Line: 33 ]]
-        -- upvalues: v6 (copy)
-        v6:Disconnect();
-    end;
-end;
-v0.connectManual = function(v7, v8, v9) --[[ Line: 38 ]] --[[ Name: connectManual ]]
-    if v7.connections[v8] then
-        v7.connections[v8]();
-    end;
-    v7.connections[v8] = v9;
-end;
-v0.disconnect = function(v10, v11) --[[ Line: 45 ]] --[[ Name: disconnect ]]
-    if v10.connections[v11] then
-        v10.connections[v11]();
-        v10.connections[v11] = nil;
-    end;
-end;
-v0.disconnectAll = function(v12) --[[ Line: 52 ]] --[[ Name: disconnectAll ]]
-    for _, v14 in pairs(v12.connections) do
-        v14();
-    end;
-    v12.connections = {};
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 21
+	-- upvalues: t1 (copy)
+	local self = setmetatable({}, t1)
+
+	self.connections = {}
+
+	return self
+end
+function t1.connect(p1, p2, p3, p4) -- line: 27
+	if p1.connections[p2] then
+		p1.connections[p2]()
+	end
+
+	local connection = p3:Connect(p4)
+
+	p1.connections[p2] = function() -- line: 33
+		-- upvalues: connection (copy)
+		connection:Disconnect()
+	end
+end
+function t1.connectManual(p5, p6, p7) -- line: 38
+	if p5.connections[p6] then
+		p5.connections[p6]()
+	end
+
+	p5.connections[p6] = p7
+end
+function t1.disconnect(p8, p9) -- line: 45
+	if p8.connections[p9] then
+		p8.connections[p9]()
+		p8.connections[p9] = nil
+	end
+end
+function t1.disconnectAll(p10) -- line: 52
+	for _, v in pairs(p10.connections) do
+		v()
+	end
+
+	p10.connections = {}
+end
+
+return t1

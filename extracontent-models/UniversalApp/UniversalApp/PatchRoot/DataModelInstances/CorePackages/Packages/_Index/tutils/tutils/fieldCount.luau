@@ -1,7 +1,9 @@
-return function(v0) --[[ Line: 4 ]]
-    local v1 = 0;
-    for _ in pairs(v0) do
-        v1 = v1 + 1;
-    end;
-    return v1;
-end;
+return function(p1) -- line: 4
+	local n1 = 0
+
+	for _ in pairs(p1) do
+		n1 += 1
+	end
+
+	return n1
+end

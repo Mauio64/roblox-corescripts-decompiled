@@ -1,89 +1,103 @@
-local v0 = require(script.Parent.Enum.TooltipOrientation);
-return function(v1, v2, v3, v4, v5, v6, v7) --[[ Line: 22 ]]
-    -- upvalues: v0 (copy)
-    local v8 = {};
-    local v9 = v4 + v5 * 0.5;
-    local v10 = v4 + v5;
-    local v11 = nil;
-    local v12 = nil;
-    local v13 = nil;
-    local v14 = nil;
-    local v15 = 0;
-    local v16 = 0;
-    if v3 == v0.Bottom or v3 == v0.Top then
-        if not v7 and v2 + 8 + 12 > v6.Y - v10.Y then
-            v3 = v0.Top;
-        end;
-        local v17 = v6.X - 12 - v1;
-        v11 = math.clamp(v9.X - v1 * 0.5, 12, v17);
-        v13 = v11 - v4.X;
-        local v18 = nil;
-        local v19 = v1 - 12 - 16;
-        if v1 < 40 then
-            v8.caretPosition = UDim2.fromScale(0.5, 0);
-        elseif v7 then
-            v18 = math.clamp(v5.X * 0.5 + math.abs(v5.X * v7.X.Scale + v7.X.Offset), 12, v19);
-            v8.caretPosition = UDim2.fromOffset(v18, 0);
-        elseif v9.X - v1 * 0.5 >= 12 and v9.X + v1 * 0.5 <= v6.X - 12 then
-            v8.caretPosition = UDim2.fromScale(0.5, 0);
-        else
-            v18 = math.clamp(v9.X - v11, 12, v19);
-            v8.caretPosition = UDim2.fromOffset(v18, 0);
-        end;
-        v8.caretFrameSize = UDim2.fromOffset(v1, 8);
-        v8.caretImageSize = UDim2.fromOffset(16, 8);
-        v8.caretAnchorPoint = Vector2.new(0.5, 0);
-        v8.fillDirection = Enum.FillDirection.Vertical;
-        if v3 == v0.Bottom then
-            v12 = v4.Y + v5.Y;
-            v14 = v5.Y;
-            v8.caretLayoutOrder = 1;
-            v8.contentLayoutOrder = 2;
-            v16 = 4;
-        else
-            v12 = v4.Y - v2 - 8;
-            v14 = -(v2 + 8);
-            v8.caretLayoutOrder = 2;
-            v8.contentLayoutOrder = 1;
-            v16 = -4;
-        end;
-    else
-        local v20 = v6.Y - 12 - v2;
-        v12 = math.clamp(v9.Y - v2 * 0.5, 12, v20);
-        v14 = v12 - v4.Y;
-        local v21 = nil;
-        local v22 = v2 - 12 - 16;
-        if v7 then
-            v21 = math.clamp(v5.Y * 0.5 + math.abs(v5.Y * v7.Y.Scale + v7.Y.Offset), 12, v22);
-            v8.caretPosition = UDim2.fromOffset(0, v21);
-        elseif v9.Y - v2 * 0.5 >= 12 and v9.Y + v2 * 0.5 <= v6.Y - 12 or v2 <= 40 then
-            v8.caretPosition = UDim2.fromScale(0, 0.5);
-        else
-            local v23 = v2 - 12 - 16;
-            v21 = math.clamp(v9.Y - v12, 12, v23);
-            v8.caretPosition = UDim2.fromOffset(0, v21);
-        end;
-        v8.caretFrameSize = UDim2.fromOffset(8, v2);
-        v8.caretImageSize = UDim2.fromOffset(8, 16);
-        v8.caretAnchorPoint = Vector2.new(0, 0.5);
-        v8.fillDirection = Enum.FillDirection.Horizontal;
-        if v3 == v0.Right then
-            v11 = v10.X;
-            v13 = v5.X;
-            v8.caretLayoutOrder = 1;
-            v8.contentLayoutOrder = 2;
-            v15 = 4;
-        else
-            v11 = v4.X - v1 - 8;
-            v13 = -(v1 - 8);
-            v8.caretLayoutOrder = 2;
-            v8.contentLayoutOrder = 1;
-            v15 = -4;
-        end;
-    end;
-    v8.absolutePosition = UDim2.fromOffset(v11, v12);
-    v8.position = UDim2.fromOffset(v13, v14);
-    v8.animatedDistance = UDim2.fromOffset(v15, v16);
-    v8.updatedOrientation = v3;
-    return v8;
-end;
+local TooltipOrientation = require(script.Parent.Enum.TooltipOrientation)
+
+return function(p1, p2, p3, p4, p5, p6, p7) -- line: 22
+	-- upvalues: TooltipOrientation (copy)
+	local t1 = {}
+	local v10 = p4 + p5 * 0.5
+	local v11 = p4 + p5
+	local n1 = 0
+	local n2 = 0
+	local v15, v16, v20, p5Y
+
+	if p3 == TooltipOrientation.Bottom or p3 == TooltipOrientation.Top then
+		if not p7 and p2 + 8 + 12 > p6.Y - v11.Y then
+			p3 = TooltipOrientation.Top
+		end
+
+		local v14 = p6.X - 12 - p1
+
+		v15 = math.clamp(v10.X - p1 * 0.5, 12, v14)
+		v16 = v15 - p4.X
+
+		local v17 = p1 - 12 - 16
+
+		if p1 < 40 then
+			t1.caretPosition = UDim2.fromScale(0.5, 0)
+		elseif p7 then
+			local v18 = math.clamp(p5.X * 0.5 + math.abs(p5.X * p7.X.Scale + p7.X.Offset), 12, v17)
+
+			t1.caretPosition = UDim2.fromOffset(v18, 0)
+		elseif v10.X - p1 * 0.5 >= 12 and v10.X + p1 * 0.5 <= p6.X - 12 then
+			t1.caretPosition = UDim2.fromScale(0.5, 0)
+		else
+			local v19 = math.clamp(v10.X - v15, 12, v17)
+
+			t1.caretPosition = UDim2.fromOffset(v19, 0)
+		end
+
+		t1.caretFrameSize = UDim2.fromOffset(p1, 8)
+		t1.caretImageSize = UDim2.fromOffset(16, 8)
+		t1.caretAnchorPoint = Vector2.new(0.5, 0)
+		t1.fillDirection = Enum.FillDirection.Vertical
+
+		if p3 == TooltipOrientation.Bottom then
+			v20 = p4.Y + p5.Y
+			p5Y = p5.Y
+			t1.caretLayoutOrder = 1
+			t1.contentLayoutOrder = 2
+			n2 = 4
+		else
+			v20 = p4.Y - p2 - 8
+			p5Y = -(p2 + 8)
+			t1.caretLayoutOrder = 2
+			t1.contentLayoutOrder = 1
+			n2 = -4
+		end
+	else
+		local v22 = p6.Y - 12 - p2
+
+		v20 = math.clamp(v10.Y - p2 * 0.5, 12, v22)
+		p5Y = v20 - p4.Y
+
+		local v23 = p2 - 12 - 16
+
+		if p7 then
+			local v24 = math.clamp(p5.Y * 0.5 + math.abs(p5.Y * p7.Y.Scale + p7.Y.Offset), 12, v23)
+
+			t1.caretPosition = UDim2.fromOffset(0, v24)
+		elseif v10.Y - p2 * 0.5 >= 12 and v10.Y + p2 * 0.5 <= p6.Y - 12 or p2 <= 40 then
+			t1.caretPosition = UDim2.fromScale(0, 0.5)
+		else
+			local v25 = p2 - 12 - 16
+			local v26 = math.clamp(v10.Y - v20, 12, v25)
+
+			t1.caretPosition = UDim2.fromOffset(0, v26)
+		end
+
+		t1.caretFrameSize = UDim2.fromOffset(8, p2)
+		t1.caretImageSize = UDim2.fromOffset(8, 16)
+		t1.caretAnchorPoint = Vector2.new(0, 0.5)
+		t1.fillDirection = Enum.FillDirection.Horizontal
+
+		if p3 == TooltipOrientation.Right then
+			v15 = v11.X
+			v16 = p5.X
+			t1.caretLayoutOrder = 1
+			t1.contentLayoutOrder = 2
+			n1 = 4
+		else
+			v15 = p4.X - p1 - 8
+			v16 = -(p1 - 8)
+			t1.caretLayoutOrder = 2
+			t1.contentLayoutOrder = 1
+			n1 = -4
+		end
+	end
+
+	t1.absolutePosition = UDim2.fromOffset(v15, v20)
+	t1.position = UDim2.fromOffset(v16, p5Y)
+	t1.animatedDistance = UDim2.fromOffset(n1, n2)
+	t1.updatedOrientation = p3
+
+	return t1
+end

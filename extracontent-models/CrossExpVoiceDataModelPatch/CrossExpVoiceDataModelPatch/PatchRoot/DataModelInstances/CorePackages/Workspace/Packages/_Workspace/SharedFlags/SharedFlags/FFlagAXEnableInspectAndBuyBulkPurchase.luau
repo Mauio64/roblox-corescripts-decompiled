@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableInspectAndBuyBulkPurchase3", false);
+return game:DefineFastFlag("AXEnableInspectAndBuyBulkPurchase3", false)

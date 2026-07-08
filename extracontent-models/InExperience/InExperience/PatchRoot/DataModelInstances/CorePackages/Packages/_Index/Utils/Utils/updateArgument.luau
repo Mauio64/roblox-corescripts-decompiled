@@ -1,58 +1,64 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Object_0 = v1.Object;
-local v4 = {};
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_astFromType_0 = require(script.Parent.astFromType).astFromType;
-v4.updateArgument = function(v7, v8, v9, v10, v11, v12, v13) --[[ Line: 22 ]] --[[ Name: updateArgument ]]
-    -- upvalues: l_Kind_0 (copy), l_astFromType_0 (copy), l_Array_0 (copy), l_Object_0 (copy)
-    v7[tostring(v10)] = {
-        kind = l_Kind_0.ARGUMENT, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v10
-        }, 
-        value = {
-            kind = l_Kind_0.VARIABLE, 
-            name = {
-                kind = l_Kind_0.NAME, 
-                value = v11
-            }
-        }
-    };
-    v8[tostring(v11)] = {
-        kind = l_Kind_0.VARIABLE_DEFINITION, 
-        variable = {
-            kind = l_Kind_0.VARIABLE, 
-            name = {
-                kind = l_Kind_0.NAME, 
-                value = v11
-            }
-        }, 
-        type = l_astFromType_0(v12)
-    };
-    if v13 ~= nil then
-        v9[tostring(v11)] = v13;
-        return;
-    else
-        if l_Array_0.indexOf(l_Object_0.keys(v9), (tostring(v11))) ~= -1 then
-            v9[tostring(v11)] = nil;
-        end;
-        return;
-    end;
-end;
-v4.createVariableNameGenerator = function(v14) --[[ Line: 55 ]] --[[ Name: createVariableNameGenerator ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy)
-    local v15 = 0;
-    return function(v16) --[[ Line: 59 ]]
-        -- upvalues: v15 (ref), l_Array_0 (ref), l_Object_0 (ref), v14 (copy)
-        local v17 = nil;
-        repeat
-            v17 = ("_v%s_%s"):format(tostring(v15), v16);
-            v15 = v15 + 1;
-        until l_Array_0.indexOf(l_Object_0.keys(v14), (tostring(v17))) == -1;
-        return v17;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local t1 = {}
+local Kind = require(ParentParent.GraphQL).Kind
+local astFromType = require(script.Parent.astFromType).astFromType
+
+function t1.updateArgument(t2: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}, s1: string, s2: string, p1, p2) -- line: 22
+	-- upvalues: Kind (copy), astFromType (copy), Array (copy), Object (copy)
+	t2[tostring(s1)] = {
+		kind = Kind.ARGUMENT,
+		name = {
+			kind = Kind.NAME,
+			value = s1
+		},
+		value = {
+			kind = Kind.VARIABLE,
+			name = {
+				kind = Kind.NAME,
+				value = s2
+			}
+		}
+	}
+	t3[tostring(s2)] = {
+		kind = Kind.VARIABLE_DEFINITION,
+		variable = {
+			kind = Kind.VARIABLE,
+			name = {
+				kind = Kind.NAME,
+				value = s2
+			}
+		},
+		type = astFromType(p1)
+	}
+
+	if p2 ~= nil then
+		t4[tostring(s2)] = p2
+
+		return
+	end
+
+	if Array.indexOf(Object.keys(t4), (tostring(s2))) ~= -1 then
+		t4[tostring(s2)] = nil
+	end
+end
+function t1.createVariableNameGenerator(t5: {[any]: any}) -- line: 55
+	-- upvalues: Array (copy), Object (copy)
+	local n1 = 0
+
+	return function(s3: string) -- line: 59
+		-- upvalues: n1 (ref), Array (copy), Object (copy), t5 (copy)
+		local v18
+
+		repeat
+			v18 = ("_v%s_%s"):format(tostring(n1), s3)
+			n1 += 1
+		until Array.indexOf(Object.keys(t5), (tostring(v18))) == -1
+
+		return v18
+	end
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddPurchaseOptionForProvidingBalance", false);
+return game:DefineFastFlag("AddPurchaseOptionForProvidingBalance", false)

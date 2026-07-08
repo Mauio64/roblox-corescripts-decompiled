@@ -2,7 +2,7 @@ local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
 local React = require(Parent.React)
 local SystemBanner = require(Parent.Foundation).SystemBanner
 
-return React.memo(function(t1: {[any]: any}) --[[ SduiSystemBanner ]] -- line: 35
+local function SduiSystemBanner(t1: {[any]: any}) -- line: 35
 	-- upvalues: React (copy), SystemBanner (copy)
 	return React.createElement(SystemBanner, {
 		severity = t1.severity,
@@ -18,4 +18,6 @@ return React.memo(function(t1: {[any]: any}) --[[ SduiSystemBanner ]] -- line: 3
 		ZIndex = t1.zIndex,
 		testId = t1.testId
 	})
-end)
+end
+
+return React.memo(SduiSystemBanner)

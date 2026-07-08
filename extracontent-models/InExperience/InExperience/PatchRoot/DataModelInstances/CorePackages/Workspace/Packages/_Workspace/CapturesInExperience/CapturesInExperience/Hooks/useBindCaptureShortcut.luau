@@ -1,93 +1,99 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v4 = require(l_Parent_1.React);
-local v5 = require(l_Parent_1.RoactUtils);
-local v6 = require(l_Parent_1.SocialStopwatch);
-local v7 = require(l_Parent_0.Constants);
-local v8 = require(l_Parent_0.Analytics.EventNames);
-local v9 = require(l_Parent_0.Utils.getCaptureShortcutSetupKeys);
-local v10 = require(l_Parent_0.Thunks.TakeCapture);
-local v11 = require(l_Parent_0.Analytics.useAnalytics);
-local l_useDispatch_0 = v5.Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v4.useEffect;
-local v14 = require(l_Parent_0.Hooks.useKeyboardEnabled);
-local v15 = require(l_Parent_0.Hooks.usePlayShutterSound);
-local l_useSelector_0 = v5.Hooks.RoactRodux.useSelector;
-local _ = function() --[[ Line: 25 ]]
-    -- upvalues: v9 (copy), l_UserInputService_0 (copy)
-    for _, v18 in (v9()) do
-        if l_UserInputService_0:IsKeyDown(v18) then
-            return true;
-        end;
-    end;
-    return false;
-end;
-return function() --[[ Line: 35 ]]
-    -- upvalues: v11 (copy), l_useDispatch_0 (copy), l_useSelector_0 (copy), v7 (copy), v15 (copy), v14 (copy), l_useEffect_0 (copy), v6 (copy), v8 (copy), v10 (copy), l_ContextActionService_0 (copy), v9 (copy), l_UserInputService_0 (copy)
-    local v20 = v11();
-    local v21 = l_useDispatch_0();
-    local v23 = l_useSelector_0(function(v22) --[[ Line: 39 ]]
-        -- upvalues: v7 (ref)
-        return v22[v7.RoduxKey].IsActive;
-    end);
-    local v25 = l_useSelector_0(function(v24) --[[ Line: 43 ]]
-        -- upvalues: v7 (ref)
-        return v24[v7.RoduxKey].IsCapturesCoreGuiEnabled;
-    end);
-    local v26 = v15();
-    local v27 = v14();
-    l_useEffect_0(function() --[[ Line: 50 ]]
-        -- upvalues: v27 (copy), v25 (copy), v26 (copy), v6 (ref), v20 (copy), v8 (ref), v21 (copy), v10 (ref), l_ContextActionService_0 (ref), v9 (ref), l_UserInputService_0 (ref)
-        if not v27 then
-            return;
-        elseif not v25 then
-            return;
-        else
-            local function v28() --[[ Line: 59 ]]
-                -- upvalues: v26 (ref), v6 (ref), v20 (ref), v8 (ref), v21 (ref), v10 (ref)
-                v26();
-                if not v6.Stopwatch.get(v6.Events.CaptureTaken) then
-                    v6.Stopwatch.start(v6.Events.CaptureTaken);
-                end;
-                v20.fireEvent(v8.CapturesEntrypointActivated);
-                v20.fireEvent(v8.CapturesDesktopHotkeyCaptureTriggered);
-                v21(v10());
-            end;
-            l_ContextActionService_0:BindCoreAction("CaptureShortcutAction", function(_, v30) --[[ Line: 70 ]]
-                -- upvalues: v9 (ref), l_UserInputService_0 (ref), v28 (copy)
-                local v31 = false;
-                if v30 == Enum.UserInputState.Begin then
-                    local v32;
-                    for _, v34 in (v9()) do
-                        if l_UserInputService_0:IsKeyDown(v34) then
-                            v32 = true;
-                            v31 = true;
-                        end;
-                        if v31 then
-                            break;
-                        end;
-                    end;
-                    if not v31 then
-                        v32 = false;
-                    end;
-                    v31 = false;
-                    if v32 then
-                        v28();
-                        return Enum.ContextActionResult.Sink;
-                    end;
-                end;
-                return Enum.ContextActionResult.Pass;
-            end, false, Enum.KeyCode.One);
-            return function() --[[ Line: 79 ]]
-                -- upvalues: l_ContextActionService_0 (ref)
-                l_ContextActionService_0:UnbindCoreAction("CaptureShortcutAction");
-            end;
-        end;
-    end, {
-        v23, 
-        v25, 
-        v27
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ContextActionService = game:GetService("ContextActionService")
+local UserInputService = game:GetService("UserInputService")
+local React = require(ParentParentParent.React)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local SocialStopwatch = require(ParentParentParent.SocialStopwatch)
+local Constants = require(ParentParent.Constants)
+local EventNames = require(ParentParent.Analytics.EventNames)
+local getCaptureShortcutSetupKeys = require(ParentParent.Utils.getCaptureShortcutSetupKeys)
+local TakeCapture = require(ParentParent.Thunks.TakeCapture)
+local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useKeyboardEnabled = require(ParentParent.Hooks.useKeyboardEnabled)
+local usePlayShutterSound = require(ParentParent.Hooks.usePlayShutterSound)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+return function() -- line: 35
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useSelector (copy), Constants (copy), usePlayShutterSound (copy), useKeyboardEnabled (copy), useEffect (copy), SocialStopwatch (copy), EventNames (copy), TakeCapture (copy), ContextActionService (copy), getCaptureShortcutSetupKeys (copy), UserInputService (copy)
+	local v20 = useAnalytics()
+	local v21 = useDispatch()
+	local v22 = useSelector(function(p1) -- line: 39
+		-- upvalues: Constants (copy)
+		return p1[Constants.RoduxKey].IsActive
+	end)
+	local v23 = useSelector(function(p2) -- line: 43
+		-- upvalues: Constants (copy)
+		return p2[Constants.RoduxKey].IsCapturesCoreGuiEnabled
+	end)
+	local v24 = usePlayShutterSound()
+	local v25 = useKeyboardEnabled()
+
+	useEffect(function() -- line: 50
+		-- upvalues: v25 (copy), v23 (copy), v24 (copy), SocialStopwatch (copy), v20 (copy), EventNames (copy), v21 (copy), TakeCapture (copy), ContextActionService (copy), getCaptureShortcutSetupKeys (copy), UserInputService (copy)
+		if not v25 then
+			return
+		end
+
+		if not v23 then
+			return
+		end
+
+		local function v28() -- line: 59
+			-- upvalues: v24 (copy), SocialStopwatch (copy), v20 (copy), EventNames (copy), v21 (copy), TakeCapture (copy)
+			v24()
+
+			if not SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.CaptureTaken) then
+				SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.CaptureTaken)
+			end
+
+			v20.fireEvent(EventNames.CapturesEntrypointActivated)
+			v20.fireEvent(EventNames.CapturesDesktopHotkeyCaptureTriggered)
+			v21(TakeCapture())
+		end
+
+		ContextActionService:BindCoreAction("CaptureShortcutAction", function(_, p4) -- line: 70
+			-- upvalues: getCaptureShortcutSetupKeys (copy), UserInputService (copy), v28 (copy)
+			if p4 == Enum.UserInputState.Begin then
+				local g34 = nil
+				local v33 = nil
+
+				for _, v32 in (getCaptureShortcutSetupKeys()) do
+					if UserInputService:IsKeyDown(v32) then
+						v33 = true
+						g34 = true
+					end
+
+					if g34 then
+						break
+					end
+				end
+
+				if not g34 then
+					v33 = false
+				end
+
+				g34 = false
+
+				if v33 then
+					v28()
+
+					return Enum.ContextActionResult.Sink
+				end
+			end
+
+			return Enum.ContextActionResult.Pass
+		end, false, Enum.KeyCode.One)
+
+		return function() -- line: 79
+			-- upvalues: ContextActionService (copy)
+			ContextActionService:UnbindCoreAction("CaptureShortcutAction")
+		end
+	end, {
+		v22,
+		v23,
+		v25
+	})
+end

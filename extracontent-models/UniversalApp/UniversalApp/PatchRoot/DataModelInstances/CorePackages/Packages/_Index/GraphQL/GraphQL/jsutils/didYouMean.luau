@@ -1,35 +1,49 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+
 return {
-    didYouMean = function(v2, v3) --[[ Line: 20 ]] --[[ Name: didYouMean ]]
-        local v4 = nil;
-        local v5 = nil;
-        if v3 then
-            v4 = v2;
-            v5 = v3;
-        else
-            v5 = v2;
-        end;
-        local v6 = " Did you mean ";
-        if v4 then
-            v6 = v6 .. v4 .. " ";
-        end;
-        local v7 = {};
-        for v8 = 1, #v5 do
-            v7[v8] = ("%q"):format(v5[v8]);
-        end;
-        local v9 = #v7;
-        if v9 == 0 then
-            return "";
-        elseif v9 == 1 then
-            return v6 .. v7[1] .. "?";
-        elseif v9 == 2 then
-            return v6 .. v7[1] .. " or " .. v7[2] .. "?";
-        else
-            local v10 = {};
-            table.move(v7, 1, 5, 1, v10);
-            local v11 = table.remove(v10);
-            return v6 .. table.concat(v10, ", ") .. ", or " .. tostring(v11) .. "?";
-        end;
-    end
-};
+	didYouMean = function(p1, p2) -- line: 20
+		local v4 = nil
+
+		if p2 then
+			v4 = p1
+		else
+			p2 = p1
+		end
+
+		local s1 = " Did you mean "
+
+		if v4 then
+			s1 ..= v4 .. " "
+		end
+
+		local t1 = {}
+
+		for i = 1, #p2 do
+			t1[i] = ("%q"):format(p2[i])
+		end
+
+		local v8 = #t1
+
+		if v8 == 0 then
+			return ""
+		end
+
+		if v8 == 1 then
+			return s1 .. t1[1] .. "?"
+		end
+
+		if v8 == 2 then
+			return s1 .. t1[1] .. " or " .. t1[2] .. "?"
+		end
+
+		local t2 = {}
+
+		table.move(t1, 1, 5, 1, t2)
+
+		local v10 = table.remove(t2)
+
+		return s1 .. table.concat(t2, ", ") .. ", or " .. tostring(v10) .. "?"
+	end
+}

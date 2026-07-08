@@ -1,13 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local l_GetFFlagExpChatUseVoiceParticipantsStore_0 = require(l_Parent_0.SharedFlags).GetFFlagExpChatUseVoiceParticipantsStore;
-local v3 = game:DefineFastFlag("EasierUnmutingVoiceParticipantsMutedReducer", false);
-local v4 = game:DefineFastFlag("UseLikelySpeakingReducer", false);
-return v1.combineReducers({
-    participants = if l_GetFFlagExpChatUseVoiceParticipantsStore_0() then nil else require(script.Parent.participants), 
-    participantsMuted = if v3 then require(script.Parent.participantsMuted) else v1.createReducer({}, {}), 
-    isEnabled = require(script.Parent.isEnabled), 
-    likelySpeakingUsers = if v4 then require(script.Parent.likelySpeakingUsers) else v1.createReducer({}, {}), 
-    showLikelySpeakingBubbles = if v4 then require(script.Parent.showLikelySpeakingBubbles) else v1.createReducer(false, {}), 
-    isVoiceUIVisible = require(script.Parent.isVoiceUIVisible)
-});
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(Parent.Rodux)
+local GetFFlagExpChatUseVoiceParticipantsStore = require(Parent.SharedFlags).GetFFlagExpChatUseVoiceParticipantsStore
+local v4 = game:DefineFastFlag("EasierUnmutingVoiceParticipantsMutedReducer", false)
+
+return Rodux.combineReducers({
+	participants = if not GetFFlagExpChatUseVoiceParticipantsStore() then require(script.Parent.participants) else nil,
+	participantsMuted = if not v4 then Rodux.createReducer({}, {}) else require(script.Parent.participantsMuted),
+	isEnabled = require(script.Parent.isEnabled),
+	isVoiceUIVisible = require(script.Parent.isVoiceUIVisible)
+})

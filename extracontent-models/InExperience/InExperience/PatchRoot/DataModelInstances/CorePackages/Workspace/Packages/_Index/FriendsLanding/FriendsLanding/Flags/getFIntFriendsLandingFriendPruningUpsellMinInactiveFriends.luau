@@ -1,4 +1,5 @@
-game:DefineFastInt("FriendsLandingFriendPruningUpsellMinInactiveFriends", 5);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("FriendsLandingFriendPruningUpsellMinInactiveFriends");
-end;
+game:DefineFastInt("FriendsLandingFriendPruningUpsellMinInactiveFriends", 5)
+
+return function() -- line: 3
+	return game:GetFastInt("FriendsLandingFriendPruningUpsellMinInactiveFriends")
+end

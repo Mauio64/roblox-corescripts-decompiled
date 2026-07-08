@@ -1,3 +1,3 @@
 return {
-    SquadRccEventManager = require(script.SquadRccEventManager)
-};
+	SquadRccEventManager = require(script.SquadRccEventManager)
+}

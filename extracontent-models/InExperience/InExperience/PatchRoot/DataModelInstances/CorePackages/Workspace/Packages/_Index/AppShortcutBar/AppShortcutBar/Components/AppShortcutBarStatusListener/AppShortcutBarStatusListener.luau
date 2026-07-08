@@ -1,28 +1,33 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppShortcutBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Hooks);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_FFlagGuacStickyShortcutBarEnabled_0 = require(l_Parent_0.SharedFlags).FFlagGuacStickyShortcutBarEnabled;
-return function(v6) --[[ Line: 14 ]] --[[ Name: AppShortcutBarStatusListener ]]
-    -- upvalues: v3 (copy), l_FFlagGuacStickyShortcutBarEnabled_0 (copy), l_useAppPolicy_0 (copy), v2 (copy)
-    local v7 = v3.useAppShortcutBarHeight();
-    local v8 = nil;
-    v8 = if l_FFlagGuacStickyShortcutBarEnabled_0 then l_useAppPolicy_0(function(v9) --[[ Line: 19 ]]
-        return v9.getStickyShortcutBarEnabled();
-    end) else v3.useIsStickyShortcutBarEnabled();
-    local v10 = v3.useShortcutBarVisible();
-    local v11 = v8 and v10;
-    v2.useEffect(function() --[[ Line: 29 ]]
-        -- upvalues: v6 (copy), v11 (copy), v7 (copy)
-        if v6.onHeightChanged then
-            local v12 = if v11 then v7 else 0;
-            v6.onHeightChanged(v12);
-        end;
-    end, {
-        v11, 
-        v7, 
-        v6.onHeightChanged
-    });
-    return nil;
-end;
+local AppShortcutBar = script:FindFirstAncestor("AppShortcutBar")
+local AppShortcutBarParent = AppShortcutBar.Parent
+local React = require(AppShortcutBarParent.React)
+local Hooks = require(AppShortcutBar.Hooks)
+local useAppPolicy = require(AppShortcutBarParent.UniversalAppPolicy).useAppPolicy
+local FFlagGuacStickyShortcutBarEnabled = require(AppShortcutBarParent.SharedFlags).FFlagGuacStickyShortcutBarEnabled
+
+local function AppShortcutBarStatusListener(t1: {[any]: any}) -- line: 14
+	-- upvalues: Hooks (copy), FFlagGuacStickyShortcutBarEnabled (copy), useAppPolicy (copy), React (copy)
+	local v9 = Hooks.useAppShortcutBarHeight()
+	local v10 = if not FFlagGuacStickyShortcutBarEnabled then Hooks.useIsStickyShortcutBarEnabled() else useAppPolicy(function(p1) -- line: 19
+		return p1.getStickyShortcutBarEnabled()
+	end)
+	local v11 = Hooks.useShortcutBarVisible()
+	local v12 = v10 and v11
+
+	React.useEffect(function() -- line: 29
+		-- upvalues: t1 (copy), v12 (copy), v9 (copy)
+		if t1.onHeightChanged then
+			local v14 = not v12 and 0 or v9
+
+			t1.onHeightChanged(v14)
+		end
+	end, {
+		v12,
+		v9,
+		t1.onHeightChanged
+	})
+
+	return nil
+end
+
+return AppShortcutBarStatusListener

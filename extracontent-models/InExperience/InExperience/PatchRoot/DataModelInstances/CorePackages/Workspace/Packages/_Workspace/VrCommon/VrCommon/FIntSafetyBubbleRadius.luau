@@ -1,1 +1,1 @@
-return game:DefineFastInt("SafetyBubbleRadius", 5);
+return game:DefineFastInt("SafetyBubbleRadius", 5)

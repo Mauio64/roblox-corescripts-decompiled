@@ -1,54 +1,56 @@
-local l_Parent_0 = script:FindFirstAncestor("UserRelationshipModals").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Dialog_0 = v2.Dialog;
-local l_DialogSize_0 = v2.Enums.DialogSize;
-local l_ButtonVariant_0 = v2.Enums.ButtonVariant;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v7 = require(l_Parent_0.UserTile);
-local l_UserTile_0 = v7.UserTile;
-local l_LayoutMode_0 = v7.LayoutMode;
-local l_FFlagConnectionsToFriendsRename_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsToFriendsRename;
-local v11 = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false);
-local v12 = l_FFlagConnectionsToFriendsRename_0 and v11;
-return function(v13) --[[ Line: 33 ]] --[[ Name: PromptFriendRequestModal ]]
-    -- upvalues: l_useLocalization_0 (copy), v12 (copy), v1 (copy), l_Dialog_0 (copy), l_DialogSize_0 (copy), v2 (copy), l_UserTile_0 (copy), l_LayoutMode_0 (copy), l_ButtonVariant_0 (copy)
-    local v14 = l_useLocalization_0({
-        titleText = v12 and "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest", 
-        sendText = "InGame.FriendPlayerPrompt.Action.Send"
-    });
-    return v1.createElement(l_Dialog_0.Root, {
-        size = l_DialogSize_0.Medium, 
-        onClose = v13.onClose
-    }, {
-        DialogTitle = v1.createElement(l_Dialog_0.Title, {
-            text = v14.titleText
-        }), 
-        Avatar = v1.createElement(v2.View, {
-            tag = "row align-x-center size-full-3000", 
-            LayoutOrder = 2
-        }, {
-            UserTile = v1.createElement(l_UserTile_0, {
-                userId = v13.userId, 
-                title = v13.displayName, 
-                subtitle = "@" .. v13.username, 
-                layoutMode = l_LayoutMode_0.compact
-            })
-        }), 
-        Buffer = v1.createElement(v2.View, {
-            tag = "size-full-500", 
-            LayoutOrder = 3
-        }), 
-        DialogActions = v1.createElement(l_Dialog_0.Actions, {
-            LayoutOrder = 4, 
-            actions = {
-                {
-                    text = v14.sendText, 
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    onActivated = v13.onSendClicked, 
-                    inputDelay = v13.inputDelay == nil and 3 or v13.inputDelay
-                }
-            }
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local Dialog = Foundation.Dialog
+local DialogSize = Foundation.Enums.DialogSize
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local UserTile = require(Parent.UserTile)
+local UserTile2 = UserTile.UserTile
+local LayoutMode = UserTile.LayoutMode
+local FFlagConnectionsToFriendsRename = require(Parent.SharedFlags).FFlagConnectionsToFriendsRename
+local v12 = game:DefineFastFlag("PromptFriendRequestModalRevampFriendsRename", false)
+local v13 = FFlagConnectionsToFriendsRename and v12
+
+local function PromptFriendRequestModal(t1: {[any]: any}) -- line: 33
+	-- upvalues: useLocalization (copy), v13 (copy), React (copy), Dialog (copy), DialogSize (copy), Foundation (copy), UserTile2 (copy), LayoutMode (copy), ButtonVariant (copy)
+	local v16 = useLocalization({
+		sendText = "InGame.FriendPlayerPrompt.Action.Send",
+		titleText = not v13 and "InGame.FriendPlayerPrompt.Title.SendFriendRequest" or "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename"
+	})
+
+	return React.createElement(Dialog.Root, {
+		size = DialogSize.Medium,
+		onClose = t1.onClose
+	}, {
+		DialogTitle = React.createElement(Dialog.Title, {
+			text = v16.titleText
+		}),
+		Avatar = React.createElement(Foundation.View, {
+			tag = "row align-x-center size-full-3000",
+			LayoutOrder = 2
+		}, {
+			UserTile = React.createElement(UserTile2, {
+				userId = t1.userId,
+				title = t1.displayName,
+				subtitle = "@" .. t1.username,
+				layoutMode = LayoutMode.compact
+			})
+		}),
+		Buffer = React.createElement(Foundation.View, {
+			tag = "size-full-500",
+			LayoutOrder = 3
+		}),
+		DialogActions = React.createElement(Dialog.Actions, {
+			LayoutOrder = 4,
+			actions = {{
+				text = v16.sendText,
+				variant = ButtonVariant.Emphasis,
+				onActivated = t1.onSendClicked,
+				inputDelay = if t1.inputDelay ~= nil then t1.inputDelay else 3
+			}}
+		})
+	})
+end
+
+return PromptFriendRequestModal

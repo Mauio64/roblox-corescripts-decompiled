@@ -1,1 +1,1 @@
-return game:DefineFastInt("ScaleBrazilContentRatingBadge", 100);
+return game:DefineFastInt("ScaleBrazilContentRatingBadge", 100)

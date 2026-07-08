@@ -1,3 +1,5 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.Signals);
-return nil;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.Signals)
+
+return nil

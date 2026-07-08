@@ -1,4 +1,4 @@
 return {
-    formatPrimaryName = require(script.formatPrimaryName), 
-    formatUsername = require(script.formatUsername)
-};
+	formatPrimaryName = require(script.formatPrimaryName),
+	formatUsername = require(script.formatUsername)
+}

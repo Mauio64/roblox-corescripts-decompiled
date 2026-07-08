@@ -1,20 +1,24 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 4 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = v1 or {};
-    setmetatable(v2, {
-        __index = v0
-    });
-    return v2;
-end;
-v0.GetItem = function(v3, v4) --[[ Line: 13 ]] --[[ Name: GetItem ]]
-    return v3[v4];
-end;
-v0.SetItem = function(v5, v6, v7) --[[ Line: 18 ]] --[[ Name: SetItem ]]
-    v5[v6] = tostring(v7);
-end;
-v0.flush = function(_) --[[ Line: 22 ]] --[[ Name: flush ]]
+local t1 = {}
 
-end;
-return v0;
+t1.__index = t1
+
+function t1.new(p1) -- line: 4
+	-- upvalues: t1 (copy)
+	local v3 = p1 or {}
+
+	setmetatable(v3, {
+		__index = t1
+	})
+
+	return v3
+end
+function t1.GetItem(p2, p3) -- line: 13
+	return p2[p3]
+end
+function t1.SetItem(p4, p5, p6) -- line: 18
+	p4[p5] = tostring(p6)
+end
+function t1.flush(_) -- line: 22
+end
+
+return t1

@@ -1,124 +1,136 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Otter);
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.t);
-local v5 = require(l_Parent_0.UIBlox.Core.Style.withStyle);
-local v6 = require(script.Parent.ModalBottomSheetButton);
-local v7 = v2.PureComponent:extend("ModalBottomSheet");
-local v8 = {
-    frequency = 4, 
-    dampingRatio = 1
-};
-v7.validateProps = v4.strictInterface({
-    buttonModels = v4.array(v4.table), 
-    screenWidth = v4.number, 
-    onDismiss = v4.callback, 
-    showImages = v4.optional(v4.boolean), 
-    bottomGap = v4.optional(v4.number), 
-    sheetContentXSize = v4.optional(v4.UDim), 
-    sheetContentXPosition = v4.optional(v4.UDim)
-});
-v7.defaultProps = {
-    bottomGap = 0, 
-    showImages = true, 
-    sheetContentXSize = UDim.new(1, 0), 
-    sheetContentXPosition = UDim.new(0, 0)
-};
-v7.init = function(v9) --[[ Line: 49 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    v9.motor = v1.createSingleMotor(0);
-    v9.ref = v2.createRef();
-    v9.active = true;
-end;
-v7.render = function(v10) --[[ Line: 55 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v2 (copy), v6 (copy), v5 (copy), v1 (copy), v8 (copy)
-    local l_sheetContentXPosition_0 = v10.props.sheetContentXPosition;
-    local l_sheetContentXSize_0 = v10.props.sheetContentXSize;
-    v10.sheetHeight = #v10.props.buttonModels * 56;
-    if #v10.props.buttonModels >= 7 then
-        v10.sheetHeight = 420;
-    end;
-    local v13 = {};
-    for v14, v15 in ipairs(v10.props.buttonModels) do
-        local v17 = v3.Dictionary.join(v15, {
-            hasRoundTop = v14 == 1, 
-            hasRoundBottom = v14 == #v10.props.buttonModels, 
-            isFixed = v10.props.screenWidth > 600, 
-            elementHeight = 56, 
-            showImage = v10.props.showImages, 
-            LayoutOrder = v14, 
-            onActivatedAndDismissed = function(v16) --[[ Line: 72 ]] --[[ Name: onActivatedAndDismissed ]]
-                -- upvalues: v15 (copy), v10 (copy)
-                if v15.onActivated then
-                    v15.onActivated(v16);
-                end;
-                if not v15.stayOnActivated then
-                    v10.props.onDismiss();
-                end;
-            end
-        });
-        v13["button " .. v14] = v2.createElement(v6, v17);
-    end;
-    v13.layout = v2.createElement("UIListLayout", {
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        FillDirection = Enum.FillDirection.Vertical, 
-        SortOrder = Enum.SortOrder.LayoutOrder
-    });
-    return v5(function(v18) --[[ Line: 91 ]]
-        -- upvalues: v2 (ref), v10 (copy), v1 (ref), v8 (ref), l_sheetContentXSize_0 (copy), l_sheetContentXPosition_0 (copy), v13 (copy)
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, {
-            Background = v2.createElement("TextButton", {
-                ZIndex = 0, 
-                AutoButtonColor = false, 
-                BackgroundColor3 = v18.Theme.Overlay.Color, 
-                BackgroundTransparency = v18.Theme.Overlay.Transparency, 
-                BorderSizePixel = 0, 
-                Selectable = false, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                Text = "", 
-                [v2.Event.Activated] = function() --[[ Line: 106 ]]
-                    -- upvalues: v10 (ref), v1 (ref), v8 (ref)
-                    v10.active = false;
-                    v10.motor:setGoal(v1.spring(0, v8));
-                end
-            }), 
-            SheetContent = v2.createElement("ScrollingFrame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(l_sheetContentXSize_0.Scale, l_sheetContentXSize_0.Offset, 0, v10.sheetHeight), 
-                Position = UDim2.new(l_sheetContentXPosition_0.Scale, l_sheetContentXPosition_0.Offset, 1, 0), 
-                Selectable = false, 
-                ScrollBarThickness = 0, 
-                CanvasSize = UDim2.new(l_sheetContentXSize_0.Scale, l_sheetContentXSize_0.Offset, 0, #v10.props.buttonModels * 56), 
-                ClipsDescendants = true, 
-                [v2.Ref] = v10.ref
-            }, v13)
-        });
-    end);
-end;
-v7.didMount = function(v19) --[[ Line: 130 ]] --[[ Name: didMount ]]
-    -- upvalues: v1 (copy), v8 (copy)
-    local l_sheetContentXPosition_1 = v19.props.sheetContentXPosition;
-    v19.motor:onStep(function(v21) --[[ Line: 132 ]]
-        -- upvalues: v19 (copy), l_sheetContentXPosition_1 (copy)
-        if v19.ref.current then
-            v19.ref.current.Position = UDim2.new(l_sheetContentXPosition_1.Scale, l_sheetContentXPosition_1.Offset, 1, -(v19.sheetHeight + v19.props.bottomGap) * v21);
-        end;
-    end);
-    v19.motor:setGoal(v1.spring(1, v8));
-    v19.motor:onComplete(function() --[[ Line: 143 ]]
-        -- upvalues: v19 (copy)
-        if not v19.active then
-            v19.props.onDismiss();
-        end;
-    end);
-    v19.motor:start();
-end;
-v7.willUnmount = function(v22) --[[ Line: 151 ]] --[[ Name: willUnmount ]]
-    v22.motor:destroy();
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent
+local Otter = require(ParentParent.Otter)
+local Roact = require(ParentParent.Roact)
+local Cryo = require(ParentParent.Cryo)
+local t = require(ParentParent.t)
+local withStyle = require(ParentParent.UIBlox.Core.Style.withStyle)
+local ModalBottomSheetButton = require(script.Parent.ModalBottomSheetButton)
+local v8 = Roact.PureComponent:extend("ModalBottomSheet")
+local t1 = {
+	frequency = 4,
+	dampingRatio = 1
+}
+
+v8.validateProps = t.strictInterface({
+	buttonModels = t.array(t.table),
+	screenWidth = t.number,
+	onDismiss = t.callback,
+	showImages = t.optional(t.boolean),
+	bottomGap = t.optional(t.number),
+	sheetContentXSize = t.optional(t.UDim),
+	sheetContentXPosition = t.optional(t.UDim)
+})
+v8.defaultProps = {
+	bottomGap = 0,
+	showImages = true,
+	sheetContentXSize = UDim.new(1, 0),
+	sheetContentXPosition = UDim.new(0, 0)
+}
+
+function v8.init(p1) -- line: 49
+	-- upvalues: Otter (copy), Roact (copy)
+	p1.motor = Otter.createSingleMotor(0)
+	p1.ref = Roact.createRef()
+	p1.active = true
+end
+function v8.render(p2) -- line: 55
+	-- upvalues: Cryo (copy), Roact (copy), ModalBottomSheetButton (copy), withStyle (copy), Otter (copy), t1 (copy)
+	local sheetContentXPosition = p2.props.sheetContentXPosition
+	local sheetContentXSize = p2.props.sheetContentXSize
+
+	p2.sheetHeight = #p2.props.buttonModels * 56
+
+	if #p2.props.buttonModels >= 7 then
+		p2.sheetHeight = 420
+	end
+
+	local t2 = {}
+
+	for i, v in ipairs(p2.props.buttonModels) do
+		local v17 = Cryo.Dictionary.join(v, {
+			elementHeight = 56,
+			hasRoundTop = i == 1,
+			hasRoundBottom = i == #p2.props.buttonModels,
+			isFixed = p2.props.screenWidth > 600,
+			showImage = p2.props.showImages,
+			LayoutOrder = i,
+			onActivatedAndDismissed = function(p3) -- line: 72
+				-- upvalues: v (copy), p2 (copy)
+				if v.onActivated then
+					v.onActivated(p3)
+				end
+
+				if not v.stayOnActivated then
+					p2.props.onDismiss()
+				end
+			end
+		})
+
+		t2["button " .. i] = Roact.createElement(ModalBottomSheetButton, v17)
+	end
+
+	t2.layout = Roact.createElement("UIListLayout", {
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		FillDirection = Enum.FillDirection.Vertical,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	return withStyle(function(p4) -- line: 91
+		-- upvalues: Roact (copy), p2 (copy), Otter (copy), t1 (copy), sheetContentXSize (copy), sheetContentXPosition (copy), t2 (copy)
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			Background = Roact.createElement("TextButton", {
+				ZIndex = 0,
+				AutoButtonColor = false,
+				BackgroundColor3 = p4.Theme.Overlay.Color,
+				BackgroundTransparency = p4.Theme.Overlay.Transparency,
+				BorderSizePixel = 0,
+				Selectable = false,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = "",
+				[Roact.Event.Activated] = function() -- line: 106
+					-- upvalues: p2 (copy), Otter (copy), t1 (copy)
+					p2.active = false
+					p2.motor:setGoal(Otter.spring(0, t1))
+				end
+			}),
+			SheetContent = Roact.createElement("ScrollingFrame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(sheetContentXSize.Scale, sheetContentXSize.Offset, 0, p2.sheetHeight),
+				Position = UDim2.new(sheetContentXPosition.Scale, sheetContentXPosition.Offset, 1, 0),
+				Selectable = false,
+				ScrollBarThickness = 0,
+				CanvasSize = UDim2.new(sheetContentXSize.Scale, sheetContentXSize.Offset, 0, #p2.props.buttonModels * 56),
+				ClipsDescendants = true,
+				[Roact.Ref] = p2.ref
+			}, t2)
+		})
+	end)
+end
+function v8.didMount(p5) -- line: 130
+	-- upvalues: Otter (copy), t1 (copy)
+	local sheetContentXPosition = p5.props.sheetContentXPosition
+
+	p5.motor:onStep(function(p6) -- line: 132
+		-- upvalues: p5 (copy), sheetContentXPosition (copy)
+		if p5.ref.current then
+			p5.ref.current.Position = UDim2.new(sheetContentXPosition.Scale, sheetContentXPosition.Offset, 1, -(p5.sheetHeight + p5.props.bottomGap) * p6)
+		end
+	end)
+	p5.motor:setGoal(Otter.spring(1, t1))
+	p5.motor:onComplete(function() -- line: 143
+		-- upvalues: p5 (copy)
+		if not p5.active then
+			p5.props.onDismiss()
+		end
+	end)
+	p5.motor:start()
+end
+function v8.willUnmount(p7) -- line: 151
+	p7.motor:destroy()
+end
+
+return v8

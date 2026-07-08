@@ -1,165 +1,177 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Modules_0 = l_CoreGui_0.RobloxGui.Modules;
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_ShareGame_0 = l_Modules_0.Settings.Pages.ShareGame;
-local v7 = require(l_ShareGame_0.Constants);
-local l_GameInviteEvents_0 = require(l_CorePackages_0.Workspace.Packages.GameInvite).GameInviteEvents;
-local v9 = require(l_ShareGame_0.Components.Header);
-local v10 = require(l_ShareGame_0.Components.ConversationList);
-local v11 = require(l_ShareGame_0.Components.ErrorToaster);
-local v12 = require(l_ShareGame_0.Components.BackButton);
-local l_Text_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Text;
-local v14 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local v15 = require(l_Modules_0.Flags.GetFFlagEnableNewInviteMenu);
-local v16 = require(l_Modules_0.Flags.GetFFlagEnableNewInviteSendEndpoint);
-local v17 = UDim.new(0.8, 320);
-local v18 = UDim.new(0.7, 500);
-local v19 = UDim.new(0.8, 440);
-local v20 = Color3.fromRGB(41, 41, 41);
-local v21 = v4.PureComponent:extend("ModalShareGamePageFrame");
-v21.defaultProps = {
-    isVisible = true
-};
-v21.init = function(v22) --[[ Line: 53 ]] --[[ Name: init ]]
-    -- upvalues: v7 (copy), v14 (copy), l_Text_0 (copy), v4 (copy)
-    v22.state = {
-        promptMessageFitsFrame = true
-    };
-    v22.onCustomTextAreaSizeChange = function(v23) --[[ Line: 58 ]]
-        -- upvalues: v22 (copy), v7 (ref), v14 (ref), l_Text_0 (ref)
-        local l_deviceLayout_0 = v22.props.deviceLayout;
-        local v25 = v7.LayoutSpecific[l_deviceLayout_0];
-        local l_promptMessage_0 = v22.props.promptMessage;
-        local v27 = v14.textSize(v25.PAGE_TITLE_TEXT_SIZE);
-        v22:setState({
-            promptMessageFitsFrame = l_promptMessage_0 and l_Text_0.GetTextWidth(l_promptMessage_0, v14.font(Enum.Font.SourceSans), v27) < v23.AbsoluteSize.X
-        });
-    end;
-    v22.customTextAreaRef = v4.createRef();
-    v22.onClosePage = function() --[[ Line: 71 ]]
-        -- upvalues: v22 (copy)
-        v22.props.closePage();
-        if v22.props.onAfterClosePage then
-            v22.props.onAfterClosePage();
-        end;
-    end;
-end;
-v21.didMount = function(v28) --[[ Line: 79 ]] --[[ Name: didMount ]]
-    -- upvalues: v15 (copy), v16 (copy), v7 (copy), l_GameInviteEvents_0 (copy)
-    if v15() and v28.customTextAreaRef.current then
-        v28.onCustomTextAreaSizeChange(v28.customTextAreaRef.current);
-    end;
-    if v16() and v28.props.promptMessage and v28.props.analytics then
-        v28.props.analytics:sendEvent(v7.Triggers.DeveloperMultiple, l_GameInviteEvents_0.CustomTextShown);
-    end;
-end;
-v21.render = function(v29) --[[ Line: 92 ]] --[[ Name: render ]]
-    -- upvalues: v15 (copy), v19 (copy), v17 (copy), v7 (copy), v18 (copy), v14 (copy), v4 (copy), v20 (copy), l_CoreGui_0 (copy), v11 (copy), v9 (copy), v12 (copy), v10 (copy)
-    local l_analytics_0 = v29.props.analytics;
-    local l_deviceLayout_1 = v29.props.deviceLayout;
-    local l_zIndex_0 = v29.props.zIndex;
-    local l_searchAreaActive_0 = v29.props.searchAreaActive;
-    local l_searchText_0 = v29.props.searchText;
-    local l_isVisible_0 = v29.props.isVisible;
-    local v36 = v15();
-    local v37 = if v36 then v19 else v17;
-    local v38 = v36 and v29.props.deviceInfo and v29.props.deviceInfo.DeviceLayout == v7.DeviceLayout.PHONE_LANDSCAPE;
-    local v39 = Vector2.new(0.5, 0.5);
-    local v40 = UDim2.new(v37.Scale, 0, v18.Scale, 0);
-    local v41 = Vector2.new(v37.Offset, v18.Offset);
-    local v42 = UDim2.new(0.5, 0, 0.425, 0);
-    if v38 then
-        v39 = Vector2.new(0.5, 1);
-        v40 = UDim2.new(v37.Scale, 0, 1, 0);
-        v41 = Vector2.new(v37.Offset, 1e999);
-        v42 = UDim2.new(0.5, 0, 1, 4);
-    end;
-    local v43 = v7.LayoutSpecific[l_deviceLayout_1];
-    local l_promptMessage_1 = v29.props.promptMessage;
-    local v45 = v14.textSize(v43.PAGE_TITLE_TEXT_SIZE);
-    local v46 = v36 and l_promptMessage_1 and v29.state.promptMessageFitsFrame;
-    local v47 = if v46 then v45 + 10 else 10;
-    local v48 = if v36 then 40 + v47 else 60;
-    return v4.createElement("ImageButton", {
-        AnchorPoint = v39, 
-        BackgroundTransparency = 1, 
-        Image = "rbxasset://textures/ui/LuaChat/9-slice/btn-control-sm.png", 
-        ImageColor3 = v20, 
-        ImageTransparency = 0.1, 
-        Modal = l_isVisible_0, 
-        Position = v42, 
-        Size = v40, 
-        ScaleType = Enum.ScaleType.Slice, 
-        SliceCenter = Rect.new(Vector2.new(3, 3), Vector2.new(3, 3))
-    }, {
-        sizeConstraint = v4.createElement("UISizeConstraint", {
-            MaxSize = v41
-        }), 
-        uiPadding2 = v4.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, 15), 
-            PaddingRight = UDim.new(0, 15), 
-            PaddingBottom = UDim.new(0, 15)
-        }), 
-        content = v4.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            ZIndex = l_zIndex_0
-        }, {
-            toasterPortal = v4.createElement(v4.Portal, {
-                target = l_CoreGui_0
-            }, {
-                Toaster = v4.createElement(v11)
-            }), 
-            Layout = v4.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Padding = if v36 then v4.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 10)
-            }) else nil, 
-            Header = v4.createElement(v9, {
-                deviceLayout = l_deviceLayout_1, 
-                size = UDim2.new(1, 0, 0, v36 and 40 or 60), 
-                layoutOrder = 0, 
-                zIndex = l_zIndex_0, 
-                closePage = v29.onClosePage, 
-                searchAreaActive = l_searchAreaActive_0, 
-                toggleSearchIcon = true, 
-                iconType = v12.IconType.Cross
-            }), 
-            CustomText = v36 and v4.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, v47), 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                TextSize = v45, 
-                TextColor3 = v7.Color.WHITE, 
-                Font = v14.font(Enum.Font.SourceSans), 
-                BackgroundTransparency = 1, 
-                Text = if v46 then l_promptMessage_1 else "", 
-                [v4.Change.AbsoluteSize] = v29.onCustomTextAreaSizeChange, 
-                [v4.Ref] = v29.customTextAreaRef
-            }), 
-            ConversationList = v4.createElement(v10, {
-                analytics = l_analytics_0, 
-                size = UDim2.new(1, 0, 1, -v48), 
-                topPadding = 10, 
-                layoutOrder = 1, 
-                zIndex = l_zIndex_0, 
-                searchText = l_searchText_0, 
-                entryHeight = 62, 
-                entryPadding = 18, 
-                isVisible = l_isVisible_0, 
-                trigger = v7.Triggers.DeveloperMultiple, 
-                inviteMessageId = v29.props.inviteMessageId, 
-                launchData = v29.props.launchData
-            })
-        })
-    });
-end;
-return (v5.connect(function(v49) --[[ Line: 211 ]]
-    return {
-        deviceInfo = v49.DeviceInfo
-    };
-end)(v21));
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Modules = CoreGui.RobloxGui.Modules
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ShareGame = Modules.Settings.Pages.ShareGame
+local Constants = require(ShareGame.Constants)
+local GameInviteEvents = require(CorePackages.Workspace.Packages.GameInvite).GameInviteEvents
+local Header = require(ShareGame.Components.Header)
+local ConversationList = require(ShareGame.Components.ConversationList)
+local ErrorToaster = require(ShareGame.Components.ErrorToaster)
+local BackButton = require(ShareGame.Components.BackButton)
+local Text = require(CorePackages.Workspace.Packages.AppCommonLib).Text
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local GetFFlagEnableNewInviteMenu = require(Modules.Flags.GetFFlagEnableNewInviteMenu)
+local GetFFlagEnableNewInviteSendEndpoint = require(Modules.Flags.GetFFlagEnableNewInviteSendEndpoint)
+local uDim = UDim.new(0.8, 320)
+local uDim2 = UDim.new(0.7, 500)
+local uDim3 = UDim.new(0.8, 440)
+local color3 = Color3.fromRGB(41, 41, 41)
+local v22 = Roact.PureComponent:extend("ModalShareGamePageFrame")
+
+v22.defaultProps = {
+	isVisible = true
+}
+
+function v22.init(p1) -- line: 53
+	-- upvalues: Constants (copy), Theme (copy), Text (copy), Roact (copy)
+	p1.state = {
+		promptMessageFitsFrame = true
+	}
+
+	function p1.onCustomTextAreaSizeChange(p2) -- line: 58
+		-- upvalues: p1 (copy), Constants (copy), Theme (copy), Text (copy)
+		local deviceLayout = p1.props.deviceLayout
+		local v48 = Constants.LayoutSpecific[deviceLayout]
+		local promptMessage = p1.props.promptMessage
+		local v50 = Theme.textSize(v48.PAGE_TITLE_TEXT_SIZE)
+
+		p1:setState({
+			promptMessageFitsFrame = promptMessage and Text.GetTextWidth(promptMessage, Theme.font(Enum.Font.SourceSans), v50) < p2.AbsoluteSize.X
+		})
+	end
+
+	p1.customTextAreaRef = Roact.createRef()
+
+	function p1.onClosePage() -- line: 71
+		-- upvalues: p1 (copy)
+		p1.props.closePage()
+
+		if p1.props.onAfterClosePage then
+			p1.props.onAfterClosePage()
+		end
+	end
+end
+function v22.didMount(p3) -- line: 79
+	-- upvalues: GetFFlagEnableNewInviteMenu (copy), GetFFlagEnableNewInviteSendEndpoint (copy), Constants (copy), GameInviteEvents (copy)
+	if GetFFlagEnableNewInviteMenu() and p3.customTextAreaRef.current then
+		p3.onCustomTextAreaSizeChange(p3.customTextAreaRef.current)
+	end
+
+	if GetFFlagEnableNewInviteSendEndpoint() and p3.props.promptMessage and p3.props.analytics then
+		p3.props.analytics:sendEvent(Constants.Triggers.DeveloperMultiple, GameInviteEvents.CustomTextShown)
+	end
+end
+function v22.render(p4) -- line: 92
+	-- upvalues: GetFFlagEnableNewInviteMenu (copy), uDim3 (copy), uDim (copy), Constants (copy), uDim2 (copy), Theme (copy), Roact (copy), color3 (copy), CoreGui (copy), ErrorToaster (copy), Header (copy), BackButton (copy), ConversationList (copy)
+	local analytics = p4.props.analytics
+	local deviceLayout = p4.props.deviceLayout
+	local zIndex = p4.props.zIndex
+	local searchAreaActive = p4.props.searchAreaActive
+	local searchText = p4.props.searchText
+	local isVisible = p4.props.isVisible
+	local v32 = GetFFlagEnableNewInviteMenu()
+	local v33 = if not v32 then uDim else uDim3
+	local v34 = v32 and (p4.props.deviceInfo and p4.props.deviceInfo.DeviceLayout == Constants.DeviceLayout.PHONE_LANDSCAPE)
+	local vector2 = Vector2.new(0.5, 0.5)
+	local uDim2_2 = UDim2.new(v33.Scale, 0, uDim2.Scale, 0)
+	local vector2_2 = Vector2.new(v33.Offset, uDim2.Offset)
+	local uDim2_3 = UDim2.new(0.5, 0, 0.425, 0)
+
+	if v34 then
+		vector2 = Vector2.new(0.5, 1)
+		uDim2_2 = UDim2.new(v33.Scale, 0, 1, 0)
+		vector2_2 = Vector2.new(v33.Offset, 1e999)
+		uDim2_3 = UDim2.new(0.5, 0, 1, 4)
+	end
+
+	local v39 = Constants.LayoutSpecific[deviceLayout]
+	local promptMessage = p4.props.promptMessage
+	local v41 = Theme.textSize(v39.PAGE_TITLE_TEXT_SIZE)
+	local v42 = v32 and (promptMessage and p4.state.promptMessageFitsFrame)
+	local v43 = not v42 and 10 or v41 + 10
+	local v44 = not v32 and 60 or 40 + v43
+
+	return Roact.createElement("ImageButton", {
+		BackgroundTransparency = 1,
+		Image = "rbxasset://textures/ui/LuaChat/9-slice/btn-control-sm.png",
+		ImageTransparency = 0.1,
+		AnchorPoint = vector2,
+		ImageColor3 = color3,
+		Modal = isVisible,
+		Position = uDim2_3,
+		Size = uDim2_2,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(Vector2.new(3, 3), Vector2.new(3, 3))
+	}, {
+		sizeConstraint = Roact.createElement("UISizeConstraint", {
+			MaxSize = vector2_2
+		}),
+		uiPadding2 = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 15),
+			PaddingRight = UDim.new(0, 15),
+			PaddingBottom = UDim.new(0, 15)
+		}),
+		content = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = UDim2.new(0, 0, 0, 0),
+			ZIndex = zIndex
+		}, {
+			toasterPortal = Roact.createElement(Roact.Portal, {
+				target = CoreGui
+			}, {
+				Toaster = Roact.createElement(ErrorToaster)
+			}),
+			Layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Padding = if not v32 then nil else Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 10)
+			}),
+			Header = Roact.createElement(Header, {
+				layoutOrder = 0,
+				toggleSearchIcon = true,
+				deviceLayout = deviceLayout,
+				size = UDim2.new(1, 0, 0, not v32 and 60 or 40),
+				zIndex = zIndex,
+				closePage = p4.onClosePage,
+				searchAreaActive = searchAreaActive,
+				iconType = BackButton.IconType.Cross
+			}),
+			CustomText = v32 and Roact.createElement("TextLabel", {
+				Size = UDim2.new(1, 0, 0, v43),
+				TextYAlignment = Enum.TextYAlignment.Top,
+				TextSize = v41,
+				TextColor3 = Constants.Color.WHITE,
+				Font = Theme.font(Enum.Font.SourceSans),
+				BackgroundTransparency = 1,
+				Text = not v42 and "" or promptMessage,
+				[Roact.Change.AbsoluteSize] = p4.onCustomTextAreaSizeChange,
+				[Roact.Ref] = p4.customTextAreaRef
+			}),
+			ConversationList = Roact.createElement(ConversationList, {
+				topPadding = 10,
+				layoutOrder = 1,
+				entryHeight = 62,
+				entryPadding = 18,
+				analytics = analytics,
+				size = UDim2.new(1, 0, 1, -v44),
+				zIndex = zIndex,
+				searchText = searchText,
+				isVisible = isVisible,
+				trigger = Constants.Triggers.DeveloperMultiple,
+				inviteMessageId = p4.props.inviteMessageId,
+				launchData = p4.props.launchData
+			})
+		})
+	})
+end
+
+return (RoactRodux.connect(function(p5) -- line: 211
+	return {
+		deviceInfo = p5.DeviceInfo
+	}
+end)(v22))

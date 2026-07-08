@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RemoveHardCodedFriendLimitPrompt", false);
+return game:DefineFastFlag("RemoveHardCodedFriendLimitPrompt", false)

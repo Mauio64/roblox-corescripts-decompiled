@@ -1,3 +1,3 @@
 return {
-    WebPresenceMap = require(script.WebPresenceMap)
-};
+	WebPresenceMap = require(script.WebPresenceMap)
+}

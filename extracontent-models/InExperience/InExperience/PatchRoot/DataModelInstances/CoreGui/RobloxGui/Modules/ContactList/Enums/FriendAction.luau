@@ -1,5 +1,5 @@
 return {
-    NoAction = "", 
-    Block = "Block", 
-    Unfriend = "Unfriend"
-};
+	NoAction = "",
+	Block = "Block",
+	Unfriend = "Unfriend"
+}

@@ -1,79 +1,110 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.LuaSocialLibrariesDeps).SocialLibraries.config({});
-local v4 = require(script.Parent.StatusCodesToRetry);
-local function _(v5) --[[ Line: 10 ]] --[[ Name: shouldRetryRequest ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    if v5.error then
-        local v6 = v3.Dictionary.getDeepValue(v5, "error.graphQLErrors");
-        if v6 and v6[1] then
-            return v4[v3.Dictionary.getDeepValue(v6[1], "extensions.status")] or false;
-        end;
-    end;
-    return false;
-end;
-return function(v8, v9) --[[ Line: 22 ]] --[[ Name: useApolloAutoRetry ]]
-    -- upvalues: v1 (copy), v3 (copy), v4 (copy), v2 (copy)
-    local v10, v11 = v1.useState(0);
-    local v12, v13 = v1.useState(false);
-    v1.useEffect(function() --[[ Line: 26 ]]
-        -- upvalues: v8 (copy), v3 (ref), v4 (ref), v10 (copy), v9 (copy), v12 (copy), v13 (copy), v11 (copy)
-        local v14 = false;
-        local l_v8_0 = v8;
-        local v16;
-        if l_v8_0.error then
-            local v17 = v3.Dictionary.getDeepValue(l_v8_0, "error.graphQLErrors");
-            if v17 and v17[1] then
-                v16 = v4[v3.Dictionary.getDeepValue(v17[1], "extensions.status")] or false;
-                v14 = true;
-            end;
-        end;
-        if not v14 then
-            v16 = false;
-        end;
-        v14 = false;
-        if v16 and v10 < v9.retryCount and not v12 then
-            v13(true);
-            task.delay(2 ^ v10 + math.random(), function() --[[ Line: 30 ]]
-                -- upvalues: v8 (ref), v13 (ref), v11 (ref), v10 (ref)
-                v8:refetch();
-                v13(false);
-                v11(v10 + 1);
-            end);
-        end;
-    end, {
-        v8, 
-        v12, 
-        v10
-    });
-    return (v1.useMemo(function() --[[ Line: 38 ]]
-        -- upvalues: v2 (ref), v8 (copy), v3 (ref), v4 (ref), v10 (copy), v9 (copy)
-        local v18 = false;
-        local l_join_0 = v2.Dictionary.join;
-        local l_v8_1 = v8;
-        local v21 = {};
-        local l_v8_2 = v8;
-        local v23;
-        if l_v8_2.error then
-            local v24 = v3.Dictionary.getDeepValue(l_v8_2, "error.graphQLErrors");
-            if v24 and v24[1] then
-                v23 = v4[v3.Dictionary.getDeepValue(v24[1], "extensions.status")] or false;
-                v18 = true;
-            end;
-        end;
-        if not v18 then
-            v23 = false;
-        end;
-        v18 = false;
-        if v23 then
-            v23 = v10 < v9.retryCount;
-        end;
-        v21.isRetrying = v23;
-        v21.retryCount = v10;
-        return l_join_0(l_v8_1, v21);
-    end, {
-        v8, 
-        v10
-    }));
-end;
+local Parent = script:FindFirstAncestor("SocialCommon").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local v4 = require(Parent.LuaSocialLibrariesDeps).SocialLibraries.config({})
+local StatusCodesToRetry = require(script.Parent.StatusCodesToRetry)
+
+local function shouldRetryRequest(p1) -- line: 10
+	-- upvalues: v4 (copy), StatusCodesToRetry (copy)
+	if p1.error then
+		local v9 = v4.Dictionary.getDeepValue(p1, "error.graphQLErrors")
+
+		if v9 and v9[1] then
+			return StatusCodesToRetry[v4.Dictionary.getDeepValue(v9[1], "extensions.status")] or false
+		end
+	end
+
+	return false
+end
+local function useApolloAutoRetry(p2, t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), v4 (copy), StatusCodesToRetry (copy), Cryo (copy)
+	local v12, v13 = React.useState(0)
+	local v14, v15 = React.useState(false)
+
+	React.useEffect(function() -- line: 26
+		-- upvalues: p2 (copy), v4 (copy), StatusCodesToRetry (copy), v12 (copy), t1 (copy), v14 (copy), v15 (copy), v13 (copy)
+		local v16 = p2
+		local g17 = nil
+		local v18 = nil
+		local v19 = nil
+
+		repeat
+			if g17 or v16.error then
+				if not g17 then
+					v18 = v4.Dictionary.getDeepValue(v16, "error.graphQLErrors")
+				end
+
+				if g17 or v18 and v18[1] then
+					if not g17 then
+						v19 = StatusCodesToRetry[v4.Dictionary.getDeepValue(v18[1], "extensions.status")] or false
+					end
+
+					g17 = false
+
+					if v19 and v12 < t1.retryCount and not v14 then
+						v15(true)
+						task.delay(2 ^ v12 + math.random(), function() -- line: 30
+							-- upvalues: p2 (copy), v15 (copy), v13 (copy), v12 (copy)
+							p2:refetch()
+							v15(false)
+							v13(v12 + 1)
+						end)
+					end
+
+					return
+				end
+			end
+
+			v19 = false
+			g17 = true
+		until not g17
+	end, {
+		p2,
+		v14,
+		v12
+	})
+
+	return (React.useMemo(function() -- line: 38
+		-- upvalues: Cryo (copy), p2 (copy), v4 (copy), StatusCodesToRetry (copy), v12 (copy), t1 (copy)
+		local join = Cryo.Dictionary.join
+		local v21 = p2
+		local t2 = {}
+		local v23 = p2
+		local g24 = nil
+		local v25 = nil
+		local v26 = nil
+
+		repeat
+			if g24 or v23.error then
+				if not g24 then
+					v25 = v4.Dictionary.getDeepValue(v23, "error.graphQLErrors")
+				end
+
+				if g24 or v25 and v25[1] then
+					if not g24 then
+						v26 = StatusCodesToRetry[v4.Dictionary.getDeepValue(v25[1], "extensions.status")] or false
+					end
+
+					g24 = false
+
+					if v26 then
+						v26 = v12 < t1.retryCount
+					end
+
+					t2.isRetrying = v26
+					t2.retryCount = v12
+
+					return join(v21, t2)
+				end
+			end
+
+			v26 = false
+			g24 = true
+		until not g24
+	end, {
+		p2,
+		v12
+	}))
+end
+
+return useApolloAutoRetry

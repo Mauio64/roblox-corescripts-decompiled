@@ -1,4 +1,4 @@
 return {
-    Ring = "Ring", 
-    Circle = "Circle"
-};
+	Ring = "Ring",
+	Circle = "Circle"
+}

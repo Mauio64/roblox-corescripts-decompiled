@@ -1,13 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Contexts.ChatPlacementContext);
-local l_useChatPlacementContext_0 = v1.useChatPlacementContext;
-local l_isPlacementInExperience_0 = v1.isPlacementInExperience;
-return function(_) --[[ Line: 12 ]]
-    -- upvalues: l_useChatPlacementContext_0 (copy), l_isPlacementInExperience_0 (copy)
-    local l_chatPlacement_0 = l_useChatPlacementContext_0().chatPlacement;
-    if not l_isPlacementInExperience_0(l_chatPlacement_0) then
-        return nil;
-    else
-        return 0;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local useChatPlacementContext = ChatPlacementContext.useChatPlacementContext
+local isPlacementInExperience = ChatPlacementContext.isPlacementInExperience
+
+return function(_: {[any]: any}) -- line: 12
+	-- upvalues: useChatPlacementContext (copy), isPlacementInExperience (copy)
+	local chatPlacement = useChatPlacementContext().chatPlacement
+
+	if not isPlacementInExperience(chatPlacement) then
+		return nil
+	end
+
+	return 0
+end

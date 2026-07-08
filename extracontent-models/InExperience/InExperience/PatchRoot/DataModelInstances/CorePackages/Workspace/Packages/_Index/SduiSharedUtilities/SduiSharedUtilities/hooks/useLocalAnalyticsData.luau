@@ -1,16 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedUtilities").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3, v4) --[[ Line: 5 ]] --[[ Name: useLocalAnalyticsData ]]
-    -- upvalues: v1 (copy)
-    return v1.useMemo(function() --[[ Line: 6 ]]
-        -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-        local v5 = if v4 then v4 else {};
-        v5.configKey = v2;
-        v5.appPage = v3;
-        return v5;
-    end, {
-        v2, 
-        v3, 
-        v4
-    });
-end;
+local Parent = script:FindFirstAncestor("SduiSharedUtilities").Parent
+local React = require(Parent.React)
+
+local function useLocalAnalyticsData(s1: string, s2: string, t1: {[any]: any}?) -- line: 5
+	-- upvalues: React (copy)
+	return React.useMemo(function() -- line: 6
+		-- upvalues: t1 (copy), s1 (copy), s2 (copy)
+		local v7 = if not t1 then {} else t1
+
+		v7.configKey = s1
+		v7.appPage = s2
+
+		return v7
+	end, {
+		s1,
+		s2,
+		t1
+	})
+end
+
+return useLocalAnalyticsData

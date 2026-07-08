@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAppStoreAgeSignalsOnHomePage", false);
+return game:DefineFastFlag("EnableAppStoreAgeSignalsOnHomePage", false)

@@ -1,10 +1,11 @@
-local l_networkRequests_0 = script.Parent.networkRequests;
-local v1 = require(l_networkRequests_0.createGetUserProfileSettings);
-local v2 = require(l_networkRequests_0.createSetUserProfileSettings);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return {
-        GetUserProfileSettings = v1(v3), 
-        SetUserProfileSettings = v2(v3)
-    };
-end;
+local networkRequests = script.Parent.networkRequests
+local createGetUserProfileSettings = require(networkRequests.createGetUserProfileSettings)
+local createSetUserProfileSettings = require(networkRequests.createSetUserProfileSettings)
+
+return function(t1: {[any]: any}) -- line: 6
+	-- upvalues: createGetUserProfileSettings (copy), createSetUserProfileSettings (copy)
+	return {
+		GetUserProfileSettings = createGetUserProfileSettings(t1),
+		SetUserProfileSettings = createSetUserProfileSettings(t1)
+	}
+end

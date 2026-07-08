@@ -1,22 +1,7 @@
 return {
-    pointInAxisAlignedBounds = function(v0, v1, v2) --[[ Line: 7 ]] --[[ Name: pointInAxisAlignedBounds ]]
-        local v3 = v0 - v1;
-        local v4 = false;
-        if v3.X >= -v2.X / 2 then
-            v4 = false;
-            if v3.X <= v2.X / 2 then
-                v4 = false;
-                if v3.Y >= -v2.Y / 2 then
-                    v4 = false;
-                    if v3.Y <= v2.Y / 2 then
-                        v4 = false;
-                        if v3.Z >= -v2.Z / 2 then
-                            v4 = v3.Z <= v2.Z / 2;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-        return v4;
-    end
-};
+	pointInAxisAlignedBounds = function(vector3: Vector3, vector3_2: Vector3, vector3_3: Vector3) -- line: 7
+		local v4 = vector3 - vector3_2
+
+		return v4.X >= -vector3_3.X / 2 and (v4.X <= vector3_3.X / 2 and (v4.Y >= -vector3_3.Y / 2 and (v4.Y <= vector3_3.Y / 2 and (v4.Z >= -vector3_3.Z / 2 and v4.Z <= vector3_3.Z / 2))))
+	end
+}

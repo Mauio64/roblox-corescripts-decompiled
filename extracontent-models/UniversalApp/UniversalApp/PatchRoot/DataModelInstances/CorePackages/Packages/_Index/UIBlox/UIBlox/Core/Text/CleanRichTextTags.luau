@@ -1,19 +1,24 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: cleanRichTextTags ]]
-    local v1 = "";
-    local v2 = 0;
-    for v3 = 1, #v0 do
-        local v4 = string.sub(v0, v3, v3);
-        if v4 == "<" then
-            v2 = v2 + 1;
-        elseif v4 == ">" and v2 > 0 then
-            v2 = v2 - 1;
-        elseif v2 == 0 then
-            v1 = v1 .. v4;
-        end;
-    end;
-    if v2 ~= 0 then
-        return v0;
-    else
-        return v1;
-    end;
-end;
+local function cleanRichTextTags(s1: string) -- line: 4
+	local s2 = ""
+	local n1 = 0
+
+	for i = 1, #s1 do
+		local v6 = string.sub(s1, i, i)
+
+		if v6 == "<" then
+			n1 += 1
+		elseif v6 == ">" and n1 > 0 then
+			n1 -= 1
+		elseif n1 == 0 then
+			s2 ..= v6
+		end
+	end
+
+	if n1 ~= 0 then
+		return s1
+	end
+
+	return s2
+end
+
+return cleanRichTextTags

@@ -31,9 +31,9 @@ local getFFlagAppChatEnableManualTranslation = require(AppChat.Flags.getFFlagApp
 local t1 = {
 	message = nil,
 	userOwnsMessage = false,
-	inputBoxRef = React.createRef(),
 	unitTestDeviceType = nil,
-	unitTestScreenSize = nil
+	unitTestScreenSize = nil,
+	inputBoxRef = React.createRef()
 }
 
 if t1.unitTestDeviceType ~= nil then
@@ -51,7 +51,7 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 	local v30 = Cryo.Dictionary.union(t1, t2)
 	local v31 = if not FFlagAppChatSignalsReplyStore then nil else GetReplyingToStore(false)
 	local v32 = useReplyingToMessageDispatch()
-	local GlobalColor = useStyle().Tokens.Global.Color
+	local Tokens = useStyle().Tokens
 	local v34 = React.useRef(Signal.new())
 	local v35 = v30.unitTestScreenSize or useLayerCollector().absoluteSize
 	local v36 = useNavigation()
@@ -159,8 +159,8 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 		v40(EventNames.ChatMessageMenuCopyBtnActivated)
 		v46()
 		default:shareText({
-			text = v30.message.content,
-			context = "AppChat-ChatConversation-MessageContextMenu"
+			context = "AppChat-ChatConversation-MessageContextMenu",
+			text = v30.message.content
 		})
 	end, {
 		v40,
@@ -193,7 +193,7 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 	local v54 = React.useCallback(function() -- line: 248
 	end)
 	local v55 = React.useMemo(function() -- line: 253
-		-- upvalues: Images (copy), v39 (copy), v48 (copy), v49 (copy), v30 (copy), v50 (copy), GlobalColor (copy), v51 (copy), getFFlagAppChatEnableManualTranslation (copy), u52 (ref), v54 (copy)
+		-- upvalues: Images (copy), v39 (copy), v48 (copy), v49 (copy), v30 (copy), v50 (copy), Tokens (copy), v51 (copy), getFFlagAppChatEnableManualTranslation (copy), u52 (ref), v54 (copy)
 		local t3 = {
 			{
 				icon = Images["icons/placeholder/placeholderOff"],
@@ -215,9 +215,9 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 			})
 			table.insert(t3, {
 				icon = Images["icons/actions/edit/delete"],
-				iconColorOverride = GlobalColor.Red.Color3,
+				iconColorOverride = Tokens.Color.System.Alert.Color3,
 				text = v39.deleteText,
-				textColorOverride = GlobalColor.Red.Color3,
+				textColorOverride = Tokens.Color.System.Alert.Color3,
 				onActivated = v51
 			})
 
@@ -226,17 +226,17 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 
 		if getFFlagAppChatEnableManualTranslation() then
 			table.insert(t3, {
-				icon = Images["icons/placeholder/placeholderOff"],
 				text = "Translate",
+				icon = Images["icons/placeholder/placeholderOff"],
 				onActivated = u52
 			})
 		end
 
 		table.insert(t3, {
 			icon = Images["icons/placeholder/placeholderOff"],
-			iconColorOverride = GlobalColor.Red.Color3,
+			iconColorOverride = Tokens.Color.System.Alert.Color3,
 			text = v39.reportText,
-			textColorOverride = GlobalColor.Red.Color3,
+			textColorOverride = Tokens.Color.System.Alert.Color3,
 			onActivated = v54
 		})
 
@@ -273,6 +273,9 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 	end
 
 	local v61 = React.createElement(ContextualMenu, {
+		isElementBackgroundVisible = true,
+		isElementDividerVisible = true,
+		open = true,
 		screenSize = v35,
 		menuDirection = MenuDirection.Up,
 		openPositionY = uDim,
@@ -281,9 +284,6 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 		contextMenuWidthOverride = uDim2,
 		borderCornerRadius = n1,
 		buttonProps = v55,
-		isElementBackgroundVisible = true,
-		isElementDividerVisible = true,
-		open = true,
 		onDismiss = v47
 	})
 	local v62 = React.createElement("ImageButton", {
@@ -292,11 +292,11 @@ function MessageContextMenu(t2: {[any]: any}) -- line: 86
 		[React.Event.Activated] = v47
 	}, {
 		PeekView = React.createElement(PeekView, {
-			briefViewContentHeight = UDim.new(0, v56),
-			fullViewContentHeight = UDim.new(1, -v56),
 			mountAsFullView = false,
 			mountAnimation = true,
 			showDraggerInClosedState = false,
+			briefViewContentHeight = UDim.new(0, v56),
+			fullViewContentHeight = UDim.new(1, -v56),
 			closeSignal = v34.current,
 			viewStateChanged = v45
 		}, { v61 })

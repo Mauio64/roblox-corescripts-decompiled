@@ -1,68 +1,77 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v5 = require(l_Parent_0.AvatarExperienceUIKit);
-local l_ItemCardThumbnail_0 = v5.ItemCardComponents.ItemCardThumbnail;
-local l_ItemCardHeader_0 = v5.ItemCardComponents.ItemCardHeader;
-local l_ItemCard_0 = v5.ItemCardComponents.ItemCard;
-local v9 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_getItemWidth_0 = require(l_script_FirstAncestor_0.Utils.itemDetailsUtils).getItemWidth;
-return function(v12) --[[ Line: 44 ]] --[[ Name: BundleAssetsList ]]
-    -- upvalues: l_useTokens_0 (copy), v9 (copy), v2 (copy), l_ItemCard_0 (copy), l_getItemWidth_0 (copy), l_ItemCardHeader_0 (copy), l_ItemCardThumbnail_0 (copy), v3 (copy)
-    local v13 = l_useTokens_0();
-    local l_itemData_0 = v12.itemData;
-    local v15 = v12.view == v9.WideLandscape;
-    local v16 = v12.view == v9.Compact;
-    local v17, v18 = v2.useBinding(Vector2.new(0, 0));
-    local v19 = {};
-    local v20 = (not not v15 or v16) and 4 or 6;
-    if l_itemData_0.assetsInBundle then
-        for v21, v22 in l_itemData_0.assetsInBundle do
-            v19["AssetItemCard" .. v21] = v2.createElement(l_ItemCard_0, {
-                Size = v17:map(function(v23) --[[ Line: 57 ]]
-                    -- upvalues: l_getItemWidth_0 (ref), v20 (copy), v13 (copy)
-                    local v24 = l_getItemWidth_0(v23.X, v20, v13.Gap.Medium);
-                    return UDim2.new(0, v24, 1, 0);
-                end), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                headerSlot = v2.createElement(l_ItemCardHeader_0, {
-                    LayoutOrder = 1
-                }, v2.createElement(l_ItemCardThumbnail_0, {
-                    url = "rbxthumb://type=Asset&id=" .. v22.id .. "&w=420&h=420"
-                })), 
-                footerSlot = if v22.name then v2.createElement(v3.Text, {
-                    tag = "auto-y text-body-small content-emphasis text-truncate-split text-align-x-left size-full-0 text-wrap", 
-                    LayoutOrder = 2, 
-                    Text = v22.name
-                }) else nil
-            });
-        end;
-    end;
-    local v26 = v2.useCallback(function(v25) --[[ Line: 81 ]]
-        -- upvalues: v18 (copy)
-        v18(v25.AbsoluteSize);
-    end, {});
-    return v2.createElement(v3.View, {
-        tag = "auto-y size-full-0 col align-x-left align-y-top gap-small", 
-        LayoutOrder = v12.LayoutOrder or 5, 
-        onAbsoluteSizeChanged = v26
-    }, {
-        IncludedPartsLabel = v2.createElement(v3.View, {
-            tag = "auto-xy padding-top-xxlarge", 
-            LayoutOrder = 1
-        }, {
-            Label = v2.createElement(v3.Text, {
-                tag = "text-title-medium text-align-x-left content-emphasis", 
-                Text = v12.headerLabel, 
-                LayoutOrder = 1
-            })
-        }), 
-        BundleAssets = v2.createElement(v3.View, {
-            tag = "auto-y size-full-0 padding-y-small row align-x-left align-y-top gap-medium wrap", 
-            LayoutOrder = 2
-        }, v19)
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local AvatarExperienceUIKit = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceUIKit)
+local ItemCardThumbnail = AvatarExperienceUIKit.ItemCardComponents.ItemCardThumbnail
+local ItemCardHeader = AvatarExperienceUIKit.ItemCardComponents.ItemCardHeader
+local ItemCard = AvatarExperienceUIKit.ItemCardComponents.ItemCard
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local getItemWidth = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils).getItemWidth
+
+local function BundleAssetsList(t1: {[any]: any}) -- line: 44
+	-- upvalues: useTokens (copy), ViewType (copy), React (copy), ItemCard (copy), getItemWidth (copy), ItemCardHeader (copy), ItemCardThumbnail (copy), Foundation (copy)
+	local v14 = useTokens()
+	local itemData = t1.itemData
+	local v16 = t1.view == ViewType.WideLandscape
+	local v17 = t1.view == ViewType.Compact
+	local v18, v19 = React.useBinding(Vector2.new(0, 0))
+	local t2 = {}
+	local v21 = not v16 and not v17 and 6 or 4
+
+	if itemData.assetsInBundle then
+		for v22, v23 in itemData.assetsInBundle do
+			t2["AssetItemCard" .. v22] = React.createElement(ItemCard, {
+				Size = v18:map(function(vector2: Vector2) -- line: 57
+					-- upvalues: getItemWidth (copy), v21 (copy), v14 (copy)
+					local v26 = getItemWidth(vector2.X, v21, v14.Gap.Medium)
+
+					return UDim2.new(0, v26, 1, 0)
+				end),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				headerSlot = React.createElement(ItemCardHeader, {
+					LayoutOrder = 1
+				}, React.createElement(ItemCardThumbnail, {
+					url = "rbxthumb://type=Asset&id=" .. v23.id .. "&w=420&h=420"
+				})),
+				footerSlot = if not v23.name then nil else React.createElement(Foundation.Text, {
+					tag = "auto-y text-body-small content-emphasis text-truncate-split text-align-x-left size-full-0 text-wrap",
+					LayoutOrder = 2,
+					Text = v23.name
+				})
+			})
+		end
+	end
+
+	local v24 = React.useCallback(function(p1) -- line: 81
+		-- upvalues: v19 (copy)
+		v19(p1.AbsoluteSize)
+	end, {})
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-y size-full-0 col align-x-left align-y-top gap-small",
+		LayoutOrder = t1.LayoutOrder or 5,
+		onAbsoluteSizeChanged = v24
+	}, {
+		IncludedPartsLabel = React.createElement(Foundation.View, {
+			tag = "auto-xy padding-top-xxlarge",
+			LayoutOrder = 1
+		}, {
+			Label = React.createElement(Foundation.Text, {
+				tag = "text-title-medium text-align-x-left content-emphasis",
+				LayoutOrder = 1,
+				Text = t1.headerLabel
+			})
+		}),
+		BundleAssets = React.createElement(Foundation.View, {
+			tag = "auto-y size-full-0 padding-y-small row align-x-left align-y-top gap-medium wrap",
+			LayoutOrder = 2
+		}, t2)
+	})
+end
+
+return BundleAssetsList

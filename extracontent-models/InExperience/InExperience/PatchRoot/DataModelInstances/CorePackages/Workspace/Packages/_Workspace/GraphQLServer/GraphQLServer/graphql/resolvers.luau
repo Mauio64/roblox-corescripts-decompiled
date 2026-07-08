@@ -1,1 +1,1 @@
-return require(script.mergedResolvers).default;
+return require(script.mergedResolvers).default

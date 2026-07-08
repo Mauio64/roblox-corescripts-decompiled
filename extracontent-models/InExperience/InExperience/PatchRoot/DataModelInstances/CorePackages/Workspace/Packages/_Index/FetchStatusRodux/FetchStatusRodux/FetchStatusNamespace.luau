@@ -1,6 +1,6 @@
 return {
-    GameSorts = "GameSorts", 
-    GameSortToken = "GameSortToken", 
-    OmniRecommendations = "OmniRecommendations", 
-    SearchLandingPage = "SearchLandingPage"
-};
+	GameSorts = "GameSorts",
+	GameSortToken = "GameSortToken",
+	OmniRecommendations = "OmniRecommendations",
+	SearchLandingPage = "SearchLandingPage"
+}

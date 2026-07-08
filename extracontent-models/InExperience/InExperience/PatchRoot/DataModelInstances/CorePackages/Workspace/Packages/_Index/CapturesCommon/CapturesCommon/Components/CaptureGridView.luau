@@ -1,145 +1,156 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Dash);
-local v3 = require(l_Parent_1.Foundation);
-local v4 = require(l_Parent_1.React);
-local l_GridView_0 = require(l_Parent_1.UIBlox).App.Grid.GridView;
-local l_ScrollBarVisibility_0 = v3.Enums.ScrollBarVisibility;
-local l_ScrollView_0 = v3.ScrollView;
-local l_View_0 = v3.View;
-local v9 = require(l_Parent_0.Components.MenuButton);
-local _ = require(l_Parent_0.Types);
-local v11 = require(l_Parent_0.Hooks.useScreenSize);
-local function _(v12) --[[ Line: 41 ]] --[[ Name: getItemsPerRow ]]
-    return (math.clamp(math.floor(v12 / 120), 1, 4));
-end;
-local function v19(v14, v15) --[[ Line: 45 ]] --[[ Name: getGalleryItemSize ]]
-    local v16 = math.clamp(math.floor(v15 / 120), 1, 4);
-    v15 = v15 - 4 * (v16 - 1);
-    local v17 = math.min(v15 / v16, v15);
-    local v18 = v17 * v14;
-    return Vector2.new(math.floor(v17), (math.floor(v18)));
-end;
-local function _(v20, v21, v22) --[[ Line: 55 ]] --[[ Name: getItemsPerPage ]]
-    if v20 <= 0 then
-        return 0;
-    else
-        local v23 = math.floor(v20 / v22.Y);
-        if v20 < v22.Y * v23 + (v23 - 1) * 4 then
-            v23 = v23 - 1;
-        end;
-        return (math.max(v23 * math.clamp(math.floor(v21 / 120), 1, 4), 8));
-    end;
-end;
-return function(v25) --[[ Line: 70 ]]
-    -- upvalues: v4 (copy), v11 (copy), v19 (copy), v2 (copy), l_View_0 (copy), l_ScrollView_0 (copy), l_ScrollBarVisibility_0 (copy), l_GridView_0 (copy), v9 (copy)
-    local v26, v27 = v4.useState(Vector2.new(0, 0));
-    local v28, v29 = v4.useState(0);
-    local v30 = v11();
-    local v32 = v4.useCallback(function(v31) --[[ Line: 75 ]]
-        -- upvalues: v27 (copy)
-        v27(v31.AbsoluteSize);
-    end, {});
-    local v33 = false;
-    if v26.X > 0 then
-        v33 = v26.Y > 0;
-    end;
-    local v34 = v25.shouldShowShowMoreButton and v28 < #v25.captures;
-    local v35 = math.clamp(v30.Y / v30.X, 0.42857142857142855, 1);
-    local v36 = v26.Y - 12 - 40 - 36;
-    local v37 = v26.X - 12 - 8;
-    local v38 = v4.useMemo(function() --[[ Line: 89 ]]
-        -- upvalues: v19 (ref), v35 (ref), v37 (copy)
-        return v19(v35, v37);
-    end, {
-        v35, 
-        v37
-    });
-    local v43 = v4.useMemo(function() --[[ Line: 93 ]]
-        -- upvalues: v36 (copy), v37 (copy), v38 (copy)
-        local l_v36_0 = v36;
-        local l_v37_0 = v37;
-        local l_v38_0 = v38;
-        if l_v36_0 <= 0 then
-            return 0;
-        else
-            local v42 = math.floor(l_v36_0 / l_v38_0.Y);
-            if l_v36_0 < l_v38_0.Y * v42 + (v42 - 1) * 4 then
-                v42 = v42 - 1;
-            end;
-            return (math.max(v42 * math.clamp(math.floor(l_v37_0 / 120), 1, 4), 8));
-        end;
-    end, {
-        v36, 
-        v37, 
-        v38
-    });
-    v4.useEffect(function() --[[ Line: 97 ]]
-        -- upvalues: v28 (copy), v43 (copy), v29 (copy)
-        if v28 < v43 then
-            v29(v43);
-        end;
-    end, {
-        v26, 
-        v43, 
-        v28
-    });
-    local v44 = v4.useCallback(function() --[[ Line: 103 ]]
-        -- upvalues: v29 (copy), v28 (copy), v43 (copy)
-        v29(v28 + v43);
-    end, {
-        v28, 
-        v43
-    });
-    local v46 = v4.useMemo(function() --[[ Line: 107 ]]
-        -- upvalues: v34 (copy), v25 (copy), v28 (copy), v2 (ref)
-        if v34 then
-            local v45 = math.min(#v25.captures, v28);
-            return v2.slice(v25.captures, 1, v45);
-        else
-            return v25.captures;
-        end;
-    end, {
-        v25.captures, 
-        v34, 
-        v28
-    });
-    return v4.createElement(l_View_0, {
-        BorderSizePixel = 0, 
-        onAbsoluteSizeChanged = v32, 
-        Position = if v25.position then v25.position else UDim2.fromOffset(0, 0), 
-        Size = if v25.size then v25.size else UDim2.fromScale(1, 1), 
-        tag = "bg-surface-0"
-    }, {
-        CaptureGridViewContainer = v4.createElement(l_View_0, {
-            tag = "bg-action-subtle size-full gap-xsmall col align-x-center align-y-top shrink"
-        }, {
-            Header = v25.header, 
-            ScrollView = v4.createElement(l_ScrollView_0, {
-                BorderSizePixel = 0, 
-                LayoutOrder = if v25.layoutOrder then v25.layoutOrder else 1, 
-                scroll = {
-                    AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                    CanvasSize = UDim2.fromScale(1, 0), 
-                    ScrollingDirection = Enum.ScrollingDirection.Y, 
-                    scrollBarVisibility = l_ScrollBarVisibility_0.Auto
-                }, 
-                tag = "auto-y size-full-0 gap-xsmall col align-x-center align-y-top shrink padding-x-xsmall"
-            }, {
-                GridView = if v33 then v4.createElement(l_GridView_0, {
-                    itemPadding = Vector2.new(4, 4), 
-                    items = v46, 
-                    itemSize = v38, 
-                    LayoutOrder = 1, 
-                    renderItem = v25.renderItem
-                }) else nil, 
-                ShowMore = if v34 then v4.createElement(v9, {
-                    buttonHeight = 40, 
-                    LayoutOrder = 2, 
-                    onActivated = v44, 
-                    text = "Show More"
-                }) else nil
-            })
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Dash = require(ParentParentParent.Dash)
+local Foundation = require(ParentParentParent.Foundation)
+local React = require(ParentParentParent.React)
+local GridView = require(ParentParentParent.UIBlox).App.Grid.GridView
+local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
+local ScrollView = Foundation.ScrollView
+local View = Foundation.View
+local MenuButton = require(ParentParent.Components.MenuButton)
+
+require(ParentParent.Types)
+
+local useScreenSize = require(ParentParent.Hooks.useScreenSize)
+
+local function getItemsPerRow(n1: number) -- line: 41
+	return (math.clamp(math.floor(n1 / 120), 1, 4))
+end
+local function getGalleryItemSize(n2: number, n3: number) -- line: 45
+	local v18 = math.clamp(math.floor(n3 / 120), 1, 4)
+	local v19 = n3 - 4 * (v18 - 1)
+	local v20 = math.min(v19 / v18, v19)
+	local v21 = v20 * n2
+
+	return Vector2.new(math.floor(v20), (math.floor(v21)))
+end
+local function getItemsPerPage(n4: number, n5: number, vector2: Vector2) -- line: 55
+	if n4 <= 0 then
+		return 0
+	end
+
+	local v25 = math.floor(n4 / vector2.Y)
+
+	if n4 < vector2.Y * v25 + (v25 - 1) * 4 then
+		v25 -= 1
+	end
+
+	return (math.max(v25 * math.clamp(math.floor(n5 / 120), 1, 4), 8))
+end
+
+return function(t1: {[any]: any}) -- line: 70
+	-- upvalues: React (copy), useScreenSize (copy), getGalleryItemSize (copy), Dash (copy), View (copy), ScrollView (copy), ScrollBarVisibility (copy), GridView (copy), MenuButton (copy)
+	local v27, v28 = React.useState(Vector2.new(0, 0))
+	local v29, v30 = React.useState(0)
+	local v31 = useScreenSize()
+	local v32 = React.useCallback(function(p1) -- line: 75
+		-- upvalues: v28 (copy)
+		v28(p1.AbsoluteSize)
+	end, {})
+	local v33 = v27.X > 0 and v27.Y > 0
+	local v34 = t1.shouldShowShowMoreButton and v29 < #t1.captures
+	local u35 = math.clamp(v31.Y / v31.X, 0.42857142857142855, 1)
+	local v36 = v27.Y - 12 - 40 - 36
+	local v37 = v27.X - 12 - 8
+	local v38 = React.useMemo(function() -- line: 89
+		-- upvalues: getGalleryItemSize (copy), u35 (ref), v37 (copy)
+		return getGalleryItemSize(u35, v37)
+	end, {
+		u35,
+		v37
+	})
+	local v39 = React.useMemo(function() -- line: 93
+		-- upvalues: v36 (copy), v37 (copy), v38 (copy)
+		local v43 = v36
+		local v44 = v37
+		local v45 = v38
+
+		if v43 <= 0 then
+			return 0
+		end
+
+		local v46 = math.floor(v43 / v45.Y)
+
+		if v43 < v45.Y * v46 + (v46 - 1) * 4 then
+			v46 -= 1
+		end
+
+		return (math.max(v46 * math.clamp(math.floor(v44 / 120), 1, 4), 8))
+	end, {
+		v36,
+		v37,
+		v38
+	})
+
+	React.useEffect(function() -- line: 97
+		-- upvalues: v29 (copy), v39 (copy), v30 (copy)
+		if v29 < v39 then
+			v30(v39)
+		end
+	end, {
+		v27,
+		v39,
+		v29
+	})
+
+	local v40 = React.useCallback(function() -- line: 103
+		-- upvalues: v30 (copy), v29 (copy), v39 (copy)
+		v30(v29 + v39)
+	end, {
+		v29,
+		v39
+	})
+	local v41 = React.useMemo(function() -- line: 107
+		-- upvalues: v34 (copy), t1 (copy), v29 (copy), Dash (copy)
+		if v34 then
+			local v47 = math.min(#t1.captures, v29)
+
+			return Dash.slice(t1.captures, 1, v47)
+		end
+
+		return t1.captures
+	end, {
+		t1.captures,
+		v34,
+		v29
+	})
+
+	return React.createElement(View, {
+		BorderSizePixel = 0,
+		tag = "bg-surface-0",
+		onAbsoluteSizeChanged = v32,
+		Position = if not t1.position then UDim2.fromOffset(0, 0) else t1.position,
+		Size = if not t1.size then UDim2.fromScale(1, 1) else t1.size
+	}, {
+		CaptureGridViewContainer = React.createElement(View, {
+			tag = "bg-action-subtle size-full gap-xsmall col align-x-center align-y-top shrink"
+		}, {
+			Header = t1.header,
+			ScrollView = React.createElement(ScrollView, {
+				BorderSizePixel = 0,
+				tag = "auto-y size-full-0 gap-xsmall col align-x-center align-y-top shrink padding-x-xsmall",
+				LayoutOrder = not t1.layoutOrder and 1 or t1.layoutOrder,
+				scroll = {
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					CanvasSize = UDim2.fromScale(1, 0),
+					ScrollingDirection = Enum.ScrollingDirection.Y,
+					scrollBarVisibility = ScrollBarVisibility.Auto
+				}
+			}, {
+				GridView = if not v33 then nil else React.createElement(GridView, {
+					LayoutOrder = 1,
+					itemPadding = Vector2.new(4, 4),
+					items = v41,
+					itemSize = v38,
+					renderItem = t1.renderItem
+				}),
+				ShowMore = if not v34 then nil else React.createElement(MenuButton, {
+					buttonHeight = 40,
+					LayoutOrder = 2,
+					text = "Show More",
+					onActivated = v40
+				})
+			})
+		})
+	})
+end

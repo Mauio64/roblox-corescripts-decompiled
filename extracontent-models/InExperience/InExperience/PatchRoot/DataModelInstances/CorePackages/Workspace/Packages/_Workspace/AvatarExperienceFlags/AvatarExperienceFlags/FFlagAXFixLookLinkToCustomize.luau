@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixLookLinkToCustomize", false);
+return game:DefineFastFlag("AXFixLookLinkToCustomize", false)

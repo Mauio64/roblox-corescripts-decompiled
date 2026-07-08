@@ -1,11 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 21 ]] --[[ Name: useLazyRef ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(nil);
-    if v3.current == nil then
-        v3.current = v2();
-    end;
-    assert(v3.current ~= nil, "Ref must be defined after initialization function is called");
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useLazyRef(p1: ((...any) -> ...any)) -- line: 21
+	-- upvalues: React (copy)
+	local v5 = React.useRef(nil)
+
+	if v5.current == nil then
+		v5.current = p1()
+	end
+
+	assert(v5.current ~= nil, "Ref must be defined after initialization function is called")
+
+	return v5
+end
+
+return useLazyRef

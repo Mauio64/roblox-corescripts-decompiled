@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CapturesDragEdgeOffsetEnabled", false);
+return game:DefineFastFlag("CapturesDragEdgeOffsetEnabled", false)

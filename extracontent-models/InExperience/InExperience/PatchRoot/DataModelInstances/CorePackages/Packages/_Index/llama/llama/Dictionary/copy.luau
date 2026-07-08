@@ -1,9 +1,15 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: copy ]]
-    local v1 = type(v0);
-    assert(v1 == "table", "expected a table for first argument, got " .. v1);
-    local v2 = {};
-    for v3, v4 in pairs(v0) do
-        v2[v3] = v4;
-    end;
-    return v2;
-end;
+local function copy(p1) -- line: 2
+	local v3 = type(p1)
+
+	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		t1[k] = v
+	end
+
+	return t1
+end
+
+return copy

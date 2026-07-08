@@ -1,71 +1,87 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Array_0 = require(l_Parent_1.LuauPolyfill).Array;
-local v3 = require(l_Parent_1.LuauRegExp);
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(script.Parent.types);
-local v6 = require(l_Parent_0.utilities);
-local l_isReference_0 = v6.isReference;
-local l_isField_0 = v6.isField;
-local l_DeepMerger_0 = v6.DeepMerger;
-local l_resultKeyNameFromFieldf_0 = v6.resultKeyNameFromFieldf;
-local l_shouldInclude_0 = v6.shouldInclude;
-local l_isNonNullObject_0 = v6.isNonNullObject;
-local v13 = {};
-local v14 = require(l_Parent_0.luaUtils.hasOwnProperty);
-v13.hasOwn = v14;
-v13.getTypenameFromStoreObject = function(v15, v16) --[[ Line: 41 ]] --[[ Name: getTypenameFromStoreObject ]]
-    -- upvalues: l_isReference_0 (copy)
-    if l_isReference_0(v16) then
-        return (v15:get(v16.__ref, "__typename"));
-    elseif v16 then
-        return v16.__typename;
-    else
-        return nil;
-    end;
-end;
-v13.TypeOrFieldNameRegExp = v3("^[_a-zA-Z][_0-9a-zA-Z]*", "i");
-local v17 = {};
-v13.fieldNameFromStoreName = function(v18) --[[ Line: 64 ]] --[[ Name: fieldNameFromStoreName ]]
-    -- upvalues: v17 (copy)
-    if v17[v18] then
-        return v17[v18];
-    else
-        local v19 = string.match(v18, "^[_a-zA-Z][_0-9a-zA-Z]*") or v18;
-        v17[v18] = v19;
-        return v19;
-    end;
-end;
-local function v20(v21, v22, v23) --[[ Line: 76 ]] --[[ Name: selectionSetMatchesResult ]]
-    -- upvalues: l_isNonNullObject_0 (copy), l_Array_0 (copy), v20 (copy), l_isField_0 (copy), l_shouldInclude_0 (copy), l_resultKeyNameFromFieldf_0 (copy), v14 (copy)
-    if l_isNonNullObject_0(v22) then
-        if l_Array_0.isArray(v22) then
-            return l_Array_0.every(v22, function(v24) --[[ Line: 84 ]]
-                -- upvalues: v20 (ref), v21 (copy), v23 (copy)
-                return v20(v21, v24, v23);
-            end);
-        else
-            return l_Array_0.every(v21.selections, function(v25) --[[ Line: 88 ]]
-                -- upvalues: l_isField_0 (ref), l_shouldInclude_0 (ref), v23 (copy), l_resultKeyNameFromFieldf_0 (ref), v14 (ref), v22 (copy), v20 (ref)
-                if l_isField_0(v25) and l_shouldInclude_0(v25, v23) then
-                    local v26 = l_resultKeyNameFromFieldf_0(v25);
-                    return v14(v22, v26) and (not v25.selectionSet or v20(v25.selectionSet, v22[v26], v23));
-                else
-                    return true;
-                end;
-            end);
-        end;
-    else
-        return false;
-    end;
-end;
-v13.selectionSetMatchesResult = v20;
-v13.storeValueIsStoreObject = function(v27) --[[ Line: 116 ]] --[[ Name: storeValueIsStoreObject ]]
-    -- upvalues: l_isNonNullObject_0 (copy), l_isReference_0 (copy), l_Array_0 (copy)
-    return l_isNonNullObject_0(v27) and not l_isReference_0(v27) and not l_Array_0.isArray(v27);
-end;
-v13.makeProcessedFieldsMerger = function() --[[ Line: 121 ]] --[[ Name: makeProcessedFieldsMerger ]]
-    -- upvalues: l_DeepMerger_0 (copy)
-    return l_DeepMerger_0.new();
-end;
-return v13;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Array = require(ParentParentParent.LuauPolyfill).Array
+local LuauRegExp = require(ParentParentParent.LuauRegExp)
+
+require(ParentParentParent.GraphQL)
+require(script.Parent.types)
+
+local utilities = require(ParentParent.utilities)
+local isReference = utilities.isReference
+local isField = utilities.isField
+local DeepMerger = utilities.DeepMerger
+local resultKeyNameFromFieldf = utilities.resultKeyNameFromFieldf
+local shouldInclude = utilities.shouldInclude
+local isNonNullObject = utilities.isNonNullObject
+local t1 = {}
+local hasOwnProperty = require(ParentParent.luaUtils.hasOwnProperty)
+
+t1.hasOwn = hasOwnProperty
+
+function t1.getTypenameFromStoreObject(p1, p2) -- line: 41
+	-- upvalues: isReference (copy)
+	if isReference(p2) then
+		return (p1:get(p2.__ref, "__typename"))
+	end
+
+	if p2 then
+		return p2.__typename
+	end
+
+	return nil
+end
+
+t1.TypeOrFieldNameRegExp = LuauRegExp("^[_a-zA-Z][_0-9a-zA-Z]*", "i")
+
+local t2 = {}
+
+function t1.fieldNameFromStoreName(s1: string) -- line: 64
+	-- upvalues: t2 (copy)
+	if t2[s1] then
+		return t2[s1]
+	end
+
+	local v19 = string.match(s1, "^[_a-zA-Z][_0-9a-zA-Z]*") or s1
+
+	t2[s1] = v19
+
+	return v19
+end
+
+local function selectionSetMatchesResult(p3, t3: {[any]: any}, t4: {[any]: any}?) -- line: 76
+	-- upvalues: isNonNullObject (copy), Array (copy), selectionSetMatchesResult (copy), isField (copy), shouldInclude (copy), resultKeyNameFromFieldf (copy), hasOwnProperty (copy)
+	if isNonNullObject(t3) then
+		if Array.isArray(t3) then
+			return Array.every(t3, function(p4) -- line: 84
+				-- upvalues: selectionSetMatchesResult (copy), p3 (copy), t4 (copy)
+				return selectionSetMatchesResult(p3, p4, t4)
+			end)
+		end
+
+		return Array.every(p3.selections, function(p5) -- line: 88
+			-- upvalues: isField (copy), shouldInclude (copy), t4 (copy), resultKeyNameFromFieldf (copy), hasOwnProperty (copy), t3 (copy), selectionSetMatchesResult (copy)
+			if isField(p5) and shouldInclude(p5, t4) then
+				local v26 = resultKeyNameFromFieldf(p5)
+
+				return hasOwnProperty(t3, v26) and (not p5.selectionSet or selectionSetMatchesResult(p5.selectionSet, t3[v26], t4))
+			end
+
+			return true
+		end)
+	end
+
+	return false
+end
+
+t1.selectionSetMatchesResult = selectionSetMatchesResult
+
+function t1.storeValueIsStoreObject(p6) -- line: 116
+	-- upvalues: isNonNullObject (copy), isReference (copy), Array (copy)
+	return isNonNullObject(p6) and (not isReference(p6) and not Array.isArray(p6))
+end
+function t1.makeProcessedFieldsMerger() -- line: 121
+	-- upvalues: DeepMerger (copy)
+	return DeepMerger.new()
+end
+
+return t1

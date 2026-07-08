@@ -1,4 +1,4 @@
 return {
-    ApiFetchGamesDataByPlaceIds = require(script.ApiFetchGamesDataByPlaceIds), 
-    GamesMultigetPlaceDetails = require(script.GamesMultigetPlaceDetails)
-};
+	ApiFetchGamesDataByPlaceIds = require(script.ApiFetchGamesDataByPlaceIds),
+	GamesMultigetPlaceDetails = require(script.GamesMultigetPlaceDetails)
+}

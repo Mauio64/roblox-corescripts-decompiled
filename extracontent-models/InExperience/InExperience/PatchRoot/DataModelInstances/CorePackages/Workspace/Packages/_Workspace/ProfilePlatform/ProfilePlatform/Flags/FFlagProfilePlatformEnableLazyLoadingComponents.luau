@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableLazyLoadingComponentsV5", false);
+return game:DefineFastFlag("ProfilePlatformEnableLazyLoadingComponentsV5", false)

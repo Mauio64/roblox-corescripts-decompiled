@@ -1,4 +1,3 @@
 return {
-    GetFFlagLogExposureForExperienceUpsell = require(script.GetFFlagLogExposureForExperienceUpsell), 
-    GetFFlagSupportGamepadNavInVoiceModals = require(script.GetFFlagSupportGamepadNavInVoiceModals)
-};
+	GetFFlagSupportGamepadNavInVoiceModals = require(script.GetFFlagSupportGamepadNavInVoiceModals)
+}

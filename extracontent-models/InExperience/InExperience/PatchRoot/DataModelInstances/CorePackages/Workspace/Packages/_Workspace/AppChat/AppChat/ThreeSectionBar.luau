@@ -1,89 +1,98 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_RoactFitComponents_0 = require(l_Parent_0.LuaSocialLibrariesDeps).RoactFitComponents;
-local v2 = require(l_Parent_0.Roact);
-local v3 = v2.PureComponent:extend("ThreeSectionBar");
-v3.Rect = l_RoactFitComponents_0.Rect;
-v3.defaultProps = {
-    marginLeft = v3.Rect.square(0), 
-    marginRight = v3.Rect.square(0), 
-    contentPaddingLeft = UDim.new(0, 0), 
-    contentPaddingRight = UDim.new(0, 0), 
-    height = UDim.new(0, 0)
-};
-v3.init = function(v4) --[[ Line: 23 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    local v5, v6 = v2.createBinding(0);
-    v4.leftWidth = v5;
-    v4.updateLeftWidth = v6;
-    v5, v6 = v2.createBinding(0);
-    v4.rightWidth = v5;
-    v4.updateRightWidth = v6;
-    v5, v6 = v2.createBinding(0);
-    v4.fullWidth = v5;
-    v4.updateFullWidth = v6;
-end;
-v3.render = function(v7) --[[ Line: 30 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), l_RoactFitComponents_0 (copy)
-    return v2.createElement("Frame", {
-        Size = UDim2.new(UDim.new(1, 0), v7.props.height), 
-        LayoutOrder = v7.props.LayoutOrder, 
-        [v2.Change.AbsoluteSize] = function(v8) --[[ Line: 35 ]]
-            -- upvalues: v7 (copy)
-            v7.updateFullWidth(v8.AbsoluteSize.X);
-        end
-    }, {
-        leftFrame = v2.createElement(l_RoactFitComponents_0.FitFrameHorizontal, {
-            Transparency = 1, 
-            AnchorPoint = Vector2.new(0, 0), 
-            Position = UDim2.fromScale(0, 0), 
-            minimumSize = UDim.new(0, 0), 
-            height = UDim.new(1, 0), 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            contentPadding = v7.props.contentPaddingLeft, 
-            margin = v7.props.marginLeft, 
-            [v2.Change.AbsoluteSize] = function(v9) --[[ Line: 49 ]]
-                -- upvalues: v7 (copy)
-                v7.updateLeftWidth(v9.AbsoluteSize.X);
-            end
-        }, {
-            leftContent = v7.props.renderLeft(v7.props)
-        }), 
-        centerFrame = v2.createElement("Frame", {
-            AnchorPoint = Vector2.new(0.5, 0), 
-            Position = UDim2.fromScale(0.5, 0), 
-            Size = v2.joinBindings({
-                v7.leftWidth, 
-                v7.rightWidth, 
-                v7.fullWidth
-            }):map(function(v10) --[[ Line: 60 ]]
-                local v11 = v10[1];
-                local v12 = v10[2];
-                local v13 = v10[3];
-                local v14 = math.max(v11, v12);
-                local l_Magnitude_0 = (Vector2.new(v13 / 2, 0) - Vector2.new(v14, 0)).Magnitude;
-                return UDim2.new(0, l_Magnitude_0 * 2, 1, 0);
-            end)
-        }, {
-            ["$layout"] = v2.createElement("UIListLayout", {
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
-            }), 
-            centerContent = v7.props.renderCenter(v7.props)
-        }), 
-        rightFrame = v2.createElement(l_RoactFitComponents_0.FitFrameHorizontal, {
-            AnchorPoint = Vector2.new(1, 0), 
-            Position = UDim2.fromScale(1, 0), 
-            minimumSize = UDim.new(0, 0), 
-            height = UDim.new(1, 0), 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            contentPadding = v7.props.contentPaddingRight, 
-            margin = v7.props.marginRight, 
-            [v2.Change.AbsoluteSize] = function(v16) --[[ Line: 89 ]]
-                -- upvalues: v7 (copy)
-                v7.updateRightWidth(v16.AbsoluteSize.X);
-            end
-        }, {
-            rightContent = v7.props.renderRight(v7.props)
-        })
-    });
-end;
-return v3;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local RoactFitComponents = require(Parent.LuaSocialLibrariesDeps).RoactFitComponents
+local Roact = require(Parent.Roact)
+local v4 = Roact.PureComponent:extend("ThreeSectionBar")
+
+v4.Rect = RoactFitComponents.Rect
+v4.defaultProps = {
+	marginLeft = v4.Rect.square(0),
+	marginRight = v4.Rect.square(0),
+	contentPaddingLeft = UDim.new(0, 0),
+	contentPaddingRight = UDim.new(0, 0),
+	height = UDim.new(0, 0)
+}
+
+function v4.init(p1) -- line: 23
+	-- upvalues: Roact (copy)
+	local v6, v7 = Roact.createBinding(0)
+
+	p1.leftWidth = v6
+	p1.updateLeftWidth = v7
+
+	local v8, v9 = Roact.createBinding(0)
+
+	p1.rightWidth = v8
+	p1.updateRightWidth = v9
+
+	local v10, v11 = Roact.createBinding(0)
+
+	p1.fullWidth = v10
+	p1.updateFullWidth = v11
+end
+function v4.render(p2) -- line: 30
+	-- upvalues: Roact (copy), RoactFitComponents (copy)
+	return Roact.createElement("Frame", {
+		Size = UDim2.new(UDim.new(1, 0), p2.props.height),
+		LayoutOrder = p2.props.LayoutOrder,
+		[Roact.Change.AbsoluteSize] = function(p3) -- line: 35
+			-- upvalues: p2 (copy)
+			p2.updateFullWidth(p3.AbsoluteSize.X)
+		end
+	}, {
+		leftFrame = Roact.createElement(RoactFitComponents.FitFrameHorizontal, {
+			Transparency = 1,
+			AnchorPoint = Vector2.new(0, 0),
+			Position = UDim2.fromScale(0, 0),
+			minimumSize = UDim.new(0, 0),
+			height = UDim.new(1, 0),
+			FillDirection = Enum.FillDirection.Horizontal,
+			contentPadding = p2.props.contentPaddingLeft,
+			margin = p2.props.marginLeft,
+			[Roact.Change.AbsoluteSize] = function(p4) -- line: 49
+				-- upvalues: p2 (copy)
+				p2.updateLeftWidth(p4.AbsoluteSize.X)
+			end
+		}, {
+			leftContent = p2.props.renderLeft(p2.props)
+		}),
+		centerFrame = Roact.createElement("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.fromScale(0.5, 0),
+			Size = Roact.joinBindings({
+				p2.leftWidth,
+				p2.rightWidth,
+				p2.fullWidth
+			}):map(function(p5) -- line: 60
+				local v16 = p5[1]
+				local v17 = p5[2]
+				local v18 = p5[3]
+				local v19 = math.max(v16, v17)
+				local Magnitude = (Vector2.new(v18 / 2, 0) - Vector2.new(v19, 0)).Magnitude
+
+				return UDim2.new(0, Magnitude * 2, 1, 0)
+			end)
+		}, {
+			["$layout"] = Roact.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}),
+			centerContent = p2.props.renderCenter(p2.props)
+		}),
+		rightFrame = Roact.createElement(RoactFitComponents.FitFrameHorizontal, {
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.fromScale(1, 0),
+			minimumSize = UDim.new(0, 0),
+			height = UDim.new(1, 0),
+			FillDirection = Enum.FillDirection.Horizontal,
+			contentPadding = p2.props.contentPaddingRight,
+			margin = p2.props.marginRight,
+			[Roact.Change.AbsoluteSize] = function(p6) -- line: 89
+				-- upvalues: p2 (copy)
+				p2.updateRightWidth(p6.AbsoluteSize.X)
+			end
+		}, {
+			rightContent = p2.props.renderRight(p2.props)
+		})
+	})
+end
+
+return v4

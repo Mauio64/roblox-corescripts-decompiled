@@ -1,247 +1,290 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local v2 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local l_Signal_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Signal;
-local l_FFlagEnableConsoleExpControls_0 = v2.FFlagEnableConsoleExpControls;
-local v5 = {
-    Unavailable = 0, 
-    Loading = 1, 
-    Available = 2, 
-    Pinned = 3
-};
-local v6 = {};
-v6.__index = v6;
-v6.new = function(v7) --[[ Line: 33 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy), l_FFlagEnableConsoleExpControls_0 (copy), l_Signal_0 (copy), v6 (copy)
-    return (setmetatable({
-        _state = v7 or v5.Unavailable, 
-        _forceUnavailable = not l_FFlagEnableConsoleExpControls_0 and nil, 
-        _changeSignal = l_Signal_0.new()
-    }, v6));
-end;
-v6.connect = function(v8, v9) --[[ Line: 42 ]] --[[ Name: connect ]]
-    return v8._changeSignal:connect(v9);
-end;
-v6.set = function(v10, v11) --[[ Line: 46 ]] --[[ Name: set ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy)
-    if v10._state ~= v11 then
-        v10._state = v11;
-        if not l_FFlagEnableConsoleExpControls_0 or not v10._forceUnavailable then
-            v10._changeSignal:fire(v11);
-        end;
-    end;
-end;
-v6.get = function(v12) --[[ Line: 55 ]] --[[ Name: get ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), v5 (copy)
-    if l_FFlagEnableConsoleExpControls_0 and v12._forceUnavailable then
-        return v5.Unavailable;
-    else
-        return v12._state;
-    end;
-end;
-v6.available = function(v13) --[[ Line: 63 ]] --[[ Name: available ]]
-    -- upvalues: v5 (copy)
-    v13:set(v5.Available);
-end;
-v6.loading = function(v14) --[[ Line: 67 ]] --[[ Name: loading ]]
-    -- upvalues: v5 (copy)
-    v14:set(v5.Loading);
-end;
-v6.unavailable = function(v15) --[[ Line: 71 ]] --[[ Name: unavailable ]]
-    -- upvalues: v5 (copy)
-    v15:set(v5.Unavailable);
-end;
-v6.pinned = function(v16) --[[ Line: 75 ]] --[[ Name: pinned ]]
-    -- upvalues: v5 (copy)
-    v16:set(v5.Pinned);
-end;
-v6.forceUnavailable = function(v17) --[[ Line: 79 ]] --[[ Name: forceUnavailable ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), v5 (copy)
-    if l_FFlagEnableConsoleExpControls_0 and not v17._forceUnavailable then
-        v17._forceUnavailable = true;
-        if v17._state ~= v5.Unavailable then
-            v17._changeSignal:fire(v5.Unavailable);
-        end;
-    end;
-end;
-v6.unforceUnavailable = function(v18) --[[ Line: 89 ]] --[[ Name: unforceUnavailable ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), v5 (copy)
-    if l_FFlagEnableConsoleExpControls_0 and v18._forceUnavailable then
-        v18._forceUnavailable = false;
-        if v18._state ~= v5.Unavailable then
-            v18._changeSignal:fire(v18._state);
-        end;
-    end;
-end;
-local v19 = {};
-v19.__index = v19;
-v19.new = function(v20) --[[ Line: 116 ]] --[[ Name: new ]]
-    -- upvalues: l_Signal_0 (copy), v19 (copy)
-    return (setmetatable({
-        _value = {
-            type = "empty", 
-            value = nil
-        }, 
-        _changeSignal = l_Signal_0.new(), 
-        _excludeFromTotalCounts = v20 or false
-    }, v19));
-end;
-v19.setExcludeFromTotalCounts = function(v21, v22) --[[ Line: 125 ]] --[[ Name: setExcludeFromTotalCounts ]]
-    v21._excludeFromTotalCounts = v22;
-end;
-v19.excludeFromTotalCounts = function(v23) --[[ Line: 129 ]] --[[ Name: excludeFromTotalCounts ]]
-    return v23._excludeFromTotalCounts;
-end;
-v19.connect = function(v24, v25) --[[ Line: 133 ]] --[[ Name: connect ]]
-    return v24._changeSignal:connect(v25);
-end;
-v19.get = function(v26) --[[ Line: 137 ]] --[[ Name: get ]]
-    return v26._value;
-end;
-v19.clear = function(v27) --[[ Line: 141 ]] --[[ Name: clear ]]
-    if v27._value and v27._value.type ~= "empty" then
-        v27._value = {
-            type = "empty", 
-            value = nil
-        };
-        v27._changeSignal:fire(v27._value);
-    end;
-end;
-v19.fireCount = function(v28, v29) --[[ Line: 148 ]] --[[ Name: fireCount ]]
-    local v30 = {
-        type = "count", 
-        value = v29
-    };
-    if v28._value ~= v30 then
-        v28._value = v30;
-        v28._changeSignal:fire(v28._value);
-    end;
-end;
-v19.isEmpty = function(v31) --[[ Line: 156 ]] --[[ Name: isEmpty ]]
-    return v31._value and v31._value.type == "empty";
-end;
-local v32 = {};
-v32.__index = v32;
-v32.new = function(v33) --[[ Line: 174 ]] --[[ Name: new ]]
-    -- upvalues: l_Signal_0 (copy), v32 (copy)
-    return (setmetatable({
-        _value = v33, 
-        _changeSignal = l_Signal_0.new()
-    }, v32));
-end;
-v32.get = function(v34) --[[ Line: 181 ]] --[[ Name: get ]]
-    return v34._value;
-end;
-v32.setMomentary = function(v35, v36, v37, v38) --[[ Line: 185 ]] --[[ Name: setMomentary ]]
-    if v35._value ~= v36 then
-        v35._value = v36;
-        v35._changeSignal:fire(v36);
-    end;
-    local l__momentaryClearThread_0 = v35._momentaryClearThread;
-    if l__momentaryClearThread_0 then
-        task.cancel(l__momentaryClearThread_0);
-    end;
-    v35._momentaryClearThread = task.delay(v37, function() --[[ Line: 197 ]]
-        -- upvalues: v35 (copy), v38 (copy)
-        v35._momentaryClearThread = nil;
-        v35.set(v35, v38);
-    end);
-end;
-v32.set = function(v40, v41) --[[ Line: 204 ]] --[[ Name: set ]]
-    local l__momentaryClearThread_1 = v40._momentaryClearThread;
-    if l__momentaryClearThread_1 then
-        task.cancel(l__momentaryClearThread_1);
-        v40._momentaryClearThread = nil;
-    end;
-    if v40._value ~= v41 then
-        v40._value = v41;
-        v40._changeSignal:fire(v41);
-    end;
-end;
-v32.signal = function(v43) --[[ Line: 217 ]] --[[ Name: signal ]]
-    return v43._changeSignal;
-end;
-v32.connect = function(v44, v45, v46) --[[ Line: 221 ]] --[[ Name: connect ]]
-    local v47 = v44._changeSignal:connect(v45);
-    if v46 == true then
-        v45(v44._value);
-    end;
-    return v47;
-end;
-local v48 = {};
-v48.__index = v48;
-v48.new = function(v49, v50, v51) --[[ Line: 253 ]] --[[ Name: new ]]
-    -- upvalues: v48 (copy)
-    if not v49 then
-        error("No signal provided to MappedSignal");
-    end;
-    if not v50 then
-        error("No fetchMapFunction provided to MappedSignal");
-    end;
-    return (setmetatable({
-        _signal = v49, 
-        _fetchMapFunction = v50, 
-        _eventReceiver = v51
-    }, v48));
-end;
-v48.connect = function(v52, v53) --[[ Line: 267 ]] --[[ Name: connect ]]
-    if not v52._signal then
-        warn("MappedSignal: Missing signal");
-        return function() --[[ Line: 270 ]]
+local CorePackages = game:GetService("CorePackages")
+local StarterGui = game:GetService("StarterGui")
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
 
-        end;
-    else
-        local v54 = v52._signal:connect(function() --[[ Line: 273 ]]
-            -- upvalues: v52 (copy), v53 (copy)
-            if v52._eventReceiver then
-                v52._eventReceiver();
-            end;
-            v53(v52._fetchMapFunction());
-        end);
-        if v52._eventReceiver then
-            v52._eventReceiver();
-        end;
-        v53(v52._fetchMapFunction());
-        return v54;
-    end;
-end;
-v48.get = function(v55) --[[ Line: 287 ]] --[[ Name: get ]]
-    return v55._fetchMapFunction();
-end;
-setCoreGuiAvailability = function(v56, v57, v58) --[[ Line: 291 ]] --[[ Name: setCoreGuiAvailability ]]
-    -- upvalues: l_StarterGui_0 (copy)
-    local function v60() --[[ Line: 296 ]] --[[ Name: updateAvailable ]]
-        -- upvalues: l_StarterGui_0 (ref), v57 (copy), v58 (copy), v56 (copy)
-        local l_l_StarterGui_0_CoreGuiEnabled_0 = l_StarterGui_0:GetCoreGuiEnabled(v57);
-        if v58 then
-            v58(l_l_StarterGui_0_CoreGuiEnabled_0);
-            return;
-        elseif l_l_StarterGui_0_CoreGuiEnabled_0 then
-            v56.availability:available();
-            return;
-        else
-            v56.availability:unavailable();
-            return;
-        end;
-    end;
-    local v61 = l_StarterGui_0.CoreGuiChangedSignal:Connect(v60);
-    local l_l_StarterGui_0_CoreGuiEnabled_1 = l_StarterGui_0:GetCoreGuiEnabled(v57);
-    if v58 then
-        v58(l_l_StarterGui_0_CoreGuiEnabled_1);
-        return v61;
-    elseif l_l_StarterGui_0_CoreGuiEnabled_1 then
-        v56.availability:available();
-        return v61;
-    else
-        v56.availability:unavailable();
-        return v61;
-    end;
-end;
+require(CorePackages.Workspace.Packages.Chrome)
+
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local t1 = {
+	Unavailable = 0,
+	Loading = 1,
+	Available = 2,
+	Pinned = 3
+}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(n1: number) -- line: 28
+	-- upvalues: t1 (copy), FFlagEnableConsoleExpControls (copy), Signal (copy), t2 (copy)
+	return (setmetatable({
+		_state = n1 or t1.Unavailable,
+		_forceUnavailable = not FFlagEnableConsoleExpControls and nil,
+		_changeSignal = Signal.new()
+	}, t2))
+end
+function t2.connect(p1, p2) -- line: 37
+	return p1._changeSignal:connect(p2)
+end
+function t2.set(t3: {[any]: any}, n2: number) -- line: 41
+	-- upvalues: FFlagEnableConsoleExpControls (copy)
+	if n2 ~= t3._state then
+		t3._state = n2
+
+		if not FFlagEnableConsoleExpControls or not t3._forceUnavailable then
+			t3._changeSignal:fire(n2)
+		end
+	end
+end
+function t2.get(p3) -- line: 50
+	-- upvalues: FFlagEnableConsoleExpControls (copy), t1 (copy)
+	if FFlagEnableConsoleExpControls and p3._forceUnavailable then
+		return t1.Unavailable
+	end
+
+	return p3._state
+end
+function t2.available(p4) -- line: 58
+	-- upvalues: t1 (copy)
+	p4:set(t1.Available)
+end
+function t2.loading(p5) -- line: 62
+	-- upvalues: t1 (copy)
+	p5:set(t1.Loading)
+end
+function t2.unavailable(p6) -- line: 66
+	-- upvalues: t1 (copy)
+	p6:set(t1.Unavailable)
+end
+function t2.pinned(p7) -- line: 70
+	-- upvalues: t1 (copy)
+	p7:set(t1.Pinned)
+end
+function t2.forceUnavailable(p8) -- line: 74
+	-- upvalues: FFlagEnableConsoleExpControls (copy), t1 (copy)
+	if FFlagEnableConsoleExpControls and not p8._forceUnavailable then
+		p8._forceUnavailable = true
+
+		if p8._state ~= t1.Unavailable then
+			p8._changeSignal:fire(t1.Unavailable)
+		end
+	end
+end
+function t2.unforceUnavailable(p9) -- line: 84
+	-- upvalues: FFlagEnableConsoleExpControls (copy), t1 (copy)
+	if FFlagEnableConsoleExpControls and p9._forceUnavailable then
+		p9._forceUnavailable = false
+
+		if p9._state ~= t1.Unavailable then
+			p9._changeSignal:fire(p9._state)
+		end
+	end
+end
+
+local t4 = {}
+
+t4.__index = t4
+
+function t4.new(b1: boolean?) -- line: 97
+	-- upvalues: Signal (copy), t4 (copy)
+	return (setmetatable({
+		_value = {
+			type = "empty",
+			value = nil
+		},
+		_changeSignal = Signal.new(),
+		_excludeFromTotalCounts = b1 or false
+	}, t4))
+end
+function t4.setExcludeFromTotalCounts(t5: {[any]: any}, b2: boolean) -- line: 106
+	t5._excludeFromTotalCounts = b2
+end
+function t4.excludeFromTotalCounts(p10) -- line: 110
+	return p10._excludeFromTotalCounts
+end
+function t4.connect(t6: {[any]: any}, p11: ((...any) -> ...any)) -- line: 114
+	return t6._changeSignal:connect(p11)
+end
+function t4.get(p12) -- line: 118
+	return p12._value
+end
+function t4.clear(p13) -- line: 122
+	if p13._value and p13._value.type ~= "empty" then
+		p13._value = {
+			type = "empty",
+			value = nil
+		}
+		p13._changeSignal:fire(p13._value)
+	end
+end
+function t4.fireCount(t7: {[any]: any}, n3: number) -- line: 129
+	local t8 = {
+		type = "count",
+		value = n3
+	}
+
+	if t8 ~= t7._value then
+		t7._value = t8
+		t7._changeSignal:fire(t7._value)
+	end
+end
+function t4.isEmpty(p14) -- line: 137
+	return p14._value and p14._value.type == "empty"
+end
+
+local t9 = {}
+
+t9.__index = t9
+
+function t9.new(p15) -- line: 146
+	-- upvalues: Signal (copy), t9 (copy)
+	return (setmetatable({
+		_value = p15,
+		_changeSignal = Signal.new()
+	}, t9))
+end
+function t9.get(p16) -- line: 153
+	return p16._value
+end
+function t9.setMomentary(p17, p18, n4: number, p19) -- line: 157
+	if p18 ~= p17._value then
+		p17._value = p18
+		p17._changeSignal:fire(p18)
+	end
+
+	local _momentaryClearThread = p17._momentaryClearThread
+
+	if _momentaryClearThread then
+		task.cancel(_momentaryClearThread)
+	end
+
+	p17._momentaryClearThread = task.delay(n4, function() -- line: 169
+		-- upvalues: p17 (copy), p19 (copy)
+		p17._momentaryClearThread = nil
+		p17.set(p17, p19)
+	end)
+end
+function t9.set(p20, p21) -- line: 176
+	local _momentaryClearThread = p20._momentaryClearThread
+
+	if _momentaryClearThread then
+		task.cancel(_momentaryClearThread)
+		p20._momentaryClearThread = nil
+	end
+
+	if p21 ~= p20._value then
+		p20._value = p21
+		p20._changeSignal:fire(p21)
+	end
+end
+function t9.signal(p22) -- line: 189
+	return p22._changeSignal
+end
+function t9.connect(p23, p24, p25) -- line: 193
+	local v49 = p23._changeSignal:connect(p24)
+
+	if p25 == true then
+		p24(p23._value)
+	end
+
+	return v49
+end
+
+local t10 = {}
+
+t10.__index = t10
+
+function t10.new(p26, p27, p28: ((...any) -> ...any)?) -- line: 219
+	-- upvalues: t10 (copy)
+	if not p26 then
+		error("No signal provided to MappedSignal")
+	end
+
+	if not p27 then
+		error("No fetchMapFunction provided to MappedSignal")
+	end
+
+	return (setmetatable({
+		_signal = p26,
+		_fetchMapFunction = p27,
+		_eventReceiver = p28
+	}, t10))
+end
+function t10.connect(p29, p30) -- line: 233
+	if not p29._signal then
+		warn("MappedSignal: Missing signal")
+
+		return function() -- line: 236
+		end
+	end
+
+	local v55 = p29._signal:connect(function() -- line: 239
+		-- upvalues: p29 (copy), p30 (copy)
+		if p29._eventReceiver then
+			p29._eventReceiver()
+		end
+
+		p30(p29._fetchMapFunction())
+	end)
+
+	if p29._eventReceiver then
+		p29._eventReceiver()
+	end
+
+	p30(p29._fetchMapFunction())
+
+	return v55
+end
+function t10.get(p31) -- line: 253
+	return p31._fetchMapFunction()
+end
+function setCoreGuiAvailability(t11: {[any]: any}, p32, p33: ((...any) -> ...any)?) -- line: 257
+	-- upvalues: StarterGui (copy)
+	local function updateAvailable() -- line: 262
+		-- upvalues: StarterGui (copy), p32 (copy), p33 (copy), t11 (copy)
+		local CoreGuiEnabled = StarterGui:GetCoreGuiEnabled(p32)
+
+		if p33 then
+			p33(CoreGuiEnabled)
+
+			return
+		end
+
+		if CoreGuiEnabled then
+			t11.availability:available()
+
+			return
+		end
+
+		t11.availability:unavailable()
+	end
+
+	local connection = StarterGui.CoreGuiChangedSignal:Connect(updateAvailable)
+	local CoreGuiEnabled = StarterGui:GetCoreGuiEnabled(p32)
+
+	if p33 then
+		p33(CoreGuiEnabled)
+
+		return connection
+	end
+
+	if CoreGuiEnabled then
+		t11.availability:available()
+
+		return connection
+	end
+
+	t11.availability:unavailable()
+
+	return connection
+end
+
 return {
-    MappedSignal = v48, 
-    AvailabilitySignal = v6, 
-    AvailabilitySignalState = v5, 
-    NotifySignal = v19, 
-    ObservableValue = v32, 
-    setCoreGuiAvailability = setCoreGuiAvailability
-};
+	MappedSignal = t10,
+	AvailabilitySignal = t2,
+	AvailabilitySignalState = t1,
+	NotifySignal = t4,
+	ObservableValue = t9,
+	setCoreGuiAvailability = setCoreGuiAvailability
+}

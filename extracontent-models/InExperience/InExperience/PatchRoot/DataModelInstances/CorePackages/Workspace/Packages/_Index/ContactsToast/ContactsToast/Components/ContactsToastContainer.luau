@@ -1,247 +1,217 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ContactsToast");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.ExperienceService);
-local v5 = require(l_Parent_0.Promise);
-local v6 = require(l_Parent_0.React);
-local v7 = require(l_Parent_0.Cryo);
-local l_getDeepValue_0 = require(l_Parent_0.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue;
-local v9 = require(l_Parent_0.RobloxAppHooks);
-local l_useLocalUserId_0 = v9.useLocalUserId;
-local l_useScreenSize_0 = v9.useScreenSize;
-local l_SetCurrentToastMessage_0 = require(l_Parent_0.ToastRodux).Actions.SetCurrentToastMessage;
-local l_PermissionsProtocol_0 = require(l_Parent_0.PermissionsProtocol).PermissionsProtocol;
-local v14 = require(l_Parent_0.SocialModalsCommon);
-local l_EnumScreens_0 = v14.EnumScreens;
-local l_updateOptedInUsers_0 = v14.Utils.updateOptedInUsers;
-local l_UpdateContactImporterModalLogic_0 = v14.Actions.UpdateContactImporterModalLogic;
-local l_setTimeout_0 = require(l_Parent_0.LuauPolyfill).setTimeout;
-local v19 = require(l_Parent_0.UIBlox);
-local l_Toast_0 = v19.App.Dialog.Toast;
-local l_Images_0 = v19.App.ImageSet.Images;
-local l_IconSize_0 = v19.App.Constant.IconSize;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_GetFFlagContactsToastEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagContactsToastEnabled;
-local l_ExperienceService_0 = v4.ExperienceService;
-local v28 = require(l_script_FirstAncestor_0.Common.Constants);
-local v29 = require(l_script_FirstAncestor_0.Utils.localStorageContactsToast);
-local v30 = require(l_script_FirstAncestor_0.Networking.configureRoduxUsers);
-local v31 = require(l_script_FirstAncestor_0.Experiments.ContactsToastIXP);
-local l_Analytics_0 = require(l_script_FirstAncestor_0.Analytics).Analytics;
-local v33 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-local v35 = game:DefineFastInt("ContactsToastAccountAgeThresholdInDays", 7);
-local v36 = l_Images_0["icons/graphic/connectcontacts_large"];
-local v37 = Vector2.new(l_IconSize_0.Large, l_IconSize_0.Large);
-return function(v38) --[[ Line: 63 ]]
-    -- upvalues: v6 (copy), l_useDispatch_0 (copy), l_Analytics_0 (copy), l_useLocalization_0 (copy), v28 (copy), v31 (copy), l_useSelector_0 (copy), l_useScreenSize_0 (copy), l_useLocalUserId_0 (copy), l_GetFFlagContactsToastEnabled_0 (copy), l_getDeepValue_0 (copy), l_PermissionsProtocol_0 (copy), l_SetCurrentToastMessage_0 (copy), v7 (copy), v33 (copy), l_UpdateContactImporterModalLogic_0 (copy), l_l_UserInputService_0_Platform_0 (copy), l_updateOptedInUsers_0 (copy), l_AppStorageService_0 (copy), l_EnumScreens_0 (copy), v5 (copy), l_Toast_0 (copy), v36 (copy), v37 (copy), v30 (copy), v35 (copy), v29 (copy), l_ExperienceService_0 (copy), l_setTimeout_0 (copy)
-    local v39, v40 = v6.useState(false);
-    local v41 = l_useDispatch_0();
-    local v42 = l_Analytics_0();
-    local v43 = l_useLocalization_0({
-        title = v28.Translations.title, 
-        subtitle = v28.Translations.subtitle, 
-        button = v28.Translations.button, 
-        buttonV2 = v28.Translations.buttonV2
-    });
-    local v44 = v31.useContactsToastVariant();
-    local v45 = l_useSelector_0(v38.getContactImporterParams);
-    local l_isDiscoverabilityUnset_0 = v45.isDiscoverabilityUnset;
-    local l_isPhoneVerified_0 = v45.isPhoneVerified;
-    local v48 = l_useScreenSize_0();
-    local v49 = l_useLocalUserId_0();
-    local v51 = l_useSelector_0(function(v50) --[[ Line: 80 ]]
-        return v50.IsLocalUserUnder13;
-    end);
-    local v53 = l_useSelector_0(function(v52) --[[ Line: 84 ]]
-        -- upvalues: l_GetFFlagContactsToastEnabled_0 (ref), v44 (copy), l_getDeepValue_0 (ref), v28 (ref), v49 (copy)
-        if l_GetFFlagContactsToastEnabled_0() or v44 then
-            return (l_getDeepValue_0(v52, (("%*.Users.byUserId.%*"):format(v28.RODUX_KEY, v49))));
-        else
-            return {};
-        end;
-    end);
-    local l_default_0 = l_PermissionsProtocol_0.default;
-    local function v56(v55) --[[ Line: 92 ]]
-        -- upvalues: v41 (copy), l_SetCurrentToastMessage_0 (ref)
-        v41(l_SetCurrentToastMessage_0({
-            toastMessage = v55
-        }));
-    end;
-    local function v57() --[[ Line: 97 ]]
-        -- upvalues: v41 (copy), v38 (copy)
-        v41(v38.openContactImporterLearnMoreLink());
-    end;
-    local function v60(v58, v59) --[[ Line: 100 ]]
-        -- upvalues: v41 (copy), v38 (copy)
-        v41(v38.openProfilePeekView(v58, v59));
-    end;
-    local function v63(v61, v62) --[[ Line: 104 ]]
-        -- upvalues: v41 (copy), v38 (copy)
-        v41(v38.openAmpWizardContainer(v61, v62));
-    end;
-    local function v66(v64, v65) --[[ Line: 108 ]]
-        -- upvalues: v41 (copy), v38 (copy), v7 (ref)
-        v41(v38.navigateToRoute({
-            v7.Dictionary.join({
-                name = v64
-            }, v65)
-        }));
-    end;
-    local function _() --[[ Line: 112 ]]
-        -- upvalues: l_default_0 (copy), l_PermissionsProtocol_0 (ref)
-        return l_default_0:checkOrRequestPermissions({
-            l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-        });
-    end;
-    local function _() --[[ Line: 118 ]]
-        -- upvalues: v38 (copy), l_default_0 (copy), l_PermissionsProtocol_0 (ref)
-        if v38.hasPermissions then
-            return (v38.hasPermissions());
-        else
-            return (l_default_0:hasPermissions({
-                l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-            }));
-        end;
-    end;
-    local function v69() --[[ Line: 124 ]]
-        -- upvalues: v40 (copy), v42 (copy), v33 (ref), v44 (copy)
-        v40(false);
-        v42.fireAnalyticsEvent(v33.ContactsToastDismissed, {
-            variant = v44
-        });
-    end;
-    local function _() --[[ Line: 131 ]]
-        -- upvalues: v41 (copy), l_UpdateContactImporterModalLogic_0 (ref)
-        v41(l_UpdateContactImporterModalLogic_0({
-            hasOSPermissions = true, 
-            shouldShowContactImporterUpsellModal = false
-        }));
-    end;
-    local function v72() --[[ Line: 138 ]]
-        -- upvalues: l_l_UserInputService_0_Platform_0 (ref), l_default_0 (copy), l_PermissionsProtocol_0 (ref), l_updateOptedInUsers_0 (ref), l_AppStorageService_0 (ref), v49 (copy), v41 (copy), l_UpdateContactImporterModalLogic_0 (ref), v66 (copy), l_EnumScreens_0 (ref), v56 (copy), l_isPhoneVerified_0 (copy), v57 (copy), v63 (copy), v5 (ref), v48 (copy), l_isDiscoverabilityUnset_0 (copy), v60 (copy), v40 (copy), v42 (copy), v33 (ref), v44 (copy)
-        if l_l_UserInputService_0_Platform_0 == Enum.Platform.IOS then
-            l_default_0:checkOrRequestPermissions({
-                l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-            }):andThen(function(v71) --[[ Line: 140 ]]
-                -- upvalues: l_PermissionsProtocol_0 (ref), l_updateOptedInUsers_0 (ref), l_AppStorageService_0 (ref), v49 (ref), v41 (ref), l_UpdateContactImporterModalLogic_0 (ref), v66 (ref), l_EnumScreens_0 (ref), v56 (ref), l_isPhoneVerified_0 (ref), v57 (ref), v63 (ref), v5 (ref), v48 (ref)
-                if v71 == l_PermissionsProtocol_0.Status.AUTHORIZED then
-                    l_updateOptedInUsers_0:addUserToLocalStorage(l_AppStorageService_0, v49);
-                    v41(l_UpdateContactImporterModalLogic_0({
-                        hasOSPermissions = true, 
-                        shouldShowContactImporterUpsellModal = false
-                    }));
-                    v66(l_EnumScreens_0.ContactsList, {
-                        showToast = v56, 
-                        shouldUpdateUserSettings = true, 
-                        isPhoneVerified = l_isPhoneVerified_0, 
-                        openLearnMoreLink = v57, 
-                        openAmpUpsell = v63
-                    });
-                    return v5.resolve();
-                elseif v71 == l_PermissionsProtocol_0.Status.DENIED then
-                    v66(l_EnumScreens_0.ContactsRevokedAccessDialog, {
-                        screenSize = v48
-                    });
-                    return v5.resolve();
-                else
-                    return v5.reject();
-                end;
-            end);
-        else
-            v66(l_EnumScreens_0.ContactImporter, {
-                showToast = v56, 
-                openLearnMoreLink = v57, 
-                isFromAddFriendsPage = false, 
-                isDiscoverabilityUnset = l_isDiscoverabilityUnset_0, 
-                isPhoneVerified = l_isPhoneVerified_0, 
-                openProfilePeekView = v60, 
-                openAmpUpsell = v63
-            });
-        end;
-        v40(false);
-        v42.fireAnalyticsEvent(v33.ContactsToastButtonPressed, {
-            variant = v44
-        });
-    end;
-    local v73 = v6.createElement(l_Toast_0, {
-        duration = 4, 
-        toastContent = {
-            iconImage = v36, 
-            toastTitle = v43.title, 
-            toastSubtitle = v43.subtitle, 
-            iconSize = v37, 
-            onActivated = v72, 
-            onDismissed = v69, 
-            buttonText = if v44 == v28.Experiment.FIND_FRIENDS then v43.button else v43.buttonV2, 
-            swipeUpDismiss = true
-        }
-    });
-    local function _() --[[ Line: 194 ]]
-        -- upvalues: v49 (copy), v41 (copy), v30 (ref)
-        if v49 and string.len(v49) > 0 and v49 ~= "0" then
-            v41(v30.GetUserV2FromUserId.API(v49));
-        end;
-    end;
-    v6.useEffect(function() --[[ Line: 200 ]]
-        -- upvalues: v49 (copy), v41 (copy), v30 (ref)
-        if v49 and string.len(v49) > 0 and v49 ~= "0" then
-            v41(v30.GetUserV2FromUserId.API(v49));
-        end;
-    end, {
-        v49
-    });
-    v6.useEffect(function() --[[ Line: 204 ]]
-        -- upvalues: v49 (copy), v53 (copy), v35 (ref), v38 (copy), v51 (copy), v29 (ref), l_default_0 (copy), l_PermissionsProtocol_0 (ref), l_ExperienceService_0 (ref), l_setTimeout_0 (ref), v40 (copy), v42 (copy), v33 (ref), v44 (copy)
-        if v49 and string.len(v49) > 0 and v53 and v53.created then
-            local v75, v76, v77 = v53.created:match("(%d+)-(%d+)-(%d+)");
-            if math.floor((os.time() - os.time({
-                year = v75, 
-                month = v76, 
-                day = v77
-            })) / 86400) <= v35 and v38.isContactsToastPolicyEnabled and not v51 and v29:CheckUserHasNotSeen(v49) then
-                (if v38.hasPermissions then v38.hasPermissions() else l_default_0:hasPermissions({
-                    l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS
-                })):andThen(function(v78) --[[ Line: 215 ]]
-                    -- upvalues: l_PermissionsProtocol_0 (ref), v29 (ref), v49 (ref), l_ExperienceService_0 (ref), l_setTimeout_0 (ref), v40 (ref), v42 (ref), v33 (ref), v44 (ref)
-                    if v78.status == l_PermissionsProtocol_0.Status.DENIED and v78.missingPermissions[1] == l_PermissionsProtocol_0.Permissions.CONTACTS_ACCESS or v78.status ~= l_PermissionsProtocol_0.Status.DENIED and v29:CheckUserHasNotOptedIn(v49) then
-                        l_ExperienceService_0:RegisterForExperienceLeave(function() --[[ Line: 224 ]]
-                            -- upvalues: v29 (ref), v49 (ref), l_setTimeout_0 (ref), v40 (ref), v42 (ref), v33 (ref), v44 (ref)
-                            if v29:CheckUserHasNotSeen(v49) then
-                                l_setTimeout_0(function() --[[ Line: 227 ]]
-                                    -- upvalues: v40 (ref), v29 (ref), v49 (ref), v42 (ref), v33 (ref), v44 (ref)
-                                    v40(true);
-                                    v29:AddUser(v49);
-                                    v42.fireAnalyticsEvent(v33.ContactsToastSeen, {
-                                        variant = v44
-                                    });
-                                end, 1000);
-                            end;
-                        end);
-                    end;
-                end);
-            end;
-        end;
-    end, {
-        v49, 
-        v38.isContactsToastPolicyEnabled, 
-        v51, 
-        v53
-    });
-    if v38.isContactsToastPolicyEnabled and not v51 and v39 or v38.testOverride then
-        return (v6.createElement("ScreenGui", {
-            DisplayOrder = 13
-        }, {
-            v6.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, -20), 
-                Position = UDim2.new(0, 0, 0, 20)
-            }, v73)
-        }));
-    else
-        return nil;
-    end;
-end;
+local ContactsToast = script:FindFirstAncestor("ContactsToast")
+local UserInputService = game:GetService("UserInputService")
+local AppStorageService = game:GetService("AppStorageService")
+local ContactsToastParent = ContactsToast.Parent
+local ExperienceService = require(ContactsToastParent.ExperienceService)
+local Promise = require(ContactsToastParent.Promise)
+local React = require(ContactsToastParent.React)
+local Cryo = require(ContactsToastParent.Cryo)
+local getDeepValue = require(ContactsToastParent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local RobloxAppHooks = require(ContactsToastParent.RobloxAppHooks)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local useScreenSize = RobloxAppHooks.useScreenSize
+local SetCurrentToastMessage = require(ContactsToastParent.ToastRodux).Actions.SetCurrentToastMessage
+local PermissionsProtocol = require(ContactsToastParent.PermissionsProtocol).PermissionsProtocol
+local SocialModalsCommon = require(ContactsToastParent.SocialModalsCommon)
+local EnumScreens = SocialModalsCommon.EnumScreens
+local updateOptedInUsers = SocialModalsCommon.Utils.updateOptedInUsers
+local UpdateContactImporterModalLogic = SocialModalsCommon.Actions.UpdateContactImporterModalLogic
+local setTimeout = require(ContactsToastParent.LuauPolyfill).setTimeout
+local UIBlox = require(ContactsToastParent.UIBlox)
+local Toast = UIBlox.App.Dialog.Toast
+local Images = UIBlox.App.ImageSet.Images
+local IconSize = UIBlox.App.Constant.IconSize
+local useLocalization = require(ContactsToastParent.Localization).Hooks.useLocalization
+local useSelector = require(ContactsToastParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useDispatch = require(ContactsToastParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local GetFFlagContactsToastEnabled = require(ContactsToastParent.SharedFlags).GetFFlagContactsToastEnabled
+local ExperienceService2 = ExperienceService.ExperienceService
+local Constants = require(ContactsToast.Common.Constants)
+local localStorageContactsToast = require(ContactsToast.Utils.localStorageContactsToast)
+local configureRoduxUsers = require(ContactsToast.Networking.configureRoduxUsers)
+local ContactsToastIXP = require(ContactsToast.Experiments.ContactsToastIXP)
+local Analytics = require(ContactsToast.Analytics).Analytics
+local EventNames = require(ContactsToast.Analytics.EventNames)
+local Platform = UserInputService:GetPlatform()
+local v36 = game:DefineFastInt("ContactsToastAccountAgeThresholdInDays", 7)
+local v37 = Images["icons/graphic/connectcontacts_large"]
+local vector2 = Vector2.new(IconSize.Large, IconSize.Large)
+
+return function(t1: {[any]: any}) -- line: 63
+	-- upvalues: React (copy), useDispatch (copy), Analytics (copy), useLocalization (copy), Constants (copy), ContactsToastIXP (copy), useSelector (copy), useScreenSize (copy), useLocalUserId (copy), GetFFlagContactsToastEnabled (copy), getDeepValue (copy), PermissionsProtocol (copy), SetCurrentToastMessage (copy), Cryo (copy), EventNames (copy), UpdateContactImporterModalLogic (copy), Platform (copy), updateOptedInUsers (copy), AppStorageService (copy), EnumScreens (copy), Promise (copy), Toast (copy), v37 (copy), vector2 (copy), configureRoduxUsers (copy), v36 (copy), localStorageContactsToast (copy), ExperienceService2 (copy), setTimeout (copy)
+	local v40, v41 = React.useState(false)
+	local v42 = useDispatch()
+	local v43 = Analytics()
+	local v44 = useLocalization({
+		title = Constants.Translations.title,
+		subtitle = Constants.Translations.subtitle,
+		button = Constants.Translations.button,
+		buttonV2 = Constants.Translations.buttonV2
+	})
+	local v45 = ContactsToastIXP.useContactsToastVariant()
+	local v46 = useSelector(t1.getContactImporterParams)
+	local isDiscoverabilityUnset = v46.isDiscoverabilityUnset
+	local isPhoneVerified = v46.isPhoneVerified
+	local v49 = useScreenSize()
+	local v50 = useLocalUserId()
+	local v51 = useSelector(function(p1) -- line: 80
+		return p1.IsLocalUserUnder13
+	end)
+	local v52 = useSelector(function(p2) -- line: 84
+		-- upvalues: GetFFlagContactsToastEnabled (copy), v45 (copy), getDeepValue (copy), Constants (copy), v50 (copy)
+		if GetFFlagContactsToastEnabled() or v45 then
+			return (getDeepValue(p2, `{ Constants.RODUX_KEY }.Users.byUserId.{ v50 }`))
+		end
+
+		return {}
+	end)
+	local default = PermissionsProtocol.default
+
+	local function v54(p3) -- line: 92
+		-- upvalues: v42 (copy), SetCurrentToastMessage (copy)
+		v42(SetCurrentToastMessage({
+			toastMessage = p3
+		}))
+	end
+	local function v55() -- line: 97
+		-- upvalues: v42 (copy), t1 (copy)
+		v42(t1.openContactImporterLearnMoreLink())
+	end
+	local function v56(p4, p5) -- line: 100
+		-- upvalues: v42 (copy), t1 (copy)
+		v42(t1.openProfilePeekView(p4, p5))
+	end
+	local function v57(p6, p7) -- line: 104
+		-- upvalues: v42 (copy), t1 (copy)
+		v42(t1.openAmpWizardContainer(p6, p7))
+	end
+	local function v58(p8, p9) -- line: 108
+		-- upvalues: v42 (copy), t1 (copy), Cryo (copy)
+		v42(t1.navigateToRoute({ Cryo.Dictionary.join({
+			name = p8
+		}, p9) }))
+	end
+
+	local v59 = React.createElement(Toast, {
+		duration = 4,
+		toastContent = {
+			swipeUpDismiss = true,
+			iconImage = v37,
+			toastTitle = v44.title,
+			toastSubtitle = v44.subtitle,
+			iconSize = vector2,
+			onActivated = function() -- line: 138
+				-- upvalues: Platform (copy), default (copy), PermissionsProtocol (copy), updateOptedInUsers (copy), AppStorageService (copy), v50 (copy), v42 (copy), UpdateContactImporterModalLogic (copy), v58 (copy), EnumScreens (copy), v54 (copy), isPhoneVerified (copy), v55 (copy), v57 (copy), Promise (copy), v49 (copy), isDiscoverabilityUnset (copy), v56 (copy), v41 (copy), v43 (copy), EventNames (copy), v45 (copy)
+				if Platform == Enum.Platform.IOS then
+					default:checkOrRequestPermissions({ PermissionsProtocol.Permissions.CONTACTS_ACCESS }):andThen(function(p10) -- line: 140
+						-- upvalues: PermissionsProtocol (copy), updateOptedInUsers (copy), AppStorageService (copy), v50 (copy), v42 (copy), UpdateContactImporterModalLogic (copy), v58 (copy), EnumScreens (copy), v54 (copy), isPhoneVerified (copy), v55 (copy), v57 (copy), Promise (copy), v49 (copy)
+						if p10 == PermissionsProtocol.Status.AUTHORIZED then
+							updateOptedInUsers:addUserToLocalStorage(AppStorageService, v50)
+							v42(UpdateContactImporterModalLogic({
+								hasOSPermissions = true,
+								shouldShowContactImporterUpsellModal = false
+							}))
+							v58(EnumScreens.ContactsList, {
+								shouldUpdateUserSettings = true,
+								showToast = v54,
+								isPhoneVerified = isPhoneVerified,
+								openLearnMoreLink = v55,
+								openAmpUpsell = v57
+							})
+
+							return Promise.resolve()
+						end
+
+						if p10 == PermissionsProtocol.Status.DENIED then
+							v58(EnumScreens.ContactsRevokedAccessDialog, {
+								screenSize = v49
+							})
+
+							return Promise.resolve()
+						end
+
+						return Promise.reject()
+					end)
+				else
+					v58(EnumScreens.ContactImporter, {
+						isFromAddFriendsPage = false,
+						showToast = v54,
+						openLearnMoreLink = v55,
+						isDiscoverabilityUnset = isDiscoverabilityUnset,
+						isPhoneVerified = isPhoneVerified,
+						openProfilePeekView = v56,
+						openAmpUpsell = v57
+					})
+				end
+
+				v41(false)
+				v43.fireAnalyticsEvent(EventNames.ContactsToastButtonPressed, {
+					variant = v45
+				})
+			end,
+			onDismissed = function() -- line: 124
+				-- upvalues: v41 (copy), v43 (copy), EventNames (copy), v45 (copy)
+				v41(false)
+				v43.fireAnalyticsEvent(EventNames.ContactsToastDismissed, {
+					variant = v45
+				})
+			end,
+			buttonText = if v45 ~= Constants.Experiment.FIND_FRIENDS then v44.buttonV2 else v44.button
+		}
+	})
+
+	React.useEffect(function() -- line: 200
+		-- upvalues: v50 (copy), v42 (copy), configureRoduxUsers (copy)
+		if v50 and (string.len(v50) > 0 and v50 ~= "0") then
+			v42(configureRoduxUsers.GetUserV2FromUserId.API(v50))
+		end
+	end, { v50 })
+	React.useEffect(function() -- line: 204
+		-- upvalues: v50 (copy), v52 (copy), v36 (copy), t1 (copy), v51 (copy), localStorageContactsToast (copy), default (copy), PermissionsProtocol (copy), ExperienceService2 (copy), setTimeout (copy), v41 (copy), v43 (copy), EventNames (copy), v45 (copy)
+		if v50 and (string.len(v50) > 0 and v52 and v52.created) then
+			local v69, v70, v71 = v52.created:match("(%d+)-(%d+)-(%d+)")
+
+			if math.floor((os.time() - os.time({
+				year = v69,
+				month = v70,
+				day = v71
+			})) / 86400) <= v36 and t1.isContactsToastPolicyEnabled and not v51 and localStorageContactsToast:CheckUserHasNotSeen(v50) then
+				((if not t1.hasPermissions then default:hasPermissions({ PermissionsProtocol.Permissions.CONTACTS_ACCESS }) else t1.hasPermissions())):andThen(function(p11) -- line: 215
+					-- upvalues: PermissionsProtocol (copy), localStorageContactsToast (copy), v50 (copy), ExperienceService2 (copy), setTimeout (copy), v41 (copy), v43 (copy), EventNames (copy), v45 (copy)
+					if p11.status == PermissionsProtocol.Status.DENIED and p11.missingPermissions[1] == PermissionsProtocol.Permissions.CONTACTS_ACCESS or p11.status ~= PermissionsProtocol.Status.DENIED and localStorageContactsToast:CheckUserHasNotOptedIn(v50) then
+						ExperienceService2:RegisterForExperienceLeave(function() -- line: 224
+							-- upvalues: localStorageContactsToast (copy), v50 (copy), setTimeout (copy), v41 (copy), v43 (copy), EventNames (copy), v45 (copy)
+							if localStorageContactsToast:CheckUserHasNotSeen(v50) then
+								setTimeout(function() -- line: 227
+									-- upvalues: v41 (copy), localStorageContactsToast (copy), v50 (copy), v43 (copy), EventNames (copy), v45 (copy)
+									v41(true)
+									localStorageContactsToast:AddUser(v50)
+									v43.fireAnalyticsEvent(EventNames.ContactsToastSeen, {
+										variant = v45
+									})
+								end, 1000)
+							end
+						end)
+					end
+				end)
+			end
+		end
+	end, {
+		v50,
+		t1.isContactsToastPolicyEnabled,
+		v51,
+		v52
+	})
+
+	if t1.isContactsToastPolicyEnabled and (not v51 and v40) or t1.testOverride then
+		return (React.createElement("ScreenGui", {
+			DisplayOrder = 13
+		}, { React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, -20),
+			Position = UDim2.new(0, 0, 0, 20)
+		}, v59) }))
+	end
+
+	return nil
+end

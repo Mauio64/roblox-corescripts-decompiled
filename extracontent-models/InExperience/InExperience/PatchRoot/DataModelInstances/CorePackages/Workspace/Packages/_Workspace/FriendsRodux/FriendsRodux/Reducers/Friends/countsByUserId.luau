@@ -1,19 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.roduxFriendsTypes);
-local v5 = {};
-return function(v6) --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), v5 (copy), v3 (copy)
-    local l_friendsNetworking_0 = v6.friendsNetworking;
-    return v2.createReducer(v5, {
-        [l_friendsNetworking_0.GetFriendsCountFromUserId.Succeeded.name] = function(v8, v9) --[[ Line: 12 ]]
-            -- upvalues: v3 (ref)
-            local v10 = tostring(v9.namedIds.users);
-            return v3.Dictionary.union(v8, {
-                [v10] = v9.responseBody.count
-            });
-        end
-    });
-end;
+local FriendsRodux = script:FindFirstAncestor("FriendsRodux")
+local FriendsRoduxParent = FriendsRodux.Parent
+local Rodux = require(FriendsRoduxParent.Rodux)
+local Cryo = require(FriendsRoduxParent.Cryo)
+
+require(FriendsRodux.roduxFriendsTypes)
+
+local t1 = {}
+
+return function(p1) -- line: 8
+	-- upvalues: Rodux (copy), t1 (copy), Cryo (copy)
+	local friendsNetworking = p1.friendsNetworking
+
+	return Rodux.createReducer(t1, {
+		[friendsNetworking.GetFriendsCountFromUserId.Succeeded.name] = function(p2, p3) -- line: 12
+			-- upvalues: Cryo (copy)
+			local str = tostring(p3.namedIds.users)
+
+			return Cryo.Dictionary.union(p2, {
+				[str] = p3.responseBody.count
+			})
+		end
+	})
+end

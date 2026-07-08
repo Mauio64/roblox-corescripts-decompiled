@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: blendTransparencies ]]
-    if v0 == nil then
-        return v1 or 0;
-    elseif v1 == nil then
-        return v0 or 0;
-    else
-        return 1 - (1 - v0) * (1 - v1);
-    end;
-end;
+local function blendTransparencies(n1: number?, n2: number?) -- line: 1
+	if n1 == nil then
+		return n2 or 0
+	end
+
+	if n2 == nil then
+		return n1 or 0
+	end
+
+	return 1 - (1 - n1) * (1 - n2)
+end
+
+return blendTransparencies

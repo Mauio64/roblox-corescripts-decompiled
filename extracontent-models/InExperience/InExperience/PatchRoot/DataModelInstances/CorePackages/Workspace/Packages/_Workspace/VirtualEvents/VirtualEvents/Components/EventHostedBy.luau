@@ -1,56 +1,60 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local v3 = require(l_script_FirstAncestor_0.Parent.UIBlox);
-local l_useLocalization_0 = require(l_script_FirstAncestor_0.Parent.Localization).Hooks.useLocalization;
-local v5 = require(l_script_FirstAncestor_0.Components.EventHostName);
-local _ = require(l_script_FirstAncestor_0.Parent.VirtualEventsState);
-local v7 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local l_useCursor_0 = v7.Hooks.useCursor;
-local l_Cell_0 = v3.App.Table.Cell;
-local l_CellHeadDetail_0 = v3.App.Table.CellHeadDetail;
-local l_CellTailDescription_0 = v3.App.Table.CellTailDescription;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local v13 = {
-    size = UDim2.new(1, 0, 0, 52)
-};
-return function(v14) --[[ Line: 29 ]] --[[ Name: EventHostedBy ]]
-    -- upvalues: v1 (copy), v13 (copy), l_useStyle_0 (copy), l_useLocalization_0 (copy), l_useCursor_0 (copy), v7 (copy), v2 (copy), l_Cell_0 (copy), l_CellHeadDetail_0 (copy), l_CellTailDescription_0 (copy), v5 (copy)
-    v14 = v1.Dictionary.join(v13, v14);
-    local v15 = l_useStyle_0();
-    local v16 = l_useLocalization_0({
-        hostedBy = "Feature.VirtualEvents.HostedByLabel"
-    });
-    local v17 = l_useCursor_0(v7.Enums.CursorType.RoundedRect);
-    local v18 = v2.useCallback(function() --[[ Line: 38 ]]
-        -- upvalues: v14 (ref)
-        if v14.onActivated then
-            v14.onActivated(v14.host);
-        end;
-    end, {
-        v14
-    });
-    return v2.createElement(l_Cell_0, {
-        selectionCursor = v17, 
-        size = v14.size, 
-        userInteractionEnabled = true, 
-        horizontalPadding = 0, 
-        onActivated = v18, 
-        head = v2.createElement(l_CellHeadDetail_0, {
-            labelText = v16.hostedBy, 
-            labelTextColor = v15.Theme.TextDefault, 
-            labelTextFont = v15.Font.Body
-        }), 
-        tail = v2.createElement(l_CellTailDescription_0, {
-            text = "", 
-            renderTextOverride = function() --[[ Line: 57 ]] --[[ Name: renderTextOverride ]]
-                -- upvalues: v2 (ref), v5 (ref), v14 (ref)
-                return v2.createElement(v5, {
-                    host = v14.host
-                });
-            end, 
-            showArrow = true
-        }), 
-        layoutWraps = true
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local Cryo = require(VirtualEvents.Parent.Cryo)
+local React = require(VirtualEvents.Parent.React)
+local UIBlox = require(VirtualEvents.Parent.UIBlox)
+local useLocalization = require(VirtualEvents.Parent.Localization).Hooks.useLocalization
+local EventHostName = require(VirtualEvents.Components.EventHostName)
+
+require(VirtualEvents.Parent.VirtualEventsState)
+
+local Foundation = require(VirtualEvents.Parent.Foundation)
+local useCursor = Foundation.Hooks.useCursor
+local Cell = UIBlox.App.Table.Cell
+local CellHeadDetail = UIBlox.App.Table.CellHeadDetail
+local CellTailDescription = UIBlox.App.Table.CellTailDescription
+local useStyle = UIBlox.Core.Style.useStyle
+local t1 = {
+	size = UDim2.new(1, 0, 0, 52)
+}
+
+local function EventHostedBy(t2: {[any]: any}) -- line: 29
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useLocalization (copy), useCursor (copy), Foundation (copy), React (copy), Cell (copy), CellHeadDetail (copy), CellTailDescription (copy), EventHostName (copy)
+	local u16 = Cryo.Dictionary.join(t1, t2)
+	local v17 = useStyle()
+	local v18 = useLocalization({
+		hostedBy = "Feature.VirtualEvents.HostedByLabel"
+	})
+	local v19 = useCursor(Foundation.Enums.CursorType.RoundedRect)
+	local v20 = React.useCallback(function() -- line: 38
+		-- upvalues: u16 (ref)
+		if u16.onActivated then
+			u16.onActivated(u16.host)
+		end
+	end, { u16 })
+
+	return React.createElement(Cell, {
+		userInteractionEnabled = true,
+		horizontalPadding = 0,
+		layoutWraps = true,
+		selectionCursor = v19,
+		size = u16.size,
+		onActivated = v20,
+		head = React.createElement(CellHeadDetail, {
+			labelText = v18.hostedBy,
+			labelTextColor = v17.Theme.TextDefault,
+			labelTextFont = v17.Font.Body
+		}),
+		tail = React.createElement(CellTailDescription, {
+			text = "",
+			showArrow = true,
+			renderTextOverride = function() -- line: 57
+				-- upvalues: React (copy), EventHostName (copy), u16 (ref)
+				return React.createElement(EventHostName, {
+					host = u16.host
+				})
+			end
+		})
+	})
+end
+
+return EventHostedBy

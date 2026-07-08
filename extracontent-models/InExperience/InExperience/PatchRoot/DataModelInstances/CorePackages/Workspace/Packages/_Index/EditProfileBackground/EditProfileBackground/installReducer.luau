@@ -1,1 +1,1 @@
-return require(script.installReducer);
+return require(script.installReducer)

@@ -1,23 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v4 = require(l_script_FirstAncestor_0.Analytics);
-local l_DefaultAnalyticsService_0 = require(l_Parent_0.SocialLuaAnalytics).Analytics.DefaultAnalyticsService;
-local v6 = require(script.Parent.EditProfileEntryPointContainer);
-return function(v7) --[[ Line: 11 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v2 (copy), v4 (copy), l_DefaultAnalyticsService_0 (copy), v6 (copy)
-    local v8 = l_useLocalUserId_0();
-    return v2.createElement(v4.Context.Provider, {
-        value = {
-            fireAnalyticsEvent = v4.setupFireAnalyticsEvents({
-                analytics = l_DefaultAnalyticsService_0, 
-                infoForAllEvents = {
-                    uid = v8
-                }
-            })
-        }
-    }, {
-        v2.createElement(v6, v7)
-    });
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local Analytics = require(EditProfile.Analytics)
+local DefaultAnalyticsService = require(EditProfileParent.SocialLuaAnalytics).Analytics.DefaultAnalyticsService
+local EditProfileEntryPointContainer = require(script.Parent.EditProfileEntryPointContainer)
+
+return function(p1) -- line: 11
+	-- upvalues: useLocalUserId (copy), React (copy), Analytics (copy), DefaultAnalyticsService (copy), EditProfileEntryPointContainer (copy)
+	local v9 = useLocalUserId()
+
+	return React.createElement(Analytics.Context.Provider, {
+		value = {
+			fireAnalyticsEvent = Analytics.setupFireAnalyticsEvents({
+				analytics = DefaultAnalyticsService,
+				infoForAllEvents = {
+					uid = v9
+				}
+			})
+		}
+	}, { React.createElement(EditProfileEntryPointContainer, p1) })
+end

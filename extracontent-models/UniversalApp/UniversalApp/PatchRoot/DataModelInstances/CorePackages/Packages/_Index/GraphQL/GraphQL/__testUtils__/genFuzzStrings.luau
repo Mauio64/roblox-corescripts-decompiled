@@ -1,25 +1,33 @@
 return {
-    genFuzzStrings = function(v0) --[[ Line: 13 ]] --[[ Name: genFuzzStrings ]]
-        return coroutine.wrap(function() --[[ Line: 14 ]] --[[ Name: getFuzzStrings ]]
-            -- upvalues: v0 (copy)
-            local l_allowedChars_0 = v0.allowedChars;
-            local l_maxLength_0 = v0.maxLength;
-            local v3 = #l_allowedChars_0;
-            local v4 = 0;
-            for v5 = 1, l_maxLength_0 do
-                v4 = v4 + v3 ^ v5;
-            end;
-            coroutine.yield("");
-            for v6 = 0, v4 - 1 do
-                local v7 = "";
-                local l_v6_0 = v6;
-                while l_v6_0 >= 0 do
-                    local v9 = l_v6_0 % v3;
-                    v7 = l_allowedChars_0[v9 + 1] .. v7;
-                    l_v6_0 = (l_v6_0 - v9) / v3 - 1;
-                end;
-                coroutine.yield(v7);
-            end;
-        end);
-    end
-};
+	genFuzzStrings = function(t1: {[any]: any}) -- line: 13
+		local function getFuzzStrings() -- line: 14
+			-- upvalues: t1 (copy)
+			local allowedChars = t1.allowedChars
+			local maxLength = t1.maxLength
+			local v5 = #allowedChars
+			local n1 = 0
+
+			for i = 1, maxLength do
+				n1 += v5 ^ i
+			end
+
+			coroutine.yield("")
+
+			for i = 0, n1 - 1 do
+				local s1 = ""
+				local v10 = i
+
+				while v10 >= 0 do
+					local v11 = v10 % v5
+
+					s1 = allowedChars[v11 + 1] .. s1
+					v10 = (v10 - v11) / v5 - 1
+				end
+
+				coroutine.yield(s1)
+			end
+		end
+
+		return coroutine.wrap(getFuzzStrings)
+	end
+}

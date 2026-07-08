@@ -1,58 +1,62 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TextService_0 = game:GetService("TextService");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.Parent.Constants);
-local l_CheckboxInnerPadding_0 = v3.UtilityBarFormatting.CheckboxInnerPadding;
-local v5 = v2.Component:extend("Checkbox");
-v5.render = function(v6) --[[ Line: 10 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), l_TextService_0 (copy), v2 (copy), l_CheckboxInnerPadding_0 (copy)
-    local l_checkboxHeight_0 = v6.props.checkboxHeight;
-    local l_frameHeight_0 = v6.props.frameHeight;
-    local l_layoutOrder_0 = v6.props.layoutOrder;
-    local l_name_0 = v6.props.name;
-    local l_font_0 = v6.props.font;
-    local l_fontSize_0 = v6.props.fontSize;
-    local l_isSelected_0 = v6.props.isSelected;
-    local l_selectedColor_0 = v6.props.selectedColor;
-    local l_unselectedColor_0 = v6.props.unselectedColor;
-    local l_onCheckboxClicked_0 = v6.props.onCheckboxClicked;
-    local v17 = "";
-    local v18 = 1;
-    local l_l_unselectedColor_0_0 = l_unselectedColor_0;
-    if l_isSelected_0 then
-        v17 = v3.Image.Check;
-        v18 = 0;
-        l_l_unselectedColor_0_0 = l_selectedColor_0;
-    end;
-    local l_X_0 = l_TextService_0:GetTextSize(l_name_0, l_fontSize_0, l_font_0, Vector2.new(0, l_frameHeight_0)).X;
-    return v2.createElement("ImageButton", {
-        Size = UDim2.new(0, l_checkboxHeight_0 + l_X_0 + l_CheckboxInnerPadding_0 * 2, 0, l_frameHeight_0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = l_layoutOrder_0, 
-        [v2.Event.Activated] = function(_) --[[ Line: 43 ]]
-            -- upvalues: l_onCheckboxClicked_0 (copy), l_name_0 (copy), l_isSelected_0 (copy)
-            l_onCheckboxClicked_0(l_name_0, not l_isSelected_0);
-        end
-    }, {
-        Icon = v2.createElement("ImageLabel", {
-            Image = v17, 
-            Size = UDim2.new(0, l_checkboxHeight_0, 0, l_checkboxHeight_0), 
-            Position = UDim2.new(0, 0, 0.5, -l_checkboxHeight_0 / 2), 
-            BackgroundColor3 = l_l_unselectedColor_0_0, 
-            BackgroundTransparency = 0, 
-            BorderColor3 = v3.Color.Text, 
-            BorderSizePixel = v18
-        }), 
-        Text = v2.createElement("TextLabel", {
-            Text = l_name_0, 
-            TextColor3 = v3.Color.Text, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            Font = l_font_0, 
-            TextSize = l_fontSize_0, 
-            Size = UDim2.new(1, -l_frameHeight_0, 1, 0), 
-            Position = UDim2.new(0, l_checkboxHeight_0 + l_CheckboxInnerPadding_0, 0, 0), 
-            BackgroundTransparency = 1
-        })
-    });
-end;
-return v5;
+local CorePackages = game:GetService("CorePackages")
+local TextService = game:GetService("TextService")
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Constants)
+local CheckboxInnerPadding = Constants.UtilityBarFormatting.CheckboxInnerPadding
+local v6 = Roact.Component:extend("Checkbox")
+
+function v6.render(p1) -- line: 10
+	-- upvalues: Constants (copy), TextService (copy), Roact (copy), CheckboxInnerPadding (copy)
+	local checkboxHeight = p1.props.checkboxHeight
+	local frameHeight = p1.props.frameHeight
+	local layoutOrder = p1.props.layoutOrder
+	local name = p1.props.name
+	local font = p1.props.font
+	local fontSize = p1.props.fontSize
+	local isSelected = p1.props.isSelected
+	local selectedColor = p1.props.selectedColor
+	local unselectedColor = p1.props.unselectedColor
+	local onCheckboxClicked = p1.props.onCheckboxClicked
+	local s1 = ""
+	local n1 = 1
+
+	if isSelected then
+		s1 = Constants.Image.Check
+		n1 = 0
+		unselectedColor = selectedColor
+	end
+
+	local X = TextService:GetTextSize(name, fontSize, font, Vector2.new(0, frameHeight)).X
+
+	return Roact.createElement("ImageButton", {
+		Size = UDim2.new(0, checkboxHeight + X + CheckboxInnerPadding * 2, 0, frameHeight),
+		BackgroundTransparency = 1,
+		LayoutOrder = layoutOrder,
+		[Roact.Event.Activated] = function(_) -- line: 43
+			-- upvalues: onCheckboxClicked (copy), name (copy), isSelected (copy)
+			onCheckboxClicked(name, not isSelected)
+		end
+	}, {
+		Icon = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 0,
+			Image = s1,
+			Size = UDim2.new(0, checkboxHeight, 0, checkboxHeight),
+			Position = UDim2.new(0, 0, 0.5, -checkboxHeight / 2),
+			BackgroundColor3 = unselectedColor,
+			BorderColor3 = Constants.Color.Text,
+			BorderSizePixel = n1
+		}),
+		Text = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = name,
+			TextColor3 = Constants.Color.Text,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Font = font,
+			TextSize = fontSize,
+			Size = UDim2.new(1, -frameHeight, 1, 0),
+			Position = UDim2.new(0, checkboxHeight + CheckboxInnerPadding, 0, 0)
+		})
+	})
+end
+
+return v6

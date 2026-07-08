@@ -1,50 +1,65 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_TextService_0 = game:GetService("TextService");
-local v4 = require(l_script_FirstAncestor_0.BubbleChat.Helpers.getAbsolutePaddingbyDimension);
-local l_getFFlagExpChatAlwaysRunTCS_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).getFFlagExpChatAlwaysRunTCS;
-local function v17(v6, v7) --[[ Line: 9 ]]
-    -- upvalues: l_CoreGui_0 (copy), v4 (copy)
-    local l_ScreenGui_0 = Instance.new("ScreenGui");
-    l_ScreenGui_0.Enabled = false;
-    l_ScreenGui_0.Name = "RichTextSizingLabel";
-    l_ScreenGui_0.Parent = l_CoreGui_0;
-    local l_TextLabel_0 = Instance.new("TextLabel");
-    l_TextLabel_0.TextWrapped = true;
-    l_TextLabel_0.RichText = true;
-    l_TextLabel_0.Parent = l_ScreenGui_0;
-    l_TextLabel_0.Text = v6;
-    l_TextLabel_0.TextSize = v7.TextSize;
-    if v7.FontFace then
-        l_TextLabel_0.FontFace = v7.FontFace;
-    else
-        l_TextLabel_0.Font = v7.Font;
-    end;
-    l_TextLabel_0.Size = UDim2.fromOffset(v7.MaxWidth, 10000);
-    local l_TextBounds_0 = l_TextLabel_0.TextBounds;
-    l_ScreenGui_0:Destroy();
-    local v11 = nil;
-    if v7.UIPadding then
-        local v12 = v4(v7.UIPadding.PaddingLeft, l_TextBounds_0.X);
-        local v13 = v4(v7.UIPadding.PaddingRight, l_TextBounds_0.X);
-        local v14 = v4(v7.UIPadding.PaddingTop, l_TextBounds_0.Y);
-        local v15 = v4(v7.UIPadding.PaddingBottom, l_TextBounds_0.Y);
-        v11 = Vector2.new((v12 + v13) * 2, v14 + v15);
-    else
-        local l_Padding_0 = v7.Padding;
-        v11 = Vector2.new(l_Padding_0 * 4, l_Padding_0 * 2);
-    end;
-    return v11 + l_TextBounds_0;
-end;
-return function(v18, v19, v20) --[[ Line: 51 ]]
-    -- upvalues: l_TextChatService_0 (copy), l_getFFlagExpChatAlwaysRunTCS_0 (copy), v17 (copy), l_TextService_0 (copy)
-    if v20 == nil then
-        v20 = l_TextChatService_0;
-    end;
-    if l_getFFlagExpChatAlwaysRunTCS_0() or v20.ChatVersion == Enum.ChatVersion.TextChatService then
-        return (v17(v18, v19));
-    else
-        return l_TextService_0:GetTextSize(v18, v19.TextSize, v19.Font, Vector2.new(v19.MaxWidth, 10000)) + Vector2.new(v19.Padding * 4, v19.Padding * 2);
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local TextChatService = game:GetService("TextChatService")
+local TextService = game:GetService("TextService")
+local getAbsolutePaddingbyDimension = require(ExpChat.BubbleChat.Helpers.getAbsolutePaddingbyDimension)
+local getFFlagExpChatAlwaysRunTCS = require(ExpChat.Parent.SharedFlags).getFFlagExpChatAlwaysRunTCS
+
+local function v7(s1: string, p1) -- line: 9
+	-- upvalues: CoreGui (copy), getAbsolutePaddingbyDimension (copy)
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.Enabled = false
+	ScreenGui.Name = "RichTextSizingLabel"
+	ScreenGui.Parent = CoreGui
+
+	local TextLabel = Instance.new("TextLabel")
+
+	TextLabel.TextWrapped = true
+	TextLabel.RichText = true
+	TextLabel.Parent = ScreenGui
+	TextLabel.Text = s1
+	TextLabel.TextSize = p1.TextSize
+
+	if p1.FontFace then
+		TextLabel.FontFace = p1.FontFace
+	else
+		TextLabel.Font = p1.Font
+	end
+
+	TextLabel.Size = UDim2.fromOffset(p1.MaxWidth, 10000)
+
+	local TextBounds = TextLabel.TextBounds
+
+	ScreenGui:Destroy()
+
+	local vector2
+
+	if p1.UIPadding then
+		local v13 = getAbsolutePaddingbyDimension(p1.UIPadding.PaddingLeft, TextBounds.X)
+		local v14 = getAbsolutePaddingbyDimension(p1.UIPadding.PaddingRight, TextBounds.X)
+		local v15 = getAbsolutePaddingbyDimension(p1.UIPadding.PaddingTop, TextBounds.Y)
+		local v16 = getAbsolutePaddingbyDimension(p1.UIPadding.PaddingBottom, TextBounds.Y)
+
+		vector2 = Vector2.new((v13 + v14) * 2, v15 + v16)
+	else
+		local p1Padding = p1.Padding
+
+		vector2 = Vector2.new(p1Padding * 4, p1Padding * 2)
+	end
+
+	return vector2 + TextBounds
+end
+
+return function(s2: string, p2, p3) -- line: 51
+	-- upvalues: TextChatService (copy), getFFlagExpChatAlwaysRunTCS (copy), v7 (copy), TextService (copy)
+	if p3 == nil then
+		p3 = TextChatService
+	end
+
+	if getFFlagExpChatAlwaysRunTCS() or p3.ChatVersion == Enum.ChatVersion.TextChatService then
+		return (v7(s2, p2))
+	end
+
+	return TextService:GetTextSize(s2, p2.TextSize, p2.Font, Vector2.new(p2.MaxWidth, 10000)) + Vector2.new(p2.Padding * 4, p2.Padding * 2)
+end

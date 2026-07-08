@@ -1,71 +1,85 @@
-enc = function(v0) --[[ Line: 6 ]] --[[ Name: enc ]]
-    return (v0:gsub(".", function(v1) --[[ Line: 7 ]]
-        local v2 = "";
-        local v3 = v1:byte();
-        for v4 = 8, 1, -1 do
-            v2 = v2 .. (v3 % 2 ^ v4 - v3 % 2 ^ (v4 - 1) > 0 and "1" or "0");
-        end;
-        return v2;
-    end) .. "0000"):gsub("%d%d%d?%d?%d?%d?", function(v5) --[[ Line: 11 ]]
-        if #v5 < 6 then
-            return "";
-        else
-            local v6 = 0;
-            for v7 = 1, 6 do
-                v6 = v6 + (v5:sub(v7, v7) == "1" and 2 ^ (6 - v7) or 0);
-            end;
-            return ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"):sub(v6 + 1, v6 + 1);
-        end;
-    end) .. ({
-        "", 
-        "==", 
-        "="
-    })[#v0 % 3 + 1];
-end;
-dec = function(v8) --[[ Line: 20 ]] --[[ Name: dec ]]
-    return (string.gsub(v8, "[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=]", ""):gsub(".", function(v9) --[[ Line: 22 ]]
-        if v9 == "=" then
-            return "";
-        else
-            local v10 = "";
-            local v11 = ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"):find(v9) - 1;
-            for v12 = 6, 1, -1 do
-                v10 = v10 .. (v11 % 2 ^ v12 - v11 % 2 ^ (v12 - 1) > 0 and "1" or "0");
-            end;
-            return v10;
-        end;
-    end):gsub("%d%d%d?%d?%d?%d?%d?%d?", function(v13) --[[ Line: 27 ]]
-        if #v13 ~= 8 then
-            return "";
-        else
-            local v14 = 0;
-            for v15 = 1, 8 do
-                v14 = v14 + (v13:sub(v15, v15) == "1" and 2 ^ (7 - v15) or 0);
-            end;
-            return (string.char(v14));
-        end;
-    end));
-end;
-safe_enc = function(v16, v17) --[[ Line: 35 ]] --[[ Name: safe_enc ]]
-    if v17 == nil then
-        v17 = true;
-    end;
-    local v18 = "";
-    local v19 = {};
-    while #v16 > 0 do
-        table.insert(v19, v16:sub(1, 204798));
-        v16 = v16:sub(204799);
-    end;
-    for v20, v21 in ipairs(v19) do
-        if v17 then
-            print(("[http] Encoding B64 chunk %s/%s"):format(v20, #v19));
-        end;
-        v18 = v18 .. enc(v21);
-        wait();
-    end;
-    return v18;
-end;
+function enc(p1) -- line: 6
+	return (p1:gsub(".", function(p2) -- line: 7
+		local s1 = ""
+		local v11 = p2:byte()
+
+		for i = 8, 1, -1 do
+			s1 ..= not (v11 % 2 ^ i - v11 % 2 ^ (i - 1) > 0) and "0" or "1"
+		end
+
+		return s1
+	end) .. "0000"):gsub("%d%d%d?%d?%d?%d?", function(p3) -- line: 11
+		if #p3 < 6 then
+			return ""
+		end
+
+		local n1 = 0
+
+		for i = 1, 6 do
+			n1 += p3:sub(i, i) == "1" and 2 ^ (6 - i) or 0
+		end
+
+		return ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"):sub(n1 + 1, n1 + 1)
+	end) .. ({
+		"",
+		"==",
+		"="
+	})[#p1 % 3 + 1]
+end
+function dec(p4) -- line: 20
+	return (string.gsub(p4, "[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=]", ""):gsub(".", function(p5) -- line: 22
+		if p5 == "=" then
+			return ""
+		end
+
+		local s2 = ""
+		local v18 = ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"):find(p5) - 1
+
+		for i = 6, 1, -1 do
+			s2 ..= not (v18 % 2 ^ i - v18 % 2 ^ (i - 1) > 0) and "0" or "1"
+		end
+
+		return s2
+	end):gsub("%d%d%d?%d?%d?%d?%d?%d?", function(p6) -- line: 27
+		if #p6 ~= 8 then
+			return ""
+		end
+
+		local n2 = 0
+
+		for i = 1, 8 do
+			n2 += p6:sub(i, i) == "1" and 2 ^ (7 - i) or 0
+		end
+
+		return (string.char(n2))
+	end))
+end
+function safe_enc(p7, p8) -- line: 35
+	if p8 == nil then
+		p8 = true
+	end
+
+	local s3 = ""
+	local t1 = {}
+
+	while #p7 > 0 do
+		table.insert(t1, p7:sub(1, 204798))
+		p7 = p7:sub(204799)
+	end
+
+	for i, v in ipairs(t1) do
+		if p8 then
+			print(("[http] Encoding B64 chunk %s/%s"):format(i, #t1))
+		end
+
+		s3 ..= enc(v)
+		wait()
+	end
+
+	return s3
+end
+
 return {
-    encode = safe_enc, 
-    decode = dec
-};
+	encode = safe_enc,
+	decode = dec
+}

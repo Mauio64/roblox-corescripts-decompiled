@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableFavoriteExperiences_V3", false);
+return game:DefineFastFlag("ProfilePlatformEnableFavoriteExperiences_V3", false)

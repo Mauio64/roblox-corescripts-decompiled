@@ -1,46 +1,51 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagEnableModerateChatRemoteEvent_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableModerateChatRemoteEvent;
-return function() --[[ Line: 4 ]]
-    -- upvalues: l_FFlagEnableModerateChatRemoteEvent_0 (copy)
-    assert(game:FindService("NetworkServer") ~= nil);
-    local l_NetworkServer_0 = game:GetService("NetworkServer");
-    local v3 = {};
-    table.insert(v3, "GetServerVersion");
-    table.insert(v3, "GetServerChannel");
-    table.insert(v3, "WhisperChat");
-    table.insert(v3, "GetServerType");
-    table.insert(v3, "ServerSideBulkPurchaseEvent");
-    table.insert(v3, "CanChatWith");
-    table.insert(v3, "SetPlayerBlockList");
-    table.insert(v3, "UpdatePlayerBlockList");
-    table.insert(v3, "NewPlayerGroupDetails");
-    table.insert(v3, "NewPlayerCanManageDetails");
-    table.insert(v3, "SendPlayerBlockList");
-    table.insert(v3, "UpdateLocalPlayerBlockList");
-    table.insert(v3, "SendPlayerProfileSettings");
-    table.insert(v3, "UpdatePlayerProfileSettings");
-    table.insert(v3, "ShowPlayerJoinedFriendsToast");
-    table.insert(v3, "ShowFriendJoinedPlayerToast");
-    table.insert(v3, "CreateOrJoinParty");
-    if game:DefineFastFlag("RemoteAllowListAddSocial", false) then
-        table.insert(v3, "RequestPlayerProfileSettings");
-    end;
-    if l_FFlagEnableModerateChatRemoteEvent_0 then
-        table.insert(v3, "ModerateChatSettingUpdated");
-    end;
-    table.insert(v3, "SetDialogInUse");
-    table.insert(v3, "ContactListInvokeIrisInvite");
-    table.insert(v3, "ContactListIrisInviteTeleport");
-    table.insert(v3, "UpdateCurrentCall");
-    table.insert(v3, "RequestDeviceCameraOrientationCapability");
-    table.insert(v3, "RequestDeviceCameraCFrame");
-    table.insert(v3, "ReplicateDeviceCameraCFrame");
-    table.insert(v3, "ReferredPlayerJoin");
-    table.insert(v3, "SetUserActive");
-    table.insert(v3, "SendLikelySpeakingUsers");
-    table.insert(v3, "ReceiveLikelySpeakingUsers");
-    if game:DefineFastFlag("RemoteAllowListAddVR", false) then
-        table.insert(v3, "AvatarGesturesVRPlayer");
-    end;
-    l_NetworkServer_0:InitializeRemoteAllowList(v3);
-end;
+local CorePackages = game:GetService("CorePackages")
+local FFlagEnableModerateChatRemoteEvent = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableModerateChatRemoteEvent
+local v3 = game:DefineFastFlag("RemoteAllowListAddExpChatFeatureValueChanged", false)
+
+return function() -- line: 6
+	-- upvalues: FFlagEnableModerateChatRemoteEvent (copy), v3 (copy)
+	assert(game:FindService("NetworkServer") ~= nil)
+
+	local NetworkServer = game:GetService("NetworkServer")
+	local t1 = {}
+
+	table.insert(t1, "GetServerVersion")
+	table.insert(t1, "GetServerChannel")
+	table.insert(t1, "WhisperChat")
+	table.insert(t1, "GetServerType")
+	table.insert(t1, "ServerSideBulkPurchaseEvent")
+	table.insert(t1, "CanChatWith")
+	table.insert(t1, "SetPlayerBlockList")
+	table.insert(t1, "UpdatePlayerBlockList")
+	table.insert(t1, "NewPlayerGroupDetails")
+	table.insert(t1, "NewPlayerCanManageDetails")
+	table.insert(t1, "SendPlayerBlockList")
+	table.insert(t1, "UpdateLocalPlayerBlockList")
+	table.insert(t1, "SendPlayerProfileSettings")
+	table.insert(t1, "UpdatePlayerProfileSettings")
+	table.insert(t1, "ShowPlayerJoinedFriendsToast")
+	table.insert(t1, "ShowFriendJoinedPlayerToast")
+	table.insert(t1, "CreateOrJoinParty")
+	table.insert(t1, "RequestPlayerProfileSettings")
+
+	if FFlagEnableModerateChatRemoteEvent then
+		table.insert(t1, "ModerateChatSettingUpdated")
+	end
+
+	if v3 then
+		table.insert(t1, "ExpChatFeatureValueChanged")
+	end
+
+	table.insert(t1, "SetDialogInUse")
+	table.insert(t1, "ContactListInvokeIrisInvite")
+	table.insert(t1, "ContactListIrisInviteTeleport")
+	table.insert(t1, "UpdateCurrentCall")
+	table.insert(t1, "RequestDeviceCameraOrientationCapability")
+	table.insert(t1, "RequestDeviceCameraCFrame")
+	table.insert(t1, "ReplicateDeviceCameraCFrame")
+	table.insert(t1, "ReferredPlayerJoin")
+	table.insert(t1, "BuildExperiencePlaytestTeleport")
+	table.insert(t1, "SetUserActive")
+	table.insert(t1, "AvatarGesturesVRPlayer")
+	NetworkServer:InitializeRemoteAllowList(t1)
+end

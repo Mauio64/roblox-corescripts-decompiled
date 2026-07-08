@@ -1,48 +1,63 @@
-local v0 = {
-    "ClimbAnimation", 
-    "Face", 
-    "FallAnimation", 
-    "GraphicTShirt", 
-    "Head", 
-    "IdleAnimation", 
-    "JumpAnimation", 
-    "LeftArm", 
-    "LeftLeg", 
-    "Pants", 
-    "RightArm", 
-    "RightLeg", 
-    "RunAnimation", 
-    "Shirt", 
-    "SwimAnimation", 
-    "Torso", 
-    "WalkAnimation"
-};
-return function(v1) --[[ Line: 22 ]]
-    -- upvalues: v0 (copy)
-    local v2 = {};
-    for _, v4 in ipairs(v0) do
-        local v5 = v1[v4];
-        if typeof(v5) == "number" and v5 > 0 then
-            table.insert(v2, v5);
-        elseif typeof(v5) == "string" and v5 ~= "" then
-            for v6 in v5:gmatch("([%d]+),?") do
-                table.insert(v2, (tonumber(v6)));
-            end;
-        end;
-    end;
-    local l_v1_Accessories_0 = v1:GetAccessories(true);
-    for _, v9 in ipairs(l_v1_Accessories_0) do
-        table.insert(v2, v9.AssetId);
-    end;
-    local l_v1_Emotes_0 = v1:GetEmotes();
-    local l_v1_EquippedEmotes_0 = v1:GetEquippedEmotes();
-    for _, v13 in ipairs(l_v1_EquippedEmotes_0) do
-        local v14 = l_v1_Emotes_0[v13.Name];
-        if v14 then
-            for _, v16 in ipairs(v14) do
-                table.insert(v2, v16);
-            end;
-        end;
-    end;
-    return v2;
-end;
+local t1 = {
+	"ClimbAnimation",
+	"Face",
+	"FallAnimation",
+	"GraphicTShirt",
+	"Head",
+	"IdleAnimation",
+	"JumpAnimation",
+	"LeftArm",
+	"LeftLeg",
+	"Pants",
+	"RightArm",
+	"RightLeg",
+	"RunAnimation",
+	"Shirt",
+	"SwimAnimation",
+	"Torso",
+	"WalkAnimation"
+}
+
+return function(p1) -- line: 23
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	for _, v in ipairs(t1) do
+		local v6 = p1[v]
+
+		if typeof(v6) == "number" and v6 > 0 then
+			table.insert(t2, v6)
+		elseif typeof(v6) == "string" and v6 ~= "" then
+			for match in v6:gmatch("([%d]+),?") do
+				table.insert(t2, (tonumber(match)))
+			end
+		end
+	end
+
+	local Accessories = p1:GetAccessories(true)
+
+	for _, v in ipairs(Accessories) do
+		table.insert(t2, v.AssetId)
+	end
+
+	for _, child in (p1:GetChildren()) do
+		if child:IsA("MakeupDescription") and child.AssetId > 0 then
+			table.insert(t2, child.AssetId)
+		end
+	end
+
+	local Emotes = p1:GetEmotes()
+	local EquippedEmotes = p1:GetEquippedEmotes()
+
+	for _, v in ipairs(EquippedEmotes) do
+		local v17 = Emotes[v.Name]
+
+		if v17 then
+			for _, v2 in ipairs(v17) do
+				table.insert(t2, v2)
+			end
+		end
+	end
+
+	return t2
+end

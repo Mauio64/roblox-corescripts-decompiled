@@ -1,29 +1,34 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v4 = {};
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-local l_mergeEnumValues_0 = require(script.Parent["enum-values"]).mergeEnumValues;
-local _ = require(script.Parent["merge-typedefs_types"]);
-v4.mergeEnum = function(v9, v10, v11) --[[ Line: 26 ]] --[[ Name: mergeEnum ]]
-    -- upvalues: l_Boolean_0 (copy), l_mergeDirectives_0 (copy), l_mergeEnumValues_0 (copy), l_Object_0 (copy), l_Kind_0 (copy)
-    if l_Boolean_0.toJSBoolean(v10) then
-        return {
-            name = v9.name, 
-            description = if l_Boolean_0.toJSBoolean(v9.description) then v9.description else v10.description, 
-            kind = (not (not (v11 and l_Boolean_0.toJSBoolean(v11.convertExtensions)) and v9.kind ~= "EnumTypeDefinition") or v10.kind == "EnumTypeDefinition") and "EnumTypeDefinition" or "EnumTypeExtension", 
-            loc = v9.loc, 
-            directives = l_mergeDirectives_0(v9.directives, v10.directives, v11), 
-            values = l_mergeEnumValues_0(v9.values, v10.values, v11)
-        };
-    elseif v11 and l_Boolean_0.toJSBoolean(v11.convertExtensions) then
-        return (l_Object_0.assign({}, v9, {
-            kind = l_Kind_0.ENUM_TYPE_DEFINITION
-        }));
-    else
-        return v9;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local Kind = require(ParentParent.GraphQL).Kind
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+local mergeEnumValues = require(script.Parent["enum-values"]).mergeEnumValues
+
+require(script.Parent["merge-typedefs_types"])
+
+function t1.mergeEnum(p1, p2, p3) -- line: 26
+	-- upvalues: Boolean (copy), mergeDirectives (copy), mergeEnumValues (copy), Object (copy), Kind (copy)
+	if Boolean.toJSBoolean(p2) then
+		return {
+			name = p1.name,
+			description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
+			kind = not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "EnumTypeDefinition" and p2.kind ~= "EnumTypeDefinition") and "EnumTypeExtension" or "EnumTypeDefinition",
+			loc = p1.loc,
+			directives = mergeDirectives(p1.directives, p2.directives, p3),
+			values = mergeEnumValues(p1.values, p2.values, p3)
+		}
+	end
+
+	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
+		return (Object.assign({}, p1, {
+			kind = Kind.ENUM_TYPE_DEFINITION
+		}))
+	end
+
+	return p1
+end
+
+return t1

@@ -1,429 +1,509 @@
-local v0 = require(script.Parent.symbols);
-local v1 = require(script.Parent.Spy);
-local v2 = require(script.Parent.setReturnValue);
-local v3 = require(script.Parent.setSideEffect);
-local function _(v4, v5) --[[ Line: 8 ]] --[[ Name: isKeyInSpec ]]
-    -- upvalues: v0 (copy)
-    local v6 = v4[v0.Spec];
-    if v6 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 11 ]]
-            -- upvalues: v6 (copy), v5 (copy)
-            return v6[v5];
-        end);
-        return l_status_0 and l_result_0;
-    else
-        return true;
-    end;
-end;
-local v10 = {
-    is = require(script.Parent.isAMagicMock)
-};
-local v31 = {
-    __tostring = function(v11) --[[ Line: 24 ]] --[[ Name: __tostring ]]
-        -- upvalues: v0 (copy)
-        local v12 = getmetatable(v11);
-        local v13 = {
-            "id=" .. v12[v0.Address]
-        };
-        local v14 = v12[v0.Name];
-        if v14 ~= nil and v14 ~= "mock" then
-            table.insert(v13, "name=" .. v14);
-        end;
-        return "<MagicMock " .. table.concat(v13, " ") .. ">";
-    end, 
-    __index = function(v15, v16) --[[ Line: 36 ]] --[[ Name: __index ]]
-        -- upvalues: v0 (copy), v10 (copy)
-        local v17 = getmetatable(v15);
-        local v18 = v17[v0.Spec];
-        local v19;
-        if v18 then
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 11 ]]
-                -- upvalues: v18 (copy), v16 (copy)
-                return v18[v16];
-            end);
-            v19 = l_status_1 and l_result_1;
-        else
-            v19 = true;
-        end;
-        if not v19 then
-            error(string.format("MagicMock Error: Cannot index key %q since it is out of spec.", (tostring(v16))));
-        end;
-        v19 = v17[v0.Children][v16];
-        if v19 == nil then
-            v19 = v10.new({
-                name = v17[v0.Name] .. "." .. tostring(v16)
-            });
-            v17[v0.Children][v16] = v19;
-            return v19;
-        elseif v19 == v0.None then
-            return nil;
-        else
-            return v19;
-        end;
-    end, 
-    __newindex = function(v22, v23, v24) --[[ Line: 56 ]] --[[ Name: __newindex ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        local v25 = getmetatable(v22);
-        local v26 = v25[v0.Spec];
-        local v27;
-        if v26 then
-            local l_v26_0 = v26 --[[ copy: 5 -> 8 ]];
-            local l_status_2, l_result_2 = pcall(function() --[[ Line: 11 ]]
-                -- upvalues: l_v26_0 (copy), v23 (copy)
-                return l_v26_0[v23];
-            end);
-            v27 = l_status_2 and l_result_2;
-        else
-            v27 = true;
-        end;
-        if not v27 then
-            error(string.format("MagicMock Error: Cannot write key %q since it is out of spec", (tostring(v23))));
-        end;
-        if type(v24) == "function" then
-            v27, v26 = v1.new(v24);
-            v24 = v26;
-        elseif v24 == nil then
-            v24 = v0.None;
-        end;
-        if v23 == v0.ReturnValue then
-            v25[v0.ReturnValue] = {
-                v24; 
-                n = 1
-            };
-            return;
-        else
-            v25[v0.Children][v23] = v24;
-            return;
-        end;
-    end
-};
-local function _(v32) --[[ Line: 78 ]] --[[ Name: isTuple ]]
-    -- upvalues: v0 (copy), v10 (copy)
-    if type(v32) == "table" and v32[v0.isTuple] then
-        return not v10.is(v32);
-    else
-        return;
-    end;
-end;
-local function v39(v34, ...) --[[ Line: 84 ]] --[[ Name: getReturnValue ]]
-    -- upvalues: v0 (copy), v1 (copy), v10 (copy)
-    if v34[v0.ReturnValue] then
-        return v34[v0.ReturnValue];
-    else
-        local v35 = v34[v0.SideEffect];
-        if v35 then
-            v35.calls = v35.calls + 1;
-            if type(v35.value) == "function" or v1.is(v35.value) then
-                return {
-                    v35.value(...)
-                };
-            elseif type(v35.value) == "table" then
-                local l_calls_0 = v35.calls;
-                local v37 = nil;
-                local l_value_0 = v35.value;
-                v37 = if if type(l_value_0) == "table" and l_value_0[v0.isTuple] then not v10.is(l_value_0) else nil then v35.value.values[l_calls_0] else v35.value[l_calls_0];
-                if v37 then
-                    return {
-                        v37
-                    };
-                else
-                    error("MagicMock Error: SideEffect iteration reached");
-                end;
-            else
-                error("MagicMock Error: Invalid SideEffect");
-            end;
-        end;
-        return nil;
-    end;
-end;
-v31.__call = function(v40, ...) --[[ Line: 117 ]] --[[ Name: __call ]]
-    -- upvalues: v39 (copy), v10 (copy), v0 (copy)
-    local v41 = getmetatable(v40);
-    local v42 = {
-        args = table.pack(...), 
-        result = v39(v41, ...)
-    };
-    if v42.result == nil then
-        v42.result = {
-            v10.new({
-                name = v41[v0.Name] .. "()"
-            }); 
-            n = 1
-        };
-        v41[v0.ReturnValue] = v42.result;
-    elseif v42.result == v0.None then
-        v42.result = {
-            n = 1
-        };
-    else
-        local v43 = v42.result[1];
-        if if type(v43) == "table" and v43[v0.isTuple] then not v10.is(v43) else nil then
-            v42.result = v42.result[1].values;
-        end;
-    end;
-    table.insert(v41[v0.Calls], v42);
-    return table.unpack(v42.result);
-end;
-local function _(v44) --[[ Line: 144 ]] --[[ Name: operation ]]
-    -- upvalues: v0 (copy), v10 (copy)
-    return function(v45, v46) --[[ Line: 145 ]]
-        -- upvalues: v44 (copy), v0 (ref), v10 (ref)
-        local v47 = nil;
-        local v48 = nil;
-        if type(v45) ~= "string" and getmetatable(v45) then
-            v47 = getmetatable(v45);
-            v48 = string.format("__%s()", v44);
-        else
-            v47 = getmetatable(v46);
-            v48 = string.format("__r_%s()", v44);
-        end;
-        local v49 = v47[v0.Operations][v48];
-        if v49 == nil then
-            local v50 = v10.new({
-                name = v47[v0.Name] .. "." .. v48
-            });
-            v47[v0.Operations][v48] = v50;
-            return v50;
-        else
-            return v49;
-        end;
-    end;
-end;
-local v52 = "add";
-local l_v52_0 = v52 --[[ copy: 11 -> 12 ]];
-v31.__add = function(v54, v55) --[[ Line: 145 ]]
-    -- upvalues: l_v52_0 (copy), v0 (copy), v10 (copy)
-    local v56 = nil;
-    local v57 = nil;
-    if type(v54) ~= "string" and getmetatable(v54) then
-        v56 = getmetatable(v54);
-        v57 = string.format("__%s()", l_v52_0);
-    else
-        v56 = getmetatable(v55);
-        v57 = string.format("__r_%s()", l_v52_0);
-    end;
-    local v58 = v56[v0.Operations][v57];
-    if v58 == nil then
-        local v59 = v10.new({
-            name = v56[v0.Name] .. "." .. v57
-        });
-        v56[v0.Operations][v57] = v59;
-        return v59;
-    else
-        return v58;
-    end;
-end;
-v52 = "sub";
-local l_v52_1 = v52 --[[ copy: 11 -> 13 ]];
-v31.__sub = function(v61, v62) --[[ Line: 145 ]]
-    -- upvalues: l_v52_1 (copy), v0 (copy), v10 (copy)
-    local v63 = nil;
-    local v64 = nil;
-    if type(v61) ~= "string" and getmetatable(v61) then
-        v63 = getmetatable(v61);
-        v64 = string.format("__%s()", l_v52_1);
-    else
-        v63 = getmetatable(v62);
-        v64 = string.format("__r_%s()", l_v52_1);
-    end;
-    local v65 = v63[v0.Operations][v64];
-    if v65 == nil then
-        local v66 = v10.new({
-            name = v63[v0.Name] .. "." .. v64
-        });
-        v63[v0.Operations][v64] = v66;
-        return v66;
-    else
-        return v65;
-    end;
-end;
-v52 = "div";
-local l_v52_2 = v52 --[[ copy: 11 -> 14 ]];
-v31.__div = function(v68, v69) --[[ Line: 145 ]]
-    -- upvalues: l_v52_2 (copy), v0 (copy), v10 (copy)
-    local v70 = nil;
-    local v71 = nil;
-    if type(v68) ~= "string" and getmetatable(v68) then
-        v70 = getmetatable(v68);
-        v71 = string.format("__%s()", l_v52_2);
-    else
-        v70 = getmetatable(v69);
-        v71 = string.format("__r_%s()", l_v52_2);
-    end;
-    local v72 = v70[v0.Operations][v71];
-    if v72 == nil then
-        local v73 = v10.new({
-            name = v70[v0.Name] .. "." .. v71
-        });
-        v70[v0.Operations][v71] = v73;
-        return v73;
-    else
-        return v72;
-    end;
-end;
-v52 = "mul";
-local l_v52_3 = v52 --[[ copy: 11 -> 15 ]];
-v31.__mul = function(v75, v76) --[[ Line: 145 ]]
-    -- upvalues: l_v52_3 (copy), v0 (copy), v10 (copy)
-    local v77 = nil;
-    local v78 = nil;
-    if type(v75) ~= "string" and getmetatable(v75) then
-        v77 = getmetatable(v75);
-        v78 = string.format("__%s()", l_v52_3);
-    else
-        v77 = getmetatable(v76);
-        v78 = string.format("__r_%s()", l_v52_3);
-    end;
-    local v79 = v77[v0.Operations][v78];
-    if v79 == nil then
-        local v80 = v10.new({
-            name = v77[v0.Name] .. "." .. v78
-        });
-        v77[v0.Operations][v78] = v80;
-        return v80;
-    else
-        return v79;
-    end;
-end;
-v52 = "mod";
-local l_v52_4 = v52 --[[ copy: 11 -> 16 ]];
-v31.__mod = function(v82, v83) --[[ Line: 145 ]]
-    -- upvalues: l_v52_4 (copy), v0 (copy), v10 (copy)
-    local v84 = nil;
-    local v85 = nil;
-    if type(v82) ~= "string" and getmetatable(v82) then
-        v84 = getmetatable(v82);
-        v85 = string.format("__%s()", l_v52_4);
-    else
-        v84 = getmetatable(v83);
-        v85 = string.format("__r_%s()", l_v52_4);
-    end;
-    local v86 = v84[v0.Operations][v85];
-    if v86 == nil then
-        local v87 = v10.new({
-            name = v84[v0.Name] .. "." .. v85
-        });
-        v84[v0.Operations][v85] = v87;
-        return v87;
-    else
-        return v86;
-    end;
-end;
-v52 = "pow";
-local l_v52_5 = v52 --[[ copy: 11 -> 17 ]];
-v31.__pow = function(v89, v90) --[[ Line: 145 ]]
-    -- upvalues: l_v52_5 (copy), v0 (copy), v10 (copy)
-    local v91 = nil;
-    local v92 = nil;
-    if type(v89) ~= "string" and getmetatable(v89) then
-        v91 = getmetatable(v89);
-        v92 = string.format("__%s()", l_v52_5);
-    else
-        v91 = getmetatable(v90);
-        v92 = string.format("__r_%s()", l_v52_5);
-    end;
-    local v93 = v91[v0.Operations][v92];
-    if v93 == nil then
-        local v94 = v10.new({
-            name = v91[v0.Name] .. "." .. v92
-        });
-        v91[v0.Operations][v92] = v94;
-        return v94;
-    else
-        return v93;
-    end;
-end;
-v52 = "neg";
-local l_v52_6 = v52 --[[ copy: 11 -> 18 ]];
-v31.__unm = function(v96, v97) --[[ Line: 145 ]]
-    -- upvalues: l_v52_6 (copy), v0 (copy), v10 (copy)
-    local v98 = nil;
-    local v99 = nil;
-    if type(v96) ~= "string" and getmetatable(v96) then
-        v98 = getmetatable(v96);
-        v99 = string.format("__%s()", l_v52_6);
-    else
-        v98 = getmetatable(v97);
-        v99 = string.format("__r_%s()", l_v52_6);
-    end;
-    local v100 = v98[v0.Operations][v99];
-    if v100 == nil then
-        local v101 = v10.new({
-            name = v98[v0.Name] .. "." .. v99
-        });
-        v98[v0.Operations][v99] = v101;
-        return v101;
-    else
-        return v100;
-    end;
-end;
-v52 = "concat";
-v31.__concat = function(v102, v103) --[[ Line: 145 ]]
-    -- upvalues: v52 (copy), v0 (copy), v10 (copy)
-    local v104 = nil;
-    local v105 = nil;
-    if type(v102) ~= "string" and getmetatable(v102) then
-        v104 = getmetatable(v102);
-        v105 = string.format("__%s()", v52);
-    else
-        v104 = getmetatable(v103);
-        v105 = string.format("__r_%s()", v52);
-    end;
-    local v106 = v104[v0.Operations][v105];
-    if v106 == nil then
-        local v107 = v10.new({
-            name = v104[v0.Name] .. "." .. v105
-        });
-        v104[v0.Operations][v105] = v107;
-        return v107;
-    else
-        return v106;
-    end;
-end;
-v10.new = function(v108) --[[ Line: 176 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v31 (copy), v2 (copy), v3 (copy)
-    v108 = v108 or {};
-    local function _() --[[ Line: 179 ]] --[[ Name: getName ]]
-        -- upvalues: v108 (ref)
-        if v108.name then
-            return v108.name;
-        elseif v108.spec then
-            return (tostring(v108.spec));
-        else
-            return "mock";
-        end;
-    end;
-    local v110 = {};
-    local v111 = {
-        [v0.isMagicMock] = true, 
-        [v0.Address] = tostring(v110), 
-        [v0.Name] = if v108.name then v108.name else if v108.spec then tostring(v108.spec) else "mock", 
-        [v0.Operations] = {}, 
-        [v0.Calls] = {}, 
-        [v0.Children] = {}, 
-        [v0.Spec] = v108.spec or nil, 
-        [v0.ReturnValue] = nil, 
-        [v0.SideEffect] = nil
-    };
-    for v112, v113 in pairs(v31) do
-        v111[v112] = v113;
-    end;
-    local v114 = setmetatable(v110, v111);
-    if v108.returnValue then
-        v2(v114, v108.returnValue);
-    end;
-    if v108.sideEffect then
-        v3(v114, v108.sideEffect);
-    end;
-    return v114;
-end;
-v10.is = function(v115) --[[ Line: 218 ]] --[[ Name: is ]]
-    -- upvalues: v0 (copy)
-    local v116 = getmetatable(v115);
-    if v116 then
-        return v116[v0.isMagicMock] ~= nil;
-    else
-        return false;
-    end;
-end;
-return v10;
+local symbols = require(script.Parent.symbols)
+local Spy = require(script.Parent.Spy)
+local setReturnValue = require(script.Parent.setReturnValue)
+local setSideEffect = require(script.Parent.setSideEffect)
+
+local function isKeyInSpec(p1, p2) -- line: 8
+	-- upvalues: symbols (copy)
+	local v21 = p1[symbols.Spec]
+
+	if v21 then
+		local ok, result = pcall(function() -- line: 11
+			-- upvalues: v21 (copy), p2 (copy)
+			return v21[p2]
+		end)
+
+		return ok and result
+	end
+
+	return true
+end
+
+local t1 = {
+	is = require(script.Parent.isAMagicMock)
+}
+local t3 = {
+	__tostring = function(p3) -- line: 24
+		-- upvalues: symbols (copy)
+		local mt = getmetatable(p3)
+		local t2 = { "id=" .. mt[symbols.Address] }
+		local v27 = mt[symbols.Name]
+
+		if v27 ~= nil and v27 ~= "mock" then
+			table.insert(t2, "name=" .. v27)
+		end
+
+		return "<MagicMock " .. table.concat(t2, " ") .. ">"
+	end,
+	__index = function(p4, p5) -- line: 36
+		-- upvalues: symbols (copy), t1 (copy)
+		local mt = getmetatable(p4)
+		local v31 = mt[symbols.Spec]
+		local v34
+
+		if v31 then
+			local ok, result = pcall(function() -- line: 11
+				-- upvalues: v31 (copy), p5 (copy)
+				return v31[p5]
+			end)
+
+			v34 = ok and result
+		else
+			v34 = true
+		end
+
+		if not v34 then
+			error(string.format("MagicMock Error: Cannot index key %q since it is out of spec.", (tostring(p5))))
+		end
+
+		local v35 = mt[symbols.Children][p5]
+
+		if v35 == nil then
+			local v36 = t1.new({
+				name = mt[symbols.Name] .. "." .. tostring(p5)
+			})
+
+			mt[symbols.Children][p5] = v36
+
+			return v36
+		end
+
+		if v35 == symbols.None then
+			return nil
+		end
+
+		return v35
+	end,
+	__newindex = function(p6, p7, p8) -- line: 56
+		-- upvalues: symbols (copy), Spy (copy)
+		local mt = getmetatable(p6)
+		local v41 = mt[symbols.Spec]
+		local v44
+
+		if v41 then
+			local ok, result = pcall(function() -- line: 11
+				-- upvalues: v41 (copy), p7 (copy)
+				return v41[p7]
+			end)
+
+			v44 = ok and result
+		else
+			v44 = true
+		end
+
+		if not v44 then
+			error(string.format("MagicMock Error: Cannot write key %q since it is out of spec", (tostring(p7))))
+		end
+
+		if type(p8) == "function" then
+			local v45
+
+			v45, p8 = Spy.new(p8)
+		elseif p8 == nil then
+			p8 = symbols.None
+		end
+
+		if p7 == symbols.ReturnValue then
+			mt[symbols.ReturnValue] = {
+				p8,
+				n = 1
+			}
+
+			return
+		end
+
+		mt[symbols.Children][p7] = p8
+	end
+}
+
+local function isTuple(p9) -- line: 78
+	-- upvalues: symbols (copy), t1 (copy)
+	if type(p9) == "table" and p9[symbols.isTuple] then
+		return not t1.is(p9)
+	end
+end
+local function getReturnValue(p10, ...) -- line: 84
+	-- upvalues: symbols (copy), Spy (copy), t1 (copy)
+	if p10[symbols.ReturnValue] then
+		return p10[symbols.ReturnValue]
+	end
+
+	local v48 = p10[symbols.SideEffect]
+
+	if v48 then
+		v48.calls = v48.calls + 1
+
+		if type(v48.value) == "function" or Spy.is(v48.value) then
+			return { v48.value(...) }
+		end
+
+		if type(v48.value) == "table" then
+			local calls = v48.calls
+			local value = v48.value
+			local v51 = if not if type(value) ~= "table" or not value[symbols.isTuple] then nil else not t1.is(value) then v48.value[calls] else v48.value.values[calls]
+
+			if v51 then
+				return { v51 }
+			end
+
+			error("MagicMock Error: SideEffect iteration reached")
+		else
+			error("MagicMock Error: Invalid SideEffect")
+		end
+	end
+
+	return nil
+end
+
+function t3.__call(p11, ...) -- line: 117
+	-- upvalues: getReturnValue (copy), t1 (copy), symbols (copy)
+	local mt = getmetatable(p11)
+	local t4 = {
+		args = table.pack(...),
+		result = getReturnValue(mt, ...)
+	}
+
+	if t4.result == nil then
+		t4.result = {
+			t1.new({
+				name = mt[symbols.Name] .. "()"
+			}),
+			n = 1
+		}
+		mt[symbols.ReturnValue] = t4.result
+	elseif t4.result == symbols.None then
+		t4.result = {
+			n = 1
+		}
+	else
+		local v55 = t4.result[1]
+
+		if if type(v55) ~= "table" or not v55[symbols.isTuple] then nil else not t1.is(v55) then
+			t4.result = t4.result[1].values
+		end
+	end
+
+	table.insert(mt[symbols.Calls], t4)
+
+	return table.unpack(t4.result)
+end
+
+local function operation(p12) -- line: 144
+	-- upvalues: symbols (copy), t1 (copy)
+	return function(p13, p14) -- line: 145
+		-- upvalues: p12 (copy), symbols (copy), t1 (copy)
+		local mt, v118
+
+		if type(p13) ~= "string" and getmetatable(p13) then
+			mt = getmetatable(p13)
+			v118 = string.format("__%s()", p12)
+		else
+			mt = getmetatable(p14)
+			v118 = string.format("__r_%s()", p12)
+		end
+
+		local v119 = mt[symbols.Operations][v118]
+
+		if v119 == nil then
+			local v120 = t1.new({
+				name = mt[symbols.Name] .. "." .. v118
+			})
+
+			mt[symbols.Operations][v118] = v120
+
+			return v120
+		end
+
+		return v119
+	end
+end
+
+local s1 = "add"
+
+function t3.__add(p15, p16) -- line: 145
+	-- upvalues: s1 (copy), symbols (copy), t1 (copy)
+	local mt, v60
+
+	if type(p15) ~= "string" and getmetatable(p15) then
+		mt = getmetatable(p15)
+		v60 = string.format("__%s()", s1)
+	else
+		mt = getmetatable(p16)
+		v60 = string.format("__r_%s()", s1)
+	end
+
+	local v61 = mt[symbols.Operations][v60]
+
+	if v61 == nil then
+		local v62 = t1.new({
+			name = mt[symbols.Name] .. "." .. v60
+		})
+
+		mt[symbols.Operations][v60] = v62
+
+		return v62
+	end
+
+	return v61
+end
+
+local s2 = "sub"
+
+function t3.__sub(p17, p18) -- line: 145
+	-- upvalues: s2 (copy), symbols (copy), t1 (copy)
+	local mt, v66
+
+	if type(p17) ~= "string" and getmetatable(p17) then
+		mt = getmetatable(p17)
+		v66 = string.format("__%s()", s2)
+	else
+		mt = getmetatable(p18)
+		v66 = string.format("__r_%s()", s2)
+	end
+
+	local v67 = mt[symbols.Operations][v66]
+
+	if v67 == nil then
+		local v68 = t1.new({
+			name = mt[symbols.Name] .. "." .. v66
+		})
+
+		mt[symbols.Operations][v66] = v68
+
+		return v68
+	end
+
+	return v67
+end
+
+local s3 = "div"
+
+function t3.__div(p19, p20) -- line: 145
+	-- upvalues: s3 (copy), symbols (copy), t1 (copy)
+	local mt, v72
+
+	if type(p19) ~= "string" and getmetatable(p19) then
+		mt = getmetatable(p19)
+		v72 = string.format("__%s()", s3)
+	else
+		mt = getmetatable(p20)
+		v72 = string.format("__r_%s()", s3)
+	end
+
+	local v73 = mt[symbols.Operations][v72]
+
+	if v73 == nil then
+		local v74 = t1.new({
+			name = mt[symbols.Name] .. "." .. v72
+		})
+
+		mt[symbols.Operations][v72] = v74
+
+		return v74
+	end
+
+	return v73
+end
+
+local s4 = "mul"
+
+function t3.__mul(p21, p22) -- line: 145
+	-- upvalues: s4 (copy), symbols (copy), t1 (copy)
+	local mt, v78
+
+	if type(p21) ~= "string" and getmetatable(p21) then
+		mt = getmetatable(p21)
+		v78 = string.format("__%s()", s4)
+	else
+		mt = getmetatable(p22)
+		v78 = string.format("__r_%s()", s4)
+	end
+
+	local v79 = mt[symbols.Operations][v78]
+
+	if v79 == nil then
+		local v80 = t1.new({
+			name = mt[symbols.Name] .. "." .. v78
+		})
+
+		mt[symbols.Operations][v78] = v80
+
+		return v80
+	end
+
+	return v79
+end
+
+local s5 = "mod"
+
+function t3.__mod(p23, p24) -- line: 145
+	-- upvalues: s5 (copy), symbols (copy), t1 (copy)
+	local mt, v84
+
+	if type(p23) ~= "string" and getmetatable(p23) then
+		mt = getmetatable(p23)
+		v84 = string.format("__%s()", s5)
+	else
+		mt = getmetatable(p24)
+		v84 = string.format("__r_%s()", s5)
+	end
+
+	local v85 = mt[symbols.Operations][v84]
+
+	if v85 == nil then
+		local v86 = t1.new({
+			name = mt[symbols.Name] .. "." .. v84
+		})
+
+		mt[symbols.Operations][v84] = v86
+
+		return v86
+	end
+
+	return v85
+end
+
+local s6 = "pow"
+
+function t3.__pow(p25, p26) -- line: 145
+	-- upvalues: s6 (copy), symbols (copy), t1 (copy)
+	local mt, v90
+
+	if type(p25) ~= "string" and getmetatable(p25) then
+		mt = getmetatable(p25)
+		v90 = string.format("__%s()", s6)
+	else
+		mt = getmetatable(p26)
+		v90 = string.format("__r_%s()", s6)
+	end
+
+	local v91 = mt[symbols.Operations][v90]
+
+	if v91 == nil then
+		local v92 = t1.new({
+			name = mt[symbols.Name] .. "." .. v90
+		})
+
+		mt[symbols.Operations][v90] = v92
+
+		return v92
+	end
+
+	return v91
+end
+
+local s7 = "neg"
+
+function t3.__unm(p27, p28) -- line: 145
+	-- upvalues: s7 (copy), symbols (copy), t1 (copy)
+	local mt, v96
+
+	if type(p27) ~= "string" and getmetatable(p27) then
+		mt = getmetatable(p27)
+		v96 = string.format("__%s()", s7)
+	else
+		mt = getmetatable(p28)
+		v96 = string.format("__r_%s()", s7)
+	end
+
+	local v97 = mt[symbols.Operations][v96]
+
+	if v97 == nil then
+		local v98 = t1.new({
+			name = mt[symbols.Name] .. "." .. v96
+		})
+
+		mt[symbols.Operations][v96] = v98
+
+		return v98
+	end
+
+	return v97
+end
+
+local s8 = "concat"
+
+function t3.__concat(p29, p30) -- line: 145
+	-- upvalues: s8 (copy), symbols (copy), t1 (copy)
+	local mt, v102
+
+	if type(p29) ~= "string" and getmetatable(p29) then
+		mt = getmetatable(p29)
+		v102 = string.format("__%s()", s8)
+	else
+		mt = getmetatable(p30)
+		v102 = string.format("__r_%s()", s8)
+	end
+
+	local v103 = mt[symbols.Operations][v102]
+
+	if v103 == nil then
+		local v104 = t1.new({
+			name = mt[symbols.Name] .. "." .. v102
+		})
+
+		mt[symbols.Operations][v102] = v104
+
+		return v104
+	end
+
+	return v103
+end
+function t1.new(p31) -- line: 176
+	-- upvalues: symbols (copy), t3 (copy), setReturnValue (copy), setSideEffect (copy)
+	local u106 = p31 or {}
+
+	local function getName() -- line: 179
+		-- upvalues: u106 (ref)
+		if u106.name then
+			return u106.name
+		end
+
+		if u106.spec then
+			return (tostring(u106.spec))
+		end
+
+		return "mock"
+	end
+
+	local t5 = {}
+	local t6 = {
+		[symbols.isMagicMock] = true,
+		[symbols.Address] = tostring(t5),
+		[symbols.Name] = if not u106.name then not u106.spec and "mock" or tostring(u106.spec) else u106.name,
+		[symbols.Operations] = {},
+		[symbols.Calls] = {},
+		[symbols.Children] = {},
+		[symbols.Spec] = u106.spec or nil,
+		[symbols.ReturnValue] = nil,
+		[symbols.SideEffect] = nil
+	}
+
+	for k, v in pairs(t3) do
+		t6[k] = v
+	end
+
+	local v112 = setmetatable(t5, t6)
+
+	if u106.returnValue then
+		setReturnValue(v112, u106.returnValue)
+	end
+
+	if u106.sideEffect then
+		setSideEffect(v112, u106.sideEffect)
+	end
+
+	return v112
+end
+function t1.is(p32) -- line: 218
+	-- upvalues: symbols (copy)
+	local mt = getmetatable(p32)
+
+	if mt then
+		return mt[symbols.isMagicMock] ~= nil
+	end
+
+	return false
+end
+
+return t1

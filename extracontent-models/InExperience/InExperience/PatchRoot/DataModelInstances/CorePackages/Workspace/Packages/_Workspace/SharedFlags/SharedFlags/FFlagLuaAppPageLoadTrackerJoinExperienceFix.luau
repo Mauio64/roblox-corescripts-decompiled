@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppPageLoadTrackerJoinExperienceFix", false);
+return game:DefineFastFlag("LuaAppPageLoadTrackerJoinExperienceFix", false)

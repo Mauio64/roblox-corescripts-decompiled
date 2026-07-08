@@ -1,1 +1,1 @@
-return require(script.Components.ContactsImporterOverlay);
+return require(script.Components.ContactsImporterOverlay)

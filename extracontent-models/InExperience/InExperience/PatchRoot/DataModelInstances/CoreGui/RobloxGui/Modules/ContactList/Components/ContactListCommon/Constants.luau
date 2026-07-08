@@ -1,4 +1,4 @@
 return {
-    ITEM_HEIGHT = 92, 
-    TOUCH_SLOP = 12
-};
+	ITEM_HEIGHT = 92,
+	TOUCH_SLOP = 12
+}

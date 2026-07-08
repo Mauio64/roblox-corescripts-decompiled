@@ -1,3 +1,3 @@
 return {
-    ReconfirmLaunchModal = "reconfirmLaunchModal"
-};
+	ReconfirmLaunchModal = "reconfirmLaunchModal"
+}

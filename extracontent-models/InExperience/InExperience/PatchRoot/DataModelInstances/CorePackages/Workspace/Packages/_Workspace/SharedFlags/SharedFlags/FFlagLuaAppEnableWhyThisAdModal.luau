@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableWhyThisAdModal", false);
+return game:DefineFastFlag("LuaAppEnableWhyThisAdModal", false)

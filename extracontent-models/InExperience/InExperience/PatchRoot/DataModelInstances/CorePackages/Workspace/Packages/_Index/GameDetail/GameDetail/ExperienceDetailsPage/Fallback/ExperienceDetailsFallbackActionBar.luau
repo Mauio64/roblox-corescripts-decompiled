@@ -1,71 +1,97 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_View_0 = v2.View;
-local l_Skeleton_0 = v2.Skeleton;
-local l_Radius_0 = v2.Enums.Radius;
-local l_ButtonSize_0 = v2.Enums.ButtonSize;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local v8 = require(l_Parent_0.GamePlayButton);
-local v9 = require(script.Parent.Parent.useGameInfo);
-local l_PlayButton_0 = v8.PlayButton;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local Skeleton = Foundation.Skeleton
+local EnumsRadius = Foundation.Enums.Radius
+local ButtonSize = Foundation.Enums.ButtonSize
+local useTokens = Foundation.Hooks.useTokens
+local GamePlayButton = require(Parent.GamePlayButton)
+local useGameInfo = require(script.Parent.Parent.useGameInfo)
+local PlayButton = GamePlayButton.PlayButton
+local SharedFlags = require(Parent.SharedFlags)
+local FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox = SharedFlags.FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox
+local FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox = SharedFlags.FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox
+local FFlagSduiEdpPersistentActionBarPlayButton = SharedFlags.FFlagSduiEdpPersistentActionBarPlayButton
+local FFlagLuaAppLaunchWhenLoadingEdp = SharedFlags.FFlagLuaAppLaunchWhenLoadingEdp
+local FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp = SharedFlags.FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp
+
+local function ExperienceDetailsActionBarSkeleton(t1: {[any]: any}) -- line: 34
+	-- upvalues: useTokens (copy), React (copy), View (copy), FFlagSduiEdpPersistentActionBarPlayButton (copy), Skeleton (copy), EnumsRadius (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), Foundation (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
+	local Size_1200 = useTokens().Size.Size_1200
+
+	return React.createElement(View, {
+		testId = "--edp-fallback-action-bar-skeleton",
+		tag = not FFlagSduiEdpPersistentActionBarPlayButton and "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default" or "row align-y-center gap-small auto-xy"
+	}, {
+		IconButtonSkeleton1 = React.createElement(Skeleton, {
+			LayoutOrder = 1,
+			Size = UDim2.fromOffset(Size_1200, Size_1200),
+			radius = EnumsRadius.Medium
+		}),
+		IconButtonSkeleton2 = React.createElement(Skeleton, {
+			LayoutOrder = 2,
+			Size = UDim2.fromOffset(Size_1200, Size_1200),
+			radius = EnumsRadius.Medium
+		}),
+		PlayBtnContainer = if not FFlagSduiEdpPersistentActionBarPlayButton then React.createElement(View, {
+			tag = "grow auto-y",
+			LayoutOrder = 3
+		}, {
+			PlayBtn = React.createElement(PlayButton, {
+				testId = "--edp-fallback-play-button",
+				universeId = t1.universeId,
+				referralSource = t1.referralSource,
+				launchSource = t1.launchSource,
+				experienceJoinData = t1.experienceJoinData,
+				placeId = t1.placeIdOverride,
+				useUIBloxButton = if not FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox then nil else FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox,
+				buttonSize = ButtonSize.Large,
+				fillBehavior = Foundation.Enums.FillBehavior.Fill,
+				launchWhenLoading = not not FFlagLuaAppLaunchWhenLoadingEdp or nil,
+				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil
+			})
+		}) else nil
+	})
+end
+local function ExperienceDetailsActionBarError(t2: {[any]: any}) -- line: 79
+	-- upvalues: useGameInfo (copy), FFlagSduiEdpPersistentActionBarPlayButton (copy), React (copy), View (copy), PlayButton (copy), FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox (copy), FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox (copy), ButtonSize (copy), Foundation (copy), FFlagLuaAppLaunchWhenLoadingEdp (copy), FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp (copy)
+	local v23 = useGameInfo(t2.universeId)
+
+	if v23 ~= nil and v23.isUnavailable == true then
+		return nil
+	end
+
+	if FFlagSduiEdpPersistentActionBarPlayButton then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "row align-y-center gap-small size-full-0 auto-y padding-x-medium padding-top-medium bg-surface-0 stroke-default",
+		testId = "--edp-fallback-action-bar-error"
+	}, {
+		PlayBtnContainer = React.createElement(View, {
+			tag = "grow auto-y",
+			LayoutOrder = 1
+		}, {
+			PlayBtn = React.createElement(PlayButton, {
+				testId = "--edp-fallback-play-button",
+				universeId = t2.universeId,
+				referralSource = t2.referralSource,
+				launchSource = t2.launchSource,
+				experienceJoinData = t2.experienceJoinData,
+				placeId = t2.placeIdOverride,
+				useUIBloxButton = not FFlagLuaAppSduiEdpFallbackPlayButtonPassUiBlox or FFlagLuaAppSduiEdpFallbackPlayButtonUseUiBlox,
+				buttonSize = ButtonSize.Large,
+				fillBehavior = Foundation.Enums.FillBehavior.Fill,
+				launchWhenLoading = not not FFlagLuaAppLaunchWhenLoadingEdp or nil,
+				launchOnReleaseAfterUnmount = not not FFlagLuaAppPlayButtonLaunchOnReleaseAfterUnmountEdp or nil
+			})
+		})
+	})
+end
+
 return {
-    Skeleton = v1.memo(function(v11) --[[ Line: 24 ]] --[[ Name: ExperienceDetailsActionBarSkeleton ]]
-        -- upvalues: l_useTokens_0 (copy), v1 (copy), l_View_0 (copy), l_Skeleton_0 (copy), l_Radius_0 (copy), l_PlayButton_0 (copy), l_ButtonSize_0 (copy), v2 (copy)
-        local l_Size_1200_0 = l_useTokens_0().Size.Size_1200;
-        return v1.createElement(l_View_0, {
-            tag = "row align-y-center gap-small size-full-0 auto-y padding-xlarge bg-surface-0", 
-            testId = "--edp-fallback-action-bar-skeleton"
-        }, {
-            IconButtonSkeleton1 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(l_Size_1200_0, l_Size_1200_0), 
-                radius = l_Radius_0.Medium, 
-                LayoutOrder = 1
-            }), 
-            IconButtonSkeleton2 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(l_Size_1200_0, l_Size_1200_0), 
-                radius = l_Radius_0.Medium, 
-                LayoutOrder = 2
-            }), 
-            PlayBtn = v1.createElement(l_PlayButton_0, {
-                universeId = v11.universeId, 
-                referralSource = v11.referralSource, 
-                launchSource = v11.launchSource, 
-                experienceJoinData = v11.experienceJoinData, 
-                placeId = v11.placeIdOverride, 
-                buttonSize = l_ButtonSize_0.Large, 
-                fillBehavior = v2.Enums.FillBehavior.Fill, 
-                LayoutOrder = 3, 
-                testId = "--edp-fallback-play-button"
-            })
-        });
-    end), 
-    Error = v1.memo(function(v13) --[[ Line: 56 ]] --[[ Name: ExperienceDetailsActionBarError ]]
-        -- upvalues: v9 (copy), v1 (copy), l_View_0 (copy), l_PlayButton_0 (copy), l_ButtonSize_0 (copy), v2 (copy)
-        local v14 = v9(v13.universeId);
-        local v15 = false;
-        if v14 ~= nil then
-            v15 = v14.isUnavailable == true;
-        end;
-        if v15 then
-            return nil;
-        else
-            return v1.createElement(l_View_0, {
-                tag = "row align-y-center gap-small size-full-0 auto-y padding-xlarge bg-surface-0", 
-                testId = "--edp-fallback-action-bar-error"
-            }, {
-                PlayBtn = v1.createElement(l_PlayButton_0, {
-                    universeId = v13.universeId, 
-                    referralSource = v13.referralSource, 
-                    launchSource = v13.launchSource, 
-                    experienceJoinData = v13.experienceJoinData, 
-                    placeId = v13.placeIdOverride, 
-                    buttonSize = l_ButtonSize_0.Large, 
-                    fillBehavior = v2.Enums.FillBehavior.Fill, 
-                    LayoutOrder = 1, 
-                    testId = "--edp-fallback-play-button"
-                })
-            });
-        end;
-    end)
-};
+	Skeleton = React.memo(ExperienceDetailsActionBarSkeleton),
+	Error = React.memo(ExperienceDetailsActionBarError)
+}

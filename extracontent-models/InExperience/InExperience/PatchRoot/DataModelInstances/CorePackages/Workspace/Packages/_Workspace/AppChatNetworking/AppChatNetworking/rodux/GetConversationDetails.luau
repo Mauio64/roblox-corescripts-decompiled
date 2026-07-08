@@ -1,21 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local v1 = require(l_script_FirstAncestor_0.url.CHAT_PLATFORM_BASE_URL);
-local v2 = require(script.Parent.RoduxNetworking);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-local l_GetFFlagEnableSocialCards_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableSocialCards;
-return v2.POST(script.Name, function(v6, v7) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), l_GetFFlagEnableSocialCards_0 (copy), l_GetFFlagIsSquadEnabled_0 (copy)
-    return v6(v1):path("v1"):path("get-conversations"):body({
-        ids = {
-            v7
-        }, 
-        include_cards = l_GetFFlagEnableSocialCards_0() and true or false, 
-        include_participants = true, 
-        include_user_data = true, 
-        include_messages = true, 
-        check_for_group_up = l_GetFFlagIsSquadEnabled_0() and true or false
-    }):setStatusIds({
-        v7
-    });
-end);
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+local AppChatNetworkingParent = AppChatNetworking.Parent
+local GetFFlagIsSquadEnabled = require(AppChatNetworkingParent.SharedFlags).GetFFlagIsSquadEnabled
+local GetFFlagEnableSocialCards = require(AppChatNetworkingParent.SharedFlags).GetFFlagEnableSocialCards
+
+return RoduxNetworking.POST(script.Name, function(p1, s1: string) -- line: 9
+	-- upvalues: CHAT_PLATFORM_BASE_URL (copy), GetFFlagEnableSocialCards (copy), GetFFlagIsSquadEnabled (copy)
+	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversations"):body({
+		include_participants = true,
+		include_user_data = true,
+		include_messages = true,
+		ids = { s1 },
+		include_cards = not not GetFFlagEnableSocialCards(),
+		check_for_group_up = not not GetFFlagIsSquadEnabled()
+	}):setStatusIds({ s1 })
+end)

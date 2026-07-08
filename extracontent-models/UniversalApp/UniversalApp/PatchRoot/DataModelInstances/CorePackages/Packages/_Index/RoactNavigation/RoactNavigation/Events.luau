@@ -1,15 +1,16 @@
-local v0 = require(script.Parent.NavigationSymbol);
-local v1 = v0("WILL_FOCUS");
-local v2 = v0("DID_FOCUS");
-local v3 = v0("WILL_BLUR");
-local v4 = v0("DID_BLUR");
-local v5 = v0("ACTION");
-local v6 = v0("REFOCUS");
+local NavigationSymbol = require(script.Parent.NavigationSymbol)
+local v2 = NavigationSymbol("WILL_FOCUS")
+local v3 = NavigationSymbol("DID_FOCUS")
+local v4 = NavigationSymbol("WILL_BLUR")
+local v5 = NavigationSymbol("DID_BLUR")
+local v6 = NavigationSymbol("ACTION")
+local v7 = NavigationSymbol("REFOCUS")
+
 return {
-    WillFocus = v1, 
-    DidFocus = v2, 
-    WillBlur = v3, 
-    DidBlur = v4, 
-    Action = v5, 
-    Refocus = v6
-};
+	WillFocus = v2,
+	DidFocus = v3,
+	WillBlur = v4,
+	DidBlur = v5,
+	Action = v6,
+	Refocus = v7
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddUpsellEntryComponentToAnalytics", false);
+return game:DefineFastFlag("AddUpsellEntryComponentToAnalytics", false)

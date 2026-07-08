@@ -1,122 +1,144 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local l_usePreferredInput_0 = require(l_Parent_0.Responsive).usePreferredInput;
-local v6 = require(l_Parent_0.Display);
-local l_useStore_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useStore;
-local v8 = require(l_script_FirstAncestor_0.CollectionLayoutCalculators);
-local v9 = require(l_script_FirstAncestor_0.calculateItemWidth);
-local _ = require(l_script_FirstAncestor_0.CollectionViewTypes);
-local l_FFlagLuaAppLayoutParamsInContext_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppLayoutParamsInContext;
-local v12 = game:DefineFastFlag("LuaAppUseDisplayStoreForCollectionLayoutParams", false);
-return function(v13, v14, v15, v16, v17, v18) --[[ Line: 35 ]] --[[ Name: useCollectionLayoutParams ]]
-    -- upvalues: l_useStore_0 (copy), v12 (copy), v6 (copy), v8 (copy), l_FFlagLuaAppLayoutParamsInContext_0 (copy), l_useTokens_0 (copy), l_useDesignTokens_0 (copy), l_usePreferredInput_0 (copy), v2 (copy), v9 (copy)
-    local v19 = l_useStore_0();
-    local v20 = if v12 then v6.GetDisplayStore(false).getViewportSize(false) or Vector2.new(0, 0) else v19:getState().ScreenSize or Vector2.new(0, 0);
-    local v21 = v17 or v8;
-    local v22 = v16 and v16.sideMargin or nil;
-    local v23 = v16 and v16.columnGap or nil;
-    local v24 = v16 and v16.numColumns or nil;
-    local v25 = v16 and v16.fractionalItemAmount or nil;
-    local v26 = v16 and v16.loadMoreThreshold or nil;
-    local v27 = v16 and v16.verticalPadding or nil;
-    local v28 = if l_FFlagLuaAppLayoutParamsInContext_0 then l_useTokens_0() else l_useDesignTokens_0();
-    local v29 = l_usePreferredInput_0();
-    local v30 = v27 or v21.calculateVerticalPadding(v28, v13);
-    local v31 = v21.calculateMaxTilesToShow(v29);
-    local v32 = v2.useRef(nil);
-    if v32.current == nil then
-        v32.current = v18 or v20;
-    end;
-    local l_X_0 = v32.current.X;
-    local v34, v35 = v2.useState(function() --[[ Line: 80 ]]
-        -- upvalues: v22 (copy), v21 (copy), l_X_0 (copy), v28 (copy), v20 (copy)
-        return v22 or v21.calculateSideMargin(l_X_0, v28, v20.X);
-    end);
-    local v36, v37 = v2.useState(function() --[[ Line: 83 ]]
-        -- upvalues: v23 (copy), v21 (copy), l_X_0 (copy), v28 (copy), v20 (copy)
-        return v23 or v21.calculateColumnGap(l_X_0, v28, v20.X);
-    end);
-    local v38, v39 = v2.useState(function() --[[ Line: 86 ]]
-        -- upvalues: v25 (copy), v21 (copy), v13 (copy), v29 (copy)
-        return v25 or v21.calculateFractionalItemAmount(v13, v29);
-    end);
-    local v40, v41 = v2.useState(function() --[[ Line: 90 ]]
-        -- upvalues: v24 (copy), v21 (copy), l_X_0 (copy), v34 (copy), v36 (copy), v13 (copy), v28 (copy)
-        return v24 or v21.calculateNumColumns(l_X_0, v34, v36, v13, v28);
-    end);
-    local v42, v43 = v2.useState(function() --[[ Line: 94 ]]
-        -- upvalues: v26 (copy), v21 (copy), l_X_0 (copy)
-        return v26 or v21.calculateLoadMoreThreshold(l_X_0);
-    end);
-    local v44, v45 = v2.useState(function() --[[ Line: 99 ]]
-        -- upvalues: v15 (copy), v9 (ref), v40 (copy), v36 (copy), v34 (copy), l_X_0 (copy), v38 (copy)
-        if v15 then
-            return v9(v40, v36, v34, l_X_0, v38);
-        else
-            return 1;
-        end;
-    end);
-    local v55 = v2.useCallback(function(v46) --[[ Line: 108 ]]
-        -- upvalues: v12 (ref), v6 (ref), v19 (copy), v22 (copy), v21 (copy), v28 (copy), v35 (copy), v23 (copy), v37 (copy), v24 (copy), v13 (copy), v41 (copy), v25 (copy), v29 (copy), v39 (copy), v26 (copy), v43 (copy), v32 (copy), v15 (copy), v9 (ref), v45 (copy)
-        local l_X_1 = v46.X;
-        local v48 = if v12 then v6.GetDisplayStore(false).getViewportSize(false) and v6.GetDisplayStore(false).getViewportSize(false).X or 0 else v19:getState().ScreenSize and v19:getState().ScreenSize.X or 0;
-        local v49 = v22 or v21.calculateSideMargin(l_X_1, v28, v48);
-        v35(v49);
-        local v50 = v23 or v21.calculateColumnGap(l_X_1, v28, v48);
-        v37(v50);
-        local v51 = v24 or v21.calculateNumColumns(l_X_1, v49, v50, v13, v28);
-        v41(v51);
-        local v52 = v25 or v21.calculateFractionalItemAmount(v13, v29);
-        v39(v52);
-        local v53 = v26 or v21.calculateLoadMoreThreshold(l_X_1);
-        v43(v53);
-        v32.current = v46;
-        if v15 then
-            local v54 = v9(v51, v50, v49, l_X_1, v52);
-            v45(v54);
-        end;
-    end, {
-        v13, 
-        v15, 
-        v23, 
-        v22, 
-        v24, 
-        v25, 
-        v26, 
-        v28, 
-        v19
-    });
-    v2.useEffect(function() --[[ Line: 168 ]]
-        -- upvalues: v14 (copy), v55 (copy)
-        local v56 = nil;
-        if v14 then
-            v55(v14.AbsoluteSize);
-            v56 = v14:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 172 ]]
-                -- upvalues: v55 (ref), v14 (ref)
-                v55(v14.AbsoluteSize);
-            end);
-        end;
-        return function() --[[ Line: 176 ]]
-            -- upvalues: v56 (ref)
-            if v56 then
-                v56:Disconnect();
-            end;
-        end;
-    end, {
-        v55, 
-        v14
-    });
-    return {
-        numColumns = v40, 
-        fractionalItemAmount = v38, 
-        columnGap = v36, 
-        sideMargin = v34, 
-        verticalPadding = v30, 
-        maxTilesToShow = v31, 
-        itemWidth = v44, 
-        loadMoreThreshold = v42
-    };
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local useDesignTokens = require(CollectionViewsParent.Style).useDesignTokens
+local useTokens = require(CollectionViewsParent.Foundation).Hooks.useTokens
+local usePreferredInput = require(CollectionViewsParent.Responsive).usePreferredInput
+local Display = require(CollectionViewsParent.Display)
+local useStore = require(CollectionViewsParent.RoactUtils).Hooks.RoactRodux.useStore
+local CollectionLayoutCalculators = require(CollectionViews.CollectionLayoutCalculators)
+local calculateItemWidth = require(CollectionViews.calculateItemWidth)
+
+require(CollectionViews.CollectionViewTypes)
+
+local FFlagLuaAppLayoutParamsInContext = require(CollectionViewsParent.SharedFlags).FFlagLuaAppLayoutParamsInContext
+local v12 = game:DefineFastFlag("LuaAppUseDisplayStoreForCollectionLayoutParams", false)
+
+local function useCollectionLayoutParams(p1, p2, b1: boolean?, t1: {[any]: any}?, p3, vector2: Vector2?) -- line: 35
+	-- upvalues: useStore (copy), v12 (copy), Display (copy), CollectionLayoutCalculators (copy), FFlagLuaAppLayoutParamsInContext (copy), useTokens (copy), useDesignTokens (copy), usePreferredInput (copy), React (copy), calculateItemWidth (copy)
+	local v20 = useStore()
+	local v21 = if not v12 then v20:getState().ScreenSize or Vector2.new(0, 0) else Display.GetDisplayStore(false).getViewportSize(false) or Vector2.new(0, 0)
+	local v22 = p3 or CollectionLayoutCalculators
+	local v23 = t1 and t1.sideMargin or nil
+	local v24 = t1 and t1.columnGap or nil
+	local v25 = t1 and t1.numColumns or nil
+	local v26 = t1 and t1.fractionalItemAmount or nil
+	local v27 = t1 and t1.loadMoreThreshold or nil
+	local v28 = t1 and t1.verticalPadding or nil
+	local v29 = if not FFlagLuaAppLayoutParamsInContext then useDesignTokens() else useTokens()
+	local v30 = usePreferredInput()
+	local v31 = v28 or v22.calculateVerticalPadding(v29, p1)
+	local v32 = v22.calculateMaxTilesToShow(v30)
+	local v33 = React.useRef(nil)
+
+	if v33.current == nil then
+		v33.current = vector2 or v21
+	end
+
+	local currentX = v33.current.X
+	local v35, v36 = React.useState(function() -- line: 80
+		-- upvalues: v23 (copy), v22 (copy), currentX (copy), v29 (copy), v21 (copy)
+		return v23 or v22.calculateSideMargin(currentX, v29, v21.X)
+	end)
+	local v37, v38 = React.useState(function() -- line: 83
+		-- upvalues: v24 (copy), v22 (copy), currentX (copy), v29 (copy), v21 (copy)
+		return v24 or v22.calculateColumnGap(currentX, v29, v21.X)
+	end)
+	local v39, v40 = React.useState(function() -- line: 86
+		-- upvalues: v26 (copy), v22 (copy), p1 (copy), v30 (copy)
+		return v26 or v22.calculateFractionalItemAmount(p1, v30)
+	end)
+	local v41, v42 = React.useState(function() -- line: 90
+		-- upvalues: v25 (copy), v22 (copy), currentX (copy), v35 (copy), v37 (copy), p1 (copy), v29 (copy)
+		return v25 or v22.calculateNumColumns(currentX, v35, v37, p1, v29)
+	end)
+	local v43, v44 = React.useState(function() -- line: 94
+		-- upvalues: v27 (copy), v22 (copy), currentX (copy)
+		return v27 or v22.calculateLoadMoreThreshold(currentX)
+	end)
+	local v45, v46 = React.useState(function() -- line: 99
+		-- upvalues: b1 (copy), calculateItemWidth (copy), v41 (copy), v37 (copy), v35 (copy), currentX (copy), v39 (copy)
+		if b1 then
+			return calculateItemWidth(v41, v37, v35, currentX, v39)
+		end
+
+		return 1
+	end)
+	local v47 = React.useCallback(function(vector2_2: Vector2) -- line: 108
+		-- upvalues: v12 (copy), Display (copy), v20 (copy), v23 (copy), v22 (copy), v29 (copy), v36 (copy), v24 (copy), v38 (copy), v25 (copy), p1 (copy), v42 (copy), v26 (copy), v30 (copy), v40 (copy), v27 (copy), v44 (copy), v33 (copy), b1 (copy), calculateItemWidth (copy), v46 (copy)
+		local vector2_2X = vector2_2.X
+		local v50 = if not v12 then v20:getState().ScreenSize and v20:getState().ScreenSize.X or 0 else Display.GetDisplayStore(false).getViewportSize(false) and Display.GetDisplayStore(false).getViewportSize(false).X or 0
+		local v51 = v23 or v22.calculateSideMargin(vector2_2X, v29, v50)
+
+		v36(v51)
+
+		local v52 = v24 or v22.calculateColumnGap(vector2_2X, v29, v50)
+
+		v38(v52)
+
+		local v53 = v25 or v22.calculateNumColumns(vector2_2X, v51, v52, p1, v29)
+
+		v42(v53)
+
+		local v54 = v26 or v22.calculateFractionalItemAmount(p1, v30)
+
+		v40(v54)
+
+		local v55 = v27 or v22.calculateLoadMoreThreshold(vector2_2X)
+
+		v44(v55)
+		v33.current = vector2_2
+
+		if b1 then
+			local v56 = calculateItemWidth(v53, v52, v51, vector2_2X, v54)
+
+			v46(v56)
+		end
+	end, {
+		p1,
+		b1,
+		v24,
+		v23,
+		v25,
+		v26,
+		v27,
+		v29,
+		v20
+	})
+
+	React.useEffect(function() -- line: 168
+		-- upvalues: p2 (copy), v47 (copy)
+		local connection = nil
+
+		if p2 then
+			v47(p2.AbsoluteSize)
+			connection = p2:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 172
+				-- upvalues: v47 (copy), p2 (copy)
+				v47(p2.AbsoluteSize)
+			end)
+		end
+
+		return function() -- line: 176
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, {
+		v47,
+		p2
+	})
+
+	return {
+		numColumns = v41,
+		fractionalItemAmount = v39,
+		columnGap = v37,
+		sideMargin = v35,
+		verticalPadding = v31,
+		maxTilesToShow = v32,
+		itemWidth = v45,
+		loadMoreThreshold = v43
+	}
+end
+
+return useCollectionLayoutParams

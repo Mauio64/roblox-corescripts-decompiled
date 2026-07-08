@@ -1,29 +1,34 @@
-local v0 = game:DefineFastFlag("DevConsoleFixTimestampDST", false);
-local function _(v1) --[[ Line: 4 ]] --[[ Name: numberWithZero ]]
-    return (v1 < 10 and "0" or "") .. v1;
-end;
-return function(v3) --[[ Line: 8 ]] --[[ Name: convertTimeStamp ]]
-    -- upvalues: v0 (copy)
-    local v4 = nil;
-    local v5 = nil;
-    local v6 = nil;
-    if v0 then
-        local v7 = os.date("*t", v3);
-        v4 = v7.hour;
-        v5 = v7.min;
-        v6 = v7.sec;
-    else
-        local v8 = math.floor(v3 - os.time() + tick()) % 86400;
-        v4 = math.floor(v8 / 3600);
-        v8 = v8 - v4 * 3600;
-        v5 = math.floor(v8 / 60);
-        v6 = v8 - v5 * 60;
-    end;
-    local l_v4_0 = v4;
-    local v10 = (l_v4_0 < 10 and "0" or "") .. l_v4_0;
-    local l_v5_0 = v5;
-    l_v4_0 = (l_v5_0 < 10 and "0" or "") .. l_v5_0;
-    local l_v6_0 = v6;
-    l_v5_0 = (l_v6_0 < 10 and "0" or "") .. l_v6_0;
-    return string.format("%s:%s:%s", v10, l_v4_0, l_v5_0);
-end;
+local v1 = game:DefineFastFlag("DevConsoleFixTimestampDST", false)
+
+local function numberWithZero(p1) -- line: 4
+	return (not (p1 < 10) and "" or "0") .. p1
+end
+local function convertTimeStamp(p2) -- line: 8
+	-- upvalues: v1 (copy)
+	local hour, min, sec
+
+	if v1 then
+		local v6 = os.date("*t", p2)
+
+		hour = v6.hour
+		min = v6.min
+		sec = v6.sec
+	else
+		local v10 = math.floor(p2 - os.time() + tick()) % 86400
+
+		hour = math.floor(v10 / 3600)
+
+		local v11 = v10 - hour * 3600
+
+		min = math.floor(v11 / 60)
+		sec = v11 - min * 60
+	end
+
+	local v12 = (not (hour < 10) and "" or "0") .. hour
+	local v13 = (not (min < 10) and "" or "0") .. min
+	local v14 = (not (sec < 10) and "" or "0") .. sec
+
+	return string.format("%s:%s:%s", v12, v13, v14)
+end
+
+return convertTimeStamp

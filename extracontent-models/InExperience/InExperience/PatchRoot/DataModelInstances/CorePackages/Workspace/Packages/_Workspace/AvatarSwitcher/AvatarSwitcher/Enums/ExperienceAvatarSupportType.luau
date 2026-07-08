@@ -1,5 +1,5 @@
 return {
-    NoSupport = "NoSupport", 
-    UnknownSupport = "UnknownSupport", 
-    FullSupport = "FullSupport"
-};
+	NoSupport = "NoSupport",
+	UnknownSupport = "UnknownSupport",
+	FullSupport = "FullSupport"
+}

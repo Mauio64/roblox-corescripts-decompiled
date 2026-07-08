@@ -1,13 +1,3 @@
-return function(v0) --[[ Line: 2 ]]
-    local v1 = false;
-    if typeof(v0) == "number" then
-        v1 = false;
-        if v0 == v0 then
-            v1 = false;
-            if v0 ~= 1e999 then
-                v1 = v0 ~= -1e999;
-            end;
-        end;
-    end;
-    return v1;
-end;
+return function(p1) -- line: 2
+	return typeof(p1) == "number" and (p1 == p1 and (p1 ~= 1e999 and p1 ~= -1e999))
+end

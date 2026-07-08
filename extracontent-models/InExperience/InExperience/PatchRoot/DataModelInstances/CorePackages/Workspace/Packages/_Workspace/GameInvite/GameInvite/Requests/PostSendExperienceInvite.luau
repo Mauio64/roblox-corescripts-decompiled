@@ -1,18 +1,21 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script:FindFirstAncestor("GameInvite").Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-game:DefineFastFlag("LuaAppExperienceJoinIdempotencyKey", false);
-return function(v3, v4, v5, v6, v7, v8) --[[ Line: 9 ]]
-    -- upvalues: l_HttpService_0 (copy), l_Url_0 (copy)
-    local v9 = l_HttpService_0:JSONEncode({
-        recipientUserId = v4, 
-        inviteMessageId = v7, 
-        placeId = v5, 
-        launchData = v8, 
-        trigger = v6, 
-        idempotencyKey = if game:GetFastFlag("LuaAppExperienceJoinIdempotencyKey") then l_HttpService_0:GenerateGUID(false) else nil
-    });
-    return v3(string.format("%snotifications/v1/send-experience-invite", l_Url_0.APIS_URL), "POST", {
-        postBody = v9
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local Parent = script:FindFirstAncestor("GameInvite").Parent
+local Url = require(Parent.Http).Url
+
+game:DefineFastFlag("LuaAppExperienceJoinIdempotencyKey", false)
+
+return function(p1, s1: string, s2: string, s3: string, s4: string?, s5: string?) -- line: 9
+	-- upvalues: HttpService (copy), Url (copy)
+	local json = HttpService:JSONEncode({
+		recipientUserId = s1,
+		inviteMessageId = s4,
+		placeId = s2,
+		launchData = s5,
+		trigger = s3,
+		idempotencyKey = if not game:GetFastFlag("LuaAppExperienceJoinIdempotencyKey") then nil else HttpService:GenerateGUID(false)
+	})
+
+	return p1(string.format("%snotifications/v1/send-experience-invite", Url.APIS_URL), "POST", {
+		postBody = json
+	})
+end

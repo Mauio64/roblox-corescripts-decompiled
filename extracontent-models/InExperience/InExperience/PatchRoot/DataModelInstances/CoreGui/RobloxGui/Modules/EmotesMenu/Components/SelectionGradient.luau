@@ -1,43 +1,48 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Constants);
-local v5 = v1.PureComponent:extend("SelectionGradient");
-v5.render = function(v6) --[[ Line: 13 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v1 (copy)
-    local v7 = v4.Layouts[v6.props.layout];
-    local l_focusedSegmentIndex_0 = v6.props.emotesWheel.focusedSegmentIndex;
-    local v9 = 360 / v4.EmotesPerPage * (l_focusedSegmentIndex_0 - 1) + v4.SegmentsStartRotation;
-    return v1.createElement("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        Rotation = v9, 
-        Visible = l_focusedSegmentIndex_0 ~= 0
-    }, {
-        SelectedGradient = v1.createElement("ImageLabel", {
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = UDim2.new(0.5, 0, 0.5, 0), 
-            Size = UDim2.new(0.5, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            ImageTransparency = v4.GradientTransparency, 
-            Image = v7.SelectedGradient, 
-            ZIndex = 2
-        }, {
-            AsspectRatioConstraint = v1.createElement("UIAspectRatioConstraint", {
-                AspectRatio = v7.SelectedGradientImageSize.X / v7.SelectedGradientImageSize.Y
-            }), 
-            SizeConstraint = v1.createElement("UISizeConstraint", {
-                MaxSize = v7.SelectedGradientImageSize
-            })
-        })
-    });
-end;
-return v2.connect(function(v10) --[[ Line: 47 ]] --[[ Name: mapStateToProps ]]
-    return {
-        emotesWheel = v10.emotesWheel, 
-        layout = v10.layout
-    };
-end, nil)(v5);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local v6 = Roact.PureComponent:extend("SelectionGradient")
+
+function v6.render(p1) -- line: 13
+	-- upvalues: Constants (copy), Roact (copy)
+	local v9 = Constants.Layouts[p1.props.layout]
+	local focusedSegmentIndex = p1.props.emotesWheel.focusedSegmentIndex
+	local v11 = 360 / Constants.EmotesPerPage * (focusedSegmentIndex - 1) + Constants.SegmentsStartRotation
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1, 0, 1, 0),
+		Rotation = v11,
+		Visible = focusedSegmentIndex ~= 0
+	}, {
+		SelectedGradient = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			ZIndex = 2,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(0.5, 0, 1, 0),
+			ImageTransparency = Constants.GradientTransparency,
+			Image = v9.SelectedGradient
+		}, {
+			AsspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = v9.SelectedGradientImageSize.X / v9.SelectedGradientImageSize.Y
+			}),
+			SizeConstraint = Roact.createElement("UISizeConstraint", {
+				MaxSize = v9.SelectedGradientImageSize
+			})
+		})
+	})
+end
+
+local function mapStateToProps(p2) -- line: 47
+	return {
+		emotesWheel = p2.emotesWheel,
+		layout = p2.layout
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(v6)

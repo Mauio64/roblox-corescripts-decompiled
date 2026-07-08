@@ -1,25 +1,32 @@
-local l_Actions_0 = game:GetService("CoreGui").RobloxGui.Modules.Shell.Actions;
-local v1 = require(l_Actions_0.InsertScreen);
-local v2 = require(l_Actions_0.RemoveScreen);
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Immutable_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Immutable;
-return function(v5, v6) --[[ Line: 19 ]]
-    -- upvalues: v1 (copy), l_Immutable_0 (copy), v2 (copy)
-    v5 = v5 or {};
-    assert(v5, "");
-    if v6.type == v1.name then
-        local v7 = l_Immutable_0.Append(v5, v6.item);
-        table.sort(v7, function(v8, v9) --[[ Line: 26 ]]
-            if v8.priority == v9.priority then
-                return v8.createdAt > v9.createdAt;
-            else
-                return v8.priority > v9.priority;
-            end;
-        end);
-        return v7;
-    elseif v6.type == v2.name then
-        return l_Immutable_0.RemoveValueFromList(v5, v6.item);
-    else
-        return v5;
-    end;
-end;
+local Actions = game:GetService("CoreGui").RobloxGui.Modules.Shell.Actions
+local InsertScreen = require(Actions.InsertScreen)
+local RemoveScreen = require(Actions.RemoveScreen)
+local CorePackages = game:GetService("CorePackages")
+local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+
+return function(t1: {[any]: any}?, p1) -- line: 19
+	-- upvalues: InsertScreen (copy), Immutable (copy), RemoveScreen (copy)
+	local v8 = t1 or {}
+
+	assert(v8, "")
+
+	if p1.type == InsertScreen.name then
+		local v9 = Immutable.Append(v8, p1.item)
+
+		table.sort(v9, function(p2, p3) -- line: 26
+			if p2.priority == p3.priority then
+				return p2.createdAt > p3.createdAt
+			end
+
+			return p2.priority > p3.priority
+		end)
+
+		return v9
+	end
+
+	if p1.type == RemoveScreen.name then
+		return Immutable.RemoveValueFromList(v8, p1.item)
+	end
+
+	return v8
+end

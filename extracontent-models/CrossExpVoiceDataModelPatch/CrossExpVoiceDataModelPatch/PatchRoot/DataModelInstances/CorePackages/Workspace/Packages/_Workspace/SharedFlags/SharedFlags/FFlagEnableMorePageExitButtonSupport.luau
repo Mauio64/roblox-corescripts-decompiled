@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableMorePageExitButtonSupport2", false);
+return game:DefineFastFlag("EnableMorePageExitButtonSupport2", false)

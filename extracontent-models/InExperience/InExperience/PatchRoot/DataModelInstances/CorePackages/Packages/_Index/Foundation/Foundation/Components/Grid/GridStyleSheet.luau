@@ -1,76 +1,79 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local l_useStyleSheet_0 = require(l_script_FirstAncestor_0.Providers.Style.StyleSheetContext).useStyleSheet;
-local _ = require(l_script_FirstAncestor_0.Enums.Breakpoint);
-local v6 = require(script.Parent.createGridStyleRules);
-local v7 = require(l_script_FirstAncestor_0.Utility.getGridMetrics);
-local v8 = require(l_script_FirstAncestor_0.Providers.Responsive.useResponsive);
-local v9 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v10 = {
-    containerWidth = 0
-};
-return v3.memo(function(v11) --[[ Line: 25 ]] --[[ Name: GridStyleSheet ]]
-    -- upvalues: v9 (copy), v10 (copy), v3 (copy), v8 (copy), l_useStyleSheet_0 (copy), v6 (copy), v2 (copy), v7 (copy)
-    local v12 = v9(v11, v10);
-    local v13 = v3.useRef(nil);
-    local v14 = v8();
-    local v15 = l_useStyleSheet_0();
-    local l_breakpoint_0 = v14.config.breakpoint;
-    local l_grid_0 = v14.config.grid;
-    local v18 = l_breakpoint_0.order[#l_breakpoint_0.order];
-    local v19 = l_grid_0.columns[v18];
-    local v20 = v12.breakpoint or v18;
-    local v21 = math.max(1, v12.containerWidth);
-    local v22 = v3.useMemo(function() --[[ Line: 39 ]]
-        -- upvalues: v6 (ref), v14 (copy)
-        return v6(v14.config);
-    end, {
-        v14.config
-    });
-    local v23 = v3.useMemo(function() --[[ Line: 43 ]]
-        -- upvalues: v2 (ref), v22 (copy), v20 (copy)
-        return v2.join(v22.baseRules, v22.rulesByBreakpoint[v20]);
-    end, {
-        v22, 
-        v20
-    });
-    v3.useLayoutEffect(function() --[[ Line: 47 ]]
-        -- upvalues: v13 (copy), l_grid_0 (copy), v20 (copy), v19 (copy), v7 (ref), v14 (copy), v21 (copy)
-        if v13.current then
-            local v24 = l_grid_0.columns[v20];
-            for v25 = 0, v19 do
-                local v26 = math.min(v25, v24);
-                local v27 = v7(v14.config, v20, v21, v26);
-                local v28 = Vector2.new(v27.cellWidth, 0);
-                local v29 = Vector2.new(v27.cellWidth, 1e999);
-                v13.current:SetAttribute("Col" .. v25, v27.cellSize);
-                v13.current:SetAttribute("ColMin" .. v25, v28);
-                v13.current:SetAttribute("ColMax" .. v25, v29);
-            end;
-        end;
-    end, {
-        v14.config, 
-        v21, 
-        v20
-    });
-    v3.useLayoutEffect(function() --[[ Line: 70 ]]
-        -- upvalues: v13 (copy), v15 (copy)
-        if v13.current then
-            v13.current:SetDerives({
-                v15
-            });
-        end;
-    end, {
-        v15
-    });
-    return v3.createElement(v3.Fragment, nil, {
-        GridStyleSheet = v3.createElement("StyleSheet", {
-            ref = v13
-        }, v23), 
-        GridStyleLink = v3.createElement("StyleLink", {
-            StyleSheet = v13.current
-        })
-    });
-end);
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+local useStyleSheet = require(Foundation.Providers.Style.StyleSheetContext).useStyleSheet
+
+require(Foundation.Enums.Breakpoint)
+
+local createGridStyleRules = require(script.Parent.createGridStyleRules)
+local getGridMetrics = require(Foundation.Utility.getGridMetrics)
+local useResponsive = require(Foundation.Providers.Responsive.useResponsive)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local t1 = {
+	containerWidth = 0
+}
+
+local function GridStyleSheet(t2: {[any]: any}) -- line: 25
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), useResponsive (copy), useStyleSheet (copy), createGridStyleRules (copy), Dash (copy), getGridMetrics (copy)
+	local v13 = withDefaults(t2, t1)
+	local v14 = React.useRef(nil)
+	local v15 = useResponsive()
+	local v16 = useStyleSheet()
+	local breakpoint = v15.config.breakpoint
+	local grid = v15.config.grid
+	local v19 = breakpoint.order[#breakpoint.order]
+	local v20 = grid.columns[v19]
+	local v21 = v13.breakpoint or v19
+	local v22 = math.max(1, v13.containerWidth)
+	local v23 = React.useMemo(function() -- line: 39
+		-- upvalues: createGridStyleRules (copy), v15 (copy)
+		return createGridStyleRules(v15.config)
+	end, { v15.config })
+	local v24 = React.useMemo(function() -- line: 43
+		-- upvalues: Dash (copy), v23 (copy), v21 (copy)
+		return Dash.join(v23.baseRules, v23.rulesByBreakpoint[v21])
+	end, {
+		v23,
+		v21
+	})
+
+	React.useLayoutEffect(function() -- line: 47
+		-- upvalues: v14 (copy), grid (copy), v21 (copy), v20 (copy), getGridMetrics (copy), v15 (copy), v22 (copy)
+		if v14.current then
+			local v25 = grid.columns[v21]
+
+			for i = 0, v20 do
+				local v27 = math.min(i, v25)
+				local v28 = getGridMetrics(v15.config, v21, v22, v27)
+				local vector2 = Vector2.new(v28.cellWidth, 0)
+				local vector2_2 = Vector2.new(v28.cellWidth, 1e999)
+
+				v14.current:SetAttribute("Col" .. i, v28.cellSize)
+				v14.current:SetAttribute("ColMin" .. i, vector2)
+				v14.current:SetAttribute("ColMax" .. i, vector2_2)
+			end
+		end
+	end, {
+		v15.config,
+		v22,
+		v21
+	})
+	React.useLayoutEffect(function() -- line: 70
+		-- upvalues: v14 (copy), v16 (copy)
+		if v14.current then
+			v14.current:SetDerives({ v16 })
+		end
+	end, { v16 })
+
+	return React.createElement(React.Fragment, nil, {
+		GridStyleSheet = React.createElement("StyleSheet", {
+			ref = v14
+		}, v24),
+		GridStyleLink = React.createElement("StyleLink", {
+			StyleSheet = v14.current
+		})
+	})
+end
+
+return React.memo(GridStyleSheet)

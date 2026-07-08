@@ -1,198 +1,231 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Players_0 = game:GetService("Players");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_RobloxGui_0.Modules.PlayerPermissionsModule);
-local v5 = require(l_RobloxGui_0.Modules.TenFootInterface);
-local v6 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local v7 = require(l_CorePackages_0.Workspace.Packages.BlockingUtility);
-local v8 = require(l_RobloxGui_0.Modules.Common.Flags.FFlagInExperienceUserProfileSettingsEnabled);
-local v9 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local l_FFlagBadgeVisibilitySettingEnabled_0 = v9.FFlagBadgeVisibilitySettingEnabled;
-local l_FFlagReplacePlayerIconRoduxWithSignal_0 = v9.FFlagReplacePlayerIconRoduxWithSignal;
-local l_FFlagEnableMobilePlayerListOnConsole_0 = v6.Flags.FFlagEnableMobilePlayerListOnConsole;
-local v13 = game:DefineFastFlag("EnableBadgeCheckForUserCreator", false);
-local l_PlayerIconInfoStore_0 = require(l_CorePackages_0.Workspace.Packages.PlayerIconInfoStore).PlayerIconInfoStore;
-local l_Images_0 = require(l_CorePackages_0.Packages.UIBlox).App.ImageSet.Images;
-local l_Parent_0 = script.Parent.Parent;
-local v17 = {
-    Admin = l_Images_0["icons/status/player/admin"], 
-    Intern = l_Images_0["icons/status/player/intern"], 
-    Star = l_Images_0["icons/status/player/videostar"]
-};
-local v18 = require(l_Parent_0.Actions.SetPlayerSpecialGroupIcon);
-local v19 = require(l_Parent_0.Actions.SetPlayerIsCreator);
-local v20 = require(l_Parent_0.Actions.SetPlayerAvatarIcon);
-local v21 = require(l_Parent_0.Actions.SetPlayerIsBlocked);
-local v22 = require(l_Parent_0.Actions.SetPlayerFriendStatus);
-local function v30(v23, v24, v25) --[[ Line: 47 ]] --[[ Name: dispatchIfPlayerExists ]]
-    local l_players_0 = v23:getState().players;
-    local v27 = false;
-    for _, v29 in ipairs(l_players_0) do
-        if v24 == v29 then
-            v27 = true;
-            break;
-        end;
-    end;
-    if v27 then
-        v23:dispatch(v25);
-    end;
-end;
-local function _(v31) --[[ Line: 61 ]] --[[ Name: isInExperienceNameEnabled ]]
-    -- upvalues: v8 (copy), v4 (copy)
-    if v8 and v4.IsPlayerInExperienceNameEnabledAsync(v31) then
-        return true;
-    else
-        return false;
-    end;
-end;
-local function v41(v33, v34) --[[ Line: 70 ]] --[[ Name: getGroupsPermissionsInfo ]]
-    -- upvalues: l_FFlagBadgeVisibilitySettingEnabled_0 (copy), v4 (copy), v17 (copy), l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), l_PlayerIconInfoStore_0 (copy), v8 (copy), v30 (copy), v18 (copy)
-    if l_FFlagBadgeVisibilitySettingEnabled_0 then
-        local v35 = nil;
-        if v4.IsPlayerAdminAsync(v34) then
-            v35 = v17.Admin;
-        elseif v4.IsPlayerStarAsync(v34) then
-            v35 = v17.Star;
-        elseif v4.IsPlayerInternAsync(v34) then
-            v35 = v17.Intern;
-        end;
-        if v35 then
-            if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-                local v36 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v34.UserId)(false);
-                l_PlayerIconInfoStore_0.setPlayerIconInfo(v34.UserId, {
-                    isPlaceOwner = v36.isPlaceOwner, 
-                    avatarIcon = v36.avatarIcon, 
-                    specialGroupIcon = v35
-                });
-                return;
-            else
-                local v37 = not (v8 and v4.IsPlayerInExperienceNameEnabledAsync(v34) and true or false) and v35 or nil;
-                v30(v33, v34, v18(v34, v37));
-                return;
-            end;
-        end;
-    elseif v4.IsPlayerAdminAsync(v34) then
-        if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-            local v38 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v34.UserId)(false);
-            l_PlayerIconInfoStore_0.setPlayerIconInfo(v34.UserId, {
-                isPlaceOwner = v38.isPlaceOwner, 
-                avatarIcon = v38.avatarIcon, 
-                specialGroupIcon = v17.Admin
-            });
-            return;
-        elseif not (v8 and v4.IsPlayerInExperienceNameEnabledAsync(v34) and true or false) then
-            v30(v33, v34, v18(v34, v17.Admin));
-            return;
-        end;
-    elseif v4.IsPlayerStarAsync(v34) then
-        if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-            local v39 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v34.UserId)(false);
-            l_PlayerIconInfoStore_0.setPlayerIconInfo(v34.UserId, {
-                isPlaceOwner = v39.isPlaceOwner, 
-                avatarIcon = v39.avatarIcon, 
-                specialGroupIcon = v17.Star
-            });
-            return;
-        elseif not (v8 and v4.IsPlayerInExperienceNameEnabledAsync(v34) and true or false) then
-            v30(v33, v34, v18(v34, v17.Star));
-            return;
-        end;
-    elseif v4.IsPlayerInternAsync(v34) then
-        if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-            local v40 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v34.UserId)(false);
-            l_PlayerIconInfoStore_0.setPlayerIconInfo(v34.UserId, {
-                isPlaceOwner = v40.isPlaceOwner, 
-                avatarIcon = v40.avatarIcon, 
-                specialGroupIcon = v17.Intern
-            });
-            return;
-        elseif not (v8 and v4.IsPlayerInExperienceNameEnabledAsync(v34) and true or false) then
-            v30(v33, v34, v18(v34, v17.Intern));
-        end;
-    end;
-end;
-local function v45(v42, v43) --[[ Line: 142 ]] --[[ Name: getGameCreator ]]
-    -- upvalues: v13 (copy), v4 (copy), l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), l_PlayerIconInfoStore_0 (copy), v8 (copy), v30 (copy), v19 (copy)
-    if not v13 and game.CreatorType ~= Enum.CreatorType.Group then
-        return;
-    else
-        if v4.CanPlayerManagePlaceAsync(v43) then
-            if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-                local v44 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v43.UserId)(false);
-                l_PlayerIconInfoStore_0.setPlayerIconInfo(v43.UserId, {
-                    isPlaceOwner = true, 
-                    avatarIcon = v44.avatarIcon, 
-                    specialGroupIcon = v44.specialGroupIcon
-                });
-                return;
-            elseif not (v8 and v4.IsPlayerInExperienceNameEnabledAsync(v43) and true or false) then
-                v30(v42, v43, v19(v43, true));
-            end;
-        end;
-        return;
-    end;
-end;
-local function v50(v46, v47) --[[ Line: 164 ]] --[[ Name: getPlayerAvatarIcon ]]
-    -- upvalues: l_FFlagEnableMobilePlayerListOnConsole_0 (copy), v5 (copy), l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), l_PlayerIconInfoStore_0 (copy), v30 (copy), v20 (copy)
-    if l_FFlagEnableMobilePlayerListOnConsole_0 or not v5:IsEnabled() then
-        return;
-    else
-        local v48 = "rbxthumb://type=Avatar&id=" .. v47.UserId .. "&w=100&h=100";
-        if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-            local v49 = l_PlayerIconInfoStore_0.getPlayerIconInfoReactive(v47.UserId)(false);
-            l_PlayerIconInfoStore_0.setPlayerIconInfo(v47.UserId, {
-                isPlaceOwner = v49.isPlaceOwner, 
-                avatarIcon = v48, 
-                specialGroupIcon = v49.specialGroupIcon
-            });
-            return;
-        else
-            v30(v46, v47, v20(v47, v48));
-            return;
-        end;
-    end;
-end;
-local function v53(v51, v52) --[[ Line: 183 ]] --[[ Name: getPlayerIsBlocked ]]
-    -- upvalues: v7 (copy), v30 (copy), v21 (copy)
-    if v7:IsPlayerBlockedByUserId(v52.UserId) then
-        v30(v51, v52, v21(v52, true));
-    end;
-end;
-local function v56(v54, v55) --[[ Line: 189 ]] --[[ Name: getPlayerFriendStatus ]]
-    -- upvalues: l_Players_0 (copy), v30 (copy), v22 (copy)
-    if v55 ~= l_Players_0.LocalPlayer and v55.Parent == l_Players_0 and l_Players_0.LocalPlayer.Parent == l_Players_0 then
-        v30(v54, v55, v22(v55, l_Players_0.LocalPlayer:GetFriendStatus(v55)));
-    end;
-end;
-return function(v57) --[[ Line: 199 ]] --[[ Name: MakePlayerInfoRequests ]]
-    -- upvalues: l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), v8 (copy), v4 (copy), l_PlayerIconInfoStore_0 (copy), v41 (copy), v45 (copy), v50 (copy), v53 (copy), v56 (copy)
-    return function(v58) --[[ Line: 200 ]]
-        -- upvalues: l_FFlagReplacePlayerIconRoduxWithSignal_0 (ref), v57 (copy), v8 (ref), v4 (ref), l_PlayerIconInfoStore_0 (ref), v41 (ref), v45 (ref), v50 (ref), v53 (ref), v56 (ref)
-        if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-            coroutine.wrap(function() --[[ Line: 202 ]]
-                -- upvalues: v57 (ref), v8 (ref), v4 (ref), l_PlayerIconInfoStore_0 (ref), v41 (ref), v58 (copy), v45 (ref), v50 (ref)
-                local l_v57_0 = v57;
-                if v8 and v4.IsPlayerInExperienceNameEnabledAsync(l_v57_0) and true or false then
-                    l_PlayerIconInfoStore_0.setPlayerIconInfo(v57.UserId, {
-                        isPlaceOwner = false, 
-                        avatarIcon = nil, 
-                        specialGroupIcon = nil
-                    });
-                    return;
-                else
-                    coroutine.wrap(v41)(v58, v57);
-                    coroutine.wrap(v45)(v58, v57);
-                    coroutine.wrap(v50)(v58, v57);
-                    return;
-                end;
-            end)();
-        else
-            coroutine.wrap(v41)(v58, v57);
-            coroutine.wrap(v45)(v58, v57);
-            coroutine.wrap(v50)(v58, v57);
-        end;
-        coroutine.wrap(v53)(v58, v57);
-        coroutine.wrap(v56)(v58, v57);
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local PlayerPermissionsModule = require(RobloxGui.Modules.PlayerPermissionsModule)
+local TenFootInterface = require(RobloxGui.Modules.TenFootInterface)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
+local FFlagInExperienceUserProfileSettingsEnabled = require(RobloxGui.Modules.Common.Flags.FFlagInExperienceUserProfileSettingsEnabled)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagBadgeVisibilitySettingEnabled = SharedFlags.FFlagBadgeVisibilitySettingEnabled
+local FFlagReplacePlayerIconRoduxWithSignal = SharedFlags.FFlagReplacePlayerIconRoduxWithSignal
+local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
+local v14 = game:DefineFastFlag("EnableBadgeCheckForUserCreator", false)
+local PlayerIconInfoStore = require(CorePackages.Workspace.Packages.PlayerIconInfoStore).PlayerIconInfoStore
+local Images = require(CorePackages.Packages.UIBlox).App.ImageSet.Images
+local ParentParent = script.Parent.Parent
+local t1 = {
+	Admin = Images["icons/status/player/admin"],
+	Intern = Images["icons/status/player/intern"],
+	Star = Images["icons/status/player/videostar"]
+}
+local SetPlayerSpecialGroupIcon = require(ParentParent.Actions.SetPlayerSpecialGroupIcon)
+local SetPlayerIsCreator = require(ParentParent.Actions.SetPlayerIsCreator)
+local SetPlayerAvatarIcon = require(ParentParent.Actions.SetPlayerAvatarIcon)
+local SetPlayerIsBlocked = require(ParentParent.Actions.SetPlayerIsBlocked)
+local SetPlayerFriendStatus = require(ParentParent.Actions.SetPlayerFriendStatus)
+
+local function dispatchIfPlayerExists(p1, p2, p3) -- line: 47
+	local players = p1:getState().players
+	local v36 = false
+
+	for _, v in ipairs(players) do
+		if p2 == v then
+			v36 = true
+
+			break
+		end
+	end
+
+	if v36 then
+		p1:dispatch(p3)
+	end
+end
+local function isInExperienceNameEnabled(p4) -- line: 61
+	-- upvalues: FFlagInExperienceUserProfileSettingsEnabled (copy), PlayerPermissionsModule (copy)
+	if FFlagInExperienceUserProfileSettingsEnabled and PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p4) then
+		return true
+	end
+
+	return false
+end
+local function getGroupsPermissionsInfo(p5, p6) -- line: 70
+	-- upvalues: FFlagBadgeVisibilitySettingEnabled (copy), PlayerPermissionsModule (copy), t1 (copy), FFlagReplacePlayerIconRoduxWithSignal (copy), PlayerIconInfoStore (copy), FFlagInExperienceUserProfileSettingsEnabled (copy), dispatchIfPlayerExists (copy), SetPlayerSpecialGroupIcon (copy)
+	if FFlagBadgeVisibilitySettingEnabled then
+		local Admin = nil
+
+		if PlayerPermissionsModule.IsPlayerAdminAsync(p6) then
+			Admin = t1.Admin
+		elseif PlayerPermissionsModule.IsPlayerStarAsync(p6) then
+			Admin = t1.Star
+		elseif PlayerPermissionsModule.IsPlayerInternAsync(p6) then
+			Admin = t1.Intern
+		end
+
+		if Admin then
+			if FFlagReplacePlayerIconRoduxWithSignal then
+				local v43 = PlayerIconInfoStore.getPlayerIconInfoReactive(p6.UserId)(false)
+
+				PlayerIconInfoStore.setPlayerIconInfo(p6.UserId, {
+					isPlaceOwner = v43.isPlaceOwner,
+					avatarIcon = v43.avatarIcon,
+					specialGroupIcon = Admin
+				})
+
+				return
+			end
+
+			local v44 = not (not not FFlagInExperienceUserProfileSettingsEnabled and not not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p6)) and Admin or nil
+
+			dispatchIfPlayerExists(p5, p6, SetPlayerSpecialGroupIcon(p6, v44))
+
+			return
+		end
+	elseif PlayerPermissionsModule.IsPlayerAdminAsync(p6) then
+		if FFlagReplacePlayerIconRoduxWithSignal then
+			local v45 = PlayerIconInfoStore.getPlayerIconInfoReactive(p6.UserId)(false)
+
+			PlayerIconInfoStore.setPlayerIconInfo(p6.UserId, {
+				isPlaceOwner = v45.isPlaceOwner,
+				avatarIcon = v45.avatarIcon,
+				specialGroupIcon = t1.Admin
+			})
+
+			return
+		end
+
+		if not FFlagInExperienceUserProfileSettingsEnabled or not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p6) then
+			dispatchIfPlayerExists(p5, p6, SetPlayerSpecialGroupIcon(p6, t1.Admin))
+
+			return
+		end
+	elseif PlayerPermissionsModule.IsPlayerStarAsync(p6) then
+		if FFlagReplacePlayerIconRoduxWithSignal then
+			local v46 = PlayerIconInfoStore.getPlayerIconInfoReactive(p6.UserId)(false)
+
+			PlayerIconInfoStore.setPlayerIconInfo(p6.UserId, {
+				isPlaceOwner = v46.isPlaceOwner,
+				avatarIcon = v46.avatarIcon,
+				specialGroupIcon = t1.Star
+			})
+
+			return
+		end
+
+		if not FFlagInExperienceUserProfileSettingsEnabled or not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p6) then
+			dispatchIfPlayerExists(p5, p6, SetPlayerSpecialGroupIcon(p6, t1.Star))
+
+			return
+		end
+	elseif PlayerPermissionsModule.IsPlayerInternAsync(p6) then
+		if FFlagReplacePlayerIconRoduxWithSignal then
+			local v47 = PlayerIconInfoStore.getPlayerIconInfoReactive(p6.UserId)(false)
+
+			PlayerIconInfoStore.setPlayerIconInfo(p6.UserId, {
+				isPlaceOwner = v47.isPlaceOwner,
+				avatarIcon = v47.avatarIcon,
+				specialGroupIcon = t1.Intern
+			})
+
+			return
+		end
+
+		if not FFlagInExperienceUserProfileSettingsEnabled or not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p6) then
+			dispatchIfPlayerExists(p5, p6, SetPlayerSpecialGroupIcon(p6, t1.Intern))
+		end
+	end
+end
+local function getGameCreator(p7, p8) -- line: 142
+	-- upvalues: v14 (copy), PlayerPermissionsModule (copy), FFlagReplacePlayerIconRoduxWithSignal (copy), PlayerIconInfoStore (copy), FFlagInExperienceUserProfileSettingsEnabled (copy), dispatchIfPlayerExists (copy), SetPlayerIsCreator (copy)
+	if not v14 and game.CreatorType ~= Enum.CreatorType.Group then
+		return
+	end
+
+	if PlayerPermissionsModule.CanPlayerManagePlaceAsync(p8) then
+		if FFlagReplacePlayerIconRoduxWithSignal then
+			local v50 = PlayerIconInfoStore.getPlayerIconInfoReactive(p8.UserId)(false)
+
+			PlayerIconInfoStore.setPlayerIconInfo(p8.UserId, {
+				isPlaceOwner = true,
+				avatarIcon = v50.avatarIcon,
+				specialGroupIcon = v50.specialGroupIcon
+			})
+
+			return
+		end
+
+		if not FFlagInExperienceUserProfileSettingsEnabled or not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(p8) then
+			dispatchIfPlayerExists(p7, p8, SetPlayerIsCreator(p8, true))
+		end
+	end
+end
+local function getPlayerAvatarIcon(p9, p10) -- line: 164
+	-- upvalues: FFlagEnableMobilePlayerListOnConsole (copy), TenFootInterface (copy), FFlagReplacePlayerIconRoduxWithSignal (copy), PlayerIconInfoStore (copy), dispatchIfPlayerExists (copy), SetPlayerAvatarIcon (copy)
+	if FFlagEnableMobilePlayerListOnConsole or not TenFootInterface:IsEnabled() then
+		return
+	end
+
+	local v53 = "rbxthumb://type=Avatar&id=" .. p10.UserId .. "&w=100&h=100"
+
+	if FFlagReplacePlayerIconRoduxWithSignal then
+		local v54 = PlayerIconInfoStore.getPlayerIconInfoReactive(p10.UserId)(false)
+
+		PlayerIconInfoStore.setPlayerIconInfo(p10.UserId, {
+			isPlaceOwner = v54.isPlaceOwner,
+			avatarIcon = v53,
+			specialGroupIcon = v54.specialGroupIcon
+		})
+
+		return
+	end
+
+	dispatchIfPlayerExists(p9, p10, SetPlayerAvatarIcon(p10, v53))
+end
+local function getPlayerIsBlocked(p11, p12) -- line: 183
+	-- upvalues: BlockingUtility (copy), dispatchIfPlayerExists (copy), SetPlayerIsBlocked (copy)
+	if BlockingUtility:IsPlayerBlockedByUserId(p12.UserId) then
+		dispatchIfPlayerExists(p11, p12, SetPlayerIsBlocked(p12, true))
+	end
+end
+local function getPlayerFriendStatus(p13, p14) -- line: 189
+	-- upvalues: Players (copy), dispatchIfPlayerExists (copy), SetPlayerFriendStatus (copy)
+	if p14 ~= Players.LocalPlayer and (p14.Parent == Players and Players.LocalPlayer.Parent == Players) then
+		dispatchIfPlayerExists(p13, p14, SetPlayerFriendStatus(p14, Players.LocalPlayer:GetFriendStatus(p14)))
+	end
+end
+local function MakePlayerInfoRequests(p15) -- line: 199
+	-- upvalues: FFlagReplacePlayerIconRoduxWithSignal (copy), FFlagInExperienceUserProfileSettingsEnabled (copy), PlayerPermissionsModule (copy), PlayerIconInfoStore (copy), getGroupsPermissionsInfo (copy), getGameCreator (copy), getPlayerAvatarIcon (copy), getPlayerIsBlocked (copy), getPlayerFriendStatus (copy)
+	return function(p16) -- line: 200
+		-- upvalues: FFlagReplacePlayerIconRoduxWithSignal (copy), p15 (copy), FFlagInExperienceUserProfileSettingsEnabled (copy), PlayerPermissionsModule (copy), PlayerIconInfoStore (copy), getGroupsPermissionsInfo (copy), getGameCreator (copy), getPlayerAvatarIcon (copy), getPlayerIsBlocked (copy), getPlayerFriendStatus (copy)
+		if FFlagReplacePlayerIconRoduxWithSignal then
+			coroutine.wrap(function() -- line: 202
+				-- upvalues: p15 (copy), FFlagInExperienceUserProfileSettingsEnabled (copy), PlayerPermissionsModule (copy), PlayerIconInfoStore (copy), getGroupsPermissionsInfo (copy), p16 (copy), getGameCreator (copy), getPlayerAvatarIcon (copy)
+				local v61 = p15
+
+				if not not FFlagInExperienceUserProfileSettingsEnabled and not not PlayerPermissionsModule.IsPlayerInExperienceNameEnabledAsync(v61) then
+					PlayerIconInfoStore.setPlayerIconInfo(p15.UserId, {
+						isPlaceOwner = false,
+						avatarIcon = nil,
+						specialGroupIcon = nil
+					})
+
+					return
+				end
+
+				coroutine.wrap(getGroupsPermissionsInfo)(p16, p15)
+				coroutine.wrap(getGameCreator)(p16, p15)
+				coroutine.wrap(getPlayerAvatarIcon)(p16, p15)
+			end)()
+		else
+			coroutine.wrap(getGroupsPermissionsInfo)(p16, p15)
+			coroutine.wrap(getGameCreator)(p16, p15)
+			coroutine.wrap(getPlayerAvatarIcon)(p16, p15)
+		end
+
+		coroutine.wrap(getPlayerIsBlocked)(p16, p15)
+		coroutine.wrap(getPlayerFriendStatus)(p16, p15)
+	end
+end
+
+return MakePlayerInfoRequests

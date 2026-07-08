@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableUnifiedPurchaseFlowForDevSubs10", false);
+return game:DefineFastFlag("EnableUnifiedPurchaseFlowForDevSubs10", false)

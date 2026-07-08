@@ -1,26 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerTriggeredModals").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local l_default_0 = v1.default;
-local v3 = {
-    eventName = "ServerTriggeredModals_HttpStatusCode", 
-    backends = {
-        v1.TelemetryBackends.Counter
-    }, 
-    lastUpdated = {
-        25, 
-        8, 
-        29
-    }, 
-    description = "Response status code from server triggered modals request"
-};
-return function(v4, v5, v6) --[[ Line: 18 ]]
-    -- upvalues: l_default_0 (copy), v3 (copy)
-    if v6 == nil then
-        v6 = l_default_0;
-    end;
-    assert(v6, "loggingProtocol must exists");
-    v6:logRobloxTelemetryCounter(v3, 1, {
-        endpoint_name = v4, 
-        status_code = v5 or "unknown"
-    });
-end;
+local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local default = LoggingProtocol.default
+local t1 = {
+	eventName = "ServerTriggeredModals_HttpStatusCode",
+	description = "Response status code from server triggered modals request",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		25,
+		8,
+		29
+	}
+}
+
+return function(s1: string, n1: number?, p1) -- line: 18
+	-- upvalues: default (copy), t1 (copy)
+	if p1 == nil then
+		p1 = default
+	end
+
+	assert(p1, "loggingProtocol must exists")
+	p1:logRobloxTelemetryCounter(t1, 1, {
+		endpoint_name = s1,
+		status_code = n1 or "unknown"
+	})
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePostAuthRoutingInAllCases2", false);
+return game:DefineFastFlag("EnablePostAuthRoutingInAllCases2", false)

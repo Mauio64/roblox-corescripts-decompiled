@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.SocialLuaAnalytics);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+
 return {
-    new = v1.Telemetry.new, 
-    contexts = v1.Analytics.Enums.Contexts
-};
+	new = SocialLuaAnalytics.Telemetry.new,
+	contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
+}

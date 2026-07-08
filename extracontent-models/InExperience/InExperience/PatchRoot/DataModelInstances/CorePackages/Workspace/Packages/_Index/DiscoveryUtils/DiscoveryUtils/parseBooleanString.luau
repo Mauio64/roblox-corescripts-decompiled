@@ -1,14 +1,9 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: parseBooleanString ]]
-    if v0 == nil then
-        return nil;
-    else
-        local v1 = true;
-        if v0 ~= "true" then
-            v1 = true;
-            if v0 ~= "True" then
-                v1 = v0 == "1";
-            end;
-        end;
-        return v1;
-    end;
-end;
+local function parseBooleanString(s1: string?) -- line: 1
+	if s1 == nil then
+		return nil
+	end
+
+	return s1 == "true" or (s1 == "True" or s1 == "1")
+end
+
+return parseBooleanString

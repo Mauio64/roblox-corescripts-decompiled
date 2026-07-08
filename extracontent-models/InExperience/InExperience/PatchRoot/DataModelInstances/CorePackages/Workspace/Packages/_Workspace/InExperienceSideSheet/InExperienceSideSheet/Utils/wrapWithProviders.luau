@@ -1,31 +1,62 @@
-local l_Parent_0 = script:FindFirstAncestor("InExperienceSideSheet").Parent;
-local v1 = require(l_Parent_0.Chrome);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactRodux);
-local v4 = require(l_Parent_0.Rodux);
-local v5 = require(l_Parent_0.Style);
-local l_Constants_0 = require(l_Parent_0.UIBlox).App.Style.Constants;
-local l_UiModeStyleProvider_0 = v5.UiModeStyleProvider;
-local l_UnibarStyle_0 = v1.UnibarStyle;
-return function(v9, v10) --[[ Line: 15 ]] --[[ Name: wrapWithProviders ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy), l_UiModeStyleProvider_0 (copy), l_Constants_0 (copy), l_UnibarStyle_0 (copy)
-    local v12 = v4.Store.new(function(v11) --[[ Line: 16 ]]
-        return v11 or {};
-    end);
-    local l_v9_0 = v9;
-    for _, v15 in v10 do
-        l_v9_0 = v2.createElement(v15, nil, l_v9_0);
-    end;
-    return v2.createElement(v3.StoreProvider, {
-        store = v12
-    }, {
-        UiModeStyleProvider = v2.createElement(l_UiModeStyleProvider_0, {
-            style = {
-                themeName = l_Constants_0.ThemeName.Dark, 
-                fontName = l_Constants_0.FontName.Gotham
-            }
-        }, {
-            UnibarStyleProvider = v2.createElement(l_UnibarStyle_0.Provider, {}, l_v9_0)
-        })
-    });
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local Parent = script:FindFirstAncestor("InExperienceSideSheet").Parent
+local Chrome = require(Parent.Chrome)
+local Localization = require(Parent.InExperienceLocales).Localization
+local LocalizationProvider = require(Parent.Localization).LocalizationProvider
+local React = require(Parent.React)
+local RoactNavigation = require(Parent.RoactNavigation)
+local RoactRodux = require(Parent.RoactRodux)
+local Rodux = require(Parent.Rodux)
+local Style = require(Parent.Style)
+local UIBlox = require(Parent.UIBlox)
+local FFlagEnableDrawerFocusNav = require(Parent.SharedFlags).FFlagEnableDrawerFocusNav
+local Constants = UIBlox.App.Style.Constants
+local UiModeStyleProvider = Style.UiModeStyleProvider
+local UnibarStyle = Chrome.UnibarStyle
+local t1 = {
+	isFocused = function() -- line: 28
+		return true
+	end,
+	addListener = function(_: string, _: ((...any) -> ...any)) -- line: 31
+		return {
+			remove = function() -- line: 33
+			end
+		}
+	end
+}
+
+local function wrapWithProviders(p2, t2: {[any]: any}, p3) -- line: 38
+	-- upvalues: Rodux (copy), React (copy), FFlagEnableDrawerFocusNav (copy), RoactNavigation (copy), t1 (copy), RoactRodux (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), UiModeStyleProvider (copy), Constants (copy), UnibarStyle (copy)
+	local v23 = p3 or Rodux.Store.new(function(p4) -- line: 39
+		return p4 or {}
+	end)
+
+	for _, v25 in t2 do
+		p2 = React.createElement(v25, nil, p2)
+	end
+
+	if FFlagEnableDrawerFocusNav then
+		p2 = React.createElement(RoactNavigation.Provider, {
+			value = t1
+		}, p2)
+	end
+
+	return React.createElement(RoactRodux.StoreProvider, {
+		store = v23
+	}, {
+		LocalizationProvider = React.createElement(LocalizationProvider, {
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		}, {
+			UiModeStyleProvider = React.createElement(UiModeStyleProvider, {
+				style = {
+					themeName = Constants.ThemeName.Dark,
+					fontName = Constants.FontName.Gotham
+				}
+			}, {
+				UnibarStyleProvider = React.createElement(UnibarStyle.Provider, {}, p2)
+			})
+		})
+	})
+end
+
+return wrapWithProviders

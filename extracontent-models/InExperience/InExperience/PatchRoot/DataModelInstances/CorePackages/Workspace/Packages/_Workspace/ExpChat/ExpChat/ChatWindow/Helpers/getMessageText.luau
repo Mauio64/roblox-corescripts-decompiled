@@ -1,9 +1,11 @@
-return function(v0, v1, v2) --[[ Line: 1 ]]
-    if v1 == nil or v1 == "" then
-        return v2 or "";
-    elseif v0 then
-        return v1 or "";
-    else
-        return v2 or "";
-    end;
-end;
+return function(b1: boolean?, s1: string?, s2: string?) -- line: 1
+	if s1 == nil or s1 == "" then
+		return s2 or ""
+	end
+
+	if b1 then
+		return s1 or ""
+	end
+
+	return s2 or ""
+end

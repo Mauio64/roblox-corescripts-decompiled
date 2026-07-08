@@ -1,49 +1,63 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Autocomplete");
-local l_List_0 = require(l_Parent_0.llama).List;
-local v3 = require(l_script_FirstAncestor_0.Trie.TrieNode);
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 11 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    local v5 = {};
-    setmetatable(v5, v4);
-    v5.root = v3.new("");
-    return v5;
-end;
-v4.insert = function(v6, v7) --[[ Line: 18 ]] --[[ Name: insert ]]
-    -- upvalues: v3 (copy)
-    local l_root_0 = v6.root;
-    for v9 = 1, #v7 do
-        local v10 = string.sub(v7, v9, v9);
-        if not l_root_0.children[v10] then
-            l_root_0.children[v10] = v3.new(v10);
-        end;
-        l_root_0 = l_root_0.children[v10];
-    end;
-    l_root_0.isEndOfWord = true;
-end;
-v4.autocomplete = function(v11, v12) --[[ Line: 30 ]] --[[ Name: autocomplete ]]
-    local v13 = {};
-    local l_root_1 = v11.root;
-    for v15 = 1, #v12 do
-        local v16 = string.sub(v12, v15, v15);
-        if l_root_1.children[v16] then
-            l_root_1 = l_root_1.children[v16];
-        else
-            return v13;
-        end;
-    end;
-    return (v11:helper(l_root_1, v13, (string.sub(v12, 1, #v12 - 1))));
-end;
-v4.helper = function(v17, v18, v19, v20) --[[ Line: 45 ]] --[[ Name: helper ]]
-    -- upvalues: l_List_0 (copy)
-    if v18.isEndOfWord then
-        v19 = l_List_0.push(v19, v20 .. v18.data);
-    end;
-    for _, v22 in pairs(v18.children) do
-        v19 = v17:helper(v22, v19, v20 .. v18.data);
-    end;
-    return v19;
-end;
-return v4;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Autocomplete = script:FindFirstAncestor("Autocomplete")
+local List = require(Parent.llama).List
+local TrieNode = require(Autocomplete.Trie.TrieNode)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 11
+	-- upvalues: t1 (copy), TrieNode (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.root = TrieNode.new("")
+
+	return t2
+end
+function t1.insert(t3: {[any]: any}, s1: string) -- line: 18
+	-- upvalues: TrieNode (copy)
+	local root = t3.root
+
+	for i = 1, #s1 do
+		local v11 = string.sub(s1, i, i)
+
+		if not root.children[v11] then
+			root.children[v11] = TrieNode.new(v11)
+		end
+
+		root = root.children[v11]
+	end
+
+	root.isEndOfWord = true
+end
+function t1.autocomplete(t4: {[any]: any}, s2: string) -- line: 30
+	local t5 = {}
+	local root = t4.root
+
+	for i = 1, #s2 do
+		local v17 = string.sub(s2, i, i)
+
+		if not root.children[v17] then
+			return t5
+		end
+
+		root = root.children[v17]
+	end
+
+	return (t4:helper(root, t5, (string.sub(s2, 1, #s2 - 1))))
+end
+function t1.helper(t6: {[any]: any}, p1, t7: {[any]: any}, s3: string) -- line: 45
+	-- upvalues: List (copy)
+	if p1.isEndOfWord then
+		t7 = List.push(t7, s3 .. p1.data)
+	end
+
+	for _, v in pairs(p1.children) do
+		t7 = t6:helper(v, t7, s3 .. p1.data)
+	end
+
+	return t7
+end
+
+return t1

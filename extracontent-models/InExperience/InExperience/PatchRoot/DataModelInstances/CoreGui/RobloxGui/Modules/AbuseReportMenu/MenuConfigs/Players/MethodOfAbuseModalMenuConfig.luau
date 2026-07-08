@@ -1,46 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v4 = require(l_script_FirstAncestor_0.Components.Constants);
-local v5 = require(l_script_FirstAncestor_0.Utility.getAvailableMethodsOfAbuse);
-local v6 = require(l_script_FirstAncestor_0.IXP.TnSIXPWrapper);
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v9 = require(l_CorePackages_0.Packages.Cryo);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CoreGui = game:GetService("CoreGui")
+
+require(AbuseReportMenu.Components.Types)
+
+local CorePackages = game:GetService("CorePackages")
+local Constants = require(AbuseReportMenu.Components.Constants)
+local getAvailableMethodsOfAbuse = require(AbuseReportMenu.Utility.getAvailableMethodsOfAbuse)
+local TnSIXPWrapper = require(AbuseReportMenu.IXP.TnSIXPWrapper)
+local RobloxGui = CoreGui.RobloxGui
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local Cryo = require(CorePackages.Packages.Cryo)
+
 return {
-    componentType = "modalSelector", 
-    getIsVisible = function(v10) --[[ Line: 15 ]] --[[ Name: getIsVisible ]]
-        -- upvalues: v6 (copy)
-        return v10.isVoiceEnabled or v6.getReportAnythingAvatarEnabled();
-    end, 
-    getMenuItems = function(v11) --[[ Line: 18 ]] --[[ Name: getMenuItems ]]
-        -- upvalues: v9 (copy), l_default_0 (copy), v5 (copy), v6 (copy)
-        local v12 = v11.isVoiceEnabled and not v9.isEmpty(l_default_0:getRecentUsersInteractionData());
-        return v5(v12, v6.getReportAnythingAvatarEnabled());
-    end, 
-    getSelectedValue = function(v13) --[[ Line: 24 ]] --[[ Name: getSelectedValue ]]
-        return v13.methodOfAbuse;
-    end, 
-    onUpdateSelectedOption = function(v14, v15, v16, v17) --[[ Line: 27 ]] --[[ Name: onUpdateSelectedOption ]]
-        -- upvalues: v4 (copy)
-        v16({
-            type = v4.PlayerMenuActions.UpdateMethodOfAbuse, 
-            methodOfAbuse = v14.identifier
-        });
-        if v14.identifier ~= v15.methodOfAbuse then
-            v17.reportAnythingDispatch({
-                type = v4.ReportAnythingActions.ClearAnnotationFlowProperties
-            });
-            v17.analyticsDispatch({
-                type = v4.AnalyticsActions.IncrementTypeofabuseChanged
-            });
-            v17.analyticsDispatch({
-                type = v4.AnalyticsActions.SetTypeOfAbuseSelection, 
-                selection = v14.identifier
-            });
-        end;
-    end, 
-    fieldLabel = "MethodOfAbuse", 
-    componentName = "MethodOfAbuse"
-};
+	componentType = "modalSelector",
+	fieldLabel = "MethodOfAbuse",
+	componentName = "MethodOfAbuse",
+	getIsVisible = function(p1) -- line: 15
+		-- upvalues: TnSIXPWrapper (copy)
+		return p1.isVoiceEnabled or TnSIXPWrapper.getReportAnythingAvatarEnabled()
+	end,
+	getMenuItems = function(p2) -- line: 18
+		-- upvalues: Cryo (copy), default (copy), getAvailableMethodsOfAbuse (copy), TnSIXPWrapper (copy)
+		local v12 = p2.isVoiceEnabled and not Cryo.isEmpty(default:getRecentUsersInteractionData())
+
+		return getAvailableMethodsOfAbuse(v12, TnSIXPWrapper.getReportAnythingAvatarEnabled())
+	end,
+	getSelectedValue = function(p3) -- line: 24
+		return p3.methodOfAbuse
+	end,
+	onUpdateSelectedOption = function(p4, p5, p6, p7) -- line: 27
+		-- upvalues: Constants (copy)
+		p6({
+			type = Constants.PlayerMenuActions.UpdateMethodOfAbuse,
+			methodOfAbuse = p4.identifier
+		})
+
+		if p4.identifier ~= p5.methodOfAbuse then
+			p7.reportAnythingDispatch({
+				type = Constants.ReportAnythingActions.ClearAnnotationFlowProperties
+			})
+			p7.analyticsDispatch({
+				type = Constants.AnalyticsActions.IncrementTypeofabuseChanged
+			})
+			p7.analyticsDispatch({
+				type = Constants.AnalyticsActions.SetTypeOfAbuseSelection,
+				selection = p4.identifier
+			})
+		end
+	end
+}

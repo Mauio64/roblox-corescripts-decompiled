@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppDataHydrationConnectionsPlayedStore", false);
+return game:DefineFastFlag("LuaAppDataHydrationConnectionsPlayedStore", false)

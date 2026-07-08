@@ -1,26 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local v1 = require(l_script_FirstAncestor_0.calculateSpacePerItem);
-return function(v2, v3, v4, v5, v6, v7) --[[ Line: 14 ]] --[[ Name: calculateCarouselSpacingMetrics ]]
-    -- upvalues: v1 (copy)
-    if v3 <= 0 then
-        return {
-            containerWidth = v2, 
-            effectiveWidth = 0, 
-            stride = 0, 
-            renderedItemWidth = 0, 
-            renderedGap = 0
-        };
-    else
-        local v8 = v2 - v5 - v6 * v7;
-        local v9 = v1(v3, v4);
-        local v10 = math.floor(v8 / v3 + 0.5) - v9.gapOffsetPerItem;
-        local v11 = math.floor(v9.adjustedGap + 0.5);
-        return {
-            containerWidth = v2, 
-            effectiveWidth = v8, 
-            stride = v10 + v11, 
-            renderedItemWidth = v10, 
-            renderedGap = v11
-        };
-    end;
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local calculateSpacePerItem = require(CollectionViews.calculateSpacePerItem)
+
+local function calculateCarouselSpacingMetrics(n1: number, n2: number, n3: number, n4: number, n5: number, n6: number) -- line: 14
+	-- upvalues: calculateSpacePerItem (copy)
+	if n2 <= 0 then
+		return {
+			effectiveWidth = 0,
+			stride = 0,
+			renderedItemWidth = 0,
+			renderedGap = 0,
+			containerWidth = n1
+		}
+	end
+
+	local v10 = n1 - n4 - n5 * n6
+	local v11 = calculateSpacePerItem(n2, n3)
+	local v12 = math.floor(v10 / n2 + 0.5) - v11.gapOffsetPerItem
+	local v13 = math.floor(v11.adjustedGap + 0.5)
+
+	return {
+		containerWidth = n1,
+		effectiveWidth = v10,
+		stride = v12 + v13,
+		renderedItemWidth = v12,
+		renderedGap = v13
+	}
+end
+
+return calculateCarouselSpacingMetrics

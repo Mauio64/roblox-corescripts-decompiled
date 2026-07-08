@@ -1,18 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local v4 = require(l_script_FirstAncestor_0.Actions.ThirdPartyChatSettingsLoaded);
-return function() --[[ Line: 7 ]] --[[ Name: AppChatRemoveThirdPartyRestriction ]]
-    -- upvalues: l_useDispatch_0 (copy), v2 (copy), v4 (copy)
-    local v5 = l_useDispatch_0();
-    v2.useEffect(function() --[[ Line: 9 ]]
-        -- upvalues: v5 (copy), v4 (ref)
-        if v5 then
-            v5(v4(Enum.ChatRestrictionStatus.NotRestricted));
-        end;
-    end, {
-        v5
-    });
-    return nil;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local ThirdPartyChatSettingsLoaded = require(AppChat.Actions.ThirdPartyChatSettingsLoaded)
+
+local function AppChatRemoveThirdPartyRestriction() -- line: 7
+	-- upvalues: useDispatch (copy), React (copy), ThirdPartyChatSettingsLoaded (copy)
+	local v7 = useDispatch()
+
+	React.useEffect(function() -- line: 9
+		-- upvalues: v7 (copy), ThirdPartyChatSettingsLoaded (copy)
+		if v7 then
+			v7(ThirdPartyChatSettingsLoaded(Enum.ChatRestrictionStatus.NotRestricted))
+		end
+	end, { v7 })
+
+	return nil
+end
+
+return AppChatRemoveThirdPartyRestriction

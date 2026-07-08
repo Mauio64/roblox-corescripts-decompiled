@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SocialCarouselEnableUserSeenEvents2", false);
+return game:DefineFastFlag("SocialCarouselEnableUserSeenEvents2", false)

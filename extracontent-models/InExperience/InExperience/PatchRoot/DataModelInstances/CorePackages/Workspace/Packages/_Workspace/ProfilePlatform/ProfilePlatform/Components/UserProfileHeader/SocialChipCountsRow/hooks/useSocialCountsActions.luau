@@ -1,95 +1,213 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.NavigationRodux);
-local v4 = require(l_Parent_0.RoactUtils);
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_NavigateDown_0 = v3.Thunks.NavigateDown;
-local v9 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v10 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local l_FFlagConnectionsToFriendsRename_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsToFriendsRename;
-local l_FFlagCreateConnectionsHub_0 = require(l_Parent_0.SharedFlags).FFlagCreateConnectionsHub;
-return function(v15, v16, v17, v18) --[[ Line: 29 ]] --[[ Name: useSocialCountsActions ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useNavigation_0 (copy), v2 (copy), v10 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), l_Url_0 (copy), v9 (copy), l_FFlagCreateConnectionsHub_0 (copy), l_UrlBuilder_0 (copy), l_FFlagConnectionsToFriendsRename_0 (copy)
-    local v19 = l_useDispatch_0();
-    local v20 = l_useNavigation_0();
-    return v2.useMemo(function() --[[ Line: 38 ]]
-        -- upvalues: v17 (copy), v10 (ref), v19 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v18 (copy), l_Url_0 (ref), v15 (copy), v9 (ref), v16 (copy), l_FFlagCreateConnectionsHub_0 (ref), v20 (copy), l_UrlBuilder_0 (ref), l_FFlagConnectionsToFriendsRename_0 (ref)
-        return {
-            mutualFriendsCount = function() --[[ Line: 40 ]] --[[ Name: mutualFriendsCount ]]
-                -- upvalues: v17 (ref), v10 (ref), v19 (ref), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v18 (ref)
-                v17.fireAnalyticsEvent(v10.MutualFriendsButton);
-                v19(l_NavigateDown_0({
-                    name = l_AppPage_0.MutualConnectionList, 
-                    extraProps = {
-                        mutualFriendIds = v18
-                    }
-                }));
-            end, 
-            followersCount = function() --[[ Line: 50 ]] --[[ Name: followersCount ]]
-                -- upvalues: v17 (ref), v10 (ref), v19 (ref), l_NavigateDown_0 (ref), l_AppPage_0 (ref), l_Url_0 (ref), v15 (ref), v9 (ref)
-                v17.fireAnalyticsEvent(v10.FollowersButton);
-                v19(l_NavigateDown_0({
-                    name = l_AppPage_0.GenericWebPage, 
-                    detail = ("%*users/%*/friends#!/followers"):format(l_Url_0.BASE_URL, v15), 
-                    extraProps = {
-                        titleKey = v9.Followers
-                    }
-                }));
-            end, 
-            followingsCount = function() --[[ Line: 61 ]] --[[ Name: followingsCount ]]
-                -- upvalues: v17 (ref), v10 (ref), v19 (ref), l_NavigateDown_0 (ref), l_AppPage_0 (ref), l_Url_0 (ref), v15 (ref), v9 (ref)
-                v17.fireAnalyticsEvent(v10.FollowingsButton);
-                v19(l_NavigateDown_0({
-                    name = l_AppPage_0.GenericWebPage, 
-                    detail = ("%*users/%*/friends#!/following"):format(l_Url_0.BASE_URL, v15), 
-                    extraProps = {
-                        titleKey = v9.Following
-                    }
-                }));
-            end, 
-            friendsCount = function() --[[ Line: 72 ]] --[[ Name: friendsCount ]]
-                -- upvalues: v17 (ref), v10 (ref), v16 (ref), l_FFlagCreateConnectionsHub_0 (ref), v20 (ref), l_AppPage_0 (ref), v19 (ref), l_NavigateDown_0 (ref), l_UrlBuilder_0 (ref), v15 (ref), l_FFlagConnectionsToFriendsRename_0 (ref), v9 (ref)
-                v17.fireAnalyticsEvent(v10.FriendsButton);
-                if v16 then
-                    if l_FFlagCreateConnectionsHub_0 then
-                        v20.navigate(l_AppPage_0.CoHubMyConnections);
-                        return;
-                    else
-                        v19(l_NavigateDown_0({
-                            name = l_AppPage_0.ViewFriends, 
-                            extraProps = {
-                                navigateToFriendsLandingEventStart = {
-                                    startPage = l_AppPage_0.ProfilePlatform, 
-                                    startTime = os.clock()
-                                }
-                            }
-                        }));
-                        return;
-                    end;
-                else
-                    v19(l_NavigateDown_0({
-                        name = l_AppPage_0.GenericWebPage, 
-                        detail = l_UrlBuilder_0.user.friends({
-                            userId = v15
-                        }), 
-                        extraProps = {
-                            titleKey = if l_FFlagConnectionsToFriendsRename_0 then v9.Friends else v9.Connections
-                        }
-                    }));
-                    return;
-                end;
-            end
-        };
-    end, {
-        v15, 
-        v16, 
-        v17, 
-        v19, 
-        v18
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local NavigationRodux = require(ProfilePlatformParent.NavigationRodux)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local AppPage = require(ProfilePlatformParent.RobloxAppEnums).AppPage
+local Url = require(ProfilePlatformParent.Http).Url
+local UrlBuilder = require(ProfilePlatformParent.UrlBuilder).UrlBuilder
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local EventNames = require(ProfilePlatform.Analytics.EventNames)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useNavigation = require(ProfilePlatformParent.Navigation).useNavigation
+local FFlagConnectionsToFriendsRename = require(ProfilePlatformParent.SharedFlags).FFlagConnectionsToFriendsRename
+local FFlagCreateConnectionsHub = require(ProfilePlatformParent.SharedFlags).FFlagCreateConnectionsHub
+local FFlagEnableSocialTabsPage = require(ProfilePlatformParent.SharedFlags).FFlagEnableSocialTabsPage
+local FFlagSignalsNavP3Dispatch = require(ProfilePlatformParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v18 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
+
+local function useSocialCountsActions(s1: string, b1: boolean, p1, t1: {[any]: any}?, s2: string?) -- line: 35
+	-- upvalues: useDispatch (copy), useNavigation (copy), React (copy), AppPage (copy), EventNames (copy), FFlagEnableSocialTabsPage (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), NavigateDown (copy), Url (copy), TextKeys (copy), FFlagCreateConnectionsHub (copy), UrlBuilder (copy), FFlagConnectionsToFriendsRename (copy)
+	local v25 = useDispatch()
+	local v26 = useNavigation()
+
+	return React.useMemo(function() -- line: 46
+		-- upvalues: t1 (copy), AppPage (copy), p1 (copy), EventNames (copy), FFlagEnableSocialTabsPage (copy), b1 (copy), s1 (copy), s2 (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), v25 (copy), NavigateDown (copy), Url (copy), TextKeys (copy), FFlagCreateConnectionsHub (copy), v26 (copy), UrlBuilder (copy), FFlagConnectionsToFriendsRename (copy)
+		local function buildTabConfig() -- line: 47
+			-- upvalues: t1 (copy), AppPage (copy)
+			local t2 = {}
+
+			if t1 and #t1 > 0 then
+				table.insert(t2, {
+					tabLabelKey = "Feature.Friends.Mutuals",
+					id = AppPage.SocialTabsMutuals
+				})
+			end
+
+			table.insert(t2, {
+				tabLabelKey = "CommonUI.Features.Label.Friends",
+				id = AppPage.SocialTabsFriends
+			})
+
+			return t2
+		end
+
+		return {
+			mutualFriendsCount = function() -- line: 60
+				-- upvalues: p1 (copy), EventNames (copy), FFlagEnableSocialTabsPage (copy), b1 (copy), AppPage (copy), s1 (copy), s2 (copy), buildTabConfig (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), v25 (copy), NavigateDown (copy), t1 (copy)
+				p1.fireAnalyticsEvent(EventNames.MutualFriendsButton)
+
+				if FFlagEnableSocialTabsPage and not b1 then
+					local t3 = {
+						name = AppPage.SocialTabsPage,
+						extraProps = {
+							source = "ProfilePage",
+							profileId = s1,
+							title = s2,
+							initialTabId = AppPage.SocialTabsMutuals,
+							tabConfig = buildTabConfig()
+						}
+					}
+
+					if FFlagSignalsNavP3Dispatch then
+						v18.down(v18.fromLegacyPage(t3))
+
+						return
+					end
+
+					v25(NavigateDown(t3))
+
+					return
+				end
+
+				local t4 = {
+					name = AppPage.MutualConnectionList,
+					extraProps = {
+						mutualFriendIds = t1
+					}
+				}
+
+				if FFlagSignalsNavP3Dispatch then
+					v18.down(v18.fromLegacyPage(t4))
+
+					return
+				end
+
+				v25(NavigateDown(t4))
+			end,
+			followersCount = function() -- line: 94
+				-- upvalues: p1 (copy), EventNames (copy), AppPage (copy), Url (copy), s1 (copy), TextKeys (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), v25 (copy), NavigateDown (copy)
+				p1.fireAnalyticsEvent(EventNames.FollowersButton)
+
+				local t5 = {
+					name = AppPage.GenericWebPage,
+					detail = `{ Url.BASE_URL }users/{ s1 }/friends#!/followers`,
+					extraProps = {
+						titleKey = TextKeys.Followers
+					}
+				}
+
+				if FFlagSignalsNavP3Dispatch then
+					v18.down(v18.fromLegacyPage(t5))
+
+					return
+				end
+
+				v25(NavigateDown(t5))
+			end,
+			followingsCount = function() -- line: 110
+				-- upvalues: p1 (copy), EventNames (copy), AppPage (copy), Url (copy), s1 (copy), TextKeys (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), v25 (copy), NavigateDown (copy)
+				p1.fireAnalyticsEvent(EventNames.FollowingsButton)
+
+				local t6 = {
+					name = AppPage.GenericWebPage,
+					detail = `{ Url.BASE_URL }users/{ s1 }/friends#!/following`,
+					extraProps = {
+						titleKey = TextKeys.Following
+					}
+				}
+
+				if FFlagSignalsNavP3Dispatch then
+					v18.down(v18.fromLegacyPage(t6))
+
+					return
+				end
+
+				v25(NavigateDown(t6))
+			end,
+			friendsCount = function() -- line: 126
+				-- upvalues: p1 (copy), EventNames (copy), b1 (copy), FFlagCreateConnectionsHub (copy), v26 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v18 (copy), v25 (copy), NavigateDown (copy), FFlagEnableSocialTabsPage (copy), s1 (copy), s2 (copy), buildTabConfig (copy), UrlBuilder (copy), FFlagConnectionsToFriendsRename (copy), TextKeys (copy)
+				p1.fireAnalyticsEvent(EventNames.FriendsButton)
+
+				if b1 then
+					if FFlagCreateConnectionsHub then
+						v26.navigate(AppPage.CoHubMyConnections)
+
+						return
+					end
+
+					local t7 = {
+						name = AppPage.ViewFriends,
+						extraProps = {
+							navigateToFriendsLandingEventStart = {
+								startPage = AppPage.ProfilePlatform,
+								startTime = os.clock()
+							}
+						}
+					}
+
+					if FFlagSignalsNavP3Dispatch then
+						v18.down(v18.fromLegacyPage(t7))
+
+						return
+					end
+
+					v25(NavigateDown(t7))
+
+					return
+				end
+
+				if FFlagEnableSocialTabsPage then
+					local t8 = {
+						name = AppPage.SocialTabsPage,
+						extraProps = {
+							source = "ProfilePage",
+							profileId = s1,
+							title = s2,
+							initialTabId = AppPage.SocialTabsFriends,
+							tabConfig = buildTabConfig()
+						}
+					}
+
+					if FFlagSignalsNavP3Dispatch then
+						v18.down(v18.fromLegacyPage(t8))
+
+						return
+					end
+
+					v25(NavigateDown(t8))
+
+					return
+				end
+
+				local t9 = {
+					name = AppPage.GenericWebPage,
+					detail = UrlBuilder.user.friends({
+						userId = s1
+					}),
+					extraProps = {
+						titleKey = if not FFlagConnectionsToFriendsRename then TextKeys.Connections else TextKeys.Friends
+					}
+				}
+
+				if FFlagSignalsNavP3Dispatch then
+					v18.down(v18.fromLegacyPage(t9))
+
+					return
+				end
+
+				v25(NavigateDown(t9))
+			end
+		}
+	end, {
+		s1,
+		b1,
+		p1,
+		v25,
+		t1,
+		if not FFlagEnableSocialTabsPage then nil else s2
+	})
+end
+
+return useSocialCountsActions

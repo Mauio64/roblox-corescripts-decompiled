@@ -1,20 +1,22 @@
-local l_Parent_0 = script:FindFirstAncestor("GraphQLServer").Parent;
-local l_mergeTypeDefs_0 = require(l_Parent_0.GraphqlToolsMerge).mergeTypeDefs;
-local v2 = require(l_Parent_0.GraphQL);
-local v3 = require(script.resolvers);
-local v4 = require(script.generatedTypes);
-local v5 = require(script.luaTypeDefs);
-local v6 = require(script.dataLoaders);
-local v7 = require(script.mocks);
+local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local mergeTypeDefs = require(Parent.GraphqlToolsMerge).mergeTypeDefs
+local GraphQL = require(Parent.GraphQL)
+local resolvers = require(script.resolvers)
+local generatedTypes = require(script.generatedTypes)
+local luaTypeDefs = require(script.luaTypeDefs)
+local dataLoaders = require(script.dataLoaders)
+local mocks = require(script.mocks)
+
 return {
-    typeDefs = "", 
-    generateTypeDefs = function() --[[ Line: 35 ]] --[[ Name: generateTypeDefs ]]
-        -- upvalues: l_mergeTypeDefs_0 (copy), v5 (copy), v2 (copy)
-        local v8 = l_mergeTypeDefs_0(v5);
-        return (v2.print(v8));
-    end, 
-    resolvers = v3, 
-    generatedTypes = v4, 
-    dataLoaders = v6, 
-    mocks = v7
-};
+	typeDefs = "",
+	generateTypeDefs = function() -- line: 35
+		-- upvalues: mergeTypeDefs (copy), luaTypeDefs (copy), GraphQL (copy)
+		local v9 = mergeTypeDefs(luaTypeDefs)
+
+		return (GraphQL.print(v9))
+	end,
+	resolvers = resolvers,
+	generatedTypes = generatedTypes,
+	dataLoaders = dataLoaders,
+	mocks = mocks
+}

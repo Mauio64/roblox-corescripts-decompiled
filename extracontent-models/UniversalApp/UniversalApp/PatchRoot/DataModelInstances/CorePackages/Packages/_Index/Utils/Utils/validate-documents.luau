@@ -1,110 +1,131 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Error_0 = v1.Error;
-local l_Map_0 = v1.Map;
-local v5 = require(l_Parent_0.Promise);
-local v6 = {};
-local v7 = require(l_Parent_0.GraphQL);
-local l_Kind_0 = v7.Kind;
-local l_validate_0 = v7.validate;
-local l_specifiedRules_0 = v7.specifiedRules;
-local l_concatAST_0 = v7.concatAST;
-local l_versionInfo_0 = v7.versionInfo;
-local _ = require(script.Parent.loaders);
-local l_AggregateError_0 = require(script.Parent.AggregateError).AggregateError;
-local v15 = nil;
-v6.validateGraphQlDocuments = function(v16, v17, v18) --[[ Line: 66 ]] --[[ Name: validateGraphQlDocuments ]]
-    -- upvalues: v15 (ref), v5 (copy), l_Map_0 (copy), l_Kind_0 (copy), l_Array_0 (copy), l_concatAST_0 (copy), l_validate_0 (copy)
-    local v19 = if v18 ~= nil then v18 else v15();
-    return v5.resolve():andThen(function() --[[ Line: 74 ]]
-        -- upvalues: l_Map_0 (ref), v17 (copy), l_Kind_0 (ref), l_Array_0 (ref), v5 (ref), l_concatAST_0 (ref), l_validate_0 (ref), v16 (copy), v19 (copy)
-        local v20 = l_Map_0.new();
-        local v21 = {};
-        for _, v23 in v17 do
-            if v23.document then
-                local v24 = {};
-                for _, v26 in v23.document.definitions do
-                    if v26.kind == l_Kind_0.FRAGMENT_DEFINITION then
-                        v20:set(v26.name.value, v26);
-                    else
-                        table.insert(v24, v26);
-                    end;
-                end;
-                table.insert(v21, {
-                    location = v23.location, 
-                    document = {
-                        kind = l_Kind_0.DOCUMENT, 
-                        definitions = v24
-                    }
-                });
-            end;
-        end;
-        local v27 = {};
-        local v28 = {
-            kind = l_Kind_0.DOCUMENT, 
-            definitions = l_Array_0.concat({}, v20:values())
-        };
-        v5.all(l_Array_0.map(v21, function(v29) --[[ Line: 104 ]]
-            -- upvalues: v5 (ref), l_concatAST_0 (ref), v28 (copy), l_validate_0 (ref), v16 (ref), v19 (ref), v27 (copy)
-            return v5.resolve():andThen(function() --[[ Line: 105 ]]
-                -- upvalues: l_concatAST_0 (ref), v28 (ref), v29 (copy), l_validate_0 (ref), v16 (ref), v19 (ref), v27 (ref)
-                local v30 = l_concatAST_0({
-                    v28, 
-                    v29.document
-                });
-                local v31 = l_validate_0(v16, v30, v19);
-                if #v31 > 0 then
-                    table.insert(v27, {
-                        filePath = v29.location, 
-                        errors = v31
-                    });
-                end;
-            end);
-        end)):expect();
-        return v27;
-    end);
-end;
-v6.checkValidationErrors = function(v32) --[[ Line: 123 ]] --[[ Name: checkValidationErrors ]]
-    -- upvalues: l_Error_0 (copy), l_AggregateError_0 (copy), l_Array_0 (copy)
-    if #v32 > 0 then
-        local v33 = {};
-        for _, v35 in v32 do
-            for _, v37 in v35.errors do
-                local v38 = l_Error_0.new();
-                v38.name = "GraphQLDocumentError";
-                v38.message = ("%s: %s"):format(tostring(v38.name), (tostring(v37.message)));
-                v38.stack = v38.message;
-                if v37.locations then
-                    for _, v40 in v37.locations do
-                        v38.stack = tostring(v38.stack) .. ("\n    at %s:%s:%s"):format(tostring(v35.filePath), tostring(v40.line), (tostring(v40.column)));
-                    end;
-                end;
-                table.insert(v33, v38);
-            end;
-        end;
-        error(l_AggregateError_0.new(v33, ("GraphQL Document Validation failed with %s errors;\n  %s"):format(tostring(#v33), (tostring(l_Array_0.join(l_Array_0.map(v33, function(v41, v42) --[[ Line: 170 ]]
-            return ("Error %s: %s"):format(tostring(v42), (tostring(v41.stack)));
-        end), "\n\n"))))));
-    end;
-end;
-v15 = function() --[[ Line: 185 ]] --[[ Name: createDefaultRules ]]
-    -- upvalues: l_versionInfo_0 (copy), l_Array_0 (copy), l_specifiedRules_0 (copy)
-    local v43 = {
-        "NoUnusedFragmentsRule", 
-        "NoUnusedVariablesRule", 
-        "KnownDirectivesRule"
-    };
-    if l_versionInfo_0.major < 15 then
-        v43 = l_Array_0.map(v43, function(v44) --[[ Line: 192 ]]
-            return (v44:gsub("Rule$", "", 1));
-        end);
-    end;
-    return l_Array_0.filter(l_specifiedRules_0, function(v45) --[[ Line: 200 ]]
-        -- upvalues: l_Array_0 (ref), v43 (ref)
-        local v46 = debug.info(v45, "n");
-        return not l_Array_0.includes(v43, v46);
-    end);
-end;
-v6.createDefaultRules = v15;
-return v6;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local Map = LuauPolyfill.Map
+local Promise = require(ParentParent.Promise)
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local Kind = GraphQL.Kind
+local validate = GraphQL.validate
+local specifiedRules = GraphQL.specifiedRules
+local concatAST = GraphQL.concatAST
+local versionInfo = GraphQL.versionInfo
+
+require(script.Parent.loaders)
+
+local AggregateError = require(script.Parent.AggregateError).AggregateError
+local createDefaultRules = nil
+
+function t1.validateGraphQlDocuments(p1, p2, p3) -- line: 66
+	-- upvalues: createDefaultRules (ref), Promise (copy), Map (copy), Kind (copy), Array (copy), concatAST (copy), validate (copy)
+	local v19 = if p3 == nil then createDefaultRules() else p3
+
+	return Promise.resolve():andThen(function() -- line: 74
+		-- upvalues: Map (copy), p2 (copy), Kind (copy), Array (copy), Promise (copy), concatAST (copy), validate (copy), p1 (copy), v19 (copy)
+		local v30 = Map.new()
+		local t2 = {}
+
+		for _, v33 in p2 do
+			if v33.document then
+				local t3 = {}
+
+				for _, v36 in v33.document.definitions do
+					if v36.kind == Kind.FRAGMENT_DEFINITION then
+						v30:set(v36.name.value, v36)
+					else
+						table.insert(t3, v36)
+					end
+				end
+
+				table.insert(t2, {
+					location = v33.location,
+					document = {
+						kind = Kind.DOCUMENT,
+						definitions = t3
+					}
+				})
+			end
+		end
+
+		local t4 = {}
+		local t5 = {
+			kind = Kind.DOCUMENT,
+			definitions = Array.concat({}, v30:values())
+		}
+
+		Promise.all(Array.map(t2, function(p4) -- line: 104
+			-- upvalues: Promise (copy), concatAST (copy), t5 (copy), validate (copy), p1 (copy), v19 (copy), t4 (copy)
+			return Promise.resolve():andThen(function() -- line: 105
+				-- upvalues: concatAST (copy), t5 (copy), p4 (copy), validate (copy), p1 (copy), v19 (copy), t4 (copy)
+				local v45 = concatAST({
+					t5,
+					p4.document
+				})
+				local v46 = validate(p1, v45, v19)
+
+				if #v46 > 0 then
+					table.insert(t4, {
+						filePath = p4.location,
+						errors = v46
+					})
+				end
+			end)
+		end)):expect()
+
+		return t4
+	end)
+end
+function t1.checkValidationErrors(p5) -- line: 123
+	-- upvalues: Error (copy), AggregateError (copy), Array (copy)
+	if #p5 > 0 then
+		local t6 = {}
+
+		for _, v23 in p5 do
+			for _, v25 in v23.errors do
+				local v26 = Error.new()
+
+				v26.name = "GraphQLDocumentError"
+				v26.message = ("%s: %s"):format(tostring(v26.name), (tostring(v25.message)))
+				v26.stack = v26.message
+
+				if v25.locations then
+					for _, v28 in v25.locations do
+						v26.stack = tostring(v26.stack) .. ("\n    at %s:%s:%s"):format(tostring(v23.filePath), tostring(v28.line), (tostring(v28.column)))
+					end
+				end
+
+				table.insert(t6, v26)
+			end
+		end
+
+		error(AggregateError.new(t6, ("GraphQL Document Validation failed with %s errors;\n  %s"):format(tostring(#t6), (tostring(Array.join(Array.map(t6, function(p6, p7) -- line: 170
+			return ("Error %s: %s"):format(tostring(p7), (tostring(p6.stack)))
+		end), "\n\n"))))))
+	end
+end
+function createDefaultRules() -- line: 185
+	-- upvalues: versionInfo (copy), Array (copy), specifiedRules (copy)
+	local t7 = {
+		"NoUnusedFragmentsRule",
+		"NoUnusedVariablesRule",
+		"KnownDirectivesRule"
+	}
+
+	if versionInfo.major < 15 then
+		t7 = Array.map(t7, function(p8) -- line: 192
+			return (p8:gsub("Rule$", "", 1))
+		end)
+	end
+
+	return Array.filter(specifiedRules, function(p9: ((...any) -> ...any)) -- line: 200
+		-- upvalues: Array (copy), t7 (ref)
+		local v43 = debug.info(p9, "n")
+
+		return not Array.includes(t7, v43)
+	end)
+end
+
+t1.createDefaultRules = createDefaultRules
+
+return t1

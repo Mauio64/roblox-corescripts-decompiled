@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-return require(l_Parent_0.AppCommonLib).Symbol.named("RoactChatAnalytics");
+local Parent = script:FindFirstAncestor("AppChat").Parent
+
+return require(Parent.AppCommonLib).Symbol.named("RoactChatAnalytics")

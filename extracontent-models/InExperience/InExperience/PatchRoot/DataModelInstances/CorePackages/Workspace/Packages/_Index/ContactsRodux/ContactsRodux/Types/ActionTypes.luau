@@ -1,2 +1,3 @@
-local _ = require(script.Parent.ContactTypes);
-return {};
+require(script.Parent.ContactTypes)
+
+return {}

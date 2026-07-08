@@ -1,69 +1,79 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.Signals);
-local _ = require(l_Parent_0.LeaderboardStore);
-local function v11(v3) --[[ Line: 43 ]] --[[ Name: getSortedPlayerInstances ]]
-    local v4 = {};
-    for _, v6 in v3 do
-        for _, v8 in v6.players do
-            table.insert(v4, {
-                teamId = v6.teamId, 
-                teamOrder = v6.order(false), 
-                playerOrder = v8.order(false), 
-                playerInstance = v8
-            });
-        end;
-    end;
-    table.sort(v4, function(v9, v10) --[[ Line: 57 ]]
-        if v9.teamOrder == v10.teamOrder then
-            return v9.playerOrder < v10.playerOrder;
-        else
-            return v9.teamOrder < v10.teamOrder;
-        end;
-    end);
-    return v4;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.Signals)
+require(ParentParent.LeaderboardStore)
+
+local function getSortedPlayerInstances(t1: {[any]: any}) -- line: 43
+	local t2 = {}
+
+	for _, v6 in t1 do
+		for _, v8 in v6.players do
+			table.insert(t2, {
+				teamId = v6.teamId,
+				teamOrder = v6.order(false),
+				playerOrder = v8.order(false),
+				playerInstance = v8
+			})
+		end
+	end
+
+	table.sort(t2, function(p1, p2) -- line: 57
+		if p1.teamOrder == p2.teamOrder then
+			return p1.playerOrder < p2.playerOrder
+		end
+
+		return p1.teamOrder < p2.teamOrder
+	end)
+
+	return t2
+end
+
 return {
-    getNextPlayerInstance = function(v12, v13, v14) --[[ Line: 68 ]] --[[ Name: getNextPlayerInstance ]]
-        -- upvalues: v11 (copy)
-        local v15 = v11(v12);
-        local v16 = nil;
-        for v17, v18 in v15 do
-            if v18.playerInstance.userId == v13.userId then
-                if v18.playerInstance.object == v13.object then
-                    local v19 = if v17 - 1 > 0 then v15[v17 - 1] else nil;
-                    local v20 = if v17 + 1 <= #v15 then v15[v17 + 1] else nil;
-                    if v20 then
-                        if v20.teamId == v14 or not v19 or v19.teamId ~= v14 then
-                            v16 = v20.playerInstance;
-                        else
-                            v16 = v19.playerInstance;
-                        end;
-                    elseif v19 then
-                        v16 = v19.playerInstance;
-                    end;
-                else
-                    return v18.playerInstance;
-                end;
-            end;
-        end;
-        return v16;
-    end, 
-    getFirstPlayerInstance = function(v21) --[[ Line: 104 ]] --[[ Name: getFirstPlayerInstance ]]
-        local v22 = nil;
-        local v23 = 1e999;
-        for _, v25 in v21 do
-            if next(v25.players) then
-                local v26 = v25.order(false);
-                if not v22 or v23 >= v26 then
-                    for _, v28 in v25.players do
-                        if not v22 or v28.order(false) < v22.order(false) then
-                            v22 = v28;
-                            v23 = v26;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-        return v22;
-    end
-};
+	getNextPlayerInstance = function(t3: {[any]: any}, t4: {[any]: any}, p3) -- line: 68
+		-- upvalues: getSortedPlayerInstances (copy)
+		local v12 = getSortedPlayerInstances(t3)
+		local v13 = nil
+
+		for v14, v15 in v12 do
+			if v15.playerInstance.userId ~= t4.userId then
+				continue
+			end
+
+			if v15.playerInstance.object ~= t4.object then
+				return v15.playerInstance
+			end
+
+			local v16 = if not (v14 - 1 > 0) then nil else v12[v14 - 1]
+			local v17 = if not (v14 + 1 <= #v12) then nil else v12[v14 + 1]
+
+			if v17 then
+				v13 = if p3 ~= v17.teamId and (not not v16 and p3 == v16.teamId) then v16.playerInstance else v17.playerInstance
+			elseif v16 then
+				v13 = v16.playerInstance
+			end
+		end
+
+		return v13
+	end,
+	getFirstPlayerInstance = function(t5: {[any]: any}) -- line: 104
+		local v19 = nil
+		local n1 = 1e999
+
+		for _, v22 in t5 do
+			if next(v22.players) then
+				local v23 = v22.order(false)
+
+				if not v19 or not (n1 < v23) then
+					for _, v25 in v22.players do
+						if not v19 or v25.order(false) < v19.order(false) then
+							v19 = v25
+							n1 = v23
+						end
+					end
+				end
+			end
+		end
+
+		return v19
+	end
+}

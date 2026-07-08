@@ -1,33 +1,47 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InterventionShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-local v3 = require(l_Parent_0.Cryo);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v5 = require(l_Parent_0.RobloxAppLocales).Localization.new(l_LocalizationService_0.RobloxLocaleId);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local _ = require(l_script_FirstAncestor_0.Utils.Types);
-return function(v8) --[[ Line: 40 ]] --[[ Name: useParsedBadUtterances ]]
-    -- upvalues: l_LocalPlayer_0 (copy), v5 (copy), l_useLocalization_0 (copy), v3 (copy)
-    local v9 = {};
-    local v10 = {};
-    for _, v12 in v8 do
-        local l_utteranceText_0 = v12.utteranceText;
-        table.insert(v9, if l_LocalPlayer_0 then v5:Format("Feature.InExperienceIntervention.Label.Player", {
-            username = l_LocalPlayer_0.Name, 
-            evidence = l_utteranceText_0
-        }) else l_utteranceText_0);
-        v10[v12.labelTranslationKey] = "Feature.NotApproved." .. v12.labelTranslationKey;
-    end;
-    local v14 = l_useLocalization_0(v10);
-    local v15 = {};
-    for v16, _ in v10 do
-        local v18 = v14[v16];
-        if v18 and v18 ~= "" then
-            v15[v18] = true;
-        end;
-    end;
-    return {
-        textItems = v3.List.reverse(v9), 
-        abuseTypes = v3.Dictionary.keys(v15)
-    };
-end;
+local InterventionShared = script:FindFirstAncestor("InterventionShared")
+local InterventionSharedParent = InterventionShared.Parent
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Cryo = require(InterventionSharedParent.Cryo)
+local LocalizationService = game:GetService("LocalizationService")
+local v6 = require(InterventionSharedParent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
+local useLocalization = require(InterventionSharedParent.Localization).Hooks.useLocalization
+
+require(InterventionShared.Utils.Types)
+
+local function useParsedBadUtterances(t1: {[any]: any}, s1: string?) -- line: 40
+	-- upvalues: LocalPlayer (copy), v6 (copy), useLocalization (copy), Cryo (copy)
+	local t2 = {}
+	local t3 = {}
+
+	if s1 and s1 ~= "" then
+		t3[s1] = "Feature.NotApproved." .. s1
+	end
+
+	for _, v14 in t1 do
+		local utteranceText = v14.utteranceText
+
+		table.insert(t2, if not LocalPlayer then utteranceText else v6:Format("Feature.InExperienceIntervention.Label.Player", {
+			username = LocalPlayer.Name,
+			evidence = utteranceText
+		}))
+		t3[v14.labelTranslationKey] = "Feature.NotApproved." .. v14.labelTranslationKey
+	end
+
+	local v16 = useLocalization(t3)
+	local t4 = {}
+
+	for v18, _ in t3 do
+		local v20 = v16[v18]
+
+		if v20 and v20 ~= "" then
+			t4[v20] = true
+		end
+	end
+
+	return {
+		textItems = Cryo.List.reverse(t2),
+		abuseTypes = Cryo.Dictionary.keys(t4)
+	}
+end
+
+return useParsedBadUtterances

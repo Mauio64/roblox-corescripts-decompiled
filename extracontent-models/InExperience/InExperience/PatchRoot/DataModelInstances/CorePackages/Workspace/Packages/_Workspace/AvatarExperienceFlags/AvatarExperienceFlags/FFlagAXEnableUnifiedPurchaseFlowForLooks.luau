@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceFlags").Parent;
-return require(l_Parent_0.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow and game:DefineFastFlag("AXEnableUnifiedPurchaseFlowForLooks", false);
+local Parent = script:FindFirstAncestor("AvatarExperienceFlags").Parent
+
+return require(Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow and game:DefineFastFlag("AXEnableUnifiedPurchaseFlowForLooks", false)

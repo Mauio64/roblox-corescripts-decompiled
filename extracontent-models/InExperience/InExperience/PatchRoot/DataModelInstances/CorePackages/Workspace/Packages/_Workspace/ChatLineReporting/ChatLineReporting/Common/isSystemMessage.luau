@@ -1,15 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Common.Constants);
-local l_FFlagEnableGlobalChatAbuseReporting_0 = require(l_Parent_0.SharedFlags).FFlagEnableGlobalChatAbuseReporting;
-isSystemMessage = function(v4) --[[ Line: 11 ]] --[[ Name: isSystemMessage ]]
-    -- upvalues: l_FFlagEnableGlobalChatAbuseReporting_0 (copy), v2 (copy)
-    if (not l_FFlagEnableGlobalChatAbuseReporting_0 or v4.textChannel) and v4.textChannel.Name == v2.ChannelTypes.System then
-        return true;
-    elseif not v4.userId or v4.userId == "0" then
-        return true;
-    else
-        return false;
-    end;
-end;
-return isSystemMessage;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local Constants = require(ChatLineReporting.Common.Constants)
+local FFlagEnableGlobalChatAbuseReporting = require(ChatLineReportingParent.SharedFlags).FFlagEnableGlobalChatAbuseReporting
+
+function isSystemMessage(t1: {[any]: any}) -- line: 11
+	-- upvalues: FFlagEnableGlobalChatAbuseReporting (copy), Constants (copy)
+	if (not FFlagEnableGlobalChatAbuseReporting or t1.textChannel) and t1.textChannel.Name == Constants.ChannelTypes.System then
+		return true
+	end
+
+	if not t1.userId or t1.userId == "0" then
+		return true
+	end
+
+	return false
+end
+
+return isSystemMessage

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnablePageLoadTracker", false);
+return game:DefineFastFlag("LuaAppEnablePageLoadTracker", false)

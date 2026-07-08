@@ -1,41 +1,50 @@
-local v0 = require(script.Parent.Parent.Immutable);
-local v1 = require(script.Parent.Parent.Constants);
-local v2 = require(script.Parent.Parent.Actions.SetDevConsoleVisibility);
-local v3 = require(script.Parent.Parent.Actions.SetDevConsoleMinimized);
-local v4 = require(script.Parent.Parent.Actions.ChangeDevConsoleSize);
-local v5 = require(script.Parent.Parent.Actions.SetDevConsolePosition);
-local v6 = require(script.Parent.Parent.Actions.SetActiveTab);
-return function(v7, v8) --[[ Line: 19 ]]
-    -- upvalues: v1 (copy), v2 (copy), v0 (copy), v5 (copy), v3 (copy), v4 (copy), v6 (copy)
-    local v9 = v7 or {
-        formFactor = v1.FormFactor.Large, 
-        isVisible = false, 
-        isMinimized = false, 
-        position = v1.MainWindowInit.Position, 
-        size = v1.MainWindowInit.Size, 
-        visibleStartTime = 0
-    };
-    if v8.type == v2.name then
-        local v10 = {
-            isVisible = v8.isVisible
-        };
-        if v10.isVisible then
-            v10.isMinimized = false;
-            v10.visibleStartTime = tick();
-        end;
-        return v0.JoinDictionaries(v9, v10);
-    elseif v8.type == v5.name then
-        return (v0.Set(v9, "position", v8.position));
-    elseif v8.type == v3.name then
-        return (v0.Set(v9, "isMinimized", v8.isMinimized));
-    else
-        if v8.type == v4.name then
-            if v9.formFactor == v1.FormFactor.Large then
-                return (v0.Set(v9, "size", v8.newSize));
-            end;
-        elseif v8.type == v6.name then
-            return (v0.Set(v9, "isMinimized", false));
-        end;
-        return v9;
-    end;
-end;
+local Immutable = require(script.Parent.Parent.Immutable)
+local Constants = require(script.Parent.Parent.Constants)
+local SetDevConsoleVisibility = require(script.Parent.Parent.Actions.SetDevConsoleVisibility)
+local SetDevConsoleMinimized = require(script.Parent.Parent.Actions.SetDevConsoleMinimized)
+local ChangeDevConsoleSize = require(script.Parent.Parent.Actions.ChangeDevConsoleSize)
+local SetDevConsolePosition = require(script.Parent.Parent.Actions.SetDevConsolePosition)
+local SetActiveTab = require(script.Parent.Parent.Actions.SetActiveTab)
+
+return function(t1: {[any]: any}?, t2: {[any]: any}) -- line: 19
+	-- upvalues: Constants (copy), SetDevConsoleVisibility (copy), Immutable (copy), SetDevConsolePosition (copy), SetDevConsoleMinimized (copy), ChangeDevConsoleSize (copy), SetActiveTab (copy)
+	local v10 = t1 or {
+		isVisible = false,
+		isMinimized = false,
+		visibleStartTime = 0,
+		formFactor = Constants.FormFactor.Large,
+		position = Constants.MainWindowInit.Position,
+		size = Constants.MainWindowInit.Size
+	}
+
+	if t2.type == SetDevConsoleVisibility.name then
+		local t3 = {
+			isVisible = t2.isVisible
+		}
+
+		if t3.isVisible then
+			t3.isMinimized = false
+			t3.visibleStartTime = tick()
+		end
+
+		return Immutable.JoinDictionaries(v10, t3)
+	end
+
+	if t2.type == SetDevConsolePosition.name then
+		return (Immutable.Set(v10, "position", t2.position))
+	end
+
+	if t2.type == SetDevConsoleMinimized.name then
+		return (Immutable.Set(v10, "isMinimized", t2.isMinimized))
+	end
+
+	if t2.type == ChangeDevConsoleSize.name then
+		if v10.formFactor == Constants.FormFactor.Large then
+			return (Immutable.Set(v10, "size", t2.newSize))
+		end
+	elseif t2.type == SetActiveTab.name then
+		return (Immutable.Set(v10, "isMinimized", false))
+	end
+
+	return v10
+end

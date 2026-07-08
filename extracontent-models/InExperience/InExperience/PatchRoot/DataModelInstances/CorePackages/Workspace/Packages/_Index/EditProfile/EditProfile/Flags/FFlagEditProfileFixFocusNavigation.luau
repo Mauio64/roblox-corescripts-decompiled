@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileFixFocusNavigationV2", false);
+return game:DefineFastFlag("EditProfileFixFocusNavigationV2", false)

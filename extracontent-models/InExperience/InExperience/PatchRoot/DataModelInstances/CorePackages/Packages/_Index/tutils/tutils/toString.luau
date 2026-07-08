@@ -1,24 +1,32 @@
-local v0 = require(script.Parent.checkListConsistency);
-local function v1(v2, v3) --[[ Line: 6 ]] --[[ Name: recursiveToString ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    v3 = v3 or "";
-    if type(v2) == "table" then
-        local v4 = "";
-        if not v0(v2) then
-            v4 = v4 .. "-- WARNING: this table fails the list consistency test\n";
-        end;
-        v4 = v4 .. "{\n";
-        for v5, v6 in pairs(v2) do
-            if type(v5) == "string" then
-                v4 = v4 .. "  " .. v3 .. tostring(v5) .. " = " .. v1(v6, "  " .. v3) .. ";\n";
-            end;
-            if type(v5) == "number" then
-                v4 = v4 .. "  " .. v3 .. v1(v6, "  " .. v3) .. ",\n";
-            end;
-        end;
-        return v4 .. v3 .. "}";
-    else
-        return (tostring(v2));
-    end;
-end;
-return v1;
+local checkListConsistency = require(script.Parent.checkListConsistency)
+
+local function recursiveToString(p1, p2) -- line: 6
+	-- upvalues: checkListConsistency (copy), recursiveToString (copy)
+	local v5 = p2 or ""
+
+	if type(p1) == "table" then
+		local s1 = ""
+
+		if not checkListConsistency(p1) then
+			s1 ..= "-- WARNING: this table fails the list consistency test\n"
+		end
+
+		local v7 = s1 .. "{\n"
+
+		for k, v in pairs(p1) do
+			if type(k) == "string" then
+				v7 ..= "  " .. v5 .. tostring(k) .. " = " .. recursiveToString(v, "  " .. v5) .. ";\n"
+			end
+
+			if type(k) == "number" then
+				v7 ..= "  " .. v5 .. recursiveToString(v, "  " .. v5) .. ",\n"
+			end
+		end
+
+		return v7 .. v5 .. "}"
+	end
+
+	return (tostring(p1))
+end
+
+return recursiveToString

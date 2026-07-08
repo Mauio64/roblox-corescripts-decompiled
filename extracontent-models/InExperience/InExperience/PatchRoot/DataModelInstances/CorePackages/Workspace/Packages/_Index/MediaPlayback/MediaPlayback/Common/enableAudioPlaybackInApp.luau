@@ -1,7 +1,10 @@
-local l_SoundService_0 = game:GetService("SoundService");
-return function() --[[ Line: 25 ]] --[[ Name: enableAudioPlaybackInApp ]]
-    -- upvalues: l_SoundService_0 (copy)
-    if game:GetEngineFeature("SoundServiceSetSoundEnabled") then
-        l_SoundService_0:SetSoundEnabled(true);
-    end;
-end;
+local SoundService = game:GetService("SoundService")
+
+local function enableAudioPlaybackInApp() -- line: 25
+	-- upvalues: SoundService (copy)
+	if game:GetEngineFeature("SoundServiceSetSoundEnabled") then
+		SoundService:SetSoundEnabled(true)
+	end
+end
+
+return enableAudioPlaybackInApp

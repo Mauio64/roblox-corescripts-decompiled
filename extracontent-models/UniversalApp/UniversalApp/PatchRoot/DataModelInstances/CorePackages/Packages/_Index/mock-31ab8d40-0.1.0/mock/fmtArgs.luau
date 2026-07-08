@@ -1,11 +1,13 @@
-return function(v0) --[[ Line: 1 ]]
-    local v1 = {};
-    for v2 = 1, v0.n do
-        if type(v0[v2]) == "string" then
-            table.insert(v1, "\"" .. v0[v2] .. "\"");
-        else
-            table.insert(v1, (tostring(v0[v2])));
-        end;
-    end;
-    return "{" .. table.concat(v1, ", ") .. "}";
-end;
+return function(p1) -- line: 1
+	local t1 = {}
+
+	for i = 1, p1.n do
+		if type(p1[i]) == "string" then
+			table.insert(t1, "\"" .. p1[i] .. "\"")
+		else
+			table.insert(t1, (tostring(p1[i])))
+		end
+	end
+
+	return "{" .. table.concat(t1, ", ") .. "}"
+end

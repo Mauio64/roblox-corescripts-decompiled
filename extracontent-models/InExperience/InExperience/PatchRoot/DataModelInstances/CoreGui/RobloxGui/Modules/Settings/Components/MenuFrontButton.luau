@@ -1,226 +1,255 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v3.Core.ImageSet.ImageSetLabel;
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local v8 = require(l_RobloxGui_0.Modules.Settings.Utility);
-local v9 = require(l_RobloxGui_0.Modules.Settings.FrontButtonController);
-local v10 = v2.PureComponent:extend("MenuFrontButton");
-local v11 = require(l_RobloxGui_0.Modules.TenFootInterface):IsEnabled();
-local v12 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local v13 = game:DefineFastFlag("ShowTeleportHistoryFrontButton", false);
-v10.validateProps = v4.strictInterface({
-    HubBar = v4.instanceOf("ImageLabel"), 
-    frontEnabled = v4.boolean, 
-    FrontBarRef = v4.optional(v4.table), 
-    LayoutOrder = v4.optional(v4.integer)
-});
-v10.defaultProps = {
-    frontEnabled = v13 and v9.hasReturnUniverse()
-};
-v10.init = function(v14) --[[ Line: 33 ]] --[[ Name: init ]]
-    -- upvalues: v9 (copy), v2 (copy)
-    v14:setState({
-        text = v9.getMenuText()
-    });
-    local v15, v16 = v2.createBinding(nil);
-    v14.sizeBinding = v15;
-    v14.updateSizeBinding = v16;
-    v15, v16 = v2.createBinding(nil);
-    v14.sizeConstraintBinding = v15;
-    v14.updateSizeConstraintBinding = v16;
-    v15, v16 = v2.createBinding(nil);
-    v14.visibleBinding = v15;
-    v14.updateVisibleBinding = v16;
-    v15, v16 = v2.createBinding(nil);
-    v14.buttonHeightBinding = v15;
-    v14.updateButtonHeightBinding = v16;
-    v15, v16 = v2.createBinding(nil);
-    v14.textSizeBinding = v15;
-    v14.updateTextSizeBinding = v16;
-    v15, v16 = v2.createBinding(nil);
-    v14.textSizeConstraintBinding = v15;
-    v14.updateTextSizeConstraintBinding = v16;
-    v14.textLabelRef = v2.createRef();
-end;
-v10.didMount = function(v17) --[[ Line: 45 ]] --[[ Name: didMount ]]
-    v17.updateSizeBinding(v17.props.HubBar.Size);
-    v17.updateVisibleBinding(v17.props.HubBar.Visible);
-    v17:updateViewport();
-end;
-v10.didUpdate = function(v18, v19) --[[ Line: 50 ]] --[[ Name: didUpdate ]]
-    if v18.props.HubBar ~= v19.HubBar then
-        v18.updateSizeBinding(v18.props.HubBar.Size);
-        v18.updateVisibleBinding(v18.props.HubBar.Visible);
-    end;
-end;
-v10.updateViewport = function(v20) --[[ Line: 56 ]] --[[ Name: updateViewport ]]
-    -- upvalues: v12 (copy), v8 (copy), v11 (copy)
-    local v21 = v12.textSize(24);
-    if v8:IsSmallTouchScreen() then
-        v21 = v12.textSize(18);
-    elseif v11 then
-        v21 = v12.textSize(36);
-    end;
-    v20.updateTextSizeConstraintBinding(v21);
-    local v22 = v8:IsPortrait();
-    local v23 = v11 and 120 or v12.LargeButtonHeight;
-    if v22 or v8:IsSmallTouchScreen() then
-        v23 = v12.ButtonHeight;
-        v21 = v22 and v12.textSize(16) or v12.textSize(24);
-    end;
-    v20.updateTextSizeBinding(v21);
-    v20.updateButtonHeightBinding(v23);
-    if v20.textLabelRef:getValue() and v20.props.FrontBarRef:getValue() then
-        local v24 = v20.textLabelRef:getValue().AbsolutePosition.X - v20.props.FrontBarRef:getValue().AbsolutePosition.X;
-        v20.updateSizeConstraintBinding(Vector2.new(v20.props.FrontBarRef:getValue().AbsoluteSize.X - v24, 1e999));
-    end;
-end;
-v10.render = function(v25) --[[ Line: 80 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), l_ExternalEventConnection_0 (copy), v12 (copy), v9 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy)
-    return v2.createElement("Frame", {
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        AnchorPoint = Vector2.new(1, 0), 
-        Position = UDim2.new(1, 0, 0, 0), 
-        LayoutOrder = v25.props.LayoutOrder, 
-        Visible = v2.joinBindings({
-            v25.state.text, 
-            v25.visibleBinding
-        }):map(function(v26) --[[ Line: 89 ]]
-            -- upvalues: v25 (copy)
-            return v25.props.frontEnabled and v26[1] ~= nil and v26[2];
-        end), 
-        Size = v2.joinBindings({
-            v25.sizeBinding, 
-            v25.buttonHeightBinding
-        }):map(function(v27) --[[ Line: 92 ]]
-            local v28 = v27[1];
-            local v29 = v27[2];
-            if v28 and v29 then
-                return UDim2.new(UDim.new(v28.X.Scale * 0.5, v28.X.Offset * 0.5), UDim.new(0, v29 + 6));
-            else
-                return UDim2.new();
-            end;
-        end), 
-        [v2.Ref] = v25.props.FrontBarRef
-    }, {
-        SizeConnection = v2.createElement(l_ExternalEventConnection_0, {
-            event = v25.props.HubBar:GetPropertyChangedSignal("Size"), 
-            callback = function() --[[ Line: 108 ]] --[[ Name: callback ]]
-                -- upvalues: v25 (copy)
-                v25.updateSizeBinding(v25.props.HubBar.Size);
-            end
-        }), 
-        VisibleConnection = v2.createElement(l_ExternalEventConnection_0, {
-            event = v25.props.HubBar:GetPropertyChangedSignal("Visible"), 
-            callback = function() --[[ Line: 114 ]] --[[ Name: callback ]]
-                -- upvalues: v25 (copy)
-                v25.updateVisibleBinding(v25.props.HubBar.Visible);
-            end
-        }), 
-        ViewportSizeChangedConnection = v2.createElement(l_ExternalEventConnection_0, {
-            event = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"), 
-            callback = function() --[[ Line: 120 ]] --[[ Name: callback ]]
-                -- upvalues: v25 (copy)
-                v25:updateViewport();
-            end
-        }), 
-        UIPadding = v2.createElement("UIPadding", {
-            PaddingBottom = UDim.new(0, 6), 
-            PaddingTop = UDim.new(0, 10)
-        }), 
-        ImageButton = v2.createElement("ImageButton", {
-            Image = "", 
-            BorderSizePixel = 0, 
-            BackgroundColor3 = v12.color("DefaultButton"), 
-            BackgroundTransparency = v12.transparency("DefaultButton", 1), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            Size = v25.buttonHeightBinding:map(function(v30) --[[ Line: 134 ]]
-                if v30 then
-                    return UDim2.new(0, 0, 0, v30);
-                else
-                    return UDim2.new();
-                end;
-            end), 
-            AutomaticSize = Enum.AutomaticSize.X, 
-            ScaleType = Enum.ScaleType.Stretch, 
-            SliceCenter = Rect.new(8, 6, 46, 44), 
-            [v2.Event.MouseEnter] = function(v31) --[[ Line: 144 ]]
-                -- upvalues: v12 (ref)
-                v31.BackgroundColor3 = v12.color("DefaultButtonHover");
-                v31.BackgroundTransparency = v12.transparency("DefaultButtonHover");
-            end, 
-            [v2.Event.MouseLeave] = function(v32) --[[ Line: 148 ]]
-                -- upvalues: v12 (ref)
-                v32.BackgroundColor3 = v12.color("DefaultButton");
-                v32.BackgroundTransparency = v12.transparency("DefaultButton");
-            end, 
-            [v2.Event.Activated] = function(_) --[[ Line: 152 ]]
-                -- upvalues: v9 (ref)
-                v9.initiateFrontButtonTeleport();
-            end
-        }, {
-            UICorner = v2.createElement("UICorner", {
-                CornerRadius = v12.DefaultCornerRadius
-            }), 
-            UIStroke = v2.createElement("UIStroke", {
-                Color = v12.color("DefaultButtonStroke"), 
-                Transparency = v12.transparency("DefaultButtonStroke"), 
-                Thickness = v12.DefaultStokeThickness
-            }), 
-            Frame = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                Position = UDim2.new(0, 4, 0, 0), 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1
-            }, {
-                UIPadding = v2.createElement("UIPadding", {
-                    PaddingRight = UDim.new(0, 12)
-                }), 
-                Container = v2.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                TextLabel = v2.createElement("TextLabel", {
-                    Text = v25.state.text, 
-                    Size = UDim2.new(0, 0, 1, 0), 
-                    AutomaticSize = Enum.AutomaticSize.X, 
-                    BorderSizePixel = 0, 
-                    BackgroundTransparency = 1, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextColor3 = Color3.fromRGB(255, 255, 255), 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    Font = v12.font(Enum.Font.SourceSansBold, "Bold"), 
-                    TextSize = v25.textSizeBinding, 
-                    TextScaled = true, 
-                    TextWrapped = true, 
-                    LayoutOrder = 1, 
-                    [v2.Ref] = v25.textLabelRef
-                }, {
-                    UITextSizeConstraint = v2.createElement("UITextSizeConstraint", {
-                        MaxTextSize = v25.textSizeConstraintBinding
-                    }), 
-                    UISizeConstraint = v2.createElement("UISizeConstraint", {
-                        MaxSize = v25.sizeConstraintBinding
-                    })
-                }), 
-                ImageLabel = v2.createElement(l_ImageSetLabel_0, {
-                    Image = l_Images_0["icons/actions/cycleRight"], 
-                    Size = UDim2.new(1, 0, 0.75, 0), 
-                    BorderSizePixel = 0, 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2
-                }, {
-                    UIAspectRatioConstraint = v2.createElement("UIAspectRatioConstraint", {})
-                })
-            })
-        })
-    });
-end;
-return v10;
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Foundation = require(CorePackages.Packages.Foundation)
+local FFlagCoreUiMigrateUIBloxToFoundation = require(CorePackages.Workspace.Packages.SharedFlags).FFlagCoreUiMigrateUIBloxToFoundation
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local Utility = require(RobloxGui.Modules.Settings.Utility)
+local FrontButtonController = require(RobloxGui.Modules.Settings.FrontButtonController)
+local v13 = Roact.PureComponent:extend("MenuFrontButton")
+local v14 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local v16 = game:DefineFastFlag("ShowTeleportHistoryFrontButton", false)
+
+v13.validateProps = t.strictInterface({
+	HubBar = t.instanceOf("ImageLabel"),
+	frontEnabled = t.boolean,
+	FrontBarRef = t.optional(t.table),
+	LayoutOrder = t.optional(t.integer)
+})
+v13.defaultProps = {
+	frontEnabled = v16 and FrontButtonController.hasReturnUniverse()
+}
+
+function v13.init(p1) -- line: 38
+	-- upvalues: FrontButtonController (copy), Roact (copy)
+	p1:setState({
+		text = FrontButtonController.getMenuText()
+	})
+
+	local v18, v19 = Roact.createBinding(nil)
+
+	p1.sizeBinding = v18
+	p1.updateSizeBinding = v19
+
+	local v20, v21 = Roact.createBinding(nil)
+
+	p1.sizeConstraintBinding = v20
+	p1.updateSizeConstraintBinding = v21
+
+	local v22, v23 = Roact.createBinding(nil)
+
+	p1.visibleBinding = v22
+	p1.updateVisibleBinding = v23
+
+	local v24, v25 = Roact.createBinding(nil)
+
+	p1.buttonHeightBinding = v24
+	p1.updateButtonHeightBinding = v25
+
+	local v26, v27 = Roact.createBinding(nil)
+
+	p1.textSizeBinding = v26
+	p1.updateTextSizeBinding = v27
+
+	local v28, v29 = Roact.createBinding(nil)
+
+	p1.textSizeConstraintBinding = v28
+	p1.updateTextSizeConstraintBinding = v29
+	p1.textLabelRef = Roact.createRef()
+end
+function v13.didMount(p2) -- line: 50
+	p2.updateSizeBinding(p2.props.HubBar.Size)
+	p2.updateVisibleBinding(p2.props.HubBar.Visible)
+	p2:updateViewport()
+end
+function v13.didUpdate(p3, p4) -- line: 55
+	if p3.props.HubBar ~= p4.HubBar then
+		p3.updateSizeBinding(p3.props.HubBar.Size)
+		p3.updateVisibleBinding(p3.props.HubBar.Visible)
+	end
+end
+function v13.updateViewport(p5) -- line: 61
+	-- upvalues: Theme (copy), Utility (copy), v14 (copy)
+	local v34 = Theme.textSize(24)
+
+	if Utility:IsSmallTouchScreen() then
+		v34 = Theme.textSize(18)
+	elseif v14 then
+		v34 = Theme.textSize(36)
+	end
+
+	p5.updateTextSizeConstraintBinding(v34)
+
+	local v35 = Utility:IsPortrait()
+	local v36 = if not v14 then Theme.LargeButtonHeight else 120
+
+	if v35 or Utility:IsSmallTouchScreen() then
+		v36 = Theme.ButtonHeight
+		v34 = v35 and Theme.textSize(16) or Theme.textSize(24)
+	end
+
+	p5.updateTextSizeBinding(v34)
+	p5.updateButtonHeightBinding(v36)
+
+	if p5.textLabelRef:getValue() and p5.props.FrontBarRef:getValue() then
+		local v37 = p5.textLabelRef:getValue().AbsolutePosition.X - p5.props.FrontBarRef:getValue().AbsolutePosition.X
+
+		p5.updateSizeConstraintBinding(Vector2.new(p5.props.FrontBarRef:getValue().AbsoluteSize.X - v37, 1e999))
+	end
+end
+function v13.render(p6) -- line: 85
+	-- upvalues: Roact (copy), ExternalEventConnection (copy), Theme (copy), FrontButtonController (copy), FFlagCoreUiMigrateUIBloxToFoundation (copy), Foundation (copy), ImageSetLabel (copy), Images (copy)
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, 0, 0, 0),
+		LayoutOrder = p6.props.LayoutOrder,
+		Visible = Roact.joinBindings({
+			p6.state.text,
+			p6.visibleBinding
+		}):map(function(p7) -- line: 94
+			-- upvalues: p6 (copy)
+			return p6.props.frontEnabled and (p7[1] ~= nil and p7[2])
+		end),
+		Size = Roact.joinBindings({
+			p6.sizeBinding,
+			p6.buttonHeightBinding
+		}):map(function(p8) -- line: 97
+			local v41 = p8[1]
+			local v42 = p8[2]
+
+			if v41 and v42 then
+				return UDim2.new(UDim.new(v41.X.Scale * 0.5, v41.X.Offset * 0.5), UDim.new(0, v42 + 6))
+			end
+
+			return UDim2.new()
+		end),
+		[Roact.Ref] = p6.props.FrontBarRef
+	}, {
+		SizeConnection = Roact.createElement(ExternalEventConnection, {
+			event = p6.props.HubBar:GetPropertyChangedSignal("Size"),
+			callback = function() -- line: 113
+				-- upvalues: p6 (copy)
+				p6.updateSizeBinding(p6.props.HubBar.Size)
+			end
+		}),
+		VisibleConnection = Roact.createElement(ExternalEventConnection, {
+			event = p6.props.HubBar:GetPropertyChangedSignal("Visible"),
+			callback = function() -- line: 119
+				-- upvalues: p6 (copy)
+				p6.updateVisibleBinding(p6.props.HubBar.Visible)
+			end
+		}),
+		ViewportSizeChangedConnection = Roact.createElement(ExternalEventConnection, {
+			event = workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"),
+			callback = function() -- line: 125
+				-- upvalues: p6 (copy)
+				p6:updateViewport()
+			end
+		}),
+		UIPadding = Roact.createElement("UIPadding", {
+			PaddingBottom = UDim.new(0, 6),
+			PaddingTop = UDim.new(0, 10)
+		}),
+		ImageButton = Roact.createElement("ImageButton", {
+			Image = "",
+			BorderSizePixel = 0,
+			BackgroundColor3 = Theme.color("DefaultButton"),
+			BackgroundTransparency = Theme.transparency("DefaultButton", 1),
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = p6.buttonHeightBinding:map(function(p9) -- line: 139
+				if p9 then
+					return UDim2.new(0, 0, 0, p9)
+				end
+
+				return UDim2.new()
+			end),
+			AutomaticSize = Enum.AutomaticSize.X,
+			ScaleType = Enum.ScaleType.Stretch,
+			SliceCenter = Rect.new(8, 6, 46, 44),
+			[Roact.Event.MouseEnter] = function(p10) -- line: 149
+				-- upvalues: Theme (copy)
+				p10.BackgroundColor3 = Theme.color("DefaultButtonHover")
+				p10.BackgroundTransparency = Theme.transparency("DefaultButtonHover")
+			end,
+			[Roact.Event.MouseLeave] = function(p11) -- line: 153
+				-- upvalues: Theme (copy)
+				p11.BackgroundColor3 = Theme.color("DefaultButton")
+				p11.BackgroundTransparency = Theme.transparency("DefaultButton")
+			end,
+			[Roact.Event.Activated] = function(_) -- line: 157
+				-- upvalues: FrontButtonController (copy)
+				FrontButtonController.initiateFrontButtonTeleport()
+			end
+		}, {
+			UICorner = Roact.createElement("UICorner", {
+				CornerRadius = Theme.DefaultCornerRadius
+			}),
+			UIStroke = Roact.createElement("UIStroke", {
+				Color = Theme.color("DefaultButtonStroke"),
+				Transparency = Theme.transparency("DefaultButtonStroke"),
+				Thickness = Theme.DefaultStokeThickness
+			}),
+			Frame = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0, 4, 0, 0)
+			}, {
+				UIPadding = Roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, 12)
+				}),
+				Container = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Right,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				TextLabel = Roact.createElement("TextLabel", {
+					Text = p6.state.text,
+					Size = UDim2.new(0, 0, 1, 0),
+					AutomaticSize = Enum.AutomaticSize.X,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextColor3 = Color3.fromRGB(255, 255, 255),
+					TextYAlignment = Enum.TextYAlignment.Center,
+					Font = Theme.font(Enum.Font.SourceSansBold, "Bold"),
+					TextSize = p6.textSizeBinding,
+					TextScaled = true,
+					TextWrapped = true,
+					LayoutOrder = 1,
+					[Roact.Ref] = p6.textLabelRef
+				}, {
+					UITextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+						MaxTextSize = p6.textSizeConstraintBinding
+					}),
+					UISizeConstraint = Roact.createElement("UISizeConstraint", {
+						MaxSize = p6.sizeConstraintBinding
+					})
+				}),
+				ImageLabel = if not FFlagCoreUiMigrateUIBloxToFoundation then Roact.createElement(ImageSetLabel, {
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Image = Images["icons/actions/cycleRight"],
+					Size = UDim2.new(1, 0, 0.75, 0)
+				}, {
+					UIAspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {})
+				}) else Roact.createElement(Foundation.Icon, {
+					name = "icons/actions/cycleRight",
+					LayoutOrder = 2,
+					size = Foundation.Enums.IconSize.Large
+				})
+			})
+		})
+	})
+end
+
+return v13

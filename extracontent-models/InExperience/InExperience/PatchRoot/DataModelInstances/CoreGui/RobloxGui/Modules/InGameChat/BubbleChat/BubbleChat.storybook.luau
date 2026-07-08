@@ -1,27 +1,31 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-require(l_CorePackages_0.Packages.UIBlox).init(require(l_CorePackages_0.Workspace.Packages.RobloxAppUIBloxConfig));
-local v4 = require(script.Parent.Helpers.StoryStore);
-local v5 = require(script.Parent.ChatSettings);
-v2.setGlobalConfig({
-    elementTracing = true, 
-    propValidation = true
-});
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+
+require(CorePackages.Packages.UIBlox).init(require(CorePackages.Workspace.Packages.RobloxAppUIBloxConfig))
+
+local StoryStore = require(script.Parent.Helpers.StoryStore)
+local ChatSettings = require(script.Parent.ChatSettings)
+
+Roact.setGlobalConfig({
+	elementTracing = true,
+	propValidation = true
+})
+
 return {
-    roact = v2, 
-    mapStory = function(v6) --[[ Line: 19 ]] --[[ Name: mapStory ]]
-        -- upvalues: v2 (copy), v3 (copy), v4 (copy), v1 (copy), v5 (copy)
-        return function(v7) --[[ Line: 20 ]]
-            -- upvalues: v2 (ref), v3 (ref), v4 (ref), v6 (copy), v1 (ref), v5 (ref)
-            return v2.createElement(v3.StoreProvider, {
-                store = v4
-            }, {
-                Story = v2.createElement(v6, v1.Dictionary.join(v7, {
-                    chatSettings = v5
-                }))
-            });
-        end;
-    end
-};
+	roact = Roact,
+	mapStory = function(p1) -- line: 19
+		-- upvalues: Roact (copy), RoactRodux (copy), StoryStore (copy), Cryo (copy), ChatSettings (copy)
+		return function(p2) -- line: 20
+			-- upvalues: Roact (copy), RoactRodux (copy), StoryStore (copy), p1 (copy), Cryo (copy), ChatSettings (copy)
+			return Roact.createElement(RoactRodux.StoreProvider, {
+				store = StoryStore
+			}, {
+				Story = Roact.createElement(p1, Cryo.Dictionary.join(p2, {
+					chatSettings = ChatSettings
+				}))
+			})
+		end
+	end
+}

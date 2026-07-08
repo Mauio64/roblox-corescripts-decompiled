@@ -1,56 +1,59 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Object_0 = v1.Object;
-local function v4(v5, v6) --[[ Line: 12 ]] --[[ Name: equal ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy), v4 (copy)
-    if typeof(v5) ~= typeof(v6) then
-        return false;
-    elseif v5 == v6 then
-        return true;
-    elseif typeof(v5) == "table" then
-        if l_Array_0.isArray(v5) and not l_Array_0.isArray(v6) then
-            return false;
-        elseif #v5 ~= #v6 or #l_Object_0.keys(v5) ~= #l_Object_0.keys(v6) then
-            return false;
-        else
-            if l_Array_0.isArray(v5) then
-                for v7, _ in ipairs(v5) do
-                    if not v4(v5[v7], v6[v7]) then
-                        return false;
-                    end;
-                end;
-            else
-                for v9 in pairs(v5) do
-                    if not v4(v5[tostring(v9)], v6[tostring(v9)]) then
-                        return false;
-                    end;
-                end;
-            end;
-            return true;
-        end;
-    elseif typeof(v5) == "string" or typeof(v5) == "number" or typeof(v5) == "boolean" then
-        return v5 == v6;
-    elseif typeof(v5) == "function" then
-        local v10 = false;
-        if debug.info(v5, "n") == debug.info(v6, "n") then
-            v10 = false;
-            if debug.info(v5, "s") == debug.info(v6, "s") then
-                v10 = false;
-                if debug.info(v5, "l") == debug.info(v6, "l") then
-                    v10 = debug.info(v5, "a") == debug.info(v6, "a");
-                end;
-            end;
-        end;
-        return v10;
-    else
-        if typeof(v5) == "thread" then
-            error("unhandled equality check for type 'thread'");
-        elseif typeof(v5) == "userdata" then
-            error("unhandled equality check for type 'userdata'");
-        end;
-        error("unhandled equality check for type " .. typeof(v5));
-        return;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+
+local function equal(p1, p2) -- line: 12
+	-- upvalues: Array (copy), Object (copy), equal (copy)
+	if typeof(p1) ~= typeof(p2) then
+		return false
+	end
+
+	if p1 == p2 then
+		return true
+	end
+
+	if typeof(p1) == "table" then
+		if Array.isArray(p1) and not Array.isArray(p2) then
+			return false
+		end
+
+		if #p1 ~= #p2 or #Object.keys(p1) ~= #Object.keys(p2) then
+			return false
+		end
+
+		if Array.isArray(p1) then
+			for i, _ in ipairs(p1) do
+				if not equal(p1[i], p2[i]) then
+					return false
+				end
+			end
+		else
+			for k in pairs(p1) do
+				if not equal(p1[tostring(k)], p2[tostring(k)]) then
+					return false
+				end
+			end
+		end
+
+		return true
+	end
+
+	if typeof(p1) == "string" or typeof(p1) == "number" or typeof(p1) == "boolean" then
+		return p1 == p2
+	end
+
+	if typeof(p1) == "function" then
+		return debug.info(p1, "n") == debug.info(p2, "n") and (debug.info(p1, "s") == debug.info(p2, "s") and (debug.info(p1, "l") == debug.info(p2, "l") and debug.info(p1, "a") == debug.info(p2, "a")))
+	end
+
+	if typeof(p1) == "thread" then
+		error("unhandled equality check for type 'thread'")
+	elseif typeof(p1) == "userdata" then
+		error("unhandled equality check for type 'userdata'")
+	end
+
+	error("unhandled equality check for type " .. typeof(p1))
+end
+
+return equal

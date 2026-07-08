@@ -1,5 +1,6 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)("LoadingStrategy", {
-    "Eager", 
-    "Default"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)("LoadingStrategy", {
+	"Eager",
+	"Default"
+})

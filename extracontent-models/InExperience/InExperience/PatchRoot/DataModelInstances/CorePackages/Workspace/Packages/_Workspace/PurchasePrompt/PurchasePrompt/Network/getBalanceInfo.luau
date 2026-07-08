@@ -1,32 +1,37 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PurchaseError);
-local v2 = require(l_Parent_0.Promise);
-local l_FFlagAddPurchaseOptionForProvidingBalance_0 = require(l_Parent_0.Parent.SharedFlags).FFlagAddPurchaseOptionForProvidingBalance;
-return function(v4, v5, v6, v7, v8) --[[ Line: 10 ]] --[[ Name: getBalanceInfo ]]
-    -- upvalues: l_FFlagAddPurchaseOptionForProvidingBalance_0 (copy), v2 (copy), v1 (copy)
-    if l_FFlagAddPurchaseOptionForProvidingBalance_0 and v8 ~= nil then
-        return v2.resolve({
-            robux = v8, 
-            hasFailed = false
-        });
-    else
-        return v4.getBalanceInfo():andThen(function(v9) --[[ Line: 22 ]]
-            -- upvalues: v5 (copy), v6 (copy), v2 (ref)
-            if v5.isStudio() and not v6 then
-                v9.robux = 2147483647;
-            end;
-            v9.hasFailed = false;
-            return v2.resolve(v9);
-        end):catch(function(_) --[[ Line: 33 ]]
-            -- upvalues: v7 (copy), v2 (ref), v1 (ref)
-            if v7 then
-                return v2.resolve({
-                    robux = 0, 
-                    hasFailed = true
-                });
-            else
-                return v2.reject(v1.UnknownFailure);
-            end;
-        end);
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local Promise = require(ParentParent.Promise)
+local FFlagAddPurchaseOptionForProvidingBalance = require(ParentParent.Parent.SharedFlags).FFlagAddPurchaseOptionForProvidingBalance
+
+local function getBalanceInfo(p1, p2, p3, b1: boolean?, n1: number?) -- line: 10
+	-- upvalues: FFlagAddPurchaseOptionForProvidingBalance (copy), Promise (copy), PurchaseError (copy)
+	if FFlagAddPurchaseOptionForProvidingBalance and n1 ~= nil then
+		return Promise.resolve({
+			hasFailed = false,
+			robux = n1
+		})
+	end
+
+	return p1.getBalanceInfo():andThen(function(p4) -- line: 22
+		-- upvalues: p2 (copy), p3 (copy), Promise (copy)
+		if p2.isStudio() and not p3 then
+			p4.robux = 2147483647
+		end
+
+		p4.hasFailed = false
+
+		return Promise.resolve(p4)
+	end):catch(function(_) -- line: 33
+		-- upvalues: b1 (copy), Promise (copy), PurchaseError (copy)
+		if b1 then
+			return Promise.resolve({
+				robux = 0,
+				hasFailed = true
+			})
+		end
+
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end)
+end
+
+return getBalanceInfo

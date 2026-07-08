@@ -1,11 +1,13 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Rodux);
-return function(v2) --[[ Line: 7 ]]
-    -- upvalues: v1 (copy)
-    local l_networkingAccountInformation_0 = v2.networkingAccountInformation;
-    return v1.createReducer(false, {
-        [l_networkingAccountInformation_0.GetPhoneInformation.Succeeded.name] = function(_, v5) --[[ Line: 11 ]]
-            return v5.responseBody and v5.responseBody.isVerified;
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Rodux = require(ParentParent.Rodux)
+
+return function(p1) -- line: 7
+	-- upvalues: Rodux (copy)
+	local networkingAccountInformation = p1.networkingAccountInformation
+
+	return Rodux.createReducer(false, {
+		[networkingAccountInformation.GetPhoneInformation.Succeeded.name] = function(_, p3) -- line: 11
+			return p3.responseBody and p3.responseBody.isVerified
+		end
+	})
+end

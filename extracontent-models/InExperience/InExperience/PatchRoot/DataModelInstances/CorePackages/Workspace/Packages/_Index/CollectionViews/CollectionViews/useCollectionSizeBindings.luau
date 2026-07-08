@@ -1,59 +1,75 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.calculateItemWidth);
-local l_useStore_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useStore;
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local function v15(v6, v7, v8, v9, v10, v11, v12) --[[ Line: 12 ]] --[[ Name: getItemSize ]]
-    -- upvalues: v3 (copy), l_FFlagLuaAppCompositionSupport_0 (copy)
-    local v13 = v3(v6, v7, v8, v9, v10, if l_FFlagLuaAppCompositionSupport_0 then v12 else nil);
-    local v14 = v11(v13);
-    return Vector2.new(v13, v14);
-end;
-return function(v16, v17, v18, v19, v20, v21, v22) --[[ Line: 37 ]] --[[ Name: useCollectionSizeBindings ]]
-    -- upvalues: l_useStore_0 (copy), v2 (copy), v15 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), v3 (copy)
-    local v23 = l_useStore_0();
-    local v24, v25 = v2.useBinding(Vector2.zero);
-    if v24:getValue() == Vector2.zero then
-        v25(v23:getState().ScreenSize);
-    end;
-    local v26, v27 = v2.useBinding(v15(v16, v17, v18, v24:getValue() and v24:getValue().X or 0, v19, v20, if l_FFlagLuaAppCompositionSupport_0 then v22 else nil));
-    local v28, v29 = v2.useState(nil);
-    local v42 = v2.useCallback(function(v30) --[[ Line: 66 ]]
-        -- upvalues: v21 (copy), v25 (copy), v16 (copy), v17 (copy), v18 (copy), v19 (copy), v20 (copy), l_FFlagLuaAppCompositionSupport_0 (ref), v22 (copy), v3 (ref), v27 (copy)
-        local l_AbsoluteSize_0 = v30.AbsoluteSize;
-        if v21 then
-            v21(l_AbsoluteSize_0);
-        end;
-        v25(l_AbsoluteSize_0);
-        local l_v16_0 = v16;
-        local l_v17_0 = v17;
-        local l_v18_0 = v18;
-        local v35 = l_AbsoluteSize_0 and l_AbsoluteSize_0.X or 0;
-        local l_v19_0 = v19;
-        local l_v20_0 = v20;
-        local v38 = if l_FFlagLuaAppCompositionSupport_0 then v22 else nil;
-        local v39 = v3(l_v16_0, l_v17_0, l_v18_0, v35, l_v19_0, if l_FFlagLuaAppCompositionSupport_0 then v38 else nil);
-        local v40 = l_v20_0(v39);
-        local v41 = Vector2.new(v39, v40);
-        v27(v41);
-    end, {
-        v16, 
-        v17, 
-        v18, 
-        v19, 
-        v20, 
-        v21, 
-        if l_FFlagLuaAppCompositionSupport_0 then v22 else nil
-    });
-    v2.useEffect(function() --[[ Line: 95 ]]
-        -- upvalues: v28 (copy), v42 (copy)
-        if v28 then
-            v42(v28);
-        end;
-    end, {
-        v42, 
-        v28
-    });
-    return v26, v24, v42, v29;
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local calculateItemWidth = require(CollectionViews.calculateItemWidth)
+local useStore = require(CollectionViewsParent.RoactUtils).Hooks.RoactRodux.useStore
+local v6 = game:DefineFastFlag("LuaAppFixCollectionSizeBindingsZero", false)
+
+local function getItemSize(n1: number, n2: number, n3: number, n4: number, n5: number, p1: ((...any) -> ...any), n6: number?) -- line: 12
+	-- upvalues: calculateItemWidth (copy)
+	local v16 = calculateItemWidth(n1, n2, n3, n4, n5, n6)
+	local v17 = p1(v16)
+
+	return Vector2.new(v16, v17)
+end
+local function useCollectionSizeBindings(n7: number, n8: number, n9: number, n10: number, p2: ((...any) -> ...any), p3: ((...any) -> ...any)?, n11: number?) -- line: 31
+	-- upvalues: useStore (copy), React (copy), getItemSize (copy), v6 (copy), calculateItemWidth (copy)
+	local v25 = useStore()
+	local v26, v27 = React.useBinding(Vector2.zero)
+
+	if v26:getValue() == Vector2.zero then
+		v27(v25:getState().ScreenSize)
+	end
+
+	local v28, v29 = React.useBinding(getItemSize(n7, n8, n9, v26:getValue() and v26:getValue().X or 0, n10, p2, n11))
+	local v30, v31 = React.useState(nil)
+	local v32 = React.useCallback(function(p4) -- line: 60
+		-- upvalues: v6 (copy), p3 (copy), v27 (copy), n7 (copy), n8 (copy), n9 (copy), n10 (copy), p2 (copy), n11 (copy), calculateItemWidth (copy), v29 (copy)
+		local AbsoluteSize = p4.AbsoluteSize
+
+		if v6 and AbsoluteSize.X == 0 then
+			return
+		end
+
+		if p3 then
+			p3(AbsoluteSize)
+		end
+
+		v27(AbsoluteSize)
+
+		local v35 = n7
+		local v36 = n8
+		local v37 = n9
+		local v38 = AbsoluteSize and AbsoluteSize.X or 0
+		local v39 = n10
+		local v40 = p2
+		local v41 = n11
+		local v42 = calculateItemWidth(v35, v36, v37, v38, v39, v41)
+		local v43 = v40(v42)
+		local vector2 = Vector2.new(v42, v43)
+
+		v29(vector2)
+	end, {
+		n7,
+		n8,
+		n9,
+		n10,
+		p2,
+		p3,
+		n11
+	})
+
+	React.useEffect(function() -- line: 93
+		-- upvalues: v30 (copy), v32 (copy)
+		if v30 then
+			v32(v30)
+		end
+	end, {
+		v32,
+		v30
+	})
+
+	return v28, v26, v32, v31
+end
+
+return useCollectionSizeBindings

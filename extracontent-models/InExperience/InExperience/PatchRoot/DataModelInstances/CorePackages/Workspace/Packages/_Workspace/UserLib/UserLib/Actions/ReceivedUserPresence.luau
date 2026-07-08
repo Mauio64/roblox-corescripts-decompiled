@@ -1,24 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("UserLib").Parent;
-local l_makeActionCreator_0 = require(l_Parent_0.Rodux).makeActionCreator;
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-return l_makeActionCreator_0(script.Name, function(v3, v4, v5, v6, v7, v8, v9, v10, v11) --[[ Line: 10 ]]
-    -- upvalues: l_DateTime_0 (copy)
-    local v12 = 0;
-    if v9 ~= nil then
-        local v13 = l_DateTime_0.fromIsoDate(v9);
-        if v13 ~= nil then
-            v12 = v13:GetUnixTimestamp();
-        end;
-    end;
-    return {
-        userId = v3, 
-        presence = v4, 
-        lastLocation = v5, 
-        placeId = v6, 
-        rootPlaceId = v7, 
-        gameInstanceId = v8, 
-        lastOnline = v12, 
-        universeId = v10, 
-        previousUniverseId = v11
-    };
-end);
+local Parent = script:FindFirstAncestor("UserLib").Parent
+local makeActionCreator = require(Parent.Rodux).makeActionCreator
+local DateTime = require(Parent.Time).DateTime
+
+return makeActionCreator(script.Name, function(p1, p2, p3, p4, p5, p6, p7, p8, p9) -- line: 10
+	-- upvalues: DateTime (copy)
+	local n1 = 0
+
+	if p7 ~= nil then
+		local v14 = DateTime.fromIsoDate(p7)
+
+		if v14 ~= nil then
+			n1 = v14:GetUnixTimestamp()
+		end
+	end
+
+	return {
+		userId = p1,
+		presence = p2,
+		lastLocation = p3,
+		placeId = p4,
+		rootPlaceId = p5,
+		gameInstanceId = p6,
+		lastOnline = n1,
+		universeId = p8,
+		previousUniverseId = p9
+	}
+end)

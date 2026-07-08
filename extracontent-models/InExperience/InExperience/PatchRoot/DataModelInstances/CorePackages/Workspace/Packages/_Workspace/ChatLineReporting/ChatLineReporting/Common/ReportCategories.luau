@@ -1,54 +1,55 @@
-local l_Parent_0 = script:FindFirstAncestor("ChatLineReporting").Parent;
-local l_AbuseCategory_0 = require(l_Parent_0.GenericAbuseReporting).Enums.AbuseCategory;
+local Parent = script:FindFirstAncestor("ChatLineReporting").Parent
+local AbuseCategory = require(Parent.GenericAbuseReporting.AbuseCategory)
+
 return {
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Bullying", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_BULLYING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Bullying"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Cheating", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_CHEATING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Cheating"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Dating", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_DATING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Dating"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Hate", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_HATE_SPEECH, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Hate"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Links", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_OFFSITE_LINKS, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Links"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Personal", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_PERSONAL_QUESTION, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Personal"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Scamming", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_SCAMMING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Scamming"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Spamming", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_SPAMMING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Spamming"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Swearing", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_SWEARING, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Swearing"
-    }, 
-    {
-        localizationKey = "Feature.ReportAbuse.Problem.Violence", 
-        value = l_AbuseCategory_0.ABUSE_CATEGORY_VIOLENCE_OR_TERRORISM, 
-        descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Violence"
-    }
-};
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Bullying",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Bullying",
+		value = AbuseCategory.ABUSE_CATEGORY_BULLYING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Cheating",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Cheating",
+		value = AbuseCategory.ABUSE_CATEGORY_CHEATING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Dating",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Dating",
+		value = AbuseCategory.ABUSE_CATEGORY_DATING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Hate",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Hate",
+		value = AbuseCategory.ABUSE_CATEGORY_HATE_SPEECH
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Links",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Links",
+		value = AbuseCategory.ABUSE_CATEGORY_OFFSITE_LINKS
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Personal",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Personal",
+		value = AbuseCategory.ABUSE_CATEGORY_PERSONAL_QUESTION
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Scamming",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Scamming",
+		value = AbuseCategory.ABUSE_CATEGORY_SCAMMING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Spamming",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Spamming",
+		value = AbuseCategory.ABUSE_CATEGORY_SPAMMING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Swearing",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Swearing",
+		value = AbuseCategory.ABUSE_CATEGORY_SWEARING
+	},
+	{
+		localizationKey = "Feature.ReportAbuse.Problem.Violence",
+		descriptionLocalizationKey = "Feature.ReportAbuse.ProblemDescription.Violence",
+		value = AbuseCategory.ABUSE_CATEGORY_VIOLENCE_OR_TERRORISM
+	}
+}

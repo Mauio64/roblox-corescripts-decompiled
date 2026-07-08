@@ -1,72 +1,92 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = {};
-local function _(v5, v6) --[[ Line: 25 ]] --[[ Name: getMemoKey ]]
-    return (("$%*___$%*"):format(v5, v6));
-end;
-local function _(v8, v9, v10) --[[ Line: 29 ]] --[[ Name: getMemo ]]
-    -- upvalues: v4 (copy)
-    local v11 = ("$%*___$%*"):format(v9, v10);
-    return v4[v8][v11];
-end;
-local function _(v13, v14, v15, v16) --[[ Line: 35 ]] --[[ Name: setMemo ]]
-    -- upvalues: v4 (copy)
-    local v17 = ("$%*___$%*"):format(v14, v15);
-    v4[v13][v17] = v16;
-end;
-return function(v19, v20, v21, v22) --[[ Line: 40 ]] --[[ Name: isDescendant ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-    if not v4[v20] then
-        v4[v20] = {};
-    end;
-    local v23 = {};
-    local function v24(v25) --[[ Line: 46 ]] --[[ Name: dfs ]]
-        -- upvalues: v23 (copy), v20 (copy), v22 (copy), v4 (ref), v19 (copy), v2 (ref), v3 (ref), v24 (copy)
-        v23[v25] = true;
-        local l_v20_0 = v20;
-        local v27 = ("$%*___$%*"):format(v25, v22);
-        local v28 = v4[l_v20_0][v27];
-        if v28 ~= nil then
-            return v28;
-        else
-            l_v20_0 = v19[v25];
-            if not l_v20_0 then
-                v2:error((("Node %* not found in graph"):format(v25)));
-                local l_v20_1 = v20;
-                local v30 = ("$%*___$%*"):format(v25, v22);
-                v4[l_v20_1][v30] = false;
-                return false;
-            elseif l_v20_0.children[v22] then
-                local l_v20_2 = v20;
-                local v32 = ("$%*___$%*"):format(v25, v22);
-                v4[l_v20_2][v32] = true;
-                return true;
-            else
-                local v34 = v3.List.filter(v3.Dictionary.keys(l_v20_0.children), function(v33) --[[ Line: 64 ]]
-                    -- upvalues: v23 (ref), l_v20_0 (copy)
-                    if not v23[v33] and l_v20_0.children[v33] then
-                        return true;
-                    else
-                        return false;
-                    end;
-                end);
-                v27 = false;
-                for _, v36 in v34 do
-                    if v24(v36) then
-                        v27 = true;
-                        break;
-                    end;
-                end;
-                local l_v20_3 = v20;
-                local l_v22_0 = v22;
-                local l_v27_0 = v27;
-                local v40 = ("$%*___$%*"):format(v25, l_v22_0);
-                v4[l_v20_3][v40] = l_v27_0;
-                return v27;
-            end;
-        end;
-    end;
-    return (v24(v21));
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+local InlineRichTextParent = InlineRichText.Parent
+local v3 = require(InlineRichText.Logger):new(script.Name)
+local Cryo = require(InlineRichTextParent.Cryo)
+local t1 = {}
+
+local function getMemoKey(s1: string, s2: string) -- line: 25
+	return `${ s1 }___${ s2 }`
+end
+local function getMemo(s3: string, s4: string, s5: string) -- line: 29
+	-- upvalues: t1 (copy)
+	local v15 = `${ s4 }___${ s5 }`
+
+	return t1[s3][v15]
+end
+local function setMemo(s6: string, s7: string, s8: string, b1: boolean) -- line: 35
+	-- upvalues: t1 (copy)
+	local v20 = `${ s7 }___${ s8 }`
+
+	t1[s6][v20] = b1
+end
+local function isDescendant(t2: {[any]: any}, s9: string, s10: string, s11: string) -- line: 40
+	-- upvalues: t1 (copy), v3 (copy), Cryo (copy)
+	if not t1[s9] then
+		t1[s9] = {}
+	end
+
+	local t3 = {}
+
+	local function dfs(s12: string) -- line: 46
+		-- upvalues: t3 (copy), s9 (copy), s11 (copy), t1 (copy), t2 (copy), v3 (copy), Cryo (copy), dfs (copy)
+		t3[s12] = true
+
+		local v28 = s9
+		local v29 = `${ s12 }___${ s11 }`
+		local v30 = t1[v28][v29]
+
+		if v30 ~= nil then
+			return v30
+		end
+
+		local v31 = t2[s12]
+
+		if not v31 then
+			v3:error(`Node { s12 } not found in graph`)
+
+			local v32 = s9
+			local v33 = `${ s12 }___${ s11 }`
+
+			t1[v32][v33] = false
+
+			return false
+		end
+
+		if v31.children[s11] then
+			local v34 = s9
+			local v35 = `${ s12 }___${ s11 }`
+
+			t1[v34][v35] = true
+
+			return true
+		end
+
+		local v36 = false
+
+		for _, v38 in (Cryo.List.filter(Cryo.Dictionary.keys(v31.children), function(p1) -- line: 64
+			-- upvalues: t3 (copy), v31 (copy)
+			if not t3[p1] and v31.children[p1] then
+				return true
+			end
+
+			return false
+		end)) do
+			if dfs(v38) then
+				v36 = true
+
+				break
+			end
+		end
+
+		local v39 = s9
+		local v40 = `${ s12 }___${ s11 }`
+
+		t1[v39][v40] = v36
+
+		return v36
+	end
+
+	return (dfs(s10))
+end
+
+return isDescendant

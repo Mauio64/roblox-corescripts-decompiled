@@ -1,1 +1,1 @@
-return bit32.countlz;
+return bit32.countlz

@@ -1,4 +1,4 @@
 return {
-    SquadLobbyUpsellCardClicked = "SquadLobbyUpsellCardClicked", 
-    SquadLobbyAddFriendsIconButtonClicked = "SquadLobbyAddFriendsIconButtonClicked"
-};
+	SquadLobbyUpsellCardClicked = "SquadLobbyUpsellCardClicked",
+	SquadLobbyAddFriendsIconButtonClicked = "SquadLobbyAddFriendsIconButtonClicked"
+}

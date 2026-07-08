@@ -1,1 +1,1 @@
-return require(script.StyleProvider);
+return require(script.StyleProvider)

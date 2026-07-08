@@ -1,5 +1,5 @@
 return {
-    None = "None", 
-    UAAppChatPage = "UAAppChatPage", 
-    InExperienceAppChatModal = "InExperienceAppChatModal"
-};
+	None = "None",
+	UAAppChatPage = "UAAppChatPage",
+	InExperienceAppChatModal = "InExperienceAppChatModal"
+}

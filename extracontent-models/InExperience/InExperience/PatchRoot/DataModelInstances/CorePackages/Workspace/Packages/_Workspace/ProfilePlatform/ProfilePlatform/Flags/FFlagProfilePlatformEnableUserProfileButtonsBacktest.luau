@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableUserProfileButtonsBacktest", false);
+return game:DefineFastFlag("ProfilePlatformEnableUserProfileButtonsBacktest", false)

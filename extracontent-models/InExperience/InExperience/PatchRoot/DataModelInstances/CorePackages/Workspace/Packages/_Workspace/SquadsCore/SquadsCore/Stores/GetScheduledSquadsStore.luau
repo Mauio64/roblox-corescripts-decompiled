@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createScheduledSquadStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local Signals = require(Parent.Signals)
+local createScheduledSquadStore = require(script.createScheduledSquadStore)
+
+return Signals.createComputed(createScheduledSquadStore)

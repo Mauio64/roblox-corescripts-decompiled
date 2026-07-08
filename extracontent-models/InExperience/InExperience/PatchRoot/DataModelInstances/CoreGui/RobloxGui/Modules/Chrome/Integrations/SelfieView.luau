@@ -1,182 +1,192 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_script_FirstAncestor_0.Service);
-local v4 = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils);
-local l_VideoCaptureService_0 = game:GetService("VideoCaptureService");
-local l_FaceAnimatorService_0 = game:GetService("FaceAnimatorService");
-local l_SocialService_0 = game:GetService("SocialService");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local v9 = require(l_script_FirstAncestor_0.Integrations.CommonIcon);
-local l_MappedSignal_0 = v4.MappedSignal;
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_TopBar_0 = l_RobloxGui_0.Modules.TopBar;
-local v13 = require(l_TopBar_0.Constants);
-local v14 = v13.ApplyDisplayScale(v13.TopBarHeight);
-local l_SelfieView_0 = l_script_FirstAncestor_0.Parent.SelfieView;
-local v16 = require(l_script_FirstAncestor_0.Flags.GetFFlagChromeSelfViewIgnoreCoreGui);
-local l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 = require(l_script_FirstAncestor_0.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider;
-local l_FFlagEnableConsoleExpControls_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls;
-local v19 = require(l_SelfieView_0);
-local v20 = require(l_SelfieView_0.Utils.FaceChatUtils);
-local v21 = require(l_SelfieView_0.Utils.SizingUtils);
-local v22 = require(l_SelfieView_0.Utils.SelfieViewPolicy);
-local l_AvailabilitySignalState_0 = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils).AvailabilitySignalState;
-local v24 = require(l_script_FirstAncestor_0.ChromeShared.Service.WindowSizeSignal);
-local l_UnibarStyle_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).UnibarStyle;
-local v26 = require(l_script_FirstAncestor_0.ChromeShared.Service.ViewportUtil);
-local v27 = v21.getSize(v26.screenSize:get(), false);
-local v28 = v24.new(v27.X, v27.Y);
-local v29 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.Constants);
-local v30 = require(l_RobloxGui_0.Modules.SelfView.Analytics).new();
-local l_SELFIE_VIEW_ID_0 = v29.SELFIE_VIEW_ID;
-local v32 = l_MappedSignal_0.new(v3:onIntegrationStatusChanged(), function() --[[ Line: 49 ]]
-    -- upvalues: v3 (copy), l_SELFIE_VIEW_ID_0 (copy)
-    return v3:isWindowOpen(l_SELFIE_VIEW_ID_0);
-end);
-local v33 = nil;
-local v34 = nil;
-local v44 = v3:register({
-    id = l_SELFIE_VIEW_ID_0, 
-    label = "CoreScripts.TopBar.SelfViewLabel", 
-    windowSize = v28, 
-    windowDefaultOpen = false, 
-    initialAvailability = l_AvailabilitySignalState_0.Unavailable, 
-    persistWindowState = true, 
-    activated = function() --[[ Line: 67 ]] --[[ Name: activated ]]
-        -- upvalues: v3 (copy), l_SELFIE_VIEW_ID_0 (copy)
-        v3:toggleWindow(l_SELFIE_VIEW_ID_0);
-    end, 
-    isActivated = function() --[[ Line: 70 ]] --[[ Name: isActivated ]]
-        -- upvalues: v32 (copy)
-        return v32:get();
-    end, 
-    draggable = true, 
-    cachePosition = true, 
-    components = {
-        Icon = function(_) --[[ Line: 76 ]] --[[ Name: Icon ]]
-            -- upvalues: l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 (copy), l_UnibarStyle_0 (copy), v29 (copy), v2 (copy), v9 (copy), v32 (copy), v19 (copy), v3 (copy), l_SELFIE_VIEW_ID_0 (copy)
-            local _ = nil;
-            local v37 = nil;
-            v37 = if l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 then l_UnibarStyle_0.use().ICON_SIZE else v29.ICON_SIZE;
-            return v2.createElement("Frame", {
-                Size = UDim2.new(0, v37, 0, v37), 
-                BackgroundTransparency = 1
-            }, {
-                v9("icons/controls/selfieOff", "icons/controls/selfie", v32); 
-                CameraStatusDot = if not v19.useCameraOn() or v3:isWindowOpen(l_SELFIE_VIEW_ID_0) then nil else v2.createElement(v19.CameraStatusDot, {
-                    Position = UDim2.fromScale(0.8, 0.7), 
-                    ZIndex = 2
-                })
-            }, {});
-        end, 
-        Window = function(_) --[[ Line: 98 ]] --[[ Name: Window ]]
-            -- upvalues: v3 (copy), l_SELFIE_VIEW_ID_0 (copy), v2 (copy), v19 (copy), v28 (copy)
-            local v39 = v3:dragConnection(l_SELFIE_VIEW_ID_0);
-            local l_createElement_0 = v2.createElement;
-            local l_Window_0 = v19.Window;
-            local v42 = {
-                id = l_SELFIE_VIEW_ID_0, 
-                windowSize = v28
-            };
-            local v43 = false;
-            if v39 ~= nil then
-                v43 = v39.connection ~= nil;
-            end;
-            v42.isDraggedOut = v43;
-            return l_createElement_0(l_Window_0, v42, {});
-        end
-    }
-});
-v26.screenSize:connect(function(v45) --[[ Line: 110 ]]
-    -- upvalues: v3 (copy), l_SELFIE_VIEW_ID_0 (copy), v21 (copy), v28 (copy)
-    if not v3:isWindowOpen(l_SELFIE_VIEW_ID_0) then
-        local v46 = v21.getSize(v45, v28:getIsLarge());
-        v28:requestSize(v46.X, v46.Y);
-    end;
-end, true);
-local function v51() --[[ Line: 117 ]]
-    -- upvalues: l_StarterGui_0 (copy), v16 (copy), v20 (copy), v44 (copy)
-    local l_l_StarterGui_0_CoreGuiEnabled_0 = l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView);
-    if not v16() and not l_l_StarterGui_0_CoreGuiEnabled_0 then
-        if v20.isCameraOn() then
-            v20.toggleVideoAnimation();
-        end;
-        v44.availability:unavailable();
-        return;
-    else
-        local v48 = v20.getPermissions();
-        local v49 = v48.placeCamEnabled or v48.placeMicEnabled;
-        local v50 = v48.userCamEligible or v48.userMicEligible;
-        if not v49 or not v50 then
-            v44.availability:unavailable();
-            return;
-        else
-            v44.availability:available();
-            return;
-        end;
-    end;
-end;
-local function _() --[[ Line: 145 ]]
-    -- upvalues: v20 (copy), v30 (copy)
-    local v52 = v20.getPermissions();
-    v30:reportExperienceSettings(true, v52.placeCamEnabled, v52.placeMicEnabled);
-    v30:reportUserAccountSettings(v52.userCamEnabled, v52.userMicEnabled);
-end;
-if l_FFlagEnableConsoleExpControls_0 then
-    local v54 = v22.PolicyImplementation.read();
-    if not if v54 then v22.Mapper(v54).eligibleForSelfieViewFeature() else false then
-        v44.availability:forceUnavailable();
-    end;
-end;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local Service = require(Chrome.Service)
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local VideoCaptureService = game:GetService("VideoCaptureService")
+local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local SocialService = game:GetService("SocialService")
+local StarterGui = game:GetService("StarterGui")
+local CommonIcon = require(Chrome.Integrations.CommonIcon)
+local MappedSignal = ChromeUtils.MappedSignal
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local TopBar = RobloxGui.Modules.TopBar
+local Constants = require(TopBar.Constants)
+local v15 = Constants.ApplyDisplayScale(Constants.TopBarHeight)
+local SelfieView = Chrome.Parent.SelfieView
+local GetFFlagChromeSelfViewIgnoreCoreGui = require(Chrome.Flags.GetFFlagChromeSelfViewIgnoreCoreGui)
+local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local FFlagTokenizeUnibarConstantsWithStyleProvider = require(Chrome.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
+local lib = require(SelfieView)
+local FaceChatUtils = require(SelfieView.Utils.FaceChatUtils)
+local SizingUtils = require(SelfieView.Utils.SizingUtils)
+local SelfieViewPolicy = require(SelfieView.Utils.SelfieViewPolicy)
+local AvailabilitySignalState = require(Chrome.ChromeShared.Service.ChromeUtils).AvailabilitySignalState
+local WindowSizeSignal = require(Chrome.ChromeShared.Service.WindowSizeSignal)
+local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
+local ViewportUtil = require(Chrome.ChromeShared.Service.ViewportUtil)
+local v31 = SizingUtils.getSize(ViewportUtil.screenSize:get(), false)
+local v32 = WindowSizeSignal.new(v31.X, v31.Y)
+local Constants2 = require(Chrome.ChromeShared.Unibar.Constants)
+local v34 = require(RobloxGui.Modules.SelfView.Analytics).new()
+local SELFIE_VIEW_ID = Constants2.SELFIE_VIEW_ID
+local v36 = MappedSignal.new(Service:onIntegrationStatusChanged(), function() -- line: 53
+	-- upvalues: Service (copy), SELFIE_VIEW_ID (copy)
+	return Service:isWindowOpen(SELFIE_VIEW_ID)
+end)
+local v37 = nil
+local v38 = nil
+local v39 = Service:register({
+	label = "CoreScripts.TopBar.SelfViewLabel",
+	windowDefaultOpen = false,
+	persistWindowState = true,
+	draggable = true,
+	cachePosition = true,
+	id = SELFIE_VIEW_ID,
+	sideSheetPlacement = SideSheetPlacement.Vertical,
+	windowSize = v32,
+	initialAvailability = AvailabilitySignalState.Unavailable,
+	activated = function() -- line: 72
+		-- upvalues: Service (copy), SELFIE_VIEW_ID (copy)
+		Service:toggleWindow(SELFIE_VIEW_ID)
+	end,
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 77
+		-- upvalues: v36 (copy)
+		return v36:get()
+	end or v36,
+	components = {
+		Icon = function(_) -- line: 83
+			-- upvalues: FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants2 (copy), React (copy), CommonIcon (copy), v36 (copy), lib (copy), Service (copy), SELFIE_VIEW_ID (copy)
+			local v44 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants2.ICON_SIZE else UnibarStyle.use().ICON_SIZE
+
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, v44, 0, v44)
+			}, {
+				CommonIcon("icons/controls/selfieOff", "icons/controls/selfie", v36),
+				CameraStatusDot = if not lib.useCameraOn() or Service:isWindowOpen(SELFIE_VIEW_ID) then nil else React.createElement(lib.CameraStatusDot, {
+					ZIndex = 2,
+					Position = UDim2.fromScale(0.8, 0.7)
+				})
+			}, {})
+		end,
+		Window = function(_) -- line: 105
+			-- upvalues: Service (copy), SELFIE_VIEW_ID (copy), React (copy), lib (copy), v32 (copy)
+			local v46 = Service:dragConnection(SELFIE_VIEW_ID)
+
+			return React.createElement(lib.Window, {
+				id = SELFIE_VIEW_ID,
+				windowSize = v32,
+				isDraggedOut = v46 ~= nil and v46.connection ~= nil
+			}, {})
+		end
+	}
+})
+
+ViewportUtil.screenSize:connect(function(p3) -- line: 117
+	-- upvalues: Service (copy), SELFIE_VIEW_ID (copy), SizingUtils (copy), v32 (copy)
+	if not Service:isWindowOpen(SELFIE_VIEW_ID) then
+		local v48 = SizingUtils.getSize(p3, v32:getIsLarge())
+
+		v32:requestSize(v48.X, v48.Y)
+	end
+end, true)
+
+local function v40() -- line: 124
+	-- upvalues: StarterGui (copy), GetFFlagChromeSelfViewIgnoreCoreGui (copy), FaceChatUtils (copy), v39 (copy)
+	local CoreGuiEnabled = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView)
+
+	if not GetFFlagChromeSelfViewIgnoreCoreGui() and not CoreGuiEnabled then
+		if FaceChatUtils.isCameraOn() then
+			FaceChatUtils.toggleVideoAnimation()
+		end
+
+		v39.availability:unavailable()
+
+		return
+	end
+
+	local v50 = FaceChatUtils.getPermissions()
+	local v51 = v50.placeCamEnabled or v50.placeMicEnabled
+	local v52 = v50.userCamEligible or v50.userMicEligible
+
+	if not v51 or not v52 then
+		v39.availability:unavailable()
+
+		return
+	end
+
+	v39.availability:available()
+end
+
+if FFlagEnableConsoleExpControls then
+	local v41 = SelfieViewPolicy.PolicyImplementation.read()
+
+	if not v41 or not SelfieViewPolicy.Mapper(v41).eligibleForSelfieViewFeature() then
+		v39.availability:forceUnavailable()
+	end
+end
+
 if game:GetEngineFeature("VideoCaptureService") then
-    v51();
-    l_VideoCaptureService_0.Started:Connect(v51);
-    l_VideoCaptureService_0.Stopped:Connect(v51);
-    l_VideoCaptureService_0.DevicesChanged:Connect(v51);
-    l_FaceAnimatorService_0:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(v51);
-    l_FaceAnimatorService_0:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(v51);
-    local v55 = v20.getPermissions();
-    v30:reportExperienceSettings(true, v55.placeCamEnabled, v55.placeMicEnabled);
-    v30:reportUserAccountSettings(v55.userCamEnabled, v55.userMicEnabled);
-end;
-l_StarterGui_0.CoreGuiChangedSignal:Connect(v51);
+	v40()
+	VideoCaptureService.Started:Connect(v40)
+	VideoCaptureService.Stopped:Connect(v40)
+	VideoCaptureService.DevicesChanged:Connect(v40)
+	FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(v40)
+	FaceAnimatorService:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(v40)
+
+	local v42 = FaceChatUtils.getPermissions()
+
+	v34:reportExperienceSettings(true, v42.placeCamEnabled, v42.placeMicEnabled)
+	v34:reportUserAccountSettings(v42.userCamEnabled, v42.userMicEnabled)
+end
+
+StarterGui.CoreGuiChangedSignal:Connect(v40)
+
 if game:GetEngineFeature("EnableSelfViewToggleApi") then
-    if v33 then
-        v33:Disconnect();
-        v33 = nil;
-    end;
-    if v34 then
-        v34:Disconnect();
-        v34 = nil;
-    end;
-    v33 = l_SocialService_0.SelfViewVisible:Connect(function(v56) --[[ Line: 183 ]]
-        -- upvalues: v13 (copy), v3 (copy), l_SELFIE_VIEW_ID_0 (copy), v28 (copy), v26 (copy), v29 (copy), v14 (copy)
-        local v57 = v13.ApplyDisplayScale(v13.ScreenSideOffset);
-        if not v3:isWindowOpen(l_SELFIE_VIEW_ID_0) then
-            local v58 = v28:get();
-            local v59 = v26.screenSize:get();
-            local v60 = nil;
-            if v56 == Enum.SelfViewPosition.TopLeft then
-                v60 = UDim2.fromOffset(v57, v29.WINDOW_DEFAULT_PADDING);
-            elseif v56 == Enum.SelfViewPosition.TopRight then
-                v60 = UDim2.fromOffset(v59.X - (v58.X.Offset + v57), v29.WINDOW_DEFAULT_PADDING);
-            elseif v56 == Enum.SelfViewPosition.BottomLeft then
-                v60 = UDim2.fromOffset(v57, v59.Y - (v14 + v58.Y.Offset + v29.WINDOW_DEFAULT_PADDING));
-            elseif v56 == Enum.SelfViewPosition.BottomRight then
-                v60 = UDim2.fromOffset(v59.X - (v58.X.Offset + v57), v59.Y - (v14 + v58.Y.Offset + v29.WINDOW_DEFAULT_PADDING));
-            end;
-            v3:toggleWindow(l_SELFIE_VIEW_ID_0);
-            if v60 then
-                v3:updateWindowPosition(l_SELFIE_VIEW_ID_0, v60);
-            end;
-        end;
-    end);
-    v34 = l_SocialService_0.SelfViewHidden:Connect(function() --[[ Line: 217 ]]
-        -- upvalues: v3 (copy), l_SELFIE_VIEW_ID_0 (copy)
-        if v3:isWindowOpen(l_SELFIE_VIEW_ID_0) then
-            v3:toggleWindow(l_SELFIE_VIEW_ID_0);
-        end;
-    end);
-end;
-return v44;
+	if v37 then
+		v37:Disconnect()
+	end
+
+	if v38 then
+		v38:Disconnect()
+	end
+
+	SocialService.SelfViewVisible:Connect(function(p4) -- line: 190
+		-- upvalues: Constants (copy), Service (copy), SELFIE_VIEW_ID (copy), v32 (copy), ViewportUtil (copy), Constants2 (copy), v15 (copy)
+		local v55 = Constants.ApplyDisplayScale(Constants.ScreenSideOffset)
+
+		if not Service:isWindowOpen(SELFIE_VIEW_ID) then
+			local v56 = v32:get()
+			local v57 = ViewportUtil.screenSize:get()
+			local uDim2 = nil
+
+			if p4 == Enum.SelfViewPosition.TopLeft then
+				uDim2 = UDim2.fromOffset(v55, Constants2.WINDOW_DEFAULT_PADDING)
+			elseif p4 == Enum.SelfViewPosition.TopRight then
+				uDim2 = UDim2.fromOffset(v57.X - (v56.X.Offset + v55), Constants2.WINDOW_DEFAULT_PADDING)
+			elseif p4 == Enum.SelfViewPosition.BottomLeft then
+				uDim2 = UDim2.fromOffset(v55, v57.Y - (v15 + v56.Y.Offset + Constants2.WINDOW_DEFAULT_PADDING))
+			elseif p4 == Enum.SelfViewPosition.BottomRight then
+				uDim2 = UDim2.fromOffset(v57.X - (v56.X.Offset + v55), v57.Y - (v15 + v56.Y.Offset + Constants2.WINDOW_DEFAULT_PADDING))
+			end
+
+			Service:toggleWindow(SELFIE_VIEW_ID)
+
+			if uDim2 then
+				Service:updateWindowPosition(SELFIE_VIEW_ID, uDim2)
+			end
+		end
+	end)
+	SocialService.SelfViewHidden:Connect(function() -- line: 224
+		-- upvalues: Service (copy), SELFIE_VIEW_ID (copy)
+		if Service:isWindowOpen(SELFIE_VIEW_ID) then
+			Service:toggleWindow(SELFIE_VIEW_ID)
+		end
+	end)
+end
+
+return v39

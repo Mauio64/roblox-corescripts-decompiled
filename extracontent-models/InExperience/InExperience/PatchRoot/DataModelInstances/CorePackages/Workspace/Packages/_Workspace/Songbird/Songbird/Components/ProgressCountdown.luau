@@ -1,41 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local v3 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local l_useCallback_0 = v2.useCallback;
-local v5 = {
-    counterType = "Remaining"
-};
-local function v10(v6) --[[ Line: 24 ]] --[[ Name: secondsToHHM ]]
-    local v7 = math.floor(v6 / 3600);
-    local v8 = math.floor(v6 % 3600 / 60);
-    local v9 = v6 % 60;
-    if v7 > 0 then
-        return string.format("%i:%02i:%02i", v7, v8, v9);
-    else
-        return string.format("%i:%02i", v8, v9);
-    end;
-end;
-return function(v11) --[[ Line: 36 ]] --[[ Name: ProgressCountdown ]]
-    -- upvalues: v1 (copy), v5 (copy), l_useCallback_0 (copy), v10 (copy), v2 (copy), v3 (copy)
-    local v12 = v1.Dictionary.join(v5, v11);
-    local v15 = l_useCallback_0(function(v13) --[[ Line: 39 ]]
-        -- upvalues: v12 (copy), v10 (ref)
-        if v12.counterType == "Remaining" then
-            local v14 = math.floor(v12.timeLength - v13);
-            return "-" .. v10(v14);
-        else
-            return v10((math.ceil(v13)));
-        end;
-    end, {
-        v12.timeLength
-    });
-    return v2.createElement(v3.Text, {
-        tag = {
-            ["auto-xy text-label-medium content-muted"] = true, 
-            ["align-x-right"] = v12.counterType == "Remaining"
-        }, 
-        Text = v12.timePosition:map(v15), 
-        LayoutOrder = v12.LayoutOrder
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local Cryo = require(Songbird.Parent.Cryo)
+local React = require(Songbird.Parent.React)
+local Foundation = require(Songbird.Parent.Foundation)
+local useCallback = React.useCallback
+local t1 = {
+	counterType = "Remaining"
+}
+
+local function secondsToHHM(n1: number) -- line: 24
+	local v10 = math.floor(n1 / 3600)
+	local v11 = math.floor(n1 % 3600 / 60)
+	local v12 = n1 % 60
+
+	if v10 > 0 then
+		return string.format("%i:%02i:%02i", v10, v11, v12)
+	end
+
+	return string.format("%i:%02i", v11, v12)
+end
+local function ProgressCountdown(t2: {[any]: any}) -- line: 36
+	-- upvalues: Cryo (copy), t1 (copy), useCallback (copy), secondsToHHM (copy), React (copy), Foundation (copy)
+	local v14 = Cryo.Dictionary.join(t1, t2)
+	local v15 = useCallback(function(n2: number) -- line: 39
+		-- upvalues: v14 (copy), secondsToHHM (copy)
+		if v14.counterType == "Remaining" then
+			local v17 = math.floor(v14.timeLength - n2)
+
+			return "-" .. secondsToHHM(v17)
+		end
+
+		return secondsToHHM((math.ceil(n2)))
+	end, { v14.timeLength })
+
+	return React.createElement(Foundation.Text, {
+		tag = {
+			["auto-xy text-label-medium content-muted"] = true,
+			["align-x-right"] = v14.counterType == "Remaining"
+		},
+		Text = v14.timePosition:map(v15),
+		LayoutOrder = v14.LayoutOrder
+	})
+end
+
+return ProgressCountdown

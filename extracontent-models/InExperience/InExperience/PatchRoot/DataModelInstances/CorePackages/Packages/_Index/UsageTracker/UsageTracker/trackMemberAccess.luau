@@ -1,51 +1,63 @@
-local l_Parent_0 = script:FindFirstAncestor("UsageTracker").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(script.Parent.isReactComponent);
-local v3 = require(script.Parent.UsageGraph);
-return function(v4, v5, v6) --[[ Line: 11 ]] --[[ Name: trackMemberAccess ]]
-    -- upvalues: v2 (copy), v1 (copy), v3 (copy)
-    local v7 = {};
-    local v8 = {};
-    local v9 = v6 or v2;
-    local function v10(v11, v12) --[[ Line: 17 ]] --[[ Name: wrap ]]
-        -- upvalues: v9 (copy), v7 (copy), v8 (copy), v10 (copy), v1 (ref)
-        local v13 = {};
-        local v14 = {};
-        for v15, v16 in v12 do
-            if v15 ~= "__index" and typeof(v15) == "string" then
-                local v17 = v11 .. "." .. v15;
-                if v9(v16) then
-                    v7[v17] = {};
-                    v13[v15] = v16;
-                elseif typeof(v16) == "table" and not v8[v16] then
-                    v14[v15] = v10(v17, v16);
-                else
-                    v14[v15] = v16;
-                end;
-                v8[v16] = true;
-            end;
-        end;
-        return (setmetatable(v14, {
-            __index = function(_, v19) --[[ Line: 41 ]] --[[ Name: __index ]]
-                -- upvalues: v13 (copy), v14 (copy), v11 (copy), v7 (ref), v1 (ref)
-                local v20 = v13[v19];
-                if not v20 then
-                    return (rawget(v14, v19));
-                else
-                    local v21 = v11 .. "." .. v19;
-                    local v22, v23 = debug.info(2, "sl");
-                    v7[v21] = v1.List.join(v7[v21], {
-                        {
-                            dmPath = v22, 
-                            lineNumber = v23
-                        }
-                    });
-                    return v20;
-                end;
-            end
-        }));
-    end;
-    local v24 = v10(v4, v5);
-    v24[v3.UsageGraphKey] = v7;
-    return v24;
-end;
+local Parent = script:FindFirstAncestor("UsageTracker").Parent
+local Cryo = require(Parent.Cryo)
+local isReactComponent = require(script.Parent.isReactComponent)
+local UsageGraph = require(script.Parent.UsageGraph)
+
+local function trackMemberAccess(s1: string, t1: {[any]: any}, p1: ((...any) -> ...any)?) -- line: 11
+	-- upvalues: isReactComponent (copy), Cryo (copy), UsageGraph (copy)
+	local t2 = {}
+	local t3 = {}
+	local v11 = p1 or isReactComponent
+
+	local function wrap(s2: string, t4: {[any]: any}) -- line: 17
+		-- upvalues: v11 (copy), t2 (copy), t3 (copy), wrap (copy), Cryo (copy)
+		local t5 = {}
+		local t6 = {}
+
+		for v18, v19 in t4 do
+			if v18 ~= "__index" and typeof(v18) == "string" then
+				local v20 = s2 .. "." .. v18
+
+				if v11(v19) then
+					t2[v20] = {}
+					t5[v18] = v19
+				elseif typeof(v19) == "table" and not t3[v19] then
+					t6[v18] = wrap(v20, v19)
+				else
+					t6[v18] = v19
+				end
+
+				t3[v19] = true
+			end
+		end
+
+		return (setmetatable(t6, {
+			__index = function(_, p3) -- line: 41
+				-- upvalues: t5 (copy), t6 (copy), s2 (copy), t2 (copy), Cryo (copy)
+				local v23 = t5[p3]
+
+				if not v23 then
+					return (rawget(t6, p3))
+				end
+
+				local v24 = s2 .. "." .. p3
+				local v25, v26 = debug.info(2, "sl")
+
+				t2[v24] = Cryo.List.join(t2[v24], {{
+					dmPath = v25,
+					lineNumber = v26
+				}})
+
+				return v23
+			end
+		}))
+	end
+
+	local v13 = wrap(s1, t1)
+
+	v13[UsageGraph.UsageGraphKey] = t2
+
+	return v13
+end
+
+return trackMemberAccess

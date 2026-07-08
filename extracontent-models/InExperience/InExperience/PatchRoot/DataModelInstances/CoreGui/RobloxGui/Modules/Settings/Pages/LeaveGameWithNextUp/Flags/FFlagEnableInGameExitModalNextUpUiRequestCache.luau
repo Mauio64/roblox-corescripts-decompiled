@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableInGameExitModalNextUpUiRequestCache", false);
+return game:DefineFastFlag("EnableInGameExitModalNextUpUiRequestCache", false)

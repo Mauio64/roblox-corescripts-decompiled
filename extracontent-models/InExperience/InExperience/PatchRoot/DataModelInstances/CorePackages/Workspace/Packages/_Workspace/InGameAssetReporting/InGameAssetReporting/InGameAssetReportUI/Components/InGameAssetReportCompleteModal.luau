@@ -1,86 +1,84 @@
-local l_Parent_0 = script:FindFirstAncestor("InGameAssetReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = require(l_Parent_0.UIBlox);
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local l_InteractiveAlert_0 = v3.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local v7 = {
-    stiffness = 400, 
-    damping = 40, 
-    mass = 1
-};
-return function(v8) --[[ Line: 24 ]] --[[ Name: InGameAssetReportCompleteModal ]]
-    -- upvalues: v1 (copy), v2 (copy), v7 (copy), l_withLocalization_0 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local v9, v10 = v1.useState(true);
-    local v11, v12 = v2.useAnimatedBinding(1, function() --[[ Line: 27 ]]
-        -- upvalues: v9 (copy), v8 (copy)
-        if not v9 then
-            v8.onClose();
-        end;
-    end);
-    local v13 = v1.useMemo(function() --[[ Line: 34 ]]
-        -- upvalues: v9 (copy)
-        if v9 then
-            return 0;
-        else
-            return 1;
-        end;
-    end, {
-        v9
-    });
-    v1.useEffect(function() --[[ Line: 38 ]]
-        -- upvalues: v12 (copy), v2 (ref), v13 (copy), v7 (ref)
-        v12(v2.spring(v13, v7));
-    end, {
-        v13
-    });
-    local v14 = v1.useCallback(function() --[[ Line: 42 ]]
-        -- upvalues: v10 (copy)
-        v10(false);
-    end, {
-        v10
-    });
-    return l_withLocalization_0({
-        reportCompleteTitle = "Feature.ReportAbuse.Title.SelectInSceneThankYou", 
-        reportCompleteDescription = "Feature.ReportAbuse.Label.SelectInSceneComplete", 
-        reportCompleteClose = "Feature.ReportAbuse.Action.Close"
-    })(function(v15) --[[ Line: 50 ]]
-        -- upvalues: v1 (ref), v11 (copy), v14 (copy), l_InteractiveAlert_0 (ref), v8 (copy), l_ButtonType_0 (ref)
-        return v1.createElement("TextButton", {
-            AutoButtonColor = false, 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = v11:map(function(v16) --[[ Line: 54 ]]
-                return v16 + 0.3;
-            end), 
-            BackgroundColor3 = Color3.fromHex("#000000"), 
-            Size = UDim2.new(1, 0, 1, 0), 
-            Text = "", 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            [v1.Event.Activated] = v14, 
-            ZIndex = 10
-        }, {
-            Alert = v1.createElement(l_InteractiveAlert_0, {
-                screenSize = v8.screenSize, 
-                title = v15.reportCompleteTitle, 
-                bodyText = v15.reportCompleteDescription, 
-                anchorPoint = Vector2.new(0.5, 0.5), 
-                position = v11:map(function(v17) --[[ Line: 70 ]]
-                    return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), v17);
-                end), 
-                buttonStackInfo = {
-                    buttons = {
-                        {
-                            buttonType = l_ButtonType_0.PrimarySystem, 
-                            props = {
-                                onActivated = v14, 
-                                text = v15.reportCompleteClose
-                            }
-                        }
-                    }
-                }
-            })
-        });
-    end);
-end;
+local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+local UIBlox = require(Parent.UIBlox)
+local withLocalization = require(Parent.Localization).withLocalization
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local t1 = {
+	stiffness = 400,
+	damping = 40,
+	mass = 1
+}
+
+local function InGameAssetReportCompleteModal(t2: {[any]: any}) -- line: 24
+	-- upvalues: React (copy), ReactOtter (copy), t1 (copy), withLocalization (copy), InteractiveAlert (copy), ButtonType (copy)
+	local v11, v12 = React.useState(true)
+	local v13, v14 = ReactOtter.useAnimatedBinding(1, function() -- line: 27
+		-- upvalues: v11 (copy), t2 (copy)
+		if not v11 then
+			t2.onClose()
+		end
+	end)
+	local v15 = React.useMemo(function() -- line: 34
+		-- upvalues: v11 (copy)
+		if v11 then
+			return 0
+		end
+
+		return 1
+	end, { v11 })
+
+	React.useEffect(function() -- line: 38
+		-- upvalues: v14 (copy), ReactOtter (copy), v15 (copy), t1 (copy)
+		v14(ReactOtter.spring(v15, t1))
+	end, { v15 })
+
+	local v16 = React.useCallback(function() -- line: 42
+		-- upvalues: v12 (copy)
+		v12(false)
+	end, { v12 })
+
+	return withLocalization({
+		reportCompleteTitle = "Feature.ReportAbuse.Title.SelectInSceneThankYou",
+		reportCompleteDescription = "Feature.ReportAbuse.Label.SelectInSceneComplete",
+		reportCompleteClose = "Feature.ReportAbuse.Action.Close"
+	})(function(p1) -- line: 50
+		-- upvalues: React (copy), v13 (copy), v16 (copy), InteractiveAlert (copy), t2 (copy), ButtonType (copy)
+		return React.createElement("TextButton", {
+			AutoButtonColor = false,
+			BorderSizePixel = 0,
+			BackgroundTransparency = v13:map(function(n1: number) -- line: 54
+				return n1 + 0.3
+			end),
+			BackgroundColor3 = Color3.fromHex("#000000"),
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = "",
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			[React.Event.Activated] = v16,
+			ZIndex = 10
+		}, {
+			Alert = React.createElement(InteractiveAlert, {
+				screenSize = t2.screenSize,
+				title = p1.reportCompleteTitle,
+				bodyText = p1.reportCompleteDescription,
+				anchorPoint = Vector2.new(0.5, 0.5),
+				position = v13:map(function(p2) -- line: 70
+					return UDim2.new(0.5, 0, 0.5, 0):Lerp(UDim2.new(0.5, 0, -0.5, 0), p2)
+				end),
+				buttonStackInfo = {
+					buttons = {{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							onActivated = v16,
+							text = p1.reportCompleteClose
+						}
+					}}
+				}
+			})
+		})
+	end)
+end
+
+return InGameAssetReportCompleteModal

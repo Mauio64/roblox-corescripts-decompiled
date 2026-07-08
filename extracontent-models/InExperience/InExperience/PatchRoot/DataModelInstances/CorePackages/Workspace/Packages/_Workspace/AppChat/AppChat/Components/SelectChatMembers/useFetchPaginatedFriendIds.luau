@@ -1,30 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UserProfiles);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_useFriendsListOrderedByPresence_0 = require(l_Parent_0.FriendsCommon).Hooks.useFriendsListOrderedByPresence;
-useFetchPaginatedFriendIds = function() --[[ Line: 14 ]] --[[ Name: useFetchPaginatedFriendIds ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v2 (copy), l_useFriendsListOrderedByPresence_0 (copy), v1 (copy), v3 (copy)
-    local v6 = l_useLocalUserId_0();
-    local v7 = v2.useRef({});
-    local v8 = l_useFriendsListOrderedByPresence_0({
-        userId = v6, 
-        pageSize = 50
-    });
-    local v9 = v1.List.join(v8.onlineFriends, v8.offlineFriends);
-    local v11 = v1.List.map(v9, function(v10) --[[ Line: 23 ]]
-        return v10.id;
-    end);
-    local v12 = v1.List.toSet(v7.current);
-    local v14 = v1.List.filter(v11, function(v13) --[[ Line: 27 ]]
-        -- upvalues: v12 (copy)
-        return not v12[v13];
-    end);
-    if #v14 > 0 then
-        v3.Stores.UserProfileStore.get().fetchNamesByUserIds(v14);
-    end;
-    v7.current = v11;
-    return v7.current, v8.fetchMoreFriends, v8.isEndOfList, v8;
-end;
-return useFetchPaginatedFriendIds;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+local UserProfiles = require(Parent.UserProfiles)
+local useLocalUserId = require(Parent.RobloxAppHooks).useLocalUserId
+local useFriendsListOrderedByPresence = require(Parent.FriendsCommon).Hooks.useFriendsListOrderedByPresence
+
+function useFetchPaginatedFriendIds() -- line: 14
+	-- upvalues: useLocalUserId (copy), React (copy), useFriendsListOrderedByPresence (copy), Cryo (copy), UserProfiles (copy)
+	local v7 = useLocalUserId()
+	local v8 = React.useRef({})
+	local v9 = useFriendsListOrderedByPresence({
+		pageSize = 50,
+		userId = v7
+	})
+	local v10 = Cryo.List.join(v9.onlineFriends, v9.offlineFriends)
+	local v11 = Cryo.List.map(v10, function(p1) -- line: 23
+		return p1.id
+	end)
+	local v12 = Cryo.List.toSet(v8.current)
+	local v13 = Cryo.List.filter(v11, function(p2) -- line: 27
+		-- upvalues: v12 (copy)
+		return not v12[p2]
+	end)
+
+	if #v13 > 0 then
+		UserProfiles.Stores.UserProfileStore.get().fetchNamesByUserIds(v13)
+	end
+
+	v8.current = v11
+
+	return v8.current, v9.fetchMoreFriends, v9.isEndOfList, v9
+end
+
+return useFetchPaginatedFriendIds

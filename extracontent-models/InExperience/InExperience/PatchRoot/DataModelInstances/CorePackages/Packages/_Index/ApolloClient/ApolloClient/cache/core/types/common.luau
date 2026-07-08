@@ -1,21 +1,29 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Error_0 = require(l_Parent_1.LuauPolyfill).Error;
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(l_Parent_0.utilities.graphql.types);
-local v6 = setmetatable({}, {
-    __index = l_Error_0
-});
-v6.__index = v6;
-v6.new = function(v7, v8, v9, v10) --[[ Line: 62 ]] --[[ Name: new ]]
-    -- upvalues: l_Error_0 (copy), v6 (copy)
-    local v11 = l_Error_0.new(v7);
-    v11.message = v7;
-    v11.path = v8;
-    v11.query = v9;
-    v11.variables = v10;
-    return (setmetatable(v11, v6));
-end;
-v0.MissingFieldError = v6;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Error = require(ParentParentParent.LuauPolyfill).Error
+
+require(ParentParentParent.GraphQL)
+require(ParentParent.utilities.graphql.types)
+
+local self = setmetatable({}, {
+	__index = Error
+})
+
+self.__index = self
+
+function self.new(s1: string, p1, p2, t2: {[any]: any}?) -- line: 62
+	-- upvalues: Error (copy), self (copy)
+	local v10 = Error.new(s1)
+
+	v10.message = s1
+	v10.path = p1
+	v10.query = p2
+	v10.variables = t2
+
+	return (setmetatable(v10, self))
+end
+
+t1.MissingFieldError = self
+
+return t1

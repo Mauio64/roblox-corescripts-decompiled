@@ -1,83 +1,97 @@
-local l_Parent_0 = script:FindFirstAncestor("Achievements").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local _ = require(l_Parent_0.Signal);
-local v3 = require(script.Parent.AchievementRules);
-local v4 = require(script.Parent.AchievementConstants);
-local v5 = require(script.Parent.AchievementTelemetry);
-local v19 = {
-    NAMES = v4.ACHIEVEMENT_NAMES, 
-    _init = function(v6, v7, v8, v9) --[[ Line: 28 ]] --[[ Name: _init ]]
-        -- upvalues: v3 (copy)
-        v6.achievementService = v9;
-        v6.achievementName = v7;
-        v6.achievementRule = v3[v7];
-        v6.achievementAwardedCallbacks = {};
-        v6.hasAchieved = nil;
-        assert(v6.achievementRule, "Achievement rule not found for " .. tostring(v7));
-        if v6.achievementService:IsAvailable() then
-            pcall(function() --[[ Line: 37 ]]
-                -- upvalues: v6 (copy), v7 (copy)
-                v6.hasAchieved = v6.achievementService:HasAchieved(v7);
-            end);
-            if v6.hasAchieved == false then
-                v6.achievementDataSubscription = v8:subscribe(function(v10) --[[ Line: 42 ]]
-                    -- upvalues: v6 (copy)
-                    if v6.achievementRule(v10) then
-                        v6:grantAchievement(v6.achievementName);
-                    end;
-                end);
-            end;
-        end;
-    end, 
-    grantAchievement = function(v11, v12) --[[ Line: 51 ]] --[[ Name: grantAchievement ]]
-        -- upvalues: v1 (copy), v5 (copy)
-        if v11.hasAchieved == false then
-            local _, l_result_0 = pcall(function() --[[ Line: 53 ]]
-                -- upvalues: v11 (copy), v12 (copy)
-                return v11.achievementService:GrantAchievement(v12);
-            end);
-            v1.default:logRobloxTelemetryEvent(v5, nil, {
-                achievementName = v12, 
-                grantedState = tostring(l_result_0)
-            });
-            if l_result_0 == true then
-                v11.hasAchieved = true;
-                v11.achievementDataSubscription:unsubscribe();
-                for _, v16 in v11.achievementAwardedCallbacks do
-                    v16(v12);
-                end;
-            end;
-        end;
-    end, 
-    registerOnAchievementAwardedListener = function(v17, v18) --[[ Line: 72 ]] --[[ Name: registerOnAchievementAwardedListener ]]
-        v17.achievementAwardedCallbacks[v18] = v18;
-        return {
-            unsubscribe = function() --[[ Line: 77 ]] --[[ Name: unsubscribe ]]
-                -- upvalues: v17 (copy), v18 (copy)
-                v17.achievementAwardedCallbacks[v18] = nil;
-            end
-        };
-    end
-};
-v19.new = function(v20, v21, v22) --[[ Line: 83 ]] --[[ Name: new ]]
-    -- upvalues: v19 (copy)
-    local v23 = {};
-    setmetatable(v23, {
-        __index = v19
-    });
-    v23:_init(v20, v21, v22);
-    return v23;
-end;
-v19.newWithRefresher = function(v24, v25, v26, v27) --[[ Line: 94 ]] --[[ Name: newWithRefresher ]]
-    -- upvalues: v19 (copy)
-    local v28 = v19.new(v24, v25, v27);
-    if v28.hasAchieved == false then
-        v26:start();
-        v28:registerOnAchievementAwardedListener(function() --[[ Line: 104 ]]
-            -- upvalues: v26 (copy)
-            v26:stop();
-        end);
-    end;
-    return v28;
-end;
-return v19;
+local Parent = script:FindFirstAncestor("Achievements").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+
+require(Parent.Signal)
+
+local AchievementRules = require(script.Parent.AchievementRules)
+local AchievementConstants = require(script.Parent.AchievementConstants)
+local AchievementTelemetry = require(script.Parent.AchievementTelemetry)
+local t2 = {
+	NAMES = AchievementConstants.ACHIEVEMENT_NAMES,
+	_init = function(p1, p2, p3, p4) -- line: 28
+		-- upvalues: AchievementRules (copy)
+		p1.achievementService = p4
+		p1.achievementName = p2
+		p1.achievementRule = AchievementRules[p2]
+		p1.achievementAwardedCallbacks = {}
+		p1.hasAchieved = nil
+		assert(p1.achievementRule, "Achievement rule not found for " .. tostring(p2))
+
+		if p1.achievementService:IsAvailable() then
+			pcall(function() -- line: 37
+				-- upvalues: p1 (copy), p2 (copy)
+				p1.hasAchieved = p1.achievementService:HasAchieved(p2)
+			end)
+
+			if p1.hasAchieved == false then
+				p1.achievementDataSubscription = p3:subscribe(function(p5) -- line: 42
+					-- upvalues: p1 (copy)
+					if p1.achievementRule(p5) then
+						p1:grantAchievement(p1.achievementName)
+					end
+				end)
+			end
+		end
+	end,
+	grantAchievement = function(p6, p7) -- line: 51
+		-- upvalues: LoggingProtocol (copy), AchievementTelemetry (copy)
+		if p6.hasAchieved == false then
+			local _, result = pcall(function() -- line: 53
+				-- upvalues: p6 (copy), p7 (copy)
+				return p6.achievementService:GrantAchievement(p7)
+			end)
+
+			LoggingProtocol.default:logRobloxTelemetryEvent(AchievementTelemetry, nil, {
+				achievementName = p7,
+				grantedState = tostring(result)
+			})
+
+			if result == true then
+				p6.hasAchieved = true
+				p6.achievementDataSubscription:unsubscribe()
+
+				for _, v16 in p6.achievementAwardedCallbacks do
+					v16(p7)
+				end
+			end
+		end
+	end,
+	registerOnAchievementAwardedListener = function(t1: {[any]: any}, p8: ((...any) -> ...any)) -- line: 72
+		t1.achievementAwardedCallbacks[p8] = p8
+
+		return {
+			unsubscribe = function() -- line: 77
+				-- upvalues: t1 (copy), p8 (copy)
+				t1.achievementAwardedCallbacks[p8] = nil
+			end
+		}
+	end
+}
+
+function t2.new(p9, p10, p11) -- line: 83
+	-- upvalues: t2 (copy)
+	local t3 = {}
+
+	setmetatable(t3, {
+		__index = t2
+	})
+	t3:_init(p9, p10, p11)
+
+	return t3
+end
+function t2.newWithRefresher(p12, p13, t4: {[any]: any}, p14) -- line: 94
+	-- upvalues: t2 (copy)
+	local v27 = t2.new(p12, p13, p14)
+
+	if v27.hasAchieved == false then
+		t4:start()
+		v27:registerOnAchievementAwardedListener(function() -- line: 104
+			-- upvalues: t4 (copy)
+			t4:stop()
+		end)
+	end
+
+	return v27
+end
+
+return t2

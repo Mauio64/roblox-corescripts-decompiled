@@ -1,105 +1,99 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_View_0 = require(l_CorePackages_0.Packages.Foundation).View;
-local v5 = require(l_CorePackages_0.Workspace.Packages.Responsive);
-local l_CoreScriptsRootProvider_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local l_RoactAppPolicy_0 = require(l_CorePackages_0.Workspace.Packages.UniversalAppPolicy).RoactAppPolicy;
-local l_AppFeaturePolicies_0 = require(l_CorePackages_0.Workspace.Packages.UniversalAppPolicy).AppFeaturePolicies;
-local l_ChatPolicies_0 = require(l_CorePackages_0.Workspace.Packages.SocialPolicies).ChatPolicies;
-local l_AvatarPolicies_0 = require(l_CorePackages_0.Workspace.Packages.AvatarPolicies).AvatarPolicies;
-local l_SharePolicies_0 = require(l_CorePackages_0.Workspace.Packages.SocialPolicies).SharePolicies;
-local l_ShareTargetGamePolicies_0 = require(l_CorePackages_0.Workspace.Packages.SocialPolicies).ShareTargetGamePolicies;
-local v13 = require(l_CorePackages_0.Workspace.Packages.ProfilePlatform.Enums);
-local v14 = require(l_CorePackages_0.Workspace.Packages.ProfilePlatform.installReducer);
-local v15 = require(l_CorePackages_0.Workspace.Packages.ProfilePlatform.Constants);
-local l_ProfileTypes_0 = v13.ProfileTypes;
-local v17 = require(l_CorePackages_0.Workspace.Packages.ProfilePlatform.ProfileWrapperContext);
-local v18 = require(script.Parent.PlayerProfile);
-local function v21(v19) --[[ Line: 29 ]] --[[ Name: createStore ]]
-    -- upvalues: v2 (copy), v15 (copy), v14 (copy)
-    local v20 = v2.combineReducers({
-        [v15.RODUX_KEY] = v14()
-    });
-    return v2.Store.new(v20, v19 or {}, {
-        v2.thunkMiddleware
-    });
-end;
-return function(v22) --[[ Line: 42 ]] --[[ Name: PlayerProfileContainer ]]
-    -- upvalues: v1 (copy), l_RoactAppPolicy_0 (copy), l_AppFeaturePolicies_0 (copy), l_ChatPolicies_0 (copy), l_AvatarPolicies_0 (copy), l_SharePolicies_0 (copy), l_ShareTargetGamePolicies_0 (copy), v17 (copy), l_ProfileTypes_0 (copy), v13 (copy), l_CoreScriptsRootProvider_0 (copy), v3 (copy), v21 (copy), v5 (copy), l_View_0 (copy), v18 (copy)
-    local v23 = v1.useRef(nil);
-    return v1.createElement(l_RoactAppPolicy_0.Provider, {
-        policy = {
-            l_AppFeaturePolicies_0, 
-            l_ChatPolicies_0, 
-            l_AvatarPolicies_0, 
-            l_SharePolicies_0, 
-            l_ShareTargetGamePolicies_0
-        }
-    }, {
-        ProfileWrapperProvider = v1.createElement(v17.Provider, {
-            value = {
-                profileId = tostring(v22.userId), 
-                profileType = l_ProfileTypes_0.User, 
-                sourceInfo = {
-                    source = v13.Sources.InExperienceProfile, 
-                    contextualInfoType = ""
-                }, 
-                navigateTo = {
-                    qRCodePage = function() --[[ Line: 63 ]] --[[ Name: qRCodePage ]]
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local Rodux = require(CorePackages.Packages.Rodux)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local View = require(CorePackages.Packages.Foundation).View
+local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local CoreScriptsRootProvider = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local RoactAppPolicy = require(CorePackages.Workspace.Packages.UniversalAppPolicy).RoactAppPolicy
+local AppFeaturePolicies = require(CorePackages.Workspace.Packages.UniversalAppPolicy).AppFeaturePolicies
+local ChatPolicies = require(CorePackages.Workspace.Packages.SocialPolicies).ChatPolicies
+local AvatarPolicies = require(CorePackages.Workspace.Packages.AvatarPolicies).AvatarPolicies
+local SharePolicies = require(CorePackages.Workspace.Packages.SocialPolicies).SharePolicies
+local ShareTargetGamePolicies = require(CorePackages.Workspace.Packages.SocialPolicies).ShareTargetGamePolicies
+local Enums = require(CorePackages.Workspace.Packages.ProfilePlatform.Enums)
+local installReducer = require(CorePackages.Workspace.Packages.ProfilePlatform.installReducer)
+local Constants = require(CorePackages.Workspace.Packages.ProfilePlatform.Constants)
+local ProfileTypes = Enums.ProfileTypes
+local ProfileWrapperContext = require(CorePackages.Workspace.Packages.ProfilePlatform.ProfileWrapperContext)
+local PlayerProfile = require(script.Parent.PlayerProfile)
 
-                    end, 
-                    previousView = function(_) --[[ Line: 64 ]] --[[ Name: previousView ]]
+local function createStore(p1) -- line: 29
+	-- upvalues: Rodux (copy), Constants (copy), installReducer (copy)
+	local v23 = Rodux.combineReducers({
+		[Constants.RODUX_KEY] = installReducer()
+	})
 
-                    end, 
-                    itemDetails = function(_) --[[ Line: 65 ]] --[[ Name: itemDetails ]]
+	return Rodux.Store.new(v23, p1 or {}, { Rodux.thunkMiddleware })
+end
+local function PlayerProfileContainer(t1: {[any]: any}) -- line: 42
+	-- upvalues: React (copy), RoactAppPolicy (copy), AppFeaturePolicies (copy), ChatPolicies (copy), AvatarPolicies (copy), SharePolicies (copy), ShareTargetGamePolicies (copy), ProfileWrapperContext (copy), ProfileTypes (copy), Enums (copy), CoreScriptsRootProvider (copy), RoactRodux (copy), createStore (copy), Responsive (copy), View (copy), PlayerProfile (copy)
+	local v25 = React.useRef(nil)
 
-                    end, 
-                    itemOrBundleDetails = function(_, _) --[[ Line: 66 ]] --[[ Name: itemOrBundleDetails ]]
+	return React.createElement(RoactAppPolicy.Provider, {
+		policy = {
+			AppFeaturePolicies,
+			ChatPolicies,
+			AvatarPolicies,
+			SharePolicies,
+			ShareTargetGamePolicies
+		}
+	}, {
+		ProfileWrapperProvider = React.createElement(ProfileWrapperContext.Provider, {
+			value = {
+				profileId = tostring(t1.userId),
+				profileType = ProfileTypes.User,
+				sourceInfo = {
+					contextualInfoType = "",
+					source = Enums.Sources.InExperienceProfile
+				},
+				navigateTo = {
+					qRCodePage = function() -- line: 63
+					end,
+					previousView = function(_: boolean) -- line: 64
+					end,
+					itemDetails = function(_) -- line: 65
+					end,
+					itemOrBundleDetails = function(_, _) -- line: 66
+					end,
+					catalogSearch = function(_) -- line: 67
+					end,
+					tryOnItem = function(_: string, _: string, _: string?, _: string?) -- line: 68
+					end,
+					inspectAvatar = t1.inspectAvatar,
+					editUsername = function() -- line: 76
+					end,
+					openLeaveRobloxAlertUIBlox = function(_: ((...any) -> ...any)) -- line: 77
+					end,
+					closeLeaveRobloxAlert = function() -- line: 78
+					end
+				},
+				externalAnalytics = {
+					catalogAnalytics = {}
+				}
+			}
+		}, {
+			CoreScriptsRootProvider = React.createElement(CoreScriptsRootProvider, {}, {
+				RoduxStore = React.createElement(RoactRodux.StoreProvider, {
+					store = createStore()
+				}, {
+					ResponsiveProvider = React.createElement(Responsive.ContainerRef.Provider, {
+						value = v25
+					}, {
+						PlayerProfileContainer = React.createElement(View, {
+							tag = "size-full",
+							ref = v25
+						}, {
+							PlayerProfile = React.createElement(PlayerProfile, {
+								userId = t1.userId,
+								closePage = t1.closePage
+							})
+						})
+					})
+				})
+			})
+		})
+	})
+end
 
-                    end, 
-                    catalogSearch = function(_) --[[ Line: 67 ]] --[[ Name: catalogSearch ]]
-
-                    end, 
-                    tryOnItem = function(_, _, _, _) --[[ Line: 68 ]] --[[ Name: tryOnItem ]]
-
-                    end, 
-                    inspectAvatar = v22.inspectAvatar, 
-                    editUsername = function() --[[ Line: 76 ]] --[[ Name: editUsername ]]
-
-                    end, 
-                    openLeaveRobloxAlertUIBlox = function(_) --[[ Line: 77 ]] --[[ Name: openLeaveRobloxAlertUIBlox ]]
-
-                    end, 
-                    closeLeaveRobloxAlert = function() --[[ Line: 78 ]] --[[ Name: closeLeaveRobloxAlert ]]
-
-                    end
-                }, 
-                externalAnalytics = {
-                    catalogAnalytics = {}
-                }
-            }
-        }, {
-            CoreScriptsRootProvider = v1.createElement(l_CoreScriptsRootProvider_0, {}, {
-                RoduxStore = v1.createElement(v3.StoreProvider, {
-                    store = v21()
-                }, {
-                    ResponsiveProvider = v1.createElement(v5.ContainerRef.Provider, {
-                        value = v23
-                    }, {
-                        PlayerProfileContainer = v1.createElement(l_View_0, {
-                            tag = "size-full", 
-                            ref = v23
-                        }, {
-                            PlayerProfile = v1.createElement(v18, {
-                                userId = v22.userId, 
-                                closePage = v22.closePage
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    });
-end;
+return PlayerProfileContainer

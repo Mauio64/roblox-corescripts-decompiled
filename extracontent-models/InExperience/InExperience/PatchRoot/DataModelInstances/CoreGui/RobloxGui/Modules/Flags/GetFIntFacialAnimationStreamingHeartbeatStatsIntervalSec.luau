@@ -1,4 +1,5 @@
-game:DefineFastInt("FacialAnimationStreamingHeartbeatStatsIntervalSec", 0);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("FacialAnimationStreamingHeartbeatStatsIntervalSec");
-end;
+game:DefineFastInt("FacialAnimationStreamingHeartbeatStatsIntervalSec", 0)
+
+return function() -- line: 3
+	return game:GetFastInt("FacialAnimationStreamingHeartbeatStatsIntervalSec")
+end

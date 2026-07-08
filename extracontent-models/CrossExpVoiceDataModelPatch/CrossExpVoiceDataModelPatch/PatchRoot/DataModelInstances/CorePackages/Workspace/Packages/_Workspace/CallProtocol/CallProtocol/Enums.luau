@@ -1,6 +1,7 @@
-local v0 = require(script.CallStatus);
-local v1 = require(script.MessageType);
+local CallStatus = require(script.CallStatus)
+local MessageType = require(script.MessageType)
+
 return {
-    CallStatus = v0, 
-    MessageType = v1
-};
+	CallStatus = CallStatus,
+	MessageType = MessageType
+}

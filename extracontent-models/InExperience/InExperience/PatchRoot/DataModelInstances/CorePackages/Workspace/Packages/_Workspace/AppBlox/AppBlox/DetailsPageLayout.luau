@@ -1,10 +1,12 @@
-local v0 = require(script.DetailsPageLayoutRoot);
-local v1 = require(script.DetailsPageLayoutHeader);
-local v2 = require(script.DetailsPageLayoutContent);
-local v3 = require(script.DetailsPageLayoutActions);
+local DetailsPageLayoutRoot = require(script.DetailsPageLayoutRoot)
+local DetailsPageLayoutHeader = require(script.DetailsPageLayoutHeader)
+local DetailsPageLayoutContent = require(script.DetailsPageLayoutContent)
+local DetailsPageLayoutActions = require(script.DetailsPageLayoutActions)
+
 return {
-    Root = v0, 
-    Header = v1, 
-    Content = v2, 
-    Actions = v3
-};
+	Root = DetailsPageLayoutRoot,
+	Header = DetailsPageLayoutHeader,
+	Content = DetailsPageLayoutContent,
+	Actions = DetailsPageLayoutActions,
+	DetailsPageLayoutContext = require(script.DetailsPageLayoutContext)
+}

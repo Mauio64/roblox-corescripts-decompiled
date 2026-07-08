@@ -1,14 +1,15 @@
-local v0 = require(script.Actions);
-local v1 = require(script.Content);
-local v2 = require(script.HeroMedia);
-local v3 = require(script.Dialog);
-local v4 = require(script.Text);
-local v5 = require(script.Title);
+local Actions = require(script.Actions)
+local Content = require(script.Content)
+local HeroMedia = require(script.HeroMedia)
+local Dialog = require(script.Dialog)
+local Text = require(script.Text)
+local Title = require(script.Title)
+
 return {
-    Root = v3, 
-    Actions = v0, 
-    Content = v1, 
-    Text = v4, 
-    HeroMedia = v2, 
-    Title = v5
-};
+	Root = Dialog,
+	Actions = Actions,
+	Content = Content,
+	Text = Text,
+	HeroMedia = HeroMedia,
+	Title = Title
+}

@@ -1,3 +1,3 @@
 return {
-    Thunks = require(script.Thunks)
-};
+	Thunks = require(script.Thunks)
+}

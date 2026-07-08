@@ -1,44 +1,41 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v2 = require(l_Parent_0.IXPUtils);
-game:DefineFastFlag("AXRecentlyViewedSearchItemsEnabled4", false);
-game:DefineFastFlag("AXRecentlyViewedSearchItemsEnabledForAll4", false);
-game:DefineFastFlag("AXRecentlyViewedSearchItemsPositionTop4", false);
-game:DefineFastFlag("AXRecentlyViewedSearchItemsSaveInCatalog4", false);
-return v2.defineIXPTest({
-    name = "AvatarMarketplace.UA.RecentlyViewedSearchItems", 
-    recordExposure = false, 
-    layer = l_AppUserLayers_0.AvatarExperienceUASearchView, 
-    getIsUserInExperiment = function(v3) --[[ Line: 25 ]] --[[ Name: getIsUserInExperiment ]]
-        local v4 = false;
-        if v3.enableRecentlyViewedItems ~= nil then
-            v4 = false;
-            if v3.recentlyViewedSearchItemsPositionTop ~= nil then
-                v4 = v3.recentlyViewedSearchItemsSaveInCatalog ~= nil;
-            end;
-        end;
-        return v4;
-    end, 
-    getDependentFlagsEnabled = function() --[[ Line: 31 ]] --[[ Name: getDependentFlagsEnabled ]]
-        return true;
-    end, 
-    getEnabledFlag = function() --[[ Line: 35 ]] --[[ Name: getEnabledFlag ]]
-        return game:GetFastFlag("AXRecentlyViewedSearchItemsEnabled4");
-    end, 
-    getEnabledForAllFlag = function() --[[ Line: 39 ]] --[[ Name: getEnabledForAllFlag ]]
-        return game:GetFastFlag("AXRecentlyViewedSearchItemsEnabledForAll4");
-    end, 
-    variables = {
-        EnabledForUser = function(v5, v6) --[[ Line: 45 ]] --[[ Name: EnabledForUser ]]
-            return v6 or v5.enableRecentlyViewedItems;
-        end, 
-        EnabledTopVariant = function(v7) --[[ Line: 48 ]] --[[ Name: EnabledTopVariant ]]
-            local l_recentlyViewedSearchItemsPositionTop_0 = v7.recentlyViewedSearchItemsPositionTop;
-            return game:GetFastFlag("AXRecentlyViewedSearchItemsPositionTop4") or l_recentlyViewedSearchItemsPositionTop_0 == true or false;
-        end, 
-        EnabledSaveInCatalog = function(v9) --[[ Line: 52 ]] --[[ Name: EnabledSaveInCatalog ]]
-            local l_recentlyViewedSearchItemsSaveInCatalog_0 = v9.recentlyViewedSearchItemsSaveInCatalog;
-            return game:GetFastFlag("AXRecentlyViewedSearchItemsSaveInCatalog4") or l_recentlyViewedSearchItemsSaveInCatalog_0 == true or false;
-        end
-    }
-});
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local IXPUtils = require(Parent.IXPUtils)
+
+game:DefineFastFlag("AXRecentlyViewedSearchItemsEnabled4", false)
+game:DefineFastFlag("AXRecentlyViewedSearchItemsEnabledForAll4", false)
+game:DefineFastFlag("AXRecentlyViewedSearchItemsPositionTop4", false)
+game:DefineFastFlag("AXRecentlyViewedSearchItemsSaveInCatalog4", false)
+
+return IXPUtils.defineIXPTest({
+	name = "AvatarMarketplace.UA.RecentlyViewedSearchItems",
+	recordExposure = false,
+	layer = AppUserLayers.AvatarExperienceUASearchView,
+	getIsUserInExperiment = function(p1) -- line: 25
+		return p1.enableRecentlyViewedItems ~= nil and (p1.recentlyViewedSearchItemsPositionTop ~= nil and p1.recentlyViewedSearchItemsSaveInCatalog ~= nil)
+	end,
+	getDependentFlagsEnabled = function() -- line: 31
+		return true
+	end,
+	getEnabledFlag = function() -- line: 35
+		return game:GetFastFlag("AXRecentlyViewedSearchItemsEnabled4")
+	end,
+	getEnabledForAllFlag = function() -- line: 39
+		return game:GetFastFlag("AXRecentlyViewedSearchItemsEnabledForAll4")
+	end,
+	variables = {
+		EnabledForUser = function(p2, p3) -- line: 45
+			return p3 or p2.enableRecentlyViewedItems
+		end,
+		EnabledTopVariant = function(p4) -- line: 48
+			local recentlyViewedSearchItemsPositionTop = p4.recentlyViewedSearchItemsPositionTop
+
+			return game:GetFastFlag("AXRecentlyViewedSearchItemsPositionTop4") or (recentlyViewedSearchItemsPositionTop == true or false)
+		end,
+		EnabledSaveInCatalog = function(p5) -- line: 52
+			local recentlyViewedSearchItemsSaveInCatalog = p5.recentlyViewedSearchItemsSaveInCatalog
+
+			return game:GetFastFlag("AXRecentlyViewedSearchItemsSaveInCatalog4") or (recentlyViewedSearchItemsSaveInCatalog == true or false)
+		end
+	}
+})

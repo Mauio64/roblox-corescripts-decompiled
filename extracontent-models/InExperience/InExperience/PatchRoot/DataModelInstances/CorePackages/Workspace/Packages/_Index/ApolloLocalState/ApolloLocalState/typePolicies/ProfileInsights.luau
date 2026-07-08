@@ -1,5 +1,3 @@
 return {
-    keyFields = {
-        "targetUserId"
-    }
-};
+	keyFields = { "targetUserId" }
+}

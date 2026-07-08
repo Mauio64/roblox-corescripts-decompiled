@@ -1,5 +1,5 @@
 return {
-    All = "All", 
-    BucketsOnly = "BucketsOnly", 
-    None = "None"
-};
+	All = "All",
+	BucketsOnly = "BucketsOnly",
+	None = "None"
+}

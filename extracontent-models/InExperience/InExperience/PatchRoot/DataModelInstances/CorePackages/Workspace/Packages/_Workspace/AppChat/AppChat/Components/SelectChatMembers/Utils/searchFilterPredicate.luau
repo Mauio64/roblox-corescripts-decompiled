@@ -1,11 +1,13 @@
-return function(v0, v1) --[[ Line: 8 ]]
-    if not v0 or v0 == "" then
-        return true;
-    else
-        local l_displayName_0 = v1.displayName;
-        if v1.alias ~= nil then
-            l_displayName_0 = l_displayName_0 .. v1.alias;
-        end;
-        return string.find(string.lower(l_displayName_0), string.lower(v0), 1, true) ~= nil;
-    end;
-end;
+return function(p1, t1: {[any]: any}) -- line: 8
+	if not p1 or p1 == "" then
+		return true
+	end
+
+	local displayName = t1.displayName
+
+	if t1.alias ~= nil then
+		displayName ..= t1.alias
+	end
+
+	return string.find(string.lower(displayName), string.lower(p1), 1, true) ~= nil
+end

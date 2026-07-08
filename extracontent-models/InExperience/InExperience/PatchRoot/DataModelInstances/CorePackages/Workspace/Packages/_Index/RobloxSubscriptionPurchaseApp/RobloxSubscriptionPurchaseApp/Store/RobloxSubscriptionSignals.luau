@@ -1,36 +1,68 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent;
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_Parent_0.Signals);
-local v3 = nil;
-local function v9() --[[ Line: 15 ]]
-    -- upvalues: l_Players_0 (copy), v2 (copy)
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    local v5 = l_LocalPlayer_0.HasRobloxSubscription == true;
-    local v6, v7 = v2.createSignal(v5);
-    local v8 = l_LocalPlayer_0:GetPropertyChangedSignal("HasRobloxSubscription"):Connect(function() --[[ Line: 22 ]]
-        -- upvalues: v7 (copy), l_LocalPlayer_0 (copy)
-        v7(l_LocalPlayer_0.HasRobloxSubscription == true);
-    end);
-    return {
-        getHasRobloxSubscription = v6, 
-        cleanup = function() --[[ Line: 28 ]] --[[ Name: cleanup ]]
-            -- upvalues: v8 (copy)
-            if v8 then
-                v8:Disconnect();
-            end;
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp").Parent
+local Players = game:GetService("Players")
+local Signals = require(Parent.Signals)
+local v4 = game:DefineFastFlag("AXSubscriptionSignalsPlayersServiceOverride", false)
+local u5 = nil
+local u6 = nil
+
+local function getPlayersService() -- line: 28
+	-- upvalues: v4 (copy), u6 (ref), Players (copy)
+	if v4 and u6 ~= nil then
+		return u6
+	end
+
+	return Players
+end
+local function v8() -- line: 35
+	-- upvalues: v4 (copy), u6 (ref), Players (copy), Signals (copy)
+	local LocalPlayer = ((if not v4 or u6 == nil then Players else u6)).LocalPlayer
+	local v10 = LocalPlayer.HasRobloxSubscription == true
+	local v11, v12 = Signals.createSignal(v10)
+	local v13, v14 = Signals.createSignal(false)
+	local connection = LocalPlayer:GetPropertyChangedSignal("HasRobloxSubscription"):Connect(function() -- line: 43
+		-- upvalues: LocalPlayer (copy), v11 (copy), v12 (copy), v14 (copy)
+		local v17 = LocalPlayer.HasRobloxSubscription == true
+		local v18 = v11()
+
+		v12(v17)
+
+		if v17 and not v18 then
+			v14(true)
+		end
+	end)
+
+	return {
+		getHasRobloxSubscription = v11,
+		getGainedRobloxSubscriptionThisSession = v13,
+		setHasRobloxSubscriptionForTesting = v12,
+		setGainedRobloxSubscriptionThisSessionForTesting = v14,
+		cleanup = function() -- line: 61
+			-- upvalues: connection (copy)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	}
+end
+
 return {
-    get = function() --[[ Line: 38 ]]
-        -- upvalues: v3 (ref), v2 (copy), v9 (copy)
-        if v3 == nil then
-            v3 = v2.createComputed(v9)(false);
-        end;
-        return v3;
-    end, 
-    cleanup = function() --[[ Line: 45 ]]
-        -- upvalues: v3 (ref)
-        v3 = nil;
-    end
-};
+	get = function() -- line: 71
+		-- upvalues: u5 (ref), Signals (copy), v8 (copy)
+		if u5 == nil then
+			u5 = Signals.createComputed(v8)(false)
+		end
+
+		return u5
+	end,
+	setPlayersServiceForTesting = function(p1) -- line: 78
+		-- upvalues: v4 (copy), u6 (ref)
+		if v4 then
+			u6 = p1
+		end
+	end,
+	cleanup = function() -- line: 84
+		-- upvalues: u5 (ref), u6 (ref)
+		u5 = nil
+		u6 = nil
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppAddSortDataToSocialCarouselClicks", false);
+return game:DefineFastFlag("LuaAppAddSortDataToSocialCarouselClicks", false)

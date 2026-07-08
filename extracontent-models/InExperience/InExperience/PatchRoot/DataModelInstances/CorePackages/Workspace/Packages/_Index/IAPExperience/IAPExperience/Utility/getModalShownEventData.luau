@@ -1,13 +1,13 @@
-return function(v0, v1, v2, v3, v4) --[[ Line: 1 ]]
-    local l_v2_0 = v2;
-    if v1 then
-        l_v2_0 = v1 .. l_v2_0;
-    end;
-    return {
-        purchase_flow_uuid = v0, 
-        purchase_flow = l_v2_0, 
-        view_name = v3, 
-        purchase_event_type = "ViewShown", 
-        event_metadata = v4
-    };
-end;
+return function(s1: string, s2: string?, s3: string, s4: string, s5: string?) -- line: 1
+	if s2 then
+		s3 = s2 .. s3
+	end
+
+	return {
+		purchase_event_type = "ViewShown",
+		purchase_flow_uuid = s1,
+		purchase_flow = s3,
+		view_name = s4,
+		event_metadata = s5
+	}
+end

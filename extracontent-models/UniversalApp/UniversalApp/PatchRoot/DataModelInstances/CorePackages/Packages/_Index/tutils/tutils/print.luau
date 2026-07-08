@@ -1,60 +1,74 @@
-return function(v0) --[[ Line: 1 ]]
-    local function _(v1) --[[ Line: 2 ]] --[[ Name: makeKeyString ]]
-        if type(v1) == "string" then
-            return string.format("%s", v1);
-        else
-            return string.format("[%s]", (tostring(v1)));
-        end;
-    end;
-    local function v5(v3) --[[ Line: 10 ]] --[[ Name: makeValueString ]]
-        local v4 = type(v3);
-        if v4 == "string" then
-            return string.format("%q", v3);
-        elseif v4 == "function" or v4 == "table" then
-            return string.format("<%s>", (tostring(v3)));
-        else
-            return string.format("%s", (tostring(v3)));
-        end;
-    end;
-    local function v13(v6, v7, v8, v9) --[[ Line: 21 ]] --[[ Name: printKeypair ]]
-        -- upvalues: v5 (copy), v0 (copy)
-        local v10 = if type(v6) == "string" then string.format("%s", v6) else string.format("[%s]", (tostring(v6)));
-        local v11 = v5(v7);
-        local v12 = v9 and string.format(" -- %s", v9) or "";
-        v0(string.format("%s%s = %s,%s", v8, v10, v11, v12));
-    end;
-    return function(v14, v15) --[[ Line: 33 ]]
-        -- upvalues: v0 (copy), v5 (copy), v13 (copy)
-        v15 = v15 or "  ";
-        if type(v14) ~= "table" then
-            error("tutils.Print must be passed a table", 2);
-        end;
-        local v16 = {};
-        local function v17(v18, v19, v20) --[[ Line: 43 ]] --[[ Name: recurse ]]
-            -- upvalues: v16 (copy), v15 (ref), v0 (ref), v5 (ref), v13 (ref), v17 (copy)
-            v16[v18] = true;
-            local v21 = string.rep(v15, v20);
-            local v22 = string.rep(v15, v20 + 1);
-            if v19 then
-                v0(string.format("%s%s = %s {", v21, if type(v19) == "string" then string.format("%s", v19) else string.format("[%s]", (tostring(v19))), v5(v18)));
-            else
-                v0(string.format("%s%s {", v21, v5(v18)));
-            end;
-            for v23, v24 in pairs(v18) do
-                if type(v24) == "table" then
-                    if v16[v24] then
-                        v13(v23, v24, v22, "Possible cycle");
-                    else
-                        v17(v24, v23, v20 + 1);
-                    end;
-                else
-                    local v25 = if type(v23) == "string" then string.format("%s", v23) else string.format("[%s]", (tostring(v23)));
-                    local v26 = v5(v24);
-                    v0(string.format("%s%s = %s,%s", v22, v25, v26, ""));
-                end;
-            end;
-            v0(string.format("%s}%s", v21, v20 > 0 and "," or ""));
-        end;
-        v17(v14, nil, 0);
-    end;
-end;
+return function(p1) -- line: 1
+	local function makeKeyString(p2) -- line: 2
+		if type(p2) == "string" then
+			return string.format("%s", p2)
+		end
+
+		return string.format("[%s]", (tostring(p2)))
+	end
+	local function makeValueString(p3) -- line: 10
+		local v7 = type(p3)
+
+		if v7 == "string" then
+			return string.format("%q", p3)
+		end
+
+		if v7 == "function" or v7 == "table" then
+			return string.format("<%s>", (tostring(p3)))
+		end
+
+		return string.format("%s", (tostring(p3)))
+	end
+	local function printKeypair(p4, p5, p6, p7) -- line: 21
+		-- upvalues: makeValueString (copy), p1 (copy)
+		local v12 = if type(p4) ~= "string" then string.format("[%s]", (tostring(p4))) else string.format("%s", p4)
+		local v13 = makeValueString(p5)
+		local v14 = p7 and string.format(" -- %s", p7) or ""
+
+		p1(string.format("%s%s = %s,%s", p6, v12, v13, v14))
+	end
+
+	return function(p8, p9) -- line: 33
+		-- upvalues: p1 (copy), makeValueString (copy), printKeypair (copy)
+		local u17 = p9 or "  "
+
+		if type(p8) ~= "table" then
+			error("tutils.Print must be passed a table", 2)
+		end
+
+		local t1 = {}
+
+		local function recurse(p10, p11, p12) -- line: 43
+			-- upvalues: t1 (copy), u17 (ref), p1 (copy), makeValueString (copy), printKeypair (copy), recurse (copy)
+			t1[p10] = true
+
+			local v23 = string.rep(u17, p12)
+			local v24 = string.rep(u17, p12 + 1)
+
+			if p11 then
+				p1(string.format("%s%s = %s {", v23, if type(p11) ~= "string" then string.format("[%s]", (tostring(p11))) else string.format("%s", p11), makeValueString(p10)))
+			else
+				p1(string.format("%s%s {", v23, makeValueString(p10)))
+			end
+
+			for k, v in pairs(p10) do
+				if type(v) == "table" then
+					if t1[v] then
+						printKeypair(k, v, v24, "Possible cycle")
+					else
+						recurse(v, k, p12 + 1)
+					end
+				else
+					local v27 = if type(k) ~= "string" then string.format("[%s]", (tostring(k))) else string.format("%s", k)
+					local v28 = makeValueString(v)
+
+					p1(string.format("%s%s = %s,%s", v24, v27, v28, ""))
+				end
+			end
+
+			p1(string.format("%s}%s", v23, not (p12 > 0) and "" or ","))
+		end
+
+		recurse(p8, nil, 0)
+	end
+end

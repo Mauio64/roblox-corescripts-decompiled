@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePurchaseFlowUUIDMigration", false);
+return game:DefineFastFlag("EnablePurchaseFlowUUIDMigration", false)

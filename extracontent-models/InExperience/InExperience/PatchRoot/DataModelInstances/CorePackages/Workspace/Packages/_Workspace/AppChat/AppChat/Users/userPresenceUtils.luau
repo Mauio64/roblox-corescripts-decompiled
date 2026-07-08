@@ -1,65 +1,75 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_PresenceType_0 = require(l_script_FirstAncestor_0.Http.RoduxPresence).Enums.PresenceType;
-local v3 = require(l_Parent_0.UIBlox).App.ImageSet.Images["component_assets/circle_25"];
-local v4 = {
-    [l_PresenceType_0.Offline] = "Common.Presence.Label.Offline", 
-    [l_PresenceType_0.Online] = "Common.Presence.Label.Online", 
-    [l_PresenceType_0.InGame] = "", 
-    [l_PresenceType_0.InStudio] = ""
-};
-local v5 = {
-    [l_PresenceType_0.Offline] = "", 
-    [l_PresenceType_0.Online] = v3, 
-    [l_PresenceType_0.InGame] = v3, 
-    [l_PresenceType_0.InStudio] = v3
-};
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local PresenceType = require(AppChat.Http.RoduxPresence).Enums.PresenceType
+local v4 = require(AppChatParent.UIBlox).App.ImageSet.Images["component_assets/circle_25"]
+local t1 = {
+	[PresenceType.Offline] = "Common.Presence.Label.Offline",
+	[PresenceType.Online] = "Common.Presence.Label.Online",
+	[PresenceType.InGame] = "",
+	[PresenceType.InStudio] = ""
+}
+local t2 = {
+	[PresenceType.Offline] = "",
+	[PresenceType.Online] = v4,
+	[PresenceType.InGame] = v4,
+	[PresenceType.InStudio] = v4
+}
+
 return {
-    getUserDisplayPresence = function(v6, v7) --[[ Line: 41 ]]
-        -- upvalues: v4 (copy), l_PresenceType_0 (copy), v5 (copy)
-        local v8 = false;
-        if not v6 then
-            return {
-                text = ""
-            };
-        else
-            local v9, v10, v11;
-            if v7 then
-                v9 = {
-                    text = v4[l_PresenceType_0.Online], 
-                    image = v5[l_PresenceType_0.Online]
-                };
-                v8 = v9;
-            end;
-            if not v8 then
-                v9 = {};
-                v10 = v6.userPresenceType;
-                v11 = v6.lastLocation;
-                v9.text = if v10 == l_PresenceType_0.Offline then v4[l_PresenceType_0.Offline] else if v10 == l_PresenceType_0.Online then v4[l_PresenceType_0.Online] else if not (v10 ~= l_PresenceType_0.InGame) or v10 == l_PresenceType_0.InStudio then if v11 then tostring(v11) else v4[l_PresenceType_0.Online] else "";
-                v9.image = v5[v6.userPresenceType];
-            end;
-            v8 = false;
-            return v9;
-        end;
-    end, 
-    getUserPresenceText = function(v12) --[[ Line: 22 ]]
-        -- upvalues: l_PresenceType_0 (copy), v4 (copy)
-        local l_userPresenceType_0 = v12.userPresenceType;
-        local l_lastLocation_0 = v12.lastLocation;
-        if l_userPresenceType_0 == l_PresenceType_0.Offline then
-            return v4[l_PresenceType_0.Offline];
-        elseif l_userPresenceType_0 == l_PresenceType_0.Online then
-            return v4[l_PresenceType_0.Online];
-        elseif l_userPresenceType_0 == l_PresenceType_0.InGame or l_userPresenceType_0 == l_PresenceType_0.InStudio then
-            if l_lastLocation_0 then
-                return (tostring(l_lastLocation_0));
-            else
-                return v4[l_PresenceType_0.Online];
-            end;
-        else
-            return "";
-        end;
-    end, 
-    userPresenceImage = v5, 
-    userPresenceText = v4
-};
+	getUserDisplayPresence = function(p1, b1: boolean?) -- line: 41
+		-- upvalues: t1 (copy), PresenceType (copy), t2 (copy)
+		if not p1 then
+			return {
+				text = ""
+			}
+		end
+
+		local t3
+
+		if b1 then
+			t3 = {
+				text = t1[PresenceType.Online],
+				image = t2[PresenceType.Online]
+			}
+
+			if t3 then
+				return t3
+			end
+		end
+
+		t3 = {}
+
+		local userPresenceType = p1.userPresenceType
+		local lastLocation = p1.lastLocation
+
+		t3.text = if userPresenceType ~= PresenceType.Offline then if userPresenceType ~= PresenceType.Online then userPresenceType ~= PresenceType.InGame and userPresenceType ~= PresenceType.InStudio and "" or if not lastLocation then t1[PresenceType.Online] else tostring(lastLocation) else t1[PresenceType.Online] else t1[PresenceType.Offline]
+		t3.image = t2[p1.userPresenceType]
+
+		return t3
+	end,
+	getUserPresenceText = function(p2) -- line: 22
+		-- upvalues: PresenceType (copy), t1 (copy)
+		local userPresenceType = p2.userPresenceType
+		local lastLocation = p2.lastLocation
+
+		if userPresenceType == PresenceType.Offline then
+			return t1[PresenceType.Offline]
+		end
+
+		if userPresenceType == PresenceType.Online then
+			return t1[PresenceType.Online]
+		end
+
+		if userPresenceType == PresenceType.InGame or userPresenceType == PresenceType.InStudio then
+			if lastLocation then
+				return (tostring(lastLocation))
+			end
+
+			return t1[PresenceType.Online]
+		end
+
+		return ""
+	end,
+	userPresenceImage = t2,
+	userPresenceText = t1
+}

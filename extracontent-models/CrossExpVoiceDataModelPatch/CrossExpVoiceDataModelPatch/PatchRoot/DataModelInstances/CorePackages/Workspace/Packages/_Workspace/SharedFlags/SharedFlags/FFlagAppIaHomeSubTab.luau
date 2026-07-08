@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppIaHomeSubTab", false);
+return game:DefineFastFlag("LuaAppIaHomeSubTab", false)

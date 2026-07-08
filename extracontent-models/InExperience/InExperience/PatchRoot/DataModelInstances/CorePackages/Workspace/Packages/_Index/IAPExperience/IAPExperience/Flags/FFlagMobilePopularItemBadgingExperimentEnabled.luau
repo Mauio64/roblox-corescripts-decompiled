@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MobilePopularItemBadgingExperimentEnabledV2", false);
+return game:DefineFastFlag("MobilePopularItemBadgingExperimentEnabledV2", false)

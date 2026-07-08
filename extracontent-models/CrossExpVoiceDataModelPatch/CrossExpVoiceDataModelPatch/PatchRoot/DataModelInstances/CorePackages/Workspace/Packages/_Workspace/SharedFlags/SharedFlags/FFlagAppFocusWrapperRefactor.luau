@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppFocusWrapperRefactor", false);
+return game:DefineFastFlag("AppFocusWrapperRefactor", false)

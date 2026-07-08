@@ -1,17 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_llama_0 = require(l_script_FirstAncestor_0.dependencies).llama;
-return function(v2, v3, v4) --[[ Line: 6 ]]
-    -- upvalues: l_llama_0 (copy)
-    return function(v5, v6) --[[ Line: 7 ]]
-        -- upvalues: v4 (copy), v3 (copy), l_llama_0 (ref), v2 (copy)
-        v5 = v5 or v4;
-        local v7 = {
-            v6
-        };
-        local v8 = v3[v6.type];
-        if v8 then
-            v7 = v8(v6);
-        end;
-        return l_llama_0.List.reduce(v7, v2, v5);
-    end;
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local llama = require(FriendsLanding.dependencies).llama
+
+return function(p1, p2, p3) -- line: 6
+	-- upvalues: llama (copy)
+	return function(p4, p5) -- line: 7
+		-- upvalues: p3 (copy), p2 (copy), llama (copy), p1 (copy)
+		local v8 = p4 or p3
+		local t1 = { p5 }
+		local v10 = p2[p5.type]
+
+		if v10 then
+			t1 = v10(p5)
+		end
+
+		return llama.List.reduce(t1, p1, v8)
+	end
+end

@@ -1,164 +1,178 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 45 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        creator_type = (not (v4 ~= nil) or v4.creator_type == nil) and "" or v4.creator_type, 
-        creator_id = (not (v4 ~= nil) or v4.creator_id == nil) and 0 or v4.creator_id, 
-        creator_name = (not (v4 ~= nil) or v4.creator_name == nil) and "" or v4.creator_name, 
-        is_verified = v4 ~= nil and not (v4.is_verified == nil) and v4.is_verified
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 54 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.creator_type ~= nil and v5.creator_type ~= "" then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.lengthDelimited);
-        v8, v9 = v0.writeString(v8, v9, v5.creator_type);
-        v6 = v8;
-        v7 = v9;
-    end;
-    if v5.creator_id ~= nil and v5.creator_id ~= 0 then
-        local v10, v11 = v0.writeTag(v6, v7, 2, v0.wireTypes.varint);
-        v10, v11 = v0.writeVarInt(v10, v11, v5.creator_id);
-        v6 = v10;
-        v7 = v11;
-    end;
-    if v5.creator_name ~= nil and v5.creator_name ~= "" then
-        local v12, v13 = v0.writeTag(v6, v7, 3, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v5.creator_name);
-        v6 = v12;
-        v7 = v13;
-    end;
-    if v5.is_verified then
-        local v14, v15 = v0.writeTag(v6, v7, 4, v0.wireTypes.varint);
-        v14, v15 = v0.writeVarInt(v14, v15, v5.is_verified and 1 or 0);
-        v6 = v14;
-        v7 = v15;
-    end;
-    local v16 = buffer.create(v7);
-    buffer.copy(v16, 0, v6, 0, v7);
-    return v16;
-end;
-v3.decode = function(v17) --[[ Line: 83 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v18 = v3.new();
-    local v19 = 0;
-    while v19 < buffer.len(v17) do
-        local v20 = nil;
-        local v21 = nil;
-        local v22, v23, v24 = v0.readTag(v17, v19);
-        v20 = v22;
-        v21 = v23;
-        v19 = v24;
-        if v21 == v0.wireTypes.varint then
-            if v20 == 2 then
-                v22 = nil;
-                v23, v24 = v0.readVarIntI64(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.creator_id = v22;
-            elseif v20 == 4 then
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.is_verified = v22 ~= 0;
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v22 = v23;
-                v19 = v24;
-            end;
-        elseif v21 == v0.wireTypes.lengthDelimited then
-            if v20 == 1 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.creator_type = buffer.tostring(v22);
-            elseif v20 == 3 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.creator_name = buffer.tostring(v22);
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v19 = v24 + v23;
-            end;
-        elseif v21 == v0.wireTypes.i32 then
-            v22 = nil;
-            v23, v24 = v0.readFixed32(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        elseif v21 == v0.wireTypes.i64 then
-            v22 = nil;
-            v23, v24 = v0.readFixed64(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        else
-            error("Unsupported wire type: " .. v21);
-        end;
-    end;
-    return v18;
-end;
-v3.jsonEncode = function(v25) --[[ Line: 141 ]] --[[ Name: jsonEncode ]]
-    local v26 = {};
-    if v25.creator_type ~= nil and v25.creator_type ~= "" then
-        v26.creatorType = v25.creator_type;
-    end;
-    if v25.creator_id ~= nil and v25.creator_id ~= 0 then
-        v26.creatorId = v25.creator_id;
-    end;
-    if v25.creator_name ~= nil and v25.creator_name ~= "" then
-        v26.creatorName = v25.creator_name;
-    end;
-    if v25.is_verified then
-        v26.isVerified = v25.is_verified;
-    end;
-    return v26;
-end;
-v3.jsonDecode = function(v27) --[[ Line: 163 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy)
-    local v28 = v3.new();
-    if v27.creator_type ~= nil then
-        v28.creator_type = v27.creator_type;
-    end;
-    if v27.creatorType ~= nil then
-        v28.creator_type = v27.creatorType;
-    end;
-    if v27.creator_id ~= nil then
-        v28.creator_id = v27.creator_id;
-    end;
-    if v27.creatorId ~= nil then
-        v28.creator_id = v27.creatorId;
-    end;
-    if v27.creator_name ~= nil then
-        v28.creator_name = v27.creator_name;
-    end;
-    if v27.creatorName ~= nil then
-        v28.creator_name = v27.creatorName;
-    end;
-    if v27.is_verified ~= nil then
-        v28.is_verified = v27.is_verified;
-    end;
-    if v27.isVerified ~= nil then
-        v28.is_verified = v27.isVerified;
-    end;
-    return v28;
-end;
-v3.descriptor = {
-    name = "CreatorData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.CreatorData"
-};
-v2.CreatorData = v3;
-v1.default:register(v2.CreatorData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 45
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		creator_type = if t3 ~= nil and t3.creator_type ~= nil then t3.creator_type else "",
+		creator_id = if t3 ~= nil and t3.creator_id ~= nil then t3.creator_id else 0,
+		creator_name = if t3 ~= nil and t3.creator_name ~= nil then t3.creator_name else "",
+		is_verified = t3 ~= nil and (t3.is_verified ~= nil and t3.is_verified)
+	}, t2))
+end
+function t2.encode(p1) -- line: 54
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.creator_type ~= nil and p1.creator_type ~= "" then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v9, v10, p1.creator_type)
+	end
+
+	if p1.creator_id ~= nil and p1.creator_id ~= 0 then
+		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v11, v12, p1.creator_id)
+	end
+
+	if p1.creator_name ~= nil and p1.creator_name ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.creator_name)
+	end
+
+	if p1.is_verified then
+		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v15, v16, not p1.is_verified and 0 or 1)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 83
+	-- upvalues: t2 (copy), proto (copy)
+	local v19 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v21, v22
+
+		v21, v22, n2 = proto.readTag(p2, n2)
+
+		if v22 == proto.wireTypes.varint then
+			if v21 == 2 then
+				local v23
+
+				v23, n2 = proto.readVarIntI64(p2, n2)
+				v19.creator_id = v23
+			elseif v21 == 4 then
+				local v24
+
+				v24, n2 = proto.readVarInt(p2, n2)
+				v19.is_verified = v24 ~= 0
+			else
+				local v25
+
+				v25, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v22 == proto.wireTypes.lengthDelimited then
+			if v21 == 1 then
+				local v26
+
+				v26, n2 = proto.readBuffer(p2, n2)
+				v19.creator_type = buffer.tostring(v26)
+			elseif v21 == 3 then
+				local v27
+
+				v27, n2 = proto.readBuffer(p2, n2)
+				v19.creator_name = buffer.tostring(v27)
+			else
+				local v28, v29 = proto.readVarInt(p2, n2)
+
+				n2 = v29 + v28
+			end
+		elseif v22 == proto.wireTypes.i32 then
+			local v30
+
+			v30, n2 = proto.readFixed32(p2, n2)
+		elseif v22 == proto.wireTypes.i64 then
+			local v31
+
+			v31, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v22)
+		end
+	end
+
+	return v19
+end
+function t2.jsonEncode(p3) -- line: 141
+	local t4 = {}
+
+	if p3.creator_type ~= nil and p3.creator_type ~= "" then
+		t4.creatorType = p3.creator_type
+	end
+
+	if p3.creator_id ~= nil and p3.creator_id ~= 0 then
+		t4.creatorId = p3.creator_id
+	end
+
+	if p3.creator_name ~= nil and p3.creator_name ~= "" then
+		t4.creatorName = p3.creator_name
+	end
+
+	if p3.is_verified then
+		t4.isVerified = p3.is_verified
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 163
+	-- upvalues: t2 (copy)
+	local v35 = t2.new()
+
+	if t5.creator_type ~= nil then
+		v35.creator_type = t5.creator_type
+	end
+
+	if t5.creatorType ~= nil then
+		v35.creator_type = t5.creatorType
+	end
+
+	if t5.creator_id ~= nil then
+		v35.creator_id = t5.creator_id
+	end
+
+	if t5.creatorId ~= nil then
+		v35.creator_id = t5.creatorId
+	end
+
+	if t5.creator_name ~= nil then
+		v35.creator_name = t5.creator_name
+	end
+
+	if t5.creatorName ~= nil then
+		v35.creator_name = t5.creatorName
+	end
+
+	if t5.is_verified ~= nil then
+		v35.is_verified = t5.is_verified
+	end
+
+	if t5.isVerified ~= nil then
+		v35.is_verified = t5.isVerified
+	end
+
+	return v35
+end
+
+t2.descriptor = {
+	name = "CreatorData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.CreatorData"
+}
+t1.CreatorData = t2
+typeRegistry.default:register(t1.CreatorData)
+
 return {
-    CreatorData = v2.CreatorData
-};
+	CreatorData = t1.CreatorData
+}

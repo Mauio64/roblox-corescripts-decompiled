@@ -1,52 +1,60 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v5 = {};
-local l_valueFromASTUntyped_0 = require(l_Parent_0.GraphQL).valueFromASTUntyped;
-local _ = require(script.Parent.types);
-v5.getFieldsWithDirectives = function(v8, v9) --[[ Line: 35 ]] --[[ Name: getFieldsWithDirectives ]]
-    -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy), l_Object_0 (copy), l_valueFromASTUntyped_0 (copy)
-    local v10 = if v9 ~= nil then v9 else {};
-    local v11 = {};
-    local v12 = {
-        "ObjectTypeDefinition", 
-        "ObjectTypeExtension"
-    };
-    if l_Boolean_0.toJSBoolean(v10.includeInputTypes) then
-        v12 = l_Array_0.concat({}, v12, {
-            "InputObjectTypeDefinition", 
-            "InputObjectTypeExtension"
-        });
-    end;
-    for _, v15 in (l_Array_0.filter(v8.definitions, function(v13) --[[ Line: 45 ]]
-        -- upvalues: l_Array_0 (ref), v12 (ref)
-        return l_Array_0.includes(v12, v13.kind);
-    end)) do
-        local l_value_0 = v15.name.value;
-        if v15.fields ~= nil then
-            for _, v18 in v15.fields do
-                if l_Boolean_0.toJSBoolean(v18.directives) and #v18.directives > 0 then
-                    local l_value_1 = v18.name.value;
-                    local v20 = ("%s.%s"):format(tostring(l_value_0), (tostring(l_value_1)));
-                    local v24 = l_Array_0.map(v18.directives, function(v21) --[[ Line: 70 ]]
-                        -- upvalues: l_Array_0 (ref), l_Boolean_0 (ref), l_Object_0 (ref), l_valueFromASTUntyped_0 (ref)
-                        return {
-                            name = v21.name.value, 
-                            args = l_Array_0.reduce(l_Boolean_0.toJSBoolean(v21.arguments) and v21.arguments or {}, function(v22, v23) --[[ Line: 77 ]]
-                                -- upvalues: l_Object_0 (ref), l_valueFromASTUntyped_0 (ref)
-                                return l_Object_0.assign({}, v22, {
-                                    [v23.name.value] = l_valueFromASTUntyped_0(v23.value, nil)
-                                });
-                            end, {})
-                        };
-                    end);
-                    v11[tostring(v20)] = v24;
-                end;
-            end;
-        end;
-    end;
-    return v11;
-end;
-return v5;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local valueFromASTUntyped = require(ParentParent.GraphQL).valueFromASTUntyped
+
+require(script.Parent.types)
+
+function t1.getFieldsWithDirectives(p1, t2: {[any]: any}?) -- line: 35
+	-- upvalues: Boolean (copy), Array (copy), Object (copy), valueFromASTUntyped (copy)
+	local v10 = if t2 == nil then {} else t2
+	local t3 = {}
+	local t4 = {
+		"ObjectTypeDefinition",
+		"ObjectTypeExtension"
+	}
+
+	if Boolean.toJSBoolean(v10.includeInputTypes) then
+		t4 = Array.concat({}, t4, {
+			"InputObjectTypeDefinition",
+			"InputObjectTypeExtension"
+		})
+	end
+
+	for _, v14 in (Array.filter(p1.definitions, function(p2) -- line: 45
+		-- upvalues: Array (copy), t4 (ref)
+		return Array.includes(t4, p2.kind)
+	end)) do
+		local value = v14.name.value
+
+		if v14.fields ~= nil then
+			for _, v17 in v14.fields do
+				if Boolean.toJSBoolean(v17.directives) and #v17.directives > 0 then
+					local value2 = v17.name.value
+					local v19 = ("%s.%s"):format(tostring(value), (tostring(value2)))
+					local v20 = Array.map(v17.directives, function(p3) -- line: 70
+						-- upvalues: Array (copy), Boolean (copy), Object (copy), valueFromASTUntyped (copy)
+						return {
+							name = p3.name.value,
+							args = Array.reduce(Boolean.toJSBoolean(p3.arguments) and p3.arguments or {}, function(t5: {[any]: any}, p4) -- line: 77
+								-- upvalues: Object (copy), valueFromASTUntyped (copy)
+								return Object.assign({}, t5, {
+									[p4.name.value] = valueFromASTUntyped(p4.value, nil)
+								})
+							end, {})
+						}
+					end)
+
+					t3[tostring(v19)] = v20
+				end
+			end
+		end
+	end
+
+	return t3
+end
+
+return t1

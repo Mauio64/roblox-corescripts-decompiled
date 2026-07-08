@@ -1,4 +1,5 @@
-game:DefineFastInt("MessageListMountingBuffer", 200);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("MessageListMountingBuffer");
-end;
+game:DefineFastInt("MessageListMountingBuffer", 200)
+
+return function() -- line: 3
+	return game:GetFastInt("MessageListMountingBuffer")
+end

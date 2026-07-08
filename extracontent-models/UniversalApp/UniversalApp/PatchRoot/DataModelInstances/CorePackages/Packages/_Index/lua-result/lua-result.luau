@@ -1,71 +1,75 @@
-local v0 = {};
-v0.__index = v0;
-local v1 = newproxy(true);
-v0.new = function(v2, v3) --[[ Line: 6 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy), v0 (copy)
-    assert(typeof(v2) == "boolean");
-    local v4 = {
-        _source = debug.traceback(), 
-        [v1] = true, 
-        _status = v2, 
-        _value = v3
-    };
-    setmetatable(v4, v0);
-    return v4;
-end;
-v0.success = function(v5) --[[ Line: 27 ]] --[[ Name: success ]]
-    -- upvalues: v0 (copy)
-    return v0.new(true, v5);
-end;
-v0.error = function(v6) --[[ Line: 31 ]] --[[ Name: error ]]
-    -- upvalues: v0 (copy)
-    return v0.new(false, v6);
-end;
-v0.is = function(v7) --[[ Line: 38 ]] --[[ Name: is ]]
-    -- upvalues: v1 (copy)
-    if typeof(v7) ~= "table" then
-        return false;
-    else
-        return v7[v1];
-    end;
-end;
-v0.match = function(v8, v9, v10) --[[ Line: 51 ]] --[[ Name: match ]]
-    -- upvalues: v0 (copy)
-    local v11 = true;
-    if typeof(v9) ~= "function" then
-        v11 = typeof(v9) == "nil";
-    end;
-    assert(v11, string.format("Result:match expects successHandler to be a function or nil, got %s", (typeof(v9))));
-    v11 = true;
-    if typeof(v10) ~= "function" then
-        v11 = typeof(v10) == "nil";
-    end;
-    assert(v11, string.format("Result:match expects errorHandler to be a function or nil, got %s", (typeof(v10))));
-    local v12 = nil;
-    if v8._status then
-        if v9 ~= nil then
-            v12 = v9(v8._value);
-        else
-            return v8;
-        end;
-    elseif v10 ~= nil then
-        v12 = v10(v8._value);
-    else
-        return v8;
-    end;
-    if v0.is(v12) then
-        return v12;
-    else
-        return v0.success(v12);
-    end;
-end;
-v0.matchSuccess = function(v13, v14) --[[ Line: 83 ]] --[[ Name: matchSuccess ]]
-    return v13:match(v14, nil);
-end;
-v0.matchError = function(v15, v16) --[[ Line: 92 ]] --[[ Name: matchError ]]
-    return v15:match(nil, v16);
-end;
-v0.unwrap = function(v17) --[[ Line: 96 ]] --[[ Name: unwrap ]]
-    return v17._status, v17._value;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+local v2 = newproxy(true)
+
+function t1.new(p1, p2) -- line: 6
+	-- upvalues: v2 (copy), t1 (copy)
+	assert(typeof(p1) == "boolean")
+
+	local t2 = {
+		_source = debug.traceback(),
+		[v2] = true,
+		_status = p1,
+		_value = p2
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.success(p3) -- line: 27
+	-- upvalues: t1 (copy)
+	return t1.new(true, p3)
+end
+function t1.error(p4) -- line: 31
+	-- upvalues: t1 (copy)
+	return t1.new(false, p4)
+end
+function t1.is(p5) -- line: 38
+	-- upvalues: v2 (copy)
+	if typeof(p5) ~= "table" then
+		return false
+	end
+
+	return p5[v2]
+end
+function t1.match(p6, p7, p8) -- line: 51
+	-- upvalues: t1 (copy)
+	assert(typeof(p7) == "function" or typeof(p7) == "nil", string.format("Result:match expects successHandler to be a function or nil, got %s", (typeof(p7))))
+	assert(typeof(p8) == "function" or typeof(p8) == "nil", string.format("Result:match expects errorHandler to be a function or nil, got %s", (typeof(p8))))
+
+	local v12
+
+	if p6._status then
+		if p7 == nil then
+			return p6
+		end
+
+		v12 = p7(p6._value)
+	else
+		if p8 == nil then
+			return p6
+		end
+
+		v12 = p8(p6._value)
+	end
+
+	if t1.is(v12) then
+		return v12
+	end
+
+	return t1.success(v12)
+end
+function t1.matchSuccess(p9, p10) -- line: 83
+	return p9:match(p10, nil)
+end
+function t1.matchError(p11, p12) -- line: 92
+	return p11:match(nil, p12)
+end
+function t1.unwrap(p13) -- line: 96
+	return p13._status, p13._value
+end
+
+return t1

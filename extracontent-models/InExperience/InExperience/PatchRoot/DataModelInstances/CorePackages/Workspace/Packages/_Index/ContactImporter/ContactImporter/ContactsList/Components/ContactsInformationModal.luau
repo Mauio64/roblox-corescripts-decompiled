@@ -1,1 +1,1 @@
-return require(script.ContactsInformationModal);
+return require(script.ContactsInformationModal)

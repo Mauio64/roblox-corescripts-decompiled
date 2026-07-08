@@ -1,108 +1,111 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ContactImporter");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_React_0 = v1.React;
-local l_Button_0 = l_UIBlox_0.App.Button.Button;
-local l_ButtonType_0 = l_UIBlox_0.App.Button.Enum.ButtonType;
-local l_StyledTextLabel_0 = l_UIBlox_0.App.Text.StyledTextLabel;
-local v8 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_StandardButtonSize_0 = l_UIBlox_0.App.Button.Enum.StandardButtonSize;
-local l_SMSProtocol_0 = v1.SMSProtocol;
-local l_Dash_0 = v1.Dash;
-local l_useStyle_0 = v1.useStyle;
-local l_useLocalization_0 = v1.useLocalization;
-local v14 = require(l_script_FirstAncestor_0.Flags.getFFlagContactsListEntryUpdatedTruncationFix);
-local v15 = require(script.Parent.sendInviteLink);
-local v16 = {
-    smsProtocol = l_SMSProtocol_0.default
-};
-ContactsListInviteEntry = function(v17) --[[ Line: 42 ]] --[[ Name: ContactsListInviteEntry ]]
-    -- upvalues: l_Dash_0 (copy), v16 (copy), l_useLocalization_0 (copy), v8 (copy), l_useStyle_0 (copy), v15 (copy), l_SMSProtocol_0 (copy), l_React_0 (copy), l_Roact_0 (copy), v14 (copy), l_StyledTextLabel_0 (copy), l_Button_0 (copy), l_ButtonType_0 (copy), l_StandardButtonSize_0 (copy)
-    local v18 = l_Dash_0.join(v16, v17);
-    local v19 = l_useLocalization_0({
-        invite = v8.INVITE_BUTTON_TEXT
-    });
-    local v20 = l_useStyle_0();
-    local v21 = v15({
-        address = v18.phoneNumber, 
-        deviceContactId = v18.deviceContactId, 
-        smsProtocol = l_SMSProtocol_0.default
-    });
-    local v22, v23 = l_React_0.useState(0);
-    return l_Roact_0.createElement("Frame", {
-        Name = v18.deviceContactId, 
-        Size = UDim2.new(1, 0, 0, 72), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1
-    }, {
-        entryContent = l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            padding = l_Roact_0.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 26), 
-                PaddingBottom = UDim.new(0, 26)
-            }), 
-            contactNameLabel = if v14() then l_Roact_0.createElement(l_StyledTextLabel_0, {
-                size = UDim2.new(1, v22, 0, 20), 
-                colorStyle = v20.Theme.TextEmphasis, 
-                fontStyle = v20.Font.Header2, 
-                lineHeight = 1, 
-                text = v18.contactName, 
-                fluidSizing = false, 
-                richText = false, 
-                textWrapped = false, 
-                textXAlignment = Enum.TextXAlignment.Left, 
-                textYAlignment = Enum.TextYAlignment.Bottom, 
-                textTruncate = Enum.TextTruncate.AtEnd
-            }) else l_Roact_0.createElement(l_StyledTextLabel_0, {
-                automaticSize = Enum.AutomaticSize.Y, 
-                colorStyle = v20.Theme.TextEmphasis, 
-                fontStyle = v20.Font.Header2, 
-                lineHeight = 1, 
-                text = v18.contactName, 
-                textXAlignment = Enum.TextXAlignment.Left, 
-                textYAlignment = Enum.TextYAlignment.Bottom
-            }), 
-            sendInviteButton = if not v18.hasSentRequest then l_Roact_0.createElement(l_Button_0, {
-                buttonType = l_ButtonType_0.PrimarySystem, 
-                position = UDim2.new(1, -1, 0.5, 0), 
-                anchorPoint = Vector2.new(1, 0.5), 
-                standardSize = l_StandardButtonSize_0.XSmall, 
-                fitContent = true, 
-                text = v19.invite, 
-                isDisabled = v21.isLoading, 
-                onActivated = v21.sendInvite, 
-                [l_React_0.Change.AbsoluteSize] = function(v24) --[[ Line: 108 ]]
-                    -- upvalues: v14 (ref), v23 (copy)
-                    if v14() then
-                        v23(0 - (v24.AbsoluteSize.X + 10));
-                    end;
-                end
-            }) else l_Roact_0.createElement(l_Button_0, {
-                buttonType = l_ButtonType_0.Secondary, 
-                position = UDim2.new(1, -1, 0.5, 0), 
-                anchorPoint = Vector2.new(1, 0.5), 
-                standardSize = l_StandardButtonSize_0.XSmall, 
-                isDisabled = true, 
-                text = v19.invite, 
-                onActivated = l_Dash_0.noop, 
-                [l_React_0.Change.AbsoluteSize] = function(v25) --[[ Line: 122 ]]
-                    -- upvalues: v14 (ref), v23 (copy)
-                    if v14() then
-                        v23(0 - (v25.AbsoluteSize.X + 10));
-                    end;
-                end
-            })
-        }), 
-        divider = if v18.hasDivider then l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 1), 
-            Position = UDim2.new(0, 0, 1, 0), 
-            BorderSizePixel = 0, 
-            BackgroundColor3 = v20.Theme.Divider.Color, 
-            BackgroundTransparency = v20.Theme.Divider.Transparency
-        }) else nil
-    });
-end;
-return ContactsListInviteEntry;
+local ContactImporter = script:FindFirstAncestor("ContactImporter")
+local dependencies = require(ContactImporter.dependencies)
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local React = dependencies.React
+local Button = UIBlox.App.Button.Button
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local TextKeys = require(ContactImporter.Common.TextKeys)
+local StandardButtonSize = UIBlox.App.Button.Enum.StandardButtonSize
+local SMSProtocol = dependencies.SMSProtocol
+local Dash = dependencies.Dash
+local useStyle = dependencies.useStyle
+local useLocalization = dependencies.useLocalization
+local getFFlagContactsListEntryUpdatedTruncationFix = require(ContactImporter.Flags.getFFlagContactsListEntryUpdatedTruncationFix)
+local sendInviteLink = require(script.Parent.sendInviteLink)
+local t1 = {
+	smsProtocol = SMSProtocol.default
+}
+
+function ContactsListInviteEntry(t2: {[any]: any}) -- line: 42
+	-- upvalues: Dash (copy), t1 (copy), useLocalization (copy), TextKeys (copy), useStyle (copy), sendInviteLink (copy), SMSProtocol (copy), React (copy), Roact (copy), getFFlagContactsListEntryUpdatedTruncationFix (copy), StyledTextLabel (copy), Button (copy), ButtonType (copy), StandardButtonSize (copy)
+	local v19 = Dash.join(t1, t2)
+	local v20 = useLocalization({
+		invite = TextKeys.INVITE_BUTTON_TEXT
+	})
+	local v21 = useStyle()
+	local v22 = sendInviteLink({
+		address = v19.phoneNumber,
+		deviceContactId = v19.deviceContactId,
+		smsProtocol = SMSProtocol.default
+	})
+	local v23, v24 = React.useState(0)
+
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Name = v19.deviceContactId,
+		Size = UDim2.new(1, 0, 0, 72)
+	}, {
+		entryContent = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 26),
+				PaddingBottom = UDim.new(0, 26)
+			}),
+			contactNameLabel = if not getFFlagContactsListEntryUpdatedTruncationFix() then Roact.createElement(StyledTextLabel, {
+				lineHeight = 1,
+				automaticSize = Enum.AutomaticSize.Y,
+				colorStyle = v21.Theme.TextEmphasis,
+				fontStyle = v21.Font.Header2,
+				text = v19.contactName,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Bottom
+			}) else Roact.createElement(StyledTextLabel, {
+				lineHeight = 1,
+				fluidSizing = false,
+				richText = false,
+				textWrapped = false,
+				size = UDim2.new(1, v23, 0, 20),
+				colorStyle = v21.Theme.TextEmphasis,
+				fontStyle = v21.Font.Header2,
+				text = v19.contactName,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Bottom,
+				textTruncate = Enum.TextTruncate.AtEnd
+			}),
+			sendInviteButton = if v19.hasSentRequest then Roact.createElement(Button, {
+				buttonType = ButtonType.Secondary,
+				position = UDim2.new(1, -1, 0.5, 0),
+				anchorPoint = Vector2.new(1, 0.5),
+				standardSize = StandardButtonSize.XSmall,
+				isDisabled = true,
+				text = v20.invite,
+				onActivated = Dash.noop,
+				[React.Change.AbsoluteSize] = function(p1) -- line: 122
+					-- upvalues: getFFlagContactsListEntryUpdatedTruncationFix (copy), v24 (copy)
+					if getFFlagContactsListEntryUpdatedTruncationFix() then
+						v24(0 - (p1.AbsoluteSize.X + 10))
+					end
+				end
+			}) else Roact.createElement(Button, {
+				buttonType = ButtonType.PrimarySystem,
+				position = UDim2.new(1, -1, 0.5, 0),
+				anchorPoint = Vector2.new(1, 0.5),
+				standardSize = StandardButtonSize.XSmall,
+				fitContent = true,
+				text = v20.invite,
+				isDisabled = v22.isLoading,
+				onActivated = v22.sendInvite,
+				[React.Change.AbsoluteSize] = function(p2) -- line: 108
+					-- upvalues: getFFlagContactsListEntryUpdatedTruncationFix (copy), v24 (copy)
+					if getFFlagContactsListEntryUpdatedTruncationFix() then
+						v24(0 - (p2.AbsoluteSize.X + 10))
+					end
+				end
+			})
+		}),
+		divider = if not v19.hasDivider then nil else Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0, 1),
+			Position = UDim2.new(0, 0, 1, 0),
+			BackgroundColor3 = v21.Theme.Divider.Color,
+			BackgroundTransparency = v21.Theme.Divider.Transparency
+		})
+	})
+end
+
+return ContactsListInviteEntry

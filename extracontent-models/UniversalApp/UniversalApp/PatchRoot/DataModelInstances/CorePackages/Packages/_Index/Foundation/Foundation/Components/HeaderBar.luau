@@ -1,3 +1,4 @@
+local Actions = require(script.Actions)
 local Content = require(script.Content)
 local Leading = require(script.Leading)
 local HeaderBar = require(script.HeaderBar)
@@ -7,5 +8,6 @@ return {
 	Root = HeaderBar,
 	Leading = Leading,
 	Trailing = Trailing,
-	Content = Content
+	Content = Content,
+	Actions = Actions
 }

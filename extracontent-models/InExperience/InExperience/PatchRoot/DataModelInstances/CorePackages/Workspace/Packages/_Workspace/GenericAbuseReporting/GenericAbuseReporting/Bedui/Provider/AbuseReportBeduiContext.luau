@@ -1,9 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_AbuseReportBeduiContextStatus_0 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes).AbuseReportBeduiContextStatus;
-return v2.createContext({
-    status = l_AbuseReportBeduiContextStatus_0.Loading, 
-    beduiData = nil, 
-    error = nil
-});
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+local AbuseReportBeduiContextStatus = require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes).AbuseReportBeduiContextStatus
+
+return React.createContext({
+	beduiData = nil,
+	error = nil,
+	status = AbuseReportBeduiContextStatus.Loading
+})

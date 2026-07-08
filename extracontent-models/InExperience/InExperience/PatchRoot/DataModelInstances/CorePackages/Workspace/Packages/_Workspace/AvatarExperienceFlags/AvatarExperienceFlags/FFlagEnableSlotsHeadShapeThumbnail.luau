@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("EnableSlotsHeadShapeThumbnail2", false);
+return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("EnableSlotsHeadShapeThumbnail2", false)

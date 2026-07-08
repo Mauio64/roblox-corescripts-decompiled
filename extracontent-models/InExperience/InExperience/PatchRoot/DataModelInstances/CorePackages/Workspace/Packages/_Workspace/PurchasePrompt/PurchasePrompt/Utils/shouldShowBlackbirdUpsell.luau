@@ -15,7 +15,7 @@ local FFlagEnableBlackbirdUpsellImpressionGating = SharedFlags.FFlagEnableBlackb
 local FIntBlackbirdUpsellMinPriceForDiscountInclusive = SharedFlags.FIntBlackbirdUpsellMinPriceForDiscountInclusive
 local FIntBlackbirdUpsellMaxPriceForDiscountInclusive = SharedFlags.FIntBlackbirdUpsellMaxPriceForDiscountInclusive
 
-return function(p1, p2, b1: boolean, p3) --[[ shouldShowBlackbirdUpsell ]] -- line: 26
+local function shouldShowBlackbirdUpsell(p1, p2, b1: boolean, p3) -- line: 26
 	-- upvalues: FFlagBlackbirdUpsellGateTimedOption (copy), FFlagBlackbirdUpsellGateResale (copy), getAppFeaturePolicies (copy), isRequestTypeHiddenFromBlackbirdUpsell (copy), FIntBlackbirdUpsellMaxPriceForDiscountInclusive (copy), FIntBlackbirdUpsellMinPriceForDiscountInclusive (copy), DiscountType (copy), FFlagEnableBlackbirdUpsellImpressionGating (copy), BlackbirdUpsellImpressionTracker (copy)
 	if b1 then
 		return false
@@ -47,9 +47,9 @@ return function(p1, p2, b1: boolean, p3) --[[ shouldShowBlackbirdUpsell ]] -- li
 
 	if p1 then
 		local basePriceInRobux = p1.basePriceInRobux
-		local v21 = FIntBlackbirdUpsellMaxPriceForDiscountInclusive
+		local v22 = FIntBlackbirdUpsellMaxPriceForDiscountInclusive
 
-		if basePriceInRobux <= FIntBlackbirdUpsellMinPriceForDiscountInclusive or v21 ~= 0 and v21 <= basePriceInRobux then
+		if basePriceInRobux <= FIntBlackbirdUpsellMinPriceForDiscountInclusive or v22 ~= 0 and v22 <= basePriceInRobux then
 			return false
 		end
 	end
@@ -58,8 +58,8 @@ return function(p1, p2, b1: boolean, p3) --[[ shouldShowBlackbirdUpsell ]] -- li
 		local discounts = p1.discounts
 
 		if discounts then
-			for _, v24 in discounts do
-				if v24.type == DiscountType.BlackbirdSubscription or v24.type == DiscountType.RobloxPlusSubscription then
+			for _, v25 in discounts do
+				if v25.type == DiscountType.BlackbirdSubscription or v25.type == DiscountType.RobloxPlusSubscription then
 					return false
 				end
 			end
@@ -72,3 +72,5 @@ return function(p1, p2, b1: boolean, p3) --[[ shouldShowBlackbirdUpsell ]] -- li
 
 	return true
 end
+
+return shouldShowBlackbirdUpsell

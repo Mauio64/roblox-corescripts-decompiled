@@ -1,7 +1,7 @@
-return function(v0) --[[ Line: 1 ]]
-    if not v0 then
-        return false;
-    else
-        return (table.find(v0, "WhoCanChatWithMeInApp") or table.find(v0, "WhoCanGroupChatWithMeInApp") or table.find(v0, "WhoCanOneOnOnePartyWithMe") or table.find(v0, "WhoCanGroupPartyWithMe")) ~= nil;
-    end;
-end;
+return function(t1: {[any]: any}?) -- line: 1
+	if not t1 then
+		return false
+	end
+
+	return (table.find(t1, "WhoCanChatWithMeInApp") or (table.find(t1, "WhoCanGroupChatWithMeInApp") or (table.find(t1, "WhoCanOneOnOnePartyWithMe") or table.find(t1, "WhoCanGroupPartyWithMe")))) ~= nil
+end

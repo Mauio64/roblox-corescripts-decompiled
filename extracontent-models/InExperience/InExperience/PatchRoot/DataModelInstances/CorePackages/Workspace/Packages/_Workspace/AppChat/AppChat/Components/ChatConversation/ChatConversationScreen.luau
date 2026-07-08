@@ -1,386 +1,514 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.EnumScreens);
-local v3 = require(l_Parent_0.ArgCheck);
-local v4 = require(l_Parent_0.Roact);
-local v5 = require(l_Parent_0.RoactNavigation);
-local v6 = require(l_Parent_0.Cryo);
-local v7 = require(script.Parent.Utils.readingMessagesIsEnabled);
-local v8 = require(script.Parent.ChatConversationContainer);
-local v9 = require(script.Parent.Logger);
-local l_withChatPlacementContext_0 = require(l_script_FirstAncestor_0.Contexts.ChatPlacementContext).withChatPlacementContext;
-local v11 = require(l_Parent_0.Squads);
-local l_SquadJoinButton_0 = v11.SquadJoinButton;
-local l_SquadButtonSourceEnum_0 = v11.Enums.SquadButtonSourceEnum;
-local l_SquadComponentAccessWrapper_0 = v11.SquadComponentAccessWrapper;
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-local v16 = require(l_script_FirstAncestor_0.Stores.GetTopBarStore);
-local v17 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatTopBarSignalsStore);
-local v18 = require(l_script_FirstAncestor_0.Flags.FFlagDebugAppChatEnableDomLocators);
-local v19 = require(l_script_FirstAncestor_0.Utils.DomLocators);
-local v20 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatTopBarConfigDriven);
-local v21 = v4.PureComponent:extend("ChatConversationScreen");
-v21.defaultProps = {
-    navigation = nil
-};
-v21.navigationOptions = function(v22) --[[ Line: 33 ]]
-    -- upvalues: v20 (copy), l_GetFFlagIsSquadEnabled_0 (copy), v2 (copy), v4 (copy), l_withChatPlacementContext_0 (copy), l_SquadComponentAccessWrapper_0 (copy), l_SquadJoinButton_0 (copy), l_SquadButtonSourceEnum_0 (copy), v18 (copy), v19 (copy)
-    local l_navigation_0 = v22.navigation;
-    if v20() then
-        return {
-            tabBarVisible = false, 
-            lockIconEnabled = true, 
-            absorbInput = false, 
-            backButtonEnabled = not l_navigation_0.getScreenProps("wideMode", false), 
-            isRoot = l_navigation_0.getScreenProps("wideMode", false)
-        };
-    else
-        local v24 = if l_navigation_0.getScreenProps("wideMode", false) then l_navigation_0.getScreenProps("appChatInnerPadding", 12) else l_navigation_0.getScreenProps("appChatOuterPadding", 12);
-        local v25 = nil;
-        if l_GetFFlagIsSquadEnabled_0() then
-            local v26 = l_navigation_0.getParam("conversationId", nil);
-            if v26 then
-                v26 = tostring(v26);
-            else
-                v26 = nil;
-            end;
-            do
-                local l_v26_0 = v26;
-                local function v28() --[[ Line: 54 ]]
-                    -- upvalues: l_navigation_0 (copy), v2 (ref), l_v26_0 (ref)
-                    l_navigation_0.navigate(v2.SquadLobby, {
-                        conversationId = l_v26_0
-                    });
-                end;
-                if l_v26_0 then
-                    v25 = v4.createElement("Frame", {
-                        AutomaticSize = Enum.AutomaticSize.XY, 
-                        BackgroundTransparency = 1
-                    }, {
-                        UIListLayout = v4.createElement("UIListLayout", {
-                            HorizontalAlignment = Enum.HorizontalAlignment.Right
-                        }), 
-                        GroupUpButton = l_withChatPlacementContext_0(function(v29) --[[ Line: 68 ]]
-                            -- upvalues: v4 (ref), l_SquadComponentAccessWrapper_0 (ref), l_v26_0 (ref), l_SquadJoinButton_0 (ref), v28 (copy), l_SquadButtonSourceEnum_0 (ref), v18 (ref), v19 (ref)
-                            return v4.createElement(l_SquadComponentAccessWrapper_0, {
-                                parentChannelId = l_v26_0
-                            }, v4.createElement(l_SquadJoinButton_0, {
-                                conversationId = l_v26_0, 
-                                isFullWidth = false, 
-                                isInCard = false, 
-                                layoutOrder = 0, 
-                                onActivated = v28, 
-                                shouldAnimate = true, 
-                                shouldShowSignifier = true, 
-                                squadButtonSource = l_SquadButtonSourceEnum_0.ChatConversationScreen, 
-                                squadLocation = v29.chatPlacement, 
-                                testId = if v18 then v19.chatConversationTopBarButton("squadJoin") else nil
-                            }));
-                        end)
-                    });
-                end;
-            end;
-        end;
-        return {
-            tabBarVisible = false, 
-            lockIconEnabled = true, 
-            absorbInput = false, 
-            backButtonEnabled = not l_navigation_0.getScreenProps("wideMode", false), 
-            isRoot = l_navigation_0.getScreenProps("wideMode", false), 
-            renderRight = function() --[[ Line: 100 ]] --[[ Name: renderRight ]]
-                -- upvalues: v4 (ref), v25 (ref)
-                return v4.createFragment({
-                    groupUp = v25
-                });
-            end, 
-            leftPaddingOverride = v24, 
-            rightPaddingOverride = l_navigation_0.getScreenProps("appChatOuterPadding", 12)
-        };
-    end;
-end;
-v21.init = function(v30) --[[ Line: 110 ]] --[[ Name: init ]]
-    -- upvalues: v4 (copy), v9 (copy), v2 (copy), v20 (copy), v17 (copy), v16 (copy), v3 (copy), v6 (copy), v7 (copy)
-    v30.toastProps = nil;
-    v30.inputBoxRef = v4.createRef();
-    local l_navigation_1 = v30.props.navigation;
-    local v32 = l_navigation_1.getParam and l_navigation_1.getParam("conversationId", nil);
-    v30.navigateToConversationOverlay = function() --[[ Line: 117 ]]
-        -- upvalues: v9 (ref), v32 (copy), v30 (copy), l_navigation_1 (copy), v2 (ref)
-        v9:info("Navigate To ConversationOverlay: {} from {screen}", v32);
-        local v33 = v30.props.navigation.getParam and v30.props.navigation.getParam("conversationId", nil);
-        l_navigation_1.navigate(v2.ConversationOverlay, {
-            conversationId = v33, 
-            isOverlay = true
-        });
-    end;
-    v30.navigateToChatDetails = function() --[[ Line: 127 ]]
-        -- upvalues: v30 (copy), v9 (ref), l_navigation_1 (copy), v2 (ref)
-        local v34 = v30.props.navigation.getParam and v30.props.navigation.getParam("conversationId", nil);
-        v9:info("Navigate To ChatDetails: {} from {screen}", v34);
-        l_navigation_1.navigate(v2.ChatDetails, {
-            conversationId = v34
-        });
-    end;
-    if v20() or v17 then
-        local v35 = l_navigation_1.getScreenProps("wideMode", false);
-        local v36 = {
-            navigateToChatDetails = v30.navigateToChatDetails, 
-            conversationId = v32
-        };
-        if v20() then
-            v36.backButtonEnabled = not v35;
-            v36.isRoot = v35;
-            v36.leftPaddingOverride = if v35 then l_navigation_1.getScreenProps("appChatInnerPadding", 12) else l_navigation_1.getScreenProps("appChatOuterPadding", 12);
-            v36.rightPaddingOverride = l_navigation_1.getScreenProps("appChatOuterPadding", 12);
-        end;
-        v16(false).setScreenTopBar(v2.ChatConversation, v36);
-    else
-        local v37 = v30.props.navigation.getScreenProps("setScreenTopBar", nil);
-        v3.isNotNil(v37, "setScreenTopBar in screenProps");
-        v37(v2.ChatConversation, {
-            navigateToChatDetails = v30.navigateToChatDetails, 
-            conversationId = v32
-        });
-    end;
-    v30.queueNavigationToToast = function(v38) --[[ Line: 161 ]]
-        -- upvalues: v30 (copy)
-        if v30.props.navigation.isFocused() then
-            v30.navigateToToast(v38);
-            v30.toastProps = nil;
-            return;
-        else
-            v30.toastProps = v38;
-            return;
-        end;
-    end;
-    v30.onDidFocus = function() --[[ Line: 171 ]]
-        -- upvalues: v30 (copy)
-        v30.setInputBarCloseCallback(v30.releaseFocus);
-        if v30.toastProps then
-            v30.navigateToToast(v30.toastProps);
-            v30.toastProps = nil;
-        end;
-    end;
-    v30.releaseFocus = function() --[[ Line: 180 ]]
-        -- upvalues: v30 (copy)
-        if v30.inputBoxRef and v30.inputBoxRef:getValue() then
-            v30.inputBoxRef:getValue():ReleaseFocus();
-        end;
-    end;
-    v30.onWillBlur = function() --[[ Line: 186 ]]
-        -- upvalues: v30 (copy)
-        v30.releaseFocus();
-        v30.setInputBarCloseCallback();
-    end;
-    v30.navigateToToast = function(v39) --[[ Line: 192 ]]
-        -- upvalues: v9 (ref), v30 (copy), v2 (ref), v6 (ref)
-        v9:info("Navigate To Toast from {screen}");
-        v30.props.navigation.navigate(v2.RoactChatToast, v6.Dictionary.union(v39, {
-            isOverlay = true
-        }));
-    end;
-    v30.openViewProfile = function(v40) --[[ Line: 201 ]]
-        -- upvalues: v30 (copy), v2 (ref), v9 (ref)
-        local v41 = v30.props.navigation.getScreenProps("navigateToLuaAppPages", {})[v2.ViewUserProfile];
-        if v41 then
-            v9:info("Navigate To UserProfile from {screen}");
-            v41(v40, {});
-            return;
-        else
-            v9:warning("UserProfile page was not set in navigateToLuaAppPages screenProps");
-            return;
-        end;
-    end;
-    v30.openGameDetailsPage = function(v42, v43) --[[ Line: 213 ]]
-        -- upvalues: v30 (copy), v2 (ref), v9 (ref)
-        local v44 = v30.props.navigation.getScreenProps("navigateToLuaAppPages", {})[v2.GameDetail];
-        if v44 then
-            v9:info("Navigate To GameDetail from " .. tostring(v43));
-            v44(v42, v43);
-            return;
-        else
-            v9:warning("GameDetail page was not set in navigateToLuaAppPages screenProps");
-            return;
-        end;
-    end;
-    v30.navigateToChatConversation = function(v45) --[[ Line: 226 ]]
-        -- upvalues: v9 (ref), v30 (copy), v2 (ref)
-        v9:info("Navigate To Conversation: {} from {screen}", v45);
-        v30.props.navigation.navigate(v2.ChatConversation, {
-            conversationId = v45
-        });
-    end;
-    v30.navigateToScreen = function(v46, v47, v48) --[[ Line: 231 ]]
-        -- upvalues: v9 (ref), v30 (copy), v6 (ref)
-        v9:info("Navigate To Screen: {} from {screen}", v46);
-        local l_navigation_2 = v30.props.navigation;
-        local v50 = l_navigation_2 and l_navigation_2.getParam and l_navigation_2.getParam("conversationId", nil);
-        if v47 then
-            v30.props.navigation.navigate(v46, v6.Dictionary.union({
-                conversationId = v50, 
-                isOverlay = v48
-            }, v47));
-            return;
-        else
-            v30.props.navigation.navigate(v46, {
-                conversationId = v50
-            });
-            return;
-        end;
-    end;
-    v30.navigateBack = function() --[[ Line: 251 ]]
-        -- upvalues: v30 (copy)
-        if v30.props.navigation.isFocused() then
-            v30.props.navigation.goBack();
-        end;
-    end;
-    v30.navigateToChatLanding = function() --[[ Line: 257 ]]
-        -- upvalues: v9 (ref), v30 (copy), v2 (ref)
-        v9:info("Navigate To ChatLanding from {screen}");
-        if v30.props.navigation.getScreenProps("wideMode", false) then
-            v30.props.navigation.navigate(v2.EmptyConversation);
-            return;
-        else
-            v30.props.navigation.navigate(v2.ChatLanding);
-            return;
-        end;
-    end;
-    v30.navigateToSquadLobby = function(v51) --[[ Line: 267 ]]
-        -- upvalues: v9 (ref), v30 (copy), v2 (ref)
-        v9:info("Navigate To SquadLobby from {screen}");
-        v30.props.navigation.navigate(v2.SquadLobby, {
-            conversationId = v51
-        });
-    end;
-    v30.updateConversationTitle = function(v52) --[[ Line: 272 ]]
-        -- upvalues: v20 (ref), v17 (ref), v16 (ref), v2 (ref), v30 (copy), v3 (ref)
-        local v53 = {
-            headerText = if v52 then {
-                raw = v52, 
-                shouldLocalize = false
-            } else {
-                raw = "CommonUI.Features.Label.Chat", 
-                shouldLocalize = true
-            }
-        };
-        if v20() or v17 then
-            v16(false).setScreenTopBar(v2.ChatConversation, v53);
-            return;
-        else
-            local v54 = v30.props.navigation.getScreenProps("setScreenTopBar", nil);
-            v3.isNotNil(v54, "setScreenTopBar in screenProps");
-            v54(v2.ChatConversation, v53);
-            return;
-        end;
-    end;
-    v30.setInputBarCloseCallback = function(v55) --[[ Line: 293 ]]
-        -- upvalues: v17 (ref), v16 (ref), v2 (ref), v30 (copy), v3 (ref)
-        if v17 then
-            v16(false).setScreenTopBar(v2.ChatLanding, {
-                closeInputBar = v55
-            });
-            return;
-        else
-            local v56 = v30.props.navigation.getScreenProps("setScreenTopBar", nil);
-            v3.isNotNil(v56, "setScreenTopBar in screenProps");
-            v56(v2.ChatLanding, {
-                closeInputBar = v55
-            });
-            return;
-        end;
-    end;
-    v30.getReadingMessagesIsEnabled = function() --[[ Line: 303 ]]
-        -- upvalues: v7 (ref), v30 (copy)
-        return v7(v30.props.navigation);
-    end;
-    v30.updatePrivateConversationTopBar = function(v57) --[[ Line: 307 ]]
-        -- upvalues: v20 (ref), v17 (ref), v16 (ref), v2 (ref), v30 (copy), v3 (ref)
-        if v20() or v17 then
-            v16(false).setScreenTopBar(v2.ChatConversation, {
-                isPrivateConversation = v57
-            });
-            return;
-        else
-            local v58 = v30.props.navigation.getScreenProps("setScreenTopBar", nil);
-            v3.isNotNil(v58, "setScreenTopBar in screenProps");
-            v58(v2.ChatConversation, {
-                isPrivateConversation = v57
-            });
-            return;
-        end;
-    end;
-end;
-v21.didUpdate = function(v59, v60) --[[ Line: 319 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v20 (copy), v17 (copy), v16 (copy), v2 (copy), v3 (copy)
-    local v61 = v60.navigation and v60.navigation.getParam and v60.navigation.getParam("conversationId", nil);
-    local v62 = v59.props.navigation and v59.props.navigation.getParam and v59.props.navigation.getParam("conversationId", nil);
-    if v61 ~= v62 then
-        if v20() or v17 then
-            v16(false).setScreenTopBar(v2.ChatConversation, {
-                conversationId = v62
-            });
-            return;
-        else
-            local v63 = v59.props.navigation.getScreenProps("setScreenTopBar", nil);
-            v3.isNotNil(v63, "setScreenTopBar in screenProps");
-            v63(v2.ChatConversation, {
-                conversationId = v62
-            });
-        end;
-    end;
-end;
-v21.render = function(v64) --[[ Line: 341 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), v4 (copy), v5 (copy), v8 (copy)
-    local v65 = v3.isNotNil(v64.props.navigation, "navigation in ChatConversationScreen");
-    local v66 = v4.createElement(v5.NavigationEvents, {
-        onDidFocus = v64.onDidFocus, 
-        onWillBlur = v64.onWillBlur
-    });
-    local v67 = v65.getParam("conversationId", nil);
-    local v68 = v67 and tostring(v67) or nil;
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1
-    }, {
-        container = v4.createElement(v8, {
-            topBarHeight = v65.getScreenProps("topBarHeight", 0), 
-            wideMode = v65.getScreenProps("wideMode", false), 
-            openGameDetailsPage = v64.openGameDetailsPage, 
-            getReadingMessagesIsEnabled = v64.getReadingMessagesIsEnabled, 
-            conversationId = v68, 
-            inputBoxRef = v64.inputBoxRef, 
-            updateConversationTitle = v64.updateConversationTitle, 
-            updatePrivateConversationTopBar = v64.updatePrivateConversationTopBar, 
-            releaseInputBarFocus = v64.releaseFocus, 
-            navigateBack = v64.navigateBack, 
-            navigateToToast = v64.queueNavigationToToast, 
-            openViewProfile = v64.openViewProfile, 
-            navigateToChatConversation = v64.navigateToChatConversation, 
-            navigateToChatLanding = v64.navigateToChatLanding, 
-            navigateToScreen = v64.navigateToScreen, 
-            navigateToSquadLobby = v64.navigateToSquadLobby, 
-            navigateToConversationOverlay = v64.navigateToConversationOverlay, 
-            navigation = v64.props.navigation
-        }), 
-        eventsAdapter = v66
-    });
-end;
-v21.didMount = function(v69) --[[ Line: 381 ]] --[[ Name: didMount ]]
-    -- upvalues: v9 (copy), v20 (copy), v16 (copy), v2 (copy)
-    v9:info("{screen} mounted");
-    if v20() then
-        local l_navigation_3 = v69.props.navigation;
-        local v71 = l_navigation_3.getScreenProps("wideMode", false);
-        v16(false).setScreenTopBar(v2.ChatConversation, {
-            leftPaddingOverride = if v71 then l_navigation_3.getScreenProps("appChatInnerPadding", 12) else l_navigation_3.getScreenProps("appChatOuterPadding", 12), 
-            rightPaddingOverride = l_navigation_3.getScreenProps("appChatOuterPadding", 12)
-        });
-    end;
-end;
-v21.willUnmount = function(_) --[[ Line: 395 ]] --[[ Name: willUnmount ]]
-    -- upvalues: v20 (copy), v16 (copy), v2 (copy)
-    if v20() then
-        v16(false).clearScreenTopBar(v2.ChatConversation);
-    end;
-end;
-return v21;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local EnumScreens = require(AppChat.EnumScreens)
+local ArgCheck = require(AppChatParent.ArgCheck)
+local Roact = require(AppChatParent.Roact)
+local RoactNavigation = require(AppChatParent.RoactNavigation)
+local Cryo = require(AppChatParent.Cryo)
+local readingMessagesIsEnabled = require(script.Parent.Utils.readingMessagesIsEnabled)
+local ChatConversationContainer = require(script.Parent.ChatConversationContainer)
+local Logger = require(script.Parent.Logger)
+local withChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext).withChatPlacementContext
+local SquadJoinButton = require(AppChatParent.Squads.SquadJoinButton)
+local SquadButtonSourceEnum = require(AppChatParent.Squads.Enums).SquadButtonSourceEnum
+local SquadComponentAccessWrapper = require(AppChatParent.Squads.SquadComponentAccessWrapper)
+local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
+local GetTopBarStore = require(AppChat.Stores.GetTopBarStore)
+local FFlagAppChatTopBarSignalsStore = require(AppChat.Flags.FFlagAppChatTopBarSignalsStore)
+local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
+local DomLocators = require(AppChat.Utils.DomLocators)
+local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
+local FFlagAppChatFixBackButtonOnRotation = require(AppChat.Flags.FFlagAppChatFixBackButtonOnRotation)
+local canPopParentStack = require(AppChat.Utils.canPopParentStack)
+
+local function getBackButtonConfig(p1) -- line: 37
+	-- upvalues: FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy)
+	local v26 = p1.getScreenProps("wideMode", false)
+
+	if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(p1) then
+		return true, false
+	end
+
+	return not v26, v26
+end
+
+local v24 = Roact.PureComponent:extend("ChatConversationScreen")
+
+v24.defaultProps = {
+	navigation = nil
+}
+
+function v24.navigationOptions(p2) -- line: 49
+	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), GetFFlagIsSquadEnabled (copy), EnumScreens (copy), Roact (copy), withChatPlacementContext (copy), SquadComponentAccessWrapper (copy), SquadJoinButton (copy), SquadButtonSourceEnum (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
+	local navigation = p2.navigation
+
+	if FFlagAppChatTopBarConfigDriven() then
+		local v29 = navigation.getScreenProps("wideMode", false)
+		local v30
+
+		if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(navigation) then
+			v30 = true
+			v29 = false
+		else
+			v30 = not v29
+		end
+
+		return {
+			tabBarVisible = false,
+			lockIconEnabled = true,
+			absorbInput = false,
+			backButtonEnabled = v30,
+			isRoot = v29
+		}
+	end
+
+	local v31 = if not navigation.getScreenProps("wideMode", false) then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
+	local u32 = nil
+
+	if GetFFlagIsSquadEnabled() then
+		local v33 = navigation.getParam("conversationId", nil)
+		local u34 = if not v33 then nil else tostring(v33)
+
+		local function v35() -- line: 71
+			-- upvalues: navigation (copy), EnumScreens (copy), u34 (ref)
+			navigation.navigate(EnumScreens.SquadLobby, {
+				conversationId = u34
+			})
+		end
+
+		if u34 then
+			u32 = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.XY
+			}, {
+				UIListLayout = Roact.createElement("UIListLayout", {
+					HorizontalAlignment = Enum.HorizontalAlignment.Right
+				}),
+				GroupUpButton = withChatPlacementContext(function(p3) -- line: 85
+					-- upvalues: Roact (copy), SquadComponentAccessWrapper (copy), u34 (ref), SquadJoinButton (copy), v35 (copy), SquadButtonSourceEnum (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy)
+					return Roact.createElement(SquadComponentAccessWrapper, {
+						parentChannelId = u34
+					}, Roact.createElement(SquadJoinButton, {
+						isFullWidth = false,
+						isInCard = false,
+						layoutOrder = 0,
+						shouldAnimate = true,
+						shouldShowSignifier = true,
+						conversationId = u34,
+						onActivated = v35,
+						squadButtonSource = SquadButtonSourceEnum.ChatConversationScreen,
+						squadLocation = p3.chatPlacement,
+						testId = if not FFlagDebugAppChatEnableDomLocators then nil else DomLocators.chatConversationTopBarButton("squadJoin")
+					}))
+				end)
+			})
+		end
+	end
+
+	local v36 = navigation.getScreenProps("wideMode", false)
+	local v37
+
+	if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(navigation) then
+		v37 = true
+		v36 = false
+	else
+		v37 = not v36
+	end
+
+	return {
+		tabBarVisible = false,
+		lockIconEnabled = true,
+		absorbInput = false,
+		backButtonEnabled = v37,
+		isRoot = v36,
+		renderRight = function() -- line: 118
+			-- upvalues: Roact (copy), u32 (ref)
+			return Roact.createFragment({
+				groupUp = u32
+			})
+		end,
+		leftPaddingOverride = v31,
+		rightPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12)
+	}
+end
+function v24.init(p4) -- line: 128
+	-- upvalues: Roact (copy), FFlagAppChatTopBarConfigDriven (copy), Logger (copy), EnumScreens (copy), FFlagAppChatTopBarSignalsStore (copy), FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), GetTopBarStore (copy), ArgCheck (copy), Cryo (copy), readingMessagesIsEnabled (copy)
+	p4.toastProps = nil
+	p4.inputBoxRef = Roact.createRef()
+
+	if FFlagAppChatTopBarConfigDriven() then
+		p4.lastHeaderText = nil
+		p4.lastIsPrivateConversation = nil
+	end
+
+	local navigation = p4.props.navigation
+	local v40 = navigation.getParam and navigation.getParam("conversationId", nil)
+
+	function p4.navigateToConversationOverlay() -- line: 142
+		-- upvalues: Logger (copy), v40 (copy), p4 (copy), navigation (copy), EnumScreens (copy)
+		Logger:info("Navigate To ConversationOverlay: {} from {screen}", v40)
+
+		local v61 = p4.props.navigation.getParam and p4.props.navigation.getParam("conversationId", nil)
+
+		navigation.navigate(EnumScreens.ConversationOverlay, {
+			isOverlay = true,
+			conversationId = v61
+		})
+	end
+	function p4.navigateToChatDetails() -- line: 152
+		-- upvalues: p4 (copy), Logger (copy), navigation (copy), EnumScreens (copy)
+		local v62 = p4.props.navigation.getParam and p4.props.navigation.getParam("conversationId", nil)
+
+		Logger:info("Navigate To ChatDetails: {} from {screen}", v62)
+		navigation.navigate(EnumScreens.ChatDetails, {
+			conversationId = v62
+		})
+	end
+
+	if FFlagAppChatTopBarConfigDriven() or FFlagAppChatTopBarSignalsStore then
+		local v41 = navigation.getScreenProps("wideMode", false)
+		local t1 = {
+			navigateToChatDetails = p4.navigateToChatDetails,
+			conversationId = v40
+		}
+
+		if FFlagAppChatTopBarConfigDriven() then
+			local v43 = navigation.getScreenProps("wideMode", false)
+			local v44
+
+			if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(navigation) then
+				v44 = true
+				v43 = false
+			else
+				v44 = not v43
+			end
+
+			t1.backButtonEnabled = v44
+			t1.isRoot = v43
+			t1.leftPaddingOverride = if not v41 then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12)
+			t1.rightPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12)
+		end
+
+		GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, t1)
+	else
+		local v45 = p4.props.navigation.getScreenProps("setScreenTopBar", nil)
+
+		ArgCheck.isNotNil(v45, "setScreenTopBar in screenProps")
+		v45(EnumScreens.ChatConversation, {
+			navigateToChatDetails = p4.navigateToChatDetails,
+			conversationId = v40
+		})
+	end
+
+	function p4.writeScreenTopBar() -- line: 184
+		-- upvalues: p4 (copy), FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), GetTopBarStore (copy), EnumScreens (copy)
+		local v63 = if not p4.props.navigation.getParam then nil else p4.props.navigation.getParam("conversationId", nil)
+		local v64 = p4.props.navigation.getScreenProps("wideMode", false)
+		local navigation2 = p4.props.navigation
+		local v66 = navigation2.getScreenProps("wideMode", false)
+		local v67
+
+		if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(navigation2) then
+			v67 = true
+			v66 = false
+		else
+			v67 = not v66
+		end
+
+		local t2 = {
+			navigateToChatDetails = p4.navigateToChatDetails,
+			conversationId = v63,
+			backButtonEnabled = v67,
+			isRoot = v66,
+			leftPaddingOverride = if not v64 then p4.props.navigation.getScreenProps("appChatOuterPadding", 12) else p4.props.navigation.getScreenProps("appChatInnerPadding", 12),
+			rightPaddingOverride = p4.props.navigation.getScreenProps("appChatOuterPadding", 12)
+		}
+
+		if p4.lastHeaderText ~= nil then
+			t2.headerText = p4.lastHeaderText
+		end
+
+		if p4.lastIsPrivateConversation ~= nil then
+			t2.isPrivateConversation = p4.lastIsPrivateConversation
+		end
+
+		GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, t2)
+	end
+	function p4.queueNavigationToToast(p5) -- line: 212
+		-- upvalues: p4 (copy)
+		if p4.props.navigation.isFocused() then
+			p4.navigateToToast(p5)
+			p4.toastProps = nil
+
+			return
+		end
+
+		p4.toastProps = p5
+	end
+	function p4.onDidFocus() -- line: 222
+		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p4 (copy)
+		if FFlagAppChatTopBarConfigDriven() then
+			p4.writeScreenTopBar()
+		end
+
+		p4.setInputBarCloseCallback(p4.releaseFocus)
+
+		if p4.toastProps then
+			p4.navigateToToast(p4.toastProps)
+			p4.toastProps = nil
+		end
+	end
+	function p4.releaseFocus() -- line: 238
+		-- upvalues: p4 (copy)
+		if p4.inputBoxRef and p4.inputBoxRef:getValue() then
+			p4.inputBoxRef:getValue():ReleaseFocus()
+		end
+	end
+	function p4.onWillBlur() -- line: 244
+		-- upvalues: p4 (copy)
+		p4.releaseFocus()
+		p4.setInputBarCloseCallback()
+	end
+	function p4.navigateToToast(p6) -- line: 250
+		-- upvalues: Logger (copy), p4 (copy), EnumScreens (copy), Cryo (copy)
+		Logger:info("Navigate To Toast from {screen}")
+		p4.props.navigation.navigate(EnumScreens.RoactChatToast, Cryo.Dictionary.union(p6, {
+			isOverlay = true
+		}))
+	end
+	function p4.openViewProfile(p7) -- line: 259
+		-- upvalues: p4 (copy), EnumScreens (copy), Logger (copy)
+		local v72 = p4.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.ViewUserProfile]
+
+		if v72 then
+			Logger:info("Navigate To UserProfile from {screen}")
+			v72(p7, {})
+
+			return
+		end
+
+		Logger:warning("UserProfile page was not set in navigateToLuaAppPages screenProps")
+	end
+	function p4.openGameDetailsPage(p8, p9) -- line: 271
+		-- upvalues: p4 (copy), EnumScreens (copy), Logger (copy)
+		local v75 = p4.props.navigation.getScreenProps("navigateToLuaAppPages", {})[EnumScreens.GameDetail]
+
+		if v75 then
+			Logger:info("Navigate To GameDetail from " .. tostring(p9))
+			v75(p8, p9)
+
+			return
+		end
+
+		Logger:warning("GameDetail page was not set in navigateToLuaAppPages screenProps")
+	end
+	function p4.navigateToChatConversation(p10) -- line: 284
+		-- upvalues: Logger (copy), p4 (copy), EnumScreens (copy)
+		Logger:info("Navigate To Conversation: {} from {screen}", p10)
+		p4.props.navigation.navigate(EnumScreens.ChatConversation, {
+			conversationId = p10
+		})
+	end
+	function p4.navigateToScreen(p11, p12, p13) -- line: 289
+		-- upvalues: Logger (copy), p4 (copy), Cryo (copy)
+		Logger:info("Navigate To Screen: {} from {screen}", p11)
+
+		local navigation3 = p4.props.navigation
+		local v81 = navigation3 and (navigation3.getParam and navigation3.getParam("conversationId", nil))
+
+		if p12 then
+			p4.props.navigation.navigate(p11, Cryo.Dictionary.union({
+				conversationId = v81,
+				isOverlay = p13
+			}, p12))
+
+			return
+		end
+
+		p4.props.navigation.navigate(p11, {
+			conversationId = v81
+		})
+	end
+	function p4.navigateBack() -- line: 309
+		-- upvalues: p4 (copy)
+		if p4.props.navigation.isFocused() then
+			p4.props.navigation.goBack()
+		end
+	end
+	function p4.navigateToChatLanding() -- line: 315
+		-- upvalues: Logger (copy), p4 (copy), EnumScreens (copy)
+		Logger:info("Navigate To ChatLanding from {screen}")
+
+		if p4.props.navigation.getScreenProps("wideMode", false) then
+			p4.props.navigation.navigate(EnumScreens.EmptyConversation)
+
+			return
+		end
+
+		p4.props.navigation.navigate(EnumScreens.ChatLanding)
+	end
+	function p4.navigateToSquadLobby(p14) -- line: 325
+		-- upvalues: Logger (copy), p4 (copy), EnumScreens (copy)
+		Logger:info("Navigate To SquadLobby from {screen}")
+		p4.props.navigation.navigate(EnumScreens.SquadLobby, {
+			conversationId = p14
+		})
+	end
+	function p4.updateConversationTitle(p15) -- line: 330
+		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p4 (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), ArgCheck (copy)
+		local v84 = if not p15 then {
+			raw = "CommonUI.Features.Label.Chat",
+			shouldLocalize = true
+		} else {
+			shouldLocalize = false,
+			raw = p15
+		}
+
+		if FFlagAppChatTopBarConfigDriven() then
+			p4.lastHeaderText = v84
+		end
+
+		local t3 = {
+			headerText = v84
+		}
+
+		if FFlagAppChatTopBarConfigDriven() or FFlagAppChatTopBarSignalsStore then
+			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, t3)
+
+			return
+		end
+
+		local v86 = p4.props.navigation.getScreenProps("setScreenTopBar", nil)
+
+		ArgCheck.isNotNil(v86, "setScreenTopBar in screenProps")
+		v86(EnumScreens.ChatConversation, t3)
+	end
+	function p4.setInputBarCloseCallback(p16) -- line: 355
+		-- upvalues: FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), p4 (copy), ArgCheck (copy)
+		if FFlagAppChatTopBarSignalsStore then
+			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatLanding, {
+				closeInputBar = p16
+			})
+
+			return
+		end
+
+		local v88 = p4.props.navigation.getScreenProps("setScreenTopBar", nil)
+
+		ArgCheck.isNotNil(v88, "setScreenTopBar in screenProps")
+		v88(EnumScreens.ChatLanding, {
+			closeInputBar = p16
+		})
+	end
+	function p4.getReadingMessagesIsEnabled() -- line: 365
+		-- upvalues: readingMessagesIsEnabled (copy), p4 (copy)
+		return readingMessagesIsEnabled(p4.props.navigation)
+	end
+	function p4.updatePrivateConversationTopBar(p17) -- line: 369
+		-- upvalues: FFlagAppChatTopBarConfigDriven (copy), p4 (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), ArgCheck (copy)
+		if FFlagAppChatTopBarConfigDriven() then
+			p4.lastIsPrivateConversation = p17
+		end
+
+		if FFlagAppChatTopBarConfigDriven() or FFlagAppChatTopBarSignalsStore then
+			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, {
+				isPrivateConversation = p17
+			})
+
+			return
+		end
+
+		local v90 = p4.props.navigation.getScreenProps("setScreenTopBar", nil)
+
+		ArgCheck.isNotNil(v90, "setScreenTopBar in screenProps")
+		v90(EnumScreens.ChatConversation, {
+			isPrivateConversation = p17
+		})
+	end
+end
+function v24.didUpdate(p18, p19) -- line: 384
+	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatTopBarSignalsStore (copy), GetTopBarStore (copy), EnumScreens (copy), ArgCheck (copy)
+	local v48 = p19.navigation and (p19.navigation.getParam and p19.navigation.getParam("conversationId", nil))
+	local v49 = p18.props.navigation and (p18.props.navigation.getParam and p18.props.navigation.getParam("conversationId", nil))
+
+	if v48 ~= v49 then
+		if FFlagAppChatTopBarConfigDriven() then
+			p18.lastHeaderText = nil
+			p18.lastIsPrivateConversation = nil
+		end
+
+		if FFlagAppChatTopBarConfigDriven() or FFlagAppChatTopBarSignalsStore then
+			GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, {
+				conversationId = v49
+			})
+
+			return
+		end
+
+		local v50 = p18.props.navigation.getScreenProps("setScreenTopBar", nil)
+
+		ArgCheck.isNotNil(v50, "setScreenTopBar in screenProps")
+		v50(EnumScreens.ChatConversation, {
+			conversationId = v49
+		})
+	end
+end
+function v24.render(p20) -- line: 412
+	-- upvalues: ArgCheck (copy), Roact (copy), RoactNavigation (copy), ChatConversationContainer (copy)
+	local v52 = ArgCheck.isNotNil(p20.props.navigation, "navigation in ChatConversationScreen")
+	local v53 = Roact.createElement(RoactNavigation.NavigationEvents, {
+		onDidFocus = p20.onDidFocus,
+		onWillBlur = p20.onWillBlur
+	})
+	local v54 = v52.getParam("conversationId", nil)
+	local v55 = v54 and tostring(v54) or nil
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		container = Roact.createElement(ChatConversationContainer, {
+			topBarHeight = v52.getScreenProps("topBarHeight", 0),
+			wideMode = v52.getScreenProps("wideMode", false),
+			openGameDetailsPage = p20.openGameDetailsPage,
+			getReadingMessagesIsEnabled = p20.getReadingMessagesIsEnabled,
+			conversationId = v55,
+			inputBoxRef = p20.inputBoxRef,
+			updateConversationTitle = p20.updateConversationTitle,
+			updatePrivateConversationTopBar = p20.updatePrivateConversationTopBar,
+			releaseInputBarFocus = p20.releaseFocus,
+			navigateBack = p20.navigateBack,
+			navigateToToast = p20.queueNavigationToToast,
+			openViewProfile = p20.openViewProfile,
+			navigateToChatConversation = p20.navigateToChatConversation,
+			navigateToChatLanding = p20.navigateToChatLanding,
+			navigateToScreen = p20.navigateToScreen,
+			navigateToSquadLobby = p20.navigateToSquadLobby,
+			navigateToConversationOverlay = p20.navigateToConversationOverlay,
+			navigation = p20.props.navigation
+		}),
+		eventsAdapter = v53
+	})
+end
+function v24.didMount(p21) -- line: 452
+	-- upvalues: Logger (copy), FFlagAppChatTopBarConfigDriven (copy), GetTopBarStore (copy), EnumScreens (copy)
+	Logger:info("{screen} mounted")
+
+	if FFlagAppChatTopBarConfigDriven() then
+		local navigation = p21.props.navigation
+		local v58 = navigation.getScreenProps("wideMode", false)
+
+		GetTopBarStore(false).setScreenTopBar(EnumScreens.ChatConversation, {
+			leftPaddingOverride = if not v58 then navigation.getScreenProps("appChatOuterPadding", 12) else navigation.getScreenProps("appChatInnerPadding", 12),
+			rightPaddingOverride = navigation.getScreenProps("appChatOuterPadding", 12)
+		})
+	end
+end
+function v24.willUnmount(_) -- line: 466
+	-- upvalues: FFlagAppChatTopBarConfigDriven (copy), GetTopBarStore (copy), EnumScreens (copy)
+	if FFlagAppChatTopBarConfigDriven() then
+		GetTopBarStore(false).clearScreenTopBar(EnumScreens.ChatConversation)
+	end
+end
+
+return v24

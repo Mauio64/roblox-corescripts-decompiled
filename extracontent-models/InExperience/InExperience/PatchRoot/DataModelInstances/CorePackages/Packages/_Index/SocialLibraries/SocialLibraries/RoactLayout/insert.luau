@@ -1,6 +1,8 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: insert ]]
-    return {
-        size = v0, 
-        element = v1
-    };
-end;
+local function insert(p1, p2) -- line: 1
+	return {
+		size = p1,
+		element = p2
+	}
+end
+
+return insert

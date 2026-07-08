@@ -1,91 +1,100 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameCollections");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_GameTileConstants_0 = require(l_Parent_0.GameTile).GameTileConstants;
-local v4 = require(l_Parent_0.Responsive);
-local l_usePreferredInput_0 = v4.usePreferredInput;
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local v7 = require(l_Parent_0.CollectionViews);
-local l_CollectionGrid_0 = v7.CollectionGrid;
-local l_useCollectionLayout_0 = v7.useCollectionLayout;
-local v10 = require(l_script_FirstAncestor_0.useGetGameTileHeight);
-local v11 = require(l_script_FirstAncestor_0.useGameCollectionLayoutParams);
-local l_getGameTileCollectionItemSize_0 = require(l_Parent_0.GameTile).getGameTileCollectionItemSize;
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local l_FFlagLuaAppCompositionAlways_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionAlways;
-local v15 = {};
-local function v20(_, _, _, _) --[[ Line: 41 ]] --[[ Name: renderItem ]]
-    return nil, "placeholder";
-end;
-return v2.memo(function(v21) --[[ Line: 48 ]] --[[ Name: PlaceholderGameGrid ]]
-    -- upvalues: l_useAppPolicy_0 (copy), l_usePreferredInput_0 (copy), v4 (copy), l_FFlagLuaAppCompositionAlways_0 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), l_getGameTileCollectionItemSize_0 (copy), v2 (copy), v11 (copy), l_useCollectionLayout_0 (copy), l_GameTileConstants_0 (copy), v10 (copy), v15 (copy), l_CollectionGrid_0 (copy), v20 (copy)
-    local v23 = l_useAppPolicy_0(function(v22) --[[ Line: 50 ]]
-        return v22.useGridPageLayout();
-    end);
-    local v24 = l_usePreferredInput_0();
-    local v25 = v21.isHoverSupportEnabled and v23 and v24 == v4.Input.Pointer;
-    local v26 = v21.gameTileLayoutType or "Narrow";
-    local v27 = l_FFlagLuaAppCompositionAlways_0 or l_FFlagLuaAppCompositionSupport_0 and v21.appCompositionEnabled;
-    local v28 = if v27 then l_getGameTileCollectionItemSize_0(v26) else nil;
-    local v29, v30 = v2.useState(nil);
-    v2.useRef(v29).current = v29;
-    local v31 = if v23 then nil else {
-        sideMargin = v21.sideMargin
-    };
-    local v32 = v11(v26, v29, false, v31);
-    local v33 = nil;
-    if l_FFlagLuaAppCompositionSupport_0 then
-        v33 = l_useCollectionLayout_0(v28).itemsPerRow;
-    end;
-    local v34 = if v27 then v33 else v32.numColumns;
-    local v35 = v21.shouldHideTileTitle or false;
-    local v36 = v21.shouldHideTileMetadata or false;
-    local v37 = v21.containedTile or false;
-    local v38 = l_GameTileConstants_0.TileTextLines[v26] and l_GameTileConstants_0.TileTextLines[v26].titleTextLines;
-    local v39 = v10(v25, v26, v37, v36, v35, nil, nil, v38);
-    if not l_FFlagLuaAppCompositionAlways_0 then
-        local v40 = v2.useRef(0);
-        local l_v40_0 = v40 --[[ copy: 19 -> 21 ]];
-        v2.useEffect(function() --[[ Line: 105 ]]
-            -- upvalues: v27 (copy), v32 (copy), l_v40_0 (copy), v21 (copy)
-            if not v27 and v32.numColumns ~= l_v40_0.current then
-                l_v40_0.current = v32.numColumns;
-                if v21.onItemsPerRowChanged then
-                    v21.onItemsPerRowChanged(v32.numColumns);
-                end;
-            end;
-        end, {
-            v32.numColumns, 
-            v21.onItemsPerRowChanged, 
-            v40, 
-            if l_FFlagLuaAppCompositionSupport_0 then v27 else nil
-        });
-    end;
-    local v42 = math.clamp(v21.numRows, 0, 4);
-    local v45 = v2.useMemo(function() --[[ Line: 128 ]]
-        -- upvalues: v34 (copy), v42 (copy), v15 (ref)
-        local v43 = {};
-        for _ = 1, v34 * v42 do
-            table.insert(v43, v15);
-        end;
-        return v43;
-    end, {
-        if l_FFlagLuaAppCompositionSupport_0 then v34 else v32.numColumns, 
-        v42
-    });
-    return v2.createElement(v2.Fragment, nil, {
-        GameGrid = v2.createElement(l_CollectionGrid_0, {
-            collectionItemSize = if v27 then v28 else nil, 
-            title = if v42 > 0 then v21.title else nil, 
-            containerRef = v30, 
-            verticalScrollingFrameRef = v21.verticalScrollingFrameRef, 
-            hideHeaderButton = true, 
-            items = v45, 
-            renderItem = v20, 
-            getItemHeight = v39, 
-            numColumns = if v27 then nil else v32.numColumns, 
-            columnGap = if v27 then nil else v32.columnGap, 
-            sideMargin = if v27 then nil else v32.sideMargin
-        })
-    });
-end);
+local GameCollections = script:FindFirstAncestor("GameCollections")
+local GameCollectionsParent = GameCollections.Parent
+local React = require(GameCollectionsParent.React)
+local GameTileConstants = require(GameCollectionsParent.GameTile).GameTileConstants
+local Responsive = require(GameCollectionsParent.Responsive)
+local usePreferredInput = Responsive.usePreferredInput
+local useAppPolicy = require(GameCollectionsParent.UniversalAppPolicy).useAppPolicy
+local CollectionViews = require(GameCollectionsParent.CollectionViews)
+local CollectionGrid = CollectionViews.CollectionGrid
+local useCollectionLayout = CollectionViews.useCollectionLayout
+local useGetGameTileHeight = require(GameCollections.useGetGameTileHeight)
+local useGameCollectionLayoutParams = require(GameCollections.useGameCollectionLayoutParams)
+local getGameTileCollectionItemSize = require(GameCollectionsParent.GameTile).getGameTileCollectionItemSize
+local FFlagLuaAppCompositionAlways = require(GameCollectionsParent.SharedFlags).FFlagLuaAppCompositionAlways
+local FFlagLuaAppSearchPlaceholderGrid = require(GameCollectionsParent.SharedFlags).FFlagLuaAppSearchPlaceholderGrid
+local t1 = {}
+
+local function renderItem(_, _, _, _) -- line: 42
+	return nil, "placeholder"
+end
+local function PlaceholderGameGrid(t2: {[any]: any}) -- line: 49
+	-- upvalues: useAppPolicy (copy), usePreferredInput (copy), Responsive (copy), FFlagLuaAppCompositionAlways (copy), getGameTileCollectionItemSize (copy), React (copy), useGameCollectionLayoutParams (copy), useCollectionLayout (copy), GameTileConstants (copy), useGetGameTileHeight (copy), t1 (copy), CollectionGrid (copy), FFlagLuaAppSearchPlaceholderGrid (copy), renderItem (copy)
+	local v24 = useAppPolicy(function(p5) -- line: 51
+		return p5.useGridPageLayout()
+	end)
+	local v25 = usePreferredInput()
+	local v26 = t2.isHoverSupportEnabled and (v24 and v25 == Responsive.Input.Pointer)
+	local v27 = t2.gameTileLayoutType or "Narrow"
+	local v28 = FFlagLuaAppCompositionAlways or t2.appCompositionEnabled
+	local v29 = if not v28 then nil else getGameTileCollectionItemSize(v27)
+	local v30, v31 = React.useState(nil)
+
+	React.useRef(v30).current = v30
+
+	local v32 = if not v24 then {
+		sideMargin = t2.sideMargin
+	} else nil
+	local v33 = useGameCollectionLayoutParams(v27, v30, false, v32)
+	local itemsPerRow = useCollectionLayout(v29).itemsPerRow
+	local v35 = if not v28 then v33.numColumns else itemsPerRow
+	local v36 = t2.shouldHideTileTitle or false
+	local v37 = t2.shouldHideTileMetadata or false
+	local v38 = t2.containedTile or false
+	local v39 = GameTileConstants.TileTextLines[v27] and GameTileConstants.TileTextLines[v27].titleTextLines
+	local v40 = useGetGameTileHeight(v26, v27, v38, v37, v36, nil, nil, v39)
+
+	if not FFlagLuaAppCompositionAlways then
+		local v41 = React.useRef(0)
+
+		React.useEffect(function() -- line: 102
+			-- upvalues: v28 (copy), v33 (copy), v41 (copy), t2 (copy)
+			if not v28 and v33.numColumns ~= v41.current then
+				v41.current = v33.numColumns
+
+				if t2.onItemsPerRowChanged then
+					t2.onItemsPerRowChanged(v33.numColumns)
+				end
+			end
+		end, {
+			v33.numColumns,
+			t2.onItemsPerRowChanged,
+			v41,
+			v28
+		})
+	end
+
+	local v42 = math.clamp(t2.numRows, 0, 4)
+	local v43 = React.useMemo(function() -- line: 125
+		-- upvalues: v35 (copy), v42 (copy), t1 (copy)
+		local t3 = {}
+
+		for _ = 1, v35 * v42 do
+			table.insert(t3, t1)
+		end
+
+		return t3
+	end, {
+		v35,
+		v42
+	})
+
+	return React.createElement(React.Fragment, nil, {
+		GameGrid = React.createElement(CollectionGrid, {
+			hideHeaderButton = true,
+			collectionItemSize = if not v28 then nil else v29,
+			title = if not (v42 > 0) then nil else t2.title,
+			headerComponent = if not FFlagLuaAppSearchPlaceholderGrid then nil else t2.headerComponent,
+			containerRef = v31,
+			verticalScrollingFrameRef = t2.verticalScrollingFrameRef,
+			items = v43,
+			renderItem = renderItem,
+			getItemHeight = v40,
+			numColumns = if not v28 then v33.numColumns else nil,
+			columnGap = if not v28 then v33.columnGap else nil,
+			sideMargin = if not v28 then v33.sideMargin else nil
+		})
+	})
+end
+
+return React.memo(PlaceholderGameGrid)

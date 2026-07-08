@@ -1,16 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_Text_0 = require(l_Parent_0.Foundation).Text;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function(_) --[[ Line: 13 ]] --[[ Name: CommunityLocked ]]
-    -- upvalues: l_useLocalization_0 (copy), v3 (copy), v2 (copy), l_Text_0 (copy)
-    local v7 = l_useLocalization_0({
-        groupLocked = v3.GroupLocked
-    });
-    return v2.createElement(l_Text_0, {
-        Text = v7.groupLocked, 
-        tag = "padding-top-xlarge"
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local Text = require(ProfilePlatformParent.Foundation).Text
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+
+local function CommunityLocked(_: {[any]: any}) -- line: 13
+	-- upvalues: useLocalization (copy), TextKeys (copy), React (copy), Text (copy)
+	local v9 = useLocalization({
+		groupLocked = TextKeys.GroupLocked
+	})
+
+	return React.createElement(Text, {
+		tag = "padding-top-xlarge",
+		Text = v9.groupLocked
+	})
+end
+
+return CommunityLocked

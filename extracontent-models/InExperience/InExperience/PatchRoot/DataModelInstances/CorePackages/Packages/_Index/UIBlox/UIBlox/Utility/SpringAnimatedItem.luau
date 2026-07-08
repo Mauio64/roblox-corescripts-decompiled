@@ -1,111 +1,126 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Otter);
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.t);
-local v6 = v4.intersection(v4.strictInterface({
-    animatedValues = v4.table, 
-    mapValuesToProps = v4.callback, 
-    springOptions = v4.optional(v4.table), 
-    onComplete = v4.optional(v4.callback), 
-    regularProps = v4.table, 
-    [v2.Children] = v4.optional(v4.table)
-}), function(v5) --[[ Line: 53 ]]
-    -- upvalues: v2 (copy)
-    if v5[v2.Children] ~= nil and v5.regularProps[v2.Children] ~= nil then
-        return false, "Children must be specified in one place, but the [Roact.Children] key was found in both props and props.regularProps on SpringAnimatedItem.";
-    else
-        return true;
-    end;
-end);
-local v31 = {
-    wrap = function(v7) --[[ Line: 66 ]] --[[ Name: wrap ]]
-        -- upvalues: v2 (copy), v1 (copy), v6 (copy), v3 (copy)
-        local v8 = v2.PureComponent:extend(string.format("SpringAnimatedItem(%s)", (tostring(v7))));
-        v8.defaultProps = {
-            regularProps = {}
-        };
-        v8.init = function(v9) --[[ Line: 73 ]] --[[ Name: init ]]
-            -- upvalues: v2 (ref)
-            v9.ref = v9.props.regularProps[v2.Ref] or v2.createRef();
-            v9.applyAnimatedValues = function(v10) --[[ Line: 76 ]]
-                -- upvalues: v9 (copy)
-                local l_current_0 = v9.ref.current;
-                if l_current_0 == nil then
-                    return;
-                else
-                    local v12 = v9.props.mapValuesToProps(v10);
-                    for v13, v14 in pairs(v12) do
-                        l_current_0[v13] = v14;
-                    end;
-                    return;
-                end;
-            end;
-            v9.onComplete = function() --[[ Line: 90 ]]
-                -- upvalues: v9 (copy)
-                if v9.props.onComplete then
-                    v9.props.onComplete();
-                end;
-            end;
-            v9.motor = nil;
-        end;
-        v8.didMount = function(v15) --[[ Line: 99 ]] --[[ Name: didMount ]]
-            -- upvalues: v1 (ref)
-            local l_animatedValues_0 = v15.props.animatedValues;
-            v15.applyAnimatedValues(l_animatedValues_0);
-            v15.motor = v1.createGroupMotor(l_animatedValues_0);
-            v15.motor:onStep(function(v17) --[[ Line: 107 ]]
-                -- upvalues: v15 (copy)
-                v15.applyAnimatedValues(v17);
-            end);
-            v15.motor:onComplete(v15.onComplete);
-            v15.motor:start();
-        end;
-        v8.willUpdate = function(v18, v19) --[[ Line: 114 ]] --[[ Name: willUpdate ]]
-            -- upvalues: v2 (ref)
-            if v18.props.regularProps[v2.Ref] ~= v19.regularProps[v2.Ref] and v19.regularProps[v2.Ref] ~= nil then
-                v18.ref = v19.regularProps[v2.Ref];
-            end;
-        end;
-        v8.render = function(v20) --[[ Line: 123 ]] --[[ Name: render ]]
-            -- upvalues: v6 (ref), v3 (ref), v2 (ref), v7 (copy)
-            assert(v6(v20.props));
-            local l_regularProps_0 = v20.props.regularProps;
-            local v22 = v3.Dictionary.join(l_regularProps_0, {
-                [v2.Ref] = v20.ref, 
-                [v2.Children] = v20.props[v2.Children]
-            });
-            return v2.createElement(v7, v22);
-        end;
-        v8.didUpdate = function(v23, v24) --[[ Line: 135 ]] --[[ Name: didUpdate ]]
-            -- upvalues: v1 (ref)
-            if v23.props.animatedValues ~= v24.animatedValues then
-                local v25 = {};
-                local v26 = false;
-                for v27, v28 in pairs(v23.props.animatedValues) do
-                    local l_springOptions_0 = v23.props.springOptions;
-                    v25[v27] = v1.spring(v28, l_springOptions_0);
-                    if v28 ~= v24.animatedValues[v27] then
-                        v26 = true;
-                    end;
-                end;
-                if v26 then
-                    v23.motor:setGoal(v25);
-                end;
-            end;
-        end;
-        v8.willUnmount = function(v30) --[[ Line: 153 ]] --[[ Name: willUnmount ]]
-            if v30.motor then
-                v30.motor:destroy();
-                v30.motor = nil;
-            end;
-        end;
-        return v8;
-    end
-};
-v31.AnimatedFrame = v31.wrap("Frame");
-v31.AnimatedScrollingFrame = v31.wrap("ScrollingFrame");
-v31.AnimatedImageLabel = v31.wrap("ImageLabel");
-v31.AnimatedTextButton = v31.wrap("TextButton");
-v31.AnimatedUIScale = v31.wrap("UIScale");
-return v31;
+local ParentParent = script.Parent.Parent.Parent
+local Otter = require(ParentParent.Otter)
+local Roact = require(ParentParent.Roact)
+local Cryo = require(ParentParent.Cryo)
+local t = require(ParentParent.t)
+local v6 = t.intersection(t.strictInterface({
+	animatedValues = t.table,
+	mapValuesToProps = t.callback,
+	springOptions = t.optional(t.table),
+	onComplete = t.optional(t.callback),
+	regularProps = t.table,
+	[Roact.Children] = t.optional(t.table)
+}), function(p1) -- line: 53
+	-- upvalues: Roact (copy)
+	if p1[Roact.Children] ~= nil and p1.regularProps[Roact.Children] ~= nil then
+		return false, "Children must be specified in one place, but the [Roact.Children] key was found in both props and props.regularProps on SpringAnimatedItem."
+	end
+
+	return true
+end)
+local t2 = {
+	wrap = function(p2) -- line: 66
+		-- upvalues: Roact (copy), Otter (copy), v6 (copy), Cryo (copy)
+		local v10 = Roact.PureComponent:extend(string.format("SpringAnimatedItem(%s)", (tostring(p2))))
+
+		v10.defaultProps = {
+			regularProps = {}
+		}
+
+		function v10.init(p3) -- line: 73
+			-- upvalues: Roact (copy)
+			p3.ref = p3.props.regularProps[Roact.Ref] or Roact.createRef()
+
+			function p3.applyAnimatedValues(p4) -- line: 76
+				-- upvalues: p3 (copy)
+				local current = p3.ref.current
+
+				if current == nil then
+					return
+				end
+
+				local v29 = p3.props.mapValuesToProps(p4)
+
+				for k, v in pairs(v29) do
+					current[k] = v
+				end
+			end
+			function p3.onComplete() -- line: 90
+				-- upvalues: p3 (copy)
+				if p3.props.onComplete then
+					p3.props.onComplete()
+				end
+			end
+
+			p3.motor = nil
+		end
+		function v10.didMount(p5) -- line: 99
+			-- upvalues: Otter (copy)
+			local animatedValues = p5.props.animatedValues
+
+			p5.applyAnimatedValues(animatedValues)
+			p5.motor = Otter.createGroupMotor(animatedValues)
+			p5.motor:onStep(function(p6) -- line: 107
+				-- upvalues: p5 (copy)
+				p5.applyAnimatedValues(p6)
+			end)
+			p5.motor:onComplete(p5.onComplete)
+			p5.motor:start()
+		end
+		function v10.willUpdate(p7, p8) -- line: 114
+			-- upvalues: Roact (copy)
+			if p7.props.regularProps[Roact.Ref] ~= p8.regularProps[Roact.Ref] and p8.regularProps[Roact.Ref] ~= nil then
+				p7.ref = p8.regularProps[Roact.Ref]
+			end
+		end
+		function v10.render(p9) -- line: 123
+			-- upvalues: v6 (copy), Cryo (copy), Roact (copy), p2 (copy)
+			assert(v6(p9.props))
+
+			local regularProps = p9.props.regularProps
+			local v18 = Cryo.Dictionary.join(regularProps, {
+				[Roact.Ref] = p9.ref,
+				[Roact.Children] = p9.props[Roact.Children]
+			})
+
+			return Roact.createElement(p2, v18)
+		end
+		function v10.didUpdate(p10, p11) -- line: 135
+			-- upvalues: Otter (copy)
+			if p10.props.animatedValues ~= p11.animatedValues then
+				local t1 = {}
+				local v22 = false
+
+				for k, v in pairs(p10.props.animatedValues) do
+					local springOptions = p10.props.springOptions
+
+					t1[k] = Otter.spring(v, springOptions)
+
+					if v ~= p11.animatedValues[k] then
+						v22 = true
+					end
+				end
+
+				if v22 then
+					p10.motor:setGoal(t1)
+				end
+			end
+		end
+		function v10.willUnmount(p12) -- line: 153
+			if p12.motor then
+				p12.motor:destroy()
+				p12.motor = nil
+			end
+		end
+
+		return v10
+	end
+}
+
+t2.AnimatedFrame = t2.wrap("Frame")
+t2.AnimatedScrollingFrame = t2.wrap("ScrollingFrame")
+t2.AnimatedImageLabel = t2.wrap("ImageLabel")
+t2.AnimatedTextButton = t2.wrap("TextButton")
+t2.AnimatedUIScale = t2.wrap("UIScale")
+
+return t2

@@ -1,46 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v5 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local v6 = require(l_RobloxGui_0.Modules.Captures.CapturesApp);
-local l_CapturesPolicy_0 = require(l_CorePackages_0.Workspace.Packages.CapturesInExperience).CapturesPolicy;
-local v8 = require(l_script_FirstAncestor_0.Service);
-local v9 = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils);
-local v10 = require(l_script_FirstAncestor_0.Integrations.CommonIcon);
-local l_MappedSignal_0 = v9.MappedSignal;
-local l_FFlagEnableConsoleExpControls_0 = v5.FFlagEnableConsoleExpControls;
-local l_Available_0 = v8.AvailabilitySignal.Available;
-l_Available_0 = if not not l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.All) or l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.Captures) then v8.AvailabilitySignal.Available else v8.AvailabilitySignal.Unavailable;
-local v14 = l_MappedSignal_0.new(v6.onIsActiveChanged, function() --[[ Line: 24 ]]
-    -- upvalues: v6 (copy)
-    return v6.getIsActive();
-end);
-local v17 = v8:register({
-    initialAvailability = l_Available_0, 
-    id = "camera_entrypoint", 
-    label = "Feature.SettingsHub.Label.Captures", 
-    activated = function(_) --[[ Line: 32 ]] --[[ Name: activated ]]
-        -- upvalues: v6 (copy)
-        v6.onToggleActivationFromChrome();
-    end, 
-    isActivated = function() --[[ Line: 35 ]] --[[ Name: isActivated ]]
-        -- upvalues: v14 (copy)
-        return v14:get();
-    end, 
-    components = {
-        Icon = function(_) --[[ Line: 39 ]] --[[ Name: Icon ]]
-            -- upvalues: v10 (copy), v14 (copy)
-            return v10("icons/controls/cameraOff", "icons/controls/cameraOn", v14);
-        end
-    }
-});
-v9.setCoreGuiAvailability(v17, Enum.CoreGuiType.Captures);
-if l_FFlagEnableConsoleExpControls_0 then
-    local v18 = l_CapturesPolicy_0.PolicyImplementation.read();
-    if not if v18 then l_CapturesPolicy_0.Mapper(v18).eligibleForCapturesFeature() else false then
-        v17.availability:forceUnavailable();
-    end;
-end;
-return v17;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local StarterGui = game:GetService("StarterGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local CapturesApp = require(RobloxGui.Modules.Captures.CapturesApp)
+local CapturesPolicy = require(CorePackages.Workspace.Packages.CapturesInExperience).CapturesPolicy
+local Service = require(Chrome.Service)
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local CommonIcon = require(Chrome.Integrations.CommonIcon)
+local MappedSignal = ChromeUtils.MappedSignal
+local FFlagEnableConsoleExpControls = SharedFlags.FFlagEnableConsoleExpControls
+local FFlagChromeActivatedMappedSignal = SharedFlags.FFlagChromeActivatedMappedSignal
+local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local _ = Service.AvailabilitySignal.Available
+local v17 = if not StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.All) and not StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Captures) then Service.AvailabilitySignal.Unavailable else Service.AvailabilitySignal.Available
+local v18 = MappedSignal.new(CapturesApp.onIsActiveChanged, function() -- line: 28
+	-- upvalues: CapturesApp (copy)
+	return CapturesApp.getIsActive()
+end)
+local v19 = Service:register({
+	id = "camera_entrypoint",
+	label = "Feature.SettingsHub.Label.Captures",
+	initialAvailability = v17,
+	sideSheetPlacement = SideSheetPlacement.Vertical,
+	activated = function(_) -- line: 37
+		-- upvalues: CapturesApp (copy)
+		CapturesApp.onToggleActivationFromChrome()
+	end,
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 42
+		-- upvalues: v18 (copy)
+		return v18:get()
+	end or v18,
+	components = {
+		Icon = function(_) -- line: 46
+			-- upvalues: CommonIcon (copy), v18 (copy)
+			return CommonIcon("icons/controls/cameraOff", "icons/controls/cameraOn", v18)
+		end
+	}
+})
+
+ChromeUtils.setCoreGuiAvailability(v19, Enum.CoreGuiType.Captures)
+
+if FFlagEnableConsoleExpControls then
+	local v20 = CapturesPolicy.PolicyImplementation.read()
+
+	if not v20 or not CapturesPolicy.Mapper(v20).eligibleForCapturesFeature() then
+		v19.availability:forceUnavailable()
+	end
+end
+
+return v19

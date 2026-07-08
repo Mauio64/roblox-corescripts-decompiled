@@ -1,6 +1,6 @@
 return {
-    Appearing = "Appearing", 
-    Appeared = "Appeared", 
-    Disappearing = "Disappearing", 
-    Disappeared = "Disappeared"
-};
+	Appearing = "Appearing",
+	Appeared = "Appeared",
+	Disappearing = "Disappearing",
+	Disappeared = "Disappeared"
+}

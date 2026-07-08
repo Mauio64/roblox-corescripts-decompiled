@@ -1,34 +1,43 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.BackgroundGradient);
-local v3 = require(script.Parent.BackgroundImage);
-return function(v4) --[[ Line: 35 ]] --[[ Name: BackgroundLayers ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    local v5 = {};
-    for v6, v7 in v4.backgroundLayers do
-        local v8 = (v4.ZIndex or 0) - (#v4.backgroundLayers - v6);
-        if v7.type == "GradientBackground" then
-            v5[("GradientBackground_%*"):format(v6)] = v1.createElement(v2, {
-                colorSequence = v7.colorSequence, 
-                cornerRadius = v4.cornerRadius, 
-                offset = v7.offset, 
-                rotation = v7.rotation, 
-                transparency = v7.transparency, 
-                ZIndex = v8, 
-                tag = v7.tag
-            });
-        elseif v7.type == "ImageBackground" then
-            v5[("ImageBackground_%*"):format(v6)] = v1.createElement(v3, {
-                anchorPoint = v7.anchorPoint, 
-                color = v7.color, 
-                cornerRadius = v4.cornerRadius, 
-                position = v7.position, 
-                resourceIdentifier = v7.resourceIdentifier, 
-                transparency = v7.transparency, 
-                ZIndex = v8, 
-                tag = v7.tag
-            });
-        end;
-    end;
-    return v1.createElement(v1.Fragment, nil, v5);
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local BackgroundGradient = require(script.Parent.BackgroundGradient)
+local BackgroundImage = require(script.Parent.BackgroundImage)
+local FFlagAXHeroWidget = AvatarExperienceFlags.FFlagAXHeroWidget
+
+local function BackgroundLayers(t1: {[any]: any}) -- line: 40
+	-- upvalues: React (copy), BackgroundGradient (copy), BackgroundImage (copy), FFlagAXHeroWidget (copy)
+	local t2 = {}
+
+	for v10, v11 in t1.backgroundLayers do
+		local v12 = (t1.ZIndex or 0) - (#t1.backgroundLayers - v10)
+
+		if v11.type == "GradientBackground" then
+			t2[`GradientBackground_{ v10 }`] = React.createElement(BackgroundGradient, {
+				colorSequence = v11.colorSequence,
+				cornerRadius = t1.cornerRadius,
+				offset = v11.offset,
+				rotation = v11.rotation,
+				transparency = v11.transparency,
+				ZIndex = v12,
+				tag = v11.tag
+			})
+		elseif v11.type == "ImageBackground" then
+			t2[`ImageBackground_{ v10 }`] = React.createElement(BackgroundImage, {
+				anchorPoint = v11.anchorPoint,
+				color = v11.color,
+				cornerRadius = t1.cornerRadius,
+				position = v11.position,
+				resourceIdentifier = v11.resourceIdentifier,
+				transparency = v11.transparency,
+				ZIndex = v12,
+				tag = v11.tag,
+				scaleType = if not FFlagAXHeroWidget then nil else t1.imageScaleType
+			})
+		end
+	end
+
+	return React.createElement(React.Fragment, nil, t2)
+end
+
+return BackgroundLayers

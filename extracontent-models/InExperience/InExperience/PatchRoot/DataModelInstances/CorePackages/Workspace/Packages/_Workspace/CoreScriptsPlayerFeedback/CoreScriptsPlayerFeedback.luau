@@ -1,5 +1,6 @@
-local v0 = require(script.PlayerFeedbackApp);
+local PlayerFeedbackApp = require(script.PlayerFeedbackApp)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    createApp = v0
-};
+	["jest.config"] = script["jest.config"],
+	createApp = PlayerFeedbackApp
+}

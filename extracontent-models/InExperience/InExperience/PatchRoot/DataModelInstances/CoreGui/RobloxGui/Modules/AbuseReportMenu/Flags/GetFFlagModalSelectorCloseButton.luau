@@ -1,4 +1,5 @@
-game:DefineFastFlag("ModalSelectorCloseButton", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ModalSelectorCloseButton");
-end;
+game:DefineFastFlag("ModalSelectorCloseButton", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ModalSelectorCloseButton")
+end

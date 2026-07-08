@@ -1,131 +1,139 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.RoactNavigation);
-local v5 = require(l_Parent_0.Foundation);
-local v6 = require(l_Parent_0.Responsive);
-local v7 = require(l_script_FirstAncestor_0.EnumScreens);
-local v8 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatTopBarConfigDriven);
-local v9 = require(l_script_FirstAncestor_0.Components.TopBar.SystemMenuTopBar);
-local v10 = require(l_script_FirstAncestor_0.configureTopBarWithNavigationOptions);
-local v11 = require(l_script_FirstAncestor_0.Navigators.isolatedAutoFocusNavigation);
-local v12 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatPerfTracking);
-local v13 = require(l_script_FirstAncestor_0.Telemetry.AppChatPerfTracker);
-local function _(v14) --[[ Line: 25 ]] --[[ Name: getActiveRouteName ]]
-    local v15 = v14 and v14.state;
-    if not v15 or not v15.routes or not v15.index then
-        return nil;
-    else
-        local v16 = v15.routes[v15.index];
-        if not v16 then
-            return nil;
-        else
-            return v16.routeName;
-        end;
-    end;
-end;
-local function _(v18) --[[ Line: 37 ]] --[[ Name: wrapInOverlay ]]
-    -- upvalues: v6 (copy), v8 (copy), v12 (copy), v13 (copy), v7 (copy), v3 (copy), v9 (copy), v10 (copy), v5 (copy)
-    return function(v19) --[[ Line: 38 ]]
-        -- upvalues: v6 (ref), v8 (ref), v12 (ref), v13 (ref), v7 (ref), v3 (ref), v9 (ref), v10 (ref), v5 (ref), v18 (copy)
-        local v20 = v6.useBreakpointXOrSmaller(v6.Keys.Small);
-        local v21 = v6.useBreakpointYOrSmaller(v6.Keys.Small);
-        local v22 = v20 and -24 or -360;
-        local v23 = v21 and -24 or -72;
-        local v24 = UDim2.new(1, v22, 1, v23);
-        local v25 = nil;
-        if v8() then
-            if v12 then
-                v13.start(v13.Events.TopBarRenderInterval);
-            end;
-            local l_navigation_0 = v19.navigation;
-            local v27 = l_navigation_0 and l_navigation_0.state;
-            local v28;
-            if not v27 or not v27.routes or not v27.index then
-                v28 = nil;
-            else
-                local v29 = v27.routes[v27.index];
-                v28 = if not v29 then nil else v29.routeName;
-            end;
-            if v28 == v7.CreateNewChat or v28 == v7.EditChatMembers or v28 == v7.QuickStartSquadInviteFriends then
-                v25 = v3.createElement(v9, {
-                    screenName = v28, 
-                    navigation = v19.navigation
-                });
-            end;
-        end;
-        if not v25 then
-            v25 = v10(v19.navigation);
-        end;
-        return v3.createElement(v5.View, {
-            tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large", 
-            Size = v24
-        }, {
-            sizeConstraint = v3.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(1000, 800), 
-                MinSize = Vector2.new(0, 0)
-            }), 
-            topBar = v25, 
-            overlayContent = v3.createElement(v18, v19)
-        });
-    end;
-end;
-return function(v31) --[[ Line: 85 ]]
-    -- upvalues: v4 (copy), v3 (copy), v11 (copy), v6 (copy), v8 (copy), v12 (copy), v13 (copy), v7 (copy), v9 (copy), v10 (copy), v5 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    local v32 = v4.createRobloxStackNavigator(v31, {
-        defaultNavigationOptions = {
-            isDialog = true
-        }
-    });
-    local v33 = v3.PureComponent:extend("OverlayNavigatorConnector");
-    v33.router = v32.router;
-    local v45 = v11(function(v34) --[[ Line: 38 ]]
-        -- upvalues: v6 (ref), v8 (ref), v12 (ref), v13 (ref), v7 (ref), v3 (ref), v9 (ref), v10 (ref), v5 (ref), v32 (copy)
-        local v35 = v6.useBreakpointXOrSmaller(v6.Keys.Small);
-        local v36 = v6.useBreakpointYOrSmaller(v6.Keys.Small);
-        local v37 = v35 and -24 or -360;
-        local v38 = v36 and -24 or -72;
-        local v39 = UDim2.new(1, v37, 1, v38);
-        local v40 = nil;
-        if v8() then
-            if v12 then
-                v13.start(v13.Events.TopBarRenderInterval);
-            end;
-            local l_navigation_1 = v34.navigation;
-            local v42 = l_navigation_1 and l_navigation_1.state;
-            local v43;
-            if not v42 or not v42.routes or not v42.index then
-                v43 = nil;
-            else
-                local v44 = v42.routes[v42.index];
-                v43 = if not v44 then nil else v44.routeName;
-            end;
-            if v43 == v7.CreateNewChat or v43 == v7.EditChatMembers or v43 == v7.QuickStartSquadInviteFriends then
-                v40 = v3.createElement(v9, {
-                    screenName = v43, 
-                    navigation = v34.navigation
-                });
-            end;
-        end;
-        if not v40 then
-            v40 = v10(v34.navigation);
-        end;
-        return v3.createElement(v5.View, {
-            tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large", 
-            Size = v39
-        }, {
-            sizeConstraint = v3.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(1000, 800), 
-                MinSize = Vector2.new(0, 0)
-            }), 
-            topBar = v40, 
-            overlayContent = v3.createElement(v32, v34)
-        });
-    end, l_FocusNavigableSurfaceIdentifierEnum_0.PopUp);
-    v33.render = function(v46) --[[ Line: 94 ]] --[[ Name: render ]]
-        -- upvalues: v3 (ref), v45 (copy)
-        return v3.createElement(v45, v46.props);
-    end;
-    return v33;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local FocusNavigableSurfaceIdentifierEnum = require(AppChatParent.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+local React = require(AppChatParent.React)
+local RoactNavigation = require(AppChatParent.RoactNavigation)
+local Foundation = require(AppChatParent.Foundation)
+local Responsive = require(AppChatParent.Responsive)
+local EnumScreens = require(AppChat.EnumScreens)
+local FFlagAppChatTopBarConfigDriven = require(AppChat.Flags.FFlagAppChatTopBarConfigDriven)
+local SystemMenuTopBar = require(AppChat.Components.TopBar.SystemMenuTopBar)
+local configureTopBarWithNavigationOptions = require(AppChat.configureTopBarWithNavigationOptions)
+local isolatedAutoFocusNavigation = require(AppChat.Navigators.isolatedAutoFocusNavigation)
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+
+local function getActiveRouteName(p1) -- line: 25
+	local v18 = p1 and p1.state
+
+	if not v18 or (not v18.routes or not v18.index) then
+		return nil
+	end
+
+	while v18 and v18.routes and v18.index do
+		v18 = v18.routes[v18.index]
+
+		if not v18 then
+			return nil
+		end
+
+		if not v18.routes or not v18.index then
+			return v18.routeName
+		end
+	end
+
+	return nil
+end
+local function wrapInOverlay(p2) -- line: 52
+	-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy)
+	return function(p3) -- line: 53
+		-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), p2 (copy)
+		local v25 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
+		local v26 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.Small)
+		local v27 = not v25 and -360 or -24
+		local v28 = not v26 and -72 or -24
+		local uDim2 = UDim2.new(1, v27, 1, v28)
+		local v30 = nil
+
+		if FFlagAppChatTopBarConfigDriven() then
+			if FFlagAppChatPerfTracking then
+				AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
+			end
+
+			local v31 = getActiveRouteName(p3.navigation)
+
+			if v31 == EnumScreens.CreateNewChat or v31 == EnumScreens.EditChatMembers or v31 == EnumScreens.QuickStartSquadInviteFriends then
+				v30 = React.createElement(SystemMenuTopBar, {
+					screenName = v31,
+					navigation = p3.navigation
+				})
+			end
+		end
+
+		if not v30 then
+			v30 = configureTopBarWithNavigationOptions(p3.navigation)
+		end
+
+		return React.createElement(Foundation.View, {
+			tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large",
+			Size = uDim2
+		}, {
+			sizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(1000, 800),
+				MinSize = Vector2.new(0, 0)
+			}),
+			topBar = v30,
+			overlayContent = React.createElement(p2, p3)
+		})
+	end
+end
+
+return function(p4) -- line: 100
+	-- upvalues: RoactNavigation (copy), React (copy), isolatedAutoFocusNavigation (copy), Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v21 = RoactNavigation.createRobloxStackNavigator(p4, {
+		defaultNavigationOptions = {
+			isDialog = true
+		}
+	})
+	local v22 = React.PureComponent:extend("OverlayNavigatorConnector")
+
+	v22.router = v21.router
+
+	local v23 = isolatedAutoFocusNavigation(function(p5) -- line: 53
+		-- upvalues: Responsive (copy), FFlagAppChatTopBarConfigDriven (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), getActiveRouteName (copy), EnumScreens (copy), React (copy), SystemMenuTopBar (copy), configureTopBarWithNavigationOptions (copy), Foundation (copy), v21 (copy)
+		local v33 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
+		local v34 = Responsive.useBreakpointYOrSmaller(Responsive.Keys.Small)
+		local v35 = not v33 and -360 or -24
+		local v36 = not v34 and -72 or -24
+		local uDim2 = UDim2.new(1, v35, 1, v36)
+		local v38 = nil
+
+		if FFlagAppChatTopBarConfigDriven() then
+			if FFlagAppChatPerfTracking then
+				AppChatPerfTracker.start(AppChatPerfTracker.Events.TopBarRenderInterval)
+			end
+
+			local v39 = getActiveRouteName(p5.navigation)
+
+			if v39 == EnumScreens.CreateNewChat or v39 == EnumScreens.EditChatMembers or v39 == EnumScreens.QuickStartSquadInviteFriends then
+				v38 = React.createElement(SystemMenuTopBar, {
+					screenName = v39,
+					navigation = p5.navigation
+				})
+			end
+		end
+
+		if not v38 then
+			v38 = configureTopBarWithNavigationOptions(p5.navigation)
+		end
+
+		return React.createElement(Foundation.View, {
+			tag = "col position-center-center anchor-center-center clip bg-surface-0 radius-large",
+			Size = uDim2
+		}, {
+			sizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(1000, 800),
+				MinSize = Vector2.new(0, 0)
+			}),
+			topBar = v38,
+			overlayContent = React.createElement(v21, p5)
+		})
+	end, FocusNavigableSurfaceIdentifierEnum.PopUp)
+
+	function v22.render(p6) -- line: 109
+		-- upvalues: React (copy), v23 (copy)
+		return React.createElement(v23, p6.props)
+	end
+
+	return v22
+end

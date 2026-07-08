@@ -1,28 +1,33 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v6 = require(l_Parent_0.Resources.FTUXSlideshowData);
-local _ = require(l_Parent_0.Enums.PlatformEnum);
-return function(v8) --[[ Line: 19 ]] --[[ Name: Title ]]
-    -- upvalues: l_useStyle_0 (copy), v6 (copy), l_withLocalization_0 (copy), v1 (copy), v2 (copy)
-    local v9 = l_useStyle_0();
-    local l_Theme_0 = v9.Theme;
-    local l_Font_0 = v9.Font;
-    local l_title_0 = v6[v8.platform][v8.currentIndex].title;
-    return l_withLocalization_0({
-        titleText = l_title_0
-    })(function(v13) --[[ Line: 30 ]]
-        -- upvalues: v1 (ref), v2 (ref), l_Font_0 (copy), l_Theme_0 (copy)
-        return v1.createElement(v2.App.Text.StyledTextLabel, {
-            text = v13.titleText, 
-            fontStyle = l_Font_0.SubHeader1, 
-            colorStyle = l_Theme_0.TextEmphasis, 
-            textXAlignment = Enum.TextXAlignment.Left, 
-            size = UDim2.new(1, 0, 0.031, 0), 
-            layoutOrder = 1
-        });
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local ParentParent = script.Parent.Parent.Parent
+local FTUXSlideshowData = require(ParentParent.Resources.FTUXSlideshowData)
+
+require(ParentParent.Enums.PlatformEnum)
+
+local function Title(t1: {[any]: any}) -- line: 19
+	-- upvalues: useStyle (copy), FTUXSlideshowData (copy), withLocalization (copy), React (copy), UIBlox (copy)
+	local v10 = useStyle()
+	local Theme = v10.Theme
+	local Font = v10.Font
+	local title = FTUXSlideshowData[t1.platform][t1.currentIndex].title
+
+	return withLocalization({
+		titleText = title
+	})(function(p1) -- line: 30
+		-- upvalues: React (copy), UIBlox (copy), Font (copy), Theme (copy)
+		return React.createElement(UIBlox.App.Text.StyledTextLabel, {
+			layoutOrder = 1,
+			text = p1.titleText,
+			fontStyle = Font.SubHeader1,
+			colorStyle = Theme.TextEmphasis,
+			textXAlignment = Enum.TextXAlignment.Left,
+			size = UDim2.new(1, 0, 0.031, 0)
+		})
+	end)
+end
+
+return Title

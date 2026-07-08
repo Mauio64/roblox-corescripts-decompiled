@@ -1,153 +1,155 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local _ = require(l_script_FirstAncestor_0.Parent.GraphQLServer);
-local l_Text_0 = require(l_script_FirstAncestor_0.Parent.AppCommonLib).Text;
-local l_useLocalization_0 = require(l_script_FirstAncestor_0.Parent.Localization).Hooks.useLocalization;
-local v6 = require(l_script_FirstAncestor_0.Common.formatDate);
-local v7 = require(l_script_FirstAncestor_0.Common.getVirtualEventDates);
-local v8 = require(l_script_FirstAncestor_0.Common.getEventCategory);
-local v9 = require(l_script_FirstAncestor_0.Components.AttendanceChip);
-local v10 = require(l_script_FirstAncestor_0.Components.DescriptionExpander);
-local _ = require(l_script_FirstAncestor_0.Parent.VirtualEventsState);
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_Text_1 = v2.Text;
-local l_Icon_0 = v2.Icon;
-local l_IconSize_0 = v2.Enums.IconSize;
-return function(v16) --[[ Line: 36 ]] --[[ Name: EventDetailsBody ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_Text_0 (copy), v8 (copy), v7 (copy), l_useLocalization_0 (copy), v9 (copy), l_Text_1 (copy), v10 (copy), l_Icon_0 (copy), l_IconSize_0 (copy), v6 (copy)
-    local v17 = l_useTokens_0();
-    local v18 = v1.useMemo(function() --[[ Line: 39 ]]
-        -- upvalues: v16 (copy), l_Text_0 (ref)
-        if v16.virtualEvent.description == nil then
-            return nil;
-        else
-            return l_Text_0.Trim(v16.virtualEvent.description);
-        end;
-    end, {
-        v16.virtualEvent.description
-    });
-    local v19 = v1.useMemo(function() --[[ Line: 46 ]]
-        -- upvalues: v8 (ref), v16 (copy)
-        return v8(v16.virtualEvent);
-    end, {
-        v16.virtualEvent
-    });
-    local v20 = v1.useMemo(function() --[[ Line: 50 ]]
-        -- upvalues: v7 (ref), v16 (copy)
-        return v7(v16.virtualEvent);
-    end, {
-        v16.virtualEvent
-    });
-    local v21 = l_useLocalization_0({
-        interested = "Feature.VirtualEvents.AttendanceBeforeEvent", 
-        newContent = "Feature.VirtualEvents.Label.NewContent", 
-        itemDrop = "Feature.VirtualEvents.Label.ItemDrop", 
-        newSeason = "Feature.VirtualEvents.Label.NewSeason", 
-        newLocation = "Feature.VirtualEvents.Label.NewLocation", 
-        newMap = "Feature.VirtualEvents.Label.NewMap", 
-        moreLevels = "Feature.VirtualEvents.Label.MoreLevels", 
-        newFeature = "Feature.VirtualEvents.Label.NewFeature", 
-        earlyAccess = "Feature.VirtualEvents.Label.EarlyAccess", 
-        expansion = "Feature.VirtualEvents.Label.Expansion", 
-        challenge = "Feature.VirtualEvents.Label.Challenge", 
-        quest = "Feature.VirtualEvents.Label.Quest", 
-        festival = "Feature.VirtualEvents.Label.Festival"
-    });
-    return v1.createElement("Frame", {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 0)
-    }, {
-        BodyContainer = v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1, 
-            ZIndex = 1
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 8)
-            }), 
-            EventAttendace = v1.createElement(v9, {
-                LayoutOrder = 1, 
-                virtualEvent = v16.virtualEvent, 
-                eventStatus = v16.eventStatus
-            }), 
-            EventTitle = v1.createElement(l_Text_1, {
-                LayoutOrder = 2, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                Text = v16.virtualEvent.title, 
-                TextTruncate = Enum.TextTruncate.None, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                RichText = true, 
-                textStyle = v17.Color.Content.Emphasis, 
-                fontStyle = v17.Typography.TitleLarge, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextWrapped = false
-            }), 
-            Description = if v18 and v18 ~= "" then v1.createElement(v10, {
-                layoutOrder = 3, 
-                description = v18, 
-                width = v16.containerSize.X - 32 - 16, 
-                maxHeight = v16.containerSize.Y * 0.3, 
-                isExpanded = v16.isExpanded, 
-                setIsExpanded = v16.setIsExpanded
-            }) else nil, 
-            EventCategory = if v19 and v21[v19] then v1.createElement("Frame", {
-                LayoutOrder = 4, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    Padding = UDim.new(0, 6)
-                }), 
-                Icon = v1.createElement(l_Icon_0, {
-                    LayoutOrder = 1, 
-                    name = "icons/common/poi_small", 
-                    size = l_IconSize_0.Small, 
-                    style = v17.Color.Content.Emphasis
-                }), 
-                Label = v1.createElement(l_Text_1, {
-                    LayoutOrder = 2, 
-                    Text = v21[v19], 
-                    TextTruncate = Enum.TextTruncate.None, 
-                    textStyle = v17.Color.Content.Emphasis, 
-                    fontStyle = v17.Typography.BodyLarge, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = false
-                })
-            }) else nil, 
-            EventTime = if v16.eventStatus == "Upcoming" then v1.createElement("Frame", {
-                LayoutOrder = 5, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    Padding = UDim.new(0, 6)
-                }), 
-                Icon = v1.createElement(l_Icon_0, {
-                    LayoutOrder = 1, 
-                    name = "icons/actions/calendar_small", 
-                    size = l_IconSize_0.Small, 
-                    style = v17.Color.Content.Emphasis
-                }), 
-                Label = v1.createElement(l_Text_1, {
-                    LayoutOrder = 2, 
-                    Text = v6(v20.startDate, true), 
-                    TextTruncate = Enum.TextTruncate.None, 
-                    textStyle = v17.Color.Content.Emphasis, 
-                    fontStyle = v17.Typography.BodyLarge, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextWrapped = false
-                })
-            }) else nil
-        })
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local React = require(VirtualEvents.Parent.React)
+local Foundation = require(VirtualEvents.Parent.Foundation)
+
+require(VirtualEvents.Parent.GraphQLServer)
+
+local Text = require(VirtualEvents.Parent.AppCommonLib).Text
+local useLocalization = require(VirtualEvents.Parent.Localization).Hooks.useLocalization
+local formatDate = require(VirtualEvents.Common.formatDate)
+local getVirtualEventDates = require(VirtualEvents.Common.getVirtualEventDates)
+local getEventCategory = require(VirtualEvents.Common.getEventCategory)
+local AttendanceChip = require(VirtualEvents.Components.AttendanceChip)
+local DescriptionExpander = require(VirtualEvents.Components.DescriptionExpander)
+
+require(VirtualEvents.Parent.VirtualEventsState)
+
+local useTokens = Foundation.Hooks.useTokens
+local FoundationText = Foundation.Text
+local Icon = Foundation.Icon
+local IconSize = Foundation.Enums.IconSize
+
+local function EventDetailsBody(t1: {[any]: any}) -- line: 36
+	-- upvalues: useTokens (copy), React (copy), Text (copy), getEventCategory (copy), getVirtualEventDates (copy), useLocalization (copy), AttendanceChip (copy), FoundationText (copy), DescriptionExpander (copy), Icon (copy), IconSize (copy), formatDate (copy)
+	local v17 = useTokens()
+	local v18 = React.useMemo(function() -- line: 39
+		-- upvalues: t1 (copy), Text (copy)
+		if t1.virtualEvent.description == nil then
+			return nil
+		end
+
+		return Text.Trim(t1.virtualEvent.description)
+	end, { t1.virtualEvent.description })
+	local v19 = React.useMemo(function() -- line: 46
+		-- upvalues: getEventCategory (copy), t1 (copy)
+		return getEventCategory(t1.virtualEvent)
+	end, { t1.virtualEvent })
+	local v20 = React.useMemo(function() -- line: 50
+		-- upvalues: getVirtualEventDates (copy), t1 (copy)
+		return getVirtualEventDates(t1.virtualEvent)
+	end, { t1.virtualEvent })
+	local v21 = useLocalization({
+		interested = "Feature.VirtualEvents.AttendanceBeforeEvent",
+		newContent = "Feature.VirtualEvents.Label.NewContent",
+		itemDrop = "Feature.VirtualEvents.Label.ItemDrop",
+		newSeason = "Feature.VirtualEvents.Label.NewSeason",
+		newLocation = "Feature.VirtualEvents.Label.NewLocation",
+		newMap = "Feature.VirtualEvents.Label.NewMap",
+		moreLevels = "Feature.VirtualEvents.Label.MoreLevels",
+		newFeature = "Feature.VirtualEvents.Label.NewFeature",
+		earlyAccess = "Feature.VirtualEvents.Label.EarlyAccess",
+		expansion = "Feature.VirtualEvents.Label.Expansion",
+		challenge = "Feature.VirtualEvents.Label.Challenge",
+		quest = "Feature.VirtualEvents.Label.Quest",
+		festival = "Feature.VirtualEvents.Label.Festival"
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, 0)
+	}, {
+		BodyContainer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			ZIndex = 1,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 8)
+			}),
+			EventAttendace = React.createElement(AttendanceChip, {
+				LayoutOrder = 1,
+				virtualEvent = t1.virtualEvent,
+				eventStatus = t1.eventStatus
+			}),
+			EventTitle = React.createElement(FoundationText, {
+				LayoutOrder = 2,
+				RichText = true,
+				TextWrapped = false,
+				Size = UDim2.new(1, 0, 0, 0),
+				Text = t1.virtualEvent.title,
+				TextTruncate = Enum.TextTruncate.None,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				textStyle = v17.Color.Content.Emphasis,
+				fontStyle = v17.Typography.TitleLarge,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			Description = if not v18 or v18 == "" then nil else React.createElement(DescriptionExpander, {
+				layoutOrder = 3,
+				description = v18,
+				width = t1.containerSize.X - 32 - 16,
+				maxHeight = t1.containerSize.Y * 0.3,
+				isExpanded = t1.isExpanded,
+				setIsExpanded = t1.setIsExpanded
+			}),
+			EventCategory = if not v19 or not v21[v19] then nil else React.createElement("Frame", {
+				LayoutOrder = 4,
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 6)
+				}),
+				Icon = React.createElement(Icon, {
+					LayoutOrder = 1,
+					name = "icons/common/poi_small",
+					size = IconSize.Small,
+					style = v17.Color.Content.Emphasis
+				}),
+				Label = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					TextWrapped = false,
+					Text = v21[v19],
+					TextTruncate = Enum.TextTruncate.None,
+					textStyle = v17.Color.Content.Emphasis,
+					fontStyle = v17.Typography.BodyLarge,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			}),
+			EventTime = if t1.eventStatus ~= "Upcoming" then nil else React.createElement("Frame", {
+				LayoutOrder = 5,
+				BackgroundTransparency = 1,
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 6)
+				}),
+				Icon = React.createElement(Icon, {
+					LayoutOrder = 1,
+					name = "icons/actions/calendar_small",
+					size = IconSize.Small,
+					style = v17.Color.Content.Emphasis
+				}),
+				Label = React.createElement(FoundationText, {
+					LayoutOrder = 2,
+					TextWrapped = false,
+					Text = formatDate(v20.startDate, true),
+					TextTruncate = Enum.TextTruncate.None,
+					textStyle = v17.Color.Content.Emphasis,
+					fontStyle = v17.Typography.BodyLarge,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			})
+		})
+	})
+end
+
+return EventDetailsBody

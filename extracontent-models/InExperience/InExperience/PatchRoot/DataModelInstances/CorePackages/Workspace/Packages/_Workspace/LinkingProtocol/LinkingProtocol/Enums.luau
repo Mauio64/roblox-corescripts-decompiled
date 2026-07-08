@@ -1,3 +1,3 @@
 return {
-    SettingsRoute = require(script.SettingsRoute)
-};
+	SettingsRoute = require(script.SettingsRoute)
+}

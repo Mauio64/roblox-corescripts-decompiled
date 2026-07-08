@@ -1,6 +1,7 @@
-local v0 = require(script.Parent.isInteger);
-local v1 = require(script.Parent.MAX_SAFE_INTEGER);
-return function(v2) --[[ Line: 6 ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    return v0(v2) and math.abs(v2) <= v1;
-end;
+local isInteger = require(script.Parent.isInteger)
+local MAX_SAFE_INTEGER = require(script.Parent.MAX_SAFE_INTEGER)
+
+return function(p1) -- line: 6
+	-- upvalues: isInteger (copy), MAX_SAFE_INTEGER (copy)
+	return isInteger(p1) and math.abs(p1) <= MAX_SAFE_INTEGER
+end

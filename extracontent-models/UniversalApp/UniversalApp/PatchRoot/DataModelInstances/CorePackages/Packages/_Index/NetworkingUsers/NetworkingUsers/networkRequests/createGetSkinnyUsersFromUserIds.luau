@@ -1,12 +1,13 @@
-local v0 = require(script.Parent.Parent.USERS_URL);
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return v1.roduxNetworking.POST({
-        Name = "GetSkinnyUsersFromUserIds"
-    }, function(v2, v3) --[[ Line: 6 ]]
-        -- upvalues: v0 (ref)
-        return v2(v0):path("v1"):path("users"):body({
-            userIds = v3
-        });
-    end);
-end;
+local USERS_URL = require(script.Parent.Parent.USERS_URL)
+
+return function(p1) -- line: 3
+	-- upvalues: USERS_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "GetSkinnyUsersFromUserIds"
+	}, function(p2, p3) -- line: 6
+		-- upvalues: USERS_URL (copy)
+		return p2(USERS_URL):path("v1"):path("users"):body({
+			userIds = p3
+		})
+	end)
+end

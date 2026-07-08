@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXWearTimeSupport3", false);
+return game:DefineFastFlag("AXWearTimeSupport3", false)

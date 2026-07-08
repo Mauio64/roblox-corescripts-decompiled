@@ -1,21 +1,35 @@
-local l_Parent_0 = script.Parent;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_1 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_0.TagsContext);
-local v5 = require(l_script_FirstAncestor_0.Utility.getFormattedTags);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v7) --[[ Line: 12 ]] --[[ Name: useStyleTags ]]
-    -- upvalues: v5 (copy), v3 (copy), v4 (copy)
-    local v8 = v5(v7);
-    local v9 = v3.useContext(v4);
-    v3.useLayoutEffect(function() --[[ Line: 16 ]]
-        -- upvalues: v8 (copy), v9 (copy)
-        if v8 ~= nil then
-            v9(v8);
-        end;
-    end, {
-        v8
-    });
-    return v8;
-end;
+local scriptParent = script.Parent
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local TagsContext = require(scriptParent.TagsContext)
+local getFormattedTags = require(Foundation.Utility.getFormattedTags)
+local Flags = require(Foundation.Utility.Flags)
+
+require(Foundation.Components.Types)
+
+local function useStyleTags(p1) -- line: 14
+	-- upvalues: getFormattedTags (copy), React (copy), TagsContext (copy), Flags (copy)
+	local v10 = getFormattedTags(p1)
+	local v11 = React.useContext(TagsContext)
+
+	React.useLayoutEffect(function() -- line: 18
+		-- upvalues: v10 (copy), Flags (copy), v11 (copy)
+		if v10 ~= nil then
+			if Flags.FoundationUseStyleSheetRegistry then
+				v11(string.split(v10, " "))
+
+				return
+			end
+
+			v11(v10)
+		end
+	end, {
+		v10,
+		if not Flags.FoundationUseStyleSheetRegistry then nil else v11
+	})
+
+	return v10
+end
+
+return useStyleTags

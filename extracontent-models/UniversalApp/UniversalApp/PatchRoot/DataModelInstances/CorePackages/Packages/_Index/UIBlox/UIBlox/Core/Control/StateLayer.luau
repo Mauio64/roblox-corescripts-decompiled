@@ -1,92 +1,100 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.React);
-local v5 = require(l_Parent_3.Cryo);
-local v6 = require(l_Parent_1.Style.useStyle);
-local v7 = require(l_Parent_2.App.SelectionCursor.useCursor);
-local v8 = require(l_Parent_0.Interactable);
-local v9 = require(l_Parent_0.Enum.ControlState);
-local v10 = {
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    position = UDim2.fromScale(0.5, 0.5), 
-    size = UDim2.fromScale(1, 1), 
-    isDisabled = false, 
-    selectable = true, 
-    affordance = "Background", 
-    stateStyle = "Standard", 
-    outset = {
-        top = UDim.new(0, 0), 
-        right = UDim.new(0, 0), 
-        bottom = UDim.new(0, 0), 
-        left = UDim.new(0, 0)
-    }
-};
-local v11 = v9.Initialize.rawValue();
-local v31 = v4.forwardRef(function(v12, v13) --[[ Line: 76 ]]
-    -- upvalues: v5 (copy), v10 (copy), v6 (copy), v11 (copy), v4 (copy), v7 (copy), v8 (copy)
-    local v14 = v5.Dictionary.join(v10, v12);
-    local l_StateLayer_0 = v6().Tokens.Component.StateLayer;
-    local l_Color_0 = l_StateLayer_0[v14.stateStyle][v11].Color;
-    local v17, v18 = v4.useBinding(l_Color_0.Color3);
-    local v19, v20 = v4.useBinding(l_Color_0.Transparency);
-    local v21 = v7(v14.cornerRadius);
-    local v22 = {
-        ref = v13, 
-        AnchorPoint = v14.anchorPoint, 
-        Position = v14.position, 
-        Size = v14.size, 
-        LayoutOrder = v14.layoutOrder, 
-        ZIndex = v14.zIndex, 
-        BackgroundTransparency = 1
-    };
-    local v23 = {};
-    if v14.cornerRadius ~= nil then
-        v23.UICorner = v4.createElement("UICorner", {
-            CornerRadius = v14.cornerRadius
-        });
-    end;
-    if v14.affordance == "Border" then
-        v23.UIStroke = v4.createElement("UIStroke", {
-            Thickness = l_StateLayer_0.Base.BorderWidth, 
-            Color = v17, 
-            Transparency = v19
-        });
-        v22.BackgroundTransparency = 1;
-    elseif v14.affordance == "Background" then
-        v22.BackgroundColor3 = v17;
-        v22.BackgroundTransparency = v19;
-    end;
-    local l_outset_0 = v14.outset;
-    local v25 = UDim2.new(1 + l_outset_0.left.Scale + l_outset_0.right.Scale, l_outset_0.left.Offset + l_outset_0.right.Offset, 1 + l_outset_0.top.Scale + l_outset_0.bottom.Scale, l_outset_0.top.Offset + l_outset_0.bottom.Offset);
-    local v26 = UDim2.new(-l_outset_0.left.Scale, -l_outset_0.left.Offset, -l_outset_0.top.Scale, -l_outset_0.top.Offset);
-    local v30 = v4.useCallback(function(v27, v28) --[[ Line: 122 ]]
-        -- upvalues: l_StateLayer_0 (copy), v14 (copy), v18 (copy), v20 (copy)
-        local l_Color_1 = l_StateLayer_0[v14.stateStyle][v28.rawValue()].Color;
-        v18(l_Color_1.Color3);
-        v20(l_Color_1.Transparency);
-        if v14.onStateChanged then
-            v14.onStateChanged(v27, v28);
-        end;
-    end, {
-        l_StateLayer_0, 
-        v18, 
-        v20, 
-        v14.stateStyle, 
-        v14.onStateChanged
-    });
-    v23.Button = v4.createElement(v8, {
-        Size = v25, 
-        Position = v26, 
-        BackgroundTransparency = 1, 
-        Selectable = not v14.isDisabled and v14.selectable, 
-        SelectionImageObject = v21, 
-        [v4.Event.Activated] = v14.onActivated, 
-        onStateChanged = v30, 
-        isDisabled = v14.isDisabled, 
-        userInteractionEnabled = not v14.isDisabled
-    });
-    return v4.createElement("Frame", v22, v23);
-end);
-return v4.memo(v31);
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local scriptParentParentParentParent = scriptParentParentParent.Parent
+local React = require(scriptParentParentParentParent.React)
+local Cryo = require(scriptParentParentParentParent.Cryo)
+local useStyle = require(scriptParentParent.Style.useStyle)
+local useCursor = require(scriptParentParentParent.App.SelectionCursor.useCursor)
+local Interactable = require(scriptParent.Interactable)
+local ControlState = require(scriptParent.Enum.ControlState)
+local t1 = {
+	isDisabled = false,
+	selectable = true,
+	affordance = "Background",
+	stateStyle = "Standard",
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.fromScale(0.5, 0.5),
+	size = UDim2.fromScale(1, 1),
+	outset = {
+		top = UDim.new(0, 0),
+		right = UDim.new(0, 0),
+		bottom = UDim.new(0, 0),
+		left = UDim.new(0, 0)
+	}
+}
+local v12 = ControlState.Initialize.rawValue()
+local v13 = React.forwardRef(function(t2: {[any]: any}, p1) -- line: 76
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), v12 (copy), React (copy), useCursor (copy), Interactable (copy)
+	local v16 = Cryo.Dictionary.join(t1, t2)
+	local StateLayer = useStyle().Tokens.Component.StateLayer
+	local Color = StateLayer[v16.stateStyle][v12].Color
+	local v19, v20 = React.useBinding(Color.Color3)
+	local v21, v22 = React.useBinding(Color.Transparency)
+	local v23 = useCursor(v16.cornerRadius)
+	local t3 = {
+		BackgroundTransparency = 1,
+		ref = p1,
+		AnchorPoint = v16.anchorPoint,
+		Position = v16.position,
+		Size = v16.size,
+		LayoutOrder = v16.layoutOrder,
+		ZIndex = v16.zIndex
+	}
+	local t4 = {}
+
+	if v16.cornerRadius ~= nil then
+		t4.UICorner = React.createElement("UICorner", {
+			CornerRadius = v16.cornerRadius
+		})
+	end
+
+	if v16.affordance == "Border" then
+		t4.UIStroke = React.createElement("UIStroke", {
+			Thickness = StateLayer.Base.BorderWidth,
+			Color = v19,
+			Transparency = v21
+		})
+		t3.BackgroundTransparency = 1
+	elseif v16.affordance == "Background" then
+		t3.BackgroundColor3 = v19
+		t3.BackgroundTransparency = v21
+	end
+
+	local outset = v16.outset
+	local uDim2 = UDim2.new(1 + outset.left.Scale + outset.right.Scale, outset.left.Offset + outset.right.Offset, 1 + outset.top.Scale + outset.bottom.Scale, outset.top.Offset + outset.bottom.Offset)
+	local uDim2_2 = UDim2.new(-outset.left.Scale, -outset.left.Offset, -outset.top.Scale, -outset.top.Offset)
+	local v29 = React.useCallback(function(p2, p3) -- line: 122
+		-- upvalues: StateLayer (copy), v16 (copy), v20 (copy), v22 (copy)
+		local Color2 = StateLayer[v16.stateStyle][p3.rawValue()].Color
+
+		v20(Color2.Color3)
+		v22(Color2.Transparency)
+
+		if v16.onStateChanged then
+			v16.onStateChanged(p2, p3)
+		end
+	end, {
+		StateLayer,
+		v20,
+		v22,
+		v16.stateStyle,
+		v16.onStateChanged
+	})
+
+	t4.Button = React.createElement(Interactable, {
+		Size = uDim2,
+		Position = uDim2_2,
+		BackgroundTransparency = 1,
+		Selectable = not v16.isDisabled and v16.selectable,
+		SelectionImageObject = v23,
+		[React.Event.Activated] = v16.onActivated,
+		onStateChanged = v29,
+		isDisabled = v16.isDisabled,
+		userInteractionEnabled = not v16.isDisabled
+	})
+
+	return React.createElement("Frame", t3, t4)
+end)
+
+return React.memo(v13)

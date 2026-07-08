@@ -1,25 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Analytics.AnalyticsTypes);
-return v2.createContext({
-    eventIngest = function() --[[ Line: 29 ]] --[[ Name: eventIngest ]]
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local React = require(SocialCarouselParent.React)
 
-    end, 
-    appAnalytics = function() --[[ Line: 30 ]] --[[ Name: appAnalytics ]]
+require(SocialCarousel.Analytics.AnalyticsTypes)
 
-    end, 
-    hideCarouselHeader = false, 
-    unifiedLogging = nil, 
-    sortAnalyticsData = nil, 
-    tiles = {}, 
-    friendRequestCount = 0, 
-    friendCount = 0, 
-    recommendationCount = 0, 
-    onSuccessfulRender = function() --[[ Line: 38 ]] --[[ Name: onSuccessfulRender ]]
-
-    end, 
-    selectionOrderBase = nil, 
-    source = nil, 
-    navigateToQRCodePage = nil
-});
+return React.createContext({
+	hideCarouselHeader = false,
+	openGameJoinCardUserId = nil,
+	setOpenGameJoinCardUserId = nil,
+	unifiedLogging = nil,
+	sortAnalyticsData = nil,
+	friendRequestCount = 0,
+	friendCount = 0,
+	recommendationCount = 0,
+	selectionOrderBase = nil,
+	source = nil,
+	navigateToQRCodePage = nil,
+	isLoading = false,
+	eventIngest = function() -- line: 32
+	end,
+	appAnalytics = function() -- line: 33
+	end,
+	tiles = {},
+	onSuccessfulRender = function() -- line: 43
+	end
+})

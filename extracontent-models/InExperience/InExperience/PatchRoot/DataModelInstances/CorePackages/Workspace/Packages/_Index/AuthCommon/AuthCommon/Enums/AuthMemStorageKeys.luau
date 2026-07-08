@@ -1,5 +1,5 @@
 return {
-    ThemeUpdate = "ThemeUpdate", 
-    AuthenticatedCredentials = "AuthenticatedCredentials", 
-    AutoFillCredentials = "AutoFillCredentials"
-};
+	ThemeUpdate = "ThemeUpdate",
+	AuthenticatedCredentials = "AuthenticatedCredentials",
+	AutoFillCredentials = "AutoFillCredentials"
+}

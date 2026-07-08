@@ -1,4 +1,5 @@
-game:DefineFastFlag("ClearUserFromRecentVoiceDataOnLeave", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ClearUserFromRecentVoiceDataOnLeave");
-end;
+game:DefineFastFlag("ClearUserFromRecentVoiceDataOnLeave", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ClearUserFromRecentVoiceDataOnLeave")
+end

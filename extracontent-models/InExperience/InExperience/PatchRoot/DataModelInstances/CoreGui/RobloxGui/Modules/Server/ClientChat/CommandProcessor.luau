@@ -1,52 +1,63 @@
-local v0 = {};
-local v1 = {};
-v1.__index = v1;
-local l_ClientChatModules_0 = game:GetService("Chat"):WaitForChild("ClientChatModules");
-local l_CommandModules_0 = l_ClientChatModules_0:WaitForChild("CommandModules");
-local l_Util_0 = require(l_CommandModules_0:WaitForChild("Util"));
-local _ = script.Parent;
-local l_ChatSettings_0 = require(l_ClientChatModules_0:WaitForChild("ChatSettings"));
-v1.SetupCommandProcessors = function(v7) --[[ Line: 19 ]] --[[ Name: SetupCommandProcessors ]]
-    -- upvalues: l_CommandModules_0 (copy), l_Util_0 (copy)
-    local l_l_CommandModules_0_Children_0 = l_CommandModules_0:GetChildren();
-    for v9 = 1, #l_l_CommandModules_0_Children_0 do
-        if l_l_CommandModules_0_Children_0[v9]:IsA("ModuleScript") and l_l_CommandModules_0_Children_0[v9].Name ~= "Util" then
-            local v10 = require(l_l_CommandModules_0_Children_0[v9]);
-            local v11 = v10[l_Util_0.KEY_COMMAND_PROCESSOR_TYPE];
-            local v12 = v10[l_Util_0.KEY_PROCESSOR_FUNCTION];
-            if v11 == l_Util_0.IN_PROGRESS_MESSAGE_PROCESSOR then
-                table.insert(v7.InProgressMessageProcessors, v12);
-            elseif v11 == l_Util_0.COMPLETED_MESSAGE_PROCESSOR then
-                table.insert(v7.CompletedMessageProcessors, v12);
-            end;
-        end;
-    end;
-end;
-v1.ProcessCompletedChatMessage = function(v13, v14, v15) --[[ Line: 37 ]] --[[ Name: ProcessCompletedChatMessage ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    for v16 = 1, #v13.CompletedMessageProcessors do
-        if v13.CompletedMessageProcessors[v16](v14, v15, l_ChatSettings_0) then
-            return true;
-        end;
-    end;
-    return false;
-end;
-v1.ProcessInProgressChatMessage = function(v17, v18, v19, v20) --[[ Line: 47 ]] --[[ Name: ProcessInProgressChatMessage ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    for v21 = 1, #v17.InProgressMessageProcessors do
-        local v22 = v17.InProgressMessageProcessors[v21](v18, v19, v20, l_ChatSettings_0);
-        if v22 then
-            return v22;
-        end;
-    end;
-    return nil;
-end;
-v0.new = function() --[[ Line: 60 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy)
-    local v23 = setmetatable({}, v1);
-    v23.CompletedMessageProcessors = {};
-    v23.InProgressMessageProcessors = {};
-    v23:SetupCommandProcessors();
-    return v23;
-end;
-return v0;
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
+local CommandModules = ClientChatModules:WaitForChild("CommandModules")
+local Util = require(CommandModules:WaitForChild("Util"))
+local _ = script.Parent
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+
+function t2.SetupCommandProcessors(p1) -- line: 19
+	-- upvalues: CommandModules (copy), Util (copy)
+	local children = CommandModules:GetChildren()
+
+	for i = 1, #children do
+		if children[i]:IsA("ModuleScript") and children[i].Name ~= "Util" then
+			local lib = require(children[i])
+			local v12 = lib[Util.KEY_COMMAND_PROCESSOR_TYPE]
+			local v13 = lib[Util.KEY_PROCESSOR_FUNCTION]
+
+			if v12 == Util.IN_PROGRESS_MESSAGE_PROCESSOR then
+				table.insert(p1.InProgressMessageProcessors, v13)
+			elseif v12 == Util.COMPLETED_MESSAGE_PROCESSOR then
+				table.insert(p1.CompletedMessageProcessors, v13)
+			end
+		end
+	end
+end
+function t2.ProcessCompletedChatMessage(p2, p3, p4) -- line: 37
+	-- upvalues: ChatSettings (copy)
+	for i = 1, #p2.CompletedMessageProcessors do
+		if p2.CompletedMessageProcessors[i](p3, p4, ChatSettings) then
+			return true
+		end
+	end
+
+	return false
+end
+function t2.ProcessInProgressChatMessage(p5, p6, p7, p8) -- line: 47
+	-- upvalues: ChatSettings (copy)
+	for i = 1, #p5.InProgressMessageProcessors do
+		local v23 = p5.InProgressMessageProcessors[i](p6, p7, p8, ChatSettings)
+
+		if v23 then
+			return v23
+		end
+	end
+
+	return nil
+end
+function t1.new() -- line: 60
+	-- upvalues: t2 (copy)
+	local self = setmetatable({}, t2)
+
+	self.CompletedMessageProcessors = {}
+	self.InProgressMessageProcessors = {}
+	self:SetupCommandProcessors()
+
+	return self
+end
+
+return t1

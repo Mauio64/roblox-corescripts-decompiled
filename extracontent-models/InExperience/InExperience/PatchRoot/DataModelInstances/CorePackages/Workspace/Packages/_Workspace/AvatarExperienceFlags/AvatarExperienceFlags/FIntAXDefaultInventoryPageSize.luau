@@ -1,1 +1,1 @@
-return game:DefineFastInt("AXDefaultInventoryPageSize", 25);
+return game:DefineFastInt("AXDefaultInventoryPageSize", 25)

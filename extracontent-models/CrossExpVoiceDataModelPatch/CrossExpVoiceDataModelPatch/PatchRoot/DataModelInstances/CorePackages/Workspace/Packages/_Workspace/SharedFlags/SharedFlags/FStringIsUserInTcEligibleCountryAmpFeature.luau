@@ -1,1 +1,1 @@
-return game:DefineFastString("IsUserInTcEligibleCountryAmpFeature", "IsUserInTcEligibleCountry");
+return game:DefineFastString("IsUserInTcEligibleCountryAmpFeature", "IsUserInTcEligibleCountry")

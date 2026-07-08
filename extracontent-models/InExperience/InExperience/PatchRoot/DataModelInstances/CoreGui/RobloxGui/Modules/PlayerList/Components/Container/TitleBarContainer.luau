@@ -1,29 +1,35 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.SignalsReact);
-local v4 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local l_useLeaderboardStore_0 = v4.Hooks.useLeaderboardStore;
-local v7 = require(l_Parent_0.Components.PresentationCommon.TitleBarView);
-local l_FFlagPlayerListFixLeaderstatsStacking_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking;
-return v2.memo(function(v9) --[[ Line: 41 ]] --[[ Name: TitleBarContainer ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), l_FFlagPlayerListFixLeaderstatsStacking_0 (copy), v3 (copy), v2 (copy), v7 (copy)
-    local v10 = l_useLeaderboardStore_0().getGameStatsList();
-    local v11 = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v3.useSignalState(v10.getCount);
-    return v2.createElement(v7, {
-        gameStats = v10, 
-        gameStatsCount = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v11, 
-        size = v9.size, 
-        entrySizeX = v9.entrySizeX, 
-        layoutOrder = v9.layoutOrder, 
-        contentsVisible = v9.contentsVisible, 
-        isSmallTouchDevice = v9.isSmallTouchDevice, 
-        showDivider = v9.showDivider, 
-        showBackground = v9.showBackground, 
-        backgroundTransparency = v9.backgroundTransparency, 
-        useCustomTextColor = v9.useCustomTextColor, 
-        customTextColor = v9.customTextColor, 
-        headerPaddingLeft = v9.headerPaddingLeft
-    });
-end);
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
+local TitleBarView = require(ParentParent.Components.PresentationCommon.TitleBarView)
+local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+
+local function TitleBarContainer(t1: {[any]: any}) -- line: 41
+	-- upvalues: useLeaderboardStore (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), React (copy), TitleBarView (copy)
+	local v11 = useLeaderboardStore().getGameStatsList()
+	local v12 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(v11.getCount) else nil
+
+	return React.createElement(TitleBarView, {
+		gameStats = v11,
+		gameStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v12 else nil,
+		size = t1.size,
+		entrySizeX = t1.entrySizeX,
+		layoutOrder = t1.layoutOrder,
+		contentsVisible = t1.contentsVisible,
+		isSmallTouchDevice = t1.isSmallTouchDevice,
+		showDivider = t1.showDivider,
+		showBackground = t1.showBackground,
+		backgroundTransparency = t1.backgroundTransparency,
+		useCustomTextColor = t1.useCustomTextColor,
+		customTextColor = t1.customTextColor,
+		headerPaddingLeft = t1.headerPaddingLeft
+	})
+end
+
+return React.memo(TitleBarContainer)

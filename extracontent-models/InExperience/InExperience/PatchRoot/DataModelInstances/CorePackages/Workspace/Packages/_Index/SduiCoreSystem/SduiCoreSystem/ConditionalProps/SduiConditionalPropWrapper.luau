@@ -1,166 +1,190 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_GetInputModeStore_0 = require(l_Parent_0.Responsive).GetInputModeStore;
-local v5 = require(l_script_FirstAncestor_0.compareSduiProps);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiConfigTypes);
-local v8 = require(l_script_FirstAncestor_0.ConditionalProps.SduiResponsiveDetector);
-local v9 = require(l_script_FirstAncestor_0.ConditionalProps.SduiPresenceDetector);
-local l_GetDisplayStore_0 = require(l_Parent_0.Display).GetDisplayStore;
-local v11 = require(l_script_FirstAncestor_0.ConditionalProps.checkPresenceConditions);
-local l_checkResponsiveConditions_0 = require(l_script_FirstAncestor_0.SduiResponsiveHelpers).checkResponsiveConditions;
-local v13 = require(l_script_FirstAncestor_0.ConditionalProps.SduiConditionalPropTypes);
-local l_SduiConditionKey_0 = v13.SduiConditionKey;
-local l_SduiResponsiveKey_0 = v13.SduiResponsiveKey;
-local v16 = {};
-return v3.memo(function(v17) --[[ Line: 42 ]] --[[ Name: SduiConditionalPropWrapper ]]
-    -- upvalues: v3 (copy), l_SduiConditionKey_0 (copy), l_SduiResponsiveKey_0 (copy), l_GetDisplayStore_0 (copy), l_GetInputModeStore_0 (copy), l_checkResponsiveConditions_0 (copy), v16 (copy), v11 (copy), v2 (copy), v9 (copy), v8 (copy)
-    local l_sduiContext_0 = v17.sduiContext;
-    l_sduiContext_0.dependencies.instrumentation:startTimerFlow("SduiConditionalPropWrapper");
-    local l_conditionalProps_0 = v17.componentConfig.conditionalProps;
-    local l_dataStore_0 = l_sduiContext_0.dataStore;
-    local v26 = v3.useMemo(function() --[[ Line: 51 ]]
-        -- upvalues: l_conditionalProps_0 (copy), l_SduiConditionKey_0 (ref), l_SduiResponsiveKey_0 (ref)
-        local v21 = {};
-        if not l_conditionalProps_0 then
-            return v21;
-        else
-            assert(l_conditionalProps_0, "conditionalProps must exist");
-            for _, v23 in l_conditionalProps_0 do
-                if v23.conditions then
-                    for v24, _ in v23.conditions do
-                        if v24 == l_SduiConditionKey_0.friendInGame then
-                            v21.hasPresenceProp = true;
-                        elseif l_SduiResponsiveKey_0[v24] ~= nil then
-                            v21.hasResponsiveProp = true;
-                        else
-                            v21.hasCustomProp = true;
-                        end;
-                    end;
-                end;
-            end;
-            return v21;
-        end;
-    end, {
-        l_conditionalProps_0
-    });
-    local v27, v28 = v3.useState(nil);
-    local v33 = v3.useCallback(function(v29, v30) --[[ Line: 77 ]]
-        -- upvalues: v28 (copy)
-        v28(function(v31) --[[ Line: 78 ]]
-            -- upvalues: v30 (copy), v29 (copy)
-            if v31 == nil and v30 == nil then
-                return v31;
-            elseif v31 == nil then
-                return {
-                    [v29] = v30
-                };
-            elseif v31[v29] == v30 then
-                return v31;
-            else
-                local v32 = table.clone(v31);
-                v32[v29] = v30;
-                return v32;
-            end;
-        end);
-    end, {});
-    local v38, v39 = v3.useState(function() --[[ Line: 95 ]]
-        -- upvalues: v26 (copy), l_GetDisplayStore_0 (ref), l_GetInputModeStore_0 (ref), l_checkResponsiveConditions_0 (ref), l_conditionalProps_0 (copy), l_sduiContext_0 (copy), v16 (ref)
-        if v26.hasResponsiveProp then
-            local l_getViewportSize_0 = l_GetDisplayStore_0(false).getViewportSize;
-            local l_getLastInputType_0 = l_GetInputModeStore_0(false).getLastInputType;
-            local l_getPreferredInputType_0 = l_GetInputModeStore_0(false).getPreferredInputType;
-            local l_getIsSpatial_0 = l_GetDisplayStore_0(false).getIsSpatial;
-            return l_checkResponsiveConditions_0(l_conditionalProps_0, l_getViewportSize_0(false), l_getLastInputType_0(false), l_getPreferredInputType_0(false), l_getIsSpatial_0(false), l_sduiContext_0);
-        else
-            return v16;
-        end;
-    end);
-    local v40, v41 = v3.useState(function() --[[ Line: 115 ]]
-        -- upvalues: v26 (copy), v11 (ref), l_conditionalProps_0 (copy), l_dataStore_0 (copy), v16 (ref)
-        if v26.hasPresenceProp then
-            return v11(l_conditionalProps_0, l_dataStore_0.social.getInGameFriendsByGame(false));
-        else
-            return v16;
-        end;
-    end);
-    local v46 = v3.useCallback(function(v42, v43) --[[ Line: 124 ]]
-        -- upvalues: v38 (copy), v40 (copy), l_SduiResponsiveKey_0 (ref), l_SduiConditionKey_0 (ref), v27 (copy)
-        if v38[v42] or v40[v42] then
-            return false;
-        else
-            if v43.conditions then
-                for v44, v45 in v43.conditions do
-                    if l_SduiResponsiveKey_0[v44] == nil and v44 ~= l_SduiConditionKey_0.friendInGame then
-                        return v27 and v27[v44] == v45 or false;
-                    end;
-                end;
-            end;
-            return true;
-        end;
-    end, {
-        v38, 
-        v40, 
-        v27
-    });
-    local v50 = v3.useMemo(function() --[[ Line: 142 ]]
-        -- upvalues: v33 (copy), l_conditionalProps_0 (copy), v46 (copy), v2 (ref)
-        local v47 = {
-            setCustomConditionState = v33
-        };
-        if l_conditionalProps_0 then
-            for v48, v49 in l_conditionalProps_0 do
-                if v49.propOverrides and v46(v48, v49) then
-                    v47 = v2.Dictionary.join(v47, v49.propOverrides);
-                end;
-            end;
-        end;
-        return v47;
-    end, {
-        v46, 
-        l_conditionalProps_0, 
-        v33
-    });
-    local v52 = v3.useMemo(function() --[[ Line: 162 ]]
-        -- upvalues: l_conditionalProps_0 (copy), v26 (copy), v3 (ref), v9 (ref), v41 (copy), l_sduiContext_0 (copy), v8 (ref), v39 (copy)
-        if not l_conditionalProps_0 then
-            return {};
-        else
-            assert(l_conditionalProps_0, "conditionalProps must exist");
-            local v51 = {};
-            if v26.hasPresenceProp then
-                v51.PresenceDetector = v3.createElement(v9, {
-                    setFailedPresencePropIndexes = v41, 
-                    sduiContext = l_sduiContext_0, 
-                    allConditionalProps = l_conditionalProps_0
-                });
-            end;
-            if v26.hasResponsiveProp then
-                v51.ResponsiveDetector = v3.createElement(v8, {
-                    setFailedResponsivePropIndexes = v39, 
-                    sduiContext = l_sduiContext_0, 
-                    allConditionalProps = l_conditionalProps_0
-                });
-            end;
-            return v51;
-        end;
-    end, {
-        l_conditionalProps_0, 
-        l_sduiContext_0, 
-        v26
-    });
-    v52.WrappedComponent = v3.useMemo(function() --[[ Line: 196 ]]
-        -- upvalues: v3 (ref), v17 (copy), v2 (ref), v50 (copy)
-        return v3.createElement(v17.wrappedComponent, v2.Dictionary.join(v17, {
-            conditionalProps = v50
-        }));
-    end, {
-        v17.wrappedComponent, 
-        v50, 
-        v17
-    });
-    l_sduiContext_0.dependencies.instrumentation:stopTimerFlow("SduiConditionalPropWrapper", l_sduiContext_0);
-    return v3.createElement(v3.Fragment, nil, v52);
-end, v5);
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local Cryo = require(SduiCoreSystemParent.Cryo)
+local React = require(SduiCoreSystemParent.React)
+local GetInputModeStore = require(SduiCoreSystemParent.Responsive).GetInputModeStore
+local compareSduiProps = require(SduiCoreSystem.compareSduiProps)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.SduiConfigTypes)
+
+local SduiResponsiveDetector = require(SduiCoreSystem.ConditionalProps.SduiResponsiveDetector)
+local SduiPresenceDetector = require(SduiCoreSystem.ConditionalProps.SduiPresenceDetector)
+local GetDisplayStore = require(SduiCoreSystemParent.Display).GetDisplayStore
+local checkPresenceConditions = require(SduiCoreSystem.ConditionalProps.checkPresenceConditions)
+local checkResponsiveConditions = require(SduiCoreSystem.SduiResponsiveHelpers).checkResponsiveConditions
+local SduiConditionalPropTypes = require(SduiCoreSystem.ConditionalProps.SduiConditionalPropTypes)
+local SduiConditionKey = SduiConditionalPropTypes.SduiConditionKey
+local SduiResponsiveKey = SduiConditionalPropTypes.SduiResponsiveKey
+local t1 = {}
+
+local function SduiConditionalPropWrapper(t2: {[any]: any}) -- line: 46
+	-- upvalues: React (copy), SduiConditionKey (copy), SduiResponsiveKey (copy), GetDisplayStore (copy), GetInputModeStore (copy), checkResponsiveConditions (copy), t1 (copy), checkPresenceConditions (copy), Cryo (copy), SduiPresenceDetector (copy), SduiResponsiveDetector (copy)
+	local sduiContext = t2.sduiContext
+
+	sduiContext.dependencies.instrumentation:startTimerFlow("SduiConditionalPropWrapper")
+
+	local conditionalProps = t2.componentConfig.conditionalProps
+	local dataStore = sduiContext.dataStore
+	local v21 = React.useMemo(function() -- line: 55
+		-- upvalues: conditionalProps (copy), SduiConditionKey (copy), SduiResponsiveKey (copy)
+		local t3 = {}
+
+		if not conditionalProps then
+			return t3
+		end
+
+		assert(conditionalProps, "conditionalProps must exist")
+
+		for _, v34 in conditionalProps do
+			if v34.conditions then
+				for v35, _ in v34.conditions do
+					if v35 == SduiConditionKey.friendInGame then
+						t3.hasPresenceProp = true
+					elseif SduiResponsiveKey[v35] ~= nil then
+						t3.hasResponsiveProp = true
+					else
+						t3.hasCustomProp = true
+					end
+				end
+			end
+		end
+
+		return t3
+	end, { conditionalProps })
+	local v22, v23 = React.useState(nil)
+	local v24 = React.useCallback(function(s1: string, p1) -- line: 81
+		-- upvalues: v23 (copy)
+		v23(function(p2) -- line: 82
+			-- upvalues: p1 (copy), s1 (copy)
+			if p2 == nil and p1 == nil then
+				return p2
+			end
+
+			if p2 == nil then
+				return {
+					[s1] = p1
+				}
+			end
+
+			if p2[s1] == p1 then
+				return p2
+			end
+
+			local v52 = table.clone(p2)
+
+			v52[s1] = p1
+
+			return v52
+		end)
+	end, {})
+	local v25, v26 = React.useState(function() -- line: 99
+		-- upvalues: v21 (copy), GetDisplayStore (copy), GetInputModeStore (copy), checkResponsiveConditions (copy), conditionalProps (copy), sduiContext (copy), t1 (copy)
+		if v21.hasResponsiveProp then
+			local getViewportSize = GetDisplayStore(false).getViewportSize
+			local getLastInputType = GetInputModeStore(false).getLastInputType
+			local getPreferredInputType = GetInputModeStore(false).getPreferredInputType
+			local getIsSpatial = GetDisplayStore(false).getIsSpatial
+
+			return checkResponsiveConditions(conditionalProps, getViewportSize(false), getLastInputType(false), getPreferredInputType(false), getIsSpatial(false), sduiContext)
+		end
+
+		return t1
+	end)
+	local v27, v28 = React.useState(function() -- line: 119
+		-- upvalues: v21 (copy), checkPresenceConditions (copy), conditionalProps (copy), dataStore (copy), t1 (copy)
+		if v21.hasPresenceProp then
+			return checkPresenceConditions(conditionalProps, dataStore.social.getInGameFriendsByGame(false))
+		end
+
+		return t1
+	end)
+	local v29 = React.useCallback(function(n1: number, p3) -- line: 128
+		-- upvalues: v25 (copy), v27 (copy), SduiResponsiveKey (copy), SduiConditionKey (copy), v22 (copy)
+		if v25[n1] or v27[n1] then
+			return false
+		end
+
+		if p3.conditions then
+			for v45, v46 in p3.conditions do
+				if SduiResponsiveKey[v45] == nil and v45 ~= SduiConditionKey.friendInGame then
+					return not not v22 and (v46 == v22[v45] or false)
+				end
+			end
+		end
+
+		return true
+	end, {
+		v25,
+		v27,
+		v22
+	})
+	local v30 = React.useMemo(function() -- line: 146
+		-- upvalues: v24 (copy), conditionalProps (copy), v29 (copy), Cryo (copy)
+		local t4 = {
+			setCustomConditionState = v24
+		}
+
+		if conditionalProps then
+			for v48, v49 in conditionalProps do
+				if v49.propOverrides and v29(v48, v49) then
+					t4 = Cryo.Dictionary.join(t4, v49.propOverrides)
+				end
+			end
+		end
+
+		return t4
+	end, {
+		v29,
+		conditionalProps,
+		v24
+	})
+	local v31 = React.useMemo(function() -- line: 166
+		-- upvalues: conditionalProps (copy), v21 (copy), React (copy), SduiPresenceDetector (copy), v28 (copy), sduiContext (copy), SduiResponsiveDetector (copy), v26 (copy)
+		if not conditionalProps then
+			return {}
+		end
+
+		assert(conditionalProps, "conditionalProps must exist")
+
+		local t5 = {}
+
+		if v21.hasPresenceProp then
+			t5.PresenceDetector = React.createElement(SduiPresenceDetector, {
+				setFailedPresencePropIndexes = v28,
+				sduiContext = sduiContext,
+				allConditionalProps = conditionalProps
+			})
+		end
+
+		if v21.hasResponsiveProp then
+			t5.ResponsiveDetector = React.createElement(SduiResponsiveDetector, {
+				setFailedResponsivePropIndexes = v26,
+				sduiContext = sduiContext,
+				allConditionalProps = conditionalProps
+			})
+		end
+
+		return t5
+	end, {
+		conditionalProps,
+		sduiContext,
+		v21
+	})
+
+	v31.WrappedComponent = React.useMemo(function() -- line: 200
+		-- upvalues: React (copy), t2 (copy), Cryo (copy), v30 (copy)
+		return React.createElement(t2.wrappedComponent, Cryo.Dictionary.join(t2, {
+			conditionalProps = v30
+		}))
+	end, {
+		t2.wrappedComponent,
+		v30,
+		t2
+	})
+	sduiContext.dependencies.instrumentation:stopTimerFlow("SduiConditionalPropWrapper", sduiContext)
+
+	return React.createElement(React.Fragment, nil, v31)
+end
+
+return React.memo(SduiConditionalPropWrapper, compareSduiProps)

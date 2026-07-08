@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableExpJoinMicPermAnalytics", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableExpJoinMicPermAnalytics");
-end;
+game:DefineFastFlag("EnableExpJoinMicPermAnalytics", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableExpJoinMicPermAnalytics")
+end

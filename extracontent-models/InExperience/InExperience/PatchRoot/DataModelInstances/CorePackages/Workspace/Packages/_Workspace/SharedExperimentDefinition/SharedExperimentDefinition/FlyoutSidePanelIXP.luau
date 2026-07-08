@@ -1,6 +1,6 @@
 local ParentParent = script.Parent.Parent
 local ExperimentCacheManager = require(ParentParent.ExperimentCacheManager).ExperimentCacheManager
-local v3 = game:DefineFastInt("FlyoutTestVariantRollout11", -1)
+local v3 = game:DefineFastInt("FlyoutTestVariantRollout12", -1)
 local v4 = game:DefineFastFlag("EnableFlyoutIxp11", false)
 local v5 = game:DefineFastString("FlyoutIxpLayer", "Universality.MorePage")
 local v6 = game:DefineFastString("FlyoutIxpVariantKey", "flyout_side_panel_type")
@@ -46,15 +46,15 @@ local function getIXPVariant() -- line: 26
 end
 
 return {
-	isFlyoutSidePanelEnabled = function() --[[ isFlyoutSidePanelEnabled ]] -- line: 47
+	isFlyoutSidePanelEnabled = function() -- line: 47
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isRobloxLogoEnabled = function() --[[ isRobloxLogoEnabled ]] -- line: 53
+	isRobloxLogoEnabled = function() -- line: 53
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isProfileEntryRemoved = function() --[[ isProfileEntryRemoved ]] -- line: 59
+	isProfileEntryRemoved = function() -- line: 59
 		-- upvalues: getIXPVariant (copy), v14 (copy), v9 (copy), v15 (copy), v8 (copy), v10 (copy), v7 (copy)
 		local v21 = getIXPVariant()
 
@@ -68,11 +68,11 @@ return {
 
 		return v21 ~= v7
 	end,
-	isFriendsSortHeaderHiddenInFlyoutIxp = function() --[[ isFriendsSortHeaderHiddenInFlyoutIxp ]] -- line: 73
+	isFriendsSortHeaderHiddenInFlyoutIxp = function() -- line: 73
 		-- upvalues: getIXPVariant (copy), v7 (copy), v12 (copy)
 		return getIXPVariant() ~= v7 and not v12
 	end,
-	isAlternateEntryPointEnabled = function() --[[ isAlternateEntryPointEnabled ]] -- line: 78
+	isAlternateEntryPointEnabled = function() -- line: 78
 		-- upvalues: getIXPVariant (copy), v16 (copy), v14 (copy), v9 (copy), v15 (copy), v8 (copy), v10 (copy), v7 (copy)
 		local v22 = getIXPVariant()
 
@@ -84,15 +84,15 @@ return {
 
 		return v22 == v8 or v22 == v10
 	end,
-	isRobuxIconRemoved = function() --[[ isRobuxIconRemoved ]] -- line: 89
+	isRobuxIconRemoved = function() -- line: 89
 		-- upvalues: getIXPVariant (copy), v11 (copy)
 		return getIXPVariant() == v11
 	end,
-	isScrollAwayEnabled = function() --[[ isScrollAwayEnabled ]] -- line: 95
+	isScrollAwayEnabled = function() -- line: 95
 		-- upvalues: getIXPVariant (copy), v7 (copy)
 		return getIXPVariant() ~= v7
 	end,
-	isHomeSubTabEnabled = function() --[[ isHomeSubTabEnabled ]] -- line: 100
+	isHomeSubTabEnabled = function() -- line: 100
 		-- upvalues: getIXPVariant (copy), v8 (copy), v9 (copy)
 		local v24 = getIXPVariant()
 

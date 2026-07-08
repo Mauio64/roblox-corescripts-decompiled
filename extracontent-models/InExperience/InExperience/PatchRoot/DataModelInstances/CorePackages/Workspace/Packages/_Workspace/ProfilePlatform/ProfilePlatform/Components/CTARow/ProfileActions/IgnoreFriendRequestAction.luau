@@ -29,12 +29,12 @@ return {
 					})):andThen(function() -- line: 30
 						-- upvalues: p1 (copy), SetCurrentToastMessage (copy), Images (copy), refreshProfilePlatformActionInfo (copy)
 						p1.dispatch(SetCurrentToastMessage({
+							isLocalized = true,
 							toastMessage = p1.localized.friendRequestIgnoredToast,
-							toastIcon = Images["icons/actions/reject"],
-							isLocalized = true
+							toastIcon = Images["icons/actions/reject"]
 						}))
 
-						return p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId))
+						return p1.dispatch(refreshProfilePlatformActionInfo(p1.profileId, p1.actionsComponentRequest))
 					end)
 				end
 			}

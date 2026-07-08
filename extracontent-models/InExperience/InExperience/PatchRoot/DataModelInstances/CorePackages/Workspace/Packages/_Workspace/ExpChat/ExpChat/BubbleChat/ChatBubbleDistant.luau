@@ -1,1 +1,1 @@
-return require(script.ChatBubbleDistant);
+return require(script.ChatBubbleDistant)

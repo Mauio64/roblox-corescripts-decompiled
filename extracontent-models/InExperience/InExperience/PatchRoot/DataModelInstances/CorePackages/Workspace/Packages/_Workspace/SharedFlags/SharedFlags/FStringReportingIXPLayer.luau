@@ -1,1 +1,1 @@
-return game:DefineFastString("ReportingIXPLayer", "UserSafety.Reporting");
+return game:DefineFastString("ReportingIXPLayer", "UserSafety.Reporting")

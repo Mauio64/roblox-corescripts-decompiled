@@ -1,128 +1,216 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RobloxAppHooks);
-local v4 = require(l_Parent_0.PeekView);
-local v5 = require(l_Parent_0.RoactUtils);
-local v6 = require(l_Parent_0.NavigationRodux);
-local v7 = require(l_Parent_0.Foundation);
-local v8 = require(l_Parent_0.InputUi);
-local l_useNavigationProps_0 = require(l_Parent_0.RobloxAppNavigation).useNavigationProps;
-local v10 = require(l_Parent_0.SharedFlags);
-local v11 = require(l_script_FirstAncestor_0.Hooks.useProfileFormFactor);
-local v12 = require(l_script_FirstAncestor_0.Common.Enums);
-local v13 = require(l_script_FirstAncestor_0.Common.Constants);
-local v14 = require(l_script_FirstAncestor_0.Hooks.useProfileCardWidth);
-local l_useProfileCardWidth_0 = require(l_Parent_0.ProfilePlatformCommon).Hooks.useProfileCardWidth;
-local l_useSelector_0 = v5.Hooks.RoactRodux.useSelector;
-local l_useDispatch_0 = v5.Hooks.RoactRodux.useDispatch;
-local l_NavigateBack_0 = v6.Thunks.NavigateBack;
-local l_useScreenSize_0 = v3.useScreenSize;
-local l_useTopBarHeight_0 = v3.useTopBarHeight;
-local l_getSafeAreaSize_0 = v8.getSafeAreaSize;
-local l_PeekViewWithTopBar_0 = v4.PeekViewWithTopBar;
-local l_PeekViewState_0 = v4.PeekViewState;
-local l_FFlagProfilePlatformNewProfileHeader_0 = v10.FFlagProfilePlatformNewProfileHeader;
-local l_FFlagSwitchProfileWidthHookToSocialCommon_0 = v10.FFlagSwitchProfileWidthHookToSocialCommon;
-local l_IconButton_0 = v7.IconButton;
-local l_View_0 = v7.View;
-local v28 = {
-    position = UDim2.fromScale(0, 0), 
-    size = UDim2.fromScale(1, 1), 
-    anchorPoint = Vector2.new(0, 0)
-};
-return function(_) --[[ Line: 41 ]] --[[ Name: AboutDetailsSheet ]]
-    -- upvalues: l_useTopBarHeight_0 (copy), l_useDispatch_0 (copy), v11 (copy), v12 (copy), l_useScreenSize_0 (copy), l_useSelector_0 (copy), l_getSafeAreaSize_0 (copy), l_FFlagProfilePlatformNewProfileHeader_0 (copy), l_FFlagSwitchProfileWidthHookToSocialCommon_0 (copy), l_useProfileCardWidth_0 (copy), v14 (copy), v13 (copy), v2 (copy), l_NavigateBack_0 (copy), l_PeekViewState_0 (copy), l_useNavigationProps_0 (copy), v28 (copy), l_View_0 (copy), l_PeekViewWithTopBar_0 (copy), l_IconButton_0 (copy)
-    local v30 = UDim.new(0.55, 0);
-    local v31 = l_useTopBarHeight_0();
-    local v32 = l_useDispatch_0();
-    local v33 = v11();
-    local v34 = v33.formFactor == v12.ProfileFormFactor.Wide;
-    local v35 = l_useScreenSize_0();
-    local v37 = l_useSelector_0(function(v36) --[[ Line: 49 ]]
-        return v36.GlobalGuiInset;
-    end);
-    local v39 = l_useSelector_0(function(v38) --[[ Line: 52 ]]
-        return v38.TopBar.statusBarHeight;
-    end);
-    local v40 = l_getSafeAreaSize_0(v35, v37);
-    local v41 = (if l_FFlagProfilePlatformNewProfileHeader_0 then if l_FFlagSwitchProfileWidthHookToSocialCommon_0 then l_useProfileCardWidth_0() else v14(v34) else math.min(v40.X.Offset, v13.MAXIMUM_CONTAINER_WIDTH)) / v40.X.Offset;
-    local v42 = v2.useCallback(function() --[[ Line: 65 ]]
-        -- upvalues: v32 (copy), l_NavigateBack_0 (ref)
-        v32(l_NavigateBack_0(true));
-    end, {
-        v32
-    });
-    local v43 = v2.useCallback(function() --[[ Line: 69 ]]
-        -- upvalues: v42 (copy)
-        v42();
-    end, {
-        v42
-    });
-    local v47 = v2.useCallback(function(v44, _, _) --[[ Line: 73 ]]
-        -- upvalues: l_PeekViewState_0 (ref), v42 (copy)
-        if v44 == l_PeekViewState_0.Closed then
-            v42();
-        end;
-    end, {
-        v42
-    });
-    local v50 = l_useNavigationProps_0(function(_, v49) --[[ Line: 79 ]]
-        return {
-            sections = v49.sections
-        };
-    end).sections or {};
-    local v51 = {
-        position = UDim2.fromScale(1, 0), 
-        size = UDim2.fromScale(v41, 1), 
-        anchorPoint = Vector2.new(1, 0)
-    };
-    local v52 = v2.useMemo(function() --[[ Line: 92 ]]
-        -- upvalues: v34 (copy), v51 (copy), v28 (ref)
-        if v34 then
-            return v51;
-        else
-            return v28;
-        end;
-    end, {
-        v33.formFactor
-    });
-    return v2.createElement(l_View_0, {
-        Size = v52.size, 
-        Position = v52.position, 
-        AnchorPoint = v52.anchorPoint
-    }, {
-        AboutDetailsSheet = v2.createElement(l_PeekViewWithTopBar_0, {
-            briefViewContentHeight = v30, 
-            fullViewContentHeight = UDim.new(1, -v31), 
-            onViewStateChanged = v47, 
-            topBarHeight = v31, 
-            topBarSlot = v2.createElement(l_View_0, {
-                tag = "bg-surface-100", 
-                Position = UDim2.new(0, 0, 0, 0), 
-                Size = UDim2.new(0, 0, 0, v31), 
-                Active = true, 
-                BorderSizePixel = 0
-            }, {
-                LeftNavigationButton = v2.createElement(l_IconButton_0, {
-                    Position = UDim2.new(0, 15, 0, v39), 
-                    BackgroundTransparency = 1, 
-                    onActivated = v43, 
-                    icon = "icons/navigation/close"
-                })
-            }), 
-            contentSlot = v2.createElement(l_View_0, {
-                Size = UDim2.new(1, 0, 1, -v31), 
-                tag = "auto-y align-x-center col padding-bottom-large"
-            }, {
-                Contents = v2.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 0, 0), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    tag = "align-x-center col padding-x-xlarge gap-xlarge padding-top-large padding-bottom-large"
-                }, {
-                    ContentSections = v2.createElement(v2.Fragment, {}, v50)
-                })
-            })
-        })
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
+local PeekView = require(ProfilePlatformParent.PeekView)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local NavigationRodux = require(ProfilePlatformParent.NavigationRodux)
+local Foundation = require(ProfilePlatformParent.Foundation)
+local InputUi = require(ProfilePlatformParent.InputUi)
+local useNavigationProps = require(ProfilePlatformParent.RobloxAppNavigation).useNavigationProps
+local SharedFlags = require(ProfilePlatformParent.SharedFlags)
+local useProfileFormFactor = require(ProfilePlatform.Hooks.useProfileFormFactor)
+local Enums = require(ProfilePlatform.Common.Enums)
+local Constants = require(ProfilePlatform.Common.Constants)
+local useProfileCardWidth = require(ProfilePlatform.Hooks.useProfileCardWidth)
+local useProfileCardWidth2 = require(ProfilePlatformParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local NavigateBack = NavigationRodux.Thunks.NavigateBack
+local useScreenSize = RobloxAppHooks.useScreenSize
+local useTopBarHeight = RobloxAppHooks.useTopBarHeight
+local getSafeAreaSize = InputUi.getSafeAreaSize
+local PeekViewWithTopBar = PeekView.PeekViewWithTopBar
+local PeekViewState = PeekView.PeekViewState
+local FFlagProfilePlatformNewProfileHeader = SharedFlags.FFlagProfilePlatformNewProfileHeader
+local FFlagSwitchProfileWidthHookToSocialCommon = SharedFlags.FFlagSwitchProfileWidthHookToSocialCommon
+local FFlagSignalsNavP3Dispatch = SharedFlags.FFlagSignalsNavP3Dispatch
+local FFlagProfileAboutDetailsUseSheet = SharedFlags.FFlagProfileAboutDetailsUseSheet
+local v31 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
+local IconButton = Foundation.IconButton
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Sheet = Foundation.Sheet
+local OverlayProvider = Foundation.OverlayProvider
+local t1 = {
+	0.55,
+	1
+}
+local t2 = {
+	position = UDim2.fromScale(0, 0),
+	size = UDim2.fromScale(1, 1),
+	anchorPoint = Vector2.new(0, 0)
+}
+
+local function AboutDetailsSheetLegacy(_) -- line: 55
+	-- upvalues: useTopBarHeight (copy), useDispatch (copy), useProfileFormFactor (copy), Enums (copy), useScreenSize (copy), useSelector (copy), getSafeAreaSize (copy), FFlagProfilePlatformNewProfileHeader (copy), FFlagSwitchProfileWidthHookToSocialCommon (copy), useProfileCardWidth2 (copy), useProfileCardWidth (copy), Constants (copy), React (copy), FFlagSignalsNavP3Dispatch (copy), v31 (copy), NavigateBack (copy), PeekViewState (copy), useNavigationProps (copy), t2 (copy), View (copy), PeekViewWithTopBar (copy), IconButton (copy)
+	local uDim = UDim.new(0.55, 0)
+	local v44 = useTopBarHeight()
+	local v45 = useDispatch()
+	local v46 = useProfileFormFactor()
+	local v47 = v46.formFactor == Enums.ProfileFormFactor.Wide
+	local v48 = useScreenSize()
+	local v49 = useSelector(function(p2) -- line: 63
+		return p2.GlobalGuiInset
+	end)
+	local v50 = useSelector(function(p3) -- line: 66
+		return p3.TopBar.statusBarHeight
+	end)
+	local v51 = getSafeAreaSize(v48, v49)
+	local v52 = ((if not FFlagProfilePlatformNewProfileHeader then math.min(v51.X.Offset, Constants.MAXIMUM_CONTAINER_WIDTH) else (if not FFlagSwitchProfileWidthHookToSocialCommon then useProfileCardWidth(v47) else useProfileCardWidth2()))) / v51.X.Offset
+	local v53 = React.useCallback(function() -- line: 79
+		-- upvalues: FFlagSignalsNavP3Dispatch (copy), v31 (copy), v45 (copy), NavigateBack (copy)
+		if FFlagSignalsNavP3Dispatch then
+			v31.back(true)
+
+			return
+		end
+
+		v45(NavigateBack(true))
+	end, { v45 })
+	local v54 = React.useCallback(function() -- line: 87
+		-- upvalues: v53 (copy)
+		v53()
+	end, { v53 })
+	local v55 = React.useCallback(function(p4, _, _) -- line: 91
+		-- upvalues: PeekViewState (copy), v53 (copy)
+		if p4 == PeekViewState.Closed then
+			v53()
+		end
+	end, { v53 })
+	local v56 = useNavigationProps(function(_, p8) -- line: 97
+		return {
+			sections = p8.sections
+		}
+	end).sections or {}
+	local t3 = {
+		position = UDim2.fromScale(1, 0),
+		size = UDim2.fromScale(v52, 1),
+		anchorPoint = Vector2.new(1, 0)
+	}
+	local v58 = React.useMemo(function() -- line: 110
+		-- upvalues: v47 (copy), t3 (copy), t2 (copy)
+		if v47 then
+			return t3
+		end
+
+		return t2
+	end, { v46.formFactor })
+
+	return React.createElement(View, {
+		Size = v58.size,
+		Position = v58.position,
+		AnchorPoint = v58.anchorPoint
+	}, {
+		AboutDetailsSheet = React.createElement(PeekViewWithTopBar, {
+			briefViewContentHeight = uDim,
+			fullViewContentHeight = UDim.new(1, -v44),
+			onViewStateChanged = v55,
+			topBarHeight = v44,
+			topBarSlot = React.createElement(View, {
+				tag = "bg-surface-100",
+				Active = true,
+				BorderSizePixel = 0,
+				Position = UDim2.new(0, 0, 0, 0),
+				Size = UDim2.new(0, 0, 0, v44)
+			}, {
+				LeftNavigationButton = React.createElement(IconButton, {
+					BackgroundTransparency = 1,
+					icon = "icons/navigation/close",
+					Position = UDim2.new(0, 15, 0, v50),
+					onActivated = v54
+				})
+			}),
+			contentSlot = React.createElement(View, {
+				tag = "auto-y align-x-center col padding-bottom-large",
+				Size = UDim2.new(1, 0, 1, -v44)
+			}, {
+				Contents = React.createElement(View, {
+					tag = "align-x-center col padding-x-xlarge gap-xlarge padding-top-large padding-bottom-large",
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					ContentSections = React.createElement(React.Fragment, {}, v56)
+				})
+			})
+		})
+	})
+end
+local function AboutDetailsSheetFoundation(_) -- line: 159
+	-- upvalues: useDispatch (copy), React (copy), FFlagSignalsNavP3Dispatch (copy), v31 (copy), NavigateBack (copy), useNavigationProps (copy), useLocalization (copy), TextKeys (copy), View (copy), OverlayProvider (copy), Sheet (copy), t1 (copy), FoundationText (copy)
+	local v60 = useDispatch()
+	local v61 = React.useCallback(function() -- line: 162
+		-- upvalues: FFlagSignalsNavP3Dispatch (copy), v31 (copy), v60 (copy), NavigateBack (copy)
+		if FFlagSignalsNavP3Dispatch then
+			v31.back(true)
+
+			return
+		end
+
+		v60(NavigateBack(true))
+	end, { v60 })
+	local v62 = useNavigationProps(function(_, p11) -- line: 170
+		return {
+			sections = p11.sections,
+			profileName = p11.profileName
+		}
+	end)
+	local v63 = v62.sections or {}
+	local profileName = v62.profileName
+	local v65, v66 = React.useState(nil)
+	local v67 = useLocalization({
+		about = TextKeys.About,
+		aboutHeading = {
+			TextKeys.AboutDetailsHeading,
+			name = profileName or ""
+		}
+	})
+
+	return React.createElement(View, {
+		ref = v66,
+		Size = UDim2.fromScale(1, 1)
+	}, {
+		Overlay = v65 and React.createElement(OverlayProvider, {
+			gui = v65
+		}, {
+			AboutSheet = React.createElement(Sheet.Root, {
+				isOpen = true,
+				preferCenterSheet = true,
+				defaultSnapPointIndex = 1,
+				onClose = v61,
+				snapPoints = t1
+			}, {
+				Header = React.createElement(Sheet.Header, {
+					hasCloseAffordance = true
+				}, {
+					HeaderContent = React.createElement(FoundationText, {
+						LayoutOrder = 1,
+						tag = "size-full-0 auto-y text-heading-small text-align-x-left",
+						Text = if not profileName then v67.about else v67.aboutHeading
+					})
+				}),
+				Content = React.createElement(Sheet.Content, nil, {
+					Contents = React.createElement(View, {
+						tag = "col align-x-center gap-xlarge padding-bottom-large",
+						Size = UDim2.new(1, 0, 0, 0),
+						AutomaticSize = Enum.AutomaticSize.Y
+					}, {
+						ContentSections = React.createElement(React.Fragment, {}, v63)
+					})
+				})
+			})
+		}) or nil
+	})
+end
+local function AboutDetailsSheet(p12) -- line: 222
+	-- upvalues: FFlagProfileAboutDetailsUseSheet (copy), AboutDetailsSheetFoundation (copy), AboutDetailsSheetLegacy (copy)
+	if FFlagProfileAboutDetailsUseSheet then
+		return AboutDetailsSheetFoundation(p12)
+	end
+
+	return AboutDetailsSheetLegacy(p12)
+end
+
+return AboutDetailsSheet

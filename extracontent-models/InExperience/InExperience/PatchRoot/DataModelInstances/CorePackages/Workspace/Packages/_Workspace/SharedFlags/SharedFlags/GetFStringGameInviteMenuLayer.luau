@@ -1,4 +1,5 @@
-game:DefineFastString("LuaGameInviteMenuLayer", "Growth.Notifications.GameInviteMenu");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("LuaGameInviteMenuLayer");
-end;
+game:DefineFastString("LuaGameInviteMenuLayer", "Growth.Notifications.GameInviteMenu")
+
+return function() -- line: 3
+	return game:GetFastString("LuaGameInviteMenuLayer")
+end

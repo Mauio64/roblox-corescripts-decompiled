@@ -1,1 +1,1 @@
-return require(script.AppSquadEventReceiver);
+return require(script.AppSquadEventReceiver)

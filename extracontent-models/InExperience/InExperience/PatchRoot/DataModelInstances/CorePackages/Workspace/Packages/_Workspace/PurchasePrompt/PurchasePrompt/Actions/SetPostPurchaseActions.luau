@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "postPurchaseActions");
+return require(script.Parent.makeActionCreator)(script.Name, "postPurchaseActions")

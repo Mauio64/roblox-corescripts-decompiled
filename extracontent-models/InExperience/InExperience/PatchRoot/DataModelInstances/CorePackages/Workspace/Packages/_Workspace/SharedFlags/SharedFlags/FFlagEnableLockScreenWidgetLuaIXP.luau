@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableLockScreenWidgetLuaIXP", false);
+return game:DefineFastFlag("EnableLockScreenWidgetLuaIXP", false)

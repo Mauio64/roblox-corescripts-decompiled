@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAvatarSharingEntryPoint", false);
+return game:DefineFastFlag("AXAvatarSharingEntryPoint", false)

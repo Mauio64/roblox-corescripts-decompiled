@@ -1,298 +1,310 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local v6 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceFlags);
-local v7 = require(l_Parent_0.Components.AvatarViewport);
-local v8 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceInspectAndBuy);
-local l_useViewBreakpoints_0 = v8.Hooks.useViewBreakpoints;
-local l_ResponsivePanelLayout_0 = v8.Components.ResponsivePanelLayout;
-local l_useResponsivePanelLayoutProps_0 = v8.Hooks.useResponsivePanelLayoutProps;
-local l_applyTryOnItemToHumanoidDescription_0 = v8.Utils.applyTryOnItemToHumanoidDescription;
-local l_useInspectAndBuyFocusNavigation_0 = v8.Hooks.useInspectAndBuyFocusNavigation;
-local l_buildBulkPurchaseAnalyticsPayload_0 = v8.Utils.buildBulkPurchaseAnalyticsPayload;
-local v15 = require(l_Parent_0.Actions.UpdateBulkPuchaseResults);
-local v16 = require(l_Parent_0.Thunks.GetProductInfo);
-local v17 = require(l_Parent_0.Thunks.GetFavoriteForAsset);
-local v18 = require(l_Parent_0.Thunks.GetFavoriteForBundle);
-local v19 = require(l_Parent_0.Thunks.CreateFavoriteForAsset);
-local v20 = require(l_Parent_0.Thunks.DeleteFavoriteForAsset);
-local v21 = require(l_Parent_0.Thunks.CreateFavoriteForBundle);
-local v22 = require(l_Parent_0.Thunks.DeleteFavoriteForBundle);
-local v23 = require(l_Parent_0.Thunks.PromptPurchase);
-local v24 = require(l_Parent_0.Thunks.GetItemDetails);
-local v25 = require(l_CorePackages_0.Workspace.Packages.RoactUtils);
-local l_useDispatch_0 = v25.Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = v25.Hooks.RoactRodux.useSelector;
-local l_ItemTypeEnum_0 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceCommon).Enums.ItemTypeEnum;
-local v29 = require(l_Parent_0.Actions.OpenOverlay);
-local v30 = require(l_Parent_0.Enums.Overlay);
-local v31 = require(l_Parent_0.Components.Overlay);
-local l_useUnifiedEventListenerInExperience_0 = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceAnalytics).useUnifiedEventListener.useUnifiedEventListenerInExperience;
-local l_useSignalState_0 = require(l_CorePackages_0.Packages.SignalsReact).useSignalState;
-local v34 = require(l_CorePackages_0.Packages.Foundation);
-local l_useTokens_0 = v34.Hooks.useTokens;
-local l_Modules_0 = l_CoreGui_0.RobloxGui.Modules;
-local v37 = require(l_Modules_0.Settings.Theme);
-local v38 = require(l_Modules_0.TopBar.Constants);
-local v39 = require(l_CorePackages_0.Packages.tutils);
-local v40 = game:DefineFastFlag("EnableAvatarViewportAutoRotation", false);
-local v41 = game:DefineFastInt("AXViewportCameraFieldOfView", 68);
-local l_FFlagIBV2Attribution_0 = v5.FFlagIBV2Attribution;
-local l_FFlagAXEnableBatchItemDetailsFetchV2_0 = v6.FFlagAXEnableBatchItemDetailsFetchV2;
-local l_FFlagAXEnableInspectAndBuyFocusNavigation_0 = v6.FFlagAXEnableInspectAndBuyFocusNavigation;
-local l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 = v6.FFlagAXEnableIaBTimedOptionsBulkPurchase;
-local v46 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v8.Contexts.ItemSelectionStoreContext else nil;
-local v47 = if v46 then v46.Provider else nil;
-local v48 = if v46 then v46.useItemSelectionStore else nil;
-local function v50(v49) --[[ Line: 84 ]]
-    return v49.assets;
-end;
-local function v52(v51) --[[ Line: 88 ]]
-    return v51.collectibleResellableInstances;
-end;
-local function v54(v53) --[[ Line: 92 ]]
-    return v53.bundles;
-end;
-local function v97(v55) --[[ Line: 96 ]] --[[ Name: InspectAndBuyBaseContainer ]]
-    -- upvalues: l_useViewBreakpoints_0 (copy), v38 (copy), l_useTokens_0 (copy), l_useDispatch_0 (copy), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (copy), v48 (copy), l_useSignalState_0 (copy), l_useSelector_0 (copy), v50 (copy), v39 (copy), v52 (copy), v54 (copy), v4 (copy), l_GuiService_0 (copy), v15 (copy), l_ItemTypeEnum_0 (copy), l_buildBulkPurchaseAnalyticsPayload_0 (copy), v24 (copy), v17 (copy), v16 (copy), l_FFlagIBV2Attribution_0 (copy), l_FFlagAXEnableBatchItemDetailsFetchV2_0 (copy), v18 (copy), v20 (copy), v19 (copy), v22 (copy), v21 (copy), v29 (copy), v30 (copy), v23 (copy), l_applyTryOnItemToHumanoidDescription_0 (copy), v7 (copy), v40 (copy), v41 (copy), l_useResponsivePanelLayoutProps_0 (copy), l_useUnifiedEventListenerInExperience_0 (copy), l_FFlagAXEnableInspectAndBuyFocusNavigation_0 (copy), l_useInspectAndBuyFocusNavigation_0 (copy), v34 (copy), v37 (copy), l_ResponsivePanelLayout_0 (copy), v31 (copy)
-    local v56 = l_useViewBreakpoints_0(v38.TopBarHeight);
-    local v57 = l_useTokens_0();
-    local v58 = l_useDispatch_0();
-    local v59 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v48() else nil;
-    local v60 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSignalState_0(v59.getItemDataMap) else nil;
-    local v61 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSelector_0(v50, v39.deepEqual) else nil;
-    local v62 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSelector_0(v52, v39.deepEqual) else nil;
-    local v63 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSelector_0(v54, v39.deepEqual) else nil;
-    local v64 = v4.useCallback(function() --[[ Line: 121 ]]
-        -- upvalues: l_GuiService_0 (ref)
-        l_GuiService_0:CloseInspectMenu();
-    end, {});
-    local v76 = v4.useCallback(function(_, _, v67) --[[ Line: 129 ]]
-        -- upvalues: v58 (copy), v15 (ref), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (ref), v60 (copy), l_ItemTypeEnum_0 (ref), l_buildBulkPurchaseAnalyticsPayload_0 (ref), v61 (copy), v63 (copy), v62 (copy), v55 (copy), v24 (ref)
-        v58(v15(v67));
-        for _, v69 in v67.Items do
-            if v69.status == Enum.MarketplaceItemPurchaseStatus.Success then
-                if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 and v60 then
-                    local v70 = v69.type == Enum.MarketplaceProductType.AvatarAsset;
-                    local l_id_0 = v69.id;
-                    local v72 = if v70 then Enum.AvatarItemType.Asset else Enum.AvatarItemType.Bundle;
-                    local v73 = if v70 then l_ItemTypeEnum_0.Asset else l_ItemTypeEnum_0.Bundle;
-                    local v74 = v60[tostring(l_id_0)];
-                    local v75 = l_buildBulkPurchaseAnalyticsPayload_0({
-                        itemId = tostring(l_id_0), 
-                        itemType = v73, 
-                        assetsMap = v61, 
-                        bundlesMap = v63, 
-                        collectibleResellableInstances = v62, 
-                        storedData = v74
-                    });
-                    if v75 then
-                        v55.analytics.reportPurchaseSuccessUnifiedEvent(v73, l_id_0, v75);
-                    end;
-                    v58(v24(l_id_0, v72));
-                elseif v69.type == Enum.MarketplaceProductType.AvatarAsset then
-                    v55.analytics.reportPurchaseSuccess(l_ItemTypeEnum_0.Asset, v69.id);
-                    v58(v24(v69.id, Enum.AvatarItemType.Asset));
-                elseif v69.type == Enum.MarketplaceProductType.AvatarBundle then
-                    v55.analytics.reportPurchaseSuccess(l_ItemTypeEnum_0.Bundle, v69.id);
-                    v58(v24(v69.id, Enum.AvatarItemType.Bundle));
-                end;
-            end;
-        end;
-    end, {
-        v58, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v61 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v63 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v62 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v60 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v55.analytics.reportPurchaseSuccess else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v55.analytics.reportPurchaseSuccessUnifiedEvent else nil
-    });
-    local v78 = v4.useCallback(function(v77) --[[ Line: 186 ]]
-        -- upvalues: l_ItemTypeEnum_0 (ref), v58 (copy), v17 (ref), v16 (ref), l_FFlagIBV2Attribution_0 (ref), l_FFlagAXEnableBatchItemDetailsFetchV2_0 (ref), v24 (ref), v18 (ref)
-        if v77.itemType == l_ItemTypeEnum_0.Asset then
-            v58(v17(v77.id));
-            v58(v16(v77.id));
-            if l_FFlagIBV2Attribution_0 and l_FFlagAXEnableBatchItemDetailsFetchV2_0 then
-                v58(v24(v77.id, Enum.AvatarItemType.Asset));
-                return;
-            end;
-        elseif v77.itemType == l_ItemTypeEnum_0.Bundle then
-            v58(v18(v77.id));
-        end;
-    end, {
-        v58
-    });
-    local v81 = v4.useCallback(function(v79, v80) --[[ Line: 205 ]]
-        -- upvalues: l_ItemTypeEnum_0 (ref), v58 (copy), v20 (ref), v19 (ref), v22 (ref), v21 (ref)
-        if v79.itemType == l_ItemTypeEnum_0.Asset then
-            if v80 then
-                v58(v20(v79.id));
-                return;
-            else
-                v58(v19(v79.id));
-                return;
-            end;
-        else
-            if v79.itemType == l_ItemTypeEnum_0.Bundle then
-                if v80 then
-                    v58(v22(v79.id));
-                    return;
-                else
-                    v58(v21(v79.id));
-                end;
-            end;
-            return;
-        end;
-    end, {
-        v58
-    });
-    local v83 = if l_FFlagIBV2Attribution_0 then v4.useCallback(function(v82) --[[ Line: 222 ]]
-        -- upvalues: v58 (copy), v29 (ref), v30 (ref)
-        v58(v29(v30.AttributionTraversal, v82));
-    end, {
-        v58
-    }) else nil;
-    local function v91(v84, v85, v86, v87, v88, v89, v90) --[[ Line: 260 ]]
-        -- upvalues: v58 (copy), v23 (ref)
-        v58(v23(v84, v85, v86, v87, v88, v89, v90));
-    end;
-    local v94 = v4.useCallback(function(v92) --[[ Line: 282 ]]
-        -- upvalues: v55 (copy), l_applyTryOnItemToHumanoidDescription_0 (ref), v4 (ref), v7 (ref), v40 (ref), v41 (ref)
-        if v55.localPlayerModel and v55.localPlayerModel.Humanoid then
-            local v93 = v55.localPlayerModel.Humanoid.HumanoidDescription:Clone();
-            l_applyTryOnItemToHumanoidDescription_0(v92, v93);
-            return v4.createElement(v7, {
-                size = UDim2.new(1, 0, 1, 0), 
-                position = UDim2.new(0.5, 0, 0.5, 0), 
-                humanoidDescription = v93, 
-                model = v55.localPlayerModel, 
-                visible = true, 
-                backgroundTransparency = 1, 
-                disableAutoRotation = not v40, 
-                offsetOptions = {
-                    defaultCameraOffset = CFrame.new(0, 0.5, -5), 
-                    toolOffset = CFrame.new(0, 2, -8)
-                }, 
-                cameraFieldOfView = v41, 
-                resetCameraAndAutoRotationOnModelChange = true
-            });
-        else
-            return nil;
-        end;
-    end, {
-        v55.localPlayerModel
-    });
-    local v95 = l_useResponsivePanelLayoutProps_0({
-        onInspectMenuClosed = v64, 
-        onBulkPurchaseFinished = v76, 
-        onItemDetailsOpened = v78, 
-        onToggleFavorite = v81, 
-        openAttributionOverlay = if l_FFlagIBV2Attribution_0 then v83 else nil, 
-        onPromptPurchase = v91, 
-        renderTryOnViewport = v94, 
-        localPlayerModel = v55.localPlayerModel, 
-        analytics = v55.analytics
-    });
-    l_useUnifiedEventListenerInExperience_0();
-    if l_FFlagAXEnableInspectAndBuyFocusNavigation_0 then
-        local v96 = l_useInspectAndBuyFocusNavigation_0();
-        return v4.createElement("Frame", {
-            ref = v96.setFocusRef, 
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            SelectionGroup = v96.focusNavigationProps.SelectionGroup, 
-            SelectionBehaviorDown = v96.focusNavigationProps.SelectionBehaviorDown, 
-            SelectionBehaviorLeft = v96.focusNavigationProps.SelectionBehaviorLeft, 
-            SelectionBehaviorRight = v96.focusNavigationProps.SelectionBehaviorRight, 
-            SelectionBehaviorUp = v96.focusNavigationProps.SelectionBehaviorUp
-        }, {
-            Content = v4.createElement(v34.View, {
-                Size = v56.OverlaySize, 
-                Position = v56.OverlayPosition, 
-                backgroundStyle = v57.Color.Common.Shadow, 
-                stateLayer = {
-                    affordance = v34.Enums.StateLayerAffordance.None
-                }, 
-                onActivated = function() --[[ Line: 342 ]] --[[ Name: onActivated ]]
-                    -- upvalues: l_GuiService_0 (ref)
-                    l_GuiService_0:CloseInspectMenu();
-                end
-            }, {
-                ContainerView = v4.createElement(v34.View, {
-                    AnchorPoint = v56.ContainerAnchorPoint, 
-                    ClipsDescendants = true, 
-                    Size = v56.ContainerSize, 
-                    Position = v56.ContainerPosition, 
-                    backgroundStyle = {
-                        Color3 = v37.color("MenuContainer"), 
-                        Transparency = v37.transparency("MenuContainer", 1) * l_GuiService_0.PreferredTransparency
-                    }, 
-                    stateLayer = {
-                        affordance = v34.Enums.StateLayerAffordance.None
-                    }, 
-                    onActivated = function() --[[ Line: 358 ]] --[[ Name: onActivated ]]
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local CoreGui = game:GetService("CoreGui")
+local ParentParent = script.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local AvatarExperienceFlags = require(CorePackages.Workspace.Packages.AvatarExperienceFlags)
+local AvatarViewport = require(ParentParent.Components.AvatarViewport)
+local AvatarExperienceInspectAndBuy = require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
+local PopoverFocusRestorationContext = require(CorePackages.Workspace.Packages.AvatarExperienceTimedOptions).PopoverFocusRestorationContext
+local useViewBreakpoints = AvatarExperienceInspectAndBuy.Hooks.useViewBreakpoints
+local ResponsivePanelLayout = AvatarExperienceInspectAndBuy.Components.ResponsivePanelLayout
+local useResponsivePanelLayoutProps = AvatarExperienceInspectAndBuy.Hooks.useResponsivePanelLayoutProps
+local applyTryOnItemToHumanoidDescription = AvatarExperienceInspectAndBuy.Utils.applyTryOnItemToHumanoidDescription
+local useInspectAndBuyFocusNavigation = AvatarExperienceInspectAndBuy.Hooks.useInspectAndBuyFocusNavigation
+local buildBulkPurchaseAnalyticsPayload = AvatarExperienceInspectAndBuy.Utils.buildBulkPurchaseAnalyticsPayload
+local UpdateBulkPuchaseResults = require(ParentParent.Actions.UpdateBulkPuchaseResults)
+local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
+local GetFavoriteForAsset = require(ParentParent.Thunks.GetFavoriteForAsset)
+local GetFavoriteForBundle = require(ParentParent.Thunks.GetFavoriteForBundle)
+local CreateFavoriteForAsset = require(ParentParent.Thunks.CreateFavoriteForAsset)
+local DeleteFavoriteForAsset = require(ParentParent.Thunks.DeleteFavoriteForAsset)
+local CreateFavoriteForBundle = require(ParentParent.Thunks.CreateFavoriteForBundle)
+local DeleteFavoriteForBundle = require(ParentParent.Thunks.DeleteFavoriteForBundle)
+local PromptPurchase = require(ParentParent.Thunks.PromptPurchase)
+local GetItemDetails = require(ParentParent.Thunks.GetItemDetails)
+local RoactUtils = require(CorePackages.Workspace.Packages.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local ItemTypeEnum = require(CorePackages.Workspace.Packages.AvatarExperienceCommon).Enums.ItemTypeEnum
+local OpenOverlay = require(ParentParent.Actions.OpenOverlay)
+local Overlay = require(ParentParent.Enums.Overlay)
+local Overlay2 = require(ParentParent.Components.Overlay)
+local useUnifiedEventListenerInExperience = require(CorePackages.Workspace.Packages.AvatarExperienceAnalytics).useUnifiedEventListener.useUnifiedEventListenerInExperience
+local useSignalState = require(CorePackages.Packages.SignalsReact).useSignalState
+local Foundation = require(CorePackages.Packages.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local Modules = CoreGui.RobloxGui.Modules
+local Theme = require(Modules.Settings.Theme)
+local Constants = require(Modules.TopBar.Constants)
+local tutils = require(CorePackages.Packages.tutils)
+local v41 = game:DefineFastFlag("EnableAvatarViewportAutoRotation", false)
+local v42 = game:DefineFastInt("AXViewportCameraFieldOfView", 68)
+local FFlagAXEnableBatchItemDetailsFetchV2 = AvatarExperienceFlags.FFlagAXEnableBatchItemDetailsFetchV2
+local FFlagAXEnableInspectAndBuyFocusNavigation = AvatarExperienceFlags.FFlagAXEnableInspectAndBuyFocusNavigation
+local FFlagAXEnableIaBTimedOptionsBulkPurchase = AvatarExperienceFlags.FFlagAXEnableIaBTimedOptionsBulkPurchase
+local FFlagAXFixIaBTimedOptionsPopoverFocus = AvatarExperienceFlags.FFlagAXFixIaBTimedOptionsPopoverFocus
+local v47 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else AvatarExperienceInspectAndBuy.Contexts.ItemSelectionStoreContext
+local v48 = if not v47 then nil else v47.Provider
+local v49 = if not v47 then nil else v47.useItemSelectionStore
 
-                    end
-                }, {
-                    UICorner = v4.createElement("UICorner", {
-                        CornerRadius = v37.DefaultCornerRadius
-                    }), 
-                    ResponsivePanelLayout = v4.createElement(l_ResponsivePanelLayout_0, v95)
-                }), 
-                Overlay = if l_FFlagIBV2Attribution_0 then v4.createElement(v31) else nil
-            })
-        });
-    else
-        return (v4.createElement(v34.View, {
-            Size = v56.OverlaySize, 
-            Position = v56.OverlayPosition, 
-            backgroundStyle = v57.Color.Common.Shadow, 
-            stateLayer = {
-                affordance = v34.Enums.StateLayerAffordance.None
-            }, 
-            onActivated = function() --[[ Line: 376 ]] --[[ Name: onActivated ]]
-                -- upvalues: l_GuiService_0 (ref)
-                l_GuiService_0:CloseInspectMenu();
-            end
-        }, {
-            ContainerView = v4.createElement(v34.View, {
-                AnchorPoint = v56.ContainerAnchorPoint, 
-                ClipsDescendants = true, 
-                Size = v56.ContainerSize, 
-                Position = v56.ContainerPosition, 
-                backgroundStyle = {
-                    Color3 = v37.color("MenuContainer"), 
-                    Transparency = v37.transparency("MenuContainer", 1) * l_GuiService_0.PreferredTransparency
-                }, 
-                stateLayer = {
-                    affordance = v34.Enums.StateLayerAffordance.None
-                }, 
-                onActivated = function() --[[ Line: 392 ]] --[[ Name: onActivated ]]
+local function v50(p1) -- line: 85
+	return p1.assets
+end
+local function v51(p2) -- line: 89
+	return p2.collectibleResellableInstances
+end
+local function v52(p3) -- line: 93
+	return p3.bundles
+end
+local function InspectAndBuyBaseContainer(p4) -- line: 97
+	-- upvalues: useViewBreakpoints (copy), Constants (copy), useTokens (copy), useDispatch (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v49 (copy), useSignalState (copy), useSelector (copy), v50 (copy), tutils (copy), v51 (copy), v52 (copy), React (copy), GuiService (copy), UpdateBulkPuchaseResults (copy), ItemTypeEnum (copy), buildBulkPurchaseAnalyticsPayload (copy), GetItemDetails (copy), GetFavoriteForAsset (copy), GetProductInfo (copy), FFlagAXEnableBatchItemDetailsFetchV2 (copy), GetFavoriteForBundle (copy), DeleteFavoriteForAsset (copy), CreateFavoriteForAsset (copy), DeleteFavoriteForBundle (copy), CreateFavoriteForBundle (copy), OpenOverlay (copy), Overlay (copy), PromptPurchase (copy), applyTryOnItemToHumanoidDescription (copy), AvatarViewport (copy), v41 (copy), v42 (copy), useResponsivePanelLayoutProps (copy), useUnifiedEventListenerInExperience (copy), FFlagAXEnableInspectAndBuyFocusNavigation (copy), useInspectAndBuyFocusNavigation (copy), Foundation (copy), Theme (copy), ResponsivePanelLayout (copy), Overlay2 (copy), FFlagAXFixIaBTimedOptionsPopoverFocus (copy), PopoverFocusRestorationContext (copy)
+	local v59 = useViewBreakpoints(Constants.TopBarHeight)
+	local v60 = useTokens()
+	local v61 = useDispatch()
+	local v62 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v49()
+	local v63 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSignalState(v62.getItemDataMap)
+	local v64 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSelector(v50, tutils.deepEqual)
+	local v65 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSelector(v51, tutils.deepEqual)
+	local v66 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSelector(v52, tutils.deepEqual)
+	local v67 = React.useCallback(function() -- line: 122
+		-- upvalues: GuiService (copy)
+		GuiService:CloseInspectMenu()
+	end, {})
+	local v68 = React.useCallback(function(_, _, p7) -- line: 130
+		-- upvalues: v61 (copy), UpdateBulkPuchaseResults (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v63 (copy), ItemTypeEnum (copy), buildBulkPurchaseAnalyticsPayload (copy), v64 (copy), v66 (copy), v65 (copy), p4 (copy), GetItemDetails (copy)
+		v61(UpdateBulkPuchaseResults(p7))
 
-                end
-            }, {
-                UICorner = v4.createElement("UICorner", {
-                    CornerRadius = v37.DefaultCornerRadius
-                }), 
-                ResponsivePanelLayout = v4.createElement(l_ResponsivePanelLayout_0, v95)
-            }), 
-            Overlay = if l_FFlagIBV2Attribution_0 then v4.createElement(v31) else nil
-        }));
-    end;
-end;
-local function v99(v98) --[[ Line: 404 ]] --[[ Name: InspectAndBuyBaseContainerWithSignalsProvider ]]
-    -- upvalues: v4 (copy), v47 (copy), v97 (copy)
-    return v4.createElement(v47, {}, {
-        Inner = v4.createElement(v97, v98)
-    });
-end;
-if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then
-    return v99;
-else
-    return v97;
-end;
+		for _, v81 in p7.Items do
+			if v81.status == Enum.MarketplaceItemPurchaseStatus.Success then
+				if FFlagAXEnableIaBTimedOptionsBulkPurchase and v63 then
+					local v82 = v81.type == Enum.MarketplaceProductType.AvatarAsset
+					local id = v81.id
+					local v84 = if not v82 then Enum.AvatarItemType.Bundle else Enum.AvatarItemType.Asset
+					local v85 = if not v82 then ItemTypeEnum.Bundle else ItemTypeEnum.Asset
+					local v86 = v63[tostring(id)]
+					local v87 = buildBulkPurchaseAnalyticsPayload({
+						itemId = tostring(id),
+						itemType = v85,
+						assetsMap = v64,
+						bundlesMap = v66,
+						collectibleResellableInstances = v65,
+						storedData = v86
+					})
+
+					if v87 then
+						p4.analytics.reportPurchaseSuccessUnifiedEvent(v85, id, v87)
+					end
+
+					v61(GetItemDetails(id, v84))
+				elseif v81.type == Enum.MarketplaceProductType.AvatarAsset then
+					p4.analytics.reportPurchaseSuccess(ItemTypeEnum.Asset, v81.id)
+					v61(GetItemDetails(v81.id, Enum.AvatarItemType.Asset))
+				elseif v81.type == Enum.MarketplaceProductType.AvatarBundle then
+					p4.analytics.reportPurchaseSuccess(ItemTypeEnum.Bundle, v81.id)
+					v61(GetItemDetails(v81.id, Enum.AvatarItemType.Bundle))
+				end
+			end
+		end
+	end, {
+		v61,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v64,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v66,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v65,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v63,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else p4.analytics.reportPurchaseSuccess,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else p4.analytics.reportPurchaseSuccessUnifiedEvent
+	})
+	local v69 = React.useCallback(function(p8) -- line: 187
+		-- upvalues: ItemTypeEnum (copy), v61 (copy), GetFavoriteForAsset (copy), GetProductInfo (copy), FFlagAXEnableBatchItemDetailsFetchV2 (copy), GetItemDetails (copy), GetFavoriteForBundle (copy)
+		if p8.itemType == ItemTypeEnum.Asset then
+			v61(GetFavoriteForAsset(p8.id))
+			v61(GetProductInfo(p8.id))
+
+			if FFlagAXEnableBatchItemDetailsFetchV2 then
+				v61(GetItemDetails(p8.id, Enum.AvatarItemType.Asset))
+
+				return
+			end
+		elseif p8.itemType == ItemTypeEnum.Bundle then
+			v61(GetFavoriteForBundle(p8.id))
+		end
+	end, { v61 })
+	local v70 = React.useCallback(function(p9, b1: boolean) -- line: 206
+		-- upvalues: ItemTypeEnum (copy), v61 (copy), DeleteFavoriteForAsset (copy), CreateFavoriteForAsset (copy), DeleteFavoriteForBundle (copy), CreateFavoriteForBundle (copy)
+		if p9.itemType == ItemTypeEnum.Asset then
+			if b1 then
+				v61(DeleteFavoriteForAsset(p9.id))
+
+				return
+			end
+
+			v61(CreateFavoriteForAsset(p9.id))
+
+			return
+		end
+
+		if p9.itemType == ItemTypeEnum.Bundle then
+			if b1 then
+				v61(DeleteFavoriteForBundle(p9.id))
+
+				return
+			end
+
+			v61(CreateFavoriteForBundle(p9.id))
+		end
+	end, { v61 })
+	local v71 = React.useCallback(function(p10) -- line: 222
+		-- upvalues: v61 (copy), OpenOverlay (copy), Overlay (copy)
+		v61(OpenOverlay(Overlay.AttributionTraversal, p10))
+	end, { v61 })
+	local v72 = React.useCallback(function(p11) -- line: 281
+		-- upvalues: p4 (copy), applyTryOnItemToHumanoidDescription (copy), React (copy), AvatarViewport (copy), v41 (copy), v42 (copy)
+		if p4.localPlayerModel and p4.localPlayerModel.Humanoid then
+			local clone = p4.localPlayerModel.Humanoid.HumanoidDescription:Clone()
+
+			applyTryOnItemToHumanoidDescription(p11, clone)
+
+			return React.createElement(AvatarViewport, {
+				visible = true,
+				backgroundTransparency = 1,
+				resetCameraAndAutoRotationOnModelChange = true,
+				size = UDim2.new(1, 0, 1, 0),
+				position = UDim2.new(0.5, 0, 0.5, 0),
+				humanoidDescription = clone,
+				model = p4.localPlayerModel,
+				disableAutoRotation = not v41,
+				offsetOptions = {
+					defaultCameraOffset = CFrame.new(0, 0.5, -5),
+					toolOffset = CFrame.new(0, 2, -8)
+				},
+				cameraFieldOfView = v42
+			})
+		end
+
+		return nil
+	end, { p4.localPlayerModel })
+	local v73 = useResponsivePanelLayoutProps({
+		onInspectMenuClosed = v67,
+		onBulkPurchaseFinished = v68,
+		onItemDetailsOpened = v69,
+		onToggleFavorite = v70,
+		openAttributionOverlay = v71,
+		onPromptPurchase = function(p12, p13, p14, p15, p16, p17, p18) -- line: 259
+			-- upvalues: v61 (copy), PromptPurchase (copy)
+			v61(PromptPurchase(p12, p13, p14, p15, p16, p17, p18))
+		end,
+		renderTryOnViewport = v72,
+		localPlayerModel = p4.localPlayerModel,
+		analytics = p4.analytics
+	})
+
+	useUnifiedEventListenerInExperience()
+
+	if FFlagAXEnableInspectAndBuyFocusNavigation then
+		local v74 = useInspectAndBuyFocusNavigation()
+		local v75 = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ref = v74.setFocusRef,
+			Size = UDim2.fromScale(1, 1),
+			SelectionGroup = v74.focusNavigationProps.SelectionGroup,
+			SelectionBehaviorDown = v74.focusNavigationProps.SelectionBehaviorDown,
+			SelectionBehaviorLeft = v74.focusNavigationProps.SelectionBehaviorLeft,
+			SelectionBehaviorRight = v74.focusNavigationProps.SelectionBehaviorRight,
+			SelectionBehaviorUp = v74.focusNavigationProps.SelectionBehaviorUp
+		}, {
+			Content = React.createElement(Foundation.View, {
+				Size = v59.OverlaySize,
+				Position = v59.OverlayPosition,
+				backgroundStyle = v60.Color.Common.Shadow,
+				stateLayer = {
+					affordance = Foundation.Enums.StateLayerAffordance.None
+				},
+				onActivated = function() -- line: 341
+					-- upvalues: GuiService (copy)
+					GuiService:CloseInspectMenu()
+				end
+			}, {
+				ContainerView = React.createElement(Foundation.View, {
+					ClipsDescendants = true,
+					AnchorPoint = v59.ContainerAnchorPoint,
+					Size = v59.ContainerSize,
+					Position = v59.ContainerPosition,
+					backgroundStyle = {
+						Color3 = Theme.color("MenuContainer"),
+						Transparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
+					},
+					stateLayer = {
+						affordance = Foundation.Enums.StateLayerAffordance.None
+					},
+					onActivated = function() -- line: 357
+					end
+				}, {
+					UICorner = React.createElement("UICorner", {
+						CornerRadius = Theme.DefaultCornerRadius
+					}),
+					ResponsivePanelLayout = React.createElement(ResponsivePanelLayout, v73)
+				}),
+				Overlay = React.createElement(Overlay2)
+			})
+		})
+
+		if FFlagAXFixIaBTimedOptionsPopoverFocus then
+			return (React.createElement(PopoverFocusRestorationContext.Provider, {
+				value = true
+			}, {
+				InspectAndBuyContent = v75
+			}))
+		end
+
+		return v75
+	end
+
+	return (React.createElement(Foundation.View, {
+		Size = v59.OverlaySize,
+		Position = v59.OverlayPosition,
+		backgroundStyle = v60.Color.Common.Shadow,
+		stateLayer = {
+			affordance = Foundation.Enums.StateLayerAffordance.None
+		},
+		onActivated = function() -- line: 388
+			-- upvalues: GuiService (copy)
+			GuiService:CloseInspectMenu()
+		end
+	}, {
+		ContainerView = React.createElement(Foundation.View, {
+			ClipsDescendants = true,
+			AnchorPoint = v59.ContainerAnchorPoint,
+			Size = v59.ContainerSize,
+			Position = v59.ContainerPosition,
+			backgroundStyle = {
+				Color3 = Theme.color("MenuContainer"),
+				Transparency = Theme.transparency("MenuContainer", 1) * GuiService.PreferredTransparency
+			},
+			stateLayer = {
+				affordance = Foundation.Enums.StateLayerAffordance.None
+			},
+			onActivated = function() -- line: 404
+			end
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = Theme.DefaultCornerRadius
+			}),
+			ResponsivePanelLayout = React.createElement(ResponsivePanelLayout, v73)
+		}),
+		Overlay = React.createElement(Overlay2)
+	}))
+end
+local function InspectAndBuyBaseContainerWithSignalsProvider(p19) -- line: 416
+	-- upvalues: React (copy), v48 (copy), InspectAndBuyBaseContainer (copy)
+	return React.createElement(v48, {}, {
+		Inner = React.createElement(InspectAndBuyBaseContainer, p19)
+	})
+end
+
+if FFlagAXEnableIaBTimedOptionsBulkPurchase then
+	return InspectAndBuyBaseContainerWithSignalsProvider
+end
+
+return InspectAndBuyBaseContainer

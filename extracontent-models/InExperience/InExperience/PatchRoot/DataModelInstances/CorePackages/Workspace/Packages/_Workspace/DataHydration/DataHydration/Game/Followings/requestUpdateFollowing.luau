@@ -1,27 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(l_Parent_0.HttpRequest);
-local v4 = require(l_Parent_0.Promise);
-local l_getLocalPlayerUserId_0 = require(l_script_FirstAncestor_0.DataHydrationUtils).getLocalPlayerUserId;
-local v6 = require(script.Parent.FollowingsUrlBuilder);
-return function(v7, v8) --[[ Line: 13 ]] --[[ Name: requestUpdateFollowing ]]
-    -- upvalues: l_getLocalPlayerUserId_0 (copy), v4 (copy), v6 (copy), v3 (copy), l_HttpService_0 (copy)
-    local v9 = l_getLocalPlayerUserId_0();
-    if not v9 or v9 <= 0 then
-        return v4.reject({
-            ClientError = "Missing or invalid local player ID", 
-            message = "Cannot update following status: missing or invalid local player ID"
-        });
-    else
-        local v10 = v6.buildFollowingUpdateUrl(tostring(v9), v7);
-        return v3.config({
-            requestFunction = function(v11, v12, v13) --[[ Line: 25 ]] --[[ Name: requestFunction ]]
-                -- upvalues: v3 (ref)
-                return v3.requestFunctions.RequestInternal(v11, v12, v13);
-            end
-        })(v10, v8 and "POST" or "DELETE", {
-            postBody = if v8 then l_HttpService_0:JSONEncode({}) else nil
-        });
-    end;
-end;
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local HttpService = game:GetService("HttpService")
+local HttpRequest = require(DataHydrationParent.HttpRequest)
+local Promise = require(DataHydrationParent.Promise)
+local getLocalPlayerUserId = require(DataHydration.DataHydrationUtils).getLocalPlayerUserId
+local FollowingsUrlBuilder = require(script.Parent.FollowingsUrlBuilder)
+
+local function requestUpdateFollowing(s1: string, b1: boolean) -- line: 13
+	-- upvalues: getLocalPlayerUserId (copy), Promise (copy), FollowingsUrlBuilder (copy), HttpRequest (copy), HttpService (copy)
+	local v11 = getLocalPlayerUserId()
+
+	if not v11 or v11 <= 0 then
+		return Promise.reject({
+			ClientError = "Missing or invalid local player ID",
+			message = "Cannot update following status: missing or invalid local player ID"
+		})
+	end
+
+	local v12 = FollowingsUrlBuilder.buildFollowingUpdateUrl(tostring(v11), s1)
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 25
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.RequestInternal(s2, s3, p1)
+		end
+	})(v12, not b1 and "DELETE" or "POST", {
+		postBody = if not b1 then nil else HttpService:JSONEncode({})
+	})
+end
+
+return requestUpdateFollowing

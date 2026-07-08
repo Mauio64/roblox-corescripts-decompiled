@@ -1,10 +1,12 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: validateMotor ]]
-    assert(typeof(v0) == "table");
-    assert(typeof(v0.start) == "function");
-    assert(typeof(v0.stop) == "function");
-    assert(typeof(v0.step) == "function");
-    assert(typeof(v0.setGoal) == "function");
-    assert(typeof(v0.onStep) == "function");
-    assert(typeof(v0.onComplete) == "function");
-    assert(typeof(v0.destroy) == "function");
-end;
+local function validateMotor(p1) -- line: 1
+	assert(typeof(p1) == "table")
+	assert(typeof(p1.start) == "function")
+	assert(typeof(p1.stop) == "function")
+	assert(typeof(p1.step) == "function")
+	assert(typeof(p1.setGoal) == "function")
+	assert(typeof(p1.onStep) == "function")
+	assert(typeof(p1.onComplete) == "function")
+	assert(typeof(p1.destroy) == "function")
+end
+
+return validateMotor

@@ -1,101 +1,107 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Cryo_0 = v1.Cryo;
-local l_Roact_0 = v1.Roact;
-local l_Text_0 = v1.Text;
-local v5 = require(l_script_FirstAncestor_0.Components.Style.TestStyle);
-local v6 = require(script.Parent.CallbackInputBox);
-local v7 = l_Roact_0.PureComponent:extend("InputBoxWithCharacterCounter");
-v7.defaultProps = {
-    initialInputText = "", 
-    validInputTextColor3 = Color3.fromRGB(0, 255, 0), 
-    validInputTextTransparency = 0, 
-    invalidInputTextColor3 = Color3.fromRGB(255, 0, 0), 
-    invalidInputTextTransparency = 0, 
-    counterTextPadding = 0, 
-    characterLimit = 150, 
-    style = v5
-};
-v7.init = function(v8) --[[ Line: 26 ]] --[[ Name: init ]]
-    v8.state = {
-        inputText = v8.props.initialInputText
-    };
-    v8.textChangedCallback = function(v9) --[[ Line: 31 ]]
-        -- upvalues: v8 (copy)
-        v8:setState({
-            inputText = v9
-        });
-    end;
-end;
-v7.render = function(v10) --[[ Line: 38 ]] --[[ Name: render ]]
-    -- upvalues: l_Text_0 (copy), l_Cryo_0 (copy), l_Roact_0 (copy), v6 (copy)
-    local l_style_0 = v10.props.style;
-    local v12 = #v10.state.inputText;
-    local v13 = v12 .. "/" .. v10.props.characterLimit;
-    local l_Font_0 = l_style_0.Font.CaptionSubHeader.Font;
-    local v15 = l_style_0.Font.BaseSize * l_style_0.Font.CaptionSubHeader.RelativeSize;
-    local v16 = nil;
-    local v17 = nil;
-    local v18 = l_Text_0.GetTextWidth(v13, l_Font_0, v15);
-    local v19 = l_Text_0.GetTextHeight(v13, l_Font_0, v15, v18);
-    if v12 <= v10.props.characterLimit then
-        v16 = v10.props.validInputTextColor3;
-        v17 = v10.props.validInputTextTransparency;
-    else
-        v16 = v10.props.invalidInputTextColor3;
-        v17 = v10.props.invalidInputTextTransparency;
-    end;
-    local v20 = l_Cryo_0.Dictionary.join(v10.props, {
-        inputText = v10.state.inputText, 
-        textChangedCallback = v10.textChangedCallback
-    });
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, {
-        layout = l_Roact_0.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        }), 
-        inputBoxContainer = l_Roact_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, -v19), 
-            LayoutOrder = 1
-        }, {
-            border = l_Roact_0.createElement("ImageLabel", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(3, 3, 4, 4), 
-                Image = "rbxasset://textures/ui/LuaChat/9-slice/input-default.png"
-            }), 
-            inputBox = l_Roact_0.createElement(v6, v20)
-        }), 
-        characterCounter = l_Roact_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, v19), 
-            LayoutOrder = 2
-        }, {
-            layout = l_Roact_0.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right
-            }), 
-            padding = l_Roact_0.createElement("UIPadding", {
-                PaddingRight = UDim.new(0, v10.props.counterTextPadding)
-            }), 
-            characterCountLabel = l_Roact_0.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1, 
-                Text = v13, 
-                TextColor3 = v16, 
-                TextTransparency = v17, 
-                TextSize = v15, 
-                TextXAlignment = Enum.TextXAlignment.Right, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                Font = l_Font_0
-            })
-        })
-    });
-end;
-return v7;
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Cryo = dependencies.Cryo
+local Roact = dependencies.Roact
+local dependenciesText = dependencies.Text
+local TestStyle = require(SocialLibraries.Components.Style.TestStyle)
+local CallbackInputBox = require(script.Parent.CallbackInputBox)
+local v8 = Roact.PureComponent:extend("InputBoxWithCharacterCounter")
+
+v8.defaultProps = {
+	initialInputText = "",
+	validInputTextTransparency = 0,
+	invalidInputTextTransparency = 0,
+	counterTextPadding = 0,
+	characterLimit = 150,
+	validInputTextColor3 = Color3.fromRGB(0, 255, 0),
+	invalidInputTextColor3 = Color3.fromRGB(255, 0, 0),
+	style = TestStyle
+}
+
+function v8.init(p1) -- line: 26
+	p1.state = {
+		inputText = p1.props.initialInputText
+	}
+
+	function p1.textChangedCallback(p2) -- line: 31
+		-- upvalues: p1 (copy)
+		p1:setState({
+			inputText = p2
+		})
+	end
+end
+function v8.render(p3) -- line: 38
+	-- upvalues: dependenciesText (copy), Cryo (copy), Roact (copy), CallbackInputBox (copy)
+	local style = p3.props.style
+	local v12 = #p3.state.inputText
+	local v13 = v12 .. "/" .. p3.props.characterLimit
+	local CaptionSubHeaderFont = style.Font.CaptionSubHeader.Font
+	local v15 = style.Font.BaseSize * style.Font.CaptionSubHeader.RelativeSize
+	local v16 = dependenciesText.GetTextWidth(v13, CaptionSubHeaderFont, v15)
+	local v17 = dependenciesText.GetTextHeight(v13, CaptionSubHeaderFont, v15, v16)
+	local validInputTextColor3, validInputTextTransparency
+
+	if v12 <= p3.props.characterLimit then
+		validInputTextColor3 = p3.props.validInputTextColor3
+		validInputTextTransparency = p3.props.validInputTextTransparency
+	else
+		validInputTextColor3 = p3.props.invalidInputTextColor3
+		validInputTextTransparency = p3.props.invalidInputTextTransparency
+	end
+
+	local v20 = Cryo.Dictionary.join(p3.props, {
+		inputText = p3.state.inputText,
+		textChangedCallback = p3.textChangedCallback
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		layout = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		inputBoxContainer = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 1, -v17)
+		}, {
+			border = Roact.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Image = "rbxasset://textures/ui/LuaChat/9-slice/input-default.png",
+				Size = UDim2.new(1, 0, 1, 0),
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(3, 3, 4, 4)
+			}),
+			inputBox = Roact.createElement(CallbackInputBox, v20)
+		}),
+		characterCounter = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, v17)
+		}, {
+			layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Bottom,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right
+			}),
+			padding = Roact.createElement("UIPadding", {
+				PaddingRight = UDim.new(0, p3.props.counterTextPadding)
+			}),
+			characterCountLabel = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Text = v13,
+				TextColor3 = validInputTextColor3,
+				TextTransparency = validInputTextTransparency,
+				TextSize = v15,
+				TextXAlignment = Enum.TextXAlignment.Right,
+				TextYAlignment = Enum.TextYAlignment.Top,
+				Font = CaptionSubHeaderFont
+			})
+		})
+	})
+end
+
+return v8

@@ -1,1102 +1,1280 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script:FindFirstAncestor("PeekView").Parent;
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_RunService_0 = game:GetService("RunService");
-local v6 = require(l_Parent_0.Cryo);
-local v7 = require(l_Parent_0.React);
-local v8 = require(l_Parent_0.Roact);
-local v9 = require(l_Parent_0.UIBlox);
-local v10 = require(l_Parent_0.RoactGamepad);
-local l_Focusable_0 = v10.Focusable;
-local v12 = require(l_Parent_0.RoactRodux);
-local v13 = require(script.Parent.PeekViewState);
-local v14 = require(script.Parent.Scrim);
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v9.App.ImageSet.Images;
-local l_ExternalEventConnection_0 = require(l_Parent_0.RoactUtils).ExternalEventConnection;
-local v18 = require(l_Parent_0.ArgCheck);
-local l_InputTypeConstants_0 = require(l_Parent_0.InputType).InputTypeConstants;
-local l_GamepadUtils_0 = require(l_Parent_0.InputUi).Gamepad.GamepadUtils;
-local l_getInputGroup_0 = require(l_Parent_0.InputType).getInputGroup;
-local v22 = require(script.Parent.analytics.peekViewDismissedEvent);
-local v23 = require(l_Parent_0.Analytics).AnalyticsReporters.EventIngest.new(l_EventIngestService_0);
-local l_switchAccountScrimError_0 = require(l_Parent_0.UiShellEvents).switchAccountScrimError;
-local v25 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceWrapper_0 = v25.FocusNavigableSurfaceWrapper;
-local v27 = require(script.Parent.usePeekViewFocusNavigationBindings);
-local l_GetFFlagEnablePeekViewStateOnMountParam_0 = require(l_Parent_0.SharedFlags).GetFFlagEnablePeekViewStateOnMountParam;
-local l_GetFIntPeekViewTransitionDelayTiming_0 = require(l_Parent_0.SharedFlags).GetFIntPeekViewTransitionDelayTiming;
-local l_FFlagProfilePlatformNewProfileHeader_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformNewProfileHeader;
-local v31 = game:DefineFastFlag("EnableFastScrollingFixTest", false);
-local l_FFlagEnablePeekViewFocusNav_0 = require(l_Parent_0.SharedFlags).FFlagEnablePeekViewFocusNav;
-local l_GetFFlagPreventSuperBriefPeekViewClose_0 = require(l_Parent_0.SharedFlags).GetFFlagPreventSuperBriefPeekViewClose;
-local v34 = require(l_Parent_0.SharedFlags).FFlagAXMigrateAXFocusBehaviorRoot and game:DefineFastFlag("AXMigratePeekViewToFocusNavigation", false);
-local l_FFlagAXMigrateAXToGlobalAutofocus_0 = require(l_Parent_0.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus;
-local l_FFlagAXScrollingFramesShouldAnimateOnFocus_0 = require(l_Parent_0.SharedFlags).FFlagAXScrollingFramesShouldAnimateOnFocus;
-local l_FFlagAXFixManageOutfitPageFocusLostBehind_0 = require(l_Parent_0.SharedFlags).FFlagAXFixManageOutfitPageFocusLostBehind;
-local v38 = game:DefineFastFlag("PeekViewUpdateOnBriefViewHeightChange", false);
-local v39 = Rect.new(9, 9, 9, 9);
-local v40 = l_Images_0["icons/navigation/swipe"];
-local v41 = 0.1 * l_GetFIntPeekViewTransitionDelayTiming_0();
-local l_Hidden_0 = v13.Hidden;
-local l_Closed_0 = v13.Closed;
-local l_SuperBrief_0 = v13.SuperBrief;
-local l_Brief_0 = v13.Brief;
-local l_Full_0 = v13.Full;
-local l_Extended_0 = v13.Extended;
-local v48 = v8.PureComponent:extend("PeekView");
-v48.defaultProps = {
-    superBriefViewContentHeight = nil, 
-    briefViewContentHeight = UDim.new(0.5, 0), 
-    fullViewContentHeight = if not v34 then UDim.new(1, 0) else nil, 
-    bottomDockedContainerHeight = 0, 
-    bottomDockedContainerContent = nil, 
-    elasticBehavior = Enum.ElasticBehavior.Always, 
-    hidden = false, 
-    showDraggerInClosedState = true, 
-    showDropShadow = true, 
-    stateOnMount = nil, 
-    mountAsFullView = false, 
-    mountAnimation = true, 
-    canDragFullViewToBrief = false, 
-    withNewThemeProvider = true, 
-    viewStateChanged = nil, 
-    briefToFullTransitionPercent = nil, 
-    peekHeaderClose = true, 
-    peekHeaderPositionYChange = nil, 
-    isScrollingEnabled = true, 
-    closeSignal = nil, 
-    hideDraggerInSuperBrief = false, 
-    minimizeToSuperBrief = false, 
-    customBackground = nil, 
-    shouldCaptureFocus = l_FFlagAXMigrateAXToGlobalAutofocus_0 and true or nil, 
-    hasSolidDragger = true
-};
-v48.init = function(v49) --[[ Line: 143 ]] --[[ Name: init ]]
-    -- upvalues: l_UserGameSettings_0 (copy), l_Hidden_0 (copy), l_getInputGroup_0 (copy), l_UserInputService_0 (copy), v8 (copy), v9 (copy), l_Closed_0 (copy), l_SuperBrief_0 (copy), l_Brief_0 (copy), l_Full_0 (copy), v34 (copy), l_switchAccountScrimError_0 (copy), v23 (copy), v31 (copy), l_GetFFlagPreventSuperBriefPeekViewClose_0 (copy), v13 (copy), l_InputTypeConstants_0 (copy), v22 (copy), l_Extended_0 (copy), v18 (copy), l_RunService_0 (copy), v41 (copy), l_GuiService_0 (copy)
-    v49.isMounted = false;
-    v49.isTouched = false;
-    v49.isInGoToState = false;
-    v49.useReducedMotion = l_UserGameSettings_0.ReducedMotion;
-    v49.viewType = l_Hidden_0;
-    v49:setState({
-        scrollableViewType = false, 
-        absoluteWindowSizeX = 0, 
-        absoluteWindowSizeY = 0, 
-        lastInputGroup = l_getInputGroup_0(l_UserInputService_0:GetLastInputType()), 
-        canvasGroupTransparency = 0
-    });
-    v49.containerFrameRef = v8.createRef();
-    v49.clipFrameRef = v8.createRef();
-    v49.shadowRef = v8.createRef();
-    v49.fillingAreaRef = v8.createRef();
-    v49.swipeScrollingFrameRef = v8.createRef();
-    v49.bottomContainerRef = v8.createRef();
-    local v50, v51 = v8.createBinding(0);
-    v49.transitionPercent = v50;
-    v49.setTransitionPercent = v51;
-    v49.onAbsoluteWindowSizeChanged = function(v52) --[[ Line: 169 ]]
-        -- upvalues: v49 (copy)
-        if v52.AbsoluteWindowSize.X ~= v49.state.absoluteWindowSizeX or v52.AbsoluteWindowSize.Y ~= v49.state.absoluteWindowSizeY then
-            v49:setState({
-                absoluteWindowSizeX = v52.AbsoluteWindowSize.X, 
-                absoluteWindowSizeY = v52.AbsoluteWindowSize.Y
-            });
-        end;
-    end;
-    v49.withStyle = function(v53) --[[ Line: 181 ]]
-        -- upvalues: v49 (copy), v9 (ref)
-        if v49.props.withNewThemeProvider then
-            return v9.Style.withStyle(v53);
-        else
-            return v53({
-                Theme = {
-                    BackgroundDefault = {
-                        Color = Color3.fromRGB(35, 37, 39), 
-                        Transparency = 0
-                    }, 
-                    UIEmphasis = {
-                        Color = Color3.fromRGB(255, 255, 255), 
-                        Transparency = 0.7
-                    }, 
-                    DropShadow = {
-                        Color = Color3.fromRGB(0, 0, 0), 
-                        Transparency = 0
-                    }
-                }, 
-                Settings = {
-                    ReducedMotion = false
-                }
-            });
-        end;
-    end;
-    v49.inputBeganCallback = function(v54) --[[ Line: 207 ]]
-        -- upvalues: v49 (copy)
-        if not v49.isMounted then
-            return;
-        elseif v54.UserInputType ~= Enum.UserInputType.Touch then
-            return;
-        else
-            v49.isTouched = true;
-            return;
-        end;
-    end;
-    v49.inputEndedCallback = function(v55) --[[ Line: 219 ]]
-        -- upvalues: v49 (copy)
-        if not v49.isMounted then
-            return;
-        elseif v55.UserInputType ~= Enum.UserInputType.Touch then
-            return;
-        else
-            v49.isTouched = false;
-            v49.checkGoTo();
-            return;
-        end;
-    end;
-    v49.getViewSize = function(v56) --[[ Line: 232 ]]
-        -- upvalues: l_Hidden_0 (ref), l_Closed_0 (ref), l_SuperBrief_0 (ref), v49 (copy), l_Brief_0 (ref), l_Full_0 (ref)
-        if v56 == l_Hidden_0 then
-            return UDim.new(0, 0);
-        elseif v56 == l_Closed_0 then
-            return UDim.new(0, 0);
-        elseif v56 == l_SuperBrief_0 then
-            if v49.props.superBriefViewContentHeight then
-                local l_superBriefViewContentHeight_0 = v49.props.superBriefViewContentHeight;
-                return UDim.new(l_superBriefViewContentHeight_0.Scale, l_superBriefViewContentHeight_0.Offset + 25);
-            else
-                return UDim.new(0, 0);
-            end;
-        elseif v56 == l_Brief_0 then
-            local l_briefViewContentHeight_0 = v49.props.briefViewContentHeight;
-            return UDim.new(l_briefViewContentHeight_0.Scale, l_briefViewContentHeight_0.Offset + 25);
-        elseif v56 == l_Full_0 then
-            return v49.props.fullViewContentHeight;
-        else
-            return nil;
-        end;
-    end;
-    v49.hasNilRefs = function() --[[ Line: 257 ]]
-        -- upvalues: v34 (ref), v49 (copy)
-        local v59 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-        local v60 = if v34 then v49.props.containerFrameRef.current else v49.containerFrameRef.current;
-        local l_current_0 = v49.clipFrameRef.current;
-        local l_current_1 = v49.shadowRef.current;
-        local l_current_2 = v49.fillingAreaRef.current;
-        return not (v59 and v60 and l_current_0 and l_current_1 and l_current_2);
-    end;
-    v49.reportRefStatus = function(v64, v65, v66, v67, v68, v69) --[[ Line: 271 ]]
-        -- upvalues: l_switchAccountScrimError_0 (ref), v23 (ref)
-        l_switchAccountScrimError_0(v23, "switchAccountScrimError", {
-            callSite = v64, 
-            swipeScrollingFrame = v65 and "true" or "nil", 
-            containerFrame = v66 and "true" or "nil", 
-            clipFrame = v67 and "true" or "nil", 
-            shadow = v68 and "true" or "nil", 
-            fillingArea = v69 and "true" or "nil"
-        });
-    end;
-    v49.reconcileRbxInstances = function(v70) --[[ Line: 283 ]]
-        -- upvalues: v34 (ref), v49 (copy)
-        local v71 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-        local v72 = v71 and v71.CanvasPosition.Y or 0;
-        local v73 = if v34 then v49.props.containerFrameRef.current else v49.containerFrameRef.current;
-        local l_current_3 = v49.clipFrameRef.current;
-        local l_current_4 = v49.shadowRef.current;
-        local l_current_5 = v49.fillingAreaRef.current;
-        if v49.hasNilRefs() then
-            v49.reportRefStatus(v70, v71, v73, l_current_3, l_current_4, l_current_5);
-            return;
-        else
-            local l_X_0 = v73.AbsoluteSize.X;
-            local l_Y_0 = v73.AbsoluteSize.Y;
-            l_current_3.Size = UDim2.new(0, l_X_0, 0, v72);
-            l_current_4.Size = UDim2.new(0, l_X_0, 0, 36);
-            l_current_3.Position = UDim2.new(0, 0, 1, -v72);
-            l_current_4.Position = UDim2.new(0, 0, 1, -v72 - 30);
-            v71.Size = UDim2.new(0, l_X_0, 0, l_Y_0);
-            v71.Position = UDim2.new(0, 0, 0, -(l_Y_0 - v72));
-            l_current_5.Size = UDim2.new(0, l_X_0, 0, l_Y_0);
-            local l_current_6 = v49.bottomContainerRef.current;
-            if l_current_6 then
-                local l_bottomDockedContainerHeight_0 = v49.props.bottomDockedContainerHeight;
-                if l_current_3.AbsoluteSize.Y > 25 + l_bottomDockedContainerHeight_0 then
-                    l_current_6.Active = true;
-                    l_current_6.Position = UDim2.new(0, 0, 1, -l_bottomDockedContainerHeight_0);
-                else
-                    l_current_6.Active = false;
-                    l_current_6.Position = UDim2.new(0, 0, 1, -l_current_3.AbsoluteSize.Y + 25);
-                end;
-            end;
-            v49.transitionCallbacks();
-            if v49.props.peekHeaderPositionYChange then
-                v49.props.peekHeaderPositionYChange(v72);
-            end;
-            return;
-        end;
-    end;
-    v49.updateSwipeScrollingFrame = function() --[[ Line: 333 ]]
-        -- upvalues: v49 (copy), v34 (ref)
-        local v81 = v49.getViewSize(v49.viewType);
-        local v82 = nil;
-        v82 = if v34 then v49.props.containerFrameRef.current and v49.props.swipeScrollingFrameRef.current else v49.containerFrameRef.current and v49.swipeScrollingFrameRef.current;
-        if v81 and v82 then
-            local l_Y_1 = (if v34 then v49.props.containerFrameRef.current else v49.containerFrameRef.current).AbsoluteSize.Y;
-            local v84 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-            local v85 = l_Y_1 * v81.Scale + v81.Offset;
-            if v84.CanvasPosition.Y ~= v85 then
-                v84.CanvasPosition = Vector2.new(0, v85);
-                if v49.props.peekHeaderPositionYChange then
-                    v49.props.peekHeaderPositionYChange(v85);
-                end;
-            end;
-        end;
-    end;
-    v49.onContainerFrameAbsoluteSizeChanged = function() --[[ Line: 362 ]]
-        -- upvalues: v49 (copy)
-        if not v49.isMounted then
-            return;
-        else
-            v49.reconcileRbxInstances("onContainerFrameAbsoluteSizeChanged");
-            v49.updateSwipeScrollingFrame();
-            return;
-        end;
-    end;
-    v49.onSwipeScrollingFrameCanvasPositionChanged = function() --[[ Line: 371 ]]
-        -- upvalues: v49 (copy), v34 (ref), v31 (ref), l_GetFFlagPreventSuperBriefPeekViewClose_0 (ref), v13 (ref), l_InputTypeConstants_0 (ref)
-        if not v49.isMounted then
-            return;
-        else
-            local v86 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-            local l_Y_2 = v86.CanvasPosition.Y;
-            if l_Y_2 ~= math.floor(l_Y_2) then
-                if not v31 then
-                    if l_GetFFlagPreventSuperBriefPeekViewClose_0() then
-                        local v88 = math.floor(l_Y_2 + 0.5);
-                        if v49.viewType == v13.SuperBrief and v49.props.minimizeToSuperBrief then
-                            local v89 = v49.getSuperBriefViewY();
-                            if v89 ~= nil and v88 ~= nil and v88 < v89 then
-                                v88 = v89;
-                            end;
-                        end;
-                        v86.CanvasPosition = Vector2.new(0, v88);
-                    else
-                        v86.CanvasPosition = Vector2.new(0, (math.floor(l_Y_2 + 0.5)));
-                    end;
-                end;
-                if v49.props.peekHeaderPositionYChange then
-                    v49.props.peekHeaderPositionYChange(l_Y_2);
-                end;
-                if not v31 then
-                    return;
-                end;
-            end;
-            v49.reconcileRbxInstances("onSwipeScrollingFrameCanvasPositionChanged");
-            if v49.state.lastInputGroup ~= l_InputTypeConstants_0.Gamepad then
-                v49.checkGoTo();
-            end;
-            return;
-        end;
-    end;
-    v49.getBriefViewY = function() --[[ Line: 420 ]]
-        -- upvalues: v34 (ref), v49 (copy)
-        local v90 = if v34 then v49.props.containerFrameRef.current.AbsoluteSize.Y else v49.containerFrameRef.current.AbsoluteSize.Y;
-        local l_briefViewContentHeight_1 = v49.props.briefViewContentHeight;
-        return v90 * l_briefViewContentHeight_1.Scale + l_briefViewContentHeight_1.Offset + 25;
-    end;
-    v49.getSuperBriefViewY = function() --[[ Line: 428 ]]
-        -- upvalues: v34 (ref), v49 (copy)
-        if v34 then
-            if not v49.props.superBriefViewContentHeight or not v49.props.containerFrameRef:getValue() then
-                return nil;
-            end;
-        elseif not v49.props.superBriefViewContentHeight or not v49.containerFrameRef:getValue() then
-            return nil;
-        end;
-        local v92 = if v34 then v49.props.containerFrameRef:getValue().AbsoluteSize.Y else v49.containerFrameRef:getValue().AbsoluteSize.Y;
-        local l_superBriefViewContentHeight_1 = v49.props.superBriefViewContentHeight;
-        return v92 * l_superBriefViewContentHeight_1.Scale + l_superBriefViewContentHeight_1.Offset + 25;
-    end;
-    v49.getFullViewY = function() --[[ Line: 446 ]]
-        -- upvalues: v49 (copy)
-        return v49.containerFrameRef.current.AbsoluteSize.Y * v49.props.fullViewContentHeight.Scale + v49.props.fullViewContentHeight.Offset;
-    end;
-    v49.transitionCallbacks = function() --[[ Line: 451 ]]
-        -- upvalues: v49 (copy), v34 (ref)
-        local l_briefToFullTransitionPercent_0 = v49.props.briefToFullTransitionPercent;
-        local l_Y_3 = (if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current).CanvasPosition.Y;
-        local v96 = v49.getBriefViewY();
-        local v97 = if v34 then v49.props.getFullViewY() else v49.getFullViewY();
-        local v98 = v97 - v96;
-        local v99 = 0;
-        if v96 < l_Y_3 and l_Y_3 <= v97 then
-            v99 = (l_Y_3 - v96) / v98;
-        elseif v97 < l_Y_3 then
-            v99 = 1;
-        end;
-        v49.setTransitionPercent(v99);
-        if l_briefToFullTransitionPercent_0 then
-            l_briefToFullTransitionPercent_0(v99);
-        end;
-    end;
-    v49.checkGoTo = function() --[[ Line: 488 ]]
-        -- upvalues: v49 (copy), v34 (ref), v13 (ref)
-        if v49.isInGoToState then
-            return;
-        elseif v49.isTouched then
-            return;
-        else
-            local v100 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-            if v100 and v49.state.absoluteWindowSizeX == 0 and v49.state.absoluteWindowSizeY == 0 then
-                return;
-            else
-                local v101 = v49.getBriefViewY();
-                local v102 = v49.getSuperBriefViewY();
-                local v103 = if v34 then v49.props.getFullViewY() else v49.getFullViewY();
-                if v103 < v101 then
-                    return;
-                elseif v102 and v101 < v102 then
-                    return;
-                elseif v100.AbsoluteWindowSize.Y + 25 + v49.props.bottomDockedContainerHeight > (v100.AbsoluteCanvasSize.Y or v100.CanvasSize.Y.Offset) then
-                    return;
-                else
-                    local l_Y_4 = v100.ScrollVelocity.Y;
-                    local v105 = l_Y_4 < 0;
-                    local v106 = l_Y_4 > 0;
-                    local l_Y_5 = v100.CanvasPosition.Y;
-                    local v108 = false;
-                    if v49.viewType == v13.Brief then
-                        v108 = l_Y_5 == v101;
-                    end;
-                    local v109 = false;
-                    if v49.viewType == v13.Full then
-                        v109 = l_Y_5 == v103;
-                    end;
-                    if (v108 or v109) and l_Y_4 == 0 then
-                        return;
-                    elseif v103 < l_Y_5 then
-                        v49:handleCurYAboveFullViewY(v105);
-                        return;
-                    elseif v101 < l_Y_5 and l_Y_5 <= v103 then
-                        v49:handleCurYFromBriefToFull(l_Y_5, l_Y_4, v105, v106);
-                        return;
-                    else
-                        if v102 then
-                            if v102 < l_Y_5 and l_Y_5 <= v101 then
-                                v49:handleCurYFromSuperBriefToBrief(l_Y_5, v102, l_Y_4, v105, v106);
-                                return;
-                            elseif l_Y_5 <= v102 then
-                                v49:handleCurYFromClosedToSuperBrief(l_Y_5, v102, l_Y_4, v106, v105);
-                                return;
-                            end;
-                        elseif l_Y_5 <= v101 then
-                            v49:handleCurYFromClosedToBrief(l_Y_5, v106, v105);
-                        end;
-                        return;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    v49.onPeekHeaderActivated = function() --[[ Line: 575 ]]
-        -- upvalues: v49 (copy), l_Closed_0 (ref), l_Brief_0 (ref), l_Full_0 (ref), l_SuperBrief_0 (ref), v22 (ref)
-        if v49.viewType == l_Closed_0 then
-            v49.goTo(l_Brief_0);
-            return;
-        elseif v49.viewType == l_Brief_0 then
-            v49.goTo(l_Full_0);
-            return;
-        elseif v49.viewType == l_SuperBrief_0 then
-            v49.goTo(l_Brief_0);
-            return;
-        else
-            if v49.viewType == l_Full_0 then
-                if v49.props.peekHeaderClose then
-                    v49.goTo(l_Closed_0, nil, nil, {
-                        dismissMethod = v22.dismissMethodEnum.handleTap
-                    });
-                    return;
-                else
-                    v49.goTo(l_Brief_0);
-                end;
-            end;
-            return;
-        end;
-    end;
-    v49.setViewType = function(v110, v111) --[[ Line: 593 ]]
-        -- upvalues: v49 (copy), l_Extended_0 (ref), l_Full_0 (ref)
-        if v49.goToAnimationConnection then
-            v49.goToAnimationConnection:disconnect();
-            v49.goToAnimationConnection = nil;
-        end;
-        v49.isInGoToState = false;
-        v49.clipFrameRef.current.Active = false;
-        local l_viewType_0 = v49.viewType;
-        if l_viewType_0 ~= v110 then
-            v49.viewType = v110;
-            local v113 = true;
-            if v49.viewType ~= l_Extended_0 then
-                v113 = v49.viewType == l_Full_0;
-            end;
-            v49:setState({
-                scrollableViewType = v113
-            });
-            local l_viewStateChanged_0 = v49.props.viewStateChanged;
-            if l_viewStateChanged_0 then
-                l_viewStateChanged_0(v110, l_viewType_0, v111 or {});
-            end;
-        end;
-        v49.updateSwipeScrollingFrame();
-    end;
-    v49.goTo = function(v115, v116, v117, v118) --[[ Line: 621 ]]
-        -- upvalues: v49 (copy), v18 (ref), v34 (ref), l_Full_0 (ref), l_Closed_0 (ref), l_RunService_0 (ref), l_Brief_0 (ref), v41 (ref)
-        if v49.viewType == v115 then
-            return;
-        elseif v18.isEqual(v49.isInGoToState, false, "self.isInGoToState") then
-            return;
-        elseif v18.isEqual(v49.goToAnimationConnection, nil, "self.goToAnimationConnection") then
-            return;
-        else
-            v49.isInGoToState = true;
-            if v34 then
-                v49.props.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0);
-            else
-                v49.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0);
-            end;
-            v49.clipFrameRef.current.Active = true;
-            if v116 == false then
-                v49.setViewType(v115, v118);
-                if v115 == l_Full_0 then
-                    v49:adjustScrollingFramePosition();
-                    return;
-                end;
-            else
-                local v119 = tick();
-                if not v117 then
-                    v49:setState({
-                        canvasGroupTransparency = v115 == l_Closed_0 and 1 or 0
-                    });
-                    v49.goToAnimationConnection = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 656 ]]
-                        -- upvalues: v49 (ref), v119 (copy), v115 (copy), l_Brief_0 (ref), v41 (ref), v34 (ref), v18 (ref), v118 (copy), l_Full_0 (ref)
-                        if not v49.isMounted then
-                            return;
-                        else
-                            local v120 = tick() - v119;
-                            if v115 ~= l_Brief_0 or v41 <= v120 then
-                                if v34 then
-                                    v49.props.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0);
-                                else
-                                    v49.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0);
-                                end;
-                                local v121 = if v34 then v49.props.swipeScrollingFrameRef.current else v49.swipeScrollingFrameRef.current;
-                                local v122 = if v34 then v49.props.containerFrameRef.current.AbsoluteSize.Y else v49.containerFrameRef.current.AbsoluteSize.Y;
-                                local v123 = v18.isNotNil(v49.getViewSize(v115), "self.goTo.viewSize");
-                                local v124 = v122 * v123.Scale + v123.Offset;
-                                if v115 == l_Brief_0 then
-                                    v120 = v120 - v41;
-                                end;
-                                if v120 >= 0.35 then
-                                    v49.setViewType(v115, v118);
-                                    if v115 == l_Full_0 then
-                                        v49:adjustScrollingFramePosition();
-                                    end;
-                                    return;
-                                else
-                                    local l_Y_6 = v121.CanvasPosition.Y;
-                                    local v126 = v124 - l_Y_6;
-                                    v121.CanvasPosition = Vector2.new(0, l_Y_6 + v126 * math.sin(v120 * 2.468394227820552));
-                                end;
-                            end;
-                            return;
-                        end;
-                    end);
-                    return;
-                else
-                    if v115 ~= l_Closed_0 then
-                        v49.setViewType(v115, v118);
-                        if v115 == l_Full_0 then
-                            v49:adjustScrollingFramePosition();
-                        end;
-                    end;
-                    v49:setState({
-                        canvasGroupTransparency = v115 == l_Closed_0 and 0 or 1
-                    });
-                    v49.goToAnimationConnection = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 709 ]]
-                        -- upvalues: v49 (ref), v115 (copy), l_Full_0 (ref), v119 (copy), l_Closed_0 (ref), v118 (copy)
-                        if not v49.isMounted then
-                            return;
-                        else
-                            if v115 == l_Full_0 then
-                                v49.updateSwipeScrollingFrame();
-                            end;
-                            local v127 = tick() - v119;
-                            if v127 >= 0.35 then
-                                v49:setState({
-                                    canvasGroupTransparency = v115 == l_Closed_0 and 1 or 0
-                                });
-                                v49.setViewType(v115, v118);
-                                if v115 == l_Full_0 then
-                                    v49:adjustScrollingFramePosition();
-                                end;
-                                return;
-                            else
-                                v49:setState({
-                                    canvasGroupTransparency = if v115 == l_Closed_0 then v127 / 0.35 else 1 - v127 / 0.35
-                                });
-                                return;
-                            end;
-                        end;
-                    end);
-                end;
-            end;
-            return;
-        end;
-    end;
-    v49.selectedCoreObjectConnection = l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):connect(function() --[[ Line: 743 ]]
-        -- upvalues: v34 (ref), v49 (copy), l_InputTypeConstants_0 (ref)
-        if v34 then
-            if v49.props.swipeScrollingFrameRef.current and v49.state.lastInputGroup == l_InputTypeConstants_0.Gamepad then
-                v49:adjustScrollingFramePosition();
-                return;
-            end;
-        elseif v49.swipeScrollingFrameRef.current and v49.state.lastInputGroup == l_InputTypeConstants_0.Gamepad then
-            v49:adjustScrollingFramePosition();
-        end;
-    end);
-end;
-v48.handleCurYAboveFullViewY = function(v128, v129) --[[ Line: 769 ]] --[[ Name: handleCurYAboveFullViewY ]]
-    -- upvalues: l_Full_0 (copy), l_Extended_0 (copy)
-    if v128.viewType ~= l_Full_0 and v128.viewType ~= l_Extended_0 then
-        if v129 then
-            v128.goTo(l_Full_0);
-            return;
-        else
-            v128.setViewType(l_Extended_0);
-            return;
-        end;
-    else
-        if v128.viewType == l_Full_0 then
-            v128.setViewType(l_Extended_0);
-        end;
-        return;
-    end;
-end;
-v48.handleCurYFromBriefToFull = function(v130, v131, v132, v133, v134) --[[ Line: 781 ]] --[[ Name: handleCurYFromBriefToFull ]]
-    -- upvalues: v34 (copy), l_Full_0 (copy), l_Brief_0 (copy), l_Closed_0 (copy), v22 (copy), l_Extended_0 (copy)
-    local l_canDragFullViewToBrief_0 = v130.props.canDragFullViewToBrief;
-    local l_minimizeToSuperBrief_0 = v130.props.minimizeToSuperBrief;
-    local v137 = if v34 then v130.props.swipeScrollingFrameRef:getValue() else v130.swipeScrollingFrameRef:getValue();
-    local v138 = v130.getBriefViewY();
-    local v139 = (if v34 then v130.props.getFullViewY() else v130.getFullViewY()) - v138;
-    if v130.viewType == l_Full_0 then
-        if v137.AbsoluteCanvasSize.Y - v137.AbsoluteWindowSize.Y - 1 < v131 then
-            return;
-        elseif v134 or v131 < v138 + v139 * 0.8 then
-            local v140 = v134 and v132 > 500;
-            if l_canDragFullViewToBrief_0 and (not v140 or l_minimizeToSuperBrief_0) then
-                v130.goTo(l_Brief_0);
-                return;
-            else
-                v130.goTo(l_Closed_0, nil, nil, {
-                    dismissMethod = v22.dismissMethodEnum.swipe
-                });
-                return;
-            end;
-        end;
-    elseif v130.viewType == l_Extended_0 then
-        if not v134 or v131 < v138 + v139 * 0.8 or v132 > -1 then
-            v130.goTo(l_Full_0);
-            return;
-        end;
-    elseif v133 or v138 + v139 * 0.2 < v131 then
-        v130.goTo(l_Full_0);
-        return;
-    else
-        v130.goTo(l_Brief_0);
-    end;
-end;
-v48.handleCurYFromSuperBriefToBrief = function(v141, v142, v143, v144, v145, v146) --[[ Line: 822 ]] --[[ Name: handleCurYFromSuperBriefToBrief ]]
-    -- upvalues: v34 (copy), l_Full_0 (copy), l_SuperBrief_0 (copy), l_Closed_0 (copy), v22 (copy), l_Brief_0 (copy), l_Extended_0 (copy)
-    local l_canDragFullViewToBrief_1 = v141.props.canDragFullViewToBrief;
-    local l_minimizeToSuperBrief_1 = v141.props.minimizeToSuperBrief;
-    local v149 = (if v34 then v141.props.getFullViewY() else v141.getFullViewY()) - v143;
-    if v141.viewType == l_Full_0 then
-        if v146 or v142 < v143 + v149 * 0.8 then
-            local v150 = v146 and v144 > 500;
-            if l_canDragFullViewToBrief_1 and (not v150 or l_minimizeToSuperBrief_1) then
-                v141.goTo(l_SuperBrief_0);
-                return;
-            else
-                v141.goTo(l_Closed_0, nil, nil, {
-                    dismissMethod = v22.dismissMethodEnum.swipe
-                });
-                return;
-            end;
-        else
-            v141.goTo(l_Brief_0);
-            return;
-        end;
-    else
-        if v141.viewType == l_Extended_0 then
-            if not v146 or v142 < v143 + v149 * 0.8 or v144 > -1 then
-                v141.goTo(l_Brief_0);
-                return;
-            end;
-        elseif v145 or v143 + v149 * 0.2 < v142 then
-            v141.goTo(l_Brief_0);
-            return;
-        else
-            local v151 = v146 and v144 > 500;
-            if l_canDragFullViewToBrief_1 and (not v151 or l_minimizeToSuperBrief_1) then
-                v141.goTo(l_SuperBrief_0);
-                return;
-            else
-                v141.goTo(l_Closed_0, nil, nil, {
-                    dismissMethod = v22.dismissMethodEnum.swipe
-                });
-            end;
-        end;
-        return;
-    end;
-end;
-v48.handleCurYFromClosedToSuperBrief = function(v152, v153, v154, v155, v156, v157) --[[ Line: 860 ]] --[[ Name: handleCurYFromClosedToSuperBrief ]]
-    -- upvalues: l_SuperBrief_0 (copy), l_Closed_0 (copy), v22 (copy)
-    local v158 = v154 - 0;
-    local l_minimizeToSuperBrief_2 = v152.props.minimizeToSuperBrief;
-    if v152.viewType == l_SuperBrief_0 then
-        if (v156 or v153 < v158 * 0.8) and not l_minimizeToSuperBrief_2 then
-            v152.goTo(l_Closed_0, nil, nil, {
-                dismissMethod = v22.dismissMethodEnum.swipe
-            });
-            return;
-        else
-            v152.goTo(l_SuperBrief_0);
-            return;
-        end;
-    elseif (not v156 or v155 <= 500) and (v157 or v158 * 0.8 < v153) or l_minimizeToSuperBrief_2 then
-        v152.goTo(l_SuperBrief_0);
-        return;
-    else
-        v152.goTo(l_Closed_0, nil, nil, {
-            dismissMethod = v22.dismissMethodEnum.swipe
-        });
-        return;
-    end;
-end;
-v48.handleCurYFromClosedToBrief = function(v160, v161, v162, v163) --[[ Line: 883 ]] --[[ Name: handleCurYFromClosedToBrief ]]
-    -- upvalues: l_Brief_0 (copy), l_Closed_0 (copy), v22 (copy)
-    local v164 = v160.getBriefViewY() - 0;
-    if v160.viewType == l_Brief_0 then
-        if v162 or v161 < 0 + v164 * 0.8 then
-            v160.goTo(l_Closed_0, nil, nil, {
-                dismissMethod = v22.dismissMethodEnum.swipe
-            });
-            return;
-        else
-            v160.goTo(l_Brief_0);
-            return;
-        end;
-    elseif v163 or 0 + v164 * 0.2 < v161 then
-        v160.goTo(l_Brief_0);
-        return;
-    else
-        v160.goTo(l_Closed_0, nil, nil, {
-            dismissMethod = v22.dismissMethodEnum.swipe
-        });
-        return;
-    end;
-end;
-v48.adjustScrollingFramePosition = function(v165) --[[ Line: 906 ]] --[[ Name: adjustScrollingFramePosition ]]
-    -- upvalues: l_GuiService_0 (copy), v34 (copy), l_Extended_0 (copy), l_Full_0 (copy), v18 (copy)
-    local l_SelectedCoreObject_0 = l_GuiService_0.SelectedCoreObject;
-    if not l_SelectedCoreObject_0 or not v165.props.contentFrameRef or not l_SelectedCoreObject_0:IsDescendantOf(v165.props.contentFrameRef.current) then
-        return;
-    else
-        local v167 = if v34 then v165.props.swipeScrollingFrameRef.current else v165.swipeScrollingFrameRef.current;
-        if v165.viewType ~= l_Extended_0 and v165.viewType ~= l_Full_0 then
-            local v168 = v18.isNotNil(v165.getViewSize(v165.viewType), "self.adjustScrollingFramePosition.viewSize");
-            v167.CanvasPosition = Vector2.new(v167.CanvasPosition.X, v168.Offset);
-            return;
-        else
-            local v169 = l_SelectedCoreObject_0.AbsolutePosition.Y - v165.props.topBarHeight;
-            local l_Y_7 = l_SelectedCoreObject_0.AbsoluteSize.Y;
-            local l_Y_8 = v167.AbsoluteWindowSize.Y;
-            local v172 = l_Y_8 - (v169 + l_Y_7);
-            local l_Y_9 = v167.CanvasPosition.Y;
-            if v172 < v165.props.bottomDockedContainerHeight then
-                l_Y_9 = l_Y_9 + v165.props.bottomDockedContainerHeight - v172;
-            elseif v169 + l_Y_7 + (l_Y_9 - l_Y_8) < l_Y_8 - v165.props.bottomDockedContainerHeight then
-                l_Y_9 = l_Y_8;
-            end;
-            l_Y_9 = math.max(0, (math.min(l_Y_9, (v167.AbsoluteCanvasSize.Y or v167.CanvasSize.Y.Offset) - v167.AbsoluteWindowSize.Y)));
-            v167.CanvasPosition = Vector2.new(v167.CanvasPosition.X, l_Y_9);
-            return;
-        end;
-    end;
-end;
-v48.handleThumbstickInput = function(v174, v175, v176) --[[ Line: 953 ]] --[[ Name: handleThumbstickInput ]]
-    -- upvalues: l_GamepadUtils_0 (copy)
-    local l_Position_0 = v175.Position;
-    local v178 = v174.swipeScrollingFrameRef:getValue();
-    if v174.containerFrameRef:getValue() and v178 then
-        local v179 = v178.CanvasPosition.Y + v176 * -l_GamepadUtils_0.normalizeStickByDeadzone(l_Position_0).Y * 1000;
-        if v174.getFullViewY() < v179 then
-            v178.CanvasPosition = Vector2.new(0, v179);
-        end;
-    end;
-end;
-v48.renderWithStyle = function(v180, v181) --[[ Line: 966 ]] --[[ Name: renderWithStyle ]]
-    -- upvalues: v8 (copy), v34 (copy), l_FFlagAXFixManageOutfitPageFocusLostBehind_0 (copy), l_SuperBrief_0 (copy), l_ImageSetLabel_0 (copy), v40 (copy), l_FFlagProfilePlatformNewProfileHeader_0 (copy), l_Focusable_0 (copy), v10 (copy), l_FFlagEnablePeekViewFocusNav_0 (copy), v39 (copy), l_Brief_0 (copy), l_Full_0 (copy), l_FFlagAXMigrateAXToGlobalAutofocus_0 (copy), l_FocusNavigableSurfaceWrapper_0 (copy), v25 (copy), l_ExternalEventConnection_0 (copy), l_UserInputService_0 (copy)
-    local v182 = v180.props[v8.Children];
-    local l_bottomDockedContainerHeight_1 = v180.props.bottomDockedContainerHeight;
-    local l_bottomDockedContainerContent_0 = v180.props.bottomDockedContainerContent;
-    local v185 = v180.props.thumbstickScrollEnabled and v180.state.scrollableViewType;
-    local l_Color_0 = v181.Theme.BackgroundContrast.Color;
-    local function v192() --[[ Line: 975 ]] --[[ Name: getDraggerTransparency ]]
-        -- upvalues: v34 (ref), v180 (copy), v181 (copy)
-        local v187 = if v34 then v180.props.swipeScrollingFrameRef.current else v180.swipeScrollingFrameRef.current;
-        if not v187 then
-            return v181.Theme.UIEmphasis.Transparency;
-        else
-            local l_Y_10 = v187.CanvasPosition.Y;
-            local v189 = v180.getBriefViewY();
-            local v190 = if v34 then v180.props.getFullViewY() else v180.getFullViewY();
-            local v191 = math.max(0, (math.min(1, (l_Y_10 - v189) / (v190 - v189))));
-            return v181.Theme.UIEmphasis.Transparency + v191 * (1 - v181.Theme.UIEmphasis.Transparency);
-        end;
-    end;
-    local v193 = v8.createElement("TextButton", {
-        Text = "", 
-        LayoutOrder = 3, 
-        ZIndex = 3, 
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 25), 
-        [v8.Event.Activated] = v180.onPeekHeaderActivated, 
-        Selectable = not l_FFlagAXFixManageOutfitPageFocusLostBehind_0 and nil
-    }, {
-        Dragger = if v180.props.hideDraggerInSuperBrief and v180.props.peekViewState == l_SuperBrief_0 then nil else v8.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 36, 0, 36), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.new(0.5, 0, 0.5, 0), 
-            Image = v40, 
-            ImageColor3 = v181.Theme.UIEmphasis.Color, 
-            ImageTransparency = if not l_FFlagProfilePlatformNewProfileHeader_0 or v180.props.hasSolidDragger then v181.Theme.UIEmphasis.Transparency else v192(), 
-            Active = false
-        })
-    });
-    local l_createElement_0 = v8.createElement;
-    local l_Frame_0 = l_Focusable_0.Frame;
-    local v198 = {
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true, 
-        [v8.Ref] = v180.clipFrameRef, 
-        restorePreviousChildFocus = true, 
-        inputBindings = if not v34 and v185 then {
-            ScrollPeekView = v10.Input.onStep(Enum.KeyCode.Thumbstick2, function(v196, v197) --[[ Line: 1026 ]]
-                -- upvalues: v180 (copy)
-                v180:handleThumbstickInput(v196, v197);
-            end)
-        } else nil
-    };
-    local v199 = {};
-    local l_createElement_1 = v8.createElement;
-    local v201 = "ScrollingFrame";
-    local v202 = {
-        AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-        Selectable = not l_FFlagEnablePeekViewFocusNav_0 and nil, 
-        CanvasSize = UDim2.fromScale(1, 0), 
-        Active = true, 
-        BackgroundTransparency = 1, 
-        ZIndex = 1, 
-        BorderSizePixel = 0, 
-        ScrollBarThickness = 0, 
-        ClipsDescendants = false, 
-        ScrollingDirection = Enum.ScrollingDirection.Y, 
-        ElasticBehavior = v180.props.elasticBehavior, 
-        ScrollingEnabled = v180.props.isScrollingEnabled, 
-        [v8.Ref] = if v34 then v180.props.swipeScrollingFrameRef else v180.swipeScrollingFrameRef, 
-        [v8.Change.CanvasPosition] = v180.onSwipeScrollingFrameCanvasPositionChanged, 
-        [v8.Change.AbsoluteWindowSize] = v180.onAbsoluteWindowSizeChanged
-    };
-    local v203 = {
-        UIListLayout = v8.createElement("UIListLayout", {
-            Padding = UDim.new(0, 0), 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top
-        }), 
-        FillingArea = v8.createElement("Frame", {
-            LayoutOrder = 1, 
-            BackgroundTransparency = 1, 
-            Active = false, 
-            [v8.Ref] = v180.fillingAreaRef
-        }), 
-        BackgroundFrame = v8.createElement("Frame", {
-            LayoutOrder = 2, 
-            ZIndex = 1, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            Active = false
-        }, {
-            BackgroundImage = v8.createElement(l_ImageSetLabel_0, {
-                Size = UDim2.new(1, 0, 0, 9999), 
-                BackgroundTransparency = 0, 
-                BorderSizePixel = 0, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = v39, 
-                BackgroundColor3 = if v180.props.customBackground then v180.props.customBackground else l_Color_0, 
-                Active = false
-            })
-        }), 
-        PeekHeader = if not l_FFlagProfilePlatformNewProfileHeader_0 or v180.props.hasSolidDragger then v193 else nil, 
-        ContentFrame = v8.createElement(l_Focusable_0.Frame, {
-            LayoutOrder = 4, 
-            ZIndex = 2, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            ClipsDescendants = false, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            [v8.Ref] = v180.props.contentFrameRef, 
-            restorePreviousChildFocus = true, 
-            onFocusGained = function() --[[ Line: 1097 ]] --[[ Name: onFocusGained ]]
-                -- upvalues: v180 (copy), l_Brief_0 (ref), l_Full_0 (ref)
-                if v180.viewType == l_Brief_0 and v180.props.peekViewState ~= l_Full_0 then
-                    v180.goTo(l_Full_0);
-                end;
-            end
-        }, if not l_FFlagProfilePlatformNewProfileHeader_0 or v180.props.hasSolidDragger then v182 else {
-            PeekHeader = v193, 
-            Content = v8.createElement("Frame", {
-                LayoutOrder = 2, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, v182)
-        })
-    };
-    local v204 = false;
-    if l_bottomDockedContainerHeight_1 > 0 then
-        v204 = v8.createElement("Frame", {
-            LayoutOrder = 5, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, l_bottomDockedContainerHeight_1), 
-            Active = false
-        });
-    end;
-    v203.BottomContainerPlaceHolder = v204;
-    v199.SwipeScrollingFrame = l_createElement_1(v201, v202, v203);
-    l_createElement_1 = false;
-    if l_bottomDockedContainerHeight_1 > 0 then
-        l_createElement_1 = v8.createElement("Frame", {
-            Active = true, 
-            ZIndex = 2, 
-            Size = UDim2.new(1, 0, 0, l_bottomDockedContainerHeight_1), 
-            BackgroundTransparency = 1, 
-            [v8.Ref] = v180.bottomContainerRef
-        }, l_bottomDockedContainerContent_0);
-    end;
-    v199.BottomContainer = l_createElement_1;
-    l_createElement_0 = l_createElement_0(l_Frame_0, v198, v199);
-    l_Frame_0 = if not l_FFlagAXMigrateAXToGlobalAutofocus_0 or v180.props.shouldCaptureFocus then if l_FFlagEnablePeekViewFocusNav_0 then v8.createElement(l_FocusNavigableSurfaceWrapper_0, {
-        surfaceIdentifier = v25.FocusNavigableSurfaceIdentifierEnum.PeekView, 
-        isIsolated = true
-    }, {
-        ClipFrame = l_createElement_0
-    }) else nil else nil;
-    return v8.createFragment({
-        DropShadowBackground = v8.createElement("Frame", {
-            ZIndex = 0, 
-            Visible = v180.props.showDropShadow, 
-            [v8.Ref] = v180.shadowRef
-        }, {
-            UIGradient = v8.createElement("UIGradient", {
-                Rotation = 90, 
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, v181.Theme.DropShadow.Color), 
-                    ColorSequenceKeypoint.new(1, v181.Theme.DropShadow.Color)
-                }), 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 1), 
-                    NumberSequenceKeypoint.new(1, 0.7)
-                })
-            })
-        }), 
-        ClipFrameContainer = l_Frame_0, 
-        ClipFrame = if not l_FFlagAXMigrateAXToGlobalAutofocus_0 or v180.props.shouldCaptureFocus then if l_FFlagEnablePeekViewFocusNav_0 then nil else l_createElement_0 else l_createElement_0, 
-        InputBegan = v8.createElement(l_ExternalEventConnection_0, {
-            event = l_UserInputService_0.InputBegan, 
-            callback = v180.inputBeganCallback
-        }), 
-        InputEnded = v8.createElement(l_ExternalEventConnection_0, {
-            event = l_UserInputService_0.InputEnded, 
-            callback = v180.inputEndedCallback
-        })
-    });
-end;
-v48.render = function(v205) --[[ Line: 1176 ]] --[[ Name: render ]]
-    -- upvalues: v8 (copy), v14 (copy), v34 (copy), l_Closed_0 (copy), v22 (copy)
-    return v205.withStyle(function(v206) --[[ Line: 1177 ]]
-        -- upvalues: v205 (copy), v8 (ref), v14 (ref), v34 (ref), l_Closed_0 (ref), v22 (ref)
-        local v207 = if v205.useReducedMotion then v8.createElement("CanvasGroup", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            GroupTransparency = v205.state.canvasGroupTransparency
-        }, {
-            v205:renderWithStyle(v206)
-        }) else v205:renderWithStyle(v206);
-        if v205.props.hasScrim then
-            return v8.createElement(v14, {
-                [v8.Ref] = if v34 then v205.props.containerFrameRef else v205.containerFrameRef, 
-                onActivated = function() --[[ Line: 1193 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v205 (ref), l_Closed_0 (ref), v22 (ref)
-                    if v205.isInGoToState then
-                        return;
-                    else
-                        v205.goTo(l_Closed_0, nil, nil, {
-                            dismissMethod = v22.dismissMethodEnum.scrimTap
-                        });
-                        return;
-                    end;
-                end, 
-                onSizeChanged = v205.onContainerFrameAbsoluteSizeChanged
-            }, v207);
-        else
-            return v8.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1, 
-                ClipsDescendants = false, 
-                [v8.Ref] = if v34 then v205.props.containerFrameRef else v205.containerFrameRef, 
-                [v8.Change.AbsoluteSize] = v205.onContainerFrameAbsoluteSizeChanged
-            }, v207);
-        end;
-    end);
-end;
-v48.didMount = function(v208) --[[ Line: 1218 ]] --[[ Name: didMount ]]
-    -- upvalues: l_Closed_0 (copy), l_GetFFlagEnablePeekViewStateOnMountParam_0 (copy), l_Full_0 (copy), l_Brief_0 (copy), l_getInputGroup_0 (copy), l_UserInputService_0 (copy)
-    v208.isMounted = true;
-    if v208.props.closeSignal then
-        v208.closeSignalConnection = v208.props.closeSignal:connect(function() --[[ Line: 1222 ]]
-            -- upvalues: v208 (copy), l_Closed_0 (ref)
-            if not v208.isInGoToState then
-                v208.goTo(l_Closed_0, true, v208.useReducedMotion);
-            end;
-        end);
-    end;
-    local l_hidden_0 = v208.props.hidden;
-    local l_mountAsFullView_0 = v208.props.mountAsFullView;
-    local l_mountAnimation_0 = v208.props.mountAnimation;
-    local v212 = if l_GetFFlagEnablePeekViewStateOnMountParam_0() then v208.props.stateOnMount else nil;
-    if not l_hidden_0 then
-        if l_mountAsFullView_0 then
-            v208.goTo(l_Full_0, l_mountAnimation_0, v208.useReducedMotion);
-        elseif v212 ~= nil then
-            v208.goTo(v212, l_mountAnimation_0, v208.useReducedMotion);
-        else
-            v208.goTo(l_Brief_0, l_mountAnimation_0, v208.useReducedMotion);
-        end;
-    end;
-    v208:setState({
-        lastInputGroup = l_getInputGroup_0(l_UserInputService_0:GetLastInputType())
-    });
-    l_UserInputService_0.LastInputTypeChanged:Connect(function(v213) --[[ Line: 1250 ]]
-        -- upvalues: v208 (copy), l_getInputGroup_0 (ref)
-        v208:setState({
-            lastInputGroup = l_getInputGroup_0(v213)
-        });
-    end);
-end;
-v48.isAnimating = function(v214) --[[ Line: 1255 ]] --[[ Name: isAnimating ]]
-    return v214.goToAnimationConnection ~= nil;
-end;
-v48.didUpdate = function(v215, v216, v217) --[[ Line: 1259 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v38 (copy), l_Hidden_0 (copy), l_Brief_0 (copy), l_Extended_0 (copy)
-    if v217.absoluteWindowSizeX ~= v215.state.absoluteWindowSizeX or v217.absoluteWindowSizeY ~= v215.state.absoluteWindowSizeY then
-        v215.reconcileRbxInstances("didUpdate");
-        if not v215:isAnimating() then
-            v215.updateSwipeScrollingFrame();
-        end;
-    end;
-    if v216.bottomDockedContainerHeight ~= v215.props.bottomDockedContainerHeight then
-        v215.onContainerFrameAbsoluteSizeChanged();
-    end;
-    if v38 and v216.briefViewContentHeight ~= v215.props.briefViewContentHeight and not v215:isAnimating() then
-        v215.updateSwipeScrollingFrame();
-    end;
-    if v216.hidden == false and v215.props.hidden == true then
-        v215.goTo(l_Hidden_0);
-    elseif v216.hidden == true and v215.props.hidden == false then
-        v215.goTo(l_Brief_0);
-    end;
-    local l_peekViewState_0 = v215.props.peekViewState;
-    local l_isInGoToState_0 = v215.isInGoToState;
-    if l_peekViewState_0 ~= v216.peekViewState and v215.viewType == v216.peekViewState and l_peekViewState_0 ~= l_Extended_0 and not l_isInGoToState_0 then
-        v215.goTo(v215.props.peekViewState);
-    end;
-end;
-v48.willUnmount = function(v220) --[[ Line: 1309 ]] --[[ Name: willUnmount ]]
-    v220.isMounted = false;
-    if v220.closeSignalConnection then
-        v220.closeSignalConnection:disconnect();
-        v220.closeSignalConnection = nil;
-    end;
-    if v220.goToAnimationConnection then
-        v220.goToAnimationConnection:disconnect();
-        v220.goToAnimationConnection = nil;
-    end;
-    if v220.selectedCoreObjectConnection then
-        v220.selectedCoreObjectConnection:disconnect();
-        v220.selectedCoreObjectConnection = nil;
-    end;
-end;
-local function v223(v221, _) --[[ Line: 1328 ]] --[[ Name: mapStateToProps ]]
-    return {
-        topBarHeight = v221.TopBar and v221.TopBar.topBarHeight or 0
-    };
-end;
-local function v235(v224) --[[ Line: 1334 ]] --[[ Name: PeekViewContainer ]]
-    -- upvalues: v7 (copy), l_FFlagAXScrollingFramesShouldAnimateOnFocus_0 (copy), l_GamepadUtils_0 (copy), v27 (copy), v48 (ref), v6 (copy)
-    local v225 = v7.useRef(nil);
-    if l_FFlagAXScrollingFramesShouldAnimateOnFocus_0 and v224.scrollingFrameRef then
-        v225 = v224.scrollingFrameRef;
-    end;
-    local v226 = v7.useRef(nil);
-    local v227 = nil;
-    v227 = if v224.fullViewContentHeight then v224.fullViewContentHeight else UDim.new(1, 0);
-    local v228 = v7.useCallback(function() --[[ Line: 1350 ]]
-        -- upvalues: v226 (copy), v227 (ref)
-        return v226.current.AbsoluteSize.Y * v227.Scale + v227.Offset;
-    end, {
-        v227, 
-        v226
-    });
-    local v234 = v7.useCallback(function(v229, v230) --[[ Line: 1355 ]]
-        -- upvalues: v225 (ref), v226 (copy), l_GamepadUtils_0 (ref), v228 (copy)
-        local l_Position_1 = v229.Position;
-        local v232 = v225:getValue();
-        if v226:getValue() and v232 then
-            local v233 = v232.CanvasPosition.Y + v230 * -l_GamepadUtils_0.normalizeStickByDeadzone(l_Position_1).Y * 1000;
-            if v228() < v233 then
-                v232.CanvasPosition = Vector2.new(0, v233);
-            end;
-        end;
-    end, {
-        v228, 
-        v225, 
-        v226
-    });
-    v27(v234);
-    return v7.createElement(v48, v6.Dictionary.join(v224, {
-        swipeScrollingFrameRef = v225, 
-        containerFrameRef = v226, 
-        fullViewContentHeight = v227, 
-        getFullViewY = v228
-    }));
-end;
-v48 = v12.connect(v223, nil)(v48);
-if v34 then
-    return v235;
-else
-    return v48;
-end;
+local GuiService = game:GetService("GuiService")
+local Parent = script:FindFirstAncestor("PeekView").Parent
+local UserInputService = game:GetService("UserInputService")
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local EventIngestService = game:GetService("EventIngestService")
+local RunService = game:GetService("RunService")
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+local Roact = require(Parent.Roact)
+local UIBlox = require(Parent.UIBlox)
+local RoactGamepad = require(Parent.RoactGamepad)
+local Focusable = RoactGamepad.Focusable
+local RoactRodux = require(Parent.RoactRodux)
+local PeekViewState = require(script.Parent.PeekViewState)
+local Scrim = require(script.Parent.Scrim)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local ExternalEventConnection = require(Parent.RoactUtils).ExternalEventConnection
+local ArgCheck = require(Parent.ArgCheck)
+local InputTypeConstants = require(Parent.InputType).InputTypeConstants
+local GamepadUtils = require(Parent.InputUi).Gamepad.GamepadUtils
+local getInputGroup = require(Parent.InputType).getInputGroup
+local peekViewDismissedEvent = require(script.Parent.analytics.peekViewDismissedEvent)
+local v24 = require(Parent.Analytics).AnalyticsReporters.EventIngest.new(EventIngestService)
+local switchAccountScrimError = require(Parent.UiShellEvents).switchAccountScrimError
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
+local usePeekViewFocusNavigationBindings = require(script.Parent.usePeekViewFocusNavigationBindings)
+local GetFFlagEnablePeekViewStateOnMountParam = require(Parent.SharedFlags).GetFFlagEnablePeekViewStateOnMountParam
+local GetFIntPeekViewTransitionDelayTiming = require(Parent.SharedFlags).GetFIntPeekViewTransitionDelayTiming
+local FFlagProfilePlatformNewProfileHeader = require(Parent.SharedFlags).FFlagProfilePlatformNewProfileHeader
+local v32 = game:DefineFastFlag("EnableFastScrollingFixTest", false)
+local FFlagEnablePeekViewFocusNav = require(Parent.SharedFlags).FFlagEnablePeekViewFocusNav
+local GetFFlagPreventSuperBriefPeekViewClose = require(Parent.SharedFlags).GetFFlagPreventSuperBriefPeekViewClose
+local v35 = game:DefineFastFlag("AXMigratePeekViewToFocusNavigation", false)
+local FFlagAXMigrateAXToGlobalAutofocus = require(Parent.SharedFlags).FFlagAXMigrateAXToGlobalAutofocus
+local FFlagAXScrollingFramesShouldAnimateOnFocus = require(Parent.SharedFlags).FFlagAXScrollingFramesShouldAnimateOnFocus
+local v38 = game:DefineFastFlag("FixPeekViewAnimationJitter", false)
+local FFlagPeekViewFixBriefHeightLayoutRace = require(Parent.SharedFlags).FFlagPeekViewFixBriefHeightLayoutRace
+local rect = Rect.new(9, 9, 9, 9)
+local v41 = Images["icons/navigation/swipe"]
+local v42 = 0.1 * GetFIntPeekViewTransitionDelayTiming()
+local Hidden = PeekViewState.Hidden
+local Closed = PeekViewState.Closed
+local SuperBrief = PeekViewState.SuperBrief
+local Brief = PeekViewState.Brief
+local Full = PeekViewState.Full
+local Extended = PeekViewState.Extended
+local u49 = Roact.PureComponent:extend("PeekView")
+
+u49.defaultProps = {
+	superBriefViewContentHeight = nil,
+	bottomDockedContainerHeight = 0,
+	bottomDockedContainerContent = nil,
+	hidden = false,
+	showDraggerInClosedState = true,
+	showDropShadow = true,
+	stateOnMount = nil,
+	mountAsFullView = false,
+	mountAnimation = true,
+	canDragFullViewToBrief = false,
+	withNewThemeProvider = true,
+	viewStateChanged = nil,
+	briefToFullTransitionPercent = nil,
+	peekHeaderClose = true,
+	peekHeaderPositionYChange = nil,
+	isScrollingEnabled = true,
+	closeSignal = nil,
+	hideDraggerInSuperBrief = false,
+	minimizeToSuperBrief = false,
+	customBackground = nil,
+	hasSolidDragger = true,
+	briefViewContentHeight = UDim.new(0.5, 0),
+	fullViewContentHeight = if v35 then nil else UDim.new(1, 0),
+	elasticBehavior = Enum.ElasticBehavior.Always,
+	shouldCaptureFocus = not not FFlagAXMigrateAXToGlobalAutofocus or nil
+}
+
+function u49.init(p1) -- line: 140
+	-- upvalues: UserGameSettings (copy), Hidden (copy), getInputGroup (copy), UserInputService (copy), Roact (copy), UIBlox (copy), Closed (copy), SuperBrief (copy), Brief (copy), Full (copy), v35 (copy), switchAccountScrimError (copy), v24 (copy), v38 (copy), FFlagPeekViewFixBriefHeightLayoutRace (copy), v32 (copy), GetFFlagPreventSuperBriefPeekViewClose (copy), PeekViewState (copy), InputTypeConstants (copy), peekViewDismissedEvent (copy), Extended (copy), ArgCheck (copy), RunService (copy), v42 (copy), GuiService (copy)
+	p1.isMounted = false
+	p1.isTouched = false
+	p1.isInGoToState = false
+	p1.useReducedMotion = UserGameSettings.ReducedMotion
+	p1.viewType = Hidden
+	p1:setState({
+		scrollableViewType = false,
+		absoluteWindowSizeX = 0,
+		absoluteWindowSizeY = 0,
+		canvasGroupTransparency = 0,
+		lastInputGroup = getInputGroup(UserInputService:GetLastInputType())
+	})
+	p1.containerFrameRef = Roact.createRef()
+	p1.clipFrameRef = Roact.createRef()
+	p1.shadowRef = Roact.createRef()
+	p1.fillingAreaRef = Roact.createRef()
+	p1.swipeScrollingFrameRef = Roact.createRef()
+	p1.bottomContainerRef = Roact.createRef()
+
+	local v53, v54 = Roact.createBinding(0)
+
+	p1.transitionPercent = v53
+	p1.setTransitionPercent = v54
+
+	function p1.onAbsoluteWindowSizeChanged(p2) -- line: 166
+		-- upvalues: p1 (copy)
+		if p2.AbsoluteWindowSize.X ~= p1.state.absoluteWindowSizeX or p2.AbsoluteWindowSize.Y ~= p1.state.absoluteWindowSizeY then
+			p1:setState({
+				absoluteWindowSizeX = p2.AbsoluteWindowSize.X,
+				absoluteWindowSizeY = p2.AbsoluteWindowSize.Y
+			})
+		end
+	end
+	function p1.withStyle(p3) -- line: 178
+		-- upvalues: p1 (copy), UIBlox (copy)
+		if p1.props.withNewThemeProvider then
+			return UIBlox.Style.withStyle(p3)
+		end
+
+		return p3({
+			Theme = {
+				BackgroundDefault = {
+					Transparency = 0,
+					Color = Color3.fromRGB(35, 37, 39)
+				},
+				UIEmphasis = {
+					Transparency = 0.7,
+					Color = Color3.fromRGB(255, 255, 255)
+				},
+				DropShadow = {
+					Transparency = 0,
+					Color = Color3.fromRGB(0, 0, 0)
+				}
+			},
+			Settings = {
+				ReducedMotion = false
+			}
+		})
+	end
+	function p1.inputBeganCallback(p4) -- line: 204
+		-- upvalues: p1 (copy)
+		if not p1.isMounted then
+			return
+		end
+
+		if p4.UserInputType ~= Enum.UserInputType.Touch then
+			return
+		end
+
+		p1.isTouched = true
+	end
+	function p1.inputEndedCallback(p5) -- line: 216
+		-- upvalues: p1 (copy)
+		if not p1.isMounted then
+			return
+		end
+
+		if p5.UserInputType ~= Enum.UserInputType.Touch then
+			return
+		end
+
+		p1.isTouched = false
+		p1.checkGoTo()
+	end
+	function p1.getViewSize(p6) -- line: 229
+		-- upvalues: Hidden (copy), Closed (copy), SuperBrief (copy), p1 (copy), Brief (copy), Full (copy)
+		if p6 == Hidden then
+			return UDim.new(0, 0)
+		end
+
+		if p6 == Closed then
+			return UDim.new(0, 0)
+		end
+
+		if p6 == SuperBrief then
+			if p1.props.superBriefViewContentHeight then
+				local superBriefViewContentHeight = p1.props.superBriefViewContentHeight
+
+				return UDim.new(superBriefViewContentHeight.Scale, superBriefViewContentHeight.Offset + 25)
+			end
+
+			return UDim.new(0, 0)
+		end
+
+		if p6 == Brief then
+			local briefViewContentHeight = p1.props.briefViewContentHeight
+
+			return UDim.new(briefViewContentHeight.Scale, briefViewContentHeight.Offset + 25)
+		end
+
+		if p6 == Full then
+			return p1.props.fullViewContentHeight
+		end
+
+		return nil
+	end
+	function p1.hasNilRefs() -- line: 254
+		-- upvalues: v35 (copy), p1 (copy)
+		local v147 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+		local v148 = if not v35 then p1.containerFrameRef.current else p1.props.containerFrameRef.current
+		local current = p1.clipFrameRef.current
+		local current2 = p1.shadowRef.current
+		local current3 = p1.fillingAreaRef.current
+
+		return not (v147 and (v148 and (current and (current2 and current3))))
+	end
+	function p1.reportRefStatus(p7, p8, p9, p10, p11, p12) -- line: 268
+		-- upvalues: switchAccountScrimError (copy), v24 (copy)
+		switchAccountScrimError(v24, "switchAccountScrimError", {
+			callSite = p7,
+			swipeScrollingFrame = not p8 and "nil" or "true",
+			containerFrame = not p9 and "nil" or "true",
+			clipFrame = not p10 and "nil" or "true",
+			shadow = not p11 and "nil" or "true",
+			fillingArea = not p12 and "nil" or "true"
+		})
+	end
+	function p1.reconcileRbxInstances(s1: string?) -- line: 280
+		-- upvalues: v35 (copy), p1 (copy)
+		local v159 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+		local v160 = v159 and v159.CanvasPosition.Y or 0
+		local v161 = if not v35 then p1.containerFrameRef.current else p1.props.containerFrameRef.current
+		local current = p1.clipFrameRef.current
+		local current4 = p1.shadowRef.current
+		local current5 = p1.fillingAreaRef.current
+
+		if p1.hasNilRefs() then
+			p1.reportRefStatus(s1, v159, v161, current, current4, current5)
+
+			return
+		end
+
+		local AbsoluteSizeX = v161.AbsoluteSize.X
+		local AbsoluteSizeY = v161.AbsoluteSize.Y
+
+		current.Size = UDim2.new(0, AbsoluteSizeX, 0, v160)
+		current4.Size = UDim2.new(0, AbsoluteSizeX, 0, 36)
+		current.Position = UDim2.new(0, 0, 1, -v160)
+		current4.Position = UDim2.new(0, 0, 1, -v160 - 30)
+		v159.Size = UDim2.new(0, AbsoluteSizeX, 0, AbsoluteSizeY)
+		v159.Position = UDim2.new(0, 0, 0, -(AbsoluteSizeY - v160))
+		current5.Size = UDim2.new(0, AbsoluteSizeX, 0, AbsoluteSizeY)
+
+		local current6 = p1.bottomContainerRef.current
+
+		if current6 then
+			local bottomDockedContainerHeight = p1.props.bottomDockedContainerHeight
+
+			if current.AbsoluteSize.Y > 25 + bottomDockedContainerHeight then
+				current6.Active = true
+				current6.Position = UDim2.new(0, 0, 1, -bottomDockedContainerHeight)
+			else
+				current6.Active = false
+				current6.Position = UDim2.new(0, 0, 1, -current.AbsoluteSize.Y + 25)
+			end
+		end
+
+		p1.transitionCallbacks()
+
+		if p1.props.peekHeaderPositionYChange then
+			p1.props.peekHeaderPositionYChange(v160)
+		end
+	end
+	function p1.updateSwipeScrollingFrame() -- line: 330
+		-- upvalues: p1 (copy), v35 (copy)
+		local v169 = p1.getViewSize(p1.viewType)
+		local v170 = if not v35 then p1.containerFrameRef.current and p1.swipeScrollingFrameRef.current else p1.props.containerFrameRef.current and p1.props.swipeScrollingFrameRef.current
+
+		if v169 and v170 then
+			local AbsoluteSizeY = ((if not v35 then p1.containerFrameRef.current else p1.props.containerFrameRef.current)).AbsoluteSize.Y
+			local v172 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+			local v173 = AbsoluteSizeY * v169.Scale + v169.Offset
+
+			if v173 ~= v172.CanvasPosition.Y then
+				v172.CanvasPosition = Vector2.new(0, v173)
+
+				if p1.props.peekHeaderPositionYChange then
+					p1.props.peekHeaderPositionYChange(v173)
+				end
+			end
+		end
+	end
+	function p1.onContainerFrameAbsoluteSizeChanged() -- line: 359
+		-- upvalues: p1 (copy), v38 (copy), Hidden (copy)
+		if not p1.isMounted then
+			return
+		end
+
+		p1.reconcileRbxInstances("onContainerFrameAbsoluteSizeChanged")
+
+		if v38 then
+			if not p1:isAnimating() or p1.viewType ~= Hidden then
+				p1.updateSwipeScrollingFrame()
+
+				return
+			end
+		else
+			p1.updateSwipeScrollingFrame()
+		end
+	end
+
+	if FFlagPeekViewFixBriefHeightLayoutRace then
+		function p1.onAbsoluteCanvasSizeChanged() -- line: 381
+			-- upvalues: p1 (copy), Brief (copy), SuperBrief (copy), v35 (copy)
+			if not p1.isMounted or (p1:isAnimating() or p1.isTouched) then
+				return
+			end
+
+			if p1.viewType ~= Brief and p1.viewType ~= SuperBrief then
+				return
+			end
+
+			local v174 = p1.getViewSize(p1.viewType)
+
+			if not v174 then
+				return
+			end
+
+			local v175 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+			local v176 = if not v35 then p1.containerFrameRef.current else p1.props.containerFrameRef.current
+
+			if not v175 or not v176 then
+				return
+			end
+
+			local v177 = v176.AbsoluteSize.Y * v174.Scale + v174.Offset
+			local v178 = v175.AbsoluteCanvasSize.Y - v175.AbsoluteWindowSize.Y
+
+			if v177 > v175.CanvasPosition.Y and v177 <= v178 then
+				v175.CanvasPosition = Vector2.new(0, v177)
+			end
+		end
+	end
+
+	function p1.onSwipeScrollingFrameCanvasPositionChanged() -- line: 412
+		-- upvalues: p1 (copy), v35 (copy), v32 (copy), GetFFlagPreventSuperBriefPeekViewClose (copy), PeekViewState (copy), InputTypeConstants (copy)
+		if not p1.isMounted then
+			return
+		end
+
+		local v179 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+		local CanvasPositionY = v179.CanvasPosition.Y
+
+		if CanvasPositionY ~= math.floor(CanvasPositionY) then
+			if not v32 then
+				if GetFFlagPreventSuperBriefPeekViewClose() then
+					local v181 = math.floor(CanvasPositionY + 0.5)
+
+					if p1.viewType == PeekViewState.SuperBrief and p1.props.minimizeToSuperBrief then
+						local v182 = p1.getSuperBriefViewY()
+
+						if v182 ~= nil and v181 ~= nil and v181 < v182 then
+							v181 = v182
+						end
+					end
+
+					v179.CanvasPosition = Vector2.new(0, v181)
+				else
+					v179.CanvasPosition = Vector2.new(0, (math.floor(CanvasPositionY + 0.5)))
+				end
+			end
+
+			if p1.props.peekHeaderPositionYChange then
+				p1.props.peekHeaderPositionYChange(CanvasPositionY)
+			end
+
+			if not v32 then
+				return
+			end
+		end
+
+		p1.reconcileRbxInstances("onSwipeScrollingFrameCanvasPositionChanged")
+
+		if p1.state.lastInputGroup ~= InputTypeConstants.Gamepad then
+			p1.checkGoTo()
+		end
+	end
+	function p1.getBriefViewY() -- line: 461
+		-- upvalues: v35 (copy), p1 (copy)
+		local v183 = if not v35 then p1.containerFrameRef.current.AbsoluteSize.Y else p1.props.containerFrameRef.current.AbsoluteSize.Y
+		local briefViewContentHeight = p1.props.briefViewContentHeight
+
+		return v183 * briefViewContentHeight.Scale + briefViewContentHeight.Offset + 25
+	end
+	function p1.getSuperBriefViewY() -- line: 469
+		-- upvalues: v35 (copy), p1 (copy)
+		if v35 then
+			if not p1.props.superBriefViewContentHeight or not p1.props.containerFrameRef:getValue() then
+				return nil
+			end
+		elseif not p1.props.superBriefViewContentHeight or not p1.containerFrameRef:getValue() then
+			return nil
+		end
+
+		local v185 = if not v35 then p1.containerFrameRef:getValue().AbsoluteSize.Y else p1.props.containerFrameRef:getValue().AbsoluteSize.Y
+		local superBriefViewContentHeight = p1.props.superBriefViewContentHeight
+
+		return v185 * superBriefViewContentHeight.Scale + superBriefViewContentHeight.Offset + 25
+	end
+	function p1.getFullViewY() -- line: 487
+		-- upvalues: p1 (copy)
+		return p1.containerFrameRef.current.AbsoluteSize.Y * p1.props.fullViewContentHeight.Scale + p1.props.fullViewContentHeight.Offset
+	end
+	function p1.transitionCallbacks() -- line: 492
+		-- upvalues: p1 (copy), v35 (copy)
+		local briefToFullTransitionPercent = p1.props.briefToFullTransitionPercent
+		local CanvasPositionY = ((if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current)).CanvasPosition.Y
+		local v189 = p1.getBriefViewY()
+		local v190 = if not v35 then p1.getFullViewY() else p1.props.getFullViewY()
+		local v191 = v190 - v189
+		local n1 = 0
+
+		if v189 < CanvasPositionY and CanvasPositionY <= v190 then
+			n1 = (CanvasPositionY - v189) / v191
+		elseif v190 < CanvasPositionY then
+			n1 = 1
+		end
+
+		p1.setTransitionPercent(n1)
+
+		if briefToFullTransitionPercent then
+			briefToFullTransitionPercent(n1)
+		end
+	end
+	function p1.checkGoTo() -- line: 529
+		-- upvalues: p1 (copy), v35 (copy), PeekViewState (copy)
+		if p1.isInGoToState then
+			return
+		end
+
+		if p1.isTouched then
+			return
+		end
+
+		local v193 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+
+		if v193 and p1.state.absoluteWindowSizeX == 0 and p1.state.absoluteWindowSizeY == 0 then
+			return
+		end
+
+		local v194 = p1.getBriefViewY()
+		local v195 = p1.getSuperBriefViewY()
+		local v196 = if not v35 then p1.getFullViewY() else p1.props.getFullViewY()
+
+		if v196 < v194 then
+			return
+		end
+
+		if v195 and v194 < v195 then
+			return
+		end
+
+		if v193.AbsoluteWindowSize.Y + 25 + p1.props.bottomDockedContainerHeight > (v193.AbsoluteCanvasSize.Y or v193.CanvasSize.Y.Offset) then
+			return
+		end
+
+		local ScrollVelocityY = v193.ScrollVelocity.Y
+		local v198 = ScrollVelocityY < 0
+		local v199 = ScrollVelocityY > 0
+		local CanvasPositionY = v193.CanvasPosition.Y
+		local v201 = p1.viewType == PeekViewState.Brief and CanvasPositionY == v194
+		local v202 = p1.viewType == PeekViewState.Full and CanvasPositionY == v196
+
+		if (v201 or v202) and ScrollVelocityY == 0 then
+			return
+		end
+
+		if v196 < CanvasPositionY then
+			p1:handleCurYAboveFullViewY(v198)
+
+			return
+		end
+
+		if v194 < CanvasPositionY and CanvasPositionY <= v196 then
+			p1:handleCurYFromBriefToFull(CanvasPositionY, ScrollVelocityY, v198, v199)
+
+			return
+		end
+
+		if v195 then
+			if v195 < CanvasPositionY and CanvasPositionY <= v194 then
+				p1:handleCurYFromSuperBriefToBrief(CanvasPositionY, v195, ScrollVelocityY, v198, v199)
+
+				return
+			end
+
+			if CanvasPositionY <= v195 then
+				p1:handleCurYFromClosedToSuperBrief(CanvasPositionY, v195, ScrollVelocityY, v199, v198)
+
+				return
+			end
+		elseif CanvasPositionY <= v194 then
+			p1:handleCurYFromClosedToBrief(CanvasPositionY, v199, v198)
+		end
+	end
+	function p1.onPeekHeaderActivated() -- line: 616
+		-- upvalues: p1 (copy), Closed (copy), Brief (copy), Full (copy), SuperBrief (copy), peekViewDismissedEvent (copy)
+		if p1.viewType == Closed then
+			p1.goTo(Brief)
+
+			return
+		end
+
+		if p1.viewType == Brief then
+			p1.goTo(Full)
+
+			return
+		end
+
+		if p1.viewType == SuperBrief then
+			p1.goTo(Brief)
+
+			return
+		end
+
+		if p1.viewType == Full then
+			if p1.props.peekHeaderClose then
+				p1.goTo(Closed, nil, nil, {
+					dismissMethod = peekViewDismissedEvent.dismissMethodEnum.handleTap
+				})
+
+				return
+			end
+
+			p1.goTo(Brief)
+		end
+	end
+	function p1.setViewType(p13, p14) -- line: 634
+		-- upvalues: p1 (copy), Extended (copy), Full (copy)
+		if p1.goToAnimationConnection then
+			p1.goToAnimationConnection:disconnect()
+			p1.goToAnimationConnection = nil
+		end
+
+		p1.isInGoToState = false
+		p1.clipFrameRef.current.Active = false
+
+		local viewType = p1.viewType
+
+		if viewType ~= p13 then
+			p1.viewType = p13
+
+			local v206 = p1.viewType == Extended or p1.viewType == Full
+
+			p1:setState({
+				scrollableViewType = v206
+			})
+
+			local viewStateChanged = p1.props.viewStateChanged
+
+			if viewStateChanged then
+				viewStateChanged(p13, viewType, p14 or {})
+			end
+		end
+
+		p1.updateSwipeScrollingFrame()
+	end
+	function p1.goTo(p15, p16, p17, p18) -- line: 662
+		-- upvalues: p1 (copy), ArgCheck (copy), v35 (copy), Full (copy), Closed (copy), RunService (copy), Brief (copy), v42 (copy)
+		if p15 == p1.viewType then
+			return
+		end
+
+		if ArgCheck.isEqual(p1.isInGoToState, false, "self.isInGoToState") then
+			return
+		end
+
+		if ArgCheck.isEqual(p1.goToAnimationConnection, nil, "self.goToAnimationConnection") then
+			return
+		end
+
+		p1.isInGoToState = true
+
+		if v35 then
+			p1.props.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0)
+		else
+			p1.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0)
+		end
+
+		p1.clipFrameRef.current.Active = true
+
+		if p16 == false then
+			p1.setViewType(p15, p18)
+
+			if p15 == Full then
+				p1:adjustScrollingFramePosition()
+
+				return
+			end
+		else
+			local timestamp = tick()
+
+			if not p17 then
+				p1:setState({
+					canvasGroupTransparency = p15 ~= Closed and 0 or 1
+				})
+				p1.goToAnimationConnection = RunService.RenderStepped:Connect(function() -- line: 697
+					-- upvalues: p1 (copy), timestamp (copy), p15 (copy), Brief (copy), v42 (copy), v35 (copy), ArgCheck (copy), p18 (copy), Full (copy)
+					if not p1.isMounted then
+						return
+					end
+
+					local v228 = tick() - timestamp
+
+					if p15 ~= Brief or v228 >= v42 then
+						if v35 then
+							p1.props.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0)
+						else
+							p1.swipeScrollingFrameRef:getValue().ScrollVelocity = Vector2.new(0, 0)
+						end
+
+						local v229 = if not v35 then p1.swipeScrollingFrameRef.current else p1.props.swipeScrollingFrameRef.current
+						local v230 = if not v35 then p1.containerFrameRef.current.AbsoluteSize.Y else p1.props.containerFrameRef.current.AbsoluteSize.Y
+						local v231 = ArgCheck.isNotNil(p1.getViewSize(p15), "self.goTo.viewSize")
+						local v232 = v230 * v231.Scale + v231.Offset
+
+						if p15 == Brief then
+							v228 -= v42
+						end
+
+						if v228 >= 0.35 then
+							p1.setViewType(p15, p18)
+
+							if p15 == Full then
+								p1:adjustScrollingFramePosition()
+							end
+
+							return
+						end
+
+						local CanvasPositionY = v229.CanvasPosition.Y
+						local v234 = v232 - CanvasPositionY
+
+						v229.CanvasPosition = Vector2.new(0, CanvasPositionY + v234 * math.sin(v228 * 2.468394227820552))
+					end
+				end)
+
+				return
+			end
+
+			if p15 ~= Closed then
+				p1.setViewType(p15, p18)
+
+				if p15 == Full then
+					p1:adjustScrollingFramePosition()
+				end
+			end
+
+			p1:setState({
+				canvasGroupTransparency = p15 ~= Closed and 1 or 0
+			})
+			p1.goToAnimationConnection = RunService.RenderStepped:Connect(function() -- line: 750
+				-- upvalues: p1 (copy), p15 (copy), Full (copy), timestamp (copy), Closed (copy), p18 (copy)
+				if not p1.isMounted then
+					return
+				end
+
+				if p15 == Full then
+					p1.updateSwipeScrollingFrame()
+				end
+
+				local v235 = tick() - timestamp
+
+				if v235 >= 0.35 then
+					p1:setState({
+						canvasGroupTransparency = p15 ~= Closed and 0 or 1
+					})
+					p1.setViewType(p15, p18)
+
+					if p15 == Full then
+						p1:adjustScrollingFramePosition()
+					end
+
+					return
+				end
+
+				p1:setState({
+					canvasGroupTransparency = if p15 ~= Closed then 1 - v235 / 0.35 else v235 / 0.35
+				})
+			end)
+		end
+	end
+
+	p1.selectedCoreObjectConnection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):connect(function() -- line: 784
+		-- upvalues: v35 (copy), p1 (copy), InputTypeConstants (copy)
+		if v35 then
+			if p1.props.swipeScrollingFrameRef.current and p1.state.lastInputGroup == InputTypeConstants.Gamepad then
+				p1:adjustScrollingFramePosition()
+
+				return
+			end
+		elseif p1.swipeScrollingFrameRef.current and p1.state.lastInputGroup == InputTypeConstants.Gamepad then
+			p1:adjustScrollingFramePosition()
+		end
+	end)
+end
+function u49.handleCurYAboveFullViewY(p19, p20) -- line: 810
+	-- upvalues: Full (copy), Extended (copy)
+	if p19.viewType ~= Full and p19.viewType ~= Extended then
+		if p20 then
+			p19.goTo(Full)
+
+			return
+		end
+
+		p19.setViewType(Extended)
+
+		return
+	end
+
+	if p19.viewType == Full then
+		p19.setViewType(Extended)
+	end
+end
+function u49.handleCurYFromBriefToFull(p21, p22, p23, p24, p25) -- line: 822
+	-- upvalues: v35 (copy), Full (copy), Brief (copy), Closed (copy), peekViewDismissedEvent (copy), Extended (copy)
+	local canDragFullViewToBrief = p21.props.canDragFullViewToBrief
+	local minimizeToSuperBrief = p21.props.minimizeToSuperBrief
+	local v64 = if not v35 then p21.swipeScrollingFrameRef:getValue() else p21.props.swipeScrollingFrameRef:getValue()
+	local v65 = p21.getBriefViewY()
+	local v66 = ((if not v35 then p21.getFullViewY() else p21.props.getFullViewY())) - v65
+
+	if p21.viewType == Full then
+		if p22 > v64.AbsoluteCanvasSize.Y - v64.AbsoluteWindowSize.Y - 1 then
+			return
+		end
+
+		if p25 or p22 < v65 + v66 * 0.8 then
+			local v67 = p25 and p23 > 500
+
+			if canDragFullViewToBrief and (not v67 or minimizeToSuperBrief) then
+				p21.goTo(Brief)
+
+				return
+			end
+
+			p21.goTo(Closed, nil, nil, {
+				dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+			})
+
+			return
+		end
+	elseif p21.viewType == Extended then
+		if not p25 or p22 < v65 + v66 * 0.8 or p23 > -1 then
+			p21.goTo(Full)
+
+			return
+		end
+	else
+		if p24 or p22 > v65 + v66 * 0.2 then
+			p21.goTo(Full)
+
+			return
+		end
+
+		p21.goTo(Brief)
+	end
+end
+function u49.handleCurYFromSuperBriefToBrief(p26, p27, p28, p29, p30, p31) -- line: 863
+	-- upvalues: v35 (copy), Full (copy), SuperBrief (copy), Closed (copy), peekViewDismissedEvent (copy), Brief (copy), Extended (copy)
+	local canDragFullViewToBrief = p26.props.canDragFullViewToBrief
+	local minimizeToSuperBrief = p26.props.minimizeToSuperBrief
+	local v76 = ((if not v35 then p26.getFullViewY() else p26.props.getFullViewY())) - p28
+
+	if p26.viewType == Full then
+		if p31 or p27 < p28 + v76 * 0.8 then
+			local v77 = p31 and p29 > 500
+
+			if canDragFullViewToBrief and (not v77 or minimizeToSuperBrief) then
+				p26.goTo(SuperBrief)
+
+				return
+			end
+
+			p26.goTo(Closed, nil, nil, {
+				dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+			})
+
+			return
+		end
+
+		p26.goTo(Brief)
+
+		return
+	end
+
+	if p26.viewType == Extended then
+		if not p31 or p27 < p28 + v76 * 0.8 or p29 > -1 then
+			p26.goTo(Brief)
+
+			return
+		end
+	else
+		if p30 or p27 > p28 + v76 * 0.2 then
+			p26.goTo(Brief)
+
+			return
+		end
+
+		local v78 = p31 and p29 > 500
+
+		if canDragFullViewToBrief and (not v78 or minimizeToSuperBrief) then
+			p26.goTo(SuperBrief)
+
+			return
+		end
+
+		p26.goTo(Closed, nil, nil, {
+			dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+		})
+	end
+end
+function u49.handleCurYFromClosedToSuperBrief(p32, p33, p34, p35, p36, p37) -- line: 901
+	-- upvalues: SuperBrief (copy), Closed (copy), peekViewDismissedEvent (copy)
+	local v85 = p34 - 0
+	local minimizeToSuperBrief = p32.props.minimizeToSuperBrief
+
+	if p32.viewType == SuperBrief then
+		if (p36 or p33 < v85 * 0.8) and not minimizeToSuperBrief then
+			p32.goTo(Closed, nil, nil, {
+				dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+			})
+
+			return
+		end
+
+		p32.goTo(SuperBrief)
+
+		return
+	end
+
+	if (not p36 or not (p35 > 500)) and (p37 or p33 > v85 * 0.8) or minimizeToSuperBrief then
+		p32.goTo(SuperBrief)
+
+		return
+	end
+
+	p32.goTo(Closed, nil, nil, {
+		dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+	})
+end
+function u49.handleCurYFromClosedToBrief(p38, p39, p40, p41) -- line: 924
+	-- upvalues: Brief (copy), Closed (copy), peekViewDismissedEvent (copy)
+	local v91 = p38.getBriefViewY() - 0
+
+	if p38.viewType == Brief then
+		if p40 or p39 < 0 + v91 * 0.8 then
+			p38.goTo(Closed, nil, nil, {
+				dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+			})
+
+			return
+		end
+
+		p38.goTo(Brief)
+
+		return
+	end
+
+	if p41 or p39 > 0 + v91 * 0.2 then
+		p38.goTo(Brief)
+
+		return
+	end
+
+	p38.goTo(Closed, nil, nil, {
+		dismissMethod = peekViewDismissedEvent.dismissMethodEnum.swipe
+	})
+end
+function u49.adjustScrollingFramePosition(p42) -- line: 947
+	-- upvalues: GuiService (copy), v35 (copy), Extended (copy), Full (copy), ArgCheck (copy)
+	local SelectedCoreObject = GuiService.SelectedCoreObject
+
+	if not SelectedCoreObject or (not p42.props.contentFrameRef or not SelectedCoreObject:IsDescendantOf(p42.props.contentFrameRef.current)) then
+		return
+	end
+
+	local v94 = if not v35 then p42.swipeScrollingFrameRef.current else p42.props.swipeScrollingFrameRef.current
+
+	if p42.viewType ~= Extended and p42.viewType ~= Full then
+		local v95 = ArgCheck.isNotNil(p42.getViewSize(p42.viewType), "self.adjustScrollingFramePosition.viewSize")
+
+		v94.CanvasPosition = Vector2.new(v94.CanvasPosition.X, v95.Offset)
+
+		return
+	end
+
+	local v96 = SelectedCoreObject.AbsolutePosition.Y - p42.props.topBarHeight
+	local AbsoluteSizeY = SelectedCoreObject.AbsoluteSize.Y
+	local AbsoluteWindowSizeY = v94.AbsoluteWindowSize.Y
+	local v99 = AbsoluteWindowSizeY - (v96 + AbsoluteSizeY)
+	local CanvasPositionY = v94.CanvasPosition.Y
+
+	if v99 < p42.props.bottomDockedContainerHeight then
+		CanvasPositionY = CanvasPositionY + p42.props.bottomDockedContainerHeight - v99
+	elseif v96 + AbsoluteSizeY + (CanvasPositionY - AbsoluteWindowSizeY) < AbsoluteWindowSizeY - p42.props.bottomDockedContainerHeight then
+		CanvasPositionY = AbsoluteWindowSizeY
+	end
+
+	local v101 = math.max(0, (math.min(CanvasPositionY, (v94.AbsoluteCanvasSize.Y or v94.CanvasSize.Y.Offset) - v94.AbsoluteWindowSize.Y)))
+
+	v94.CanvasPosition = Vector2.new(v94.CanvasPosition.X, v101)
+end
+function u49.handleThumbstickInput(p43, p44, p45) -- line: 994
+	-- upvalues: GamepadUtils (copy)
+	local p44Position = p44.Position
+	local v106 = p43.swipeScrollingFrameRef:getValue()
+
+	if p43.containerFrameRef:getValue() and v106 then
+		local v107 = v106.CanvasPosition.Y + p45 * -GamepadUtils.normalizeStickByDeadzone(p44Position).Y * 1000
+
+		if v107 > p43.getFullViewY() then
+			v106.CanvasPosition = Vector2.new(0, v107)
+		end
+	end
+end
+function u49.renderWithStyle(p46, p47) -- line: 1007
+	-- upvalues: Roact (copy), v35 (copy), SuperBrief (copy), ImageSetLabel (copy), v41 (copy), FFlagProfilePlatformNewProfileHeader (copy), Focusable (copy), RoactGamepad (copy), FFlagEnablePeekViewFocusNav (copy), FFlagPeekViewFixBriefHeightLayoutRace (copy), rect (copy), Brief (copy), Full (copy), FFlagAXMigrateAXToGlobalAutofocus (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigationUtils (copy), ExternalEventConnection (copy), UserInputService (copy)
+	local v110 = p46.props[Roact.Children]
+	local bottomDockedContainerHeight = p46.props.bottomDockedContainerHeight
+	local bottomDockedContainerContent = p46.props.bottomDockedContainerContent
+	local v113 = p46.props.thumbstickScrollEnabled and p46.state.scrollableViewType
+	local BackgroundContrastColor = p47.Theme.BackgroundContrast.Color
+
+	local function getDraggerTransparency() -- line: 1016
+		-- upvalues: v35 (copy), p46 (copy), p47 (copy)
+		local v213 = if not v35 then p46.swipeScrollingFrameRef.current else p46.props.swipeScrollingFrameRef.current
+
+		if not v213 then
+			return p47.Theme.UIEmphasis.Transparency
+		end
+
+		local CanvasPositionY = v213.CanvasPosition.Y
+		local v215 = p46.getBriefViewY()
+		local v216 = if not v35 then p46.getFullViewY() else p46.props.getFullViewY()
+		local v217 = math.max(0, (math.min(1, (CanvasPositionY - v215) / (v216 - v215))))
+
+		return p47.Theme.UIEmphasis.Transparency + v217 * (1 - p47.Theme.UIEmphasis.Transparency)
+	end
+
+	local v116 = Roact.createElement("TextButton", {
+		Text = "",
+		LayoutOrder = 3,
+		ZIndex = 3,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 25),
+		[Roact.Event.Activated] = p46.onPeekHeaderActivated,
+		Selectable = false
+	}, {
+		Dragger = if not p46.props.hideDraggerInSuperBrief or p46.props.peekViewState ~= SuperBrief then Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			Active = false,
+			Size = UDim2.new(0, 36, 0, 36),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Image = v41,
+			ImageColor3 = p47.Theme.UIEmphasis.Color,
+			ImageTransparency = if not FFlagProfilePlatformNewProfileHeader or p46.props.hasSolidDragger then p47.Theme.UIEmphasis.Transparency else getDraggerTransparency()
+		}) else nil
+	})
+	local v117 = Roact.createElement(Focusable.Frame, {
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		[Roact.Ref] = p46.clipFrameRef,
+		restorePreviousChildFocus = true,
+		inputBindings = if v35 or not v113 then nil else {
+			ScrollPeekView = RoactGamepad.Input.onStep(Enum.KeyCode.Thumbstick2, function(p48, p49) -- line: 1067
+				-- upvalues: p46 (copy)
+				p46:handleThumbstickInput(p48, p49)
+			end)
+		}
+	}, {
+		SwipeScrollingFrame = Roact.createElement("ScrollingFrame", {
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			Selectable = not FFlagEnablePeekViewFocusNav and nil,
+			CanvasSize = UDim2.fromScale(1, 0),
+			Active = true,
+			BackgroundTransparency = 1,
+			ZIndex = 1,
+			BorderSizePixel = 0,
+			ScrollBarThickness = 0,
+			ClipsDescendants = false,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ElasticBehavior = p46.props.elasticBehavior,
+			ScrollingEnabled = p46.props.isScrollingEnabled,
+			[Roact.Ref] = if not v35 then p46.swipeScrollingFrameRef else p46.props.swipeScrollingFrameRef,
+			[Roact.Change.CanvasPosition] = p46.onSwipeScrollingFrameCanvasPositionChanged,
+			[Roact.Change.AbsoluteWindowSize] = p46.onAbsoluteWindowSizeChanged,
+			[Roact.Change.AbsoluteCanvasSize] = if not FFlagPeekViewFixBriefHeightLayoutRace then nil else p46.onAbsoluteCanvasSizeChanged
+		}, {
+			UIListLayout = Roact.createElement("UIListLayout", {
+				Padding = UDim.new(0, 0),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Top
+			}),
+			FillingArea = Roact.createElement("Frame", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Active = false,
+				[Roact.Ref] = p46.fillingAreaRef
+			}),
+			BackgroundFrame = Roact.createElement("Frame", {
+				LayoutOrder = 2,
+				ZIndex = 1,
+				Active = false,
+				Size = UDim2.new(1, 0, 0, 0)
+			}, {
+				BackgroundImage = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					Active = false,
+					Size = UDim2.new(1, 0, 0, 9999),
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = rect,
+					BackgroundColor3 = if not p46.props.customBackground then BackgroundContrastColor else p46.props.customBackground
+				})
+			}),
+			PeekHeader = if not FFlagProfilePlatformNewProfileHeader or p46.props.hasSolidDragger then v116 else nil,
+			ContentFrame = Roact.createElement(Focusable.Frame, {
+				LayoutOrder = 4,
+				ZIndex = 2,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ClipsDescendants = false,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				[Roact.Ref] = p46.props.contentFrameRef,
+				restorePreviousChildFocus = true,
+				onFocusGained = function() -- line: 1141
+					-- upvalues: p46 (copy), Brief (copy), Full (copy)
+					if p46.viewType == Brief and p46.props.peekViewState ~= Full then
+						p46.goTo(Full)
+					end
+				end
+			}, if not FFlagProfilePlatformNewProfileHeader or p46.props.hasSolidDragger then v110 else {
+				PeekHeader = v116,
+				Content = Roact.createElement("Frame", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, v110)
+			}),
+			BottomContainerPlaceHolder = bottomDockedContainerHeight > 0 and Roact.createElement("Frame", {
+				LayoutOrder = 5,
+				BackgroundTransparency = 1,
+				Active = false,
+				Size = UDim2.new(1, 0, 0, bottomDockedContainerHeight)
+			})
+		}),
+		BottomContainer = bottomDockedContainerHeight > 0 and Roact.createElement("Frame", {
+			Active = true,
+			ZIndex = 2,
+			Size = UDim2.new(1, 0, 0, bottomDockedContainerHeight),
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p46.bottomContainerRef
+		}, bottomDockedContainerContent)
+	})
+	local v118 = if not FFlagAXMigrateAXToGlobalAutofocus or p46.props.shouldCaptureFocus then if not FFlagEnablePeekViewFocusNav then nil else Roact.createElement(FocusNavigableSurfaceWrapper, {
+		isIsolated = true,
+		surfaceIdentifier = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum.PeekView
+	}, {
+		ClipFrame = v117
+	}) else nil
+
+	return Roact.createFragment({
+		DropShadowBackground = Roact.createElement("Frame", {
+			ZIndex = 0,
+			Visible = p46.props.showDropShadow,
+			[Roact.Ref] = p46.shadowRef
+		}, {
+			UIGradient = Roact.createElement("UIGradient", {
+				Rotation = 90,
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, p47.Theme.DropShadow.Color),
+					ColorSequenceKeypoint.new(1, p47.Theme.DropShadow.Color)
+				}),
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 1),
+					NumberSequenceKeypoint.new(1, 0.7)
+				})
+			})
+		}),
+		ClipFrameContainer = v118,
+		ClipFrame = if not FFlagAXMigrateAXToGlobalAutofocus or p46.props.shouldCaptureFocus then if not FFlagEnablePeekViewFocusNav then v117 else nil else v117,
+		InputBegan = Roact.createElement(ExternalEventConnection, {
+			event = UserInputService.InputBegan,
+			callback = p46.inputBeganCallback
+		}),
+		InputEnded = Roact.createElement(ExternalEventConnection, {
+			event = UserInputService.InputEnded,
+			callback = p46.inputEndedCallback
+		})
+	})
+end
+function u49.render(p50) -- line: 1220
+	-- upvalues: Roact (copy), Scrim (copy), v35 (copy), Closed (copy), peekViewDismissedEvent (copy)
+	return p50.withStyle(function(p51) -- line: 1221
+		-- upvalues: p50 (copy), Roact (copy), Scrim (copy), v35 (copy), Closed (copy), peekViewDismissedEvent (copy)
+		local v221 = if not p50.useReducedMotion then p50:renderWithStyle(p51) else Roact.createElement("CanvasGroup", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			GroupTransparency = p50.state.canvasGroupTransparency
+		}, { p50:renderWithStyle(p51) })
+
+		if p50.props.hasScrim then
+			return Roact.createElement(Scrim, {
+				[Roact.Ref] = if not v35 then p50.containerFrameRef else p50.props.containerFrameRef,
+				onActivated = function() -- line: 1237
+					-- upvalues: p50 (copy), Closed (copy), peekViewDismissedEvent (copy)
+					if p50.isInGoToState then
+						return
+					end
+
+					p50.goTo(Closed, nil, nil, {
+						dismissMethod = peekViewDismissedEvent.dismissMethodEnum.scrimTap
+					})
+				end,
+				onSizeChanged = p50.onContainerFrameAbsoluteSizeChanged
+			}, v221)
+		end
+
+		return Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			ClipsDescendants = false,
+			[Roact.Ref] = if not v35 then p50.containerFrameRef else p50.props.containerFrameRef,
+			[Roact.Change.AbsoluteSize] = p50.onContainerFrameAbsoluteSizeChanged
+		}, v221)
+	end)
+end
+function u49.didMount(p52) -- line: 1262
+	-- upvalues: Closed (copy), GetFFlagEnablePeekViewStateOnMountParam (copy), Full (copy), Brief (copy), getInputGroup (copy), UserInputService (copy)
+	p52.isMounted = true
+
+	if p52.props.closeSignal then
+		p52.closeSignalConnection = p52.props.closeSignal:connect(function() -- line: 1266
+			-- upvalues: p52 (copy), Closed (copy)
+			if not p52.isInGoToState then
+				p52.goTo(Closed, true, p52.useReducedMotion)
+			end
+		end)
+	end
+
+	local hidden = p52.props.hidden
+	local mountAsFullView = p52.props.mountAsFullView
+	local mountAnimation = p52.props.mountAnimation
+	local v124 = if not GetFFlagEnablePeekViewStateOnMountParam() then nil else p52.props.stateOnMount
+
+	if not hidden then
+		if mountAsFullView then
+			p52.goTo(Full, mountAnimation, p52.useReducedMotion)
+		elseif v124 ~= nil then
+			p52.goTo(v124, mountAnimation, p52.useReducedMotion)
+		else
+			p52.goTo(Brief, mountAnimation, p52.useReducedMotion)
+		end
+	end
+
+	p52:setState({
+		lastInputGroup = getInputGroup(UserInputService:GetLastInputType())
+	})
+	UserInputService.LastInputTypeChanged:Connect(function(p53) -- line: 1294
+		-- upvalues: p52 (copy), getInputGroup (copy)
+		p52:setState({
+			lastInputGroup = getInputGroup(p53)
+		})
+	end)
+end
+function u49.isAnimating(p54) -- line: 1299
+	return p54.goToAnimationConnection ~= nil
+end
+function u49.didUpdate(p55, p56, p57) -- line: 1303
+	-- upvalues: Hidden (copy), Brief (copy), Extended (copy)
+	if p57.absoluteWindowSizeX ~= p55.state.absoluteWindowSizeX or p57.absoluteWindowSizeY ~= p55.state.absoluteWindowSizeY then
+		p55.reconcileRbxInstances("didUpdate")
+
+		if not p55:isAnimating() then
+			p55.updateSwipeScrollingFrame()
+		end
+	end
+
+	if p56.bottomDockedContainerHeight ~= p55.props.bottomDockedContainerHeight then
+		p55.onContainerFrameAbsoluteSizeChanged()
+	end
+
+	if p56.briefViewContentHeight ~= p55.props.briefViewContentHeight and not p55:isAnimating() then
+		p55.updateSwipeScrollingFrame()
+	end
+
+	if p56.hidden == false and p55.props.hidden == true then
+		p55.goTo(Hidden)
+	elseif p56.hidden == true and p55.props.hidden == false then
+		p55.goTo(Brief)
+	end
+
+	local peekViewState = p55.props.peekViewState
+	local isInGoToState = p55.isInGoToState
+
+	if peekViewState ~= p56.peekViewState and p55.viewType == p56.peekViewState and peekViewState ~= Extended and not isInGoToState then
+		p55.goTo(p55.props.peekViewState)
+	end
+end
+function u49.willUnmount(p58) -- line: 1350
+	p58.isMounted = false
+
+	if p58.closeSignalConnection then
+		p58.closeSignalConnection:disconnect()
+		p58.closeSignalConnection = nil
+	end
+
+	if p58.goToAnimationConnection then
+		p58.goToAnimationConnection:disconnect()
+		p58.goToAnimationConnection = nil
+	end
+
+	if p58.selectedCoreObjectConnection then
+		p58.selectedCoreObjectConnection:disconnect()
+		p58.selectedCoreObjectConnection = nil
+	end
+end
+
+local function mapStateToProps(p59, _) -- line: 1369
+	return {
+		topBarHeight = p59.TopBar and p59.TopBar.topBarHeight or 0
+	}
+end
+local function PeekViewContainer(p61) -- line: 1375
+	-- upvalues: React (copy), FFlagAXScrollingFramesShouldAnimateOnFocus (copy), GamepadUtils (copy), usePeekViewFocusNavigationBindings (copy), u49 (ref), Cryo (copy)
+	local u135 = React.useRef(nil)
+
+	if FFlagAXScrollingFramesShouldAnimateOnFocus and p61.scrollingFrameRef then
+		u135 = p61.scrollingFrameRef
+	end
+
+	local v136 = React.useRef(nil)
+	local u137 = if not p61.fullViewContentHeight then UDim.new(1, 0) else p61.fullViewContentHeight
+	local v138 = React.useCallback(function() -- line: 1391
+		-- upvalues: v136 (copy), u137 (ref)
+		return v136.current.AbsoluteSize.Y * u137.Scale + u137.Offset
+	end, {
+		u137,
+		v136
+	})
+	local v139 = React.useCallback(function(p62, n2: number) -- line: 1396
+		-- upvalues: u135 (ref), v136 (copy), GamepadUtils (copy), v138 (copy)
+		local p62Position = p62.Position
+		local v226 = u135:getValue()
+
+		if v136:getValue() and v226 then
+			local v227 = v226.CanvasPosition.Y + n2 * -GamepadUtils.normalizeStickByDeadzone(p62Position).Y * 1000
+
+			if v227 > v138() then
+				v226.CanvasPosition = Vector2.new(0, v227)
+			end
+		end
+	end, {
+		v138,
+		u135,
+		v136
+	})
+
+	usePeekViewFocusNavigationBindings(v139)
+
+	return React.createElement(u49, Cryo.Dictionary.join(p61, {
+		swipeScrollingFrameRef = u135,
+		containerFrameRef = v136,
+		fullViewContentHeight = u137,
+		getFullViewY = v138
+	}))
+end
+
+u49 = RoactRodux.connect(mapStateToProps, nil)(u49)
+
+if v35 then
+	return PeekViewContainer
+end
+
+return u49

@@ -1,13 +1,15 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: startsWith ]]
-    if string.len(v1) == 0 then
-        return true;
-    else
-        local v3 = nil;
-        v3 = (not (v2 ~= nil) or v2 < 1) and 1 or v2;
-        if string.len(v0) < v3 then
-            return false;
-        else
-            return v0:find(v1, v3, true) == v3;
-        end;
-    end;
-end;
+local function startsWith(s1: string, s2: string, n1: number?) -- line: 2
+	if string.len(s2) == 0 then
+		return true
+	end
+
+	local v5 = if n1 ~= nil and not (n1 < 1) then n1 else 1
+
+	if v5 > string.len(s1) then
+		return false
+	end
+
+	return v5 == s1:find(s2, v5, true)
+end
+
+return startsWith

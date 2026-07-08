@@ -1,201 +1,240 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local v3 = require(l_CorePackages_0.Packages.Foundation);
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.Constants);
-local v6 = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils);
-local v7 = require(l_script_FirstAncestor_0.ChromeShared.Hooks.useMappedSignal);
-local v8 = require(l_script_FirstAncestor_0.Integrations.Party.usePartyIcon);
-local l_dependencyArray_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.dependencyArray;
-local l_MappedSignal_0 = v6.MappedSignal;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_UnibarStyle_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).UnibarStyle;
-local v13 = require(l_script_FirstAncestor_0.ChromeShared.Unibar.SubMenuContext);
-local v14 = require(l_CorePackages_0.Workspace.Packages.AppChat);
-local l_InExperienceAppChatModal_0 = v14.App.InExperienceAppChatModal;
-local l_getAppChatNavbarItemConfig_0 = v14.Utils.getAppChatNavbarItemConfig;
-local l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 = require(l_script_FirstAncestor_0.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v19 = l_getAppChatNavbarItemConfig_0();
-local l_off_0 = v19.icon.off;
-local l_on_0 = v19.icon.on;
-local v22 = {
-    integrationId = "", 
-    shouldShowCustomBadge = true, 
-    isSquadIndicatorEnabled = false
-};
-return function(v23) --[[ Line: 51 ]] --[[ Name: ConnectIcon ]]
-    -- upvalues: v2 (copy), v22 (copy), l_useTokens_0 (copy), l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 (copy), l_UnibarStyle_0 (copy), v5 (copy), v4 (copy), l_InExperienceAppChatModal_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_MappedSignal_0 (copy), v7 (copy), v8 (copy), l_on_0 (copy), l_off_0 (copy), v13 (copy), v3 (copy)
-    local v24 = v2.Dictionary.union(v22, v23);
-    local v25 = l_useTokens_0();
-    local _ = nil;
-    local v27 = nil;
-    v27 = if l_FFlagTokenizeUnibarConstantsWithStyleProvider_0 then l_UnibarStyle_0.use().ICON_SIZE else v5.ICON_SIZE;
-    local v28, v29 = v4.useState(l_InExperienceAppChatModal_0.default.unreadCount);
-    if v24.shouldShowCustomBadge then
-        v4.useEffect(function() --[[ Line: 66 ]]
-            -- upvalues: l_InExperienceAppChatModal_0 (ref), v29 (copy)
-            local v31 = l_InExperienceAppChatModal_0.default.unreadCountSignal.Event:Connect(function(v30) --[[ Line: 67 ]]
-                -- upvalues: v29 (ref)
-                v29(v30);
-            end);
-            return function() --[[ Line: 70 ]]
-                -- upvalues: v31 (copy)
-                v31:Disconnect();
-            end;
-        end, {
-            v29
-        });
-    else
-        v28 = 0;
-    end;
-    local v32 = nil;
-    local v33 = nil;
-    local v34 = nil;
-    if v24.isSquadIndicatorEnabled then
-        local v35, v36 = v4.useState(l_InExperienceAppChatModal_0.default.currentSquadId);
-        v32 = v35;
-        v33 = v36;
-    end;
-    v4.useEffect(function() --[[ Line: 84 ]]
-        -- upvalues: v24 (copy), l_InExperienceAppChatModal_0 (ref), v33 (ref)
-        if v24.isSquadIndicatorEnabled then
-            local v38 = l_InExperienceAppChatModal_0.default.currentSquadIdSignal.Event:Connect(function(v37) --[[ Line: 87 ]]
-                -- upvalues: v33 (ref)
-                v33(v37);
-            end);
-            return function() --[[ Line: 91 ]]
-                -- upvalues: v38 (copy)
-                v38:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 95 ]]
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Foundation = require(CorePackages.Packages.Foundation)
+local React = require(CorePackages.Packages.React)
+local Constants = require(Chrome.ChromeShared.Unibar.Constants)
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local useMappedSignal = require(CorePackages.Workspace.Packages.Chrome).Hooks.useMappedSignal
+local usePartyIcon = require(Chrome.Integrations.Party.usePartyIcon)
+local MappedSignal = ChromeUtils.MappedSignal
+local useTokens = Foundation.Hooks.useTokens
+local UnibarStyle = require(CorePackages.Workspace.Packages.Chrome).UnibarStyle
+local SubMenuContext = require(Chrome.ChromeShared.Unibar.SubMenuContext)
+local InExperienceAppChatModal = require(CorePackages.Workspace.Packages.AppChat.InExperienceAppChatModal)
+local getAppChatNavbarItemConfig = require(CorePackages.Workspace.Packages.AppChat.getAppChatNavbarItemConfig)
+local FFlagTokenizeUnibarConstantsWithStyleProvider = require(Chrome.ChromeShared.Flags).FFlagTokenizeUnibarConstantsWithStyleProvider
+local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
+local v18 = getAppChatNavbarItemConfig()
+local off = v18.icon.off
+local on = v18.icon.on
+local t1 = {
+	integrationId = "",
+	shouldShowCustomBadge = true,
+	isSquadIndicatorEnabled = false
+}
 
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v24.isSquadIndicatorEnabled, 
-        v33
-    } else l_dependencyArray_0(v24.isSquadIndicatorEnabled, v33));
-    if v24.isSquadIndicatorEnabled then
-        if v32 ~= "" then
-            v34 = v25.Color.System.Success;
-        elseif v28 > 0 then
-            v34 = v25.Color.System.Contrast;
-        end;
-    end;
-    local v39 = if v24.isSquadIndicatorEnabled then v34 else v28 > 0;
-    local v41 = l_MappedSignal_0.new(l_InExperienceAppChatModal_0.default.visibilitySignal.Event, function(_) --[[ Line: 112 ]]
-        -- upvalues: l_InExperienceAppChatModal_0 (ref)
-        return l_InExperienceAppChatModal_0:getVisible();
-    end);
-    local v42 = v7(v41);
-    local v43 = v8(v27, 24, if v42 then l_on_0 else l_off_0);
-    local v44 = v4.useContext(v13);
-    local function _(v45) --[[ Line: 120 ]] --[[ Name: getTransparency ]]
-        -- upvalues: v44 (copy)
-        if v44 then
-            return (v44:map(function(v46) --[[ Line: 122 ]]
-                -- upvalues: v45 (copy)
-                return v45 + (1 - v45) * (1 - v46);
-            end));
-        else
-            return v45;
-        end;
-    end;
-    local l_createElement_0 = v4.createElement;
-    local l_View_0 = v3.View;
-    local v50 = {
-        Size = UDim2.new(0, v27, 0, v27)
-    };
-    local v51 = {};
-    local l_createElement_1 = v4.createElement;
-    local l_Image_0 = v3.Image;
-    local v55 = {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = v43.size:map(function(v54) --[[ Line: 134 ]]
-            return UDim2.fromOffset(v54, v54);
-        end)
-    };
-    local v56;
-    if v43.image.backgroundColor then
-        v56 = {
-            Color3 = v43.image.backgroundColor
-        };
-        local v57;
-        if v44 then
-            local v58 = 0;
-            v57 = v44:map(function(v59) --[[ Line: 122 ]]
-                -- upvalues: v58 (copy)
-                return v58 + (1 - v58) * (1 - v59);
-            end);
-        else
-            v57 = 0;
-        end;
-        v56.Transparency = v57;
-    else
-        v56 = v25.Color.None;
-    end;
-    v55.backgroundStyle = v56;
-    v55.cornerRadius = UDim.new(0, v25.Radius.Circle);
-    v55.Image = v43.image.thumbnail;
-    v56 = {
-        Color3 = v25.Color.Content.Emphasis.Color3
-    };
-    local l_Transparency_0 = v25.Color.Content.Emphasis.Transparency;
-    local l_l_Transparency_0_0 = l_Transparency_0 --[[ copy: 25 -> 28 ]];
-    v56.Transparency = if v44 then v44:map(function(v62) --[[ Line: 122 ]]
-        -- upvalues: l_l_Transparency_0_0 (copy)
-        return l_l_Transparency_0_0 + (1 - l_l_Transparency_0_0) * (1 - v62);
-    end) else l_Transparency_0;
-    v55.imageStyle = v56;
-    v51.Icon = l_createElement_1(l_Image_0, v55);
-    if v39 then
-        l_createElement_1 = v4.createElement;
-        l_Image_0 = v3.View;
-        v55 = {
-            Position = UDim2.new(1, -v25.Stroke.Thicker, 0, v25.Stroke.Thicker)
-        };
-        if v24.isSquadIndicatorEnabled then
-            v56 = {
-                Color3 = v34.Color3
-            };
-            l_Transparency_0 = v34.Transparency;
-            local l_l_Transparency_0_1 = l_Transparency_0 --[[ copy: 25 -> 30 ]];
-            v56.Transparency = if v44 then v44:map(function(v64) --[[ Line: 122 ]]
-                -- upvalues: l_l_Transparency_0_1 (copy)
-                return l_l_Transparency_0_1 + (1 - l_l_Transparency_0_1) * (1 - v64);
-            end) else l_Transparency_0;
-        else
-            v56 = {
-                Color3 = v25.Color.System.Contrast.Color3
-            };
-            l_Transparency_0 = v25.Color.System.Contrast.Transparency;
-            local l_l_Transparency_0_2 = l_Transparency_0 --[[ copy: 25 -> 29 ]];
-            v56.Transparency = if v44 then v44:map(function(v66) --[[ Line: 122 ]]
-                -- upvalues: l_l_Transparency_0_2 (copy)
-                return l_l_Transparency_0_2 + (1 - l_l_Transparency_0_2) * (1 - v66);
-            end) else l_Transparency_0;
-        end;
-        v55.backgroundStyle = v56;
-        v56 = {
-            Color = v25.Color.Surface.Surface_0.Color3
-        };
-        l_Transparency_0 = v25.Color.Surface.Surface_0.Transparency;
-        v56.Transparency = if v44 then v44:map(function(v67) --[[ Line: 122 ]]
-            -- upvalues: l_Transparency_0 (copy)
-            return l_Transparency_0 + (1 - l_Transparency_0) * (1 - v67);
-        end) else l_Transparency_0;
-        v56.Thickness = v25.Stroke.Thicker;
-        v55.stroke = v56;
-        v55.tag = "anchor-top-right radius-circle size-200 stroke-thicker";
-        v55.ZIndex = 2;
-        l_createElement_1 = l_createElement_1(l_Image_0, v55);
-    else
-        l_createElement_1 = nil;
-    end;
-    v51.Badge = l_createElement_1;
-    return l_createElement_0(l_View_0, v50, v51);
-end;
+local function ConnectIcon(t2: {[any]: any}) -- line: 45
+	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), FFlagTokenizeUnibarConstantsWithStyleProvider (copy), UnibarStyle (copy), Constants (copy), React (copy), InExperienceAppChatModal (copy), MappedSignal (copy), useMappedSignal (copy), usePartyIcon (copy), on (copy), off (copy), SubMenuContext (copy), Foundation (copy), ArgoPartyExperimentation (copy), v18 (copy)
+	local v24 = Cryo.Dictionary.union(t1, t2)
+	local v25 = useTokens()
+	local v26 = if not FFlagTokenizeUnibarConstantsWithStyleProvider then Constants.ICON_SIZE else UnibarStyle.use().ICON_SIZE
+	local v27, v28 = React.useState(InExperienceAppChatModal.default.unreadCount)
+
+	if v24.shouldShowCustomBadge then
+		React.useEffect(function() -- line: 60
+			-- upvalues: InExperienceAppChatModal (copy), v28 (copy)
+			local connection = InExperienceAppChatModal.default.unreadCountSignal.Event:Connect(function(p1) -- line: 61
+				-- upvalues: v28 (copy)
+				v28(p1)
+			end)
+
+			return function() -- line: 64
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end, { v28 })
+	else
+		v27 = 0
+	end
+
+	local v29 = nil
+	local u30 = nil
+	local Success = nil
+
+	if v24.isSquadIndicatorEnabled then
+		local v32
+
+		v29, v32 = React.useState(InExperienceAppChatModal.default.currentSquadId)
+		u30 = v32
+	end
+
+	React.useEffect(function() -- line: 77
+		-- upvalues: v24 (copy), InExperienceAppChatModal (copy), u30 (ref)
+		if v24.isSquadIndicatorEnabled then
+			local connection = InExperienceAppChatModal.default.currentSquadIdSignal.Event:Connect(function(p2) -- line: 80
+				-- upvalues: u30 (ref)
+				u30(p2)
+			end)
+
+			return function() -- line: 84
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end
+
+		return function() -- line: 88
+		end
+	end, {
+		v24.isSquadIndicatorEnabled,
+		u30
+	})
+
+	if v24.isSquadIndicatorEnabled then
+		if v29 ~= "" then
+			Success = v25.Color.System.Success
+		elseif v27 > 0 then
+			Success = v25.Color.System.Contrast
+		end
+	end
+
+	local v33 = if not v24.isSquadIndicatorEnabled then v27 > 0 else Success
+	local v34 = MappedSignal.new(InExperienceAppChatModal.default.visibilitySignal.Event, function(_) -- line: 101
+		-- upvalues: InExperienceAppChatModal (copy)
+		return InExperienceAppChatModal:getVisible()
+	end)
+	local v35 = useMappedSignal(v34)
+	local v36 = usePartyIcon(v26, 24, if not v35 then off else on)
+	local v37 = React.useContext(SubMenuContext)
+
+	local function getTransparency(n1: number) -- line: 109
+		-- upvalues: v37 (copy)
+		if v37 then
+			return (v37:map(function(p4) -- line: 111
+				-- upvalues: n1 (copy)
+				return n1 + (1 - n1) * (1 - p4)
+			end))
+		end
+
+		return n1
+	end
+
+	local createElement = React.createElement
+	local View = Foundation.View
+	local t3 = {
+		Size = UDim2.new(0, v26, 0, v26)
+	}
+	local t4 = {}
+	local v43
+
+	if ArgoPartyExperimentation.getIsRenameEnabled() then
+		v43 = React.createElement(Foundation.Icon, {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			name = v18.icon,
+			variant = if not v35 then Foundation.Enums.IconVariant.Regular else Foundation.Enums.IconVariant.Filled
+		})
+	else
+		local createElement2 = React.createElement
+		local FoundationImage = Foundation.Image
+		local t5 = {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = v36.size:map(function(p5) -- line: 130
+				return UDim2.fromOffset(p5, p5)
+			end)
+		}
+		local t6
+
+		if v36.image.backgroundColor then
+			t6 = {
+				Color3 = v36.image.backgroundColor
+			}
+
+			local v49
+
+			if v37 then
+				local n2 = 0
+
+				v49 = v37:map(function(p6) -- line: 111
+					-- upvalues: n2 (copy)
+					return n2 + (1 - n2) * (1 - p6)
+				end)
+			else
+				v49 = 0
+			end
+
+			t6.Transparency = v49
+		else
+			t6 = v25.Color.None
+		end
+
+		t5.backgroundStyle = t6
+		t5.cornerRadius = UDim.new(0, v25.Radius.Circle)
+		t5.Image = v36.image.thumbnail
+
+		local t7 = {
+			Color3 = v25.Color.Content.Emphasis.Color3
+		}
+		local EmphasisTransparency = v25.Color.Content.Emphasis.Transparency
+
+		t7.Transparency = if not v37 then EmphasisTransparency else v37:map(function(p7) -- line: 111
+			-- upvalues: EmphasisTransparency (copy)
+			return EmphasisTransparency + (1 - EmphasisTransparency) * (1 - p7)
+		end)
+		t5.imageStyle = t7
+		v43 = createElement2(FoundationImage, t5)
+	end
+
+	t4.Icon = v43
+
+	local v60
+
+	if v33 then
+		local createElement3 = React.createElement
+		local View2 = Foundation.View
+		local t8 = {
+			tag = "anchor-top-right radius-circle size-200 stroke-thicker",
+			ZIndex = 2,
+			Position = UDim2.new(1, -v25.Stroke.Thicker, 0, v25.Stroke.Thicker)
+		}
+		local t9
+
+		if v24.isSquadIndicatorEnabled then
+			t9 = {
+				Color3 = Success.Color3
+			}
+
+			local SuccessTransparency = Success.Transparency
+
+			t9.Transparency = if not v37 then SuccessTransparency else v37:map(function(p8) -- line: 111
+				-- upvalues: SuccessTransparency (copy)
+				return SuccessTransparency + (1 - SuccessTransparency) * (1 - p8)
+			end)
+		else
+			t9 = {
+				Color3 = v25.Color.System.Contrast.Color3
+			}
+
+			local ContrastTransparency = v25.Color.System.Contrast.Transparency
+
+			t9.Transparency = if not v37 then ContrastTransparency else v37:map(function(p9) -- line: 111
+				-- upvalues: ContrastTransparency (copy)
+				return ContrastTransparency + (1 - ContrastTransparency) * (1 - p9)
+			end)
+		end
+
+		t8.backgroundStyle = t9
+
+		local t10 = {
+			Color = v25.Color.Surface.Surface_0.Color3
+		}
+		local Surface_0Transparency = v25.Color.Surface.Surface_0.Transparency
+
+		t10.Transparency = if not v37 then Surface_0Transparency else v37:map(function(p10) -- line: 111
+			-- upvalues: Surface_0Transparency (copy)
+			return Surface_0Transparency + (1 - Surface_0Transparency) * (1 - p10)
+		end)
+		t10.Thickness = v25.Stroke.Thicker
+		t8.stroke = t10
+		v60 = createElement3(View2, t8)
+	else
+		v60 = nil
+	end
+
+	t4.Badge = v60
+
+	return createElement(View, t3, t4)
+end
+
+return ConnectIcon

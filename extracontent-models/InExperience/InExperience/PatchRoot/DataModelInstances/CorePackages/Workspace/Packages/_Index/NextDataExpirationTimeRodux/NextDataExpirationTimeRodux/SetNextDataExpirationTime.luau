@@ -1,14 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("NextDataExpirationTimeRodux").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2, v3) --[[ Line: 5 ]]
-    assert(type(v1) == "string", "SetNextDataExpirationTime: key must be a string!");
-    local v4 = false;
-    if type(v2) == "number" then
-        v4 = v2 > 0;
-    end;
-    assert(v4, "SetNextDataExpirationTime: nextDataExpirationTime must be a positive number!");
-    return {
-        key = v1, 
-        nextDataExpirationTime = v2, 
-        namespace = v3
-    };
-end);
+local Parent = script:FindFirstAncestor("NextDataExpirationTimeRodux").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string, n1: number, s2: string?) -- line: 5
+	assert(type(s1) == "string", "SetNextDataExpirationTime: key must be a string!")
+	assert(type(n1) == "number" and n1 > 0, "SetNextDataExpirationTime: nextDataExpirationTime must be a positive number!")
+
+	return {
+		key = s1,
+		nextDataExpirationTime = n1,
+		namespace = s2
+	}
+end)

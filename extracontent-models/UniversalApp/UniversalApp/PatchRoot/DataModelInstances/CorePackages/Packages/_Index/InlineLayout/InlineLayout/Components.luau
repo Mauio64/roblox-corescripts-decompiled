@@ -1,4 +1,4 @@
 return {
-    InlineLayout = require(script.InlineLayout), 
-    InlineLayoutElements = require(script.InlineLayout.InlineLayoutElements)
-};
+	InlineLayout = require(script.InlineLayout),
+	InlineLayoutElements = require(script.InlineLayout.InlineLayoutElements)
+}

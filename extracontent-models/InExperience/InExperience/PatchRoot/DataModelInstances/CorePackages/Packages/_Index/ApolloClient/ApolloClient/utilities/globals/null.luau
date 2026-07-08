@@ -1,12 +1,13 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Boolean_0 = require(l_Parent_0.LuauPolyfill).Boolean;
-local v2 = {
-    __value = "null"
-};
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Boolean = require(ParentParent.LuauPolyfill).Boolean
+local t1 = {
+	__value = "null"
+}
+
 return {
-    NULL = v2, 
-    toJSBoolean = function(v3) --[[ Line: 19 ]] --[[ Name: toJSBoolean ]]
-        -- upvalues: l_Boolean_0 (copy), v2 (copy)
-        return l_Boolean_0.toJSBoolean(v3) and v3 ~= v2;
-    end
-};
+	NULL = t1,
+	toJSBoolean = function(p1) -- line: 19
+		-- upvalues: Boolean (copy), t1 (copy)
+		return Boolean.toJSBoolean(p1) and p1 ~= t1
+	end
+}

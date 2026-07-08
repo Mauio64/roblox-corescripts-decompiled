@@ -1,1 +1,1 @@
-return game:DefineFastString("ContactsToastSocialFriendsLayer", "Social.Friends");
+return game:DefineFastString("ContactsToastSocialFriendsLayer", "Social.Friends")

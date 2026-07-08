@@ -1,24 +1,28 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v2 = require(script.Parent.Parent.NavigationSymbol)("JUMP_TO");
-local v3 = {
-    JumpTo = v2
-};
-setmetatable(v3, {
-    __index = function(_, v5) --[[ Line: 16 ]] --[[ Name: __index ]]
-        error(("%q is not a valid member of SwitchActions"):format((tostring(v5))), 2);
-    end
-});
-v3.jumpTo = function(v6) --[[ Line: 22 ]] --[[ Name: jumpTo ]]
-    -- upvalues: v2 (copy), l_Object_0 (copy)
-    local v7 = {
-        type = v2, 
-        preserveFocus = true
-    };
-    if v6 then
-        return (l_Object_0.assign(v7, v6));
-    else
-        return v7;
-    end;
-end;
-return v3;
+local ParentParent = script.Parent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local v3 = require(script.Parent.Parent.NavigationSymbol)("JUMP_TO")
+local t1 = {
+	JumpTo = v3
+}
+
+setmetatable(t1, {
+	__index = function(_, p2) -- line: 16
+		error(("%q is not a valid member of SwitchActions"):format((tostring(p2))), 2)
+	end
+})
+
+function t1.jumpTo(p3) -- line: 22
+	-- upvalues: v3 (copy), Object (copy)
+	local t2 = {
+		preserveFocus = true,
+		type = v3
+	}
+
+	if p3 then
+		return (Object.assign(t2, p3))
+	end
+
+	return t2
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PasskeyUpsellEnabled1", false);
+return game:DefineFastFlag("PasskeyUpsellEnabled1", false)

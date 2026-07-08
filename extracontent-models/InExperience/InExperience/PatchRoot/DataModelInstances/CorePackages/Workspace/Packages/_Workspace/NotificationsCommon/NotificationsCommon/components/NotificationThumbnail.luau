@@ -1,133 +1,133 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_context_0 = l_Parent_0.context;
-local v2 = require(l_Parent_0.dependencies);
-local l_React_0 = v2.React;
-local l_UIBlox_0 = v2.UIBlox;
-local l_useStyle_0 = l_UIBlox_0.Core.Style.useStyle;
-local l_LoadableImage_0 = l_UIBlox_0.App.Loading.LoadableImage;
-local v7 = require(l_Parent_0.type);
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v2.getRbxthumbWithTypeSizeAndOptions;
-local l_UserLibConstants_0 = v2.UserLibConstants;
-local v10 = require(l_Parent_0.constants);
-local v11 = game:DefineFastFlag("EnableStreamGamePassThumbnail", false);
-local v12 = game:DefineFastFlag("EnableStreamAvatarImageUrlThumbnail", false);
-local v13 = game:DefineFastFlag("EnableWhiteOverlayForRobloxIconInStreamNotifications", false);
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v16 = l_Images_0["icons/logo/block"];
-local v17 = l_Images_0["icons/common/safety"];
-local v18 = require(l_context_0.useNotificationCardState);
-local function v20(v19) --[[ Line: 25 ]]
-    -- upvalues: v7 (copy), l_UserLibConstants_0 (copy), v11 (copy), v12 (copy)
-    if v19 == v7.SENDERThumbnailTypeEnum.Game then
-        return l_UserLibConstants_0.RbxthumbTypes.GameIcon;
-    elseif v19 == v7.SENDERThumbnailTypeEnum.User then
-        return l_UserLibConstants_0.RbxthumbTypes.AvatarHeadShot;
-    elseif v19 == v7.SENDERThumbnailTypeEnum.Group then
-        return l_UserLibConstants_0.RbxthumbTypes.GroupIcon;
-    elseif v19 == v7.SENDERThumbnailTypeEnum.Asset then
-        return l_UserLibConstants_0.RbxthumbTypes.Asset;
-    elseif v19 == v7.SENDERThumbnailTypeEnum.Bundle then
-        return l_UserLibConstants_0.RbxthumbTypes.BundleThumbnail;
-    elseif v19 == v7.SENDERThumbnailTypeEnum.GamePass and v11 then
-        return l_UserLibConstants_0.RbxthumbTypes.GamePass;
-    elseif v12 and v19 == v7.SENDERThumbnailTypeEnum.AvatarImageUrl then
-        return l_UserLibConstants_0.RbxthumbTypes.AvatarImageUrl;
-    else
-        return l_UserLibConstants_0.RbxthumbTypes.GameIcon;
-    end;
-end;
-local function _(v21) --[[ Line: 48 ]]
-    -- upvalues: v7 (copy), v12 (copy)
-    local v22 = true;
-    if v21.idType ~= v7.SENDERThumbnailTypeEnum.User then
-        v22 = v12 and v21.idType == v7.SENDERThumbnailTypeEnum.AvatarImageUrl;
-    end;
-    return v22;
-end;
-return function() --[[ Line: 56 ]]
-    -- upvalues: v18 (copy), v12 (copy), v7 (copy), l_useStyle_0 (copy), v10 (copy), l_React_0 (copy), l_ImageSetLabel_0 (copy), v17 (copy), v16 (copy), v13 (copy), v20 (copy), l_UserLibConstants_0 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), l_LoadableImage_0 (copy)
-    local v24 = v18("thumbnail");
-    if v24 == nil or #v24 == 0 then
-        return nil;
-    else
-        local v25 = v24[1];
-        if v25 == nil then
-            return nil;
-        elseif not v12 and v25.idType == v7.SENDERThumbnailTypeEnum.AvatarImageUrl then
-            return nil;
-        else
-            local v26 = l_useStyle_0();
-            if v25.idType == v7.SENDERThumbnailTypeEnum.Icon then
-                if v25.id == v10.SafetyThumbnailId then
-                    return l_React_0.createElement("Frame", {
-                        BackgroundTransparency = 1, 
-                        Size = UDim2.fromScale(1, 1), 
-                        SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                        BorderSizePixel = 0
-                    }, {
-                        Icon = l_React_0.createElement(l_ImageSetLabel_0, {
-                            Size = UDim2.fromScale(1, 1), 
-                            AnchorPoint = Vector2.new(0.5, 0.5), 
-                            Position = UDim2.fromScale(0.5, 0.5), 
-                            LayoutOrder = 1, 
-                            Image = v17, 
-                            BackgroundTransparency = 1, 
-                            ImageColor3 = v26.Theme.IconDefault.Color
-                        })
-                    });
-                else
-                    return l_React_0.createElement("Frame", {
-                        BackgroundTransparency = 0, 
-                        Size = UDim2.fromScale(1, 1), 
-                        SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                        BackgroundColor3 = v26.Tokens.Global.Color.Blue.Color3, 
-                        BorderSizePixel = 0
-                    }, {
-                        UICorner = l_React_0.createElement("UICorner", {
-                            CornerRadius = UDim.new(0, 11)
-                        }), 
-                        Icon = l_React_0.createElement(l_ImageSetLabel_0, {
-                            Size = UDim2.fromScale(0.75, 0.75), 
-                            AnchorPoint = Vector2.new(0.5, 0.5), 
-                            Position = UDim2.fromScale(0.5, 0.5), 
-                            LayoutOrder = 1, 
-                            Image = v16, 
-                            BackgroundTransparency = 1, 
-                            ImageColor3 = if v13 then v26.Tokens.Global.Color.White.Color3 else nil
-                        })
-                    });
-                end;
-            else
-                local v27 = if v12 and v20(v25.idType) == l_UserLibConstants_0.RbxthumbTypes.AvatarImageUrl then v25.id else l_getRbxthumbWithTypeSizeAndOptions_0(v25.id, v20(v25.idType), 150);
-                local l_createElement_0 = l_React_0.createElement;
-                local v29 = "Frame";
-                local v30 = {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.fromScale(1, 1), 
-                    SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                    BorderSizePixel = 0
-                };
-                local v31 = {};
-                local l_createElement_1 = l_React_0.createElement;
-                local l_l_LoadableImage_0_0 = l_LoadableImage_0;
-                local v34 = {
-                    BackgroundTransparency = 0, 
-                    BackgroundColor3 = v26.Theme.BackgroundDefault.Color, 
-                    Image = v27, 
-                    Size = UDim2.fromScale(1, 1)
-                };
-                local v35 = true;
-                if v25.idType ~= v7.SENDERThumbnailTypeEnum.User then
-                    v35 = v12 and v25.idType == v7.SENDERThumbnailTypeEnum.AvatarImageUrl;
-                end;
-                v34.cornerRadius = if v35 then UDim.new(0.5, 0) else UDim.new(0, 8);
-                v34.showFailedStateWhenLoadingFailed = true;
-                v34.useShimmerAnimationWhileLoading = true;
-                v34.ZIndex = 1;
-                v31.Thumbnail = l_createElement_1(l_l_LoadableImage_0_0, v34);
-                return l_createElement_0(v29, v30, v31);
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local context = ParentParent.context
+local dependencies = require(ParentParent.dependencies)
+local React = dependencies.React
+local UIBlox = dependencies.UIBlox
+local useStyle = UIBlox.Core.Style.useStyle
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+local type = require(ParentParent.type)
+local getRbxthumbWithTypeSizeAndOptions = dependencies.getRbxthumbWithTypeSizeAndOptions
+local UserLibConstants = dependencies.UserLibConstants
+local constants = require(ParentParent.constants)
+local v12 = game:DefineFastFlag("EnableStreamAvatarImageUrlThumbnail", false)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v15 = Images["icons/logo/block"]
+local v16 = Images["icons/common/safety"]
+local useNotificationCardState = require(context.useNotificationCardState)
+
+local function v18(p1) -- line: 21
+	-- upvalues: type (copy), UserLibConstants (copy), v12 (copy)
+	if p1 == type.SENDERThumbnailTypeEnum.Game then
+		return UserLibConstants.RbxthumbTypes.GameIcon
+	end
+
+	if p1 == type.SENDERThumbnailTypeEnum.User then
+		return UserLibConstants.RbxthumbTypes.AvatarHeadShot
+	end
+
+	if p1 == type.SENDERThumbnailTypeEnum.Group then
+		return UserLibConstants.RbxthumbTypes.GroupIcon
+	end
+
+	if p1 == type.SENDERThumbnailTypeEnum.Asset then
+		return UserLibConstants.RbxthumbTypes.Asset
+	end
+
+	if p1 == type.SENDERThumbnailTypeEnum.Bundle then
+		return UserLibConstants.RbxthumbTypes.BundleThumbnail
+	end
+
+	if p1 == type.SENDERThumbnailTypeEnum.GamePass then
+		return UserLibConstants.RbxthumbTypes.GamePass
+	end
+
+	if v12 and p1 == type.SENDERThumbnailTypeEnum.AvatarImageUrl then
+		return UserLibConstants.RbxthumbTypes.AvatarImageUrl
+	end
+
+	return UserLibConstants.RbxthumbTypes.GameIcon
+end
+
+return function() -- line: 52
+	-- upvalues: useNotificationCardState (copy), v12 (copy), type (copy), useStyle (copy), constants (copy), React (copy), ImageSetLabel (copy), v16 (copy), v15 (copy), v18 (copy), UserLibConstants (copy), getRbxthumbWithTypeSizeAndOptions (copy), LoadableImage (copy)
+	local v21 = useNotificationCardState("thumbnail")
+
+	if v21 == nil or #v21 == 0 then
+		return nil
+	end
+
+	local v22 = v21[1]
+
+	if v22 == nil then
+		return nil
+	end
+
+	if not v12 and v22.idType == type.SENDERThumbnailTypeEnum.AvatarImageUrl then
+		return nil
+	end
+
+	local v23 = useStyle()
+
+	if v22.idType == type.SENDERThumbnailTypeEnum.Icon then
+		if v22.id == constants.SafetyThumbnailId then
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Size = UDim2.fromScale(1, 1),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX
+			}, {
+				Icon = React.createElement(ImageSetLabel, {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Image = v16,
+					ImageColor3 = v23.Theme.IconDefault.Color
+				})
+			})
+		end
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 0,
+			BorderSizePixel = 0,
+			Size = UDim2.fromScale(1, 1),
+			SizeConstraint = Enum.SizeConstraint.RelativeXX,
+			BackgroundColor3 = v23.Tokens.Color.System.Emphasis.Color3
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 11)
+			}),
+			Icon = React.createElement(ImageSetLabel, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0.75, 0.75),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+				Image = v15,
+				ImageColor3 = v23.Tokens.Color.Extended.White.White_100.Color3
+			})
+		})
+	end
+
+	local v24 = if not v12 or v18(v22.idType) ~= UserLibConstants.RbxthumbTypes.AvatarImageUrl then getRbxthumbWithTypeSizeAndOptions(v22.id, v18(v22.idType), 150) else v22.id
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromScale(1, 1),
+		SizeConstraint = Enum.SizeConstraint.RelativeXX
+	}, {
+		Thumbnail = React.createElement(LoadableImage, {
+			BackgroundTransparency = 0,
+			showFailedStateWhenLoadingFailed = true,
+			useShimmerAnimationWhileLoading = true,
+			ZIndex = 1,
+			BackgroundColor3 = v23.Theme.BackgroundDefault.Color,
+			Image = v24,
+			Size = UDim2.fromScale(1, 1),
+			cornerRadius = if not (v22.idType == type.SENDERThumbnailTypeEnum.User or v12 and v22.idType == type.SENDERThumbnailTypeEnum.AvatarImageUrl) then UDim.new(0, 8) else UDim.new(0.5, 0)
+		})
+	})
+end

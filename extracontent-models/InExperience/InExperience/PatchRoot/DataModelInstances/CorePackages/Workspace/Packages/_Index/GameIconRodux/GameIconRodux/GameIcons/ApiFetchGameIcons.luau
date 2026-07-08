@@ -1,25 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameIconRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local l_ApiFetchThumbnails_0 = require(l_Parent_0.Http).Utils.ApiFetchThumbnails;
-local v4 = require(l_script_FirstAncestor_0.GamesGetIcons);
-local v5 = require(l_script_FirstAncestor_0.GameIcons.SetGameIcons);
-local v6 = require(l_script_FirstAncestor_0.GameIcons.GameIconReducer);
-return function(v7, v8, v9) --[[ Line: 12 ]]
-    -- upvalues: v6 (copy), v2 (copy), l_ApiFetchThumbnails_0 (copy), v4 (copy), v5 (copy)
-    return function(v10) --[[ Line: 13 ]]
-        -- upvalues: v6 (ref), v8 (copy), v2 (ref), l_ApiFetchThumbnails_0 (ref), v7 (copy), v9 (copy), v4 (ref), v5 (ref)
-        local v11 = v10:getState()[v6.key];
-        local v12 = {};
-        for _, v14 in pairs(v8) do
-            if v11[v14] == nil then
-                table.insert(v12, v14);
-            end;
-        end;
-        if #v12 == 0 then
-            return v2.resolve();
-        else
-            return l_ApiFetchThumbnails_0.Fetch(v7, v12, v9 or "150x150", "Game", v4, v5, v10);
-        end;
-    end;
-end;
+local GameIconRodux = script:FindFirstAncestor("GameIconRodux")
+local GameIconRoduxParent = GameIconRodux.Parent
+local Promise = require(GameIconRoduxParent.Promise)
+local ApiFetchThumbnails = require(GameIconRoduxParent.Http).Utils.ApiFetchThumbnails
+local GamesGetIcons = require(GameIconRodux.GamesGetIcons)
+local SetGameIcons = require(GameIconRodux.GameIcons.SetGameIcons)
+local GameIconReducer = require(GameIconRodux.GameIcons.GameIconReducer)
+
+return function(p1, p2, s1: string?) -- line: 12
+	-- upvalues: GameIconReducer (copy), Promise (copy), ApiFetchThumbnails (copy), GamesGetIcons (copy), SetGameIcons (copy)
+	return function(p3) -- line: 13
+		-- upvalues: GameIconReducer (copy), p2 (copy), Promise (copy), ApiFetchThumbnails (copy), p1 (copy), s1 (copy), GamesGetIcons (copy), SetGameIcons (copy)
+		local v12 = p3:getState()[GameIconReducer.key]
+		local t1 = {}
+
+		for _, v in pairs(p2) do
+			if v12[v] == nil then
+				table.insert(t1, v)
+			end
+		end
+
+		if #t1 == 0 then
+			return Promise.resolve()
+		end
+
+		return ApiFetchThumbnails.Fetch(p1, t1, s1 or "150x150", "Game", GamesGetIcons, SetGameIcons, p3)
+	end
+end

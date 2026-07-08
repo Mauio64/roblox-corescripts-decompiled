@@ -1,18 +1,19 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetTryingOnInfo);
-local v4 = {
-    tryingOn = false, 
-    assetId = nil, 
-    assetTypeId = nil
-};
-return v1.createReducer(v4, {
-    [v3.name] = function(_, v6) --[[ Line: 13 ]]
-        return {
-            tryingOn = v6.tryingOn, 
-            assetId = v6.assetId, 
-            assetTypeId = v6.assetTypeId
-        };
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetTryingOnInfo = require(ParentParent.Actions.SetTryingOnInfo)
+local t1 = {
+	tryingOn = false,
+	assetId = nil,
+	assetTypeId = nil
+}
+
+return Rodux.createReducer(t1, {
+	[SetTryingOnInfo.name] = function(_, p2) -- line: 13
+		return {
+			tryingOn = p2.tryingOn,
+			assetId = p2.assetId,
+			assetTypeId = p2.assetTypeId
+		}
+	end
+})

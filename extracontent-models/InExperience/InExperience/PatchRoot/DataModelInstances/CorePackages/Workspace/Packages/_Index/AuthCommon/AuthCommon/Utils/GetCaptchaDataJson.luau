@@ -1,26 +1,31 @@
-local l_HttpService_0 = game:GetService("HttpService");
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: l_HttpService_0 (copy)
-    if v1 ~= nil and v1.errors ~= nil and v1.errors[1] and v1.errors[1].fieldData then
-        local l_fieldData_0 = v1.errors[1].fieldData;
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 11 ]]
-            -- upvalues: l_HttpService_0 (ref), l_fieldData_0 (copy)
-            return l_HttpService_0:JSONDecode(l_fieldData_0);
-        end);
-        if l_status_0 then
-            local v5 = "";
-            local v6 = "";
-            if l_result_0.unifiedCaptchaId then
-                v5 = l_result_0.unifiedCaptchaId;
-            end;
-            if l_result_0.dxBlob then
-                v6 = l_result_0.dxBlob;
-            end;
-            return v5, v6;
-        else
-            return "", l_fieldData_0;
-        end;
-    else
-        return "", "";
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+
+return function(p1) -- line: 3
+	-- upvalues: HttpService (copy)
+	if p1 ~= nil and (p1.errors ~= nil and p1.errors[1] and p1.errors[1].fieldData) then
+		local fieldData = p1.errors[1].fieldData
+		local ok, result = pcall(function() -- line: 11
+			-- upvalues: HttpService (copy), fieldData (copy)
+			return HttpService:JSONDecode(fieldData)
+		end)
+
+		if ok then
+			local s1 = ""
+			local s2 = ""
+
+			if result.unifiedCaptchaId then
+				s1 = result.unifiedCaptchaId
+			end
+
+			if result.dxBlob then
+				s2 = result.dxBlob
+			end
+
+			return s1, s2
+		end
+
+		return "", fieldData
+	end
+
+	return "", ""
+end

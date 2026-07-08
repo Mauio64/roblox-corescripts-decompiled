@@ -1,5 +1,5 @@
 return {
-    Play = "Play", 
-    Follow = "Follow", 
-    Following = "Following"
-};
+	Play = "Play",
+	Follow = "Follow",
+	Following = "Following"
+}

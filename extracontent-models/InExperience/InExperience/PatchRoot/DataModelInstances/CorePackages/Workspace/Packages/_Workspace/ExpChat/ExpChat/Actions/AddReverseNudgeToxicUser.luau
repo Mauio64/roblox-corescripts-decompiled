@@ -1,7 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2) --[[ Line: 11 ]]
-    return {
-        toxicUserId = tostring(v1), 
-        reverseNudgeType = v2
-    };
-end);
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, s1: string) -- line: 11
+	return {
+		toxicUserId = tostring(p1),
+		reverseNudgeType = s1
+	}
+end)

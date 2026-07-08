@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagUseNewPlayerList) and game:DefineFastFlag("AddNewPlayerListFocusNav", false);
+return game:DefineFastFlag("AddNewPlayerListFocusNav", false)

@@ -1,172 +1,202 @@
-local _ = game:GetService("RunService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local l_NotificationService_0 = game:GetService("NotificationService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local v8 = require(l_RobloxGui_0.Modules.ErrorPrompt);
-local l_Url_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).Url;
-local function _() --[[ Line: 18 ]] --[[ Name: leaveGame ]]
-    -- upvalues: l_GuiService_0 (copy)
-    l_GuiService_0.SelectedCoreObject = nil;
-    game:Shutdown();
-end;
-local v11 = {
-    Warning = 1, 
-    Lockout = 2
-};
-local function _(v12) --[[ Line: 28 ]] --[[ Name: parseResponse ]]
-    local l_type_0 = v12.response.state.type;
-    local l_messages_0 = v12.response.state.messages;
-    return {
-        State = l_type_0, 
-        Messages = l_messages_0
-    };
-end;
-local _ = function(v16) --[[ Line: 37 ]] --[[ Name: markRead ]]
-    -- upvalues: l_Url_0 (copy), l_HttpRbxApiService_0 (copy)
-    local v17 = "mesasgeId=" .. v16;
-    local v18 = l_Url_0.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v17;
-    local _, _ = pcall(l_HttpRbxApiService_0.GetAsyncFullUrl, l_HttpRbxApiService_0, v18);
-end;
-local v34 = {
-    pendingResolveMessage = {}, 
-    displaying = nil, 
-    resolvedMessage = {}, 
-    displayMessageCallback = nil, 
-    update = function(v22, v23) --[[ Line: 57 ]] --[[ Name: update ]]
-        for _, v25 in pairs(v23) do
-            local v26 = {
-                id = v25.id, 
-                message = v25.text
-            };
-            table.insert(v22.pendingResolveMessage, v26);
-        end;
-        v22:processNext();
-    end, 
-    processNext = function(v27) --[[ Line: 68 ]] --[[ Name: processNext ]]
-        -- upvalues: l_Url_0 (copy), l_HttpRbxApiService_0 (copy)
-        if v27.displaying then
-            return;
-        else
-            local v28 = table.remove(v27.pendingResolveMessage, 1);
-            if not v28 then
-                return;
-            elseif v27.resolvedMessage[v28.id] then
-                v27:processNext();
-                return;
-            else
-                v27.displaying = v28;
-                if v27.displayMessageCallback then
-                    v27.displayMessageCallback(v28.message);
-                end;
-                spawn(function() --[[ Line: 88 ]]
-                    -- upvalues: v28 (copy), l_Url_0 (ref), l_HttpRbxApiService_0 (ref)
-                    local v29 = "mesasgeId=" .. v28.id;
-                    local v30 = l_Url_0.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v29;
-                    local _, _ = pcall(l_HttpRbxApiService_0.GetAsyncFullUrl, l_HttpRbxApiService_0, v30);
-                end);
-                return;
-            end;
-        end;
-    end, 
-    resolve = function(v33) --[[ Line: 94 ]] --[[ Name: resolve ]]
-        v33.resolvedMessage[v33.displaying.id] = v33.displaying.message;
-        v33.displaying = nil;
-        v33:processNext();
-    end
-};
-local v35 = {
-    MessageTextScaled = true, 
-    HideErrorCode = true, 
-    MenuIsOpenKey = "AnitAddictionPrompt"
-};
-local v36 = v8.new("Default", v35);
-v36:setParent(l_RobloxGui_0);
-local function v38(v37) --[[ Line: 110 ]] --[[ Name: displayMessage ]]
-    -- upvalues: v36 (copy)
-    v36:_open(v37);
-end;
-local v39 = {
-    {
-        Text = "OK", 
-        LocalizationKey = "InGame.CommonUI.Button.Ok", 
-        LayoutOrder = 1, 
-        Callback = function() --[[ Line: 114 ]] --[[ Name: resolveMessage ]]
-            -- upvalues: v36 (copy), v34 (copy)
-            v36:_close();
-            v34:resolve();
-        end, 
-        Primary = true
-    }
-};
-v34.displayMessageCallback = v38;
-v36:updateButtons(v39);
-v36:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning");
-local l_X_0 = l_RobloxGui_0.AbsoluteSize.X;
-local l_Y_0 = l_RobloxGui_0.AbsoluteSize.Y;
-local function v44() --[[ Line: 136 ]] --[[ Name: onScreenSizeChanged ]]
-    -- upvalues: v36 (copy), l_RobloxGui_0 (copy), l_X_0 (ref), l_Y_0 (ref)
-    if not v36 then
-        return;
-    else
-        local l_X_1 = l_RobloxGui_0.AbsoluteSize.X;
-        local l_Y_1 = l_RobloxGui_0.AbsoluteSize.Y;
-        if l_X_0 ~= l_X_1 or l_Y_0 ~= l_Y_1 then
-            l_X_0 = l_X_1;
-            l_Y_0 = l_Y_1;
-            v36:resizeWidthAndHeight(l_X_0, l_Y_0);
-        end;
-        return;
-    end;
-end;
-l_RobloxGui_0:GetPropertyChangedSignal("AbsoluteSize"):connect(v44);
-if v36 then
-    local l_X_2 = l_RobloxGui_0.AbsoluteSize.X;
-    local l_Y_2 = l_RobloxGui_0.AbsoluteSize.Y;
-    if l_X_0 ~= l_X_2 or l_Y_0 ~= l_Y_2 then
-        l_X_0 = l_X_2;
-        l_Y_0 = l_Y_2;
-        v36:resizeWidthAndHeight(l_X_0, l_Y_0);
-    end;
-end;
-local v47 = nil;
-local function _(v48) --[[ Line: 154 ]] --[[ Name: antiAddictionStatesUpdated ]]
-    -- upvalues: v11 (copy), v47 (ref), l_GuiService_0 (copy), v34 (copy)
-    local l_type_1 = v48.response.state.type;
-    local l_messages_1 = v48.response.state.messages;
-    local v51 = {
-        State = l_type_1, 
-        Messages = l_messages_1
-    };
-    if v51.State == v11.Lockout then
-        if v47 then
-            v47:Disconnect();
-        end;
-        l_GuiService_0.SelectedCoreObject = nil;
-        game:Shutdown();
-    end;
-    v34:update(v51.Messages);
-end;
-v47 = l_NotificationService_0.RobloxEventReceived:Connect(function(v53) --[[ Line: 168 ]]
-    -- upvalues: l_HttpService_0 (copy), v11 (copy), v47 (ref), l_GuiService_0 (copy), v34 (copy)
-    if v53.namespace == "AntiAddictionNotifications" then
-        local v54 = l_HttpService_0:JSONDecode(v53.detail);
-        local l_type_2 = v54.response.state.type;
-        local l_messages_2 = v54.response.state.messages;
-        local v57 = {
-            State = l_type_2, 
-            Messages = l_messages_2
-        };
-        if v57.State == v11.Lockout then
-            if v47 then
-                v47:Disconnect();
-            end;
-            l_GuiService_0.SelectedCoreObject = nil;
-            game:Shutdown();
-        end;
-        v34:update(v57.Messages);
-    end;
-end);
+game:GetService("RunService")
+
+local GuiService = game:GetService("GuiService")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui.RobloxGui
+local NotificationService = game:GetService("NotificationService")
+local HttpService = game:GetService("HttpService")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local ErrorPrompt = require(RobloxGui.Modules.ErrorPrompt)
+local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
+
+local function leaveGame() -- line: 18
+	-- upvalues: GuiService (copy)
+	GuiService.SelectedCoreObject = nil
+	game:Shutdown()
+end
+
+local t1 = {
+	Warning = 1,
+	Lockout = 2
+}
+
+local function parseResponse(p1) -- line: 28
+	local type = p1.response.state.type
+	local messages = p1.response.state.messages
+
+	return {
+		State = type,
+		Messages = messages
+	}
+end
+local function markRead(p2) -- line: 37
+	-- upvalues: Url (copy), HttpRbxApiService (copy)
+	local v31 = "mesasgeId=" .. p2
+	local v32 = Url.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v31
+	local _, _ = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v32)
+end
+
+local t3 = {
+	displaying = nil,
+	displayMessageCallback = nil,
+	pendingResolveMessage = {},
+	resolvedMessage = {},
+	update = function(p3, p4) -- line: 57
+		for _, v in pairs(p4) do
+			local t2 = {
+				id = v.id,
+				message = v.text
+			}
+
+			table.insert(p3.pendingResolveMessage, t2)
+		end
+
+		p3:processNext()
+	end,
+	processNext = function(p5) -- line: 68
+		-- upvalues: Url (copy), HttpRbxApiService (copy)
+		if p5.displaying then
+			return
+		end
+
+		local v41 = table.remove(p5.pendingResolveMessage, 1)
+
+		if not v41 then
+			return
+		end
+
+		if p5.resolvedMessage[v41.id] then
+			p5:processNext()
+
+			return
+		end
+
+		p5.displaying = v41
+
+		if p5.displayMessageCallback then
+			p5.displayMessageCallback(v41.message)
+		end
+
+		spawn(function() -- line: 88
+			-- upvalues: v41 (copy), Url (copy), HttpRbxApiService (copy)
+			local v55 = "mesasgeId=" .. v41.id
+			local v56 = Url.RCS_URL .. "screen-time-api/v1/messages/mark-read" .. "?" .. v55
+			local _, _ = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v56)
+		end)
+	end,
+	resolve = function(p6) -- line: 94
+		p6.resolvedMessage[p6.displaying.id] = p6.displaying.message
+		p6.displaying = nil
+		p6:processNext()
+	end
+}
+local t4 = {
+	MessageTextScaled = true,
+	HideErrorCode = true,
+	MenuIsOpenKey = "AnitAddictionPrompt"
+}
+local v16 = ErrorPrompt.new("Default", t4)
+
+v16:setParent(RobloxGui)
+
+local function displayMessage(p7) -- line: 110
+	-- upvalues: v16 (copy)
+	v16:_open(p7)
+end
+local function resolveMessage() -- line: 114
+	-- upvalues: v16 (copy), t3 (copy)
+	v16:_close()
+	t3:resolve()
+end
+
+local t5 = {{
+	Text = "OK",
+	LocalizationKey = "InGame.CommonUI.Button.Ok",
+	LayoutOrder = 1,
+	Primary = true,
+	Callback = resolveMessage
+}}
+
+t3.displayMessageCallback = displayMessage
+v16:updateButtons(t5)
+v16:setErrorTitle("Warning", "InGame.CommonUI.Title.Warning")
+
+local AbsoluteSizeX = RobloxGui.AbsoluteSize.X
+local AbsoluteSizeY = RobloxGui.AbsoluteSize.Y
+
+local function onScreenSizeChanged() -- line: 136
+	-- upvalues: v16 (copy), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
+	if not v16 then
+		return
+	end
+
+	local AbsoluteSizeX2 = RobloxGui.AbsoluteSize.X
+	local AbsoluteSizeY2 = RobloxGui.AbsoluteSize.Y
+
+	if AbsoluteSizeX2 ~= AbsoluteSizeX or AbsoluteSizeY2 ~= AbsoluteSizeY then
+		AbsoluteSizeX = AbsoluteSizeX2
+		AbsoluteSizeY = AbsoluteSizeY2
+		v16:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+end
+
+RobloxGui:GetPropertyChangedSignal("AbsoluteSize"):connect(onScreenSizeChanged)
+
+if v16 then
+	local AbsoluteSizeX3 = RobloxGui.AbsoluteSize.X
+	local AbsoluteSizeY3 = RobloxGui.AbsoluteSize.Y
+
+	if AbsoluteSizeX3 ~= AbsoluteSizeX or AbsoluteSizeY3 ~= AbsoluteSizeY then
+		AbsoluteSizeX = AbsoluteSizeX3
+		AbsoluteSizeY = AbsoluteSizeY3
+		v16:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+end
+
+local connection = nil
+
+local function antiAddictionStatesUpdated(p8) -- line: 154
+	-- upvalues: connection (ref), GuiService (copy), t3 (copy)
+	local type = p8.response.state.type
+	local messages = p8.response.state.messages
+	local t6 = {
+		State = type,
+		Messages = messages
+	}
+
+	if t6.State == 2 then
+		if connection then
+			connection:Disconnect()
+		end
+
+		GuiService.SelectedCoreObject = nil
+		game:Shutdown()
+	end
+
+	t3:update(t6.Messages)
+end
+
+connection = NotificationService.RobloxEventReceived:Connect(function(p9) -- line: 168
+	-- upvalues: HttpService (copy), t1 (copy), connection (ref), GuiService (copy), t3 (copy)
+	if p9.namespace == "AntiAddictionNotifications" then
+		local data = HttpService:JSONDecode(p9.detail)
+		local type = data.response.state.type
+		local messages = data.response.state.messages
+		local t7 = {
+			State = type,
+			Messages = messages
+		}
+
+		if t7.State == t1.Lockout then
+			if connection then
+				connection:Disconnect()
+			end
+
+			GuiService.SelectedCoreObject = nil
+			game:Shutdown()
+		end
+
+		t3:update(t7.Messages)
+	end
+end)

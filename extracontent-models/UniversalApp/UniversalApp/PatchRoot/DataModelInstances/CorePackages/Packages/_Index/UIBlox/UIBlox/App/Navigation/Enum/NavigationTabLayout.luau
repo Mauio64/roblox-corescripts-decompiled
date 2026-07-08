@@ -1,4 +1,4 @@
 return {
-    Stacked = "Stacked", 
-    Inline = "Inline"
-};
+	Stacked = "Stacked",
+	Inline = "Inline"
+}

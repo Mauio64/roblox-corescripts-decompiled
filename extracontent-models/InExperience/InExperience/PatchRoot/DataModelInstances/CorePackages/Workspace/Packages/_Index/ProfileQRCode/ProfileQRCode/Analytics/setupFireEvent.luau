@@ -1,25 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfileQRCode").Parent;
-local v1 = require(l_Parent_0.SocialLuaAnalytics);
-local v2 = require(script.Parent.DiagActionList);
-local l_fireEventStream_0 = v1.Analytics.FireEvent.fireEventStream;
-local l_fireDiagCounter_0 = v1.Analytics.FireEvent.fireDiagCounter;
-local v5 = require(script.Parent.EventStreamActionList);
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: l_fireEventStream_0 (copy), v5 (copy), l_fireDiagCounter_0 (copy), v2 (copy)
-    local v7 = l_fireEventStream_0({
-        eventStreamImpl = v6.analytics.EventStream, 
-        eventList = v5, 
-        infoForAllEvents = v6.infoForAllEvents
-    });
-    local v8 = l_fireDiagCounter_0({
-        diagImpl = v6.analytics.Diag, 
-        eventList = v2
-    });
-    return function(v9, v10) --[[ Line: 26 ]]
-        -- upvalues: v2 (ref), v8 (copy), v7 (copy)
-        if v2[v9] then
-            v8(v9);
-        end;
-        return v7(v9, v10);
-    end;
-end;
+local Parent = script:FindFirstAncestor("ProfileQRCode").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local DiagActionList = require(script.Parent.DiagActionList)
+local fireEventStream = SocialLuaAnalytics.Analytics.FireEvent.fireEventStream
+local fireDiagCounter = SocialLuaAnalytics.Analytics.FireEvent.fireDiagCounter
+local EventStreamActionList = require(script.Parent.EventStreamActionList)
+
+return function(t1: {[any]: any}) -- line: 10
+	-- upvalues: fireEventStream (copy), EventStreamActionList (copy), fireDiagCounter (copy), DiagActionList (copy)
+	local v8 = fireEventStream({
+		eventStreamImpl = t1.analytics.EventStream,
+		eventList = EventStreamActionList,
+		infoForAllEvents = t1.infoForAllEvents
+	})
+	local v9 = fireDiagCounter({
+		diagImpl = t1.analytics.Diag,
+		eventList = DiagActionList
+	})
+
+	return function(p1, p2) -- line: 26
+		-- upvalues: DiagActionList (copy), v9 (copy), v8 (copy)
+		if DiagActionList[p1] then
+			v9(p1)
+		end
+
+		return v8(p1, p2)
+	end
+end

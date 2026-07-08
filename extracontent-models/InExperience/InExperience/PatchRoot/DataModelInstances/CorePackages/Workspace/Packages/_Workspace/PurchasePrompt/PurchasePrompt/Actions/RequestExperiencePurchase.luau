@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "universeId");
+return require(script.Parent.makeActionCreator)(script.Name, "universeId")

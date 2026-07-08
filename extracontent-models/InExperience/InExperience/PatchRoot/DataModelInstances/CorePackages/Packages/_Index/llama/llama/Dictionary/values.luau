@@ -1,11 +1,17 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: values ]]
-    local v1 = type(v0);
-    assert(v1 == "table", "expected a table for first argument, got " .. v1);
-    local v2 = {};
-    local v3 = 1;
-    for _, v5 in pairs(v0) do
-        v2[v3] = v5;
-        v3 = v3 + 1;
-    end;
-    return v2;
-end;
+local function values(p1) -- line: 2
+	local v3 = type(p1)
+
+	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+
+	local t1 = {}
+	local n1 = 1
+
+	for _, v in pairs(p1) do
+		t1[n1] = v
+		n1 += 1
+	end
+
+	return t1
+end
+
+return values

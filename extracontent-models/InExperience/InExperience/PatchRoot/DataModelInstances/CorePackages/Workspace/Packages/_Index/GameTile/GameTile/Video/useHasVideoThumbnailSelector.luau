@@ -1,14 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GameInfosReducer_0 = require(l_Parent_0.GameInfosRodux).GameInfosReducer;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v4 = require(l_script_FirstAncestor_0.getGameTileLayoutData);
-return function(v5, v6) --[[ Line: 10 ]] --[[ Name: useHasVideoThumbnailSelector ]]
-    -- upvalues: l_useSelector_0 (copy), l_GameInfosReducer_0 (copy), v4 (copy)
-    local v8 = l_useSelector_0(function(v7) --[[ Line: 11 ]]
-        -- upvalues: l_GameInfosReducer_0 (ref), v5 (copy)
-        return v7.Personalization[l_GameInfosReducer_0.key][v5];
-    end);
-    local v9 = v4(v8, v6);
-    return (v9 and v9.primaryMediaAsset and v9.primaryMediaAsset.wideVideoAssetId) ~= nil;
-end;
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local GameInfosReducer = require(GameTileParent.GameInfosRodux).GameInfosReducer
+local useSelector = require(GameTileParent.RoactUtils).Hooks.RoactRodux.useSelector
+local getGameTileLayoutData = require(GameTile.getGameTileLayoutData)
+
+local function useHasVideoThumbnailSelector(s1: string, s2: string?) -- line: 10
+	-- upvalues: useSelector (copy), GameInfosReducer (copy), getGameTileLayoutData (copy)
+	local v9 = useSelector(function(p1) -- line: 11
+		-- upvalues: GameInfosReducer (copy), s1 (copy)
+		return p1.Personalization[GameInfosReducer.key][s1]
+	end)
+	local v10 = getGameTileLayoutData(v9, s2)
+
+	return (v10 and (v10.primaryMediaAsset and v10.primaryMediaAsset.wideVideoAssetId)) ~= nil
+end
+
+return useHasVideoThumbnailSelector

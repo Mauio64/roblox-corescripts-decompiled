@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign) and game:DefineFastFlag("LuaAppEdpMediaGalleryPreloadImage", false);
+return require(script.Parent.FFlagLuaAppEdpMediaGalleryRedesign) and game:DefineFastFlag("LuaAppEdpMediaGalleryPreloadImage", false)

@@ -1,81 +1,90 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_ButtonType_0 = require(l_CorePackages_0.Packages.UIBlox).App.Button.Enum.ButtonType;
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v7 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v10 = require(l_Parent_1.Thunks.SignalUpdateOutfitPermissionDenied);
-local v11 = require(l_Parent_1.Thunks.PerformUpdateOutfit);
-local v12 = require(l_Parent_0.Prompts.PromptWithAvatarViewport);
-local v13 = require(l_Parent_1.AvatarEditorPromptsPolicy);
-local v14 = v2.PureComponent:extend("UpdateOutfitPrompt");
-v14.validateProps = v4.strictInterface({
-    screenSize = v4.Vector2, 
-    humanoidDescription = v4.instanceOf("HumanoidDescription"), 
-    rigType = v4.enum(Enum.HumanoidRigType), 
-    outfitName = v4.string, 
-    signalUpdateOutfitPermissionDenied = v4.callback, 
-    performUpdateOutfit = v4.callback, 
-    showCustomOutfitNames = v4.boolean
-});
-v14.render = function(v15) --[[ Line: 45 ]] --[[ Name: render ]]
-    -- upvalues: v7 (copy), v2 (copy), v12 (copy), l_ButtonType_0 (copy)
-    local v16 = nil;
-    v16 = if v15.props.showCustomOutfitNames then v7:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptText", {
-        RBX_NAME = v15.props.outfitName
-    }) else v7:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptTextNoOutfitName");
-    return v2.createElement(v12, {
-        humanoidDescription = v15.props.humanoidDescription, 
-        rigType = v15.props.rigType, 
-        title = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptTitle"), 
-        bodyText = v16, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = v15.props.signalUpdateOutfitPermissionDenied, 
-                        text = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptNo")
-                    }, 
-                    isDefaultChild = true
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        onActivated = v15.props.performUpdateOutfit, 
-                        text = v7:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptYes")
-                    }, 
-                    isDefaultChild = false
-                }
-            }
-        }
-    });
-end;
-v14 = v3.connect(function(v17) --[[ Line: 83 ]] --[[ Name: mapStateToProps ]]
-    return {
-        screenSize = v17.screenSize, 
-        humanoidDescription = v17.promptInfo.humanoidDescription, 
-        rigType = v17.promptInfo.rigType, 
-        outfitName = v17.promptInfo.outfitName
-    };
-end, function(v18) --[[ Line: 92 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v10 (copy), v11 (copy)
-    return {
-        signalUpdateOutfitPermissionDenied = function() --[[ Line: 94 ]] --[[ Name: signalUpdateOutfitPermissionDenied ]]
-            -- upvalues: v18 (copy), v10 (ref)
-            return v18(v10);
-        end, 
-        performUpdateOutfit = function() --[[ Line: 98 ]]
-            -- upvalues: v18 (copy), v11 (ref)
-            return v18(v11);
-        end or nil
-    };
-end)(v14);
-return (v13.connect(function(v19, _) --[[ Line: 106 ]]
-    return {
-        showCustomOutfitNames = v19.getCustomOutfitNames()
-    };
-end)(v14));
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local ButtonType = require(CorePackages.Packages.UIBlox).App.Button.Enum.ButtonType
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local SignalUpdateOutfitPermissionDenied = require(ParentParentParent.Thunks.SignalUpdateOutfitPermissionDenied)
+local PerformUpdateOutfit = require(ParentParentParent.Thunks.PerformUpdateOutfit)
+local PromptWithAvatarViewport = require(ParentParent.Prompts.PromptWithAvatarViewport)
+local AvatarEditorPromptsPolicy = require(ParentParentParent.AvatarEditorPromptsPolicy)
+local v14 = Roact.PureComponent:extend("UpdateOutfitPrompt")
+
+v14.validateProps = t.strictInterface({
+	screenSize = t.Vector2,
+	humanoidDescription = t.instanceOf("HumanoidDescription"),
+	rigType = t.enum(Enum.HumanoidRigType),
+	outfitName = t.string,
+	signalUpdateOutfitPermissionDenied = t.callback,
+	performUpdateOutfit = t.callback,
+	showCustomOutfitNames = t.boolean
+})
+
+function v14.render(p1) -- line: 45
+	-- upvalues: RobloxTranslator (copy), Roact (copy), PromptWithAvatarViewport (copy), ButtonType (copy)
+	local v19 = if not p1.props.showCustomOutfitNames then RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptTextNoOutfitName") else RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptText", {
+		RBX_NAME = p1.props.outfitName
+	})
+
+	return Roact.createElement(PromptWithAvatarViewport, {
+		humanoidDescription = p1.props.humanoidDescription,
+		rigType = p1.props.rigType,
+		title = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptTitle"),
+		bodyText = v19,
+		buttonStackInfo = {
+			buttons = {
+				{
+					isDefaultChild = true,
+					props = {
+						onActivated = p1.props.signalUpdateOutfitPermissionDenied,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptNo")
+					}
+				},
+				{
+					isDefaultChild = false,
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = p1.props.performUpdateOutfit,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UpdateOutfitPromptYes")
+					}
+				}
+			}
+		}
+	})
+end
+
+local function mapStateToProps(p2) -- line: 83
+	return {
+		screenSize = p2.screenSize,
+		humanoidDescription = p2.promptInfo.humanoidDescription,
+		rigType = p2.promptInfo.rigType,
+		outfitName = p2.promptInfo.outfitName
+	}
+end
+local function mapDispatchToProps(p3) -- line: 92
+	-- upvalues: SignalUpdateOutfitPermissionDenied (copy), PerformUpdateOutfit (copy)
+	return {
+		signalUpdateOutfitPermissionDenied = function() -- line: 94
+			-- upvalues: p3 (copy), SignalUpdateOutfitPermissionDenied (copy)
+			return p3(SignalUpdateOutfitPermissionDenied)
+		end,
+		performUpdateOutfit = function() -- line: 98
+			-- upvalues: p3 (copy), PerformUpdateOutfit (copy)
+			return p3(PerformUpdateOutfit)
+		end or nil
+	}
+end
+
+local v17 = RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v14)
+
+return (AvatarEditorPromptsPolicy.connect(function(p4, _) -- line: 106
+	return {
+		showCustomOutfitNames = p4.getCustomOutfitNames()
+	}
+end)(v17))

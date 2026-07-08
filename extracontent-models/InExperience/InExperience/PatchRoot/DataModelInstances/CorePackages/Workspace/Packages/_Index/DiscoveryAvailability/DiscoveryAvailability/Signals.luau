@@ -1,6 +1,7 @@
-local v0 = require(script.getCacheStore);
-local v1 = require(script.CacheStoreTypes);
+local getCacheStore = require(script.getCacheStore)
+local CacheStoreTypes = require(script.CacheStoreTypes)
+
 return {
-    getCacheStore = v0, 
-    HomePageDataSourceType = v1.HomePageDataSourceType
-};
+	getCacheStore = getCacheStore,
+	HomePageDataSourceType = CacheStoreTypes.HomePageDataSourceType
+}

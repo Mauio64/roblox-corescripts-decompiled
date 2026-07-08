@@ -1,24 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Components.Common.TwoPanelLabelWithDivider);
-return function(v5) --[[ Line: 39 ]] --[[ Name: ItemInfoLabels ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    local v6 = {};
-    for v7, v8 in v5.itemInfoLabels do
-        if v8.isVisible then
-            v6[v8.key] = v2.createElement(v4, {
-                LayoutOrder = v7, 
-                labelProps = v8.labelProps, 
-                showDivider = true
-            });
-        end;
-    end;
-    return v2.createElement(v3.View, {
-        tag = "auto-y size-full-0 padding-top-medium col align-x-left align-y-top gap-small", 
-        LayoutOrder = v5.LayoutOrder or 4
-    }, {
-        v6
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local TwoPanelLabelWithDivider = require(AvatarExperienceInspectAndBuy.Components.Common.TwoPanelLabelWithDivider)
+local FFlagAXFixIaBItemMap = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags).FFlagAXFixIaBItemMap
+
+local function ItemInfoLabels(t1: {[any]: any}) -- line: 41
+	-- upvalues: React (copy), TwoPanelLabelWithDivider (copy), Foundation (copy), FFlagAXFixIaBItemMap (copy)
+	local t2 = {}
+
+	for v10, v11 in t1.itemInfoLabels do
+		if v11.isVisible then
+			t2[v11.key] = React.createElement(TwoPanelLabelWithDivider, {
+				showDivider = true,
+				LayoutOrder = v10,
+				labelProps = v11.labelProps
+			})
+		end
+	end
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-y size-full-0 padding-top-medium col align-x-left align-y-top gap-small",
+		LayoutOrder = t1.LayoutOrder or 4
+	}, if not FFlagAXFixIaBItemMap then { t2 } else t2)
+end
+
+return ItemInfoLabels

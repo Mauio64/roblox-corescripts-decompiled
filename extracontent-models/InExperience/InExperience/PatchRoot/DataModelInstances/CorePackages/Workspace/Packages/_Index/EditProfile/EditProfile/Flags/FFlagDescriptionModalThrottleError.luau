@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DescriptionModalThrottleError", false);
+return game:DefineFastFlag("DescriptionModalThrottleError", false)

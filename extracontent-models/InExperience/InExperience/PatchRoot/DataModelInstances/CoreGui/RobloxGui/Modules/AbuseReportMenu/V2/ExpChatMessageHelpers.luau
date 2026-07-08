@@ -1,97 +1,146 @@
-local l_Players_0 = game:GetService("Players");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_FFlagEnableGlobalChatAbuseReporting_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableGlobalChatAbuseReporting;
-local v19 = {
-    CHANNEL_GENERAL = "RBXGeneral", 
-    areChannelTabsEnabled = function() --[[ Line: 29 ]] --[[ Name: areChannelTabsEnabled ]]
-        -- upvalues: l_TextChatService_0 (copy)
-        if not game:GetEngineFeature("EnableChannelTabsConfiguration") then
-            return false;
-        else
-            local l_ChannelTabsConfiguration_0 = l_TextChatService_0:FindFirstChildOfClass("ChannelTabsConfiguration");
-            local v5 = false;
-            if l_ChannelTabsConfiguration_0 ~= nil then
-                v5 = l_ChannelTabsConfiguration_0.Enabled;
-            end;
-            return v5;
-        end;
-    end, 
-    localizeString = function(v6, v7) --[[ Line: 41 ]] --[[ Name: localizeString ]]
-        if not v6 then
-            return v7;
-        else
-            local l_status_0, l_result_0 = pcall(v6.TranslateGameText, v6, game, v7);
-            if l_status_0 and type(l_result_0) == "string" then
-                return l_result_0;
-            else
-                return v7;
-            end;
-        end;
-    end, 
-    isSystemMessage = function(v10) --[[ Line: 52 ]] --[[ Name: isSystemMessage ]]
-        if v10.textChannel and v10.textChannel.Name == "RBXSystem" then
-            return true;
-        elseif not v10.userId or v10.userId == "0" then
-            return true;
-        else
-            return false;
-        end;
-    end, 
-    formatChannelLabel = function(v11, v12) --[[ Line: 64 ]] --[[ Name: formatChannelLabel ]]
-        -- upvalues: l_Players_0 (copy), l_FFlagEnableGlobalChatAbuseReporting_0 (copy)
-        if string.find(v11, "RBXGeneral") then
-            return "General";
-        elseif string.find(v11, "^RBXTeam") then
-            return "Team";
-        elseif string.find(v11, "^RBXWhisper") then
-            if v12 and l_Players_0.LocalPlayer then
-                for _, v14 in ipairs(v12:GetChildren()) do
-                    if v14:IsA("TextSource") then
-                        local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v14.UserId);
-                        if l_l_Players_0_PlayerByUserId_0 and l_l_Players_0_PlayerByUserId_0 ~= l_Players_0.LocalPlayer then
-                            return l_l_Players_0_PlayerByUserId_0.DisplayName;
-                        end;
-                    end;
-                end;
-            end;
-            return "Whisper";
-        elseif l_FFlagEnableGlobalChatAbuseReporting_0 and v11 == "RBXGlobal" then
-            return "Global";
-        else
-            return v11;
-        end;
-    end, 
-    formatMessageLabel = function(v16) --[[ Line: 88 ]] --[[ Name: formatMessageLabel ]]
-        local v17 = v16.prefixText or "";
-        local v18 = v16.text or "";
-        if #v17 > 0 then
-            return v17 .. " " .. v18;
-        else
-            return v18;
-        end;
-    end
-};
-v19.collectItems = function(v20, v21) --[[ Line: 96 ]] --[[ Name: collectItems ]]
-    -- upvalues: v19 (copy)
-    local v22 = {};
-    for _, v24 in ipairs(v21) do
-        local v25 = v20[v24];
-        if v25 and not v19.isSystemMessage(v25) then
-            table.insert(v22, {
-                id = v25.messageId, 
-                label = v19.formatMessageLabel(v25)
-            });
-        end;
-    end;
-    return v22;
-end;
-v19.annotateWhisperItems = function(v26, v27) --[[ Line: 113 ]] --[[ Name: annotateWhisperItems ]]
-    for _, v29 in ipairs(v26) do
-        local v30 = v27[v29.id];
-        if v30 and v30.textChannel and typeof(v30.textChannel.Name) == "string" and string.sub(v30.textChannel.Name, 1, 10) == "RBXWhisper" then
-            v29.label = "[Sent privately] " .. v29.label;
-        end;
-    end;
-end;
-return v19;
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local CorePackages = game:GetService("CorePackages")
+local FFlagEnableGlobalChatAbuseReporting = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableGlobalChatAbuseReporting
+local t1 = {
+	CHANNEL_GENERAL = "RBXGeneral",
+	CHANNEL_GLOBAL = "RBXGlobal",
+	areChannelTabsEnabled = function() -- line: 30
+		-- upvalues: TextChatService (copy)
+		if not game:GetEngineFeature("EnableChannelTabsConfiguration") then
+			return false
+		end
+
+		local ChannelTabsConfiguration = TextChatService:FindFirstChildOfClass("ChannelTabsConfiguration")
+
+		return ChannelTabsConfiguration ~= nil and ChannelTabsConfiguration.Enabled
+	end,
+	localizeString = function(p1, s1: string) -- line: 42
+		if not p1 then
+			return s1
+		end
+
+		local ok, result = pcall(p1.TranslateGameText, p1, game, s1)
+
+		if ok and type(result) == "string" then
+			return result
+		end
+
+		return s1
+	end,
+	isSystemMessage = function(p2) -- line: 53
+		if p2.textChannel and p2.textChannel.Name == "RBXSystem" then
+			return true
+		end
+
+		if not p2.userId or p2.userId == "0" then
+			return true
+		end
+
+		return false
+	end,
+	formatChannelLabel = function(s2: string, p3) -- line: 65
+		-- upvalues: Players (copy), FFlagEnableGlobalChatAbuseReporting (copy)
+		if string.find(s2, "RBXGeneral") then
+			return "General"
+		end
+
+		if string.find(s2, "^RBXTeam") then
+			return "Team"
+		end
+
+		if string.find(s2, "^RBXWhisper") then
+			if p3 and Players.LocalPlayer then
+				for _, child in ipairs(p3:GetChildren()) do
+					if not child:IsA("TextSource") then
+						continue
+					end
+
+					local PlayerByUserId = Players:GetPlayerByUserId(child.UserId)
+
+					if PlayerByUserId and PlayerByUserId ~= Players.LocalPlayer then
+						return PlayerByUserId.DisplayName
+					end
+				end
+			end
+
+			return "Whisper"
+		end
+
+		if FFlagEnableGlobalChatAbuseReporting and s2 == "RBXGlobal" then
+			return "Global"
+		end
+
+		return s2
+	end,
+	formatMessageLabel = function(p4) -- line: 89
+		local v18 = p4.prefixText or ""
+		local v19 = p4.text or ""
+
+		if #v18 > 0 then
+			return v18 .. " " .. v19
+		end
+
+		return v19
+	end,
+	getMessageUsername = function(p5) -- line: 95
+		-- upvalues: Players (copy)
+		local num = tonumber(p5.userId)
+
+		if num and num ~= 0 then
+			local PlayerByUserId = Players:GetPlayerByUserId(num)
+
+			if PlayerByUserId then
+				return PlayerByUserId.Name
+			end
+		end
+
+		local textChatMessageInstance = p5.textChatMessageInstance
+
+		if textChatMessageInstance then
+			local TextSource = textChatMessageInstance.TextSource
+
+			if TextSource and TextSource.Username and #TextSource.Username > 0 then
+				return TextSource.Username
+			end
+		end
+
+		return nil
+	end
+}
+
+function t1.collectItems(p6, p7) -- line: 123
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	for _, v in ipairs(p7) do
+		local v30 = p6[v]
+
+		if v30 and not t1.isSystemMessage(v30) then
+			table.insert(t2, {
+				id = v30.messageId,
+				label = t1.formatMessageLabel(v30),
+				meta = {
+					textChannel = v30.textChannel,
+					userId = tostring(v30.userId),
+					presetId = v30.presetId,
+					presetChatVersion = v30.presetChatVersion,
+					username = t1.getMessageUsername(v30)
+				}
+			})
+		end
+	end
+
+	return t2
+end
+function t1.annotateWhisperItems(t3: {[any]: any}, p8, s3: string) -- line: 147
+	for _, v in ipairs(t3) do
+		local v36 = p8[v.id]
+
+		if v36 and v36.textChannel and typeof(v36.textChannel.Name) == "string" and string.sub(v36.textChannel.Name, 1, 10) == "RBXWhisper" then
+			v.label = string.format("[%s] %s", s3, v.label)
+		end
+	end
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SupportFreeTrial", false);
+return game:DefineFastFlag("SupportFreeTrial", false)

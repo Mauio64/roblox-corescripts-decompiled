@@ -1,24 +1,29 @@
 return {
-    substituteAmount = function(v0, v1) --[[ Line: 5 ]] --[[ Name: substituteAmount ]]
-        local v2, _ = string.gsub(v0, "{amount}", (tostring(v1)));
-        return v2;
-    end, 
-    substituteReceiverNotAllowed = function(v4, v5) --[[ Line: 10 ]] --[[ Name: substituteReceiverNotAllowed ]]
-        local v6 = tostring(v5);
-        local v7, _ = string.gsub(v4, "{userName}", v6);
-        local v9, _ = string.gsub(v7, "{username}", v6);
-        return v9;
-    end, 
-    substituteUsername = function(v11, v12) --[[ Line: 17 ]] --[[ Name: substituteUsername ]]
-        local v13, _ = string.gsub(v11, "{username}", (tostring(v12)));
-        return v13;
-    end, 
-    substituteMinAmount = function(v15, v16) --[[ Line: 22 ]] --[[ Name: substituteMinAmount ]]
-        local v17, _ = string.gsub(v15, "{minAmount}", (tostring(v16)));
-        return v17;
-    end, 
-    substituteMaxAmount = function(v19, v20) --[[ Line: 27 ]] --[[ Name: substituteMaxAmount ]]
-        local v21, _ = string.gsub(v19, "{maxAmount}", (tostring(v20)));
-        return v21;
-    end
-};
+	substituteAmount = function(s1: string, s2: string) -- line: 5
+		local result, _ = string.gsub(s1, "{amount}", (tostring(s2)))
+
+		return result
+	end,
+	substituteReceiverNotAllowed = function(s3: string, s4: string) -- line: 10
+		local str = tostring(s4)
+		local result, _ = string.gsub(s3, "{userName}", str)
+		local result2, _ = string.gsub(result, "{username}", str)
+
+		return result2
+	end,
+	substituteUsername = function(s5: string, s6: string) -- line: 17
+		local result, _ = string.gsub(s5, "{username}", (tostring(s6)))
+
+		return result
+	end,
+	substituteMinAmount = function(s7: string, s8: string) -- line: 22
+		local result, _ = string.gsub(s7, "{minAmount}", (tostring(s8)))
+
+		return result
+	end,
+	substituteMaxAmount = function(s9: string, s10: string) -- line: 27
+		local result, _ = string.gsub(s9, "{maxAmount}", (tostring(s10)))
+
+		return result
+	end
+}

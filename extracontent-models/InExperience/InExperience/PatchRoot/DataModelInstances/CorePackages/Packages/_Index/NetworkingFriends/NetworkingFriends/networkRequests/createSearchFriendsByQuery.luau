@@ -1,16 +1,18 @@
-local v0 = require(script.Parent.Parent.FRIENDS_URL);
-local _ = require(script.Parent.Parent.networkingFriendsTypes);
-return function(v2) --[[ Line: 12 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "SearchFriendsByQuery"
-    }, function(v3, v4, v5) --[[ Line: 15 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("v1"):path("users"):id(v4):path("friends"):path("search"):queryArgs({
-            query = if v5 then v5.query else nil, 
-            userSort = if v5 then v5.userSort else nil, 
-            cursor = if v5 then v5.cursor else nil, 
-            limit = if v5 then v5.limit else nil
-        });
-    end);
-end;
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+
+require(script.Parent.Parent.networkingFriendsTypes)
+
+return function(p1) -- line: 12
+	-- upvalues: FRIENDS_URL (copy)
+	return p1.roduxNetworking.GET({
+		Name = "SearchFriendsByQuery"
+	}, function(p2, p3, t1: {[any]: any}?) -- line: 15
+		-- upvalues: FRIENDS_URL (copy)
+		return p2(FRIENDS_URL):path("v1"):path("users"):id(p3):path("friends"):path("search"):queryArgs({
+			query = if not t1 then nil else t1.query,
+			userSort = if not t1 then nil else t1.userSort,
+			cursor = if not t1 then nil else t1.cursor,
+			limit = if not t1 then nil else t1.limit
+		})
+	end)
+end

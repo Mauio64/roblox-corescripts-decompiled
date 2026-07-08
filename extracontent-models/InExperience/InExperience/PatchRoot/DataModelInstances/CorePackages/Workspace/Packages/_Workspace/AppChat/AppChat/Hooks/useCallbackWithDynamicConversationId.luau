@@ -1,28 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_script_FirstAncestor_0.Hooks.useGetConversationFromId);
-local v6 = require(l_script_FirstAncestor_0.Hooks.useGetOneToOneFriendIdFromConversationId);
-return function(v7, v8) --[[ Line: 25 ]] --[[ Name: useCallbackWithDynamicConversationId ]]
-    -- upvalues: v5 (copy), v6 (copy), v4 (copy), v3 (copy)
-    local v9 = v5(v8);
-    local v10 = v9 ~= nil;
-    local v11 = v6(v8);
-    local v12 = v9 and v9.source == "friends" and v11;
-    local v13 = v9 and v9.source ~= "friends" and v8;
-    return v4.useCallback(function(v14) --[[ Line: 35 ]]
-        -- upvalues: v7 (copy), v3 (ref), v13 (copy), v8 (copy), v12 (copy), v11 (copy)
-        return v7((v3.Dictionary.union(v14 or {}, {
-            conversationId = if v13 then v8 else nil, 
-            friendId = if v12 then v11 else nil
-        })));
-    end, {
-        v7, 
-        v8, 
-        v12, 
-        v13, 
-        v11
-    }), v10;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+
+require(AppChat.Models.ConversationChannels)
+
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local useGetConversationFromId = require(AppChat.Hooks.useGetConversationFromId)
+local useGetOneToOneFriendIdFromConversationId = require(AppChat.Hooks.useGetOneToOneFriendIdFromConversationId)
+
+local function useCallbackWithDynamicConversationId(p1: ((...any) -> ...any), s1: string) -- line: 25
+	-- upvalues: useGetConversationFromId (copy), useGetOneToOneFriendIdFromConversationId (copy), React (copy), Cryo (copy)
+	local v10 = useGetConversationFromId(s1)
+	local v11 = v10 ~= nil
+	local v12 = useGetOneToOneFriendIdFromConversationId(s1)
+	local v13 = v10 and (v10.source == "friends" and v12)
+	local v14 = v10 and (v10.source ~= "friends" and s1)
+
+	return React.useCallback(function(p2) -- line: 35
+		-- upvalues: p1 (copy), Cryo (copy), v14 (copy), s1 (copy), v13 (copy), v12 (copy)
+		return p1((Cryo.Dictionary.union(p2 or {}, {
+			conversationId = if not v14 then nil else s1,
+			friendId = if not v13 then nil else v12
+		})))
+	end, {
+		p1,
+		s1,
+		v13,
+		v14,
+		v12
+	}), v11
+end
+
+return useCallbackWithDynamicConversationId

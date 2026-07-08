@@ -1,1 +1,1 @@
-return require(script.Parent.makeThunkMiddleware)(nil);
+return require(script.Parent.makeThunkMiddleware)(nil)

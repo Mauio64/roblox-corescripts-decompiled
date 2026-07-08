@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigratePurchasePromptInteractiveToFocusNavigation2", false);
+return game:DefineFastFlag("AXMigratePurchasePromptInteractiveToFocusNavigation2", false)

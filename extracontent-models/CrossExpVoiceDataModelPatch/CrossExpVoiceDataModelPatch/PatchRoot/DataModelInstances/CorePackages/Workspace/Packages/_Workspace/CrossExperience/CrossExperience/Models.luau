@@ -1,3 +1,3 @@
 return {
-    ParticipantModel = require(script.ParticipantModel)
-};
+	ParticipantModel = require(script.ParticipantModel)
+}

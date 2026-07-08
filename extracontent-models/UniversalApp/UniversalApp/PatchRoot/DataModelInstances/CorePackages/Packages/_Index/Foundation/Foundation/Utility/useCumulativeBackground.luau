@@ -1,1 +1,1 @@
-return require(script.useCumulativeBackground);
+return require(script.useCumulativeBackground)

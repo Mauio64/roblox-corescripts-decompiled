@@ -1,10 +1,13 @@
-local v0 = require(script.Parent.RoduxNetworking);
-return function(v1) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    local v2 = v0.getNetworkImpl();
-    v0.setNetworkImpl(v1);
-    return function() --[[ Line: 7 ]]
-        -- upvalues: v0 (ref), v2 (copy)
-        v0.setNetworkImpl(v2);
-    end;
-end;
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+return function(p1) -- line: 3
+	-- upvalues: RoduxNetworking (copy)
+	local v3 = RoduxNetworking.getNetworkImpl()
+
+	RoduxNetworking.setNetworkImpl(p1)
+
+	return function() -- line: 7
+		-- upvalues: RoduxNetworking (copy), v3 (copy)
+		RoduxNetworking.setNetworkImpl(v3)
+	end
+end

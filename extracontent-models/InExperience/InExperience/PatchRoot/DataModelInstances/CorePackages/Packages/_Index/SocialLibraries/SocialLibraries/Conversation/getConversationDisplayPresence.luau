@@ -1,20 +1,24 @@
-local l_User_0 = script:FindFirstAncestor("SocialLibraries").User;
-local v1 = require(l_User_0.presenceImageByPresence);
-local v2 = require(l_User_0.getPresenceTextFromUser);
-local v3 = require(script.Parent.getOtherParticipant);
-return function(v4, v5) --[[ Line: 8 ]]
-    -- upvalues: v3 (copy), v1 (copy), v2 (copy)
-    if v5.conversationType == "OneToOneConversation" then
-        local v6 = v3(v4, v5.participants);
-        if v6 then
-            local v7 = v4.Users[v6];
-            if v7 then
-                return {
-                    image = v1[v7.presence], 
-                    text = v2(v7)
-                };
-            end;
-        end;
-    end;
-    return nil;
-end;
+local User = script:FindFirstAncestor("SocialLibraries").User
+local presenceImageByPresence = require(User.presenceImageByPresence)
+local getPresenceTextFromUser = require(User.getPresenceTextFromUser)
+local getOtherParticipant = require(script.Parent.getOtherParticipant)
+
+return function(p1, p2) -- line: 8
+	-- upvalues: getOtherParticipant (copy), presenceImageByPresence (copy), getPresenceTextFromUser (copy)
+	if p2.conversationType == "OneToOneConversation" then
+		local v7 = getOtherParticipant(p1, p2.participants)
+
+		if v7 then
+			local v8 = p1.Users[v7]
+
+			if v8 then
+				return {
+					image = presenceImageByPresence[v8.presence],
+					text = getPresenceTextFromUser(v8)
+				}
+			end
+		end
+	end
+
+	return nil
+end

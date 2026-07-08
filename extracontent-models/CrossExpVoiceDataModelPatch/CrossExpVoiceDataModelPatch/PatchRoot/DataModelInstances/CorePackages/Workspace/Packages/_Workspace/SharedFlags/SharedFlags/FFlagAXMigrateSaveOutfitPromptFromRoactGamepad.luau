@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateSaveOutfitPromptFromRoactGamepad", false);
+return game:DefineFastFlag("AXMigrateSaveOutfitPromptFromRoactGamepad", false)

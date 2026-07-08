@@ -1,39 +1,44 @@
-local l_SessionService_0 = game:GetService("SessionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceAnalytics");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(script.Parent.UnifiedEventLogConstants);
-local v5 = require(l_script_FirstAncestor_0.Utils.UnifiedEventLoggingUtils);
-local v6 = require(script.Parent.sendUnifiedEventLog);
-local l_isRunningInStudio_0 = require(l_Parent_0.AppCommonLib).isRunningInStudio;
-local l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents;
-local v9 = require(script.Parent.AXUnifiedEventFilter);
-return function(v10, v11, v12) --[[ Line: 22 ]]
-    -- upvalues: l_SessionService_0 (copy), v4 (copy), l_isRunningInStudio_0 (copy), l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 (copy), v5 (copy), v3 (copy), v9 (copy), v6 (copy)
-    if l_SessionService_0:GetSessionTag("level2a") ~= v10:GetAttribute(v4.SESSION_TAG_NAME) and not l_isRunningInStudio_0() then
-        return;
-    else
-        local v13 = v12 or {};
-        local v14 = {};
-        local l_v10_Attributes_0 = v10:GetAttributes();
-        if l_FFlagAXMISEnableMultiShoppingUnifiedEvents_0 then
-            v14 = v5.getFieldsToSendFromInstanceAttributes(l_v10_Attributes_0);
-        else
-            for v16, v17 in l_v10_Attributes_0 do
-                if v5.isUnifiedLoggingAttribute(v16) then
-                    v14[v5.getUnifiedLoggingFieldName(v16)] = v17;
-                end;
-            end;
-        end;
-        if v13.includeScreenSize then
-            v14 = v3.Dictionary.join(v14, v5.getScreenSize(v10));
-        end;
-        if v13.includeElementSizeAndPosition then
-            v14 = v3.Dictionary.join(v14, v5.getElementSizeAndPosition(v10));
-        end;
-        local v18 = v3.Dictionary.join(v14, v11);
-        v9.filter(v18);
-        v6(v18);
-        return;
-    end;
-end;
+local SessionService = game:GetService("SessionService")
+local AvatarExperienceAnalytics = script:FindFirstAncestor("AvatarExperienceAnalytics")
+local AvatarExperienceAnalyticsParent = AvatarExperienceAnalytics.Parent
+local Cryo = require(AvatarExperienceAnalyticsParent.Cryo)
+local UnifiedEventLogConstants = require(script.Parent.UnifiedEventLogConstants)
+local UnifiedEventLoggingUtils = require(AvatarExperienceAnalytics.Utils.UnifiedEventLoggingUtils)
+local sendUnifiedEventLog = require(script.Parent.sendUnifiedEventLog)
+local isRunningInStudio = require(AvatarExperienceAnalyticsParent.AppCommonLib).isRunningInStudio
+local FFlagAXMISEnableMultiShoppingUnifiedEvents = require(AvatarExperienceAnalyticsParent.AvatarExperienceFlags).FFlagAXMISEnableMultiShoppingUnifiedEvents
+local AXUnifiedEventFilter = require(script.Parent.AXUnifiedEventFilter)
+
+return function(p1, p2, t1: {[any]: any}?) -- line: 22
+	-- upvalues: SessionService (copy), UnifiedEventLogConstants (copy), isRunningInStudio (copy), FFlagAXMISEnableMultiShoppingUnifiedEvents (copy), UnifiedEventLoggingUtils (copy), Cryo (copy), AXUnifiedEventFilter (copy), sendUnifiedEventLog (copy)
+	if SessionService:GetSessionTag("level2a") ~= p1:GetAttribute(UnifiedEventLogConstants.SESSION_TAG_NAME) and not isRunningInStudio() then
+		return
+	end
+
+	local v14 = t1 or {}
+	local t2 = {}
+	local Attributes = p1:GetAttributes()
+
+	if FFlagAXMISEnableMultiShoppingUnifiedEvents then
+		t2 = UnifiedEventLoggingUtils.getFieldsToSendFromInstanceAttributes(Attributes)
+	else
+		for v17, v18 in Attributes do
+			if UnifiedEventLoggingUtils.isUnifiedLoggingAttribute(v17) then
+				t2[UnifiedEventLoggingUtils.getUnifiedLoggingFieldName(v17)] = v18
+			end
+		end
+	end
+
+	if v14.includeScreenSize then
+		t2 = Cryo.Dictionary.join(t2, UnifiedEventLoggingUtils.getScreenSize(p1))
+	end
+
+	if v14.includeElementSizeAndPosition then
+		t2 = Cryo.Dictionary.join(t2, UnifiedEventLoggingUtils.getElementSizeAndPosition(p1))
+	end
+
+	local v19 = Cryo.Dictionary.join(t2, p2)
+
+	AXUnifiedEventFilter.filter(v19)
+	sendUnifiedEventLog(v19)
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableFlyoutUncheckedBadge", false)
+return game:DefineFastFlag("EnableFlyoutUncheckedBadge2", false)

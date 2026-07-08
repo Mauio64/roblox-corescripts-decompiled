@@ -1,36 +1,31 @@
-local v0 = require(script.Parent.Parent.Parent.dependencies);
-local l_Roact_0 = v0.Roact;
-local l_RoactNavigation_0 = v0.RoactNavigation;
-local v3 = {
-    state = {
-        params = {}, 
-        routeName = "", 
-        key = ""
-    }, 
-    dispatch = function() --[[ Line: 11 ]] --[[ Name: dispatch ]]
+local dependencies = require(script.Parent.Parent.Parent.dependencies)
+local Roact = dependencies.Roact
+local RoactNavigation = dependencies.RoactNavigation
+local t1 = {
+	state = {
+		routeName = "",
+		key = "",
+		params = {}
+	},
+	dispatch = function() -- line: 11
+	end,
+	goBack = function() -- line: 12
+	end,
+	addListener = function() -- line: 13
+	end,
+	isFocused = function() -- line: 14
+	end,
+	setParams = function() -- line: 15
+	end,
+	getParam = function() -- line: 16
+	end
+}
 
-    end, 
-    goBack = function() --[[ Line: 12 ]] --[[ Name: goBack ]]
-
-    end, 
-    addListener = function() --[[ Line: 13 ]] --[[ Name: addListener ]]
-
-    end, 
-    isFocused = function() --[[ Line: 14 ]] --[[ Name: isFocused ]]
-
-    end, 
-    setParams = function() --[[ Line: 15 ]] --[[ Name: setParams ]]
-
-    end, 
-    getParam = function() --[[ Line: 16 ]] --[[ Name: getParam ]]
-
-    end
-};
-return function(v4) --[[ Line: 19 ]]
-    -- upvalues: l_Roact_0 (copy), l_RoactNavigation_0 (copy), v3 (copy)
-    return l_Roact_0.createElement(l_RoactNavigation_0.Provider, {
-        value = v3
-    }, {
-        Element = v4
-    });
-end;
+return function(p1) -- line: 19
+	-- upvalues: Roact (copy), RoactNavigation (copy), t1 (copy)
+	return Roact.createElement(RoactNavigation.Provider, {
+		value = t1
+	}, {
+		Element = p1
+	})
+end

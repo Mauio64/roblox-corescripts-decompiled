@@ -1,270 +1,288 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local _ = game:GetService("ScriptContext");
-local v4 = require(script.Parent.ProfilerUtil);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v6 = require(l_Components_0.DropDown);
-local l_Actions_0 = script.Parent.Parent.Parent.Actions;
-local v8 = require(l_Actions_0.SetScriptProfilerState);
-local v9 = require(script.Parent.Parent.Parent.Constants);
-local v10 = v9.GeneralFormatting.MainRowPadding * 2;
-local l_SmallFrameHeight_0 = v9.UtilityBarFormatting.SmallFrameHeight;
-local l_MainWindowHeader_0 = v9.Font.MainWindowHeader;
-local l_MainWindow_0 = v9.Font.MainWindow;
-local l_ButtonTextSize_0 = v9.MicroProfilerFormatting.ButtonTextSize;
-local l_Text_0 = v9.Color.Text;
-local _ = v9.Color.UnselectedGray;
-local l_UnselectedGray_1 = v9.Color.UnselectedGray;
-local l_SelectedBlue_0 = v9.Color.SelectedBlue;
-local l_UnselectedGray_2 = v9.Color.UnselectedGray;
-local l_ButtonWidth_0 = v9.MicroProfilerFormatting.ButtonWidth;
-local l_DropDownArrowHeight_0 = v9.GeneralFormatting.DropDownArrowHeight;
-local v22 = l_DropDownArrowHeight_0 / 2;
-local l_DownArrow_0 = v9.Image.DownArrow;
-local v24 = game:DefineFastFlag("ScriptProfilerShowPlugins2", false);
-local _ = function(v25, v26) --[[ Line: 43 ]] --[[ Name: makeFormattedStringTable ]]
-    local v27 = table.create(#v25);
-    for _, v29 in v25 do
-        table.insert(v27, v26(v29));
-    end;
-    return v27;
-end;
-local function v32(v31) --[[ Line: 53 ]] --[[ Name: formatTimeSelection ]]
-    -- upvalues: v4 (copy)
-    if v31 == 0 then
-        return "Off";
-    else
-        return v4.formatTimer(v31);
-    end;
-end;
-local v33 = {
-    "Callgraph", 
-    "Functions"
-};
-local v34 = {
-    0, 
-    1, 
-    60, 
-    300, 
-    600
-};
-local v35 = table.create(#v34);
-for _, v37 in v34 do
-    table.insert(v35, v32(v37));
-end;
-local l_v35_0 = v35;
-v35 = {
-    1000, 
-    10000
-};
-local l_formatFrequency_0 = v4.formatFrequency;
-local v40 = table.create(#v35);
-for _, v42 in v35 do
-    table.insert(v40, l_formatFrequency_0(v42));
-end;
-local l_v40_0 = v40;
-l_formatFrequency_0 = {
-    0, 
-    60, 
-    300, 
-    600
-};
-local v44 = table.create(#l_formatFrequency_0);
-for _, v46 in l_formatFrequency_0 do
-    table.insert(v44, v32(v46));
-end;
-v40 = v44;
-v44 = v1.PureComponent:extend("MobileSettingsView");
-v44.init = function(_) --[[ Line: 74 ]] --[[ Name: init ]]
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
 
-end;
-v44.didMount = function(_) --[[ Line: 76 ]] --[[ Name: didMount ]]
+game:GetService("ScriptContext")
 
-end;
-v44.didUpdate = function(_) --[[ Line: 78 ]] --[[ Name: didUpdate ]]
+local ProfilerUtil = require(script.Parent.ProfilerUtil)
+local Components = script.Parent.Parent.Parent.Components
+local DropDown = require(Components.DropDown)
+local Actions = script.Parent.Parent.Parent.Actions
+local SetScriptProfilerState = require(Actions.SetScriptProfilerState)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local v10 = Constants.GeneralFormatting.MainRowPadding * 2
+local SmallFrameHeight = Constants.UtilityBarFormatting.SmallFrameHeight
+local MainWindowHeader = Constants.Font.MainWindowHeader
+local MainWindow = Constants.Font.MainWindow
+local ButtonTextSize = Constants.MicroProfilerFormatting.ButtonTextSize
+local ColorText = Constants.Color.Text
+local _ = Constants.Color.UnselectedGray
+local UnselectedGray = Constants.Color.UnselectedGray
+local SelectedBlue = Constants.Color.SelectedBlue
+local UnselectedGray2 = Constants.Color.UnselectedGray
+local ButtonWidth = Constants.MicroProfilerFormatting.ButtonWidth
+local DropDownArrowHeight = Constants.GeneralFormatting.DropDownArrowHeight
+local v22 = DropDownArrowHeight / 2
+local DownArrow = Constants.Image.DownArrow
+local v24 = game:DefineFastFlag("ScriptProfilerShowPlugins2", false)
 
-end;
-v44.GetState = function(v50, v51) --[[ Line: 80 ]] --[[ Name: GetState ]]
-    return (if v50.props.isClientView then v50.props.client else v50.props.server)[v51];
-end;
-v44.UpdateState = function(v52, v53, v54) --[[ Line: 86 ]] --[[ Name: UpdateState ]]
-    local v55 = if v52.props.isClientView then v52.props.client else v52.props.server;
-    local v56 = table.clone(v55);
-    v56[v53] = v54;
-    v52.props.dispatchSetScriptProfilerState(v52.props.isClientView, v56);
-end;
-v44.renderToggle = function(_, v58, v59, v60) --[[ Line: 95 ]] --[[ Name: renderToggle ]]
-    -- upvalues: v1 (copy), l_SmallFrameHeight_0 (copy), l_ButtonWidth_0 (copy), l_MainWindowHeader_0 (copy), l_ButtonTextSize_0 (copy), v9 (copy), l_UnselectedGray_2 (copy), l_UnselectedGray_1 (copy), l_SelectedBlue_0 (copy)
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_SmallFrameHeight_0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 2
-    }, {
-        Label = v1.createElement("TextLabel", {
-            Size = UDim2.new(0, l_ButtonWidth_0, 0, l_SmallFrameHeight_0), 
-            Position = UDim2.new(0.1, 0, 0, 0), 
-            Text = v58, 
-            Font = l_MainWindowHeader_0, 
-            TextSize = l_ButtonTextSize_0, 
-            TextColor3 = v9.Color.Text, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Center, 
-            BackgroundColor3 = l_UnselectedGray_2, 
-            BackgroundTransparency = 1
-        }), 
-        ToggleButton = v1.createElement("TextLabel", {
-            Size = UDim2.new(0, l_ButtonWidth_0 * 2, 0, l_SmallFrameHeight_0), 
-            Position = UDim2.new(0.9, -l_ButtonWidth_0 * 2, 0, 0), 
-            BackgroundTransparency = 1
-        }, {
-            OffButton = v1.createElement("TextButton", {
-                Size = UDim2.new(0.5, 0, 1, 0), 
-                Text = "Off", 
-                Font = l_MainWindowHeader_0, 
-                TextSize = l_ButtonTextSize_0, 
-                TextColor3 = v9.Color.Text, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                BackgroundColor3 = v59 and l_UnselectedGray_1 or l_SelectedBlue_0, 
-                [v1.Event.Activated] = function() --[[ Line: 129 ]]
-                    -- upvalues: v60 (copy)
-                    v60(false);
-                end
-            }), 
-            OnButton = v1.createElement("TextButton", {
-                Size = UDim2.new(0.5, 0, 1, 0), 
-                Position = UDim2.new(0.5, 0, 0, 0), 
-                Text = "On", 
-                Font = l_MainWindowHeader_0, 
-                TextSize = l_ButtonTextSize_0, 
-                TextColor3 = v9.Color.Text, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                BackgroundColor3 = v59 and l_SelectedBlue_0 or l_UnselectedGray_1, 
-                [v1.Event.Activated] = function() --[[ Line: 145 ]]
-                    -- upvalues: v60 (copy)
-                    v60(true);
-                end
-            })
-        })
-    });
-end;
-v44.renderStateToggle = function(v61, v62, v63, _) --[[ Line: 153 ]] --[[ Name: renderStateToggle ]]
-    return v61:renderToggle(v62, v61:GetState(v63), function(v65) --[[ Line: 156 ]]
-        -- upvalues: v61 (copy), v63 (copy)
-        v61:UpdateState(v63, v65);
-    end);
-end;
-v44.renderDropDown = function(v66, v67, v68, v69, v70, v71, v72) --[[ Line: 161 ]] --[[ Name: renderDropDown ]]
-    -- upvalues: v1 (copy), l_ButtonWidth_0 (copy), l_SmallFrameHeight_0 (copy), l_ButtonTextSize_0 (copy), l_Text_0 (copy), l_MainWindow_0 (copy), v9 (copy), l_DownArrow_0 (copy), l_DropDownArrowHeight_0 (copy), v22 (copy), v6 (copy), l_MainWindowHeader_0 (copy), l_UnselectedGray_2 (copy)
-    local v73 = nil;
-    v73 = if v72 then v1.createElement("TextButton", {
-        Position = UDim2.new(0.9, -l_ButtonWidth_0, 0, 0), 
-        Size = UDim2.new(0, l_ButtonWidth_0, 0, l_SmallFrameHeight_0), 
-        Text = v69[v71], 
-        TextSize = l_ButtonTextSize_0, 
-        TextColor3 = l_Text_0, 
-        Font = l_MainWindow_0, 
-        AutoButtonColor = true, 
-        BackgroundColor3 = v9.Color.InactiveBox, 
-        BackgroundTransparency = 0
-    }, {
-        arrow = v1.createElement("ImageLabel", {
-            Image = l_DownArrow_0, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, l_DropDownArrowHeight_0, 0, l_DropDownArrowHeight_0), 
-            Position = UDim2.new(1, -l_DropDownArrowHeight_0 - v22, 0.5, -v22)
-        })
-    }) else v1.createElement("Frame", {
-        Position = UDim2.new(0.9, -l_ButtonWidth_0, 0, 0), 
-        Size = UDim2.new(0, l_ButtonWidth_0, 0, l_SmallFrameHeight_0)
-    }, {
-        Selection = v1.createElement(v6, {
-            buttonSize = UDim2.new(1, 0, 0, l_SmallFrameHeight_0), 
-            dropDownList = v69, 
-            selectedIndex = v71, 
-            onSelection = function(v74) --[[ Line: 193 ]] --[[ Name: onSelection ]]
-                -- upvalues: v66 (copy), v68 (copy), v70 (copy)
-                local l_v66_State_0 = v66:GetState(v68);
-                if typeof(l_v66_State_0) == "boolean" then
-                    l_v66_State_0 = v74 == 2;
-                elseif typeof(l_v66_State_0) == "number" then
-                    l_v66_State_0 = v70[v74];
-                end;
-                v66:UpdateState(v68, l_v66_State_0);
-            end
-        })
-    });
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_SmallFrameHeight_0), 
-        BackgroundTransparency = 1
-    }, {
-        Label = v1.createElement("TextLabel", {
-            Size = UDim2.new(0, l_ButtonWidth_0, 0, l_SmallFrameHeight_0), 
-            Position = UDim2.new(0.1, 0, 0, 0), 
-            Text = v67, 
-            Font = l_MainWindowHeader_0, 
-            TextSize = l_ButtonTextSize_0, 
-            TextColor3 = v9.Color.Text, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Center, 
-            BackgroundColor3 = l_UnselectedGray_2, 
-            BackgroundTransparency = 1
-        }), 
-        DropDown = v73
-    });
-end;
-v44.render = function(v76) --[[ Line: 229 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v9 (copy), v10 (copy), v24 (copy), l_v35_0 (copy), v34 (copy), l_v40_0 (copy), v35 (copy), v4 (copy), v40 (copy), l_formatFrequency_0 (copy), v33 (copy)
-    local l_v76_State_0 = v76:GetState("isProfiling");
-    return v1.createElement("ScrollingFrame", {
-        Size = v76.props.size, 
-        BackgroundColor3 = v9.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 2, 
-        AutomaticCanvasSize = Enum.AutomaticSize.Y
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, v10), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        Percentages = v76:renderToggle("Percentages", v76.props.usePercentages, function(v78) --[[ Line: 245 ]]
-            -- upvalues: v76 (copy)
-            v76.props.dispatchSetScriptProfilerUsePercentages(v78);
-        end), 
-        LiveToggle = v76:renderStateToggle("Live Update", "liveUpdate"), 
-        PluginsToggle = if not v24 then nil else v76:renderStateToggle("Show Plugins", "showPlugins"), 
-        GCToggle = v76:renderStateToggle("GC Overhead", "showGc"), 
-        AverageDropDown = v76:renderDropDown("Average", "average", l_v35_0, v34, table.find(v34, v76:GetState("average")) or 1), 
-        FrequencyDropDown = v76:renderDropDown("Frequency", "frequency", l_v40_0, v35, table.find(v35, v76:GetState("frequency")) or 1, l_v76_State_0), 
-        TimerDropDown = v76:renderDropDown("Timer" .. if l_v76_State_0 then ": " .. v4.formatTimer(v76:GetState("timedProfilingCountdown")) else "", "timedProfilingDuration", v40, l_formatFrequency_0, table.find(l_formatFrequency_0, v76:GetState("timedProfilingDuration")) or 1, l_v76_State_0), 
-        ViewDropDown = v76:renderDropDown("View", "isFunctionsView", v33, nil, v76:GetState("isFunctionsView") and 2 or 1)
-    });
-end;
-return v2.UNSTABLE_connect2(function(v79, _) --[[ Line: 296 ]] --[[ Name: mapStateToProps ]]
-    return {
-        usePercentages = v79.ScriptProfiler.usePercentages, 
-        isClientView = v79.ScriptProfiler.isClientView, 
-        client = v79.ScriptProfiler.client, 
-        server = v79.ScriptProfiler.server
-    };
-end, function(v81) --[[ Line: 305 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v8 (copy)
-    return {
-        dispatchSetScriptProfilerState = function(v82, v83) --[[ Line: 307 ]] --[[ Name: dispatchSetScriptProfilerState ]]
-            -- upvalues: v81 (copy), v8 (ref)
-            if v82 then
-                v81(v8(v82, nil, v83, nil));
-                return;
-            else
-                v81(v8(v82, nil, nil, v83));
-                return;
-            end;
-        end, 
-        dispatchSetScriptProfilerUsePercentages = function(v84) --[[ Line: 315 ]] --[[ Name: dispatchSetScriptProfilerUsePercentages ]]
-            -- upvalues: v81 (copy), v8 (ref)
-            v81(v8(nil, v84));
-        end
-    };
-end)(v44);
+local function makeFormattedStringTable(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 43
+	local t2 = table.create(#t1)
+
+	for _, v51 in t1 do
+		table.insert(t2, p1(v51))
+	end
+
+	return t2
+end
+local function formatTimeSelection(p2) -- line: 53
+	-- upvalues: ProfilerUtil (copy)
+	if p2 == 0 then
+		return "Off"
+	end
+
+	return ProfilerUtil.formatTimer(p2)
+end
+
+local t3 = {
+	"Callgraph",
+	"Functions"
+}
+local t4 = {
+	0,
+	1,
+	60,
+	300,
+	600
+}
+local t5 = table.create(#t4)
+
+for _, v31 in t4 do
+	table.insert(t5, formatTimeSelection(v31))
+end
+
+local v32 = t5
+local t6 = {
+	1000,
+	10000
+}
+local formatFrequency = ProfilerUtil.formatFrequency
+local t7 = table.create(#t6)
+
+for _, v37 in t6 do
+	table.insert(t7, formatFrequency(v37))
+end
+
+local v38 = t7
+local t8 = {
+	0,
+	60,
+	300,
+	600
+}
+local t9 = table.create(#t8)
+
+for _, v42 in t8 do
+	table.insert(t9, formatTimeSelection(v42))
+end
+
+local v43 = t9
+local v44 = Roact.PureComponent:extend("MobileSettingsView")
+
+function v44.init(_) -- line: 74
+end
+function v44.didMount(_) -- line: 76
+end
+function v44.didUpdate(_) -- line: 78
+end
+function v44.GetState(p6, p7) -- line: 80
+	return ((if not p6.props.isClientView then p6.props.server else p6.props.client))[p7]
+end
+function v44.UpdateState(p8, p9, p10) -- line: 86
+	local v61 = if not p8.props.isClientView then p8.props.server else p8.props.client
+	local v62 = table.clone(v61)
+
+	v62[p9] = p10
+	p8.props.dispatchSetScriptProfilerState(p8.props.isClientView, v62)
+end
+function v44.renderToggle(_, p12, p13, p14) -- line: 95
+	-- upvalues: Roact (copy), SmallFrameHeight (copy), ButtonWidth (copy), MainWindowHeader (copy), ButtonTextSize (copy), Constants (copy), UnselectedGray2 (copy), UnselectedGray (copy), SelectedBlue (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Size = UDim2.new(1, 0, 0, SmallFrameHeight)
+	}, {
+		Label = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, ButtonWidth, 0, SmallFrameHeight),
+			Position = UDim2.new(0.1, 0, 0, 0),
+			Text = p12,
+			Font = MainWindowHeader,
+			TextSize = ButtonTextSize,
+			TextColor3 = Constants.Color.Text,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			BackgroundColor3 = UnselectedGray2
+		}),
+		ToggleButton = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, ButtonWidth * 2, 0, SmallFrameHeight),
+			Position = UDim2.new(0.9, -ButtonWidth * 2, 0, 0)
+		}, {
+			OffButton = Roact.createElement("TextButton", {
+				Size = UDim2.new(0.5, 0, 1, 0),
+				Text = "Off",
+				Font = MainWindowHeader,
+				TextSize = ButtonTextSize,
+				TextColor3 = Constants.Color.Text,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				BackgroundColor3 = p13 and UnselectedGray or SelectedBlue,
+				[Roact.Event.Activated] = function() -- line: 129
+					-- upvalues: p14 (copy)
+					p14(false)
+				end
+			}),
+			OnButton = Roact.createElement("TextButton", {
+				Size = UDim2.new(0.5, 0, 1, 0),
+				Position = UDim2.new(0.5, 0, 0, 0),
+				Text = "On",
+				Font = MainWindowHeader,
+				TextSize = ButtonTextSize,
+				TextColor3 = Constants.Color.Text,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				BackgroundColor3 = p13 and SelectedBlue or UnselectedGray,
+				[Roact.Event.Activated] = function() -- line: 145
+					-- upvalues: p14 (copy)
+					p14(true)
+				end
+			})
+		})
+	})
+end
+function v44.renderStateToggle(p15, p16, p17, _) -- line: 153
+	return p15:renderToggle(p16, p15:GetState(p17), function(p19) -- line: 156
+		-- upvalues: p15 (copy), p17 (copy)
+		p15:UpdateState(p17, p19)
+	end)
+end
+function v44.renderDropDown(p20, p21, p22, p23, p24, p25, p26) -- line: 161
+	-- upvalues: Roact (copy), ButtonWidth (copy), SmallFrameHeight (copy), ButtonTextSize (copy), ColorText (copy), MainWindow (copy), Constants (copy), DownArrow (copy), DropDownArrowHeight (copy), v22 (copy), DropDown (copy), MainWindowHeader (copy), UnselectedGray2 (copy)
+	local v78 = if not p26 then Roact.createElement("Frame", {
+		Position = UDim2.new(0.9, -ButtonWidth, 0, 0),
+		Size = UDim2.new(0, ButtonWidth, 0, SmallFrameHeight)
+	}, {
+		Selection = Roact.createElement(DropDown, {
+			buttonSize = UDim2.new(1, 0, 0, SmallFrameHeight),
+			dropDownList = p23,
+			selectedIndex = p25,
+			onSelection = function(p27) -- line: 193
+				-- upvalues: p20 (copy), p22 (copy), p24 (copy)
+				local State = p20:GetState(p22)
+
+				if typeof(State) == "boolean" then
+					State = p27 == 2
+				elseif typeof(State) == "number" then
+					State = p24[p27]
+				end
+
+				p20:UpdateState(p22, State)
+			end
+		})
+	}) else Roact.createElement("TextButton", {
+		AutoButtonColor = true,
+		BackgroundTransparency = 0,
+		Position = UDim2.new(0.9, -ButtonWidth, 0, 0),
+		Size = UDim2.new(0, ButtonWidth, 0, SmallFrameHeight),
+		Text = p23[p25],
+		TextSize = ButtonTextSize,
+		TextColor3 = ColorText,
+		Font = MainWindow,
+		BackgroundColor3 = Constants.Color.InactiveBox
+	}, {
+		arrow = Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = DownArrow,
+			Size = UDim2.new(0, DropDownArrowHeight, 0, DropDownArrowHeight),
+			Position = UDim2.new(1, -DropDownArrowHeight - v22, 0.5, -v22)
+		})
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, SmallFrameHeight)
+	}, {
+		Label = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, ButtonWidth, 0, SmallFrameHeight),
+			Position = UDim2.new(0.1, 0, 0, 0),
+			Text = p21,
+			Font = MainWindowHeader,
+			TextSize = ButtonTextSize,
+			TextColor3 = Constants.Color.Text,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			BackgroundColor3 = UnselectedGray2
+		}),
+		DropDown = v78
+	})
+end
+function v44.render(p28) -- line: 229
+	-- upvalues: Roact (copy), Constants (copy), v10 (copy), v24 (copy), v32 (copy), t4 (copy), v38 (copy), t6 (copy), ProfilerUtil (copy), v43 (copy), t8 (copy), t3 (copy)
+	local State = p28:GetState("isProfiling")
+
+	return Roact.createElement("ScrollingFrame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Size = p28.props.size,
+		BackgroundColor3 = Constants.Color.BaseGray,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, v10),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Percentages = p28:renderToggle("Percentages", p28.props.usePercentages, function(p29) -- line: 245
+			-- upvalues: p28 (copy)
+			p28.props.dispatchSetScriptProfilerUsePercentages(p29)
+		end),
+		LiveToggle = p28:renderStateToggle("Live Update", "liveUpdate"),
+		PluginsToggle = if v24 then p28:renderStateToggle("Show Plugins", "showPlugins") else nil,
+		GCToggle = p28:renderStateToggle("GC Overhead", "showGc"),
+		AverageDropDown = p28:renderDropDown("Average", "average", v32, t4, table.find(t4, p28:GetState("average")) or 1),
+		FrequencyDropDown = p28:renderDropDown("Frequency", "frequency", v38, t6, table.find(t6, p28:GetState("frequency")) or 1, State),
+		TimerDropDown = p28:renderDropDown("Timer" .. (not State and "" or ": " .. ProfilerUtil.formatTimer(p28:GetState("timedProfilingCountdown"))), "timedProfilingDuration", v43, t8, table.find(t8, p28:GetState("timedProfilingDuration")) or 1, State),
+		ViewDropDown = p28:renderDropDown("View", "isFunctionsView", t3, nil, not p28:GetState("isFunctionsView") and 1 or 2)
+	})
+end
+
+local function mapStateToProps(p30, _) -- line: 296
+	return {
+		usePercentages = p30.ScriptProfiler.usePercentages,
+		isClientView = p30.ScriptProfiler.isClientView,
+		client = p30.ScriptProfiler.client,
+		server = p30.ScriptProfiler.server
+	}
+end
+local function mapDispatchToProps(p32) -- line: 305
+	-- upvalues: SetScriptProfilerState (copy)
+	return {
+		dispatchSetScriptProfilerState = function(p33, p34) -- line: 307
+			-- upvalues: p32 (copy), SetScriptProfilerState (copy)
+			if p33 then
+				p32(SetScriptProfilerState(p33, nil, p34, nil))
+
+				return
+			end
+
+			p32(SetScriptProfilerState(p33, nil, nil, p34))
+		end,
+		dispatchSetScriptProfilerUsePercentages = function(p35) -- line: 315
+			-- upvalues: p32 (copy), SetScriptProfilerState (copy)
+			p32(SetScriptProfilerState(nil, p35))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v44)

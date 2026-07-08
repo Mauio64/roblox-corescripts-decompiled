@@ -1,60 +1,72 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.t);
-local v2 = {
-    minimumItemsPerRow = 2, 
-    minimumItemWidth = 160
-};
-local v3 = {
-    minimumItemsPerRow = 1, 
-    minimumItemWidth = 332
-};
-local function _(v4, v5, v6) --[[ Line: 24 ]] --[[ Name: getItemMetrics ]]
-    local v7 = math.floor((v4 + v5) / (v6.minimumItemWidth + v5));
-    v7 = math.max(v6.minimumItemsPerRow, v7);
-    local v8 = math.floor((v4 - (v7 - 1) * v5) / v7);
-    return {
-        itemsPerRow = v7, 
-        itemWidth = v8
-    };
-end;
-local v10 = {};
-local v11 = v1.strictInterface({
-    minimumItemsPerRow = v1.intersection(v1.integer, v1.numberMin(1)), 
-    minimumItemWidth = v1.numberMin(0)
-});
-local v12 = v1.tuple(v1.numberMin(0), v1.number);
-v10.makeCustomMetricsGetter = function(v13) --[[ Line: 48 ]] --[[ Name: makeCustomMetricsGetter ]]
-    -- upvalues: v11 (copy), v12 (copy)
-    assert(v11(v13));
-    return function(v14, v15) --[[ Line: 51 ]]
-        -- upvalues: v12 (ref), v13 (copy)
-        assert(v12(v14, v15));
-        local l_v13_0 = v13;
-        local v17 = math.floor((v14 + v15) / (l_v13_0.minimumItemWidth + v15));
-        v17 = math.max(l_v13_0.minimumItemsPerRow, v17);
-        local v18 = math.floor((v14 - (v17 - 1) * v15) / v17);
-        return {
-            itemsPerRow = v17, 
-            itemWidth = v18
-        };
-    end;
-end;
-v10.getLargeMetrics = v10.makeCustomMetricsGetter(v3);
-v10.getMediumMetrics = v10.makeCustomMetricsGetter(v2);
-v10.getSmallMetrics = function(v19, v20) --[[ Line: 60 ]] --[[ Name: getSmallMetrics ]]
-    -- upvalues: v10 (copy)
-    local v21 = v10.getMediumMetrics(v19, v20).itemsPerRow + 1;
-    local v22 = math.floor((v19 - (v21 - 1) * v20) / v21);
-    return {
-        itemsPerRow = v21, 
-        itemWidth = v22
-    };
-end;
-v10.getMetricsForFixedColumns = function(v23, v24, v25) --[[ Line: 73 ]] --[[ Name: getMetricsForFixedColumns ]]
-    local v26 = math.floor((v23 - (v25 - 1) * v24) / v25);
-    return {
-        itemsPerRow = v25, 
-        itemWidth = v26
-    };
-end;
-return v10;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local t = require(ParentParent.t)
+local t1 = {
+	minimumItemsPerRow = 2,
+	minimumItemWidth = 160
+}
+local t2 = {
+	minimumItemsPerRow = 1,
+	minimumItemWidth = 332
+}
+
+local function getItemMetrics(p1, p2, p3) -- line: 24
+	local v12 = math.floor((p1 + p2) / (p3.minimumItemWidth + p2))
+	local v13 = math.max(p3.minimumItemsPerRow, v12)
+	local v14 = math.floor((p1 - (v13 - 1) * p2) / v13)
+
+	return {
+		itemsPerRow = v13,
+		itemWidth = v14
+	}
+end
+
+local t3 = {}
+local v7 = t.strictInterface({
+	minimumItemsPerRow = t.intersection(t.integer, t.numberMin(1)),
+	minimumItemWidth = t.numberMin(0)
+})
+local v8 = t.tuple(t.numberMin(0), t.number)
+
+function t3.makeCustomMetricsGetter(p4) -- line: 48
+	-- upvalues: v7 (copy), v8 (copy)
+	assert(v7(p4))
+
+	return function(p5, p6) -- line: 51
+		-- upvalues: v8 (copy), p4 (copy)
+		assert(v8(p5, p6))
+
+		local v26 = p4
+		local v27 = math.floor((p5 + p6) / (v26.minimumItemWidth + p6))
+		local v28 = math.max(v26.minimumItemsPerRow, v27)
+		local v29 = math.floor((p5 - (v28 - 1) * p6) / v28)
+
+		return {
+			itemsPerRow = v28,
+			itemWidth = v29
+		}
+	end
+end
+
+t3.getLargeMetrics = t3.makeCustomMetricsGetter(t2)
+t3.getMediumMetrics = t3.makeCustomMetricsGetter(t1)
+
+function t3.getSmallMetrics(p7, p8) -- line: 60
+	-- upvalues: t3 (copy)
+	local v18 = t3.getMediumMetrics(p7, p8).itemsPerRow + 1
+	local v19 = math.floor((p7 - (v18 - 1) * p8) / v18)
+
+	return {
+		itemsPerRow = v18,
+		itemWidth = v19
+	}
+end
+function t3.getMetricsForFixedColumns(p9, p10, p11) -- line: 73
+	local v23 = math.floor((p9 - (p11 - 1) * p10) / p11)
+
+	return {
+		itemsPerRow = p11,
+		itemWidth = v23
+	}
+end
+
+return t3

@@ -7,49 +7,51 @@ local Badge = Foundation.Badge
 local BadgeVariant = Foundation.Enums.BadgeVariant
 local useLocalization = require(Parent.Localization).Hooks.useLocalization
 
-return function(t1: {[any]: any}) --[[ RobloxPlusUpsellBannerCTA ]] -- line: 25
+local function RobloxPlusUpsellBannerCTA(t1: {[any]: any}) -- line: 25
 	-- upvalues: useLocalization (copy), React (copy), View (copy), Badge (copy), BadgeVariant (copy), FoundationText (copy)
-	local v10 = useLocalization({
+	local v11 = useLocalization({
 		getFreeTrialText = "Feature.RobloxSubscription.Label.FreeTrialText",
 		subscribe = "Feature.RobloxSubscription.Action.Subscribe",
 		newBadge = "Feature.Catalog.Label.New"
 	})
-	local v11 = React.useCallback(function() -- line: 32
-		-- upvalues: t1 (copy), v10 (copy)
+	local v12 = React.useCallback(function() -- line: 32
+		-- upvalues: t1 (copy), v11 (copy)
 		if t1.productInfo.isFreeTrial then
-			return v10.getFreeTrialText
+			return v11.getFreeTrialText
 		end
 
-		return v10.subscribe
+		return v11.subscribe
 	end, {
 		t1.productInfo.isFreeTrial,
-		v10.getFreeTrialText,
-		v10.subscribe
+		v11.getFreeTrialText,
+		v11.subscribe
 	})
 
 	if t1.shouldShowNewBadge then
 		return React.createElement(View, {
+			tag = "row align-y-center gap-xsmall auto-xy",
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1, 0, 0.5, 0),
-			tag = "row align-y-center gap-xsmall auto-xy"
+			Position = UDim2.new(1, 0, 0.5, 0)
 		}, {
 			NewBadge = React.createElement(Badge, {
-				text = v10.newBadge,
-				variant = BadgeVariant.Contrast,
-				LayoutOrder = 1
+				LayoutOrder = 1,
+				text = v11.newBadge,
+				variant = BadgeVariant.Contrast
 			})
 		})
 	end
 
 	return React.createElement(View, {
+		tag = "auto-xy",
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, 0, 0.5, 0),
-		tag = "auto-xy"
+		Position = UDim2.new(1, 0, 0.5, 0)
 	}, {
 		SubscribeText = React.createElement(FoundationText, {
 			tag = "auto-xy text-body-small content-default",
-			Text = "<u>" .. v11() .. "</u>",
-			RichText = true
+			RichText = true,
+			Text = "<u>" .. v12() .. "</u>"
 		})
 	})
 end
+
+return RobloxPlusUpsellBannerCTA

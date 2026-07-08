@@ -1,7 +1,8 @@
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_getPlatformTarget_0 = require(l_Parent_0.Analytics).getPlatformTarget;
-return function(v3, v4, v5) --[[ Line: 5 ]]
-    -- upvalues: l_EventIngestService_0 (copy), l_getPlatformTarget_0 (copy)
-    l_EventIngestService_0:SendEventDeferred(l_getPlatformTarget_0(), v3, v4, v5 or {});
-end;
+local EventIngestService = game:GetService("EventIngestService")
+local ParentParent = script.Parent.Parent.Parent
+local getPlatformTarget = require(ParentParent.Analytics).getPlatformTarget
+
+return function(s1: string, s2: string, t1: {[any]: any}?) -- line: 5
+	-- upvalues: EventIngestService (copy), getPlatformTarget (copy)
+	EventIngestService:SendEventDeferred(getPlatformTarget(), s1, s2, t1 or {})
+end

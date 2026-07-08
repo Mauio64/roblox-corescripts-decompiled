@@ -1,7 +1,8 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)("RetrievalStatus", {
-    "NotStarted", 
-    "Fetching", 
-    "Done", 
-    "Failed"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)("RetrievalStatus", {
+	"NotStarted",
+	"Fetching",
+	"Done",
+	"Failed"
+})

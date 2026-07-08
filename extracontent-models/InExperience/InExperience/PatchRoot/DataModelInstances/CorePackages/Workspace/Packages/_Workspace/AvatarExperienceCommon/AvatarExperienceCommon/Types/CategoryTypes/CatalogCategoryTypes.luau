@@ -1,2 +1,3 @@
-local _ = require(script.Parent.CategoryTypes);
-return {};
+require(script.Parent.CategoryTypes)
+
+return {}

@@ -1,27 +1,33 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local v1 = {
-    MeshId = true, 
-    CageMeshId = true, 
-    ReferenceMeshId = true
-};
-local v2 = {
-    TextureId = true, 
-    MetalnessMap = true, 
-    NormalMap = true, 
-    RoughnessMap = true
-};
-return function(v3) --[[ Line: 15 ]] --[[ Name: preloadEditablesFromRootInstance ]]
-    -- upvalues: v1 (copy), l_UGCValidationService_0 (copy), v2 (copy)
-    local v4 = {};
-    local v5 = {};
-    local l_v3_Descendants_0 = v3:GetDescendants();
-    table.insert(l_v3_Descendants_0, v3);
-    for _, v8 in l_v3_Descendants_0 do
-        if v8:IsA("BinaryStringValue") and v1[v8.Name] then
-            v4[v8.Parent[v8.Name]] = l_UGCValidationService_0:CreateEditableMeshFromBinaryStringRobloxOnly(v8);
-        elseif v8:IsA("BinaryStringValue") and v2[v8.Name] then
-            v5[v8.Parent[v8.Name]] = l_UGCValidationService_0:CreateEditableImageFromBinaryStringRobloxOnly(v8);
-        end;
-    end;
-    return v4, v5;
-end;
+local UGCValidationService = game:GetService("UGCValidationService")
+local t1 = {
+	MeshId = true,
+	CageMeshId = true,
+	ReferenceMeshId = true
+}
+local t2 = {
+	TextureId = true,
+	MetalnessMap = true,
+	NormalMap = true,
+	RoughnessMap = true
+}
+
+local function preloadEditablesFromRootInstance(p1) -- line: 15
+	-- upvalues: t1 (copy), UGCValidationService (copy), t2 (copy)
+	local t3 = {}
+	local t4 = {}
+	local descendants = p1:GetDescendants()
+
+	table.insert(descendants, p1)
+
+	for _, v10 in descendants do
+		if v10:IsA("BinaryStringValue") and t1[v10.Name] then
+			t3[v10.Parent[v10.Name]] = UGCValidationService:CreateEditableMeshFromBinaryStringRobloxOnly(v10)
+		elseif v10:IsA("BinaryStringValue") and t2[v10.Name] then
+			t4[v10.Parent[v10.Name]] = UGCValidationService:CreateEditableImageFromBinaryStringRobloxOnly(v10)
+		end
+	end
+
+	return t3, t4
+end
+
+return preloadEditablesFromRootInstance

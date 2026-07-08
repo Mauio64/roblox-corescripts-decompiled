@@ -1,76 +1,86 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_CapturesCommonNetworking_0 = require(l_Parent_0.Networking).CapturesCommonNetworking;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.RoactUtils);
-local v5 = require(l_Parent_0.Enums.AssetType);
-local v6 = require(l_Parent_0.Enums.ThumbnailState);
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v3.useEffect;
-local l_useState_0 = v3.useState;
-local v10 = game:DefineFastInt("ContentPostsThumbnailsInitialDelayTimeMs", 100);
-local v11 = game:DefineFastInt("ContentPostsThumbnailsMaxRetries", 10);
-local function v18(v12, v13, v14) --[[ Line: 20 ]] --[[ Name: makeThumbnailRequest ]]
-    -- upvalues: l_CapturesCommonNetworking_0 (copy), v5 (copy), v6 (copy)
-    return v12(l_CapturesCommonNetworking_0.GetThumbnailByAssetId.API({
-        assetId = v13, 
-        assetType = v5.Screenshot, 
-        size = v14
-    })):andThen(function(v15) --[[ Line: 26 ]]
-        -- upvalues: v6 (ref)
-        local v16 = v15.responseBody.data[1];
-        if v16.imageUrl and v16.imageUrl ~= "" and v16.state == v6.Completed then
-            return v16.imageUrl;
-        else
-            return nil;
-        end;
-    end):catch(function(_) --[[ Line: 38 ]]
-        return nil;
-    end):await();
-end;
-return function(v19, v20, v21) --[[ Line: 44 ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useState_0 (copy), l_useEffect_0 (copy), v10 (copy), v11 (copy), v18 (copy)
-    local v22 = l_useDispatch_0();
-    local v23, v24 = l_useState_0("");
-    local v25, v26 = l_useState_0(false);
-    local v27 = tostring(v20) .. "x" .. tostring(v21);
-    l_useEffect_0(function() --[[ Line: 52 ]]
-        -- upvalues: v10 (ref), v11 (ref), v26 (copy), v24 (copy), v19 (copy), v18 (ref), v22 (copy), v27 (copy)
-        local v28 = false;
-        local l_v10_0 = v10;
-        local l_v11_0 = v11;
-        v26(false);
-        v24("");
-        if not v19 then
-            return;
-        else
-            task.spawn(function() --[[ Line: 64 ]]
-                -- upvalues: v28 (ref), l_v11_0 (ref), v18 (ref), v22 (ref), v19 (ref), v27 (ref), v24 (ref), v26 (ref), l_v10_0 (ref)
-                while not v28 and l_v11_0 > 0 do
-                    local v31, v32 = v18(v22, v19, v27);
-                    if not v28 then
-                        if v31 and v32 then
-                            v24(v32);
-                            v26(true);
-                            return;
-                        else
-                            task.wait(l_v10_0 / 1000);
-                            l_v10_0 = l_v10_0 * 2;
-                            l_v11_0 = l_v11_0 - 1;
-                        end;
-                    else
-                        break;
-                    end;
-                end;
-            end);
-            return function() --[[ Line: 84 ]]
-                -- upvalues: v28 (ref)
-                v28 = true;
-            end;
-        end;
-    end, {
-        v19, 
-        v27
-    });
-    return v23, v25;
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local CapturesCommonNetworking = require(ParentParent.Networking).CapturesCommonNetworking
+local React = require(ParentParentParent.React)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local AssetType = require(ParentParent.Enums.AssetType)
+local ThumbnailState = require(ParentParent.Enums.ThumbnailState)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useState = React.useState
+local v11 = game:DefineFastInt("ContentPostsThumbnailsInitialDelayTimeMs", 100)
+local v12 = game:DefineFastInt("ContentPostsThumbnailsMaxRetries", 10)
+
+local function makeThumbnailRequest(p1, n1: number, s1: string) -- line: 20
+	-- upvalues: CapturesCommonNetworking (copy), AssetType (copy), ThumbnailState (copy)
+	return p1(CapturesCommonNetworking.GetThumbnailByAssetId.API({
+		assetId = n1,
+		assetType = AssetType.Screenshot,
+		size = s1
+	})):andThen(function(p2) -- line: 26
+		-- upvalues: ThumbnailState (copy)
+		local v27 = p2.responseBody.data[1]
+
+		if v27.imageUrl and (v27.imageUrl ~= "" and v27.state == ThumbnailState.Completed) then
+			return v27.imageUrl
+		end
+
+		return nil
+	end):catch(function(_) -- line: 38
+		return nil
+	end):await()
+end
+
+return function(n2: number?, n3: number, n4: number) -- line: 44
+	-- upvalues: useDispatch (copy), useState (copy), useEffect (copy), v11 (copy), v12 (copy), makeThumbnailRequest (copy)
+	local v20 = useDispatch()
+	local v21, v22 = useState("")
+	local v23, v24 = useState(false)
+	local v25 = tostring(n3) .. "x" .. tostring(n4)
+
+	useEffect(function() -- line: 52
+		-- upvalues: v11 (copy), v12 (copy), v24 (copy), v22 (copy), n2 (copy), makeThumbnailRequest (copy), v20 (copy), v25 (copy)
+		local u29 = false
+		local u30 = v11
+		local u31 = v12
+
+		v24(false)
+		v22("")
+
+		if not n2 then
+			return
+		end
+
+		task.spawn(function() -- line: 64
+			-- upvalues: u29 (ref), u31 (ref), makeThumbnailRequest (copy), v20 (copy), n2 (copy), v25 (copy), v22 (copy), v24 (copy), u30 (ref)
+			while not u29 and u31 > 0 do
+				local v32, v33 = makeThumbnailRequest(v20, n2, v25)
+
+				if u29 then
+					return
+				end
+
+				if v32 and v33 then
+					v22(v33)
+					v24(true)
+
+					return
+				end
+
+				task.wait(u30 / 1000)
+				u30 *= 2
+				u31 -= 1
+			end
+		end)
+
+		return function() -- line: 84
+			-- upvalues: u29 (ref)
+			u29 = true
+		end
+	end, {
+		n2,
+		v25
+	})
+
+	return v21, v23
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddAutoTranslateToLoadingScreen", false);
+return game:DefineFastFlag("AddAutoTranslateToLoadingScreen", false)

@@ -1,12 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v1 = require(l_script_FirstAncestor_0.Hooks.useBackgroundExperience);
-return function() --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local v2 = v1();
-    local v3 = v2 and v2.jobId;
-    local v4 = false;
-    if v3 ~= nil then
-        v4 = v3 ~= "";
-    end;
-    return v4;
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local useBackgroundExperience = require(CrossExperienceVoice.Hooks.useBackgroundExperience)
+
+return function() -- line: 5
+	-- upvalues: useBackgroundExperience (copy)
+	local v3 = useBackgroundExperience()
+	local v4 = v3 and v3.jobId
+
+	return v4 ~= nil and v4 ~= ""
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogItemCardSelectedOverlayButtonLogging", false);
+return game:DefineFastFlag("AXCatalogItemCardSelectedOverlayButtonLogging", false)

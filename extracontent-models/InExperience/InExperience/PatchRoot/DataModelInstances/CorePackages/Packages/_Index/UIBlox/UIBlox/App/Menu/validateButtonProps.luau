@@ -1,41 +1,42 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Core_0 = l_Parent_0.Core;
-local v3 = require(l_Parent_1.t);
-local v4 = require(l_Parent_0.Core.Style.Validator.validateColorInfo);
-local v5 = require(l_Core_0.Style.Validator.validateFontInfo);
-local v6 = require(l_Parent_0.Core.Style.Validator.validateTypographyInfo);
-return v3.array(v3.strictInterface({
-    icon = v3.optional(v3.union(v3.table, v3.string)), 
-    text = v3.string, 
-    onActivated = v3.callback, 
-    disabled = v3.optional(v3.boolean), 
-    inputBindingKey = v3.optional(v3.string), 
-    keyCodeLabel = v3.optional(v3.union(v3.enum(Enum.KeyCode), v3.strictInterface({
-        key = v3.enum(Enum.KeyCode), 
-        axis = v3.optional(v3.string)
-    }))), 
-    selected = v3.optional(v3.boolean), 
-    stayOnActivated = v3.optional(v3.boolean), 
-    renderRightSideGadget = v3.optional(v3.callback), 
-    rightSideGadgetSize = v3.optional(v3.Vector2), 
-    iconColorOverride = v3.optional(v3.Color3), 
-    textColorOverride = v3.optional(v3.Color3), 
-    dividerOffset = v3.optional(v3.number), 
-    dividerSize = v3.optional(v3.number), 
-    leftPaddingOffset = v3.optional(v3.number), 
-    fontStyle = v3.optional(v3.union(v3.string, v5, v6)), 
-    iconSize = v3.optional(v3.integer), 
-    selectedIconSize = v3.optional(v3.integer), 
-    iconPaddingLeft = v3.optional(v3.integer), 
-    textPadding = v3.optional(v3.strictInterface({
-        left = v3.integer, 
-        right = v3.integer
-    })), 
-    selectedIconPaddingRight = v3.optional(v3.integer), 
-    keyLabelPaddingRight = v3.optional(v3.integer), 
-    textOnlyPadding = v3.optional(v3.integer), 
-    buttonTextOverride = v3.optional(v3.table), 
-    borderCornerRadius = v3.optional(v3.integer), 
-    background = v3.optional(v4)
-}));
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Core = ParentParent.Core
+local t = require(ParentParentParent.t)
+local validateColorInfo = require(ParentParent.Core.Style.Validator.validateColorInfo)
+local validateFontInfo = require(Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(ParentParent.Core.Style.Validator.validateTypographyInfo)
+
+return t.array(t.strictInterface({
+	icon = t.optional(t.union(t.table, t.string)),
+	text = t.string,
+	onActivated = t.callback,
+	disabled = t.optional(t.boolean),
+	inputBindingKey = t.optional(t.string),
+	keyCodeLabel = t.optional(t.union(t.enum(Enum.KeyCode), t.strictInterface({
+		key = t.enum(Enum.KeyCode),
+		axis = t.optional(t.string)
+	}))),
+	selected = t.optional(t.boolean),
+	stayOnActivated = t.optional(t.boolean),
+	renderRightSideGadget = t.optional(t.callback),
+	rightSideGadgetSize = t.optional(t.Vector2),
+	iconColorOverride = t.optional(t.Color3),
+	textColorOverride = t.optional(t.Color3),
+	dividerOffset = t.optional(t.number),
+	dividerSize = t.optional(t.number),
+	leftPaddingOffset = t.optional(t.number),
+	fontStyle = t.optional(t.union(t.string, validateFontInfo, validateTypographyInfo)),
+	iconSize = t.optional(t.integer),
+	selectedIconSize = t.optional(t.integer),
+	iconPaddingLeft = t.optional(t.integer),
+	textPadding = t.optional(t.strictInterface({
+		left = t.integer,
+		right = t.integer
+	})),
+	selectedIconPaddingRight = t.optional(t.integer),
+	keyLabelPaddingRight = t.optional(t.integer),
+	textOnlyPadding = t.optional(t.integer),
+	buttonTextOverride = t.optional(t.table),
+	borderCornerRadius = t.optional(t.integer),
+	background = t.optional(validateColorInfo)
+}))

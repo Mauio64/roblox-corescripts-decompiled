@@ -1,17 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.Dash);
-local v2 = require(l_Parent_0.React);
-local l_None_0 = v1.None;
-local v4 = v2.createContext(l_None_0);
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local Dash = require(Parent.Dash)
+local React = require(Parent.React)
+local None = Dash.None
+local v5 = React.createContext(None)
+
 return {
-    Provider = v4.Provider, 
-    useStyleSheet = function() --[[ Line: 11 ]] --[[ Name: useStyleSheet ]]
-        -- upvalues: v2 (copy), v4 (copy), l_None_0 (copy)
-        local v5 = v2.useContext(v4);
-        if v5 == l_None_0 then
-            return nil;
-        else
-            return v5;
-        end;
-    end
-};
+	Provider = v5.Provider,
+	useStyleSheet = function() -- line: 11
+		-- upvalues: React (copy), v5 (copy), None (copy)
+		local v6 = React.useContext(v5)
+
+		if v6 == None then
+			return nil
+		end
+
+		return v6
+	end
+}

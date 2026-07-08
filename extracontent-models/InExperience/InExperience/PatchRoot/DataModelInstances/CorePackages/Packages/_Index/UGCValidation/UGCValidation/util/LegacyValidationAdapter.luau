@@ -1,149 +1,257 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.validationSystem.ValidationManager);
-local v3 = require(l_Parent_0.flags.getFFlagUGCValidationCombineEntrypointResults);
-local v4 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
-local v5 = {};
-local function v15(v6) --[[ Line: 9 ]] --[[ Name: fallbackLocalizationFunction ]]
-    -- upvalues: v4 (copy)
-    local v7 = v6.key:split(".");
-    local v8 = v7[#v7];
-    local v9 = v4.Values[v8];
-    if not v9 then
-        return v6.key;
-    else
-        local v10 = {};
-        local v11 = nil;
-        for v12 = 1, #v9 do
-            local v13 = string.sub(v9, v12, v12);
-            if v13 == "{" then
-                v11 = {};
-            elseif v13 == "}" then
-                if v11 ~= nil then
-                    local v14 = table.concat(v11);
-                    if v6.params[v14] ~= nil then
-                        table.insert(v10, (tostring(v6.params[v14])));
-                    end;
-                    v11 = nil;
-                end;
-            elseif v11 ~= nil then
-                table.insert(v11, v13);
-            else
-                table.insert(v10, v13);
-            end;
-        end;
-        return table.concat(v10);
-    end;
-end;
-v5.getPrecomputedEditables = function(v16, v17) --[[ Line: 45 ]] --[[ Name: getPrecomputedEditables ]]
-    local v18 = {
-        {}, 
-        {}
-    };
-    for v19, v20 in {
-        v16, 
-        v17
-    } do
-        for v21, v22 in v20 do
-            for v23, v24 in v22 do
-                pcall(function() --[[ Line: 54 ]]
-                    -- upvalues: v21 (copy), v23 (copy), v18 (copy), v19 (copy), v24 (copy)
-                    local v25 = v21[v23];
-                    if v25 ~= nil and v25 ~= "" then
-                        v18[v19][v25] = v24.instance;
-                    end;
-                end);
-            end;
-        end;
-    end;
-    return v18[1], v18[2];
-end;
-local function v32(v26, v27) --[[ Line: 67 ]] --[[ Name: fetchString ]]
-    -- upvalues: v15 (copy)
-    local v28 = nil;
-    local v29 = nil;
-    if v26 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 73 ]]
-            -- upvalues: v26 (copy), v27 (copy)
-            return v26(v27);
-        end);
-        v28 = l_status_0;
-        v29 = l_result_0;
-    end;
-    if v28 and v29 ~= v27.key then
-        return v29;
-    else
-        return v15(v27);
-    end;
-end;
-v5.combineResultsIntoLegacy = function(v33, v34, v35, v36) --[[ Line: 85 ]] --[[ Name: combineResultsIntoLegacy ]]
-    -- upvalues: v32 (copy), v4 (copy)
-    local l_v33_0 = v33;
-    local l_v34_0 = v34;
-    l_v33_0 = l_v33_0 and v35.pass;
-    if #v35.errorTranslationContexts > 0 then
-        if l_v34_0 == nil then
-            l_v34_0 = {};
-        end;
-        for _, v40 in v35.errorTranslationContexts do
-            table.insert(l_v34_0, v32(v36, v40));
-        end;
-    end;
-    if not l_v33_0 and (l_v34_0 == nil or #l_v34_0 == 0) then
-        if l_v34_0 == nil then
-            l_v34_0 = {};
-        end;
-        table.insert(l_v34_0, v32(v36, {
-            key = v4.Keys.FailureWithoutReason, 
-            params = {}
-        }));
-    end;
-    return l_v33_0, l_v34_0;
-end;
-v5.studioRFUAssetValidation = function(v41, v42, v43, v44) --[[ Line: 124 ]] --[[ Name: studioRFUAssetValidation ]]
-    -- upvalues: v5 (copy), v2 (copy), v3 (copy)
-    local v45 = "Toolbox";
-    local v46 = v41.bypassFlags and v41.bypassFlags.enforceShadowValidations or false;
-    if v41.bypassFlags and v41.bypassFlags.studioPluginName then
-        v45 = v41.bypassFlags.studioPluginName;
-    end;
-    local v47, v48 = v5.getPrecomputedEditables(v41.editableMeshes or {}, v41.editableImages or {});
-    local v49 = v2.ValidateAsset(v41.instances, v41.assetTypeEnum, {
-        source = v45, 
-        enforceR15FolderStructure = v41.requireAllFolders or false, 
-        enforceShadowValidations = v46, 
-        telemetryBundleId = v42, 
-        preloadedEditableMeshes = v47, 
-        preloadedEditableImages = v48
-    });
-    if v3() then
-        return v5.combineResultsIntoLegacy(v43, v44, v49, if v41.bypassFlags ~= nil then v41.bypassFlags.localizationCallback else nil);
-    else
-        return v43, v44;
-    end;
-end;
-v5.studioRFUBundleValidation = function(v50, v51, v52, v53, v54, v55) --[[ Line: 167 ]] --[[ Name: studioRFUBundleValidation ]]
-    -- upvalues: v5 (copy), v2 (copy), v3 (copy)
-    local v56 = "Toolbox";
-    if v52.bypassFlags and v52.bypassFlags.studioPluginName then
-        v56 = v52.bypassFlags.studioPluginName;
-    end;
-    local v57 = v52.bypassFlags and v52.bypassFlags.enforceShadowValidations or false;
-    local v58, v59 = v5.getPrecomputedEditables(v52.editableMeshes or {}, v52.editableImages or {});
-    local v60 = v2.ValidateFinalizedBundle(v50, v51, {
-        source = v56, 
-        enforceR15FolderStructure = v52.requireAllFolders or false, 
-        enforceShadowValidations = v57, 
-        telemetryBundleId = v53, 
-        preloadedEditableMeshes = v58, 
-        preloadedEditableImages = v59
-    });
-    if v3() then
-        assert(v52.bypassFlags);
-        assert(v52.bypassFlags.localizationCallback);
-        return v5.combineResultsIntoLegacy(v54, v55, v60, if v52.bypassFlags ~= nil then v52.bypassFlags.localizationCallback else nil);
-    else
-        return v54, v55;
-    end;
-end;
-return v5;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local ValidationManager = require(ParentParent.validationSystem.ValidationManager)
+local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
+local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local t1 = {
+	LegacyValidator = "LegacyValidator"
+}
+
+local function fallbackLocalizationFunction(p1, t2: {[any]: any}?) -- line: 15
+	-- upvalues: ErrorSourceStrings (copy)
+	local v11 = if not t2 then nil else t2[p1.key]
+
+	if v11 == nil then
+		local parts = p1.key:split(".")
+		local v13 = parts[#parts]
+
+		v11 = ErrorSourceStrings.Values[v13]
+	end
+
+	if v11 == nil then
+		return p1.key
+	end
+
+	local t3 = {}
+	local t4 = nil
+
+	for i = 1, #v11 do
+		local v17 = string.sub(v11, i, i)
+
+		if v17 == "{" then
+			t4 = {}
+		elseif v17 == "}" then
+			if t4 ~= nil then
+				local v18 = table.concat(t4)
+
+				if p1.params[v18] ~= nil then
+					table.insert(t3, (tostring(p1.params[v18])))
+				end
+
+				t4 = nil
+			end
+		elseif t4 ~= nil then
+			table.insert(t4, v17)
+		else
+			table.insert(t3, v17)
+		end
+	end
+
+	return table.concat(t3)
+end
+
+function t1.getPrecomputedEditables(p2, p3) -- line: 59
+	local t5 = {
+		{},
+		{}
+	}
+
+	for v22, v23 in {
+		p2,
+		p3
+	} do
+		for v24, v25 in v23 do
+			for v26, v27 in v25 do
+				pcall(function() -- line: 68
+					-- upvalues: v24 (copy), v26 (copy), t5 (copy), v22 (copy), v27 (copy)
+					local v71 = v24[v26]
+
+					if v71 ~= nil and v71 ~= "" then
+						t5[v22][v71] = v27.instance
+					end
+				end)
+			end
+		end
+	end
+
+	return t5[1], t5[2]
+end
+
+local function fetchString(p4: ((...any) -> ...any)?, p5, t6: {[any]: any}?) -- line: 81
+	-- upvalues: t1 (copy), fallbackLocalizationFunction (copy)
+	if p5.key == t1.LegacyValidator then
+		return p5.params.Message or ""
+	end
+
+	local ok = nil
+	local result = nil
+
+	if p4 then
+		ok, result = pcall(function() -- line: 92
+			-- upvalues: p4 (copy), p5 (copy)
+			return p4(p5)
+		end)
+	end
+
+	if ok and result ~= p5.key then
+		return result
+	end
+
+	return fallbackLocalizationFunction(p5, t6)
+end
+
+function t1.combineResultsIntoLegacy(b1: boolean, t7: {[any]: any}?, p6, p7: ((...any) -> ...any)?) -- line: 105
+	-- upvalues: getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), fetchString (copy), ErrorSourceStrings (copy)
+	local v37 = b1 and p6.pass
+
+	if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
+		if next(p6.failureMap) ~= nil then
+			if t7 == nil then
+				t7 = {}
+			end
+
+			for _, v39 in p6.failureMap do
+				for _, v41 in v39 do
+					table.insert(t7, fetchString(p7, {
+						key = v41.failureStringKey,
+						params = v41.failureStringParams
+					}, p6.relevantSourceStrings))
+				end
+			end
+		end
+	else
+		local errorTranslationContexts = p6.errorTranslationContexts
+
+		if errorTranslationContexts and #errorTranslationContexts > 0 then
+			if t7 == nil then
+				t7 = {}
+			end
+
+			for _, v44 in errorTranslationContexts do
+				table.insert(t7, fetchString(p7, v44))
+			end
+		end
+	end
+
+	if not v37 and (t7 == nil or #t7 == 0) then
+		if t7 == nil then
+			t7 = {}
+		end
+
+		if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
+			table.insert(t7, fetchString(p7, {
+				key = ErrorSourceStrings.Keys.InternalError,
+				params = {
+					ValidationJobId = p6.validationJobId
+				}
+			}, p6.relevantSourceStrings))
+
+			return v37, t7
+		end
+
+		table.insert(t7, fetchString(p7, {
+			key = ErrorSourceStrings.Keys.FailureWithoutReason,
+			params = {}
+		}))
+	end
+
+	return v37, t7
+end
+function t1.mergeLegacyIntoModern(b2: boolean, t8: {[any]: any}?, p8) -- line: 172
+	-- upvalues: getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), t1 (copy)
+	assert(getEngineFeatureEngineUGCValidationExpandReturnSchema(), "mergeLegacyIntoModern requires EngineUGCValidationExpandReturnSchema")
+	p8.pass = p8.pass and b2
+
+	if t8 and #t8 > 0 then
+		local t9 = {}
+
+		for _, v50 in t8 do
+			if v50 ~= "" then
+				table.insert(t9, {
+					instancePath = "",
+					failureStringKey = t1.LegacyValidator,
+					failureStringParams = {
+						Message = v50
+					}
+				})
+			end
+		end
+
+		if #t9 > 0 then
+			p8.failureMap[t1.LegacyValidator] = t9
+			p8.numFailures = p8.numFailures + #t9
+		end
+	end
+end
+function t1.studioRFUAssetValidation(p9, s1: string, b3: boolean, t10: {[any]: any}?) -- line: 204
+	-- upvalues: t1 (copy), ValidationManager (copy), getFFlagUGCValidationCombineEntrypointResults (copy)
+	local s2 = "Toolbox"
+	local v56 = not not p9.bypassFlags and (p9.bypassFlags.enforceShadowValidations or false)
+
+	if p9.bypassFlags and p9.bypassFlags.studioPluginName then
+		s2 = p9.bypassFlags.studioPluginName
+	end
+
+	local v57, v58 = t1.getPrecomputedEditables(p9.editableMeshes or {}, p9.editableImages or {})
+	local v59 = ValidationManager.ValidateAsset(p9.instances, p9.assetTypeEnum, {
+		source = s2,
+		enforceR15FolderStructure = p9.requireAllFolders or false,
+		enforceShadowValidations = v56,
+		telemetryBundleId = s1,
+		preloadedEditableMeshes = v57,
+		preloadedEditableImages = v58,
+		backendConfigs = if not p9.restrictedUserIds then nil else {
+			restrictedUserIds = p9.restrictedUserIds
+		},
+		iecConfigs = if not p9.token then nil else {
+			token = p9.token,
+			universeId = p9.universeId
+		}
+	})
+
+	if getFFlagUGCValidationCombineEntrypointResults() then
+		return t1.combineResultsIntoLegacy(b3, t10, v59, if p9.bypassFlags == nil then nil else p9.bypassFlags.localizationCallback)
+	end
+
+	return b3, t10
+end
+function t1.studioRFUBundleValidation(p10, p11, p12, s3: string, b4: boolean, t11: {[any]: any}?) -- line: 257
+	-- upvalues: t1 (copy), ValidationManager (copy), getFFlagUGCValidationCombineEntrypointResults (copy)
+	local s4 = "Toolbox"
+
+	if p12.bypassFlags and p12.bypassFlags.studioPluginName then
+		s4 = p12.bypassFlags.studioPluginName
+	end
+
+	local v67 = not not p12.bypassFlags and (p12.bypassFlags.enforceShadowValidations or false)
+	local v68, v69 = t1.getPrecomputedEditables(p12.editableMeshes or {}, p12.editableImages or {})
+	local v70 = ValidationManager.ValidateFinalizedBundle(p10, p11, {
+		source = s4,
+		enforceR15FolderStructure = p12.requireAllFolders or false,
+		enforceShadowValidations = v67,
+		telemetryBundleId = s3,
+		preloadedEditableMeshes = v68,
+		preloadedEditableImages = v69,
+		backendConfigs = if not p12.restrictedUserIds then nil else {
+			restrictedUserIds = p12.restrictedUserIds
+		},
+		iecConfigs = if not p12.token then nil else {
+			token = p12.token,
+			universeId = p12.universeId
+		}
+	})
+
+	if getFFlagUGCValidationCombineEntrypointResults() then
+		assert(p12.bypassFlags)
+		assert(p12.bypassFlags.localizationCallback)
+
+		return t1.combineResultsIntoLegacy(b4, t11, v70, if p12.bypassFlags == nil then nil else p12.bypassFlags.localizationCallback)
+	end
+
+	return b4, t11
+end
+
+return t1

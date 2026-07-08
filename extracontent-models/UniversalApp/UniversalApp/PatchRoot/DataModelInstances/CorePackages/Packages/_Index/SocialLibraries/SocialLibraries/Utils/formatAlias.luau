@@ -1,3 +1,3 @@
-return function(v0) --[[ Line: 1 ]]
-    return string.format("(%s)", v0);
-end;
+return function(p1) -- line: 1
+	return string.format("(%s)", p1)
+end

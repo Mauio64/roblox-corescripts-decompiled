@@ -1,62 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.Parent.EditBio);
-local v4 = require(l_Parent_0.Promise);
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v6 = require(l_script_FirstAncestor_0.Stores.EditProfileStore);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v8 = require(l_script_FirstAncestor_0.Analytics.AnalyticsServiceV2);
-return function(v9) --[[ Line: 18 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v6 (copy), l_useSignalState_0 (copy), v2 (copy), v8 (copy), v4 (copy), v3 (copy)
-    local v10 = l_useLocalUserId_0();
-    local v11 = v6.getDescription(v10);
-    local v12 = l_useSignalState_0(v11.data) or "";
-    local v13, v14 = v2.useState(v12);
-    local v15, v16 = v2.useState(nil);
-    local v18 = v2.useCallback(function(v17) --[[ Line: 26 ]]
-        -- upvalues: v14 (copy), v16 (copy)
-        v14(v17);
-        v16(nil);
-    end, {});
-    v2.useEffect(function() --[[ Line: 31 ]]
-        -- upvalues: v14 (copy), v12 (copy)
-        v14(v12);
-    end, {
-        v12
-    });
-    v2.useEffect(function() --[[ Line: 35 ]]
-        -- upvalues: v9 (copy), v6 (ref), v10 (copy), v13 (copy), v16 (copy), v8 (ref), v4 (ref)
-        v9.registerSaveHandler(function() --[[ Line: 36 ]]
-            -- upvalues: v6 (ref), v10 (ref), v13 (ref), v16 (ref), v8 (ref), v4 (ref)
-            return v6.updateDescription(v10, v13):catch(function(v19) --[[ Line: 37 ]]
-                -- upvalues: v16 (ref), v8 (ref), v4 (ref)
-                if v19 then
-                    local v20 = nil;
-                    if v19.errors and v19.errors[1] then
-                        v20 = v19.errors[1].code;
-                    elseif v19.statusCode then
-                        v20 = v19.statusCode;
-                    end;
-                    if v20 then
-                        v16(v20);
-                        v8.sendError(v20);
-                    end;
-                    return v4.reject(v19);
-                else
-                    return;
-                end;
-            end);
-        end);
-    end, {
-        v9.registerSaveHandler, 
-        v10, 
-        v13
-    });
-    return v2.createElement(v3, {
-        bioText = v13, 
-        onDataChange = v18, 
-        errorCode = v15, 
-        textBoxRef = v9.textBoxRef
-    });
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local EditBio = require(script.Parent.EditBio)
+local Promise = require(EditProfileParent.Promise)
+local useLocalUserId = require(EditProfileParent.RobloxAppHooks).useLocalUserId
+local EditProfileStore = require(EditProfile.Stores.EditProfileStore)
+local useSignalState = require(EditProfileParent.SignalsReact).useSignalState
+local AnalyticsServiceV2 = require(EditProfile.Analytics.AnalyticsServiceV2)
+
+return function(t1: {[any]: any}) -- line: 18
+	-- upvalues: useLocalUserId (copy), EditProfileStore (copy), useSignalState (copy), React (copy), AnalyticsServiceV2 (copy), Promise (copy), EditBio (copy)
+	local v11 = useLocalUserId()
+	local v12 = EditProfileStore.getDescription(v11)
+	local v13 = useSignalState(v12.data) or ""
+	local v14, v15 = React.useState(v13)
+	local v16, v17 = React.useState(nil)
+	local v18 = React.useCallback(function(p1) -- line: 26
+		-- upvalues: v15 (copy), v17 (copy)
+		v15(p1)
+		v17(nil)
+	end, {})
+
+	React.useEffect(function() -- line: 31
+		-- upvalues: v15 (copy), v13 (copy)
+		v15(v13)
+	end, { v13 })
+	React.useEffect(function() -- line: 35
+		-- upvalues: t1 (copy), EditProfileStore (copy), v11 (copy), v14 (copy), v17 (copy), AnalyticsServiceV2 (copy), Promise (copy)
+		t1.registerSaveHandler(function() -- line: 36
+			-- upvalues: EditProfileStore (copy), v11 (copy), v14 (copy), v17 (copy), AnalyticsServiceV2 (copy), Promise (copy)
+			return EditProfileStore.updateDescription(v11, v14):catch(function(p2) -- line: 37
+				-- upvalues: v17 (copy), AnalyticsServiceV2 (copy), Promise (copy)
+				if p2 then
+					local code = nil
+
+					if p2.errors and p2.errors[1] then
+						code = p2.errors[1].code
+					elseif p2.statusCode then
+						code = p2.statusCode
+					end
+
+					if code then
+						v17(code)
+						AnalyticsServiceV2.sendError(code)
+					end
+
+					return Promise.reject(p2)
+				end
+			end)
+		end)
+	end, {
+		t1.registerSaveHandler,
+		v11,
+		v14
+	})
+
+	return React.createElement(EditBio, {
+		bioText = v14,
+		onDataChange = v18,
+		errorCode = v16,
+		textBoxRef = t1.textBoxRef
+	})
+end

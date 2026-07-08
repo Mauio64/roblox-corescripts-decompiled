@@ -1,11 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = {};
-local _ = require(l_Parent_0.GraphQL);
-v1.getResponseKeyFromInfo = function(v3) --[[ Line: 14 ]] --[[ Name: getResponseKeyFromInfo ]]
-    if v3.fieldNodes[1] and v3.fieldNodes[1].alias ~= nil then
-        return v3.fieldNodes[1].alias.value;
-    else
-        return v3.fieldName;
-    end;
-end;
-return v1;
+local ParentParent = script.Parent.Parent
+local t1 = {}
+
+require(ParentParent.GraphQL)
+
+function t1.getResponseKeyFromInfo(p1) -- line: 14
+	if p1.fieldNodes[1] and p1.fieldNodes[1].alias ~= nil then
+		return p1.fieldNodes[1].alias.value
+	end
+
+	return p1.fieldName
+end
+
+return t1

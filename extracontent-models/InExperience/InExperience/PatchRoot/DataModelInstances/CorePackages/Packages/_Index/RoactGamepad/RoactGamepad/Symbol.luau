@@ -1,12 +1,15 @@
 return {
-    named = function(v0) --[[ Line: 16 ]] --[[ Name: named ]]
-        assert(type(v0) == "string", "Symbols must be created using a string name!");
-        local v1 = newproxy(true);
-        local v2 = ("Symbol(%s)"):format(v0);
-        getmetatable(v1).__tostring = function() --[[ Line: 23 ]]
-            -- upvalues: v2 (copy)
-            return v2;
-        end;
-        return v1;
-    end
-};
+	named = function(p1) -- line: 16
+		assert(type(p1) == "string", "Symbols must be created using a string name!")
+
+		local v2 = newproxy(true)
+		local v3 = ("Symbol(%s)"):format(p1)
+
+		getmetatable(v2).__tostring = function() -- line: 23
+			-- upvalues: v3 (copy)
+			return v3
+		end
+
+		return v2
+	end
+}

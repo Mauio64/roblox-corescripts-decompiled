@@ -1,82 +1,94 @@
-local l_AdService_0 = game:GetService("AdService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_script_0 = script;
-local l_Parent_0 = l_script_0.Parent;
-local v4 = require(l_script_0.Flags);
-local v5 = require(l_script_0.components.AdPlayerComponent);
-local l_AdsDisplayOrder_0 = require(l_Parent_0.AdGuiInteractivity).AdsDisplayOrder;
-local v7 = require(l_Parent_0.ReactRoblox);
-local v8 = require(l_Parent_0.React);
-local v9 = require(l_script_0.components.BaseComponent);
+local AdService = game:GetService("AdService")
+local CoreGui = game:GetService("CoreGui")
+local _script = script
+local _scriptParent = _script.Parent
+local Flags = require(_script.Flags)
+local AdPlayerComponent = require(_script.components.AdPlayerComponent)
+local AdsDisplayOrder = require(_scriptParent.AdGuiInteractivity).AdsDisplayOrder
+local ReactRoblox = require(_scriptParent.ReactRoblox)
+local React = require(_scriptParent.React)
+local BaseComponent = require(_script.components.BaseComponent)
+
 return {
-    ["jest.config"] = l_script_0["jest.config"], 
-    init = function() --[[ Line: 26 ]] --[[ Name: init ]]
-        -- upvalues: l_AdsDisplayOrder_0 (copy), l_CoreGui_0 (copy), v7 (copy), l_AdService_0 (copy), v4 (copy), v8 (copy), v9 (copy), v5 (copy)
-        local l_ScreenGui_0 = Instance.new("ScreenGui");
-        l_ScreenGui_0.Name = "RewardedVideoAdPlayer";
-        l_ScreenGui_0.DisplayOrder = l_AdsDisplayOrder_0.AdPlayer;
-        l_ScreenGui_0.IgnoreGuiInset = true;
-        l_ScreenGui_0.ResetOnSpawn = false;
-        l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-        l_ScreenGui_0.Parent = l_CoreGui_0;
-        local v11 = v7.createRoot(l_ScreenGui_0);
-        l_AdService_0.onDemandVideoPlayInUI = function(v12) --[[ Line: 37 ]]
-            -- upvalues: v11 (copy), l_AdService_0 (ref), v4 (ref), v8 (ref), v9 (ref), v5 (ref)
-            local function _(v13) --[[ Line: 38 ]] --[[ Name: onVideoCompleted ]]
-                -- upvalues: v11 (ref), l_AdService_0 (ref), v12 (copy)
-                v11:render(nil);
-                l_AdService_0:onDemandVideoCompleteFromUI(v13, v12.encryptedAdTrackingData, v12.encryptionMetadata, v12.rewardDetails);
-            end;
-            local v15 = nil;
-            if v4.GetEnableLuaRewardTimerUI() and v12.durationNeededForRewardMs and v12.durationNeededEnum == "Variable" then
-                v15 = v12.durationNeededForRewardMs / 1000;
-            end;
-            local l_BindableEvent_0 = Instance.new("BindableEvent");
-            local v17 = nil;
-            v11:render(v8.createElement(v9, {}, {
-                v8.createElement(v5, {
-                    isEligible = v12.isEligible, 
-                    creativeAssetUrl = v12.creativeAssetUrl, 
-                    durationNeededForReward = if v4.GetEnableLuaRewardTimerUI() then v15 else nil, 
-                    onVideoFrameLoaded = function(v18) --[[ Line: 66 ]] --[[ Name: onVideoFrameLoaded ]]
-                        -- upvalues: v17 (ref), l_BindableEvent_0 (copy)
-                        v17 = v18;
-                        if l_BindableEvent_0 then
-                            l_BindableEvent_0:Fire();
-                        end;
-                    end, 
-                    onCancel = function() --[[ Line: 72 ]] --[[ Name: onCancel ]]
-                        -- upvalues: v11 (ref), l_AdService_0 (ref), v12 (copy)
-                        local l_ShowInterrupted_0 = Enum.ShowAdResult.ShowInterrupted;
-                        v11:render(nil);
-                        l_AdService_0:onDemandVideoCompleteFromUI(l_ShowInterrupted_0, v12.encryptedAdTrackingData, v12.encryptionMetadata, v12.rewardDetails);
-                    end, 
-                    onComplete = function() --[[ Line: 75 ]] --[[ Name: onComplete ]]
-                        -- upvalues: v11 (ref), l_AdService_0 (ref), v12 (copy)
-                        local l_ShowCompleted_0 = Enum.ShowAdResult.ShowCompleted;
-                        v11:render(nil);
-                        l_AdService_0:onDemandVideoCompleteFromUI(l_ShowCompleted_0, v12.encryptedAdTrackingData, v12.encryptionMetadata, v12.rewardDetails);
-                    end, 
-                    showWhyThisAd = function() --[[ Line: 78 ]] --[[ Name: showWhyThisAd ]]
-                        -- upvalues: l_AdService_0 (ref)
-                        l_AdService_0:HandleWhyThisAdClicked("advertiserName", "payerName");
-                    end, 
-                    getReportAdInfo = function() --[[ Line: 81 ]] --[[ Name: getReportAdInfo ]]
-                        -- upvalues: v12 (copy)
-                        return {
-                            assetId = v12.creativeAssetUrl, 
-                            adUnitName = "Rewarded Video Ad", 
-                            encryptionMetadata = v12.encryptionMetadata, 
-                            encryptedAdTrackingData = v12.encryptedAdTrackingData
-                        };
-                    end
-                })
-            }));
-            if not v17 then
-                l_BindableEvent_0.Event:Wait();
-            end;
-            l_BindableEvent_0:Destroy();
-            return v17;
-        end;
-    end
-};
+	["jest.config"] = _script["jest.config"],
+	init = function() -- line: 26
+		-- upvalues: AdsDisplayOrder (copy), CoreGui (copy), ReactRoblox (copy), AdService (copy), Flags (copy), React (copy), BaseComponent (copy), AdPlayerComponent (copy)
+		local ScreenGui = Instance.new("ScreenGui")
+
+		ScreenGui.Name = "RewardedVideoAdPlayer"
+		ScreenGui.DisplayOrder = AdsDisplayOrder.AdPlayer
+		ScreenGui.IgnoreGuiInset = true
+		ScreenGui.ResetOnSpawn = false
+		ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		ScreenGui.Parent = CoreGui
+
+		local v12 = ReactRoblox.createRoot(ScreenGui)
+
+		function AdService.onDemandVideoPlayInUI(t1: {[any]: any}) -- line: 37
+			-- upvalues: v12 (copy), AdService (copy), Flags (copy), React (copy), BaseComponent (copy), AdPlayerComponent (copy)
+			local function onVideoCompleted(p1) -- line: 38
+				-- upvalues: v12 (copy), AdService (copy), t1 (copy)
+				v12:render(nil)
+				AdService:onDemandVideoCompleteFromUI(p1, t1.encryptedAdTrackingData, t1.encryptionMetadata, t1.rewardDetails)
+			end
+
+			local v15 = nil
+
+			if Flags.GetEnableLuaRewardTimerUI() and (t1.durationNeededForRewardMs and t1.durationNeededEnum == "Variable") then
+				v15 = t1.durationNeededForRewardMs / 1000
+			end
+
+			local BindableEvent = Instance.new("BindableEvent")
+			local u17 = nil
+
+			v12:render(React.createElement(BaseComponent, {}, { React.createElement(AdPlayerComponent, {
+				isEligible = t1.isEligible,
+				creativeAssetUrl = t1.creativeAssetUrl,
+				durationNeededForReward = if not Flags.GetEnableLuaRewardTimerUI() then nil else v15,
+				onVideoFrameLoaded = function(p2) -- line: 66
+					-- upvalues: u17 (ref), BindableEvent (copy)
+					u17 = p2
+
+					if BindableEvent then
+						BindableEvent:Fire()
+					end
+				end,
+				onCancel = function() -- line: 72
+					-- upvalues: v12 (copy), AdService (copy), t1 (copy)
+					local ShowInterrupted = Enum.ShowAdResult.ShowInterrupted
+
+					v12:render(nil)
+					AdService:onDemandVideoCompleteFromUI(ShowInterrupted, t1.encryptedAdTrackingData, t1.encryptionMetadata, t1.rewardDetails)
+				end,
+				onComplete = function() -- line: 75
+					-- upvalues: v12 (copy), AdService (copy), t1 (copy)
+					local ShowCompleted = Enum.ShowAdResult.ShowCompleted
+
+					v12:render(nil)
+					AdService:onDemandVideoCompleteFromUI(ShowCompleted, t1.encryptedAdTrackingData, t1.encryptionMetadata, t1.rewardDetails)
+				end,
+				showWhyThisAd = function() -- line: 78
+					-- upvalues: AdService (copy)
+					AdService:HandleWhyThisAdClicked("advertiserName", "payerName")
+				end,
+				getReportAdInfo = function() -- line: 81
+					-- upvalues: t1 (copy)
+					return {
+						adUnitName = "Rewarded Video Ad",
+						assetId = t1.creativeAssetUrl,
+						encryptionMetadata = t1.encryptionMetadata,
+						encryptedAdTrackingData = t1.encryptedAdTrackingData
+					}
+				end
+			}) }))
+
+			if not u17 then
+				BindableEvent.Event:Wait()
+			end
+
+			BindableEvent:Destroy()
+
+			return u17
+		end
+	end
+}

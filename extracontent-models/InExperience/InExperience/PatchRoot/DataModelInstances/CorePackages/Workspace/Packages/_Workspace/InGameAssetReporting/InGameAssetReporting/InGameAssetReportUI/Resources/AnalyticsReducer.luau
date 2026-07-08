@@ -1,73 +1,118 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InGameAssetReporting");
-local _ = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.Types);
-local l_AnalyticsActions_0 = require(l_script_FirstAncestor_0.InGameAssetReportUI.Resources.Constants).AnalyticsActions;
-return function(v3, v4) --[[ Line: 8 ]] --[[ Name: analyticsReducer ]]
-    -- upvalues: l_AnalyticsActions_0 (copy)
-    local v5 = table.clone(v3);
-    local l_type_0 = v4.type;
-    if l_type_0 == l_AnalyticsActions_0.SetPlaceId then
-        v5.place_id = v4.place_id;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.AccumulateForTimeSpent then
-        v5.accumulated_time_ms = v4.accumulated_time_ms;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetReasonSelection then
-        v5.reason_selection = v4.reason_selection;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetSurfaceSelection then
-        v5.surface_selection = v4.surface_selection;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetPrefilledSurfaceSelection then
-        v5.prefilled_surface_selection = v4.prefilled_surface_selection;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetCommentAdded then
-        v5.comment_added = v4.comment_added;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.IncrementNextCount then
-        v5.next_count = v5.next_count + 1;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.IncremementAnnotationCount then
-        v5.annotation_place_count = v5.annotation_place_count + 1;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.IncremementAnnotationUndoCount then
-        v5.annotation_undo_count = v5.annotation_undo_count + 1;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.IncremementAnnotationRedoCount then
-        v5.annotation_redo_count = v5.annotation_redo_count + 1;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetExtractionResults then
-        local l_results_0 = v4.results;
-        v5.annotation_final_count = v4.final_annotation_count;
-        v5.avatar_final_count = l_results_0.stats.playersCount;
-        v5.image_asset_count = #l_results_0.extractedAssets.Image;
-        v5.mesh_asset_count = #l_results_0.extractedAssets.Mesh;
-        v5.model_asset_count = #l_results_0.extractedAssets.Model;
-        v5.package_asset_count = #l_results_0.extractedAssets.Package;
-        v5.final_raycast_target_count = l_results_0.stats.raycastTargetCount;
-        v5.final_raycast_completed_count = l_results_0.stats.raycastCompletedCount;
-        v5.final_raycast_resumption_count = l_results_0.stats.raycastResumptionCount;
-        v5.final_raycast_computation_time_us = math.ceil(l_results_0.stats.raycastComputeTime * 1000000);
-        v5.hit_count_map_size = l_results_0.stats.hitCountMapSize;
-        v5.top_level_objects_size = l_results_0.stats.topLevelObjectsSize;
-        v5.instances_traversed_count = l_results_0.stats.instancesTraversed;
-        v5.traversal_task_list_size = l_results_0.stats.traversalTaskListSize;
-        v5.traversal_tasks_completed_count = l_results_0.stats.traversalTasksCompleted;
-        v5.extraction_resumption_count = l_results_0.stats.resumptionCount;
-        v5.extraction_computation_time_us = math.ceil(l_results_0.stats.computeTime * 1000000);
-        v5.extraction_wall_time_us = math.ceil(l_results_0.stats.wallTime * 1000000);
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetViewportInformation then
-        v5.viewport_size_x = v4.viewport_size_x;
-        v5.viewport_size_y = v4.viewport_size_y;
-        v5.is_portrait_mode = v4.is_portrait_mode;
-        return v5;
-    elseif l_type_0 == l_AnalyticsActions_0.SetDidUserResize then
-        v5.did_user_resize = v4.did_user_resize;
-        return v5;
-    else
-        if l_type_0 == l_AnalyticsActions_0.SetVariant then
-            v5.variant = v4.variant;
-        end;
-        return v5;
-    end;
-end;
+local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+
+require(InGameAssetReporting.InGameAssetReportUI.Resources.Types)
+
+local AnalyticsActions = require(InGameAssetReporting.InGameAssetReportUI.Resources.Constants).AnalyticsActions
+
+local function analyticsReducer(p1, p2) -- line: 8
+	-- upvalues: AnalyticsActions (copy)
+	local v6 = table.clone(p1)
+	local type = p2.type
+
+	if type == AnalyticsActions.SetPlaceId then
+		v6.place_id = p2.place_id
+
+		return v6
+	end
+
+	if type == AnalyticsActions.AccumulateForTimeSpent then
+		v6.accumulated_time_ms = p2.accumulated_time_ms
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetReasonSelection then
+		v6.reason_selection = p2.reason_selection
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetSurfaceSelection then
+		v6.surface_selection = p2.surface_selection
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetPrefilledSurfaceSelection then
+		v6.prefilled_surface_selection = p2.prefilled_surface_selection
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetCommentAdded then
+		v6.comment_added = p2.comment_added
+
+		return v6
+	end
+
+	if type == AnalyticsActions.IncrementNextCount then
+		v6.next_count = v6.next_count + 1
+
+		return v6
+	end
+
+	if type == AnalyticsActions.IncremementAnnotationCount then
+		v6.annotation_place_count = v6.annotation_place_count + 1
+
+		return v6
+	end
+
+	if type == AnalyticsActions.IncremementAnnotationUndoCount then
+		v6.annotation_undo_count = v6.annotation_undo_count + 1
+
+		return v6
+	end
+
+	if type == AnalyticsActions.IncremementAnnotationRedoCount then
+		v6.annotation_redo_count = v6.annotation_redo_count + 1
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetExtractionResults then
+		local results = p2.results
+
+		v6.annotation_final_count = p2.final_annotation_count
+		v6.avatar_final_count = results.stats.playersCount
+		v6.image_asset_count = #results.extractedAssets.Image
+		v6.mesh_asset_count = #results.extractedAssets.Mesh
+		v6.model_asset_count = #results.extractedAssets.Model
+		v6.package_asset_count = #results.extractedAssets.Package
+		v6.final_raycast_target_count = results.stats.raycastTargetCount
+		v6.final_raycast_completed_count = results.stats.raycastCompletedCount
+		v6.final_raycast_resumption_count = results.stats.raycastResumptionCount
+		v6.final_raycast_computation_time_us = math.ceil(results.stats.raycastComputeTime * 1000000)
+		v6.hit_count_map_size = results.stats.hitCountMapSize
+		v6.top_level_objects_size = results.stats.topLevelObjectsSize
+		v6.instances_traversed_count = results.stats.instancesTraversed
+		v6.traversal_task_list_size = results.stats.traversalTaskListSize
+		v6.traversal_tasks_completed_count = results.stats.traversalTasksCompleted
+		v6.extraction_resumption_count = results.stats.resumptionCount
+		v6.extraction_computation_time_us = math.ceil(results.stats.computeTime * 1000000)
+		v6.extraction_wall_time_us = math.ceil(results.stats.wallTime * 1000000)
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetViewportInformation then
+		v6.viewport_size_x = p2.viewport_size_x
+		v6.viewport_size_y = p2.viewport_size_y
+		v6.is_portrait_mode = p2.is_portrait_mode
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetDidUserResize then
+		v6.did_user_resize = p2.did_user_resize
+
+		return v6
+	end
+
+	if type == AnalyticsActions.SetVariant then
+		v6.variant = p2.variant
+	end
+
+	return v6
+end
+
+return analyticsReducer

@@ -1,39 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.GameDetailRodux);
-local v3 = require(l_Parent_0.Http);
-local v4 = require(l_Parent_0.PlayabilityRodux);
-local v5 = require(l_Parent_0.Rodux);
-local v6 = require(l_Parent_0.SquadsCore);
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-local l_FormFactorReducer_0 = require(l_Parent_0.FormFactor).FormFactorReducer;
-local v9 = require(l_Parent_0.UserLib);
-local l_GameDetailReducer_0 = v2.GameDetails.GameDetailReducer;
-local l_FetchingStatus_0 = v3.Reducers.FetchingStatus;
-local l_UserReducer_0 = v9.Reducers.UserReducer;
-local l_LocalUserIdReducer_0 = v9.Reducers.LocalUserIdReducer;
-local l_PlayabilityStatusReducer_0 = v4.PlayabilityStatus.PlayabilityStatusReducer;
-local v15 = require(l_Parent_0.SocialBlockingModal);
-local v16 = require(l_script_FirstAncestor_0.installReducer);
-local v17 = require(l_script_FirstAncestor_0.installReducer.ScreenSize);
-local l_FriendCount_0 = require(l_Parent_0.LegacyFriendsRodux).Reducers.FriendCount;
-local v19 = require(l_Parent_0.PlayerContextualMenu);
-local l_SquadLocation_0 = v6.Enums.SquadLocation;
-local l_PartyPageCarouselExperimentation_0 = require(l_Parent_0.SocialExperiments).PartyPageCarouselExperimentation;
-return (v5.combineReducers({
-    PlayerContextualMenu = v19.installReducer(), 
-    EventReceievers = v5.combineReducers({
-        NetworkStatus = require(l_script_FirstAncestor_0.Http.RoduxNetworking).installReducer()
-    }), 
-    ChatAppReducer = v16(), 
-    FetchingStatus = l_FetchingStatus_0, 
-    GameDetails = l_GameDetailReducer_0, 
-    LocalUserId = l_LocalUserIdReducer_0, 
-    FriendCount = l_FriendCount_0, 
-    PlayabilityStatus = l_PlayabilityStatusReducer_0, 
-    ScreenSize = if l_PartyPageCarouselExperimentation_0.getPartyPageCarouselEnabled() then v17 else nil, 
-    FormFactor = l_FormFactorReducer_0, 
-    Users = l_UserReducer_0, 
-    [v6.RoduxKey] = if l_GetFFlagIsSquadEnabled_0() then v6.installReducer(l_SquadLocation_0.InExperience) else nil, 
-    [v15.RoduxKey] = v15.installReducer()
-}));
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local GameDetailRodux = require(AppChatParent.GameDetailRodux)
+local Http = require(AppChatParent.Http)
+local PlayabilityRodux = require(AppChatParent.PlayabilityRodux)
+local Rodux = require(AppChatParent.Rodux)
+local Constants = require(AppChatParent.SquadsCore.Constants)
+local installReducer = require(AppChatParent.SquadsCore.installReducer)
+local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
+local FormFactorReducer = require(AppChatParent.FormFactor).FormFactorReducer
+local UserLib = require(AppChatParent.UserLib)
+local GameDetailReducer = GameDetailRodux.GameDetails.GameDetailReducer
+local FetchingStatus = Http.Reducers.FetchingStatus
+local UserReducer = UserLib.Reducers.UserReducer
+local LocalUserIdReducer = UserLib.Reducers.LocalUserIdReducer
+local PlayabilityStatusReducer = PlayabilityRodux.PlayabilityStatus.PlayabilityStatusReducer
+local SocialBlockingModal = require(AppChatParent.SocialBlockingModal)
+local installReducer2 = require(AppChat.installReducer)
+local ScreenSize = require(AppChat.installReducer.ScreenSize)
+local FriendCount = require(AppChatParent.LegacyFriendsRodux).Reducers.FriendCount
+local PlayerContextualMenu = require(AppChatParent.PlayerContextualMenu)
+local SquadLocation = require(AppChatParent.SquadsCore.Enums).SquadLocation
+local PartyPageCarouselExperimentation = require(AppChatParent.SocialExperiments).PartyPageCarouselExperimentation
+
+return (Rodux.combineReducers({
+	PlayerContextualMenu = PlayerContextualMenu.installReducer(),
+	EventReceievers = Rodux.combineReducers({
+		NetworkStatus = require(AppChat.Http.RoduxNetworking).installReducer()
+	}),
+	ChatAppReducer = installReducer2(),
+	FetchingStatus = FetchingStatus,
+	GameDetails = GameDetailReducer,
+	LocalUserId = LocalUserIdReducer,
+	FriendCount = FriendCount,
+	PlayabilityStatus = PlayabilityStatusReducer,
+	ScreenSize = if not PartyPageCarouselExperimentation.getPartyPageCarouselEnabled() then nil else ScreenSize,
+	FormFactor = FormFactorReducer,
+	Users = UserReducer,
+	[Constants.RODUX_KEY] = if not GetFFlagIsSquadEnabled() then nil else installReducer(SquadLocation.InExperience),
+	[SocialBlockingModal.RoduxKey] = SocialBlockingModal.installReducer()
+}))

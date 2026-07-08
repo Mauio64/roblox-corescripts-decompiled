@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSquadRegroupServerCapacityCheck", false);
+return game:DefineFastFlag("EnableSquadRegroupServerCapacityCheck", false)

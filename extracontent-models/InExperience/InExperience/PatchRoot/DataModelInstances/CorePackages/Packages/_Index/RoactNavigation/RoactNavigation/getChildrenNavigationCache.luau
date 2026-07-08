@@ -1,23 +1,26 @@
-return function(v0) --[[ Line: 3 ]]
-    if not v0 then
-        return {};
-    else
-        if not v0._childrenNavigation then
-            v0._childrenNavigation = {};
-        end;
-        local l__childrenNavigation_0 = v0._childrenNavigation;
-        local v2 = {};
-        local v3 = v0.state.routes or {};
-        for _, v5 in v3 do
-            v2[v5.key] = true;
-        end;
-        if not v0.state.isTransitioning then
-            for v6, _ in l__childrenNavigation_0 do
-                if not v2[v6] then
-                    l__childrenNavigation_0[v6] = nil;
-                end;
-            end;
-        end;
-        return v0._childrenNavigation;
-    end;
-end;
+return function(p1) -- line: 3
+	if not p1 then
+		return {}
+	end
+
+	if not p1._childrenNavigation then
+		p1._childrenNavigation = {}
+	end
+
+	local _childrenNavigation = p1._childrenNavigation
+	local t1 = {}
+
+	for _, v5 in p1.state.routes or {} do
+		t1[v5.key] = true
+	end
+
+	if not p1.state.isTransitioning then
+		for v6, _ in _childrenNavigation do
+			if not t1[v6] then
+				_childrenNavigation[v6] = nil
+			end
+		end
+	end
+
+	return p1._childrenNavigation
+end

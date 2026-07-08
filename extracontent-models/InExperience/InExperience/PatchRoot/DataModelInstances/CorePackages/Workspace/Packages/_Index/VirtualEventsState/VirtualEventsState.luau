@@ -1,15 +1,18 @@
-local v0 = require(script.installReducer);
-local _ = require(script.types);
-local v2 = require(script.enums);
-local v3 = require(script.network);
-local v4 = require(script.Models.ExperienceDetailsModel);
-local v5 = require(script.Models.ExperienceMediaModel);
+local installReducer = require(script.installReducer)
+
+require(script.types)
+
+local enums = require(script.enums)
+local network = require(script.network)
+local ExperienceDetailsModel = require(script.Models.ExperienceDetailsModel)
+local ExperienceMediaModel = require(script.Models.ExperienceMediaModel)
+
 return {
-    RoduxKey = "VirtualEvents", 
-    installReducer = v0, 
-    enums = v2, 
-    network = v3, 
-    ExperienceDetailsModel = v4, 
-    ExperienceMediaModel = v5, 
-    ["jest.config"] = script["jest.config"]
-};
+	RoduxKey = "VirtualEvents",
+	installReducer = installReducer,
+	enums = enums,
+	network = network,
+	ExperienceDetailsModel = ExperienceDetailsModel,
+	ExperienceMediaModel = ExperienceMediaModel,
+	["jest.config"] = script["jest.config"]
+}

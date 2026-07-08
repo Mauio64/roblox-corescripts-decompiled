@@ -1,20 +1,22 @@
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Actions.SetGameNameAndDescription);
-local v4 = require(l_Parent_0.Network.httpRequest)(l_HttpRbxApiService_0);
-local l_GetGameNameAndDescription_0 = require(l_CorePackages_0.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription;
-return function(v6) --[[ Line: 13 ]] --[[ Name: requestGameNameAndDescription ]]
-    -- upvalues: l_GetGameNameAndDescription_0 (copy), v4 (copy), v3 (copy)
-    if game.GameId == 0 then
-        return;
-    else
-        l_GetGameNameAndDescription_0(v4, game.GameId):andThen(function(v7) --[[ Line: 18 ]]
-            -- upvalues: v6 (copy), v3 (ref)
-            v6:dispatch(v3(v7.Name, v7.Description));
-        end):catch(function() --[[ Line: 20 ]]
-            warn("Unable to retrieve game name for in game menu");
-        end);
-        return;
-    end;
-end;
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local SetGameNameAndDescription = require(ParentParent.Actions.SetGameNameAndDescription)
+local v5 = require(ParentParent.Network.httpRequest)(HttpRbxApiService)
+local GetGameNameAndDescription = require(CorePackages.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription
+
+local function requestGameNameAndDescription(p1) -- line: 13
+	-- upvalues: GetGameNameAndDescription (copy), v5 (copy), SetGameNameAndDescription (copy)
+	if game.GameId == 0 then
+		return
+	end
+
+	GetGameNameAndDescription(v5, game.GameId):andThen(function(p2) -- line: 18
+		-- upvalues: p1 (copy), SetGameNameAndDescription (copy)
+		p1:dispatch(SetGameNameAndDescription(p2.Name, p2.Description))
+	end):catch(function() -- line: 20
+		warn("Unable to retrieve game name for in game menu")
+	end)
+end
+
+return requestGameNameAndDescription

@@ -1,7 +1,7 @@
 return (require(script.Parent.createEnum)("UpsellFlow", {
-    "Web", 
-    "Mobile", 
-    "Xbox", 
-    "Unavailable", 
-    "None"
-}));
+	"Web",
+	"Mobile",
+	"Xbox",
+	"Unavailable",
+	"None"
+}))

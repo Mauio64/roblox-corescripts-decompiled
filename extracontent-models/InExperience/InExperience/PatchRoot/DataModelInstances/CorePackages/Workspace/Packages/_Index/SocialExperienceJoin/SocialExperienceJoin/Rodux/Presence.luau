@@ -1,6 +1,7 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialExperienceJoin");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Common.Constants);
-return require(l_Parent_0.LuaSocialLibrariesDeps).RoduxPresence.config({
-    keyPath = v2.RODUX_KEY .. ".Presence"
-});
+local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
+local SocialExperienceJoinParent = SocialExperienceJoin.Parent
+local Constants = require(SocialExperienceJoin.Common.Constants)
+
+return require(SocialExperienceJoinParent.LuaSocialLibrariesDeps).RoduxPresence.config({
+	keyPath = Constants.RODUX_KEY .. ".Presence"
+})

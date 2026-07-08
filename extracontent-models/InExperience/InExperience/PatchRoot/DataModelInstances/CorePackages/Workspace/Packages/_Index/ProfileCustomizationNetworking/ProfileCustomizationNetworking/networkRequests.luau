@@ -1,4 +1,4 @@
 return {
-    createUpdateProfileCustomization = require(script.createUpdateProfileCustomization), 
-    createGetProfileCustomization = require(script.createGetProfileCustomization)
-};
+	createUpdateProfileCustomization = require(script.createUpdateProfileCustomization),
+	createGetProfileCustomization = require(script.createGetProfileCustomization)
+}

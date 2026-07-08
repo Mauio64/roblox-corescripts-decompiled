@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableMergeOmniFeedSorts3", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableMergeOmniFeedSorts3");
-end;
+game:DefineFastFlag("EnableMergeOmniFeedSorts3", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableMergeOmniFeedSorts3")
+end

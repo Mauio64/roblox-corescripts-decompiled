@@ -1,59 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NetworkingVirtualEvents");
-local _ = require(l_script_FirstAncestor_0.types);
+local NetworkingVirtualEvents = script:FindFirstAncestor("NetworkingVirtualEvents")
+
+require(NetworkingVirtualEvents.types)
+
 return {
-    mock = function(v2) --[[ Line: 7 ]] --[[ Name: mock ]]
-        local v3 = DateTime.now();
-        local v4 = DateTime.fromUnixTimestamp(v3.UnixTimestamp + 86400);
-        return {
-            id = v2, 
-            title = "Event Name", 
-            description = "Event description goes here...", 
-            host = {
-                hostType = "user", 
-                hostId = 1, 
-                hostName = "Roblox", 
-                hasVerifiedBadge = true
-            }, 
-            eventTime = {
-                startTime = v3, 
-                endTime = v4, 
-                startUtc = v3:ToIsoDate(), 
-                endUtc = v3:ToIsoDate()
-            }, 
-            universeId = 3531439676, 
-            placeId = 123456789, 
-            eventStatus = "active", 
-            createdTime = v3, 
-            updatedTime = v3, 
-            userRsvpStatus = "none"
-        };
-    end, 
-    fromResponse = function(v5) --[[ Line: 38 ]] --[[ Name: fromResponse ]]
-        local v6 = DateTime.fromIsoDate(v5.eventTime.startUtc);
-        local v7 = DateTime.fromIsoDate(v5.eventTime.endUtc);
-        local v8 = DateTime.fromIsoDate(v5.createdUtc);
-        local v9 = DateTime.fromIsoDate(v5.updatedUtc);
-        if v6 and v7 and v8 and v9 then
-            return {
-                id = v5.id, 
-                title = v5.title, 
-                description = v5.description, 
-                host = v5.host, 
-                eventTime = {
-                    startTime = v6, 
-                    endTime = v7, 
-                    startUtc = v5.eventTime.startUtc, 
-                    endUtc = v5.eventTime.endUtc
-                }, 
-                universeId = v5.universeId, 
-                placeId = v5.placeId, 
-                eventStatus = v5.eventStatus, 
-                createdTime = v8, 
-                updatedTime = v9, 
-                userRsvpStatus = v5.userRsvpStatus
-            };
-        else
-            return nil;
-        end;
-    end
-};
+	mock = function(s1: string) -- line: 7
+		local dateTime = DateTime.now()
+		local dateTime2 = DateTime.fromUnixTimestamp(dateTime.UnixTimestamp + 86400)
+
+		return {
+			title = "Event Name",
+			description = "Event description goes here...",
+			universeId = 3531439676,
+			placeId = 123456789,
+			eventStatus = "active",
+			userRsvpStatus = "none",
+			id = s1,
+			host = {
+				hostType = "user",
+				hostId = 1,
+				hostName = "Roblox",
+				hasVerifiedBadge = true
+			},
+			eventTime = {
+				startTime = dateTime,
+				endTime = dateTime2,
+				startUtc = dateTime:ToIsoDate(),
+				endUtc = dateTime:ToIsoDate()
+			},
+			createdTime = dateTime,
+			updatedTime = dateTime
+		}
+	end,
+	fromResponse = function(p1) -- line: 38
+		local dateTime = DateTime.fromIsoDate(p1.eventTime.startUtc)
+		local dateTime3 = DateTime.fromIsoDate(p1.eventTime.endUtc)
+		local dateTime4 = DateTime.fromIsoDate(p1.createdUtc)
+		local dateTime5 = DateTime.fromIsoDate(p1.updatedUtc)
+
+		if dateTime and (dateTime3 and dateTime4 and dateTime5) then
+			return {
+				id = p1.id,
+				title = p1.title,
+				description = p1.description,
+				host = p1.host,
+				eventTime = {
+					startTime = dateTime,
+					endTime = dateTime3,
+					startUtc = p1.eventTime.startUtc,
+					endUtc = p1.eventTime.endUtc
+				},
+				universeId = p1.universeId,
+				placeId = p1.placeId,
+				eventStatus = p1.eventStatus,
+				createdTime = dateTime4,
+				updatedTime = dateTime5,
+				userRsvpStatus = p1.userRsvpStatus
+			}
+		end
+
+		return nil
+	end
+}

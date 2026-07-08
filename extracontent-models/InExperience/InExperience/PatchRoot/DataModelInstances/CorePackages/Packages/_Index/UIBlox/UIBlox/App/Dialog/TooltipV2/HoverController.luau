@@ -1,56 +1,66 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.React);
-local v4 = require(l_Parent_2.LuauPolyfill);
-local _ = require(l_Parent_0.Types);
-local v6 = require(l_Parent_0.Constants);
-local v7 = require(l_Parent_0.TooltipController);
-local v8 = require(l_Parent_1.Core.Control.Enum.ControlState);
-local v9 = require(l_Parent_1.UIBloxConfig);
-return function(v10) --[[ Line: 17 ]] --[[ Name: HoverController ]]
-    -- upvalues: v3 (copy), v9 (copy), v6 (copy), v8 (copy), v4 (copy), v7 (copy)
-    local v11, v12 = v3.useState(false);
-    local v13 = v3.useRef(tick());
-    v3.useEffect(function() --[[ Line: 21 ]]
-        -- upvalues: v13 (copy)
-        return function() --[[ Line: 22 ]]
-            -- upvalues: v13 (ref)
-            v13.current = tick();
-        end;
-    end, if v9.enableTooltipV2HoverControllerReRenderFix then {} else nil);
-    local v14 = v10.delayTime or v6.DEFAULT_DELAY_TIME;
-    local v18 = v3.useCallback(function(v15, v16) --[[ Line: 30 ]]
-        -- upvalues: v10 (copy), v12 (copy), v8 (ref), v13 (copy), v14 (copy)
-        if v10.disabled then
-            v12(false);
-            return;
-        elseif v16 == v8.Hover or v16 == v8.Selected then
-            local l_current_0 = v13.current;
-            delay(v14, function() --[[ Line: 37 ]]
-                -- upvalues: v13 (ref), l_current_0 (copy), v12 (ref)
-                if v13.current == l_current_0 then
-                    v12(true);
-                end;
-            end);
-            return;
-        else
-            if v15 == v8.Hover or v15 == v8.Selected then
-                v13.current = tick();
-                v12(false);
-            end;
-            return;
-        end;
-    end, {
-        v14
-    });
-    local v20 = v4.Object.assign({}, v10, {
-        delayTime = v4.Object.None, 
-        active = v11, 
-        renderTriggerPoint = function(v19) --[[ Line: 52 ]] --[[ Name: renderTriggerPoint ]]
-            -- upvalues: v10 (copy), v18 (copy)
-            return v10.renderTriggerPoint(v19, v18);
-        end
-    });
-    return v3.createElement(v7, v20);
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+
+require(scriptParent.Types)
+
+local Constants = require(scriptParent.Constants)
+local TooltipController = require(scriptParent.TooltipController)
+local ControlState = require(ParentParent.Core.Control.Enum.ControlState)
+local UIBloxConfig = require(ParentParent.UIBloxConfig)
+
+local function HoverController(p1) -- line: 17
+	-- upvalues: React (copy), UIBloxConfig (copy), Constants (copy), ControlState (copy), LuauPolyfill (copy), TooltipController (copy)
+	local v12, v13 = React.useState(false)
+	local v14 = React.useRef(tick())
+
+	React.useEffect(function() -- line: 21
+		-- upvalues: v14 (copy)
+		return function() -- line: 22
+			-- upvalues: v14 (copy)
+			v14.current = tick()
+		end
+	end, if not UIBloxConfig.enableTooltipV2HoverControllerReRenderFix then nil else {})
+
+	local v15 = p1.delayTime or Constants.DEFAULT_DELAY_TIME
+	local v16 = React.useCallback(function(p2, p3) -- line: 30
+		-- upvalues: p1 (copy), v13 (copy), ControlState (copy), v14 (copy), v15 (copy)
+		if p1.disabled then
+			v13(false)
+
+			return
+		end
+
+		if p3 == ControlState.Hover or p3 == ControlState.Selected then
+			local current = v14.current
+
+			delay(v15, function() -- line: 37
+				-- upvalues: v14 (copy), current (copy), v13 (copy)
+				if v14.current == current then
+					v13(true)
+				end
+			end)
+
+			return
+		end
+
+		if p2 == ControlState.Hover or p2 == ControlState.Selected then
+			v14.current = tick()
+			v13(false)
+		end
+	end, { v15 })
+	local v17 = LuauPolyfill.Object.assign({}, p1, {
+		delayTime = LuauPolyfill.Object.None,
+		active = v12,
+		renderTriggerPoint = function(p4) -- line: 52
+			-- upvalues: p1 (copy), v16 (copy)
+			return p1.renderTriggerPoint(p4, v16)
+		end
+	})
+
+	return React.createElement(TooltipController, v17)
+end
+
+return HoverController

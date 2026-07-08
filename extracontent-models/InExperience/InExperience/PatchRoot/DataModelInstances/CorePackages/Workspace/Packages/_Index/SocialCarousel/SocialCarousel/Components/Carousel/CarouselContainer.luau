@@ -1,64 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RobloxAppEnums);
-local v4 = require(l_Parent_0.RoactUtils);
-local v5 = require(script.Parent.Carousel);
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v7 = require(l_Parent_0.Navigation);
-local v8 = require(l_script_FirstAncestor_0.Analytics.useSocialCarouselAnalytics);
-local v9 = require(l_script_FirstAncestor_0.Analytics.useTilesSeenCollection);
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_AppPage_0 = v3.AppPage;
-local l_useNavigation_0 = v7.useNavigation;
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local l_FFlagCreateConnectionsHub_0 = require(l_Parent_0.SharedFlags).FFlagCreateConnectionsHub;
-local l_FFlagRemoveFriendsRenameInfoModal_0 = require(l_Parent_0.SharedFlags).FFlagRemoveFriendsRenameInfoModal;
-return function(v16) --[[ Line: 24 ]] --[[ Name: CarouselContainer ]]
-    -- upvalues: v8 (copy), v9 (copy), l_useDispatch_0 (copy), l_useNavigation_0 (copy), v2 (copy), l_FFlagCreateConnectionsHub_0 (copy), l_AppPage_0 (copy), l_NavigateDown_0 (copy), l_FFlagRemoveFriendsRenameInfoModal_0 (copy), v5 (copy), l_FFlagLuaAppCompositionSupport_0 (copy)
-    local v17 = v8();
-    local v18 = v9();
-    local v19 = l_useDispatch_0();
-    local v20 = l_useNavigation_0();
-    local v21 = v2.useRef({
-        startIndex = 1, 
-        endIndex = 1
-    });
-    local v22 = v2.useCallback(function() --[[ Line: 31 ]]
-        -- upvalues: v17 (copy), l_FFlagCreateConnectionsHub_0 (ref), v20 (copy), l_AppPage_0 (ref), v19 (copy), l_NavigateDown_0 (ref)
-        v17.friendsHeaderPressed();
-        if l_FFlagCreateConnectionsHub_0 then
-            v20.navigate(l_AppPage_0.CoHubMyConnections);
-            return;
-        else
-            v19(l_NavigateDown_0({
-                name = l_AppPage_0.ViewFriends
-            }));
-            return;
-        end;
-    end, {
-        v19, 
-        v20
-    });
-    local v23 = if l_FFlagRemoveFriendsRenameInfoModal_0 then nil else v2.useCallback(function() --[[ Line: 42 ]]
-        -- upvalues: v20 (copy), l_AppPage_0 (ref)
-        v20.push(l_AppPage_0.FriendsRenameInfoModal);
-    end, {
-        v20
-    });
-    local v28 = v2.useCallback(function(v24, v25, v26) --[[ Line: 46 ]]
-        -- upvalues: v21 (copy), v18 (copy)
-        local l_current_0 = v21.current;
-        if l_current_0.startIndex <= v25 and v25 <= l_current_0.endIndex then
-            v18.addTileToCollection(v24, v25, v26);
-        end;
-    end, {
-        v18
-    });
-    return v2.createElement(v5, {
-        onActivateHeader = v22, 
-        onActivateInfoIcon = if l_FFlagRemoveFriendsRenameInfoModal_0 then nil else v23, 
-        onTileContentChanged = v28, 
-        appCompositionEnabled = if l_FFlagLuaAppCompositionSupport_0 then v16.appCompositionEnabled else nil
-    });
-end;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local React = require(SocialCarouselParent.React)
+local RobloxAppEnums = require(SocialCarouselParent.RobloxAppEnums)
+local RoactUtils = require(SocialCarouselParent.RoactUtils)
+local Carousel = require(script.Parent.Carousel)
+local NavigateDown = require(SocialCarouselParent.NavigationRodux).Thunks.NavigateDown
+local Navigation = require(SocialCarouselParent.Navigation)
+local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCarouselAnalytics)
+local useTilesSeenCollection = require(SocialCarousel.Analytics.useTilesSeenCollection)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local AppPage = RobloxAppEnums.AppPage
+local useNavigation = Navigation.useNavigation
+local FFlagCreateConnectionsHub = require(SocialCarouselParent.SharedFlags).FFlagCreateConnectionsHub
+local FFlagSignalsNavP3Dispatch = require(SocialCarouselParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v16 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialCarouselParent.RobloxAppNavigation).NavigationCommands
+
+local function CarouselContainer(t1: {[any]: any}) -- line: 26
+	-- upvalues: useSocialCarouselAnalytics (copy), useTilesSeenCollection (copy), useDispatch (copy), useNavigation (copy), React (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), NavigateDown (copy), Carousel (copy)
+	local v19 = useSocialCarouselAnalytics()
+	local v20 = useTilesSeenCollection()
+	local v21 = useDispatch()
+	local v22 = useNavigation()
+	local v23 = React.useRef({
+		startIndex = 1,
+		endIndex = 1
+	})
+	local v24 = React.useCallback(function() -- line: 33
+		-- upvalues: v19 (copy), FFlagCreateConnectionsHub (copy), v22 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v16 (copy), v21 (copy), NavigateDown (copy)
+		v19.friendsHeaderPressed()
+
+		if FFlagCreateConnectionsHub then
+			v22.navigate(AppPage.CoHubMyConnections)
+
+			return
+		end
+
+		if FFlagSignalsNavP3Dispatch then
+			v16.down(v16.fromLegacyPage({
+				name = AppPage.ViewFriends
+			}))
+
+			return
+		end
+
+		v21(NavigateDown({
+			name = AppPage.ViewFriends
+		}))
+	end, {
+		v21,
+		v22
+	})
+	local v25 = React.useCallback(function(s1: string, n1: number, p1) -- line: 44
+		-- upvalues: v23 (copy), v20 (copy)
+		local current = v23.current
+
+		if n1 >= current.startIndex and n1 <= current.endIndex then
+			v20.addTileToCollection(s1, n1, p1)
+		end
+	end, { v20 })
+
+	return React.createElement(Carousel, {
+		onActivateHeader = v24,
+		onTileContentChanged = v25,
+		appCompositionEnabled = t1.appCompositionEnabled
+	})
+end
+
+return CarouselContainer

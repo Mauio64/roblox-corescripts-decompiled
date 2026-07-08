@@ -1,123 +1,187 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_Parent_0.React);
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local _ = require(l_Parent_0.RobloxAppEnums);
-local v6 = require(l_Parent_0.RobloxAppHooks);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_useDeviceOrientation_0 = v6.useDeviceOrientation;
-local l_AbuseReportAnalyticsProvider_0 = require(l_script_FirstAncestor_0.BeduiV2.Analytics.AbuseReportAnalyticsContext).AbuseReportAnalyticsProvider;
-local v10 = require(l_script_FirstAncestor_0.BeduiV2.Components.AbuseReportInline);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes);
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-local l_ArTranslationProvider_0 = require(l_script_FirstAncestor_0.BeduiV2.Utils.Translate.arTranslation).ArTranslationProvider;
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.fetchConfig);
-local v15 = require(l_script_FirstAncestor_0.BeduiV2.Loaders.getUsers);
-local v16 = require(l_script_FirstAncestor_0.BeduiV2.Components.LayoutSlots);
-local v17 = require(l_script_FirstAncestor_0.BeduiV2.Loaders.LoaderContext);
-local v18 = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.useAbuseSheetFlow);
-local v19 = require(l_script_FirstAncestor_0.BeduiV2.Hooks.useInExpCustomSubmit);
-local l_inlineLandscapeSlots_0 = v16.inlineLandscapeSlots;
-local l_inlinePortraitSlots_0 = v16.inlinePortraitSlots;
-local l_LayoutSlotsProvider_0 = v16.LayoutSlotsProvider;
-local l_LoaderProvider_0 = v17.LoaderProvider;
-return v3.memo(function(v24) --[[ Line: 55 ]] --[[ Name: DynamicReportV2InExpContainer ]]
-    -- upvalues: l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), v3 (copy), l_useDeviceOrientation_0 (copy), l_GuiService_0 (copy), v15 (copy), l_script_FirstAncestor_0 (copy), v19 (copy), v18 (copy), l_ArTranslationProvider_0 (copy), l_AbuseReportAnalyticsProvider_0 (copy), l_LayoutSlotsProvider_0 (copy), l_inlineLandscapeSlots_0 (copy), l_inlinePortraitSlots_0 (copy), l_LoaderProvider_0 (copy), v10 (copy)
-    local v25 = l_useRoactService_0(l_RoactNetworking_0);
-    local v26, v27 = v3.useState(nil);
-    local v28, v29 = v3.useState(false);
-    local v30 = l_useDeviceOrientation_0();
-    local v31 = l_GuiService_0.ViewportDisplaySize == Enum.DisplaySize.Small;
-    local v32 = true;
-    if v30 ~= "Landscape" then
-        v32 = not v31;
-    end;
-    local v34 = v3.useMemo(function() --[[ Line: 64 ]]
-        -- upvalues: v15 (ref), v24 (copy)
-        local v33 = {
-            users = {
-                type = "listItem", 
-                fetch = v15
-            }
-        };
-        if v24.inExpChatMessagesLoader then
-            v33.inExpChatMessages = v24.inExpChatMessagesLoader;
-        end;
-        if v24.inExpVoiceUsersLoader then
-            v33.voiceUsers = v24.inExpVoiceUsersLoader;
-        end;
-        return v33;
-    end, {
-        v24.inExpChatMessagesLoader, 
-        v24.inExpVoiceUsersLoader
-    });
-    v3.useEffect(function() --[[ Line: 83 ]]
-        -- upvalues: v27 (copy), l_script_FirstAncestor_0 (ref)
-        v27((require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.inExperienceConfig)));
-    end, {
-        v25
-    });
-    local v35 = v3.useRef(DateTime.now().UnixTimestampMillis);
-    v3.useEffect(function() --[[ Line: 98 ]]
-        -- upvalues: v24 (copy), v35 (copy)
-        if v24.isReportTabVisible then
-            v35.current = DateTime.now().UnixTimestampMillis;
-        end;
-    end, {
-        v24.isReportTabVisible
-    });
-    local v36 = v19({
-        voiceChatServiceManager = v24.voiceChatServiceManager, 
-        inExpChatMessagesLoader = v24.inExpChatMessagesLoader, 
-        menuOpenTimeRef = v35
-    });
-    local v37 = v18(v26, {
-        abuseVector = "in-experience", 
-        targetId = "", 
-        onClose = v24.onClose, 
-        open = true, 
-        onCustomSubmit = v36
-    });
-    local v38 = v3.useRef(v37);
-    v38.current = v37;
-    v3.useEffect(function() --[[ Line: 124 ]]
-        -- upvalues: v24 (copy), v38 (copy)
-        v24.registerOnInGameMenuClosed(function() --[[ Line: 125 ]]
-            -- upvalues: v38 (ref)
-            if v38.current then
-                v38.current.reset();
-            end;
-        end);
-    end, {
-        v24.registerOnInGameMenuClosed
-    });
-    v3.useEffect(function() --[[ Line: 132 ]]
-        -- upvalues: v26 (copy), v37 (copy), v29 (copy)
-        if v26 and not v37 then
-            v29(true);
-        end;
-    end, {
-        v26, 
-        v37
-    });
-    if v37 and not v28 then
-        return (v3.createElement(l_ArTranslationProvider_0, {
-            translations = v37.config.translations
-        }, v3.createElement(l_AbuseReportAnalyticsProvider_0, {
-            analytics = v37.analytics
-        }, v3.createElement(l_LayoutSlotsProvider_0, {
-            slots = if v32 then l_inlineLandscapeSlots_0 else l_inlinePortraitSlots_0
-        }, v3.createElement(l_LoaderProvider_0, {
-            loaders = v34, 
-            open = v24.isReportTabVisible
-        }, {
-            AbuseReportInline = if v24.isReportTabVisible then v3.createElement(v10, {
-                abuseReportFlow = v37, 
-                shouldUseOverlaidControls = v32
-            }) else nil
-        })))));
-    else
-        return nil;
-    end;
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local GuiService = game:GetService("GuiService")
+local React = require(GenericAbuseReportingParent.React)
+
+require(GenericAbuseReportingParent.RobloxAppEnums)
+
+local useDeviceOrientation = require(GenericAbuseReportingParent.RobloxAppHooks).useDeviceOrientation
+local AbuseReportErrorBoundary = require(GenericAbuseReporting.BeduiV2.Components.AbuseReportErrorBoundary)
+local getIsInExpSceneSelectionAvailable = require(GenericAbuseReporting.BeduiV2.Components.Nodes.getIsInExpSceneSelectionAvailable)
+local getUsers = require(GenericAbuseReporting.BeduiV2.Loaders.getUsers)
+
+require(GenericAbuseReporting.BeduiV2.Loaders.LoaderContext)
+
+local sendBoundaryErrorTelemetry = require(GenericAbuseReporting.BeduiV2.Analytics.sendBoundaryErrorTelemetry)
+local useInExpCustomSubmit = require(GenericAbuseReporting.BeduiV2.Hooks.useInExpCustomSubmit).useInExpCustomSubmit
+
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.fetchConfigWithAttributes)
+
+local DynamicReportV2InExpError = require(script.Parent.DynamicReportV2InExpError)
+local AbuseReportContentInExp = require(script.Parent.AbuseReportContentInExp)
+local useDynamicInExpConfig = require(script.Parent.useDynamicInExpConfig).useDynamicInExpConfig
+
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.useAbuseSheetFlow)
+
+local useIsVoiceChatReportable = require(script.Parent.useIsVoiceChatReportable).useIsVoiceChatReportable
+
+require(GenericAbuseReporting.BeduiV2.Utils.appendReportAnythingTags)
+
+local FFlagAbuseReportInlineAlertStateOutsideReducer = require(GenericAbuseReporting.Flags.FFlagAbuseReportInlineAlertStateOutsideReducer)
+
+local function DynamicReportV2InExpContainer(t1: {[any]: any}) -- line: 59
+	-- upvalues: React (copy), useIsVoiceChatReportable (copy), getIsInExpSceneSelectionAvailable (copy), useDynamicInExpConfig (copy), FFlagAbuseReportInlineAlertStateOutsideReducer (copy), useDeviceOrientation (copy), GuiService (copy), getUsers (copy), useInExpCustomSubmit (copy), sendBoundaryErrorTelemetry (copy), DynamicReportV2InExpError (copy), AbuseReportErrorBoundary (copy), AbuseReportContentInExp (copy)
+	local preselectedPlayer = t1.preselectedPlayer
+	local v19 = React.useMemo(function() -- line: 62
+		return (tostring(game.GameId))
+	end, {})
+	local v20 = useIsVoiceChatReportable(t1.voiceChatServiceManager)
+	local v21 = React.useMemo(function() -- line: 68
+		-- upvalues: v19 (copy), v20 (copy), getIsInExpSceneSelectionAvailable (copy), preselectedPlayer (copy)
+		local t2 = {
+			experienceTargetId = v19,
+			isVoiceChatReportable = v20,
+			isSceneSelectionAvailable = getIsInExpSceneSelectionAvailable()
+		}
+
+		if preselectedPlayer then
+			t2.preselectedAbuserId = tostring(preselectedPlayer.UserId)
+			t2.preselectedAbuserDisplayName = preselectedPlayer.DisplayName
+			t2.preselectedAbuserUsername = preselectedPlayer.Name
+		end
+
+		return t2
+	end, {
+		v19,
+		preselectedPlayer,
+		v20
+	})
+	local v22 = useDynamicInExpConfig(t1.isReportTabVisible, v21)
+	local config = v22.config
+	local hasError = v22.hasError
+	local setHasError = v22.setHasError
+	local abuseVector = v22.abuseVector
+	local u27 = nil
+	local u28 = nil
+
+	if FFlagAbuseReportInlineAlertStateOutsideReducer then
+		local v29, v30 = React.useState(nil)
+
+		u27 = v29
+		u28 = v30
+	end
+
+	local v31 = useDeviceOrientation()
+	local v32 = GuiService.ViewportDisplaySize == Enum.DisplaySize.Small
+	local v33 = v31 == "Landscape" or not v32
+	local v34 = React.useMemo(function() -- line: 97
+		-- upvalues: getUsers (copy), t1 (copy)
+		local t3 = {
+			users = {
+				type = "listItem",
+				fetch = getUsers
+			}
+		}
+
+		if t1.inExpChatMessagesLoader then
+			t3.inExpChatMessages = t1.inExpChatMessagesLoader
+		end
+
+		if t1.inExpVoiceUsersLoader then
+			t3.voiceUsers = t1.inExpVoiceUsersLoader
+		end
+
+		return t3
+	end, {
+		t1.inExpChatMessagesLoader,
+		t1.inExpVoiceUsersLoader
+	})
+	local v35 = React.useRef(DateTime.now().UnixTimestampMillis)
+
+	React.useEffect(function() -- line: 118
+		-- upvalues: t1 (copy), v35 (copy)
+		if t1.isReportTabVisible then
+			v35.current = DateTime.now().UnixTimestampMillis
+		end
+	end, { t1.isReportTabVisible })
+
+	if FFlagAbuseReportInlineAlertStateOutsideReducer then
+		React.useEffect(function() -- line: 125
+			-- upvalues: t1 (copy), u28 (ref)
+			if not t1.isReportTabVisible and u28 then
+				u28(nil)
+			end
+		end, {
+			t1.isReportTabVisible,
+			u28
+		})
+	end
+
+	local v36 = useInExpCustomSubmit({
+		voiceChatServiceManager = t1.voiceChatServiceManager,
+		inExpChatMessagesLoader = t1.inExpChatMessagesLoader,
+		menuOpenTimeRef = v35,
+		reportAnythingSnapshotRef = t1.reportAnythingSnapshotRef
+	})
+	local v37 = React.useCallback(function() -- line: 141
+		-- upvalues: setHasError (copy)
+		setHasError(true)
+	end, { setHasError })
+	local v38 = React.useCallback(function(p1) -- line: 145
+		-- upvalues: sendBoundaryErrorTelemetry (copy), abuseVector (copy), v19 (copy), setHasError (copy)
+		warn("AbuseReportErrorBoundary (in-exp) caught:", p1)
+		sendBoundaryErrorTelemetry(p1, {
+			abuse_vector = abuseVector,
+			target_id = v19
+		})
+		setHasError(true)
+	end, {
+		abuseVector,
+		v19,
+		setHasError
+	})
+	local v39 = nil
+
+	if FFlagAbuseReportInlineAlertStateOutsideReducer then
+		v39 = React.useMemo(function() -- line: 156
+			-- upvalues: u28 (ref), u27 (ref)
+			if u28 then
+				return {
+					pendingInlineAlert = u27,
+					setInlineAlert = u28
+				}
+			end
+
+			return nil
+		end, {
+			u27,
+			u28
+		})
+	end
+
+	if t1.isReportTabVisible and hasError then
+		return React.createElement(DynamicReportV2InExpError, nil)
+	end
+
+	return if not t1.isReportTabVisible or (not config or hasError) then nil else React.createElement(AbuseReportErrorBoundary, {
+		onError = v38
+	}, {
+		AbuseReportContentInExp = React.createElement(AbuseReportContentInExp, {
+			rawConfig = config,
+			abuseVector = abuseVector,
+			targetId = v19,
+			onClose = t1.onClose,
+			open = t1.isReportTabVisible,
+			onCustomSubmit = v36,
+			onFinish = t1.onReportFinish,
+			onResolveError = v37,
+			shouldUseOverlaidControls = v33,
+			loaders = v34,
+			attemptTrigger = not preselectedPlayer and "onFirstAction" or "onOpen",
+			inlineAlertController = v39
+		})
+	})
+end
+
+return React.memo(DynamicReportV2InExpContainer)

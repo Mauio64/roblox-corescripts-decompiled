@@ -1,72 +1,59 @@
-local function _(v0) --[[ Line: 1 ]] --[[ Name: newSymbol ]]
-    local v1 = newproxy(true);
-    v0 = ("Mocks.%s"):format(v0);
-    getmetatable(v1).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: v0 (ref)
-        return v0;
-    end;
-    return v1;
-end;
-local v3 = {};
-local v4 = "Calls";
-local v5 = newproxy(true);
-v4 = ("Mocks.%s"):format(v4);
-local v6;
-do
-    local l_v4_0 = v4;
-    getmetatable(v5).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: l_v4_0 (ref)
-        return l_v4_0;
-    end;
-    v6 = v5;
-end;
-v3.Calls = v6;
-v4 = "Children";
-v5 = newproxy(true);
-v4 = ("Mocks.%s"):format(v4);
-do
-    local l_v4_1 = v4;
-    getmetatable(v5).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: l_v4_1 (ref)
-        return l_v4_1;
-    end;
-    v6 = v5;
-end;
-v3.Children = v6;
-v4 = "Lock";
-v5 = newproxy(true);
-v4 = ("Mocks.%s"):format(v4);
-do
-    local l_v4_2 = v4;
-    getmetatable(v5).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: l_v4_2 (ref)
-        return l_v4_2;
-    end;
-    v6 = v5;
-end;
-v3.Lock = v6;
-v4 = "None";
-v5 = newproxy(true);
-v4 = ("Mocks.%s"):format(v4);
-do
-    local l_v4_3 = v4;
-    getmetatable(v5).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: l_v4_3 (ref)
-        return l_v4_3;
-    end;
-    v6 = v5;
-end;
-v3.None = v6;
-v4 = "ReturnValue";
-v5 = newproxy(true);
-v4 = ("Mocks.%s"):format(v4);
-do
-    local l_v4_4 = v4;
-    getmetatable(v5).__tostring = function() --[[ Line: 4 ]]
-        -- upvalues: l_v4_4 (ref)
-        return l_v4_4;
-    end;
-    v6 = v5;
-end;
-v3.ReturnValue = v6;
-return v3;
+local function newSymbol(p1) -- line: 1
+	local v14 = newproxy(true)
+	local u15 = ("Mocks.%s"):format(p1)
+
+	getmetatable(v14).__tostring = function() -- line: 4
+		-- upvalues: u15 (ref)
+		return u15
+	end
+
+	return v14
+end
+
+local t1 = {}
+local v3 = newproxy(true)
+local u4 = ("Mocks.%s"):format("Calls")
+
+getmetatable(v3).__tostring = function() -- line: 4
+	-- upvalues: u4 (ref)
+	return u4
+end
+t1.Calls = v3
+
+local v5 = newproxy(true)
+local u6 = ("Mocks.%s"):format("Children")
+
+getmetatable(v5).__tostring = function() -- line: 4
+	-- upvalues: u6 (ref)
+	return u6
+end
+t1.Children = v5
+
+local v7 = newproxy(true)
+local u8 = ("Mocks.%s"):format("Lock")
+
+getmetatable(v7).__tostring = function() -- line: 4
+	-- upvalues: u8 (ref)
+	return u8
+end
+t1.Lock = v7
+
+local v9 = newproxy(true)
+local u10 = ("Mocks.%s"):format("None")
+
+getmetatable(v9).__tostring = function() -- line: 4
+	-- upvalues: u10 (ref)
+	return u10
+end
+t1.None = v9
+
+local v11 = newproxy(true)
+local u12 = ("Mocks.%s"):format("ReturnValue")
+
+getmetatable(v11).__tostring = function() -- line: 4
+	-- upvalues: u12 (ref)
+	return u12
+end
+t1.ReturnValue = v11
+
+return t1

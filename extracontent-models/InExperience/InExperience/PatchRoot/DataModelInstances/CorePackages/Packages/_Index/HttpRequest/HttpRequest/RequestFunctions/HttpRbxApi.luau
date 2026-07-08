@@ -1,76 +1,79 @@
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(script.Parent.Parent.StatusCode);
-local l_Extreme_0 = Enum.ThrottlingPriority.Extreme;
-local l_ApplicationJson_0 = Enum.HttpContentType.ApplicationJson;
-local function _(v5, v6) --[[ Line: 9 ]] --[[ Name: doHttpGet ]]
-    -- upvalues: l_HttpRbxApiService_0 (copy), l_Extreme_0 (copy)
-    return pcall(function() --[[ Line: 10 ]]
-        -- upvalues: l_HttpRbxApiService_0 (ref), v5 (copy), v6 (copy), l_Extreme_0 (ref)
-        return l_HttpRbxApiService_0:GetAsyncFullUrl(v5, v6.throttlingPriority or l_Extreme_0, v6.httpRequestType or nil);
-    end);
-end;
-local function v11(v8, v9) --[[ Line: 19 ]] --[[ Name: doHttpPost ]]
-    -- upvalues: l_HttpService_0 (copy), l_HttpRbxApiService_0 (copy), l_Extreme_0 (copy), l_ApplicationJson_0 (copy)
-    local v10 = nil;
-    assert(v9.postBody, "Expected a postBody to be specified with this request");
-    if type(v9.postBody) == "table" then
-        v10 = l_HttpService_0:JSONEncode(v9.postBody);
-    elseif type(v9.postBody) == "string" then
-        v10 = v9.postBody;
-    else
-        error("Expected postBody to be a string or table");
-    end;
-    return pcall(function() --[[ Line: 30 ]]
-        -- upvalues: l_HttpRbxApiService_0 (ref), v8 (copy), v10 (ref), v9 (copy), l_Extreme_0 (ref), l_ApplicationJson_0 (ref)
-        return l_HttpRbxApiService_0:PostAsyncFullUrl(v8, v10, v9.throttlingPriority or l_Extreme_0, v9.contentType or l_ApplicationJson_0, v9.httpRequestType or nil);
-    end);
-end;
-local function v16(v12) --[[ Line: 41 ]] --[[ Name: createResponse ]]
-    -- upvalues: v2 (copy), l_HttpService_0 (copy)
-    local l_OK_0 = v2.OK;
-    local l_status_0, _ = pcall(function() --[[ Line: 44 ]]
-        -- upvalues: l_HttpService_0 (ref), v12 (copy)
-        return l_HttpService_0:JSONDecode(v12);
-    end);
-    if not l_status_0 then
-        l_OK_0 = tonumber(v12:sub(6, 8));
-    end;
-    return {
-        Body = v12, 
-        StatusCode = l_OK_0, 
-        Headers = {}
-    };
-end;
-return function(v17, v18, v19) --[[ Line: 61 ]]
-    -- upvalues: l_HttpRbxApiService_0 (copy), l_Extreme_0 (copy), v11 (copy), v16 (copy)
-    return {
-        Start = function(_, v21) --[[ Line: 63 ]] --[[ Name: Start ]]
-            -- upvalues: v18 (copy), v17 (copy), v19 (copy), l_HttpRbxApiService_0 (ref), l_Extreme_0 (ref), v11 (ref), v16 (ref)
-            local v22 = nil;
-            local v23 = nil;
-            if v18 == "GET" then
-                local l_v17_0 = v17;
-                local l_v19_0 = v19;
-                local l_status_1, l_result_1 = pcall(function() --[[ Line: 10 ]]
-                    -- upvalues: l_HttpRbxApiService_0 (ref), l_v17_0 (copy), l_v19_0 (copy), l_Extreme_0 (ref)
-                    return l_HttpRbxApiService_0:GetAsyncFullUrl(l_v17_0, l_v19_0.throttlingPriority or l_Extreme_0, l_v19_0.httpRequestType or nil);
-                end);
-                local l_l_status_1_0 = l_status_1;
-                local l_l_result_1_0 = l_result_1;
-                v22 = l_l_status_1_0;
-                v23 = l_l_result_1_0;
-            elseif v18 == "POST" then
-                local v30, v31 = v11(v17, v19);
-                v22 = v30;
-                v23 = v31;
-            else
-                error("Unsupported method: " .. v18);
-            end;
-            v21(v22, (v16(v23)));
-        end, 
-        Cancel = function() --[[ Line: 77 ]] --[[ Name: Cancel ]]
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local HttpService = game:GetService("HttpService")
+local StatusCode = require(script.Parent.Parent.StatusCode)
+local Extreme = Enum.ThrottlingPriority.Extreme
+local ApplicationJson = Enum.HttpContentType.ApplicationJson
 
-        end
-    };
-end;
+local function doHttpGet(p1, p2) -- line: 9
+	-- upvalues: HttpRbxApiService (copy), Extreme (copy)
+	return pcall(function() -- line: 10
+		-- upvalues: HttpRbxApiService (copy), p1 (copy), p2 (copy), Extreme (copy)
+		return HttpRbxApiService:GetAsyncFullUrl(p1, p2.throttlingPriority or Extreme, p2.httpRequestType or nil)
+	end)
+end
+local function doHttpPost(p3, p4) -- line: 19
+	-- upvalues: HttpService (copy), HttpRbxApiService (copy), Extreme (copy), ApplicationJson (copy)
+	local json = nil
+
+	assert(p4.postBody, "Expected a postBody to be specified with this request")
+
+	if type(p4.postBody) == "table" then
+		json = HttpService:JSONEncode(p4.postBody)
+	elseif type(p4.postBody) == "string" then
+		json = p4.postBody
+	else
+		error("Expected postBody to be a string or table")
+	end
+
+	return pcall(function() -- line: 30
+		-- upvalues: HttpRbxApiService (copy), p3 (copy), json (ref), p4 (copy), Extreme (copy), ApplicationJson (copy)
+		return HttpRbxApiService:PostAsyncFullUrl(p3, json, p4.throttlingPriority or Extreme, p4.contentType or ApplicationJson, p4.httpRequestType or nil)
+	end)
+end
+local function createResponse(p5) -- line: 41
+	-- upvalues: StatusCode (copy), HttpService (copy)
+	local OK = StatusCode.OK
+	local ok, _ = pcall(function() -- line: 44
+		-- upvalues: HttpService (copy), p5 (copy)
+		return HttpService:JSONDecode(p5)
+	end)
+
+	if not ok then
+		OK = tonumber(p5:sub(6, 8))
+	end
+
+	return {
+		Body = p5,
+		StatusCode = OK,
+		Headers = {}
+	}
+end
+
+return function(p6, p7, p8) -- line: 61
+	-- upvalues: HttpRbxApiService (copy), Extreme (copy), doHttpPost (copy), createResponse (copy)
+	return {
+		Start = function(_, p10) -- line: 63
+			-- upvalues: p7 (copy), p6 (copy), p8 (copy), HttpRbxApiService (copy), Extreme (copy), doHttpPost (copy), createResponse (copy)
+			local ok = nil
+			local result = nil
+
+			if p7 == "GET" then
+				local v25 = p6
+				local v26 = p8
+
+				ok, result = pcall(function() -- line: 10
+					-- upvalues: HttpRbxApiService (copy), v25 (copy), v26 (copy), Extreme (copy)
+					return HttpRbxApiService:GetAsyncFullUrl(v25, v26.throttlingPriority or Extreme, v26.httpRequestType or nil)
+				end)
+			elseif p7 == "POST" then
+				ok, result = doHttpPost(p6, p8)
+			else
+				error("Unsupported method: " .. p7)
+			end
+
+			p10(ok, (createResponse(result)))
+		end,
+		Cancel = function() -- line: 77
+		end
+	}
+end

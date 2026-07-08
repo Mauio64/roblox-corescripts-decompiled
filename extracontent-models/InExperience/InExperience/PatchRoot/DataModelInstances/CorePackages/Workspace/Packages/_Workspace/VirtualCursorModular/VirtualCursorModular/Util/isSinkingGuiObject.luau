@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 3 ]] --[[ Name: isSinkingGuiObject ]]
-    return v0.Visible and v0.Active and v0.Interactable;
-end;
+local function isSinkingGuiObject(p1) -- line: 3
+	return p1.Visible and (p1.Active and p1.Interactable)
+end
+
+return isSinkingGuiObject

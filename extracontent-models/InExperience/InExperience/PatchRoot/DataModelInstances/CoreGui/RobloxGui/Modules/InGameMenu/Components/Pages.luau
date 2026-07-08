@@ -1,99 +1,101 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local l_Images_0 = require(l_CorePackages_0.Packages.InGameMenuDependencies).UIBlox.App.ImageSet.Images;
-local v3 = require(l_Parent_0.Resources.Constants);
-local v4 = {
-    {
-        key = v3.InitalPageKey, 
-        navigationDepth = 1, 
-        component = script.InitalPage, 
-        parentPage = nil
-    }, 
-    {
-        key = v3.MainPagePageKey, 
-        navigationDepth = 1, 
-        component = script.Parent.MainPage, 
-        parentPage = nil
-    }, 
-    {
-        key = "Players", 
-        title = "CoreScripts.InGameMenu.PageTitle.Players", 
-        icon = l_Images_0["icons/controls/players"], 
-        component = script.PlayersPage, 
-        navigationDepth = 2, 
-        parentPage = v3.MainPagePageKey
-    }, 
-    {
-        key = "InviteFriends", 
-        title = "CoreScripts.InGameMenu.PageTitle.InviteFriends", 
-        icon = l_Images_0["icons/actions/friends/friendInvite"], 
-        component = script.Parent.InviteFriendsPage, 
-        navigationDepth = 2, 
-        parentPage = v3.MainPagePageKey
-    }, 
-    {
-        key = "GameSettings", 
-        title = "CoreScripts.InGameMenu.PageTitle.GameSettings", 
-        icon = l_Images_0["icons/common/settings"], 
-        component = script.Parent.GameSettingsPage.BasicPage, 
-        navigationDepth = 2, 
-        parentPage = v3.MainPagePageKey
-    }, 
-    {
-        key = "Report", 
-        title = "CoreScripts.InGameMenu.PageTitle.Report", 
-        icon = l_Images_0["icons/actions/feedback"], 
-        component = script.Parent.ReportPage, 
-        navigationDepth = 2, 
-        parentPage = v3.MainPagePageKey
-    }, 
-    {
-        key = "Controls", 
-        title = "CoreScripts.InGameMenu.PageTitle.Controls", 
-        icon = l_Images_0["icons/controls/controls"], 
-        component = script.Parent.ControlsPage, 
-        isModal = true, 
-        navigationDepth = 2, 
-        parentPage = v3.MainPagePageKey
-    }, 
-    {
-        key = "AdvancedGameSettings", 
-        title = "CoreScripts.InGameMenu.PageTitle.GameSettings", 
-        icon = l_Images_0["icons/menu/settings_large"], 
-        component = script.Parent.GameSettingsPage.AdvancedPage, 
-        isSecondaryPage = true, 
-        navigationDepth = 3, 
-        parentPage = "GameSettings"
-    }, 
-    {
-        key = "VRGameSettings", 
-        title = "CoreScripts.InGameMenu.PageTitle.VRComfortSettings", 
-        icon = l_Images_0["icons/menu/settings_large"], 
-        component = script.Parent.GameSettingsPage.VRComfortSettingsPage, 
-        isSecondaryPage = true, 
-        navigationDepth = 3, 
-        parentPage = "GameSettings"
-    }, 
-    {
-        key = v3.LeaveToAppPromptPageKey, 
-        navigationDepth = 1, 
-        component = script.Dialog.LeaveToAppPrompt, 
-        parentPage = nil
-    }, 
-    {
-        key = v3.LeaveGamePromptPageKey, 
-        navigationDepth = 1, 
-        component = script.Dialog.LeaveGamePrompt, 
-        parentPage = nil
-    }
-};
-local v5 = {};
-for v6, v7 in ipairs(v4) do
-    v7.index = v6;
-    assert(v5[v7.key] == nil, ("page key %s is duplicated"):format(v7.key));
-    v5[v7.key] = v7;
-end;
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local Images = require(CorePackages.Packages.InGameMenuDependencies).UIBlox.App.ImageSet.Images
+local Constants = require(ParentParent.Resources.Constants)
+local t1 = {
+	{
+		navigationDepth = 1,
+		parentPage = nil,
+		key = Constants.InitalPageKey,
+		component = script.InitalPage
+	},
+	{
+		navigationDepth = 1,
+		parentPage = nil,
+		key = Constants.MainPagePageKey,
+		component = script.Parent.MainPage
+	},
+	{
+		key = "Players",
+		title = "CoreScripts.InGameMenu.PageTitle.Players",
+		navigationDepth = 2,
+		icon = Images["icons/controls/players"],
+		component = script.PlayersPage,
+		parentPage = Constants.MainPagePageKey
+	},
+	{
+		key = "InviteFriends",
+		title = "CoreScripts.InGameMenu.PageTitle.InviteFriends",
+		navigationDepth = 2,
+		icon = Images["icons/actions/friends/friendInvite"],
+		component = script.Parent.InviteFriendsPage,
+		parentPage = Constants.MainPagePageKey
+	},
+	{
+		key = "GameSettings",
+		title = "CoreScripts.InGameMenu.PageTitle.GameSettings",
+		navigationDepth = 2,
+		icon = Images["icons/common/settings"],
+		component = script.Parent.GameSettingsPage.BasicPage,
+		parentPage = Constants.MainPagePageKey
+	},
+	{
+		key = "Report",
+		title = "CoreScripts.InGameMenu.PageTitle.Report",
+		navigationDepth = 2,
+		icon = Images["icons/actions/feedback"],
+		component = script.Parent.ReportPage,
+		parentPage = Constants.MainPagePageKey
+	},
+	{
+		key = "Controls",
+		title = "CoreScripts.InGameMenu.PageTitle.Controls",
+		isModal = true,
+		navigationDepth = 2,
+		icon = Images["icons/controls/controls"],
+		component = script.Parent.ControlsPage,
+		parentPage = Constants.MainPagePageKey
+	},
+	{
+		key = "AdvancedGameSettings",
+		title = "CoreScripts.InGameMenu.PageTitle.GameSettings",
+		isSecondaryPage = true,
+		navigationDepth = 3,
+		parentPage = "GameSettings",
+		icon = Images["icons/menu/settings_large"],
+		component = script.Parent.GameSettingsPage.AdvancedPage
+	},
+	{
+		key = "VRGameSettings",
+		title = "CoreScripts.InGameMenu.PageTitle.VRComfortSettings",
+		isSecondaryPage = true,
+		navigationDepth = 3,
+		parentPage = "GameSettings",
+		icon = Images["icons/menu/settings_large"],
+		component = script.Parent.GameSettingsPage.VRComfortSettingsPage
+	},
+	{
+		navigationDepth = 1,
+		parentPage = nil,
+		key = Constants.LeaveToAppPromptPageKey,
+		component = script.Dialog.LeaveToAppPrompt
+	},
+	{
+		navigationDepth = 1,
+		parentPage = nil,
+		key = Constants.LeaveGamePromptPageKey,
+		component = script.Dialog.LeaveGamePrompt
+	}
+}
+local t2 = {}
+
+for i, v in ipairs(t1) do
+	v.index = i
+	assert(t2[v.key] == nil, ("page key %s is duplicated"):format(v.key))
+	t2[v.key] = v
+end
+
 return {
-    pagesByIndex = v4, 
-    pagesByKey = v5
-};
+	pagesByIndex = t1,
+	pagesByKey = t2
+}

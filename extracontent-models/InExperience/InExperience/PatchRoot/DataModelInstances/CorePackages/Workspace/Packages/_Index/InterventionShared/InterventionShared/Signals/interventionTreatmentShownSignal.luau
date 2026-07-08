@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("InterventionShared").Parent;
-return (require(l_Parent_0.AppCommonLib).Signal.new());
+local Parent = script:FindFirstAncestor("InterventionShared").Parent
+
+return (require(Parent.AppCommonLib).Signal.new())

@@ -1,78 +1,79 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Components.ScreenshotDialog);
-local v5 = require(l_Parent_0.Components.ScreenshotReviewDialog);
-local _ = require(script.Parent.Parent.Parent.Components.Types);
-local l_GetFFlagAvatarIdentificationSafeAreaFix_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix;
-return function(v8) --[[ Line: 28 ]] --[[ Name: ScreenshotFlowStepHandler ]]
-    -- upvalues: v1 (copy), l_GetFFlagAvatarIdentificationSafeAreaFix_0 (copy), v5 (copy), v2 (copy), v4 (copy)
-    local v9, v10 = v1.useState(v8.initialPageNumber == nil and 1 or v8.initialPageNumber);
-    local v11, v12 = v1.useState(1.7777777777777777);
-    local v13, v14 = v1.useState(800);
-    local v15, v16 = v1.useState(800);
-    local v17, v18 = v1.useState(true);
-    local v19 = v1.useCallback(function() --[[ Line: 35 ]]
-        -- upvalues: v10 (copy)
-        v10(2);
-    end, {
-        v10
-    });
-    local v20 = v1.useCallback(function() --[[ Line: 38 ]]
-        -- upvalues: v10 (copy)
-        v10(1);
-    end, {
-        v10
-    });
-    v1.useEffect(function() --[[ Line: 42 ]]
-        -- upvalues: l_GetFFlagAvatarIdentificationSafeAreaFix_0 (ref), v8 (copy), v12 (copy), v14 (copy), v16 (copy), v18 (copy)
-        local l_CurrentCamera_0 = game.Workspace.CurrentCamera;
-        if l_CurrentCamera_0 ~= nil then
-            local l_viewportSize_0 = l_CurrentCamera_0.viewportSize;
-            if l_GetFFlagAvatarIdentificationSafeAreaFix_0() and v8.viewportInfo then
-                v12(v8.viewportInfo.width / v8.viewportInfo.height);
-            else
-                v12(l_viewportSize_0.X / l_viewportSize_0.Y);
-            end;
-            v14(l_viewportSize_0.Y);
-            v16(l_viewportSize_0.X);
-            local l_v18_0 = v18;
-            local v24 = false;
-            if l_viewportSize_0.X < l_viewportSize_0.Y then
-                v24 = l_viewportSize_0.X < 800;
-            end;
-            l_v18_0(v24);
-        end;
-    end, {});
-    local _ = nil;
-    if v9 == 1 then
-        return (v1.createElement(v5, {
-            imageAspectRatio = v11, 
-            isSmallPortraitMode = v17, 
-            viewportUISafeAreaHeight = v13, 
-            viewportUISafeAreaWidth = v15, 
-            onNextPage = v19, 
-            onBack = v8.dismissAction, 
-            onSkip = v8.skipAnnotationAction, 
-            onRestart = v8.restartAction, 
-            screenshot = v8.screenshot, 
-            reportAnythingAnalytics = v8.reportAnythingAnalytics
-        }, {}));
-    else
-        local v26 = if v8.entryPoint == "player" then v2:FormatByKey("Feature.ReportAbuse.Label.SelectPerson") else v2:FormatByKey("Feature.ReportAbuse.Label.SelectProblem");
-        return (v1.createElement(v4, {
-            titleText = v26, 
-            backAction = v20, 
-            dismissAction = v8.dismissAction, 
-            finishAnnotationAction = v8.finishAnnotationAction, 
-            initialAnnotationPoints = v8.initialAnnotationPoints, 
-            isSmallPortraitMode = v17, 
-            screenshot = v8.screenshot, 
-            imageAspectRatio = v11, 
-            setAnnotationCircleRadius = v8.setAnnotationCircleRadius, 
-            setAnnotationAreaDimensions = v8.setAnnotationAreaDimensions, 
-            reportAnythingAnalytics = v8.reportAnythingAnalytics
-        }));
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ParentParent = script.Parent.Parent
+local ScreenshotDialog = require(ParentParent.Components.ScreenshotDialog)
+local ScreenshotReviewDialog = require(ParentParent.Components.ScreenshotReviewDialog)
+
+require(script.Parent.Parent.Parent.Components.Types)
+
+local GetFFlagAvatarIdentificationSafeAreaFix = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix
+
+local function ScreenshotFlowStepHandler(p1) -- line: 28
+	-- upvalues: React (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), ScreenshotReviewDialog (copy), RobloxTranslator (copy), ScreenshotDialog (copy)
+	local v10, v11 = React.useState(if p1.initialPageNumber ~= nil then p1.initialPageNumber else 1)
+	local v12, v13 = React.useState(1.7777777777777777)
+	local v14, v15 = React.useState(800)
+	local v16, v17 = React.useState(800)
+	local v18, v19 = React.useState(true)
+	local v20 = React.useCallback(function() -- line: 35
+		-- upvalues: v11 (copy)
+		v11(2)
+	end, { v11 })
+	local v21 = React.useCallback(function() -- line: 38
+		-- upvalues: v11 (copy)
+		v11(1)
+	end, { v11 })
+
+	React.useEffect(function() -- line: 42
+		-- upvalues: GetFFlagAvatarIdentificationSafeAreaFix (copy), p1 (copy), v13 (copy), v15 (copy), v17 (copy), v19 (copy)
+		local CurrentCamera = game.Workspace.CurrentCamera
+
+		if CurrentCamera ~= nil then
+			local viewportSize = CurrentCamera.viewportSize
+
+			if GetFFlagAvatarIdentificationSafeAreaFix() and p1.viewportInfo then
+				v13(p1.viewportInfo.width / p1.viewportInfo.height)
+			else
+				v13(viewportSize.X / viewportSize.Y)
+			end
+
+			v15(viewportSize.Y)
+			v17(viewportSize.X)
+			v19(viewportSize.X < viewportSize.Y and viewportSize.X < 800)
+		end
+	end, {})
+
+	if v10 == 1 then
+		return (React.createElement(ScreenshotReviewDialog, {
+			imageAspectRatio = v12,
+			isSmallPortraitMode = v18,
+			viewportUISafeAreaHeight = v14,
+			viewportUISafeAreaWidth = v16,
+			onNextPage = v20,
+			onBack = p1.dismissAction,
+			onSkip = p1.skipAnnotationAction,
+			onRestart = p1.restartAction,
+			screenshot = p1.screenshot,
+			reportAnythingAnalytics = p1.reportAnythingAnalytics
+		}, {}))
+	end
+
+	local v22 = if p1.entryPoint ~= "player" then RobloxTranslator:FormatByKey("Feature.ReportAbuse.Label.SelectProblem") else RobloxTranslator:FormatByKey("Feature.ReportAbuse.Label.SelectPerson")
+
+	return (React.createElement(ScreenshotDialog, {
+		titleText = v22,
+		backAction = v21,
+		dismissAction = p1.dismissAction,
+		finishAnnotationAction = p1.finishAnnotationAction,
+		initialAnnotationPoints = p1.initialAnnotationPoints,
+		isSmallPortraitMode = v18,
+		screenshot = p1.screenshot,
+		imageAspectRatio = v12,
+		setAnnotationCircleRadius = p1.setAnnotationCircleRadius,
+		setAnnotationAreaDimensions = p1.setAnnotationAreaDimensions,
+		reportAnythingAnalytics = p1.reportAnythingAnalytics
+	}))
+end
+
+return ScreenshotFlowStepHandler

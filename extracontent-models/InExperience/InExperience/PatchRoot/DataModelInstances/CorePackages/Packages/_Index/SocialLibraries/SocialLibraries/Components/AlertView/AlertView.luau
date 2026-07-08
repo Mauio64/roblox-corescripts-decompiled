@@ -1,40 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local v4 = require(script.Parent.Parent.FitFrameVertical);
-local v5 = l_Roact_0.Component:extend("AlertView");
-v5.defaultProps = {
-    Visible = false, 
-    width = UDim.new(0.5, 0), 
-    contentPaddingLeft = 12, 
-    contentPaddingRight = 12, 
-    contentPaddingTop = 12, 
-    contentPaddingBottom = 12
-};
-v5.render = function(v6) --[[ Line: 18 ]] --[[ Name: render ]]
-    -- upvalues: l_UIBlox_0 (copy), l_Roact_0 (copy), v4 (copy)
-    return l_UIBlox_0.Style.withStyle(function(v7) --[[ Line: 19 ]]
-        -- upvalues: l_Roact_0 (ref), v4 (ref), v6 (copy)
-        return l_Roact_0.createElement(v4, {
-            Visible = v6.props.Visible, 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundColor3 = v7.Theme.BackgroundUIDefault.Color, 
-            Position = UDim2.new(0.5, 0, 0.5, 0), 
-            width = v6.props.width
-        }, {
-            InnerFrame = l_Roact_0.createElement(v4, {
-                margin = {
-                    top = v6.props.contentPaddingTop, 
-                    bottom = v6.props.contentPaddingBottom, 
-                    left = v6.props.contentPaddingLeft, 
-                    right = v6.props.contentPaddingRight
-                }, 
-                width = UDim.new(1, 0), 
-                BackgroundTransparency = 1, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
-            }, v6.props[l_Roact_0.Children])
-        });
-    end);
-end;
-return v5;
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local FitFrameVertical = require(script.Parent.Parent.FitFrameVertical)
+local v6 = Roact.Component:extend("AlertView")
+
+v6.defaultProps = {
+	Visible = false,
+	contentPaddingLeft = 12,
+	contentPaddingRight = 12,
+	contentPaddingTop = 12,
+	contentPaddingBottom = 12,
+	width = UDim.new(0.5, 0)
+}
+
+function v6.render(p1) -- line: 18
+	-- upvalues: UIBlox (copy), Roact (copy), FitFrameVertical (copy)
+	return UIBlox.Style.withStyle(function(p2) -- line: 19
+		-- upvalues: Roact (copy), FitFrameVertical (copy), p1 (copy)
+		return Roact.createElement(FitFrameVertical, {
+			Visible = p1.props.Visible,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = p2.Theme.BackgroundUIDefault.Color,
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			width = p1.props.width
+		}, {
+			InnerFrame = Roact.createElement(FitFrameVertical, {
+				BackgroundTransparency = 1,
+				margin = {
+					top = p1.props.contentPaddingTop,
+					bottom = p1.props.contentPaddingBottom,
+					left = p1.props.contentPaddingLeft,
+					right = p1.props.contentPaddingRight
+				},
+				width = UDim.new(1, 0),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}, p1.props[Roact.Children])
+		})
+	end)
+end
+
+return v6

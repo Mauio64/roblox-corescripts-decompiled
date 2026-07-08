@@ -1,4 +1,4 @@
 return {
-    CrossExperienceAnalytics = require(script.CrossExperienceAnalytics), 
-    EventNames = require(script.EventNames)
-};
+	CrossExperienceAnalytics = require(script.CrossExperienceAnalytics),
+	EventNames = require(script.EventNames)
+}

@@ -8,12 +8,12 @@ require(VideoUtils.ViewportVideoAutoplayController)
 local VideoEndReason = require(VideoUtils.Analytics.Enums).VideoEndReason
 local v6 = game:DefineFastInt("LuaAppVideoAutoplayWinnerLineOffsetFromTopBarPx", 240)
 
-return function(t1: {[any]: any}) --[[ ViewportVideoAutoplaySync ]] -- line: 20
+local function ViewportVideoAutoplaySync(t1: {[any]: any}) -- line: 20
 	-- upvalues: useViewportBounds (copy), React (copy), v6 (copy), VideoEndReason (copy)
-	local v8 = useViewportBounds(t1.scrollingFrameRef)
+	local v9 = useViewportBounds(t1.scrollingFrameRef)
 
 	React.useEffect(function() -- line: 25
-		-- upvalues: t1 (copy), v6 (copy), v8 (copy)
+		-- upvalues: t1 (copy), v6 (copy), v9 (copy)
 		local viewportAutoplayController = t1.viewportAutoplayController
 
 		if not viewportAutoplayController then
@@ -22,11 +22,11 @@ return function(t1: {[any]: any}) --[[ ViewportVideoAutoplaySync ]] -- line: 20
 
 		viewportAutoplayController:setWinnerLineOffsetFromTopBarPx(v6)
 		viewportAutoplayController:setFeedScopeRef(t1.scrollingFrameRef)
-		viewportAutoplayController:setViewPortBounds(v8)
+		viewportAutoplayController:setViewPortBounds(v9)
 	end, {
 		t1.viewportAutoplayController,
 		t1.scrollingFrameRef,
-		v8
+		v9
 	})
 	React.useEffect(function() -- line: 45
 		-- upvalues: t1 (copy), VideoEndReason (copy)
@@ -47,3 +47,5 @@ return function(t1: {[any]: any}) --[[ ViewportVideoAutoplaySync ]] -- line: 20
 
 	return nil
 end
+
+return ViewportVideoAutoplaySync

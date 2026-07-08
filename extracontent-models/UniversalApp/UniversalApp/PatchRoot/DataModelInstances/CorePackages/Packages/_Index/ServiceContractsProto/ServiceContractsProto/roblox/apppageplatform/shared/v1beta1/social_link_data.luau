@@ -1,152 +1,186 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 45 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        id = (not (v4 ~= nil) or v4.id == nil) and 0 or v4.id, 
-        title = (not (v4 ~= nil) or v4.title == nil) and "" or v4.title, 
-        url = (not (v4 ~= nil) or v4.url == nil) and "" or v4.url, 
-        type = (not (v4 ~= nil) or v4.type == nil) and "" or v4.type
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 54 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.id ~= nil and v5.id ~= 0 then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.varint);
-        v8, v9 = v0.writeVarInt(v8, v9, v5.id);
-        v6 = v8;
-        v7 = v9;
-    end;
-    if v5.title ~= nil and v5.title ~= "" then
-        local v10, v11 = v0.writeTag(v6, v7, 2, v0.wireTypes.lengthDelimited);
-        v10, v11 = v0.writeString(v10, v11, v5.title);
-        v6 = v10;
-        v7 = v11;
-    end;
-    if v5.url ~= nil and v5.url ~= "" then
-        local v12, v13 = v0.writeTag(v6, v7, 3, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v5.url);
-        v6 = v12;
-        v7 = v13;
-    end;
-    if v5.type ~= nil and v5.type ~= "" then
-        local v14, v15 = v0.writeTag(v6, v7, 4, v0.wireTypes.lengthDelimited);
-        v14, v15 = v0.writeString(v14, v15, v5.type);
-        v6 = v14;
-        v7 = v15;
-    end;
-    local v16 = buffer.create(v7);
-    buffer.copy(v16, 0, v6, 0, v7);
-    return v16;
-end;
-v3.decode = function(v17) --[[ Line: 83 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v18 = v3.new();
-    local v19 = 0;
-    while v19 < buffer.len(v17) do
-        local v20 = nil;
-        local v21 = nil;
-        local v22, v23, v24 = v0.readTag(v17, v19);
-        v20 = v22;
-        v21 = v23;
-        v19 = v24;
-        if v21 == v0.wireTypes.varint then
-            if v20 == 1 then
-                v22 = nil;
-                v23, v24 = v0.readVarIntI64(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.id = v22;
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v22 = v23;
-                v19 = v24;
-            end;
-        elseif v21 == v0.wireTypes.lengthDelimited then
-            if v20 == 2 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.title = buffer.tostring(v22);
-            elseif v20 == 3 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.url = buffer.tostring(v22);
-            elseif v20 == 4 then
-                v22 = nil;
-                v23, v24 = v0.readBuffer(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.type = buffer.tostring(v22);
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v19 = v24 + v23;
-            end;
-        elseif v21 == v0.wireTypes.i32 then
-            v22 = nil;
-            v23, v24 = v0.readFixed32(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        elseif v21 == v0.wireTypes.i64 then
-            v22 = nil;
-            v23, v24 = v0.readFixed64(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        else
-            error("Unsupported wire type: " .. v21);
-        end;
-    end;
-    return v18;
-end;
-v3.jsonEncode = function(v25) --[[ Line: 141 ]] --[[ Name: jsonEncode ]]
-    local v26 = {};
-    if v25.id ~= nil and v25.id ~= 0 then
-        v26.id = v25.id;
-    end;
-    if v25.title ~= nil and v25.title ~= "" then
-        v26.title = v25.title;
-    end;
-    if v25.url ~= nil and v25.url ~= "" then
-        v26.url = v25.url;
-    end;
-    if v25.type ~= nil and v25.type ~= "" then
-        v26.type = v25.type;
-    end;
-    return v26;
-end;
-v3.jsonDecode = function(v27) --[[ Line: 163 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy)
-    local v28 = v3.new();
-    if v27.id ~= nil then
-        v28.id = v27.id;
-    end;
-    if v27.title ~= nil then
-        v28.title = v27.title;
-    end;
-    if v27.url ~= nil then
-        v28.url = v27.url;
-    end;
-    if v27.type ~= nil then
-        v28.type = v27.type;
-    end;
-    return v28;
-end;
-v3.descriptor = {
-    name = "SocialLinkData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkData"
-};
-v2.SocialLinkData = v3;
-v1.default:register(v2.SocialLinkData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 47
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		id = if t3 ~= nil and t3.id ~= nil then t3.id else 0,
+		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
+		url = if t3 ~= nil and t3.url ~= nil then t3.url else "",
+		type = if t3 ~= nil and t3.type ~= nil then t3.type else "",
+		community_id = if t3 ~= nil and t3.community_id ~= nil then t3.community_id else 0
+	}, t2))
+end
+function t2.encode(p1) -- line: 57
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.id ~= nil and p1.id ~= 0 then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v9, v10, p1.id)
+	end
+
+	if p1.title ~= nil and p1.title ~= "" then
+		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v11, v12, p1.title)
+	end
+
+	if p1.url ~= nil and p1.url ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.url)
+	end
+
+	if p1.type ~= nil and p1.type ~= "" then
+		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v15, v16, p1.type)
+	end
+
+	if p1.community_id ~= nil and p1.community_id ~= 0 then
+		local v17, v18 = proto.writeTag(buf, n1, 5, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v17, v18, p1.community_id)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 91
+	-- upvalues: t2 (copy), proto (copy)
+	local v21 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v23, v24
+
+		v23, v24, n2 = proto.readTag(p2, n2)
+
+		if v24 == proto.wireTypes.varint then
+			if v23 == 1 then
+				local v25
+
+				v25, n2 = proto.readVarIntI64(p2, n2)
+				v21.id = v25
+			elseif v23 == 5 then
+				local v26
+
+				v26, n2 = proto.readVarIntI64(p2, n2)
+				v21.community_id = v26
+			else
+				local v27
+
+				v27, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v24 == proto.wireTypes.lengthDelimited then
+			if v23 == 2 then
+				local v28
+
+				v28, n2 = proto.readBuffer(p2, n2)
+				v21.title = buffer.tostring(v28)
+			elseif v23 == 3 then
+				local v29
+
+				v29, n2 = proto.readBuffer(p2, n2)
+				v21.url = buffer.tostring(v29)
+			elseif v23 == 4 then
+				local v30
+
+				v30, n2 = proto.readBuffer(p2, n2)
+				v21.type = buffer.tostring(v30)
+			else
+				local v31, v32 = proto.readVarInt(p2, n2)
+
+				n2 = v32 + v31
+			end
+		elseif v24 == proto.wireTypes.i32 then
+			local v33
+
+			v33, n2 = proto.readFixed32(p2, n2)
+		elseif v24 == proto.wireTypes.i64 then
+			local v34
+
+			v34, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v24)
+		end
+	end
+
+	return v21
+end
+function t2.jsonEncode(p3) -- line: 154
+	local t4 = {}
+
+	if p3.id ~= nil and p3.id ~= 0 then
+		t4.id = p3.id
+	end
+
+	if p3.title ~= nil and p3.title ~= "" then
+		t4.title = p3.title
+	end
+
+	if p3.url ~= nil and p3.url ~= "" then
+		t4.url = p3.url
+	end
+
+	if p3.type ~= nil and p3.type ~= "" then
+		t4.type = p3.type
+	end
+
+	if p3.community_id ~= nil and p3.community_id ~= 0 then
+		t4.communityId = p3.community_id
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 180
+	-- upvalues: t2 (copy)
+	local v38 = t2.new()
+
+	if t5.id ~= nil then
+		v38.id = t5.id
+	end
+
+	if t5.title ~= nil then
+		v38.title = t5.title
+	end
+
+	if t5.url ~= nil then
+		v38.url = t5.url
+	end
+
+	if t5.type ~= nil then
+		v38.type = t5.type
+	end
+
+	if t5.community_id ~= nil then
+		v38.community_id = t5.community_id
+	end
+
+	if t5.communityId ~= nil then
+		v38.community_id = t5.communityId
+	end
+
+	return v38
+end
+
+t2.descriptor = {
+	name = "SocialLinkData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.SocialLinkData"
+}
+t1.SocialLinkData = t2
+typeRegistry.default:register(t1.SocialLinkData)
+
 return {
-    SocialLinkData = v2.SocialLinkData
-};
+	SocialLinkData = t1.SocialLinkData
+}

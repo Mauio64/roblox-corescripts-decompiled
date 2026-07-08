@@ -1,8 +1,10 @@
-local _ = require(script.Parent.Types);
-return function(v1) --[[ Line: 4 ]]
-    return function(v2) --[[ Line: 5 ]]
-        -- upvalues: v1 (copy)
-        v1:reportCounter(v2.name, v2.count or 1);
-        return v2;
-    end;
-end;
+require(script.Parent.Types)
+
+return function(t1: {[any]: any}) -- line: 4
+	return function(p1) -- line: 5
+		-- upvalues: t1 (copy)
+		t1:reportCounter(p1.name, p1.count or 1)
+
+		return p1
+	end
+end

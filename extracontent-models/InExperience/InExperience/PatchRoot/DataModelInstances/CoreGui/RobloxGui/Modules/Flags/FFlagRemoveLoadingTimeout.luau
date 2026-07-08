@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RemoveLoadingTimeout", false);
+return game:DefineFastFlag("RemoveLoadingTimeout", false)

@@ -1,21 +1,31 @@
-local v0 = {};
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_DEV_0 = require(l_Parent_0.utilities).DEV;
-l_invariant_0(typeof(l_DEV_0) == "boolean", (tostring(l_DEV_0)));
-local v6 = require(script.context);
-v0.ApolloProvider = v6.ApolloProvider;
-v0.ApolloConsumer = v6.ApolloConsumer;
-v0.getApolloContext = v6.getApolloContext;
-v0.resetApolloContext = v6.resetApolloContext;
-local v7 = require(script.hooks);
-l_Object_0.assign(v0, v7);
-local v8 = require(script.parser);
-v0.DocumentType = v8.DocumentType;
-v0.operationName = v8.operationName;
-v0.parser = v8.parser;
-local v9 = require(script.types.types);
-l_Object_0.assign(v0, v9);
-return v0;
+local t1 = {}
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Object = require(scriptParentParent.LuauPolyfill).Object
+local invariant = require(scriptParent.jsutils.invariant).invariant
+local DEV = require(scriptParent.utilities).DEV
+
+invariant(typeof(DEV) == "boolean", (tostring(DEV)))
+
+local context = require(script.context)
+
+t1.ApolloProvider = context.ApolloProvider
+t1.ApolloConsumer = context.ApolloConsumer
+t1.getApolloContext = context.getApolloContext
+t1.resetApolloContext = context.resetApolloContext
+
+local hooks = require(script.hooks)
+
+Object.assign(t1, hooks)
+
+local parser = require(script.parser)
+
+t1.DocumentType = parser.DocumentType
+t1.operationName = parser.operationName
+t1.parser = parser.parser
+
+local types = require(script.types.types)
+
+Object.assign(t1, types)
+
+return t1

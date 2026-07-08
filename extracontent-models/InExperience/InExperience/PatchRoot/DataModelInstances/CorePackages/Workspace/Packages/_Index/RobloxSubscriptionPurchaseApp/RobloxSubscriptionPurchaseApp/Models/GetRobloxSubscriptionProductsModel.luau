@@ -1,177 +1,192 @@
-local function v4(v0) --[[ Line: 51 ]] --[[ Name: parseEligibleOffers ]]
-    assert(type(v0) == "table", "Expected EligibleOffers to be a table");
-    local v1 = {};
-    for _, v3 in ipairs(v0) do
-        assert(type(v3) == "table", "Expected each EligibleOffer to be a table");
-        table.insert(v1, {
-            Duration = tonumber(v3.Duration) or 0, 
-            OfferType = tostring(v3.OfferType or ""), 
-            PeriodType = tostring(v3.PeriodType or "")
-        });
-    end;
-    return v1;
-end;
-local function v9(v5) --[[ Line: 65 ]] --[[ Name: parseRobloxSubscriptionDiscounts ]]
-    if type(v5) ~= "table" then
-        return nil;
-    else
-        local v6 = {};
-        for _, v8 in ipairs(v5) do
-            if type(v8) == "table" then
-                table.insert(v6, {
-                    DiscountPercent = tonumber(v8.DiscountPercent) or 0, 
-                    PeriodIndex = tonumber(v8.PeriodIndex) or 0, 
-                    TierId = tostring(v8.TierId or "")
-                });
-            end;
-        end;
-        return v6;
-    end;
-end;
-local function v11(v10) --[[ Line: 82 ]] --[[ Name: parseFeatureConfig ]]
-    -- upvalues: v9 (copy)
-    assert(type(v10) == "table", "Expected FeatureConfig to be a table");
-    return {
-        IsRobuxTransferEnabled = v10.IsRobuxTransferEnabled == true, 
-        IsTradingEnabled = v10.IsTradingEnabled == true, 
-        IsUgcPublishingEnabled = v10.IsUgcPublishingEnabled == true, 
-        VirtualTransactionDiscounts = v9(v10.VirtualTransactionDiscounts), 
-        PrivateServerDiscounts = v9(v10.PrivateServerDiscounts)
-    };
-end;
-local function _(v12) --[[ Line: 94 ]] --[[ Name: parseRobloxSubscriptionProductDetails ]]
-    -- upvalues: v11 (copy)
-    assert(type(v12) == "table", "Expected RobloxSubscriptionProductDetails to be a table");
-    return {
-        FeatureConfig = v11(v12.FeatureConfig)
-    };
-end;
-local function _(v14) --[[ Line: 101 ]] --[[ Name: parseProductTypeDetails ]]
-    -- upvalues: v11 (copy)
-    assert(type(v14) == "table", "Expected ProductTypeDetails to be a table");
-    local v15 = {};
-    local l_RobloxSubscriptionProductDetails_0 = v14.RobloxSubscriptionProductDetails;
-    assert(type(l_RobloxSubscriptionProductDetails_0) == "table", "Expected RobloxSubscriptionProductDetails to be a table");
-    v15.RobloxSubscriptionProductDetails = {
-        FeatureConfig = v11(l_RobloxSubscriptionProductDetails_0.FeatureConfig)
-    };
-    return v15;
-end;
-local function v19(v18) --[[ Line: 108 ]] --[[ Name: parseLocalizedPrice ]]
-    assert(type(v18) == "table", "Expected LocalizedPrice to be a table");
-    return {
-        CurrencyCode = tostring(v18.CurrencyCode or ""), 
-        Nanos = tonumber(v18.Nanos) or 0, 
-        Units = tonumber(v18.Units) or 0
-    };
-end;
-local function v21(v20) --[[ Line: 117 ]] --[[ Name: parseProductKey ]]
-    if type(v20) ~= "table" then
-        return {
-            Id = "", 
-            Type = ""
-        };
-    else
-        return {
-            Id = tostring(v20.Id or ""), 
-            Type = tostring(v20.Type or "")
-        };
-    end;
-end;
-local v23 = {
-    new = function(v22) --[[ Line: 129 ]] --[[ Name: new ]]
-        return v22;
-    end
-};
-v23.format = function(v24) --[[ Line: 134 ]] --[[ Name: format ]]
-    -- upvalues: v4 (copy), v19 (copy), v21 (copy), v11 (copy), v23 (copy)
-    assert(type(v24) == "table", "Expected products response to be a table");
-    local v25 = {};
-    for _, v27 in ipairs(v24) do
-        if type(v27) == "table" then
-            local v28 = false;
-            if type(v27.PeriodType) == "string" then
-                v28 = v27.PeriodType ~= "";
-            end;
-            assert(v28, "Missing or invalid PeriodType");
-            local v29 = {
-                EligibleOffers = v4(v27.EligibleOffers), 
-                LocalizedPrice = v19(v27.LocalizedPrice), 
-                LocalizedPriceDisplayString = type(v27.LocalizedPriceDisplayString) == "string" and v27.LocalizedPriceDisplayString or nil, 
-                PeriodType = tostring(v27.PeriodType), 
-                ProductKey = v21(v27.ProductKey)
-            };
-            local l_ProductTypeDetails_0 = v27.ProductTypeDetails;
-            assert(type(l_ProductTypeDetails_0) == "table", "Expected ProductTypeDetails to be a table");
-            v28 = {};
-            local l_RobloxSubscriptionProductDetails_1 = l_ProductTypeDetails_0.RobloxSubscriptionProductDetails;
-            assert(type(l_RobloxSubscriptionProductDetails_1) == "table", "Expected RobloxSubscriptionProductDetails to be a table");
-            v28.RobloxSubscriptionProductDetails = {
-                FeatureConfig = v11(l_RobloxSubscriptionProductDetails_1.FeatureConfig)
-            };
-            v29.ProductTypeDetails = v28;
-            table.insert(v25, v23.new(v29));
-        else
-            error("Expected each product to be a table");
-        end;
-    end;
-    return v25;
-end;
-v23.mock = function(v32) --[[ Line: 158 ]] --[[ Name: mock ]]
-    -- upvalues: v23 (copy)
-    local v33 = {
-        EligibleOffers = {
-            {
-                Duration = 1, 
-                OfferType = "FreeTrial", 
-                PeriodType = "Month"
-            }
-        }, 
-        LocalizedPrice = {
-            CurrencyCode = "USD", 
-            Nanos = 990000000, 
-            Units = 12
-        }, 
-        LocalizedPriceDisplayString = "$12.99", 
-        PeriodType = "Month", 
-        ProductKey = {
-            Id = "8429606799668938154", 
-            Type = "Blackbird"
-        }, 
-        ProductTypeDetails = {
-            RobloxSubscriptionProductDetails = {
-                FeatureConfig = {
-                    IsRobuxTransferEnabled = true, 
-                    IsTradingEnabled = true, 
-                    IsUgcPublishingEnabled = true, 
-                    VirtualTransactionDiscounts = {
-                        {
-                            DiscountPercent = 1, 
-                            PeriodIndex = 0, 
-                            TierId = "percent_1"
-                        }, 
-                        {
-                            DiscountPercent = 50, 
-                            PeriodIndex = 2, 
-                            TierId = "percent_50"
-                        }
-                    }, 
-                    PrivateServerDiscounts = {
-                        {
-                            DiscountPercent = 100, 
-                            PeriodIndex = 0, 
-                            TierId = "free"
-                        }
-                    }
-                }
-            }
-        }
-    };
-    if type(v32) == "table" then
-        for v34, v35 in pairs(v32) do
-            v33[v34] = v35;
-        end;
-    end;
-    return v23.new(v33);
-end;
-return v23;
+local function parseEligibleOffers(p1) -- line: 51
+	assert(type(p1) == "table", "Expected EligibleOffers to be a table")
+
+	local t1 = {}
+
+	for _, v in ipairs(p1) do
+		assert(type(v) == "table", "Expected each EligibleOffer to be a table")
+		table.insert(t1, {
+			Duration = tonumber(v.Duration) or 0,
+			OfferType = tostring(v.OfferType or ""),
+			PeriodType = tostring(v.PeriodType or "")
+		})
+	end
+
+	return t1
+end
+local function parseRobloxSubscriptionDiscounts(p2) -- line: 65
+	if type(p2) ~= "table" then
+		return nil
+	end
+
+	local t2 = {}
+
+	for _, v in ipairs(p2) do
+		if type(v) == "table" then
+			table.insert(t2, {
+				DiscountPercent = tonumber(v.DiscountPercent) or 0,
+				PeriodIndex = tonumber(v.PeriodIndex) or 0,
+				TierId = tostring(v.TierId or "")
+			})
+		end
+	end
+
+	return t2
+end
+local function parseFeatureConfig(p3) -- line: 82
+	-- upvalues: parseRobloxSubscriptionDiscounts (copy)
+	assert(type(p3) == "table", "Expected FeatureConfig to be a table")
+
+	return {
+		IsRobuxTransferEnabled = p3.IsRobuxTransferEnabled == true,
+		IsTradingEnabled = p3.IsTradingEnabled == true,
+		IsUgcPublishingEnabled = p3.IsUgcPublishingEnabled == true,
+		VirtualTransactionDiscounts = parseRobloxSubscriptionDiscounts(p3.VirtualTransactionDiscounts),
+		PrivateServerDiscounts = parseRobloxSubscriptionDiscounts(p3.PrivateServerDiscounts)
+	}
+end
+local function parseRobloxSubscriptionProductDetails(p4) -- line: 94
+	-- upvalues: parseFeatureConfig (copy)
+	assert(type(p4) == "table", "Expected RobloxSubscriptionProductDetails to be a table")
+
+	return {
+		FeatureConfig = parseFeatureConfig(p4.FeatureConfig)
+	}
+end
+local function parseProductTypeDetails(p5) -- line: 101
+	-- upvalues: parseFeatureConfig (copy)
+	assert(type(p5) == "table", "Expected ProductTypeDetails to be a table")
+
+	local t3 = {}
+	local RobloxSubscriptionProductDetails = p5.RobloxSubscriptionProductDetails
+
+	assert(type(RobloxSubscriptionProductDetails) == "table", "Expected RobloxSubscriptionProductDetails to be a table")
+	t3.RobloxSubscriptionProductDetails = {
+		FeatureConfig = parseFeatureConfig(RobloxSubscriptionProductDetails.FeatureConfig)
+	}
+
+	return t3
+end
+local function parseLocalizedPrice(p6) -- line: 108
+	assert(type(p6) == "table", "Expected LocalizedPrice to be a table")
+
+	return {
+		CurrencyCode = tostring(p6.CurrencyCode or ""),
+		Nanos = tonumber(p6.Nanos) or 0,
+		Units = tonumber(p6.Units) or 0
+	}
+end
+local function parseProductKey(p7) -- line: 117
+	if type(p7) ~= "table" then
+		return {
+			Id = "",
+			Type = ""
+		}
+	end
+
+	return {
+		Id = tostring(p7.Id or ""),
+		Type = tostring(p7.Type or "")
+	}
+end
+
+local t5 = {
+	new = function(t4: {[any]: any}) -- line: 129
+		return t4
+	end
+}
+
+function t5.format(p8) -- line: 134
+	-- upvalues: parseEligibleOffers (copy), parseLocalizedPrice (copy), parseProductKey (copy), parseFeatureConfig (copy), t5 (copy)
+	assert(type(p8) == "table", "Expected products response to be a table")
+
+	local t6 = {}
+
+	for _, v in ipairs(p8) do
+		if type(v) == "table" then
+			assert(type(v.PeriodType) == "string" and v.PeriodType ~= "", "Missing or invalid PeriodType")
+
+			local t7 = {
+				EligibleOffers = parseEligibleOffers(v.EligibleOffers),
+				LocalizedPrice = parseLocalizedPrice(v.LocalizedPrice),
+				LocalizedPriceDisplayString = type(v.LocalizedPriceDisplayString) == "string" and v.LocalizedPriceDisplayString or nil,
+				PeriodType = tostring(v.PeriodType),
+				ProductKey = parseProductKey(v.ProductKey)
+			}
+			local ProductTypeDetails = v.ProductTypeDetails
+
+			assert(type(ProductTypeDetails) == "table", "Expected ProductTypeDetails to be a table")
+
+			local t8 = {}
+			local RobloxSubscriptionProductDetails = ProductTypeDetails.RobloxSubscriptionProductDetails
+
+			assert(type(RobloxSubscriptionProductDetails) == "table", "Expected RobloxSubscriptionProductDetails to be a table")
+			t8.RobloxSubscriptionProductDetails = {
+				FeatureConfig = parseFeatureConfig(RobloxSubscriptionProductDetails.FeatureConfig)
+			}
+			t7.ProductTypeDetails = t8
+			table.insert(t6, t5.new(t7))
+		else
+			error("Expected each product to be a table")
+		end
+	end
+
+	return t6
+end
+function t5.mock(t9: {[any]: any}?) -- line: 158
+	-- upvalues: t5 (copy)
+	local t10 = {
+		LocalizedPriceDisplayString = "$12.99",
+		PeriodType = "Month",
+		EligibleOffers = {{
+			Duration = 1,
+			OfferType = "FreeTrial",
+			PeriodType = "Month"
+		}},
+		LocalizedPrice = {
+			CurrencyCode = "USD",
+			Nanos = 990000000,
+			Units = 12
+		},
+		ProductKey = {
+			Id = "8429606799668938154",
+			Type = "Blackbird"
+		},
+		ProductTypeDetails = {
+			RobloxSubscriptionProductDetails = {
+				FeatureConfig = {
+					IsRobuxTransferEnabled = true,
+					IsTradingEnabled = true,
+					IsUgcPublishingEnabled = true,
+					VirtualTransactionDiscounts = {
+						{
+							DiscountPercent = 1,
+							PeriodIndex = 0,
+							TierId = "percent_1"
+						},
+						{
+							DiscountPercent = 50,
+							PeriodIndex = 2,
+							TierId = "percent_50"
+						}
+					},
+					PrivateServerDiscounts = {{
+						DiscountPercent = 100,
+						PeriodIndex = 0,
+						TierId = "free"
+					}}
+				}
+			}
+		}
+	}
+
+	if type(t9) == "table" then
+		for k, v in pairs(t9) do
+			t10[k] = v
+		end
+	end
+
+	return t5.new(t10)
+end
+
+return t5

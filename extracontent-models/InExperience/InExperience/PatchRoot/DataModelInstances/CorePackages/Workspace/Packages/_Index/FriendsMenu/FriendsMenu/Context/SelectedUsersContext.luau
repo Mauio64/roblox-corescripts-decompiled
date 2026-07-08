@@ -1,18 +1,16 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-return (require(l_Parent_0.React).createContext({
-    selectedFriendsSize = 0, 
-    selectedFriends = {}, 
-    addFriend = function() --[[ Line: 21 ]] --[[ Name: addFriend ]]
+local ParentParent = script.Parent.Parent.Parent
 
-    end, 
-    removeFriend = function() --[[ Line: 22 ]] --[[ Name: removeFriend ]]
-
-    end, 
-    isFriendSelected = function() --[[ Line: 23 ]] --[[ Name: isFriendSelected ]]
-        return false;
-    end, 
-    preselectedUsers = {}, 
-    onRemoveCallback = function() --[[ Line: 27 ]] --[[ Name: onRemoveCallback ]]
-
-    end
-}));
+return (require(ParentParent.React).createContext({
+	selectedFriendsSize = 0,
+	selectedFriends = {},
+	addFriend = function() -- line: 21
+	end,
+	removeFriend = function() -- line: 22
+	end,
+	isFriendSelected = function() -- line: 23
+		return false
+	end,
+	preselectedUsers = {},
+	onRemoveCallback = function() -- line: 27
+	end
+}))

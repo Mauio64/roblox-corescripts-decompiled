@@ -1,25 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.createAnimatedVisibilityStore);
-local v3 = require(script.Parent.AnimatedVisibilityContext);
-return function(v4) --[[ Line: 14 ]] --[[ Name: AnimatedVisibilityProvider ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    local v5 = v1.useMemo(function() --[[ Line: 15 ]]
-        -- upvalues: v2 (ref), v4 (copy)
-        return v2(v4.initialRatio);
-    end, {});
-    v1.useEffect(function() --[[ Line: 19 ]]
-        -- upvalues: v5 (copy)
-        return function() --[[ Line: 20 ]]
-            -- upvalues: v5 (ref)
-            v5.destroy();
-        end;
-    end, {
-        v5
-    });
-    return v1.createElement(v3.Provider, {
-        value = {
-            animatedMenusStore = v5
-        }
-    }, v4.children);
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local createAnimatedVisibilityStore = require(script.Parent.createAnimatedVisibilityStore)
+local AnimatedVisibilityContext = require(script.Parent.AnimatedVisibilityContext)
+
+local function AnimatedVisibilityProvider(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), createAnimatedVisibilityStore (copy), AnimatedVisibilityContext (copy)
+	local v7 = React.useMemo(function() -- line: 15
+		-- upvalues: createAnimatedVisibilityStore (copy), t1 (copy)
+		return createAnimatedVisibilityStore(t1.initialRatio)
+	end, {})
+
+	React.useEffect(function() -- line: 19
+		-- upvalues: v7 (copy)
+		return function() -- line: 20
+			-- upvalues: v7 (copy)
+			v7.destroy()
+		end
+	end, { v7 })
+
+	return React.createElement(AnimatedVisibilityContext.Provider, {
+		value = {
+			animatedMenusStore = v7
+		}
+	}, t1.children)
+end
+
+return AnimatedVisibilityProvider

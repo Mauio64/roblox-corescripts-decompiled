@@ -1,120 +1,140 @@
-local v0 = require(script.Parent.CameraUtility);
-local v1 = require(script.Parent.CFrameUtility);
-local v2 = require(script.Parent.CharacterUtility);
-local v3 = require(script.Parent.MannequinUtility);
-local v4 = game:DefineFastInt("CameraPresetHeadshotExtentScaleHundredths", 130);
-local v5 = {
-    GOLDEN_RATIO = game:DefineFastInt("AvatarGoldenRatio", 618) / 1000, 
-    UPVECTOR_ORENTATION_TRESHOLD = game:DefineFastInt("UpVectorOrentationThreshold1", -60) / 100, 
-    AVATAR_ROTATION_DEGREE = game:DefineFastInt("LookAvatarRotationDegree1", 23)
-};
-local function _(v6) --[[ Line: 18 ]] --[[ Name: getTorsoOrUpperTorso ]]
-    return v6:FindFirstChild("Torso") or v6:FindFirstChild("UpperTorso");
-end;
-local function v15(v8, v9) --[[ Line: 22 ]] --[[ Name: getMannequinBodyParts ]]
-    -- upvalues: v3 (copy)
-    local v10 = {};
-    if v9.RigType == Enum.HumanoidRigType.R6 then
-        for v11, _ in v3.CharacterPartNames.R6 do
-            if v11 ~= "CharacterMesh" and v11 ~= "HumanoidRootPart" then
-                table.insert(v10, (v8:FindFirstChild(v11)));
-            end;
-        end;
-        return v10;
-    else
-        if v9.RigType == Enum.HumanoidRigType.R15 then
-            for v13, _ in v3.CharacterPartNames.R15 do
-                if v13 ~= "HumanoidRootPart" then
-                    table.insert(v10, (v8:FindFirstChild(v13)));
-                end;
-            end;
-        end;
-        return v10;
-    end;
-end;
-v5.GetCharacterTorsoCFrame = function(v16) --[[ Line: 43 ]]
-    return (v16:FindFirstChild("Torso") or v16:FindFirstChild("UpperTorso")).CFrame;
-end;
-v5.GetFullBodyCameraCFrame = function(v17, v18, v19, v20, v21) --[[ Line: 61 ]]
-    -- upvalues: v5 (copy), v15 (copy), v2 (copy), v0 (copy)
-    local v22 = v20 or 56;
-    local v23 = v21 or v5.GetCharacterTorsoCFrame(v17);
-    local l_LookVector_0 = v23.LookVector;
-    if type(v18) == "function" then
-        v18();
-    end;
-    local l_Humanoid_0 = v17:FindFirstChildOfClass("Humanoid");
-    if not l_Humanoid_0 then
-        return;
-    else
-        local v26 = v15(v17, l_Humanoid_0);
-        local l_CFrame_0 = (v17:FindFirstChild("Torso") or v17:FindFirstChild("UpperTorso")).CFrame;
-        local l_UpVector_0 = l_CFrame_0.UpVector;
-        local v29 = nil;
-        local v30 = nil;
-        local v31 = nil;
-        local v32, v33, v34 = v17:FindFirstChild("Head").CFrame:ToEulerAnglesXYZ();
-        v29 = v32;
-        v30 = v33;
-        v31 = v34;
-        if v19 then
-            v17:PivotTo(v23 * CFrame.Angles(0, math.rad(v5.AVATAR_ROTATION_DEGREE * -1), 0));
-        end;
-        v32, v33 = v2.CalculateBodyPartsExtents(l_CFrame_0, v26);
-        v34 = math.tan((math.rad(v22 / 2)));
-        local v35 = v32:Lerp(v33, v5.GOLDEN_RATIO);
-        local v36 = v32:Lerp(v33, 0.5);
-        local v37 = Vector3.new(v36.X, v35.Y, v36.Z);
-        local v38 = l_CFrame_0:PointToWorldSpace(v37);
-        local v39 = l_CFrame_0 - l_CFrame_0.Position + v38;
-        if not v19 then
-            local v40 = CFrame.fromEulerAnglesXYZ(v29, v30, v31);
-            v39 = v40 - v40.Position + v38;
-        end;
-        local v41 = math.max(v37.X - v32.X, v37.Y - v32.Y);
-        local v42 = math.max(v33.X - v37.X, v33.Y - v37.Y);
-        local v43 = v41 * v0.DefaultBodyMarginScale / v34;
-        local v44 = v42 * v0.DefaultBodyMarginScale / v34;
-        local l_v43_0 = v43;
-        local v46 = l_UpVector_0.Y < v5.UPVECTOR_ORENTATION_TRESHOLD;
-        local v47 = l_UpVector_0.X < v5.UPVECTOR_ORENTATION_TRESHOLD;
-        if v46 or v47 then
-            l_v43_0 = math.max(v43, v44);
-        end;
-        local v48 = l_v43_0 * v0.DistanceScaleForFullBody * l_LookVector_0;
-        return v0.GetCameraCFrame(v39, v48);
-    end;
-end;
-v5.GetCameraCFrame_ForAvatarR15Action_LookAtGoldenRatioOfTheHumanoid = v5.GetFullBodyCameraCFrame;
-v5.GetHeadshotCameraCFrame = function(v49, v50, v51, v52) --[[ Line: 163 ]] --[[ Name: GetHeadshotCameraCFrame ]]
-    -- upvalues: v5 (copy), v1 (copy), v2 (copy), v0 (copy), v4 (copy)
-    local v53 = v52 or 30;
-    if type(v50) == "function" then
-        v50();
-    end;
-    if v51 then
-        v49:PivotTo(v5.GetCharacterTorsoCFrame(v49) * CFrame.Angles(0, math.rad(v5.AVATAR_ROTATION_DEGREE * -1), 0));
-    end;
-    local l_Head_0 = v49:FindFirstChild("Head");
-    if not l_Head_0 then
-        error("Character is missing a Head, cannot apply upper body camera preset.");
-    end;
-    local l_CFrame_1 = l_Head_0.CFrame;
-    local l_FaceFrontAttachment_0 = l_Head_0:FindFirstChild("FaceFrontAttachment");
-    if l_FaceFrontAttachment_0 then
-        l_CFrame_1 = l_FaceFrontAttachment_0.WorldCFrame;
-    end;
-    local v57 = v1.CalculateTargetCFrame(l_CFrame_1);
-    local v58, v59 = v2.CalculateHeadExtents(v49, v57);
-    local v60 = v0.CreateThumbnailCamera();
-    local v61 = {
-        extentScale = v4 / 100, 
-        maxExtent = v59, 
-        minExtent = v58, 
-        optCameraXRot = v0.XRotForCloseup, 
-        optFieldOfView = v53, 
-        targetCFrame = v57
-    };
-    v0.SetupCamera(v60, v61);
-end;
-return v5;
+local CameraUtility = require(script.Parent.CameraUtility)
+local CFrameUtility = require(script.Parent.CFrameUtility)
+local CharacterUtility = require(script.Parent.CharacterUtility)
+local MannequinUtility = require(script.Parent.MannequinUtility)
+local v5 = game:DefineFastInt("CameraPresetHeadshotExtentScaleHundredths", 130)
+local t1 = {
+	GOLDEN_RATIO = game:DefineFastInt("AvatarGoldenRatio", 618) / 1000,
+	UPVECTOR_ORENTATION_TRESHOLD = game:DefineFastInt("UpVectorOrentationThreshold1", -60) / 100,
+	AVATAR_ROTATION_DEGREE = game:DefineFastInt("LookAvatarRotationDegree1", 23)
+}
+
+local function getTorsoOrUpperTorso(p1) -- line: 18
+	return p1:FindFirstChild("Torso") or p1:FindFirstChild("UpperTorso")
+end
+local function getMannequinBodyParts(p2, p3) -- line: 22
+	-- upvalues: MannequinUtility (copy)
+	local t2 = {}
+
+	if p3.RigType == Enum.HumanoidRigType.R6 then
+		for v13, _ in MannequinUtility.CharacterPartNames.R6 do
+			if v13 ~= "CharacterMesh" and v13 ~= "HumanoidRootPart" then
+				table.insert(t2, (p2:FindFirstChild(v13)))
+			end
+		end
+
+		return t2
+	end
+
+	if p3.RigType == Enum.HumanoidRigType.R15 then
+		for v15, _ in MannequinUtility.CharacterPartNames.R15 do
+			if v15 ~= "HumanoidRootPart" then
+				table.insert(t2, (p2:FindFirstChild(v15)))
+			end
+		end
+	end
+
+	return t2
+end
+
+function t1.GetCharacterTorsoCFrame(p4) -- line: 43
+	return (p4:FindFirstChild("Torso") or p4:FindFirstChild("UpperTorso")).CFrame
+end
+function t1.GetFullBodyCameraCFrame(p5, p6: ((...any) -> ...any)?, b1: boolean?, n1: number?, cFrame: CFrame?) -- line: 61
+	-- upvalues: t1 (copy), getMannequinBodyParts (copy), CharacterUtility (copy), CameraUtility (copy)
+	local v23 = n1 or 56
+	local v24 = cFrame or t1.GetCharacterTorsoCFrame(p5)
+	local LookVector = v24.LookVector
+
+	if type(p6) == "function" then
+		p6()
+	end
+
+	local Humanoid = p5:FindFirstChildOfClass("Humanoid")
+
+	if not Humanoid then
+		return
+	end
+
+	local v27 = getMannequinBodyParts(p5, Humanoid)
+	local CFrame2 = (p5:FindFirstChild("Torso") or p5:FindFirstChild("UpperTorso")).CFrame
+	local UpVector = CFrame2.UpVector
+	local v30, v31, v32 = p5:FindFirstChild("Head").CFrame:ToEulerAnglesXYZ()
+
+	if b1 then
+		p5:PivotTo(v24 * CFrame.Angles(0, math.rad(t1.AVATAR_ROTATION_DEGREE * -1), 0))
+	end
+
+	local v33, v34 = CharacterUtility.CalculateBodyPartsExtents(CFrame2, v27)
+	local v35 = math.tan((math.rad(v23 / 2)))
+	local v36 = v33:Lerp(v34, t1.GOLDEN_RATIO)
+	local v37 = v33:Lerp(v34, 0.5)
+	local vector3 = Vector3.new(v37.X, v36.Y, v37.Z)
+	local v39 = CFrame2:PointToWorldSpace(vector3)
+	local v40 = CFrame2 - CFrame2.Position + v39
+
+	if not b1 then
+		local cFrame2 = CFrame.fromEulerAnglesXYZ(v30, v31, v32)
+
+		v40 = cFrame2 - cFrame2.Position + v39
+	end
+
+	local v42 = math.max(vector3.X - v33.X, vector3.Y - v33.Y)
+	local v43 = math.max(v34.X - vector3.X, v34.Y - vector3.Y)
+	local v44 = v42 * CameraUtility.DefaultBodyMarginScale / v35
+	local v45 = v43 * CameraUtility.DefaultBodyMarginScale / v35
+	local v46 = UpVector.Y < t1.UPVECTOR_ORENTATION_TRESHOLD
+	local v47 = UpVector.X < t1.UPVECTOR_ORENTATION_TRESHOLD
+
+	if v46 or v47 then
+		v44 = math.max(v44, v45)
+	end
+
+	local v48 = v44 * CameraUtility.DistanceScaleForFullBody * LookVector
+
+	return CameraUtility.GetCameraCFrame(v40, v48)
+end
+
+t1.GetCameraCFrame_ForAvatarR15Action_LookAtGoldenRatioOfTheHumanoid = t1.GetFullBodyCameraCFrame
+
+function t1.GetHeadshotCameraCFrame(p7, p8: ((...any) -> ...any)?, b2: boolean?, n2: number?) -- line: 163
+	-- upvalues: t1 (copy), CFrameUtility (copy), CharacterUtility (copy), CameraUtility (copy), v5 (copy)
+	local v53 = n2 or 30
+
+	if type(p8) == "function" then
+		p8()
+	end
+
+	if b2 then
+		p7:PivotTo(t1.GetCharacterTorsoCFrame(p7) * CFrame.Angles(0, math.rad(t1.AVATAR_ROTATION_DEGREE * -1), 0))
+	end
+
+	local Head = p7:FindFirstChild("Head")
+
+	if not Head then
+		error("Character is missing a Head, cannot apply upper body camera preset.")
+	end
+
+	local HeadCFrame = Head.CFrame
+	local FaceFrontAttachment = Head:FindFirstChild("FaceFrontAttachment")
+
+	if FaceFrontAttachment then
+		HeadCFrame = FaceFrontAttachment.WorldCFrame
+	end
+
+	local v57 = CFrameUtility.CalculateTargetCFrame(HeadCFrame)
+	local v58, v59 = CharacterUtility.CalculateHeadExtents(p7, v57)
+	local v60 = CameraUtility.CreateThumbnailCamera()
+	local t3 = {
+		extentScale = v5 / 100,
+		maxExtent = v59,
+		minExtent = v58,
+		optCameraXRot = CameraUtility.XRotForCloseup,
+		optFieldOfView = v53,
+		targetCFrame = v57
+	}
+
+	CameraUtility.SetupCamera(v60, t3)
+end
+
+return t1

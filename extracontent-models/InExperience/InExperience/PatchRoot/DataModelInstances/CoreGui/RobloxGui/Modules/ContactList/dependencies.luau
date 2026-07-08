@@ -1,63 +1,66 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.LuaSocialLibrariesDeps);
-local v2 = require(l_CorePackages_0.Packages.Lumberyak);
-local l_httpRequest_0 = v1.httpRequest;
-local v4 = v2.Logger.new(nil, "ContactList");
-local v5 = game:DefineFastInt("ContactListHttpRetryCount", 3);
-local v6 = v4:new("ContactList Networking");
-local v12 = l_httpRequest_0.config({
-    requestFunction = function(v7, v8, v9) --[[ Line: 10 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v6 (copy), l_httpRequest_0 (copy)
-        v6:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v8, v7));
-        return l_httpRequest_0.requestFunctions.HttpRbxApi(v7, v8, v9);
-    end, 
-    postRequestFunction = function(v10, v11) --[[ Line: 14 ]] --[[ Name: postRequestFunction ]]
-        -- upvalues: v6 (copy)
-        v6:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", v11.requestMethod, v11.url, v10.StatusCode, v10.Body));
-    end, 
-    maxRetryCount = v5
-});
-local v13 = v1.RoduxNetworking.config({
-    keyPath = "NetworkStatus", 
-    networkImpl = v12
-});
+local CorePackages = game:GetService("CorePackages")
+local LuaSocialLibrariesDeps = require(CorePackages.Packages.LuaSocialLibrariesDeps)
+local Lumberyak = require(CorePackages.Packages.Lumberyak)
+local httpRequest = LuaSocialLibrariesDeps.httpRequest
+local v5 = Lumberyak.Logger.new(nil, "ContactList")
+local v6 = game:DefineFastInt("ContactListHttpRetryCount", 3)
+local v7 = v5:new("ContactList Networking")
+local v8 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 10
+		-- upvalues: v7 (copy), httpRequest (copy)
+		v7:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	postRequestFunction = function(p4, p5) -- line: 14
+		-- upvalues: v7 (copy)
+		v7:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", p5.requestMethod, p5.url, p4.StatusCode, p4.Body))
+	end,
+	maxRetryCount = v6
+})
+local v9 = LuaSocialLibrariesDeps.RoduxNetworking.config({
+	keyPath = "NetworkStatus",
+	networkImpl = v8
+})
+
 return {
-    Hooks = {
-        dependencyArray = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.dependencyArray, 
-        useDispatch = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useDispatch, 
-        useSelector = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector, 
-        usePrevious = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.usePrevious, 
-        useLocalization = require(l_CorePackages_0.Workspace.Packages.Localization).Hooks.useLocalization
-    }, 
-    NetworkingCall = v1.NetworkingCall.config({
-        roduxNetworking = v13, 
-        useMockedResponse = true
-    }), 
-    RoduxCall = v1.RoduxCall.config({
-        keyPath = "Call"
-    }), 
-    RoduxFriends = require(l_CorePackages_0.Workspace.Packages.FriendsRodux).config({
-        keyPath = "Friends"
-    }), 
-    RoduxPresence = v1.RoduxPresence.config({
-        keyPath = "Presence"
-    }), 
-    RoduxUsers = v1.RoduxUsers.config({
-        keyPath = "Users"
-    }), 
-    RoduxNetworking = v13, 
-    NetworkingPresence = v1.NetworkingPresence.config({
-        roduxNetworking = v13
-    }), 
-    NetworkingFriends = require(l_CorePackages_0.Workspace.Packages.FriendsNetworking).config({
-        roduxNetworking = v13
-    }), 
-    NetworkingUsers = v1.NetworkingUsers.config({
-        roduxNetworking = v13
-    }), 
-    SocialLibraries = v1.SocialLibraries.config({}), 
-    UIBlox = require(l_CorePackages_0.Packages.UIBlox), 
-    enumerate = require(l_CorePackages_0.Packages.enumerate), 
-    getStandardSizeAvatarHeadShotRbxthumb = require(l_CorePackages_0.Workspace.Packages.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb, 
-    teleportToRootPlace = require(script.Parent.teleportToRootPlace)
-};
+	Hooks = {
+		dependencyArray = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.dependencyArray,
+		useDispatch = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useDispatch,
+		useSelector = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector,
+		usePrevious = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.usePrevious,
+		useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+	},
+	NetworkingCall = LuaSocialLibrariesDeps.NetworkingCall.config({
+		useMockedResponse = true,
+		roduxNetworking = v9
+	}),
+	RoduxCall = LuaSocialLibrariesDeps.RoduxCall.config({
+		keyPath = "Call"
+	}),
+	RoduxFriends = require(CorePackages.Workspace.Packages.FriendsRodux).config({
+		keyPath = "Friends"
+	}),
+	RoduxPresence = LuaSocialLibrariesDeps.RoduxPresence.config({
+		keyPath = "Presence"
+	}),
+	RoduxUsers = LuaSocialLibrariesDeps.RoduxUsers.config({
+		keyPath = "Users"
+	}),
+	RoduxNetworking = v9,
+	NetworkingPresence = LuaSocialLibrariesDeps.NetworkingPresence.config({
+		roduxNetworking = v9
+	}),
+	NetworkingFriends = require(CorePackages.Workspace.Packages.FriendsNetworking).config({
+		roduxNetworking = v9
+	}),
+	NetworkingUsers = LuaSocialLibrariesDeps.NetworkingUsers.config({
+		roduxNetworking = v9
+	}),
+	SocialLibraries = LuaSocialLibrariesDeps.SocialLibraries.config({}),
+	UIBlox = require(CorePackages.Packages.UIBlox),
+	Foundation = require(CorePackages.Packages.Foundation),
+	enumerate = require(CorePackages.Packages.enumerate),
+	getStandardSizeAvatarHeadShotRbxthumb = require(CorePackages.Workspace.Packages.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb,
+	teleportToRootPlace = require(script.Parent.teleportToRootPlace)
+}

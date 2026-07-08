@@ -1,24 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppComposition");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.Dev.ReactRoblox);
-local l_FoundationProvider_0 = v3.FoundationProvider;
+local AppComposition = script:FindFirstAncestor("AppComposition")
+local AppCompositionParent = AppComposition.Parent
+local React = require(AppCompositionParent.React)
+local Foundation = require(AppCompositionParent.Foundation)
+local ReactRoblox = require(AppCompositionParent.Dev.ReactRoblox)
+local FoundationProvider = Foundation.FoundationProvider
+
 return {
-    name = l_script_FirstAncestor_0.Name, 
-    roact = v2, 
-    reactRoblox = v4, 
-    mapStory = function(v6) --[[ Line: 14 ]] --[[ Name: mapStory ]]
-        -- upvalues: v2 (copy), l_FoundationProvider_0 (copy)
-        return function(v7) --[[ Line: 15 ]]
-            -- upvalues: v2 (ref), l_FoundationProvider_0 (ref), v6 (copy)
-            return v2.createElement(l_FoundationProvider_0, {
-                theme = v7.theme, 
-                device = v7.platform
-            }, v2.createElement(v6, v7));
-        end;
-    end, 
-    storyRoots = {
-        l_script_FirstAncestor_0
-    }
-};
+	name = AppComposition.Name,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = function(p1) -- line: 14
+		-- upvalues: React (copy), FoundationProvider (copy)
+		return function(p2) -- line: 15
+			-- upvalues: React (copy), FoundationProvider (copy), p1 (copy)
+			return React.createElement(FoundationProvider, {
+				theme = p2.theme,
+				device = p2.platform
+			}, React.createElement(p1, p2))
+		end
+	end,
+	storyRoots = { AppComposition }
+}

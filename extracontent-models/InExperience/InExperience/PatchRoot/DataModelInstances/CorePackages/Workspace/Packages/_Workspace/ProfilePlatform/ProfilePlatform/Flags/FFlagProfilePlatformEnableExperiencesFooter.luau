@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableExperiencesFooter", false);
+return game:DefineFastFlag("ProfilePlatformEnableExperiencesFooter", false)

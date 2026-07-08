@@ -1,36 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_UserModel_0 = require(l_Parent_0.UserLib).Models.UserModel;
-local l_MockUser_0 = require(l_Parent_0.UserLib).Models.MockUser;
-local v4 = require(l_script_FirstAncestor_0.Users.MockUserData);
-local v5 = l_MockUser_0.new();
-local l_1_0 = v4.USERS["1"];
-v5.name = l_1_0.displayName;
-v5.id = l_1_0.id;
-v5.presence = l_UserModel_0.PresenceType.ONLINE;
-v5.lastLocation = l_1_0.lastLocation;
-v5.isFriend = true;
-local v7 = l_MockUser_0.new();
-local l_2_0 = v4.USERS["2"];
-v7.name = l_2_0.displayName;
-v7.id = l_2_0.id;
-v7.presence = l_UserModel_0.PresenceType.IN_GAME;
-v7.lastLocation = l_2_0.lastLocation;
-v7.isFriend = true;
-local v9 = l_MockUser_0.new();
-local l_3_0 = v4.USERS["3"];
-v9.name = l_3_0.displayName;
-v9.id = l_3_0.id;
-v9.isFriend = true;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local UserModel = require(AppChatParent.UserLib).Models.UserModel
+local MockUser = require(AppChatParent.UserLib).Models.MockUser
+local MockUserData = require(AppChat.Users.MockUserData)
+local v6 = MockUser.new()
+local v7 = MockUserData.USERS["1"]
+
+v6.name = v7.displayName
+v6.id = v7.id
+v6.presence = UserModel.PresenceType.ONLINE
+v6.lastLocation = v7.lastLocation
+v6.isFriend = true
+
+local v8 = MockUser.new()
+local v9 = MockUserData.USERS["2"]
+
+v8.name = v9.displayName
+v8.id = v9.id
+v8.presence = UserModel.PresenceType.IN_GAME
+v8.lastLocation = v9.lastLocation
+v8.isFriend = true
+
+local v10 = MockUser.new()
+local v11 = MockUserData.USERS["3"]
+
+v10.name = v11.displayName
+v10.id = v11.id
+v10.isFriend = true
+
 return {
-    Users = {
-        [1] = v5, 
-        [2] = v7, 
-        [3] = v9
-    }, 
-    ChatAppReducer = {
-        Presence = {
-            byUserId = v4.createMockPresenceData()
-        }
-    }
-};
+	Users = {
+		[1] = v6,
+		[2] = v8,
+		[3] = v10
+	},
+	ChatAppReducer = {
+		Presence = {
+			byUserId = MockUserData.createMockPresenceData()
+		}
+	}
+}

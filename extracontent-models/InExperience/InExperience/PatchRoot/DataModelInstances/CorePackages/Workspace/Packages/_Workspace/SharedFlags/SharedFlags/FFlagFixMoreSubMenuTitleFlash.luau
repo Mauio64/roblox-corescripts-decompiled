@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixMoreSubMenuTitleFlash", false);
+return game:DefineFastFlag("FixMoreSubMenuTitleFlash", false)

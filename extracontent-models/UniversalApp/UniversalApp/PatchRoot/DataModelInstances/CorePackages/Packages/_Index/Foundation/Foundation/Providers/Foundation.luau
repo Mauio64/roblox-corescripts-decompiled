@@ -1,1 +1,1 @@
-return require(script.FoundationProvider);
+return require(script.FoundationProvider)

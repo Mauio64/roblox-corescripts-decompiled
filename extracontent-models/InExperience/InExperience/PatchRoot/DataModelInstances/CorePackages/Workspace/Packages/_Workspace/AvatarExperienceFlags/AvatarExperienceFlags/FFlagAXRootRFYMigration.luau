@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXRootRFYMigration", false);
+return game:DefineFastFlag("AXRootRFYMigration", false)

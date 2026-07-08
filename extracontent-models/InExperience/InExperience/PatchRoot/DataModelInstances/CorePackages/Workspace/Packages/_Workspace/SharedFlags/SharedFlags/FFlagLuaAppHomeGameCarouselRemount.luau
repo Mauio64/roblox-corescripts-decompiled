@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppHomeGameCarouselRemount", false);
+return game:DefineFastFlag("LuaAppHomeGameCarouselRemount", false)

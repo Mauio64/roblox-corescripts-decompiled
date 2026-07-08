@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FriendsPageViewBtnWidth", false);
+return game:DefineFastFlag("FriendsPageViewBtnWidth", false)

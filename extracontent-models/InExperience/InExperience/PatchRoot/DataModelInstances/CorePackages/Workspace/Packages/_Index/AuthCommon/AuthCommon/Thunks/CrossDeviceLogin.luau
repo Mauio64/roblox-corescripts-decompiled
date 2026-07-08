@@ -1,98 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_CentralOverlayType_0 = require(l_Parent_0.RobloxAppEnums).CentralOverlayType;
-local l_SetCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Actions.SetCentralOverlay;
-local v4 = require(l_script_FirstAncestor_0.Http.Requests.PostEnterLoginCode);
-local v5 = require(l_script_FirstAncestor_0.Http.Requests.PostConfirmLoginCode);
-local v6 = require(l_script_FirstAncestor_0.Http.Requests.PostCreateLoginCode);
-local v7 = require(l_script_FirstAncestor_0.Http.Requests.PostLoginCodeStatus);
-local v8 = require(l_script_FirstAncestor_0.Http.Requests.PostCancelLoginCode);
-local l_GetFFlagEnableCrossDeviceLoginUsingQRCodes_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableCrossDeviceLoginUsingQRCodes;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local CentralOverlayType = require(AuthCommonParent.RobloxAppEnums).CentralOverlayType
+local SetCentralOverlay = require(AuthCommonParent.CentralOverlay).Actions.SetCentralOverlay
+local PostEnterLoginCode = require(AuthCommon.Http.Requests.PostEnterLoginCode)
+local PostConfirmLoginCode = require(AuthCommon.Http.Requests.PostConfirmLoginCode)
+local PostCreateLoginCode = require(AuthCommon.Http.Requests.PostCreateLoginCode)
+local PostLoginCodeStatus = require(AuthCommon.Http.Requests.PostLoginCodeStatus)
+local PostCancelLoginCode = require(AuthCommon.Http.Requests.PostCancelLoginCode)
+local GetFFlagEnableCrossDeviceLoginUsingQRCodes = require(AuthCommonParent.SharedFlags).GetFFlagEnableCrossDeviceLoginUsingQRCodes
+
 return {
-    EnterCode = function(v10, v11) --[[ Line: 17 ]] --[[ Name: EnterCode ]]
-        -- upvalues: v4 (copy)
-        return function(_) --[[ Line: 18 ]]
-            -- upvalues: v4 (ref), v10 (copy), v11 (copy)
-            return v4(v10, v11):andThen(function(v13) --[[ Line: 19 ]]
-                if v13 and v13.responseBody then
-                    return {
-                        DeviceInfo = string.format("%s\n%s", v13.responseBody.deviceInfo or "", v13.responseBody.location or "")
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-    end, 
-    FetchDeviceCode = function(v14) --[[ Line: 36 ]] --[[ Name: FetchDeviceCode ]]
-        -- upvalues: v6 (copy), l_GetFFlagEnableCrossDeviceLoginUsingQRCodes_0 (copy)
-        return function(_) --[[ Line: 37 ]]
-            -- upvalues: v6 (ref), v14 (copy), l_GetFFlagEnableCrossDeviceLoginUsingQRCodes_0 (ref)
-            return v6(v14):andThen(function(v16) --[[ Line: 38 ]]
-                -- upvalues: l_GetFFlagEnableCrossDeviceLoginUsingQRCodes_0 (ref)
-                local v17 = v16 and v16.responseBody;
-                if v17 then
-                    return {
-                        DeviceCode = v17.code, 
-                        PrivateKey = v17.privateKey, 
-                        QrCodePath = if l_GetFFlagEnableCrossDeviceLoginUsingQRCodes_0() then v17.imagePath else nil
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-    end, 
-    GetLoginStatus = function(v18, v19, v20) --[[ Line: 53 ]] --[[ Name: GetLoginStatus ]]
-        -- upvalues: v7 (copy)
-        return function(_) --[[ Line: 54 ]]
-            -- upvalues: v7 (ref), v18 (copy), v19 (copy), v20 (copy)
-            return v7(v18, v19, v20):andThen(function(v22) --[[ Line: 55 ]]
-                local v23 = v22 and v22.responseBody;
-                if v23 then
-                    return {
-                        Status = v23.status, 
-                        AccountName = v23.accountName, 
-                        AccountPictureUrl = v23.accountPictureUrl, 
-                        ExpirationTime = v23.expirationTime
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-    end, 
-    OpenLoginCodePrompt = function(v24) --[[ Line: 71 ]] --[[ Name: OpenLoginCodePrompt ]]
-        -- upvalues: l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy)
-        return function(v25) --[[ Line: 72 ]]
-            -- upvalues: l_SetCentralOverlay_0 (ref), l_CentralOverlayType_0 (ref), v24 (copy)
-            v25:dispatch(l_SetCentralOverlay_0(l_CentralOverlayType_0.CrossDeviceCodePrompt, v24));
-        end;
-    end, 
-    ConfirmDeviceAccess = function(v26, v27) --[[ Line: 77 ]] --[[ Name: ConfirmDeviceAccess ]]
-        -- upvalues: v5 (copy)
-        return function(_) --[[ Line: 78 ]]
-            -- upvalues: v5 (ref), v26 (copy), v27 (copy)
-            return v5(v26, v27);
-        end;
-    end, 
-    CancelLoginCode = function(v29, v30) --[[ Line: 83 ]] --[[ Name: CancelLoginCode ]]
-        -- upvalues: v8 (copy)
-        return function(_) --[[ Line: 84 ]]
-            -- upvalues: v8 (ref), v29 (copy), v30 (copy)
-            return v8(v29, v30);
-        end;
-    end, 
-    OpenConfirmationOverlay = function(v32, v33, v34, v35) --[[ Line: 89 ]] --[[ Name: OpenConfirmationOverlay ]]
-        -- upvalues: l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy)
-        return function(v36) --[[ Line: 90 ]]
-            -- upvalues: l_SetCentralOverlay_0 (ref), l_CentralOverlayType_0 (ref), v32 (copy), v33 (copy), v34 (copy), v35 (copy)
-            v36:dispatch(l_SetCentralOverlay_0(l_CentralOverlayType_0.CrossDeviceLoginConfirmation, {
-                loginSuccess = v32, 
-                closeCallback = v33, 
-                retryCallback = v34, 
-                deviceString = v35
-            }));
-        end;
-    end
-};
+	EnterCode = function(p1, p2) -- line: 17
+		-- upvalues: PostEnterLoginCode (copy)
+		return function(_) -- line: 18
+			-- upvalues: PostEnterLoginCode (copy), p1 (copy), p2 (copy)
+			return PostEnterLoginCode(p1, p2):andThen(function(p4) -- line: 19
+				if p4 and p4.responseBody then
+					return {
+						DeviceInfo = string.format("%s\n%s", p4.responseBody.deviceInfo or "", p4.responseBody.location or "")
+					}
+				end
+
+				return nil
+			end)
+		end
+	end,
+	FetchDeviceCode = function(p5) -- line: 36
+		-- upvalues: PostCreateLoginCode (copy), GetFFlagEnableCrossDeviceLoginUsingQRCodes (copy)
+		return function(_) -- line: 37
+			-- upvalues: PostCreateLoginCode (copy), p5 (copy), GetFFlagEnableCrossDeviceLoginUsingQRCodes (copy)
+			return PostCreateLoginCode(p5):andThen(function(p7) -- line: 38
+				-- upvalues: GetFFlagEnableCrossDeviceLoginUsingQRCodes (copy)
+				local v35 = p7 and p7.responseBody
+
+				if v35 then
+					return {
+						DeviceCode = v35.code,
+						PrivateKey = v35.privateKey,
+						QrCodePath = if not GetFFlagEnableCrossDeviceLoginUsingQRCodes() then nil else v35.imagePath
+					}
+				end
+
+				return nil
+			end)
+		end
+	end,
+	GetLoginStatus = function(p8, p9, p10) -- line: 53
+		-- upvalues: PostLoginCodeStatus (copy)
+		return function(_) -- line: 54
+			-- upvalues: PostLoginCodeStatus (copy), p8 (copy), p9 (copy), p10 (copy)
+			return PostLoginCodeStatus(p8, p9, p10):andThen(function(p12) -- line: 55
+				local v37 = p12 and p12.responseBody
+
+				if v37 then
+					return {
+						Status = v37.status,
+						AccountName = v37.accountName,
+						AccountPictureUrl = v37.accountPictureUrl,
+						ExpirationTime = v37.expirationTime
+					}
+				end
+
+				return nil
+			end)
+		end
+	end,
+	OpenLoginCodePrompt = function(p13) -- line: 71
+		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
+		return function(p14) -- line: 72
+			-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), p13 (copy)
+			p14:dispatch(SetCentralOverlay(CentralOverlayType.CrossDeviceCodePrompt, p13))
+		end
+	end,
+	ConfirmDeviceAccess = function(p15, p16) -- line: 77
+		-- upvalues: PostConfirmLoginCode (copy)
+		return function(_) -- line: 78
+			-- upvalues: PostConfirmLoginCode (copy), p15 (copy), p16 (copy)
+			return PostConfirmLoginCode(p15, p16)
+		end
+	end,
+	CancelLoginCode = function(p18, p19) -- line: 83
+		-- upvalues: PostCancelLoginCode (copy)
+		return function(_) -- line: 84
+			-- upvalues: PostCancelLoginCode (copy), p18 (copy), p19 (copy)
+			return PostCancelLoginCode(p18, p19)
+		end
+	end,
+	OpenConfirmationOverlay = function(p21, p22, p23, p24) -- line: 89
+		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
+		return function(p25) -- line: 90
+			-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), p21 (copy), p22 (copy), p23 (copy), p24 (copy)
+			p25:dispatch(SetCentralOverlay(CentralOverlayType.CrossDeviceLoginConfirmation, {
+				loginSuccess = p21,
+				closeCallback = p22,
+				retryCallback = p23,
+				deviceString = p24
+			}))
+		end
+	end
+}

@@ -1,136 +1,152 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.capability);
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5) --[[ Line: 43 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    return (setmetatable({
-        enabled_capabilities = if not (v5 ~= nil) or v5.enabled_capabilities == nil then {} else v5.enabled_capabilities, 
-        proto_version = (not (v5 ~= nil) or v5.proto_version == nil) and "" or v5.proto_version
-    }, v4));
-end;
-v4.encode = function(v6) --[[ Line: 52 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy), v3 (copy)
-    local v7 = buffer.create(0);
-    local v8 = 0;
-    if v6.enabled_capabilities ~= nil and #v6.enabled_capabilities > 0 then
-        for _, v10 in v6.enabled_capabilities do
-            local v11, v12 = v0.writeTag(v7, v8, 1, v0.wireTypes.varint);
-            v11, v12 = v0.writeVarInt(v11, v12, v3.Capability.toNumber(v10));
-            v7 = v11;
-            v8 = v12;
-        end;
-    end;
-    if v6.proto_version ~= nil and v6.proto_version ~= "" then
-        local v13, v14 = v0.writeTag(v7, v8, 2, v0.wireTypes.lengthDelimited);
-        v13, v14 = v0.writeString(v13, v14, v6.proto_version);
-        v7 = v13;
-        v8 = v14;
-    end;
-    local v15 = buffer.create(v8);
-    buffer.copy(v15, 0, v7, 0, v8);
-    return v15;
-end;
-v4.decode = function(v16) --[[ Line: 77 ]] --[[ Name: decode ]]
-    -- upvalues: v4 (copy), v0 (copy), v3 (copy)
-    local v17 = v4.new();
-    local v18 = 0;
-    while v18 < buffer.len(v16) do
-        local v19 = nil;
-        local v20 = nil;
-        local v21, v22, v23 = v0.readTag(v16, v18);
-        v19 = v21;
-        v20 = v22;
-        v18 = v23;
-        if v20 == v0.wireTypes.varint then
-            if v19 == 1 then
-                v21 = nil;
-                v22, v23 = v0.readVarIntI32(v16, v18);
-                v21 = v22;
-                v18 = v23;
-                table.insert(v17.enabled_capabilities, v3.Capability.fromNumber(v21) or v21);
-            else
-                v21 = nil;
-                v22, v23 = v0.readVarInt(v16, v18);
-                v21 = v22;
-                v18 = v23;
-            end;
-        elseif v20 == v0.wireTypes.lengthDelimited then
-            if v19 == 2 then
-                v21 = nil;
-                v22, v23 = v0.readBuffer(v16, v18);
-                v21 = v22;
-                v18 = v23;
-                v17.proto_version = buffer.tostring(v21);
-            else
-                v21 = nil;
-                v22, v23 = v0.readVarInt(v16, v18);
-                v18 = v23 + v22;
-            end;
-        elseif v20 == v0.wireTypes.i32 then
-            v21 = nil;
-            v22, v23 = v0.readFixed32(v16, v18);
-            v21 = v22;
-            v18 = v23;
-        elseif v20 == v0.wireTypes.i64 then
-            v21 = nil;
-            v22, v23 = v0.readFixed64(v16, v18);
-            v21 = v22;
-            v18 = v23;
-        else
-            error("Unsupported wire type: " .. v20);
-        end;
-    end;
-    return v17;
-end;
-v4.jsonEncode = function(v24) --[[ Line: 128 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v3 (copy)
-    local v25 = {};
-    if v24.enabled_capabilities ~= nil and #v24.enabled_capabilities > 0 then
-        local v26 = {};
-        for _, v28 in v24.enabled_capabilities do
-            table.insert(v26, if typeof(v28) == "number" then v28 else v3.Capability.toNumber(v28));
-        end;
-        v25.enabledCapabilities = v26;
-    end;
-    if v24.proto_version ~= nil and v24.proto_version ~= "" then
-        v25.protoVersion = v24.proto_version;
-    end;
-    return v25;
-end;
-v4.jsonDecode = function(v29) --[[ Line: 151 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    local v30 = v4.new();
-    if v29.enabled_capabilities ~= nil then
-        local v31 = {};
-        for _, v33 in v29.enabled_capabilities do
-            table.insert(v31, if typeof(v33) == "number" then v3.Capability.fromNumber(v33) or v33 else v3.Capability.fromName(v33) or v33);
-        end;
-        v30.enabled_capabilities = v31;
-    end;
-    if v29.enabledCapabilities ~= nil then
-        local v34 = {};
-        for _, v36 in v29.enabledCapabilities do
-            table.insert(v34, if typeof(v36) == "number" then v3.Capability.fromNumber(v36) or v36 else v3.Capability.fromName(v36) or v36);
-        end;
-        v30.enabled_capabilities = v34;
-    end;
-    if v29.proto_version ~= nil then
-        v30.proto_version = v29.proto_version;
-    end;
-    if v29.protoVersion ~= nil then
-        v30.proto_version = v29.protoVersion;
-    end;
-    return v30;
-end;
-v4.descriptor = {
-    name = "ClientCapabilities", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.ClientCapabilities"
-};
-v2.ClientCapabilities = v4;
-v1.default:register(v2.ClientCapabilities);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local capability = require(script.Parent.capability)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 43
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		enabled_capabilities = if t3 ~= nil and t3.enabled_capabilities ~= nil then t3.enabled_capabilities else {},
+		proto_version = if t3 ~= nil and t3.proto_version ~= nil then t3.proto_version else ""
+	}, t2))
+end
+function t2.encode(p1) -- line: 52
+	-- upvalues: proto (copy), capability (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.enabled_capabilities ~= nil and #p1.enabled_capabilities > 0 then
+		for _, v11 in p1.enabled_capabilities do
+			local v12, v13 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+			buf, n1 = proto.writeVarInt(v12, v13, capability.Capability.toNumber(v11))
+		end
+	end
+
+	if p1.proto_version ~= nil and p1.proto_version ~= "" then
+		local v14, v15 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v14, v15, p1.proto_version)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 77
+	-- upvalues: t2 (copy), proto (copy), capability (copy)
+	local v18 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v20, v21
+
+		v20, v21, n2 = proto.readTag(p2, n2)
+
+		if v21 == proto.wireTypes.varint then
+			if v20 == 1 then
+				local v22
+
+				v22, n2 = proto.readVarIntI32(p2, n2)
+				table.insert(v18.enabled_capabilities, capability.Capability.fromNumber(v22) or v22)
+			else
+				local v23
+
+				v23, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v21 == proto.wireTypes.lengthDelimited then
+			if v20 == 2 then
+				local v24
+
+				v24, n2 = proto.readBuffer(p2, n2)
+				v18.proto_version = buffer.tostring(v24)
+			else
+				local v25, v26 = proto.readVarInt(p2, n2)
+
+				n2 = v26 + v25
+			end
+		elseif v21 == proto.wireTypes.i32 then
+			local v27
+
+			v27, n2 = proto.readFixed32(p2, n2)
+		elseif v21 == proto.wireTypes.i64 then
+			local v28
+
+			v28, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v21)
+		end
+	end
+
+	return v18
+end
+function t2.jsonEncode(p3) -- line: 128
+	-- upvalues: capability (copy)
+	local t4 = {}
+
+	if p3.enabled_capabilities ~= nil and #p3.enabled_capabilities > 0 then
+		local t5 = {}
+
+		for _, v33 in p3.enabled_capabilities do
+			table.insert(t5, if typeof(v33) ~= "number" then capability.Capability.toNumber(v33) else v33)
+		end
+
+		t4.enabledCapabilities = t5
+	end
+
+	if p3.proto_version ~= nil and p3.proto_version ~= "" then
+		t4.protoVersion = p3.proto_version
+	end
+
+	return t4
+end
+function t2.jsonDecode(t6: {[any]: any}) -- line: 151
+	-- upvalues: t2 (copy), capability (copy)
+	local v35 = t2.new()
+
+	if t6.enabled_capabilities ~= nil then
+		local t7 = {}
+
+		for _, v38 in t6.enabled_capabilities do
+			table.insert(t7, if typeof(v38) ~= "number" then capability.Capability.fromName(v38) or v38 else capability.Capability.fromNumber(v38) or v38)
+		end
+
+		v35.enabled_capabilities = t7
+	end
+
+	if t6.enabledCapabilities ~= nil then
+		local t8 = {}
+
+		for _, v41 in t6.enabledCapabilities do
+			table.insert(t8, if typeof(v41) ~= "number" then capability.Capability.fromName(v41) or v41 else capability.Capability.fromNumber(v41) or v41)
+		end
+
+		v35.enabled_capabilities = t8
+	end
+
+	if t6.proto_version ~= nil then
+		v35.proto_version = t6.proto_version
+	end
+
+	if t6.protoVersion ~= nil then
+		v35.proto_version = t6.protoVersion
+	end
+
+	return v35
+end
+
+t2.descriptor = {
+	name = "ClientCapabilities",
+	fullName = "roblox.apppageplatform.shared.v1beta1.ClientCapabilities"
+}
+t1.ClientCapabilities = t2
+typeRegistry.default:register(t1.ClientCapabilities)
+
 return {
-    ClientCapabilities = v2.ClientCapabilities
-};
+	ClientCapabilities = t1.ClientCapabilities
+}

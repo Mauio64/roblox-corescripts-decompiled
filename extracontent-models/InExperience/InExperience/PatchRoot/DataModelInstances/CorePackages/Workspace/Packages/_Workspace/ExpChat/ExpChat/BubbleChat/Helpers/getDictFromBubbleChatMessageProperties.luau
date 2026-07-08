@@ -1,42 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local v1 = require(l_script_FirstAncestor_0.Config);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    local v3 = {};
-    for v4, _ in pairs(v1.DefaultBubbleChatMessagePropertiesInstanceSettings) do
-        v3[v4] = v2[v4];
-    end;
-    local l_ImageLabel_0 = v2:FindFirstChildOfClass("ImageLabel");
-    if l_ImageLabel_0 then
-        local v7 = {};
-        for v8, _ in pairs(v1.DefaultBubbleChatChildrenCustomizationProperties.ImageLabel) do
-            v7[v8] = l_ImageLabel_0[v8];
-        end;
-        v3.ImageLabel = v7;
-    end;
-    local l_UIGradient_0 = v2:FindFirstChildOfClass("UIGradient");
-    if l_UIGradient_0 then
-        local v11 = {};
-        for v12, _ in pairs(v1.DefaultBubbleChatChildrenCustomizationProperties.UIGradient) do
-            v11[v12] = l_UIGradient_0[v12];
-        end;
-        v3.UIGradient = v11;
-    end;
-    local l_UICorner_0 = v2:FindFirstChildOfClass("UICorner");
-    if l_UICorner_0 then
-        local v15 = {};
-        for v16, _ in pairs(v1.DefaultBubbleChatChildrenCustomizationProperties.UICorner) do
-            v15[v16] = l_UICorner_0[v16];
-        end;
-        v3.UICorner = v15;
-    end;
-    local l_UIPadding_0 = v2:FindFirstChildOfClass("UIPadding");
-    if l_UIPadding_0 then
-        local v19 = {};
-        for v20, _ in pairs(v1.DefaultBubbleChatChildrenCustomizationProperties.UIPadding) do
-            v19[v20] = l_UIPadding_0[v20];
-        end;
-        v3.UIPadding = v19;
-    end;
-    return v3;
-end;
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local Config = require(ExpChat.Config)
+
+return function(p1) -- line: 4
+	-- upvalues: Config (copy)
+	local t1 = {}
+
+	for k, _ in pairs(Config.DefaultBubbleChatMessagePropertiesInstanceSettings) do
+		t1[k] = p1[k]
+	end
+
+	local ImageLabel = p1:FindFirstChildOfClass("ImageLabel")
+
+	if ImageLabel then
+		local t2 = {}
+
+		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.ImageLabel) do
+			t2[k] = ImageLabel[k]
+		end
+
+		t1.ImageLabel = t2
+	end
+
+	local UIGradient = p1:FindFirstChildOfClass("UIGradient")
+
+	if UIGradient then
+		local t3 = {}
+
+		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UIGradient) do
+			t3[k] = UIGradient[k]
+		end
+
+		t1.UIGradient = t3
+	end
+
+	local UICorner = p1:FindFirstChildOfClass("UICorner")
+
+	if UICorner then
+		local t4 = {}
+
+		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner) do
+			t4[k] = UICorner[k]
+		end
+
+		t1.UICorner = t4
+	end
+
+	local UIPadding = p1:FindFirstChildOfClass("UIPadding")
+
+	if UIPadding then
+		local t5 = {}
+
+		for k, _ in pairs(Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding) do
+			t5[k] = UIPadding[k]
+		end
+
+		t1.UIPadding = t5
+	end
+
+	return t1
+end

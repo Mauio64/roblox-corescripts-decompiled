@@ -1,5 +1,5 @@
 return {
-    rescaleCFramePosition = function(v0, v1) --[[ Line: 1 ]] --[[ Name: rescaleCFramePosition ]]
-        return v0.Rotation + v0.Position * v1;
-    end
-};
+	rescaleCFramePosition = function(cFrame: CFrame, n1: number) -- line: 1
+		return cFrame.Rotation + cFrame.Position * n1
+	end
+}

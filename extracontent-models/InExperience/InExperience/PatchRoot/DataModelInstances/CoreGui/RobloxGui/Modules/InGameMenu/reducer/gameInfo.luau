@@ -1,18 +1,19 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Cryo_0 = v1.Cryo;
-local l_Rodux_0 = v1.Rodux;
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.Actions.SetGameNameAndDescription);
-return l_Rodux_0.createReducer({
-    name = "Game", 
-    description = ""
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Cryo = InGameMenuDependencies.Cryo
+local Rodux = InGameMenuDependencies.Rodux
+local ParentParent = script.Parent.Parent
+local SetGameNameAndDescription = require(ParentParent.Actions.SetGameNameAndDescription)
+
+return Rodux.createReducer({
+	name = "Game",
+	description = ""
 }, {
-    [v5.name] = function(v6, v7) --[[ Line: 15 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        return l_Cryo_0.Dictionary.join(v6, {
-            name = v7.gameName, 
-            description = v7.gameDescription
-        });
-    end
-});
+	[SetGameNameAndDescription.name] = function(p1, p2) -- line: 15
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			name = p2.gameName,
+			description = p2.gameDescription
+		})
+	end
+})

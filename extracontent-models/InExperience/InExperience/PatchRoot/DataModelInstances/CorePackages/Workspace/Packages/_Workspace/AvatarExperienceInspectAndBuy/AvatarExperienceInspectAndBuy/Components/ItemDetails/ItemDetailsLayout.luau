@@ -1,39 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Components.ItemDetails.ItemDetailsView);
-local v5 = require(l_script_FirstAncestor_0.Components.ItemsView.BuyActionBarLayout);
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v8 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local v9 = require(l_Parent_0.Cryo);
-return function(v10) --[[ Line: 21 ]] --[[ Name: ItemDetailsLayout ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), v9 (copy), v8 (copy), v3 (copy), v4 (copy), v5 (copy)
-    local v11 = l_useTokens_0();
-    local l_Size_2700_0 = v11.Size.Size_2700;
-    local v13 = v2.useMemo(function() --[[ Line: 27 ]]
-        -- upvalues: v9 (ref), v10 (copy), l_Size_2700_0 (copy)
-        return v9.Dictionary.join(v10.itemDetailsViewProps, {
-            buyActionBarOffset = l_Size_2700_0
-        });
-    end, {
-        v10.itemDetailsViewProps, 
-        l_Size_2700_0
-    });
-    local v14 = v10.view == v8.Compact;
-    return v2.createElement(v3.View, {
-        tag = "size-full"
-    }, {
-        ItemDetailsView = v2.createElement(v4, v13), 
-        BuyActionBarLayout = if v14 then v2.createElement(v5, {
-            buyActionBarProps = v10.buyActionBarProps, 
-            enableTopBorder = true, 
-            ZIndex = 2, 
-            Position = UDim2.new(0, 0, 1, 0), 
-            AnchorPoint = Vector2.new(0, 1), 
-            padding = UDim.new(0, v11.Padding.Medium), 
-            Size = UDim2.new(1, 0, 0, l_Size_2700_0)
-        }) else nil
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local ItemDetailsView = require(AvatarExperienceInspectAndBuy.Components.ItemDetails.ItemDetailsView)
+local BuyActionBarLayout = require(AvatarExperienceInspectAndBuy.Components.ItemsView.BuyActionBarLayout)
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+
+local useTokens = Foundation.Hooks.useTokens
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+local Cryo = require(AvatarExperienceInspectAndBuyParent.Cryo)
+
+local function ItemDetailsLayout(t1: {[any]: any}) -- line: 21
+	-- upvalues: useTokens (copy), React (copy), Cryo (copy), ViewType (copy), Foundation (copy), ItemDetailsView (copy), BuyActionBarLayout (copy)
+	local v12 = useTokens()
+	local Size_2700 = v12.Size.Size_2700
+	local v14 = React.useMemo(function() -- line: 27
+		-- upvalues: Cryo (copy), t1 (copy), Size_2700 (copy)
+		return Cryo.Dictionary.join(t1.itemDetailsViewProps, {
+			buyActionBarOffset = Size_2700
+		})
+	end, {
+		t1.itemDetailsViewProps,
+		Size_2700
+	})
+	local v15 = t1.view == ViewType.Compact
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full"
+	}, {
+		ItemDetailsView = React.createElement(ItemDetailsView, v14),
+		BuyActionBarLayout = if not v15 then nil else React.createElement(BuyActionBarLayout, {
+			enableTopBorder = true,
+			ZIndex = 2,
+			buyActionBarProps = t1.buyActionBarProps,
+			Position = UDim2.new(0, 0, 1, 0),
+			AnchorPoint = Vector2.new(0, 1),
+			padding = UDim.new(0, v12.Padding.Medium),
+			Size = UDim2.new(1, 0, 0, Size_2700)
+		})
+	})
+end
+
+return ItemDetailsLayout

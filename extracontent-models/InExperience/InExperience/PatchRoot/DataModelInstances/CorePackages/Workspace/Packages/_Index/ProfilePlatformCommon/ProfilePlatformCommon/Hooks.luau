@@ -1,3 +1,3 @@
 return {
-    useProfileCardWidth = require(script.useProfileCardWidth)
-};
+	useProfileCardWidth = require(script.useProfileCardWidth)
+}

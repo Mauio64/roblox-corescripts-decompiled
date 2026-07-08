@@ -1,64 +1,79 @@
-local l_Parent_0 = script:FindFirstAncestor("GraphQLServer").Parent;
-local l_DataLoader_0 = require(l_Parent_0.DataLoader).DataLoader;
-local v2 = require(l_Parent_0.Cryo);
-local l_fetchProfilesByIds_0 = require(script.Parent.Parent.connectors.UserProfileConnector).fetchProfilesByIds;
-local v4 = {};
-v4.__index = v4;
-local v5 = game:DefineFastInt("UserProfilesDataLoaderClearTime_v1", 15);
-local l_getFFlagRemoveDataLoaderTimer_0 = require(l_Parent_0.SharedFlags).getFFlagRemoveDataLoaderTimer;
-v4.new = function() --[[ Line: 22 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    local v7 = {
-        loader = nil, 
-        lastTime = 0, 
-        fieldsSet = {}, 
-        dataLoaderOptions = {
-            batchSize = 50, 
-            batchDelay = 0
-        }
-    };
-    setmetatable(v7, v4);
-    return v7;
-end;
-convertToSet = function(v8) --[[ Line: 37 ]] --[[ Name: convertToSet ]]
-    local v9 = {};
-    for _, v11 in v8 do
-        v9[v11] = true;
-    end;
-    return v9;
-end;
-v4.getFields = function(v12) --[[ Line: 45 ]] --[[ Name: getFields ]]
-    local v13 = {};
-    for v14, _ in v12.fieldsSet do
-        table.insert(v13, v14);
-    end;
-    return v13;
-end;
-v4.makeDataLoader = function(v16, v17, v18, v19) --[[ Line: 53 ]] --[[ Name: makeDataLoader ]]
-    -- upvalues: v2 (copy), l_DataLoader_0 (copy), l_fetchProfilesByIds_0 (copy)
-    v16.fieldsSet = v2.Dictionary.join(v16.fieldsSet, convertToSet(v18));
-    local v20 = v19 or v16.dataLoaderOptions;
-    return l_DataLoader_0.new(function(v21) --[[ Line: 56 ]]
-        -- upvalues: l_fetchProfilesByIds_0 (ref), v16 (copy), v17 (copy)
-        return l_fetchProfilesByIds_0(v21, v16:getFields(), v17);
-    end, {
-        cache = true, 
-        maxBatchSize = v20.batchSize, 
-        batchScheduleFn = function(v22) --[[ Line: 61 ]] --[[ Name: batchScheduleFn ]]
-            -- upvalues: v20 (copy)
-            task.delay(v20.batchDelay, v22);
-        end
-    });
-end;
-v4.getLoader = function(v23, v24, v25, v26) --[[ Line: 68 ]] --[[ Name: getLoader ]]
-    -- upvalues: v2 (copy), l_getFFlagRemoveDataLoaderTimer_0 (copy), v5 (copy)
-    v23.fieldsSet = v2.Dictionary.join(v23.fieldsSet, convertToSet(v25));
-    local v27 = os.clock();
-    local v28 = not l_getFFlagRemoveDataLoaderTimer_0() and v27 - v23.lastTime > v5;
-    if not v23.loader or v28 then
-        v23.lastTime = v27;
-        v23.loader = v23:makeDataLoader(v24, v25, v26);
-    end;
-    return v23.loader;
-end;
-return v4;
+local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local DataLoader = require(Parent.DataLoader).DataLoader
+local Cryo = require(Parent.Cryo)
+local fetchProfilesByIds = require(script.Parent.Parent.connectors.UserProfileConnector).fetchProfilesByIds
+local t1 = {}
+
+t1.__index = t1
+
+local v6 = game:DefineFastInt("UserProfilesDataLoaderClearTime_v1", 15)
+local getFFlagRemoveDataLoaderTimer = require(Parent.SharedFlags).getFFlagRemoveDataLoaderTimer
+
+function t1.new() -- line: 22
+	-- upvalues: t1 (copy)
+	local t2 = {
+		loader = nil,
+		lastTime = 0,
+		fieldsSet = {},
+		dataLoaderOptions = {
+			batchSize = 50,
+			batchDelay = 0
+		}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function convertToSet(p1) -- line: 37
+	local t3 = {}
+
+	for _, v12 in p1 do
+		t3[v12] = true
+	end
+
+	return t3
+end
+function t1.getFields(p2) -- line: 45
+	local t4 = {}
+
+	for v15, _ in p2.fieldsSet do
+		table.insert(t4, v15)
+	end
+
+	return t4
+end
+function t1.makeDataLoader(t5: {[any]: any}, p3, t6: {[any]: any}, t7: {[any]: any}) -- line: 53
+	-- upvalues: Cryo (copy), DataLoader (copy), fetchProfilesByIds (copy)
+	t5.fieldsSet = Cryo.Dictionary.join(t5.fieldsSet, convertToSet(t6))
+
+	local v21 = t7 or t5.dataLoaderOptions
+
+	return DataLoader.new(function(p4) -- line: 56
+		-- upvalues: fetchProfilesByIds (copy), t5 (copy), p3 (copy)
+		return fetchProfilesByIds(p4, t5:getFields(), p3)
+	end, {
+		cache = true,
+		maxBatchSize = v21.batchSize,
+		batchScheduleFn = function(p5) -- line: 61
+			-- upvalues: v21 (copy)
+			task.delay(v21.batchDelay, p5)
+		end
+	})
+end
+function t1.getLoader(t8: {[any]: any}, p6, t9: {[any]: any}, t10: {[any]: any}) -- line: 68
+	-- upvalues: Cryo (copy), getFFlagRemoveDataLoaderTimer (copy), v6 (copy)
+	t8.fieldsSet = Cryo.Dictionary.join(t8.fieldsSet, convertToSet(t9))
+
+	local elapsed = os.clock()
+	local v27 = not getFFlagRemoveDataLoaderTimer() and elapsed - t8.lastTime > v6
+
+	if not t8.loader or v27 then
+		t8.lastTime = elapsed
+		t8.loader = t8:makeDataLoader(p6, t9, t10)
+	end
+
+	return t8.loader
+end
+
+return t1

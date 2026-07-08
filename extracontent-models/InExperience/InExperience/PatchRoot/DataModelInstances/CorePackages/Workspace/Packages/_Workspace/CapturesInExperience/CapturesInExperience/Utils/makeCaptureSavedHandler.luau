@@ -1,62 +1,101 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.SocialStopwatch);
-local v3 = require(l_Parent_0.App.CapturesPolicy);
-local v4 = require(l_Parent_0.Enums.CapturesToastType);
-local v5 = require(l_Parent_0.Analytics.EventNames);
-local v6 = require(l_Parent_0.Thunks.RetrieveCaptures);
-local v7 = require(l_Parent_0.Actions.ToastTriggered);
-local v8 = require(l_Parent_0.Enums.TriggerSourceType);
-local _ = require(l_Parent_0.Types);
-local v10 = require(l_Parent_0.Utils.getCaptureObject);
-local v11 = require(l_Parent_0.Utils.waitForFlashOverlay);
-local v12 = require(l_Parent_0.Flags.FFlagCreateMomentsToast);
-local v13 = require(l_Parent_0.Flags.FFlagEnableUpdatedCaptureControls);
-local v14 = require(l_Parent_0.Enums.CaptureType);
-local v15 = require(l_Parent_0.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript);
-return function(v16, _, v18) --[[ Line: 27 ]] --[[ Name: makeCaptureSavedHandler ]]
-    -- upvalues: v15 (copy), v14 (copy), v8 (copy), v13 (copy), v2 (copy), v5 (copy), v6 (copy), v11 (copy), v3 (copy), v10 (copy), v12 (copy), v7 (copy), v4 (copy)
-    return function(v19, v20) --[[ Line: 28 ]] --[[ Name: captureSavedHandler ]]
-        -- upvalues: v15 (ref), v14 (ref), v8 (ref), v13 (ref), v2 (ref), v18 (copy), v5 (ref), v16 (copy), v6 (ref), v11 (ref), v3 (ref), v10 (ref), v12 (ref), v7 (ref), v4 (ref)
-        local v21 = if v15 then v19.CaptureType == Enum.CaptureType.Video else v19.type == v14.Video;
-        if v20 == v8.UserSave and (not v13 or not v21) then
-            local v22 = v2.Stopwatch.stop(v2.Events.CaptureTaken);
-            v18(v5.CapturesEntrypointLatency, {
-                statValue = if v22 then v22.timeElapsed else nil
-            });
-        end;
-        v16:dispatch(v6());
-        v11(v16);
-        if v20 == v8.PromptedShare then
-            return;
-        else
-            local v23 = v3.PolicyImplementation.read();
-            local v24 = if v23 then v3.Mapper(v23).enableShareCaptureCTA() else false;
-            local v25 = false;
-            local v26 = v10(v19);
-            if v12 then
-                local v27 = false;
-                if v26 ~= nil then
-                    v27 = v21 and v26.TimeLength >= 6 or not v21;
-                end;
-                v25 = v27;
-            end;
-            if v25 then
-                v16:dispatch(v7(v4.CaptureTakenWithMomentsCTA, {
-                    captureInfo = v26
-                }));
-            elseif v24 then
-                v16:dispatch(v7(v4.CaptureTaken, {
-                    captureInfo = v19
-                }));
-            else
-                v16:dispatch(v7(v4.ViewCapture));
-            end;
-            if v21 then
-                v18(v5.CapturesVideoShareToastViewed);
-            end;
-            v18(v5.CapturesShareToastViewed);
-            return;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local SocialStopwatch = require(ParentParentParent.SocialStopwatch)
+local CapturesPolicy = require(ParentParent.App.CapturesPolicy)
+local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
+local Constants = require(ParentParent.Constants)
+local EventNames = require(ParentParent.Analytics.EventNames)
+local RetrieveCaptures = require(ParentParent.Thunks.RetrieveCaptures)
+local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+local TriggerSourceType = require(ParentParent.Enums.TriggerSourceType)
+
+require(ParentParent.Types)
+
+local fetchCapturesFromGallery = require(ParentParent.Utils.fetchCapturesFromGallery)
+local findMatchingCapture = require(ParentParent.Utils.findMatchingCapture)
+local getCaptureObject = require(ParentParent.Utils.getCaptureObject)
+local waitForFlashOverlay = require(ParentParent.Utils.waitForFlashOverlay)
+local FFlagCreateMomentsToast = require(ParentParent.Flags.FFlagCreateMomentsToast)
+local FFlagEnableUpdatedCaptureControls = require(ParentParent.Flags.FFlagEnableUpdatedCaptureControls)
+local CaptureType = require(ParentParent.Enums.CaptureType)
+local FFlagEnableCapturesGalleryRetrievalCoreScript = require(ParentParent.Flags.FFlagEnableCapturesGalleryRetrievalCoreScript)
+local EngineFeature = game:GetEngineFeature("CaptureServiceEnableXExperiencePostingApis")
+
+local function triggerDefaultToast(p1, b1: boolean, p2, b2: boolean, p3: ((...any) -> ...any)) -- line: 33
+	-- upvalues: ToastTriggered (copy), CapturesToastType (copy), EventNames (copy)
+	if b1 then
+		p1:dispatch(ToastTriggered(CapturesToastType.CaptureTaken, {
+			captureInfo = p2
+		}))
+	else
+		p1:dispatch(ToastTriggered(CapturesToastType.ViewCapture))
+	end
+
+	if b2 then
+		p3(EventNames.CapturesVideoShareToastViewed)
+	end
+
+	p3(EventNames.CapturesShareToastViewed)
+end
+local function makeCaptureSavedHandler(p4, _, p6: ((...any) -> ...any)) -- line: 55
+	-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), TriggerSourceType (copy), FFlagEnableUpdatedCaptureControls (copy), SocialStopwatch (copy), EventNames (copy), RetrieveCaptures (copy), waitForFlashOverlay (copy), CapturesPolicy (copy), getCaptureObject (copy), FFlagCreateMomentsToast (copy), EngineFeature (copy), triggerDefaultToast (copy), Constants (copy), fetchCapturesFromGallery (copy), findMatchingCapture (copy), ToastTriggered (copy), CapturesToastType (copy)
+	local function captureSavedHandler(p7, p8) -- line: 56
+		-- upvalues: FFlagEnableCapturesGalleryRetrievalCoreScript (copy), CaptureType (copy), TriggerSourceType (copy), FFlagEnableUpdatedCaptureControls (copy), SocialStopwatch (copy), p6 (copy), EventNames (copy), p4 (copy), RetrieveCaptures (copy), waitForFlashOverlay (copy), CapturesPolicy (copy), getCaptureObject (copy), FFlagCreateMomentsToast (copy), EngineFeature (copy), triggerDefaultToast (copy), Constants (copy), fetchCapturesFromGallery (copy), findMatchingCapture (copy), ToastTriggered (copy), CapturesToastType (copy)
+		local v33 = if not FFlagEnableCapturesGalleryRetrievalCoreScript then p7.type == CaptureType.Video else p7.CaptureType == Enum.CaptureType.Video
+
+		if p8 == TriggerSourceType.UserSave and (not FFlagEnableUpdatedCaptureControls or not v33) then
+			local v34 = SocialStopwatch.Stopwatch.stop(SocialStopwatch.Events.CaptureTaken)
+
+			p6(EventNames.CapturesEntrypointLatency, {
+				statValue = if not v34 then nil else v34.timeElapsed
+			})
+		end
+
+		p4:dispatch(RetrieveCaptures())
+		waitForFlashOverlay(p4)
+
+		if p8 == TriggerSourceType.PromptedShare then
+			return
+		end
+
+		local v35 = CapturesPolicy.PolicyImplementation.read()
+		local v36 = not not v35 and CapturesPolicy.Mapper(v35).enableShareCaptureCTA()
+		local v37 = getCaptureObject(p7)
+		local v38 = false
+		local v39 = if not FFlagCreateMomentsToast then nil else game.GameId
+
+		if FFlagCreateMomentsToast and EngineFeature then
+			local v40 = v37 ~= nil and v37.CaptureType == Enum.CaptureType.Video
+			local v41 = if not v40 then nil else v37.TimeLength
+
+			v38 = v37 ~= nil and (not v40 or type(v41) == "number" and v41 >= 6)
+		end
+
+		if not v38 or v39 == nil then
+			triggerDefaultToast(p4, v36, p7, v33, p6)
+
+			return
+		end
+
+		if p4:getState()[Constants.RoduxKey].MomentsEligibility.byUniverseId[v39] == true then
+			if FFlagCreateMomentsToast and v37 then
+				local v42 = fetchCapturesFromGallery()
+
+				v37 = findMatchingCapture(v42, v37) or v37
+			end
+
+			p4:dispatch(ToastTriggered(CapturesToastType.CaptureTakenWithMomentsCTA, {
+				captureInfo = v37
+			}))
+			p6(EventNames.CapturesCreateMomentToastViewed)
+
+			return
+		end
+
+		triggerDefaultToast(p4, v36, p7, v33, p6)
+	end
+
+	return captureSavedHandler
+end
+
+return makeCaptureSavedHandler

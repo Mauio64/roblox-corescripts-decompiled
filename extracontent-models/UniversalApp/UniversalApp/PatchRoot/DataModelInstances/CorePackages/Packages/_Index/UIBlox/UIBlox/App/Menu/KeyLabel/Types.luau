@@ -1,3 +1,5 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.ImageSet.Images);
-return {};
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.ImageSet.Images)
+
+return {}

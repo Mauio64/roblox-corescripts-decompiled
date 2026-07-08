@@ -1,121 +1,141 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local _ = require(l_script_FirstAncestor_0.Types);
-local v2 = require(l_script_FirstAncestor_0.Enums.TokenName);
-local v3 = require(l_script_FirstAncestor_0.Parser.parseXmlAttributes);
-local v4 = require(l_script_FirstAncestor_0.Utils.escapeRichFormatting);
-local v5 = {
-    Open = "OPEN", 
-    Close = "CLOSE", 
-    OpenClose = "OPEN_CLOSE"
-};
-local v6 = {
-    {
-        name = v5.OpenClose, 
-        pattern = "^<([%w-]+)%s?([^>]*)/>"
-    }, 
-    {
-        name = v5.Open, 
-        pattern = "^<([%w-]+)%s?([^>]*)>"
-    }, 
-    {
-        name = v5.Close, 
-        pattern = "^</([%w-]+)%s?([^>]*)>"
-    }
-};
-local v17 = {
-    [v5.Open] = function(v7, v8, v9) --[[ Line: 32 ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        local v10 = v3(v9);
-        table.insert(v7, {
-            name = v2.Open, 
-            text = v8, 
-            attributes = v10
-        });
-    end, 
-    [v5.Close] = function(v11, v12) --[[ Line: 40 ]]
-        -- upvalues: v2 (copy)
-        table.insert(v11, {
-            name = v2.Close, 
-            text = v12, 
-            attributes = {}
-        });
-    end, 
-    [v5.OpenClose] = function(v13, v14, v15) --[[ Line: 47 ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        local v16 = v3(v15);
-        table.insert(v13, {
-            name = v2.Open, 
-            text = v14, 
-            attributes = v16
-        });
-        table.insert(v13, {
-            name = v2.Close, 
-            text = v14, 
-            attributes = {}
-        });
-    end
-};
-return function(v18) --[[ Line: 62 ]] --[[ Name: tokenize ]]
-    -- upvalues: v6 (copy), v2 (copy), v4 (copy), v5 (copy), v17 (copy)
-    local v19 = 0;
-    local v20 = 0;
-    local v21 = {};
-    local v22 = string.gsub(v18, "\n+", " ");
-    for v23 in string.gmatch(v22, "()<") do
-        if v23 >= v19 then
-            v19 = v23;
-            local v24 = false;
-            for _, v26 in v6 do
-                local l_name_0 = v26.name;
-                local l_pattern_0 = v26.pattern;
-                local v29, v30 = string.find(v22, l_pattern_0, v19);
-                if v29 and v30 then
-                    local v31 = {
-                        string.match(v22, l_pattern_0, v19)
-                    };
-                    local v32 = v31[1];
-                    local v33 = v31[2] or "";
-                    if v32 then
-                        if v19 ~= v20 then
-                            table.insert(v21, {
-                                name = v2.Text, 
-                                text = v4((string.sub(v22, v20, v19 - 1))), 
-                                attributes = {}
-                            });
-                        end;
-                        if v32 == "br" then
-                            if l_name_0 == v5.Open or l_name_0 == v5.OpenClose then
-                                table.insert(v21, {
-                                    name = v2.Break, 
-                                    text = "", 
-                                    attributes = {}
-                                });
-                            end;
-                        else
-                            v17[l_name_0](v21, v32, v33);
-                        end;
-                        v19 = v19 + (v30 - v29 + 1);
-                        v20 = v19;
-                        v24 = true;
-                        break;
-                    end;
-                end;
-            end;
-            if not v24 then
-                v19 = v19 + 1;
-            end;
-        end;
-    end;
-    v19 = #v22 + 1;
-    if v19 ~= v20 then
-        table.insert(v21, {
-            name = v2.Text, 
-            text = v4((string.sub(v22, v20, v19 - 1))), 
-            attributes = {}
-        });
-    end;
-    if v21[1] and v21[1].name == v2.Text and v21[1].text == "" then
-        table.remove(v21, 1);
-    end;
-    return v21;
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+
+require(InlineRichText.Types)
+
+local TokenName = require(InlineRichText.Enums.TokenName)
+local parseXmlAttributes = require(InlineRichText.Parser.parseXmlAttributes)
+local escapeRichFormatting = require(InlineRichText.Utils.escapeRichFormatting)
+local _ = {
+	Open = "OPEN",
+	Close = "CLOSE",
+	OpenClose = "OPEN_CLOSE"
+}
+local t1 = {
+	{
+		name = "OPEN_CLOSE",
+		pattern = "^<([%w-]+)%s?([^>]*)/>"
+	},
+	{
+		name = "OPEN",
+		pattern = "^<([%w-]+)%s?([^>]*)>"
+	},
+	{
+		name = "CLOSE",
+		pattern = "^</([%w-]+)%s?([^>]*)>"
+	}
+}
+local t5 = {
+	OPEN = function(t2: {[any]: any}, s1: string, s2: string) -- line: 32
+		-- upvalues: parseXmlAttributes (copy), TokenName (copy)
+		local v12 = parseXmlAttributes(s2)
+
+		table.insert(t2, {
+			name = TokenName.Open,
+			text = s1,
+			attributes = v12
+		})
+	end,
+	CLOSE = function(t3: {[any]: any}, s3: string) -- line: 40
+		-- upvalues: TokenName (copy)
+		table.insert(t3, {
+			name = TokenName.Close,
+			text = s3,
+			attributes = {}
+		})
+	end,
+	OPEN_CLOSE = function(t4: {[any]: any}, s4: string, s5: string) -- line: 47
+		-- upvalues: parseXmlAttributes (copy), TokenName (copy)
+		local v18 = parseXmlAttributes(s5)
+
+		table.insert(t4, {
+			name = TokenName.Open,
+			text = s4,
+			attributes = v18
+		})
+		table.insert(t4, {
+			name = TokenName.Close,
+			text = s4,
+			attributes = {}
+		})
+	end
+}
+
+local function tokenize(s6: string) -- line: 62
+	-- upvalues: t1 (copy), TokenName (copy), escapeRichFormatting (copy), t5 (copy)
+	local n1 = 0
+	local n2 = 0
+	local t6 = {}
+	local v23 = string.gsub(s6, "\n+", " ")
+
+	for match in string.gmatch(v23, "()<") do
+		if not (match < n1) then
+			n1 = match
+
+			local v25 = false
+
+			for _, v27 in t1 do
+				local name = v27.name
+				local pattern = v27.pattern
+				local start, stop = string.find(v23, pattern, n1)
+
+				if not start or not stop then
+					continue
+				end
+
+				local t7 = { string.match(v23, pattern, n1) }
+				local v33 = t7[1]
+				local v34 = t7[2] or ""
+
+				if v33 then
+					if n1 ~= n2 then
+						table.insert(t6, {
+							name = TokenName.Text,
+							text = escapeRichFormatting((string.sub(v23, n2, n1 - 1))),
+							attributes = {}
+						})
+					end
+
+					if v33 == "br" then
+						if name == "OPEN" or name == "OPEN_CLOSE" then
+							table.insert(t6, {
+								text = "",
+								name = TokenName.Break,
+								attributes = {}
+							})
+						end
+					else
+						t5[name](t6, v33, v34)
+					end
+
+					n1 += stop - start + 1
+					n2 = n1
+					v25 = true
+
+					break
+				end
+			end
+
+			if not v25 then
+				n1 += 1
+			end
+		end
+	end
+
+	local v35 = #v23 + 1
+
+	if v35 ~= n2 then
+		table.insert(t6, {
+			name = TokenName.Text,
+			text = escapeRichFormatting((string.sub(v23, n2, v35 - 1))),
+			attributes = {}
+		})
+	end
+
+	if t6[1] and t6[1].name == TokenName.Text and t6[1].text == "" then
+		table.remove(t6, 1)
+	end
+
+	return t6
+end
+
+return tokenize

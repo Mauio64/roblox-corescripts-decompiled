@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugMessageProfiling", false);
+return game:DefineFastFlag("DebugMessageProfiling", false)

@@ -1,28 +1,29 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Thunk);
-local v2 = require(l_Parent_0.Services.Analytics);
-local v3 = require(l_Parent_0.UtilityFunctions);
-local v4 = require(l_Parent_0.Thunks.SendCounter);
-local v5 = require(l_Parent_0.Constants);
-local v6 = {
-    v2
-};
-return function(v7) --[[ Line: 18 ]] --[[ Name: ReportOpenDetailsPage ]]
-    -- upvalues: v1 (copy), v6 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy)
-    return v1.new(script.Name, v6, function(v8, v9) --[[ Line: 19 ]]
-        -- upvalues: v2 (ref), v7 (copy), v3 (ref), v4 (ref), v5 (ref)
-        local v10 = v9[v2];
-        local v11 = v7 and v7.parentBundleId ~= nil;
-        local v12 = nil;
-        local v13 = nil;
-        if v11 then
-            v12 = "Bundle";
-            v13 = v3.getBundleId(v7);
-        else
-            v12 = "Asset";
-            v13 = v7.assetId;
-        end;
-        v10.reportItemDetailPageOpened(v12, v13);
-        v8:dispatch(v4(v5.Counters.ItemDetailPageOpened));
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local Analytics = require(ParentParent.Services.Analytics)
+local UtilityFunctions = require(ParentParent.UtilityFunctions)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local Constants = require(ParentParent.Constants)
+local t1 = { Analytics }
+
+local function ReportOpenDetailsPage(p1) -- line: 18
+	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), UtilityFunctions (copy), SendCounter (copy), Constants (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 19
+		-- upvalues: Analytics (copy), p1 (copy), UtilityFunctions (copy), SendCounter (copy), Constants (copy)
+		local v12 = p3[Analytics]
+		local s1, v14
+
+		if p1 and p1.parentBundleId ~= nil then
+			s1 = "Bundle"
+			v14 = UtilityFunctions.getBundleId(p1)
+		else
+			s1 = "Asset"
+			v14 = p1.assetId
+		end
+
+		v12.reportItemDetailPageOpened(s1, v14)
+		p2:dispatch(SendCounter(Constants.Counters.ItemDetailPageOpened))
+	end)
+end
+
+return ReportOpenDetailsPage

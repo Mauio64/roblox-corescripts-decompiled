@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileDisplayNameUseUnder17Description", false);
+return game:DefineFastFlag("EditProfileDisplayNameUseUnder17Description", false)

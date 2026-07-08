@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Action)(script.Name, function(v0) --[[ Line: 4 ]]
-    return {
-        dumpPath = v0
-    };
-end);
+return require(script.Parent.Parent.Action)(script.Name, function(s1: string) -- line: 4
+	return {
+		dumpPath = s1
+	}
+end)

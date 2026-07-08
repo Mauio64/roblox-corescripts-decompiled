@@ -1,34 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("VideoUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-return function(v3) --[[ Line: 17 ]] --[[ Name: VideoProgressBar ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy)
-    local v4 = l_useTokens_0();
-    local l_Muted_0 = v4.DarkMode.Content.Muted;
-    local l_Emphasis_0 = v4.Color.Content.Emphasis;
-    return v1.createElement("Frame", {
-        AnchorPoint = v3.AnchorPoint, 
-        Position = v3.Position, 
-        Size = v3.Size, 
-        BackgroundColor3 = l_Muted_0.Color3, 
-        BackgroundTransparency = l_Muted_0.Transparency, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v3.LayoutOrder
-    }, {
-        UICorner = v1.createElement("UICorner", {
-            CornerRadius = UDim.new(1, 0)
-        }), 
-        ProgressFill = v1.createElement("Frame", {
-            Size = v3.progressBinding:map(function(v7) --[[ Line: 37 ]]
-                return UDim2.fromScale(v7, 1);
-            end), 
-            BackgroundColor3 = l_Emphasis_0.Color3, 
-            BackgroundTransparency = l_Emphasis_0.Transparency, 
-            BorderSizePixel = 0
-        }, {
-            UICorner = v1.createElement("UICorner", {
-                CornerRadius = UDim.new(1, 0)
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("VideoUtils").Parent
+local React = require(Parent.React)
+local useTokens = require(Parent.Foundation).Hooks.useTokens
+
+local function VideoProgressBar(t1: {[any]: any}) -- line: 17
+	-- upvalues: useTokens (copy), React (copy)
+	local v6 = useTokens()
+	local Muted = v6.DarkMode.Content.Muted
+	local Emphasis = v6.Color.Content.Emphasis
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		AnchorPoint = t1.AnchorPoint,
+		Position = t1.Position,
+		Size = t1.Size,
+		BackgroundColor3 = Muted.Color3,
+		BackgroundTransparency = Muted.Transparency,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(1, 0)
+		}),
+		ProgressFill = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = t1.progressBinding:map(function(n1: number) -- line: 37
+				return UDim2.fromScale(n1, 1)
+			end),
+			BackgroundColor3 = Emphasis.Color3,
+			BackgroundTransparency = Emphasis.Transparency
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(1, 0)
+			})
+		})
+	})
+end
+
+return VideoProgressBar

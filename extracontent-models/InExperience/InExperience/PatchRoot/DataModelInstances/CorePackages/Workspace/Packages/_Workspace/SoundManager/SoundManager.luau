@@ -1,10 +1,11 @@
-local v0 = require(script.Sounds);
-local v1 = require(script.SoundEffects);
-local v2 = require(script.SoundGroups);
-local v3 = require(script.SoundManager);
+local Sounds = require(script.Sounds)
+local SoundEffects = require(script.SoundEffects)
+local SoundGroups = require(script.SoundGroups)
+local SoundManager = require(script.SoundManager)
+
 return {
-    Sounds = v0, 
-    SoundEffects = v1, 
-    SoundGroups = v2, 
-    SoundManager = v3
-};
+	Sounds = Sounds,
+	SoundEffects = SoundEffects,
+	SoundGroups = SoundGroups,
+	SoundManager = SoundManager
+}

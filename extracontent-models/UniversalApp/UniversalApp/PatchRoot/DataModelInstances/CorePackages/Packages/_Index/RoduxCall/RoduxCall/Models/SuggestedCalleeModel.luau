@@ -1,37 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxCall");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.t);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_script_FirstAncestor_0.Enums);
-local v5 = {};
-v5.new = function(v6) --[[ Line: 9 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy)
-    assert(v5.isValid(v6));
-    v5.__index = v5;
-    setmetatable(v6, v5);
-    return v6;
-end;
-v5.mock = function(v7) --[[ Line: 21 ]] --[[ Name: mock ]]
-    -- upvalues: v5 (copy)
-    v7 = v7 or {};
-    return (v5.new({
-        userId = v7.userId or 12345, 
-        userPresenceType = v7.userPresenceType or "Offline", 
-        lastLocation = ""
-    }));
-end;
-v5.format = function(v8) --[[ Line: 33 ]] --[[ Name: format ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    return v3.Dictionary.join(v8, {
-        userPresenceType = v4.PresenceType[v8.userPresenceType]
-    });
-end;
-v5.isValid = v2.strictInterface({
-    userId = v2.number, 
-    userPresenceType = function(v9) --[[ Line: 41 ]] --[[ Name: userPresenceType ]]
-        -- upvalues: v4 (copy)
-        return v4.PresenceType[v9] ~= nil;
-    end, 
-    lastLocation = v2.string
-});
-return v5;
+local RoduxCall = script:FindFirstAncestor("RoduxCall")
+local RoduxCallParent = RoduxCall.Parent
+local t = require(RoduxCallParent.t)
+local Cryo = require(RoduxCallParent.Cryo)
+local Enums = require(RoduxCall.Enums)
+local t1 = {}
+
+function t1.new(p1) -- line: 9
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 21
+	-- upvalues: t1 (copy)
+	local v9 = p2 or {}
+
+	return (t1.new({
+		lastLocation = "",
+		userId = v9.userId or 12345,
+		userPresenceType = v9.userPresenceType or "Offline"
+	}))
+end
+function t1.format(p3) -- line: 33
+	-- upvalues: Cryo (copy), Enums (copy)
+	return Cryo.Dictionary.join(p3, {
+		userPresenceType = Enums.PresenceType[p3.userPresenceType]
+	})
+end
+
+t1.isValid = t.strictInterface({
+	userId = t.number,
+	userPresenceType = function(p4) -- line: 41
+		-- upvalues: Enums (copy)
+		return Enums.PresenceType[p4] ~= nil
+	end,
+	lastLocation = t.string
+})
+
+return t1

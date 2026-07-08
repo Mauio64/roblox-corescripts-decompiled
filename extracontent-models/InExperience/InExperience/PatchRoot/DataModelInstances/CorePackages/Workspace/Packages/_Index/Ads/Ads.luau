@@ -1,3 +1,3 @@
 return {
-    SponsoredTooltipHover = require(script.SponsoredTooltipHover)
-};
+	SponsoredTooltipHover = require(script.SponsoredTooltipHover)
+}

@@ -1,7 +1,7 @@
 return {
-    JoinExperience = "joinExperience", 
-    PurchaseExperience = "purchaseExperience", 
-    CancelPurchaseExperience = "cancelPurchaseExperience", 
-    UnableToJoinCancel = "unableToJoinCancel", 
-    UnableToJoinViewDetails = "unableToJoinViewDetails"
-};
+	JoinExperience = "joinExperience",
+	PurchaseExperience = "purchaseExperience",
+	CancelPurchaseExperience = "cancelPurchaseExperience",
+	UnableToJoinCancel = "unableToJoinCancel",
+	UnableToJoinViewDetails = "unableToJoinViewDetails"
+}

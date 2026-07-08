@@ -1,34 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("ContactsToast").Parent;
-local v1 = require(l_Parent_0.SocialLuaAnalytics);
-local v2 = require(script.Parent.EventNames);
-local l_Enums_0 = v1.Analytics.Enums;
-local v4 = require(script.Parent.BtnValues);
-local l_Contexts_0 = l_Enums_0.Contexts;
-local l_EventTypes_0 = l_Enums_0.EventTypes;
-local v7 = require(l_Parent_0.Dash);
+local Parent = script:FindFirstAncestor("ContactsToast").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local EventNames = require(script.Parent.EventNames)
+local Enums = SocialLuaAnalytics.Analytics.Enums
+local BtnValues = require(script.Parent.BtnValues)
+local Contexts = Enums.Contexts
+local EventTypes = Enums.EventTypes
+local Dash = require(Parent.Dash)
+
 return {
-    [v2.ContactsToastSeen] = {
-        context = l_Contexts_0.ContactsToast, 
-        eventType = l_EventTypes_0.UserSeen, 
-        formatRulesForAdditionalInfo = {
-            variant = v7.identity
-        }
-    }, 
-    [v2.ContactsToastDismissed] = {
-        context = l_Contexts_0.ContactsToast, 
-        eventType = l_EventTypes_0.Dismissed, 
-        formatRulesForAdditionalInfo = {
-            variant = v7.identity
-        }
-    }, 
-    [v2.ContactsToastButtonPressed] = {
-        context = l_Contexts_0.ContactsToast, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v4.FindFriendsButton
-        }, 
-        formatRulesForAdditionalInfo = {
-            variant = v7.identity
-        }
-    }
-};
+	[EventNames.ContactsToastSeen] = {
+		context = Contexts.ContactsToast,
+		eventType = EventTypes.UserSeen,
+		formatRulesForAdditionalInfo = {
+			variant = Dash.identity
+		}
+	},
+	[EventNames.ContactsToastDismissed] = {
+		context = Contexts.ContactsToast,
+		eventType = EventTypes.Dismissed,
+		formatRulesForAdditionalInfo = {
+			variant = Dash.identity
+		}
+	},
+	[EventNames.ContactsToastButtonPressed] = {
+		context = Contexts.ContactsToast,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = BtnValues.FindFriendsButton
+		},
+		formatRulesForAdditionalInfo = {
+			variant = Dash.identity
+		}
+	}
+}

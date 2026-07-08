@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXCatalogCategoriesStore) and game:DefineFastFlag("AXCatalogSupportDisableFilters3", false);
+return game:DefineFastFlag("AXCatalogSupportDisableFilters3", false)

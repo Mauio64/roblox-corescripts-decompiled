@@ -1,27 +1,32 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.FocusNavigation);
-return function(...) --[[ Line: 5 ]] --[[ Name: composeFocusBehaviors ]]
-    local v2 = {
-        ...
-    };
-    return {
-        onDescendantFocusChanged = function(v3) --[[ Line: 8 ]] --[[ Name: onDescendantFocusChanged ]]
-            -- upvalues: v2 (copy)
-            for _, v5 in v2 do
-                if v5.onDescendantFocusChanged then
-                    v5.onDescendantFocusChanged(v3);
-                end;
-            end;
-        end, 
-        getTargets = function() --[[ Line: 15 ]] --[[ Name: getTargets ]]
-            -- upvalues: v2 (copy)
-            local v6 = {};
-            for _, v8 in v2 do
-                for _, v10 in (v8.getTargets()) do
-                    table.insert(v6, v10);
-                end;
-            end;
-            return v6;
-        end
-    };
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.FocusNavigation)
+
+local function composeFocusBehaviors(...) -- line: 5
+	local t1 = { ... }
+
+	return {
+		onDescendantFocusChanged = function(p1) -- line: 8
+			-- upvalues: t1 (copy)
+			for _, v6 in t1 do
+				if v6.onDescendantFocusChanged then
+					v6.onDescendantFocusChanged(p1)
+				end
+			end
+		end,
+		getTargets = function() -- line: 15
+			-- upvalues: t1 (copy)
+			local t2 = {}
+
+			for _, v9 in t1 do
+				for _, v11 in (v9.getTargets()) do
+					table.insert(t2, v11)
+				end
+			end
+
+			return t2
+		end
+	}
+end
+
+return composeFocusBehaviors

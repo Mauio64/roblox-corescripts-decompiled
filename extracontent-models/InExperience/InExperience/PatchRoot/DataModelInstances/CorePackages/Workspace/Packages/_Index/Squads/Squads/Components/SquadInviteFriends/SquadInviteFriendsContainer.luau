@@ -1,201 +1,223 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local v3 = require(l_script_FirstAncestor_0.Enums.SquadInviteSourceEnum);
-local v4 = require(l_script_FirstAncestor_0.Thunks.inviteToSquad);
-local v5 = require(l_script_FirstAncestor_0.Thunks.InviteToParentChannel);
-local v6 = require(l_Parent_0.NotificationModalsManager);
-local v7 = require(l_Parent_0.Promise);
-local v8 = require(l_Parent_0.UIBlox);
-local l_useAppPolicy_0 = require(l_Parent_0.UniversalAppPolicy).useAppPolicy;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_Cryo_0 = v2.Cryo;
-local l_dependencyArray_0 = v2.Hooks.dependencyArray;
-local l_React_0 = v2.React;
-local l_useCurrentSquadSelector_0 = v2.Hooks.useCurrentSquadSelector;
-local l_useDispatch_0 = v2.Hooks.useDispatch;
-local l_useLocalization_0 = v2.Hooks.useLocalization;
-local l_Constants_0 = v2.SquadsCore.Common.Constants;
-local l_SquadExternalContractContext_0 = v2.SquadsCore.SquadExternalContractProvider.SquadExternalContractContext;
-local l_EventNames_0 = v2.SquadsCore.Analytics.EventNames;
-local l_SquadPromptType_0 = v2.SquadsCore.Enums.SquadPromptType;
-local l_useNavigation_0 = v2.useNavigation;
-local l_useStore_0 = v2.Hooks.useStore;
-local l_Images_0 = v8.App.ImageSet.Images;
-local l_FFlagEnableAppChatFocusableFixes_0 = v2.SharedFlags.FFlagEnableAppChatFocusableFixes;
-local v25 = require(script.Parent.SquadInviteFriends);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v2.SharedFlags.FFlagRemoveDependencyArrayAntipattern;
-return function(v27) --[[ Line: 37 ]] --[[ Name: SquadInviteFriendsContainer ]]
-    -- upvalues: l_React_0 (copy), l_SquadExternalContractContext_0 (copy), l_useNavigation_0 (copy), l_useDispatch_0 (copy), l_useStore_0 (copy), l_useLocalization_0 (copy), l_useCurrentSquadSelector_0 (copy), l_useLocalUserId_0 (copy), l_useAppPolicy_0 (copy), l_Cryo_0 (copy), v6 (copy), l_Images_0 (copy), v3 (copy), l_EventNames_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v7 (copy), v5 (copy), v4 (copy), l_Constants_0 (copy), l_SquadPromptType_0 (copy), v25 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy)
-    local v28 = l_React_0.useContext(l_SquadExternalContractContext_0);
-    local v29 = l_useNavigation_0();
-    local v30 = l_useDispatch_0();
-    local v31 = l_useStore_0();
-    local v32 = l_useLocalization_0({
-        addText = "Feature.Squads.Action.Add", 
-        user = "Feature.Squads.Description.User", 
-        youAddedMoreThanTwoToChat = "Feature.Squads.Description.YouAddedMoreThanTwoToChat", 
-        youAddedToChat = "Feature.Squads.Description.YouAddedToChat", 
-        youAddedTwoToChat = "Feature.Squads.Description.YouAddedTwoToChat"
-    });
-    local v33 = l_React_0.useRef(false);
-    local v34 = l_useCurrentSquadSelector_0();
-    local v35 = if v34 and v34.parentChannelId then v34.parentChannelId else "";
-    local v36 = v28.useGetConversationFromId(v35);
-    local v37 = l_useLocalUserId_0();
-    local v39 = l_React_0.useCallback(function(v38) --[[ Line: 61 ]]
-        return v38.getCanUsePlatformChat();
-    end, {});
-    local v40 = l_useAppPolicy_0(v39);
-    local v46 = l_React_0.useCallback(function(v41) --[[ Line: 69 ]]
-        -- upvalues: l_Cryo_0 (ref), v32 (copy), v6 (ref), l_Images_0 (ref)
-        local v42 = l_Cryo_0.Dictionary.keys(v41);
-        local l_displayName_0 = v41[v42[1]].displayName;
-        local v44 = nil;
-        if #v42 > 2 then
-            v44 = v32.youAddedMoreThanTwoToChat:gsub("{(.-)}", {
-                username = l_displayName_0, 
-                userCountMinusOne = tostring(#v42 - 1)
-            });
-        elseif #v42 == 2 then
-            local l_displayName_1 = v41[v42[2]].displayName;
-            v44 = v32.youAddedTwoToChat:gsub("{(.-)}", {
-                username1 = l_displayName_0, 
-                username2 = l_displayName_1
-            });
-        else
-            v44 = v32.youAddedToChat:gsub("{(.-)}", {
-                username = l_displayName_0
-            });
-        end;
-        v6.SetUIBloxToast({
-            iconImage = l_Images_0["icons/actions/friends/friendAdd"], 
-            toastTitle = v44
-        });
-    end, {
-        v32.youAddedMoreThanTwoToChat, 
-        v32.youAddedToChat, 
-        v32.youAddedTwoToChat
-    });
-    local v49 = l_React_0.useCallback(function(v47) --[[ Line: 97 ]]
-        -- upvalues: l_Cryo_0 (ref), v35 (copy), v3 (ref), v28 (copy), l_EventNames_0 (ref)
-        local v48 = l_Cryo_0.Dictionary.union({
-            parentChannelId = v35, 
-            source = v3.SourceSquadInvitePage
-        }, v47);
-        v28.fireSquadAnalytics(l_EventNames_0.SquadInvite, v48);
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v35, 
-        v28.fireSquadAnalytics
-    } else l_dependencyArray_0(v35, v28.fireSquadAnalytics));
-    local v64 = l_React_0.useCallback(function(v50) --[[ Line: 111 ]]
-        -- upvalues: v34 (copy), v36 (copy), l_Cryo_0 (ref), v37 (copy), v28 (copy), v30 (copy), v7 (ref), v5 (ref), v29 (copy), v4 (ref), v49 (copy), v46 (copy), l_Constants_0 (ref), v40 (copy), v31 (copy), l_SquadPromptType_0 (ref)
-        if not v34 or not v36 then
-            return;
-        else
-            local v51 = l_Cryo_0.Dictionary.keys(v50);
-            local v52 = l_Cryo_0.List.toSet(v36.participants);
-            local v54 = l_Cryo_0.List.filter(v51, function(v53) --[[ Line: 122 ]]
-                -- upvalues: v52 (copy)
-                return v52[v53] == nil;
-            end);
-            local function v63() --[[ Line: 126 ]]
-                -- upvalues: l_Cryo_0 (ref), v36 (ref), v51 (copy), v37 (ref), v28 (ref), v30 (ref), v7 (ref), v54 (copy), v5 (ref), v29 (ref), v4 (ref), v34 (ref), v49 (ref), v46 (ref), v50 (copy)
-                local v57 = l_Cryo_0.List.filter(v36.participants, function(v55) --[[ Line: 129 ]]
-                    -- upvalues: l_Cryo_0 (ref), v51 (ref), v37 (ref)
-                    local v56 = false;
-                    if l_Cryo_0.List.find(v51, (tostring(v55))) == nil then
-                        v56 = v55 ~= v37;
-                    end;
-                    return v56;
-                end);
-                local v58 = {};
-                if #v57 > 0 then
-                    for _, v60 in ipairs(v57) do
-                        table.insert(v58, v28.removeUserFromParentChannel(v30, v36.id, v60));
-                    end;
-                end;
-                v7.all(v58):andThen(function() --[[ Line: 146 ]]
-                    -- upvalues: v54 (ref), v30 (ref), v5 (ref), v57 (copy), v29 (ref), v36 (ref), v4 (ref), v34 (ref), v37 (ref), v49 (ref), v46 (ref), v50 (ref), v28 (ref)
-                    if #v54 > 0 then
-                        v30(v5({
-                            dispatch = v30, 
-                            onErrorCallback = function() --[[ Line: 150 ]] --[[ Name: onErrorCallback ]]
-                                -- upvalues: v57 (ref), v29 (ref)
-                                if #v57 > 0 then
-                                    v29.pop();
-                                end;
-                            end, 
-                            onSuccessCallback = function(v61) --[[ Line: 155 ]] --[[ Name: onSuccessCallback ]]
-                                -- upvalues: v36 (ref), v30 (ref), v4 (ref), v34 (ref), v37 (ref), v54 (ref), v49 (ref), v46 (ref), v50 (ref), v29 (ref)
-                                local v62 = v61 ~= v36.id;
-                                v30(v4(v34.squadId, v61, v37, v54, v49, v62));
-                                v46(v50);
-                                v29.pop();
-                            end, 
-                            parentChannel = v36, 
-                            userIds = v54, 
-                            squadExternalContext = v28
-                        }));
-                        return;
-                    else
-                        v29.pop();
-                        return;
-                    end;
-                end);
-            end;
-            if v36.type == l_Constants_0.CONVERSATION_CHANNEL_GROUP_TYPE and v40 and #v54 > 0 then
-                v28.setSquadPrompt(v31, {
-                    hideCancelButton = false, 
-                    promptType = l_SquadPromptType_0.ConfirmInviteToSquad, 
-                    onConfirm = function() --[[ Line: 188 ]] --[[ Name: onConfirm ]]
-                        -- upvalues: v63 (copy)
-                        v63();
-                    end
-                });
-                return;
-            else
-                v63();
-                return;
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v34, 
-        v30, 
-        v29, 
-        v36, 
-        v49, 
-        v46, 
-        v28.setSquadPrompt, 
-        v28.inviteToParentChannel, 
-        v31
-    } else l_dependencyArray_0(v34, v30, v29, v36, v49, v46, v28.setSquadPrompt, v28.inviteToParentChannel, v31));
-    return l_React_0.createElement(v25, {
-        participants = v27.participants, 
-        onMultiInvite = v64, 
-        buttonText = v32.addText, 
-        analyticsInfo = {
-            selectionPageType = "SquadInvite"
-        }, 
-        partyStartedRef = v33, 
-        onRemoveCallback = v36 and function(v65, v66) --[[ Line: 230 ]]
-            -- upvalues: l_Cryo_0 (ref), v36 (copy), v28 (copy), v31 (copy), v32 (copy), l_SquadPromptType_0 (ref)
-            if l_Cryo_0.List.find(v36.participants, v65) then
-                v28.setSquadPrompt(v31, {
-                    bodyTextLocalizationProps = {
-                        displayName = v66 or v32.user
-                    }, 
-                    hideCancelButton = true, 
-                    promptType = l_SquadPromptType_0.RemoveFromParty
-                });
-            end;
-        end or nil, 
-        preselectedUsers = v36 and v36.participants and l_Cryo_0.List.filter(v36.participants, function(v67) --[[ Line: 245 ]]
-            -- upvalues: v37 (copy)
-            return v67 ~= v37;
-        end), 
-        preselectedUsersUnremovable = if v36 then v36.type == l_Constants_0.CONVERSATION_CHANNEL_ONE_TO_ONE_TYPE or v36.initiator ~= tostring(v37) else nil, 
-        onSelectedFriendsChanged = if l_FFlagEnableAppChatFocusableFixes_0 then v27.onSelectedFriendsChanged else nil, 
-        shouldHideFooterButton = if l_FFlagEnableAppChatFocusableFixes_0 then v27.shouldHideFooterButton else nil
-    });
-end;
+local Squads = script:FindFirstAncestor("Squads")
+local SquadsParent = Squads.Parent
+local dependencies = require(Squads.dependencies)
+local SquadInviteSourceEnum = require(Squads.Enums.SquadInviteSourceEnum)
+local inviteToSquad = require(Squads.Thunks.inviteToSquad)
+local InviteToParentChannel = require(Squads.Thunks.InviteToParentChannel)
+local NotificationModalsManager = require(SquadsParent.NotificationModalsManager)
+local Promise = require(SquadsParent.Promise)
+local UIBlox = require(SquadsParent.UIBlox)
+local useAppPolicy = require(SquadsParent.UniversalAppPolicy).useAppPolicy
+local useLocalUserId = require(SquadsParent.RobloxAppHooks).useLocalUserId
+local Cryo = dependencies.Cryo
+local React = dependencies.React
+local useCurrentSquadSelector = dependencies.Hooks.useCurrentSquadSelector
+local useDispatch = dependencies.Hooks.useDispatch
+local useLocalization = dependencies.Hooks.useLocalization
+local Constants = require(SquadsParent.SquadsCore.Constants)
+local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
+local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
+local useNavigation = dependencies.useNavigation
+local useStore = dependencies.Hooks.useStore
+local Images = UIBlox.App.ImageSet.Images
+local SquadInviteFriends = require(script.Parent.SquadInviteFriends)
+
+local function SquadInviteFriendsContainer(p1) -- line: 33
+	-- upvalues: React (copy), SquadExternalContractContext (copy), useNavigation (copy), useDispatch (copy), useStore (copy), useLocalization (copy), useCurrentSquadSelector (copy), useLocalUserId (copy), useAppPolicy (copy), Cryo (copy), NotificationModalsManager (copy), Images (copy), SquadInviteSourceEnum (copy), EventNames (copy), Promise (copy), InviteToParentChannel (copy), inviteToSquad (copy), Constants (copy), SquadPromptType (copy), SquadInviteFriends (copy)
+	local v27 = React.useContext(SquadExternalContractContext)
+	local v28 = useNavigation()
+	local v29 = useDispatch()
+	local v30 = useStore()
+	local v31 = useLocalization({
+		addText = "Feature.Squads.Action.Add",
+		user = "Feature.Squads.Description.User",
+		youAddedMoreThanTwoToChat = "Feature.Squads.Description.YouAddedMoreThanTwoToChat",
+		youAddedToChat = "Feature.Squads.Description.YouAddedToChat",
+		youAddedTwoToChat = "Feature.Squads.Description.YouAddedTwoToChat"
+	})
+	local v32 = React.useRef(false)
+	local v33 = useCurrentSquadSelector()
+	local v34 = (not v33 or not v33.parentChannelId) and "" or v33.parentChannelId
+	local v35 = v27.useGetConversationFromId(v34)
+	local v36 = useLocalUserId()
+	local v37 = React.useCallback(function(p2) -- line: 57
+		return p2.getCanUsePlatformChat()
+	end, {})
+	local v38 = useAppPolicy(v37)
+	local v39 = React.useCallback(function(p3) -- line: 65
+		-- upvalues: Cryo (copy), v31 (copy), NotificationModalsManager (copy), Images (copy)
+		local v44 = Cryo.Dictionary.keys(p3)
+		local displayName = p3[v44[1]].displayName
+		local v46
+
+		if #v44 > 2 then
+			v46 = v31.youAddedMoreThanTwoToChat:gsub("{(.-)}", {
+				username = displayName,
+				userCountMinusOne = tostring(#v44 - 1)
+			})
+		elseif #v44 == 2 then
+			local displayName2 = p3[v44[2]].displayName
+
+			v46 = v31.youAddedTwoToChat:gsub("{(.-)}", {
+				username1 = displayName,
+				username2 = displayName2
+			})
+		else
+			v46 = v31.youAddedToChat:gsub("{(.-)}", {
+				username = displayName
+			})
+		end
+
+		NotificationModalsManager.SetUIBloxToast({
+			iconImage = Images["icons/actions/friends/friendAdd"],
+			toastTitle = v46
+		})
+	end, {
+		v31.youAddedMoreThanTwoToChat,
+		v31.youAddedToChat,
+		v31.youAddedTwoToChat
+	})
+	local v40 = React.useCallback(function(p4) -- line: 92
+		-- upvalues: Cryo (copy), v34 (copy), SquadInviteSourceEnum (copy), v27 (copy), EventNames (copy)
+		local v49 = Cryo.Dictionary.union({
+			parentChannelId = v34,
+			source = SquadInviteSourceEnum.SourceSquadInvitePage
+		}, p4)
+
+		v27.fireSquadAnalytics(EventNames.SquadInvite, v49)
+	end, {
+		v34,
+		v27.fireSquadAnalytics
+	})
+	local v41 = React.useCallback(function(p5) -- line: 101
+		-- upvalues: v33 (copy), v35 (copy), Cryo (copy), v36 (copy), v27 (copy), v29 (copy), Promise (copy), InviteToParentChannel (copy), v28 (copy), inviteToSquad (copy), v40 (copy), v39 (copy), Constants (copy), v30 (copy), SquadPromptType (copy), v38 (copy)
+		if not v33 or not v35 then
+			return
+		end
+
+		local v51 = Cryo.Dictionary.keys(p5)
+		local v52 = Cryo.List.toSet(v35.participants)
+		local v53 = Cryo.List.filter(v51, function(p6) -- line: 112
+			-- upvalues: v52 (copy)
+			return v52[p6] == nil
+		end)
+
+		local function v54() -- line: 116
+			-- upvalues: Cryo (copy), v35 (copy), v51 (copy), v36 (copy), v27 (copy), v29 (copy), Promise (copy), v53 (copy), InviteToParentChannel (copy), v28 (copy), inviteToSquad (copy), v33 (copy), v40 (copy), v39 (copy), p5 (copy)
+			local v59 = Cryo.List.filter(v35.participants, function(p7) -- line: 119
+				-- upvalues: Cryo (copy), v51 (copy), v36 (copy)
+				return Cryo.List.find(v51, (tostring(p7))) == nil and p7 ~= v36
+			end)
+			local t1 = {}
+
+			if #v59 > 0 then
+				for _, v in ipairs(v59) do
+					table.insert(t1, v27.removeUserFromParentChannel(v29, v35.id, v))
+				end
+			end
+
+			Promise.all(t1):andThen(function() -- line: 136
+				-- upvalues: v53 (copy), v29 (copy), InviteToParentChannel (copy), v59 (copy), v28 (copy), v35 (copy), inviteToSquad (copy), v33 (copy), v36 (copy), v40 (copy), v39 (copy), p5 (copy), v27 (copy)
+				if #v53 > 0 then
+					v29(InviteToParentChannel({
+						dispatch = v29,
+						onErrorCallback = function() -- line: 140
+							-- upvalues: v59 (copy), v28 (copy)
+							if #v59 > 0 then
+								v28.pop()
+							end
+						end,
+						onSuccessCallback = function(s1: string) -- line: 145
+							-- upvalues: v35 (copy), v29 (copy), inviteToSquad (copy), v33 (copy), v36 (copy), v53 (copy), v40 (copy), v39 (copy), p5 (copy), v28 (copy)
+							local v65 = s1 ~= v35.id
+
+							v29(inviteToSquad(v33.squadId, s1, v36, v53, v40, v65))
+							v39(p5)
+							v28.pop()
+						end,
+						parentChannel = v35,
+						userIds = v53,
+						squadExternalContext = v27
+					}))
+
+					return
+				end
+
+				v28.pop()
+			end)
+		end
+
+		if v35.type == Constants.CONVERSATION_CHANNEL_ONE_TO_ONE_TYPE and v35.moderationType == Constants.TRUSTED_COMM_MODERATION_TYPE then
+			v27.setSquadPrompt(v30, {
+				hideCancelButton = true,
+				promptType = SquadPromptType.CannotExpandToGroupChatActiveParty,
+				onConfirm = function() -- line: 177
+					-- upvalues: v28 (copy)
+					v28.pop()
+				end
+			})
+
+			return
+		end
+
+		if v35.type == Constants.CONVERSATION_CHANNEL_GROUP_TYPE and v38 and #v53 > 0 then
+			v27.setSquadPrompt(v30, {
+				hideCancelButton = false,
+				promptType = SquadPromptType.ConfirmInviteToSquad,
+				onConfirm = function() -- line: 189
+					-- upvalues: v54 (copy)
+					v54()
+				end
+			})
+
+			return
+		end
+
+		v54()
+	end, {
+		v33,
+		v29,
+		v28,
+		v35,
+		v40,
+		v39,
+		v27.setSquadPrompt,
+		v27.inviteToParentChannel,
+		v30,
+		v38,
+		v36,
+		v27
+	})
+
+	return React.createElement(SquadInviteFriends, {
+		participants = p1.participants,
+		onMultiInvite = v41,
+		buttonText = v31.addText,
+		analyticsInfo = {
+			selectionPageType = "SquadInvite"
+		},
+		partyStartedRef = v32,
+		onRemoveCallback = if not v35 then nil else function(p8, p9) -- line: 220
+			-- upvalues: Cryo (copy), v35 (copy), v27 (copy), v30 (copy), v31 (copy), SquadPromptType (copy)
+			if Cryo.List.find(v35.participants, p8) then
+				v27.setSquadPrompt(v30, {
+					hideCancelButton = true,
+					bodyTextLocalizationProps = {
+						displayName = p9 or v31.user
+					},
+					promptType = SquadPromptType.RemoveFromParty
+				})
+			end
+		end,
+		preselectedUsers = v35 and (v35.participants and Cryo.List.filter(v35.participants, function(p10) -- line: 235
+			-- upvalues: v36 (copy)
+			return p10 ~= v36
+		end)),
+		preselectedUsersUnremovable = if not v35 then nil else v35.type == Constants.CONVERSATION_CHANNEL_ONE_TO_ONE_TYPE or v35.initiator ~= tostring(v36),
+		onSelectedFriendsChanged = p1.onSelectedFriendsChanged,
+		shouldHideFooterButton = p1.shouldHideFooterButton
+	})
+end
+
+return SquadInviteFriendsContainer

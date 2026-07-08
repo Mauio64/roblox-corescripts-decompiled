@@ -1,53 +1,60 @@
-local l_Parent_0 = script:FindFirstAncestor("DsaIllegalContentReporting").Parent;
-local v1 = require(l_Parent_0.Foundation);
-local l_default_0 = require(l_Parent_0.LinkingProtocol).LinkingProtocol.default;
-local v3 = require(l_Parent_0.Localization);
-local v4 = require(l_Parent_0.React);
-local l_ControlState_0 = v1.Enums.ControlState;
-local l_getIconRichText_0 = v1.Utility.getIconRichText;
-local l_IconName_0 = v1.Enums.IconName;
-local l_Text_0 = v1.Text;
-local l_useLocalization_0 = v3.Hooks.useLocalization;
-local l_View_0 = v1.View;
-local v11 = game:DefineFastString("GenericReportLink", "https://www.roblox.com/illegal-content-reporting");
-local v12 = game:DefineFastFlag("ImproveIllegalContentReportingLinkLook", false);
-GenericReportLink = function() --[[ Line: 22 ]] --[[ Name: GenericReportLink ]]
-    -- upvalues: v12 (copy), v4 (copy), l_useLocalization_0 (copy), l_getIconRichText_0 (copy), l_IconName_0 (copy), l_default_0 (copy), v11 (copy), l_ControlState_0 (copy), l_View_0 (copy), l_Text_0 (copy)
-    local v13 = nil;
-    local v14 = nil;
-    if v12 then
-        local v15, v16 = v4.useState(false);
-        v13 = v15;
-        v14 = v16;
-    end;
-    local v17 = l_useLocalization_0({
-        GenericReportLinkText = "Feature.ReportAbuse.Label.GenericReportIllegalContentMessage"
-    });
-    local v18 = nil;
-    if v12 then
-        v18 = ("<b>%*</b> %*"):format(v17.GenericReportLinkText, (l_getIconRichText_0(l_IconName_0.ArrowUpRightFromSquare)));
-    end;
-    local v19 = v4.useCallback(function() --[[ Line: 39 ]]
-        -- upvalues: l_default_0 (ref), v11 (ref)
-        l_default_0:openURL(v11);
-    end, {});
-    local v20 = nil;
-    if v12 then
-        v20 = v4.useCallback(function(v21) --[[ Line: 45 ]]
-            -- upvalues: v14 (ref), l_ControlState_0 (ref)
-            v14(v21 == l_ControlState_0.Hover);
-        end, {});
-    end;
-    return v4.createElement(l_View_0, {
-        tag = "auto-xy col gap-small"
-    }, {
-        v4.createElement(l_Text_0, {
-            Text = if v12 then if v13 then ("<u>%*</u>"):format(v18) else v18 else ("<b>%*</b>"):format(v17.GenericReportLinkText), 
-            RichText = true, 
-            onActivated = v19, 
-            onStateChanged = if v12 then v20 else nil, 
-            tag = "auto-xy radius-small padding-xsmall text-wrap text-body-small"
-        })
-    });
-end;
-return v4.memo(GenericReportLink);
+local Parent = script:FindFirstAncestor("DsaIllegalContentReporting").Parent
+local Foundation = require(Parent.Foundation)
+local default = require(Parent.LinkingProtocol).LinkingProtocol.default
+local Localization = require(Parent.Localization)
+local React = require(Parent.React)
+local ControlState = Foundation.Enums.ControlState
+local getIconRichText = Foundation.Utility.getIconRichText
+local IconName = Foundation.Enums.IconName
+local FoundationText = Foundation.Text
+local useLocalization = Localization.Hooks.useLocalization
+local View = Foundation.View
+local v12 = game:DefineFastString("GenericReportLink", "https://www.roblox.com/illegal-content-reporting")
+local v13 = game:DefineFastFlag("ImproveIllegalContentReportingLinkLook", false)
+
+function GenericReportLink() -- line: 22
+	-- upvalues: v13 (copy), React (copy), useLocalization (copy), getIconRichText (copy), IconName (copy), default (copy), v12 (copy), ControlState (copy), View (copy), FoundationText (copy)
+	local v14 = nil
+	local u15 = nil
+
+	if v13 then
+		local v16
+
+		v14, v16 = React.useState(false)
+		u15 = v16
+	end
+
+	local v17 = useLocalization({
+		GenericReportLinkText = "Feature.ReportAbuse.Label.GenericReportIllegalContentMessage"
+	})
+	local v18 = nil
+
+	if v13 then
+		v18 = `<b>{ v17.GenericReportLinkText }</b> { getIconRichText(IconName.ArrowUpRightFromSquare) }`
+	end
+
+	local v19 = React.useCallback(function() -- line: 39
+		-- upvalues: default (copy), v12 (copy)
+		default:openURL(v12)
+	end, {})
+	local v20 = nil
+
+	if v13 then
+		v20 = React.useCallback(function(p1) -- line: 45
+			-- upvalues: u15 (ref), ControlState (copy)
+			u15(p1 == ControlState.Hover)
+		end, {})
+	end
+
+	return React.createElement(View, {
+		tag = "auto-xy col gap-small"
+	}, { React.createElement(FoundationText, {
+		RichText = true,
+		tag = "auto-xy radius-small padding-xsmall text-wrap text-body-small",
+		Text = if not v13 then `<b>{ v17.GenericReportLinkText }</b>` else if not v14 then v18 else `<u>{ v18 }</u>`,
+		onActivated = v19,
+		onStateChanged = if not v13 then nil else v20
+	}) })
+end
+
+return React.memo(GenericReportLink)

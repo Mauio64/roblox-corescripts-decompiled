@@ -1,26 +1,29 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useEffect_0 = v2.useEffect;
-local l_useRef_0 = v2.useRef;
-v0.useAfterFastRefresh = function(v5) --[[ Line: 16 ]] --[[ Name: useAfterFastRefresh ]]
-    -- upvalues: l_useRef_0 (copy), l_useEffect_0 (copy)
-    if _G.__DEV__ then
-        local v6 = l_useRef_0(false);
-        l_useEffect_0(function() --[[ Line: 19 ]]
-            -- upvalues: v6 (copy)
-            return function() --[[ Line: 20 ]]
-                -- upvalues: v6 (ref)
-                v6.current = true;
-            end;
-        end, {});
-        l_useEffect_0(function() --[[ Line: 24 ]]
-            -- upvalues: v6 (copy), v5 (copy)
-            if v6.current == true then
-                v6.current = false;
-                v5();
-            end;
-        end, {});
-    end;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local useEffect = React.useEffect
+local useRef = React.useRef
+
+function t1.useAfterFastRefresh(p1: ((...any) -> ...any)) -- line: 16
+	-- upvalues: useRef (copy), useEffect (copy)
+	if _G.__DEV__ then
+		local v7 = useRef(false)
+
+		useEffect(function() -- line: 19
+			-- upvalues: v7 (copy)
+			return function() -- line: 20
+				-- upvalues: v7 (copy)
+				v7.current = true
+			end
+		end, {})
+		useEffect(function() -- line: 24
+			-- upvalues: v7 (copy), p1 (copy)
+			if v7.current == true then
+				v7.current = false
+				p1()
+			end
+		end, {})
+	end
+end
+
+return t1

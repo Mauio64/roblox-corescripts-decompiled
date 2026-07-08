@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXDurablesSupportForRFYMigration2", false);
+return game:DefineFastFlag("AXDurablesSupportForRFYMigration2", false)

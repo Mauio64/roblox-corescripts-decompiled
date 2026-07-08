@@ -1,76 +1,88 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_ChatSettings_0 = require(l_Parent_0:WaitForChild("ChatSettings"));
-local l_ChatConstants_0 = require(l_Parent_0:WaitForChild("ChatConstants"));
-local l_Util_0 = require(script.Parent:WaitForChild("Util"));
-CreateMeCommandMessageLabel = function(v4, v5) --[[ Line: 11 ]] --[[ Name: CreateMeCommandMessageLabel ]]
-    -- upvalues: l_ChatSettings_0 (copy), l_Util_0 (copy)
-    local _ = v4.Message;
-    local v7 = v4.ExtraData or {};
-    local v8 = v7.Font or Enum.Font.SourceSansItalic;
-    local v9 = v7.TextSize or l_ChatSettings_0.ChatWindowTextSize;
-    local v10 = Color3.new(1, 1, 1);
-    local v11 = v7.ChannelColor or v10;
-    local v12 = 0;
-    local l_l_Util_0_BaseMessage_0, v14 = l_Util_0:CreateBaseMessage("", v8, v9, v10);
-    local v15 = nil;
-    if v5 ~= v4.OriginalChannel then
-        local v16 = string.format("{%s}", v4.OriginalChannel);
-        v15 = l_Util_0:AddChannelButtonToBaseMessage(v14, v11, v16, v4.OriginalChannel);
-        v12 = l_Util_0:GetNumberOfSpaces(v16, v8, v9) + 1;
-    end;
-    local function v20(v17) --[[ Line: 29 ]] --[[ Name: UpdateTextFunction ]]
-        -- upvalues: v4 (copy), v14 (copy), l_Util_0 (ref), v12 (ref)
-        if v4.IsFiltered then
-            v14.Text = l_Util_0:CreateLeadingSpaces(v12) .. l_Util_0:SanitizeForRichText(v17.FromSpeaker .. " " .. string.sub(v17.Message, 5));
-            return;
-        else
-            local v18 = v17.MessageLengthUtf8 or v17.MessageLength;
-            local v19 = utf8.len(utf8.nfcnormalize(v17.FromSpeaker)) + v18 - 4;
-            v14.Text = l_Util_0:CreateLeadingSpaces(v12) .. string.rep("_", v19);
-            return;
-        end;
-    end;
-    v20(v4);
-    local function v22(v21) --[[ Line: 41 ]] --[[ Name: GetHeightFunction ]]
-        -- upvalues: l_Util_0 (ref), v14 (copy), l_l_Util_0_BaseMessage_0 (copy)
-        return l_Util_0:GetMessageHeight(v14, l_l_Util_0_BaseMessage_0, v21);
-    end;
-    local v23 = {
-        [v14] = {
-            TextTransparency = {
-                FadedIn = 0, 
-                FadedOut = 1
-            }, 
-            TextStrokeTransparency = {
-                FadedIn = 0.75, 
-                FadedOut = 1
-            }
-        }
-    };
-    if v15 then
-        v23[v15] = {
-            TextTransparency = {
-                FadedIn = 0, 
-                FadedOut = 1
-            }, 
-            TextStrokeTransparency = {
-                FadedIn = 0.75, 
-                FadedOut = 1
-            }
-        };
-    end;
-    local l_l_Util_0_FadeFunctions_0, v25, v26 = l_Util_0:CreateFadeFunctions(v23);
-    return {
-        [l_Util_0.KEY_BASE_FRAME] = l_l_Util_0_BaseMessage_0, 
-        [l_Util_0.KEY_BASE_MESSAGE] = v14, 
-        [l_Util_0.KEY_UPDATE_TEXT_FUNC] = v20, 
-        [l_Util_0.KEY_GET_HEIGHT] = v22, 
-        [l_Util_0.KEY_FADE_IN] = l_l_Util_0_FadeFunctions_0, 
-        [l_Util_0.KEY_FADE_OUT] = v25, 
-        [l_Util_0.KEY_UPDATE_ANIMATION] = v26
-    };
-end;
+local ParentParent = script.Parent.Parent
+local ChatSettings = require(ParentParent:WaitForChild("ChatSettings"))
+local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
+local Util = require(script.Parent:WaitForChild("Util"))
+
+function CreateMeCommandMessageLabel(p1, p2) -- line: 11
+	-- upvalues: ChatSettings (copy), Util (copy)
+	local _ = p1.Message
+	local v8 = p1.ExtraData or {}
+	local v9 = v8.Font or Enum.Font.SourceSansItalic
+	local v10 = v8.TextSize or ChatSettings.ChatWindowTextSize
+	local color3 = Color3.new(1, 1, 1)
+	local v12 = v8.ChannelColor or color3
+	local n1 = 0
+	local v14, v15 = Util:CreateBaseMessage("", v9, v10, color3)
+	local v16 = nil
+
+	if p2 ~= p1.OriginalChannel then
+		local v17 = string.format("{%s}", p1.OriginalChannel)
+
+		v16 = Util:AddChannelButtonToBaseMessage(v15, v12, v17, p1.OriginalChannel)
+		n1 = Util:GetNumberOfSpaces(v17, v9, v10) + 1
+	end
+
+	local function UpdateTextFunction(p3) -- line: 29
+		-- upvalues: p1 (copy), v15 (copy), Util (copy), n1 (ref)
+		if p1.IsFiltered then
+			v15.Text = Util:CreateLeadingSpaces(n1) .. Util:SanitizeForRichText(p3.FromSpeaker .. " " .. string.sub(p3.Message, 5))
+
+			return
+		end
+
+		local v25 = p3.MessageLengthUtf8 or p3.MessageLength
+		local v26 = utf8.len(utf8.nfcnormalize(p3.FromSpeaker)) + v25 - 4
+
+		v15.Text = Util:CreateLeadingSpaces(n1) .. string.rep("_", v26)
+	end
+
+	UpdateTextFunction(p1)
+
+	local function GetHeightFunction(p4) -- line: 41
+		-- upvalues: Util (copy), v15 (copy), v14 (copy)
+		return Util:GetMessageHeight(v15, v14, p4)
+	end
+
+	local t1 = {
+		[v15] = {
+			TextTransparency = {
+				FadedIn = 0,
+				FadedOut = 1
+			},
+			TextStrokeTransparency = {
+				FadedIn = 0.75,
+				FadedOut = 1
+			}
+		}
+	}
+
+	if v16 then
+		t1[v16] = {
+			TextTransparency = {
+				FadedIn = 0,
+				FadedOut = 1
+			},
+			TextStrokeTransparency = {
+				FadedIn = 0.75,
+				FadedOut = 1
+			}
+		}
+	end
+
+	local v21, v22, v23 = Util:CreateFadeFunctions(t1)
+
+	return {
+		[Util.KEY_BASE_FRAME] = v14,
+		[Util.KEY_BASE_MESSAGE] = v15,
+		[Util.KEY_UPDATE_TEXT_FUNC] = UpdateTextFunction,
+		[Util.KEY_GET_HEIGHT] = GetHeightFunction,
+		[Util.KEY_FADE_IN] = v21,
+		[Util.KEY_FADE_OUT] = v22,
+		[Util.KEY_UPDATE_ANIMATION] = v23
+	}
+end
+
 return {
-    [l_Util_0.KEY_MESSAGE_TYPE] = l_ChatConstants_0.MessageTypeMeCommand, 
-    [l_Util_0.KEY_CREATOR_FUNCTION] = CreateMeCommandMessageLabel
-};
+	[Util.KEY_MESSAGE_TYPE] = ChatConstants.MessageTypeMeCommand,
+	[Util.KEY_CREATOR_FUNCTION] = CreateMeCommandMessageLabel
+}

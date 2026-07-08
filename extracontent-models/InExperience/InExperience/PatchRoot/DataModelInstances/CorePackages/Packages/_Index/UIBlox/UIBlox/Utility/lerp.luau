@@ -1,3 +1,3 @@
-return function(v0, v1, v2) --[[ Line: 2 ]]
-    return (1 - v2) * v0 + v1 * v2;
-end;
+return function(p1, p2, p3) -- line: 2
+	return (1 - p3) * p1 + p2 * p3
+end

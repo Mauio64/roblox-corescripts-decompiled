@@ -1,1 +1,1 @@
-return require(script.VoiceIndicator);
+return require(script.VoiceIndicator)

@@ -262,6 +262,10 @@ local v44 = if not FFlagAXCustomizeMakeupSupport then nil else {
 	[t4.LipMakeup] = 1,
 	[t4.EyeMakeup] = 2
 }
+local t19 = {
+	AttributeKey = "IXP_LAYER",
+	TagName = "WIDGET"
+}
 
 return {
 	BODY_BUNDLE_TYPE_ID = "1",
@@ -295,5 +299,6 @@ return {
 	MAX_MAKEUP_LAYERS = 6,
 	LOOK_TYPE = t18,
 	MIN_MAKEUP_ITEMS_FOR_LAYERING_BUTTON = 2,
-	LabelAbuseTypeMapping = LabelAbuseTypeMapping
+	LabelAbuseTypeMapping = LabelAbuseTypeMapping,
+	IXP_WIDGET_LAYER_EXPOSURE = t19
 }

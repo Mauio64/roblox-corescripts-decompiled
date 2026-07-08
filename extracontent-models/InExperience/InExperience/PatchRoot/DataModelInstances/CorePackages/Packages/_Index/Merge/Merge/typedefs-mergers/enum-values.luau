@@ -1,45 +1,61 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Map_0 = v1.Map;
-local v5 = {};
-local _ = require(l_Parent_0.GraphQL);
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-local _ = require(script.Parent["merge-typedefs_types"]);
-local l_compareNodes_0 = require(l_Parent_0.Utils).compareNodes;
-v5.mergeEnumValues = function(v10, v11, v12) --[[ Line: 30 ]] --[[ Name: mergeEnumValues ]]
-    -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy), l_Map_0 (copy), l_mergeDirectives_0 (copy), l_compareNodes_0 (copy)
-    if l_Boolean_0.toJSBoolean(if typeof(v12) == "table" then v12.consistentEnumMerge else nil) then
-        local v13 = {};
-        if l_Boolean_0.toJSBoolean(v10) then
-            v13 = l_Array_0.concat(v13, v10);
-        end;
-        v10 = v11;
-        v11 = v13;
-    end;
-    local v14 = l_Map_0.new();
-    if v10 then
-        for _, v16 in v10 do
-            v14:set(v16.name.value, v16);
-        end;
-    end;
-    if v11 then
-        for _, v18 in v11 do
-            local l_value_0 = v18.name.value;
-            if l_Boolean_0.toJSBoolean(v14:has(l_value_0)) then
-                local v20 = v14:get(l_value_0);
-                v20.description = l_Boolean_0.toJSBoolean(v18.description) and v18.description or v20.description;
-                v20.directives = l_mergeDirectives_0(v18.directives, v20.directives);
-            else
-                v14:set(l_value_0, v18);
-            end;
-        end;
-    end;
-    local v21 = l_Array_0.concat({}, v14:values());
-    if v12 and l_Boolean_0.toJSBoolean(v12.sort) then
-        l_Array_0.sort(v21, l_compareNodes_0);
-    end;
-    return v21;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Map = LuauPolyfill.Map
+local t1 = {}
+
+require(ParentParent.GraphQL)
+
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+
+require(script.Parent["merge-typedefs_types"])
+
+local compareNodes = require(ParentParent.Utils).compareNodes
+
+function t1.mergeEnumValues(p1, p2, p3) -- line: 30
+	-- upvalues: Boolean (copy), Array (copy), Map (copy), mergeDirectives (copy), compareNodes (copy)
+	if Boolean.toJSBoolean(if typeof(p3) ~= "table" then nil else p3.consistentEnumMerge) then
+		local t2 = {}
+
+		if Boolean.toJSBoolean(p1) then
+			t2 = Array.concat(t2, p1)
+		end
+
+		p1 = p2
+		p2 = t2
+	end
+
+	local v13 = Map.new()
+
+	if p1 then
+		for _, v15 in p1 do
+			v13:set(v15.name.value, v15)
+		end
+	end
+
+	if p2 then
+		for _, v17 in p2 do
+			local value = v17.name.value
+
+			if Boolean.toJSBoolean(v13:has(value)) then
+				local v19 = v13:get(value)
+
+				v19.description = Boolean.toJSBoolean(v17.description) and v17.description or v19.description
+				v19.directives = mergeDirectives(v17.directives, v19.directives)
+			else
+				v13:set(value, v17)
+			end
+		end
+	end
+
+	local v20 = Array.concat({}, v13:values())
+
+	if p3 and Boolean.toJSBoolean(p3.sort) then
+		Array.sort(v20, compareNodes)
+	end
+
+	return v20
+end
+
+return t1

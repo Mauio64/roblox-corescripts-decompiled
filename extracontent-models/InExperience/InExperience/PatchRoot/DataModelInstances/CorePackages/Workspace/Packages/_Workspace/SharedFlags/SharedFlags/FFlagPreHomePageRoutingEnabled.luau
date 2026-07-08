@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PreHomePageRoutingEnabled", false);
+return game:DefineFastFlag("PreHomePageRoutingEnabled", false)

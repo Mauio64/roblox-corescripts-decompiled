@@ -1,486 +1,514 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent.Parent;
-local l_MessageBus_0 = require(l_Parent_0.MessageBus).MessageBus;
-local v3 = require(l_Parent_0.t);
-local v4 = require(l_Parent_0.Promise);
-local _ = require(script.Parent.CredentialsProtocolTypes);
-local v6 = {
-    FIDO2 = "FIDO2", 
-    password = "password", 
-    all = "all", 
-    iosKeychainPassword = "iosKeychainPassword", 
-    keystore = "keystore"
-};
-local v7 = v3.strictInterface({
-    keyType = v3.optional(v3.string), 
-    publicKey = v3.interface({
-        challenge = v3.string, 
-        timeout = v3.optional(v3.number), 
-        rpId = v3.optional(v3.string), 
-        allowCredentials = v3.optional(v3.table), 
-        userVerification = v3.optional(v3.string), 
-        attestation = v3.optional(v3.string), 
-        extensions = v3.optional(v3.table)
-    }), 
-    deviceBoundOnly = v3.optional(v3.boolean)
-});
-local v8 = {
-    [v6.FIDO2] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v7
-    }), 
-    [v6.all] = v3.strictInterface({
-        FIDO2 = v3.optional(v7), 
-        password = v3.optional(v3.strictInterface({
-            username = v3.optional(v3.string)
-        }))
-    }), 
-    [v6.iosKeychainPassword] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.interface({
-            server = v3.optional(v3.string)
-        })
-    }), 
-    [v6.keystore] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.interface({
-            server = v3.optional(v3.string), 
-            key = v3.optional(v3.string)
-        })
-    })
-};
-local v9 = v3.strictInterface({
-    id = v3.optional(v3.string), 
-    rawId = v3.optional(v3.string), 
-    type = v3.optional(v3.string), 
-    response = v3.interface({
-        authenticatorData = v3.string, 
-        clientDataJSON = v3.string, 
-        signature = v3.string, 
-        userHandle = v3.optional(v3.string)
-    }), 
-    errorCode = v3.optional(v3.string), 
-    errorMsg = v3.optional(v3.string)
-});
-local v10 = {
-    [v6.FIDO2] = v9, 
-    [v6.all] = v3.strictInterface({
-        credentialType = v3.string, 
-        response = v3.union(v9, v3.strictInterface({
-            username = v3.optional(v3.string), 
-            password = v3.optional(v3.string), 
-            errorCode = v3.optional(v3.string), 
-            errorMsg = v3.optional(v3.string)
-        }))
-    }), 
-    [v6.iosKeychainPassword] = v3.array(v3.strictInterface({
-        experimentGroup = v3.optional(v3.string), 
-        username = v3.optional(v3.string), 
-        userId = v3.optional(v3.string), 
-        password = v3.optional(v3.string), 
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    })), 
-    [v6.keystore] = v3.array(v3.strictInterface({
-        experimentGroup = v3.optional(v3.string), 
-        username = v3.optional(v3.string), 
-        userId = v3.optional(v3.string), 
-        password = v3.optional(v3.string), 
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    }))
-};
-local v11 = {
-    [v6.FIDO2] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.interface({
-            keyType = v3.optional(v3.string), 
-            isSilentPasskeyUpgrade = v3.optional(v3.boolean), 
-            publicKey = v3.interface({
-                rp = v3.interface({
-                    name = v3.string, 
-                    id = v3.string
-                }), 
-                user = v3.interface({
-                    name = v3.string, 
-                    displayName = v3.string, 
-                    id = v3.string
-                }), 
-                challenge = v3.string, 
-                pubKeyCredParams = v3.optional(v3.table), 
-                timeout = v3.optional(v3.number), 
-                excludeCredentials = v3.optional(v3.table), 
-                authenticationSelection = v3.optional(v3.table), 
-                attestation = v3.optional(v3.string), 
-                extensions = v3.optional(v3.table)
-            })
-        })
-    }), 
-    [v6.password] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.strictInterface({
-            username = v3.string, 
-            password = v3.string
-        })
-    }), 
-    [v6.iosKeychainPassword] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.strictInterface({
-            server = v3.string, 
-            username = v3.string, 
-            userId = v3.string, 
-            password = v3.string, 
-            experimentGroup = v3.optional(v3.string)
-        })
-    }), 
-    [v6.keystore] = v3.strictInterface({
-        credentialType = v3.string, 
-        parameters = v3.strictInterface({
-            server = v3.string, 
-            key = v3.optional(v3.string), 
-            username = v3.string, 
-            userId = v3.string, 
-            password = v3.string, 
-            experimentGroup = v3.optional(v3.string)
-        })
-    })
-};
-local v12 = {
-    [v6.FIDO2] = v3.strictInterface({
-        id = v3.optional(v3.string), 
-        rawId = v3.optional(v3.string), 
-        type = v3.optional(v3.string), 
-        response = v3.interface({
-            clientDataJSON = v3.string, 
-            attestationObject = v3.string
-        }), 
-        authenticatorAttachment = v3.optional(v3.string), 
-        clientExtensionResults = v3.optional(v3.table), 
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    }), 
-    [v6.password] = v3.strictInterface({
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    }), 
-    [v6.iosKeychainPassword] = v3.strictInterface({
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    }), 
-    [v6.keystore] = v3.strictInterface({
-        errorCode = v3.optional(v3.string), 
-        errorMsg = v3.optional(v3.string)
-    })
-};
-local v13 = {
-    CredentialsTypes = v6, 
-    GET_CREDENTIALS_REQUEST_DESCRIPTOR = {
-        [v6.FIDO2] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsRequest"), 
-            validateParams = v8[v6.FIDO2]
-        }, 
-        [v6.all] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsRequest"), 
-            validateParams = v8[v6.all]
-        }, 
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsRequest"), 
-            validateParams = v8[v6.iosKeychainPassword]
-        }, 
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsRequest"), 
-            validateParams = v8[v6.keystore]
-        }
-    }, 
-    GET_CREDENTIALS_RESPONSE_DESCRIPTOR = {
-        [v6.FIDO2] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsResponse"), 
-            validateParams = v10[v6.FIDO2]
-        }, 
-        [v6.all] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsResponse"), 
-            validateParams = v10[v6.all]
-        }, 
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsResponse"), 
-            validateParams = v10[v6.iosKeychainPassword]
-        }, 
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "getCredentialsResponse"), 
-            validateParams = v10[v6.keystore]
-        }
-    }, 
-    DELETE_IOS_KEYCHAIN_CREDENTIALS_REQUEST_DESCRIPTOR = {
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "deleteIosKeychainCredentialsRequest"), 
-            validateParams = v3.strictInterface({
-                credentialType = v3.string, 
-                parameters = v3.strictInterface({
-                    server = v3.string
-                })
-            })
-        }
-    }, 
-    DELETE_KEYSTORE_CREDENTIALS_REQUEST_DESCRIPTOR = {
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "deleteKeystoreCredentialsRequest"), 
-            validateParams = v3.strictInterface({
-                credentialType = v3.string, 
-                parameters = v3.strictInterface({
-                    server = v3.string, 
-                    key = v3.optional(v3.string)
-                })
-            })
-        }
-    }, 
-    DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR = {
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "deleteIosKeychainCredentialsResponse"), 
-            validateParams = v3.strictInterface({
-                credentialType = v3.string, 
-                response = v3.array(v3.strictInterface({
-                    errorCode = v3.optional(v3.string), 
-                    errorMsg = v3.optional(v3.string)
-                }))
-            })
-        }
-    }, 
-    DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR = {
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "deleteKeystoreCredentialsResponse"), 
-            validateParams = v3.strictInterface({
-                credentialType = v3.string, 
-                response = v3.array(v3.strictInterface({
-                    errorCode = v3.optional(v3.string), 
-                    errorMsg = v3.optional(v3.string)
-                }))
-            })
-        }
-    }, 
-    REGISTER_CREDENTIALS_REQUEST_DESCRIPTOR = {
-        [v6.FIDO2] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsRequest"), 
-            validateParams = v11[v6.FIDO2]
-        }, 
-        [v6.password] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsRequest"), 
-            validateParams = v11[v6.password]
-        }, 
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsRequest"), 
-            validateParams = v11[v6.iosKeychainPassword]
-        }, 
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsRequest"), 
-            validateParams = v11[v6.keystore]
-        }
-    }, 
-    REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR = {
-        [v6.FIDO2] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsResponse"), 
-            validateParams = v12[v6.FIDO2]
-        }, 
-        [v6.password] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsResponse"), 
-            validateParams = v12[v6.password]
-        }, 
-        [v6.iosKeychainPassword] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsResponse"), 
-            validateParams = v12[v6.iosKeychainPassword]
-        }, 
-        [v6.keystore] = {
-            mid = l_MessageBus_0.getMessageId("Credentials", "registerCredentialsResponse"), 
-            validateParams = v12[v6.keystore]
-        }
-    }, 
-    IS_AVAILABLE_REQUEST_DESCRIPTOR = {
-        mid = l_MessageBus_0.getMessageId("Credentials", "isAvailableRequest"), 
-        validateParams = v3.strictInterface({
-            credentialType = v3.optional(v3.valueOf(v6))
-        })
-    }, 
-    IS_AVAILABLE_RESPONSE_DESCRIPTOR = {
-        mid = l_MessageBus_0.getMessageId("Credentials", "isAvailableResponse"), 
-        validateParams = v3.strictInterface({
-            isAvailable = v3.optional(v3.boolean), 
-            supportsDeviceBoundOnly = v3.optional(v3.boolean), 
-            FIDO2 = v3.optional(v3.strictInterface({
-                isAvailable = v3.boolean, 
-                supportsDeviceBoundOnly = v3.boolean, 
-                supportsSilentPasskeyUpgrade = v3.optional(v3.boolean)
-            })), 
-            password = v3.optional(v3.strictInterface({
-                isAvailable = v3.boolean
-            })), 
-            iosKeychainPassword = v3.optional(v3.strictInterface({
-                isAvailable = v3.boolean
-            })), 
-            keystore = v3.optional(v3.strictInterface({
-                isAvailable = v3.boolean
-            }))
-        })
-    }
-};
-v13.__index = v13;
-v13.new = function() --[[ Line: 406 ]] --[[ Name: new ]]
-    -- upvalues: l_MessageBus_0 (copy), v13 (copy)
-    return (setmetatable({
-        subscriber = l_MessageBus_0.Subscriber.new(), 
-        getCredentialsRequestInFlight = false, 
-        registerCredentialsRequestInFlight = false, 
-        deleteIosKeychainCredentialsRequestInFlight = false, 
-        deleteKeystoreCredentialsRequestInFlight = false
-    }, v13));
-end;
-v13.getCredentials = function(v14, v15, v16, v17) --[[ Line: 420 ]] --[[ Name: getCredentials ]]
-    -- upvalues: v4 (copy), l_HttpService_0 (copy), v6 (copy), l_MessageBus_0 (copy)
-    if not v14.getCredentialsRequestInFlight then
-        local v22 = v4.race({
-            v4.new(function(v18, _) --[[ Line: 424 ]]
-                -- upvalues: v14 (copy), v15 (copy), l_HttpService_0 (ref)
-                v14.subscriber:subscribe(v14.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[v15], function(v20) --[[ Line: 425 ]]
-                    -- upvalues: v14 (ref), v15 (ref), l_HttpService_0 (ref), v18 (copy)
-                    v14.subscriber:unsubscribe(v14.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[v15]);
-                    v14.getCredentialsRequestInFlight = false;
-                    local v21 = l_HttpService_0:JSONEncode(v20);
-                    v18(v21);
-                end);
-            end), 
-            v4.delay(v17):andThen(function() --[[ Line: 432 ]]
-                -- upvalues: v14 (copy), v15 (copy)
-                v14.subscriber:unsubscribe(v14.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[v15]);
-                v14.getCredentialsRequestInFlight = false;
-            end)
-        });
-        v14.getCredentialsRequestInFlight = true;
-        if v15 == v6.all then
-            l_MessageBus_0.publish(v14.GET_CREDENTIALS_REQUEST_DESCRIPTOR[v15], l_HttpService_0:JSONDecode(v16));
-            return v22;
-        else
-            l_MessageBus_0.publish(v14.GET_CREDENTIALS_REQUEST_DESCRIPTOR[v15], {
-                credentialType = v15, 
-                parameters = l_HttpService_0:JSONDecode(v16)
-            });
-            return v22;
-        end;
-    else
-        return v4.reject();
-    end;
-end;
-v13.registerCredentials = function(v23, v24, v25, v26) --[[ Line: 458 ]] --[[ Name: registerCredentials ]]
-    -- upvalues: v4 (copy), l_HttpService_0 (copy), l_MessageBus_0 (copy)
-    if not v23.registerCredentialsRequestInFlight then
-        local v31 = v4.race({
-            v4.new(function(v27, _) --[[ Line: 466 ]]
-                -- upvalues: v23 (copy), v24 (copy), l_HttpService_0 (ref)
-                v23.subscriber:subscribe(v23.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[v24], function(v29) --[[ Line: 469 ]]
-                    -- upvalues: v23 (ref), v24 (ref), l_HttpService_0 (ref), v27 (copy)
-                    v23.subscriber:unsubscribe(v23.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[v24]);
-                    v23.registerCredentialsRequestInFlight = false;
-                    local v30 = l_HttpService_0:JSONEncode(v29);
-                    v27(v30);
-                end);
-            end), 
-            v4.delay(v26):andThen(function() --[[ Line: 477 ]]
-                -- upvalues: v23 (copy), v24 (copy)
-                v23.subscriber:unsubscribe(v23.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[v24]);
-                v23.registerCredentialsRequestInFlight = false;
-            end)
-        });
-        v23.registerCredentialsRequestInFlight = true;
-        l_MessageBus_0.publish(v23.REGISTER_CREDENTIALS_REQUEST_DESCRIPTOR[v24], {
-            credentialType = v24, 
-            parameters = l_HttpService_0:JSONDecode(v25)
-        });
-        return v31;
-    else
-        return v4.reject();
-    end;
-end;
-v13.deleteAllCredentialsFromiOSKeychain = function(v32, v33, v34, v35) --[[ Line: 494 ]] --[[ Name: deleteAllCredentialsFromiOSKeychain ]]
-    -- upvalues: v4 (copy), l_HttpService_0 (copy), l_MessageBus_0 (copy)
-    if not v32.deleteIosKeychainCredentialsRequestInFlight then
-        local v40 = v4.race({
-            v4.new(function(v36, _) --[[ Line: 502 ]]
-                -- upvalues: v32 (copy), v33 (copy), l_HttpService_0 (ref)
-                v32.subscriber:subscribe(v32.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[v33], function(v38) --[[ Line: 505 ]]
-                    -- upvalues: v32 (ref), v33 (ref), l_HttpService_0 (ref), v36 (copy)
-                    v32.subscriber:unsubscribe(v32.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[v33]);
-                    v32.deleteIosKeychainCredentialsRequestInFlight = false;
-                    local v39 = l_HttpService_0:JSONEncode(v38);
-                    v36(v39);
-                end);
-            end), 
-            v4.delay(v35):andThen(function() --[[ Line: 513 ]]
-                -- upvalues: v32 (copy), v33 (copy)
-                v32.subscriber:unsubscribe(v32.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[v33]);
-                v32.deleteIosKeychainCredentialsRequestInFlight = false;
-            end)
-        });
-        v32.deleteIosKeychainCredentialsRequestInFlight = true;
-        l_MessageBus_0.publish(v32.DELETE_IOS_KEYCHAIN_CREDENTIALS_REQUEST_DESCRIPTOR[v33], {
-            credentialType = v33, 
-            parameters = l_HttpService_0:JSONDecode(v34)
-        });
-        return v40;
-    else
-        return v4.reject();
-    end;
-end;
-v13.deleteAllCredentialsFromKeystore = function(v41, v42, v43, v44) --[[ Line: 532 ]] --[[ Name: deleteAllCredentialsFromKeystore ]]
-    -- upvalues: v4 (copy), l_HttpService_0 (copy), l_MessageBus_0 (copy)
-    if not v41.deleteKeystoreCredentialsRequestInFlight then
-        local v49 = v4.race({
-            v4.new(function(v45, _) --[[ Line: 540 ]]
-                -- upvalues: v41 (copy), v42 (copy), l_HttpService_0 (ref)
-                v41.subscriber:subscribe(v41.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[v42], function(v47) --[[ Line: 543 ]]
-                    -- upvalues: v41 (ref), v42 (ref), l_HttpService_0 (ref), v45 (copy)
-                    v41.subscriber:unsubscribe(v41.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[v42]);
-                    v41.deleteKeystoreCredentialsRequestInFlight = false;
-                    local v48 = l_HttpService_0:JSONEncode(v47);
-                    v45(v48);
-                end);
-            end), 
-            v4.delay(v44):andThen(function() --[[ Line: 551 ]]
-                -- upvalues: v41 (copy), v42 (copy)
-                v41.subscriber:unsubscribe(v41.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[v42]);
-                v41.deleteKeystoreCredentialsRequestInFlight = false;
-            end)
-        });
-        v41.deleteKeystoreCredentialsRequestInFlight = true;
-        l_MessageBus_0.publish(v41.DELETE_KEYSTORE_CREDENTIALS_REQUEST_DESCRIPTOR[v42], {
-            credentialType = v42, 
-            parameters = l_HttpService_0:JSONDecode(v43)
-        });
-        return v49;
-    else
-        return v4.reject();
-    end;
-end;
-v13.isAvailable = function(v50, v51, v52) --[[ Line: 572 ]] --[[ Name: isAvailable ]]
-    -- upvalues: v4 (copy), l_MessageBus_0 (copy)
-    local v56 = v4.race({
-        v4.new(function(v53, _) --[[ Line: 577 ]]
-            -- upvalues: v50 (copy)
-            v50.subscriber:subscribe(v50.IS_AVAILABLE_RESPONSE_DESCRIPTOR, function(v55) --[[ Line: 578 ]]
-                -- upvalues: v50 (ref), v53 (copy)
-                v50.subscriber:unsubscribe(v50.IS_AVAILABLE_RESPONSE_DESCRIPTOR);
-                v53(v55);
-            end);
-        end), 
-        v4.delay(v52):andThen(function() --[[ Line: 583 ]]
-            -- upvalues: v50 (copy), v4 (ref)
-            v50.subscriber:unsubscribe(v50.IS_AVAILABLE_RESPONSE_DESCRIPTOR);
-            return v4.resolve({
-                isAvailable = nil, 
-                supportsDeviceBoundOnly = nil
-            });
-        end)
-    });
-    l_MessageBus_0.publish(v50.IS_AVAILABLE_REQUEST_DESCRIPTOR, {
-        credentialType = v51
-    });
-    return v56;
-end;
-v13.default = v13.new();
-return v13;
+local HttpService = game:GetService("HttpService")
+local ParentParent = script.Parent.Parent
+local MessageBus = require(ParentParent.MessageBus).MessageBus
+local t = require(ParentParent.t)
+local Promise = require(ParentParent.Promise)
+
+require(script.Parent.CredentialsProtocolTypes)
+
+local t1 = {
+	FIDO2 = "FIDO2",
+	password = "password",
+	all = "all",
+	iosKeychainPassword = "iosKeychainPassword",
+	keystore = "keystore"
+}
+local v7 = t.strictInterface({
+	keyType = t.optional(t.string),
+	publicKey = t.interface({
+		challenge = t.string,
+		timeout = t.optional(t.number),
+		rpId = t.optional(t.string),
+		allowCredentials = t.optional(t.table),
+		userVerification = t.optional(t.string),
+		attestation = t.optional(t.string),
+		extensions = t.optional(t.table)
+	}),
+	deviceBoundOnly = t.optional(t.boolean)
+})
+local t2 = {
+	[t1.FIDO2] = t.strictInterface({
+		credentialType = t.string,
+		parameters = v7
+	}),
+	[t1.all] = t.strictInterface({
+		FIDO2 = t.optional(v7),
+		password = t.optional(t.strictInterface({
+			username = t.optional(t.string)
+		}))
+	}),
+	[t1.iosKeychainPassword] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.interface({
+			server = t.optional(t.string)
+		})
+	}),
+	[t1.keystore] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.interface({
+			server = t.optional(t.string),
+			key = t.optional(t.string)
+		})
+	})
+}
+local v9 = t.strictInterface({
+	id = t.optional(t.string),
+	rawId = t.optional(t.string),
+	type = t.optional(t.string),
+	response = t.interface({
+		authenticatorData = t.string,
+		clientDataJSON = t.string,
+		signature = t.string,
+		userHandle = t.optional(t.string)
+	}),
+	errorCode = t.optional(t.string),
+	errorMsg = t.optional(t.string)
+})
+local t3 = {
+	[t1.FIDO2] = v9,
+	[t1.all] = t.strictInterface({
+		credentialType = t.string,
+		response = t.union(v9, t.strictInterface({
+			username = t.optional(t.string),
+			password = t.optional(t.string),
+			errorCode = t.optional(t.string),
+			errorMsg = t.optional(t.string)
+		}))
+	}),
+	[t1.iosKeychainPassword] = t.array(t.strictInterface({
+		experimentGroup = t.optional(t.string),
+		username = t.optional(t.string),
+		userId = t.optional(t.string),
+		password = t.optional(t.string),
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	})),
+	[t1.keystore] = t.array(t.strictInterface({
+		experimentGroup = t.optional(t.string),
+		username = t.optional(t.string),
+		userId = t.optional(t.string),
+		password = t.optional(t.string),
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	}))
+}
+local t4 = {
+	[t1.FIDO2] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.interface({
+			keyType = t.optional(t.string),
+			isSilentPasskeyUpgrade = t.optional(t.boolean),
+			publicKey = t.interface({
+				rp = t.interface({
+					name = t.string,
+					id = t.string
+				}),
+				user = t.interface({
+					name = t.string,
+					displayName = t.string,
+					id = t.string
+				}),
+				challenge = t.string,
+				pubKeyCredParams = t.optional(t.table),
+				timeout = t.optional(t.number),
+				excludeCredentials = t.optional(t.table),
+				authenticationSelection = t.optional(t.table),
+				attestation = t.optional(t.string),
+				extensions = t.optional(t.table)
+			})
+		})
+	}),
+	[t1.password] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.strictInterface({
+			username = t.string,
+			password = t.string
+		})
+	}),
+	[t1.iosKeychainPassword] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.strictInterface({
+			server = t.string,
+			username = t.string,
+			userId = t.string,
+			password = t.string,
+			experimentGroup = t.optional(t.string)
+		})
+	}),
+	[t1.keystore] = t.strictInterface({
+		credentialType = t.string,
+		parameters = t.strictInterface({
+			server = t.string,
+			key = t.optional(t.string),
+			username = t.string,
+			userId = t.string,
+			password = t.string,
+			experimentGroup = t.optional(t.string)
+		})
+	})
+}
+local t5 = {
+	[t1.FIDO2] = t.strictInterface({
+		id = t.optional(t.string),
+		rawId = t.optional(t.string),
+		type = t.optional(t.string),
+		response = t.interface({
+			clientDataJSON = t.string,
+			attestationObject = t.string
+		}),
+		authenticatorAttachment = t.optional(t.string),
+		clientExtensionResults = t.optional(t.table),
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	}),
+	[t1.password] = t.strictInterface({
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	}),
+	[t1.iosKeychainPassword] = t.strictInterface({
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	}),
+	[t1.keystore] = t.strictInterface({
+		errorCode = t.optional(t.string),
+		errorMsg = t.optional(t.string)
+	})
+}
+local t6 = {
+	CredentialsTypes = t1,
+	GET_CREDENTIALS_REQUEST_DESCRIPTOR = {
+		[t1.FIDO2] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsRequest"),
+			validateParams = t2[t1.FIDO2]
+		},
+		[t1.all] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsRequest"),
+			validateParams = t2[t1.all]
+		},
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsRequest"),
+			validateParams = t2[t1.iosKeychainPassword]
+		},
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsRequest"),
+			validateParams = t2[t1.keystore]
+		}
+	},
+	GET_CREDENTIALS_RESPONSE_DESCRIPTOR = {
+		[t1.FIDO2] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsResponse"),
+			validateParams = t3[t1.FIDO2]
+		},
+		[t1.all] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsResponse"),
+			validateParams = t3[t1.all]
+		},
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsResponse"),
+			validateParams = t3[t1.iosKeychainPassword]
+		},
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "getCredentialsResponse"),
+			validateParams = t3[t1.keystore]
+		}
+	},
+	DELETE_IOS_KEYCHAIN_CREDENTIALS_REQUEST_DESCRIPTOR = {
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "deleteIosKeychainCredentialsRequest"),
+			validateParams = t.strictInterface({
+				credentialType = t.string,
+				parameters = t.strictInterface({
+					server = t.string
+				})
+			})
+		}
+	},
+	DELETE_KEYSTORE_CREDENTIALS_REQUEST_DESCRIPTOR = {
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "deleteKeystoreCredentialsRequest"),
+			validateParams = t.strictInterface({
+				credentialType = t.string,
+				parameters = t.strictInterface({
+					server = t.string,
+					key = t.optional(t.string)
+				})
+			})
+		}
+	},
+	DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR = {
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "deleteIosKeychainCredentialsResponse"),
+			validateParams = t.strictInterface({
+				credentialType = t.string,
+				response = t.array(t.strictInterface({
+					errorCode = t.optional(t.string),
+					errorMsg = t.optional(t.string)
+				}))
+			})
+		}
+	},
+	DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR = {
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "deleteKeystoreCredentialsResponse"),
+			validateParams = t.strictInterface({
+				credentialType = t.string,
+				response = t.array(t.strictInterface({
+					errorCode = t.optional(t.string),
+					errorMsg = t.optional(t.string)
+				}))
+			})
+		}
+	},
+	REGISTER_CREDENTIALS_REQUEST_DESCRIPTOR = {
+		[t1.FIDO2] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsRequest"),
+			validateParams = t4[t1.FIDO2]
+		},
+		[t1.password] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsRequest"),
+			validateParams = t4[t1.password]
+		},
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsRequest"),
+			validateParams = t4[t1.iosKeychainPassword]
+		},
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsRequest"),
+			validateParams = t4[t1.keystore]
+		}
+	},
+	REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR = {
+		[t1.FIDO2] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsResponse"),
+			validateParams = t5[t1.FIDO2]
+		},
+		[t1.password] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsResponse"),
+			validateParams = t5[t1.password]
+		},
+		[t1.iosKeychainPassword] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsResponse"),
+			validateParams = t5[t1.iosKeychainPassword]
+		},
+		[t1.keystore] = {
+			mid = MessageBus.getMessageId("Credentials", "registerCredentialsResponse"),
+			validateParams = t5[t1.keystore]
+		}
+	},
+	IS_AVAILABLE_REQUEST_DESCRIPTOR = {
+		mid = MessageBus.getMessageId("Credentials", "isAvailableRequest"),
+		validateParams = t.strictInterface({
+			credentialType = t.optional(t.valueOf(t1))
+		})
+	},
+	IS_AVAILABLE_RESPONSE_DESCRIPTOR = {
+		mid = MessageBus.getMessageId("Credentials", "isAvailableResponse"),
+		validateParams = t.strictInterface({
+			isAvailable = t.optional(t.boolean),
+			supportsDeviceBoundOnly = t.optional(t.boolean),
+			FIDO2 = t.optional(t.strictInterface({
+				isAvailable = t.boolean,
+				supportsDeviceBoundOnly = t.boolean,
+				supportsSilentPasskeyUpgrade = t.optional(t.boolean),
+				supportsPasskeyCreationOnDevice = t.optional(t.boolean)
+			})),
+			password = t.optional(t.strictInterface({
+				isAvailable = t.boolean
+			})),
+			iosKeychainPassword = t.optional(t.strictInterface({
+				isAvailable = t.boolean
+			})),
+			keystore = t.optional(t.strictInterface({
+				isAvailable = t.boolean
+			}))
+		})
+	}
+}
+
+t6.__index = t6
+
+function t6.new() -- line: 407
+	-- upvalues: MessageBus (copy), t6 (copy)
+	return (setmetatable({
+		getCredentialsRequestInFlight = false,
+		registerCredentialsRequestInFlight = false,
+		deleteIosKeychainCredentialsRequestInFlight = false,
+		deleteKeystoreCredentialsRequestInFlight = false,
+		subscriber = MessageBus.Subscriber.new()
+	}, t6))
+end
+function t6.getCredentials(t7: {[any]: any}, s1: string, s2: string, n1: number) -- line: 421
+	-- upvalues: Promise (copy), HttpService (copy), t1 (copy), MessageBus (copy)
+	if not t7.getCredentialsRequestInFlight then
+		local v18 = Promise.race({
+			Promise.new(function(resolve, _) -- line: 425
+				-- upvalues: t7 (copy), s1 (copy), HttpService (copy)
+				t7.subscriber:subscribe(t7.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[s1], function(p2) -- line: 426
+					-- upvalues: t7 (copy), s1 (copy), HttpService (copy), resolve (copy)
+					t7.subscriber:unsubscribe(t7.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[s1])
+					t7.getCredentialsRequestInFlight = false
+
+					local json = HttpService:JSONEncode(p2)
+
+					resolve(json)
+				end)
+			end),
+			Promise.delay(n1):andThen(function() -- line: 433
+				-- upvalues: t7 (copy), s1 (copy)
+				t7.subscriber:unsubscribe(t7.GET_CREDENTIALS_RESPONSE_DESCRIPTOR[s1])
+				t7.getCredentialsRequestInFlight = false
+			end)
+		})
+
+		t7.getCredentialsRequestInFlight = true
+
+		if s1 == t1.all then
+			MessageBus.publish(t7.GET_CREDENTIALS_REQUEST_DESCRIPTOR[s1], HttpService:JSONDecode(s2))
+
+			return v18
+		end
+
+		MessageBus.publish(t7.GET_CREDENTIALS_REQUEST_DESCRIPTOR[s1], {
+			credentialType = s1,
+			parameters = HttpService:JSONDecode(s2)
+		})
+
+		return v18
+	end
+
+	return Promise.reject()
+end
+function t6.registerCredentials(t8: {[any]: any}, s3: string, s4: string, n2: number) -- line: 459
+	-- upvalues: Promise (copy), HttpService (copy), MessageBus (copy)
+	if not t8.registerCredentialsRequestInFlight then
+		local v23 = Promise.race({
+			Promise.new(function(resolve, _) -- line: 467
+				-- upvalues: t8 (copy), s3 (copy), HttpService (copy)
+				t8.subscriber:subscribe(t8.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[s3], function(p4) -- line: 470
+					-- upvalues: t8 (copy), s3 (copy), HttpService (copy), resolve (copy)
+					t8.subscriber:unsubscribe(t8.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[s3])
+					t8.registerCredentialsRequestInFlight = false
+
+					local json = HttpService:JSONEncode(p4)
+
+					resolve(json)
+				end)
+			end),
+			Promise.delay(n2):andThen(function() -- line: 478
+				-- upvalues: t8 (copy), s3 (copy)
+				t8.subscriber:unsubscribe(t8.REGISTER_CREDENTIALS_RESPONSE_DESCRIPTOR[s3])
+				t8.registerCredentialsRequestInFlight = false
+			end)
+		})
+
+		t8.registerCredentialsRequestInFlight = true
+		MessageBus.publish(t8.REGISTER_CREDENTIALS_REQUEST_DESCRIPTOR[s3], {
+			credentialType = s3,
+			parameters = HttpService:JSONDecode(s4)
+		})
+
+		return v23
+	end
+
+	return Promise.reject()
+end
+function t6.deleteAllCredentialsFromiOSKeychain(t9: {[any]: any}, s5: string, s6: string, n3: number) -- line: 495
+	-- upvalues: Promise (copy), HttpService (copy), MessageBus (copy)
+	if not t9.deleteIosKeychainCredentialsRequestInFlight then
+		local v28 = Promise.race({
+			Promise.new(function(resolve, _) -- line: 503
+				-- upvalues: t9 (copy), s5 (copy), HttpService (copy)
+				t9.subscriber:subscribe(t9.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[s5], function(p6) -- line: 506
+					-- upvalues: t9 (copy), s5 (copy), HttpService (copy), resolve (copy)
+					t9.subscriber:unsubscribe(t9.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[s5])
+					t9.deleteIosKeychainCredentialsRequestInFlight = false
+
+					local json = HttpService:JSONEncode(p6)
+
+					resolve(json)
+				end)
+			end),
+			Promise.delay(n3):andThen(function() -- line: 514
+				-- upvalues: t9 (copy), s5 (copy)
+				t9.subscriber:unsubscribe(t9.DELETE_IOS_KEYCHAIN_CREDENTIALS_RESPONSE_DESCRIPTOR[s5])
+				t9.deleteIosKeychainCredentialsRequestInFlight = false
+			end)
+		})
+
+		t9.deleteIosKeychainCredentialsRequestInFlight = true
+		MessageBus.publish(t9.DELETE_IOS_KEYCHAIN_CREDENTIALS_REQUEST_DESCRIPTOR[s5], {
+			credentialType = s5,
+			parameters = HttpService:JSONDecode(s6)
+		})
+
+		return v28
+	end
+
+	return Promise.reject()
+end
+function t6.deleteAllCredentialsFromKeystore(t10: {[any]: any}, s7: string, s8: string, n4: number) -- line: 533
+	-- upvalues: Promise (copy), HttpService (copy), MessageBus (copy)
+	if not t10.deleteKeystoreCredentialsRequestInFlight then
+		local v33 = Promise.race({
+			Promise.new(function(resolve, _) -- line: 541
+				-- upvalues: t10 (copy), s7 (copy), HttpService (copy)
+				t10.subscriber:subscribe(t10.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[s7], function(p8) -- line: 544
+					-- upvalues: t10 (copy), s7 (copy), HttpService (copy), resolve (copy)
+					t10.subscriber:unsubscribe(t10.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[s7])
+					t10.deleteKeystoreCredentialsRequestInFlight = false
+
+					local json = HttpService:JSONEncode(p8)
+
+					resolve(json)
+				end)
+			end),
+			Promise.delay(n4):andThen(function() -- line: 552
+				-- upvalues: t10 (copy), s7 (copy)
+				t10.subscriber:unsubscribe(t10.DELETE_KEYSTORE_CREDENTIALS_RESPONSE_DESCRIPTOR[s7])
+				t10.deleteKeystoreCredentialsRequestInFlight = false
+			end)
+		})
+
+		t10.deleteKeystoreCredentialsRequestInFlight = true
+		MessageBus.publish(t10.DELETE_KEYSTORE_CREDENTIALS_REQUEST_DESCRIPTOR[s7], {
+			credentialType = s7,
+			parameters = HttpService:JSONDecode(s8)
+		})
+
+		return v33
+	end
+
+	return Promise.reject()
+end
+function t6.isAvailable(t11: {[any]: any}, s9: string, n5: number) -- line: 573
+	-- upvalues: Promise (copy), MessageBus (copy)
+	local v37 = Promise.race({
+		Promise.new(function(resolve, _) -- line: 578
+			-- upvalues: t11 (copy)
+			t11.subscriber:subscribe(t11.IS_AVAILABLE_RESPONSE_DESCRIPTOR, function(p10) -- line: 579
+				-- upvalues: t11 (copy), resolve (copy)
+				t11.subscriber:unsubscribe(t11.IS_AVAILABLE_RESPONSE_DESCRIPTOR)
+				resolve(p10)
+			end)
+		end),
+		Promise.delay(n5):andThen(function() -- line: 584
+			-- upvalues: t11 (copy), Promise (copy)
+			t11.subscriber:unsubscribe(t11.IS_AVAILABLE_RESPONSE_DESCRIPTOR)
+
+			return Promise.resolve({
+				isAvailable = nil,
+				supportsDeviceBoundOnly = nil
+			})
+		end)
+	})
+
+	MessageBus.publish(t11.IS_AVAILABLE_REQUEST_DESCRIPTOR, {
+		credentialType = s9
+	})
+
+	return v37
+end
+
+t6.default = t6.new()
+
+return t6

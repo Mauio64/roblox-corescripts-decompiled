@@ -1,136 +1,147 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_Parent_0.Components.InitialView);
-local v6 = require(l_Parent_0.Components.AssetDetails);
-local v7 = require(l_Parent_0.Components.CloseButton);
-local v8 = require(l_Parent_0.Components.Overlay);
-local v9 = require(l_Parent_0.Components.NoInventoryNotice);
-local v10 = require(l_Parent_0.Colors);
-local v11 = require(l_Parent_0.Constants);
-local v12 = require(l_CorePackages_0.Packages.Signals);
-local v13 = require(l_CorePackages_0.Workspace.Packages.Display);
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v15 = require(l_Modules_0.Settings.Theme);
-local v16 = require(l_Modules_0.TopBar.Constants);
-local v17 = require(l_Parent_0.Components.InspectAndBuyContext);
-local v18 = v3.PureComponent:extend("Container");
-v18.init = function(v19) --[[ Line: 26 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v12 (copy), v13 (copy)
-    v19.frameRef = v3.createRef();
-    v19.lastSavedSelectedCoreGui = nil;
-    v19.disposeUiScaleEffect = v12.createEffect(function(v20) --[[ Line: 29 ]]
-        -- upvalues: v13 (ref), v19 (copy)
-        local v21 = v13.GetDisplayStore(v20);
-        v19:setState({
-            UiScale = v21.getUIScale(v20)
-        });
-    end);
-end;
-v18.didMount = function(v22) --[[ Line: 37 ]] --[[ Name: didMount ]]
-    -- upvalues: l_GuiService_0 (copy)
-    local l_gamepadEnabled_0 = v22.props.gamepadEnabled;
-    v22.selectedCoreObjectChangedSignal = l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() --[[ Line: 40 ]]
-        -- upvalues: v22 (copy), l_GuiService_0 (ref)
-        if v22.props.visible and l_GuiService_0.SelectedCoreObject then
-            v22.lastSavedSelectedCoreGui = l_GuiService_0.SelectedCoreObject;
-        end;
-    end);
-    if l_gamepadEnabled_0 then
-        l_GuiService_0:AddSelectionParent("InspectMenu", v22.frameRef.current);
-    end;
-end;
-v18.didUpdate = function(v24, v25) --[[ Line: 52 ]] --[[ Name: didUpdate ]]
-    -- upvalues: l_GuiService_0 (copy)
-    local l_visible_0 = v24.props.visible;
-    local l_gamepadEnabled_1 = v24.props.gamepadEnabled;
-    if l_visible_0 and l_gamepadEnabled_1 and v24.frameRef.current then
-        l_GuiService_0:RemoveSelectionGroup("InspectMenu");
-        l_GuiService_0:AddSelectionParent("InspectMenu", v24.frameRef.current);
-        if v24.lastSavedSelectedCoreGui then
-            l_GuiService_0.SelectedCoreObject = v24.lastSavedSelectedCoreGui;
-        end;
-    elseif not l_gamepadEnabled_1 and v25.gamepadEnabled or not l_visible_0 then
-        l_GuiService_0:RemoveSelectionGroup("InspectMenu");
-    end;
-    if l_visible_0 and not v25.visible then
-        l_GuiService_0.SelectedCoreObject = v24.lastSavedSelectedCoreGui;
-    end;
-end;
-v18.willUnmount = function(v28) --[[ Line: 72 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_GuiService_0 (copy)
-    v28.selectedCoreObjectChangedSignal:disconnect();
-    l_GuiService_0:RemoveSelectionGroup("InspectMenu");
-    l_GuiService_0.SelectedCoreObject = nil;
-    if v28.disposeUiScaleEffect then
-        v28.disposeUiScaleEffect();
-    end;
-end;
-v18.render = function(v29) --[[ Line: 81 ]] --[[ Name: render ]]
-    -- upvalues: v15 (copy), v16 (copy), v3 (copy), v17 (copy), v11 (copy), l_GuiService_0 (copy), v8 (copy), v10 (copy), v7 (copy), v5 (copy), v6 (copy), v9 (copy)
-    local l_view_0 = v29.props.view;
-    local l_localPlayerModel_0 = v29.props.localPlayerModel;
-    local l_visible_1 = v29.props.visible;
-    local v33 = v15.UseInspectAndBuyPanel();
-    local v34 = v16.TopBarHeight * v29.state.UiScale;
-    local v35 = v16.ScreenSideOffset * v29.state.UiScale;
-    return v3.createElement(v17.Consumer, {
-        render = function(v36) --[[ Line: 90 ]] --[[ Name: render ]]
-            -- upvalues: l_view_0 (copy), v29 (copy), v3 (ref), v33 (copy), v35 (copy), v15 (ref), v34 (copy), l_visible_1 (copy), v11 (ref), l_GuiService_0 (ref), v8 (ref), v10 (ref), v7 (ref), v5 (ref), v6 (ref), l_localPlayerModel_0 (copy), v9 (ref)
-            local v37 = v36[l_view_0];
-            local v38 = v37.ContainerSize(v29.state.UiScale);
-            local v39 = v37.ContainerPosition(v29.state.UiScale);
-            return v3.createElement("ImageButton", {
-                Size = UDim2.new(1, if v33 then v35 * -2 else 0, 1, if v33 then v15.DefaultCornerRadius.Offset else v34), 
-                Position = UDim2.new(0, if v33 then v35 else 0, 0, v33 and 0 or -v34), 
-                BackgroundColor3 = v37.ContainerBackgroundColor, 
-                BackgroundTransparency = v37.ContainerBackgroundTransparency, 
-                Visible = l_visible_1, 
-                Selectable = false, 
-                AutoButtonColor = false, 
-                AutoLocalize = false, 
-                [v3.Event.Activated] = function() --[[ Line: 114 ]]
-                    -- upvalues: l_view_0 (ref), v11 (ref), l_GuiService_0 (ref)
-                    if l_view_0 == v11.View.Wide then
-                        l_GuiService_0:CloseInspectMenu();
-                    end;
-                end
-            }, {
-                UICorner = if v33 then v3.createElement("UICorner", {
-                    CornerRadius = v15.DefaultCornerRadius
-                }) else nil, 
-                Overlay = v3.createElement(v8), 
-                MainContainer = v3.createElement("ImageButton", {
-                    AnchorPoint = v37.ContainerAnchorPoint, 
-                    Size = v38, 
-                    Position = v39, 
-                    BackgroundColor3 = v10.Carbon, 
-                    BorderSizePixel = 0, 
-                    Active = true, 
-                    AutoButtonColor = false, 
-                    Selectable = false, 
-                    [v3.Ref] = v29.frameRef
-                }, {
-                    AspectRatioConstraint = v37.UseContainerAspectRatio and v3.createElement("UIAspectRatioConstraint", {
-                        AspectRatio = v37.ContainerAspectRatio
-                    }), 
-                    CloseButton = v3.createElement(v7), 
-                    InitialView = v3.createElement(v5), 
-                    AssetDetails = v3.createElement(v6, {
-                        localPlayerModel = l_localPlayerModel_0
-                    }), 
-                    NoInventoryNotice = v3.createElement(v9)
-                })
-            });
-        end
-    });
-end;
-return v4.UNSTABLE_connect2(function(v40, _) --[[ Line: 153 ]]
-    return {
-        view = v40.view, 
-        visible = v40.visible, 
-        gamepadEnabled = v40.gamepadEnabled
-    };
-end)(v18);
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local InitialView = require(ParentParent.Components.InitialView)
+local AssetDetails = require(ParentParent.Components.AssetDetails)
+local CloseButton = require(ParentParent.Components.CloseButton)
+local Overlay = require(ParentParent.Components.Overlay)
+local NoInventoryNotice = require(ParentParent.Components.NoInventoryNotice)
+local Colors = require(ParentParent.Colors)
+local Constants = require(ParentParent.Constants)
+local Signals = require(CorePackages.Packages.Signals)
+local Display = require(CorePackages.Workspace.Packages.Display)
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Theme = require(Modules.Settings.Theme)
+local Constants2 = require(Modules.TopBar.Constants)
+local InspectAndBuyContext = require(ParentParent.Components.InspectAndBuyContext)
+local v19 = Roact.PureComponent:extend("Container")
+
+function v19.init(p1) -- line: 26
+	-- upvalues: Roact (copy), Signals (copy), Display (copy)
+	p1.frameRef = Roact.createRef()
+	p1.lastSavedSelectedCoreGui = nil
+	p1.disposeUiScaleEffect = Signals.createEffect(function(p2) -- line: 29
+		-- upvalues: Display (copy), p1 (copy)
+		local v38 = Display.GetDisplayStore(p2)
+
+		p1:setState({
+			UiScale = v38.getUIScale(p2)
+		})
+	end)
+end
+function v19.didMount(p3) -- line: 37
+	-- upvalues: GuiService (copy)
+	local gamepadEnabled = p3.props.gamepadEnabled
+
+	p3.selectedCoreObjectChangedSignal = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 40
+		-- upvalues: p3 (copy), GuiService (copy)
+		if p3.props.visible and GuiService.SelectedCoreObject then
+			p3.lastSavedSelectedCoreGui = GuiService.SelectedCoreObject
+		end
+	end)
+
+	if gamepadEnabled then
+		GuiService:AddSelectionParent("InspectMenu", p3.frameRef.current)
+	end
+end
+function v19.didUpdate(p4, p5) -- line: 52
+	-- upvalues: GuiService (copy)
+	local visible = p4.props.visible
+	local gamepadEnabled = p4.props.gamepadEnabled
+
+	if visible and (gamepadEnabled and p4.frameRef.current) then
+		GuiService:RemoveSelectionGroup("InspectMenu")
+		GuiService:AddSelectionParent("InspectMenu", p4.frameRef.current)
+
+		if p4.lastSavedSelectedCoreGui then
+			GuiService.SelectedCoreObject = p4.lastSavedSelectedCoreGui
+		end
+	elseif not gamepadEnabled and p5.gamepadEnabled or not visible then
+		GuiService:RemoveSelectionGroup("InspectMenu")
+	end
+
+	if visible and not p5.visible then
+		GuiService.SelectedCoreObject = p4.lastSavedSelectedCoreGui
+	end
+end
+function v19.willUnmount(p6) -- line: 72
+	-- upvalues: GuiService (copy)
+	p6.selectedCoreObjectChangedSignal:disconnect()
+	GuiService:RemoveSelectionGroup("InspectMenu")
+	GuiService.SelectedCoreObject = nil
+
+	if p6.disposeUiScaleEffect then
+		p6.disposeUiScaleEffect()
+	end
+end
+function v19.render(p7) -- line: 81
+	-- upvalues: Theme (copy), Constants2 (copy), Roact (copy), InspectAndBuyContext (copy), Constants (copy), GuiService (copy), Overlay (copy), Colors (copy), CloseButton (copy), InitialView (copy), AssetDetails (copy), NoInventoryNotice (copy)
+	local view = p7.props.view
+	local localPlayerModel = p7.props.localPlayerModel
+	local visible = p7.props.visible
+	local v32 = Theme.UseInspectAndBuyPanel()
+	local v33 = Constants2.TopBarHeight * p7.state.UiScale
+	local v34 = Constants2.ScreenSideOffset * p7.state.UiScale
+
+	return Roact.createElement(InspectAndBuyContext.Consumer, {
+		render = function(p8) -- line: 90
+			-- upvalues: view (copy), p7 (copy), Roact (copy), v32 (copy), v34 (copy), Theme (copy), v33 (copy), visible (copy), Constants (copy), GuiService (copy), Overlay (copy), Colors (copy), CloseButton (copy), InitialView (copy), AssetDetails (copy), localPlayerModel (copy), NoInventoryNotice (copy)
+			local v40 = p8[view]
+			local v41 = v40.ContainerSize(p7.state.UiScale)
+			local v42 = v40.ContainerPosition(p7.state.UiScale)
+
+			return Roact.createElement("ImageButton", {
+				Size = UDim2.new(1, not v32 and 0 or v34 * -2, 1, if not v32 then v33 else Theme.DefaultCornerRadius.Offset),
+				Position = UDim2.new(0, not v32 and 0 or v34, 0, if not v32 then -v33 else 0),
+				BackgroundColor3 = v40.ContainerBackgroundColor,
+				BackgroundTransparency = v40.ContainerBackgroundTransparency,
+				Visible = visible,
+				Selectable = false,
+				AutoButtonColor = false,
+				AutoLocalize = false,
+				[Roact.Event.Activated] = function() -- line: 114
+					-- upvalues: view (copy), Constants (copy), GuiService (copy)
+					if view == Constants.View.Wide then
+						GuiService:CloseInspectMenu()
+					end
+				end
+			}, {
+				UICorner = if not v32 then nil else Roact.createElement("UICorner", {
+					CornerRadius = Theme.DefaultCornerRadius
+				}),
+				Overlay = Roact.createElement(Overlay),
+				MainContainer = Roact.createElement("ImageButton", {
+					AnchorPoint = v40.ContainerAnchorPoint,
+					Size = v41,
+					Position = v42,
+					BackgroundColor3 = Colors.Carbon,
+					BorderSizePixel = 0,
+					Active = true,
+					AutoButtonColor = false,
+					Selectable = false,
+					[Roact.Ref] = p7.frameRef
+				}, {
+					AspectRatioConstraint = v40.UseContainerAspectRatio and Roact.createElement("UIAspectRatioConstraint", {
+						AspectRatio = v40.ContainerAspectRatio
+					}),
+					CloseButton = Roact.createElement(CloseButton),
+					InitialView = Roact.createElement(InitialView),
+					AssetDetails = Roact.createElement(AssetDetails, {
+						localPlayerModel = localPlayerModel
+					}),
+					NoInventoryNotice = Roact.createElement(NoInventoryNotice)
+				})
+			})
+		end
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p9, _) -- line: 153
+	return {
+		view = p9.view,
+		visible = p9.visible,
+		gamepadEnabled = p9.gamepadEnabled
+	}
+end)(v19)

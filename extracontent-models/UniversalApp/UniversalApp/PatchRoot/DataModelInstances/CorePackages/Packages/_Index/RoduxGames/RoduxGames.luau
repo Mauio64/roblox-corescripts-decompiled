@@ -1,27 +1,29 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.RoduxNetworking);
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.NetworkingGames);
-local v4 = require(script.Reducers);
-local v5 = require(script.Actions);
-local v6 = require(script.Models);
-local v7 = require(script.Enums);
+local scriptParent = script.Parent
+local RoduxNetworking = require(scriptParent.RoduxNetworking)
+local Dash = require(scriptParent.Dash)
+local NetworkingGames = require(scriptParent.NetworkingGames)
+local Reducers = require(script.Reducers)
+local Actions = require(script.Actions)
+local Models = require(script.Models)
+local Enums = require(script.Enums)
+
 return {
-    config = function(v8) --[[ Line: 12 ]] --[[ Name: config ]]
-        -- upvalues: v2 (copy), v3 (copy), v1 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy)
-        v8 = v2.join(v8, {
-            networkingGames = v3.config({
-                roduxNetworking = v1.mock()
-            })
-        });
-        return {
-            installReducer = function() --[[ Line: 20 ]] --[[ Name: installReducer ]]
-                -- upvalues: v4 (ref), v8 (ref)
-                return v4(v8);
-            end, 
-            Actions = v5, 
-            Models = v6, 
-            Enums = v7
-        };
-    end
-};
+	config = function(p1) -- line: 12
+		-- upvalues: Dash (copy), NetworkingGames (copy), RoduxNetworking (copy), Reducers (copy), Actions (copy), Models (copy), Enums (copy)
+		local u10 = Dash.join(p1, {
+			networkingGames = NetworkingGames.config({
+				roduxNetworking = RoduxNetworking.mock()
+			})
+		})
+
+		return {
+			installReducer = function() -- line: 20
+				-- upvalues: Reducers (copy), u10 (ref)
+				return Reducers(u10)
+			end,
+			Actions = Actions,
+			Models = Models,
+			Enums = Enums
+		}
+	end
+}

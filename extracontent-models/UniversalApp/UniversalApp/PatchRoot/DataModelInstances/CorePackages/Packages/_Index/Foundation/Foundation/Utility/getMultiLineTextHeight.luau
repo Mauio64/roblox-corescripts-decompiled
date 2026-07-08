@@ -1,21 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Components.Text.FontScales);
-return function(v2, v3, v4) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    if v2 <= 0 or v3 <= 0 then
-        return 0;
-    else
-        if v4 <= 1 then
-            v4 = 1;
-        end;
-        v2 = math.floor(v2);
-        local v5 = 0;
-        local v6 = v1[Font.fromEnum(Enum.Font.BuilderSans).Family];
-        if v6 ~= nil then
-            v5 = (v2 / v6 * (v4 * v6) - v2) / 2;
-        end;
-        local v7 = math.ceil((v3 - 1) * v4 * v2);
-        local v8 = if v5 >= 1 then math.ceil(v5) else math.floor(v5);
-        return v7 + v2 + v8;
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FontScales = require(Foundation.Components.Text.FontScales)
+
+return function(n1: number, n2: number, n3: number) -- line: 5
+	-- upvalues: FontScales (copy)
+	if n1 <= 0 or n2 <= 0 then
+		return 0
+	end
+
+	if n3 <= 1 then
+		n3 = 1
+	end
+
+	local v6 = math.floor(n1)
+	local n4 = 0
+	local v8 = FontScales[Font.fromEnum(Enum.Font.BuilderSans).Family]
+
+	if v8 ~= nil then
+		n4 = (v6 / v8 * (n3 * v8) - v6) / 2
+	end
+
+	local v9 = math.ceil((n2 - 1) * n3 * v6)
+	local v10 = if not (n4 >= 1) then math.floor(n4) else math.ceil(n4)
+
+	return v9 + v6 + v10
+end

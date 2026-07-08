@@ -1,100 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local l_Players_0 = game:GetService("Players");
-local l_getAppFeaturePolicies_0 = require(l_Parent_0.UniversalAppPolicy).getAppFeaturePolicies;
-local l_default_0 = require(l_Parent_0.LoggingProtocol).default;
-local v7 = require(l_script_FirstAncestor_0.Analytics.KeystrokeEvent);
-local v8 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatBehaviorCollectionEnabledMaster);
-local v9 = require(l_script_FirstAncestor_0.Flags.getFIntAppChatBehaviorCollectionEnabledPercentage);
-local v10 = {
-    Enum.KeyCode.Return, 
-    Enum.KeyCode.KeypadEnter
-};
-return function(v11) --[[ Line: 33 ]] --[[ Name: useKeystrokeCollection ]]
-    -- upvalues: v2 (copy), l_getAppFeaturePolicies_0 (copy), v8 (copy), v9 (copy), l_Players_0 (copy), l_default_0 (copy), v7 (copy), v3 (copy), v10 (copy)
-    local v12 = v2.useRef(false);
-    local v13 = v2.useRef({});
-    local v14 = v2.useRef({});
-    local v15 = v2.useRef({});
-    v2.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: l_getAppFeaturePolicies_0 (ref), v8 (ref), v9 (ref), l_Players_0 (ref), v12 (copy)
-        local v16 = l_getAppFeaturePolicies_0().getKeystrokeCollectionEnabled();
-        if v8() then
-            local v17 = v9();
-            if v17 > 0 and l_Players_0.LocalPlayer and v16 then
-                v12.current = l_Players_0.LocalPlayer.UserId % 100 < v17;
-            end;
-        end;
-    end, {});
-    local v19 = v2.useCallback(function(v18) --[[ Line: 49 ]]
-        -- upvalues: v13 (copy), v11 (copy), l_default_0 (ref), v7 (ref), v14 (copy), v15 (copy)
-        if #v13.current >= 0 then
-            v11.eventLoggingFunc(l_default_0, v7, {}, {
-                chatContext = v18, 
-                keyPressedData = table.concat(v13.current, ","), 
-                eventTypeData = table.concat(v14.current, ","), 
-                timestampData = table.concat(v15.current, ",")
-            });
-            v13.current = {};
-            v14.current = {};
-            v15.current = {};
-        end;
-    end, {
-        v11.eventLoggingFunc
-    });
-    local v22 = v2.useCallback(function(v20, v21) --[[ Line: 63 ]]
-        -- upvalues: v12 (copy), v13 (copy), v14 (copy), v15 (copy), v3 (ref), v10 (ref), v11 (copy), v19 (copy)
-        if not v12.current then
-            return;
-        else
-            if v20 then
-                table.insert(v13.current, v21.Name);
-                table.insert(v14.current, 0);
-                table.insert(v15.current, DateTime.now().UnixTimestampMillis);
-            elseif v3.List.find(v10, v21) == nil or #v13.current ~= 0 then
-                table.insert(v13.current, v21.Name);
-                table.insert(v14.current, 1);
-                table.insert(v15.current, DateTime.now().UnixTimestampMillis);
-            end;
-            if #v13.current >= (v11.maxKeystrokeDataLength or 200) then
-                v19("UAMaxLengthReached");
-            end;
-            return;
-        end;
-    end, {
-        v19, 
-        v11.maxKeystrokeDataLength
-    });
-    local v25 = v2.useCallback(function(v23) --[[ Line: 88 ]]
-        -- upvalues: v12 (copy), v13 (copy), v15 (copy), v11 (copy), v19 (copy)
-        if not v12.current then
-            return;
-        else
-            local v24 = string.sub(v23, -1);
-            table.insert(v13.current, v24);
-            table.insert(v15.current, DateTime.now().UnixTimestampMillis);
-            if #v13.current >= (v11.maxKeystrokeDataLength or 200) then
-                v19("UAMaxLengthReached");
-            end;
-            return;
-        end;
-    end, {
-        v19, 
-        v11.maxKeystrokeDataLength
-    });
-    local v26 = v2.useCallback(function() --[[ Line: 103 ]]
-        -- upvalues: v12 (copy), v19 (copy)
-        if v12.current then
-            v19("UASendPressed");
-        end;
-    end, {
-        v19
-    });
-    return {
-        recordKeystroke = v22, 
-        recordTextChange = v25, 
-        sendKeystrokeEventOnSend = v26
-    };
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Cryo = require(AppChatParent.Cryo)
+local Players = game:GetService("Players")
+local getAppFeaturePolicies = require(AppChatParent.UniversalAppPolicy).getAppFeaturePolicies
+local default = require(AppChatParent.LoggingProtocol).default
+local KeystrokeEvent = require(AppChat.Analytics.KeystrokeEvent)
+local getFIntAppChatBehaviorCollectionEnabledPercentage = require(AppChat.Flags.getFIntAppChatBehaviorCollectionEnabledPercentage)
+local t1 = {
+	Enum.KeyCode.Return,
+	Enum.KeyCode.KeypadEnter
+}
+
+local function useKeystrokeCollection(t2: {[any]: any}) -- line: 31
+	-- upvalues: React (copy), getAppFeaturePolicies (copy), getFIntAppChatBehaviorCollectionEnabledPercentage (copy), Players (copy), default (copy), KeystrokeEvent (copy), Cryo (copy), t1 (copy)
+	local v13 = React.useRef(false)
+	local v14 = React.useRef({})
+	local v15 = React.useRef({})
+	local v16 = React.useRef({})
+
+	React.useEffect(function() -- line: 37
+		-- upvalues: getAppFeaturePolicies (copy), getFIntAppChatBehaviorCollectionEnabledPercentage (copy), Players (copy), v13 (copy)
+		local v21 = getAppFeaturePolicies().getKeystrokeCollectionEnabled()
+		local v22 = getFIntAppChatBehaviorCollectionEnabledPercentage()
+
+		if v22 > 0 and (Players.LocalPlayer and v21) then
+			v13.current = v22 > Players.LocalPlayer.UserId % 100
+		end
+	end, {})
+
+	local v17 = React.useCallback(function(s1: string) -- line: 45
+		-- upvalues: v14 (copy), t2 (copy), default (copy), KeystrokeEvent (copy), v15 (copy), v16 (copy)
+		if #v14.current >= 0 then
+			t2.eventLoggingFunc(default, KeystrokeEvent, {}, {
+				chatContext = s1,
+				keyPressedData = table.concat(v14.current, ","),
+				eventTypeData = table.concat(v15.current, ","),
+				timestampData = table.concat(v16.current, ",")
+			})
+			v14.current = {}
+			v15.current = {}
+			v16.current = {}
+		end
+	end, { t2.eventLoggingFunc })
+	local v18 = React.useCallback(function(b1: boolean, p1) -- line: 59
+		-- upvalues: v13 (copy), v14 (copy), v15 (copy), v16 (copy), Cryo (copy), t1 (copy), t2 (copy), v17 (copy)
+		if not v13.current then
+			return
+		end
+
+		if b1 then
+			table.insert(v14.current, p1.Name)
+			table.insert(v15.current, 0)
+			table.insert(v16.current, DateTime.now().UnixTimestampMillis)
+		elseif Cryo.List.find(t1, p1) == nil or #v14.current ~= 0 then
+			table.insert(v14.current, p1.Name)
+			table.insert(v15.current, 1)
+			table.insert(v16.current, DateTime.now().UnixTimestampMillis)
+		end
+
+		if #v14.current >= (t2.maxKeystrokeDataLength or 200) then
+			v17("UAMaxLengthReached")
+		end
+	end, {
+		v17,
+		t2.maxKeystrokeDataLength
+	})
+	local v19 = React.useCallback(function(s2: string) -- line: 84
+		-- upvalues: v13 (copy), v14 (copy), v16 (copy), t2 (copy), v17 (copy)
+		if not v13.current then
+			return
+		end
+
+		local v27 = string.sub(s2, -1)
+
+		table.insert(v14.current, v27)
+		table.insert(v16.current, DateTime.now().UnixTimestampMillis)
+
+		if #v14.current >= (t2.maxKeystrokeDataLength or 200) then
+			v17("UAMaxLengthReached")
+		end
+	end, {
+		v17,
+		t2.maxKeystrokeDataLength
+	})
+	local v20 = React.useCallback(function() -- line: 99
+		-- upvalues: v13 (copy), v17 (copy)
+		if v13.current then
+			v17("UASendPressed")
+		end
+	end, { v17 })
+
+	return {
+		recordKeystroke = v18,
+		recordTextChange = v19,
+		sendKeystrokeEventOnSend = v20
+	}
+end
+
+return useKeystrokeCollection

@@ -1,12 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local v1 = require(l_script_FirstAncestor_0.HiddenGameTile.createGameTileHiddenStore);
-local v2 = {};
-return function(v3) --[[ Line: 8 ]] --[[ Name: getGameTileHiddenStore ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v4 = v2[v3];
-    if v4 == nil then
-        v2[v3] = v1();
-        v4 = v2[v3];
-    end;
-    return v4;
-end;
+local GameTile = script:FindFirstAncestor("GameTile")
+local createGameTileHiddenStore = require(GameTile.HiddenGameTile.createGameTileHiddenStore)
+local t1 = {}
+
+local function getGameTileHiddenStore(s1: string) -- line: 8
+	-- upvalues: t1 (copy), createGameTileHiddenStore (copy)
+	local v6 = t1[s1]
+
+	if v6 == nil then
+		t1[s1] = createGameTileHiddenStore()
+		v6 = t1[s1]
+	end
+
+	return v6
+end
+
+return getGameTileHiddenStore

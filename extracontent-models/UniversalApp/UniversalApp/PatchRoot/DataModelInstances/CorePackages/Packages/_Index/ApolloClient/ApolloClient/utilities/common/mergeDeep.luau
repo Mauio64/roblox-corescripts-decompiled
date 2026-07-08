@@ -1,86 +1,104 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Set_0 = require(l_Parent_1.LuauPolyfill).Set;
-local v4 = newproxy(true);
-getmetatable(v4).__tostring = function() --[[ Line: 23 ]]
-    return "Value.None";
-end;
-local l_isNonNullObject_0 = require(script.Parent.objects).isNonNullObject;
-local v6 = require(l_Parent_0.luaUtils.hasOwnProperty);
-local v7 = require(l_Parent_0.luaUtils.objectKeysForEach);
-local v8 = nil;
-v0.mergeDeep = function(...) --[[ Line: 59 ]] --[[ Name: mergeDeep ]]
-    -- upvalues: v8 (ref)
-    return v8({
-        ...
-    });
-end;
-local v9 = {};
-v8 = function(v10) --[[ Line: 73 ]] --[[ Name: mergeDeepArray ]]
-    -- upvalues: v9 (copy)
-    local v11 = v10[1] or {};
-    local v12 = #v10;
-    if v12 > 1 then
-        local v13 = v9.new();
-        for v14 = 2, v12 do
-            v11 = v13:merge(v11, v10[v14]);
-        end;
-    end;
-    return v11;
-end;
-v0.mergeDeepArray = v8;
-v9.__index = v9;
-v9.new = function(v15) --[[ Line: 107 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy), l_isNonNullObject_0 (copy), l_Set_0 (copy)
-    local v16 = setmetatable({}, v9);
-    local function v21(v17, v18, v19, v20) --[[ Line: 110 ]]
-        return v17:merge(v18[v20], v19[v20]);
-    end;
-    if v15 == nil then
-        v15 = v21;
-    end;
-    v16.reconciler = v15;
-    v16.isObject = l_isNonNullObject_0;
-    v16.pastCopies = l_Set_0.new();
-    return v16;
-end;
-v9.merge = function(v22, v23, v24, ...) --[[ Line: 124 ]] --[[ Name: merge ]]
-    -- upvalues: l_isNonNullObject_0 (copy), v7 (copy), v6 (copy), v4 (copy)
-    local v25 = table.pack(...);
-    if l_isNonNullObject_0(v24) and l_isNonNullObject_0(v23) then
-        v7(v24, function(v26) --[[ Line: 130 ]]
-            -- upvalues: v6 (ref), v23 (ref), v24 (copy), v22 (copy), v25 (copy), v4 (ref)
-            if v6(v23, v26) then
-                local v27 = v23[v26];
-                if v24[v26] ~= v27 then
-                    local v28 = v22:reconciler(v23, v24, v26, table.unpack(v25));
-                    if v28 ~= v27 then
-                        v23 = v22:shallowCopyForMerge(v23);
-                        v23[v26] = v28;
-                    end;
-                end;
-            else
-                v23 = v22:shallowCopyForMerge(v23);
-                v23[v26] = v24[v26];
-            end;
-            if v23[v26] == v4 then
-                v23[v26] = nil;
-            end;
-        end);
-        return v23;
-    else
-        return v24;
-    end;
-end;
-v9.shallowCopyForMerge = function(v29, v30) --[[ Line: 163 ]] --[[ Name: shallowCopyForMerge ]]
-    -- upvalues: l_isNonNullObject_0 (copy)
-    if l_isNonNullObject_0(v30) and not v29.pastCopies:has(v30) then
-        v30 = table.clone(v30);
-        v29.pastCopies:add(v30);
-    end;
-    return v30;
-end;
-v9.None = v4;
-v0.DeepMerger = v9;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Set = require(ParentParentParent.LuauPolyfill).Set
+local v5 = newproxy(true)
+
+getmetatable(v5).__tostring = function() -- line: 23
+	return "Value.None"
+end
+
+local isNonNullObject = require(script.Parent.objects).isNonNullObject
+local hasOwnProperty = require(ParentParent.luaUtils.hasOwnProperty)
+local objectKeysForEach = require(ParentParent.luaUtils.objectKeysForEach)
+local mergeDeepArray = nil
+
+function t1.mergeDeep(...) -- line: 59
+	-- upvalues: mergeDeepArray (ref)
+	return mergeDeepArray({ ... })
+end
+
+local t2 = {}
+
+function mergeDeepArray(p1) -- line: 73
+	-- upvalues: t2 (copy)
+	local v12 = p1[1] or {}
+	local v13 = #p1
+
+	if v13 > 1 then
+		local v14 = t2.new()
+
+		for i = 2, v13 do
+			v12 = v14:merge(v12, p1[i])
+		end
+	end
+
+	return v12
+end
+
+t1.mergeDeepArray = mergeDeepArray
+t2.__index = t2
+
+function t2.new(p2: ((...any) -> ...any)?) -- line: 107
+	-- upvalues: t2 (copy), isNonNullObject (copy), Set (copy)
+	local self = setmetatable({}, t2)
+
+	if p2 == nil then
+		function p2(p3, p4, p5, p6) -- line: 110
+			return p3:merge(p4[p6], p5[p6])
+		end
+	end
+
+	self.reconciler = p2
+	self.isObject = isNonNullObject
+	self.pastCopies = Set.new()
+
+	return self
+end
+function t2.merge(t3: {[any]: any}, p7, p8, ...) -- line: 124
+	-- upvalues: isNonNullObject (copy), objectKeysForEach (copy), hasOwnProperty (copy), v5 (copy)
+	local v22 = table.pack(...)
+
+	if isNonNullObject(p8) and isNonNullObject(p7) then
+		objectKeysForEach(p8, function(p9) -- line: 130
+			-- upvalues: hasOwnProperty (copy), p7 (ref), p8 (copy), t3 (copy), v22 (copy), v5 (copy)
+			if hasOwnProperty(p7, p9) then
+				local v30 = p7[p9]
+
+				if v30 ~= p8[p9] then
+					local v31 = t3:reconciler(p7, p8, p9, table.unpack(v22))
+
+					if v31 ~= v30 then
+						p7 = t3:shallowCopyForMerge(p7)
+						p7[p9] = v31
+					end
+				end
+			else
+				p7 = t3:shallowCopyForMerge(p7)
+				p7[p9] = p8[p9]
+			end
+
+			if p7[p9] == v5 then
+				p7[p9] = nil
+			end
+		end)
+
+		return p7
+	end
+
+	return p8
+end
+function t2.shallowCopyForMerge(p10, p11) -- line: 163
+	-- upvalues: isNonNullObject (copy)
+	if isNonNullObject(p11) and not p10.pastCopies:has(p11) then
+		p11 = table.clone(p11)
+		p10.pastCopies:add(p11)
+	end
+
+	return p11
+end
+
+t2.None = v5
+t1.DeepMerger = t2
+
+return t1

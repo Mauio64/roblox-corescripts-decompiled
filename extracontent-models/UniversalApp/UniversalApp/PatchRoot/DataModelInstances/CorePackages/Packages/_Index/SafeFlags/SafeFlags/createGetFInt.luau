@@ -1,17 +1,20 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: createGetFInt ]]
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 2 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        game:DefineFastInt(v0, v1);
-    end);
-    if not l_status_0 and l_result_0:match("The current thread cannot call") then
-        return function() --[[ Line: 7 ]]
-            -- upvalues: v1 (copy)
-            return v1;
-        end;
-    else
-        return function() --[[ Line: 12 ]]
-            -- upvalues: v0 (copy)
-            return game:GetFastInt(v0);
-        end;
-    end;
-end;
+local function createGetFInt(s1: string, n1: number) -- line: 1
+	local ok, result = pcall(function() -- line: 2
+		-- upvalues: s1 (copy), n1 (copy)
+		game:DefineFastInt(s1, n1)
+	end)
+
+	if not ok and result:match("The current thread cannot call") then
+		return function() -- line: 7
+			-- upvalues: n1 (copy)
+			return n1
+		end
+	end
+
+	return function() -- line: 12
+		-- upvalues: s1 (copy)
+		return game:GetFastInt(s1)
+	end
+end
+
+return createGetFInt

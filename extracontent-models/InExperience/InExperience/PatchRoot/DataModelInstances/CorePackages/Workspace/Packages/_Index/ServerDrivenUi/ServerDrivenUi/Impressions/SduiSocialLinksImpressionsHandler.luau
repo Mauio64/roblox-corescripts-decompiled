@@ -3,7 +3,7 @@ local sendSocialLinksImpressionsEvent = require(Parent.DiscoveryAnalytics).Event
 local SduiErrors = require(Parent.SduiCoreSystem).SduiErrors
 local t1 = {}
 
-return function(p1, t2: {[any]: any}, t3: {[any]: any}, p2, _: number?) --[[ SduiSocialLinksImpressionsHandler ]] -- line: 15
+local function SduiSocialLinksImpressionsHandler(p1, t2: {[any]: any}, t3: {[any]: any}, p2, _: number?) -- line: 15
 	-- upvalues: SduiErrors (copy), t1 (copy), sendSocialLinksImpressionsEvent (copy)
 	if not p2 then
 		p1.dependencies.logger.reportError(SduiErrors.SduiErrorType.FailedToLogSocialLinksImpressions, {
@@ -27,13 +27,13 @@ return function(p1, t2: {[any]: any}, t3: {[any]: any}, p2, _: number?) --[[ Sdu
 	local t5 = {}
 	local t6 = {}
 
-	for _, v14 in t2 do
-		local v15 = t3[v14]
+	for _, v15 in t2 do
+		local v16 = t3[v15]
 
-		if v15 then
-			table.insert(t4, v14)
-			table.insert(t5, v15.socialLinkUrl or "")
-			table.insert(t6, v15.socialLinkType or "")
+		if v16 then
+			table.insert(t4, v15)
+			table.insert(t5, v16.socialLinkUrl or "")
+			table.insert(t6, v16.socialLinkType or "")
 		end
 	end
 
@@ -56,3 +56,5 @@ return function(p1, t2: {[any]: any}, t3: {[any]: any}, p2, _: number?) --[[ Sdu
 		page = p1.appPage
 	})
 end
+
+return SduiSocialLinksImpressionsHandler

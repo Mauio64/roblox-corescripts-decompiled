@@ -1,38 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportBeduiTypes);
-local v4 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportFormDataContext);
-local l_FFlagAddThumbnailSelectorReport_0 = require(l_Parent_0.SharedFlags).FFlagAddThumbnailSelectorReport;
-return function(v6) --[[ Line: 19 ]] --[[ Name: AbuseReportFormDataProvider ]]
-    -- upvalues: v2 (copy), v4 (copy), l_FFlagAddThumbnailSelectorReport_0 (copy)
-    local v7, v8 = v2.useState({});
-    local v9, v10 = v2.useState({});
-    local v15 = v2.useCallback(function(v11, v12) --[[ Line: 23 ]]
-        -- upvalues: v8 (copy)
-        v8(function(v13) --[[ Line: 24 ]]
-            -- upvalues: v11 (copy), v12 (copy)
-            local v14 = table.clone(v13);
-            v14[v11] = v12;
-            return v14;
-        end);
-    end, {});
-    local v20 = v2.useCallback(function(v16, v17) --[[ Line: 31 ]]
-        -- upvalues: v10 (copy)
-        v10(function(v18) --[[ Line: 32 ]]
-            -- upvalues: v16 (copy), v17 (copy)
-            local v19 = table.clone(v18);
-            v19[v16] = v17;
-            return v19;
-        end);
-    end, {});
-    return v2.createElement(v4.Provider, {
-        value = {
-            formData = v7, 
-            updateForm = v15, 
-            custom = v6.custom, 
-            additionalReportTags = if l_FFlagAddThumbnailSelectorReport_0 then v9 else nil, 
-            updateAdditionalReportTags = if l_FFlagAddThumbnailSelectorReport_0 then v20 else nil
-        }
-    }, v6.children);
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+
+require(GenericAbuseReporting.Bedui.Provider.AbuseReportBeduiTypes)
+
+local AbuseReportFormDataContext = require(GenericAbuseReporting.Bedui.Provider.AbuseReportFormDataContext)
+local FFlagAddThumbnailSelectorReport = require(GenericAbuseReportingParent.SharedFlags).FFlagAddThumbnailSelectorReport
+
+local function AbuseReportFormDataProvider(t1: {[any]: any}) -- line: 19
+	-- upvalues: React (copy), AbuseReportFormDataContext (copy), FFlagAddThumbnailSelectorReport (copy)
+	local v8, v9 = React.useState({})
+	local v10, v11 = React.useState({})
+	local v12 = React.useCallback(function(s1: string, s2: string) -- line: 23
+		-- upvalues: v9 (copy)
+		v9(function(p1) -- line: 24
+			-- upvalues: s1 (copy), s2 (copy)
+			local v19 = table.clone(p1)
+
+			v19[s1] = s2
+
+			return v19
+		end)
+	end, {})
+	local v13 = React.useCallback(function(s3: string, p2) -- line: 31
+		-- upvalues: v11 (copy)
+		v11(function(p3) -- line: 32
+			-- upvalues: s3 (copy), p2 (copy)
+			local v21 = table.clone(p3)
+
+			v21[s3] = p2
+
+			return v21
+		end)
+	end, {})
+
+	return React.createElement(AbuseReportFormDataContext.Provider, {
+		value = {
+			formData = v8,
+			updateForm = v12,
+			custom = t1.custom,
+			additionalReportTags = if not FFlagAddThumbnailSelectorReport then nil else v10,
+			updateAdditionalReportTags = if not FFlagAddThumbnailSelectorReport then nil else v13
+		}
+	}, t1.children)
+end
+
+return AbuseReportFormDataProvider

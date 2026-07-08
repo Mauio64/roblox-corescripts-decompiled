@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformUseProfileTypeContext", false);
+return game:DefineFastFlag("ProfilePlatformUseProfileTypeContext", false)

@@ -1,8 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 31 ]] --[[ Name: useRefToState ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(v2);
-    v3.current = v2;
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useRefToState(p1) -- line: 31
+	-- upvalues: React (copy)
+	local v5 = React.useRef(p1)
+
+	v5.current = p1
+
+	return v5
+end
+
+return useRefToState

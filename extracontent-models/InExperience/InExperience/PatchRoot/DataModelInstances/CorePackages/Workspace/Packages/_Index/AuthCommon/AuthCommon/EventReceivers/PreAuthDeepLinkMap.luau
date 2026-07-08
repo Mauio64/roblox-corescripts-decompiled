@@ -1,88 +1,104 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GetFFlagEnableUnifiedWebViews_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableUnifiedWebViews;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_BrowserService_0 = game:GetService("BrowserService");
-local v5 = if l_GetFFlagEnableUnifiedWebViews_0() then game:GetService("WebViewService") else nil;
-local l_NavigateSideways_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateSideways;
-local v7 = require(l_script_FirstAncestor_0.Thunks.HandleAuthTicket);
-local l_LaunchContext_0 = require(l_Parent_0.AppStartup).Enums.LaunchContext;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v10 = game:DefineFastFlag("EnableJoinV2PreAuthDeepLink", false);
-local v11 = game:DefineFastFlag("EnableAccountRecoveryPreAuthDeepLink2", true);
-local v12 = game:DefineFastInt("WaitAfterCloseChallengeWebViewSeconds", 500);
-local v19 = {
-    {
-        regexPattern = "roblox.*//testing/preauth.*", 
-        handler = function(v13, v14) --[[ Line: 58 ]] --[[ Name: handler ]]
-            print("preauth deeplink example called with query params:");
-            for v15, v16 in pairs(v13) do
-                print(v15, "=", v16);
-            end;
-            print("context:");
-            for v17, v18 in pairs(v14) do
-                print(v17, "=", v18);
-            end;
-            return true;
-        end, 
-        preauthOnly = false
-    }
-};
-if v10 then
-    table.insert(v19, {
-        regexPattern = "roblox.*://join_v2/join.*", 
-        handler = function(v20, v21) --[[ Line: 78 ]] --[[ Name: handler ]]
-            -- upvalues: l_LaunchContext_0 (copy), v7 (copy)
-            local function v22() --[[ Line: 79 ]]
-                -- upvalues: v21 (copy), l_LaunchContext_0 (ref)
-                return v21.dispatch(v21.launchApp(v21.networking, v21.omniRecommendationsRequest, v21.analytics, v21.appPolicy, l_LaunchContext_0.Login));
-            end;
-            return v7(v21.networking, v20.ticket, v20.placelauncherurl, v22, function() --[[ Line: 91 ]]
-                -- upvalues: v21 (copy)
-                return v21.dispatch(v21.resetAppState());
-            end);
-        end, 
-        preauthOnly = false
-    });
-end;
-if v11 then
-    table.insert(v19, {
-        regexPattern = "roblox.*://navigation/account_recovery.*", 
-        handler = function(v23, v24) --[[ Line: 110 ]] --[[ Name: handler ]]
-            -- upvalues: l_GetFFlagEnableUnifiedWebViews_0 (copy), v5 (copy), l_BrowserService_0 (copy), v12 (copy), l_NavigateSideways_0 (copy), l_AppPage_0 (copy), l_HttpService_0 (copy)
-            local l_origin_0 = v23.origin;
-            local v26 = {};
-            if l_origin_0 == "login2SV" then
-                v26 = {
-                    continuingRecovery = false, 
-                    recover2sv = true, 
-                    recoverPassword = false, 
-                    identifier = v23.username
-                };
-            elseif l_origin_0 == "passwordReset2SV" then
-                v26 = {
-                    continuingRecovery = true, 
-                    recover2sv = true, 
-                    recoverPassword = true, 
-                    recoverySessionID = v23.recoverysessionid, 
-                    identifier = v23.username
-                };
-            end;
-            if l_GetFFlagEnableUnifiedWebViews_0() then
-                v5:CloseWindow();
-            else
-                l_BrowserService_0:CloseBrowserWindow();
-            end;
-            if l_origin_0 == "login2SV" then
-                task.wait(v12 / 1000);
-            end;
-            return v24.dispatch(l_NavigateSideways_0({
-                name = l_AppPage_0.AccountRecovery, 
-                detail = l_HttpService_0:GenerateGUID(false):lower(), 
-                extraProps = v26
-            }));
-        end, 
-        preauthOnly = false
-    });
-end;
-return v19;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local GetFFlagEnableUnifiedWebViews = require(AuthCommonParent.SharedFlags).GetFFlagEnableUnifiedWebViews
+local HttpService = game:GetService("HttpService")
+local BrowserService = game:GetService("BrowserService")
+local v6 = if not GetFFlagEnableUnifiedWebViews() then nil else game:GetService("WebViewService")
+local NavigateSideways = require(AuthCommonParent.NavigationRodux).Thunks.NavigateSideways
+local FFlagSignalsNavP3Dispatch = require(AuthCommonParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(AuthCommonParent.RobloxAppNavigation).NavigationCommands
+local HandleAuthTicket = require(AuthCommon.Thunks.HandleAuthTicket)
+local LaunchContext = require(AuthCommonParent.AppStartup).Enums.LaunchContext
+local AppPage = require(AuthCommonParent.RobloxAppEnums).AppPage
+local v13 = game:DefineFastFlag("EnableJoinV2PreAuthDeepLink", false)
+local v14 = game:DefineFastFlag("EnableAccountRecoveryPreAuthDeepLink2", true)
+local v15 = game:DefineFastInt("WaitAfterCloseChallengeWebViewSeconds", 500)
+local t1 = {{
+	regexPattern = "roblox.*//testing/preauth.*",
+	preauthOnly = false,
+	handler = function(p1, p2) -- line: 62
+		print("preauth deeplink example called with query params:")
+
+		for k, v in pairs(p1) do
+			print(k, "=", v)
+		end
+
+		print("context:")
+
+		for k, v in pairs(p2) do
+			print(k, "=", v)
+		end
+
+		return true
+	end
+}}
+
+if v13 then
+	table.insert(t1, {
+		regexPattern = "roblox.*://join_v2/join.*",
+		preauthOnly = false,
+		handler = function(p3, p4) -- line: 82
+			-- upvalues: LaunchContext (copy), HandleAuthTicket (copy)
+			return HandleAuthTicket(p4.networking, p3.ticket, p3.placelauncherurl, function() -- line: 83
+				-- upvalues: p4 (copy), LaunchContext (copy)
+				return p4.dispatch(p4.launchApp(p4.networking, p4.omniRecommendationsRequest, p4.analytics, p4.appPolicy, LaunchContext.Login))
+			end, function() -- line: 95
+				-- upvalues: p4 (copy)
+				return p4.dispatch(p4.resetAppState())
+			end)
+		end
+	})
+end
+
+if v14 then
+	table.insert(t1, {
+		regexPattern = "roblox.*://navigation/account_recovery.*",
+		preauthOnly = false,
+		handler = function(p5, p6) -- line: 114
+			-- upvalues: GetFFlagEnableUnifiedWebViews (copy), v6 (copy), BrowserService (copy), v15 (copy), AppPage (copy), HttpService (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateSideways (copy)
+			local origin = p5.origin
+			local t2 = {}
+
+			if origin == "login2SV" then
+				t2 = {
+					continuingRecovery = false,
+					recover2sv = true,
+					recoverPassword = false,
+					identifier = p5.username
+				}
+			elseif origin == "passwordReset2SV" then
+				t2 = {
+					continuingRecovery = true,
+					recover2sv = true,
+					recoverPassword = true,
+					recoverySessionID = p5.recoverysessionid,
+					identifier = p5.username
+				}
+			end
+
+			if GetFFlagEnableUnifiedWebViews() then
+				v6:CloseWindow()
+			else
+				BrowserService:CloseBrowserWindow()
+			end
+
+			if origin == "login2SV" then
+				task.wait(v15 / 1000)
+			end
+
+			local t3 = {
+				name = AppPage.AccountRecovery,
+				detail = HttpService:GenerateGUID(false):lower(),
+				extraProps = t2
+			}
+
+			if FFlagSignalsNavP3Dispatch then
+				return v9.sideways(v9.fromLegacyPage(t3))
+			end
+
+			return p6.dispatch(NavigateSideways(t3))
+		end
+	})
+end
+
+return t1

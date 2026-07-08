@@ -1,131 +1,201 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Analytics);
-local v2 = require(l_Parent_0.flags.getFFlagDebugUGCDisableSurfaceAppearanceTests);
-local v3 = require(l_Parent_0.validation.validateBodyPartMeshBounds);
-local v4 = require(l_Parent_0.validation.validateAssetBounds);
-local v5 = require(l_Parent_0.validation.validateAccurateBoundingBoxRasterMethod);
-local v6 = require(l_Parent_0.validation.validateBodyPartChildAttachmentBounds);
-local v7 = require(l_Parent_0.validation.validateBodyPartChildAttachmentOrientations);
-local v8 = require(l_Parent_0.validation.validateBodyPartExtentsRelativeToParent);
-local v9 = require(l_Parent_0.validation.validateDependencies);
-local v10 = require(l_Parent_0.validation.validateDescendantMeshMetrics);
-local v11 = require(l_Parent_0.validation.validateDescendantTextureMetrics);
-local v12 = require(l_Parent_0.validation.validateSurfaceAppearances);
-local v13 = require(l_Parent_0.validation.validateMaterials);
-local v14 = require(l_Parent_0.validation.validateTags);
-local v15 = require(l_Parent_0.validation.validatePropertyRequirements);
-local v16 = require(l_Parent_0.validation.validateAttributes);
-local v17 = require(l_Parent_0.validation.validateHSR);
-local v18 = require(l_Parent_0.validation.validateBodyPartCollisionFidelity);
-local v19 = require(l_Parent_0.validation.validateModeration);
-local v20 = require(l_Parent_0.validation.validateAssetTransparency);
-local v21 = require(l_Parent_0.validation.validatePose);
-local v22 = require(l_Parent_0.util.ValidateBodyBlockingTests);
-local v23 = require(l_Parent_0.validation.ValidateMeshSizeProperty);
-local v24 = require(l_Parent_0.validation.ValidatePropertiesSensible);
-local v25 = require(l_Parent_0.validation.ValidateLegsSeparation);
-local v26 = require(l_Parent_0.validation.ValidateTexturePack);
-local v27 = require(l_Parent_0.util.validateWithSchema);
-local v28 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local v29 = require(l_Parent_0.validation.ValidateMeshPartOnlySkinnedToR15);
-local v30 = require(l_Parent_0.util.bodyAssetMasksRenderer);
-local v31 = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidatePropertiesSensible);
-local v32 = require(l_Parent_0.flags.getFFlagUGCValidateTexturePack);
-local v33 = require(l_Parent_0.flags.getFFlagUGCValidationEnableR15plusSkinning);
-local v34 = require(l_Parent_0.util.resetPhysicsData);
-local _ = require(l_Parent_0.util.Types);
-return function(v36, v37, v38) --[[ Line: 50 ]] --[[ Name: validateMeshPartBodyPart ]]
-    -- upvalues: v27 (copy), v1 (copy), v2 (copy), v12 (copy), v9 (copy), v34 (copy), v31 (copy), v24 (copy), v22 (copy), v23 (copy), v28 (copy), v3 (copy), v32 (copy), v26 (copy), v6 (copy), v8 (copy), v7 (copy), v21 (copy), v4 (copy), v25 (copy), v5 (copy), v30 (copy), v10 (copy), v11 (copy), v17 (copy), v20 (copy), v13 (copy), v15 (copy), v18 (copy), v14 (copy), v16 (copy), v33 (copy), v29 (copy), v19 (copy)
-    local l_isServer_0 = v38.isServer;
-    local l_assetTypeEnum_0 = v38.assetTypeEnum;
-    local l_allowUnreviewedAssets_0 = v38.allowUnreviewedAssets;
-    local l_restrictedUserIds_0 = v38.restrictedUserIds;
-    local v43 = v27(v37, v36, v38);
-    if not v43.success then
-        v1.reportFailure(v1.ErrorType.validateMeshPartBodyPart_ValidateWithSchema, nil, v38);
-        return false, {
-            string.format("Body part '%s' does not follow R15 schema. The specific issues are: ", v36.Name), 
-            v43.message
-        };
-    else
-        if not v2() then
-            local v44, v45 = v12(v36, v38);
-            if not v44 then
-                return v44, v45;
-            end;
-        end;
-        local v46, v47 = v9(v36, v38);
-        if not v46 then
-            return v46, v47;
-        else
-            v46, v47 = v34({
-                v36
-            }, v38);
-            if not v46 then
-                return false, {
-                    v47
-                };
-            else
-                if v31() then
-                    local v48, v49 = v24.validate(v36, v38);
-                    if not v48 then
-                        return false, v49;
-                    end;
-                end;
-                local v50, v51 = v22.validate(v36, v38);
-                if not v50 then
-                    return false, v51;
-                else
-                    v50, v51 = v23.validateBodyAsset(v36, v38);
-                    if not v50 then
-                        return false, v51;
-                    else
-                        v50 = v28.new();
-                        v50:updateReasons(v3(v36, v38));
-                        if v32() then
-                            v50:updateReasons(v26.validate(v36, true, v38));
-                        end;
-                        v50:updateReasons(v6(v36, v38));
-                        v50:updateReasons(v8.runValidation(v36, v38));
-                        v50:updateReasons(v7.runValidation(v36, v38));
-                        v50:updateReasons(v21(v36, v38));
-                        v50:updateReasons(v4(nil, v36, v38));
-                        v50:updateReasons(v25.validateAsset(v36, v38));
-                        v51 = v5.getBoundsViewsForAssetType(l_assetTypeEnum_0);
-                        local v52 = nil;
-                        local v53, v54 = v30.new(v36, v51, v38);
-                        v46 = v53;
-                        v52 = v54;
-                        if v46 then
-                            v50:updateReasons(v5.validate(v36, v52, v38));
-                        else
-                            v50:updateReasons(v46, v52);
-                        end;
-                        v50:updateReasons(v10(v36, v38));
-                        v50:updateReasons(v11(v36, v38));
-                        v50:updateReasons(v17(v36, v38));
-                        v53 = tick();
-                        v50:updateReasons(v20(v36, v38));
-                        v1.recordScriptTime("validateAssetTransparency", v53, v38);
-                        v50:updateReasons(v13(v36, v38));
-                        v50:updateReasons(v15(v36, l_assetTypeEnum_0, v38));
-                        v50:updateReasons(v18(v36, v38));
-                        v50:updateReasons(v14(v36, v38));
-                        v50:updateReasons(v16(v36, v38));
-                        if not v33() and l_assetTypeEnum_0 ~= Enum.AssetType.DynamicHead then
-                            v50:updateReasons(v29.validateBodyParts(v36, v38));
-                        end;
-                        v54 = not l_isServer_0;
-                        if l_allowUnreviewedAssets_0 then
-                            v54 = false;
-                        end;
-                        if v54 then
-                            v50:updateReasons(v19(v36, l_restrictedUserIds_0, v38));
-                        end;
-                        return v50:getFinalResults();
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local getFFlagDebugUGCDisableSurfaceAppearanceTests = require(ParentParent.flags.getFFlagDebugUGCDisableSurfaceAppearanceTests)
+local validateBodyPartMeshBounds = require(ParentParent.validation.validateBodyPartMeshBounds)
+local validateAssetBounds = require(ParentParent.validation.validateAssetBounds)
+local validateAccurateBoundingBoxRasterMethod = require(ParentParent.validation.validateAccurateBoundingBoxRasterMethod)
+local validateBodyPartChildAttachmentBounds = require(ParentParent.validation.validateBodyPartChildAttachmentBounds)
+local validateBodyPartChildAttachmentOrientations = require(ParentParent.validation.validateBodyPartChildAttachmentOrientations)
+local validateBodyPartExtentsRelativeToParent = require(ParentParent.validation.validateBodyPartExtentsRelativeToParent)
+local validateDependencies = require(ParentParent.validation.validateDependencies)
+local validateDescendantMeshMetrics = require(ParentParent.validation.validateDescendantMeshMetrics)
+local validateDescendantTextureMetrics = require(ParentParent.validation.validateDescendantTextureMetrics)
+local validateSurfaceAppearances = require(ParentParent.validation.validateSurfaceAppearances)
+local validateMaterials = require(ParentParent.validation.validateMaterials)
+local validateTags = require(ParentParent.validation.validateTags)
+local validatePropertyRequirements = require(ParentParent.validation.validatePropertyRequirements)
+local validateAttributes = require(ParentParent.validation.validateAttributes)
+local validateHSR = require(ParentParent.validation.validateHSR)
+local validateBodyPartCollisionFidelity = require(ParentParent.validation.validateBodyPartCollisionFidelity)
+local validateModeration = require(ParentParent.validation.validateModeration)
+local validateAssetTransparency = require(ParentParent.validation.validateAssetTransparency)
+local validatePose = require(ParentParent.validation.validatePose)
+local ValidateBodyBlockingTests = require(ParentParent.util.ValidateBodyBlockingTests)
+local ValidateMeshSizeProperty = require(ParentParent.validation.ValidateMeshSizeProperty)
+local ValidatePropertiesSensible = require(ParentParent.validation.ValidatePropertiesSensible)
+local ValidateLegsSeparation = require(ParentParent.validation.ValidateLegsSeparation)
+local ValidateTexturePack = require(ParentParent.validation.ValidateTexturePack)
+local validateWithSchema = require(ParentParent.util.validateWithSchema)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+local ValidateMeshPartOnlySkinnedToR15 = require(ParentParent.validation.ValidateMeshPartOnlySkinnedToR15)
+local bodyAssetMasksRenderer = require(ParentParent.util.bodyAssetMasksRenderer)
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(ParentParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+local getFFlagUGCValidateTexturePack = require(ParentParent.flags.getFFlagUGCValidateTexturePack)
+local getFFlagUGCValidationEnableR15plusSkinning = require(ParentParent.flags.getFFlagUGCValidationEnableR15plusSkinning)
+local resetPhysicsData = require(ParentParent.util.resetPhysicsData)
+
+require(ParentParent.util.Types)
+
+local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
+local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
+local getFFlagUGCValidateMigrateTextureTransparency = require(ParentParent.flags.getFFlagUGCValidateMigrateTextureTransparency)
+local getFFlagUGCValidateMigrateBodyPartBounds = require(ParentParent.flags.getFFlagUGCValidateMigrateBodyPartBounds)
+local getFFlagUGCValidateMigratePoseBlocking = require(ParentParent.flags.getFFlagUGCValidateMigratePoseBlocking)
+local getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality = require(ParentParent.flags.getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality)
+
+local function validateMeshPartBodyPart(p1, p2, p3) -- line: 58
+	-- upvalues: validateWithSchema (copy), Analytics (copy), getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality (copy), getFFlagDebugUGCDisableSurfaceAppearanceTests (copy), validateSurfaceAppearances (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), getFFlagUGCValidationCombineEntrypointResults (copy), validateDependencies (copy), resetPhysicsData (copy), getEngineFeatureEngineUGCValidatePropertiesSensible (copy), ValidatePropertiesSensible (copy), getFFlagUGCValidateMigratePoseBlocking (copy), ValidateBodyBlockingTests (copy), getFFlagUGCValidateMigrateBodyPartBounds (copy), ValidateMeshSizeProperty (copy), FailureReasonsAccumulator (copy), validateBodyPartMeshBounds (copy), getFFlagUGCValidateTexturePack (copy), ValidateTexturePack (copy), validateBodyPartChildAttachmentBounds (copy), validateBodyPartExtentsRelativeToParent (copy), validateBodyPartChildAttachmentOrientations (copy), validatePose (copy), validateAssetBounds (copy), ValidateLegsSeparation (copy), validateAccurateBoundingBoxRasterMethod (copy), bodyAssetMasksRenderer (copy), validateDescendantMeshMetrics (copy), getFFlagUGCValidateMigrateTextureTransparency (copy), validateDescendantTextureMetrics (copy), validateHSR (copy), validateAssetTransparency (copy), validateMaterials (copy), validatePropertyRequirements (copy), validateBodyPartCollisionFidelity (copy), validateAttributes (copy), validateTags (copy), getFFlagUGCValidationEnableR15plusSkinning (copy), ValidateMeshPartOnlySkinnedToR15 (copy), validateModeration (copy)
+	local isServer = p3.isServer
+	local assetTypeEnum = p3.assetTypeEnum
+	local allowUnreviewedAssets = p3.allowUnreviewedAssets
+	local restrictedUserIds = p3.restrictedUserIds
+	local v50 = validateWithSchema(p2, p1, p3)
+
+	if not v50.success then
+		Analytics.reportFailure(Analytics.ErrorType.validateMeshPartBodyPart_ValidateWithSchema, nil, p3)
+
+		return false, {
+			string.format("Body part '%s' does not follow R15 schema. The specific issues are: ", p1.Name),
+			v50.message
+		}
+	end
+
+	if not getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality() and not getFFlagDebugUGCDisableSurfaceAppearanceTests() then
+		local v51, v52 = validateSurfaceAppearances(p1, p3)
+
+		if not v51 then
+			return v51, v52
+		end
+	end
+
+	local t1 = {
+		skipExistenceCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults(),
+		skipOwnershipCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults()
+	}
+	local v54, v55 = validateDependencies(p1, p3, t1)
+
+	if not v54 then
+		return v54, v55
+	end
+
+	local v56, v57 = resetPhysicsData({ p1 }, p3)
+
+	if not v56 then
+		return false, { v57 }
+	end
+
+	if getEngineFeatureEngineUGCValidatePropertiesSensible() then
+		local v58, v59 = ValidatePropertiesSensible.validate(p1, p3)
+
+		if not v58 then
+			return false, v59
+		end
+	end
+
+	if not getFFlagUGCValidateMigratePoseBlocking() then
+		local v60, v61 = ValidateBodyBlockingTests.validate(p1, p3)
+
+		if not v60 then
+			return false, v61
+		end
+	end
+
+	if not getFFlagUGCValidateMigrateBodyPartBounds() then
+		local v62, v63 = ValidateMeshSizeProperty.validateBodyAsset(p1, p3)
+
+		if not v62 then
+			return false, v63
+		end
+	end
+
+	local v64 = FailureReasonsAccumulator.new()
+
+	if not getFFlagUGCValidateMigrateBodyPartBounds() then
+		v64:updateReasons(validateBodyPartMeshBounds(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateSurfaceAppearanceMeshQuality() and getFFlagUGCValidateTexturePack() then
+		v64:updateReasons(ValidateTexturePack.validate(p1, true, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		v64:updateReasons(validateBodyPartChildAttachmentBounds(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateBodyPartBounds() then
+		v64:updateReasons(validateBodyPartExtentsRelativeToParent.runValidation(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		v64:updateReasons(validateBodyPartChildAttachmentOrientations.runValidation(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigratePoseBlocking() then
+		v64:updateReasons(validatePose(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateBodyPartBounds() then
+		v64:updateReasons(validateAssetBounds(nil, p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigratePoseBlocking() then
+		v64:updateReasons(ValidateLegsSeparation.validateAsset(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigratePoseBlocking() then
+		local v65 = validateAccurateBoundingBoxRasterMethod.getBoundsViewsForAssetType(assetTypeEnum)
+		local v66, v67 = bodyAssetMasksRenderer.new(p1, v65, p3)
+
+		if v66 then
+			v64:updateReasons(validateAccurateBoundingBoxRasterMethod.validate(p1, v67, p3))
+		else
+			v64:updateReasons(v66, v67)
+		end
+	end
+
+	v64:updateReasons(validateDescendantMeshMetrics(p1, p3))
+
+	if not getFFlagUGCValidateMigrateTextureTransparency() then
+		v64:updateReasons(validateDescendantTextureMetrics(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		v64:updateReasons(validateHSR(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateTextureTransparency() then
+		local timestamp = tick()
+
+		v64:updateReasons(validateAssetTransparency(p1, p3))
+		Analytics.recordScriptTime("validateAssetTransparency", timestamp, p3)
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		v64:updateReasons(validateMaterials(p1, p3))
+		v64:updateReasons(validatePropertyRequirements(p1, assetTypeEnum, p3))
+		v64:updateReasons(validateBodyPartCollisionFidelity(p1, p3))
+		v64:updateReasons(validateAttributes(p1, p3))
+	end
+
+	v64:updateReasons(validateTags(p1, p3))
+
+	if not getFFlagUGCValidationEnableR15plusSkinning() and assetTypeEnum ~= Enum.AssetType.DynamicHead then
+		v64:updateReasons(ValidateMeshPartOnlySkinnedToR15.validateBodyParts(p1, p3))
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		local v69 = not isServer
+
+		if allowUnreviewedAssets then
+			v69 = false
+		end
+
+		if v69 then
+			v64:updateReasons(validateModeration(p1, restrictedUserIds, p3))
+		end
+	end
+
+	return v64:getFinalResults()
+end
+
+return validateMeshPartBodyPart

@@ -1,30 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChatShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local l_Commands_0 = l_script_FirstAncestor_0.Commands;
-local v5 = require(l_Commands_0.Whisper.RBXWhisperCommand);
-local v6 = require(l_Commands_0.RBXTeamCommand);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v8 = require(l_Actions_0.CommandAliasChanged);
-local v9 = {
-    RBXWhisperCommand = {
-        primaryAlias = v5.alias[1], 
-        secondaryAlias = v5.alias[2]
-    }, 
-    RBXTeamCommand = {
-        primaryAlias = v6.alias[1], 
-        secondaryAlias = v6.alias[2]
-    }
-};
-return v2.createReducer(v9, {
-    [v8.name] = function(v10, v11) --[[ Line: 25 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v10, {
-            [v11.name] = {
-                primaryAlias = v11.primaryAlias, 
-                secondaryAlias = v11.secondaryAlias
-            }
-        });
-    end
-});
+local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
+local ExpChatSharedParent = ExpChatShared.Parent
+local Rodux = require(ExpChatSharedParent.Rodux)
+local Dictionary = require(ExpChatSharedParent.llama).Dictionary
+local Commands = ExpChatShared.Commands
+local RBXWhisperCommand = require(Commands.Whisper.RBXWhisperCommand)
+local RBXTeamCommand = require(Commands.RBXTeamCommand)
+local Actions = ExpChatShared.Actions
+local CommandAliasChanged = require(Actions.CommandAliasChanged)
+local t1 = {
+	RBXWhisperCommand = {
+		primaryAlias = RBXWhisperCommand.alias[1],
+		secondaryAlias = RBXWhisperCommand.alias[2]
+	},
+	RBXTeamCommand = {
+		primaryAlias = RBXTeamCommand.alias[1],
+		secondaryAlias = RBXTeamCommand.alias[2]
+	}
+}
+
+return Rodux.createReducer(t1, {
+	[CommandAliasChanged.name] = function(p1, p2) -- line: 25
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(p1, {
+			[p2.name] = {
+				primaryAlias = p2.primaryAlias,
+				secondaryAlias = p2.secondaryAlias
+			}
+		})
+	end
+})

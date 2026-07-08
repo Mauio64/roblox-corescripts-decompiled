@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnifiedPurchaseModalUiImprovements", false);
+return game:DefineFastFlag("UnifiedPurchaseModalUiImprovements", false)

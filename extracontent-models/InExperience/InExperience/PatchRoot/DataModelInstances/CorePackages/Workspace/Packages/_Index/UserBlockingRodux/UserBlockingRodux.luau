@@ -1,23 +1,25 @@
-local l_script_0 = script;
-local l_Parent_0 = l_script_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.RoduxNetworking);
-local v4 = require(l_Parent_0.UserBlockingNetworking);
-local v5 = require(l_script_0.Reducers.UserBlockingReducer);
+local _script = script
+local _scriptParent = _script.Parent
+local Cryo = require(_scriptParent.Cryo)
+local RoduxNetworking = require(_scriptParent.RoduxNetworking)
+local UserBlockingNetworking = require(_scriptParent.UserBlockingNetworking)
+local UserBlockingReducer = require(_script.Reducers.UserBlockingReducer)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    config = function(v6) --[[ Line: 11 ]] --[[ Name: config ]]
-        -- upvalues: v2 (copy), v4 (copy), v3 (copy), v5 (copy)
-        v6 = v2.Dictionary.join(v6, {
-            userBlockingNetworking = v4.config({
-                roduxNetworking = v3.mock()
-            })
-        });
-        return {
-            installReducer = function() --[[ Line: 19 ]] --[[ Name: installReducer ]]
-                -- upvalues: v5 (ref), v6 (ref)
-                return v5(v6);
-            end
-        };
-    end
-};
+	["jest.config"] = script["jest.config"],
+	config = function(p1) -- line: 11
+		-- upvalues: Cryo (copy), UserBlockingNetworking (copy), RoduxNetworking (copy), UserBlockingReducer (copy)
+		local u8 = Cryo.Dictionary.join(p1, {
+			userBlockingNetworking = UserBlockingNetworking.config({
+				roduxNetworking = RoduxNetworking.mock()
+			})
+		})
+
+		return {
+			installReducer = function() -- line: 19
+				-- upvalues: UserBlockingReducer (copy), u8 (ref)
+				return UserBlockingReducer(u8)
+			end
+		}
+	end
+}

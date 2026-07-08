@@ -1,9 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v3 = require(l_Parent_0.React);
-local v4 = require(script.Parent.TileContext);
-return function() --[[ Line: 17 ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    return v3.useContext(v4);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(Foundation.Components.Types)
+
+local React = require(FoundationParent.React)
+local TileContext = require(script.Parent.TileContext)
+
+return function() -- line: 17
+	-- upvalues: React (copy), TileContext (copy)
+	return React.useContext(TileContext)
+end

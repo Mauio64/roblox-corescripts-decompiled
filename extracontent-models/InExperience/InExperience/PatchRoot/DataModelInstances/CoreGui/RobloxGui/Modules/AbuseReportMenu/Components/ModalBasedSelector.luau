@@ -1,53 +1,56 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Foundation);
-local v3 = require(l_CorePackages_0.Packages.React);
-local l_Icon_0 = v2.Icon;
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local v7 = require(l_script_FirstAncestor_0.Components.ModalBasedSelectorDialogController);
-local v8 = require(l_script_FirstAncestor_0.Flags.FFlagHideShortcutsOnReportDropdown);
-return function(v9) --[[ Line: 23 ]] --[[ Name: ModalBasedSelector ]]
-    -- upvalues: v8 (copy), v3 (copy), v7 (copy), l_View_0 (copy), l_Text_0 (copy), l_Icon_0 (copy)
-    local v10 = nil;
-    if v8 then
-        v10 = v3.useCallback(function() --[[ Line: 26 ]]
-            -- upvalues: v9 (copy)
-            v9.onMenuOpenChange(true);
-        end, {
-            v9.onMenuOpenChange
-        });
-    end;
-    local v11 = v3.useCallback(function() --[[ Line: 31 ]]
-        -- upvalues: v7 (ref), v8 (ref), v9 (copy)
-        v7.unmountModalSelector();
-        if v8 then
-            v9.onMenuOpenChange(false);
-        end;
-    end, {
-        v9.onMenuOpenChange
-    });
-    return v3.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, v9.selectorHeight), 
-        BackgroundTransparency = 1
-    }, {
-        ControlButton = v3.createElement(l_View_0, {
-            tag = "size-full stroke-thicker stroke-emphasis radius-medium", 
-            onActivated = function() --[[ Line: 44 ]] --[[ Name: onActivated ]]
-                -- upvalues: v7 (ref), v9 (copy), v11 (copy), v10 (ref)
-                v7.mountModalSelector(v9.viewportHeight, v9.viewportWidth, v9.selections, v9.onSelect, v11, v10);
-            end
-        }, {
-            Text = v3.createElement(l_Text_0, {
-                Text = v9.selectedValue or v9.placeholderText, 
-                tag = "size-full anchor-center-center position-center-center", 
-                TextTruncate = Enum.TextTruncate.AtEnd
-            }), 
-            Icon = v3.createElement(l_Icon_0, {
-                name = "icons/actions/truncationExpand", 
-                AnchorPoint = Vector2.new(1, 0), 
-                Position = UDim2.new(1, 0, 0, 0)
-            })
-        })
-    });
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Foundation = require(CorePackages.Packages.Foundation)
+local React = require(CorePackages.Packages.React)
+local Icon = Foundation.Icon
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local ModalBasedSelectorDialogController = require(AbuseReportMenu.Components.ModalBasedSelectorDialogController)
+local FFlagHideShortcutsOnReportDropdown = require(AbuseReportMenu.Flags.FFlagHideShortcutsOnReportDropdown)
+
+local function ModalBasedSelector(p1) -- line: 23
+	-- upvalues: FFlagHideShortcutsOnReportDropdown (copy), React (copy), ModalBasedSelectorDialogController (copy), View (copy), FoundationText (copy), Icon (copy)
+	local u12 = nil
+
+	if FFlagHideShortcutsOnReportDropdown then
+		u12 = React.useCallback(function() -- line: 26
+			-- upvalues: p1 (copy)
+			p1.onMenuOpenChange(true)
+		end, { p1.onMenuOpenChange })
+	end
+
+	local v13 = React.useCallback(function() -- line: 31
+		-- upvalues: ModalBasedSelectorDialogController (copy), FFlagHideShortcutsOnReportDropdown (copy), p1 (copy)
+		ModalBasedSelectorDialogController.unmountModalSelector()
+
+		if FFlagHideShortcutsOnReportDropdown then
+			p1.onMenuOpenChange(false)
+		end
+	end, { p1.onMenuOpenChange })
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, p1.selectorHeight)
+	}, {
+		ControlButton = React.createElement(View, {
+			tag = "size-full stroke-thicker stroke-emphasis radius-medium",
+			onActivated = function() -- line: 44
+				-- upvalues: ModalBasedSelectorDialogController (copy), p1 (copy), v13 (copy), u12 (ref)
+				ModalBasedSelectorDialogController.mountModalSelector(p1.viewportHeight, p1.viewportWidth, p1.selections, p1.onSelect, v13, u12)
+			end
+		}, {
+			Text = React.createElement(FoundationText, {
+				tag = "size-full anchor-center-center position-center-center",
+				Text = p1.selectedValue or p1.placeholderText,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			}),
+			Icon = React.createElement(Icon, {
+				name = "icons/actions/truncationExpand",
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.new(1, 0, 0, 0)
+			})
+		})
+	})
+end
+
+return ModalBasedSelector

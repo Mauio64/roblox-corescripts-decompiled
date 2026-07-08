@@ -1,49 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactUtils);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v5 = require(script.Parent.GameCardContainer);
-local v6 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local l_useEffect_0 = v2.useEffect;
-local l_useDispatch_0 = v3.Hooks.RoactRodux.useDispatch;
-local v9 = require(l_script_FirstAncestor_0.Stores.GetShareLinkStore);
-return function(v10) --[[ Line: 37 ]] --[[ Name: ShareLinkContainer ]]
-    -- upvalues: v9 (copy), l_useSignalState_0 (copy), l_useDispatch_0 (copy), l_useEffect_0 (copy), v6 (copy), v2 (copy), v5 (copy)
-    local l_linkId_0 = v10.shareLink.linkId;
-    local l_linkType_0 = v10.shareLink.linkType;
-    local v13 = v9(false);
-    local v14 = l_useSignalState_0(v13.getShareLinkMetadataComputed(l_linkId_0));
-    local v15 = l_useDispatch_0();
-    l_useEffect_0(function() --[[ Line: 44 ]]
-        -- upvalues: v14 (copy), v13 (copy), v15 (copy), l_linkId_0 (copy), l_linkType_0 (copy), v6 (ref)
-        if not v14 then
-            v13.fetchShareLinkMetadata(v15, l_linkId_0, l_linkType_0);
-            return;
-        else
-            v6:warning("ShareLinkContainer: Missing linkId or linkType in props.");
-            return;
-        end;
-    end, {
-        l_linkId_0, 
-        l_linkType_0, 
-        v14
-    });
-    return v2.createElement(v5, {
-        universeId = if v14 then v14.universeId else nil, 
-        placeId = if v14 then v14.placeId else nil, 
-        conversationId = v10.conversationId, 
-        senderUserId = v10.senderUserId, 
-        onDetailsOpened = v10.onDetailsOpened, 
-        openGameDetailsPage = v10.openGameDetailsPage, 
-        networkImpl = v10.networkImpl, 
-        eventStream = v10.eventStream, 
-        eventIngest = v10.eventIngest, 
-        luaChatPlayTogetherEnabled = v10.luaChatPlayTogetherEnabled, 
-        isStartOfGroup = v10.isStartOfGroup, 
-        isIncoming = v10.isIncoming, 
-        isUnfiltered = v10.isUnfiltered, 
-        isPending = v10.isPending, 
-        isRepliedTo = v10.isRepliedTo
-    });
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local RoactUtils = require(AppChatParent.RoactUtils)
+local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local GameCardContainer = require(script.Parent.GameCardContainer)
+local v7 = require(AppChat.Logger):new(script.Name)
+local useEffect = React.useEffect
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local GetShareLinkStore = require(AppChat.Stores.GetShareLinkStore)
+
+local function ShareLinkContainer(t1: {[any]: any}) -- line: 37
+	-- upvalues: GetShareLinkStore (copy), useSignalState (copy), useDispatch (copy), useEffect (copy), v7 (copy), React (copy), GameCardContainer (copy)
+	local linkId = t1.shareLink.linkId
+	local linkType = t1.shareLink.linkType
+	local v15 = GetShareLinkStore(false)
+	local v16 = useSignalState(v15.getShareLinkMetadataComputed(linkId))
+	local v17 = useDispatch()
+
+	useEffect(function() -- line: 44
+		-- upvalues: v16 (copy), v15 (copy), v17 (copy), linkId (copy), linkType (copy), v7 (copy)
+		if not v16 then
+			v15.fetchShareLinkMetadata(v17, linkId, linkType)
+
+			return
+		end
+
+		v7:warning("ShareLinkContainer: Missing linkId or linkType in props.")
+	end, {
+		linkId,
+		linkType,
+		v16
+	})
+
+	return React.createElement(GameCardContainer, {
+		universeId = if not v16 then nil else v16.universeId,
+		placeId = if not v16 then nil else v16.placeId,
+		conversationId = t1.conversationId,
+		senderUserId = t1.senderUserId,
+		onDetailsOpened = t1.onDetailsOpened,
+		openGameDetailsPage = t1.openGameDetailsPage,
+		networkImpl = t1.networkImpl,
+		eventStream = t1.eventStream,
+		eventIngest = t1.eventIngest,
+		luaChatPlayTogetherEnabled = t1.luaChatPlayTogetherEnabled,
+		isStartOfGroup = t1.isStartOfGroup,
+		isIncoming = t1.isIncoming,
+		isUnfiltered = t1.isUnfiltered,
+		isPending = t1.isPending,
+		isRepliedTo = t1.isRepliedTo
+	})
+end
+
+return ShareLinkContainer

@@ -1,31 +1,44 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: makeMergeOverlappingArraysPolicy ]]
-    return function(_, v2, v3, v4) --[[ Line: 2 ]] --[[ Name: mergeOverlappingArraysPolicy ]]
-        -- upvalues: v0 (copy)
-        v2 = v2 or {};
-        v3 = v3 or {};
-        if #v3 == 0 then
-            return v2;
-        elseif #v2 == 0 then
-            return v3;
-        else
-            local v5 = {};
-            local v6 = table.clone(v2);
-            for v7, v8 in v6 do
-                local v9 = v4:readField(v0, v8);
-                if v9 then
-                    v5[v9] = v7;
-                end;
-            end;
-            for _, v11 in v3 do
-                local v12 = v4:readField(v0, v11);
-                if v12 and v5[v12] then
-                    local v13 = v5[v12];
-                    v6[v13] = v4:mergeObjects(v6[v13], v11);
-                else
-                    table.insert(v6, v11);
-                end;
-            end;
-            return v6;
-        end;
-    end;
-end;
+local function makeMergeOverlappingArraysPolicy(s1: string) -- line: 1
+	local function mergeOverlappingArraysPolicy(_, p2, p3, p4) -- line: 2
+		-- upvalues: s1 (copy)
+		local v8 = p2 or {}
+		local v9 = p3 or {}
+
+		if #v9 == 0 then
+			return v8
+		end
+
+		if #v8 == 0 then
+			return v9
+		end
+
+		local t1 = {}
+		local v11 = table.clone(v8)
+
+		for v12, v13 in v11 do
+			local v14 = p4:readField(s1, v13)
+
+			if v14 then
+				t1[v14] = v12
+			end
+		end
+
+		for _, v16 in v9 do
+			local v17 = p4:readField(s1, v16)
+
+			if v17 and t1[v17] then
+				local v18 = t1[v17]
+
+				v11[v18] = p4:mergeObjects(v11[v18], v16)
+			else
+				table.insert(v11, v16)
+			end
+		end
+
+		return v11
+	end
+
+	return mergeOverlappingArraysPolicy
+end
+
+return makeMergeOverlappingArraysPolicy

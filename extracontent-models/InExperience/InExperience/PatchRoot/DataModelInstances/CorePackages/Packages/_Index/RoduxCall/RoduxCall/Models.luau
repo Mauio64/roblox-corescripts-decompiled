@@ -1,4 +1,4 @@
 return {
-    CallStateModel = require(script.CallStateModel), 
-    SuggestedCalleeModel = require(script.SuggestedCalleeModel)
-};
+	CallStateModel = require(script.CallStateModel),
+	SuggestedCalleeModel = require(script.SuggestedCalleeModel)
+}

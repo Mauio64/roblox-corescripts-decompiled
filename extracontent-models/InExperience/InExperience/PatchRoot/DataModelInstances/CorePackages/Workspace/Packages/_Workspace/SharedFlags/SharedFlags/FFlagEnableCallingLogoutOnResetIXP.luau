@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FFlagEnableCallingLogoutOnResetIXP", true);
+return game:DefineFastFlag("FFlagEnableCallingLogoutOnResetIXP", true)

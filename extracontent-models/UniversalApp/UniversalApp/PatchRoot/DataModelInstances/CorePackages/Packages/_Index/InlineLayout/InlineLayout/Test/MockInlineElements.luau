@@ -1,67 +1,78 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineLayout");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Utils.InlineElementType);
-local v4 = {};
-v4.__index = v4;
-v4.__type = v3;
-v4.new = function(v5, v6) --[[ Line: 12 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    local v7 = setmetatable({}, v4);
-    v7.width = v5;
-    v7.canForceSplit = v6;
-    return v7;
-end;
-v4.getWidth = function(v8) --[[ Line: 19 ]] --[[ Name: getWidth ]]
-    return v8.width;
-end;
-v4.split = function(v9, _, _) --[[ Line: 23 ]] --[[ Name: split ]]
-    -- upvalues: v4 (copy)
-    return v4.new(v9.width, v9.canForceSplit);
-end;
-v4.render = function(v12, v13, v14) --[[ Line: 28 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy)
-    return v2.createElement("TextLabel", {
-        key = tostring(v14), 
-        LayoutOrder = v14, 
-        Size = UDim2.new(0, v12.width, 0, 20), 
-        Text = ("%*"):format(v13)
-    });
-end;
-local v15 = {};
-v15.__index = v15;
-v15.__type = v3;
-v15.new = function(v16, v17) --[[ Line: 42 ]] --[[ Name: new ]]
-    -- upvalues: v15 (copy)
-    local v18 = setmetatable({}, v15);
-    v18.width = v16;
-    v18.canForceSplit = v17;
-    return v18;
-end;
-v15.getWidth = function(v19) --[[ Line: 49 ]] --[[ Name: getWidth ]]
-    return v19.width;
-end;
-v15.split = function(v20, v21, v22) --[[ Line: 53 ]] --[[ Name: split ]]
-    -- upvalues: v15 (copy)
-    local v23 = math.floor(v20.width / 2);
-    local l_v23_0 = v23;
-    local v25 = v20.width - v23;
-    if v22 and v21 < v23 then
-        l_v23_0 = v21;
-        v25 = v20.width - v21;
-    end;
-    return v15.new(l_v23_0, v20.canForceSplit), (v15.new(v25, v20.canForceSplit));
-end;
-v15.render = function(v26, v27, v28) --[[ Line: 70 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy)
-    return v2.createElement("TextLabel", {
-        key = tostring(v28), 
-        LayoutOrder = v28, 
-        Size = UDim2.new(0, v26.width, 0, 20), 
-        Text = ("%*"):format(v27)
-    });
-end;
+local InlineLayout = script:FindFirstAncestor("InlineLayout")
+local InlineLayoutParent = InlineLayout.Parent
+local React = require(InlineLayoutParent.React)
+local InlineElementType = require(InlineLayout.Utils.InlineElementType)
+local t1 = {}
+
+t1.__index = t1
+t1.__type = InlineElementType
+
+function t1.new(n1: number, b1: boolean?) -- line: 12
+	-- upvalues: t1 (copy)
+	local self = setmetatable({}, t1)
+
+	self.width = n1
+	self.canForceSplit = b1
+
+	return self
+end
+function t1.getWidth(p1) -- line: 19
+	return p1.width
+end
+function t1.split(t2: {[any]: any}, _: number, _: boolean?) -- line: 23
+	-- upvalues: t1 (copy)
+	return t1.new(t2.width, t2.canForceSplit)
+end
+function t1.render(t3: {[any]: any}, p2, n3: number) -- line: 28
+	-- upvalues: React (copy)
+	return React.createElement("TextLabel", {
+		key = tostring(n3),
+		LayoutOrder = n3,
+		Size = UDim2.new(0, t3.width, 0, 20),
+		Text = `{ p2 }`
+	})
+end
+
+local t4 = {}
+
+t4.__index = t4
+t4.__type = InlineElementType
+
+function t4.new(n4: number, b3: boolean?) -- line: 42
+	-- upvalues: t4 (copy)
+	local self = setmetatable({}, t4)
+
+	self.width = n4
+	self.canForceSplit = b3
+
+	return self
+end
+function t4.getWidth(p3) -- line: 49
+	return p3.width
+end
+function t4.split(t5: {[any]: any}, n5: number, b4: boolean?) -- line: 53
+	-- upvalues: t4 (copy)
+	local v24 = math.floor(t5.width / 2)
+	local v25 = t5.width - v24
+
+	if b4 and n5 < v24 then
+		v24 = n5
+		v25 = t5.width - n5
+	end
+
+	return t4.new(v24, t5.canForceSplit), (t4.new(v25, t5.canForceSplit))
+end
+function t4.render(t6: {[any]: any}, p4, n6: number) -- line: 70
+	-- upvalues: React (copy)
+	return React.createElement("TextLabel", {
+		key = tostring(n6),
+		LayoutOrder = n6,
+		Size = UDim2.new(0, t6.width, 0, 20),
+		Text = `{ p4 }`
+	})
+end
+
 return {
-    MockInlineElement = v4, 
-    SplittableMockInlineElement = v15
-};
+	MockInlineElement = t1,
+	SplittableMockInlineElement = t4
+}

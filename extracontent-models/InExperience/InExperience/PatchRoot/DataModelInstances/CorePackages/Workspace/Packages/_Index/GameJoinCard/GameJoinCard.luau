@@ -1,13 +1,20 @@
-local v0 = require(script.Analytics.AnalyticsConstants);
+local AnalyticsConstants = require(script.Analytics.AnalyticsConstants)
+
 return {
-    Analytics = {
-        AnalyticsConstants = v0, 
-        Constants = v0, 
-        useGameJoinCardAnalytics = require(script.Analytics.useGameJoinCardAnalytics)
-    }, 
-    DesktopGameJoinCard = require(script.Components.DesktopGameJoinCard.DesktopGameJoinCard), 
-    DesktopGameJoinCardContainer = require(script.Components.DesktopGameJoinCard.DesktopGameJoinCardContainer), 
-    GamepadJoinFocusBehavior = require(script.Components.DesktopGameJoinCard.GamepadJoinFocusBehavior), 
-    MobileGameJoinCard = require(script.Components.MobileGameJoinCard), 
-    ["jest.config"] = script["jest.config"]
-};
+	Analytics = {
+		AnalyticsConstants = AnalyticsConstants,
+		Constants = AnalyticsConstants,
+		useGameJoinCardAnalytics = require(script.Analytics.useGameJoinCardAnalytics)
+	},
+	DesktopGameJoinCard = require(script.Components.DesktopGameJoinCard.DesktopGameJoinCard),
+	DesktopGameJoinCardContainer = require(script.Components.DesktopGameJoinCard.DesktopGameJoinCardContainer),
+	GamepadJoinFocusBehavior = require(script.Components.DesktopGameJoinCard.GamepadJoinFocusBehavior),
+	useGameJoinCardNavigation = require(script.Components.DesktopGameJoinCard.useGameJoinCardNavigation),
+	usePrefetchInGameFriendsMedia = require(script.Hooks.usePrefetchInGameFriendsMedia),
+	MobileGameJoinCard = require(script.Components.MobileGameJoinCard),
+	Telemetry = {
+		GameJoinCardTelemetry = require(script.Telemetry.GameJoinCardTelemetry),
+		GameJoinCardTTI = require(script.Telemetry.GameJoinCardTTI)
+	},
+	["jest.config"] = script["jest.config"]
+}

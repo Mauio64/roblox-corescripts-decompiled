@@ -1,17 +1,8 @@
 return {
-    IsPointInRect = function(v0, v1) --[[ Line: 4 ]] --[[ Name: IsPointInRect ]]
-        local l_Min_0 = v0.Min;
-        local l_Max_0 = v0.Max;
-        local v4 = false;
-        if v1.X >= l_Min_0.X then
-            v4 = false;
-            if v1.Y >= l_Min_0.Y then
-                v4 = false;
-                if v1.X <= l_Max_0.X then
-                    v4 = v1.Y <= l_Max_0.Y;
-                end;
-            end;
-        end;
-        return v4;
-    end
-};
+	IsPointInRect = function(p1, p2) -- line: 4
+		local Min = p1.Min
+		local Max = p1.Max
+
+		return p2.X >= Min.X and (p2.Y >= Min.Y and (p2.X <= Max.X and p2.Y <= Max.Y))
+	end
+}

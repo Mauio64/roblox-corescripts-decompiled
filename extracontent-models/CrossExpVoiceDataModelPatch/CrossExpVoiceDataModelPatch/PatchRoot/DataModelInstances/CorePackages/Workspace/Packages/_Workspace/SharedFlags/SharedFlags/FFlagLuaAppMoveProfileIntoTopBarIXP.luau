@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppMoveProfileIntoTopBarIXP", false);
+return game:DefineFastFlag("LuaAppMoveProfileIntoTopBarIXP", false)

@@ -1,7 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.ReplyingToMessageContext);
-return function() --[[ Line: 7 ]] --[[ Name: useReplyingToMessage ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.useContext(v2);
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local ReplyingToMessageContext = require(script.Parent.ReplyingToMessageContext)
+
+local function useReplyingToMessage() -- line: 7
+	-- upvalues: React (copy), ReplyingToMessageContext (copy)
+	return React.useContext(ReplyingToMessageContext)
+end
+
+return useReplyingToMessage

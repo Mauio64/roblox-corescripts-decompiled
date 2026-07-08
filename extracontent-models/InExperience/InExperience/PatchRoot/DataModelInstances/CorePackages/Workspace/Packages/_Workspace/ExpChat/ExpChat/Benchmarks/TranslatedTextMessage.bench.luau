@@ -1,122 +1,127 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_render_0 = require(l_Parent_0.Dev.ReactTestingLibrary).render;
-local l_benchmark_0 = require(l_Parent_0.Dev.JestBenchmark).benchmark;
-local v6 = require(l_Parent_0.Dev.BenchmarkUtils);
-local l_benchFile_0 = v6.benchFile;
-local l_mountComponentTimes_0 = v6.mountComponentTimes;
-local l_scrollComponentTimes_0 = v6.scrollComponentTimes;
-local v10 = require(l_script_FirstAncestor_0.Config);
-local l_Helpers_0 = l_script_FirstAncestor_0.ChatWindow.Helpers;
-local v12 = require(l_Helpers_0.getMessageSettings);
-local v13 = require(l_Helpers_0.getMessageText);
-local v14 = require(l_script_FirstAncestor_0.ChatWindow.UI.TranslatedTextMessageV2);
-local v15 = {
-    FontFace = v10.ChatWindowFont, 
-    TextColor3 = v10.ChatWindowTextColor3, 
-    TextSize = v10.ChatWindowTextSize, 
-    TextStrokeColor3 = v10.ChatWindowTextStrokeColor, 
-    TextStrokeTransparency = v10.ChatWindowTextStrokeTransparency, 
-    BackgroundColor3 = v10.ChatWindowBackgroundColor3, 
-    BackgroundTransparency = v10.ChatWindowBackgroundTransparency
-};
-local function v22(v16) --[[ Line: 34 ]] --[[ Name: createMessageElement ]]
-    -- upvalues: v12 (copy), v15 (copy), v2 (copy), v14 (copy), v13 (copy)
-    local v17 = {
-        text = "Sample text chat message text!", 
-        translation = "Exemple de texte de message de chat !", 
-        useTranslation = false, 
-        prefixText = "<font color=\"#FFA500\">PrefixText</font>", 
-        chatWindowMessageProperties = nil, 
-        isUserVerified = false, 
-        isSpatialUIEnabled = false, 
-        isTrustedConnection = false, 
-        wasRewritten = false, 
-        isRewriteWindowOpen = false
-    };
-    if v16 then
-        for v18, v19 in v16 do
-            v17[v18] = v19;
-        end;
-    end;
-    local v20 = {
-        current = {
-            text = v17.text, 
-            translation = v17.translation, 
-            useTranslation = v17.useTranslation, 
-            prefixText = v17.prefixText, 
-            userId = 0, 
-            messageId = "0", 
-            chatWindowMessageProperties = v17.chatWindowMessageProperties
-        }
-    };
-    local v21 = v12(v20.current, v15);
-    return v2.createElement(v14, {
-        chatWindowSettings = v15, 
-        textTransparency = v2.createBinding(0), 
-        onTextMessageLabelButtonActivated = function() --[[ Line: 71 ]] --[[ Name: onTextMessageLabelButtonActivated ]]
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local React = require(ExpChatParent.React)
+local Foundation = require(ExpChatParent.Foundation)
+local render = require(ExpChatParent.Dev.ReactTestingLibrary).render
+local benchmark = require(ExpChatParent.Dev.JestBenchmark).benchmark
+local BenchmarkUtils = require(ExpChatParent.Dev.BenchmarkUtils)
+local benchFile = BenchmarkUtils.benchFile
+local mountComponentTimes = BenchmarkUtils.mountComponentTimes
+local scrollComponentTimes = BenchmarkUtils.scrollComponentTimes
+local Config = require(ExpChat.Config)
+local Helpers = ExpChat.ChatWindow.Helpers
+local getMessageSettings = require(Helpers.getMessageSettings)
+local getMessageText = require(Helpers.getMessageText)
+local TranslatedTextMessageV2 = require(ExpChat.ChatWindow.UI.TranslatedTextMessageV2)
+local t1 = {
+	FontFace = Config.ChatWindowFont,
+	TextColor3 = Config.ChatWindowTextColor3,
+	TextSize = Config.ChatWindowTextSize,
+	TextStrokeColor3 = Config.ChatWindowTextStrokeColor,
+	TextStrokeTransparency = Config.ChatWindowTextStrokeTransparency,
+	BackgroundColor3 = Config.ChatWindowBackgroundColor3,
+	BackgroundTransparency = Config.ChatWindowBackgroundTransparency
+}
 
-        end, 
-        isSpatialUIEnabled = v17.isSpatialUIEnabled, 
-        originalBodyText = v2.createBinding(v13(v20.current.useTranslation, v21.translation, v21.text)), 
-        originalPrefixText = v2.createBinding(v21.prefixText or ""), 
-        shouldShowTranslationToggle = v2.createBinding(false), 
-        bodyTextProperties = v2.createBinding(v21.bodyTextProperties), 
-        prefixTextProperties = v2.createBinding(v21.prefixTextProperties), 
-        layoutOrder = v2.createBinding(0), 
-        visible = v2.createBinding(true), 
-        isUserVerified = v2.createBinding(v17.isUserVerified), 
-        message = v20, 
-        isTrustedConnection = v2.createBinding(v17.isTrustedConnection), 
-        wasRewritten = v2.createBinding(v17.wasRewritten), 
-        isRewriteWindowOpen = v2.createBinding(v17.isRewriteWindowOpen), 
-        chatWindowTransparencyBindable = v2.createBinding(0), 
-        arButtonPadding = v2.createBinding(UDim.new(0, 0))
-    });
-end;
-local function _(v23) --[[ Line: 92 ]] --[[ Name: wrapWithProviders ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.createElement(v3.FoundationProvider, {
-        device = "Desktop", 
-        theme = "Dark"
-    }, v23);
-end;
-local v25 = v22();
-local v26 = v2.createElement(v3.FoundationProvider, {
-    device = "Desktop", 
-    theme = "Dark"
-}, v25);
-local v27 = v22({
-    useTranslation = true
-});
-v25 = v2.createElement(v3.FoundationProvider, {
-    device = "Desktop", 
-    theme = "Dark"
-}, v27);
-local v28 = v22({
-    isUserVerified = true
-});
-v27 = v2.createElement(v3.FoundationProvider, {
-    device = "Desktop", 
-    theme = "Dark"
-}, v28);
-l_benchFile_0(script, function() --[[ Line: 103 ]]
-    -- upvalues: l_benchmark_0 (copy), l_render_0 (copy), v26 (copy), v25 (copy), v27 (copy), l_mountComponentTimes_0 (copy), l_scrollComponentTimes_0 (copy)
-    l_benchmark_0("Render TranslatedTextMessage", function() --[[ Line: 104 ]]
-        -- upvalues: l_render_0 (ref), v26 (ref)
-        l_render_0(v26):unmount();
-    end);
-    l_benchmark_0("Render TranslatedTextMessage with translation", function() --[[ Line: 109 ]]
-        -- upvalues: l_render_0 (ref), v25 (ref)
-        l_render_0(v25):unmount();
-    end);
-    l_benchmark_0("Render TranslatedTextMessage (verified user)", function() --[[ Line: 114 ]]
-        -- upvalues: l_render_0 (ref), v27 (ref)
-        l_render_0(v27):unmount();
-    end);
-    l_mountComponentTimes_0(v26, "TranslatedTextMessage", 50);
-    l_mountComponentTimes_0(v26, "TranslatedTextMessage", 100);
-    l_scrollComponentTimes_0(v26, "TranslatedTextMessage", 50);
-end);
+local function createMessageElement(t2: {[any]: any}?) -- line: 34
+	-- upvalues: getMessageSettings (copy), t1 (copy), React (copy), TranslatedTextMessageV2 (copy), getMessageText (copy)
+	local t3 = {
+		text = "Sample text chat message text!",
+		translation = "Exemple de texte de message de chat !",
+		useTranslation = false,
+		prefixText = "<font color=\"#FFA500\">PrefixText</font>",
+		chatWindowMessageProperties = nil,
+		isUserVerified = false,
+		isSpatialUIEnabled = false,
+		isTrustedConnection = false,
+		wasRewritten = false,
+		isRewriteWindowOpen = false
+	}
+
+	if t2 then
+		for v27, v28 in t2 do
+			t3[v27] = v28
+		end
+	end
+
+	local t4 = {
+		current = {
+			userId = 0,
+			messageId = "0",
+			text = t3.text,
+			translation = t3.translation,
+			useTranslation = t3.useTranslation,
+			prefixText = t3.prefixText,
+			chatWindowMessageProperties = t3.chatWindowMessageProperties
+		}
+	}
+	local v30 = getMessageSettings(t4.current, t1)
+
+	return React.createElement(TranslatedTextMessageV2, {
+		chatWindowSettings = t1,
+		textTransparency = React.createBinding(0),
+		onTextMessageLabelButtonActivated = function() -- line: 71
+		end,
+		isSpatialUIEnabled = t3.isSpatialUIEnabled,
+		originalBodyText = React.createBinding(getMessageText(t4.current.useTranslation, v30.translation, v30.text)),
+		originalPrefixText = React.createBinding(v30.prefixText or ""),
+		shouldShowTranslationToggle = React.createBinding(false),
+		bodyTextProperties = React.createBinding(v30.bodyTextProperties),
+		prefixTextProperties = React.createBinding(v30.prefixTextProperties),
+		layoutOrder = React.createBinding(0),
+		visible = React.createBinding(true),
+		isUserVerified = React.createBinding(t3.isUserVerified),
+		message = t4,
+		isTrustedConnection = React.createBinding(t3.isTrustedConnection),
+		wasRewritten = React.createBinding(t3.wasRewritten),
+		isRewriteWindowOpen = React.createBinding(t3.isRewriteWindowOpen),
+		chatWindowTransparencyBindable = React.createBinding(0),
+		arButtonPadding = React.createBinding(UDim.new(0, 0))
+	})
+end
+local function wrapWithProviders(p1) -- line: 92
+	-- upvalues: React (copy), Foundation (copy)
+	return React.createElement(Foundation.FoundationProvider, {
+		device = "Desktop",
+		theme = "Dark"
+	}, p1)
+end
+
+local v19 = createMessageElement()
+local v20 = React.createElement(Foundation.FoundationProvider, {
+	device = "Desktop",
+	theme = "Dark"
+}, v19)
+local v21 = createMessageElement({
+	useTranslation = true
+})
+local v22 = React.createElement(Foundation.FoundationProvider, {
+	device = "Desktop",
+	theme = "Dark"
+}, v21)
+local v23 = createMessageElement({
+	isUserVerified = true
+})
+local v24 = React.createElement(Foundation.FoundationProvider, {
+	device = "Desktop",
+	theme = "Dark"
+}, v23)
+
+benchFile(script, function() -- line: 103
+	-- upvalues: benchmark (copy), render (copy), v20 (copy), v22 (copy), v24 (copy), mountComponentTimes (copy), scrollComponentTimes (copy)
+	benchmark("Render TranslatedTextMessage", function() -- line: 104
+		-- upvalues: render (copy), v20 (copy)
+		render(v20):unmount()
+	end)
+	benchmark("Render TranslatedTextMessage with translation", function() -- line: 109
+		-- upvalues: render (copy), v22 (copy)
+		render(v22):unmount()
+	end)
+	benchmark("Render TranslatedTextMessage (verified user)", function() -- line: 114
+		-- upvalues: render (copy), v24 (copy)
+		render(v24):unmount()
+	end)
+	mountComponentTimes(v20, "TranslatedTextMessage", 50)
+	mountComponentTimes(v20, "TranslatedTextMessage", 100)
+	scrollComponentTimes(v20, "TranslatedTextMessage", 50)
+end)

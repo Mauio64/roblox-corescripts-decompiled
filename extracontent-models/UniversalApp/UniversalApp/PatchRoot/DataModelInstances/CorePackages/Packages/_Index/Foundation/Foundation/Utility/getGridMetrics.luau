@@ -1,48 +1,58 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Enums.Breakpoint);
-local v3 = require(l_Parent_0.Dash);
-local _ = require(l_script_FirstAncestor_0.Providers.Responsive.ResponsiveContext);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local function v12(v6, v7, v8) --[[ Line: 29 ]] --[[ Name: getColumnMetrics ]]
-    local v9 = v6.grid.columns[v7];
-    local l_v9_0 = v9;
-    if v8 then
-        if type(v8) == "table" then
-            v8 = v8[v6.breakpoint.shortNames[v7]] or v9;
-        end;
-        l_v9_0 = math.clamp(v8, 0, v9);
-    end;
-    local v11 = math.max(0, l_v9_0 - 1);
-    return {
-        colCount = l_v9_0, 
-        gutterCount = v11
-    };
-end;
-return function(v13, v14, v15, v16) --[[ Line: 53 ]] --[[ Name: getGridMetrics ]]
-    -- upvalues: v12 (copy), v3 (copy)
-    local v17 = v12(v13, v14);
-    local v18 = if v16 then v12(v13, v14, v16) else v17;
-    local l_grid_0 = v13.grid;
-    local v20 = l_grid_0.gaps[v14];
-    local v21 = l_grid_0.gutters[v14];
-    local v22 = l_grid_0.margins[v14];
-    local v23 = math.max(0, v15 - v22 * 2);
-    local v24 = v17.gutterCount * v21;
-    local v25 = v18.gutterCount * v21;
-    local v26 = math.max(0, (v23 - v24) / v17.colCount);
-    local v27 = if v24 < v23 then math.floor(v26 * v18.colCount + v25) else 0;
-    local v28 = UDim2.fromOffset(v27, 0);
-    return v3.assign({
-        full = v3.assign(v17, {
-            margin = v22
-        }), 
-        margin = v22, 
-        colWidth = v26, 
-        gapHeight = v20, 
-        gutterWidth = v21, 
-        gridWidth = v23, 
-        cellSize = v28, 
-        cellWidth = v27
-    }, v18);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(Foundation.Enums.Breakpoint)
+
+local Dash = require(FoundationParent.Dash)
+
+require(Foundation.Providers.Responsive.ResponsiveContext)
+require(Foundation.Components.Types)
+
+local function getColumnMetrics(p1, p2, p3) -- line: 29
+	local v9 = p1.grid.columns[p2]
+
+	if p3 then
+		if type(p3) == "table" then
+			p3 = p3[p1.breakpoint.shortNames[p2]] or v9
+		end
+
+		v9 = math.clamp(p3, 0, v9)
+	end
+
+	local v10 = math.max(0, v9 - 1)
+
+	return {
+		colCount = v9,
+		gutterCount = v10
+	}
+end
+local function getGridMetrics(p4, p5, n1: number, p6) -- line: 53
+	-- upvalues: getColumnMetrics (copy), Dash (copy)
+	local v15 = getColumnMetrics(p4, p5)
+	local v16 = if not p6 then v15 else getColumnMetrics(p4, p5, p6)
+	local grid = p4.grid
+	local v18 = grid.gaps[p5]
+	local v19 = grid.gutters[p5]
+	local v20 = grid.margins[p5]
+	local v21 = math.max(0, n1 - v20 * 2)
+	local v22 = v15.gutterCount * v19
+	local v23 = v16.gutterCount * v19
+	local v24 = math.max(0, (v21 - v22) / v15.colCount)
+	local v25 = not (v22 < v21) and 0 or math.floor(v24 * v16.colCount + v23)
+	local uDim2 = UDim2.fromOffset(v25, 0)
+
+	return Dash.assign({
+		full = Dash.assign(v15, {
+			margin = v20
+		}),
+		margin = v20,
+		colWidth = v24,
+		gapHeight = v18,
+		gutterWidth = v19,
+		gridWidth = v21,
+		cellSize = uDim2,
+		cellWidth = v25
+	}, v16)
+end
+
+return getGridMetrics

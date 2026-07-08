@@ -1,5 +1,5 @@
 return {
-    UsernameMatch = "UsernameMatch", 
-    Length = "Length", 
-    Simple = "Simple"
-};
+	UsernameMatch = "UsernameMatch",
+	Length = "Length",
+	Simple = "Simple"
+}

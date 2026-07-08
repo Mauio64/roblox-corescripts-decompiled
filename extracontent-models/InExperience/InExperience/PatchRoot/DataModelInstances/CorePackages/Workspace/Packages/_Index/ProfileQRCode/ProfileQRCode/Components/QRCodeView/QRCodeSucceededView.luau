@@ -1,144 +1,147 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.QRCodeDisplay);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.UIBlox);
-local v5 = require(l_Parent_0.UserLib);
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v4.Core.ImageSet.ImageSetLabel;
-local l_LightTheme_0 = v4.App.Style.Themes.LightTheme;
-local l_StyledTextLabel_0 = v4.App.Text.StyledTextLabel;
-local l_OpenTypeSupport_0 = v4.Utility.OpenTypeSupport;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v12 = require(l_script_FirstAncestor_0.Utils.useLocalUserInfo);
-local l_useStyle_0 = v4.Core.Style.useStyle;
-local l_DisplayQRCode_0 = v2.DisplayQRCode;
-local l_getStandardSizeAvatarHeadShotRbxthumb_0 = v5.Utils.getStandardSizeAvatarHeadShotRbxthumb;
-local l_GetFFlagLuaAppEnableOpenTypeSupport_0 = require(l_Parent_0.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport;
-local v17 = l_Images_0["component_assets/dropshadow_56_8"];
-return function(v18) --[[ Line: 38 ]]
-    -- upvalues: l_useLocalUserId_0 (copy), v12 (copy), l_useStyle_0 (copy), l_getStandardSizeAvatarHeadShotRbxthumb_0 (copy), v3 (copy), l_LightTheme_0 (copy), l_DisplayQRCode_0 (copy), v2 (copy), l_ImageSetLabel_0 (copy), v17 (copy), l_StyledTextLabel_0 (copy), l_GetFFlagLuaAppEnableOpenTypeSupport_0 (copy), l_OpenTypeSupport_0 (copy)
-    local v19 = l_useLocalUserId_0();
-    local v20 = v12(v19);
-    local v21 = l_useStyle_0();
-    local v22 = nil;
-    if v19 then
-        v22 = l_getStandardSizeAvatarHeadShotRbxthumb_0(v19);
-    end;
-    return v3.createElement("Frame", {
-        BorderSizePixel = 0, 
-        BackgroundTransparency = l_LightTheme_0.BackgroundUIDefault.Transparency, 
-        BackgroundColor3 = l_LightTheme_0.BackgroundUIDefault.Color, 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, {
-        Layout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        Padding = v3.createElement("UIPadding", {
-            PaddingTop = UDim.new(0, if v18.isSmallScreen then v18.padding / 2 else v18.padding), 
-            PaddingRight = UDim.new(0, v18.padding), 
-            PaddingBottom = UDim.new(0, if v18.isSmallScreen then v18.padding / 2 else v18.padding), 
-            PaddingLeft = UDim.new(0, v18.padding)
-        }), 
-        QRCodeWrapper = v3.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, v18.qrCodeLength, 0, v18.qrCodeLength), 
-            LayoutOrder = 1
-        }, {
-            QRCode = v3.createElement(l_DisplayQRCode_0, {
-                toEncode = v18.url, 
-                ecLevel = v2.ECLevels.EC_LEVEL_4, 
-                sideLength = v18.qrCodeLength, 
-                pixelColor = l_LightTheme_0.UIEmphasis.Color, 
-                qrCodeRotation = 15
-            }), 
-            PlayerAvatar = v3.createElement("Frame", {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundColor3 = l_LightTheme_0.BackgroundUIDefault.Color, 
-                BackgroundTransparency = l_LightTheme_0.BackgroundUIDefault.Transparency, 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                Rotation = 15, 
-                Size = UDim2.fromOffset(44, 44), 
-                ZIndex = 3
-            }, {
-                Canvas = v3.createElement("CanvasGroup", {
-                    BackgroundColor3 = l_LightTheme_0.BackgroundUIDefault.Color, 
-                    BackgroundTransparency = l_LightTheme_0.BackgroundUIDefault.Transparency, 
-                    BorderSizePixel = 0, 
-                    ClipsDescendants = true, 
-                    Size = UDim2.fromScale(1, 1)
-                }, {
-                    Avatar = v3.createElement("ImageLabel", {
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundColor3 = l_LightTheme_0.BackgroundUIDefault.Color, 
-                        BackgroundTransparency = l_LightTheme_0.BackgroundUIDefault.Transparency, 
-                        BorderSizePixel = 0, 
-                        Image = v22, 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        Rotation = -15, 
-                        Size = UDim2.fromOffset(60, 60), 
-                        ZIndex = 2
-                    })
-                }), 
-                UIStroke = v3.createElement("UIStroke", {
-                    Color = l_LightTheme_0.BackgroundUIDefault.Color, 
-                    Thickness = 2
-                })
-            }), 
-            BigShadow = v3.createElement(l_ImageSetLabel_0, {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Position = UDim2.new(0.5, 0, 0.5, 0), 
-                Size = UDim2.new(0, 70, 0, 70), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                ZIndex = 2, 
-                Image = v17, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(28, 28, 29, 29), 
-                ImageColor3 = v21.Theme.DropShadow.Color, 
-                ImageTransparency = v21.Theme.DropShadow.Transparency
-            })
-        }), 
-        Spacer1 = v3.createElement("Frame", {
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 0, 0, 10), 
-            LayoutOrder = 2
-        }), 
-        DisplayName = v3.createElement(l_StyledTextLabel_0, {
-            layoutOrder = 3, 
-            text = v20.displayName, 
-            fontStyle = v21.Font.SubHeader1, 
-            lineHeight = 1, 
-            colorStyle = l_LightTheme_0.TextEmphasis, 
-            automaticSize = Enum.AutomaticSize.Y, 
-            textTruncate = Enum.TextTruncate.AtEnd, 
-            textXAlignment = Enum.TextXAlignment.Center, 
-            textYAlignment = Enum.TextYAlignment.Center, 
-            fluidSizing = false, 
-            richText = false, 
-            size = UDim2.new(1, 0, 0, 0)
-        }), 
-        Username = v3.createElement(l_StyledTextLabel_0, {
-            size = UDim2.new(1, 0, 0, 0), 
-            layoutOrder = 4, 
-            text = "@" .. v20.username, 
-            fontStyle = v21.Font.CaptionBody, 
-            lineHeight = 1, 
-            automaticSize = Enum.AutomaticSize.Y, 
-            colorStyle = l_LightTheme_0.TextEmphasis, 
-            textTruncate = Enum.TextTruncate.AtEnd, 
-            textXAlignment = Enum.TextXAlignment.Center, 
-            textYAlignment = Enum.TextYAlignment.Center, 
-            fluidSizing = false, 
-            richText = false, 
-            openTypeFeatures = if l_GetFFlagLuaAppEnableOpenTypeSupport_0() then l_OpenTypeSupport_0:getUserNameStylisticAlternative() else nil
-        }), 
-        UICorner = v3.createElement("UICorner", {
-            CornerRadius = UDim.new(0.05, 0)
-        })
-    });
-end;
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local QRCodeDisplay = require(ProfileQRCodeParent.QRCodeDisplay)
+local React = require(ProfileQRCodeParent.React)
+local UIBlox = require(ProfileQRCodeParent.UIBlox)
+local UserLib = require(ProfileQRCodeParent.UserLib)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local LightTheme = UIBlox.App.Style.Themes.LightTheme
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local OpenTypeSupport = UIBlox.Utility.OpenTypeSupport
+local useLocalUserId = require(ProfileQRCodeParent.RobloxAppHooks).useLocalUserId
+local useLocalUserInfo = require(ProfileQRCode.Utils.useLocalUserInfo)
+local useStyle = UIBlox.Core.Style.useStyle
+local DisplayQRCode = QRCodeDisplay.DisplayQRCode
+local getStandardSizeAvatarHeadShotRbxthumb = UserLib.Utils.getStandardSizeAvatarHeadShotRbxthumb
+local GetFFlagLuaAppEnableOpenTypeSupport = require(ProfileQRCodeParent.SharedFlags).GetFFlagLuaAppEnableOpenTypeSupport
+local v18 = Images["component_assets/dropshadow_56_8"]
+
+return function(t1: {[any]: any}) -- line: 38
+	-- upvalues: useLocalUserId (copy), useLocalUserInfo (copy), useStyle (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), React (copy), LightTheme (copy), DisplayQRCode (copy), QRCodeDisplay (copy), ImageSetLabel (copy), v18 (copy), StyledTextLabel (copy), GetFFlagLuaAppEnableOpenTypeSupport (copy), OpenTypeSupport (copy)
+	local v20 = useLocalUserId()
+	local v21 = useLocalUserInfo(v20)
+	local v22 = useStyle()
+	local v23 = nil
+
+	if v20 then
+		v23 = getStandardSizeAvatarHeadShotRbxthumb(v20)
+	end
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = LightTheme.BackgroundUIDefault.Transparency,
+		BackgroundColor3 = LightTheme.BackgroundUIDefault.Color,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		Padding = React.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, if not t1.isSmallScreen then t1.padding else t1.padding / 2),
+			PaddingRight = UDim.new(0, t1.padding),
+			PaddingBottom = UDim.new(0, if not t1.isSmallScreen then t1.padding else t1.padding / 2),
+			PaddingLeft = UDim.new(0, t1.padding)
+		}),
+		QRCodeWrapper = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(0, t1.qrCodeLength, 0, t1.qrCodeLength)
+		}, {
+			QRCode = React.createElement(DisplayQRCode, {
+				qrCodeRotation = 15,
+				toEncode = t1.url,
+				ecLevel = QRCodeDisplay.ECLevels.EC_LEVEL_4,
+				sideLength = t1.qrCodeLength,
+				pixelColor = LightTheme.UIEmphasis.Color
+			}),
+			PlayerAvatar = React.createElement("Frame", {
+				Rotation = 15,
+				ZIndex = 3,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundColor3 = LightTheme.BackgroundUIDefault.Color,
+				BackgroundTransparency = LightTheme.BackgroundUIDefault.Transparency,
+				Position = UDim2.fromScale(0.5, 0.5),
+				Size = UDim2.fromOffset(44, 44)
+			}, {
+				Canvas = React.createElement("CanvasGroup", {
+					BorderSizePixel = 0,
+					ClipsDescendants = true,
+					BackgroundColor3 = LightTheme.BackgroundUIDefault.Color,
+					BackgroundTransparency = LightTheme.BackgroundUIDefault.Transparency,
+					Size = UDim2.fromScale(1, 1)
+				}, {
+					Avatar = React.createElement("ImageLabel", {
+						BorderSizePixel = 0,
+						Rotation = -15,
+						ZIndex = 2,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = LightTheme.BackgroundUIDefault.Color,
+						BackgroundTransparency = LightTheme.BackgroundUIDefault.Transparency,
+						Image = v23,
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = UDim2.fromOffset(60, 60)
+					})
+				}),
+				UIStroke = React.createElement("UIStroke", {
+					Thickness = 2,
+					Color = LightTheme.BackgroundUIDefault.Color
+				})
+			}),
+			BigShadow = React.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ZIndex = 2,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				Size = UDim2.new(0, 70, 0, 70),
+				Image = v18,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(28, 28, 29, 29),
+				ImageColor3 = v22.Theme.DropShadow.Color,
+				ImageTransparency = v22.Theme.DropShadow.Transparency
+			})
+		}),
+		Spacer1 = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(0, 0, 0, 10)
+		}),
+		DisplayName = React.createElement(StyledTextLabel, {
+			layoutOrder = 3,
+			lineHeight = 1,
+			fluidSizing = false,
+			richText = false,
+			text = v21.displayName,
+			fontStyle = v22.Font.SubHeader1,
+			colorStyle = LightTheme.TextEmphasis,
+			automaticSize = Enum.AutomaticSize.Y,
+			textTruncate = Enum.TextTruncate.AtEnd,
+			textXAlignment = Enum.TextXAlignment.Center,
+			textYAlignment = Enum.TextYAlignment.Center,
+			size = UDim2.new(1, 0, 0, 0)
+		}),
+		Username = React.createElement(StyledTextLabel, {
+			layoutOrder = 4,
+			lineHeight = 1,
+			fluidSizing = false,
+			richText = false,
+			size = UDim2.new(1, 0, 0, 0),
+			text = "@" .. v21.username,
+			fontStyle = v22.Font.CaptionBody,
+			automaticSize = Enum.AutomaticSize.Y,
+			colorStyle = LightTheme.TextEmphasis,
+			textTruncate = Enum.TextTruncate.AtEnd,
+			textXAlignment = Enum.TextXAlignment.Center,
+			textYAlignment = Enum.TextYAlignment.Center,
+			openTypeFeatures = if not GetFFlagLuaAppEnableOpenTypeSupport() then nil else OpenTypeSupport:getUserNameStylisticAlternative()
+		}),
+		UICorner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0.05, 0)
+		})
+	})
+end

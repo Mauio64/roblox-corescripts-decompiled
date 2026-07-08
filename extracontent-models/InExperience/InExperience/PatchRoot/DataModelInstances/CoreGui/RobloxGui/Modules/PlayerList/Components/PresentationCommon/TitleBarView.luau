@@ -1,137 +1,156 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v3 = require(l_CorePackages_0.Packages.React);
-local v4 = require(l_CorePackages_0.Packages.SignalsReact);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local v6 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local v8 = require(l_RobloxGui_0.Modules.GameTranslator);
-local v9 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_useLayoutValues_0 = v6.Common.useLayoutValues;
-local l_useStyle_0 = v5.Core.Style.useStyle;
-local l_FFlagPlayerListFixLeaderstatsStacking_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking;
-local l_FFlagEnableMobilePlayerListOnConsole_0 = v6.Flags.FFlagEnableMobilePlayerListOnConsole;
-local v14 = {
-    showDivider = false, 
-    showBackground = false, 
-    backgroundTransparency = 1, 
-    useCustomTextColor = false, 
-    customTextColor = Color3.fromRGB(255, 255, 255), 
-    headerPaddingLeft = 15
-};
-return v3.memo(function(v15) --[[ Line: 56 ]] --[[ Name: TitleBarView ]]
-    -- upvalues: v14 (copy), l_useLayoutValues_0 (copy), l_useStyle_0 (copy), v3 (copy), v9 (copy), l_FFlagEnableMobilePlayerListOnConsole_0 (copy), l_FFlagPlayerListFixLeaderstatsStacking_0 (copy), v4 (copy), v8 (copy), l_CoreGui_0 (copy), l_CorePackages_0 (copy)
-    local v16 = {};
-    for v17, v18 in pairs(v14) do
-        v16[v17] = v15[v17] ~= nil and v15[v17] or v18;
-    end;
-    for v19, v20 in pairs(v15) do
-        v16[v19] = v20;
-    end;
-    v15 = v16;
-    local v21 = l_useLayoutValues_0();
-    local v22 = l_useStyle_0();
-    local v23 = {
-        layout = v3.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        })
-    };
-    local l_entrySizeX_0 = v15.entrySizeX;
-    if v15.isSmallTouchDevice then
-        l_entrySizeX_0 = v21.PlayerNameSizeXMobile;
-    end;
-    local v25 = v15.useCustomTextColor and v15.customTextColor or v22.Theme.TextMuted.Color;
-    local v26 = v15.useCustomTextColor and 0 or v22.Theme.TextMuted.Transparency;
-    v23.playersHeader = v3.createElement("TextLabel", {
-        LayoutOrder = 1, 
-        Size = UDim2.new(0, l_entrySizeX_0, 1, 0), 
-        Text = v9:FormatByKey("InGame.PlayerList.Players"), 
-        BackgroundTransparency = 1, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        TextYAlignment = Enum.TextYAlignment.Center, 
-        Font = v22.Font.Footer.Font, 
-        TextSize = if l_FFlagEnableMobilePlayerListOnConsole_0 then v21.TitleBarTextSize else v22.Font.BaseSize * v22.Font.Footer.RelativeSize, 
-        TextTransparency = v26, 
-        TextColor3 = v25
-    }, {
-        Padding = v3.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v15.headerPaddingLeft)
-        })
-    });
-    local l_MaxLeaderstats_0 = v21.MaxLeaderstats;
-    if l_FFlagPlayerListFixLeaderstatsStacking_0 then
-        for v28, v29 in (v4.useSignalState(v15.gameStats.getAllData)) do
-            if l_MaxLeaderstats_0 >= v29.order(false) then
-                local v30 = v8:TranslateGameText(l_CoreGui_0, v28);
-                v23["stat_" .. v28] = v3.createElement("TextLabel", {
-                    LayoutOrder = v29.order(false) + 1, 
-                    Size = UDim2.new(0, v21.StatEntrySizeX, 1, 0), 
-                    Text = v30, 
-                    BackgroundTransparency = 1, 
-                    TextXAlignment = Enum.TextXAlignment.Center, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    Font = v22.Font.Footer.Font, 
-                    TextSize = if l_FFlagEnableMobilePlayerListOnConsole_0 then v21.TitleBarTextSize else v22.Font.BaseSize * v22.Font.Footer.RelativeSize, 
-                    TextTransparency = v26, 
-                    TextColor3 = v25, 
-                    TextTruncate = Enum.TextTruncate.AtEnd
-                });
-            end;
-        end;
-    elseif v15.gameStatsCount and v15.gameStatsCount > 0 then
-        v15.gameStats.iterateData(function(v31, v32) --[[ Line: 138 ]]
-            -- upvalues: l_MaxLeaderstats_0 (copy), v8 (ref), l_CoreGui_0 (ref), v23 (copy), v3 (ref), v21 (copy), v22 (copy), l_FFlagEnableMobilePlayerListOnConsole_0 (ref), v26 (copy), v25 (copy)
-            if v32.order(false) > l_MaxLeaderstats_0 then
-                return;
-            else
-                local v33 = v8:TranslateGameText(l_CoreGui_0, v31);
-                v23["stat_" .. v31] = v3.createElement("TextLabel", {
-                    LayoutOrder = v32.order(false) + 1, 
-                    Size = UDim2.new(0, v21.StatEntrySizeX, 1, 0), 
-                    Text = v33, 
-                    BackgroundTransparency = 1, 
-                    TextXAlignment = Enum.TextXAlignment.Center, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    Font = v22.Font.Footer.Font, 
-                    TextSize = if l_FFlagEnableMobilePlayerListOnConsole_0 then v21.TitleBarTextSize else v22.Font.BaseSize * v22.Font.Footer.RelativeSize, 
-                    TextTransparency = v26, 
-                    TextColor3 = v25, 
-                    TextTruncate = Enum.TextTruncate.AtEnd
-                });
-                return;
-            end;
-        end, false);
-    end;
-    local v34 = Color3.fromRGB(0, 0, 0);
-    if v15.showBackground then
-        v34 = if require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled() then v22.Theme.BackgroundUIContrast.Color else v22.Theme.BackgroundContrast.Color;
-    end;
-    local v35 = {};
-    if v15.showDivider then
-        v35.Divider = v3.createElement("Frame", {
-            Visible = v15.contentsVisible, 
-            Size = UDim2.new(1, 0, 0, 1), 
-            Position = UDim2.new(0, 0, 1, 0), 
-            AnchorPoint = Vector2.new(0, 1), 
-            BackgroundTransparency = v22.Theme.Divider.Transparency, 
-            BackgroundColor3 = v22.Theme.Divider.Color, 
-            BorderSizePixel = 0
-        });
-    end;
-    v35.ChildrenFrame = v3.createElement("Frame", {
-        Visible = v15.contentsVisible, 
-        BackgroundTransparency = 1, 
-        Position = v15.showBackground and UDim2.new(0, 0, 0, -2) or UDim2.new(0, 0, 0, 0), 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, v23);
-    return v3.createElement("Frame", {
-        Size = v15.size, 
-        LayoutOrder = v15.layoutOrder, 
-        BackgroundTransparency = v15.backgroundTransparency, 
-        BackgroundColor3 = v34, 
-        BorderSizePixel = 0
-    }, v35);
-end);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local React = require(CorePackages.Packages.React)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local GameTranslator = require(RobloxGui.Modules.GameTranslator)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local useLayoutValues = PlayerList.Common.useLayoutValues
+local useStyle = UIBlox.Core.Style.useStyle
+local FFlagPlayerListFixLeaderstatsStacking = require(CorePackages.Workspace.Packages.SharedFlags).FFlagPlayerListFixLeaderstatsStacking
+local FFlagEnableMobilePlayerListOnConsole = PlayerList.Flags.FFlagEnableMobilePlayerListOnConsole
+local t1 = {
+	showDivider = false,
+	showBackground = false,
+	backgroundTransparency = 1,
+	useCustomTextColor = false,
+	headerPaddingLeft = 15,
+	customTextColor = Color3.fromRGB(255, 255, 255)
+}
+
+local function TitleBarView(t2: {[any]: any}) -- line: 56
+	-- upvalues: t1 (copy), useLayoutValues (copy), useStyle (copy), React (copy), RobloxTranslator (copy), FFlagEnableMobilePlayerListOnConsole (copy), FFlagPlayerListFixLeaderstatsStacking (copy), SignalsReact (copy), GameTranslator (copy), CoreGui (copy), CorePackages (copy)
+	local t3 = {}
+
+	for k, v in pairs(t1) do
+		t3[k] = t2[k] ~= nil and t2[k] or v
+	end
+
+	for k, v in pairs(t2) do
+		t3[k] = v
+	end
+
+	local v22 = useLayoutValues()
+	local v23 = useStyle()
+	local t4 = {
+		layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		})
+	}
+	local entrySizeX = t3.entrySizeX
+
+	if t3.isSmallTouchDevice then
+		entrySizeX = v22.PlayerNameSizeXMobile
+	end
+
+	local v26 = t3.useCustomTextColor and t3.customTextColor or v23.Theme.TextMuted.Color
+	local v27 = if not t3.useCustomTextColor then v23.Theme.TextMuted.Transparency else 0
+
+	t4.playersHeader = React.createElement("TextLabel", {
+		LayoutOrder = 1,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, entrySizeX, 1, 0),
+		Text = RobloxTranslator:FormatByKey("InGame.PlayerList.Players"),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = Enum.TextYAlignment.Center,
+		Font = v23.Font.Footer.Font,
+		TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
+		TextTransparency = v27,
+		TextColor3 = v26
+	}, {
+		Padding = React.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, t3.headerPaddingLeft)
+		})
+	})
+
+	local MaxLeaderstats = v22.MaxLeaderstats
+
+	if FFlagPlayerListFixLeaderstatsStacking then
+		for v29, v30 in (SignalsReact.useSignalState(t3.gameStats.getAllData)) do
+			if not (MaxLeaderstats < v30.order(false)) then
+				local v31 = GameTranslator:TranslateGameText(CoreGui, v29)
+
+				t4["stat_" .. v29] = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					LayoutOrder = v30.order(false) + 1,
+					Size = UDim2.new(0, v22.StatEntrySizeX, 1, 0),
+					Text = v31,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					Font = v23.Font.Footer.Font,
+					TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
+					TextTransparency = v27,
+					TextColor3 = v26,
+					TextTruncate = Enum.TextTruncate.AtEnd
+				})
+			end
+		end
+	elseif t3.gameStatsCount and t3.gameStatsCount > 0 then
+		t3.gameStats.iterateData(function(p1, p2) -- line: 138
+			-- upvalues: MaxLeaderstats (copy), GameTranslator (copy), CoreGui (copy), t4 (copy), React (copy), v22 (copy), v23 (copy), FFlagEnableMobilePlayerListOnConsole (copy), v27 (copy), v26 (copy)
+			if p2.order(false) > MaxLeaderstats then
+				return
+			end
+
+			local v36 = GameTranslator:TranslateGameText(CoreGui, p1)
+
+			t4["stat_" .. p1] = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = p2.order(false) + 1,
+				Size = UDim2.new(0, v22.StatEntrySizeX, 1, 0),
+				Text = v36,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Font = v23.Font.Footer.Font,
+				TextSize = if not FFlagEnableMobilePlayerListOnConsole then v23.Font.BaseSize * v23.Font.Footer.RelativeSize else v22.TitleBarTextSize,
+				TextTransparency = v27,
+				TextColor3 = v26,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			})
+		end, false)
+	end
+
+	local color3 = Color3.fromRGB(0, 0, 0)
+
+	if t3.showBackground then
+		color3 = if not require(CorePackages.Workspace.Packages.Chrome).Enabled() then v23.Theme.BackgroundContrast.Color else v23.Theme.BackgroundUIContrast.Color
+	end
+
+	local t5 = {}
+
+	if t3.showDivider then
+		t5.Divider = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			Visible = t3.contentsVisible,
+			Size = UDim2.new(1, 0, 0, 1),
+			Position = UDim2.new(0, 0, 1, 0),
+			AnchorPoint = Vector2.new(0, 1),
+			BackgroundTransparency = v23.Theme.Divider.Transparency,
+			BackgroundColor3 = v23.Theme.Divider.Color
+		})
+	end
+
+	t5.ChildrenFrame = React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Visible = t3.contentsVisible,
+		Position = t3.showBackground and UDim2.new(0, 0, 0, -2) or UDim2.new(0, 0, 0, 0),
+		Size = UDim2.new(1, 0, 1, 0)
+	}, t4)
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = t3.size,
+		LayoutOrder = t3.layoutOrder,
+		BackgroundTransparency = t3.backgroundTransparency,
+		BackgroundColor3 = color3
+	}, t5)
+end
+
+return React.memo(TitleBarView)

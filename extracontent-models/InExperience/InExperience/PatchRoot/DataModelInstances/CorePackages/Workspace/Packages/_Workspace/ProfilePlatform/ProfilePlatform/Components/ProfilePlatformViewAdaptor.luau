@@ -1,1 +1,1 @@
-return require(script.ProfilePlatformViewAdaptor);
+return require(script.ProfilePlatformViewAdaptor)

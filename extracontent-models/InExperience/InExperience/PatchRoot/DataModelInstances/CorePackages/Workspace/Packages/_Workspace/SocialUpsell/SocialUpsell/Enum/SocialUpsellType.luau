@@ -1,5 +1,5 @@
 return {
-    FacialAgeEstimation = "FacialAgeEstimation", 
-    ConversationFacialAgeEstimation = "ConversationFacialAgeEstimation", 
-    Unknown = "Unknown"
-};
+	FacialAgeEstimation = "FacialAgeEstimation",
+	ConversationFacialAgeEstimation = "ConversationFacialAgeEstimation",
+	Unknown = "Unknown"
+}

@@ -1,72 +1,85 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxSquads");
-local v1 = require(l_script_FirstAncestor_0.Logger);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.Rodux);
-local l_CurrentExperienceInviteUpdated_0 = require(l_script_FirstAncestor_0.Actions).CurrentExperienceInviteUpdated;
-local l_CurrentExperienceInviteDismissed_0 = require(l_script_FirstAncestor_0.Actions).CurrentExperienceInviteDismissed;
-local l_CurrentExperienceInviteReceived_0 = require(l_script_FirstAncestor_0.Actions).CurrentExperienceInviteReceived;
-local l_ExperienceInviteModel_0 = require(l_script_FirstAncestor_0.Models).ExperienceInviteModel;
-local _ = require(script.Parent.Parent.RoduxSquadsTypes);
-return function(v10) --[[ Line: 17 ]]
-    -- upvalues: v3 (copy), v4 (copy), v1 (copy), l_ExperienceInviteModel_0 (copy), l_CurrentExperienceInviteUpdated_0 (copy), l_CurrentExperienceInviteReceived_0 (copy), l_CurrentExperienceInviteDismissed_0 (copy)
-    local l_NetworkingSquads_0 = v10.NetworkingSquads;
-    local function v14(v12, v13) --[[ Line: 20 ]]
-        -- upvalues: v3 (ref)
-        if v12 and v12.notification.experienceInviteId == v13.experienceInviteId and (v12.model == nil or v12.model.versionId < v13.versionId) then
-            return v3.Dictionary.join(v12, {
-                model = v13
-            });
-        else
-            return v12;
-        end;
-    end;
-    return v4.createReducer(nil, {
-        [l_NetworkingSquads_0.CreateExperienceInvite.Succeeded.name] = function(v15, v16) --[[ Line: 35 ]]
-            -- upvalues: v1 (ref)
-            local l_responseBody_0 = v16.responseBody;
-            v1:debug("Create experience invite success. ExperienceInviteId: {}", l_responseBody_0.experienceInviteId);
-            return v15;
-        end, 
-        [l_NetworkingSquads_0.GetExperienceInvite.Succeeded.name] = function(v18, v19) --[[ Line: 48 ]]
-            -- upvalues: v14 (copy), l_ExperienceInviteModel_0 (ref)
-            local l_responseBody_1 = v19.responseBody;
-            assert(l_responseBody_1, "Experience invite must exist.");
-            return v14(v18, l_ExperienceInviteModel_0.format(l_responseBody_1));
-        end, 
-        [l_NetworkingSquads_0.VoteForExperienceInvite.Succeeded.name] = function(v21, v22) --[[ Line: 58 ]]
-            -- upvalues: v1 (ref), v14 (copy), l_ExperienceInviteModel_0 (ref)
-            local l_responseBody_2 = v22.responseBody;
-            v1:debug("Vote experience invite success. ExperienceInviteId: {}", l_responseBody_2.experienceInviteId);
-            return v14(v21, l_ExperienceInviteModel_0.format(l_responseBody_2));
-        end, 
-        [l_CurrentExperienceInviteUpdated_0.name] = function(v24, v25) --[[ Line: 67 ]]
-            -- upvalues: v14 (copy), l_ExperienceInviteModel_0 (ref)
-            local l_experienceInvite_0 = v25.payload.experienceInvite;
-            assert(l_experienceInvite_0, "Experience invite must exist.");
-            return v14(v24, l_ExperienceInviteModel_0.format(l_experienceInvite_0));
-        end, 
-        [l_CurrentExperienceInviteReceived_0.name] = function(v27, v28) --[[ Line: 76 ]]
-            local l_experienceInviteId_0 = v28.payload.experienceInviteId;
-            if v27 == nil or v27.notification.experienceInviteId ~= l_experienceInviteId_0 then
-                return {
-                    notification = {
-                        experienceInviteId = l_experienceInviteId_0, 
-                        membershipEntityId = v28.payload.membershipEntityId, 
-                        notificationId = v28.payload.notificationId, 
-                        isInviter = v28.payload.isInviter
-                    }
-                };
-            else
-                return v27;
-            end;
-        end, 
-        [l_CurrentExperienceInviteDismissed_0.name] = function(v30, v31) --[[ Line: 100 ]]
-            if v30 and v30.notification.notificationId == v31.payload.notificationId then
-                return nil;
-            else
-                return v30;
-            end;
-        end
-    });
-end;
+local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
+local Logger = require(RoduxSquads.Logger)
+local RoduxSquadsParent = RoduxSquads.Parent
+local Cryo = require(RoduxSquadsParent.Cryo)
+local Rodux = require(RoduxSquadsParent.Rodux)
+local CurrentExperienceInviteUpdated = require(RoduxSquads.Actions).CurrentExperienceInviteUpdated
+local CurrentExperienceInviteDismissed = require(RoduxSquads.Actions).CurrentExperienceInviteDismissed
+local CurrentExperienceInviteReceived = require(RoduxSquads.Actions).CurrentExperienceInviteReceived
+local ExperienceInviteModel = require(RoduxSquads.Models).ExperienceInviteModel
+
+require(script.Parent.Parent.RoduxSquadsTypes)
+
+return function(p1) -- line: 17
+	-- upvalues: Cryo (copy), Rodux (copy), Logger (copy), ExperienceInviteModel (copy), CurrentExperienceInviteUpdated (copy), CurrentExperienceInviteReceived (copy), CurrentExperienceInviteDismissed (copy)
+	local NetworkingSquads = p1.NetworkingSquads
+
+	local function v12(p2, p3) -- line: 20
+		-- upvalues: Cryo (copy)
+		if p2 and p2.notification.experienceInviteId == p3.experienceInviteId and (p2.model == nil or p2.model.versionId < p3.versionId) then
+			return Cryo.Dictionary.join(p2, {
+				model = p3
+			})
+		end
+
+		return p2
+	end
+
+	return Rodux.createReducer(nil, {
+		[NetworkingSquads.CreateExperienceInvite.Succeeded.name] = function(p4, p5) -- line: 35
+			-- upvalues: Logger (copy)
+			local responseBody = p5.responseBody
+
+			Logger:debug("Create experience invite success. ExperienceInviteId: {}", responseBody.experienceInviteId)
+
+			return p4
+		end,
+		[NetworkingSquads.GetExperienceInvite.Succeeded.name] = function(p6, p7) -- line: 48
+			-- upvalues: v12 (copy), ExperienceInviteModel (copy)
+			local responseBody = p7.responseBody
+
+			assert(responseBody, "Experience invite must exist.")
+
+			return v12(p6, ExperienceInviteModel.format(responseBody))
+		end,
+		[NetworkingSquads.VoteForExperienceInvite.Succeeded.name] = function(p8, p9) -- line: 58
+			-- upvalues: Logger (copy), v12 (copy), ExperienceInviteModel (copy)
+			local responseBody = p9.responseBody
+
+			Logger:debug("Vote experience invite success. ExperienceInviteId: {}", responseBody.experienceInviteId)
+
+			return v12(p8, ExperienceInviteModel.format(responseBody))
+		end,
+		[CurrentExperienceInviteUpdated.name] = function(p10, p11) -- line: 67
+			-- upvalues: v12 (copy), ExperienceInviteModel (copy)
+			local experienceInvite = p11.payload.experienceInvite
+
+			assert(experienceInvite, "Experience invite must exist.")
+
+			return v12(p10, ExperienceInviteModel.format(experienceInvite))
+		end,
+		[CurrentExperienceInviteReceived.name] = function(p12, p13) -- line: 76
+			local experienceInviteId = p13.payload.experienceInviteId
+
+			if p12 == nil or experienceInviteId ~= p12.notification.experienceInviteId then
+				return {
+					notification = {
+						experienceInviteId = experienceInviteId,
+						membershipEntityId = p13.payload.membershipEntityId,
+						notificationId = p13.payload.notificationId,
+						isInviter = p13.payload.isInviter
+					}
+				}
+			end
+
+			return p12
+		end,
+		[CurrentExperienceInviteDismissed.name] = function(p14, p15) -- line: 100
+			if p14 and p14.notification.notificationId == p15.payload.notificationId then
+				return nil
+			end
+
+			return p14
+		end
+	})
+end

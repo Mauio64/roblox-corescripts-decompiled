@@ -1,10 +1,12 @@
-local _ = require(script.Parent.types);
-local function v1(v2) --[[ Line: 7 ]] --[[ Name: getCurrentNavigationState ]]
-    -- upvalues: v1 (copy)
-    if v2.routes and v2.index then
-        return v1(v2.routes[v2.index]);
-    else
-        return v2;
-    end;
-end;
-return v1;
+require(script.Parent.types)
+
+local function getCurrentNavigationState(p1) -- line: 7
+	-- upvalues: getCurrentNavigationState (copy)
+	if p1.routes and p1.index then
+		return getCurrentNavigationState(p1.routes[p1.index])
+	end
+
+	return p1
+end
+
+return getCurrentNavigationState

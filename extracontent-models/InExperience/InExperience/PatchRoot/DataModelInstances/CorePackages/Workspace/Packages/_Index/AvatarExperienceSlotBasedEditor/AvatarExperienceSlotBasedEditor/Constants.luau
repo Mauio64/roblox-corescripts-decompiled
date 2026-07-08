@@ -1,579 +1,570 @@
-local _ = require(script.Parent.Types);
-local v1 = require(script.Parent.Enums.AvatarEditorSubcategories);
-local v2 = require(script.Parent.Enums.InventoryFilters);
-local v3 = require(script.Parent.Enums.SlotType);
-local v4 = {};
-local v5 = require(script.Parent.Enums.Categories);
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent;
-local v7 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagRemoveClassicHeadsAndFaces_0 = v7.FFlagRemoveClassicHeadsAndFaces;
-local l_FFlagAXCustomizeMakeupSupport_0 = v7.FFlagAXCustomizeMakeupSupport;
-local l_FFlagAXMigrateBuilderIcons_0 = v7.FFlagAXMigrateBuilderIcons;
-local l_FFlagAXSlotsDesktopRedesign_0 = v7.FFlagAXSlotsDesktopRedesign;
-local l_FFlagAXInventoryDurablesExpiredFilter_0 = v7.FFlagAXInventoryDurablesExpiredFilter;
-local l_IconName_0 = require(l_Parent_0.Foundation).Enums.IconName;
-local l_IconVariant_0 = require(l_Parent_0.Foundation).Enums.IconVariant;
-local v15 = {
-    FullBody = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonStanding, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/body_on", 
-    ClassicHead = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.HeadBlank, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/classicHead_on", 
-    Hair = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.HeadFemale, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/hair_on", 
-    Faces = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.FaceWinking, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/faces_on", 
-    Clothing = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ClothesHanger, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/clothing_on", 
-    Jackets = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Jacket, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/jackets_on", 
-    Shirts = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Shirt, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/shirts_on", 
-    Pants = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Pants, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/pants_on", 
-    Shoes = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Shoe, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/shoes_on", 
-    ClassicTShirts = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Tshirt_2dText, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/classicTshirts_on", 
-    ClassicShirts = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Shirt_2dText, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/classicShirts_on", 
-    ClassicPants = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Pants_2dText, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/classicPants_on", 
-    Accessories = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.BowTie, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/accessories_off", 
-    Head = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.HatFedora, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/hats_on", 
-    Face = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Glasses, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/eyes_on", 
-    Neck = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Necklace, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/neck_off", 
-    Shoulder = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Parrot, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/shoulder_on", 
-    Front = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Purse, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/front_on", 
-    Back = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ButterflyWings, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/back_on", 
-    Waist = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Belt, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/waist_on", 
-    Gear = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Sword, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/gear_on", 
-    Animation = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonTeleport, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/animation_off", 
-    Idle = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonStanding, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/idle_on", 
-    Walk = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonWalking, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/walk_off", 
-    Jump = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonJumping, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/jump_off", 
-    Fall = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonFalling, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/fall_off", 
-    Climb = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonClimbing, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/climb_off", 
-    Swim = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonSwimming, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/swim_off", 
-    Emote = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.SquareFaceWavingHand, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/controls/emoteOn", 
-    Reset = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ArrowSpinClockwise, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/actions/reset", 
-    Undo = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ArrowCurlToLeft, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/actions/edit/undo", 
-    Redo = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ArrowCurlToRight, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/actions/edit/redo", 
-    Torso = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Torso, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/torsos_on", 
-    Arm = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Arm, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/arms_on", 
-    Leg = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Leg, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/legs_on", 
-    Inventory = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Backpack, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/menu/inventoryOff", 
-    Adjust = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.ThreeSlidersHorizontal, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/actions/adjust", 
-    Success = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.CheckLarge, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/status/success_small", 
-    Add = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.CirclePlus, 
-        variant = l_IconVariant_0.Regular
-    } else "icons/actions/edit/add", 
-    Build = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.PersonStandingDualArrowsVertical, 
-        variant = l_IconVariant_0.Filled
-    } else "icons/menu/clothing/build_on", 
-    Eyelashes = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Eyelashes, 
-        variant = l_IconVariant_0.Regular
-    } else l_IconName_0.Eyelashes, 
-    Eyebrows = if l_FFlagAXMigrateBuilderIcons_0 then {
-        name = l_IconName_0.Eyebrows, 
-        variant = l_IconVariant_0.Regular
-    } else l_IconName_0.Eyebrows
-};
-local v16 = {
-    Enum.AssetType.LeftLeg, 
-    Enum.AssetType.RightLeg, 
-    Enum.AssetType.LeftArm, 
-    Enum.AssetType.RightArm, 
-    Enum.AssetType.Torso, 
-    Enum.AssetType.Head, 
-    Enum.AssetType.DynamicHead
-};
-local v17 = {
-    [v5.All] = {
-        name = "All", 
-        nameTranslationKey = l_FFlagAXSlotsDesktopRedesign_0 and "Feature.Avatar.Heading.All" or "Feature.Catalog.Label.Avatars", 
-        index = 0, 
-        slots = {}, 
-        hide = true
-    }, 
-    [v5.Avatars] = {
-        name = "Avatars", 
-        nameTranslationKey = "Feature.Catalog.Label.Avatars", 
-        index = 1, 
-        slots = {}
-    }, 
-    [v5.Body] = {
-        name = "Body", 
-        nameTranslationKey = "Feature.Catalog.Label.Body", 
-        index = 2, 
-        slots = if not l_FFlagRemoveClassicHeadsAndFaces_0 then {
-            {
-                name = "Body", 
-                nameTranslationKey = "Feature.Catalog.Label.FullBody", 
-                editorSubcategory = v1.PurchasedCharacters, 
-                assetTypes = {}
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Hair", 
-                icon = v15.Hair, 
-                editorSubcategory = v1.Hair, 
-                assetTypes = {
-                    Enum.AvatarAssetType.HairAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Head", 
-                icon = v15.ClassicHead, 
-                editorSubcategory = v1.Heads, 
-                assetTypes = {
-                    Enum.AvatarAssetType.DynamicHead, 
-                    Enum.AvatarAssetType.Head
-                }
-            }, 
-            {
-                name = "Classic Face", 
-                nameTranslationKey = "Feature.Avatar.Label.Face", 
-                icon = v15.Faces, 
-                editorSubcategory = v1.ClassicFaces, 
-                assetTypes = {
-                    Enum.AvatarAssetType.Face
-                }
-            }, 
-            {
-                name = "Build", 
-                nameTranslationKey = "Feature.Avatar.Label.Build", 
-                assetTypes = {}, 
-                icon = v15.Build, 
-                editorSubcategory = v1.Build
-            }, 
-            {
-                name = "Skin", 
-                nameTranslationKey = "Feature.Avatar.Label.Skin", 
-                editorSubcategory = v1.Skin, 
-                assetTypes = {}
-            }
-        } else {
-            {
-                name = "Body", 
-                nameTranslationKey = "Feature.Catalog.Label.FullBody", 
-                editorSubcategory = v1.PurchasedCharacters, 
-                assetTypes = {}
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Hair", 
-                icon = v15.Hair, 
-                editorSubcategory = v1.Hair, 
-                assetTypes = {
-                    Enum.AvatarAssetType.HairAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Head", 
-                icon = v15.ClassicHead, 
-                editorSubcategory = v1.Heads, 
-                assetTypes = {
-                    Enum.AvatarAssetType.DynamicHead
-                }
-            }, 
-            {
-                name = "Build", 
-                nameTranslationKey = "Feature.Avatar.Label.Build", 
-                assetTypes = {}, 
-                icon = v15.Build, 
-                editorSubcategory = v1.Build
-            }, 
-            {
-                name = "Skin", 
-                nameTranslationKey = "Feature.Avatar.Label.Skin", 
-                editorSubcategory = v1.Skin, 
-                assetTypes = {}
-            }
-        }
-    }, 
-    [v5.Makeup] = if not l_FFlagAXCustomizeMakeupSupport_0 then nil else {
-        name = "Makeup", 
-        nameTranslationKey = "Feature.Avatar.Label.Makeup", 
-        index = 3, 
-        resetSlotOnClearAll = true, 
-        slots = {
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Eyelashes", 
-                icon = v15.Eyelashes, 
-                editorSubcategory = v1.MakeupLooks, 
-                eligibleSubcategories = {
-                    v1.MakeupLooks, 
-                    v1.EyeMakeup, 
-                    v1.FaceMakeup, 
-                    v1.LipMakeup
-                }, 
-                assetTypes = {}, 
-                hide = true
-            }, 
-            {
-                slotType = v3.LayeredSlot, 
-                layerLimit = 6, 
-                name = "Makeup", 
-                nameTranslationKey = "Feature.Avatar.Label.MakeupLayer", 
-                eligibleSubcategories = {
-                    v1.EyeMakeup, 
-                    v1.FaceMakeup, 
-                    v1.LipMakeup
-                }, 
-                editorSubcategory = v1.EyeMakeup, 
-                assetTypes = {
-                    Enum.AvatarAssetType.EyeMakeup, 
-                    Enum.AvatarAssetType.FaceMakeup, 
-                    Enum.AvatarAssetType.LipMakeup
-                }, 
-                deselectable = true
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Eyelashes", 
-                icon = v15.Eyelashes, 
-                editorSubcategory = v1.Eyelashes, 
-                assetTypes = {
-                    Enum.AvatarAssetType.EyelashAccessory
-                }, 
-                deselectable = true
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Eyebrows", 
-                icon = v15.Eyebrows, 
-                editorSubcategory = v1.Eyebrows, 
-                assetTypes = {
-                    Enum.AvatarAssetType.EyebrowAccessory
-                }, 
-                deselectable = true
-            }
-        }
-    }, 
-    [v5.Clothing] = {
-        name = "Clothing", 
-        nameTranslationKey = "Feature.Catalog.Label.Clothing", 
-        index = l_FFlagAXCustomizeMakeupSupport_0 and 4 or 3, 
-        slots = {
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Top", 
-                icon = v15.Shirts, 
-                editorSubcategory = v1.Tops, 
-                assetTypes = {
-                    Enum.AvatarAssetType.ShirtAccessory, 
-                    Enum.AvatarAssetType.TShirtAccessory, 
-                    Enum.AvatarAssetType.SweaterAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Outerwear", 
-                icon = v15.Jackets, 
-                editorSubcategory = v1.Outerwear, 
-                assetTypes = {
-                    Enum.AvatarAssetType.JacketAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Bottom", 
-                icon = v15.Pants, 
-                editorSubcategory = v1.Bottoms, 
-                assetTypes = {
-                    Enum.AvatarAssetType.PantsAccessory, 
-                    Enum.AvatarAssetType.ShortsAccessory, 
-                    Enum.AvatarAssetType.DressSkirtAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Shoes", 
-                icon = v15.Shoes, 
-                editorSubcategory = v1.Shoes, 
-                assetTypes = {
-                    Enum.AvatarAssetType.RightShoeAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.ShirtClassic", 
-                icon = v15.ClassicShirts, 
-                editorSubcategory = v1.ClassicShirts, 
-                assetTypes = {
-                    Enum.AvatarAssetType.Shirt
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.PantsClassic", 
-                icon = v15.ClassicPants, 
-                editorSubcategory = v1.ClassicPants, 
-                assetTypes = {
-                    Enum.AvatarAssetType.Pants
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.TShirtClassic", 
-                icon = v15.ClassicTShirts, 
-                editorSubcategory = v1.ClassicTShirts, 
-                assetTypes = {
-                    Enum.AvatarAssetType.TShirt
-                }
-            }
-        }
-    }, 
-    [v5.Accessories] = {
-        name = "Accessories", 
-        nameTranslationKey = "Feature.Catalog.LabelAccessories", 
-        index = l_FFlagAXCustomizeMakeupSupport_0 and 5 or 4, 
-        slots = {
-            {
-                name = "Head", 
-                nameTranslationKey = "Feature.Avatar.Label.Head", 
-                icon = v15.Head, 
-                editorSubcategory = v1.Hats, 
-                assetTypes = {
-                    Enum.AvatarAssetType.Hat
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Face", 
-                icon = v15.Face, 
-                editorSubcategory = v1.Face, 
-                assetTypes = {
-                    Enum.AvatarAssetType.FaceAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Neck", 
-                icon = v15.Neck, 
-                editorSubcategory = v1.Neck, 
-                assetTypes = {
-                    Enum.AvatarAssetType.NeckAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Back", 
-                icon = v15.Back, 
-                editorSubcategory = v1.Back, 
-                assetTypes = {
-                    Enum.AvatarAssetType.BackAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Waist", 
-                icon = v15.Waist, 
-                editorSubcategory = v1.Waist, 
-                assetTypes = {
-                    Enum.AvatarAssetType.WaistAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Shoulder", 
-                icon = v15.Shoulder, 
-                editorSubcategory = v1.Shoulder, 
-                assetTypes = {
-                    Enum.AvatarAssetType.ShoulderAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Front", 
-                icon = v15.Front, 
-                editorSubcategory = v1.Front, 
-                assetTypes = {
-                    Enum.AvatarAssetType.FrontAccessory
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Gear", 
-                icon = v15.Gear, 
-                editorSubcategory = v1.Gear, 
-                assetTypes = {
-                    Enum.AvatarAssetType.Gear
-                }
-            }
-        }
-    }, 
-    [v5.Animations] = {
-        name = "Animations", 
-        nameTranslationKey = "Feature.Avatar.Heading.Animations", 
-        index = l_FFlagAXCustomizeMakeupSupport_0 and 6 or 5, 
-        slots = {
-            {
-                nameTranslationKey = "Feature.Avatar.Label.AnimationFullSet", 
-                icon = v15.Animation, 
-                editorSubcategory = v1.AnimationFullSets, 
-                assetTypes = {
-                    Enum.AvatarAssetType.IdleAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Idle", 
-                icon = v15.Idle, 
-                editorSubcategory = v1.IdleAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.IdleAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Walk", 
-                icon = v15.Walk, 
-                editorSubcategory = v1.WalkAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.WalkAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Run", 
-                icon = v15.Animation, 
-                editorSubcategory = v1.RunAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.RunAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Jump", 
-                icon = v15.Jump, 
-                editorSubcategory = v1.JumpAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.JumpAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Fall", 
-                icon = v15.Fall, 
-                editorSubcategory = v1.FallAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.FallAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Climb", 
-                icon = v15.Climb, 
-                editorSubcategory = v1.ClimbAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.ClimbAnimation
-                }
-            }, 
-            {
-                nameTranslationKey = "Feature.Avatar.Label.Swim", 
-                icon = v15.Swim, 
-                editorSubcategory = v1.SwimAnimations, 
-                assetTypes = {
-                    Enum.AvatarAssetType.SwimAnimation
-                }
-            }
-        }
-    }, 
-    [v5.Emotes] = {
-        name = "Emotes", 
-        nameTranslationKey = "Feature.Catalog.Label.Emotes", 
-        index = l_FFlagAXCustomizeMakeupSupport_0 and 7 or 6, 
-        slots = {}
-    }
-};
-local v18 = if l_FFlagAXInventoryDurablesExpiredFilter_0 then {
-    [v2.Expired] = 2
-} else nil;
-v4.Categories = v5;
-v4.SlotEditorCategories = v17;
-v4.Icons = v15;
-v4.BodyAssetTypes = v16;
-v4.InventoryFilterToAvailabilityStatus = v18;
-return v4;
+require(script.Parent.Types)
+
+local AvatarEditorSubcategories = require(script.Parent.Enums.AvatarEditorSubcategories)
+local InventoryFilters = require(script.Parent.Enums.InventoryFilters)
+local SlotType = require(script.Parent.Enums.SlotType)
+local t1 = {}
+local Categories = require(script.Parent.Enums.Categories)
+local Parent = script:FindFirstAncestor("AvatarExperienceSlotBasedEditor").Parent
+local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local FFlagRemoveClassicHeadsAndFaces = AvatarExperienceFlags.FFlagRemoveClassicHeadsAndFaces
+local FFlagAXCustomizeMakeupSupport = AvatarExperienceFlags.FFlagAXCustomizeMakeupSupport
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+local FFlagAXSlotsDesktopRedesign = AvatarExperienceFlags.FFlagAXSlotsDesktopRedesign
+local FFlagAXInventoryDurablesExpiredFilter = AvatarExperienceFlags.FFlagAXInventoryDurablesExpiredFilter
+local FFlagAXCustomizeBackgrounds = AvatarExperienceFlags.FFlagAXCustomizeBackgrounds
+local FFlagAXDownrankMakeupCustomize = AvatarExperienceFlags.FFlagAXDownrankMakeupCustomize
+local IconName = require(Parent.Foundation).Enums.IconName
+local IconVariant = require(Parent.Foundation).Enums.IconVariant
+local t2 = {
+	FullBody = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/body_on" or {
+		name = IconName.PersonStanding,
+		variant = IconVariant.Filled
+	},
+	ClassicHead = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_on" or {
+		name = IconName.HeadBlank,
+		variant = IconVariant.Filled
+	},
+	Hair = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hair_on" or {
+		name = IconName.HeadFemale,
+		variant = IconVariant.Filled
+	},
+	Faces = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/faces_on" or {
+		name = IconName.FaceWinking,
+		variant = IconVariant.Filled
+	},
+	Clothing = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_on" or {
+		name = IconName.ClothesHanger,
+		variant = IconVariant.Filled
+	},
+	Jackets = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/jackets_on" or {
+		name = IconName.Jacket,
+		variant = IconVariant.Filled
+	},
+	Shirts = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/shirts_on" or {
+		name = IconName.Shirt,
+		variant = IconVariant.Filled
+	},
+	Pants = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/pants_on" or {
+		name = IconName.Pants,
+		variant = IconVariant.Filled
+	},
+	Shoes = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/shoes_on" or {
+		name = IconName.Shoe,
+		variant = IconVariant.Filled
+	},
+	ClassicTShirts = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicTshirts_on" or {
+		name = IconName.Tshirt_2dText,
+		variant = IconVariant.Filled
+	},
+	ClassicShirts = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicShirts_on" or {
+		name = IconName.Shirt_2dText,
+		variant = IconVariant.Filled
+	},
+	ClassicPants = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicPants_on" or {
+		name = IconName.Pants_2dText,
+		variant = IconVariant.Filled
+	},
+	Accessories = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/accessories_off" or {
+		name = IconName.BowTie,
+		variant = IconVariant.Filled
+	},
+	Head = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_on" or {
+		name = IconName.HatFedora,
+		variant = IconVariant.Filled
+	},
+	Face = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyes_on" or {
+		name = IconName.Glasses,
+		variant = IconVariant.Filled
+	},
+	Neck = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/neck_off" or {
+		name = IconName.Necklace,
+		variant = IconVariant.Filled
+	},
+	Shoulder = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/shoulder_on" or {
+		name = IconName.Parrot,
+		variant = IconVariant.Filled
+	},
+	Front = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/front_on" or {
+		name = IconName.Purse,
+		variant = IconVariant.Filled
+	},
+	Back = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/back_on" or {
+		name = IconName.ButterflyWings,
+		variant = IconVariant.Filled
+	},
+	Waist = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/waist_on" or {
+		name = IconName.Belt,
+		variant = IconVariant.Filled
+	},
+	Gear = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/gear_on" or {
+		name = IconName.Sword,
+		variant = IconVariant.Filled
+	},
+	Animation = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/animation_off" or {
+		name = IconName.PersonTeleport,
+		variant = IconVariant.Filled
+	},
+	Idle = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/idle_on" or {
+		name = IconName.PersonStanding,
+		variant = IconVariant.Filled
+	},
+	Walk = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/walk_off" or {
+		name = IconName.PersonWalking,
+		variant = IconVariant.Filled
+	},
+	Jump = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/jump_off" or {
+		name = IconName.PersonJumping,
+		variant = IconVariant.Filled
+	},
+	Fall = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/fall_off" or {
+		name = IconName.PersonFalling,
+		variant = IconVariant.Filled
+	},
+	Climb = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/climb_off" or {
+		name = IconName.PersonClimbing,
+		variant = IconVariant.Filled
+	},
+	Swim = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/swim_off" or {
+		name = IconName.PersonSwimming,
+		variant = IconVariant.Filled
+	},
+	Emote = not FFlagAXMigrateBuilderIcons and "icons/controls/emoteOn" or {
+		name = IconName.SquareFaceWavingHand,
+		variant = IconVariant.Filled
+	},
+	Reset = not FFlagAXMigrateBuilderIcons and "icons/actions/reset" or {
+		name = IconName.ArrowSpinClockwise,
+		variant = IconVariant.Regular
+	},
+	Undo = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/undo" or {
+		name = IconName.ArrowCurlToLeft,
+		variant = IconVariant.Regular
+	},
+	Redo = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/redo" or {
+		name = IconName.ArrowCurlToRight,
+		variant = IconVariant.Regular
+	},
+	Torso = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/torsos_on" or {
+		name = IconName.Torso,
+		variant = IconVariant.Filled
+	},
+	Arm = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/arms_on" or {
+		name = IconName.Arm,
+		variant = IconVariant.Filled
+	},
+	Leg = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/legs_on" or {
+		name = IconName.Leg,
+		variant = IconVariant.Filled
+	},
+	Inventory = not FFlagAXMigrateBuilderIcons and "icons/menu/inventoryOff" or {
+		name = IconName.Backpack,
+		variant = IconVariant.Regular
+	},
+	Adjust = not FFlagAXMigrateBuilderIcons and "icons/actions/adjust" or {
+		name = IconName.ThreeSlidersHorizontal,
+		variant = IconVariant.Regular
+	},
+	Success = not FFlagAXMigrateBuilderIcons and "icons/status/success_small" or {
+		name = IconName.CheckLarge,
+		variant = IconVariant.Filled
+	},
+	Add = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/add" or {
+		name = IconName.CirclePlus,
+		variant = IconVariant.Regular
+	},
+	Build = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_on" or {
+		name = IconName.PersonStandingDualArrowsVertical,
+		variant = IconVariant.Filled
+	},
+	Eyelashes = if not FFlagAXMigrateBuilderIcons then IconName.Eyelashes else {
+		name = IconName.Eyelashes,
+		variant = IconVariant.Regular
+	},
+	Eyebrows = if not FFlagAXMigrateBuilderIcons then IconName.Eyebrows else {
+		name = IconName.Eyebrows,
+		variant = IconVariant.Regular
+	},
+	Backgrounds = {
+		name = IconName.Image,
+		variant = IconVariant.Filled
+	}
+}
+local t3 = {
+	Enum.AssetType.LeftLeg,
+	Enum.AssetType.RightLeg,
+	Enum.AssetType.LeftArm,
+	Enum.AssetType.RightArm,
+	Enum.AssetType.Torso,
+	Enum.AssetType.Head,
+	Enum.AssetType.DynamicHead
+}
+local t4 = {
+	Categories.All,
+	Categories.Avatars,
+	Categories.Body
+}
+
+if FFlagAXCustomizeMakeupSupport and not FFlagAXDownrankMakeupCustomize then
+	table.insert(t4, Categories.Makeup)
+end
+
+table.insert(t4, Categories.Clothing)
+table.insert(t4, Categories.Accessories)
+
+if FFlagAXCustomizeBackgrounds then
+	table.insert(t4, Categories.Backgrounds)
+end
+
+table.insert(t4, Categories.Animations)
+table.insert(t4, Categories.Emotes)
+
+if FFlagAXDownrankMakeupCustomize then
+	table.insert(t4, Categories.Makeup)
+end
+
+local t5 = {}
+
+for v21, v22 in t4 do
+	t5[v22] = v21 - 1
+end
+
+local t6 = {
+	[Categories.All] = {
+		name = "All",
+		hide = true,
+		nameTranslationKey = not FFlagAXSlotsDesktopRedesign and "Feature.Catalog.Label.Avatars" or "Feature.Avatar.Heading.All",
+		index = t5[Categories.All],
+		slots = {}
+	},
+	[Categories.Avatars] = {
+		name = "Avatars",
+		nameTranslationKey = "Feature.Catalog.Label.Avatars",
+		index = t5[Categories.Avatars],
+		slots = {}
+	},
+	[Categories.Body] = {
+		name = "Body",
+		nameTranslationKey = "Feature.Catalog.Label.Body",
+		index = t5[Categories.Body],
+		slots = if FFlagRemoveClassicHeadsAndFaces then {
+			{
+				name = "Body",
+				nameTranslationKey = "Feature.Catalog.Label.FullBody",
+				editorSubcategory = AvatarEditorSubcategories.PurchasedCharacters,
+				assetTypes = {}
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Hair",
+				icon = t2.Hair,
+				editorSubcategory = AvatarEditorSubcategories.Hair,
+				assetTypes = { Enum.AvatarAssetType.HairAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Head",
+				icon = t2.ClassicHead,
+				editorSubcategory = AvatarEditorSubcategories.Heads,
+				assetTypes = { Enum.AvatarAssetType.DynamicHead }
+			},
+			{
+				name = "Build",
+				nameTranslationKey = "Feature.Avatar.Label.Build",
+				assetTypes = {},
+				icon = t2.Build,
+				editorSubcategory = AvatarEditorSubcategories.Build
+			},
+			{
+				name = "Skin",
+				nameTranslationKey = "Feature.Avatar.Label.Skin",
+				editorSubcategory = AvatarEditorSubcategories.Skin,
+				assetTypes = {}
+			}
+		} else {
+			{
+				name = "Body",
+				nameTranslationKey = "Feature.Catalog.Label.FullBody",
+				editorSubcategory = AvatarEditorSubcategories.PurchasedCharacters,
+				assetTypes = {}
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Hair",
+				icon = t2.Hair,
+				editorSubcategory = AvatarEditorSubcategories.Hair,
+				assetTypes = { Enum.AvatarAssetType.HairAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Head",
+				icon = t2.ClassicHead,
+				editorSubcategory = AvatarEditorSubcategories.Heads,
+				assetTypes = {
+					Enum.AvatarAssetType.DynamicHead,
+					Enum.AvatarAssetType.Head
+				}
+			},
+			{
+				name = "Classic Face",
+				nameTranslationKey = "Feature.Avatar.Label.Face",
+				icon = t2.Faces,
+				editorSubcategory = AvatarEditorSubcategories.ClassicFaces,
+				assetTypes = { Enum.AvatarAssetType.Face }
+			},
+			{
+				name = "Build",
+				nameTranslationKey = "Feature.Avatar.Label.Build",
+				assetTypes = {},
+				icon = t2.Build,
+				editorSubcategory = AvatarEditorSubcategories.Build
+			},
+			{
+				name = "Skin",
+				nameTranslationKey = "Feature.Avatar.Label.Skin",
+				editorSubcategory = AvatarEditorSubcategories.Skin,
+				assetTypes = {}
+			}
+		}
+	},
+	[Categories.Makeup] = if FFlagAXCustomizeMakeupSupport then {
+		name = "Makeup",
+		nameTranslationKey = "Feature.Avatar.Label.Makeup",
+		resetSlotOnClearAll = true,
+		index = t5[Categories.Makeup],
+		slots = {
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Eyelashes",
+				hide = true,
+				icon = t2.Eyelashes,
+				editorSubcategory = AvatarEditorSubcategories.MakeupLooks,
+				eligibleSubcategories = {
+					AvatarEditorSubcategories.MakeupLooks,
+					AvatarEditorSubcategories.EyeMakeup,
+					AvatarEditorSubcategories.FaceMakeup,
+					AvatarEditorSubcategories.LipMakeup
+				},
+				assetTypes = {}
+			},
+			{
+				layerLimit = 6,
+				name = "Makeup",
+				nameTranslationKey = "Feature.Avatar.Label.MakeupLayer",
+				deselectable = true,
+				slotType = SlotType.LayeredSlot,
+				eligibleSubcategories = {
+					AvatarEditorSubcategories.EyeMakeup,
+					AvatarEditorSubcategories.FaceMakeup,
+					AvatarEditorSubcategories.LipMakeup
+				},
+				editorSubcategory = AvatarEditorSubcategories.EyeMakeup,
+				assetTypes = {
+					Enum.AvatarAssetType.EyeMakeup,
+					Enum.AvatarAssetType.FaceMakeup,
+					Enum.AvatarAssetType.LipMakeup
+				}
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Eyelashes",
+				deselectable = true,
+				icon = t2.Eyelashes,
+				editorSubcategory = AvatarEditorSubcategories.Eyelashes,
+				assetTypes = { Enum.AvatarAssetType.EyelashAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Eyebrows",
+				deselectable = true,
+				icon = t2.Eyebrows,
+				editorSubcategory = AvatarEditorSubcategories.Eyebrows,
+				assetTypes = { Enum.AvatarAssetType.EyebrowAccessory }
+			}
+		}
+	} else nil,
+	[Categories.Clothing] = {
+		name = "Clothing",
+		nameTranslationKey = "Feature.Catalog.Label.Clothing",
+		index = t5[Categories.Clothing],
+		slots = {
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Top",
+				icon = t2.Shirts,
+				editorSubcategory = AvatarEditorSubcategories.Tops,
+				assetTypes = {
+					Enum.AvatarAssetType.ShirtAccessory,
+					Enum.AvatarAssetType.TShirtAccessory,
+					Enum.AvatarAssetType.SweaterAccessory
+				}
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Outerwear",
+				icon = t2.Jackets,
+				editorSubcategory = AvatarEditorSubcategories.Outerwear,
+				assetTypes = { Enum.AvatarAssetType.JacketAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Bottom",
+				icon = t2.Pants,
+				editorSubcategory = AvatarEditorSubcategories.Bottoms,
+				assetTypes = {
+					Enum.AvatarAssetType.PantsAccessory,
+					Enum.AvatarAssetType.ShortsAccessory,
+					Enum.AvatarAssetType.DressSkirtAccessory
+				}
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Shoes",
+				icon = t2.Shoes,
+				editorSubcategory = AvatarEditorSubcategories.Shoes,
+				assetTypes = { Enum.AvatarAssetType.RightShoeAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.ShirtClassic",
+				icon = t2.ClassicShirts,
+				editorSubcategory = AvatarEditorSubcategories.ClassicShirts,
+				assetTypes = { Enum.AvatarAssetType.Shirt }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.PantsClassic",
+				icon = t2.ClassicPants,
+				editorSubcategory = AvatarEditorSubcategories.ClassicPants,
+				assetTypes = { Enum.AvatarAssetType.Pants }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.TShirtClassic",
+				icon = t2.ClassicTShirts,
+				editorSubcategory = AvatarEditorSubcategories.ClassicTShirts,
+				assetTypes = { Enum.AvatarAssetType.TShirt }
+			}
+		}
+	},
+	[Categories.Accessories] = {
+		name = "Accessories",
+		nameTranslationKey = "Feature.Catalog.LabelAccessories",
+		index = t5[Categories.Accessories],
+		slots = {
+			{
+				name = "Head",
+				nameTranslationKey = "Feature.Avatar.Label.Head",
+				icon = t2.Head,
+				editorSubcategory = AvatarEditorSubcategories.Hats,
+				assetTypes = { Enum.AvatarAssetType.Hat }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Face",
+				icon = t2.Face,
+				editorSubcategory = AvatarEditorSubcategories.Face,
+				assetTypes = { Enum.AvatarAssetType.FaceAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Neck",
+				icon = t2.Neck,
+				editorSubcategory = AvatarEditorSubcategories.Neck,
+				assetTypes = { Enum.AvatarAssetType.NeckAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Back",
+				icon = t2.Back,
+				editorSubcategory = AvatarEditorSubcategories.Back,
+				assetTypes = { Enum.AvatarAssetType.BackAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Waist",
+				icon = t2.Waist,
+				editorSubcategory = AvatarEditorSubcategories.Waist,
+				assetTypes = { Enum.AvatarAssetType.WaistAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Shoulder",
+				icon = t2.Shoulder,
+				editorSubcategory = AvatarEditorSubcategories.Shoulder,
+				assetTypes = { Enum.AvatarAssetType.ShoulderAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Front",
+				icon = t2.Front,
+				editorSubcategory = AvatarEditorSubcategories.Front,
+				assetTypes = { Enum.AvatarAssetType.FrontAccessory }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Gear",
+				icon = t2.Gear,
+				editorSubcategory = AvatarEditorSubcategories.Gear,
+				assetTypes = { Enum.AvatarAssetType.Gear }
+			}
+		}
+	},
+	[Categories.Backgrounds] = if FFlagAXCustomizeBackgrounds then {
+		name = "Backgrounds",
+		nameTranslationKey = "Feature.Catalog.Label.Backgrounds",
+		index = t5[Categories.Backgrounds],
+		slots = {}
+	} else nil,
+	[Categories.Animations] = {
+		name = "Animations",
+		nameTranslationKey = "Feature.Avatar.Heading.Animations",
+		index = t5[Categories.Animations],
+		slots = {
+			{
+				nameTranslationKey = "Feature.Avatar.Label.AnimationFullSet",
+				icon = t2.Animation,
+				editorSubcategory = AvatarEditorSubcategories.AnimationFullSets,
+				assetTypes = { Enum.AvatarAssetType.IdleAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Idle",
+				icon = t2.Idle,
+				editorSubcategory = AvatarEditorSubcategories.IdleAnimations,
+				assetTypes = { Enum.AvatarAssetType.IdleAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Walk",
+				icon = t2.Walk,
+				editorSubcategory = AvatarEditorSubcategories.WalkAnimations,
+				assetTypes = { Enum.AvatarAssetType.WalkAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Run",
+				icon = t2.Animation,
+				editorSubcategory = AvatarEditorSubcategories.RunAnimations,
+				assetTypes = { Enum.AvatarAssetType.RunAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Jump",
+				icon = t2.Jump,
+				editorSubcategory = AvatarEditorSubcategories.JumpAnimations,
+				assetTypes = { Enum.AvatarAssetType.JumpAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Fall",
+				icon = t2.Fall,
+				editorSubcategory = AvatarEditorSubcategories.FallAnimations,
+				assetTypes = { Enum.AvatarAssetType.FallAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Climb",
+				icon = t2.Climb,
+				editorSubcategory = AvatarEditorSubcategories.ClimbAnimations,
+				assetTypes = { Enum.AvatarAssetType.ClimbAnimation }
+			},
+			{
+				nameTranslationKey = "Feature.Avatar.Label.Swim",
+				icon = t2.Swim,
+				editorSubcategory = AvatarEditorSubcategories.SwimAnimations,
+				assetTypes = { Enum.AvatarAssetType.SwimAnimation }
+			}
+		}
+	},
+	[Categories.Emotes] = {
+		name = "Emotes",
+		nameTranslationKey = "Feature.Catalog.Label.Emotes",
+		index = t5[Categories.Emotes],
+		slots = {}
+	}
+}
+local v24 = if not FFlagAXInventoryDurablesExpiredFilter then nil else {
+	[InventoryFilters.Expired] = 2
+}
+
+t1.Categories = Categories
+t1.SlotEditorCategories = t6
+t1.Icons = t2
+t1.BodyAssetTypes = t3
+t1.InventoryFilterToAvailabilityStatus = v24
+
+return t1

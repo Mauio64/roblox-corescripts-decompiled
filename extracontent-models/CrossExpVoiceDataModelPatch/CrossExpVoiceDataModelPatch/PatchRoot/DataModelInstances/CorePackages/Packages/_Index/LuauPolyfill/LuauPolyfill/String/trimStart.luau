@@ -1,3 +1,3 @@
-return function(v0) --[[ Line: 2 ]]
-    return (v0:gsub("^[%s]+", ""));
-end;
+return function(s1: string) -- line: 2
+	return (s1:gsub("^[%s]+", ""))
+end

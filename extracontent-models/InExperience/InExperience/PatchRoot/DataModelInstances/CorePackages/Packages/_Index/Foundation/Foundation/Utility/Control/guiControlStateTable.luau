@@ -1,90 +1,92 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = script.Parent;
-local v2 = require(l_script_FirstAncestor_0.Enums.ControlState);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlStateEvent);
-local _ = require(l_Parent_0.StateTable.StateTable);
+local Foundation = script:FindFirstAncestor("Foundation")
+local scriptParent = script.Parent
+local ControlState = require(Foundation.Enums.ControlState)
+
+require(Foundation.Enums.ControlStateEvent)
+require(scriptParent.StateTable.StateTable)
+
 return {
-    Initialize = {
-        Idle = {
-            nextState = v2.Default
-        }, 
-        Enabled = {
-            nextState = v2.Default
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    Default = {
-        PrimaryPressed = {
-            nextState = v2.Pressed
-        }, 
-        PointerHover = {
-            nextState = v2.Hover
-        }, 
-        SelectionGained = {
-            nextState = v2.Selected
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    Hover = {
-        SelectionGained = {
-            nextState = v2.Selected
-        }, 
-        PrimaryPressed = {
-            nextState = v2.Pressed
-        }, 
-        PointerHoverEnd = {
-            nextState = v2.Default
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    Pressed = {
-        SelectionGained = {
-            nextState = v2.SelectedPressed
-        }, 
-        PrimaryReleasedHover = {
-            nextState = v2.Hover
-        }, 
-        PrimaryReleased = {
-            nextState = v2.Default
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    Selected = {
-        SelectionLost = {
-            nextState = v2.Default
-        }, 
-        PrimaryPressed = {
-            nextState = v2.SelectedPressed
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    SelectedPressed = {
-        SelectionLost = {
-            nextState = v2.Default
-        }, 
-        PrimaryReleasedHover = {
-            nextState = v2.Selected
-        }, 
-        PrimaryReleased = {
-            nextState = v2.Selected
-        }, 
-        Disabled = {
-            nextState = v2.Disabled
-        }
-    }, 
-    Disabled = {
-        Enabled = {
-            nextState = v2.Default
-        }
-    }
-};
+	Initialize = {
+		Idle = {
+			nextState = ControlState.Default
+		},
+		Enabled = {
+			nextState = ControlState.Default
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	Default = {
+		PrimaryPressed = {
+			nextState = ControlState.Pressed
+		},
+		PointerHover = {
+			nextState = ControlState.Hover
+		},
+		SelectionGained = {
+			nextState = ControlState.Selected
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	Hover = {
+		SelectionGained = {
+			nextState = ControlState.Selected
+		},
+		PrimaryPressed = {
+			nextState = ControlState.Pressed
+		},
+		PointerHoverEnd = {
+			nextState = ControlState.Default
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	Pressed = {
+		SelectionGained = {
+			nextState = ControlState.SelectedPressed
+		},
+		PrimaryReleasedHover = {
+			nextState = ControlState.Hover
+		},
+		PrimaryReleased = {
+			nextState = ControlState.Default
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	Selected = {
+		SelectionLost = {
+			nextState = ControlState.Default
+		},
+		PrimaryPressed = {
+			nextState = ControlState.SelectedPressed
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	SelectedPressed = {
+		SelectionLost = {
+			nextState = ControlState.Default
+		},
+		PrimaryReleasedHover = {
+			nextState = ControlState.Selected
+		},
+		PrimaryReleased = {
+			nextState = ControlState.Selected
+		},
+		Disabled = {
+			nextState = ControlState.Disabled
+		}
+	},
+	Disabled = {
+		Enabled = {
+			nextState = ControlState.Default
+		}
+	}
+}

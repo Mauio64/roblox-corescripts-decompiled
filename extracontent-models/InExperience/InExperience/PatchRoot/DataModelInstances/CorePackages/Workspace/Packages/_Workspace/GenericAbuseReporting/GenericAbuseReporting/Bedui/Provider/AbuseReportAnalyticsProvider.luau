@@ -1,17 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Bedui.Provider.AbuseReportAnalyticsContext);
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-local _ = require(l_script_FirstAncestor_0.Bedui.Utils.BeduiAnalytics);
-return function(v6) --[[ Line: 18 ]] --[[ Name: AbuseReportAnalyticsProvider ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v7, v8 = v2.useState(false);
-    return v2.createElement(v3.Provider, {
-        value = {
-            abuseVector = v6.abuseVector, 
-            isReportSubmitted = v7, 
-            setIsReportSubmitted = v8
-        }
-    }, v6.children);
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local React = require(GenericAbuseReportingParent.React)
+local AbuseReportAnalyticsContext = require(GenericAbuseReporting.Bedui.Provider.AbuseReportAnalyticsContext)
+
+require(GenericAbuseReporting.Enums.AbuseVector)
+require(GenericAbuseReporting.Bedui.Utils.BeduiAnalytics)
+
+local function AbuseReportAnalyticsProvider(t1: {[any]: any}) -- line: 18
+	-- upvalues: React (copy), AbuseReportAnalyticsContext (copy)
+	local v7, v8 = React.useState(false)
+
+	return React.createElement(AbuseReportAnalyticsContext.Provider, {
+		value = {
+			abuseVector = t1.abuseVector,
+			isReportSubmitted = v7,
+			setIsReportSubmitted = v8
+		}
+	}, t1.children)
+end
+
+return AbuseReportAnalyticsProvider

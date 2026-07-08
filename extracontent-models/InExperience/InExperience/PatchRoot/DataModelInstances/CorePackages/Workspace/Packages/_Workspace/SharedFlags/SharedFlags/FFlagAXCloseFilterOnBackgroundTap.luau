@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCloseFilterOnBackgroundTap", false);
+return game:DefineFastFlag("AXCloseFilterOnBackgroundTap", false)

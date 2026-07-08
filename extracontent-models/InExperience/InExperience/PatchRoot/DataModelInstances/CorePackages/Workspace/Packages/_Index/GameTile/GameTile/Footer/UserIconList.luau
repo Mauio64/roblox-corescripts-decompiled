@@ -1,93 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local l_ImageSetLabel_0 = require(l_Parent_0.UIBlox).Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local v5 = require(l_script_FirstAncestor_0.Footer.FriendIcon);
-local l_SourceSans_0 = Enum.Font.SourceSans;
-local v7 = Color3.fromRGB(117, 117, 117);
-local function v12(v8) --[[ Line: 22 ]] --[[ Name: NumberedIcon ]]
-    -- upvalues: v2 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), l_SourceSans_0 (copy), v7 (copy)
-    local l_size_0 = v8.size;
-    local l_layoutOrder_0 = v8.layoutOrder;
-    local l_count_0 = v8.count;
-    return v2.createElement(l_ImageSetLabel_0, {
-        Size = UDim2.new(0, l_size_0, 0, l_size_0), 
-        LayoutOrder = l_layoutOrder_0, 
-        Image = l_GetImageData_0("LuaApp/graphic/gr-counter-slot-32x32") or "LuaApp/graphic/gr-counter-slot-32x32", 
-        BackgroundTransparency = 1
-    }, {
-        Count = v2.createElement("TextLabel", {
-            Size = UDim2.new(0.5, 0, 0.5, 0), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.new(0.5, 0, 0.5, 0), 
-            Font = l_SourceSans_0, 
-            TextSize = 15, 
-            Text = "+" .. l_count_0, 
-            TextColor3 = v7, 
-            BackgroundTransparency = 1
-        })
-    });
-end;
-local v13 = v2.PureComponent:extend("UserIconList");
-v13.defaultProps = {
-    users = {}
-};
-v13.render = function(v14) --[[ Line: 52 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v5 (copy), v12 (copy)
-    local l_width_0 = v14.props.width;
-    local l_height_0 = v14.props.height;
-    local l_layoutOrder_1 = v14.props.layoutOrder;
-    local l_users_0 = v14.props.users;
-    local v19 = #l_users_0;
-    local v20 = 0;
-    local l_maskColor_0 = v14.props.maskColor;
-    if v19 <= 0 then
-        return nil;
-    else
-        local function _(v22, v23) --[[ Line: 65 ]] --[[ Name: GetMaxNumberOfIconsInWidth ]]
-            return (math.floor((v23 + 3) / (v22 + 3)));
-        end;
-        local v25 = nil;
-        v25 = l_height_0 >= 32 and math.floor((l_width_0 + 3) / 35) >= 3 and 32 or l_height_0 >= 24 and 24 or l_height_0;
-        local v26 = {};
-        local v27 = math.floor((l_width_0 + 3) / (v25 + 3));
-        if v27 > 0 then
-            if v27 < v19 then
-                v20 = v19 - (v27 - 1);
-            end;
-            v26.ListLayout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 3)
-            });
-            local v28 = v20 > 0 and v27 - 1 or math.min(v27, v19);
-            for v29 = 1, v28 do
-                local v30 = l_users_0[v29];
-                v26["UserIcon" .. v29] = v2.createElement(v5, {
-                    user = v30, 
-                    itemSize = v25, 
-                    layoutOrder = v29, 
-                    maskColor = l_maskColor_0
-                });
-            end;
-            local v31 = false;
-            if v20 > 0 then
-                v31 = v2.createElement(v12, {
-                    size = v25, 
-                    layoutOrder = v27, 
-                    count = v20
-                });
-            end;
-            v26.NumberedIcon = v31;
-        end;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(0, l_width_0, 0, l_height_0), 
-            LayoutOrder = l_layoutOrder_1, 
-            BackgroundTransparency = 1
-        }, v26);
-    end;
-end;
-return v13;
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local Roact = require(GameTileParent.Roact)
+local ImageSetLabel = require(GameTileParent.UIBlox).Core.ImageSet.ImageSetLabel
+local GetImageData = require(GameTileParent.RobloxAppAssets).GetImageData
+local FriendIcon = require(GameTile.Footer.FriendIcon)
+local SourceSans = Enum.Font.SourceSans
+local color3 = Color3.fromRGB(117, 117, 117)
+
+local function NumberedIcon(p1) -- line: 22
+	-- upvalues: Roact (copy), ImageSetLabel (copy), GetImageData (copy), SourceSans (copy), color3 (copy)
+	local size = p1.size
+	local layoutOrder = p1.layoutOrder
+	local count = p1.count
+
+	return Roact.createElement(ImageSetLabel, {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, size, 0, size),
+		LayoutOrder = layoutOrder,
+		Image = GetImageData("LuaApp/graphic/gr-counter-slot-32x32") or "LuaApp/graphic/gr-counter-slot-32x32"
+	}, {
+		Count = Roact.createElement("TextLabel", {
+			TextSize = 15,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0.5, 0, 0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Font = SourceSans,
+			Text = "+" .. count,
+			TextColor3 = color3
+		})
+	})
+end
+
+local v10 = Roact.PureComponent:extend("UserIconList")
+
+v10.defaultProps = {
+	users = {}
+}
+
+function v10.render(p2) -- line: 52
+	-- upvalues: Roact (copy), FriendIcon (copy), NumberedIcon (copy)
+	local width = p2.props.width
+	local height = p2.props.height
+	local layoutOrder = p2.props.layoutOrder
+	local users = p2.props.users
+	local v20 = #users
+	local n1 = 0
+	local maskColor = p2.props.maskColor
+
+	if v20 <= 0 then
+		return nil
+	end
+
+	local function GetMaxNumberOfIconsInWidth(p3, p4) -- line: 65
+		return (math.floor((p4 + 3) / (p3 + 3)))
+	end
+
+	local v24 = if not (height >= 32) or not (math.floor((width + 3) / 35) >= 3) then if not (height >= 24) then height else 24 else 32
+	local t1 = {}
+	local v26 = math.floor((width + 3) / (v24 + 3))
+
+	if v26 > 0 then
+		if v26 < v20 then
+			n1 = v20 - (v26 - 1)
+		end
+
+		t1.ListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 3)
+		})
+
+		for i = 1, n1 > 0 and v26 - 1 or math.min(v26, v20) do
+			local v28 = users[i]
+
+			t1["UserIcon" .. i] = Roact.createElement(FriendIcon, {
+				user = v28,
+				itemSize = v24,
+				layoutOrder = i,
+				maskColor = maskColor
+			})
+		end
+
+		t1.NumberedIcon = n1 > 0 and Roact.createElement(NumberedIcon, {
+			size = v24,
+			layoutOrder = v26,
+			count = n1
+		})
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, width, 0, height),
+		LayoutOrder = layoutOrder
+	}, t1)
+end
+
+return v10

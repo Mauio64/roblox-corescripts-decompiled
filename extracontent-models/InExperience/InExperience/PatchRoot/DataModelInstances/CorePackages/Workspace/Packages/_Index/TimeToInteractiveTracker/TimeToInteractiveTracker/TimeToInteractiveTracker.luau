@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent;
-return require(l_Parent_0.Stores.createTimeToInteractiveStore)();
+local scriptParent = script.Parent
+
+return require(scriptParent.Stores.createTimeToInteractiveStore)()

@@ -1,19 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v4 = require(l_script_FirstAncestor_0.Components.AlertPrompt);
-return function(v5) --[[ Line: 13 ]] --[[ Name: BulkPurchaseSuccess ]]
-    -- upvalues: l_useLocalization_0 (copy), v2 (copy), v4 (copy)
-    local v6 = l_useLocalization_0({
-        title = "CoreScripts.BulkPurchasePrompt.SuccessPrompt.Heading", 
-        bodyText = "CoreScripts.BulkPurchasePrompt.SuccessPrompt.Body", 
-        dismissCTA = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.DismissCTA"
-    });
-    return v2.createElement(v4, {
-        title = v6.title, 
-        bodyText = v6.bodyText:gsub("{.*}", (tostring(v5.itemCount))), 
-        dismissCTA = v6.dismissCTA, 
-        onDismiss = v5.onDismiss
-    });
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+local useLocalization = require(BulkPurchaseAppParent.Localization).Hooks.useLocalization
+local AlertPrompt = require(BulkPurchaseApp.Components.AlertPrompt)
+
+local function BulkPurchaseSuccess(t1: {[any]: any}) -- line: 13
+	-- upvalues: useLocalization (copy), React (copy), AlertPrompt (copy)
+	local v8 = useLocalization({
+		title = "CoreScripts.BulkPurchasePrompt.SuccessPrompt.Heading",
+		bodyText = "CoreScripts.BulkPurchasePrompt.SuccessPrompt.Body",
+		dismissCTA = "CoreScripts.BulkPurchasePrompt.CompletedPrompt.DismissCTA"
+	})
+
+	return React.createElement(AlertPrompt, {
+		title = v8.title,
+		bodyText = v8.bodyText:gsub("{.*}", (tostring(t1.itemCount))),
+		dismissCTA = v8.dismissCTA,
+		onDismiss = t1.onDismiss
+	})
+end
+
+return BulkPurchaseSuccess

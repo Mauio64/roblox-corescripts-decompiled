@@ -1,17 +1,20 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Http");
-local v2 = require(l_script_FirstAncestor_0.Url);
-local _ = require(l_script_FirstAncestor_0.RequestTypes);
-return function(v4, v5, v6, v7, v8, v9) --[[ Line: 8 ]]
-    -- upvalues: l_HttpService_0 (copy), v2 (copy)
-    local v10 = l_HttpService_0:JSONEncode({
-        conversationId = v5, 
-        message = v6, 
-        decorators = v7, 
-        isExperienceInvite = v8, 
-        userId = v9
-    });
-    return v4(string.format("%s/send-message", v2.CHAT_URL), "POST", {
-        postBody = v10
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local Http = script:FindFirstAncestor("Http")
+local Url = require(Http.Url)
+
+require(Http.RequestTypes)
+
+return function(p1, p2, p3, p4, b1: boolean?, n1: number?) -- line: 8
+	-- upvalues: HttpService (copy), Url (copy)
+	local json = HttpService:JSONEncode({
+		conversationId = p2,
+		message = p3,
+		decorators = p4,
+		isExperienceInvite = b1,
+		userId = n1
+	})
+
+	return p1(string.format("%s/send-message", Url.CHAT_URL), "POST", {
+		postBody = json
+	})
+end

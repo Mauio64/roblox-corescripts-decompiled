@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.Parent.Parent.Action)("ScriptProfiler" .. script.Name, function(v0) --[[ Line: 4 ]]
-    return {
-        isClient = v0
-    };
-end);
+return require(script.Parent.Parent.Parent.Parent.Action)("ScriptProfiler" .. script.Name, function(p1) -- line: 4
+	return {
+		isClient = p1
+	}
+end)

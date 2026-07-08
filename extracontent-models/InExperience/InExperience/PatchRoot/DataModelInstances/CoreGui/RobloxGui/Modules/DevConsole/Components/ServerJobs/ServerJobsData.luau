@@ -1,145 +1,167 @@
-local v0 = require(script.Parent.Parent.Parent.CircularBuffer);
-local v1 = require(script.Parent.Parent.Parent.Signal);
-local l_ChartHeaderNames_0 = require(script.Parent.Parent.Parent.Constants).ServerJobsFormatting.ChartHeaderNames;
-local v3 = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"));
-local v12 = {
-    [l_ChartHeaderNames_0[1]] = function(v4, v5) --[[ Line: 11 ]]
-        return v4.name < v5.name;
-    end, 
-    [l_ChartHeaderNames_0[2]] = function(v6, v7) --[[ Line: 14 ]]
-        return v6.dataStats.dataSet:back().data[1] < v7.dataStats.dataSet:back().data[1];
-    end, 
-    [l_ChartHeaderNames_0[3]] = function(v8, v9) --[[ Line: 17 ]]
-        return v8.dataStats.dataSet:back().data[2] < v9.dataStats.dataSet:back().data[2];
-    end, 
-    [l_ChartHeaderNames_0[4]] = function(v10, v11) --[[ Line: 20 ]]
-        return v10.dataStats.dataSet:back().data[3] < v11.dataStats.dataSet:back().data[3];
-    end
-};
-local v13 = require(script.Parent.Parent.Parent.Util.minOfTable);
-local v14 = require(script.Parent.Parent.Parent.Util.maxOfTable);
-local v15 = require(script.Parent.Parent.Parent.Util.getClientReplicator);
-local v16 = {};
-v16.__index = v16;
-v16.new = function() --[[ Line: 32 ]] --[[ Name: new ]]
-    -- upvalues: v16 (copy), v1 (copy), l_ChartHeaderNames_0 (copy)
-    local v17 = {};
-    setmetatable(v17, v16);
-    v17._serverJobsUpdated = v1.new();
-    v17._serverJobsData = {};
-    v17._sortedJobsData = {};
-    v17._sortType = l_ChartHeaderNames_0[1];
-    v17._lastUpdate = 0;
-    v17._isRunning = false;
-    return v17;
-end;
-v16.setSortType = function(v18, v19) --[[ Line: 46 ]] --[[ Name: setSortType ]]
-    -- upvalues: v12 (copy)
-    if v12[v19] then
-        v18._sortType = v19;
-        table.sort(v18._sortedJobsData, v12[v18._sortType]);
-        return;
-    else
-        error(string.format("attempted to pass invalid sortType: %s", (tostring(v19))), 2);
-        return;
-    end;
-end;
-v16.getSortType = function(v20) --[[ Line: 56 ]] --[[ Name: getSortType ]]
-    return v20._sortType;
-end;
-v16.Signal = function(v21) --[[ Line: 60 ]] --[[ Name: Signal ]]
-    return v21._serverJobsUpdated;
-end;
-v16.getCurrentData = function(v22) --[[ Line: 64 ]] --[[ Name: getCurrentData ]]
-    return v22._sortedJobsData;
-end;
-v16.updateServerJobsData = function(v23, v24) --[[ Line: 68 ]] --[[ Name: updateServerJobsData ]]
-    -- upvalues: v0 (copy), v3 (copy), v14 (copy), v13 (copy)
-    v23._lastUpdate = os.time();
-    for v25, v26 in pairs(v24) do
-        if not v23._serverJobsData[v25] then
-            local v27 = v0.new(v3);
-            v27:push_back({
-                data = v26, 
-                time = v23._lastUpdate
-            });
-            v23._serverJobsData[v25] = {
-                max = v26, 
-                min = v26, 
-                dataSet = v27
-            };
-            local v28 = {
-                name = v25, 
-                dataStats = v23._serverJobsData[v25]
-            };
-            table.insert(v23._sortedJobsData, v28);
-        else
-            local v29 = {};
-            for v30, v31 in pairs(v23._serverJobsData[v25].max) do
-                v29[v30] = v31;
-            end;
-            local v32 = {};
-            for v33, v34 in pairs(v23._serverJobsData[v25].min) do
-                v32[v33] = v34;
-            end;
-            local v35 = {
-                data = v26, 
-                time = v23._lastUpdate
-            };
-            local v36 = v23._serverJobsData[v25].dataSet:push_back(v35);
-            if v36 then
-                for v37, v38 in pairs(v36.data) do
-                    if v29[v37] == v38 then
-                        local v39 = v23._serverJobsData[v25].dataSet:iterator();
-                        local v40 = v39:next();
-                        v29[v37] = v32[v37];
-                        while v40 do
-                            v29[v37] = v40.data[v37] < v29[v37] and v29[v37] or v40.data[v37];
-                            v40 = v39:next();
-                        end;
-                    end;
-                end;
-                for v41, v42 in pairs(v36.data) do
-                    if v32[v41] == v42 then
-                        local v43 = v23._serverJobsData[v25].dataSet:iterator();
-                        local v44 = v43:next();
-                        v32[v41] = v29[v41];
-                        while v44 do
-                            v32[v41] = v32[v41] < v44.data[v41] and v32[v41] or v44.data[v41];
-                            v44 = v43:next();
-                        end;
-                    end;
-                end;
-            end;
-            v23._serverJobsData[v25].max = v14(v29, v26);
-            v23._serverJobsData[v25].min = v13(v32, v26);
-        end;
-    end;
-end;
-v16.isRunning = function(v45) --[[ Line: 141 ]] --[[ Name: isRunning ]]
-    return v45._isRunning;
-end;
-v16.start = function(v46) --[[ Line: 145 ]] --[[ Name: start ]]
-    -- upvalues: v15 (copy)
-    local v47 = v15();
-    if v47 and not v46._statsListenerConnection then
-        v46._statsListenerConnection = v47.StatsReceived:connect(function(v48) --[[ Line: 148 ]]
-            -- upvalues: v46 (copy)
-            local l_Jobs_0 = v48.Jobs;
-            if l_Jobs_0 then
-                v46:updateServerJobsData(l_Jobs_0);
-                v46._serverJobsUpdated:Fire(v46._sortedJobsData);
-            end;
-        end);
-        v47:RequestServerStats(true);
-        v46._isRunning = true;
-    end;
-end;
-v16.stop = function(v50) --[[ Line: 161 ]] --[[ Name: stop ]]
-    if v50._statsListenerConnection then
-        v50._statsListenerConnection:Disconnect();
-        v50._statsListenerConnection = nil;
-        v50._isRunning = false;
-    end;
-end;
-return v16;
+local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local ChartHeaderNames = require(script.Parent.Parent.Parent.Constants).ServerJobsFormatting.ChartHeaderNames
+local num = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+local t1 = {
+	[ChartHeaderNames[1]] = function(p1, p2) -- line: 11
+		return p1.name < p2.name
+	end,
+	[ChartHeaderNames[2]] = function(p3, p4) -- line: 14
+		return p3.dataStats.dataSet:back().data[1] < p4.dataStats.dataSet:back().data[1]
+	end,
+	[ChartHeaderNames[3]] = function(p5, p6) -- line: 17
+		return p5.dataStats.dataSet:back().data[2] < p6.dataStats.dataSet:back().data[2]
+	end,
+	[ChartHeaderNames[4]] = function(p7, p8) -- line: 20
+		return p7.dataStats.dataSet:back().data[3] < p8.dataStats.dataSet:back().data[3]
+	end
+}
+local minOfTable = require(script.Parent.Parent.Parent.Util.minOfTable)
+local maxOfTable = require(script.Parent.Parent.Parent.Util.maxOfTable)
+local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new() -- line: 32
+	-- upvalues: t2 (copy), Signal (copy), ChartHeaderNames (copy)
+	local t3 = {}
+
+	setmetatable(t3, t2)
+	t3._serverJobsUpdated = Signal.new()
+	t3._serverJobsData = {}
+	t3._sortedJobsData = {}
+	t3._sortType = ChartHeaderNames[1]
+	t3._lastUpdate = 0
+	t3._isRunning = false
+
+	return t3
+end
+function t2.setSortType(p9, p10) -- line: 46
+	-- upvalues: t1 (copy)
+	if t1[p10] then
+		p9._sortType = p10
+		table.sort(p9._sortedJobsData, t1[p9._sortType])
+
+		return
+	end
+
+	error(string.format("attempted to pass invalid sortType: %s", (tostring(p10))), 2)
+end
+function t2.getSortType(p11) -- line: 56
+	return p11._sortType
+end
+function t2.Signal(p12) -- line: 60
+	return p12._serverJobsUpdated
+end
+function t2.getCurrentData(p13) -- line: 64
+	return p13._sortedJobsData
+end
+function t2.updateServerJobsData(p14, p15) -- line: 68
+	-- upvalues: CircularBuffer (copy), num (copy), maxOfTable (copy), minOfTable (copy)
+	p14._lastUpdate = os.time()
+
+	for k, v in pairs(p15) do
+		if not p14._serverJobsData[k] then
+			local v28 = CircularBuffer.new(num)
+
+			v28:push_back({
+				data = v,
+				time = p14._lastUpdate
+			})
+			p14._serverJobsData[k] = {
+				max = v,
+				min = v,
+				dataSet = v28
+			}
+
+			local t4 = {
+				name = k,
+				dataStats = p14._serverJobsData[k]
+			}
+
+			table.insert(p14._sortedJobsData, t4)
+		else
+			local t5 = {}
+
+			for k2, v2 in pairs(p14._serverJobsData[k].max) do
+				t5[k2] = v2
+			end
+
+			local t6 = {}
+
+			for k3, v3 in pairs(p14._serverJobsData[k].min) do
+				t6[k3] = v3
+			end
+
+			local t7 = {
+				data = v,
+				time = p14._lastUpdate
+			}
+			local v37 = p14._serverJobsData[k].dataSet:push_back(t7)
+
+			if v37 then
+				for k4, v4 in pairs(v37.data) do
+					if v4 == t5[k4] then
+						local v40 = p14._serverJobsData[k].dataSet:iterator()
+						local v41 = v40:next()
+
+						t5[k4] = t6[k4]
+
+						while v41 do
+							t5[k4] = v41.data[k4] < t5[k4] and t5[k4] or v41.data[k4]
+							v41 = v40:next()
+						end
+					end
+				end
+
+				for k5, v5 in pairs(v37.data) do
+					if v5 == t6[k5] then
+						local v44 = p14._serverJobsData[k].dataSet:iterator()
+						local v45 = v44:next()
+
+						t6[k5] = t5[k5]
+
+						while v45 do
+							t6[k5] = t6[k5] < v45.data[k5] and t6[k5] or v45.data[k5]
+							v45 = v44:next()
+						end
+					end
+				end
+			end
+
+			p14._serverJobsData[k].max = maxOfTable(t5, v)
+			p14._serverJobsData[k].min = minOfTable(t6, v)
+		end
+	end
+end
+function t2.isRunning(p16) -- line: 141
+	return p16._isRunning
+end
+function t2.start(p17) -- line: 145
+	-- upvalues: getClientReplicator (copy)
+	local v48 = getClientReplicator()
+
+	if v48 and not p17._statsListenerConnection then
+		p17._statsListenerConnection = v48.StatsReceived:connect(function(p18) -- line: 148
+			-- upvalues: p17 (copy)
+			local Jobs = p18.Jobs
+
+			if Jobs then
+				p17:updateServerJobsData(Jobs)
+				p17._serverJobsUpdated:Fire(p17._sortedJobsData)
+			end
+		end)
+		v48:RequestServerStats(true)
+		p17._isRunning = true
+	end
+end
+function t2.stop(p19) -- line: 161
+	if p19._statsListenerConnection then
+		p19._statsListenerConnection:Disconnect()
+		p19._statsListenerConnection = nil
+		p19._isRunning = false
+	end
+end
+
+return t2

@@ -1,4 +1,5 @@
-game:DefineFastFlag("ConsoleApplyTokenizationEdp", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ConsoleApplyTokenizationEdp");
-end;
+game:DefineFastFlag("ConsoleApplyTokenizationEdp", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ConsoleApplyTokenizationEdp")
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuafiedWechatQQLogin8", false);
+return game:DefineFastFlag("LuafiedWechatQQLogin8", false)

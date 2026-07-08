@@ -1,37 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local _ = require(l_script_FirstAncestor_0.Telemetry.Layers.ChatConversationTelemetryLayer);
-local v2 = require(l_script_FirstAncestor_0.Components.ModalTelemetry);
+local AppChat = script:FindFirstAncestor("AppChat")
+
+require(AppChat.Telemetry.Layers.ChatConversationTelemetryLayer)
+
+local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
+
 return {
-    Events = {
-        ModalRendered = v2.Events.modalRenderedWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationTopModal, 
-            counterFormat = function(v3, _) --[[ Line: 12 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v3.modalVariant
-                };
-            end, 
-            eventStreamFormat = function(v5, _) --[[ Line: 17 ]] --[[ Name: eventStreamFormat ]]
-                return {
-                    modalVariant = v5.modalVariant, 
-                    modalContext = v5.modalContext
-                };
-            end
-        }), 
-        ModalAction = v2.Events.modalActionWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationTopModal, 
-            counterFormat = function(v7, _) --[[ Line: 26 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v7.modalVariant, 
-                    action = v7.action
-                };
-            end, 
-            eventStreamFormat = function(v9, _) --[[ Line: 35 ]] --[[ Name: eventStreamFormat ]]
-                return {
-                    modalVariant = v9.modalVariant, 
-                    action = v9.action, 
-                    modalContext = v9.modalContext
-                };
-            end
-        })
-    }
-};
+	Events = {
+		ModalRendered = ModalTelemetry.Events.modalRenderedWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationTopModal,
+			counterFormat = function(p1, _) -- line: 12
+				return {
+					modalVariant = p1.modalVariant
+				}
+			end,
+			eventStreamFormat = function(p3, _) -- line: 17
+				return {
+					modalVariant = p3.modalVariant,
+					modalContext = p3.modalContext
+				}
+			end
+		}),
+		ModalAction = ModalTelemetry.Events.modalActionWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationTopModal,
+			counterFormat = function(p5, _) -- line: 26
+				return {
+					modalVariant = p5.modalVariant,
+					action = p5.action
+				}
+			end,
+			eventStreamFormat = function(p7, _) -- line: 35
+				return {
+					modalVariant = p7.modalVariant,
+					action = p7.action,
+					modalContext = p7.modalContext
+				}
+			end
+		})
+	}
+}

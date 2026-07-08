@@ -1,18 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(script.Parent.tokenize);
-local v5 = require(script.Parent.buildTree);
-local v6 = require(script.Parent.DefaultParserOptions);
-return function(v7, v8) --[[ Line: 10 ]] --[[ Name: parseXml ]]
-    -- upvalues: v4 (copy), v5 (copy), v3 (copy), v6 (copy)
-    return pcall(function() --[[ Line: 11 ]]
-        -- upvalues: v4 (ref), v7 (copy), v5 (ref), v3 (ref), v6 (ref), v8 (copy)
-        local v9 = v4(v7);
-        return v5(v9, {
-            TagConfigurations = v3.Dictionary.join(v6.TagConfigurations, v8 and v8.TagConfigurations or {}), 
-            TagAliases = v3.Dictionary.join(v6.TagAliases, v8 and v8.TagAliases or {})
-        });
-    end);
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+
+require(InlineRichText.Types)
+
+local InlineRichTextParent = InlineRichText.Parent
+local Cryo = require(InlineRichTextParent.Cryo)
+local tokenize = require(script.Parent.tokenize)
+local buildTree = require(script.Parent.buildTree)
+local DefaultParserOptions = require(script.Parent.DefaultParserOptions)
+
+local function parseXml(s1: string, p1) -- line: 10
+	-- upvalues: tokenize (copy), buildTree (copy), Cryo (copy), DefaultParserOptions (copy)
+	return pcall(function() -- line: 11
+		-- upvalues: tokenize (copy), s1 (copy), buildTree (copy), Cryo (copy), DefaultParserOptions (copy), p1 (copy)
+		local v10 = tokenize(s1)
+
+		return buildTree(v10, {
+			TagConfigurations = Cryo.Dictionary.join(DefaultParserOptions.TagConfigurations, p1 and p1.TagConfigurations or {}),
+			TagAliases = Cryo.Dictionary.join(DefaultParserOptions.TagAliases, p1 and p1.TagAliases or {})
+		})
+	end)
+end
+
+return parseXml

@@ -1,36 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_t_0 = require(l_Parent_0.PurchasePromptDeps).t;
-local _ = require(l_script_FirstAncestor_0.strict);
-local v4 = l_t_0.interface({
-    productId = l_t_0.number, 
-    mobileProductId = l_t_0.string, 
-    robuxAmount = l_t_0.number, 
-    isSubscriptionOnly = l_t_0.boolean, 
-    premiumFeatureTypeName = l_t_0.string, 
-    description = l_t_0.string, 
-    price = l_t_0.interface({
-        amount = l_t_0.number, 
-        currency = l_t_0.interface({
-            currencySymbol = l_t_0.string
-        })
-    })
-});
-return function(v5) --[[ Line: 29 ]]
-    -- upvalues: v4 (copy)
-    local v6, _ = v4(v5);
-    if not v6 then
-        return nil;
-    else
-        return {
-            productId = v5.productId, 
-            mobileProductId = v5.mobileProductId, 
-            robuxAmount = v5.robuxAmount, 
-            isSubscriptionOnly = v5.isSubscriptionOnly, 
-            premiumFeatureTypeName = v5.premiumFeatureTypeName, 
-            description = v5.description, 
-            price = v5.price.amount, 
-            currencySymbol = v5.price.currency.currencySymbol
-        };
-    end;
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local t = require(PurchasePromptParent.PurchasePromptDeps).t
+
+require(PurchasePrompt.strict)
+
+local v4 = t.interface({
+	productId = t.number,
+	mobileProductId = t.string,
+	robuxAmount = t.number,
+	isSubscriptionOnly = t.boolean,
+	premiumFeatureTypeName = t.string,
+	description = t.string,
+	price = t.interface({
+		amount = t.number,
+		currency = t.interface({
+			currencySymbol = t.string
+		})
+	})
+})
+
+return function(p1) -- line: 29
+	-- upvalues: v4 (copy)
+	local v6, _ = v4(p1)
+
+	if not v6 then
+		return nil
+	end
+
+	return {
+		productId = p1.productId,
+		mobileProductId = p1.mobileProductId,
+		robuxAmount = p1.robuxAmount,
+		isSubscriptionOnly = p1.isSubscriptionOnly,
+		premiumFeatureTypeName = p1.premiumFeatureTypeName,
+		description = p1.description,
+		price = p1.price.amount,
+		currencySymbol = p1.price.currency.currencySymbol
+	}
+end

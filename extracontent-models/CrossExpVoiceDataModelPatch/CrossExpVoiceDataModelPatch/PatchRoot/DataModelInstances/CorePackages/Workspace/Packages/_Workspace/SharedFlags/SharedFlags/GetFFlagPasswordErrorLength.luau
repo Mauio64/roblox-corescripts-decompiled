@@ -1,4 +1,5 @@
-game:DefineFastFlag("PasswordErrorLength", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("PasswordErrorLength");
-end;
+game:DefineFastFlag("PasswordErrorLength", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("PasswordErrorLength")
+end

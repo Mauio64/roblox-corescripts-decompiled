@@ -1,7 +1,8 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-return require(l_Parent_0.dependencies).enumerate(script.Name, {
-    DiscoverabilityModalLoad = "discoverabilityModalLoad", 
-    DiscoverabilityModalContinue = "discoverabilityModalDiscoverableContinue", 
-    DiscoverabilityModalClose = "discoverabilityModalDiscoverableClose", 
-    DiscoverabilityModalRadioButtonClick = "discoverabilityModalRadioButtonClick"
-});
+local ParentParent = script.Parent.Parent.Parent
+
+return require(ParentParent.dependencies).enumerate(script.Name, {
+	DiscoverabilityModalLoad = "discoverabilityModalLoad",
+	DiscoverabilityModalContinue = "discoverabilityModalDiscoverableContinue",
+	DiscoverabilityModalClose = "discoverabilityModalDiscoverableClose",
+	DiscoverabilityModalRadioButtonClick = "discoverabilityModalRadioButtonClick"
+})

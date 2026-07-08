@@ -1,56 +1,61 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local v2 = require(l_Parent_0.SocialLuaAnalytics);
-local l_AnalyticsFactory_0 = v2.Analytics.AnalyticsFactory;
-local l_DefaultAnalyticsService_0 = v2.Analytics.DefaultAnalyticsService;
-local v5 = require(script.Parent.EventStreamActionList);
-local v6 = require(script.Parent.DiagActionList);
-local v7 = require(l_Parent_0.React);
-local l_GetFFlagIsSquadEnabled_0 = require(l_Parent_0.SharedFlags).GetFFlagIsSquadEnabled;
-local v9 = require(script.Parent.RoactChatAnalyticsContext);
-local v10 = require(script.Parent.Logger);
-local l_ChatEntryPointNames_0 = require(l_Parent_0.SocialCommon).Enums.ChatEntryPointNames;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-return function(v13) --[[ Line: 27 ]]
-    -- upvalues: l_ChatEntryPointNames_0 (copy), v10 (copy), l_GetFFlagIsSquadEnabled_0 (copy), l_useSelector_0 (copy), l_RbxAnalyticsService_0 (copy), v7 (copy), l_AnalyticsFactory_0 (copy), v5 (copy), v6 (copy), l_DefaultAnalyticsService_0 (copy), v9 (copy)
-    local l_entryPoint_0 = v13.entryPoint;
-    if not l_entryPoint_0 or not l_ChatEntryPointNames_0[l_entryPoint_0] then
-        v10:warning("entryPoint=" .. tostring(l_entryPoint_0) .. " is not a reigstered value.");
-        l_entryPoint_0 = l_ChatEntryPointNames_0.Unknown;
-    end;
-    local v17 = if l_GetFFlagIsSquadEnabled_0() then l_useSelector_0(function(v15) --[[ Line: 36 ]]
-        local v16 = v15.Squad and v15.Squad.Squad and v15.Squad.Squad.currentSquad;
-        if v16 and v16.squadId then
-            return v16.squadId;
-        else
-            return nil;
-        end;
-    end) else nil;
-    local l_l_RbxAnalyticsService_0_PlaySessionId_0 = l_RbxAnalyticsService_0:GetPlaySessionId();
-    local v19 = v7.useMemo(function() --[[ Line: 44 ]]
-        -- upvalues: l_AnalyticsFactory_0 (ref), v5 (ref), v6 (ref), l_DefaultAnalyticsService_0 (ref), l_GetFFlagIsSquadEnabled_0 (ref), v17 (copy), l_entryPoint_0 (ref), l_l_RbxAnalyticsService_0_PlaySessionId_0 (copy)
-        return l_AnalyticsFactory_0.setUpAnalyticsFactory({
-            eventLists = {
-                EventStream = v5, 
-                Diag = v6
-            }, 
-            analyticsImpl = {
-                EventStream = l_DefaultAnalyticsService_0.EventStream, 
-                Diag = l_DefaultAnalyticsService_0.Diag
-            }, 
-            staticInfoForAllEvents = {
-                squadId = if l_GetFFlagIsSquadEnabled_0() then v17 else nil, 
-                entryPoint = l_entryPoint_0, 
-                channelsApiEnabled = true, 
-                playSessionId = l_l_RbxAnalyticsService_0_PlaySessionId_0
-            }
-        })();
-    end, {
-        v17, 
-        l_entryPoint_0, 
-        l_l_RbxAnalyticsService_0_PlaySessionId_0
-    });
-    return v7.createElement(v9.Provider, {
-        value = v19
-    }, v13.children);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local SocialLuaAnalytics = require(ParentParent.SocialLuaAnalytics)
+local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EventStreamActionList = require(script.Parent.EventStreamActionList)
+local DiagActionList = require(script.Parent.DiagActionList)
+local React = require(ParentParent.React)
+local GetFFlagIsSquadEnabled = require(ParentParent.SharedFlags).GetFFlagIsSquadEnabled
+local RoactChatAnalyticsContext = require(script.Parent.RoactChatAnalyticsContext)
+local Logger = require(script.Parent.Logger)
+local ChatEntryPointNames = require(ParentParent.SocialCommon).Enums.ChatEntryPointNames
+local useSelector = require(ParentParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+return function(t1: {[any]: any}) -- line: 27
+	-- upvalues: ChatEntryPointNames (copy), Logger (copy), GetFFlagIsSquadEnabled (copy), useSelector (copy), RbxAnalyticsService (copy), React (copy), AnalyticsFactory (copy), EventStreamActionList (copy), DiagActionList (copy), DefaultAnalyticsService (copy), RoactChatAnalyticsContext (copy)
+	local entryPoint = t1.entryPoint
+
+	if not entryPoint or not ChatEntryPointNames[entryPoint] then
+		Logger:warning("entryPoint=" .. tostring(entryPoint) .. " is not a reigstered value.")
+		entryPoint = ChatEntryPointNames.Unknown
+	end
+
+	local v16 = if not GetFFlagIsSquadEnabled() then nil else useSelector(function(p1) -- line: 36
+		local v20 = p1.Squad and (p1.Squad.Squad and p1.Squad.Squad.currentSquad)
+
+		if v20 and v20.squadId then
+			return v20.squadId
+		end
+
+		return nil
+	end)
+	local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
+	local v18 = React.useMemo(function() -- line: 44
+		-- upvalues: AnalyticsFactory (copy), EventStreamActionList (copy), DiagActionList (copy), DefaultAnalyticsService (copy), GetFFlagIsSquadEnabled (copy), v16 (copy), entryPoint (ref), PlaySessionId (copy)
+		return AnalyticsFactory.setUpAnalyticsFactory({
+			eventLists = {
+				EventStream = EventStreamActionList,
+				Diag = DiagActionList
+			},
+			analyticsImpl = {
+				EventStream = DefaultAnalyticsService.EventStream,
+				Diag = DefaultAnalyticsService.Diag
+			},
+			staticInfoForAllEvents = {
+				channelsApiEnabled = true,
+				squadId = if not GetFFlagIsSquadEnabled() then nil else v16,
+				entryPoint = entryPoint,
+				playSessionId = PlaySessionId
+			}
+		})()
+	end, {
+		v16,
+		entryPoint,
+		PlaySessionId
+	})
+
+	return React.createElement(RoactChatAnalyticsContext.Provider, {
+		value = v18
+	}, t1.children)
+end

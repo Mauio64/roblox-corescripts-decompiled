@@ -1,1 +1,1 @@
-return require(script.HintText);
+return require(script.HintText)

@@ -1,19 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Dev.JestConfigs);
-local l_setupJest_0 = script.Parent.setupJest;
+local ParentParent = script.Parent.Parent
+local JestConfigs = require(ParentParent.Dev.JestConfigs)
+local setupJest = script.Parent.setupJest
+
 return {
-    displayName = "ExpChat", 
-    testMatch = {
-        "**/*.test"
-    }, 
-    testPathIgnorePatterns = {
-        "GetChatModerationStore"
-    }, 
-    mockDataModel = false, 
-    setupFilesAfterEnv = {
-        v1.setupFiles.LogHandler, 
-        v1.setupFiles.UIBloxInitializer, 
-        v1.setupFiles.createPromiseRejectionHandler(), 
-        l_setupJest_0
-    }
-};
+	displayName = "ExpChat",
+	mockDataModel = false,
+	testMatch = { "**/*.test" },
+	testPathIgnorePatterns = {
+		"GetChatModerationStore",
+		"GetUserChatSettingsStore"
+	},
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.LogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		JestConfigs.setupFiles.RetryTimes,
+		setupJest
+	}
+}

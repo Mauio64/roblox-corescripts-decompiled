@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagEnableSocialProofUserList) and game:DefineFastFlag("EnableSocialProofOnItemDetails", false);
+return require(script.Parent.FFlagEnableSocialProofUserList) and game:DefineFastFlag("EnableSocialProofOnItemDetails", false)

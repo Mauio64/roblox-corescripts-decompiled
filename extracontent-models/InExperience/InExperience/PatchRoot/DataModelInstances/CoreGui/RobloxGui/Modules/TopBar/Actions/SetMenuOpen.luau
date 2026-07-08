@@ -1,11 +1,12 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-if require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeMenuOpen then
-    return nil;
-else
-    return (l_makeActionCreator_0(script.Name, function(v2) --[[ Line: 9 ]]
-        return {
-            menuOpen = v2
-        };
-    end));
-end;
+local CorePackages = game:GetService("CorePackages")
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+if require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeMenuOpen then
+	return nil
+end
+
+return (makeActionCreator(script.Name, function(p1) -- line: 9
+	return {
+		menuOpen = p1
+	}
+end))

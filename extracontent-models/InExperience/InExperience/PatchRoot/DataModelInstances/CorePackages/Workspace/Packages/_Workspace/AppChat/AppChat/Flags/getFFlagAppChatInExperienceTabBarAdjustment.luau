@@ -1,4 +1,5 @@
-game:DefineFastFlag("AppChatInExperienceTabBarAdjustment", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("AppChatInExperienceTabBarAdjustment");
-end;
+game:DefineFastFlag("AppChatInExperienceTabBarAdjustment", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("AppChatInExperienceTabBarAdjustment")
+end

@@ -1,4 +1,5 @@
-game:DefineFastString("LuaAppConsoleExperienceMenuLayer", "Experience.Menu.Console");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("LuaAppConsoleExperienceMenuLayer");
-end;
+game:DefineFastString("LuaAppConsoleExperienceMenuLayer", "Experience.Menu.Console")
+
+return function() -- line: 3
+	return game:GetFastString("LuaAppConsoleExperienceMenuLayer")
+end

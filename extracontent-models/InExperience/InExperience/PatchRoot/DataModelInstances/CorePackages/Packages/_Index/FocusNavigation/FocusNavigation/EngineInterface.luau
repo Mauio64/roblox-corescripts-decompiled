@@ -1,69 +1,74 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent;
-local l_mockableWarn_0 = require(l_Parent_0.FocusNavigationUtils).mockableWarn;
-local _ = require(script.Parent.types);
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 13 ]]
-    -- upvalues: l_GuiService_0 (copy)
-    return l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject");
-end);
-local l_status_1, l_result_1 = pcall(function() --[[ Line: 17 ]]
-    return game:GetService("CoreGui");
-end);
-local v9 = {
-    Connect = function() --[[ Line: 23 ]] --[[ Name: Connect ]]
-        error("Could not access SelectedCoreObject signal; you may not have the correct permissions");
-    end
-};
-local v11 = {
-    getSelection = function() --[[ Line: 30 ]] --[[ Name: getSelection ]]
-        -- upvalues: l_GuiService_0 (copy)
-        return l_GuiService_0.SelectedCoreObject;
-    end, 
-    setSelection = function(v10) --[[ Line: 33 ]] --[[ Name: setSelection ]]
-        -- upvalues: l_status_1 (copy), l_result_1 (copy), l_mockableWarn_0 (copy), l_GuiService_0 (copy)
-        if _G.__DEV__ and l_status_1 and v10 ~= nil and not v10:IsDescendantOf(l_result_1) then
-            l_mockableWarn_0(string.format("Attempting to focus non-CoreGui descendant '%s' from a CoreGui FocusNavigationService instance. Consider creating this FocusNavigationService with `FocusNavigation.EnginInterface.PlayerGui` instead", v10:GetFullName()));
-        end;
-        if v10 and not v10.Selectable then
-            l_GuiService_0:Select(v10);
-            return;
-        else
-            l_GuiService_0.SelectedCoreObject = v10;
-            return;
-        end;
-    end, 
-    SelectionChanged = if l_status_0 then l_result_0 else v9, 
-    InputBegan = l_UserInputService_0.InputBegan, 
-    InputChanged = l_UserInputService_0.InputChanged, 
-    InputEnded = l_UserInputService_0.InputEnded, 
-    LastInputTypeChanged = l_UserInputService_0.LastInputTypeChanged
-};
-local v13 = {
-    getSelection = function() --[[ Line: 60 ]] --[[ Name: getSelection ]]
-        -- upvalues: l_GuiService_0 (copy)
-        return l_GuiService_0.SelectedObject;
-    end, 
-    setSelection = function(v12) --[[ Line: 63 ]] --[[ Name: setSelection ]]
-        -- upvalues: l_status_1 (copy), l_result_1 (copy), l_mockableWarn_0 (copy), l_GuiService_0 (copy)
-        if _G.__DEV__ and l_status_1 and v12 ~= nil and v12:IsDescendantOf(l_result_1) then
-            l_mockableWarn_0(string.format("Attempting to focus CoreGui descendant '%s' from a non-CoreGui FocusNavigationService instance.Consider creating this FocusNavigationService with `FocusNavigation.EnginInterface.CoreGui` instead", v12:GetFullName()));
-        end;
-        if v12 and not v12.Selectable then
-            l_GuiService_0:Select(v12);
-            return;
-        else
-            l_GuiService_0.SelectedObject = v12;
-            return;
-        end;
-    end, 
-    SelectionChanged = l_GuiService_0:GetPropertyChangedSignal("SelectedObject"), 
-    InputBegan = l_UserInputService_0.InputBegan, 
-    InputChanged = l_UserInputService_0.InputChanged, 
-    InputEnded = l_UserInputService_0.InputEnded, 
-    LastInputTypeChanged = l_UserInputService_0.LastInputTypeChanged
-};
+local GuiService = game:GetService("GuiService")
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent
+local mockableWarn = require(ParentParent.FocusNavigationUtils).mockableWarn
+
+require(script.Parent.types)
+
+local ok, result = pcall(function() -- line: 13
+	-- upvalues: GuiService (copy)
+	return GuiService:GetPropertyChangedSignal("SelectedCoreObject")
+end)
+local ok2, result2 = pcall(function() -- line: 17
+	return game:GetService("CoreGui")
+end)
+local t1 = {
+	Connect = function() -- line: 23
+		error("Could not access SelectedCoreObject signal; you may not have the correct permissions")
+	end
+}
+local t2 = {
+	getSelection = function() -- line: 30
+		-- upvalues: GuiService (copy)
+		return GuiService.SelectedCoreObject
+	end,
+	setSelection = function(p1) -- line: 33
+		-- upvalues: ok2 (copy), result2 (copy), mockableWarn (copy), GuiService (copy)
+		if _G.__DEV__ and (ok2 and p1 ~= nil and not p1:IsDescendantOf(result2)) then
+			mockableWarn(string.format("Attempting to focus non-CoreGui descendant '%s' from a CoreGui FocusNavigationService instance. Consider creating this FocusNavigationService with `FocusNavigation.EnginInterface.PlayerGui` instead", p1:GetFullName()))
+		end
+
+		if p1 and not p1.Selectable then
+			GuiService:Select(p1)
+
+			return
+		end
+
+		GuiService.SelectedCoreObject = p1
+	end,
+	SelectionChanged = if not ok then t1 else result,
+	InputBegan = UserInputService.InputBegan,
+	InputChanged = UserInputService.InputChanged,
+	InputEnded = UserInputService.InputEnded,
+	LastInputTypeChanged = UserInputService.LastInputTypeChanged
+}
+local t3 = {
+	getSelection = function() -- line: 60
+		-- upvalues: GuiService (copy)
+		return GuiService.SelectedObject
+	end,
+	setSelection = function(p2) -- line: 63
+		-- upvalues: ok2 (copy), result2 (copy), mockableWarn (copy), GuiService (copy)
+		if _G.__DEV__ and (ok2 and p2 ~= nil and p2:IsDescendantOf(result2)) then
+			mockableWarn(string.format("Attempting to focus CoreGui descendant '%s' from a non-CoreGui FocusNavigationService instance.Consider creating this FocusNavigationService with `FocusNavigation.EnginInterface.CoreGui` instead", p2:GetFullName()))
+		end
+
+		if p2 and not p2.Selectable then
+			GuiService:Select(p2)
+
+			return
+		end
+
+		GuiService.SelectedObject = p2
+	end,
+	SelectionChanged = GuiService:GetPropertyChangedSignal("SelectedObject"),
+	InputBegan = UserInputService.InputBegan,
+	InputChanged = UserInputService.InputChanged,
+	InputEnded = UserInputService.InputEnded,
+	LastInputTypeChanged = UserInputService.LastInputTypeChanged
+}
+
 return {
-    CoreGui = v11, 
-    PlayerGui = v13
-};
+	CoreGui = t2,
+	PlayerGui = t3
+}

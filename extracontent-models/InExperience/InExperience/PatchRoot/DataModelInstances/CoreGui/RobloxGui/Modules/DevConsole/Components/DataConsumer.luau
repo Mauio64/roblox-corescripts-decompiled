@@ -1,49 +1,63 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Components_0 = script.Parent.Parent.Components;
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.Parent.Parent.Immutable);
-local v4 = require(l_Components_0.DataContext);
-return function(v5, ...) --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), v3 (copy), v4 (copy)
-    if not v5 then
-        error("Expected component to be passed to connection, got nil.");
-    end;
-    local v6 = {};
-    for v7 = 1, select("#", ...) do
-        v6[v7] = select(v7, ...);
-    end;
-    local v8 = string.format("Consumer(%s)_DependsOn_%s", tostring(v5), v6[1]);
-    local v9 = v2.Component:extend(v8);
-    v9.init = function(v10) --[[ Line: 21 ]] --[[ Name: init ]]
-        -- upvalues: v6 (copy)
-        local v11 = {};
-        for _, v13 in pairs(v6) do
-            local v14 = v10.props.DevConsoleData[v13];
-            if not v14 then
-                local v15 = string.format("%s %s", tostring(v13), "could not be found. Make sure DataProvider is above this consumer");
-                error(v15);
-                return;
-            else
-                v11[v13] = v14;
-            end;
-        end;
-        v10:setState(v11);
-    end;
-    v9.render = function(v16) --[[ Line: 40 ]] --[[ Name: render ]]
-        -- upvalues: v3 (ref), v2 (ref), v5 (copy)
-        local v17 = v3.JoinDictionaries(v16.props.componentProps, v16.state);
-        return v2.createElement(v5, v17);
-    end;
-    return function(v18) --[[ Line: 45 ]] --[[ Name: DataConsumerWrapper ]]
-        -- upvalues: v2 (ref), v4 (ref), v9 (copy)
-        return v2.createElement(v4.Consumer, {
-            render = function(v19) --[[ Line: 47 ]] --[[ Name: render ]]
-                -- upvalues: v2 (ref), v9 (ref), v18 (copy)
-                return v2.createElement(v9, {
-                    componentProps = v18, 
-                    DevConsoleData = v19
-                });
-            end
-        });
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Components = script.Parent.Parent.Components
+local Roact = require(CorePackages.Packages.Roact)
+local Immutable = require(script.Parent.Parent.Immutable)
+local DataContext = require(Components.DataContext)
+
+return function(p1, ...) -- line: 8
+	-- upvalues: Roact (copy), Immutable (copy), DataContext (copy)
+	if not p1 then
+		error("Expected component to be passed to connection, got nil.")
+	end
+
+	local t1 = {}
+
+	for i = 1, select("#", ...) do
+		t1[i] = select(i, ...)
+	end
+
+	local v9 = string.format("Consumer(%s)_DependsOn_%s", tostring(p1), t1[1])
+	local v10 = Roact.Component:extend(v9)
+
+	function v10.init(p2) -- line: 21
+		-- upvalues: t1 (copy)
+		local t2 = {}
+
+		for _, v in pairs(t1) do
+			local v16 = p2.props.DevConsoleData[v]
+
+			if not v16 then
+				local v17 = string.format("%s %s", tostring(v), "could not be found. Make sure DataProvider is above this consumer")
+
+				error(v17)
+
+				return
+			end
+
+			t2[v] = v16
+		end
+
+		p2:setState(t2)
+	end
+	function v10.render(p3) -- line: 40
+		-- upvalues: Immutable (copy), Roact (copy), p1 (copy)
+		local v19 = Immutable.JoinDictionaries(p3.props.componentProps, p3.state)
+
+		return Roact.createElement(p1, v19)
+	end
+
+	local function DataConsumerWrapper(p4) -- line: 45
+		-- upvalues: Roact (copy), DataContext (copy), v10 (copy)
+		return Roact.createElement(DataContext.Consumer, {
+			render = function(p5) -- line: 47
+				-- upvalues: Roact (copy), v10 (copy), p4 (copy)
+				return Roact.createElement(v10, {
+					componentProps = p4,
+					DevConsoleData = p5
+				})
+			end
+		})
+	end
+
+	return DataConsumerWrapper
+end

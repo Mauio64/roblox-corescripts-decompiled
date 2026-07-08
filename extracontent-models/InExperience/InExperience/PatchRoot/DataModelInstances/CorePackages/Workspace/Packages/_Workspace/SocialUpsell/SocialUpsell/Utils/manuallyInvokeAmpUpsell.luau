@@ -1,24 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AmpUpsell);
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local l_InExpAmpWizardController_0 = v2.InExpAmpWizardController;
-local l_AccessResponseEnum_0 = v2.AmpEnums.AccessResponseEnum;
-local l_DEFAULT_FAE_ENTRY_POINT_EVENT_CTX_0 = v3.DEFAULT_FAE_ENTRY_POINT_EVENT_CTX;
-local v7 = require(l_script_FirstAncestor_0.Flag.FStringCommsFAEFeatureName);
-local v8 = require(l_script_FirstAncestor_0.Flag.FStringCommsFAENamespace);
-return function(v9, v10, v11) --[[ Line: 14 ]]
-    -- upvalues: l_DEFAULT_FAE_ENTRY_POINT_EVENT_CTX_0 (copy), l_InExpAmpWizardController_0 (copy), v7 (copy), l_AccessResponseEnum_0 (copy), v8 (copy)
-    local v12 = v9 or l_DEFAULT_FAE_ENTRY_POINT_EVENT_CTX_0;
-    return l_InExpAmpWizardController_0.OpenAmpWizardContainerInExp(v7, function(v13, _) --[[ Line: 18 ]]
-        -- upvalues: l_AccessResponseEnum_0 (ref), v10 (copy), v11 (copy)
-        if v13 == l_AccessResponseEnum_0.Granted then
-            if v10 then
-                v10();
-                return;
-            end;
-        elseif v11 then
-            v11();
-        end;
-    end, nil, v12, nil, v8);
-end;
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+local SocialUpsellParent = SocialUpsell.Parent
+local AmpUpsell = require(SocialUpsellParent.AmpUpsell)
+local Constants = require(SocialUpsell.Constants)
+local InExpAmpWizardController = AmpUpsell.InExpAmpWizardController
+local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
+local DEFAULT_FAE_ENTRY_POINT_EVENT_CTX = Constants.DEFAULT_FAE_ENTRY_POINT_EVENT_CTX
+local FStringCommsFAEFeatureName = require(SocialUpsell.Flag.FStringCommsFAEFeatureName)
+local FStringCommsFAENamespace = require(SocialUpsell.Flag.FStringCommsFAENamespace)
+
+return function(s1: string?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?) -- line: 14
+	-- upvalues: DEFAULT_FAE_ENTRY_POINT_EVENT_CTX (copy), InExpAmpWizardController (copy), FStringCommsFAEFeatureName (copy), AccessResponseEnum (copy), FStringCommsFAENamespace (copy)
+	local v13 = s1 or DEFAULT_FAE_ENTRY_POINT_EVENT_CTX
+
+	return InExpAmpWizardController.OpenAmpWizardContainerInExp(FStringCommsFAEFeatureName, function(p3, _) -- line: 18
+		-- upvalues: AccessResponseEnum (copy), p1 (copy), p2 (copy)
+		if p3 == AccessResponseEnum.Granted then
+			if p1 then
+				p1()
+
+				return
+			end
+		elseif p2 then
+			p2()
+		end
+	end, nil, v13, nil, FStringCommsFAENamespace)
+end

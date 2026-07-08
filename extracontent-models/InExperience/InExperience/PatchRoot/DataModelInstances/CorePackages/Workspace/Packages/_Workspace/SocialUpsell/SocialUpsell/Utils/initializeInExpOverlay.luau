@@ -1,54 +1,59 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v5 = require(l_Parent_0.ReactRoblox);
-local v6 = require(l_Parent_0.React);
-local v7 = require(l_Parent_0.Signals);
-local v8 = require(l_script_FirstAncestor_0.Components.InExpOverlay);
-local v9 = require(l_script_FirstAncestor_0.Constants);
-local v10 = require(l_script_FirstAncestor_0.Store.getOverlayStore);
-local v11 = nil;
-local v12 = nil;
-mount = function() --[[ Line: 20 ]] --[[ Name: mount ]]
-    -- upvalues: v11 (ref), v12 (ref), l_CoreGui_0 (copy), v5 (copy), l_GuiService_0 (copy), v9 (copy), l_ContextActionService_0 (copy), v6 (copy), v8 (copy)
-    if not v11 then
-        if not v12 then
-            v12 = Instance.new("Folder");
-            v12.Name = "Overlay";
-            v12.Parent = l_CoreGui_0;
-        end;
-        v11 = v5.createRoot(v12);
-    end;
-    l_GuiService_0:SetMenuIsOpen(true, v9.OVERLAY_MENU_NAME);
-    l_ContextActionService_0:BindCoreAction(v9.OVERLAY_CORE_ACTION_NAME, function() --[[ Line: 33 ]]
+local CoreGui = game:GetService("CoreGui")
+local GuiService = game:GetService("GuiService")
+local ContextActionService = game:GetService("ContextActionService")
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+local SocialUpsellParent = SocialUpsell.Parent
+local ReactRoblox = require(SocialUpsellParent.ReactRoblox)
+local React = require(SocialUpsellParent.React)
+local Signals = require(SocialUpsellParent.Signals)
+local InExpOverlay = require(SocialUpsell.Components.InExpOverlay)
+local Constants = require(SocialUpsell.Constants)
+local getOverlayStore = require(SocialUpsell.Store.getOverlayStore)
+local u12 = nil
+local Folder = nil
 
-    end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape);
-    v11:render(v6.createElement(v8, {
-        gui = v12
-    }));
-end;
-unmount = function() --[[ Line: 43 ]] --[[ Name: unmount ]]
-    -- upvalues: v11 (ref), l_ContextActionService_0 (copy), v9 (copy), l_GuiService_0 (copy)
-    if v11 then
-        v11:unmount();
-        l_ContextActionService_0:UnbindCoreAction(v9.OVERLAY_CORE_ACTION_NAME);
-        l_GuiService_0:SetMenuIsOpen(false, v9.OVERLAY_MENU_NAME);
-    end;
-end;
-local v13 = nil;
-return function() --[[ Line: 52 ]]
-    -- upvalues: v10 (copy), v13 (ref), v7 (copy)
-    local v14 = v10(false);
-    v13 = v7.createEffect(function(v15) --[[ Line: 55 ]]
-        -- upvalues: v14 (copy)
-        if v14.getCurrentOverlayType(v15) then
-            mount();
-            return;
-        else
-            unmount();
-            return;
-        end;
-    end);
-end;
+function mount() -- line: 20
+	-- upvalues: u12 (ref), Folder (ref), CoreGui (copy), ReactRoblox (copy), GuiService (copy), Constants (copy), ContextActionService (copy), React (copy), InExpOverlay (copy)
+	if not u12 then
+		if not Folder then
+			Folder = Instance.new("Folder")
+			Folder.Name = "Overlay"
+			Folder.Parent = CoreGui
+		end
+
+		u12 = ReactRoblox.createRoot(Folder)
+	end
+
+	GuiService:SetMenuIsOpen(true, Constants.OVERLAY_MENU_NAME)
+	ContextActionService:BindCoreAction(Constants.OVERLAY_CORE_ACTION_NAME, function() -- line: 33
+	end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.Escape)
+	u12:render(React.createElement(InExpOverlay, {
+		gui = Folder
+	}))
+end
+function unmount() -- line: 43
+	-- upvalues: u12 (ref), ContextActionService (copy), Constants (copy), GuiService (copy)
+	if u12 then
+		u12:unmount()
+		ContextActionService:UnbindCoreAction(Constants.OVERLAY_CORE_ACTION_NAME)
+		GuiService:SetMenuIsOpen(false, Constants.OVERLAY_MENU_NAME)
+	end
+end
+
+local u14 = nil
+
+return function() -- line: 52
+	-- upvalues: getOverlayStore (copy), u14 (ref), Signals (copy)
+	local v15 = getOverlayStore(false)
+
+	u14 = Signals.createEffect(function(p1) -- line: 55
+		-- upvalues: v15 (copy)
+		if v15.getCurrentOverlayType(p1) then
+			mount()
+
+			return
+		end
+
+		unmount()
+	end)
+end

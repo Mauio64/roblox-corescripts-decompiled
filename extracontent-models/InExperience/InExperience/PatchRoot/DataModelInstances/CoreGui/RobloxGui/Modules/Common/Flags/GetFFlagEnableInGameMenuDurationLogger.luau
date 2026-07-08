@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableInGameMenuDurationLogger", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableInGameMenuDurationLogger");
-end;
+game:DefineFastFlag("EnableInGameMenuDurationLogger", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableInGameMenuDurationLogger")
+end

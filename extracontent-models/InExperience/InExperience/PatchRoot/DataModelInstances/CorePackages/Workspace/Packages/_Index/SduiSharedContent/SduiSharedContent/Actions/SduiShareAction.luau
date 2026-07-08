@@ -1,166 +1,234 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local l_default_0 = require(l_Parent_0.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default;
-local v4 = require(l_Parent_0.Foundation);
-local v5 = require(l_Parent_0.HttpRequest);
-local v6 = require(l_Parent_0.Promise);
-local v7 = require(l_Parent_0.SduiCoreSystem);
-local v8 = require(l_Parent_0.UrlBuilder);
-local v9 = require(l_Parent_0.SharedFlags);
-local l_SduiActionType_0 = v7.SduiActionType;
-local l_SduiErrorType_0 = v7.SduiErrors.SduiErrorType;
-local l_getSduiPageEntrySnackbarStore_0 = require(l_Parent_0.SduiSharedUtilities).getSduiPageEntrySnackbarStore;
-local l_UrlBase_0 = v8.UrlBase;
-local l_UrlBuilder_0 = v8.UrlBuilder;
-local l_FFlagSduiExperienceDetailsSupport_0 = v9.FFlagSduiExperienceDetailsSupport;
-local l_FFlagSduiEventDetailsSupport_0 = v9.FFlagSduiEventDetailsSupport;
-local function v26(v17, v18, v19, v20) --[[ Line: 34 ]] --[[ Name: handleGenericShare ]]
-    -- upvalues: l_SduiErrorType_0 (copy), l_SduiActionType_0 (copy), l_default_0 (copy), l_UserInputService_0 (copy), l_getSduiPageEntrySnackbarStore_0 (copy), v4 (copy)
-    local v21 = v18 and v18.url;
-    local v22 = v18 and v18.shareUrlContext;
-    if v21 == nil then
-        v20.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.Share, 
-            message = ("Missing url in shareLinkData for %* share type"):format(v17)
-        }, v20.appPage);
-        return;
-    elseif v22 == nil then
-        v20.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.Share, 
-            message = ("Missing shareUrlContext in shareLinkData for %* share type"):format(v17)
-        }, v20.appPage);
-        return;
-    else
-        l_default_0:shareUrl({
-            context = v22, 
-            url = v21
-        });
-        local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-        local v24 = true;
-        if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.Windows then
-            v24 = true;
-            if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.OSX then
-                v24 = l_l_UserInputService_0_Platform_0 == Enum.Platform.UWP;
-            end;
-        end;
-        if v24 then
-            if v19 == nil then
-                v20.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-                    name = l_SduiActionType_0.Share, 
-                    message = "Missing entryPointKey in SduiShareAction"
-                }, v20.appPage);
-                return;
-            else
-                local v25 = v20.dependencies.localization:Format("Feature.GameDetails.Toast.LinkCopied");
-                l_getSduiPageEntrySnackbarStore_0().show(v19, {
-                    title = v25, 
-                    icon = v4.Enums.IconName.CircleCheck
-                });
-            end;
-        end;
-        return;
-    end;
-end;
-local function v36(v27, v28) --[[ Line: 88 ]] --[[ Name: fetchShareLinkId ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_UrlBase_0 (copy), l_HttpService_0 (copy), v5 (copy)
-    local v29 = l_UrlBuilder_0.new({
-        base = l_UrlBase_0.APIS, 
-        path = "sharelinks/v1/get-or-create-link"
-    })();
-    local v30 = l_HttpService_0:JSONEncode({
-        linkType = v27, 
-        data = l_HttpService_0:JSONEncode(v28)
-    });
-    return v5.config({
-        requestFunction = function(v31, v32, v33) --[[ Line: 100 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v5 (ref)
-            return v5.requestFunctions.RequestInternal(v31, v32, v33);
-        end
-    })(v29, "POST", {
-        postBody = v30
-    }):andThen(function(v34) --[[ Line: 105 ]]
-        local v35 = v34.responseBody or v34.result;
-        if v35 and v35.linkId then
-            return v35.linkId;
-        else
-            error("Share link response missing linkId");
-            return;
-        end;
-    end);
-end;
-return function(v37, _, v39) --[[ Line: 115 ]]
-    -- upvalues: l_SduiErrorType_0 (copy), l_SduiActionType_0 (copy), l_FFlagSduiExperienceDetailsSupport_0 (copy), l_FFlagSduiEventDetailsSupport_0 (copy), v6 (copy), v36 (copy), l_UrlBuilder_0 (copy), l_default_0 (copy), l_UserInputService_0 (copy), l_getSduiPageEntrySnackbarStore_0 (copy), v4 (copy), v26 (copy)
-    local v40 = v37 and v37.actionParams or nil;
-    if v40 == nil then
-        v39.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.Share, 
-            message = "Missing actionParams"
-        }, v39.appPage);
-        return;
-    elseif l_FFlagSduiExperienceDetailsSupport_0 or l_FFlagSduiEventDetailsSupport_0 then
-        local v41 = v40.shareLinkData or {};
-        local v42 = v40.entryPointKey or nil;
-        local v43 = v41.shareUrlContext or "";
-        local v44 = v41.linkType ~= nil;
-        local v45 = nil;
-        if v44 then
-            local l_linkType_0 = v41.linkType;
-            local l_linkData_0 = v41.linkData;
-            v45 = if l_linkData_0 == nil then v6.reject((("Missing linkData in ShareLinkFetchData (linkType=%*)"):format(l_linkType_0))) else v36(l_linkType_0, l_linkData_0):andThen(function(v48) --[[ Line: 143 ]]
-                -- upvalues: l_UrlBuilder_0 (ref), l_linkType_0 (copy)
-                local v49 = tostring(DateTime.now().UnixTimestampMillis);
-                return l_UrlBuilder_0.sharelinks.shortUrl({
-                    linkId = v48, 
-                    type = l_linkType_0, 
-                    stamp = v49
-                });
-            end);
-        else
-            local l_url_0 = v41.url;
-            v45 = if l_url_0 == nil then v6.reject("Missing url in shareLinkData") else v6.resolve(l_url_0);
-        end;
-        v45:andThen(function(v51) --[[ Line: 162 ]]
-            -- upvalues: l_default_0 (ref), v43 (copy), l_UserInputService_0 (ref), v42 (copy), v39 (copy), l_getSduiPageEntrySnackbarStore_0 (ref), v4 (ref)
-            l_default_0:shareUrl({
-                context = v43, 
-                url = v51
-            });
-            local l_l_UserInputService_0_Platform_1 = l_UserInputService_0:GetPlatform();
-            local v53 = true;
-            if l_l_UserInputService_0_Platform_1 ~= Enum.Platform.Windows then
-                v53 = true;
-                if l_l_UserInputService_0_Platform_1 ~= Enum.Platform.OSX then
-                    v53 = l_l_UserInputService_0_Platform_1 == Enum.Platform.UWP;
-                end;
-            end;
-            if v53 and v42 then
-                local v54 = v39.dependencies.localization:Format("Feature.GameDetails.Toast.LinkCopied");
-                l_getSduiPageEntrySnackbarStore_0().show(v42, {
-                    title = v54, 
-                    icon = v4.Enums.IconName.CircleCheck
-                });
-            end;
-        end):catch(function(v55) --[[ Line: 182 ]]
-            -- upvalues: v39 (copy), l_SduiErrorType_0 (ref), l_SduiActionType_0 (ref), v42 (copy), l_getSduiPageEntrySnackbarStore_0 (ref), v4 (ref)
-            v39.dependencies.logger.reportError(l_SduiErrorType_0.FailedToExecuteAction, {
-                name = l_SduiActionType_0.Share, 
-                message = tostring(v55)
-            }, v39.appPage);
-            if v42 then
-                local v56 = v39.dependencies.localization:Format("Feature.Toast.NetworkingError.SomethingIsWrong");
-                l_getSduiPageEntrySnackbarStore_0().show(v42, {
-                    title = v56, 
-                    icon = v4.Enums.IconName.TriangleExclamation
-                });
-            end;
-        end);
-        return;
-    else
-        local l_shareLinkType_0 = v40.shareLinkType;
-        local v58 = v40.shareLinkData or {};
-        local v59 = v40.entryPointKey or nil;
-        v26(l_shareLinkType_0, v58, v59, v39);
-        return;
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local DiscoveryAnalytics = require(Parent.DiscoveryAnalytics)
+local default = require(Parent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
+local Foundation = require(Parent.Foundation)
+local HttpRequest = require(Parent.HttpRequest)
+local Promise = require(Parent.Promise)
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local UrlBuilder = require(Parent.UrlBuilder)
+local SharedFlags = require(Parent.SharedFlags)
+local SduiActionType = SduiCoreSystem.SduiActionType
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+local getActionTelemetryFieldValue = SduiCoreSystem.getActionTelemetryFieldValue
+local getSduiPageEntrySnackbarStore = require(Parent.SduiSharedUtilities).getSduiPageEntrySnackbarStore
+local UrlBase = UrlBuilder.UrlBase
+local UrlBuilder2 = UrlBuilder.UrlBuilder
+local gameCopyExperienceLink = DiscoveryAnalytics.Events.gameCopyExperienceLink
+local gameShareExperienceLink = DiscoveryAnalytics.Events.gameShareExperienceLink
+local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
+local FFlagSduiEventDetailsSupport = SharedFlags.FFlagSduiEventDetailsSupport
+
+local function isDesktopPlatform() -- line: 38
+	-- upvalues: UserInputService (copy)
+	local Platform = UserInputService:GetPlatform()
+
+	return Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP)
+end
+local function logExperienceDetailsShareAnalytics(s1: string, s2: string, s3: string?, s4: string?) -- line: 45
+	-- upvalues: Players (copy), UserInputService (copy), gameCopyExperienceLink (copy), gameShareExperienceLink (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if not LocalPlayer then
+		return
+	end
+
+	local str = tostring(LocalPlayer.UserId)
+	local Platform = UserInputService:GetPlatform()
+
+	if Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP) then
+		gameCopyExperienceLink({
+			ctx = s2,
+			uid = str,
+			placeId = s1,
+			stamp = s4
+		}, s2)
+
+		return
+	end
+
+	gameShareExperienceLink({
+		shareToAppsflyer = true,
+		ctx = s2,
+		uid = str,
+		placeId = s1,
+		shortShareLinkFailed = s3 == nil,
+		stamp = s4,
+		linkId = s3
+	}, s2)
+end
+local function handleGenericShare(s5: string, t1: {[any]: any}, s6: string, p1) -- line: 77
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), default (copy), UserInputService (copy), getSduiPageEntrySnackbarStore (copy), Foundation (copy)
+	local v39 = t1 and t1.url
+	local v40 = t1 and t1.shareUrlContext
+
+	if v39 == nil then
+		p1.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			name = SduiActionType.Share,
+			message = `Missing url in shareLinkData for { s5 } share type`
+		}, p1.appPage)
+
+		return
+	end
+
+	if v40 == nil then
+		p1.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			name = SduiActionType.Share,
+			message = `Missing shareUrlContext in shareLinkData for { s5 } share type`
+		}, p1.appPage)
+
+		return
+	end
+
+	default:shareUrl({
+		context = v40,
+		url = v39
+	})
+
+	local Platform = UserInputService:GetPlatform()
+
+	if Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP) then
+		if s6 == nil then
+			p1.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+				message = "Missing entryPointKey in SduiShareAction",
+				name = SduiActionType.Share
+			}, p1.appPage)
+
+			return
+		end
+
+		local v42 = p1.dependencies.localization:Format("Feature.GameDetails.Toast.LinkCopied")
+
+		getSduiPageEntrySnackbarStore().show(s6, {
+			title = v42,
+			icon = Foundation.Enums.IconName.CircleCheck
+		})
+	end
+end
+local function fetchShareLinkId(s7: string, t2: {[any]: any}) -- line: 131
+	-- upvalues: UrlBuilder2 (copy), UrlBase (copy), HttpService (copy), HttpRequest (copy)
+	local v45 = UrlBuilder2.new({
+		path = "sharelinks/v1/get-or-create-link",
+		base = UrlBase.APIS
+	})()
+	local json = HttpService:JSONEncode({
+		linkType = s7,
+		data = HttpService:JSONEncode(t2)
+	})
+
+	return HttpRequest.config({
+		requestFunction = function(s8: string, s9: string, p2) -- line: 143
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.RequestInternal(s8, s9, p2)
+		end
+	})(v45, "POST", {
+		postBody = json
+	}):andThen(function(p3) -- line: 148
+		local v68 = p3.responseBody or p3.result
+
+		if v68 and v68.linkId then
+			return v68.linkId
+		end
+
+		error("Share link response missing linkId")
+	end)
+end
+
+return function(p4, p5, p6) -- line: 158
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiEventDetailsSupport (copy), Promise (copy), fetchShareLinkId (copy), UrlBuilder2 (copy), default (copy), UserInputService (copy), getSduiPageEntrySnackbarStore (copy), Foundation (copy), getActionTelemetryFieldValue (copy), logExperienceDetailsShareAnalytics (copy), handleGenericShare (copy)
+	local v50 = p4 and p4.actionParams or nil
+
+	if v50 == nil then
+		p6.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing actionParams",
+			name = SduiActionType.Share
+		}, p6.appPage)
+
+		return
+	end
+
+	if FFlagSduiExperienceDetailsSupport or FFlagSduiEventDetailsSupport then
+		local v51 = v50.shareLinkData or {}
+		local v52 = v50.entryPointKey or nil
+		local v53 = v51.shareUrlContext or ""
+		local v54 = v51.linkType ~= nil
+		local u55 = nil
+		local str = nil
+		local v59
+
+		if v54 then
+			local linkType = v51.linkType
+			local linkData = v51.linkData
+
+			v59 = if linkData ~= nil then fetchShareLinkId(linkType, linkData):andThen(function(s10: string) -- line: 190
+				-- upvalues: u55 (ref), str (ref), UrlBuilder2 (copy), linkType (copy)
+				u55 = s10
+				str = tostring(DateTime.now().UnixTimestampMillis)
+
+				return UrlBuilder2.sharelinks.shortUrl({
+					linkId = s10,
+					type = linkType,
+					stamp = str
+				})
+			end) else Promise.reject(`Missing linkData in ShareLinkFetchData (linkType={ linkType })`)
+		else
+			local url = v51.url
+
+			v59 = if url ~= nil then Promise.resolve(url) else Promise.reject("Missing url in shareLinkData")
+		end
+
+		v59:andThen(function(s11: string) -- line: 210
+			-- upvalues: default (copy), v53 (copy), UserInputService (copy), v52 (copy), p6 (copy), getSduiPageEntrySnackbarStore (copy), Foundation (copy), v51 (copy), getActionTelemetryFieldValue (copy), p4 (copy), p5 (copy), logExperienceDetailsShareAnalytics (copy), u55 (ref), str (ref)
+			default:shareUrl({
+				context = v53,
+				url = s11
+			})
+
+			local Platform = UserInputService:GetPlatform()
+
+			if (Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.UWP)) and v52 then
+				local v72 = p6.dependencies.localization:Format("Feature.GameDetails.Toast.LinkCopied")
+
+				getSduiPageEntrySnackbarStore().show(v52, {
+					title = v72,
+					icon = Foundation.Enums.IconName.CircleCheck
+				})
+			end
+
+			if v51.linkType == "ExperienceDetails" then
+				local v73 = getActionTelemetryFieldValue(p4, p5, "rootPlaceId") or getActionTelemetryFieldValue(p4, p5, "placeId")
+
+				if v73 ~= nil then
+					local v74 = getActionTelemetryFieldValue(p4, p5, "ctx") or "ExperienceDetailsShare"
+
+					logExperienceDetailsShareAnalytics(tostring(v73), v74, u55, str)
+				end
+			end
+		end):catch(function(p7) -- line: 240
+			-- upvalues: p6 (copy), SduiErrorType (copy), SduiActionType (copy), v52 (copy), getSduiPageEntrySnackbarStore (copy), Foundation (copy)
+			p6.dependencies.logger.reportError(SduiErrorType.FailedToExecuteAction, {
+				name = SduiActionType.Share,
+				message = tostring(p7)
+			}, p6.appPage)
+
+			if v52 then
+				local v76 = p6.dependencies.localization:Format("Feature.Toast.NetworkingError.SomethingIsWrong")
+
+				getSduiPageEntrySnackbarStore().show(v52, {
+					title = v76,
+					icon = Foundation.Enums.IconName.TriangleExclamation
+				})
+			end
+		end)
+
+		return
+	end
+
+	local shareLinkType = v50.shareLinkType
+	local v62 = v50.shareLinkData or {}
+	local v63 = v50.entryPointKey or nil
+
+	handleGenericShare(shareLinkType, v62, v63, p6)
+end

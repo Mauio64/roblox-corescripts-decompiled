@@ -1,1 +1,1 @@
-return game:DefineFastFlag("InGameExitModalFixModalPadding", false);
+return game:DefineFastFlag("InGameExitModalFixModalPadding", false)

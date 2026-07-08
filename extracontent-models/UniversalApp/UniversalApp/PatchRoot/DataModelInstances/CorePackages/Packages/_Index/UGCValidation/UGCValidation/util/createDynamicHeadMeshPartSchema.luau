@@ -1,14 +1,19 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.util.createIndividualBodyPartSchema);
-return function(v3) --[[ Line: 7 ]] --[[ Name: createDynamicHeadMeshPartSchema ]]
-    -- upvalues: v2 (copy)
-    local v4 = v2(Enum.AssetType.DynamicHead, "Head", v3);
-    table.insert(v4._children, {
-        Name = {
-            "FaceControls"
-        }, 
-        ClassName = "FaceControls"
-    });
-    return v4;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local createIndividualBodyPartSchema = require(ParentParent.util.createIndividualBodyPartSchema)
+
+local function createDynamicHeadMeshPartSchema(p1) -- line: 7
+	-- upvalues: createIndividualBodyPartSchema (copy)
+	local v5 = createIndividualBodyPartSchema(Enum.AssetType.DynamicHead, "Head", p1)
+
+	table.insert(v5._children, {
+		ClassName = "FaceControls",
+		Name = { "FaceControls" }
+	})
+
+	return v5
+end
+
+return createDynamicHeadMeshPartSchema

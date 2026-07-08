@@ -1,11 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Utils.checkAndSendEvent);
-return function(v2, v3, v4, v5) --[[ Line: 4 ]]
-    -- upvalues: v1 (copy)
-    local v6 = {
-        validSessionUserIds = ("[%*]"):format((table.concat(v3, ","))), 
-        shownUserIds = ("[%*]"):format((table.concat(v4, ","))), 
-        appStoragePreviousUserIds = ("[%*]"):format((table.concat(v5, ",")))
-    };
-    v1(v2, "authAccountPickerAccountsFetched", v6);
-end;
+local ParentParent = script.Parent.Parent
+local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+
+return function(s1: string, t1: {[any]: any}, t2: {[any]: any}, t3: {[any]: any}) -- line: 4
+	-- upvalues: checkAndSendEvent (copy)
+	local t4 = {
+		validSessionUserIds = `[{ table.concat(t1, ",") }]`,
+		shownUserIds = `[{ table.concat(t2, ",") }]`,
+		appStoragePreviousUserIds = `[{ table.concat(t3, ",") }]`
+	}
+
+	checkAndSendEvent(s1, "authAccountPickerAccountsFetched", t4)
+end

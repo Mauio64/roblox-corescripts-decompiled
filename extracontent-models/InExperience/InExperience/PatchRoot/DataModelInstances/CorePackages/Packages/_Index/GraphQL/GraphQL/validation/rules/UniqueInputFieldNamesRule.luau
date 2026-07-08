@@ -1,40 +1,46 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local _ = require(l_Parent_0.language.visitor);
-local _ = require(script.Parent.Parent.ValidationContext);
-local l_language_0 = l_Parent_0.language;
-local _ = require(l_language_0.ast);
+local ParentParent = script.Parent.Parent.Parent
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+
+require(ParentParent.language.visitor)
+require(script.Parent.Parent.ValidationContext)
+
+local language = ParentParent.language
+
+require(language.ast)
+
 return {
-    UniqueInputFieldNamesRule = function(v6) --[[ Line: 30 ]]
-        -- upvalues: l_GraphQLError_0 (copy)
-        local v7 = {};
-        local v8 = {};
-        return {
-            ObjectValue = {
-                enter = function() --[[ Line: 36 ]] --[[ Name: enter ]]
-                    -- upvalues: v7 (copy), v8 (ref)
-                    table.insert(v7, v8);
-                    v8 = {};
-                end, 
-                leave = function() --[[ Line: 40 ]] --[[ Name: leave ]]
-                    -- upvalues: v8 (ref), v7 (copy)
-                    v8 = table.remove(v7);
-                end
-            }, 
-            ObjectField = function(_, v10) --[[ Line: 45 ]] --[[ Name: ObjectField ]]
-                -- upvalues: v8 (ref), v6 (copy), l_GraphQLError_0 (ref)
-                local l_value_0 = v10.name.value;
-                if v8[l_value_0] then
-                    v6:reportError(l_GraphQLError_0.new(("There can be only one input field named \"%s\"."):format(l_value_0), {
-                        v8[l_value_0], 
-                        v10.name
-                    }));
-                    return;
-                else
-                    v8[l_value_0] = v10.name;
-                    return;
-                end;
-            end
-        };
-    end
-};
+	UniqueInputFieldNamesRule = function(p1) -- line: 30
+		-- upvalues: GraphQLError (copy)
+		local t1 = {}
+		local t2 = {}
+
+		return {
+			ObjectValue = {
+				enter = function() -- line: 36
+					-- upvalues: t1 (copy), t2 (ref)
+					table.insert(t1, t2)
+					t2 = {}
+				end,
+				leave = function() -- line: 40
+					-- upvalues: t2 (ref), t1 (copy)
+					t2 = table.remove(t1)
+				end
+			},
+			ObjectField = function(_, p3) -- line: 45
+				-- upvalues: t2 (ref), p1 (copy), GraphQLError (copy)
+				local value = p3.name.value
+
+				if t2[value] then
+					p1:reportError(GraphQLError.new(("There can be only one input field named \"%s\"."):format(value), {
+						t2[value],
+						p3.name
+					}))
+
+					return
+				end
+
+				t2[value] = p3.name
+			end
+		}
+	end
+}

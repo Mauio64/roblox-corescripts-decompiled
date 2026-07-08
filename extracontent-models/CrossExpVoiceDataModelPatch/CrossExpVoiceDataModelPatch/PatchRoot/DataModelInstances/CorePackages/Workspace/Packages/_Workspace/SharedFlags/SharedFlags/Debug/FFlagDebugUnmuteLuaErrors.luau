@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugUnmuteLuaErrors", false);
+return game:DefineFastFlag("DebugUnmuteLuaErrors", false)

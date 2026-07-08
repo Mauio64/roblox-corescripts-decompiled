@@ -1,37 +1,41 @@
-local v0 = require(script.Array);
-local v1 = require(script.AssertionError);
-local v2 = require(script.Error);
-local v3 = require(script.Object);
-local _ = require(script.Promise);
-local v5 = require(script.Set);
-local v6 = require(script.Symbol);
-local v7 = require(script.Timers);
-local v8 = require(script.WeakMap);
-local v9 = require(script.Map);
-local v10 = require(script.Map.coerceToMap);
-local v11 = require(script.Map.coerceToTable);
-local _ = require(script.types);
+local Array = require(script.Array)
+local AssertionError = require(script.AssertionError)
+local Error = require(script.Error)
+local Object = require(script.Object)
+
+require(script.Promise)
+
+local Set = require(script.Set)
+local Symbol = require(script.Symbol)
+local Timers = require(script.Timers)
+local WeakMap = require(script.WeakMap)
+local Map = require(script.Map)
+local coerceToMap = require(script.Map.coerceToMap)
+local coerceToTable = require(script.Map.coerceToTable)
+
+require(script.types)
+
 return {
-    Array = v0, 
-    AssertionError = v1, 
-    Boolean = require(script.Boolean), 
-    console = require(script.console), 
-    Error = v2, 
-    extends = require(script.extends), 
-    instanceof = require(script.instanceof), 
-    Math = require(script.Math), 
-    Number = require(script.Number), 
-    Object = v3, 
-    Map = v9, 
-    coerceToMap = v10, 
-    coerceToTable = v11, 
-    Set = v5, 
-    WeakMap = v8, 
-    String = require(script.String), 
-    Symbol = v6, 
-    setTimeout = v7.setTimeout, 
-    clearTimeout = v7.clearTimeout, 
-    setInterval = v7.setInterval, 
-    clearInterval = v7.clearInterval, 
-    util = require(script.util)
-};
+	Array = Array,
+	AssertionError = AssertionError,
+	Boolean = require(script.Boolean),
+	console = require(script.console),
+	Error = Error,
+	extends = require(script.extends),
+	instanceof = require(script.instanceof),
+	Math = require(script.Math),
+	Number = require(script.Number),
+	Object = Object,
+	Map = Map,
+	coerceToMap = coerceToMap,
+	coerceToTable = coerceToTable,
+	Set = Set,
+	WeakMap = WeakMap,
+	String = require(script.String),
+	Symbol = Symbol,
+	setTimeout = Timers.setTimeout,
+	clearTimeout = Timers.clearTimeout,
+	setInterval = Timers.setInterval,
+	clearInterval = Timers.clearInterval,
+	util = require(script.util)
+}

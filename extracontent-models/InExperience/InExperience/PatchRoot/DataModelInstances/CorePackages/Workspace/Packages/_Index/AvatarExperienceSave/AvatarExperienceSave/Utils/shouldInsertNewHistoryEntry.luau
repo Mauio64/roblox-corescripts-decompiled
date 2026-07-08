@@ -1,27 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSave");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local v3 = require(l_Parent_0.AvatarExperienceCommon);
-local _ = require(l_script_FirstAncestor_0.Context.AvatarSaveContext);
-local l_ItemTypeEnum_0 = v3.Enums.ItemTypeEnum;
-local v6 = require(l_script_FirstAncestor_0.Utils.getSubstateToTrackForChanges);
-local v7 = require(l_script_FirstAncestor_0.Utils.assetOrderRelativelyEqual);
-local l_FFlagAXCustomizeMakeupSupport_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXCustomizeMakeupSupport;
-local l_Constants_0 = v3.Constants;
-return function(v10, v11) --[[ Line: 16 ]] --[[ Name: shouldInsertNewHistoryEntry ]]
-    -- upvalues: v6 (copy), l_FFlagAXCustomizeMakeupSupport_0 (copy), v2 (copy), v7 (copy), l_Constants_0 (copy), l_ItemTypeEnum_0 (copy)
-    local v12 = v6(v10, l_FFlagAXCustomizeMakeupSupport_0 and true or nil);
-    local v13 = v6(v11, l_FFlagAXCustomizeMakeupSupport_0 and true or nil);
-    if v2.deepEqual(v12, v13) and (not l_FFlagAXCustomizeMakeupSupport_0 or v7(v10, v11, l_Constants_0.LAYERED_ASSET_TYPES) and v7(v10, v11, l_Constants_0.ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE)) then
-        return false;
-    else
-        local v14 = true;
-        local v15 = v13.OutfitTryOn.TryOnItems or {};
-        for _, v17 in v15 do
-            if v17.itemType == l_ItemTypeEnum_0.Bundle and v2.fieldCount(v17.bundleInfo or {}) == 0 then
-                return false;
-            end;
-        end;
-        return v14;
-    end;
-end;
+local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
+local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+local tutils = require(AvatarExperienceSaveParent.tutils)
+local AvatarExperienceCommon = require(AvatarExperienceSaveParent.AvatarExperienceCommon)
+
+require(AvatarExperienceSave.Context.AvatarSaveContext)
+
+local ItemTypeEnum = AvatarExperienceCommon.Enums.ItemTypeEnum
+local getSubstateToTrackForChanges = require(AvatarExperienceSave.Utils.getSubstateToTrackForChanges)
+local assetOrderRelativelyEqual = require(AvatarExperienceSave.Utils.assetOrderRelativelyEqual)
+local FFlagAXCustomizeMakeupSupport = require(AvatarExperienceSaveParent.AvatarExperienceFlags).FFlagAXCustomizeMakeupSupport
+local Constants = AvatarExperienceCommon.Constants
+
+local function shouldInsertNewHistoryEntry(p1, p2) -- line: 16
+	-- upvalues: getSubstateToTrackForChanges (copy), FFlagAXCustomizeMakeupSupport (copy), tutils (copy), assetOrderRelativelyEqual (copy), Constants (copy), ItemTypeEnum (copy)
+	local v13 = getSubstateToTrackForChanges(p1, not not FFlagAXCustomizeMakeupSupport or nil)
+	local v14 = getSubstateToTrackForChanges(p2, not not FFlagAXCustomizeMakeupSupport or nil)
+
+	if tutils.deepEqual(v13, v14) and (not FFlagAXCustomizeMakeupSupport or assetOrderRelativelyEqual(p1, p2, Constants.LAYERED_ASSET_TYPES) and assetOrderRelativelyEqual(p1, p2, Constants.ASSET_TYPE_ID_STRING_TO_MAKEUP_TYPE)) then
+		return false
+	end
+
+	for _, v16 in v14.OutfitTryOn.TryOnItems or {} do
+		if v16.itemType == ItemTypeEnum.Bundle and tutils.fieldCount(v16.bundleInfo or {}) == 0 then
+			return false
+		end
+	end
+
+	return true
+end
+
+return shouldInsertNewHistoryEntry

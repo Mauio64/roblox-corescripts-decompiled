@@ -5,7 +5,7 @@ require(script.Parent)
 local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
 
 return {
-	get = function(p1, n1: number) --[[ get ]] -- line: 8
+	get = function(p1, n1: number) -- line: 8
 		-- upvalues: exhaustiveMatch (copy)
 		assert(n1 >= 1, "index < 1")
 
@@ -17,12 +17,12 @@ return {
 				end
 
 				return {
-					before = function() --[[ before ]] -- line: 21
+					before = function() -- line: 21
 						-- upvalues: get (copy), n2 (copy)
 						return get(n2 - 1)
 					end,
 					value = p1.array[n2],
-					after = function() --[[ after ]] -- line: 27
+					after = function() -- line: 27
 						-- upvalues: get (copy), n2 (copy)
 						return get(n2 + 1)
 					end
@@ -38,7 +38,7 @@ return {
 
 		return exhaustiveMatch(p1.type)
 	end,
-	getByRange = function(p2, vector3: Vector3) --[[ getByRange ]] -- line: 41
+	getByRange = function(p2, vector3: Vector3) -- line: 41
 		-- upvalues: exhaustiveMatch (copy)
 		if p2.type == "array" then
 			return table.move(p2.array, vector3.X, vector3.Y, 1, {})
@@ -66,7 +66,7 @@ return {
 
 		return exhaustiveMatch(p2.type)
 	end,
-	back = function(p3) --[[ back ]] -- line: 67
+	back = function(p3) -- line: 67
 		-- upvalues: exhaustiveMatch (copy)
 		if p3.type == "array" then
 			return p3.array[#p3.array]
@@ -84,7 +84,7 @@ return {
 
 		return exhaustiveMatch(p3.type)
 	end,
-	length = function(p4) --[[ length ]] -- line: 82
+	length = function(p4) -- line: 82
 		-- upvalues: exhaustiveMatch (copy)
 		if p4.type == "array" then
 			return #p4.array
@@ -96,7 +96,7 @@ return {
 
 		return exhaustiveMatch(p4.type)
 	end,
-	equals = function(p5, p6) --[[ equals ]] -- line: 93
+	equals = function(p5, p6) -- line: 93
 		-- upvalues: exhaustiveMatch (copy)
 		if p5.type ~= p6.type then
 			return false

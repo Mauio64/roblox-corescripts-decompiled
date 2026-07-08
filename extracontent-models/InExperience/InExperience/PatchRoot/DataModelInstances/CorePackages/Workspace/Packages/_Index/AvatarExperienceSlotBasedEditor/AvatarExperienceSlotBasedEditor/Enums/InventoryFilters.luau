@@ -1,4 +1,4 @@
 return {
-    Active = "Active", 
-    Expired = "Expired"
-};
+	Active = "Active",
+	Expired = "Expired"
+}

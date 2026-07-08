@@ -1,4 +1,5 @@
-local l_Parent_0 = script.Parent.Parent;
+local ParentParent = script.Parent.Parent
+
 return {
-    TIMED_OPTIONS_SUBTITLE = require(l_Parent_0.SubtitleViews.WearTimePurchaseSubtitleText)
-};
+	TIMED_OPTIONS_SUBTITLE = require(ParentParent.SubtitleViews.WearTimePurchaseSubtitleText)
+}

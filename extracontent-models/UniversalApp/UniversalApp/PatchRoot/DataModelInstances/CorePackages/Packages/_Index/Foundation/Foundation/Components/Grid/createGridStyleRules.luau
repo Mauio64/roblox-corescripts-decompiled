@@ -1,59 +1,72 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Enums.Breakpoint);
-local _ = require(l_script_FirstAncestor_0.Enums.BreakpointShortName);
-local v4 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Providers.Responsive.ResponsiveContext);
-local v6 = require(l_script_FirstAncestor_0.StyleSheet.StyleRule);
-local function v10(v7, v8) --[[ Line: 13 ]] --[[ Name: createGridStyleRule ]]
-    -- upvalues: v4 (copy), v6 (copy)
-    local v9 = if v8 then (".%*-col-%*"):format(v8, v7) else (".col-%*"):format(v7);
-    return v4.createElement(v6, {
-        Selector = ("%* ::UISizeConstraint"):format(v9), 
-        properties = {
-            MinSize = ("$ColMin%*"):format(v7), 
-            MaxSize = ("$ColMax%*"):format(v7)
-        }
-    });
-end;
-return function(v11) --[[ Line: 24 ]] --[[ Name: createGridStyleRules ]]
-    -- upvalues: v10 (copy), v4 (copy), v6 (copy)
-    local l_breakpoint_0 = v11.breakpoint;
-    local l_grid_0 = v11.grid;
-    local v14 = l_breakpoint_0.order[#l_breakpoint_0.order];
-    local v15 = l_grid_0.columns[v14];
-    local v16 = {};
-    local v17 = {};
-    for v18 = 0, v15 do
-        v17[("Col%*"):format(v18)] = v10(v18);
-        if v18 == 0 then
-            v17.ColVisible0 = v4.createElement(v6, {
-                Selector = ".col-0", 
-                properties = {
-                    Visible = false
-                }
-            });
-        end;
-    end;
-    for _, v20 in l_breakpoint_0.order do
-        local v21 = l_breakpoint_0.shortNames[v20];
-        local v22 = l_grid_0.columns[v20];
-        local v23 = {};
-        for v24 = 0, v22 do
-            v23[("%*Col%*"):format(v20, v24)] = v10(v24, v21);
-            if v24 == 0 then
-                v23[("%*ColVisible0"):format(v20)] = v4.createElement(v6, {
-                    Selector = (".%*-col-0"):format(v21), 
-                    properties = {
-                        Visible = false
-                    }
-                });
-            end;
-        end;
-        v16[v20] = v23;
-    end;
-    return {
-        baseRules = v17, 
-        rulesByBreakpoint = v16
-    };
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(Foundation.Enums.Breakpoint)
+require(Foundation.Enums.BreakpointShortName)
+
+local React = require(FoundationParent.React)
+
+require(Foundation.Providers.Responsive.ResponsiveContext)
+
+local StyleRule = require(Foundation.StyleSheet.StyleRule)
+
+local function createGridStyleRule(n1: number, p1) -- line: 13
+	-- upvalues: React (copy), StyleRule (copy)
+	local v9 = if not p1 then `.col-{ n1 }` else `.{ p1 }-col-{ n1 }`
+
+	return React.createElement(StyleRule, {
+		Selector = `{ v9 } ::UISizeConstraint`,
+		properties = {
+			MinSize = `$ColMin{ n1 }`,
+			MaxSize = `$ColMax{ n1 }`
+		}
+	})
+end
+local function createGridStyleRules(p2) -- line: 24
+	-- upvalues: createGridStyleRule (copy), React (copy), StyleRule (copy)
+	local breakpoint = p2.breakpoint
+	local grid = p2.grid
+	local v13 = breakpoint.order[#breakpoint.order]
+	local t1 = {}
+	local t2 = {}
+
+	for i = 0, grid.columns[v13] do
+		t2[`Col{ i }`] = createGridStyleRule(i)
+
+		if i == 0 then
+			t2.ColVisible0 = React.createElement(StyleRule, {
+				Selector = ".col-0",
+				properties = {
+					Visible = false
+				}
+			})
+		end
+	end
+
+	for _, v18 in breakpoint.order do
+		local v19 = breakpoint.shortNames[v18]
+		local t3 = {}
+
+		for i = 0, grid.columns[v18] do
+			t3[`{ v18 }Col{ i }`] = createGridStyleRule(i, v19)
+
+			if i == 0 then
+				t3[`{ v18 }ColVisible0`] = React.createElement(StyleRule, {
+					Selector = `.{ v19 }-col-0`,
+					properties = {
+						Visible = false
+					}
+				})
+			end
+		end
+
+		t1[v18] = t3
+	end
+
+	return {
+		baseRules = t2,
+		rulesByBreakpoint = t1
+	}
+end
+
+return createGridStyleRules

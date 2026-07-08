@@ -1,662 +1,648 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_RunService_0 = game:GetService("RunService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_VRService_0 = game:GetService("VRService");
-local v7 = require(script.Parent.Parent.Logger)(script.Name);
-local v8 = require(l_CorePackages_0.Packages.Roact);
-local v9 = require(l_CorePackages_0.Packages.RoactRodux);
-local v10 = require(l_CorePackages_0.Packages.t);
-local v11 = require(l_CorePackages_0.Packages.Otter);
-local l_default_0 = require(l_CorePackages_0.Workspace.Packages.PermissionsProtocol).PermissionsProtocol.default;
-local v13 = require(l_RobloxGui_0.Modules.Settings.getCamMicPermissions);
-local v14 = require(script.Parent.BubbleChatList);
-local v15 = require(script.Parent.ChatBubbleDistant);
-local v16 = require(script.Parent.VoiceBubble);
-local v17 = require(script.Parent.ControlsBubble);
-local v18 = require(l_RobloxGui_0.Modules.VoiceChat.Components.VoiceIndicator);
-local v19 = require(script.Parent.Parent.Types);
-local v20 = require(script.Parent.Parent.Constants);
-local v21 = require(script.Parent.Parent.Helpers.getSettingsForMessage);
-local v22 = require(l_RobloxGui_0.Modules.SelfView.selfViewVisibilityUpdatedSignal);
-local l_Enabled_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).Enabled;
-local v24 = require(l_RobloxGui_0.Modules.VoiceChat.Constants);
-local l_default_1 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v26 = require(l_RobloxGui_0.Modules.Flags.GetFFlagMicConnectingToast);
-local v27 = require(l_RobloxGui_0.Modules.Flags.GetFFlagBubbleChatInexistantAdorneeFix);
-local v28 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagAvatarChatCoreScriptSupport();
-local v29 = require(l_RobloxGui_0.Modules.Flags.FFlagEnableAvatarChatToggleUIUpgradeForLegacyChatService);
-local v30 = require(l_RobloxGui_0.Modules.SelfView.publicApi);
-local v31 = game:DefineFastInt("BubbleVoiceTimeoutMillis", 1000);
-local v32 = game:DefineFastFlag("DebugAllowControlButtonsNoVoiceChat", false);
-local l_IXPServiceWrapper_0 = require(l_CorePackages_0.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper;
-local v34 = game:DefineFastFlag("EasierUnmuting3", false);
-local v35 = game:DefineFastFlag("EasierUnmutingBasedOnCamera", false);
-local v36 = game:DefineFastFlag("EasierUnmutingHideIfMuted", false);
-local v37 = game:DefineFastInt("EasierUnmutingDisplayDistance", 20);
-local v38 = game:DefineFastString("EasierUnmutingIXPLayerName", "Voice.UserAgency");
-local v39 = game:DefineFastString("EasierUnmutingIXPLayerValue", "VoiceUserAgencyEnabled");
-local v40 = require(l_RobloxGui_0.Modules.Flags.getFFlagDoNotPromptCameraPermissionsOnMount);
-local v41 = v8.PureComponent:extend("BubbleChatBillboard");
-local v42 = {
-    dampingRatio = 1, 
-    frequency = 4
-};
-local v43 = nil;
-if v29 then
-    v43 = require(script.Parent.ControlsBubbleV2);
-end;
-v41.validateProps = v10.strictInterface({
-    userId = v10.string, 
-    onFadeOut = v10.optional(v10.callback), 
-    voiceEnabled = v10.optional(v10.boolean), 
-    bubbleChatEnabled = v10.optional(v10.boolean), 
-    chatSettings = v19.IChatSettings, 
-    messageIds = v10.optional(v10.array(v10.string)), 
-    lastMessage = v10.optional(v19.IMessage), 
-    voiceState = v10.optional(v10.string)
-});
-getEasierUnmutingDistance = function(v44) --[[ Line: 84 ]] --[[ Name: getEasierUnmutingDistance ]]
-    -- upvalues: l_Players_0 (copy), v35 (copy)
-    if not v44 then
-        return nil;
-    else
-        local v45 = l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.Character and l_Players_0.LocalPlayer.Character:FindFirstChild("HumanoidRootPart");
-        local v46 = v45 and v45.CFrame and v45.CFrame.Position;
-        local v47 = workspace.CurrentCamera and workspace.CurrentCamera.CFrame.Position;
-        if v35 or not v46 then
-            if not v47 then
-                return nil;
-            else
-                return (v44 - v47).Magnitude;
-            end;
-        else
-            return (v44 - v46).Magnitude;
-        end;
-    end;
-end;
-v41.init = function(v48) --[[ Line: 110 ]] --[[ Name: init ]]
-    -- upvalues: v30 (copy), v28 (copy), l_StarterGui_0 (copy), v34 (copy), v36 (copy), v8 (copy), v11 (copy), l_Players_0 (copy), v20 (copy), l_default_1 (copy), v26 (copy), v24 (copy), v18 (copy), v22 (copy), l_IXPServiceWrapper_0 (copy), v38 (copy), v39 (copy)
-    local v49 = v30.getSelfViewIsOpenAndVisible();
-    local v50 = if v28 then l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.All) or l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView) else nil;
-    v48:setState({
-        adornee = nil, 
-        isInsideRenderDistance = false, 
-        isInsideMaximizeDistance = false, 
-        savedChatSettings = v48.props.chatSettings, 
-        voiceTimedOut = false, 
-        voiceStateCounter = 0, 
-        lastVoiceState = nil, 
-        selfViewOpen = v49, 
-        selfViewEnabled = v50, 
-        isInsideEasierUnmutingDistance = not v34 and nil, 
-        isMuted = (not v34 or not v36) and nil, 
-        isInEasierUnmutingTreatment = not v34 and nil, 
-        haveLoggedUserExposure = not v34 and nil
-    });
-    v48.isMounted = false;
-    local v51, v52 = v8.createBinding((Vector3.new()));
-    v48.offset = v51;
-    v48.updateOffset = v52;
-    v48.offsetMotor = v11.createSingleMotor(0);
-    v48.offsetMotor:onStep(function(v53) --[[ Line: 137 ]]
-        -- upvalues: v48 (copy)
-        v48.updateOffset((Vector3.new(0, v53, 0)));
-    end);
-    v48.offsetGoal = 0;
-    v48.onSelfViewVisibilityUpdated = function() --[[ Line: 142 ]]
-        -- upvalues: v48 (copy), v30 (ref)
-        v48:setState({
-            selfViewOpen = v30.getSelfViewIsOpenAndVisible()
-        });
-    end;
-    v48.onLastBubbleFadeOut = function() --[[ Line: 148 ]]
-        -- upvalues: v48 (copy)
-        if v48.props.onFadeOut and not v48.isFadingOut then
-            v48.isFadingOut = true;
-            v48.props.onFadeOut(v48.props.userId);
-        end;
-        if v48.state.hasMessage and v48.isMounted then
-            v48:setState({
-                hasMessage = false
-            });
-        end;
-    end;
-    if v48.props.voiceEnabled then
-        v51 = nil;
-        v51 = v48.props.userId == tostring(l_Players_0.LocalPlayer.UserId) and function() --[[ Line: 164 ]]
-            -- upvalues: v48 (copy), v20 (ref), l_default_1 (ref), v26 (ref)
-            if v48.props.voiceState == v20.VOICE_STATE.ERROR then
-                l_default_1:RejoinPreviousChannel();
-                return;
-            elseif v26() and v48.props.voiceState == v20.VOICE_STATE.CONNECTING then
-                l_default_1:ShowVoiceChatLoadingMessage();
-                return;
-            else
-                l_default_1:ToggleMic("LegacyBubbleChat");
-                return;
-            end;
-        end or function() --[[ Line: 174 ]]
-            -- upvalues: l_default_1 (ref), v48 (copy), v24 (ref)
-            l_default_1:ToggleMutePlayer(tonumber(v48.props.userId), if v48:isShowingDueToEasierUnmuting() then v24.VOICE_CONTEXT_TYPE.EASIER_UNMUTING else v24.VOICE_CONTEXT_TYPE.BUBBLE_CHAT);
-        end;
-        v52 = v48.props.userId;
-        local v54 = v52 ~= tostring(l_Players_0.LocalPlayer.UserId) and "SpeakerDark" or "MicDark";
-        local l_v52_0 = v52 --[[ copy: 4 -> 6 ]];
-        do
-            local l_v51_0 = v51;
-            v48.renderInsert = function() --[[ Line: 188 ]]
-                -- upvalues: v8 (ref), v18 (ref), l_v51_0 (ref), l_v52_0 (copy), v54 (copy)
-                return v8.createElement(v18, {
-                    onClicked = l_v51_0, 
-                    userId = l_v52_0, 
-                    iconStyle = v54
-                });
-            end;
-            v48.insertSize = Vector2.new(28, 28);
-        end;
-    end;
-    v48.onCoreGuiChanged = function() --[[ Line: 199 ]]
-        -- upvalues: l_StarterGui_0 (ref), v48 (copy)
-        local l_l_StarterGui_0_CoreGuiEnabled_0 = l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView);
-        if v48.state.selfViewOpen ~= l_l_StarterGui_0_CoreGuiEnabled_0 then
-            v48:setState({
-                selfViewOpen = l_l_StarterGui_0_CoreGuiEnabled_0
-            });
-        end;
-    end;
-    v48.selfViewVisibilityUpdatedSignal = v22:connect(function() --[[ Line: 208 ]]
-        -- upvalues: v48 (copy), v30 (ref)
-        v48:setState({
-            selfViewOpen = v30.getSelfViewIsOpenAndVisible()
-        });
-    end);
-    if v34 then
-        v51, v52 = pcall(function() --[[ Line: 215 ]]
-            -- upvalues: l_IXPServiceWrapper_0 (ref), v38 (ref)
-            return l_IXPServiceWrapper_0:GetLayerData(v38);
-        end);
-        if v51 and v52 and v52[v39] then
-            v48:setState({
-                isInEasierUnmutingTreatment = true
-            });
-        end;
-    end;
-    if v34 and v48.state.isInEasierUnmutingTreatment and v36 then
-        v48.participantsUpdateConnection = l_default_1.participantsUpdate.Event:Connect(function(v58) --[[ Line: 232 ]]
-            -- upvalues: v48 (copy)
-            local v59 = v58[v48.props.userId];
-            if not v59 then
-                return;
-            else
-                if v59.isMuted ~= v48.state.isMuted then
-                    v48:setState({
-                        isMuted = v59.isMuted
-                    });
-                end;
-                return;
-            end;
-        end);
-    end;
-end;
-v41.isShowingDueToEasierUnmuting = function(v60) --[[ Line: 249 ]] --[[ Name: isShowingDueToEasierUnmuting ]]
-    -- upvalues: v34 (copy), v20 (copy), v36 (copy)
-    return v34 and v60.state.isInEasierUnmutingTreatment and v60.props.voiceState == v20.VOICE_STATE.LOCAL_MUTED and v60.state.isInsideEasierUnmutingDistance and not (v36 and v60.state.isMuted);
-end;
-v41.checkCounterForTimeout = function(v61, v62) --[[ Line: 257 ]] --[[ Name: checkCounterForTimeout ]]
-    -- upvalues: l_Players_0 (copy), v20 (copy), v31 (copy)
-    if v61.props.userId ~= tostring(l_Players_0.LocalPlayer.UserId) and v61.state.lastVoiceState ~= v20.VOICE_STATE.TALKING and v61.state.voiceStateCounter ~= v62 then
-        local l_voiceStateCounter_0 = v61.state.voiceStateCounter;
-        delay(v31 / 1000, function() --[[ Line: 266 ]]
-            -- upvalues: v61 (copy), l_voiceStateCounter_0 (copy)
-            if v61.state.voiceStateCounter == l_voiceStateCounter_0 and v61.isMounted then
-                v61:setState({
-                    voiceTimedOut = true
-                });
-            end;
-        end);
-    end;
-end;
-v41.checkCounterForTimeoutWithEasierUnmuting = function(v64, v65) --[[ Line: 277 ]] --[[ Name: checkCounterForTimeoutWithEasierUnmuting ]]
-    -- upvalues: v34 (copy), l_Players_0 (copy), v20 (copy), v31 (copy)
-    local v66 = if v65 then v65.voiceStateCounter else nil;
-    if not v34 or not v64.state.isInEasierUnmutingTreatment then
-        return v64:checkCounterForTimeout(v66);
-    else
-        local v67 = v64.props.userId ~= tostring(l_Players_0.LocalPlayer.UserId);
-        local v68 = v64.state.voiceStateCounter ~= v66;
-        local v69 = false;
-        if v64.state.lastVoiceState ~= v20.VOICE_STATE.TALKING then
-            v69 = v64.state.lastVoiceState ~= v20.VOICE_STATE.LOCAL_MUTED;
-        end;
-        if v67 and v68 and v69 then
-            local l_voiceStateCounter_1 = v64.state.voiceStateCounter;
-            delay(v31 / 1000, function() --[[ Line: 295 ]]
-                -- upvalues: v64 (copy), l_voiceStateCounter_1 (copy)
-                if v64.state.voiceStateCounter == l_voiceStateCounter_1 and v64.isMounted then
-                    v64:setState({
-                        voiceTimedOut = true
-                    });
-                end;
-            end);
-        end;
-        return;
-    end;
-end;
-v41.didMount = function(v71) --[[ Line: 308 ]] --[[ Name: didMount ]]
-    -- upvalues: v11 (copy), v28 (copy), v40 (copy), l_Players_0 (copy), l_RunService_0 (copy), v34 (copy), v37 (copy), v20 (copy), v42 (copy)
-    v71.isMounted = true;
-    local v72 = v71.props.lastMessage and v71.props.lastMessage.adornee;
-    v71:setState({
-        adornee = v72
-    });
-    local v73 = v71:getVerticalOffset(v72);
-    v71.offsetGoal = v73;
-    v71.offsetMotor:setGoal(v11.instant(v73));
-    if v28 then
-        if v40() then
-            v71:getMicPermission();
-            v71:getCameraPermissionWithoutRequest();
-        else
-            v71:getPermissions();
-        end;
-    end;
-    local v74 = nil;
-    if v72 then
-        v74 = l_Players_0:GetPlayerFromCharacter(v72);
-    elseif tonumber(v71.props.userId) then
-        v74 = l_Players_0:GetPlayerByUserId(v71.props.userId);
-    end;
-    if v74 then
-        if v74.Character then
-            coroutine.wrap(function() --[[ Line: 338 ]]
-                -- upvalues: v71 (copy), v74 (ref)
-                v71:onCharacterAdded(v74, v74.Character);
-            end)();
-        end;
-        v71.characterConn = v74.CharacterAdded:Connect(function(v75) --[[ Line: 342 ]]
-            -- upvalues: v71 (copy), v74 (ref)
-            v71:onCharacterAdded(v74, v75);
-        end);
-    end;
-    v71.heartbeatConn = l_RunService_0.Heartbeat:Connect(function() --[[ Line: 348 ]]
-        -- upvalues: v71 (copy), v34 (ref), v37 (ref), v20 (ref), v11 (ref), v42 (ref)
-        local v76 = v71:getAdorneeInstance(v71.state.adornee);
-        if workspace.CurrentCamera and v76 then
-            local v77 = v76:IsA("Attachment") and v76.WorldPosition or v76.Position;
-            local l_Magnitude_0 = (workspace.CurrentCamera.CFrame.Position - v77).Magnitude;
-            local v79 = l_Magnitude_0 < v71.state.savedChatSettings.MaxDistance;
-            local v80 = l_Magnitude_0 < v71.state.savedChatSettings.MinimizeDistance;
-            local v81 = false;
-            if v34 and v71.state.isInEasierUnmutingTreatment then
-                local v82 = getEasierUnmutingDistance(v77);
-                if v82 ~= nil then
-                    v81 = v82 < v37;
-                end;
-            end;
-            if v80 ~= v71.state.isInsideMaximizeDistance or v79 ~= v71.state.isInsideRenderDistance or v34 and v71.state.isInEasierUnmutingTreatment and v81 ~= v71.state.isInsideEasierUnmutingDistance then
-                v71:setState({
-                    isInsideRenderDistance = v79, 
-                    isInsideMaximizeDistance = v80, 
-                    isInsideEasierUnmutingDistance = v81
-                });
-            end;
-        end;
-        local v83 = v71:getVerticalOffset(v71.state.adornee);
-        if math.abs(v83 - v71.offsetGoal) > v20.BILLBOARD_OFFSET_EPSILON then
-            v71.offsetGoal = v83;
-            v71.offsetMotor:setGoal(v11.spring(v83, v42));
-        end;
-    end);
-    if v34 and v71.state.isInEasierUnmutingTreatment then
-        v71:checkCounterForTimeoutWithEasierUnmuting(nil);
-    else
-        v71:checkCounterForTimeout(nil);
-    end;
-end;
-v41.willUnmount = function(v84) --[[ Line: 393 ]] --[[ Name: willUnmount ]]
-    -- upvalues: v7 (copy), v34 (copy), v36 (copy)
-    v7:trace("Unmounting billboards for {}", v84.state.shortId);
-    v84.isMounted = false;
-    if v84.characterConn then
-        v84.characterConn:Disconnect();
-        v84.characterConn = nil;
-    end;
-    if v84.heartbeatConn then
-        v84.heartbeatConn:Disconnect();
-        v84.heartbeatConn = nil;
-    end;
-    if v84.humanoidDiedConn then
-        v84.humanoidDiedConn:Disconnect();
-        v84.humanoidDiedConn = nil;
-    end;
-    v84.offsetMotor:destroy();
-    if v84.selfViewVisibilityUpdatedSignal then
-        v84.selfViewVisibilityUpdatedSignal:disconnect();
-        v84.selfViewVisibilityUpdatedSignal = nil;
-    end;
-    if v34 and v84.state.isInEasierUnmutingTreatment and v36 and v84.participantsUpdateConnection then
-        v84.participantsUpdateConnection:Disconnect();
-        v84.participantsUpdateConnection = nil;
-    end;
-end;
-local function v90(...) --[[ Line: 421 ]] --[[ Name: waitForFirst ]]
-    local l_BindableEvent_0 = Instance.new("BindableEvent");
-    local v86 = {
-        ...
-    };
-    local function v88(...) --[[ Line: 425 ]] --[[ Name: fire ]]
-        -- upvalues: v86 (copy), l_BindableEvent_0 (copy)
-        for v87 = 1, #v86 do
-            v86[v87]:Disconnect();
-        end;
-        return l_BindableEvent_0:Fire(...);
-    end;
-    for v89 = 1, #v86 do
-        v86[v89] = v86[v89]:Connect(v88);
-    end;
-    return l_BindableEvent_0.Event:Wait();
-end;
-local function v96(v91, v92, v93) --[[ Line: 440 ]] --[[ Name: findFirstChildByNameAndClass ]]
-    for _, v95 in ipairs(v91:GetChildren()) do
-        if v95.Name == v92 and v95:IsA(v93) then
-            return v95;
-        end;
-    end;
-end;
-v41.onCharacterAdded = function(v97, v98, v99) --[[ Line: 449 ]] --[[ Name: onCharacterAdded ]]
-    -- upvalues: v90 (copy), v7 (copy), v27 (copy), v96 (copy)
-    if not v99.Parent then
-        v90(v99.AncestryChanged, v98.CharacterAdded);
-    end;
-    if v98.Character ~= v99 or not v99.Parent then
-        v7:debug("Mismatched or unparented character in onCharacterAdded for {}", v97.state.shortId);
-        return;
-    else
-        local l_Humanoid_0 = v99:FindFirstChildOfClass("Humanoid");
-        while v99:IsDescendantOf(game) and not l_Humanoid_0 do
-            v90(v99.ChildAdded, v99.AncestryChanged, v98.CharacterAdded);
-            l_Humanoid_0 = v99:FindFirstChildOfClass("Humanoid");
-        end;
-        if v98.Character ~= v99 or not v99:IsDescendantOf(game) then
-            v7:debug("Mismatched or unparented character in onCharacterAdded for {}", v97.state.shortId);
-            return;
-        else
-            local v101 = nil;
-            v101 = if v27() then v99.PrimaryPart else v99:FindFirstChild("HumanoidRootPart");
-            while v99:IsDescendantOf(game) and not v101 do
-                v90(v99.ChildAdded, v99.AncestryChanged, v98.CharacterAdded);
-                if v27() then
-                    v101 = v99.PrimaryPart;
-                else
-                    v101 = v99:FindFirstChild("HumanoidRootPart");
-                end;
-            end;
-            if v101 and v99:IsDescendantOf(game) and v98.Character == v99 and v97.isMounted then
-                local v102 = v96(v99, "Head", "BasePart");
-                v97:setState({
-                    adornee = l_Humanoid_0.Health == 0 and v102 or v99
-                });
-                if v97.humanoidDiedConn then
-                    v97.humanoidDiedConn:Disconnect();
-                    v97.humanoidDiedConn = nil;
-                end;
-                v97.humanoidDiedConn = l_Humanoid_0.Died:Connect(function() --[[ Line: 499 ]]
-                    -- upvalues: v97 (copy), v96 (ref), v99 (copy)
-                    v97:setState({
-                        adornee = v96(v99, "Head", "BasePart") or v99
-                    });
-                end);
-            end;
-            return;
-        end;
-    end;
-end;
-v41.getVerticalOffset = function(v103, v104) --[[ Line: 509 ]] --[[ Name: getVerticalOffset ]]
-    if v104 and v104:IsA("Model") then
-        local l_v104_BoundingBox_0, v106 = v104:GetBoundingBox();
-        local v107 = v103:getAdorneeInstance(v104);
-        if not v107 then
-            return v106.Y / 2;
-        elseif v107:IsA("BasePart") then
-            local v108 = l_v104_BoundingBox_0:PointToObjectSpace(v107.Position);
-            return v106.Y / 2 - v108.Y;
-        else
-            return 0;
-        end;
-    elseif v104 and v104:IsA("BasePart") then
-        return v104.Size.Y / 2;
-    else
-        return 0;
-    end;
-end;
-v41.getAdorneeInstance = function(v109, v110) --[[ Line: 531 ]] --[[ Name: getAdorneeInstance ]]
-    -- upvalues: v27 (copy)
-    if not v110 then
-        return;
-    else
-        if v110:IsA("Model") then
-            local l_v110_FirstChild_0 = v110:FindFirstChild(v109.state.savedChatSettings.AdorneeName, true);
-            if v27() then
-                l_v110_FirstChild_0 = l_v110_FirstChild_0 or v110.PrimaryPart;
-            end;
-            if not l_v110_FirstChild_0 or l_v110_FirstChild_0:IsA("BasePart") or l_v110_FirstChild_0:IsA("Attachment") then
-                return l_v110_FirstChild_0;
-            end;
-        elseif v110:IsA("BasePart") or v110:IsA("Attachment") then
-            return v110;
-        end;
-        return;
-    end;
-end;
-v41.getPermissions = function(v112) --[[ Line: 550 ]] --[[ Name: getPermissions ]]
-    -- upvalues: v13 (copy)
-    return v13(function(v113) --[[ Line: 551 ]]
-        -- upvalues: v112 (copy)
-        v112:setState({
-            hasCameraPermissions = v113.hasCameraPermissions, 
-            hasMicPermissions = v113.hasMicPermissions
-        });
-    end, nil, nil, "BubbleChatBillboard.getPermissions");
-end;
-v41.getMicPermission = function(v114) --[[ Line: 563 ]] --[[ Name: getMicPermission ]]
-    -- upvalues: v13 (copy), l_default_0 (copy)
-    v13(function(v115) --[[ Line: 564 ]]
-        -- upvalues: v114 (copy)
-        v114:setState({
-            hasMicPermissions = v115.hasMicPermissions
-        });
-    end, {
-        l_default_0.Permissions.MICROPHONE_ACCESS
-    }, nil, "BubbleChatBillboard.getMicPermission");
-end;
-v41.getCameraPermissionWithoutRequest = function(v116) --[[ Line: 575 ]] --[[ Name: getCameraPermissionWithoutRequest ]]
-    -- upvalues: v13 (copy), l_default_0 (copy)
-    v13(function(v117) --[[ Line: 576 ]]
-        -- upvalues: v116 (copy)
-        v116:setState({
-            hasCameraPermissions = v117.hasCameraPermissions
-        });
-    end, {
-        l_default_0.Permissions.CAMERA_ACCESS
-    }, true);
-end;
-v41.setCameraPermissionStateFromControl = function(v118, v119) --[[ Line: 584 ]] --[[ Name: setCameraPermissionStateFromControl ]]
-    v118:setState({
-        hasCameraPermissions = v119
-    });
-end;
-v41.getRenderVoiceAndCameraBubble = function(v120) --[[ Line: 590 ]] --[[ Name: getRenderVoiceAndCameraBubble ]]
-    -- upvalues: v32 (copy), v28 (copy), l_Players_0 (copy), l_VRService_0 (copy), l_Enabled_0 (copy)
-    if not v120.props.voiceEnabled and not v32 and not v28 then
-        return false;
-    elseif v120.props.userId == tostring(l_Players_0.LocalPlayer.UserId) then
-        if l_VRService_0.VREnabled or l_Enabled_0() then
-            return false;
-        elseif not v120.state.selfViewOpen then
-            return true;
-        else
-            return false;
-        end;
-    else
-        return v120.props.voiceEnabled and not v120.state.voiceTimedOut;
-    end;
-end;
-v41.shouldRenderCarat = function(v121) --[[ Line: 621 ]] --[[ Name: shouldRenderCarat ]]
-    return v121.props.chatSettings.TailVisible and not v121:getRenderVoiceAndCameraBubble();
-end;
-v41.render = function(v122) --[[ Line: 625 ]] --[[ Name: render ]]
-    -- upvalues: l_Players_0 (copy), v7 (copy), v34 (copy), v20 (copy), v36 (copy), v28 (copy), l_VRService_0 (copy), l_Enabled_0 (copy), v40 (copy), v29 (copy), v8 (copy), v43 (ref), v17 (copy), v16 (copy), v14 (copy), v15 (copy)
-    local v123 = v122:getAdorneeInstance(v122.state.adornee);
-    local v124 = v122.props.userId == tostring(l_Players_0.LocalPlayer.UserId);
-    local l_savedChatSettings_0 = v122.state.savedChatSettings;
-    if not v123 then
-        v7:trace("No adornee for {}", v122.state.shortId);
-        return;
-    elseif not v122.state.isInsideRenderDistance then
-        v7:trace("Not in range for {}", v122.state.shortId);
-        return;
-    elseif v34 and v122.state.isInEasierUnmutingTreatment and v122.props.voiceState == v20.VOICE_STATE.LOCAL_MUTED and (not v122.state.isInsideEasierUnmutingDistance or v36 and v122.state.isMuted) then
-        v7:trace("Unmute toggle not applicable for {}", v122.state.shortId);
-        return;
-    else
-        local v126 = {};
-        local v127 = nil;
-        local v128 = v122.props.voiceEnabled and not v122.state.voiceTimedOut;
-        if v28 and v124 then
-            v128 = v128 and not v122.state.selfViewOpen;
-        end;
-        if (l_VRService_0.VREnabled or l_Enabled_0()) and v124 then
-            v128 = false;
-        end;
-        if v28 then
-            if v122:getRenderVoiceAndCameraBubble() then
-                local v130 = {
-                    chatSettings = l_savedChatSettings_0, 
-                    isInsideMaximizeDistance = v122.state.isInsideMaximizeDistance, 
-                    LayoutOrder = 2, 
-                    isLocalPlayer = v124, 
-                    hasCameraPermissions = v122.state.hasCameraPermissions, 
-                    hasMicPermissions = v122.state.hasMicPermissions, 
-                    userId = v122.props.userId, 
-                    voiceEnabled = v122.props.voiceEnabled, 
-                    setCameraPermissionStateFromControl = function(v129) --[[ Line: 681 ]] --[[ Name: setCameraPermissionStateFromControl ]]
-                        -- upvalues: v40 (ref), v122 (copy)
-                        if v40() then
-                            v122:setCameraPermissionStateFromControl(v129);
-                        end;
-                    end, 
-                    isShowingDueToEasierUnmuting = v122:isShowingDueToEasierUnmuting()
-                };
-                v126.VoiceAndCameraBubble = v29 and v8.createElement(v43, v130) or v8.createElement(v17, v130);
-                v126.listLayout = v8.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = Enum.VerticalAlignment.Bottom, 
-                    Padding = UDim.new(0, 8)
-                });
-                v126.padding = v8.createElement("UIPadding", {
-                    PaddingBottom = UDim.new(0, 8)
-                });
-            end;
-        elseif v128 and (not v122.props.bubbleChatEnabled or not v122.props.messageIds or #v122.props.messageIds == 0) then
-            v126.VoiceBubble = v8.createElement(v16, {
-                chatSettings = l_savedChatSettings_0, 
-                renderInsert = v122.renderInsert, 
-                insertSize = v122.insertSize, 
-                isDistant = not v122.state.isInsideMaximizeDistance
-            });
-        end;
-        if v122.state.hasMessage then
-            if v122.state.isInsideMaximizeDistance then
-                v126.BubbleChatList = v8.createElement(v14, {
-                    userId = v122.props.userId, 
-                    isVisible = v122.state.isInsideMaximizeDistance, 
-                    onLastBubbleFadeOut = v122.onLastBubbleFadeOut, 
-                    chatSettings = l_savedChatSettings_0, 
-                    renderFirstInsert = if not v28 and v128 then v122.renderInsert else nil, 
-                    insertSize = v122.insertSize, 
-                    showCarat = v122:shouldRenderCarat()
-                });
-            else
-                v126.DistantBubble = v8.createElement(v15, {
-                    fadingOut = not v122.props.messageIds or #v122.props.messageIds == 0, 
-                    onFadeOut = v122.onLastBubbleFadeOut, 
-                    chatSettings = l_savedChatSettings_0, 
-                    renderInsert = v128 and v122.renderInsert, 
-                    insertSize = v122.insertSize
-                });
-            end;
-        end;
-        v127 = v128;
-        if v28 then
-            v127 = v122:getRenderVoiceAndCameraBubble();
-        end;
-        local v131 = v124 and l_savedChatSettings_0.LocalPlayerStudsOffset or Vector3.new(0, 1, 0.10000000149011612, 0);
-        return v8.createElement("BillboardGui", {
-            Adornee = v123, 
-            Active = v127, 
-            Size = UDim2.fromOffset(500, 200), 
-            SizeOffset = Vector2.new(0, 0.5), 
-            StudsOffset = v131 + Vector3.new(0, l_savedChatSettings_0.VerticalStudsOffset, 0), 
-            StudsOffsetWorldSpace = v122.offset, 
-            ResetOnSpawn = false
-        }, v126);
-    end;
-end;
-v41.didUpdate = function(v132, _, v134) --[[ Line: 765 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v34 (copy), l_Players_0 (copy), v20 (copy), l_IXPServiceWrapper_0 (copy), v38 (copy)
-    if (not v132.props.messageIds or #v132.props.messageIds == 0) and not v132.state.isInsideRenderDistance then
-        v132.onLastBubbleFadeOut();
-    end;
-    if v132.props.messageIds and #v132.props.messageIds > 0 then
-        v132.isFadingOut = false;
-    end;
-    if v34 and v132.state.isInEasierUnmutingTreatment then
-        v132:checkCounterForTimeoutWithEasierUnmuting(v134);
-    else
-        v132:checkCounterForTimeout(v134.voiceStateCounter);
-    end;
-    local v135 = v132.props.userId == tostring(l_Players_0.LocalPlayer.UserId);
-    if v34 and v135 and not v132.state.haveLoggedUserExposure and (v132.props.voiceState == v20.VOICE_STATE.INACTIVE or v132.props.voiceState == v20.VOICE_STATE.TALKING or v132.props.voiceState == v20.VOICE_STATE.MUTED) then
-        l_IXPServiceWrapper_0:LogUserLayerExposure(v38);
-        v132:setState({
-            haveLoggedUserExposure = true
-        });
-    end;
-end;
-v41.getDerivedStateFromProps = function(v136, v137) --[[ Line: 802 ]] --[[ Name: getDerivedStateFromProps ]]
-    local v138 = "..." .. string.sub(tostring(v136.userId), -4);
-    local v139 = not v137.hasMessage and v136.messageIds and #v136.messageIds > 0;
-    local v140 = nil;
-    local v141 = nil;
-    local v142 = nil;
-    if v137.lastVoiceState ~= v136.voiceState then
-        v141 = (v137.voiceStateCounter or 0) + 1;
-        v142 = false;
-        v140 = v136.voiceState;
-    end;
-    return {
-        hasMessage = v139 or nil, 
-        savedChatSettings = v136.lastMessage and v136.chatSettings, 
-        shortId = v138, 
-        voiceStateCounter = v141, 
-        voiceTimedOut = v142, 
-        lastVoiceState = v140
-    };
-end;
-return v9.connect(function(v143, v144) --[[ Line: 832 ]] --[[ Name: mapStateToProps ]]
-    -- upvalues: v21 (copy)
-    local v145 = v143.userMessages[v144.userId];
-    local v146 = v145 and #v145 >= 1 and v145[#v145];
-    local v147 = v146 and v143.messages[v146];
-    local v148 = v143.voiceState[v144.userId];
-    return {
-        chatSettings = v21(v143.chatSettings, v147), 
-        messageIds = v145, 
-        lastMessage = v147, 
-        voiceState = v148
-    };
-end)(v41);
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local StarterGui = game:GetService("StarterGui")
+local VRService = game:GetService("VRService")
+local v8 = require(script.Parent.Parent.Logger)(script.Name)
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local Otter = require(CorePackages.Packages.Otter)
+local BubbleChatList = require(script.Parent.BubbleChatList)
+local ChatBubbleDistant = require(script.Parent.ChatBubbleDistant)
+local VoiceBubble = require(script.Parent.VoiceBubble)
+local VoiceIndicator = require(RobloxGui.Modules.VoiceChat.Components.VoiceIndicator)
+local Types = require(script.Parent.Parent.Types)
+local Constants = require(script.Parent.Parent.Constants)
+local getSettingsForMessage = require(script.Parent.Parent.Helpers.getSettingsForMessage)
+local selfViewVisibilityUpdatedSignal = require(RobloxGui.Modules.SelfView.selfViewVisibilityUpdatedSignal)
+local Enabled = require(CorePackages.Workspace.Packages.Chrome).Enabled
+local Constants2 = require(RobloxGui.Modules.VoiceChat.Constants)
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local GetFFlagMicConnectingToast = require(RobloxGui.Modules.Flags.GetFFlagMicConnectingToast)
+local GetFFlagBubbleChatInexistantAdorneeFix = require(RobloxGui.Modules.Flags.GetFFlagBubbleChatInexistantAdorneeFix)
+local publicApi = require(RobloxGui.Modules.SelfView.publicApi)
+local v27 = game:DefineFastInt("BubbleVoiceTimeoutMillis", 1000)
+local v28 = game:DefineFastFlag("DebugAllowControlButtonsNoVoiceChat", false)
+local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
+local v30 = game:DefineFastFlag("EasierUnmuting3", false)
+local v31 = game:DefineFastFlag("EasierUnmutingBasedOnCamera", false)
+local v32 = game:DefineFastFlag("EasierUnmutingHideIfMuted", false)
+local v33 = game:DefineFastInt("EasierUnmutingDisplayDistance", 20)
+local v34 = game:DefineFastString("EasierUnmutingIXPLayerName", "Voice.UserAgency")
+local v35 = game:DefineFastString("EasierUnmutingIXPLayerValue", "VoiceUserAgencyEnabled")
+local v36 = Roact.PureComponent:extend("BubbleChatBillboard")
+local t1 = {
+	dampingRatio = 1,
+	frequency = 4
+}
+
+v36.validateProps = t.strictInterface({
+	userId = t.string,
+	onFadeOut = t.optional(t.callback),
+	voiceEnabled = t.optional(t.boolean),
+	bubbleChatEnabled = t.optional(t.boolean),
+	chatSettings = Types.IChatSettings,
+	messageIds = t.optional(t.array(t.string)),
+	lastMessage = t.optional(Types.IMessage),
+	voiceState = t.optional(t.string)
+})
+
+function getEasierUnmutingDistance(p1) -- line: 72
+	-- upvalues: Players (copy), v31 (copy)
+	if not p1 then
+		return nil
+	end
+
+	local v42 = Players.LocalPlayer and (Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"))
+	local v43 = v42 and (v42.CFrame and v42.CFrame.Position)
+	local v44 = workspace.CurrentCamera and workspace.CurrentCamera.CFrame.Position
+
+	if v31 or not v43 then
+		if not v44 then
+			return nil
+		end
+
+		return (p1 - v44).Magnitude
+	end
+
+	return (p1 - v43).Magnitude
+end
+function v36.init(p2) -- line: 98
+	-- upvalues: publicApi (copy), StarterGui (copy), v30 (copy), v32 (copy), Roact (copy), Otter (copy), Players (copy), Constants (copy), default (copy), GetFFlagMicConnectingToast (copy), Constants2 (copy), VoiceIndicator (copy), selfViewVisibilityUpdatedSignal (copy), IXPServiceWrapper (copy), v34 (copy), v35 (copy)
+	local v46 = publicApi.getSelfViewIsOpenAndVisible()
+	local CoreGuiEnabled = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView)
+
+	p2:setState({
+		adornee = nil,
+		isInsideRenderDistance = false,
+		isInsideMaximizeDistance = false,
+		voiceTimedOut = false,
+		voiceStateCounter = 0,
+		lastVoiceState = nil,
+		savedChatSettings = p2.props.chatSettings,
+		selfViewOpen = v46,
+		selfViewEnabled = CoreGuiEnabled,
+		isInsideEasierUnmutingDistance = not v30 and nil,
+		isMuted = (not v30 or not v32) and nil,
+		isInEasierUnmutingTreatment = not v30 and nil,
+		haveLoggedUserExposure = not v30 and nil
+	})
+	p2.isMounted = false
+
+	local v48, v49 = Roact.createBinding((Vector3.new()))
+
+	p2.offset = v48
+	p2.updateOffset = v49
+	p2.offsetMotor = Otter.createSingleMotor(0)
+	p2.offsetMotor:onStep(function(p3) -- line: 121
+		-- upvalues: p2 (copy)
+		p2.updateOffset((Vector3.new(0, p3, 0)))
+	end)
+	p2.offsetGoal = 0
+
+	function p2.onSelfViewVisibilityUpdated() -- line: 126
+		-- upvalues: p2 (copy), publicApi (copy)
+		p2:setState({
+			selfViewOpen = publicApi.getSelfViewIsOpenAndVisible()
+		})
+	end
+	function p2.onLastBubbleFadeOut() -- line: 132
+		-- upvalues: p2 (copy)
+		if p2.props.onFadeOut and not p2.isFadingOut then
+			p2.isFadingOut = true
+			p2.props.onFadeOut(p2.props.userId)
+		end
+
+		if p2.state.hasMessage and p2.isMounted then
+			p2:setState({
+				hasMessage = false
+			})
+		end
+	end
+
+	if p2.props.voiceEnabled then
+		local u50 = p2.props.userId ~= tostring(Players.LocalPlayer.UserId) and function() -- line: 158
+			-- upvalues: default (copy), p2 (copy), Constants2 (copy)
+			default:ToggleMutePlayer(tonumber(p2.props.userId), if not p2:isShowingDueToEasierUnmuting() then Constants2.VOICE_CONTEXT_TYPE.BUBBLE_CHAT else Constants2.VOICE_CONTEXT_TYPE.EASIER_UNMUTING)
+		end or function() -- line: 148
+			-- upvalues: p2 (copy), Constants (copy), default (copy), GetFFlagMicConnectingToast (copy)
+			if p2.props.voiceState == Constants.VOICE_STATE.ERROR then
+				default:RejoinPreviousChannel()
+
+				return
+			end
+
+			if GetFFlagMicConnectingToast() and p2.props.voiceState == Constants.VOICE_STATE.CONNECTING then
+				default:ShowVoiceChatLoadingMessage()
+
+				return
+			end
+
+			default:ToggleMic("LegacyBubbleChat")
+		end
+		local userId = p2.props.userId
+		local v52 = userId == tostring(Players.LocalPlayer.UserId) and "MicDark" or "SpeakerDark"
+
+		function p2.renderInsert() -- line: 172
+			-- upvalues: Roact (copy), VoiceIndicator (copy), u50 (ref), userId (copy), v52 (copy)
+			return Roact.createElement(VoiceIndicator, {
+				onClicked = u50,
+				userId = userId,
+				iconStyle = v52
+			})
+		end
+
+		p2.insertSize = Vector2.new(28, 28)
+	end
+
+	function p2.onCoreGuiChanged() -- line: 183
+		-- upvalues: StarterGui (copy), p2 (copy)
+		local CoreGuiEnabled2 = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.SelfView)
+
+		if CoreGuiEnabled2 ~= p2.state.selfViewOpen then
+			p2:setState({
+				selfViewOpen = CoreGuiEnabled2
+			})
+		end
+	end
+
+	p2.selfViewVisibilityUpdatedSignal = selfViewVisibilityUpdatedSignal:connect(function() -- line: 192
+		-- upvalues: p2 (copy), publicApi (copy)
+		p2:setState({
+			selfViewOpen = publicApi.getSelfViewIsOpenAndVisible()
+		})
+	end)
+
+	if v30 then
+		local ok, result = pcall(function() -- line: 199
+			-- upvalues: IXPServiceWrapper (copy), v34 (copy)
+			return IXPServiceWrapper:GetLayerData(v34)
+		end)
+
+		if ok and result and result[v35] then
+			p2:setState({
+				isInEasierUnmutingTreatment = true
+			})
+		end
+	end
+
+	if v30 and p2.state.isInEasierUnmutingTreatment and v32 then
+		p2.participantsUpdateConnection = default.participantsUpdate.Event:Connect(function(p4) -- line: 216
+			-- upvalues: p2 (copy)
+			local v124 = p4[p2.props.userId]
+
+			if not v124 then
+				return
+			end
+
+			if v124.isMuted ~= p2.state.isMuted then
+				p2:setState({
+					isMuted = v124.isMuted
+				})
+			end
+		end)
+	end
+end
+function v36.isShowingDueToEasierUnmuting(p5) -- line: 233
+	-- upvalues: v30 (copy), Constants (copy), v32 (copy)
+	return v30 and (p5.state.isInEasierUnmutingTreatment and (p5.props.voiceState == Constants.VOICE_STATE.LOCAL_MUTED and (p5.state.isInsideEasierUnmutingDistance and not (v32 and p5.state.isMuted))))
+end
+function v36.checkCounterForTimeout(p6, p7) -- line: 241
+	-- upvalues: Players (copy), Constants (copy), v27 (copy)
+	if p6.props.userId ~= tostring(Players.LocalPlayer.UserId) and p6.state.lastVoiceState ~= Constants.VOICE_STATE.TALKING and p7 ~= p6.state.voiceStateCounter then
+		local voiceStateCounter = p6.state.voiceStateCounter
+
+		delay(v27 / 1000, function() -- line: 250
+			-- upvalues: p6 (copy), voiceStateCounter (copy)
+			if p6.state.voiceStateCounter == voiceStateCounter and p6.isMounted then
+				p6:setState({
+					voiceTimedOut = true
+				})
+			end
+		end)
+	end
+end
+function v36.checkCounterForTimeoutWithEasierUnmuting(p8, p9) -- line: 261
+	-- upvalues: v30 (copy), Players (copy), Constants (copy), v27 (copy)
+	local v61 = if not p9 then nil else p9.voiceStateCounter
+
+	if not v30 or not p8.state.isInEasierUnmutingTreatment then
+		return p8:checkCounterForTimeout(v61)
+	end
+
+	local v62 = p8.props.userId ~= tostring(Players.LocalPlayer.UserId)
+	local v63 = v61 ~= p8.state.voiceStateCounter
+	local v64 = p8.state.lastVoiceState ~= Constants.VOICE_STATE.TALKING and p8.state.lastVoiceState ~= Constants.VOICE_STATE.LOCAL_MUTED
+
+	if v62 and v63 and v64 then
+		local voiceStateCounter = p8.state.voiceStateCounter
+
+		delay(v27 / 1000, function() -- line: 279
+			-- upvalues: p8 (copy), voiceStateCounter (copy)
+			if p8.state.voiceStateCounter == voiceStateCounter and p8.isMounted then
+				p8:setState({
+					voiceTimedOut = true
+				})
+			end
+		end)
+	end
+end
+function v36.didMount(p10) -- line: 292
+	-- upvalues: Otter (copy), Players (copy), RunService (copy), v30 (copy), v33 (copy), Constants (copy), t1 (copy)
+	p10.isMounted = true
+
+	local v67 = p10.props.lastMessage and p10.props.lastMessage.adornee
+
+	p10:setState({
+		adornee = v67
+	})
+
+	local v68 = p10:getVerticalOffset(v67)
+
+	p10.offsetGoal = v68
+	p10.offsetMotor:setGoal(Otter.instant(v68))
+
+	local player = nil
+
+	if v67 then
+		player = Players:GetPlayerFromCharacter(v67)
+	elseif tonumber(p10.props.userId) then
+		player = Players:GetPlayerByUserId(p10.props.userId)
+	end
+
+	if player then
+		if player.Character then
+			coroutine.wrap(function() -- line: 313
+				-- upvalues: p10 (copy), player (ref)
+				p10:onCharacterAdded(player, player.Character)
+			end)()
+		end
+
+		p10.characterConn = player.CharacterAdded:Connect(function(character) -- line: 317
+			-- upvalues: p10 (copy), player (ref)
+			p10:onCharacterAdded(player, character)
+		end)
+	end
+
+	p10.heartbeatConn = RunService.Heartbeat:Connect(function() -- line: 323
+		-- upvalues: p10 (copy), v30 (copy), v33 (copy), Constants (copy), Otter (copy), t1 (copy)
+		local v126 = p10:getAdorneeInstance(p10.state.adornee)
+
+		if workspace.CurrentCamera and v126 then
+			local v127 = v126:IsA("Attachment") and v126.WorldPosition or v126.Position
+			local Magnitude = (workspace.CurrentCamera.CFrame.Position - v127).Magnitude
+			local v129 = Magnitude < p10.state.savedChatSettings.MaxDistance
+			local v130 = Magnitude < p10.state.savedChatSettings.MinimizeDistance
+			local v131 = false
+
+			if v30 and p10.state.isInEasierUnmutingTreatment then
+				local v132 = getEasierUnmutingDistance(v127)
+
+				if v132 ~= nil then
+					v131 = v132 < v33
+				end
+			end
+
+			if v130 ~= p10.state.isInsideMaximizeDistance or v129 ~= p10.state.isInsideRenderDistance or v30 and p10.state.isInEasierUnmutingTreatment and v131 ~= p10.state.isInsideEasierUnmutingDistance then
+				p10:setState({
+					isInsideRenderDistance = v129,
+					isInsideMaximizeDistance = v130,
+					isInsideEasierUnmutingDistance = v131
+				})
+			end
+		end
+
+		local v133 = p10:getVerticalOffset(p10.state.adornee)
+
+		if math.abs(v133 - p10.offsetGoal) > Constants.BILLBOARD_OFFSET_EPSILON then
+			p10.offsetGoal = v133
+			p10.offsetMotor:setGoal(Otter.spring(v133, t1))
+		end
+	end)
+
+	if v30 and p10.state.isInEasierUnmutingTreatment then
+		p10:checkCounterForTimeoutWithEasierUnmuting(nil)
+	else
+		p10:checkCounterForTimeout(nil)
+	end
+end
+function v36.willUnmount(p11) -- line: 368
+	-- upvalues: v8 (copy), v30 (copy), v32 (copy)
+	v8:trace("Unmounting billboards for {}", p11.state.shortId)
+	p11.isMounted = false
+
+	if p11.characterConn then
+		p11.characterConn:Disconnect()
+		p11.characterConn = nil
+	end
+
+	if p11.heartbeatConn then
+		p11.heartbeatConn:Disconnect()
+		p11.heartbeatConn = nil
+	end
+
+	if p11.humanoidDiedConn then
+		p11.humanoidDiedConn:Disconnect()
+		p11.humanoidDiedConn = nil
+	end
+
+	p11.offsetMotor:destroy()
+
+	if p11.selfViewVisibilityUpdatedSignal then
+		p11.selfViewVisibilityUpdatedSignal:disconnect()
+		p11.selfViewVisibilityUpdatedSignal = nil
+	end
+
+	if v30 and p11.state.isInEasierUnmutingTreatment and v32 and p11.participantsUpdateConnection then
+		p11.participantsUpdateConnection:Disconnect()
+		p11.participantsUpdateConnection = nil
+	end
+end
+
+local function waitForFirst(...) -- line: 396
+	local BindableEvent = Instance.new("BindableEvent")
+	local t2 = { ... }
+
+	local function fire(...) -- line: 400
+		-- upvalues: t2 (copy), BindableEvent (copy)
+		for i = 1, #t2 do
+			t2[i]:Disconnect()
+		end
+
+		return BindableEvent:Fire(...)
+	end
+
+	for i = 1, #t2 do
+		t2[i] = t2[i]:Connect(fire)
+	end
+
+	return BindableEvent.Event:Wait()
+end
+local function findFirstChildByNameAndClass(p12, p13, p14) -- line: 415
+	for _, child in ipairs(p12:GetChildren()) do
+		if p13 == child.Name and child:IsA(p14) then
+			return child
+		end
+	end
+end
+
+function v36.onCharacterAdded(p15, p16, p17) -- line: 424
+	-- upvalues: waitForFirst (copy), v8 (copy), GetFFlagBubbleChatInexistantAdorneeFix (copy), findFirstChildByNameAndClass (copy)
+	if not p17.Parent then
+		waitForFirst(p17.AncestryChanged, p16.CharacterAdded)
+	end
+
+	if p17 ~= p16.Character or not p17.Parent then
+		v8:debug("Mismatched or unparented character in onCharacterAdded for {}", p15.state.shortId)
+
+		return
+	end
+
+	local Humanoid = p17:FindFirstChildOfClass("Humanoid")
+
+	while p17:IsDescendantOf(game) and not Humanoid do
+		waitForFirst(p17.ChildAdded, p17.AncestryChanged, p16.CharacterAdded)
+		Humanoid = p17:FindFirstChildOfClass("Humanoid")
+	end
+
+	if p17 ~= p16.Character or not p17:IsDescendantOf(game) then
+		v8:debug("Mismatched or unparented character in onCharacterAdded for {}", p15.state.shortId)
+
+		return
+	end
+
+	local v84 = if not GetFFlagBubbleChatInexistantAdorneeFix() then p17:FindFirstChild("HumanoidRootPart") else p17.PrimaryPart
+
+	while p17:IsDescendantOf(game) and not v84 do
+		waitForFirst(p17.ChildAdded, p17.AncestryChanged, p16.CharacterAdded)
+		v84 = if not GetFFlagBubbleChatInexistantAdorneeFix() then p17:FindFirstChild("HumanoidRootPart") else p17.PrimaryPart
+	end
+
+	if v84 and p17:IsDescendantOf(game) and p17 == p16.Character and p15.isMounted then
+		local v85 = findFirstChildByNameAndClass(p17, "Head", "BasePart")
+
+		p15:setState({
+			adornee = Humanoid.Health == 0 and v85 or p17
+		})
+
+		if p15.humanoidDiedConn then
+			p15.humanoidDiedConn:Disconnect()
+			p15.humanoidDiedConn = nil
+		end
+
+		p15.humanoidDiedConn = Humanoid.Died:Connect(function() -- line: 474
+			-- upvalues: p15 (copy), findFirstChildByNameAndClass (copy), p17 (copy)
+			p15:setState({
+				adornee = findFirstChildByNameAndClass(p17, "Head", "BasePart") or p17
+			})
+		end)
+	end
+end
+function v36.getVerticalOffset(p18, p19) -- line: 484
+	if p19 and p19:IsA("Model") then
+		local v88, v89 = p19:GetBoundingBox()
+		local v90 = p18:getAdorneeInstance(p19)
+
+		if not v90 then
+			return v89.Y / 2
+		end
+
+		if v90:IsA("BasePart") then
+			local v91 = v88:PointToObjectSpace(v90.Position)
+
+			return v89.Y / 2 - v91.Y
+		end
+
+		return 0
+	end
+
+	if p19 and p19:IsA("BasePart") then
+		return p19.Size.Y / 2
+	end
+
+	return 0
+end
+function v36.getAdorneeInstance(p20, p21) -- line: 506
+	-- upvalues: GetFFlagBubbleChatInexistantAdorneeFix (copy)
+	if not p21 then
+		return
+	end
+
+	if p21:IsA("Model") then
+		local p20statesavedChatSettingsAdorneeName = p21:FindFirstChild(p20.state.savedChatSettings.AdorneeName, true)
+
+		if GetFFlagBubbleChatInexistantAdorneeFix() then
+			p20statesavedChatSettingsAdorneeName = p20statesavedChatSettingsAdorneeName or p21.PrimaryPart
+		end
+
+		if not p20statesavedChatSettingsAdorneeName or p20statesavedChatSettingsAdorneeName:IsA("BasePart") or p20statesavedChatSettingsAdorneeName:IsA("Attachment") then
+			return p20statesavedChatSettingsAdorneeName
+		end
+	elseif p21:IsA("BasePart") or p21:IsA("Attachment") then
+		return p21
+	end
+end
+function v36.getRenderVoiceAndCameraBubble(p22) -- line: 522
+	-- upvalues: v28 (copy), Players (copy), VRService (copy), Enabled (copy)
+	if not p22.props.voiceEnabled and not v28 then
+		return false
+	end
+
+	if p22.props.userId == tostring(Players.LocalPlayer.UserId) then
+		if VRService.VREnabled or Enabled() then
+			return false
+		end
+
+		if not p22.state.selfViewOpen then
+			return true
+		end
+
+		return false
+	end
+
+	return p22.props.voiceEnabled and not p22.state.voiceTimedOut
+end
+function v36.shouldRenderCarat(p23) -- line: 552
+	return p23.props.chatSettings.TailVisible and not p23:getRenderVoiceAndCameraBubble()
+end
+function v36.render(p24) -- line: 556
+	-- upvalues: Players (copy), v8 (copy), v30 (copy), Constants (copy), v32 (copy), VRService (copy), Enabled (copy), Roact (copy), VoiceBubble (copy), BubbleChatList (copy), ChatBubbleDistant (copy)
+	local v98 = p24:getAdorneeInstance(p24.state.adornee)
+	local v99 = p24.props.userId == tostring(Players.LocalPlayer.UserId)
+	local savedChatSettings = p24.state.savedChatSettings
+
+	if not v98 then
+		v8:trace("No adornee for {}", p24.state.shortId)
+
+		return
+	end
+
+	if not p24.state.isInsideRenderDistance then
+		v8:trace("Not in range for {}", p24.state.shortId)
+
+		return
+	end
+
+	if v30 and p24.state.isInEasierUnmutingTreatment and p24.props.voiceState == Constants.VOICE_STATE.LOCAL_MUTED and (not p24.state.isInsideEasierUnmutingDistance or v32 and p24.state.isMuted) then
+		v8:trace("Unmute toggle not applicable for {}", p24.state.shortId)
+
+		return
+	end
+
+	local t3 = {}
+	local v102 = p24.props.voiceEnabled and not p24.state.voiceTimedOut
+
+	if (VRService.VREnabled or Enabled()) and v99 then
+		v102 = false
+	end
+
+	if v102 and (not p24.props.bubbleChatEnabled or not p24.props.messageIds or #p24.props.messageIds == 0) then
+		t3.VoiceBubble = Roact.createElement(VoiceBubble, {
+			chatSettings = savedChatSettings,
+			renderInsert = p24.renderInsert,
+			insertSize = p24.insertSize,
+			isDistant = not p24.state.isInsideMaximizeDistance
+		})
+	end
+
+	if p24.state.hasMessage then
+		if p24.state.isInsideMaximizeDistance then
+			t3.BubbleChatList = Roact.createElement(BubbleChatList, {
+				userId = p24.props.userId,
+				isVisible = p24.state.isInsideMaximizeDistance,
+				onLastBubbleFadeOut = p24.onLastBubbleFadeOut,
+				chatSettings = savedChatSettings,
+				renderFirstInsert = if not v102 then nil else p24.renderInsert,
+				insertSize = p24.insertSize,
+				showCarat = p24:shouldRenderCarat()
+			})
+		else
+			t3.DistantBubble = Roact.createElement(ChatBubbleDistant, {
+				fadingOut = not p24.props.messageIds or #p24.props.messageIds == 0,
+				onFadeOut = p24.onLastBubbleFadeOut,
+				chatSettings = savedChatSettings,
+				renderInsert = v102 and p24.renderInsert,
+				insertSize = p24.insertSize
+			})
+		end
+	end
+
+	local v103 = v99 and savedChatSettings.LocalPlayerStudsOffset or Vector3.new(0, 1, 0.10000000149011612)
+
+	return Roact.createElement("BillboardGui", {
+		ResetOnSpawn = false,
+		Adornee = v98,
+		Active = v102,
+		Size = UDim2.fromOffset(500, 200),
+		SizeOffset = Vector2.new(0, 0.5),
+		StudsOffset = v103 + Vector3.new(0, savedChatSettings.VerticalStudsOffset, 0),
+		StudsOffsetWorldSpace = p24.offset
+	}, t3)
+end
+function v36.didUpdate(p25, _, p27) -- line: 652
+	-- upvalues: v30 (copy), Players (copy), Constants (copy), IXPServiceWrapper (copy), v34 (copy)
+	if (not p25.props.messageIds or #p25.props.messageIds == 0) and not p25.state.isInsideRenderDistance then
+		p25.onLastBubbleFadeOut()
+	end
+
+	if p25.props.messageIds and #p25.props.messageIds > 0 then
+		p25.isFadingOut = false
+	end
+
+	if v30 and p25.state.isInEasierUnmutingTreatment then
+		p25:checkCounterForTimeoutWithEasierUnmuting(p27)
+	else
+		p25:checkCounterForTimeout(p27.voiceStateCounter)
+	end
+
+	local v107 = p25.props.userId == tostring(Players.LocalPlayer.UserId)
+
+	if v30 and v107 and not p25.state.haveLoggedUserExposure and (p25.props.voiceState == Constants.VOICE_STATE.INACTIVE or p25.props.voiceState == Constants.VOICE_STATE.TALKING or p25.props.voiceState == Constants.VOICE_STATE.MUTED) then
+		IXPServiceWrapper:LogUserLayerExposure(v34)
+		p25:setState({
+			haveLoggedUserExposure = true
+		})
+	end
+end
+function v36.getDerivedStateFromProps(p28, p29) -- line: 689
+	local v110 = "..." .. string.sub(tostring(p28.userId), -4)
+	local v111 = not p29.hasMessage and (p28.messageIds and #p28.messageIds > 0)
+	local voiceState = nil
+	local v113 = nil
+	local v114 = nil
+
+	if p29.lastVoiceState ~= p28.voiceState then
+		v113 = (p29.voiceStateCounter or 0) + 1
+		v114 = false
+		voiceState = p28.voiceState
+	end
+
+	return {
+		hasMessage = v111 or nil,
+		savedChatSettings = p28.lastMessage and p28.chatSettings,
+		shortId = v110,
+		voiceStateCounter = v113,
+		voiceTimedOut = v114,
+		lastVoiceState = voiceState
+	}
+end
+
+local function mapStateToProps(p30, p31) -- line: 719
+	-- upvalues: getSettingsForMessage (copy)
+	local v117 = p30.userMessages[p31.userId]
+	local v118 = v117 and (#v117 >= 1 and v117[#v117])
+	local v119 = v118 and p30.messages[v118]
+	local v120 = p30.voiceState[p31.userId]
+
+	return {
+		chatSettings = getSettingsForMessage(p30.chatSettings, v119),
+		messageIds = v117,
+		lastMessage = v119,
+		voiceState = v120
+	}
+end
+
+return RoactRodux.connect(mapStateToProps)(v36)

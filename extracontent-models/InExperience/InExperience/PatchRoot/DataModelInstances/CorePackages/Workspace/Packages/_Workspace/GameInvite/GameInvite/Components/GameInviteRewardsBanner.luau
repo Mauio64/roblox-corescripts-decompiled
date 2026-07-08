@@ -1,125 +1,132 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameInvite");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local v5 = require(l_Parent_0.Foundation);
-local l_IconButton_0 = v5.IconButton;
-local l_IconSize_0 = v5.Enums.IconSize;
-local v8 = require(l_script_FirstAncestor_0.Components.GameInviteRewardsInfoModal);
-local l_GroupService_0 = game:GetService("GroupService");
-local l_Players_0 = game:GetService("Players");
-local function v18(v11) --[[ Line: 29 ]]
-    -- upvalues: l_GroupService_0 (copy), l_Players_0 (copy)
-    local v12 = "";
-    if v11 == nil or v11 == 0 then
-        return "";
-    else
-        if game.CreatorType == Enum.CreatorType.Group then
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 35 ]]
-                -- upvalues: l_GroupService_0 (ref), v11 (copy)
-                return l_GroupService_0:GetGroupInfoAsync(v11);
-            end);
-            if not l_status_0 then
-                v12 = "";
-            end;
-            if l_result_0 then
-                return l_result_0.Name;
-            end;
-        elseif game.CreatorType == Enum.CreatorType.User then
-            local v15 = nil;
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 46 ]]
-                -- upvalues: l_Players_0 (ref), v11 (copy)
-                return l_Players_0:GetNameFromUserIdAsync(v11);
-            end);
-            v15 = l_status_1;
-            v12 = l_result_1;
-            if not v15 then
-                v12 = "";
-            end;
-        end;
-        return v12;
-    end;
-end;
-return function(v19) --[[ Line: 56 ]]
-    -- upvalues: l_useLocalization_0 (copy), l_MarketplaceService_0 (copy), v18 (copy), v2 (copy), v8 (copy), v5 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy)
-    local v20 = l_useLocalization_0({
-        rewardsModalTitle = "Roblox.ReferralRewards.RewardBannerModalTitle", 
-        rewardsHeader = {
-            "Roblox.ReferralRewards.RewardBannerHeader"; 
-            rewardName = v19.rewardMetadata and v19.rewardMetadata.name or ""
-        }, 
-        rewardsBody = {
-            "Roblox.ReferralRewards.RewardBannerBody"; 
-            gameName = if game.PlaceId ~= nil and game.PlaceId ~= 0 then if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_MarketplaceService_0:GetProductInfoAsync(game.PlaceId).Name else l_MarketplaceService_0:GetProductInfo(game.PlaceId).Name else "", 
-            rewardName = v19.rewardMetadata and v19.rewardMetadata.name or ""
-        }, 
-        rewardsDetailsTitle = "Roblox.ReferralRewards.RewardBannerModalRewardDetails", 
-        rewardsLimitsTitle = "Roblox.ReferralRewards.AdditionalCreatorTerms", 
-        rewardsCreatorSupportText = {
-            "Roblox.ReferralRewards.RewardBannerModalCreatorSupport"; 
-            creatorName = game.CreatorId ~= nil and game.CreatorId ~= 0 and v18(game.CreatorId) or ""
-        }, 
-        rewardsExpiresText = "Roblox.ReferralRewards.Expires", 
-        rewardsTerms = "Roblox.ReferralRewards.ReferralProgramTerms"
-    });
-    local v21, v22 = v2.useState(false);
-    return v2.createElement(v2.Fragment, nil, {
-        RewardInfoModal = v21 and v19.rewardMetadata and v20 and v2.createElement(v8, {
-            title = v20.rewardsModalTitle, 
-            rewardDetailsTitle = v20.rewardsDetailsTitle, 
-            rewardDetailsBody = v19.rewardMetadata.description or "", 
-            rewardLimitsTitle = v20.rewardsLimitsTitle, 
-            rewardLimitsBody = v19.rewardMetadata.limits or "", 
-            rewardCreatorSupportText = v20.rewardsCreatorSupportText, 
-            rewardsExpiresText = v20.rewardsExpiresText, 
-            rewardsTerms = v20.rewardsTerms, 
-            expiryUtc = v19.rewardMetadata.rewardTimeOffset.endUtc or "", 
-            modalOpen = v21, 
-            setModalOpen = v22
-        }) or nil, 
-        RewardBannerContainer = v2.createElement(v5.View, {
-            tag = "row padding-x-xxlarge size-full-0 auto-y items-center", 
-            layoutOrder = v19.layoutOrder
-        }, {
-            RewardBannerCard = v2.createElement(v5.View, {
-                tag = "row size-full-0 auto-y wrap bg-surface-300 gap-medium padding-medium radius-medium align-y-top"
-            }, {
-                RewardIcon = v19.rewardMetadata and v19.rewardMetadata.iconAssetId ~= nil and v19.rewardMetadata.iconAssetId ~= "" and v2.createElement(v5.Image, {
-                    Image = "rbxassetid://" .. v19.rewardMetadata.iconAssetId, 
-                    tag = "col shrink size-1200-1200 radius-medium self-end", 
-                    LayoutOrder = 0
-                }) or nil, 
-                RewardTextContainer = v2.createElement(v5.View, {
-                    tag = "col fill auto-xy items-start", 
-                    LayoutOrder = 1
-                }, {
-                    Text = v2.createElement(v5.Text, {
-                        tag = "auto-xy text-title-medium text-wrap text-align-x-left", 
-                        Text = v20.rewardsHeader, 
-                        LayoutOrder = 0
-                    }), 
-                    Subtext = v2.createElement(v5.Text, {
-                        tag = "auto-xy text-body-small text-wrap text-align-x-left", 
-                        Text = v20.rewardsBody, 
-                        LayoutOrder = 1
-                    })
-                }), 
-                RewardInfoButtonView = v2.createElement(v5.View, {
-                    tag = "col auto-xy items-end", 
-                    LayoutOrder = 2
-                }, {
-                    RewardInfoButton = v2.createElement(l_IconButton_0, {
-                        testId = "RewardInfoButton", 
-                        icon = "icons/actions/info_small", 
-                        size = l_IconSize_0.Small, 
-                        onActivated = function() --[[ Line: 142 ]] --[[ Name: onActivated ]]
-                            -- upvalues: v22 (copy)
-                            v22(true);
-                        end
-                    })
-                })
-            })
-        })
-    });
-end;
+local GameInvite = script:FindFirstAncestor("GameInvite")
+local GameInviteParent = GameInvite.Parent
+local React = require(GameInviteParent.React)
+local useLocalization = require(GameInviteParent.Localization).Hooks.useLocalization
+local MarketplaceService = game:GetService("MarketplaceService")
+local Foundation = require(GameInviteParent.Foundation)
+local IconButton = Foundation.IconButton
+local IconSize = Foundation.Enums.IconSize
+local GameInviteRewardsInfoModal = require(GameInvite.Components.GameInviteRewardsInfoModal)
+local GroupService = game:GetService("GroupService")
+local Players = game:GetService("Players")
+
+local function v12(n1: number) -- line: 29
+	-- upvalues: GroupService (copy), Players (copy)
+	local s1 = ""
+
+	if n1 == nil or n1 == 0 then
+		return ""
+	end
+
+	if game.CreatorType == Enum.CreatorType.Group then
+		local ok, result = pcall(function() -- line: 35
+			-- upvalues: GroupService (copy), n1 (copy)
+			return GroupService:GetGroupInfoAsync(n1)
+		end)
+
+		if not ok then
+			s1 = ""
+		end
+
+		if result then
+			return result.Name
+		end
+	elseif game.CreatorType == Enum.CreatorType.User then
+		local ok
+
+		ok, s1 = pcall(function() -- line: 46
+			-- upvalues: Players (copy), n1 (copy)
+			return Players:GetNameFromUserIdAsync(n1)
+		end)
+
+		if not ok then
+			s1 = ""
+		end
+	end
+
+	return s1
+end
+
+return function(t1: {[any]: any}) -- line: 56
+	-- upvalues: useLocalization (copy), MarketplaceService (copy), v12 (copy), React (copy), GameInviteRewardsInfoModal (copy), Foundation (copy), IconButton (copy), IconSize (copy)
+	local v19 = useLocalization({
+		rewardsModalTitle = "Roblox.ReferralRewards.RewardBannerModalTitle",
+		rewardsDetailsTitle = "Roblox.ReferralRewards.RewardBannerModalRewardDetails",
+		rewardsLimitsTitle = "Roblox.ReferralRewards.AdditionalCreatorTerms",
+		rewardsExpiresText = "Roblox.ReferralRewards.Expires",
+		rewardsTerms = "Roblox.ReferralRewards.ReferralProgramTerms",
+		rewardsHeader = {
+			"Roblox.ReferralRewards.RewardBannerHeader",
+			rewardName = t1.rewardMetadata and t1.rewardMetadata.name or ""
+		},
+		rewardsBody = {
+			"Roblox.ReferralRewards.RewardBannerBody",
+			gameName = (game.PlaceId == nil or game.PlaceId == 0) and "" or if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then MarketplaceService:GetProductInfo(game.PlaceId).Name else MarketplaceService:GetProductInfoAsync(game.PlaceId).Name,
+			rewardName = t1.rewardMetadata and t1.rewardMetadata.name or ""
+		},
+		rewardsCreatorSupportText = {
+			"Roblox.ReferralRewards.RewardBannerModalCreatorSupport",
+			creatorName = game.CreatorId ~= nil and (game.CreatorId ~= 0 and v12(game.CreatorId)) or ""
+		}
+	})
+	local v20, v21 = React.useState(false)
+
+	return React.createElement(React.Fragment, nil, {
+		RewardInfoModal = v20 and (not not t1.rewardMetadata and (not not v19 and React.createElement(GameInviteRewardsInfoModal, {
+			title = v19.rewardsModalTitle,
+			rewardDetailsTitle = v19.rewardsDetailsTitle,
+			rewardDetailsBody = t1.rewardMetadata.description or "",
+			rewardLimitsTitle = v19.rewardsLimitsTitle,
+			rewardLimitsBody = t1.rewardMetadata.limits or "",
+			rewardCreatorSupportText = v19.rewardsCreatorSupportText,
+			rewardsExpiresText = v19.rewardsExpiresText,
+			rewardsTerms = v19.rewardsTerms,
+			expiryUtc = t1.rewardMetadata.rewardTimeOffset.endUtc or "",
+			modalOpen = v20,
+			setModalOpen = v21
+		}))) or nil,
+		RewardBannerContainer = React.createElement(Foundation.View, {
+			tag = "row padding-x-xxlarge size-full-0 auto-y items-center",
+			layoutOrder = t1.layoutOrder
+		}, {
+			RewardBannerCard = React.createElement(Foundation.View, {
+				tag = "row size-full-0 auto-y wrap bg-surface-300 gap-medium padding-medium radius-medium align-y-top"
+			}, {
+				RewardIcon = t1.rewardMetadata and (t1.rewardMetadata.iconAssetId ~= nil and (t1.rewardMetadata.iconAssetId ~= "" and React.createElement(Foundation.Image, {
+					tag = "col shrink size-1200-1200 radius-medium self-end",
+					LayoutOrder = 0,
+					Image = "rbxassetid://" .. t1.rewardMetadata.iconAssetId
+				}))) or nil,
+				RewardTextContainer = React.createElement(Foundation.View, {
+					tag = "col fill auto-xy items-start",
+					LayoutOrder = 1
+				}, {
+					Text = React.createElement(Foundation.Text, {
+						tag = "auto-xy text-title-medium text-wrap text-align-x-left",
+						LayoutOrder = 0,
+						Text = v19.rewardsHeader
+					}),
+					Subtext = React.createElement(Foundation.Text, {
+						tag = "auto-xy text-body-small text-wrap text-align-x-left",
+						LayoutOrder = 1,
+						Text = v19.rewardsBody
+					})
+				}),
+				RewardInfoButtonView = React.createElement(Foundation.View, {
+					tag = "col auto-xy items-end",
+					LayoutOrder = 2
+				}, {
+					RewardInfoButton = React.createElement(IconButton, {
+						testId = "RewardInfoButton",
+						icon = "icons/actions/info_small",
+						size = IconSize.Small,
+						onActivated = function() -- line: 142
+							-- upvalues: v21 (copy)
+							v21(true)
+						end
+					})
+				})
+			})
+		})
+	})
+end

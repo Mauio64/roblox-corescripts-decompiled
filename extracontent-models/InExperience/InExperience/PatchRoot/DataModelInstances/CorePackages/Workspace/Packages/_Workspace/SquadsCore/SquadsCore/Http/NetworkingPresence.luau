@@ -1,5 +1,6 @@
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v1 = require(script.Parent.RoduxNetworking);
-return (require(l_Parent_0.LuaSocialLibrariesDeps).NetworkingPresence.config({
-    roduxNetworking = v1
-}));
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local RoduxNetworking = require(script.Parent.RoduxNetworking)
+
+return (require(Parent.LuaSocialLibrariesDeps).NetworkingPresence.config({
+	roduxNetworking = RoduxNetworking
+}))

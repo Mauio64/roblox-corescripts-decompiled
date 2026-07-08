@@ -1,19 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Users.populateUserWithState);
-local v2 = require(script.Parent.Parent.Logger);
-return function(v3, v4, v5) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local l_Users_0 = v3.Users;
-    local v7 = {};
-    for v8, v9 in pairs(v4) do
-        local v10 = l_Users_0[v9];
-        local v11 = if v5 then v5[v8] else nil;
-        if v10 then
-            local v12 = v1(v3, v10, v11);
-            v7[v10.id] = v12;
-        else
-            v2:warning("user is required in selectChatUserEntryModelList");
-        end;
-    end;
-    return v7;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local populateUserWithState = require(AppChat.Users.populateUserWithState)
+local Logger = require(script.Parent.Parent.Logger)
+
+return function(p1, p2, t1: {[any]: any}?) -- line: 5
+	-- upvalues: populateUserWithState (copy), Logger (copy)
+	local Users = p1.Users
+	local t2 = {}
+
+	for k, v in pairs(p2) do
+		local v11 = Users[v]
+		local v12 = if not t1 then nil else t1[k]
+
+		if v11 then
+			local v13 = populateUserWithState(p1, v11, v12)
+
+			t2[v11.id] = v13
+		else
+			Logger:warning("user is required in selectChatUserEntryModelList")
+		end
+	end
+
+	return t2
+end

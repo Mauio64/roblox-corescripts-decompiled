@@ -17,24 +17,23 @@ local createElement = React.createElement
 local function getKeyDefault(_, n1: number) -- line: 13
 	return (tostring(n1))
 end
-
-return function(t1: {[any]: any}) --[[ ReactStateRenderer ]] -- line: 23
+local function ReactStateRenderer(t1: {[any]: any}) -- line: 23
 	-- upvalues: React (copy), getKeyDefault (copy), DimensionsMethods (copy), createElement (copy), joinAndMapBindings (copy), adjustPositionToScrollAxis (copy)
-	local v11, v12 = React.useState(t1.virtualizedListController.get)
-	local v13, v14 = React.useBinding(nil)
+	local v12, v13 = React.useState(t1.virtualizedListController.get)
+	local v14, v15 = React.useBinding(nil)
 
 	React.useEffect(function() -- line: 39
-		-- upvalues: v11 (copy), t1 (copy), v14 (copy), v12 (copy)
-		local u22 = v11
+		-- upvalues: v12 (copy), t1 (copy), v15 (copy), v13 (copy)
+		local u23 = v12
 
 		return t1.virtualizedListController.bindToUpdate(function() -- line: 42
-			-- upvalues: v14 (copy), u22 (ref), t1 (copy), v12 (copy)
-			v14({
-				lockedTo = u22,
+			-- upvalues: v15 (copy), u23 (ref), t1 (copy), v13 (copy)
+			v15({
+				lockedTo = u23,
 				scrollAxis = t1.scrollAxisBinding:getValue()
 			})
-			u22 = t1.virtualizedListController.get()
-			v12(u22)
+			u23 = t1.virtualizedListController.get()
+			v13(u23)
 		end)
 	end, {
 		t1.virtualizedListController,
@@ -42,26 +41,28 @@ return function(t1: {[any]: any}) --[[ ReactStateRenderer ]] -- line: 23
 	})
 
 	local t2 = {}
-	local v16 = t1.getKey or getKeyDefault
-	local v17 = t1.virtualizedListController.getRange()
+	local v17 = t1.getKey or getKeyDefault
+	local v18 = t1.virtualizedListController.getRange()
 
-	for v18, v19 in v11 do
-		local v20 = v17.X + (v18 - 1)
-		local v21 = DimensionsMethods.getUDimRect(t1.dimensions, v19, v20, t1.virtualizedListController.getWindowSize(), t1.direction)
+	for v19, v20 in v12 do
+		local v21 = v18.X + (v19 - 1)
+		local v22 = DimensionsMethods.getUDimRect(t1.dimensions, v20, v21, t1.virtualizedListController.getWindowSize(), t1.direction)
 
-		t2[v16(v19, v20)] = createElement("Frame", {
+		t2[v17(v20, v21)] = createElement("Frame", {
 			BackgroundTransparency = 1,
 			Position = joinAndMapBindings(function(n2: number, t3: {[any]: any}?) -- line: 70
-				-- upvalues: t1 (copy), v11 (copy), adjustPositionToScrollAxis (copy), v21 (copy)
-				if t1.config.freezeViewWhileScrolling ~= false and (t3 ~= nil and t3.lockedTo == v11) then
-					return adjustPositionToScrollAxis(v21.position, t3.scrollAxis, t1.direction)
+				-- upvalues: t1 (copy), v12 (copy), adjustPositionToScrollAxis (copy), v22 (copy)
+				if t1.config.freezeViewWhileScrolling ~= false and (t3 ~= nil and t3.lockedTo == v12) then
+					return adjustPositionToScrollAxis(v22.position, t3.scrollAxis, t1.direction)
 				end
 
-				return adjustPositionToScrollAxis(v21.position, n2, t1.direction)
-			end, t1.scrollAxisBinding, v13),
-			Size = v21.size
-		}, t1.callback(v19))
+				return adjustPositionToScrollAxis(v22.position, n2, t1.direction)
+			end, t1.scrollAxisBinding, v14),
+			Size = v22.size
+		}, t1.callback(v20))
 	end
 
 	return createElement(React.Fragment, nil, t2)
 end
+
+return ReactStateRenderer

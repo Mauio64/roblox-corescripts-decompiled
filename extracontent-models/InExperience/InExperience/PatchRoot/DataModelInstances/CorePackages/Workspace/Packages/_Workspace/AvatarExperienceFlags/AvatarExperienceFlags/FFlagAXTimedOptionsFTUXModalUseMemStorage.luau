@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXTimedOptionsFTUXModalUseMemStorage", false);
+return game:DefineFastFlag("AXTimedOptionsFTUXModalUseMemStorage", false)

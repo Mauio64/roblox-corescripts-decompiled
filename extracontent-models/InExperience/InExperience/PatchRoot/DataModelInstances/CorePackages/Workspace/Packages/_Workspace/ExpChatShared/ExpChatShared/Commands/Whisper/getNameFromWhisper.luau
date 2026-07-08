@@ -1,19 +1,23 @@
-local function v6(v0, v1) --[[ Line: 2 ]] --[[ Name: getArgs ]]
-    for _, v3 in pairs(v1) do
-        local v4 = v3 .. " ";
-        local v5 = string.len(v4);
-        if string.sub(v0, 1, v5):lower() == v4 then
-            return (string.sub(v0, v5 + 1));
-        end;
-    end;
-    return nil;
-end;
-return function(v7, v8) --[[ Line: 15 ]]
-    -- upvalues: v6 (copy)
-    local v9 = v6(v7, v8);
-    if v9 then
-        return string.split(v9, " ")[1];
-    else
-        return nil;
-    end;
-end;
+local function getArgs(s1: string, t1: {[any]: any}) -- line: 2
+	for _, v in pairs(t1) do
+		local v6 = v .. " "
+		local v7 = string.len(v6)
+
+		if v6 == string.sub(s1, 1, v7):lower() then
+			return (string.sub(s1, v7 + 1))
+		end
+	end
+
+	return nil
+end
+
+return function(s2: string, t2: {[any]: any}) -- line: 15
+	-- upvalues: getArgs (copy)
+	local v10 = getArgs(s2, t2)
+
+	if v10 then
+		return string.split(v10, " ")[1]
+	end
+
+	return nil
+end

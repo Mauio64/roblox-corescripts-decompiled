@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "purchasingStartTime");
+return require(script.Parent.makeActionCreator)(script.Name, "purchasingStartTime")

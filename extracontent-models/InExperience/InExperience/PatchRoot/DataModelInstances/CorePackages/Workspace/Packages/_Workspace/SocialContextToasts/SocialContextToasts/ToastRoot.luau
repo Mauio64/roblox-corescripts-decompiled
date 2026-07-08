@@ -1,146 +1,160 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialContextToasts");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.ToastWrapper);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_script_FirstAncestor_0.Enums.ToastTypes);
-local l_ButtonType_0 = require(l_Parent_0.UIBlox).App.Button.Enum.ButtonType;
-local v7 = require(l_Parent_0.Cryo);
-local l_GetFFlagSocialContextToastEventStream_0 = require(l_Parent_0.SharedFlags).GetFFlagSocialContextToastEventStream;
-local l_GetFFlagEnableReferredPlayerJoinRemoteEvent_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableReferredPlayerJoinRemoteEvent;
-return function(v10) --[[ Line: 44 ]] --[[ Name: ToastRoot ]]
-    -- upvalues: l_useSelector_0 (copy), l_GetFFlagSocialContextToastEventStream_0 (copy), v7 (copy), v5 (copy), v4 (copy), v2 (copy), l_ButtonType_0 (copy), l_GetFFlagEnableReferredPlayerJoinRemoteEvent_0 (copy)
-    local v12 = l_useSelector_0(function(v11) --[[ Line: 45 ]]
-        return v11.ToastContent;
-    end);
-    local v13 = if l_GetFFlagSocialContextToastEventStream_0() then v7.Dictionary.join(v10.analyticsProps, {
-        toastType = v12.toastType
-    }) else nil;
-    if v12.toastType == v5.None then
-        return nil;
-    elseif v12.toastType == v5.YouJoinedFriends then
-        local v14 = nil;
-        local l_userList_0 = v12.userList;
-        if #l_userList_0 == 1 then
-            v14 = {
-                label = {
-                    "Feature.SocialContextToast.Message.YouJoinedOneFriend"; 
-                    FRIEND_NAME = l_userList_0[1].name
-                }
-            };
-        elseif #l_userList_0 == 2 then
-            v14 = {
-                label = {
-                    "Feature.SocialContextToast.Message.YouJoinedTwoFriends"; 
-                    FRIEND_NAME_ONE = l_userList_0[1].name, 
-                    FRIEND_NAME_TWO = l_userList_0[2].name
-                }
-            };
-        elseif #l_userList_0 > 2 then
-            v14 = {
-                label = {
-                    "Feature.SocialContextToast.Message.YouJoinedManyFriends"; 
-                    FRIEND_NAME = l_userList_0[1].name, 
-                    FRIEND_COUNT = #l_userList_0 - 1
-                }
-            };
-        end;
-        local v16 = {};
-        for v17, _ in l_userList_0 do
-            table.insert(v16, l_userList_0[v17].userId);
-        end;
-        return v4.createElement(v2, {
-            toastStrings = v14, 
-            userIdList = v16, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.FriendJoinedYou then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = {
-                    "Feature.SocialContextToast.Message.FriendJoinedYou"; 
-                    FRIEND_NAME = v12.joinerName
-                }
-            }, 
-            userIdList = {
-                v12.joinerUserId
-            }, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.FriendInNonRootPlace then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = {
-                    "Feature.SocialContextToast.Message.FriendInNonRootPlace"; 
-                    FRIEND_NAME = v12.joinerName
-                }
-            }, 
-            userIdList = {
-                v12.joinerUserId
-            }, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.FollowYourFriend then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = {
-                    "Feature.SocialContextToast.Message.FollowedFriendInOtherUniverse"; 
-                    FRIEND_NAME = v12.joinerName, 
-                    EXPERIENCE_NAME = v12.experienceName
-                }, 
-                button = "Feature.SocialContextToast.Action.JoinFriend"
-            }, 
-            userIdList = {
-                v12.joinerUserId
-            }, 
-            onActivated = v12.onActivated, 
-            buttonType = l_ButtonType_0.PrimaryContextual, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.InviteBack then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = {
-                    "Feature.SocialContextToast.Message.FollowedFriendNotInGame"; 
-                    FRIEND_NAME = v12.joinerName
-                }, 
-                button = "Feature.SocialContextToast.Action.InviteBack"
-            }, 
-            userIdList = {
-                v12.joinerUserId
-            }, 
-            onActivated = v12.onActivated, 
-            areUsersActive = false, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.InviteSuccess then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = "Feature.SocialContextToast.Message.InvitationConfirmation"
-            }, 
-            analyticsProps = v13
-        });
-    elseif v12.toastType == v5.InviteFailure then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = "Feature.SocialContextToast.Message.InvitationFailure"
-            }, 
-            analyticsProps = v13
-        });
-    elseif l_GetFFlagEnableReferredPlayerJoinRemoteEvent_0() and v12.toastType == v5.InviteeJoinedYou then
-        return v4.createElement(v2, {
-            toastStrings = {
-                label = {
-                    "Feature.SocialContextToast.Message.InviteeJoinedYou"; 
-                    INVITEE_NAME = v12.joinerName
-                }
-            }, 
-            userIdList = {
-                v12.joinerUserId
-            }, 
-            analyticsProps = v13
-        });
-    else
-        return nil;
-    end;
-end;
+local SocialContextToasts = script:FindFirstAncestor("SocialContextToasts")
+local SocialContextToastsParent = SocialContextToasts.Parent
+local ToastWrapper = require(SocialContextToasts.ToastWrapper)
+local useSelector = require(SocialContextToastsParent.RoactUtils).Hooks.RoactRodux.useSelector
+local React = require(SocialContextToastsParent.React)
+local ToastTypes = require(SocialContextToasts.Enums.ToastTypes)
+local ButtonType = require(SocialContextToastsParent.UIBlox).App.Button.Enum.ButtonType
+local Cryo = require(SocialContextToastsParent.Cryo)
+local GetFFlagSocialContextToastEventStream = require(SocialContextToastsParent.SharedFlags).GetFFlagSocialContextToastEventStream
+local GetFFlagEnableReferredPlayerJoinRemoteEvent = require(SocialContextToastsParent.SharedFlags).GetFFlagEnableReferredPlayerJoinRemoteEvent
+
+local function ToastRoot(p1) -- line: 44
+	-- upvalues: useSelector (copy), GetFFlagSocialContextToastEventStream (copy), Cryo (copy), ToastTypes (copy), React (copy), ToastWrapper (copy), ButtonType (copy), GetFFlagEnableReferredPlayerJoinRemoteEvent (copy)
+	local v13 = useSelector(function(p2) -- line: 45
+		return p2.ToastContent
+	end)
+	local v14 = if not GetFFlagSocialContextToastEventStream() then nil else Cryo.Dictionary.join(p1.analyticsProps, {
+		toastType = v13.toastType
+	})
+
+	if v13.toastType == ToastTypes.None then
+		return nil
+	end
+
+	if v13.toastType == ToastTypes.YouJoinedFriends then
+		local t1 = nil
+		local userList = v13.userList
+
+		if #userList == 1 then
+			t1 = {
+				label = {
+					"Feature.SocialContextToast.Message.YouJoinedOneFriend",
+					FRIEND_NAME = userList[1].name
+				}
+			}
+		elseif #userList == 2 then
+			t1 = {
+				label = {
+					"Feature.SocialContextToast.Message.YouJoinedTwoFriends",
+					FRIEND_NAME_ONE = userList[1].name,
+					FRIEND_NAME_TWO = userList[2].name
+				}
+			}
+		elseif #userList > 2 then
+			t1 = {
+				label = {
+					"Feature.SocialContextToast.Message.YouJoinedManyFriends",
+					FRIEND_NAME = userList[1].name,
+					FRIEND_COUNT = #userList - 1
+				}
+			}
+		end
+
+		local t2 = {}
+
+		for v18, _ in userList do
+			table.insert(t2, userList[v18].userId)
+		end
+
+		return React.createElement(ToastWrapper, {
+			toastStrings = t1,
+			userIdList = t2,
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.FriendJoinedYou then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				label = {
+					"Feature.SocialContextToast.Message.FriendJoinedYou",
+					FRIEND_NAME = v13.joinerName
+				}
+			},
+			userIdList = { v13.joinerUserId },
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.FriendInNonRootPlace then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				label = {
+					"Feature.SocialContextToast.Message.FriendInNonRootPlace",
+					FRIEND_NAME = v13.joinerName
+				}
+			},
+			userIdList = { v13.joinerUserId },
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.FollowYourFriend then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				button = "Feature.SocialContextToast.Action.JoinFriend",
+				label = {
+					"Feature.SocialContextToast.Message.FollowedFriendInOtherUniverse",
+					FRIEND_NAME = v13.joinerName,
+					EXPERIENCE_NAME = v13.experienceName
+				}
+			},
+			userIdList = { v13.joinerUserId },
+			onActivated = v13.onActivated,
+			buttonType = ButtonType.PrimaryContextual,
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.InviteBack then
+		return React.createElement(ToastWrapper, {
+			areUsersActive = false,
+			toastStrings = {
+				button = "Feature.SocialContextToast.Action.InviteBack",
+				label = {
+					"Feature.SocialContextToast.Message.FollowedFriendNotInGame",
+					FRIEND_NAME = v13.joinerName
+				}
+			},
+			userIdList = { v13.joinerUserId },
+			onActivated = v13.onActivated,
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.InviteSuccess then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				label = "Feature.SocialContextToast.Message.InvitationConfirmation"
+			},
+			analyticsProps = v14
+		})
+	end
+
+	if v13.toastType == ToastTypes.InviteFailure then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				label = "Feature.SocialContextToast.Message.InvitationFailure"
+			},
+			analyticsProps = v14
+		})
+	end
+
+	if GetFFlagEnableReferredPlayerJoinRemoteEvent() and v13.toastType == ToastTypes.InviteeJoinedYou then
+		return React.createElement(ToastWrapper, {
+			toastStrings = {
+				label = {
+					"Feature.SocialContextToast.Message.InviteeJoinedYou",
+					INVITEE_NAME = v13.joinerName
+				}
+			},
+			userIdList = { v13.joinerUserId },
+			analyticsProps = v14
+		})
+	end
+
+	return nil
+end
+
+return ToastRoot

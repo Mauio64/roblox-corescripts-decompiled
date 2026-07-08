@@ -1,4 +1,4 @@
 return {
-    Unknown = "Unknown", 
-    Summary = "Summary"
-};
+	Unknown = "Unknown",
+	Summary = "Summary"
+}

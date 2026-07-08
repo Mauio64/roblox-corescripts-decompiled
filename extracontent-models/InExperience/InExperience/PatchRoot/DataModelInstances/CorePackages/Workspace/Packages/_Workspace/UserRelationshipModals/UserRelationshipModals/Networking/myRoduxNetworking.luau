@@ -1,17 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserRelationshipModals");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.RoduxNetworking);
-local v3 = require(l_Parent_0.HttpRequest);
-local v4 = game:DefineFastInt("AddFriendsHttpRetryCount", 3);
-local v5 = require(l_script_FirstAncestor_0.Rodux.RODUX_KEY);
-local v9 = v3.config({
-    requestFunction = function(v6, v7, v8) --[[ Line: 12 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v3 (copy)
-        return v3.requestFunctions.RequestInternal(v6, v7, v8);
-    end, 
-    maxRetryCount = v4
-});
-return (v2.config({
-    keyPath = ("%*.NetworkStatus"):format(v5), 
-    networkImpl = v9
-}));
+local UserRelationshipModals = script:FindFirstAncestor("UserRelationshipModals")
+local UserRelationshipModalsParent = UserRelationshipModals.Parent
+local RoduxNetworking = require(UserRelationshipModalsParent.RoduxNetworking)
+local HttpRequest = require(UserRelationshipModalsParent.HttpRequest)
+local v5 = game:DefineFastInt("AddFriendsHttpRetryCount", 3)
+local RODUX_KEY = require(UserRelationshipModals.Rodux.RODUX_KEY)
+local v7 = HttpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 12
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+	end,
+	maxRetryCount = v5
+})
+
+return (RoduxNetworking.config({
+	keyPath = `{ RODUX_KEY }.NetworkStatus`,
+	networkImpl = v7
+}))

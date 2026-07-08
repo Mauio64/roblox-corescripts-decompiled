@@ -1,5 +1,5 @@
 return {
-    Cancel = "Cancel", 
-    Create = "Create", 
-    Update = "Update"
-};
+	Cancel = "Cancel",
+	Create = "Create",
+	Update = "Update"
+}

@@ -1,221 +1,251 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("AppBlox").Parent;
-local l_EventConnection_0 = require(l_Parent_0.ReactUtils).EventConnection;
-local v3 = require(l_Parent_0.Roact);
-local v4 = require(l_Parent_0.t);
-local v5 = require(l_Parent_0.UIBlox);
-local l_IconButton_0 = v5.App.Button.IconButton;
-local l_Images_0 = v5.App.ImageSet.Images;
-local l_withStyle_0 = v5.Core.Style.withStyle;
-local v9 = require(script.Parent.ThumbnailButton);
-local v10 = require(script.Parent.getShowItems);
-local v11 = v3.Component:extend("MediaGalleryFullScreen");
-v11.validateProps = v4.strictInterface({
-    layoutOrder = v4.optional(v4.integer), 
-    size = v4.optional(v4.UDim2), 
-    anchorPoint = v4.optional(v4.Vector2), 
-    position = v4.optional(v4.UDim2), 
-    items = v4.array(v4.interface({
-        imageId = v4.string, 
-        isYouTubeVideo = v4.optional(v4.boolean)
-    })), 
-    showIndex = v4.optional(v4.integer), 
-    onVideoPlayActivated = v4.optional(v4.callback)
-});
-v11.defaultProps = {
-    size = UDim2.fromScale(1, 1), 
-    showIndex = 1
-};
-v11.getDerivedStateFromProps = function(v12, v13) --[[ Line: 53 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: v10 (copy)
-    local v14 = nil;
-    if v13.items ~= v12.items then
-        local v15 = v10(v12);
-        v14 = {
-            items = v12.items, 
-            itemsToShow = v15, 
-            showArrows = #v15 > 1, 
-            focusIndex = math.min(v13.focusIndex or 1, #v15)
-        };
-    end;
-    if v13.showIndex ~= v12.showIndex then
-        v14 = v14 or {};
-        v14.showIndex = v12.showIndex;
-        v14.focusIndex = math.min(v12.showIndex, #v12.items);
-    end;
-    return v14;
-end;
-v11.init = function(v16) --[[ Line: 76 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy)
-    v16.state = {
-        items = nil, 
-        itemsToShow = nil, 
-        showArrows = true, 
-        focusIndex = 1, 
-        showIndex = 1
-    };
-    local v17, v18 = v3.createBinding(UDim2.fromScale(1, 1));
-    v16.itemFrameSize = v17;
-    v16.updateItemFrameSize = v18;
-    v17, v18 = v3.createBinding(UDim2.new(0, 96, 1, 0));
-    v16.arrowButtonSize = v17;
-    v16.updateArrowButtonSize = v18;
-    v17, v18 = v3.createBinding(UDim2.new(0.5, 0, 0.5, 0));
-    v16.leftArrowPosition = v17;
-    v16.updateLeftArrowPosition = v18;
-    v17, v18 = v3.createBinding(UDim2.new(0.5, 0, 0.5, 0));
-    v16.rightArrowPosition = v17;
-    v16.updateRightArrowPosition = v18;
-    v16.onResize = function(v19) --[[ Line: 90 ]]
-        -- upvalues: v16 (copy)
-        local l_X_0 = v19.AbsoluteSize.X;
-        local l_Y_0 = v19.AbsoluteSize.Y;
-        local v22 = math.floor(l_Y_0 * 1.7777777777777777);
-        if l_X_0 < v22 then
-            v22 = l_X_0;
-            l_Y_0 = math.floor(v22 / 1.7777777777777777);
-        end;
-        v16.updateItemFrameSize(UDim2.new(0, v22, 0, l_Y_0));
-    end;
-    v16.onImageResize = function(v23) --[[ Line: 104 ]]
-        -- upvalues: v16 (copy)
-        local l_X_1 = v23.AbsoluteSize.X;
-        local l_Y_1 = v23.AbsoluteSize.Y;
-        v16.updateLeftArrowPosition(UDim2.new(0.5, -l_X_1 / 2, 0.5, 0));
-        v16.updateRightArrowPosition(UDim2.new(0.5, l_X_1 / 2, 0.5, 0));
-        v16.updateArrowButtonSize(UDim2.new(0, 96, 0, l_Y_1));
-    end;
-    v16.onUserInputBegan = function(v26) --[[ Line: 113 ]]
-        -- upvalues: v16 (copy)
-        if v26.UserInputType ~= Enum.UserInputType.Keyboard then
-            return;
-        else
-            local l_focusIndex_0 = v16.state.focusIndex;
-            local v28 = #v16.props.items;
-            if v26.KeyCode == Enum.KeyCode.Left and l_focusIndex_0 > 1 then
-                v16.showPreviousItem();
-                return;
-            else
-                if v26.KeyCode == Enum.KeyCode.Right and l_focusIndex_0 < v28 then
-                    v16.showNextItem();
-                end;
-                return;
-            end;
-        end;
-    end;
-    v16.showPreviousItem = function() --[[ Line: 128 ]]
-        -- upvalues: v16 (copy)
-        local v29 = v16.state.focusIndex - 1;
-        if v29 < 1 then
-            v29 = 1;
-        end;
-        v16:setState({
-            focusIndex = v29
-        });
-    end;
-    v16.showNextItem = function() --[[ Line: 139 ]]
-        -- upvalues: v16 (copy)
-        local v30 = #v16.props.items;
-        local v31 = v16.state.focusIndex + 1;
-        if v30 < v31 then
-            v31 = v30;
-        end;
-        v16:setState({
-            focusIndex = v31
-        });
-    end;
-    v16.cycleNext = function() --[[ Line: 151 ]]
-        -- upvalues: v16 (copy)
-        local v32 = #v16.props.items;
-        local v33 = v16.state.focusIndex + 1;
-        if v32 < v33 then
-            v33 = 1;
-        end;
-        v16:setState({
-            focusIndex = v33
-        });
-    end;
-    v16.onVideoPlayActivated = function(v34) --[[ Line: 163 ]]
-        -- upvalues: v16 (copy)
-        if v16.props.onVideoPlayActivated then
-            local l_originalIndex_0 = v16.state.itemsToShow[v34].originalIndex;
-            v16.props.onVideoPlayActivated(l_originalIndex_0);
-        end;
-    end;
-end;
-local function v43(_, v37, v38, v39, v40, v41, v42) --[[ Line: 172 ]] --[[ Name: renderArrowButton ]]
-    -- upvalues: v3 (copy), l_IconButton_0 (copy), l_Images_0 (copy)
-    return v3.createElement("Frame", {
-        Size = v41, 
-        AnchorPoint = v39, 
-        Position = v40, 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        ZIndex = 100
-    }, {
-        ArrowButton = v3.createElement(l_IconButton_0, {
-            size = UDim2.fromScale(1, 1), 
-            icon = l_Images_0[v37], 
-            showBackground = true, 
-            backgroundTransparency = 1, 
-            isDisabled = v38, 
-            onActivated = v42
-        })
-    });
-end;
-v11.render = function(v44) --[[ Line: 192 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy)
-    return l_withStyle_0(function(v45) --[[ Line: 193 ]]
-        -- upvalues: v44 (copy)
-        return v44:renderWithProvider(v45);
-    end);
-end;
-v11.renderWithProvider = function(v46, v47) --[[ Line: 198 ]] --[[ Name: renderWithProvider ]]
-    -- upvalues: v3 (copy), v43 (copy), v9 (copy), l_EventConnection_0 (copy), l_UserInputService_0 (copy)
-    local l_layoutOrder_0 = v46.props.layoutOrder;
-    local l_anchorPoint_0 = v46.props.anchorPoint;
-    local l_position_0 = v46.props.position;
-    local l_size_0 = v46.props.size;
-    local l_itemsToShow_0 = v46.state.itemsToShow;
-    local l_showArrows_0 = v46.state.showArrows;
-    local l_focusIndex_1 = v46.state.focusIndex;
-    local v55 = l_itemsToShow_0[l_focusIndex_1];
-    local v56 = l_focusIndex_1 <= 1;
-    local v57 = #l_itemsToShow_0 <= l_focusIndex_1;
-    return v3.createElement("Frame", {
-        LayoutOrder = l_layoutOrder_0, 
-        Size = l_size_0, 
-        AnchorPoint = l_anchorPoint_0, 
-        Position = l_position_0, 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        [v3.Change.AbsoluteSize] = v46.onResize
-    }, {
-        LeftArrow = if l_showArrows_0 then v43(v47, "icons/actions/cycleLeft", v56, Vector2.new(1, 0.5), v46.leftArrowPosition, v46.arrowButtonSize, v46.showPreviousItem) else nil, 
-        FullScreenItemFrame = v3.createElement("Frame", {
-            Size = UDim2.new(1, -192, 1, 0), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            [v3.Change.AbsoluteSize] = v46.onImageResize
-        }, {
-            UIAspectRatioConstraint = v3.createElement("UIAspectRatioConstraint", {
-                AspectRatio = 1.7777777777777777
-            }), 
-            Item = v3.createElement(v9, {
-                itemKey = l_focusIndex_1, 
-                imageId = v55.imageId, 
-                isVideo = v55.isYouTubeVideo, 
-                userInteractionEnabled = true, 
-                onActivated = v46.cycleNext, 
-                onPlayActivated = v55.isYouTubeVideo and v46.onVideoPlayActivated or nil
-            })
-        }), 
-        RightArrow = if l_showArrows_0 then v43(v47, "icons/actions/cycleRight", v57, Vector2.new(0, 0.5), v46.rightArrowPosition, v46.arrowButtonSize, v46.showNextItem) else nil, 
-        EventConnection = l_showArrows_0 and v3.createElement(l_EventConnection_0, {
-            event = l_UserInputService_0.InputBegan, 
-            callback = v46.onUserInputBegan
-        }) or nil
-    });
-end;
-return v11;
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("AppBlox").Parent
+local EventConnection = require(Parent.ReactUtils).EventConnection
+local Roact = require(Parent.Roact)
+local t = require(Parent.t)
+local UIBlox = require(Parent.UIBlox)
+local IconButton = UIBlox.App.Button.IconButton
+local Images = UIBlox.App.ImageSet.Images
+local withStyle = UIBlox.Core.Style.withStyle
+local ThumbnailButton = require(script.Parent.ThumbnailButton)
+local getShowItems = require(script.Parent.getShowItems)
+local v12 = Roact.Component:extend("MediaGalleryFullScreen")
+
+v12.validateProps = t.strictInterface({
+	layoutOrder = t.optional(t.integer),
+	size = t.optional(t.UDim2),
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	items = t.array(t.interface({
+		imageId = t.string,
+		isYouTubeVideo = t.optional(t.boolean)
+	})),
+	showIndex = t.optional(t.integer),
+	onVideoPlayActivated = t.optional(t.callback)
+})
+v12.defaultProps = {
+	showIndex = 1,
+	size = UDim2.fromScale(1, 1)
+}
+
+function v12.getDerivedStateFromProps(p1, p2) -- line: 53
+	-- upvalues: getShowItems (copy)
+	local t1 = nil
+
+	if p2.items ~= p1.items then
+		local v17 = getShowItems(p1)
+
+		t1 = {
+			items = p1.items,
+			itemsToShow = v17,
+			showArrows = #v17 > 1,
+			focusIndex = math.min(p2.focusIndex or 1, #v17)
+		}
+	end
+
+	if p2.showIndex ~= p1.showIndex then
+		t1 = t1 or {}
+		t1.showIndex = p1.showIndex
+		t1.focusIndex = math.min(p1.showIndex, #p1.items)
+	end
+
+	return t1
+end
+function v12.init(p3) -- line: 76
+	-- upvalues: Roact (copy)
+	p3.state = {
+		items = nil,
+		itemsToShow = nil,
+		showArrows = true,
+		focusIndex = 1,
+		showIndex = 1
+	}
+
+	local v19, v20 = Roact.createBinding(UDim2.fromScale(1, 1))
+
+	p3.itemFrameSize = v19
+	p3.updateItemFrameSize = v20
+
+	local v21, v22 = Roact.createBinding(UDim2.new(0, 96, 1, 0))
+
+	p3.arrowButtonSize = v21
+	p3.updateArrowButtonSize = v22
+
+	local v23, v24 = Roact.createBinding(UDim2.new(0.5, 0, 0.5, 0))
+
+	p3.leftArrowPosition = v23
+	p3.updateLeftArrowPosition = v24
+
+	local v25, v26 = Roact.createBinding(UDim2.new(0.5, 0, 0.5, 0))
+
+	p3.rightArrowPosition = v25
+	p3.updateRightArrowPosition = v26
+
+	function p3.onResize(p4) -- line: 90
+		-- upvalues: p3 (copy)
+		local AbsoluteSizeX = p4.AbsoluteSize.X
+		local AbsoluteSizeY = p4.AbsoluteSize.Y
+		local v50 = math.floor(AbsoluteSizeY * 1.7777777777777777)
+
+		if AbsoluteSizeX < v50 then
+			v50 = AbsoluteSizeX
+			AbsoluteSizeY = math.floor(v50 / 1.7777777777777777)
+		end
+
+		p3.updateItemFrameSize(UDim2.new(0, v50, 0, AbsoluteSizeY))
+	end
+	function p3.onImageResize(p5) -- line: 104
+		-- upvalues: p3 (copy)
+		local AbsoluteSizeX = p5.AbsoluteSize.X
+		local AbsoluteSizeY = p5.AbsoluteSize.Y
+
+		p3.updateLeftArrowPosition(UDim2.new(0.5, -AbsoluteSizeX / 2, 0.5, 0))
+		p3.updateRightArrowPosition(UDim2.new(0.5, AbsoluteSizeX / 2, 0.5, 0))
+		p3.updateArrowButtonSize(UDim2.new(0, 96, 0, AbsoluteSizeY))
+	end
+	function p3.onUserInputBegan(p6) -- line: 113
+		-- upvalues: p3 (copy)
+		if p6.UserInputType ~= Enum.UserInputType.Keyboard then
+			return
+		end
+
+		local focusIndex = p3.state.focusIndex
+		local v56 = #p3.props.items
+
+		if p6.KeyCode == Enum.KeyCode.Left and focusIndex > 1 then
+			p3.showPreviousItem()
+
+			return
+		end
+
+		if p6.KeyCode == Enum.KeyCode.Right and focusIndex < v56 then
+			p3.showNextItem()
+		end
+	end
+	function p3.showPreviousItem() -- line: 128
+		-- upvalues: p3 (copy)
+		local v57 = p3.state.focusIndex - 1
+
+		if v57 < 1 then
+			v57 = 1
+		end
+
+		p3:setState({
+			focusIndex = v57
+		})
+	end
+	function p3.showNextItem() -- line: 139
+		-- upvalues: p3 (copy)
+		local v58 = #p3.props.items
+		local v59 = p3.state.focusIndex + 1
+
+		if v58 < v59 then
+			v59 = v58
+		end
+
+		p3:setState({
+			focusIndex = v59
+		})
+	end
+	function p3.cycleNext() -- line: 151
+		-- upvalues: p3 (copy)
+		local v60 = #p3.props.items
+		local v61 = p3.state.focusIndex + 1
+
+		if v60 < v61 then
+			v61 = 1
+		end
+
+		p3:setState({
+			focusIndex = v61
+		})
+	end
+	function p3.onVideoPlayActivated(p7) -- line: 163
+		-- upvalues: p3 (copy)
+		if p3.props.onVideoPlayActivated then
+			local originalIndex = p3.state.itemsToShow[p7].originalIndex
+
+			p3.props.onVideoPlayActivated(originalIndex)
+		end
+	end
+end
+
+local function renderArrowButton(_, p9, p10, p11, p12, p13, p14) -- line: 172
+	-- upvalues: Roact (copy), IconButton (copy), Images (copy)
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		ZIndex = 100,
+		Size = p13,
+		AnchorPoint = p11,
+		Position = p12
+	}, {
+		ArrowButton = Roact.createElement(IconButton, {
+			showBackground = true,
+			backgroundTransparency = 1,
+			size = UDim2.fromScale(1, 1),
+			icon = Images[p9],
+			isDisabled = p10,
+			onActivated = p14
+		})
+	})
+end
+
+function v12.render(p15) -- line: 192
+	-- upvalues: withStyle (copy)
+	return withStyle(function(p16) -- line: 193
+		-- upvalues: p15 (copy)
+		return p15:renderWithProvider(p16)
+	end)
+end
+function v12.renderWithProvider(p17, p18) -- line: 198
+	-- upvalues: Roact (copy), renderArrowButton (copy), ThumbnailButton (copy), EventConnection (copy), UserInputService (copy)
+	local layoutOrder = p17.props.layoutOrder
+	local anchorPoint = p17.props.anchorPoint
+	local position = p17.props.position
+	local size = p17.props.size
+	local itemsToShow = p17.state.itemsToShow
+	local showArrows = p17.state.showArrows
+	local focusIndex = p17.state.focusIndex
+	local v44 = itemsToShow[focusIndex]
+	local v45 = focusIndex <= 1
+	local v46 = focusIndex >= #itemsToShow
+
+	return Roact.createElement("Frame", {
+		LayoutOrder = layoutOrder,
+		Size = size,
+		AnchorPoint = anchorPoint,
+		Position = position,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		[Roact.Change.AbsoluteSize] = p17.onResize
+	}, {
+		LeftArrow = if not showArrows then nil else renderArrowButton(p18, "icons/actions/cycleLeft", v45, Vector2.new(1, 0.5), p17.leftArrowPosition, p17.arrowButtonSize, p17.showPreviousItem),
+		FullScreenItemFrame = Roact.createElement("Frame", {
+			Size = UDim2.new(1, -192, 1, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			BackgroundTransparency = 1,
+			[Roact.Change.AbsoluteSize] = p17.onImageResize
+		}, {
+			UIAspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = 1.7777777777777777
+			}),
+			Item = Roact.createElement(ThumbnailButton, {
+				userInteractionEnabled = true,
+				itemKey = focusIndex,
+				imageId = v44.imageId,
+				isVideo = v44.isYouTubeVideo,
+				onActivated = p17.cycleNext,
+				onPlayActivated = v44.isYouTubeVideo and p17.onVideoPlayActivated or nil
+			})
+		}),
+		RightArrow = if not showArrows then nil else renderArrowButton(p18, "icons/actions/cycleRight", v46, Vector2.new(0, 0.5), p17.rightArrowPosition, p17.arrowButtonSize, p17.showNextItem),
+		EventConnection = showArrows and Roact.createElement(EventConnection, {
+			event = UserInputService.InputBegan,
+			callback = p17.onUserInputBegan
+		}) or nil
+	})
+end
+
+return v12

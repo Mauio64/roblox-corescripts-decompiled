@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixNotificationReportsMobile", false);
+return game:DefineFastFlag("FixNotificationReportsMobile", false)

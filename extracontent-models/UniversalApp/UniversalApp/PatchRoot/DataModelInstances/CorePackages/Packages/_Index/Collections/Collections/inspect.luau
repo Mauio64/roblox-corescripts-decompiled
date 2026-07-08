@@ -1,186 +1,210 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_0.Array.isArray);
-local _ = require(l_Parent_1.ES7Types);
-local v5 = nil;
-local v6 = nil;
-local v7 = nil;
-local v8 = nil;
-local v9 = nil;
-local function v14(v10, v11) --[[ Line: 51 ]] --[[ Name: inspect ]]
-    -- upvalues: v5 (ref)
-    local v12 = v11 or {
-        depth = 2
-    };
-    local v13 = v12.depth or 2;
-    v12.depth = if v13 >= 0 then v13 else 2;
-    return v5(v10, {}, v12);
-end;
-local function _(v15, v16) --[[ Line: 58 ]] --[[ Name: isIndexKey ]]
-    local v17 = false;
-    if type(v15) == "number" then
-        v17 = false;
-        if v15 <= v16 then
-            v17 = false;
-            if v15 >= 1 then
-                v17 = math.floor(v15) == v15;
-            end;
-        end;
-    end;
-    return v17;
-end;
-local function _(v19) --[[ Line: 65 ]] --[[ Name: getTableLength ]]
-    local v20 = 1;
-    local v21 = rawget(v19, v20);
-    while v21 ~= nil do
-        v20 = v20 + 1;
-        v21 = rawget(v19, v20);
-    end;
-    return v20 - 1;
-end;
-local function v27(v23, v24) --[[ Line: 75 ]] --[[ Name: sortKeysForPrinting ]]
-    local v25 = type(v23);
-    local v26 = type(v24);
-    if v25 == v26 and (v25 == "number" or v25 == "string") then
-        return v23 < v24;
-    else
-        return v25 < v26;
-    end;
-end;
-local function _(v28) --[[ Line: 88 ]] --[[ Name: rawpairs ]]
-    return next, v28, nil;
-end;
-local function v39(v30) --[[ Line: 92 ]] --[[ Name: getFragmentedKeys ]]
-    -- upvalues: v27 (copy)
-    local v31 = {};
-    local v32 = 0;
-    local v33 = 1;
-    local v34 = rawget(v30, v33);
-    while v34 ~= nil do
-        v33 = v33 + 1;
-        v34 = rawget(v30, v33);
-    end;
-    local v35 = v33 - 1;
-    for v36, _ in next, v30 do
-        local v38 = false;
-        if type(v36) == "number" then
-            v38 = false;
-            if v36 <= v35 then
-                v38 = false;
-                if v36 >= 1 then
-                    v38 = math.floor(v36) == v36;
-                end;
-            end;
-        end;
-        if not v38 then
-            v32 = v32 + 1;
-            v31[v32] = v36;
-        end;
-    end;
-    table.sort(v31, v27);
-    return v31, v32, v35;
-end;
-v5 = function(v40, v41, v42) --[[ Line: 106 ]] --[[ Name: formatValue ]]
-    -- upvalues: l_HttpService_0 (copy), v6 (ref)
-    local v43 = typeof(v40);
-    if v43 == "string" then
-        return l_HttpService_0:JSONEncode(v40);
-    elseif v43 == "number" then
-        if v40 ~= v40 then
-            return "NaN";
-        elseif v40 == 1e999 then
-            return "Infinity";
-        elseif v40 == -1e999 then
-            return "-Infinity";
-        else
-            return (tostring(v40));
-        end;
-    elseif v43 == "function" then
-        local v44 = "[function";
-        local v45 = debug.info(v40, "n");
-        if v45 ~= nil and v45 ~= "" then
-            v44 = v44 .. " " .. v45;
-        end;
-        return v44 .. "]";
-    elseif v43 == "table" then
-        return v6(v40, v41, v42);
-    else
-        return (tostring(v40));
-    end;
-end;
-v6 = function(v46, v47, v48) --[[ Line: 139 ]] --[[ Name: formatObjectValue ]]
-    -- upvalues: v5 (ref), v3 (copy), v7 (ref), v8 (ref)
-    if table.find(v47, v46) ~= nil then
-        return "[Circular]";
-    else
-        local v49 = {
-            unpack(v47)
-        };
-        table.insert(v49, v46);
-        if typeof(v46.toJSON) == "function" then
-            local v50 = v46:toJSON(v46);
-            if v50 ~= v46 then
-                if typeof(v50) == "string" then
-                    return v50;
-                else
-                    return v5(v50, v49, v48);
-                end;
-            end;
-        elseif v3(v46) then
-            return v7(v46, v49, v48);
-        end;
-        return v8(v46, v49, v48);
-    end;
-end;
-v8 = function(v51, v52, v53) --[[ Line: 164 ]] --[[ Name: formatObject ]]
-    -- upvalues: v39 (copy), v9 (ref), v5 (ref)
-    local v54 = "";
-    local v55 = getmetatable(v51);
-    if v55 and rawget(v55, "__tostring") then
-        return (tostring(v51));
-    else
-        local v56, v57, v58 = v39(v51);
-        if v58 == 0 and v57 == 0 then
-            return v54 .. "{}";
-        elseif #v52 > v53.depth then
-            return v54 .. "[" .. v9(v51) .. "]";
-        else
-            local v59 = {};
-            for v60 = 1, v58 do
-                table.insert(v59, (v5(v51[v60], v52, v53)));
-            end;
-            for v61 = 1, v57 do
-                local v62 = v56[v61];
-                table.insert(v59, v62 .. ": " .. v5(v51[v62], v52, v53));
-            end;
-            return v54 .. "{ " .. table.concat(v59, ", ") .. " }";
-        end;
-    end;
-end;
-v7 = function(v63, v64, v65) --[[ Line: 200 ]] --[[ Name: formatArray ]]
-    -- upvalues: v5 (ref)
-    local v66 = #v63;
-    if v66 == 0 then
-        return "[]";
-    elseif #v64 > v65.depth then
-        return "[Array]";
-    else
-        local v67 = math.min(10, v66);
-        local v68 = v66 - v67;
-        local v69 = {};
-        for v70 = 1, v67 do
-            v69[v70] = v5(v63[v70], v64, v65);
-        end;
-        if v68 == 1 then
-            table.insert(v69, "... 1 more item");
-        elseif v68 > 1 then
-            table.insert(v69, ("... %s more items"):format((tostring(v68))));
-        end;
-        return "[" .. table.concat(v69, ", ") .. "]";
-    end;
-end;
-v9 = function(_) --[[ Line: 226 ]] --[[ Name: getObjectTag ]]
-    return "Object";
-end;
-return v14;
+local HttpService = game:GetService("HttpService")
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local isArray = require(scriptParent.Array.isArray)
+
+require(scriptParentParent.ES7Types)
+
+local formatValue = nil
+local formatObjectValue = nil
+local formatArray = nil
+local formatObject = nil
+local getObjectTag = nil
+
+local function inspect(p1, t1: {[any]: any}?) -- line: 51
+	-- upvalues: formatValue (ref)
+	local v18 = t1 or {
+		depth = 2
+	}
+	local v19 = v18.depth or 2
+
+	v18.depth = not (v19 >= 0) and 2 or v19
+
+	return formatValue(p1, {}, v18)
+end
+local function isIndexKey(p2, p3) -- line: 58
+	return type(p2) == "number" and (p2 <= p3 and (p2 >= 1 and p2 == math.floor(p2)))
+end
+local function getTableLength(p4) -- line: 65
+	local n1 = 1
+	local v24 = rawget(p4, n1)
+
+	while v24 ~= nil do
+		n1 += 1
+		v24 = rawget(p4, n1)
+	end
+
+	return n1 - 1
+end
+local function sortKeysForPrinting(p5, p6) -- line: 75
+	local v27 = type(p5)
+	local v28 = type(p6)
+
+	if v27 == v28 and (v27 == "number" or v27 == "string") then
+		return p5 < p6
+	end
+
+	return v27 < v28
+end
+local function rawpairs(p7) -- line: 88
+	return next, p7, nil
+end
+local function getFragmentedKeys(p8) -- line: 92
+	-- upvalues: sortKeysForPrinting (copy)
+	local t2 = {}
+	local n2 = 0
+	local n3 = 1
+	local v34 = rawget(p8, n3)
+
+	while v34 ~= nil do
+		n3 += 1
+		v34 = rawget(p8, n3)
+	end
+
+	local v35 = n3 - 1
+
+	for k, _ in next, p8 do
+		if type(k) ~= "number" or (not (k <= v35) or (not (k >= 1) or k ~= math.floor(k))) then
+			n2 += 1
+			t2[n2] = k
+		end
+	end
+
+	table.sort(t2, sortKeysForPrinting)
+
+	return t2, n2, v35
+end
+
+function formatValue(p9, p10, t3: {[any]: any}) -- line: 106
+	-- upvalues: HttpService (copy), formatObjectValue (ref)
+	local v41 = typeof(p9)
+
+	if v41 == "string" then
+		return HttpService:JSONEncode(p9)
+	end
+
+	if v41 == "number" then
+		if p9 ~= p9 then
+			return "NaN"
+		end
+
+		if p9 == 1e999 then
+			return "Infinity"
+		end
+
+		if p9 == -1e999 then
+			return "-Infinity"
+		end
+
+		return (tostring(p9))
+	end
+
+	if v41 == "function" then
+		local s1 = "[function"
+		local v43 = debug.info(p9, "n")
+
+		if v43 ~= nil and v43 ~= "" then
+			s1 ..= " " .. v43
+		end
+
+		return s1 .. "]"
+	end
+
+	if v41 == "table" then
+		return formatObjectValue(p9, p10, t3)
+	end
+
+	return (tostring(p9))
+end
+function formatObjectValue(p11, p12, t4: {[any]: any}) -- line: 139
+	-- upvalues: formatValue (ref), isArray (copy), formatArray (ref), formatObject (ref)
+	if table.find(p12, p11) ~= nil then
+		return "[Circular]"
+	end
+
+	local t5 = { unpack(p12) }
+
+	table.insert(t5, p11)
+
+	if typeof(p11.toJSON) == "function" then
+		local v48 = p11:toJSON(p11)
+
+		if v48 ~= p11 then
+			if typeof(v48) == "string" then
+				return v48
+			end
+
+			return formatValue(v48, t5, t4)
+		end
+	elseif isArray(p11) then
+		return formatArray(p11, t5, t4)
+	end
+
+	return formatObject(p11, t5, t4)
+end
+function formatObject(p13, p14, t6: {[any]: any}) -- line: 164
+	-- upvalues: getFragmentedKeys (copy), getObjectTag (ref), formatValue (ref)
+	local s2 = ""
+	local mt = getmetatable(p13)
+
+	if mt and rawget(mt, "__tostring") then
+		return (tostring(p13))
+	end
+
+	local v54, v55, v56 = getFragmentedKeys(p13)
+
+	if v56 == 0 and v55 == 0 then
+		return s2 .. "{}"
+	end
+
+	if #p14 > t6.depth then
+		return s2 .. "[" .. getObjectTag(p13) .. "]"
+	end
+
+	local t7 = {}
+
+	for i = 1, v56 do
+		table.insert(t7, (formatValue(p13[i], p14, t6)))
+	end
+
+	for i = 1, v55 do
+		local v60 = v54[i]
+
+		table.insert(t7, v60 .. ": " .. formatValue(p13[v60], p14, t6))
+	end
+
+	return s2 .. "{ " .. table.concat(t7, ", ") .. " }"
+end
+function formatArray(p15, p16, t8: {[any]: any}) -- line: 200
+	-- upvalues: formatValue (ref)
+	local v64 = #p15
+
+	if v64 == 0 then
+		return "[]"
+	end
+
+	if #p16 > t8.depth then
+		return "[Array]"
+	end
+
+	local v65 = math.min(10, v64)
+	local v66 = v64 - v65
+	local t9 = {}
+
+	for i = 1, v65 do
+		t9[i] = formatValue(p15[i], p16, t8)
+	end
+
+	if v66 == 1 then
+		table.insert(t9, "... 1 more item")
+	elseif v66 > 1 then
+		table.insert(t9, ("... %s more items"):format((tostring(v66))))
+	end
+
+	return "[" .. table.concat(t9, ", ") .. "]"
+end
+function getObjectTag(_) -- line: 226
+	return "Object"
+end
+
+return inspect

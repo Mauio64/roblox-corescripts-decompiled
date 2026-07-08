@@ -1,49 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxPresence");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local v4 = require(l_script_FirstAncestor_0.Enums);
-local v5 = {};
-v5.new = function(v6) --[[ Line: 10 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy)
-    assert(v5.isValid(v6));
-    v5.__index = v5;
-    setmetatable(v6, v5);
-    return v6;
-end;
-v5.mock = function(v7) --[[ Line: 22 ]] --[[ Name: mock ]]
-    -- upvalues: v5 (copy)
-    v7 = v7 or {};
-    return (v5.new({
-        gameId = v7.gameId or "Game-OoooOO-Id", 
-        invisibleModeExpiry = v7.invisibleModeExpiry or "2061-01-01T00:00:00Z", 
-        lastLocation = v7.lastLocation or "LastLocation", 
-        lastOnline = v7.lastOnline or "LastOnline-OOOoOO", 
-        placeId = v7.placeId or 123, 
-        rootPlaceId = v7.rootPlaceId or 234, 
-        universeId = v7.universeId or 345, 
-        userId = v7.userId or 456, 
-        userPresenceType = v7.userPresenceType or 0
-    }));
-end;
-v5.format = function(v8) --[[ Line: 40 ]] --[[ Name: format ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    return v2.Dictionary.join(v8, {
-        userPresenceType = v4.PresenceType.fromRawValue(v8.userPresenceType)
-    });
-end;
-v5.isValid = v3.interface({
-    gameId = v3.optional(v3.string), 
-    invisibleModeExpiry = v3.optional(v3.string), 
-    lastLocation = v3.string, 
-    lastOnline = v3.string, 
-    placeId = v3.optional(v3.union(v3.numberPositive, v3.string)), 
-    rootPlaceId = v3.optional(v3.union(v3.numberPositive, v3.string)), 
-    universeId = v3.optional(v3.union(v3.numberPositive, v3.string)), 
-    userId = v3.union(v3.numberPositive, v3.string), 
-    userPresenceType = function(v9) --[[ Line: 55 ]] --[[ Name: userPresenceType ]]
-        -- upvalues: v4 (copy)
-        return v4.PresenceType.fromRawValue(v9) ~= nil;
-    end
-});
-return v5;
+local RoduxPresence = script:FindFirstAncestor("RoduxPresence")
+local RoduxPresenceParent = RoduxPresence.Parent
+local Cryo = require(RoduxPresenceParent.Cryo)
+local t = require(RoduxPresenceParent.t)
+local Enums = require(RoduxPresence.Enums)
+local t1 = {}
+
+function t1.new(p1) -- line: 10
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 22
+	-- upvalues: t1 (copy)
+	local v9 = p2 or {}
+
+	return (t1.new({
+		gameId = v9.gameId or "Game-OoooOO-Id",
+		invisibleModeExpiry = v9.invisibleModeExpiry or "2061-01-01T00:00:00Z",
+		lastLocation = v9.lastLocation or "LastLocation",
+		lastOnline = v9.lastOnline or "LastOnline-OOOoOO",
+		placeId = v9.placeId or 123,
+		rootPlaceId = v9.rootPlaceId or 234,
+		universeId = v9.universeId or 345,
+		userId = v9.userId or 456,
+		userPresenceType = v9.userPresenceType or 0
+	}))
+end
+function t1.format(p3) -- line: 40
+	-- upvalues: Cryo (copy), Enums (copy)
+	return Cryo.Dictionary.join(p3, {
+		userPresenceType = Enums.PresenceType.fromRawValue(p3.userPresenceType)
+	})
+end
+
+t1.isValid = t.interface({
+	gameId = t.optional(t.string),
+	invisibleModeExpiry = t.optional(t.string),
+	lastLocation = t.string,
+	lastOnline = t.string,
+	placeId = t.optional(t.union(t.numberPositive, t.string)),
+	rootPlaceId = t.optional(t.union(t.numberPositive, t.string)),
+	universeId = t.optional(t.union(t.numberPositive, t.string)),
+	userId = t.union(t.numberPositive, t.string),
+	userPresenceType = function(p4) -- line: 55
+		-- upvalues: Enums (copy)
+		return Enums.PresenceType.fromRawValue(p4) ~= nil
+	end
+})
+
+return t1

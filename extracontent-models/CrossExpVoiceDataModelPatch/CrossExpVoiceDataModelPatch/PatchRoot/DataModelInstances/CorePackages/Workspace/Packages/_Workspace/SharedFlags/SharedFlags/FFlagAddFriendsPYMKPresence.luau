@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddFriendsPYMKPresence", false);
+return game:DefineFastFlag("AddFriendsPYMKPresence", false)

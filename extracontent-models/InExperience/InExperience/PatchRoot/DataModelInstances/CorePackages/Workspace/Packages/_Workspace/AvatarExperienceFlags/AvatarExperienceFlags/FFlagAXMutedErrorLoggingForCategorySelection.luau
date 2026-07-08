@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMutedErrorLoggingForCategorySelection", false);
+return game:DefineFastFlag("AXMutedErrorLoggingForCategorySelection", false)

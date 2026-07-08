@@ -1,20 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEventsState");
-local v1 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v2 = require(l_script_FirstAncestor_0.Parent.Rodux);
-local _ = require(l_script_FirstAncestor_0.Models.ExperienceDetailsModel);
-return function(v4) --[[ Line: 11 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return (v2.createReducer({}, {
-        [v4.GetExperiencesDetails.Succeeded.name] = function(v5, v6) --[[ Line: 13 ]]
-            -- upvalues: v1 (ref)
-            local v7 = v6.ids[1];
-            local v8 = v6.responseBody.data[1];
-            return v1.Dictionary.join(v5, {
-                [v7] = v8
-            });
-        end, 
-        [v4.GetExperiencesDetails.Failed.name] = function(v9, _) --[[ Line: 24 ]]
-            return v9;
-        end
-    }));
-end;
+local VirtualEventsState = script:FindFirstAncestor("VirtualEventsState")
+local Cryo = require(VirtualEventsState.Parent.Cryo)
+local Rodux = require(VirtualEventsState.Parent.Rodux)
+
+require(VirtualEventsState.Models.ExperienceDetailsModel)
+
+return function(p1) -- line: 11
+	-- upvalues: Rodux (copy), Cryo (copy)
+	return (Rodux.createReducer({}, {
+		[p1.GetExperiencesDetails.Succeeded.name] = function(t1: {[any]: any}, p2) -- line: 13
+			-- upvalues: Cryo (copy)
+			local v7 = p2.ids[1]
+			local v8 = p2.responseBody.data[1]
+
+			return Cryo.Dictionary.join(t1, {
+				[v7] = v8
+			})
+		end,
+		[p1.GetExperiencesDetails.Failed.name] = function(t2: {[any]: any}, _) -- line: 24
+			return t2
+		end
+	}))
+end

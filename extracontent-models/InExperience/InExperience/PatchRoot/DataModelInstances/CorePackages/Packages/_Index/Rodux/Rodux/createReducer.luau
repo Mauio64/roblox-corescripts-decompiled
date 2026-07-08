@@ -1,14 +1,16 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    return function(v2, v3) --[[ Line: 2 ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        if v2 == nil then
-            v2 = v0;
-        end;
-        local v4 = v1[v3.type];
-        if v4 then
-            return v4(v2, v3);
-        else
-            return v2;
-        end;
-    end;
-end;
+return function(p1, p2) -- line: 1
+	return function(p3, p4) -- line: 2
+		-- upvalues: p1 (copy), p2 (copy)
+		if p3 == nil then
+			p3 = p1
+		end
+
+		local v5 = p2[p4.type]
+
+		if v5 then
+			return v5(p3, p4)
+		end
+
+		return p3
+	end
+end

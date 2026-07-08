@@ -1,1 +1,1 @@
-return game:DefineFastFlag("NewUpsellModalExperimentV2", false);
+return game:DefineFastFlag("NewUpsellModalExperimentV2", false)

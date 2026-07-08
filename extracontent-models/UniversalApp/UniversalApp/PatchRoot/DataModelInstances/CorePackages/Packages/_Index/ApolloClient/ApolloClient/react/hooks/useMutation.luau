@@ -1,53 +1,66 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local _ = require(script.Parent.Parent.Parent.core);
-local v5 = require(l_Parent_1.React);
-local l_useContext_0 = v5.useContext;
-local l_useState_0 = v5.useState;
-local l_useRef_0 = v5.useRef;
-local l_useEffect_0 = v5.useEffect;
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(l_Parent_0.jsutils.typedDocumentNode);
-local _ = require(script.Parent.Parent.types.types);
-local l_MutationData_0 = require(script.Parent.Parent.data).MutationData;
-local l_getApolloContext_0 = require(script.Parent.Parent.context).getApolloContext;
-v0.useMutation = function(v15, v16) --[[ Line: 40 ]] --[[ Name: useMutation ]]
-    -- upvalues: l_useContext_0 (copy), l_getApolloContext_0 (copy), l_useState_0 (copy), l_Object_0 (copy), l_useRef_0 (copy), l_MutationData_0 (copy), l_useEffect_0 (copy)
-    local v17 = l_useContext_0(l_getApolloContext_0());
-    local v18, v19 = l_useState_0({
-        called = false, 
-        loading = false
-    });
-    local v20 = if v16 then l_Object_0.assign({}, v16, {
-        mutation = v15
-    }) else {
-        mutation = v15
-    };
-    local v21 = l_useRef_0(nil);
-    local v24 = (function() --[[ Line: 52 ]] --[[ Name: getMutationDataRef ]]
-        -- upvalues: v21 (copy), l_MutationData_0 (ref), v20 (copy), v17 (copy), v18 (copy), v19 (copy)
-        if not v21.current then
-            v21.current = l_MutationData_0.new({
-                options = v20, 
-                context = v17, 
-                result = v18, 
-                setResult = function(_, v23) --[[ Line: 58 ]] --[[ Name: setResult ]]
-                    -- upvalues: v19 (ref)
-                    v19(v23);
-                    return nil;
-                end
-            });
-        end;
-        return v21.current;
-    end)();
-    v24:setOptions(v20);
-    v24.context = v17;
-    l_useEffect_0(function() --[[ Line: 72 ]]
-        -- upvalues: v24 (copy)
-        return v24:afterExecute();
-    end);
-    return v24:execute(v18);
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Object = require(ParentParentParent.LuauPolyfill).Object
+
+require(script.Parent.Parent.Parent.core)
+
+local React = require(ParentParentParent.React)
+local useContext = React.useContext
+local useState = React.useState
+local useRef = React.useRef
+local useEffect = React.useEffect
+
+require(ParentParentParent.GraphQL)
+require(ParentParent.jsutils.typedDocumentNode)
+require(script.Parent.Parent.types.types)
+
+local MutationData = require(script.Parent.Parent.data).MutationData
+local getApolloContext = require(script.Parent.Parent.context).getApolloContext
+
+function t1.useMutation(p1, p2) -- line: 40
+	-- upvalues: useContext (copy), getApolloContext (copy), useState (copy), Object (copy), useRef (copy), MutationData (copy), useEffect (copy)
+	local v14 = useContext(getApolloContext())
+	local v15, v16 = useState({
+		called = false,
+		loading = false
+	})
+	local v17 = if not p2 then {
+		mutation = p1
+	} else Object.assign({}, p2, {
+		mutation = p1
+	})
+	local v18 = useRef(nil)
+
+	local function getMutationDataRef() -- line: 52
+		-- upvalues: v18 (copy), MutationData (copy), v17 (copy), v14 (copy), v15 (copy), v16 (copy)
+		if not v18.current then
+			v18.current = MutationData.new({
+				options = v17,
+				context = v14,
+				result = v15,
+				setResult = function(_, p4) -- line: 58
+					-- upvalues: v16 (copy)
+					v16(p4)
+
+					return nil
+				end
+			})
+		end
+
+		return v18.current
+	end
+
+	local v20 = getMutationDataRef()
+
+	v20:setOptions(v17)
+	v20.context = v14
+	useEffect(function() -- line: 72
+		-- upvalues: v20 (copy)
+		return v20:afterExecute()
+	end)
+
+	return v20:execute(v15)
+end
+
+return t1

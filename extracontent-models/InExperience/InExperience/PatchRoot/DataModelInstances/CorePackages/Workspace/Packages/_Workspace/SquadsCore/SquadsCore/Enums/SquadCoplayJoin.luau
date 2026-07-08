@@ -1,6 +1,6 @@
 return {
-    ExperienceJoin = "ExperienceJoin", 
-    PartyJoin = "PartyJoin", 
-    SquadNudgeCreation = "SquadNudgeCreation", 
-    SquadNudgeJoin = "SquadNudgeJoin"
-};
+	ExperienceJoin = "ExperienceJoin",
+	PartyJoin = "PartyJoin",
+	SquadNudgeCreation = "SquadNudgeCreation",
+	SquadNudgeJoin = "SquadNudgeJoin"
+}

@@ -10,13 +10,13 @@ local v9 = Roact.PureComponent:extend("EmptyConversationList")
 
 v9.defaultProps = {
 	chatEnabled = false,
-	navigateToPrivacy = function() --[[ navigateToPrivacy ]] -- line: 19
+	privacyButtonKey = "Feature.Chat.Label.PrivacySettings",
+	privacyButtonEnabled = true,
+	renameFriendsToConnections = true,
+	navigateToPrivacy = function() -- line: 19
 	end,
 	makeFriendsToChatKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.MakeFriendsToChat" or "Feature.Chat.Message.MakeFriendsToParty",
-	privacyButtonKey = "Feature.Chat.Label.PrivacySettings",
-	turnOnChatKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.TurnOnChat" or "Feature.Chat.Message.TurnOnParty",
-	privacyButtonEnabled = true,
-	renameFriendsToConnections = true
+	turnOnChatKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.TurnOnChat" or "Feature.Chat.Message.TurnOnParty"
 }
 
 local t1 = {
@@ -47,9 +47,9 @@ function v9.render(p2) -- line: 51
 		return withStyle(function(p4) -- line: 62
 			-- upvalues: Roact (copy), ChatDisabledIndicator (copy), p2 (copy), p3 (copy)
 			return Roact.createElement("Frame", {
-				BackgroundColor3 = p4.Theme.BackgroundDefault.Color,
-				BackgroundTransparency = p4.Tokens.Global.Color.None.Transparency,
 				BorderSizePixel = 0,
+				BackgroundColor3 = p4.Theme.BackgroundDefault.Color,
+				BackgroundTransparency = p4.Tokens.Color.None.Transparency,
 				Size = UDim2.new(1, 0, 1, 0)
 			}, {
 				ChatDisabledIndicator = Roact.createElement(ChatDisabledIndicator, {

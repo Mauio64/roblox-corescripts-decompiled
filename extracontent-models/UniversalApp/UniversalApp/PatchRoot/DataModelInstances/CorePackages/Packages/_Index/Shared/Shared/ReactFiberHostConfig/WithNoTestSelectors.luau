@@ -1,15 +1,17 @@
-local v0 = require(script.Parent.Parent.invariant);
-local function v1(...) --[[ Line: 16 ]] --[[ Name: shim ]]
-    -- upvalues: v0 (copy)
-    v0(false, "The current renderer does not support test selectors. This error is likely caused by a bug in React. Please file an issue.");
-end;
+local invariant = require(script.Parent.Parent.invariant)
+
+local function shim(...) -- line: 16
+	-- upvalues: invariant (copy)
+	invariant(false, "The current renderer does not support test selectors. This error is likely caused by a bug in React. Please file an issue.")
+end
+
 return {
-    supportsTestSelectors = false, 
-    findFiberRoot = v1, 
-    getBoundingRect = v1, 
-    getTextContent = v1, 
-    isHiddenSubtree = v1, 
-    matchAccessibilityRole = v1, 
-    setFocusIfFocusable = v1, 
-    setupIntersectionObserver = v1
-};
+	supportsTestSelectors = false,
+	findFiberRoot = shim,
+	getBoundingRect = shim,
+	getTextContent = shim,
+	isHiddenSubtree = shim,
+	matchAccessibilityRole = shim,
+	setFocusIfFocusable = shim,
+	setupIntersectionObserver = shim
+}

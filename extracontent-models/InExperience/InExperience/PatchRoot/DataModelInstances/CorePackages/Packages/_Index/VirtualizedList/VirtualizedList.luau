@@ -1,21 +1,24 @@
-local l_Components_0 = script.Components;
-local l_Lists_0 = script.Lists;
-local v2 = require(l_Components_0.ScrollView.ScrollView);
-local v3 = require(l_Lists_0.VirtualizedList);
-local l_default_0 = require(l_Lists_0.SectionList).default;
-local v5 = require(l_Lists_0.FlatList);
-local l_BidirectionalFlatList_0 = require(l_Lists_0.BidirectionalFlatList).BidirectionalFlatList;
-local v7 = require(l_Components_0.View.View);
-local _ = require(l_Lists_0.ViewabilityHelper);
-local v9 = require(l_Lists_0.Hooks);
-local v10 = require(l_Lists_0.AnimatedFlatList);
+local Components = script.Components
+local Lists = script.Lists
+local ScrollView = require(Components.ScrollView.ScrollView)
+local VirtualizedList = require(Lists.VirtualizedList)
+local default = require(Lists.SectionList).default
+local FlatList = require(Lists.FlatList)
+local BidirectionalFlatList = require(Lists.BidirectionalFlatList).BidirectionalFlatList
+local View = require(Components.View.View)
+
+require(Lists.ViewabilityHelper)
+
+local Hooks = require(Lists.Hooks)
+local AnimatedFlatList = require(Lists.AnimatedFlatList)
+
 return {
-    ScrollView = v2, 
-    VirtualizedList = v3, 
-    SectionList = l_default_0, 
-    FlatList = v5, 
-    BidirectionalFlatList = l_BidirectionalFlatList_0, 
-    View = v7, 
-    AnimatedFlatList = v10, 
-    Hooks = v9
-};
+	ScrollView = ScrollView,
+	VirtualizedList = VirtualizedList,
+	SectionList = default,
+	FlatList = FlatList,
+	BidirectionalFlatList = BidirectionalFlatList,
+	View = View,
+	AnimatedFlatList = AnimatedFlatList,
+	Hooks = Hooks
+}

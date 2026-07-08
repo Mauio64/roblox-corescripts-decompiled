@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MoveInExperienceModeToEditProfile_V2", false);
+return game:DefineFastFlag("MoveInExperienceModeToEditProfile_V2", false)

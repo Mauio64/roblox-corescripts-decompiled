@@ -21,10 +21,10 @@ return React.memo(function(p1) -- line: 21
 	end, {})
 
 	return React.createElement(InterventionDialog, {
+		iconName = "icons/status/error_large",
 		titleText = v14.DontSharePersonalInformationText,
 		bodyText = v14.PartyChatMayBeSuspendedText,
 		onDismiss = p1.onDismiss,
-		iconName = "icons/status/error_large",
 		iconSize = IconSize.Large,
 		iconStyle = v13.Color.System.Warning,
 		eventId = p1.eventId,

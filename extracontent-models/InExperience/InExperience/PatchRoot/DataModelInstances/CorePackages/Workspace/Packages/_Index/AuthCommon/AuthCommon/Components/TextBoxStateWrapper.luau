@@ -1,204 +1,184 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.UIBlox);
-local v3 = require(l_Parent_0.Roact);
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local l_withStyle_0 = v2.Style.withStyle;
-local v7 = v3.Component:extend("TextBoxStateWrapper");
-v7.defaultProps = {
-    IconSize = UDim2.new(1, 0, 1, 0), 
-    TextBoxLabelPadding = 12, 
-    InnerSidePadding = 0
-};
-v7.init = function(v8) --[[ Line: 24 ]] --[[ Name: init ]]
-    v8:setState({
-        Focused = false, 
-        Hover = false
-    });
-    v8.onMouseEnter = function() --[[ Line: 30 ]]
-        -- upvalues: v8 (copy)
-        v8:setState({
-            Hover = true
-        });
-    end;
-    v8.onMouseLeave = function() --[[ Line: 36 ]]
-        -- upvalues: v8 (copy)
-        v8:setState({
-            Hover = false
-        });
-    end;
-    v8.onFocused = function(...) --[[ Line: 42 ]]
-        -- upvalues: v8 (copy)
-        v8:setState({
-            Focused = true
-        });
-        if v8.props.ChildProps.onFocused then
-            v8.props.ChildProps.onFocused(...);
-        end;
-    end;
-    v8.onFocusLost = function(...) --[[ Line: 51 ]]
-        -- upvalues: v8 (copy)
-        v8:setState({
-            Focused = false
-        });
-        if v8.props.ChildProps.onFocusLost then
-            v8.props.ChildProps.onFocusLost(...);
-        end;
-    end;
-end;
-v7.render = function(v9) --[[ Line: 61 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), v1 (copy)
-    local l_HelpComponent_0 = v9.props.HelpComponent;
-    local l_ErrorText_0 = v9.props.ErrorText;
-    local l_LabelText_0 = v9.props.LabelText;
-    return l_withStyle_0(function(v13) --[[ Line: 66 ]]
-        -- upvalues: v9 (copy), v3 (ref), l_LabelText_0 (copy), l_ImageSetLabel_0 (ref), l_GetImageData_0 (ref), v1 (ref), l_ErrorText_0 (copy), l_HelpComponent_0 (copy)
-        local l_Color_0 = v13.Theme.UIDefault.Color;
-        local l_Transparency_0 = v13.Theme.UIDefault.Transparency;
-        if v9.props.ErrorState then
-            l_Color_0 = v13.Theme.Alert.Color;
-            l_Transparency_0 = v13.Theme.Alert.Transparency;
-        elseif v9.state.Focused then
-            l_Color_0 = v13.Theme.IconEmphasis.Color;
-            l_Transparency_0 = v13.Theme.IconEmphasis.Transparency;
-        elseif v9.state.Hover then
-            l_Color_0 = v13.Theme.IconDefault.Color;
-            l_Transparency_0 = v13.Theme.IconDefault.Transparency;
-        end;
-        local l_createElement_0 = v3.createElement;
-        local v17 = "Frame";
-        local v18 = {
-            AnchorPoint = v9.props.AnchorPoint, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            LayoutOrder = v9.props.LayoutOrder, 
-            Position = v9.props.Position, 
-            Size = UDim2.fromScale(1, 0), 
-            [v3.Change.AbsolutePosition] = v9.props.onPositionChangedCallback
-        };
-        local v19 = {
-            ListLayout = v3.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, v9.props.TextBoxLabelPadding)
-            }), 
-            TextBoxLabel = l_LabelText_0 and v3.createElement("TextLabel", {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                Font = v13.Font.CaptionHeader.Font, 
-                LayoutOrder = 1, 
-                Size = UDim2.fromScale(1, 0), 
-                Text = l_LabelText_0, 
-                TextColor3 = v13.Theme.TextEmphasis.Color, 
-                TextSize = v9.props.TextBoxLabelTextSize, 
-                TextTransparency = v13.Theme.TextEmphasis.Transparency, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left
-            }), 
-            TextBox = v3.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 2, 
-                Size = v9.props.Size, 
-                [v3.Ref] = v9.props.buttonRef
-            }, {
-                Border = v3.createElement(l_ImageSetLabel_0, {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    ZIndex = 2, 
-                    BackgroundTransparency = 1, 
-                    ScaleType = Enum.ScaleType.Slice, 
-                    SliceCenter = Rect.new(9, 9, 9, 9), 
-                    Image = l_GetImageData_0("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke", 
-                    ImageColor3 = l_Color_0, 
-                    ImageTransparency = l_Transparency_0
-                }), 
-                TextBox = v3.createElement(v9.props.ChildClass, v1.Dictionary.join(v9.props.ChildProps, {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    onMouseEnter = v9.onMouseEnter, 
-                    onMouseLeave = v9.onMouseLeave, 
-                    onFocused = v9.onFocused, 
-                    onFocusLost = v9.onFocusLost
-                })), 
-                IconWrapper = v9.props.Icon and v3.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Position = UDim2.new(1, -2, 0, 0), 
-                    AnchorPoint = Vector2.new(1, 0), 
-                    BackgroundTransparency = 1, 
-                    ZIndex = 2
-                }, {
-                    AspectRatio = v3.createElement("UIAspectRatioConstraint", {
-                        AspectRatio = 1
-                    }), 
-                    Icon = v3.createElement(l_ImageSetLabel_0, {
-                        Size = v9.props.IconSize, 
-                        Position = UDim2.new(0.5, 0, 0.5, 0), 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundTransparency = 1, 
-                        Image = v9.props.Icon, 
-                        ImageColor3 = l_Color_0, 
-                        ImageTransparency = l_Transparency_0
-                    })
-                })
-            })
-        };
-        local l_l_ErrorText_0_0 = l_ErrorText_0;
-        if l_l_ErrorText_0_0 then
-            l_l_ErrorText_0_0 = v3.createElement;
-            local v21 = "TextLabel";
-            local v22 = {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                Font = v13.Font.CaptionBody.Font, 
-                LayoutOrder = 3, 
-                Size = UDim2.fromScale(1, 0), 
-                Text = l_ErrorText_0, 
-                TextColor3 = v13.Theme.Alert.Color, 
-                TextSize = v13.Font.CaptionBody.RelativeSize * v13.Font.BaseSize, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left
-            };
-            local v23 = {};
-            local v24 = false;
-            if v9.props.InnerSidePadding ~= 0 then
-                v24 = v3.createElement("UIPadding", {
-                    PaddingRight = UDim.new(0, v9.props.InnerSidePadding), 
-                    PaddingLeft = UDim.new(0, v9.props.InnerSidePadding)
-                });
-            end;
-            v23.Padding = v24;
-            l_l_ErrorText_0_0 = l_l_ErrorText_0_0(v21, v22, v23);
-        end;
-        v19.ErrorText = l_l_ErrorText_0_0;
-        l_l_ErrorText_0_0 = not l_ErrorText_0;
-        if l_l_ErrorText_0_0 then
-            l_l_ErrorText_0_0 = l_HelpComponent_0;
-            if l_l_ErrorText_0_0 then
-                l_l_ErrorText_0_0 = v3.createElement;
-                local v25 = "Frame";
-                local v26 = {
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    BackgroundTransparency = 1, 
-                    BorderSizePixel = 0, 
-                    LayoutOrder = 4, 
-                    Size = UDim2.fromScale(1, 0)
-                };
-                local v27 = {};
-                local v28 = false;
-                if v9.props.InnerSidePadding ~= 0 then
-                    v28 = v3.createElement("UIPadding", {
-                        PaddingRight = UDim.new(0, v9.props.InnerSidePadding), 
-                        PaddingLeft = UDim.new(0, v9.props.InnerSidePadding)
-                    });
-                end;
-                v27.Padding = v28;
-                v27.HelpComponent = l_HelpComponent_0;
-                l_l_ErrorText_0_0 = l_l_ErrorText_0_0(v25, v26, v27);
-            end;
-        end;
-        v19.HelpComponentWrapper = l_l_ErrorText_0_0;
-        return l_createElement_0(v17, v18, v19);
-    end);
-end;
-return v7;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local Cryo = require(Parent.Cryo)
+local UIBlox = require(Parent.UIBlox)
+local Roact = require(Parent.Roact)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GetImageData = require(Parent.RobloxAppAssets).GetImageData
+local withStyle = UIBlox.Style.withStyle
+local v8 = Roact.Component:extend("TextBoxStateWrapper")
+
+v8.defaultProps = {
+	TextBoxLabelPadding = 12,
+	InnerSidePadding = 0,
+	IconSize = UDim2.new(1, 0, 1, 0)
+}
+
+function v8.init(p1) -- line: 24
+	p1:setState({
+		Focused = false,
+		Hover = false
+	})
+
+	function p1.onMouseEnter() -- line: 30
+		-- upvalues: p1 (copy)
+		p1:setState({
+			Hover = true
+		})
+	end
+	function p1.onMouseLeave() -- line: 36
+		-- upvalues: p1 (copy)
+		p1:setState({
+			Hover = false
+		})
+	end
+	function p1.onFocused(...) -- line: 42
+		-- upvalues: p1 (copy)
+		p1:setState({
+			Focused = true
+		})
+
+		if p1.props.ChildProps.onFocused then
+			p1.props.ChildProps.onFocused(...)
+		end
+	end
+	function p1.onFocusLost(...) -- line: 51
+		-- upvalues: p1 (copy)
+		p1:setState({
+			Focused = false
+		})
+
+		if p1.props.ChildProps.onFocusLost then
+			p1.props.ChildProps.onFocusLost(...)
+		end
+	end
+end
+function v8.render(p2) -- line: 61
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), GetImageData (copy), Cryo (copy)
+	local HelpComponent = p2.props.HelpComponent
+	local ErrorText = p2.props.ErrorText
+	local LabelText = p2.props.LabelText
+
+	return withStyle(function(p3) -- line: 66
+		-- upvalues: p2 (copy), Roact (copy), LabelText (copy), ImageSetLabel (copy), GetImageData (copy), Cryo (copy), ErrorText (copy), HelpComponent (copy)
+		local UIDefaultColor = p3.Theme.UIDefault.Color
+		local UIDefaultTransparency = p3.Theme.UIDefault.Transparency
+
+		if p2.props.ErrorState then
+			UIDefaultColor = p3.Theme.Alert.Color
+			UIDefaultTransparency = p3.Theme.Alert.Transparency
+		elseif p2.state.Focused then
+			UIDefaultColor = p3.Theme.IconEmphasis.Color
+			UIDefaultTransparency = p3.Theme.IconEmphasis.Transparency
+		elseif p2.state.Hover then
+			UIDefaultColor = p3.Theme.IconDefault.Color
+			UIDefaultTransparency = p3.Theme.IconDefault.Transparency
+		end
+
+		return Roact.createElement("Frame", {
+			AnchorPoint = p2.props.AnchorPoint,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = p2.props.LayoutOrder,
+			Position = p2.props.Position,
+			Size = UDim2.fromScale(1, 0),
+			[Roact.Change.AbsolutePosition] = p2.props.onPositionChangedCallback
+		}, {
+			ListLayout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, p2.props.TextBoxLabelPadding)
+			}),
+			TextBoxLabel = LabelText and Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				TextWrapped = true,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Font = p3.Font.CaptionHeader.Font,
+				Size = UDim2.fromScale(1, 0),
+				Text = LabelText,
+				TextColor3 = p3.Theme.TextEmphasis.Color,
+				TextSize = p2.props.TextBoxLabelTextSize,
+				TextTransparency = p3.Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			TextBox = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				Size = p2.props.Size,
+				[Roact.Ref] = p2.props.buttonRef
+			}, {
+				Border = Roact.createElement(ImageSetLabel, {
+					ZIndex = 2,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					ScaleType = Enum.ScaleType.Slice,
+					SliceCenter = Rect.new(9, 9, 9, 9),
+					Image = GetImageData("LuaApp/buttons/buttonStroke") or "LuaApp/buttons/buttonStroke",
+					ImageColor3 = UIDefaultColor,
+					ImageTransparency = UIDefaultTransparency
+				}),
+				TextBox = Roact.createElement(p2.props.ChildClass, Cryo.Dictionary.join(p2.props.ChildProps, {
+					Size = UDim2.new(1, 0, 1, 0),
+					onMouseEnter = p2.onMouseEnter,
+					onMouseLeave = p2.onMouseLeave,
+					onFocused = p2.onFocused,
+					onFocusLost = p2.onFocusLost
+				})),
+				IconWrapper = p2.props.Icon and Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					ZIndex = 2,
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(1, -2, 0, 0),
+					AnchorPoint = Vector2.new(1, 0)
+				}, {
+					AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+						AspectRatio = 1
+					}),
+					Icon = Roact.createElement(ImageSetLabel, {
+						BackgroundTransparency = 1,
+						Size = p2.props.IconSize,
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Image = p2.props.Icon,
+						ImageColor3 = UIDefaultColor,
+						ImageTransparency = UIDefaultTransparency
+					})
+				})
+			}),
+			ErrorText = ErrorText and Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				TextWrapped = true,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Font = p3.Font.CaptionBody.Font,
+				Size = UDim2.fromScale(1, 0),
+				Text = ErrorText,
+				TextColor3 = p3.Theme.Alert.Color,
+				TextSize = p3.Font.CaptionBody.RelativeSize * p3.Font.BaseSize,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}, {
+				Padding = p2.props.InnerSidePadding ~= 0 and Roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, p2.props.InnerSidePadding),
+					PaddingLeft = UDim.new(0, p2.props.InnerSidePadding)
+				})
+			}),
+			HelpComponentWrapper = not ErrorText and (HelpComponent and Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 4,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.fromScale(1, 0)
+			}, {
+				Padding = p2.props.InnerSidePadding ~= 0 and Roact.createElement("UIPadding", {
+					PaddingRight = UDim.new(0, p2.props.InnerSidePadding),
+					PaddingLeft = UDim.new(0, p2.props.InnerSidePadding)
+				}),
+				HelpComponent = HelpComponent
+			}))
+		})
+	end)
+end
+
+return v8

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableVoiceEuConsentPrompt", false);
+return game:DefineFastFlag("EnableVoiceEuConsentPrompt", false)

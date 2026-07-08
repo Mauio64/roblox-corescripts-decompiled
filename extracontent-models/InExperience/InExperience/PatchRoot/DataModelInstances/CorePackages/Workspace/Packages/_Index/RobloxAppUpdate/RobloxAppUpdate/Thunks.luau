@@ -1,3 +1,3 @@
 return {
-    CheckForUpdate = require(script.CheckForUpdate)
-};
+	CheckForUpdate = require(script.CheckForUpdate)
+}

@@ -1,108 +1,132 @@
-local l_RunService_0 = game:GetService("RunService");
-local v1 = require(script.Parent.assign);
-local v2 = require(script.Parent.createSignal);
-local v3 = {
-    prototype = {}
-};
-v3.__index = v3.prototype;
-local function v9(v4) --[[ Line: 10 ]] --[[ Name: createGroupMotor ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    assert(typeof(v4) == "table");
-    local v5 = {};
-    for v6, v7 in pairs(v4) do
-        v5[v6] = {
-            value = v7, 
-            complete = true
-        };
-    end;
-    local v8 = {
-        __goals = {}, 
-        __states = v5, 
-        __allComplete = true, 
-        __onComplete = v2(), 
-        __onStep = v2(), 
-        __running = false
-    };
-    setmetatable(v8, v3);
-    return v8;
-end;
-v3.prototype.start = function(v10) --[[ Line: 36 ]] --[[ Name: start ]]
-    -- upvalues: l_RunService_0 (copy)
-    if v10.__running then
-        return;
-    else
-        v10.__connection = l_RunService_0.Heartbeat:Connect(function(v11) --[[ Line: 41 ]]
-            -- upvalues: v10 (copy)
-            v10:step(v11);
-        end);
-        v10.__running = true;
-        return;
-    end;
-end;
-v3.prototype.stop = function(v12) --[[ Line: 48 ]] --[[ Name: stop ]]
-    if v12.__connection ~= nil then
-        v12.__connection:Disconnect();
-        v12.__running = false;
-    end;
-end;
-v3.prototype.step = function(v13, v14) --[[ Line: 55 ]] --[[ Name: step ]]
-    assert(typeof(v14) == "number");
-    if v13.__allComplete then
-        return;
-    else
-        local v15 = true;
-        local v16 = {};
-        for v17, v18 in pairs(v13.__states) do
-            if not v18.complete then
-                local v19 = v13.__goals[v17];
-                if v19 ~= nil then
-                    local v20 = v19:step(v18, v14);
-                    if v20 ~= nil then
-                        v18 = v20;
-                        v13.__states[v17] = v20;
-                    end;
-                else
-                    v18.complete = true;
-                end;
-                if not v18.complete then
-                    v15 = false;
-                end;
-            end;
-            v16[v17] = v18.value;
-        end;
-        local l___allComplete_0 = v13.__allComplete;
-        v13.__allComplete = v15;
-        v13.__onStep:fire(v16);
-        if v13.__allComplete and not l___allComplete_0 and v13.__running then
-            v13:stop();
-            v13.__onComplete:fire(v16);
-        end;
-        return;
-    end;
-end;
-v3.prototype.setGoal = function(v22, v23) --[[ Line: 102 ]] --[[ Name: setGoal ]]
-    -- upvalues: v1 (copy)
-    assert(typeof(v23) == "table");
-    v22.__goals = v1({}, v22.__goals, v23);
-    for v24 in pairs(v23) do
-        local v25 = v22.__states[v24];
-        if v25 == nil then
-            error(("Cannot set goal for the value %s because it doesn't exist"):format((tostring(v24))), 2);
-        end;
-        v25.complete = false;
-    end;
-    v22.__allComplete = false;
-    v22:start();
-end;
-v3.prototype.onStep = function(v26, v27) --[[ Line: 121 ]] --[[ Name: onStep ]]
-    assert(typeof(v27) == "function");
-    return v26.__onStep:subscribe(v27);
-end;
-v3.prototype.onComplete = function(v28, v29) --[[ Line: 127 ]] --[[ Name: onComplete ]]
-    assert(typeof(v29) == "function");
-    return v28.__onComplete:subscribe(v29);
-end;
-v3.prototype.destroy = function(v30) --[[ Line: 133 ]] --[[ Name: destroy ]]
-    v30:stop();
-end;
-return v9;
+local RunService = game:GetService("RunService")
+local assign = require(script.Parent.assign)
+local createSignal = require(script.Parent.createSignal)
+local t1 = {
+	prototype = {}
+}
+
+t1.__index = t1.prototype
+
+local function createGroupMotor(p1) -- line: 10
+	-- upvalues: createSignal (copy), t1 (copy)
+	assert(typeof(p1) == "table")
+
+	local t2 = {}
+
+	for k, v in pairs(p1) do
+		t2[k] = {
+			complete = true,
+			value = v
+		}
+	end
+
+	local t3 = {
+		__allComplete = true,
+		__running = false,
+		__goals = {},
+		__states = t2,
+		__onComplete = createSignal(),
+		__onStep = createSignal()
+	}
+
+	setmetatable(t3, t1)
+
+	return t3
+end
+
+function t1.prototype.start(p2) -- line: 36
+	-- upvalues: RunService (copy)
+	if p2.__running then
+		return
+	end
+
+	p2.__connection = RunService.Heartbeat:Connect(function(dt) -- line: 41
+		-- upvalues: p2 (copy)
+		p2:step(dt)
+	end)
+	p2.__running = true
+end
+function t1.prototype.stop(p3) -- line: 48
+	if p3.__connection ~= nil then
+		p3.__connection:Disconnect()
+		p3.__running = false
+	end
+end
+function t1.prototype.step(p4, p5) -- line: 55
+	assert(typeof(p5) == "number")
+
+	if p4.__allComplete then
+		return
+	end
+
+	local v15 = true
+	local t4 = {}
+
+	for k, v in pairs(p4.__states) do
+		local v19 = v
+
+		if not v19.complete then
+			local v20 = p4.__goals[k]
+
+			if v20 ~= nil then
+				local v21 = v20:step(v19, p5)
+
+				if v21 ~= nil then
+					v19 = v21
+					p4.__states[k] = v21
+				end
+			else
+				v19.complete = true
+			end
+
+			if not v19.complete then
+				v15 = false
+			end
+		end
+
+		t4[k] = v19.value
+	end
+
+	local __allComplete = p4.__allComplete
+
+	p4.__allComplete = v15
+	p4.__onStep:fire(t4)
+
+	if p4.__allComplete and not __allComplete and p4.__running then
+		p4:stop()
+		p4.__onComplete:fire(t4)
+	end
+end
+function t1.prototype.setGoal(p6, p7) -- line: 102
+	-- upvalues: assign (copy)
+	assert(typeof(p7) == "table")
+	p6.__goals = assign({}, p6.__goals, p7)
+
+	for k in pairs(p7) do
+		local v26 = p6.__states[k]
+
+		if v26 == nil then
+			error(("Cannot set goal for the value %s because it doesn't exist"):format((tostring(k))), 2)
+		end
+
+		v26.complete = false
+	end
+
+	p6.__allComplete = false
+	p6:start()
+end
+function t1.prototype.onStep(p8, p9) -- line: 121
+	assert(typeof(p9) == "function")
+
+	return p8.__onStep:subscribe(p9)
+end
+function t1.prototype.onComplete(p10, p11) -- line: 127
+	assert(typeof(p11) == "function")
+
+	return p10.__onComplete:subscribe(p11)
+end
+function t1.prototype.destroy(p12) -- line: 133
+	p12:stop()
+end
+
+return createGroupMotor

@@ -1,85 +1,88 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local v4 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent;
-local l_withStyle_0 = v3.Core.Style.withStyle;
-local l_AppStyleProvider_0 = v3.App.Style.AppStyleProvider;
-local l_Dark_0 = v3.App.Style.Constants.ThemeName.Dark;
-local v9 = require(l_Parent_0.Actions.SetFeedbackFlowState);
-local v10 = require(l_Parent_0.Actions.SetScreenSize);
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local v12 = require(l_Parent_0.Resources.Assets);
-local v13 = require(l_Parent_0.Components.FeedbackReportDialog);
-local v14 = require(l_Parent_0.Components.RefinedFeedbackBar);
-local v15 = require(l_Parent_0.Components.FeedbackSubmissionToast);
-local v16 = require(l_Parent_0.Components.HelpModal);
-local v17 = require(l_Parent_0.Components.OnboardingModal);
-local l_FFlagInExperienceUseAppStyleProvider_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagInExperienceUseAppStyleProvider;
-local v19 = v1.PureComponent:extend("FeedbackApp");
-v19.validateProps = v4.strictInterface({
-    setScreenGuiSize = v4.callback
-});
-v19.render = function(v20) --[[ Line: 46 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), l_FFlagInExperienceUseAppStyleProvider_0 (copy), l_AppStyleProvider_0 (copy), v3 (copy), l_Dark_0 (copy), v15 (copy), v16 (copy), v17 (copy), v13 (copy), l_withLocalization_0 (copy), l_withStyle_0 (copy), v14 (copy), v12 (copy)
-    return v1.createElement(if l_FFlagInExperienceUseAppStyleProvider_0 then l_AppStyleProvider_0 else v3.Core.Style.Provider, if l_FFlagInExperienceUseAppStyleProvider_0 then {
-        style = {
-            themeName = l_Dark_0
-        }
-    } else {}, {
-        Gui = v1.createElement("ScreenGui", {
-            AutoLocalize = false, 
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = true, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-            [v1.Change.AbsoluteSize] = v20.props.setScreenGuiSize
-        }, {
-            ScreenFrame = v1.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ZIndex = 10
-            }, {
-                FeedbackSubmissionToast = v1.createElement(v15), 
-                HelpModal = v1.createElement(v16), 
-                OnboardingModal = v1.createElement(v17), 
-                FeedbackReportDialog = v1.createElement(v13)
-            }), 
-            RefinedFeedbackBar = l_withLocalization_0({
-                feedbackBarText = "CoreScripts.Feedback.FeedbackBar.MainLabel"
-            })(function(v21) --[[ Line: 78 ]]
-                -- upvalues: l_withStyle_0 (ref), v1 (ref), v14 (ref), v12 (ref)
-                return l_withStyle_0(function(v22) --[[ Line: 79 ]]
-                    -- upvalues: v1 (ref), v14 (ref), v21 (copy), v12 (ref)
-                    local l_Font_0 = v22.Font;
-                    return v1.createElement(v14, {
-                        leftHint = {
-                            text = v21.feedbackBarText, 
-                            hintTextSize = l_Font_0.BaseSize * l_Font_0.Body.RelativeSize, 
-                            maxWidth = 200, 
-                            icon = v12.Images.FeedbackBarHintIcon
-                        }
-                    }, {});
-                end);
-            end)
-        })
-    });
-end;
-return v2.connect(function() --[[ Line: 96 ]]
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent
+local withStyle = UIBlox.Core.Style.withStyle
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Dark = UIBlox.App.Style.Constants.ThemeName.Dark
+local SetFeedbackFlowState = require(ParentParent.Actions.SetFeedbackFlowState)
+local SetScreenSize = require(ParentParent.Actions.SetScreenSize)
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local Assets = require(ParentParent.Resources.Assets)
+local FeedbackReportDialog = require(ParentParent.Components.FeedbackReportDialog)
+local RefinedFeedbackBar = require(ParentParent.Components.RefinedFeedbackBar)
+local FeedbackSubmissionToast = require(ParentParent.Components.FeedbackSubmissionToast)
+local HelpModal = require(ParentParent.Components.HelpModal)
+local OnboardingModal = require(ParentParent.Components.OnboardingModal)
+local FFlagInExperienceUseAppStyleProvider = require(CorePackages.Workspace.Packages.SharedFlags).FFlagInExperienceUseAppStyleProvider
+local v20 = Roact.PureComponent:extend("FeedbackApp")
 
-end, function(v24) --[[ Line: 96 ]]
-    -- upvalues: v10 (copy), v9 (copy)
-    return {
-        setScreenGuiSize = function(v25) --[[ Line: 98 ]] --[[ Name: setScreenGuiSize ]]
-            -- upvalues: v24 (copy), v10 (ref)
-            v24(v10(v25.AbsoluteSize));
-        end, 
-        setFeedbackFlowState = function(v26) --[[ Line: 101 ]] --[[ Name: setFeedbackFlowState ]]
-            -- upvalues: v24 (copy), v9 (ref)
-            v24(function(v27) --[[ Line: 102 ]]
-                -- upvalues: v9 (ref), v26 (copy)
-                v27:dispatch(v9(v26));
-            end);
-        end
-    };
-end)(v19);
+v20.validateProps = t.strictInterface({
+	setScreenGuiSize = t.callback
+})
+
+function v20.render(p1) -- line: 46
+	-- upvalues: Roact (copy), FFlagInExperienceUseAppStyleProvider (copy), AppStyleProvider (copy), UIBlox (copy), Dark (copy), FeedbackSubmissionToast (copy), HelpModal (copy), OnboardingModal (copy), FeedbackReportDialog (copy), withLocalization (copy), withStyle (copy), RefinedFeedbackBar (copy), Assets (copy)
+	return Roact.createElement(if not FFlagInExperienceUseAppStyleProvider then UIBlox.Core.Style.Provider else AppStyleProvider, if not FFlagInExperienceUseAppStyleProvider then {} else {
+		style = {
+			themeName = Dark
+		}
+	}, {
+		Gui = Roact.createElement("ScreenGui", {
+			AutoLocalize = false,
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			[Roact.Change.AbsoluteSize] = p1.props.setScreenGuiSize
+		}, {
+			ScreenFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				ZIndex = 10,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, {
+				FeedbackSubmissionToast = Roact.createElement(FeedbackSubmissionToast),
+				HelpModal = Roact.createElement(HelpModal),
+				OnboardingModal = Roact.createElement(OnboardingModal),
+				FeedbackReportDialog = Roact.createElement(FeedbackReportDialog)
+			}),
+			RefinedFeedbackBar = withLocalization({
+				feedbackBarText = "CoreScripts.Feedback.FeedbackBar.MainLabel"
+			})(function(p2) -- line: 78
+				-- upvalues: withStyle (copy), Roact (copy), RefinedFeedbackBar (copy), Assets (copy)
+				return withStyle(function(p3) -- line: 79
+					-- upvalues: Roact (copy), RefinedFeedbackBar (copy), p2 (copy), Assets (copy)
+					local p3Font = p3.Font
+
+					return Roact.createElement(RefinedFeedbackBar, {
+						leftHint = {
+							maxWidth = 200,
+							text = p2.feedbackBarText,
+							hintTextSize = p3Font.BaseSize * p3Font.Body.RelativeSize,
+							icon = Assets.Images.FeedbackBarHintIcon
+						}
+					}, {})
+				end)
+			end)
+		})
+	})
+end
+
+return RoactRodux.connect(function() -- line: 96
+end, function(p4) -- line: 96
+	-- upvalues: SetScreenSize (copy), SetFeedbackFlowState (copy)
+	return {
+		setScreenGuiSize = function(p5) -- line: 98
+			-- upvalues: p4 (copy), SetScreenSize (copy)
+			p4(SetScreenSize(p5.AbsoluteSize))
+		end,
+		setFeedbackFlowState = function(p6) -- line: 101
+			-- upvalues: p4 (copy), SetFeedbackFlowState (copy)
+			p4(function(p7) -- line: 102
+				-- upvalues: SetFeedbackFlowState (copy), p6 (copy)
+				p7:dispatch(SetFeedbackFlowState(p6))
+			end)
+		end
+	}
+end)(v20)

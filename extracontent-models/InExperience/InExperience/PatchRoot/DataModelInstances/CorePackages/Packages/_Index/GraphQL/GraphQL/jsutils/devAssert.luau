@@ -1,7 +1,7 @@
 return {
-    devAssert = function(v0, v1) --[[ Line: 9 ]] --[[ Name: devAssert ]]
-        if not v0 then
-            error(v1, 2);
-        end;
-    end
-};
+	devAssert = function(p1, s1: string) -- line: 9
+		if not p1 then
+			error(s1, 2)
+		end
+	end
+}

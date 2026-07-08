@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAndroidAppRatingPromptLua", false);
+return game:DefineFastFlag("EnableAndroidAppRatingPromptLua", false)

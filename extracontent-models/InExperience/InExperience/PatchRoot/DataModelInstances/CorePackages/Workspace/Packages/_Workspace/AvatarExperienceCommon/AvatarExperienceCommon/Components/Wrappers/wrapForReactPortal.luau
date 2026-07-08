@@ -1,23 +1,26 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactRoblox);
-local v3 = require(l_Parent_0.Foundation);
-local function v6(v4, v5) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    return v1.createElement(v3.View, {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        ZIndex = 5, 
-        ref = v5, 
-        selectionGroup = {
-            SelectionBehaviorUp = Enum.SelectionBehavior.Stop, 
-            SelectionBehaviorDown = Enum.SelectionBehavior.Stop, 
-            SelectionBehaviorLeft = Enum.SelectionBehavior.Stop, 
-            SelectionBehaviorRight = Enum.SelectionBehavior.Stop
-        }
-    }, v4);
-end;
-return function(v7, v8, v9) --[[ Line: 23 ]] --[[ Name: wrapForReactPortal ]]
-    -- upvalues: v2 (copy), v6 (copy)
-    return v2.createPortal(v6(v7, v9), v8);
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local ReactRoblox = require(Parent.ReactRoblox)
+local Foundation = require(Parent.Foundation)
+
+local function v5(p1, p2) -- line: 8
+	-- upvalues: React (copy), Foundation (copy)
+	return React.createElement(Foundation.View, {
+		BackgroundTransparency = 1,
+		ZIndex = 5,
+		Size = UDim2.new(1, 0, 1, 0),
+		ref = p2,
+		selectionGroup = {
+			SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorDown = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+			SelectionBehaviorRight = Enum.SelectionBehavior.Stop
+		}
+	}, p1)
+end
+local function wrapForReactPortal(p3, p4, p5) -- line: 23
+	-- upvalues: ReactRoblox (copy), v5 (copy)
+	return ReactRoblox.createPortal(v5(p3, p5), p4)
+end
+
+return wrapForReactPortal

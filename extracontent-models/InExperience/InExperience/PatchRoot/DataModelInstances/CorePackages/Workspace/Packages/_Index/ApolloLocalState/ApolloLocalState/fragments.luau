@@ -1,3 +1,3 @@
 return {
-    userPresenceAllFields = require(script.userPresenceAllFields)
-};
+	userPresenceAllFields = require(script.userPresenceAllFields)
+}

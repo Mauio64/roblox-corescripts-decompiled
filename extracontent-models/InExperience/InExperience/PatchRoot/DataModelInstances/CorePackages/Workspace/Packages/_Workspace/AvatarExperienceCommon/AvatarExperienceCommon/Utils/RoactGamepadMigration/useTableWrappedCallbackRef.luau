@@ -1,11 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 11 ]] --[[ Name: useTableWrappedCallbackRef ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef(nil);
-    v1.useImperativeHandle(v2, function() --[[ Line: 19 ]]
-        -- upvalues: v3 (copy)
-        return v3.current;
-    end);
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+
+local function useTableWrappedCallbackRef(p1) -- line: 11
+	-- upvalues: React (copy)
+	local v5 = React.useRef(nil)
+
+	React.useImperativeHandle(p1, function() -- line: 19
+		-- upvalues: v5 (copy)
+		return v5.current
+	end)
+
+	return v5
+end
+
+return useTableWrappedCallbackRef

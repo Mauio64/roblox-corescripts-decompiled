@@ -1,142 +1,150 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.Foundation);
-local l_ButtonVariant_0 = require(l_Parent_1.Foundation).Enums.ButtonVariant;
-local l_FillBehavior_0 = require(l_Parent_1.Foundation).Enums.FillBehavior;
-local l_View_0 = v3.View;
-local l_Text_0 = v3.Text;
-local l_Icon_0 = v3.Icon;
-local l_Sheet_0 = v3.Sheet;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_useScaledValue_0 = v3.Hooks.useScaledValue;
-local v12 = require(l_Parent_1.LoggingProtocol);
-local l_UnifiedProductPurchaseCompletionModalShownCounter_0 = require(l_Parent_0.Generic.Events.UnifiedPurchaseCompletionCounter).UnifiedProductPurchaseCompletionModalShownCounter;
-local l_useLocalization_0 = require(l_Parent_1.Localization).Hooks.useLocalization;
-local v15 = require(l_Parent_0.Utility.formatTextWithParams);
-local v16 = require(l_Parent_0.Generic.Hooks.useFocusNavigationRefs);
-local v17 = require(l_Parent_0.Generic.Hooks.useInitialButtonDisableDelay);
-local l_UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS_0 = require(l_Parent_0.Generic.Constants).UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS;
-local v19 = require(l_Parent_0.Flags.FFlagUnifiedPurchaseModalUiImprovements);
-local v20 = require(l_Parent_0.Flags.FFlagAddFocusNavigationToUnifiedPurchase);
-return function(v21) --[[ Line: 58 ]] --[[ Name: UnifiedPurchaseCompletionModal ]]
-    -- upvalues: l_useLocalization_0 (copy), v20 (copy), v16 (copy), v17 (copy), l_useTokens_0 (copy), v2 (copy), v3 (copy), v12 (copy), l_UnifiedProductPurchaseCompletionModalShownCounter_0 (copy), v15 (copy), l_Sheet_0 (copy), v19 (copy), l_useScaledValue_0 (copy), l_UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS_0 (copy), l_Text_0 (copy), l_View_0 (copy), l_Icon_0 (copy), l_FillBehavior_0 (copy), l_ButtonVariant_0 (copy)
-    local v22 = l_useLocalization_0({
-        PurchaseCompleteTitle = "IAPExperience.PurchasePrompt.Title.PurchaseCompleted", 
-        PurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseCompleted", 
-        ErrorTitle = "CoreScripts.PremiumModal.Title.Error", 
-        GenericErrorBody = "CoreScripts.PurchasePrompt.PurchaseFailed.UnknownFailureNoItemName", 
-        OkButtonText = "CoreScripts.PurchasePrompt.Button.OK", 
-        MultiItemPurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseItemsSuccess"
-    });
-    local v23 = nil;
-    local v24 = nil;
-    local v25 = false;
-    if v20 then
-        local v26, v27 = v16(v21.buttons.onClose, nil);
-        v23 = v26;
-        v24 = v27;
-        v25 = v17();
-    end;
-    local v28 = l_useTokens_0();
-    local v29, v30 = v2.useState(v3.Enums.IconName.CircleCheck);
-    v2.useEffect(function() --[[ Line: 77 ]]
-        -- upvalues: v12 (ref), l_UnifiedProductPurchaseCompletionModalShownCounter_0 (ref)
-        v12.default:logRobloxTelemetryCounter(l_UnifiedProductPurchaseCompletionModalShownCounter_0, 1, {});
-    end, {});
-    local v31 = v2.useMemo(function() --[[ Line: 81 ]]
-        -- upvalues: v21 (copy), v22 (copy)
-        if v21.title then
-            return v21.title;
-        elseif v21.isError then
-            return v22.ErrorTitle;
-        else
-            return v22.PurchaseCompleteTitle;
-        end;
-    end, {
-        v21.title, 
-        v21.isError
-    });
-    local v32 = v2.useMemo(function() --[[ Line: 91 ]]
-        -- upvalues: v21 (copy), v22 (copy), v15 (ref)
-        if v21.bodyText then
-            return v21.bodyText;
-        elseif v21.isError then
-            return v22.GenericErrorBody;
-        elseif v21.isMultiItem then
-            return v22.MultiItemPurchaseCompleteBody;
-        else
-            return v15(v22.PurchaseCompleteBody, {
-                ITEM_NAME = v21.itemName
-            });
-        end;
-    end, {
-        v21.bodyText, 
-        v21.isError, 
-        v21.isMultiItem, 
-        v21.itemName
-    });
-    local v33 = nil;
-    v33 = if v21.buttons and v21.buttons.text then v21.buttons.text else v22.OkButtonText;
-    v2.useEffect(function() --[[ Line: 112 ]]
-        -- upvalues: v21 (copy), v30 (copy), v3 (ref)
-        if v21.isError then
-            v30(v3.Enums.IconName.TriangleExclamation);
-            return;
-        else
-            v30(v3.Enums.IconName.CircleCheck);
-            return;
-        end;
-    end, {
-        v21.isError
-    });
-    return v2.createElement(l_Sheet_0.Root, {
-        onClose = if v21.buttons.onClose then v21.buttons.onClose else v21.buttons.onActivated, 
-        snapPoints = if v19 then {
-            l_useScaledValue_0(l_UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS_0), 
-            0.8
-        } else {
-            0.4, 
-            0.8
-        }, 
-        preferCenterSheet = true, 
-        ref = if v20 then if v25 then nil else v23 else nil
-    }, {
-        Header = v2.createElement(l_Sheet_0.Header, {}, {
-            Title = v2.createElement(l_Text_0, {
-                Text = v31, 
-                tag = "auto-xy text-heading-small content-default text-align-x-left"
-            })
-        }), 
-        Content = v2.createElement(l_Sheet_0.Content, {
-            LayoutOrder = 2
-        }, {
-            Body = v2.createElement(l_View_0, {
-                tag = v19 and "col gap-large auto-y size-full-0 align-x-center align-y-center padding-top-small" or "col gap-medium auto-y size-full-0 align-x-center align-y-center", 
-                LayoutOrder = 1
-            }, {
-                Icon = v2.createElement(l_Icon_0, {
-                    name = v29, 
-                    size = v28.Size.Size_1200, 
-                    tag = "auto-xy"
-                }), 
-                Message = v2.createElement(l_Text_0, {
-                    Text = v32, 
-                    tag = "auto-xy text-body content-default text-align-x-left text-body-medium text-wrap"
-                })
-            })
-        }), 
-        Actions = v2.createElement(l_Sheet_0.Actions, {
-            LayoutOrder = 3
-        }, {
-            v2.createElement(v3.Button, {
-                text = v33, 
-                onActivated = v21.buttons.onActivated, 
-                fillBehavior = l_FillBehavior_0.Fill, 
-                variant = l_ButtonVariant_0.Emphasis, 
-                ref = if v20 then v24 else nil, 
-                isDisabled = v25
-            })
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Foundation = require(ParentParentParent.Foundation)
+local ButtonVariant = require(ParentParentParent.Foundation).Enums.ButtonVariant
+local FillBehavior = require(ParentParentParent.Foundation).Enums.FillBehavior
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Icon = Foundation.Icon
+local Sheet = Foundation.Sheet
+local useTokens = Foundation.Hooks.useTokens
+local useScaledValue = Foundation.Hooks.useScaledValue
+local LoggingProtocol = require(ParentParentParent.LoggingProtocol)
+local UnifiedProductPurchaseCompletionModalShownCounter = require(ParentParent.Generic.Events.UnifiedPurchaseCompletionCounter).UnifiedProductPurchaseCompletionModalShownCounter
+local useLocalization = require(ParentParentParent.Localization).Hooks.useLocalization
+local formatTextWithParams = require(ParentParent.Utility.formatTextWithParams)
+local useFocusNavigationRefs = require(ParentParent.Generic.Hooks.useFocusNavigationRefs)
+local useInitialButtonDisableDelay = require(ParentParent.Generic.Hooks.useInitialButtonDisableDelay)
+local UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS = require(ParentParent.Generic.Constants).UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS
+local FFlagUnifiedPurchaseModalUiImprovements = require(ParentParent.Flags.FFlagUnifiedPurchaseModalUiImprovements)
+local FFlagAddFocusNavigationToUnifiedPurchase = require(ParentParent.Flags.FFlagAddFocusNavigationToUnifiedPurchase)
+
+local function UnifiedPurchaseCompletionModal(t1: {[any]: any}) -- line: 58
+	-- upvalues: useLocalization (copy), FFlagAddFocusNavigationToUnifiedPurchase (copy), useFocusNavigationRefs (copy), useInitialButtonDisableDelay (copy), useTokens (copy), React (copy), Foundation (copy), LoggingProtocol (copy), UnifiedProductPurchaseCompletionModalShownCounter (copy), formatTextWithParams (copy), Sheet (copy), FFlagUnifiedPurchaseModalUiImprovements (copy), useScaledValue (copy), UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS (copy), FoundationText (copy), View (copy), Icon (copy), FillBehavior (copy), ButtonVariant (copy)
+	local v24 = useLocalization({
+		PurchaseCompleteTitle = "IAPExperience.PurchasePrompt.Title.PurchaseCompleted",
+		PurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseCompleted",
+		ErrorTitle = "CoreScripts.PremiumModal.Title.Error",
+		GenericErrorBody = "CoreScripts.PurchasePrompt.PurchaseFailed.UnknownFailureNoItemName",
+		OkButtonText = "CoreScripts.PurchasePrompt.Button.OK",
+		MultiItemPurchaseCompleteBody = "IAPExperience.PurchasePrompt.Body.PurchaseItemsSuccess"
+	})
+	local v25 = nil
+	local v26 = nil
+	local v27 = false
+
+	if FFlagAddFocusNavigationToUnifiedPurchase then
+		v25, v26 = useFocusNavigationRefs(t1.buttons.onClose, nil)
+		v27 = useInitialButtonDisableDelay()
+	end
+
+	local v28 = useTokens()
+	local v29, v30 = React.useState(Foundation.Enums.IconName.CircleCheck)
+
+	React.useEffect(function() -- line: 77
+		-- upvalues: LoggingProtocol (copy), UnifiedProductPurchaseCompletionModalShownCounter (copy)
+		LoggingProtocol.default:logRobloxTelemetryCounter(UnifiedProductPurchaseCompletionModalShownCounter, 1, {})
+	end, {})
+
+	local v31 = React.useMemo(function() -- line: 81
+		-- upvalues: t1 (copy), v24 (copy)
+		if t1.title then
+			return t1.title
+		end
+
+		if t1.isError then
+			return v24.ErrorTitle
+		end
+
+		return v24.PurchaseCompleteTitle
+	end, {
+		t1.title,
+		t1.isError
+	})
+	local v32 = React.useMemo(function() -- line: 91
+		-- upvalues: t1 (copy), v24 (copy), formatTextWithParams (copy)
+		if t1.bodyText then
+			return t1.bodyText
+		end
+
+		if t1.isError then
+			return v24.GenericErrorBody
+		end
+
+		if t1.isMultiItem then
+			return v24.MultiItemPurchaseCompleteBody
+		end
+
+		return formatTextWithParams(v24.PurchaseCompleteBody, {
+			ITEM_NAME = t1.itemName
+		})
+	end, {
+		t1.bodyText,
+		t1.isError,
+		t1.isMultiItem,
+		t1.itemName
+	})
+	local v33 = if not t1.buttons or not t1.buttons.text then v24.OkButtonText else t1.buttons.text
+
+	React.useEffect(function() -- line: 112
+		-- upvalues: t1 (copy), v30 (copy), Foundation (copy)
+		if t1.isError then
+			v30(Foundation.Enums.IconName.TriangleExclamation)
+
+			return
+		end
+
+		v30(Foundation.Enums.IconName.CircleCheck)
+	end, { t1.isError })
+
+	return React.createElement(Sheet.Root, {
+		preferCenterSheet = true,
+		onClose = if not t1.buttons.onClose then t1.buttons.onActivated else t1.buttons.onClose,
+		snapPoints = if not FFlagUnifiedPurchaseModalUiImprovements then {
+			0.4,
+			0.8
+		} else {
+			useScaledValue(UNIFIED_PURCHASE_COMPLETION_MODAL_MIN_HEIGHT_PIXELS),
+			0.8
+		},
+		ref = if not FFlagAddFocusNavigationToUnifiedPurchase then nil else if not v27 then v25 else nil
+	}, {
+		Header = React.createElement(Sheet.Header, {}, {
+			Title = React.createElement(FoundationText, {
+				tag = "auto-xy text-heading-small content-default text-align-x-left",
+				Text = v31
+			})
+		}),
+		Content = React.createElement(Sheet.Content, {
+			LayoutOrder = 2
+		}, {
+			Body = React.createElement(View, {
+				LayoutOrder = 1,
+				tag = not FFlagUnifiedPurchaseModalUiImprovements and "col gap-medium auto-y size-full-0 align-x-center align-y-center" or "col gap-large auto-y size-full-0 align-x-center align-y-center padding-top-small"
+			}, {
+				Icon = React.createElement(Icon, {
+					tag = "auto-xy",
+					name = v29,
+					size = v28.Size.Size_1200
+				}),
+				Message = React.createElement(FoundationText, {
+					tag = "auto-xy text-body content-default text-align-x-left text-body-medium text-wrap",
+					Text = v32
+				})
+			})
+		}),
+		Actions = React.createElement(Sheet.Actions, {
+			LayoutOrder = 3
+		}, { React.createElement(Foundation.Button, {
+			text = v33,
+			onActivated = t1.buttons.onActivated,
+			fillBehavior = FillBehavior.Fill,
+			variant = ButtonVariant.Emphasis,
+			ref = if not FFlagAddFocusNavigationToUnifiedPurchase then nil else v26,
+			isDisabled = v27
+		}) })
+	})
+end
+
+return UnifiedPurchaseCompletionModal

@@ -1,5 +1,6 @@
-local _ = require(script.types);
+require(script.types)
+
 return {
-    createResource = require(script.createResource), 
-    createCachedResource = require(script.createCachedResource)
-};
+	createResource = require(script.createResource),
+	createCachedResource = require(script.createCachedResource)
+}

@@ -1,4 +1,7 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: isScrollingFrameOverflowingY ]]
-    local v2 = if v1 ~= nil then v1 else 1;
-    return v0.AbsoluteCanvasSize.Y > v0.AbsoluteWindowSize.Y + v2;
-end;
+local function isScrollingFrameOverflowingY(p1, n1: number?) -- line: 1
+	local v4 = n1 == nil and 1 or n1
+
+	return p1.AbsoluteCanvasSize.Y > p1.AbsoluteWindowSize.Y + v4
+end
+
+return isScrollingFrameOverflowingY

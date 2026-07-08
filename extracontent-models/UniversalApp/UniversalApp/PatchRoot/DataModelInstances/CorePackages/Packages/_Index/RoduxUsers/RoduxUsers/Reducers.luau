@@ -1,11 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxUsers").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local v2 = require(script.Users.byUserId);
-local v3 = require(script.Users.byUsername);
-return function(v4) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    return v1.combineReducers({
-        byUserId = v2(v4), 
-        byUsername = v3(v4)
-    });
-end;
+local Parent = script:FindFirstAncestor("RoduxUsers").Parent
+local Rodux = require(Parent.Rodux)
+local byUserId = require(script.Users.byUserId)
+local byUsername = require(script.Users.byUsername)
+
+return function(p1) -- line: 8
+	-- upvalues: Rodux (copy), byUserId (copy), byUsername (copy)
+	return Rodux.combineReducers({
+		byUserId = byUserId(p1),
+		byUsername = byUsername(p1)
+	})
+end

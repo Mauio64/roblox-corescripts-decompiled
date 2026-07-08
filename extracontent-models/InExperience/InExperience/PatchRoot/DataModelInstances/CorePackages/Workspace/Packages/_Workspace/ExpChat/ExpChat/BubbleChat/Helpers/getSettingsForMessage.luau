@@ -1,12 +1,19 @@
-return function(v0, v1) --[[ Line: 3 ]] --[[ Name: getSettingsForMessage ]]
-    local v2 = v0 and v0.UserSpecificSettings;
-    if not v1 or not v2 then
-        return v0;
-    elseif v2[v1.userId] then
-        return v2[v1.userId];
-    elseif v1.partOrModel and v2[v1.partOrModel:GetFullName()] then
-        return v2[v1.partOrModel:GetFullName()];
-    else
-        return v0;
-    end;
-end;
+local function getSettingsForMessage(p1, p2) -- line: 3
+	local v4 = p1 and p1.UserSpecificSettings
+
+	if not p2 or not v4 then
+		return p1
+	end
+
+	if v4[p2.userId] then
+		return v4[p2.userId]
+	end
+
+	if p2.partOrModel and v4[p2.partOrModel:GetFullName()] then
+		return v4[p2.partOrModel:GetFullName()]
+	end
+
+	return p1
+end
+
+return getSettingsForMessage

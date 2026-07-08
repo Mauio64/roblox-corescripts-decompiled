@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXColorAdjustmentButtonShouldAccountForTryOns", false);
+return game:DefineFastFlag("AXColorAdjustmentButtonShouldAccountForTryOns", false)

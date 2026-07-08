@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogM41FullMasks", false);
+return game:DefineFastFlag("AXCatalogM41FullMasks", false)

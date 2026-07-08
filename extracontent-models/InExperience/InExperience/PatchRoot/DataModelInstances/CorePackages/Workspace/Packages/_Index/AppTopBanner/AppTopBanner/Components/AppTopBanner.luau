@@ -1,89 +1,95 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppTopBanner");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.React);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v7 = require(l_script_FirstAncestor_0.Enums.AppTopBannerType);
-local v8 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusRoot_0 = v8.FocusRoot;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v8.FocusNavigableSurfaceIdentifierEnum;
-local v11 = {
-    contentMaps = {}, 
-    deviceStatusBarHeight = 0
-};
-return v4.memo(function(v12) --[[ Line: 28 ]] --[[ Name: AppTopBanner ]]
-    -- upvalues: v2 (copy), v11 (copy), l_useTokens_0 (copy), v4 (copy), l_useSelector_0 (copy), v7 (copy), v3 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    v12 = v2.Dictionary.join(v11, v12);
-    local v13 = l_useTokens_0();
-    local v14, v15 = v4.useState(0);
-    local v17 = v4.useCallback(function(v16) --[[ Line: 38 ]]
-        if v16.AppTopBanner then
-            return v16.AppTopBanner.expanded;
-        else
-            return false;
-        end;
-    end, {});
-    local v18 = l_useSelector_0(v17);
-    local v20 = v4.useCallback(function(v19) --[[ Line: 42 ]]
-        return v19.AppTopBanner and v19.AppTopBanner.appTopBannerContentProps;
-    end, {});
-    local v21 = l_useSelector_0(v20);
-    local v23 = v4.useCallback(function(v22) --[[ Line: 46 ]]
-        return v22.AppTopBanner and v22.AppTopBanner.onAppTopBannerClick;
-    end, {});
-    local v24 = l_useSelector_0(v23);
-    local v26 = v4.useCallback(function(v25) --[[ Line: 50 ]]
-        return v25.AppTopBanner and v25.AppTopBanner.appTopBannerContentHeight;
-    end, {});
-    local v27 = l_useSelector_0(v26);
-    local v29 = v4.useCallback(function(v28) --[[ Line: 54 ]]
-        if v28.AppTopBanner then
-            return v28.AppTopBanner.isDisabled;
-        else
-            return false;
-        end;
-    end, {});
-    local v30 = l_useSelector_0(v29);
-    v4.useEffect(function() --[[ Line: 61 ]]
-        -- upvalues: v18 (copy), v30 (copy), v15 (copy), v27 (copy), v12 (ref)
-        if v18 and not v30 then
-            v15(v27 + v12.deviceStatusBarHeight);
-            return;
-        else
-            v15(0);
-            return;
-        end;
-    end, {
-        v27, 
-        v18, 
-        v12.deviceStatusBarHeight, 
-        v30
-    });
-    local v32 = v4.useCallback(function(v31) --[[ Line: 77 ]]
-        -- upvalues: v7 (ref)
-        if v31.AppTopBanner then
-            return v31.AppTopBanner.appTopBannerType;
-        else
-            return v7.None;
-        end;
-    end, {});
-    local v33 = l_useSelector_0(v32);
-    local v34 = v12.contentMaps[v33];
-    local v35 = v4.createElement(v3.View, {
-        Size = UDim2.new(1, 0, 0, v14), 
-        backgroundStyle = v13.Color.Extended.Green.Green_800, 
-        onActivated = v24, 
-        padding = {
-            left = UDim.new(0, v13.Padding.XLarge), 
-            right = UDim.new(0, v13.Padding.XLarge), 
-            top = UDim.new(0, v12.deviceStatusBarHeight)
-        }
-    }, {
-        content = if v34 then v4.createElement(v34, v21) else nil
-    });
-    return if not (v14 > 0) or v30 then nil else v4.createElement(l_FocusRoot_0, {
-        surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.Auxiliary
-    }, v35);
-end);
+local AppTopBanner = script:FindFirstAncestor("AppTopBanner")
+local AppTopBannerParent = AppTopBanner.Parent
+local Cryo = require(AppTopBannerParent.Cryo)
+local Foundation = require(AppTopBannerParent.Foundation)
+local React = require(AppTopBannerParent.React)
+local useSelector = require(AppTopBannerParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useTokens = Foundation.Hooks.useTokens
+local AppTopBannerType = require(AppTopBanner.Enums.AppTopBannerType)
+local FocusNavigationUtils = require(AppTopBannerParent.FocusNavigationUtils)
+local FocusRoot = FocusNavigationUtils.FocusRoot
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local t1 = {
+	deviceStatusBarHeight = 0,
+	contentMaps = {}
+}
+
+local function AppTopBanner2(t2: {[any]: any}) -- line: 28
+	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), React (copy), useSelector (copy), AppTopBannerType (copy), Foundation (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local u15 = Cryo.Dictionary.join(t1, t2)
+	local v16 = useTokens()
+	local v17, v18 = React.useState(0)
+	local v19 = React.useCallback(function(p1) -- line: 38
+		if p1.AppTopBanner then
+			return p1.AppTopBanner.expanded
+		end
+
+		return false
+	end, {})
+	local v20 = useSelector(v19)
+	local v21 = React.useCallback(function(p2) -- line: 42
+		return p2.AppTopBanner and p2.AppTopBanner.appTopBannerContentProps
+	end, {})
+	local v22 = useSelector(v21)
+	local v23 = React.useCallback(function(p3) -- line: 46
+		return p3.AppTopBanner and p3.AppTopBanner.onAppTopBannerClick
+	end, {})
+	local v24 = useSelector(v23)
+	local v25 = React.useCallback(function(p4) -- line: 50
+		return p4.AppTopBanner and p4.AppTopBanner.appTopBannerContentHeight
+	end, {})
+	local v26 = useSelector(v25)
+	local v27 = React.useCallback(function(p5) -- line: 54
+		if p5.AppTopBanner then
+			return p5.AppTopBanner.isDisabled
+		end
+
+		return false
+	end, {})
+	local v28 = useSelector(v27)
+
+	React.useEffect(function() -- line: 61
+		-- upvalues: v20 (copy), v28 (copy), v18 (copy), v26 (copy), u15 (ref)
+		if v20 and not v28 then
+			v18(v26 + u15.deviceStatusBarHeight)
+
+			return
+		end
+
+		v18(0)
+	end, {
+		v26,
+		v20,
+		u15.deviceStatusBarHeight,
+		v28
+	})
+
+	local v29 = React.useCallback(function(p6) -- line: 77
+		-- upvalues: AppTopBannerType (copy)
+		if p6.AppTopBanner then
+			return p6.AppTopBanner.appTopBannerType
+		end
+
+		return AppTopBannerType.None
+	end, {})
+	local v30 = useSelector(v29)
+	local v31 = u15.contentMaps[v30]
+	local v32 = React.createElement(Foundation.View, {
+		Size = UDim2.new(1, 0, 0, v17),
+		backgroundStyle = v16.Color.Extended.Green.Green_800,
+		onActivated = v24,
+		padding = {
+			left = UDim.new(0, v16.Padding.XLarge),
+			right = UDim.new(0, v16.Padding.XLarge),
+			top = UDim.new(0, u15.deviceStatusBarHeight)
+		}
+	}, {
+		content = if not v31 then nil else React.createElement(v31, v22)
+	})
+
+	return if not (v17 > 0) or v28 then nil else React.createElement(FocusRoot, {
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.Auxiliary
+	}, v32)
+end
+
+return React.memo(AppTopBanner2)

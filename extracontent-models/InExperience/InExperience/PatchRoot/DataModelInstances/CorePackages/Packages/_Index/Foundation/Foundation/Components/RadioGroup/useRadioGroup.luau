@@ -1,7 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.RadioGroupContext);
-return function() --[[ Line: 15 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.useContext(v2);
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+local RadioGroupContext = require(script.Parent.RadioGroupContext)
+
+return function() -- line: 15
+	-- upvalues: React (copy), RadioGroupContext (copy)
+	return React.useContext(RadioGroupContext)
+end

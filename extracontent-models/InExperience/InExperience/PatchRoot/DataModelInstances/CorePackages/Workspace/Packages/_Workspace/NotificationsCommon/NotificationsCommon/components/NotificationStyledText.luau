@@ -1,102 +1,121 @@
-local l_Parent_0 = script:FindFirstAncestor("NotificationsCommon").Parent;
-local l_Parent_1 = script.Parent.Parent;
-local v2 = require(l_Parent_1.dependencies);
-local l_useStyle_0 = v2.UIBlox.Core.Style.useStyle;
-local _ = require(l_Parent_1.type);
-local l_Text_0 = require(l_Parent_0.AppCommonLib).Text;
-local l_React_0 = v2.React;
-local v9 = {
-    highlight = function(v7) --[[ Line: 49 ]] --[[ Name: highlight ]]
-        return "<b>" .. v7 .. "</b>";
-    end, 
-    warning = function(v8) --[[ Line: 52 ]] --[[ Name: warning ]]
-        return "<b>" .. v8 .. "</b>";
-    end
-};
-utf8Sub = function(v10, v11, v12) --[[ Line: 57 ]] --[[ Name: utf8Sub ]]
-    local v13 = utf8.offset(v10, v11);
-    local v14 = utf8.offset(v10, v12 + 1);
-    if v13 == nil or v14 == nil then
-        return (string.sub(v10, v11, v12));
-    else
-        return (string.sub(v10, v13, v14 - 1));
-    end;
-end;
-local function v33(v15) --[[ Line: 66 ]] --[[ Name: formatString ]]
-    -- upvalues: v9 (copy), l_Text_0 (copy)
-    local v16 = v15.text .. " ";
-    local l_styledElements_0 = v15.styledElements;
-    local v18 = {
-        {
-            Position = 0, 
-            ReferenceCount = 0, 
-            Format = "highlight"
-        }, 
-        {
-            Position = utf8.len(v15.text), 
-            ReferenceCount = 0, 
-            Format = "highlight"
-        }
-    };
-    if l_styledElements_0 then
-        for _, v20 in pairs(l_styledElements_0) do
-            table.insert(v18, {
-                Position = v20.offset, 
-                ReferenceCount = 1, 
-                Format = v20.styledElementType
-            });
-            table.insert(v18, {
-                Position = v20.offset + v20.length, 
-                ReferenceCount = -1, 
-                Format = v20.styledElementType
-            });
-        end;
-    end;
-    table.sort(v18, function(v21, v22) --[[ Line: 101 ]]
-        return v21.Position < v22.Position;
-    end);
-    local v23 = {};
-    for v24 in pairs(v9) do
-        v23[v24] = 0;
-    end;
-    local v25 = "";
-    for v26 = 1, #v18 - 1 do
-        local v27 = v18[v26];
-        local v28 = v18[v26 + 1];
-        if v27.Format then
-            local l_Format_0 = v27.Format;
-            v23[l_Format_0] = v23[l_Format_0] + v27.ReferenceCount;
-        end;
-        if v27.Position ~= v28.Position then
-            local v30 = utf8Sub(v16, v27.Position + 1, v28.Position);
-            for v31, v32 in pairs(v9) do
-                if v23[v31] > 0 then
-                    v30 = v32(v30);
-                end;
-            end;
-            v25 = v25 .. v30;
-        end;
-    end;
-    return l_Text_0.Trim(v25);
-end;
-return function(v34) --[[ Line: 132 ]]
-    -- upvalues: l_useStyle_0 (copy), v33 (copy), l_React_0 (copy)
-    local v35 = l_useStyle_0();
-    local v36 = if v34.Text then v33(v34.Text) else "";
-    return l_React_0.createElement("TextLabel", {
-        RichText = true, 
-        Text = v36, 
-        BackgroundTransparency = 1, 
-        TextColor3 = v34.TextColor3 or v35.Theme.TextDefault.Color, 
-        TextTransparency = v34.TextTransparency or v35.Theme.TextDefault.Transparency, 
-        Font = v34.Font or v35.Font.Body.Font, 
-        AutomaticSize = v34.AutomaticSize, 
-        Size = v34.Size, 
-        TextSize = v34.TextSize, 
-        Position = v34.Position, 
-        AnchorPoint = v34.AnchorPoint, 
-        TextXAlignment = v34.TextXAlignment, 
-        TextWrapped = true, 
-        LayoutOrder = v34.LayoutOrder
-    });
-end;
+local Parent = script:FindFirstAncestor("NotificationsCommon").Parent
+local ParentParent = script.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local useStyle = dependencies.UIBlox.Core.Style.useStyle
+
+require(ParentParent.type)
+
+local Text = require(Parent.AppCommonLib).Text
+local React = dependencies.React
+local t1 = {
+	highlight = function(s1: string) -- line: 49
+		return "<b>" .. s1 .. "</b>"
+	end,
+	warning = function(s2: string) -- line: 52
+		return "<b>" .. s2 .. "</b>"
+	end
+}
+
+function utf8Sub(s3: string, n1: number, n2: number) -- line: 57
+	local v14 = utf8.offset(s3, n1)
+	local v15 = utf8.offset(s3, n2 + 1)
+
+	if v14 == nil or v15 == nil then
+		return (string.sub(s3, n1, n2))
+	end
+
+	return (string.sub(s3, v14, v15 - 1))
+end
+
+local function formatString(p1) -- line: 66
+	-- upvalues: t1 (copy), Text (copy)
+	local v17 = p1.text .. " "
+	local styledElements = p1.styledElements
+	local t2 = {
+		{
+			Position = 0,
+			ReferenceCount = 0,
+			Format = "highlight"
+		},
+		{
+			ReferenceCount = 0,
+			Format = "highlight",
+			Position = utf8.len(p1.text)
+		}
+	}
+
+	if styledElements then
+		for _, v in pairs(styledElements) do
+			table.insert(t2, {
+				ReferenceCount = 1,
+				Position = v.offset,
+				Format = v.styledElementType
+			})
+			table.insert(t2, {
+				ReferenceCount = -1,
+				Position = v.offset + v.length,
+				Format = v.styledElementType
+			})
+		end
+	end
+
+	table.sort(t2, function(p2, p3) -- line: 101
+		return p2.Position < p3.Position
+	end)
+
+	local t3 = {}
+
+	for k in pairs(t1) do
+		t3[k] = 0
+	end
+
+	local s4 = ""
+
+	for i = 1, #t2 - 1 do
+		local v26 = t2[i]
+		local v27 = t2[i + 1]
+
+		if v26.Format then
+			local Format = v26.Format
+
+			t3[Format] = t3[Format] + v26.ReferenceCount
+		end
+
+		if v26.Position ~= v27.Position then
+			local v29 = utf8Sub(v17, v26.Position + 1, v27.Position)
+
+			for k, v in pairs(t1) do
+				if t3[k] > 0 then
+					v29 = v(v29)
+				end
+			end
+
+			s4 ..= v29
+		end
+	end
+
+	return Text.Trim(s4)
+end
+
+return function(t4: {[any]: any}) -- line: 132
+	-- upvalues: useStyle (copy), formatString (copy), React (copy)
+	local v33 = useStyle()
+	local v34 = not t4.Text and "" or formatString(t4.Text)
+
+	return React.createElement("TextLabel", {
+		RichText = true,
+		BackgroundTransparency = 1,
+		TextWrapped = true,
+		Text = v34,
+		TextColor3 = t4.TextColor3 or v33.Theme.TextDefault.Color,
+		TextTransparency = t4.TextTransparency or v33.Theme.TextDefault.Transparency,
+		Font = t4.Font or v33.Font.Body.Font,
+		AutomaticSize = t4.AutomaticSize,
+		Size = t4.Size,
+		TextSize = t4.TextSize,
+		Position = t4.Position,
+		AnchorPoint = t4.AnchorPoint,
+		TextXAlignment = t4.TextXAlignment,
+		LayoutOrder = t4.LayoutOrder
+	})
+end

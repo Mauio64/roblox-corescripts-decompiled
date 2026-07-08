@@ -1,5 +1,6 @@
-local v0 = game:DefineFastFlag("EnableInAppBugReporting", false);
-return function() --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return v0 and game:GetEngineFeature("BugReporterProtocol");
-end;
+local v1 = game:DefineFastFlag("EnableInAppBugReporting", false)
+
+return function() -- line: 3
+	-- upvalues: v1 (copy)
+	return v1 and game:GetEngineFeature("BugReporterProtocol")
+end

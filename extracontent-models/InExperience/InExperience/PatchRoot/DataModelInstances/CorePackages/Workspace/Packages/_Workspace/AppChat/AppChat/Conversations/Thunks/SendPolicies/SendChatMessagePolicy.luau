@@ -1,109 +1,150 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local v3 = require(script.Parent.SendMessagePolicy);
-local v4 = require(l_script_FirstAncestor_0.Models.MessageModel);
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-local v6 = require(l_script_FirstAncestor_0.Conversations.Thunks.ReceivedChatResponse);
-local v7 = require(l_script_FirstAncestor_0.Conversations.Actions.SendingMessage);
-local v8 = require(l_script_FirstAncestor_0.Conversations.Actions.SentMessage);
-local l_StatusCodes_0 = require(l_Parent_0.Http).StatusCodes;
-local v10 = require(l_script_FirstAncestor_0.Conversations.Actions.MessageFailedToSend);
-local v11 = require(l_script_FirstAncestor_0.Conversations.Actions.MessageModerated);
-local l_ResponseStatus_0 = require(l_Parent_0.AppChatNetworking).Constants.ResponseStatus;
-local v13 = require(l_script_FirstAncestor_0.Actions.NavigateIntoChat);
-local v14 = require(l_script_FirstAncestor_0.Conversations.Actions.ReceivedChannelsMigrationConflict);
-local v15 = require(l_script_FirstAncestor_0.EnumScreens);
-local v16 = require(l_script_FirstAncestor_0.Utils.getDeepValue2);
-local _ = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local v18 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatPerfTracking);
-local v19 = require(l_script_FirstAncestor_0.Telemetry.AppChatPerfTracker);
-local v20 = 0;
-local v21 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local function _() --[[ Line: 30 ]] --[[ Name: getAscendingNumber ]]
-    -- upvalues: v20 (ref)
-    v20 = v20 + 1;
-    return v20;
-end;
-local v23 = setmetatable({}, v3);
-v23.__index = v23;
-v23.new = function(v24, v25, v26) --[[ Line: 38 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    return (setmetatable({
-        messageSendingId = v4.newSendingId(), 
-        conversationId = v25, 
-        replyingToMessage = v26
-    }, v24));
-end;
-v23.onBeforeSendingMessage = function(v27, v28) --[[ Line: 46 ]] --[[ Name: onBeforeSendingMessage ]]
-    -- upvalues: v21 (copy), v16 (copy), v4 (copy), l_Immutable_0 (copy), v20 (ref), l_DateTime_0 (copy), v7 (copy)
-    v21:trace("onBeforeSendingMessage conversationId: {} messageSendingId: {}, replyingToId: {}", v27.conversationId, v27.messageSendingId, if v27.replyingToMessage then v27.replyingToMessage.id else nil);
-    local v29 = nil;
-    local v30 = v16(v28:getState(), (("ChatAppReducer.Conversations.%*"):format(v27.conversationId)));
-    v29 = v30 and v30.moderationType;
-    local l_newSending_0 = v4.newSending;
-    local l_JoinDictionaries_0 = l_Immutable_0.JoinDictionaries;
-    local v33 = {
-        id = v27.messageSendingId
-    };
-    v20 = v20 + 1;
-    v33.order = v20;
-    v33.conversationId = v27.conversationId;
-    v33.repliesTo = v27.replyingToMessage;
-    v33.sent = l_DateTime_0.now();
-    v33.moderationType = v29;
-    l_newSending_0 = l_newSending_0(l_JoinDictionaries_0(v33, v27:sendingMessagePayload()));
-    v27.sendingMessageStableKey = l_newSending_0.stableKey;
-    assert(l_newSending_0, "Failed to create sending message placeholder");
-    v28:dispatch(v7(v27.conversationId, l_newSending_0));
-end;
-v23.sendingMessagePayload = function(_) --[[ Line: 73 ]] --[[ Name: sendingMessagePayload ]]
-    error("Override me");
-end;
-v23.onSuccess = function(v35, v36, v37) --[[ Line: 77 ]] --[[ Name: onSuccess ]]
-    -- upvalues: v21 (copy), v18 (copy), v19 (copy), v8 (copy), v6 (copy)
-    v21:debug("Message sent successfully. conversationId: {} messageSendingId: {} replyingToId: {}", v35.conversationId, v35.messageSendingId, if v35.replyingToMessage then v35.replyingToMessage.id else nil);
-    if v18 then
-        v19.start(v19.Events.MessageSendResponseToFinalRender, {
-            conversationId = v35.conversationId
-        });
-    end;
-    v36:dispatch(v8(v35.conversationId, v35.messageSendingId));
-    v36:dispatch(v6(v35.conversationId, v37.responseBody, v35.sendingMessageStableKey));
-    return v37;
-end;
-v23.onFailure = function(v38, v39, v40) --[[ Line: 96 ]] --[[ Name: onFailure ]]
-    -- upvalues: v21 (copy), v18 (copy), v19 (copy), l_StatusCodes_0 (copy), v14 (copy), v13 (copy), v15 (copy), v10 (copy), l_ResponseStatus_0 (copy), v11 (copy)
-    v21:error("Failed to send message. conversationId: {}, messageSendingId: {}, responseCode: {}", v38.conversationId, v38.messageSendingId, v40.responseCode);
-    if v18 then
-        v19.start(v19.Events.MessageSendResponseToFinalRender, {
-            conversationId = v38.conversationId
-        });
-    end;
-    if not v40 or v40.responseCode ~= nil and v40.responseCode ~= l_StatusCodes_0.OK or v40.StatusCode ~= nil and v40.StatusCode ~= l_StatusCodes_0.OK or not v40.responseBody or not v40.responseBody.messages or #v40.responseBody.messages == 0 then
-        if v40.StatusCode == l_StatusCodes_0.CONFLICT then
-            v21:error("Message sent conflicting system (409). Reloading messages...");
-            v39:dispatch(v14());
-            v39:dispatch(v13({
-                screen = v15.ChatLanding, 
-                params = {
-                    key = tostring(os.clock())
-                }
-            }));
-            return v40;
-        else
-            v39:dispatch(v10(v38.conversationId, v38.messageSendingId));
-            v21:error("Message could not be sent, no response body or no messages in response body");
-            return v40;
-        end;
-    elseif v40.responseBody.messages[1].status and v40.responseBody.messages[1].status == l_ResponseStatus_0.MODERATED then
-        v39:dispatch(v11(v38.conversationId, v38.messageSendingId));
-        v21:error("Message was moderated.");
-        return v40;
-    else
-        v39:dispatch(v10(v38.conversationId, v38.messageSendingId));
-        v21:error("Message could not be sent, no response body or no messages in response body");
-        return v40;
-    end;
-end;
-return v23;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Immutable = require(AppChatParent.AppCommonLib).Immutable
+local SendMessagePolicy = require(script.Parent.SendMessagePolicy)
+local MessageModel = require(AppChat.Models.MessageModel)
+local DateTime = require(AppChatParent.Time).DateTime
+local ReceivedChatResponse = require(AppChat.Conversations.Thunks.ReceivedChatResponse)
+local SendingMessage = require(AppChat.Conversations.Actions.SendingMessage)
+local SentMessage = require(AppChat.Conversations.Actions.SentMessage)
+local StatusCodes = require(AppChatParent.Http).StatusCodes
+local MessageFailedToSend = require(AppChat.Conversations.Actions.MessageFailedToSend)
+local MessageModerated = require(AppChat.Conversations.Actions.MessageModerated)
+local ResponseStatus = require(AppChatParent.AppChatNetworking).Constants.ResponseStatus
+local NavigateIntoChat = require(AppChat.Actions.NavigateIntoChat)
+local ReceivedChannelsMigrationConflict = require(AppChat.Conversations.Actions.ReceivedChannelsMigrationConflict)
+local EnumScreens = require(AppChat.EnumScreens)
+local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+
+require(AppChat.Models.ConversationChannels)
+
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local n1 = 0
+local v22 = require(AppChat.Logger):new(script.Name)
+
+local function getAscendingNumber() -- line: 31
+	-- upvalues: n1 (ref)
+	n1 += 1
+
+	return n1
+end
+
+local self = setmetatable({}, SendMessagePolicy)
+
+self.__index = self
+
+function self.new(p1, p2, p3) -- line: 39
+	-- upvalues: MessageModel (copy)
+	return (setmetatable({
+		messageSendingId = MessageModel.newSendingId(),
+		conversationId = p2,
+		replyingToMessage = p3
+	}, p1))
+end
+function self.onBeforeSendingMessage(p4, p5) -- line: 47
+	-- upvalues: v22 (copy), getDeepValue2 (copy), MessageModel (copy), Immutable (copy), n1 (ref), DateTime (copy), SendingMessage (copy)
+	v22:trace("onBeforeSendingMessage conversationId: {} messageSendingId: {}, replyingToId: {}", p4.conversationId, p4.messageSendingId, if not p4.replyingToMessage then nil else p4.replyingToMessage.id)
+
+	local v30 = getDeepValue2(p5:getState(), `ChatAppReducer.Conversations.{ p4.conversationId }`)
+	local v31 = v30 and v30.moderationType
+	local newSending = MessageModel.newSending
+	local JoinDictionaries = Immutable.JoinDictionaries
+	local t1 = {
+		id = p4.messageSendingId
+	}
+
+	n1 += 1
+	t1.order = n1
+	t1.conversationId = p4.conversationId
+	t1.repliesTo = p4.replyingToMessage
+	t1.sent = DateTime.now()
+	t1.moderationType = v31
+
+	local v35 = newSending(JoinDictionaries(t1, p4:sendingMessagePayload()))
+
+	p4.sendingMessageStableKey = v35.stableKey
+	assert(v35, "Failed to create sending message placeholder")
+	p5:dispatch(SendingMessage(p4.conversationId, v35))
+end
+function self.sendingMessagePayload(_) -- line: 74
+	error("Override me")
+end
+function self.onSuccess(p7, p8, p9) -- line: 78
+	-- upvalues: v22 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), SentMessage (copy), ReceivedChatResponse (copy)
+	v22:debug("Message sent successfully. conversationId: {} messageSendingId: {} replyingToId: {}", p7.conversationId, p7.messageSendingId, if not p7.replyingToMessage then nil else p7.replyingToMessage.id)
+
+	if FFlagAppChatPerfTracking then
+		if FFlagAppChatMessageTTIMilestones then
+			local t2 = {
+				conversationId = p7.conversationId
+			}
+
+			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, t2)
+			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived, t2)
+		else
+			AppChatPerfTracker.start(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, {
+				conversationId = p7.conversationId
+			})
+		end
+	end
+
+	p8:dispatch(SentMessage(p7.conversationId, p7.messageSendingId))
+	p8:dispatch(ReceivedChatResponse(p7.conversationId, p9.responseBody, p7.sendingMessageStableKey))
+
+	return p9
+end
+function self.onFailure(p10, p11, p12) -- line: 112
+	-- upvalues: v22 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), StatusCodes (copy), ReceivedChannelsMigrationConflict (copy), NavigateIntoChat (copy), EnumScreens (copy), MessageFailedToSend (copy), ResponseStatus (copy), MessageModerated (copy)
+	v22:error("Failed to send message. conversationId: {}, messageSendingId: {}, responseCode: {}", p10.conversationId, p10.messageSendingId, p12.responseCode)
+
+	if FFlagAppChatPerfTracking then
+		if FFlagAppChatMessageTTIMilestones then
+			local t3 = {
+				conversationId = p10.conversationId
+			}
+
+			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, t3)
+			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.MessageSendTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived, t3)
+		else
+			AppChatPerfTracker.start(AppChatPerfTracker.Events.MessageSendResponseToFinalRender, {
+				conversationId = p10.conversationId
+			})
+		end
+	end
+
+	if not p12 or (p12.responseCode ~= nil and p12.responseCode ~= StatusCodes.OK or (p12.StatusCode ~= nil and p12.StatusCode ~= StatusCodes.OK or (not p12.responseBody or (not p12.responseBody.messages or #p12.responseBody.messages == 0)))) then
+		if p12.StatusCode == StatusCodes.CONFLICT then
+			v22:error("Message sent conflicting system (409). Reloading messages...")
+			p11:dispatch(ReceivedChannelsMigrationConflict())
+			p11:dispatch(NavigateIntoChat({
+				screen = EnumScreens.ChatLanding,
+				params = {
+					key = tostring(os.clock())
+				}
+			}))
+
+			return p12
+		end
+
+		p11:dispatch(MessageFailedToSend(p10.conversationId, p10.messageSendingId))
+		v22:error("Message could not be sent, no response body or no messages in response body")
+
+		return p12
+	end
+
+	if p12.responseBody.messages[1].status and p12.responseBody.messages[1].status == ResponseStatus.MODERATED then
+		p11:dispatch(MessageModerated(p10.conversationId, p10.messageSendingId))
+		v22:error("Message was moderated.")
+
+		return p12
+	end
+
+	p11:dispatch(MessageFailedToSend(p10.conversationId, p10.messageSendingId))
+	v22:error("Message could not be sent, no response body or no messages in response body")
+
+	return p12
+end
+
+return self

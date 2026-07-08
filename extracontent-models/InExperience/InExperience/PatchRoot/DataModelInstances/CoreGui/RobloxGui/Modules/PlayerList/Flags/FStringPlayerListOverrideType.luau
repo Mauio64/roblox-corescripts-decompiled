@@ -1,1 +1,1 @@
-return game:DefineFastString("PlayerListOverrideType", "");
+return game:DefineFastString("PlayerListOverrideType", "")

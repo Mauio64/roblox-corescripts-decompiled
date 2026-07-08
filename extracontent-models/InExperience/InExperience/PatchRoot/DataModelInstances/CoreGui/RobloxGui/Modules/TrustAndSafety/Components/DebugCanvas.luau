@@ -1,65 +1,80 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Logging;
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_CorePackages_0.Packages.RoactRodux);
-local _ = require(l_CorePackages_0.Packages.t);
-local _ = require(l_CorePackages_0.Packages.UIBlox).App.Button.TextButton;
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.Actions.EndReportFlow);
-local _ = require(l_Parent_0.Resources.Constants);
-local v9 = require(l_Parent_0.Flags.GetFFlagReportAnythingDebugCanvas);
-local v10 = v2.PureComponent:extend("DebugCanvas");
-v10.render = function(v11) --[[ Line: 23 ]] --[[ Name: render ]]
-    -- upvalues: v9 (copy), v2 (copy)
-    if not v9() or not v11.props.identifiedAvatars then
-        return v2.createElement("Frame", {
-            Size = UDim2.fromScale(0, 0)
-        });
-    else
-        local v12 = {};
-        for _, v14 in pairs(v11.props.identifiedAvatars) do
-            local l_boundingBox_0 = v14.boundingBox;
-            v12[#v12 + 1] = v2.createElement("Frame", {
-                Position = UDim2.fromScale(l_boundingBox_0.min.X, l_boundingBox_0.min.Y), 
-                Size = UDim2.fromScale(l_boundingBox_0.max.X - l_boundingBox_0.min.X, l_boundingBox_0.max.Y - l_boundingBox_0.min.Y), 
-                BackgroundTransparency = 0.8, 
-                BackgroundColor3 = Color3.fromRGB(20, 0, 255 * v14.hitRate)
-            });
-            local v16 = #v14.convexHull;
-            for v17, v18 in v14.convexHull do
-                v12[#v12 + 1] = v2.createElement("Frame", {
-                    Position = UDim2.new(v18.X, -2, v18.Y, -2), 
-                    Size = UDim2.fromOffset(4, 4), 
-                    BackgroundTransparency = 0.2, 
-                    BackgroundColor3 = Color3.fromHSV(v17 / v16, 1, 0.65)
-                });
-            end;
-        end;
-        for _, v20 in pairs(v11.props.identifiedAds) do
-            local l_boundingBox_1 = v20.boundingBox;
-            v12[#v12 + 1] = v2.createElement("Frame", {
-                Position = UDim2.fromScale(l_boundingBox_1.min.X, l_boundingBox_1.min.Y), 
-                Size = UDim2.fromScale(l_boundingBox_1.max.X - l_boundingBox_1.min.X, l_boundingBox_1.max.Y - l_boundingBox_1.min.Y), 
-                BackgroundTransparency = 0.8, 
-                BackgroundColor3 = Color3.fromRGB(20, 0, 255)
-            });
-            for _, v23 in v20.visibleRegions do
-                local v24 = #v23.convexHull;
-                for v25, v26 in v23.convexHull do
-                    v12[#v12 + 1] = v2.createElement("Frame", {
-                        Position = UDim2.new(v26.X, -2, v26.Y, -2), 
-                        Size = UDim2.fromOffset(4, 4), 
-                        BackgroundTransparency = 0.2, 
-                        BackgroundColor3 = Color3.fromHSV(v25 / v24, 1, 0.65)
-                    });
-                end;
-            end;
-        end;
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 0.9, 
-            Size = UDim2.fromScale(1, 1), 
-            ZIndex = v11.props.ZIndex
-        }, v12);
-    end;
-end;
-return v10;
+local CorePackages = game:GetService("CorePackages")
+local _ = require(CorePackages.Workspace.Packages.AppCommonLib).Logging
+local React = require(CorePackages.Packages.React)
+
+require(CorePackages.Packages.RoactRodux)
+require(CorePackages.Packages.t)
+
+local _ = require(CorePackages.Packages.UIBlox).App.Button.TextButton
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.Actions.EndReportFlow)
+require(ParentParent.Resources.Constants)
+
+local GetFFlagReportAnythingDebugCanvas = require(ParentParent.Flags.GetFFlagReportAnythingDebugCanvas)
+local v7 = React.PureComponent:extend("DebugCanvas")
+
+function v7.render(p1) -- line: 23
+	-- upvalues: GetFFlagReportAnythingDebugCanvas (copy), React (copy)
+	if not GetFFlagReportAnythingDebugCanvas() or not p1.props.identifiedAvatars then
+		return React.createElement("Frame", {
+			Size = UDim2.fromScale(0, 0)
+		})
+	end
+
+	local t1 = {}
+
+	for _, v in pairs(p1.props.identifiedAvatars) do
+		local boundingBox = v.boundingBox
+
+		t1[#t1 + 1] = React.createElement("Frame", {
+			BackgroundTransparency = 0.8,
+			Position = UDim2.fromScale(boundingBox.min.X, boundingBox.min.Y),
+			Size = UDim2.fromScale(boundingBox.max.X - boundingBox.min.X, boundingBox.max.Y - boundingBox.min.Y),
+			BackgroundColor3 = Color3.fromRGB(20, 0, 255 * v.hitRate)
+		})
+
+		local v13 = #v.convexHull
+
+		for v14, v15 in v.convexHull do
+			t1[#t1 + 1] = React.createElement("Frame", {
+				BackgroundTransparency = 0.2,
+				Position = UDim2.new(v15.X, -2, v15.Y, -2),
+				Size = UDim2.fromOffset(4, 4),
+				BackgroundColor3 = Color3.fromHSV(v14 / v13, 1, 0.65)
+			})
+		end
+	end
+
+	for _, v in pairs(p1.props.identifiedAds) do
+		local boundingBox = v.boundingBox
+
+		t1[#t1 + 1] = React.createElement("Frame", {
+			BackgroundTransparency = 0.8,
+			Position = UDim2.fromScale(boundingBox.min.X, boundingBox.min.Y),
+			Size = UDim2.fromScale(boundingBox.max.X - boundingBox.min.X, boundingBox.max.Y - boundingBox.min.Y),
+			BackgroundColor3 = Color3.fromRGB(20, 0, 255)
+		})
+
+		for _, v20 in v.visibleRegions do
+			local v21 = #v20.convexHull
+
+			for v22, v23 in v20.convexHull do
+				t1[#t1 + 1] = React.createElement("Frame", {
+					BackgroundTransparency = 0.2,
+					Position = UDim2.new(v23.X, -2, v23.Y, -2),
+					Size = UDim2.fromOffset(4, 4),
+					BackgroundColor3 = Color3.fromHSV(v22 / v21, 1, 0.65)
+				})
+			end
+		end
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 0.9,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = p1.props.ZIndex
+	}, t1)
+end
+
+return v7

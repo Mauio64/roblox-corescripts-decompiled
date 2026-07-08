@@ -1,4 +1,4 @@
 return {
-    inviteToSquad = require(script.inviteToSquad), 
-    CreateExperienceInvite = require(script.CreateExperienceInvite)
-};
+	inviteToSquad = require(script.inviteToSquad),
+	CreateExperienceInvite = require(script.CreateExperienceInvite)
+}

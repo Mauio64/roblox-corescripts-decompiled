@@ -1,63 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("StreamNotifications");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_FFlagStreamNotificationUXDropdown_0 = require(l_Parent_0.SharedFlags).FFlagStreamNotificationUXDropdown;
-local l_ixpHelper_0 = require(l_Parent_0.NotificationsCommon).ixpHelper;
-local v4 = require(l_script_FirstAncestor_0.constants);
-local v5 = game:DefineFastString("StreamNotificationUXExposureLayer", "Notifications.StreamNotificationUXExposure");
-local v6 = game:DefineFastString("StreamNotificationUXDropdownVariant", "enableStreamDropdown");
-local function _() --[[ Line: 20 ]] --[[ Name: getIsLargeScreen ]]
-    -- upvalues: v4 (copy)
-    local l_CurrentCamera_0 = workspace.CurrentCamera;
-    local v8 = false;
-    if l_CurrentCamera_0 ~= nil then
-        v8 = l_CurrentCamera_0.ViewportSize.X >= v4.Modal.WidthLimit;
-    end;
-    return v8;
-end;
-local function _() --[[ Line: 25 ]] --[[ Name: getIsUserInTreatment ]]
-    -- upvalues: l_ixpHelper_0 (copy), v5 (copy), v6 (copy)
-    local v10 = l_ixpHelper_0.getIxpLayerData(v5);
-    if v10 and v10[v6] ~= nil then
-        return v10[v6] == true;
-    else
-        return false;
-    end;
-end;
+local StreamNotifications = script:FindFirstAncestor("StreamNotifications")
+local StreamNotificationsParent = StreamNotifications.Parent
+local FFlagStreamNotificationUXDropdown = require(StreamNotificationsParent.SharedFlags).FFlagStreamNotificationUXDropdown
+local ixpHelper = require(StreamNotificationsParent.NotificationsCommon).ixpHelper
+local constants = require(StreamNotifications.constants)
+local v6 = game:DefineFastString("StreamNotificationUXExposureLayer", "Notifications.StreamNotificationUXExposure")
+local v7 = game:DefineFastString("StreamNotificationUXDropdownVariant", "enableStreamDropdown")
+
+local function getIsLargeScreen() -- line: 20
+	-- upvalues: constants (copy)
+	local CurrentCamera = workspace.CurrentCamera
+
+	return CurrentCamera ~= nil and CurrentCamera.ViewportSize.X >= constants.Modal.WidthLimit
+end
+local function getIsUserInTreatment() -- line: 25
+	-- upvalues: ixpHelper (copy), v6 (copy), v7 (copy)
+	local v11 = ixpHelper.getIxpLayerData(v6)
+
+	if v11 and v11[v7] ~= nil then
+		return v11[v7] == true
+	end
+
+	return false
+end
+
 return {
-    getDropdownEnabled = function() --[[ Line: 36 ]] --[[ Name: getDropdownEnabled ]]
-        -- upvalues: l_FFlagStreamNotificationUXDropdown_0 (copy), v4 (copy), l_ixpHelper_0 (copy), v5 (copy), v6 (copy)
-        local l_l_FFlagStreamNotificationUXDropdown_0_0 = l_FFlagStreamNotificationUXDropdown_0;
-        if l_l_FFlagStreamNotificationUXDropdown_0_0 then
-            local l_CurrentCamera_1 = workspace.CurrentCamera;
-            l_l_FFlagStreamNotificationUXDropdown_0_0 = false;
-            if l_CurrentCamera_1 ~= nil then
-                l_l_FFlagStreamNotificationUXDropdown_0_0 = l_CurrentCamera_1.ViewportSize.X >= v4.Modal.WidthLimit;
-            end;
-            if l_l_FFlagStreamNotificationUXDropdown_0_0 then
-                l_CurrentCamera_1 = l_ixpHelper_0.getIxpLayerData(v5);
-                if l_CurrentCamera_1 and l_CurrentCamera_1[v6] ~= nil then
-                    return l_CurrentCamera_1[v6] == true;
-                else
-                    l_l_FFlagStreamNotificationUXDropdown_0_0 = false;
-                end;
-            end;
-        end;
-        return l_l_FFlagStreamNotificationUXDropdown_0_0;
-    end, 
-    logExposure = function() --[[ Line: 43 ]] --[[ Name: logExposure ]]
-        -- upvalues: l_FFlagStreamNotificationUXDropdown_0 (copy), v4 (copy), l_ixpHelper_0 (copy), v5 (copy), v6 (copy)
-        if l_FFlagStreamNotificationUXDropdown_0 then
-            local l_CurrentCamera_2 = workspace.CurrentCamera;
-            local v15 = false;
-            if l_CurrentCamera_2 ~= nil then
-                v15 = l_CurrentCamera_2.ViewportSize.X >= v4.Modal.WidthLimit;
-            end;
-            if v15 then
-                v15 = l_ixpHelper_0.getIxpLayerData(v5);
-                if v15 and v15[v6] ~= nil then
-                    l_ixpHelper_0.logUserLayerExposure(v5);
-                end;
-            end;
-        end;
-    end
-};
+	getDropdownEnabled = function() -- line: 36
+		-- upvalues: FFlagStreamNotificationUXDropdown (copy), constants (copy), ixpHelper (copy), v6 (copy), v7 (copy)
+		local v12 = FFlagStreamNotificationUXDropdown
+
+		if v12 then
+			local CurrentCamera = workspace.CurrentCamera
+
+			v12 = CurrentCamera ~= nil and CurrentCamera.ViewportSize.X >= constants.Modal.WidthLimit
+
+			if v12 then
+				local v14 = ixpHelper.getIxpLayerData(v6)
+
+				if v14 and v14[v7] ~= nil then
+					return v14[v7] == true
+				end
+
+				v12 = false
+			end
+		end
+
+		return v12
+	end,
+	logExposure = function() -- line: 43
+		-- upvalues: FFlagStreamNotificationUXDropdown (copy), constants (copy), ixpHelper (copy), v6 (copy), v7 (copy)
+		if FFlagStreamNotificationUXDropdown then
+			local CurrentCamera = workspace.CurrentCamera
+
+			if CurrentCamera ~= nil and CurrentCamera.ViewportSize.X >= constants.Modal.WidthLimit then
+				local v16 = ixpHelper.getIxpLayerData(v6)
+
+				if v16 and v16[v7] ~= nil then
+					ixpHelper.logUserLayerExposure(v6)
+				end
+			end
+		end
+	end
+}

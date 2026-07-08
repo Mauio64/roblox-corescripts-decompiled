@@ -1,1 +1,1 @@
-return require(script.BlockingUtility);
+return require(script.BlockingUtility)

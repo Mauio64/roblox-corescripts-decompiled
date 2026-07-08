@@ -1,46 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.UIBlox);
-local l_useLocalization_0 = require(l_script_FirstAncestor_0.Parent.Localization).Hooks.useLocalization;
-local v4 = require(l_script_FirstAncestor_0.Common.formatNumberWithShortUnits);
-local _ = require(l_script_FirstAncestor_0.Parent.VirtualEventsState);
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v2.App.ImageSet.Images;
-local l_StyledTextLabel_0 = v2.App.Text.StyledTextLabel;
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local v10 = l_Images_0["icons/status/games/people-playing_small"];
-local v11 = UDim.new(0, 6);
-return function(v12) --[[ Line: 25 ]] --[[ Name: AttendanceCount ]]
-    -- upvalues: l_useStyle_0 (copy), l_useLocalization_0 (copy), v1 (copy), v11 (copy), l_ImageSetLabel_0 (copy), v10 (copy), l_StyledTextLabel_0 (copy), v4 (copy)
-    local v13 = l_useStyle_0();
-    local v14 = l_useLocalization_0({
-        interested = "Feature.VirtualEvents.AttendanceBeforeEvent", 
-        attendingNow = "Feature.VirtualEvents.AttendanceDuringEvent"
-    });
-    local v15 = v12.eventStatus == "Ongoing";
-    return v1.createElement("Frame", {
-        LayoutOrder = v12.layoutOrder, 
-        BackgroundTransparency = 1, 
-        AutomaticSize = Enum.AutomaticSize.XY
-    }, {
-        Layout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            Padding = v11
-        }), 
-        Icon = v1.createElement(l_ImageSetLabel_0, {
-            LayoutOrder = 1, 
-            Size = UDim2.fromOffset(18, 18), 
-            Image = v10, 
-            ImageColor3 = v13.Theme.IconEmphasis.Color, 
-            BackgroundTransparency = 1
-        }), 
-        Label = v1.createElement(l_StyledTextLabel_0, {
-            layoutOrder = 2, 
-            fontStyle = v13.Font.Header1, 
-            colorStyle = v13.Theme.TextEmphasis, 
-            text = ("%s %s"):format(v4(if v15 then v12.attending else v12.interested), if v15 then v14.attendingNow else v14.interested)
-        })
-    });
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local React = require(VirtualEvents.Parent.React)
+local UIBlox = require(VirtualEvents.Parent.UIBlox)
+local useLocalization = require(VirtualEvents.Parent.Localization).Hooks.useLocalization
+local formatNumberWithShortUnits = require(VirtualEvents.Common.formatNumberWithShortUnits)
+
+require(VirtualEvents.Parent.VirtualEventsState)
+
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local useStyle = UIBlox.Core.Style.useStyle
+local v10 = Images["icons/status/games/people-playing_small"]
+local uDim = UDim.new(0, 6)
+
+local function AttendanceCount(t1: {[any]: any}) -- line: 25
+	-- upvalues: useStyle (copy), useLocalization (copy), React (copy), uDim (copy), ImageSetLabel (copy), v10 (copy), StyledTextLabel (copy), formatNumberWithShortUnits (copy)
+	local v14 = useStyle()
+	local v15 = useLocalization({
+		interested = "Feature.VirtualEvents.AttendanceBeforeEvent",
+		attendingNow = "Feature.VirtualEvents.AttendanceDuringEvent"
+	})
+	local v16 = t1.eventStatus == "Ongoing"
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = t1.layoutOrder,
+		AutomaticSize = Enum.AutomaticSize.XY
+	}, {
+		Layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = uDim
+		}),
+		Icon = React.createElement(ImageSetLabel, {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.fromOffset(18, 18),
+			Image = v10,
+			ImageColor3 = v14.Theme.IconEmphasis.Color
+		}),
+		Label = React.createElement(StyledTextLabel, {
+			layoutOrder = 2,
+			fontStyle = v14.Font.Header1,
+			colorStyle = v14.Theme.TextEmphasis,
+			text = ("%s %s"):format(formatNumberWithShortUnits(if not v16 then t1.interested else t1.attending), if not v16 then v15.interested else v15.attendingNow)
+		})
+	})
+end
+
+return AttendanceCount

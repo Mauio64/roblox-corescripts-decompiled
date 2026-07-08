@@ -1,4 +1,5 @@
-game:DefineFastInt("CurrencyTransferDeveloperCommissionRate", 10);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("CurrencyTransferDeveloperCommissionRate");
-end;
+game:DefineFastInt("CurrencyTransferDeveloperCommissionRate", 10)
+
+return function() -- line: 3
+	return game:GetFastInt("CurrencyTransferDeveloperCommissionRate")
+end

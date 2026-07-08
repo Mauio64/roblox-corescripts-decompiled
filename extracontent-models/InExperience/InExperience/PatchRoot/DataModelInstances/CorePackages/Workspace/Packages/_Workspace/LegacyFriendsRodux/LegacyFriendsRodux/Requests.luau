@@ -1,3 +1,3 @@
 return {
-    UsersGetFriendCount = require(script.UsersGetFriendCount)
-};
+	UsersGetFriendCount = require(script.UsersGetFriendCount)
+}

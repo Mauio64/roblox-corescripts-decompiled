@@ -1,8 +1,10 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Actions.SetCurrentPage);
-local v2 = require(l_Parent_0.Components.Pages);
-return function(v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4 = v3:getState();
-    v3:dispatch(v1(v2.pagesByKey[v4.menuPage].parentPage));
-end;
+local ParentParent = script.Parent.Parent
+local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
+local Pages = require(ParentParent.Components.Pages)
+
+return function(p1) -- line: 5
+	-- upvalues: SetCurrentPage (copy), Pages (copy)
+	local v5 = p1:getState()
+
+	p1:dispatch(SetCurrentPage(Pages.pagesByKey[v5.menuPage].parentPage))
+end

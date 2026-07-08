@@ -1,29 +1,48 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("IAPExperience");
-local v1 = require(l_script_FirstAncestor_0.Enums.CheckUserPurchaseSettingsFailureReason);
-local v2 = require(l_script_FirstAncestor_0.Enums.EconomicRestrictionsViolationType);
-return function(v3) --[[ Line: 7 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    if v3 == v1.Chargeback then
-        return v2.Chargeback;
-    elseif v3 == v1.AbuseOfAffiliateSystem then
-        return v2.AbuseOfAffiliateSystem;
-    elseif v3 == v1.AttemptedUnauthorizedPaymentMethodUse then
-        return v2.AttemptedUnauthorizedPaymentMethodUse;
-    elseif v3 == v1.PaymentAuthorizationAttempt then
-        return v2.PaymentAuthorizationAttempt;
-    elseif v3 == v1.RepeatedRefundRequests then
-        return v2.RepeatedRefundRequests;
-    elseif v3 == v1.SuspiciousAccountPatterns then
-        return v2.SuspiciousAccountPatterns;
-    elseif v3 == v1.SuspiciousRefundRequests then
-        return v2.SuspiciousRefundRequests;
-    elseif v3 == v1.UnauthorizedPurchase then
-        return v2.UnauthorizedPurchase;
-    elseif v3 == v1.UseOfUnauthorizedOffPlatformTransactions then
-        return v2.UseOfUnauthorizedOffPlatformTransactions;
-    elseif v3 == v1.VirtualEconomyAbuse then
-        return v2.VirtualEconomyAbuse;
-    else
-        return v2.None;
-    end;
-end;
+local IAPExperience = script:FindFirstAncestor("IAPExperience")
+local CheckUserPurchaseSettingsFailureReason = require(IAPExperience.Enums.CheckUserPurchaseSettingsFailureReason)
+local EconomicRestrictionsViolationType = require(IAPExperience.Enums.EconomicRestrictionsViolationType)
+
+return function(p1) -- line: 7
+	-- upvalues: CheckUserPurchaseSettingsFailureReason (copy), EconomicRestrictionsViolationType (copy)
+	if p1 == CheckUserPurchaseSettingsFailureReason.Chargeback then
+		return EconomicRestrictionsViolationType.Chargeback
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.AbuseOfAffiliateSystem then
+		return EconomicRestrictionsViolationType.AbuseOfAffiliateSystem
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.AttemptedUnauthorizedPaymentMethodUse then
+		return EconomicRestrictionsViolationType.AttemptedUnauthorizedPaymentMethodUse
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.PaymentAuthorizationAttempt then
+		return EconomicRestrictionsViolationType.PaymentAuthorizationAttempt
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.RepeatedRefundRequests then
+		return EconomicRestrictionsViolationType.RepeatedRefundRequests
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.SuspiciousAccountPatterns then
+		return EconomicRestrictionsViolationType.SuspiciousAccountPatterns
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.SuspiciousRefundRequests then
+		return EconomicRestrictionsViolationType.SuspiciousRefundRequests
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.UnauthorizedPurchase then
+		return EconomicRestrictionsViolationType.UnauthorizedPurchase
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.UseOfUnauthorizedOffPlatformTransactions then
+		return EconomicRestrictionsViolationType.UseOfUnauthorizedOffPlatformTransactions
+	end
+
+	if p1 == CheckUserPurchaseSettingsFailureReason.VirtualEconomyAbuse then
+		return EconomicRestrictionsViolationType.VirtualEconomyAbuse
+	end
+
+	return EconomicRestrictionsViolationType.None
+end

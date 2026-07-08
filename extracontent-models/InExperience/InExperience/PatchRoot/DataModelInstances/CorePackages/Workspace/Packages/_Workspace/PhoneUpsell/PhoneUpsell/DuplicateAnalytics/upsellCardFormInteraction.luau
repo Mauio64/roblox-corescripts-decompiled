@@ -1,18 +1,21 @@
-return function(v0, v1, v2, v3, v4, v5, v6) --[[ Line: 8 ]]
-    assert(type(v1) == "string", "Expected eventContext to be a string");
-    assert(type(v2) == "string", "Expected field to be a string");
-    assert(type(v3) == "string", "Expected actionType to be a string");
-    if v4 ~= nil then
-        assert(type(v4) == "string", "Expected origin to be a string");
-    end;
-    if v5 ~= nil then
-        assert(type(v5) == "string", "Expected btn to be a string");
-    end;
-    v0:setRBXEventStream(v1, "formInteraction", {
-        field = v2, 
-        aType = v3, 
-        origin = v4, 
-        btn = v5, 
-        section = v6
-    });
-end;
+return function(p1, p2, p3, p4, p5, p6, p7) -- line: 8
+	assert(type(p2) == "string", "Expected eventContext to be a string")
+	assert(type(p3) == "string", "Expected field to be a string")
+	assert(type(p4) == "string", "Expected actionType to be a string")
+
+	if p5 ~= nil then
+		assert(type(p5) == "string", "Expected origin to be a string")
+	end
+
+	if p6 ~= nil then
+		assert(type(p6) == "string", "Expected btn to be a string")
+	end
+
+	p1:setRBXEventStream(p2, "formInteraction", {
+		field = p3,
+		aType = p4,
+		origin = p5,
+		btn = p6,
+		section = p7
+	})
+end

@@ -1,435 +1,472 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local l_HttpService_0 = game:GetService("HttpService");
-local _ = require(script.Parent.ast);
-local l_visit_0 = require(script.Parent.visitor).visit;
-local l_printBlockString_0 = require(script.Parent.blockString).printBlockString;
-local v6 = nil;
-local v7 = nil;
-local v8 = nil;
-local v9 = nil;
-local v10 = nil;
-local v11 = nil;
-local v12 = nil;
-local v13 = nil;
-local function v15(v14) --[[ Line: 75 ]] --[[ Name: print_ ]]
-    -- upvalues: l_visit_0 (copy), v6 (ref)
-    return l_visit_0(v14, {
-        leave = v6
-    });
-end;
-v7 = function(v16) --[[ Line: 83 ]] --[[ Name: addDescription ]]
-    -- upvalues: v8 (ref)
-    return function(_, v18) --[[ Line: 85 ]]
-        -- upvalues: v8 (ref), v16 (copy)
-        return v8({
-            v18.description, 
-            v16(v18)
-        }, "\n");
-    end;
-end;
-v6 = {
-    Name = function(_, v20) --[[ Line: 92 ]] --[[ Name: Name ]]
-        return v20.value;
-    end, 
-    Variable = function(_, v22) --[[ Line: 96 ]] --[[ Name: Variable ]]
-        return "$" .. tostring(v22.name);
-    end, 
-    Document = function(_, v24) --[[ Line: 102 ]] --[[ Name: Document ]]
-        -- upvalues: v8 (ref)
-        return v8(v24.definitions, "\n\n") .. "\n";
-    end, 
-    OperationDefinition = function(_, v26) --[[ Line: 106 ]] --[[ Name: OperationDefinition ]]
-        -- upvalues: v10 (ref), v8 (ref)
-        local l_operation_0 = v26.operation;
-        local l_name_0 = v26.name;
-        local v29 = v10("(", v8(v26.variableDefinitions, ", "), ")");
-        local v30 = v8(v26.directives, " ");
-        local l_selectionSet_0 = v26.selectionSet;
-        if not l_name_0 and (not v30 or v30 == "") and (not v29 or v29 == "") and l_operation_0 == "query" then
-            return l_selectionSet_0;
-        else
-            return v8({
-                l_operation_0, 
-                v8({
-                    l_name_0, 
-                    v29
-                }), 
-                v30, 
-                l_selectionSet_0
-            }, " ");
-        end;
-    end, 
-    VariableDefinition = function(_, v33) --[[ Line: 131 ]] --[[ Name: VariableDefinition ]]
-        -- upvalues: v10 (ref), v8 (ref)
-        local l_variable_0 = v33.variable;
-        local l_type_0 = v33.type;
-        local l_defaultValue_0 = v33.defaultValue;
-        local l_directives_0 = v33.directives;
-        return tostring(l_variable_0) .. ": " .. tostring(l_type_0) .. v10(" = ", l_defaultValue_0) .. v10(" ", v8(l_directives_0, " "));
-    end, 
-    SelectionSet = function(_, v39) --[[ Line: 143 ]] --[[ Name: SelectionSet ]]
-        -- upvalues: v9 (ref)
-        return v9(v39.selections);
-    end, 
-    Field = function(_, v41) --[[ Line: 147 ]] --[[ Name: Field ]]
-        -- upvalues: v10 (ref), v8 (ref), v11 (ref)
-        local l_alias_0 = v41.alias;
-        local l_name_1 = v41.name;
-        local l_arguments_0 = v41.arguments;
-        local l_directives_1 = v41.directives;
-        local l_selectionSet_1 = v41.selectionSet;
-        local v47 = v10("", l_alias_0, ": ") .. tostring(l_name_1);
-        local v48 = v47 .. v10("(", v8(l_arguments_0, ", "), ")");
-        local v49 = utf8.len(v48);
-        assert(v49 ~= nil, "invalid utf8 string");
-        if v49 > 80 then
-            v48 = v47 .. v10("(\n", v11(v8(l_arguments_0, "\n")), "\n)");
-        end;
-        return v8({
-            v48, 
-            v8(l_directives_1, " "), 
-            l_selectionSet_1
-        }, " ");
-    end, 
-    Argument = function(_, v51) --[[ Line: 168 ]] --[[ Name: Argument ]]
-        local l_name_2 = v51.name;
-        local l_value_0 = v51.value;
-        return tostring(l_name_2) .. ": " .. tostring(l_value_0);
-    end, 
-    FragmentSpread = function(_, v55) --[[ Line: 176 ]] --[[ Name: FragmentSpread ]]
-        -- upvalues: v10 (ref), v8 (ref)
-        local l_name_3 = v55.name;
-        local l_directives_2 = v55.directives;
-        return "..." .. tostring(l_name_3) .. v10(" ", v8(l_directives_2, " "));
-    end, 
-    InlineFragment = function(_, v59) --[[ Line: 182 ]] --[[ Name: InlineFragment ]]
-        -- upvalues: v8 (ref), v10 (ref)
-        local l_typeCondition_0 = v59.typeCondition;
-        local l_directives_3 = v59.directives;
-        local l_selectionSet_2 = v59.selectionSet;
-        return v8({
-            "...", 
-            v10("on ", l_typeCondition_0), 
-            v8(l_directives_3, " "), 
-            l_selectionSet_2
-        }, " ");
-    end, 
-    FragmentDefinition = function(_, v64) --[[ Line: 193 ]] --[[ Name: FragmentDefinition ]]
-        -- upvalues: v10 (ref), v8 (ref)
-        local l_name_4 = v64.name;
-        local l_typeCondition_1 = v64.typeCondition;
-        local l_variableDefinitions_0 = v64.variableDefinitions;
-        local l_directives_4 = v64.directives;
-        local l_selectionSet_3 = v64.selectionSet;
-        return "fragment " .. tostring(l_name_4) .. v10("(", v8(l_variableDefinitions_0, ", "), ")") .. " " .. "on " .. tostring(l_typeCondition_1) .. " " .. v10("", v8(l_directives_4, " "), " ") .. tostring(l_selectionSet_3);
-    end, 
-    IntValue = function(_, v71) --[[ Line: 216 ]] --[[ Name: IntValue ]]
-        return v71.value;
-    end, 
-    FloatValue = function(_, v73) --[[ Line: 220 ]] --[[ Name: FloatValue ]]
-        return v73.value;
-    end, 
-    StringValue = function(_, v75, v76) --[[ Line: 224 ]] --[[ Name: StringValue ]]
-        -- upvalues: l_printBlockString_0 (copy), l_HttpService_0 (copy)
-        local l_value_1 = v75.value;
-        if v75.block then
-            return (l_printBlockString_0(l_value_1, v76 == "description" and "" or "  "));
-        else
-            return (l_HttpService_0:JSONEncode(l_value_1));
-        end;
-    end, 
-    BooleanValue = function(_, v79) --[[ Line: 231 ]] --[[ Name: BooleanValue ]]
-        if v79.value then
-            return "true";
-        else
-            return "false";
-        end;
-    end, 
-    NullValue = function(_, _) --[[ Line: 239 ]] --[[ Name: NullValue ]]
-        return "null";
-    end, 
-    EnumValue = function(_, v83) --[[ Line: 242 ]] --[[ Name: EnumValue ]]
-        return v83.value;
-    end, 
-    ListValue = function(_, v85) --[[ Line: 246 ]] --[[ Name: ListValue ]]
-        -- upvalues: v8 (ref)
-        local l_values_0 = v85.values;
-        return "[" .. v8(l_values_0, ", ") .. "]";
-    end, 
-    ObjectValue = function(_, v88) --[[ Line: 250 ]] --[[ Name: ObjectValue ]]
-        -- upvalues: v8 (ref)
-        local l_fields_0 = v88.fields;
-        return "{" .. v8(l_fields_0, ", ") .. "}";
-    end, 
-    ObjectField = function(_, v91) --[[ Line: 254 ]] --[[ Name: ObjectField ]]
-        return v91.name .. ": " .. v91.value;
-    end, 
-    Directive = function(_, v93) --[[ Line: 262 ]] --[[ Name: Directive ]]
-        -- upvalues: v10 (ref), v8 (ref)
-        local l_name_5 = v93.name;
-        local l_arguments_1 = v93.arguments;
-        return "@" .. tostring(l_name_5) .. v10("(", v8(l_arguments_1, ", "), ")");
-    end, 
-    NamedType = function(_, v97) --[[ Line: 270 ]] --[[ Name: NamedType ]]
-        return v97.name;
-    end, 
-    ListType = function(_, v99) --[[ Line: 274 ]] --[[ Name: ListType ]]
-        return "[" .. tostring(v99.type) .. "]";
-    end, 
-    NonNullType = function(_, v101) --[[ Line: 278 ]] --[[ Name: NonNullType ]]
-        return tostring(v101.type) .. "!";
-    end, 
-    SchemaDefinition = v7(function(v102) --[[ Line: 286 ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_directives_5 = v102.directives;
-        local l_operationTypes_0 = v102.operationTypes;
-        return v8({
-            "schema", 
-            v8(l_directives_5, " "), 
-            v9(l_operationTypes_0)
-        }, " ");
-    end), 
-    OperationTypeDefinition = function(_, v106) --[[ Line: 293 ]] --[[ Name: OperationTypeDefinition ]]
-        local l_operation_1 = v106.operation;
-        local l_type_1 = v106.type;
-        return tostring(l_operation_1) .. ": " .. tostring(l_type_1);
-    end, 
-    ScalarTypeDefinition = v7(function(v109) --[[ Line: 299 ]]
-        -- upvalues: v8 (ref)
-        local l_name_6 = v109.name;
-        local l_directives_6 = v109.directives;
-        return v8({
-            "scalar", 
-            l_name_6, 
-            v8(l_directives_6, " ")
-        }, " ");
-    end), 
-    ObjectTypeDefinition = v7(function(v112) --[[ Line: 306 ]]
-        -- upvalues: v8 (ref), v10 (ref), v9 (ref)
-        local l_name_7 = v112.name;
-        local l_interfaces_0 = v112.interfaces;
-        local l_directives_7 = v112.directives;
-        local l_fields_1 = v112.fields;
-        return v8({
-            "type", 
-            l_name_7, 
-            v10("implements ", v8(l_interfaces_0, " & ")), 
-            v8(l_directives_7, " "), 
-            v9(l_fields_1)
-        }, " ");
-    end), 
-    FieldDefinition = v7(function(v117) --[[ Line: 320 ]]
-        -- upvalues: v13 (ref), v10 (ref), v11 (ref), v8 (ref)
-        local l_name_8 = v117.name;
-        local l_arguments_2 = v117.arguments;
-        local l_type_2 = v117.type;
-        local l_directives_8 = v117.directives;
-        return tostring(l_name_8) .. (if v13(l_arguments_2) then v10("(\n", v11(v8(l_arguments_2, "\n")), "\n)") else v10("(", v8(l_arguments_2, ", "), ")")) .. ": " .. tostring(l_type_2) .. v10(" ", v8(l_directives_8, " "));
-    end), 
-    InputValueDefinition = v7(function(v122) --[[ Line: 334 ]]
-        -- upvalues: v8 (ref), v10 (ref)
-        local l_name_9 = v122.name;
-        local l_type_3 = v122.type;
-        local l_defaultValue_1 = v122.defaultValue;
-        local l_directives_9 = v122.directives;
-        return v8({
-            tostring(l_name_9) .. ": " .. tostring(l_type_3), 
-            v10("= ", l_defaultValue_1), 
-            v8(l_directives_9, " ")
-        }, " ");
-    end), 
-    InterfaceTypeDefinition = v7(function(v127) --[[ Line: 346 ]]
-        -- upvalues: v8 (ref), v10 (ref), v9 (ref)
-        local l_name_10 = v127.name;
-        local l_interfaces_1 = v127.interfaces;
-        local l_directives_10 = v127.directives;
-        local l_fields_2 = v127.fields;
-        return v8({
-            "interface", 
-            l_name_10, 
-            v10("implements ", v8(l_interfaces_1, " & ")), 
-            v8(l_directives_10, " "), 
-            v9(l_fields_2)
-        }, " ");
-    end), 
-    UnionTypeDefinition = v7(function(v132) --[[ Line: 361 ]]
-        -- upvalues: v8 (ref)
-        local l_name_11 = v132.name;
-        local l_directives_11 = v132.directives;
-        local l_types_0 = v132.types;
-        return v8({
-            "union", 
-            l_name_11, 
-            v8(l_directives_11, " "), 
-            if l_types_0 and #l_types_0 ~= 0 then "= " .. v8(l_types_0, " | ") else ""
-        }, " ");
-    end), 
-    EnumTypeDefinition = v7(function(v136) --[[ Line: 374 ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_name_12 = v136.name;
-        local l_directives_12 = v136.directives;
-        local l_values_1 = v136.values;
-        return v8({
-            "enum", 
-            l_name_12, 
-            v8(l_directives_12, " "), 
-            v9(l_values_1)
-        }, " ");
-    end), 
-    EnumValueDefinition = v7(function(v140) --[[ Line: 387 ]]
-        -- upvalues: v8 (ref)
-        local l_name_13 = v140.name;
-        local l_directives_13 = v140.directives;
-        return v8({
-            l_name_13, 
-            v8(l_directives_13, " ")
-        }, " ");
-    end), 
-    InputObjectTypeDefinition = v7(function(v143) --[[ Line: 397 ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_name_14 = v143.name;
-        local l_directives_14 = v143.directives;
-        local l_fields_3 = v143.fields;
-        return v8({
-            "input", 
-            l_name_14, 
-            v8(l_directives_14, " "), 
-            v9(l_fields_3)
-        }, " ");
-    end), 
-    DirectiveDefinition = v7(function(v147) --[[ Line: 410 ]]
-        -- upvalues: v13 (ref), v10 (ref), v11 (ref), v8 (ref)
-        local l_name_15 = v147.name;
-        local l_arguments_3 = v147.arguments;
-        local l_repeatable_0 = v147.repeatable;
-        local l_locations_0 = v147.locations;
-        return "directive @" .. tostring(l_name_15) .. (if v13(l_arguments_3) then v10("(\n", v11(v8(l_arguments_3, "\n")), "\n)") else v10("(", v8(l_arguments_3, ", "), ")")) .. (l_repeatable_0 and " repeatable" or "") .. " on " .. v8(l_locations_0, " | ");
-    end), 
-    SchemaExtension = function(_, v153) --[[ Line: 425 ]] --[[ Name: SchemaExtension ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_directives_15 = v153.directives;
-        local l_operationTypes_1 = v153.operationTypes;
-        return v8({
-            "extend schema", 
-            v8(l_directives_15, " "), 
-            v9(l_operationTypes_1)
-        }, " ");
-    end, 
-    ScalarTypeExtension = function(_, v157) --[[ Line: 436 ]] --[[ Name: ScalarTypeExtension ]]
-        -- upvalues: v8 (ref)
-        local l_name_16 = v157.name;
-        local l_directives_16 = v157.directives;
-        return v8({
-            "extend scalar", 
-            l_name_16, 
-            v8(l_directives_16, " ")
-        }, " ");
-    end, 
-    ObjectTypeExtension = function(_, v161) --[[ Line: 447 ]] --[[ Name: ObjectTypeExtension ]]
-        -- upvalues: v8 (ref), v10 (ref), v9 (ref)
-        local l_name_17 = v161.name;
-        local l_interfaces_2 = v161.interfaces;
-        local l_directives_17 = v161.directives;
-        local l_fields_4 = v161.fields;
-        return v8({
-            "extend type", 
-            l_name_17, 
-            v10("implements ", v8(l_interfaces_2, " & ")), 
-            v8(l_directives_17, " "), 
-            v9(l_fields_4)
-        }, " ");
-    end, 
-    InterfaceTypeExtension = function(_, v167) --[[ Line: 462 ]] --[[ Name: InterfaceTypeExtension ]]
-        -- upvalues: v8 (ref), v10 (ref), v9 (ref)
-        local l_name_18 = v167.name;
-        local l_interfaces_3 = v167.interfaces;
-        local l_directives_18 = v167.directives;
-        local l_fields_5 = v167.fields;
-        return v8({
-            "extend interface", 
-            l_name_18, 
-            v10("implements ", v8(l_interfaces_3, " & ")), 
-            v8(l_directives_18, " "), 
-            v9(l_fields_5)
-        }, " ");
-    end, 
-    UnionTypeExtension = function(_, v173) --[[ Line: 477 ]] --[[ Name: UnionTypeExtension ]]
-        -- upvalues: v8 (ref)
-        local l_name_19 = v173.name;
-        local l_directives_19 = v173.directives;
-        local l_types_1 = v173.types;
-        return v8({
-            "extend union", 
-            l_name_19, 
-            v8(l_directives_19, " "), 
-            if l_types_1 and #l_types_1 ~= 0 then "= " .. v8(l_types_1, " | ") else ""
-        }, " ");
-    end, 
-    EnumTypeExtension = function(_, v178) --[[ Line: 490 ]] --[[ Name: EnumTypeExtension ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_name_20 = v178.name;
-        local l_directives_20 = v178.directives;
-        local l_values_2 = v178.values;
-        return v8({
-            "extend enum", 
-            l_name_20, 
-            v8(l_directives_20, " "), 
-            v9(l_values_2)
-        }, " ");
-    end, 
-    InputObjectTypeExtension = function(_, v183) --[[ Line: 503 ]] --[[ Name: InputObjectTypeExtension ]]
-        -- upvalues: v8 (ref), v9 (ref)
-        local l_name_21 = v183.name;
-        local l_directives_21 = v183.directives;
-        local l_fields_6 = v183.fields;
-        return v8({
-            "extend input", 
-            l_name_21, 
-            v8(l_directives_21, " "), 
-            v9(l_fields_6)
-        }, " ");
-    end
-};
-v8 = function(v187, v188) --[[ Line: 521 ]] --[[ Name: join ]]
-    -- upvalues: l_Array_0 (copy)
-    v188 = v188 or "";
-    if v187 then
-        return l_Array_0.join(l_Array_0.filter(v187, function(v189) --[[ Line: 525 ]]
-            return tostring(v189) and v189 ~= "";
-        end), v188);
-    else
-        return "";
-    end;
-end;
-v9 = function(v190) --[[ Line: 539 ]] --[[ Name: block ]]
-    -- upvalues: v10 (ref), v11 (ref), v8 (ref)
-    return v10("{\n", v11(v8(v190, "\n")), "\n}");
-end;
-v10 = function(v191, v192, v193) --[[ Line: 546 ]] --[[ Name: wrap ]]
-    v193 = v193 or "";
-    if v192 ~= nil and v192 ~= "" then
-        return v191 .. tostring(v192) .. tostring(v193);
-    else
-        return "";
-    end;
-end;
-v11 = function(v194) --[[ Line: 556 ]] --[[ Name: indent ]]
-    -- upvalues: v10 (ref)
-    local v195 = v194:gsub("\n", "\n  ");
-    return v10("  ", v195);
-end;
-v12 = function(v196) --[[ Line: 563 ]] --[[ Name: isMultiline ]]
-    return string.find(tostring(v196), "\n") ~= nil;
-end;
-v13 = function(v197) --[[ Line: 567 ]] --[[ Name: hasMultilineItems ]]
-    -- upvalues: l_Array_0 (copy), v12 (ref)
-    local v198 = false;
-    if v197 ~= nil then
-        v198 = l_Array_0.some(v197, v12);
-    end;
-    return v198;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Array = require(ParentParent.LuauPolyfill).Array
+local HttpService = game:GetService("HttpService")
+
+require(script.Parent.ast)
+
+local visit = require(script.Parent.visitor).visit
+local printBlockString = require(script.Parent.blockString).printBlockString
+local t4 = nil
+local join = nil
+local block = nil
+local wrap = nil
+local indent = nil
+local hasMultilineItems = nil
+
+local function print_(p1) -- line: 75
+	-- upvalues: visit (copy), t4 (ref)
+	return visit(p1, {
+		leave = t4
+	})
+end
+local function addDescription(p2) -- line: 83
+	-- upvalues: join (ref)
+	return function(_, p4) -- line: 85
+		-- upvalues: join (ref), p2 (copy)
+		return join({
+			p4.description,
+			p2(p4)
+		}, "\n")
+	end
+end
+
+t4 = {
+	Name = function(_, p6) -- line: 92
+		return p6.value
+	end,
+	Variable = function(_, p8) -- line: 96
+		return "$" .. tostring(p8.name)
+	end,
+	Document = function(_, p10) -- line: 102
+		-- upvalues: join (ref)
+		return join(p10.definitions, "\n\n") .. "\n"
+	end,
+	OperationDefinition = function(_, p12) -- line: 106
+		-- upvalues: wrap (ref), join (ref)
+		local operation = p12.operation
+		local name = p12.name
+		local v27 = wrap("(", join(p12.variableDefinitions, ", "), ")")
+		local v28 = join(p12.directives, " ")
+		local selectionSet = p12.selectionSet
+
+		if not name and (not v28 or v28 == "") and ((not v27 or v27 == "") and operation == "query") then
+			return selectionSet
+		end
+
+		return join({
+			operation,
+			join({
+				name,
+				v27
+			}),
+			v28,
+			selectionSet
+		}, " ")
+	end,
+	VariableDefinition = function(_, p14) -- line: 131
+		-- upvalues: wrap (ref), join (ref)
+		local variable = p14.variable
+		local type = p14.type
+		local defaultValue = p14.defaultValue
+		local directives = p14.directives
+
+		return tostring(variable) .. ": " .. tostring(type) .. wrap(" = ", defaultValue) .. wrap(" ", join(directives, " "))
+	end,
+	SelectionSet = function(_, p16) -- line: 143
+		-- upvalues: block (ref)
+		return block(p16.selections)
+	end,
+	Field = function(_, p18) -- line: 147
+		-- upvalues: wrap (ref), join (ref), indent (ref)
+		local alias = p18.alias
+		local name = p18.name
+		local arguments = p18.arguments
+		local directives = p18.directives
+		local selectionSet = p18.selectionSet
+		local v45 = wrap("", alias, ": ") .. tostring(name)
+		local v46 = v45 .. wrap("(", join(arguments, ", "), ")")
+		local v47 = utf8.len(v46)
+
+		assert(v47 ~= nil, "invalid utf8 string")
+
+		if v47 > 80 then
+			v46 = v45 .. wrap("(\n", indent(join(arguments, "\n")), "\n)")
+		end
+
+		return join({
+			v46,
+			join(directives, " "),
+			selectionSet
+		}, " ")
+	end,
+	Argument = function(_, p20) -- line: 168
+		local name = p20.name
+		local value = p20.value
+
+		return tostring(name) .. ": " .. tostring(value)
+	end,
+	FragmentSpread = function(_, p22) -- line: 176
+		-- upvalues: wrap (ref), join (ref)
+		local name = p22.name
+		local directives = p22.directives
+
+		return "..." .. tostring(name) .. wrap(" ", join(directives, " "))
+	end,
+	InlineFragment = function(_, p24) -- line: 182
+		-- upvalues: join (ref), wrap (ref)
+		local typeCondition = p24.typeCondition
+		local directives = p24.directives
+		local selectionSet = p24.selectionSet
+
+		return join({
+			"...",
+			wrap("on ", typeCondition),
+			join(directives, " "),
+			selectionSet
+		}, " ")
+	end,
+	FragmentDefinition = function(_, p26) -- line: 193
+		-- upvalues: wrap (ref), join (ref)
+		local name = p26.name
+		local typeCondition = p26.typeCondition
+		local variableDefinitions = p26.variableDefinitions
+		local directives = p26.directives
+		local selectionSet = p26.selectionSet
+
+		return "fragment " .. tostring(name) .. wrap("(", join(variableDefinitions, ", "), ")") .. " " .. "on " .. tostring(typeCondition) .. " " .. wrap("", join(directives, " "), " ") .. tostring(selectionSet)
+	end,
+	IntValue = function(_, p28) -- line: 216
+		return p28.value
+	end,
+	FloatValue = function(_, p30) -- line: 220
+		return p30.value
+	end,
+	StringValue = function(_, p32, s1: string) -- line: 224
+		-- upvalues: printBlockString (copy), HttpService (copy)
+		local value = p32.value
+
+		if p32.block then
+			return (printBlockString(value, s1 ~= "description" and "  " or ""))
+		end
+
+		return (HttpService:JSONEncode(value))
+	end,
+	BooleanValue = function(_, p34) -- line: 231
+		if p34.value then
+			return "true"
+		end
+
+		return "false"
+	end,
+	NullValue = function(_, _) -- line: 239
+		return "null"
+	end,
+	EnumValue = function(_, p38) -- line: 242
+		return p38.value
+	end,
+	ListValue = function(_, t1: {[any]: any}) -- line: 246
+		-- upvalues: join (ref)
+		local values = t1.values
+
+		return "[" .. join(values, ", ") .. "]"
+	end,
+	ObjectValue = function(_, t2: {[any]: any}) -- line: 250
+		-- upvalues: join (ref)
+		local fields = t2.fields
+
+		return "{" .. join(fields, ", ") .. "}"
+	end,
+	ObjectField = function(_, t3: {[any]: any}) -- line: 254
+		return t3.name .. ": " .. t3.value
+	end,
+	Directive = function(_, p43) -- line: 262
+		-- upvalues: wrap (ref), join (ref)
+		local name = p43.name
+		local arguments = p43.arguments
+
+		return "@" .. tostring(name) .. wrap("(", join(arguments, ", "), ")")
+	end,
+	NamedType = function(_, p45) -- line: 270
+		return p45.name
+	end,
+	ListType = function(_, p47) -- line: 274
+		return "[" .. tostring(p47.type) .. "]"
+	end,
+	NonNullType = function(_, p49) -- line: 278
+		return tostring(p49.type) .. "!"
+	end,
+	SchemaDefinition = addDescription(function(p50) -- line: 286
+		-- upvalues: join (ref), block (ref)
+		local directives = p50.directives
+		local operationTypes = p50.operationTypes
+
+		return join({
+			"schema",
+			join(directives, " "),
+			block(operationTypes)
+		}, " ")
+	end),
+	OperationTypeDefinition = function(_, p52) -- line: 293
+		local operation = p52.operation
+		local type = p52.type
+
+		return tostring(operation) .. ": " .. tostring(type)
+	end,
+	ScalarTypeDefinition = addDescription(function(p53) -- line: 299
+		-- upvalues: join (ref)
+		local name = p53.name
+		local directives = p53.directives
+
+		return join({
+			"scalar",
+			name,
+			join(directives, " ")
+		}, " ")
+	end),
+	ObjectTypeDefinition = addDescription(function(p54) -- line: 306
+		-- upvalues: join (ref), wrap (ref), block (ref)
+		local name = p54.name
+		local interfaces = p54.interfaces
+		local directives = p54.directives
+		local fields = p54.fields
+
+		return join({
+			"type",
+			name,
+			wrap("implements ", join(interfaces, " & ")),
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end),
+	FieldDefinition = addDescription(function(p55) -- line: 320
+		-- upvalues: hasMultilineItems (ref), wrap (ref), indent (ref), join (ref)
+		local name = p55.name
+		local arguments = p55.arguments
+		local type = p55.type
+		local directives = p55.directives
+
+		return tostring(name) .. ((if not hasMultilineItems(arguments) then wrap("(", join(arguments, ", "), ")") else wrap("(\n", indent(join(arguments, "\n")), "\n)"))) .. ": " .. tostring(type) .. wrap(" ", join(directives, " "))
+	end),
+	InputValueDefinition = addDescription(function(p56) -- line: 334
+		-- upvalues: join (ref), wrap (ref)
+		local name = p56.name
+		local type = p56.type
+		local defaultValue = p56.defaultValue
+		local directives = p56.directives
+
+		return join({
+			tostring(name) .. ": " .. tostring(type),
+			wrap("= ", defaultValue),
+			join(directives, " ")
+		}, " ")
+	end),
+	InterfaceTypeDefinition = addDescription(function(p57) -- line: 346
+		-- upvalues: join (ref), wrap (ref), block (ref)
+		local name = p57.name
+		local interfaces = p57.interfaces
+		local directives = p57.directives
+		local fields = p57.fields
+
+		return join({
+			"interface",
+			name,
+			wrap("implements ", join(interfaces, " & ")),
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end),
+	UnionTypeDefinition = addDescription(function(p58) -- line: 361
+		-- upvalues: join (ref)
+		local name = p58.name
+		local directives = p58.directives
+		local types = p58.types
+
+		return join({
+			"union",
+			name,
+			join(directives, " "),
+			(not types or #types == 0) and "" or "= " .. join(types, " | ")
+		}, " ")
+	end),
+	EnumTypeDefinition = addDescription(function(p59) -- line: 374
+		-- upvalues: join (ref), block (ref)
+		local name = p59.name
+		local directives = p59.directives
+		local values = p59.values
+
+		return join({
+			"enum",
+			name,
+			join(directives, " "),
+			block(values)
+		}, " ")
+	end),
+	EnumValueDefinition = addDescription(function(p60) -- line: 387
+		-- upvalues: join (ref)
+		local name = p60.name
+		local directives = p60.directives
+
+		return join({
+			name,
+			join(directives, " ")
+		}, " ")
+	end),
+	InputObjectTypeDefinition = addDescription(function(p61) -- line: 397
+		-- upvalues: join (ref), block (ref)
+		local name = p61.name
+		local directives = p61.directives
+		local fields = p61.fields
+
+		return join({
+			"input",
+			name,
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end),
+	DirectiveDefinition = addDescription(function(p62) -- line: 410
+		-- upvalues: hasMultilineItems (ref), wrap (ref), indent (ref), join (ref)
+		local name = p62.name
+		local arguments = p62.arguments
+		local repeatable = p62.repeatable
+		local locations = p62.locations
+
+		return "directive @" .. tostring(name) .. ((if not hasMultilineItems(arguments) then wrap("(", join(arguments, ", "), ")") else wrap("(\n", indent(join(arguments, "\n")), "\n)"))) .. (not repeatable and "" or " repeatable") .. " on " .. join(locations, " | ")
+	end),
+	SchemaExtension = function(_, p64) -- line: 425
+		-- upvalues: join (ref), block (ref)
+		local directives = p64.directives
+		local operationTypes = p64.operationTypes
+
+		return join({
+			"extend schema",
+			join(directives, " "),
+			block(operationTypes)
+		}, " ")
+	end,
+	ScalarTypeExtension = function(_, p66) -- line: 436
+		-- upvalues: join (ref)
+		local name = p66.name
+		local directives = p66.directives
+
+		return join({
+			"extend scalar",
+			name,
+			join(directives, " ")
+		}, " ")
+	end,
+	ObjectTypeExtension = function(_, p68) -- line: 447
+		-- upvalues: join (ref), wrap (ref), block (ref)
+		local name = p68.name
+		local interfaces = p68.interfaces
+		local directives = p68.directives
+		local fields = p68.fields
+
+		return join({
+			"extend type",
+			name,
+			wrap("implements ", join(interfaces, " & ")),
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end,
+	InterfaceTypeExtension = function(_, p70) -- line: 462
+		-- upvalues: join (ref), wrap (ref), block (ref)
+		local name = p70.name
+		local interfaces = p70.interfaces
+		local directives = p70.directives
+		local fields = p70.fields
+
+		return join({
+			"extend interface",
+			name,
+			wrap("implements ", join(interfaces, " & ")),
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end,
+	UnionTypeExtension = function(_, p72) -- line: 477
+		-- upvalues: join (ref)
+		local name = p72.name
+		local directives = p72.directives
+		local types = p72.types
+
+		return join({
+			"extend union",
+			name,
+			join(directives, " "),
+			(not types or #types == 0) and "" or "= " .. join(types, " | ")
+		}, " ")
+	end,
+	EnumTypeExtension = function(_, p74) -- line: 490
+		-- upvalues: join (ref), block (ref)
+		local name = p74.name
+		local directives = p74.directives
+		local values = p74.values
+
+		return join({
+			"extend enum",
+			name,
+			join(directives, " "),
+			block(values)
+		}, " ")
+	end,
+	InputObjectTypeExtension = function(_, p76) -- line: 503
+		-- upvalues: join (ref), block (ref)
+		local name = p76.name
+		local directives = p76.directives
+		local fields = p76.fields
+
+		return join({
+			"extend input",
+			name,
+			join(directives, " "),
+			block(fields)
+		}, " ")
+	end
+}
+
+function join(p77, s2: string?) -- line: 521
+	-- upvalues: Array (copy)
+	local v187 = s2 or ""
+
+	if p77 then
+		return Array.join(Array.filter(p77, function(p78) -- line: 525
+			return tostring(p78) and p78 ~= ""
+		end), v187)
+	end
+
+	return ""
+end
+function block(p79) -- line: 539
+	-- upvalues: wrap (ref), indent (ref), join (ref)
+	return wrap("{\n", indent(join(p79, "\n")), "\n}")
+end
+function wrap(s3: string, p80, s4: string?) -- line: 546
+	local v192 = s4 or ""
+
+	if p80 ~= nil and p80 ~= "" then
+		return s3 .. tostring(p80) .. tostring(v192)
+	end
+
+	return ""
+end
+function indent(s5: string) -- line: 556
+	-- upvalues: wrap (ref)
+	local v194 = s5:gsub("\n", "\n  ")
+
+	return wrap("  ", v194)
+end
+
+local function isMultiline(s6: string) -- line: 563
+	return string.find(tostring(s6), "\n") ~= nil
+end
+
+function hasMultilineItems(p81) -- line: 567
+	-- upvalues: Array (copy), isMultiline (ref)
+	return p81 ~= nil and Array.some(p81, isMultiline)
+end
+
 return {
-    print = v15
-};
+	print = print_
+}

@@ -1,137 +1,160 @@
-local l_Players_0 = game:GetService("Players");
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0.ChildAdded:wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local l_Parent_0 = script.Parent.Parent;
-local l_ChatSettings_0 = require(l_Parent_0:WaitForChild("ChatSettings"));
-local l_ChatConstants_0 = require(l_Parent_0:WaitForChild("ChatConstants"));
-local l_Util_0 = require(script.Parent:WaitForChild("Util"));
-local v6 = utf8.char(57344);
-local v7 = nil;
-pcall(function() --[[ Line: 22 ]]
-    -- upvalues: v7 (ref)
-    v7 = require(game:GetService("Chat").ClientChatModules.ChatLocalization);
-end);
-IsPlayerVerified = function(v8) --[[ Line: 24 ]] --[[ Name: IsPlayerVerified ]]
-    -- upvalues: l_Players_0 (copy)
-    local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v8);
-    if not l_l_Players_0_PlayerByUserId_0 then
-        return false;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 31 ]]
-            -- upvalues: l_l_Players_0_PlayerByUserId_0 (copy)
-            return l_l_Players_0_PlayerByUserId_0.HasVerifiedBadge;
-        end);
-        if l_status_0 then
-            return l_result_0;
-        else
-            return false;
-        end;
-    end;
-end;
-AppendVerifiedBadge = function(v12) --[[ Line: 38 ]] --[[ Name: AppendVerifiedBadge ]]
-    -- upvalues: v6 (copy)
-    return v12 .. v6;
-end;
-CreateMessageLabel = function(v13, v14) --[[ Line: 42 ]] --[[ Name: CreateMessageLabel ]]
-    -- upvalues: l_ChatSettings_0 (copy), l_Util_0 (copy), l_LocalPlayer_0 (ref), v7 (ref)
-    local l_FromSpeaker_0 = v13.FromSpeaker;
-    local v16 = nil;
-    v16 = if l_ChatSettings_0.PlayerDisplayNamesEnabled and v13.SpeakerDisplayName then v13.SpeakerDisplayName else l_FromSpeaker_0;
-    local l_SpeakerUserId_0 = v13.SpeakerUserId;
-    if IsPlayerVerified(l_SpeakerUserId_0) then
-        v16 = AppendVerifiedBadge(v16);
-    end;
-    local _ = v13.Message;
-    local v19 = v13.ExtraData or {};
-    local v20 = v19.Font or l_ChatSettings_0.DefaultFont;
-    local v21 = v19.TextSize or l_ChatSettings_0.ChatWindowTextSize;
-    local v22 = v19.NameColor or l_ChatSettings_0.DefaultNameColor;
-    local v23 = v19.ChatColor or l_ChatSettings_0.DefaultMessageColor;
-    local v24 = v19.ChannelColor or v23;
-    local v25 = string.format("[%s]:", v16);
-    local _ = l_Util_0:GetStringTextBounds(v25, v20, v21);
-    local v27 = l_Util_0:GetNumberOfSpaces(v25, v20, v21) + 1;
-    local l_l_Util_0_BaseMessage_0, v29 = l_Util_0:CreateBaseMessage("", v20, v21, v23);
-    local v30 = l_Util_0:AddNameButtonToBaseMessage(v29, v22, v25, l_FromSpeaker_0);
-    local v31 = nil;
-    if v14 ~= v13.OriginalChannel then
-        local l_OriginalChannel_0 = v13.OriginalChannel;
-        if v13.FromSpeaker ~= l_LocalPlayer_0.Name then
-            l_OriginalChannel_0 = string.format("From %s", v13.FromSpeaker);
-        end;
-        if v7.tryLocalize then
-            l_OriginalChannel_0 = v7:tryLocalize(l_OriginalChannel_0);
-        end;
-        local v33 = string.format("{%s}", l_OriginalChannel_0);
-        v31 = l_Util_0:AddChannelButtonToBaseMessage(v29, v24, v33, v13.OriginalChannel);
-        v30.Position = UDim2.new(0, v31.Size.X.Offset + l_Util_0:GetStringTextBounds(" ", v20, v21).X, 0, 0);
-        v27 = v27 + l_Util_0:GetNumberOfSpaces(v33, v20, v21) + 1;
-    end;
-    local function v36(v34) --[[ Line: 92 ]] --[[ Name: UpdateTextFunction ]]
-        -- upvalues: v13 (copy), v29 (copy), l_Util_0 (ref), v27 (ref)
-        if v13.IsFiltered then
-            v29.Text = l_Util_0:CreateLeadingSpaces(v27) .. l_Util_0:SanitizeForRichText(v34.Message);
-            return;
-        else
-            local v35 = v34.MessageLengthUtf8 or v34.MessageLength;
-            v29.Text = l_Util_0:CreateLeadingSpaces(v27) .. string.rep("_", v35);
-            return;
-        end;
-    end;
-    v36(v13);
-    local function v38(v37) --[[ Line: 103 ]] --[[ Name: GetHeightFunction ]]
-        -- upvalues: l_Util_0 (ref), v29 (copy), l_l_Util_0_BaseMessage_0 (copy)
-        return l_Util_0:GetMessageHeight(v29, l_l_Util_0_BaseMessage_0, v37);
-    end;
-    local v39 = {
-        [v30] = {
-            TextTransparency = {
-                FadedIn = 0, 
-                FadedOut = 1
-            }, 
-            TextStrokeTransparency = {
-                FadedIn = 0.75, 
-                FadedOut = 1
-            }
-        }, 
-        [v29] = {
-            TextTransparency = {
-                FadedIn = 0, 
-                FadedOut = 1
-            }, 
-            TextStrokeTransparency = {
-                FadedIn = 0.75, 
-                FadedOut = 1
-            }
-        }
-    };
-    if v31 then
-        v39[v31] = {
-            TextTransparency = {
-                FadedIn = 0, 
-                FadedOut = 1
-            }, 
-            TextStrokeTransparency = {
-                FadedIn = 0.75, 
-                FadedOut = 1
-            }
-        };
-    end;
-    local l_l_Util_0_FadeFunctions_0, v41, v42 = l_Util_0:CreateFadeFunctions(v39);
-    return {
-        [l_Util_0.KEY_BASE_FRAME] = l_l_Util_0_BaseMessage_0, 
-        [l_Util_0.KEY_BASE_MESSAGE] = v29, 
-        [l_Util_0.KEY_UPDATE_TEXT_FUNC] = v36, 
-        [l_Util_0.KEY_GET_HEIGHT] = v38, 
-        [l_Util_0.KEY_FADE_IN] = l_l_Util_0_FadeFunctions_0, 
-        [l_Util_0.KEY_FADE_OUT] = v41, 
-        [l_Util_0.KEY_UPDATE_ANIMATION] = v42
-    };
-end;
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+while not LocalPlayer do
+	Players.ChildAdded:wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local ParentParent = script.Parent.Parent
+local ChatSettings = require(ParentParent:WaitForChild("ChatSettings"))
+local ChatConstants = require(ParentParent:WaitForChild("ChatConstants"))
+local Util = require(script.Parent:WaitForChild("Util"))
+local v7 = utf8.char(57344)
+local ChatLocalization = nil
+
+pcall(function() -- line: 22
+	-- upvalues: ChatLocalization (ref)
+	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+end)
+
+function IsPlayerVerified(p1) -- line: 24
+	-- upvalues: Players (copy)
+	local PlayerByUserId = Players:GetPlayerByUserId(p1)
+
+	if not PlayerByUserId then
+		return false
+	end
+
+	local ok, result = pcall(function() -- line: 31
+		-- upvalues: PlayerByUserId (copy)
+		return PlayerByUserId.HasVerifiedBadge
+	end)
+
+	if ok then
+		return result
+	end
+
+	return false
+end
+function AppendVerifiedBadge(p2) -- line: 38
+	-- upvalues: v7 (copy)
+	return p2 .. v7
+end
+function CreateMessageLabel(p3, p4) -- line: 42
+	-- upvalues: ChatSettings (copy), Util (copy), LocalPlayer (ref), ChatLocalization (ref)
+	local FromSpeaker = p3.FromSpeaker
+	local v17 = if not ChatSettings.PlayerDisplayNamesEnabled or not p3.SpeakerDisplayName then FromSpeaker else p3.SpeakerDisplayName
+	local SpeakerUserId = p3.SpeakerUserId
+
+	if IsPlayerVerified(SpeakerUserId) then
+		v17 = AppendVerifiedBadge(v17)
+	end
+
+	local _ = p3.Message
+	local v20 = p3.ExtraData or {}
+	local v21 = v20.Font or ChatSettings.DefaultFont
+	local v22 = v20.TextSize or ChatSettings.ChatWindowTextSize
+	local v23 = v20.NameColor or ChatSettings.DefaultNameColor
+	local v24 = v20.ChatColor or ChatSettings.DefaultMessageColor
+	local v25 = v20.ChannelColor or v24
+	local v26 = string.format("[%s]:", v17)
+
+	Util:GetStringTextBounds(v26, v21, v22)
+
+	local u27 = Util:GetNumberOfSpaces(v26, v21, v22) + 1
+	local v28, v29 = Util:CreateBaseMessage("", v21, v22, v24)
+	local v30 = Util:AddNameButtonToBaseMessage(v29, v23, v26, FromSpeaker)
+	local v31 = nil
+
+	if p4 ~= p3.OriginalChannel then
+		local OriginalChannel = p3.OriginalChannel
+
+		if p3.FromSpeaker ~= LocalPlayer.Name then
+			OriginalChannel = string.format("From %s", p3.FromSpeaker)
+		end
+
+		if ChatLocalization.tryLocalize then
+			OriginalChannel = ChatLocalization:tryLocalize(OriginalChannel)
+		end
+
+		local v33 = string.format("{%s}", OriginalChannel)
+
+		v31 = Util:AddChannelButtonToBaseMessage(v29, v25, v33, p3.OriginalChannel)
+		v30.Position = UDim2.new(0, v31.Size.X.Offset + Util:GetStringTextBounds(" ", v21, v22).X, 0, 0)
+		u27 = u27 + Util:GetNumberOfSpaces(v33, v21, v22) + 1
+	end
+
+	local function UpdateTextFunction(p5) -- line: 92
+		-- upvalues: p3 (copy), v29 (copy), Util (copy), u27 (ref)
+		if p3.IsFiltered then
+			v29.Text = Util:CreateLeadingSpaces(u27) .. Util:SanitizeForRichText(p5.Message)
+
+			return
+		end
+
+		local v41 = p5.MessageLengthUtf8 or p5.MessageLength
+
+		v29.Text = Util:CreateLeadingSpaces(u27) .. string.rep("_", v41)
+	end
+
+	UpdateTextFunction(p3)
+
+	local function GetHeightFunction(p6) -- line: 103
+		-- upvalues: Util (copy), v29 (copy), v28 (copy)
+		return Util:GetMessageHeight(v29, v28, p6)
+	end
+
+	local t1 = {
+		[v30] = {
+			TextTransparency = {
+				FadedIn = 0,
+				FadedOut = 1
+			},
+			TextStrokeTransparency = {
+				FadedIn = 0.75,
+				FadedOut = 1
+			}
+		},
+		[v29] = {
+			TextTransparency = {
+				FadedIn = 0,
+				FadedOut = 1
+			},
+			TextStrokeTransparency = {
+				FadedIn = 0.75,
+				FadedOut = 1
+			}
+		}
+	}
+
+	if v31 then
+		t1[v31] = {
+			TextTransparency = {
+				FadedIn = 0,
+				FadedOut = 1
+			},
+			TextStrokeTransparency = {
+				FadedIn = 0.75,
+				FadedOut = 1
+			}
+		}
+	end
+
+	local v37, v38, v39 = Util:CreateFadeFunctions(t1)
+
+	return {
+		[Util.KEY_BASE_FRAME] = v28,
+		[Util.KEY_BASE_MESSAGE] = v29,
+		[Util.KEY_UPDATE_TEXT_FUNC] = UpdateTextFunction,
+		[Util.KEY_GET_HEIGHT] = GetHeightFunction,
+		[Util.KEY_FADE_IN] = v37,
+		[Util.KEY_FADE_OUT] = v38,
+		[Util.KEY_UPDATE_ANIMATION] = v39
+	}
+end
+
 return {
-    [l_Util_0.KEY_MESSAGE_TYPE] = l_ChatConstants_0.MessageTypeWhisper, 
-    [l_Util_0.KEY_CREATOR_FUNCTION] = CreateMessageLabel
-};
+	[Util.KEY_MESSAGE_TYPE] = ChatConstants.MessageTypeWhisper,
+	[Util.KEY_CREATOR_FUNCTION] = CreateMessageLabel
+}

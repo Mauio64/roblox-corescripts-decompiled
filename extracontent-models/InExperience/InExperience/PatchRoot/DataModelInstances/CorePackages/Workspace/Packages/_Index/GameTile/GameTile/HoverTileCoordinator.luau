@@ -1,56 +1,69 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 24 ]] --[[ Name: new ]]
-    -- upvalues: l_Signal_0 (copy), v2 (copy)
-    local v3 = {
-        changed = l_Signal_0.new(), 
-        hoveredKey = nil, 
-        waitingForHover = nil
-    };
-    setmetatable(v3, v2);
-    return v3;
-end;
-v2.requestHover = function(v4, v5) --[[ Line: 34 ]] --[[ Name: requestHover ]]
-    if v4.hoveredKey == v5 then
-        return;
-    elseif v4.waitingForHover == v5 then
-        return;
-    elseif v4.hoveredKey == nil or v4.waitingForHover ~= nil then
-        v4.hoveredKey = v5;
-        v4.waitingForHover = nil;
-        v4.changed:fire(v4.hoveredKey);
-        return;
-    else
-        v4.waitingForHover = v5;
-        return;
-    end;
-end;
-v2.cancelHover = function(v6, v7) --[[ Line: 57 ]] --[[ Name: cancelHover ]]
-    if v6.hoveredKey == v7 then
-        if v6.waitingForHover ~= nil then
-            v6.hoveredKey = v6.waitingForHover;
-            v6.waitingForHover = nil;
-        else
-            v6.hoveredKey = nil;
-        end;
-        v6.changed:fire(v6.hoveredKey);
-        return;
-    else
-        if v6.waitingForHover == v7 then
-            v6.waitingForHover = nil;
-        end;
-        return;
-    end;
-end;
-v2.reset = function(v8) --[[ Line: 72 ]] --[[ Name: reset ]]
-    local l_hoveredKey_0 = v8.hoveredKey;
-    v8.waitingForHover = nil;
-    v8.hoveredKey = nil;
-    if l_hoveredKey_0 ~= nil then
-        v8.changed:fire(v8.hoveredKey);
-    end;
-end;
-v2.default = v2.new();
-return v2;
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local Signal = require(Parent.AppCommonLib).Signal
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 24
+	-- upvalues: Signal (copy), t1 (copy)
+	local t2 = {
+		hoveredKey = nil,
+		waitingForHover = nil,
+		changed = Signal.new()
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.requestHover(p1, s1: string) -- line: 34
+	if s1 == p1.hoveredKey then
+		return
+	end
+
+	if s1 == p1.waitingForHover then
+		return
+	end
+
+	if p1.hoveredKey == nil or p1.waitingForHover ~= nil then
+		p1.hoveredKey = s1
+		p1.waitingForHover = nil
+		p1.changed:fire(p1.hoveredKey)
+
+		return
+	end
+
+	p1.waitingForHover = s1
+end
+function t1.cancelHover(p2, s2: string) -- line: 57
+	if s2 == p2.hoveredKey then
+		if p2.waitingForHover ~= nil then
+			p2.hoveredKey = p2.waitingForHover
+			p2.waitingForHover = nil
+		else
+			p2.hoveredKey = nil
+		end
+
+		p2.changed:fire(p2.hoveredKey)
+
+		return
+	end
+
+	if s2 == p2.waitingForHover then
+		p2.waitingForHover = nil
+	end
+end
+function t1.reset(p3) -- line: 72
+	local hoveredKey = p3.hoveredKey
+
+	p3.waitingForHover = nil
+	p3.hoveredKey = nil
+
+	if hoveredKey ~= nil then
+		p3.changed:fire(p3.hoveredKey)
+	end
+end
+
+t1.default = t1.new()
+
+return t1

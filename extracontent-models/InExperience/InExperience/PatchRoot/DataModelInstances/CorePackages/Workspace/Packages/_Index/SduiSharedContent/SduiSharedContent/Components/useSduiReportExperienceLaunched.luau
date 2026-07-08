@@ -1,78 +1,109 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local l_calculateRowPositionFields_0 = require(l_Parent_0.UnifiedLogging).calculateRowPositionFields;
-local l_SetGamePlaySession_0 = require(l_Parent_0.RobloxAppSessionization).SetGamePlaySession;
-local v4 = require(l_Parent_0.DiscoveryAnalytics);
-local l_gamePlayIntent_0 = v4.Events.gamePlayIntent;
-local l_sponsoredGamesRecordClick_0 = v4.Requests.sponsoredGamesRecordClick;
-local l_findAnalyticsFieldInAncestors_0 = require(l_Parent_0.SduiCoreSystem).findAnalyticsFieldInAncestors;
-local l_FFlagLuaAppTwoByOneTileTelemetryFix_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppTwoByOneTileTelemetryFix;
-return function(v9, v10, v11, v12, v13, v14) --[[ Line: 21 ]] --[[ Name: useSduiReportExperienceLaunched ]]
-    -- upvalues: v1 (copy), l_findAnalyticsFieldInAncestors_0 (copy), l_SetGamePlaySession_0 (copy), l_sponsoredGamesRecordClick_0 (copy), l_calculateRowPositionFields_0 (copy), l_FFlagLuaAppTwoByOneTileTelemetryFix_0 (copy), l_gamePlayIntent_0 (copy)
-    local l_eventIngest_0 = v9.dependencies.eventIngest;
-    local l_sessionService_0 = v9.dependencies.sessionService;
-    return v1.useCallback(function() --[[ Line: 33 ]]
-        -- upvalues: v13 (ref), v12 (copy), v10 (copy), l_findAnalyticsFieldInAncestors_0 (ref), l_SetGamePlaySession_0 (ref), l_sessionService_0 (copy), l_sponsoredGamesRecordClick_0 (ref), v9 (copy), l_calculateRowPositionFields_0 (ref), l_FFlagLuaAppTwoByOneTileTelemetryFix_0 (ref), l_gamePlayIntent_0 (ref), l_eventIngest_0 (copy), v11 (copy), v14 (copy)
-        v13 = v13 or v12;
-        local v17 = nil;
-        local v18 = nil;
-        local v19 = nil;
-        local v20 = nil;
-        local v21 = v10.getCollectionData and v10.getCollectionData() or nil;
-        if v21 then
-            v17 = v21.collectionPosition;
-            v18 = v21.collectionId;
-            v19 = v21.itemsPerRow;
-            v20 = v21.startRowNumber;
-        end;
-        v17 = v17 or l_findAnalyticsFieldInAncestors_0("collectionIndex", v10);
-        v18 = v18 or l_findAnalyticsFieldInAncestors_0("collectionId", v10);
-        local v22 = l_findAnalyticsFieldInAncestors_0("gameSetTargetId", v10);
-        local v23 = l_findAnalyticsFieldInAncestors_0("itemPosition", v10, -1);
-        local v24 = l_findAnalyticsFieldInAncestors_0("topicDataPosition", v10, v23);
-        local v25 = l_findAnalyticsFieldInAncestors_0("heroUnitId", v10);
-        local v26 = l_findAnalyticsFieldInAncestors_0("eventContext", v10, "ExperienceTile");
-        local v27 = l_findAnalyticsFieldInAncestors_0("referralSource", v10);
-        local v28 = l_findAnalyticsFieldInAncestors_0("gamePlaySessionType", v10);
-        if v28 then
-            l_SetGamePlaySession_0(l_sessionService_0, v28, true);
-        end;
-        local v29 = l_findAnalyticsFieldInAncestors_0("nativeAdData", v10);
-        if v29 == nil then
-            v29 = l_findAnalyticsFieldInAncestors_0("adId", v10);
-        end;
-        if v29 then
-            l_sponsoredGamesRecordClick_0(v9.dependencies.networking, (tostring(v29)));
-        end;
-        local v30 = l_calculateRowPositionFields_0(v23, v19, v20);
-        local v31 = if l_FFlagLuaAppTwoByOneTileTelemetryFix_0 then l_findAnalyticsFieldInAncestors_0("tileType", v10, "GameTile") else nil;
-        l_gamePlayIntent_0(l_eventIngest_0, tostring(v26), {
-            placeId = tostring(v12), 
-            rootPlaceId = tonumber(v13), 
-            universeId = tostring(v11), 
-            sortIndex = tostring(v17), 
-            sortEntryIndex = if v23 then tostring(v23) else nil, 
-            referralSource = v27, 
-            gameSetTypeId = tostring(v18), 
-            gameSetTargetId = v22, 
-            appliedFilters = v14, 
-            topicDataPosition = v24, 
-            nativeAdData = v29, 
-            pageName = v9.appPage, 
-            positionInRow = v30.positionInRow, 
-            rowNumber = v30.rowInSort, 
-            feedRowNumber = v30.rowOnPage, 
-            heroUnitId = v25, 
-            tileType = if l_FFlagLuaAppTwoByOneTileTelemetryFix_0 then v31 else nil
-        });
-    end, {
-        l_eventIngest_0, 
-        v10, 
-        v11, 
-        v12, 
-        v13, 
-        v14, 
-        l_sessionService_0, 
-        v9
-    });
-end;
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local calculateRowPositionFields = require(Parent.UnifiedLogging).calculateRowPositionFields
+local SetGamePlaySession = require(Parent.RobloxAppSessionization).SetGamePlaySession
+local DiscoveryAnalytics = require(Parent.DiscoveryAnalytics)
+local gamePlayIntent = DiscoveryAnalytics.Events.gamePlayIntent
+local sponsoredGamesRecordClick = DiscoveryAnalytics.Requests.sponsoredGamesRecordClick
+local findAnalyticsFieldInAncestors = require(Parent.SduiCoreSystem).findAnalyticsFieldInAncestors
+local sduiReportGamePlayIntent = require(script.Parent.sduiReportGamePlayIntent)
+local FFlagSduiLaunchExperienceAction = require(Parent.SharedFlags).FFlagSduiLaunchExperienceAction
+local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+
+local function useSduiReportExperienceLaunched(p1, p2, s1: string, s2: string?, s3: string?, p3, s4: string?) -- line: 24
+	-- upvalues: React (copy), FFlagSduiLaunchExperienceAction (copy), sduiReportGamePlayIntent (copy), FFlagSduiExperienceDetailsSupport (copy), findAnalyticsFieldInAncestors (copy), SetGamePlaySession (copy), sponsoredGamesRecordClick (copy), calculateRowPositionFields (copy), gamePlayIntent (copy)
+	local eventIngest = p1.dependencies.eventIngest
+	local sessionService = p1.dependencies.sessionService
+
+	return React.useCallback(function() -- line: 37
+		-- upvalues: FFlagSduiLaunchExperienceAction (copy), sduiReportGamePlayIntent (copy), p1 (copy), p2 (copy), s1 (copy), s2 (copy), s3 (ref), p3 (copy), FFlagSduiExperienceDetailsSupport (copy), s4 (copy), findAnalyticsFieldInAncestors (copy), SetGamePlaySession (copy), sessionService (copy), sponsoredGamesRecordClick (copy), calculateRowPositionFields (copy), gamePlayIntent (copy), eventIngest (copy)
+		if FFlagSduiLaunchExperienceAction then
+			sduiReportGamePlayIntent({
+				sduiContext = p1,
+				analyticsContext = p2,
+				universeId = s1,
+				placeId = s2,
+				rootPlaceId = s3,
+				appliedFilters = p3,
+				launchData = if not FFlagSduiExperienceDetailsSupport then nil else s4
+			})
+
+			return
+		end
+
+		s3 = s3 or s2
+
+		local collectionPosition = nil
+		local collectionId = nil
+		local itemsPerRow = nil
+		local startRowNumber = nil
+		local v27 = p2.getCollectionData and p2.getCollectionData() or nil
+
+		if v27 then
+			collectionPosition = v27.collectionPosition
+			collectionId = v27.collectionId
+			itemsPerRow = v27.itemsPerRow
+			startRowNumber = v27.startRowNumber
+		end
+
+		local v28 = collectionPosition or findAnalyticsFieldInAncestors("collectionIndex", p2)
+		local v29 = collectionId or findAnalyticsFieldInAncestors("collectionId", p2)
+		local v30 = findAnalyticsFieldInAncestors("gameSetTargetId", p2)
+		local v31 = findAnalyticsFieldInAncestors("itemPosition", p2, -1)
+		local v32 = findAnalyticsFieldInAncestors("topicDataPosition", p2, v31)
+		local v33 = findAnalyticsFieldInAncestors("heroUnitId", p2)
+		local v34 = findAnalyticsFieldInAncestors("eventContext", p2, "ExperienceTile")
+		local v35 = findAnalyticsFieldInAncestors("referralSource", p2)
+		local v36 = findAnalyticsFieldInAncestors("gamePlaySessionType", p2)
+
+		if v36 then
+			SetGamePlaySession(sessionService, v36, true)
+		end
+
+		local v37 = findAnalyticsFieldInAncestors("nativeAdData", p2)
+
+		if v37 == nil then
+			v37 = findAnalyticsFieldInAncestors("adId", p2)
+		end
+
+		if v37 then
+			sponsoredGamesRecordClick(p1.dependencies.networking, (tostring(v37)))
+		end
+
+		local v38 = calculateRowPositionFields(v31, itemsPerRow, startRowNumber)
+		local v39 = findAnalyticsFieldInAncestors("tileType", p2, "GameTile")
+
+		gamePlayIntent(eventIngest, tostring(v34), {
+			placeId = tostring(s2),
+			rootPlaceId = tonumber(s3),
+			universeId = tostring(s1),
+			sortIndex = tostring(v28),
+			sortEntryIndex = if not v31 then nil else tostring(v31),
+			referralSource = v35,
+			gameSetTypeId = tostring(v29),
+			gameSetTargetId = v30,
+			appliedFilters = p3,
+			topicDataPosition = v32,
+			nativeAdData = v37,
+			pageName = p1.appPage,
+			positionInRow = v38.positionInRow,
+			rowNumber = v38.rowInSort,
+			feedRowNumber = v38.rowOnPage,
+			heroUnitId = v33,
+			tileType = v39,
+			launchData = if not FFlagSduiExperienceDetailsSupport then nil else s4
+		})
+	end, {
+		eventIngest,
+		p2,
+		s1,
+		s2,
+		s3,
+		p3,
+		if not FFlagSduiExperienceDetailsSupport then nil else s4,
+		sessionService,
+		p1
+	})
+end
+
+return useSduiReportExperienceLaunched

@@ -1,46 +1,49 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_GetFFlagGenerateLinkWithChannel_0 = require(l_Parent_1.SharedFlags).GetFFlagGenerateLinkWithChannel;
-local v3 = require(l_Parent_0.utils.WebViewServiceWrapper);
-local v4 = require(l_Parent_1.React);
-local l_UrlBuilder_0 = require(l_Parent_1.UrlBuilder).UrlBuilder;
-local v6 = require(l_Parent_0.utils.LifecycleEvents);
-local l_NotificationTypeEnum_0 = require(l_Parent_0.type).NotificationTypeEnum;
-local l_default_0 = require(l_Parent_1.ToastNotificationsProtocol).ToastNotificationProtocol.default;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Localization_0 = require(l_Parent_1.RobloxAppLocales).Localization;
-return function() --[[ Line: 19 ]] --[[ Name: SecurityEventReceiver ]]
-    -- upvalues: v4 (copy), v6 (copy), l_NotificationTypeEnum_0 (copy), l_GetFFlagGenerateLinkWithChannel_0 (copy), l_UrlBuilder_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), v3 (copy), l_default_0 (copy)
-    v4.useEffect(function() --[[ Line: 20 ]]
-        -- upvalues: v6 (ref), l_NotificationTypeEnum_0 (ref), l_GetFFlagGenerateLinkWithChannel_0 (ref), l_UrlBuilder_0 (ref), l_Localization_0 (ref), l_LocalizationService_0 (ref), v3 (ref), l_default_0 (ref)
-        local v16 = v6:RegisterCallback(v6.ToastEvents.UserAction, l_NotificationTypeEnum_0.SecurityAlert, function(v11) --[[ Line: 24 ]]
-            -- upvalues: l_GetFFlagGenerateLinkWithChannel_0 (ref), l_UrlBuilder_0 (ref), l_Localization_0 (ref), l_LocalizationService_0 (ref), v3 (ref), l_default_0 (ref)
-            if not v11 or not v11.notificationData or not v11.notificationData.notificationType or not v11.notificationData.clientEventsPayload or not v11.notificationData.clientEventsPayload.payload or not v11.notificationData.clientEventsPayload.username then
-                return;
-            else
-                local l_payload_0 = v11.notificationData.clientEventsPayload.payload;
-                local l_username_0 = v11.notificationData.clientEventsPayload.username;
-                local v14 = nil;
-                v14 = if l_GetFFlagGenerateLinkWithChannel_0() then l_UrlBuilder_0.static.securityAlertWithChannel({
-                    payload = l_payload_0, 
-                    username = l_username_0, 
-                    channel = "toast"
-                }) else l_UrlBuilder_0.static.securityAlert({
-                    payload = l_payload_0, 
-                    username = l_username_0
-                });
-                local v15 = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId):Format("Feature.SecurityFeedback.Header.NewLogin");
-                v3.new({
-                    title = v15, 
-                    url = v14
-                }):open();
-                l_default_0:dismissNotification(v11.notificationData.id);
-                return;
-            end;
-        end);
-        return function() --[[ Line: 65 ]]
-            -- upvalues: v16 (copy)
-            v16();
-        end;
-    end, {});
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local GetFFlagGenerateLinkWithChannel = require(ParentParentParent.SharedFlags).GetFFlagGenerateLinkWithChannel
+local WebViewServiceWrapper = require(ParentParent.utils.WebViewServiceWrapper)
+local React = require(ParentParentParent.React)
+local UrlBuilder = require(ParentParentParent.UrlBuilder).UrlBuilder
+local LifecycleEvents = require(ParentParent.utils.LifecycleEvents)
+local NotificationTypeEnum = require(ParentParent.type).NotificationTypeEnum
+local default = require(ParentParentParent.ToastNotificationsProtocol).ToastNotificationProtocol.default
+local LocalizationService = game:GetService("LocalizationService")
+local Localization = require(ParentParentParent.RobloxAppLocales).Localization
+
+local function SecurityEventReceiver() -- line: 19
+	-- upvalues: React (copy), LifecycleEvents (copy), NotificationTypeEnum (copy), GetFFlagGenerateLinkWithChannel (copy), UrlBuilder (copy), Localization (copy), LocalizationService (copy), WebViewServiceWrapper (copy), default (copy)
+	React.useEffect(function() -- line: 20
+		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), GetFFlagGenerateLinkWithChannel (copy), UrlBuilder (copy), Localization (copy), LocalizationService (copy), WebViewServiceWrapper (copy), default (copy)
+		local v13 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SecurityAlert, function(p1) -- line: 24
+			-- upvalues: GetFFlagGenerateLinkWithChannel (copy), UrlBuilder (copy), Localization (copy), LocalizationService (copy), WebViewServiceWrapper (copy), default (copy)
+			if not p1 or (not p1.notificationData or not p1.notificationData.notificationType or not p1.notificationData.clientEventsPayload or not p1.notificationData.clientEventsPayload.payload or not p1.notificationData.clientEventsPayload.username) then
+				return
+			end
+
+			local payload = p1.notificationData.clientEventsPayload.payload
+			local username = p1.notificationData.clientEventsPayload.username
+			local v17 = if not GetFFlagGenerateLinkWithChannel() then UrlBuilder.static.securityAlert({
+				payload = payload,
+				username = username
+			}) else UrlBuilder.static.securityAlertWithChannel({
+				channel = "toast",
+				payload = payload,
+				username = username
+			})
+			local v18 = Localization.new(LocalizationService.RobloxLocaleId):Format("Feature.SecurityFeedback.Header.NewLogin")
+
+			WebViewServiceWrapper.new({
+				title = v18,
+				url = v17
+			}):open()
+			default:dismissNotification(p1.notificationData.id)
+		end)
+
+		return function() -- line: 65
+			-- upvalues: v13 (copy)
+			v13()
+		end
+	end, {})
+end
+
+return SecurityEventReceiver

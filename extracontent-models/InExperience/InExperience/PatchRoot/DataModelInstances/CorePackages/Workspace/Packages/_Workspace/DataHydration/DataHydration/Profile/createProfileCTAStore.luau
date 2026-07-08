@@ -1,82 +1,96 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.createDataCache);
-local v3 = require(l_script_FirstAncestor_0.createDataResolver);
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local v5 = require(l_Parent_0.Cryo);
-local v6 = require(l_script_FirstAncestor_0.Profile.Requests);
-local _ = require(l_script_FirstAncestor_0.Profile.Enums.ProfileCTAEnums);
-game:DefineFastInt("ProfileCTAStoreProcessDelaySec", 1);
-local function _() --[[ Line: 36 ]]
-    return game:GetFastInt("ProfileCTAStoreProcessDelaySec");
-end;
-return function() --[[ Line: 40 ]] --[[ Name: createProfileCTAStore ]]
-    -- upvalues: v2 (copy), v3 (copy), v5 (copy), v6 (copy)
-    local v9 = v2();
-    local v19 = v3({
-        cache = v9, 
-        queueProcessDelaySec = game:GetFastInt("ProfileCTAStoreProcessDelaySec"), 
-        fetchFn = function(v10) --[[ Line: 46 ]] --[[ Name: fetchFn ]]
-            -- upvalues: v5 (ref), v6 (ref)
-            local v11 = v5.Dictionary.keys(v10);
-            return v6.GetUserProfileCTA(v11):andThen(function(v12) --[[ Line: 49 ]]
-                -- upvalues: v11 (copy)
-                local v13 = {};
-                if v12.responseBody and v12.responseBody.profiles then
-                    for _, v15 in v11 do
-                        local v16 = tostring(v15);
-                        local v17 = v12.responseBody.profiles[v16];
-                        v13[v16] = v17 and v17.components and v17.components.Actions or {};
-                    end;
-                end;
-                return v13;
-            end):catch(function(_) --[[ Line: 63 ]]
-                return {};
-            end);
-        end
-    });
-    return {
-        getCTA = function(v20, v21) --[[ Line: 69 ]] --[[ Name: getCTA ]]
-            -- upvalues: v19 (copy)
-            local v22 = nil;
-            if v21 ~= nil then
-                local v23 = v21 == true;
-                v22 = function(_) --[[ Line: 73 ]]
-                    -- upvalues: v23 (copy)
-                    return v23;
-                end;
-            end;
-            return v19.getAndFetchItem(v20, v22);
-        end, 
-        getBatchCTAs = function(v25, v26) --[[ Line: 80 ]] --[[ Name: getBatchCTAs ]]
-            -- upvalues: v19 (copy)
-            local v27 = nil;
-            if v26 then
-                local v28 = 0;
-                do
-                    local l_v28_0 = v28;
-                    v27 = function(_) --[[ Line: 87 ]]
-                        -- upvalues: l_v28_0 (ref), v25 (copy), v26 (copy)
-                        l_v28_0 = l_v28_0 + 1;
-                        local v31 = v25[l_v28_0];
-                        if v31 then
-                            return v26[v31] == true;
-                        else
-                            return false;
-                        end;
-                    end;
-                end;
-            end;
-            return v19.getAndFetchItems(v25, v27);
-        end, 
-        clear = function() --[[ Line: 99 ]] --[[ Name: clear ]]
-            -- upvalues: v9 (copy), v19 (copy)
-            v9.clear();
-            v19.clear();
-        end, 
-        dispose = function() --[[ Line: 104 ]] --[[ Name: dispose ]]
-            -- upvalues: v19 (copy)
-            v19.dispose();
-        end
-    };
-end;
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local createDataCache = require(DataHydration.createDataCache)
+local createDataResolver = require(DataHydration.createDataResolver)
+
+require(DataHydration.DataHydrationTypes)
+
+local Cryo = require(DataHydrationParent.Cryo)
+local Requests = require(DataHydration.Profile.Requests)
+
+require(DataHydration.Profile.Enums.ProfileCTAEnums)
+game:DefineFastInt("ProfileCTAStoreProcessDelaySec", 1)
+
+local function createProfileCTAStore() -- line: 40
+	-- upvalues: createDataCache (copy), createDataResolver (copy), Cryo (copy), Requests (copy)
+	local v8 = createDataCache()
+	local v9 = createDataResolver({
+		requestBatchSize = 25,
+		cache = v8,
+		queueProcessDelaySec = game:GetFastInt("ProfileCTAStoreProcessDelaySec"),
+		fetchFn = function(t1: {[any]: any}) -- line: 47
+			-- upvalues: Cryo (copy), Requests (copy)
+			local v11 = Cryo.Dictionary.keys(t1)
+
+			return Requests.GetUserProfileCTA(v11):andThen(function(p1) -- line: 50
+				-- upvalues: v11 (copy)
+				local t2 = {}
+
+				if p1.responseBody and p1.responseBody.profiles then
+					for _, v23 in v11 do
+						local str = tostring(v23)
+						local v25 = p1.responseBody.profiles[str]
+
+						t2[str] = v25 and (not not v25.components and v25.components.Actions) or {}
+					end
+				end
+
+				return t2
+			end):catch(function(_) -- line: 64
+				return {}
+			end)
+		end
+	})
+
+	return {
+		getCTA = function(s1: string, b1: boolean?) -- line: 70
+			-- upvalues: v9 (copy)
+			local v14 = nil
+
+			if b1 ~= nil then
+				local v15 = b1 == true
+
+				function v14(_: {[any]: any}?) -- line: 74
+					-- upvalues: v15 (copy)
+					return v15
+				end
+			end
+
+			return v9.getAndFetchItem(s1, v14)
+		end,
+		getBatchCTAs = function(t4: {[any]: any}, t5: {[any]: any}?) -- line: 81
+			-- upvalues: v9 (copy)
+			local v18 = nil
+
+			if t5 then
+				local n1 = 0
+
+				function v18(_: {[any]: any}?) -- line: 88
+					-- upvalues: n1 (ref), t4 (copy), t5 (copy)
+					n1 += 1
+
+					local v29 = t4[n1]
+
+					if v29 then
+						return t5[v29] == true
+					end
+
+					return false
+				end
+			end
+
+			return v9.getAndFetchItems(t4, v18)
+		end,
+		clear = function() -- line: 100
+			-- upvalues: v8 (copy), v9 (copy)
+			v8.clear()
+			v9.clear()
+		end,
+		dispose = function() -- line: 105
+			-- upvalues: v9 (copy)
+			v9.dispose()
+		end
+	}
+end
+
+return createProfileCTAStore

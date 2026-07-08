@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableNapIxpLayerExposure", false);
+return game:DefineFastFlag("EnableNapIxpLayerExposure", false)

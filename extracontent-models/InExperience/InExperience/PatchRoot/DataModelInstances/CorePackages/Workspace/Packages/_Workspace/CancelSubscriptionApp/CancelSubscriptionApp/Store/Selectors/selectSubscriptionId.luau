@@ -1,5 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CancelSubscriptionApp");
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-return function(v2) --[[ Line: 7 ]] --[[ Name: selectSubscriptionId ]]
-    return v2.subscriptionId;
-end;
+local CancelSubscriptionApp = script:FindFirstAncestor("CancelSubscriptionApp")
+
+require(CancelSubscriptionApp.Store.Types)
+
+local function selectSubscriptionId(p1) -- line: 7
+	return p1.subscriptionId
+end
+
+return selectSubscriptionId

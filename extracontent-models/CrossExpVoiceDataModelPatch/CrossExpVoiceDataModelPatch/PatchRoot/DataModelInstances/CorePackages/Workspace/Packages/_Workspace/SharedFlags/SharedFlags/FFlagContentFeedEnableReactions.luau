@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ContentFeedEnableReactions", false);
+return game:DefineFastFlag("ContentFeedEnableReactions", false)

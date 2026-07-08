@@ -1,41 +1,52 @@
-local v0 = {};
-v0.__index = v0;
-v0.createNode = function(v1) --[[ Line: 4 ]]
-    -- upvalues: v0 (copy)
-    local v2 = {
-        previous = nil, 
-        next = nil, 
-        value = v1
-    };
-    setmetatable(v2, v0);
-    return v2;
-end;
-v0.CreateNext = function(v3, v4) --[[ Line: 17 ]] --[[ Name: CreateNext ]]
-    -- upvalues: v0 (copy)
-    local v5 = {
-        previous = v3, 
-        next = v3.next, 
-        value = v4 or {}
-    };
-    if v3.next then
-        v3.next.previous = v5;
-    end;
-    setmetatable(v5, v0);
-    v3.next = v5;
-    return v5;
-end;
-v0.CreatePrevious = function(v6, v7) --[[ Line: 34 ]] --[[ Name: CreatePrevious ]]
-    -- upvalues: v0 (copy)
-    local v8 = {
-        previous = v6.previous, 
-        next = v6, 
-        value = v7 or {}
-    };
-    if v6.previous then
-        v6.previous.next = v8;
-    end;
-    setmetatable(v8, v0);
-    v6.previous = v8;
-    return v8;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.createNode(p1) -- line: 4
+	-- upvalues: t1 (copy)
+	local t2 = {
+		previous = nil,
+		next = nil,
+		value = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.CreateNext(p2, p3) -- line: 17
+	-- upvalues: t1 (copy)
+	local t3 = {
+		previous = p2,
+		next = p2.next,
+		value = p3 or {}
+	}
+
+	if p2.next then
+		p2.next.previous = t3
+	end
+
+	setmetatable(t3, t1)
+	p2.next = t3
+
+	return t3
+end
+function t1.CreatePrevious(p4, p5) -- line: 34
+	-- upvalues: t1 (copy)
+	local t4 = {
+		previous = p4.previous,
+		next = p4,
+		value = p5 or {}
+	}
+
+	if p4.previous then
+		p4.previous.next = t4
+	end
+
+	setmetatable(t4, t1)
+	p4.previous = t4
+
+	return t4
+end
+
+return t1

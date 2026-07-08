@@ -1,7 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.SignalsReact);
-local v2 = require(l_Parent_0.DataHydration);
-return function(v3) --[[ Line: 9 ]] --[[ Name: useGameInfo ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.useSignalState(v2.Game.getGameInfoStore(false).getGameInfo(v3).data);
-end;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local SignalsReact = require(Parent.SignalsReact)
+local DataHydration = require(Parent.DataHydration)
+
+local function useGameInfo(s1: string) -- line: 9
+	-- upvalues: SignalsReact (copy), DataHydration (copy)
+	return SignalsReact.useSignalState(DataHydration.Game.getGameInfoStore(false).getGameInfo(s1).data)
+end
+
+return useGameInfo

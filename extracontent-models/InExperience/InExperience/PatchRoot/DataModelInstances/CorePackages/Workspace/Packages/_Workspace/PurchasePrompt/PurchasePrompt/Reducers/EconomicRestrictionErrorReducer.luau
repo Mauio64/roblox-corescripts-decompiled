@@ -1,12 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Rodux_0 = require(l_Parent_0.PurchasePromptDeps).Rodux;
-local v3 = require(l_script_FirstAncestor_0.Actions.SetEconomicRestrictionError);
-return l_Rodux_0.createReducer({}, {
-    [v3.name] = function(_, v5) --[[ Line: 10 ]]
-        return {
-            timeoutMinutes = v5.timeoutMinutes, 
-            violationType = v5.violationType
-        };
-    end
-});
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local SetEconomicRestrictionError = require(PurchasePrompt.Actions.SetEconomicRestrictionError)
+
+return Rodux.createReducer({}, {
+	[SetEconomicRestrictionError.name] = function(_, p2) -- line: 10
+		return {
+			timeoutMinutes = p2.timeoutMinutes,
+			violationType = p2.violationType
+		}
+	end
+})

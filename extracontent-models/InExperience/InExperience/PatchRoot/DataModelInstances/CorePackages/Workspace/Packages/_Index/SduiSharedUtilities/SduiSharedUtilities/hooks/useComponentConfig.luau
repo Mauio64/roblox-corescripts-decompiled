@@ -1,18 +1,25 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiSharedUtilities");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local _ = require(l_Parent_0.SduiCoreSystem);
-local v5 = require(l_script_FirstAncestor_0.getSduiApiStore);
-return function(v6, v7) --[[ Line: 10 ]] --[[ Name: useComponentConfig ]]
-    -- upvalues: v2 (copy), v5 (copy), v3 (copy)
-    local v10 = v2.useCallback(function(v8) --[[ Line: 12 ]]
-        -- upvalues: v7 (copy), v6 (copy), v5 (ref)
-        local v9 = if v7 then ("%*_%*"):format(v6, v7) else nil;
-        return v5().getRootConfig(v6, v8, v9);
-    end, {
-        v6, 
-        v7
-    });
-    return v3.useSignalState(v10);
-end;
+local SduiSharedUtilities = script:FindFirstAncestor("SduiSharedUtilities")
+local SduiSharedUtilitiesParent = SduiSharedUtilities.Parent
+local React = require(SduiSharedUtilitiesParent.React)
+local SignalsReact = require(SduiSharedUtilitiesParent.SignalsReact)
+
+require(SduiSharedUtilitiesParent.SduiCoreSystem)
+
+local getSduiApiStore = require(SduiSharedUtilities.getSduiApiStore)
+
+local function useComponentConfig(s1: string, s2: string?) -- line: 10
+	-- upvalues: React (copy), getSduiApiStore (copy), SignalsReact (copy)
+	local v9 = React.useCallback(function(p1) -- line: 12
+		-- upvalues: s2 (copy), s1 (copy), getSduiApiStore (copy)
+		local v11 = if not s2 then nil else `{ s1 }_{ s2 }`
+
+		return getSduiApiStore().getRootConfig(s1, p1, v11)
+	end, {
+		s1,
+		s2
+	})
+
+	return SignalsReact.useSignalState(v9)
+end
+
+return useComponentConfig

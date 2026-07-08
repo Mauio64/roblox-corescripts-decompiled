@@ -1,9 +1,10 @@
-local v0 = require(script.StoreProvider);
-local v1 = require(script.StoreContext);
-local v2 = require(script.connect);
+local StoreProvider = require(script.StoreProvider)
+local StoreContext = require(script.StoreContext)
+local connect = require(script.connect)
+
 return {
-    StoreProvider = v0, 
-    StoreContext = v1, 
-    connect = v2, 
-    UNSTABLE_connect2 = v2
-};
+	StoreProvider = StoreProvider,
+	StoreContext = StoreContext,
+	connect = connect,
+	UNSTABLE_connect2 = connect
+}

@@ -1,9 +1,11 @@
-return function(v0, v1) --[[ Line: 3 ]]
-    v0 = v0 or Vector2.new(0, 0);
-    assert(v0, "");
-    if v1 and v1.screenSize then
-        return v1.screenSize;
-    else
-        return v0;
-    end;
-end;
+return function(vector2: Vector2?, p1) -- line: 3
+	local v3 = vector2 or Vector2.new(0, 0)
+
+	assert(v3, "")
+
+	if p1 and p1.screenSize then
+		return p1.screenSize
+	end
+
+	return v3
+end

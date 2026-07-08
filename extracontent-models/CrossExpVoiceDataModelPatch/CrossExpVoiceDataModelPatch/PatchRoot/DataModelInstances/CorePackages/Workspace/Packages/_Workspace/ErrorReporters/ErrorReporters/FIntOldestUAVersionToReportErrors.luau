@@ -1,1 +1,1 @@
-return game:DefineFastInt("OldestUAVersionToReportErrors", 0);
+return game:DefineFastInt("OldestUAVersionToReportErrors", 0)

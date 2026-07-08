@@ -1,147 +1,145 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_1.Roact);
-local _ = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.BuilderIcons);
-local v5 = require(l_Parent_0.migrationSizeExceptions);
-local v6 = {
-    ImageLabel = "TextLabel", 
-    ImageButton = "TextButton"
-};
-local v7 = {
-    ["icons/common/goldrobux"] = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.new(0.97, 0.93, 0.72)), 
-        ColorSequenceKeypoint.new(0.6, Color3.new(0.67, 0.58, 0.36)), 
-        ColorSequenceKeypoint.new(1, Color3.new(0.99, 0.88, 0.64))
-    }), 
-    ["icons/common/goldrobux_small"] = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.new(0.78, 0.71, 0.43)), 
-        ColorSequenceKeypoint.new(0.5, Color3.new(0.65, 0.55, 0.32)), 
-        ColorSequenceKeypoint.new(1, Color3.new(0.83, 0.71, 0.44))
-    })
-};
-local function _(v8) --[[ Line: 28 ]]
-    if not v8 then
-        return true;
-    else
-        return v8.X.Offset ~= 0 and v8.Y.Scale ~= 0 or v8.Y.Offset ~= 0 and v8.X.Scale ~= 0;
-    end;
-end;
-local function v13(v10) --[[ Line: 35 ]]
-    local l_v10_0 = v10;
-    if not (not l_v10_0 or l_v10_0.X.Offset ~= 0 and l_v10_0.Y.Scale ~= 0 or l_v10_0.Y.Offset ~= 0 and l_v10_0.X.Scale ~= 0) and (v10.X.Offset ~= v10.Y.Offset or v10.X.Scale ~= v10.Y.Scale) then
-        if v10.X.Offset ~= 0 then
-            l_v10_0 = math.min(v10.X.Offset, v10.Y.Offset);
-            return (UDim2.fromOffset(l_v10_0, l_v10_0));
-        else
-            local _ = true;
-        end;
-    end;
-    return v10;
-end;
-local function v15(v14) --[[ Line: 48 ]]
-    return not v14 or v14.X.Offset ~= 0 and v14.Y.Scale ~= 0 or v14.Y.Offset ~= 0 and v14.X.Scale ~= 0 or v14.X.Offset == 0;
-end;
-local function _(v16, v17, v18, v19, v20) --[[ Line: 58 ]]
-    -- upvalues: v5 (copy)
-    local l_Offset_0 = v16.Y.Offset;
-    if l_Offset_0 ~= 0 and not v17 and not v5[v19.name] then
-        local l_Size_100_0 = v18.Size.Size_100;
-        local l_Size_600_0 = v18.Size.Size_600;
-        local v24 = v20 * 38;
-        if l_Size_600_0 <= l_Offset_0 and l_Offset_0 <= v24 then
-            return l_Size_600_0;
-        else
-            l_Offset_0 = math.round(l_Offset_0 / l_Size_100_0) * l_Size_100_0;
-        end;
-    end;
-    return l_Offset_0;
-end;
-return function(v26, v27, v28, v29, v30, v31, v32) --[[ Line: 74 ]] --[[ Name: getBuilderIconElement ]]
-    -- upvalues: v13 (copy), v15 (copy), v5 (copy), v4 (copy), v6 (copy), v2 (copy), v7 (copy)
-    local v33 = false;
-    if v26.ImageRectOffset == nil then
-        v33 = v26.ImageRectSize == nil;
-    end;
-    assert(v33, "ImageRect props not supported for migration icons");
-    v33 = false;
-    if v26.SliceCenter == nil then
-        v33 = v26.SliceScale == nil;
-    end;
-    assert(v33, "Image slices not supported for migration icons");
-    local v34 = table.clone(v26);
-    if typeof(v34.Size) == "table" then
-        v33 = v34.Size;
-        v34.Size = v33:map(v13);
-        v34.TextScaled = v33:map(v15);
-        v34.TextSize = v33:map(function(v35) --[[ Line: 97 ]]
-            -- upvalues: v30 (copy), v28 (copy), v32 (copy), v5 (ref)
-            local v36 = not v35 or v35.X.Offset ~= 0 and v35.Y.Scale ~= 0 or v35.Y.Offset ~= 0 and v35.X.Scale ~= 0 or v35.X.Offset == 0;
-            local l_v30_0 = v30;
-            local l_v28_0 = v28;
-            local v39 = v32 or 1;
-            local l_Offset_1 = v35.Y.Offset;
-            if l_Offset_1 ~= 0 and not v36 and not v5[l_v28_0.name] then
-                local l_Size_100_1 = l_v30_0.Size.Size_100;
-                local l_Size_600_1 = l_v30_0.Size.Size_600;
-                local v43 = v39 * 38;
-                l_Offset_1 = if l_Size_600_1 <= l_Offset_1 and l_Offset_1 <= v43 then l_Size_600_1 else math.round(l_Offset_1 / l_Size_100_1) * l_Size_100_1;
-            end;
-            return l_Offset_1;
-        end);
-    else
-        v33 = v34.Size;
-        v34.Size = v13(v33);
-        local v44 = not v33 or v33.X.Offset ~= 0 and v33.Y.Scale ~= 0 or v33.Y.Offset ~= 0 and v33.X.Scale ~= 0 or v33.X.Offset == 0;
-        v34.TextScaled = v44;
-        local v45 = v32 or 1;
-        local l_Offset_2 = v33.Y.Offset;
-        if l_Offset_2 ~= 0 and not v44 and not v5[v28.name] then
-            local l_Size_100_2 = v30.Size.Size_100;
-            local l_Size_600_2 = v30.Size.Size_600;
-            local v49 = v45 * 38;
-            l_Offset_2 = if l_Size_600_2 <= l_Offset_2 and l_Offset_2 <= v49 then l_Size_600_2 else math.round(l_Offset_2 / l_Size_100_2) * l_Size_100_2;
-        end;
-        v34.TextSize = l_Offset_2;
-    end;
-    v34.Text = v28.name;
-    v34.FontFace = v4.Font[v28.variant];
-    v34.TextColor3 = v34.ImageColor3 or v30.Color.Content.Emphasis.Color3;
-    v34.TextTransparency = v34.ImageTransparency or v30.Color.Content.Emphasis.Transparency;
-    v34.ImageColor3 = nil;
-    v34.ImageTransparency = nil;
-    v34.ResampleMode = nil;
-    v34.ScaleType = nil;
-    v34.TileSize = nil;
-    v34.Image = nil;
-    v33 = v6[v27];
-    if v33 == nil then
-        error("Unsupported inner component for image set icon migration: " .. v27);
-    end;
-    local v50 = nil;
-    if v31 > 0 then
-        if v50 == nil then
-            v50 = {};
-        end;
-        v50.UITextSizeConstraint = v2.createElement("UITextSizeConstraint", {
-            MaxTextSize = v34.TextSize
-        });
-    end;
-    local v51 = v7[v29];
-    if v51 then
-        if v50 == nil then
-            v50 = {};
-        end;
-        v34.TextColor3 = Color3.new(1, 1, 1);
-        v50.UIGradient = v2.createElement("UIGradient", {
-            Color = v51, 
-            Rotation = 90
-        });
-    end;
-    if v50 ~= nil then
-        v50.Children = v2.createFragment(v26[v2.Children]);
-        return v2.createElement(v33, v34, v50);
-    else
-        return v2.createElement(v33, v34);
-    end;
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+
+require(ParentParent.React)
+
+local BuilderIcons = require(ParentParent.BuilderIcons)
+local migrationSizeExceptions = require(scriptParent.migrationSizeExceptions)
+local t1 = {
+	ImageLabel = "TextLabel",
+	ImageButton = "TextButton"
+}
+local t2 = {
+	["icons/common/goldrobux"] = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.new(0.97, 0.93, 0.72)),
+		ColorSequenceKeypoint.new(0.6, Color3.new(0.67, 0.58, 0.36)),
+		ColorSequenceKeypoint.new(1, Color3.new(0.99, 0.88, 0.64))
+	}),
+	["icons/common/goldrobux_small"] = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.new(0.78, 0.71, 0.43)),
+		ColorSequenceKeypoint.new(0.5, Color3.new(0.65, 0.55, 0.32)),
+		ColorSequenceKeypoint.new(1, Color3.new(0.83, 0.71, 0.44))
+	})
+}
+
+local function v8(uDim2: UDim2) -- line: 35
+	if uDim2 and ((uDim2.X.Offset == 0 or uDim2.Y.Scale == 0) and (uDim2.Y.Offset == 0 or uDim2.X.Scale == 0)) and (uDim2.X.Offset ~= uDim2.Y.Offset or uDim2.X.Scale ~= uDim2.Y.Scale) then
+		if uDim2.X.Offset ~= 0 then
+			local v13 = math.min(uDim2.X.Offset, uDim2.Y.Offset)
+
+			return (UDim2.fromOffset(v13, v13))
+		end
+	end
+
+	return uDim2
+end
+local function v9(uDim2: UDim2) -- line: 48
+	return not uDim2 or (uDim2.X.Offset ~= 0 and uDim2.Y.Scale ~= 0 or uDim2.Y.Offset ~= 0 and uDim2.X.Scale ~= 0) or uDim2.X.Offset == 0
+end
+local function getBuilderIconElement(p1, s1: string, p2, s2: string, p3, n1: number, n2: number?) -- line: 74
+	-- upvalues: v8 (copy), v9 (copy), migrationSizeExceptions (copy), BuilderIcons (copy), t1 (copy), Roact (copy), t2 (copy)
+	assert(p1.ImageRectOffset == nil and p1.ImageRectSize == nil, "ImageRect props not supported for migration icons")
+	assert(p1.SliceCenter == nil and p1.SliceScale == nil, "Image slices not supported for migration icons")
+
+	local v31 = table.clone(p1)
+
+	if typeof(v31.Size) == "table" then
+		local Size = v31.Size
+
+		v31.Size = Size:map(v8)
+		v31.TextScaled = Size:map(v9)
+		v31.TextSize = Size:map(function(p4) -- line: 97
+			-- upvalues: p3 (copy), p2 (copy), n2 (copy), migrationSizeExceptions (copy)
+			local v44 = not p4 or (p4.X.Offset ~= 0 and p4.Y.Scale ~= 0 or p4.Y.Offset ~= 0 and p4.X.Scale ~= 0) or p4.X.Offset == 0
+			local v45 = p3
+			local v46 = p2
+			local v47 = n2 or 1
+			local YOffset = p4.Y.Offset
+
+			if YOffset ~= 0 and (not v44 and not migrationSizeExceptions[v46.name]) then
+				local Size_100 = v45.Size.Size_100
+				local Size_600 = v45.Size.Size_600
+				local v51 = v47 * 38
+
+				YOffset = if not (Size_600 <= YOffset) or not (YOffset <= v51) then math.round(YOffset / Size_100) * Size_100 else Size_600
+			end
+
+			return YOffset
+		end)
+	else
+		local Size = v31.Size
+
+		v31.Size = v8(Size)
+
+		local v34 = not Size or (Size.X.Offset ~= 0 and Size.Y.Scale ~= 0 or Size.Y.Offset ~= 0 and Size.X.Scale ~= 0) or Size.X.Offset == 0
+
+		v31.TextScaled = v34
+
+		local v35 = n2 or 1
+		local YOffset = Size.Y.Offset
+
+		if YOffset ~= 0 and not v34 and not migrationSizeExceptions[p2.name] then
+			local Size_100 = p3.Size.Size_100
+			local Size_600 = p3.Size.Size_600
+			local v39 = v35 * 38
+
+			YOffset = if not (Size_600 <= YOffset) or not (YOffset <= v39) then math.round(YOffset / Size_100) * Size_100 else Size_600
+		end
+
+		v31.TextSize = YOffset
+	end
+
+	v31.Text = p2.name
+	v31.FontFace = BuilderIcons.Font[p2.variant]
+	v31.TextColor3 = v31.ImageColor3 or p3.Color.Content.Emphasis.Color3
+	v31.TextTransparency = v31.ImageTransparency or p3.Color.Content.Emphasis.Transparency
+	v31.ImageColor3 = nil
+	v31.ImageTransparency = nil
+	v31.ResampleMode = nil
+	v31.ScaleType = nil
+	v31.TileSize = nil
+	v31.Image = nil
+
+	local v40 = t1[s1]
+
+	if v40 == nil then
+		error("Unsupported inner component for image set icon migration: " .. s1)
+	end
+
+	local t3 = nil
+
+	if n1 > 0 then
+		if t3 == nil then
+			t3 = {}
+		end
+
+		t3.UITextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+			MaxTextSize = v31.TextSize
+		})
+	end
+
+	local v42 = t2[s2]
+
+	if v42 then
+		if t3 == nil then
+			t3 = {}
+		end
+
+		v31.TextColor3 = Color3.new(1, 1, 1)
+		t3.UIGradient = Roact.createElement("UIGradient", {
+			Rotation = 90,
+			Color = v42
+		})
+	end
+
+	if t3 ~= nil then
+		t3.Children = Roact.createFragment(p1[Roact.Children])
+
+		return Roact.createElement(v40, v31, t3)
+	end
+
+	return Roact.createElement(v40, v31)
+end
+
+return getBuilderIconElement

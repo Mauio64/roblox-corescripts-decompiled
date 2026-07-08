@@ -6,6 +6,7 @@ require(script.Components.CatalogRowItemCard.CatalogRowItemCardFooter)
 local CatalogItemCardItemInfoEnum = require(script.Components.CatalogItemCard.Enums.CatalogItemCardItemInfoEnum)
 local CatalogItemCardItemTypeEnum = require(script.Components.CatalogItemCard.Enums.CatalogItemCardItemTypeEnum)
 local ItemRestrictions = require(script.Enums.ItemRestrictions)
+local ItemStatus = require(script.Enums.ItemStatus)
 local SalesLocationType = require(script.Enums.SalesLocationType)
 local CreatorType = require(script.Enums.CreatorType)
 local CatalogItemCardStatusIconTypeEnum = require(script.Components.CatalogItemCard.Enums.CatalogItemCardStatusIconTypeEnum)
@@ -67,6 +68,7 @@ require(script.Types.AvatarColorTypes)
 require(script.Types.WidgetAnalyticsInfo)
 require(script.Types.WidgetInfoContextTypes)
 require(script.Types.ItemTypes)
+require(script.Backgrounds.types)
 
 return {
 	Components = {
@@ -109,6 +111,7 @@ return {
 		OutfitTypes = require(script.Enums.OutfitTypes),
 		ItemTypeEnum = ItemTypeEnum,
 		ItemRestrictions = ItemRestrictions,
+		ItemStatus = ItemStatus,
 		SalesLocationType = SalesLocationType,
 		CreatorType = CreatorType,
 		NoPriceStatus = NoPriceStatus,
@@ -119,7 +122,8 @@ return {
 		CatalogSubcategoryIds = CatalogSubcategoryIds,
 		CatalogSDUICategoryIds = CatalogSDUICategoryIds,
 		FullView = FullView,
-		WearTimeFilter = WearTimeFilter
+		WearTimeFilter = WearTimeFilter,
+		DiscountTypeEnum = require(script.Enums.DiscountType)
 	},
 	Hooks = {
 		useSelectorSignal = useSelectorSignal,
@@ -135,7 +139,8 @@ return {
 		useEnhancedAvatarHeadsFtux = require(script.Hooks.useEnhancedAvatarHeadsFtux),
 		useAdaptiveScrolling = require(script.Hooks.useAdaptiveScrolling),
 		AdaptiveScrollingContext = AdaptiveScrollingContext,
-		withAdaptiveScrolling = withAdaptiveScrolling
+		withAdaptiveScrolling = withAdaptiveScrolling,
+		useUnifiedImpressionExposer = require(script.Hooks.useUnifiedImpressionExposer)
 	},
 	Lib = {
 		SafeAppStorageService = require(script.Lib.SafeAppStorageService)
@@ -166,9 +171,7 @@ return {
 			selectTryOnsLookId = selectTryOnsLookId
 		},
 		Actions = {
-			CharacterHistoryStateChangeButtonActivated = CharacterHistoryStateChangeButtonActivated,
-			ClearTryOns = require(script.State.Actions.ClearTryOns),
-			SetOutfitTryOns = require(script.State.Actions.SetOutfitTryOns)
+			CharacterHistoryStateChangeButtonActivated = CharacterHistoryStateChangeButtonActivated
 		}
 	},
 	Stores = {
@@ -216,6 +219,12 @@ return {
 		isLayeredClothingAssetType = require(script.Utils.isLayeredClothingAssetType),
 		isDurableItemExpired = require(script.Utils.isDurableItemExpired),
 		formatTimeoutEndTime = require(script.Utils.formatTimeoutEndTime)
+	},
+	Backgrounds = {
+		loadBackgroundAsset = require(script.Backgrounds.loadBackgroundAsset),
+		selectActiveBackground = require(script.Backgrounds.selectActiveBackground),
+		buildOutfitProfileConfiguration = require(script.Backgrounds.buildOutfitProfileConfiguration),
+		NO_BACKGROUND_ASSET_ID = require(script.Backgrounds.constants).NO_BACKGROUND_ASSET_ID
 	},
 	Constants = require(script.Constants),
 	AnimationConstants = require(script.AnimationConstants),

@@ -1,4 +1,5 @@
-game:DefineFastString("TopSongsSortExploreApiPageType", "");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("TopSongsSortExploreApiPageType");
-end;
+game:DefineFastString("TopSongsSortExploreApiPageType", "")
+
+return function() -- line: 3
+	return game:GetFastString("TopSongsSortExploreApiPageType")
+end

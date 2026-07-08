@@ -1,346 +1,333 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_RunService_0 = game:GetService("RunService");
-local l_BrowserService_0 = game:GetService("BrowserService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AdGuiInteractivity");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.UIBlox);
-local v7 = require(l_Parent_0.GenericAbuseReporting);
-local v8 = require(l_Parent_0.LinkingProtocol);
-local v9 = require(l_Parent_0.Foundation);
-local v10 = require(l_Parent_0.Localization);
-local v11 = require(l_Parent_0.UniversalAppPolicy);
-local v12 = require(l_Parent_0.Http);
-local v13 = require(l_Parent_0.RoactServices);
-local v14 = require(l_Parent_0.RoactServiceTags);
-local v15 = require(l_Parent_0.RobloxAppHooks);
-local v16 = require(l_Parent_0.Screenshot);
-local v17 = require(l_Parent_0.LoggingProtocol);
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local v19 = require(l_script_FirstAncestor_0.Flags);
-local v20 = require(l_script_FirstAncestor_0.AdsInteractivityTelemetry);
-local l_useRoactService_0 = v15.useRoactService;
-local l_useAppPolicy_0 = v11.useAppPolicy;
-local l_AppStyleProvider_0 = v6.App.Style.AppStyleProvider;
-local l_Constants_0 = v6.App.Style.Constants;
-local l_DefaultTwoStepReportFlow_0 = v7.UXFlows.DefaultTwoStepReportFlow;
-local l_Button_0 = v9.Button;
-local l_View_0 = v9.View;
-local l_ButtonVariant_0 = v9.Enums.ButtonVariant;
-local l_InputSize_0 = v9.Enums.InputSize;
-local l_useLocalization_0 = v10.Hooks.useLocalization;
-local l_default_0 = v8.LinkingProtocol.default;
-local l_default_1 = v17.default;
-local l_Url_0 = v12.Url;
-local v34 = game:DefineFastFlag("AddImmersiveBrandedAdReportPlaceId", false);
-local v35 = {
-    {
-        localizationKey = "CoreScripts.Ads.Label.InappropriateAd", 
-        value = "ABUSE_CATEGORY_INAPPROPRIATE_AD"
-    }
-};
-local v36 = l_UrlBuilder_0.new({
-    base = l_Url_0.BASE_URL, 
-    path = "illegal-content-reporting"
-});
-local v37 = l_UrlBuilder_0.new({
-    base = l_Url_0.CREATOR_HUB_URL, 
-    path = "store/asset/{assetId}"
-});
-local v38 = l_UrlBuilder_0.new({
-    base = l_Url_0.APIS_URL, 
-    path = "abuse-reporting/v1/abuse-report"
-});
-local v39 = {
-    eventName = "ReportImmersiveBrandedAdTotalCounter", 
-    backends = {
-        v17.TelemetryBackends.Counter
-    }, 
-    lastUpdated = {
-        26, 
-        3, 
-        11
-    }, 
-    description = "This event is fired when the user initiates submitting an immersive branded ad abuse report (before success or failure is known)."
-};
-local v40 = {
-    eventName = "ReportImmersiveBrandedAdSuccessCounter", 
-    backends = {
-        v17.TelemetryBackends.Counter
-    }, 
-    lastUpdated = {
-        26, 
-        3, 
-        11
-    }, 
-    description = "This event is fired when an immersive branded ad abuse report is successfully submitted to the server."
-};
-local v41 = {
-    eventName = "ReportImmersiveBrandedAdFailureCounter", 
-    backends = {
-        v17.TelemetryBackends.Counter
-    }, 
-    lastUpdated = {
-        26, 
-        3, 
-        11
-    }, 
-    description = "This event is fired when submitting an immersive branded ad abuse report fails."
-};
-local v42 = {
-    eventName = "ReportImmersiveBrandedAdHttpFaulreEvent", 
-    backends = {
-        v17.TelemetryBackends.Points
-    }, 
-    throttlingPercentage = game:DefineFastInt("ReportImmersiveBrandedAdHttpFaulreEventThrottleHundredthsPercent", 0), 
-    lastUpdated = {
-        26, 
-        11, 
-        3
-    }, 
-    description = "This event is fired when the HTTP request to submit an immersive branded ad abuse report fails."
-};
-local function _() --[[ Line: 97 ]] --[[ Name: logReportImmersiveBrandedAdTotalCounter ]]
-    -- upvalues: l_default_1 (copy), v39 (copy)
-    l_default_1:logRobloxTelemetryCounter(v39);
-end;
-local function _() --[[ Line: 101 ]] --[[ Name: logReportImmersiveBrandedAdSuccessCounter ]]
-    -- upvalues: l_default_1 (copy), v40 (copy)
-    l_default_1:logRobloxTelemetryCounter(v40);
-end;
-local function _(v45) --[[ Line: 105 ]] --[[ Name: logReportImmersiveBrandedAdFailureCounter ]]
-    -- upvalues: l_default_1 (copy), v41 (copy)
-    l_default_1:logRobloxTelemetryCounter(v41, 1, {
-        reason = v45
-    });
-end;
-local function v49(v47) --[[ Line: 111 ]] --[[ Name: logReportImmersiveBrandedAdHttpFailureEvent ]]
-    -- upvalues: l_default_1 (copy), v42 (copy)
-    local v48 = {};
-    if type(v47) == "string" then
-        v48.error = v47:sub(1, 500);
-    elseif type(v47) == "table" then
-        if v47.Body and type(v47.Body) == "string" then
-            v48.body = v47.Body:sub(1, 500);
-        end;
-        if v47.StatusCode and type(v47.StatusCode) == "number" then
-            v48.statusCode = tostring(v47.StatusCode);
-        end;
-    end;
-    l_default_1:logRobloxTelemetryEvent(v42, nil, v48);
-end;
-local function v58(v50, v51) --[[ Line: 136 ]] --[[ Name: sendImmersiveBrandedAdAbuseReport ]]
-    -- upvalues: v34 (copy), l_HttpService_0 (copy), l_default_1 (copy), v41 (copy), v38 (copy), v40 (copy), v49 (copy)
-    local v52 = {
-        abuseVector = "ad_v2", 
-        targetType = "ad_v2", 
-        category = v51.reason, 
-        comment = v51.comment, 
-        custom = {
-            SCREENSHOT_ID = v51.screenshotId, 
-            PLACE_ID = if v34 then v51.placeId else nil
-        }, 
-        submitterId = v51.userId, 
-        targetIdStr = ("immersiveBrandedAd/%*"):format(v51.immersiveBrandedAdId)
-    };
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 150 ]]
-        -- upvalues: l_HttpService_0 (ref), v52 (copy)
-        return l_HttpService_0:JSONEncode(v52);
-    end);
-    if not l_status_0 then
-        l_default_1:logRobloxTelemetryCounter(v41, 1, {
-            reason = "jsonEncode"
-        });
-        return false;
-    else
-        task.spawn(function() --[[ Line: 158 ]]
-            -- upvalues: v38 (ref), v50 (copy), l_result_0 (copy), l_default_1 (ref), v40 (ref), v41 (ref), v49 (ref)
-            local v55 = v38();
-            v50(v55, "POST", {
-                postBody = l_result_0
-            }):andThen(function(_) --[[ Line: 160 ]]
-                -- upvalues: l_default_1 (ref), v40 (ref)
-                l_default_1:logRobloxTelemetryCounter(v40);
-            end, function(v57) --[[ Line: 162 ]]
-                -- upvalues: l_default_1 (ref), v41 (ref), v49 (ref)
-                l_default_1:logRobloxTelemetryCounter(v41, 1, {
-                    reason = "http"
-                });
-                v49(v57);
-            end);
-        end);
-        return true;
-    end;
-end;
-local function v78(v59) --[[ Line: 176 ]] --[[ Name: ImmersiveBrandedAdReportAdDialog ]]
-    -- upvalues: l_useRoactService_0 (copy), v14 (copy), v5 (copy), l_useLocalization_0 (copy), l_useAppPolicy_0 (copy), v37 (copy), l_UrlBuilder_0 (copy), v36 (copy), v19 (copy), l_BrowserService_0 (copy), l_HttpService_0 (copy), l_default_0 (copy), v20 (copy), l_View_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy), l_RunService_0 (copy), l_default_1 (copy), v39 (copy), v41 (copy), v58 (copy), v34 (copy), v16 (copy), l_DefaultTwoStepReportFlow_0 (copy), v35 (copy)
-    local l_immersiveBrandedAdId_0 = v59.immersiveBrandedAdId;
-    local v61 = l_useRoactService_0(v14.RoactNetworking);
-    local v62 = v5.useRef(nil);
-    local v63, v64 = v5.useState(false);
-    local v65 = l_useLocalization_0({
-        LinkText = "CoreScripts.Ads.Label.IllegalContentReportingLink"
-    });
-    local v67 = l_useAppPolicy_0(function(v66) --[[ Line: 186 ]]
-        return v66.getShowIllegalContentReportingUI();
-    end);
-    local v71 = v5.useCallback(function() --[[ Line: 191 ]]
-        -- upvalues: v37 (ref), l_immersiveBrandedAdId_0 (copy), l_UrlBuilder_0 (ref), v36 (ref), v19 (ref), l_BrowserService_0 (ref), l_HttpService_0 (ref), l_default_0 (ref), v20 (ref), v59 (copy)
-        local v68 = v37({
-            assetId = l_immersiveBrandedAdId_0
-        });
-        local v69 = l_UrlBuilder_0.addQueryString(v36(), {
-            contentURL = v68
-        });
-        if v19.FFlagUseWebviewsForImmersiveBrandedAdLinks then
-            l_BrowserService_0:SendCommand(l_HttpService_0:JSONEncode({
-                command = "open", 
-                url = v69, 
-                visible = true, 
-                isGenericWebview = true
-            }));
-            return;
-        elseif v19.FFlagSendImmersiveBrandedAdLinkingFailureTelemetry then
-            l_default_0:openURL(v69):catch(function(_) --[[ Line: 205 ]]
-                -- upvalues: v20 (ref), v59 (ref)
-                v20.logImmersiveBrandedAdLinkingFailedCounter("reportAd.eudsaIllegalContent");
-                v59.onDismiss();
-            end);
-            return;
-        else
-            l_default_0:openURL(v69);
-            return;
-        end;
-    end, if v19.FFlagSendImmersiveBrandedAdLinkingFailureTelemetry then {
-        l_immersiveBrandedAdId_0, 
-        v59.onDismiss
-    } else {
-        l_immersiveBrandedAdId_0
-    });
-    local v72 = v5.useCallback(function() --[[ Line: 218 ]]
-        -- upvalues: v5 (ref), l_View_0 (ref), l_Button_0 (ref), v65 (copy), l_ButtonVariant_0 (ref), v71 (copy), l_InputSize_0 (ref)
-        return v5.createElement(l_View_0, {
-            tag = "col margin-x-medium padding-top-medium size-full-0 auto-y"
-        }, {
-            linkButton = v5.createElement(l_Button_0, {
-                text = v65.LinkText, 
-                variant = l_ButtonVariant_0.Link, 
-                onActivated = v71, 
-                icon = "icons/navigation/externallink", 
-                size = l_InputSize_0.Small
-            })
-        });
-    end, {
-        v71, 
-        v65.LinkText
-    });
-    local v76 = v5.useCallback(function(v73, v74) --[[ Line: 232 ]]
-        -- upvalues: l_RunService_0 (ref), l_default_1 (ref), v39 (ref), v41 (ref), v62 (copy), v58 (ref), v61 (copy), l_immersiveBrandedAdId_0 (copy), v34 (ref)
-        if l_RunService_0:IsStudio() or _G.__TESTEZ_RUNNING_TEST__ or _G.__TEST_SUITE_PACKAGE__ then
-            return true;
-        else
-            l_default_1:logRobloxTelemetryCounter(v39);
-            local l_LocalPlayer_0 = game.Players.LocalPlayer;
-            if not l_LocalPlayer_0 then
-                l_default_1:logRobloxTelemetryCounter(v41, 1, {
-                    reason = "noPlayer"
-                });
-                return false;
-            elseif not v62.current then
-                l_default_1:logRobloxTelemetryCounter(v41, 1, {
-                    reason = "noScreenshot"
-                });
-                return false;
-            else
-                return (v58(v61, {
-                    reason = v73, 
-                    comment = v74, 
-                    immersiveBrandedAdId = l_immersiveBrandedAdId_0, 
-                    screenshotId = v62.current, 
-                    userId = l_LocalPlayer_0.UserId, 
-                    placeId = if v34 then game.PlaceId else nil
-                }));
-            end;
-        end;
-    end, {
-        l_immersiveBrandedAdId_0, 
-        v61
-    });
-    v5.useEffect(function() --[[ Line: 261 ]]
-        -- upvalues: l_RunService_0 (ref), v16 (ref), v62 (copy), v64 (copy)
-        if not l_RunService_0:IsStudio() and not _G.__TESTEZ_RUNNING_TEST__ and not _G.__TEST_SUITE_PACKAGE__ then
-            v16.ScreenshotManager:TakeScreenshotWithCallback(function(v77) --[[ Line: 264 ]]
-                -- upvalues: v62 (ref)
-                v62.current = v77;
-            end, nil);
-        end;
-        task.defer(function() --[[ Line: 270 ]]
-            -- upvalues: v64 (ref)
-            v64(true);
-        end);
-    end, {});
-    if not v63 then
-        return nil;
-    else
-        return v5.createElement(v5.Fragment, {}, {
-            modal = v5.createElement("TextButton", {
-                Text = "", 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, 0, 0, 0), 
-                Modal = true
-            }), 
-            abuseReportFlow = v5.createElement(l_DefaultTwoStepReportFlow_0, {
-                analyticsContext = "Ad", 
-                onCloseProps = {
-                    hasPreviousSteps = false, 
-                    onAbandon = v59.onDismiss
-                }, 
-                onSubmitProps = {
-                    hasNextSteps = false, 
-                    onSubmit = v76
-                }, 
-                onComplete = v59.onDismiss, 
-                reportCategories = v35, 
-                reportCategoryDefaultKey = v35[1].value, 
-                isReportCategoryReadonly = true, 
-                localizationKeys = {
-                    formTitle = "CoreScripts.Ads.Label.ReportAd", 
-                    completeTitle = "Feature.ReportAbuse.Title.SelectInSceneThankYou", 
-                    completeDescription = "Feature.ReportAbuse.Label.SelectInSceneComplete"
-                }, 
-                footerContent = if v67 then v72 else nil
-            })
-        });
-    end;
-end;
-return function(v79) --[[ Line: 311 ]]
-    -- upvalues: v5 (copy), v13 (copy), v14 (copy), v12 (copy), l_HttpService_0 (copy), v11 (copy), l_AppStyleProvider_0 (copy), l_Constants_0 (copy), v78 (copy)
-    return v5.createElement(v13.RoactServices.ServiceProvider, {
-        services = {
-            [v14.RoactNetworking] = v12.NetworkLayers.requestInternalWrapper(l_HttpService_0)
-        }
-    }, {
-        policyProvider = v5.createElement(v11.RoactAppPolicy.Provider, {
-            policy = {
-                v11.AppFeaturePolicies
-            }
-        }, {
-            appStyleProvider = v5.createElement(l_AppStyleProvider_0, {
-                style = {
-                    themeName = l_Constants_0.ThemeName.Dark, 
-                    fontName = l_Constants_0.FontName.Gotham
-                }
-            }, {
-                resizeFrame = v5.createElement("Frame", {
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Size = UDim2.fromScale(1, 0.6), 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    BackgroundTransparency = 1
-                }, {
-                    reportAdDialog = v5.createElement(v78, v79)
-                })
-            })
-        })
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local AdGuiInteractivity = script:FindFirstAncestor("AdGuiInteractivity")
+local AdGuiInteractivityParent = AdGuiInteractivity.Parent
+local React = require(AdGuiInteractivityParent.React)
+local UIBlox = require(AdGuiInteractivityParent.UIBlox)
+local LinkingProtocol = require(AdGuiInteractivityParent.LinkingProtocol)
+local Foundation = require(AdGuiInteractivityParent.Foundation)
+local Localization = require(AdGuiInteractivityParent.Localization)
+local UniversalAppPolicy = require(AdGuiInteractivityParent.UniversalAppPolicy)
+local Http = require(AdGuiInteractivityParent.Http)
+local RoactServices = require(AdGuiInteractivityParent.RoactServices)
+local RoactServiceTags = require(AdGuiInteractivityParent.RoactServiceTags)
+local RobloxAppHooks = require(AdGuiInteractivityParent.RobloxAppHooks)
+local Screenshot = require(AdGuiInteractivityParent.Screenshot)
+local LoggingProtocol = require(AdGuiInteractivityParent.LoggingProtocol)
+local UrlBuilder = require(AdGuiInteractivityParent.UrlBuilder).UrlBuilder
+local AdsInteractivityTelemetry = require(AdGuiInteractivity.AdsInteractivityTelemetry)
+local useRoactService = RobloxAppHooks.useRoactService
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Constants = UIBlox.App.Style.Constants
+local DefaultTwoStepReportFlow = require(AdGuiInteractivityParent.GenericAbuseReporting.DefaultTwoStepReportFlow)
+local Button = Foundation.Button
+local View = Foundation.View
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local useLocalization = Localization.Hooks.useLocalization
+local default = LinkingProtocol.LinkingProtocol.default
+local default2 = LoggingProtocol.default
+local Url = Http.Url
+local t1 = {{
+	localizationKey = "CoreScripts.Ads.Label.InappropriateAd",
+	value = "ABUSE_CATEGORY_INAPPROPRIATE_AD"
+}}
+local v33 = UrlBuilder.new({
+	path = "illegal-content-reporting",
+	base = Url.BASE_URL
+})
+local v34 = UrlBuilder.new({
+	path = "store/asset/{assetId}",
+	base = Url.CREATOR_HUB_URL
+})
+local v35 = UrlBuilder.new({
+	path = "abuse-reporting/v1/abuse-report",
+	base = Url.APIS_URL
+})
+local t2 = {
+	eventName = "ReportImmersiveBrandedAdTotalCounter",
+	description = "This event is fired when the user initiates submitting an immersive branded ad abuse report (before success or failure is known).",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		26,
+		3,
+		11
+	}
+}
+local t3 = {
+	eventName = "ReportImmersiveBrandedAdSuccessCounter",
+	description = "This event is fired when an immersive branded ad abuse report is successfully submitted to the server.",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		26,
+		3,
+		11
+	}
+}
+local t4 = {
+	eventName = "ReportImmersiveBrandedAdFailureCounter",
+	description = "This event is fired when submitting an immersive branded ad abuse report fails.",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	lastUpdated = {
+		26,
+		3,
+		11
+	}
+}
+local t5 = {
+	eventName = "ReportImmersiveBrandedAdHttpFaulreEvent",
+	description = "This event is fired when the HTTP request to submit an immersive branded ad abuse report fails.",
+	backends = { LoggingProtocol.TelemetryBackends.Points },
+	throttlingPercentage = game:DefineFastInt("ReportImmersiveBrandedAdHttpFaulreEventThrottleHundredthsPercent", 0),
+	lastUpdated = {
+		26,
+		11,
+		3
+	}
+}
+
+local function logReportImmersiveBrandedAdTotalCounter() -- line: 92
+	-- upvalues: default2 (copy), t2 (copy)
+	default2:logRobloxTelemetryCounter(t2)
+end
+local function logReportImmersiveBrandedAdSuccessCounter() -- line: 96
+	-- upvalues: default2 (copy), t3 (copy)
+	default2:logRobloxTelemetryCounter(t3)
+end
+local function logReportImmersiveBrandedAdFailureCounter(s1: string) -- line: 100
+	-- upvalues: default2 (copy), t4 (copy)
+	default2:logRobloxTelemetryCounter(t4, 1, {
+		reason = s1
+	})
+end
+local function logReportImmersiveBrandedAdHttpFailureEvent(p1) -- line: 106
+	-- upvalues: default2 (copy), t5 (copy)
+	local t6 = {}
+
+	if type(p1) == "string" then
+		t6.error = p1:sub(1, 500)
+	elseif type(p1) == "table" then
+		if p1.Body and type(p1.Body) == "string" then
+			t6.body = p1.Body:sub(1, 500)
+		end
+
+		if p1.StatusCode and type(p1.StatusCode) == "number" then
+			t6.statusCode = tostring(p1.StatusCode)
+		end
+	end
+
+	default2:logRobloxTelemetryEvent(t5, nil, t6)
+end
+local function sendImmersiveBrandedAdAbuseReport(p2, t7: {[any]: any}) -- line: 131
+	-- upvalues: HttpService (copy), default2 (copy), t4 (copy), v35 (copy), t3 (copy), logReportImmersiveBrandedAdHttpFailureEvent (copy)
+	local t8 = {
+		abuseVector = "ad_v2",
+		targetType = "ad_v2",
+		category = t7.reason,
+		comment = t7.comment,
+		custom = {
+			SCREENSHOT_ID = t7.screenshotId,
+			PLACE_ID = t7.placeId
+		},
+		submitterId = t7.userId,
+		targetIdStr = `immersiveBrandedAd/{ t7.immersiveBrandedAdId }`
+	}
+	local ok, result = pcall(function() -- line: 145
+		-- upvalues: HttpService (copy), t8 (copy)
+		return HttpService:JSONEncode(t8)
+	end)
+
+	if not ok then
+		default2:logRobloxTelemetryCounter(t4, 1, {
+			reason = "jsonEncode"
+		})
+
+		return false
+	end
+
+	task.spawn(function() -- line: 153
+		-- upvalues: v35 (copy), p2 (copy), result (copy), default2 (copy), t3 (copy), t4 (copy), logReportImmersiveBrandedAdHttpFailureEvent (copy)
+		local v66 = v35()
+
+		p2(v66, "POST", {
+			postBody = result
+		}):andThen(function(_) -- line: 155
+			-- upvalues: default2 (copy), t3 (copy)
+			default2:logRobloxTelemetryCounter(t3)
+		end, function(p4) -- line: 157
+			-- upvalues: default2 (copy), t4 (copy), logReportImmersiveBrandedAdHttpFailureEvent (copy)
+			default2:logRobloxTelemetryCounter(t4, 1, {
+				reason = "http"
+			})
+			logReportImmersiveBrandedAdHttpFailureEvent(p4)
+		end)
+	end)
+
+	return true
+end
+local function ImmersiveBrandedAdReportAdDialog(t9: {[any]: any}) -- line: 171
+	-- upvalues: useRoactService (copy), RoactServiceTags (copy), React (copy), useLocalization (copy), useAppPolicy (copy), v34 (copy), UrlBuilder (copy), v33 (copy), default (copy), AdsInteractivityTelemetry (copy), View (copy), Button (copy), ButtonVariant (copy), InputSize (copy), RunService (copy), default2 (copy), t2 (copy), t4 (copy), sendImmersiveBrandedAdAbuseReport (copy), Screenshot (copy), DefaultTwoStepReportFlow (copy), t1 (copy)
+	local immersiveBrandedAdId = t9.immersiveBrandedAdId
+	local v56 = useRoactService(RoactServiceTags.RoactNetworking)
+	local v57 = React.useRef(nil)
+	local v58, v59 = React.useState(false)
+	local v60 = useLocalization({
+		LinkText = "CoreScripts.Ads.Label.IllegalContentReportingLink"
+	})
+	local v61 = useAppPolicy(function(p5) -- line: 181
+		return p5.getShowIllegalContentReportingUI()
+	end)
+	local v62 = React.useCallback(function() -- line: 185
+		-- upvalues: v34 (copy), immersiveBrandedAdId (copy), UrlBuilder (copy), v33 (copy), default (copy), AdsInteractivityTelemetry (copy), t9 (copy)
+		local v68 = v34({
+			assetId = immersiveBrandedAdId
+		})
+		local v69 = UrlBuilder.addQueryString(v33(), {
+			contentURL = v68
+		})
+
+		default:openURL(v69):catch(function(_) -- line: 191
+			-- upvalues: AdsInteractivityTelemetry (copy), t9 (copy)
+			AdsInteractivityTelemetry.logImmersiveBrandedAdLinkingFailedCounter("reportAd.eudsaIllegalContent")
+			t9.onDismiss()
+		end)
+	end, {
+		immersiveBrandedAdId,
+		t9.onDismiss
+	})
+	local v63 = React.useCallback(function() -- line: 197
+		-- upvalues: React (copy), View (copy), Button (copy), v60 (copy), ButtonVariant (copy), v62 (copy), InputSize (copy)
+		return React.createElement(View, {
+			tag = "col margin-x-medium padding-top-medium size-full-0 auto-y"
+		}, {
+			linkButton = React.createElement(Button, {
+				icon = "icons/navigation/externallink",
+				text = v60.LinkText,
+				variant = ButtonVariant.Link,
+				onActivated = v62,
+				size = InputSize.Small
+			})
+		})
+	end, {
+		v62,
+		v60.LinkText
+	})
+	local v64 = React.useCallback(function(p7, p8) -- line: 211
+		-- upvalues: RunService (copy), default2 (copy), t2 (copy), t4 (copy), v57 (copy), sendImmersiveBrandedAdAbuseReport (copy), v56 (copy), immersiveBrandedAdId (copy)
+		if RunService:IsStudio() or (_G.__TESTEZ_RUNNING_TEST__ or _G.__TEST_SUITE_PACKAGE__) then
+			return true
+		end
+
+		default2:logRobloxTelemetryCounter(t2)
+
+		local LocalPlayer = game.Players.LocalPlayer
+
+		if not LocalPlayer then
+			default2:logRobloxTelemetryCounter(t4, 1, {
+				reason = "noPlayer"
+			})
+
+			return false
+		end
+
+		if not v57.current then
+			default2:logRobloxTelemetryCounter(t4, 1, {
+				reason = "noScreenshot"
+			})
+
+			return false
+		end
+
+		return (sendImmersiveBrandedAdAbuseReport(v56, {
+			reason = p7,
+			comment = p8,
+			immersiveBrandedAdId = immersiveBrandedAdId,
+			screenshotId = v57.current,
+			userId = LocalPlayer.UserId,
+			placeId = game.PlaceId
+		}))
+	end, {
+		immersiveBrandedAdId,
+		v56
+	})
+
+	React.useEffect(function() -- line: 240
+		-- upvalues: RunService (copy), Screenshot (copy), v57 (copy), v59 (copy)
+		if not RunService:IsStudio() and (not _G.__TESTEZ_RUNNING_TEST__ and not _G.__TEST_SUITE_PACKAGE__) then
+			Screenshot.ScreenshotManager:TakeScreenshotWithCallback(function(p9) -- line: 243
+				-- upvalues: v57 (copy)
+				v57.current = p9
+			end, nil)
+		end
+
+		task.defer(function() -- line: 249
+			-- upvalues: v59 (copy)
+			v59(true)
+		end)
+	end, {})
+
+	if not v58 then
+		return nil
+	end
+
+	return React.createElement(React.Fragment, {}, {
+		modal = React.createElement("TextButton", {
+			Text = "",
+			BackgroundTransparency = 1,
+			Modal = true,
+			Size = UDim2.new(0, 0, 0, 0)
+		}),
+		abuseReportFlow = React.createElement(DefaultTwoStepReportFlow, {
+			analyticsContext = "Ad",
+			isReportCategoryReadonly = true,
+			onCloseProps = {
+				hasPreviousSteps = false,
+				onAbandon = t9.onDismiss
+			},
+			onSubmitProps = {
+				hasNextSteps = false,
+				onSubmit = v64
+			},
+			onComplete = t9.onDismiss,
+			reportCategories = t1,
+			reportCategoryDefaultKey = t1[1].value,
+			localizationKeys = {
+				formTitle = "CoreScripts.Ads.Label.ReportAd",
+				completeTitle = "Feature.ReportAbuse.Title.SelectInSceneThankYou",
+				completeDescription = "Feature.ReportAbuse.Label.SelectInSceneComplete"
+			},
+			footerContent = if not v61 then nil else v63
+		})
+	})
+end
+
+return function(t10: {[any]: any}) -- line: 290
+	-- upvalues: React (copy), RoactServices (copy), RoactServiceTags (copy), Http (copy), HttpService (copy), UniversalAppPolicy (copy), AppStyleProvider (copy), Constants (copy), ImmersiveBrandedAdReportAdDialog (copy)
+	return React.createElement(RoactServices.RoactServices.ServiceProvider, {
+		services = {
+			[RoactServiceTags.RoactNetworking] = Http.NetworkLayers.requestInternalWrapper(HttpService)
+		}
+	}, {
+		policyProvider = React.createElement(UniversalAppPolicy.RoactAppPolicy.Provider, {
+			policy = { UniversalAppPolicy.AppFeaturePolicies }
+		}, {
+			appStyleProvider = React.createElement(AppStyleProvider, {
+				style = {
+					themeName = Constants.ThemeName.Dark,
+					fontName = Constants.FontName.Gotham
+				}
+			}, {
+				resizeFrame = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Size = UDim2.fromScale(1, 0.6),
+					AutomaticSize = Enum.AutomaticSize.Y
+				}, {
+					reportAdDialog = React.createElement(ImmersiveBrandedAdReportAdDialog, t10)
+				})
+			})
+		})
+	})
+end

@@ -1,54 +1,55 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.ReactUtils);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local _ = require(l_script_FirstAncestor_0.types);
-local v4 = require(l_script_FirstAncestor_0.Requests.getAudioMetadataAsync);
-local l_useAsync_0 = v1.useAsync;
-local l_useState_0 = v2.useState;
-local l_useEffect_0 = v2.useEffect;
-local l_useCallback_0 = v2.useCallback;
-return function(v9) --[[ Line: 19 ]] --[[ Name: useAudioMetadata ]]
-    -- upvalues: l_useState_0 (copy), l_useAsync_0 (copy), v4 (copy), l_useCallback_0 (copy), l_useEffect_0 (copy)
-    local v10, v11 = l_useState_0({});
-    local v12 = l_useAsync_0(function() --[[ Line: 25 ]]
-        -- upvalues: v9 (copy), v4 (ref)
-        if #v9 > 0 then
-            return v4(v9);
-        else
-            return {};
-        end;
-    end, {
-        table.unpack(v9)
-    });
-    local v13 = l_useCallback_0(function() --[[ Line: 33 ]]
-        -- upvalues: v10 (copy)
-        return v10;
-    end, {
-        v10
-    });
-    local v15 = l_useCallback_0(function(v14) --[[ Line: 37 ]]
-        -- upvalues: v10 (copy)
-        return v10[tostring(v14)];
-    end, {
-        v10
-    });
-    l_useEffect_0(function() --[[ Line: 41 ]]
-        -- upvalues: v12 (copy), v11 (copy)
-        if v12.status == "ok" and #v12.value > 0 then
-            v11(function(v16) --[[ Line: 43 ]]
-                -- upvalues: v12 (ref)
-                local v17 = table.clone(v16);
-                for _, v19 in v12.value do
-                    v17[v19.AssetId] = v19;
-                end;
-                return v17;
-            end);
-        end;
-    end, {
-        v12
-    });
-    return {
-        getAll = v13, 
-        getByAssetId = v15
-    };
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local ReactUtils = require(Songbird.Parent.ReactUtils)
+local React = require(Songbird.Parent.React)
+
+require(Songbird.types)
+
+local getAudioMetadataAsync = require(Songbird.Requests.getAudioMetadataAsync)
+local useAsync = ReactUtils.useAsync
+local useState = React.useState
+local useEffect = React.useEffect
+local useCallback = React.useCallback
+
+local function useAudioMetadata(t1: {[any]: any}) -- line: 19
+	-- upvalues: useState (copy), useAsync (copy), getAudioMetadataAsync (copy), useCallback (copy), useEffect (copy)
+	local v11, v12 = useState({})
+	local v13 = useAsync(function() -- line: 25
+		-- upvalues: t1 (copy), getAudioMetadataAsync (copy)
+		if #t1 > 0 then
+			return getAudioMetadataAsync(t1)
+		end
+
+		return {}
+	end, { table.unpack(t1) })
+	local v14 = useCallback(function() -- line: 33
+		-- upvalues: v11 (copy)
+		return v11
+	end, { v11 })
+	local v15 = useCallback(function(p1) -- line: 37
+		-- upvalues: v11 (copy)
+		return v11[tostring(p1)]
+	end, { v11 })
+
+	useEffect(function() -- line: 41
+		-- upvalues: v13 (copy), v12 (copy)
+		if v13.status == "ok" and #v13.value > 0 then
+			v12(function(p2) -- line: 43
+				-- upvalues: v13 (copy)
+				local v18 = table.clone(p2)
+
+				for _, v20 in v13.value do
+					v18[v20.AssetId] = v20
+				end
+
+				return v18
+			end)
+		end
+	end, { v13 })
+
+	return {
+		getAll = v14,
+		getByAssetId = v15
+	}
+end
+
+return useAudioMetadata

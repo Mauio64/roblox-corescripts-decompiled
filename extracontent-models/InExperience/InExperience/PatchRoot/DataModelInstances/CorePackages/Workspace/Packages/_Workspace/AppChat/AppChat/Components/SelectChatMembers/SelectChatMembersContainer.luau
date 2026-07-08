@@ -24,19 +24,19 @@ local FFlagConnectionsToFriendsRename = require(AppChatParent.SharedFlags).FFlag
 local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
 local t1 = {
 	minSelections = 1,
+	canOnlyCreateOneToOneChat = false,
+	isDebugEnabled = false,
 	maxSelections = Constants.MIN_PARTICIPANT_COUNT,
 	maxConversationSize = Constants.MAX_PARTICIPANT_COUNT,
-	canOnlyCreateOneToOneChat = false,
 	filterPredicate = searchFilterPredicate,
 	sortComparator = sortComparator,
 	conversation = {
 		participants = {}
 	},
-	navigateToToast = function(_) --[[ navigateToToast ]] -- line: 63
+	navigateToToast = function(_) -- line: 63
 	end,
-	selectedUsersChanged = function(_, _) --[[ selectedUsersChanged ]] -- line: 64
-	end,
-	isDebugEnabled = false
+	selectedUsersChanged = function(_, _) -- line: 64
+	end
 }
 
 function SelectChatMembersContainer(t2: {[any]: any}) -- line: 69
@@ -74,10 +74,10 @@ function SelectChatMembersContainer(t2: {[any]: any}) -- line: 69
 	end, { v24.minSelections })
 
 	local v26 = useLocalization({
+		networkErrorText = "Feature.Chat.Response.NetworkError",
 		systemButtonText = v24.systemButtonText,
 		pageHeaderText = v24.pageHeaderText,
 		searchFriendsText = not FFlagConnectionsToFriendsRename and "Feature.Chat.Label.SearchConnections" or "Feature.Chat.Label.SearchFriends",
-		networkErrorText = "Feature.Chat.Response.NetworkError",
 		tooManyFriendsText = {
 			if not GetFFlagIsSquadEnabled() then not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsLimit" or "Feature.Chat.Message.AddFriendsLimit" else not FFlagConnectionsToFriendsRename and "Feature.Chat.Message.AddConnectionsPartyLimit" or "Feature.Chat.Message.AddFriendsPartyLimit",
 			friendNum = Constants.MAX_PARTICIPANT_COUNT,

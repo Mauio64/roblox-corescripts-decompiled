@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFixDetailsPageThumbnailRenderInPhone", false);
+return game:DefineFastFlag("LuaAppFixDetailsPageThumbnailRenderInPhone", false)

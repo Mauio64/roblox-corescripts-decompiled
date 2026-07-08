@@ -1,29 +1,30 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(script.Parent.Parent.MockId);
-local l_PlayabilityStatusEnum_0 = require(l_CorePackages_0.Workspace.Packages.DiscoveryTypes).PlayabilityStatusEnum;
+local CorePackages = game:GetService("CorePackages")
+local MockId = require(script.Parent.Parent.MockId)
+local PlayabilityStatusEnum = require(CorePackages.Workspace.Packages.DiscoveryTypes).PlayabilityStatusEnum
+
 return {
-    mock = function() --[[ Line: 26 ]] --[[ Name: mock ]]
-        -- upvalues: v1 (copy), l_PlayabilityStatusEnum_0 (copy)
-        return {
-            universeId = v1(), 
-            name = "", 
-            rootPlaceId = v1(), 
-            isPlayable = true, 
-            playabilityStatus = l_PlayabilityStatusEnum_0.Playable
-        };
-    end, 
-    fromGetPlayabilityStatus = function(v3) --[[ Line: 38 ]] --[[ Name: fromGetPlayabilityStatus ]]
-        return {
-            universeId = tostring(v3.universeId), 
-            isPlayable = v3.isPlayable, 
-            playabilityStatus = v3.playabilityStatus
-        };
-    end, 
-    fromGetExperienceInfo = function(v4) --[[ Line: 48 ]] --[[ Name: fromGetExperienceInfo ]]
-        return {
-            universeId = tostring(v4.id), 
-            rootPlaceId = tostring(v4.rootPlaceId), 
-            name = v4.name
-        };
-    end
-};
+	mock = function() -- line: 26
+		-- upvalues: MockId (copy), PlayabilityStatusEnum (copy)
+		return {
+			universeId = MockId(),
+			name = "",
+			rootPlaceId = MockId(),
+			isPlayable = true,
+			playabilityStatus = PlayabilityStatusEnum.Playable
+		}
+	end,
+	fromGetPlayabilityStatus = function(p1) -- line: 38
+		return {
+			universeId = tostring(p1.universeId),
+			isPlayable = p1.isPlayable,
+			playabilityStatus = p1.playabilityStatus
+		}
+	end,
+	fromGetExperienceInfo = function(p2) -- line: 48
+		return {
+			universeId = tostring(p2.id),
+			rootPlaceId = tostring(p2.rootPlaceId),
+			name = p2.name
+		}
+	end
+}

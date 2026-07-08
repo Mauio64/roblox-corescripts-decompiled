@@ -1,166 +1,186 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CurrencyTransfers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SharedFlags);
-local v4 = require(l_script_FirstAncestor_0.Localization.TransferLocalizationKeys);
-local v5 = require(l_Parent_0.Foundation);
-local l_ButtonVariant_0 = v5.Enums.ButtonVariant;
-local l_Dialog_0 = v5.Dialog;
-local l_DialogSize_0 = v5.Enums.DialogSize;
-local l_Orientation_0 = v5.Enums.Orientation;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v11 = require(l_script_FirstAncestor_0.Hooks.useTransferStore);
-local v12 = require(l_script_FirstAncestor_0.Actions.Send.processTransfer);
-local v13 = require(l_script_FirstAncestor_0.Actions.Receive.acceptTransfer);
-local v14 = require(l_script_FirstAncestor_0.Actions.Send.initiateTransfer);
-local v15 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v16 = require(l_script_FirstAncestor_0.Enums.TransferDirection);
-local v17 = require(l_script_FirstAncestor_0.Enums.TransferRetryOrigin);
-local v18 = require(l_Parent_0.AmpUpsell);
-local l_AccessResponseEnum_0 = v18.AmpEnums.AccessResponseEnum;
-local l_ActionTypeEnum_0 = v18.AmpEnums.ActionTypeEnum;
-local l_ActionStatusEnum_0 = v18.AmpEnums.ActionStatusEnum;
-local l_InExpAmpWizardController_0 = v18.InExpAmpWizardController;
-local v23 = require(l_script_FirstAncestor_0.Constants.AmpWizardTransferConstants);
-local v24 = require(l_script_FirstAncestor_0.Utils.getCounterUserId);
-local v25 = require(l_script_FirstAncestor_0.Events.CurrencyTransferTelemetry);
-local v26 = require(l_script_FirstAncestor_0.Enums.RobuxTransferFlowEventName);
-local v27 = require(l_script_FirstAncestor_0.Utils.logCurrencyTransferCounter);
-local v28 = require(l_script_FirstAncestor_0.Utils.logRobuxTransferFlowEvent);
-local v29 = require(l_script_FirstAncestor_0.Utils.getTransferRequestInternalId);
-local function _(v30) --[[ Line: 59 ]] --[[ Name: isVpcRequestSubmitted ]]
-    -- upvalues: l_ActionTypeEnum_0 (copy), l_ActionStatusEnum_0 (copy)
-    if type(v30) ~= "table" then
-        return false;
-    else
-        local v31 = true;
-        if v30[l_ActionTypeEnum_0.ParentConsent] ~= l_ActionStatusEnum_0.Success then
-            v31 = v30[l_ActionTypeEnum_0.ParentLink] == l_ActionStatusEnum_0.Success;
-        end;
-        return v31;
-    end;
-end;
-return function(v33) --[[ Line: 67 ]] --[[ Name: VPCBlockContainer ]]
-    -- upvalues: l_useLocalization_0 (copy), v4 (copy), v11 (copy), v16 (copy), v2 (copy), v27 (copy), v25 (copy), v3 (copy), v28 (copy), v26 (copy), v15 (copy), v29 (copy), v24 (copy), l_InExpAmpWizardController_0 (copy), l_ActionTypeEnum_0 (copy), l_ActionStatusEnum_0 (copy), l_AccessResponseEnum_0 (copy), v17 (copy), v13 (copy), v14 (copy), v12 (copy), v23 (copy), l_Dialog_0 (copy), l_DialogSize_0 (copy), l_Orientation_0 (copy), l_ButtonVariant_0 (copy)
-    local v34 = l_useLocalization_0(v4.Presets.VPCBlockContainer);
-    local v35 = v11();
-    local l_direction_0 = v33.direction;
-    local l_triggerOnClose_0 = v35.triggerOnClose;
-    local v38 = v35.getSelectedAmount(false);
-    local v39 = v35.getTransferRetryOrigin(false);
-    local v40 = v35.getTransferRequestId(false);
-    local v41 = if l_direction_0 == v16.Send then v34.AskParentBodySend else v34.AskParentBodyReceive;
-    v2.useEffect(function() --[[ Line: 81 ]]
-        -- upvalues: v27 (ref), v35 (copy), v25 (ref), v3 (ref), v28 (ref), v26 (ref)
-        v27(v35, v25.CurrencyTransferVPCBlockDialogShownCounter, {
-            recourseSurface = "vpc"
-        });
-        if v3.FFlagEnableRobuxTransferFlowEventIngest then
-            v28(v35, v26.vpc_block_shown);
-        end;
-        return nil;
-    end, {
-        v35
-    });
-    local function v42() --[[ Line: 91 ]] --[[ Name: onCancelClicked ]]
-        -- upvalues: v27 (ref), v35 (copy), v25 (ref), v3 (ref), v28 (ref), v26 (ref), l_triggerOnClose_0 (copy)
-        v27(v35, v25.CurrencyTransferVPCBlockCancelClickedCounter, {
-            recourseSurface = "vpc"
-        });
-        if v3.FFlagEnableRobuxTransferFlowEventIngest then
-            v28(v35, v26.vpc_cancel_clicked);
-        end;
-        l_triggerOnClose_0();
-    end;
-    local function v51() --[[ Line: 101 ]] --[[ Name: openAmpWizard ]]
-        -- upvalues: v27 (ref), v35 (copy), v25 (ref), v3 (ref), v28 (ref), v26 (ref), v33 (copy), l_triggerOnClose_0 (copy), v15 (ref), v29 (ref), v40 (copy), v38 (copy), v24 (ref), l_direction_0 (copy), l_InExpAmpWizardController_0 (ref), l_ActionTypeEnum_0 (ref), l_ActionStatusEnum_0 (ref), l_AccessResponseEnum_0 (ref), v39 (copy), v17 (ref), v13 (ref), v14 (ref), v12 (ref), v16 (ref), v23 (ref)
-        v27(v35, v25.CurrencyTransferVPCBlockAskClickedCounter, {
-            recourseSurface = "vpc"
-        });
-        if v3.FFlagEnableRobuxTransferFlowEventIngest then
-            v28(v35, v26.vpc_ask_clicked);
-        end;
-        if not v33.ampFeatureCheck then
-            l_triggerOnClose_0();
-            return;
-        else
-            local v43 = v35.getPromptState(false);
-            v35.setPreviousPromptState(v43);
-            v35.setPromptState(v15.Hidden);
-            local v44 = {
-                transferType = "Robux", 
-                transferId = v29(v40), 
-                robuxTransferAmount = tostring(v38 or 0)
-            };
-            local v45 = v24(v35, l_direction_0);
-            local v46 = nil;
-            if v45 then
-                v46 = {
-                    {
-                        name = "targetUser", 
-                        value = tostring(v45), 
-                        type = "UserId"
-                    }
-                };
-            end;
-            l_InExpAmpWizardController_0.OpenAmpWizardContainerInExp(v33.ampFeatureCheck, function(v47, v48) --[[ Line: 133 ]]
-                -- upvalues: l_ActionTypeEnum_0 (ref), l_ActionStatusEnum_0 (ref), v3 (ref), v28 (ref), v35 (ref), v26 (ref), l_AccessResponseEnum_0 (ref), v39 (ref), v17 (ref), v13 (ref), v14 (ref), v12 (ref), v38 (ref), l_direction_0 (ref), v16 (ref), l_triggerOnClose_0 (ref)
-                local v49 = type(v48) == "table" and (v48[l_ActionTypeEnum_0.ParentConsent] == l_ActionStatusEnum_0.Success or v48[l_ActionTypeEnum_0.ParentLink] == l_ActionStatusEnum_0.Success);
-                if v3.FFlagEnableRobuxTransferFlowEventIngest and v49 then
-                    v28(v35, v26.vpc_submitted);
-                end;
-                if v47 == l_AccessResponseEnum_0.Granted then
-                    local v50 = v35.getPreviousPromptState(false);
-                    if v50 then
-                        v35.setPromptState(v50);
-                    end;
-                    if v39 == v17.AcceptTransfer then
-                        v13(v35);
-                        return;
-                    elseif v39 == v17.InitiateTransfer then
-                        v14(v35);
-                        return;
-                    elseif v39 == v17.ProcessTransfer then
-                        v12(v35, v38 or 0);
-                        return;
-                    elseif l_direction_0 == v16.Receive then
-                        v13(v35);
-                        return;
-                    else
-                        v12(v35, v38 or 0);
-                        return;
-                    end;
-                else
-                    l_triggerOnClose_0();
-                    return;
-                end;
-            end, v44, v23.ENTRY_POINT_EVENT_CTX, v46, v23.NAMESPACE_NAME);
-            return;
-        end;
-    end;
-    return v2.createElement(l_Dialog_0.Root, {
-        size = l_DialogSize_0.Small, 
-        hasBackdrop = true, 
-        closeOnClickOutside = true, 
-        onClose = v42
-    }, {
-        DialogTitle = v2.createElement(l_Dialog_0.Title, {
-            text = v34.AskParentTitle
-        }), 
-        DialogContent = v2.createElement(l_Dialog_0.Content, nil, {
-            DialogText = v2.createElement(l_Dialog_0.Text, {
-                Text = v41
-            })
-        }), 
-        DialogActions = v2.createElement(l_Dialog_0.Actions, {
-            orientation = l_Orientation_0.Vertical, 
-            actions = {
-                {
-                    text = v34.Ask, 
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    onActivated = v51
-                }
-            }
-        })
-    });
-end;
+local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+local CurrencyTransfersParent = CurrencyTransfers.Parent
+local React = require(CurrencyTransfersParent.React)
+local SharedFlags = require(CurrencyTransfersParent.SharedFlags)
+local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
+local Foundation = require(CurrencyTransfersParent.Foundation)
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local Dialog = Foundation.Dialog
+local DialogSize = Foundation.Enums.DialogSize
+local EnumsOrientation = Foundation.Enums.Orientation
+local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
+local processTransfer = require(CurrencyTransfers.Actions.Send.processTransfer)
+local acceptTransfer = require(CurrencyTransfers.Actions.Receive.acceptTransfer)
+local initiateTransfer = require(CurrencyTransfers.Actions.Send.initiateTransfer)
+local PromptState = require(CurrencyTransfers.Enums.PromptState)
+local TransferDirection = require(CurrencyTransfers.Enums.TransferDirection)
+local TransferRetryOrigin = require(CurrencyTransfers.Enums.TransferRetryOrigin)
+local AmpUpsell = require(CurrencyTransfersParent.AmpUpsell)
+local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
+local ActionTypeEnum = AmpUpsell.AmpEnums.ActionTypeEnum
+local ActionStatusEnum = AmpUpsell.AmpEnums.ActionStatusEnum
+local InExpAmpWizardController = AmpUpsell.InExpAmpWizardController
+local AmpWizardTransferConstants = require(CurrencyTransfers.Constants.AmpWizardTransferConstants)
+local getCounterUserId = require(CurrencyTransfers.Utils.getCounterUserId)
+local CurrencyTransferTelemetry = require(CurrencyTransfers.Events.CurrencyTransferTelemetry)
+local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransferFlowEventName)
+local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
+local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
+local getTransferRequestInternalId = require(CurrencyTransfers.Utils.getTransferRequestInternalId)
+
+local function isVpcRequestSubmitted(p1) -- line: 59
+	-- upvalues: ActionTypeEnum (copy), ActionStatusEnum (copy)
+	if type(p1) ~= "table" then
+		return false
+	end
+
+	return p1[ActionTypeEnum.ParentConsent] == ActionStatusEnum.Success or p1[ActionTypeEnum.ParentLink] == ActionStatusEnum.Success
+end
+local function VPCBlockContainer(t1: {[any]: any}) -- line: 67
+	-- upvalues: useLocalization (copy), TransferLocalizationKeys (copy), useTransferStore (copy), TransferDirection (copy), React (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), PromptState (copy), getTransferRequestInternalId (copy), getCounterUserId (copy), InExpAmpWizardController (copy), ActionTypeEnum (copy), ActionStatusEnum (copy), AccessResponseEnum (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), AmpWizardTransferConstants (copy), Dialog (copy), DialogSize (copy), EnumsOrientation (copy), ButtonVariant (copy)
+	local v35 = useLocalization(TransferLocalizationKeys.Presets.VPCBlockContainer)
+	local v36 = useTransferStore()
+	local direction = t1.direction
+	local triggerOnClose = v36.triggerOnClose
+	local v39 = v36.getSelectedAmount(false)
+	local v40 = v36.getTransferRetryOrigin(false)
+	local v41 = v36.getTransferRequestId(false)
+	local v42 = if direction ~= TransferDirection.Send then v35.AskParentBodyReceive else v35.AskParentBodySend
+
+	React.useEffect(function() -- line: 81
+		-- upvalues: logCurrencyTransferCounter (copy), v36 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy)
+		logCurrencyTransferCounter(v36, CurrencyTransferTelemetry.CurrencyTransferVPCBlockDialogShownCounter, {
+			recourseSurface = "vpc"
+		})
+
+		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+			logRobuxTransferFlowEvent(v36, RobuxTransferFlowEventName.vpc_block_shown)
+		end
+
+		return nil
+	end, { v36 })
+
+	local function onCancelClicked() -- line: 91
+		-- upvalues: logCurrencyTransferCounter (copy), v36 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), triggerOnClose (copy)
+		logCurrencyTransferCounter(v36, CurrencyTransferTelemetry.CurrencyTransferVPCBlockCancelClickedCounter, {
+			recourseSurface = "vpc"
+		})
+
+		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+			logRobuxTransferFlowEvent(v36, RobuxTransferFlowEventName.vpc_cancel_clicked)
+		end
+
+		triggerOnClose()
+	end
+	local function openAmpWizard() -- line: 101
+		-- upvalues: logCurrencyTransferCounter (copy), v36 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), t1 (copy), triggerOnClose (copy), PromptState (copy), getTransferRequestInternalId (copy), v41 (copy), v39 (copy), getCounterUserId (copy), direction (copy), InExpAmpWizardController (copy), ActionTypeEnum (copy), ActionStatusEnum (copy), AccessResponseEnum (copy), v40 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), TransferDirection (copy), AmpWizardTransferConstants (copy)
+		logCurrencyTransferCounter(v36, CurrencyTransferTelemetry.CurrencyTransferVPCBlockAskClickedCounter, {
+			recourseSurface = "vpc"
+		})
+
+		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+			logRobuxTransferFlowEvent(v36, RobuxTransferFlowEventName.vpc_ask_clicked)
+		end
+
+		if not t1.ampFeatureCheck then
+			triggerOnClose()
+
+			return
+		end
+
+		local v45 = v36.getPromptState(false)
+
+		v36.setPreviousPromptState(v45)
+		v36.setPromptState(PromptState.Hidden)
+
+		local t2 = {
+			transferType = "Robux",
+			transferId = getTransferRequestInternalId(v41),
+			robuxTransferAmount = tostring(v39 or 0)
+		}
+		local v47 = getCounterUserId(v36, direction)
+		local t3 = nil
+
+		if v47 then
+			t3 = {{
+				name = "targetUser",
+				type = "UserId",
+				value = tostring(v47)
+			}}
+		end
+
+		InExpAmpWizardController.OpenAmpWizardContainerInExp(t1.ampFeatureCheck, function(p2, p3) -- line: 133
+			-- upvalues: ActionTypeEnum (copy), ActionStatusEnum (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), v36 (copy), RobuxTransferFlowEventName (copy), AccessResponseEnum (copy), v40 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), v39 (copy), direction (copy), TransferDirection (copy), triggerOnClose (copy)
+			local v51 = type(p3) == "table" and (p3[ActionTypeEnum.ParentConsent] == ActionStatusEnum.Success or p3[ActionTypeEnum.ParentLink] == ActionStatusEnum.Success)
+
+			if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest and v51 then
+				logRobuxTransferFlowEvent(v36, RobuxTransferFlowEventName.vpc_submitted)
+			end
+
+			if p2 == AccessResponseEnum.Granted then
+				local v52 = v36.getPreviousPromptState(false)
+
+				if v52 then
+					v36.setPromptState(v52)
+				end
+
+				if v40 == TransferRetryOrigin.AcceptTransfer then
+					acceptTransfer(v36)
+
+					return
+				end
+
+				if v40 == TransferRetryOrigin.InitiateTransfer then
+					initiateTransfer(v36)
+
+					return
+				end
+
+				if v40 == TransferRetryOrigin.ProcessTransfer then
+					processTransfer(v36, v39 or 0)
+
+					return
+				end
+
+				if direction == TransferDirection.Receive then
+					acceptTransfer(v36)
+
+					return
+				end
+
+				processTransfer(v36, v39 or 0)
+
+				return
+			end
+
+			triggerOnClose()
+		end, t2, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, t3, AmpWizardTransferConstants.NAMESPACE_NAME)
+	end
+
+	return React.createElement(Dialog.Root, {
+		hasBackdrop = true,
+		closeOnClickOutside = true,
+		size = DialogSize.Small,
+		onClose = onCancelClicked
+	}, {
+		DialogTitle = React.createElement(Dialog.Title, {
+			text = v35.AskParentTitle
+		}),
+		DialogContent = React.createElement(Dialog.Content, nil, {
+			DialogText = React.createElement(Dialog.Text, {
+				Text = v42
+			})
+		}),
+		DialogActions = React.createElement(Dialog.Actions, {
+			orientation = EnumsOrientation.Vertical,
+			actions = {{
+				text = v35.Ask,
+				variant = ButtonVariant.Emphasis,
+				onActivated = openAmpWizard
+			}}
+		})
+	})
+end
+
+return VPCBlockContainer

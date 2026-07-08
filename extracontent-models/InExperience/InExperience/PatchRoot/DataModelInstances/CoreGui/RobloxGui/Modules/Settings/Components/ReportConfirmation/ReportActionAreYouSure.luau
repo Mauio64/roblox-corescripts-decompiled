@@ -1,159 +1,190 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withStyle_0 = v3.Style.withStyle;
-local l_TextButton_0 = v3.App.Button.TextButton;
-local v6 = v1.PureComponent:extend("ReportActionSelection");
-local function v7() --[[ Line: 22 ]]
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+local TextButton = UIBlox.App.Button.TextButton
+local v7 = Roact.PureComponent:extend("ReportActionSelection")
 
-end;
-v6.defaultProps = {
-    isMuted = true, 
-    isBlocked = true, 
-    onCancelActivated = v7, 
-    onConfirmActivated = v7, 
-    ZIndex = 1, 
-    uiScale = 1.3
-};
-v6.validateProps = v2.strictInterface({
-    mutedTitleText = v2.string, 
-    blockedTitleText = v2.string, 
-    mutedAndBlockedTitleText = v2.string, 
-    mutedSubtitleText = v2.string, 
-    blockedSubtitleText = v2.string, 
-    mutedAndBlockedSubtitleText = v2.string, 
-    cancelText = v2.string, 
-    confirmText = v2.string, 
-    isMuted = v2.boolean, 
-    isBlocked = v2.boolean, 
-    onCancelActivated = v2.callback, 
-    onConfirmActivated = v2.callback, 
-    ZIndex = v2.optional(v2.number), 
-    uiScale = v2.optional(v2.number)
-});
-v6.init = function(v8) --[[ Line: 50 ]] --[[ Name: init ]]
-    v8.onCancelActivated = function() --[[ Line: 51 ]]
-        -- upvalues: v8 (copy)
-        v8.props.onCancelActivated();
-    end;
-    v8.onConfirmActivated = function() --[[ Line: 55 ]]
-        -- upvalues: v8 (copy)
-        v8.props.onConfirmActivated();
-    end;
-    local v9 = nil;
-    local v10 = nil;
-    if v8.props.isMuted and v8.props.isBlocked then
-        v9 = v8.props.mutedAndBlockedTitleText;
-        v10 = v8.props.mutedAndBlockedSubtitleText;
-    elseif v8.props.isMuted then
-        v9 = v8.props.mutedTitleText;
-        v10 = v8.props.mutedSubtitleText;
-    elseif v8.props.isBlocked then
-        v9 = v8.props.blockedTitleText;
-        v10 = v8.props.blockedSubtitleText;
-    end;
-    v8:setState({
-        titleText = v9, 
-        subtitleText = v10
-    });
-end;
-v6.render = function(v11) --[[ Line: 79 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), l_TextButton_0 (copy), v3 (copy)
-    return l_withStyle_0(function(v12) --[[ Line: 80 ]]
-        -- upvalues: v1 (ref), v11 (copy), l_TextButton_0 (ref), v3 (ref)
-        local l_BaseSize_0 = v12.Font.BaseSize;
-        return v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ZIndex = v11.props.ZIndex
-        }, {
-            uiScale = v1.createElement("UIScale", {
-                Scale = v11.props.uiScale
-            }), 
-            layout = v1.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 22), 
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            title = v1.createElement("TextLabel", {
-                Text = v11.state.titleText, 
-                TextColor3 = v12.Theme.TextEmphasis.Color, 
-                TextTransparency = v12.Theme.TextEmphasis.Transparency, 
-                TextSize = v12.Font.Header1.RelativeSize * l_BaseSize_0, 
-                Font = v12.Font.Header1.Font, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = 1
-            }), 
-            subtitle = v1.createElement("TextLabel", {
-                Size = UDim2.fromOffset(612, 0), 
-                Text = v11.state.subtitleText, 
-                TextColor3 = v12.Theme.TextEmphasis.Color, 
-                TextTransparency = v12.Theme.TextEmphasis.Transparency, 
-                TextSize = v12.Font.CaptionHeader.RelativeSize * l_BaseSize_0, 
-                Font = v12.Font.CaptionHeader.Font, 
-                TextWrapped = true, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 2
-            }), 
-            spacer = v1.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromOffset(0, 62), 
-                LayoutOrder = 3
-            }), 
-            actions = v1.createElement("Frame", {
-                Size = UDim2.fromOffset(584, 0), 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 4
-            }, {
-                layout = v1.createElement("UIListLayout", {
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    Padding = UDim.new(0, 70), 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                cancelContainer = v1.createElement("Frame", {
-                    BackgroundColor3 = v12.Theme.SystemPrimaryContent.Color, 
-                    BackgroundTransparency = v12.Theme.SystemPrimaryContent.Transparency, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.fromOffset(234, 44), 
-                    LayoutOrder = 1
-                }, {
-                    uiCorner = v1.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 4)
-                    }), 
-                    cancelButton = v1.createElement(l_TextButton_0, {
-                        size = UDim2.fromScale(1, 1), 
-                        text = v11.props.cancelText, 
-                        onActivated = v11.onCancelActivated
-                    })
-                }), 
-                confirmContainer = v1.createElement("Frame", {
-                    BackgroundColor3 = v3.App.Style.Colors.Blue, 
-                    BackgroundTransparency = 0, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.fromOffset(234, 44), 
-                    LayoutOrder = 2
-                }, {
-                    uiCorner = v1.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 4)
-                    }), 
-                    confirmButton = v1.createElement(l_TextButton_0, {
-                        size = UDim2.fromScale(1, 1), 
-                        text = v11.props.confirmText, 
-                        onActivated = v11.onConfirmActivated
-                    })
-                })
-            })
-        });
-    end);
-end;
-return v6;
+local function v8() -- line: 22
+end
+
+v7.defaultProps = {
+	isMuted = true,
+	isBlocked = true,
+	ZIndex = 1,
+	uiScale = 1.3,
+	onCancelActivated = v8,
+	onConfirmActivated = v8
+}
+v7.validateProps = t.strictInterface({
+	mutedTitleText = t.string,
+	blockedTitleText = t.string,
+	mutedAndBlockedTitleText = t.string,
+	mutedSubtitleText = t.string,
+	blockedSubtitleText = t.string,
+	mutedAndBlockedSubtitleText = t.string,
+	cancelText = t.string,
+	confirmText = t.string,
+	isMuted = t.boolean,
+	isBlocked = t.boolean,
+	onCancelActivated = t.callback,
+	onConfirmActivated = t.callback,
+	ZIndex = t.optional(t.number),
+	uiScale = t.optional(t.number)
+})
+
+function v7.init(p1) -- line: 50
+	function p1.onCancelActivated() -- line: 51
+		-- upvalues: p1 (copy)
+		p1.props.onCancelActivated()
+	end
+	function p1.onConfirmActivated() -- line: 55
+		-- upvalues: p1 (copy)
+		p1.props.onConfirmActivated()
+	end
+
+	local mutedAndBlockedTitleText = nil
+	local mutedAndBlockedSubtitleText = nil
+
+	if p1.props.isMuted and p1.props.isBlocked then
+		mutedAndBlockedTitleText = p1.props.mutedAndBlockedTitleText
+		mutedAndBlockedSubtitleText = p1.props.mutedAndBlockedSubtitleText
+	elseif p1.props.isMuted then
+		mutedAndBlockedTitleText = p1.props.mutedTitleText
+		mutedAndBlockedSubtitleText = p1.props.mutedSubtitleText
+	elseif p1.props.isBlocked then
+		mutedAndBlockedTitleText = p1.props.blockedTitleText
+		mutedAndBlockedSubtitleText = p1.props.blockedSubtitleText
+	end
+
+	p1:setState({
+		titleText = mutedAndBlockedTitleText,
+		subtitleText = mutedAndBlockedSubtitleText
+	})
+end
+function v7.render(p2) -- line: 79
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), TextButton (copy), UIBlox (copy)
+	return withFoundationOrUIBloxStyle(function(p3) -- line: 80
+		return {
+			Theme = {
+				SystemPrimaryContent = {
+					Color = p3.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = p3.Color.ActionSubEmphasis.Foreground.Transparency
+				},
+				TextEmphasis = {
+					Color = p3.Color.Content.Emphasis.Color3,
+					Transparency = p3.Color.Content.Emphasis.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				CaptionHeader = {
+					Font = p3.Typography.CaptionLarge.Font,
+					RelativeSize = p3.Typography.CaptionLarge.FontSize
+				},
+				Header1 = {
+					Font = p3.Typography.HeadingSmall.Font,
+					RelativeSize = p3.Typography.HeadingSmall.FontSize
+				}
+			}
+		}
+	end, function(p4) -- line: 104
+		-- upvalues: Roact (copy), p2 (copy), TextButton (copy), UIBlox (copy)
+		local BaseSize = p4.Font.BaseSize
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			ZIndex = p2.props.ZIndex
+		}, {
+			uiScale = Roact.createElement("UIScale", {
+				Scale = p2.props.uiScale
+			}),
+			layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 22),
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			title = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Text = p2.state.titleText,
+				TextColor3 = p4.Theme.TextEmphasis.Color,
+				TextTransparency = p4.Theme.TextEmphasis.Transparency,
+				TextSize = p4.Font.Header1.RelativeSize * BaseSize,
+				Font = p4.Font.Header1.Font,
+				AutomaticSize = Enum.AutomaticSize.XY
+			}),
+			subtitle = Roact.createElement("TextLabel", {
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.fromOffset(612, 0),
+				Text = p2.state.subtitleText,
+				TextColor3 = p4.Theme.TextEmphasis.Color,
+				TextTransparency = p4.Theme.TextEmphasis.Transparency,
+				TextSize = p4.Font.CaptionHeader.RelativeSize * BaseSize,
+				Font = p4.Font.CaptionHeader.Font,
+				AutomaticSize = Enum.AutomaticSize.Y
+			}),
+			spacer = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.fromOffset(0, 62)
+			}),
+			actions = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 4,
+				Size = UDim2.fromOffset(584, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					Padding = UDim.new(0, 70),
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				cancelContainer = Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					LayoutOrder = 1,
+					BackgroundColor3 = p4.Theme.SystemPrimaryContent.Color,
+					BackgroundTransparency = p4.Theme.SystemPrimaryContent.Transparency,
+					Size = UDim2.fromOffset(234, 44)
+				}, {
+					uiCorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 4)
+					}),
+					cancelButton = Roact.createElement(TextButton, {
+						size = UDim2.fromScale(1, 1),
+						text = p2.props.cancelText,
+						onActivated = p2.onCancelActivated
+					})
+				}),
+				confirmContainer = Roact.createElement("Frame", {
+					BackgroundTransparency = 0,
+					BorderSizePixel = 0,
+					LayoutOrder = 2,
+					BackgroundColor3 = UIBlox.App.Style.Colors.Blue,
+					Size = UDim2.fromOffset(234, 44)
+				}, {
+					uiCorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 4)
+					}),
+					confirmButton = Roact.createElement(TextButton, {
+						size = UDim2.fromScale(1, 1),
+						text = p2.props.confirmText,
+						onActivated = p2.onConfirmActivated
+					})
+				})
+			})
+		})
+	end)
+end
+
+return v7

@@ -1,46 +1,73 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.ReactUtils);
-local v4 = require(l_CorePackages_0.Packages.Foundation);
-local v5 = require(l_CorePackages_0.Workspace.Packages.HelpPage);
-local l_useEventConnection_0 = v3.useEventConnection;
-local l_Icon_0 = v4.Icon;
-local l_useTokens_0 = v4.Hooks.useTokens;
-local l_HELP_PAGE_0 = v5.Constants.HELP_PAGE;
-local function _() --[[ Line: 19 ]] --[[ Name: isPreferredInputTypeGamepad ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    return l_UserInputService_0.PreferredInput == Enum.PreferredInput.Gamepad;
-end;
-local function _() --[[ Line: 23 ]] --[[ Name: isPlayStationGamepad ]]
-    -- upvalues: l_UserInputService_0 (copy)
-    return l_UserInputService_0:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross";
-end;
-return v2.memo(v2.forwardRef(function(v12, v13) --[[ Line: 28 ]] --[[ Name: SwitchTabHint ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), l_UserInputService_0 (copy), l_useEventConnection_0 (copy), l_HELP_PAGE_0 (copy), l_Icon_0 (copy)
-    local v14 = l_useTokens_0();
-    local v15, v16 = v2.useState(l_UserInputService_0:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross");
-    local v17, v18 = v2.useBinding(l_UserInputService_0.PreferredInput == Enum.PreferredInput.Gamepad);
-    l_useEventConnection_0(l_UserInputService_0:GetPropertyChangedSignal("PreferredInput"), function() --[[ Line: 32 ]]
-        -- upvalues: v18 (copy), l_UserInputService_0 (ref), v16 (copy)
-        v18(l_UserInputService_0.PreferredInput == Enum.PreferredInput.Gamepad);
-        v16(l_UserInputService_0:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross");
-    end, {});
-    local v19 = v2.useMemo(function() --[[ Line: 37 ]]
-        -- upvalues: v15 (copy), l_HELP_PAGE_0 (ref), v12 (copy)
-        if v15 then
-            return l_HELP_PAGE_0.GAMEPAD_ICON_MAP_PLAYSTATION[v12.keycode];
-        else
-            return l_HELP_PAGE_0.GAMEPAD_ICON_MAP_XBOX[v12.keycode];
-        end;
-    end, {
-        v12.keycode, 
-        v15
-    });
-    return v2.createElement(l_Icon_0, {
-        name = v19, 
-        size = v14.Size.Size_800, 
-        Visible = v17, 
-        ref = v13
-    });
-end));
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local React = require(CorePackages.Packages.React)
+local ReactUtils = require(CorePackages.Packages.ReactUtils)
+local Foundation = require(CorePackages.Packages.Foundation)
+local HelpPage = require(CorePackages.Workspace.Packages.HelpPage)
+local useEventConnection = ReactUtils.useEventConnection
+local Icon = Foundation.Icon
+local useTokens = Foundation.Hooks.useTokens
+local HELP_PAGE = HelpPage.Constants.HELP_PAGE
+local FFlagGamepadIconSupportCheck = require(CorePackages.Workspace.Packages.SharedFlags).FFlagGamepadIconSupportCheck
+
+local function getSupportsButton(p1) -- line: 22
+	-- upvalues: FFlagGamepadIconSupportCheck (copy), UserInputService (copy)
+	if not FFlagGamepadIconSupportCheck then
+		return true
+	end
+
+	return UserInputService:GamepadSupports(UserInputService:GetLastInputType(), p1)
+end
+local function isPreferredInputTypeGamepad() -- line: 29
+	-- upvalues: UserInputService (copy)
+	return UserInputService.PreferredInput == Enum.PreferredInput.Gamepad
+end
+local function isPlayStationGamepad() -- line: 33
+	-- upvalues: UserInputService (copy)
+	return UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross"
+end
+local function SwitchTabHint(t1: {[any]: any}, p2) -- line: 38
+	-- upvalues: useTokens (copy), React (copy), getSupportsButton (copy), UserInputService (copy), useEventConnection (copy), FFlagGamepadIconSupportCheck (copy), HELP_PAGE (copy), Icon (copy)
+	local v19 = useTokens()
+	local v20, v21 = React.useState(getSupportsButton(t1.keycode))
+	local v22, v23 = React.useState(UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross")
+	local v24, v25 = React.useBinding(UserInputService.PreferredInput == Enum.PreferredInput.Gamepad)
+
+	useEventConnection(UserInputService:GetPropertyChangedSignal("PreferredInput"), function() -- line: 43
+		-- upvalues: v25 (copy), UserInputService (copy), v23 (copy)
+		v25(UserInputService.PreferredInput == Enum.PreferredInput.Gamepad)
+		v23(UserInputService:GetStringForKeyCode(Enum.KeyCode.ButtonA) == "ButtonCross")
+	end, {})
+
+	if FFlagGamepadIconSupportCheck then
+		useEventConnection(UserInputService.LastInputTypeChanged, function() -- line: 48
+			-- upvalues: v21 (copy), getSupportsButton (copy), t1 (copy)
+			v21(getSupportsButton(t1.keycode))
+		end, {})
+	end
+
+	local v26 = React.useMemo(function() -- line: 53
+		-- upvalues: v22 (copy), HELP_PAGE (copy), t1 (copy)
+		if v22 then
+			return HELP_PAGE.GAMEPAD_ICON_MAP_PLAYSTATION[t1.keycode]
+		end
+
+		return HELP_PAGE.GAMEPAD_ICON_MAP_XBOX[t1.keycode]
+	end, {
+		t1.keycode,
+		v22
+	})
+
+	if v20 then
+		return (React.createElement(Icon, {
+			name = v26,
+			size = v19.Size.Size_800,
+			Visible = v24,
+			ref = p2
+		}))
+	end
+
+	return nil
+end
+
+return React.memo(React.forwardRef(SwitchTabHint))

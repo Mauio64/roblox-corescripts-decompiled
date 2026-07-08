@@ -1,99 +1,86 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v5 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v6 = require(l_script_FirstAncestor_0.Components.Interactable);
-local v7 = require(l_script_FirstAncestor_0.Utility.GuiObjectChildren);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v9 = require(l_script_FirstAncestor_0.Utility.useDefaultTags);
-local v10 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v11 = require(l_script_FirstAncestor_0.Utility.withGuiObjectProps);
-local v12 = require(l_script_FirstAncestor_0.Providers.Style.useStyleTags);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v14 = {
-    layout = {
-        SortOrder = Enum.SortOrder.LayoutOrder
-    }, 
-    AutoLocalize = false, 
-    BorderSizePixel = 0, 
-    isDisabled = false
-};
-return v3.memo(v3.forwardRef(function(v15, v16) --[[ Line: 44 ]] --[[ Name: View ]]
-    -- upvalues: v10 (copy), v14 (copy), v9 (copy), v12 (copy), v3 (copy), v5 (copy), v11 (copy), v4 (copy), v6 (copy), v7 (copy), v2 (copy)
-    local v17 = v10(v15, v14);
-    local v18 = v17.backgroundStyle ~= nil and "gui-object-defaults x-default-transparency" or "gui-object-defaults";
-    local v19 = v9(v17.tag, v18);
-    local v20 = v12(v19);
-    local v21 = true;
-    if v17.onStateChanged == nil then
-        v21 = true;
-        if v17.onActivated == nil then
-            v21 = v17.onSecondaryActivated ~= nil;
-        end;
-    end;
-    local v22 = v3.useMemo(function() --[[ Line: 54 ]]
-        -- upvalues: v17 (copy)
-        if v17.GroupTransparency ~= nil then
-            if type(v17.GroupTransparency) == "table" then
-                return true;
-            else
-                return v17.GroupTransparency > 0;
-            end;
-        else
-            return false;
-        end;
-    end, {
-        v17.GroupTransparency
-    });
-    local v23 = v3.useMemo(function() --[[ Line: 65 ]]
-        -- upvalues: v22 (copy), v21 (copy), v17 (copy), v5 (ref)
-        if v22 then
-            if v21 and not v17.isDisabled then
-                v5:warning("Some state changes are not supported with GroupTransparency");
-            end;
-            return "CanvasGroup";
-        elseif v21 then
-            return "ImageButton";
-        else
-            return "Frame";
-        end;
-    end, {
-        v22, 
-        v21
-    });
-    local v24 = v11(v17, {
-        AutoButtonColor = v23 ~= "ImageButton" and nil, 
-        GroupTransparency = if v22 then v17.GroupTransparency else nil, 
-        ref = v16, 
-        [v3.Tag] = v20
-    });
-    if v4.FoundationBuildingBlocksRemoveDashUnion then
-        local l_v23_0 = v23;
-        if v21 then
-            l_v23_0 = v6;
-            v24.component = v23;
-            v24.onActivated = v17.onActivated;
-            v24.onSecondaryActivated = v17.onSecondaryActivated;
-            v24.onStateChanged = v17.onStateChanged;
-            v24.stateLayer = v17.stateLayer;
-            v24.isDisabled = v17.isDisabled;
-            v24.cursor = v17.cursor;
-        end;
-        return v3.createElement(l_v23_0, v24, v7(v17));
-    else
-        local v26 = if v21 then v6 else v23;
-        local v27 = {
-            component = v23, 
-            onActivated = v17.onActivated, 
-            onSecondaryActivated = v17.onSecondaryActivated, 
-            onStateChanged = v17.onStateChanged, 
-            stateLayer = v17.stateLayer, 
-            isDisabled = v17.isDisabled, 
-            cursor = v17.cursor
-        };
-        local v28 = if v21 then v2.union(v24, v27) else v24;
-        return v3.createElement(v26, v28, v7(v17));
-    end;
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Logger = require(Foundation.Utility.Logger)
+local Interactable = require(Foundation.Components.Interactable)
+local GuiObjectChildren = require(Foundation.Utility.GuiObjectChildren)
+
+require(Foundation.Components.Types)
+
+local useDefaultTags = require(Foundation.Utility.useDefaultTags)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local withGuiObjectProps = require(Foundation.Utility.withGuiObjectProps)
+local useStyleTags = require(Foundation.Providers.Style.useStyleTags)
+
+require(Foundation.Enums.ControlState)
+
+local t1 = {
+	AutoLocalize = false,
+	BorderSizePixel = 0,
+	isDisabled = false,
+	layout = {
+		SortOrder = Enum.SortOrder.LayoutOrder
+	}
+}
+
+local function View(p1, p2) -- line: 42
+	-- upvalues: withDefaults (copy), t1 (copy), useDefaultTags (copy), useStyleTags (copy), React (copy), Logger (copy), withGuiObjectProps (copy), Interactable (copy), GuiObjectChildren (copy)
+	local v15 = withDefaults(p1, t1)
+	local v16 = v15.backgroundStyle == nil and "gui-object-defaults" or "gui-object-defaults x-default-transparency"
+	local v17 = useDefaultTags(v15.tag, v16)
+	local v18 = useStyleTags(v17)
+	local v19 = v15.onStateChanged ~= nil or (v15.onActivated ~= nil or v15.onSecondaryActivated ~= nil)
+	local v20 = React.useMemo(function() -- line: 52
+		-- upvalues: v15 (copy)
+		if v15.GroupTransparency ~= nil then
+			if type(v15.GroupTransparency) == "table" then
+				return true
+			end
+
+			return v15.GroupTransparency > 0
+		end
+
+		return false
+	end, { v15.GroupTransparency })
+	local v21 = React.useMemo(function() -- line: 63
+		-- upvalues: v20 (copy), v19 (copy), v15 (copy), Logger (copy)
+		if v20 then
+			if v19 and not v15.isDisabled then
+				Logger:warning("Some state changes are not supported with GroupTransparency")
+			end
+
+			return "CanvasGroup"
+		end
+
+		if v19 then
+			return "ImageButton"
+		end
+
+		return "Frame"
+	end, {
+		v20,
+		v19
+	})
+	local v22 = withGuiObjectProps(v15, {
+		AutoButtonColor = v21 ~= "ImageButton" and nil,
+		GroupTransparency = if not v20 then nil else v15.GroupTransparency,
+		ref = p2,
+		[React.Tag] = v18
+	})
+	local v23 = v21
+
+	if v19 then
+		v23 = Interactable
+		v22.component = v21
+		v22.onActivated = v15.onActivated
+		v22.onSecondaryActivated = v15.onSecondaryActivated
+		v22.onStateChanged = v15.onStateChanged
+		v22.stateLayer = v15.stateLayer
+		v22.isDisabled = v15.isDisabled
+		v22.cursor = v15.cursor
+	end
+
+	return React.createElement(v23, v22, GuiObjectChildren(v15))
+end
+
+return React.memo(React.forwardRef(View))

@@ -1,12 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfileQRCode");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local l_useEffectOnce_0 = require(l_Parent_0.RoactUtils).Hooks.useEffectOnce;
-local _ = require(l_script_FirstAncestor_0.Analytics.useAnalytics);
-return function(v5, v6) --[[ Line: 9 ]]
-    -- upvalues: l_useEffectOnce_0 (copy), v2 (copy)
-    l_useEffectOnce_0(function() --[[ Line: 10 ]]
-        -- upvalues: v5 (copy), v2 (ref)
-        v5.fireEvent(v2.QRPageLoadFailed);
-    end, v6);
-end;
+local ProfileQRCode = script:FindFirstAncestor("ProfileQRCode")
+local ProfileQRCodeParent = ProfileQRCode.Parent
+local EventNames = require(ProfileQRCode.Analytics.EventNames)
+local useEffectOnce = require(ProfileQRCodeParent.RoactUtils).Hooks.useEffectOnce
+
+require(ProfileQRCode.Analytics.useAnalytics)
+
+return function(p1, b1: boolean) -- line: 9
+	-- upvalues: useEffectOnce (copy), EventNames (copy)
+	useEffectOnce(function() -- line: 10
+		-- upvalues: p1 (copy), EventNames (copy)
+		p1.fireEvent(EventNames.QRPageLoadFailed)
+	end, b1)
+end

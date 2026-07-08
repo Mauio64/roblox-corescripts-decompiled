@@ -1,22 +1,25 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.t);
-local v2 = require(l_Parent_0.Roact);
-local v3 = v2.Component:extend("OnRootedListener");
-v3.validateProps = v1.strictInterface({
-    onRooted = v1.callback
-});
-v3.init = function(v4) --[[ Line: 16 ]] --[[ Name: init ]]
-    v4.onAncestryChanged = function(v5) --[[ Line: 17 ]]
-        -- upvalues: v4 (copy)
-        if v5:IsDescendantOf(game) then
-            v4.props.onRooted(v5);
-        end;
-    end;
-end;
-v3.render = function(v6) --[[ Line: 24 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy)
-    return v2.createElement("Folder", {
-        [v2.Event.AncestryChanged] = v6.onAncestryChanged
-    });
-end;
-return v3;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local t = require(ParentParent.t)
+local Roact = require(ParentParent.Roact)
+local v4 = Roact.Component:extend("OnRootedListener")
+
+v4.validateProps = t.strictInterface({
+	onRooted = t.callback
+})
+
+function v4.init(p1) -- line: 16
+	function p1.onAncestryChanged(p2) -- line: 17
+		-- upvalues: p1 (copy)
+		if p2:IsDescendantOf(game) then
+			p1.props.onRooted(p2)
+		end
+	end
+end
+function v4.render(p3) -- line: 24
+	-- upvalues: Roact (copy)
+	return Roact.createElement("Folder", {
+		[Roact.Event.AncestryChanged] = p3.onAncestryChanged
+	})
+end
+
+return v4

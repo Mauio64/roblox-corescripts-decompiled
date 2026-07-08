@@ -3,6 +3,7 @@ local SocialCarouselParent = SocialCarousel.Parent
 local React = require(SocialCarouselParent.React)
 local CollectionViews = require(SocialCarouselParent.CollectionViews)
 local Localization = require(SocialCarouselParent.Localization)
+local Foundation = require(SocialCarouselParent.Foundation)
 local CollectionCarousel = CollectionViews.CollectionCarousel
 local useCollectionLayoutParams = CollectionViews.useCollectionLayoutParams
 local useCollectionLayout = CollectionViews.useCollectionLayout
@@ -11,93 +12,90 @@ local usePageSideMargin = CollectionViews.usePageSideMargin
 local CollectionItemSize = CollectionViewTypes.CollectionItemSize
 local useLocalization = Localization.Hooks.useLocalization
 local TileComponents = require(SocialCarousel.Common.TileComponents)
+local Tile = require(SocialCarousel.Common.Enums).Tile
 local Constants = require(SocialCarousel.Common.Constants)
 local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
-local useTokens = require(SocialCarouselParent.Foundation).Hooks.useTokens
+local useTokens = Foundation.Hooks.useTokens
 local useTilesSeenCollection = require(SocialCarousel.Analytics.useTilesSeenCollection)
-local v18 = game:DefineFastFlag("FixCarouselTileSizeScaling", false)
+local FFlagSocialCarouselShowLoadingSkeleton = require(SocialCarousel.Flags.FFlagSocialCarouselShowLoadingSkeleton)
+local v21 = game:DefineFastFlag("FixCarouselTileSizeScaling", false)
 local FFlagFlyoutHideFriendsHeader = require(SocialCarousel.Flags.FFlagFlyoutHideFriendsHeader)
 local FlyoutSidePanelIXP = require(SocialCarouselParent.SharedExperimentDefinition).FlyoutSidePanelIXP
 local SharedFlags = require(SocialCarouselParent.SharedFlags)
 local FFlagConnectionsToFriendsRename = SharedFlags.FFlagConnectionsToFriendsRename
 local FFlagEnableFlyoutFriendsHeaderFix = SharedFlags.FFlagEnableFlyoutFriendsHeaderFix
-local FFlagLuaAppCompositionSupport = require(SocialCarouselParent.SharedFlags).FFlagLuaAppCompositionSupport
 local FFlagLuaAppCompositionAlways = require(SocialCarouselParent.SharedFlags).FFlagLuaAppCompositionAlways
 
-return function(t1: {[any]: any}) --[[ Carousel ]] -- line: 36
-	-- upvalues: FFlagLuaAppCompositionAlways (copy), FFlagLuaAppCompositionSupport (copy), v18 (copy), useTokens (copy), useSocialCarouselContext (copy), useTilesSeenCollection (copy), React (copy), FFlagConnectionsToFriendsRename (copy), Constants (copy), useLocalization (copy), usePageSideMargin (copy), useCollectionLayoutParams (copy), CollectionItemSize (copy), useCollectionLayout (copy), TileComponents (copy), CollectionCarousel (copy), FFlagFlyoutHideFriendsHeader (copy), FFlagEnableFlyoutFriendsHeaderFix (copy), FlyoutSidePanelIXP (copy)
-	local v27 = FFlagLuaAppCompositionAlways or FFlagLuaAppCompositionSupport and t1.appCompositionEnabled
-	local v28 = if not v18 then nil else useTokens()
-	local v29 = useSocialCarouselContext()
-	local v30 = useTilesSeenCollection()
-	local v31, v32 = React.useState(nil)
-	local v33 = React.useRef(nil)
-	local v34 = React.useRef({
+local function Carousel(t1: {[any]: any}) -- line: 40
+	-- upvalues: FFlagLuaAppCompositionAlways (copy), v21 (copy), useTokens (copy), useSocialCarouselContext (copy), useTilesSeenCollection (copy), React (copy), FFlagSocialCarouselShowLoadingSkeleton (copy), FFlagConnectionsToFriendsRename (copy), Constants (copy), useLocalization (copy), usePageSideMargin (copy), useCollectionLayoutParams (copy), CollectionItemSize (copy), useCollectionLayout (copy), TileComponents (copy), Tile (copy), CollectionCarousel (copy), FFlagFlyoutHideFriendsHeader (copy), FFlagEnableFlyoutFriendsHeaderFix (copy), FlyoutSidePanelIXP (copy)
+	local v30 = FFlagLuaAppCompositionAlways or t1.appCompositionEnabled
+	local v31 = if not v21 then nil else useTokens()
+	local v32 = useSocialCarouselContext()
+	local v33 = useTilesSeenCollection()
+	local v34, v35 = React.useState(nil)
+	local v36 = React.useRef(nil)
+	local v37 = React.useRef({
 		startIndex = 1,
 		endIndex = 1
 	})
-	local v35 = React.useRef(false)
-	local v36 = React.useRef(nil)
-	local v37 = React.useRef(nil)
-	local v38 = if FFlagConnectionsToFriendsRename then if v29.friendCount ~= 0 then {
+	local v38 = React.useRef(false)
+	local v39 = React.useRef(nil)
+	local v40 = React.useRef(nil)
+	local v41 = if not FFlagSocialCarouselShowLoadingSkeleton then v32.friendCount > 0 else not v32.isLoading and v32.friendCount > 0
+	local v42 = if FFlagConnectionsToFriendsRename then if v41 then {
 		Constants.LOCALIZATION.FRIENDS_LABEL_WITH_COUNT,
-		friendCount = v29.friendCount
-	} else Constants.LOCALIZATION.FRIENDS_LABEL else if v29.friendCount ~= 0 then {
+		friendCount = v32.friendCount
+	} else Constants.LOCALIZATION.FRIENDS_LABEL else if v41 then {
 		Constants.LOCALIZATION.CONNECTIONS_LABEL_WITH_COUNT,
-		connectionCount = v29.friendCount
+		connectionCount = v32.friendCount
 	} else Constants.LOCALIZATION.CONNECTIONS_LABEL
-	local v39 = useLocalization({
-		friendsLabel = v38
+	local v43 = useLocalization({
+		friendsLabel = v42
 	})
-	local v40 = if FFlagLuaAppCompositionAlways then nil else usePageSideMargin(v31)
-	local v41 = useCollectionLayoutParams(CollectionItemSize.XSmall, v31, true, {
-		sideMargin = if not v27 then v40 else nil
+	local v44 = if FFlagLuaAppCompositionAlways then nil else usePageSideMargin(v34)
+	local v45 = useCollectionLayoutParams(CollectionItemSize.XSmall, v34, true, {
+		sideMargin = if not v30 then v44 else nil
 	})
-	local itemsPerRow = nil
+	local itemsPerRow = useCollectionLayout(CollectionItemSize.XSmall).itemsPerRow
+	local v47 = if not v30 then v45.numColumns else itemsPerRow
 
-	if FFlagLuaAppCompositionSupport then
-		itemsPerRow = useCollectionLayout(CollectionItemSize.XSmall).itemsPerRow
-	end
+	React.useEffect(function() -- line: 85
+		-- upvalues: v47 (copy), v39 (copy), v38 (copy), v40 (copy)
+		if v47 ~= v39.current then
+			v39.current = v47
+			v38.current = false
 
-	local v43 = if not v27 then v41.numColumns else itemsPerRow
-
-	React.useEffect(function() -- line: 81
-		-- upvalues: v43 (copy), v36 (copy), v35 (copy), v37 (copy)
-		if v43 ~= v36.current then
-			v36.current = v43
-			v35.current = false
-
-			if v37.current then
-				pcall(task.cancel, v37.current)
+			if v40.current then
+				pcall(task.cancel, v40.current)
 			end
 
-			v37.current = task.delay(0.2, function() -- line: 90
-				-- upvalues: v35 (copy), v37 (copy)
-				v35.current = true
-				v37.current = nil
+			v40.current = task.delay(0.2, function() -- line: 94
+				-- upvalues: v38 (copy), v40 (copy)
+				v38.current = true
+				v40.current = nil
 			end)
 		end
-	end, { if not FFlagLuaAppCompositionSupport then v41.numColumns else v43 })
-	React.useEffect(function() -- line: 97
-		-- upvalues: v37 (copy)
-		return function() -- line: 98
-			-- upvalues: v37 (copy)
-			if v37.current then
-				pcall(task.cancel, v37.current)
+	end, { v47 })
+	React.useEffect(function() -- line: 101
+		-- upvalues: v40 (copy)
+		return function() -- line: 102
+			-- upvalues: v40 (copy)
+			if v40.current then
+				pcall(task.cancel, v40.current)
 			end
 		end
 	end, {})
 
-	local v44 = React.useCallback(function(n1: number) -- line: 105
-		-- upvalues: v18 (copy), Constants (copy), v28 (copy)
-		return n1 + if not v18 then Constants.TILE_TEXT_HEIGHT else Constants.TILE_TEXT_HEIGHT * v28.Config.UI.Scale
+	local v48 = React.useCallback(function(n1: number) -- line: 109
+		-- upvalues: v21 (copy), Constants (copy), v31 (copy)
+		return n1 + if not v21 then Constants.TILE_TEXT_HEIGHT else Constants.TILE_TEXT_HEIGHT * v31.Config.UI.Scale
 	end, {})
-	local selectionOrderBase = v29.selectionOrderBase
-	local v46 = React.useCallback(function(p1, p2, p3) -- line: 115
+	local selectionOrderBase = v32.selectionOrderBase
+	local v50 = React.useCallback(function(p1, p2, p3) -- line: 119
 		-- upvalues: selectionOrderBase (copy), TileComponents (copy), t1 (copy)
-		local v52 = if not selectionOrderBase then nil else selectionOrderBase + p2
+		local v59 = if not selectionOrderBase then nil else selectionOrderBase + p2
 
-		return TileComponents[p1.tileType](p1, p2, p3, v52, function(s1: string, n2: number) -- line: 122
+		return TileComponents[p1.tileType](p1, p2, p3, v59, function(s1: string, n2: number) -- line: 126
 			-- upvalues: t1 (copy), p1 (copy)
 			if t1.onTileContentChanged then
 				t1.onTileContentChanged(s1, n2, p1)
@@ -107,72 +105,93 @@ return function(t1: {[any]: any}) --[[ Carousel ]] -- line: 36
 		selectionOrderBase,
 		t1.onTileContentChanged
 	})
-	local v47 = React.useCallback(function(n3: number, n4: number) -- line: 137
-		-- upvalues: v29 (copy), v31 (copy), v33 (copy), v35 (copy), v43 (copy), v34 (copy), v30 (copy)
-		if v29.unifiedLogging then
-			v29.unifiedLogging.onCollectionViewabilityChanged(n3, n4)
+	local v51 = React.useCallback(function(n3: number, n4: number) -- line: 141
+		-- upvalues: v32 (copy), v34 (copy), v36 (copy), v38 (copy), v47 (copy), v37 (copy), v33 (copy)
+		if v32.unifiedLogging then
+			v32.unifiedLogging.onCollectionViewabilityChanged(n3, n4)
 		end
 
-		if v29.tiles and v31 and v33.current and v35.current then
-			local current = v33.current
-			local AbsoluteSize = v31.AbsoluteSize
+		if v32.tiles and v34 and v36.current and v38.current then
+			local current = v36.current
+			local AbsoluteSize = v34.AbsoluteSize
 			local CanvasPosition = current.CanvasPosition
-			local v58 = AbsoluteSize.X / v43
+			local v65 = AbsoluteSize.X / v47
 			local CanvasPositionX = CanvasPosition.X
 			local AbsoluteSizeX = AbsoluteSize.X
-			local v61 = math.max(1, math.floor(CanvasPositionX / v58) + 1)
-			local v62 = math.min(#v29.tiles, (math.ceil((CanvasPositionX + AbsoluteSizeX) / v58)))
+			local v68 = math.max(1, math.floor(CanvasPositionX / v65) + 1)
+			local v69 = math.min(#v32.tiles, (math.ceil((CanvasPositionX + AbsoluteSizeX) / v65)))
 
-			v34.current = {
-				startIndex = v61,
-				endIndex = v62
+			v37.current = {
+				startIndex = v68,
+				endIndex = v69
 			}
 
-			for i = v61, v62 do
-				local v64 = v29.tiles[i]
+			for i = v68, v69 do
+				local v71 = v32.tiles[i]
 
-				if v64 and v64.id then
-					v30.addTileToCollection(v64.id, i, v64)
+				if v71 and v71.id then
+					v33.addTileToCollection(v71.id, i, v71)
 				end
 			end
 		end
 	end, {
 		t1.onViewableItemsChanged,
-		v29.tiles,
-		v31,
-		v33,
-		if not FFlagLuaAppCompositionSupport then v41 else v43,
-		v30
+		v32.tiles,
+		v34,
+		v36,
+		v47,
+		v33
 	})
+	local v52 = FFlagSocialCarouselShowLoadingSkeleton and v32.isLoading
+	local v53 = React.useMemo(function() -- line: 181
+		-- upvalues: FFlagSocialCarouselShowLoadingSkeleton (copy), v47 (copy), Tile (copy)
+		local t2 = {}
+
+		if not FFlagSocialCarouselShowLoadingSkeleton then
+			return t2
+		end
+
+		for i = 1, v47 or 5 do
+			t2[i] = {
+				id = "skeleton_" .. i,
+				tileType = Tile.Skeleton
+			}
+		end
+
+		return t2
+	end, { v47 })
+	local v54 = if not v52 then v32.tiles else v53
 
 	return React.createElement("Frame", {
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = 1
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
 	}, {
 		UIPadding = React.createElement("UIPadding", {
 			PaddingLeft = UDim.new(0, 0),
 			PaddingRight = UDim.new(0, 0)
 		}),
 		CollectionCarousel = React.createElement(CollectionCarousel, {
-			containerRef = v32,
-			scrollingFrameRef = v33,
 			LayoutOrder = 1,
-			title = v39.friendsLabel,
-			items = v29.tiles,
-			renderItem = v46,
-			getItemHeight = v44,
-			collectionItemSize = if not v27 then nil else CollectionItemSize.XSmall,
-			numColumns = if not v27 then v41.numColumns else nil,
-			fractionalItemAmount = if not v27 then v41.fractionalItemAmount else nil,
-			columnGap = if not v27 then v41.columnGap else nil,
-			sideMargin = if not v27 then v41.sideMargin else nil,
-			maxItemsToShow = v41.maxTilesToShow,
-			thresholdFromEnd = v41.loadMoreThreshold,
-			onViewableItemsChanged = v47,
-			onChangeCanvasPosition = if not v29.unifiedLogging then nil else v29.unifiedLogging.onCollectionViewabilityChanged,
+			containerRef = v35,
+			scrollingFrameRef = v36,
+			title = v43.friendsLabel,
+			items = v54,
+			renderItem = v50,
+			getItemHeight = v48,
+			collectionItemSize = if not v30 then nil else CollectionItemSize.XSmall,
+			numColumns = if not v30 then v45.numColumns else nil,
+			fractionalItemAmount = if not v30 then v45.fractionalItemAmount else nil,
+			columnGap = if not v30 then v45.columnGap else nil,
+			sideMargin = if not v30 then v45.sideMargin else nil,
+			maxItemsToShow = v45.maxTilesToShow,
+			thresholdFromEnd = v45.loadMoreThreshold,
+			onViewableItemsChanged = if not v52 then v51 else nil,
+			onChangeCanvasPosition = if not v32.unifiedLogging or v52 then nil else v32.unifiedLogging.onCollectionViewabilityChanged,
 			onActivateHeader = t1.onActivateHeader,
-			headerComponent = if not v29.hideCarouselHeader and (not FFlagFlyoutHideFriendsHeader or not if not FFlagEnableFlyoutFriendsHeaderFix then FlyoutSidePanelIXP.isFlyoutSidePanelEnabled() else FlyoutSidePanelIXP.isFriendsSortHeaderHiddenInFlyoutIxp()) then nil else React.createElement(React.Fragment, nil, {})
+			headerComponent = if not v32.hideCarouselHeader and (not FFlagFlyoutHideFriendsHeader or not if not FFlagEnableFlyoutFriendsHeaderFix then FlyoutSidePanelIXP.isFlyoutSidePanelEnabled() else FlyoutSidePanelIXP.isFriendsSortHeaderHiddenInFlyoutIxp()) then nil else React.createElement(React.Fragment, nil, {})
 		}),
-		ScreenSizeImpressionsTracker = if not v29.unifiedLogging then nil else v29.unifiedLogging.renderImpressionsTrackerComponent(v33)
+		ScreenSizeImpressionsTracker = if not v32.unifiedLogging then nil else v32.unifiedLogging.renderImpressionsTrackerComponent(v36)
 	})
 end
+
+return Carousel

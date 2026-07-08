@@ -1,272 +1,314 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local v5 = require(l_Parent_1.React);
-local v6 = require(l_Parent_1.Otter);
-local v7 = require(script.Parent.ScenesReducer);
-local v8 = require(l_Parent_0.utils.invariant);
-local v9 = {
-    frequency = 4
-};
-local function v20(v10, v11) --[[ Line: 17 ]] --[[ Name: buildTransitionProps ]]
-    -- upvalues: v8 (copy)
-    local l_navigation_0 = v10.navigation;
-    local l_options_0 = v10.options;
-    local l_layout_0 = v11.layout;
-    local l_position_0 = v11.position;
-    local l_scenes_0 = v11.scenes;
-    local v17 = nil;
-    for _, v19 in l_scenes_0 do
-        if v19.isActive then
-            v17 = v19;
-            break;
-        end;
-    end;
-    v8(v17, "Could not find active scene");
-    return {
-        layout = l_layout_0, 
-        navigation = l_navigation_0, 
-        position = l_position_0, 
-        scenes = l_scenes_0, 
-        scene = v17, 
-        options = l_options_0, 
-        index = v17.index
-    };
-end;
-local function _(v21) --[[ Line: 46 ]] --[[ Name: filterStale ]]
-    -- upvalues: l_Array_0 (copy)
-    local v23 = l_Array_0.filter(v21, function(v22) --[[ Line: 47 ]]
-        return not v22.isStale;
-    end);
-    if #v23 == #v21 then
-        return v21;
-    else
-        return v23;
-    end;
-end;
-local v25 = v5.Component:extend("Transitioner");
-v25.init = function(v26) --[[ Line: 60 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), v6 (copy), v7 (copy), v20 (copy)
-    local l_state_0 = v26.props.navigation.state;
-    local l_descriptors_0 = v26.props.descriptors;
-    v26._ref = v5.createRef();
-    v26.state = {
-        layout = {
-            initWidth = 0, 
-            initHeight = 0, 
-            isMeasured = false
-        }, 
-        position = v6.createSingleMotor(l_state_0.index), 
-        scenes = v7({}, l_state_0, nil, l_descriptors_0)
-    };
-    v26._doOnAbsoluteSizeChanged = function(...) --[[ Line: 78 ]]
-        -- upvalues: v26 (copy)
-        return v26:_onAbsoluteSizeChanged(...);
-    end;
-    v26._positionLastValue = l_state_0.index;
-    v26._prevTransitionProps = nil;
-    v26._transitionProps = v20(v26.props, v26.state);
-    v26._isMounted = false;
-    v26._isTransitionRunning = false;
-    v26._transitionQueue = {};
-    v26._completeSignalDisconnector = v26.state.position:onComplete(function() --[[ Line: 91 ]]
-        -- upvalues: v26 (copy)
-        if v26._isMounted then
-            v26:_onTransitionEnd();
-        end;
-    end);
-    v26._stepSignalDisconnector = v26.state.position:onStep(function(v29) --[[ Line: 97 ]]
-        -- upvalues: v26 (copy)
-        if v26._isMounted then
-            v26:_onPositionStep(v29);
-        end;
-    end);
-end;
-v25.didMount = function(v30) --[[ Line: 104 ]] --[[ Name: didMount ]]
-    v30._isMounted = true;
-end;
-v25.willUnmount = function(v31) --[[ Line: 108 ]] --[[ Name: willUnmount ]]
-    v31._isMounted = false;
-    if v31._completeSignalDisconnector then
-        v31._completeSignalDisconnector();
-        v31._completeSignalDisconnector = nil;
-    end;
-    if v31._stepSignalDisconnector then
-        v31._stepSignalDisconnector();
-        v31._stepSignalDisconnector = nil;
-    end;
-end;
-v25.didUpdate = function(v32, v33) --[[ Line: 122 ]] --[[ Name: didUpdate ]]
-    if not v32.state.layout.isMeasured and v32._ref.current then
-        v32:_onAbsoluteSizeChanged(v32._ref.current);
-    end;
-    if v32.props ~= v33 then
-        if v32._isTransitionRunning then
-            if (v32._transitionQueue[#v32._transitionQueue] or {}).prevProps ~= v33 then
-                table.insert(v32._transitionQueue, {
-                    prevProps = v33
-                });
-            end;
-            return;
-        else
-            v32:_startTransition(v33, v32.props);
-        end;
-    end;
-end;
-v25.render = function(v34) --[[ Line: 147 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy)
-    return v5.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        ClipsDescendants = false, 
-        [v5.Change.AbsoluteSize] = v34._doOnAbsoluteSizeChanged, 
-        ref = v34._ref
-    }, {
-        TransitionerScenes = v34.props.render(v34._transitionProps, v34._prevTransitionProps, v34)
-    });
-end;
-v25._onAbsoluteSizeChanged = function(v35, v36) --[[ Line: 165 ]] --[[ Name: _onAbsoluteSizeChanged ]]
-    -- upvalues: l_Object_0 (copy), v20 (copy)
-    if not v35._isMounted then
-        return;
-    else
-        local l_X_0 = v36.AbsoluteSize.X;
-        local l_Y_0 = v36.AbsoluteSize.Y;
-        if l_X_0 == v35.state.layout.initWidth and l_Y_0 == v35.state.layout.initHeight then
-            return;
-        else
-            local v39 = l_Object_0.assign(table.clone(v35.state.layout), {
-                initWidth = l_X_0, 
-                initHeight = l_Y_0, 
-                isMeasured = true
-            });
-            local v40 = l_Object_0.assign(table.clone(v35.state), {
-                layout = v39
-            });
-            v35._transitionProps = v20(v35.props, v40);
-            v35:setState({
-                layout = v39
-            });
-            return;
-        end;
-    end;
-end;
-v25._computeScenes = function(v41, v42, v43) --[[ Line: 194 ]] --[[ Name: _computeScenes ]]
-    -- upvalues: v7 (copy), l_Array_0 (copy)
-    local v44 = v7(v41.state.scenes, v43.navigation.state, v42.navigation.state, v43.descriptors);
-    if not v43.navigation.state.isTransitioning then
-        local l_v44_0 = v44;
-        local v47 = l_Array_0.filter(l_v44_0, function(v46) --[[ Line: 47 ]]
-            return not v46.isStale;
-        end);
-        v44 = if #v47 == #l_v44_0 then l_v44_0 else v47;
-    end;
-    if v43.screenProps ~= v41.props.screenProps then
-        v41:setState({
-            scenes = v44
-        });
-    end;
-    if v44 == v41.state.scenes then
-        return nil;
-    else
-        return v44;
-    end;
-end;
-v25._startTransition = function(v48, v49, v50) --[[ Line: 213 ]] --[[ Name: _startTransition ]]
-    -- upvalues: l_Object_0 (copy), v20 (copy), v9 (copy), v6 (copy)
-    local v51 = v49.navigation.state.index ~= v50.navigation.state.index;
-    local v52 = v48:_computeScenes(v49, v50);
-    if not v52 then
-        v48._prevTransitionProps = v48._transitionProps;
-        if v48._isTransitionRunning then
-            v48:_onTransitionEnd();
-        end;
-        return;
-    else
-        local v53 = l_Object_0.assign(table.clone(v48.state), {
-            scenes = v52
-        });
-        local l_position_1 = v53.position;
-        local l_index_0 = v50.navigation.state.index;
-        v48._prevTransitionProps = v48._transitionProps;
-        v48._transitionProps = v20(v50, v53);
-        local l_isTransitioning_0 = v48._transitionProps.navigation.state.isTransitioning;
-        if l_isTransitioning_0 and v51 then
-            v48._isTransitionRunning = true;
-        end;
-        v48:setState(v53, function() --[[ Line: 245 ]]
-            -- upvalues: l_isTransitioning_0 (copy), v51 (copy), v50 (copy), v48 (copy), l_index_0 (copy), l_Object_0 (ref), v9 (ref), l_position_1 (copy), v6 (ref)
-            if l_isTransitioning_0 and v51 then
-                if v50.onTransitionStart then
-                    v50.onTransitionStart(v48._transitionProps, v48._prevTransitionProps);
-                end;
-                if v48._positionLastValue ~= l_index_0 then
-                    local v57 = {};
-                    if v50.configureTransition then
-                        v57 = v50.configureTransition(v48._transitionProps, v48._prevTransitionProps) or {};
-                    end;
-                    local v58 = l_Object_0.assign(table.clone(v9), v57);
-                    l_position_1:setGoal(v6.spring(v50.navigation.state.index, v58));
-                    return;
-                else
-                    l_position_1:setGoal(v6.instant(v50.navigation.state.index));
-                    return;
-                end;
-            else
-                if v50.onTransitionStart then
-                    v50.onTransitionStart(v48._transitionProps, v48._prevTransitionProps);
-                end;
-                l_position_1:setGoal(v6.instant(l_index_0));
-                return;
-            end;
-        end);
-        return;
-    end;
-end;
-v25._onTransitionEnd = function(v59) --[[ Line: 284 ]] --[[ Name: _onTransitionEnd ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy), v20 (copy)
-    local l__prevTransitionProps_0 = v59._prevTransitionProps;
-    v59._prevTransitionProps = nil;
-    local l_scenes_1 = v59.state.scenes;
-    local v63 = l_Array_0.filter(l_scenes_1, function(v62) --[[ Line: 47 ]]
-        return not v62.isStale;
-    end);
-    local v64 = if #v63 == #l_scenes_1 then l_scenes_1 else v63;
-    l_scenes_1 = l_Object_0.assign(table.clone(v59.state), {
-        scenes = v64
-    });
-    v59._transitionProps = v20(v59.props, l_scenes_1);
-    v59:setState(l_scenes_1, function() --[[ Line: 296 ]]
-        -- upvalues: v59 (copy), l__prevTransitionProps_0 (copy)
-        if v59.props.onTransitionEnd then
-            v59.props.onTransitionEnd(v59._transitionProps, l__prevTransitionProps_0);
-        end;
-        local v65 = v59._transitionQueue[1];
-        if v65 then
-            local l_prevProps_0 = v65.prevProps;
-            v59._transitionQueue = table.clone(v59._transitionQueue);
-            table.remove(v59._transitionQueue, 1);
-            v59:_startTransition(l_prevProps_0, v59.props);
-            return;
-        else
-            v59._isTransitionRunning = false;
-            return;
-        end;
-    end);
-end;
-v25._onPositionStep = function(v67, v68) --[[ Line: 315 ]] --[[ Name: _onPositionStep ]]
-    v67._positionLastValue = v68;
-    local l_index_1 = v67._transitionProps.index;
-    local l_l_index_1_0 = l_index_1;
-    if v67._prevTransitionProps then
-        l_l_index_1_0 = v67._prevTransitionProps.index;
-    end;
-    if v67.props.onTransitionStep and l_l_index_1_0 ~= l_index_1 then
-        local v71 = (v68 - l_l_index_1_0) / (l_index_1 - l_l_index_1_0);
-        v67.props.onTransitionStep(v67._transitionProps, v67._prevTransitionProps, v71);
-    end;
-end;
-return v25;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local React = require(ParentParentParent.React)
+local Otter = require(ParentParentParent.Otter)
+local ScenesReducer = require(script.Parent.ScenesReducer)
+local invariant = require(ParentParent.utils.invariant)
+local t1 = {
+	frequency = 4
+}
+
+local function buildTransitionProps(p1, p2) -- line: 17
+	-- upvalues: invariant (copy)
+	local navigation = p1.navigation
+	local options = p1.options
+	local layout = p2.layout
+	local position = p2.position
+	local scenes = p2.scenes
+	local v21 = nil
+
+	for _, v23 in scenes do
+		if v23.isActive then
+			v21 = v23
+
+			break
+		end
+	end
+
+	invariant(v21, "Could not find active scene")
+
+	return {
+		layout = layout,
+		navigation = navigation,
+		position = position,
+		scenes = scenes,
+		scene = v21,
+		options = options,
+		index = v21.index
+	}
+end
+local function filterStale(p3) -- line: 46
+	-- upvalues: Array (copy)
+	local v25 = Array.filter(p3, function(p4) -- line: 47
+		return not p4.isStale
+	end)
+
+	if #v25 == #p3 then
+		return p3
+	end
+
+	return v25
+end
+
+local v13 = React.Component:extend("Transitioner")
+
+function v13.init(p5) -- line: 60
+	-- upvalues: React (copy), Otter (copy), ScenesReducer (copy), buildTransitionProps (copy)
+	local state = p5.props.navigation.state
+	local descriptors = p5.props.descriptors
+
+	p5._ref = React.createRef()
+	p5.state = {
+		layout = {
+			initWidth = 0,
+			initHeight = 0,
+			isMeasured = false
+		},
+		position = Otter.createSingleMotor(state.index),
+		scenes = ScenesReducer({}, state, nil, descriptors)
+	}
+
+	function p5._doOnAbsoluteSizeChanged(...) -- line: 78
+		-- upvalues: p5 (copy)
+		return p5:_onAbsoluteSizeChanged(...)
+	end
+
+	p5._positionLastValue = state.index
+	p5._prevTransitionProps = nil
+	p5._transitionProps = buildTransitionProps(p5.props, p5.state)
+	p5._isMounted = false
+	p5._isTransitionRunning = false
+	p5._transitionQueue = {}
+	p5._completeSignalDisconnector = p5.state.position:onComplete(function() -- line: 91
+		-- upvalues: p5 (copy)
+		if p5._isMounted then
+			p5:_onTransitionEnd()
+		end
+	end)
+	p5._stepSignalDisconnector = p5.state.position:onStep(function(p6) -- line: 97
+		-- upvalues: p5 (copy)
+		if p5._isMounted then
+			p5:_onPositionStep(p6)
+		end
+	end)
+end
+function v13.didMount(p7) -- line: 104
+	p7._isMounted = true
+end
+function v13.willUnmount(p8) -- line: 108
+	p8._isMounted = false
+
+	if p8._completeSignalDisconnector then
+		p8._completeSignalDisconnector()
+		p8._completeSignalDisconnector = nil
+	end
+
+	if p8._stepSignalDisconnector then
+		p8._stepSignalDisconnector()
+		p8._stepSignalDisconnector = nil
+	end
+end
+function v13.didUpdate(p9, p10) -- line: 122
+	if not p9.state.layout.isMeasured and p9._ref.current then
+		p9:_onAbsoluteSizeChanged(p9._ref.current)
+	end
+
+	if p10 ~= p9.props then
+		if p9._isTransitionRunning then
+			if p10 ~= (p9._transitionQueue[#p9._transitionQueue] or {}).prevProps then
+				table.insert(p9._transitionQueue, {
+					prevProps = p10
+				})
+			end
+
+			return
+		end
+
+		p9:_startTransition(p10, p9.props)
+	end
+end
+function v13.render(p11) -- line: 147
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ClipsDescendants = false,
+		[React.Change.AbsoluteSize] = p11._doOnAbsoluteSizeChanged,
+		ref = p11._ref
+	}, {
+		TransitionerScenes = p11.props.render(p11._transitionProps, p11._prevTransitionProps, p11)
+	})
+end
+function v13._onAbsoluteSizeChanged(p12, p13) -- line: 165
+	-- upvalues: Object (copy), buildTransitionProps (copy)
+	if not p12._isMounted then
+		return
+	end
+
+	local AbsoluteSizeX = p13.AbsoluteSize.X
+	local AbsoluteSizeY = p13.AbsoluteSize.Y
+
+	if AbsoluteSizeX == p12.state.layout.initWidth and AbsoluteSizeY == p12.state.layout.initHeight then
+		return
+	end
+
+	local v38 = Object.assign(table.clone(p12.state.layout), {
+		isMeasured = true,
+		initWidth = AbsoluteSizeX,
+		initHeight = AbsoluteSizeY
+	})
+	local v39 = Object.assign(table.clone(p12.state), {
+		layout = v38
+	})
+
+	p12._transitionProps = buildTransitionProps(p12.props, v39)
+	p12:setState({
+		layout = v38
+	})
+end
+function v13._computeScenes(p14, p15, p16) -- line: 194
+	-- upvalues: ScenesReducer (copy), Array (copy)
+	local v43 = ScenesReducer(p14.state.scenes, p16.navigation.state, p15.navigation.state, p16.descriptors)
+
+	if not p16.navigation.state.isTransitioning then
+		local v44 = Array.filter(v43, function(p17) -- line: 47
+			return not p17.isStale
+		end)
+
+		v43 = if #v44 ~= #v43 then v44 else v43
+	end
+
+	if p16.screenProps ~= p14.props.screenProps then
+		p14:setState({
+			scenes = v43
+		})
+	end
+
+	if v43 == p14.state.scenes then
+		return nil
+	end
+
+	return v43
+end
+function v13._startTransition(p18, p19, p20) -- line: 213
+	-- upvalues: Object (copy), buildTransitionProps (copy), t1 (copy), Otter (copy)
+	local v48 = p19.navigation.state.index ~= p20.navigation.state.index
+	local v49 = p18:_computeScenes(p19, p20)
+
+	if not v49 then
+		p18._prevTransitionProps = p18._transitionProps
+
+		if p18._isTransitionRunning then
+			p18:_onTransitionEnd()
+		end
+
+		return
+	end
+
+	local v50 = Object.assign(table.clone(p18.state), {
+		scenes = v49
+	})
+	local position = v50.position
+	local index = p20.navigation.state.index
+
+	p18._prevTransitionProps = p18._transitionProps
+	p18._transitionProps = buildTransitionProps(p20, v50)
+
+	local isTransitioning = p18._transitionProps.navigation.state.isTransitioning
+
+	if isTransitioning and v48 then
+		p18._isTransitionRunning = true
+	end
+
+	p18:setState(v50, function() -- line: 245
+		-- upvalues: isTransitioning (copy), v48 (copy), p20 (copy), p18 (copy), index (copy), Object (copy), t1 (copy), position (copy), Otter (copy)
+		if isTransitioning and v48 then
+			if p20.onTransitionStart then
+				p20.onTransitionStart(p18._transitionProps, p18._prevTransitionProps)
+			end
+
+			if p18._positionLastValue ~= index then
+				local t2 = {}
+
+				if p20.configureTransition then
+					t2 = p20.configureTransition(p18._transitionProps, p18._prevTransitionProps) or {}
+				end
+
+				local v69 = Object.assign(table.clone(t1), t2)
+
+				position:setGoal(Otter.spring(p20.navigation.state.index, v69))
+
+				return
+			end
+
+			position:setGoal(Otter.instant(p20.navigation.state.index))
+
+			return
+		end
+
+		if p20.onTransitionStart then
+			p20.onTransitionStart(p18._transitionProps, p18._prevTransitionProps)
+		end
+
+		position:setGoal(Otter.instant(index))
+	end)
+end
+function v13._onTransitionEnd(p21) -- line: 284
+	-- upvalues: Array (copy), Object (copy), buildTransitionProps (copy)
+	local _prevTransitionProps = p21._prevTransitionProps
+
+	p21._prevTransitionProps = nil
+
+	local scenes = p21.state.scenes
+	local v57 = Array.filter(scenes, function(p22) -- line: 47
+		return not p22.isStale
+	end)
+	local v58 = if #v57 ~= #scenes then v57 else scenes
+	local v59 = Object.assign(table.clone(p21.state), {
+		scenes = v58
+	})
+
+	p21._transitionProps = buildTransitionProps(p21.props, v59)
+	p21:setState(v59, function() -- line: 296
+		-- upvalues: p21 (copy), _prevTransitionProps (copy)
+		if p21.props.onTransitionEnd then
+			p21.props.onTransitionEnd(p21._transitionProps, _prevTransitionProps)
+		end
+
+		local v71 = p21._transitionQueue[1]
+
+		if v71 then
+			local prevProps = v71.prevProps
+
+			p21._transitionQueue = table.clone(p21._transitionQueue)
+			table.remove(p21._transitionQueue, 1)
+			p21:_startTransition(prevProps, p21.props)
+
+			return
+		end
+
+		p21._isTransitionRunning = false
+	end)
+end
+function v13._onPositionStep(p23, p24) -- line: 315
+	p23._positionLastValue = p24
+
+	local index = p23._transitionProps.index
+	local v63 = index
+
+	if p23._prevTransitionProps then
+		v63 = p23._prevTransitionProps.index
+	end
+
+	if p23.props.onTransitionStep and v63 ~= index then
+		local v64 = (p24 - v63) / (index - v63)
+
+		p23.props.onTransitionStep(p23._transitionProps, p23._prevTransitionProps, v64)
+	end
+end
+
+return v13

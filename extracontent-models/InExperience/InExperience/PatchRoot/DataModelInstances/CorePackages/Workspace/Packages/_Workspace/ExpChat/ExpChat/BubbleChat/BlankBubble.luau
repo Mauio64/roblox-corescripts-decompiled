@@ -1,1 +1,1 @@
-return require(script.BlankBubble);
+return require(script.BlankBubble)

@@ -1,64 +1,77 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserList");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local v4 = require(l_script_FirstAncestor_0.Networking.NetworkingPresence);
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v8 = require(l_script_FirstAncestor_0.Common.Constants);
-local v9 = require(script.Parent.UserRowWrapper);
-return function(v10) --[[ Line: 21 ]] --[[ Name: UserList ]]
-    -- upvalues: l_useDispatch_0 (copy), v2 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v8 (copy), v4 (copy), l_View_0 (copy), v9 (copy)
-    local v11 = l_useDispatch_0();
-    local v13 = v2.useCallback(function(v12) --[[ Line: 24 ]]
-        -- upvalues: v10 (copy), v11 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v8 (ref)
-        if v10.onUserSelected then
-            v10.onUserSelected(v12);
-            return;
-        else
-            v11(l_NavigateDown_0({
-                name = l_AppPage_0.ProfilePlatform, 
-                detail = v12, 
-                extraProps = {
-                    profileType = v8.PROFILE_TYPE
-                }
-            }));
-            return;
-        end;
-    end, {
-        v10.onUserSelected, 
-        v11
-    });
-    v2.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: v10 (copy), v11 (copy), v4 (ref)
-        if #v10.userIds > 0 then
-            v11(v4.GetPresencesFromUserIds.API(v10.userIds));
-        end;
-    end, {
-        v10.userIds
-    });
-    if #v10.userIds == 0 then
-        return nil;
-    else
-        return v2.createElement(l_View_0, {
-            tag = "size-full-0 auto-y col gap-large", 
-            LayoutOrder = v10.layoutOrder or 0
-        }, {
-            UserRows = v2.createElement(v2.Fragment, {}, unpack(v2.useMemo(function() --[[ Line: 57 ]]
-                -- upvalues: v10 (copy), v2 (ref), v9 (ref), v13 (copy)
-                local v14 = {};
-                for v15, v16 in ipairs(v10.userIds) do
-                    v14[v15] = v2.createElement(v9, {
-                        userId = v16, 
-                        LayoutOrder = v15, 
-                        onActivated = v13
-                    });
-                end;
-                return v14;
-            end, {
-                v10.userIds
-            })))
-        });
-    end;
-end;
+local UserList = script:FindFirstAncestor("UserList")
+local UserListParent = UserList.Parent
+local React = require(UserListParent.React)
+local useDispatch = require(UserListParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local NetworkingPresence = require(UserList.Networking.NetworkingPresence)
+local View = require(UserListParent.Foundation).View
+local NavigateDown = require(UserListParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(UserListParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v9 = if not FFlagSignalsNavP3Dispatch then nil else require(UserListParent.RobloxAppNavigation).NavigationCommands
+local AppPage = require(UserListParent.RobloxAppEnums).AppPage
+local Constants = require(UserList.Common.Constants)
+local UserRowWrapper = require(script.Parent.UserRowWrapper)
+
+local function UserList2(t1: {[any]: any}) -- line: 25
+	-- upvalues: useDispatch (copy), React (copy), AppPage (copy), Constants (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), NavigateDown (copy), NetworkingPresence (copy), View (copy), UserRowWrapper (copy)
+	local v15 = useDispatch()
+	local v16 = React.useCallback(function(s1: string) -- line: 28
+		-- upvalues: t1 (copy), AppPage (copy), Constants (copy), FFlagSignalsNavP3Dispatch (copy), v9 (copy), v15 (copy), NavigateDown (copy)
+		if t1.onUserSelected then
+			t1.onUserSelected(s1)
+
+			return
+		end
+
+		local t2 = {
+			name = AppPage.ProfilePlatform,
+			detail = s1,
+			extraProps = {
+				profileType = Constants.PROFILE_TYPE
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v9.down(v9.fromLegacyPage(t2))
+
+			return
+		end
+
+		v15(NavigateDown(t2))
+	end, {
+		t1.onUserSelected,
+		v15
+	})
+
+	React.useEffect(function() -- line: 49
+		-- upvalues: t1 (copy), v15 (copy), NetworkingPresence (copy)
+		if #t1.userIds > 0 then
+			v15(NetworkingPresence.GetPresencesFromUserIds.API(t1.userIds))
+		end
+	end, { t1.userIds })
+
+	if #t1.userIds == 0 then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y col gap-large",
+		LayoutOrder = t1.layoutOrder or 0
+	}, {
+		UserRows = React.createElement(React.Fragment, {}, unpack(React.useMemo(function() -- line: 66
+			-- upvalues: t1 (copy), React (copy), UserRowWrapper (copy), v16 (copy)
+			local t3 = {}
+
+			for i, v in ipairs(t1.userIds) do
+				t3[i] = React.createElement(UserRowWrapper, {
+					userId = v,
+					LayoutOrder = i,
+					onActivated = v16
+				})
+			end
+
+			return t3
+		end, { t1.userIds })))
+	})
+end
+
+return UserList2

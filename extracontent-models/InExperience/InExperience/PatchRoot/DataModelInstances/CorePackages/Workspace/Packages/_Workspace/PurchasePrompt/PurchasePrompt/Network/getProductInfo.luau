@@ -24,70 +24,69 @@ local resolveRefreshedExpectedPrice = require(ParentParent.Utils.resolveRefreshe
 local FFlagFixTimedOptionRefresh = require(ParentParent.Flags.FFlagFixTimedOptionRefresh)
 local resolveRefreshedProductInfo = require(ParentParent.Utils.resolveRefreshedProductInfo)
 
-local function fetchRefreshedPrice(p1, p2, p3, t1: {[any]: any}) -- line: 37
+local function fetchRefreshedPrice(p1, p2, s1: string, t1: {[any]: any}) -- line: 37
 	-- upvalues: Promise (copy), getCatalogItemDetails (copy), getResellers (copy), FFlagFixTimedOptionRefresh (copy), resolveRefreshedProductInfo (copy), resolveRefreshedExpectedPrice (copy)
 	local collectibleItemId = t1.collectibleItemId
 	local collectibleItemInstanceId = t1.collectibleItemInstanceId
 
 	return Promise.all({
-		catalogItemDetails = getCatalogItemDetails(p1, p2, p3):catch(function() -- line: 41
+		catalogItemDetails = getCatalogItemDetails(p1, p2, s1):catch(function() -- line: 41
 			return nil
 		end),
 		resellersData = if not collectibleItemInstanceId or (collectibleItemInstanceId == "" or (not collectibleItemId or collectibleItemId == "")) then Promise.resolve(nil) else getResellers(p1, collectibleItemId, 10):catch(function() -- line: 48
 			return nil
 		end)
-	}):andThen(function(p4) -- line: 52
+	}):andThen(function(p3) -- line: 52
 		-- upvalues: FFlagFixTimedOptionRefresh (copy), resolveRefreshedProductInfo (copy), collectibleItemInstanceId (copy), t1 (copy), resolveRefreshedExpectedPrice (copy)
 		if FFlagFixTimedOptionRefresh then
-			return resolveRefreshedProductInfo(p4.catalogItemDetails, p4.resellersData, collectibleItemInstanceId, t1.timedOptionDays)
+			return resolveRefreshedProductInfo(p3.catalogItemDetails, p3.resellersData, collectibleItemInstanceId, t1.timedOptionDays)
 		end
 
-		return (resolveRefreshedExpectedPrice(p4.catalogItemDetails, p4.resellersData, collectibleItemInstanceId, t1.timedOptionDays))
+		return (resolveRefreshedExpectedPrice(p3.catalogItemDetails, p3.resellersData, collectibleItemInstanceId, t1.timedOptionDays))
 	end)
 end
-
-return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- line: 70
+local function getProductInfo(p4, p5, p6, p7, t2: {[any]: any}?) -- line: 70
 	-- upvalues: getAssetInfo (copy), getAssetInfoUtil (copy), Promise (copy), PurchaseError (copy), isCreatorStoreAssetType (copy), getCreatorStoreProductInfo (copy), getCreatorStoreProductInfoUtil (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), fetchRefreshedPrice (copy), FFlagFixTimedOptionRefresh (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), ProductTypeEnum (copy), getExperienceProductInfoUtil (copy), FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell (copy), handleLooksProductInfoResult (copy), FFlagRefreshLookPriceOnRetryAfterUpsell (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy), GetFFlagDiscountInfoForSubscriptionPurchaseModalLua (copy)
-	if p7 == Enum.InfoType.Asset then
-		local v35 = getAssetInfo(p5, p6):andThen(function(p9) -- line: 73
-			-- upvalues: getAssetInfoUtil (copy), Promise (copy), PurchaseError (copy), isCreatorStoreAssetType (copy), getCreatorStoreProductInfo (copy), p5 (copy), p6 (copy), getCreatorStoreProductInfoUtil (copy), p7 (copy)
-			local u38 = nil
+	if p6 == Enum.InfoType.Asset then
+		local v36 = getAssetInfo(p4, p5):andThen(function(p8) -- line: 73
+			-- upvalues: getAssetInfoUtil (copy), Promise (copy), PurchaseError (copy), isCreatorStoreAssetType (copy), getCreatorStoreProductInfo (copy), p4 (copy), p5 (copy), getCreatorStoreProductInfoUtil (copy), p6 (copy)
+			local u39 = nil
 
-			if p9 and (p9.data and p9.data[1]) then
-				if not getAssetInfoUtil.isAssetValid(p9.data[1]) then
+			if p8 and (p8.data and p8.data[1]) then
+				if not getAssetInfoUtil.isAssetValid(p8.data[1]) then
 					return Promise.reject(PurchaseError.UnknownFailureNoItemName)
 				end
 
-				u38 = getAssetInfoUtil.fromAsset(p9.data[1])
+				u39 = getAssetInfoUtil.fromAsset(p8.data[1])
 			end
 
-			local v39 = u38 and u38.type or ""
+			local v40 = u39 and u39.type or ""
 
-			if isCreatorStoreAssetType(v39) then
-				return getCreatorStoreProductInfo(p5, p6, v39):andThen(function(p10) -- line: 84
-					-- upvalues: getCreatorStoreProductInfoUtil (copy), u38 (ref), v39 (copy)
-					local v58 = getCreatorStoreProductInfoUtil.fromProduct(p10)
+			if isCreatorStoreAssetType(v40) then
+				return getCreatorStoreProductInfo(p4, p5, v40):andThen(function(p9) -- line: 84
+					-- upvalues: getCreatorStoreProductInfoUtil (copy), u39 (ref), v40 (copy)
+					local v59 = getCreatorStoreProductInfoUtil.fromProduct(p9)
 
 					return {
-						AssetId = u38.id,
-						AssetType = v39,
-						AssetTypeId = u38.typeId,
-						Creator = {
-							CreatorTargetId = u38.creator.targetId,
-							CreatorType = u38.creator.type
-						},
-						Description = u38.description,
-						IsFiatPriced = v58.basePrice and (v58.basePrice.quantity and v58.basePrice.quantity.significand ~= 0),
-						IsForSale = v58.purchasable,
-						IsPublicDomain = u38.isPublicDomainEnabled,
-						Name = u38.name,
 						PriceInRobux = 0,
-						ProductId = u38.id
+						AssetId = u39.id,
+						AssetType = v40,
+						AssetTypeId = u39.typeId,
+						Creator = {
+							CreatorTargetId = u39.creator.targetId,
+							CreatorType = u39.creator.type
+						},
+						Description = u39.description,
+						IsFiatPriced = v59.basePrice and (v59.basePrice.quantity and v59.basePrice.quantity.significand ~= 0),
+						IsForSale = v59.purchasable,
+						IsPublicDomain = u39.isPublicDomainEnabled,
+						Name = u39.name,
+						ProductId = u39.id
 					}
 				end)
 			end
 
-			return p5.getProductInfo(p6, p7):catch(function(_) -- line: 108
+			return p4.getProductInfo(p5, p6):catch(function(_) -- line: 108
 				-- upvalues: Promise (copy), PurchaseError (copy)
 				return Promise.reject(PurchaseError.UnknownFailureNoItemName)
 			end)
@@ -98,14 +97,14 @@ return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- lin
 
 		if FFlagRefreshPriceOnRetryAfterUpsell and t2 then
 			return Promise.all({
-				productInfo = v35,
-				refreshedPrice = fetchRefreshedPrice(p5, p6, "asset", t2)
-			}):andThen(function(p13) -- line: 127
+				productInfo = v36,
+				refreshedPrice = fetchRefreshedPrice(p4, p5, "asset", t2)
+			}):andThen(function(p12) -- line: 127
 				-- upvalues: FFlagFixTimedOptionRefresh (copy)
-				local productInfo = p13.productInfo
+				local productInfo = p12.productInfo
 
 				if FFlagFixTimedOptionRefresh then
-					local refreshedPrice = p13.refreshedPrice
+					local refreshedPrice = p12.refreshedPrice
 
 					if refreshedPrice ~= nil then
 						for k, v in pairs(refreshedPrice) do
@@ -114,30 +113,30 @@ return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- lin
 
 						return productInfo
 					end
-				elseif p13.refreshedPrice ~= nil then
-					productInfo.refreshedExpectedPrice = p13.refreshedPrice
+				elseif p12.refreshedPrice ~= nil then
+					productInfo.refreshedExpectedPrice = p12.refreshedPrice
 				end
 
 				return productInfo
 			end)
 		end
 
-		return v35
+		return v36
 	end
 
-	if FFlagEnableUnifiedProductPurchaseFlow and p7 == ProductTypeEnum.Experience then
-		return p5.getExperienceProductInfo(p6):andThen(function(p14) -- line: 149
-			-- upvalues: p8 (copy), getExperienceProductInfoUtil (copy), Promise (copy), PurchaseError (copy)
-			if p14 and (p14.data and p14.data[1] and p8.name and p8.imageUrl) then
-				local v47 = getExperienceProductInfoUtil.fromProduct(p14.data[1])
+	if FFlagEnableUnifiedProductPurchaseFlow and p6 == ProductTypeEnum.Experience then
+		return p4.getExperienceProductInfo(p5):andThen(function(p13) -- line: 149
+			-- upvalues: p7 (copy), getExperienceProductInfoUtil (copy), Promise (copy), PurchaseError (copy)
+			if p13 and (p13.data and p13.data[1] and p7.name and p7.imageUrl) then
+				local v48 = getExperienceProductInfoUtil.fromProduct(p13.data[1])
 
 				return {
-					IsForSale = v47.isForSale,
-					PriceInRobux = v47.price,
-					ProductId = v47.productId,
-					SellerId = v47.sellerId,
-					Name = p8.name,
-					ImageUrl = p8.imageUrl
+					IsForSale = v48.isForSale,
+					PriceInRobux = v48.price,
+					ProductId = v48.productId,
+					SellerId = v48.sellerId,
+					Name = p7.name,
+					ImageUrl = p7.imageUrl
 				}
 			end
 
@@ -148,21 +147,21 @@ return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- lin
 		end)
 	end
 
-	if FFlagEnableUnifiedProductPurchaseFlow and p7 == ProductTypeEnum.Look then
+	if FFlagEnableUnifiedProductPurchaseFlow and p6 == ProductTypeEnum.Look then
 		if FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell then
-			return p5.GetLookDetailsV2ProductInfo(p6):andThen(function(p16) -- line: 176
-				-- upvalues: handleLooksProductInfoResult (copy), p8 (copy), Promise (copy), PurchaseError (copy), FFlagRefreshLookPriceOnRetryAfterUpsell (copy)
-				local v50 = handleLooksProductInfoResult(p16, p8)
+			return p4.GetLookDetailsV2ProductInfo(p5):andThen(function(p15) -- line: 176
+				-- upvalues: handleLooksProductInfoResult (copy), p7 (copy), Promise (copy), PurchaseError (copy), FFlagRefreshLookPriceOnRetryAfterUpsell (copy)
+				local v51 = handleLooksProductInfoResult(p15, p7)
 
-				if not v50 then
+				if not v51 then
 					return Promise.reject(PurchaseError.UnknownFailureNoItemName)
 				end
 
 				if FFlagRefreshLookPriceOnRetryAfterUpsell then
-					v50.refreshedExpectedPrice = v50.PriceInRobux
+					v51.refreshedExpectedPrice = v51.PriceInRobux
 				end
 
-				return v50
+				return v51
 			end):catch(function() -- line: 187
 				-- upvalues: Promise (copy), PurchaseError (copy)
 				return Promise.reject(PurchaseError.UnknownFailureNoItemName)
@@ -170,32 +169,32 @@ return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- lin
 		end
 
 		return Promise.resolve({
-			PriceInRobux = p8.expectedPrice,
 			IsForSale = true,
-			Name = "Looks"
+			Name = "Looks",
+			PriceInRobux = p7.expectedPrice
 		})
 	end
 
-	if FFlagEnableUnifiedPurchaseFlowForDevSubs and p7 == ProductTypeEnum.DeveloperSubscription then
-		return p5.getSubscriptionProductInfo(p6):andThen(function(p17) -- line: 199
+	if FFlagEnableUnifiedPurchaseFlowForDevSubs and p6 == ProductTypeEnum.DeveloperSubscription then
+		return p4.getSubscriptionProductInfo(p5):andThen(function(p16) -- line: 199
 			-- upvalues: GetFFlagDiscountInfoForSubscriptionPurchaseModalLua (copy), ProductTypeEnum (copy), Promise (copy), PurchaseError (copy)
-			if p17 and p17.Name then
-				local v52 = GetFFlagDiscountInfoForSubscriptionPurchaseModalLua()
-				local v53 = if not v52 then nil else p17.UserBasePriceInRobux
-				local v54 = if not v52 then nil else p17.PriceDiscountDetails
+			if p16 and p16.Name then
+				local v53 = GetFFlagDiscountInfoForSubscriptionPurchaseModalLua()
+				local v54 = if not v53 then nil else p16.UserBasePriceInRobux
+				local v55 = if not v53 then nil else p16.PriceDiscountDetails
 
 				return {
-					Name = p17.Name,
-					Description = p17.Description,
-					IconImageAssetId = p17.IconImageAssetId,
-					IsForSale = p17.IsForSale,
-					DisplayPrice = p17.DisplayPrice,
-					SubscriptionProviderName = p17.SubscriptionProviderName,
-					PriceInRobux = p17.PriceInRobux,
-					PriceTier = p17.PriceTier,
+					Name = p16.Name,
+					Description = p16.Description,
+					IconImageAssetId = p16.IconImageAssetId,
+					IsForSale = p16.IsForSale,
+					DisplayPrice = p16.DisplayPrice,
+					SubscriptionProviderName = p16.SubscriptionProviderName,
+					PriceInRobux = p16.PriceInRobux,
+					PriceTier = p16.PriceTier,
 					ProductType = ProductTypeEnum.DeveloperSubscription,
-					UserBasePriceInRobux = v53,
-					PriceDiscountDetails = v54
+					UserBasePriceInRobux = v54,
+					PriceDiscountDetails = v55
 				}
 			end
 
@@ -206,8 +205,10 @@ return function(p5, p6, p7, p8, t2: {[any]: any}?) --[[ getProductInfo ]] -- lin
 		end)
 	end
 
-	return p5.getProductInfo(p6, p7):catch(function(_) -- line: 224
+	return p4.getProductInfo(p5, p6):catch(function(_) -- line: 224
 		-- upvalues: Promise (copy), PurchaseError (copy)
 		return Promise.reject(PurchaseError.UnknownFailureNoItemName)
 	end)
 end
+
+return getProductInfo

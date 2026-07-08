@@ -1,1 +1,1 @@
-return require(script.emojiList);
+return require(script.emojiList)

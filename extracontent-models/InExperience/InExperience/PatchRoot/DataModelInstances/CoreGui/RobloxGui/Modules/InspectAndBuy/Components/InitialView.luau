@@ -1,55 +1,59 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_Parent_0.Components.PlayerNameLabel);
-local v5 = require(l_Parent_0.Components.AvatarHeadShot);
-local v6 = require(l_Parent_0.Components.AssetList);
-local v7 = require(l_Parent_0.Components.InspectAndBuyContext);
-local v8 = v2.PureComponent:extend("InitialView");
-v8.render = function(v9) --[[ Line: 13 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v7 (copy), v5 (copy), v4 (copy), v6 (copy)
-    local l_view_0 = v9.props.view;
-    local l_detailsInformation_0 = v9.props.detailsInformation;
-    return v2.createElement(v7.Consumer, {
-        render = function(v12) --[[ Line: 18 ]] --[[ Name: render ]]
-            -- upvalues: l_view_0 (copy), v2 (ref), l_detailsInformation_0 (copy), v5 (ref), v4 (ref), v6 (ref)
-            local v13 = v12[l_view_0];
-            return v2.createElement("ScrollingFrame", {
-                BackgroundTransparency = 1, 
-                Position = UDim2.new(0, v13.BorderPaddingSize, 0, 10), 
-                Size = UDim2.new(1, -(2 * v13.BorderPaddingSize), 1, -36), 
-                ScrollBarThickness = 0, 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                Visible = not l_detailsInformation_0.viewingDetails, 
-                Selectable = false
-            }, {
-                UIListLayout = v2.createElement("UIListLayout", {
-                    Padding = UDim.new(0, 15), 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                Top = v2.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v13.TopSizeY), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2
-                }, {
-                    UIListLayout = v2.createElement("UIListLayout", {
-                        Padding = UDim.new(0, 10), 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        FillDirection = Enum.FillDirection.Horizontal
-                    }), 
-                    AvatarHeadShot = v2.createElement(v5), 
-                    PlayerNameLabel = v2.createElement(v4)
-                }), 
-                AssetList = v2.createElement(v6)
-            });
-        end
-    });
-end;
-return v3.UNSTABLE_connect2(function(v14, _) --[[ Line: 53 ]]
-    return {
-        view = v14.view, 
-        detailsInformation = v14.detailsInformation
-    };
-end)(v8);
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local PlayerNameLabel = require(ParentParent.Components.PlayerNameLabel)
+local AvatarHeadShot = require(ParentParent.Components.AvatarHeadShot)
+local AssetList = require(ParentParent.Components.AssetList)
+local InspectAndBuyContext = require(ParentParent.Components.InspectAndBuyContext)
+local v9 = Roact.PureComponent:extend("InitialView")
+
+function v9.render(p1) -- line: 13
+	-- upvalues: Roact (copy), InspectAndBuyContext (copy), AvatarHeadShot (copy), PlayerNameLabel (copy), AssetList (copy)
+	local view = p1.props.view
+	local detailsInformation = p1.props.detailsInformation
+
+	return Roact.createElement(InspectAndBuyContext.Consumer, {
+		render = function(p2) -- line: 18
+			-- upvalues: view (copy), Roact (copy), detailsInformation (copy), AvatarHeadShot (copy), PlayerNameLabel (copy), AssetList (copy)
+			local v16 = p2[view]
+
+			return Roact.createElement("ScrollingFrame", {
+				BackgroundTransparency = 1,
+				ScrollBarThickness = 0,
+				Selectable = false,
+				Position = UDim2.new(0, v16.BorderPaddingSize, 0, 10),
+				Size = UDim2.new(1, -(2 * v16.BorderPaddingSize), 1, -36),
+				ScrollingDirection = Enum.ScrollingDirection.Y,
+				Visible = not detailsInformation.viewingDetails
+			}, {
+				UIListLayout = Roact.createElement("UIListLayout", {
+					Padding = UDim.new(0, 15),
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Top = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 2,
+					Size = UDim2.new(1, 0, 0, v16.TopSizeY)
+				}, {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						Padding = UDim.new(0, 10),
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Horizontal
+					}),
+					AvatarHeadShot = Roact.createElement(AvatarHeadShot),
+					PlayerNameLabel = Roact.createElement(PlayerNameLabel)
+				}),
+				AssetList = Roact.createElement(AssetList)
+			})
+		end
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p3, _) -- line: 53
+	return {
+		view = p3.view,
+		detailsInformation = p3.detailsInformation
+	}
+end)(v9)

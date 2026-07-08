@@ -1,2 +1,3 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-require(l_CorePackages_0.Workspace.Packages.InExperienceDetailsPrompt).renderInExperienceDetailsPrompt();
+local CorePackages = game:GetService("CorePackages")
+
+require(CorePackages.Workspace.Packages.InExperienceDetailsPrompt).renderInExperienceDetailsPrompt()

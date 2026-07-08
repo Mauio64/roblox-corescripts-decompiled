@@ -1,1 +1,1 @@
-return require(script.SocialCountsConfig);
+return require(script.SocialCountsConfig)

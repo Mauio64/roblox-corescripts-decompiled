@@ -1,15 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ApolloPresence");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_fragments_0 = require(l_Parent_0.ApolloLocalState).fragments;
-local v3 = require(l_script_FirstAncestor_0.Formatters);
-return function(v4, v5) --[[ Line: 9 ]] --[[ Name: updateUserPresenceCache ]]
-    -- upvalues: l_fragments_0 (copy), v3 (copy)
-    return (v4.cache:writeFragment({
-        id = v4.cache:identify({
-            __typename = "UserPresence", 
-            id = v5.id
-        }), 
-        fragment = l_fragments_0.userPresenceAllFields, 
-        data = v3.formatUserPresence(v5)
-    }));
-end;
+local ApolloPresence = script:FindFirstAncestor("ApolloPresence")
+local ApolloPresenceParent = ApolloPresence.Parent
+local fragments = require(ApolloPresenceParent.ApolloLocalState).fragments
+local Formatters = require(ApolloPresence.Formatters)
+
+local function updateUserPresenceCache(p1, p2) -- line: 9
+	-- upvalues: fragments (copy), Formatters (copy)
+	return (p1.cache:writeFragment({
+		id = p1.cache:identify({
+			__typename = "UserPresence",
+			id = p2.id
+		}),
+		fragment = fragments.userPresenceAllFields,
+		data = Formatters.formatUserPresence(p2)
+	}))
+end
+
+return updateUserPresenceCache

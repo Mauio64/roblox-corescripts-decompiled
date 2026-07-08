@@ -1,8 +1,9 @@
-local l_script_0 = script;
+local _script = script
+
 return {
-    ShareGameAnalytics = require(l_script_0.ShareGameAnalytics), 
-    Enums = require(l_script_0.Enums), 
-    FireEvent = require(l_script_0.FireEvent), 
-    Navigation = require(l_script_0.Navigation), 
-    Formatters = require(l_script_0.Formatters)
-};
+	ShareGameAnalytics = require(_script.ShareGameAnalytics),
+	Enums = require(_script.Enums),
+	FireEvent = require(_script.FireEvent),
+	Navigation = require(_script.Navigation),
+	Formatters = require(_script.Formatters)
+}

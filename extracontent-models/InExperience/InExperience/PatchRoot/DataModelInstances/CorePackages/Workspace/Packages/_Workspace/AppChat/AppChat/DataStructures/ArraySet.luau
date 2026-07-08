@@ -1,94 +1,146 @@
-local v0 = {};
-v0.__index = function(v1, v2) --[[ Line: 47 ]] --[[ Name: __index ]]
-    -- upvalues: v0 (copy)
-    if type(v2) == "number" then
-        return v1:at(v2);
-    else
-        return v0[v2];
-    end;
-end;
-v0.__len = function(v3) --[[ Line: 55 ]] --[[ Name: __len ]]
-    return v3:size();
-end;
-v0.__newindex = function(v4, v5, v6) --[[ Line: 59 ]] --[[ Name: __newindex ]]
-    v4._indexToValue[v5] = v6;
-end;
-v0.__iter = function(v7) --[[ Line: 63 ]] --[[ Name: __iter ]]
-    local v8 = 0;
-    return function() --[[ Line: 65 ]]
-        -- upvalues: v8 (ref), v7 (copy)
-        v8 = v8 + 1;
-        if v8 <= v7._size then
-            return v7._indexToValue[v8];
-        else
-            return nil;
-        end;
-    end;
-end;
-v0.add = function(v9, v10) --[[ Line: 75 ]] --[[ Name: add ]]
-    if v9._valueToIndex[v10] then
-        return false;
-    else
-        local v11 = v9._size + 1;
-        v9._valueToIndex[v10] = v11;
-        v9._indexToValue[v11] = v10;
-        v9._size = v11;
-        return true;
-    end;
-end;
-v0.remove = function(v12, v13) --[[ Line: 91 ]] --[[ Name: remove ]]
-    if not v12._valueToIndex[v13] then
-        return false;
-    else
-        local v14 = v12._valueToIndex[v13];
-        v12._valueToIndex[v13] = nil;
-        for v15 = v14 + 1, v12._size do
-            local v16 = v12._indexToValue[v15];
-            v12._indexToValue[v15 - 1] = v16;
-            v12._valueToIndex[v16] = v15 - 1;
-        end;
-        v12._indexToValue[v12._size] = nil;
-        v12._size = v12._size - 1;
-        return true;
-    end;
-end;
-v0.has = function(v17, v18) --[[ Line: 114 ]] --[[ Name: has ]]
-    return v17._valueToIndex[v18] ~= nil;
-end;
-v0.clear = function(v19) --[[ Line: 118 ]] --[[ Name: clear ]]
-    v19._valueToIndex = {};
-    v19._indexToValue = {};
-    v19._size = 0;
-end;
-v0.size = function(v20) --[[ Line: 124 ]] --[[ Name: size ]]
-    return v20._size;
-end;
-v0.at = function(v21, v22) --[[ Line: 129 ]] --[[ Name: at ]]
-    if v22 < 1 or v21._size < v22 then
-        return nil;
-    else
-        return v21._indexToValue[v22];
-    end;
-end;
-v0.toArray = function(v23) --[[ Line: 139 ]] --[[ Name: toArray ]]
-    return table.clone(v23._indexToValue);
-end;
-v0.clone = function(v24) --[[ Line: 144 ]] --[[ Name: clone ]]
-    -- upvalues: v0 (copy)
-    return v0.new(v24._indexToValue);
-end;
-v0.new = function(v25) --[[ Line: 148 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v26 = setmetatable({
-        _valueToIndex = {}, 
-        _indexToValue = {}, 
-        _size = 0
-    }, v0);
-    if v25 then
-        for _, v28 in v25 do
-            v26:add(v28);
-        end;
-    end;
-    return v26;
-end;
-return v0;
+local t1 = {}
+
+function t1.__index(p1, p2) -- line: 55
+	-- upvalues: t1 (copy)
+	if type(p2) == "number" then
+		return p1:at(p2)
+	end
+
+	return t1[p2]
+end
+function t1.__len(p3) -- line: 63
+	return p3:size()
+end
+function t1.__newindex(p4, p5, p6) -- line: 67
+	p4._indexToValue[p5] = p6
+end
+function t1.__iter(p7) -- line: 71
+	local n1 = 0
+
+	return function() -- line: 73
+		-- upvalues: n1 (ref), p7 (copy)
+		n1 += 1
+
+		if n1 <= p7._size then
+			return p7._indexToValue[n1]
+		end
+
+		return nil
+	end
+end
+function t1.add(p8, p9) -- line: 83
+	if p8._valueToIndex[p9] then
+		return false
+	end
+
+	local v12 = p8._size + 1
+
+	p8._valueToIndex[p9] = v12
+	p8._indexToValue[v12] = p9
+	p8._size = v12
+
+	return true
+end
+function t1.prependAll(t2: {[any]: any}, t3: {[any]: any}) -- line: 101
+	local t4 = {}
+	local t5 = {}
+
+	for _, v18 in t3 do
+		if not t2._valueToIndex[v18] and not t5[v18] then
+			t5[v18] = true
+			table.insert(t4, v18)
+		end
+	end
+
+	if #t4 == 0 then
+		return false
+	end
+
+	local v19 = #t4
+
+	for i = t2._size, 1, -1 do
+		local v21 = t2._indexToValue[i]
+
+		t2._indexToValue[i + v19] = v21
+		t2._valueToIndex[v21] = i + v19
+	end
+
+	for v22, v23 in t4 do
+		t2._indexToValue[v22] = v23
+		t2._valueToIndex[v23] = v22
+	end
+
+	t2._size = t2._size + v19
+
+	return true
+end
+function t1.remove(p10, p11) -- line: 136
+	if not p10._valueToIndex[p11] then
+		return false
+	end
+
+	local v26 = p10._valueToIndex[p11]
+
+	p10._valueToIndex[p11] = nil
+
+	for i = v26 + 1, p10._size do
+		local v28 = p10._indexToValue[i]
+
+		p10._indexToValue[i - 1] = v28
+		p10._valueToIndex[v28] = i - 1
+	end
+
+	p10._indexToValue[p10._size] = nil
+	p10._size = p10._size - 1
+
+	return true
+end
+function t1.has(p12, p13) -- line: 159
+	return p12._valueToIndex[p13] ~= nil
+end
+function t1.clear(p14) -- line: 163
+	p14._valueToIndex = {}
+	p14._indexToValue = {}
+	p14._size = 0
+end
+function t1.size(p15) -- line: 169
+	return p15._size
+end
+function t1.at(t6: {[any]: any}, n2: number) -- line: 174
+	if n2 < 1 or n2 > t6._size then
+		return nil
+	end
+
+	return t6._indexToValue[n2]
+end
+function t1.indexOf(p16, p17) -- line: 183
+	return p16._valueToIndex[p17]
+end
+function t1.toArray(p18) -- line: 188
+	return table.clone(p18._indexToValue)
+end
+function t1.values(p19) -- line: 194
+	return p19._indexToValue
+end
+function t1.clone(p20) -- line: 199
+	-- upvalues: t1 (copy)
+	return t1.new(p20._indexToValue)
+end
+function t1.new(t7: {[any]: any}?) -- line: 203
+	-- upvalues: t1 (copy)
+	local v41 = setmetatable({
+		_size = 0,
+		_valueToIndex = {},
+		_indexToValue = {}
+	}, t1)
+
+	if t7 then
+		for _, v43 in t7 do
+			v41:add(v43)
+		end
+	end
+
+	return v41
+end
+
+return t1

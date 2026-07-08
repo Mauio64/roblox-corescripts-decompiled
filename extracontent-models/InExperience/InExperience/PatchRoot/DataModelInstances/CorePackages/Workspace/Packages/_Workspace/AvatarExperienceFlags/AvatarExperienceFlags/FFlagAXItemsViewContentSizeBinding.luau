@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXItemsViewContentSizeBinding", false);
+return game:DefineFastFlag("AXItemsViewContentSizeBinding", false)

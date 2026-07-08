@@ -1,45 +1,49 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-return function(v2, v3) --[[ Line: 5 ]] --[[ Name: useRefImpression ]]
-    -- upvalues: v1 (copy)
-    local v4 = v1.useRef(false);
-    local v7 = v1.useCallback(function(v5, v6) --[[ Line: 8 ]]
-        -- upvalues: v4 (copy), v3 (copy)
-        if v5.AbsolutePosition.Y <= v6.AbsoluteSize.Y then
-            v4.current = true;
-            v3();
-        end;
-    end, {
-        v3
-    });
-    v1.useEffect(function() --[[ Line: 15 ]]
-        -- upvalues: v4 (copy), v2 (copy), v7 (copy)
-        if v4.current then
-            return;
-        else
-            local l_current_0 = v2.current;
-            local v9 = nil;
-            if l_current_0 then
-                local l_l_current_0_FirstAncestorWhichIsA_0 = l_current_0:FindFirstAncestorWhichIsA("ScreenGui");
-                if l_l_current_0_FirstAncestorWhichIsA_0 then
-                    v7(l_current_0, l_l_current_0_FirstAncestorWhichIsA_0);
-                    v9 = l_current_0:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() --[[ Line: 29 ]]
-                        -- upvalues: v4 (ref), v7 (ref), l_current_0 (copy), l_l_current_0_FirstAncestorWhichIsA_0 (copy)
-                        if v4.current then
-                            return;
-                        else
-                            v7(l_current_0, l_l_current_0_FirstAncestorWhichIsA_0);
-                            return;
-                        end;
-                    end);
-                end;
-            end;
-            return function() --[[ Line: 39 ]]
-                -- upvalues: v9 (ref)
-                if v9 then
-                    v9:Disconnect();
-                end;
-            end;
-        end;
-    end);
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local React = require(VirtualEvents.Parent.React)
+
+local function useRefImpression(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 5
+	-- upvalues: React (copy)
+	local v6 = React.useRef(false)
+	local v7 = React.useCallback(function(p2, p3) -- line: 8
+		-- upvalues: v6 (copy), p1 (copy)
+		if p2.AbsolutePosition.Y <= p3.AbsoluteSize.Y then
+			v6.current = true
+			p1()
+		end
+	end, { p1 })
+
+	React.useEffect(function() -- line: 15
+		-- upvalues: v6 (copy), t1 (copy), v7 (copy)
+		if v6.current then
+			return
+		end
+
+		local current = t1.current
+		local connection = nil
+
+		if current then
+			local ScreenGui = current:FindFirstAncestorWhichIsA("ScreenGui")
+
+			if ScreenGui then
+				v7(current, ScreenGui)
+				connection = current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 29
+					-- upvalues: v6 (copy), v7 (copy), current (copy), ScreenGui (copy)
+					if v6.current then
+						return
+					end
+
+					v7(current, ScreenGui)
+				end)
+			end
+		end
+
+		return function() -- line: 39
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end)
+end
+
+return useRefImpression

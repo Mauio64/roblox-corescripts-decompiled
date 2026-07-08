@@ -1,53 +1,66 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.util.calculateMinMax);
-local v3 = {};
-v3.combineBounds = function(v4, v5) --[[ Line: 23 ]] --[[ Name: combineBounds ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v6 = {};
-    local v7, v8 = v2(v4.minMeshCorner, v4.maxMeshCorner, v5.minMeshCorner, v5.maxMeshCorner);
-    v6.minMeshCorner = v7;
-    v6.maxMeshCorner = v8;
-    v7, v8 = v2(v4.minRigAttachment, v4.maxRigAttachment, v5.minRigAttachment, v5.maxRigAttachment);
-    v6.minRigAttachment = v7;
-    v6.maxRigAttachment = v8;
-    v3.setOverallBounds(v6);
-    return v6;
-end;
-v3.expandMeshBounds = function(v9, v10) --[[ Line: 36 ]] --[[ Name: expandMeshBounds ]]
-    -- upvalues: v2 (copy)
-    local v11, v12 = v2(v9.minMeshCorner, v9.maxMeshCorner, v10, v10);
-    v9.minMeshCorner = v11;
-    v9.maxMeshCorner = v12;
-end;
-v3.expandRigAttachmentBounds = function(v13, v14) --[[ Line: 41 ]] --[[ Name: expandRigAttachmentBounds ]]
-    -- upvalues: v2 (copy)
-    local v15, v16 = v2(v13.minRigAttachment, v13.maxRigAttachment, v14, v14);
-    v13.minRigAttachment = v15;
-    v13.maxRigAttachment = v16;
-end;
-v3.setOverallBounds = function(v17) --[[ Line: 46 ]] --[[ Name: setOverallBounds ]]
-    -- upvalues: v2 (copy)
-    local v18, v19 = v2(v17.minMeshCorner, v17.maxMeshCorner, v17.minRigAttachment, v17.maxRigAttachment);
-    v17.minOverall = v18;
-    v17.maxOverall = v19;
-end;
-v3.calculateBoundsCenters = function(v20) --[[ Line: 52 ]] --[[ Name: calculateBoundsCenters ]]
-    local v21 = if v20.minMeshCorner and v20.maxMeshCorner then (v20.minMeshCorner + v20.maxMeshCorner) / 2 else nil;
-    local v22 = if v20.minRigAttachment and v20.maxRigAttachment then (v20.minRigAttachment + v20.maxRigAttachment) / 2 else nil;
-    if v20.minOverall and v20.maxOverall then
-        return v21, v22, (v20.minOverall + v20.maxOverall) / 2;
-    else
-        return v21, v22, nil;
-    end;
-end;
-v3.calculateBoundsDimensions = function(v23) --[[ Line: 66 ]] --[[ Name: calculateBoundsDimensions ]]
-    local v24 = if v23.minMeshCorner and v23.maxMeshCorner then v23.maxMeshCorner - v23.minMeshCorner else nil;
-    local v25 = if v23.minRigAttachment and v23.maxRigAttachment then v23.maxRigAttachment - v23.minRigAttachment else nil;
-    if v23.minOverall and v23.maxOverall then
-        return v24, v25, v23.maxOverall - v23.minOverall;
-    else
-        return v24, v25, nil;
-    end;
-end;
-return v3;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local calculateMinMax = require(ParentParent.util.calculateMinMax)
+local t1 = {}
+
+function t1.combineBounds(p1, p2) -- line: 23
+	-- upvalues: calculateMinMax (copy), t1 (copy)
+	local t2 = {}
+	local v7, v8 = calculateMinMax(p1.minMeshCorner, p1.maxMeshCorner, p2.minMeshCorner, p2.maxMeshCorner)
+
+	t2.minMeshCorner = v7
+	t2.maxMeshCorner = v8
+
+	local v9, v10 = calculateMinMax(p1.minRigAttachment, p1.maxRigAttachment, p2.minRigAttachment, p2.maxRigAttachment)
+
+	t2.minRigAttachment = v9
+	t2.maxRigAttachment = v10
+	t1.setOverallBounds(t2)
+
+	return t2
+end
+function t1.expandMeshBounds(p3, vector3: Vector3) -- line: 36
+	-- upvalues: calculateMinMax (copy)
+	local v13, v14 = calculateMinMax(p3.minMeshCorner, p3.maxMeshCorner, vector3, vector3)
+
+	p3.minMeshCorner = v13
+	p3.maxMeshCorner = v14
+end
+function t1.expandRigAttachmentBounds(p4, vector3: Vector3) -- line: 41
+	-- upvalues: calculateMinMax (copy)
+	local v17, v18 = calculateMinMax(p4.minRigAttachment, p4.maxRigAttachment, vector3, vector3)
+
+	p4.minRigAttachment = v17
+	p4.maxRigAttachment = v18
+end
+function t1.setOverallBounds(p5) -- line: 46
+	-- upvalues: calculateMinMax (copy)
+	local v20, v21 = calculateMinMax(p5.minMeshCorner, p5.maxMeshCorner, p5.minRigAttachment, p5.maxRigAttachment)
+
+	p5.minOverall = v20
+	p5.maxOverall = v21
+end
+function t1.calculateBoundsCenters(p6) -- line: 52
+	local v23 = if not p6.minMeshCorner or not p6.maxMeshCorner then nil else (p6.minMeshCorner + p6.maxMeshCorner) / 2
+	local v24 = if not p6.minRigAttachment or not p6.maxRigAttachment then nil else (p6.minRigAttachment + p6.maxRigAttachment) / 2
+
+	if p6.minOverall and p6.maxOverall then
+		return v23, v24, (p6.minOverall + p6.maxOverall) / 2
+	end
+
+	return v23, v24, nil
+end
+function t1.calculateBoundsDimensions(p7) -- line: 66
+	local v26 = if not p7.minMeshCorner or not p7.maxMeshCorner then nil else p7.maxMeshCorner - p7.minMeshCorner
+	local v27 = if not p7.minRigAttachment or not p7.maxRigAttachment then nil else p7.maxRigAttachment - p7.minRigAttachment
+
+	if p7.minOverall and p7.maxOverall then
+		return v26, v27, p7.maxOverall - p7.minOverall
+	end
+
+	return v26, v27, nil
+end
+
+return t1

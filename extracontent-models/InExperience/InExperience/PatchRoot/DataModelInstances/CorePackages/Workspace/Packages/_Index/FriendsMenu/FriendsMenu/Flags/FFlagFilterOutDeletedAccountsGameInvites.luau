@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FilterOutDeletedAccountsGameInvites", false);
+return game:DefineFastFlag("FilterOutDeletedAccountsGameInvites", false)

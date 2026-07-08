@@ -1,20 +1,21 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v3 = require(script.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider);
-local l_Localization_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_CorePackages_0.Workspace.Packages.Localization).LocalizationProvider;
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), v3 (copy)
-    return v1.createElement(l_LocalizationProvider_0, {
-        localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-    }, {
-        FTUXMock = v1.createElement("ScreenGui", {}, {
-            ThemeProvider = v3({
-                Frame = v1.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0)
-                }, v6)
-            })
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local LocalizationService = game:GetService("LocalizationService")
+local renderWithCoreScriptsStyleProvider = require(script.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider)
+local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local LocalizationProvider = require(CorePackages.Workspace.Packages.Localization).LocalizationProvider
+
+return function(p1) -- line: 10
+	-- upvalues: Roact (copy), LocalizationProvider (copy), Localization (copy), LocalizationService (copy), renderWithCoreScriptsStyleProvider (copy)
+	return Roact.createElement(LocalizationProvider, {
+		localization = Localization.new(LocalizationService.RobloxLocaleId)
+	}, {
+		FTUXMock = Roact.createElement("ScreenGui", {}, {
+			ThemeProvider = renderWithCoreScriptsStyleProvider({
+				Frame = Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 1, 0)
+				}, p1)
+			})
+		})
+	})
+end

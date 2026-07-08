@@ -1,14 +1,14 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_useEffect_0 = require(l_Parent_0.React).useEffect;
-usePingLazyRenderResizing = function(v2, v3) --[[ Line: 6 ]] --[[ Name: usePingLazyRenderResizing ]]
-    -- upvalues: l_useEffect_0 (copy)
-    l_useEffect_0(function() --[[ Line: 7 ]]
-        -- upvalues: v2 (copy)
-        if v2.current then
-            local _ = v2.current.AbsoluteSize;
-        end;
-    end, {
-        v3
-    });
-end;
-return usePingLazyRenderResizing;
+local ParentParent = script.Parent.Parent.Parent
+local useEffect = require(ParentParent.React).useEffect
+
+function usePingLazyRenderResizing(p1, p2) -- line: 6
+	-- upvalues: useEffect (copy)
+	useEffect(function() -- line: 7
+		-- upvalues: p1 (copy)
+		if p1.current then
+			local _ = p1.current.AbsoluteSize
+		end
+	end, { p2 })
+end
+
+return usePingLazyRenderResizing

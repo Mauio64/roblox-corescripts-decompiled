@@ -1,4 +1,4 @@
 return {
-    Join = "Join", 
-    Leave = "Leave"
-};
+	Join = "Join",
+	Leave = "Leave"
+}

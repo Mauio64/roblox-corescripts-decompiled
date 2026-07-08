@@ -1,22 +1,23 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Actions.CapturesActivated);
-local v2 = require(l_Parent_0.Actions.CapturesDeactivated);
-local v3 = require(l_Parent_0.Enums.CapturesToastType);
-local v4 = require(l_Parent_0.Actions.ToastDismissed);
-local v5 = require(l_Parent_0.Actions.ToastTriggered);
-return function(v6, v7, v8, v9, v10, v11) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v5 (copy), v3 (copy), v2 (copy), v4 (copy)
-    if (not v7 or v7 == 1) and not v6 then
-        v8(v10);
-        v9(v1());
-        v9(v5(v3.CapturesActivated));
-        return;
-    else
-        if v6 then
-            v8(v11);
-            v9(v2());
-            v9(v4());
-        end;
-        return;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local CapturesActivated = require(ParentParent.Actions.CapturesActivated)
+local CapturesDeactivated = require(ParentParent.Actions.CapturesDeactivated)
+local CapturesToastType = require(ParentParent.Enums.CapturesToastType)
+local ToastDismissed = require(ParentParent.Actions.ToastDismissed)
+local ToastTriggered = require(ParentParent.Actions.ToastTriggered)
+
+return function(b1: boolean, n1: number?, p1, p2, p3, p4) -- line: 9
+	-- upvalues: CapturesActivated (copy), ToastTriggered (copy), CapturesToastType (copy), CapturesDeactivated (copy), ToastDismissed (copy)
+	if (not n1 or n1 == 1) and not b1 then
+		p1(p3)
+		p2(CapturesActivated())
+		p2(ToastTriggered(CapturesToastType.CapturesActivated))
+
+		return
+	end
+
+	if b1 then
+		p1(p4)
+		p2(CapturesDeactivated())
+		p2(ToastDismissed())
+	end
+end

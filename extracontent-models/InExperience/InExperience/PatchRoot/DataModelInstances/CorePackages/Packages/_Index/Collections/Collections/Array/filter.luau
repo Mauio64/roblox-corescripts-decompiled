@@ -1,36 +1,45 @@
-local l___DEV___0 = _G.__DEV__;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.ES7Types);
-return function(v3, v4, v5) --[[ Line: 27 ]]
-    -- upvalues: l___DEV___0 (copy)
-    if l___DEV___0 then
-        if typeof(v3) ~= "table" then
-            error(string.format("Array.filter called on %s", (typeof(v3))));
-        end;
-        if typeof(v4) ~= "function" then
-            error("callback is not a function");
-        end;
-    end;
-    local v6 = #v3;
-    local v7 = {};
-    local v8 = 1;
-    if v5 == nil then
-        for v9 = 1, v6 do
-            local v10 = v3[v9];
-            if v10 ~= nil and v4(v10, v9, v3) then
-                v7[v8] = v10;
-                v8 = v8 + 1;
-            end;
-        end;
-        return v7;
-    else
-        for v11 = 1, v6 do
-            local v12 = v3[v11];
-            if v12 ~= nil and v4(v5, v12, v11, v3) then
-                v7[v8] = v12;
-                v8 = v8 + 1;
-            end;
-        end;
-        return v7;
-    end;
-end;
+local __DEV__ = _G.__DEV__
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+return function(p1, p2: ((...any) -> ...any), p3) -- line: 27
+	-- upvalues: __DEV__ (copy)
+	if __DEV__ then
+		if typeof(p1) ~= "table" then
+			error(string.format("Array.filter called on %s", (typeof(p1))))
+		end
+
+		if typeof(p2) ~= "function" then
+			error("callback is not a function")
+		end
+	end
+
+	local v6 = #p1
+	local t1 = {}
+	local n1 = 1
+
+	if p3 == nil then
+		for i = 1, v6 do
+			local v10 = p1[i]
+
+			if v10 ~= nil and p2(v10, i, p1) then
+				t1[n1] = v10
+				n1 += 1
+			end
+		end
+
+		return t1
+	end
+
+	for i = 1, v6 do
+		local v12 = p1[i]
+
+		if v12 ~= nil and p2(p3, v12, i, p1) then
+			t1[n1] = v12
+			n1 += 1
+		end
+	end
+
+	return t1
+end

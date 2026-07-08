@@ -1,57 +1,59 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local v4 = require(l_Parent_0.ReactRoblox);
-local l_InteractiveAlert_0 = v3.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local v7 = game:DefineFastFlag("EnableToastNotificationsDeeplinkConfirmationModalHeightFix", false);
-local v8 = require(l_Parent_0.RobloxTranslator);
-return function(v9) --[[ Line: 22 ]]
-    -- upvalues: v2 (copy), v8 (copy), v7 (copy), l_GuiService_0 (copy), v4 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local v10, v11 = v2.useState(Vector2.new(800, 600));
-    local v12 = v8:FormatByKey("Notifications.ToastNotifications.Title.LeavingExperience");
-    local v13 = v8:FormatByKey("Notifications.ToastNotifications.Label.LeaveExperienceConfirmation");
-    local v14 = v8:FormatByKey("InGame.InspectMenu.Action.Cancel");
-    local v15 = v8:FormatByKey("InGame.InspectMenu.Action.Confirm");
-    return v2.createElement("Frame", {
-        Active = true, 
-        BackgroundTransparency = if v9.backgroundTransparency then v9.backgroundTransparency else 0.5, 
-        BackgroundColor3 = Color3.new(0, 0, 0), 
-        Size = UDim2.new(1, 0, 1, if v7 then l_GuiService_0.TopbarInset.Height else 0), 
-        [v4.Change.AbsoluteSize] = function(v16) --[[ Line: 42 ]]
-            -- upvalues: v11 (copy)
-            v11(v16.AbsoluteSize);
-        end, 
-        Position = if v7 then UDim2.fromOffset(0, -l_GuiService_0.TopbarInset.Height) else nil
-    }, {
-        Alert = v2.createElement(l_InteractiveAlert_0, {
-            screenSize = v10, 
-            title = v12, 
-            bodyText = v13, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        props = {
-                            onActivated = function() --[[ Line: 57 ]] --[[ Name: onActivated ]]
-                                -- upvalues: v9 (copy)
-                                v9.closeCallback(false);
-                            end, 
-                            text = v14
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = function() --[[ Line: 66 ]] --[[ Name: onActivated ]]
-                                -- upvalues: v9 (copy)
-                                v9.closeCallback(true);
-                            end, 
-                            text = v15
-                        }
-                    }
-                }
-            }
-        })
-    });
-end;
+local GuiService = game:GetService("GuiService")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local UIBlox = require(ParentParent.UIBlox)
+local ReactRoblox = require(ParentParent.ReactRoblox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local v8 = game:DefineFastFlag("EnableToastNotificationsDeeplinkConfirmationModalHeightFix", false)
+local RobloxTranslator = require(ParentParent.RobloxTranslator)
+
+return function(t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), RobloxTranslator (copy), v8 (copy), GuiService (copy), ReactRoblox (copy), InteractiveAlert (copy), ButtonType (copy)
+	local v11, v12 = React.useState(Vector2.new(800, 600))
+	local v13 = RobloxTranslator:FormatByKey("Notifications.ToastNotifications.Title.LeavingExperience")
+	local v14 = RobloxTranslator:FormatByKey("Notifications.ToastNotifications.Label.LeaveExperienceConfirmation")
+	local v15 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Cancel")
+	local v16 = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Confirm")
+
+	return React.createElement("Frame", {
+		Active = true,
+		BackgroundTransparency = not t1.backgroundTransparency and 0.5 or t1.backgroundTransparency,
+		BackgroundColor3 = Color3.new(0, 0, 0),
+		Size = UDim2.new(1, 0, 1, not v8 and 0 or GuiService.TopbarInset.Height),
+		[ReactRoblox.Change.AbsoluteSize] = function(p1) -- line: 42
+			-- upvalues: v12 (copy)
+			v12(p1.AbsoluteSize)
+		end,
+		Position = if not v8 then nil else UDim2.fromOffset(0, -GuiService.TopbarInset.Height)
+	}, {
+		Alert = React.createElement(InteractiveAlert, {
+			screenSize = v11,
+			title = v13,
+			bodyText = v14,
+			buttonStackInfo = {
+				buttons = {
+					{
+						props = {
+							onActivated = function() -- line: 57
+								-- upvalues: t1 (copy)
+								t1.closeCallback(false)
+							end,
+							text = v15
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							onActivated = function() -- line: 66
+								-- upvalues: t1 (copy)
+								t1.closeCallback(true)
+							end,
+							text = v16
+						}
+					}
+				}
+			}
+		})
+	})
+end

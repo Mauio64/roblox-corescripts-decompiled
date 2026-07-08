@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppLogGameAttributionError2", false);
+return game:DefineFastFlag("LuaAppLogGameAttributionError2", false)

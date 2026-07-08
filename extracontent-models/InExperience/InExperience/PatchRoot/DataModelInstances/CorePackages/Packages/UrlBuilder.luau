@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent._Index;
-return (require(l__Index_0.UrlBuilder.UrlBuilder));
+local _Index = script.Parent._Index
+
+return (require(_Index.UrlBuilder.UrlBuilder))

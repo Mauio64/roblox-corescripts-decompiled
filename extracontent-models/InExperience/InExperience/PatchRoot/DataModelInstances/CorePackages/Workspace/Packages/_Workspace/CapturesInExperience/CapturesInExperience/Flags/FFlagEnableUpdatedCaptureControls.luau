@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableUpdatedCaptureControls_v9", false);
+return game:DefineFastFlag("EnableUpdatedCaptureControls_v9", false)

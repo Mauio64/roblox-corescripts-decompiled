@@ -1,63 +1,70 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Packages_0 = l_CorePackages_0.Packages;
-local v2 = require(l_Packages_0.React);
-local v3 = require(l_Packages_0.LuauPolyfill);
-local l_setTimeout_0 = v3.setTimeout;
-local l_clearTimeout_0 = v3.clearTimeout;
-local v6 = require(script.Parent.useTrackerMode);
-local v7 = require(script.Parent.Parent.Utils.FaceChatUtils);
-local l_useLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).Hooks.useLocalization;
-local l_TrackerMode_0 = Enum.TrackerMode;
-return function() --[[ Line: 27 ]]
-    -- upvalues: v2 (copy), v7 (copy), v6 (copy), l_useLocalization_0 (copy), l_TrackerMode_0 (copy), l_clearTimeout_0 (copy), l_setTimeout_0 (copy)
-    local v10 = v2.useRef(v7.getTrackerMode());
-    local v11 = v6();
-    local v12 = l_useLocalization_0({
-        controlMessageSound = "CoreScripts.TopBar.ControlMessageSound", 
-        controlMessageMotion = "CoreScripts.TopBar.ControlMessageMotion", 
-        controlMessageOn = "CoreScripts.TopBar.ControlMessageOn", 
-        controlMessageOff = "CoreScripts.TopBar.ControlMessageOff"
-    });
-    local v13, v14 = v2.useState({
-        visible = false, 
-        text = v12.controlMessageMotion, 
-        status = v12.controlMessageOff
-    });
-    local v15 = v2.useRef(nil);
-    local function v18() --[[ Line: 42 ]]
-        -- upvalues: v12 (copy), v11 (copy), l_TrackerMode_0 (ref), v10 (copy)
-        local l_controlMessageMotion_0 = v12.controlMessageMotion;
-        local l_controlMessageOff_0 = v12.controlMessageOff;
-        if v11 ~= l_TrackerMode_0.None then
-            l_controlMessageOff_0 = v12.controlMessageOn;
-            l_controlMessageMotion_0 = if not (v11 ~= l_TrackerMode_0.AudioVideo) or v11 == l_TrackerMode_0.Video then v12.controlMessageMotion else v12.controlMessageSound;
-        else
-            l_controlMessageOff_0 = v12.controlMessageOff;
-            l_controlMessageMotion_0 = if v10.current == l_TrackerMode_0.Audio then v12.controlMessageSound else v12.controlMessageMotion;
-        end;
-        v10.current = v11;
-        return {
-            visible = true, 
-            text = l_controlMessageMotion_0, 
-            status = l_controlMessageOff_0
-        };
-    end;
-    v2.useEffect(function() --[[ Line: 75 ]]
-        -- upvalues: v15 (copy), l_clearTimeout_0 (ref), v14 (copy), v18 (copy), l_setTimeout_0 (ref), v13 (copy)
-        if v15.current then
-            l_clearTimeout_0(v15.current);
-        end;
-        v14((v18()));
-        v15.current = l_setTimeout_0(function() --[[ Line: 81 ]]
-            -- upvalues: v14 (ref), v13 (ref)
-            v14({
-                visible = false, 
-                text = v13.text, 
-                status = v13.status
-            });
-        end, 2000);
-    end, {
-        v11
-    });
-    return v13;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Packages = CorePackages.Packages
+local React = require(Packages.React)
+local LuauPolyfill = require(Packages.LuauPolyfill)
+local setTimeout = LuauPolyfill.setTimeout
+local clearTimeout = LuauPolyfill.clearTimeout
+local useTrackerMode = require(script.Parent.useTrackerMode)
+local FaceChatUtils = require(script.Parent.Parent.Utils.FaceChatUtils)
+local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local TrackerMode = Enum.TrackerMode
+
+return function() -- line: 27
+	-- upvalues: React (copy), FaceChatUtils (copy), useTrackerMode (copy), useLocalization (copy), TrackerMode (copy), clearTimeout (copy), setTimeout (copy)
+	local v11 = React.useRef(FaceChatUtils.getTrackerMode())
+	local v12 = useTrackerMode()
+	local v13 = useLocalization({
+		controlMessageSound = "CoreScripts.TopBar.ControlMessageSound",
+		controlMessageMotion = "CoreScripts.TopBar.ControlMessageMotion",
+		controlMessageOn = "CoreScripts.TopBar.ControlMessageOn",
+		controlMessageOff = "CoreScripts.TopBar.ControlMessageOff"
+	})
+	local v14, v15 = React.useState({
+		visible = false,
+		text = v13.controlMessageMotion,
+		status = v13.controlMessageOff
+	})
+	local v16 = React.useRef(nil)
+
+	local function v17() -- line: 42
+		-- upvalues: v13 (copy), v12 (copy), TrackerMode (copy), v11 (copy)
+		local _ = v13.controlMessageMotion
+		local _ = v13.controlMessageOff
+		local controlMessageOn, v21
+
+		if v12 ~= TrackerMode.None then
+			controlMessageOn = v13.controlMessageOn
+			v21 = if v12 ~= TrackerMode.AudioVideo and v12 ~= TrackerMode.Video then v13.controlMessageSound else v13.controlMessageMotion
+		else
+			controlMessageOn = v13.controlMessageOff
+			v21 = if v11.current ~= TrackerMode.Audio then v13.controlMessageMotion else v13.controlMessageSound
+		end
+
+		v11.current = v12
+
+		return {
+			visible = true,
+			text = v21,
+			status = controlMessageOn
+		}
+	end
+
+	React.useEffect(function() -- line: 75
+		-- upvalues: v16 (copy), clearTimeout (copy), v15 (copy), v17 (copy), setTimeout (copy), v14 (copy)
+		if v16.current then
+			clearTimeout(v16.current)
+		end
+
+		v15((v17()))
+		v16.current = setTimeout(function() -- line: 81
+			-- upvalues: v15 (copy), v14 (copy)
+			v15({
+				visible = false,
+				text = v14.text,
+				status = v14.status
+			})
+		end, 2000)
+	end, { v12 })
+
+	return v14
+end

@@ -1,53 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local l_useFriendsListOrderedByPresence_0 = require(l_Parent_0.FriendsCommon).Hooks.useFriendsListOrderedByPresence;
-local l_UserModel_0 = require(l_Parent_0.UserLib).Models.UserModel;
-local v5 = require(script.Parent.Utils.convertPresenceTypeToUserPresence);
-useFetchPaginatedFriends = function() --[[ Line: 14 ]] --[[ Name: useFetchPaginatedFriends ]]
-    -- upvalues: l_useLocalUserId_0 (copy), l_useLocalization_0 (copy), l_useFriendsListOrderedByPresence_0 (copy), v5 (copy), l_UserModel_0 (copy)
-    local v6 = l_useLocalUserId_0();
-    local v7 = l_useLocalization_0({
-        offlinePresenceText = "Common.Presence.Label.Offline", 
-        onlinePresenceText = "Common.Presence.Label.Online"
-    });
-    local v8 = l_useFriendsListOrderedByPresence_0({
-        userId = v6, 
-        pageSize = 50
-    });
-    local v9 = {};
-    if v8.onlineFriends and v8.offlineFriends then
-        for _, v11 in v8.onlineFriends do
-            local l_id_0 = v11.id;
-            local v13 = if v11.presence then v11.presence.userPresenceType else nil;
-            local v14 = v5(v13);
-            local v15 = nil;
-            if v14 == l_UserModel_0.PresenceType.ONLINE then
-                v15 = v7.onlinePresenceText;
-            elseif v14 == l_UserModel_0.PresenceType.IN_GAME then
-                v15 = if v11.presence then v11.presence.lastLocation else "";
-            elseif v14 == l_UserModel_0.PresenceType.IN_STUDIO then
-                v15 = "Studio";
-            end;
-            table.insert(v9, {
-                id = l_id_0, 
-                presence = v14, 
-                presenceText = v15, 
-                thumbnail = ("rbxthumb://type=AvatarHeadShot&id=%*&w=150&h=150"):format(l_id_0)
-            });
-        end;
-        for _, v17 in v8.offlineFriends do
-            local l_OFFLINE_0 = l_UserModel_0.PresenceType.OFFLINE;
-            local l_offlinePresenceText_0 = v7.offlinePresenceText;
-            local l_id_1 = v17.id;
-            table.insert(v9, {
-                id = l_id_1, 
-                presence = l_OFFLINE_0, 
-                presenceText = l_offlinePresenceText_0, 
-                thumbnail = ("rbxthumb://type=AvatarHeadShot&id=%*&w=150&h=150"):format(l_id_1)
-            });
-        end;
-    end;
-    return v9, v8.fetchMoreFriends, v8.isEndOfList;
-end;
-return useFetchPaginatedFriends;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local useLocalUserId = require(Parent.RobloxAppHooks).useLocalUserId
+local useFriendsListOrderedByPresence = require(Parent.FriendsCommon).Hooks.useFriendsListOrderedByPresence
+local UserModel = require(Parent.UserLib).Models.UserModel
+local convertPresenceTypeToUserPresence = require(script.Parent.Utils.convertPresenceTypeToUserPresence)
+
+function useFetchPaginatedFriends() -- line: 14
+	-- upvalues: useLocalUserId (copy), useLocalization (copy), useFriendsListOrderedByPresence (copy), convertPresenceTypeToUserPresence (copy), UserModel (copy)
+	local v7 = useLocalUserId()
+	local v8 = useLocalization({
+		offlinePresenceText = "Common.Presence.Label.Offline",
+		onlinePresenceText = "Common.Presence.Label.Online"
+	})
+	local v9 = useFriendsListOrderedByPresence({
+		pageSize = 50,
+		userId = v7
+	})
+	local t1 = {}
+
+	if v9.onlineFriends and v9.offlineFriends then
+		for _, v12 in v9.onlineFriends do
+			local id = v12.id
+			local v14 = if not v12.presence then nil else v12.presence.userPresenceType
+			local v15 = convertPresenceTypeToUserPresence(v14)
+			local onlinePresenceText = nil
+
+			if v15 == UserModel.PresenceType.ONLINE then
+				onlinePresenceText = v8.onlinePresenceText
+			elseif v15 == UserModel.PresenceType.IN_GAME then
+				onlinePresenceText = not v12.presence and "" or v12.presence.lastLocation
+			elseif v15 == UserModel.PresenceType.IN_STUDIO then
+				onlinePresenceText = "Studio"
+			end
+
+			table.insert(t1, {
+				id = id,
+				presence = v15,
+				presenceText = onlinePresenceText,
+				thumbnail = `rbxthumb://type=AvatarHeadShot&id={ id }&w=150&h=150`
+			})
+		end
+
+		for _, v18 in v9.offlineFriends do
+			local OFFLINE = UserModel.PresenceType.OFFLINE
+			local offlinePresenceText = v8.offlinePresenceText
+			local id = v18.id
+
+			table.insert(t1, {
+				id = id,
+				presence = OFFLINE,
+				presenceText = offlinePresenceText,
+				thumbnail = `rbxthumb://type=AvatarHeadShot&id={ id }&w=150&h=150`
+			})
+		end
+	end
+
+	return t1, v9.fetchMoreFriends, v9.isEndOfList
+end
+
+return useFetchPaginatedFriends

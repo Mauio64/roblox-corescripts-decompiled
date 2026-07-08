@@ -1,77 +1,87 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.ReactUtils);
-local l_useProperties_0 = v3.useProperties;
-local l_usePropertiesDeferred_0 = v3.usePropertiesDeferred;
-local v6 = require(l_Parent_0.UIBloxConfig);
-local v7 = require(l_Parent_0.Core.Layout.Responsive.ResponsiveRow);
-local v8 = require(l_Parent_0.Core.Layout.Responsive.useResponsiveLayout);
-local function v18(v9, v10) --[[ Line: 60 ]] --[[ Name: useCellAbsoluteHeight ]]
-    -- upvalues: v8 (copy), v2 (copy)
-    local v11 = v8("columns", v10) or 1;
-    local v12 = v8("gutter", v10) or 0;
-    local v13 = v8("verticalGutter", v10) or v12;
-    local v14 = v8("margin", v10) or 0;
-    local v15 = v8("relativeHeight", v10);
-    local v16 = v9 or v15;
-    return v2.useCallback(function(v17) --[[ Line: 69 ]]
-        -- upvalues: v16 (copy), v14 (copy), v12 (copy), v11 (copy), v13 (copy)
-        if v16 then
-            return math.max(((v17 - 2 * v14 + v12) / v11 - v12) * v16.Scale + v16.Offset, 0) + v13;
-        else
-            return nil;
-        end;
-    end, {
-        v11, 
-        v12, 
-        v13, 
-        v14, 
-        v16
-    });
-end;
-local v19 = NumberRange.new(0, 0);
-local v20 = if v6.responsiveGridDisplayLinesNonNil then v19 else nil;
-return v2.forwardRef(function(v21, v22) --[[ Line: 83 ]] --[[ Name: ResponsiveGrid ]]
-    -- upvalues: v2 (copy), v20 (copy), v18 (copy), l_usePropertiesDeferred_0 (copy), l_useProperties_0 (copy), v7 (copy)
-    local v23, v24 = v2.useState(v20);
-    local v25 = v18(v21.relativeHeight, v21.kind);
-    local v31 = v2.useCallback(function(v26, v27) --[[ Line: 87 ]]
-        -- upvalues: v21 (copy), v25 (copy), v24 (copy), v20 (ref)
-        if v21.absoluteWindowTop and v21.absoluteWindowHeight then
-            local v28 = v25(v27.X);
-            if v28 and v28 > 0 then
-                local v29 = math.floor(math.max(v21.absoluteWindowTop - v26.Y, 0) / v28) + 1;
-                local v30 = math.ceil(math.max(v21.absoluteWindowHeight, 0) / v28) + 1;
-                return v24(NumberRange.new(v29, v29 + v30 - 1));
-            end;
-        end;
-        return v24(v20);
-    end, {
-        v25, 
-        v21.absoluteWindowTop, 
-        v21.absoluteWindowHeight, 
-        v24
-    });
-    local v32 = (if v21.enableDeferredRefPropEvents then l_usePropertiesDeferred_0 else l_useProperties_0)(v22, v31, {
-        "AbsolutePosition", 
-        "AbsoluteSize"
-    });
-    return v2.createElement(v7, {
-        kind = v21.kind, 
-        layoutOrder = v21.layoutOrder, 
-        scrollable = false, 
-        multiLine = true, 
-        displayLines = if v21.absoluteWindowTop and v21.absoluteWindowHeight then v23 else nil, 
-        relativeHeight = v21.relativeHeight, 
-        data = v21.data, 
-        getItem = v21.getItem, 
-        getItemCount = v21.getItemCount, 
-        renderItem = v21.renderItem, 
-        keyExtractor = v21.keyExtractor, 
-        getCellColspan = v21.getCellColspan, 
-        getCellRowspan = v21.getCellRowspan, 
-        getCellOrder = v21.getCellOrder, 
-        ref = v32
-    });
-end);
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local ReactUtils = require(ParentParentParent.ReactUtils)
+local useProperties = ReactUtils.useProperties
+local usePropertiesDeferred = ReactUtils.usePropertiesDeferred
+local UIBloxConfig = require(ParentParent.UIBloxConfig)
+local ResponsiveRow = require(ParentParent.Core.Layout.Responsive.ResponsiveRow)
+local useResponsiveLayout = require(ParentParent.Core.Layout.Responsive.useResponsiveLayout)
+
+local function useCellAbsoluteHeight(uDim: UDim?, s1: string?) -- line: 60
+	-- upvalues: useResponsiveLayout (copy), React (copy)
+	local v16 = useResponsiveLayout("columns", s1) or 1
+	local v17 = useResponsiveLayout("gutter", s1) or 0
+	local v18 = useResponsiveLayout("verticalGutter", s1) or v17
+	local v19 = useResponsiveLayout("margin", s1) or 0
+	local v20 = useResponsiveLayout("relativeHeight", s1)
+	local v21 = uDim or v20
+
+	return React.useCallback(function(n1: number) -- line: 69
+		-- upvalues: v21 (copy), v19 (copy), v17 (copy), v16 (copy), v18 (copy)
+		if v21 then
+			return math.max(((n1 - 2 * v19 + v17) / v16 - v17) * v21.Scale + v21.Offset, 0) + v18
+		end
+
+		return nil
+	end, {
+		v16,
+		v17,
+		v18,
+		v19,
+		v21
+	})
+end
+
+local numberRange = NumberRange.new(0, 0)
+local v12 = if not UIBloxConfig.responsiveGridDisplayLinesNonNil then nil else numberRange
+
+local function ResponsiveGrid(t1: {[any]: any}, p1) -- line: 83
+	-- upvalues: React (copy), v12 (copy), useCellAbsoluteHeight (copy), usePropertiesDeferred (copy), useProperties (copy), ResponsiveRow (copy)
+	local v24, v25 = React.useState(v12)
+	local v26 = useCellAbsoluteHeight(t1.relativeHeight, t1.kind)
+	local v27 = React.useCallback(function(p2, p3) -- line: 87
+		-- upvalues: t1 (copy), v26 (copy), v25 (copy), v12 (copy)
+		if t1.absoluteWindowTop and t1.absoluteWindowHeight then
+			local v32 = v26(p3.X)
+
+			if v32 and v32 > 0 then
+				local v33 = math.floor(math.max(t1.absoluteWindowTop - p2.Y, 0) / v32) + 1
+				local v34 = math.ceil(math.max(t1.absoluteWindowHeight, 0) / v32) + 1
+
+				return v25(NumberRange.new(v33, v33 + v34 - 1))
+			end
+		end
+
+		return v25(v12)
+	end, {
+		v26,
+		t1.absoluteWindowTop,
+		t1.absoluteWindowHeight,
+		v25
+	})
+	local v28 = ((if not t1.enableDeferredRefPropEvents then useProperties else usePropertiesDeferred))(p1, v27, {
+		"AbsolutePosition",
+		"AbsoluteSize"
+	})
+
+	return React.createElement(ResponsiveRow, {
+		scrollable = false,
+		multiLine = true,
+		kind = t1.kind,
+		layoutOrder = t1.layoutOrder,
+		displayLines = if not t1.absoluteWindowTop or not t1.absoluteWindowHeight then nil else v24,
+		relativeHeight = t1.relativeHeight,
+		data = t1.data,
+		getItem = t1.getItem,
+		getItemCount = t1.getItemCount,
+		renderItem = t1.renderItem,
+		keyExtractor = t1.keyExtractor,
+		getCellColspan = t1.getCellColspan,
+		getCellRowspan = t1.getCellRowspan,
+		getCellOrder = t1.getCellOrder,
+		ref = v28
+	})
+end
+
+return React.forwardRef(ResponsiveGrid)

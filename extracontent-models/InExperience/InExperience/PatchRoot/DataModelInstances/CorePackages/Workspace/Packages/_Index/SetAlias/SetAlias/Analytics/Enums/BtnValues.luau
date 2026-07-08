@@ -1,4 +1,4 @@
 return {
-    CloseCustomizeName = "closeCustomizeName", 
-    SaveAlias = "saveAlias"
-};
+	CloseCustomizeName = "closeCustomizeName",
+	SaveAlias = "saveAlias"
+}

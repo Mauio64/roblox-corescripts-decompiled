@@ -1,37 +1,39 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v5 = {
-    _initialized = false, 
-    _isKeyboardJustOff = false, 
-    getInstance = function(v1) --[[ Line: 8 ]] --[[ Name: getInstance ]]
-        if not v1._initialized then
-            v1:initialize();
-            v1._initialized = true;
-        end;
-        return v1;
-    end, 
-    initialize = function(v2) --[[ Line: 16 ]] --[[ Name: initialize ]]
-        -- upvalues: l_UserInputService_0 (copy)
-        v2._isKeyboardJustOff = false;
-        l_UserInputService_0:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(function() --[[ Line: 18 ]]
-            -- upvalues: l_UserInputService_0 (ref), v2 (copy)
-            if not l_UserInputService_0.OnScreenKeyboardVisible then
-                v2._isKeyboardJustOff = true;
-            end;
-        end);
-        l_UserInputService_0.InputEnded:Connect(function(_) --[[ Line: 23 ]]
-            -- upvalues: v2 (copy)
-            if v2._isKeyboardJustOff then
-                v2._isKeyboardJustOff = false;
-            end;
-        end);
-    end, 
-    isKeyboardJustOff = function(v4) --[[ Line: 35 ]] --[[ Name: isKeyboardJustOff ]]
-        return v4._isKeyboardJustOff;
-    end
-};
+local UserInputService = game:GetService("UserInputService")
+local t1 = {
+	_initialized = false,
+	_isKeyboardJustOff = false,
+	getInstance = function(p1) -- line: 8
+		if not p1._initialized then
+			p1:initialize()
+			p1._initialized = true
+		end
+
+		return p1
+	end,
+	initialize = function(p2) -- line: 16
+		-- upvalues: UserInputService (copy)
+		p2._isKeyboardJustOff = false
+		UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(function() -- line: 18
+			-- upvalues: UserInputService (copy), p2 (copy)
+			if not UserInputService.OnScreenKeyboardVisible then
+				p2._isKeyboardJustOff = true
+			end
+		end)
+		UserInputService.InputEnded:Connect(function(_) -- line: 23
+			-- upvalues: p2 (copy)
+			if p2._isKeyboardJustOff then
+				p2._isKeyboardJustOff = false
+			end
+		end)
+	end,
+	isKeyboardJustOff = function(p4) -- line: 35
+		return p4._isKeyboardJustOff
+	end
+}
+
 return {
-    getInstance = function() --[[ Line: 40 ]] --[[ Name: getInstance ]]
-        -- upvalues: v5 (copy)
-        return v5:getInstance();
-    end
-};
+	getInstance = function() -- line: 40
+		-- upvalues: t1 (copy)
+		return t1:getInstance()
+	end
+}

@@ -1,2 +1,3 @@
-game:DefineFastInt("VRBottomBarPositionOffsetDepthNumber", -20);
-return game:GetFastInt("VRBottomBarPositionOffsetDepthNumber");
+game:DefineFastInt("VRBottomBarPositionOffsetDepthNumber", -20)
+
+return game:GetFastInt("VRBottomBarPositionOffsetDepthNumber")

@@ -1,120 +1,124 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local v3 = require(l_CorePackages_0.Packages.React);
-local l_StyledTextLabel_0 = v2.App.Text.StyledTextLabel;
-local l_InteractiveAlert_0 = v2.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v2.App.Button.Enum.ButtonType;
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_useSelector_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useDispatch_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useDispatch;
-local v11 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v12 = require(l_CoreGui_0.RobloxGui.Modules.Common.Hooks.useScreenSize);
-local l_ExperienceService_0 = require(l_CorePackages_0.Workspace.Packages.ExperienceService).ExperienceService;
-local l_Parent_0 = script.Parent.Parent;
-local v15 = require(l_Parent_0.Actions.CloseOverlay);
-return function(v16) --[[ Line: 31 ]] --[[ Name: AttributionTraversal ]]
-    -- upvalues: l_useDispatch_0 (copy), v12 (copy), l_useStyle_0 (copy), v3 (copy), v15 (copy), l_ExperienceService_0 (copy), l_useSelector_0 (copy), l_InteractiveAlert_0 (copy), v11 (copy), l_ImageSetLabel_0 (copy), l_StyledTextLabel_0 (copy), l_ButtonType_0 (copy)
-    local v17 = l_useDispatch_0();
-    local v18 = v12();
-    local v19 = l_useStyle_0();
-    local v20 = v3.useCallback(function() --[[ Line: 36 ]]
-        -- upvalues: v17 (copy), v15 (ref)
-        v17(v15());
-    end, {
-        v17
-    });
-    local v22 = v3.useCallback(function() --[[ Line: 40 ]]
-        -- upvalues: v16 (copy), l_ExperienceService_0 (ref), v17 (copy), v15 (ref)
-        local v21 = {
-            placeId = v16.rootPlaceId
-        };
-        l_ExperienceService_0:LaunchExperience(v21);
-        v17(v15());
-    end, {
-        v17, 
-        v16.rootPlaceId
-    });
-    local v24 = l_useSelector_0(function(v23) --[[ Line: 49 ]]
-        return v23.locale;
-    end);
-    local l_Theme_0 = v19.Theme;
-    local l_Font_0 = v19.Font;
-    local v27 = v16.name or "";
-    return v3.createElement(l_InteractiveAlert_0, {
-        title = v11:FormatByKeyForLocale("InGame.InspectMenu.Attribution.GoToExperience", v24), 
-        middleContent = function() --[[ Line: 59 ]] --[[ Name: middleContent ]]
-            -- upvalues: v3 (ref), v19 (copy), l_Theme_0 (copy), l_ImageSetLabel_0 (ref), v16 (copy), l_StyledTextLabel_0 (ref), v11 (ref), v24 (copy), v27 (copy), l_Font_0 (copy)
-            return v3.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y
-            }, {
-                UIListLayout = v3.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, v19.Tokens.Global.Space_150)
-                }), 
-                ExperienceThumbnailFrame = v3.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.fromOffset(150, 150), 
-                    BackgroundColor3 = l_Theme_0.BackgroundContrast.Color, 
-                    BorderSizePixel = 0, 
-                    LayoutOrder = 1, 
-                    ClipsDescendants = true
-                }, {
-                    ExperienceThumbnail = v3.createElement(l_ImageSetLabel_0, {
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        Image = string.format("rbxthumb://type=GameIcon&id=%s&w=%d&h=%d", tostring(v16.universeId), 150, 150), 
-                        Size = UDim2.fromScale(1, 1), 
-                        BorderSizePixel = 0, 
-                        BackgroundTransparency = 1
-                    }, {
-                        RoundCorner = v3.createElement("UICorner", {
-                            CornerRadius = UDim.new(0, v19.Tokens.Semantic.Radius.Medium)
-                        })
-                    })
-                }), 
-                BodyText = v3.createElement(l_StyledTextLabel_0, {
-                    text = v11:FormatByKeyForLocale("InGame.InspectMenu.Attribution.GoToDescription", v24, {
-                        EXPERIENCE_NAME = v27
-                    }), 
-                    fontStyle = l_Font_0.Body, 
-                    colorStyle = l_Theme_0.TextDefault, 
-                    layoutOrder = 2, 
-                    automaticSize = Enum.AutomaticSize.Y, 
-                    size = UDim2.fromScale(1, 0), 
-                    textXAlignment = Enum.TextXAlignment.Center, 
-                    lineHeight = 1
-                })
-            });
-        end, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = v20, 
-                        text = v11:FormatByKeyForLocale("InGame.InspectMenu.Action.Cancel", v24), 
-                        layoutOrder = 0
-                    }, 
-                    isDefaultChild = true
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimaryContextual, 
-                    props = {
-                        onActivated = v22, 
-                        text = v11:FormatByKeyForLocale("InGame.InspectMenu.Action.Go", v24), 
-                        layoutOrder = 2
-                    }, 
-                    isDefaultChild = false
-                }
-            }
-        }, 
-        isMiddleContentFocusable = false, 
-        screenSize = v18
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local FFlagRenameDeprecatedUIBloxTokens = require(CorePackages.Workspace.Packages.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local React = require(CorePackages.Packages.React)
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local useStyle = UIBlox.Core.Style.useStyle
+local useSelector = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useSelector
+local useDispatch = require(CorePackages.Workspace.Packages.RoactUtils).Hooks.RoactRodux.useDispatch
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local useScreenSize = require(CoreGui.RobloxGui.Modules.Common.Hooks.useScreenSize)
+local ExperienceService = require(CorePackages.Workspace.Packages.ExperienceService).ExperienceService
+local ParentParent = script.Parent.Parent
+local CloseOverlay = require(ParentParent.Actions.CloseOverlay)
+
+local function AttributionTraversal(p1) -- line: 34
+	-- upvalues: useDispatch (copy), useScreenSize (copy), useStyle (copy), React (copy), CloseOverlay (copy), ExperienceService (copy), useSelector (copy), InteractiveAlert (copy), RobloxTranslator (copy), FFlagRenameDeprecatedUIBloxTokens (copy), ImageSetLabel (copy), StyledTextLabel (copy), ButtonType (copy)
+	local v20 = useDispatch()
+	local v21 = useScreenSize()
+	local v22 = useStyle()
+	local v23 = React.useCallback(function() -- line: 39
+		-- upvalues: v20 (copy), CloseOverlay (copy)
+		v20(CloseOverlay())
+	end, { v20 })
+	local v24 = React.useCallback(function() -- line: 43
+		-- upvalues: p1 (copy), ExperienceService (copy), v20 (copy), CloseOverlay (copy)
+		local t1 = {
+			placeId = p1.rootPlaceId
+		}
+
+		ExperienceService:LaunchExperience(t1)
+		v20(CloseOverlay())
+	end, {
+		v20,
+		p1.rootPlaceId
+	})
+	local v25 = useSelector(function(p2) -- line: 52
+		return p2.locale
+	end)
+	local Theme = v22.Theme
+	local Font = v22.Font
+	local v28 = p1.name or ""
+
+	return React.createElement(InteractiveAlert, {
+		isMiddleContentFocusable = false,
+		title = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Attribution.GoToExperience", v25),
+		middleContent = function() -- line: 62
+			-- upvalues: React (copy), FFlagRenameDeprecatedUIBloxTokens (copy), v22 (copy), Theme (copy), ImageSetLabel (copy), p1 (copy), StyledTextLabel (copy), RobloxTranslator (copy), v25 (copy), v28 (copy), Font (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Vertical,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v22.Tokens.Global.Space_150 else v22.Tokens.Size.Size_300)
+				}),
+				ExperienceThumbnailFrame = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					LayoutOrder = 1,
+					ClipsDescendants = true,
+					Size = UDim2.fromOffset(150, 150),
+					BackgroundColor3 = Theme.BackgroundContrast.Color
+				}, {
+					ExperienceThumbnail = React.createElement(ImageSetLabel, {
+						BorderSizePixel = 0,
+						BackgroundTransparency = 1,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
+						Image = string.format("rbxthumb://type=GameIcon&id=%s&w=%d&h=%d", tostring(p1.universeId), 150, 150),
+						Size = UDim2.fromScale(1, 1)
+					}, {
+						RoundCorner = React.createElement("UICorner", {
+							CornerRadius = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v22.Tokens.Semantic.Radius.Medium else v22.Tokens.Radius.Medium)
+						})
+					})
+				}),
+				BodyText = React.createElement(StyledTextLabel, {
+					layoutOrder = 2,
+					lineHeight = 1,
+					text = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Attribution.GoToDescription", v25, {
+						EXPERIENCE_NAME = v28
+					}),
+					fontStyle = Font.Body,
+					colorStyle = Theme.TextDefault,
+					automaticSize = Enum.AutomaticSize.Y,
+					size = UDim2.fromScale(1, 0),
+					textXAlignment = Enum.TextXAlignment.Center
+				})
+			})
+		end,
+		buttonStackInfo = {
+			buttons = {
+				{
+					isDefaultChild = true,
+					props = {
+						layoutOrder = 0,
+						onActivated = v23,
+						text = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.Cancel", v25)
+					}
+				},
+				{
+					isDefaultChild = false,
+					buttonType = ButtonType.PrimaryContextual,
+					props = {
+						layoutOrder = 2,
+						onActivated = v24,
+						text = RobloxTranslator:FormatByKeyForLocale("InGame.InspectMenu.Action.Go", v25)
+					}
+				}
+			}
+		},
+		screenSize = v21
+	})
+end
+
+return AttributionTraversal

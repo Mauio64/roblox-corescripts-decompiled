@@ -1,5 +1,8 @@
-local v0 = require(script.Parent.useNavigation);
-return function() --[[ Line: 8 ]] --[[ Name: useRouteName ]]
-    -- upvalues: v0 (copy)
-    return v0().state.routeName;
-end;
+local useNavigation = require(script.Parent.useNavigation)
+
+local function useRouteName() -- line: 8
+	-- upvalues: useNavigation (copy)
+	return useNavigation().state.routeName
+end
+
+return useRouteName

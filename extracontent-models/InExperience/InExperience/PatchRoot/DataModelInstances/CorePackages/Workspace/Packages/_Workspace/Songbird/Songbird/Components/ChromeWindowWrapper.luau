@@ -1,73 +1,95 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Components.ChromeWindow);
-local v3 = require(l_script_FirstAncestor_0.Hooks.useCurrentSong);
-local v4 = require(l_script_FirstAncestor_0.Analytics.AnalyticActions);
-local v5 = require(l_script_FirstAncestor_0.Analytics.sendChromeWindowAnalytics);
-local l_useCallback_0 = v1.useCallback;
-local l_useEffect_0 = v1.useEffect;
-local l_useMemo_0 = v1.useMemo;
-local v9 = require(l_script_FirstAncestor_0.Components.ReportAudioPopupContext);
-return function(v10) --[[ Line: 25 ]] --[[ Name: ChromeWindowWrapper ]]
-    -- upvalues: v3 (copy), v9 (copy), l_useMemo_0 (copy), l_useEffect_0 (copy), l_useCallback_0 (copy), v5 (copy), v4 (copy), v1 (copy), v2 (copy)
-    local v11 = v3();
-    local v12 = v9.use();
-    local v13 = l_useMemo_0(function() --[[ Line: 29 ]]
-        -- upvalues: v11 (copy)
-        if v11 then
-            return (tonumber(v11.metadata.AssetId));
-        else
-            return nil;
-        end;
-    end, {
-        v11
-    });
-    l_useEffect_0(function() --[[ Line: 33 ]]
-        -- upvalues: v12 (copy), v13 (copy)
-        v12.setAssetId(v13);
-        return function() --[[ Line: 36 ]]
-            -- upvalues: v12 (ref)
-            v12.setAssetId(nil);
-        end;
-    end, {
-        v13
-    });
-    local v14 = l_useCallback_0(function() --[[ Line: 41 ]]
-        -- upvalues: v12 (copy), v5 (ref), v13 (copy), v4 (ref), v10 (copy)
-        v12.setVisibility(true);
-        v5({
-            assetId = v13, 
-            action = v4.OpenReport
-        });
-        if v10.onReport then
-            v10.onReport();
-        end;
-    end, {
-        v10.onClose, 
-        v10.onReport
-    });
-    local v15 = l_useCallback_0(function() --[[ Line: 50 ]]
-        -- upvalues: v11 (copy)
-        if v11 then
-            v11.toggleFavorite();
-        end;
-    end, {
-        v11
-    });
-    return v1.createElement(v2, {
-        song = if v11 then {
-            title = v11.metadata.Title, 
-            artists = {
-                v11.metadata.Artist
-            }, 
-            isLiked = v11.isFavorited, 
-            meetsCriteria = v11.meetsCriteria
-        } else nil, 
-        isFocused = v10.isFocused, 
-        maxSize = v10.maxSize, 
-        onToggleLike = v15, 
-        onReport = v14, 
-        onClose = v10.onClose, 
-        onUnfocus = v10.onUnfocus
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local React = require(Songbird.Parent.React)
+local ChromeWindow = require(Songbird.Components.ChromeWindow)
+local useCurrentSong = require(Songbird.Hooks.useCurrentSong)
+local AnalyticActions = require(Songbird.Analytics.AnalyticActions)
+local sendChromeWindowAnalytics = require(Songbird.Analytics.sendChromeWindowAnalytics)
+local getFFlagSongbirdMusicIconThumbnail = require(Songbird.Flags.getFFlagSongbirdMusicIconThumbnail)
+local useSongAlbumArt = require(Songbird.Hooks.useSongAlbumArt)
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local useMemo = React.useMemo
+local ReportAudioPopupContext = require(Songbird.Components.ReportAudioPopupContext)
+
+local function ChromeWindowWrapper(t1: {[any]: any}) -- line: 28
+	-- upvalues: useCurrentSong (copy), ReportAudioPopupContext (copy), useMemo (copy), getFFlagSongbirdMusicIconThumbnail (copy), useSongAlbumArt (copy), useEffect (copy), useCallback (copy), sendChromeWindowAnalytics (copy), AnalyticActions (copy), React (copy), ChromeWindow (copy)
+	local v15 = useCurrentSong()
+	local v16 = ReportAudioPopupContext.use()
+	local v17 = useMemo(function() -- line: 32
+		-- upvalues: v15 (copy)
+		if v15 then
+			return (tonumber(v15.metadata.AssetId))
+		end
+
+		return nil
+	end, { v15 })
+	local v18 = getFFlagSongbirdMusicIconThumbnail() and (v15 and v15.meetsCriteria)
+	local v19 = useSongAlbumArt(if not v18 then nil else v17)
+	local v20 = if not v18 then nil else v19.value
+
+	useEffect(function() -- line: 40
+		-- upvalues: v16 (copy), v17 (copy)
+		v16.setAssetId(v17)
+
+		return function() -- line: 43
+			-- upvalues: v16 (copy)
+			v16.setAssetId(nil)
+		end
+	end, {
+		v17,
+		v16.setAssetId
+	})
+	useEffect(function() -- line: 48
+		-- upvalues: v16 (copy), v20 (copy)
+		v16.setHasThumbnail(v20 ~= nil)
+
+		return function() -- line: 51
+			-- upvalues: v16 (copy)
+			v16.setHasThumbnail(false)
+		end
+	end, {
+		v20,
+		v16.setHasThumbnail
+	})
+
+	local v21 = useCallback(function() -- line: 56
+		-- upvalues: v16 (copy), sendChromeWindowAnalytics (copy), v17 (copy), AnalyticActions (copy), t1 (copy)
+		v16.setVisibility(true)
+		sendChromeWindowAnalytics({
+			assetId = v17,
+			action = AnalyticActions.OpenReport
+		})
+
+		if t1.onReport then
+			t1.onReport()
+		end
+	end, {
+		t1.onReport,
+		v17,
+		v16.setVisibility
+	})
+	local v22 = useCallback(function() -- line: 65
+		-- upvalues: v15 (copy)
+		if v15 then
+			v15.toggleFavorite()
+		end
+	end, { v15 })
+
+	return React.createElement(ChromeWindow, {
+		song = if not v15 then nil else {
+			title = v15.metadata.Title,
+			artists = { v15.metadata.Artist },
+			isLiked = v15.isFavorited,
+			meetsCriteria = v15.meetsCriteria,
+			thumbnailUrl = v20
+		},
+		isFocused = t1.isFocused,
+		maxSize = t1.maxSize,
+		onToggleLike = v22,
+		onReport = v21,
+		onClose = t1.onClose,
+		onUnfocus = t1.onUnfocus
+	})
+end
+
+return ChromeWindowWrapper

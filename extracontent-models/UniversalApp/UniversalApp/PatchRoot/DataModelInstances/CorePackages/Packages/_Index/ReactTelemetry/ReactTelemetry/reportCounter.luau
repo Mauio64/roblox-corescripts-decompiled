@@ -1,29 +1,30 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.SafeFlags);
-local v3 = require(l_Parent_0.ReactGlobals);
-local v4 = v2.createGetFFlag("ReactTelemetryEnabled", false)();
-return function(v5) --[[ Line: 19 ]] --[[ Name: reportCounter ]]
-    -- upvalues: v4 (copy), l_TelemetryService_0 (copy), v3 (copy)
-    if not v4 then
-        return;
-    else
-        local v6 = {
-            eventName = v5.eventName, 
-            backends = {
-                "RobloxTelemetryCounter"
-            }, 
-            lastUpdated = v5.lastUpdated, 
-            description = v5.description, 
-            links = v5.links
-        };
-        local v7 = {
-            customFields = v5.customFields or {}
-        };
-        local l_status_0, l_result_0 = pcall(l_TelemetryService_0.LogCounter, l_TelemetryService_0, v6, v7, v5.value);
-        if v3.__DEV__ and not l_status_0 then
-            warn((("React telemetry collection is enabled but log failed: %*"):format(l_result_0)));
-        end;
-        return;
-    end;
-end;
+local TelemetryService = game:GetService("TelemetryService")
+local ParentParent = script.Parent.Parent
+local SafeFlags = require(ParentParent.SafeFlags)
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local v5 = SafeFlags.createGetFFlag("ReactTelemetryEnabled", false)()
+
+local function reportCounter(t1: {[any]: any}) -- line: 19
+	-- upvalues: v5 (copy), TelemetryService (copy), ReactGlobals (copy)
+	if not v5 then
+		return
+	end
+
+	local t2 = {
+		eventName = t1.eventName,
+		backends = { "RobloxTelemetryCounter" },
+		lastUpdated = t1.lastUpdated,
+		description = t1.description,
+		links = t1.links
+	}
+	local t3 = {
+		customFields = t1.customFields or {}
+	}
+	local ok, result = pcall(TelemetryService.LogCounter, TelemetryService, t2, t3, t1.value)
+
+	if ReactGlobals.__DEV__ and not ok then
+		warn(`React telemetry collection is enabled but log failed: { result }`)
+	end
+end
+
+return reportCounter

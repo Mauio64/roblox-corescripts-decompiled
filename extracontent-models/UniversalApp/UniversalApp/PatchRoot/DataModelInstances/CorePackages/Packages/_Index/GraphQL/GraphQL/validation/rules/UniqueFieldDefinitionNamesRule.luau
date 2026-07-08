@@ -1,57 +1,66 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Map_0 = require(l_Parent_1.LuauPolyfill).Map;
-local l_isNotNillish_0 = require(l_Parent_0.luaUtils.isNillish).isNotNillish;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local v5 = require(l_Parent_0.type.definition);
-local l_isObjectType_0 = v5.isObjectType;
-local l_isInterfaceType_0 = v5.isInterfaceType;
-local l_isInputObjectType_0 = v5.isInputObjectType;
-local v9 = {};
-local v10 = nil;
-v9.UniqueFieldDefinitionNamesRule = function(v11) --[[ Line: 32 ]]
-    -- upvalues: l_Map_0 (copy), v10 (ref), l_GraphQLError_0 (copy)
-    local v12 = v11:getSchema();
-    local v13 = v12 and v12:getTypeMap() or l_Map_0.new();
-    local v14 = {};
-    local function v23(_, v16) --[[ Line: 40 ]] --[[ Name: checkFieldUniqueness ]]
-        -- upvalues: v14 (copy), v10 (ref), v13 (copy), v11 (copy), l_GraphQLError_0 (ref)
-        local l_value_0 = v16.name.value;
-        if not v14[l_value_0] then
-            v14[l_value_0] = {};
-        end;
-        local v18 = v16.fields or {};
-        local v19 = v14[l_value_0];
-        for _, v21 in ipairs(v18) do
-            local l_value_1 = v21.name.value;
-            if v10(v13:get(l_value_0), l_value_1) then
-                v11:reportError(l_GraphQLError_0.new(("Field \"%s.%s\" already exists in the schema. It cannot also be defined in this type extension."):format(l_value_0, l_value_1), v21.name));
-            elseif v19[l_value_1] then
-                v11:reportError(l_GraphQLError_0.new(("Field \"%s.%s\" can only be defined once."):format(l_value_0, l_value_1), {
-                    v19[l_value_1], 
-                    v21.name
-                }));
-            else
-                v19[l_value_1] = v21.name;
-            end;
-        end;
-        return false;
-    end;
-    return {
-        InputObjectTypeDefinition = v23, 
-        InputObjectTypeExtension = v23, 
-        InterfaceTypeDefinition = v23, 
-        InterfaceTypeExtension = v23, 
-        ObjectTypeDefinition = v23, 
-        ObjectTypeExtension = v23
-    };
-end;
-v10 = function(v24, v25) --[[ Line: 88 ]] --[[ Name: hasField ]]
-    -- upvalues: l_isObjectType_0 (copy), l_isInterfaceType_0 (copy), l_isInputObjectType_0 (copy), l_isNotNillish_0 (copy)
-    if l_isObjectType_0(v24) or l_isInterfaceType_0(v24) or l_isInputObjectType_0(v24) then
-        return l_isNotNillish_0(v24:getFields():get(v25));
-    else
-        return false;
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Map = require(ParentParentParent.LuauPolyfill).Map
+local isNotNillish = require(ParentParent.luaUtils.isNillish).isNotNillish
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local definition = require(ParentParent.type.definition)
+local isObjectType = definition.isObjectType
+local isInterfaceType = definition.isInterfaceType
+local isInputObjectType = definition.isInputObjectType
+local t1 = {}
+local hasField = nil
+
+function t1.UniqueFieldDefinitionNamesRule(p1) -- line: 32
+	-- upvalues: Map (copy), hasField (ref), GraphQLError (copy)
+	local v13 = p1:getSchema()
+	local v14 = v13 and v13:getTypeMap() or Map.new()
+	local t2 = {}
+
+	local function checkFieldUniqueness(_, p3) -- line: 40
+		-- upvalues: t2 (copy), hasField (ref), v14 (copy), p1 (copy), GraphQLError (copy)
+		local value = p3.name.value
+
+		if not t2[value] then
+			t2[value] = {}
+		end
+
+		local v22 = p3.fields or {}
+		local v23 = t2[value]
+
+		for _, v in ipairs(v22) do
+			local value2 = v.name.value
+
+			if hasField(v14:get(value), value2) then
+				p1:reportError(GraphQLError.new(("Field \"%s.%s\" already exists in the schema. It cannot also be defined in this type extension."):format(value, value2), v.name))
+			elseif v23[value2] then
+				p1:reportError(GraphQLError.new(("Field \"%s.%s\" can only be defined once."):format(value, value2), {
+					v23[value2],
+					v.name
+				}))
+			else
+				v23[value2] = v.name
+			end
+		end
+
+		return false
+	end
+
+	return {
+		InputObjectTypeDefinition = checkFieldUniqueness,
+		InputObjectTypeExtension = checkFieldUniqueness,
+		InterfaceTypeDefinition = checkFieldUniqueness,
+		InterfaceTypeExtension = checkFieldUniqueness,
+		ObjectTypeDefinition = checkFieldUniqueness,
+		ObjectTypeExtension = checkFieldUniqueness
+	}
+end
+function hasField(p4, s1: string) -- line: 88
+	-- upvalues: isObjectType (copy), isInterfaceType (copy), isInputObjectType (copy), isNotNillish (copy)
+	if isObjectType(p4) or (isInterfaceType(p4) or isInputObjectType(p4)) then
+		return isNotNillish(p4:getFields():get(s1))
+	end
+
+	return false
+end
+
+return t1

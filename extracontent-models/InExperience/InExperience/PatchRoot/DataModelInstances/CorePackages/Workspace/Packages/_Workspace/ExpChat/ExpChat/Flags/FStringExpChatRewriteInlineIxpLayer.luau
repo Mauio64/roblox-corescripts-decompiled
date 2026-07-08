@@ -1,1 +1,1 @@
-return game:DefineFastString("ExpChatRewriteInlineIxpLayer", "ChatWindow.Performance");
+return game:DefineFastString("ExpChatRewriteInlineIxpLayer", "ChatWindow.Performance")

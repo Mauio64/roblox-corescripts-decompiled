@@ -1,34 +1,39 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
+local ParentParent = script.Parent.Parent.Parent
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+
 return {
-    NoUnusedVariablesRule = function(v2) --[[ Line: 20 ]] --[[ Name: NoUnusedVariablesRule ]]
-        -- upvalues: l_GraphQLError_0 (copy)
-        local v3 = {};
-        return {
-            OperationDefinition = {
-                enter = function() --[[ Line: 25 ]] --[[ Name: enter ]]
-                    -- upvalues: v3 (ref)
-                    v3 = {};
-                end, 
-                leave = function(_, v5) --[[ Line: 28 ]] --[[ Name: leave ]]
-                    -- upvalues: v2 (copy), v3 (ref), l_GraphQLError_0 (ref)
-                    local v6 = {};
-                    local v7 = v2:getRecursiveVariableUsages(v5);
-                    for _, v9 in ipairs(v7) do
-                        v6[v9.node.name.value] = true;
-                    end;
-                    for _, v11 in ipairs(v3) do
-                        local l_value_0 = v11.variable.name.value;
-                        if v6[l_value_0] ~= true then
-                            v2:reportError(l_GraphQLError_0.new(v5.name and ("Variable \"$%s\" is never used in operation \"%s\"."):format(l_value_0, v5.name.value) or ("Variable \"$%s\" is never used."):format(l_value_0), v11));
-                        end;
-                    end;
-                end
-            }, 
-            VariableDefinition = function(_, v14) --[[ Line: 55 ]] --[[ Name: VariableDefinition ]]
-                -- upvalues: v3 (ref)
-                table.insert(v3, v14);
-            end
-        };
-    end
-};
+	NoUnusedVariablesRule = function(p1) -- line: 20
+		-- upvalues: GraphQLError (copy)
+		local t1 = {}
+
+		return {
+			OperationDefinition = {
+				enter = function() -- line: 25
+					-- upvalues: t1 (ref)
+					t1 = {}
+				end,
+				leave = function(_, p3) -- line: 28
+					-- upvalues: p1 (copy), t1 (ref), GraphQLError (copy)
+					local t2 = {}
+					local v8 = p1:getRecursiveVariableUsages(p3)
+
+					for _, v in ipairs(v8) do
+						t2[v.node.name.value] = true
+					end
+
+					for _, v in ipairs(t1) do
+						local value = v.variable.name.value
+
+						if t2[value] ~= true then
+							p1:reportError(GraphQLError.new(p3.name and ("Variable \"$%s\" is never used in operation \"%s\"."):format(value, p3.name.value) or ("Variable \"$%s\" is never used."):format(value), v))
+						end
+					end
+				end
+			},
+			VariableDefinition = function(_, p5) -- line: 55
+				-- upvalues: t1 (ref)
+				table.insert(t1, p5)
+			end
+		}
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAvatarsTabIXPEnabledForAll", false);
+return game:DefineFastFlag("AXAvatarsTabIXPEnabledForAll", false)

@@ -1,9 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("Localization").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.LocalizationRoactContext);
-return function(v3) --[[ Line: 7 ]] --[[ Name: LocalizationProvider ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Provider, {
-        value = v3.localization
-    }, v3.children);
-end;
+local Parent = script:FindFirstAncestor("Localization").Parent
+local React = require(Parent.React)
+local LocalizationRoactContext = require(script.Parent.LocalizationRoactContext)
+
+local function LocalizationProvider(p1) -- line: 7
+	-- upvalues: React (copy), LocalizationRoactContext (copy)
+	return React.createElement(LocalizationRoactContext.Provider, {
+		value = p1.localization
+	}, p1.children)
+end
+
+return LocalizationProvider

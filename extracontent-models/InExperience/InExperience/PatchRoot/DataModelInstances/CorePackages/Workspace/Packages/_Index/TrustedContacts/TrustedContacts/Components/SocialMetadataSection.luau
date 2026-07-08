@@ -1,1 +1,1 @@
-return require(script.SocialMetadataSection);
+return require(script.SocialMetadataSection)

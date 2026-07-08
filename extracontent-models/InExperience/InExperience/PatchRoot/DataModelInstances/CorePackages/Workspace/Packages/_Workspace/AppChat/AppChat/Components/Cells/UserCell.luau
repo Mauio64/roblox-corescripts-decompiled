@@ -1,65 +1,67 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.UIBlox);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(script.Parent.PresenceBubbleCellStyled);
-local l_UserModel_0 = require(l_Parent_0.UserLib).Models.UserModel;
-local v7 = require(l_Parent_0.UIBlox).App.ImageSet.Images["component_assets/circle_25"];
-local l_TestStyle_0 = require(l_script_FirstAncestor_0.SocialLibraries).Components.TestStyle;
-local l_FFlagEnableBlackbirdCheckDev_0 = require(l_Parent_0.SharedFlags).FFlagEnableBlackbirdCheckDev;
-local l_useIsRobloxSubscriber_0 = require(l_Parent_0.UserProfiles).Hooks.useIsRobloxSubscriber;
-local v11 = {
-    subTitleText = "subTitleText", 
-    user = {}, 
-    childWidth = 0, 
-    style = v4.Dictionary.join(l_TestStyle_0, {
-        Tokens = {
-            Global = {
-                Color = {
-                    None = {}
-                }
-            }
-        }
-    }), 
-    showDivider = true, 
-    boldTitle = true
-};
-return v2.memo(function(v12) --[[ Line: 51 ]] --[[ Name: UserCell ]]
-    -- upvalues: v4 (copy), v11 (copy), v2 (copy), l_FFlagEnableBlackbirdCheckDev_0 (copy), l_useIsRobloxSubscriber_0 (copy), v5 (copy), l_UserModel_0 (copy), v7 (copy)
-    local v13 = v4.Dictionary.join(v11, v12);
-    local v14 = v2.useCallback(function() --[[ Line: 53 ]]
-        -- upvalues: v13 (copy)
-        if v13.onActivated then
-            v13.onActivated(v13.user);
-        end;
-    end);
-    local l_user_0 = v13.user;
-    local v16 = l_user_0.metadata and l_user_0.metadata.isPending;
-    local v17 = nil;
-    if l_FFlagEnableBlackbirdCheckDev_0 then
-        v17 = l_useIsRobloxSubscriber_0(if l_user_0.id then tostring(l_user_0.id) else nil);
-    end;
-    local v18 = v2.useMemo(function() --[[ Line: 67 ]]
-        -- upvalues: l_user_0 (copy)
-        return {
-            l_user_0.thumbnail
-        };
-    end, {
-        l_user_0.thumbnail
-    });
-    return v2.createElement(v5, {
-        style = v13.style, 
-        childWidth = v13.childWidth, 
-        onActivated = v14, 
-        onCircleActivated = v13.onCircleActivated, 
-        subTitleText = v13.subTitleText, 
-        showDivider = v13.showDivider, 
-        boldTitle = not v16 and v13.boldTitle, 
-        isRobloxSubscriber = if l_FFlagEnableBlackbirdCheckDev_0 then v17 else nil, 
-        avatarCirclePresenceImage = if l_user_0.presence ~= l_UserModel_0.PresenceType.OFFLINE and l_user_0.presence ~= nil then v7 else nil, 
-        titleText = l_user_0.displayName, 
-        secondaryTitleText = l_user_0.alias, 
-        thumbnails = v18
-    }, v13.children or {});
-end);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+
+require(AppChatParent.UIBlox)
+
+local Cryo = require(AppChatParent.Cryo)
+local PresenceBubbleCellStyled = require(script.Parent.PresenceBubbleCellStyled)
+local UserModel = require(AppChatParent.UserLib).Models.UserModel
+local v7 = require(AppChatParent.UIBlox).App.ImageSet.Images["component_assets/circle_25"]
+local TestStyle = require(AppChat.SocialLibraries).Components.TestStyle
+local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
+local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
+local t1 = {
+	subTitleText = "subTitleText",
+	childWidth = 0,
+	showDivider = true,
+	boldTitle = true,
+	user = {},
+	style = Cryo.Dictionary.join(TestStyle, {
+		Tokens = {
+			Color = {
+				None = {}
+			}
+		}
+	})
+}
+
+local function UserCell(t2: {[any]: any}) -- line: 49
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), PresenceBubbleCellStyled (copy), UserModel (copy), v7 (copy)
+	local v14 = Cryo.Dictionary.join(t1, t2)
+	local v15 = React.useCallback(function() -- line: 51
+		-- upvalues: v14 (copy)
+		if v14.onActivated then
+			v14.onActivated(v14.user)
+		end
+	end)
+	local user = v14.user
+	local v17 = user.metadata and user.metadata.isPending
+	local v18 = nil
+
+	if FFlagEnableBlackbirdCheck then
+		v18 = useIsRobloxSubscriber(if not user.id then nil else tostring(user.id))
+	end
+
+	local v19 = React.useMemo(function() -- line: 65
+		-- upvalues: user (copy)
+		return { user.thumbnail }
+	end, { user.thumbnail })
+
+	return React.createElement(PresenceBubbleCellStyled, {
+		style = v14.style,
+		childWidth = v14.childWidth,
+		onActivated = v15,
+		onCircleActivated = v14.onCircleActivated,
+		subTitleText = v14.subTitleText,
+		showDivider = v14.showDivider,
+		boldTitle = not v17 and v14.boldTitle,
+		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v18,
+		avatarCirclePresenceImage = if user.presence == UserModel.PresenceType.OFFLINE or user.presence == nil then nil else v7,
+		titleText = user.displayName,
+		secondaryTitleText = user.alias,
+		thumbnails = v19
+	}, v14.children or {})
+end
+
+return React.memo(UserCell)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableCoreContentBadge2", false);
+return game:DefineFastFlag("EnableCoreContentBadge2", false)

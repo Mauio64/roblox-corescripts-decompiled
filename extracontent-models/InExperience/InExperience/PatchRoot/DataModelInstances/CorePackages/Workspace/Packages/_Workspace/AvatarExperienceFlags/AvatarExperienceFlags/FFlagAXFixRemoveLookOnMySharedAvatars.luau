@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixRemoveLookOnMySharedAvatars", false);
+return game:DefineFastFlag("AXFixRemoveLookOnMySharedAvatars", false)

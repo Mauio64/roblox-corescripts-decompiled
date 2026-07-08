@@ -1,4 +1,4 @@
 return {
-    UserRow = require(script.UserRow), 
-    EntityRow = require(script.EntityRow)
-};
+	UserRow = require(script.UserRow),
+	EntityRow = require(script.EntityRow)
+}

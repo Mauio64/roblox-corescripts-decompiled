@@ -1,18 +1,24 @@
-local l___DEV___0 = _G.__DEV__;
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v3 = require(l_Parent_0.flat);
-local v4 = require(l_Parent_0.map);
-local _ = require(l_Parent_1.ES7Types);
-return function(v6, v7, v8) --[[ Line: 25 ]] --[[ Name: flatMap ]]
-    -- upvalues: l___DEV___0 (copy), v3 (copy), v4 (copy)
-    if l___DEV___0 then
-        if typeof(v6) ~= "table" then
-            error(string.format("Array.flatMap called on %s", (typeof(v6))));
-        end;
-        if typeof(v7) ~= "function" then
-            error("callback is not a function");
-        end;
-    end;
-    return v3(v4(v6, v7, v8));
-end;
+local __DEV__ = _G.__DEV__
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local flat = require(scriptParent.flat)
+local map = require(scriptParent.map)
+
+require(ParentParent.ES7Types)
+
+local function flatMap(p1, p2: ((...any) -> ...any), p3) -- line: 25
+	-- upvalues: __DEV__ (copy), flat (copy), map (copy)
+	if __DEV__ then
+		if typeof(p1) ~= "table" then
+			error(string.format("Array.flatMap called on %s", (typeof(p1))))
+		end
+
+		if typeof(p2) ~= "function" then
+			error("callback is not a function")
+		end
+	end
+
+	return flat(map(p1, p2, p3))
+end
+
+return flatMap

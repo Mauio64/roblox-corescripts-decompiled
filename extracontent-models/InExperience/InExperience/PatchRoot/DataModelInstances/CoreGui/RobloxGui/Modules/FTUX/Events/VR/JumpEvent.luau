@@ -1,48 +1,58 @@
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_RunService_0 = game:GetService("RunService");
-local _ = require(script.Parent.Parent.EventType);
-local v3 = {
-    Name = "FirstPersonToggleEvent"
-};
-local v4 = false;
-local v5 = nil;
-local function v9(v6, v7, _) --[[ Line: 16 ]] --[[ Name: onJumpInput ]]
-    -- upvalues: v4 (ref)
-    if v6 == "JumpAction" and v7 == Enum.UserInputState.Begin then
-        v4 = true;
-    end;
-    return Enum.ContextActionResult.Pass;
-end;
-startJumpEventListener = function() --[[ Line: 26 ]] --[[ Name: startJumpEventListener ]]
-    -- upvalues: l_ContextActionService_0 (copy), v9 (copy)
-    l_ContextActionService_0:BindCoreAction("JumpAction", v9, false, Enum.KeyCode.Space);
-end;
-stopJumpEventListener = function() --[[ Line: 30 ]] --[[ Name: stopJumpEventListener ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindAction("JumpAction");
-end;
-v3.StartEvent = function(v10) --[[ Line: 34 ]] --[[ Name: StartEvent ]]
-    -- upvalues: v4 (ref), v5 (ref), l_RunService_0 (copy)
-    startJumpEventListener();
-    local function v12(_) --[[ Line: 39 ]] --[[ Name: onRenderStepped ]]
-        -- upvalues: v4 (ref), v10 (copy), v5 (ref)
-        if v4 then
-            stopJumpEventListener();
-            v10();
-            if v5 then
-                v5:Disconnect();
-                v5 = nil;
-            end;
-        end;
-    end;
-    v5 = l_RunService_0.RenderStepped:Connect(v12);
-end;
-v3.StopEvent = function() --[[ Line: 58 ]] --[[ Name: StopEvent ]]
-    -- upvalues: v5 (ref)
-    if v5 then
-        v5:Disconnect();
-        v5 = nil;
-    end;
-    stopJumpEventListener();
-end;
-return v3;
+local ContextActionService = game:GetService("ContextActionService")
+local RunService = game:GetService("RunService")
+
+require(script.Parent.Parent.EventType)
+
+local t1 = {
+	Name = "FirstPersonToggleEvent"
+}
+local u4 = false
+local u5 = nil
+
+local function onJumpInput(p1, p2, _) -- line: 16
+	-- upvalues: u4 (ref)
+	if p1 == "JumpAction" and p2 == Enum.UserInputState.Begin then
+		u4 = true
+	end
+
+	return Enum.ContextActionResult.Pass
+end
+
+function startJumpEventListener() -- line: 26
+	-- upvalues: ContextActionService (copy), onJumpInput (copy)
+	ContextActionService:BindCoreAction("JumpAction", onJumpInput, false, Enum.KeyCode.Space)
+end
+function stopJumpEventListener() -- line: 30
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindAction("JumpAction")
+end
+function t1.StartEvent(p4) -- line: 34
+	-- upvalues: u4 (ref), u5 (ref), RunService (copy)
+	startJumpEventListener()
+
+	local function onRenderStepped(_) -- line: 39
+		-- upvalues: u4 (ref), p4 (copy), u5 (ref)
+		if u4 then
+			stopJumpEventListener()
+			p4()
+
+			if u5 then
+				u5:Disconnect()
+				u5 = nil
+			end
+		end
+	end
+
+	u5 = RunService.RenderStepped:Connect(onRenderStepped)
+end
+function t1.StopEvent() -- line: 58
+	-- upvalues: u5 (ref)
+	if u5 then
+		u5:Disconnect()
+		u5 = nil
+	end
+
+	stopJumpEventListener()
+end
+
+return t1

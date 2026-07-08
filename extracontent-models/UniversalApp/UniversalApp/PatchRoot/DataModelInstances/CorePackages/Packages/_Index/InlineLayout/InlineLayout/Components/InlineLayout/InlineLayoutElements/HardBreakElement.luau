@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("Components").Parent;
-return (require(l_Parent_0.Parent.Dash).Symbol.new("InlineLayoutHardBreak"));
+local Parent = script:FindFirstAncestor("Components").Parent
+
+return (require(Parent.Parent.Dash).Symbol.new("InlineLayoutHardBreak"))

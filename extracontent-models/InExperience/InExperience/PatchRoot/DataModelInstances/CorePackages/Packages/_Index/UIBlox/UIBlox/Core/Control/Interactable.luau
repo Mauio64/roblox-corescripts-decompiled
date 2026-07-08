@@ -1,30 +1,40 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.React);
-local v4 = require(l_Parent_2.Foundation);
-local v5 = require(l_Parent_0.Control.Enum.ControlState);
-local _ = require(l_Parent_0.Control.Hooks.useGuiControlState);
-local v7 = require(l_Parent_1.Core.ImageSet.ImageSetComponent);
-local v8 = {
-    affordance = v4.Enums.StateLayerAffordance.None
-};
-return (v3.forwardRef(function(v9, v10) --[[ Line: 49 ]] --[[ Name: Interactable ]]
-    -- upvalues: v7 (copy), v8 (copy), v3 (copy), v5 (copy), v4 (copy)
-    local v11 = table.clone(v9);
-    v11.isDisabled = v11.isDisabled or v11.userInteractionEnabled == false;
-    v11.userInteractionEnabled = nil;
-    v11.ref = v10;
-    v11.component = v11.component or v7.Button;
-    v11.stateLayer = v8;
-    local v12 = v3.useRef(v5.Initialize);
-    if v9.onStateChanged then
-        v11.onStateChanged = function(v13) --[[ Line: 59 ]]
-            -- upvalues: v5 (ref), v9 (copy), v12 (copy)
-            local v14 = v5[v13];
-            v9.onStateChanged(v12.current, v14);
-            v12.current = v14;
-        end;
-    end;
-    return v3.createElement(v4.UNSTABLE.Interactable, v11);
-end));
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local React = require(ParentParentParentParent.React)
+local Foundation = require(ParentParentParentParent.Foundation)
+local ControlState = require(ParentParent.Control.Enum.ControlState)
+
+require(ParentParent.Control.Hooks.useGuiControlState)
+
+local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
+local t1 = {
+	affordance = Foundation.Enums.StateLayerAffordance.None
+}
+
+local function Interactable(t2: {[any]: any}, p1) -- line: 49
+	-- upvalues: ImageSetComponent (copy), t1 (copy), React (copy), ControlState (copy), Foundation (copy)
+	local v12 = table.clone(t2)
+
+	v12.isDisabled = v12.isDisabled or v12.userInteractionEnabled == false
+	v12.userInteractionEnabled = nil
+	v12.ref = p1
+	v12.component = v12.component or ImageSetComponent.Button
+	v12.stateLayer = t1
+
+	local v13 = React.useRef(ControlState.Initialize)
+
+	if t2.onStateChanged then
+		function v12.onStateChanged(p2) -- line: 59
+			-- upvalues: ControlState (copy), t2 (copy), v13 (copy)
+			local v15 = ControlState[p2]
+
+			t2.onStateChanged(v13.current, v15)
+			v13.current = v15
+		end
+	end
+
+	return React.createElement(Foundation.UNSTABLE.Interactable, v12)
+end
+
+return (React.forwardRef(Interactable))

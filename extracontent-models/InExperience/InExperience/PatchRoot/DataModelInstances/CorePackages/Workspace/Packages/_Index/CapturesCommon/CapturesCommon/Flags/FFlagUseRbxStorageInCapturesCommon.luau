@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UseRbxStorageInCapturesCommon", false);
+return game:DefineFastFlag("UseRbxStorageInCapturesCommon", false)

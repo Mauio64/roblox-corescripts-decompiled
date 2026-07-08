@@ -12,27 +12,32 @@ require(SduiCoreSystem.SduiComponentType)
 local PropResultCategory = require(SduiCoreSystem.ClientBinding.SduiClientBindingTypes).PropResultCategory
 local ProtoVariableMapper = require(SduiCoreSystem.ClientBinding.ProtoVariableMapper)
 local SduiParseHelpers = require(SduiCoreSystem.SduiParseHelpers)
-local getSduiComponentRegistry = require(SduiCoreSystem.getSduiComponentRegistry)
 local SharedFlags = require(SduiCoreSystemParent.SharedFlags)
 local FFlagSduiOneofPropSupport = SharedFlags.FFlagSduiOneofPropSupport
-local FFlagSduiPropMapping = SharedFlags.FFlagSduiPropMapping
 local FFlagSduiNestedComponentListProp = SharedFlags.FFlagSduiNestedComponentListProp
 local FFlagSduiImprovedErrorDimensions = SharedFlags.FFlagSduiImprovedErrorDimensions
+local FFlagSduiInlineNestedComponentSchema = SharedFlags.FFlagSduiInlineNestedComponentSchema
+local FFlagSduiGenericContainerDispatch = SharedFlags.FFlagSduiGenericContainerDispatch
+local FFlagSduiDeferredListItems = SharedFlags.FFlagSduiDeferredListItems
 
-local function buildProp(p1, p2, p3, p4, p5) -- line: 35
-	-- upvalues: FFlagSduiOneofPropSupport (copy), buildProp (copy), FFlagSduiImprovedErrorDimensions (copy)
+local function buildProp(p1, p2, p3, p4, p5) -- line: 36
+	-- upvalues: FFlagSduiOneofPropSupport (copy), buildProp (copy), FFlagSduiGenericContainerDispatch (copy), FFlagSduiImprovedErrorDimensions (copy)
 	if FFlagSduiOneofPropSupport and (p1.oneof_prop and p1.oneof_prop.value) then
 		return buildProp(p1.oneof_prop.value, p2, p3, p4, p5)
 	end
 
-	local v25 = p1 and (p1.kind and p1.kind.type)
+	if FFlagSduiGenericContainerDispatch and typeof(p1) == "table" and p1.descriptor == nil then
+		return p4.getPropBuilder("ContainerProp")(nil, p1, p2, p3, p4, p5)
+	end
 
-	if v25 == nil then
+	local v26 = p1 and (p1.kind and p1.kind.type)
+
+	if v26 == nil then
 		error("No propDefinitionType provided")
 	end
 
 	if p1.descriptor == nil then
-		error(`No propDefinitionType descriptor provided for { v25 }`)
+		error(`No propDefinitionType descriptor provided for { v26 }`)
 	end
 
 	local name = p1.descriptor.name
@@ -41,20 +46,20 @@ local function buildProp(p1, p2, p3, p4, p5) -- line: 35
 		p4.currentParserName = name
 	end
 
-	local v27 = p4.getPropBuilder(name)
-	local v28 = p1.kind and p1.kind.value
+	local v28 = p4.getPropBuilder(name)
+	local v29 = p1.kind and p1.kind.value
 
-	if FFlagSduiOneofPropSupport and v28 == nil then
-		error(`No propDefinitionValue provided for { v25 }`)
+	if FFlagSduiOneofPropSupport and v29 == nil then
+		error(`No propDefinitionValue provided for { v26 }`)
 	end
 
-	local v29, v30, v31 = v27(v25, v28, p2, p3, p4, p5)
+	local v30, v31, v32 = v28(v26, v29, p2, p3, p4, p5)
 
-	return v29, v30, v31
+	return v30, v31, v32
 end
-local function buildPropTable(p6, p7, p8, p9, p10, t1: {[any]: any}?) -- line: 107
-	-- upvalues: FFlagSduiImprovedErrorDimensions (copy), FFlagSduiPropMapping (copy), ProtoVariableMapper (copy), buildProp (copy), PropResultCategory (copy), FFlagSduiNestedComponentListProp (copy), SduiLogger (copy), SduiErrors (copy)
-	local t2 = {}
+local function buildPropTable(p6, p7, p8, p9, p10) -- line: 96
+	-- upvalues: FFlagSduiImprovedErrorDimensions (copy), ProtoVariableMapper (copy), buildProp (copy), PropResultCategory (copy), FFlagSduiNestedComponentListProp (copy), SduiLogger (copy), SduiErrors (copy)
+	local t1 = {}
 
 	if p6 == nil then
 		error("Attempt to buildPropTable with nil")
@@ -66,100 +71,100 @@ local function buildPropTable(p6, p7, p8, p9, p10, t1: {[any]: any}?) -- line: 1
 		currentComponentType = p9.currentComponentType
 	end
 
+	local t2 = nil
 	local t3 = nil
 	local t4 = nil
-	local t5 = nil
 
-	for v45, v46 in p6 do
-		local v47 = if not FFlagSduiPropMapping then ProtoVariableMapper.mapPropName(v45) else if not t1 or not t1[v45] then ProtoVariableMapper.mapPropName(v45) or v45 else t1[v45]
-		local ok, result = pcall(function() -- line: 132
-			-- upvalues: buildProp (copy), v46 (copy), p7 (copy), p8 (copy), p9 (copy), p10 (copy), PropResultCategory (copy), t3 (ref), v47 (copy), t4 (ref), FFlagSduiNestedComponentListProp (copy), t5 (ref), t2 (copy), SduiLogger (copy), SduiErrors (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref)
-			local v79, v80, v81 = buildProp(v46, p7, p8, p9, p10)
+	for v43, v44 in p6 do
+		local v45 = ProtoVariableMapper.mapPropName(v43)
+		local ok, result = pcall(function() -- line: 118
+			-- upvalues: buildProp (copy), v44 (copy), p7 (copy), p8 (copy), p9 (copy), p10 (copy), PropResultCategory (copy), t2 (ref), v45 (copy), t3 (ref), FFlagSduiNestedComponentListProp (copy), t4 (ref), t1 (copy), SduiLogger (copy), SduiErrors (copy), FFlagSduiImprovedErrorDimensions (copy), currentComponentType (ref)
+			local v77, v78, v79 = buildProp(v44, p7, p8, p9, p10)
 
-			if v80 == PropResultCategory.PropSignal then
-				if t3 == nil then
-					t3 = {}
+			if v78 == PropResultCategory.PropSignal then
+				if t2 == nil then
+					t2 = {}
 				end
 
-				t3[v47] = v79
+				t2[v45] = v77
 
 				return
 			end
 
-			if v80 == PropResultCategory.NestedComponentConfig then
+			if v78 == PropResultCategory.NestedComponentConfig then
+				if t3 == nil then
+					t3 = {}
+				end
+
+				t3[v45] = v77
+
+				return
+			end
+
+			if FFlagSduiNestedComponentListProp and v78 == PropResultCategory.NestedComponentConfigListPropSignal then
+				if t2 == nil then
+					t2 = {}
+				end
+
+				t2[v45] = v77
+
 				if t4 == nil then
 					t4 = {}
 				end
 
-				t4[v47] = v79
+				t4[v45] = true
 
 				return
 			end
 
-			if FFlagSduiNestedComponentListProp and v80 == PropResultCategory.NestedComponentConfigListPropSignal then
-				if t3 == nil then
-					t3 = {}
-				end
-
-				t3[v47] = v79
-
-				if t5 == nil then
-					t5 = {}
-				end
-
-				t5[v47] = true
-
-				return
-			end
-
-			if v80 == PropResultCategory.Failed then
-				t2[v47] = v79
+			if v78 == PropResultCategory.Failed then
+				t1[v45] = v77
 				SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToParseProp, {
-					message = `ClientBinding - failed to build prop { v47 }: { v79 }, { v81 }`,
-					propName = `{ v47 }`,
+					message = `ClientBinding - failed to build prop { v45 }: { v77 }, { v79 }`,
+					propName = `{ v45 }`,
 					name = p9.debugName,
 					componentType = if not FFlagSduiImprovedErrorDimensions then nil else currentComponentType,
-					parserName = if not FFlagSduiImprovedErrorDimensions then nil else v46.descriptor.name,
-					value = v46
+					parserName = if not FFlagSduiImprovedErrorDimensions then nil else v44.descriptor.name,
+					value = v44
 				}, p9.appPage)
 
 				return
 			end
 
-			if v80 == PropResultCategory.Literal then
-				t2[v47] = v79
+			if v78 == PropResultCategory.Literal then
+				t1[v45] = v77
 
 				return
 			end
 
 			SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToParseProp, {
-				message = `ClientBinding - unexpected propResultCategory: { v80 }. { v47 }: { v79 }, { v81 }`,
-				propName = `{ v47 }`,
+				message = `ClientBinding - unexpected propResultCategory: { v78 }. { v45 }: { v77 }, { v79 }`,
+				propName = `{ v45 }`,
 				name = p9.debugName,
 				componentType = if not FFlagSduiImprovedErrorDimensions then nil else currentComponentType,
-				parserName = if not FFlagSduiImprovedErrorDimensions then nil else v46.descriptor.name,
-				value = v46
+				parserName = if not FFlagSduiImprovedErrorDimensions then nil else v44.descriptor.name,
+				value = v44
 			}, p9.appPage)
-			t2[v47] = v79
+			t1[v45] = v77
 		end)
 
 		if not ok then
 			SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToParseProp, {
-				message = `ClientBinding - failed to build prop { v47 }: { result }. { result }`,
-				propName = `{ v47 }`,
+				message = `ClientBinding - failed to build prop { v45 }: { result }. { result }`,
+				propName = `{ v45 }`,
 				name = p9.debugName,
 				componentType = if not FFlagSduiImprovedErrorDimensions then nil else currentComponentType,
-				parserName = if not FFlagSduiImprovedErrorDimensions then nil else v46.descriptor.name,
-				value = v46
+				parserName = if not FFlagSduiImprovedErrorDimensions then nil else v44.descriptor.name,
+				value = v44
 			}, p9.appPage)
 		end
 	end
 
-	return t2, t3, t4, t5
+	return t1, t2, t3, t4
 end
 
-local t6 = {
-	__index = function(p11, p12) --[[ __index ]] -- line: 201
+local t5 = {
+	__index = function(p11, p12) -- line: 187
 		if p12 == "analyticsData" then
 			return p11.analyticsContext and p11.analyticsContext.analyticsData
 		end
@@ -171,8 +176,8 @@ local t6 = {
 return {
 	buildPropTable = buildPropTable,
 	buildProp = buildProp,
-	buildConfigForComponent = function(p13, p14, p15, p16, _) --[[ buildConfigForComponent ]] -- line: 210
-		-- upvalues: FFlagSduiImprovedErrorDimensions (copy), ProtoVariableMapper (copy), Signals (copy), buildDataBindingSourcesForTemplate (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), t6 (copy), buildPropTable (copy), buildAnalyticsContextForClientBinding (copy), FFlagSduiPropMapping (copy), getSduiComponentRegistry (copy), FFlagSduiNestedComponentListProp (copy), buildProp (copy), PropResultCategory (copy)
+	buildConfigForComponent = function(p13, p14, p15, p16, _, p18, t6: {[any]: any}?) -- line: 196
+		-- upvalues: FFlagSduiImprovedErrorDimensions (copy), ProtoVariableMapper (copy), FFlagSduiInlineNestedComponentSchema (copy), Signals (copy), buildDataBindingSourcesForTemplate (copy), SduiLogger (copy), SduiErrors (copy), SduiParseHelpers (copy), FFlagSduiDeferredListItems (copy), t5 (copy), buildPropTable (copy), buildAnalyticsContextForClientBinding (copy), FFlagSduiNestedComponentListProp (copy), buildProp (copy), PropResultCategory (copy)
 		if not p13 or not next(p13) then
 			error("Attempt to buildConfigForComponent with nil template")
 		end
@@ -191,26 +196,33 @@ return {
 			p15.currentComponentType = u58
 		end
 
-		local v60 = value.shared and value.shared.data or {}
-		local v61 = Signals.createComputed(function(p18) -- line: 237
-			-- upvalues: buildDataBindingSourcesForTemplate (copy), p14 (copy), v60 (copy), SduiLogger (copy), SduiErrors (copy), p15 (copy), FFlagSduiImprovedErrorDimensions (copy), u58 (ref), SduiParseHelpers (copy)
-			local ok, result = pcall(function() -- line: 238
-				-- upvalues: buildDataBindingSourcesForTemplate (copy), p14 (copy), p18 (copy), v60 (copy)
-				return buildDataBindingSourcesForTemplate(p14(p18), v60)
+		local u60
+
+		if FFlagSduiInlineNestedComponentSchema and p18 ~= nil then
+			u60 = p18
+		else
+			local v61 = value.shared and value.shared.data or {}
+
+			u60 = Signals.createComputed(function(p19) -- line: 237
+				-- upvalues: buildDataBindingSourcesForTemplate (copy), p14 (copy), v61 (copy), SduiLogger (copy), SduiErrors (copy), p15 (copy), FFlagSduiImprovedErrorDimensions (copy), u58 (ref), SduiParseHelpers (copy)
+				local ok, result = pcall(function() -- line: 238
+					-- upvalues: buildDataBindingSourcesForTemplate (copy), p14 (copy), p19 (copy), v61 (copy)
+					return buildDataBindingSourcesForTemplate(p14(p19), v61)
+				end)
+
+				if not ok then
+					SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToBuildBindingSources, {
+						name = p15.debugName,
+						componentType = if not FFlagSduiImprovedErrorDimensions then nil else u58,
+						message = SduiParseHelpers.stringifyValue(result)
+					}, p15.appPage)
+
+					return {}
+				end
+
+				return result
 			end)
-
-			if not ok then
-				SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToBuildBindingSources, {
-					name = p15.debugName,
-					componentType = if not FFlagSduiImprovedErrorDimensions then nil else u58,
-					message = SduiParseHelpers.stringifyValue(result)
-				}, p15.appPage)
-
-				return {}
-			end
-
-			return result
-		end)
+		end
 
 		if not FFlagSduiImprovedErrorDimensions then
 			local v62 = value.shared and value.shared.component_type
@@ -222,70 +234,71 @@ return {
 			u58 = ProtoVariableMapper.mapUiComponentTypeToLua(v62)
 		end
 
-		local t7 = {
-			__processed = true,
-			__isClientBinding = true,
-			componentType = u58
-		}
+		local u63
 
-		setmetatable(t7, t6)
+		if FFlagSduiDeferredListItems then
+			u63 = t6 or {}
+			u63.__processed = true
+			u63.__isClientBinding = true
+			u63.componentType = u58
+		else
+			u63 = {
+				__processed = true,
+				__isClientBinding = true,
+				componentType = u58
+			}
+		end
+
+		setmetatable(u63, t5)
 
 		local v64 = nil
 		local v65 = nil
 
 		if value.shared and value.shared.analytics_data then
-			v64, v65 = buildPropTable(value.shared.analytics_data, v61, p14, p15, nil, nil)
+			v64, v65 = buildPropTable(value.shared.analytics_data, u60, p14, p15, nil)
 		end
 
-		t7.analyticsContext = buildAnalyticsContextForClientBinding(v64, v65, p16, p15)
+		u63.analyticsContext = buildAnalyticsContextForClientBinding(v64, v65, p16, p15)
 
 		if value.props then
-			local v66 = nil
+			local v66, v67, v68, v69 = buildPropTable(value.props, u60, p14, p15, u63.analyticsContext)
 
-			if FFlagSduiPropMapping then
-				local v67 = getSduiComponentRegistry().getComponentDefinition(u58)
+			u63.props = v66
 
-				v66 = v67 and v67.propMapping or nil
+			if v67 ~= nil and next(v67) then
+				u63.propSignals = v67
 			end
 
-			local v68, v69, v70, v71 = buildPropTable(value.props, v61, p14, p15, t7.analyticsContext, v66)
-
-			t7.props = v68
-
-			if v69 ~= nil and next(v69) then
-				t7.propSignals = v69
+			if v68 ~= nil and next(v68) then
+				u63.nestedComponentConfigs = v68
 			end
 
-			if v70 ~= nil and next(v70) then
-				t7.nestedComponentConfigs = v70
-			end
-
-			if FFlagSduiNestedComponentListProp and v71 ~= nil and next(v71) then
-				t7.nestedComponentConfigListPropSignalNames = v71
+			if FFlagSduiNestedComponentListProp and v69 ~= nil and next(v69) then
+				u63.nestedComponentConfigListPropSignalNames = v69
 			end
 		end
 
 		if value.shared and value.shared.is_component_filtered then
 			local is_component_filtered = value.shared.is_component_filtered
-			local ok, result, v75, v76 = pcall(function() -- line: 318
-				-- upvalues: buildProp (copy), is_component_filtered (copy), v61 (copy), p14 (copy), p15 (copy), t7 (copy)
-				return buildProp(is_component_filtered, v61, p14, p15, t7.analyticsContext)
+			local ok, result, v73, v74 = pcall(function() -- line: 319
+				-- upvalues: buildProp (copy), is_component_filtered (copy), u60 (ref), p14 (copy), p15 (copy), u63 (ref)
+				return buildProp(is_component_filtered, u60, p14, p15, u63.analyticsContext)
 			end)
 
-			if not ok or v76 or v75 == PropResultCategory.Failed then
-				local v77 = if not v76 then SduiParseHelpers.stringifyValue(result) else SduiParseHelpers.stringifyValue(v76)
-				local v78 = SduiParseHelpers.stringifyValue(is_component_filtered)
+			if not ok or v74 or v73 == PropResultCategory.Failed then
+				local v75 = if not v74 then SduiParseHelpers.stringifyValue(result) else SduiParseHelpers.stringifyValue(v74)
+				local v76 = SduiParseHelpers.stringifyValue(is_component_filtered)
 
 				SduiLogger.reportError(SduiErrors.SduiErrorType.FailedToParseProp, {
-					message = `Failed to build is_component_filtered prop: { v77 }`,
+					message = `Failed to build is_component_filtered prop: { v75 }`,
 					name = p15.debugName,
 					componentType = if not FFlagSduiImprovedErrorDimensions then nil else u58,
-					value = v78
+					value = v76
 				}, p15.appPage)
-			elseif v75 == PropResultCategory.PropSignal then
-				t7.isComponentFilteredSignal = result
-			elseif v75 == PropResultCategory.Literal then
-				function t7.isComponentFilteredSignal() -- line: 343
+			elseif v73 == PropResultCategory.PropSignal then
+				u63.isComponentFilteredSignal = result
+			elseif v73 == PropResultCategory.Literal then
+				function u63.isComponentFilteredSignal() -- line: 344
 					-- upvalues: result (copy)
 					return {
 						data = result
@@ -294,6 +307,6 @@ return {
 			end
 		end
 
-		return t7
+		return u63
 	end
 }

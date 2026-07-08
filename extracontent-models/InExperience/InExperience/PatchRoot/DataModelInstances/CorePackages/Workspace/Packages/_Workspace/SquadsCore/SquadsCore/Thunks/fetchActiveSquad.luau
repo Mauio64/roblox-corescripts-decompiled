@@ -1,17 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Http.NetworkingSquads);
-local l_Logger_0 = require(l_Parent_0.Loggers).Logger;
-local v4 = require(l_Parent_0.Promise);
-local v5 = l_Logger_0:new("SquadsCore");
-return function() --[[ Line: 11 ]]
-    -- upvalues: v2 (copy), v5 (copy), v4 (copy)
-    return function(v6) --[[ Line: 12 ]]
-        -- upvalues: v2 (ref), v5 (ref), v4 (ref)
-        return v6:dispatch(v2.GetSquadActive.API({})):catch(function(v7) --[[ Line: 13 ]]
-            -- upvalues: v5 (ref), v4 (ref)
-            v5:warning("Error fetching active squad: {}", if v7.StatusCode then v7.StatusCode else -1);
-            return v4.reject(v7);
-        end);
-    end;
-end;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local NetworkingSquads = require(SquadsCore.Http.NetworkingSquads)
+local Logger = require(SquadsCoreParent.Loggers).Logger
+local Promise = require(SquadsCoreParent.Promise)
+local v6 = Logger:new("SquadsCore")
+
+return function() -- line: 11
+	-- upvalues: NetworkingSquads (copy), v6 (copy), Promise (copy)
+	return function(p1) -- line: 12
+		-- upvalues: NetworkingSquads (copy), v6 (copy), Promise (copy)
+		return p1:dispatch(NetworkingSquads.GetSquadActive.API({})):catch(function(p2) -- line: 13
+			-- upvalues: v6 (copy), Promise (copy)
+			v6:warning("Error fetching active squad: {}", not p2.StatusCode and -1 or p2.StatusCode)
+
+			return Promise.reject(p2)
+		end)
+	end
+end

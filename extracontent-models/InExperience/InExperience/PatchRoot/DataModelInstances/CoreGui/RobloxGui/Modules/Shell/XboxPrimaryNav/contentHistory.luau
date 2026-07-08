@@ -1,28 +1,32 @@
-local l_Shell_0 = game:GetService("CoreGui"):FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell");
-local v1 = require(l_Shell_0.Flags.GetFFlagXboxFixPrimaryNavABEvents);
-return ((function() --[[ Line: 12 ]] --[[ Name: contentHistory ]]
-    -- upvalues: v1 (copy)
-    local v2 = {};
-    local v3 = nil;
-    v2.setLastSelectedContent = function(_, v5) --[[ Line: 17 ]] --[[ Name: setLastSelectedContent ]]
-        -- upvalues: v3 (ref)
-        v3 = v5;
-    end;
-    v2.getLastContentName = function(_) --[[ Line: 21 ]] --[[ Name: getLastContentName ]]
-        -- upvalues: v1 (ref), v3 (ref)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 22 ]]
-            -- upvalues: v1 (ref), v3 (ref)
-            if v1() then
-                return v3:GetId();
-            else
-                return v3:GetName();
-            end;
-        end);
-        if l_status_0 then
-            return l_result_0;
-        else
-            return;
-        end;
-    end;
-    return v2;
-end)());
+local Shell = game:GetService("CoreGui"):FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
+local GetFFlagXboxFixPrimaryNavABEvents = require(Shell.Flags.GetFFlagXboxFixPrimaryNavABEvents)
+
+local function contentHistory() -- line: 12
+	-- upvalues: GetFFlagXboxFixPrimaryNavABEvents (copy)
+	local t1 = {}
+	local u5 = nil
+
+	function t1.setLastSelectedContent(_, p2) -- line: 17
+		-- upvalues: u5 (ref)
+		u5 = p2
+	end
+	function t1.getLastContentName(_) -- line: 21
+		-- upvalues: GetFFlagXboxFixPrimaryNavABEvents (copy), u5 (ref)
+		local ok, result = pcall(function() -- line: 22
+			-- upvalues: GetFFlagXboxFixPrimaryNavABEvents (copy), u5 (ref)
+			if GetFFlagXboxFixPrimaryNavABEvents() then
+				return u5:GetId()
+			end
+
+			return u5:GetName()
+		end)
+
+		if ok then
+			return result
+		end
+	end
+
+	return t1
+end
+
+return (contentHistory())

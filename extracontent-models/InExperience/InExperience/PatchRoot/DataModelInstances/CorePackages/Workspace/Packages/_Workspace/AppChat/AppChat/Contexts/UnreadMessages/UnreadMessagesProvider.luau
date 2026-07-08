@@ -1,9 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.UnreadMessagesDispatchContext);
-return function(v3) --[[ Line: 11 ]] --[[ Name: UnreadMessagesProvider ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Provider, {
-        value = v3.dispatch
-    }, v3.children);
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local UnreadMessagesDispatchContext = require(script.Parent.UnreadMessagesDispatchContext)
+
+local function UnreadMessagesProvider(t1: {[any]: any}) -- line: 11
+	-- upvalues: React (copy), UnreadMessagesDispatchContext (copy)
+	return React.createElement(UnreadMessagesDispatchContext.Provider, {
+		value = t1.dispatch
+	}, t1.children)
+end
+
+return UnreadMessagesProvider

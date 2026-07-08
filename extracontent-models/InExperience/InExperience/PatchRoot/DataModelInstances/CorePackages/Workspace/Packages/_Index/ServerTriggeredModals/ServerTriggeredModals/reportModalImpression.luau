@@ -1,49 +1,55 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerTriggeredModals");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_UrlBase_0 = require(l_Parent_0.UrlBuilder).UrlBase;
-local v5 = require(l_script_FirstAncestor_0.Logger);
-local v6 = require(l_script_FirstAncestor_0.logResponseStatus);
-local v7 = require(l_script_FirstAncestor_0.logResponseLatency);
-local v8 = l_UrlBuilder_0.new({
-    base = l_UrlBase_0.APIS, 
-    path = "modals-api/v1/impression"
-});
-return function(v9, v10, v11) --[[ Line: 20 ]]
-    -- upvalues: v5 (copy), v8 (copy), l_HttpService_0 (copy), v7 (copy), v6 (copy)
-    if not v9 then
-        v5:error("Missing networking implementation");
-        return;
-    else
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 26 ]]
-            -- upvalues: v8 (ref), l_HttpService_0 (ref), v10 (copy), v11 (copy), v9 (copy)
-            local v12 = v8();
-            local v13 = l_HttpService_0:JSONEncode({
-                modalId = v10, 
-                modalType = v11
-            });
-            return v9(v12, "POST", {
-                postBody = v13
-            });
-        end);
-        if not l_status_0 then
-            v5:error((("Report impression request failed to start: %*"):format(l_result_0)));
-            return;
-        else
-            l_result_0:andThen(function(v16) --[[ Line: 38 ]]
-                -- upvalues: v7 (ref), v5 (ref)
-                local v17 = v16 and v16.responseCode or nil;
-                v7("modals-api/v1/impression", v16.responseTimeMs, v17);
-                if v17 ~= nil and v17 ~= 200 then
-                    v5:error((("Unexpected responseCode when reporting impression: %*"):format(v17)));
-                end;
-            end):catch(function(v18) --[[ Line: 45 ]]
-                -- upvalues: v6 (ref), v5 (ref)
-                v6("modals-api/v1/impression", v18.StatusCode);
-                v5:error((("Report Impression request error: %*"):format(v18)));
-            end);
-            return;
-        end;
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
+local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
+local UrlBuilder = require(ServerTriggeredModalsParent.UrlBuilder).UrlBuilder
+local UrlBase = require(ServerTriggeredModalsParent.UrlBuilder).UrlBase
+local Logger = require(ServerTriggeredModals.Logger)
+local logResponseStatus = require(ServerTriggeredModals.logResponseStatus)
+local logResponseLatency = require(ServerTriggeredModals.logResponseLatency)
+local v9 = UrlBuilder.new({
+	path = "modals-api/v1/impression",
+	base = UrlBase.APIS
+})
+
+return function(p1, s1: string, s2: string) -- line: 20
+	-- upvalues: Logger (copy), v9 (copy), HttpService (copy), logResponseLatency (copy), logResponseStatus (copy)
+	if not p1 then
+		Logger:error("Missing networking implementation")
+
+		return
+	end
+
+	local ok, result = pcall(function() -- line: 26
+		-- upvalues: v9 (copy), HttpService (copy), s1 (copy), s2 (copy), p1 (copy)
+		local v15 = v9()
+		local json = HttpService:JSONEncode({
+			modalId = s1,
+			modalType = s2
+		})
+
+		return p1(v15, "POST", {
+			postBody = json
+		})
+	end)
+
+	if not ok then
+		Logger:error(`Report impression request failed to start: { result }`)
+
+		return
+	end
+
+	result:andThen(function(p2) -- line: 38
+		-- upvalues: logResponseLatency (copy), Logger (copy)
+		local v18 = p2 and p2.responseCode or nil
+
+		logResponseLatency("modals-api/v1/impression", p2.responseTimeMs, v18)
+
+		if v18 ~= nil and v18 ~= 200 then
+			Logger:error(`Unexpected responseCode when reporting impression: { v18 }`)
+		end
+	end):catch(function(p3) -- line: 45
+		-- upvalues: logResponseStatus (copy), Logger (copy)
+		logResponseStatus("modals-api/v1/impression", p3.StatusCode)
+		Logger:error(`Report Impression request error: { p3 }`)
+	end)
+end

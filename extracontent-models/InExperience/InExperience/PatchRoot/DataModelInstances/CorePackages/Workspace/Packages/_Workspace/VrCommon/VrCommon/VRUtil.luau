@@ -1,45 +1,57 @@
-local l_Parent_0 = script:FindFirstAncestor("VrCommon").Parent;
-local v1 = require(l_Parent_0.MockableProxyServices);
-local l_game_EngineFeature_0 = game:GetEngineFeature("EnableVRUpdate3");
-local l_VRService_0 = v1.VRService;
+local Parent = script:FindFirstAncestor("VrCommon").Parent
+local MockableProxyServices = require(Parent.MockableProxyServices)
+local EngineFeature = game:GetEngineFeature("EnableVRUpdate3")
+local VRService = MockableProxyServices.VRService
+
 return {
-    RayPlaneIntersection = function(v4, v5, v6) --[[ Line: 17 ]] --[[ Name: RayPlaneIntersection ]]
-        v5 = v5.unit;
-        v4 = v4.Unit;
-        local v7 = v5:Dot(v4.Direction);
-        if v7 == 0 then
-            return nil;
-        else
-            local v8 = v5:Dot(v6 - v4.Origin) / v7;
-            if v8 < 0 then
-                return nil;
-            else
-                return v4.Origin + v4.Direction * v8;
-            end;
-        end;
-    end, 
-    GetUserCFrameWorldSpace = function(v9) --[[ Line: 35 ]] --[[ Name: GetUserCFrameWorldSpace ]]
-        -- upvalues: l_VRService_0 (copy)
-        local l_l_VRService_0_UserCFrame_0 = l_VRService_0:GetUserCFrame(v9);
-        if not workspace.CurrentCamera.HeadLocked then
-            l_l_VRService_0_UserCFrame_0 = l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head):Inverse() * l_l_VRService_0_UserCFrame_0;
-        end;
-        return workspace.CurrentCamera.CFrame * (CFrame.new(l_l_VRService_0_UserCFrame_0.p * workspace.CurrentCamera.HeadScale) * (l_l_VRService_0_UserCFrame_0 - l_l_VRService_0_UserCFrame_0.p));
-    end, 
-    getCurrentControllerType = function() --[[ Line: 47 ]] --[[ Name: getCurrentControllerType ]]
-        -- upvalues: l_game_EngineFeature_0 (copy), l_VRService_0 (copy)
-        local v11 = l_game_EngineFeature_0 and l_VRService_0.VRDeviceName or nil;
-        local v12 = v11:match("Oculus") or v11:match("Meta") or v11:match("OpenXr") or v11:match("OpenXR");
-        if v11:match("Vive") then
-            return "Vive";
-        elseif v11:match("Rift") then
-            return "Rift";
-        elseif v11:match("Index") then
-            return "Index";
-        elseif v12 then
-            return "Touch";
-        else
-            return "Rift";
-        end;
-    end
-};
+	RayPlaneIntersection = function(p1, p2, p3) -- line: 17
+		local unit = p2.unit
+		local Unit = p1.Unit
+		local v10 = unit:Dot(Unit.Direction)
+
+		if v10 == 0 then
+			return nil
+		end
+
+		local v11 = unit:Dot(p3 - Unit.Origin) / v10
+
+		if v11 < 0 then
+			return nil
+		end
+
+		return Unit.Origin + Unit.Direction * v11
+	end,
+	GetUserCFrameWorldSpace = function(p4) -- line: 35
+		-- upvalues: VRService (copy)
+		local UserCFrame = VRService:GetUserCFrame(p4)
+
+		if not workspace.CurrentCamera.HeadLocked then
+			UserCFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head):Inverse() * UserCFrame
+		end
+
+		return workspace.CurrentCamera.CFrame * (CFrame.new(UserCFrame.p * workspace.CurrentCamera.HeadScale) * (UserCFrame - UserCFrame.p))
+	end,
+	getCurrentControllerType = function() -- line: 47
+		-- upvalues: EngineFeature (copy), VRService (copy)
+		local v14 = EngineFeature and VRService.VRDeviceName or nil
+		local v15 = v14:match("Oculus") or (v14:match("Meta") or (v14:match("OpenXr") or v14:match("OpenXR")))
+
+		if v14:match("Vive") then
+			return "Vive"
+		end
+
+		if v14:match("Rift") then
+			return "Rift"
+		end
+
+		if v14:match("Index") then
+			return "Index"
+		end
+
+		if v15 then
+			return "Touch"
+		end
+
+		return "Rift"
+	end
+}

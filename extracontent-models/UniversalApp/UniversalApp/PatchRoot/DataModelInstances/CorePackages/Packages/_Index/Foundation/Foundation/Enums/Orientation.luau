@@ -1,4 +1,4 @@
 return {
-    Horizontal = "Horizontal", 
-    Vertical = "Vertical"
-};
+	Horizontal = "Horizontal",
+	Vertical = "Vertical"
+}

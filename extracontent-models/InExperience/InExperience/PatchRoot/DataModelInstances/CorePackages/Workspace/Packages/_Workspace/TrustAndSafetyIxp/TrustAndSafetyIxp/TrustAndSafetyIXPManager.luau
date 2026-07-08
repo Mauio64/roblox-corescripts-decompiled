@@ -1,85 +1,97 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("TrustAndSafetyIxp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GetFFlagReportAnythingAnnotationIXP_0 = require(l_Parent_0.SharedFlags).GetFFlagReportAnythingAnnotationIXP;
-local l_GetFStringReportAnythingAnnotationIXPLayerName_0 = require(l_Parent_0.SharedFlags).GetFStringReportAnythingAnnotationIXPLayerName;
-local v4 = require(l_script_FirstAncestor_0.Flags.GetFFlagForceReportAnythingAnnotationEnabled);
-local l_IXPServiceWrapper_0 = require(l_Parent_0.IxpServiceWrapper).IXPServiceWrapper;
-local v6 = require(l_Parent_0.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local v7 = {};
-v7.__index = v7;
-v7.new = function(v8) --[[ Line: 19 ]] --[[ Name: new ]]
-    -- upvalues: l_IXPServiceWrapper_0 (copy), v7 (copy)
-    local v9 = {
-        _ixpServiceWrapper = v8 or l_IXPServiceWrapper_0, 
-        _initialized = false, 
-        _ixpInitialized = false, 
-        _optionalScreenshotEnabled = false, 
-        _reportAnythingExperienceEnabled = false, 
-        _reportAnythingAvatarEnabled = false, 
-        _callbacks = {}
-    };
-    setmetatable(v9, v7);
-    return v9;
-end;
-v7.getReportAnythingExperienceEnabled = function(v10) --[[ Line: 33 ]] --[[ Name: getReportAnythingExperienceEnabled ]]
-    -- upvalues: v4 (copy)
-    if v4() then
-        return true;
-    else
-        return v10._reportAnythingExperienceEnabled or v10._optionalScreenshotEnabled;
-    end;
-end;
-v7.getReportAnythingAvatarEnabled = function(v11) --[[ Line: 40 ]] --[[ Name: getReportAnythingAvatarEnabled ]]
-    -- upvalues: v4 (copy)
-    if v4() then
-        return true;
-    else
-        return v11._reportAnythingAvatarEnabled or v11._optionalScreenshotEnabled;
-    end;
-end;
-v7.waitForInitialization = function(v12, v13) --[[ Line: 47 ]] --[[ Name: waitForInitialization ]]
-    if v12._ixpInitialized then
-        v13();
-        return;
-    else
-        table.insert(v12._callbacks, v13);
-        return;
-    end;
-end;
-v7.initialize = function(v14) --[[ Line: 55 ]] --[[ Name: initialize ]]
-    -- upvalues: l_GetFFlagReportAnythingAnnotationIXP_0 (copy), l_GetFStringReportAnythingAnnotationIXPLayerName_0 (copy), v6 (copy)
-    if v14._initialized then
-        return;
-    else
-        v14._initialized = true;
-        local function v17() --[[ Line: 61 ]] --[[ Name: invokeCallbacks ]]
-            -- upvalues: v14 (copy)
-            for _, v16 in ipairs(v14._callbacks) do
-                v16();
-            end;
-            v14._callbacks = {};
-        end;
-        if not l_GetFFlagReportAnythingAnnotationIXP_0() then
-            v14._ixpInitialized = true;
-            v17();
-            return;
-        else
-            task.spawn(function() --[[ Line: 74 ]]
-                -- upvalues: v14 (copy), l_GetFStringReportAnythingAnnotationIXPLayerName_0 (ref), v6 (ref), v17 (copy)
-                v14._ixpServiceWrapper:WaitForInitialization();
-                local l_LayerData_0 = v14._ixpServiceWrapper:GetLayerData(l_GetFStringReportAnythingAnnotationIXPLayerName_0());
-                if l_LayerData_0 then
-                    v14._optionalScreenshotEnabled = l_LayerData_0.OptionalScreenshotEnabled or false;
-                    v14._reportAnythingExperienceEnabled = l_LayerData_0.OptionalScreenshotExperience or false;
-                    v14._reportAnythingAvatarEnabled = l_LayerData_0.OptionalScreenshotAvatar or false;
-                end;
-                v6:debug("RA Optional Screenshot enabled (Avatar and/or Experience) or Select In Scene enabled? Both Avatar and Exp: {}, Exp: {}, Avatar: {}, Select in Scene: {}. Invoking {} callbacks.", v14._optionalScreenshotEnabled, v14._reportAnythingExperienceEnabled, v14._reportAnythingAvatarEnabled, v14._selectInSceneEnabled, #v14._callbacks);
-                v14._ixpInitialized = true;
-                v17();
-            end);
-            return;
-        end;
-    end;
-end;
-v7.default = v7.new();
-return v7;
+local TrustAndSafetyIxp = script:FindFirstAncestor("TrustAndSafetyIxp")
+local TrustAndSafetyIxpParent = TrustAndSafetyIxp.Parent
+local GetFFlagReportAnythingAnnotationIXP = require(TrustAndSafetyIxpParent.SharedFlags).GetFFlagReportAnythingAnnotationIXP
+local GetFStringReportAnythingAnnotationIXPLayerName = require(TrustAndSafetyIxpParent.SharedFlags).GetFStringReportAnythingAnnotationIXPLayerName
+local GetFFlagForceReportAnythingAnnotationEnabled = require(TrustAndSafetyIxp.Flags.GetFFlagForceReportAnythingAnnotationEnabled)
+local IXPServiceWrapper = require(TrustAndSafetyIxpParent.IxpServiceWrapper).IXPServiceWrapper
+local v7 = require(TrustAndSafetyIxpParent.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 19
+	-- upvalues: IXPServiceWrapper (copy), t1 (copy)
+	local t2 = {
+		_initialized = false,
+		_ixpInitialized = false,
+		_optionalScreenshotEnabled = false,
+		_reportAnythingExperienceEnabled = false,
+		_reportAnythingAvatarEnabled = false,
+		_ixpServiceWrapper = p1 or IXPServiceWrapper,
+		_callbacks = {}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.getReportAnythingExperienceEnabled(p2) -- line: 33
+	-- upvalues: GetFFlagForceReportAnythingAnnotationEnabled (copy)
+	if GetFFlagForceReportAnythingAnnotationEnabled() then
+		return true
+	end
+
+	return p2._reportAnythingExperienceEnabled or p2._optionalScreenshotEnabled
+end
+function t1.getReportAnythingAvatarEnabled(p3) -- line: 40
+	-- upvalues: GetFFlagForceReportAnythingAnnotationEnabled (copy)
+	if GetFFlagForceReportAnythingAnnotationEnabled() then
+		return true
+	end
+
+	return p3._reportAnythingAvatarEnabled or p3._optionalScreenshotEnabled
+end
+function t1.waitForInitialization(p4, p5) -- line: 47
+	if p4._ixpInitialized then
+		p5()
+
+		return
+	end
+
+	table.insert(p4._callbacks, p5)
+end
+function t1.initialize(p6) -- line: 55
+	-- upvalues: GetFFlagReportAnythingAnnotationIXP (copy), GetFStringReportAnythingAnnotationIXPLayerName (copy), v7 (copy)
+	if p6._initialized then
+		return
+	end
+
+	p6._initialized = true
+
+	local function invokeCallbacks() -- line: 61
+		-- upvalues: p6 (copy)
+		for _, v in ipairs(p6._callbacks) do
+			v()
+		end
+
+		p6._callbacks = {}
+	end
+
+	if not GetFFlagReportAnythingAnnotationIXP() then
+		p6._ixpInitialized = true
+		invokeCallbacks()
+
+		return
+	end
+
+	task.spawn(function() -- line: 74
+		-- upvalues: p6 (copy), GetFStringReportAnythingAnnotationIXPLayerName (copy), v7 (copy), invokeCallbacks (copy)
+		p6._ixpServiceWrapper:WaitForInitialization()
+
+		local LayerData = p6._ixpServiceWrapper:GetLayerData(GetFStringReportAnythingAnnotationIXPLayerName())
+
+		if LayerData then
+			p6._optionalScreenshotEnabled = LayerData.OptionalScreenshotEnabled or false
+			p6._reportAnythingExperienceEnabled = LayerData.OptionalScreenshotExperience or false
+			p6._reportAnythingAvatarEnabled = LayerData.OptionalScreenshotAvatar or false
+		end
+
+		v7:debug("RA Optional Screenshot enabled (Avatar and/or Experience) or Select In Scene enabled? Both Avatar and Exp: {}, Exp: {}, Avatar: {}, Select in Scene: {}. Invoking {} callbacks.", p6._optionalScreenshotEnabled, p6._reportAnythingExperienceEnabled, p6._reportAnythingAvatarEnabled, p6._selectInSceneEnabled, #p6._callbacks)
+		p6._ixpInitialized = true
+		invokeCallbacks()
+	end)
+end
+
+t1.default = t1.new()
+
+return t1

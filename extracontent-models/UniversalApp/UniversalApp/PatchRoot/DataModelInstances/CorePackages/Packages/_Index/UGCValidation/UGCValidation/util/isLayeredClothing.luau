@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isLayeredClothing ]]
-    return v0:FindFirstChildWhichIsA("WrapLayer", true);
-end;
+local function isLayeredClothing(p1) -- line: 1
+	return p1:FindFirstChildWhichIsA("WrapLayer", true)
+end
+
+return isLayeredClothing

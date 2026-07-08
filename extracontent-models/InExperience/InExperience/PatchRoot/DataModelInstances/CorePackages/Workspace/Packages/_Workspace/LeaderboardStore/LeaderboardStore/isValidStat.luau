@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isValidStat ]]
-    return v0:IsA("StringValue") or v0:IsA("IntValue") or v0:IsA("BoolValue") or v0:IsA("NumberValue") or v0:IsA("DoubleConstrainedValue") or v0:IsA("IntConstrainedValue");
-end;
+local function isValidStat(p1) -- line: 1
+	return p1:IsA("StringValue") or (p1:IsA("IntValue") or (p1:IsA("BoolValue") or (p1:IsA("NumberValue") or (p1:IsA("DoubleConstrainedValue") or p1:IsA("IntConstrainedValue")))))
+end
+
+return isValidStat

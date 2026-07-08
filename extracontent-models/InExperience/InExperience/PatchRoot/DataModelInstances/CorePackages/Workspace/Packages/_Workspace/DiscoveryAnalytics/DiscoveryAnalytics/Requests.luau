@@ -1,3 +1,3 @@
 return {
-    sponsoredGamesRecordClick = require(script.sponsoredGamesRecordClick)
-};
+	sponsoredGamesRecordClick = require(script.sponsoredGamesRecordClick)
+}

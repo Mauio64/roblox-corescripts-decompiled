@@ -1,1 +1,1 @@
-return require(script.EditBioContainer);
+return require(script.EditBioContainer)

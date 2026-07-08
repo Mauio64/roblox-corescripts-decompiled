@@ -1,4 +1,4 @@
 return {
-    GroupsListCreateGroupClicked = "GroupsListCreateGroupClicked", 
-    GroupsListPageExposure = "GroupsListPageExposure"
-};
+	GroupsListCreateGroupClicked = "GroupsListCreateGroupClicked",
+	GroupsListPageExposure = "GroupsListPageExposure"
+}

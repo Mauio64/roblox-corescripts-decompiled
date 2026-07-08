@@ -1,29 +1,31 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-return function(v2) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    local v3 = {
-        TextDefault = {
-            Color = v2.Theme.TextEmphasis.Color, 
-            Transparency = v2.Theme.TextEmphasis.Transparency
-        }
-    };
-    local v4 = {
-        Body = {
-            Font = v2.Font.Header1.Font, 
-            RelativeSize = v2.Font.Body.RelativeSize, 
-            RelativeMinSize = v2.Font.Body.RelativeMinSize
-        }, 
-        CaptionBody = {
-            Font = v2.Font.Header1.Font, 
-            RelativeSize = v2.Font.CaptionBody.RelativeSize, 
-            RelativeMinSize = v2.Font.CaptionBody.RelativeMinSize
-        }
-    };
-    return {
-        Theme = v1.Dictionary.join(v2.Theme, v3), 
-        Font = v1.Dictionary.join(v2.Font, v4), 
-        Settings = nil, 
-        Tokens = v2.Tokens
-    };
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+
+return function(p1) -- line: 6
+	-- upvalues: Cryo (copy)
+	local t1 = {
+		TextDefault = {
+			Color = p1.Theme.TextEmphasis.Color,
+			Transparency = p1.Theme.TextEmphasis.Transparency
+		}
+	}
+	local t2 = {
+		Body = {
+			Font = p1.Font.Header1.Font,
+			RelativeSize = p1.Font.Body.RelativeSize,
+			RelativeMinSize = p1.Font.Body.RelativeMinSize
+		},
+		CaptionBody = {
+			Font = p1.Font.Header1.Font,
+			RelativeSize = p1.Font.CaptionBody.RelativeSize,
+			RelativeMinSize = p1.Font.CaptionBody.RelativeMinSize
+		}
+	}
+
+	return {
+		Settings = nil,
+		Theme = Cryo.Dictionary.join(p1.Theme, t1),
+		Font = Cryo.Dictionary.join(p1.Font, t2),
+		Tokens = p1.Tokens
+	}
+end

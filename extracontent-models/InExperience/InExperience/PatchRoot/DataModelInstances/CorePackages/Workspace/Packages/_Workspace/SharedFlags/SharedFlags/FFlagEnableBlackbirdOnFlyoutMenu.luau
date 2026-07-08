@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableBlackbirdOnFlyoutMenu", false);
+return game:DefineFastFlag("EnableBlackbirdOnFlyoutMenu2", false)

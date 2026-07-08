@@ -1,20 +1,24 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useClock_0 = require(l_Parent_0.ReactUtils).useClock;
-local v3 = NumberRange.new(0, 1);
-return function(v4, v5) --[[ Line: 15 ]] --[[ Name: usePulseBinding ]]
-    -- upvalues: l_useClock_0 (copy), v3 (copy), v1 (copy)
-    local v6 = l_useClock_0();
-    local v7 = v4 or 1;
-    local v8 = v5 or v3;
-    return v1.useMemo(function() --[[ Line: 21 ]]
-        -- upvalues: v6 (copy), v7 (copy), v8 (copy)
-        return v6:map(function(v9) --[[ Line: 22 ]]
-            -- upvalues: v7 (ref), v8 (ref)
-            return math.map(math.sin(v9 * 3.141592653589793 / v7) ^ 2, 0, 1, v8.Min, v8.Max);
-        end);
-    end, {
-        v4, 
-        v5
-    });
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+local useClock = require(Parent.ReactUtils).useClock
+local numberRange = NumberRange.new(0, 1)
+
+local function usePulseBinding(n1: number?, numberRange2: NumberRange?) -- line: 15
+	-- upvalues: useClock (copy), numberRange (copy), React (copy)
+	local v8 = useClock()
+	local v9 = n1 or 1
+	local v10 = numberRange2 or numberRange
+
+	return React.useMemo(function() -- line: 21
+		-- upvalues: v8 (copy), v9 (copy), v10 (copy)
+		return v8:map(function(n2: number) -- line: 22
+			-- upvalues: v9 (copy), v10 (copy)
+			return math.map(math.sin(n2 * 3.141592653589793 / v9) ^ 2, 0, 1, v10.Min, v10.Max)
+		end)
+	end, {
+		n1,
+		numberRange2
+	})
+end
+
+return usePulseBinding

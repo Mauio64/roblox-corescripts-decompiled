@@ -1,6 +1,8 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: createUnimplemented ]]
-    return function() --[[ Line: 3 ]]
-        -- upvalues: v0 (copy)
-        error((("Calling unimplemented function %*"):format(v0)));
-    end;
-end;
+local function createUnimplemented(s1: string) -- line: 2
+	return function() -- line: 3
+		-- upvalues: s1 (copy)
+		error(`Calling unimplemented function { s1 }`)
+	end
+end
+
+return createUnimplemented

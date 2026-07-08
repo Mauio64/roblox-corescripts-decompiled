@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAvatarsTabIXP1", false);
+return game:DefineFastFlag("AXAvatarsTabIXP1", false)

@@ -1,55 +1,60 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v6 = require(l_Parent_0.Resources.FTUXConstants);
-local _ = require(l_Parent_0.Enums.PlatformEnum);
-return function(v8) --[[ Line: 18 ]] --[[ Name: Header ]]
-    -- upvalues: l_useStyle_0 (copy), v6 (copy), l_withLocalization_0 (copy), v1 (copy), v2 (copy)
-    local v9 = l_useStyle_0();
-    local l_Theme_0 = v9.Theme;
-    local l_Font_0 = v9.Font;
-    local l_PanelConstants_0 = v6[v8.platform].PanelConstants;
-    local l_Color_0 = l_Theme_0.BackgroundContrast.Color;
-    local l_HEADER_HEIGHT_RATIO_0 = l_PanelConstants_0.HEADER_HEIGHT_RATIO;
-    local v15 = l_PanelConstants_0.CONTENT_PADDING / l_PanelConstants_0.SLIDESHOW_FRAME_WIDTH;
-    local v16 = 1 - 2 * v15;
-    return l_withLocalization_0({
-        headerText = "CoreScripts.VRFTUX.Heading.Header"
-    })(function(v17) --[[ Line: 33 ]]
-        -- upvalues: v1 (ref), l_Color_0 (copy), l_HEADER_HEIGHT_RATIO_0 (copy), v16 (copy), v15 (copy), v2 (ref), l_Font_0 (copy), l_Theme_0 (copy)
-        return v1.createElement("Frame", {
-            BackgroundColor3 = l_Color_0, 
-            BackgroundTransparency = 0, 
-            Size = UDim2.new(1, 0, l_HEADER_HEIGHT_RATIO_0, 0), 
-            LayoutOrder = 1
-        }, {
-            UICorner = v1.createElement("UICorner", {
-                CornerRadius = UDim.new(0.26, 0)
-            }), 
-            HeaderFrame = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                Position = UDim2.new(0, 0, 0, 0), 
-                BackgroundTransparency = 1
-            }, {
-                Box = v1.createElement("Frame", {
-                    Size = UDim2.new(v16, 0, 1, 0), 
-                    Position = UDim2.new(v15, 0, 0, 0), 
-                    BackgroundTransparency = 1
-                }, {
-                    HeaderText = v1.createElement(v2.App.Text.StyledTextLabel, {
-                        text = v17.headerText, 
-                        fontStyle = l_Font_0.Header1, 
-                        colorStyle = l_Theme_0.TextEmphasis, 
-                        textXAlignment = Enum.TextXAlignment.Left, 
-                        size = UDim2.new(1, 0, 1, 0), 
-                        fluidSizing = true, 
-                        automaticSize = Enum.AutomaticSize.XY
-                    })
-                })
-            })
-        });
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local ParentParent = script.Parent.Parent.Parent
+local FTUXConstants = require(ParentParent.Resources.FTUXConstants)
+
+require(ParentParent.Enums.PlatformEnum)
+
+local function Header(t1: {[any]: any}) -- line: 18
+	-- upvalues: useStyle (copy), FTUXConstants (copy), withLocalization (copy), React (copy), UIBlox (copy)
+	local v10 = useStyle()
+	local Theme = v10.Theme
+	local Font = v10.Font
+	local PanelConstants = FTUXConstants[t1.platform].PanelConstants
+	local BackgroundContrastColor = Theme.BackgroundContrast.Color
+	local HEADER_HEIGHT_RATIO = PanelConstants.HEADER_HEIGHT_RATIO
+	local v16 = PanelConstants.CONTENT_PADDING / PanelConstants.SLIDESHOW_FRAME_WIDTH
+	local v17 = 1 - 2 * v16
+
+	return withLocalization({
+		headerText = "CoreScripts.VRFTUX.Heading.Header"
+	})(function(p1) -- line: 33
+		-- upvalues: React (copy), BackgroundContrastColor (copy), HEADER_HEIGHT_RATIO (copy), v17 (copy), v16 (copy), UIBlox (copy), Font (copy), Theme (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 0,
+			LayoutOrder = 1,
+			BackgroundColor3 = BackgroundContrastColor,
+			Size = UDim2.new(1, 0, HEADER_HEIGHT_RATIO, 0)
+		}, {
+			UICorner = React.createElement("UICorner", {
+				CornerRadius = UDim.new(0.26, 0)
+			}),
+			HeaderFrame = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				Position = UDim2.new(0, 0, 0, 0)
+			}, {
+				Box = React.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(v17, 0, 1, 0),
+					Position = UDim2.new(v16, 0, 0, 0)
+				}, {
+					HeaderText = React.createElement(UIBlox.App.Text.StyledTextLabel, {
+						fluidSizing = true,
+						text = p1.headerText,
+						fontStyle = Font.Header1,
+						colorStyle = Theme.TextEmphasis,
+						textXAlignment = Enum.TextXAlignment.Left,
+						size = UDim2.new(1, 0, 1, 0),
+						automaticSize = Enum.AutomaticSize.XY
+					})
+				})
+			})
+		})
+	end)
+end
+
+return Header

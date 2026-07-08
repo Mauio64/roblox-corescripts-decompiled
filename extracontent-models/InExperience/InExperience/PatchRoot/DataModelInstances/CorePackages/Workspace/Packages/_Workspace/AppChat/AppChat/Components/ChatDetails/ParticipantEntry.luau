@@ -6,117 +6,117 @@ local Foundation = require(AppChatParent.Foundation)
 local Text = require(AppChatParent.AppCommonLib).Text
 local useUserData = require(AppChat.Hooks.useUserData)
 local useTokens = Foundation.Hooks.useTokens
-local FFlagEnableAppChatFocusableFixes = require(AppChatParent.SharedFlags).FFlagEnableAppChatFocusableFixes
-local FFlagAppChatShowInvitedStatusInParticipantList = require(AppChat.Flags).FFlagAppChatShowInvitedStatusInParticipantList
 local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
 local useIsRobloxSubscriber = require(AppChatParent.UserProfiles).Hooks.useIsRobloxSubscriber
-local v13 = string.rep("W", 20)
+local v11 = string.rep("W", 20)
 local t1 = {
 	showDivider = true
 }
 
-return React.memo(function(t2: {[any]: any}) --[[ ParticipantEntry ]] -- line: 36
-	-- upvalues: Cryo (copy), t1 (copy), useUserData (copy), useTokens (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), React (copy), Text (copy), v13 (copy), Foundation (copy), FFlagAppChatShowInvitedStatusInParticipantList (copy), FFlagEnableAppChatFocusableFixes (copy)
-	local v16 = Cryo.Dictionary.union(t1, t2)
-	local v17 = useUserData(v16.userId)
-	local v18 = useTokens()
-	local v19 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else v16.userId)
-	local v20 = React.useCallback(function() -- line: 43
-		-- upvalues: v16 (copy)
-		if v16.onActivated then
-			v16.onActivated()
+local function ParticipantEntry(t2: {[any]: any}) -- line: 32
+	-- upvalues: Cryo (copy), t1 (copy), useUserData (copy), useTokens (copy), useIsRobloxSubscriber (copy), FFlagEnableBlackbirdCheck (copy), React (copy), Text (copy), v11 (copy), Foundation (copy)
+	local v15 = Cryo.Dictionary.union(t1, t2)
+	local v16 = useUserData(v15.userId)
+	local v17 = useTokens()
+	local v18 = useIsRobloxSubscriber(if not FFlagEnableBlackbirdCheck then nil else v15.userId)
+	local v19 = React.useCallback(function() -- line: 39
+		-- upvalues: v15 (copy)
+		if v15.onActivated then
+			v15.onActivated()
 		end
-	end, { v16.onActivated })
-	local v21 = React.useMemo(function() -- line: 49
-		-- upvalues: Text (copy), v13 (copy), v18 (copy)
-		local v23 = Text.GetTextBounds(v13, v18.Typography.TitleLarge.Font, v18.Typography.TitleLarge.FontSize, Vector2.zero)
+	end, { v15.onActivated })
+	local v20 = React.useMemo(function() -- line: 45
+		-- upvalues: Text (copy), v11 (copy), v17 (copy)
+		local v22 = Text.GetTextBounds(v11, v17.Typography.TitleLarge.Font, v17.Typography.TitleLarge.FontSize, Vector2.zero)
+
+		return UDim2.fromOffset(v22.X, v22.Y)
+	end, {
+		v17.Typography.TitleLarge.Font,
+		v17.Typography.TitleLarge.FontSize
+	})
+	local v21 = React.useMemo(function() -- line: 55
+		-- upvalues: Text (copy), v17 (copy)
+		local v23 = Text.GetTextBounds("Roblox Studio", v17.Typography.CaptionMedium.Font, v17.Typography.CaptionMedium.FontSize, Vector2.zero)
 
 		return UDim2.fromOffset(v23.X, v23.Y)
 	end, {
-		v18.Typography.TitleLarge.Font,
-		v18.Typography.TitleLarge.FontSize
-	})
-	local v22 = React.useMemo(function() -- line: 59
-		-- upvalues: Text (copy), v18 (copy)
-		local v24 = Text.GetTextBounds("Roblox Studio", v18.Typography.CaptionMedium.Font, v18.Typography.CaptionMedium.FontSize, Vector2.zero)
-
-		return UDim2.fromOffset(v24.X, v24.Y)
-	end, {
-		v18.Typography.CaptionMedium.Font,
-		v18.Typography.CaptionMedium.FontSize
+		v17.Typography.CaptionMedium.Font,
+		v17.Typography.CaptionMedium.FontSize
 	})
 
 	return React.createElement(Foundation.View, {
 		Name = "ParticipantEntryContainer",
 		tag = {
 			["row align-y-center gap-medium size-full padding-x-medium"] = true,
-			["stroke-thin stroke-muted"] = v16.showDivider
+			["stroke-thin stroke-muted"] = v15.showDivider
 		},
-		onActivated = if not v16.onActivated then nil else v20
+		onActivated = if not v15.onActivated then nil else v19
 	}, {
 		Avatar = React.createElement(Foundation.Avatar, {
-			userId = v17.id,
-			userPresence = v17.presence,
+			LayoutOrder = 1,
+			userId = v16.id,
+			userPresence = v16.presence,
 			size = Foundation.Enums.InputSize.Medium,
-			backgroundStyle = v18.Color.Shift.Shift_300,
-			LayoutOrder = 1
+			backgroundStyle = v17.Color.Shift.Shift_300
 		}),
 		UserInfo = React.createElement(Foundation.View, {
 			tag = "col fill auto-y clip",
 			LayoutOrder = 2
 		}, {
 			UserDataSkeleton = React.createElement(Foundation.Skeleton, {
-				Size = UDim2.new(v21.X, v21.Y + v22.Y),
-				Visible = v17.isLoading,
-				LayoutOrder = 1
-			}),
-			DisplayName = if not FFlagEnableBlackbirdCheck or not v19 then React.createElement(Foundation.Text, {
-				tag = "auto-xy text-title-large text-truncate-end content-emphasis",
-				Text = v17.combinedName,
 				LayoutOrder = 1,
-				Visible = v17.isLoading:map(function(p1) -- line: 118
+				Size = UDim2.new(v20.X, v20.Y + v21.Y),
+				Visible = v16.isLoading
+			}),
+			DisplayName = if not FFlagEnableBlackbirdCheck or not v18 then React.createElement(Foundation.Text, {
+				tag = "auto-xy text-title-large text-truncate-end content-emphasis",
+				LayoutOrder = 1,
+				Text = v16.combinedName,
+				Visible = v16.isLoading:map(function(p1) -- line: 114
 					return not p1
 				end)
 			}) else React.createElement(Foundation.View, {
 				tag = "row align-y-center gap-xxsmall auto-xy",
 				LayoutOrder = 1,
-				Visible = v17.isLoading:map(function(p2) -- line: 98
+				Visible = v16.isLoading:map(function(p2) -- line: 94
 					return not p2
 				end)
 			}, {
 				NameText = React.createElement(Foundation.Text, {
 					tag = "shrink auto-xy text-title-large text-truncate-end content-emphasis",
-					Text = v17.combinedName,
-					LayoutOrder = 1
+					LayoutOrder = 1,
+					Text = v16.combinedName
 				}),
 				SubscriptionBadge = React.createElement(Foundation.Icon, {
 					LayoutOrder = 2,
 					name = Foundation.Enums.IconName.RobloxPlus,
 					size = Foundation.Enums.IconSize.Small,
-					style = v18.Color.Content.Emphasis
+					style = v17.Color.Content.Emphasis
 				})
 			}),
 			PresenceText = React.createElement(Foundation.Text, {
 				tag = "auto-xy text-caption-medium text-truncate-end content-muted",
-				Text = if not FFlagAppChatShowInvitedStatusInParticipantList or not v16.statusText then v17.presenceText else v17.presenceText:map(function(s1: string) -- line: 126
-					-- upvalues: v16 (copy)
-					return s1 .. " . " .. v16.statusText
-				end),
 				LayoutOrder = 3,
-				Visible = v17.isLoading:map(function(p3) -- line: 131
+				Text = if not v15.statusText then v16.presenceText else v16.presenceText:map(function(s1: string) -- line: 122
+					-- upvalues: v15 (copy)
+					return s1 .. " . " .. v15.statusText
+				end),
+				Visible = v16.isLoading:map(function(p3) -- line: 127
 					return not p3
 				end)
 			})
 		}),
-		ChildrenContainer = if not v16.children then nil else React.createElement(Foundation.View, {
+		ChildrenContainer = if not v15.children then nil else React.createElement(Foundation.View, {
 			tag = "row align-x-right align-y-center auto-y",
 			LayoutOrder = 3,
-			selection = if not FFlagEnableAppChatFocusableFixes then nil else {
+			selection = {
 				Selectable = false
 			},
 			stateLayer = {
 				affordance = Foundation.Enums.StateLayerAffordance.None
 			}
-		}, v16.children)
+		}, v15.children)
 	})
-end)
+end
+
+return React.memo(ParticipantEntry)

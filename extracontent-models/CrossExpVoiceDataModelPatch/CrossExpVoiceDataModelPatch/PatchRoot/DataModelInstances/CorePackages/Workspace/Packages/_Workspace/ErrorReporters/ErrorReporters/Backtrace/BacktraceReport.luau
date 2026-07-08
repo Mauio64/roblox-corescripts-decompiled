@@ -1,265 +1,303 @@
-local l_Parent_0 = script:FindFirstAncestor("ErrorReporters").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local v4 = require(script.Parent.Parent.ProcessErrorStack);
-local v5 = require(script.Parent.Flags.GetFFlagBacktraceMainSourcePathEnabled);
-local v6 = v3.strictInterface({
-    guessed_frame = v3.optional(v3.boolean), 
-    funcName = v3.optional(v3.string), 
-    address = v3.optional(v3.string), 
-    line = v3.optional(v3.string), 
-    column = v3.optional(v3.string), 
-    sourceCode = v3.optional(v3.string), 
-    library = v3.optional(v3.string), 
-    debug_identifier = v3.optional(v3.string), 
-    faulted = v3.optional(v3.boolean), 
-    registers = v3.optional(v3.map(v3.string, v3.some(v3.string, v3.number)))
-});
-local v7 = v3.strictInterface({
-    name = v3.optional(v3.string), 
-    fault = v3.optional(v3.boolean), 
-    stack = v3.optional(v3.array(v6))
-});
-local v8 = v3.strictInterface({
-    name = v3.string, 
-    registers = v3.map(v3.string, v3.string)
-});
-local v9 = v3.strictInterface({
-    text = v3.optional(v3.string), 
-    startLine = v3.optional(v3.number), 
-    startColumn = v3.optional(v3.number), 
-    startPos = v3.optional(v3.number), 
-    path = v3.optional(v3.string), 
-    tabWidth = v3.optional(v3.number)
-});
-local v10 = v3.strictInterface({
-    read = v3.boolean, 
-    write = v3.boolean, 
-    exec = v3.boolean
-});
-local v11 = v3.strictInterface({
-    start = v3.string, 
-    size = v3.optional(v3.number), 
-    data = v3.optional(v3.string), 
-    perms = v3.optional(v10)
-});
-local v12 = v3.strictInterface({
-    start = v3.string, 
-    size = v3.number, 
-    code_file = v3.optional(v3.string), 
-    version = v3.optional(v3.string), 
-    debug_file = v3.optional(v3.string), 
-    debug_identifier = v3.optional(v3.string), 
-    debug_file_exists = v3.optional(v3.boolean)
-});
-local v13 = v3.optional(v3.map(v3.string, v3.some(v3.string, v3.number, v3.boolean)));
-local v21 = v3.optional(v3.map(v3.string, function(v14) --[[ Line: 77 ]]
-    -- upvalues: v3 (copy)
-    local function v15(v16) --[[ Line: 78 ]] --[[ Name: checkTypeRecursive ]]
-        -- upvalues: v15 (copy), v3 (ref)
-        if type(v16) == "table" then
-            for v17, v18 in pairs(v16) do
-                local v19, v20 = v15(v18);
-                if not v19 then
-                    return false, string.format("error when checking key: %s - %s", v17, v20);
-                end;
-            end;
-            return true;
-        else
-            return v3.some(v3.string, v3.number, v3.boolean)(v16);
-        end;
-    end;
-    return v15(v14);
-end));
-local v30 = v3.intersection(v3.strictInterface({
-    uuid = v3.string, 
-    timestamp = v3.number, 
-    lang = v3.string, 
-    langVersion = v3.string, 
-    agent = v3.string, 
-    agentVersion = v3.string, 
-    threads = v3.map(v3.string, v7), 
-    mainThread = v3.string, 
-    attributes = v13, 
-    annotations = v21, 
-    symbolication = v3.optional(v3.literal("minidump")), 
-    entryThread = v3.optional(v3.string), 
-    arch = v3.optional(v8), 
-    fingerprint = v3.optional(v3.string), 
-    classifiers = v3.optional(v3.array(v3.string)), 
-    sourceCode = v3.optional(v3.map(v3.string, v9)), 
-    memory = v3.optional(v3.array(v11)), 
-    modules = v3.optional(v3.array(v12))
-}), function(v22) --[[ Line: 122 ]]
-    local v23 = false;
-    local l_threads_0 = v22.threads;
-    for _, v26 in pairs(l_threads_0) do
-        local l_stack_0 = v26.stack;
-        if l_stack_0 ~= nil then
-            for _, v29 in ipairs(l_stack_0) do
-                if v29.registers ~= nil then
-                    v23 = true;
-                    break;
-                end;
-            end;
-        end;
-        if v23 then
-            break;
-        end;
-    end;
-    if v23 and v22.arch == nil then
-        return false, "arch must exist if you want to have registers in the stack";
-    else
-        return true;
-    end;
-end);
-local v31 = {
-    IAttributes = v13, 
-    IAnnotations = v21
-};
-v31.__index = v31;
-local function _(v32) --[[ Line: 155 ]]
-    -- upvalues: v2 (copy)
-    if v32 and type(v32) == "table" then
-        local v33 = v2.Dictionary.keys(v32);
-        if #v33 > 0 then
-            local v34 = v32[v33[1]];
-            if v34 and v34.path ~= nil then
-                return v34.path;
-            end;
-        end;
-    end;
-    return "";
-end;
-v31.validate = function(v36) --[[ Line: 168 ]] --[[ Name: validate ]]
-    -- upvalues: v30 (copy)
-    return v30(v36);
-end;
-v31.new = function() --[[ Line: 173 ]] --[[ Name: new ]]
-    -- upvalues: l_HttpService_0 (copy), v31 (copy)
-    local v37 = {
-        uuid = l_HttpService_0:GenerateGUID(false):lower(), 
-        timestamp = os.time(), 
-        lang = "lua", 
-        langVersion = "Roblox", 
-        agent = "backtrace-Lua", 
-        agentVersion = "0.1.0", 
-        threads = {}, 
-        mainThread = "default"
-    };
-    setmetatable(v37, v31);
-    return v37;
-end;
-v31.addAttributes = function(v38, v39) --[[ Line: 190 ]] --[[ Name: addAttributes ]]
-    -- upvalues: v2 (copy)
-    if type(v39) ~= "table" then
-        warn("Cannot add attributes of type: ", (type(v39)));
-        return;
-    else
-        local v40 = v38.attributes or {};
-        v38.attributes = v2.Dictionary.join(v40, v39);
-        return;
-    end;
-end;
-v31.addAnnotations = function(v41, v42) --[[ Line: 203 ]] --[[ Name: addAnnotations ]]
-    -- upvalues: v2 (copy)
-    if type(v42) ~= "table" then
-        warn("Cannot add annotations of type: ", (type(v42)));
-        return;
-    else
-        local v43 = v41.annotations or {};
-        v41.annotations = v2.Dictionary.join(v43, v42);
-        return;
-    end;
-end;
-v31.addStackToThread = function(v44, v45, v46) --[[ Line: 216 ]] --[[ Name: addStackToThread ]]
-    -- upvalues: v2 (copy)
-    local l_threads_1 = v44.threads;
-    v44.threads = v2.Dictionary.join(l_threads_1, {
-        [v46] = {
-            name = v46, 
-            stack = v45
-        }
-    });
-end;
-v31.addStackToMainThread = function(v48, v49) --[[ Line: 229 ]] --[[ Name: addStackToMainThread ]]
-    v48:addStackToThread(v49, v48.mainThread);
-end;
-v31.fromMessageAndStack = function(v50, v51) --[[ Line: 233 ]] --[[ Name: fromMessageAndStack ]]
-    -- upvalues: v31 (copy), v4 (copy), v5 (copy), v2 (copy)
-    local v52 = false;
-    local v53 = v31.new();
-    v53:addAttributes({
-        ["error.message"] = v50
-    });
-    local v54, v55 = v4(v51);
-    v53:addStackToMainThread(v54);
-    v53.sourceCode = v55;
-    if v5() then
-        local v56 = {};
-        local l_sourceCode_0 = v53.sourceCode;
-        local v58;
-        if l_sourceCode_0 and type(l_sourceCode_0) == "table" then
-            local v59 = v2.Dictionary.keys(l_sourceCode_0);
-            if #v59 > 0 then
-                local v60 = l_sourceCode_0[v59[1]];
-                if v60 and v60.path ~= nil then
-                    v58 = v60.path;
-                    v52 = true;
-                end;
-            end;
-        end;
-        if not v52 then
-            v58 = "";
-        end;
-        v52 = false;
-        v56.MainSourcePath = v58;
-        v53:addAttributes(v56);
-    end;
-    return v53;
-end;
-v31.fromDetails = function(v61) --[[ Line: 253 ]] --[[ Name: fromDetails ]]
-    -- upvalues: v31 (copy), v4 (copy), v2 (copy), v5 (copy)
-    local v62 = false;
-    local v63 = v31.new();
-    v63:addAttributes({
-        ["error.message"] = v61.message
-    });
-    v63.sourceCode = {};
-    local v64 = 0;
-    for v65, v66 in ipairs(v61.stacks) do
-        local v67, v68, v69 = v4(v66, v64);
-        if v65 == 1 then
-            v63:addStackToMainThread(v67);
-        else
-            v63:addStackToThread(v67, "stack" .. v65);
-        end;
-        v63.sourceCode = v2.Dictionary.join(v63.sourceCode, v68);
-        v64 = v69;
-    end;
-    v63:addAnnotations(v61.annotations);
-    if v5() then
-        local v70 = {};
-        local l_sourceCode_1 = v63.sourceCode;
-        local v72;
-        if l_sourceCode_1 and type(l_sourceCode_1) == "table" then
-            local v73 = v2.Dictionary.keys(l_sourceCode_1);
-            if #v73 > 0 then
-                local v74 = l_sourceCode_1[v73[1]];
-                if v74 and v74.path ~= nil then
-                    v72 = v74.path;
-                    v62 = true;
-                end;
-            end;
-        end;
-        if not v62 then
-            v72 = "";
-        end;
-        v62 = false;
-        v70.MainSourcePath = v72;
-        v63:addAttributes(v70);
-    end;
-    return v63;
-end;
-return v31;
+local Parent = script:FindFirstAncestor("ErrorReporters").Parent
+local HttpService = game:GetService("HttpService")
+local Cryo = require(Parent.Cryo)
+local t = require(Parent.t)
+local ProcessErrorStack = require(script.Parent.Parent.ProcessErrorStack)
+local v6 = t.strictInterface({
+	guessed_frame = t.optional(t.boolean),
+	funcName = t.optional(t.string),
+	address = t.optional(t.string),
+	line = t.optional(t.string),
+	column = t.optional(t.string),
+	sourceCode = t.optional(t.string),
+	library = t.optional(t.string),
+	debug_identifier = t.optional(t.string),
+	faulted = t.optional(t.boolean),
+	registers = t.optional(t.map(t.string, t.some(t.string, t.number)))
+})
+local v7 = t.strictInterface({
+	name = t.optional(t.string),
+	fault = t.optional(t.boolean),
+	stack = t.optional(t.array(v6))
+})
+local v8 = t.strictInterface({
+	name = t.string,
+	registers = t.map(t.string, t.string)
+})
+local v9 = t.strictInterface({
+	text = t.optional(t.string),
+	startLine = t.optional(t.number),
+	startColumn = t.optional(t.number),
+	startPos = t.optional(t.number),
+	path = t.optional(t.string),
+	tabWidth = t.optional(t.number)
+})
+local v10 = t.strictInterface({
+	read = t.boolean,
+	write = t.boolean,
+	exec = t.boolean
+})
+local v11 = t.strictInterface({
+	start = t.string,
+	size = t.optional(t.number),
+	data = t.optional(t.string),
+	perms = t.optional(v10)
+})
+local v12 = t.strictInterface({
+	start = t.string,
+	size = t.number,
+	code_file = t.optional(t.string),
+	version = t.optional(t.string),
+	debug_file = t.optional(t.string),
+	debug_identifier = t.optional(t.string),
+	debug_file_exists = t.optional(t.boolean)
+})
+local v13 = t.optional(t.map(t.string, t.some(t.string, t.number, t.boolean)))
+local v14 = t.optional(t.map(t.string, function(p1) -- line: 76
+	-- upvalues: t (copy)
+	local function checkTypeRecursive(p2) -- line: 77
+		-- upvalues: checkTypeRecursive (copy), t (copy)
+		if type(p2) == "table" then
+			for k, v in pairs(p2) do
+				local v71, v72 = checkTypeRecursive(v)
+
+				if not v71 then
+					return false, string.format("error when checking key: %s - %s", k, v72)
+				end
+			end
+
+			return true
+		end
+
+		return t.some(t.string, t.number, t.boolean)(p2)
+	end
+
+	return checkTypeRecursive(p1)
+end))
+local v15 = t.intersection(t.strictInterface({
+	uuid = t.string,
+	timestamp = t.number,
+	lang = t.string,
+	langVersion = t.string,
+	agent = t.string,
+	agentVersion = t.string,
+	threads = t.map(t.string, v7),
+	mainThread = t.string,
+	attributes = v13,
+	annotations = v14,
+	symbolication = t.optional(t.literal("minidump")),
+	entryThread = t.optional(t.string),
+	arch = t.optional(v8),
+	fingerprint = t.optional(t.string),
+	classifiers = t.optional(t.array(t.string)),
+	sourceCode = t.optional(t.map(t.string, v9)),
+	memory = t.optional(t.array(v11)),
+	modules = t.optional(t.array(v12))
+}), function(p3) -- line: 121
+	local v20 = false
+	local threads = p3.threads
+
+	for _, v in pairs(threads) do
+		local stack = v.stack
+
+		if stack ~= nil then
+			for _, v2 in ipairs(stack) do
+				if v2.registers ~= nil then
+					v20 = true
+
+					break
+				end
+			end
+		end
+
+		if v20 then
+			break
+		end
+	end
+
+	if v20 and p3.arch == nil then
+		return false, "arch must exist if you want to have registers in the stack"
+	end
+
+	return true
+end)
+local t1 = {
+	IAttributes = v13,
+	IAnnotations = v14
+}
+
+t1.__index = t1
+
+function t1.validate(p4) -- line: 167
+	-- upvalues: v15 (copy)
+	return v15(p4)
+end
+function t1.new() -- line: 172
+	-- upvalues: HttpService (copy), t1 (copy)
+	local t2 = {
+		lang = "lua",
+		langVersion = "Roblox",
+		agent = "backtrace-Lua",
+		agentVersion = "0.1.0",
+		mainThread = "default",
+		uuid = HttpService:GenerateGUID(false):lower(),
+		timestamp = os.time(),
+		threads = {}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.addAttributes(p5, p6) -- line: 189
+	-- upvalues: Cryo (copy)
+	if type(p6) ~= "table" then
+		warn("Cannot add attributes of type: ", (type(p6)))
+
+		return
+	end
+
+	local v34 = p5.attributes or {}
+
+	p5.attributes = Cryo.Dictionary.join(v34, p6)
+end
+function t1.addAnnotations(p7, p8) -- line: 202
+	-- upvalues: Cryo (copy)
+	if type(p8) ~= "table" then
+		warn("Cannot add annotations of type: ", (type(p8)))
+
+		return
+	end
+
+	local v37 = p7.annotations or {}
+
+	p7.annotations = Cryo.Dictionary.join(v37, p8)
+end
+function t1.addStackToThread(p9, p10, p11) -- line: 215
+	-- upvalues: Cryo (copy)
+	local threads = p9.threads
+
+	p9.threads = Cryo.Dictionary.join(threads, {
+		[p11] = {
+			name = p11,
+			stack = p10
+		}
+	})
+end
+function t1.addStackToMainThread(p12, p13) -- line: 228
+	p12:addStackToThread(p13, p12.mainThread)
+end
+function t1.fromMessageAndStack(p14, p15) -- line: 232
+	-- upvalues: t1 (copy), ProcessErrorStack (copy), Cryo (copy)
+	local v46 = t1.new()
+
+	v46:addAttributes({
+		["error.message"] = p14
+	})
+
+	local v47, v48 = ProcessErrorStack(p15)
+
+	v46:addStackToMainThread(v47)
+	v46.sourceCode = v48
+
+	local t3 = {}
+	local sourceCode = v46.sourceCode
+	local g51 = nil
+	local v52 = nil
+	local v53 = nil
+	local path = nil
+
+	repeat
+		if g51 or sourceCode and type(sourceCode) == "table" then
+			if not g51 then
+				v52 = Cryo.Dictionary.keys(sourceCode)
+			end
+
+			if g51 or #v52 > 0 then
+				if not g51 then
+					v53 = sourceCode[v52[1]]
+				end
+
+				if g51 or v53 and v53.path ~= nil then
+					if not g51 then
+						path = v53.path
+					end
+
+					g51 = false
+					t3.MainSourcePath = path
+					v46:addAttributes(t3)
+
+					return v46
+				end
+			end
+		end
+
+		path = ""
+		g51 = true
+	until not g51
+end
+function t1.fromDetails(p16) -- line: 250
+	-- upvalues: t1 (copy), ProcessErrorStack (copy), Cryo (copy)
+	local v56 = t1.new()
+
+	v56:addAttributes({
+		["error.message"] = p16.message
+	})
+	v56.sourceCode = {}
+
+	local n1 = 0
+	local g64 = nil
+	local v65 = nil
+	local v66 = nil
+	local path = nil
+
+	for i, v in ipairs(p16.stacks) do
+		local v60, v61
+
+		v60, v61, n1 = ProcessErrorStack(v, n1)
+
+		if i == 1 then
+			v56:addStackToMainThread(v60)
+		else
+			v56:addStackToThread(v60, "stack" .. i)
+		end
+
+		v56.sourceCode = Cryo.Dictionary.join(v56.sourceCode, v61)
+	end
+
+	v56:addAnnotations(p16.annotations)
+
+	local t4 = {}
+	local sourceCode = v56.sourceCode
+
+	repeat
+		if g64 or sourceCode and type(sourceCode) == "table" then
+			if not g64 then
+				v65 = Cryo.Dictionary.keys(sourceCode)
+			end
+
+			if g64 or #v65 > 0 then
+				if not g64 then
+					v66 = sourceCode[v65[1]]
+				end
+
+				if g64 or v66 and v66.path ~= nil then
+					if not g64 then
+						path = v66.path
+					end
+
+					g64 = false
+					t4.MainSourcePath = path
+					v56:addAttributes(t4)
+
+					return v56
+				end
+			end
+		end
+
+		path = ""
+		g64 = true
+	until not g64
+end
+
+return t1

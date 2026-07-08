@@ -1,42 +1,33 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local l_DiscoveryEventErrorLogger_0 = require(l_Parent_0.DiscoveryUtils).DiscoveryEventErrorLogger;
-local l_EnumIgrsRating_0 = require(l_Parent_0.DiscoveryTypes).EnumIgrsRating;
-local v3 = require(l_Parent_0.SharedFlags);
-local v4 = game:DefineFastFlag("LuaAppCompressIgrsImages", false);
-local l_FFlagLuaAppAllowNoIgrsImage_0 = v3.FFlagLuaAppAllowNoIgrsImage;
-local l_FFlagLuaAppAddUnratedIgrsImage_0 = v3.FFlagLuaAppAddUnratedIgrsImage;
-local l_FFlagLuaAppAddIgrsImages_0 = v3.FFlagLuaAppAddIgrsImages;
-local v8 = {
-    [l_EnumIgrsRating_0.IgrsThirteenPlus] = v4 and "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-13.png" or "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs13.png", 
-    [l_EnumIgrsRating_0.IgrsFifteenPlus] = v4 and "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-15.png" or "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs15.png", 
-    [l_EnumIgrsRating_0.IgrsEighteenPlus] = v4 and "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-18.png" or "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs18.png"
-};
-if l_FFlagLuaAppAddUnratedIgrsImage_0 and l_EnumIgrsRating_0.IgrsUnrated then
-    v8[l_EnumIgrsRating_0.IgrsUnrated] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-pending.png";
-end;
-if l_FFlagLuaAppAddIgrsImages_0 then
-    if l_EnumIgrsRating_0.IgrsThreePlus then
-        v8[l_EnumIgrsRating_0.IgrsThreePlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-3.png";
-    end;
-    if l_EnumIgrsRating_0.IgrsSevenPlus then
-        v8[l_EnumIgrsRating_0.IgrsSevenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-7.png";
-    end;
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
+local EnumIgrsRating = require(Parent.DiscoveryTypes).EnumIgrsRating
+local FFlagLuaAppAddIgrsImages = require(Parent.SharedFlags).FFlagLuaAppAddIgrsImages
+local t1 = {
+	[EnumIgrsRating.IgrsThirteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-13.png",
+	[EnumIgrsRating.IgrsFifteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-15.png",
+	[EnumIgrsRating.IgrsEighteenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-18.png",
+	[EnumIgrsRating.IgrsUnrated] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-pending.png"
+}
+
+if FFlagLuaAppAddIgrsImages then
+	if EnumIgrsRating.IgrsThreePlus then
+		t1[EnumIgrsRating.IgrsThreePlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-3.png"
+	end
+
+	if EnumIgrsRating.IgrsSevenPlus then
+		t1[EnumIgrsRating.IgrsSevenPlus] = "rbxasset://textures/ui/LuaApp/icons/GameDetails/contentRating/igrs-7.png"
+	end
+end
+
 return {
-    getIgrsImage = function(v9) --[[ Line: 44 ]] --[[ Name: getIgrsImage ]]
-        -- upvalues: v8 (copy), l_FFlagLuaAppAllowNoIgrsImage_0 (copy), l_FFlagLuaAppAddUnratedIgrsImage_0 (copy), l_EnumIgrsRating_0 (copy), l_DiscoveryEventErrorLogger_0 (copy)
-        if not v8[v9] then
-            if l_FFlagLuaAppAllowNoIgrsImage_0 then
-                if l_FFlagLuaAppAddUnratedIgrsImage_0 or v9 ~= l_EnumIgrsRating_0.IgrsUnrated then
-                    l_DiscoveryEventErrorLogger_0.reportError("getIgrsImage", (("Invalid IGRS rating: %*"):format(v9)));
-                end;
-                return nil;
-            else
-                l_DiscoveryEventErrorLogger_0.reportError("getIgrsImage", (("Invalid IGRS rating: %*"):format(v9)));
-                return v8[l_EnumIgrsRating_0.IgrsThirteenPlus];
-            end;
-        else
-            return v8[v9];
-        end;
-    end
-};
+	getIgrsImage = function(p1) -- line: 31
+		-- upvalues: t1 (copy), DiscoveryEventErrorLogger (copy)
+		if not t1[p1] then
+			DiscoveryEventErrorLogger.reportError("getIgrsImage", `Invalid IGRS rating: { p1 }`)
+
+			return nil
+		end
+
+		return t1[p1]
+	end
+}

@@ -1,37 +1,45 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Cryo_0 = require(l_CorePackages_0.Packages.InGameMenuDependencies).Cryo;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Components.Pages);
-local v4 = require(l_Parent_0.Actions.NavigateBack);
-local v5 = require(l_Parent_0.Actions.SetCurrentPage);
-return function(v6, v7) --[[ Line: 12 ]]
-    -- upvalues: v3 (copy), v4 (copy), l_Cryo_0 (copy), v5 (copy)
-    local v8 = v3.pagesByKey[v6.menuPage];
-    if v7.type == v4.name then
-        if v6.respawn.dialogOpen then
-            return l_Cryo_0.Dictionary.join(v6, {
-                respawn = l_Cryo_0.Dictionary.join(v6.respawn, {
-                    dialogOpen = false
-                })
-            });
-        elseif v6.report.dialogOpen then
-            return l_Cryo_0.Dictionary.join(v6, {
-                report = l_Cryo_0.Dictionary.join(v6.report, {
-                    dialogOpen = false
-                })
-            });
-        elseif v6.menuPage then
-            local l_parentPage_0 = v8.parentPage;
-            if l_parentPage_0 ~= nil then
-                return l_Cryo_0.Dictionary.join(v6, {
-                    menuPage = l_parentPage_0
-                });
-            end;
-        end;
-    elseif v7.type == v5.name then
-        return l_Cryo_0.Dictionary.join(v6, {
-            currentlyOpenBubble = l_Cryo_0.None
-        });
-    end;
-    return v6;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.InGameMenuDependencies).Cryo
+local ParentParent = script.Parent.Parent
+local Pages = require(ParentParent.Components.Pages)
+local NavigateBack = require(ParentParent.Actions.NavigateBack)
+local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
+
+return function(p1, p2) -- line: 12
+	-- upvalues: Pages (copy), NavigateBack (copy), Cryo (copy), SetCurrentPage (copy)
+	local v9 = Pages.pagesByKey[p1.menuPage]
+
+	if p2.type == NavigateBack.name then
+		if p1.respawn.dialogOpen then
+			return Cryo.Dictionary.join(p1, {
+				respawn = Cryo.Dictionary.join(p1.respawn, {
+					dialogOpen = false
+				})
+			})
+		end
+
+		if p1.report.dialogOpen then
+			return Cryo.Dictionary.join(p1, {
+				report = Cryo.Dictionary.join(p1.report, {
+					dialogOpen = false
+				})
+			})
+		end
+
+		if p1.menuPage then
+			local parentPage = v9.parentPage
+
+			if parentPage ~= nil then
+				return Cryo.Dictionary.join(p1, {
+					menuPage = parentPage
+				})
+			end
+		end
+	elseif p2.type == SetCurrentPage.name then
+		return Cryo.Dictionary.join(p1, {
+			currentlyOpenBubble = Cryo.None
+		})
+	end
+
+	return p1
+end

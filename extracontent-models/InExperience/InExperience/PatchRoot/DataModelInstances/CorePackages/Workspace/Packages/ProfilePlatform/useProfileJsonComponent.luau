@@ -1,2 +1,3 @@
-local l__Workspace_0 = script.Parent.Parent._Workspace;
-return require(l__Workspace_0.ProfilePlatform.ProfilePlatform.Hooks.useProfileJsonComponent);
+local _Workspace = script.Parent.Parent._Workspace
+
+return require(_Workspace.ProfilePlatform.ProfilePlatform.Hooks.useProfileJsonComponent)

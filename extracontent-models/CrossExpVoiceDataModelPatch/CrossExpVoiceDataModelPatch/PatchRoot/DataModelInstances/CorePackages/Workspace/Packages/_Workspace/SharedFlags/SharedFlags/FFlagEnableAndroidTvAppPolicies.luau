@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAndroidTvAppPolicies", false);
+return game:DefineFastFlag("EnableAndroidTvAppPolicies", false)

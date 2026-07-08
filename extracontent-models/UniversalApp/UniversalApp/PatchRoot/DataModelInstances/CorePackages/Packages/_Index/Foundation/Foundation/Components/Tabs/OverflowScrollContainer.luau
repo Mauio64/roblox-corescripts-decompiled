@@ -44,25 +44,24 @@ local function OverflowButton(p1) -- line: 35
 		})
 	})
 end
-
-return function(p2) --[[ OverflowScrollContainer ]] -- line: 72
+local function OverflowScrollContainer(p2) -- line: 72
 	-- upvalues: React (copy), Flags (copy), ReactOtter (copy), Dash (copy), Otter (copy), ControlState (copy), View (copy), withCommonProps (copy), ScrollView (copy), StateLayerAffordance (copy), Visibility (copy), OverflowButton (copy), numberSequence (copy), numberSequence2 (copy)
-	local v21, v22 = React.useBinding(false)
-	local v23, v24 = React.useBinding(false)
-	local u25 = nil
+	local v22, v23 = React.useBinding(false)
+	local v24, v25 = React.useBinding(false)
 	local u26 = nil
+	local u27 = nil
 
 	if Flags.FoundationTabsNavArrowsOnlyOnHover then
-		local v27, v28 = React.useState(false)
+		local v28, v29 = React.useState(false)
 
-		u25 = v27
 		u26 = v28
+		u27 = v29
 	end
 
-	local v29 = React.useRef(nil)
-	local v30 = ReactOtter.useMotor(0, function(p3) -- line: 80
-		-- upvalues: v29 (copy)
-		local current = v29.current
+	local v30 = React.useRef(nil)
+	local v31 = ReactOtter.useMotor(0, function(p3) -- line: 80
+		-- upvalues: v30 (copy)
+		local current = v30.current
 
 		if not current then
 			return
@@ -70,66 +69,70 @@ return function(p2) --[[ OverflowScrollContainer ]] -- line: 72
 
 		current.CanvasPosition = Vector2.new(p3, 0)
 	end)
-	local v31 = React.useCallback(Dash.throttle(function(p4) -- line: 89
-		-- upvalues: v22 (copy), v24 (copy)
+	local v32 = React.useCallback(Dash.throttle(function(p4) -- line: 89
+		-- upvalues: v23 (copy), v25 (copy)
 		if p4.AbsoluteWindowSize.X == 0 then
 			return
 		end
 
-		v22(p4.AbsoluteWindowSize.X + p4.CanvasPosition.X < p4.AbsoluteCanvasSize.X - 1)
-		v24(p4.CanvasPosition.X ~= 0)
+		v23(p4.AbsoluteWindowSize.X + p4.CanvasPosition.X < p4.AbsoluteCanvasSize.X - 1)
+		v25(p4.CanvasPosition.X ~= 0)
 	end, 0.2), {})
-	local v32 = React.useCallback(function(n1: number) -- line: 102
-		-- upvalues: v29 (copy), v30 (copy), Otter (copy)
-		local current = v29.current
+	local v33 = React.useCallback(function(n1: number) -- line: 102
+		-- upvalues: v30 (copy), v31 (copy), Otter (copy)
+		local current = v30.current
 
 		if not current then
 			return
 		end
 
-		v30(Otter.ease(current.CanvasPosition.X + n1, {
+		v31(Otter.ease(current.CanvasPosition.X + n1, {
 			duration = 0.2,
 			easingStyle = Enum.EasingStyle.Quad
 		}))
 	end, {})
 
 	React.useEffect(function() -- line: 116
-		-- upvalues: v29 (copy), v31 (copy)
-		if v29.current then
-			v31(v29.current)
+		-- upvalues: v30 (copy), v32 (copy)
+		if v30.current then
+			v32(v30.current)
 		end
 	end, {})
 
-	local v33 = React.useCallback(function() -- line: 122
-		-- upvalues: v32 (copy)
-		v32(-90)
-	end, { v32 })
-	local v34 = React.useCallback(function() -- line: 126
-		-- upvalues: v32 (copy)
-		v32(90)
-	end, { v32 })
-	local v35 = if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else React.useCallback(function(p5) -- line: 131
-		-- upvalues: u26 (ref), ControlState (copy)
-		u26(p5 == ControlState.Hover)
+	local v34 = React.useCallback(function() -- line: 122
+		-- upvalues: v33 (copy)
+		v33(-90)
+	end, { v33 })
+	local v35 = React.useCallback(function() -- line: 126
+		-- upvalues: v33 (copy)
+		v33(90)
+	end, { v33 })
+	local v36 = if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else React.useCallback(function(p5) -- line: 131
+		-- upvalues: u27 (ref), ControlState (copy)
+		u27(p5 == ControlState.Hover)
 	end, {})
 
-	return React.createElement(View, withCommonProps(p2, {
+	return React.createElement(View, withCommonProps(p2, if not Flags.FoundationTabsInlineSizeFull then {
 		tag = "size-full-0 auto-y"
+	} else {
+		tag = "auto-y",
+		Size = UDim2.fromScale(1, 0)
 	}), {
 		Scroll = React.createElement(ScrollView, {
 			LayoutOrder = 1,
-			tag = {
+			tag = if not Flags.FoundationTabsInlineSizeFull then {
 				["size-full-0 auto-y"] = Flags.FoundationTabsNavArrowsOnlyOnHover,
 				["size-full"] = not Flags.FoundationTabsNavArrowsOnlyOnHover
-			},
-			onStateChanged = if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else v35,
+			} else if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else "auto-y",
+			Size = if not Flags.FoundationTabsInlineSizeFull then nil else if not Flags.FoundationTabsNavArrowsOnlyOnHover then UDim2.fromScale(1, 1) else UDim2.fromScale(1, 0),
+			onStateChanged = if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else v36,
 			stateLayer = if not Flags.FoundationTabsNavArrowsOnlyOnHover then nil else {
 				affordance = StateLayerAffordance.None
 			},
-			onCanvasPositionChanged = v31,
-			onAbsoluteWindowSizeChanged = v31,
-			scrollingFrameRef = v29,
-			selection = if not Flags.FoundationTabsDisableScrollSelection then nil else {
+			onCanvasPositionChanged = v32,
+			onAbsoluteWindowSizeChanged = v32,
+			scrollingFrameRef = v30,
+			selection = {
 				Selectable = false
 			},
 			scroll = {
@@ -142,34 +145,36 @@ return function(p2) --[[ OverflowScrollContainer ]] -- line: 72
 		}, p2.children),
 		OverflowStart = React.createElement(OverflowButton, {
 			LayoutOrder = 3,
-			Position = UDim2.fromScale(0, 0),
-			size = p2.size,
 			isStart = true,
 			ZIndex = 2,
-			Visible = if not Flags.FoundationTabsNavArrowsOnlyOnHover then v23 else v23:map(function(p6) -- line: 172
-				-- upvalues: u25 (ref)
-				return u25 and p6
-			end),
-			onActivated = v33,
-			gradient = numberSequence,
 			tag = "padding-right-small",
 			icon = "chevron-large-left",
+			Position = UDim2.fromScale(0, 0),
+			size = p2.size,
+			Visible = if not Flags.FoundationTabsNavArrowsOnlyOnHover then v24 else v24:map(function(p6) -- line: 185
+				-- upvalues: u26 (ref)
+				return u26 and p6
+			end),
+			onActivated = v34,
+			gradient = numberSequence,
 			testId = `{ p2.testId }--overflow-start`
 		}),
 		OverflowEnd = React.createElement(OverflowButton, {
 			LayoutOrder = 4,
-			Position = UDim2.fromScale(1, 0),
-			size = p2.size,
 			ZIndex = 2,
-			Visible = if not Flags.FoundationTabsNavArrowsOnlyOnHover then v21 else v21:map(function(p7) -- line: 188
-				-- upvalues: u25 (ref)
-				return u25 and p7
-			end),
-			onActivated = v34,
-			gradient = numberSequence2,
 			tag = "anchor-top-right padding-left-small",
 			icon = "chevron-large-right",
+			Position = UDim2.fromScale(1, 0),
+			size = p2.size,
+			Visible = if not Flags.FoundationTabsNavArrowsOnlyOnHover then v22 else v22:map(function(p7) -- line: 201
+				-- upvalues: u26 (ref)
+				return u26 and p7
+			end),
+			onActivated = v35,
+			gradient = numberSequence2,
 			testId = `{ p2.testId }--overflow-end`
 		})
 	})
 end
+
+return OverflowScrollContainer

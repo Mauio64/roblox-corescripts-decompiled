@@ -1,7 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(l_CorePackages_0.Workspace.Packages.TnSAvatarIdentification);
-local _ = require(l_CorePackages_0.Workspace.Packages.TnSAdIdentification);
-local _ = require(l_CorePackages_0.Workspace.Packages.ExpChat);
-local _ = require(l_script_FirstAncestor_0.ReportAnything.Utility.ReportAnythingAnalytics);
-return {};
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+
+require(CorePackages.Workspace.Packages.TnSAvatarIdentification)
+require(CorePackages.Workspace.Packages.TnSAdIdentification)
+require(CorePackages.Workspace.Packages.ExpChat)
+require(AbuseReportMenu.ReportAnything.Utility.ReportAnythingAnalytics)
+
+return {}

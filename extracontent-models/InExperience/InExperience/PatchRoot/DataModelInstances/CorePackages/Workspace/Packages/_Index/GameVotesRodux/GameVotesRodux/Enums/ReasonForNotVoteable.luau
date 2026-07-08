@@ -1,5 +1,5 @@
 return {
-    PlayGame = "PlayGame", 
-    FloodCheckThresholdMet = "FloodCheckThresholdMet", 
-    AssetNotVoteable = "AssetNotVoteable"
-};
+	PlayGame = "PlayGame",
+	FloodCheckThresholdMet = "FloodCheckThresholdMet",
+	AssetNotVoteable = "AssetNotVoteable"
+}

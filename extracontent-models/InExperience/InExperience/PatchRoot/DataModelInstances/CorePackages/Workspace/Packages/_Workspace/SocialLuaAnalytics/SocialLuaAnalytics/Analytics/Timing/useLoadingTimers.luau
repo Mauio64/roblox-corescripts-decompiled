@@ -1,8 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialLuaAnalytics").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.Timers);
-local _ = require(script.Parent.SimpleTimer);
-return function(v4) --[[ Line: 9 ]] --[[ Name: useLoadingTimers ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.useRef(v2(v4)).current;
-end;
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+local React = require(Parent.React)
+local Timers = require(script.Parent.Timers)
+
+require(script.Parent.SimpleTimer)
+
+local function useLoadingTimers(p1) -- line: 9
+	-- upvalues: React (copy), Timers (copy)
+	return React.useRef(Timers(p1)).current
+end
+
+return useLoadingTimers

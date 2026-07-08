@@ -1,80 +1,97 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v3 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
-local v4 = require(l_Parent_0.util.getAllInstancesIsA);
-local v5 = require(l_Parent_0.util.Vector3Utils);
-local v6 = require(l_Parent_0.util.valueToString);
-local v7 = require(l_Parent_0.util.CFrameUtils);
-local v8 = require(l_Parent_0.util.getDiffBetweenOrientations);
-local v9 = {
-    categories = {
-        v2.UploadCategory.TORSO_AND_LIMBS, 
-        v2.UploadCategory.DYNAMIC_HEAD
-    }, 
-    requiredData = {
-        v2.SharedDataMember.rootInstance, 
-        v2.SharedDataMember.renderMeshesData
-    }, 
-    fflag = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidateTPoseAdjustment)
-};
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local v11 = game:DefineFastInt("UGCValidationTposeShoulderDegreeOffsetThreshold", 30);
-local v12 = game:DefineFastInt("UGCValidationTposeElbowDegreeOffsetThreshold", 30);
-local v13 = game:DefineFastInt("UGCValidationTposeWristDegreeOffsetThreshold", 30);
-local v14 = game:DefineFastInt("UGCValidationTposeClavicleDegreeOffsetThreshold", 30);
-local v15 = game:DefineFastInt("UGCValidationTposeFingerDegreeOffsetThreshold", 30);
-local v16 = game:DefineFastInt("UGCValidationTposeGeneralDegreeOffsetThreshold", 30);
-local v17 = game:DefineFastInt("UGCValidationTposePositionOffsetPercentThreshold", 40) / 100;
-local v18 = {
-    [Enum.RigLabel.LeftShoulder] = v11, 
-    [Enum.RigLabel.RightShoulder] = v11, 
-    [Enum.RigLabel.LeftElbow] = v12, 
-    [Enum.RigLabel.RightElbow] = v12, 
-    [Enum.RigLabel.LeftWrist] = v13, 
-    [Enum.RigLabel.RightWrist] = v13, 
-    [Enum.RigLabel.LeftClavicle] = v14, 
-    [Enum.RigLabel.RightClavicle] = v14
-};
-local function v26(v19, v20, v21, v22, v23, v24) --[[ Line: 42 ]] --[[ Name: checkJointTposeAdjustment ]]
-    -- upvalues: l_UGCValidationService_0 (copy), v8 (copy), v3 (copy), v7 (copy), v5 (copy), v6 (copy)
-    local l_l_UGCValidationService_0_ExpectedTposeRotation_0 = l_UGCValidationService_0:GetExpectedTposeRotation(v20, v22);
-    if v24 < v8(v21.Rotation, l_l_UGCValidationService_0_ExpectedTposeRotation_0) then
-        v19:fail(v3.Keys.HrdTposeRotation, {
-            jointName = v20.Name, 
-            degLimit = v24, 
-            expectedOrientation = v7.getRotationString(l_l_UGCValidationService_0_ExpectedTposeRotation_0)
-        });
-    end;
-    if not v5.isInRange(v21.Position, v23 * -1, v23) then
-        v19:fail(v3.Keys.HrdTposePosition, {
-            jointName = v20.Name, 
-            offsetLimit = v6(v23)
-        });
-    end;
-end;
-v9.run = function(v27, v28) --[[ Line: 69 ]]
-    -- upvalues: v4 (copy), v17 (copy), v26 (copy), v18 (copy), v16 (copy), v15 (copy)
-    local l_rootInstance_0 = v28.rootInstance;
-    for _, v31 in v4(l_rootInstance_0, "MeshPart") do
-        local l_HumanoidRigDescription_0 = v31:FindFirstChildWhichIsA("HumanoidRigDescription");
-        if l_HumanoidRigDescription_0 ~= nil then
-            local v33 = v28.renderMeshesData[v31.Name];
-            local v34 = v33.originalSize * v33.scale * v17;
-            for _, v36 in (l_HumanoidRigDescription_0:GetContainedJointLabels(v31.Name)) do
-                if l_HumanoidRigDescription_0:GetJoint(v36) then
-                    v26(v27, v36, l_HumanoidRigDescription_0:GetTposeAdjustment(v36), l_rootInstance_0, v34, v18[v36] or v16);
-                end;
-            end;
-            local l_DigitsRigDescription_0 = v31:FindFirstChildWhichIsA("DigitsRigDescription");
-            if l_DigitsRigDescription_0 ~= nil then
-                for _, v39 in l_DigitsRigDescription_0:GetJointLabels() do
-                    if l_DigitsRigDescription_0:GetJoint(v39) then
-                        v26(v27, v39, l_DigitsRigDescription_0:GetTposeAdjustment(v39), l_rootInstance_0, v34, v18[v39] or v15);
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
+local getAllInstancesIsA = require(ParentParent.util.getAllInstancesIsA)
+local Vector3Utils = require(ParentParent.util.Vector3Utils)
+local valueToString = require(ParentParent.util.valueToString)
+local CFrameUtils = require(ParentParent.util.CFrameUtils)
+local getDiffBetweenOrientations = require(ParentParent.util.getDiffBetweenOrientations)
+local t1 = {
+	categories = {
+		ValidationEnums.UploadCategory.TORSO_AND_LIMBS,
+		ValidationEnums.UploadCategory.DYNAMIC_HEAD
+	},
+	requiredData = {
+		ValidationEnums.SharedDataMember.rootInstance,
+		ValidationEnums.SharedDataMember.renderMeshesData
+	},
+	fflag = require(ParentParent.flags.getEngineFeatureEngineUGCValidateTPoseAdjustment)
+}
+local UGCValidationService = game:GetService("UGCValidationService")
+local v12 = game:DefineFastInt("UGCValidationTposeShoulderDegreeOffsetThreshold", 30)
+local v13 = game:DefineFastInt("UGCValidationTposeElbowDegreeOffsetThreshold", 30)
+local v14 = game:DefineFastInt("UGCValidationTposeWristDegreeOffsetThreshold", 30)
+local v15 = game:DefineFastInt("UGCValidationTposeClavicleDegreeOffsetThreshold", 30)
+local v16 = game:DefineFastInt("UGCValidationTposeFingerDegreeOffsetThreshold", 30)
+local v17 = game:DefineFastInt("UGCValidationTposeGeneralDegreeOffsetThreshold", 30)
+local v18 = game:DefineFastInt("UGCValidationTposePositionOffsetPercentThreshold", 40) / 100
+local t2 = {
+	[Enum.RigLabel.LeftShoulder] = v12,
+	[Enum.RigLabel.RightShoulder] = v12,
+	[Enum.RigLabel.LeftElbow] = v13,
+	[Enum.RigLabel.RightElbow] = v13,
+	[Enum.RigLabel.LeftWrist] = v14,
+	[Enum.RigLabel.RightWrist] = v14,
+	[Enum.RigLabel.LeftClavicle] = v15,
+	[Enum.RigLabel.RightClavicle] = v15
+}
+
+local function checkJointTposeAdjustment(p1, p2, cFrame: CFrame, p3, vector3: Vector3, n1: number) -- line: 44
+	-- upvalues: UGCValidationService (copy), getDiffBetweenOrientations (copy), ErrorSourceStrings (copy), CFrameUtils (copy), Vector3Utils (copy), valueToString (copy)
+	local ExpectedTposeRotation = UGCValidationService:GetExpectedTposeRotation(p2, p3)
+
+	if n1 < getDiffBetweenOrientations(cFrame.Rotation, ExpectedTposeRotation) then
+		p1:fail(ErrorSourceStrings.Keys.HrdTposeRotation, {
+			jointName = p2.Name,
+			degLimit = n1,
+			expectedOrientation = CFrameUtils.getRotationString(ExpectedTposeRotation)
+		})
+	end
+
+	if not Vector3Utils.isInRange(cFrame.Position, vector3 * -1, vector3) then
+		p1:fail(ErrorSourceStrings.Keys.HrdTposePosition, {
+			jointName = p2.Name,
+			offsetLimit = valueToString(vector3)
+		})
+	end
+end
+
+function t1.run(p4, p5) -- line: 71
+	-- upvalues: getAllInstancesIsA (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy), v18 (copy), checkJointTposeAdjustment (copy), t2 (copy), v17 (copy), v16 (copy)
+	local rootInstance = p5.rootInstance
+
+	for _, v32 in getAllInstancesIsA(rootInstance, "MeshPart") do
+		local HumanoidRigDescription = v32:FindFirstChildWhichIsA("HumanoidRigDescription")
+
+		if HumanoidRigDescription ~= nil then
+			if getEngineFeatureEngineUGCValidationExpandReturnSchema() then
+				p4:setReportingInstance(v32)
+			end
+
+			local v34 = p5.renderMeshesData[v32.Name]
+			local v35 = v34.originalSize * v34.scale * v18
+
+			for _, v37 in (HumanoidRigDescription:GetContainedJointLabels(v32.Name)) do
+				if HumanoidRigDescription:GetJoint(v37) then
+					checkJointTposeAdjustment(p4, v37, HumanoidRigDescription:GetTposeAdjustment(v37), rootInstance, v35, t2[v37] or v17)
+				end
+			end
+
+			local DigitsRigDescription = v32:FindFirstChildWhichIsA("DigitsRigDescription")
+
+			if DigitsRigDescription ~= nil then
+				for _, v40 in DigitsRigDescription:GetJointLabels() do
+					if DigitsRigDescription:GetJoint(v40) then
+						checkJointTposeAdjustment(p4, v40, DigitsRigDescription:GetTposeAdjustment(v40), rootInstance, v35, t2[v40] or v16)
+					end
+				end
+			end
+		end
+	end
+end
+
+return t1

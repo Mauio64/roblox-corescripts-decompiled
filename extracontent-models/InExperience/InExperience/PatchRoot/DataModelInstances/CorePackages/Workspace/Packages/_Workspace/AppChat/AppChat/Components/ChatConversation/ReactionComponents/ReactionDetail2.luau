@@ -1,173 +1,177 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local l_Colors_0 = require(l_Parent_0.Style).Colors;
-local v5 = require(script.Parent.ReactionMap);
-local v6 = require(script.Parent.ReactionList);
-local v7 = require(script.Parent.DetailList);
-local l_White_0 = l_Colors_0.White;
-local l_Flint_0 = l_Colors_0.Flint;
-local l_ArialBold_0 = Enum.Font.ArialBold;
-local function v21(v11) --[[ Line: 25 ]] --[[ Name: Navigator ]]
-    -- upvalues: v6 (copy), v2 (copy), v3 (copy), v1 (copy), l_Flint_0 (copy), v5 (copy), l_ArialBold_0 (copy), l_White_0 (copy)
-    local v12 = {};
-    local v13 = 0;
-    local v14 = 1;
-    for _, v16 in v11.reactionData do
-        v13 = v13 + #v16;
-    end;
-    for v17 in v6 do
-        if v11.reactionData[v6[v17]] ~= nil then
-            v12[v14] = v6[v17];
-            v14 = v14 + 1;
-        end;
-    end;
-    local v20 = v2.useMemo(function() --[[ Line: 38 ]]
-        -- upvalues: v3 (ref), v12 (copy), v1 (ref), l_Flint_0 (ref), v2 (ref), v11 (copy), v5 (ref), l_ArialBold_0 (ref), l_White_0 (ref)
-        return v3.List.map(v12, function(v18, v19) --[[ Line: 39 ]]
-            -- upvalues: v1 (ref), l_Flint_0 (ref), v2 (ref), v11 (ref), v5 (ref), l_ArialBold_0 (ref), l_White_0 (ref)
-            return v1.createElement("TextButton", {
-                Size = UDim2.new(0, 54, 0, 28), 
-                BackgroundColor3 = l_Flint_0, 
-                BorderSizePixel = 0, 
-                Text = "", 
-                LayoutOrder = v19 + 2, 
-                [v2.Event.Activated] = function() --[[ Line: 46 ]]
-                    -- upvalues: v11 (ref), v18 (copy)
-                    v11.setEmoji(v18);
-                end
-            }, {
-                corner = v1.createElement("UICorner", {
-                    CornerRadius = UDim.new(0.4, 0)
-                }), 
-                emoji = v1.createElement("ImageLabel", {
-                    Size = UDim2.new(0, 18, 0, 18), 
-                    Position = UDim2.new(0.16, 0, 0.5, -9), 
-                    BackgroundTransparency = 1, 
-                    Image = v5[v18]
-                }), 
-                count = v1.createElement("TextLabel", {
-                    Size = UDim2.new(0.5, 0, 1, 0), 
-                    Position = UDim2.new(0.5, 0, 0, 0), 
-                    BackgroundTransparency = 1, 
-                    Name = v18 .. "Filter", 
-                    Text = #v11.reactionData[v18], 
-                    Font = l_ArialBold_0, 
-                    TextColor3 = l_White_0, 
-                    TextSize = 15, 
-                    TextWrapped = true
-                })
-            });
-        end);
-    end, {
-        v12
-    });
-    return v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 80), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v11.LayoutOrder
-    }, {
-        verticalLayout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    }, {
-        header = v1.createElement("TextLabel", {
-            Text = "Reactions", 
-            TextSize = 20, 
-            TextColor3 = l_White_0, 
-            Font = l_ArialBold_0, 
-            Size = UDim2.fromScale(1, 0.5), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1
-        }), 
-        scroller = v1.createElement("ScrollingFrame", {
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromScale(1, 0.5), 
-            ScrollBarThickness = 5, 
-            CanvasSize = UDim2.new(0, (#v12 + 1) * 54 + 10, 0, 0), 
-            LayoutOrder = 2
-        }, {
-            horizontalLayout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-        }, {
-            padding = v1.createElement("Frame", {
-                Size = UDim2.new(0, 5, 0, 5), 
-                BorderSizePixel = 0, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }), 
-            allFilter = v1.createElement("TextButton", {
-                Size = UDim2.new(0, 54, 0, 28), 
-                BackgroundColor3 = l_Flint_0, 
-                BorderSizePixel = 0, 
-                Text = "All  " .. v13, 
-                Font = l_ArialBold_0, 
-                TextColor3 = l_White_0, 
-                TextSize = 15, 
-                TextWrapped = true, 
-                LayoutOrder = 2, 
-                [v2.Event.Activated] = function() --[[ Line: 122 ]]
-                    -- upvalues: v11 (copy)
-                    v11.setEmoji("All");
-                end
-            }, {
-                corner = v1.createElement("UICorner", {
-                    CornerRadius = UDim.new(0.4, 0)
-                })
-            })
-        }, v20)
-    });
-end;
-return function(v22) --[[ Line: 134 ]] --[[ Name: ReactionDetail ]]
-    -- upvalues: v2 (copy), v1 (copy), l_Flint_0 (copy), v21 (copy), l_Colors_0 (copy), v7 (copy)
-    local v23, v24 = v2.useState("All");
-    return {
-        ReactionDetail = v1.createElement("Frame", {
-            Size = UDim2.new(0, 300, 0, 375), 
-            BackgroundColor3 = l_Flint_0
-        }, {
-            corner = v1.createElement("UICorner", {
-                CornerRadius = UDim.new(0.05, 0)
-            }), 
-            layout = v1.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-        }, {
-            navigator = v1.createElement(v21, {
-                setEmoji = v24, 
-                reactionData = v22.reactionData, 
-                LayoutOrder = 1
-            }), 
-            bar = v1.createElement("Frame", {
-                Size = UDim2.fromScale(1, 0), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 2
-            }, {
-                v1.createElement("Frame", {
-                    Size = UDim2.new(0.97, 0, 0, 0), 
-                    BackgroundColor3 = l_Colors_0.White, 
-                    BorderColor3 = l_Colors_0.White, 
-                    Position = UDim2.new(0.015, 0, 0, 0)
-                })
-            }), 
-            padding = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, 10), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 3
-            }), 
-            detailList = v1.createElement(v7, {
-                emoji = v23, 
-                reactionData = v22.reactionData, 
-                LayoutOrder = 4
-            })
-        })
-    };
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Roact = require(Parent.Roact)
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local Colors = require(Parent.Style).Colors
+local ReactionMap = require(script.Parent.ReactionMap)
+local ReactionList = require(script.Parent.ReactionList)
+local DetailList = require(script.Parent.DetailList)
+local White = Colors.White
+local Flint = Colors.Flint
+local ArialBold = Enum.Font.ArialBold
+
+local function Navigator(p1) -- line: 25
+	-- upvalues: ReactionList (copy), React (copy), Cryo (copy), Roact (copy), Flint (copy), ReactionMap (copy), ArialBold (copy), White (copy)
+	local t1 = {}
+	local n1 = 0
+	local n2 = 1
+
+	for _, v19 in p1.reactionData do
+		n1 += #v19
+	end
+
+	for v20 in ReactionList do
+		if p1.reactionData[ReactionList[v20]] ~= nil then
+			t1[n2] = ReactionList[v20]
+			n2 += 1
+		end
+	end
+
+	local v21 = React.useMemo(function() -- line: 38
+		-- upvalues: Cryo (copy), t1 (copy), Roact (copy), Flint (copy), React (copy), p1 (copy), ReactionMap (copy), ArialBold (copy), White (copy)
+		return Cryo.List.map(t1, function(s1: string, n3: number) -- line: 39
+			-- upvalues: Roact (copy), Flint (copy), React (copy), p1 (copy), ReactionMap (copy), ArialBold (copy), White (copy)
+			return Roact.createElement("TextButton", {
+				Size = UDim2.new(0, 54, 0, 28),
+				BackgroundColor3 = Flint,
+				BorderSizePixel = 0,
+				Text = "",
+				LayoutOrder = n3 + 2,
+				[React.Event.Activated] = function() -- line: 46
+					-- upvalues: p1 (copy), s1 (copy)
+					p1.setEmoji(s1)
+				end
+			}, {
+				corner = Roact.createElement("UICorner", {
+					CornerRadius = UDim.new(0.4, 0)
+				}),
+				emoji = Roact.createElement("ImageLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 18, 0, 18),
+					Position = UDim2.new(0.16, 0, 0.5, -9),
+					Image = ReactionMap[s1]
+				}),
+				count = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 15,
+					TextWrapped = true,
+					Size = UDim2.new(0.5, 0, 1, 0),
+					Position = UDim2.new(0.5, 0, 0, 0),
+					Name = s1 .. "Filter",
+					Text = #p1.reactionData[s1],
+					Font = ArialBold,
+					TextColor3 = White
+				})
+			})
+		end)
+	end, { t1 })
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 80),
+		LayoutOrder = p1.LayoutOrder
+	}, {
+		verticalLayout = Roact.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}, {
+		header = Roact.createElement("TextLabel", {
+			Text = "Reactions",
+			TextSize = 20,
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			TextColor3 = White,
+			Font = ArialBold,
+			Size = UDim2.fromScale(1, 0.5)
+		}),
+		scroller = Roact.createElement("ScrollingFrame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			ScrollBarThickness = 5,
+			LayoutOrder = 2,
+			Size = UDim2.fromScale(1, 0.5),
+			CanvasSize = UDim2.new(0, (#t1 + 1) * 54 + 10, 0, 0)
+		}, {
+			horizontalLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+		}, {
+			padding = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(0, 5, 0, 5)
+			}),
+			allFilter = Roact.createElement("TextButton", {
+				Size = UDim2.new(0, 54, 0, 28),
+				BackgroundColor3 = Flint,
+				BorderSizePixel = 0,
+				Text = "All  " .. n1,
+				Font = ArialBold,
+				TextColor3 = White,
+				TextSize = 15,
+				TextWrapped = true,
+				LayoutOrder = 2,
+				[React.Event.Activated] = function() -- line: 122
+					-- upvalues: p1 (copy)
+					p1.setEmoji("All")
+				end
+			}, {
+				corner = Roact.createElement("UICorner", {
+					CornerRadius = UDim.new(0.4, 0)
+				})
+			})
+		}, v21)
+	})
+end
+local function ReactionDetail(p2) -- line: 134
+	-- upvalues: React (copy), Roact (copy), Flint (copy), Navigator (copy), Colors (copy), DetailList (copy)
+	local v23, v24 = React.useState("All")
+
+	return {
+		ReactionDetail = Roact.createElement("Frame", {
+			Size = UDim2.new(0, 300, 0, 375),
+			BackgroundColor3 = Flint
+		}, {
+			corner = Roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0.05, 0)
+			}),
+			layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+		}, {
+			navigator = Roact.createElement(Navigator, {
+				LayoutOrder = 1,
+				setEmoji = v24,
+				reactionData = p2.reactionData
+			}),
+			bar = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				Size = UDim2.fromScale(1, 0)
+			}, { Roact.createElement("Frame", {
+				Size = UDim2.new(0.97, 0, 0, 0),
+				BackgroundColor3 = Colors.White,
+				BorderColor3 = Colors.White,
+				Position = UDim2.new(0.015, 0, 0, 0)
+			}) }),
+			padding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 0, 10)
+			}),
+			detailList = Roact.createElement(DetailList, {
+				LayoutOrder = 4,
+				emoji = v23,
+				reactionData = p2.reactionData
+			})
+		})
+	}
+end
+
+return ReactionDetail

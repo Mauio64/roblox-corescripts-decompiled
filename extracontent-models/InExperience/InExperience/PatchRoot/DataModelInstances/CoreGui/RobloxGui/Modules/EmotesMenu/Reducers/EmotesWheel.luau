@@ -1,21 +1,22 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v4 = require(l_Actions_0.FocusSegment);
-local v5 = require(l_Actions_0.HideMenu);
-local v6 = {
-    focusedSegmentIndex = 0
-};
-return v2.createReducer(v6, {
-    [v4.name] = function(v7, v8) --[[ Line: 18 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v7, {
-            focusedSegmentIndex = v8.segmentIndex
-        });
-    end, 
-    [v5.name] = function(v9, _) --[[ Line: 25 ]]
-        -- upvalues: v1 (copy), v6 (copy)
-        return v1.Dictionary.join(v9, v6);
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local Actions = script.Parent.Parent.Actions
+local FocusSegment = require(Actions.FocusSegment)
+local HideMenu = require(Actions.HideMenu)
+local t1 = {
+	focusedSegmentIndex = 0
+}
+
+return Rodux.createReducer(t1, {
+	[FocusSegment.name] = function(p1, p2) -- line: 18
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			focusedSegmentIndex = p2.segmentIndex
+		})
+	end,
+	[HideMenu.name] = function(p3, _) -- line: 25
+		-- upvalues: Cryo (copy), t1 (copy)
+		return Cryo.Dictionary.join(p3, t1)
+	end
+})

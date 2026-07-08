@@ -1,93 +1,103 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v1 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsUtils);
-local v2 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsTextPanel);
-local v3 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsAnnotatedGraph);
-local v4 = UDim2.new(0, 0, 0, 0);
-local v5 = UDim2.new(0.4, 0, 1, 0);
-local v6 = UDim2.new(0.4, 0, 0, 0);
-local v7 = UDim2.new(0.6, 0, 1, 0);
-local v8 = {};
-v8.__index = v8;
-v8.new = function() --[[ Line: 31 ]] --[[ Name: new ]]
-    -- upvalues: v8 (copy), v1 (copy)
-    local v9 = {};
-    setmetatable(v9, v8);
-    v9._frameImageLabel = Instance.new("ImageLabel");
-    v9._frameImageLabel.Name = "PS_Viewer";
-    v9._frameImageLabel.Image = "rbxasset://textures/ui/PerformanceStats/BackgroundRounded.png";
-    v9._frameImageLabel.ScaleType = Enum.ScaleType.Slice;
-    v9._frameImageLabel.SliceCenter = Rect.new(10, 10, 22, 22);
-    v9._frameImageLabel.BackgroundTransparency = 1;
-    v9._frameImageLabel.ImageColor3 = v1.NormalColor;
-    v9._frameImageLabel.ImageTransparency = v1.Transparency;
-    v9._textPanel = nil;
-    v9._statType = nil;
-    v9._graph = nil;
-    return v9;
-end;
-v8.OnPerformanceStatsShouldBeVisibleChanged = function(v10) --[[ Line: 51 ]] --[[ Name: OnPerformanceStatsShouldBeVisibleChanged ]]
-    if v10._graph then
-        v10._graph:OnPerformanceStatsShouldBeVisibleChanged();
-    end;
-    if v10._textPanel then
-        v10._textPanel:OnPerformanceStatsShouldBeVisibleChanged();
-    end;
-end;
-v8.GetIsVisible = function(v11) --[[ Line: 60 ]] --[[ Name: GetIsVisible ]]
-    return v11._frameImageLabel.Visible;
-end;
-v8.GetStatType = function(v12) --[[ Line: 64 ]] --[[ Name: GetStatType ]]
-    return v12._statType;
-end;
-v8.SetSizeAndPosition = function(v13, v14, v15) --[[ Line: 68 ]] --[[ Name: SetSizeAndPosition ]]
-    v13._frameImageLabel.Size = v14;
-    v13._frameImageLabel.Position = v15;
-end;
-v8.SetParent = function(v16, v17) --[[ Line: 73 ]] --[[ Name: SetParent ]]
-    v16._frameImageLabel.Parent = v17;
-end;
-v8.SetVisible = function(v18, v19) --[[ Line: 77 ]] --[[ Name: SetVisible ]]
-    v18._frameImageLabel.Visible = v19;
-    if v18._graph then
-        v18._graph:SetVisible(v19);
-    end;
-    if v18._textPanel then
-        v18._textPanel:SetVisible(v19);
-    end;
-end;
-v8.SetStatType = function(v20, v21) --[[ Line: 89 ]] --[[ Name: SetStatType ]]
-    -- upvalues: v2 (copy), v5 (copy), v4 (copy), v3 (copy), v7 (copy), v6 (copy), v1 (copy)
-    v20._statType = v21;
-    v20._frameImageLabel:ClearAllChildren();
-    if v20._textPanel then
-        v20._textPanel:SetVisible(false);
-        v20._textPanel = nil;
-    end;
-    v20._textPanel = v2.new(v21);
-    v20._textPanel:PlaceInParent(v20._frameImageLabel, v5, v4);
-    v20._graph = v3.new(v21, true);
-    v20._graph:PlaceInParent(v20._frameImageLabel, v7, v6);
-    v20._textPanel:SetZIndex(v1.TextZIndex);
-    v20._graph:SetZIndex(v1.GraphZIndex);
-    v20._graph:SetVisible(v20._frameImageLabel.Visible);
-    v20._textPanel:SetVisible(v20._frameImageLabel.Visible);
-    v20:_applyStatsAggregator();
-end;
-v8._applyStatsAggregator = function(v22) --[[ Line: 118 ]] --[[ Name: _applyStatsAggregator ]]
-    if v22._aggregator == nil then
-        return;
-    else
-        if v22._textPanel then
-            v22._textPanel:SetStatsAggregator(v22._aggregator);
-        end;
-        if v22._graph then
-            v22._graph:SetStatsAggregator(v22._aggregator);
-        end;
-        return;
-    end;
-end;
-v8.SetStatsAggregator = function(v23, v24) --[[ Line: 132 ]] --[[ Name: SetStatsAggregator ]]
-    v23._aggregator = v24;
-    v23:_applyStatsAggregator();
-end;
-return v8;
+local CoreGui = game:GetService("CoreGui")
+local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
+local StatsTextPanel = require(CoreGui.RobloxGui.Modules.Stats.StatsTextPanel)
+local StatsAnnotatedGraph = require(CoreGui.RobloxGui.Modules.Stats.StatsAnnotatedGraph)
+local uDim2 = UDim2.new(0, 0, 0, 0)
+local uDim2_2 = UDim2.new(0.4, 0, 1, 0)
+local uDim2_3 = UDim2.new(0.4, 0, 0, 0)
+local uDim2_4 = UDim2.new(0.6, 0, 1, 0)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 31
+	-- upvalues: t1 (copy), StatsUtils (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._frameImageLabel = Instance.new("ImageLabel")
+	t2._frameImageLabel.Name = "PS_Viewer"
+	t2._frameImageLabel.Image = "rbxasset://textures/ui/PerformanceStats/BackgroundRounded.png"
+	t2._frameImageLabel.ScaleType = Enum.ScaleType.Slice
+	t2._frameImageLabel.SliceCenter = Rect.new(10, 10, 22, 22)
+	t2._frameImageLabel.BackgroundTransparency = 1
+	t2._frameImageLabel.ImageColor3 = StatsUtils.NormalColor
+	t2._frameImageLabel.ImageTransparency = StatsUtils.Transparency
+	t2._textPanel = nil
+	t2._statType = nil
+	t2._graph = nil
+
+	return t2
+end
+function t1.OnPerformanceStatsShouldBeVisibleChanged(p1) -- line: 51
+	if p1._graph then
+		p1._graph:OnPerformanceStatsShouldBeVisibleChanged()
+	end
+
+	if p1._textPanel then
+		p1._textPanel:OnPerformanceStatsShouldBeVisibleChanged()
+	end
+end
+function t1.GetIsVisible(p2) -- line: 60
+	return p2._frameImageLabel.Visible
+end
+function t1.GetStatType(p3) -- line: 64
+	return p3._statType
+end
+function t1.SetSizeAndPosition(p4, p5, p6) -- line: 68
+	p4._frameImageLabel.Size = p5
+	p4._frameImageLabel.Position = p6
+end
+function t1.SetParent(p7, p8) -- line: 73
+	p7._frameImageLabel.Parent = p8
+end
+function t1.SetVisible(p9, p10) -- line: 77
+	p9._frameImageLabel.Visible = p10
+
+	if p9._graph then
+		p9._graph:SetVisible(p10)
+	end
+
+	if p9._textPanel then
+		p9._textPanel:SetVisible(p10)
+	end
+end
+function t1.SetStatType(p11, p12) -- line: 89
+	-- upvalues: StatsTextPanel (copy), uDim2_2 (copy), uDim2 (copy), StatsAnnotatedGraph (copy), uDim2_4 (copy), uDim2_3 (copy), StatsUtils (copy)
+	p11._statType = p12
+	p11._frameImageLabel:ClearAllChildren()
+
+	if p11._textPanel then
+		p11._textPanel:SetVisible(false)
+		p11._textPanel = nil
+	end
+
+	p11._textPanel = StatsTextPanel.new(p12)
+	p11._textPanel:PlaceInParent(p11._frameImageLabel, uDim2_2, uDim2)
+	p11._graph = StatsAnnotatedGraph.new(p12, true)
+	p11._graph:PlaceInParent(p11._frameImageLabel, uDim2_4, uDim2_3)
+	p11._textPanel:SetZIndex(StatsUtils.TextZIndex)
+	p11._graph:SetZIndex(StatsUtils.GraphZIndex)
+	p11._graph:SetVisible(p11._frameImageLabel.Visible)
+	p11._textPanel:SetVisible(p11._frameImageLabel.Visible)
+	p11:_applyStatsAggregator()
+end
+function t1._applyStatsAggregator(p13) -- line: 118
+	if p13._aggregator == nil then
+		return
+	end
+
+	if p13._textPanel then
+		p13._textPanel:SetStatsAggregator(p13._aggregator)
+	end
+
+	if p13._graph then
+		p13._graph:SetStatsAggregator(p13._aggregator)
+	end
+end
+function t1.SetStatsAggregator(p14, p15) -- line: 132
+	p14._aggregator = p15
+	p14:_applyStatsAggregator()
+end
+
+return t1

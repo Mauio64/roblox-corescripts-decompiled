@@ -1,30 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_script_FirstAncestor_0.Service.ChromeUtils);
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: v2 (copy)
-    if not v4 then
-        warn("observableValue undefined");
-        return nil;
-    else
-        local v5, v6 = v2.useState(v4:get());
-        v2.useEffect(function() --[[ Line: 14 ]]
-            -- upvalues: v4 (copy), v6 (copy), v5 (copy)
-            local v7 = v4:connect(function() --[[ Line: 15 ]]
-                -- upvalues: v6 (ref), v4 (ref)
-                v6(v4:get());
-            end);
-            if v5 ~= v4:get() then
-                v6(v4:get());
-            end;
-            return function() --[[ Line: 23 ]]
-                -- upvalues: v7 (copy)
-                v7:disconnect();
-            end;
-        end, {
-            v4
-        });
-        return v5;
-    end;
-end;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+
+require(ChromeShared.Service.ChromeUtils)
+
+return function(p1) -- line: 7
+	-- upvalues: React (copy)
+	if not p1 then
+		warn("observableValue undefined")
+
+		return nil
+	end
+
+	local v5, v6 = React.useState(p1:get())
+
+	React.useEffect(function() -- line: 14
+		-- upvalues: p1 (copy), v6 (copy), v5 (copy)
+		local v7 = p1:connect(function() -- line: 15
+			-- upvalues: v6 (copy), p1 (copy)
+			v6(p1:get())
+		end)
+
+		if v5 ~= p1:get() then
+			v6(p1:get())
+		end
+
+		return function() -- line: 23
+			-- upvalues: v7 (copy)
+			v7:disconnect()
+		end
+	end, { p1 })
+
+	return v5
+end

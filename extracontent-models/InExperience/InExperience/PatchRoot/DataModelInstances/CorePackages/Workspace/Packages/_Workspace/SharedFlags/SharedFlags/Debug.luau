@@ -1,3 +1,3 @@
 return {
-    FFlagDebugUnmuteLuaErrors = require(script.FFlagDebugUnmuteLuaErrors)
-};
+	FFlagDebugUnmuteLuaErrors = require(script.FFlagDebugUnmuteLuaErrors)
+}

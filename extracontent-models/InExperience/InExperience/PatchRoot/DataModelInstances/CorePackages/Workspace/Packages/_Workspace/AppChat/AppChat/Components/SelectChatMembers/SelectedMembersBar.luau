@@ -1,64 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useStyle_0 = require(l_Parent_0.UIBlox).Core.Style.useStyle;
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v6 = require(script.Parent.FriendCountLabel);
-local v7 = require(script.Parent.MemberEntry);
-local v8 = require(l_script_FirstAncestor_0.Stores.GetSelectedUsersStore);
-local l_FFlagEnableAppChatFocusableFixes_0 = require(l_Parent_0.SharedFlags).FFlagEnableAppChatFocusableFixes;
-return v2.memo(function(v10) --[[ Line: 22 ]] --[[ Name: SelectedMembersBar ]]
-    -- upvalues: l_useStyle_0 (copy), v2 (copy), v8 (copy), l_useSignalState_0 (copy), v7 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy), v3 (copy), v6 (copy)
-    local v11 = l_useStyle_0();
-    local v12 = v2.useRef(nil);
-    local v13 = v8(false);
-    local v14 = l_useSignalState_0(v13.getMaxSize());
-    local v17 = v2.useMemo(function() --[[ Line: 29 ]]
-        -- upvalues: v14 (copy), v2 (ref), v7 (ref), v11 (copy)
-        local v15 = {};
-        for v16 = 1, v14 do
-            v15[("user-%*"):format(v16)] = v2.createElement(v7, {
-                index = v16, 
-                style = v11
-            });
-        end;
-        return v15;
-    end, {
-        v14
-    });
-    v2.useEffect(function() --[[ Line: 41 ]]
-        -- upvalues: v12 (copy), l_FFlagEnableAppChatFocusableFixes_0 (ref)
-        if v12.current then
-            v12.current.ScrollBarThickness = 0;
-            if l_FFlagEnableAppChatFocusableFixes_0 then
-                v12.current.Selectable = false;
-            end;
-        end;
-    end, {
-        v12
-    });
-    return v2.createElement(v3.View, {
-        LayoutOrder = v10.LayoutOrder, 
-        tag = "row size-full-0 auto-y flex-y-fill padding-x-small gap-medium"
-    }, {
-        FriendCountContainer = v2.createElement(v3.View, {
-            tag = "auto-xy padding-y-small", 
-            LayoutOrder = 1
-        }, {
-            FriendCount = v2.createElement(v6)
-        }), 
-        UserScrollBar = v2.createElement(v3.ScrollView, {
-            tag = "fill auto-y", 
-            LayoutOrder = 2, 
-            scroll = {
-                scrollBarVisibility = v3.Enums.ScrollBarVisibility.None, 
-                ScrollingDirection = Enum.ScrollingDirection.X, 
-                AutomaticCanvasSize = Enum.AutomaticSize.XY
-            }, 
-            scrollingFrameRef = v12
-        }, v2.createElement(v3.View, {
-            tag = "row size-full padding-x-xsmall gap-medium align-y-center"
-        }, v17))
-    });
-end);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local Foundation = require(AppChatParent.Foundation)
+local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local useSignalState = require(AppChatParent.SignalsReact).useSignalState
+local FriendCountLabel = require(script.Parent.FriendCountLabel)
+local MemberEntry = require(script.Parent.MemberEntry)
+local GetSelectedUsersStore = require(AppChat.Stores.GetSelectedUsersStore)
+
+local function SelectedMembersBar(t1: {[any]: any}) -- line: 20
+	-- upvalues: useStyle (copy), React (copy), GetSelectedUsersStore (copy), useSignalState (copy), MemberEntry (copy), Foundation (copy), FriendCountLabel (copy)
+	local v12 = useStyle()
+	local v13 = React.useRef(nil)
+	local v14 = GetSelectedUsersStore(false)
+	local v15 = useSignalState(v14.getMaxSize())
+	local v16 = React.useMemo(function() -- line: 27
+		-- upvalues: v15 (copy), React (copy), MemberEntry (copy), v12 (copy)
+		local t2 = {}
+
+		for i = 1, v15 do
+			t2[`user-{ i }`] = React.createElement(MemberEntry, {
+				index = i,
+				style = v12
+			})
+		end
+
+		return t2
+	end, { v15 })
+
+	React.useEffect(function() -- line: 39
+		-- upvalues: v13 (copy)
+		if v13.current then
+			v13.current.ScrollBarThickness = 0
+			v13.current.Selectable = false
+		end
+	end, { v13 })
+
+	return React.createElement(Foundation.View, {
+		tag = "row size-full-0 auto-y flex-y-fill padding-x-small gap-medium",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		FriendCountContainer = React.createElement(Foundation.View, {
+			tag = "auto-xy padding-y-small",
+			LayoutOrder = 1
+		}, {
+			FriendCount = React.createElement(FriendCountLabel)
+		}),
+		UserScrollBar = React.createElement(Foundation.ScrollView, {
+			tag = "fill auto-y",
+			LayoutOrder = 2,
+			scroll = {
+				scrollBarVisibility = Foundation.Enums.ScrollBarVisibility.None,
+				ScrollingDirection = Enum.ScrollingDirection.X,
+				AutomaticCanvasSize = Enum.AutomaticSize.XY
+			},
+			scrollingFrameRef = v13
+		}, React.createElement(Foundation.View, {
+			tag = "row size-full padding-x-xsmall gap-medium align-y-center"
+		}, v16))
+	})
+end
+
+return React.memo(SelectedMembersBar)

@@ -1,1 +1,1 @@
-return require(script.AssetsCarousel);
+return require(script.AssetsCarousel)

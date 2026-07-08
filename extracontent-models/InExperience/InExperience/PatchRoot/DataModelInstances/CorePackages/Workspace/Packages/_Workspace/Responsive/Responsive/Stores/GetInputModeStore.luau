@@ -1,4 +1,5 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createInputModeStore);
-return v1.createComputed(v2);
+local ParentParent = script.Parent.Parent.Parent
+local Signals = require(ParentParent.Signals)
+local createInputModeStore = require(script.createInputModeStore)
+
+return Signals.createComputed(createInputModeStore)

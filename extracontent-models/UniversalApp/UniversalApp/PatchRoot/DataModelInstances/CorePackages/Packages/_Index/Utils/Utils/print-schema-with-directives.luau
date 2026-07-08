@@ -1,580 +1,661 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local l_Map_0 = v1.Map;
-local l_Object_0 = v1.Object;
-local v7 = {};
-local v8 = require(l_Parent_0.GraphQL);
-local l_print_0 = v8.print;
-local l_Kind_0 = v8.Kind;
-local l_isSpecifiedScalarType_0 = v8.isSpecifiedScalarType;
-local l_isIntrospectionType_0 = v8.isIntrospectionType;
-local l_isSpecifiedDirective_0 = v8.isSpecifiedDirective;
-local l_astFromValue_0 = v8.astFromValue;
-local l_GraphQLDeprecatedDirective_0 = v8.GraphQLDeprecatedDirective;
-local l_isObjectType_0 = v8.isObjectType;
-local l_isInterfaceType_0 = v8.isInterfaceType;
-local l_isUnionType_0 = v8.isUnionType;
-local l_isInputObjectType_0 = v8.isInputObjectType;
-local l_isEnumType_0 = v8.isEnumType;
-local l_isScalarType_0 = v8.isScalarType;
-local _ = require(script.Parent.types);
-local l_astFromType_0 = require(script.Parent.astFromType).astFromType;
-local l_getDirectivesInExtensions_0 = require(script.Parent["get-directives"]).getDirectivesInExtensions;
-local l_astFromValueUntyped_0 = require(script.Parent.astFromValueUntyped).astFromValueUntyped;
-local l_isSome_0 = require(script.Parent.helpers).isSome;
-local l_getRootTypeMap_0 = require(script.Parent.rootTypes).getRootTypeMap;
-local v28 = nil;
-local v29 = nil;
-local v30 = nil;
-local v31 = nil;
-local v32 = nil;
-local v33 = nil;
-local v34 = nil;
-local v35 = nil;
-local v36 = nil;
-local v37 = nil;
-local v38 = nil;
-local v39 = nil;
-local v40 = nil;
-local v41 = nil;
-local v42 = nil;
-local v43 = nil;
-local l_NULL_0 = v8.NULL;
-local function v58(v45, v46) --[[ Line: 160 ]] --[[ Name: getDocumentNodeFromSchema ]]
-    -- upvalues: v28 (ref), l_Boolean_0 (copy), l_isSpecifiedDirective_0 (copy), v29 (ref), l_isSpecifiedScalarType_0 (copy), l_isIntrospectionType_0 (copy), l_isObjectType_0 (copy), v32 (ref), l_isInterfaceType_0 (copy), v36 (ref), l_isUnionType_0 (copy), v37 (ref), l_isInputObjectType_0 (copy), v38 (ref), l_isEnumType_0 (copy), v39 (ref), l_isScalarType_0 (copy), v40 (ref), l_Error_0 (copy), l_Kind_0 (copy)
-    local l_pathToDirectivesInExtensions_0 = (if v46 ~= nil then v46 else {}).pathToDirectivesInExtensions;
-    local v48 = v45:getTypeMap();
-    local v49 = v28(v45, l_pathToDirectivesInExtensions_0);
-    local v50 = if v49 ~= nil then {
-        v49
-    } else {};
-    for _, v52 in (v45:getDirectives()) do
-        if not l_Boolean_0.toJSBoolean(l_isSpecifiedDirective_0(v52)) then
-            table.insert(v50, v29(v52, v45, l_pathToDirectivesInExtensions_0));
-        end;
-    end;
-    for _, v54 in v48 do
-        local v55 = v48:get(v54[1]);
-        local v56 = l_isSpecifiedScalarType_0(v55);
-        local v57 = l_isIntrospectionType_0(v55);
-        if not v56 and not v57 then
-            if l_Boolean_0.toJSBoolean(l_isObjectType_0(v55)) then
-                table.insert(v50, v32(v55, v45, l_pathToDirectivesInExtensions_0));
-            elseif l_Boolean_0.toJSBoolean(l_isInterfaceType_0(v55)) then
-                table.insert(v50, v36(v55, v45, l_pathToDirectivesInExtensions_0));
-            elseif l_Boolean_0.toJSBoolean(l_isUnionType_0(v55)) then
-                table.insert(v50, v37(v55, v45, l_pathToDirectivesInExtensions_0));
-            elseif l_Boolean_0.toJSBoolean(l_isInputObjectType_0(v55)) then
-                table.insert(v50, v38(v55, v45, l_pathToDirectivesInExtensions_0));
-            elseif l_Boolean_0.toJSBoolean(l_isEnumType_0(v55)) then
-                table.insert(v50, v39(v55, v45, l_pathToDirectivesInExtensions_0));
-            elseif l_Boolean_0.toJSBoolean(l_isScalarType_0(v55)) then
-                table.insert(v50, v40(v55, v45, l_pathToDirectivesInExtensions_0));
-            else
-                error(l_Error_0.new(("Unknown type %s."):format((tostring(v55)))));
-            end;
-        end;
-    end;
-    return {
-        kind = l_Kind_0.DOCUMENT, 
-        definitions = v50
-    };
-end;
-v7.getDocumentNodeFromSchema = v58;
-v7.printSchemaWithDirectives = function(v59, v60) --[[ Line: 244 ]] --[[ Name: printSchemaWithDirectives ]]
-    -- upvalues: v58 (copy), l_print_0 (copy)
-    local v61 = if v60 ~= nil then v60 else {};
-    local v62 = v58(v59, v61);
-    return l_print_0(v62);
-end;
-v28 = function(v63, v64) --[[ Line: 252 ]] --[[ Name: astFromSchema ]]
-    -- upvalues: l_Map_0 (copy), l_Object_0 (copy), l_Boolean_0 (copy), l_getRootTypeMap_0 (copy), l_astFromType_0 (copy), l_Kind_0 (copy), l_Array_0 (copy), l_isSome_0 (copy), v31 (ref)
-    local v65 = l_Map_0.new({
-        {
-            "query", 
-            l_Object_0.None
-        }, 
-        {
-            "mutation", 
-            l_Object_0.None
-        }, 
-        {
-            "subscription", 
-            l_Object_0.None
-        }
-    });
-    local v66 = {};
-    if v63.astNode ~= nil then
-        table.insert(v66, v63.astNode);
-    end;
-    if v63.extensionASTNodes ~= nil then
-        for _, v68 in v63.extensionASTNodes do
-            table.insert(v66, v68);
-        end;
-    end;
-    for _, v70 in v66 do
-        if l_Boolean_0.toJSBoolean(v70.operationTypes) then
-            for _, v72 in v70.operationTypes do
-                v65:set(v72.operation, v72);
-            end;
-        end;
-    end;
-    local v73 = l_getRootTypeMap_0(v63);
-    for _, v75 in v65 do
-        local v76, v77 = table.unpack(v75, 1, 2);
-        local v78 = v73:get(v76);
-        if v78 ~= nil then
-            local v79 = l_astFromType_0(v78);
-            if v77 ~= nil and v77 ~= l_Object_0.None then
-                v77.type = v79;
-            else
-                v65:set(v76, {
-                    kind = l_Kind_0.OPERATION_TYPE_DEFINITION, 
-                    operation = v76, 
-                    type = v79
-                });
-            end;
-        end;
-    end;
-    local v80 = l_Array_0.filter(l_Array_0.concat({}, v65:values()), l_isSome_0);
-    local v81 = v31(v63, v63, v64);
-    if not l_Boolean_0.toJSBoolean(#v80) and not l_Boolean_0.toJSBoolean(#v81) then
-        return nil;
-    else
-        local v82 = {
-            kind = if v80 ~= nil then l_Kind_0.SCHEMA_DEFINITION else l_Kind_0.SCHEMA_EXTENSION, 
-            operationTypes = v80, 
-            directives = v81
-        };
-        local l_toJSBoolean_0 = l_Boolean_0.toJSBoolean;
-        local v84 = if typeof(v63.astNode) == "table" then v63.astNode.description else nil;
-        v82.description = if l_toJSBoolean_0(if v84 ~= nil then v84 else v63.description ~= nil) then {
-            kind = l_Kind_0.STRING, 
-            value = v63.description, 
-            block = true
-        } else nil;
-        return v82;
-    end;
-end;
-v7.astFromSchema = v28;
-v29 = function(v85, v86, v87) --[[ Line: 355 ]] --[[ Name: astFromDirective ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v41 (ref)
-    local l_DIRECTIVE_DEFINITION_0 = l_Kind_0.DIRECTIVE_DEFINITION;
-    local v89 = if typeof(v85.astNode) == "table" then v85.astNode.description else nil;
-    local v90 = if v89 ~= nil then v89 else if l_Boolean_0.toJSBoolean(v85.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v85.description
-    } else nil;
-    local v91 = {
-        kind = l_Kind_0.NAME, 
-        value = v85.name
-    };
-    local v93 = if typeof(v85.args) == "table" then l_Array_0.map(v85.args, function(v92) --[[ Line: 379 ]]
-        -- upvalues: v41 (ref), v86 (copy), v87 (copy)
-        return v41(v92, v86, v87);
-    end) else nil;
-    local l_isRepeatable_0 = v85.isRepeatable;
-    local v96 = if typeof(v85.locations) == "table" then l_Array_0.map(v85.locations, function(v95) --[[ Line: 390 ]]
-        -- upvalues: l_Kind_0 (ref)
-        return {
-            kind = l_Kind_0.NAME, 
-            value = v95
-        };
-    end) else nil;
-    local v97 = l_Boolean_0.toJSBoolean(v96) and v96 or {};
-    return {
-        kind = l_DIRECTIVE_DEFINITION_0, 
-        description = v90, 
-        name = v91, 
-        arguments = v93, 
-        repeatable = l_isRepeatable_0, 
-        locations = v97
-    };
-end;
-v7.astFromDirective = v29;
-v31 = function(v98, v99, v100) --[[ Line: 418 ]] --[[ Name: getDirectiveNodes ]]
-    -- upvalues: l_getDirectivesInExtensions_0 (copy), l_Array_0 (copy), l_Object_0 (copy), v33 (ref), l_Boolean_0 (copy)
-    local v101 = l_getDirectivesInExtensions_0(v98, v100);
-    local v102 = {};
-    if v98.astNode ~= nil then
-        table.insert(v102, v98.astNode);
-    end;
-    if l_Array_0.indexOf(l_Object_0.keys(v98), "extensionASTNodes") ~= -1 and v98.extensionASTNodes ~= nil then
-        v102 = l_Array_0.concat(v102, v98.extensionASTNodes);
-    end;
-    local v103 = nil;
-    if v101 ~= nil then
-        return (v33(v99, v101));
-    else
-        v103 = {};
-        for _, v105 in v102 do
-            if l_Boolean_0.toJSBoolean(v105.directives) then
-                v103 = l_Array_0.concat(v103, v105.directives);
-            end;
-        end;
-        return v103;
-    end;
-end;
-v7.getDirectiveNodes = v31;
-local function v116(v106, v107, v108) --[[ Line: 471 ]] --[[ Name: getDeprecatableDirectiveNodes ]]
-    -- upvalues: l_getDirectivesInExtensions_0 (copy), v33 (ref), l_Array_0 (copy), v35 (ref)
-    local v109 = {};
-    local v110 = nil;
-    local v111 = l_getDirectivesInExtensions_0(v106, v108);
-    local v112 = nil;
-    v112 = if v111 ~= nil then v33(v107, v111) else if typeof(v106.astNode) == "table" then v106.astNode.directives else nil;
-    if v112 ~= nil then
-        v109 = l_Array_0.filter(v112, function(v113) --[[ Line: 493 ]]
-            return v113.name.value ~= "deprecated";
-        end);
-        if v106.deprecationReason ~= nil then
-            v110 = if typeof(l_Array_0.filter(v112, function(v114) --[[ Line: 500 ]]
-                return v114.name.value == "deprecated";
-            end)) == "table" then l_Array_0.filter(v112, function(v115) --[[ Line: 504 ]]
-                return v115.name.value == "deprecated";
-            end)[1] else nil;
-        end;
-    end;
-    if v106.deprecationReason ~= nil and v110 == nil then
-        v110 = v35(v106.deprecationReason);
-    end;
-    if v110 == nil then
-        return v109;
-    else
-        return (l_Array_0.concat({
-            v110
-        }, v109));
-    end;
-end;
-v7.getDeprecatableDirectiveNodes = v116;
-v41 = function(v117, v118, v119) --[[ Line: 528 ]] --[[ Name: astFromArg ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_astFromType_0 (copy), l_astFromValue_0 (copy), v116 (copy)
-    local l_INPUT_VALUE_DEFINITION_0 = l_Kind_0.INPUT_VALUE_DEFINITION;
-    local v121 = if typeof(v117.astNode) == "table" then v117.astNode.description else nil;
-    local v122 = if v121 ~= nil then v121 else if l_Boolean_0.toJSBoolean(v117.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v117.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_INPUT_VALUE_DEFINITION_0, 
-        description = v122, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v117.name
-        }, 
-        type = l_astFromType_0(v117.type), 
-        defaultValue = if v117.defaultValue ~= nil then l_astFromValue_0(v117.defaultValue, v117.type) else nil, 
-        directives = v116(v117, v118, v119)
-    };
-end;
-v7.astFromArg = v41;
-v32 = function(v123, v124, v125) --[[ Line: 566 ]] --[[ Name: astFromObjectType ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v42 (ref), l_Object_0 (copy), l_astFromType_0 (copy), v31 (ref)
-    local l_OBJECT_TYPE_DEFINITION_0 = l_Kind_0.OBJECT_TYPE_DEFINITION;
-    local v127 = if typeof(v123.astNode) == "table" then v123.astNode.description else nil;
-    local v128 = if v127 ~= nil then v127 else if l_Boolean_0.toJSBoolean(v123.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v123.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_OBJECT_TYPE_DEFINITION_0, 
-        description = v128, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v123.name
-        }, 
-        fields = l_Array_0.map(v123:getFields():values(), function(v129) --[[ Line: 592 ]]
-            -- upvalues: v42 (ref), v124 (copy), v125 (copy)
-            return v42(v129, v124, v125);
-        end), 
-        interfaces = l_Array_0.map(l_Object_0.values(v123:getInterfaces()), function(v130) --[[ Line: 596 ]]
-            -- upvalues: l_astFromType_0 (ref)
-            return (l_astFromType_0(v130));
-        end), 
-        directives = v31(v123, v124, v125)
-    };
-end;
-v7.astFromObjectType = v32;
-v36 = function(v131, v132, v133) --[[ Line: 605 ]] --[[ Name: astFromInterfaceType ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v42 (ref), v31 (ref), l_Object_0 (copy), l_astFromType_0 (copy)
-    local l_INTERFACE_TYPE_DEFINITION_0 = l_Kind_0.INTERFACE_TYPE_DEFINITION;
-    local v135 = if typeof(v131.astNode) == "table" then v131.astNode.description else nil;
-    local v136 = if v135 ~= nil then v135 else if l_Boolean_0.toJSBoolean(v131.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v131.description, 
-        block = true
-    } else nil;
-    local v138 = {
-        kind = l_INTERFACE_TYPE_DEFINITION_0, 
-        description = v136, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v131.name
-        }, 
-        fields = l_Array_0.map(v131:getFields():values(), function(v137) --[[ Line: 631 ]]
-            -- upvalues: v42 (ref), v132 (copy), v133 (copy)
-            return v42(v137, v132, v133);
-        end), 
-        directives = v31(v131, v132, v133)
-    };
-    if v131.getInterfaces ~= nil then
-        v138.interfaces = l_Array_0.map(l_Object_0.values(v131:getInterfaces()), function(v139) --[[ Line: 643 ]]
-            -- upvalues: l_astFromType_0 (ref)
-            return (l_astFromType_0(v139));
-        end);
-    end;
-    return v138;
-end;
-v7.astFromInterfaceType = v36;
-v37 = function(v140, v141, v142) --[[ Line: 653 ]] --[[ Name: astFromUnionType ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), v31 (ref), l_Array_0 (copy), l_astFromType_0 (copy)
-    local l_UNION_TYPE_DEFINITION_0 = l_Kind_0.UNION_TYPE_DEFINITION;
-    local v144 = if typeof(v140.astNode) == "table" then v140.astNode.description else nil;
-    local v145 = if v144 ~= nil then v144 else if l_Boolean_0.toJSBoolean(v140.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v140.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_UNION_TYPE_DEFINITION_0, 
-        description = v145, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v140.name
-        }, 
-        directives = v31(v140, v141, v142), 
-        types = l_Array_0.map(v140:getTypes(), function(v146) --[[ Line: 680 ]]
-            -- upvalues: l_astFromType_0 (ref)
-            return (l_astFromType_0(v146));
-        end)
-    };
-end;
-v7.astFromUnionType = v37;
-v38 = function(v147, v148, v149) --[[ Line: 688 ]] --[[ Name: astFromInputObjectType ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v43 (ref), v31 (ref)
-    local l_INPUT_OBJECT_TYPE_DEFINITION_0 = l_Kind_0.INPUT_OBJECT_TYPE_DEFINITION;
-    local v151 = if typeof(v147.astNode) == "table" then v147.astNode.description else nil;
-    local v152 = if v151 ~= nil then v151 else if l_Boolean_0.toJSBoolean(v147.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v147.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_INPUT_OBJECT_TYPE_DEFINITION_0, 
-        description = v152, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v147.name
-        }, 
-        fields = l_Array_0.map(v147:getFields():values(), function(v153) --[[ Line: 714 ]]
-            -- upvalues: v43 (ref), v148 (copy), v149 (copy)
-            return v43(v153, v148, v149);
-        end), 
-        directives = v31(v147, v148, v149)
-    };
-end;
-v7.astFromInputObjectType = v38;
-v39 = function(v154, v155, v156) --[[ Line: 725 ]] --[[ Name: astFromEnumType ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), l_Object_0 (copy), v34 (ref), v31 (ref)
-    local l_ENUM_TYPE_DEFINITION_0 = l_Kind_0.ENUM_TYPE_DEFINITION;
-    local v158 = if typeof(v154.astNode) == "table" then v154.astNode.description else nil;
-    local v159 = if v158 ~= nil then v158 else if l_Boolean_0.toJSBoolean(v154.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v154.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_ENUM_TYPE_DEFINITION_0, 
-        description = v159, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v154.name
-        }, 
-        values = l_Array_0.map(l_Object_0.values(v154:getValues()), function(v160) --[[ Line: 749 ]]
-            -- upvalues: v34 (ref), v155 (copy), v156 (copy)
-            return v34(v160, v155, v156);
-        end), 
-        directives = v31(v154, v155, v156)
-    };
-end;
-v7.astFromEnumType = v39;
-v40 = function(v161, v162, v163) --[[ Line: 759 ]] --[[ Name: astFromScalarType ]]
-    -- upvalues: l_getDirectivesInExtensions_0 (copy), l_Boolean_0 (copy), v33 (ref), l_Array_0 (copy), v30 (ref), l_Kind_0 (copy)
-    local v164 = l_getDirectivesInExtensions_0(v161, v163);
-    local v165 = if l_Boolean_0.toJSBoolean(v164) then v33(v162, v164) else (if typeof(v161.astNode) == "table" then v161.astNode.directives else nil) or {};
-    local v166 = l_Boolean_0.toJSBoolean(v161.specifiedByUrl) and v161.specifiedByUrl or v161.specifiedByURL;
-    if l_Boolean_0.toJSBoolean(if l_Boolean_0.toJSBoolean(v166) then not l_Boolean_0.toJSBoolean(l_Array_0.some(v165, function(v167) --[[ Line: 787 ]]
-        return v167.name.value == "specifiedBy";
-    end)) else v166) then
-        local v168 = {
-            url = v166
-        };
-        table.insert(v165, v30("specifiedBy", v168));
-    end;
-    local l_SCALAR_TYPE_DEFINITION_0 = l_Kind_0.SCALAR_TYPE_DEFINITION;
-    local v170 = if typeof(v161.astNode) == "table" then v161.astNode.description else nil;
-    local v171 = if v170 ~= nil then v170 else if l_Boolean_0.toJSBoolean(v161.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v161.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_SCALAR_TYPE_DEFINITION_0, 
-        description = v171, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v161.name
-        }, 
-        directives = v165
-    };
-end;
-v7.astFromScalarType = v40;
-v42 = function(v172, v173, v174) --[[ Line: 817 ]] --[[ Name: astFromField ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_Array_0 (copy), v41 (ref), l_astFromType_0 (copy), v116 (copy)
-    local l_FIELD_DEFINITION_0 = l_Kind_0.FIELD_DEFINITION;
-    local v176 = if typeof(v172.astNode) == "table" then v172.astNode.description else nil;
-    local v177 = if v176 ~= nil then v176 else if l_Boolean_0.toJSBoolean(v172.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v172.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_FIELD_DEFINITION_0, 
-        description = v177, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v172.name
-        }, 
-        arguments = l_Array_0.map(v172.args, function(v178) --[[ Line: 838 ]]
-            -- upvalues: v41 (ref), v173 (copy), v174 (copy)
-            return v41(v178, v173, v174);
-        end), 
-        type = l_astFromType_0(v172.type), 
-        directives = v116(v172, v173, v174)
-    };
-end;
-v7.astFromField = v42;
-v43 = function(v179, v180, v181) --[[ Line: 849 ]] --[[ Name: astFromInputField ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), l_astFromType_0 (copy), v116 (copy), l_astFromValue_0 (copy), l_NULL_0 (copy)
-    local l_INPUT_VALUE_DEFINITION_1 = l_Kind_0.INPUT_VALUE_DEFINITION;
-    local v183 = if typeof(v179.astNode) == "table" then v179.astNode.description else nil;
-    local v184 = if v183 ~= nil then v183 else if l_Boolean_0.toJSBoolean(v179.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v179.description, 
-        block = true
-    } else nil;
-    local v185 = {
-        kind = l_Kind_0.NAME, 
-        value = v179.name
-    };
-    local v186 = l_astFromType_0(v179.type);
-    local v187 = v116(v179, v180, v181);
-    local v188 = l_astFromValue_0(v179.defaultValue, v179.type);
-    local v189 = if v188 ~= nil and v188 ~= l_NULL_0 then v188 else nil;
-    return {
-        kind = l_INPUT_VALUE_DEFINITION_1, 
-        description = v184, 
-        name = v185, 
-        type = v186, 
-        directives = v187, 
-        defaultValue = v189
-    };
-end;
-v7.astFromInputField = v43;
-v34 = function(v190, v191, v192) --[[ Line: 888 ]] --[[ Name: astFromEnumValue ]]
-    -- upvalues: l_Kind_0 (copy), l_Boolean_0 (copy), v116 (copy)
-    local l_ENUM_VALUE_DEFINITION_0 = l_Kind_0.ENUM_VALUE_DEFINITION;
-    local v194 = if typeof(v190.astNode) == "table" then v190.astNode.description else nil;
-    local v195 = if v194 ~= nil then v194 else if l_Boolean_0.toJSBoolean(v190.description) then {
-        kind = l_Kind_0.STRING, 
-        value = v190.description, 
-        block = true
-    } else nil;
-    return {
-        kind = l_ENUM_VALUE_DEFINITION_0, 
-        description = v195, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v190.name
-        }, 
-        directives = v116(v190, v191, v192)
-    };
-end;
-v7.astFromEnumValue = v34;
-v35 = function(v196) --[[ Line: 916 ]] --[[ Name: makeDeprecatedDirective ]]
-    -- upvalues: v30 (ref), l_GraphQLDeprecatedDirective_0 (copy)
-    return v30("deprecated", {
-        reason = v196
-    }, l_GraphQLDeprecatedDirective_0);
-end;
-v7.makeDeprecatedDirective = v35;
-v30 = function(v197, v198, v199) --[[ Line: 923 ]] --[[ Name: makeDirectiveNode ]]
-    -- upvalues: l_astFromValue_0 (copy), l_Boolean_0 (copy), l_Kind_0 (copy), l_astFromValueUntyped_0 (copy)
-    local v200 = {};
-    if v199 ~= nil then
-        for _, v202 in v199.args do
-            local l_name_0 = v202.name;
-            local v204 = v198[tostring(l_name_0)];
-            if v204 ~= nil then
-                local v205 = l_astFromValue_0(v204, v202.type);
-                if l_Boolean_0.toJSBoolean(v205) then
-                    table.insert(v200, {
-                        kind = l_Kind_0.ARGUMENT, 
-                        name = {
-                            kind = l_Kind_0.NAME, 
-                            value = l_name_0
-                        }, 
-                        value = v205
-                    });
-                end;
-            end;
-        end;
-    else
-        for v206 in v198 do
-            local v207 = v198[tostring(v206)];
-            local v208 = l_astFromValueUntyped_0(v207);
-            if l_Boolean_0.toJSBoolean(v208) then
-                table.insert(v200, {
-                    kind = l_Kind_0.ARGUMENT, 
-                    name = {
-                        kind = l_Kind_0.NAME, 
-                        value = v206
-                    }, 
-                    value = v208
-                });
-            end;
-        end;
-    end;
-    return {
-        kind = l_Kind_0.DIRECTIVE, 
-        name = {
-            kind = l_Kind_0.NAME, 
-            value = v197
-        }, 
-        arguments = v200
-    };
-end;
-v7.makeDirectiveNode = v30;
-v33 = function(v209, v210) --[[ Line: 975 ]] --[[ Name: makeDirectiveNodes ]]
-    -- upvalues: l_Array_0 (copy), v30 (ref)
-    local v211 = {};
-    for v212 in v210 do
-        local v213 = v210[tostring(v212)];
-        local v214 = if typeof(v209) == "table" then v209:getDirective(v212) else nil;
-        if l_Array_0.isArray(v213) and #v213 ~= 0 then
-            for _, v216 in v213 do
-                table.insert(v211, v30(v212, v216, v214));
-            end;
-        else
-            table.insert(v211, v30(v212, v213, v214));
-        end;
-    end;
-    return v211;
-end;
-v7.makeDirectiveNodes = v33;
-return v7;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local Map = LuauPolyfill.Map
+local Object = LuauPolyfill.Object
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local print = GraphQL.print
+local Kind = GraphQL.Kind
+local isSpecifiedScalarType = GraphQL.isSpecifiedScalarType
+local isIntrospectionType = GraphQL.isIntrospectionType
+local isSpecifiedDirective = GraphQL.isSpecifiedDirective
+local astFromValue = GraphQL.astFromValue
+local GraphQLDeprecatedDirective = GraphQL.GraphQLDeprecatedDirective
+local isObjectType = GraphQL.isObjectType
+local isInterfaceType = GraphQL.isInterfaceType
+local isUnionType = GraphQL.isUnionType
+local isInputObjectType = GraphQL.isInputObjectType
+local isEnumType = GraphQL.isEnumType
+local isScalarType = GraphQL.isScalarType
+
+require(script.Parent.types)
+
+local astFromType = require(script.Parent.astFromType).astFromType
+local getDirectivesInExtensions = require(script.Parent["get-directives"]).getDirectivesInExtensions
+local astFromValueUntyped = require(script.Parent.astFromValueUntyped).astFromValueUntyped
+local isSome = require(script.Parent.helpers).isSome
+local getRootTypeMap = require(script.Parent.rootTypes).getRootTypeMap
+local astFromSchema = nil
+local astFromDirective = nil
+local makeDirectiveNode = nil
+local getDirectiveNodes = nil
+local astFromObjectType = nil
+local makeDirectiveNodes = nil
+local astFromEnumValue = nil
+local makeDeprecatedDirective = nil
+local astFromInterfaceType = nil
+local astFromUnionType = nil
+local astFromInputObjectType = nil
+local astFromEnumType = nil
+local astFromScalarType = nil
+local astFromArg = nil
+local astFromField = nil
+local astFromInputField = nil
+local NULL = GraphQL.NULL
+
+local function getDocumentNodeFromSchema(p1, p2) -- line: 160
+	-- upvalues: astFromSchema (ref), Boolean (copy), isSpecifiedDirective (copy), astFromDirective (ref), isSpecifiedScalarType (copy), isIntrospectionType (copy), isObjectType (copy), astFromObjectType (ref), isInterfaceType (copy), astFromInterfaceType (ref), isUnionType (copy), astFromUnionType (ref), isInputObjectType (copy), astFromInputObjectType (ref), isEnumType (copy), astFromEnumType (ref), isScalarType (copy), astFromScalarType (ref), Error (copy), Kind (copy)
+	local pathToDirectivesInExtensions = ((if p2 == nil then {} else p2)).pathToDirectivesInExtensions
+	local v50 = p1:getTypeMap()
+	local v51 = astFromSchema(p1, pathToDirectivesInExtensions)
+	local v52 = if v51 == nil then {} else { v51 }
+
+	for _, v54 in (p1:getDirectives()) do
+		if not Boolean.toJSBoolean(isSpecifiedDirective(v54)) then
+			table.insert(v52, astFromDirective(v54, p1, pathToDirectivesInExtensions))
+		end
+	end
+
+	for _, v56 in v50 do
+		local v57 = v50:get(v56[1])
+		local v58 = isSpecifiedScalarType(v57)
+		local v59 = isIntrospectionType(v57)
+
+		if not v58 and not v59 then
+			if Boolean.toJSBoolean(isObjectType(v57)) then
+				table.insert(v52, astFromObjectType(v57, p1, pathToDirectivesInExtensions))
+			elseif Boolean.toJSBoolean(isInterfaceType(v57)) then
+				table.insert(v52, astFromInterfaceType(v57, p1, pathToDirectivesInExtensions))
+			elseif Boolean.toJSBoolean(isUnionType(v57)) then
+				table.insert(v52, astFromUnionType(v57, p1, pathToDirectivesInExtensions))
+			elseif Boolean.toJSBoolean(isInputObjectType(v57)) then
+				table.insert(v52, astFromInputObjectType(v57, p1, pathToDirectivesInExtensions))
+			elseif Boolean.toJSBoolean(isEnumType(v57)) then
+				table.insert(v52, astFromEnumType(v57, p1, pathToDirectivesInExtensions))
+			elseif Boolean.toJSBoolean(isScalarType(v57)) then
+				table.insert(v52, astFromScalarType(v57, p1, pathToDirectivesInExtensions))
+			else
+				error(Error.new(("Unknown type %s."):format((tostring(v57)))))
+			end
+		end
+	end
+
+	return {
+		kind = Kind.DOCUMENT,
+		definitions = v52
+	}
+end
+
+t1.getDocumentNodeFromSchema = getDocumentNodeFromSchema
+
+function t1.printSchemaWithDirectives(p3, p4) -- line: 244
+	-- upvalues: getDocumentNodeFromSchema (copy), print (copy)
+	local v62 = if p4 == nil then {} else p4
+	local v63 = getDocumentNodeFromSchema(p3, v62)
+
+	return print(v63)
+end
+function astFromSchema(p5, p6) -- line: 252
+	-- upvalues: Map (copy), Object (copy), Boolean (copy), getRootTypeMap (copy), astFromType (copy), Kind (copy), Array (copy), isSome (copy), getDirectiveNodes (ref)
+	local v66 = Map.new({
+		{
+			"query",
+			Object.None
+		},
+		{
+			"mutation",
+			Object.None
+		},
+		{
+			"subscription",
+			Object.None
+		}
+	})
+	local t2 = {}
+
+	if p5.astNode ~= nil then
+		table.insert(t2, p5.astNode)
+	end
+
+	if p5.extensionASTNodes ~= nil then
+		for _, v69 in p5.extensionASTNodes do
+			table.insert(t2, v69)
+		end
+	end
+
+	for _, v71 in t2 do
+		if Boolean.toJSBoolean(v71.operationTypes) then
+			for _, v73 in v71.operationTypes do
+				v66:set(v73.operation, v73)
+			end
+		end
+	end
+
+	local v74 = getRootTypeMap(p5)
+
+	for _, v76 in v66 do
+		local v77, v78 = table.unpack(v76, 1, 2)
+		local v79 = v74:get(v77)
+
+		if v79 ~= nil then
+			local v80 = astFromType(v79)
+
+			if v78 ~= nil and v78 ~= Object.None then
+				v78.type = v80
+			else
+				v66:set(v77, {
+					kind = Kind.OPERATION_TYPE_DEFINITION,
+					operation = v77,
+					type = v80
+				})
+			end
+		end
+	end
+
+	local v81 = Array.filter(Array.concat({}, v66:values()), isSome)
+	local v82 = getDirectiveNodes(p5, p5, p6)
+
+	if not Boolean.toJSBoolean(#v81) and not Boolean.toJSBoolean(#v82) then
+		return nil
+	end
+
+	local t3 = {
+		kind = if v81 == nil then Kind.SCHEMA_EXTENSION else Kind.SCHEMA_DEFINITION,
+		operationTypes = v81,
+		directives = v82
+	}
+	local toJSBoolean = Boolean.toJSBoolean
+	local v85 = if typeof(p5.astNode) ~= "table" then nil else p5.astNode.description
+
+	t3.description = if not toJSBoolean(if v85 == nil then p5.description ~= nil else v85) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p5.description
+	}
+
+	return t3
+end
+
+t1.astFromSchema = astFromSchema
+
+function astFromDirective(p7, p8, p9) -- line: 355
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), astFromArg (ref)
+	local DIRECTIVE_DEFINITION = Kind.DIRECTIVE_DEFINITION
+	local v90 = if typeof(p7.astNode) ~= "table" then nil else p7.astNode.description
+	local v91 = if v90 == nil then if not Boolean.toJSBoolean(p7.description) then nil else {
+		kind = Kind.STRING,
+		value = p7.description
+	} else v90
+	local t4 = {
+		kind = Kind.NAME,
+		value = p7.name
+	}
+	local v93 = if typeof(p7.args) ~= "table" then nil else Array.map(p7.args, function(p10) -- line: 379
+		-- upvalues: astFromArg (ref), p8 (copy), p9 (copy)
+		return astFromArg(p10, p8, p9)
+	end)
+	local isRepeatable = p7.isRepeatable
+	local v95 = if typeof(p7.locations) ~= "table" then nil else Array.map(p7.locations, function(p11) -- line: 390
+		-- upvalues: Kind (copy)
+		return {
+			kind = Kind.NAME,
+			value = p11
+		}
+	end)
+	local v96 = Boolean.toJSBoolean(v95) and v95 or {}
+
+	return {
+		kind = DIRECTIVE_DEFINITION,
+		description = v91,
+		name = t4,
+		arguments = v93,
+		repeatable = isRepeatable,
+		locations = v96
+	}
+end
+
+t1.astFromDirective = astFromDirective
+
+function getDirectiveNodes(p12, p13, p14) -- line: 418
+	-- upvalues: getDirectivesInExtensions (copy), Array (copy), Object (copy), makeDirectiveNodes (ref), Boolean (copy)
+	local v100 = getDirectivesInExtensions(p12, p14)
+	local t5 = {}
+
+	if p12.astNode ~= nil then
+		table.insert(t5, p12.astNode)
+	end
+
+	if Array.indexOf(Object.keys(p12), "extensionASTNodes") ~= -1 and p12.extensionASTNodes ~= nil then
+		t5 = Array.concat(t5, p12.extensionASTNodes)
+	end
+
+	if v100 ~= nil then
+		return (makeDirectiveNodes(p13, v100))
+	end
+
+	local t6 = {}
+
+	for _, v104 in t5 do
+		if Boolean.toJSBoolean(v104.directives) then
+			t6 = Array.concat(t6, v104.directives)
+		end
+	end
+
+	return t6
+end
+
+t1.getDirectiveNodes = getDirectiveNodes
+
+local function getDeprecatableDirectiveNodes(p15, p16, p17) -- line: 471
+	-- upvalues: getDirectivesInExtensions (copy), makeDirectiveNodes (ref), Array (copy), makeDeprecatedDirective (ref)
+	local t7 = {}
+	local v109 = nil
+	local v110 = getDirectivesInExtensions(p15, p17)
+	local v111 = if v110 == nil then if typeof(p15.astNode) ~= "table" then nil else p15.astNode.directives else makeDirectiveNodes(p16, v110)
+
+	if v111 ~= nil then
+		t7 = Array.filter(v111, function(p18) -- line: 493
+			return p18.name.value ~= "deprecated"
+		end)
+
+		if p15.deprecationReason ~= nil then
+			v109 = if typeof(Array.filter(v111, function(p19) -- line: 500
+				return p19.name.value == "deprecated"
+			end)) ~= "table" then nil else Array.filter(v111, function(p20) -- line: 504
+				return p20.name.value == "deprecated"
+			end)[1]
+		end
+	end
+
+	if p15.deprecationReason ~= nil and v109 == nil then
+		v109 = makeDeprecatedDirective(p15.deprecationReason)
+	end
+
+	if v109 == nil then
+		return t7
+	end
+
+	return (Array.concat({ v109 }, t7))
+end
+
+t1.getDeprecatableDirectiveNodes = getDeprecatableDirectiveNodes
+
+function astFromArg(p21, p22, p23) -- line: 528
+	-- upvalues: Kind (copy), Boolean (copy), astFromType (copy), astFromValue (copy), getDeprecatableDirectiveNodes (copy)
+	local INPUT_VALUE_DEFINITION = Kind.INPUT_VALUE_DEFINITION
+	local v116 = if typeof(p21.astNode) ~= "table" then nil else p21.astNode.description
+	local v117 = if v116 == nil then if not Boolean.toJSBoolean(p21.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p21.description
+	} else v116
+
+	return {
+		kind = INPUT_VALUE_DEFINITION,
+		description = v117,
+		name = {
+			kind = Kind.NAME,
+			value = p21.name
+		},
+		type = astFromType(p21.type),
+		defaultValue = if p21.defaultValue == nil then nil else astFromValue(p21.defaultValue, p21.type),
+		directives = getDeprecatableDirectiveNodes(p21, p22, p23)
+	}
+end
+
+t1.astFromArg = astFromArg
+
+function astFromObjectType(p24, p25, p26) -- line: 566
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), astFromField (ref), Object (copy), astFromType (copy), getDirectiveNodes (ref)
+	local OBJECT_TYPE_DEFINITION = Kind.OBJECT_TYPE_DEFINITION
+	local v122 = if typeof(p24.astNode) ~= "table" then nil else p24.astNode.description
+	local v123 = if v122 == nil then if not Boolean.toJSBoolean(p24.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p24.description
+	} else v122
+
+	return {
+		kind = OBJECT_TYPE_DEFINITION,
+		description = v123,
+		name = {
+			kind = Kind.NAME,
+			value = p24.name
+		},
+		fields = Array.map(p24:getFields():values(), function(p27) -- line: 592
+			-- upvalues: astFromField (ref), p25 (copy), p26 (copy)
+			return astFromField(p27, p25, p26)
+		end),
+		interfaces = Array.map(Object.values(p24:getInterfaces()), function(p28) -- line: 596
+			-- upvalues: astFromType (copy)
+			return (astFromType(p28))
+		end),
+		directives = getDirectiveNodes(p24, p25, p26)
+	}
+end
+
+t1.astFromObjectType = astFromObjectType
+
+function astFromInterfaceType(p29, p30, p31) -- line: 605
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), astFromField (ref), getDirectiveNodes (ref), Object (copy), astFromType (copy)
+	local INTERFACE_TYPE_DEFINITION = Kind.INTERFACE_TYPE_DEFINITION
+	local v128 = if typeof(p29.astNode) ~= "table" then nil else p29.astNode.description
+	local v129 = if v128 == nil then if not Boolean.toJSBoolean(p29.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p29.description
+	} else v128
+	local t8 = {
+		kind = INTERFACE_TYPE_DEFINITION,
+		description = v129,
+		name = {
+			kind = Kind.NAME,
+			value = p29.name
+		},
+		fields = Array.map(p29:getFields():values(), function(p32) -- line: 631
+			-- upvalues: astFromField (ref), p30 (copy), p31 (copy)
+			return astFromField(p32, p30, p31)
+		end),
+		directives = getDirectiveNodes(p29, p30, p31)
+	}
+
+	if p29.getInterfaces ~= nil then
+		t8.interfaces = Array.map(Object.values(p29:getInterfaces()), function(p33) -- line: 643
+			-- upvalues: astFromType (copy)
+			return (astFromType(p33))
+		end)
+	end
+
+	return t8
+end
+
+t1.astFromInterfaceType = astFromInterfaceType
+
+function astFromUnionType(p34, p35, p36) -- line: 653
+	-- upvalues: Kind (copy), Boolean (copy), getDirectiveNodes (ref), Array (copy), astFromType (copy)
+	local UNION_TYPE_DEFINITION = Kind.UNION_TYPE_DEFINITION
+	local v135 = if typeof(p34.astNode) ~= "table" then nil else p34.astNode.description
+	local v136 = if v135 == nil then if not Boolean.toJSBoolean(p34.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p34.description
+	} else v135
+
+	return {
+		kind = UNION_TYPE_DEFINITION,
+		description = v136,
+		name = {
+			kind = Kind.NAME,
+			value = p34.name
+		},
+		directives = getDirectiveNodes(p34, p35, p36),
+		types = Array.map(p34:getTypes(), function(p37) -- line: 680
+			-- upvalues: astFromType (copy)
+			return (astFromType(p37))
+		end)
+	}
+end
+
+t1.astFromUnionType = astFromUnionType
+
+function astFromInputObjectType(p38, p39, p40) -- line: 688
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), astFromInputField (ref), getDirectiveNodes (ref)
+	local INPUT_OBJECT_TYPE_DEFINITION = Kind.INPUT_OBJECT_TYPE_DEFINITION
+	local v141 = if typeof(p38.astNode) ~= "table" then nil else p38.astNode.description
+	local v142 = if v141 == nil then if not Boolean.toJSBoolean(p38.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p38.description
+	} else v141
+
+	return {
+		kind = INPUT_OBJECT_TYPE_DEFINITION,
+		description = v142,
+		name = {
+			kind = Kind.NAME,
+			value = p38.name
+		},
+		fields = Array.map(p38:getFields():values(), function(p41) -- line: 714
+			-- upvalues: astFromInputField (ref), p39 (copy), p40 (copy)
+			return astFromInputField(p41, p39, p40)
+		end),
+		directives = getDirectiveNodes(p38, p39, p40)
+	}
+end
+
+t1.astFromInputObjectType = astFromInputObjectType
+
+function astFromEnumType(p42, p43, p44) -- line: 725
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), Object (copy), astFromEnumValue (ref), getDirectiveNodes (ref)
+	local ENUM_TYPE_DEFINITION = Kind.ENUM_TYPE_DEFINITION
+	local v147 = if typeof(p42.astNode) ~= "table" then nil else p42.astNode.description
+	local v148 = if v147 == nil then if not Boolean.toJSBoolean(p42.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p42.description
+	} else v147
+
+	return {
+		kind = ENUM_TYPE_DEFINITION,
+		description = v148,
+		name = {
+			kind = Kind.NAME,
+			value = p42.name
+		},
+		values = Array.map(Object.values(p42:getValues()), function(p45) -- line: 749
+			-- upvalues: astFromEnumValue (ref), p43 (copy), p44 (copy)
+			return astFromEnumValue(p45, p43, p44)
+		end),
+		directives = getDirectiveNodes(p42, p43, p44)
+	}
+end
+
+t1.astFromEnumType = astFromEnumType
+
+function astFromScalarType(p46, p47, p48) -- line: 759
+	-- upvalues: getDirectivesInExtensions (copy), Boolean (copy), makeDirectiveNodes (ref), Array (copy), makeDirectiveNode (ref), Kind (copy)
+	local v152 = getDirectivesInExtensions(p46, p48)
+	local v153 = if not Boolean.toJSBoolean(v152) then ((if typeof(p46.astNode) ~= "table" then nil else p46.astNode.directives)) or {} else makeDirectiveNodes(p47, v152)
+	local v154 = Boolean.toJSBoolean(p46.specifiedByUrl) and p46.specifiedByUrl or p46.specifiedByURL
+
+	if Boolean.toJSBoolean(if not Boolean.toJSBoolean(v154) then v154 else not Boolean.toJSBoolean(Array.some(v153, function(p49) -- line: 787
+		return p49.name.value == "specifiedBy"
+	end))) then
+		local t9 = {
+			url = v154
+		}
+
+		table.insert(v153, makeDirectiveNode("specifiedBy", t9))
+	end
+
+	local SCALAR_TYPE_DEFINITION = Kind.SCALAR_TYPE_DEFINITION
+	local v157 = if typeof(p46.astNode) ~= "table" then nil else p46.astNode.description
+	local v158 = if v157 == nil then if not Boolean.toJSBoolean(p46.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p46.description
+	} else v157
+
+	return {
+		kind = SCALAR_TYPE_DEFINITION,
+		description = v158,
+		name = {
+			kind = Kind.NAME,
+			value = p46.name
+		},
+		directives = v153
+	}
+end
+
+t1.astFromScalarType = astFromScalarType
+
+function astFromField(p50, p51, p52) -- line: 817
+	-- upvalues: Kind (copy), Boolean (copy), Array (copy), astFromArg (ref), astFromType (copy), getDeprecatableDirectiveNodes (copy)
+	local FIELD_DEFINITION = Kind.FIELD_DEFINITION
+	local v163 = if typeof(p50.astNode) ~= "table" then nil else p50.astNode.description
+	local v164 = if v163 == nil then if not Boolean.toJSBoolean(p50.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p50.description
+	} else v163
+
+	return {
+		kind = FIELD_DEFINITION,
+		description = v164,
+		name = {
+			kind = Kind.NAME,
+			value = p50.name
+		},
+		arguments = Array.map(p50.args, function(p53) -- line: 838
+			-- upvalues: astFromArg (ref), p51 (copy), p52 (copy)
+			return astFromArg(p53, p51, p52)
+		end),
+		type = astFromType(p50.type),
+		directives = getDeprecatableDirectiveNodes(p50, p51, p52)
+	}
+end
+
+t1.astFromField = astFromField
+
+function astFromInputField(p54, p55, p56) -- line: 849
+	-- upvalues: Kind (copy), Boolean (copy), astFromType (copy), getDeprecatableDirectiveNodes (copy), astFromValue (copy), NULL (copy)
+	local INPUT_VALUE_DEFINITION = Kind.INPUT_VALUE_DEFINITION
+	local v169 = if typeof(p54.astNode) ~= "table" then nil else p54.astNode.description
+	local v170 = if v169 == nil then if not Boolean.toJSBoolean(p54.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p54.description
+	} else v169
+	local t10 = {
+		kind = Kind.NAME,
+		value = p54.name
+	}
+	local v172 = astFromType(p54.type)
+	local v173 = getDeprecatableDirectiveNodes(p54, p55, p56)
+	local v174 = astFromValue(p54.defaultValue, p54.type)
+	local v175 = if v174 == nil or v174 == NULL then nil else v174
+
+	return {
+		kind = INPUT_VALUE_DEFINITION,
+		description = v170,
+		name = t10,
+		type = v172,
+		directives = v173,
+		defaultValue = v175
+	}
+end
+
+t1.astFromInputField = astFromInputField
+
+function astFromEnumValue(p57, p58, p59) -- line: 888
+	-- upvalues: Kind (copy), Boolean (copy), getDeprecatableDirectiveNodes (copy)
+	local ENUM_VALUE_DEFINITION = Kind.ENUM_VALUE_DEFINITION
+	local v180 = if typeof(p57.astNode) ~= "table" then nil else p57.astNode.description
+	local v181 = if v180 == nil then if not Boolean.toJSBoolean(p57.description) then nil else {
+		block = true,
+		kind = Kind.STRING,
+		value = p57.description
+	} else v180
+
+	return {
+		kind = ENUM_VALUE_DEFINITION,
+		description = v181,
+		name = {
+			kind = Kind.NAME,
+			value = p57.name
+		},
+		directives = getDeprecatableDirectiveNodes(p57, p58, p59)
+	}
+end
+
+t1.astFromEnumValue = astFromEnumValue
+
+function makeDeprecatedDirective(s1: string) -- line: 916
+	-- upvalues: makeDirectiveNode (ref), GraphQLDeprecatedDirective (copy)
+	return makeDirectiveNode("deprecated", {
+		reason = s1
+	}, GraphQLDeprecatedDirective)
+end
+
+t1.makeDeprecatedDirective = makeDeprecatedDirective
+
+function makeDirectiveNode(s2: string, t11: {[any]: any}, p60) -- line: 923
+	-- upvalues: astFromValue (copy), Boolean (copy), Kind (copy), astFromValueUntyped (copy)
+	local t12 = {}
+
+	if p60 ~= nil then
+		for _, v188 in p60.args do
+			local name = v188.name
+			local v190 = t11[tostring(name)]
+
+			if v190 ~= nil then
+				local v191 = astFromValue(v190, v188.type)
+
+				if Boolean.toJSBoolean(v191) then
+					table.insert(t12, {
+						kind = Kind.ARGUMENT,
+						name = {
+							kind = Kind.NAME,
+							value = name
+						},
+						value = v191
+					})
+				end
+			end
+		end
+	else
+		for v192 in t11 do
+			local v193 = t11[tostring(v192)]
+			local v194 = astFromValueUntyped(v193)
+
+			if Boolean.toJSBoolean(v194) then
+				table.insert(t12, {
+					kind = Kind.ARGUMENT,
+					name = {
+						kind = Kind.NAME,
+						value = v192
+					},
+					value = v194
+				})
+			end
+		end
+	end
+
+	return {
+		kind = Kind.DIRECTIVE,
+		name = {
+			kind = Kind.NAME,
+			value = s2
+		},
+		arguments = t12
+	}
+end
+
+t1.makeDirectiveNode = makeDirectiveNode
+
+function makeDirectiveNodes(p61, t13: {[any]: any}) -- line: 975
+	-- upvalues: Array (copy), makeDirectiveNode (ref)
+	local t14 = {}
+
+	for v198 in t13 do
+		local v199 = t13[tostring(v198)]
+		local v200 = if typeof(p61) ~= "table" then nil else p61:getDirective(v198)
+
+		if Array.isArray(v199) and #v199 ~= 0 then
+			for _, v202 in v199 do
+				table.insert(t14, makeDirectiveNode(v198, v202, v200))
+			end
+		else
+			table.insert(t14, makeDirectiveNode(v198, v199, v200))
+		end
+	end
+
+	return t14
+end
+
+t1.makeDirectiveNodes = makeDirectiveNodes
+
+return t1

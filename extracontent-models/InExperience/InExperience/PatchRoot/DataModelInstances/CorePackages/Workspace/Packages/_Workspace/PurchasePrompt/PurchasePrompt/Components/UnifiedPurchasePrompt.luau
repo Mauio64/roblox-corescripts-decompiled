@@ -1,92 +1,139 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.IAPExperience);
-local v4 = require(l_script_FirstAncestor_0.Components.PurchasePromptApp);
-local v5 = require(l_script_FirstAncestor_0.Actions.SetPurchaseCallbacks);
-local v6 = require(l_script_FirstAncestor_0.Actions.SetPostPurchaseActions);
-local v7 = require(l_script_FirstAncestor_0.Actions.SetProductPayload);
-local v8 = require(l_script_FirstAncestor_0.Actions.SetPurchaseAnalyticsMetadata);
-local v9 = require(l_script_FirstAncestor_0.Actions.SetPurchaseOptions);
-local v10 = require(l_script_FirstAncestor_0.Thunks.initiatePurchase);
-local v11 = require(l_script_FirstAncestor_0.Thunks.initiateBundlePurchase);
-local v12 = require(l_script_FirstAncestor_0.Utils.dispatchPurchaseForProductPayload);
-local l_ProductTypeEnum_0 = require(l_script_FirstAncestor_0.types).ProductTypeEnum;
-local v14 = require(l_Parent_0.SharedFlags);
-local l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 = v14.FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow;
-local l_FFlagPurchasePromptSubtitleForTimedOptions_0 = v14.FFlagPurchasePromptSubtitleForTimedOptions;
-local _ = v14.FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal;
-local v18 = require(l_script_FirstAncestor_0.Flags.FFlagRefactorUnifiedPurchasePrompt);
-local _ = require(l_script_FirstAncestor_0.types);
-return function(v20) --[[ Line: 37 ]] --[[ Name: UnifiedPurchasePrompt ]]
-    -- upvalues: v2 (copy), v7 (copy), v5 (copy), v6 (copy), v8 (copy), l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (copy), v9 (copy), v18 (copy), v12 (copy), l_ProductTypeEnum_0 (copy), v10 (copy), v11 (copy), v4 (copy), l_FFlagPurchasePromptSubtitleForTimedOptions_0 (copy)
-    local l_store_0 = v20.store;
-    v2.useEffect(function() --[[ Line: 39 ]]
-        -- upvalues: v20 (copy), l_store_0 (copy), v7 (ref), v5 (ref), v6 (ref), v8 (ref), l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (ref), v9 (ref), v18 (ref), v12 (ref), l_ProductTypeEnum_0 (ref), v10 (ref), v11 (ref)
-        local l_productPayload_0 = v20.productPayload;
-        l_store_0:dispatch(v7(l_productPayload_0));
-        if v20.purchaseCallbacks then
-            l_store_0:dispatch(v5(v20.purchaseCallbacks));
-        end;
-        if v20.postPurchaseActions then
-            l_store_0:dispatch(v6(v20.postPurchaseActions));
-        end;
-        if v20.purchaseAnalyticsMetadata then
-            l_store_0:dispatch(v8({
-                surface = v20.purchaseAnalyticsMetadata.surface, 
-                productUniverseId = v20.purchaseAnalyticsMetadata.productUniverseId
-            }));
-        end;
-        if l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 and v20.purchaseOptions then
-            l_store_0:dispatch(v9(v20.purchaseOptions));
-        end;
-        if v18 then
-            v12(function(v23) --[[ Line: 64 ]]
-                -- upvalues: l_store_0 (ref)
-                l_store_0:dispatch(v23);
-            end, l_productPayload_0, nil, false);
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Asset then
-            l_store_0:dispatch(v10(l_productPayload_0.id, Enum.InfoType.Asset, l_productPayload_0.equipIfPurchased, l_productPayload_0.isRobloxPurchase, l_productPayload_0.idempotencyKey, nil, l_productPayload_0.collectibleItemId, l_productPayload_0.collectibleItemInstanceId, l_productPayload_0.collectibleProductId, l_productPayload_0.expectedPrice));
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Gamepass then
-            l_store_0:dispatch(v10(l_productPayload_0.id, Enum.InfoType.GamePass));
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Product then
-            l_store_0:dispatch(v10(l_productPayload_0.id, Enum.InfoType.Product, l_productPayload_0.equipIfPurchased));
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Bundle then
-            l_store_0:dispatch(v11(l_productPayload_0.id, l_productPayload_0.idempotencyKey, nil, l_productPayload_0.collectibleItemId, l_productPayload_0.collectibleItemInstanceId, l_productPayload_0.collectibleProductId, l_productPayload_0.expectedPrice));
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Experience then
-            l_store_0:dispatch(v10(l_productPayload_0.universeId, l_ProductTypeEnum_0.Experience, nil, nil, nil, nil, nil, nil, nil, nil, {
-                name = l_productPayload_0.experienceName, 
-                imageUrl = l_productPayload_0.experienceIconUrl
-            }));
-            return;
-        elseif l_productPayload_0.kind == l_ProductTypeEnum_0.Look then
-            l_store_0:dispatch(v10(l_productPayload_0.id, l_ProductTypeEnum_0.Look, nil, nil, nil, nil, nil, nil, nil, nil, {
-                expectedPrice = l_productPayload_0.expectedPrice
-            }));
-            return;
-        else
-            if l_productPayload_0.kind == l_ProductTypeEnum_0.DeveloperSubscription then
-                l_store_0:dispatch(v10(l_productPayload_0.subscriptionId, l_ProductTypeEnum_0.DeveloperSubscription, nil, nil, nil, nil, nil, nil, nil, l_productPayload_0.expectedPrice, {
-                    expectedPrice = l_productPayload_0.expectedPrice, 
-                    name = l_productPayload_0.name, 
-                    iconImageAssetId = l_productPayload_0.iconImageAssetId, 
-                    displayPrice = l_productPayload_0.displayPrice
-                }));
-            end;
-            return;
-        end;
-    end, {
-        v20.productPayload, 
-        v20.purchaseCallbacks, 
-        v20.postPurchaseActions
-    });
-    return v2.createElement(v4, {
-        store = l_store_0, 
-        subtitleView = if l_FFlagPurchasePromptSubtitleForTimedOptions_0 then v20.subtitleView else nil
-    });
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local React = require(PurchasePromptParent.React)
+
+require(PurchasePromptParent.IAPExperience)
+
+local PurchasePromptApp = require(PurchasePrompt.Components.PurchasePromptApp)
+local SetPurchaseCallbacks = require(PurchasePrompt.Actions.SetPurchaseCallbacks)
+local SetPostPurchaseActions = require(PurchasePrompt.Actions.SetPostPurchaseActions)
+local SetProductPayload = require(PurchasePrompt.Actions.SetProductPayload)
+local SetPurchaseAnalyticsMetadata = require(PurchasePrompt.Actions.SetPurchaseAnalyticsMetadata)
+local SetPurchaseOptions = require(PurchasePrompt.Actions.SetPurchaseOptions)
+local initiatePurchase = require(PurchasePrompt.Thunks.initiatePurchase)
+local initiateBundlePurchase = require(PurchasePrompt.Thunks.initiateBundlePurchase)
+local dispatchPurchaseForProductPayload = require(PurchasePrompt.Utils.dispatchPurchaseForProductPayload)
+local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local SharedFlags = require(PurchasePromptParent.SharedFlags)
+local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = SharedFlags.FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+local FFlagPurchasePromptSubtitleForTimedOptions = SharedFlags.FFlagPurchasePromptSubtitleForTimedOptions
+local _ = SharedFlags.FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal
+local FFlagRefactorUnifiedPurchasePrompt = require(PurchasePrompt.Flags.FFlagRefactorUnifiedPurchasePrompt)
+local FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell = require(PurchasePrompt.Flags.FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell)
+local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
+
+require(PurchasePrompt.types)
+
+local function UnifiedPurchasePrompt(t1: {[any]: any}) -- line: 42
+	-- upvalues: React (copy), SetProductPayload (copy), SetPurchaseCallbacks (copy), SetPostPurchaseActions (copy), SetPurchaseAnalyticsMetadata (copy), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), SetPurchaseOptions (copy), FFlagRefactorUnifiedPurchasePrompt (copy), dispatchPurchaseForProductPayload (copy), ProductTypeEnum (copy), initiatePurchase (copy), initiateBundlePurchase (copy), FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell (copy), FFlagAXMISWithBlackbird (copy), PurchasePromptApp (copy), FFlagPurchasePromptCartPricingEnabled (copy), FFlagPurchasePromptSubtitleForTimedOptions (copy)
+	local store = t1.store
+
+	React.useEffect(function() -- line: 44
+		-- upvalues: t1 (copy), store (copy), SetProductPayload (copy), SetPurchaseCallbacks (copy), SetPostPurchaseActions (copy), SetPurchaseAnalyticsMetadata (copy), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), SetPurchaseOptions (copy), FFlagRefactorUnifiedPurchasePrompt (copy), dispatchPurchaseForProductPayload (copy), ProductTypeEnum (copy), initiatePurchase (copy), initiateBundlePurchase (copy), FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell (copy), FFlagAXMISWithBlackbird (copy)
+		local productPayload = t1.productPayload
+
+		store:dispatch(SetProductPayload(productPayload))
+
+		if t1.purchaseCallbacks then
+			store:dispatch(SetPurchaseCallbacks(t1.purchaseCallbacks))
+		end
+
+		if t1.postPurchaseActions then
+			store:dispatch(SetPostPurchaseActions(t1.postPurchaseActions))
+		end
+
+		if t1.purchaseAnalyticsMetadata then
+			store:dispatch(SetPurchaseAnalyticsMetadata({
+				surface = t1.purchaseAnalyticsMetadata.surface,
+				productUniverseId = t1.purchaseAnalyticsMetadata.productUniverseId
+			}))
+		end
+
+		if FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow and t1.purchaseOptions then
+			store:dispatch(SetPurchaseOptions(t1.purchaseOptions))
+		end
+
+		if FFlagRefactorUnifiedPurchasePrompt then
+			dispatchPurchaseForProductPayload(function(p1) -- line: 69
+				-- upvalues: store (copy)
+				store:dispatch(p1)
+			end, productPayload, nil, false)
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Asset then
+			store:dispatch(initiatePurchase(productPayload.id, Enum.InfoType.Asset, productPayload.equipIfPurchased, productPayload.isRobloxPurchase, productPayload.idempotencyKey, nil, productPayload.collectibleItemId, productPayload.collectibleItemInstanceId, productPayload.collectibleProductId, productPayload.expectedPrice))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Gamepass then
+			store:dispatch(initiatePurchase(productPayload.id, Enum.InfoType.GamePass))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Product then
+			store:dispatch(initiatePurchase(productPayload.id, Enum.InfoType.Product, productPayload.equipIfPurchased))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Bundle then
+			store:dispatch(initiateBundlePurchase(productPayload.id, productPayload.idempotencyKey, nil, productPayload.collectibleItemId, productPayload.collectibleItemInstanceId, productPayload.collectibleProductId, productPayload.expectedPrice))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Experience then
+			store:dispatch(initiatePurchase(productPayload.universeId, ProductTypeEnum.Experience, nil, nil, nil, nil, nil, nil, nil, nil, {
+				name = productPayload.experienceName,
+				imageUrl = productPayload.experienceIconUrl
+			}))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.Look then
+			store:dispatch(initiatePurchase(productPayload.id, ProductTypeEnum.Look, nil, nil, nil, nil, nil, nil, nil, nil, if not FFlagUnifiedPurchaseSupportRefetchingLooksAfterUpsell then {
+				expectedPrice = productPayload.expectedPrice
+			} else {
+				expectedPrice = productPayload.expectedPrice,
+				excludedAssetIds = productPayload.excludedAssetIds,
+				excludedBundleIds = productPayload.excludedBundleIds,
+				timedOptions = productPayload.timedOptions
+			}))
+
+			return
+		end
+
+		if FFlagAXMISWithBlackbird and productPayload.kind == ProductTypeEnum.RobuxUpsell then
+			store:dispatch(initiatePurchase(nil, ProductTypeEnum.RobuxUpsell, nil, nil, nil, nil, nil, nil, nil, nil, nil))
+
+			return
+		end
+
+		if productPayload.kind == ProductTypeEnum.DeveloperSubscription then
+			store:dispatch(initiatePurchase(productPayload.subscriptionId, ProductTypeEnum.DeveloperSubscription, nil, nil, nil, nil, nil, nil, nil, productPayload.expectedPrice, {
+				expectedPrice = productPayload.expectedPrice,
+				name = productPayload.name,
+				iconImageAssetId = productPayload.iconImageAssetId,
+				displayPrice = productPayload.displayPrice
+			}))
+		end
+	end, {
+		t1.productPayload,
+		t1.purchaseCallbacks,
+		t1.postPurchaseActions
+	})
+
+	return React.createElement(PurchasePromptApp, {
+		store = store,
+		network = if not FFlagPurchasePromptCartPricingEnabled then nil else t1.network,
+		subtitleView = if not FFlagPurchasePromptSubtitleForTimedOptions then nil else t1.subtitleView
+	})
+end
+
+return UnifiedPurchasePrompt

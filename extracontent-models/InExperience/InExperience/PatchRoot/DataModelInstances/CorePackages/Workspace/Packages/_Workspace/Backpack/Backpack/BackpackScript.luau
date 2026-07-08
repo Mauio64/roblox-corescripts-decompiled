@@ -5,14 +5,17 @@ local Modules = RobloxGui.Modules
 local Signals = require(Parent.Signals)
 local InExperienceTopBar = require(Parent.InExperienceTopBar)
 local SettingsShowSignal = require(Parent.CoreScriptsCommon).SettingsShowSignal
-local InExperienceAppChatModal = require(Parent.AppChat).App.InExperienceAppChatModal
+local InExperienceAppChatModal = require(Parent.AppChat.InExperienceAppChatModal)
 local FFlagMountCoreGuiBackpack = require(Modules.Flags.FFlagMountCoreGuiBackpack)
 local isInExperienceUIVREnabled = require(Parent.SharedExperimentDefinition).isInExperienceUIVREnabled
 local InExperienceUIVRIXP = require(Parent.SharedExperimentDefinition).InExperienceUIVRIXP
 local FFlagTopBarSignalizeSetCores = InExperienceTopBar.Flags.FFlagTopBarSignalizeSetCores
 local RobloxTranslator = require(Parent.RobloxTranslator)
+local Responsive = require(Parent.Responsive)
+local FFlagBackpackResponsiveUnits = require(Parent.SharedFlags).FFlagBackpackResponsiveUnits
 local System = require(Parent.System)
-local v15 = game:DefineFastFlag("EnableHotbarHide", false)
+local v17 = game:DefineFastFlag("EnableHotbarHide", false)
+local EngineFeature = game:GetEngineFeature("DeprecateOldGuiObjectProperties")
 local t1 = {
 	OpenClose = nil,
 	IsHotbarVisible = false,
@@ -25,11 +28,11 @@ local t1 = {
 }
 local n1 = 60
 local Size14 = Enum.FontSize.Size14
-local u19 = 0.5 * UserGameSettings.PreferredTransparency
+local u22 = 0.5 * UserGameSettings.PreferredTransparency
 local color3 = Color3.new(0.12156862745098039, 0.12156862745098039, 0.12156862745098039)
 local color3_2 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805)
 local color3_3 = Color3.new(0.35294117647058826, 0.5568627450980392, 0.9137254901960784)
-local u23 = 0.5 * UserGameSettings.PreferredTransparency
+local u26 = 0.5 * UserGameSettings.PreferredTransparency
 local color3_4 = Color3.new(1, 1, 1)
 
 UDim2.new(0, 14, 0, 9)
@@ -38,7 +41,7 @@ local BackquoteValue = Enum.KeyCode.Backquote.Value
 local color3_5 = Color3.new(0, 0.6352941176470588, 1)
 local s1 = "   Search"
 local color3_6 = Color3.new(0.37, 0.37, 0.37)
-local u29 = 0.15 * UserGameSettings.PreferredTransparency
+local u32 = 0.15 * UserGameSettings.PreferredTransparency
 local ZeroValue = Enum.KeyCode.Zero.Value
 local BackspaceValue = Enum.KeyCode.Backspace.Value
 local t2 = {
@@ -61,60 +64,59 @@ local GamepadService = game:GetService("GamepadService")
 
 RobloxGui:WaitForChild("Modules"):WaitForChild("TenFootInterface")
 
-local v40 = require(Modules.TenFootInterface):IsEnabled()
+local v43 = require(Modules.TenFootInterface):IsEnabled()
 local Create = require(Parent.AppCommonLib).Create
 local GameTranslator = require(Modules.GameTranslator)
 
-pcall(function() -- line: 121
+pcall(function() -- line: 124
 	-- upvalues: s1 (ref), RobloxTranslator (copy)
 	s1 = RobloxTranslator:FormatByKey("InGame.UnknownNamespace.BACKPACK_SEARCH")
 end)
 
-local u43 = true
-local MakeSlot = nil
+local u46 = true
 
-if v40 then
+if v43 then
 	n1 = 100
 	Size14 = Enum.FontSize.Size24
 end
 
-local u44 = false
-local v45 = UserInputService.TouchEnabled and GuiService:GetScreenResolution().X < 1024
+local u47 = false
+local v48 = if not FFlagBackpackResponsiveUnits then UserInputService.TouchEnabled and GuiService:GetScreenResolution().X < 1024 else Responsive.GetInputModeStore().getPreferredInputType() == Responsive.Input.Touch and GuiService:GetScreenResolution().X < 1024
 local LocalPlayer = Players.LocalPlayer
-local u47 = nil
-local u48 = nil
-local u49 = nil
 local u50 = nil
 local u51 = nil
 local u52 = nil
 local u53 = nil
 local u54 = nil
-local UIGridLayout = nil
+local u55 = nil
 local u56 = nil
 local u57 = nil
-local u58 = nil
+local UIGridLayout = nil
 local u59 = nil
+local u60 = nil
+local u61 = nil
+local u62 = nil
 local Backpack = nil
 local t3 = {}
-local u62 = nil
+local u65 = nil
 local t4 = {}
 local t5 = {}
 local t6 = {}
 local n2 = 0
-local u67 = nil
-local u68 = false
-local u69 = false
-local u70 = false
+local u70 = nil
 local u71 = false
+local u72 = false
+local u73 = false
+local u74 = false
 local t7 = {}
 local t8 = {}
 local t9 = {}
-local u75 = false
+local u78 = false
 local n3 = 0
-local u77 = not v45 and 10 or 3
-local v78 = not v45 and 4 or 2
-local u79 = nil
-local u80 = nil
+local u80 = not v48 and 10 or 3
+local v81 = not v48 and 4 or 2
+local u82 = nil
+local u83 = nil
 
 t1.BackpackEmpty = Create("BindableEvent")({
 	Name = "BackpackEmpty"
@@ -126,39 +128,50 @@ t1.BackpackItemRemoved = Create("BindableEvent")({
 	Name = "BackpackRemoved"
 })
 
-local function NewGui(p1, p2) -- line: 190
+local function NewGui(p1, p2) -- line: 200
 	-- upvalues: Size14 (ref)
-	local v102 = Instance.new(p1)
+	local v120 = Instance.new(p1)
 
-	v102.Name = p2
-	v102.BackgroundColor3 = Color3.new(0, 0, 0)
-	v102.BackgroundTransparency = 1
-	v102.BorderColor3 = Color3.new(0, 0, 0)
-	v102.BorderSizePixel = 0
-	v102.Size = UDim2.new(1, 0, 1, 0)
+	v120.Name = p2
+	v120.BackgroundColor3 = Color3.new(0, 0, 0)
+	v120.BackgroundTransparency = 1
+	v120.BorderColor3 = Color3.new(0, 0, 0)
+	v120.BorderSizePixel = 0
+	v120.Size = UDim2.new(1, 0, 1, 0)
 
 	if p1:match("Text") then
-		v102.TextColor3 = Color3.new(1, 1, 1)
-		v102.Text = ""
-		v102.Font = Enum.Font.SourceSans
-		v102.FontSize = Size14
-		v102.TextWrapped = true
+		v120.TextColor3 = Color3.new(1, 1, 1)
+		v120.Text = ""
+		v120.Font = Enum.Font.SourceSans
+		v120.FontSize = Size14
+		v120.TextWrapped = true
 
 		if p1 == "TextButton" then
-			v102.Font = Enum.Font.SourceSansBold
-			v102.BorderSizePixel = 1
+			v120.Font = Enum.Font.SourceSansBold
+			v120.BorderSizePixel = 1
 		end
 	end
 
-	return v102
+	return v120
 end
+local function FindLowestEmpty() -- line: 222
+	-- upvalues: u80 (ref), t3 (copy)
+	for i = 1, u80 do
+		local v122 = t3[i]
 
-function t1.IsInventoryEmpty() -- line: 222
-	-- upvalues: u77 (ref), t3 (copy)
-	for i = u77 + 1, #t3 do
-		local v106 = t3[i]
+		if not v122.Tool then
+			return v122
+		end
+	end
 
-		if v106 and v106.Tool then
+	return nil
+end
+local function isInventoryEmpty() -- line: 232
+	-- upvalues: u80 (ref), t3 (copy)
+	for i = u80 + 1, #t3 do
+		local v124 = t3[i]
+
+		if v124 and v124.Tool then
 			return false
 		end
 	end
@@ -166,277 +179,363 @@ function t1.IsInventoryEmpty() -- line: 222
 	return true
 end
 
-local function AdjustHotbarFrames(p3) -- line: 238
-	-- upvalues: u51 (ref), u77 (ref), n2 (ref), v15 (copy), t3 (copy), u49 (ref), t1 (copy)
-	local Visible = u51.Visible
-	local v109 = Visible and u77 or n2
+t1.IsInventoryEmpty = isInventoryEmpty
+
+local function UseGazeSelection() -- line: 244
+	return false
+end
+local function AdjustHotbarFrames(p3) -- line: 248
+	-- upvalues: u54 (ref), u80 (ref), n2 (ref), v17 (copy), t3 (copy), u52 (ref), t1 (copy)
+	if not u54 then
+		return
+	end
+
+	local Visible = u54.Visible
+	local v127 = Visible and u80 or n2
 	local n4 = 0
-	local v111 = if not v15 then v109 >= 1 else v109 >= 1 and not p3
-	local g119 = nil
-	local v118 = nil
+	local v129 = if not v17 then v127 >= 1 else v127 >= 1 and not p3
+	local g137 = nil
+	local v136 = nil
 
-	for i = 1, u77 do
-		local v113 = t3[i]
+	for i = 1, u80 do
+		local v131 = t3[i]
 
-		if ((if not v15 then v113.Tool else v113.Tool and not p3)) or Visible then
+		if ((if not v17 then v131.Tool else v131.Tool and not p3)) or Visible then
 			n4 += 1
-			v113:Readjust(n4, v109)
-			v113.Frame.Visible = true
+			v131:Readjust(n4, v127)
+			v131.Frame.Visible = true
 		else
-			v113.Frame.Visible = false
+			v131.Frame.Visible = false
 		end
 	end
 
-	local v114 = u49
-	local v115 = not Visible
+	if u52 then
+		local v132 = u52
+		local v133 = not Visible
 
-	if v115 then
-		v115 = v111
+		if v133 then
+			v133 = v129
 
-		if not v115 then
-			for i = u77 + 1, #t3 do
-				local v117 = t3[i]
+			if not v133 then
+				for i = u80 + 1, #t3 do
+					local v135 = t3[i]
 
-				if v117 and v117.Tool then
-					v118 = false
-					g119 = true
+					if v135 and v135.Tool then
+						v136 = false
+						g137 = true
+					end
+
+					if g137 then
+						break
+					end
 				end
 
-				if g119 then
-					break
+				if not g137 then
+					v136 = true
 				end
-			end
 
-			if not g119 then
-				v118 = true
+				g137 = false
+				v133 = not v136
 			end
-
-			g119 = false
-			v115 = not v118
 		end
+
+		v132.Visible = v133
+		u52.Position = UDim2.new(0.5, -15, 1, not v129 and -50 or -110)
 	end
 
-	v114.Visible = v115
-	u49.Position = UDim2.new(0.5, -15, 1, not v111 and -50 or -110)
-	t1.IsHotbarVisible = v111
+	t1.IsHotbarVisible = v129
 end
-local function UpdateScrollingFrameCanvasSize() -- line: 261
-	-- upvalues: u53 (ref), n1 (ref), u54 (ref)
-	local v120 = math.floor(u53.AbsoluteSize.X / (n1 + 5))
-	local v121 = math.ceil((#u54:GetChildren() - 1) / v120) * (n1 + 5) + 5
+local function UpdateScrollingFrameCanvasSize() -- line: 276
+	-- upvalues: u56 (ref), u57 (ref), n1 (ref)
+	if not u56 or not u57 then
+		return
+	end
 
-	u53.CanvasSize = UDim2.new(0, 0, 0, v121)
+	local v138 = math.floor(u56.AbsoluteSize.X / (n1 + 5))
+	local v139 = math.ceil((#u57:GetChildren() - 1) / v138) * (n1 + 5) + 5
+
+	u56.CanvasSize = UDim2.new(0, 0, 0, v139)
 end
-local function AdjustInventoryFrames() -- line: 268
-	-- upvalues: u77 (ref), t3 (copy), UpdateScrollingFrameCanvasSize (copy)
-	for i = u77 + 1, #t3 do
-		local v123 = t3[i]
+local function AdjustInventoryFrames() -- line: 286
+	-- upvalues: u80 (ref), t3 (copy), UpdateScrollingFrameCanvasSize (copy)
+	for i = u80 + 1, #t3 do
+		local v141 = t3[i]
 
-		v123.Frame.LayoutOrder = v123.Index
-		v123.Frame.Visible = v123.Tool ~= nil
+		v141.Frame.LayoutOrder = v141.Index
+		v141.Frame.Visible = v141.Tool ~= nil
 	end
 
 	UpdateScrollingFrameCanvasSize()
 end
-local function UpdateBackpackLayout() -- line: 277
-	-- upvalues: u48 (ref), u77 (ref), n1 (ref), u51 (ref), v78 (copy), u53 (ref), AdjustHotbarFrames (copy), AdjustInventoryFrames (copy)
-	u48.Size = UDim2.new(0, 5 + u77 * (n1 + 5), 0, n1 + 5 + 5)
-	u48.Position = UDim2.new(0.5, -u48.Size.X.Offset / 2, 1, -u48.Size.Y.Offset)
-	u51.Size = UDim2.new(0, u48.Size.X.Offset, 0, u48.Size.Y.Offset * v78 + 40)
-	u51.Position = UDim2.new(0.5, -u51.Size.X.Offset / 2, 1, u48.Position.Y.Offset - u51.Size.Y.Offset)
-	u53.Size = UDim2.new(1, u53.ScrollBarThickness + 1, 1, -40)
-	u53.Position = UDim2.new(0, 0, 0, 40)
+local function UpdateBackpackLayout() -- line: 295
+	-- upvalues: u51 (ref), u54 (ref), u80 (ref), n1 (ref), v81 (copy), u56 (ref), AdjustHotbarFrames (copy), AdjustInventoryFrames (copy)
+	if not u51 or not u54 then
+		return
+	end
+
+	u51.Size = UDim2.new(0, 5 + u80 * (n1 + 5), 0, n1 + 5 + 5)
+	u51.Position = UDim2.new(0.5, -u51.Size.X.Offset / 2, 1, -u51.Size.Y.Offset)
+	u54.Size = UDim2.new(0, u51.Size.X.Offset, 0, u51.Size.Y.Offset * v81 + 40)
+	u54.Position = UDim2.new(0.5, -u54.Size.X.Offset / 2, 1, u51.Position.Y.Offset - u54.Size.Y.Offset)
+
+	if u56 then
+		u56.Size = UDim2.new(1, u56.ScrollBarThickness + 1, 1, -40)
+		u56.Position = UDim2.new(0, 0, 0, 40)
+	end
+
 	AdjustHotbarFrames()
 	AdjustInventoryFrames()
 end
+local function Clamp(p4, p5, p6) -- line: 327
+	return (math.min(p5, (math.max(p4, p6))))
+end
+local function CheckBounds(p7, p8, p9) -- line: 331
+	local AbsolutePosition = p7.AbsolutePosition
+	local AbsoluteSize = p7.AbsoluteSize
 
-function MakeSlot(p4, p5) -- line: 350
-	-- upvalues: t3 (copy), u23 (ref), color3_2 (copy), color3 (copy), u48 (ref), n1 (ref), GameTranslator (copy), u77 (ref), u51 (ref), n2 (ref), u69 (ref), u44 (ref), ContextActionService (copy), u80 (ref), t4 (copy), u62 (ref), u58 (ref), u79 (ref), NewGui (copy), color3_3 (copy), t6 (copy), UpdateScrollingFrameCanvasSize (copy), u59 (ref), u67 (ref), Backpack (ref), color3_4 (copy), MakeSlot (copy), u54 (ref), u71 (ref), t5 (copy), ZeroValue (copy), u53 (ref)
-	local v138 = p5 or #t3 + 1
+	return p8 > AbsolutePosition.X and (p8 <= AbsolutePosition.X + AbsoluteSize.X and (p9 > AbsolutePosition.Y and p9 <= AbsolutePosition.Y + AbsoluteSize.Y))
+end
+local function GetOffset(p10, p11) -- line: 337
+	return (p10.AbsolutePosition + p10.AbsoluteSize / 2 - p11).magnitude
+end
+local function DisableActiveHopper() -- line: 342
+	-- upvalues: u70 (ref), t4 (copy)
+	u70:ToggleSelect()
+	t4[u70]:UpdateEquipView()
+	u70 = nil
+end
+local function UnequipAllTools() -- line: 348
+	-- upvalues: u62 (ref), u70 (ref), t4 (copy)
+	if u62 then
+		u62:UnequipTools()
+
+		if u70 then
+			u70:ToggleSelect()
+			t4[u70]:UpdateEquipView()
+			u70 = nil
+		end
+	end
+end
+local function EquipNewTool(p12) -- line: 357
+	-- upvalues: u62 (ref), u70 (ref), t4 (copy), u61 (ref)
+	if u62 then
+		u62:UnequipTools()
+
+		if u70 then
+			u70:ToggleSelect()
+			t4[u70]:UpdateEquipView()
+			u70 = nil
+		end
+	end
+
+	if p12:IsA("HopperBin") then
+		p12:ToggleSelect()
+		t4[p12]:UpdateEquipView()
+		u70 = p12
+
+		return
+	end
+
+	p12.Parent = u61
+end
+local function IsEquipped(p13) -- line: 369
+	-- upvalues: u61 (ref)
+	return p13 and (p13:IsA("HopperBin") and p13.Active or p13.Parent == u61)
+end
+local function MakeSlot(p14, p15) -- line: 373
+	-- upvalues: t3 (copy), u26 (ref), color3_2 (copy), color3 (copy), u51 (ref), n1 (ref), GameTranslator (copy), u80 (ref), u54 (ref), n2 (ref), u72 (ref), u47 (ref), ContextActionService (copy), u83 (ref), t4 (copy), u65 (ref), u61 (ref), u82 (ref), NewGui (copy), color3_3 (copy), t6 (copy), UpdateScrollingFrameCanvasSize (copy), u62 (ref), u70 (ref), Backpack (ref), color3_4 (copy), MakeSlot (copy), u57 (ref), u74 (ref), t5 (copy), ZeroValue (copy), u56 (ref)
+	local v156 = p15 or #t3 + 1
 	local t10 = {
 		Tool = nil,
-		Index = v138,
+		Index = v156,
 		Frame = nil
 	}
-	local u140 = nil
-	local u141 = nil
-	local u142 = nil
-	local u143 = nil
-	local u144 = nil
-	local u145 = nil
-	local u146 = nil
-	local u147 = nil
+	local u158 = nil
+	local u159 = nil
+	local u160 = nil
+	local u161 = nil
+	local u162 = nil
+	local u163 = nil
+	local u164 = nil
+	local u165 = nil
 
-	function t10.Readjust(_, p7, p8) -- line: 381
-		-- upvalues: u48 (ref), n1 (ref), u140 (ref)
-		local v268 = u48.Size.X.Offset / 2
-		local v269 = n1 + 5
-		local v270 = p7 - (p8 / 2 + 0.5)
-
-		u140.Position = UDim2.new(0, v268 - n1 / 2 + v269 * v270, 0, 5)
+	local function UpdateSlotFading() -- line: 398
+		-- upvalues: u158 (ref), u26 (ref), color3_2 (copy), color3 (copy)
+		u158.SelectionImageObject = nil
+		u158.BackgroundTransparency = if not u158.Draggable then u26 else 0
+		u158.BackgroundColor3 = u158.Draggable and color3_2 or color3
 	end
-	function t10.Fill(p9, p10) -- line: 389
-		-- upvalues: u142 (ref), u143 (ref), GameTranslator (copy), u146 (ref), u144 (ref), u77 (ref), u51 (ref), u140 (ref), n2 (ref), u69 (ref), u44 (ref), ContextActionService (copy), u80 (ref), t4 (copy), u62 (ref), t3 (copy)
-		if not p10 then
-			return p9:Clear()
+
+	function t10.Readjust(_, p17, p18) -- line: 404
+		-- upvalues: u51 (ref), n1 (ref), u158 (ref)
+		local v293 = u51.Size.X.Offset / 2
+		local v294 = n1 + 5
+		local v295 = p17 - (p18 / 2 + 0.5)
+
+		u158.Position = UDim2.new(0, v293 - n1 / 2 + v294 * v295, 0, 5)
+	end
+	function t10.Fill(p19, p20) -- line: 412
+		-- upvalues: u160 (ref), u161 (ref), GameTranslator (copy), u164 (ref), u162 (ref), u80 (ref), u54 (ref), u158 (ref), n2 (ref), u72 (ref), u47 (ref), ContextActionService (copy), u83 (ref), t4 (copy), u65 (ref), t3 (copy)
+		if not p20 then
+			return p19:Clear()
 		end
 
-		p9.Tool = p10
+		p19.Tool = p20
 
-		local function assignToolData() -- line: 396
-			-- upvalues: p10 (copy), u142 (ref), u143 (ref), GameTranslator (copy), u146 (ref)
-			local TextureId = p10.TextureId
+		local function assignToolData() -- line: 419
+			-- upvalues: p20 (copy), u160 (ref), u161 (ref), GameTranslator (copy), u164 (ref)
+			local TextureId = p20.TextureId
 
-			u142.Image = TextureId
+			u160.Image = TextureId
 
 			if TextureId ~= "" then
-				u143.Visible = false
+				u161.Visible = false
 			else
-				u143.Visible = true
+				u161.Visible = true
 			end
 
-			GameTranslator:TranslateAndRegister(u143, p10, p10.Name)
+			GameTranslator:TranslateAndRegister(u161, p20, p20.Name)
 
-			if u146 and p10:IsA("Tool") then
-				GameTranslator:TranslateAndRegister(u146, p10, p10.ToolTip)
+			if u164 and p20:IsA("Tool") then
+				GameTranslator:TranslateAndRegister(u164, p20, p20.ToolTip)
 
-				local v400 = u146.TextBounds.X + 6
+				local v427 = u164.TextBounds.X + 6
 
-				u146.Size = UDim2.new(0, v400, 0, 16)
-				u146.Position = UDim2.new(0.5, -v400 / 2, 0, -25)
+				u164.Size = UDim2.new(0, v427, 0, 16)
+				u164.Position = UDim2.new(0.5, -v427 / 2, 0, -25)
 			end
 		end
 
 		assignToolData()
 
-		local g278 = nil
-		local v277 = nil
+		local g303 = nil
+		local v302 = nil
 
-		if u144 then
-			u144:disconnect()
-			u144 = nil
+		if u162 then
+			u162:disconnect()
+			u162 = nil
 		end
 
-		u144 = p10.Changed:connect(function(p11) -- line: 422
+		u162 = p20.Changed:connect(function(p21) -- line: 445
 			-- upvalues: assignToolData (copy)
-			if p11 == "TextureId" or (p11 == "Name" or p11 == "ToolTip") then
+			if p21 == "TextureId" or (p21 == "Name" or p21 == "ToolTip") then
 				assignToolData()
 			end
 		end)
 
-		local v274 = p9.Index <= u77
-		local Visible = u51.Visible
+		local v299 = p19.Index <= u80
+		local Visible = u54.Visible
 
-		if not v274 or Visible then
-			u140.Draggable = true
+		if not v299 or Visible then
+			u158.Draggable = true
 		end
 
-		p9:UpdateEquipView()
+		p19:UpdateEquipView()
 
-		if v274 then
+		if v299 then
 			n2 += 1
 
-			if u69 and n2 >= 1 and not u44 then
-				u44 = true
-				ContextActionService:BindAction("RBXHotbarEquip", u80, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
+			if u72 and n2 >= 1 and not u47 then
+				u47 = true
+				ContextActionService:BindAction("RBXHotbarEquip", u83, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
 			end
 		end
 
-		t4[p10] = p9
+		t4[p20] = p19
 
-		for i = 1, u77 do
-			v277 = t3[i]
+		for i = 1, u80 do
+			v302 = t3[i]
 
-			if not v277.Tool then
-				g278 = true
+			if not v302.Tool then
+				g303 = true
 			end
 
-			if g278 then
+			if g303 then
 				break
 			end
 		end
 
-		if not g278 then
-			v277 = nil
+		if not g303 then
+			v302 = nil
 		end
 
-		g278 = false
-		u62 = v277
+		g303 = false
+		u65 = v302
 	end
-	function t10.Clear(p12) -- line: 459
-		-- upvalues: u144 (ref), u142 (ref), u143 (ref), u146 (ref), u140 (ref), u77 (ref), n2 (ref), u44 (ref), ContextActionService (copy), t4 (copy), u62 (ref), t3 (copy)
-		if not p12.Tool then
+	function t10.Clear(p22) -- line: 482
+		-- upvalues: u162 (ref), u160 (ref), u161 (ref), u164 (ref), u158 (ref), u80 (ref), n2 (ref), u47 (ref), ContextActionService (copy), t4 (copy), u65 (ref), t3 (copy)
+		if not p22.Tool then
 			return
 		end
 
-		local g282 = nil
-		local v281 = nil
+		local g307 = nil
+		local v306 = nil
 
-		if u144 then
-			u144:disconnect()
-			u144 = nil
+		if u162 then
+			u162:disconnect()
+			u162 = nil
 		end
 
-		u142.Image = ""
-		u143.Text = ""
+		u160.Image = ""
+		u161.Text = ""
 
-		if u146 then
-			u146.Text = ""
-			u146.Visible = false
+		if u164 then
+			u164.Text = ""
+			u164.Visible = false
 		end
 
-		u140.Draggable = false
-		p12:UpdateEquipView(true)
+		u158.Draggable = false
+		p22:UpdateEquipView(true)
 
-		if p12.Index <= u77 then
+		if p22.Index <= u80 then
 			n2 -= 1
 
 			if n2 < 1 then
-				u44 = false
+				u47 = false
 				ContextActionService:UnbindAction("RBXHotbarEquip")
 			end
 		end
 
-		t4[p12.Tool] = nil
-		p12.Tool = nil
+		t4[p22.Tool] = nil
+		p22.Tool = nil
 
-		for i = 1, u77 do
-			v281 = t3[i]
+		for i = 1, u80 do
+			v306 = t3[i]
 
-			if not v281.Tool then
-				g282 = true
+			if not v306.Tool then
+				g307 = true
 			end
 
-			if g282 then
+			if g307 then
 				break
 			end
 		end
 
-		if not g282 then
-			v281 = nil
+		if not g307 then
+			v306 = nil
 		end
 
-		g282 = false
-		u62 = v281
+		g307 = false
+		u65 = v306
 	end
-	function t10.UpdateEquipView(p13, p14) -- line: 492
-		-- upvalues: u58 (ref), u79 (ref), t10 (copy), u145 (ref), NewGui (copy), u140 (ref), color3_3 (copy), u23 (ref), color3_2 (copy), color3 (copy)
-		local g285 = nil
+	function t10.UpdateEquipView(p23, p24) -- line: 515
+		-- upvalues: u61 (ref), u82 (ref), t10 (copy), u163 (ref), NewGui (copy), u158 (ref), color3_3 (copy), u26 (ref), color3_2 (copy), color3 (copy)
+		local g310 = nil
 		local Tool = nil
 
 		repeat
-			if g285 or not p14 then
-				if not g285 then
-					Tool = p13.Tool
+			if g310 or not p24 then
+				if not g310 then
+					Tool = p23.Tool
 				end
 
-				if g285 or Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u58) then
-					if not g285 then
-						u79 = t10
+				if g310 or Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u61) then
+					if not g310 then
+						u82 = t10
 
-						if not u145 then
-							u145 = NewGui("Frame", "Equipped")
-							u145.ZIndex = u140.ZIndex
+						if not u163 then
+							u163 = NewGui("Frame", "Equipped")
+							u163.ZIndex = u158.ZIndex
 
 							for _, v in pairs({
 								{
@@ -464,109 +563,117 @@ function MakeSlot(p4, p5) -- line: 350
 									0.9
 								}
 							}) do
-								local v289 = NewGui("Frame", "Edge")
+								local v314 = NewGui("Frame", "Edge")
 
-								v289.BackgroundTransparency = 0
-								v289.BackgroundColor3 = color3_3
-								v289.Size = UDim2.new(v[1], 0, v[2], 0)
-								v289.Position = UDim2.new(v[3], 0, v[4], 0)
-								v289.ZIndex = u145.ZIndex
-								v289.Parent = u145
+								v314.BackgroundTransparency = 0
+								v314.BackgroundColor3 = color3_3
+								v314.Size = UDim2.new(v[1], 0, v[2], 0)
+								v314.Position = UDim2.new(v[3], 0, v[4], 0)
+								v314.ZIndex = u163.ZIndex
+								v314.Parent = u163
 							end
 						end
 
-						u145.Parent = u140
+						u163.Parent = u158
 					end
 
-					g285 = false
-					u140.SelectionImageObject = nil
-					u140.BackgroundTransparency = if not u140.Draggable then u23 else 0
-					u140.BackgroundColor3 = u140.Draggable and color3_2 or color3
+					g310 = false
+					u158.SelectionImageObject = nil
+					u158.BackgroundTransparency = if not u158.Draggable then u26 else 0
+					u158.BackgroundColor3 = u158.Draggable and color3_2 or color3
 
 					return
 				end
 			end
 
-			if u145 then
-				u145.Parent = nil
+			if u163 then
+				u163.Parent = nil
 			end
 
-			g285 = true
-		until not g285
+			g310 = true
+		until not g310
 	end
-	function t10.IsEquipped(p15) -- line: 524
-		-- upvalues: u58 (ref)
-		local Tool = p15.Tool
+	function t10.IsEquipped(p25) -- line: 547
+		-- upvalues: u61 (ref)
+		local Tool = p25.Tool
 
-		return Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u58)
+		return Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u61)
 	end
-	function t10.Delete(p16) -- line: 528
-		-- upvalues: t6 (copy), u140 (ref), t3 (copy), UpdateScrollingFrameCanvasSize (copy)
-		t6[u140] = nil
-		u140:Destroy()
-		table.remove(t3, p16.Index)
+	function t10.Delete(p26) -- line: 551
+		-- upvalues: t6 (copy), u158 (ref), t3 (copy), UpdateScrollingFrameCanvasSize (copy)
+		t6[u158] = nil
+		u158:Destroy()
+		table.remove(t3, p26.Index)
 
-		local v293 = #t3
+		local v318 = #t3
 
-		for i = p16.Index, v293 do
+		for i = p26.Index, v318 do
 			t3[i]:SlideBack()
 		end
 
 		UpdateScrollingFrameCanvasSize()
 	end
-	function t10.Swap(p17, p18) -- line: 542
-		local Tool = p17.Tool
-		local Tool2 = p18.Tool
+	function t10.Swap(p27, p28) -- line: 565
+		local Tool = p27.Tool
+		local Tool2 = p28.Tool
 
-		p17:Clear()
+		p27:Clear()
 
 		if Tool2 then
-			p18:Clear()
-			p17:Fill(Tool2)
+			p28:Clear()
+			p27:Fill(Tool2)
 		end
 
 		if Tool then
-			p18:Fill(Tool)
+			p28:Fill(Tool)
 
 			return
 		end
 
-		p18:Clear()
+		p28:Clear()
 	end
-	function t10.SlideBack(p19) -- line: 556
-		-- upvalues: u140 (ref)
-		p19.Index = p19.Index - 1
-		u140.Name = p19.Index
-		u140.LayoutOrder = p19.Index
+	function t10.SlideBack(p29) -- line: 579
+		-- upvalues: u158 (ref)
+		p29.Index = p29.Index - 1
+		u158.Name = p29.Index
+		u158.LayoutOrder = p29.Index
 	end
-	function t10.TurnNumber(_, p21) -- line: 562
-		-- upvalues: u147 (ref)
-		if u147 then
-			u147.Visible = p21
+	function t10.TurnNumber(_, p31) -- line: 585
+		-- upvalues: u165 (ref)
+		if u165 then
+			u165.Visible = p31
 		end
 	end
-	function t10.SetClickability(p22, p23) -- line: 568
-		-- upvalues: u140 (ref), u23 (ref), color3_2 (copy), color3 (copy)
-		if p22.Tool then
-			u140.Draggable = not p23
-			u140.SelectionImageObject = nil
-			u140.BackgroundTransparency = if not u140.Draggable then u23 else 0
-			u140.BackgroundColor3 = u140.Draggable and color3_2 or color3
+	function t10.SetClickability(p32, p33) -- line: 591
+		-- upvalues: u158 (ref), u26 (ref), color3_2 (copy), color3 (copy)
+		if p32.Tool then
+			u158.Draggable = not p33
+			u158.SelectionImageObject = nil
+			u158.BackgroundTransparency = if not u158.Draggable then u26 else 0
+			u158.BackgroundColor3 = u158.Draggable and color3_2 or color3
 		end
 	end
-	function t10.CheckTerms(p24, p25) -- line: 575
-		-- upvalues: u143 (ref), u146 (ref)
+	function t10.CheckTerms(p34, p35) -- line: 598
+		-- upvalues: u161 (ref), u164 (ref)
 		local n5 = 0
-		local Tool = p24.Tool
+
+		local function checkEm(p36, p37) -- line: 600
+			-- upvalues: n5 (ref)
+			local _, count = p36:lower():gsub(p37, "")
+
+			n5 += count
+		end
+
+		local Tool = p34.Tool
 
 		if Tool then
-			for k in pairs(p25) do
-				local _, count = u143.Text:lower():gsub(k, "")
+			for k in pairs(p35) do
+				local _, count = u161.Text:lower():gsub(k, "")
 
 				n5 += count
 
 				if Tool:IsA("Tool") then
-					local _, count2 = (u146 and u146.Text or ""):lower():gsub(k, "")
+					local _, count2 = (u164 and u164.Text or ""):lower():gsub(k, "")
 
 					n5 += count2
 				end
@@ -575,362 +682,425 @@ function MakeSlot(p4, p5) -- line: 350
 
 		return n5
 	end
-	function t10.Select(_, p27) -- line: 595
-		-- upvalues: t10 (copy), u58 (ref), u59 (ref), u67 (ref), t4 (copy), Backpack (ref)
-		if p27 then
+	function t10.Select(_, p39) -- line: 618
+		-- upvalues: t10 (copy), u61 (ref), u62 (ref), u70 (ref), t4 (copy), Backpack (ref)
+		if p39 then
 			return
 		end
 
 		local Tool = t10.Tool
 
 		if Tool then
-			if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u58) then
-				if u59 then
-					u59:UnequipTools()
+			if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u61) then
+				if u62 then
+					u62:UnequipTools()
 
-					if u67 then
-						u67:ToggleSelect()
-						t4[u67]:UpdateEquipView()
-						u67 = nil
+					if u70 then
+						u70:ToggleSelect()
+						t4[u70]:UpdateEquipView()
+						u70 = nil
 
 						return
 					end
 				end
 			elseif Tool.Parent == Backpack then
-				if u59 then
-					u59:UnequipTools()
+				if u62 then
+					u62:UnequipTools()
 
-					if u67 then
-						u67:ToggleSelect()
-						t4[u67]:UpdateEquipView()
-						u67 = nil
+					if u70 then
+						u70:ToggleSelect()
+						t4[u70]:UpdateEquipView()
+						u70 = nil
 					end
 				end
 
 				if Tool:IsA("HopperBin") then
 					Tool:ToggleSelect()
 					t4[Tool]:UpdateEquipView()
-					u67 = Tool
+					u70 = Tool
 
 					return
 				end
 
-				Tool.Parent = u58
+				Tool.Parent = u61
 			end
 		end
 	end
 
-	u140 = NewGui("TextButton", v138)
-	u140.BackgroundColor3 = color3
-	u140.BorderColor3 = color3_4
-	u140.Text = ""
-	u140.AutoButtonColor = false
-	u140.BorderSizePixel = 0
-	u140.Size = UDim2.new(0, n1, 0, n1)
-	u140.Active = true
-	u140.Draggable = false
-	u140.BackgroundTransparency = u23
-	u140.MouseButton1Click:connect(function() -- line: 622
+	u158 = NewGui("TextButton", v156)
+	u158.BackgroundColor3 = color3
+	u158.BorderColor3 = color3_4
+	u158.Text = ""
+	u158.AutoButtonColor = false
+	u158.BorderSizePixel = 0
+	u158.Size = UDim2.new(0, n1, 0, n1)
+	u158.Active = true
+	u158.Draggable = false
+	u158.BackgroundTransparency = u26
+	u158.MouseButton1Click:connect(function() -- line: 645
 		-- upvalues: t10 (copy)
 		changeSlot(t10)
 	end)
-	t10.Frame = u140
+	t10.Frame = u158
 
-	local v148 = NewGui("Frame", "SelectionObjectClipper")
+	local v167 = NewGui("Frame", "SelectionObjectClipper")
 
-	v148.Visible = false
-	v148.Parent = u140
+	v167.Visible = false
+	v167.Parent = u158
 
-	local v149 = NewGui("ImageLabel", "Selector")
+	local v168 = NewGui("ImageLabel", "Selector")
 
-	v149.Size = UDim2.new(1, 0, 1, 0)
-	v149.Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png"
-	v149.ScaleType = Enum.ScaleType.Slice
-	v149.SliceCenter = Rect.new(12, 12, 52, 52)
-	v149.Parent = v148
-	u142 = NewGui("ImageLabel", "Icon")
-	u142.Size = UDim2.new(0.8, 0, 0.8, 0)
-	u142.Position = UDim2.new(0.1, 0, 0.1, 0)
-	u142.Parent = u140
-	u143 = NewGui("TextLabel", "ToolName")
-	u143.Size = UDim2.new(1, -2, 1, -2)
-	u143.Position = UDim2.new(0, 1, 0, 1)
-	u143.Parent = u140
+	v168.Size = UDim2.new(1, 0, 1, 0)
+	v168.Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png"
+	v168.ScaleType = Enum.ScaleType.Slice
+	v168.SliceCenter = Rect.new(12, 12, 52, 52)
+	v168.Parent = v167
+	u160 = NewGui("ImageLabel", "Icon")
+	u160.Size = UDim2.new(0.8, 0, 0.8, 0)
+	u160.Position = UDim2.new(0.1, 0, 0.1, 0)
+	u160.Parent = u158
+	u161 = NewGui("TextLabel", "ToolName")
+	u161.Size = UDim2.new(1, -2, 1, -2)
+	u161.Position = UDim2.new(0, 1, 0, 1)
+	u161.Parent = u158
 	t10.Frame.LayoutOrder = t10.Index
 
-	if v138 <= u77 then
-		u146 = NewGui("TextLabel", "ToolTip")
-		u146.TextWrapped = false
-		u146.TextYAlignment = Enum.TextYAlignment.Top
-		u146.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
-		u146.BackgroundTransparency = 0
-		u146.Visible = false
-		u146.Parent = u140
-		u140.MouseEnter:connect(function() -- line: 661
-			-- upvalues: u146 (ref)
-			if u146.Text ~= "" then
-				u146.Visible = true
+	if v156 <= u80 then
+		u164 = NewGui("TextLabel", "ToolTip")
+		u164.TextWrapped = false
+		u164.TextYAlignment = Enum.TextYAlignment.Top
+		u164.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
+		u164.BackgroundTransparency = 0
+		u164.Visible = false
+		u164.Parent = u158
+		u158.MouseEnter:connect(function() -- line: 684
+			-- upvalues: u164 (ref)
+			if u164.Text ~= "" then
+				u164.Visible = true
 			end
 		end)
-		u140.MouseLeave:connect(function() -- line: 666
-			-- upvalues: u146 (ref)
-			u146.Visible = false
+		u158.MouseLeave:connect(function() -- line: 689
+			-- upvalues: u164 (ref)
+			u164.Visible = false
 		end)
 
-		function t10.MoveToInventory(p28) -- line: 670
-			-- upvalues: t10 (copy), u77 (ref), MakeSlot (copy), u54 (ref), u58 (ref), u59 (ref), u67 (ref), t4 (copy), u71 (ref), u51 (ref)
-			if t10.Index <= u77 then
+		function t10.MoveToInventory(p40) -- line: 693
+			-- upvalues: t10 (copy), u80 (ref), MakeSlot (copy), u57 (ref), u61 (ref), u62 (ref), u70 (ref), t4 (copy), u74 (ref), u54 (ref)
+			if t10.Index <= u80 then
 				local Tool = t10.Tool
 
-				p28:Clear()
+				p40:Clear()
 
-				local v318 = MakeSlot(u54)
+				local v344 = MakeSlot(u57)
 
-				v318:Fill(Tool)
+				v344:Fill(Tool)
 
-				if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u58) and u59 then
-					u59:UnequipTools()
+				if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u61) and u62 then
+					u62:UnequipTools()
 
-					if u67 then
-						u67:ToggleSelect()
-						t4[u67]:UpdateEquipView()
-						u67 = nil
+					if u70 then
+						u70:ToggleSelect()
+						t4[u70]:UpdateEquipView()
+						u70 = nil
 					end
 				end
 
-				if u71 then
-					v318.Frame.Visible = false
-					v318.Parent = u51
+				if u74 then
+					v344.Frame.Visible = false
+					v344.Parent = u54
 				end
 			end
 		end
 
-		if v138 < 10 or v138 == u77 then
-			local v150 = v138 < 10 and v138 or 0
+		if v156 < 10 or v156 == u80 then
+			local v169 = v156 < 10 and v156 or 0
 
-			u147 = NewGui("TextLabel", "Number")
-			u147.Text = v150
-			u147.Size = UDim2.new(0.15, 0, 0.15, 0)
-			u147.Visible = false
-			u147.Parent = u140
-			t5[ZeroValue + v150] = function(p29) -- line: 696
+			u165 = NewGui("TextLabel", "Number")
+			u165.Text = v169
+			u165.Size = UDim2.new(0.15, 0, 0.15, 0)
+			u165.Visible = false
+			u165.Parent = u158
+			t5[ZeroValue + v169] = function(p41) -- line: 719
 				-- upvalues: t10 (copy)
-				t10:Select(p29)
+				t10:Select(p41)
 			end
 		end
 	end
 
-	local Position = u140.Position
+	local Position = u158.Position
 	local n6 = 0
 	local Parent2 = nil
 
-	u140.DragBegin:connect(function(p30) -- line: 707
-		-- upvalues: t6 (copy), u140 (ref), Position (ref), u142 (ref), u143 (ref), u147 (ref), u145 (ref), Parent2 (ref), u54 (ref), u51 (ref), u141 (ref), NewGui (copy)
-		t6[u140] = true
-		Position = p30
-		u140.BorderSizePixel = 2
-		u140.ZIndex = 2
-		u142.ZIndex = 2
-		u143.ZIndex = 2
-		u140.Parent.ZIndex = 2
+	u158.DragBegin:connect(function(p42) -- line: 730
+		-- upvalues: t6 (copy), u158 (ref), Position (ref), u160 (ref), u161 (ref), u165 (ref), u163 (ref), Parent2 (ref), u57 (ref), u54 (ref), u159 (ref), NewGui (copy)
+		t6[u158] = true
+		Position = p42
+		u158.BorderSizePixel = 2
+		u158.ZIndex = 2
+		u160.ZIndex = 2
+		u161.ZIndex = 2
+		u158.Parent.ZIndex = 2
 
-		if u147 then
-			u147.ZIndex = 2
+		if u165 then
+			u165.ZIndex = 2
 		end
 
-		if u145 then
-			u145.ZIndex = 2
+		if u163 then
+			u163.ZIndex = 2
 
-			for _, v in pairs(u145:GetChildren()) do
-				v.ZIndex = 2
+			for _, child in pairs(u163:GetChildren()) do
+				child.ZIndex = 2
 			end
 		end
 
-		Parent2 = u140.Parent
+		Parent2 = u158.Parent
 
-		if Parent2 == u54 then
-			local _ = u140.AbsolutePosition
-			local uDim2 = UDim2.new(0, u140.AbsolutePosition.X - u51.AbsolutePosition.X, 0, u140.AbsolutePosition.Y - u51.AbsolutePosition.Y)
+		if Parent2 == u57 then
+			local _ = u158.AbsolutePosition
+			local uDim2 = UDim2.new(0, u158.AbsolutePosition.X - u54.AbsolutePosition.X, 0, u158.AbsolutePosition.Y - u54.AbsolutePosition.Y)
 
-			u140.Parent = u51
-			u140.Position = uDim2
-			u141 = NewGui("Frame", "FakeSlot")
-			u141.LayoutOrder = u140.LayoutOrder
-			u141.Size = u140.Size
-			u141.BackgroundTransparency = 1
-			u141.Parent = u54
+			u158.Parent = u54
+			u158.Position = uDim2
+			u159 = NewGui("Frame", "FakeSlot")
+			u159.LayoutOrder = u158.LayoutOrder
+			u159.Size = u158.Size
+			u159.BackgroundTransparency = 1
+			u159.Parent = u57
 		end
 	end)
-	u140.DragStopped:connect(function(p31, p32) -- line: 749
-		-- upvalues: u141 (ref), u140 (ref), Position (ref), Parent2 (ref), u142 (ref), u143 (ref), u147 (ref), u145 (ref), t6 (copy), t10 (copy), u51 (ref), u77 (ref), n6 (ref), u62 (ref), u48 (ref), t3 (copy), u58 (ref), u59 (ref), u67 (ref), t4 (copy), u71 (ref)
-		if u141 then
-			u141:Destroy()
+	u158.DragStopped:connect(function(p43, p44) -- line: 772
+		-- upvalues: u159 (ref), u158 (ref), Position (ref), Parent2 (ref), u160 (ref), u161 (ref), u165 (ref), u163 (ref), t6 (copy), t10 (copy), u54 (ref), u80 (ref), n6 (ref), u65 (ref), u51 (ref), t3 (copy), u61 (ref), u62 (ref), u70 (ref), t4 (copy), u74 (ref)
+		if u159 then
+			u159:Destroy()
 		end
 
 		local timestamp = tick()
 
-		u140.Position = Position
-		u140.Parent = Parent2
-		u140.BorderSizePixel = 0
-		u140.ZIndex = 1
-		u142.ZIndex = 1
-		u143.ZIndex = 1
+		u158.Position = Position
+		u158.Parent = Parent2
+		u158.BorderSizePixel = 0
+		u158.ZIndex = 1
+		u160.ZIndex = 1
+		u161.ZIndex = 1
 		Parent2.ZIndex = 1
 
-		if u147 then
-			u147.ZIndex = 1
+		if u165 then
+			u165.ZIndex = 1
 		end
 
-		if u145 then
-			u145.ZIndex = 1
+		if u163 then
+			u163.ZIndex = 1
 
-			for _, v in pairs(u145:GetChildren()) do
-				v.ZIndex = 1
+			for _, child in pairs(u163:GetChildren()) do
+				child.ZIndex = 1
 			end
 		end
 
-		t6[u140] = nil
+		t6[u158] = nil
 
 		if not t10.Tool then
 			return
 		end
 
-		local v330 = u51
-		local AbsolutePosition = v330.AbsolutePosition
-		local AbsoluteSize = v330.AbsoluteSize
+		local v356 = u54
+		local AbsolutePosition = v356.AbsolutePosition
+		local AbsoluteSize = v356.AbsoluteSize
 
-		if p31 > AbsolutePosition.X and (p31 <= AbsolutePosition.X + AbsoluteSize.X and (p32 > AbsolutePosition.Y and p32 <= AbsolutePosition.Y + AbsoluteSize.Y)) then
-			if t10.Index <= u77 then
+		if p43 > AbsolutePosition.X and (p43 <= AbsolutePosition.X + AbsoluteSize.X and (p44 > AbsolutePosition.Y and p44 <= AbsolutePosition.Y + AbsoluteSize.Y)) then
+			if t10.Index <= u80 then
 				t10:MoveToInventory()
 			end
 
-			if t10.Index > u77 and timestamp - n6 < 0.5 then
-				if u62 then
+			if t10.Index > u80 and timestamp - n6 < 0.5 then
+				if u65 then
 					local Tool = t10.Tool
 
 					t10:Clear()
-					u62:Fill(Tool)
+					u65:Fill(Tool)
 					t10:Delete()
 				end
 
 				timestamp = 0
 			end
 		else
-			local v334 = u48
-			local AbsolutePosition2 = v334.AbsolutePosition
-			local AbsoluteSize2 = v334.AbsoluteSize
+			local v360 = u51
+			local AbsolutePosition2 = v360.AbsolutePosition
+			local AbsoluteSize2 = v360.AbsoluteSize
 
-			if p31 > AbsolutePosition2.X and (p31 <= AbsolutePosition2.X + AbsoluteSize2.X and (p32 > AbsolutePosition2.Y and p32 <= AbsolutePosition2.Y + AbsoluteSize2.Y)) then
+			if p43 > AbsolutePosition2.X and (p43 <= AbsolutePosition2.X + AbsoluteSize2.X and (p44 > AbsolutePosition2.Y and p44 <= AbsolutePosition2.Y + AbsoluteSize2.Y)) then
 				local t11 = {
 					1e999,
 					nil
 				}
 
-				for i = 1, u77 do
-					local v339 = t3[i]
-					local Frame = v339.Frame
-					local vector2 = Vector2.new(p31, p32)
+				for i = 1, u80 do
+					local v365 = t3[i]
+					local Frame = v365.Frame
+					local vector2 = Vector2.new(p43, p44)
 					local magnitude = (Frame.AbsolutePosition + Frame.AbsoluteSize / 2 - vector2).magnitude
 
 					if magnitude < t11[1] then
 						t11 = {
 							magnitude,
-							v339
+							v365
 						}
 					end
 				end
 
-				local v343 = t11[2]
+				local v369 = t11[2]
 
-				if v343 ~= t10 then
-					t10:Swap(v343)
+				if v369 ~= t10 then
+					t10:Swap(v369)
 
-					if t10.Index > u77 then
+					if t10.Index > u80 then
 						local Tool = t10.Tool
 
 						if not Tool then
 							t10:Delete()
 						else
-							if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u58) and u59 then
-								u59:UnequipTools()
+							if Tool and (Tool:IsA("HopperBin") and Tool.Active or Tool.Parent == u61) and u62 then
+								u62:UnequipTools()
 
-								if u67 then
-									u67:ToggleSelect()
-									t4[u67]:UpdateEquipView()
-									u67 = nil
+								if u70 then
+									u70:ToggleSelect()
+									t4[u70]:UpdateEquipView()
+									u70 = nil
 								end
 							end
 
-							if u71 then
+							if u74 then
 								t10.Frame.Visible = false
-								t10.Frame.Parent = u51
+								t10.Frame.Parent = u54
 							end
 						end
 					end
 				end
-			elseif t10.Index <= u77 then
+			elseif t10.Index <= u80 then
 				t10:MoveToInventory()
 			end
 		end
 
 		n6 = timestamp
 	end)
-	u140.Parent = p4
-	t3[v138] = t10
+	u158.Parent = p14
+	t3[v156] = t10
 
-	if v138 > u77 then
+	if v156 > u80 then
 		UpdateScrollingFrameCanvasSize()
 
-		if u51.Visible and not u71 then
-			local v154 = u53.CanvasSize.Y.Offset - u53.AbsoluteSize.Y
+		if u56 and u54.Visible and not u74 then
+			local v173 = u56.CanvasSize.Y.Offset - u56.AbsoluteSize.Y
 
-			u53.CanvasPosition = Vector2.new(0, (math.max(0, v154)))
+			u56.CanvasPosition = Vector2.new(0, (math.max(0, v173)))
 		end
 	end
 
 	return t10
 end
+local function SetNumberOfHotbarSlots(p45) -- line: 881
+	-- upvalues: u80 (ref), t3 (copy), MakeSlot (copy), u51 (ref), u65 (ref), n2 (ref), UpdateBackpackLayout (copy)
+	if p45 ~= u80 then
+		local v175 = u80
 
-local function OnChildAdded(p33) -- line: 920
-	-- upvalues: u58 (ref), u59 (ref), n3 (ref), u67 (ref), t4 (copy), u68 (ref), LocalPlayer (ref), u62 (ref), MakeSlot (copy), u54 (ref), t3 (copy), Backpack (ref), AdjustHotbarFrames (copy), u77 (ref), u51 (ref), t1 (copy)
-	if not p33:IsA("Tool") and not p33:IsA("HopperBin") then
-		if p33:IsA("Humanoid") and p33.Parent == u58 then
-			u59 = p33
+		if p45 < v175 then
+			for i = v175, p45 + 1, -1 do
+				local v177 = t3[i]
+
+				if v177 then
+					v177:MoveToInventory()
+					v177:Delete()
+				end
+			end
+
+			for i = v175, p45 + 1, -1 do
+				local v179 = t3[i]
+
+				if not v179.Tool then
+					v179:Delete()
+				end
+			end
+		else
+			for i = v175, p45 do
+				u80 = i
+
+				if t3[i] then
+					local _ = t3[i]
+					local Tool = t3[i].Tool
+					local v183 = MakeSlot(u51, i)
+
+					if Tool then
+						v183:Fill(Tool)
+					elseif not u65 then
+						u65 = v183
+					end
+				else
+					local v184 = MakeSlot(u51, i)
+
+					v184.Frame.Visible = false
+
+					if not u65 then
+						u65 = v184
+					end
+				end
+			end
+		end
+
+		u80 = p45
+		n2 = 0
+
+		for i = 1, u80 do
+			if t3[i] and t3[i].Tool then
+				n2 += 1
+			end
+		end
+
+		UpdateBackpackLayout()
+	end
+end
+local function OnChildAdded(p46) -- line: 943
+	-- upvalues: u50 (ref), u61 (ref), u62 (ref), n3 (ref), u70 (ref), t4 (copy), u71 (ref), LocalPlayer (ref), u65 (ref), MakeSlot (copy), u57 (ref), t3 (copy), Backpack (ref), AdjustHotbarFrames (copy), u80 (ref), u54 (ref), t1 (copy)
+	if not u50 then
+		return
+	end
+
+	if not p46:IsA("Tool") and not p46:IsA("HopperBin") then
+		if p46:IsA("Humanoid") and p46.Parent == u61 then
+			u62 = p46
 		end
 
 		return
 	end
 
-	if p33.Parent == u58 then
+	if p46.Parent == u61 then
 		n3 = tick()
 	end
 
-	if u67 and p33.Parent == u58 then
-		u67:ToggleSelect()
-		t4[u67]:UpdateEquipView()
-		u67 = nil
+	if u70 and p46.Parent == u61 then
+		u70:ToggleSelect()
+		t4[u70]:UpdateEquipView()
+		u70 = nil
 	end
 
-	if not u68 and p33.Parent == u58 and not t4[p33] then
+	if not u71 and p46.Parent == u61 and not t4[p46] then
 		local StarterGear = LocalPlayer:FindFirstChild("StarterGear")
 
-		if StarterGear and StarterGear:FindFirstChild(p33.Name) then
-			u68 = true
+		if StarterGear and StarterGear:FindFirstChild(p46.Name) then
+			u71 = true
 
-			for i = (u62 or MakeSlot(u54)).Index, 1, -1 do
-				local v170 = t3[i]
-				local v171 = i - 1
+			for i = (u65 or MakeSlot(u57)).Index, 1, -1 do
+				local v189 = t3[i]
+				local v190 = i - 1
 
-				if v171 > 0 then
-					t3[v171]:Swap(v170)
+				if v190 > 0 then
+					t3[v190]:Swap(v189)
 				else
-					v170:Fill(p33)
+					v189:Fill(p46)
 				end
 			end
 
-			for _, v in pairs(u58:GetChildren()) do
-				if v:IsA("Tool") and v ~= p33 then
-					v.Parent = Backpack
+			for _, child in pairs(u61:GetChildren()) do
+				if child:IsA("Tool") and child ~= p46 then
+					child.Parent = Backpack
 				end
 			end
 
@@ -940,265 +1110,317 @@ local function OnChildAdded(p33) -- line: 920
 		end
 	end
 
-	local v174 = t4[p33]
+	local v193 = t4[p46]
 
-	if v174 then
-		v174:UpdateEquipView()
+	if v193 then
+		v193:UpdateEquipView()
 	else
-		local v175 = u62 or MakeSlot(u54)
+		local v194 = u65 or MakeSlot(u57)
 
-		v175:Fill(p33)
+		v194:Fill(p46)
 
-		if v175.Index <= u77 and not u51.Visible then
+		if v194.Index <= u80 and not u54.Visible then
 			AdjustHotbarFrames()
 		end
 
-		if p33:IsA("HopperBin") and p33.Active then
-			if u59 then
-				u59:UnequipTools()
+		if p46:IsA("HopperBin") and p46.Active then
+			if u62 then
+				u62:UnequipTools()
 
-				if u67 then
-					u67:ToggleSelect()
-					t4[u67]:UpdateEquipView()
-					u67 = nil
+				if u70 then
+					u70:ToggleSelect()
+					t4[u70]:UpdateEquipView()
+					u70 = nil
 				end
 			end
 
-			u67 = p33
+			u70 = p46
 		end
 	end
 
 	t1.BackpackItemAdded:Fire()
 end
-local function OnChildRemoved(p34) -- line: 987
-	-- upvalues: n3 (ref), u58 (ref), Backpack (ref), t4 (copy), u77 (ref), u51 (ref), AdjustHotbarFrames (copy), u67 (ref), t1 (copy), t3 (copy)
-	if not p34:IsA("Tool") and not p34:IsA("HopperBin") then
+local function OnChildRemoved(p47) -- line: 1013
+	-- upvalues: u50 (ref), n3 (ref), u61 (ref), Backpack (ref), t4 (copy), u80 (ref), u54 (ref), AdjustHotbarFrames (copy), u70 (ref), t1 (copy), t3 (copy)
+	if not u50 then
+		return
+	end
+
+	if not p47:IsA("Tool") and not p47:IsA("HopperBin") then
 		return
 	end
 
 	n3 = tick()
 
-	local p34Parent = p34.Parent
+	local p47Parent = p47.Parent
 
-	if p34Parent == u58 or p34Parent == Backpack then
+	if p47Parent == u61 or p47Parent == Backpack then
 		return
 	end
 
-	local v178 = t4[p34]
-	local g182 = nil
-	local v181 = nil
+	local v197 = t4[p47]
+	local g201 = nil
+	local v200 = nil
 
-	if v178 then
-		v178:Clear()
+	if v197 then
+		v197:Clear()
 
-		if v178.Index > u77 then
-			v178:Delete()
-		elseif not u51.Visible then
+		if v197.Index > u80 then
+			v197:Delete()
+		elseif not u54.Visible then
 			AdjustHotbarFrames()
 		end
 	end
 
-	if p34 == u67 then
-		u67 = nil
+	if p47 == u70 then
+		u70 = nil
 	end
 
 	t1.BackpackItemRemoved:Fire()
 
-	for i = u77 + 1, #t3 do
-		local v180 = t3[i]
+	for i = u80 + 1, #t3 do
+		local v199 = t3[i]
 
-		if v180 and v180.Tool then
-			v181 = false
-			g182 = true
+		if v199 and v199.Tool then
+			v200 = false
+			g201 = true
 		end
 
-		if g182 then
+		if g201 then
 			break
 		end
 	end
 
-	if not g182 then
-		v181 = true
+	if not g201 then
+		v200 = true
 	end
 
-	g182 = false
+	g201 = false
 
-	if v181 then
+	if v200 then
 		t1.BackpackEmpty:Fire()
 	end
 end
-local function OnCharacterAdded(p35) -- line: 1021
-	-- upvalues: t3 (copy), u77 (ref), u67 (ref), t8 (ref), u58 (ref), OnChildRemoved (copy), OnChildAdded (copy), Backpack (ref), LocalPlayer (ref), AdjustHotbarFrames (copy)
+local function OnCharacterAdded(p48) -- line: 1050
+	-- upvalues: t3 (copy), u80 (ref), u70 (ref), t8 (ref), u61 (ref), OnChildRemoved (copy), OnChildAdded (copy), Backpack (ref), LocalPlayer (ref), AdjustHotbarFrames (copy)
 	for i = #t3, 1, -1 do
-		local v185 = t3[i]
+		local v204 = t3[i]
 
-		if v185.Tool then
-			v185:Clear()
+		if v204.Tool then
+			v204:Clear()
 		end
 
-		if i > u77 then
-			v185:Delete()
+		if i > u80 then
+			v204:Delete()
 		end
 	end
 
-	u67 = nil
+	u70 = nil
 
 	for _, v in pairs(t8) do
 		v:disconnect()
 	end
 
 	t8 = {}
-	u58 = p35
-	table.insert(t8, p35.ChildRemoved:connect(OnChildRemoved))
-	table.insert(t8, p35.ChildAdded:connect(OnChildAdded))
+	u61 = p48
+	table.insert(t8, p48.ChildRemoved:connect(OnChildRemoved))
+	table.insert(t8, p48.ChildAdded:connect(OnChildAdded))
 
-	for _, v in pairs(p35:GetChildren()) do
-		OnChildAdded(v)
+	for _, child in pairs(p48:GetChildren()) do
+		OnChildAdded(child)
 	end
 
 	Backpack = LocalPlayer:WaitForChild("Backpack")
 	table.insert(t8, Backpack.ChildRemoved:connect(OnChildRemoved))
 	table.insert(t8, Backpack.ChildAdded:connect(OnChildAdded))
 
-	for _, v in pairs(Backpack:GetChildren()) do
-		OnChildAdded(v)
+	for _, child in pairs(Backpack:GetChildren()) do
+		OnChildAdded(child)
 	end
 
 	AdjustHotbarFrames()
 end
-local function OnInputBegan(p36, p37) -- line: 1060
-	-- upvalues: u70 (ref), u69 (ref), BackspaceValue (copy), t5 (copy), u51 (ref), t1 (copy)
-	if p36.UserInputType == Enum.UserInputType.Keyboard and not u70 and (u69 or p36.KeyCode.Value == BackspaceValue) then
-		local v194 = t5[p36.KeyCode.Value]
+local function OnInputBegan(p49, p50) -- line: 1089
+	-- upvalues: u73 (ref), u72 (ref), BackspaceValue (copy), t5 (copy), u54 (ref), t1 (copy)
+	if p49.UserInputType == Enum.UserInputType.Keyboard and not u73 and (u72 or p49.KeyCode.Value == BackspaceValue) then
+		local v213 = t5[p49.KeyCode.Value]
 
-		if v194 then
-			v194(p37)
+		if v213 then
+			v213(p50)
 		end
 	end
 
-	local UserInputType = p36.UserInputType
+	local UserInputType = p49.UserInputType
 
-	if not p37 and ((UserInputType == Enum.UserInputType.MouseButton1 or UserInputType == Enum.UserInputType.Touch) and u51.Visible) then
+	if not p50 and ((UserInputType == Enum.UserInputType.MouseButton1 or UserInputType == Enum.UserInputType.Touch) and u54 and u54.Visible) then
 		t1.OpenClose()
 	end
 end
-local function OnUISChanged(p38) -- line: 1083
-	-- upvalues: UserInputService (copy), VRService (copy), u77 (ref), t3 (copy)
-	if p38 == "KeyboardEnabled" or p38 == "VREnabled" then
-		local v197 = UserInputService.KeyboardEnabled and not VRService.VREnabled
+local function OnUISChanged(p51) -- line: 1112
+	-- upvalues: UserInputService (copy), VRService (copy), u80 (ref), t3 (copy)
+	if p51 == "KeyboardEnabled" or p51 == "VREnabled" then
+		local v216 = UserInputService.KeyboardEnabled and not VRService.VREnabled
 
-		for i = 1, u77 do
-			t3[i]:TurnNumber(v197)
+		for i = 1, u80 do
+			t3[i]:TurnNumber(v216)
 		end
 	end
 end
 
-local u92 = nil
+local u106 = nil
 local timestamp = nil
 
-local function v94() -- line: 1095
+local function v108() -- line: 1124
 end
 
-local _ = Vector2.new(0, 0)
+local vector2 = Vector2.new(0, 0)
 
-function unbindAllGamepadEquipActions() -- line: 1099
+function unbindAllGamepadEquipActions() -- line: 1128
 	-- upvalues: ContextActionService (copy)
 	ContextActionService:UnbindAction("RBXBackpackHasGamepadFocus")
 	ContextActionService:UnbindAction("RBXCloseInventory")
 end
-function u80(_, p40, p41) -- line: 1174
-	-- upvalues: u92 (ref), timestamp (ref), u59 (ref), u67 (ref), t4 (copy), u77 (ref), t3 (copy), u79 (ref)
-	if p40 ~= Enum.UserInputState.Begin then
+
+local function setHotbarVisibility(p52, p53) -- line: 1133
+	-- upvalues: u80 (ref), t3 (copy)
+	for i = 1, u80 do
+		local v221 = t3[i]
+
+		if v221 and v221.Frame and (p53 or v221.Tool) then
+			v221.Frame.Visible = p52
+		end
+	end
+end
+local function getInputDirection(p54) -- line: 1142
+	-- upvalues: vector2 (ref)
+	local n7 = 1
+
+	if p54.UserInputState == Enum.UserInputState.End then
+		n7 = -1
+	end
+
+	if p54.KeyCode == Enum.KeyCode.Thumbstick1 then
+		local magnitude = p54.Position.magnitude
+
+		if magnitude > 0.98 then
+			vector2 = Vector2.new(p54.Position.x / magnitude, -p54.Position.y / magnitude)
+		else
+			vector2 = Vector2.new(0, 0)
+		end
+	elseif p54.KeyCode == Enum.KeyCode.DPadLeft then
+		vector2 = Vector2.new(vector2.x - n7 * 1, vector2.y)
+	elseif p54.KeyCode == Enum.KeyCode.DPadRight then
+		vector2 = Vector2.new(vector2.x + n7 * 1, vector2.y)
+	elseif p54.KeyCode == Enum.KeyCode.DPadUp then
+		vector2 = Vector2.new(vector2.x, vector2.y - n7 * 1)
+	elseif p54.KeyCode == Enum.KeyCode.DPadDown then
+		vector2 = Vector2.new(vector2.x, vector2.y + n7 * 1)
+	else
+		vector2 = Vector2.new(0, 0)
+	end
+
+	return vector2
+end
+
+function u83(_, p56, p57) -- line: 1203
+	-- upvalues: u106 (ref), timestamp (ref), u62 (ref), u70 (ref), t4 (copy), u80 (ref), t3 (copy), u82 (ref)
+	if p56 ~= Enum.UserInputState.Begin then
 		return
 	end
 
-	if u92 and ((u92.KeyCode == Enum.KeyCode.ButtonR1 and p41.KeyCode == Enum.KeyCode.ButtonL1 or u92.KeyCode == Enum.KeyCode.ButtonL1 and p41.KeyCode == Enum.KeyCode.ButtonR1) and tick() - timestamp <= 0.06) then
-		if u59 then
-			u59:UnequipTools()
+	if u106 and ((u106.KeyCode == Enum.KeyCode.ButtonR1 and p57.KeyCode == Enum.KeyCode.ButtonL1 or u106.KeyCode == Enum.KeyCode.ButtonL1 and p57.KeyCode == Enum.KeyCode.ButtonR1) and tick() - timestamp <= 0.06) then
+		if u62 then
+			u62:UnequipTools()
 
-			if u67 then
-				u67:ToggleSelect()
-				t4[u67]:UpdateEquipView()
-				u67 = nil
+			if u70 then
+				u70:ToggleSelect()
+				t4[u70]:UpdateEquipView()
+				u70 = nil
 			end
 		end
 
-		u92 = p41
+		u106 = p57
 		timestamp = tick()
 
 		return
 	end
 
-	u92 = p41
+	u106 = p57
 	timestamp = tick()
-	delay(0.06, function() -- line: 1202
-		-- upvalues: u92 (ref), p41 (copy), u77 (ref), t3 (copy), u59 (ref), u67 (ref), t4 (copy), u79 (ref)
-		if u92 ~= p41 then
+	delay(0.06, function() -- line: 1231
+		-- upvalues: u106 (ref), p57 (copy), u80 (ref), t3 (copy), u62 (ref), u70 (ref), t4 (copy), u82 (ref)
+		if u106 ~= p57 then
 			return
 		end
 
-		local v345 = p41.KeyCode ~= Enum.KeyCode.ButtonL1 and 1 or -1
+		local v371 = p57.KeyCode ~= Enum.KeyCode.ButtonL1 and 1 or -1
 
-		for i = 1, u77 do
-			if t3[i]:IsEquipped() then
-				local v347 = v345 + i
-				local v348 = false
+		for i = 1, u80 do
+			local v373 = t3[i]
 
-				if v347 > u77 then
-					v347 = 1
-					v348 = true
-				elseif v347 < 1 then
-					v347 = u77
-					v348 = true
+			if not v373 then
+				return
+			end
+
+			if v373:IsEquipped() then
+				local v374 = v371 + i
+				local v375 = false
+
+				if v374 > u80 then
+					v374 = 1
+					v375 = true
+				elseif v374 < 1 then
+					v374 = u80
+					v375 = true
 				end
 
-				local v349 = v347
+				local v376 = v374
 
-				while not t3[v349].Tool do
-					v349 += v345
+				while not t3[v376].Tool do
+					v376 += v371
 
-					if v349 == v347 then
+					if v376 == v374 then
 						return
 					end
 
-					if v349 > u77 then
-						v349 = 1
-						v348 = true
-					elseif v349 < 1 then
-						v349 = u77
-						v348 = true
+					if v376 > u80 then
+						v376 = 1
+						v375 = true
+					elseif v376 < 1 then
+						v376 = u80
+						v375 = true
 					end
 				end
 
-				if v348 then
-					if u59 then
-						u59:UnequipTools()
+				if v375 then
+					if u62 then
+						u62:UnequipTools()
 
-						if u67 then
-							u67:ToggleSelect()
-							t4[u67]:UpdateEquipView()
-							u67 = nil
+						if u70 then
+							u70:ToggleSelect()
+							t4[u70]:UpdateEquipView()
+							u70 = nil
 						end
 					end
 
-					u79 = nil
+					u82 = nil
 
 					return
 				end
 
-				t3[v349]:Select()
+				t3[v376]:Select()
 
 				return
 			end
 		end
 
-		if u79 and u79.Tool then
-			u79:Select()
+		if u82 and u82.Tool then
+			u82:Select()
 
 			return
 		end
 
-		for i = v345 == -1 and u77 or 1, if v345 ~= -1 then u77 else 1, v345 do
+		for i = v371 == -1 and u80 or 1, if v371 ~= -1 then u80 else 1, v371 do
 			if t3[i].Tool then
 				t3[i]:Select()
 
@@ -1207,7 +1429,7 @@ function u80(_, p40, p41) -- line: 1174
 		end
 	end)
 end
-function getGamepadSwapSlot() -- line: 1269
+function getGamepadSwapSlot() -- line: 1301
 	-- upvalues: t3 (copy)
 	for i = 1, #t3 do
 		if t3[i].Frame.BorderSizePixel > 0 then
@@ -1215,375 +1437,426 @@ function getGamepadSwapSlot() -- line: 1269
 		end
 	end
 end
-function changeSlot(p42) -- line: 1277
-	-- upvalues: GamepadService (copy), GuiService (copy), u52 (ref), u77 (ref)
+function changeSlot(p58) -- line: 1309
+	-- upvalues: GamepadService (copy), GuiService (copy), u55 (ref), u80 (ref), EngineFeature (copy)
 	local GamepadCursorEnabled = GamepadService.GamepadCursorEnabled
 
-	if p42.Frame == GuiService.SelectedCoreObject and not GamepadCursorEnabled then
-		local v219 = getGamepadSwapSlot()
+	if p58.Frame == GuiService.SelectedCoreObject and not GamepadCursorEnabled then
+		local v238 = getGamepadSwapSlot()
 
-		if not v219 then
-			local FrameSize = p42.Frame.Size
-			local FramePosition = p42.Frame.Position
+		if v238 then
+			v238.Frame.BorderSizePixel = 0
 
-			p42.Frame:TweenSizeAndPosition(FrameSize + UDim2.new(0, 10, 0, 10), FramePosition - UDim2.new(0, 5, 0, 5), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, function() -- line: 1313
-				-- upvalues: p42 (copy), FrameSize (copy), FramePosition (copy)
-				p42.Frame:TweenSizeAndPosition(FrameSize, FramePosition, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1, true)
-			end)
-			p42.Frame.BorderSizePixel = 3
-			u52.SelectionImageObject.Visible = true
+			if v238 ~= p58 then
+				p58:Swap(v238)
 
-			return
-		end
-
-		v219.Frame.BorderSizePixel = 0
-
-		if v219 ~= p42 then
-			p42:Swap(v219)
-			u52.SelectionImageObject.Visible = false
-
-			if p42.Index > u77 and not p42.Tool then
-				if GuiService.SelectedCoreObject == p42.Frame then
-					GuiService.SelectedCoreObject = v219.Frame
+				if u55 and u55.SelectionImageObject then
+					u55.SelectionImageObject.Visible = false
 				end
 
-				p42:Delete()
+				if p58.Index > u80 and not p58.Tool then
+					if GuiService.SelectedCoreObject == p58.Frame then
+						GuiService.SelectedCoreObject = v238.Frame
+					end
+
+					p58:Delete()
+				end
+
+				if v238.Index > u80 and not v238.Tool then
+					if GuiService.SelectedCoreObject == v238.Frame then
+						GuiService.SelectedCoreObject = p58.Frame
+					end
+
+					v238:Delete()
+
+					return
+				end
+			end
+		else
+			local FrameSize = p58.Frame.Size
+			local FramePosition = p58.Frame.Position
+
+			if EngineFeature then
+				p58.Frame:TweenSizeAndPositionInternal(FrameSize + UDim2.new(0, 10, 0, 10), FramePosition - UDim2.new(0, 5, 0, 5), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, function() -- line: 1348
+					-- upvalues: p58 (copy), FrameSize (copy), FramePosition (copy)
+					p58.Frame:TweenSizeAndPositionInternal(FrameSize, FramePosition, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1, true)
+				end)
+			else
+				p58.Frame:TweenSizeAndPosition(FrameSize + UDim2.new(0, 10, 0, 10), FramePosition - UDim2.new(0, 5, 0, 5), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.1, true, function() -- line: 1367
+					-- upvalues: p58 (copy), FrameSize (copy), FramePosition (copy)
+					p58.Frame:TweenSizeAndPosition(FrameSize, FramePosition, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.1, true)
+				end)
 			end
 
-			if v219.Index > u77 and not v219.Tool then
-				if GuiService.SelectedCoreObject == v219.Frame then
-					GuiService.SelectedCoreObject = p42.Frame
-				end
+			p58.Frame.BorderSizePixel = 3
 
-				v219:Delete()
+			if u55 and u55.SelectionImageObject then
+				u55.SelectionImageObject.Visible = true
 
 				return
 			end
 		end
 	else
-		p42:Select()
-		u52.SelectionImageObject.Visible = false
+		p58:Select()
+
+		if u55 and u55.SelectionImageObject then
+			u55.SelectionImageObject.Visible = false
+		end
 	end
 end
-function enableGamepadInventoryControl() -- line: 1333
-	-- upvalues: u51 (ref), t1 (copy), ContextActionService (copy), v94 (copy), GuiService (copy), u48 (ref)
-	ContextActionService:BindAction("RBXBackpackHasGamepadFocus", v94, false, Enum.UserInputType.Gamepad1)
-	ContextActionService:BindAction("RBXCloseInventory", function(_, p44, _) -- line: 1334
-		-- upvalues: u51 (ref), t1 (copy)
-		if p44 ~= Enum.UserInputState.Begin then
+function enableGamepadInventoryControl() -- line: 1392
+	-- upvalues: u54 (ref), t1 (copy), ContextActionService (copy), v108 (copy), u51 (ref), GuiService (copy)
+	ContextActionService:BindAction("RBXBackpackHasGamepadFocus", v108, false, Enum.UserInputType.Gamepad1)
+	ContextActionService:BindAction("RBXCloseInventory", function(_, inputState, _) -- line: 1393
+		-- upvalues: u54 (ref), t1 (copy)
+		if inputState ~= Enum.UserInputState.Begin then
 			return
 		end
 
 		if getGamepadSwapSlot() then
-			local v354 = getGamepadSwapSlot()
+			local v381 = getGamepadSwapSlot()
 
-			if v354 then
-				v354.Frame.BorderSizePixel = 0
+			if v381 then
+				v381.Frame.BorderSizePixel = 0
 
 				return
 			end
-		elseif u51.Visible then
+		elseif u54 and u54.Visible then
 			t1.OpenClose()
 		end
 	end, false, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonStart)
 
-	if not false then
-		GuiService.SelectedCoreObject = u48:FindFirstChild("1")
+	if not false and u51 then
+		GuiService.SelectedCoreObject = u51:FindFirstChild("1")
 	end
 end
-function disableGamepadInventoryControl() -- line: 1366
-	-- upvalues: u77 (ref), t3 (copy), GuiService (copy), u47 (ref)
+function disableGamepadInventoryControl() -- line: 1425
+	-- upvalues: u80 (ref), t3 (copy), u50 (ref), GuiService (copy)
 	unbindAllGamepadEquipActions()
 
-	for i = 1, u77 do
-		local v223 = t3[i]
+	for i = 1, u80 do
+		local v242 = t3[i]
 
-		if v223 and v223.Frame then
-			v223.Frame.BorderSizePixel = 0
+		if v242 and v242.Frame then
+			v242.Frame.BorderSizePixel = 0
 		end
 	end
 
-	if GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(u47) then
+	if u50 and GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(u50) then
 		GuiService.SelectedCoreObject = nil
 	end
 end
-function gamepadDisconnected() -- line: 1400
-	-- upvalues: VRService (copy), u75 (ref)
+
+local function bindBackpackHotbarAction() -- line: 1440
+	-- upvalues: u72 (ref), u47 (ref), ContextActionService (copy), u83 (ref)
+	if u72 and not u47 then
+		u47 = true
+		ContextActionService:BindAction("RBXHotbarEquip", u83, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
+	end
+end
+local function unbindBackpackHotbarAction() -- line: 1453
+	-- upvalues: u47 (ref), ContextActionService (copy)
+	disableGamepadInventoryControl()
+	u47 = false
+	ContextActionService:UnbindAction("RBXHotbarEquip")
+end
+
+function gamepadDisconnected() -- line: 1459
+	-- upvalues: VRService (copy), u78 (ref)
 	if not VRService.VREnabled then
-		u75 = false
+		u78 = false
 		disableGamepadInventoryControl()
 	end
 end
-function gamepadConnected() -- line: 1407
-	-- upvalues: VRService (copy), u75 (ref), GuiService (copy), u47 (ref), n2 (ref), u69 (ref), u44 (ref), ContextActionService (copy), u80 (ref), u51 (ref)
+function gamepadConnected() -- line: 1466
+	-- upvalues: VRService (copy), u78 (ref), u50 (ref), GuiService (copy), n2 (ref), u72 (ref), u47 (ref), ContextActionService (copy), u83 (ref), u54 (ref)
 	if not VRService.VREnabled then
-		u75 = true
-		GuiService:AddSelectionParent("RBXBackpackSelection", u47)
+		u78 = true
 
-		if n2 >= 1 and u69 and not u44 then
-			u44 = true
-			ContextActionService:BindAction("RBXHotbarEquip", u80, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
+		if u50 then
+			GuiService:AddSelectionParent("RBXBackpackSelection", u50)
 		end
 
-		if u51.Visible then
+		if n2 >= 1 and u72 and not u47 then
+			u47 = true
+			ContextActionService:BindAction("RBXHotbarEquip", u83, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
+		end
+
+		if u54 and u54.Visible then
 			enableGamepadInventoryControl()
 		end
 	end
 end
 
-local function setBackpackEnabled(p46) -- line: 1422
-	-- upvalues: u43 (ref), u69 (ref), u47 (ref), FFlagMountCoreGuiBackpack (copy), RobloxGui (copy), t7 (copy), GuiService (copy), n2 (ref), u44 (ref), ContextActionService (copy), u80 (ref)
-	local v225 = p46 and u43
+local function setBackpackEnabled(p61) -- line: 1483
+	-- upvalues: u46 (ref), u72 (ref), u50 (ref), FFlagMountCoreGuiBackpack (copy), RobloxGui (copy), t7 (copy), GuiService (copy), n2 (ref), u47 (ref), ContextActionService (copy), u83 (ref)
+	local v244 = p61 and u46
 
-	u69 = v225
+	u72 = v244
 
-	if u47 then
+	if u50 then
 		if FFlagMountCoreGuiBackpack then
-			if v225 then
-				u47.Parent = RobloxGui
+			if v244 then
+				u50.Parent = RobloxGui
 			else
-				u47.Parent = nil
+				u50.Parent = nil
 			end
 		else
-			u47.Visible = v225
+			u50.Visible = v244
 		end
 	end
 
 	for _, v in pairs(t7) do
-		if v225 then
+		if v244 then
 			GuiService:AddKey(v)
 		else
 			GuiService:RemoveKey(v)
 		end
 	end
 
-	if v225 then
-		if n2 >= 1 and u69 and not u44 then
-			u44 = true
-			ContextActionService:BindAction("RBXHotbarEquip", u80, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
+	if v244 then
+		if n2 >= 1 and u72 and not u47 then
+			u47 = true
+			ContextActionService:BindAction("RBXHotbarEquip", u83, false, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1)
 
 			return
 		end
 	else
 		disableGamepadInventoryControl()
-		u44 = false
+		u47 = false
 		ContextActionService:UnbindAction("RBXHotbarEquip")
 	end
 end
-local function MakeVRRoundButton(p47, p48) -- line: 1455
+local function MakeVRRoundButton(p62, p63) -- line: 1516
 	-- upvalues: NewGui (copy)
-	local v230 = NewGui("ImageButton", p47)
+	local v249 = NewGui("ImageButton", p62)
 
-	v230.Size = UDim2.new(0, 40, 0, 40)
-	v230.Image = "rbxasset://textures/ui/Keyboard/close_button_background.png"
+	v249.Size = UDim2.new(0, 40, 0, 40)
+	v249.Image = "rbxasset://textures/ui/Keyboard/close_button_background.png"
 
-	local v231 = NewGui("ImageLabel", "Icon")
+	local v250 = NewGui("ImageLabel", "Icon")
 
-	v231.Size = UDim2.new(0.5, 0, 0.5, 0)
-	v231.Position = UDim2.new(0.25, 0, 0.25, 0)
-	v231.Image = p48
-	v231.Parent = v230
+	v250.Size = UDim2.new(0.5, 0, 0.5, 0)
+	v250.Position = UDim2.new(0.25, 0, 0.25, 0)
+	v250.Image = p63
+	v250.Parent = v249
 
-	local v232 = NewGui("ImageLabel", "Selection")
+	local v251 = NewGui("ImageLabel", "Selection")
 
-	v232.Size = UDim2.new(0.9, 0, 0.9, 0)
-	v232.Position = UDim2.new(0.05, 0, 0.05, 0)
-	v232.Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png"
-	v230.SelectionImageObject = v232
+	v251.Size = UDim2.new(0.9, 0, 0.9, 0)
+	v251.Position = UDim2.new(0.05, 0, 0.05, 0)
+	v251.Image = "rbxasset://textures/ui/Keyboard/close_button_selection.png"
+	v249.SelectionImageObject = v251
 
-	return v230, v231, v232
+	return v249, v250, v251
 end
 
-function t1.createGui() -- line: 1475
-	-- upvalues: u47 (ref), NewGui (copy), FFlagMountCoreGuiBackpack (copy), StarterGui (copy), RobloxGui (copy), u48 (ref), u77 (ref), MakeSlot (copy), u62 (ref), u49 (ref), t1 (copy), color3_5 (copy), u50 (ref), MakeVRRoundButton (copy), u51 (ref), u19 (ref), color3 (copy), u52 (ref), u53 (ref), u54 (ref), UIGridLayout (ref), n1 (ref), u56 (ref), u57 (ref), UpdateBackpackLayout (copy), Create (copy), v40 (copy), color3_6 (copy), u29 (ref), s1 (ref), color3_3 (copy), t3 (copy), u71 (ref), UpdateScrollingFrameCanvasSize (copy), t9 (copy), t5 (copy), VRService (copy), UserInputService (copy), GuiService (copy), t6 (copy), AdjustHotbarFrames (copy), u75 (ref), t2 (copy), ContextActionService (copy), BackquoteValue (copy), LocalPlayer (ref), Players (copy), OnCharacterAdded (copy), t7 (copy), OnInputBegan (copy), u70 (ref), BackspaceValue (copy), u67 (ref), u59 (ref), t4 (copy), OnUISChanged (copy), v15 (copy), SettingsShowSignal (copy), isInExperienceUIVREnabled (copy), InExperienceUIVRIXP (copy), InExperienceAppChatModal (copy), UserGameSettings (copy), u23 (ref)
-	u47 = NewGui("Frame", "Backpack")
+function t1.createGui() -- line: 1536
+	-- upvalues: u50 (ref), NewGui (copy), FFlagMountCoreGuiBackpack (copy), StarterGui (copy), RobloxGui (copy), u51 (ref), u80 (ref), MakeSlot (copy), u65 (ref), u52 (ref), t1 (copy), color3_5 (copy), u53 (ref), MakeVRRoundButton (copy), u54 (ref), u22 (ref), color3 (copy), u55 (ref), u56 (ref), u57 (ref), UIGridLayout (ref), n1 (ref), u59 (ref), u60 (ref), UpdateBackpackLayout (copy), Create (copy), v43 (copy), color3_6 (copy), u32 (ref), s1 (ref), color3_3 (copy), t3 (copy), u74 (ref), UpdateScrollingFrameCanvasSize (copy), t9 (copy), t5 (copy), VRService (copy), UserInputService (copy), GuiService (copy), t6 (copy), AdjustHotbarFrames (copy), u78 (ref), t2 (copy), ContextActionService (copy), BackquoteValue (copy), LocalPlayer (ref), Players (copy), OnCharacterAdded (copy), t7 (copy), OnInputBegan (copy), u73 (ref), BackspaceValue (copy), u70 (ref), u62 (ref), t4 (copy), OnUISChanged (copy), v17 (copy), SettingsShowSignal (copy), isInExperienceUIVREnabled (copy), InExperienceUIVRIXP (copy), InExperienceAppChatModal (copy), UserGameSettings (copy), u26 (ref)
+	u50 = NewGui("Frame", "Backpack")
 
 	if FFlagMountCoreGuiBackpack then
 		if StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Backpack) then
-			u47.Parent = RobloxGui
+			u50.Parent = RobloxGui
 		end
 	else
-		u47.Visible = false
-		u47.Parent = RobloxGui
+		u50.Visible = false
+		u50.Parent = RobloxGui
 	end
 
-	u48 = NewGui("Frame", "Hotbar")
-	u48.Parent = u47
+	u51 = NewGui("Frame", "Hotbar")
+	u51.Parent = u50
 
-	for i = 1, u77 do
-		local v234 = MakeSlot(u48, i)
+	for i = 1, u80 do
+		local v253 = MakeSlot(u51, i)
 
-		v234.Frame.Visible = false
+		v253.Frame.Visible = false
 
-		if not u62 then
-			u62 = v234
+		if not u65 then
+			u65 = v253
 		end
 	end
 
-	u49 = NewGui("ImageButton", "OpenInventory")
-	u49.Size = UDim2.new(0, 30, 0, 30)
-	u49.Image = "rbxasset://textures/ui/Backpack/ScrollUpArrow.png"
-	u49.MouseButton1Click:connect(function() -- line: 1506
+	u52 = NewGui("ImageButton", "OpenInventory")
+	u52.Size = UDim2.new(0, 30, 0, 30)
+	u52.Image = "rbxasset://textures/ui/Backpack/ScrollUpArrow.png"
+	u52.MouseButton1Click:connect(function() -- line: 1567
 		-- upvalues: t1 (copy)
 		t1.OpenClose()
 	end)
-	u49.SelectionGained:connect(function() -- line: 1509
-		-- upvalues: u49 (ref), color3_5 (copy)
-		u49.ImageColor3 = color3_5
+	u52.SelectionGained:connect(function() -- line: 1570
+		-- upvalues: u52 (ref), color3_5 (copy)
+		u52.ImageColor3 = color3_5
 	end)
-	u49.SelectionLost:connect(function() -- line: 1512
-		-- upvalues: u49 (ref)
-		u49.ImageColor3 = Color3.new(1, 1, 1)
+	u52.SelectionLost:connect(function() -- line: 1573
+		-- upvalues: u52 (ref)
+		u52.ImageColor3 = Color3.new(1, 1, 1)
 	end)
 
-	local v235 = NewGui("Frame", "Selection")
+	local v254 = NewGui("Frame", "Selection")
 
-	v235.Visible = false
-	u49.SelectionImageObject = v235
-	u50 = MakeVRRoundButton("CloseInventory", "rbxasset://textures/ui/Keyboard/close_button_icon.png")
-	u50.Position = UDim2.new(0, 0, 0, -50)
-	u50.MouseButton1Click:connect(function() -- line: 1522
-		-- upvalues: u51 (ref), t1 (copy)
-		if u51.Visible then
+	v254.Visible = false
+	u52.SelectionImageObject = v254
+	u53 = MakeVRRoundButton("CloseInventory", "rbxasset://textures/ui/Keyboard/close_button_icon.png")
+	u53.Position = UDim2.new(0, 0, 0, -50)
+	u53.MouseButton1Click:connect(function() -- line: 1583
+		-- upvalues: u54 (ref), t1 (copy)
+		if u54.Visible then
 			t1.OpenClose()
 		end
 	end)
 
-	local v236 = NewGui("ImageLabel", "LeftBumper")
+	local v255 = NewGui("ImageLabel", "LeftBumper")
 
-	v236.Size = UDim2.new(0, 40, 0, 40)
-	v236.Position = UDim2.new(0, -v236.Size.X.Offset, 0.5, -v236.Size.Y.Offset / 2)
+	v255.Size = UDim2.new(0, 40, 0, 40)
+	v255.Position = UDim2.new(0, -v255.Size.X.Offset, 0.5, -v255.Size.Y.Offset / 2)
 
-	local v237 = NewGui("ImageLabel", "RightBumper")
+	local v256 = NewGui("ImageLabel", "RightBumper")
 
-	v237.Size = UDim2.new(0, 40, 0, 40)
-	v237.Position = UDim2.new(1, 0, 0.5, -v237.Size.Y.Offset / 2)
-	u51 = NewGui("Frame", "Inventory")
-	u51.BackgroundTransparency = u19
-	u51.BackgroundColor3 = color3
-	u51.Active = true
-	u51.Visible = false
-	u51.Parent = u47
-	u52 = NewGui("TextButton", "VRInventorySelector")
-	u52.Position = UDim2.new(0, 0, 0, 0)
-	u52.Size = UDim2.new(1, 0, 1, 0)
-	u52.BackgroundTransparency = 1
-	u52.Text = ""
-	u52.Parent = u51
+	v256.Size = UDim2.new(0, 40, 0, 40)
+	v256.Position = UDim2.new(1, 0, 0.5, -v256.Size.Y.Offset / 2)
+	u54 = NewGui("Frame", "Inventory")
+	u54.BackgroundTransparency = u22
+	u54.BackgroundColor3 = color3
+	u54.Active = true
+	u54.Visible = false
+	u54.Parent = u50
+	u55 = NewGui("TextButton", "VRInventorySelector")
+	u55.Position = UDim2.new(0, 0, 0, 0)
+	u55.Size = UDim2.new(1, 0, 1, 0)
+	u55.BackgroundTransparency = 1
+	u55.Text = ""
+	u55.Parent = u54
 
-	local v238 = NewGui("ImageLabel", "Selector")
+	local v257 = NewGui("ImageLabel", "Selector")
 
-	v238.Size = UDim2.new(1, 0, 1, 0)
-	v238.Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png"
-	v238.ScaleType = Enum.ScaleType.Slice
-	v238.SliceCenter = Rect.new(12, 12, 52, 52)
-	v238.Visible = false
-	u52.SelectionImageObject = v238
-	u53 = NewGui("ScrollingFrame", "ScrollingFrame")
-	u53.Selectable = false
-	u53.CanvasSize = UDim2.new(0, 0, 0, 0)
-	u53.Parent = u51
-	u54 = NewGui("Frame", "UIGridFrame")
-	u54.Selectable = false
-	u54.Size = UDim2.new(1, -10, 1, 0)
-	u54.Position = UDim2.new(0, 5, 0, 0)
-	u54.Parent = u53
+	v257.Size = UDim2.new(1, 0, 1, 0)
+	v257.Image = "rbxasset://textures/ui/Keyboard/key_selection_9slice.png"
+	v257.ScaleType = Enum.ScaleType.Slice
+	v257.SliceCenter = Rect.new(12, 12, 52, 52)
+	v257.Visible = false
+	u55.SelectionImageObject = v257
+	u56 = NewGui("ScrollingFrame", "ScrollingFrame")
+	u56.Selectable = false
+	u56.CanvasSize = UDim2.new(0, 0, 0, 0)
+	u56.Parent = u54
+	u57 = NewGui("Frame", "UIGridFrame")
+	u57.Selectable = false
+	u57.Size = UDim2.new(1, -10, 1, 0)
+	u57.Position = UDim2.new(0, 5, 0, 0)
+	u57.Parent = u56
 	UIGridLayout = Instance.new("UIGridLayout")
 	UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIGridLayout.CellSize = UDim2.new(0, n1, 0, n1)
 	UIGridLayout.CellPadding = UDim2.new(0, 5, 0, 5)
-	UIGridLayout.Parent = u54
-	u56 = MakeVRRoundButton("ScrollUpButton", "rbxasset://textures/ui/Backpack/ScrollUpArrow.png")
-	u56.Size = UDim2.new(0, 34, 0, 34)
-	u56.Position = UDim2.new(0.5, -u56.Size.X.Offset / 2, 0, 43)
-	u56.Icon.Position = u56.Icon.Position - UDim2.new(0, 0, 0, 2)
-	u56.MouseButton1Click:connect(function() -- line: 1582
-		-- upvalues: u53 (ref), n1 (ref)
-		u53.CanvasPosition = Vector2.new(u53.CanvasPosition.X, (math.min(u53.CanvasSize.Y.Offset - u53.AbsoluteWindowSize.Y, (math.max(0, u53.CanvasPosition.Y - (n1 + 5))))))
-	end)
-	u57 = MakeVRRoundButton("ScrollDownButton", "rbxasset://textures/ui/Backpack/ScrollUpArrow.png")
-	u57.Rotation = 180
-	u57.Icon.Position = u57.Icon.Position - UDim2.new(0, 0, 0, 2)
-	u57.Size = UDim2.new(0, 34, 0, 34)
-	u57.Position = UDim2.new(0.5, -u57.Size.X.Offset / 2, 1, -u57.Size.Y.Offset - 3)
-	u57.MouseButton1Click:connect(function() -- line: 1600
-		-- upvalues: u53 (ref), n1 (ref)
-		u53.CanvasPosition = Vector2.new(u53.CanvasPosition.X, (math.min(u53.CanvasSize.Y.Offset - u53.AbsoluteWindowSize.Y, (math.max(0, u53.CanvasPosition.Y + (n1 + 5))))))
-	end)
-	u53.Changed:connect(function(p49) -- line: 1611
-		-- upvalues: u53 (ref), u56 (ref), u57 (ref)
-		if p49 == "AbsoluteWindowSize" or (p49 == "CanvasPosition" or p49 == "CanvasSize") then
-			local v356 = u53.CanvasPosition.Y ~= 0
-			local v357 = u53.CanvasPosition.Y < u53.CanvasSize.Y.Offset - u53.AbsoluteWindowSize.Y
+	UIGridLayout.Parent = u57
+	u59 = MakeVRRoundButton("ScrollUpButton", "rbxasset://textures/ui/Backpack/ScrollUpArrow.png")
+	u59.Size = UDim2.new(0, 34, 0, 34)
+	u59.Position = UDim2.new(0.5, -u59.Size.X.Offset / 2, 0, 43)
+	u59.Icon.Position = u59.Icon.Position - UDim2.new(0, 0, 0, 2)
+	u59.MouseButton1Click:connect(function() -- line: 1643
+		-- upvalues: u56 (ref), n1 (ref)
+		if not u56 then
+			return
+		end
 
-			u56.Visible = v356
-			u57.Visible = v357
+		u56.CanvasPosition = Vector2.new(u56.CanvasPosition.X, (math.min(u56.CanvasSize.Y.Offset - u56.AbsoluteWindowSize.Y, (math.max(0, u56.CanvasPosition.Y - (n1 + 5))))))
+	end)
+	u60 = MakeVRRoundButton("ScrollDownButton", "rbxasset://textures/ui/Backpack/ScrollUpArrow.png")
+	u60.Rotation = 180
+	u60.Icon.Position = u60.Icon.Position - UDim2.new(0, 0, 0, 2)
+	u60.Size = UDim2.new(0, 34, 0, 34)
+	u60.Position = UDim2.new(0.5, -u60.Size.X.Offset / 2, 1, -u60.Size.Y.Offset - 3)
+	u60.MouseButton1Click:connect(function() -- line: 1664
+		-- upvalues: u56 (ref), n1 (ref)
+		if not u56 then
+			return
+		end
+
+		u56.CanvasPosition = Vector2.new(u56.CanvasPosition.X, (math.min(u56.CanvasSize.Y.Offset - u56.AbsoluteWindowSize.Y, (math.max(0, u56.CanvasPosition.Y + (n1 + 5))))))
+	end)
+	u56.Changed:connect(function(p64) -- line: 1678
+		-- upvalues: u56 (ref), u59 (ref), u60 (ref)
+		if not u56 then
+			return
+		end
+
+		if p64 == "AbsoluteWindowSize" or p64 == "CanvasPosition" or p64 == "CanvasSize" then
+			local v383 = u56.CanvasPosition.Y ~= 0
+			local v384 = u56.CanvasPosition.Y < u56.CanvasSize.Y.Offset - u56.AbsoluteWindowSize.Y
+
+			u59.Visible = v383
+			u60.Visible = v384
 		end
 	end)
 	UpdateBackpackLayout()
 
-	local v239 = Create("Frame")({
+	local v258 = Create("Frame")({
 		Name = "GamepadHintsFrame",
-		Size = UDim2.new(0, u48.Size.X.Offset, 0, not v40 and 60 or 95),
 		BackgroundTransparency = 1,
 		Visible = false,
-		Parent = u47
+		Size = UDim2.new(0, u51.Size.X.Offset, 0, not v43 and 60 or 95),
+		Parent = u50
 	})
 
-	local function addGamepadHint(p50, p51, p52) -- line: 1634
-		-- upvalues: Create (copy), v239 (copy), v40 (copy)
-		local v361 = Create("Frame")({
+	local function addGamepadHint(p65, p66, p67) -- line: 1704
+		-- upvalues: Create (copy), v258 (copy), v43 (copy)
+		local v388 = Create("Frame")({
 			Name = "HintFrame",
+			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, -5),
 			Position = UDim2.new(0, 0, 0, 0),
-			BackgroundTransparency = 1,
-			Parent = v239
+			Parent = v258
 		})
 
 		Create("ImageLabel")({
 			Name = "HintImage",
-			Size = v40 and UDim2.new(0, 90, 0, 90) or UDim2.new(0, 60, 0, 60),
 			BackgroundTransparency = 1,
-			Image = v40 and p51 or p50,
-			Parent = v361
+			Size = v43 and UDim2.new(0, 90, 0, 90) or UDim2.new(0, 60, 0, 60),
+			Image = v43 and p66 or p65,
+			Parent = v388
 		})
 
-		local v362 = Create("TextLabel")({
+		local v389 = Create("TextLabel")({
 			Name = "HintText",
-			Position = UDim2.new(0, not v40 and 70 or 100, 0, 0),
-			Size = UDim2.new(1, -(not v40 and 70 or 100), 1, 0),
-			Font = Enum.Font.SourceSansBold,
-			FontSize = v40 and Enum.FontSize.Size36 or Enum.FontSize.Size24,
 			BackgroundTransparency = 1,
-			Text = p52,
+			TextWrapped = true,
+			Position = UDim2.new(0, not v43 and 70 or 100, 0, 0),
+			Size = UDim2.new(1, -(not v43 and 70 or 100), 1, 0),
+			Font = Enum.Font.SourceSansBold,
+			FontSize = v43 and Enum.FontSize.Size36 or Enum.FontSize.Size24,
+			Text = p67,
 			TextColor3 = Color3.new(1, 1, 1),
 			TextXAlignment = Enum.TextXAlignment.Left,
-			TextWrapped = true,
-			Parent = v361
+			Parent = v388
 		})
 		local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 
-		UITextSizeConstraint.Parent = v362
-		UITextSizeConstraint.MaxTextSize = v362.TextSize
+		UITextSizeConstraint.Parent = v389
+		UITextSizeConstraint.MaxTextSize = v389.TextSize
 	end
-	local function resizeGamepadHintsFrame() -- line: 1669
-		-- upvalues: v239 (copy), u48 (ref), v40 (copy), u51 (ref)
-		v239.Size = UDim2.new(u48.Size.X.Scale, u48.Size.X.Offset, 0, not v40 and 60 or 95)
-		v239.Position = UDim2.new(u48.Position.X.Scale, u48.Position.X.Offset, u51.Position.Y.Scale, u51.Position.Y.Offset - v239.Size.Y.Offset)
+	local function resizeGamepadHintsFrame() -- line: 1739
+		-- upvalues: u51 (ref), u54 (ref), v258 (copy), v43 (copy)
+		if not u51 or not u54 then
+			return
+		end
 
-		local n7 = 0
-		local children = v239:GetChildren()
+		v258.Size = UDim2.new(u51.Size.X.Scale, u51.Size.X.Offset, 0, not v43 and 60 or 95)
+		v258.Position = UDim2.new(u51.Position.X.Scale, u51.Position.X.Offset, u54.Position.Y.Scale, u54.Position.Y.Offset - v258.Size.Y.Offset)
+
+		local n8 = 0
+		local children = v258:GetChildren()
 
 		for i = 1, #children do
 			children[i].Size = UDim2.new(1, 0, 1, -5)
 			children[i].Position = UDim2.new(0, 0, 0, 0)
-			n7 += children[i].HintText.Position.X.Offset + children[i].HintText.TextBounds.X
+			n8 += children[i].HintText.Position.X.Offset + children[i].HintText.TextBounds.X
 		end
 
-		local v367 = (v239.AbsoluteSize.X - n7) / (#children - 1)
+		local v394 = (v258.AbsoluteSize.X - n8) / (#children - 1)
 
 		for i = 1, #children do
-			children[i].Position = i == 1 and UDim2.new(0, 0, 0, 0) or UDim2.new(0, children[i - 1].Position.X.Offset + children[i - 1].Size.X.Offset + v367, 0, 0)
+			children[i].Position = i == 1 and UDim2.new(0, 0, 0, 0) or UDim2.new(0, children[i - 1].Position.X.Offset + children[i - 1].Size.X.Offset + v394, 0, 0)
 			children[i].Size = UDim2.new(0, children[i].HintText.Position.X.Offset + children[i].HintText.TextBounds.X, 1, -5)
 		end
 	end
@@ -1592,116 +1865,112 @@ function t1.createGui() -- line: 1475
 	addGamepadHint("rbxasset://textures/ui/Controls/DesignSystem/ButtonA.png", "rbxasset://textures/ui/Controls/DesignSystem/ButtonA@2x.png", "Select/Swap")
 	addGamepadHint("rbxasset://textures/ui/Controls/DesignSystem/ButtonB.png", "rbxasset://textures/ui/Controls/DesignSystem/ButtonB@2x.png", "Close Backpack")
 
-	local v242 = NewGui("Frame", "Search")
+	local v261 = NewGui("Frame", "Search")
 
-	v242.BackgroundColor3 = color3_6
-	v242.BackgroundTransparency = u29
-	v242.Size = UDim2.new(0, 190, 0, 30)
-	v242.Position = UDim2.new(1, -v242.Size.X.Offset - 5, 0, 5)
-	v242.Parent = u51
+	v261.BackgroundColor3 = color3_6
+	v261.BackgroundTransparency = u32
+	v261.Size = UDim2.new(0, 190, 0, 30)
+	v261.Position = UDim2.new(1, -v261.Size.X.Offset - 5, 0, 5)
+	v261.Parent = u54
 
-	local v243 = NewGui("TextBox", "TextBox")
+	local v262 = NewGui("TextBox", "TextBox")
 
-	v243.Text = s1
-	v243.ClearTextOnFocus = false
-	v243.FontSize = Enum.FontSize.Size24
-	v243.TextXAlignment = Enum.TextXAlignment.Left
-	v243.Size = v242.Size - UDim2.new(0, 0, 0, 0)
-	v243.Position = UDim2.new(0, 0, 0, 0)
-	v243.Parent = v242
+	v262.Text = s1
+	v262.ClearTextOnFocus = false
+	v262.FontSize = Enum.FontSize.Size24
+	v262.TextXAlignment = Enum.TextXAlignment.Left
+	v262.Size = v261.Size - UDim2.new(0, 0, 0, 0)
+	v262.Position = UDim2.new(0, 0, 0, 0)
+	v262.Parent = v261
 
-	local v244 = NewGui("TextButton", "X")
+	local v263 = NewGui("TextButton", "X")
 
-	v244.Text = "x"
-	v244.TextColor3 = color3_3
-	v244.FontSize = Enum.FontSize.Size24
-	v244.TextYAlignment = Enum.TextYAlignment.Bottom
-	v244.BackgroundColor3 = color3_6
-	v244.BackgroundTransparency = 0
-	v244.Size = UDim2.new(0, v242.Size.Y.Offset - 10, 0, v242.Size.Y.Offset - 10)
-	v244.Position = UDim2.new(1, -v244.Size.X.Offset - 10, 0.5, -v244.Size.Y.Offset / 2)
-	v244.ZIndex = 0
-	v244.Visible = false
-	v244.BorderSizePixel = 0
-	v244.Parent = v242
+	v263.Text = "x"
+	v263.TextColor3 = color3_3
+	v263.FontSize = Enum.FontSize.Size24
+	v263.TextYAlignment = Enum.TextYAlignment.Bottom
+	v263.BackgroundColor3 = color3_6
+	v263.BackgroundTransparency = 0
+	v263.Size = UDim2.new(0, v261.Size.Y.Offset - 10, 0, v261.Size.Y.Offset - 10)
+	v263.Position = UDim2.new(1, -v263.Size.X.Offset - 10, 0.5, -v263.Size.Y.Offset / 2)
+	v263.ZIndex = 0
+	v263.Visible = false
+	v263.BorderSizePixel = 0
+	v263.Parent = v261
 
-	local function search() -- line: 1764
-		-- upvalues: v243 (copy), u77 (ref), t3 (copy), u51 (ref), u71 (ref), u54 (ref), u53 (ref), UpdateScrollingFrameCanvasSize (copy), v244 (copy)
+	local function search() -- line: 1837
+		-- upvalues: v262 (copy), u80 (ref), t3 (copy), u54 (ref), u74 (ref), u57 (ref), u56 (ref), UpdateScrollingFrameCanvasSize (copy), v263 (copy)
 		local t12 = {}
 
-		for match in v243.Text:gmatch("%S+") do
+		for match in v262.Text:gmatch("%S+") do
 			t12[match:lower()] = true
 		end
 
 		local t13 = {}
 
-		for i = u77 + 1, #t3 do
-			local v373 = t3[i]
+		for i = u80 + 1, #t3 do
+			local v400 = t3[i]
 
 			table.insert(t13, {
-				v373,
-				(v373:CheckTerms(t12))
+				v400,
+				(v400:CheckTerms(t12))
 			})
-			v373.Frame.Visible = false
-			v373.Frame.Parent = u51
+			v400.Frame.Visible = false
+			v400.Frame.Parent = u54
 		end
 
-		table.sort(t13, function(p53, p54) -- line: 1779
-			return p53[2] > p54[2]
+		table.sort(t13, function(p68, p69) -- line: 1852
+			return p68[2] > p69[2]
 		end)
-		u71 = true
+		u74 = true
 
-		local n8 = 0
+		local n9 = 0
 
 		for _, v in ipairs(t13) do
-			local v377 = v[1]
+			local v404 = v[1]
 
 			if v[2] > 0 then
-				v377.Frame.Visible = true
-				v377.Frame.Parent = u54
-				v377.Frame.LayoutOrder = u77 + n8
-				n8 += 1
+				v404.Frame.Visible = true
+				v404.Frame.Parent = u57
+				v404.Frame.LayoutOrder = u80 + n9
+				n9 += 1
 			end
 		end
 
-		u53.CanvasPosition = Vector2.new(0, 0)
+		if u56 then
+			u56.CanvasPosition = Vector2.new(0, 0)
+		end
+
 		UpdateScrollingFrameCanvasSize()
-		v244.ZIndex = 3
+		v263.ZIndex = 3
 	end
-	local function clearResults() -- line: 1801
-		-- upvalues: v244 (copy), u71 (ref), u77 (ref), t3 (copy), u54 (ref), UpdateScrollingFrameCanvasSize (copy)
-		if v244.ZIndex > 0 then
-			u71 = false
+	local function clearResults() -- line: 1876
+		-- upvalues: v263 (copy), u74 (ref), u80 (ref), t3 (copy), u57 (ref), UpdateScrollingFrameCanvasSize (copy)
+		if v263.ZIndex > 0 then
+			u74 = false
 
-			for i = u77 + 1, #t3 do
-				local v379 = t3[i]
+			for i = u80 + 1, #t3 do
+				local v406 = t3[i]
 
-				v379.Frame.LayoutOrder = v379.Index
-				v379.Frame.Parent = u54
-				v379.Frame.Visible = true
+				v406.Frame.LayoutOrder = v406.Index
+				v406.Frame.Parent = u57
+				v406.Frame.Visible = true
 			end
 
-			v244.ZIndex = 0
+			v263.ZIndex = 0
 		end
 
 		UpdateScrollingFrameCanvasSize()
 	end
-
-	v243.Focused:connect(function() --[[ onFocused ]] -- line: 1832
-		-- upvalues: v243 (copy), s1 (ref)
-		if v243.Text == s1 then
-			v243.Text = ""
-		end
-	end)
-	v244.MouseButton1Click:connect(function() --[[ reset ]] -- line: 1815
-		-- upvalues: clearResults (copy), v243 (copy), s1 (ref)
+	local function reset() -- line: 1890
+		-- upvalues: clearResults (copy), v262 (copy), s1 (ref)
 		clearResults()
-		v243.Text = s1
-	end)
-	v243.Changed:connect(function(p55) --[[ onChanged ]] -- line: 1820
-		-- upvalues: v243 (copy), clearResults (copy), s1 (ref), search (copy), v244 (copy)
-		if p55 == "Text" then
-			local Text = v243.Text
+		v262.Text = s1
+	end
+	local function onChanged(p70) -- line: 1895
+		-- upvalues: v262 (copy), clearResults (copy), s1 (ref), search (copy), v263 (copy)
+		if p70 == "Text" then
+			local Text = v262.Text
 
 			if Text == "" then
 				clearResults()
@@ -1709,57 +1978,71 @@ function t1.createGui() -- line: 1475
 				search()
 			end
 
-			v244.Visible = Text ~= "" and Text ~= s1
+			v263.Visible = Text ~= "" and Text ~= s1
 		end
-	end)
-	v243.FocusLost:connect(function(p56) --[[ focusLost ]] -- line: 1838
-		-- upvalues: search (copy), v243 (copy), s1 (ref)
-		if p56 then
+	end
+	local function onFocused() -- line: 1907
+		-- upvalues: v262 (copy), s1 (ref)
+		if v262.Text == s1 then
+			v262.Text = ""
+		end
+	end
+	local function focusLost(p71) -- line: 1913
+		-- upvalues: search (copy), v262 (copy), s1 (ref)
+		if p71 then
 			search()
 
 			return
 		end
 
-		if v243.Text == "" then
-			v243.Text = s1
+		if v262.Text == "" then
+			v262.Text = s1
 		end
-	end)
-	table.insert(t9, t1.StateChanged.Event:connect(function(p57) -- line: 1854
-		-- upvalues: v244 (copy), clearResults (copy), v243 (copy), s1 (ref)
-		v244.Modal = p57
+	end
 
-		if not p57 then
+	v262.Focused:connect(onFocused)
+	v263.MouseButton1Click:connect(reset)
+	v262.Changed:connect(onChanged)
+	v262.FocusLost:connect(focusLost)
+	table.insert(t9, t1.StateChanged.Event:connect(function(p72) -- line: 1929
+		-- upvalues: v263 (copy), clearResults (copy), v262 (copy), s1 (ref)
+		v263.Modal = p72
+
+		if not p72 then
 			clearResults()
-			v243.Text = s1
+			v262.Text = s1
 		end
 	end))
-	t5[Enum.KeyCode.Escape.Value] = function(p58) -- line: 1862
-		-- upvalues: clearResults (copy), v243 (copy), s1 (ref), u51 (ref), t1 (copy)
-		if p58 then
+	t5[Enum.KeyCode.Escape.Value] = function(p73) -- line: 1937
+		-- upvalues: clearResults (copy), v262 (copy), s1 (ref), u54 (ref), t1 (copy)
+		if p73 then
 			clearResults()
-			v243.Text = s1
+			v262.Text = s1
 
 			return
 		end
 
-		if u51.Visible then
+		if u54 and u54.Visible then
 			t1.OpenClose()
 		end
 	end
-	table.insert(t9, UserInputService.LastInputTypeChanged:connect(function(p59) --[[ detectGamepad ]] -- line: 1870
-		-- upvalues: VRService (copy), v242 (copy)
-		if p59 == Enum.UserInputType.Gamepad1 and not VRService.VREnabled then
-			v242.Visible = false
+
+	local function detectGamepad(p74) -- line: 1945
+		-- upvalues: VRService (copy), v261 (copy)
+		if p74 == Enum.UserInputType.Gamepad1 and not VRService.VREnabled then
+			v261.Visible = false
 
 			return
 		end
 
-		v242.Visible = true
-	end))
+		v261.Visible = true
+	end
 
-	local function v247(_, p61, _) -- line: 1881
-		-- upvalues: GuiService (copy), u77 (ref), t3 (copy)
-		if p61 ~= Enum.UserInputState.Begin then
+	table.insert(t9, UserInputService.LastInputTypeChanged:connect(detectGamepad))
+
+	local function v271(_, p76, _) -- line: 1956
+		-- upvalues: GuiService (copy), u80 (ref), t3 (copy)
+		if p76 ~= Enum.UserInputState.Begin then
 			return
 		end
 
@@ -1767,7 +2050,7 @@ function t1.createGui() -- line: 1475
 			return
 		end
 
-		for i = 1, u77 do
+		for i = 1, u80 do
 			if t3[i].Frame == GuiService.SelectedCoreObject and t3[i].Tool then
 				t3[i]:MoveToInventory()
 
@@ -1775,49 +2058,53 @@ function t1.createGui() -- line: 1475
 			end
 		end
 	end
-	local function openClose() -- line: 1897
-		-- upvalues: t6 (copy), u51 (ref), AdjustHotbarFrames (copy), u48 (ref), u77 (ref), t3 (copy), u75 (ref), t2 (copy), UserInputService (copy), resizeGamepadHintsFrame (copy), v239 (copy), ContextActionService (copy), v247 (copy), t1 (copy)
-		if not next(t6) then
-			u51.Visible = not u51.Visible
+	local function openClose() -- line: 1972
+		-- upvalues: u54 (ref), t6 (copy), AdjustHotbarFrames (copy), u51 (ref), u80 (ref), t3 (copy), u78 (ref), t2 (copy), UserInputService (copy), resizeGamepadHintsFrame (copy), v258 (copy), ContextActionService (copy), v271 (copy), t1 (copy)
+		if not u54 then
+			return
+		end
 
-			local Visible = u51.Visible
+		if not next(t6) then
+			u54.Visible = not u54.Visible
+
+			local Visible = u54.Visible
 
 			AdjustHotbarFrames()
-			u48.Active = not u48.Active
+			u51.Active = not u51.Active
 
-			for i = 1, u77 do
+			for i = 1, u80 do
 				t3[i]:SetClickability(not Visible)
 			end
 		end
 
-		if u51.Visible then
-			if u75 then
+		if u54.Visible then
+			if u78 then
 				if t2[UserInputService:GetLastInputType()] then
 					resizeGamepadHintsFrame()
-					v239.Visible = true
+					v258.Visible = true
 				end
 
 				enableGamepadInventoryControl()
 			end
 		else
-			if u75 then
-				v239.Visible = false
+			if u78 then
+				v258.Visible = false
 			end
 
 			disableGamepadInventoryControl()
 		end
 
-		if u51.Visible then
-			ContextActionService:BindAction("RBXRemoveSlot", v247, false, Enum.KeyCode.ButtonX)
+		if u54.Visible then
+			ContextActionService:BindAction("RBXRemoveSlot", v271, false, Enum.KeyCode.ButtonX)
 		else
 			ContextActionService:UnbindAction("RBXRemoveSlot")
 		end
 
-		t1.IsOpen = u51.Visible
-		t1.StateChanged:Fire(u51.Visible)
+		t1.IsOpen = u54.Visible
+		t1.StateChanged:Fire(u54.Visible)
 	end
 
-	t5[BackquoteValue] = function() -- line: 1933
+	t5[BackquoteValue] = function() -- line: 2011
 		-- upvalues: GuiService (copy), openClose (copy)
 		if GuiService.MenuIsOpen then
 			return
@@ -1844,53 +2131,53 @@ function t1.createGui() -- line: 1475
 
 	table.insert(t7, "`")
 	table.insert(t9, UserInputService.InputBegan:connect(OnInputBegan))
-	table.insert(t9, UserInputService.TextBoxFocused:connect(function() -- line: 1970
-		-- upvalues: u70 (ref)
-		u70 = true
+	table.insert(t9, UserInputService.TextBoxFocused:connect(function() -- line: 2048
+		-- upvalues: u73 (ref)
+		u73 = true
 	end))
-	table.insert(t9, UserInputService.TextBoxFocusReleased:connect(function() -- line: 1976
-		-- upvalues: u70 (ref)
-		u70 = false
+	table.insert(t9, UserInputService.TextBoxFocusReleased:connect(function() -- line: 2054
+		-- upvalues: u73 (ref)
+		u73 = false
 	end))
-	t5[BackspaceValue] = function() -- line: 1982
-		-- upvalues: u67 (ref), u59 (ref), t4 (copy)
-		if u67 and u59 then
-			u59:UnequipTools()
+	t5[BackspaceValue] = function() -- line: 2060
+		-- upvalues: u70 (ref), u62 (ref), t4 (copy)
+		if u70 and u62 then
+			u62:UnequipTools()
 
-			if u67 then
-				u67:ToggleSelect()
-				t4[u67]:UpdateEquipView()
-				u67 = nil
+			if u70 then
+				u70:ToggleSelect()
+				t4[u70]:UpdateEquipView()
+				u70 = nil
 			end
 		end
 	end
 	table.insert(t9, UserInputService.Changed:connect(OnUISChanged))
 
-	local v250 = UserInputService.KeyboardEnabled and not VRService.VREnabled
+	local v274 = UserInputService.KeyboardEnabled and not VRService.VREnabled
 
-	for i = 1, u77 do
-		t3[i]:TurnNumber(v250)
+	for i = 1, u80 do
+		t3[i]:TurnNumber(v274)
 	end
 
 	if UserInputService:GetGamepadConnected(Enum.UserInputType.Gamepad1) then
 		gamepadConnected()
 	end
 
-	table.insert(t9, UserInputService.GamepadConnected:connect(function(p63) -- line: 1998
-		if p63 == Enum.UserInputType.Gamepad1 then
+	table.insert(t9, UserInputService.GamepadConnected:connect(function(p78) -- line: 2076
+		if p78 == Enum.UserInputType.Gamepad1 then
 			gamepadConnected()
 		end
 	end))
-	table.insert(t9, UserInputService.GamepadDisconnected:connect(function(p64) -- line: 2006
-		if p64 == Enum.UserInputType.Gamepad1 then
+	table.insert(t9, UserInputService.GamepadDisconnected:connect(function(p79) -- line: 2084
+		if p79 == Enum.UserInputType.Gamepad1 then
 			gamepadDisconnected()
 		end
 	end))
 
-	if v15 then
-		table.insert(t9, SettingsShowSignal:connect(function(p65) -- line: 2017
+	if v17 then
+		table.insert(t9, SettingsShowSignal:connect(function(p80) -- line: 2095
 			-- upvalues: t1 (copy), AdjustHotbarFrames (copy)
-			if p65 then
+			if p80 then
 				if t1.IsHotbarVisible then
 					AdjustHotbarFrames(true)
 
@@ -1902,36 +2189,43 @@ function t1.createGui() -- line: 1475
 		end))
 	end
 
-	table.insert(t9, GuiService.MenuOpened:Connect(function() -- line: 2031
+	table.insert(t9, GuiService.MenuOpened:Connect(function() -- line: 2109
 		-- upvalues: t1 (copy), isInExperienceUIVREnabled (copy), InExperienceUIVRIXP (copy), VRService (copy)
 		if t1.IsOpen and (not isInExperienceUIVREnabled or (InExperienceUIVRIXP:isMovePanelToCenter() and true or not VRService.VREnabled)) then
 			t1.OpenClose()
 		end
 	end))
-	table.insert(t9, InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p66) -- line: 2047
+	table.insert(t9, InExperienceAppChatModal.default.visibilitySignal.Event:Connect(function(p81) -- line: 2125
 		-- upvalues: t1 (copy)
-		if p66 and t1.IsOpen then
+		if p81 and t1.IsOpen then
 			t1.OpenClose()
 		end
 	end))
-	table.insert(t9, UserGameSettings:GetPropertyChangedSignal("PreferredTransparency"):connect(function() --[[ OnPreferredTransparencyChanged ]] -- line: 2054
-		-- upvalues: UserGameSettings (copy), u19 (ref), u51 (ref), u23 (ref), t3 (copy), u29 (ref), v242 (copy)
+
+	local function OnPreferredTransparencyChanged() -- line: 2132
+		-- upvalues: UserGameSettings (copy), u22 (ref), u54 (ref), u26 (ref), t3 (copy), u32 (ref), v261 (copy)
 		local PreferredTransparency = UserGameSettings.PreferredTransparency
 
-		u19 = 0.5 * UserGameSettings.PreferredTransparency
-		u51.BackgroundTransparency = u19
-		u23 = 0.5 * PreferredTransparency
+		u22 = 0.5 * UserGameSettings.PreferredTransparency
 
-		for _, v in ipairs(t3) do
-			v.Frame.BackgroundTransparency = u23
+		if u54 then
+			u54.BackgroundTransparency = u22
 		end
 
-		u29 = 0.15 * UserGameSettings.PreferredTransparency
-		v242.BackgroundTransparency = u29
-	end))
+		u26 = 0.5 * PreferredTransparency
+
+		for _, v in ipairs(t3) do
+			v.Frame.BackgroundTransparency = u26
+		end
+
+		u32 = 0.15 * UserGameSettings.PreferredTransparency
+		v261.BackgroundTransparency = u32
+	end
+
+	table.insert(t9, UserGameSettings:GetPropertyChangedSignal("PreferredTransparency"):connect(OnPreferredTransparencyChanged))
 end
-function t1.destroyGui() -- line: 2074
-	-- upvalues: t9 (copy), t8 (ref), ContextActionService (copy), t3 (copy), t4 (copy), t5 (copy), t6 (copy), t7 (copy), u47 (ref), u48 (ref), u49 (ref), u50 (ref), u51 (ref), u52 (ref), u53 (ref), u54 (ref), UIGridLayout (ref), u56 (ref), u57 (ref), u58 (ref), u59 (ref), Backpack (ref), u62 (ref), n2 (ref), u67 (ref), u68 (ref), u69 (ref), u70 (ref), u71 (ref), u75 (ref), u44 (ref), n3 (ref), u79 (ref), t1 (copy)
+function t1.destroyGui() -- line: 2154
+	-- upvalues: t9 (copy), t8 (ref), ContextActionService (copy), t3 (copy), t4 (copy), t5 (copy), t6 (copy), t7 (copy), u50 (ref), u51 (ref), u52 (ref), u53 (ref), u54 (ref), u55 (ref), u56 (ref), u57 (ref), UIGridLayout (ref), u59 (ref), u60 (ref), u61 (ref), u62 (ref), Backpack (ref), u65 (ref), n2 (ref), u70 (ref), u71 (ref), u72 (ref), u73 (ref), u74 (ref), u78 (ref), u47 (ref), n3 (ref), u82 (ref), t1 (copy)
 	for _, v in pairs(t9) do
 		v:disconnect()
 	end
@@ -1948,10 +2242,10 @@ function t1.destroyGui() -- line: 2074
 	unbindAllGamepadEquipActions()
 
 	for i = #t3, 1, -1 do
-		local v257 = t3[i]
+		local v282 = t3[i]
 
-		if v257.Tool then
-			v257:Clear()
+		if v282.Tool then
+			v282:Clear()
 		end
 	end
 
@@ -1961,52 +2255,52 @@ function t1.destroyGui() -- line: 2074
 	table.clear(t6)
 	table.clear(t7)
 
-	if u47 then
-		u47:Destroy()
-		u47 = nil
+	if u50 then
+		u50:Destroy()
+		u50 = nil
 	end
 
-	u48 = nil
-	u49 = nil
-	u50 = nil
 	u51 = nil
 	u52 = nil
 	u53 = nil
 	u54 = nil
-	UIGridLayout = nil
+	u55 = nil
 	u56 = nil
 	u57 = nil
-	u58 = nil
+	UIGridLayout = nil
 	u59 = nil
-	Backpack = nil
+	u60 = nil
+	u61 = nil
 	u62 = nil
+	Backpack = nil
+	u65 = nil
 	n2 = 0
-	u67 = nil
-	u68 = false
-	u69 = false
-	u70 = false
+	u70 = nil
 	u71 = false
-	u75 = false
-	u44 = false
+	u72 = false
+	u73 = false
+	u74 = false
+	u78 = false
+	u47 = false
 	n3 = 0
-	u79 = nil
+	u82 = nil
 	t1.OpenClose = nil
 	t1.IsOpen = false
 	t1.IsHotbarVisible = false
 end
-function t1.TopbarEnabledChanged(_, p68) -- line: 2136
-	-- upvalues: u43 (ref), setBackpackEnabled (copy), StarterGui (copy)
-	u43 = p68
+function t1.TopbarEnabledChanged(_, p83) -- line: 2216
+	-- upvalues: u46 (ref), setBackpackEnabled (copy), StarterGui (copy)
+	u46 = p83
 	setBackpackEnabled(StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Backpack))
 end
 
 if FFlagTopBarSignalizeSetCores then
-	t1.disposeEffect = Signals.createEffect(function(p69) -- line: 2142
+	t1.disposeEffect = Signals.createEffect(function(p84) -- line: 2222
 		-- upvalues: InExperienceTopBar (copy), t1 (copy)
 		local GetTopBarStore = InExperienceTopBar.Stores.GetTopBarStore
 
 		if GetTopBarStore then
-			t1:TopbarEnabledChanged(GetTopBarStore(p69).getTopBarCoreGuiEnabled(p69))
+			t1:TopbarEnabledChanged(GetTopBarStore(p84).getTopBarCoreGuiEnabled(p84))
 		end
 	end)
 end
@@ -2017,28 +2311,28 @@ local lifecycle = Features.registerLifecycle(Features.FeatureName.Backpack, {
 	coreGuiType = Enum.CoreGuiType.Backpack
 }).lifecycle
 
-lifecycle:onEnabledChanged(function(p70) -- line: 2157
+lifecycle:onEnabledChanged(function(p85) -- line: 2237
 	-- upvalues: t1 (copy), setBackpackEnabled (copy)
-	if p70 then
+	if p85 then
 		t1.createGui()
 	else
 		t1.destroyGui()
 	end
 
-	setBackpackEnabled(p70)
+	setBackpackEnabled(p85)
 end)
-lifecycle:onVisibilityChanged(function(p71) -- line: 2167
+lifecycle:onVisibilityChanged(function(p86) -- line: 2247
 	-- upvalues: t1 (copy)
-	if t1.OpenClose and p71 ~= t1.IsOpen then
+	if t1.OpenClose and p86 ~= t1.IsOpen then
 		t1.OpenClose()
 	end
 
 	return t1.IsOpen
 end)
-t1.StateChanged.Event:connect(function(p72) -- line: 2175
+t1.StateChanged.Event:connect(function(p87) -- line: 2255
 	-- upvalues: lifecycle (copy)
 	if lifecycle then
-		lifecycle.setVisible(p72)
+		lifecycle.setVisible(p87)
 	end
 end)
 

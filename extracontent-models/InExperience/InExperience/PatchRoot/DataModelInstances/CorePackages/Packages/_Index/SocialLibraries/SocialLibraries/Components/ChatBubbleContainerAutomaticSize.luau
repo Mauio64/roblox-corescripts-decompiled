@@ -1,93 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_React_0 = v1.React;
-local l_UIBlox_0 = v1.UIBlox;
-local l_Object_0 = v1.LuauPolyfill.Object;
-local v5 = Rect.new(10, 10, 11, 11);
-local v7 = {
-    isIncoming = false, 
-    hasTail = false, 
-    padding = 12, 
-    LayoutOrder = 0, 
-    isPending = false, 
-    [l_React_0.Change.AbsoluteSize] = function(_) --[[ Line: 21 ]]
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local React = dependencies.React
+local UIBlox = dependencies.UIBlox
+local Object = dependencies.LuauPolyfill.Object
+local rect = Rect.new(10, 10, 11, 11)
+local t1 = {
+	isIncoming = false,
+	hasTail = false,
+	padding = 12,
+	LayoutOrder = 0,
+	isPending = false,
+	[React.Change.AbsoluteSize] = function(_) -- line: 21
+	end,
+	overrideImageColor = false
+}
 
-    end, 
-    overrideImageColor = false
-};
-return function(v8) --[[ Line: 26 ]] --[[ Name: ChatBubbleContainer ]]
-    -- upvalues: l_React_0 (copy), v7 (copy), l_UIBlox_0 (copy), v5 (copy), l_Object_0 (copy)
-    local v9, v10 = l_React_0.useState(0);
-    local v11 = v8[l_React_0.Change.AbsoluteSize] or v7[l_React_0.Change.AbsoluteSize];
-    return l_UIBlox_0.Style.withStyle(function(v12) --[[ Line: 30 ]]
-        -- upvalues: v8 (copy), v7 (ref), l_React_0 (ref), v9 (copy), v5 (ref), v11 (copy), l_Object_0 (ref), v10 (copy)
-        local v13 = v8.children or {};
-        local v14 = v8.hasTail or v7.hasTail;
-        local v15 = v8.isIncoming or v7.isIncoming;
-        local v16 = v8.isPending or v7.isPending;
-        local v17 = nil;
-        v17 = if v15 then v12.Theme.UIDefault else if v16 then v12.Theme.UIMuted else v12.Theme.UIEmphasis;
-        local l_Color_0 = v17.Color;
-        local l_Transparency_0 = v17.Transparency;
-        if v8.overrideImageColor or v7.overrideImageColor then
-            l_Color_0 = nil;
-            if not v16 then
-                l_Transparency_0 = nil;
-            end;
-        end;
-        local v20 = "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self2.png";
-        if v14 then
-            v20 = v15 and "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble.png" or "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self.png";
-        end;
-        local v21 = v15 and UDim2.new(0, 6, 0, 0) or UDim2.new(1, -6, 0, 0);
-        local v22 = v15 and "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-tip.png" or "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self-tip.png";
-        local v23 = v15 and UDim2.new(0, 0, 0, 0) or UDim2.new(1, 0, 0, 0);
-        local v24 = UDim.new(0, v8.padding or v7.padding);
-        return l_React_0.createElement("Frame", {
-            AutomaticSize = Enum.AutomaticSize.XY, 
-            Size = UDim2.new(0, v9 + 6, 0, 0), 
-            LayoutOrder = v8.LayoutOrder or v7.LayoutOrder, 
-            BackgroundTransparency = 1
-        }, {
-            bubble = l_React_0.createElement("ImageLabel", {
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                Size = UDim2.new(0, v9, 0, 0), 
-                AnchorPoint = v15 and Vector2.new(0, 0) or Vector2.new(1, 0), 
-                BackgroundTransparency = 1, 
-                ImageColor3 = l_Color_0, 
-                Image = v20, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = v5, 
-                ImageTransparency = l_Transparency_0, 
-                Position = v21, 
-                [l_React_0.Change.AbsoluteSize] = function(v25) --[[ Line: 82 ]]
-                    -- upvalues: v11 (ref)
-                    v11(v25);
-                end
-            }, l_Object_0.assign(table.clone(v13), {
-                ["$margin"] = l_React_0.createElement("UIPadding", {
-                    PaddingBottom = v24, 
-                    PaddingTop = v24, 
-                    PaddingRight = v24, 
-                    PaddingLeft = v24
-                }), 
-                ["$layout"] = l_React_0.createElement("UIListLayout", {
-                    [l_React_0.Change.AbsoluteContentSize] = function(v26) --[[ Line: 93 ]]
-                        -- upvalues: v10 (ref), v24 (copy)
-                        v10(v26.AbsoluteContentSize.X + v24.Offset * 2);
-                    end
-                })
-            })), 
-            tail = l_React_0.createElement("ImageLabel", {
-                AnchorPoint = v15 and Vector2.new(0, 0) or Vector2.new(1, 0), 
-                Size = UDim2.new(0, 6, 0, 6), 
-                BackgroundTransparency = 1, 
-                ImageColor3 = l_Color_0, 
-                Position = v23, 
-                Image = v22, 
-                ImageTransparency = l_Transparency_0, 
-                Visible = v14
-            })
-        });
-    end);
-end;
+local function ChatBubbleContainer(p2) -- line: 26
+	-- upvalues: React (copy), t1 (copy), UIBlox (copy), rect (copy), Object (copy)
+	local v11, v12 = React.useState(0)
+	local v13 = p2[React.Change.AbsoluteSize] or t1[React.Change.AbsoluteSize]
+
+	return UIBlox.Style.withStyle(function(p3) -- line: 30
+		-- upvalues: p2 (copy), t1 (copy), React (copy), v11 (copy), rect (copy), v13 (copy), Object (copy), v12 (copy)
+		local v15 = p2.children or {}
+		local v16 = p2.hasTail or t1.hasTail
+		local v17 = p2.isIncoming or t1.isIncoming
+		local v18 = p2.isPending or t1.isPending
+		local v19 = if not v17 then if not v18 then p3.Theme.UIEmphasis else p3.Theme.UIMuted else p3.Theme.UIDefault
+		local Color = v19.Color
+		local Transparency = v19.Transparency
+
+		if p2.overrideImageColor or t1.overrideImageColor then
+			Color = nil
+
+			if not v18 then
+				Transparency = nil
+			end
+		end
+
+		local s1 = "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self2.png"
+
+		if v16 then
+			s1 = not v17 and "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self.png" or "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble.png"
+		end
+
+		local v23 = v17 and UDim2.new(0, 6, 0, 0) or UDim2.new(1, -6, 0, 0)
+		local v24 = not v17 and "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-self-tip.png" or "rbxasset://textures/ui/LuaChat/9-slice/chat-bubble-tip.png"
+		local v25 = v17 and UDim2.new(0, 0, 0, 0) or UDim2.new(1, 0, 0, 0)
+		local uDim = UDim.new(0, p2.padding or t1.padding)
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Size = UDim2.new(0, v11 + 6, 0, 0),
+			LayoutOrder = p2.LayoutOrder or t1.LayoutOrder
+		}, {
+			bubble = React.createElement("ImageLabel", {
+				AutomaticSize = Enum.AutomaticSize.XY,
+				Size = UDim2.new(0, v11, 0, 0),
+				AnchorPoint = v17 and Vector2.new(0, 0) or Vector2.new(1, 0),
+				BackgroundTransparency = 1,
+				ImageColor3 = Color,
+				Image = s1,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = rect,
+				ImageTransparency = Transparency,
+				Position = v23,
+				[React.Change.AbsoluteSize] = function(p4) -- line: 82
+					-- upvalues: v13 (copy)
+					v13(p4)
+				end
+			}, Object.assign(table.clone(v15), {
+				["$margin"] = React.createElement("UIPadding", {
+					PaddingBottom = uDim,
+					PaddingTop = uDim,
+					PaddingRight = uDim,
+					PaddingLeft = uDim
+				}),
+				["$layout"] = React.createElement("UIListLayout", {
+					[React.Change.AbsoluteContentSize] = function(p5) -- line: 93
+						-- upvalues: v12 (copy), uDim (copy)
+						v12(p5.AbsoluteContentSize.X + uDim.Offset * 2)
+					end
+				})
+			})),
+			tail = React.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				AnchorPoint = v17 and Vector2.new(0, 0) or Vector2.new(1, 0),
+				Size = UDim2.new(0, 6, 0, 6),
+				ImageColor3 = Color,
+				Position = v25,
+				Image = v24,
+				ImageTransparency = Transparency,
+				Visible = v16
+			})
+		})
+	end)
+end
+
+return ChatBubbleContainer

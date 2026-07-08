@@ -1,19 +1,19 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Workspace.Packages.CachedPolicyService);
-local v5 = require(l_RobloxGui_0.Modules.Flags.GetFFlagScreenshotHudApi);
-return function() --[[ Line: 9 ]]
-    -- upvalues: l_UserInputService_0 (copy), v5 (copy), v4 (copy)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    local v7 = true;
-    if l_l_UserInputService_0_Platform_0 ~= Enum.Platform.IOS then
-        v7 = l_l_UserInputService_0_Platform_0 == Enum.Platform.Android;
-    end;
-    local v8 = false;
-    if v5() and v7 and not v4:IsSubjectToChinaPolicies() then
-        v8 = true;
-    end;
-    return v8;
-end;
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
+local GetFFlagScreenshotHudApi = require(RobloxGui.Modules.Flags.GetFFlagScreenshotHudApi)
+
+return function() -- line: 9
+	-- upvalues: UserInputService (copy), GetFFlagScreenshotHudApi (copy), CachedPolicyService (copy)
+	local Platform = UserInputService:GetPlatform()
+	local v8 = Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android
+	local v9 = false
+
+	if GetFFlagScreenshotHudApi() and (v8 and not CachedPolicyService:IsSubjectToChinaPolicies()) then
+		v9 = true
+	end
+
+	return v9
+end

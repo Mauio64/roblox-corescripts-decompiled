@@ -1,9 +1,10 @@
-local v0 = require(script.Parent.utils.makeDefaultReadPolicy);
+local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
+
 return {
-    fields = {
-        isSponsored = {}, 
-        thumbnails = {
-            read = v0({})
-        }
-    }
-};
+	fields = {
+		isSponsored = {},
+		thumbnails = {
+			read = makeDefaultReadPolicy({})
+		}
+	}
+}

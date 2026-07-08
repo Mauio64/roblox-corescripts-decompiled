@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: validateProps ]]
-    if _G.__DEV__ or _G.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ then
-        local v2, v3 = v0(v1);
-        if not v2 then
-            local v4 = ("prop validation failed: %*"):format(v3);
-            error(v4);
-        end;
-    end;
-end;
+local function validateProps(p1: ((...any) -> ...any), p2) -- line: 1
+	if _G.__DEV__ or _G.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ then
+		local v4, v5 = p1(p2)
+
+		if not v4 then
+			local v6 = `prop validation failed: { v5 }`
+
+			error(v6)
+		end
+	end
+end
+
+return validateProps

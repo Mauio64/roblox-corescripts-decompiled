@@ -1,156 +1,176 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(script.Parent.Parent.Parent.Constants);
-local l_SummaryHeaderNames_0 = v2.NetworkFormatting.SummaryHeaderNames;
-local l_SummaryCellWidths_0 = v2.NetworkFormatting.SummaryCellWidths;
-local l_HeaderFrameHeight_0 = v2.NetworkFormatting.HeaderFrameHeight;
-local l_EntryFrameHeight_0 = v2.NetworkFormatting.EntryFrameHeight;
-local l_LineWidth_0 = v2.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v2.GeneralFormatting.LineColor;
-local l_CellPadding_0 = v2.NetworkFormatting.CellPadding;
-local l_Text_0 = v2.Color.Text;
-local v11 = require(script.Parent.Parent.Parent.Components.CellLabel);
-local v12 = require(script.Parent.Parent.Parent.Components.HeaderButton);
-local v13 = 0;
-for _, v15 in pairs(l_SummaryCellWidths_0) do
-    v13 = v13 + v15;
-end;
-local v16 = -v13;
-local v17 = {};
-local v18 = {};
-local v19 = {};
-table.insert(v17, UDim2.new(0, l_CellPadding_0, 0, 0));
-table.insert(v18, UDim2.new(1, -v13 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-table.insert(v19, UDim2.new(1, -v13 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-for _, v21 in ipairs(l_SummaryCellWidths_0) do
-    table.insert(v17, UDim2.new(1, v16 + l_CellPadding_0, 0, 0));
-    table.insert(v18, UDim2.new(0, v21 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-    table.insert(v19, UDim2.new(0, v21 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-    v16 = v16 + v21;
-end;
-local v22 = {};
-for v23, v24 in ipairs(v17) do
-    v22[v23] = UDim2.new(v24.X.Scale, v24.X.Offset - l_CellPadding_0, v24.Y.Scale, v24.Y.Offset);
-end;
-local v25 = v1.Component:extend("NetworkSummary");
-v25.render = function(v26) --[[ Line: 50 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), l_LineWidth_0 (copy), l_LineColor_0 (copy), v22 (copy), l_HeaderFrameHeight_0 (copy), l_SummaryHeaderNames_0 (copy), v12 (copy), v18 (copy), v17 (copy), v11 (copy), l_EntryFrameHeight_0 (copy), l_Text_0 (copy)
-    local l_width_0 = v26.props.width;
-    local v28 = v26.props.httpSummaryTable or {};
-    local l_layoutOrder_0 = v26.props.layoutOrder;
-    local v30 = {
-        UIListLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    };
-    local v31 = {
-        UpperHorizontalLine = v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        }), 
-        LowerHorizontalLine = v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-            Position = UDim2.new(0, 0, 1, 0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        })
-    };
-    for v32 = 2, #v22 do
-        v31[string.format("VerticalLine_%d", v32)] = v1.createElement("Frame", {
-            Size = UDim2.new(0, l_LineWidth_0, 0, l_HeaderFrameHeight_0), 
-            Position = v22[v32], 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-    end;
-    for v33, v34 in ipairs(l_SummaryHeaderNames_0) do
-        v31[v34] = v1.createElement(v12, {
-            text = v34, 
-            size = v18[v33], 
-            pos = v17[v33]
-        });
-    end;
-    v30.Header = v1.createElement("Frame", {
-        Size = UDim2.new(0, l_width_0, 0, l_HeaderFrameHeight_0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 1
-    }, v31);
-    local v35 = 0;
-    for _, v37 in pairs(v28) do
-        v35 = v35 + 1;
-        local v38 = {
-            RequestType = v1.createElement(v11, {
-                text = v37.RequestType, 
-                size = v18[1], 
-                pos = v17[1]
-            }), 
-            RequestCount = v1.createElement(v11, {
-                text = v37.RequestCount, 
-                size = v18[2], 
-                pos = v17[2]
-            }), 
-            FailedCount = v1.createElement(v11, {
-                text = v37.FailedCount, 
-                size = v18[3], 
-                pos = v17[3]
-            }), 
-            AverageTime = v1.createElement(v11, {
-                text = string.format("%.3f", v37.AverageTime), 
-                size = v18[4], 
-                pos = v17[4]
-            }), 
-            MinTime = v1.createElement(v11, {
-                text = string.format("%.3f", v37.MinTime), 
-                size = v18[5], 
-                pos = v17[5]
-            }), 
-            MaxTime = v1.createElement(v11, {
-                text = string.format("%.3f", v37.MaxTime), 
-                size = v18[6], 
-                pos = v17[6]
-            }), 
-            LowerHorizontalLine = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-                Position = UDim2.new(0, 0, 1, 0), 
-                BackgroundColor3 = l_LineColor_0, 
-                BorderSizePixel = 0
-            })
-        };
-        for v39 = 2, #v22 do
-            v38[string.format("VerticalLine_%d", v39)] = v1.createElement("Frame", {
-                Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-                Position = v22[v39], 
-                BackgroundColor3 = l_LineColor_0, 
-                BorderSizePixel = 0
-            });
-        end;
-        v30[v37.RequestType] = v1.createElement("Frame", {
-            Size = UDim2.new(0, l_width_0, 0, l_EntryFrameHeight_0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v35 + 1
-        }, v38);
-    end;
-    if v35 == 0 then
-        v30.Padding = v1.createElement("TextLabel", {
-            Size = UDim2.new(0, l_width_0, 0, l_EntryFrameHeight_0), 
-            Text = "No Summary Data Found", 
-            TextColor3 = l_Text_0, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 2
-        });
-        v35 = 1;
-    end;
-    local v40 = v35 * l_EntryFrameHeight_0 + l_HeaderFrameHeight_0;
-    return v1.createElement("ScrollingFrame", {
-        Size = UDim2.new(1, 0, 0, v40), 
-        ScrollingEnabled = false, 
-        ScrollBarThickness = 0, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = l_layoutOrder_0
-    }, v30);
-end;
-return v25;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local SummaryHeaderNames = Constants.NetworkFormatting.SummaryHeaderNames
+local SummaryCellWidths = Constants.NetworkFormatting.SummaryCellWidths
+local HeaderFrameHeight = Constants.NetworkFormatting.HeaderFrameHeight
+local EntryFrameHeight = Constants.NetworkFormatting.EntryFrameHeight
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local CellPadding = Constants.NetworkFormatting.CellPadding
+local ColorText = Constants.Color.Text
+local CellLabel = require(script.Parent.Parent.Parent.Components.CellLabel)
+local HeaderButton = require(script.Parent.Parent.Parent.Components.HeaderButton)
+local n1 = 0
+
+for _, v in pairs(SummaryCellWidths) do
+	n1 += v
+end
+
+local v17 = -n1
+local t1 = {}
+local t2 = {}
+local t3 = {}
+
+table.insert(t1, UDim2.new(0, CellPadding, 0, 0))
+table.insert(t2, UDim2.new(1, -n1 - CellPadding, 0, HeaderFrameHeight))
+table.insert(t3, UDim2.new(1, -n1 - CellPadding, 0, EntryFrameHeight))
+
+for _, v in ipairs(SummaryCellWidths) do
+	table.insert(t1, UDim2.new(1, v17 + CellPadding, 0, 0))
+	table.insert(t2, UDim2.new(0, v - CellPadding, 0, HeaderFrameHeight))
+	table.insert(t3, UDim2.new(0, v - CellPadding, 0, EntryFrameHeight))
+	v17 += v
+end
+
+local t4 = {}
+
+for i, v in ipairs(t1) do
+	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+end
+
+local v26 = Roact.Component:extend("NetworkSummary")
+
+function v26.render(p1) -- line: 50
+	-- upvalues: Roact (copy), LineWidth (copy), LineColor (copy), t4 (copy), HeaderFrameHeight (copy), SummaryHeaderNames (copy), HeaderButton (copy), t2 (copy), t1 (copy), CellLabel (copy), EntryFrameHeight (copy), ColorText (copy)
+	local width = p1.props.width
+	local v29 = p1.props.httpSummaryTable or {}
+	local layoutOrder = p1.props.layoutOrder
+	local t5 = {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}
+	local t6 = {
+		UpperHorizontalLine = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0, LineWidth),
+			BackgroundColor3 = LineColor
+		}),
+		LowerHorizontalLine = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 0, LineWidth),
+			Position = UDim2.new(0, 0, 1, 0),
+			BackgroundColor3 = LineColor
+		})
+	}
+
+	for i = 2, #t4 do
+		t6[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, LineWidth, 0, HeaderFrameHeight),
+			Position = t4[i],
+			BackgroundColor3 = LineColor
+		})
+	end
+
+	for i, v in ipairs(SummaryHeaderNames) do
+		t6[v] = Roact.createElement(HeaderButton, {
+			text = v,
+			size = t2[i],
+			pos = t1[i]
+		})
+	end
+
+	t5.Header = Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+		Size = UDim2.new(0, width, 0, HeaderFrameHeight)
+	}, t6)
+
+	local n2 = 0
+
+	for _, v in pairs(v29) do
+		n2 += 1
+
+		local t7 = {
+			RequestType = Roact.createElement(CellLabel, {
+				text = v.RequestType,
+				size = t2[1],
+				pos = t1[1]
+			}),
+			RequestCount = Roact.createElement(CellLabel, {
+				text = v.RequestCount,
+				size = t2[2],
+				pos = t1[2]
+			}),
+			FailedCount = Roact.createElement(CellLabel, {
+				text = v.FailedCount,
+				size = t2[3],
+				pos = t1[3]
+			}),
+			AverageTime = Roact.createElement(CellLabel, {
+				text = string.format("%.3f", v.AverageTime),
+				size = t2[4],
+				pos = t1[4]
+			}),
+			MinTime = Roact.createElement(CellLabel, {
+				text = string.format("%.3f", v.MinTime),
+				size = t2[5],
+				pos = t1[5]
+			}),
+			MaxTime = Roact.createElement(CellLabel, {
+				text = string.format("%.3f", v.MaxTime),
+				size = t2[6],
+				pos = t1[6]
+			}),
+			LowerHorizontalLine = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, LineWidth),
+				Position = UDim2.new(0, 0, 1, 0),
+				BackgroundColor3 = LineColor
+			})
+		}
+
+		for i = 2, #t4 do
+			t7[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(0, LineWidth, 1, 0),
+				Position = t4[i],
+				BackgroundColor3 = LineColor
+			})
+		end
+
+		t5[v.RequestType] = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, width, 0, EntryFrameHeight),
+			LayoutOrder = n2 + 1
+		}, t7)
+	end
+
+	if n2 == 0 then
+		t5.Padding = Roact.createElement("TextLabel", {
+			Text = "No Summary Data Found",
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(0, width, 0, EntryFrameHeight),
+			TextColor3 = ColorText
+		})
+		n2 = 1
+	end
+
+	local v41 = n2 * EntryFrameHeight + HeaderFrameHeight
+
+	return Roact.createElement("ScrollingFrame", {
+		ScrollingEnabled = false,
+		ScrollBarThickness = 0,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, v41),
+		LayoutOrder = layoutOrder
+	}, t5)
+end
+
+return v26

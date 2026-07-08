@@ -1,4 +1,4 @@
 return {
-    RegisterCustomGetStateForAction = "RegisterCustomGetStateForAction", 
-    DeregisterCustomGetStateForAction = "DeregisterCustomGetStateForAction"
-};
+	RegisterCustomGetStateForAction = "RegisterCustomGetStateForAction",
+	DeregisterCustomGetStateForAction = "DeregisterCustomGetStateForAction"
+}

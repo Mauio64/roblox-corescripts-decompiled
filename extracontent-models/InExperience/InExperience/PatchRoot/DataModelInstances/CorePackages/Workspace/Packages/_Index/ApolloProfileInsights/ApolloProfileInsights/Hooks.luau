@@ -1,3 +1,3 @@
 return {
-    useProfileInsightsByUserIds = require(script.useProfileInsightsByUserIds)
-};
+	useProfileInsightsByUserIds = require(script.useProfileInsightsByUserIds)
+}

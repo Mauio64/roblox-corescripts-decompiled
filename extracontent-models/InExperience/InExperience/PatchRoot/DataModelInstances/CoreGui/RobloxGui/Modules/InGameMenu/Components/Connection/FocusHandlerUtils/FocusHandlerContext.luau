@@ -1,15 +1,13 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.InGameMenuDependencies).Roact.createContext({
-    currentHandlerId = nil, 
-    candidateHandlerId = nil, 
-    previousSelections = {}, 
-    requestFocusForHandlerId = function() --[[ Line: 9 ]] --[[ Name: requestFocusForHandlerId ]]
+local CorePackages = game:GetService("CorePackages")
 
-    end, 
-    forgetLastSelectionForHandlerId = function() --[[ Line: 10 ]] --[[ Name: forgetLastSelectionForHandlerId ]]
-
-    end, 
-    blurCurrentFocusHandler = function() --[[ Line: 11 ]] --[[ Name: blurCurrentFocusHandler ]]
-
-    end
-});
+return require(CorePackages.Packages.InGameMenuDependencies).Roact.createContext({
+	currentHandlerId = nil,
+	candidateHandlerId = nil,
+	previousSelections = {},
+	requestFocusForHandlerId = function() -- line: 9
+	end,
+	forgetLastSelectionForHandlerId = function() -- line: 10
+	end,
+	blurCurrentFocusHandler = function() -- line: 11
+	end
+})

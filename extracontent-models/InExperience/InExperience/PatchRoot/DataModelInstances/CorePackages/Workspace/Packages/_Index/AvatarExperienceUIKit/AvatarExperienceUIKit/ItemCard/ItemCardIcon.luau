@@ -1,17 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Icon_0 = v2.Icon;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_IconSize_0 = v2.Enums.IconSize;
-return function(v6) --[[ Line: 9 ]] --[[ Name: ItemCardIcon ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_Icon_0 (copy), l_IconSize_0 (copy)
-    local v7 = l_useTokens_0();
-    return v1.createElement(l_Icon_0, {
-        name = v6.icon, 
-        style = v6.iconStyle or v7.Color.Content.Emphasis, 
-        size = l_IconSize_0.Small, 
-        LayoutOrder = v6.LayoutOrder, 
-        testId = ("icon-%*"):format(v6.icon)
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local Icon = Foundation.Icon
+local useTokens = Foundation.Hooks.useTokens
+local IconSize = Foundation.Enums.IconSize
+
+local function ItemCardIcon(t1: {[any]: any}) -- line: 11
+	-- upvalues: useTokens (copy), React (copy), Icon (copy), IconSize (copy)
+	local v9 = useTokens()
+
+	return React.createElement(Icon, {
+		name = t1.icon,
+		style = t1.iconStyle or v9.Color.Content.Emphasis,
+		size = IconSize.Small,
+		LayoutOrder = t1.LayoutOrder,
+		testId = `icon-{ t1.icon }`
+	})
+end
+
+if require(Parent.AvatarExperienceFlags).FFlagAXItemCardComponentsMemo then
+	return (React.memo(ItemCardIcon))
+end
+
+return ItemCardIcon

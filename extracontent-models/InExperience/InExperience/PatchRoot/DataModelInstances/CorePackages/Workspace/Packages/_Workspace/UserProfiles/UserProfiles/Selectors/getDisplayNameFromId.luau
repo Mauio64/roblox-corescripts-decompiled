@@ -1,10 +1,12 @@
-local v0 = require(script.Parent.getUserProfileFromId);
-return function(v1, v2) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    local v3 = v0(v1, v2);
-    if v3.names then
-        return v3.names.displayName;
-    else
-        return nil;
-    end;
-end;
+local getUserProfileFromId = require(script.Parent.getUserProfileFromId)
+
+return function(p1, p2) -- line: 3
+	-- upvalues: getUserProfileFromId (copy)
+	local v4 = getUserProfileFromId(p1, p2)
+
+	if v4.names then
+		return v4.names.displayName
+	end
+
+	return nil
+end

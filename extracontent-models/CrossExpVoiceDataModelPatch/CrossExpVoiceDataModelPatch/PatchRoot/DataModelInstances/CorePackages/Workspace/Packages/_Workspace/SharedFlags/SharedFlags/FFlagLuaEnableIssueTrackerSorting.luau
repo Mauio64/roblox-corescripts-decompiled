@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaEnableIssueTrackerSorting", false);
+return game:DefineFastFlag("LuaEnableIssueTrackerSorting", false)

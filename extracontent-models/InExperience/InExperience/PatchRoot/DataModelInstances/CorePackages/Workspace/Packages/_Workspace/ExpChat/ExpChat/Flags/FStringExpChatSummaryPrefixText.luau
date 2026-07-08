@@ -1,1 +1,1 @@
-return game:DefineFastString("ExpChatSummaryPrefixText", "");
+return game:DefineFastString("ExpChatSummaryPrefixText", "")

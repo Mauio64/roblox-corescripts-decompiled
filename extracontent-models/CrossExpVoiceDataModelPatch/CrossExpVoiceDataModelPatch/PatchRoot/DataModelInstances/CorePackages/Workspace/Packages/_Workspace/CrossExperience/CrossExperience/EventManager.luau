@@ -1,324 +1,360 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperience");
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local _ = require(l_script_FirstAncestor_0.Types);
-local v4 = require(l_script_FirstAncestor_0.Communication);
-local v5 = require(l_script_FirstAncestor_0.Constants);
-local v6 = require(l_script_FirstAncestor_0.Actions);
-local v7 = require(l_script_FirstAncestor_0.Models);
-local v8 = require(l_script_FirstAncestor_0.Utils);
-local v9 = require(l_script_FirstAncestor_0.Utils.EventQueue);
-local v10 = require(l_script_FirstAncestor_0.Middlewares.createPersistenceMiddleware);
-local v11 = game:DefineFastFlag("EnableCrossExpEventLogging", false);
-local l_SharedFlags_0 = v2.SharedFlags;
-local l_FFlagPartyVoiceBlockSync_0 = l_SharedFlags_0.FFlagPartyVoiceBlockSync;
-local l_FFlagEnablePartyVoiceChangersInLua_0 = l_SharedFlags_0.FFlagEnablePartyVoiceChangersInLua;
-local l_Cryo_0 = v2.Cryo;
-local v16 = 0;
-local v17 = l_HttpService_0:GenerateGUID(false);
-local v18 = {};
-v18.__index = v18;
-v18.new = function(v19, v20) --[[ Line: 105 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy), v18 (copy)
-    local v21 = {
-        observers = {}, 
-        experienceType = v19, 
-        isSubscribed = false, 
-        eventQueue = v9.new(v20)
-    };
-    setmetatable(v21, v18);
-    return v21;
-end;
-local function _(v22) --[[ Line: 116 ]]
-    return {
-        userId = tonumber(v22.userId) or -1, 
-        isLocalUser = v22.isLocalUser
-    };
-end;
-v18.notify = function(_, v25, v26) --[[ Line: 123 ]] --[[ Name: notify ]]
-    -- upvalues: v16 (ref), v17 (copy), v4 (copy)
-    if not v26 then
-        v26 = {};
-    end;
-    v16 = v16 + 1;
-    v26._seq = v16;
-    v26._origin = v17;
-    v4.notify(v25, v26);
-end;
-v18.removeObserver = function(v27, v28, v29) --[[ Line: 134 ]] --[[ Name: removeObserver ]]
-    -- upvalues: v4 (copy)
-    v4.removeObserver(v27.experienceType, v29, v28);
-end;
-v18.addObserver = function(v30, v31, v32) --[[ Line: 138 ]] --[[ Name: addObserver ]]
-    -- upvalues: v4 (copy)
-    local v34 = v4.addObserver(v30.experienceType, v31, function(v33) --[[ Line: 139 ]]
-        -- upvalues: v30 (copy), v31 (copy), v32 (copy)
-        v30.eventQueue:process(v31, v33, v32);
-    end);
-    table.insert(v30.observers, {
-        id = v34, 
-        event = v31
-    });
-end;
-local v35 = v10({
-    storeKey = v5.STORAGE_CEV_STORE_KEY
-});
-v18.subscribe = function(v36, v37, v38) --[[ Line: 154 ]] --[[ Name: subscribe ]]
-    -- upvalues: v11 (copy), v5 (copy), v6 (copy), l_Cryo_0 (copy), v7 (copy), l_FFlagEnablePartyVoiceChangersInLua_0 (copy), l_FFlagPartyVoiceBlockSync_0 (copy)
-    if v36.isSubscribed then
-        return;
-    else
-        v36.isSubscribed = true;
-        if v38 and v11 then
-            v38:info("{}: Subscribing to the CEV Store", v36.experienceType);
-        end;
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_GAME_JOIN_FAILED, function(v39) --[[ Line: 167 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref), v5 (ref)
-            if v38 and v11 then
-                v38:info("{}: Experience Party Voice Game Join Failed: {}", v36.experienceType, v39.state);
-            end;
-            v37:dispatch(v6.VoiceStatusChanged({
-                status = v5.VOICE_STATUS.ERROR_RCC_CONNECTING
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_STATUS_CHANGED, function(v40) --[[ Line: 180 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v5 (ref), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Experience Voice Status Changed: {}, {}, {}, {}", v36.experienceType, v40.status, v40.detail, v40.voiceChannelId, v40.voiceSessionId);
-            end;
-            if v40.status == v5.VOICE_STATUS.VOICE_CONNECTED then
-                if not v40.voiceChannelId and v38 then
-                    v38:warning("Voice channel id is expected");
-                end;
-                if not v40.voiceSessionId then
-                    v38:warning("Voice session id is expected");
-                end;
-            end;
-            v37:dispatch(v6.VoiceStatusChanged({
-                status = v40.status, 
-                voiceChannelId = v40.voiceChannelId, 
-                voiceSessionId = v40.voiceSessionId
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_EXPERIENCE_JOINED, function(v41) --[[ Line: 212 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), l_Cryo_0 (ref), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Experience joined JobID: {}, GameID: {}, PlaceId: {}", v36.experienceType, v41.jobId, v41.gameId, v41.placeId);
-            end;
-            local v42 = v36:getBackgroundStateSnapshot();
-            local l_v41_0 = v41;
-            if v42 and v42.Participants then
-                l_v41_0 = l_Cryo_0.Dictionary.join(l_v41_0, v42.Participants);
-            end;
-            v37:dispatch(v6.ExperienceJoined(l_v41_0));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_AUDIO_FOCUS_CHANGED, function(v44) --[[ Line: 234 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant Audio Focus Changed {} = {}", v36.experienceType, v44.userId, v44.contextId);
-            end;
-            v37:dispatch(v6.ParticipantAudioFocusChanged({
-                userId = v44.userId, 
-                contextId = v44.contextId, 
-                contextIds = v44.contextIds
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_ADDED, function(v45) --[[ Line: 254 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v7 (ref), l_FFlagEnablePartyVoiceChangersInLua_0 (ref), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant added {}", v36.experienceType, v45.userId);
-            end;
-            local v46 = v7.ParticipantModel.format({
-                userId = v45.userId, 
-                isLocalUser = v45.isLocalUser, 
-                username = v45.username, 
-                displayname = v45.displayname, 
-                isActive = false, 
-                isMuted = false, 
-                isMutedLocally = false, 
-                isVoiceChangerActive = not l_FFlagEnablePartyVoiceChangersInLua_0 and nil, 
-                isVoiceChangerHearMyselfActive = not l_FFlagEnablePartyVoiceChangersInLua_0 and nil, 
-                selectedVoicePack = if l_FFlagEnablePartyVoiceChangersInLua_0 then v45.selectedVoicePack else nil
-            });
-            v37:dispatch(v6.ParticipantAdded(v46));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_REMOVED, function(v47) --[[ Line: 276 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant removed {}", v36.experienceType, v47.userId);
-            end;
-            v37:dispatch(v6.ParticipantRemoved({
-                userId = tonumber(v47.userId) or -1, 
-                isLocalUser = v47.isLocalUser
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_IS_ACTIVE, function(v48) --[[ Line: 286 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is active {}", v36.experienceType, v48.userId);
-            end;
-            v37:dispatch(v6.ParticipantIsActive({
-                userId = tonumber(v48.userId) or -1, 
-                isLocalUser = v48.isLocalUser
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_IS_INACTIVE, function(v49) --[[ Line: 296 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is inactive {}", v36.experienceType, v49.userId);
-            end;
-            v37:dispatch(v6.ParticipantIsInactive({
-                userId = tonumber(v49.userId) or -1, 
-                isLocalUser = v49.isLocalUser
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_WAS_MUTED, function(v50) --[[ Line: 306 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is was muted {}", v36.experienceType, v50.userId);
-            end;
-            v37:dispatch(v6.ParticipantWasMuted({
-                userId = tonumber(v50.userId) or -1, 
-                isLocalUser = v50.isLocalUser
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.PARTY_VOICE_PARTICIPANT_WAS_UNMUTED, function(v51) --[[ Line: 316 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is was unmuted {}", v36.experienceType, v51.userId);
-            end;
-            v37:dispatch(v6.ParticipantWasUnmuted({
-                userId = tonumber(v51.userId) or -1, 
-                isLocalUser = v51.isLocalUser
-            }));
-        end);
-        if l_FFlagEnablePartyVoiceChangersInLua_0 then
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_CHANGER_WAS_ENABLED, function(v52) --[[ Line: 327 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-                if v38 and v11 then
-                    v38:info("{}: Participant voice changer was enabled {}", v36.experienceType, v52.userId);
-                end;
-                v37:dispatch(v6.VoiceChangerWasEnabled({
-                    userId = tonumber(v52.userId) or -1, 
-                    isLocalUser = v52.isLocalUser
-                }));
-            end);
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_CHANGER_WAS_DISABLED, function(v53) --[[ Line: 337 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-                if v38 and v11 then
-                    v38:info("{}: Participant voice changer was disabled {}", v36.experienceType, v53.userId);
-                end;
-                v37:dispatch(v6.VoiceChangerWasDisabled({
-                    userId = tonumber(v53.userId) or -1, 
-                    isLocalUser = v53.isLocalUser
-                }));
-            end);
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_PACK_WAS_SET, function(v54) --[[ Line: 347 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-                if v38 and v11 then
-                    v38:info("{}: Participant {} voice pack was set to {}", v36.experienceType, v54.userId, v54.voicePackName);
-                end;
-                v37:dispatch(v6.VoicePackWasSet({
-                    userId = tonumber(v54.userId) or -1, 
-                    isLocalUser = v54.isLocalUser, 
-                    voicePackName = v54.voicePackName
-                }));
-            end);
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_CHANGER_FEEDBACK_WAS_ENABLED, function(v55) --[[ Line: 366 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-                if v38 and v11 then
-                    v38:info("{}: Participant voice changer feedback was enabled {}", v36.experienceType, v55.userId);
-                end;
-                v37:dispatch(v6.VoiceChangerFeedbackWasEnabled({
-                    userId = tonumber(v55.userId) or -1, 
-                    isLocalUser = v55.isLocalUser
-                }));
-            end);
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_CHANGER_FEEDBACK_WAS_DISABLED, function(v56) --[[ Line: 380 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-                if v38 and v11 then
-                    v38:info("{}: Participant voice changer feedback was disabled {}", v36.experienceType, v56.userId);
-                end;
-                v37:dispatch(v6.VoiceChangerFeedbackWasDisabled({
-                    userId = tonumber(v56.userId) or -1, 
-                    isLocalUser = v56.isLocalUser
-                }));
-            end);
-        end;
-        v36:addObserver(v5.EVENTS.MUTE_PARTY_VOICE_PARTICIPANT, function(v57) --[[ Line: 395 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is muted locally {}", v36.experienceType, v57.userId);
-            end;
-            v37:dispatch(v6.MuteParticipant({
-                userId = tonumber(v57.userId) or -1, 
-                isLocalUser = v57.isLocalUser
-            }));
-        end);
-        v36:addObserver(v5.EVENTS.UNMUTE_PARTY_VOICE_PARTICIPANT, function(v58) --[[ Line: 405 ]]
-            -- upvalues: v38 (copy), v11 (ref), v36 (copy), v37 (copy), v6 (ref)
-            if v38 and v11 then
-                v38:info("{}: Participant is unmuted locally {}", v36.experienceType, v58.userId);
-            end;
-            v37:dispatch(v6.UnmuteParticipant({
-                userId = tonumber(v58.userId) or -1, 
-                isLocalUser = v58.isLocalUser
-            }));
-        end);
-        if l_FFlagPartyVoiceBlockSync_0 then
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_BLOCK_PARTICIPANT, function(v59) --[[ Line: 416 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy)
-                if v38 and v11 then
-                    v38:info("{}: Participant was blocked {} from party voice", v36.experienceType, v59.userId);
-                end;
-            end);
-            v36:addObserver(v5.EVENTS.PARTY_VOICE_UNBLOCK_PARTICIPANT, function(v60) --[[ Line: 425 ]]
-                -- upvalues: v38 (copy), v11 (ref), v36 (copy)
-                if v38 and v11 then
-                    v38:info("{}: Participant was unblocked {} from party voice", v36.experienceType, v60.userId);
-                end;
-            end);
-        end;
-        return;
-    end;
-end;
-v18.getBackgroundStateSnapshot = function(_) --[[ Line: 434 ]] --[[ Name: getBackgroundStateSnapshot ]]
-    -- upvalues: v35 (copy), v8 (copy)
-    local v62 = v35.restore();
-    if v62 and v62.Squad and v62.Squad.CrossExperienceVoice then
-        return {
-            Experience = v62.Squad.CrossExperienceVoice.Experience, 
-            Participants = {
-                participants = v8.stringMapToNumberMap(v62.Squad.CrossExperienceVoice.Participants.participants), 
-                activeUserIds = v62.Squad.CrossExperienceVoice.Participants.activeUserIds, 
-                publicVoiceFocusedUserIds = v8.stringMapToNumberMap(v62.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds)
-            }
-        };
-    else
-        return nil;
-    end;
-end;
-v18.restoreStateFromBackground = function(v63, v64, v65) --[[ Line: 452 ]] --[[ Name: restoreStateFromBackground ]]
-    -- upvalues: v11 (copy), l_HttpService_0 (copy), v6 (copy)
-    local v66 = v63:getBackgroundStateSnapshot();
-    if v66 then
-        if v65 and v11 then
-            v65:info("{}: Restoring state from background {}", v63.experienceType, l_HttpService_0:JSONEncode(v66));
-        end;
-        v64:dispatch(v6.RestoreState(v66));
-    end;
-end;
-v18.unsubscribe = function(v67, v68, v69) --[[ Line: 462 ]] --[[ Name: unsubscribe ]]
-    -- upvalues: v11 (copy), v6 (copy)
-    if v69 and v11 then
-        v69:info("{}: Unsubscribing from the CEV Store", v67.experienceType);
-    end;
-    v68:dispatch(v6.ExperienceLeft());
-    for _, v71 in ipairs(v67.observers) do
-        v67:removeObserver(v71.id, v71.event);
-    end;
-    v67.isSubscribed = false;
-    v67.observers = {};
-    v67.eventQueue:reset();
-end;
-return v18;
+local HttpService = game:GetService("HttpService")
+local CrossExperience = script:FindFirstAncestor("CrossExperience")
+local dependencies = require(CrossExperience.dependencies)
+
+require(CrossExperience.Types)
+
+local Communication = require(CrossExperience.Communication)
+local Constants = require(CrossExperience.Constants)
+local Actions = require(CrossExperience.Actions)
+local Models = require(CrossExperience.Models)
+local Utils = require(CrossExperience.Utils)
+local EventQueue = require(CrossExperience.Utils.EventQueue)
+local createPersistenceMiddleware = require(CrossExperience.Middlewares.createPersistenceMiddleware)
+local v11 = game:DefineFastFlag("EnableCrossExpEventLogging", false)
+local SharedFlags = dependencies.SharedFlags
+local FFlagPartyVoiceBlockSync = SharedFlags.FFlagPartyVoiceBlockSync
+local FFlagEnablePartyVoiceChangersInLua = SharedFlags.FFlagEnablePartyVoiceChangersInLua
+local Cryo = dependencies.Cryo
+local n1 = 0
+local guid = HttpService:GenerateGUID(false)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, b1: boolean) -- line: 105
+	-- upvalues: EventQueue (copy), t1 (copy)
+	local t2 = {
+		isSubscribed = false,
+		observers = {},
+		experienceType = p1,
+		eventQueue = EventQueue.new(b1)
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.notify(_, p3, p4) -- line: 123
+	-- upvalues: n1 (ref), guid (copy), Communication (copy)
+	if not p4 then
+		p4 = {}
+	end
+
+	n1 += 1
+	p4._seq = n1
+	p4._origin = guid
+	Communication.notify(p3, p4)
+end
+function t1.removeObserver(t3: {[any]: any}, s1: string, p5) -- line: 134
+	-- upvalues: Communication (copy)
+	Communication.removeObserver(t3.experienceType, p5, s1)
+end
+function t1.addObserver(t4: {[any]: any}, p6, p7: ((...any) -> ...any)) -- line: 138
+	-- upvalues: Communication (copy)
+	local v33 = Communication.addObserver(t4.experienceType, p6, function(p8) -- line: 139
+		-- upvalues: t4 (copy), p6 (copy), p7 (copy)
+		t4.eventQueue:process(p6, p8, p7)
+	end)
+
+	table.insert(t4.observers, {
+		id = v33,
+		event = p6
+	})
+end
+
+local v19 = createPersistenceMiddleware({
+	storeKey = Constants.STORAGE_CEV_STORE_KEY
+})
+
+function t1.subscribe(p9, p10, p11) -- line: 154
+	-- upvalues: v11 (copy), Constants (copy), Actions (copy), Cryo (copy), Models (copy), FFlagEnablePartyVoiceChangersInLua (copy), FFlagPartyVoiceBlockSync (copy)
+	if p9.isSubscribed then
+		return
+	end
+
+	p9.isSubscribed = true
+
+	if p11 and v11 then
+		p11:info("{}: Subscribing to the CEV Store", p9.experienceType)
+	end
+
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_GAME_JOIN_FAILED, function(p12) -- line: 167
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy), Constants (copy)
+		if p11 and v11 then
+			p11:info("{}: Experience Party Voice Game Join Failed: {}", p9.experienceType, p12.state)
+		end
+
+		p10:dispatch(Actions.VoiceStatusChanged({
+			status = Constants.VOICE_STATUS.ERROR_RCC_CONNECTING
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_STATUS_CHANGED, function(p13) -- line: 180
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), Constants (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Experience Voice Status Changed: {}, {}, {}, {}", p9.experienceType, p13.status, p13.detail, p13.voiceChannelId, p13.voiceSessionId)
+		end
+
+		if p13.status == Constants.VOICE_STATUS.VOICE_CONNECTED then
+			if not p13.voiceChannelId and p11 then
+				p11:warning("Voice channel id is expected")
+			end
+
+			if not p13.voiceSessionId then
+				p11:warning("Voice session id is expected")
+			end
+		end
+
+		p10:dispatch(Actions.VoiceStatusChanged({
+			status = p13.status,
+			voiceChannelId = p13.voiceChannelId,
+			voiceSessionId = p13.voiceSessionId
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_EXPERIENCE_JOINED, function(p14) -- line: 212
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), Cryo (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Experience joined JobID: {}, GameID: {}, PlaceId: {}", p9.experienceType, p14.jobId, p14.gameId, p14.placeId)
+		end
+
+		local v52 = p9:getBackgroundStateSnapshot()
+
+		if v52 and v52.Participants then
+			p14 = Cryo.Dictionary.join(p14, v52.Participants)
+		end
+
+		p10:dispatch(Actions.ExperienceJoined(p14))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_AUDIO_FOCUS_CHANGED, function(p15) -- line: 234
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant Audio Focus Changed {} = {}", p9.experienceType, p15.userId, p15.contextId)
+		end
+
+		p10:dispatch(Actions.ParticipantAudioFocusChanged({
+			userId = p15.userId,
+			contextId = p15.contextId,
+			contextIds = p15.contextIds
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_ADDED, function(p16) -- line: 254
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), Models (copy), FFlagEnablePartyVoiceChangersInLua (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant added {}", p9.experienceType, p16.userId)
+		end
+
+		local v55 = Models.ParticipantModel.format({
+			isActive = false,
+			isMuted = false,
+			isMutedLocally = false,
+			userId = p16.userId,
+			isLocalUser = p16.isLocalUser,
+			username = p16.username,
+			displayname = p16.displayname,
+			isVoiceChangerActive = not FFlagEnablePartyVoiceChangersInLua and nil,
+			isVoiceChangerHearMyselfActive = not FFlagEnablePartyVoiceChangersInLua and nil,
+			selectedVoicePack = if not FFlagEnablePartyVoiceChangersInLua then nil else p16.selectedVoicePack
+		})
+
+		p10:dispatch(Actions.ParticipantAdded(v55))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_REMOVED, function(p17) -- line: 276
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant removed {}", p9.experienceType, p17.userId)
+		end
+
+		p10:dispatch(Actions.ParticipantRemoved({
+			userId = tonumber(p17.userId) or -1,
+			isLocalUser = p17.isLocalUser
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_IS_ACTIVE, function(p18) -- line: 286
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is active {}", p9.experienceType, p18.userId)
+		end
+
+		p10:dispatch(Actions.ParticipantIsActive({
+			userId = tonumber(p18.userId) or -1,
+			isLocalUser = p18.isLocalUser
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_IS_INACTIVE, function(p19) -- line: 296
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is inactive {}", p9.experienceType, p19.userId)
+		end
+
+		p10:dispatch(Actions.ParticipantIsInactive({
+			userId = tonumber(p19.userId) or -1,
+			isLocalUser = p19.isLocalUser
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_WAS_MUTED, function(p20) -- line: 306
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is was muted {}", p9.experienceType, p20.userId)
+		end
+
+		p10:dispatch(Actions.ParticipantWasMuted({
+			userId = tonumber(p20.userId) or -1,
+			isLocalUser = p20.isLocalUser
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.PARTY_VOICE_PARTICIPANT_WAS_UNMUTED, function(p21) -- line: 316
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is was unmuted {}", p9.experienceType, p21.userId)
+		end
+
+		p10:dispatch(Actions.ParticipantWasUnmuted({
+			userId = tonumber(p21.userId) or -1,
+			isLocalUser = p21.isLocalUser
+		}))
+	end)
+
+	if FFlagEnablePartyVoiceChangersInLua then
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_CHANGER_WAS_ENABLED, function(p22) -- line: 327
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant voice changer was enabled {}", p9.experienceType, p22.userId)
+			end
+
+			p10:dispatch(Actions.VoiceChangerWasEnabled({
+				userId = tonumber(p22.userId) or -1,
+				isLocalUser = p22.isLocalUser
+			}))
+		end)
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_CHANGER_WAS_DISABLED, function(p23) -- line: 337
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant voice changer was disabled {}", p9.experienceType, p23.userId)
+			end
+
+			p10:dispatch(Actions.VoiceChangerWasDisabled({
+				userId = tonumber(p23.userId) or -1,
+				isLocalUser = p23.isLocalUser
+			}))
+		end)
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_PACK_WAS_SET, function(p24) -- line: 347
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant {} voice pack was set to {}", p9.experienceType, p24.userId, p24.voicePackName)
+			end
+
+			p10:dispatch(Actions.VoicePackWasSet({
+				userId = tonumber(p24.userId) or -1,
+				isLocalUser = p24.isLocalUser,
+				voicePackName = p24.voicePackName
+			}))
+		end)
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_CHANGER_FEEDBACK_WAS_ENABLED, function(p25) -- line: 366
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant voice changer feedback was enabled {}", p9.experienceType, p25.userId)
+			end
+
+			p10:dispatch(Actions.VoiceChangerFeedbackWasEnabled({
+				userId = tonumber(p25.userId) or -1,
+				isLocalUser = p25.isLocalUser
+			}))
+		end)
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_CHANGER_FEEDBACK_WAS_DISABLED, function(p26) -- line: 380
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant voice changer feedback was disabled {}", p9.experienceType, p26.userId)
+			end
+
+			p10:dispatch(Actions.VoiceChangerFeedbackWasDisabled({
+				userId = tonumber(p26.userId) or -1,
+				isLocalUser = p26.isLocalUser
+			}))
+		end)
+	end
+
+	p9:addObserver(Constants.EVENTS.MUTE_PARTY_VOICE_PARTICIPANT, function(p27) -- line: 395
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is muted locally {}", p9.experienceType, p27.userId)
+		end
+
+		p10:dispatch(Actions.MuteParticipant({
+			userId = tonumber(p27.userId) or -1,
+			isLocalUser = p27.isLocalUser
+		}))
+	end)
+	p9:addObserver(Constants.EVENTS.UNMUTE_PARTY_VOICE_PARTICIPANT, function(p28) -- line: 405
+		-- upvalues: p11 (copy), v11 (copy), p9 (copy), p10 (copy), Actions (copy)
+		if p11 and v11 then
+			p11:info("{}: Participant is unmuted locally {}", p9.experienceType, p28.userId)
+		end
+
+		p10:dispatch(Actions.UnmuteParticipant({
+			userId = tonumber(p28.userId) or -1,
+			isLocalUser = p28.isLocalUser
+		}))
+	end)
+
+	if FFlagPartyVoiceBlockSync then
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_BLOCK_PARTICIPANT, function(p29) -- line: 416
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant was blocked {} from party voice", p9.experienceType, p29.userId)
+			end
+		end)
+		p9:addObserver(Constants.EVENTS.PARTY_VOICE_UNBLOCK_PARTICIPANT, function(p30) -- line: 425
+			-- upvalues: p11 (copy), v11 (copy), p9 (copy)
+			if p11 and v11 then
+				p11:info("{}: Participant was unblocked {} from party voice", p9.experienceType, p30.userId)
+			end
+		end)
+	end
+end
+function t1.getBackgroundStateSnapshot(_) -- line: 434
+	-- upvalues: v19 (copy), Utils (copy)
+	local v38 = v19.restore()
+
+	if v38 and (v38.Squad and v38.Squad.CrossExperienceVoice) then
+		return {
+			Experience = v38.Squad.CrossExperienceVoice.Experience,
+			Participants = {
+				participants = Utils.stringMapToNumberMap(v38.Squad.CrossExperienceVoice.Participants.participants),
+				activeUserIds = v38.Squad.CrossExperienceVoice.Participants.activeUserIds,
+				publicVoiceFocusedUserIds = Utils.stringMapToNumberMap(v38.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds)
+			}
+		}
+	end
+
+	return nil
+end
+function t1.restoreStateFromBackground(p32, p33, p34) -- line: 452
+	-- upvalues: v11 (copy), HttpService (copy), Actions (copy)
+	local v42 = p32:getBackgroundStateSnapshot()
+
+	if v42 then
+		if p34 and v11 then
+			p34:info("{}: Restoring state from background {}", p32.experienceType, HttpService:JSONEncode(v42))
+		end
+
+		p33:dispatch(Actions.RestoreState(v42))
+	end
+end
+function t1.unsubscribe(p35, p36, p37) -- line: 462
+	-- upvalues: v11 (copy), Actions (copy)
+	if p37 and v11 then
+		p37:info("{}: Unsubscribing from the CEV Store", p35.experienceType)
+	end
+
+	p36:dispatch(Actions.ExperienceLeft())
+
+	for _, v in ipairs(p35.observers) do
+		p35:removeObserver(v.id, v.event)
+	end
+
+	p35.isSubscribed = false
+	p35.observers = {}
+	p35.eventQueue:reset()
+end
+
+return t1

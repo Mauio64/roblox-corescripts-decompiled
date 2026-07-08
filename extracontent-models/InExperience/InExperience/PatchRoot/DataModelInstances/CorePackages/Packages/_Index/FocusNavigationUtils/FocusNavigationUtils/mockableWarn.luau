@@ -1,16 +1,17 @@
-local l_warn_0 = warn;
+local _warn = warn
+
 return (setmetatable({
-    mock = function(v1) --[[ Line: 4 ]] --[[ Name: mock ]]
-        -- upvalues: l_warn_0 (ref)
-        l_warn_0 = v1;
-    end, 
-    unmock = function() --[[ Line: 7 ]] --[[ Name: unmock ]]
-        -- upvalues: l_warn_0 (ref)
-        l_warn_0 = warn;
-    end
+	mock = function(p1) -- line: 4
+		-- upvalues: _warn (ref)
+		_warn = p1
+	end,
+	unmock = function() -- line: 7
+		-- upvalues: _warn (ref)
+		_warn = warn
+	end
 }, {
-    __call = function(_, ...) --[[ Line: 11 ]] --[[ Name: __call ]]
-        -- upvalues: l_warn_0 (ref)
-        l_warn_0(...);
-    end
-}));
+	__call = function(_, ...) -- line: 11
+		-- upvalues: _warn (ref)
+		_warn(...)
+	end
+}))

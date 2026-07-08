@@ -4,8 +4,10 @@ local FFlagAddIEMProfilePage = require(ProfilePlatformParent.SharedFlags).FFlagA
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagEnableProfileCompletion = require(ProfilePlatformParent.SharedFlags).FFlagEnableProfileCompletion
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
 local FFlagSocialEnableProfileInspectAndBuy = require(ProfilePlatformParent.SharedFlags).FFlagSocialEnableProfileInspectAndBuy
 local FFlagProfilePlatformCTAsRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformCTAsRefactor)
+local FFlagProfilePlatformEnableMoments = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableMoments)
 
 return {
 	Components = {
@@ -26,9 +28,10 @@ return {
 		ContactDescription = "ContactDescription",
 		CommunityLocked = "CommunityLocked",
 		ProfileBackground = "ProfileBackground",
-		ProfileCompletion = not FFlagEnableProfileCompletion and "" or "ProfileCompletion",
 		Events = "Events",
-		CurrentlyPlaying = "CurrentlyPlaying"
+		CurrentlyPlaying = "CurrentlyPlaying",
+		ProfileCompletion = not FFlagEnableProfileCompletion and "" or "ProfileCompletion",
+		Moments = not FFlagProfilePlatformEnableMoments and "" or "UserMoments"
 	},
 	ProfileActions = {
 		AcceptFriendRequest = "AcceptFriendRequest",
@@ -50,6 +53,7 @@ return {
 		EditLook = "EditLook",
 		EditEmotes = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or "EditEmotes",
 		SwitchAvatar = not FFlagProfilePlatformEnableEditAppearanceMenu and "" or "SwitchAvatar",
+		EditBackground = (not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEditBackgroundMenuItem) and "" or "EditBackground",
 		EditProfile = "EditProfile",
 		IgnoreFriendRequest = "IgnoreFriendRequest",
 		JoinExperience = "JoinExperience",
@@ -104,8 +108,9 @@ return {
 		HomepageAd = "HomepageAd",
 		ItemDetailsPage = "ItemDetailsPage",
 		MutualConnectionsList = "MutualConnectionsList",
+		JoinGameCard = "JoinGameCard",
 		InExperienceProfile = not FFlagAddIEMProfilePage and "" or "InExperienceProfile",
-		JoinGameCard = "JoinGameCard"
+		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"
 	},
 	ContextualTypes = {
 		AccountDeleted = "AccountDeleted",
@@ -141,9 +146,11 @@ return {
 		ContextualMenu = "ContextualMenu",
 		EditProfileBackground = "EditProfileBackground",
 		CommunityVerificationModal = "CommunityVerificationModal",
-		TransferRobuxFlow = not FFlagProfilePlatformEnableCurrencyTransfer and "" or "TransferRobuxFlow",
 		PurchaseConfirmationModal = "PurchaseConfirmationModal",
-		InspectAvatarSheet = not FFlagSocialEnableProfileInspectAndBuy and "" or "InspectAvatarSheet"
+		TransferRobuxFlow = not FFlagProfilePlatformEnableCurrencyTransfer and "" or "TransferRobuxFlow",
+		InspectAvatarSheet = not FFlagSocialEnableProfileInspectAndBuy and "" or "InspectAvatarSheet",
+		MomentsAll = not FFlagProfilePlatformEnableMoments and "" or "MomentsAll",
+		MomentsFeed = not FFlagProfilePlatformEnableMoments and "" or "MomentsFeed"
 	},
 	NameTypes = {
 		Alias = "Alias",
@@ -187,6 +194,10 @@ return {
 	ProfileFormFactor = {
 		Wide = "Wide",
 		PeekView = "PeekView"
+	},
+	ProfileTabVariants = {
+		Default = "Default",
+		MeTab = "MeTab"
 	},
 	LoadingState = {
 		Failed = "Failed",

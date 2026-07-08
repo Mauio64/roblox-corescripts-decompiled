@@ -1,4 +1,4 @@
 return {
-    Default = "Default", 
-    Link = "Link"
-};
+	Default = "Default",
+	Link = "Link"
+}

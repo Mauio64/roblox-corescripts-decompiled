@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.ActionCreator)("AddGameStat", function(v0, v1, v2) --[[ Line: 4 ]]
-    return {
-        statName = v0, 
-        isPrimary = v1, 
-        priority = v2
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("AddGameStat", function(p1, p2, p3) -- line: 4
+	return {
+		statName = p1,
+		isPrimary = p2,
+		priority = p3
+	}
+end)

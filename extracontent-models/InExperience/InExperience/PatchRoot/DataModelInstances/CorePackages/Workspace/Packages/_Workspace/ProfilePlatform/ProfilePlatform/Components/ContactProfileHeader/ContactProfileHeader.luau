@@ -1,121 +1,128 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v4 = require(l_script_FirstAncestor_0.Common.Constants);
-local v5 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v6 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v6.Core.Style.useStyle;
-local l_LoadableImage_0 = v6.App.Loading.LoadableImage;
-local l_ImageSetLabel_0 = v6.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v6.App.ImageSet.Images;
-local l_StyledTextLabel_0 = v6.App.Text.StyledTextLabel;
-local l_HorizontalPageMargin_0 = v6.App.Container.HorizontalPageMargin;
-return function(v13) --[[ Line: 30 ]] --[[ Name: ContactProfileHeader ]]
-    -- upvalues: l_useLocalization_0 (copy), v5 (copy), l_useStyle_0 (copy), v2 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), l_LoadableImage_0 (copy), v4 (copy), l_HorizontalPageMargin_0 (copy), l_StyledTextLabel_0 (copy)
-    local v14 = l_useLocalization_0({
-        contactsProfileBody = {
-            v5.ContactsProfileBody; 
-            contactName = v13.contactName
-        }, 
-        failedMessage = v5.NoInternet, 
-        fromContacts = v5.FromContacts
-    });
-    local v15 = l_useStyle_0();
-    local l_Theme_0 = v15.Theme;
-    local l_Font_0 = v15.Font;
-    return v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 400), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v13.layoutOrder
-    }, {
-        Background = v2.createElement(l_ImageSetLabel_0, {
-            Size = UDim2.fromScale(1, 1), 
-            BorderSizePixel = 0, 
-            Image = l_Images_0[v15.Theme.PlayerBackgroundDefault.Image], 
-            ZIndex = 1
-        }), 
-        AvatarThumbnail = v2.createElement(l_LoadableImage_0, {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.new(0.5, 0, 0.5, -48), 
-            Size = UDim2.new(1, -96, 1, -96), 
-            ScaleType = Enum.ScaleType.Fit, 
-            BackgroundTransparency = 1, 
-            Image = v13.avatarThumbnailUrl, 
-            useShimmerAnimationWhileLoading = true, 
-            ZIndex = 2
-        }), 
-        TopGradient = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v4.CONTACT_CARD_GRADIENT_HEIGHT), 
-            BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-            BorderSizePixel = 0, 
-            ZIndex = 3
-        }, {
-            UIGradient = v2.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0), 
-                    NumberSequenceKeypoint.new(1, 1)
-                })
-            })
-        }), 
-        BottomGradient = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v4.CONTACT_CARD_GRADIENT_HEIGHT), 
-            Position = UDim2.new(0, 0, 1, 0), 
-            AnchorPoint = Vector2.new(0, 1), 
-            BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-            BorderSizePixel = 0, 
-            ZIndex = 3
-        }, {
-            UIGradient = v2.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 1), 
-                    NumberSequenceKeypoint.new(1, 0)
-                })
-            })
-        }), 
-        UserDetails = v2.createElement(l_HorizontalPageMargin_0, {
-            size = UDim2.new(1, 0, 0, 56), 
-            position = UDim2.fromScale(0, 0.9), 
-            anchorPoint = Vector2.new(0, 1), 
-            zIndex = 4, 
-            backgroundTransparency = 1
-        }, {
-            UserDetailsLayout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Padding1 = v2.createElement("Frame", {
-                Size = UDim2.fromOffset(0, 40), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }), 
-            ContactName = v2.createElement(l_StyledTextLabel_0, {
-                text = v13.contactName, 
-                size = UDim2.new(1, 0, 0, 24), 
-                textTruncate = Enum.TextTruncate.AtEnd, 
-                textXAlignment = Enum.TextXAlignment.Left, 
-                textYAlignment = Enum.TextYAlignment.Center, 
-                fontStyle = l_Font_0.Header1, 
-                colorStyle = l_Theme_0.TextEmphasis, 
-                layoutOrder = 2
-            }), 
-            Padding2 = v2.createElement("Frame", {
-                Size = UDim2.fromOffset(0, 15), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 3
-            }), 
-            FromContacts = v2.createElement(l_StyledTextLabel_0, {
-                size = UDim2.new(1, 0, 0, 16), 
-                text = v14.fromContacts, 
-                textTruncate = Enum.TextTruncate.AtEnd, 
-                textXAlignment = Enum.TextXAlignment.Left, 
-                textYAlignment = Enum.TextYAlignment.Center, 
-                fontStyle = l_Font_0.CaptionHeader, 
-                colorStyle = l_Theme_0.TextMuted, 
-                layoutOrder = 4
-            })
-        })
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local Constants = require(ProfilePlatform.Common.Constants)
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local UIBlox = require(ProfilePlatformParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local useStyleMetadata = UIBlox.Core.Style.useStyleMetadata
+local LoadableImage = UIBlox.App.Loading.LoadableImage
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local HorizontalPageMargin = UIBlox.App.Container.HorizontalPageMargin
+
+local function ContactProfileHeader(t1: {[any]: any}) -- line: 32
+	-- upvalues: useLocalization (copy), TextKeys (copy), useStyle (copy), useStyleMetadata (copy), React (copy), ImageSetLabel (copy), Images (copy), LoadableImage (copy), Constants (copy), HorizontalPageMargin (copy), StyledTextLabel (copy)
+	local v17 = useLocalization({
+		contactsProfileBody = {
+			TextKeys.ContactsProfileBody,
+			contactName = t1.contactName
+		},
+		failedMessage = TextKeys.NoInternet,
+		fromContacts = TextKeys.FromContacts
+	})
+	local v18 = useStyle()
+	local v19 = useStyleMetadata()
+	local Theme = v18.Theme
+	local Font = v18.Font
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 400),
+		LayoutOrder = t1.layoutOrder
+	}, {
+		Background = React.createElement(ImageSetLabel, {
+			BorderSizePixel = 0,
+			ZIndex = 1,
+			Size = UDim2.fromScale(1, 1),
+			Image = Images[v18.Theme.PlayerBackgroundDefault.Image],
+			ImageColor3 = if not v19 or not v19.HasSurfaceOverrides then nil else v18.Theme.BackgroundUIDefault.Color:Lerp(v18.Theme.PlayerBackgroundDefault.Color, v18.Theme.Overlay.Transparency)
+		}),
+		AvatarThumbnail = React.createElement(LoadableImage, {
+			BackgroundTransparency = 1,
+			useShimmerAnimationWhileLoading = true,
+			ZIndex = 2,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, -48),
+			Size = UDim2.new(1, -96, 1, -96),
+			ScaleType = Enum.ScaleType.Fit,
+			Image = t1.avatarThumbnailUrl
+		}),
+		TopGradient = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			Size = UDim2.new(1, 0, 0, Constants.CONTACT_CARD_GRADIENT_HEIGHT),
+			BackgroundColor3 = Theme.BackgroundDefault.Color
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+			})
+		}),
+		BottomGradient = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			Size = UDim2.new(1, 0, 0, Constants.CONTACT_CARD_GRADIENT_HEIGHT),
+			Position = UDim2.new(0, 0, 1, 0),
+			AnchorPoint = Vector2.new(0, 1),
+			BackgroundColor3 = Theme.BackgroundDefault.Color
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 1),
+					NumberSequenceKeypoint.new(1, 0)
+				})
+			})
+		}),
+		UserDetails = React.createElement(HorizontalPageMargin, {
+			zIndex = 4,
+			backgroundTransparency = 1,
+			size = UDim2.new(1, 0, 0, 56),
+			position = UDim2.fromScale(0, 0.9),
+			anchorPoint = Vector2.new(0, 1)
+		}, {
+			UserDetailsLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Padding1 = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.fromOffset(0, 40)
+			}),
+			ContactName = React.createElement(StyledTextLabel, {
+				layoutOrder = 2,
+				text = t1.contactName,
+				size = UDim2.new(1, 0, 0, 24),
+				textTruncate = Enum.TextTruncate.AtEnd,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Center,
+				fontStyle = Font.Header1,
+				colorStyle = Theme.TextEmphasis
+			}),
+			Padding2 = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.fromOffset(0, 15)
+			}),
+			FromContacts = React.createElement(StyledTextLabel, {
+				layoutOrder = 4,
+				size = UDim2.new(1, 0, 0, 16),
+				text = v17.fromContacts,
+				textTruncate = Enum.TextTruncate.AtEnd,
+				textXAlignment = Enum.TextXAlignment.Left,
+				textYAlignment = Enum.TextYAlignment.Center,
+				fontStyle = Font.CaptionHeader,
+				colorStyle = Theme.TextMuted
+			})
+		})
+	})
+end
+
+return ContactProfileHeader

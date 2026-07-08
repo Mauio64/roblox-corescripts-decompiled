@@ -1,11 +1,12 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxSquads").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2, v3, v4) --[[ Line: 7 ]]
-    return {
-        payload = {
-            experienceInviteId = v1, 
-            membershipEntityId = v2, 
-            notificationId = v3, 
-            isInviter = v4
-        }
-    };
-end);
+local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(s1: string, s2: string, s3: string, b1: boolean) -- line: 7
+	return {
+		payload = {
+			experienceInviteId = s1,
+			membershipEntityId = s2,
+			notificationId = s3,
+			isInviter = b1
+		}
+	}
+end)

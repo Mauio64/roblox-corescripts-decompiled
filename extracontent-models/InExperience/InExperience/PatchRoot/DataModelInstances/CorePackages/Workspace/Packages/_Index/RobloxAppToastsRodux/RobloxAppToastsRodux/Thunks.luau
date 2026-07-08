@@ -1,3 +1,3 @@
 return {
-    SetNetworkingErrorToast = require(script.SetNetworkingErrorToast)
-};
+	SetNetworkingErrorToast = require(script.SetNetworkingErrorToast)
+}

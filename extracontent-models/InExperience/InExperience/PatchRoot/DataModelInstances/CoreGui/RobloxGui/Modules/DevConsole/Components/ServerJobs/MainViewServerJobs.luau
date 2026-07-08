@@ -1,96 +1,96 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v4 = require(l_Components_0.ServerJobs.ServerJobsChart);
-local v5 = require(l_Components_0.UtilAndTab);
-local l_Actions_0 = script.Parent.Parent.Parent.Actions;
-local v7 = require(l_Actions_0.ServerJobsUpdateSearchFilter);
-local v8 = require(script.Parent.Parent.Parent.Constants);
-local l_MainRowPadding_0 = v8.GeneralFormatting.MainRowPadding;
-local v10 = v1.Component:extend("MainViewServerJobs");
-v10.init = function(v11) --[[ Line: 17 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v11.onUtilTabHeightChanged = function(v12) --[[ Line: 18 ]]
-        -- upvalues: v11 (copy)
-        v11:setState({
-            utilTabHeight = v12
-        });
-    end;
-    v11.onSearchTermChanged = function(v13) --[[ Line: 24 ]]
-        -- upvalues: v11 (copy)
-        v11.props.dispatchServerJobsUpdateSearchFilter(v13, {});
-    end;
-    v11.utilRef = v1.createRef();
-    v11.state = {
-        utilTabHeight = 0
-    };
-end;
-v10.didMount = function(v14) --[[ Line: 35 ]] --[[ Name: didMount ]]
-    v14:setState({
-        utilTabHeight = v14.utilRef.current.Size.Y.Offset
-    });
-end;
-v10.didUpdate = function(v15) --[[ Line: 42 ]] --[[ Name: didUpdate ]]
-    local l_Size_0 = v15.utilRef.current.Size;
-    if l_Size_0.Y.Offset ~= v15.state.utilTabHeight then
-        v15:setState({
-            utilTabHeight = l_Size_0.Y.Offset
-        });
-    end;
-end;
-v10.render = function(v17) --[[ Line: 51 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v8 (copy), l_MainRowPadding_0 (copy), v5 (copy), v4 (copy)
-    local l_size_0 = v17.props.size;
-    local l_formFactor_0 = v17.props.formFactor;
-    local l_tabList_0 = v17.props.tabList;
-    local l_jobsSearchTerm_0 = v17.props.jobsSearchTerm;
-    local l_utilTabHeight_0 = v17.state.utilTabHeight;
-    local l_createElement_0 = v1.createElement;
-    local v24 = "Frame";
-    local v25 = {
-        Size = l_size_0, 
-        BackgroundColor3 = v8.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 3
-    };
-    local v26 = {
-        UIListLayout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, l_MainRowPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        UtilAndTab = v1.createElement(v5, {
-            windowWidth = l_size_0.X.Offset, 
-            formFactor = l_formFactor_0, 
-            tabList = l_tabList_0, 
-            searchTerm = l_jobsSearchTerm_0, 
-            layoutOrder = 1, 
-            refForParent = v17.utilRef, 
-            onHeightChanged = v17.onUtilTabHeightChanged, 
-            onSearchTermChanged = v17.onSearchTermChanged
-        })
-    };
-    local v27 = false;
-    if l_utilTabHeight_0 > 0 then
-        v27 = v1.createElement(v4, {
-            size = UDim2.new(1, 0, 1, -l_utilTabHeight_0), 
-            searchTerm = l_jobsSearchTerm_0, 
-            layoutOrder = 2
-        });
-    end;
-    v26.ServerJobs = v27;
-    return l_createElement_0(v24, v25, v26);
-end;
-return v2.UNSTABLE_connect2(function(v28, _) --[[ Line: 91 ]] --[[ Name: mapStateToProps ]]
-    return {
-        jobsSearchTerm = v28.ServerJobsData.jobsSearchTerm
-    };
-end, function(v30) --[[ Line: 97 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v7 (copy)
-    return {
-        dispatchServerJobsUpdateSearchFilter = function(v31, v32) --[[ Line: 99 ]] --[[ Name: dispatchServerJobsUpdateSearchFilter ]]
-            -- upvalues: v30 (copy), v7 (ref)
-            v30(v7(v31, v32));
-        end
-    };
-end)(v10);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local Components = script.Parent.Parent.Parent.Components
+local ServerJobsChart = require(Components.ServerJobs.ServerJobsChart)
+local UtilAndTab = require(Components.UtilAndTab)
+local Actions = script.Parent.Parent.Parent.Actions
+local ServerJobsUpdateSearchFilter = require(Actions.ServerJobsUpdateSearchFilter)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+local v11 = Roact.Component:extend("MainViewServerJobs")
+
+function v11.init(p1) -- line: 17
+	-- upvalues: Roact (copy)
+	function p1.onUtilTabHeightChanged(p2) -- line: 18
+		-- upvalues: p1 (copy)
+		p1:setState({
+			utilTabHeight = p2
+		})
+	end
+	function p1.onSearchTermChanged(p3) -- line: 24
+		-- upvalues: p1 (copy)
+		p1.props.dispatchServerJobsUpdateSearchFilter(p3, {})
+	end
+
+	p1.utilRef = Roact.createRef()
+	p1.state = {
+		utilTabHeight = 0
+	}
+end
+function v11.didMount(p4) -- line: 35
+	p4:setState({
+		utilTabHeight = p4.utilRef.current.Size.Y.Offset
+	})
+end
+function v11.didUpdate(p5) -- line: 42
+	local currentSize = p5.utilRef.current.Size
+
+	if currentSize.Y.Offset ~= p5.state.utilTabHeight then
+		p5:setState({
+			utilTabHeight = currentSize.Y.Offset
+		})
+	end
+end
+function v11.render(p6) -- line: 51
+	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy), UtilAndTab (copy), ServerJobsChart (copy)
+	local size = p6.props.size
+	local formFactor = p6.props.formFactor
+	local tabList = p6.props.tabList
+	local jobsSearchTerm = p6.props.jobsSearchTerm
+	local utilTabHeight = p6.state.utilTabHeight
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = Roact.createElement(UtilAndTab, {
+			layoutOrder = 1,
+			windowWidth = size.X.Offset,
+			formFactor = formFactor,
+			tabList = tabList,
+			searchTerm = jobsSearchTerm,
+			refForParent = p6.utilRef,
+			onHeightChanged = p6.onUtilTabHeightChanged,
+			onSearchTermChanged = p6.onSearchTermChanged
+		}),
+		ServerJobs = utilTabHeight > 0 and Roact.createElement(ServerJobsChart, {
+			layoutOrder = 2,
+			size = UDim2.new(1, 0, 1, -utilTabHeight),
+			searchTerm = jobsSearchTerm
+		})
+	})
+end
+
+local function mapStateToProps(p7, _) -- line: 91
+	return {
+		jobsSearchTerm = p7.ServerJobsData.jobsSearchTerm
+	}
+end
+local function mapDispatchToProps(p9) -- line: 97
+	-- upvalues: ServerJobsUpdateSearchFilter (copy)
+	return {
+		dispatchServerJobsUpdateSearchFilter = function(p10, p11) -- line: 99
+			-- upvalues: p9 (copy), ServerJobsUpdateSearchFilter (copy)
+			p9(ServerJobsUpdateSearchFilter(p10, p11))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v11)

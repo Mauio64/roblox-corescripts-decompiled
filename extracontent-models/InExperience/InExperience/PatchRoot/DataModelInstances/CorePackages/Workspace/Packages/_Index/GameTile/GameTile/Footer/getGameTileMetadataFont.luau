@@ -1,18 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local _ = require(l_Parent_0.Foundation);
-local l_FFlagLuaAppMigrateGameTileFixConsoleMetadataText_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppMigrateGameTileFixConsoleMetadataText;
-local l_FFlagLuaAppNarrowTileSmallerFooterFont_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont;
-return function(v4, v5, v6, v7, v8) --[[ Line: 10 ]] --[[ Name: getGameTileMetadataFont ]]
-    -- upvalues: l_FFlagLuaAppNarrowTileSmallerFooterFont_0 (copy), l_FFlagLuaAppMigrateGameTileFixConsoleMetadataText_0 (copy)
-    if v7 and v6 then
-        if l_FFlagLuaAppNarrowTileSmallerFooterFont_0 and v8 or l_FFlagLuaAppMigrateGameTileFixConsoleMetadataText_0 and v4 == false then
-            return v6.Typography.BodySmall;
-        else
-            return v6.Typography.BodyMedium;
-        end;
-    elseif v4 then
-        return v5.Semantic.Typography.Body;
-    else
-        return v5.Semantic.Typography.CaptionHeader;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GameTile").Parent
+
+require(Parent.Foundation)
+
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local FFlagLuaAppMigrateGameTileFixConsoleMetadataText = require(Parent.SharedFlags).FFlagLuaAppMigrateGameTileFixConsoleMetadataText
+local FFlagLuaAppNarrowTileSmallerFooterFont = require(Parent.SharedFlags).FFlagLuaAppNarrowTileSmallerFooterFont
+
+local function getGameTileMetadataFont(b1: boolean?, p1, p2, b2: boolean?, b3: boolean?) -- line: 13
+	-- upvalues: FFlagLuaAppNarrowTileSmallerFooterFont (copy), FFlagLuaAppMigrateGameTileFixConsoleMetadataText (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
+	if b2 and p2 then
+		if FFlagLuaAppNarrowTileSmallerFooterFont and b3 or FFlagLuaAppMigrateGameTileFixConsoleMetadataText and b1 == false then
+			return p2.Typography.BodySmall
+		end
+
+		return p2.Typography.BodyMedium
+	end
+
+	if b1 then
+		if FFlagRenameDeprecatedUIBloxTokens then
+			return p1.Typography.BodyLarge
+		end
+
+		return p1.Semantic.Typography.Body
+	end
+
+	if FFlagRenameDeprecatedUIBloxTokens then
+		return p1.Typography.CaptionMedium
+	end
+
+	return p1.Semantic.Typography.CaptionHeader
+end
+
+return getGameTileMetadataFont

@@ -1,7 +1,8 @@
-local v0 = require(script.Parent.FFlagAXStrictCheckForPrefetchMarketplace);
-local v1 = v0 and game:DefineFastFlag("AXPrefetchMarketplaceThumbnailsXP", false);
-local v2 = v0 and game:DefineFastFlag("AXPrefetchMarketplaceThumbnailsXPExposure", false);
+local FFlagAXStrictCheckForPrefetchMarketplace = require(script.Parent.FFlagAXStrictCheckForPrefetchMarketplace)
+local v2 = FFlagAXStrictCheckForPrefetchMarketplace and game:DefineFastFlag("AXPrefetchMarketplaceThumbnailsXPV4", false)
+local v3 = FFlagAXStrictCheckForPrefetchMarketplace and game:DefineFastFlag("AXPrefetchMarketplaceThumbnailsXPExposureV4", false)
+
 return {
-    UserIsInTreatment = v1, 
-    UserIsInExperiment = v2
-};
+	UserIsInTreatment = v2,
+	UserIsInExperiment = v3
+}

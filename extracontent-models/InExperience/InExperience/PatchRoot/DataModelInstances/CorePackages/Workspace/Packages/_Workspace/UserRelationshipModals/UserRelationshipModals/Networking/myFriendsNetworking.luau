@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("UserRelationshipModals").Parent;
-local v1 = require(l_Parent_0.FriendsNetworking);
-local v2 = require(script.Parent.myRoduxNetworking);
-return v1.config({
-    roduxNetworking = v2
-});
+local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
+local FriendsNetworking = require(Parent.FriendsNetworking)
+local myRoduxNetworking = require(script.Parent.myRoduxNetworking)
+
+return FriendsNetworking.config({
+	roduxNetworking = myRoduxNetworking
+})

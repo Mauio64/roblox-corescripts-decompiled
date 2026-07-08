@@ -1,91 +1,102 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(script.Parent.CryptoUtils);
-local v2 = require(l_Parent_0.Constants.LegallySensitiveContentConstants);
-local l_Base64_0 = require(l_Parent_0.dependencies).Base64;
-local v4 = require(l_Parent_0.Enums.ConsentName);
-local _ = require(l_Parent_0.Types.LegallySensitiveContentTypes);
-local function v9(v6, v7) --[[ Line: 18 ]] --[[ Name: getAuditDataForConsent ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    local v8 = ({
-        [v4.phoneNumberDiscoverabilityUpsell] = {
-            {
-                consentStringTemplate = v7.phoneNumberDiscoverabilityUpsellNotNow, 
-                sourceContentId = v2.phoneNumberDiscoverabilityUpsell.notNowSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.phoneNumberDiscoverabilityUpsellTurnOn, 
-                sourceContentId = v2.phoneNumberDiscoverabilityUpsell.turnOnSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.phoneNumberDiscoverabilityUpsellTitle, 
-                sourceContentId = v2.phoneNumberDiscoverabilityUpsell.titleSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.phoneNumberDiscoverabilityUpsellContent, 
-                sourceContentId = v2.phoneNumberDiscoverabilityUpsell.contentSourceContentId
-            }
-        }, 
-        [v4.PhotoToAvatar] = {
-            {
-                consentStringTemplate = v7.photoToAvatarTitle, 
-                sourceContentId = v2.photoToAvatar.titleSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.photoToAvatarBodyText, 
-                sourceContentId = v2.photoToAvatar.bodyTextSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.photoToAvatarPrivacyLinkText, 
-                sourceContentId = v2.photoToAvatar.privacyLinkTextSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.photoToAvatarAgreeButton, 
-                sourceContentId = v2.photoToAvatar.agreeButtonSourceContentId
-            }, 
-            {
-                consentStringTemplate = v7.photoToAvatarCancelButton, 
-                sourceContentId = v2.photoToAvatar.cancelButtonSourceContentId
-            }
-        }
-    })[v6];
-    if v8 then
-        return v8;
-    else
-        return {};
-    end;
-end;
-local function v22(v10, v11, v12) --[[ Line: 98 ]] --[[ Name: getAuditHeaderValue ]]
-    -- upvalues: v1 (copy)
-    local v13 = {};
-    for _, v15 in ipairs(v10) do
-        local v16 = {
-            hash = v1.hashStringWithFnv1a32(v15.consentStringTemplate)
-        };
-        if v15.vars ~= nil then
-            for v17, v18 in pairs(v15.vars) do
-                v16[v17] = v18;
-            end;
-        end;
-        v13[v15.sourceContentId] = v16;
-    end;
-    local v19 = {
-        surface = v11, 
-        content = v13
-    };
-    if v12 then
-        for v20, v21 in pairs(v12) do
-            v19[v20] = v21;
-        end;
-    end;
-    return game:GetService("HttpService"):JSONEncode(v19);
-end;
+local ParentParent = script.Parent.Parent
+local CryptoUtils = require(script.Parent.CryptoUtils)
+local LegallySensitiveContentConstants = require(ParentParent.Constants.LegallySensitiveContentConstants)
+local Base64 = require(ParentParent.dependencies).Base64
+local ConsentName = require(ParentParent.Enums.ConsentName)
+
+require(ParentParent.Types.LegallySensitiveContentTypes)
+
+local function getAuditDataForConsent(p1, t1: {[any]: any}) -- line: 18
+	-- upvalues: ConsentName (copy), LegallySensitiveContentConstants (copy)
+	local v10 = ({
+		[ConsentName.phoneNumberDiscoverabilityUpsell] = {
+			{
+				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellNotNow,
+				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.notNowSourceContentId
+			},
+			{
+				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellTurnOn,
+				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.turnOnSourceContentId
+			},
+			{
+				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellTitle,
+				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.titleSourceContentId
+			},
+			{
+				consentStringTemplate = t1.phoneNumberDiscoverabilityUpsellContent,
+				sourceContentId = LegallySensitiveContentConstants.phoneNumberDiscoverabilityUpsell.contentSourceContentId
+			}
+		},
+		[ConsentName.PhotoToAvatar] = {
+			{
+				consentStringTemplate = t1.photoToAvatarTitle,
+				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.titleSourceContentId
+			},
+			{
+				consentStringTemplate = t1.photoToAvatarBodyText,
+				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.bodyTextSourceContentId
+			},
+			{
+				consentStringTemplate = t1.photoToAvatarPrivacyLinkText,
+				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.privacyLinkTextSourceContentId
+			},
+			{
+				consentStringTemplate = t1.photoToAvatarAgreeButton,
+				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.agreeButtonSourceContentId
+			},
+			{
+				consentStringTemplate = t1.photoToAvatarCancelButton,
+				sourceContentId = LegallySensitiveContentConstants.photoToAvatar.cancelButtonSourceContentId
+			}
+		}
+	})[p1]
+
+	if v10 then
+		return v10
+	end
+
+	return {}
+end
+local function getAuditHeaderValue(t2: {[any]: any}, s1: string, t3: {[any]: any}?) -- line: 98
+	-- upvalues: CryptoUtils (copy)
+	local t4 = {}
+
+	for _, v in ipairs(t2) do
+		local t5 = {
+			hash = CryptoUtils.hashStringWithFnv1a32(v.consentStringTemplate)
+		}
+
+		if v.vars ~= nil then
+			for k, v2 in pairs(v.vars) do
+				t5[k] = v2
+			end
+		end
+
+		t4[v.sourceContentId] = t5
+	end
+
+	local t6 = {
+		surface = s1,
+		content = t4
+	}
+
+	if t3 then
+		for k, v in pairs(t3) do
+			t6[k] = v
+		end
+	end
+
+	return game:GetService("HttpService"):JSONEncode(t6)
+end
+
 return {
-    getAuditDataForConsent = v9, 
-    getAuditHeaderValue = v22, 
-    getEncodedAuditHeader = function(v23, v24, v25, v26) --[[ Line: 138 ]] --[[ Name: getEncodedAuditHeader ]]
-        -- upvalues: v9 (copy), v22 (copy), l_Base64_0 (copy)
-        local v27 = v9(v23, v24);
-        local v28 = v22(v27, v25, v26);
-        return (l_Base64_0.EncodeUrl(v28));
-    end
-};
+	getAuditDataForConsent = getAuditDataForConsent,
+	getAuditHeaderValue = getAuditHeaderValue,
+	getEncodedAuditHeader = function(p2, t7: {[any]: any}, s2: string, t8: {[any]: any}?) -- line: 138
+		-- upvalues: getAuditDataForConsent (copy), getAuditHeaderValue (copy), Base64 (copy)
+		local v27 = getAuditDataForConsent(p2, t7)
+		local v28 = getAuditHeaderValue(v27, s2, t8)
+
+		return (Base64.EncodeUrl(v28))
+	end
+}

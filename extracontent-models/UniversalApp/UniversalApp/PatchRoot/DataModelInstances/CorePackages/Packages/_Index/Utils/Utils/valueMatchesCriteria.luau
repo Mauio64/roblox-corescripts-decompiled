@@ -1,34 +1,39 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local l_instanceof_0 = v1.instanceof;
-local v6 = require(l_Parent_0.LuauRegExp);
-local v7 = {};
-local function v8(v9, v10) --[[ Line: 16 ]] --[[ Name: valueMatchesCriteria ]]
-    -- upvalues: l_Array_0 (copy), v8 (copy), l_Boolean_0 (copy), l_Object_0 (copy), l_instanceof_0 (copy), v6 (copy)
-    if v9 == nil then
-        return v9 == v10;
-    elseif l_Array_0.isArray(v9) then
-        return l_Array_0.isArray(v10) and l_Array_0.every(v9, function(v11, v12) --[[ Line: 31 ]]
-            -- upvalues: v8 (ref), v10 (copy)
-            return v8(v11, v10[v12]);
-        end);
-    elseif typeof(v9) == "table" then
-        local v13 = false;
-        if typeof(v10) == "table" then
-            v13 = l_Boolean_0.toJSBoolean(v10) and l_Array_0.every(l_Object_0.keys(v10), function(v14) --[[ Line: 45 ]]
-                -- upvalues: v8 (ref), v9 (copy), v10 (copy)
-                return v8(v9[v14], v10[v14]);
-            end);
-        end;
-        return v13;
-    elseif l_instanceof_0(v10, v6) then
-        return v10:test(v9);
-    else
-        return v9 == v10;
-    end;
-end;
-v7.valueMatchesCriteria = v8;
-return v7;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local instanceof = LuauPolyfill.instanceof
+local LuauRegExp = require(ParentParent.LuauRegExp)
+local t1 = {}
+
+local function valueMatchesCriteria(p1, p2) -- line: 16
+	-- upvalues: Array (copy), valueMatchesCriteria (copy), Boolean (copy), Object (copy), instanceof (copy), LuauRegExp (copy)
+	if p1 == nil then
+		return p1 == p2
+	end
+
+	if Array.isArray(p1) then
+		return Array.isArray(p2) and Array.every(p1, function(p3, p4) -- line: 31
+			-- upvalues: valueMatchesCriteria (copy), p2 (copy)
+			return valueMatchesCriteria(p3, p2[p4])
+		end)
+	end
+
+	if typeof(p1) == "table" then
+		return typeof(p2) == "table" and (Boolean.toJSBoolean(p2) and Array.every(Object.keys(p2), function(p5) -- line: 45
+			-- upvalues: valueMatchesCriteria (copy), p1 (copy), p2 (copy)
+			return valueMatchesCriteria(p1[p5], p2[p5])
+		end))
+	end
+
+	if instanceof(p2, LuauRegExp) then
+		return p2:test(p1)
+	end
+
+	return p1 == p2
+end
+
+t1.valueMatchesCriteria = valueMatchesCriteria
+
+return t1

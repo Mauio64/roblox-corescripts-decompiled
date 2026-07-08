@@ -1,1 +1,1 @@
-return require(script.FriendsHintTile);
+return require(script.FriendsHintTile)

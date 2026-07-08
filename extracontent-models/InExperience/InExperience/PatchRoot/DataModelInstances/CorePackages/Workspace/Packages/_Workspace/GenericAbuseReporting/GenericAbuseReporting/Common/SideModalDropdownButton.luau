@@ -1,68 +1,70 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Icon_0 = v2.Icon;
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local l_ControlState_0 = v2.Enums.ControlState;
-local l_IconSize_0 = v2.Enums.IconSize;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_FFlagPrefillPreciseSelectionChoices_0 = require(l_Parent_0.SharedFlags).FFlagPrefillPreciseSelectionChoices;
-return function(v11) --[[ Line: 29 ]] --[[ Name: SideModalDropdown ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_useLocalization_0 (copy), l_ControlState_0 (copy), l_View_0 (copy), l_FFlagPrefillPreciseSelectionChoices_0 (copy), l_Text_0 (copy), l_Icon_0 (copy), l_IconSize_0 (copy)
-    local v12 = l_useTokens_0();
-    local v13, v14 = v1.useState(false);
-    local v15 = l_useLocalization_0({
-        ChooseOne = "Feature.ReportAbuse.Label.ChooseOne"
-    });
-    local v17 = v1.useCallback(function(v16) --[[ Line: 36 ]]
-        -- upvalues: l_ControlState_0 (ref), v14 (copy)
-        if v16 == l_ControlState_0.Hover then
-            v14(true);
-            return;
-        else
-            v14(false);
-            return;
-        end;
-    end, {
-        v14
-    });
-    return v1.createElement(l_View_0, {
-        Size = if l_FFlagPrefillPreciseSelectionChoices_0 then UDim2.new(1, 0, 0, 48) else UDim2.new(0, 0, 0, 48), 
-        tag = "auto-x radius-medium align-x-left align-y-center padding-xxsmall bg-shift-100", 
-        onStateChanged = v17, 
-        onActivated = v11.onActivated, 
-        LayoutOrder = if l_FFlagPrefillPreciseSelectionChoices_0 then v11.layoutOrder else nil
-    }, {
-        UIStroke = v1.createElement("UIStroke", {
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border, 
-            Color = if v11.isDropdownError then v12.Color.System.Alert.Color3 else v12.Color.Stroke.Default.Color3, 
-            Transparency = if v11.isDropdownError then v12.Color.System.Alert.Transparency else if v13 then v12.Color.Stroke.Emphasis.Transparency else v12.Color.Stroke.Default.Transparency, 
-            Thickness = v12.Stroke.Standard
-        }), 
-        UIListLayout = v1.createElement("UIListLayout", {
-            HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Center
-        }), 
-        Text = v1.createElement(l_Text_0, {
-            Text = v11.text or v15.ChooseOne, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            Size = UDim2.new(1, -44, 1, 0), 
-            tag = "text-truncate-split padding-left-small", 
-            LayoutOrder = 0
-        }), 
-        IconContainer = v1.createElement(l_View_0, {
-            tag = "auto-xy padding-right-small", 
-            LayoutOrder = 1
-        }, {
-            Icon = v1.createElement(l_Icon_0, {
-                name = "icons/actions/truncationExpand", 
-                size = l_IconSize_0.Medium, 
-                LayoutOrder = 1
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local Icon = Foundation.Icon
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local ControlState = Foundation.Enums.ControlState
+local IconSize = Foundation.Enums.IconSize
+local useTokens = Foundation.Hooks.useTokens
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local FFlagPrefillPreciseSelectionChoices = require(Parent.SharedFlags).FFlagPrefillPreciseSelectionChoices
+
+local function SideModalDropdown(t1: {[any]: any}) -- line: 29
+	-- upvalues: useTokens (copy), React (copy), useLocalization (copy), ControlState (copy), View (copy), FFlagPrefillPreciseSelectionChoices (copy), FoundationText (copy), Icon (copy), IconSize (copy)
+	local v14 = useTokens()
+	local v15, v16 = React.useState(false)
+	local v17 = useLocalization({
+		ChooseOne = "Feature.ReportAbuse.Label.ChooseOne"
+	})
+	local v18 = React.useCallback(function(p1) -- line: 36
+		-- upvalues: ControlState (copy), v16 (copy)
+		if p1 == ControlState.Hover then
+			v16(true)
+
+			return
+		end
+
+		v16(false)
+	end, { v16 })
+
+	return React.createElement(View, {
+		tag = "auto-x radius-medium align-x-left align-y-center padding-xxsmall bg-shift-100",
+		Size = if not FFlagPrefillPreciseSelectionChoices then UDim2.new(0, 0, 0, 48) else UDim2.new(1, 0, 0, 48),
+		onStateChanged = v18,
+		onActivated = t1.onActivated,
+		LayoutOrder = if not FFlagPrefillPreciseSelectionChoices then nil else t1.layoutOrder
+	}, {
+		UIStroke = React.createElement("UIStroke", {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Color = if not t1.isDropdownError then v14.Color.Stroke.Default.Color3 else v14.Color.System.Alert.Color3,
+			Transparency = if not t1.isDropdownError then if not v15 then v14.Color.Stroke.Default.Transparency else v14.Color.Stroke.Emphasis.Transparency else v14.Color.System.Alert.Transparency,
+			Thickness = v14.Stroke.Standard
+		}),
+		UIListLayout = React.createElement("UIListLayout", {
+			HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween,
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center
+		}),
+		Text = React.createElement(FoundationText, {
+			tag = "text-truncate-split padding-left-small",
+			LayoutOrder = 0,
+			Text = t1.text or v17.ChooseOne,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Size = UDim2.new(1, -44, 1, 0)
+		}),
+		IconContainer = React.createElement(View, {
+			tag = "auto-xy padding-right-small",
+			LayoutOrder = 1
+		}, {
+			Icon = React.createElement(Icon, {
+				name = "icons/actions/truncationExpand",
+				LayoutOrder = 1,
+				size = IconSize.Medium
+			})
+		})
+	})
+end
+
+return SideModalDropdown

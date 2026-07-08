@@ -1,5 +1,5 @@
 return {
-    None = "None", 
-    Background = "Background", 
-    Border = "Border"
-};
+	None = "None",
+	Background = "Background",
+	Border = "Border"
+}

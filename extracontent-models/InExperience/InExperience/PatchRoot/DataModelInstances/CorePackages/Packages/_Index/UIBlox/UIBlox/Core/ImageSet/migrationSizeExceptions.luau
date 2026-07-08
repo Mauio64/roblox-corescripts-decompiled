@@ -1,4 +1,4 @@
 return {
-    ["play-large"] = true, 
-    tilt = true
-};
+	["play-large"] = true,
+	tilt = true
+}

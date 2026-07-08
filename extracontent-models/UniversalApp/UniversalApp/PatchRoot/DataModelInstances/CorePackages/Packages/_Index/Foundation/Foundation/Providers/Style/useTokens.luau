@@ -1,9 +1,14 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = script:FindFirstAncestor("Foundation").Parent;
-local _ = require(l_Parent_0.Tokens);
-local v3 = require(l_Parent_0.TokensContext);
-local v4 = require(l_Parent_1.React);
-return function() --[[ Line: 10 ]] --[[ Name: useTokens ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    return (v4.useContext(v3));
-end;
+local scriptParent = script.Parent
+local Parent = script:FindFirstAncestor("Foundation").Parent
+
+require(scriptParent.Tokens)
+
+local TokensContext = require(scriptParent.TokensContext)
+local React = require(Parent.React)
+
+local function useTokens() -- line: 10
+	-- upvalues: React (copy), TokensContext (copy)
+	return (React.useContext(TokensContext))
+end
+
+return useTokens

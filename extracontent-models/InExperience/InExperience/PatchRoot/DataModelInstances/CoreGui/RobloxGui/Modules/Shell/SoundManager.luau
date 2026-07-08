@@ -1,168 +1,212 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RunService_0 = game:GetService("RunService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Shell_0 = l_CoreGui_0:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell");
-local l_Utility_0 = require(l_Shell_0:FindFirstChild("Utility"));
-local v5 = {
-    BackgroundLoop = "RobloxMusic.ogg", 
-    Error = "Error.mp3", 
-    ButtonPress = "ButtonPress.mp3", 
-    MoveSelection = "MoveSelection.mp3", 
-    OverlayOpen = "OverlayOpen.mp3", 
-    PopUp = "PopUp.mp3", 
-    PurchaseSuccess = "PurchaseSuccess.mp3", 
-    ScreenChange = "ScreenChange.mp3", 
-    SideMenuSlideIn = "SideMenuSlideIn.mp3"
-};
-local v6 = {};
-local function _(v7, v8, v9, v10) --[[ Line: 33 ]] --[[ Name: EaseOutCirc ]]
-    v7 = v7 / v10 - 1;
-    return v9 * math.sqrt(1 - v7 * v7) + v8;
-end;
-local function v12() --[[ Line: 39 ]] --[[ Name: IsGameRunning ]]
-    -- upvalues: l_RunService_0 (copy)
-    if not UserSettings().GameSettings:InStudioMode() or game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Windows then
-        return true;
-    else
-        return l_RunService_0:IsRunning();
-    end;
-end;
-GetSoundManager = function() --[[ Line: 46 ]]
-    -- upvalues: v6 (copy), v5 (copy), v12 (copy), l_Utility_0 (copy), l_CoreGui_0 (copy), l_GuiService_0 (copy)
-    local v13 = {
-        SoundHolder = nil
-    };
-    local v14 = {};
-    local function _(v15) --[[ Line: 53 ]] --[[ Name: FindSoundObjectForName ]]
-        -- upvalues: v6 (ref)
-        if v6[v15] then
-            local v16 = table.remove(v6[v15], 1);
-            if v16 then
-                table.insert(v6[v15], v16);
-                return v16;
-            end;
-        end;
-    end;
-    v13.CreateSound = function(_, v19) --[[ Line: 63 ]] --[[ Name: CreateSound ]]
-        -- upvalues: v5 (ref)
-        local v20 = "rbxasset://sounds/ui/Shell/" .. v5[v19];
-        local l_Sound_0 = Instance.new("Sound");
-        l_Sound_0.Name = v19;
-        l_Sound_0.SoundId = v20;
-        return l_Sound_0;
-    end;
-    v13.Play = function(_, v23, v24, v25, v26, ...) --[[ Line: 74 ]] --[[ Name: Play ]]
-        -- upvalues: v5 (ref), v6 (ref), v14 (copy), v12 (ref)
-        local v27 = false;
-        local v28 = nil;
-        if v5[v23] then
-            local v29;
-            if v6[v23] then
-                local v30 = table.remove(v6[v23], 1);
-                if v30 then
-                    table.insert(v6[v23], v30);
-                    v29 = v30;
-                    v27 = true;
-                end;
-            end;
-            if not v27 then
-                v29 = nil;
-            end;
-            v27 = false;
-            if v29 then
-                v29.Volume = v24 or 1;
-                v29.Looped = v25 or false;
-                v29.Pitch = v26 or 1;
-                v29:Play(...);
-                v14[v29] = v29.Volume;
-                if not v12() then
-                    v29.Volume = 0;
-                end;
-                return v29;
-            end;
-        else
-            spawn(function() --[[ Line: 95 ]]
-                -- upvalues: v23 (copy)
-                error("Unable to find sound: " .. tostring(v23));
-            end);
-        end;
-        return v28;
-    end;
-    v13.IsPlaying = function(_, v32) --[[ Line: 103 ]] --[[ Name: IsPlaying ]]
-        -- upvalues: v13 (copy)
-        local l_FirstChild_0 = v13.SoundHolder:FindFirstChild(v32);
-        if l_FirstChild_0 then
-            return l_FirstChild_0.IsPlaying;
-        else
-            return false;
-        end;
-    end;
-    v13.Stop = function(_, v35, ...) --[[ Line: 111 ]] --[[ Name: Stop ]]
-        -- upvalues: v13 (copy), v5 (ref)
-        if v13.SoundHolder and v5[v35] then
-            local l_FirstChild_1 = v13.SoundHolder:FindFirstChild(v35);
-            if l_FirstChild_1 then
-                l_FirstChild_1:Stop();
-            end;
-        end;
-    end;
-    v13.TweenSound = function(_, v38, v39, v40) --[[ Line: 120 ]] --[[ Name: TweenSound ]]
-        -- upvalues: v14 (copy), l_Utility_0 (ref), v12 (ref)
-        v14[v38] = nil;
-        l_Utility_0.PropertyTweener(v38, "Volume", v38.Volume, v39, v40, function(...) --[[ Line: 123 ]]
-            -- upvalues: v12 (ref), l_Utility_0 (ref)
-            return v12() and l_Utility_0.EaseInOutQuad(...) or 0;
-        end, true, function() --[[ Line: 127 ]]
-            -- upvalues: v14 (ref), v38 (copy), v39 (copy)
-            v14[v38] = v39;
-        end);
-    end;
-    (function() --[[ Line: 138 ]] --[[ Name: Initialize ]]
-        -- upvalues: l_CoreGui_0 (ref), v13 (copy), v5 (ref), v6 (ref), l_GuiService_0 (ref), v12 (ref), v14 (copy)
-        local l_Folder_0 = Instance.new("Folder");
-        l_Folder_0.Name = "AppShellSounds";
-        l_Folder_0.Parent = l_CoreGui_0;
-        v13.SoundHolder = l_Folder_0;
-        for v42, _ in pairs(v5) do
-            local l_Folder_1 = Instance.new("Folder");
-            l_Folder_1.Name = v42;
-            l_Folder_1.Parent = v13.SoundHolder;
-            v6[v42] = {};
-            local l_v13_Sound_0 = v13:CreateSound(v42);
-            l_v13_Sound_0.Parent = l_Folder_1;
-            table.insert(v6[v42], l_v13_Sound_0);
-            l_v13_Sound_0 = v13:CreateSound(v42);
-            l_v13_Sound_0.Parent = l_Folder_1;
-            table.insert(v6[v42], l_v13_Sound_0);
-            l_v13_Sound_0 = v13:CreateSound(v42);
-            l_v13_Sound_0.Parent = l_Folder_1;
-            table.insert(v6[v42], l_v13_Sound_0);
-        end;
-        local v46 = nil;
-        l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):connect(function() --[[ Line: 159 ]]
-            -- upvalues: l_GuiService_0 (ref), v46 (ref)
-            local l_SelectedCoreObject_0 = l_GuiService_0.SelectedCoreObject;
-            if l_SelectedCoreObject_0 and v46 then
-                local l_MoveSelection_0 = l_SelectedCoreObject_0:FindFirstChild("MoveSelection");
-                if l_MoveSelection_0 and l_MoveSelection_0:IsA("Sound") then
-                    l_MoveSelection_0.Volume = 0.35;
-                    l_MoveSelection_0:Play();
-                end;
-            end;
-            v46 = l_SelectedCoreObject_0;
-        end);
-        if not v12() then
-            spawn(function() --[[ Line: 172 ]]
-                -- upvalues: v12 (ref), v14 (ref)
-                while not v12() do
-                    wait(0.1);
-                end;
-                for v49, v50 in pairs(v14) do
-                    v49.Volume = v50;
-                end;
-            end);
-        end;
-    end)();
-    return v13;
-end;
-return GetSoundManager();
+local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Shell = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Shell")
+local Utility = require(Shell:FindFirstChild("Utility"))
+local t1 = {
+	BackgroundLoop = "RobloxMusic.ogg",
+	Error = "Error.mp3",
+	ButtonPress = "ButtonPress.mp3",
+	MoveSelection = "MoveSelection.mp3",
+	OverlayOpen = "OverlayOpen.mp3",
+	PopUp = "PopUp.mp3",
+	PurchaseSuccess = "PurchaseSuccess.mp3",
+	ScreenChange = "ScreenChange.mp3",
+	SideMenuSlideIn = "SideMenuSlideIn.mp3"
+}
+local t2 = {}
+
+local function EaseOutCirc(p1, p2, p3, p4) -- line: 33
+	local v14 = p1 / p4 - 1
+
+	return p3 * math.sqrt(1 - v14 * v14) + p2
+end
+local function IsGameRunning() -- line: 39
+	-- upvalues: RunService (copy)
+	if not UserSettings().GameSettings:InStudioMode() or game:GetService("UserInputService"):GetPlatform() == Enum.Platform.Windows then
+		return true
+	end
+
+	return RunService:IsRunning()
+end
+
+function GetSoundManager() -- line: 46
+	-- upvalues: t2 (copy), t1 (copy), IsGameRunning (copy), Utility (copy), CoreGui (copy), GuiService (copy)
+	local t3 = {
+		SoundHolder = nil
+	}
+	local t4 = {}
+
+	local function FindSoundObjectForName(p5) -- line: 53
+		-- upvalues: t2 (copy)
+		if t2[p5] then
+			local v20 = table.remove(t2[p5], 1)
+
+			if v20 then
+				table.insert(t2[p5], v20)
+
+				return v20
+			end
+		end
+	end
+
+	function t3.CreateSound(_, p7) -- line: 63
+		-- upvalues: t1 (copy)
+		local v23 = "rbxasset://sounds/ui/Shell/" .. t1[p7]
+		local Sound = Instance.new("Sound")
+
+		Sound.Name = p7
+		Sound.SoundId = v23
+
+		return Sound
+	end
+	function t3.Play(_, p9, p10, p11, p12, ...) -- line: 74
+		-- upvalues: t1 (copy), t2 (copy), t4 (copy), IsGameRunning (copy)
+		if not t1[p9] then
+			spawn(function() -- line: 95
+				-- upvalues: p9 (copy)
+				error("Unable to find sound: " .. tostring(p9))
+			end)
+
+			return nil
+		end
+
+		local g30 = nil
+		local v31 = nil
+
+		repeat
+			if g30 or t2[p9] then
+				if not g30 then
+					v31 = table.remove(t2[p9], 1)
+				end
+
+				if g30 or v31 then
+					if not g30 then
+						table.insert(t2[p9], v31)
+					end
+
+					g30 = false
+
+					if v31 then
+						v31.Volume = p10 or 1
+						v31.Looped = p11 or false
+						v31.Pitch = p12 or 1
+						v31:Play(...)
+						t4[v31] = v31.Volume
+
+						if not IsGameRunning() then
+							v31.Volume = 0
+						end
+
+						return v31
+					end
+
+					return nil
+				end
+			end
+
+			v31 = nil
+			g30 = true
+		until not g30
+	end
+	function t3.IsPlaying(_, p14) -- line: 103
+		-- upvalues: t3 (copy)
+		local p14_2 = t3.SoundHolder:FindFirstChild(p14)
+
+		if p14_2 then
+			return p14_2.IsPlaying
+		end
+
+		return false
+	end
+	function t3.Stop(_, p16, ...) -- line: 111
+		-- upvalues: t3 (copy), t1 (copy)
+		if t3.SoundHolder and t1[p16] then
+			local p16_2 = t3.SoundHolder:FindFirstChild(p16)
+
+			if p16_2 then
+				p16_2:Stop()
+			end
+		end
+	end
+	function t3.TweenSound(_, p18, p19, p20) -- line: 120
+		-- upvalues: t4 (copy), Utility (copy), IsGameRunning (copy)
+		t4[p18] = nil
+		Utility.PropertyTweener(p18, "Volume", p18.Volume, p19, p20, function(...) -- line: 123
+			-- upvalues: IsGameRunning (copy), Utility (copy)
+			return IsGameRunning() and Utility.EaseInOutQuad(...) or 0
+		end, true, function() -- line: 127
+			-- upvalues: t4 (copy), p18 (copy), p19 (copy)
+			t4[p18] = p19
+		end)
+	end
+
+	local function Initialize() -- line: 138
+		-- upvalues: CoreGui (copy), t3 (copy), t1 (copy), t2 (copy), GuiService (copy), IsGameRunning (copy), t4 (copy)
+		local Folder = Instance.new("Folder")
+
+		Folder.Name = "AppShellSounds"
+		Folder.Parent = CoreGui
+		t3.SoundHolder = Folder
+
+		for k, _ in pairs(t1) do
+			local Folder2 = Instance.new("Folder")
+
+			Folder2.Name = k
+			Folder2.Parent = t3.SoundHolder
+			t2[k] = {}
+
+			local v46 = t3:CreateSound(k)
+
+			v46.Parent = Folder2
+			table.insert(t2[k], v46)
+
+			local v47 = t3:CreateSound(k)
+
+			v47.Parent = Folder2
+			table.insert(t2[k], v47)
+
+			local v48 = t3:CreateSound(k)
+
+			v48.Parent = Folder2
+			table.insert(t2[k], v48)
+		end
+
+		local u49 = nil
+
+		GuiService:GetPropertyChangedSignal("SelectedCoreObject"):connect(function() -- line: 159
+			-- upvalues: GuiService (copy), u49 (ref)
+			local SelectedCoreObject = GuiService.SelectedCoreObject
+
+			if SelectedCoreObject and u49 then
+				local MoveSelection = SelectedCoreObject:FindFirstChild("MoveSelection")
+
+				if MoveSelection and MoveSelection:IsA("Sound") then
+					MoveSelection.Volume = 0.35
+					MoveSelection:Play()
+				end
+			end
+
+			u49 = SelectedCoreObject
+		end)
+
+		if not IsGameRunning() then
+			spawn(function() -- line: 172
+				-- upvalues: IsGameRunning (copy), t4 (copy)
+				while not IsGameRunning() do
+					wait(0.1)
+				end
+
+				for k, v in pairs(t4) do
+					k.Volume = v
+				end
+			end)
+		end
+	end
+
+	Initialize()
+
+	return t3
+end
+
+return GetSoundManager()

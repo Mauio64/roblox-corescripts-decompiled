@@ -1,75 +1,86 @@
-local v0 = require(script.Parent.Parent.Resources.Constants);
-local v1 = {};
-v1.__index = v1;
-v1.new = function(v2, v3) --[[ Line: 6 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy)
-    local v4 = {
-        _eventStreamImpl = v2, 
-        _target = "EventIngest", 
-        _context = v3 or "SettingsHub"
-    };
-    setmetatable(v4, v1);
-    return v4;
-end;
-v1.onToggleMuteAll = function(v5, v6) --[[ Line: 17 ]] --[[ Name: onToggleMuteAll ]]
-    if v6 then
-        v5:onMuteAll();
-        return;
-    else
-        v5:onUnmuteAll();
-        return;
-    end;
-end;
-v1.onToggleMuteSelf = function(v7, v8) --[[ Line: 25 ]] --[[ Name: onToggleMuteSelf ]]
-    if v8 then
-        v7:onMuteSelf();
-        return;
-    else
-        v7:onUnmuteSelf();
-        return;
-    end;
-end;
-v1.onToggleMutePlayer = function(v9, v10, v11) --[[ Line: 33 ]] --[[ Name: onToggleMutePlayer ]]
-    if v11 then
-        v9:onMutePlayer(v10);
-        return;
-    else
-        v9:onUnmutePlayer(v10);
-        return;
-    end;
-end;
-v1.onMuteSelf = function(v12) --[[ Line: 41 ]] --[[ Name: onMuteSelf ]]
-    -- upvalues: v0 (copy)
-    local l_MuteSelf_0 = v0.VoiceAnalytics.MuteSelf;
-    v12._eventStreamImpl:setRBXEventStream(v12._target, v12._context, l_MuteSelf_0, {});
-end;
-v1.onUnmuteSelf = function(v14) --[[ Line: 46 ]] --[[ Name: onUnmuteSelf ]]
-    -- upvalues: v0 (copy)
-    local l_UnmuteSelf_0 = v0.VoiceAnalytics.UnmuteSelf;
-    v14._eventStreamImpl:setRBXEventStream(v14._target, v14._context, l_UnmuteSelf_0, {});
-end;
-v1.onMuteAll = function(v16) --[[ Line: 51 ]] --[[ Name: onMuteAll ]]
-    -- upvalues: v0 (copy)
-    local l_MuteAll_0 = v0.VoiceAnalytics.MuteAll;
-    v16._eventStreamImpl:setRBXEventStream(v16._target, v16._context, l_MuteAll_0, {});
-end;
-v1.onUnmuteAll = function(v18) --[[ Line: 56 ]] --[[ Name: onUnmuteAll ]]
-    -- upvalues: v0 (copy)
-    local l_UnmuteAll_0 = v0.VoiceAnalytics.UnmuteAll;
-    v18._eventStreamImpl:setRBXEventStream(v18._target, v18._context, l_UnmuteAll_0, {});
-end;
-v1.onMutePlayer = function(v20, v21) --[[ Line: 61 ]] --[[ Name: onMutePlayer ]]
-    -- upvalues: v0 (copy)
-    local l_MutePlayer_0 = v0.VoiceAnalytics.MutePlayer;
-    v20._eventStreamImpl:setRBXEventStream(v20._target, v20._context, l_MutePlayer_0, {
-        mutedUserId = v21
-    });
-end;
-v1.onUnmutePlayer = function(v23, v24) --[[ Line: 68 ]] --[[ Name: onUnmutePlayer ]]
-    -- upvalues: v0 (copy)
-    local l_UnmutePlayer_0 = v0.VoiceAnalytics.UnmutePlayer;
-    v23._eventStreamImpl:setRBXEventStream(v23._target, v23._context, l_UnmutePlayer_0, {
-        mutedUserId = v24
-    });
-end;
-return v1;
+local Constants = require(script.Parent.Parent.Resources.Constants)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2) -- line: 6
+	-- upvalues: t1 (copy)
+	local t2 = {
+		_target = "EventIngest",
+		_eventStreamImpl = p1,
+		_context = p2 or "SettingsHub"
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.onToggleMuteAll(p3, p4) -- line: 17
+	if p4 then
+		p3:onMuteAll()
+
+		return
+	end
+
+	p3:onUnmuteAll()
+end
+function t1.onToggleMuteSelf(p5, p6) -- line: 25
+	if p6 then
+		p5:onMuteSelf()
+
+		return
+	end
+
+	p5:onUnmuteSelf()
+end
+function t1.onToggleMutePlayer(p7, p8, p9) -- line: 33
+	if p9 then
+		p7:onMutePlayer(p8)
+
+		return
+	end
+
+	p7:onUnmutePlayer(p8)
+end
+function t1.onMuteSelf(p10) -- line: 41
+	-- upvalues: Constants (copy)
+	local MuteSelf = Constants.VoiceAnalytics.MuteSelf
+
+	p10._eventStreamImpl:setRBXEventStream(p10._target, p10._context, MuteSelf, {})
+end
+function t1.onUnmuteSelf(p11) -- line: 46
+	-- upvalues: Constants (copy)
+	local UnmuteSelf = Constants.VoiceAnalytics.UnmuteSelf
+
+	p11._eventStreamImpl:setRBXEventStream(p11._target, p11._context, UnmuteSelf, {})
+end
+function t1.onMuteAll(p12) -- line: 51
+	-- upvalues: Constants (copy)
+	local MuteAll = Constants.VoiceAnalytics.MuteAll
+
+	p12._eventStreamImpl:setRBXEventStream(p12._target, p12._context, MuteAll, {})
+end
+function t1.onUnmuteAll(p13) -- line: 56
+	-- upvalues: Constants (copy)
+	local UnmuteAll = Constants.VoiceAnalytics.UnmuteAll
+
+	p13._eventStreamImpl:setRBXEventStream(p13._target, p13._context, UnmuteAll, {})
+end
+function t1.onMutePlayer(p14, p15) -- line: 61
+	-- upvalues: Constants (copy)
+	local MutePlayer = Constants.VoiceAnalytics.MutePlayer
+
+	p14._eventStreamImpl:setRBXEventStream(p14._target, p14._context, MutePlayer, {
+		mutedUserId = p15
+	})
+end
+function t1.onUnmutePlayer(p16, p17) -- line: 68
+	-- upvalues: Constants (copy)
+	local UnmutePlayer = Constants.VoiceAnalytics.UnmutePlayer
+
+	p16._eventStreamImpl:setRBXEventStream(p16._target, p16._context, UnmutePlayer, {
+		mutedUserId = p17
+	})
+end
+
+return t1

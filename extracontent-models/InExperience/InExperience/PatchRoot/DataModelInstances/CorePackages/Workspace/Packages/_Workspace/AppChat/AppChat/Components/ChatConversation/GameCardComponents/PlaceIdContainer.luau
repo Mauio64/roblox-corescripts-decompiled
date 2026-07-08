@@ -1,122 +1,127 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_FFlagLuaAppDefaultHttpRetry_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppDefaultHttpRetry;
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.React);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_memo_0 = v4.memo;
-local l_useCallback_0 = v4.useCallback;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v4.useEffect;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v11 = require(l_Parent_0.Loggers).Logger:new("PlaceIdContainer");
-local l_ApiFetchPlaceInfos_0 = require(l_Parent_0.PlaceInfoRodux).Thunks.ApiFetchPlaceInfos;
-local v13 = require(script.Parent.GameCardGroupable);
-local v14 = require(script.Parent.GameCardContainer);
-local v15 = require(script.Parent.GameCardError);
-local v16 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatInvalidGameLinkCard);
-local v17 = require(l_Parent_0.HttpRequest);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v22 = {
-    networkImpl = v17.config({
-        requestFunction = function(v19, v20, v21) --[[ Line: 35 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v11 (copy), v17 (copy)
-            v11:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v20, v19));
-            return v17.requestFunctions.HttpRbxApi(v19, v20, v21);
-        end, 
-        maxRetryCount = if l_FFlagLuaAppDefaultHttpRetry_0 then game:DefineFastInt("PlaceIdContainerHttpRetryCount", 4) else nil
-    })
-};
-local function _(v23, v24) --[[ Line: 55 ]] --[[ Name: getPlaceInfo ]]
-    return v23.ChatAppReducer.PlaceInfos[v24] or {};
-end;
-PlaceIdContainer = function(v26) --[[ Line: 59 ]] --[[ Name: PlaceIdContainer ]]
-    -- upvalues: v3 (copy), v22 (copy), l_useDispatch_0 (copy), l_useCallback_0 (copy), l_ApiFetchPlaceInfos_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_useSelector_0 (copy), v16 (copy), v4 (copy), l_useEffect_0 (copy), v15 (copy), v13 (copy), v14 (copy)
-    local v27 = v3.Dictionary.join(v22, v26);
-    local v28 = l_useDispatch_0();
-    local v31 = l_useCallback_0(function(v29, v30) --[[ Line: 63 ]]
-        -- upvalues: v28 (copy), l_ApiFetchPlaceInfos_0 (ref)
-        return v28(l_ApiFetchPlaceInfos_0(v29, {
-            v30
-        }));
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v28
-    } else l_dependencyArray_0(v28));
-    local v34 = l_useSelector_0(function(v32) --[[ Line: 67 ]]
-        -- upvalues: v27 (copy)
-        local l_placeId_0 = v27.placeId;
-        l_placeId_0 = (v32.ChatAppReducer.PlaceInfos[l_placeId_0] or {}).universeId;
-        return l_placeId_0 and tostring(l_placeId_0) or nil;
-    end);
-    local v35 = if v16 then v4.useRef(nil) else {
-        current = nil
-    };
-    local v36 = nil;
-    local v37 = nil;
-    if v16 then
-        local v38, v39 = v4.useState(false);
-        v36 = v38;
-        v37 = v39;
-    end;
-    l_useEffect_0(function() --[[ Line: 81 ]]
-        -- upvalues: v27 (copy), v31 (copy), v16 (ref), v3 (ref), v34 (copy), v35 (copy), v37 (ref)
-        local l_networkImpl_0 = v27.networkImpl;
-        local v41 = false;
-        v31(l_networkImpl_0, v27.placeId):andThen(function(v42) --[[ Line: 85 ]]
-            -- upvalues: v16 (ref), v41 (ref), v3 (ref)
-            if v16 then
-                v41 = not v3.isEmpty(v42);
-            end;
-        end);
-        if v16 then
-            if not v34 then
-                if v35.current then
-                    task.cancel(v35.current);
-                end;
-                v35.current = task.delay(1, function() --[[ Line: 97 ]]
-                    -- upvalues: v41 (ref), v37 (ref), v35 (ref)
-                    if not v41 then
-                        v37(true);
-                    end;
-                    v35.current = nil;
-                end);
-            end;
-            return function() --[[ Line: 105 ]]
-                -- upvalues: v35 (ref)
-                if v35.current then
-                    task.cancel(v35.current);
-                    v35.current = nil;
-                end;
-            end;
-        else
-            return;
-        end;
-    end, {});
-    if v16 then
-        l_useEffect_0(function() --[[ Line: 117 ]]
-            -- upvalues: v34 (copy), v35 (copy)
-            if v34 and v35.current then
-                task.cancel(v35.current);
-                v35.current = nil;
-            end;
-        end, {
-            v34
-        });
-    end;
-    if not v34 then
-        if v16 and v36 then
-            return v4.createElement(v15, {});
-        else
-            return v4.createElement(v13, {
-                isLoading = true, 
-                gameName = "", 
-                gameThumbnail = ""
-            });
-        end;
-    else
-        return v4.createElement(v14, v3.Dictionary.join(v27, {
-            universeId = v34
-        }));
-    end;
-end;
-return l_memo_0(PlaceIdContainer);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local FFlagLuaAppDefaultHttpRetry = require(AppChatParent.SharedFlags).FFlagLuaAppDefaultHttpRetry
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local memo = React.memo
+local useCallback = React.useCallback
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local v11 = require(AppChatParent.Loggers).Logger:new("PlaceIdContainer")
+local ApiFetchPlaceInfos = require(AppChatParent.PlaceInfoRodux).Thunks.ApiFetchPlaceInfos
+local GameCardGroupable = require(script.Parent.GameCardGroupable)
+local GameCardContainer = require(script.Parent.GameCardContainer)
+local GameCardError = require(script.Parent.GameCardError)
+local FFlagAppChatInvalidGameLinkCard = require(AppChat.Flags.FFlagAppChatInvalidGameLinkCard)
+local HttpRequest = require(AppChatParent.HttpRequest)
+local t1 = {
+	networkImpl = HttpRequest.config({
+		requestFunction = function(p1, p2, p3) -- line: 32
+			-- upvalues: v11 (copy), HttpRequest (copy)
+			v11:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+			return HttpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+		end,
+		maxRetryCount = if not FFlagLuaAppDefaultHttpRetry then nil else game:DefineFastInt("PlaceIdContainerHttpRetryCount", 4)
+	})
+}
+
+local function getPlaceInfo(p4, p5) -- line: 52
+	return p4.ChatAppReducer.PlaceInfos[p5] or {}
+end
+
+function PlaceIdContainer(p6) -- line: 56
+	-- upvalues: Cryo (copy), t1 (copy), useDispatch (copy), useCallback (copy), ApiFetchPlaceInfos (copy), useSelector (copy), FFlagAppChatInvalidGameLinkCard (copy), React (copy), useEffect (copy), GameCardError (copy), GameCardGroupable (copy), GameCardContainer (copy)
+	local v26 = Cryo.Dictionary.join(t1, p6)
+	local v27 = useDispatch()
+	local v28 = useCallback(function(p7, p8) -- line: 60
+		-- upvalues: v27 (copy), ApiFetchPlaceInfos (copy)
+		return v27(ApiFetchPlaceInfos(p7, { p8 }))
+	end, { v27 })
+	local v29 = useSelector(function(p9) -- line: 64
+		-- upvalues: v26 (copy)
+		local placeId = v26.placeId
+		local universeId = (p9.ChatAppReducer.PlaceInfos[placeId] or {}).universeId
+
+		return universeId and tostring(universeId) or nil
+	end)
+	local v30 = if not FFlagAppChatInvalidGameLinkCard then {
+		current = nil
+	} else React.useRef(nil)
+	local v31 = nil
+	local u32 = nil
+
+	if FFlagAppChatInvalidGameLinkCard then
+		local v33
+
+		v31, v33 = React.useState(false)
+		u32 = v33
+	end
+
+	useEffect(function() -- line: 78
+		-- upvalues: v26 (copy), v28 (copy), FFlagAppChatInvalidGameLinkCard (copy), Cryo (copy), v29 (copy), v30 (copy), u32 (ref)
+		local networkImpl = v26.networkImpl
+		local u40 = false
+
+		v28(networkImpl, v26.placeId):andThen(function(p10) -- line: 82
+			-- upvalues: FFlagAppChatInvalidGameLinkCard (copy), u40 (ref), Cryo (copy)
+			if FFlagAppChatInvalidGameLinkCard then
+				u40 = not Cryo.isEmpty(p10)
+			end
+		end)
+
+		if FFlagAppChatInvalidGameLinkCard then
+			if not v29 then
+				if v30.current then
+					task.cancel(v30.current)
+				end
+
+				v30.current = task.delay(1, function() -- line: 94
+					-- upvalues: u40 (ref), u32 (ref), v30 (copy)
+					if not u40 then
+						u32(true)
+					end
+
+					v30.current = nil
+				end)
+			end
+
+			return function() -- line: 102
+				-- upvalues: v30 (copy)
+				if v30.current then
+					task.cancel(v30.current)
+					v30.current = nil
+				end
+			end
+		end
+	end, {})
+
+	if FFlagAppChatInvalidGameLinkCard then
+		useEffect(function() -- line: 114
+			-- upvalues: v29 (copy), v30 (copy)
+			if v29 and v30.current then
+				task.cancel(v30.current)
+				v30.current = nil
+			end
+		end, { v29 })
+	end
+
+	if not v29 then
+		if FFlagAppChatInvalidGameLinkCard and v31 then
+			return React.createElement(GameCardError, {})
+		end
+
+		return React.createElement(GameCardGroupable, {
+			isLoading = true,
+			gameName = "",
+			gameThumbnail = ""
+		})
+	end
+
+	return React.createElement(GameCardContainer, Cryo.Dictionary.join(v26, {
+		universeId = v29
+	}))
+end
+
+return memo(PlaceIdContainer)

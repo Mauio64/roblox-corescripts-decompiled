@@ -1,68 +1,76 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1, v2) --[[ Line: 19 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v3 = {};
-    setmetatable(v3, v0);
-    v3._id = v1;
-    v3._parent = v2;
-    v3._children = {};
-    return v3;
-end;
-v0.getValue = function(v4) --[[ Line: 29 ]] --[[ Name: getValue ]]
-    return v4._value;
-end;
-v0.getLabel = function(v5) --[[ Line: 33 ]] --[[ Name: getLabel ]]
-    return v5._label;
-end;
-v0.getChildren = function(v6) --[[ Line: 37 ]] --[[ Name: getChildren ]]
-    return v6._children;
-end;
-v0.getId = function(v7) --[[ Line: 41 ]] --[[ Name: getId ]]
-    return v7._id;
-end;
-v0.getStackDepth = function(v8) --[[ Line: 45 ]] --[[ Name: getStackDepth ]]
-    if v8._parent == nil then
-        return 0;
-    else
-        return 1 + v8._parent:getStackDepth();
-    end;
-end;
-v0.setLabelAndValue = function(v9, v10, v11) --[[ Line: 53 ]] --[[ Name: setLabelAndValue ]]
-    v9._label = v10;
-    v9._value = v11;
-end;
-v0.getOrMakeChildById = function(v12, v13) --[[ Line: 58 ]] --[[ Name: getOrMakeChildById ]]
-    -- upvalues: v0 (copy)
-    for _, v15 in ipairs(v12._children) do
-        if v15:getId() == v13 then
-            return v15;
-        end;
-    end;
-    local v16 = v0.new(v13, v12);
-    table.insert(v12._children, v16);
-    return v16;
-end;
-v0.removeChildren = function(v17) --[[ Line: 70 ]] --[[ Name: removeChildren ]]
-    if not v17._children then
-        return;
-    else
-        for _, v19 in ipairs(v17._children) do
-            v19:removeChildren();
-            v19 = nil;
-        end;
-        v17._id = nil;
-        v17._parent = nil;
-        v17._children = nil;
-        return;
-    end;
-end;
-v0.removeChild = function(v20, v21) --[[ Line: 82 ]] --[[ Name: removeChild ]]
-    for _, v23 in ipairs(v20._children) do
-        if v23:getId() == v21 then
-            v23:removeChildren();
-            return;
-        end;
-    end;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2) -- line: 19
+	-- upvalues: t1 (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._id = p1
+	t2._parent = p2
+	t2._children = {}
+
+	return t2
+end
+function t1.getValue(p3) -- line: 29
+	return p3._value
+end
+function t1.getLabel(p4) -- line: 33
+	return p4._label
+end
+function t1.getChildren(p5) -- line: 37
+	return p5._children
+end
+function t1.getId(p6) -- line: 41
+	return p6._id
+end
+function t1.getStackDepth(p7) -- line: 45
+	if p7._parent == nil then
+		return 0
+	end
+
+	return 1 + p7._parent:getStackDepth()
+end
+function t1.setLabelAndValue(p8, p9, p10) -- line: 53
+	p8._label = p9
+	p8._value = p10
+end
+function t1.getOrMakeChildById(p11, p12) -- line: 58
+	-- upvalues: t1 (copy)
+	for _, v in ipairs(p11._children) do
+		if p12 == v:getId() then
+			return v
+		end
+	end
+
+	local v17 = t1.new(p12, p11)
+
+	table.insert(p11._children, v17)
+
+	return v17
+end
+function t1.removeChildren(p13) -- line: 70
+	if not p13._children then
+		return
+	end
+
+	for _, v in ipairs(p13._children) do
+		v:removeChildren()
+	end
+
+	p13._id = nil
+	p13._parent = nil
+	p13._children = nil
+end
+function t1.removeChild(p14, p15) -- line: 82
+	for _, v in ipairs(p14._children) do
+		if p15 == v:getId() then
+			v:removeChildren()
+
+			return
+		end
+	end
+end
+
+return t1

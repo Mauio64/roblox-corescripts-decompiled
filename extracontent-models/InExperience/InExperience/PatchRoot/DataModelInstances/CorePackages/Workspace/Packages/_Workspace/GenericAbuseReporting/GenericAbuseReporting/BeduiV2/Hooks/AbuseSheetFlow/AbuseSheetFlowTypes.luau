@@ -1,5 +1,6 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Components.Nodes.ListNode);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Utils.Translate.translate);
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Types);
-return {};
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+
+require(GenericAbuseReporting.BeduiV2.Utils.Translate.translate)
+require(GenericAbuseReporting.BeduiV2.Types)
+
+return {}

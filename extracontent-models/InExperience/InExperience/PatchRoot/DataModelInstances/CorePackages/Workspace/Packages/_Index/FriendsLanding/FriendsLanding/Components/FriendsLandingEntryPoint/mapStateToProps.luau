@@ -1,15 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_getDeepValue_0 = v1.SocialLibraries.Dictionary.getDeepValue;
-local l_FriendsNetworking_0 = v1.FriendsNetworking;
-return function(v4) --[[ Line: 8 ]]
-    -- upvalues: l_getDeepValue_0 (copy), l_FriendsNetworking_0 (copy)
-    local v5 = l_getDeepValue_0(v4, string.format("FriendsLanding.Friends.byUserId.%s", v4.LocalUserId));
-    return {
-        localUserId = v4.LocalUserId, 
-        screenSize = v4.ScreenSize, 
-        inactiveFriendsNetworkRequestStatus = l_FriendsNetworking_0.GetInactiveFriends.getStatus(v4, v4.LocalUserId), 
-        friendRequestCount = l_getDeepValue_0(v4, "FriendsLanding.Friends.requests.receivedCount") or 0, 
-        totalFriendCount = v5 and #v5 or 0
-    };
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
+local FriendsNetworking = dependencies.FriendsNetworking
+
+return function(p1) -- line: 8
+	-- upvalues: getDeepValue (copy), FriendsNetworking (copy)
+	local v6 = getDeepValue(p1, string.format("FriendsLanding.Friends.byUserId.%s", p1.LocalUserId))
+
+	return {
+		localUserId = p1.LocalUserId,
+		screenSize = p1.ScreenSize,
+		inactiveFriendsNetworkRequestStatus = FriendsNetworking.GetInactiveFriends.getStatus(p1, p1.LocalUserId),
+		friendRequestCount = getDeepValue(p1, "FriendsLanding.Friends.requests.receivedCount") or 0,
+		totalFriendCount = v6 and #v6 or 0
+	}
+end

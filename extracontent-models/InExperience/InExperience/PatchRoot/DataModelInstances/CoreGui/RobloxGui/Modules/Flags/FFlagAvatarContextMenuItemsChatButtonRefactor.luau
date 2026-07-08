@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AvatarContextMenuItemsChatButtonRefactor", false);
+return game:DefineFastFlag("AvatarContextMenuItemsChatButtonRefactor", false)

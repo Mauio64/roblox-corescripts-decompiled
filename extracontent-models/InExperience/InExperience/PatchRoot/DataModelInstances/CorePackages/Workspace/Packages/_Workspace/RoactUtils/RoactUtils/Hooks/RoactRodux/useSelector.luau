@@ -1,120 +1,141 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v1 = require(l_Parent_0.ArgCheck);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Dash);
-local v4 = require(script.Parent.useStore);
-local function v7(v5, v6) --[[ Line: 52 ]]
-    return v5 == v6;
-end;
-useSelectorWithStore = function(v8, v9, v10) --[[ Line: 56 ]] --[[ Name: useSelectorWithStore ]]
-    -- upvalues: v2 (copy)
-    local _, v13 = v2.useReducer(function(v11) --[[ Line: 61 ]]
-        return v11 + 1;
-    end, 0);
-    local v14 = v2.useRef(nil);
-    local v15 = v2.useRef(nil);
-    local v16 = v2.useRef(nil);
-    local v17 = v2.useRef(nil);
-    local v18 = v10:getState();
-    local v19 = nil;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 73 ]]
-        -- upvalues: v8 (copy), v15 (copy), v18 (copy), v16 (copy), v14 (copy), v17 (copy), v9 (copy), v19 (ref)
-        if v8 ~= v15.current or v18 ~= v16.current or v14.current then
-            local v20 = v8(v18);
-            if v17.current == nil or not v9(v20, v17.current) then
-                v19 = v20;
-                return;
-            else
-                v19 = v17.current;
-                return;
-            end;
-        else
-            v19 = v17.current;
-            return;
-        end;
-    end);
-    if not l_status_0 then
-        if v14.current then
-            l_result_0 = string.format("%s\nThe error may be correlated with this previous error:\n%s\n\n", tostring(l_result_0), (tostring(v14.current)));
-        end;
-        error(l_result_0);
-    end;
-    v2.useLayoutEffect(function() --[[ Line: 103 ]]
-        -- upvalues: v15 (copy), v8 (copy), v16 (copy), v18 (copy), v17 (copy), v19 (ref), v14 (copy)
-        v15.current = v8;
-        v16.current = v18;
-        v17.current = v19;
-        v14.current = nil;
-    end);
-    v2.useLayoutEffect(function() --[[ Line: 110 ]]
-        -- upvalues: v16 (copy), v15 (copy), v9 (copy), v17 (copy), v14 (copy), v13 (copy), v10 (copy)
-        local function v27(v23) --[[ Line: 111 ]] --[[ Name: checkForUpdates ]]
-            -- upvalues: v16 (ref), v15 (ref), v9 (ref), v17 (ref), v14 (ref), v13 (ref)
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 112 ]]
-                -- upvalues: v23 (copy), v16 (ref), v15 (ref), v9 (ref), v17 (ref)
-                if v23 == v16.current then
-                    return false;
-                else
-                    assert(v15.current, "latestSelector");
-                    local v24 = v15.current(v23);
-                    if v9(v24, v17.current) then
-                        return false;
-                    else
-                        v17.current = v24;
-                        v16.current = v23;
-                        return true;
-                    end;
-                end;
-            end);
-            if not l_status_1 then
-                l_result_1 = l_result_1 or "Error";
-                v14.current = l_result_1;
-            end;
-            if l_result_1 then
-                v13(nil);
-            end;
-        end;
-        local v28 = v10.changed:connect(v27);
-        local v29 = v10:getState();
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 112 ]]
-            -- upvalues: v29 (copy), v16 (ref), v15 (ref), v9 (ref), v17 (ref)
-            if v29 == v16.current then
-                return false;
-            else
-                assert(v15.current, "latestSelector");
-                local v30 = v15.current(v29);
-                if v9(v30, v17.current) then
-                    return false;
-                else
-                    v17.current = v30;
-                    v16.current = v29;
-                    return true;
-                end;
-            end;
-        end);
-        if not l_status_2 then
-            l_result_2 = l_result_2 or "Error";
-            v14.current = l_result_2;
-        end;
-        if l_result_2 then
-            v13(nil);
-        end;
-        return function() --[[ Line: 146 ]]
-            -- upvalues: v28 (copy)
-            v28:disconnect();
-        end;
-    end, {
-        v10
-    });
-    return v19;
-end;
-useSelector = function(v33, v34) --[[ Line: 154 ]] --[[ Name: useSelector ]]
-    -- upvalues: v1 (copy), v3 (copy), v7 (copy), v4 (copy)
-    v1.isNotNil(v33, "selector");
-    v1.assert(v3.isCallable(v33), "useSelector expects 'selector' to be callable");
-    v1.isTypeOrNil(v34, "function", "equalityFn");
-    local v35 = v34 or v7;
-    local v36 = v4();
-    return (useSelectorWithStore(v33, v35, v36));
-end;
-return useSelector;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local ArgCheck = require(Parent.ArgCheck)
+local React = require(Parent.React)
+local Dash = require(Parent.Dash)
+local useStore = require(script.Parent.useStore)
+
+local function v6(p1, p2) -- line: 52
+	return p1 == p2
+end
+
+function useSelectorWithStore(p3: ((...any) -> ...any), p4: ((...any) -> ...any), p5) -- line: 56
+	-- upvalues: React (copy)
+	local _, v13 = React.useReducer(function(n1: number) -- line: 61
+		return n1 + 1
+	end, 0)
+	local v14 = React.useRef(nil)
+	local v15 = React.useRef(nil)
+	local v16 = React.useRef(nil)
+	local v17 = React.useRef(nil)
+	local v18 = p5:getState()
+	local u19 = nil
+	local ok, result = pcall(function() -- line: 73
+		-- upvalues: p3 (copy), v15 (copy), v18 (copy), v16 (copy), v14 (copy), v17 (copy), p4 (copy), u19 (ref)
+		if p3 ~= v15.current or (v18 ~= v16.current or v14.current) then
+			local v27 = p3(v18)
+
+			if v17.current == nil or not p4(v27, v17.current) then
+				u19 = v27
+
+				return
+			end
+
+			u19 = v17.current
+
+			return
+		end
+
+		u19 = v17.current
+	end)
+
+	if not ok then
+		if v14.current then
+			result = string.format("%s\nThe error may be correlated with this previous error:\n%s\n\n", tostring(result), (tostring(v14.current)))
+		end
+
+		error(result)
+	end
+
+	React.useLayoutEffect(function() -- line: 103
+		-- upvalues: v15 (copy), p3 (copy), v16 (copy), v18 (copy), v17 (copy), u19 (ref), v14 (copy)
+		v15.current = p3
+		v16.current = v18
+		v17.current = u19
+		v14.current = nil
+	end)
+	React.useLayoutEffect(function() -- line: 110
+		-- upvalues: v16 (copy), v15 (copy), p4 (copy), v17 (copy), v14 (copy), v13 (copy), p5 (copy)
+		local function checkForUpdates(p6) -- line: 111
+			-- upvalues: v16 (copy), v15 (copy), p4 (copy), v17 (copy), v14 (copy), v13 (copy)
+			local ok2, result2 = pcall(function() -- line: 112
+				-- upvalues: p6 (copy), v16 (copy), v15 (copy), p4 (copy), v17 (copy)
+				if p6 == v16.current then
+					return false
+				end
+
+				assert(v15.current, "latestSelector")
+
+				local v37 = v15.current(p6)
+
+				if p4(v37, v17.current) then
+					return false
+				end
+
+				v17.current = v37
+				v16.current = p6
+
+				return true
+			end)
+
+			if not ok2 then
+				result2 = result2 or "Error"
+				v14.current = result2
+			end
+
+			if result2 then
+				v13(nil)
+			end
+		end
+
+		local v29 = p5.changed:connect(checkForUpdates)
+		local v30 = p5:getState()
+		local ok3, result3 = pcall(function() -- line: 112
+			-- upvalues: v30 (copy), v16 (copy), v15 (copy), p4 (copy), v17 (copy)
+			if v30 == v16.current then
+				return false
+			end
+
+			assert(v15.current, "latestSelector")
+
+			local v36 = v15.current(v30)
+
+			if p4(v36, v17.current) then
+				return false
+			end
+
+			v17.current = v36
+			v16.current = v30
+
+			return true
+		end)
+
+		if not ok3 then
+			result3 = result3 or "Error"
+			v14.current = result3
+		end
+
+		if result3 then
+			v13(nil)
+		end
+
+		return function() -- line: 146
+			-- upvalues: v29 (copy)
+			v29:disconnect()
+		end
+	end, { p5 })
+
+	return u19
+end
+function useSelector(p7: ((...any) -> ...any), p8: ((...any) -> ...any)?) -- line: 154
+	-- upvalues: ArgCheck (copy), Dash (copy), v6 (copy), useStore (copy)
+	ArgCheck.isNotNil(p7, "selector")
+	ArgCheck.assert(Dash.isCallable(p7), "useSelector expects 'selector' to be callable")
+	ArgCheck.isTypeOrNil(p8, "function", "equalityFn")
+
+	local v24 = p8 or v6
+	local v25 = useStore()
+
+	return (useSelectorWithStore(p7, v24, v25))
+end
+
+return useSelector

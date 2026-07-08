@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFixEventNotFoundErrorStateExit", false);
+return game:DefineFastFlag("LuaAppFixEventNotFoundErrorStateExit", false)

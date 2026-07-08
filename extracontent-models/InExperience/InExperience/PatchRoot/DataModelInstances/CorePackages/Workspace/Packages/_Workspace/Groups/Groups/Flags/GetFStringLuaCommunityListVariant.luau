@@ -1,4 +1,5 @@
-game:DefineFastString("LuaCommunityListVariant", "isLuaCommunityListEnabled");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("LuaCommunityListVariant");
-end;
+game:DefineFastString("LuaCommunityListVariant", "isLuaCommunityListEnabled")
+
+return function() -- line: 3
+	return game:GetFastString("LuaCommunityListVariant")
+end

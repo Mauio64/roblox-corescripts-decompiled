@@ -1,3 +1,3 @@
 return {
-    LogTopBarToggled = require(script.LogTopBarToggled)
-};
+	LogTopBarToggled = require(script.LogTopBarToggled)
+}

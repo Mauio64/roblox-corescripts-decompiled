@@ -1,1 +1,1 @@
-return require(script.usePulseBinding);
+return require(script.usePulseBinding)

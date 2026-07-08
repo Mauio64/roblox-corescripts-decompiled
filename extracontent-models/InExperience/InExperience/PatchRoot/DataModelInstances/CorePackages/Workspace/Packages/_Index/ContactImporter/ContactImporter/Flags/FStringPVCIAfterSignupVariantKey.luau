@@ -1,1 +1,1 @@
-return game:DefineFastString("PVCIAfterSignupVariantKey", "after_signup_variant");
+return game:DefineFastString("PVCIAfterSignupVariantKey", "after_signup_variant")

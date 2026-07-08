@@ -1,1 +1,1 @@
-return require(script.FriendsRenameInfoModal);
+return require(script.FriendsRenameInfoModal)

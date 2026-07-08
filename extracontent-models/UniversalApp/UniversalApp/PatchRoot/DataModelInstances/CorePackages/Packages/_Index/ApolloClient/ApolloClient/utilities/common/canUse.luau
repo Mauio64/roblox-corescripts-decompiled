@@ -1,4 +1,4 @@
 return {
-    canUseWeakMap = true, 
-    canUseWeakSet = false
-};
+	canUseWeakMap = true,
+	canUseWeakSet = false
+}

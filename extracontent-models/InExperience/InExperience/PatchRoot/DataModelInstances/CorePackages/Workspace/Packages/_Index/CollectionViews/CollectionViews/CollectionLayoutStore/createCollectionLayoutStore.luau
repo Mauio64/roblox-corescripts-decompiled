@@ -1,69 +1,70 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local v3 = require(l_Parent_0.Display);
-local l_CollectionItemSize_0 = require(l_script_FirstAncestor_0.CollectionViewTypes).CollectionItemSize;
-local v5 = require(script.Parent.CollectionBreakpointConfig);
-local l_resolveBreakpoint_0 = v5.resolveBreakpoint;
-local l_getItemsPerRow_0 = v5.getItemsPerRow;
-local l_FFlagSduiCarouselHoverFixes_0 = require(l_Parent_0.SharedFlags).FFlagSduiCarouselHoverFixes;
-return function(v9, v10) --[[ Line: 27 ]] --[[ Name: createCollectionLayoutStore ]]
-    -- upvalues: v3 (copy), l_FFlagSduiCarouselHoverFixes_0 (copy), v2 (copy), l_resolveBreakpoint_0 (copy), l_CollectionItemSize_0 (copy), l_getItemsPerRow_0 (copy)
-    local l_getPlatformScale_0 = v3.GetDisplayStore(false).getPlatformScale;
-    local v12 = nil;
-    local v13 = nil;
-    if l_FFlagSduiCarouselHoverFixes_0 then
-        v12 = v2.createComputed(function(v14) --[[ Line: 37 ]]
-            -- upvalues: v9 (copy)
-            return v9(v14) > 0;
-        end);
-        v13 = if v10 then v2.createComputed(function(v15) --[[ Line: 42 ]]
-            -- upvalues: v9 (copy), v10 (copy)
-            local v16 = v9(v15);
-            if v16 > 0 then
-                return v16;
-            else
-                return v10.getContainerWidth(v15);
-            end;
-        end) else v9;
-    else
-        v13 = v9;
-    end;
-    local v18 = v2.createComputed(function(v17) --[[ Line: 54 ]]
-        -- upvalues: v13 (ref), l_getPlatformScale_0 (copy)
-        return v13(v17) / l_getPlatformScale_0(v17);
-    end);
-    local v20 = v2.createComputed(function(v19) --[[ Line: 58 ]]
-        -- upvalues: l_resolveBreakpoint_0 (ref), v18 (copy)
-        return l_resolveBreakpoint_0(v18(v19));
-    end);
-    local v21 = {
-        l_CollectionItemSize_0.XSmall, 
-        l_CollectionItemSize_0.Small, 
-        l_CollectionItemSize_0.Medium, 
-        l_CollectionItemSize_0.Large, 
-        l_CollectionItemSize_0.XLarge
-    };
-    local v22 = {};
-    for _, v24 in v21 do
-        v22[v24] = v2.createComputed(function(v25) --[[ Line: 72 ]]
-            -- upvalues: l_getItemsPerRow_0 (ref), v20 (copy), v24 (copy)
-            return l_getItemsPerRow_0(v20(v25), v24);
-        end);
-    end;
-    local v30 = v2.createComputed(function(v26) --[[ Line: 78 ]]
-        -- upvalues: v22 (copy)
-        local v27 = {};
-        for v28, v29 in v22 do
-            v27[v28] = v29(v26);
-        end;
-        return v27;
-    end);
-    return {
-        getContainerWidth = v13, 
-        getDesignSpaceContainerWidth = v18, 
-        getItemsPerRow = v22, 
-        getNumItemsForAllCategories = v30, 
-        getIsContainerMeasured = if l_FFlagSduiCarouselHoverFixes_0 then v12 else nil
-    };
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local Signals = require(CollectionViewsParent.Signals)
+local Display = require(CollectionViewsParent.Display)
+local CollectionItemSize = require(CollectionViews.CollectionViewTypes).CollectionItemSize
+local CollectionBreakpointConfig = require(script.Parent.CollectionBreakpointConfig)
+local resolveBreakpoint = CollectionBreakpointConfig.resolveBreakpoint
+local getItemsPerRow = CollectionBreakpointConfig.getItemsPerRow
+
+local function createCollectionLayoutStore(p1, p2) -- line: 24
+	-- upvalues: Display (copy), Signals (copy), resolveBreakpoint (copy), CollectionItemSize (copy), getItemsPerRow (copy)
+	local getPlatformScale = Display.GetDisplayStore(false).getPlatformScale
+	local v13 = Signals.createComputed(function(p3) -- line: 30
+		-- upvalues: p1 (copy)
+		return p1(p3) > 0
+	end)
+	local v14 = if not p2 then p1 else Signals.createComputed(function(p4) -- line: 35
+		-- upvalues: p1 (copy), p2 (copy)
+		local v23 = p1(p4)
+
+		if v23 > 0 then
+			return v23
+		end
+
+		return p2.getContainerWidth(p4)
+	end)
+	local v15 = Signals.createComputed(function(p5) -- line: 44
+		-- upvalues: v14 (copy), getPlatformScale (copy)
+		return v14(p5) / getPlatformScale(p5)
+	end)
+	local v16 = Signals.createComputed(function(p6) -- line: 48
+		-- upvalues: resolveBreakpoint (copy), v15 (copy)
+		return resolveBreakpoint(v15(p6))
+	end)
+	local t1 = {}
+
+	for _, v19 in {
+		CollectionItemSize.XSmall,
+		CollectionItemSize.Small,
+		CollectionItemSize.Medium,
+		CollectionItemSize.Large,
+		CollectionItemSize.XLarge
+	} do
+		t1[v19] = Signals.createComputed(function(p7) -- line: 62
+			-- upvalues: getItemsPerRow (copy), v16 (copy), v19 (copy)
+			return getItemsPerRow(v16(p7), v19)
+		end)
+	end
+
+	local v20 = Signals.createComputed(function(p8) -- line: 68
+		-- upvalues: t1 (copy)
+		local t2 = {}
+
+		for v29, v30 in t1 do
+			t2[v29] = v30(p8)
+		end
+
+		return t2
+	end)
+
+	return {
+		getContainerWidth = v14,
+		getDesignSpaceContainerWidth = v15,
+		getItemsPerRow = t1,
+		getNumItemsForAllCategories = v20,
+		getIsContainerMeasured = v13
+	}
+end
+
+return createCollectionLayoutStore

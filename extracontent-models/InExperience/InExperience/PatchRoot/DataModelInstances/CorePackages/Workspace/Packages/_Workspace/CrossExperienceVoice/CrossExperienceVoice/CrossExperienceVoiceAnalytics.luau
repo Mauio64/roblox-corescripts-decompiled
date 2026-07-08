@@ -1,252 +1,252 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_script_FirstAncestor_0.Analytics);
-local v4 = require(l_script_FirstAncestor_0.Flags);
-local l_LoggingProtocol_0 = v1.LoggingProtocol;
-local l_CrossExperience_0 = v1.CrossExperience;
-local l_getMemStorageKey_0 = l_CrossExperience_0.Utils.getMemStorageKey;
-local v8 = {};
-v8.__index = v8;
-local l_CEV_JOIN_ATTEMPT_ID_KEY_0 = l_CrossExperience_0.Constants.CEV_JOIN_ATTEMPT_ID_KEY;
-v8.new = function() --[[ Line: 82 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), v8 (copy)
-    local v10 = {
-        previousStatus = nil, 
-        connections = {}, 
-        isInitialized = false, 
-        eventManager = nil, 
-        analytics = v3.Analytics()
-    };
-    setmetatable(v10, v8);
-    return v10;
-end;
-v8.initialize = function(v11, v12) --[[ Line: 94 ]] --[[ Name: initialize ]]
-    v11.eventManager = v12;
-    v11.isInitialized = true;
-end;
-v8.fireCEVAnalyticsEvent = function(v13, v14, v15) --[[ Line: 99 ]] --[[ Name: fireCEVAnalyticsEvent ]]
-    -- upvalues: l_getMemStorageKey_0 (copy), l_CEV_JOIN_ATTEMPT_ID_KEY_0 (copy)
-    local v16 = v15 or {};
-    v16.cevJoinAttemptId = l_getMemStorageKey_0(l_CEV_JOIN_ATTEMPT_ID_KEY_0);
-    v16.clientTimeStamp = os.time();
-    v13.analytics.fireAnalyticsEvent(v14, v16);
-end;
-v8.logPartyVoiceTimeout = function(v17, v18) --[[ Line: 106 ]] --[[ Name: logPartyVoiceTimeout ]]
-    -- upvalues: v3 (copy), l_CrossExperience_0 (copy), l_Players_0 (copy)
-    if not v17.isInitialized then
-        return;
-    else
-        v17:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceStateChanged, {
-            partyId = v18 or "", 
-            status = l_CrossExperience_0.Constants.VOICE_STATUS.ERROR_RCC_TIMEOUT, 
-            previousStatus = v17.previousStatus or "", 
-            userId = if l_Players_0.LocalPlayer then l_Players_0.LocalPlayer.UserId else 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceStatusChanged = function(v19, v20, v21, v22) --[[ Line: 119 ]] --[[ Name: logPartyVoiceStatusChanged ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    if not v19.isInitialized then
-        return;
-    else
-        if v19.previousStatus ~= v20.status then
-            if v4.FFlagEnablePartyVoiceStatusChangedDetailAnalytics then
-                if v4.FFlagPartyVoiceLogActiveDM then
-                    v19:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceStateChanged, {
-                        partyId = v21 or "", 
-                        status = v20.status, 
-                        detail = v20.detail or "", 
-                        previousStatus = v19.previousStatus or "", 
-                        voiceChannelId = v20.voiceChannelId, 
-                        voiceSessionId = v20.voiceSessionId, 
-                        userId = v20.userId, 
-                        activeDm = v22 or ""
-                    });
-                else
-                    v19:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceStateChanged, {
-                        partyId = v21 or "", 
-                        status = v20.status, 
-                        detail = v20.detail or "", 
-                        previousStatus = v19.previousStatus or "", 
-                        voiceChannelId = v20.voiceChannelId, 
-                        voiceSessionId = v20.voiceSessionId, 
-                        userId = v20.userId, 
-                        activeDm = ""
-                    });
-                end;
-            else
-                v19:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceStateChanged, {
-                    partyId = v21 or "", 
-                    status = v20.status, 
-                    previousStatus = v19.previousStatus or "", 
-                    voiceChannelId = v20.voiceChannelId, 
-                    voiceSessionId = v20.voiceSessionId, 
-                    userId = v20.userId
-                });
-            end;
-        end;
-        v19.previousStatus = v20.status;
-        return;
-    end;
-end;
-v8.logPartyVoiceConnectedState = function(v23, v24, v25, v26) --[[ Line: 171 ]] --[[ Name: logPartyVoiceConnectedState ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    if not v23.isInitialized then
-        return;
-    else
-        if v4.FFlagPartyVoiceLogActiveDM then
-            v23:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceConnectedParticipantsOnJoin, {
-                userId = if v24.userId then v24.userId else 0, 
-                partyId = v25 or "", 
-                status = if v24.status then v24.status else "", 
-                voiceChannelId = if v24.voiceChannelId then v24.voiceChannelId else "", 
-                voiceSessionId = if v24.voiceSessionId then v24.voiceSessionId else "", 
-                voicePlaySessionId = if v24.voicePlaySessionId then v24.voicePlaySessionId else "", 
-                participants = if v24.participants then v24.participants else "", 
-                numberActive = v24.numberActive or 0, 
-                activeDm = v26 or ""
-            });
-        else
-            v23:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceConnectedParticipantsOnJoin, {
-                userId = if v24.userId then v24.userId else 0, 
-                partyId = v25 or "", 
-                status = if v24.status then v24.status else "", 
-                voiceChannelId = if v24.voiceChannelId then v24.voiceChannelId else "", 
-                voiceSessionId = if v24.voiceSessionId then v24.voiceSessionId else "", 
-                voicePlaySessionId = if v24.voicePlaySessionId then v24.voicePlaySessionId else "", 
-                participants = if v24.participants then v24.participants else "", 
-                numberActive = v24.numberActive or 0, 
-                activeDm = ""
-            });
-        end;
-        v23:logLaunchFlowEndEvent();
-        return;
-    end;
-end;
-v8.logPartyVoiceJoinAttempt = function(v27, v28) --[[ Line: 209 ]] --[[ Name: logPartyVoiceJoinAttempt ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    if not v27.isInitialized then
-        return;
-    else
-        if v4.FFlagPartyVoiceLogActiveDM then
-            v27:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceJoinAttempt, {
-                userId = if v28.userId then v28.userId else 0, 
-                partyId = if v28.partyId then v28.partyId else "", 
-                targetPlaceId = if v28.targetPlaceId then v28.targetPlaceId else 0, 
-                isConnected = if v28.isConnected then v28.isConnected else false, 
-                activeDm = if v28.activeDm then v28.activeDm else ""
-            });
-        else
-            v27:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceJoinAttempt, {
-                userId = if v28.userId then v28.userId else 0, 
-                partyId = if v28.partyId then v28.partyId else "", 
-                targetPlaceId = if v28.targetPlaceId then v28.targetPlaceId else 0, 
-                isConnected = if v28.isConnected then v28.isConnected else false, 
-                activeDm = ""
-            });
-        end;
-        v27:logLaunchFlowBeginEvent();
-        return;
-    end;
-end;
-v8.logLaunchFlowBeginEvent = function(_) --[[ Line: 234 ]] --[[ Name: logLaunchFlowBeginEvent ]]
-    -- upvalues: l_LoggingProtocol_0 (copy)
-    l_LoggingProtocol_0.default:logEvent("party_voice_launch_flow_begin");
-end;
-v8.logLaunchFlowEndEvent = function(_) --[[ Line: 238 ]] --[[ Name: logLaunchFlowEndEvent ]]
-    -- upvalues: l_LoggingProtocol_0 (copy)
-    l_LoggingProtocol_0.default:logEvent("party_voice_launch_flow_end");
-end;
-v8.logPartyVoiceJoinFailure = function(v31, v32, v33, v34) --[[ Line: 242 ]] --[[ Name: logPartyVoiceJoinFailure ]]
-    -- upvalues: v3 (copy)
-    if not v31.isInitialized then
-        return;
-    else
-        v31:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceJoinFailure, {
-            partyId = v32, 
-            errorMessage = v33 or "", 
-            userId = v34 or 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceUnmuteParticipant = function(v35, v36, v37) --[[ Line: 254 ]] --[[ Name: logPartyVoiceUnmuteParticipant ]]
-    -- upvalues: v3 (copy)
-    if not v35.isInitialized then
-        return;
-    else
-        v35:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceUnmuteParticipant, {
-            partyId = v36, 
-            userId = v37 or 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceMuteParticipant = function(v38, v39, v40) --[[ Line: 265 ]] --[[ Name: logPartyVoiceMuteParticipant ]]
-    -- upvalues: v3 (copy)
-    if not v38.isInitialized then
-        return;
-    else
-        v38:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceMuteParticipant, {
-            partyId = v39, 
-            userId = v40 or 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceBlockParticipant = function(v41, v42, v43) --[[ Line: 276 ]] --[[ Name: logPartyVoiceBlockParticipant ]]
-    -- upvalues: v3 (copy)
-    if not v41.isInitialized then
-        return;
-    else
-        v41:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceBlockParticipant, {
-            partyId = v42, 
-            userId = v43 or 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceUnblockParticipant = function(v44, v45, v46) --[[ Line: 287 ]] --[[ Name: logPartyVoiceUnblockParticipant ]]
-    -- upvalues: v3 (copy)
-    if not v44.isInitialized then
-        return;
-    else
-        v44:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceUnblockParticipant, {
-            partyId = v45, 
-            userId = v46 or 0
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceOnCrossExperienceStartedSignalReceived = function(v47, v48, v49) --[[ Line: 298 ]] --[[ Name: logPartyVoiceOnCrossExperienceStartedSignalReceived ]]
-    -- upvalues: v3 (copy)
-    if not v47.isInitialized then
-        return;
-    else
-        v47:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceOnCrossExperienceStartedSignalReceived, {
-            hasExperienceStarted = v48, 
-            isActiveDM = v49
-        });
-        return;
-    end;
-end;
-v8.logPartyVoiceStateChangeHandlerRun = function(v50, v51, v52) --[[ Line: 311 ]] --[[ Name: logPartyVoiceStateChangeHandlerRun ]]
-    -- upvalues: v3 (copy)
-    if not v50.isInitialized then
-        return;
-    else
-        v50:fireCEVAnalyticsEvent(v3.EventNames.PartyVoiceStateChangeHandlerRun, {
-            isActiveDM = v51, 
-            status = v52.status, 
-            detail = v52.detail or ""
-        });
-        return;
-    end;
-end;
-v8.reset = function(v53) --[[ Line: 325 ]] --[[ Name: reset ]]
-    v53.previousStatus = nil;
-end;
-v8.default = v8.new();
-return v8;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local Players = game:GetService("Players")
+local Analytics = require(CrossExperienceVoice.Analytics)
+local Flags = require(CrossExperienceVoice.Flags)
+local LoggingProtocol = dependencies.LoggingProtocol
+local CrossExperience = dependencies.CrossExperience
+local getMemStorageKey = CrossExperience.Utils.getMemStorageKey
+local t1 = {}
+
+t1.__index = t1
+
+local CEV_JOIN_ATTEMPT_ID_KEY = CrossExperience.Constants.CEV_JOIN_ATTEMPT_ID_KEY
+
+function t1.new() -- line: 82
+	-- upvalues: Analytics (copy), t1 (copy)
+	local t2 = {
+		previousStatus = nil,
+		isInitialized = false,
+		eventManager = nil,
+		connections = {},
+		analytics = Analytics.Analytics()
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.initialize(p1, p2) -- line: 94
+	p1.eventManager = p2
+	p1.isInitialized = true
+end
+function t1.fireCEVAnalyticsEvent(t3: {[any]: any}, s1: string, p3) -- line: 99
+	-- upvalues: getMemStorageKey (copy), CEV_JOIN_ATTEMPT_ID_KEY (copy)
+	local v17 = p3 or {}
+
+	v17.cevJoinAttemptId = getMemStorageKey(CEV_JOIN_ATTEMPT_ID_KEY)
+	v17.clientTimeStamp = os.time()
+	t3.analytics.fireAnalyticsEvent(s1, v17)
+end
+function t1.logPartyVoiceTimeout(t4: {[any]: any}, s2: string?) -- line: 106
+	-- upvalues: Analytics (copy), CrossExperience (copy), Players (copy)
+	if not t4.isInitialized then
+		return
+	end
+
+	t4:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceStateChanged, {
+		partyId = s2 or "",
+		status = CrossExperience.Constants.VOICE_STATUS.ERROR_RCC_TIMEOUT,
+		previousStatus = t4.previousStatus or "",
+		userId = not Players.LocalPlayer and 0 or Players.LocalPlayer.UserId
+	})
+end
+function t1.logPartyVoiceStatusChanged(t5: {[any]: any}, p4, s3: string?, s4: string?) -- line: 119
+	-- upvalues: Flags (copy), Analytics (copy)
+	if not t5.isInitialized then
+		return
+	end
+
+	if t5.previousStatus ~= p4.status then
+		if Flags.FFlagEnablePartyVoiceStatusChangedDetailAnalytics then
+			if Flags.FFlagPartyVoiceLogActiveDM then
+				t5:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceStateChanged, {
+					partyId = s3 or "",
+					status = p4.status,
+					detail = p4.detail or "",
+					previousStatus = t5.previousStatus or "",
+					voiceChannelId = p4.voiceChannelId,
+					voiceSessionId = p4.voiceSessionId,
+					userId = p4.userId,
+					activeDm = s4 or ""
+				})
+			else
+				t5:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceStateChanged, {
+					activeDm = "",
+					partyId = s3 or "",
+					status = p4.status,
+					detail = p4.detail or "",
+					previousStatus = t5.previousStatus or "",
+					voiceChannelId = p4.voiceChannelId,
+					voiceSessionId = p4.voiceSessionId,
+					userId = p4.userId
+				})
+			end
+		else
+			t5:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceStateChanged, {
+				partyId = s3 or "",
+				status = p4.status,
+				previousStatus = t5.previousStatus or "",
+				voiceChannelId = p4.voiceChannelId,
+				voiceSessionId = p4.voiceSessionId,
+				userId = p4.userId
+			})
+		end
+	end
+
+	t5.previousStatus = p4.status
+end
+function t1.logPartyVoiceConnectedState(t6: {[any]: any}, p5, s5: string?, s6: string?) -- line: 171
+	-- upvalues: Flags (copy), Analytics (copy)
+	if not t6.isInitialized then
+		return
+	end
+
+	if Flags.FFlagPartyVoiceLogActiveDM then
+		t6:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceConnectedParticipantsOnJoin, {
+			userId = not p5.userId and 0 or p5.userId,
+			partyId = s5 or "",
+			status = not p5.status and "" or p5.status,
+			voiceChannelId = not p5.voiceChannelId and "" or p5.voiceChannelId,
+			voiceSessionId = not p5.voiceSessionId and "" or p5.voiceSessionId,
+			voicePlaySessionId = not p5.voicePlaySessionId and "" or p5.voicePlaySessionId,
+			participants = not p5.participants and "" or p5.participants,
+			numberActive = p5.numberActive or 0,
+			activeDm = s6 or ""
+		})
+	else
+		t6:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceConnectedParticipantsOnJoin, {
+			activeDm = "",
+			userId = not p5.userId and 0 or p5.userId,
+			partyId = s5 or "",
+			status = not p5.status and "" or p5.status,
+			voiceChannelId = not p5.voiceChannelId and "" or p5.voiceChannelId,
+			voiceSessionId = not p5.voiceSessionId and "" or p5.voiceSessionId,
+			voicePlaySessionId = not p5.voicePlaySessionId and "" or p5.voicePlaySessionId,
+			participants = not p5.participants and "" or p5.participants,
+			numberActive = p5.numberActive or 0
+		})
+	end
+
+	t6:logLaunchFlowEndEvent()
+end
+function t1.logPartyVoiceJoinAttempt(p6, p7) -- line: 209
+	-- upvalues: Flags (copy), Analytics (copy)
+	if not p6.isInitialized then
+		return
+	end
+
+	if Flags.FFlagPartyVoiceLogActiveDM then
+		p6:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceJoinAttempt, {
+			userId = not p7.userId and 0 or p7.userId,
+			partyId = not p7.partyId and "" or p7.partyId,
+			targetPlaceId = not p7.targetPlaceId and 0 or p7.targetPlaceId,
+			isConnected = not not p7.isConnected and p7.isConnected,
+			activeDm = not p7.activeDm and "" or p7.activeDm
+		})
+	else
+		p6:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceJoinAttempt, {
+			activeDm = "",
+			userId = not p7.userId and 0 or p7.userId,
+			partyId = not p7.partyId and "" or p7.partyId,
+			targetPlaceId = not p7.targetPlaceId and 0 or p7.targetPlaceId,
+			isConnected = not not p7.isConnected and p7.isConnected
+		})
+	end
+
+	p6:logLaunchFlowBeginEvent()
+end
+function t1.logLaunchFlowBeginEvent(_) -- line: 234
+	-- upvalues: LoggingProtocol (copy)
+	LoggingProtocol.default:logEvent("party_voice_launch_flow_begin")
+end
+function t1.logLaunchFlowEndEvent(_) -- line: 238
+	-- upvalues: LoggingProtocol (copy)
+	LoggingProtocol.default:logEvent("party_voice_launch_flow_end")
+end
+function t1.logPartyVoiceJoinFailure(t7: {[any]: any}, s7: string, s8: string?, n1: number?) -- line: 242
+	-- upvalues: Analytics (copy)
+	if not t7.isInitialized then
+		return
+	end
+
+	t7:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceJoinFailure, {
+		partyId = s7,
+		errorMessage = s8 or "",
+		userId = n1 or 0
+	})
+end
+function t1.logPartyVoiceUnmuteParticipant(t8: {[any]: any}, s9: string, n2: number) -- line: 254
+	-- upvalues: Analytics (copy)
+	if not t8.isInitialized then
+		return
+	end
+
+	t8:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceUnmuteParticipant, {
+		partyId = s9,
+		userId = n2 or 0
+	})
+end
+function t1.logPartyVoiceMuteParticipant(t9: {[any]: any}, s10: string, n3: number) -- line: 265
+	-- upvalues: Analytics (copy)
+	if not t9.isInitialized then
+		return
+	end
+
+	t9:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceMuteParticipant, {
+		partyId = s10,
+		userId = n3 or 0
+	})
+end
+function t1.logPartyVoiceBlockParticipant(t10: {[any]: any}, s11: string, n4: number) -- line: 276
+	-- upvalues: Analytics (copy)
+	if not t10.isInitialized then
+		return
+	end
+
+	t10:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceBlockParticipant, {
+		partyId = s11,
+		userId = n4 or 0
+	})
+end
+function t1.logPartyVoiceUnblockParticipant(t11: {[any]: any}, s12: string, n5: number) -- line: 287
+	-- upvalues: Analytics (copy)
+	if not t11.isInitialized then
+		return
+	end
+
+	t11:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceUnblockParticipant, {
+		partyId = s12,
+		userId = n5 or 0
+	})
+end
+function t1.logPartyVoiceOnCrossExperienceStartedSignalReceived(t12: {[any]: any}, b1: boolean, b2: boolean) -- line: 298
+	-- upvalues: Analytics (copy)
+	if not t12.isInitialized then
+		return
+	end
+
+	t12:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceOnCrossExperienceStartedSignalReceived, {
+		hasExperienceStarted = b1,
+		isActiveDM = b2
+	})
+end
+function t1.logPartyVoiceStateChangeHandlerRun(t13: {[any]: any}, b3: boolean, p10) -- line: 311
+	-- upvalues: Analytics (copy)
+	if not t13.isInitialized then
+		return
+	end
+
+	t13:fireCEVAnalyticsEvent(Analytics.EventNames.PartyVoiceStateChangeHandlerRun, {
+		isActiveDM = b3,
+		status = p10.status,
+		detail = p10.detail or ""
+	})
+end
+function t1.reset(p11) -- line: 325
+	p11.previousStatus = nil
+end
+
+t1.default = t1.new()
+
+return t1

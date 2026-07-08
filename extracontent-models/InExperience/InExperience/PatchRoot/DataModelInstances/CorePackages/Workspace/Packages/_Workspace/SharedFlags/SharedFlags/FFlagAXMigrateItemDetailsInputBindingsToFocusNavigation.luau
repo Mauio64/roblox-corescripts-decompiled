@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateCatalogItemCardInputBindingsToFocusNavigation) and game:DefineFastFlag("AXMigrateItemDetailsInputBindingsToFocusNavigation", false);
+return game:DefineFastFlag("AXMigrateItemDetailsInputBindingsToFocusNavigation", false)

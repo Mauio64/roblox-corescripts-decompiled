@@ -1,4 +1,5 @@
-local _ = require(script.Parent.CategoryTypes);
-local _ = require(script.Parent.AvatarEditorCategoryTypes);
-local _ = require(script.Parent.CatalogCategoryTypes);
-return {};
+require(script.Parent.CategoryTypes)
+require(script.Parent.AvatarEditorCategoryTypes)
+require(script.Parent.CatalogCategoryTypes)
+
+return {}

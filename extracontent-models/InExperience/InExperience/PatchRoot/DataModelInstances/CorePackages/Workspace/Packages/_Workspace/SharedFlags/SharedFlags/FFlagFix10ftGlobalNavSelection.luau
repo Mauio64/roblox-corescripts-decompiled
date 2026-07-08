@@ -1,1 +1,1 @@
-return game:DefineFastFlag("Fix10ftGlobalNavSelection", false);
+return game:DefineFastFlag("Fix10ftGlobalNavSelection", false)

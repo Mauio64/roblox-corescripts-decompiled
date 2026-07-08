@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableGlobalChatAbuseReporting", false);
+return game:DefineFastFlag("EnableGlobalChatAbuseReporting", false)

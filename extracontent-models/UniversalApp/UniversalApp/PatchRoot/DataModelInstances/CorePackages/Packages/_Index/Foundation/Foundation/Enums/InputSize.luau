@@ -1,6 +1,6 @@
 return {
-    XSmall = "XSmall", 
-    Small = "Small", 
-    Medium = "Medium", 
-    Large = "Large"
-};
+	XSmall = "XSmall",
+	Small = "Small",
+	Medium = "Medium",
+	Large = "Large"
+}

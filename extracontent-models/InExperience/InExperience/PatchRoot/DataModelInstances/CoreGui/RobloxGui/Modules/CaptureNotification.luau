@@ -1,186 +1,187 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local v4 = require(l_CorePackages_0.Packages.Roact);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local v6 = require(l_CorePackages_0.Packages.t);
-local l_ButtonType_0 = v5.App.Button.Enum.ButtonType;
-local l_InteractiveAlert_0 = v5.App.Dialog.Alert.InteractiveAlert;
-local l_Toast_0 = v5.App.Dialog.Toast;
-local l_Images_0 = v5.App.ImageSet.Images;
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v12 = require(l_RobloxGui_0.Modules.shouldSaveScreenshotToAlbum);
-local v13 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v14 = require(l_RobloxGui_0.Modules.Common.renderWithCoreScriptsStyleProvider);
-local v15 = {
-    None = "None", 
-    Success = "Success", 
-    Fail = "Fail", 
-    Permission = "Permission"
-};
-local v16 = v4.PureComponent:extend("CaptureNotification");
-v16.validateProps = v6.strictInterface({
-    forceDismissToast = v6.optional(v6.table), 
-    permissionEvent = v6.optional(v6.instanceOf("BindableEvent"))
-});
-v16.init = function(v17) --[[ Line: 40 ]] --[[ Name: init ]]
-    -- upvalues: v15 (copy), l_Images_0 (copy), v13 (copy), v4 (copy), l_UserInputService_0 (copy)
-    v17.state = {
-        screenSize = Vector2.new(0, 0), 
-        dismissedPermission = false, 
-        notificationType = v15.None, 
-        toastContent = nil
-    };
-    v17.onScreenSizeChanged = function(v18) --[[ Line: 48 ]]
-        -- upvalues: v17 (copy)
-        if v17.state.screenSize ~= v18.AbsoluteSize then
-            v17:setState({
-                screenSize = v18.AbsoluteSize
-            });
-        end;
-    end;
-    v17.getToastContent = function(v19) --[[ Line: 56 ]]
-        -- upvalues: v15 (ref), l_Images_0 (ref), v13 (ref), v17 (copy), v4 (ref)
-        if v19 == v15.Success or v19 == v15.Fail then
-            local v20 = v19 == v15.Success;
-            return {
-                iconImage = v20 and l_Images_0["icons/status/success"] or l_Images_0["icons/status/alert"], 
-                iconColorStyle = not v20 and {
-                    Color = Color3.fromRGB(247, 75, 82), 
-                    Transparency = 0
-                } or nil, 
-                toastTitle = v20 and v13:FormatByKey("InGame.NotificationScript2.Capture.Success.ToastText") or v13:FormatByKey("InGame.NotificationScript2.Capture.Fail.ToastText"), 
-                onDismissed = function() --[[ Line: 68 ]] --[[ Name: onDismissed ]]
-                    -- upvalues: v17 (ref), v15 (ref), v4 (ref)
-                    v17:setState({
-                        notificationType = v15.None, 
-                        toastContent = v4.None
-                    });
-                    if v17.props.forceDismissToast and v17.props.forceDismissToast.onDismissed then
-                        v17.props.forceDismissToast.onDismissed();
-                    end;
-                end
-            };
-        else
-            return v4.None;
-        end;
-    end;
-    v17.dismissPermissionAlert = function() --[[ Line: 83 ]]
-        -- upvalues: v17 (copy), v15 (ref)
-        v17:setState({
-            dismissedPermission = true, 
-            notificationType = v15.Fail, 
-            toastContent = v17.getToastContent(v15.Fail)
-        });
-    end;
-    v17.screenshotSavedToAlbumCallback = function(_, v22, v23) --[[ Line: 91 ]]
-        -- upvalues: v15 (ref), v17 (copy)
-        local v24 = nil;
-        v24 = if v22 then v15.Success else if not v17.state.dismissedPermission and v23:find("Domain=ALAssetsLibraryErrorDomain") and v23:find("Data unavailable") then v15.Permission else v15.Fail;
-        v17:setState({
-            notificationType = v24, 
-            toastContent = v17.getToastContent(v24)
-        });
-    end;
-    v17.permissionEventCallback = function() --[[ Line: 116 ]]
-        -- upvalues: v17 (copy), v15 (ref)
-        v17:setState({
-            notificationType = v15.Permission, 
-            toastContent = v17.getToastContent(v15.Permission)
-        });
-    end;
-    v17.getPermissionAlertBodyText = function() --[[ Line: 123 ]]
-        -- upvalues: l_UserInputService_0 (ref), v13 (ref)
-        if l_UserInputService_0:GetPlatform() == Enum.Platform.IOS then
-            return v13:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTextIOS");
-        elseif l_UserInputService_0:GetPlatform() == Enum.Platform.Android then
-            return v13:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTextAndroid");
-        else
-            return v13:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertText");
-        end;
-    end;
-end;
-v16.renderWithStyle = function(_, v26) --[[ Line: 134 ]] --[[ Name: renderWithStyle ]]
-    -- upvalues: v14 (copy)
-    return v14(v26);
-end;
-v16.render = function(v27) --[[ Line: 138 ]] --[[ Name: render ]]
-    -- upvalues: v15 (copy), v4 (copy), l_Toast_0 (copy), l_InteractiveAlert_0 (copy), v13 (copy), l_ButtonType_0 (copy), v12 (copy), l_ExternalEventConnection_0 (copy)
-    local l_notificationType_0 = v27.state.notificationType;
-    local v29 = false;
-    if l_notificationType_0 == v15.Success then
-        v29 = v27.state.toastContent;
-    end;
-    local v30 = false;
-    if l_notificationType_0 == v15.Fail then
-        v30 = v27.state.toastContent;
-    end;
-    local v31 = l_notificationType_0 == v15.Permission;
-    return v27:renderWithStyle({
-        RobloxCaptureNotificationGui = v4.createElement("ScreenGui", {
-            AutoLocalize = false, 
-            DisplayOrder = 9, 
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = true, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        }, {
-            Content = v4.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                [v4.Change.AbsoluteSize] = v27.onScreenSizeChanged
-            }, {
-                SuccessToast = v29 and v4.createElement(l_Toast_0, {
-                    duration = 3, 
-                    show = not v27.props.forceDismissToast, 
-                    toastContent = v27.state.toastContent
-                }), 
-                FailToast = v30 and v4.createElement(l_Toast_0, {
-                    duration = 3, 
-                    show = not v27.props.forceDismissToast, 
-                    toastContent = v27.state.toastContent
-                }), 
-                PermissionAlertOverlay = v31 and v4.createElement("Frame", {
-                    Active = true, 
-                    BackgroundColor3 = Color3.new(0, 0, 0), 
-                    BackgroundTransparency = 0.5, 
-                    Size = UDim2.new(1, 0, 1, 0)
-                }, {
-                    PermissionAlert = v4.createElement(l_InteractiveAlert_0, {
-                        title = v13:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTitle"), 
-                        bodyText = v27.getPermissionAlertBodyText(), 
-                        buttonStackInfo = {
-                            buttons = {
-                                {
-                                    buttonType = l_ButtonType_0.PrimarySystem, 
-                                    props = {
-                                        onActivated = v27.dismissPermissionAlert, 
-                                        text = v13:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertButtonText")
-                                    }
-                                }
-                            }
-                        }, 
-                        position = UDim2.fromScale(0.5, 0.5), 
-                        screenSize = v27.state.screenSize
-                    })
-                }), 
-                ScreenshotSavedToAlbumConnection = v12() and v4.createElement(l_ExternalEventConnection_0, {
-                    event = game.ScreenshotSavedToAlbum, 
-                    callback = v27.screenshotSavedToAlbumCallback
-                }), 
-                PermissionEventConnection = v27.props.permissionEvent and v4.createElement(l_ExternalEventConnection_0, {
-                    event = v27.props.permissionEvent.Event, 
-                    callback = v27.permissionEventCallback
-                })
-            })
-        })
-    });
-end;
-v16.didUpdate = function(v32, v33) --[[ Line: 208 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v15 (copy)
-    local l_forceDismissToast_0 = v32.props.forceDismissToast;
-    if v33.forceDismissToast ~= l_forceDismissToast_0 and not ((not (v32.state.notificationType ~= v15.Success) or v32.state.notificationType == v15.Fail) and v32.state.toastContent) and l_forceDismissToast_0 and l_forceDismissToast_0.onDismissed then
-        l_forceDismissToast_0.onDismissed();
-    end;
-end;
-return v16;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local Toast = UIBlox.App.Dialog.Toast
+local Images = UIBlox.App.ImageSet.Images
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local shouldSaveScreenshotToAlbum = require(RobloxGui.Modules.shouldSaveScreenshotToAlbum)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local renderWithCoreScriptsStyleProvider = require(RobloxGui.Modules.Common.renderWithCoreScriptsStyleProvider)
+local _ = {
+	None = "None",
+	Success = "Success",
+	Fail = "Fail",
+	Permission = "Permission"
+}
+local v17 = Roact.PureComponent:extend("CaptureNotification")
+
+v17.validateProps = t.strictInterface({
+	forceDismissToast = t.optional(t.table),
+	permissionEvent = t.optional(t.instanceOf("BindableEvent"))
+})
+
+function v17.init(p1) -- line: 40
+	-- upvalues: Images (copy), RobloxTranslator (copy), Roact (copy), UserInputService (copy)
+	p1.state = {
+		dismissedPermission = false,
+		notificationType = "None",
+		toastContent = nil,
+		screenSize = Vector2.new(0, 0)
+	}
+
+	function p1.onScreenSizeChanged(p2) -- line: 48
+		-- upvalues: p1 (copy)
+		if p1.state.screenSize ~= p2.AbsoluteSize then
+			p1:setState({
+				screenSize = p2.AbsoluteSize
+			})
+		end
+	end
+	function p1.getToastContent(p3) -- line: 56
+		-- upvalues: Images (copy), RobloxTranslator (copy), p1 (copy), Roact (copy)
+		if p3 == "Success" or p3 == "Fail" then
+			local v31 = p3 == "Success"
+
+			return {
+				iconImage = v31 and Images["icons/status/success"] or Images["icons/status/alert"],
+				iconColorStyle = not v31 and {
+					Transparency = 0,
+					Color = Color3.fromRGB(247, 75, 82)
+				} or nil,
+				toastTitle = v31 and RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Success.ToastText") or RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Fail.ToastText"),
+				onDismissed = function() -- line: 68
+					-- upvalues: p1 (copy), Roact (copy)
+					p1:setState({
+						notificationType = "None",
+						toastContent = Roact.None
+					})
+
+					if p1.props.forceDismissToast and p1.props.forceDismissToast.onDismissed then
+						p1.props.forceDismissToast.onDismissed()
+					end
+				end
+			}
+		end
+
+		return Roact.None
+	end
+	function p1.dismissPermissionAlert() -- line: 83
+		-- upvalues: p1 (copy)
+		p1:setState({
+			dismissedPermission = true,
+			notificationType = "Fail",
+			toastContent = p1.getToastContent("Fail")
+		})
+	end
+	function p1.screenshotSavedToAlbumCallback(_, p5, p6) -- line: 91
+		-- upvalues: p1 (copy)
+		local v35 = if not p5 then (p1.state.dismissedPermission or (not p6:find("Domain=ALAssetsLibraryErrorDomain") or not p6:find("Data unavailable"))) and "Fail" or "Permission" else "Success"
+
+		p1:setState({
+			notificationType = v35,
+			toastContent = p1.getToastContent(v35)
+		})
+	end
+	function p1.permissionEventCallback() -- line: 116
+		-- upvalues: p1 (copy)
+		p1:setState({
+			notificationType = "Permission",
+			toastContent = p1.getToastContent("Permission")
+		})
+	end
+	function p1.getPermissionAlertBodyText() -- line: 123
+		-- upvalues: UserInputService (copy), RobloxTranslator (copy)
+		if UserInputService:GetPlatform() == Enum.Platform.IOS then
+			return RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTextIOS")
+		end
+
+		if UserInputService:GetPlatform() == Enum.Platform.Android then
+			return RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTextAndroid")
+		end
+
+		return RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertText")
+	end
+end
+function v17.renderWithStyle(_, p8) -- line: 134
+	-- upvalues: renderWithCoreScriptsStyleProvider (copy)
+	return renderWithCoreScriptsStyleProvider(p8)
+end
+function v17.render(p9) -- line: 138
+	-- upvalues: Roact (copy), Toast (copy), InteractiveAlert (copy), RobloxTranslator (copy), ButtonType (copy), shouldSaveScreenshotToAlbum (copy), ExternalEventConnection (copy)
+	local notificationType = p9.state.notificationType
+	local v23 = notificationType == "Success" and p9.state.toastContent
+	local v24 = notificationType == "Fail" and p9.state.toastContent
+	local v25 = notificationType == "Permission"
+
+	return p9:renderWithStyle({
+		RobloxCaptureNotificationGui = Roact.createElement("ScreenGui", {
+			AutoLocalize = false,
+			DisplayOrder = 9,
+			IgnoreGuiInset = true,
+			OnTopOfCoreBlur = true,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		}, {
+			Content = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				[Roact.Change.AbsoluteSize] = p9.onScreenSizeChanged
+			}, {
+				SuccessToast = v23 and Roact.createElement(Toast, {
+					duration = 3,
+					show = not p9.props.forceDismissToast,
+					toastContent = p9.state.toastContent
+				}),
+				FailToast = v24 and Roact.createElement(Toast, {
+					duration = 3,
+					show = not p9.props.forceDismissToast,
+					toastContent = p9.state.toastContent
+				}),
+				PermissionAlertOverlay = v25 and Roact.createElement("Frame", {
+					Active = true,
+					BackgroundTransparency = 0.5,
+					BackgroundColor3 = Color3.new(0, 0, 0),
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					PermissionAlert = Roact.createElement(InteractiveAlert, {
+						title = RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertTitle"),
+						bodyText = p9.getPermissionAlertBodyText(),
+						buttonStackInfo = {
+							buttons = {{
+								buttonType = ButtonType.PrimarySystem,
+								props = {
+									onActivated = p9.dismissPermissionAlert,
+									text = RobloxTranslator:FormatByKey("InGame.NotificationScript2.Capture.Permission.AlertButtonText")
+								}
+							}}
+						},
+						position = UDim2.fromScale(0.5, 0.5),
+						screenSize = p9.state.screenSize
+					})
+				}),
+				ScreenshotSavedToAlbumConnection = shouldSaveScreenshotToAlbum() and Roact.createElement(ExternalEventConnection, {
+					event = game.ScreenshotSavedToAlbum,
+					callback = p9.screenshotSavedToAlbumCallback
+				}),
+				PermissionEventConnection = p9.props.permissionEvent and Roact.createElement(ExternalEventConnection, {
+					event = p9.props.permissionEvent.Event,
+					callback = p9.permissionEventCallback
+				})
+			})
+		})
+	})
+end
+function v17.didUpdate(p10, p11) -- line: 208
+	local forceDismissToast = p10.props.forceDismissToast
+
+	if forceDismissToast ~= p11.forceDismissToast and ((p10.state.notificationType ~= "Success" and p10.state.notificationType ~= "Fail" or not p10.state.toastContent) and forceDismissToast and forceDismissToast.onDismissed) then
+		forceDismissToast.onDismissed()
+	end
+end
+
+return v17

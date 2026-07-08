@@ -1,35 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local v4 = l_Roact_0.PureComponent:extend("AlertViewLabel");
-v4.defaultProps = {
-    BackgroundTransparency = 1, 
-    Size = UDim2.new(1, 0, 0, 40), 
-    Text = "", 
-    TextXAlignment = Enum.TextXAlignment.Center
-};
-v4.render = function(v5) --[[ Line: 14 ]] --[[ Name: render ]]
-    -- upvalues: l_UIBlox_0 (copy), l_Roact_0 (copy)
-    return l_UIBlox_0.Style.withStyle(function(v6) --[[ Line: 15 ]]
-        -- upvalues: v5 (copy), l_Roact_0 (ref)
-        local l_BackgroundTransparency_0 = v5.props.BackgroundTransparency;
-        local v8 = v5.props.Font or v6.Font.Body.Font;
-        local l_Text_0 = v5.props.Text;
-        local v10 = v5.props.TextColor3 or v6.Theme.TextDefault.Color;
-        local v11 = v5.props.TextSize or v6.Font.Body.RelativeSize * v6.Font.BaseSize;
-        local l_TextXAlignment_0 = v5.props.TextXAlignment;
-        return l_Roact_0.createElement("TextLabel", {
-            BackgroundTransparency = l_BackgroundTransparency_0, 
-            Font = v8, 
-            LayoutOrder = v5.props.LayoutOrder, 
-            Size = v5.props.Size, 
-            Text = l_Text_0, 
-            TextColor3 = v10, 
-            TextSize = v11, 
-            TextWrapped = true, 
-            TextXAlignment = l_TextXAlignment_0
-        });
-    end);
-end;
-return v4;
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local v5 = Roact.PureComponent:extend("AlertViewLabel")
+
+v5.defaultProps = {
+	BackgroundTransparency = 1,
+	Text = "",
+	Size = UDim2.new(1, 0, 0, 40),
+	TextXAlignment = Enum.TextXAlignment.Center
+}
+
+function v5.render(p1) -- line: 14
+	-- upvalues: UIBlox (copy), Roact (copy)
+	return UIBlox.Style.withStyle(function(p2) -- line: 15
+		-- upvalues: p1 (copy), Roact (copy)
+		local propsBackgroundTransparency = p1.props.BackgroundTransparency
+		local v9 = p1.props.Font or p2.Font.Body.Font
+		local propsText = p1.props.Text
+		local v11 = p1.props.TextColor3 or p2.Theme.TextDefault.Color
+		local v12 = p1.props.TextSize or p2.Font.Body.RelativeSize * p2.Font.BaseSize
+		local TextXAlignment = p1.props.TextXAlignment
+
+		return Roact.createElement("TextLabel", {
+			TextWrapped = true,
+			BackgroundTransparency = propsBackgroundTransparency,
+			Font = v9,
+			LayoutOrder = p1.props.LayoutOrder,
+			Size = p1.props.Size,
+			Text = propsText,
+			TextColor3 = v11,
+			TextSize = v12,
+			TextXAlignment = TextXAlignment
+		})
+	end)
+end
+
+return v5

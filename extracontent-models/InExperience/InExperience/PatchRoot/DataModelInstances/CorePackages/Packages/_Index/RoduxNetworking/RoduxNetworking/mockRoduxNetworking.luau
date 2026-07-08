@@ -1,27 +1,32 @@
-local v0 = require(script.Parent.makeActionCreator);
-local function v4(v1) --[[ Line: 3 ]] --[[ Name: makeMockRequestObject ]]
-    -- upvalues: v0 (copy)
-    local v2 = v0(v1);
-    local function v3() --[[ Line: 5 ]]
+local makeActionCreator = require(script.Parent.makeActionCreator)
 
-    end;
-    v2.API = function() --[[ Line: 6 ]]
-        -- upvalues: v2 (copy)
-        return v2.Succeeded();
-    end;
-    v2.Mock = {
-        reply = v3, 
-        clear = v3, 
-        replyWithError = v3
-    };
-    return v2;
-end;
-return function() --[[ Line: 19 ]]
-    -- upvalues: v4 (copy)
-    return {
-        GET = v4, 
-        POST = v4, 
-        PATCH = v4, 
-        DELETE = v4
-    };
-end;
+local function makeMockRequestObject(p1) -- line: 3
+	-- upvalues: makeActionCreator (copy)
+	local v4 = makeActionCreator(p1)
+
+	local function v5() -- line: 5
+	end
+
+	function v4.API() -- line: 6
+		-- upvalues: v4 (copy)
+		return v4.Succeeded()
+	end
+
+	v4.Mock = {
+		reply = v5,
+		clear = v5,
+		replyWithError = v5
+	}
+
+	return v4
+end
+
+return function() -- line: 19
+	-- upvalues: makeMockRequestObject (copy)
+	return {
+		GET = makeMockRequestObject,
+		POST = makeMockRequestObject,
+		PATCH = makeMockRequestObject,
+		DELETE = makeMockRequestObject
+	}
+end

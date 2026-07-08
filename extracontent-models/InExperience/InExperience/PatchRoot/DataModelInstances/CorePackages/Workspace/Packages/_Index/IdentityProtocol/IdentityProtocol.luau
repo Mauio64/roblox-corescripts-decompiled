@@ -1,5 +1,7 @@
-local v0 = require(script.IdentityProtocol);
-local _ = require(script.IdentityProtocolTypes);
+local IdentityProtocol = require(script.IdentityProtocol)
+
+require(script.IdentityProtocolTypes)
+
 return {
-    IdentityProtocol = v0
-};
+	IdentityProtocol = IdentityProtocol
+}

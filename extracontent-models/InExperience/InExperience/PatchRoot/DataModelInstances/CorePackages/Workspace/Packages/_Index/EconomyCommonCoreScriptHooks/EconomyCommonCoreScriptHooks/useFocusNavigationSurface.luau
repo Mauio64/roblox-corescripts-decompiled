@@ -1,64 +1,69 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceRegistry_0 = v3.FocusNavigableSurfaceRegistry;
-local l_useRegisterFocusNavigableSurface_0 = l_FocusNavigableSurfaceRegistry_0.useRegisterFocusNavigableSurface;
-local l_useDeRegisterFocusNavigableSurface_0 = l_FocusNavigableSurfaceRegistry_0.useDeRegisterFocusNavigableSurface;
-local l_useLastInputMethod_0 = v3.useLastInputMethod;
-local l_useAutoFocus_0 = v3.useAutoFocus;
-local l_useDescendantHasFocus_0 = v3.useDescendantHasFocus;
-return function(v10) --[[ Line: 22 ]] --[[ Name: useFocusNavigationSurface ]]
-    -- upvalues: v2 (copy), l_useRegisterFocusNavigableSurface_0 (copy), l_useDeRegisterFocusNavigableSurface_0 (copy), l_useAutoFocus_0 (copy), l_useDescendantHasFocus_0 (copy), l_useLastInputMethod_0 (copy), l_GuiService_0 (copy)
-    local v11, v12 = v2.useState(nil);
-    local v13 = l_useRegisterFocusNavigableSurface_0();
-    local v14 = l_useDeRegisterFocusNavigableSurface_0();
-    local v15 = l_useAutoFocus_0({
-        v11
-    }, 0.1);
-    local v16 = l_useDescendantHasFocus_0(v11);
-    local v17 = l_useLastInputMethod_0();
-    local v18 = true;
-    if v17 ~= "Gamepad" then
-        v18 = v17 == "Keyboard";
-    end;
-    v2.useEffect(function() --[[ Line: 31 ]]
-        -- upvalues: v11 (copy), v13 (copy), v10 (copy), l_GuiService_0 (ref), v14 (copy)
-        if v11 then
-            v13(v10.focusNavigableSurfaceIdentifier, v11);
-            l_GuiService_0:AddSelectionParent(v10.selectionGroupName, v11);
-        else
-            v14(v10.focusNavigableSurfaceIdentifier, v11);
-            l_GuiService_0:RemoveSelectionGroup(v10.selectionGroupName);
-            l_GuiService_0.SelectedCoreObject = nil;
-        end;
-        return function() --[[ Line: 42 ]]
-            -- upvalues: v14 (ref), v10 (ref), v11 (ref), l_GuiService_0 (ref)
-            v14(v10.focusNavigableSurfaceIdentifier, v11);
-            l_GuiService_0:RemoveSelectionGroup(v10.selectionGroupName);
-            l_GuiService_0.SelectedCoreObject = nil;
-        end;
-    end, {
-        v11, 
-        v10.focusNavigableSurfaceIdentifier, 
-        v10.selectionGroupName
-    });
-    local v19 = v18 and v11 and not v16;
-    v2.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v19 (copy), v15 (copy)
-        local v20 = nil;
-        if v19 then
-            v20 = v15();
-        end;
-        return function() --[[ Line: 57 ]]
-            -- upvalues: v20 (ref)
-            if v20 then
-                v20.cancel();
-            end;
-        end;
-    end, {
-        v19, 
-        v15
-    });
-    return v12;
-end;
+local GuiService = game:GetService("GuiService")
+local Parent = script:FindFirstAncestor("EconomyCommonCoreScriptHooks").Parent
+local React = require(Parent.React)
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigableSurfaceRegistry = FocusNavigationUtils.FocusNavigableSurfaceRegistry
+local useRegisterFocusNavigableSurface = FocusNavigableSurfaceRegistry.useRegisterFocusNavigableSurface
+local useDeRegisterFocusNavigableSurface = FocusNavigableSurfaceRegistry.useDeRegisterFocusNavigableSurface
+local useLastInputMethod = FocusNavigationUtils.useLastInputMethod
+local useAutoFocus = FocusNavigationUtils.useAutoFocus
+local useDescendantHasFocus = FocusNavigationUtils.useDescendantHasFocus
+
+local function useFocusNavigationSurface(t1: {[any]: any}) -- line: 22
+	-- upvalues: React (copy), useRegisterFocusNavigableSurface (copy), useDeRegisterFocusNavigableSurface (copy), useAutoFocus (copy), useDescendantHasFocus (copy), useLastInputMethod (copy), GuiService (copy)
+	local v13, v14 = React.useState(nil)
+	local v15 = useRegisterFocusNavigableSurface()
+	local v16 = useDeRegisterFocusNavigableSurface()
+	local v17 = useAutoFocus({ v13 }, 0.1)
+	local v18 = useDescendantHasFocus(v13)
+	local v19 = useLastInputMethod()
+	local v20 = v19 == "Gamepad" or v19 == "Keyboard"
+
+	React.useEffect(function() -- line: 31
+		-- upvalues: v13 (copy), v15 (copy), t1 (copy), GuiService (copy), v16 (copy)
+		if v13 then
+			v15(t1.focusNavigableSurfaceIdentifier, v13)
+			GuiService:AddSelectionParent(t1.selectionGroupName, v13)
+		else
+			v16(t1.focusNavigableSurfaceIdentifier, v13)
+			GuiService:RemoveSelectionGroup(t1.selectionGroupName)
+			GuiService.SelectedCoreObject = nil
+		end
+
+		return function() -- line: 42
+			-- upvalues: v16 (copy), t1 (copy), v13 (copy), GuiService (copy)
+			v16(t1.focusNavigableSurfaceIdentifier, v13)
+			GuiService:RemoveSelectionGroup(t1.selectionGroupName)
+			GuiService.SelectedCoreObject = nil
+		end
+	end, {
+		v13,
+		t1.focusNavigableSurfaceIdentifier,
+		t1.selectionGroupName
+	})
+
+	local v21 = v20 and (v13 and not v18)
+
+	React.useEffect(function() -- line: 52
+		-- upvalues: v21 (copy), v17 (copy)
+		local u22 = nil
+
+		if v21 then
+			u22 = v17()
+		end
+
+		return function() -- line: 57
+			-- upvalues: u22 (ref)
+			if u22 then
+				u22.cancel()
+			end
+		end
+	end, {
+		v21,
+		v17
+	})
+
+	return v14
+end
+
+return useFocusNavigationSurface

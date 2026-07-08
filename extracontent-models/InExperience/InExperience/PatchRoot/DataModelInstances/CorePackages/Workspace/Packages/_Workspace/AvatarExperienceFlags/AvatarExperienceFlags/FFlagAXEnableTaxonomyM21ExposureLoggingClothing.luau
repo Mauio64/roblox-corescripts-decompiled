@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableTaxonomyM21ExposureLoggingClothing", false);
+return game:DefineFastFlag("AXEnableTaxonomyM21ExposureLoggingClothing", false)

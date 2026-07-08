@@ -1,30 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsMenu");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.friendsMenuModalType);
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local l_GetFFlagFriendsMenuDummyLoadingFriendsFix_0 = require(l_Parent_0.SharedFlags).GetFFlagFriendsMenuDummyLoadingFriendsFix;
-local function v6(v5) --[[ Line: 9 ]]
-    -- upvalues: l_GetFFlagFriendsMenuDummyLoadingFriendsFix_0 (copy), v3 (copy)
-    return {
-        displayName = "", 
-        friendFrequentRank = v5, 
-        friendRank = v5, 
-        hasVerifiedBadge = false, 
-        id = l_GetFFlagFriendsMenuDummyLoadingFriendsFix_0() and v3.DummyFriendsPrefix .. tostring(v5) or tostring(v5), 
-        isFetching = true, 
-        isFriend = true, 
-        lastLocation = "", 
-        lastOnline = DateTime.now(), 
-        name = "", 
-        presence = "", 
-        isLoadingPlaceholder = true
-    };
-end;
-return function(v7) --[[ Line: 28 ]]
-    -- upvalues: v6 (copy)
-    local v8 = {};
-    for v9 = 1, v7 do
-        v8[v9] = v6(v9);
-    end;
-    return v8;
-end;
+local FriendsMenu = script:FindFirstAncestor("FriendsMenu")
+local FriendsMenuParent = FriendsMenu.Parent
+
+require(FriendsMenu.friendsMenuModalType)
+
+local Constants = require(FriendsMenu.Constants)
+local GetFFlagFriendsMenuDummyLoadingFriendsFix = require(FriendsMenuParent.SharedFlags).GetFFlagFriendsMenuDummyLoadingFriendsFix
+
+local function v5(n1: number) -- line: 9
+	-- upvalues: GetFFlagFriendsMenuDummyLoadingFriendsFix (copy), Constants (copy)
+	return {
+		displayName = "",
+		hasVerifiedBadge = false,
+		isFetching = true,
+		isFriend = true,
+		lastLocation = "",
+		name = "",
+		presence = "",
+		isLoadingPlaceholder = true,
+		friendFrequentRank = n1,
+		friendRank = n1,
+		id = GetFFlagFriendsMenuDummyLoadingFriendsFix() and Constants.DummyFriendsPrefix .. tostring(n1) or tostring(n1),
+		lastOnline = DateTime.now()
+	}
+end
+
+return function(n2: number) -- line: 28
+	-- upvalues: v5 (copy)
+	local t1 = {}
+
+	for i = 1, n2 do
+		t1[i] = v5(i)
+	end
+
+	return t1
+end

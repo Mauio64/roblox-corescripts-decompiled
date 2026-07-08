@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXHydrateAssetFromBundleItems) and game:DefineFastFlag("AXMISEnableMultiShopping11", false);
+return game:DefineFastFlag("AXMISEnableMultiShopping13", false)

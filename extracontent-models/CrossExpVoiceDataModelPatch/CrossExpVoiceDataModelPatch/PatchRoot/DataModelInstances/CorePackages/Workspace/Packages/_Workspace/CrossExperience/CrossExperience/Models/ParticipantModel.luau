@@ -1,45 +1,49 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperience");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_FFlagEnablePartyVoiceChangersInLua_0 = v1.SharedFlags.FFlagEnablePartyVoiceChangersInLua;
-local l_t_0 = v1.t;
-local v4 = {};
-v4.new = function(v5) --[[ Line: 10 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    assert(v4.isValid(v5));
-    v4.__index = v4;
-    setmetatable(v5, v4);
-    return v5;
-end;
-v4.format = function(v6) --[[ Line: 22 ]] --[[ Name: format ]]
-    -- upvalues: v4 (copy), l_FFlagEnablePartyVoiceChangersInLua_0 (copy)
-    return (v4.new({
-        userId = v6.userId, 
-        isLocalUser = v6.isLocalUser, 
-        username = v6.username, 
-        displayname = v6.displayname, 
-        isMuted = v6.isMuted, 
-        isMutedLocally = v6.isMutedLocally, 
-        isVoiceChangerActive = if l_FFlagEnablePartyVoiceChangersInLua_0 then v6.isVoiceChangerActive else nil, 
-        isVoiceChangerHearMyselfActive = if l_FFlagEnablePartyVoiceChangersInLua_0 then v6.isVoiceChangerHearMyselfActive else nil, 
-        selectedVoicePack = if l_FFlagEnablePartyVoiceChangersInLua_0 then v6.selectedVoicePack else nil
-    }));
-end;
-v4.isValid = if l_FFlagEnablePartyVoiceChangersInLua_0 then l_t_0.strictInterface({
-    userId = l_t_0.number, 
-    isLocalUser = l_t_0.boolean, 
-    username = l_t_0.string, 
-    displayname = l_t_0.string, 
-    isMuted = l_t_0.boolean, 
-    isMutedLocally = l_t_0.boolean, 
-    isVoiceChangerActive = l_t_0.boolean, 
-    isVoiceChangerHearMyselfActive = l_t_0.boolean, 
-    selectedVoicePack = l_t_0.string
-}) else l_t_0.strictInterface({
-    userId = l_t_0.number, 
-    isLocalUser = l_t_0.boolean, 
-    username = l_t_0.string, 
-    displayname = l_t_0.string, 
-    isMuted = l_t_0.boolean, 
-    isMutedLocally = l_t_0.boolean
-});
-return v4;
+local CrossExperience = script:FindFirstAncestor("CrossExperience")
+local dependencies = require(CrossExperience.dependencies)
+local FFlagEnablePartyVoiceChangersInLua = dependencies.SharedFlags.FFlagEnablePartyVoiceChangersInLua
+local t = dependencies.t
+local t1 = {}
+
+function t1.new(p1) -- line: 10
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.format(p2) -- line: 22
+	-- upvalues: t1 (copy), FFlagEnablePartyVoiceChangersInLua (copy)
+	return (t1.new({
+		userId = p2.userId,
+		isLocalUser = p2.isLocalUser,
+		username = p2.username,
+		displayname = p2.displayname,
+		isMuted = p2.isMuted,
+		isMutedLocally = p2.isMutedLocally,
+		isVoiceChangerActive = if not FFlagEnablePartyVoiceChangersInLua then nil else p2.isVoiceChangerActive,
+		isVoiceChangerHearMyselfActive = if not FFlagEnablePartyVoiceChangersInLua then nil else p2.isVoiceChangerHearMyselfActive,
+		selectedVoicePack = if not FFlagEnablePartyVoiceChangersInLua then nil else p2.selectedVoicePack
+	}))
+end
+
+t1.isValid = if not FFlagEnablePartyVoiceChangersInLua then t.strictInterface({
+	userId = t.number,
+	isLocalUser = t.boolean,
+	username = t.string,
+	displayname = t.string,
+	isMuted = t.boolean,
+	isMutedLocally = t.boolean
+}) else t.strictInterface({
+	userId = t.number,
+	isLocalUser = t.boolean,
+	username = t.string,
+	displayname = t.string,
+	isMuted = t.boolean,
+	isMutedLocally = t.boolean,
+	isVoiceChangerActive = t.boolean,
+	isVoiceChangerHearMyselfActive = t.boolean,
+	selectedVoicePack = t.string
+})
+
+return t1

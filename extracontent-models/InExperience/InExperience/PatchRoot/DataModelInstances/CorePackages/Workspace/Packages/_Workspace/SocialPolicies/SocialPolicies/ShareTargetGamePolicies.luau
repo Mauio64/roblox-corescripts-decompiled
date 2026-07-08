@@ -1,13 +1,16 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: ShareTargetGamePolicies ]]
-    return {
-        shouldShowCreatorName = function() --[[ Line: 4 ]] --[[ Name: shouldShowCreatorName ]]
-            -- upvalues: v0 (copy)
-            local l_ShowShareTargetGameCreator_0 = v0.ShowShareTargetGameCreator;
-            if l_ShowShareTargetGameCreator_0 ~= nil then
-                return l_ShowShareTargetGameCreator_0;
-            else
-                return false;
-            end;
-        end
-    };
-end;
+local function ShareTargetGamePolicies(p1) -- line: 2
+	return {
+		shouldShowCreatorName = function() -- line: 4
+			-- upvalues: p1 (copy)
+			local ShowShareTargetGameCreator = p1.ShowShareTargetGameCreator
+
+			if ShowShareTargetGameCreator ~= nil then
+				return ShowShareTargetGameCreator
+			end
+
+			return false
+		end
+	}
+end
+
+return ShareTargetGamePolicies

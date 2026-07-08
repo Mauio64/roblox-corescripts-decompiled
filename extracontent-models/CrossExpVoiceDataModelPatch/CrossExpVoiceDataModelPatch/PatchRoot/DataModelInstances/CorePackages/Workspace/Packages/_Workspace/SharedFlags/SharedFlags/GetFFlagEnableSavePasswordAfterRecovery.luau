@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableSavePasswordAfterRecovery", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableSavePasswordAfterRecovery");
-end;
+game:DefineFastFlag("EnableSavePasswordAfterRecovery", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableSavePasswordAfterRecovery")
+end

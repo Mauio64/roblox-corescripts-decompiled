@@ -1,17 +1,16 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v2 = require(l_Parent_0.Cryo);
-local l_useExternalEvent_0 = require(l_Parent_0.RoactUtils).Hooks.useExternalEvent;
-return function(v4, v5, v6) --[[ Line: 15 ]] --[[ Name: useKeybind ]]
-    -- upvalues: l_useExternalEvent_0 (copy), l_UserInputService_0 (copy), v2 (copy)
-    l_useExternalEvent_0(l_UserInputService_0.InputBegan, function(v7) --[[ Line: 16 ]]
-        -- upvalues: v4 (copy), v5 (copy)
-        if v7.KeyCode == v4.keyCode and (v4.modifierKey == nil or v7:IsModifierKeyDown(v4.modifierKey)) then
-            v5();
-        end;
-    end, v2.List.join({
-        v4
-    }, {
-        v5
-    }, v6));
-end;
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+local useExternalEvent = require(Parent.RoactUtils).Hooks.useExternalEvent
+
+local function useKeybind(t1: {[any]: any}, p1: ((...any) -> ...any), t2: {[any]: any}) -- line: 15
+	-- upvalues: useExternalEvent (copy), UserInputService (copy), Cryo (copy)
+	useExternalEvent(UserInputService.InputBegan, function(p2) -- line: 16
+		-- upvalues: t1 (copy), p1 (copy)
+		if p2.KeyCode == t1.keyCode and (t1.modifierKey == nil or p2:IsModifierKeyDown(t1.modifierKey)) then
+			p1()
+		end
+	end, Cryo.List.join({ t1 }, { p1 }, t2))
+end
+
+return useKeybind

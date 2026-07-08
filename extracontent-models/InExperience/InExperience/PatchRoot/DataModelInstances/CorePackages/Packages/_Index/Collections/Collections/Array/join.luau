@@ -1,15 +1,19 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local _ = require(l_Parent_1.ES7Types);
-local v3 = require(l_Parent_0.map);
-return function(v4, v5) --[[ Line: 22 ]]
-    -- upvalues: v3 (copy)
-    if #v4 == 0 then
-        return "";
-    else
-        local v7 = v3(v4, function(v6) --[[ Line: 27 ]]
-            return (tostring(v6));
-        end);
-        return table.concat(v7, v5 or ",");
-    end;
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+local map = require(scriptParent.map)
+
+return function(p1, s1: string?) -- line: 22
+	-- upvalues: map (copy)
+	if #p1 == 0 then
+		return ""
+	end
+
+	local v6 = map(p1, function(p2) -- line: 27
+		return (tostring(p2))
+	end)
+
+	return table.concat(v6, s1 or ",")
+end

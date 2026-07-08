@@ -1,54 +1,55 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.t);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v5 = require(l_Parent_0.createShallowEqualAndTables);
-local v6 = require(l_Parent_0.Flags.FFlagPlayerListReduceRerenders);
-local v7 = v1.PureComponent:extend("CellExtender");
-v7.validateProps = v3.strictInterface({
-    layoutOrder = v3.integer, 
-    size = v3.UDim2, 
-    backgroundStyle = v3.strictInterface({
-        Color = v3.Color3, 
-        Transparency = v3.number
-    }), 
-    overlayStyle = v3.strictInterface({
-        Color = v3.Color3, 
-        Transparency = v3.number
-    }), 
-    doubleOverlay = v3.boolean
-});
-v7.render = function(v8) --[[ Line: 28 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy)
-    return v1.createElement("Frame", {
-        LayoutOrder = v8.props.layoutOrder, 
-        Size = v8.props.size, 
-        BackgroundTransparency = v8.props.backgroundStyle.Transparency, 
-        BackgroundColor3 = v8.props.backgroundStyle.Color, 
-        BorderSizePixel = 0
-    }, {
-        DoubleOverLay = v1.createElement("Frame", {
-            ZIndex = 1, 
-            Visible = v8.props.doubleOverlay, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v8.props.overlayStyle.Transparency, 
-            BackgroundColor3 = v8.props.overlayStyle.Color, 
-            BorderSizePixel = 0
-        }), 
-        OverlayFrame = v1.createElement("Frame", {
-            ZIndex = 2, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v8.props.overlayStyle.Transparency, 
-            BackgroundColor3 = v8.props.overlayStyle.Color, 
-            BorderSizePixel = 0
-        })
-    });
-end;
-if v6 then
-    return v2.memo(v7, v5({
-        "backgroundStyle"
-    }));
-else
-    return v7;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local React = require(CorePackages.Packages.React)
+local t = require(CorePackages.Packages.t)
+local ParentParent = script.Parent.Parent.Parent
+local createShallowEqualAndTables = require(ParentParent.createShallowEqualAndTables)
+local FFlagPlayerListReduceRerenders = require(ParentParent.Flags.FFlagPlayerListReduceRerenders)
+local v8 = Roact.PureComponent:extend("CellExtender")
+
+v8.validateProps = t.strictInterface({
+	layoutOrder = t.integer,
+	size = t.UDim2,
+	backgroundStyle = t.strictInterface({
+		Color = t.Color3,
+		Transparency = t.number
+	}),
+	overlayStyle = t.strictInterface({
+		Color = t.Color3,
+		Transparency = t.number
+	}),
+	doubleOverlay = t.boolean
+})
+
+function v8.render(p1) -- line: 28
+	-- upvalues: Roact (copy)
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		LayoutOrder = p1.props.layoutOrder,
+		Size = p1.props.size,
+		BackgroundTransparency = p1.props.backgroundStyle.Transparency,
+		BackgroundColor3 = p1.props.backgroundStyle.Color
+	}, {
+		DoubleOverLay = Roact.createElement("Frame", {
+			ZIndex = 1,
+			BorderSizePixel = 0,
+			Visible = p1.props.doubleOverlay,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = p1.props.overlayStyle.Transparency,
+			BackgroundColor3 = p1.props.overlayStyle.Color
+		}),
+		OverlayFrame = Roact.createElement("Frame", {
+			ZIndex = 2,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = p1.props.overlayStyle.Transparency,
+			BackgroundColor3 = p1.props.overlayStyle.Color
+		})
+	})
+end
+
+if FFlagPlayerListReduceRerenders then
+	return React.memo(v8, createShallowEqualAndTables({ "backgroundStyle" }))
+end
+
+return v8

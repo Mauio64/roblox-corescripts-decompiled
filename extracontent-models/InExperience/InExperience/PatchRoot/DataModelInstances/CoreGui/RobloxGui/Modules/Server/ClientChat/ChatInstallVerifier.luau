@@ -1,26 +1,35 @@
-local l_Players_0 = game:GetService("Players");
-local l_StarterPlayer_0 = game:GetService("StarterPlayer");
-local function v5(v2, v3) --[[ Line: 10 ]] --[[ Name: waitForChildOfClass ]]
-    local l_v2_FirstChildOfClass_0 = v2:FindFirstChildOfClass(v3);
-    while not l_v2_FirstChildOfClass_0 or l_v2_FirstChildOfClass_0.ClassName ~= v3 do
-        l_v2_FirstChildOfClass_0 = v2.ChildAdded:Wait();
-    end;
-    return l_v2_FirstChildOfClass_0;
-end;
-local v6 = v5(l_Players_0.LocalPlayer, "PlayerScripts");
-local v7 = v5(l_StarterPlayer_0, "StarterPlayerScripts");
-VerifyScriptExistence = function() --[[ Line: 22 ]] --[[ Name: VerifyScriptExistence ]]
-    -- upvalues: v6 (copy), v7 (copy)
-    local l_Value_0 = script:WaitForChild("ScriptToVerify").Value;
-    if not v6:FindFirstChild(l_Value_0) then
-        local l_v7_FirstChild_0 = v7:FindFirstChild(l_Value_0);
-        if l_v7_FirstChild_0 then
-            local l_Archivable_0 = l_v7_FirstChild_0.Archivable;
-            l_v7_FirstChild_0.Archivable = true;
-            l_v7_FirstChild_0:Clone().Parent = v6;
-            l_v7_FirstChild_0.Archivable = l_Archivable_0;
-        end;
-    end;
-end;
-VerifyScriptExistence();
-script:Destroy();
+local Players = game:GetService("Players")
+local StarterPlayer = game:GetService("StarterPlayer")
+
+local function waitForChildOfClass(p1, p2) -- line: 10
+	local p2_2 = p1:FindFirstChildOfClass(p2)
+
+	while not p2_2 or p2 ~= p2_2.ClassName do
+		p2_2 = p1.ChildAdded:Wait()
+	end
+
+	return p2_2
+end
+
+local v4 = waitForChildOfClass(Players.LocalPlayer, "PlayerScripts")
+local v5 = waitForChildOfClass(StarterPlayer, "StarterPlayerScripts")
+
+function VerifyScriptExistence() -- line: 22
+	-- upvalues: v4 (copy), v5 (copy)
+	local Value = script:WaitForChild("ScriptToVerify").Value
+
+	if not v4:FindFirstChild(Value) then
+		local Value2 = v5:FindFirstChild(Value)
+
+		if Value2 then
+			local Archivable = Value2.Archivable
+
+			Value2.Archivable = true
+			Value2:Clone().Parent = v4
+			Value2.Archivable = Archivable
+		end
+	end
+end
+
+VerifyScriptExistence()
+script:Destroy()

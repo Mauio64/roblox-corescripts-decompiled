@@ -1,79 +1,90 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.SignalsReact);
-local v5 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local v7 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local v8 = require(l_CorePackages_0.Workspace.Packages.PlayerIconInfoStore);
-local l_useLeaderboardStore_0 = v5.Hooks.useLeaderboardStore;
-local v10 = require(l_Parent_0.Components.PresentationCommon.PlayerEntryView);
-local v11 = require(l_Parent_0.Actions.ClosePlayerDropDown);
-local v12 = require(l_Parent_0.Actions.OpenPlayerDropDown);
-local l_FFlagReplacePlayerIconRoduxWithSignal_0 = v7.FFlagReplacePlayerIconRoduxWithSignal;
-local v14 = if l_FFlagReplacePlayerIconRoduxWithSignal_0 then v8.PlayerIconInfoStore else nil;
-local l_FFlagPlayerListFixLeaderstatsStacking_0 = v7.FFlagPlayerListFixLeaderstatsStacking;
-local l_FFlagPlayerListUseFocusNavHook_0 = v5.Flags.FFlagPlayerListUseFocusNavHook;
-return v2.memo(v3.connect(function(v17) --[[ Line: 116 ]] --[[ Name: mapStateToProps ]]
-    return {
-        selectedPlayer = v17.playerDropDown.selectedPlayer, 
-        dropdownOpen = v17.playerDropDown.isVisible, 
-        isSmallTouchDevice = v17.displayOptions.isSmallTouchDevice, 
-        isDirectionalPreferred = v17.displayOptions.isTenFootInterface
-    };
-end, function(v18) --[[ Line: 126 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v11 (copy), v12 (copy)
-    return {
-        closeDropdown = function() --[[ Line: 128 ]] --[[ Name: closeDropdown ]]
-            -- upvalues: v18 (copy), v11 (ref)
-            return v18(v11());
-        end, 
-        openDropdown = function(v19) --[[ Line: 131 ]] --[[ Name: openDropdown ]]
-            -- upvalues: v18 (copy), v12 (ref)
-            return v18(v12(v19));
-        end
-    };
-end)(function(v20) --[[ Line: 71 ]] --[[ Name: PlayerEntryContainer ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), l_FFlagReplacePlayerIconRoduxWithSignal_0 (copy), v14 (copy), v4 (copy), l_FFlagPlayerListFixLeaderstatsStacking_0 (copy), v2 (copy), v10 (copy), l_FFlagPlayerListUseFocusNavHook_0 (copy)
-    local v21 = l_useLeaderboardStore_0();
-    local v22 = nil;
-    if l_FFlagReplacePlayerIconRoduxWithSignal_0 then
-        local v23 = v14.getPlayerIconInfoReactive(v20.player.UserId);
-        v22 = v4.useSignalState(v23);
-    else
-        v22 = v20.playerIconInfo;
-    end;
-    local v24 = v21.getGameStatsList();
-    local v25 = v21.getPlayerEntry(v20.player, false);
-    local v26 = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v4.useSignalState(v24.getCount);
-    if v25 then
-        return (v2.createElement(v10, {
-            playerData = v25, 
-            gameStats = v24, 
-            gameStatsCount = if l_FFlagPlayerListFixLeaderstatsStacking_0 then nil else v26, 
-            size = v20.size, 
-            entrySizeX = v20.entrySizeX, 
-            layoutOrder = v20.layoutOrder, 
-            player = v20.player, 
-            titlePlayerEntry = v20.titlePlayerEntry, 
-            playerIconInfo = v22, 
-            playerRelationship = v20.playerRelationship, 
-            dropdownOpen = v20.dropdownOpen, 
-            selectedPlayer = v20.selectedPlayer, 
-            firstPlayerRef = v20.firstPlayerRef, 
-            openDropdown = v20.openDropdown, 
-            closeDropdown = v20.closeDropdown, 
-            setDropDownPlayerDimensionY = v20.setDropDownPlayerDimensionY, 
-            prevFocusedEntry = v20.prevFocusedEntry, 
-            destroyedFocusedPlayerId = v20.destroyedFocusedPlayerId, 
-            registerPlayerInstance = if l_FFlagPlayerListUseFocusNavHook_0 then v20.registerPlayerInstance else nil, 
-            unregisterPlayerInstance = if l_FFlagPlayerListUseFocusNavHook_0 then v20.unregisterPlayerInstance else nil, 
-            setSelectedPlayerId = if l_FFlagPlayerListUseFocusNavHook_0 then v20.setSelectedPlayerId else nil, 
-            isSmallTouchDevice = v20.isSmallTouchDevice, 
-            isDirectionalPreferred = v20.isDirectionalPreferred
-        }));
-    else
-        return nil;
-    end;
-end));
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local PlayerIconInfoStore = require(CorePackages.Workspace.Packages.PlayerIconInfoStore)
+local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
+local PlayerEntryView = require(ParentParent.Components.PresentationCommon.PlayerEntryView)
+local ClosePlayerDropDown = require(ParentParent.Actions.ClosePlayerDropDown)
+local OpenPlayerDropDown = require(ParentParent.Actions.OpenPlayerDropDown)
+local FFlagReplacePlayerIconRoduxWithSignal = SharedFlags.FFlagReplacePlayerIconRoduxWithSignal
+local v14 = if not FFlagReplacePlayerIconRoduxWithSignal then nil else PlayerIconInfoStore.PlayerIconInfoStore
+local FFlagPlayerListFixLeaderstatsStacking = SharedFlags.FFlagPlayerListFixLeaderstatsStacking
+local FFlagPlayerListUseFocusNavHook = PlayerList.Flags.FFlagPlayerListUseFocusNavHook
+
+local function PlayerEntryContainer(t1: {[any]: any}) -- line: 71
+	-- upvalues: useLeaderboardStore (copy), FFlagReplacePlayerIconRoduxWithSignal (copy), v14 (copy), SignalsReact (copy), FFlagPlayerListFixLeaderstatsStacking (copy), React (copy), PlayerEntryView (copy), FFlagPlayerListUseFocusNavHook (copy)
+	local v21 = useLeaderboardStore()
+	local v23
+
+	if FFlagReplacePlayerIconRoduxWithSignal then
+		local v22 = v14.getPlayerIconInfoReactive(t1.player.UserId)
+
+		v23 = SignalsReact.useSignalState(v22)
+	else
+		v23 = t1.playerIconInfo
+	end
+
+	local v24 = v21.getGameStatsList()
+	local v25 = v21.getPlayerEntry(t1.player, false)
+	local v26 = if not FFlagPlayerListFixLeaderstatsStacking then SignalsReact.useSignalState(v24.getCount) else nil
+
+	if v25 then
+		return (React.createElement(PlayerEntryView, {
+			playerData = v25,
+			gameStats = v24,
+			gameStatsCount = if not FFlagPlayerListFixLeaderstatsStacking then v26 else nil,
+			size = t1.size,
+			entrySizeX = t1.entrySizeX,
+			layoutOrder = t1.layoutOrder,
+			player = t1.player,
+			titlePlayerEntry = t1.titlePlayerEntry,
+			playerIconInfo = v23,
+			playerRelationship = t1.playerRelationship,
+			dropdownOpen = t1.dropdownOpen,
+			selectedPlayer = t1.selectedPlayer,
+			firstPlayerRef = t1.firstPlayerRef,
+			openDropdown = t1.openDropdown,
+			closeDropdown = t1.closeDropdown,
+			setDropDownPlayerDimensionY = t1.setDropDownPlayerDimensionY,
+			prevFocusedEntry = t1.prevFocusedEntry,
+			destroyedFocusedPlayerId = t1.destroyedFocusedPlayerId,
+			registerPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else t1.registerPlayerInstance,
+			unregisterPlayerInstance = if not FFlagPlayerListUseFocusNavHook then nil else t1.unregisterPlayerInstance,
+			setSelectedPlayerId = if not FFlagPlayerListUseFocusNavHook then nil else t1.setSelectedPlayerId,
+			isSmallTouchDevice = t1.isSmallTouchDevice,
+			isDirectionalPreferred = t1.isDirectionalPreferred
+		}))
+	end
+
+	return nil
+end
+local function mapStateToProps(p1) -- line: 116
+	return {
+		selectedPlayer = p1.playerDropDown.selectedPlayer,
+		dropdownOpen = p1.playerDropDown.isVisible,
+		isSmallTouchDevice = p1.displayOptions.isSmallTouchDevice,
+		isDirectionalPreferred = p1.displayOptions.isTenFootInterface
+	}
+end
+local function mapDispatchToProps(p2) -- line: 126
+	-- upvalues: ClosePlayerDropDown (copy), OpenPlayerDropDown (copy)
+	return {
+		closeDropdown = function() -- line: 128
+			-- upvalues: p2 (copy), ClosePlayerDropDown (copy)
+			return p2(ClosePlayerDropDown())
+		end,
+		openDropdown = function(p3) -- line: 131
+			-- upvalues: p2 (copy), OpenPlayerDropDown (copy)
+			return p2(OpenPlayerDropDown(p3))
+		end
+	}
+end
+
+return React.memo(RoactRodux.connect(mapStateToProps, mapDispatchToProps)(PlayerEntryContainer))

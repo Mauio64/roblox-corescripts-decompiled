@@ -1,7 +1,10 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.types);
-local v2 = require(script.Parent.indexOf);
-return function(v3, v4, v5) --[[ Line: 7 ]]
-    -- upvalues: v2 (copy)
-    return v2(v3, v4, v5) ~= -1;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.types)
+
+local indexOf = require(script.Parent.indexOf)
+
+return function(p1, p2, n1: number?) -- line: 7
+	-- upvalues: indexOf (copy)
+	return indexOf(p1, p2, n1) ~= -1
+end

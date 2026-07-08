@@ -1,25 +1,28 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.ExperienceService);
-local v4 = require(l_Parent_0.ToastNotificationWrapper);
-local l_ExperienceService_0 = v3.ExperienceService;
-return function(v6) --[[ Line: 14 ]]
-    -- upvalues: v2 (copy), l_ExperienceService_0 (copy), v4 (copy)
-    local v7, v8 = v2.useState(false);
-    v2.useEffect(function() --[[ Line: 16 ]]
-        -- upvalues: l_ExperienceService_0 (ref), v8 (copy)
-        l_ExperienceService_0:RegisterForExperienceJoin(function() --[[ Line: 17 ]]
-            -- upvalues: v8 (ref)
-            v8(true);
-        end);
-        l_ExperienceService_0:RegisterForExperienceLeave(function() --[[ Line: 20 ]]
-            -- upvalues: v8 (ref)
-            v8(false);
-        end);
-    end, {});
-    return not v7 and v2.createElement(v4, {
-        displayOrder = v6.displayOrder, 
-        renderLocation = "universalApp"
-    });
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local React = require(scriptParentParent.React)
+local ExperienceService = require(scriptParentParent.ExperienceService)
+local ToastNotificationWrapper = require(scriptParent.ToastNotificationWrapper)
+local ExperienceService2 = ExperienceService.ExperienceService
+
+return function(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), ExperienceService2 (copy), ToastNotificationWrapper (copy)
+	local v8, v9 = React.useState(false)
+
+	React.useEffect(function() -- line: 16
+		-- upvalues: ExperienceService2 (copy), v9 (copy)
+		ExperienceService2:RegisterForExperienceJoin(function() -- line: 17
+			-- upvalues: v9 (copy)
+			v9(true)
+		end)
+		ExperienceService2:RegisterForExperienceLeave(function() -- line: 20
+			-- upvalues: v9 (copy)
+			v9(false)
+		end)
+	end, {})
+
+	return not v8 and React.createElement(ToastNotificationWrapper, {
+		renderLocation = "universalApp",
+		displayOrder = t1.displayOrder
+	})
+end

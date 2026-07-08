@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddReasonToEveryLogout", false);
+return game:DefineFastFlag("AddReasonToEveryLogout", false)

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ForceEnableSquadRegroup", false);
+return game:DefineFastFlag("ForceEnableSquadRegroup", false)

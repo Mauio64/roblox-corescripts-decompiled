@@ -1,35 +1,46 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Symbols.Symbol);
-local v2 = require(l_Parent_0.strict);
-return function(v3, v4) --[[ Line: 19 ]] --[[ Name: createEnum ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    assert(typeof(v3) == "string", "Bad argument #1, expected string");
-    assert(typeof(v4) == "table", "Bad argument #2, expected list of values");
-    local v5 = {};
-    for _, v7 in ipairs(v4) do
-        assert(v7 ~= "isMember", "Shadowing 'isMember' function is not allowed");
-        assert(typeof(v7) == "string", "Only string names are supported for enum types");
-        local v8 = v1.named(v7);
-        local v9 = ("%s.%s"):format(v3, v7);
-        getmetatable(v8).__tostring = function() --[[ Line: 31 ]]
-            -- upvalues: v9 (copy)
-            return v9;
-        end;
-        v5[v7] = v8;
-    end;
-    v5.isMember = function(v10) --[[ Line: 38 ]] --[[ Name: isMember ]]
-        -- upvalues: v5 (copy)
-        if typeof(v10) ~= "userdata" then
-            return false;
-        else
-            for _, v12 in pairs(v5) do
-                if v10 == v12 then
-                    return true;
-                end;
-            end;
-            return false;
-        end;
-    end;
-    getmetatable((newproxy(true))).__index = v5;
-    return v2(v5, v3);
-end;
+local ParentParent = script.Parent.Parent
+local Symbol = require(ParentParent.Symbols.Symbol)
+local strict = require(ParentParent.strict)
+
+local function createEnum(s1: string, t1: {[any]: any}) -- line: 19
+	-- upvalues: Symbol (copy), strict (copy)
+	assert(typeof(s1) == "string", "Bad argument #1, expected string")
+	assert(typeof(t1) == "table", "Bad argument #2, expected list of values")
+
+	local t2 = {}
+
+	for _, v in ipairs(t1) do
+		assert(v ~= "isMember", "Shadowing 'isMember' function is not allowed")
+		assert(typeof(v) == "string", "Only string names are supported for enum types")
+
+		local v10 = Symbol.named(v)
+		local v11 = ("%s.%s"):format(s1, v)
+
+		getmetatable(v10).__tostring = function() -- line: 31
+			-- upvalues: v11 (copy)
+			return v11
+		end
+		t2[v] = v10
+	end
+
+	function t2.isMember(p1) -- line: 38
+		-- upvalues: t2 (copy)
+		if typeof(p1) ~= "userdata" then
+			return false
+		end
+
+		for _, v in pairs(t2) do
+			if p1 == v then
+				return true
+			end
+		end
+
+		return false
+	end
+
+	getmetatable((newproxy(true))).__index = t2
+
+	return strict(t2, s1)
+end
+
+return createEnum

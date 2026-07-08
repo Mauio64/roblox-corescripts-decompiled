@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserBlockingApiPlayerContextMenuEnabled", false);
+return game:DefineFastFlag("UserBlockingApiPlayerContextMenuEnabled", false)

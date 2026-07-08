@@ -1,8 +1,13 @@
-return function(v0, v1) --[[ Line: 6 ]] --[[ Name: sort ]]
-    local v2 = {};
-    for v3 = 1, #v0 do
-        v2[v3] = v0[v3];
-    end;
-    table.sort(v2, v1);
-    return v2;
-end;
+local function sort(p1, p2) -- line: 6
+	local t1 = {}
+
+	for i = 1, #p1 do
+		t1[i] = p1[i]
+	end
+
+	table.sort(t1, p2)
+
+	return t1
+end
+
+return sort

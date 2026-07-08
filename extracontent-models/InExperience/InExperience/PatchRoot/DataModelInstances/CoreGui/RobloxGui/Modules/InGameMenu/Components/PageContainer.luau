@@ -1,171 +1,191 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_RoactRodux_0 = v2.RoactRodux;
-local l_Otter_0 = v2.Otter;
-local l_t_0 = v2.t;
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(script.Parent.BlurredModalPortal);
-local v9 = require(script.Parent.Pages);
-local v10 = require(script.Parent.Parent.Resources.Constants);
-local v11 = {};
-for v12, v13 in pairs(v9.pagesByKey) do
-    v11[v12] = require(v13.component);
-end;
-local v14 = require(l_Parent_0.Localization.withLocalization);
-local v15 = l_Roact_0.PureComponent:extend("PageContainer");
-v15.validateProps = l_t_0.strictInterface({
-    currentPage = l_t_0.string, 
-    visible = l_t_0.boolean, 
-    controllerBarHeight = l_t_0.number, 
-    controllerBarCount = l_t_0.number
-});
-v15.init = function(v16, v17) --[[ Line: 34 ]] --[[ Name: init ]]
-    -- upvalues: l_GuiService_0 (copy), v9 (copy), l_Roact_0 (copy), l_Otter_0 (copy)
-    v16.onContainerRendered = function(v18, v19) --[[ Line: 35 ]]
-        -- upvalues: v16 (copy), l_GuiService_0 (ref)
-        if v18 then
-            local v20 = v16.getSelectionParentNameFromKey(v19);
-            l_GuiService_0:RemoveSelectionGroup(v20);
-            l_GuiService_0:AddSelectionParent(v20, v18);
-        end;
-    end;
-    v16.getSelectionParentNameFromKey = function(v21) --[[ Line: 43 ]]
-        return v21 .. "_IGMPageSelectionGroup";
-    end;
-    local v22 = {};
-    local v23 = {};
-    local v24 = {};
-    v16.pagePositions = {};
-    v16.pageVisibilities = {};
-    for v25, _ in pairs(v9.pagesByKey) do
-        local v27 = v17.currentPage == v25 and 1 or 0;
-        local v28, v29 = l_Roact_0.createBinding(v27);
-        v22[v25] = v28;
-        v23[v25] = v29;
-        v24[v25] = v27;
-        v16.pagePositions[v25] = v22[v25]:map(function(v30) --[[ Line: 55 ]]
-            return UDim2.new(v30 - 1, 0, 0, 0);
-        end);
-        v16.pageVisibilities[v25] = v22[v25]:map(function(v31) --[[ Line: 60 ]]
-            if v31 == 0 or v31 == 1.25 then
-                return false;
-            else
-                return true;
-            end;
-        end);
-    end;
-    v16.pageMotor = l_Otter_0.createGroupMotor(v24);
-    v16.pageMotor:onStep(function(v32) --[[ Line: 69 ]]
-        -- upvalues: v23 (copy)
-        for v33, v34 in pairs(v32) do
-            v23[v33](v34);
-        end;
-    end);
-end;
-v15.render = function(v35) --[[ Line: 76 ]] --[[ Name: render ]]
-    -- upvalues: v9 (copy), v14 (copy), l_Roact_0 (copy), v11 (copy), v8 (copy), v10 (copy)
-    local v36 = {};
-    for v37, v38 in pairs(v9.pagesByKey) do
-        local v39 = v35.pageVisibilities[v37];
-        v36[v37] = v14({
-            title = v38.title
-        })(function(v40) --[[ Line: 84 ]]
-            -- upvalues: v38 (copy), l_Roact_0 (ref), v35 (copy), v37 (copy), v39 (copy), v11 (ref), v8 (ref)
-            if not v38.isModal then
-                return l_Roact_0.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Position = v35.pagePositions[v37], 
-                    BackgroundTransparency = 1, 
-                    ZIndex = v38.navigationDepth, 
-                    Visible = v39, 
-                    [l_Roact_0.Ref] = function(v41) --[[ Line: 92 ]]
-                        -- upvalues: v35 (ref), v37 (ref)
-                        v35.onContainerRendered(v41, v37);
-                    end
-                }, {
-                    Page = l_Roact_0.createElement(v11[v37], {
-                        pageTitle = v38.title and v40.title
-                    })
-                });
-            else
-                return l_Roact_0.createElement(v8, {
-                    Enabled = v35.props.currentPage == v37
-                }, {
-                    ModalPageContent = l_Roact_0.createElement(v11[v37], {
-                        pageTitle = v40.title
-                    })
-                });
-            end;
-        end);
-    end;
-    local v42 = v35.props.controllerBarCount > 0 and -1 * v10.ControllerBarHeight or nil;
-    return l_Roact_0.createElement("Frame", {
-        Size = UDim2.new(0, 400, 1, v42), 
-        Position = UDim2.new(0, 64, 0, 0), 
-        BackgroundTransparency = 1, 
-        Visible = v35.props.visible, 
-        ClipsDescendants = true
-    }, v36);
-end;
-v15.didUpdate = function(v43, v44, _) --[[ Line: 122 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v9 (copy), l_Otter_0 (copy)
-    local l_currentPage_0 = v44.currentPage;
-    local l_currentPage_1 = v43.props.currentPage;
-    if l_currentPage_0 ~= l_currentPage_1 then
-        local l_isModal_0 = v9.pagesByKey[l_currentPage_1].isModal;
-        local l_isModal_1 = v9.pagesByKey[l_currentPage_0].isModal;
-        if l_isModal_0 or l_isModal_1 then
-            return;
-        else
-            if v9.pagesByKey[l_currentPage_0].navigationDepth < v9.pagesByKey[l_currentPage_1].navigationDepth then
-                if not l_isModal_0 then
-                    v43.pageMotor:setGoal({
-                        [l_currentPage_0] = l_Otter_0.spring(1.25, {
-                            frequency = 2.5
-                        })
-                    });
-                end;
-            elseif v9.pagesByKey[l_currentPage_0].navigationDepth == v9.pagesByKey[l_currentPage_1].navigationDepth then
-                v43.pageMotor:setGoal({
-                    [l_currentPage_0] = l_Otter_0.spring(0, {
-                        frequency = 2.5
-                    })
-                });
-            else
-                local v50 = {};
-                local l_l_currentPage_0_0 = l_currentPage_0;
-                while l_l_currentPage_0_0 ~= nil and l_l_currentPage_0_0 ~= l_currentPage_1 do
-                    v50[l_l_currentPage_0_0] = l_Otter_0.spring(0, {
-                        frequency = 3.5
-                    });
-                    l_l_currentPage_0_0 = v9.pagesByKey[l_l_currentPage_0_0].parentPage;
-                end;
-                v43.pageMotor:setGoal(v50);
-            end;
-            v43.pageMotor:setGoal({
-                [l_currentPage_1] = l_Otter_0.spring(1, {
-                    frequency = 2.5
-                })
-            });
-        end;
-    end;
-end;
-v15.willUnmount = function(v52) --[[ Line: 165 ]] --[[ Name: willUnmount ]]
-    -- upvalues: v9 (copy), l_GuiService_0 (copy)
-    for v53, v54 in pairs(v9.pagesByKey) do
-        if not v54.isModal then
-            local v55 = v52.getSelectionParentNameFromKey(v53);
-            l_GuiService_0:RemoveSelectionGroup(v55);
-        end;
-    end;
-end;
-return l_RoactRodux_0.UNSTABLE_connect2(function(v56) --[[ Line: 174 ]]
-    return {
-        currentPage = v56.menuPage, 
-        visible = v56.isMenuOpen, 
-        controllerBarHeight = v56.controllerBarHeight, 
-        controllerBarCount = v56.controllerBarCount
-    };
-end)(v15);
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local Otter = InGameMenuDependencies.Otter
+local t = InGameMenuDependencies.t
+local ParentParent = script.Parent.Parent
+local BlurredModalPortal = require(script.Parent.BlurredModalPortal)
+local Pages = require(script.Parent.Pages)
+local Constants = require(script.Parent.Parent.Resources.Constants)
+local t1 = {}
+
+for k, v in pairs(Pages.pagesByKey) do
+	t1[k] = require(v.component)
+end
+
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local v16 = Roact.PureComponent:extend("PageContainer")
+
+v16.validateProps = t.strictInterface({
+	currentPage = t.string,
+	visible = t.boolean,
+	controllerBarHeight = t.number,
+	controllerBarCount = t.number
+})
+
+function v16.init(p1, p2) -- line: 34
+	-- upvalues: GuiService (copy), Pages (copy), Roact (copy), Otter (copy)
+	function p1.onContainerRendered(p3, p4) -- line: 35
+		-- upvalues: p1 (copy), GuiService (copy)
+		if p3 then
+			local v48 = p1.getSelectionParentNameFromKey(p4)
+
+			GuiService:RemoveSelectionGroup(v48)
+			GuiService:AddSelectionParent(v48, p3)
+		end
+	end
+	function p1.getSelectionParentNameFromKey(p5) -- line: 43
+		return p5 .. "_IGMPageSelectionGroup"
+	end
+
+	local t2 = {}
+	local t3 = {}
+	local t4 = {}
+
+	p1.pagePositions = {}
+	p1.pageVisibilities = {}
+
+	for k, _ in pairs(Pages.pagesByKey) do
+		local v24 = k ~= p2.currentPage and 0 or 1
+		local v25, v26 = Roact.createBinding(v24)
+
+		t2[k] = v25
+		t3[k] = v26
+		t4[k] = v24
+		p1.pagePositions[k] = t2[k]:map(function(p6) -- line: 55
+			return UDim2.new(p6 - 1, 0, 0, 0)
+		end)
+		p1.pageVisibilities[k] = t2[k]:map(function(p7) -- line: 60
+			if p7 == 0 or p7 == 1.25 then
+				return false
+			end
+
+			return true
+		end)
+	end
+
+	p1.pageMotor = Otter.createGroupMotor(t4)
+	p1.pageMotor:onStep(function(p8) -- line: 69
+		-- upvalues: t3 (copy)
+		for k, v in pairs(p8) do
+			t3[k](v)
+		end
+	end)
+end
+function v16.render(p9) -- line: 76
+	-- upvalues: Pages (copy), withLocalization (copy), Roact (copy), t1 (copy), BlurredModalPortal (copy), Constants (copy)
+	local t5 = {}
+
+	for k, v in pairs(Pages.pagesByKey) do
+		local v31 = p9.pageVisibilities[k]
+
+		t5[k] = withLocalization({
+			title = v.title
+		})(function(p10) -- line: 84
+			-- upvalues: v (copy), Roact (copy), p9 (copy), k (copy), v31 (copy), t1 (copy), BlurredModalPortal (copy)
+			if not v.isModal then
+				return Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = p9.pagePositions[k],
+					BackgroundTransparency = 1,
+					ZIndex = v.navigationDepth,
+					Visible = v31,
+					[Roact.Ref] = function(p11) -- line: 92
+						-- upvalues: p9 (copy), k (copy)
+						p9.onContainerRendered(p11, k)
+					end
+				}, {
+					Page = Roact.createElement(t1[k], {
+						pageTitle = v.title and p10.title
+					})
+				})
+			end
+
+			return Roact.createElement(BlurredModalPortal, {
+				Enabled = p9.props.currentPage == k
+			}, {
+				ModalPageContent = Roact.createElement(t1[k], {
+					pageTitle = p10.title
+				})
+			})
+		end)
+	end
+
+	local v32 = p9.props.controllerBarCount > 0 and -1 * Constants.ControllerBarHeight or nil
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		Size = UDim2.new(0, 400, 1, v32),
+		Position = UDim2.new(0, 64, 0, 0),
+		Visible = p9.props.visible
+	}, t5)
+end
+function v16.didUpdate(p12, p13, _) -- line: 122
+	-- upvalues: Pages (copy), Otter (copy)
+	local currentPage = p13.currentPage
+	local currentPage2 = p12.props.currentPage
+
+	if currentPage ~= currentPage2 then
+		local isModal = Pages.pagesByKey[currentPage2].isModal
+		local isModal2 = Pages.pagesByKey[currentPage].isModal
+
+		if isModal or isModal2 then
+			return
+		end
+
+		if Pages.pagesByKey[currentPage].navigationDepth < Pages.pagesByKey[currentPage2].navigationDepth then
+			if not isModal then
+				p12.pageMotor:setGoal({
+					[currentPage] = Otter.spring(1.25, {
+						frequency = 2.5
+					})
+				})
+			end
+		elseif Pages.pagesByKey[currentPage].navigationDepth == Pages.pagesByKey[currentPage2].navigationDepth then
+			p12.pageMotor:setGoal({
+				[currentPage] = Otter.spring(0, {
+					frequency = 2.5
+				})
+			})
+		else
+			local t6 = {}
+
+			while currentPage ~= nil and currentPage ~= currentPage2 do
+				t6[currentPage] = Otter.spring(0, {
+					frequency = 3.5
+				})
+				currentPage = Pages.pagesByKey[currentPage].parentPage
+			end
+
+			p12.pageMotor:setGoal(t6)
+		end
+
+		p12.pageMotor:setGoal({
+			[currentPage2] = Otter.spring(1, {
+				frequency = 2.5
+			})
+		})
+	end
+end
+function v16.willUnmount(p15) -- line: 165
+	-- upvalues: Pages (copy), GuiService (copy)
+	for k, v in pairs(Pages.pagesByKey) do
+		if not v.isModal then
+			local v44 = p15.getSelectionParentNameFromKey(k)
+
+			GuiService:RemoveSelectionGroup(v44)
+		end
+	end
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p16) -- line: 174
+	return {
+		currentPage = p16.menuPage,
+		visible = p16.isMenuOpen,
+		controllerBarHeight = p16.controllerBarHeight,
+		controllerBarCount = p16.controllerBarCount
+	}
+end)(v16)

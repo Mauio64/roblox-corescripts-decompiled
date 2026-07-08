@@ -1,9 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.BulkPurchasePartialSuccess);
-local v3 = require(script.Parent.useBulkPurchasePartialSuccessProps);
-return function() --[[ Line: 8 ]] --[[ Name: BulkPurchasePartialSuccessContainer ]]
-    -- upvalues: v3 (copy), v1 (copy), v2 (copy)
-    local v4 = v3();
-    return v1.createElement(v2, v4);
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local BulkPurchasePartialSuccess = require(script.Parent.BulkPurchasePartialSuccess)
+local useBulkPurchasePartialSuccessProps = require(script.Parent.useBulkPurchasePartialSuccessProps)
+
+local function BulkPurchasePartialSuccessContainer() -- line: 8
+	-- upvalues: useBulkPurchasePartialSuccessProps (copy), React (copy), BulkPurchasePartialSuccess (copy)
+	local v6 = useBulkPurchasePartialSuccessProps()
+
+	return React.createElement(BulkPurchasePartialSuccess, v6)
+end
+
+return BulkPurchasePartialSuccessContainer

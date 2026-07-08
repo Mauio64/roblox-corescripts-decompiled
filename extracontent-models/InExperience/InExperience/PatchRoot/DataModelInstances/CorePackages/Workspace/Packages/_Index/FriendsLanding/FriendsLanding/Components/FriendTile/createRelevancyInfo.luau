@@ -1,42 +1,49 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_UIBlox_0 = v2.UIBlox;
-local v4 = require(l_script_FirstAncestor_0.Friends.isUserInGame);
-local v5 = require(l_script_FirstAncestor_0.Friends.getCorrectUserPresence);
-local v6 = require(l_script_FirstAncestor_0.Enums.NotLocalizedStrings);
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local l_PresenceType_0 = v2.RoduxPresence.Enums.PresenceType;
-local l_FFlagFriendsPageAlwaysOpenPPV_0 = require(l_Parent_0.SharedFlags).FFlagFriendsPageAlwaysOpenPPV;
-local v10 = UDim2.fromOffset(12, 12);
-return function(v11, v12, v13, v14, v15, v16, v17, v18, v19, v20) --[[ Line: 17 ]]
-    -- upvalues: v5 (copy), l_Images_0 (copy), l_PresenceType_0 (copy), v10 (copy), v4 (copy), l_FFlagFriendsPageAlwaysOpenPPV_0 (copy), v6 (copy)
-    local v21 = {};
-    local v22 = v5(v11);
-    v21.icon = v13 and l_Images_0[v13] or nil;
-    if v22 == l_PresenceType_0.Online then
-        if not v20 then
-            v21.iconSize = v10;
-        end;
-        v21.iconColor = v15.OnlineStatus.Color;
-        v21.iconTransparency = v15.OnlineStatus.Transparency;
-    end;
-    if v11.isDeleted then
-        v21.text = v19;
-    elseif v4(v11) then
-        v21.text = v11.lastLocation;
-        v21.onActivated = if l_FFlagFriendsPageAlwaysOpenPPV_0 then nil else v14(v11.universeId, v11.id, v16);
-    elseif v11.userPresenceType == l_PresenceType_0.InStudio then
-        if v11.lastLocation and v11.lastLocation ~= "" then
-            v21.text = v11.lastLocation;
-        else
-            v21.text = v17 and v6.StudioPresenceTextLuobu.rawValue() or v6.StudioPresenceTextGlobal.rawValue();
-        end;
-    else
-        v21.text = v12;
-    end;
-    if not v20 and v18 then
-        v21.fontStyle = v4(v11) and v18.CaptionHeader or v18.CaptionBody;
-    end;
-    return v21;
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local FriendsLandingParent = FriendsLanding.Parent
+local dependencies = require(FriendsLanding.dependencies)
+local UIBlox = dependencies.UIBlox
+local isUserInGame = require(FriendsLanding.Friends.isUserInGame)
+local getCorrectUserPresence = require(FriendsLanding.Friends.getCorrectUserPresence)
+local NotLocalizedStrings = require(FriendsLanding.Enums.NotLocalizedStrings)
+local Images = UIBlox.App.ImageSet.Images
+local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
+local FFlagFriendsPageAlwaysOpenPPV = require(FriendsLandingParent.SharedFlags).FFlagFriendsPageAlwaysOpenPPV
+local uDim2 = UDim2.fromOffset(12, 12)
+
+return function(p1, s1: string, s2: string?, p2, p3, n1: number, b1: boolean?, p4, s3: string?, b2: boolean?) -- line: 17
+	-- upvalues: getCorrectUserPresence (copy), Images (copy), PresenceType (copy), uDim2 (copy), isUserInGame (copy), FFlagFriendsPageAlwaysOpenPPV (copy), NotLocalizedStrings (copy)
+	local t1 = {}
+	local v23 = getCorrectUserPresence(p1)
+
+	t1.icon = s2 and Images[s2] or nil
+
+	if v23 == PresenceType.Online then
+		if not b2 then
+			t1.iconSize = uDim2
+		end
+
+		t1.iconColor = p3.OnlineStatus.Color
+		t1.iconTransparency = p3.OnlineStatus.Transparency
+	end
+
+	if p1.isDeleted then
+		t1.text = s3
+	elseif isUserInGame(p1) then
+		t1.text = p1.lastLocation
+		t1.onActivated = if not FFlagFriendsPageAlwaysOpenPPV then p2(p1.universeId, p1.id, n1) else nil
+	elseif p1.userPresenceType == PresenceType.InStudio then
+		if p1.lastLocation and p1.lastLocation ~= "" then
+			t1.text = p1.lastLocation
+		else
+			t1.text = b1 and NotLocalizedStrings.StudioPresenceTextLuobu.rawValue() or NotLocalizedStrings.StudioPresenceTextGlobal.rawValue()
+		end
+	else
+		t1.text = s1
+	end
+
+	if not b2 and p4 then
+		t1.fontStyle = isUserInGame(p1) and p4.CaptionHeader or p4.CaptionBody
+	end
+
+	return t1
+end

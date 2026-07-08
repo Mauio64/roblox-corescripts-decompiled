@@ -1,604 +1,731 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local _ = require(l_Parent_0.Shared);
-local v3 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Object_0 = v3.Object;
-local l___DEV___0 = v1.__DEV__;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local _ = require(script.Parent.ReactInternalTypes);
-local v9 = require(script.Parent.ReactRootTags);
-local v10 = require(script.Parent.ReactFiberFlags);
-local _ = require(script.Parent.ReactFiberHostConfig);
-local v12 = require(script.Parent.ReactWorkTags);
-local l_FundamentalComponent_0 = v12.FundamentalComponent;
-local _ = require(l_Parent_0.Shared);
-local v15 = require(script.Parent.ReactFiberLane);
-local _ = require(script.Parent["ReactFiberSuspenseComponent.new"]);
-local v17 = require(script.Parent.ReactFiberTreeReflection);
-local l_findCurrentHostFiber_0 = v17.findCurrentHostFiber;
-local l_findCurrentHostFiberWithNoPortals_0 = v17.findCurrentHostFiberWithNoPortals;
-local l_get_0 = require(l_Parent_0.Shared).ReactInstanceMap.get;
-local l_HostComponent_0 = v12.HostComponent;
-local l_ClassComponent_0 = v12.ClassComponent;
-local l_HostRoot_0 = v12.HostRoot;
-local l_SuspenseComponent_0 = v12.SuspenseComponent;
-local l_getComponentName_0 = require(l_Parent_0.Shared).getComponentName;
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_describeError_0 = require(l_Parent_0.Shared).describeError;
-local l_enableSchedulingProfiler_0 = require(l_Parent_0.Shared).ReactFeatureFlags.enableSchedulingProfiler;
-local l_ReactSharedInternals_0 = require(l_Parent_0.Shared).ReactSharedInternals;
-local l_getPublicInstance_0 = require(script.Parent.ReactFiberHostConfig).getPublicInstance;
-local v31 = require(script.Parent["ReactFiberContext.new"]);
-local l_findCurrentUnmaskedContext_0 = v31.findCurrentUnmaskedContext;
-local l_processChildContext_0 = v31.processChildContext;
-local l_emptyContextObject_0 = v31.emptyContextObject;
-local l_isContextProvider_0 = v31.isContextProvider;
-local l_createFiberRoot_0 = require(script.Parent["ReactFiberRoot.new"]).createFiberRoot;
-local v37 = require(script.Parent["ReactFiberDevToolsHook.new"]);
-local l_injectInternals_0 = v37.injectInternals;
-local l_onScheduleRoot_0 = v37.onScheduleRoot;
-local v40 = require(script.Parent["ReactFiberWorkLoop.new"]);
-local l_requestEventTime_0 = v40.requestEventTime;
-local l_requestUpdateLane_0 = v40.requestUpdateLane;
-local l_scheduleUpdateOnFiber_0 = v40.scheduleUpdateOnFiber;
-local l_flushRoot_0 = v40.flushRoot;
-local l_batchedEventUpdates_0 = v40.batchedEventUpdates;
-local l_batchedUpdates_0 = v40.batchedUpdates;
-local l_unbatchedUpdates_0 = v40.unbatchedUpdates;
-local l_flushSync_0 = v40.flushSync;
-local l_flushControlled_0 = v40.flushControlled;
-local l_deferredUpdates_0 = v40.deferredUpdates;
-local l_discreteUpdates_0 = v40.discreteUpdates;
-local l_flushDiscreteUpdates_0 = v40.flushDiscreteUpdates;
-local l_flushPassiveEffects_0 = v40.flushPassiveEffects;
-local l_warnIfNotScopedWithMatchingAct_0 = v40.warnIfNotScopedWithMatchingAct;
-local l_warnIfUnmockedScheduler_0 = v40.warnIfUnmockedScheduler;
-local l_IsThisRendererActing_0 = v40.IsThisRendererActing;
-local l_act_0 = v40.act;
-local v58 = require(script.Parent["ReactUpdateQueue.new"]);
-local l_createUpdate_0 = v58.createUpdate;
-local l_enqueueUpdate_0 = v58.enqueueUpdate;
-local v61 = require(script.Parent.ReactCurrentFiber);
-local l_isRendering_0 = v61.isRendering;
-local l_resetCurrentFiber_0 = v61.resetCurrentFiber;
-local l_setCurrentFiber_0 = v61.setCurrentFiber;
-local v65 = require(script.Parent.ReactTypeOfMode);
-local l_StrictMode_0 = v65.StrictMode;
-local l_SyncLane_0 = v15.SyncLane;
-local l_InputDiscreteHydrationLane_0 = v15.InputDiscreteHydrationLane;
-local l_SelectiveHydrationLane_0 = v15.SelectiveHydrationLane;
-local l_NoTimestamp_0 = v15.NoTimestamp;
-local l_getHighestPriorityPendingLanes_0 = v15.getHighestPriorityPendingLanes;
-local l_higherPriorityLane_0 = v15.higherPriorityLane;
-local l_getCurrentUpdateLanePriority_0 = v15.getCurrentUpdateLanePriority;
-local l_setCurrentUpdateLanePriority_0 = v15.setCurrentUpdateLanePriority;
-local v75 = require(script.Parent["ReactFiberHotReloading.new"]);
-local l_scheduleRefresh_0 = v75.scheduleRefresh;
-local l_scheduleRoot_0 = v75.scheduleRoot;
-local l_setRefreshHandler_0 = v75.setRefreshHandler;
-local l_findHostInstancesForRefresh_0 = v75.findHostInstancesForRefresh;
-local v80 = require(script.Parent.SchedulingProfiler);
-local l_markRenderScheduled_0 = v80.markRenderScheduled;
-local v82 = {
-    ReactRootTags = v9, 
-    ReactWorkTags = v12, 
-    ReactTypeOfMode = v65, 
-    ReactFiberFlags = v10, 
-    getNearestMountedFiber = v17.getNearestMountedFiber, 
-    findCurrentFiberUsingSlowPath = v17.findCurrentFiberUsingSlowPath, 
-    createPortal = require(script.Parent.ReactPortal).createPortal
-};
-local v83 = nil;
-local v84 = nil;
-if l___DEV___0 then
-    v83 = false;
-    v84 = {};
-end;
-local function _(v85) --[[ Line: 181 ]] --[[ Name: getContextForSubtree ]]
-    -- upvalues: l_emptyContextObject_0 (copy), l_get_0 (copy), l_findCurrentUnmaskedContext_0 (copy), l_ClassComponent_0 (copy), l_isContextProvider_0 (copy), l_processChildContext_0 (copy)
-    if not v85 then
-        return l_emptyContextObject_0;
-    else
-        local v86 = l_get_0(v85);
-        local v87 = l_findCurrentUnmaskedContext_0(v86);
-        if v86.tag == l_ClassComponent_0 then
-            local l_type_0 = v86.type;
-            if l_isContextProvider_0(l_type_0) then
-                return l_processChildContext_0(v86, l_type_0, v87);
-            end;
-        end;
-        return v87;
-    end;
-end;
-local function v93(v90) --[[ Line: 199 ]] --[[ Name: findHostInstance ]]
-    -- upvalues: l_get_0 (copy), l_invariant_0 (copy), l_Object_0 (copy), l_findCurrentHostFiber_0 (copy)
-    local v91 = l_get_0(v90);
-    if v91 == nil then
-        if typeof(v90.render) == "function" then
-            l_invariant_0(false, "Unable to find node on an unmounted component.");
-        else
-            l_invariant_0(false, "Argument appears to not be a ReactComponent. Keys: %s", table.concat(l_Object_0.keys(v90)));
-        end;
-    end;
-    local v92 = l_findCurrentHostFiber_0(v91);
-    if v92 == nil then
-        return nil;
-    else
-        return v92.stateNode;
-    end;
-end;
-local function v102(v94, v95) --[[ Line: 220 ]] --[[ Name: findHostInstanceWithWarning ]]
-    -- upvalues: l___DEV___0 (copy), l_get_0 (copy), l_invariant_0 (copy), l_Object_0 (copy), l_findCurrentHostFiber_0 (copy), l_StrictMode_0 (copy), l_getComponentName_0 (copy), v84 (ref), v61 (copy), l_setCurrentFiber_0 (copy), l_console_0 (copy), l_describeError_0 (copy), l_resetCurrentFiber_0 (copy), v93 (copy)
-    if l___DEV___0 then
-        local v96 = l_get_0(v94);
-        if v96 == nil then
-            if typeof(v94.render) == "function" then
-                l_invariant_0(false, "Unable to find node on an unmounted component.");
-            else
-                l_invariant_0(false, "Argument appears to not be a ReactComponent. Keys: %s", table.concat(l_Object_0.keys(v94)));
-            end;
-        end;
-        local v97 = l_findCurrentHostFiber_0(v96);
-        if v97 == nil then
-            return nil;
-        else
-            if bit32.band(v97.mode, l_StrictMode_0) ~= 0 then
-                local v98 = l_getComponentName_0(v96.type) or "Component";
-                if not v84[v98] then
-                    v84[v98] = true;
-                    local l_current_0 = v61.current;
-                    local v100, v101 = xpcall(function() --[[ Line: 248 ]]
-                        -- upvalues: l_setCurrentFiber_0 (ref), v97 (copy), v96 (copy), l_StrictMode_0 (ref), l_console_0 (ref), v95 (copy), v98 (copy)
-                        l_setCurrentFiber_0(v97);
-                        if bit32.band(v96.mode, l_StrictMode_0) ~= 0 then
-                            l_console_0.error("%s is deprecated in StrictMode. %s was passed an instance of %s which is inside StrictMode. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node", v95, v95, v98);
-                            return;
-                        else
-                            l_console_0.error("%s is deprecated in StrictMode. %s was passed an instance of %s which renders StrictMode children. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node", v95, v95, v98);
-                            return;
-                        end;
-                    end, l_describeError_0);
-                    if l_current_0 then
-                        l_setCurrentFiber_0(l_current_0);
-                    else
-                        l_resetCurrentFiber_0();
-                    end;
-                    if not v100 then
-                        error(v101);
-                    end;
-                end;
-            end;
-            return v97.stateNode;
-        end;
-    else
-        return (v93(v94));
-    end;
-end;
-v82.createContainer = function(v103, v104, v105, v106) --[[ Line: 293 ]]
-    -- upvalues: l_createFiberRoot_0 (copy)
-    return l_createFiberRoot_0(v103, v104, v105, v106);
-end;
-v82.updateContainer = function(v107, v108, v109, v110) --[[ Line: 302 ]]
-    -- upvalues: l___DEV___0 (copy), l_onScheduleRoot_0 (copy), l_requestEventTime_0 (copy), v1 (copy), l_warnIfUnmockedScheduler_0 (copy), l_warnIfNotScopedWithMatchingAct_0 (copy), l_requestUpdateLane_0 (copy), l_enableSchedulingProfiler_0 (copy), l_markRenderScheduled_0 (copy), l_emptyContextObject_0 (copy), l_get_0 (copy), l_findCurrentUnmaskedContext_0 (copy), l_ClassComponent_0 (copy), l_isContextProvider_0 (copy), l_processChildContext_0 (copy), l_isRendering_0 (copy), v61 (copy), v83 (ref), l_console_0 (copy), l_getComponentName_0 (copy), l_createUpdate_0 (copy), l_Object_0 (copy), l_enqueueUpdate_0 (copy), l_scheduleUpdateOnFiber_0 (copy)
-    local v111 = false;
-    if l___DEV___0 then
-        l_onScheduleRoot_0(v108, v107);
-    end;
-    local l_current_1 = v108.current;
-    local v113 = l_requestEventTime_0();
-    if l___DEV___0 and v1.__TESTEZ_RUNNING_TEST__ then
-        l_warnIfUnmockedScheduler_0(l_current_1);
-        l_warnIfNotScopedWithMatchingAct_0(l_current_1);
-    end;
-    local v114 = l_requestUpdateLane_0(l_current_1);
-    if l_enableSchedulingProfiler_0 then
-        l_markRenderScheduled_0(v114);
-    end;
-    local v115;
-    if not v109 then
-        v115 = l_emptyContextObject_0;
-    else
-        local v116 = l_get_0(v109);
-        local v117 = l_findCurrentUnmaskedContext_0(v116);
-        if v116.tag == l_ClassComponent_0 then
-            local l_type_1 = v116.type;
-            if l_isContextProvider_0(l_type_1) then
-                v115 = l_processChildContext_0(v116, l_type_1, v117);
-                v111 = true;
-            end;
-        end;
-        if not v111 then
-            v115 = v117;
-        end;
-    end;
-    v111 = false;
-    if v108.context == nil then
-        v108.context = v115;
-    else
-        v108.pendingContext = v115;
-    end;
-    if l___DEV___0 and l_isRendering_0 and v61.current ~= nil and not v83 then
-        v83 = true;
-        l_console_0.error("Render methods should be a pure function of props and state; triggering nested component updates from render is not allowed. If necessary, trigger nested updates in componentDidUpdate.\n\nCheck the render method of %s.", l_getComponentName_0(v61.current.type) or "Unknown");
-    end;
-    local v119 = l_createUpdate_0(v113, v114);
-    if v107 == nil then
-        v107 = l_Object_0.None;
-    end;
-    v119.payload = {
-        element = v107
-    };
-    if v110 ~= nil then
-        if l___DEV___0 and typeof(v110) ~= "function" then
-            l_console_0.error("render(...): Expected the last optional `callback` argument to be a function. Instead received: %s.", (tostring(v110)));
-        end;
-        v119.callback = v110;
-    end;
-    l_enqueueUpdate_0(l_current_1, v119);
-    l_scheduleUpdateOnFiber_0(l_current_1, v114, v113);
-    return v114;
-end;
-v82.batchedEventUpdates = l_batchedEventUpdates_0;
-v82.batchedUpdates = l_batchedUpdates_0;
-v82.unbatchedUpdates = l_unbatchedUpdates_0;
-v82.deferredUpdates = l_deferredUpdates_0;
-v82.discreteUpdates = l_discreteUpdates_0;
-v82.flushDiscreteUpdates = l_flushDiscreteUpdates_0;
-v82.flushControlled = l_flushControlled_0;
-v82.flushSync = l_flushSync_0;
-v82.flushPassiveEffects = l_flushPassiveEffects_0;
-v82.IsThisRendererActing = l_IsThisRendererActing_0;
-v82.act = l_act_0;
-v82.getPublicRootInstance = function(v120) --[[ Line: 397 ]]
-    -- upvalues: l_HostComponent_0 (copy), l_getPublicInstance_0 (copy)
-    local l_current_2 = v120.current;
-    if not l_current_2.child then
-        return nil;
-    elseif l_current_2.child.tag == l_HostComponent_0 then
-        return l_getPublicInstance_0(l_current_2.child.stateNode);
-    else
-        return l_current_2.child.stateNode;
-    end;
-end;
-local v122 = nil;
-v82.attemptSynchronousHydration = function(v123) --[[ Line: 414 ]]
-    -- upvalues: l_HostRoot_0 (copy), l_getHighestPriorityPendingLanes_0 (copy), l_flushRoot_0 (copy), l_SuspenseComponent_0 (copy), l_requestEventTime_0 (copy), l_flushSync_0 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_InputDiscreteHydrationLane_0 (copy), v122 (ref)
-    if v123.tag == l_HostRoot_0 then
-        local l_stateNode_0 = v123.stateNode;
-        if l_stateNode_0.hydrate then
-            local v125 = l_getHighestPriorityPendingLanes_0(l_stateNode_0);
-            l_flushRoot_0(l_stateNode_0, v125);
-            return;
-        end;
-    elseif v123.tag == l_SuspenseComponent_0 then
-        local v126 = l_requestEventTime_0();
-        l_flushSync_0(function() --[[ Line: 424 ]]
-            -- upvalues: l_scheduleUpdateOnFiber_0 (ref), v123 (copy), l_SyncLane_0 (ref), v126 (copy)
-            return l_scheduleUpdateOnFiber_0(v123, l_SyncLane_0, v126);
-        end);
-        v122(v123, l_InputDiscreteHydrationLane_0);
-    end;
-end;
-local function _(v127, v128) --[[ Line: 435 ]] --[[ Name: markRetryLaneImpl ]]
-    -- upvalues: l_higherPriorityLane_0 (copy)
-    local l_memoizedState_0 = v127.memoizedState;
-    if l_memoizedState_0 and l_memoizedState_0 ~= nil and l_memoizedState_0.dehydrated ~= nil then
-        l_memoizedState_0.retryLane = l_higherPriorityLane_0(l_memoizedState_0.retryLane, v128);
-    end;
-end;
-v122 = function(v131, v132) --[[ Line: 446 ]]
-    -- upvalues: l_higherPriorityLane_0 (copy)
-    local l_memoizedState_1 = v131.memoizedState;
-    if l_memoizedState_1 and l_memoizedState_1 ~= nil and l_memoizedState_1.dehydrated ~= nil then
-        l_memoizedState_1.retryLane = l_higherPriorityLane_0(l_memoizedState_1.retryLane, v132);
-    end;
-    l_memoizedState_1 = v131.alternate;
-    if l_memoizedState_1 then
-        local l_memoizedState_2 = l_memoizedState_1.memoizedState;
-        if l_memoizedState_2 and l_memoizedState_2 ~= nil and l_memoizedState_2.dehydrated ~= nil then
-            l_memoizedState_2.retryLane = l_higherPriorityLane_0(l_memoizedState_2.retryLane, v132);
-        end;
-    end;
-end;
-v82.attemptUserBlockingHydration = function(v135) --[[ Line: 455 ]]
-    -- upvalues: l_SuspenseComponent_0 (copy), l_requestEventTime_0 (copy), l_InputDiscreteHydrationLane_0 (copy), l_scheduleUpdateOnFiber_0 (copy), v122 (ref)
-    if v135.tag ~= l_SuspenseComponent_0 then
-        return;
-    else
-        local v136 = l_requestEventTime_0();
-        local l_l_InputDiscreteHydrationLane_0_0 = l_InputDiscreteHydrationLane_0;
-        l_scheduleUpdateOnFiber_0(v135, l_l_InputDiscreteHydrationLane_0_0, v136);
-        v122(v135, l_l_InputDiscreteHydrationLane_0_0);
-        return;
-    end;
-end;
-v82.attemptContinuousHydration = function(v138) --[[ Line: 469 ]]
-    -- upvalues: l_SuspenseComponent_0 (copy), l_requestEventTime_0 (copy), l_SelectiveHydrationLane_0 (copy), l_scheduleUpdateOnFiber_0 (copy), v122 (ref)
-    if v138.tag ~= l_SuspenseComponent_0 then
-        return;
-    else
-        local v139 = l_requestEventTime_0();
-        local l_l_SelectiveHydrationLane_0_0 = l_SelectiveHydrationLane_0;
-        l_scheduleUpdateOnFiber_0(v138, l_l_SelectiveHydrationLane_0_0, v139);
-        v122(v138, l_l_SelectiveHydrationLane_0_0);
-        return;
-    end;
-end;
-v82.attemptHydrationAtCurrentPriority = function(v141) --[[ Line: 483 ]]
-    -- upvalues: l_SuspenseComponent_0 (copy), l_requestEventTime_0 (copy), l_requestUpdateLane_0 (copy), l_scheduleUpdateOnFiber_0 (copy), v122 (ref)
-    if v141.tag ~= l_SuspenseComponent_0 then
-        return;
-    else
-        local v142 = l_requestEventTime_0();
-        local v143 = l_requestUpdateLane_0(v141);
-        l_scheduleUpdateOnFiber_0(v141, v143, v142);
-        v122(v141, v143);
-        return;
-    end;
-end;
-v82.runWithPriority = function(v144, v145) --[[ Line: 495 ]]
-    -- upvalues: l_getCurrentUpdateLanePriority_0 (copy), l_setCurrentUpdateLanePriority_0 (copy), l_describeError_0 (copy)
-    local v146 = l_getCurrentUpdateLanePriority_0();
-    l_setCurrentUpdateLanePriority_0(v144);
-    local v147, v148 = xpcall(v145, l_describeError_0);
-    l_setCurrentUpdateLanePriority_0(v146);
-    if not v147 then
-        error(v148);
-    end;
-    return v148;
-end;
-v82.getCurrentUpdateLanePriority = l_getCurrentUpdateLanePriority_0;
-v82.findHostInstance = v93;
-v82.findHostInstanceWithWarning = v102;
-v82.findHostInstanceWithNoPortals = function(v149) --[[ Line: 513 ]]
-    -- upvalues: l_findCurrentHostFiberWithNoPortals_0 (copy), l_FundamentalComponent_0 (copy)
-    local v150 = l_findCurrentHostFiberWithNoPortals_0(v149);
-    if v150 == nil then
-        return nil;
-    elseif v150.tag == l_FundamentalComponent_0 then
-        return v150.stateNode.instance;
-    else
-        return v150.stateNode;
-    end;
-end;
-local function v152(_) --[[ Line: 524 ]] --[[ Name: shouldSuspendImpl ]]
-    return false;
-end;
-v82.shouldSuspend = function(v153) --[[ Line: 528 ]]
-    -- upvalues: v152 (ref)
-    return v152(v153);
-end;
-local v154 = nil;
-local v155 = nil;
-local v156 = nil;
-local v157 = nil;
-local v158 = nil;
-local v159 = nil;
-local v160 = nil;
-local v161 = nil;
-if l___DEV___0 then
-    local function v162(v163, v164, v165) --[[ Line: 543 ]] --[[ Name: copyWithDeleteImpl ]]
-        -- upvalues: l_Array_0 (copy), v162 (copy)
-        local v166 = v164[v165];
-        local v167 = nil;
-        v167 = if l_Array_0.isArray(v163) then l_Array_0.slice(v163) else table.clone(v163);
-        if v165 + 1 == #v164 then
-            if l_Array_0.isArray(v167) then
-                l_Array_0.splice(v167, v166, 1);
-                return v167;
-            else
-                v167[v166] = nil;
-                return v167;
-            end;
-        else
-            v167[v166] = v162(v163[v166], v164, v165 + 1);
-            return v167;
-        end;
-    end;
-    local function _(v168, v169) --[[ Line: 571 ]] --[[ Name: copyWithDelete ]]
-        -- upvalues: v162 (copy)
-        return (v162(v168, v169, 0));
-    end;
-    local function v171(v172, v173, v174, v175) --[[ Line: 579 ]] --[[ Name: copyWithRenameImpl ]]
-        -- upvalues: l_Array_0 (copy), v171 (copy)
-        local v176 = v173[v175];
-        local v177 = nil;
-        v177 = if l_Array_0.isArray(v172) then l_Array_0.slice(v172) else table.clone(v172);
-        if v175 + 1 == #v173 then
-            v177[v174[v175]] = v177[v176];
-            if l_Array_0.isArray(v177) then
-                l_Array_0.splice(v177, v176, 1);
-                return v177;
-            else
-                v177[v176] = nil;
-                return v177;
-            end;
-        else
-            v177[v176] = v171(v172[v176], v173, v174, v175 + 1);
-            return v177;
-        end;
-    end;
-    local function v182(v178, v179, v180) --[[ Line: 615 ]] --[[ Name: copyWithRename ]]
-        -- upvalues: l_console_0 (copy), v171 (copy)
-        if #v179 ~= #v180 then
-            l_console_0.warn("copyWithRename() expects paths of the same length");
-            return nil;
-        else
-            for v181 = 1, #v180 do
-                if v179[v181] ~= v180[v181] then
-                    l_console_0.warn("copyWithRename() expects paths to be the same except for the deepest key");
-                    return nil;
-                end;
-            end;
-            return (v171(v178, v179, v180, 0));
-        end;
-    end;
-    local function v183(v184, v185, v186, v187) --[[ Line: 637 ]] --[[ Name: copyWithSetImpl ]]
-        -- upvalues: l_Array_0 (copy), v183 (copy)
-        if #v185 + 1 <= v186 then
-            return v187;
-        else
-            local v188 = v185[v186];
-            local v189 = nil;
-            v189 = if l_Array_0.isArray(v184) then l_Array_0.slice(v184) else table.clone(v184);
-            v189[v188] = v183(v184[v188], v185, v186 + 2, v187);
-            return v189;
-        end;
-    end;
-    local function _(v190, v191, v192) --[[ Line: 659 ]] --[[ Name: copyWithSet ]]
-        -- upvalues: v183 (copy)
-        return (v183(v190, v191, 1, v192));
-    end;
-    local function _(v194, v195) --[[ Line: 667 ]] --[[ Name: findHook ]]
-        local l_memoizedState_3 = v194.memoizedState;
-        while l_memoizedState_3 ~= nil and v195 > 1 do
-            l_memoizedState_3 = l_memoizedState_3.next;
-            v195 = v195 - 1;
-        end;
-        return l_memoizedState_3;
-    end;
-    v154 = function(v198, v199, v200, v201) --[[ Line: 679 ]]
-        -- upvalues: v183 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        local l_v199_0 = v199;
-        local l_memoizedState_4 = v198.memoizedState;
-        while l_memoizedState_4 ~= nil and l_v199_0 > 1 do
-            l_memoizedState_4 = l_memoizedState_4.next;
-            l_v199_0 = l_v199_0 - 1;
-        end;
-        local l_l_memoizedState_4_0 = l_memoizedState_4;
-        if l_l_memoizedState_4_0 ~= nil then
-            l_memoizedState_4 = l_l_memoizedState_4_0.memoizedState;
-            l_v199_0 = v183(l_memoizedState_4, v200, 1, v201);
-            l_l_memoizedState_4_0.memoizedState = l_v199_0;
-            l_l_memoizedState_4_0.baseState = l_v199_0;
-            v198.memoizedProps = table.clone(v198.memoizedProps);
-            l_scheduleUpdateOnFiber_0(v198, l_SyncLane_0, l_NoTimestamp_0);
-        end;
-    end;
-    v155 = function(v205, v206, v207) --[[ Line: 701 ]]
-        -- upvalues: v162 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        local l_v206_0 = v206;
-        local l_memoizedState_5 = v205.memoizedState;
-        while l_memoizedState_5 ~= nil and l_v206_0 > 1 do
-            l_memoizedState_5 = l_memoizedState_5.next;
-            l_v206_0 = l_v206_0 - 1;
-        end;
-        local l_l_memoizedState_5_0 = l_memoizedState_5;
-        if l_l_memoizedState_5_0 ~= nil then
-            l_memoizedState_5 = l_l_memoizedState_5_0.memoizedState;
-            l_v206_0 = v162(l_memoizedState_5, v207, 0);
-            l_l_memoizedState_5_0.memoizedState = l_v206_0;
-            l_l_memoizedState_5_0.baseState = l_v206_0;
-            v205.memoizedProps = table.clone(v205.memoizedProps);
-            l_scheduleUpdateOnFiber_0(v205, l_SyncLane_0, l_NoTimestamp_0);
-        end;
-    end;
-    v156 = function(v211, v212, v213, v214) --[[ Line: 722 ]]
-        -- upvalues: v182 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        local l_v212_0 = v212;
-        local l_memoizedState_6 = v211.memoizedState;
-        while l_memoizedState_6 ~= nil and l_v212_0 > 1 do
-            l_memoizedState_6 = l_memoizedState_6.next;
-            l_v212_0 = l_v212_0 - 1;
-        end;
-        local l_l_memoizedState_6_0 = l_memoizedState_6;
-        if l_l_memoizedState_6_0 ~= nil then
-            l_v212_0 = v182(l_l_memoizedState_6_0.memoizedState, v213, v214);
-            l_l_memoizedState_6_0.memoizedState = l_v212_0;
-            l_l_memoizedState_6_0.baseState = l_v212_0;
-            v211.memoizedProps = table.clone(v211.memoizedProps);
-            l_scheduleUpdateOnFiber_0(v211, l_SyncLane_0, l_NoTimestamp_0);
-        end;
-    end;
-    v157 = function(v218, v219, v220) --[[ Line: 746 ]]
-        -- upvalues: v183 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        local l_memoizedProps_0 = v218.memoizedProps;
-        v218.pendingProps = v183(l_memoizedProps_0, v219, 1, v220);
-        local l_alternate_0 = v218.alternate;
-        if l_alternate_0 then
-            l_alternate_0.pendingProps = v218.pendingProps;
-        end;
-        l_scheduleUpdateOnFiber_0(v218, l_SyncLane_0, l_NoTimestamp_0);
-    end;
-    v158 = function(v223, v224) --[[ Line: 755 ]]
-        -- upvalues: v162 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        local l_memoizedProps_1 = v223.memoizedProps;
-        v223.pendingProps = v162(l_memoizedProps_1, v224, 0);
-        local l_alternate_1 = v223.alternate;
-        if l_alternate_1 then
-            l_alternate_1.pendingProps = v223.pendingProps;
-        end;
-        l_scheduleUpdateOnFiber_0(v223, l_SyncLane_0, l_NoTimestamp_0);
-    end;
-    v159 = function(v227, v228, v229) --[[ Line: 764 ]]
-        -- upvalues: v182 (copy), l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        v227.pendingProps = v182(v227.memoizedProps, v228, v229);
-        local l_alternate_2 = v227.alternate;
-        if l_alternate_2 then
-            l_alternate_2.pendingProps = v227.pendingProps;
-        end;
-        l_scheduleUpdateOnFiber_0(v227, l_SyncLane_0, l_NoTimestamp_0);
-    end;
-    v160 = function(v231) --[[ Line: 778 ]]
-        -- upvalues: l_scheduleUpdateOnFiber_0 (copy), l_SyncLane_0 (copy), l_NoTimestamp_0 (copy)
-        l_scheduleUpdateOnFiber_0(v231, l_SyncLane_0, l_NoTimestamp_0);
-    end;
-    v161 = function(v232) --[[ Line: 782 ]]
-        -- upvalues: v152 (ref)
-        v152 = v232;
-    end;
-end;
-findHostInstanceByFiber = function(v233) --[[ Line: 787 ]] --[[ Name: findHostInstanceByFiber ]]
-    -- upvalues: l_findCurrentHostFiber_0 (copy)
-    local v234 = l_findCurrentHostFiber_0(v233);
-    if v234 == nil then
-        return nil;
-    else
-        return v234.stateNode;
-    end;
-end;
-emptyFindFiberByHostInstance = function(_) --[[ Line: 795 ]] --[[ Name: emptyFindFiberByHostInstance ]]
-    return nil;
-end;
-getCurrentFiberForDevTools = function() --[[ Line: 799 ]] --[[ Name: getCurrentFiberForDevTools ]]
-    -- upvalues: v61 (copy)
-    return v61.current;
-end;
-v82.injectIntoDevTools = function(v236) --[[ Line: 803 ]]
-    -- upvalues: l_ReactSharedInternals_0 (copy), l___DEV___0 (copy), l_injectInternals_0 (copy), v154 (ref), v155 (ref), v156 (ref), v157 (ref), v158 (ref), v159 (ref), v161 (ref), v160 (ref), l_findHostInstancesForRefresh_0 (copy), l_scheduleRefresh_0 (copy), l_scheduleRoot_0 (copy), l_setRefreshHandler_0 (copy)
-    local l_findFiberByHostInstance_0 = v236.findFiberByHostInstance;
-    local l_ReactCurrentDispatcher_0 = l_ReactSharedInternals_0.ReactCurrentDispatcher;
-    local v239 = nil;
-    if l___DEV___0 then
-        v239 = getCurrentFiberForDevTools;
-    end;
-    return l_injectInternals_0({
-        bundleType = v236.bundleType, 
-        version = v236.version, 
-        rendererPackageName = v236.rendererPackageName, 
-        rendererConfig = v236.rendererConfig, 
-        overrideHookState = v154, 
-        overrideHookStateDeletePath = v155, 
-        overrideHookStateRenamePath = v156, 
-        overrideProps = v157, 
-        overridePropsDeletePath = v158, 
-        overridePropsRenamePath = v159, 
-        setSuspenseHandler = v161, 
-        scheduleUpdate = v160, 
-        currentDispatcherRef = l_ReactCurrentDispatcher_0, 
-        findHostInstanceByFiber = findHostInstanceByFiber, 
-        findFiberByHostInstance = l_findFiberByHostInstance_0 or emptyFindFiberByHostInstance, 
-        findHostInstancesForRefresh = if l___DEV___0 then l_findHostInstancesForRefresh_0 else nil, 
-        scheduleRefresh = if l___DEV___0 then l_scheduleRefresh_0 else nil, 
-        scheduleRoot = if l___DEV___0 then l_scheduleRoot_0 else nil, 
-        setRefreshHandler = if l___DEV___0 then l_setRefreshHandler_0 else nil, 
-        getCurrentFiber = v239
-    });
-end;
-v82.robloxReactProfiling = require(script.Parent.RobloxReactProfiling);
-v82.schedulingProfiler = {
-    profilerEventTypes = v80.profilerEventTypes, 
-    registerProfilerEventCallback = v80.registerProfilerEventCallback
-};
-return v82;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+
+require(ParentParent.Shared)
+
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local __DEV__ = ReactGlobals.__DEV__
+local console = require(ParentParent.Shared).console
+
+require(script.Parent.ReactInternalTypes)
+
+local ReactRootTags = require(script.Parent.ReactRootTags)
+local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
+
+require(script.Parent.ReactFiberHostConfig)
+
+local ReactWorkTags = require(script.Parent.ReactWorkTags)
+local FundamentalComponent = ReactWorkTags.FundamentalComponent
+
+require(ParentParent.Shared)
+
+local ReactFiberLane = require(script.Parent.ReactFiberLane)
+
+require(script.Parent["ReactFiberSuspenseComponent.new"])
+
+local ReactFiberTreeReflection = require(script.Parent.ReactFiberTreeReflection)
+local findCurrentHostFiber = ReactFiberTreeReflection.findCurrentHostFiber
+local findCurrentHostFiberWithNoPortals = ReactFiberTreeReflection.findCurrentHostFiberWithNoPortals
+local get = require(ParentParent.Shared).ReactInstanceMap.get
+local HostComponent = ReactWorkTags.HostComponent
+local ClassComponent = ReactWorkTags.ClassComponent
+local HostRoot = ReactWorkTags.HostRoot
+local SuspenseComponent = ReactWorkTags.SuspenseComponent
+local getComponentName = require(ParentParent.Shared).getComponentName
+local invariant = require(ParentParent.Shared).invariant
+local describeError = require(ParentParent.Shared).describeError
+local enableSchedulingProfiler = require(ParentParent.Shared).ReactFeatureFlags.enableSchedulingProfiler
+local ReactSharedInternals = require(ParentParent.Shared).ReactSharedInternals
+local getPublicInstance = require(script.Parent.ReactFiberHostConfig).getPublicInstance
+local lib = require(script.Parent["ReactFiberContext.new"])
+local findCurrentUnmaskedContext = lib.findCurrentUnmaskedContext
+local processChildContext = lib.processChildContext
+local emptyContextObject = lib.emptyContextObject
+local isContextProvider = lib.isContextProvider
+local createFiberRoot = require(script.Parent["ReactFiberRoot.new"]).createFiberRoot
+local lib2 = require(script.Parent["ReactFiberDevToolsHook.new"])
+local injectInternals = lib2.injectInternals
+local onScheduleRoot = lib2.onScheduleRoot
+local lib3 = require(script.Parent["ReactFiberWorkLoop.new"])
+local requestEventTime = lib3.requestEventTime
+local requestUpdateLane = lib3.requestUpdateLane
+local scheduleUpdateOnFiber = lib3.scheduleUpdateOnFiber
+local flushRoot = lib3.flushRoot
+local batchedEventUpdates = lib3.batchedEventUpdates
+local batchedUpdates = lib3.batchedUpdates
+local unbatchedUpdates = lib3.unbatchedUpdates
+local flushSync = lib3.flushSync
+local flushControlled = lib3.flushControlled
+local deferredUpdates = lib3.deferredUpdates
+local discreteUpdates = lib3.discreteUpdates
+local flushDiscreteUpdates = lib3.flushDiscreteUpdates
+local flushPassiveEffects = lib3.flushPassiveEffects
+local warnIfNotScopedWithMatchingAct = lib3.warnIfNotScopedWithMatchingAct
+local warnIfUnmockedScheduler = lib3.warnIfUnmockedScheduler
+local IsThisRendererActing = lib3.IsThisRendererActing
+local act = lib3.act
+local lib4 = require(script.Parent["ReactUpdateQueue.new"])
+local createUpdate = lib4.createUpdate
+local enqueueUpdate = lib4.enqueueUpdate
+local ReactCurrentFiber = require(script.Parent.ReactCurrentFiber)
+local isRendering = ReactCurrentFiber.isRendering
+local resetCurrentFiber = ReactCurrentFiber.resetCurrentFiber
+local setCurrentFiber = ReactCurrentFiber.setCurrentFiber
+local ReactTypeOfMode = require(script.Parent.ReactTypeOfMode)
+local StrictMode = ReactTypeOfMode.StrictMode
+local SyncLane = ReactFiberLane.SyncLane
+local InputDiscreteHydrationLane = ReactFiberLane.InputDiscreteHydrationLane
+local SelectiveHydrationLane = ReactFiberLane.SelectiveHydrationLane
+local NoTimestamp = ReactFiberLane.NoTimestamp
+local getHighestPriorityPendingLanes = ReactFiberLane.getHighestPriorityPendingLanes
+local higherPriorityLane = ReactFiberLane.higherPriorityLane
+local getCurrentUpdateLanePriority = ReactFiberLane.getCurrentUpdateLanePriority
+local setCurrentUpdateLanePriority = ReactFiberLane.setCurrentUpdateLanePriority
+local lib5 = require(script.Parent["ReactFiberHotReloading.new"])
+local scheduleRefresh = lib5.scheduleRefresh
+local scheduleRoot = lib5.scheduleRoot
+local setRefreshHandler = lib5.setRefreshHandler
+local findHostInstancesForRefresh = lib5.findHostInstancesForRefresh
+local SchedulingProfiler = require(script.Parent.SchedulingProfiler)
+local markRenderScheduled = SchedulingProfiler.markRenderScheduled
+local t1 = {
+	ReactRootTags = ReactRootTags,
+	ReactWorkTags = ReactWorkTags,
+	ReactTypeOfMode = ReactTypeOfMode,
+	ReactFiberFlags = ReactFiberFlags,
+	getNearestMountedFiber = ReactFiberTreeReflection.getNearestMountedFiber,
+	findCurrentFiberUsingSlowPath = ReactFiberTreeReflection.findCurrentFiberUsingSlowPath,
+	createPortal = require(script.Parent.ReactPortal).createPortal
+}
+local u79 = nil
+local t2 = nil
+
+if __DEV__ then
+	u79 = false
+	t2 = {}
+end
+
+local function getContextForSubtree(p1) -- line: 181
+	-- upvalues: emptyContextObject (copy), get (copy), findCurrentUnmaskedContext (copy), ClassComponent (copy), isContextProvider (copy), processChildContext (copy)
+	if not p1 then
+		return emptyContextObject
+	end
+
+	local v102 = get(p1)
+	local v103 = findCurrentUnmaskedContext(v102)
+
+	if v102.tag == ClassComponent then
+		local type = v102.type
+
+		if isContextProvider(type) then
+			return processChildContext(v102, type, v103)
+		end
+	end
+
+	return v103
+end
+local function findHostInstance(t3: {[any]: any}) -- line: 199
+	-- upvalues: get (copy), invariant (copy), Object (copy), findCurrentHostFiber (copy)
+	local v106 = get(t3)
+
+	if v106 == nil then
+		if typeof(t3.render) == "function" then
+			invariant(false, "Unable to find node on an unmounted component.")
+		else
+			invariant(false, "Argument appears to not be a ReactComponent. Keys: %s", table.concat(Object.keys(t3)))
+		end
+	end
+
+	local v107 = findCurrentHostFiber(v106)
+
+	if v107 == nil then
+		return nil
+	end
+
+	return v107.stateNode
+end
+
+function t1.createContainer(p2, p3, b1: boolean, p4) -- line: 293
+	-- upvalues: createFiberRoot (copy)
+	return createFiberRoot(p2, p3, b1, p4)
+end
+function t1.updateContainer(p5, p6, p7, p8: ((...any) -> ...any)?) -- line: 302
+	-- upvalues: __DEV__ (copy), onScheduleRoot (copy), requestEventTime (copy), ReactGlobals (copy), warnIfUnmockedScheduler (copy), warnIfNotScopedWithMatchingAct (copy), requestUpdateLane (copy), enableSchedulingProfiler (copy), markRenderScheduled (copy), emptyContextObject (copy), get (copy), findCurrentUnmaskedContext (copy), ClassComponent (copy), isContextProvider (copy), processChildContext (copy), isRendering (copy), ReactCurrentFiber (copy), u79 (ref), console (copy), getComponentName (copy), createUpdate (copy), Object (copy), enqueueUpdate (copy), scheduleUpdateOnFiber (copy)
+	local g128 = nil
+	local v129 = nil
+	local type = nil
+	local v127 = nil
+
+	if __DEV__ then
+		onScheduleRoot(p6, p5)
+	end
+
+	local current = p6.current
+	local v125 = requestEventTime()
+
+	if __DEV__ and ReactGlobals.__TESTEZ_RUNNING_TEST__ then
+		warnIfUnmockedScheduler(current)
+		warnIfNotScopedWithMatchingAct(current)
+	end
+
+	local v126 = requestUpdateLane(current)
+
+	if enableSchedulingProfiler then
+		markRenderScheduled(v126)
+	end
+
+	if not p7 then
+		v127 = emptyContextObject
+		g128 = true
+	end
+
+	if not g128 then
+		v129 = get(p7)
+		v127 = findCurrentUnmaskedContext(v129)
+	end
+
+	repeat
+		if g128 or (g128 or v129.tag == ClassComponent) then
+			if not g128 then
+				if not g128 then
+					type = v129.type
+				end
+			end
+
+			if g128 or (g128 or isContextProvider(type)) then
+				if not g128 then
+					if not g128 then
+						v127 = processChildContext(v129, type, v127)
+					end
+				end
+
+				g128 = false
+
+				if p6.context == nil then
+					p6.context = v127
+				else
+					p6.pendingContext = v127
+				end
+
+				if __DEV__ and isRendering and ReactCurrentFiber.current ~= nil and not u79 then
+					u79 = true
+					console.error("Render methods should be a pure function of props and state; triggering nested component updates from render is not allowed. If necessary, trigger nested updates in componentDidUpdate.\n\nCheck the render method of %s.", getComponentName(ReactCurrentFiber.current.type) or "Unknown")
+				end
+
+				local v131 = createUpdate(v125, v126)
+
+				if p5 == nil then
+					p5 = Object.None
+				end
+
+				v131.payload = {
+					element = p5
+				}
+
+				if p8 ~= nil then
+					if __DEV__ and typeof(p8) ~= "function" then
+						console.error("render(...): Expected the last optional `callback` argument to be a function. Instead received: %s.", (tostring(p8)))
+					end
+
+					v131.callback = p8
+				end
+
+				enqueueUpdate(current, v131)
+				scheduleUpdateOnFiber(current, v126, v125)
+
+				return v126
+			end
+		end
+
+		g128 = true
+	until not g128
+end
+
+t1.batchedEventUpdates = batchedEventUpdates
+t1.batchedUpdates = batchedUpdates
+t1.unbatchedUpdates = unbatchedUpdates
+t1.deferredUpdates = deferredUpdates
+t1.discreteUpdates = discreteUpdates
+t1.flushDiscreteUpdates = flushDiscreteUpdates
+t1.flushControlled = flushControlled
+t1.flushSync = flushSync
+t1.flushPassiveEffects = flushPassiveEffects
+t1.IsThisRendererActing = IsThisRendererActing
+t1.act = act
+
+function t1.getPublicRootInstance(p9) -- line: 397
+	-- upvalues: HostComponent (copy), getPublicInstance (copy)
+	local current = p9.current
+
+	if not current.child then
+		return nil
+	end
+
+	if current.child.tag == HostComponent then
+		return getPublicInstance(current.child.stateNode)
+	end
+
+	return current.child.stateNode
+end
+
+local u83 = nil
+
+function t1.attemptSynchronousHydration(p10) -- line: 414
+	-- upvalues: HostRoot (copy), getHighestPriorityPendingLanes (copy), flushRoot (copy), SuspenseComponent (copy), requestEventTime (copy), flushSync (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), InputDiscreteHydrationLane (copy), u83 (ref)
+	if p10.tag == HostRoot then
+		local stateNode = p10.stateNode
+
+		if stateNode.hydrate then
+			local v136 = getHighestPriorityPendingLanes(stateNode)
+
+			flushRoot(stateNode, v136)
+
+			return
+		end
+	elseif p10.tag == SuspenseComponent then
+		local v137 = requestEventTime()
+
+		flushSync(function() -- line: 424
+			-- upvalues: scheduleUpdateOnFiber (copy), p10 (copy), SyncLane (copy), v137 (copy)
+			return scheduleUpdateOnFiber(p10, SyncLane, v137)
+		end)
+
+		local v138 = InputDiscreteHydrationLane
+
+		u83(p10, v138)
+	end
+end
+
+local function markRetryLaneImpl(p11, p12) -- line: 435
+	-- upvalues: higherPriorityLane (copy)
+	local memoizedState = p11.memoizedState
+
+	if memoizedState and (memoizedState ~= nil and memoizedState.dehydrated ~= nil) then
+		memoizedState.retryLane = higherPriorityLane(memoizedState.retryLane, p12)
+	end
+end
+
+function u83(p13, p14) -- line: 446
+	-- upvalues: higherPriorityLane (copy)
+	local memoizedState = p13.memoizedState
+
+	if memoizedState and (memoizedState ~= nil and memoizedState.dehydrated ~= nil) then
+		memoizedState.retryLane = higherPriorityLane(memoizedState.retryLane, p14)
+	end
+
+	local alternate = p13.alternate
+
+	if alternate then
+		local memoizedState2 = alternate.memoizedState
+
+		if memoizedState2 and memoizedState2 ~= nil and memoizedState2.dehydrated ~= nil then
+			memoizedState2.retryLane = higherPriorityLane(memoizedState2.retryLane, p14)
+		end
+	end
+end
+function t1.attemptUserBlockingHydration(p15) -- line: 455
+	-- upvalues: SuspenseComponent (copy), requestEventTime (copy), InputDiscreteHydrationLane (copy), scheduleUpdateOnFiber (copy), u83 (ref)
+	if p15.tag ~= SuspenseComponent then
+		return
+	end
+
+	local v148 = requestEventTime()
+	local v149 = InputDiscreteHydrationLane
+
+	scheduleUpdateOnFiber(p15, v149, v148)
+	u83(p15, v149)
+end
+function t1.attemptContinuousHydration(p16) -- line: 469
+	-- upvalues: SuspenseComponent (copy), requestEventTime (copy), SelectiveHydrationLane (copy), scheduleUpdateOnFiber (copy), u83 (ref)
+	if p16.tag ~= SuspenseComponent then
+		return
+	end
+
+	local v151 = requestEventTime()
+	local v152 = SelectiveHydrationLane
+
+	scheduleUpdateOnFiber(p16, v152, v151)
+	u83(p16, v152)
+end
+function t1.attemptHydrationAtCurrentPriority(p17) -- line: 483
+	-- upvalues: SuspenseComponent (copy), requestEventTime (copy), requestUpdateLane (copy), scheduleUpdateOnFiber (copy), u83 (ref)
+	if p17.tag ~= SuspenseComponent then
+		return
+	end
+
+	local v154 = requestEventTime()
+	local v155 = requestUpdateLane(p17)
+
+	scheduleUpdateOnFiber(p17, v155, v154)
+	u83(p17, v155)
+end
+function t1.runWithPriority(p18, p19: ((...any) -> ...any)) -- line: 495
+	-- upvalues: getCurrentUpdateLanePriority (copy), setCurrentUpdateLanePriority (copy), describeError (copy)
+	local v158 = getCurrentUpdateLanePriority()
+
+	setCurrentUpdateLanePriority(p18)
+
+	local ok, result = xpcall(p19, describeError)
+
+	setCurrentUpdateLanePriority(v158)
+
+	if not ok then
+		error(result)
+	end
+
+	return result
+end
+
+t1.getCurrentUpdateLanePriority = getCurrentUpdateLanePriority
+t1.findHostInstance = findHostInstance
+
+function t1.findHostInstanceWithWarning(t4: {[any]: any}, s1: string) -- line: 220
+	-- upvalues: __DEV__ (copy), get (copy), invariant (copy), Object (copy), findCurrentHostFiber (copy), StrictMode (copy), getComponentName (copy), t2 (ref), ReactCurrentFiber (copy), setCurrentFiber (copy), console (copy), describeError (copy), resetCurrentFiber (copy), findHostInstance (copy)
+	if __DEV__ then
+		local v110 = get(t4)
+
+		if v110 == nil then
+			if typeof(t4.render) == "function" then
+				invariant(false, "Unable to find node on an unmounted component.")
+			else
+				invariant(false, "Argument appears to not be a ReactComponent. Keys: %s", table.concat(Object.keys(t4)))
+			end
+		end
+
+		local v111 = findCurrentHostFiber(v110)
+
+		if v111 == nil then
+			return nil
+		end
+
+		if bit32.band(v111.mode, StrictMode) ~= 0 then
+			local v112 = getComponentName(v110.type) or "Component"
+
+			if not t2[v112] then
+				t2[v112] = true
+
+				local current = ReactCurrentFiber.current
+				local ok, result = xpcall(function() -- line: 248
+					-- upvalues: setCurrentFiber (copy), v111 (copy), v110 (copy), StrictMode (copy), console (copy), s1 (copy), v112 (copy)
+					setCurrentFiber(v111)
+
+					if bit32.band(v110.mode, StrictMode) ~= 0 then
+						console.error("%s is deprecated in StrictMode. %s was passed an instance of %s which is inside StrictMode. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node", s1, s1, v112)
+
+						return
+					end
+
+					console.error("%s is deprecated in StrictMode. %s was passed an instance of %s which renders StrictMode children. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node", s1, s1, v112)
+				end, describeError)
+
+				if current then
+					setCurrentFiber(current)
+				else
+					resetCurrentFiber()
+				end
+
+				if not ok then
+					error(result)
+				end
+			end
+		end
+
+		return v111.stateNode
+	end
+
+	return (findHostInstance(t4))
+end
+function t1.findHostInstanceWithNoPortals(p20) -- line: 513
+	-- upvalues: findCurrentHostFiberWithNoPortals (copy), FundamentalComponent (copy)
+	local v162 = findCurrentHostFiberWithNoPortals(p20)
+
+	if v162 == nil then
+		return nil
+	end
+
+	if v162.tag == FundamentalComponent then
+		return v162.stateNode.instance
+	end
+
+	return v162.stateNode
+end
+
+local function shouldSuspendImpl(_) -- line: 524
+	return false
+end
+
+function t1.shouldSuspend(p22) -- line: 528
+	-- upvalues: shouldSuspendImpl (ref)
+	return shouldSuspendImpl(p22)
+end
+
+local u86 = nil
+local u87 = nil
+local u88 = nil
+local u89 = nil
+local u90 = nil
+local u91 = nil
+local u92 = nil
+local u93 = nil
+
+if __DEV__ then
+	local function copyWithDeleteImpl(t5: {[any]: any}, t6: {[any]: any}, n1: number) -- line: 543
+		-- upvalues: Array (copy), copyWithDeleteImpl (copy)
+		local v168 = t6[n1]
+		local v169 = if not Array.isArray(t5) then table.clone(t5) else Array.slice(t5)
+
+		if n1 + 1 == #t6 then
+			if Array.isArray(v169) then
+				Array.splice(v169, v168, 1)
+
+				return v169
+			end
+
+			v169[v168] = nil
+
+			return v169
+		end
+
+		v169[v168] = copyWithDeleteImpl(t5[v168], t6, n1 + 1)
+
+		return v169
+	end
+	local function copyWithDelete(t7: {[any]: any}, t8: {[any]: any}) -- line: 571
+		-- upvalues: copyWithDeleteImpl (copy)
+		return (copyWithDeleteImpl(t7, t8, 0))
+	end
+	local function copyWithRenameImpl(t9: {[any]: any}, t10: {[any]: any}, t11: {[any]: any}, n2: number) -- line: 579
+		-- upvalues: Array (copy), copyWithRenameImpl (copy)
+		local v176 = t10[n2]
+		local v177 = if not Array.isArray(t9) then table.clone(t9) else Array.slice(t9)
+
+		if n2 + 1 == #t10 then
+			v177[t11[n2]] = v177[v176]
+
+			if Array.isArray(v177) then
+				Array.splice(v177, v176, 1)
+
+				return v177
+			end
+
+			v177[v176] = nil
+
+			return v177
+		end
+
+		v177[v176] = copyWithRenameImpl(t9[v176], t10, t11, n2 + 1)
+
+		return v177
+	end
+	local function copyWithRename(t12: {[any]: any}, t13: {[any]: any}, t14: {[any]: any}) -- line: 615
+		-- upvalues: console (copy), copyWithRenameImpl (copy)
+		if #t13 ~= #t14 then
+			console.warn("copyWithRename() expects paths of the same length")
+
+			return nil
+		end
+
+		for i = 1, #t14 do
+			if t13[i] ~= t14[i] then
+				console.warn("copyWithRename() expects paths to be the same except for the deepest key")
+
+				return nil
+			end
+		end
+
+		return (copyWithRenameImpl(t12, t13, t14, 0))
+	end
+	local function copyWithSetImpl(t15: {[any]: any}, t16: {[any]: any}, n3: number, p23) -- line: 637
+		-- upvalues: Array (copy), copyWithSetImpl (copy)
+		if n3 >= #t16 + 1 then
+			return p23
+		end
+
+		local v186 = t16[n3]
+		local v187 = if not Array.isArray(t15) then table.clone(t15) else Array.slice(t15)
+
+		v187[v186] = copyWithSetImpl(t15[v186], t16, n3 + 2, p23)
+
+		return v187
+	end
+	local function copyWithSet(t17: {[any]: any}, t18: {[any]: any}, p24) -- line: 659
+		-- upvalues: copyWithSetImpl (copy)
+		return (copyWithSetImpl(t17, t18, 1, p24))
+	end
+	local function findHook(p25, n4: number) -- line: 667
+		local memoizedState = p25.memoizedState
+
+		while memoizedState ~= nil and n4 > 1 do
+			memoizedState = memoizedState.next
+			n4 -= 1
+		end
+
+		return memoizedState
+	end
+
+	function u86(p26, n5: number, t19: {[any]: any}, p27) -- line: 679
+		-- upvalues: copyWithSetImpl (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		local memoizedState = p26.memoizedState
+
+		while memoizedState ~= nil and n5 > 1 do
+			memoizedState = memoizedState.next
+			n5 -= 1
+		end
+
+		if memoizedState ~= nil then
+			local memoizedState3 = memoizedState.memoizedState
+			local v200 = copyWithSetImpl(memoizedState3, t19, 1, p27)
+
+			memoizedState.memoizedState = v200
+			memoizedState.baseState = v200
+			p26.memoizedProps = table.clone(p26.memoizedProps)
+			scheduleUpdateOnFiber(p26, SyncLane, NoTimestamp)
+		end
+	end
+	function u87(p28, n6: number, t20: {[any]: any}) -- line: 701
+		-- upvalues: copyWithDeleteImpl (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		local memoizedState = p28.memoizedState
+
+		while memoizedState ~= nil and n6 > 1 do
+			memoizedState = memoizedState.next
+			n6 -= 1
+		end
+
+		if memoizedState ~= nil then
+			local memoizedState4 = memoizedState.memoizedState
+			local v206 = copyWithDeleteImpl(memoizedState4, t20, 0)
+
+			memoizedState.memoizedState = v206
+			memoizedState.baseState = v206
+			p28.memoizedProps = table.clone(p28.memoizedProps)
+			scheduleUpdateOnFiber(p28, SyncLane, NoTimestamp)
+		end
+	end
+	function u88(p29, n7: number, t21: {[any]: any}, t22: {[any]: any}) -- line: 722
+		-- upvalues: copyWithRename (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		local memoizedState = p29.memoizedState
+
+		while memoizedState ~= nil and n7 > 1 do
+			memoizedState = memoizedState.next
+			n7 -= 1
+		end
+
+		if memoizedState ~= nil then
+			local v212 = copyWithRename(memoizedState.memoizedState, t21, t22)
+
+			memoizedState.memoizedState = v212
+			memoizedState.baseState = v212
+			p29.memoizedProps = table.clone(p29.memoizedProps)
+			scheduleUpdateOnFiber(p29, SyncLane, NoTimestamp)
+		end
+	end
+	function u89(p30, t23: {[any]: any}, p31) -- line: 746
+		-- upvalues: copyWithSetImpl (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		local memoizedProps = p30.memoizedProps
+
+		p30.pendingProps = copyWithSetImpl(memoizedProps, t23, 1, p31)
+
+		local alternate = p30.alternate
+
+		if alternate then
+			alternate.pendingProps = p30.pendingProps
+		end
+
+		scheduleUpdateOnFiber(p30, SyncLane, NoTimestamp)
+	end
+	function u90(p32, t24: {[any]: any}) -- line: 755
+		-- upvalues: copyWithDeleteImpl (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		local memoizedProps = p32.memoizedProps
+
+		p32.pendingProps = copyWithDeleteImpl(memoizedProps, t24, 0)
+
+		local alternate = p32.alternate
+
+		if alternate then
+			alternate.pendingProps = p32.pendingProps
+		end
+
+		scheduleUpdateOnFiber(p32, SyncLane, NoTimestamp)
+	end
+	function u91(p33, t25: {[any]: any}, t26: {[any]: any}) -- line: 764
+		-- upvalues: copyWithRename (copy), scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		p33.pendingProps = copyWithRename(p33.memoizedProps, t25, t26)
+
+		local alternate = p33.alternate
+
+		if alternate then
+			alternate.pendingProps = p33.pendingProps
+		end
+
+		scheduleUpdateOnFiber(p33, SyncLane, NoTimestamp)
+	end
+	function u92(p34) -- line: 778
+		-- upvalues: scheduleUpdateOnFiber (copy), SyncLane (copy), NoTimestamp (copy)
+		scheduleUpdateOnFiber(p34, SyncLane, NoTimestamp)
+	end
+	function u93(p35: ((...any) -> ...any)) -- line: 782
+		-- upvalues: shouldSuspendImpl (ref)
+		shouldSuspendImpl = p35
+	end
+end
+
+function findHostInstanceByFiber(p36) -- line: 787
+	-- upvalues: findCurrentHostFiber (copy)
+	local v229 = findCurrentHostFiber(p36)
+
+	if v229 == nil then
+		return nil
+	end
+
+	return v229.stateNode
+end
+function emptyFindFiberByHostInstance(_) -- line: 795
+	return nil
+end
+function getCurrentFiberForDevTools() -- line: 799
+	-- upvalues: ReactCurrentFiber (copy)
+	return ReactCurrentFiber.current
+end
+function t1.injectIntoDevTools(t27: {[any]: any}) -- line: 803
+	-- upvalues: ReactSharedInternals (copy), __DEV__ (copy), injectInternals (copy), u86 (ref), u87 (ref), u88 (ref), u89 (ref), u90 (ref), u91 (ref), u93 (ref), u92 (ref), findHostInstancesForRefresh (copy), scheduleRefresh (copy), scheduleRoot (copy), setRefreshHandler (copy)
+	local findFiberByHostInstance = t27.findFiberByHostInstance
+	local ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher
+	local _getCurrentFiberForDevTools = nil
+
+	if __DEV__ then
+		_getCurrentFiberForDevTools = getCurrentFiberForDevTools
+	end
+
+	return injectInternals({
+		bundleType = t27.bundleType,
+		version = t27.version,
+		rendererPackageName = t27.rendererPackageName,
+		rendererConfig = t27.rendererConfig,
+		overrideHookState = u86,
+		overrideHookStateDeletePath = u87,
+		overrideHookStateRenamePath = u88,
+		overrideProps = u89,
+		overridePropsDeletePath = u90,
+		overridePropsRenamePath = u91,
+		setSuspenseHandler = u93,
+		scheduleUpdate = u92,
+		currentDispatcherRef = ReactCurrentDispatcher,
+		findHostInstanceByFiber = findHostInstanceByFiber,
+		findFiberByHostInstance = findFiberByHostInstance or emptyFindFiberByHostInstance,
+		findHostInstancesForRefresh = if not __DEV__ then nil else findHostInstancesForRefresh,
+		scheduleRefresh = if not __DEV__ then nil else scheduleRefresh,
+		scheduleRoot = if not __DEV__ then nil else scheduleRoot,
+		setRefreshHandler = if not __DEV__ then nil else setRefreshHandler,
+		getCurrentFiber = _getCurrentFiberForDevTools
+	})
+end
+
+t1.robloxReactProfiling = require(script.Parent.RobloxReactProfiling)
+t1.schedulingProfiler = {
+	profilerEventTypes = SchedulingProfiler.profilerEventTypes,
+	registerProfilerEventCallback = SchedulingProfiler.registerProfilerEventCallback
+}
+
+return t1

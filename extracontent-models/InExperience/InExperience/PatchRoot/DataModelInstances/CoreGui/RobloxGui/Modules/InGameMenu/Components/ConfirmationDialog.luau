@@ -1,224 +1,239 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RunService_0 = game:GetService("RunService");
-local l_TextService_0 = game:GetService("TextService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v6 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v6.Roact;
-local l_t_0 = v6.t;
-local l_UIBlox_0 = v6.UIBlox;
-local l_Button_0 = l_UIBlox_0.App.Button.Button;
-local l_ButtonType_0 = l_UIBlox_0.App.Button.Enum.ButtonType;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_Parent_0 = script.Parent.Parent;
-local v14 = require(l_Parent_0.Resources.Constants);
-local v15 = require(l_Parent_0.Resources.Assets);
-local v16 = require(script.Parent.ThemedTextLabel);
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v18 = require(script.Parent.Connection.FocusHandler);
-local v19 = l_Roact_0.PureComponent:extend("ConfirmationDialog");
-v19.validateProps = l_t_0.strictInterface({
-    bodyText = l_t_0.string, 
-    cancelText = l_t_0.string, 
-    confirmText = l_t_0.string, 
-    titleText = l_t_0.string, 
-    bindReturnToConfirm = l_t_0.boolean, 
-    onCancel = l_t_0.callback, 
-    onConfirm = l_t_0.callback, 
-    blurBackground = l_t_0.boolean, 
-    visible = l_t_0.boolean, 
-    inputType = l_t_0.optional(l_t_0.string)
-});
-v19.defaultProps = {
-    bodyText = "This is some body text. It will wrap when needed.", 
-    cancelText = "Cancel", 
-    confirmText = "Confirm", 
-    titleText = "Dialog Title", 
-    blurBackground = false
-};
-v19.init = function(v20) --[[ Line: 59 ]] --[[ Name: init ]]
-    -- upvalues: l_Roact_0 (copy)
-    v20.state = {
-        isRooted = false
-    };
-    v20.onAncestryChanged = function(v21) --[[ Line: 64 ]]
-        -- upvalues: v20 (copy)
-        if v21:IsDescendantOf(game) then
-            v20:setState({
-                isRooted = true
-            });
-        end;
-    end;
-    v20.confirmButtonRef = l_Roact_0.createRef();
-    v20.buttonContainerRef = l_Roact_0.createRef();
-end;
-v19.render = function(v22) --[[ Line: 75 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), l_TextService_0 (copy), l_Roact_0 (copy), l_CoreGui_0 (copy), v14 (copy), l_ImageSetLabel_0 (copy), v15 (copy), v16 (copy), l_Button_0 (copy), l_ButtonType_0 (copy), v18 (copy), l_GuiService_0 (copy)
-    local l_props_0 = v22.props;
-    return l_withStyle_0(function(v24) --[[ Line: 78 ]]
-        -- upvalues: l_props_0 (copy), l_TextService_0 (ref), l_Roact_0 (ref), l_CoreGui_0 (ref), v14 (ref), l_ImageSetLabel_0 (ref), v15 (ref), v16 (ref), v22 (copy), l_Button_0 (ref), l_ButtonType_0 (ref), v18 (ref), l_GuiService_0 (ref)
-        local l_Font_0 = v24.Font.Body.Font;
-        local v26 = v24.Font.Body.RelativeSize * v24.Font.BaseSize;
-        local l_bodyText_0 = l_props_0.bodyText;
-        local v28 = math.max(l_TextService_0:GetTextSize(l_bodyText_0, v26, l_Font_0, Vector2.new(295, 1e999)).Y, v26 * 2) + 20 + 20;
-        return l_Roact_0.createElement(l_Roact_0.Portal, {
-            target = l_CoreGui_0
-        }, {
-            InGameMenuConfirmationDialog = l_Roact_0.createElement("ScreenGui", {
-                DisplayOrder = v14.DisplayOrder.ConfirmationDialog, 
-                IgnoreGuiInset = true, 
-                OnTopOfCoreBlur = l_props_0.blurBackground, 
-                Enabled = l_props_0.visible, 
-                ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            }, {
-                Overlay = l_Roact_0.createElement("TextButton", {
-                    AutoButtonColor = false, 
-                    BackgroundColor3 = v24.Theme.Overlay.Color, 
-                    BackgroundTransparency = v24.Theme.Overlay.Transparency, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Text = ""
-                }), 
-                DialogMainFrame = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BackgroundTransparency = 1, 
-                    Image = v15.Images.RoundedRect.Image, 
-                    ImageColor3 = v24.Theme.BackgroundUIDefault.Color, 
-                    ImageTransparency = v24.Theme.BackgroundUIDefault.Transparency, 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    ScaleType = v15.Images.RoundedRect.ScaleType, 
-                    Size = UDim2.new(0, 335, 0, v28 + 49 + 36 + 20), 
-                    SliceCenter = v15.Images.RoundedRect.SliceCenter
-                }, {
-                    Padding = l_Roact_0.createElement("UIPadding", {
-                        PaddingBottom = UDim.new(0, 20), 
-                        PaddingLeft = UDim.new(0, 20), 
-                        PaddingRight = UDim.new(0, 20)
-                    }), 
-                    Layout = l_Roact_0.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                        SortOrder = Enum.SortOrder.LayoutOrder
-                    }), 
-                    Title = l_Roact_0.createElement(v16, {
-                        fontKey = "Header1", 
-                        themeKey = "TextEmphasis", 
-                        LayoutOrder = 1, 
-                        Size = UDim2.new(1, 0, 0, 48), 
-                        Text = l_props_0.titleText
-                    }), 
-                    Divider = l_Roact_0.createElement("Frame", {
-                        BackgroundColor3 = v24.Theme.Divider.Color, 
-                        BackgroundTransparency = v24.Theme.Divider.Transparency, 
-                        BorderSizePixel = 0, 
-                        LayoutOrder = 3, 
-                        Size = UDim2.new(0.8, 0, 0, 1)
-                    }), 
-                    BodyTextContainer = l_Roact_0.createElement("Frame", {
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = 4, 
-                        Size = UDim2.new(1, 0, 0, v28)
-                    }, {
-                        BodyText = l_Roact_0.createElement(v16, {
-                            Size = UDim2.new(1, 0, 1, 0), 
-                            Text = l_props_0.bodyText, 
-                            TextWrapped = true
-                        })
-                    }), 
-                    ButtonContainer = l_Roact_0.createElement("Frame", {
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = 5, 
-                        Size = UDim2.new(1, 0, 0, 36), 
-                        [l_Roact_0.Ref] = v22.buttonContainerRef, 
-                        [l_Roact_0.Event.AncestryChanged] = v22.onAncestryChanged
-                    }, {
-                        Layout = l_Roact_0.createElement("UIListLayout", {
-                            FillDirection = Enum.FillDirection.Horizontal, 
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                            Padding = UDim.new(0, 10), 
-                            SortOrder = Enum.SortOrder.LayoutOrder, 
-                            VerticalAlignment = Enum.VerticalAlignment.Center
-                        }), 
-                        CancelButton = l_Roact_0.createElement(l_Button_0, {
-                            buttonType = l_ButtonType_0.Secondary, 
-                            layoutOrder = 1, 
-                            size = UDim2.new(0.5, -5, 1, 0), 
-                            text = l_props_0.cancelText, 
-                            onActivated = l_props_0.onCancel
-                        }), 
-                        ConfirmButton = l_Roact_0.createElement(l_Button_0, {
-                            buttonType = l_ButtonType_0.PrimarySystem, 
-                            layoutOrder = 2, 
-                            size = UDim2.new(0.5, -5, 1, 0), 
-                            text = l_props_0.confirmText, 
-                            onActivated = l_props_0.onConfirm, 
-                            [l_Roact_0.Ref] = v22.confirmButtonRef
-                        })
-                    })
-                })
-            }), 
-            FocusHandler = l_Roact_0.createElement(v18, {
-                isFocused = v22.state.isRooted and v22.props.visible and v22.props.inputType == v14.InputType.Gamepad, 
-                didFocus = function() --[[ Line: 198 ]] --[[ Name: didFocus ]]
-                    -- upvalues: l_GuiService_0 (ref), v22 (ref)
-                    l_GuiService_0:RemoveSelectionGroup("InGameMenuModalButtonsSelectionParent");
-                    l_GuiService_0:AddSelectionParent("InGameMenuModalButtonsSelectionParent", v22.buttonContainerRef:getValue());
-                    l_GuiService_0.SelectedCoreObject = v22.confirmButtonRef:getValue();
-                end
-            })
-        });
-    end);
-end;
-v19.updateBlur = function(v29) --[[ Line: 209 ]] --[[ Name: updateBlur ]]
-    -- upvalues: l_RunService_0 (copy)
-    local v30 = v29.props.blurBackground and v29.props.visible;
-    l_RunService_0:SetRobloxGuiFocused(v30);
-end;
-v19.bindActions = function(v31) --[[ Line: 215 ]] --[[ Name: bindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    local function v35(_, v33, _) --[[ Line: 216 ]] --[[ Name: confirmFunc ]]
-        -- upvalues: v31 (copy)
-        if v33 == Enum.UserInputState.Begin then
-            v31.props.onConfirm();
-        end;
-    end;
-    if v31.props.bindReturnToConfirm then
-        l_ContextActionService_0:BindCoreAction("InGameMenuModalConfirm", v35, false, Enum.KeyCode.Return);
-    end;
-    l_ContextActionService_0:BindCoreAction("InGameMenuModalCancel", function(_, v37, _) --[[ Line: 226 ]] --[[ Name: cancelFunc ]]
-        -- upvalues: v31 (copy)
-        if v37 == Enum.UserInputState.Begin then
-            v31.props.onCancel();
-        end;
-    end, false, Enum.KeyCode.Escape);
-end;
-v19.unbindActions = function(_) --[[ Line: 235 ]] --[[ Name: unbindActions ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    l_ContextActionService_0:UnbindCoreAction("InGameMenuModalConfirm");
-    l_ContextActionService_0:UnbindCoreAction("InGameMenuModalCancel");
-end;
-v19.didMount = function(v40) --[[ Line: 240 ]] --[[ Name: didMount ]]
-    v40:updateBlur();
-    if v40.props.visible then
-        v40:bindActions();
-    end;
-end;
-v19.didUpdate = function(v41) --[[ Line: 248 ]] --[[ Name: didUpdate ]]
-    v41:updateBlur();
-    if v41.props.visible then
-        v41:bindActions();
-        return;
-    else
-        v41:unbindActions();
-        return;
-    end;
-end;
-v19.willUnmount = function(v42) --[[ Line: 258 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_RunService_0 (copy)
-    if v42.props.blurBackground then
-        l_RunService_0:SetRobloxGuiFocused(false);
-    end;
-    v42:unbindActions();
-end;
-return v19;
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
+local CorePackages = game:GetService("CorePackages")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local UIBlox = InGameMenuDependencies.UIBlox
+local Button = UIBlox.App.Button.Button
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local withStyle = UIBlox.Core.Style.withStyle
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Resources.Constants)
+local Assets = require(ParentParent.Resources.Assets)
+local ThemedTextLabel = require(script.Parent.ThemedTextLabel)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local FocusHandler = require(script.Parent.Connection.FocusHandler)
+local v20 = Roact.PureComponent:extend("ConfirmationDialog")
+
+v20.validateProps = t.strictInterface({
+	bodyText = t.string,
+	cancelText = t.string,
+	confirmText = t.string,
+	titleText = t.string,
+	bindReturnToConfirm = t.boolean,
+	onCancel = t.callback,
+	onConfirm = t.callback,
+	blurBackground = t.boolean,
+	visible = t.boolean,
+	inputType = t.optional(t.string)
+})
+v20.defaultProps = {
+	bodyText = "This is some body text. It will wrap when needed.",
+	cancelText = "Cancel",
+	confirmText = "Confirm",
+	titleText = "Dialog Title",
+	blurBackground = false
+}
+
+function v20.init(p1) -- line: 59
+	-- upvalues: Roact (copy)
+	p1.state = {
+		isRooted = false
+	}
+
+	function p1.onAncestryChanged(p2) -- line: 64
+		-- upvalues: p1 (copy)
+		if p2:IsDescendantOf(game) then
+			p1:setState({
+				isRooted = true
+			})
+		end
+	end
+
+	p1.confirmButtonRef = Roact.createRef()
+	p1.buttonContainerRef = Roact.createRef()
+end
+function v20.render(p3) -- line: 75
+	-- upvalues: withStyle (copy), TextService (copy), Roact (copy), CoreGui (copy), Constants (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy)
+	local props = p3.props
+
+	return withStyle(function(p4) -- line: 78
+		-- upvalues: props (copy), TextService (copy), Roact (copy), CoreGui (copy), Constants (copy), ImageSetLabel (copy), Assets (copy), ThemedTextLabel (copy), p3 (copy), Button (copy), ButtonType (copy), FocusHandler (copy), GuiService (copy)
+		local BodyFont = p4.Font.Body.Font
+		local v36 = p4.Font.Body.RelativeSize * p4.Font.BaseSize
+		local bodyText = props.bodyText
+		local v38 = math.max(TextService:GetTextSize(bodyText, v36, BodyFont, Vector2.new(295, 1e999)).Y, v36 * 2) + 20 + 20
+
+		return Roact.createElement(Roact.Portal, {
+			target = CoreGui
+		}, {
+			InGameMenuConfirmationDialog = Roact.createElement("ScreenGui", {
+				IgnoreGuiInset = true,
+				DisplayOrder = Constants.DisplayOrder.ConfirmationDialog,
+				OnTopOfCoreBlur = props.blurBackground,
+				Enabled = props.visible,
+				ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			}, {
+				Overlay = Roact.createElement("TextButton", {
+					AutoButtonColor = false,
+					BorderSizePixel = 0,
+					Text = "",
+					BackgroundColor3 = p4.Theme.Overlay.Color,
+					BackgroundTransparency = p4.Theme.Overlay.Transparency,
+					Size = UDim2.new(1, 0, 1, 0)
+				}),
+				DialogMainFrame = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = Assets.Images.RoundedRect.Image,
+					ImageColor3 = p4.Theme.BackgroundUIDefault.Color,
+					ImageTransparency = p4.Theme.BackgroundUIDefault.Transparency,
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					ScaleType = Assets.Images.RoundedRect.ScaleType,
+					Size = UDim2.new(0, 335, 0, v38 + 49 + 36 + 20),
+					SliceCenter = Assets.Images.RoundedRect.SliceCenter
+				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingBottom = UDim.new(0, 20),
+						PaddingLeft = UDim.new(0, 20),
+						PaddingRight = UDim.new(0, 20)
+					}),
+					Layout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						HorizontalAlignment = Enum.HorizontalAlignment.Center,
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					Title = Roact.createElement(ThemedTextLabel, {
+						fontKey = "Header1",
+						themeKey = "TextEmphasis",
+						LayoutOrder = 1,
+						Size = UDim2.new(1, 0, 0, 48),
+						Text = props.titleText
+					}),
+					Divider = Roact.createElement("Frame", {
+						BorderSizePixel = 0,
+						LayoutOrder = 3,
+						BackgroundColor3 = p4.Theme.Divider.Color,
+						BackgroundTransparency = p4.Theme.Divider.Transparency,
+						Size = UDim2.new(0.8, 0, 0, 1)
+					}),
+					BodyTextContainer = Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						LayoutOrder = 4,
+						Size = UDim2.new(1, 0, 0, v38)
+					}, {
+						BodyText = Roact.createElement(ThemedTextLabel, {
+							TextWrapped = true,
+							Size = UDim2.new(1, 0, 1, 0),
+							Text = props.bodyText
+						})
+					}),
+					ButtonContainer = Roact.createElement("Frame", {
+						BackgroundTransparency = 1,
+						LayoutOrder = 5,
+						Size = UDim2.new(1, 0, 0, 36),
+						[Roact.Ref] = p3.buttonContainerRef,
+						[Roact.Event.AncestryChanged] = p3.onAncestryChanged
+					}, {
+						Layout = Roact.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							Padding = UDim.new(0, 10),
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							VerticalAlignment = Enum.VerticalAlignment.Center
+						}),
+						CancelButton = Roact.createElement(Button, {
+							layoutOrder = 1,
+							buttonType = ButtonType.Secondary,
+							size = UDim2.new(0.5, -5, 1, 0),
+							text = props.cancelText,
+							onActivated = props.onCancel
+						}),
+						ConfirmButton = Roact.createElement(Button, {
+							buttonType = ButtonType.PrimarySystem,
+							layoutOrder = 2,
+							size = UDim2.new(0.5, -5, 1, 0),
+							text = props.confirmText,
+							onActivated = props.onConfirm,
+							[Roact.Ref] = p3.confirmButtonRef
+						})
+					})
+				})
+			}),
+			FocusHandler = Roact.createElement(FocusHandler, {
+				isFocused = p3.state.isRooted and (p3.props.visible and p3.props.inputType == Constants.InputType.Gamepad),
+				didFocus = function() -- line: 198
+					-- upvalues: GuiService (copy), p3 (copy)
+					GuiService:RemoveSelectionGroup("InGameMenuModalButtonsSelectionParent")
+					GuiService:AddSelectionParent("InGameMenuModalButtonsSelectionParent", p3.buttonContainerRef:getValue())
+					GuiService.SelectedCoreObject = p3.confirmButtonRef:getValue()
+				end
+			})
+		})
+	end)
+end
+function v20.updateBlur(p5) -- line: 209
+	-- upvalues: RunService (copy)
+	local v25 = p5.props.blurBackground and p5.props.visible
+
+	RunService:SetRobloxGuiFocused(v25)
+end
+function v20.bindActions(p6) -- line: 215
+	-- upvalues: ContextActionService (copy)
+	local function confirmFunc(_, p8, _) -- line: 216
+		-- upvalues: p6 (copy)
+		if p8 == Enum.UserInputState.Begin then
+			p6.props.onConfirm()
+		end
+	end
+
+	if p6.props.bindReturnToConfirm then
+		ContextActionService:BindCoreAction("InGameMenuModalConfirm", confirmFunc, false, Enum.KeyCode.Return)
+	end
+
+	local function cancelFunc(_, p11, _) -- line: 226
+		-- upvalues: p6 (copy)
+		if p11 == Enum.UserInputState.Begin then
+			p6.props.onCancel()
+		end
+	end
+
+	ContextActionService:BindCoreAction("InGameMenuModalCancel", cancelFunc, false, Enum.KeyCode.Escape)
+end
+function v20.unbindActions(_) -- line: 235
+	-- upvalues: ContextActionService (copy)
+	ContextActionService:UnbindCoreAction("InGameMenuModalConfirm")
+	ContextActionService:UnbindCoreAction("InGameMenuModalCancel")
+end
+function v20.didMount(p14) -- line: 240
+	p14:updateBlur()
+
+	if p14.props.visible then
+		p14:bindActions()
+	end
+end
+function v20.didUpdate(p15) -- line: 248
+	p15:updateBlur()
+
+	if p15.props.visible then
+		p15:bindActions()
+
+		return
+	end
+
+	p15:unbindActions()
+end
+function v20.willUnmount(p16) -- line: 258
+	-- upvalues: RunService (copy)
+	if p16.props.blurBackground then
+		RunService:SetRobloxGuiFocused(false)
+	end
+
+	p16:unbindActions()
+end
+
+return v20

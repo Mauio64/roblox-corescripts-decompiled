@@ -1,32 +1,45 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-return function(v2, v3, v4, v5) --[[ Line: 5 ]]
-    if not v4 then
-        if v5.isServer then
-            error(string.format("Failed to load texture data"));
-        else
-            return false;
-        end;
-    end;
-    local v6 = v4[v2];
-    if not v6 then
-        local v7 = v2[v3];
-        if not v7 or v7 == "" then
-            return false;
-        elseif v5.isServer then
-            error(string.format("Failed to load texture data"));
-        end;
-    end;
-    local v8 = v6[v3];
-    if not v8 or not v8.instance then
-        local v9 = v2[v3];
-        if not v9 or v9 == "" then
-            return false;
-        elseif v5.isServer then
-            error(string.format("Failed to load texture data"));
-        else
-            return false;
-        end;
-    end;
-    return true, v8.instance;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+return function(p1, s1: string, p2, p3) -- line: 5
+	if not p2 then
+		if not p3.isServer then
+			return false
+		end
+
+		error(string.format("Failed to load texture data"))
+	end
+
+	local v6 = p2[p1]
+
+	if not v6 then
+		local v7 = p1[s1]
+
+		if not v7 or v7 == "" then
+			return false
+		end
+
+		if p3.isServer then
+			error(string.format("Failed to load texture data"))
+		end
+	end
+
+	local v8 = v6[s1]
+
+	if not v8 or not v8.instance then
+		local v9 = p1[s1]
+
+		if not v9 or v9 == "" then
+			return false
+		end
+
+		if not p3.isServer then
+			return false
+		end
+
+		error(string.format("Failed to load texture data"))
+	end
+
+	return true, v8.instance
+end

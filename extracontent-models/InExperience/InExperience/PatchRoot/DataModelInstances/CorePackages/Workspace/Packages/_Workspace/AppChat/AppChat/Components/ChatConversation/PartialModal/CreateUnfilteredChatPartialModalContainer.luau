@@ -1,133 +1,143 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.types);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.React);
-local l_memo_0 = v4.memo;
-local v6 = require(l_script_FirstAncestor_0.Analytics.useAnalytics);
-local l_useCallback_0 = v4.useCallback;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useEffectOnMount_0 = require(l_Parent_0.RoactUtils).Hooks.useEffectOnMount;
-local l_useIsLocalPlayerPartyVoiceEligible_0 = require(l_Parent_0.SquadsCore).Hooks.useIsLocalPlayerPartyVoiceEligible;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useScreenSize_0 = require(l_Parent_0.RobloxAppHooks).useScreenSize;
-local l_useState_0 = v4.useState;
-local v14 = require(l_Parent_0.AppChatNetworking);
-local v15 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local v16 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v16.Core.Style.useStyle;
-local l_useLayerCollector_0 = v16.Core.Layout.LayerCollector.useLayerCollector;
-local v19 = require(script.Parent.PartialModal);
-local v22 = {
-    conversationId = "", 
-    onDismissed = function() --[[ Line: 41 ]] --[[ Name: onDismissed ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
 
-    end, 
-    navigateToConversation = function(_) --[[ Line: 42 ]] --[[ Name: navigateToConversation ]]
+require(AppChat.types)
 
-    end, 
-    navigateToToast = function(_) --[[ Line: 43 ]] --[[ Name: navigateToToast ]]
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local memo = React.memo
+local useAnalytics = require(AppChat.Analytics.useAnalytics)
+local useCallback = React.useCallback
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useEffectOnMount = require(AppChatParent.RoactUtils).Hooks.useEffectOnMount
+local useIsLocalPlayerPartyVoiceEligible = require(AppChatParent.SquadsCore.Hooks).useIsLocalPlayerPartyVoiceEligible
+local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
+local useScreenSize = require(AppChatParent.RobloxAppHooks).useScreenSize
+local useState = React.useState
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local EventNames = require(AppChat.Analytics.EventNames)
+local UIBlox = require(AppChatParent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
+local PartialModal = require(script.Parent.PartialModal)
+local t1 = {
+	conversationId = "",
+	titleKey = "Feature.Chat.Heading.CreateUnfilteredChatDialog",
+	bodyKey = "Feature.Chat.Description.CreateUnfilteredChatDialog",
+	bodyKeyWithVoice = "Feature.Chat.Description.CreateUnfilteredChatWithVoice",
+	networkErrorTextKey = "Feature.Toast.NetworkingError.SomethingIsWrong",
+	actionKey = "Feature.Chat.Action.Create",
+	cancelAlertKey = "Feature.Chat.Action.Cancel",
+	onDismissed = function() -- line: 41
+	end,
+	navigateToConversation = function(_) -- line: 42
+	end,
+	navigateToToast = function(_) -- line: 43
+	end
+}
 
-    end, 
-    titleKey = "Feature.Chat.Heading.CreateUnfilteredChatDialog", 
-    bodyKey = "Feature.Chat.Description.CreateUnfilteredChatDialog", 
-    bodyKeyWithVoice = "Feature.Chat.Description.CreateUnfilteredChatWithVoice", 
-    networkErrorTextKey = "Feature.Toast.NetworkingError.SomethingIsWrong", 
-    actionKey = "Feature.Chat.Action.Create", 
-    cancelAlertKey = "Feature.Chat.Action.Cancel"
-};
-return l_memo_0(function(v23) --[[ Line: 53 ]] --[[ Name: CreateUnfilteredChatPartialModalContainer ]]
-    -- upvalues: v3 (copy), v22 (copy), l_useStyle_0 (copy), l_useScreenSize_0 (copy), l_useLayerCollector_0 (copy), l_useState_0 (copy), l_useDispatch_0 (copy), v6 (copy), l_useIsLocalPlayerPartyVoiceEligible_0 (copy), l_useEffectOnMount_0 (copy), v15 (copy), l_useLocalization_0 (copy), l_useCallback_0 (copy), v14 (copy), v4 (copy), v19 (copy)
-    local v24 = v3.Dictionary.union(v22, v23);
-    local v25 = l_useStyle_0();
-    local v26 = l_useScreenSize_0();
-    local v27 = l_useLayerCollector_0();
-    if v27 and v27.absoluteSize then
-        v26 = v27.absoluteSize;
-    end;
-    local v28, v29 = l_useState_0(false);
-    local v30 = l_useDispatch_0();
-    local v31 = v6();
-    local v32 = l_useIsLocalPlayerPartyVoiceEligible_0();
-    l_useEffectOnMount_0(function() --[[ Line: 66 ]]
-        -- upvalues: v31 (copy), v15 (ref), v24 (copy)
-        if v31 then
-            v31.fireAnalyticsEvent(v15.ConversationUpgradeDialogRendered, {
-                conversationId = v24.conversationId
-            });
-        end;
-    end);
-    local v33 = l_useLocalization_0({
-        networkErrorText = v24.networkErrorTextKey, 
-        titleText = v24.titleKey, 
-        bodyText = v24.bodyKey, 
-        bodyTextWithVoice = v24.bodyKeyWithVoice, 
-        actionText = v24.actionKey, 
-        cancelAlertText = v24.cancelAlertKey
-    });
-    local v34 = l_useCallback_0(function() --[[ Line: 83 ]]
-        -- upvalues: v24 (copy), v33 (copy)
-        v24.navigateToToast(v33.networkErrorText);
-    end, {
-        v24.navigateToToast, 
-        v33.networkErrorText
-    });
-    local v38 = l_useCallback_0(function() --[[ Line: 88 ]]
-        -- upvalues: v31 (copy), v15 (ref), v24 (copy), v29 (copy), v30 (copy), v14 (ref), v34 (copy)
-        if v31 then
-            v31.fireAnalyticsEvent(v15.ConversationUpgradeDialogActionClicked, {
-                conversationId = v24.conversationId
-            });
-        end;
-        v29(true);
-        v30(v14.rodux.DuplicateConversation.API(v24.conversationId, "trusted_comms")):andThen(function(v35) --[[ Line: 96 ]]
-            -- upvalues: v24 (ref), v34 (ref)
-            local l_responseBody_0 = v35.responseBody;
-            local v37 = l_responseBody_0 and l_responseBody_0.conversations and l_responseBody_0.conversations[1] and l_responseBody_0.conversations[1].id;
-            if v37 then
-                v24.navigateToConversation(v37);
-                return;
-            else
-                v34();
-                return;
-            end;
-        end):catch(function() --[[ Line: 108 ]]
-            -- upvalues: v34 (ref)
-            v34();
-        end):finally(function() --[[ Line: 111 ]]
-            -- upvalues: v29 (ref)
-            v29(false);
-        end);
-    end, {
-        v30, 
-        v29, 
-        v34, 
-        v24.navigateToConversation, 
-        v24.conversationId, 
-        v31
-    });
-    local v39 = l_useCallback_0(function() --[[ Line: 117 ]]
-        -- upvalues: v31 (copy), v15 (ref), v24 (copy)
-        if v31 then
-            v31.fireAnalyticsEvent(v15.ConversationUpgradeDialogDismissed, {
-                conversationId = v24.conversationId
-            });
-        end;
-        v24.onDismissed();
-    end, {
-        v24.onDismissed, 
-        v31, 
-        v24.conversationId
-    });
-    return v4.createElement(v19, {
-        titleText = v33.titleText, 
-        bodyText = if v32 then v33.bodyTextWithVoice else v33.bodyText, 
-        actionText = v33.actionText, 
-        cancelAlertText = v33.cancelAlertText, 
-        isButtonDisabled = v28, 
-        screenSize = v26, 
-        onActivated = v38, 
-        onDismissed = v39, 
-        style = v25
-    });
-end);
+local function CreateUnfilteredChatPartialModalContainer(t2: {[any]: any}) -- line: 53
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useScreenSize (copy), useLayerCollector (copy), useState (copy), useDispatch (copy), useAnalytics (copy), useIsLocalPlayerPartyVoiceEligible (copy), useEffectOnMount (copy), EventNames (copy), useLocalization (copy), useCallback (copy), AppChatNetworking (copy), React (copy), PartialModal (copy)
+	local v25 = Cryo.Dictionary.union(t1, t2)
+	local v26 = useStyle()
+	local v27 = useScreenSize()
+	local v28 = useLayerCollector()
+
+	if v28 and v28.absoluteSize then
+		v27 = v28.absoluteSize
+	end
+
+	local v29, v30 = useState(false)
+	local v31 = useDispatch()
+	local v32 = useAnalytics()
+	local v33 = useIsLocalPlayerPartyVoiceEligible()
+
+	useEffectOnMount(function() -- line: 66
+		-- upvalues: v32 (copy), EventNames (copy), v25 (copy)
+		if v32 then
+			v32.fireAnalyticsEvent(EventNames.ConversationUpgradeDialogRendered, {
+				conversationId = v25.conversationId
+			})
+		end
+	end)
+
+	local v34 = useLocalization({
+		networkErrorText = v25.networkErrorTextKey,
+		titleText = v25.titleKey,
+		bodyText = v25.bodyKey,
+		bodyTextWithVoice = v25.bodyKeyWithVoice,
+		actionText = v25.actionKey,
+		cancelAlertText = v25.cancelAlertKey
+	})
+	local v35 = useCallback(function() -- line: 83
+		-- upvalues: v25 (copy), v34 (copy)
+		v25.navigateToToast(v34.networkErrorText)
+	end, {
+		v25.navigateToToast,
+		v34.networkErrorText
+	})
+	local v36 = useCallback(function() -- line: 88
+		-- upvalues: v32 (copy), EventNames (copy), v25 (copy), v30 (copy), v31 (copy), AppChatNetworking (copy), v35 (copy)
+		if v32 then
+			v32.fireAnalyticsEvent(EventNames.ConversationUpgradeDialogActionClicked, {
+				conversationId = v25.conversationId
+			})
+		end
+
+		v30(true)
+		v31(AppChatNetworking.rodux.DuplicateConversation.API(v25.conversationId, "trusted_comms")):andThen(function(p3) -- line: 96
+			-- upvalues: v25 (copy), v35 (copy)
+			local responseBody = p3.responseBody
+			local v40 = responseBody and (responseBody.conversations and (responseBody.conversations[1] and responseBody.conversations[1].id))
+
+			if v40 then
+				v25.navigateToConversation(v40)
+
+				return
+			end
+
+			v35()
+		end):catch(function() -- line: 108
+			-- upvalues: v35 (copy)
+			v35()
+		end):finally(function() -- line: 111
+			-- upvalues: v30 (copy)
+			v30(false)
+		end)
+	end, {
+		v31,
+		v30,
+		v35,
+		v25.navigateToConversation,
+		v25.conversationId,
+		v32
+	})
+	local v37 = useCallback(function() -- line: 117
+		-- upvalues: v32 (copy), EventNames (copy), v25 (copy)
+		if v32 then
+			v32.fireAnalyticsEvent(EventNames.ConversationUpgradeDialogDismissed, {
+				conversationId = v25.conversationId
+			})
+		end
+
+		v25.onDismissed()
+	end, {
+		v25.onDismissed,
+		v32,
+		v25.conversationId
+	})
+
+	return React.createElement(PartialModal, {
+		titleText = v34.titleText,
+		bodyText = if not v33 then v34.bodyText else v34.bodyTextWithVoice,
+		actionText = v34.actionText,
+		cancelAlertText = v34.cancelAlertText,
+		isButtonDisabled = v29,
+		screenSize = v27,
+		onActivated = v36,
+		onDismissed = v37,
+		style = v26
+	})
+end
+
+return memo(CreateUnfilteredChatPartialModalContainer)

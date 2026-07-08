@@ -1,35 +1,35 @@
 return {
-    mock = function(v0) --[[ Line: 41 ]] --[[ Name: mock ]]
-        return {
-            id = v0 or -1, 
-            rootPlaceId = -2, 
-            name = "Experience name", 
-            description = "Experience description", 
-            sourceName = "Source name", 
-            sourceDescription = "Source description", 
-            creator = {
-                id = -3, 
-                name = "CreatorName", 
-                type = "User", 
-                isRNVAccount = false, 
-                hasVerifiedBadge = false
-            }, 
-            price = 0, 
-            allowedGearGenres = {}, 
-            allowedGearCategories = {}, 
-            isGenreEnforced = false, 
-            copyingAllowed = false, 
-            playing = 0, 
-            visits = 0, 
-            maxPlayers = 10, 
-            created = DateTime.now():ToIsoDate(), 
-            updated = DateTime.now():ToIsoDate(), 
-            studioAccessToApisAllowed = false, 
-            universeAvatarType = "MorphR6", 
-            genre = "", 
-            isAllGenre = false, 
-            isFavoritedByUser = false, 
-            favoritedCount = 0
-        };
-    end
-};
+	mock = function(n1: number?) -- line: 41
+		return {
+			rootPlaceId = -2,
+			name = "Experience name",
+			description = "Experience description",
+			sourceName = "Source name",
+			sourceDescription = "Source description",
+			price = 0,
+			isGenreEnforced = false,
+			copyingAllowed = false,
+			playing = 0,
+			visits = 0,
+			maxPlayers = 10,
+			studioAccessToApisAllowed = false,
+			universeAvatarType = "MorphR6",
+			genre = "",
+			isAllGenre = false,
+			isFavoritedByUser = false,
+			favoritedCount = 0,
+			id = n1 or -1,
+			creator = {
+				id = -3,
+				name = "CreatorName",
+				type = "User",
+				isRNVAccount = false,
+				hasVerifiedBadge = false
+			},
+			allowedGearGenres = {},
+			allowedGearCategories = {},
+			created = DateTime.now():ToIsoDate(),
+			updated = DateTime.now():ToIsoDate()
+		}
+	end
+}

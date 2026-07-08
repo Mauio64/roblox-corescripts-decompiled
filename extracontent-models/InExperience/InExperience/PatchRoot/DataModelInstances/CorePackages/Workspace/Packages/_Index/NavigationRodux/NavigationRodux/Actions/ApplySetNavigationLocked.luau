@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("NavigationRodux").Parent;
-local l_makeActionCreator_0 = require(l_Parent_0.Rodux).makeActionCreator;
-local v2 = require(l_Parent_0.ArgCheck);
-return l_makeActionCreator_0(script.Name, function(v3) --[[ Line: 7 ]]
-    -- upvalues: v2 (copy)
-    return {
-        locked = v2.isType(v3, "boolean", "locked")
-    };
-end);
+local Parent = script:FindFirstAncestor("NavigationRodux").Parent
+local makeActionCreator = require(Parent.Rodux).makeActionCreator
+local ArgCheck = require(Parent.ArgCheck)
+
+return makeActionCreator(script.Name, function(p1) -- line: 7
+	-- upvalues: ArgCheck (copy)
+	return {
+		locked = ArgCheck.isType(p1, "boolean", "locked")
+	}
+end)

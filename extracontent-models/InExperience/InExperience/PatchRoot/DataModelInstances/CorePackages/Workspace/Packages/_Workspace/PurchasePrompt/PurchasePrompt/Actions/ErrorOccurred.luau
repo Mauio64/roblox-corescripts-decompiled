@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "purchaseError");
+return require(script.Parent.makeActionCreator)(script.Name, "purchaseError")

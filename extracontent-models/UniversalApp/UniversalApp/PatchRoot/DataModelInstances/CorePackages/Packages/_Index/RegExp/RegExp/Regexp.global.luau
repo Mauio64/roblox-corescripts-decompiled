@@ -1,44 +1,51 @@
-local v0 = require(script.Parent.RegEx);
-local v1 = {};
-local v3 = {
-    __index = v1, 
-    __tostring = function(v2) --[[ Line: 14 ]] --[[ Name: __tostring ]]
-        return (tostring(v2._innerRegEx));
-    end
-};
-v1.exec = function(v4, v5) --[[ Line: 19 ]] --[[ Name: exec ]]
-    local v6 = v4._innerRegEx:match(v5);
-    if not v6 then
-        return nil;
-    else
-        local v7 = v6:span();
-        local v8 = v6:grouparr();
-        local v9 = {
-            v8[0]
-        };
-        for v10 = 1, v8.n do
-            v9[v10 + 1] = v8[v10];
-        end;
-        v9.n = v8.n + 1;
-        v9.index = v7;
-        v9.input = v5;
-        return v9;
-    end;
-end;
-v1.test = function(v11, v12) --[[ Line: 38 ]] --[[ Name: test ]]
-    return v11:exec(v12) ~= nil;
-end;
-return (setmetatable(v1, {
-    __call = function(_, v14, v15) --[[ Line: 42 ]] --[[ Name: new ]]
-        -- upvalues: v0 (copy), v3 (copy)
-        v15 = v15 or "";
-        local v16 = v0.new(v14, v15);
-        return (setmetatable({
-            source = v14, 
-            ignoreCase = v15:find("i") ~= nil, 
-            global = v15:find("g") ~= nil, 
-            multiline = v15:find("m") ~= nil, 
-            _innerRegEx = v16
-        }, v3));
-    end
-}));
+local RegEx = require(script.Parent.RegEx)
+local t1 = {}
+local t2 = {
+	__index = t1,
+	__tostring = function(p1) -- line: 14
+		return (tostring(p1._innerRegEx))
+	end
+}
+
+function t1.exec(t3: {[any]: any}, s1: string) -- line: 19
+	local v8 = t3._innerRegEx:match(s1)
+
+	if not v8 then
+		return nil
+	end
+
+	local v9 = v8:span()
+	local v10 = v8:grouparr()
+	local t4 = { v10[0] }
+
+	for i = 1, v10.n do
+		t4[i + 1] = v10[i]
+	end
+
+	t4.n = v10.n + 1
+	t4.index = v9
+	t4.input = s1
+
+	return t4
+end
+function t1.test(t5: {[any]: any}, s2: string) -- line: 38
+	return t5:exec(s2) ~= nil
+end
+
+local function new(_, p3, s3: string?) -- line: 42
+	-- upvalues: RegEx (copy), t2 (copy)
+	local v18 = s3 or ""
+	local v19 = RegEx.new(p3, v18)
+
+	return (setmetatable({
+		source = p3,
+		ignoreCase = v18:find("i") ~= nil,
+		global = v18:find("g") ~= nil,
+		multiline = v18:find("m") ~= nil,
+		_innerRegEx = v19
+	}, t2))
+end
+
+return (setmetatable(t1, {
+	__call = new
+}))

@@ -1,12 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("LazyRequire").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.React);
-return function(v3) --[[ Line: 13 ]] --[[ Name: createLazyComponent ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return v2.forwardRef(function(v4, v5) --[[ Line: 16 ]]
-        -- upvalues: v2 (ref), v3 (copy), v1 (ref)
-        return v2.createElement(v3(), v1.Dictionary.join(v4, {
-            ref = v5
-        }));
-    end);
-end;
+local Parent = script:FindFirstAncestor("LazyRequire").Parent
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+
+local function createLazyComponent(p1: ((...any) -> ...any)) -- line: 13
+	-- upvalues: React (copy), Cryo (copy)
+	return React.forwardRef(function(p2, p3) -- line: 16
+		-- upvalues: React (copy), p1 (copy), Cryo (copy)
+		return React.createElement(p1(), Cryo.Dictionary.join(p2, {
+			ref = p3
+		}))
+	end)
+end
+
+return createLazyComponent

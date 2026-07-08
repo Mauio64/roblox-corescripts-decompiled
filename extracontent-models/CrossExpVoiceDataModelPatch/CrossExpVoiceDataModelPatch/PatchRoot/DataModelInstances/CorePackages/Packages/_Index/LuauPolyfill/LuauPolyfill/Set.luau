@@ -1,114 +1,133 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.Array.isArray);
-local v2 = require(l_Parent_0.Array.from.fromString);
-local v3 = require(l_Parent_0.Array.forEach);
-local _ = require(l_Parent_0.types);
-local v5 = require(l_Parent_0.util.inspect);
-local v9 = {
-    __iter = function(v6) --[[ Line: 22 ]] --[[ Name: __iter ]]
-        return next, v6._array;
-    end, 
-    __tostring = function(v7) --[[ Line: 25 ]] --[[ Name: __tostring ]]
-        -- upvalues: v5 (copy)
-        local v8 = "Set ";
-        if #v7._array > 0 then
-            v8 = v8 .. "(" .. tostring(#v7._array) .. ") ";
-        end;
-        return v8 .. v5(v7._array);
-    end
-};
-v9.__index = v9;
-v9.new = function(v10) --[[ Line: 37 ]] --[[ Name: new ]]
-    -- upvalues: v1 (copy), v2 (copy), v9 (copy)
-    local v11 = nil;
-    local v12 = {};
-    if v10 ~= nil then
-        local v13 = nil;
-        if typeof(v10) == "table" then
-            if v1(v10) then
-                v13 = table.clone(v10);
-            else
-                local v14 = getmetatable(v10);
-                if v14 and rawget(v14, "__iter") then
-                    v13 = v10;
-                elseif _G.__DEV__ then
-                    error("cannot create array from an object-like table");
-                end;
-            end;
-        elseif typeof(v10) == "string" then
-            v13 = v2(v10);
-        else
-            error(("cannot create array from value of type `%s`"):format((typeof(v10))));
-        end;
-        if v13 then
-            v11 = table.create(#v13);
-            for _, v16 in v13 do
-                if not v12[v16] then
-                    v12[v16] = true;
-                    table.insert(v11, v16);
-                end;
-            end;
-        else
-            v11 = {};
-        end;
-    else
-        v11 = {};
-    end;
-    return (setmetatable({
-        size = #v11, 
-        _map = v12, 
-        _array = v11
-    }, v9));
-end;
-v9.add = function(v17, v18) --[[ Line: 83 ]] --[[ Name: add ]]
-    if not v17._map[v18] then
-        v17.size = v17.size + 1;
-        v17._map[v18] = true;
-        table.insert(v17._array, v18);
-    end;
-    return v17;
-end;
-v9.clear = function(v19) --[[ Line: 93 ]] --[[ Name: clear ]]
-    v19.size = 0;
-    table.clear(v19._map);
-    table.clear(v19._array);
-end;
-v9.delete = function(v20, v21) --[[ Line: 99 ]] --[[ Name: delete ]]
-    if not v20._map[v21] then
-        return false;
-    else
-        v20.size = v20.size - 1;
-        v20._map[v21] = nil;
-        local v22 = table.find(v20._array, v21);
-        if v22 then
-            table.remove(v20._array, v22);
-        end;
-        return true;
-    end;
-end;
-v9.forEach = function(v23, v24, v25) --[[ Line: 115 ]] --[[ Name: forEach ]]
-    -- upvalues: v3 (copy)
-    if typeof(v24) ~= "function" then
-        error("callback is not a function");
-    end;
-    v3(v23._array, function(v26) --[[ Line: 121 ]]
-        -- upvalues: v25 (copy), v24 (copy), v23 (copy)
-        if v25 ~= nil then
-            v24(v25, v26, v26, v23);
-            return;
-        else
-            v24(v26, v26, v23);
-            return;
-        end;
-    end);
-end;
-v9.has = function(v27, v28) --[[ Line: 130 ]] --[[ Name: has ]]
-    return v27._map[v28] ~= nil;
-end;
-v9.ipairs = function(v29) --[[ Line: 134 ]] --[[ Name: ipairs ]]
-    if _G.__DEV__ then
-        warn(debug.traceback("`for _,_ in mySet:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in mySet do` instead\n", 2));
-    end;
-    return ipairs(v29._array);
-end;
-return v9;
+local scriptParent = script.Parent
+local isArray = require(scriptParent.Array.isArray)
+local fromString = require(scriptParent.Array.from.fromString)
+local forEach = require(scriptParent.Array.forEach)
+
+require(scriptParent.types)
+
+local inspect = require(scriptParent.util.inspect)
+local t1 = {
+	__iter = function(p1) -- line: 22
+		return next, p1._array
+	end,
+	__tostring = function(p2) -- line: 25
+		-- upvalues: inspect (copy)
+		local s1 = "Set "
+
+		if #p2._array > 0 then
+			s1 ..= "(" .. tostring(#p2._array) .. ") "
+		end
+
+		return s1 .. inspect(p2._array)
+	end
+}
+
+t1.__index = t1
+
+function t1.new(p3) -- line: 37
+	-- upvalues: isArray (copy), fromString (copy), t1 (copy)
+	local t2 = {}
+	local t3
+
+	if p3 ~= nil then
+		local v12 = nil
+
+		if typeof(p3) == "table" then
+			if isArray(p3) then
+				v12 = table.clone(p3)
+			else
+				local mt = getmetatable(p3)
+
+				if mt and rawget(mt, "__iter") then
+					v12 = p3
+				elseif _G.__DEV__ then
+					error("cannot create array from an object-like table")
+				end
+			end
+		elseif typeof(p3) == "string" then
+			v12 = fromString(p3)
+		else
+			error(("cannot create array from value of type `%s`"):format((typeof(p3))))
+		end
+
+		if v12 then
+			t3 = table.create(#v12)
+
+			for _, v16 in v12 do
+				if not t2[v16] then
+					t2[v16] = true
+					table.insert(t3, v16)
+				end
+			end
+		else
+			t3 = {}
+		end
+	else
+		t3 = {}
+	end
+
+	return (setmetatable({
+		size = #t3,
+		_map = t2,
+		_array = t3
+	}, t1))
+end
+function t1.add(p4, p5) -- line: 83
+	if not p4._map[p5] then
+		p4.size = p4.size + 1
+		p4._map[p5] = true
+		table.insert(p4._array, p5)
+	end
+
+	return p4
+end
+function t1.clear(p6) -- line: 93
+	p6.size = 0
+	table.clear(p6._map)
+	table.clear(p6._array)
+end
+function t1.delete(p7, p8) -- line: 99
+	if not p7._map[p8] then
+		return false
+	end
+
+	p7.size = p7.size - 1
+	p7._map[p8] = nil
+
+	local v22 = table.find(p7._array, p8)
+
+	if v22 then
+		table.remove(p7._array, v22)
+	end
+
+	return true
+end
+function t1.forEach(p9, p10, p11) -- line: 115
+	-- upvalues: forEach (copy)
+	if typeof(p10) ~= "function" then
+		error("callback is not a function")
+	end
+
+	forEach(p9._array, function(p12) -- line: 121
+		-- upvalues: p11 (copy), p10 (copy), p9 (copy)
+		if p11 ~= nil then
+			p10(p11, p12, p12, p9)
+
+			return
+		end
+
+		p10(p12, p12, p9)
+	end)
+end
+function t1.has(p13, p14) -- line: 130
+	return p13._map[p14] ~= nil
+end
+function t1.ipairs(p15) -- line: 134
+	if _G.__DEV__ then
+		warn(debug.traceback("`for _,_ in mySet:ipairs() do` is deprecated and will be removed in a future release, please use `for _,_ in mySet do` instead\n", 2))
+	end
+
+	return ipairs(p15._array)
+end
+
+return t1

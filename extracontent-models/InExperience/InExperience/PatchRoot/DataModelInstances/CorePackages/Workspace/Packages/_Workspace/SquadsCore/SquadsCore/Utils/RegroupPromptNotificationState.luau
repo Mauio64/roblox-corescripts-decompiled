@@ -1,38 +1,39 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local v1 = {};
-local v2 = nil;
-local v3 = nil;
-v1.setActive = function(v4, v5) --[[ Line: 7 ]] --[[ Name: setActive ]]
-    -- upvalues: v2 (ref), v3 (ref)
-    v2 = v4;
-    v3 = v5;
-end;
-v1.getActiveNotifId = function() --[[ Line: 12 ]] --[[ Name: getActiveNotifId ]]
-    -- upvalues: v2 (ref)
-    return v2;
-end;
-v1.getActiveSquadId = function() --[[ Line: 16 ]] --[[ Name: getActiveSquadId ]]
-    -- upvalues: v3 (ref)
-    return v3;
-end;
-v1.clearActive = function(v6) --[[ Line: 20 ]] --[[ Name: clearActive ]]
-    -- upvalues: v2 (ref), v3 (ref)
-    if v6 == nil or v2 == v6 then
-        v2 = nil;
-        v3 = nil;
-    end;
-end;
-v1.dismissNotification = function(v7) --[[ Line: 27 ]] --[[ Name: dismissNotification ]]
-    -- upvalues: l_GuiService_0 (copy), v1 (copy)
-    if v7 == nil then
-        return;
-    else
-        pcall(function() --[[ Line: 31 ]]
-            -- upvalues: l_GuiService_0 (ref), v7 (copy)
-            l_GuiService_0:DismissNotification(v7);
-        end);
-        v1.clearActive(v7);
-        return;
-    end;
-end;
-return v1;
+local GuiService = game:GetService("GuiService")
+local t1 = {}
+local u3 = nil
+local u4 = nil
+
+function t1.setActive(p1, s1: string?) -- line: 7
+	-- upvalues: u3 (ref), u4 (ref)
+	u3 = p1
+	u4 = s1
+end
+function t1.getActiveNotifId() -- line: 12
+	-- upvalues: u3 (ref)
+	return u3
+end
+function t1.getActiveSquadId() -- line: 16
+	-- upvalues: u4 (ref)
+	return u4
+end
+function t1.clearActive(p2) -- line: 20
+	-- upvalues: u3 (ref), u4 (ref)
+	if p2 == nil or p2 == u3 then
+		u3 = nil
+		u4 = nil
+	end
+end
+function t1.dismissNotification(p3) -- line: 27
+	-- upvalues: GuiService (copy), t1 (copy)
+	if p3 == nil then
+		return
+	end
+
+	pcall(function() -- line: 31
+		-- upvalues: GuiService (copy), p3 (copy)
+		GuiService:DismissNotification(p3)
+	end)
+	t1.clearActive(p3)
+end
+
+return t1

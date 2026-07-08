@@ -1,8 +1,13 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_useCursor_0 = require(l_Parent_0.Foundation).Hooks.useCursor;
-local _ = require(l_Parent_0.React);
-local v3 = require(script.Parent.mapCursorType);
-return function(v4) --[[ Line: 8 ]] --[[ Name: useCursorByType ]]
-    -- upvalues: l_useCursor_0 (copy), v3 (copy)
-    return l_useCursor_0(v3(v4));
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local useCursor = require(ParentParent.Foundation).Hooks.useCursor
+
+require(ParentParent.React)
+
+local mapCursorType = require(script.Parent.mapCursorType)
+
+local function useCursorByType(p1) -- line: 8
+	-- upvalues: useCursor (copy), mapCursorType (copy)
+	return useCursor(mapCursorType(p1))
+end
+
+return useCursorByType

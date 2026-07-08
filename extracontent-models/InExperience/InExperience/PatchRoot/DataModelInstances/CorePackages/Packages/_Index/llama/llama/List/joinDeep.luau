@@ -1,26 +1,32 @@
-local v0 = require(script.Parent.Parent.None);
-local v1 = require(script.Parent.copyDeep);
-local function v2(...) --[[ Line: 5 ]] --[[ Name: joinDeep ]]
-    -- upvalues: v1 (copy), v2 (copy), v0 (copy)
-    local v3 = {};
-    local v4 = 1;
-    for v5 = 1, select("#", ...) do
-        local v6 = select(v5, ...);
-        if v6 then
-            for v7 = 1, #v6 do
-                if type(v6[v7]) == "table" then
-                    if v3[v4] == nil or type(v3[v4] ~= "table") then
-                        v3[v4] = v1(v6[v7]);
-                    else
-                        v3[v4] = v2(v3[v4], v6[v7]);
-                    end;
-                elseif v6[v7] ~= v0 then
-                    v3[v4] = v6[v7];
-                end;
-                v4 = v4 + 1;
-            end;
-        end;
-    end;
-    return v3;
-end;
-return v2;
+local None = require(script.Parent.Parent.None)
+local copyDeep = require(script.Parent.copyDeep)
+
+local function joinDeep(...) -- line: 5
+	-- upvalues: copyDeep (copy), joinDeep (copy), None (copy)
+	local t1 = {}
+	local n1 = 1
+
+	for i = 1, select("#", ...) do
+		local v7 = select(i, ...)
+
+		if v7 then
+			for j = 1, #v7 do
+				if type(v7[j]) == "table" then
+					if t1[n1] == nil or type(t1[n1] ~= "table") then
+						t1[n1] = copyDeep(v7[j])
+					else
+						t1[n1] = joinDeep(t1[n1], v7[j])
+					end
+				elseif v7[j] ~= None then
+					t1[n1] = v7[j]
+				end
+
+				n1 += 1
+			end
+		end
+	end
+
+	return t1
+end
+
+return joinDeep

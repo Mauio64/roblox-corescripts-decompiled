@@ -1,49 +1,57 @@
-local l_MemStorageService_0 = game:GetService("MemStorageService");
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3) --[[ Line: 14 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    return (setmetatable({
-        memStorageKey = v3
-    }, v2));
-end;
-v2.getItem = function(v4) --[[ Line: 21 ]] --[[ Name: getItem ]]
-    -- upvalues: l_MemStorageService_0 (copy), l_HttpService_0 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 22 ]]
-        -- upvalues: l_MemStorageService_0 (ref), v4 (copy), l_HttpService_0 (ref)
-        local l_l_MemStorageService_0_Item_0 = l_MemStorageService_0:GetItem(v4.memStorageKey);
-        if l_l_MemStorageService_0_Item_0 and l_l_MemStorageService_0_Item_0 ~= "" then
-            return l_HttpService_0:JSONDecode(l_l_MemStorageService_0_Item_0);
-        else
-            return nil;
-        end;
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return nil;
-    end;
-end;
-v2.setItem = function(v8, v9) --[[ Line: 35 ]] --[[ Name: setItem ]]
-    -- upvalues: l_MemStorageService_0 (copy), l_HttpService_0 (copy)
-    local l_status_1, _ = pcall(function() --[[ Line: 36 ]]
-        -- upvalues: l_MemStorageService_0 (ref), v8 (copy), v9 (copy), l_HttpService_0 (ref)
-        l_MemStorageService_0:SetItem(v8.memStorageKey, if v9 and v9 ~= "" then l_HttpService_0:JSONEncode(v9) else "");
-    end);
-    return l_status_1;
-end;
-v2.bindAndFire = function(v12, v13) --[[ Line: 42 ]] --[[ Name: bindAndFire ]]
-    -- upvalues: l_MemStorageService_0 (copy), l_HttpService_0 (copy)
-    return (l_MemStorageService_0:BindAndFire(v12.memStorageKey, function(v14) --[[ Line: 43 ]]
-        -- upvalues: l_HttpService_0 (ref), v13 (copy)
-        local v15 = nil;
-        if v14 and v14 ~= "" then
-            v15 = l_HttpService_0:JSONDecode(v14);
-        end;
-        if v13 then
-            v13(v15);
-        end;
-    end));
-end;
-return v2;
+local MemStorageService = game:GetService("MemStorageService")
+local HttpService = game:GetService("HttpService")
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 14
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		memStorageKey = p1
+	}, t1))
+end
+function t1.getItem(p2) -- line: 21
+	-- upvalues: MemStorageService (copy), HttpService (copy)
+	local ok, result = pcall(function() -- line: 22
+		-- upvalues: MemStorageService (copy), p2 (copy), HttpService (copy)
+		local Item = MemStorageService:GetItem(p2.memStorageKey)
+
+		if Item and Item ~= "" then
+			return HttpService:JSONDecode(Item)
+		end
+
+		return nil
+	end)
+
+	if ok then
+		return result
+	end
+
+	return nil
+end
+function t1.setItem(p3, p4) -- line: 35
+	-- upvalues: MemStorageService (copy), HttpService (copy)
+	local ok, _ = pcall(function() -- line: 36
+		-- upvalues: MemStorageService (copy), p3 (copy), p4 (copy), HttpService (copy)
+		MemStorageService:SetItem(p3.memStorageKey, (not p4 or p4 == "") and "" or HttpService:JSONEncode(p4))
+	end)
+
+	return ok
+end
+function t1.bindAndFire(p5, p6) -- line: 42
+	-- upvalues: MemStorageService (copy), HttpService (copy)
+	return (MemStorageService:BindAndFire(p5.memStorageKey, function(p7) -- line: 43
+		-- upvalues: HttpService (copy), p6 (copy)
+		local data = nil
+
+		if p7 and p7 ~= "" then
+			data = HttpService:JSONDecode(p7)
+		end
+
+		if p6 then
+			p6(data)
+		end
+	end))
+end
+
+return t1

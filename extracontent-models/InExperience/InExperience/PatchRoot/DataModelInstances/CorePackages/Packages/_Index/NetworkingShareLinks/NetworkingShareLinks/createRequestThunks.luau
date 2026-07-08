@@ -1,13 +1,15 @@
-local _ = require(script.Parent.networkingShareLinkTypes);
-local l_networkRequests_0 = script.Parent.networkRequests;
-local v2 = require(l_networkRequests_0.createGenerateLink);
-local v3 = require(l_networkRequests_0.createGetOrGenerateLink);
-local v4 = require(l_networkRequests_0.createResolveLinkFromLinkId);
-return function(v5) --[[ Line: 9 ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-    return {
-        ResolveLinkFromLinkId = v4(v5), 
-        GenerateLink = v2(v5), 
-        GetOrGenerateLink = v3(v5)
-    };
-end;
+require(script.Parent.networkingShareLinkTypes)
+
+local networkRequests = script.Parent.networkRequests
+local createGenerateLink = require(networkRequests.createGenerateLink)
+local createGetOrGenerateLink = require(networkRequests.createGetOrGenerateLink)
+local createResolveLinkFromLinkId = require(networkRequests.createResolveLinkFromLinkId)
+
+return function(p1) -- line: 9
+	-- upvalues: createResolveLinkFromLinkId (copy), createGenerateLink (copy), createGetOrGenerateLink (copy)
+	return {
+		ResolveLinkFromLinkId = createResolveLinkFromLinkId(p1),
+		GenerateLink = createGenerateLink(p1),
+		GetOrGenerateLink = createGetOrGenerateLink(p1)
+	}
+end

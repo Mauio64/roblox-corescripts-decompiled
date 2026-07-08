@@ -1,7 +1,7 @@
-return function(v0) --[[ Line: 1 ]]
-    if v0 ~= nil and v0.errors ~= nil and v0.errors[1] and v0.errors[1].fieldData then
-        return v0.errors[1].fieldData;
-    else
-        return "";
-    end;
-end;
+return function(p1) -- line: 1
+	if p1 ~= nil and (p1.errors ~= nil and p1.errors[1] and p1.errors[1].fieldData) then
+		return p1.errors[1].fieldData
+	end
+
+	return ""
+end

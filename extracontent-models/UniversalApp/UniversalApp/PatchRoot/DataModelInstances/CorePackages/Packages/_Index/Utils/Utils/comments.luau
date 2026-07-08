@@ -1,947 +1,1071 @@
-local l_select_0 = select;
-local function v6(v1, v2, ...)
-    local v3, v4 = {
-        ...
-    }, l_select_0("#", ...);
-    for v5 = v2, v2 + v4 - 1 do
-        v1[v5] = v3[v5 - v2 + 1];
-    end;
-end;
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v8.Array;
-local l_Boolean_0 = v8.Boolean;
-local l_Object_0 = v8.Object;
-local v12 = {};
-local _ = require(script.Parent.types);
-local v14 = require(l_Parent_0.GraphQL);
-local l_visit_0 = v14.visit;
-local l_TokenKind_0 = v14.TokenKind;
-local _ = require(l_Parent_0.GraphQL);
-local v18 = nil;
-local v19 = nil;
-local v20 = nil;
-local v21 = nil;
-local v22 = nil;
-local v23 = nil;
-local v24 = nil;
-local v25 = nil;
-local l_String_0 = v8.String;
-local v27 = {};
-v12.resetComments = function() --[[ Line: 62 ]] --[[ Name: resetComments ]]
-    -- upvalues: v27 (ref)
-    v27 = {};
-end;
-v12.collectComment = function(v28) --[[ Line: 66 ]] --[[ Name: collectComment ]]
-    -- upvalues: v18 (ref), l_Boolean_0 (copy), v19 (ref)
-    local v29 = if typeof(v28.name) == "table" then v28.name.value else nil;
-    if v29 == nil then
-        return;
-    else
-        v18(v28, v29);
-        local l_kind_0 = v28.kind;
-        if l_kind_0 == "EnumTypeDefinition" then
-            if l_Boolean_0.toJSBoolean(v28.values) then
-                for _, v32 in v28.values do
-                    v18(v32, v29, v32.name.value);
-                end;
-                return;
-            end;
-        elseif (l_kind_0 == "ObjectTypeDefinition" or l_kind_0 == "InputObjectTypeDefinition" or l_kind_0 == "InterfaceTypeDefinition") and l_Boolean_0.toJSBoolean(v28.fields) then
-            for _, v34 in v28.fields do
-                v18(v34, v29, v34.name.value);
-                local l_toJSBoolean_0 = l_Boolean_0.toJSBoolean;
-                local v36 = v19(v34);
-                if l_toJSBoolean_0(if l_Boolean_0.toJSBoolean(v36) then v34.arguments else v36) then
-                    for _, v38 in v34.arguments do
-                        v18(v38, v29, v34.name.value, v38.name.value);
-                    end;
-                end;
-            end;
-        end;
-        return;
-    end;
-end;
-v18 = function(v39, v40, v41, v42) --[[ Line: 123 ]] --[[ Name: pushComment ]]
-    -- upvalues: v20 (ref), l_Boolean_0 (copy), l_Array_0 (copy), v27 (ref)
-    local v43 = v20(v39);
-    if typeof(v43) ~= "string" or #v43 == 0 then
-        return;
-    else
-        local v44 = {
-            v40
-        };
-        if l_Boolean_0.toJSBoolean(v41) then
-            table.insert(v44, v41);
-            if l_Boolean_0.toJSBoolean(v42) then
-                table.insert(v44, v42);
-            end;
-        end;
-        local v45 = l_Array_0.join(v44, ".");
-        if not l_Boolean_0.toJSBoolean(v27[tostring(v45)]) then
-            v27[tostring(v45)] = {};
-        end;
-        table.insert(v27[v45], v43);
-        return;
-    end;
-end;
-v12.pushComment = v18;
-local function v47(v46) --[[ Line: 155 ]] --[[ Name: printComment ]]
-    return "\n# " .. v46:gsub("\n", "\n# ");
-end;
-v12.printComment = v47;
-local function v51(v48, v49) --[[ Line: 183 ]] --[[ Name: join ]]
-    -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy)
-    if l_Boolean_0.toJSBoolean(v48) then
-        return (l_Array_0.join(l_Array_0.filter(v48, function(v50) --[[ Line: 195 ]]
-            -- upvalues: l_Boolean_0 (ref)
-            return l_Boolean_0.toJSBoolean(v50);
-        end), l_Boolean_0.toJSBoolean(v49) and v49 or ""));
-    else
-        return "";
-    end;
-end;
-local function _(v52) --[[ Line: 205 ]] --[[ Name: hasMultilineItems ]]
-    -- upvalues: l_Array_0 (copy), l_String_0 (copy)
-    local v54 = if typeof(v52) == "table" then l_Array_0.some(v52, function(v53) --[[ Line: 212 ]]
-        -- upvalues: l_String_0 (ref)
-        return l_String_0.includes(v53, "\n");
-    end) else nil;
-    if v54 ~= nil then
-        return v54;
-    else
-        return false;
-    end;
-end;
-local function _(v56) --[[ Line: 229 ]] --[[ Name: addDescription ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy), l_Boolean_0 (copy), l_String_0 (copy), v27 (ref), v51 (copy), v47 (copy)
-    return function(v57, v58, v59, v60, v61, v62) --[[ Line: 230 ]]
-        -- upvalues: l_Array_0 (ref), l_Object_0 (ref), l_Boolean_0 (ref), l_String_0 (ref), v27 (ref), v51 (ref), v47 (ref), v56 (copy)
-        local v63 = {};
-        local v66 = l_Array_0.reduce(v61, function(v64, v65) --[[ Line: 258 ]]
-            -- upvalues: l_Object_0 (ref), l_Array_0 (ref), l_Boolean_0 (ref), v63 (copy)
-            if v65 ~= l_Object_0.None and l_Array_0.includes({
-                "fields", 
-                "arguments", 
-                "values"
-            }, v65) and l_Boolean_0.toJSBoolean(v64.name) then
-                table.insert(v63, v64.name.value);
-            end;
-            if v64 == l_Object_0.None then
-                return v65;
-            else
-                return v64[v65];
-            end;
-        end, v62[1] or l_Object_0.None);
-        local v67 = l_Array_0.join(l_Array_0.filter(l_Array_0.concat({}, v63, {
-            if typeof(if typeof(v66) == "table" then v66.name else nil) == "table" then (if typeof(v66) == "table" then v66.name else nil).value else nil
-        }), l_Boolean_0.toJSBoolean), ".");
-        local v68 = {};
-        if l_String_0.includes(v58.kind, "Definition") and l_Boolean_0.toJSBoolean(v27[v67]) then
-            v68 = l_Array_0.concat(v68, v27[v67]);
-        end;
-        return (v51(l_Array_0.concat({}, l_Array_0.map(v68, v47), {
-            v58.description or "", 
-            (v56(v57, v58, v59, v60, v61, v62))
-        }), "\n"));
-    end;
-end;
-local function v71(v70) --[[ Line: 320 ]] --[[ Name: indent ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(v70) then
-        return ("  %s"):format((v70:gsub("\n", "\n  ")));
-    else
-        return v70;
-    end;
-end;
-local function _(v72) --[[ Line: 344 ]] --[[ Name: block ]]
-    -- upvalues: v71 (copy), v51 (copy)
-    if v72 and #v72 ~= 0 then
-        return (("{\n%s\n}"):format(v71((v51(v72, "\n")))));
-    else
-        return "";
-    end;
-end;
-local function _(v74, v75, v76) --[[ Line: 363 ]] --[[ Name: wrap ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(v75) then
-        return v74 .. tostring(v75) .. (l_Boolean_0.toJSBoolean(v76) and v76 or "");
-    else
-        return "";
-    end;
-end;
-local function v82(v78, v79) --[[ Line: 377 ]] --[[ Name: printBlockString ]]
-    -- upvalues: l_String_0 (copy), l_Boolean_0 (copy)
-    local v80 = v79 ~= nil and v79;
-    local v81 = v78:gsub("\"", "\\\"\"\"");
-    if (v78:sub(1, 1) == " " or v78:sub(1, 1) == "\t") and l_String_0.indexOf(v78, "\n") == -1 then
-        return ("\"\"\"%s\"\"\""):format((v81:gsub("\"$", "\"\n")));
-    else
-        return ("\"\"\"\n%s\n\"\"\""):format(if l_Boolean_0.toJSBoolean(v80) then v81 else if l_Boolean_0.toJSBoolean(v81) then ("  %s"):format((v81:gsub("\n", "\n  "))) else v81);
-    end;
-end;
-local v374 = {
-    Name = {
-        leave = function(_, v84) --[[ Line: 417 ]] --[[ Name: leave ]]
-            return v84.value;
-        end
-    }, 
-    Variable = {
-        leave = function(_, v86) --[[ Line: 425 ]] --[[ Name: leave ]]
-            return "$" .. tostring(v86.name);
-        end
-    }, 
-    Document = {
-        leave = function(_, v88) --[[ Line: 434 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            return (v51(v88.definitions, "\n\n"));
-        end
-    }, 
-    OperationDefinition = {
-        leave = function(_, v90) --[[ Line: 442 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local v91 = v51(v90.variableDefinitions, ", ");
-            local v92 = if l_Boolean_0.toJSBoolean(v91) then "(" .. tostring(v91) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "";
-            return tostring((v51({
-                v90.operation, 
-                v51({
-                    v90.name, 
-                    v92
-                }), 
-                (v51(v90.directives, " "))
-            }, " "))) .. " " .. tostring(v90.selectionSet);
-        end
-    }, 
-    VariableDefinition = {
-        leave = function(_, v94) --[[ Line: 452 ]] --[[ Name: leave ]]
-            -- upvalues: l_Boolean_0 (copy), v51 (copy)
-            local l_variable_0 = v94.variable;
-            local l_type_0 = v94.type;
-            local l_defaultValue_0 = v94.defaultValue;
-            local l_directives_0 = v94.directives;
-            local v99 = tostring(l_variable_0);
-            local v100 = ": ";
-            local v101 = tostring(l_type_0);
-            local v102;
-            if l_Boolean_0.toJSBoolean(l_defaultValue_0) then
-                local v103 = " = ";
-                local v104 = tostring(l_defaultValue_0);
-                v102 = if l_Boolean_0.toJSBoolean(nil) then v103 .. v104 .. "" else v103 .. v104 .. "";
-            else
-                v102 = "";
-            end;
-            local v105 = tostring(v102);
-            v102 = v51(l_directives_0, " ");
-            local v106;
-            if l_Boolean_0.toJSBoolean(v102) then
-                local v107 = " ";
-                local v108 = tostring(v102);
-                v106 = if l_Boolean_0.toJSBoolean(nil) then v107 .. v108 .. "" else v107 .. v108 .. "";
-            else
-                v106 = "";
-            end;
-            return v99 .. v100 .. v101 .. v105 .. tostring(v106);
-        end
-    }, 
-    SelectionSet = {
-        leave = function(_, v110) --[[ Line: 466 ]] --[[ Name: leave ]]
-            -- upvalues: v71 (copy), v51 (copy)
-            local l_selections_0 = v110.selections;
-            if l_selections_0 and #l_selections_0 ~= 0 then
-                return (("{\n%s\n}"):format(v71((v51(l_selections_0, "\n")))));
-            else
-                return "";
-            end;
-        end
-    }, 
-    Field = {
-        leave = function(_, v113) --[[ Line: 473 ]] --[[ Name: leave ]]
-            -- upvalues: l_Boolean_0 (copy), v51 (copy)
-            local l_alias_0 = v113.alias;
-            local l_name_0 = v113.name;
-            local l_arguments_0 = v113.arguments;
-            local l_directives_1 = v113.directives;
-            local l_selectionSet_0 = v113.selectionSet;
-            local v119 = (if l_Boolean_0.toJSBoolean(l_alias_0) then "" .. tostring(l_alias_0) .. (l_Boolean_0.toJSBoolean(": ") and ": " or "") else "") .. l_name_0;
-            local l_v119_0 = v119;
-            local v121 = v51(l_arguments_0, ", ");
-            local v122 = l_v119_0 .. if l_Boolean_0.toJSBoolean(v121) then "(" .. tostring(v121) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "";
-            if v122.length > 80 then
-                l_v119_0 = v119;
-                local v123 = v51(l_arguments_0, "\n");
-                v121 = if l_Boolean_0.toJSBoolean(v123) then ("  %s"):format((v123:gsub("\n", "\n  "))) else v123;
-                v122 = l_v119_0 .. if l_Boolean_0.toJSBoolean(v121) then "(\n" .. tostring(v121) .. (l_Boolean_0.toJSBoolean("\n)") and "\n)" or "") else "";
-            end;
-            return (v51({
-                v122, 
-                v51(l_directives_1, " "), 
-                l_selectionSet_0
-            }, " "));
-        end
-    }, 
-    Argument = {
-        leave = function(_, v125) --[[ Line: 497 ]] --[[ Name: leave ]]
-            local l_name_1 = v125.name;
-            local l_value_0 = v125.value;
-            return tostring(l_name_1) .. ": " .. tostring(l_value_0);
-        end
-    }, 
-    FragmentSpread = {
-        leave = function(_, v129) --[[ Line: 507 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_2 = v129.name;
-            local l_directives_2 = v129.directives;
-            local v132 = "...";
-            local v133 = tostring(l_name_2);
-            local v134 = v51(l_directives_2, " ");
-            local v135;
-            if l_Boolean_0.toJSBoolean(v134) then
-                local v136 = " ";
-                local v137 = tostring(v134);
-                v135 = if l_Boolean_0.toJSBoolean(nil) then v136 .. v137 .. "" else v136 .. v137 .. "";
-            else
-                v135 = "";
-            end;
-            return v132 .. v133 .. tostring(v135);
-        end
-    }, 
-    InlineFragment = {
-        leave = function(_, v139) --[[ Line: 516 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_typeCondition_0 = v139.typeCondition;
-            local l_directives_3 = v139.directives;
-            local l_selectionSet_1 = v139.selectionSet;
-            local l_v51_0 = v51;
-            local v144 = {};
-            local v145 = "...";
-            local v146;
-            if l_Boolean_0.toJSBoolean(l_typeCondition_0) then
-                local v147 = "on ";
-                local v148 = tostring(l_typeCondition_0);
-                v146 = if l_Boolean_0.toJSBoolean(nil) then v147 .. v148 .. "" else v147 .. v148 .. "";
-            else
-                v146 = "";
-            end;
-            local v149 = v51(l_directives_3, " ");
-            local l_l_selectionSet_1_0 = l_selectionSet_1;
-            v6(v144, 1, v145, v146, v149, l_l_selectionSet_1_0);
-            return (l_v51_0(v144, " "));
-        end
-    }, 
-    FragmentDefinition = {
-        leave = function(_, v152) --[[ Line: 525 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_3 = v152.name;
-            local l_typeCondition_1 = v152.typeCondition;
-            local l_variableDefinitions_0 = v152.variableDefinitions;
-            local l_directives_4 = v152.directives;
-            local l_selectionSet_2 = v152.selectionSet;
-            local v158 = "fragment %s%s ";
-            local v159 = tostring(l_name_3);
-            local v160 = v51(l_variableDefinitions_0, ", ");
-            local v161 = v158:format(v159, if l_Boolean_0.toJSBoolean(v160) then "(" .. tostring(v160) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "");
-            v158 = "on %s %s";
-            v159 = tostring(l_typeCondition_1);
-            local v162 = v51(l_directives_4, " ");
-            return v161 .. v158:format(v159, (tostring(if l_Boolean_0.toJSBoolean(v162) then "" .. tostring(v162) .. (l_Boolean_0.toJSBoolean(" ") and " " or "") else ""))) .. tostring(l_selectionSet_2);
-        end
-    }, 
-    IntValue = {
-        leave = function(_, v164) --[[ Line: 545 ]] --[[ Name: leave ]]
-            return v164.value;
-        end
-    }, 
-    FloatValue = {
-        leave = function(_, v166) --[[ Line: 554 ]] --[[ Name: leave ]]
-            return v166.value;
-        end
-    }, 
-    StringValue = {
-        leave = function(_, v168) --[[ Line: 563 ]] --[[ Name: leave ]]
-            -- upvalues: l_Boolean_0 (copy), v82 (copy)
-            local l_value_1 = v168.value;
-            local l_block_0 = v168.block;
-            if l_Boolean_0.toJSBoolean(l_block_0) then
-                return v82(l_value_1);
-            else
-                return "'" .. l_value_1:gsub("'", "\\'") .. "'";
-            end;
-        end
-    }, 
-    BooleanValue = {
-        leave = function(_, v172) --[[ Line: 579 ]] --[[ Name: leave ]]
-            -- upvalues: l_Boolean_0 (copy)
-            local l_value_2 = v172.value;
-            if l_Boolean_0.toJSBoolean(l_value_2) then
-                return "true";
-            else
-                return "false";
-            end;
-        end
-    }, 
-    NullValue = {
-        leave = function() --[[ Line: 586 ]] --[[ Name: leave ]]
-            return "null";
-        end
-    }, 
-    EnumValue = {
-        leave = function(_, v175) --[[ Line: 593 ]] --[[ Name: leave ]]
-            return v175.value;
-        end
-    }, 
-    ListValue = {
-        leave = function(_, v177) --[[ Line: 602 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            local l_values_0 = v177.values;
-            return "[" .. tostring((v51(l_values_0, ", "))) .. "]";
-        end
-    }, 
-    ObjectValue = {
-        leave = function(_, v180) --[[ Line: 611 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            local l_fields_0 = v180.fields;
-            return "{" .. tostring((v51(l_fields_0, ", "))) .. "}";
-        end
-    }, 
-    ObjectField = {
-        leave = function(_, v183) --[[ Line: 620 ]] --[[ Name: leave ]]
-            local l_name_4 = v183.name;
-            local l_value_3 = v183.value;
-            return tostring(l_name_4) .. ": " .. tostring(l_value_3);
-        end
-    }, 
-    Directive = {
-        leave = function(_, v187) --[[ Line: 630 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_5 = v187.name;
-            local l_arguments_1 = v187.arguments;
-            local v190 = "@";
-            local v191 = tostring(l_name_5);
-            local v192 = v51(l_arguments_1, ", ");
-            return v190 .. v191 .. tostring(if l_Boolean_0.toJSBoolean(v192) then "(" .. tostring(v192) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "");
-        end
-    }, 
-    NamedType = {
-        leave = function(_, v194) --[[ Line: 640 ]] --[[ Name: leave ]]
-            return v194.name;
-        end
-    }, 
-    ListType = {
-        leave = function(_, v196) --[[ Line: 649 ]] --[[ Name: leave ]]
-            return "[" .. tostring(v196.type) .. "]";
-        end
-    }, 
-    NonNullType = {
-        leave = function(_, v198) --[[ Line: 658 ]] --[[ Name: leave ]]
-            return tostring(v198.type) .. "!";
-        end
-    }, 
-    SchemaDefinition = {
-        leave = function(_, v200) --[[ Line: 668 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_directives_5 = v200.directives;
-            local l_operationTypes_0 = v200.operationTypes;
-            return (v51({
-                "schema", 
-                v51(l_directives_5, " "), 
-                if l_operationTypes_0 and #l_operationTypes_0 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_operationTypes_0, "\n")))) else ""
-            }, " "));
-        end
-    }, 
-    OperationTypeDefinition = {
-        leave = function(_, v204) --[[ Line: 677 ]] --[[ Name: leave ]]
-            local l_operation_0 = v204.operation;
-            local l_type_1 = v204.type;
-            return tostring(l_operation_0) .. ": " .. tostring(l_type_1);
-        end
-    }, 
-    ScalarTypeDefinition = {
-        leave = function(_, v208) --[[ Line: 686 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            local l_name_6 = v208.name;
-            local l_directives_6 = v208.directives;
-            return (v51({
-                "scalar", 
-                l_name_6, 
-                (v51(l_directives_6, " "))
-            }, " "));
-        end
-    }, 
-    ObjectTypeDefinition = {
-        leave = function(_, v212) --[[ Line: 695 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy), v71 (copy)
-            local l_name_7 = v212.name;
-            local l_interfaces_0 = v212.interfaces;
-            local l_directives_7 = v212.directives;
-            local l_fields_1 = v212.fields;
-            local l_v51_1 = v51;
-            local v218 = {};
-            local v219 = "type";
-            local l_l_name_7_0 = l_name_7;
-            local v221 = v51(l_interfaces_0, " & ");
-            local v222;
-            if l_Boolean_0.toJSBoolean(v221) then
-                local v223 = "implements ";
-                local v224 = tostring(v221);
-                v222 = if l_Boolean_0.toJSBoolean(nil) then v223 .. v224 .. "" else v223 .. v224 .. "";
-            else
-                v222 = "";
-            end;
-            v221 = v51(l_directives_7, " ");
-            local v225 = if l_fields_1 and #l_fields_1 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_1, "\n")))) else "";
-            v6(v218, 1, v219, l_l_name_7_0, v222, v221, v225);
-            return (l_v51_1(v218, " "));
-        end
-    }, 
-    FieldDefinition = {
-        leave = function(_, v227) --[[ Line: 710 ]] --[[ Name: leave ]]
-            -- upvalues: l_Array_0 (copy), l_String_0 (copy), v51 (copy), l_Boolean_0 (copy)
-            local l_name_8 = v227.name;
-            local l_arguments_2 = v227.arguments;
-            local l_type_2 = v227.type;
-            local l_directives_8 = v227.directives;
-            local v232 = tostring(l_name_8);
-            local v234 = if typeof(l_arguments_2) == "table" then l_Array_0.some(l_arguments_2, function(v233) --[[ Line: 212 ]]
-                -- upvalues: l_String_0 (ref)
-                return l_String_0.includes(v233, "\n");
-            end) else nil;
-            local v235;
-            if v234 ~= nil and v234 then
-                v234 = v51(l_arguments_2, "\n");
-                local v236 = if l_Boolean_0.toJSBoolean(v234) then ("  %s"):format((v234:gsub("\n", "\n  "))) else v234;
-                v235 = if l_Boolean_0.toJSBoolean(v236) then "(\n" .. tostring(v236) .. (l_Boolean_0.toJSBoolean("\n)") and "\n)" or "") else "";
-            else
-                local v237 = v51(l_arguments_2, ", ");
-                v235 = if l_Boolean_0.toJSBoolean(v237) then "(" .. tostring(v237) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "";
-            end;
-            local v238 = ": ";
-            local v239 = tostring(l_type_2);
-            local v240 = v51(l_directives_8, " ");
-            local v241;
-            if l_Boolean_0.toJSBoolean(v240) then
-                v234 = " ";
-                local v242 = tostring(v240);
-                v241 = if l_Boolean_0.toJSBoolean(nil) then v234 .. v242 .. "" else v234 .. v242 .. "";
-            else
-                v241 = "";
-            end;
-            return v232 .. v235 .. v238 .. v239 .. v241;
-        end
-    }, 
-    InputValueDefinition = {
-        leave = function(_, v244) --[[ Line: 735 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_9 = v244.name;
-            local l_type_3 = v244.type;
-            local l_defaultValue_1 = v244.defaultValue;
-            local l_directives_9 = v244.directives;
-            local l_v51_2 = v51;
-            local v250 = {};
-            local v251 = tostring(l_name_9) .. ": " .. tostring(l_type_3);
-            local v252;
-            if l_Boolean_0.toJSBoolean(l_defaultValue_1) then
-                local v253 = "= ";
-                local v254 = tostring(l_defaultValue_1);
-                v252 = if l_Boolean_0.toJSBoolean(nil) then v253 .. v254 .. "" else v253 .. v254 .. "";
-            else
-                v252 = "";
-            end;
-            local v255 = v51(l_directives_9, " ");
-            v6(v250, 1, v251, v252, v255);
-            return (l_v51_2(v250, " "));
-        end
-    }, 
-    InterfaceTypeDefinition = {
-        leave = function(_, v257) --[[ Line: 748 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy), v71 (copy)
-            local l_name_10 = v257.name;
-            local l_interfaces_1 = v257.interfaces;
-            local l_directives_10 = v257.directives;
-            local l_fields_2 = v257.fields;
-            local l_v51_3 = v51;
-            local v263 = {};
-            local v264 = "interface";
-            local l_l_name_10_0 = l_name_10;
-            local v266 = v51(l_interfaces_1, " & ");
-            local v267;
-            if l_Boolean_0.toJSBoolean(v266) then
-                local v268 = "implements ";
-                local v269 = tostring(v266);
-                v267 = if l_Boolean_0.toJSBoolean(nil) then v268 .. v269 .. "" else v268 .. v269 .. "";
-            else
-                v267 = "";
-            end;
-            v266 = v51(l_directives_10, " ");
-            local v270 = if l_fields_2 and #l_fields_2 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_2, "\n")))) else "";
-            v6(v263, 1, v264, l_l_name_10_0, v267, v266, v270);
-            return (l_v51_3(v263, " "));
-        end
-    }, 
-    UnionTypeDefinition = {
-        leave = function(_, v272) --[[ Line: 763 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_11 = v272.name;
-            local l_directives_11 = v272.directives;
-            local l_types_0 = v272.types;
-            local l_v51_4 = v51;
-            local v277 = {};
-            local v278 = "union";
-            local l_l_name_11_0 = l_name_11;
-            local v280 = v51(l_directives_11, " ");
-            local v281 = v51(l_types_0, " | ");
-            local v282;
-            if l_Boolean_0.toJSBoolean(v281) then
-                local v283 = "= ";
-                local v284 = tostring(v281);
-                v282 = if l_Boolean_0.toJSBoolean(nil) then v283 .. v284 .. "" else v283 .. v284 .. "";
-            else
-                v282 = "";
-            end;
-            v6(v277, 1, v278, l_l_name_11_0, v280, v282);
-            return (l_v51_4(v277, " "));
-        end
-    }, 
-    EnumTypeDefinition = {
-        leave = function(_, v286) --[[ Line: 772 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_name_12 = v286.name;
-            local l_directives_12 = v286.directives;
-            local l_values_1 = v286.values;
-            return (v51({
-                "enum", 
-                l_name_12, 
-                v51(l_directives_12, " "), 
-                if l_values_1 and #l_values_1 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_values_1, "\n")))) else ""
-            }, " "));
-        end
-    }, 
-    EnumValueDefinition = {
-        leave = function(_, v291) --[[ Line: 781 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            local l_name_13 = v291.name;
-            local l_directives_13 = v291.directives;
-            return (v51({
-                l_name_13, 
-                (v51(l_directives_13, " "))
-            }, " "));
-        end
-    }, 
-    InputObjectTypeDefinition = {
-        leave = function(_, v295) --[[ Line: 790 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_name_14 = v295.name;
-            local l_directives_14 = v295.directives;
-            local l_fields_3 = v295.fields;
-            return (v51({
-                "input", 
-                l_name_14, 
-                v51(l_directives_14, " "), 
-                if l_fields_3 and #l_fields_3 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_3, "\n")))) else ""
-            }, " "));
-        end
-    }, 
-    DirectiveDefinition = {
-        leave = function(_, v300) --[[ Line: 799 ]] --[[ Name: leave ]]
-            -- upvalues: l_Boolean_0 (copy), l_Array_0 (copy), l_String_0 (copy), v51 (copy)
-            local l_name_15 = v300.name;
-            local l_arguments_3 = v300.arguments;
-            local l_repeatable_0 = v300.repeatable;
-            local l_locations_0 = v300.locations;
-            local v305 = "directive @";
-            local v306 = tostring(l_name_15);
-            local l_toJSBoolean_1 = l_Boolean_0.toJSBoolean;
-            local v309 = if typeof(l_arguments_3) == "table" then l_Array_0.some(l_arguments_3, function(v308) --[[ Line: 212 ]]
-                -- upvalues: l_String_0 (ref)
-                return l_String_0.includes(v308, "\n");
-            end) else nil;
-            local v310;
-            if l_toJSBoolean_1(v309 ~= nil and v309) then
-                local v311 = v51(l_arguments_3, "\n");
-                l_toJSBoolean_1 = if l_Boolean_0.toJSBoolean(v311) then ("  %s"):format((v311:gsub("\n", "\n  "))) else v311;
-                v310 = if l_Boolean_0.toJSBoolean(l_toJSBoolean_1) then "(\n" .. tostring(l_toJSBoolean_1) .. (l_Boolean_0.toJSBoolean("\n)") and "\n)" or "") else "";
-            else
-                l_toJSBoolean_1 = v51(l_arguments_3, ", ");
-                v310 = if l_Boolean_0.toJSBoolean(l_toJSBoolean_1) then "(" .. tostring(l_toJSBoolean_1) .. (l_Boolean_0.toJSBoolean(")") and ")" or "") else "";
-            end;
-            return v305 .. v306 .. tostring(v310) .. (l_Boolean_0.toJSBoolean(l_repeatable_0) and " repeatable" or "") .. " on " .. tostring((v51(l_locations_0, " | ")));
-        end
-    }, 
-    SchemaExtension = {
-        leave = function(_, v313) --[[ Line: 817 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_directives_15 = v313.directives;
-            local l_operationTypes_1 = v313.operationTypes;
-            return (v51({
-                "extend schema", 
-                v51(l_directives_15, " "), 
-                if l_operationTypes_1 and #l_operationTypes_1 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_operationTypes_1, "\n")))) else ""
-            }, " "));
-        end
-    }, 
-    ScalarTypeExtension = {
-        leave = function(_, v317) --[[ Line: 826 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy)
-            local l_name_16 = v317.name;
-            local l_directives_16 = v317.directives;
-            return (v51({
-                "extend scalar", 
-                l_name_16, 
-                (v51(l_directives_16, " "))
-            }, " "));
-        end
-    }, 
-    ObjectTypeExtension = {
-        leave = function(_, v321) --[[ Line: 835 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy), v71 (copy)
-            local l_name_17 = v321.name;
-            local l_interfaces_2 = v321.interfaces;
-            local l_directives_17 = v321.directives;
-            local l_fields_4 = v321.fields;
-            local l_v51_5 = v51;
-            local v327 = {};
-            local v328 = "extend type";
-            local l_l_name_17_0 = l_name_17;
-            local v330 = v51(l_interfaces_2, " & ");
-            local v331;
-            if l_Boolean_0.toJSBoolean(v330) then
-                local v332 = "implements ";
-                local v333 = tostring(v330);
-                v331 = if l_Boolean_0.toJSBoolean(nil) then v332 .. v333 .. "" else v332 .. v333 .. "";
-            else
-                v331 = "";
-            end;
-            v330 = v51(l_directives_17, " ");
-            local v334 = if l_fields_4 and #l_fields_4 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_4, "\n")))) else "";
-            v6(v327, 1, v328, l_l_name_17_0, v331, v330, v334);
-            return (l_v51_5(v327, " "));
-        end
-    }, 
-    InterfaceTypeExtension = {
-        leave = function(_, v336) --[[ Line: 850 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy), v71 (copy)
-            local l_name_18 = v336.name;
-            local l_interfaces_3 = v336.interfaces;
-            local l_directives_18 = v336.directives;
-            local l_fields_5 = v336.fields;
-            local l_v51_6 = v51;
-            local v342 = {};
-            local v343 = "extend interface";
-            local l_l_name_18_0 = l_name_18;
-            local v345 = v51(l_interfaces_3, " & ");
-            local v346;
-            if l_Boolean_0.toJSBoolean(v345) then
-                local v347 = "implements ";
-                local v348 = tostring(v345);
-                v346 = if l_Boolean_0.toJSBoolean(nil) then v347 .. v348 .. "" else v347 .. v348 .. "";
-            else
-                v346 = "";
-            end;
-            v345 = v51(l_directives_18, " ");
-            local v349 = if l_fields_5 and #l_fields_5 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_5, "\n")))) else "";
-            v6(v342, 1, v343, l_l_name_18_0, v346, v345, v349);
-            return (l_v51_6(v342, " "));
-        end
-    }, 
-    UnionTypeExtension = {
-        leave = function(_, v351) --[[ Line: 865 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), l_Boolean_0 (copy)
-            local l_name_19 = v351.name;
-            local l_directives_19 = v351.directives;
-            local l_types_1 = v351.types;
-            local l_v51_7 = v51;
-            local v356 = {};
-            local v357 = "extend union";
-            local l_l_name_19_0 = l_name_19;
-            local v359 = v51(l_directives_19, " ");
-            local v360 = v51(l_types_1, " | ");
-            local v361;
-            if l_Boolean_0.toJSBoolean(v360) then
-                local v362 = "= ";
-                local v363 = tostring(v360);
-                v361 = if l_Boolean_0.toJSBoolean(nil) then v362 .. v363 .. "" else v362 .. v363 .. "";
-            else
-                v361 = "";
-            end;
-            v6(v356, 1, v357, l_l_name_19_0, v359, v361);
-            return (l_v51_7(v356, " "));
-        end
-    }, 
-    EnumTypeExtension = {
-        leave = function(_, v365) --[[ Line: 874 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_name_20 = v365.name;
-            local l_directives_20 = v365.directives;
-            local l_values_2 = v365.values;
-            return (v51({
-                "extend enum", 
-                l_name_20, 
-                v51(l_directives_20, " "), 
-                if l_values_2 and #l_values_2 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_values_2, "\n")))) else ""
-            }, " "));
-        end
-    }, 
-    InputObjectTypeExtension = {
-        leave = function(_, v370) --[[ Line: 883 ]] --[[ Name: leave ]]
-            -- upvalues: v51 (copy), v71 (copy)
-            local l_name_21 = v370.name;
-            local l_directives_21 = v370.directives;
-            local l_fields_6 = v370.fields;
-            return (v51({
-                "extend input", 
-                l_name_21, 
-                v51(l_directives_21, " "), 
-                if l_fields_6 and #l_fields_6 ~= 0 then ("{\n%s\n}"):format(v71((v51(l_fields_6, "\n")))) else ""
-            }, " "));
-        end
-    }
-};
-local v395 = l_Array_0.reduce(l_Object_0.keys(v374), function(v375, v376) --[[ Line: 900 ]]
-    -- upvalues: l_Object_0 (copy), v374 (copy), l_Array_0 (copy), l_Boolean_0 (copy), l_String_0 (copy), v27 (ref), v51 (copy), v47 (copy)
-    local l_assign_0 = l_Object_0.assign;
-    local v378 = {};
-    local l_v375_0 = v375;
-    local v380 = {};
-    local v381 = {};
-    local l_leave_0 = v374[v376].leave;
-    v381.leave = function(v383, v384, v385, v386, v387, v388) --[[ Line: 230 ]]
-        -- upvalues: l_Array_0 (ref), l_Object_0 (ref), l_Boolean_0 (ref), l_String_0 (ref), v27 (ref), v51 (ref), v47 (ref), l_leave_0 (copy)
-        local v389 = {};
-        local v392 = l_Array_0.reduce(v387, function(v390, v391) --[[ Line: 258 ]]
-            -- upvalues: l_Object_0 (ref), l_Array_0 (ref), l_Boolean_0 (ref), v389 (copy)
-            if v391 ~= l_Object_0.None and l_Array_0.includes({
-                "fields", 
-                "arguments", 
-                "values"
-            }, v391) and l_Boolean_0.toJSBoolean(v390.name) then
-                table.insert(v389, v390.name.value);
-            end;
-            if v390 == l_Object_0.None then
-                return v391;
-            else
-                return v390[v391];
-            end;
-        end, v388[1] or l_Object_0.None);
-        local v393 = l_Array_0.join(l_Array_0.filter(l_Array_0.concat({}, v389, {
-            if typeof(if typeof(v392) == "table" then v392.name else nil) == "table" then (if typeof(v392) == "table" then v392.name else nil).value else nil
-        }), l_Boolean_0.toJSBoolean), ".");
-        local v394 = {};
-        if l_String_0.includes(v384.kind, "Definition") and l_Boolean_0.toJSBoolean(v27[v393]) then
-            v394 = l_Array_0.concat(v394, v27[v393]);
-        end;
-        return (v51(l_Array_0.concat({}, l_Array_0.map(v394, v47), {
-            v384.description or "", 
-            (l_leave_0(v383, v384, v385, v386, v387, v388))
-        }), "\n"));
-    end;
-    v380[v376] = v381;
-    return (l_assign_0(v378, l_v375_0, v380));
-end, {});
-v12.printWithComments = function(v396) --[[ Line: 914 ]] --[[ Name: printWithComments ]]
-    -- upvalues: l_visit_0 (copy), v395 (copy)
-    return (l_visit_0(v396, v395));
-end;
-v19 = function(v397) --[[ Line: 920 ]] --[[ Name: isFieldDefinitionNode ]]
-    return v397.kind == "FieldDefinition";
-end;
-v12.getDescription = function(v398, v399) --[[ Line: 926 ]] --[[ Name: getDescription ]]
-    -- upvalues: l_Boolean_0 (copy), v20 (ref)
-    if v398.description ~= nil then
-        return v398.description.value;
-    elseif l_Boolean_0.toJSBoolean(if typeof(v399) == "table" then v399.commentDescriptions else nil) then
-        return v20(v398);
-    else
-        return nil;
-    end;
-end;
-v20 = function(v400) --[[ Line: 945 ]] --[[ Name: getComment ]]
-    -- upvalues: v21 (ref), v22 (ref)
-    local v401 = v21(v400);
-    if v401 ~= nil then
-        return v22(("\n%s"):format((tostring(v401))));
-    else
-        return nil;
-    end;
-end;
-v12.getComment = v20;
-v21 = function(v402) --[[ Line: 958 ]] --[[ Name: getLeadingCommentBlock ]]
-    -- upvalues: l_Boolean_0 (copy), l_TokenKind_0 (copy), l_Array_0 (copy)
-    local l_loc_0 = v402.loc;
-    if not l_Boolean_0.toJSBoolean(l_loc_0) then
-        return;
-    else
-        local v404 = {};
-        local l_prev_0 = l_loc_0.startToken.prev;
-        while l_prev_0 ~= nil and l_prev_0.kind == l_TokenKind_0.COMMENT and l_prev_0.next ~= nil and l_prev_0.prev ~= nil and l_prev_0.line + 1 == l_prev_0.next.line and l_prev_0.line ~= l_prev_0.prev.line do
-            table.insert(v404, (tostring(l_prev_0.value)));
-            l_prev_0 = l_prev_0.prev;
-        end;
-        if #v404 > 0 then
-            return (l_Array_0.join(l_Array_0.reverse(v404), "\n"));
-        else
-            return nil;
-        end;
-    end;
-end;
-v12.getLeadingCommentBlock = v21;
-v22 = function(v406) --[[ Line: 995 ]] --[[ Name: dedentBlockStringValue ]]
-    -- upvalues: l_String_0 (copy), v23 (ref), v24 (ref), l_Array_0 (copy)
-    local v407 = l_String_0.split(v406, {
-        "\r\n", 
-        "\n", 
-        "\r"
-    });
-    local v408 = v23(v407);
-    if v408 ~= 0 then
-        local v409 = 2;
-        while v409 <= #v407 do
-            v407[v409] = l_String_0.slice(v407[v409], v408 + 1);
-            v409 = v409 + 1;
-        end;
-    end;
-    while #v407 > 0 and v24(v407[1]) do
-        table.remove(v407, 1);
-    end;
-    while #v407 > 0 and v24(v407[#v407]) do
-        table.remove(v407);
-    end;
-    return l_Array_0.join(v407, "\n");
-end;
-v12.dedentBlockStringValue = v22;
-v23 = function(v410) --[[ Line: 1060 ]] --[[ Name: getBlockStringIndentation ]]
-    -- upvalues: v25 (ref)
-    local v411 = nil;
-    local v412 = 2;
-    while v412 <= #v410 do
-        local v413 = v410[v412];
-        local v414 = v25(v413);
-        if v414 == #v413 then
-            v412 = v412 + 1;
-        else
-            if v411 == nil or v414 < v411 then
-                v411 = v414;
-                if v411 == 0 then
-                    break;
-                end;
-            end;
-            v412 = v412 + 1;
-        end;
-    end;
-    if v411 == nil then
-        return 0;
-    else
-        return v411;
-    end;
-end;
-v12.getBlockStringIndentation = v23;
-v25 = function(v415) --[[ Line: 1107 ]] --[[ Name: leadingWhitespace ]]
-    local v416 = 0;
-    while v416 < #v415 and (v415:sub(v416 + 1, v416 + 1) == " " or v415:sub(v416 + 1, v416 + 1) == "\t") do
-        v416 = v416 + 1;
-    end;
-    return v416;
-end;
-v24 = function(v417) --[[ Line: 1123 ]] --[[ Name: isBlank ]]
-    -- upvalues: v25 (ref)
-    return v25(v417) == #v417;
-end;
-return v12;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+
+require(script.Parent.types)
+
+local GraphQL = require(ParentParent.GraphQL)
+local visit = GraphQL.visit
+local TokenKind = GraphQL.TokenKind
+
+require(ParentParent.GraphQL)
+
+local pushComment = nil
+local isFieldDefinitionNode = nil
+local getComment = nil
+local getLeadingCommentBlock = nil
+local dedentBlockStringValue = nil
+local getBlockStringIndentation = nil
+local isBlank = nil
+local leadingWhitespace = nil
+local String = LuauPolyfill.String
+local t2 = {}
+
+function t1.resetComments() -- line: 62
+	-- upvalues: t2 (ref)
+	t2 = {}
+end
+function t1.collectComment(p1) -- line: 66
+	-- upvalues: pushComment (ref), Boolean (copy), isFieldDefinitionNode (ref)
+	local v31 = if typeof(p1.name) ~= "table" then nil else p1.name.value
+
+	if v31 == nil then
+		return
+	end
+
+	pushComment(p1, v31)
+
+	local kind = p1.kind
+
+	if kind == "EnumTypeDefinition" then
+		if Boolean.toJSBoolean(p1.values) then
+			for _, v34 in p1.values do
+				pushComment(v34, v31, v34.name.value)
+			end
+
+			return
+		end
+	elseif (kind == "ObjectTypeDefinition" or kind == "InputObjectTypeDefinition" or kind == "InterfaceTypeDefinition") and Boolean.toJSBoolean(p1.fields) then
+		for _, v36 in p1.fields do
+			pushComment(v36, v31, v36.name.value)
+
+			local toJSBoolean = Boolean.toJSBoolean
+			local v38 = isFieldDefinitionNode(v36)
+
+			if toJSBoolean(if not Boolean.toJSBoolean(v38) then v38 else v36.arguments) then
+				for _, v40 in v36.arguments do
+					pushComment(v40, v31, v36.name.value, v40.name.value)
+				end
+			end
+		end
+	end
+end
+function pushComment(p2, s1: string, s2: string?, s3: string?) -- line: 123
+	-- upvalues: getComment (ref), Boolean (copy), Array (copy), t2 (ref)
+	local v45 = getComment(p2)
+
+	if typeof(v45) ~= "string" or #v45 == 0 then
+		return
+	end
+
+	local t3 = { s1 }
+
+	if Boolean.toJSBoolean(s2) then
+		table.insert(t3, s2)
+
+		if Boolean.toJSBoolean(s3) then
+			table.insert(t3, s3)
+		end
+	end
+
+	local v47 = Array.join(t3, ".")
+
+	if not Boolean.toJSBoolean(t2[tostring(v47)]) then
+		t2[tostring(v47)] = {}
+	end
+
+	table.insert(t2[v47], v45)
+end
+
+t1.pushComment = pushComment
+
+local function printComment(s4: string) -- line: 155
+	return "\n# " .. s4:gsub("\n", "\n# ")
+end
+
+t1.printComment = printComment
+
+local function join(p3, s5: string?) -- line: 183
+	-- upvalues: Boolean (copy), Array (copy)
+	if Boolean.toJSBoolean(p3) then
+		return (Array.join(Array.filter(p3, function(p4) -- line: 195
+			-- upvalues: Boolean (copy)
+			return Boolean.toJSBoolean(p4)
+		end), Boolean.toJSBoolean(s5) and s5 or ""))
+	end
+
+	return ""
+end
+local function hasMultilineItems(p5) -- line: 205
+	-- upvalues: Array (copy), String (copy)
+	local v52 = if typeof(p5) ~= "table" then nil else Array.some(p5, function(p6) -- line: 212
+		-- upvalues: String (copy)
+		return String.includes(p6, "\n")
+	end)
+
+	if v52 ~= nil then
+		return v52
+	end
+
+	return false
+end
+local function addDescription(p7: ((...any) -> ...any)) -- line: 229
+	-- upvalues: Array (copy), Object (copy), Boolean (copy), String (copy), t2 (ref), join (copy), printComment (copy)
+	return function(p8, t4: {[any]: any}, s6: string, p9, p10, p11) -- line: 230
+		-- upvalues: Array (copy), Object (copy), Boolean (copy), String (copy), t2 (ref), join (copy), printComment (copy), p7 (copy)
+		local t5 = {}
+		local v374 = Array.reduce(p10, function(p12, p13) -- line: 258
+			-- upvalues: Object (copy), Array (copy), Boolean (copy), t5 (copy)
+			if p13 ~= Object.None and (Array.includes({
+				"fields",
+				"arguments",
+				"values"
+			}, p13) and Boolean.toJSBoolean(p12.name)) then
+				table.insert(t5, p12.name.value)
+			end
+
+			if p12 == Object.None then
+				return p13
+			end
+
+			return p12[p13]
+		end, p11[1] or Object.None)
+		local v375 = Array.join(Array.filter(Array.concat({}, t5, { if typeof((if typeof(v374) ~= "table" then nil else v374.name)) ~= "table" then nil else ((if typeof(v374) ~= "table" then nil else v374.name)).value }), Boolean.toJSBoolean), ".")
+		local t6 = {}
+
+		if String.includes(t4.kind, "Definition") and Boolean.toJSBoolean(t2[v375]) then
+			t6 = Array.concat(t6, t2[v375])
+		end
+
+		return (join(Array.concat({}, Array.map(t6, printComment), {
+			t4.description or "",
+			(p7(p8, t4, s6, p9, p10, p11))
+		}), "\n"))
+	end
+end
+local function indent(s7: string?) -- line: 320
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(s7) then
+		return ("  %s"):format((s7:gsub("\n", "\n  ")))
+	end
+
+	return s7
+end
+local function block(p14) -- line: 344
+	-- upvalues: indent (copy), join (copy)
+	if p14 and #p14 ~= 0 then
+		return (("{\n%s\n}"):format(indent((join(p14, "\n")))))
+	end
+
+	return ""
+end
+local function wrap(s8: string, p15, s9: string?) -- line: 363
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(p15) then
+		return s8 .. tostring(p15) .. (Boolean.toJSBoolean(s9) and s9 or "")
+	end
+
+	return ""
+end
+local function printBlockString(s10: string, b1: boolean?) -- line: 377
+	-- upvalues: String (copy), Boolean (copy)
+	local v61 = b1 ~= nil and b1
+	local v62 = s10:gsub("\"", "\\\"\"\"")
+
+	if (s10:sub(1, 1) == " " or s10:sub(1, 1) == "\t") and String.indexOf(s10, "\n") == -1 then
+		return ("\"\"\"%s\"\"\""):format((v62:gsub("\"$", "\"\n")))
+	end
+
+	return ("\"\"\"\n%s\n\"\"\""):format(if not Boolean.toJSBoolean(v61) then if not Boolean.toJSBoolean(v62) then v62 else ("  %s"):format((v62:gsub("\n", "\n  "))) else v62)
+end
+
+local t15 = {
+	Name = {
+		leave = function(_, p17) -- line: 417
+			return p17.value
+		end
+	},
+	Variable = {
+		leave = function(_, p19) -- line: 425
+			return "$" .. tostring(p19.name)
+		end
+	},
+	Document = {
+		leave = function(_, p21) -- line: 434
+			-- upvalues: join (copy)
+			return (join(p21.definitions, "\n\n"))
+		end
+	},
+	OperationDefinition = {
+		leave = function(_, p23) -- line: 442
+			-- upvalues: join (copy), Boolean (copy)
+			local v71 = join(p23.variableDefinitions, ", ")
+			local v72 = not Boolean.toJSBoolean(v71) and "" or "(" .. tostring(v71) .. (not Boolean.toJSBoolean(")") and "" or ")")
+
+			return tostring((join({
+				p23.operation,
+				join({
+					p23.name,
+					v72
+				}),
+				(join(p23.directives, " "))
+			}, " "))) .. " " .. tostring(p23.selectionSet)
+		end
+	},
+	VariableDefinition = {
+		leave = function(_, p25) -- line: 452
+			-- upvalues: Boolean (copy), join (copy)
+			local variable = p25.variable
+			local type = p25.type
+			local defaultValue = p25.defaultValue
+			local directives = p25.directives
+			local str = tostring(variable)
+			local str2 = tostring(type)
+			local v82
+
+			if Boolean.toJSBoolean(defaultValue) then
+				local str3 = tostring(defaultValue)
+
+				v82 = if not Boolean.toJSBoolean(nil) then " = " .. str3 .. "" else " = " .. str3 .. ""
+			else
+				v82 = ""
+			end
+
+			local str4 = tostring(v82)
+			local v84 = join(directives, " ")
+			local v86
+
+			if Boolean.toJSBoolean(v84) then
+				local str5 = tostring(v84)
+
+				v86 = if not Boolean.toJSBoolean(nil) then " " .. str5 .. "" else " " .. str5 .. ""
+			else
+				v86 = ""
+			end
+
+			return str .. ": " .. str2 .. str4 .. tostring(v86)
+		end
+	},
+	SelectionSet = {
+		leave = function(_, p27) -- line: 466
+			-- upvalues: indent (copy), join (copy)
+			local selections = p27.selections
+
+			if selections and #selections ~= 0 then
+				return (("{\n%s\n}"):format(indent((join(selections, "\n")))))
+			end
+
+			return ""
+		end
+	},
+	Field = {
+		leave = function(_, p29) -- line: 473
+			-- upvalues: Boolean (copy), join (copy)
+			local alias = p29.alias
+			local name = p29.name
+			local arguments = p29.arguments
+			local directives = p29.directives
+			local selectionSet = p29.selectionSet
+			local v97 = (not Boolean.toJSBoolean(alias) and "" or "" .. tostring(alias) .. (not Boolean.toJSBoolean(": ") and "" or ": ")) .. name
+			local v98 = join(arguments, ", ")
+			local v99 = v97 .. (not Boolean.toJSBoolean(v98) and "" or "(" .. tostring(v98) .. (not Boolean.toJSBoolean(")") and "" or ")"))
+
+			if v99.length > 80 then
+				local v100 = join(arguments, "\n")
+				local v101 = if not Boolean.toJSBoolean(v100) then v100 else ("  %s"):format((v100:gsub("\n", "\n  ")))
+
+				v99 = v97 .. (not Boolean.toJSBoolean(v101) and "" or "(\n" .. tostring(v101) .. (not Boolean.toJSBoolean("\n)") and "" or "\n)"))
+			end
+
+			return (join({
+				v99,
+				join(directives, " "),
+				selectionSet
+			}, " "))
+		end
+	},
+	Argument = {
+		leave = function(_, p31) -- line: 497
+			local name = p31.name
+			local value = p31.value
+
+			return tostring(name) .. ": " .. tostring(value)
+		end
+	},
+	FragmentSpread = {
+		leave = function(_, p33) -- line: 507
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p33.name
+			local directives = p33.directives
+			local str = tostring(name)
+			local v111 = join(directives, " ")
+			local v113
+
+			if Boolean.toJSBoolean(v111) then
+				local str6 = tostring(v111)
+
+				v113 = if not Boolean.toJSBoolean(nil) then " " .. str6 .. "" else " " .. str6 .. ""
+			else
+				v113 = ""
+			end
+
+			return "..." .. str .. tostring(v113)
+		end
+	},
+	InlineFragment = {
+		leave = function(_, p35) -- line: 516
+			-- upvalues: join (copy), Boolean (copy)
+			local typeCondition = p35.typeCondition
+			local directives = p35.directives
+			local selectionSet = p35.selectionSet
+			local v119 = join
+			local t7 = {}
+			local s11 = "..."
+			local v123
+
+			if Boolean.toJSBoolean(typeCondition) then
+				local str = tostring(typeCondition)
+
+				v123 = if not Boolean.toJSBoolean(nil) then "on " .. str .. "" else "on " .. str .. ""
+			else
+				v123 = ""
+			end
+
+			local v124 = join(directives, " ")
+
+			t7[1] = s11
+			t7[2] = v123
+			t7[3] = v124
+			t7[4] = selectionSet
+
+			return (v119(t7, " "))
+		end
+	},
+	FragmentDefinition = {
+		leave = function(_, p37) -- line: 525
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p37.name
+			local typeCondition = p37.typeCondition
+			local variableDefinitions = p37.variableDefinitions
+			local directives = p37.directives
+			local selectionSet = p37.selectionSet
+			local str = tostring(name)
+			local v133 = join(variableDefinitions, ", ")
+			local v134 = ("fragment %s%s "):format(str, not Boolean.toJSBoolean(v133) and "" or "(" .. tostring(v133) .. (not Boolean.toJSBoolean(")") and "" or ")"))
+			local str7 = tostring(typeCondition)
+			local v136 = join(directives, " ")
+
+			return v134 .. ("on %s %s"):format(str7, (tostring(not Boolean.toJSBoolean(v136) and "" or "" .. tostring(v136) .. (not Boolean.toJSBoolean(" ") and "" or " ")))) .. tostring(selectionSet)
+		end
+	},
+	IntValue = {
+		leave = function(_, p39) -- line: 545
+			return p39.value
+		end
+	},
+	FloatValue = {
+		leave = function(_, p41) -- line: 554
+			return p41.value
+		end
+	},
+	StringValue = {
+		leave = function(_, p43) -- line: 563
+			-- upvalues: Boolean (copy), printBlockString (copy)
+			local value = p43.value
+			local block2 = p43.block
+
+			if Boolean.toJSBoolean(block2) then
+				return printBlockString(value)
+			end
+
+			return "'" .. value:gsub("'", "\\'") .. "'"
+		end
+	},
+	BooleanValue = {
+		leave = function(_, p45) -- line: 579
+			-- upvalues: Boolean (copy)
+			local value = p45.value
+
+			if Boolean.toJSBoolean(value) then
+				return "true"
+			end
+
+			return "false"
+		end
+	},
+	NullValue = {
+		leave = function() -- line: 586
+			return "null"
+		end
+	},
+	EnumValue = {
+		leave = function(_, p47) -- line: 593
+			return p47.value
+		end
+	},
+	ListValue = {
+		leave = function(_, p49) -- line: 602
+			-- upvalues: join (copy)
+			local values = p49.values
+
+			return "[" .. tostring((join(values, ", "))) .. "]"
+		end
+	},
+	ObjectValue = {
+		leave = function(_, p51) -- line: 611
+			-- upvalues: join (copy)
+			local fields = p51.fields
+
+			return "{" .. tostring((join(fields, ", "))) .. "}"
+		end
+	},
+	ObjectField = {
+		leave = function(_, p53) -- line: 620
+			local name = p53.name
+			local value = p53.value
+
+			return tostring(name) .. ": " .. tostring(value)
+		end
+	},
+	Directive = {
+		leave = function(_, p55) -- line: 630
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p55.name
+			local arguments = p55.arguments
+			local str = tostring(name)
+			local v165 = join(arguments, ", ")
+
+			return "@" .. str .. tostring(not Boolean.toJSBoolean(v165) and "" or "(" .. tostring(v165) .. (not Boolean.toJSBoolean(")") and "" or ")"))
+		end
+	},
+	NamedType = {
+		leave = function(_, p57) -- line: 640
+			return p57.name
+		end
+	},
+	ListType = {
+		leave = function(_, p59) -- line: 649
+			return "[" .. tostring(p59.type) .. "]"
+		end
+	},
+	NonNullType = {
+		leave = function(_, p61) -- line: 658
+			return tostring(p61.type) .. "!"
+		end
+	},
+	SchemaDefinition = {
+		leave = function(_, p63) -- line: 668
+			-- upvalues: join (copy), indent (copy)
+			local directives = p63.directives
+			local operationTypes = p63.operationTypes
+
+			return (join({
+				"schema",
+				join(directives, " "),
+				(not operationTypes or #operationTypes == 0) and "" or ("{\n%s\n}"):format(indent((join(operationTypes, "\n"))))
+			}, " "))
+		end
+	},
+	OperationTypeDefinition = {
+		leave = function(_, p65) -- line: 677
+			local operation = p65.operation
+			local type = p65.type
+
+			return tostring(operation) .. ": " .. tostring(type)
+		end
+	},
+	ScalarTypeDefinition = {
+		leave = function(_, p67) -- line: 686
+			-- upvalues: join (copy)
+			local name = p67.name
+			local directives = p67.directives
+
+			return (join({
+				"scalar",
+				name,
+				(join(directives, " "))
+			}, " "))
+		end
+	},
+	ObjectTypeDefinition = {
+		leave = function(_, p69) -- line: 695
+			-- upvalues: join (copy), Boolean (copy), indent (copy)
+			local name = p69.name
+			local interfaces = p69.interfaces
+			local directives = p69.directives
+			local fields = p69.fields
+			local v190 = join
+			local t8 = {}
+			local s12 = "type"
+			local v193 = join(interfaces, " & ")
+			local v195
+
+			if Boolean.toJSBoolean(v193) then
+				local str = tostring(v193)
+
+				v195 = if not Boolean.toJSBoolean(nil) then "implements " .. str .. "" else "implements " .. str .. ""
+			else
+				v195 = ""
+			end
+
+			local v196 = join(directives, " ")
+			local v197 = (not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+
+			t8[1] = s12
+			t8[2] = name
+			t8[3] = v195
+			t8[4] = v196
+			t8[5] = v197
+
+			return (v190(t8, " "))
+		end
+	},
+	FieldDefinition = {
+		leave = function(_, p71) -- line: 710
+			-- upvalues: Array (copy), String (copy), join (copy), Boolean (copy)
+			local name = p71.name
+			local arguments = p71.arguments
+			local type = p71.type
+			local directives = p71.directives
+			local str = tostring(name)
+			local v205 = if typeof(arguments) ~= "table" then nil else Array.some(arguments, function(p72) -- line: 212
+				-- upvalues: String (copy)
+				return String.includes(p72, "\n")
+			end)
+			local v208
+
+			if v205 ~= nil and v205 then
+				local v206 = join(arguments, "\n")
+				local v207 = if not Boolean.toJSBoolean(v206) then v206 else ("  %s"):format((v206:gsub("\n", "\n  ")))
+
+				v208 = not Boolean.toJSBoolean(v207) and "" or "(\n" .. tostring(v207) .. (not Boolean.toJSBoolean("\n)") and "" or "\n)")
+			else
+				local v209 = join(arguments, ", ")
+
+				v208 = not Boolean.toJSBoolean(v209) and "" or "(" .. tostring(v209) .. (not Boolean.toJSBoolean(")") and "" or ")")
+			end
+
+			local str8 = tostring(type)
+			local v211 = join(directives, " ")
+			local v213
+
+			if Boolean.toJSBoolean(v211) then
+				local str9 = tostring(v211)
+
+				v213 = if not Boolean.toJSBoolean(nil) then " " .. str9 .. "" else " " .. str9 .. ""
+			else
+				v213 = ""
+			end
+
+			return str .. v208 .. ": " .. str8 .. v213
+		end
+	},
+	InputValueDefinition = {
+		leave = function(_, p74) -- line: 735
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p74.name
+			local type = p74.type
+			local defaultValue = p74.defaultValue
+			local directives = p74.directives
+			local v220 = join
+			local t9 = {}
+			local v222 = tostring(name) .. ": " .. tostring(type)
+			local v224
+
+			if Boolean.toJSBoolean(defaultValue) then
+				local str = tostring(defaultValue)
+
+				v224 = if not Boolean.toJSBoolean(nil) then "= " .. str .. "" else "= " .. str .. ""
+			else
+				v224 = ""
+			end
+
+			local v225 = join(directives, " ")
+
+			t9[1] = v222
+			t9[2] = v224
+			t9[3] = v225
+
+			return (v220(t9, " "))
+		end
+	},
+	InterfaceTypeDefinition = {
+		leave = function(_, p76) -- line: 748
+			-- upvalues: join (copy), Boolean (copy), indent (copy)
+			local name = p76.name
+			local interfaces = p76.interfaces
+			local directives = p76.directives
+			local fields = p76.fields
+			local v232 = join
+			local t10 = {}
+			local s13 = "interface"
+			local v235 = join(interfaces, " & ")
+			local v237
+
+			if Boolean.toJSBoolean(v235) then
+				local str = tostring(v235)
+
+				v237 = if not Boolean.toJSBoolean(nil) then "implements " .. str .. "" else "implements " .. str .. ""
+			else
+				v237 = ""
+			end
+
+			local v238 = join(directives, " ")
+			local v239 = (not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+
+			t10[1] = s13
+			t10[2] = name
+			t10[3] = v237
+			t10[4] = v238
+			t10[5] = v239
+
+			return (v232(t10, " "))
+		end
+	},
+	UnionTypeDefinition = {
+		leave = function(_, p78) -- line: 763
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p78.name
+			local directives = p78.directives
+			local types = p78.types
+			local v245 = join
+			local t11 = {}
+			local s14 = "union"
+			local v248 = join(directives, " ")
+			local v249 = join(types, " | ")
+			local v251
+
+			if Boolean.toJSBoolean(v249) then
+				local str = tostring(v249)
+
+				v251 = if not Boolean.toJSBoolean(nil) then "= " .. str .. "" else "= " .. str .. ""
+			else
+				v251 = ""
+			end
+
+			t11[1] = s14
+			t11[2] = name
+			t11[3] = v248
+			t11[4] = v251
+
+			return (v245(t11, " "))
+		end
+	},
+	EnumTypeDefinition = {
+		leave = function(_, p80) -- line: 772
+			-- upvalues: join (copy), indent (copy)
+			local name = p80.name
+			local directives = p80.directives
+			local values = p80.values
+
+			return (join({
+				"enum",
+				name,
+				join(directives, " "),
+				(not values or #values == 0) and "" or ("{\n%s\n}"):format(indent((join(values, "\n"))))
+			}, " "))
+		end
+	},
+	EnumValueDefinition = {
+		leave = function(_, p82) -- line: 781
+			-- upvalues: join (copy)
+			local name = p82.name
+			local directives = p82.directives
+
+			return (join({
+				name,
+				(join(directives, " "))
+			}, " "))
+		end
+	},
+	InputObjectTypeDefinition = {
+		leave = function(_, p84) -- line: 790
+			-- upvalues: join (copy), indent (copy)
+			local name = p84.name
+			local directives = p84.directives
+			local fields = p84.fields
+
+			return (join({
+				"input",
+				name,
+				join(directives, " "),
+				(not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+			}, " "))
+		end
+	},
+	DirectiveDefinition = {
+		leave = function(_, p86) -- line: 799
+			-- upvalues: Boolean (copy), Array (copy), String (copy), join (copy)
+			local name = p86.name
+			local arguments = p86.arguments
+			local repeatable = p86.repeatable
+			local locations = p86.locations
+			local str = tostring(name)
+			local toJSBoolean = Boolean.toJSBoolean
+			local v274 = if typeof(arguments) ~= "table" then nil else Array.some(arguments, function(p87) -- line: 212
+				-- upvalues: String (copy)
+				return String.includes(p87, "\n")
+			end)
+			local v277
+
+			if toJSBoolean(v274 ~= nil and v274) then
+				local v275 = join(arguments, "\n")
+				local v276 = if not Boolean.toJSBoolean(v275) then v275 else ("  %s"):format((v275:gsub("\n", "\n  ")))
+
+				v277 = not Boolean.toJSBoolean(v276) and "" or "(\n" .. tostring(v276) .. (not Boolean.toJSBoolean("\n)") and "" or "\n)")
+			else
+				local v278 = join(arguments, ", ")
+
+				v277 = not Boolean.toJSBoolean(v278) and "" or "(" .. tostring(v278) .. (not Boolean.toJSBoolean(")") and "" or ")")
+			end
+
+			return "directive @" .. str .. tostring(v277) .. (not Boolean.toJSBoolean(repeatable) and "" or " repeatable") .. " on " .. tostring((join(locations, " | ")))
+		end
+	},
+	SchemaExtension = {
+		leave = function(_, p89) -- line: 817
+			-- upvalues: join (copy), indent (copy)
+			local directives = p89.directives
+			local operationTypes = p89.operationTypes
+
+			return (join({
+				"extend schema",
+				join(directives, " "),
+				(not operationTypes or #operationTypes == 0) and "" or ("{\n%s\n}"):format(indent((join(operationTypes, "\n"))))
+			}, " "))
+		end
+	},
+	ScalarTypeExtension = {
+		leave = function(_, p91) -- line: 826
+			-- upvalues: join (copy)
+			local name = p91.name
+			local directives = p91.directives
+
+			return (join({
+				"extend scalar",
+				name,
+				(join(directives, " "))
+			}, " "))
+		end
+	},
+	ObjectTypeExtension = {
+		leave = function(_, p93) -- line: 835
+			-- upvalues: join (copy), Boolean (copy), indent (copy)
+			local name = p93.name
+			local interfaces = p93.interfaces
+			local directives = p93.directives
+			local fields = p93.fields
+			local v293 = join
+			local t12 = {}
+			local s15 = "extend type"
+			local v296 = join(interfaces, " & ")
+			local v298
+
+			if Boolean.toJSBoolean(v296) then
+				local str = tostring(v296)
+
+				v298 = if not Boolean.toJSBoolean(nil) then "implements " .. str .. "" else "implements " .. str .. ""
+			else
+				v298 = ""
+			end
+
+			local v299 = join(directives, " ")
+			local v300 = (not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+
+			t12[1] = s15
+			t12[2] = name
+			t12[3] = v298
+			t12[4] = v299
+			t12[5] = v300
+
+			return (v293(t12, " "))
+		end
+	},
+	InterfaceTypeExtension = {
+		leave = function(_, p95) -- line: 850
+			-- upvalues: join (copy), Boolean (copy), indent (copy)
+			local name = p95.name
+			local interfaces = p95.interfaces
+			local directives = p95.directives
+			local fields = p95.fields
+			local v307 = join
+			local t13 = {}
+			local s16 = "extend interface"
+			local v310 = join(interfaces, " & ")
+			local v312
+
+			if Boolean.toJSBoolean(v310) then
+				local str = tostring(v310)
+
+				v312 = if not Boolean.toJSBoolean(nil) then "implements " .. str .. "" else "implements " .. str .. ""
+			else
+				v312 = ""
+			end
+
+			local v313 = join(directives, " ")
+			local v314 = (not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+
+			t13[1] = s16
+			t13[2] = name
+			t13[3] = v312
+			t13[4] = v313
+			t13[5] = v314
+
+			return (v307(t13, " "))
+		end
+	},
+	UnionTypeExtension = {
+		leave = function(_, p97) -- line: 865
+			-- upvalues: join (copy), Boolean (copy)
+			local name = p97.name
+			local directives = p97.directives
+			local types = p97.types
+			local v320 = join
+			local t14 = {}
+			local s17 = "extend union"
+			local v323 = join(directives, " ")
+			local v324 = join(types, " | ")
+			local v326
+
+			if Boolean.toJSBoolean(v324) then
+				local str = tostring(v324)
+
+				v326 = if not Boolean.toJSBoolean(nil) then "= " .. str .. "" else "= " .. str .. ""
+			else
+				v326 = ""
+			end
+
+			t14[1] = s17
+			t14[2] = name
+			t14[3] = v323
+			t14[4] = v326
+
+			return (v320(t14, " "))
+		end
+	},
+	EnumTypeExtension = {
+		leave = function(_, p99) -- line: 874
+			-- upvalues: join (copy), indent (copy)
+			local name = p99.name
+			local directives = p99.directives
+			local values = p99.values
+
+			return (join({
+				"extend enum",
+				name,
+				join(directives, " "),
+				(not values or #values == 0) and "" or ("{\n%s\n}"):format(indent((join(values, "\n"))))
+			}, " "))
+		end
+	},
+	InputObjectTypeExtension = {
+		leave = function(_, p101) -- line: 883
+			-- upvalues: join (copy), indent (copy)
+			local name = p101.name
+			local directives = p101.directives
+			local fields = p101.fields
+
+			return (join({
+				"extend input",
+				name,
+				join(directives, " "),
+				(not fields or #fields == 0) and "" or ("{\n%s\n}"):format(indent((join(fields, "\n"))))
+			}, " "))
+		end
+	}
+}
+local v29 = Array.reduce(Object.keys(t15), function(p102, p103) -- line: 900
+	-- upvalues: Object (copy), t15 (copy), Array (copy), Boolean (copy), String (copy), t2 (ref), join (copy), printComment (copy)
+	local assign = Object.assign
+	local t16 = {}
+	local t17 = {}
+	local leave = t15[p103].leave
+
+	function t17.leave(p104, t18: {[any]: any}, s18: string, p105, p106, p107) -- line: 230
+		-- upvalues: Array (copy), Object (copy), Boolean (copy), String (copy), t2 (ref), join (copy), printComment (copy), leave (copy)
+		local t19 = {}
+		local v386 = Array.reduce(p106, function(p108, p109) -- line: 258
+			-- upvalues: Object (copy), Array (copy), Boolean (copy), t19 (copy)
+			if p109 ~= Object.None and (Array.includes({
+				"fields",
+				"arguments",
+				"values"
+			}, p109) and Boolean.toJSBoolean(p108.name)) then
+				table.insert(t19, p108.name.value)
+			end
+
+			if p108 == Object.None then
+				return p109
+			end
+
+			return p108[p109]
+		end, p107[1] or Object.None)
+		local v387 = Array.join(Array.filter(Array.concat({}, t19, { if typeof((if typeof(v386) ~= "table" then nil else v386.name)) ~= "table" then nil else ((if typeof(v386) ~= "table" then nil else v386.name)).value }), Boolean.toJSBoolean), ".")
+		local t20 = {}
+
+		if String.includes(t18.kind, "Definition") and Boolean.toJSBoolean(t2[v387]) then
+			t20 = Array.concat(t20, t2[v387])
+		end
+
+		return (join(Array.concat({}, Array.map(t20, printComment), {
+			t18.description or "",
+			(leave(p104, t18, s18, p105, p106, p107))
+		}), "\n"))
+	end
+
+	t16[p103] = t17
+
+	return (assign({}, p102, t16))
+end, {})
+
+function t1.printWithComments(p110) -- line: 914
+	-- upvalues: visit (copy), v29 (copy)
+	return (visit(p110, v29))
+end
+function isFieldDefinitionNode(p111) -- line: 920
+	return p111.kind == "FieldDefinition"
+end
+function t1.getDescription(t21: {[any]: any}, t22: {[any]: any}?) -- line: 926
+	-- upvalues: Boolean (copy), getComment (ref)
+	if t21.description ~= nil then
+		return t21.description.value
+	end
+
+	if Boolean.toJSBoolean(if typeof(t22) ~= "table" then nil else t22.commentDescriptions) then
+		return getComment(t21)
+	end
+
+	return nil
+end
+function getComment(t23: {[any]: any}) -- line: 945
+	-- upvalues: getLeadingCommentBlock (ref), dedentBlockStringValue (ref)
+	local v348 = getLeadingCommentBlock(t23)
+
+	if v348 ~= nil then
+		return dedentBlockStringValue(("\n%s"):format((tostring(v348))))
+	end
+
+	return nil
+end
+
+t1.getComment = getComment
+
+function getLeadingCommentBlock(t24: {[any]: any}) -- line: 958
+	-- upvalues: Boolean (copy), TokenKind (copy), Array (copy)
+	local loc = t24.loc
+
+	if not Boolean.toJSBoolean(loc) then
+		return
+	end
+
+	local t25 = {}
+	local prev = loc.startToken.prev
+
+	while prev ~= nil and prev.kind == TokenKind.COMMENT and prev.next ~= nil and prev.prev ~= nil and prev.line + 1 == prev.next.line and prev.line ~= prev.prev.line do
+		table.insert(t25, (tostring(prev.value)))
+		prev = prev.prev
+	end
+
+	if #t25 > 0 then
+		return (Array.join(Array.reverse(t25), "\n"))
+	end
+
+	return nil
+end
+
+t1.getLeadingCommentBlock = getLeadingCommentBlock
+
+function dedentBlockStringValue(s19: string) -- line: 995
+	-- upvalues: String (copy), getBlockStringIndentation (ref), isBlank (ref), Array (copy)
+	local v354 = String.split(s19, {
+		"\r\n",
+		"\n",
+		"\r"
+	})
+	local v355 = getBlockStringIndentation(v354)
+
+	if v355 ~= 0 then
+		local n1 = 2
+
+		while n1 <= #v354 do
+			v354[n1] = String.slice(v354[n1], v355 + 1)
+			n1 += 1
+		end
+	end
+
+	while #v354 > 0 and isBlank(v354[1]) do
+		table.remove(v354, 1)
+	end
+
+	while #v354 > 0 and isBlank(v354[#v354]) do
+		table.remove(v354)
+	end
+
+	return Array.join(v354, "\n")
+end
+
+t1.dedentBlockStringValue = dedentBlockStringValue
+
+function getBlockStringIndentation(p112) -- line: 1060
+	-- upvalues: leadingWhitespace (ref)
+	local v358 = nil
+	local n2 = 2
+
+	while n2 <= #p112 do
+		local v360 = p112[n2]
+		local v361 = leadingWhitespace(v360)
+
+		if v361 == #v360 then
+			n2 += 1
+
+			continue
+		end
+
+		if v358 == nil or v361 < v358 then
+			v358 = v361
+
+			if v358 == 0 then
+				break
+			end
+		end
+
+		n2 += 1
+	end
+
+	if v358 == nil then
+		return 0
+	end
+
+	return v358
+end
+
+t1.getBlockStringIndentation = getBlockStringIndentation
+
+function leadingWhitespace(s20: string) -- line: 1107
+	local n3 = 0
+
+	while n3 < #s20 and (s20:sub(n3 + 1, n3 + 1) == " " or s20:sub(n3 + 1, n3 + 1) == "\t") do
+		n3 += 1
+	end
+
+	return n3
+end
+function isBlank(s21: string) -- line: 1123
+	-- upvalues: leadingWhitespace (ref)
+	return leadingWhitespace(s21) == #s21
+end
+
+return t1

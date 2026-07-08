@@ -1,352 +1,328 @@
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Promise);
-local v3 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local l_GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice;
-local v5 = require(l_RobloxGui_0.Modules.VoiceChat.Constants);
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v7 = require(l_CorePackages_0.Workspace.Packages.CrossExperience);
-local v8 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local l_Constants_0 = v7.Constants;
-local l_FIntPartyVoiceUndeafenDelayMS_0 = v8.FIntPartyVoiceUndeafenDelayMS;
-local v11 = game:DefineFastFlag("FixJoinVoiceDelayedAFMInit", false);
-local v12 = false;
-local v13 = nil;
-local v14 = false;
-local v15 = false;
-local v16 = false;
-local v17 = false;
-local v18 = nil;
-if l_GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice_0() then
-    l_default_0:subscribe("OnStateChanged", function(_, v20) --[[ Line: 28 ]]
-        -- upvalues: v13 (ref), v15 (ref)
-        v13 = v20;
-        if v20 == Enum.VoiceChatState.Ended then
-            v15 = false;
-        end;
-    end);
-    l_default_0.VoiceJoinProgressChanged.Event:Connect(function(v21) --[[ Line: 34 ]]
-        -- upvalues: v5 (copy), v12 (ref)
-        if v21 == v5.VOICE_JOIN_PROGRESS.Suspended then
-            v12 = true;
-        end;
-    end);
-    performVoiceOperationWhenReady = function(v22) --[[ Line: 40 ]] --[[ Name: performVoiceOperationWhenReady ]]
-        -- upvalues: l_default_0 (copy), v3 (copy)
-        l_default_0:asyncInit():andThen(function() --[[ Line: 42 ]]
-            -- upvalues: v22 (copy)
-            v22();
-        end):catch(function() --[[ Line: 45 ]]
-            -- upvalues: v3 (ref)
-            v3:info("VCSM was not initialized to perform operation [CEV ExperienceAudioFocusBinder]");
-        end);
-    end;
-    isConnectedToPublicVoice = function() --[[ Line: 50 ]] --[[ Name: isConnectedToPublicVoice ]]
-        -- upvalues: l_default_0 (copy), v13 (ref)
-        return not l_default_0:ShouldShowJoinVoice() or v13 == Enum.VoiceChatState.Joined;
-    end;
-    initializeAFM = function() --[[ Line: 55 ]] --[[ Name: initializeAFM ]]
-        -- upvalues: v11 (copy), v14 (ref), v3 (copy), l_Constants_0 (copy), l_FIntPartyVoiceUndeafenDelayMS_0 (copy), v18 (ref), l_default_0 (copy), v2 (copy), v15 (ref), v12 (ref), v17 (ref)
-        if v11 and v14 then
-            v3:info("VCSM was already initialized [CEV ExperienceAudioFocusBinder]");
-            return;
-        else
-            if v11 then
-                v14 = true;
-            end;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 63 ]]
-                return game:GetService("AudioFocusService");
-            end);
-            if l_status_0 and l_result_0 then
-                local l_CONTEXT_ID_0 = l_Constants_0.AUDIO_FOCUS_MANAGEMENT.UGC.CONTEXT_ID;
-                local l_FOCUS_PRIORITY_0 = l_Constants_0.AUDIO_FOCUS_MANAGEMENT.UGC.FOCUS_PRIORITY;
-                l_result_0:RegisterContextIdFromLua(l_CONTEXT_ID_0);
-                local function v27() --[[ Line: 72 ]]
-                    -- upvalues: l_FIntPartyVoiceUndeafenDelayMS_0 (ref), v18 (ref), l_default_0 (ref)
-                    if isConnectedToPublicVoice() then
-                        if l_FIntPartyVoiceUndeafenDelayMS_0 > 0 and v18 then
-                            task.cancel(v18);
-                            v18 = nil;
-                        end;
-                        l_default_0:MuteAll(true, "AudioFocusManagement UGC");
-                        if not l_default_0.localMuted then
-                            l_default_0:ToggleMic("AudioFocusManagement - UGC deafenAll");
-                        end;
-                        l_default_0:HideVoiceUI();
-                    end;
-                end;
-                local function v28() --[[ Line: 89 ]]
-                    -- upvalues: l_FIntPartyVoiceUndeafenDelayMS_0 (ref), v18 (ref), l_default_0 (ref)
-                    if isConnectedToPublicVoice() then
-                        if l_FIntPartyVoiceUndeafenDelayMS_0 > 0 and v18 then
-                            task.cancel(v18);
-                            v18 = nil;
-                        end;
-                        l_default_0:MuteAll(false, "AudioFocusManagement UGC");
-                        if not l_default_0.localMuted then
-                            l_default_0:ToggleMic("AudioFocusManagement - UGC undeafenAll");
-                        end;
-                        l_default_0:ShowVoiceUI();
-                    end;
-                end;
-                l_result_0.OnDeafenVoiceAudio:Connect(function(v29) --[[ Line: 105 ]]
-                    -- upvalues: l_CONTEXT_ID_0 (copy), l_FIntPartyVoiceUndeafenDelayMS_0 (ref), v18 (ref), v3 (ref), v27 (copy)
-                    if v29 == l_CONTEXT_ID_0 then
-                        if l_FIntPartyVoiceUndeafenDelayMS_0 > 0 and v18 then
-                            task.cancel(v18);
-                            v18 = nil;
-                        end;
-                        v3:info("UGC OnDeafenVoiceAudio fired" .. v29);
-                        performVoiceOperationWhenReady(v27);
-                    end;
-                end);
-                l_result_0.OnUndeafenVoiceAudio:Connect(function(v30) --[[ Line: 116 ]]
-                    -- upvalues: l_CONTEXT_ID_0 (copy), l_FIntPartyVoiceUndeafenDelayMS_0 (ref), v18 (ref), v3 (ref), v28 (copy)
-                    if v30 == l_CONTEXT_ID_0 then
-                        if l_FIntPartyVoiceUndeafenDelayMS_0 > 0 then
-                            if v18 then
-                                task.cancel(v18);
-                            end;
-                            v18 = task.delay(l_FIntPartyVoiceUndeafenDelayMS_0 / 1000, function() --[[ Line: 122 ]]
-                                -- upvalues: v18 (ref), v3 (ref), v30 (copy), v28 (ref)
-                                v18 = nil;
-                                v3:info("UGC OnUndeafenVoiceAudio fired delayed" .. v30);
-                                performVoiceOperationWhenReady(v28);
-                            end);
-                            return;
-                        else
-                            v3:info("UGC OnUndeafenVoiceAudio fired" .. v30);
-                            performVoiceOperationWhenReady(v28);
-                        end;
-                    end;
-                end);
-                local function _(v31, v32) --[[ Line: 134 ]]
-                    -- upvalues: v3 (ref), v2 (ref), l_result_0 (copy)
-                    v3:info("UGC requestAudioFocusWithPromise - id: {} - priority: {}", v31, v32);
-                    return v2.new(function(v33, v34) --[[ Line: 136 ]]
-                        -- upvalues: l_result_0 (ref), v31 (copy), v32 (copy), v3 (ref)
-                        local l_status_1, l_result_1 = pcall(l_result_0.RequestFocus, l_result_0, v31, v32);
-                        if l_status_1 then
-                            v3:info("UGC requestAudioFocusWithPromise - focusGranted: {}", l_result_1);
-                            v33(l_result_1);
-                            return;
-                        else
-                            v3:info("UGC requestAudioFocusWithPromise - rejected");
-                            v34("Failed to call RequestFocus due to an error");
-                            return;
-                        end;
-                    end);
-                end;
-                local function v40(v38, v39) --[[ Line: 149 ]]
-                    -- upvalues: v3 (ref), l_default_0 (ref)
-                    if v38 ~= nil then
-                        if v39 then
-                            v3:info("UGC audio focus request granted, preparing to undeafen.");
-                            l_default_0:MuteAll(false, "AudioFocusManagement UGC");
-                            l_default_0:ShowVoiceUI();
-                            return;
-                        else
-                            v3:info("UGC audio focus requested denied, preparing to deafen.");
-                            l_default_0:MuteAll(true, "AudioFocusManagement UGC");
-                            l_default_0:HideVoiceUI();
-                        end;
-                    end;
-                end;
-                local function _(v41, v42) --[[ Line: 163 ]]
-                    -- upvalues: v15 (ref), v12 (ref), v40 (copy)
-                    if not v15 then
-                        performVoiceOperationWhenReady(function() --[[ Line: 165 ]]
-                            -- upvalues: v12 (ref), v40 (ref), v41 (copy), v42 (copy)
-                            if not v12 then
-                                v40(v41, v42);
-                            end;
-                        end);
-                        v15 = true;
-                    end;
-                end;
-                v3:info("UGC requestAudioFocusWithPromise - id: {} - priority: {}", l_CONTEXT_ID_0, l_FOCUS_PRIORITY_0);
-                v2.new(function(v44, v45) --[[ Line: 136 ]]
-                    -- upvalues: l_result_0 (copy), l_CONTEXT_ID_0 (copy), l_FOCUS_PRIORITY_0 (copy), v3 (ref)
-                    local l_status_2, l_result_2 = pcall(l_result_0.RequestFocus, l_result_0, l_CONTEXT_ID_0, l_FOCUS_PRIORITY_0);
-                    if l_status_2 then
-                        v3:info("UGC requestAudioFocusWithPromise - focusGranted: {}", l_result_2);
-                        v44(l_result_2);
-                        return;
-                    else
-                        v3:info("UGC requestAudioFocusWithPromise - rejected");
-                        v45("Failed to call RequestFocus due to an error");
-                        return;
-                    end;
-                end):andThen(function(v48) --[[ Line: 175 ]]
-                    -- upvalues: l_default_0 (ref), v17 (ref), v15 (ref), v12 (ref), v40 (copy)
-                    l_default_0.muteChanged.Event:Connect(function(v49) --[[ Line: 176 ]]
-                        -- upvalues: v17 (ref), v48 (copy), v15 (ref), v12 (ref), v40 (ref)
-                        if not v17 then
-                            local l_v48_0 = v48;
-                            if not v15 then
-                                performVoiceOperationWhenReady(function() --[[ Line: 165 ]]
-                                    -- upvalues: v12 (ref), v40 (ref), v49 (copy), l_v48_0 (copy)
-                                    if not v12 then
-                                        v40(v49, l_v48_0);
-                                    end;
-                                end);
-                                v15 = true;
-                            end;
-                            v17 = true;
-                            return;
-                        else
-                            local v51 = isConnectedToPublicVoice();
-                            if not v15 then
-                                performVoiceOperationWhenReady(function() --[[ Line: 165 ]]
-                                    -- upvalues: v12 (ref), v40 (ref), v49 (copy), v51 (copy)
-                                    if not v12 then
-                                        v40(v49, v51);
-                                    end;
-                                end);
-                                v15 = true;
-                            end;
-                            return;
-                        end;
-                    end);
-                end):catch(function() --[[ Line: 185 ]]
-                    -- upvalues: v3 (ref)
-                    v3:info("[UGC] Error requesting focus inside UGCdatamodel");
-                end);
-            end;
-            return;
-        end;
-    end;
-    local l_canUseServiceResult_0 = l_default_0.canUseServiceResult;
-    if l_canUseServiceResult_0 then
-        initializeAFM();
-    elseif l_canUseServiceResult_0 == nil then
-        if v11 then
-            l_default_0:subscribe("OnVoiceChatServiceInitialized", function() --[[ Line: 196 ]]
-                -- upvalues: v16 (ref)
-                if v16 then
-                    initializeAFM();
-                    v16 = false;
-                end;
-            end);
-        end;
-        l_default_0:subscribe("OnCanUseServiceResult", function(v53) --[[ Line: 204 ]]
-            -- upvalues: v11 (copy), v16 (ref), v3 (copy)
-            if v53 then
-                initializeAFM();
-                return;
-            else
-                if v11 then
-                    v16 = true;
-                end;
-                v3:info("VCSM cannot be used [CEV ExperienceAudioFocusBinder]");
-                return;
-            end;
-        end);
-    else
-        v3:info("VCSM cannot be used [CEV ExperienceAudioFocusBinder]");
-    end;
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local CorePackages = game:GetService("CorePackages")
+local Promise = require(CorePackages.Packages.Promise)
+local v4 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice
+local Constants = require(RobloxGui.Modules.VoiceChat.Constants)
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local CrossExperience = require(CorePackages.Workspace.Packages.CrossExperience)
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local Constants2 = CrossExperience.Constants
+local FIntPartyVoiceUndeafenDelayMS = SharedFlags.FIntPartyVoiceUndeafenDelayMS
+local v12 = game:DefineFastFlag("FixJoinVoiceDelayedAFMInit", false)
+local u13 = false
+local u14 = nil
+local u15 = false
+local u16 = false
+local u17 = false
+local u18 = false
+local u19 = nil
+
+if GetFFlagFixSeamlessVoiceIntegrationWithPrivateVoice() then
+	default:subscribe("OnStateChanged", function(_, p2) -- line: 28
+		-- upvalues: u14 (ref), u16 (ref)
+		u14 = p2
+
+		if p2 == Enum.VoiceChatState.Ended then
+			u16 = false
+		end
+	end)
+	default.VoiceJoinProgressChanged.Event:Connect(function(p3) -- line: 34
+		-- upvalues: Constants (copy), u13 (ref)
+		if p3 == Constants.VOICE_JOIN_PROGRESS.Suspended then
+			u13 = true
+		end
+	end)
+
+	function performVoiceOperationWhenReady(p4) -- line: 40
+		-- upvalues: default (copy), v4 (copy)
+		default:asyncInit():andThen(function() -- line: 42
+			-- upvalues: p4 (copy)
+			p4()
+		end):catch(function() -- line: 45
+			-- upvalues: v4 (copy)
+			v4:info("VCSM was not initialized to perform operation [CEV ExperienceAudioFocusBinder]")
+		end)
+	end
+	function isConnectedToPublicVoice() -- line: 50
+		-- upvalues: default (copy), u14 (ref)
+		return not default:ShouldShowJoinVoice() or u14 == Enum.VoiceChatState.Joined
+	end
+	function initializeAFM() -- line: 55
+		-- upvalues: v12 (copy), u15 (ref), v4 (copy), Constants2 (copy), FIntPartyVoiceUndeafenDelayMS (copy), u19 (ref), default (copy), Promise (copy), u16 (ref), u13 (ref), u18 (ref)
+		if v12 and u15 then
+			v4:info("VCSM was already initialized [CEV ExperienceAudioFocusBinder]")
+
+			return
+		end
+
+		if v12 then
+			u15 = true
+		end
+
+		local ok, result = pcall(function() -- line: 63
+			return game:GetService("AudioFocusService")
+		end)
+
+		if ok and result then
+			local CONTEXT_ID = Constants2.AUDIO_FOCUS_MANAGEMENT.UGC.CONTEXT_ID
+			local FOCUS_PRIORITY = Constants2.AUDIO_FOCUS_MANAGEMENT.UGC.FOCUS_PRIORITY
+
+			result:RegisterContextIdFromLua(CONTEXT_ID)
+
+			local function v29() -- line: 72
+				-- upvalues: FIntPartyVoiceUndeafenDelayMS (copy), u19 (ref), default (copy)
+				if isConnectedToPublicVoice() then
+					if FIntPartyVoiceUndeafenDelayMS > 0 and u19 then
+						task.cancel(u19)
+						u19 = nil
+					end
+
+					default:MuteAll(true, "AudioFocusManagement UGC")
+
+					if not default.localMuted then
+						default:ToggleMic("AudioFocusManagement - UGC deafenAll")
+					end
+
+					default:HideVoiceUI()
+				end
+			end
+			local function v30() -- line: 89
+				-- upvalues: FIntPartyVoiceUndeafenDelayMS (copy), u19 (ref), default (copy)
+				if isConnectedToPublicVoice() then
+					if FIntPartyVoiceUndeafenDelayMS > 0 and u19 then
+						task.cancel(u19)
+						u19 = nil
+					end
+
+					default:MuteAll(false, "AudioFocusManagement UGC")
+
+					if not default.localMuted then
+						default:ToggleMic("AudioFocusManagement - UGC undeafenAll")
+					end
+
+					default:ShowVoiceUI()
+				end
+			end
+
+			result.OnDeafenVoiceAudio:Connect(function(p5) -- line: 105
+				-- upvalues: CONTEXT_ID (copy), FIntPartyVoiceUndeafenDelayMS (copy), u19 (ref), v4 (copy), v29 (copy)
+				if p5 == CONTEXT_ID then
+					if FIntPartyVoiceUndeafenDelayMS > 0 and u19 then
+						task.cancel(u19)
+						u19 = nil
+					end
+
+					v4:info("UGC OnDeafenVoiceAudio fired" .. p5)
+					performVoiceOperationWhenReady(v29)
+				end
+			end)
+			result.OnUndeafenVoiceAudio:Connect(function(p6) -- line: 116
+				-- upvalues: CONTEXT_ID (copy), FIntPartyVoiceUndeafenDelayMS (copy), u19 (ref), v4 (copy), v30 (copy)
+				if p6 == CONTEXT_ID then
+					if FIntPartyVoiceUndeafenDelayMS > 0 then
+						if u19 then
+							task.cancel(u19)
+						end
+
+						u19 = task.delay(FIntPartyVoiceUndeafenDelayMS / 1000, function() -- line: 122
+							-- upvalues: u19 (ref), v4 (copy), p6 (copy), v30 (copy)
+							u19 = nil
+							v4:info("UGC OnUndeafenVoiceAudio fired delayed" .. p6)
+							performVoiceOperationWhenReady(v30)
+						end)
+
+						return
+					end
+
+					v4:info("UGC OnUndeafenVoiceAudio fired" .. p6)
+					performVoiceOperationWhenReady(v30)
+				end
+			end)
+
+			local function v31(p7, p8) -- line: 149
+				-- upvalues: v4 (copy), default (copy)
+				if p7 ~= nil then
+					if p8 then
+						v4:info("UGC audio focus request granted, preparing to undeafen.")
+						default:MuteAll(false, "AudioFocusManagement UGC")
+						default:ShowVoiceUI()
+
+						return
+					end
+
+					v4:info("UGC audio focus requested denied, preparing to deafen.")
+					default:MuteAll(true, "AudioFocusManagement UGC")
+					default:HideVoiceUI()
+				end
+			end
+
+			v4:info("UGC requestAudioFocusWithPromise - id: {} - priority: {}", CONTEXT_ID, FOCUS_PRIORITY)
+			Promise.new(function(resolve, reject) -- line: 136
+				-- upvalues: result (copy), CONTEXT_ID (copy), FOCUS_PRIORITY (copy), v4 (copy)
+				local ok2, result2 = pcall(result.RequestFocus, result, CONTEXT_ID, FOCUS_PRIORITY)
+
+				if ok2 then
+					v4:info("UGC requestAudioFocusWithPromise - focusGranted: {}", result2)
+					resolve(result2)
+
+					return
+				end
+
+				v4:info("UGC requestAudioFocusWithPromise - rejected")
+				reject("Failed to call RequestFocus due to an error")
+			end):andThen(function(p9) -- line: 175
+				-- upvalues: default (copy), u18 (ref), u16 (ref), u13 (ref), v31 (copy)
+				default.muteChanged.Event:Connect(function(p10) -- line: 176
+					-- upvalues: u18 (ref), p9 (copy), u16 (ref), u13 (ref), v31 (copy)
+					if not u18 then
+						local v64 = p9
+
+						if not u16 then
+							performVoiceOperationWhenReady(function() -- line: 165
+								-- upvalues: u13 (ref), v31 (copy), p10 (copy), v64 (copy)
+								if not u13 then
+									v31(p10, v64)
+								end
+							end)
+							u16 = true
+						end
+
+						u18 = true
+
+						return
+					end
+
+					local v65 = isConnectedToPublicVoice()
+
+					if not u16 then
+						performVoiceOperationWhenReady(function() -- line: 165
+							-- upvalues: u13 (ref), v31 (copy), p10 (copy), v65 (copy)
+							if not u13 then
+								v31(p10, v65)
+							end
+						end)
+						u16 = true
+					end
+				end)
+			end):catch(function() -- line: 185
+				-- upvalues: v4 (copy)
+				v4:info("[UGC] Error requesting focus inside UGCdatamodel")
+			end)
+		end
+	end
+
+	local canUseServiceResult = default.canUseServiceResult
+
+	if canUseServiceResult then
+		initializeAFM()
+	elseif canUseServiceResult == nil then
+		if v12 then
+			default:subscribe("OnVoiceChatServiceInitialized", function() -- line: 196
+				-- upvalues: u17 (ref)
+				if u17 then
+					initializeAFM()
+					u17 = false
+				end
+			end)
+		end
+
+		default:subscribe("OnCanUseServiceResult", function(p11) -- line: 204
+			-- upvalues: v12 (copy), u17 (ref), v4 (copy)
+			if p11 then
+				initializeAFM()
+
+				return
+			end
+
+			if v12 then
+				u17 = true
+			end
+
+			v4:info("VCSM cannot be used [CEV ExperienceAudioFocusBinder]")
+		end)
+	else
+		v4:info("VCSM cannot be used [CEV ExperienceAudioFocusBinder]")
+	end
 else
-    l_default_0:asyncInit():andThen(function() --[[ Line: 219 ]]
-        -- upvalues: l_Constants_0 (copy), l_default_0 (copy), v3 (copy), v2 (copy)
-        local l_status_3, l_result_3 = pcall(function() --[[ Line: 220 ]]
-            return game:GetService("AudioFocusService");
-        end);
-        if l_status_3 and l_result_3 then
-            local l_CONTEXT_ID_1 = l_Constants_0.AUDIO_FOCUS_MANAGEMENT.UGC.CONTEXT_ID;
-            local l_FOCUS_PRIORITY_1 = l_Constants_0.AUDIO_FOCUS_MANAGEMENT.UGC.FOCUS_PRIORITY;
-            l_result_3:RegisterContextIdFromLua(l_CONTEXT_ID_1);
-            local function _() --[[ Line: 229 ]]
-                -- upvalues: l_default_0 (ref)
-                l_default_0:MuteAll(true, "AudioFocusManagement UGC");
-                if not l_default_0.localMuted then
-                    l_default_0:ToggleMic("AudioFocusManagement - UGC deafenAll");
-                end;
-                l_default_0:HideVoiceUI();
-            end;
-            local function _() --[[ Line: 239 ]]
-                -- upvalues: l_default_0 (ref)
-                l_default_0:MuteAll(false, "AudioFocusManagement UGC");
-                if not l_default_0.localMuted then
-                    l_default_0:ToggleMic("AudioFocusManagement - UGC undeafenAll");
-                end;
-                l_default_0:ShowVoiceUI();
-            end;
-            l_result_3.OnDeafenVoiceAudio:Connect(function(v60) --[[ Line: 249 ]]
-                -- upvalues: l_CONTEXT_ID_1 (copy), v3 (ref), l_default_0 (ref)
-                if v60 == l_CONTEXT_ID_1 then
-                    v3:info("UGC OnDeafenVoiceAudio fired" .. v60);
-                    l_default_0:MuteAll(true, "AudioFocusManagement UGC");
-                    if not l_default_0.localMuted then
-                        l_default_0:ToggleMic("AudioFocusManagement - UGC deafenAll");
-                    end;
-                    l_default_0:HideVoiceUI();
-                end;
-            end);
-            l_result_3.OnUndeafenVoiceAudio:Connect(function(v61) --[[ Line: 256 ]]
-                -- upvalues: l_CONTEXT_ID_1 (copy), v3 (ref), l_default_0 (ref)
-                if v61 == l_CONTEXT_ID_1 then
-                    v3:info("UGC OnUndeafenVoiceAudio fired" .. v61);
-                    l_default_0:MuteAll(false, "AudioFocusManagement UGC");
-                    if not l_default_0.localMuted then
-                        l_default_0:ToggleMic("AudioFocusManagement - UGC undeafenAll");
-                    end;
-                    l_default_0:ShowVoiceUI();
-                end;
-            end);
-            local function _(v62, v63) --[[ Line: 263 ]]
-                -- upvalues: v2 (ref), l_result_3 (copy)
-                return v2.new(function(v64, v65) --[[ Line: 264 ]]
-                    -- upvalues: l_result_3 (ref), v62 (copy), v63 (copy)
-                    local l_status_4, l_result_4 = pcall(l_result_3.RequestFocus, l_result_3, v62, v63);
-                    if l_status_4 then
-                        v64(l_result_4);
-                        return;
-                    else
-                        v65("Failed to call RequestFocus due to an error");
-                        return;
-                    end;
-                end);
-            end;
-            v2.new(function(v69, v70) --[[ Line: 264 ]]
-                -- upvalues: l_result_3 (copy), l_CONTEXT_ID_1 (copy), l_FOCUS_PRIORITY_1 (copy)
-                local l_status_5, l_result_5 = pcall(l_result_3.RequestFocus, l_result_3, l_CONTEXT_ID_1, l_FOCUS_PRIORITY_1);
-                if l_status_5 then
-                    v69(l_result_5);
-                    return;
-                else
-                    v70("Failed to call RequestFocus due to an error");
-                    return;
-                end;
-            end):andThen(function(v73) --[[ Line: 276 ]]
-                -- upvalues: v3 (ref), l_default_0 (ref)
-                if v73 then
-                    v3:info("UGC audio focus request granted, preparing to undeafen.");
-                    l_default_0.muteChanged.Event:Once(function(v74) --[[ Line: 279 ]]
-                        -- upvalues: l_default_0 (ref)
-                        if v74 ~= nil then
-                            l_default_0:MuteAll(false, "AudioFocusManagement UGC");
-                        end;
-                    end);
-                    l_default_0:ShowVoiceUI();
-                    return;
-                else
-                    v3:info("UGC audio focus requested denied, preparing to deafen.");
-                    l_default_0.muteChanged.Event:Once(function(v75) --[[ Line: 287 ]]
-                        -- upvalues: l_default_0 (ref)
-                        if v75 ~= nil then
-                            l_default_0:MuteAll(true, "AudioFocusManagement UGC");
-                        end;
-                    end);
-                    l_default_0:HideVoiceUI();
-                    return;
-                end;
-            end):catch(function() --[[ Line: 295 ]]
-                -- upvalues: v3 (ref)
-                v3:info("[UGC] Error requesting focus inside UGCdatamodel");
-            end);
-        end;
-    end):catch(function() --[[ Line: 300 ]]
-        -- upvalues: v3 (copy)
-        v3:info("VCSM was not initialized [CEV ExperienceAudioFocusBinder]");
-    end);
-end;
+	default:asyncInit():andThen(function() -- line: 219
+		-- upvalues: Constants2 (copy), default (copy), v4 (copy), Promise (copy)
+		local ok, result = pcall(function() -- line: 220
+			return game:GetService("AudioFocusService")
+		end)
+
+		if ok and result then
+			local CONTEXT_ID = Constants2.AUDIO_FOCUS_MANAGEMENT.UGC.CONTEXT_ID
+			local FOCUS_PRIORITY = Constants2.AUDIO_FOCUS_MANAGEMENT.UGC.FOCUS_PRIORITY
+
+			result:RegisterContextIdFromLua(CONTEXT_ID)
+			result.OnDeafenVoiceAudio:Connect(function(p12) -- line: 249
+				-- upvalues: CONTEXT_ID (copy), v4 (copy), default (copy)
+				if p12 == CONTEXT_ID then
+					v4:info("UGC OnDeafenVoiceAudio fired" .. p12)
+					default:MuteAll(true, "AudioFocusManagement UGC")
+
+					if not default.localMuted then
+						default:ToggleMic("AudioFocusManagement - UGC deafenAll")
+					end
+
+					default:HideVoiceUI()
+				end
+			end)
+			result.OnUndeafenVoiceAudio:Connect(function(p13) -- line: 256
+				-- upvalues: CONTEXT_ID (copy), v4 (copy), default (copy)
+				if p13 == CONTEXT_ID then
+					v4:info("UGC OnUndeafenVoiceAudio fired" .. p13)
+					default:MuteAll(false, "AudioFocusManagement UGC")
+
+					if not default.localMuted then
+						default:ToggleMic("AudioFocusManagement - UGC undeafenAll")
+					end
+
+					default:ShowVoiceUI()
+				end
+			end)
+			Promise.new(function(resolve, reject) -- line: 264
+				-- upvalues: result (copy), CONTEXT_ID (copy), FOCUS_PRIORITY (copy)
+				local ok3, result3 = pcall(result.RequestFocus, result, CONTEXT_ID, FOCUS_PRIORITY)
+
+				if ok3 then
+					resolve(result3)
+
+					return
+				end
+
+				reject("Failed to call RequestFocus due to an error")
+			end):andThen(function(p14) -- line: 276
+				-- upvalues: v4 (copy), default (copy)
+				if p14 then
+					v4:info("UGC audio focus request granted, preparing to undeafen.")
+					default.muteChanged.Event:Once(function(p15) -- line: 279
+						-- upvalues: default (copy)
+						if p15 ~= nil then
+							default:MuteAll(false, "AudioFocusManagement UGC")
+						end
+					end)
+					default:ShowVoiceUI()
+
+					return
+				end
+
+				v4:info("UGC audio focus requested denied, preparing to deafen.")
+				default.muteChanged.Event:Once(function(p16) -- line: 287
+					-- upvalues: default (copy)
+					if p16 ~= nil then
+						default:MuteAll(true, "AudioFocusManagement UGC")
+					end
+				end)
+				default:HideVoiceUI()
+			end):catch(function() -- line: 295
+				-- upvalues: v4 (copy)
+				v4:info("[UGC] Error requesting focus inside UGCdatamodel")
+			end)
+		end
+	end):catch(function() -- line: 300
+		-- upvalues: v4 (copy)
+		v4:info("VCSM was not initialized [CEV ExperienceAudioFocusBinder]")
+	end)
+end

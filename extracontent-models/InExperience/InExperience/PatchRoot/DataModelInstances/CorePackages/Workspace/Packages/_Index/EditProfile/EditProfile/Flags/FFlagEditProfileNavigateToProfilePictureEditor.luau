@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileNavigateToProfilePictureEditor", false);
+return game:DefineFastFlag("EditProfileNavigateToProfilePictureEditor", false)

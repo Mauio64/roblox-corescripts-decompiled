@@ -1,3 +1,3 @@
 return {
-    ChipGroup = require(script.ChipGroup)
-};
+	ChipGroup = require(script.ChipGroup)
+}

@@ -1,15 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("BulkPurchaseApp").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return function(v3) --[[ Line: 9 ]] --[[ Name: Divider ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v1 (copy)
-    local v4 = l_useDesignTokens_0();
-    return v1.createElement("Frame", {
-        BorderSizePixel = 0, 
-        Size = UDim2.new(1, 0, 0, 1), 
-        BackgroundColor3 = v4.Semantic.Color.Common.Divider.Color3, 
-        BackgroundTransparency = v4.Semantic.Color.Common.Divider.Transparency, 
-        LayoutOrder = v3.LayoutOrder, 
-        [v1.Tag] = "data-testid=BulkPurchaseApp_Divider"
-    });
-end;
+local Parent = script:FindFirstAncestor("BulkPurchaseApp").Parent
+local React = require(Parent.React)
+local FFlagRenameDeprecatedUIBloxTokens = require(Parent.SharedFlags).FFlagRenameDeprecatedUIBloxTokens
+local useDesignTokens = require(Parent.Style).useDesignTokens
+
+local function Divider(t1: {[any]: any}) -- line: 12
+	-- upvalues: useDesignTokens (copy), React (copy), FFlagRenameDeprecatedUIBloxTokens (copy)
+	local v7 = useDesignTokens()
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, 1),
+		BackgroundColor3 = ((if not FFlagRenameDeprecatedUIBloxTokens then v7.Semantic.Color.Common.Divider else v7.Color.Stroke.Emphasis)).Color3,
+		BackgroundTransparency = ((if not FFlagRenameDeprecatedUIBloxTokens then v7.Semantic.Color.Common.Divider else v7.Color.Stroke.Emphasis)).Transparency,
+		LayoutOrder = t1.LayoutOrder,
+		[React.Tag] = "data-testid=BulkPurchaseApp_Divider"
+	})
+end
+
+return Divider

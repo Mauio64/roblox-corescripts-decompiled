@@ -16,70 +16,72 @@ local useTokens = Foundation.Hooks.useTokens
 local t1 = {
 	bodyText = "Placeholder body",
 	iconImage = nil,
-	iconSize = IconSize.Small,
 	iconCellWidth = 30,
 	cellHeight = 28,
-	onIconActivated = function() --[[ onIconActivated ]] -- line: 37
+	iconSize = IconSize.Small,
+	onIconActivated = function() -- line: 37
 	end
 }
 
-return function(t2: {[any]: any}) --[[ ConversationTypeCell ]] -- line: 42
+local function ConversationTypeCell(t2: {[any]: any}) -- line: 42
 	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useTokens (copy), useIsInExperience (copy), React (copy), BaseCell (copy), Foundation (copy), IconButton (copy)
-	local v15 = Cryo.Dictionary.join(t1, t2)
-	local v16 = useStyle()
-	local v17 = v15.style or v16
-	local Theme = v17.Theme
-	local Size_150 = v17.Tokens.Global.Size_150
-	local v20 = useTokens()
-	local v21 = useIsInExperience()
-	local v22, v23 = React.useBinding(0)
-	local v24 = React.useCallback(function(p1) -- line: 51
-		-- upvalues: v23 (copy)
-		v23(p1.AbsoluteSize.X)
+	local v16 = Cryo.Dictionary.join(t1, t2)
+	local v17 = useStyle()
+	local v18 = v16.style or v17
+	local Theme = v18.Theme
+	local Size_300 = v18.Tokens.Size.Size_300
+	local v21 = useTokens()
+	local v22 = useIsInExperience()
+	local v23, v24 = React.useBinding(0)
+	local v25 = React.useCallback(function(p1) -- line: 51
+		-- upvalues: v24 (copy)
+		v24(p1.AbsoluteSize.X)
 	end, {})
 
 	return React.createElement(BaseCell, {
-		Size = UDim2.new(1, 0, 0, v15.cellHeight),
-		BackgroundColor3 = if not v21 then Theme.BackgroundDefault.Color else v20.Color.None.Color3,
-		BackgroundTransparency = if not v21 then v17.Theme.BackgroundDefault.Transparency else v20.Color.None.Transparency,
-		LayoutOrder = v15.layoutOrder,
 		Selectable = false,
-		dividerColor3 = Theme.Divider.Color,
-		dividerTransparency = Theme.Divider.Transparency,
 		isDisabled = true,
-		showDivider = false
+		showDivider = false,
+		Size = UDim2.new(1, 0, 0, v16.cellHeight),
+		BackgroundColor3 = if not v22 then Theme.BackgroundDefault.Color else v21.Color.None.Color3,
+		BackgroundTransparency = if not v22 then v18.Theme.BackgroundDefault.Transparency else v21.Color.None.Transparency,
+		LayoutOrder = v16.layoutOrder,
+		dividerColor3 = Theme.Divider.Color,
+		dividerTransparency = Theme.Divider.Transparency
 	}, {
 		UIPadding = React.createElement("UIPadding", {
-			PaddingLeft = UDim.new(0, Size_150),
-			PaddingRight = UDim.new(0, Size_150)
+			PaddingLeft = UDim.new(0, Size_300),
+			PaddingRight = UDim.new(0, Size_300)
 		}),
 		Content = React.createElement(Foundation.View, {
 			tag = "row size-full align-y-center",
-			onAbsoluteSizeChanged = v24
+			onAbsoluteSizeChanged = v25
 		}, {
 			Text = React.createElement(Foundation.Text, {
 				LayoutOrder = 1,
-				Text = v15.bodyText,
+				tag = "size-0-full auto-x content-emphasis text-align-x-left text-title-large text-truncate-end",
+				Text = v16.bodyText,
 				sizeConstraint = {
-					MaxSize = v22:map(function(n1: number) -- line: 80
-						-- upvalues: v15 (copy)
-						local v27 = n1 - v15.iconCellWidth
+					MaxSize = v23:map(function(n1: number) -- line: 80
+						-- upvalues: v16 (copy)
+						local v28 = n1 - v16.iconCellWidth
 
-						return Vector2.new(not (v27 > 0) and 1e999 or v27, 1e999)
+						return Vector2.new(not (v28 > 0) and 1e999 or v28, 1e999)
 					end)
-				},
-				tag = "size-0-full auto-x content-emphasis text-align-x-left text-title-large text-truncate-end"
+				}
 			}),
 			InfoIcon = React.createElement(IconButton, {
 				backgroundTransparency = 1,
-				icon = v15.iconImage,
-				iconColor3 = Theme.IconDefault.Color,
-				iconSize = v15.iconSize,
-				iconTransparency = Theme.IconDefault.Transparency,
 				layoutOrder = 2,
-				size = UDim2.fromOffset(v15.iconCellWidth, v15.iconCellWidth),
-				onActivated = v15.onIconActivated
+				icon = v16.iconImage,
+				iconColor3 = Theme.IconDefault.Color,
+				iconSize = v16.iconSize,
+				iconTransparency = Theme.IconDefault.Transparency,
+				size = UDim2.fromOffset(v16.iconCellWidth, v16.iconCellWidth),
+				onActivated = v16.onIconActivated
 			})
 		})
 	})
 end
+
+return ConversationTypeCell

@@ -1,51 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+
 return {
-    init = function() --[[ Line: 11 ]] --[[ Name: init ]]
-        -- upvalues: v1 (copy)
-        local function v3(v2) --[[ Line: 12 ]] --[[ Name: generate ]]
-            return {
-                id = v2, 
-                title = string.format("default dog chat no. %d", v2), 
-                thumbnails = {
-                    "rbxassetid://2610133241"
-                }, 
-                presenceImage = "", 
-                messages = {
-                    keys = {
-                        "messageId"
-                    }, 
-                    values = {
-                        messageId = {
-                            content = "a message placeholder \240\159\142\183\240\159\144\155"
-                        }
-                    }
-                }, 
-                shortRelativeTime = "now+" .. v2, 
-                alias = "(alias)"
-            };
-        end;
-        local v4 = {};
-        for v5 = 0, 200 do
-            table.insert(v4, (v3(v5)));
-        end;
-        return {
-            getItemList = function() --[[ Line: 38 ]] --[[ Name: getItemList ]]
-                -- upvalues: v4 (copy)
-                return v4;
-            end, 
-            loadNext = function(v6) --[[ Line: 42 ]] --[[ Name: loadNext ]]
-                -- upvalues: v1 (ref), v3 (copy)
-                return v1.List.join(v6, {
-                    (v3(v6[#v6].id + 1))
-                });
-            end, 
-            loadPrevious = function(v7) --[[ Line: 46 ]] --[[ Name: loadPrevious ]]
-                -- upvalues: v1 (ref), v3 (copy)
-                return v1.List.join({
-                    (v3(v7[1].id - 1))
-                }, v7);
-            end
-        };
-    end
-};
+	init = function() -- line: 11
+		-- upvalues: Cryo (copy)
+		local function generate(p1) -- line: 12
+			return {
+				presenceImage = "",
+				alias = "(alias)",
+				id = p1,
+				title = string.format("default dog chat no. %d", p1),
+				thumbnails = { "rbxassetid://2610133241" },
+				messages = {
+					keys = { "messageId" },
+					values = {
+						messageId = {
+							content = "a message placeholder 🎷🐛"
+						}
+					}
+				},
+				shortRelativeTime = "now+" .. p1
+			}
+		end
+
+		local t1 = {}
+
+		for i = 0, 200 do
+			table.insert(t1, (generate(i)))
+		end
+
+		return {
+			getItemList = function() -- line: 38
+				-- upvalues: t1 (copy)
+				return t1
+			end,
+			loadNext = function(p2) -- line: 42
+				-- upvalues: Cryo (copy), generate (copy)
+				return Cryo.List.join(p2, { (generate(p2[#p2].id + 1)) })
+			end,
+			loadPrevious = function(p3) -- line: 46
+				-- upvalues: Cryo (copy), generate (copy)
+				return Cryo.List.join({ (generate(p3[1].id - 1)) }, p3)
+			end
+		}
+	end
+}

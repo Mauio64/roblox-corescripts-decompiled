@@ -48,20 +48,11 @@ function t1.reportCounter(s9: string, n1: number?) -- line: 49
 		u8:ReportCounter(s9, n1 or 1)
 	end
 end
-function t1.FireLikelySpeakingBubbleAnalytics(s10: string, n2: number, n3: number, s11: string) -- line: 56
-	-- upvalues: setRbxEventStream (copy)
-	setRbxEventStream("client", "voiceChat", "likelySpeakingBubbleEvent", {
-		eventType = s10,
-		universe_id = n2,
-		place_id = n3,
-		play_session_id = s11
-	})
-end
-function t1.FireRccAnalyticsDeferred(s12: string, p7) -- line: 70
+function t1.FireRccAnalyticsDeferred(s10: string, p7) -- line: 56
 	-- upvalues: sendEventDeferred (copy)
-	sendEventDeferred("RCC", "experienceChat", s12, p7)
+	sendEventDeferred("RCC", "experienceChat", s10, p7)
 end
-function t1.TelemetryLogEvent(_: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}?, t5: {[any]: any}?) -- line: 74
+function t1.TelemetryLogEvent(_: {[any]: any}, t3: {[any]: any}, t4: {[any]: any}?, t5: {[any]: any}?) -- line: 60
 	-- upvalues: TelemetryService (copy)
 	TelemetryService:LogEvent(t3, {
 		customFields = t4,
@@ -77,15 +68,39 @@ t1.DefaultStandardizedFields = {
 }
 t1.RewriteDropdownToggledConfig = {
 	eventName = "RewriteDropdownToggled",
+	description = "When a user activates the AI rewrite dropdown toggle on a rewritten chat message.",
+	links = "",
 	backends = { "EventIngest" },
 	throttlingPercentage = game:DefineFastInt("ExpChatRewriteDropdownToggledThrottlePerMyriad", 10000),
 	lastUpdated = {
 		26,
 		4,
 		21
-	},
-	description = "When a user activates the AI rewrite dropdown toggle on a rewritten chat message.",
-	links = ""
+	}
+}
+t1.ExpChatGlobalChatTabClickedConfig = {
+	eventName = "ExpChatGlobalChatTabClicked",
+	description = "When a user selects the Global channel tab in the experience chat channel bar.",
+	links = "",
+	backends = { "EventIngest" },
+	throttlingPercentage = game:DefineFastInt("ExpChatGlobalChatTabClickedThrottlePerMyriad", 0),
+	lastUpdated = {
+		26,
+		5,
+		13
+	}
+}
+t1.ExpChatPresetActionConfig = {
+	eventName = "ExpChatPresetAction",
+	description = "When a user interacts with the preset chat UI.",
+	links = "https://roblox.atlassian.net/browse/EXPCHAT-1243",
+	backends = { "EventIngest" },
+	throttlingPercentage = game:DefineFastInt("ExpChatPresetActionThrottlePerMyriad", 10000),
+	lastUpdated = {
+		26,
+		6,
+		1
+	}
 }
 
 return t1

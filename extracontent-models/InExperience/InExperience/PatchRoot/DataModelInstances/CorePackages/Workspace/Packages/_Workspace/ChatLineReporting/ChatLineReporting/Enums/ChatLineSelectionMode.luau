@@ -1,4 +1,4 @@
 return {
-    Radio = "radio", 
-    Direct = "direct"
-};
+	Radio = "radio",
+	Direct = "direct"
+}

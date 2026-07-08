@@ -1,395 +1,430 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.RoactRodux);
-local l_RoactServices_0 = require(l_Parent_0.RoactServices).RoactServices;
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local v6 = require(l_Parent_0.t);
-local v7 = require(l_Parent_0.tutils);
-local v8 = require(l_Parent_0.ArgCheck);
-local v9 = require(l_Parent_0.UIBlox);
-local l_withStyle_0 = v9.Style.withStyle;
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local v12 = require(l_script_FirstAncestor_0.Components.FitChildren);
-local v13 = require(l_script_FirstAncestor_0.Components.FitTextLabel);
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local v16 = require(l_script_FirstAncestor_0.Components.Logger);
-local v17 = require(l_script_FirstAncestor_0.Enums.IssueCondition);
-local v18 = require(l_script_FirstAncestor_0.Enums.InputValidity);
-local v19 = v2.createBinding(0);
-local v20 = v6.interface({
-    validateFunction = v6.callback, 
-    getIssueMessageList = v6.callback, 
-    getDefaultIssues = v6.callback
-});
-local v21 = v2.PureComponent:extend("IssueTracker");
-local v22 = require(l_Parent_0.SharedFlags);
-local l_FFlagSignUpTrackFailedRequest_0 = v22.FFlagSignUpTrackFailedRequest;
-local l_FFlagLuaEnableIssueTrackerSorting_0 = v22.FFlagLuaEnableIssueTrackerSorting;
-v21.init = function(v25) --[[ Line: 51 ]] --[[ Name: init ]]
-    -- upvalues: v20 (copy), v17 (copy), v18 (copy), v2 (copy), l_FFlagSignUpTrackFailedRequest_0 (copy), v16 (copy), v7 (copy)
-    local l_validator_0 = v25.props.validator;
-    assert(v20(l_validator_0));
-    local v27 = l_validator_0.getIssueMessageList();
-    local v28 = l_validator_0.getDefaultIssues();
-    local v29 = {};
-    for v30 in pairs(v27) do
-        local v31 = false;
-        if v28[v30] ~= v17.Hidden then
-            v31 = true;
-        end;
-        v29[v30] = v31;
-    end;
-    v25.state = {
-        listOfIssuesOnDisplay = v29, 
-        issueMessageList = v27, 
-        issueCondition = v28, 
-        inputValidity = v18.Unvalidated
-    };
-    v25.isMounted = false;
-    v25.containerRef = v2.createRef();
-    v25.validateText = function() --[[ Line: 78 ]]
-        -- upvalues: v25 (copy), v20 (ref), l_validator_0 (copy), v18 (ref), l_FFlagSignUpTrackFailedRequest_0 (ref), v16 (ref)
-        local l_networking_0 = v25.props.networking;
-        local l_textToValidate_0 = v25.props.textToValidate;
-        local l_validate_0 = v25.props.validate;
-        local l_validatorAdditionalProps_0 = v25.props.validatorAdditionalProps;
-        local l_issueCondition_0 = v25.state.issueCondition;
-        assert(v20(l_validator_0));
-        l_validate_0(l_networking_0, l_validator_0.validateFunction, l_textToValidate_0, l_issueCondition_0, l_validatorAdditionalProps_0):andThen(function(v37) --[[ Line: 91 ]]
-            -- upvalues: v25 (ref), v18 (ref), l_FFlagSignUpTrackFailedRequest_0 (ref)
-            spawn(function() --[[ Line: 92 ]]
-                -- upvalues: v25 (ref), v18 (ref), v37 (copy), l_FFlagSignUpTrackFailedRequest_0 (ref)
-                local l_onTextValidated_0 = v25.props.onTextValidated;
-                local l_textToValidate_1 = v25.props.textToValidate;
-                local l_Invalid_0 = v18.Invalid;
-                if v25.isMounted and v37.Input == l_textToValidate_1 then
-                    if l_textToValidate_1 == "" then
-                        l_Invalid_0 = v18.Unvalidated;
-                    elseif v37.InputValid then
-                        l_Invalid_0 = v18.Valid;
-                    end;
-                    if l_onTextValidated_0 then
-                        if l_FFlagSignUpTrackFailedRequest_0 then
-                            l_onTextValidated_0(v37.Input, l_Invalid_0, v37.hasRequestFailed);
-                        else
-                            l_onTextValidated_0(v37.Input, l_Invalid_0);
-                        end;
-                    end;
-                    v25:setState({
-                        issueCondition = v37.IssueCondition, 
-                        inputValidity = l_Invalid_0
-                    });
-                    if v25.props.updateIssueCondition then
-                        v25.props.updateIssueCondition(v37.IssueCondition);
-                    end;
-                end;
-            end);
-        end, function(v41) --[[ Line: 124 ]]
-            -- upvalues: v16 (ref), v25 (ref), v18 (ref)
-            v16:warning(string.format("Input issueTracker error: %s", (tostring(v41))));
-            v25:setState({
-                inputValidity = v18.Unvalidated
-            });
-        end);
-    end;
-    v25.updateListOfIssuesOnDisplay = function() --[[ Line: 134 ]]
-        -- upvalues: v25 (copy), v17 (ref), v7 (ref)
-        local l_height_0 = v25.props.height;
-        local l_issueMessageList_0 = v25.state.issueMessageList;
-        local l_issueCondition_1 = v25.state.issueCondition;
-        local v45 = 0;
-        local v46 = {};
-        local v47 = {};
-        local v48 = {};
-        local v49 = {};
-        local v50 = v25.containerRef.current and v25.containerRef.current:GetChildren() or {};
-        for _, v52 in pairs(v50) do
-            if v52:IsA("GuiObject") then
-                v49[v52.Name] = v52.AbsoluteSize.Y;
-            end;
-        end;
-        for v53 in pairs(l_issueMessageList_0) do
-            v46[v53] = false;
-            local v54 = l_issueCondition_1[v53] == v17.Problematic;
-            if l_issueCondition_1[v53] ~= v17.Hidden then
-                local v55 = v49[v53] or 0;
-                table.insert(v47, v53);
-                v45 = v45 + v55;
-                if not v54 then
-                    table.insert(v48, #v47);
-                end;
-            end;
-        end;
-        v45 = v45 + (#v47 - 1) * 5;
-        if l_height_0 then
-            for v56 = #v48, 1, -1 do
-                if l_height_0 < v45 then
-                    local v57 = v48[v56];
-                    v45 = v45 - (v49[v47[v57]] or 0) - 5;
-                    table.remove(v47, v57);
-                else
-                    break;
-                end;
-            end;
-            for v58 = #v47, 1, -1 do
-                if l_height_0 < v45 then
-                    v45 = v45 - (v49[v47[v58]] or 0) - 5;
-                    table.remove(v47, v58);
-                else
-                    break;
-                end;
-            end;
-        end;
-        for _, v60 in pairs(v47) do
-            v46[v60] = true;
-        end;
-        spawn(function() --[[ Line: 210 ]]
-            -- upvalues: v25 (ref), v7 (ref), v46 (copy)
-            if v25.isMounted and not v7.shallowEqual(v46, v25.state.listOfIssuesOnDisplay) then
-                v25:setState({
-                    listOfIssuesOnDisplay = v46
-                });
-            end;
-        end);
-    end;
-end;
-v21.didMount = function(v61) --[[ Line: 222 ]] --[[ Name: didMount ]]
-    v61.isMounted = true;
-    v61.updateListOfIssuesOnDisplay();
-end;
-v21.willUnmount = function(v62) --[[ Line: 227 ]] --[[ Name: willUnmount ]]
-    v62.isMounted = false;
-end;
-v21.didUpdate = function(v63, v64, _) --[[ Line: 231 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v8 (copy), v7 (copy), l_FFlagSignUpTrackFailedRequest_0 (copy)
-    local l_validator_1 = v63.props.validator;
-    local l_validatorAdditionalProps_1 = v63.props.validatorAdditionalProps;
-    local l_textToValidate_2 = v63.props.textToValidate;
-    if l_validator_1 ~= v64.validator then
-        v8.assert(l_validator_1 == v64.validator, "IssueTracker expects the validator to never change");
-    end;
-    if l_textToValidate_2 ~= v64.textToValidate or not v7.shallowEqual(l_validatorAdditionalProps_1, v64.validatorAdditionalProps) then
-        spawn(function() --[[ Line: 244 ]]
-            -- upvalues: l_FFlagSignUpTrackFailedRequest_0 (ref), v63 (copy), l_textToValidate_2 (copy)
-            if l_FFlagSignUpTrackFailedRequest_0 then
-                task.wait(if v63.props.debounceTime then v63.props.debounceTime else 0.3);
-            else
-                wait(0.3);
-            end;
-            if v63.props.textToValidate == l_textToValidate_2 then
-                v63.validateText();
-            end;
-        end);
-    end;
-    v63.updateListOfIssuesOnDisplay();
-end;
-v21.render = function(v69) --[[ Line: 260 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v19 (copy), v2 (copy), l_FFlagLuaEnableIssueTrackerSorting_0 (copy), v17 (copy), l_withLocalization_0 (copy), v18 (copy), v12 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), v13 (copy)
-    local l_height_1 = v69.props.height;
-    local l_issueMessageList_1 = v69.state.issueMessageList;
-    local l_issueCondition_2 = v69.state.issueCondition;
-    local l_listOfIssuesOnDisplay_0 = v69.state.listOfIssuesOnDisplay;
-    return l_withStyle_0(function(v74) --[[ Line: 268 ]]
-        -- upvalues: v69 (copy), v19 (ref), v2 (ref), l_issueMessageList_1 (copy), l_FFlagLuaEnableIssueTrackerSorting_0 (ref), l_issueCondition_2 (copy), v17 (ref), l_withLocalization_0 (ref), v18 (ref), v12 (ref), l_listOfIssuesOnDisplay_0 (copy), l_ImageSetLabel_0 (ref), l_GetImageData_0 (ref), v13 (ref), l_height_1 (copy)
-        local l_Font_0 = v74.Font.CaptionBody.Font;
-        local v76 = v74.Font.BaseSize * v74.Font.CaptionBody.RelativeSize;
-        local l_contentTransparency_0 = v69.props.contentTransparency;
-        local v78 = v69.props.checkmarkTransparency or v19;
-        if not l_contentTransparency_0 then
-            local l_Transparency_0 = v74.Theme.TextDefault.Transparency;
-            if l_Transparency_0 ~= v69.textDefaultTransparency then
-                v69.textDefaultTransparency = l_Transparency_0;
-                v69.textDefaultTransparencyBinding = v2.createBinding(l_Transparency_0);
-            end;
-            l_contentTransparency_0 = v69.textDefaultTransparencyBinding;
-        end;
-        local v80 = v2.joinBindings({
-            content = l_contentTransparency_0, 
-            checkmark = v78
-        });
-        local v81 = {};
-        for v82 in pairs(l_issueMessageList_1) do
-            table.insert(v81, v82);
-        end;
-        if l_FFlagLuaEnableIssueTrackerSorting_0 and v69.props.sortProblematicIssues then
-            table.sort(v81, function(v83, v84) --[[ Line: 294 ]]
-                -- upvalues: l_issueCondition_2 (ref), v17 (ref)
-                if l_issueCondition_2[v83] == v17.Problematic and l_issueCondition_2[v84] ~= v17.Problematic then
-                    return true;
-                else
-                    return false;
-                end;
-            end);
-        end;
-        if l_FFlagLuaEnableIssueTrackerSorting_0 then
-            return l_withLocalization_0(l_issueMessageList_1)(function(v85) --[[ Line: 307 ]]
-                -- upvalues: v2 (ref), v69 (ref), v81 (copy), l_issueCondition_2 (ref), v17 (ref), v18 (ref), v12 (ref), l_listOfIssuesOnDisplay_0 (ref), l_ImageSetLabel_0 (ref), l_GetImageData_0 (ref), v74 (copy), v80 (copy), v13 (ref), l_Font_0 (copy), v76 (copy), l_contentTransparency_0 (ref), l_height_1 (ref), v78 (copy)
-                local v86 = {
-                    v2.createElement("UIListLayout", {
-                        Padding = UDim.new(0, 5), 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        [v2.Change.AbsoluteContentSize] = v69.updateListOfIssuesOnDisplay
-                    })
-                };
-                for v87, v88 in ipairs(v81) do
-                    local v89 = l_issueCondition_2[v88] == v17.Problematic;
-                    local v90 = v89 and v69.state.inputValidity ~= v18.Unvalidated;
-                    v86[v88] = v2.createElement(v12.FitFrame, {
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        fitAxis = v12.FitAxis.Height, 
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = v87, 
-                        Visible = l_listOfIssuesOnDisplay_0[v88]
-                    }, {
-                        List = v2.createElement("UIListLayout", {
-                            FillDirection = Enum.FillDirection.Horizontal, 
-                            Padding = UDim.new(0, 7), 
-                            SortOrder = Enum.SortOrder.LayoutOrder
-                        }), 
-                        CheckHolder = v2.createElement("Frame", {
-                            Size = UDim2.new(0, 12, 0, 12), 
-                            LayoutOrder = 1, 
-                            BackgroundTransparency = 1
-                        }, {
-                            CheckMark = v2.createElement(l_ImageSetLabel_0, {
-                                BackgroundTransparency = 1, 
-                                Image = if v89 then l_GetImageData_0("LuaApp/icons/navigation/close") or "LuaApp/icons/navigation/close" else l_GetImageData_0("LuaApp/icons/progress_small") or "LuaApp/icons/progress_small", 
-                                ImageColor3 = v90 and v74.Theme.Alert.Color or v74.Theme.TextDefault.Color, 
-                                ImageTransparency = v80:map(function(v91) --[[ Line: 344 ]]
-                                    return (v91.content - 1) * (1 - v91.checkmark) + 1;
-                                end), 
-                                Size = UDim2.new(1, 0, 1, 0), 
-                                Position = UDim2.new(0.5, 0, 0.65, 0), 
-                                AnchorPoint = Vector2.new(0.5, 0.5)
-                            })
-                        }), 
-                        IssueLabel = v2.createElement(v13, {
-                            LayoutOrder = 2, 
-                            Size = UDim2.new(1, 0, 0, 0), 
-                            fitAxis = v12.FitAxis.Height, 
-                            BackgroundTransparency = 1, 
-                            Text = v85[v88], 
-                            TextWrapped = true, 
-                            Font = l_Font_0, 
-                            TextSize = v76, 
-                            TextColor3 = v90 and v74.Theme.Alert.Color or v74.Theme.TextDefault.Color, 
-                            TextTransparency = l_contentTransparency_0, 
-                            TextXAlignment = Enum.TextXAlignment.Left
-                        })
-                    });
-                end;
-                if l_height_1 then
-                    return v2.createElement("Frame", {
-                        Size = UDim2.new(1, 0, 0, l_height_1), 
-                        BackgroundTransparency = 1, 
-                        [v2.Ref] = v69.containerRef, 
-                        Position = v78:map(function(v92) --[[ Line: 374 ]]
-                            return UDim2.new(0, 19 * -v92, 0, 0);
-                        end)
-                    }, v86);
-                else
-                    return v2.createElement(v12.FitFrame, {
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        fitAxis = v12.FitAxis.Height, 
-                        BackgroundTransparency = 1, 
-                        [v2.Ref] = v69.containerRef, 
-                        Position = v78:map(function(v93) --[[ Line: 384 ]]
-                            return UDim2.new(0, 19 * -v93, 0, 0);
-                        end)
-                    }, v86);
-                end;
-            end);
-        else
-            return l_withLocalization_0(l_issueMessageList_1)(function(v94) --[[ Line: 392 ]]
-                -- upvalues: v2 (ref), v69 (ref), l_issueMessageList_1 (ref), l_issueCondition_2 (ref), v17 (ref), v18 (ref), v12 (ref), l_listOfIssuesOnDisplay_0 (ref), l_ImageSetLabel_0 (ref), l_GetImageData_0 (ref), v74 (copy), v80 (copy), v13 (ref), l_Font_0 (copy), v76 (copy), l_contentTransparency_0 (ref), l_height_1 (ref), v78 (copy)
-                local v95 = {
-                    v2.createElement("UIListLayout", {
-                        Padding = UDim.new(0, 5), 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        [v2.Change.AbsoluteContentSize] = v69.updateListOfIssuesOnDisplay
-                    })
-                };
-                for v96, v97 in pairs(l_issueMessageList_1) do
-                    local v98 = l_issueCondition_2[v96] == v17.Problematic;
-                    local v99 = v98 and v69.state.inputValidity ~= v18.Unvalidated;
-                    v95[v96] = v2.createElement(v12.FitFrame, {
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        fitAxis = v12.FitAxis.Height, 
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = string.byte(v97, #v97), 
-                        Visible = l_listOfIssuesOnDisplay_0[v96]
-                    }, {
-                        List = v2.createElement("UIListLayout", {
-                            FillDirection = Enum.FillDirection.Horizontal, 
-                            Padding = UDim.new(0, 7), 
-                            SortOrder = Enum.SortOrder.LayoutOrder
-                        }), 
-                        CheckHolder = v2.createElement("Frame", {
-                            Size = UDim2.new(0, 12, 0, 12), 
-                            LayoutOrder = 1, 
-                            BackgroundTransparency = 1
-                        }, {
-                            CheckMark = v2.createElement(l_ImageSetLabel_0, {
-                                BackgroundTransparency = 1, 
-                                Image = if v98 then l_GetImageData_0("LuaApp/icons/navigation/close") or "LuaApp/icons/navigation/close" else l_GetImageData_0("LuaApp/icons/progress_small") or "LuaApp/icons/progress_small", 
-                                ImageColor3 = v99 and v74.Theme.Alert.Color or v74.Theme.TextDefault.Color, 
-                                ImageTransparency = v80:map(function(v100) --[[ Line: 429 ]]
-                                    return (v100.content - 1) * (1 - v100.checkmark) + 1;
-                                end), 
-                                Size = UDim2.new(1, 0, 1, 0), 
-                                Position = UDim2.new(0.5, 0, 0.65, 0), 
-                                AnchorPoint = Vector2.new(0.5, 0.5)
-                            })
-                        }), 
-                        IssueLabel = v2.createElement(v13, {
-                            LayoutOrder = 2, 
-                            Size = UDim2.new(1, 0, 0, 0), 
-                            fitAxis = v12.FitAxis.Height, 
-                            BackgroundTransparency = 1, 
-                            Text = v94[v96], 
-                            TextWrapped = true, 
-                            Font = l_Font_0, 
-                            TextSize = v76, 
-                            TextColor3 = v99 and v74.Theme.Alert.Color or v74.Theme.TextDefault.Color, 
-                            TextTransparency = l_contentTransparency_0, 
-                            TextXAlignment = Enum.TextXAlignment.Left
-                        })
-                    });
-                end;
-                if l_height_1 then
-                    return v2.createElement("Frame", {
-                        Size = UDim2.new(1, 0, 0, l_height_1), 
-                        BackgroundTransparency = 1, 
-                        [v2.Ref] = v69.containerRef, 
-                        Position = v78:map(function(v101) --[[ Line: 459 ]]
-                            return UDim2.new(0, 19 * -v101, 0, 0);
-                        end)
-                    }, v95);
-                else
-                    return v2.createElement(v12.FitFrame, {
-                        Size = UDim2.new(1, 0, 0, 0), 
-                        fitAxis = v12.FitAxis.Height, 
-                        BackgroundTransparency = 1, 
-                        [v2.Ref] = v69.containerRef, 
-                        Position = v78:map(function(v102) --[[ Line: 469 ]]
-                            return UDim2.new(0, 19 * -v102, 0, 0);
-                        end)
-                    }, v95);
-                end;
-            end);
-        end;
-    end);
-end;
-v21 = v3.connect(nil, function(v103) --[[ Line: 478 ]]
-    return {
-        validate = function(v104, v105, v106, v107, v108) --[[ Line: 480 ]] --[[ Name: validate ]]
-            -- upvalues: v103 (copy)
-            return v103(v105(v104, v106, v107, v108));
-        end
-    };
-end)(v21);
-return (l_RoactServices_0.connect({
-    networking = l_RoactNetworking_0
-})(v21));
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Roact = require(AuthCommonParent.Roact)
+local RoactRodux = require(AuthCommonParent.RoactRodux)
+local RoactServices = require(AuthCommonParent.RoactServices).RoactServices
+local RoactNetworking = require(AuthCommonParent.RoactServiceTags).RoactNetworking
+local t = require(AuthCommonParent.t)
+local tutils = require(AuthCommonParent.tutils)
+local ArgCheck = require(AuthCommonParent.ArgCheck)
+local UIBlox = require(AuthCommonParent.UIBlox)
+local withStyle = UIBlox.Style.withStyle
+local withLocalization = require(AuthCommonParent.Localization).withLocalization
+local FitChildren = require(AuthCommon.Components.FitChildren)
+local FitTextLabel = require(AuthCommon.Components.FitTextLabel)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GetImageData = require(AuthCommonParent.RobloxAppAssets).GetImageData
+local Logger = require(AuthCommon.Components.Logger)
+local IssueCondition = require(AuthCommon.Enums.IssueCondition)
+local InputValidity = require(AuthCommon.Enums.InputValidity)
+local v20 = Roact.createBinding(0)
+local v21 = t.interface({
+	validateFunction = t.callback,
+	getIssueMessageList = t.callback,
+	getDefaultIssues = t.callback
+})
+local v22 = Roact.PureComponent:extend("IssueTracker")
+local SharedFlags = require(AuthCommonParent.SharedFlags)
+local FFlagSignUpTrackFailedRequest = SharedFlags.FFlagSignUpTrackFailedRequest
+local FFlagLuaEnableIssueTrackerSorting = SharedFlags.FFlagLuaEnableIssueTrackerSorting
+
+function v22.init(p1) -- line: 51
+	-- upvalues: v21 (copy), IssueCondition (copy), InputValidity (copy), Roact (copy), FFlagSignUpTrackFailedRequest (copy), Logger (copy), tutils (copy)
+	local validator = p1.props.validator
+
+	assert(v21(validator))
+
+	local v29 = validator.getIssueMessageList()
+	local v30 = validator.getDefaultIssues()
+	local t1 = {}
+
+	for k in pairs(v29) do
+		t1[k] = v30[k] ~= IssueCondition.Hidden and true
+	end
+
+	p1.state = {
+		listOfIssuesOnDisplay = t1,
+		issueMessageList = v29,
+		issueCondition = v30,
+		inputValidity = InputValidity.Unvalidated
+	}
+	p1.isMounted = false
+	p1.containerRef = Roact.createRef()
+
+	function p1.validateText() -- line: 78
+		-- upvalues: p1 (copy), v21 (copy), validator (copy), InputValidity (copy), FFlagSignUpTrackFailedRequest (copy), Logger (copy)
+		local networking = p1.props.networking
+		local textToValidate = p1.props.textToValidate
+		local validate = p1.props.validate
+		local validatorAdditionalProps = p1.props.validatorAdditionalProps
+		local issueCondition = p1.state.issueCondition
+
+		assert(v21(validator))
+		validate(networking, validator.validateFunction, textToValidate, issueCondition, validatorAdditionalProps):andThen(function(p2) -- line: 91
+			-- upvalues: p1 (copy), InputValidity (copy), FFlagSignUpTrackFailedRequest (copy)
+			spawn(function() -- line: 92
+				-- upvalues: p1 (copy), InputValidity (copy), p2 (copy), FFlagSignUpTrackFailedRequest (copy)
+				local onTextValidated = p1.props.onTextValidated
+				local textToValidate2 = p1.props.textToValidate
+				local Invalid = InputValidity.Invalid
+
+				if p1.isMounted and textToValidate2 == p2.Input then
+					if textToValidate2 == "" then
+						Invalid = InputValidity.Unvalidated
+					elseif p2.InputValid then
+						Invalid = InputValidity.Valid
+					end
+
+					if onTextValidated then
+						if FFlagSignUpTrackFailedRequest then
+							onTextValidated(p2.Input, Invalid, p2.hasRequestFailed)
+						else
+							onTextValidated(p2.Input, Invalid)
+						end
+					end
+
+					p1:setState({
+						issueCondition = p2.IssueCondition,
+						inputValidity = Invalid
+					})
+
+					if p1.props.updateIssueCondition then
+						p1.props.updateIssueCondition(p2.IssueCondition)
+					end
+				end
+			end)
+		end, function(p3) -- line: 124
+			-- upvalues: Logger (copy), p1 (copy), InputValidity (copy)
+			Logger:warning(string.format("Input issueTracker error: %s", (tostring(p3))))
+			p1:setState({
+				inputValidity = InputValidity.Unvalidated
+			})
+		end)
+	end
+	function p1.updateListOfIssuesOnDisplay() -- line: 134
+		-- upvalues: p1 (copy), IssueCondition (copy), tutils (copy)
+		local height = p1.props.height
+		local issueMessageList = p1.state.issueMessageList
+		local issueCondition = p1.state.issueCondition
+		local n1 = 0
+		local t2 = {}
+		local t3 = {}
+		local t4 = {}
+		local t5 = {}
+		local v60 = p1.containerRef.current and p1.containerRef.current:GetChildren() or {}
+
+		for _, v in pairs(v60) do
+			if v:IsA("GuiObject") then
+				t5[v.Name] = v.AbsoluteSize.Y
+			end
+		end
+
+		for k in pairs(issueMessageList) do
+			t2[k] = false
+
+			local v64 = issueCondition[k] == IssueCondition.Problematic
+
+			if issueCondition[k] ~= IssueCondition.Hidden then
+				local v65 = t5[k] or 0
+
+				table.insert(t3, k)
+				n1 += v65
+
+				if not v64 then
+					table.insert(t4, #t3)
+				end
+			end
+		end
+
+		local v66 = n1 + (#t3 - 1) * 5
+
+		if height then
+			for i = #t4, 1, -1 do
+				if not (height < v66) then
+					break
+				end
+
+				local v68 = t4[i]
+
+				v66 = v66 - (t5[t3[v68]] or 0) - 5
+				table.remove(t3, v68)
+			end
+
+			for i = #t3, 1, -1 do
+				if not (height < v66) then
+					break
+				end
+
+				v66 = v66 - (t5[t3[i]] or 0) - 5
+				table.remove(t3, i)
+			end
+		end
+
+		for _, v in pairs(t3) do
+			t2[v] = true
+		end
+
+		spawn(function() -- line: 210
+			-- upvalues: p1 (copy), tutils (copy), t2 (copy)
+			if p1.isMounted and not tutils.shallowEqual(t2, p1.state.listOfIssuesOnDisplay) then
+				p1:setState({
+					listOfIssuesOnDisplay = t2
+				})
+			end
+		end)
+	end
+end
+function v22.didMount(p4) -- line: 222
+	p4.isMounted = true
+	p4.updateListOfIssuesOnDisplay()
+end
+function v22.willUnmount(p5) -- line: 227
+	p5.isMounted = false
+end
+function v22.didUpdate(p6, p7, _) -- line: 231
+	-- upvalues: ArgCheck (copy), tutils (copy), FFlagSignUpTrackFailedRequest (copy)
+	local validator = p6.props.validator
+	local validatorAdditionalProps = p6.props.validatorAdditionalProps
+	local textToValidate = p6.props.textToValidate
+
+	if validator ~= p7.validator then
+		ArgCheck.assert(validator == p7.validator, "IssueTracker expects the validator to never change")
+	end
+
+	if textToValidate ~= p7.textToValidate or not tutils.shallowEqual(validatorAdditionalProps, p7.validatorAdditionalProps) then
+		spawn(function() -- line: 244
+			-- upvalues: FFlagSignUpTrackFailedRequest (copy), p6 (copy), textToValidate (copy)
+			if FFlagSignUpTrackFailedRequest then
+				task.wait(not p6.props.debounceTime and 0.3 or p6.props.debounceTime)
+			else
+				wait(0.3)
+			end
+
+			if p6.props.textToValidate == textToValidate then
+				p6.validateText()
+			end
+		end)
+	end
+
+	p6.updateListOfIssuesOnDisplay()
+end
+function v22.render(p9) -- line: 260
+	-- upvalues: withStyle (copy), v20 (copy), Roact (copy), FFlagLuaEnableIssueTrackerSorting (copy), IssueCondition (copy), withLocalization (copy), InputValidity (copy), FitChildren (copy), ImageSetLabel (copy), GetImageData (copy), FitTextLabel (copy)
+	local height = p9.props.height
+	local issueMessageList = p9.state.issueMessageList
+	local issueCondition = p9.state.issueCondition
+	local listOfIssuesOnDisplay = p9.state.listOfIssuesOnDisplay
+
+	return withStyle(function(p10) -- line: 268
+		-- upvalues: p9 (copy), v20 (copy), Roact (copy), issueMessageList (copy), FFlagLuaEnableIssueTrackerSorting (copy), issueCondition (copy), IssueCondition (copy), withLocalization (copy), InputValidity (copy), FitChildren (copy), listOfIssuesOnDisplay (copy), ImageSetLabel (copy), GetImageData (copy), FitTextLabel (copy), height (copy)
+		local CaptionBodyFont = p10.Font.CaptionBody.Font
+		local v74 = p10.Font.BaseSize * p10.Font.CaptionBody.RelativeSize
+		local contentTransparency = p9.props.contentTransparency
+		local v76 = p9.props.checkmarkTransparency or v20
+
+		if not contentTransparency then
+			local TextDefaultTransparency = p10.Theme.TextDefault.Transparency
+
+			if TextDefaultTransparency ~= p9.textDefaultTransparency then
+				p9.textDefaultTransparency = TextDefaultTransparency
+				p9.textDefaultTransparencyBinding = Roact.createBinding(TextDefaultTransparency)
+			end
+
+			contentTransparency = p9.textDefaultTransparencyBinding
+		end
+
+		local v78 = Roact.joinBindings({
+			content = contentTransparency,
+			checkmark = v76
+		})
+		local t6 = {}
+
+		for k in pairs(issueMessageList) do
+			table.insert(t6, k)
+		end
+
+		if FFlagLuaEnableIssueTrackerSorting and p9.props.sortProblematicIssues then
+			table.sort(t6, function(p11, p12) -- line: 294
+				-- upvalues: issueCondition (copy), IssueCondition (copy)
+				if issueCondition[p11] == IssueCondition.Problematic and issueCondition[p12] ~= IssueCondition.Problematic then
+					return true
+				end
+
+				return false
+			end)
+		end
+
+		if FFlagLuaEnableIssueTrackerSorting then
+			return withLocalization(issueMessageList)(function(p13) -- line: 307
+				-- upvalues: Roact (copy), p9 (copy), t6 (copy), issueCondition (copy), IssueCondition (copy), InputValidity (copy), FitChildren (copy), listOfIssuesOnDisplay (copy), ImageSetLabel (copy), GetImageData (copy), p10 (copy), v78 (copy), FitTextLabel (copy), CaptionBodyFont (copy), v74 (copy), contentTransparency (ref), height (copy), v76 (copy)
+				local t7 = { Roact.createElement("UIListLayout", {
+					Padding = UDim.new(0, 5),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					[Roact.Change.AbsoluteContentSize] = p9.updateListOfIssuesOnDisplay
+				}) }
+
+				for i, v in ipairs(t6) do
+					local v94 = issueCondition[v] == IssueCondition.Problematic
+					local v95 = v94 and p9.state.inputValidity ~= InputValidity.Unvalidated
+
+					t7[v] = Roact.createElement(FitChildren.FitFrame, {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 0),
+						fitAxis = FitChildren.FitAxis.Height,
+						LayoutOrder = i,
+						Visible = listOfIssuesOnDisplay[v]
+					}, {
+						List = Roact.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Horizontal,
+							Padding = UDim.new(0, 7),
+							SortOrder = Enum.SortOrder.LayoutOrder
+						}),
+						CheckHolder = Roact.createElement("Frame", {
+							LayoutOrder = 1,
+							BackgroundTransparency = 1,
+							Size = UDim2.new(0, 12, 0, 12)
+						}, {
+							CheckMark = Roact.createElement(ImageSetLabel, {
+								BackgroundTransparency = 1,
+								Image = if not v94 then GetImageData("LuaApp/icons/progress_small") or "LuaApp/icons/progress_small" else GetImageData("LuaApp/icons/navigation/close") or "LuaApp/icons/navigation/close",
+								ImageColor3 = v95 and p10.Theme.Alert.Color or p10.Theme.TextDefault.Color,
+								ImageTransparency = v78:map(function(p14) -- line: 344
+									return (p14.content - 1) * (1 - p14.checkmark) + 1
+								end),
+								Size = UDim2.new(1, 0, 1, 0),
+								Position = UDim2.new(0.5, 0, 0.65, 0),
+								AnchorPoint = Vector2.new(0.5, 0.5)
+							})
+						}),
+						IssueLabel = Roact.createElement(FitTextLabel, {
+							LayoutOrder = 2,
+							BackgroundTransparency = 1,
+							TextWrapped = true,
+							Size = UDim2.new(1, 0, 0, 0),
+							fitAxis = FitChildren.FitAxis.Height,
+							Text = p13[v],
+							Font = CaptionBodyFont,
+							TextSize = v74,
+							TextColor3 = v95 and p10.Theme.Alert.Color or p10.Theme.TextDefault.Color,
+							TextTransparency = contentTransparency,
+							TextXAlignment = Enum.TextXAlignment.Left
+						})
+					})
+				end
+
+				if height then
+					return Roact.createElement("Frame", {
+						Size = UDim2.new(1, 0, 0, height),
+						BackgroundTransparency = 1,
+						[Roact.Ref] = p9.containerRef,
+						Position = v76:map(function(p15) -- line: 374
+							return UDim2.new(0, 19 * -p15, 0, 0)
+						end)
+					}, t7)
+				end
+
+				return Roact.createElement(FitChildren.FitFrame, {
+					Size = UDim2.new(1, 0, 0, 0),
+					fitAxis = FitChildren.FitAxis.Height,
+					BackgroundTransparency = 1,
+					[Roact.Ref] = p9.containerRef,
+					Position = v76:map(function(p16) -- line: 384
+						return UDim2.new(0, 19 * -p16, 0, 0)
+					end)
+				}, t7)
+			end)
+		end
+
+		return withLocalization(issueMessageList)(function(p17) -- line: 392
+			-- upvalues: Roact (copy), p9 (copy), issueMessageList (copy), issueCondition (copy), IssueCondition (copy), InputValidity (copy), FitChildren (copy), listOfIssuesOnDisplay (copy), ImageSetLabel (copy), GetImageData (copy), p10 (copy), v78 (copy), FitTextLabel (copy), CaptionBodyFont (copy), v74 (copy), contentTransparency (ref), height (copy), v76 (copy)
+			local t8 = { Roact.createElement("UIListLayout", {
+				Padding = UDim.new(0, 5),
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				[Roact.Change.AbsoluteContentSize] = p9.updateListOfIssuesOnDisplay
+			}) }
+
+			for k, v in pairs(issueMessageList) do
+				local v100 = issueCondition[k] == IssueCondition.Problematic
+				local v101 = v100 and p9.state.inputValidity ~= InputValidity.Unvalidated
+
+				t8[k] = Roact.createElement(FitChildren.FitFrame, {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 0),
+					fitAxis = FitChildren.FitAxis.Height,
+					LayoutOrder = string.byte(v, #v),
+					Visible = listOfIssuesOnDisplay[k]
+				}, {
+					List = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Horizontal,
+						Padding = UDim.new(0, 7),
+						SortOrder = Enum.SortOrder.LayoutOrder
+					}),
+					CheckHolder = Roact.createElement("Frame", {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(0, 12, 0, 12)
+					}, {
+						CheckMark = Roact.createElement(ImageSetLabel, {
+							BackgroundTransparency = 1,
+							Image = if not v100 then GetImageData("LuaApp/icons/progress_small") or "LuaApp/icons/progress_small" else GetImageData("LuaApp/icons/navigation/close") or "LuaApp/icons/navigation/close",
+							ImageColor3 = v101 and p10.Theme.Alert.Color or p10.Theme.TextDefault.Color,
+							ImageTransparency = v78:map(function(p18) -- line: 429
+								return (p18.content - 1) * (1 - p18.checkmark) + 1
+							end),
+							Size = UDim2.new(1, 0, 1, 0),
+							Position = UDim2.new(0.5, 0, 0.65, 0),
+							AnchorPoint = Vector2.new(0.5, 0.5)
+						})
+					}),
+					IssueLabel = Roact.createElement(FitTextLabel, {
+						LayoutOrder = 2,
+						BackgroundTransparency = 1,
+						TextWrapped = true,
+						Size = UDim2.new(1, 0, 0, 0),
+						fitAxis = FitChildren.FitAxis.Height,
+						Text = p17[k],
+						Font = CaptionBodyFont,
+						TextSize = v74,
+						TextColor3 = v101 and p10.Theme.Alert.Color or p10.Theme.TextDefault.Color,
+						TextTransparency = contentTransparency,
+						TextXAlignment = Enum.TextXAlignment.Left
+					})
+				})
+			end
+
+			if height then
+				return Roact.createElement("Frame", {
+					Size = UDim2.new(1, 0, 0, height),
+					BackgroundTransparency = 1,
+					[Roact.Ref] = p9.containerRef,
+					Position = v76:map(function(p19) -- line: 459
+						return UDim2.new(0, 19 * -p19, 0, 0)
+					end)
+				}, t8)
+			end
+
+			return Roact.createElement(FitChildren.FitFrame, {
+				Size = UDim2.new(1, 0, 0, 0),
+				fitAxis = FitChildren.FitAxis.Height,
+				BackgroundTransparency = 1,
+				[Roact.Ref] = p9.containerRef,
+				Position = v76:map(function(p20) -- line: 469
+					return UDim2.new(0, 19 * -p20, 0, 0)
+				end)
+			}, t8)
+		end)
+	end)
+end
+
+local v26 = RoactRodux.connect(nil, function(p21) -- line: 478
+	return {
+		validate = function(p22, p23, p24, p25, p26) -- line: 480
+			-- upvalues: p21 (copy)
+			return p21(p23(p22, p24, p25, p26))
+		end
+	}
+end)(v22)
+
+return (RoactServices.connect({
+	networking = RoactNetworking
+})(v26))

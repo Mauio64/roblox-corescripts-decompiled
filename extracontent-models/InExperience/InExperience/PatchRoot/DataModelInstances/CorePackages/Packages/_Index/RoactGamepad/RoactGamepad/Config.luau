@@ -1,4 +1,4 @@
 return {
-    Enabled = true, 
-    DebugKeyboardBindings = nil
-};
+	Enabled = true,
+	DebugKeyboardBindings = nil
+}

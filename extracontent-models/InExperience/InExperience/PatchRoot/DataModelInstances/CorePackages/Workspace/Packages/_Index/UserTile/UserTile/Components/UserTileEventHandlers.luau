@@ -1,1 +1,1 @@
-return require(script.UserTileEventHandlers);
+return require(script.UserTileEventHandlers)

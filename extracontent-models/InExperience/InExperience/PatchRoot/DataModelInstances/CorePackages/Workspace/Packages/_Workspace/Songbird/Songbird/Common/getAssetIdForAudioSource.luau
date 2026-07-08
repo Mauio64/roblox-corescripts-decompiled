@@ -1,4 +1,5 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getAssetIdForAudioSource ]]
-    local _ = nil;
-    return (tonumber(((if v0:IsA("Sound") then v0.SoundId else if v0:IsA("AudioPlayer") then v0.Asset else nil):match("rbxassetid://(.+)"))));
-end;
+local function getAssetIdForAudioSource(p1) -- line: 1
+	return (tonumber((((if not p1:IsA("Sound") then (if not p1:IsA("AudioPlayer") then nil else p1.Asset) else p1.SoundId)):match("rbxassetid://(.+)"))))
+end
+
+return getAssetIdForAudioSource

@@ -1,16 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(script.Parent.BadgesUrlBuilder);
-return function(v4) --[[ Line: 10 ]] --[[ Name: requestRemoveBadge ]]
-    -- upvalues: v3 (copy), v1 (copy), l_HttpService_0 (copy)
-    local v5 = v3.buildBadgeRemoveUrl(v4);
-    return v1.config({
-        requestFunction = function(v6, v7, v8) --[[ Line: 14 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v1 (ref)
-            return v1.requestFunctions.RequestInternal(v6, v7, v8);
-        end
-    })(v5, "DELETE", {
-        postBody = l_HttpService_0:JSONEncode({})
-    });
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+local HttpService = game:GetService("HttpService")
+local BadgesUrlBuilder = require(script.Parent.BadgesUrlBuilder)
+
+local function requestRemoveBadge(s1: string) -- line: 10
+	-- upvalues: BadgesUrlBuilder (copy), HttpRequest (copy), HttpService (copy)
+	local v7 = BadgesUrlBuilder.buildBadgeRemoveUrl(s1)
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 14
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.RequestInternal(s2, s3, p1)
+		end
+	})(v7, "DELETE", {
+		postBody = HttpService:JSONEncode({})
+	})
+end
+
+return requestRemoveBadge

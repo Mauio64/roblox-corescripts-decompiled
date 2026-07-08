@@ -1,1 +1,1 @@
-return game:DefineFastString("FriendRequestNicknamesSocialFriendsLayer", "Social.Friends");
+return game:DefineFastString("FriendRequestNicknamesSocialFriendsLayer", "Social.Friends")

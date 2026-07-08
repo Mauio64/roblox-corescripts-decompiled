@@ -1,85 +1,93 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_CorePackages_0.Workspace.Packages.Chrome);
-local v4 = require(l_CorePackages_0.Packages.Foundation);
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_CorePackages_0.Workspace.Packages.Songbird);
-local v7 = require(l_script_FirstAncestor_0.Service);
-local v8 = require(l_script_FirstAncestor_0.Integrations.MusicUtility.Constants);
-local v9 = require(l_script_FirstAncestor_0.Integrations.CommonIcon);
-local v10 = require(l_script_FirstAncestor_0.ChromeShared.Service.WindowSizeSignal);
-local v11 = require(l_CorePackages_0.Workspace.Packages.Responsive);
-local v12 = require(l_CorePackages_0.Packages.Signals);
-local v13 = require(l_CorePackages_0.Packages.SignalsReact);
-local l_MappedSignal_0 = require(l_script_FirstAncestor_0.ChromeShared.Service.ChromeUtils).MappedSignal;
-local l_MUSIC_WINDOW_MAX_SIZE_0 = v8.MUSIC_WINDOW_MAX_SIZE;
-local l_useSignalState_0 = v13.useSignalState;
-local v17 = v10.new(l_MUSIC_WINDOW_MAX_SIZE_0.X, l_MUSIC_WINDOW_MAX_SIZE_0.Y);
-local v18 = l_MappedSignal_0.new(v7:onIntegrationStatusChanged(), function() --[[ Line: 27 ]]
-    -- upvalues: v7 (copy)
-    return v7:isWindowOpen("music_entrypoint");
-end);
-local v19, v20 = v12.createSignal(false);
-local function v21() --[[ Line: 33 ]] --[[ Name: focusMusicWindow ]]
-    -- upvalues: l_GuiService_0 (copy), v20 (copy)
-    l_GuiService_0:SetMenuIsOpen(true, "music_entrypoint");
-    v20(true);
-end;
-local function v22() --[[ Line: 38 ]] --[[ Name: unfocusMusicWindow ]]
-    -- upvalues: v20 (copy), l_GuiService_0 (copy)
-    v20(false);
-    l_GuiService_0:SetMenuIsOpen(false, "music_entrypoint");
-end;
-return v7:register({
-    initialAvailability = v7.AvailabilitySignal.Available, 
-    id = "music_entrypoint", 
-    draggable = true, 
-    cachePosition = true, 
-    windowSize = v17, 
-    label = "CoreScripts.TopBar.Music", 
-    activated = function() --[[ Line: 50 ]] --[[ Name: activated ]]
-        -- upvalues: v11 (copy), v3 (copy), v21 (copy), v18 (copy), v7 (copy)
-        if v11.GetInputModeStore(false).getLastInputType(false) == v11.Input.Directional then
-            v3.FocusUtils.FocusOffChrome(v21);
-            if not v18:get() then
-                v7:toggleWindow("music_entrypoint");
-                return;
-            end;
-        else
-            v7:toggleWindow("music_entrypoint");
-        end;
-    end, 
-    isActivated = function() --[[ Line: 66 ]] --[[ Name: isActivated ]]
-        -- upvalues: v18 (copy)
-        return v18:get();
-    end, 
-    components = {
-        Icon = function(_) --[[ Line: 70 ]] --[[ Name: Icon ]]
-            -- upvalues: v9 (copy), v18 (copy)
-            return v9("icons/common/music", "icons/common/musicFilled_medium", v18);
-        end, 
-        Window = function() --[[ Line: 73 ]] --[[ Name: Window ]]
-            -- upvalues: l_useSignalState_0 (copy), v19 (copy), v5 (copy), v4 (copy), v17 (copy), v6 (copy), v20 (copy), l_GuiService_0 (copy), v7 (copy), v22 (copy)
-            local v24 = l_useSignalState_0(v19);
-            return v5.createElement(v4.View, {
-                tag = "auto-xy", 
-                onAbsoluteSizeChanged = function(v25) --[[ Line: 78 ]] --[[ Name: onAbsoluteSizeChanged ]]
-                    -- upvalues: v17 (ref)
-                    v17:requestSize(v25.AbsoluteSize.X, v25.AbsoluteSize.Y);
-                end
-            }, {
-                ChromeWindowWrapper = v5.createElement(v6.ChromeWindowWrapper, {
-                    isFocused = v24, 
-                    onClose = function() --[[ Line: 84 ]] --[[ Name: onClose ]]
-                        -- upvalues: v20 (ref), l_GuiService_0 (ref), v7 (ref)
-                        v20(false);
-                        l_GuiService_0:SetMenuIsOpen(false, "music_entrypoint");
-                        v7:toggleWindow("music_entrypoint");
-                    end, 
-                    onUnfocus = v22
-                })
-            });
-        end
-    }
-});
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local Chrome2 = require(CorePackages.Workspace.Packages.Chrome)
+local SideSheetPlacement = Chrome2.Enums.SideSheetPlacement
+local Foundation = require(CorePackages.Packages.Foundation)
+local React = require(CorePackages.Packages.React)
+local Songbird = require(CorePackages.Workspace.Packages.Songbird)
+local Service = require(Chrome.Service)
+local Constants = require(Chrome.Integrations.MusicUtility.Constants)
+local CommonIcon = require(Chrome.Integrations.CommonIcon)
+local WindowSizeSignal = require(Chrome.ChromeShared.Service.WindowSizeSignal)
+local Responsive = require(CorePackages.Workspace.Packages.Responsive)
+local Signals = require(CorePackages.Packages.Signals)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local MappedSignal = require(Chrome.ChromeShared.Service.ChromeUtils).MappedSignal
+local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
+local MUSIC_WINDOW_MAX_SIZE = Constants.MUSIC_WINDOW_MAX_SIZE
+local useSignalState = SignalsReact.useSignalState
+local v20 = WindowSizeSignal.new(MUSIC_WINDOW_MAX_SIZE.X, MUSIC_WINDOW_MAX_SIZE.Y)
+local v21 = MappedSignal.new(Service:onIntegrationStatusChanged(), function() -- line: 31
+	-- upvalues: Service (copy)
+	return Service:isWindowOpen("music_entrypoint")
+end)
+local v22, v23 = Signals.createSignal(false)
+
+local function focusMusicWindow() -- line: 37
+	-- upvalues: GuiService (copy), v23 (copy)
+	GuiService:SetMenuIsOpen(true, "music_entrypoint")
+	v23(true)
+end
+local function unfocusMusicWindow() -- line: 42
+	-- upvalues: v23 (copy), GuiService (copy)
+	v23(false)
+	GuiService:SetMenuIsOpen(false, "music_entrypoint")
+end
+
+return Service:register({
+	id = "music_entrypoint",
+	draggable = true,
+	cachePosition = true,
+	label = "CoreScripts.TopBar.Music",
+	initialAvailability = Service.AvailabilitySignal.Available,
+	sideSheetPlacement = SideSheetPlacement.Vertical,
+	windowSize = v20,
+	activated = function() -- line: 55
+		-- upvalues: Responsive (copy), Chrome2 (copy), focusMusicWindow (copy), v21 (copy), Service (copy)
+		if Responsive.GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Directional then
+			Chrome2.FocusUtils.FocusOffChrome(focusMusicWindow)
+
+			if not v21:get() then
+				Service:toggleWindow("music_entrypoint")
+
+				return
+			end
+		else
+			Service:toggleWindow("music_entrypoint")
+		end
+	end,
+	isActivated = not FFlagChromeActivatedMappedSignal and function() -- line: 73
+		-- upvalues: v21 (copy)
+		return v21:get()
+	end or v21,
+	components = {
+		Icon = function(_) -- line: 77
+			-- upvalues: CommonIcon (copy), v21 (copy)
+			return CommonIcon("icons/common/music", "icons/common/musicFilled_medium", v21)
+		end,
+		Window = function() -- line: 80
+			-- upvalues: useSignalState (copy), v22 (copy), React (copy), Foundation (copy), v20 (copy), Songbird (copy), v23 (copy), GuiService (copy), Service (copy), unfocusMusicWindow (copy)
+			local v27 = useSignalState(v22)
+
+			return React.createElement(Foundation.View, {
+				tag = "auto-xy",
+				onAbsoluteSizeChanged = function(p2) -- line: 85
+					-- upvalues: v20 (copy)
+					v20:requestSize(p2.AbsoluteSize.X, p2.AbsoluteSize.Y)
+				end
+			}, {
+				ChromeWindowWrapper = React.createElement(Songbird.ChromeWindowWrapper, {
+					isFocused = v27,
+					onClose = function() -- line: 91
+						-- upvalues: v23 (copy), GuiService (copy), Service (copy)
+						v23(false)
+						GuiService:SetMenuIsOpen(false, "music_entrypoint")
+						Service:toggleWindow("music_entrypoint")
+					end,
+					onUnfocus = unfocusMusicWindow
+				})
+			})
+		end
+	}
+})

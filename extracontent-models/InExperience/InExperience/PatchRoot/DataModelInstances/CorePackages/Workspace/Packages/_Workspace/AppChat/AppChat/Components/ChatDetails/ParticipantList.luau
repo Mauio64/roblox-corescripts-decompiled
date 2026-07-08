@@ -10,73 +10,72 @@ local presenceSortComparator = SocialLibraries.Utils.presenceSortComparator
 local SortedList = SocialLibraries.Components.SortedList
 local ParticipantEntryRightFrame = require(script.Parent.ParticipantEntryRightFrame)
 local ParticipantEntry = require(script.Parent.ParticipantEntry)
-local FFlagAppChatShowInvitedStatusInParticipantList = require(AppChat.Flags).FFlagAppChatShowInvitedStatusInParticipantList
 local FFlagDebugAppChatEnableDomLocators = require(AppChat.Flags.FFlagDebugAppChatEnableDomLocators)
 local DomLocators = require(AppChat.Utils.DomLocators)
 local getFFlagAppChatParticipantDialogFoundationMenu = require(AppChat.Flags.getFFlagAppChatParticipantDialogFoundationMenu)
 local t1 = {
-	entries = {},
 	entryHeight = 64,
-	onEntryActivated = function(_, _) --[[ onEntryActivated ]] -- line: 38
+	pendingKey = "Feature.Chat.Label.Pending",
+	invitedKey = "Feature.SettingsHub.Label.Invited",
+	LayoutOrder = 0,
+	entries = {},
+	onEntryActivated = function(_, _) -- line: 36
 		-- upvalues: Logger (copy)
 		Logger:warning("onEntryActivated was not passed to ParticipantList")
 	end,
-	pendingKey = "Feature.Chat.Label.Pending",
-	invitedKey = "Feature.SettingsHub.Label.Invited",
-	sortComparator = presenceSortComparator,
-	LayoutOrder = 0
+	sortComparator = presenceSortComparator
 }
 
-function ParticipantList(t2: {[any]: any}) -- line: 51
-	-- upvalues: Cryo (copy), t1 (copy), getFFlagAppChatParticipantDialogFoundationMenu (copy), React (copy), useLocalization (copy), FFlagAppChatShowInvitedStatusInParticipantList (copy), ParticipantEntry (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ParticipantEntryRightFrame (copy), SortedList (copy)
-	local v21 = Cryo.Dictionary.join(t1, t2)
-	local v22 = v21.onEntryActivated or t1.onEntryActivated
-	local v23 = getFFlagAppChatParticipantDialogFoundationMenu()
-	local u24 = nil
+function ParticipantList(t2: {[any]: any}) -- line: 49
+	-- upvalues: Cryo (copy), t1 (copy), getFFlagAppChatParticipantDialogFoundationMenu (copy), React (copy), useLocalization (copy), ParticipantEntry (copy), FFlagDebugAppChatEnableDomLocators (copy), DomLocators (copy), ParticipantEntryRightFrame (copy), SortedList (copy)
+	local v20 = Cryo.Dictionary.join(t1, t2)
+	local v21 = v20.onEntryActivated or t1.onEntryActivated
+	local v22 = getFFlagAppChatParticipantDialogFoundationMenu()
+	local u23 = nil
 
-	if v23 then
-		u24 = React.useRef({})
+	if v22 then
+		u23 = React.useRef({})
 	end
 
-	local v25 = useLocalization({
-		pendingLabelText = v21.pendingKey,
-		invitedLabelText = v21.invitedKey
+	local v24 = useLocalization({
+		pendingLabelText = v20.pendingKey,
+		invitedLabelText = v20.invitedKey
 	})
 	local t3 = {}
 
-	for _, v in pairs(v21.entries) do
+	for _, v in pairs(v20.entries) do
 		local t4 = {}
-		local v30 = not v.isLocalUser
-		local v31 = v.metadata and v.metadata.isPending
+		local v29 = not v.isLocalUser
+		local v30 = v.metadata and v.metadata.isPending
 
-		if v30 or v31 then
+		if v29 or v30 then
 			local t5 = {
-				labelText = if not v31 then nil else v25.pendingLabelText,
-				shouldShowDots = v30,
-				testId = if not FFlagDebugAppChatEnableDomLocators or not v30 then nil else DomLocators.chatDetailsParticipantMoreButton(v.displayName)
+				labelText = if not v30 then nil else v24.pendingLabelText,
+				shouldShowDots = v29,
+				testId = if not FFlagDebugAppChatEnableDomLocators or not v29 then nil else DomLocators.chatDetailsParticipantMoreButton(v.displayName)
 			}
 
-			if v23 and v30 then
+			if v22 and v29 then
 				local str = tostring(v.id)
-				local v34
+				local v33
 
-				if u24 == nil then
-					v34 = nil
+				if u23 == nil then
+					v33 = nil
 				else
-					if u24.current[str] == nil then
-						u24.current[str] = React.createRef()
+					if u23.current[str] == nil then
+						u23.current[str] = React.createRef()
 					end
 
-					v34 = u24.current[str]
+					v33 = u23.current[str]
 				end
 
-				local v35 = v34
+				local v34 = v33
 
-				t5.dotsRef = v35
+				t5.dotsRef = v34
 
-				function t5.onDotsActivated() -- line: 120
-					-- upvalues: v22 (copy), v (copy), v35 (copy)
-					v22(v, v35)
+				function t5.onDotsActivated() -- line: 119
+					-- upvalues: v21 (copy), v (copy), v34 (copy)
+					v21(v, v34)
 				end
 			else
 				t5.dotsRef = nil
@@ -93,46 +92,46 @@ function ParticipantList(t2: {[any]: any}) -- line: 51
 
 	return React.createElement(SortedList, {
 		entries = t3,
-		entryHeight = v21.entryHeight,
-		renderEntry = function(p3, _) -- line: 77
-			-- upvalues: FFlagAppChatShowInvitedStatusInParticipantList (copy), v25 (copy), v23 (copy), u24 (ref), React (copy), v21 (copy), v22 (copy), ParticipantEntry (copy)
-			local v39 = FFlagAppChatShowInvitedStatusInParticipantList and (p3.metadata and p3.metadata.isInvited)
+		entryHeight = v20.entryHeight,
+		renderEntry = function(p3, _) -- line: 76
+			-- upvalues: v24 (copy), v22 (copy), u23 (ref), React (copy), v20 (copy), v21 (copy), ParticipantEntry (copy)
+			local v38 = p3.metadata and p3.metadata.isInvited
 			local str = tostring(p3.id)
 			local t6 = {
 				userId = p3.id,
-				statusText = if not v39 then nil else v25.invitedLabelText
+				statusText = if not v38 then nil else v24.invitedLabelText
 			}
 
-			if v23 then
-				local v42
+			if v22 then
+				local v41
 
-				if u24 == nil then
-					v42 = nil
+				if u23 == nil then
+					v41 = nil
 				else
-					if u24.current[str] == nil then
-						u24.current[str] = React.createRef()
+					if u23.current[str] == nil then
+						u23.current[str] = React.createRef()
 					end
 
-					v42 = u24.current[str]
+					v41 = u23.current[str]
 				end
 
-				local v43 = v42
+				local v42 = v41
 
-				t6.onActivated = str ~= v21.activeParticipantId and function() -- line: 90
-					-- upvalues: v22 (copy), p3 (copy), v43 (copy)
-					v22(p3, v43)
+				t6.onActivated = str ~= v20.activeParticipantId and function() -- line: 89
+					-- upvalues: v21 (copy), p3 (copy), v42 (copy)
+					v21(p3, v42)
 				end or nil
 			else
-				function t6.onActivated() -- line: 94
-					-- upvalues: v22 (copy), p3 (copy)
-					v22(p3, nil)
+				function t6.onActivated() -- line: 93
+					-- upvalues: v21 (copy), p3 (copy)
+					v21(p3, nil)
 				end
 			end
 
 			return React.createElement(ParticipantEntry, t6, p3.children)
 		end,
-		sortComparator = v21.sortComparator,
-		LayoutOrder = v21.LayoutOrder
+		sortComparator = v20.sortComparator,
+		LayoutOrder = v20.LayoutOrder
 	})
 end
 

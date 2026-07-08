@@ -1,25 +1,25 @@
-local function _(v0) --[[ Line: 14 ]] --[[ Name: TypeError ]]
-    return v0;
-end;
-return function(v2, v3) --[[ Line: 18 ]] --[[ Name: splitOnFirst ]]
-    if type(v2) ~= "string" or type(v3) ~= "string" then
-        error("Expected the arguments to be of type `string`");
-    end;
-    if v3 == "" then
-        return {
-            v2
-        };
-    else
-        local v4 = v2:find(v3, 1, true);
-        if v4 == nil then
-            return {
-                v2
-            };
-        else
-            return {
-                v2:sub(1, v4 - 1), 
-                v2:sub(v4 + v3:len())
-            };
-        end;
-    end;
-end;
+local function TypeError(p1) -- line: 14
+	return p1
+end
+local function splitOnFirst(p2, p3) -- line: 18
+	if type(p2) ~= "string" or type(p3) ~= "string" then
+		error("Expected the arguments to be of type `string`")
+	end
+
+	if p3 == "" then
+		return { p2 }
+	end
+
+	local v6 = p2:find(p3, 1, true)
+
+	if v6 == nil then
+		return { p2 }
+	end
+
+	return {
+		p2:sub(1, v6 - 1),
+		p2:sub(v6 + p3:len())
+	}
+end
+
+return splitOnFirst

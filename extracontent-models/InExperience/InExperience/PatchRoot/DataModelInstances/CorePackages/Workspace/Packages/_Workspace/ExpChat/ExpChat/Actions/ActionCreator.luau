@@ -1,13 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    return function(...) --[[ Line: 9 ]]
-        -- upvalues: v2 (copy), v3 (copy), v1 (ref)
-        local v4 = {
-            type = v2
-        };
-        local v5 = v3(...);
-        return (v1.Dictionary.union(v5, v4));
-    end;
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Cryo = require(Parent.Cryo)
+
+return function(s1: string, p1: ((...any) -> ...any)) -- line: 5
+	-- upvalues: Cryo (copy)
+	return function(...) -- line: 9
+		-- upvalues: s1 (copy), p1 (copy), Cryo (copy)
+		local t1 = {
+			type = s1
+		}
+		local v6 = p1(...)
+
+		return (Cryo.Dictionary.union(v6, t1))
+	end
+end

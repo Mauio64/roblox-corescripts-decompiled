@@ -1,4 +1,4 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-return (require(l_Parent_0.React).createContext(function() --[[ Line: 10 ]]
+local ParentParent = script.Parent.Parent.Parent.Parent
 
-end));
+return (require(ParentParent.React).createContext(function() -- line: 10
+end))

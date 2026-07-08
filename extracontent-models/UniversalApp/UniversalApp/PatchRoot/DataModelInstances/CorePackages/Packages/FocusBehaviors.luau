@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent._Index;
-return (require(l__Index_0.FocusBehaviors.FocusBehaviors));
+local _Index = script.Parent._Index
+
+return (require(_Index.FocusBehaviors.FocusBehaviors))

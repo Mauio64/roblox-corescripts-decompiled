@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("DHMHideHeadRefinementSubheading", false);
+return require(script.Parent.FFlagDynamicHeadsMigration) and game:DefineFastFlag("DHMHideHeadRefinementSubheading", false)

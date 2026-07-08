@@ -1,41 +1,44 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local v3 = require(l_Parent_1.Cryo);
-local _ = require(l_Parent_0.Types);
-local v5 = require(l_Parent_0.Actions.CapturesRetrieved);
-local v6 = require(l_Parent_0.Actions.CaptureManagerClosed);
-local v7 = require(l_Parent_0.Actions.CaptureManagerOpened);
-local v8 = require(l_Parent_0.Actions.UpdateSelectedCaptures);
-local v9 = {
-    IsOpen = false, 
-    SelectedCaptures = {}
-};
-return v2.createReducer(v9, {
-    [v6.name] = function(v10, _) --[[ Line: 24 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v10, {
-            IsOpen = false, 
-            SelectedCaptures = {}
-        });
-    end, 
-    [v7.name] = function(v12, _) --[[ Line: 31 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v12, {
-            IsOpen = true
-        });
-    end, 
-    [v5.name] = function(v14, v15) --[[ Line: 37 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v14, {
-            IsOpen = v14.IsOpen and #v15.captures > 0, 
-            SelectedCaptures = {}
-        });
-    end, 
-    [v8.name] = function(v16, v17) --[[ Line: 44 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v16, {
-            SelectedCaptures = v17.selectedCaptures
-        });
-    end
-});
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+local Cryo = require(ParentParentParent.Cryo)
+
+require(ParentParent.Types)
+
+local CapturesRetrieved = require(ParentParent.Actions.CapturesRetrieved)
+local CaptureManagerClosed = require(ParentParent.Actions.CaptureManagerClosed)
+local CaptureManagerOpened = require(ParentParent.Actions.CaptureManagerOpened)
+local UpdateSelectedCaptures = require(ParentParent.Actions.UpdateSelectedCaptures)
+local t1 = {
+	IsOpen = false,
+	SelectedCaptures = {}
+}
+
+return Rodux.createReducer(t1, {
+	[CaptureManagerClosed.name] = function(t2: {[any]: any}, _: {[any]: any}) -- line: 24
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(t2, {
+			IsOpen = false,
+			SelectedCaptures = {}
+		})
+	end,
+	[CaptureManagerOpened.name] = function(t4: {[any]: any}, _: {[any]: any}) -- line: 31
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(t4, {
+			IsOpen = true
+		})
+	end,
+	[CapturesRetrieved.name] = function(t6: {[any]: any}, p1) -- line: 37
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(t6, {
+			IsOpen = t6.IsOpen and #p1.captures > 0,
+			SelectedCaptures = {}
+		})
+	end,
+	[UpdateSelectedCaptures.name] = function(t7: {[any]: any}, p2) -- line: 44
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(t7, {
+			SelectedCaptures = p2.selectedCaptures
+		})
+	end
+})

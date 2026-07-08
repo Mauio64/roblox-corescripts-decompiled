@@ -1,43 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("PhoneUpsell").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local v6 = require(l_Parent_0.Roact);
-return function(v7) --[[ Line: 23 ]] --[[ Name: CountryCodeButton ]]
-    -- upvalues: l_useStyle_0 (copy), v1 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), v6 (copy)
-    local v8 = l_useStyle_0();
-    local l_Tokens_0 = v8.Tokens;
-    local l_TextField_0 = l_Tokens_0.Component.TextField;
-    local l_size_0 = v7.size;
-    local l_layoutOrder_0 = v7.layoutOrder;
-    local l_countryPrefix_0 = v7.countryPrefix;
-    local v14 = if v7.error then l_Tokens_0.Global.Color.Red.Color3 else v8.Theme.UIDefault.Color;
-    local l_Transparency_0 = v8.Theme.UIDefault.Transparency;
-    local v16 = v7.font or l_TextField_0.Base.Field.Typography.Font;
-    local v17 = v7.textSize or l_TextField_0.Base.Field.Typography.FontSize;
-    return v1.createElement(l_ImageSetLabel_0, {
-        ZIndex = 2, 
-        Size = l_size_0, 
-        BackgroundTransparency = 1, 
-        ScaleType = Enum.ScaleType.Slice, 
-        SliceCenter = Rect.new(9, 9, 9, 9), 
-        Image = l_GetImageData_0("LuaApp/buttons/buttonStroke"), 
-        ImageColor3 = v14, 
-        ImageTransparency = l_Transparency_0, 
-        LayoutOrder = l_layoutOrder_0
-    }, {
-        Button = v1.createElement("TextButton", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            Text = l_countryPrefix_0, 
-            Font = v16, 
-            TextSize = v17, 
-            TextColor3 = l_TextField_0.Base.FieldValue.ContentColor.Color3, 
-            TextTransparency = l_TextField_0.Base.FieldValue.ContentColor.Transparency, 
-            [v6.Event.Activated] = v7.onButtonClick, 
-            [v6.Ref] = v7.forwardRef
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GetImageData = require(Parent.RobloxAppAssets).GetImageData
+local Roact = require(Parent.Roact)
+
+local function CountryCodeButton(t1: {[any]: any}) -- line: 23
+	-- upvalues: useStyle (copy), React (copy), ImageSetLabel (copy), GetImageData (copy), Roact (copy)
+	local v10 = useStyle()
+	local Tokens = v10.Tokens
+	local TextField = Tokens.Component.TextField
+	local size = t1.size
+	local layoutOrder = t1.layoutOrder
+	local countryPrefix = t1.countryPrefix
+	local v16 = if not t1.error then v10.Theme.UIDefault.Color else Tokens.Color.System.Alert.Color3
+	local UIDefaultTransparency = v10.Theme.UIDefault.Transparency
+	local v18 = t1.font or TextField.Base.Field.Typography.Font
+	local v19 = t1.textSize or TextField.Base.Field.Typography.FontSize
+
+	return React.createElement(ImageSetLabel, {
+		ZIndex = 2,
+		BackgroundTransparency = 1,
+		Size = size,
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(9, 9, 9, 9),
+		Image = GetImageData("LuaApp/buttons/buttonStroke"),
+		ImageColor3 = v16,
+		ImageTransparency = UIDefaultTransparency,
+		LayoutOrder = layoutOrder
+	}, {
+		Button = React.createElement("TextButton", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Text = countryPrefix,
+			Font = v18,
+			TextSize = v19,
+			TextColor3 = TextField.Base.FieldValue.ContentColor.Color3,
+			TextTransparency = TextField.Base.FieldValue.ContentColor.Transparency,
+			[Roact.Event.Activated] = t1.onButtonClick,
+			[Roact.Ref] = t1.forwardRef
+		})
+	})
+end
+
+return CountryCodeButton

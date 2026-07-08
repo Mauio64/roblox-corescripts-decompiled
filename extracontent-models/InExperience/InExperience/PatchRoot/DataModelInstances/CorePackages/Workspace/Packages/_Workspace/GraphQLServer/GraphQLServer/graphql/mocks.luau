@@ -1,3 +1,3 @@
 return {
-    createMockVirtualEvent = require(script.createMockVirtualEvent)
-};
+	createMockVirtualEvent = require(script.createMockVirtualEvent)
+}

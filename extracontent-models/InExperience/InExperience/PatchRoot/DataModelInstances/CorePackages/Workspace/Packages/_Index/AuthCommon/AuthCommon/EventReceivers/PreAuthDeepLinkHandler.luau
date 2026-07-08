@@ -1,79 +1,91 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Thunks.User);
-local l_default_0 = require(l_Parent_0.LinkingProtocol).LinkingProtocol.default;
-local v4 = require(script.Parent.PreAuthDeepLinkMap);
-local v5 = require(l_script_FirstAncestor_0.Flags.FFlagEnablePreAuthDeepLinkHandler);
-local function v14(v6) --[[ Line: 50 ]] --[[ Name: parseQueryParams ]]
-    local v7 = {};
-    local _, v9 = string.find(v6, "?");
-    if not v9 then
-        return v7;
-    else
-        local v10 = string.sub(v6, v9 + 1);
-        for v11 in string.gmatch(v10, "[^&]+") do
-            local v12, v13 = string.match(v11, "([^=]+)=?(.*)");
-            if v12 then
-                v7[string.lower(v12)] = v13 or "";
-            end;
-        end;
-        return v7;
-    end;
-end;
-local function _(v15, v16) --[[ Line: 70 ]] --[[ Name: matchesPattern ]]
-    return string.match(v16, v15) ~= nil;
-end;
-local function _() --[[ Line: 74 ]] --[[ Name: userIsAuthenticated ]]
-    -- upvalues: v2 (copy)
-    return v2.fromLocalStorage().userId ~= -1;
-end;
-local function v24(v19) --[[ Line: 78 ]] --[[ Name: isPreauthDeeplink ]]
-    -- upvalues: v4 (copy)
-    if not v19 or v19 == "" then
-        return false;
-    else
-        local v20 = string.lower(v19);
-        for _, v22 in ipairs(v4) do
-            local l_regexPattern_0 = v22.regexPattern;
-            if string.match(v20, l_regexPattern_0) ~= nil then
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
-local function v33(v25, v26) --[[ Line: 94 ]] --[[ Name: firePreauthDeeplink ]]
-    -- upvalues: v2 (copy), v4 (copy), v14 (copy)
-    if not v25 or v25 == "" then
-        return nil;
-    else
-        local v27 = string.lower(v25);
-        local v28 = v2.fromLocalStorage().userId ~= -1;
-        for _, v30 in ipairs(v4) do
-            local l_regexPattern_1 = v30.regexPattern;
-            if string.match(v27, l_regexPattern_1) ~= nil then
-                if v30.preauthOnly and v28 then
-                    return nil;
-                else
-                    local v32 = v14(v25);
-                    return v30.handler(v32, v26);
-                end;
-            end;
-        end;
-        return nil;
-    end;
-end;
-local function v37() --[[ Line: 117 ]] --[[ Name: registerPatterns ]]
-    -- upvalues: v4 (copy), l_default_0 (copy)
-    for _, v35 in ipairs(v4) do
-        local v36 = v35.regexPattern:gsub("%%", "\\");
-        l_default_0:registerURL(v36);
-    end;
-end;
-if v5 then
-    v37();
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local User = require(AuthCommon.Thunks.User)
+local default = require(AuthCommonParent.LinkingProtocol).LinkingProtocol.default
+local PreAuthDeepLinkMap = require(script.Parent.PreAuthDeepLinkMap)
+
+local function parseQueryParams(s1: string) -- line: 50
+	local t1 = {}
+	local _, stop = string.find(s1, "?")
+
+	if not stop then
+		return t1
+	end
+
+	local v14 = string.sub(s1, stop + 1)
+
+	for match in string.gmatch(v14, "[^&]+") do
+		local v16, v17 = string.match(match, "([^=]+)=?(.*)")
+
+		if v16 then
+			t1[string.lower(v16)] = v17 or ""
+		end
+	end
+
+	return t1
+end
+local function matchesPattern(s2: string, s3: string) -- line: 70
+	return string.match(s3, s2) ~= nil
+end
+local function userIsAuthenticated() -- line: 74
+	-- upvalues: User (copy)
+	return User.fromLocalStorage().userId ~= -1
+end
+local function registerPatterns() -- line: 117
+	-- upvalues: PreAuthDeepLinkMap (copy), default (copy)
+	for _, v in ipairs(PreAuthDeepLinkMap) do
+		local v35 = v.regexPattern:gsub("%%", "\\")
+
+		default:registerURL(v35)
+	end
+end
+
+if require(AuthCommon.Flags.FFlagEnablePreAuthDeepLinkHandler) then
+	registerPatterns()
+end
+
 return {
-    isPreauthDeeplink = v24, 
-    firePreauthDeeplink = v33
-};
+	isPreauthDeeplink = function(s4: string) -- line: 78
+		-- upvalues: PreAuthDeepLinkMap (copy)
+		if not s4 or s4 == "" then
+			return false
+		end
+
+		local v21 = string.lower(s4)
+
+		for _, v in ipairs(PreAuthDeepLinkMap) do
+			local regexPattern = v.regexPattern
+
+			if string.match(v21, regexPattern) ~= nil then
+				return true
+			end
+		end
+
+		return false
+	end,
+	firePreauthDeeplink = function(s5: string, t2: {[any]: any}) -- line: 94
+		-- upvalues: User (copy), PreAuthDeepLinkMap (copy), parseQueryParams (copy)
+		if not s5 or s5 == "" then
+			return nil
+		end
+
+		local v27 = string.lower(s5)
+		local v28 = User.fromLocalStorage().userId ~= -1
+
+		for _, v in ipairs(PreAuthDeepLinkMap) do
+			local regexPattern = v.regexPattern
+
+			if string.match(v27, regexPattern) ~= nil then
+				if v.preauthOnly and v28 then
+					return nil
+				end
+
+				local v32 = parseQueryParams(s5)
+
+				return v.handler(v32, t2)
+			end
+		end
+
+		return nil
+	end
+}

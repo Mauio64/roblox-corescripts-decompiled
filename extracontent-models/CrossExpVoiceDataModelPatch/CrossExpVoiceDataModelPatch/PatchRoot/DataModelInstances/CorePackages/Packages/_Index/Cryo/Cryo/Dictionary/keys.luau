@@ -1,9 +1,13 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: keys ]]
-    local v1 = {};
-    local v2 = 1;
-    for v3 in pairs(v0) do
-        v1[v2] = v3;
-        v2 = v2 + 1;
-    end;
-    return v1;
-end;
+local function keys(p1) -- line: 4
+	local t1 = {}
+	local n1 = 1
+
+	for k in pairs(p1) do
+		t1[n1] = k
+		n1 += 1
+	end
+
+	return t1
+end
+
+return keys

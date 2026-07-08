@@ -1,42 +1,50 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v4 = {};
-local v5 = require(l_Parent_0.GraphQL);
-local l_GraphQLSchema_0 = v5.GraphQLSchema;
-local l_isNamedType_0 = v5.isNamedType;
-local l_isDirective_0 = v5.isDirective;
-local l_getObjectTypeFromTypeMap_0 = require(script.Parent.getObjectTypeFromTypeMap).getObjectTypeFromTypeMap;
-local l_rewireTypes_0 = require(script.Parent.rewire).rewireTypes;
-local l_Map_0 = v1.Map;
-v4.addTypes = function(v12, v13) --[[ Line: 61 ]] --[[ Name: addTypes ]]
-    -- upvalues: l_Map_0 (copy), l_Boolean_0 (copy), l_isNamedType_0 (copy), l_isDirective_0 (copy), l_rewireTypes_0 (copy), l_Object_0 (copy), l_GraphQLSchema_0 (copy), l_getObjectTypeFromTypeMap_0 (copy)
-    local v14 = v12:toConfig();
-    local v15 = l_Map_0.new();
-    for _, v17 in v14.types do
-        v15:set(v17.name, v17);
-    end;
-    local v18 = {};
-    for _, v20 in v14.directives do
-        v18[tostring(v20.name)] = v20;
-    end;
-    for _, v22 in v13 do
-        if l_Boolean_0.toJSBoolean(l_isNamedType_0(v22)) then
-            v15:set(v22.name, v22);
-        elseif l_Boolean_0.toJSBoolean(l_isDirective_0(v22)) then
-            v18[v22.name] = v22;
-        end;
-    end;
-    local v23 = l_rewireTypes_0(v15, (l_Object_0.values(v18)));
-    local l_typeMap_0 = v23.typeMap;
-    local l_directives_0 = v23.directives;
-    return l_GraphQLSchema_0.new(l_Object_0.assign({}, v14, {
-        query = l_getObjectTypeFromTypeMap_0(l_typeMap_0, v12:getQueryType()), 
-        mutation = l_getObjectTypeFromTypeMap_0(l_typeMap_0, v12:getMutationType()), 
-        subscription = l_getObjectTypeFromTypeMap_0(l_typeMap_0, v12:getSubscriptionType()), 
-        types = l_typeMap_0:values(), 
-        directives = l_directives_0
-    }));
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local GraphQLSchema = GraphQL.GraphQLSchema
+local isNamedType = GraphQL.isNamedType
+local isDirective = GraphQL.isDirective
+local getObjectTypeFromTypeMap = require(script.Parent.getObjectTypeFromTypeMap).getObjectTypeFromTypeMap
+local rewireTypes = require(script.Parent.rewire).rewireTypes
+local Map = LuauPolyfill.Map
+
+function t1.addTypes(p1, p2) -- line: 61
+	-- upvalues: Map (copy), Boolean (copy), isNamedType (copy), isDirective (copy), rewireTypes (copy), Object (copy), GraphQLSchema (copy), getObjectTypeFromTypeMap (copy)
+	local v15 = p1:toConfig()
+	local v16 = Map.new()
+
+	for _, v18 in v15.types do
+		v16:set(v18.name, v18)
+	end
+
+	local t2 = {}
+
+	for _, v21 in v15.directives do
+		t2[tostring(v21.name)] = v21
+	end
+
+	for _, v23 in p2 do
+		if Boolean.toJSBoolean(isNamedType(v23)) then
+			v16:set(v23.name, v23)
+		elseif Boolean.toJSBoolean(isDirective(v23)) then
+			t2[v23.name] = v23
+		end
+	end
+
+	local v24 = rewireTypes(v16, (Object.values(t2)))
+	local typeMap = v24.typeMap
+	local directives = v24.directives
+
+	return GraphQLSchema.new(Object.assign({}, v15, {
+		query = getObjectTypeFromTypeMap(typeMap, p1:getQueryType()),
+		mutation = getObjectTypeFromTypeMap(typeMap, p1:getMutationType()),
+		subscription = getObjectTypeFromTypeMap(typeMap, p1:getSubscriptionType()),
+		types = typeMap:values(),
+		directives = directives
+	}))
+end
+
+return t1

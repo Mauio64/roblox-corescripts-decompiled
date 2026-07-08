@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableUpdatedLogoutUpsellModal", false);
+return game:DefineFastFlag("EnableUpdatedLogoutUpsellModal", false)

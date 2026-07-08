@@ -1,51 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialExperienceJoin");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Localization);
-local v4 = require(l_Parent_0.UIBlox);
-local l_useLocalization_0 = v3.Hooks.useLocalization;
-local l_InteractiveAlert_0 = v4.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v4.App.Button.Enum.ButtonType;
-local v8 = require(l_script_FirstAncestor_0.Common.TextKeys);
-return function(v9) --[[ Line: 22 ]]
-    -- upvalues: l_useLocalization_0 (copy), v8 (copy), v2 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local v10 = l_useLocalization_0({
-        titleText = v8.PurchaseExperienceModalTitle, 
-        bodyText = {
-            v8.PurchaseExperienceModalBody; 
-            gameName = v9.experienceName, 
-            X = v9.price
-        }, 
-        confirmButtonText = v8.Unlock, 
-        cancelButtonText = v8.Cancel, 
-        successToastTitle = v8.SuccessPurchaseToastTitle, 
-        successToastMessage = {
-            v8.SuccessPurchaseToastMessage; 
-            gameName = v9.experienceName, 
-            price = v9.price
-        }
-    });
-    return v2.createElement(l_InteractiveAlert_0, {
-        screenSize = v9.screenSize, 
-        title = v10.titleText, 
-        bodyText = v10.bodyText, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    buttonType = nil, 
-                    props = {
-                        text = v10.cancelButtonText, 
-                        onActivated = v9.cancelPurchase
-                    }
-                }, 
-                {
-                    buttonType = l_ButtonType_0.PrimarySystem, 
-                    props = {
-                        text = v10.confirmButtonText, 
-                        onActivated = v9.purchaseExperience
-                    }
-                }
-            }
-        }
-    });
-end;
+local SocialExperienceJoin = script:FindFirstAncestor("SocialExperienceJoin")
+local SocialExperienceJoinParent = SocialExperienceJoin.Parent
+local React = require(SocialExperienceJoinParent.React)
+local Localization = require(SocialExperienceJoinParent.Localization)
+local UIBlox = require(SocialExperienceJoinParent.UIBlox)
+local useLocalization = Localization.Hooks.useLocalization
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local TextKeys = require(SocialExperienceJoin.Common.TextKeys)
+
+return function(t1: {[any]: any}) -- line: 22
+	-- upvalues: useLocalization (copy), TextKeys (copy), React (copy), InteractiveAlert (copy), ButtonType (copy)
+	local v11 = useLocalization({
+		titleText = TextKeys.PurchaseExperienceModalTitle,
+		bodyText = {
+			TextKeys.PurchaseExperienceModalBody,
+			gameName = t1.experienceName,
+			X = t1.price
+		},
+		confirmButtonText = TextKeys.Unlock,
+		cancelButtonText = TextKeys.Cancel,
+		successToastTitle = TextKeys.SuccessPurchaseToastTitle,
+		successToastMessage = {
+			TextKeys.SuccessPurchaseToastMessage,
+			gameName = t1.experienceName,
+			price = t1.price
+		}
+	})
+
+	return React.createElement(InteractiveAlert, {
+		screenSize = t1.screenSize,
+		title = v11.titleText,
+		bodyText = v11.bodyText,
+		buttonStackInfo = {
+			buttons = {
+				{
+					buttonType = nil,
+					props = {
+						text = v11.cancelButtonText,
+						onActivated = t1.cancelPurchase
+					}
+				},
+				{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						text = v11.confirmButtonText,
+						onActivated = t1.purchaseExperience
+					}
+				}
+			}
+		}
+	})
+end

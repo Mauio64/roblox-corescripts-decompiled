@@ -1,68 +1,80 @@
-local v0 = require(script.Parent.EnumNetworkStatus);
-local v1 = require(script.Parent.buildActionName);
-local v2 = require(script.Parent.Promise);
-return function(v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy), v0 (copy), v2 (copy)
-    local v4 = require(script.Parent.getStatus)(v3);
-    local function _(v5, v6, v7) --[[ Line: 8 ]] --[[ Name: actionCreator ]]
-        -- upvalues: v1 (ref), v3 (copy)
-        return {
-            ids = v5, 
-            keymapper = v6, 
-            status = v7, 
-            type = v1(v3)
-        };
-    end;
-    local function v15(v9, v10, v11) --[[ Line: 17 ]] --[[ Name: filter ]]
-        -- upvalues: v4 (copy), v0 (ref)
-        local v12 = {};
-        for _, v14 in ipairs(v10) do
-            if v4(v9, v11(v14)) ~= v0.Fetching then
-                table.insert(v12, v14);
-            end;
-        end;
-        return v12;
-    end;
-    return function(v16, v17, v18, v19) --[[ Line: 28 ]]
-        -- upvalues: v15 (copy), v3 (copy), v2 (ref), v0 (ref), v1 (ref)
-        local v20 = v15(v16:getState(), v17, v18);
-        if v3.killRequestWithFilteredIds and #v17 > 0 and #v20 == 0 then
-            return v2.reject("Request with provided IDs already fetching.");
-        else
-            local l_Fetching_0 = v0.Fetching;
-            v16:dispatch({
-                ids = v20, 
-                keymapper = v18, 
-                status = l_Fetching_0, 
-                type = v1(v3)
-            });
-            return v19(v16, v20):andThen(function(v22) --[[ Line: 38 ]]
-                -- upvalues: v16 (copy), v20 (copy), v18 (copy), v0 (ref), v1 (ref), v3 (ref)
-                local l_v16_0 = v16;
-                local l_v20_0 = v20;
-                local l_v18_0 = v18;
-                local l_Done_0 = v0.Done;
-                l_v16_0:dispatch({
-                    ids = l_v20_0, 
-                    keymapper = l_v18_0, 
-                    status = l_Done_0, 
-                    type = v1(v3)
-                });
-                return v22;
-            end, function(v27) --[[ Line: 41 ]]
-                -- upvalues: v16 (copy), v20 (copy), v18 (copy), v0 (ref), v1 (ref), v3 (ref), v2 (ref)
-                local l_v16_1 = v16;
-                local l_v20_1 = v20;
-                local l_v18_1 = v18;
-                local l_Failed_0 = v0.Failed;
-                l_v16_1:dispatch({
-                    ids = l_v20_1, 
-                    keymapper = l_v18_1, 
-                    status = l_Failed_0, 
-                    type = v1(v3)
-                });
-                return v2.reject(v27);
-            end);
-        end;
-    end;
-end;
+local EnumNetworkStatus = require(script.Parent.EnumNetworkStatus)
+local buildActionName = require(script.Parent.buildActionName)
+local Promise = require(script.Parent.Promise)
+
+return function(p1) -- line: 5
+	-- upvalues: buildActionName (copy), EnumNetworkStatus (copy), Promise (copy)
+	local v5 = require(script.Parent.getStatus)(p1)
+
+	local function actionCreator(p2, p3, p4) -- line: 8
+		-- upvalues: buildActionName (copy), p1 (copy)
+		return {
+			ids = p2,
+			keymapper = p3,
+			status = p4,
+			type = buildActionName(p1)
+		}
+	end
+	local function filter(p5, p6, p7) -- line: 17
+		-- upvalues: v5 (copy), EnumNetworkStatus (copy)
+		local t1 = {}
+
+		for _, v in ipairs(p6) do
+			if v5(p5, p7(v)) ~= EnumNetworkStatus.Fetching then
+				table.insert(t1, v)
+			end
+		end
+
+		return t1
+	end
+
+	return function(p8, p9, p10, p11) -- line: 28
+		-- upvalues: filter (copy), p1 (copy), Promise (copy), EnumNetworkStatus (copy), buildActionName (copy)
+		local v21 = filter(p8:getState(), p9, p10)
+
+		if p1.killRequestWithFilteredIds and (#p9 > 0 and #v21 == 0) then
+			return Promise.reject("Request with provided IDs already fetching.")
+		end
+
+		local Fetching = EnumNetworkStatus.Fetching
+
+		p8:dispatch({
+			ids = v21,
+			keymapper = p10,
+			status = Fetching,
+			type = buildActionName(p1)
+		})
+
+		return p11(p8, v21):andThen(function(p12) -- line: 38
+			-- upvalues: p8 (copy), v21 (copy), p10 (copy), EnumNetworkStatus (copy), buildActionName (copy), p1 (copy)
+			local v24 = p8
+			local v25 = v21
+			local v26 = p10
+			local Done = EnumNetworkStatus.Done
+
+			v24:dispatch({
+				ids = v25,
+				keymapper = v26,
+				status = Done,
+				type = buildActionName(p1)
+			})
+
+			return p12
+		end, function(p13) -- line: 41
+			-- upvalues: p8 (copy), v21 (copy), p10 (copy), EnumNetworkStatus (copy), buildActionName (copy), p1 (copy), Promise (copy)
+			local v29 = p8
+			local v30 = v21
+			local v31 = p10
+			local Failed = EnumNetworkStatus.Failed
+
+			v29:dispatch({
+				ids = v30,
+				keymapper = v31,
+				status = Failed,
+				type = buildActionName(p1)
+			})
+
+			return Promise.reject(p13)
+		end)
+	end
+end

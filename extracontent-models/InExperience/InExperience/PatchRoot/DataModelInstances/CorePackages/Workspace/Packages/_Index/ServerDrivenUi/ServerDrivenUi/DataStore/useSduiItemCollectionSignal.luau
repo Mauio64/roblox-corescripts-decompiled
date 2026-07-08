@@ -1,31 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.RobloxAppEnums);
-local _ = require(l_Parent_0.Signals);
-local v4 = require(l_Parent_0.SignalsReact);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_script_FirstAncestor_0.DataStore.getSduiFeedStore);
-local v7 = require(l_script_FirstAncestor_0.DataStore.getItemCollectionKey);
-local _ = require(l_script_FirstAncestor_0.DataStore.SduiFeedStoreTypes);
-local l_FFlagLuaAppFixInlineSignalsReactPattern_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppFixInlineSignalsReactPattern;
-return function(v10, v11, v12, v13) --[[ Line: 15 ]] --[[ Name: useSduiItemCollectionSignal ]]
-    -- upvalues: v7 (copy), l_FFlagLuaAppFixInlineSignalsReactPattern_0 (copy), v5 (copy), v6 (copy), v4 (copy)
-    local v14 = v7(v11, v12);
-    local v15 = v13 or v10;
-    local _ = nil;
-    if l_FFlagLuaAppFixInlineSignalsReactPattern_0 then
-        local v18 = v5.useCallback(function(v17) --[[ Line: 27 ]]
-            -- upvalues: v6 (ref), v15 (copy), v14 (copy)
-            return v6(v15).getItemCollection(v14, true)(v17);
-        end, {
-            v14, 
-            v15
-        });
-        return (v4.useSignalState(v18));
-    else
-        return (v4.useSignalState(function(v19) --[[ Line: 40 ]]
-            -- upvalues: v6 (ref), v15 (copy), v14 (copy)
-            return v6(v15).getItemCollection(v14, true)(v19);
-        end));
-    end;
-end;
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+
+require(ServerDrivenUiParent.RobloxAppEnums)
+require(ServerDrivenUiParent.Signals)
+
+local SignalsReact = require(ServerDrivenUiParent.SignalsReact)
+local React = require(ServerDrivenUiParent.React)
+local getSduiFeedStore = require(ServerDrivenUi.DataStore.getSduiFeedStore)
+local getItemCollectionKey = require(ServerDrivenUi.DataStore.getItemCollectionKey)
+
+require(ServerDrivenUi.DataStore.SduiFeedStoreTypes)
+
+local FFlagLuaAppFixInlineSignalsReactPattern = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppFixInlineSignalsReactPattern
+
+local function useSduiItemCollectionSignal(p1, p2, n1: number, s1: string?) -- line: 19
+	-- upvalues: getItemCollectionKey (copy), FFlagLuaAppFixInlineSignalsReactPattern (copy), React (copy), getSduiFeedStore (copy), SignalsReact (copy)
+	local v13 = getItemCollectionKey(p2, n1)
+	local v14 = s1 or p1
+
+	if FFlagLuaAppFixInlineSignalsReactPattern then
+		local v15 = React.useCallback(function(p3) -- line: 31
+			-- upvalues: getSduiFeedStore (copy), v14 (copy), v13 (copy)
+			return getSduiFeedStore(v14).getItemCollection(v13, true)(p3)
+		end, {
+			v13,
+			v14
+		})
+
+		return (SignalsReact.useSignalState(v15))
+	end
+
+	return (SignalsReact.useSignalState(function(p4) -- line: 44
+		-- upvalues: getSduiFeedStore (copy), v14 (copy), v13 (copy)
+		return getSduiFeedStore(v14).getItemCollection(v13, true)(p4)
+	end))
+end
+
+return useSduiItemCollectionSignal

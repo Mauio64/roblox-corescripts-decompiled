@@ -1,16 +1,22 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.collectSet);
-local v2 = require(l_Parent_0.forEach);
-local _ = require(l_Parent_0.Types);
-return function(v4, v5) --[[ Line: 16 ]] --[[ Name: omit ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v6 = {};
-    local v7 = v1(v5);
-    v2(v4, function(_, v9) --[[ Line: 19 ]]
-        -- upvalues: v7 (copy), v6 (copy), v4 (copy)
-        if not v7[v9] then
-            v6[v9] = v4[v9];
-        end;
-    end);
-    return v6;
-end;
+local scriptParent = script.Parent
+local collectSet = require(scriptParent.collectSet)
+local forEach = require(scriptParent.forEach)
+
+require(scriptParent.Types)
+
+local function omit(t1: {[any]: any}, t2: {[any]: any}) -- line: 16
+	-- upvalues: collectSet (copy), forEach (copy)
+	local t3 = {}
+	local v8 = collectSet(t2)
+
+	forEach(t1, function(_, p2) -- line: 19
+		-- upvalues: v8 (copy), t3 (copy), t1 (copy)
+		if not v8[p2] then
+			t3[p2] = t1[p2]
+		end
+	end)
+
+	return t3
+end
+
+return omit

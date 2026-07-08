@@ -1,36 +1,35 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.React);
-local v4 = require(l_Parent_0.ContextualSlider);
-local v5 = require(l_Parent_0.SystemSlider);
-local l_describe_0 = require(l_Parent_2.Dev.JestGlobals).describe;
-local v7 = require(l_Parent_1.Utility.benchmarks);
-local l_mountComponentTimes_0 = v7.mountComponentTimes;
-local l_scrollComponentTimes_0 = v7.scrollComponentTimes;
-local v10 = v3.createElement(v4, {
-    min = 0, 
-    max = 100, 
-    value = 0, 
-    onValueChanged = function() --[[ Line: 21 ]] --[[ Name: onValueChanged ]]
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local ContextualSlider = require(scriptParent.ContextualSlider)
+local SystemSlider = require(scriptParent.SystemSlider)
+local describe = require(ParentParentParent.Dev.JestGlobals).describe
+local benchmarks = require(ParentParent.Utility.benchmarks)
+local mountComponentTimes = benchmarks.mountComponentTimes
+local scrollComponentTimes = benchmarks.scrollComponentTimes
+local v11 = React.createElement(ContextualSlider, {
+	min = 0,
+	max = 100,
+	value = 0,
+	onValueChanged = function() -- line: 21
+	end
+})
+local v12 = React.createElement(SystemSlider, {
+	min = 0,
+	max = 100,
+	value = 0,
+	onValueChanged = function() -- line: 27
+	end
+})
 
-    end
-});
-local v11 = v3.createElement(v5, {
-    min = 0, 
-    max = 100, 
-    value = 0, 
-    onValueChanged = function() --[[ Line: 27 ]] --[[ Name: onValueChanged ]]
-
-    end
-});
-l_describe_0("ContextualSlider", function() --[[ Line: 30 ]]
-    -- upvalues: l_mountComponentTimes_0 (copy), v10 (copy), l_scrollComponentTimes_0 (copy)
-    l_mountComponentTimes_0(v10, 100, "ContextualSlider");
-    l_scrollComponentTimes_0(v10, 100, "ContextualSlider");
-end);
-l_describe_0("SystemSlider", function() --[[ Line: 34 ]]
-    -- upvalues: l_mountComponentTimes_0 (copy), v11 (copy), l_scrollComponentTimes_0 (copy)
-    l_mountComponentTimes_0(v11, 100, "SystemSlider");
-    l_scrollComponentTimes_0(v11, 100, "SystemSlider");
-end);
+describe("ContextualSlider", function() -- line: 30
+	-- upvalues: mountComponentTimes (copy), v11 (copy), scrollComponentTimes (copy)
+	mountComponentTimes(v11, 100, "ContextualSlider")
+	scrollComponentTimes(v11, 100, "ContextualSlider")
+end)
+describe("SystemSlider", function() -- line: 34
+	-- upvalues: mountComponentTimes (copy), v12 (copy), scrollComponentTimes (copy)
+	mountComponentTimes(v12, 100, "SystemSlider")
+	scrollComponentTimes(v12, 100, "SystemSlider")
+end)

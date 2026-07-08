@@ -1,103 +1,109 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.util.pcallDeferred);
-local v3 = require(l_Parent_0.Analytics);
-local v4 = require(l_Parent_0.Constants);
-local v5 = require(l_Parent_0.validation.validateMeshComparison);
-local v6 = require(l_Parent_0.util.getMeshSize);
-local v7 = require(l_Parent_0.util.getEditableMeshFromContext);
-local v8 = require(l_Parent_0.util.getExpectedPartSize);
-local v9 = require(l_Parent_0.util.getMeshInfo);
-local v10 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local function v24(v11, v12, v13) --[[ Line: 21 ]] --[[ Name: validateWrapTargetComparison ]]
-    -- upvalues: v9 (copy), v4 (copy), v5 (copy)
-    local v14 = nil;
-    local v15 = nil;
-    local v16 = nil;
-    local v17, v18, v19 = v9(v12, v4.MESH_CONTENT_TYPE.RENDER_MESH, v13);
-    v14 = v17;
-    v15 = v18;
-    v16 = v19;
-    if not v14 then
-        return false, v15;
-    else
-        v17 = v12:FindFirstChildWhichIsA("WrapTarget");
-        assert(v17, "Missing WrapTarget child for " .. v12.Name);
-        v18 = nil;
-        v19 = nil;
-        local v20 = nil;
-        local v21, v22, v23 = v9(v17, v4.MESH_CONTENT_TYPE.OUTER_CAGE, v13);
-        v18 = v21;
-        v19 = v22;
-        v20 = v23;
-        if not v18 then
-            return false, v19;
-        else
-            v16.scale = v11;
-            v20.scale = v11;
-            return v5(v16, v20, v4.RenderVsWrapMeshMaxDiff, v13);
-        end;
-    end;
-end;
-local function v32(v25, v26) --[[ Line: 52 ]] --[[ Name: calculateMeshSize ]]
-    -- upvalues: v7 (copy), v2 (copy), v6 (copy), v3 (copy)
-    local v27 = {
-        fullName = v25:GetFullName(), 
-        fieldName = "MeshId", 
-        contentId = v25.MeshId, 
-        context = v25.Name
-    };
-    local v28, v29 = v7(v25, "MeshId", v26);
-    if not v28 then
-        return false, {
-            string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", v27.fullName)
-        };
-    else
-        v27.editableMesh = v29;
-        local v30, v31 = v2(function() --[[ Line: 76 ]]
-            -- upvalues: v6 (ref), v27 (copy)
-            return v6(v27);
-        end, v26);
-        if not v30 then
-            v3.reportFailure(v3.ErrorType.validateBodyPartMeshBounds_FailedToLoadMesh, nil, v26);
-            if v26.isServer then
-                error("Failed to read mesh");
-            end;
-            return false, {
-                "Failed to read mesh"
-            };
-        else
-            return true, nil, v31;
-        end;
-    end;
-end;
-local function v41(v33, v34) --[[ Line: 94 ]] --[[ Name: validateInternal ]]
-    -- upvalues: v32 (copy), v8 (copy), v10 (copy), v24 (copy), v3 (copy)
-    local v35 = tick();
-    local v36, v37, v38 = v32(v33, v34);
-    if not v36 or not v38 then
-        return v36, v37;
-    else
-        local v39 = v8(v33, v34) / v38;
-        local v40 = v10.new();
-        v40:updateReasons(v24(v39, v33, v34));
-        v3.recordScriptTime(script.Name, v35, v34);
-        return v40:getFinalResults();
-    end;
-end;
-return function(v42, v43) --[[ Line: 115 ]] --[[ Name: validateBodyPartMeshBounds ]]
-    -- upvalues: v4 (copy), v41 (copy), v10 (copy)
-    local l_assetTypeEnum_0 = v43.assetTypeEnum;
-    local v45 = v4.ASSET_TYPE_INFO[l_assetTypeEnum_0];
-    if Enum.AssetType.DynamicHead == l_assetTypeEnum_0 then
-        return v41(v42, v43);
-    else
-        local v46 = v10.new();
-        for v47 in pairs(v45.subParts) do
-            local l_v42_FirstChild_0 = v42:FindFirstChild(v47);
-            assert(l_v42_FirstChild_0);
-            v46:updateReasons(v41(l_v42_FirstChild_0, v43));
-        end;
-        return v46:getFinalResults();
-    end;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+local validateMeshComparison = require(ParentParent.validation.validateMeshComparison)
+local getMeshSize = require(ParentParent.util.getMeshSize)
+local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
+local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
+local getMeshInfo = require(ParentParent.util.getMeshInfo)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+
+local function validateWrapTargetComparison(vector3: Vector3, p1, p2) -- line: 21
+	-- upvalues: getMeshInfo (copy), Constants (copy), validateMeshComparison (copy)
+	local v18, v19, v20 = getMeshInfo(p1, Constants.MESH_CONTENT_TYPE.RENDER_MESH, p2)
+
+	if not v18 then
+		return false, v19
+	end
+
+	local WrapTarget = p1:FindFirstChildWhichIsA("WrapTarget")
+
+	assert(WrapTarget, "Missing WrapTarget child for " .. p1.Name)
+
+	local v22, v23, v24 = getMeshInfo(WrapTarget, Constants.MESH_CONTENT_TYPE.OUTER_CAGE, p2)
+
+	if not v22 then
+		return false, v23
+	end
+
+	v20.scale = vector3
+	v24.scale = vector3
+
+	return validateMeshComparison(v20, v24, Constants.RenderVsWrapMeshMaxDiff, p2)
+end
+local function calculateMeshSize(p3, p4) -- line: 52
+	-- upvalues: getEditableMeshFromContext (copy), pcallDeferred (copy), getMeshSize (copy), Analytics (copy)
+	local t1 = {
+		fieldName = "MeshId",
+		fullName = p3:GetFullName(),
+		contentId = p3.MeshId,
+		context = p3.Name
+	}
+	local v28, v29 = getEditableMeshFromContext(p3, "MeshId", p4)
+
+	if not v28 then
+		return false, { string.format("Mesh for '%s' failed to load. Make sure the mesh exists and try again.", t1.fullName) }
+	end
+
+	t1.editableMesh = v29
+
+	local v30, v31 = pcallDeferred(function() -- line: 76
+		-- upvalues: getMeshSize (copy), t1 (copy)
+		return getMeshSize(t1)
+	end, p4)
+
+	if not v30 then
+		Analytics.reportFailure(Analytics.ErrorType.validateBodyPartMeshBounds_FailedToLoadMesh, nil, p4)
+
+		if p4.isServer then
+			error("Failed to read mesh")
+		end
+
+		return false, { "Failed to read mesh" }
+	end
+
+	return true, nil, v31
+end
+local function validateInternal(p5, p6) -- line: 94
+	-- upvalues: calculateMeshSize (copy), getExpectedPartSize (copy), FailureReasonsAccumulator (copy), validateWrapTargetComparison (copy), Analytics (copy)
+	local timestamp = tick()
+	local v35, v36, v37 = calculateMeshSize(p5, p6)
+
+	if not v35 or not v37 then
+		return v35, v36
+	end
+
+	local v38 = getExpectedPartSize(p5, p6) / v37
+	local v39 = FailureReasonsAccumulator.new()
+
+	v39:updateReasons(validateWrapTargetComparison(v38, p5, p6))
+	Analytics.recordScriptTime(script.Name, timestamp, p6)
+
+	return v39:getFinalResults()
+end
+local function validateBodyPartMeshBounds(p7, p8) -- line: 115
+	-- upvalues: Constants (copy), validateInternal (copy), FailureReasonsAccumulator (copy)
+	local assetTypeEnum = p8.assetTypeEnum
+	local v43 = Constants.ASSET_TYPE_INFO[assetTypeEnum]
+
+	if assetTypeEnum == Enum.AssetType.DynamicHead then
+		return validateInternal(p7, p8)
+	end
+
+	local v44 = FailureReasonsAccumulator.new()
+
+	for k in pairs(v43.subParts) do
+		local k2 = p7:FindFirstChild(k)
+
+		assert(k2)
+		v44:updateReasons(validateInternal(k2, p8))
+	end
+
+	return v44:getFinalResults()
+end
+
+return validateBodyPartMeshBounds

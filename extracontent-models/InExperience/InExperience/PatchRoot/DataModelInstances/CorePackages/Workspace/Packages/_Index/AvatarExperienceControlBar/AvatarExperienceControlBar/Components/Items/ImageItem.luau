@@ -1,61 +1,65 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_usePulseAnimationBinding_0 = require(l_Parent_0.AvatarExperienceCommon).Hooks.usePulseAnimationBinding;
-local v5 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local v6 = require(l_script_FirstAncestor_0.Hooks.useHoverBinding);
-return v2.forwardRef(function(v7, v8) --[[ Line: 25 ]] --[[ Name: ImageItem ]]
-    -- upvalues: v5 (copy), v6 (copy), v2 (copy), l_usePulseAnimationBinding_0 (copy), v3 (copy)
-    local v9 = v5();
-    local v10, v11 = v6();
-    local v12 = v2.useRef(nil);
-    local v13 = if v7.size then v7.size else v9.defaultIconContainerSize;
-    local v14 = l_usePulseAnimationBinding_0(v7.enableFocusAnimation);
-    return v2.createElement(v3.View, {
-        tag = "auto-xy radius-circle", 
-        ref = v8, 
-        LayoutOrder = v7.LayoutOrder, 
-        stateLayer = {
-            affordance = v3.Enums.StateLayerAffordance.None
-        }, 
-        onStateChanged = v11, 
-        onActivated = v7.onActivated, 
-        disabled = v7.disabled, 
-        Visible = v7.Visible
-    }, {
-        Thumbnail = v2.createElement(v3.Image, {
-            Image = v7.thumbnailUrl, 
-            Size = UDim2.fromOffset(v13, v13), 
-            tag = "radius-circle", 
-            backgroundStyle = v10:map(function(v15) --[[ Line: 49 ]]
-                -- upvalues: v9 (copy)
-                if v15 then
-                    return v9.hoverThumbnailBackgroundStyle;
-                else
-                    return v9.thumbnailBackgroundStyle;
-                end;
-            end)
-        }), 
-        Indicator = if not v7.hideIndicator then v2.createElement(v3.View, {
-            tag = "auto-xy position-bottom-right anchor-bottom-right bg-surface-300 radius-circle size-400-400", 
-            ZIndex = 2
-        }, {
-            IndicatorImage = v2.createElement(v3.Image, {
-                Image = "icons/actions/truncationExpand_small", 
-                imageStyle = v9.contentForegroundStyle, 
-                tag = "radius-circle position-center-center anchor-center-center size-250-250"
-            })
-        }) else nil, 
-        UIStroke = if v7.enableFocusAnimation then v2.createElement("UIStroke", {
-            Color = v9.imageBorderFocusStyle, 
-            Thickness = v14:map(function(v16) --[[ Line: 71 ]]
-                return v16.thickness;
-            end), 
-            Transparency = v14:map(function(v17) --[[ Line: 74 ]]
-                return v17.transparency;
-            end), 
-            ref = v12
-        }) else nil
-    });
-end);
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local usePulseAnimationBinding = require(AvatarExperienceControlBarParent.AvatarExperienceCommon).Hooks.usePulseAnimationBinding
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+
+local function ImageItem(t1: {[any]: any}, p1) -- line: 25
+	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), React (copy), usePulseAnimationBinding (copy), Foundation (copy)
+	local v11 = useSemanticTokens()
+	local v12, v13 = useHoverBinding()
+	local v14 = React.useRef(nil)
+	local v15 = if not t1.size then v11.defaultIconContainerSize else t1.size
+	local v16 = usePulseAnimationBinding(t1.enableFocusAnimation)
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy radius-circle",
+		ref = p1,
+		LayoutOrder = t1.LayoutOrder,
+		stateLayer = {
+			affordance = Foundation.Enums.StateLayerAffordance.None
+		},
+		onStateChanged = v13,
+		onActivated = t1.onActivated,
+		disabled = t1.disabled,
+		Visible = t1.Visible
+	}, {
+		Thumbnail = React.createElement(Foundation.Image, {
+			tag = "radius-circle",
+			Image = t1.thumbnailUrl,
+			Size = UDim2.fromOffset(v15, v15),
+			backgroundStyle = v12:map(function(p2) -- line: 49
+				-- upvalues: v11 (copy)
+				if p2 then
+					return v11.hoverThumbnailBackgroundStyle
+				end
+
+				return v11.thumbnailBackgroundStyle
+			end)
+		}),
+		Indicator = if t1.hideIndicator then nil else React.createElement(Foundation.View, {
+			tag = "auto-xy position-bottom-right anchor-bottom-right bg-surface-300 radius-circle size-400-400",
+			ZIndex = 2
+		}, {
+			IndicatorImage = React.createElement(Foundation.Image, {
+				Image = "icons/actions/truncationExpand_small",
+				tag = "radius-circle position-center-center anchor-center-center size-250-250",
+				imageStyle = v11.contentForegroundStyle
+			})
+		}),
+		UIStroke = if not t1.enableFocusAnimation then nil else React.createElement("UIStroke", {
+			Color = v11.imageBorderFocusStyle,
+			Thickness = v16:map(function(p3) -- line: 71
+				return p3.thickness
+			end),
+			Transparency = v16:map(function(p4) -- line: 74
+				return p4.transparency
+			end),
+			ref = v14
+		})
+	})
+end
+
+return React.forwardRef(ImageItem)

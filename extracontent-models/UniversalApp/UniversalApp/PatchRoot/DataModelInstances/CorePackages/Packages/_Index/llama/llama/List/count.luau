@@ -1,16 +1,22 @@
-local function v0() --[[ Line: 2 ]] --[[ Name: alwaysTrue ]]
-    return true;
-end;
-return function(v1, v2) --[[ Line: 6 ]] --[[ Name: count ]]
-    -- upvalues: v0 (copy)
-    local v3 = type(v1);
-    assert(v3 == "table", "expected a table for first argument, got " .. v3);
-    v2 = v2 or v0;
-    local v4 = 0;
-    for v5 = 1, #v1 do
-        if v2(v1[v5], v5) then
-            v4 = v4 + 1;
-        end;
-    end;
-    return v4;
-end;
+local function alwaysTrue() -- line: 2
+	return true
+end
+local function count(p1, p2) -- line: 6
+	-- upvalues: alwaysTrue (copy)
+	local v5 = type(p1)
+
+	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+
+	local v6 = p2 or alwaysTrue
+	local n1 = 0
+
+	for i = 1, #p1 do
+		if v6(p1[i], i) then
+			n1 += 1
+		end
+	end
+
+	return n1
+end
+
+return count

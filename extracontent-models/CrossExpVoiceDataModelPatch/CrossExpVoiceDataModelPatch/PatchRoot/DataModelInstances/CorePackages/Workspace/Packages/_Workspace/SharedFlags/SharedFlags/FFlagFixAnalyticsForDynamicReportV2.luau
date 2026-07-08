@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixAnalyticsForDynamicReportV2", false);
+return game:DefineFastFlag("FixAnalyticsForDynamicReportV2", false)

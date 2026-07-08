@@ -1,8 +1,9 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    for _, v3 in pairs(v1.participants) do
-        if v0 == v3 then
-            return true;
-        end;
-    end;
-    return false;
-end;
+return function(p1, p2) -- line: 1
+	for _, v in pairs(p2.participants) do
+		if p1 == v then
+			return true
+		end
+	end
+
+	return false
+end

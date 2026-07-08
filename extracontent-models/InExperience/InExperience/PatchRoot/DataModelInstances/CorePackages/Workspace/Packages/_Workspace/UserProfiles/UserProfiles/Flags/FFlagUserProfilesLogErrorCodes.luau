@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfilesLogErrorCodes", false);
+return game:DefineFastFlag("UserProfilesLogErrorCodes", false)

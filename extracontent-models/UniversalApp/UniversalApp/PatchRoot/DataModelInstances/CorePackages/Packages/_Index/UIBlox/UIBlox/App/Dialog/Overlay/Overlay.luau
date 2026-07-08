@@ -1,69 +1,72 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local l_Core_0 = l_Parent_0.Core;
-local v4 = require(l_Core_0.Style.useStyle);
-local v5 = require(l_Parent_1.ReactOtter);
-local v6 = {
-    dampingRatio = 1, 
-    frequency = 3
-};
-local v7 = {
-    top = 270, 
-    topRight = 305, 
-    right = 0, 
-    bottomRight = 45, 
-    bottom = 90, 
-    bottomLeft = 135, 
-    left = 180, 
-    topLeft = 225
-};
-return function(v8) --[[ Line: 48 ]] --[[ Name: Overlay ]]
-    -- upvalues: v4 (copy), v5 (copy), v2 (copy), v6 (copy), v7 (copy)
-    local l_Theme_0 = v4().Theme;
-    local v10 = v8.showGradient and 0 or 1;
-    local v11, v12 = v5.useAnimatedBinding(v10);
-    v2.useEffect(function() --[[ Line: 55 ]]
-        -- upvalues: v8 (copy), v12 (copy), v5 (ref), v6 (ref)
-        if v8.showGradient == false then
-            v12(v5.spring(1, v6));
-            return;
-        else
-            v12(v5.spring(0, v6));
-            return;
-        end;
-    end, {
-        v8.showGradient
-    });
-    return v2.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        ClipsDescendants = true, 
-        ZIndex = v8.ZIndex
-    }, {
-        Overlay = v2.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = l_Theme_0.Overlay.Color, 
-            BackgroundTransparency = l_Theme_0.Overlay.Transparency, 
-            ZIndex = 1
-        }), 
-        Gradient = v2.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = v11, 
-            ZIndex = 2
-        }, {
-            UIGradient = v2.createElement("UIGradient", {
-                Rotation = v7[v8.gradientDirection], 
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)), 
-                    ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
-                }), 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0), 
-                    NumberSequenceKeypoint.new(1, 0.89)
-                })
-            })
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local Core = ParentParent.Core
+local useStyle = require(Core.Style.useStyle)
+local ReactOtter = require(ParentParentParent.ReactOtter)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 3
+}
+local t2 = {
+	top = 270,
+	topRight = 305,
+	right = 0,
+	bottomRight = 45,
+	bottom = 90,
+	bottomLeft = 135,
+	left = 180,
+	topLeft = 225
+}
+
+local function Overlay(t3: {[any]: any}) -- line: 48
+	-- upvalues: useStyle (copy), ReactOtter (copy), React (copy), t1 (copy), t2 (copy)
+	local Theme = useStyle().Theme
+	local v12 = not t3.showGradient and 1 or 0
+	local v13, v14 = ReactOtter.useAnimatedBinding(v12)
+
+	React.useEffect(function() -- line: 55
+		-- upvalues: t3 (copy), v14 (copy), ReactOtter (copy), t1 (copy)
+		if t3.showGradient == false then
+			v14(ReactOtter.spring(1, t1))
+
+			return
+		end
+
+		v14(ReactOtter.spring(0, t1))
+	end, { t3.showGradient })
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = t3.ZIndex
+	}, {
+		Overlay = React.createElement("Frame", {
+			ZIndex = 1,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = Theme.Overlay.Color,
+			BackgroundTransparency = Theme.Overlay.Transparency
+		}),
+		Gradient = React.createElement("Frame", {
+			ZIndex = 2,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = v13
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = t2[t3.gradientDirection],
+				Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
+					ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
+				}),
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(1, 0.89)
+				})
+			})
+		})
+	})
+end
+
+return Overlay

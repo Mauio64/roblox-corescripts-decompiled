@@ -1,55 +1,62 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.Signals);
-local v4 = require(l_script_FirstAncestor_0.Http.NetworkingShareLinks);
-local v5 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-return function() --[[ Line: 23 ]] --[[ Name: createShareLinkStore ]]
-    -- upvalues: v3 (copy), v4 (copy), l_HttpService_0 (copy), v5 (copy)
-    local v6, v7 = v3.createSignal({});
-    local function v9(v8) --[[ Line: 27 ]] --[[ Name: getShareLinkMetadataTable ]]
-        -- upvalues: v6 (copy)
-        return v6(v8);
-    end;
-    local v10 = {};
-    local function v13(v11) --[[ Line: 32 ]] --[[ Name: getShareLinkMetadataComputed ]]
-        -- upvalues: v10 (copy), v3 (ref), v6 (copy)
-        if not v10[v11] then
-            v10[v11] = v3.createComputed(function(v12) --[[ Line: 34 ]]
-                -- upvalues: v6 (ref), v11 (copy)
-                return v6(v12)[v11];
-            end);
-        end;
-        return v10[v11];
-    end;
-    local function v23(v14, v15, v16) --[[ Line: 41 ]] --[[ Name: fetchShareLinkMetadata ]]
-        -- upvalues: v4 (ref), l_HttpService_0 (ref), v5 (ref), v7 (copy)
-        v14(v4.GetMetadata.API({
-            linkId = v15, 
-            linkType = v16
-        })):andThen(function(v17) --[[ Line: 43 ]]
-            -- upvalues: l_HttpService_0 (ref), v5 (ref), v7 (ref), v15 (copy)
-            local l_responseBody_0 = v17.responseBody;
-            if l_responseBody_0.data then
-                local v19 = l_HttpService_0:JSONDecode(l_responseBody_0.data);
-                if not v19.universeId then
-                    v5:warning("Invalid share link metadata: ", v19);
-                end;
-                v7(function(v20) --[[ Line: 50 ]]
-                    -- upvalues: v15 (ref), v19 (copy)
-                    local v21 = table.clone(v20);
-                    v21[v15] = v19;
-                    return v21;
-                end);
-            end;
-        end):catch(function(v22) --[[ Line: 57 ]]
-            -- upvalues: v5 (ref)
-            v5:warning("Error fetching share link metadata: ", v22);
-        end);
-    end;
-    return {
-        getShareLinkMetadataTable = v9, 
-        getShareLinkMetadataComputed = v13, 
-        fetchShareLinkMetadata = v23
-    };
-end;
+local HttpService = game:GetService("HttpService")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Signals = require(AppChatParent.Signals)
+local NetworkingShareLinks = require(AppChat.Http.NetworkingShareLinks)
+local v6 = require(AppChat.Logger):new(script.Name)
+
+local function createShareLinkStore() -- line: 23
+	-- upvalues: Signals (copy), NetworkingShareLinks (copy), HttpService (copy), v6 (copy)
+	local v8, v9 = Signals.createSignal({})
+	local t1 = {}
+
+	return {
+		getShareLinkMetadataTable = function(p1) -- line: 27
+			-- upvalues: v8 (copy)
+			return v8(p1)
+		end,
+		getShareLinkMetadataComputed = function(s1: string) -- line: 32
+			-- upvalues: t1 (copy), Signals (copy), v8 (copy)
+			if not t1[s1] then
+				t1[s1] = Signals.createComputed(function(p2) -- line: 34
+					-- upvalues: v8 (copy), s1 (copy)
+					return v8(p2)[s1]
+				end)
+			end
+
+			return t1[s1]
+		end,
+		fetchShareLinkMetadata = function(p3, s2: string, s3: string) -- line: 41
+			-- upvalues: NetworkingShareLinks (copy), HttpService (copy), v6 (copy), v9 (copy)
+			p3(NetworkingShareLinks.GetMetadata.API({
+				linkId = s2,
+				linkType = s3
+			})):andThen(function(p4) -- line: 43
+				-- upvalues: HttpService (copy), v6 (copy), v9 (copy), s2 (copy)
+				local responseBody = p4.responseBody
+
+				if responseBody.data then
+					local data = HttpService:JSONDecode(responseBody.data)
+
+					if not data.universeId then
+						v6:warning("Invalid share link metadata: ", data)
+					end
+
+					v9(function(p5) -- line: 50
+						-- upvalues: s2 (copy), data (copy)
+						local v22 = table.clone(p5)
+
+						v22[s2] = data
+
+						return v22
+					end)
+				end
+			end):catch(function(p6) -- line: 57
+				-- upvalues: v6 (copy)
+				v6:warning("Error fetching share link metadata: ", p6)
+			end)
+		end
+	}
+end
+
+return createShareLinkStore

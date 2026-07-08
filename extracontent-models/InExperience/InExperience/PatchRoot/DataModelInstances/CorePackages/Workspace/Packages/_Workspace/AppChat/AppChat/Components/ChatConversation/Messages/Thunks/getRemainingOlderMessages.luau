@@ -1,34 +1,46 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AppChatNetworking);
-local v3 = require(l_script_FirstAncestor_0.Http.RoduxNetworking);
-local v4 = require(l_Parent_0.Promise);
-local v5 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v6 = require(l_script_FirstAncestor_0.Components.ChatConversation.Utils.getNewestWithNilPreviousMessageId);
-return function(v7, v8) --[[ Line: 11 ]]
-    -- upvalues: v5 (copy), v4 (copy), v2 (copy), v3 (copy), v6 (copy)
-    v5:info("Maybe getting older messages for {}", v8);
-    return function(v9) --[[ Line: 13 ]]
-        -- upvalues: v4 (ref), v8 (copy), v2 (ref), v3 (ref), v5 (ref), v6 (ref), v7 (copy)
-        local l_ChatAppReducer_0 = v9:getState().ChatAppReducer;
-        if not l_ChatAppReducer_0 or not l_ChatAppReducer_0.Conversations then
-            return v4.resolve();
-        else
-            local v11 = l_ChatAppReducer_0.Conversations[v8];
-            local v12 = v2.rodux.GetOlderMessages.getStatus(v9:getState(), v8) == v3.Enum.NetworkStatus.Fetching;
-            if not v11 then
-                v5:info("Canceling since conversation id {} is not in local state", v8);
-                return v4.resolve();
-            elseif v12 then
-                v5:info("Canceling since we are already fetching older messages for conversation id {}", v8);
-                return v4.resolve();
-            elseif v11.fetchedOldestMessage then
-                v5:info("Canceling since we have already fetched the oldest message for conversation id {}", v8);
-                return v4.resolve();
-            else
-                local v13 = v6(v11.messages);
-                return v7(v8, v13, v11.nextCursor);
-            end;
-        end;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local RoduxNetworking = require(AppChat.Http.RoduxNetworking)
+local Promise = require(AppChatParent.Promise)
+local v6 = require(AppChat.Logger):new(script.Name)
+local getNewestWithNilPreviousMessageId = require(AppChat.Components.ChatConversation.Utils.getNewestWithNilPreviousMessageId)
+
+return function(p1: ((...any) -> ...any), s1: string) -- line: 11
+	-- upvalues: v6 (copy), Promise (copy), AppChatNetworking (copy), RoduxNetworking (copy), getNewestWithNilPreviousMessageId (copy)
+	v6:info("Maybe getting older messages for {}", s1)
+
+	return function(p2) -- line: 13
+		-- upvalues: Promise (copy), s1 (copy), AppChatNetworking (copy), RoduxNetworking (copy), v6 (copy), getNewestWithNilPreviousMessageId (copy), p1 (copy)
+		local ChatAppReducer = p2:getState().ChatAppReducer
+
+		if not ChatAppReducer or not ChatAppReducer.Conversations then
+			return Promise.resolve()
+		end
+
+		local v12 = ChatAppReducer.Conversations[s1]
+		local v13 = AppChatNetworking.rodux.GetOlderMessages.getStatus(p2:getState(), s1) == RoduxNetworking.Enum.NetworkStatus.Fetching
+
+		if not v12 then
+			v6:info("Canceling since conversation id {} is not in local state", s1)
+
+			return Promise.resolve()
+		end
+
+		if v13 then
+			v6:info("Canceling since we are already fetching older messages for conversation id {}", s1)
+
+			return Promise.resolve()
+		end
+
+		if v12.fetchedOldestMessage then
+			v6:info("Canceling since we have already fetched the oldest message for conversation id {}", s1)
+
+			return Promise.resolve()
+		end
+
+		local v14 = getNewestWithNilPreviousMessageId(v12.messages)
+
+		return p1(s1, v14, v12.nextCursor)
+	end
+end

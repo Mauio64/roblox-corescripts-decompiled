@@ -1,3 +1,3 @@
 return {
-    getUserPresenceByUserId = require(script.getUserPresenceByUserId)
-};
+	getUserPresenceByUserId = require(script.getUserPresenceByUserId)
+}

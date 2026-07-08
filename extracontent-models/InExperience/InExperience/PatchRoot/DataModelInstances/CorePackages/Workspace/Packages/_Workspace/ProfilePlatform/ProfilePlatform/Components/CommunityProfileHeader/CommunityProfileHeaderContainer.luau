@@ -1,33 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UserLib);
-local l_Constants_0 = v3.Utils.Constants;
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v3.Utils.getRbxthumbWithTypeSizeAndOptions;
-local v6 = require(l_Parent_0.VerifiedBadges);
-local v7 = require(l_script_FirstAncestor_0.Common.Enums);
-local v8 = require(l_script_FirstAncestor_0.Utils.getDeepValue);
-local v9 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local v10 = require(l_script_FirstAncestor_0.Contexts.useProfileWrapperContext);
-local v11 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformUpdateUXForNonSocialCommunities);
-local v12 = require(l_script_FirstAncestor_0.Flags.FFlagEnablePressingCommunityOwnerInPeekView);
-local v13 = require(l_script_FirstAncestor_0.Components.CommunityProfileHeader.CommunityProfileHeader);
-return function(v14) --[[ Line: 38 ]] --[[ Name: CommunityProfileHeaderContainer ]]
-    -- upvalues: v10 (copy), v9 (copy), v7 (copy), v6 (copy), v8 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), l_Constants_0 (copy), v12 (copy), v2 (copy), v13 (copy), v11 (copy)
-    local l_profileId_0 = v10().profileId;
-    local v16 = v9(v7.Components.CommunityProfileHeader);
-    local v17 = if v16.isVerified then ("%*%*"):format(v16.name, v6.emoji.verified) else v16.name;
-    local v18 = if v16.ownerIsVerified then ("%*%*"):format(v16.ownerName, v6.emoji.verified) else v16.ownerName;
-    local v19 = v8(v16, "counts.membersCount") or 0;
-    local v20 = l_getRbxthumbWithTypeSizeAndOptions_0(l_profileId_0, l_Constants_0.RbxthumbTypes.GroupIcon, 150);
-    local v21 = if v12 then v16.ownerUserId else nil;
-    return v2.createElement(v13, {
-        layoutOrder = v14.layoutOrder, 
-        name = v17, 
-        ownerName = v18, 
-        membersCount = v19, 
-        hasSocialModules = if v11 then v16.hasSocialModules else nil, 
-        thumbnail = v20, 
-        ownerUserId = if v12 then v21 else nil
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local UserLib = require(ProfilePlatformParent.UserLib)
+local Constants = UserLib.Utils.Constants
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local VerifiedBadges = require(ProfilePlatformParent.VerifiedBadges)
+local Enums = require(ProfilePlatform.Common.Enums)
+local getDeepValue = require(ProfilePlatform.Utils.getDeepValue)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
+local FFlagProfilePlatformUpdateUXForNonSocialCommunities = require(ProfilePlatform.Flags.FFlagProfilePlatformUpdateUXForNonSocialCommunities)
+local FFlagEnablePressingCommunityOwnerInPeekView = require(ProfilePlatform.Flags.FFlagEnablePressingCommunityOwnerInPeekView)
+local CommunityProfileHeader = require(ProfilePlatform.Components.CommunityProfileHeader.CommunityProfileHeader)
+
+local function CommunityProfileHeaderContainer(t1: {[any]: any}) -- line: 38
+	-- upvalues: useProfileWrapperContext (copy), useProfileJsonComponent (copy), Enums (copy), VerifiedBadges (copy), getDeepValue (copy), getRbxthumbWithTypeSizeAndOptions (copy), Constants (copy), FFlagEnablePressingCommunityOwnerInPeekView (copy), React (copy), CommunityProfileHeader (copy), FFlagProfilePlatformUpdateUXForNonSocialCommunities (copy)
+	local profileId = useProfileWrapperContext().profileId
+	local v18 = useProfileJsonComponent(Enums.Components.CommunityProfileHeader)
+	local v19 = if not v18.isVerified then v18.name else `{ v18.name }{ VerifiedBadges.emoji.verified }`
+	local v20 = if not v18.ownerIsVerified then v18.ownerName else `{ v18.ownerName }{ VerifiedBadges.emoji.verified }`
+	local v21 = getDeepValue(v18, "counts.membersCount") or 0
+	local v22 = getRbxthumbWithTypeSizeAndOptions(profileId, Constants.RbxthumbTypes.GroupIcon, 150)
+	local v23 = if not FFlagEnablePressingCommunityOwnerInPeekView then nil else v18.ownerUserId
+
+	return React.createElement(CommunityProfileHeader, {
+		layoutOrder = t1.layoutOrder,
+		name = v19,
+		ownerName = v20,
+		membersCount = v21,
+		hasSocialModules = if not FFlagProfilePlatformUpdateUXForNonSocialCommunities then nil else v18.hasSocialModules,
+		thumbnail = v22,
+		ownerUserId = if not FFlagEnablePressingCommunityOwnerInPeekView then nil else v23
+	})
+end
+
+return CommunityProfileHeaderContainer

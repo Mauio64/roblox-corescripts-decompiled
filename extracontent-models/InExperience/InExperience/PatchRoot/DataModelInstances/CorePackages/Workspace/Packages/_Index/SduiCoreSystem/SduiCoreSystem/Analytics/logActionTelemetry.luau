@@ -1,34 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiConfigTypes);
-local v3 = require(l_script_FirstAncestor_0.SduiErrors);
-local v4 = require(l_script_FirstAncestor_0.SduiLogger);
-local v5 = require(l_script_FirstAncestor_0.getSduiTelemetryHandlerNameRegistry);
-local v6 = require(l_script_FirstAncestor_0.Analytics.reportUnifiedLoggingAction);
-return function(v7, v8, v9, v10, v11) --[[ Line: 16 ]] --[[ Name: logActionTelemetry ]]
-    -- upvalues: v5 (copy), v4 (copy), v3 (copy), v6 (copy)
-    if v7 and v7 ~= "" then
-        local v12 = v5().getTelemetryHandler(v7);
-        if v12 then
-            v12(v9, v10, v11);
-        else
-            v4.reportError(v3.SduiErrorType.InvalidActionParams, {
-                message = ("Unknown telemetry handler name: %*"):format(v7), 
-                name = v9.actionType
-            }, v11.appPage);
-        end;
-    elseif v8.telemetryHandler then
-        v8.telemetryHandler(v9, v10, v11);
-    end;
-    if not v8.firesOwnTelemetry then
-        if v10 == nil then
-            v4.reportError(v3.SduiErrorType.NilAnalyticsContext, {
-                message = ("Could not reportUnifiedLoggingAction. Missing analyticsContext %*"):format(v9.actionType), 
-                name = v9.actionType
-            }, v11.appPage);
-            return;
-        else
-            v6(v11, v9, v10);
-        end;
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.SduiConfigTypes)
+
+local SduiErrors = require(SduiCoreSystem.SduiErrors)
+local SduiLogger = require(SduiCoreSystem.SduiLogger)
+local getSduiTelemetryHandlerNameRegistry = require(SduiCoreSystem.getSduiTelemetryHandlerNameRegistry)
+local reportUnifiedLoggingAction = require(SduiCoreSystem.Analytics.reportUnifiedLoggingAction)
+
+local function logActionTelemetry(s1: string?, p1, p2, p3, p4) -- line: 16
+	-- upvalues: getSduiTelemetryHandlerNameRegistry (copy), SduiLogger (copy), SduiErrors (copy), reportUnifiedLoggingAction (copy)
+	if s1 and s1 ~= "" then
+		local v12 = getSduiTelemetryHandlerNameRegistry().getTelemetryHandler(s1)
+
+		if v12 then
+			v12(p2, p3, p4)
+		else
+			SduiLogger.reportError(SduiErrors.SduiErrorType.InvalidActionParams, {
+				message = `Unknown telemetry handler name: { s1 }`,
+				name = p2.actionType
+			}, p4.appPage)
+		end
+	elseif p1.telemetryHandler then
+		p1.telemetryHandler(p2, p3, p4)
+	end
+
+	if not p1.skipUnifiedLogging then
+		if p3 == nil then
+			SduiLogger.reportError(SduiErrors.SduiErrorType.NilAnalyticsContext, {
+				message = `Could not reportUnifiedLoggingAction. Missing analyticsContext { p2.actionType }`,
+				name = p2.actionType
+			}, p4.appPage)
+
+			return
+		end
+
+		reportUnifiedLoggingAction(p4, p2, p3)
+	end
+end
+
+return logActionTelemetry

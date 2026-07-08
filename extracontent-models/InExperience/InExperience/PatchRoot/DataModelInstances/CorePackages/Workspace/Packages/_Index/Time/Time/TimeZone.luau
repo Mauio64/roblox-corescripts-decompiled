@@ -1,8 +1,10 @@
-local v2 = setmetatable({}, {
-    __index = function(_, v1) --[[ Line: 2 ]] --[[ Name: __index ]]
-        error(("Invalid TimeZone \"%s\""):format((tostring(v1))), 2);
-    end
-});
-v2.UTC = -2;
-v2.Current = -1;
-return v2;
+local self = setmetatable({}, {
+	__index = function(_, p2) -- line: 2
+		error(("Invalid TimeZone \"%s\""):format((tostring(p2))), 2)
+	end
+})
+
+self.UTC = -2
+self.Current = -1
+
+return self

@@ -3,86 +3,140 @@ local ExpChatParent = ExpChat.Parent
 local Signals = require(ExpChatParent.Signals)
 local tutils = require(ExpChatParent.tutils)
 local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local SharedFlags = require(ExpChatParent.SharedFlags)
 local EngineFeatureExpChatGlobalChatEngineTelemetryEnabled = require(ExpChat.Flags.EngineFeatureExpChatGlobalChatEngineTelemetryEnabled)
 local GetFFlagTextChatEnableUniverseChatTabs = ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
 local createSignal = Signals.createSignal
 local createComputed = Signals.createComputed
+local getFixedTabPriority = nil
 
-local function reorderTabs(t1: {[any]: any}) -- line: 48
-	local v12 = table.clone(t1)
+local function reorderTabs(t1: {[any]: any}) -- line: 67
+	-- upvalues: getFixedTabPriority (ref)
+	local v18 = table.clone(t1)
 	local t2 = {}
 
-	for _, v in pairs(v12) do
+	for _, v in pairs(v18) do
 		table.insert(t2, v)
 	end
 
-	table.sort(t2, function(p1, p2) -- line: 57
+	table.sort(t2, function(p1, p2) -- line: 75
+		-- upvalues: getFixedTabPriority (ref)
+		local v38 = getFixedTabPriority(p1.name)
+		local v39 = getFixedTabPriority(p2.name)
+
+		if v38 and v39 then
+			return v38 < v39
+		end
+
+		if v38 then
+			return true
+		end
+
+		if v39 then
+			return false
+		end
+
 		return p1.tabIndex < p2.tabIndex
 	end)
 
 	for i, v in ipairs(t2) do
-		v12[v.name] = {
+		v18[v.name] = {
+			type = v.type,
 			name = v.name,
 			tabIndex = i,
 			HasUnreadMessages = v.HasUnreadMessages
 		}
 	end
 
-	return v12
+	return v18
+end
+local function insertTabAndReorder(t3: {[any]: any}, t4: {[any]: any}) -- line: 102
+	-- upvalues: reorderTabs (copy)
+	local v26 = table.clone(t3)
+
+	v26[t4.name] = t4
+
+	return (reorderTabs(v26))
+end
+local function removeTabAndReorder(t5: {[any]: any}, t6: {[any]: any}) -- line: 112
+	-- upvalues: reorderTabs (copy)
+	local v29 = table.clone(t5)
+
+	v29[t6.name] = nil
+
+	return (reorderTabs(v29))
 end
 
-return function() --[[ createChannelTabsStore ]] -- line: 93
-	-- upvalues: createSignal (copy), createComputed (copy), tutils (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy)
-	local t3 = {
-		allChannelTabs = {},
-		selectedTabName = nil
-	}
-	local v25, v26 = createSignal(t3)
-	local v27 = createComputed(function(p3) -- line: 102
-		-- upvalues: v25 (copy)
-		return v25(p3).selectedTabName
-	end)
-	local v28 = createComputed(function(p4) -- line: 107
-		-- upvalues: v25 (copy)
-		local v33 = v25(p4)
-		local t4 = {}
+function getFixedTabPriority(s1: string?) -- line: 125
+	-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), FFlagExpChatEnableFriendsTab (copy)
+	if s1 == "RBXGeneral" then
+		return 1
+	end
 
-		for k, v in pairs(v33.allChannelTabs) do
+	if s1 == "RBXGlobal" and GetFFlagTextChatEnableUniverseChatTabs() then
+		return 2
+	end
+
+	if s1 == "FriendsChat" and FFlagExpChatEnableFriendsTab then
+		return 3
+	end
+
+	return nil
+end
+
+local function createChannelTabsStore() -- line: 136
+	-- upvalues: createSignal (copy), createComputed (copy), tutils (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), getFixedTabPriority (ref)
+	local t7 = {
+		selectedTabName = nil,
+		allChannelTabs = {}
+	}
+	local v32, v33 = createSignal(t7)
+	local v34 = createComputed(function(p3) -- line: 145
+		-- upvalues: v32 (copy)
+		return v32(p3).selectedTabName
+	end)
+	local v35 = createComputed(function(p4) -- line: 150
+		-- upvalues: v32 (copy)
+		local v42 = v32(p4)
+		local t8 = {}
+
+		for k, v in pairs(v42.allChannelTabs) do
 			if v.HasUnreadMessages then
-				t4[k] = true
+				t8[k] = true
 			end
 		end
 
-		return t4
+		return t8
 	end, tutils.deepEqual)
 
 	return {
-		getChannelTabsState = v25,
-		getSelectedTabName = v27,
-		getUnreadChannels = v28,
-		handleIncomingOrOutgoingMessage = function(p5, b1: boolean, s1: string?) --[[ handleIncomingOrOutgoingMessage ]] -- line: 120
-			-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), v26 (copy)
+		getChannelTabsState = v32,
+		getSelectedTabName = v34,
+		getUnreadChannels = v35,
+		handleIncomingOrOutgoingMessage = function(p5, b1: boolean, s2: string?) -- line: 163
+			-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), v33 (copy)
 			if not GetFFlagTextChatEnableUniverseChatTabs() and not p5.TextChannel or b1 then
 				return
 			end
 
-			local u40 = nil
+			local u49 = nil
 
 			if GetFFlagTextChatEnableUniverseChatTabs() then
-				if s1 then
-					u40 = s1
+				if s2 then
+					u49 = s2
 				else
 					if not p5.TextChannel then
 						return
 					end
 
-					u40 = p5.TextChannel.Name
+					u49 = p5.TextChannel.Name
 				end
 			end
 
-			v26(function(p6) -- line: 142
-				-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), p5 (copy), u40 (ref)
-				local v51 = table.clone(p6)
+			v33(function(p6) -- line: 185
+				-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), p5 (copy), u49 (ref)
+				local v62 = table.clone(p6)
 
 				if not GetFFlagTextChatEnableUniverseChatTabs() then
 					local TextChannel = p5.TextChannel
@@ -91,275 +145,242 @@ return function() --[[ createChannelTabsStore ]] -- line: 93
 						return p6
 					end
 
-					u40 = TextChannel.Name
+					u49 = TextChannel.Name
 				end
 
-				if u40 == "RBXSystem" then
-					u40 = "RBXGeneral"
+				if u49 == "RBXSystem" then
+					u49 = "RBXGeneral"
 				end
 
-				if v51.allChannelTabs[u40] and u40 ~= v51.selectedTabName then
-					v51.allChannelTabs = table.clone(v51.allChannelTabs)
+				if v62.allChannelTabs[u49] and u49 ~= v62.selectedTabName then
+					v62.allChannelTabs = table.clone(v62.allChannelTabs)
 
-					local v53 = table.clone(v51.allChannelTabs[u40])
+					local v64 = table.clone(v62.allChannelTabs[u49])
 
-					v53.HasUnreadMessages = true
-					v51.allChannelTabs[u40] = v53
+					v64.HasUnreadMessages = true
+					v62.allChannelTabs[u49] = v64
 				end
 
-				return v51
+				return v62
 			end)
 		end,
-		setSelectedTab = function(s2: string) --[[ setSelectedTab ]] -- line: 182
-			-- upvalues: v26 (copy)
-			v26(function(p7) -- line: 183
-				-- upvalues: s2 (copy)
-				local v58 = table.clone(p7)
+		setSelectedTab = function(s3: string) -- line: 240
+			-- upvalues: v33 (copy)
+			v33(function(p7) -- line: 241
+				-- upvalues: s3 (copy)
+				local v72 = table.clone(p7)
 
-				v58.selectedTabName = s2
+				v72.selectedTabName = s3
 
-				if v58.allChannelTabs[s2] then
-					v58.allChannelTabs = table.clone(v58.allChannelTabs)
+				if v72.allChannelTabs[s3] then
+					v72.allChannelTabs = table.clone(v72.allChannelTabs)
 
-					local v59 = table.clone(v58.allChannelTabs[s2])
+					local v73 = table.clone(v72.allChannelTabs[s3])
 
-					v59.HasUnreadMessages = false
-					v58.allChannelTabs[s2] = v59
+					v73.HasUnreadMessages = false
+					v72.allChannelTabs[s3] = v73
 				end
 
-				return v58
+				return v72
 			end)
 		end,
-		setTargetChannel = function(p8, b2: boolean, s3: string?) --[[ setTargetChannel ]] -- line: 198
-			-- upvalues: v26 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy)
-			v26(function(p9) -- line: 199
-				-- upvalues: GetFFlagTextChatEnableUniverseChatTabs (copy), s3 (copy), p8 (copy), b2 (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy)
-				local n1 = 0
+		setTargetChannel = function(s4: string?, b2: boolean) -- line: 256
+			-- upvalues: v33 (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
+			v33(function(p8) -- line: 257
+				-- upvalues: s4 (copy), b2 (copy), reorderTabs (copy), EngineFeatureExpChatGlobalChatEngineTelemetryEnabled (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
+				local v75 = table.clone(p8)
 
-				for _, _ in pairs(p9.allChannelTabs) do
-					n1 += 1
-				end
-
-				local v64 = table.clone(p9)
-
-				if GetFFlagTextChatEnableUniverseChatTabs() and s3 then
-					local v65 = if not p8 then s3 else p8.Name
-
-					if v65 and v64.allChannelTabs[v65] then
-						local v66 = v64.allChannelTabs[v65]
-						local tabIndex = v66.tabIndex
-
-						if b2 then
-							local v68 = v64.allChannelTabs.RBXGeneral ~= nil
-							local v69 = v64.allChannelTabs.RBXGlobal ~= nil
-
-							tabIndex = if v66.name ~= "RBXGeneral" then if v66.name ~= "RBXGlobal" then if not v68 or not v69 then not v68 and not v69 and 1 or 2 else 3 else not v68 and 1 or 2 else 1
-						end
-
-						local t5 = {
-							name = v66.name,
-							tabIndex = tabIndex,
-							HasUnreadMessages = false
-						}
-						local allChannelTabs = v64.allChannelTabs
-						local v72 = table.clone(allChannelTabs)
-
-						v72[v66.name] = nil
-
-						local v73 = reorderTabs(v72)
-						local v74 = v73
-
-						if GetFFlagTextChatEnableUniverseChatTabs() and b2 and v66.name == "RBXGlobal" and tabIndex == 2 and v73.RBXGeneral ~= nil then
-							v74 = table.clone(v73)
-
-							for k, v in pairs(v73) do
-								if k ~= "RBXGeneral" and tabIndex <= v.tabIndex then
-									local v77 = table.clone(v)
-
-									v77.tabIndex = v.tabIndex + 1
-									v74[k] = v77
-								end
-							end
-						end
-
-						local v78 = table.clone(v74)
-
-						v78[t5.name] = t5
-						v64.allChannelTabs = reorderTabs(v78)
-						v64.selectedTabName = v66.name
-
-						return v64
-					end
-
-					v64.selectedTabName = v65 or ""
-
-					return v64
-				end
-
-				if p8 and v64.allChannelTabs[p8.Name] then
-					local v79 = v64.allChannelTabs[p8.Name]
-					local tabIndex = v79.tabIndex
-
-					if b2 then
-						local v81 = v64.allChannelTabs.RBXGeneral ~= nil
-
-						tabIndex = if v79.name ~= "RBXGeneral" then not v81 and 1 or 2 else 1
-					end
-
-					local t6 = {
-						name = v79.name,
-						tabIndex = tabIndex,
-						HasUnreadMessages = false
+				if s4 and v75.allChannelTabs[s4] then
+					local v76 = v75.allChannelTabs[s4]
+					local t9 = {
+						HasUnreadMessages = false,
+						type = v76.type,
+						name = v76.name,
+						tabIndex = if not b2 then v76.tabIndex else 0
 					}
-					local allChannelTabs = v64.allChannelTabs
-					local v84 = table.clone(allChannelTabs)
+					local allChannelTabs = v75.allChannelTabs
+					local v79 = table.clone(allChannelTabs)
 
-					v84[v79.name] = nil
+					v79[v76.name] = nil
 
-					local v85 = reorderTabs(v84)
-					local v86 = table.clone(v85)
+					local v80 = reorderTabs(v79)
+					local v81 = table.clone(v80)
 
-					v86[t6.name] = t6
-					v64.allChannelTabs = reorderTabs(v86)
-					v64.selectedTabName = v79.name
+					v81[t9.name] = t9
+					v75.allChannelTabs = reorderTabs(v81)
+					v75.selectedTabName = v76.name
 
-					return v64
+					return v75
 				end
 
 				if EngineFeatureExpChatGlobalChatEngineTelemetryEnabled then
-					if p8 then
-						v64.selectedTabName = p8.Name
+					if s4 then
+						v75.selectedTabName = s4
 
-						return v64
+						return v75
 					end
 
 					if not GetFFlagTextChatEnableUniverseChatTabs() then
-						v64.selectedTabName = nil
+						v75.selectedTabName = nil
 
-						return v64
+						return v75
 					end
 				else
-					v64.selectedTabName = if not p8 then nil else p8.Name
+					v75.selectedTabName = s4
 				end
 
-				return v64
+				return v75
 			end)
 		end,
-		addChannelTab = function(s4: string, n2: number) --[[ addChannelTab ]] -- line: 300
-			-- upvalues: v26 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy)
-			v26(function(p10) -- line: 301
-				-- upvalues: n2 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), s4 (copy)
-				local v88 = table.clone(p10)
+		addChannelTab = function(p9, n1: number?) -- line: 297
+			-- upvalues: v33 (copy), reorderTabs (copy), getFixedTabPriority (ref)
+			local name = p9.name
 
-				v88.allChannelTabs = table.clone(v88.allChannelTabs)
+			v33(function(p10) -- line: 300
+				-- upvalues: n1 (copy), p9 (copy), name (copy), reorderTabs (copy), getFixedTabPriority (ref)
+				local v83 = table.clone(p10)
+				local allChannelTabs = v83.allChannelTabs
 
-				local v89 = n2
+				if n1 ~= nil then
+					allChannelTabs = {}
 
-				if GetFFlagTextChatEnableUniverseChatTabs() and s4 == "RBXGlobal" then
-					v89 = not v88.allChannelTabs.RBXGeneral and 1 or 2
+					for v85, v86 in v83.allChannelTabs do
+						if v86.tabIndex >= n1 then
+							local v87 = table.clone(v86)
+
+							v87.tabIndex = v86.tabIndex + 1
+							allChannelTabs[v85] = v87
+						else
+							allChannelTabs[v85] = v86
+						end
+					end
 				end
 
-				v88.allChannelTabs[s4] = {
-					name = s4,
-					tabIndex = v89,
-					HasUnreadMessages = false
+				local t10 = {
+					HasUnreadMessages = false,
+					type = p9.type,
+					name = name,
+					tabIndex = n1 or 0
 				}
+				local v89 = table.clone(allChannelTabs)
 
-				if GetFFlagTextChatEnableUniverseChatTabs() then
-					if not v88.selectedTabName then
-						v88.selectedTabName = if not v88.allChannelTabs.RBXGeneral then s4 else "RBXGeneral"
+				v89[t10.name] = t10
+				v83.allChannelTabs = reorderTabs(v89)
 
-						return v88
-					end
+				local v90 = getFixedTabPriority(name)
+				local v91 = getFixedTabPriority(v83.selectedTabName)
 
-					if s4 == "RBXGeneral" and v88.selectedTabName == "RBXGlobal" then
-						v88.selectedTabName = "RBXGeneral"
+				if v83.selectedTabName == nil then
+					v83.selectedTabName = if not v83.allChannelTabs.RBXGeneral then name else "RBXGeneral"
 
-						return v88
-					end
-				elseif not v88.selectedTabName then
-					v88.selectedTabName = s4
+					return v83
 				end
 
-				return v88
+				if v90 ~= nil and (v91 == nil or v90 < v91) then
+					v83.selectedTabName = name
+				end
+
+				return v83
 			end)
 		end,
-		removeChannelTab = function(s5: string) --[[ removeChannelTab ]] -- line: 330
-			-- upvalues: v26 (copy)
-			v26(function(p11) -- line: 331
+		removeChannelTab = function(s5: string) -- line: 342
+			-- upvalues: v33 (copy)
+			v33(function(p11) -- line: 343
 				-- upvalues: s5 (copy)
-				local v91 = table.clone(p11)
+				local v93 = table.clone(p11)
 
-				v91.allChannelTabs = table.clone(v91.allChannelTabs)
-				v91.allChannelTabs[s5] = nil
+				v93.allChannelTabs = table.clone(v93.allChannelTabs)
+				v93.allChannelTabs[s5] = nil
 
-				if v91.selectedTabName == s5 then
-					local n3 = 1e999
-					local v93 = nil
+				if v93.selectedTabName == s5 then
+					local n2 = 1e999
+					local v95 = nil
 
-					for k, v in pairs(v91.allChannelTabs) do
-						if n3 > v.tabIndex then
-							n3 = v.tabIndex
-							v93 = k
+					for k, v in pairs(v93.allChannelTabs) do
+						if n2 > v.tabIndex then
+							n2 = v.tabIndex
+							v95 = k
 						end
 					end
 
-					v91.selectedTabName = v93
+					v93.selectedTabName = v95
 				end
 
-				return v91
+				return v93
 			end)
 		end,
-		handleChannelRemoved = function(p12) --[[ handleChannelRemoved ]] -- line: 355
-			-- upvalues: v26 (copy), reorderTabs (copy)
-			v26(function(p13) -- line: 356
-				-- upvalues: p12 (copy), reorderTabs (copy)
-				local v97 = p13.allChannelTabs[p12.Name]
+		handleChannelRemoved = function(s6: string) -- line: 367
+			-- upvalues: v33 (copy), reorderTabs (copy)
+			v33(function(p12) -- line: 368
+				-- upvalues: s6 (copy), reorderTabs (copy)
+				local v99 = p12.allChannelTabs[s6]
 
-				if v97 == nil then
-					return p13
+				if v99 == nil then
+					return p12
 				end
 
-				local v98 = table.clone(p13)
-				local allChannelTabs = v98.allChannelTabs
-				local v100 = table.clone(allChannelTabs)
+				local v100 = table.clone(p12)
+				local allChannelTabs = v100.allChannelTabs
+				local v102 = table.clone(allChannelTabs)
 
-				v100[v97.name] = nil
-				v98.allChannelTabs = reorderTabs(v100)
+				v102[v99.name] = nil
+				v100.allChannelTabs = reorderTabs(v102)
 
-				if v97.name == v98.selectedTabName then
-					v98.selectedTabName = if not v98.allChannelTabs.RBXGeneral then nil else "RBXGeneral"
+				if v99.name == v100.selectedTabName then
+					v100.selectedTabName = if not v100.allChannelTabs.RBXGeneral then nil else "RBXGeneral"
 				end
 
-				if v98.selectedTabName and v98.allChannelTabs[v98.selectedTabName] then
-					v98.allChannelTabs = table.clone(v98.allChannelTabs)
+				if v100.selectedTabName and v100.allChannelTabs[v100.selectedTabName] then
+					v100.allChannelTabs = table.clone(v100.allChannelTabs)
 
-					local v101 = table.clone(v98.allChannelTabs[v98.selectedTabName])
+					local v103 = table.clone(v100.allChannelTabs[v100.selectedTabName])
 
-					v101.HasUnreadMessages = false
-					v98.allChannelTabs[v98.selectedTabName] = v101
+					v103.HasUnreadMessages = false
+					v100.allChannelTabs[v100.selectedTabName] = v103
 				end
 
-				return v98
+				return v100
 			end)
 		end,
-		markChannelUnread = function(s6: string) --[[ markChannelUnread ]] -- line: 169
-			-- upvalues: v26 (copy)
-			v26(function(p14) -- line: 170
-				-- upvalues: s6 (copy)
-				local v55 = table.clone(p14)
+		markChannelUnread = function(s7: string) -- line: 212
+			-- upvalues: v33 (copy)
+			v33(function(p13) -- line: 213
+				-- upvalues: s7 (copy)
+				local v66 = table.clone(p13)
 
-				if v55.allChannelTabs[s6] and s6 ~= v55.selectedTabName then
-					v55.allChannelTabs = table.clone(v55.allChannelTabs)
+				if v66.allChannelTabs[s7] and s7 ~= v66.selectedTabName then
+					v66.allChannelTabs = table.clone(v66.allChannelTabs)
 
-					local v56 = table.clone(v55.allChannelTabs[s6])
+					local v67 = table.clone(v66.allChannelTabs[s7])
 
-					v56.HasUnreadMessages = true
-					v55.allChannelTabs[s6] = v56
+					v67.HasUnreadMessages = true
+					v66.allChannelTabs[s7] = v67
 				end
 
-				return v55
+				return v66
+			end)
+		end,
+		setChannelUnreadStatus = function(s8: string, b3: boolean) -- line: 225
+			-- upvalues: v33 (copy)
+			v33(function(p14) -- line: 226
+				-- upvalues: s8 (copy), b3 (copy)
+				if p14.allChannelTabs[s8] == nil then
+					return p14
+				end
+
+				local v69 = table.clone(p14)
+
+				v69.allChannelTabs = table.clone(v69.allChannelTabs)
+
+				local v70 = table.clone(v69.allChannelTabs[s8])
+
+				v70.HasUnreadMessages = b3
+				v69.allChannelTabs[s8] = v70
+
+				return v69
 			end)
 		end
 	}
 end
+
+return createChannelTabsStore

@@ -1,1 +1,1 @@
-return game:DefineFastString("AppChatChatBubbleUIRevampIxpLayer", "Social.AppChat");
+return game:DefineFastString("AppChatChatBubbleUIRevampIxpLayer", "Social.AppChat")

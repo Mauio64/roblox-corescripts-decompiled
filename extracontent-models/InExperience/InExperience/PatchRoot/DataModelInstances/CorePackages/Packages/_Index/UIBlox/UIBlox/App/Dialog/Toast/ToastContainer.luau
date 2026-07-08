@@ -1,239 +1,261 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.t);
-local v5 = require(l_Parent_1.Core.Text.GetTextSize);
-local v6 = require(l_Parent_1.App.ImageSet.Images);
-local v7 = require(l_Parent_1.Utility.memoize);
-local v8 = require(l_Parent_1.Core.Style.withStyle);
-local v9 = require(l_Parent_1.Core.Style.Validator.validateColorInfo);
-local v10 = require(l_Parent_0.Button.Enum.ButtonType);
-local v11 = Vector2.new(36, 36);
-local function _(v12, v13, v14, v15) --[[ Line: 31 ]] --[[ Name: getTextHeight ]]
-    -- upvalues: v5 (copy)
-    local v16 = Vector2.new(v15, 10000);
-    return v5(v12, v14, v13, v16).Y;
-end;
-local v18 = v3.PureComponent:extend("ToastContainer");
-v18.validateProps = v4.strictInterface({
-    anchorPoint = v4.optional(v4.Vector2), 
-    buttonText = v4.optional(v4.string), 
-    fitHeight = v4.optional(v4.boolean), 
-    iconColorStyle = v4.optional(v9), 
-    iconImage = v4.optional(v4.union(v4.table, v4.string, v4.callback)), 
-    iconSize = v4.optional(v4.Vector2), 
-    iconChildren = v4.optional(v4.table), 
-    layoutOrder = v4.optional(v4.integer), 
-    onActivated = v4.optional(v4.callback), 
-    onTouchSwipe = v4.optional(v4.callback), 
-    padding = v4.numberMin(0), 
-    position = v4.UDim2, 
-    pressedScale = v4.optional(v4.number), 
-    renderToast = v4.callback, 
-    size = v4.UDim2, 
-    sizeConstraint = v4.optional(v4.table), 
-    toastSubtitle = v4.optional(v4.string), 
-    toastTitle = v4.string, 
-    buttonType = v4.optional(v10.isEnumValue)
-});
-v18.defaultProps = {
-    anchorPoint = Vector2.new(0, 0), 
-    fitHeight = true, 
-    padding = 12, 
-    position = UDim2.new(0, 0, 0, 0), 
-    size = UDim2.new(1, -24, 0, 0), 
-    sizeConstraint = {
-        MaxSize = Vector2.new(400, 1e999), 
-        MinSize = Vector2.new(24, 60)
-    }
-};
-v18.init = function(v19) --[[ Line: 74 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), v6 (copy), v11 (copy), v5 (copy), v7 (copy)
-    v19.containerRef = v3.createRef();
-    v19.isMounted = false;
-    v19.state = {
-        containerWidth = 0, 
-        pressed = false, 
-        subtitleHeight = 0, 
-        titleHeight = 0
-    };
-    v19.getIconSize = function() --[[ Line: 85 ]]
-        -- upvalues: v19 (copy), v6 (ref), v11 (ref)
-        local l_iconSize_0 = v19.props.iconSize;
-        local l_iconImage_0 = v19.props.iconImage;
-        local l_ImagesResolutionScale_0 = v6.ImagesResolutionScale;
-        if l_iconImage_0 then
-            if l_iconSize_0 then
-                return l_iconSize_0;
-            elseif l_iconImage_0.ImageRectSize and l_ImagesResolutionScale_0 and l_ImagesResolutionScale_0 > 0 then
-                return l_iconImage_0.ImageRectSize / l_ImagesResolutionScale_0;
-            else
-                return v11;
-            end;
-        else
-            return Vector2.new(0, 0);
-        end;
-    end;
-    v19.onButtonInputBegan = function(_, v24) --[[ Line: 101 ]]
-        -- upvalues: v19 (copy)
-        if v24.UserInputState == Enum.UserInputState.Begin and (v24.UserInputType == Enum.UserInputType.Touch or v24.UserInputType == Enum.UserInputType.MouseButton1) and not v19.state.pressed then
-            v19:setState({
-                pressed = true
-            });
-        end;
-    end;
-    v19.onButtonInputEnded = function() --[[ Line: 117 ]]
-        -- upvalues: v19 (copy)
-        if v19.state.pressed then
-            v19:setState({
-                pressed = false
-            });
-        end;
-    end;
-    v19.getTextHeights = function(v25) --[[ Line: 125 ]]
-        -- upvalues: v19 (copy), v5 (ref)
-        local l_iconImage_1 = v19.props.iconImage;
-        local v27 = v19.getIconSize();
-        local l_buttonText_0 = v19.props.buttonText;
-        local l_padding_0 = v19.props.padding;
-        local l_toastSubtitle_0 = v19.props.toastSubtitle;
-        local l_toastTitle_0 = v19.props.toastTitle;
-        local l_Font_0 = v25.Font;
-        local l_Header2_0 = l_Font_0.Header2;
-        local l_CaptionBody_0 = l_Font_0.CaptionBody;
-        local v35 = v19.state.containerWidth - l_padding_0 * 2;
-        if l_iconImage_1 then
-            v35 = v35 - v27.X - l_padding_0;
-        end;
-        if l_buttonText_0 and not v19.showCompactToast() then
-            v35 = v35 - v19.getButtonDimensions(v25).X;
-        end;
-        local l_Font_1 = l_Header2_0.Font;
-        local v37 = l_Header2_0.RelativeSize * l_Font_0.BaseSize;
-        local v38 = 0;
-        local v39 = Vector2.new(v35, 10000);
-        local v40 = math.max(v38, v5(l_toastTitle_0, v37, l_Font_1, v39).Y);
-        v38 = 0;
-        if l_toastSubtitle_0 then
-            local l_Font_2 = l_CaptionBody_0.Font;
-            local v42 = l_CaptionBody_0.RelativeSize * l_Font_0.BaseSize;
-            local v43 = 0;
-            local v44 = Vector2.new(v35, 10000);
-            v38 = math.max(v43, v5(l_toastSubtitle_0, v42, l_Font_2, v44).Y);
-        end;
-        return v38, v40;
-    end;
-    v19.showCompactToast = function() --[[ Line: 160 ]]
-        -- upvalues: v19 (copy)
-        return v19.state.containerWidth < 400;
-    end;
-    v19.showPressed = function() --[[ Line: 164 ]]
-        -- upvalues: v19 (copy)
-        if not v19.props.buttonText and v19.props.onActivated then
-            return v19.state.pressed;
-        else
-            return nil;
-        end;
-    end;
-    v19.getButtonDimensions = v7(function(v45) --[[ Line: 172 ]]
-        -- upvalues: v19 (copy), v5 (ref)
-        local l_buttonText_1 = v19.props.buttonText;
-        local l_onActivated_0 = v19.props.onActivated;
-        if not l_buttonText_1 or not l_onActivated_0 then
-            return Vector2.new(0, 0);
-        else
-            local l_Font_3 = v45.Font.Header2.Font;
-            local v49 = v45.Font.Header2.RelativeSize * v45.Font.BaseSize;
-            local v50 = Vector2.new(30, 30) + Vector2.new(10, 10) + v5(l_buttonText_1, v49, l_Font_3, Vector2.new(1000, 1000));
-            if not v19.showCompactToast() then
-                return v50;
-            else
-                return Vector2.new(math.min(v50.X, 200), v50.Y);
-            end;
-        end;
-    end);
-end;
-v18.render = function(v51) --[[ Line: 193 ]] --[[ Name: render ]]
-    -- upvalues: v8 (copy), v3 (copy)
-    local l_iconImage_2 = v51.props.iconImage;
-    local v53 = v51.getIconSize();
-    local l_padding_1 = v51.props.padding;
-    local l_toastSubtitle_1 = v51.props.toastSubtitle;
-    local l_toastTitle_1 = v51.props.toastTitle;
-    return v8(function(v57) --[[ Line: 199 ]]
-        -- upvalues: v51 (copy), v53 (copy), l_padding_1 (copy), v3 (ref), l_iconImage_2 (copy), l_toastSubtitle_1 (copy), l_toastTitle_1 (copy)
-        local v58, v59 = v51.getTextHeights(v57);
-        local v60 = v59 + v58;
-        local l_Y_0 = v51.getButtonDimensions(v57).Y;
-        local l_size_0 = v51.props.size;
-        if v51.props.fitHeight then
-            local v63 = math.max(v53.Y, v60) + l_padding_1 * 2 + if v51.showCompactToast() and v51.props.buttonText then l_Y_0 else 0;
-            l_size_0 = UDim2.new(l_size_0.X.Scale, l_size_0.X.Offset, 0, v63);
-        end;
-        local l_Theme_0 = v57.Theme;
-        local l_Font_4 = v57.Font;
-        local l_Header2_1 = l_Font_4.Header2;
-        local l_CaptionBody_1 = l_Font_4.CaptionBody;
-        return v3.createElement("TextButton", {
-            AnchorPoint = v51.props.anchorPoint, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v51.props.layoutOrder, 
-            Position = v51.props.position, 
-            Size = l_size_0, 
-            Text = "", 
-            [v3.Change.AbsoluteSize] = function(v68) --[[ Line: 225 ]]
-                -- upvalues: v51 (ref)
-                if v51.state.containerWidth ~= v68.AbsoluteSize.X then
-                    v51:setState({
-                        containerWidth = v68.AbsoluteSize.X
-                    });
-                end;
-            end, 
-            [v3.Event.Activated] = if not v51.props.buttonText then v51.props.onActivated else nil, 
-            [v3.Event.InputBegan] = v51.onButtonInputBegan, 
-            [v3.Event.InputEnded] = v51.onButtonInputEnded, 
-            [v3.Event.TouchSwipe] = v51.props.onTouchSwipe, 
-            [v3.Ref] = v51.containerRef
-        }, {
-            UISizeConstraint = v3.createElement("UISizeConstraint", v51.props.sizeConstraint), 
-            Toast = v51.props.renderToast({
-                buttonProps = if v51.props.buttonText and v51.props.onActivated then {
-                    buttonDimensions = v51.getButtonDimensions(v57), 
-                    buttonText = v51.props.buttonText, 
-                    onActivated = v51.props.onActivated, 
-                    buttonType = v51.props.buttonType
-                } else nil, 
-                iconProps = l_iconImage_2 and {
-                    colorStyle = v51.props.iconColorStyle, 
-                    Image = l_iconImage_2, 
-                    Size = UDim2.new(0, v53.X, 0, v53.Y)
-                } or nil, 
-                iconChildren = v51.props.iconChildren, 
-                isCompact = if v51.props.buttonText and v51.props.onActivated then v51.showCompactToast() else nil, 
-                padding = l_padding_1, 
-                pressed = v51.showPressed(), 
-                pressedScale = v51.props.pressedScale, 
-                subtitleTextProps = l_toastSubtitle_1 and {
-                    colorStyle = l_Theme_0.TextEmphasis, 
-                    fontStyle = l_CaptionBody_1, 
-                    Size = UDim2.new(1, 0, 0, v58), 
-                    Text = l_toastSubtitle_1
-                } or nil, 
-                textFrameSize = UDim2.new(1, l_iconImage_2 and -v53.X - l_padding_1 or 0, 0, v60), 
-                titleTextProps = {
-                    colorStyle = l_Theme_0.TextEmphasis, 
-                    fontStyle = l_Header2_1, 
-                    Size = UDim2.new(1, 0, 0, v59), 
-                    Text = l_toastTitle_1
-                }
-            })
-        });
-    end);
-end;
-v18.didMount = function(v69) --[[ Line: 278 ]] --[[ Name: didMount ]]
-    v69:setState({
-        containerWidth = v69.containerRef.current and v69.containerRef.current.AbsoluteSize.X or 0
-    });
-end;
-return v18;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Roact = require(ParentParentParentParent.Roact)
+local t = require(ParentParentParentParent.t)
+local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
+local Images = require(ParentParentParent.App.ImageSet.Images)
+local memoize = require(ParentParentParent.Utility.memoize)
+local withStyle = require(ParentParentParent.Core.Style.withStyle)
+local validateColorInfo = require(ParentParentParent.Core.Style.Validator.validateColorInfo)
+local ButtonType = require(ParentParent.Button.Enum.ButtonType)
+local vector2 = Vector2.new(36, 36)
+
+local function getTextHeight(p1, p2, p3, p4) -- line: 31
+	-- upvalues: GetTextSize (copy)
+	local vector2_2 = Vector2.new(p4, 10000)
+
+	return GetTextSize(p1, p3, p2, vector2_2).Y
+end
+
+local v14 = Roact.PureComponent:extend("ToastContainer")
+
+v14.validateProps = t.strictInterface({
+	anchorPoint = t.optional(t.Vector2),
+	buttonText = t.optional(t.string),
+	fitHeight = t.optional(t.boolean),
+	iconColorStyle = t.optional(validateColorInfo),
+	iconImage = t.optional(t.union(t.table, t.string, t.callback)),
+	iconSize = t.optional(t.Vector2),
+	iconChildren = t.optional(t.table),
+	layoutOrder = t.optional(t.integer),
+	onActivated = t.optional(t.callback),
+	onTouchSwipe = t.optional(t.callback),
+	padding = t.numberMin(0),
+	position = t.UDim2,
+	pressedScale = t.optional(t.number),
+	renderToast = t.callback,
+	size = t.UDim2,
+	sizeConstraint = t.optional(t.table),
+	toastSubtitle = t.optional(t.string),
+	toastTitle = t.string,
+	buttonType = t.optional(ButtonType.isEnumValue)
+})
+v14.defaultProps = {
+	fitHeight = true,
+	padding = 12,
+	anchorPoint = Vector2.new(0, 0),
+	position = UDim2.new(0, 0, 0, 0),
+	size = UDim2.new(1, -24, 0, 0),
+	sizeConstraint = {
+		MaxSize = Vector2.new(400, 1e999),
+		MinSize = Vector2.new(24, 60)
+	}
+}
+
+function v14.init(p5) -- line: 74
+	-- upvalues: Roact (copy), Images (copy), vector2 (copy), GetTextSize (copy), memoize (copy)
+	p5.containerRef = Roact.createRef()
+	p5.isMounted = false
+	p5.state = {
+		containerWidth = 0,
+		pressed = false,
+		subtitleHeight = 0,
+		titleHeight = 0
+	}
+
+	function p5.getIconSize() -- line: 85
+		-- upvalues: p5 (copy), Images (copy), vector2 (copy)
+		local iconSize = p5.props.iconSize
+		local iconImage = p5.props.iconImage
+		local ImagesResolutionScale = Images.ImagesResolutionScale
+
+		if iconImage then
+			if iconSize then
+				return iconSize
+			end
+
+			if iconImage.ImageRectSize and ImagesResolutionScale and ImagesResolutionScale > 0 then
+				return iconImage.ImageRectSize / ImagesResolutionScale
+			end
+
+			return vector2
+		end
+
+		return Vector2.new(0, 0)
+	end
+	function p5.onButtonInputBegan(_, p7) -- line: 101
+		-- upvalues: p5 (copy)
+		if p7.UserInputState == Enum.UserInputState.Begin and ((p7.UserInputType == Enum.UserInputType.Touch or p7.UserInputType == Enum.UserInputType.MouseButton1) and not p5.state.pressed) then
+			p5:setState({
+				pressed = true
+			})
+		end
+	end
+	function p5.onButtonInputEnded() -- line: 117
+		-- upvalues: p5 (copy)
+		if p5.state.pressed then
+			p5:setState({
+				pressed = false
+			})
+		end
+	end
+	function p5.getTextHeights(p8) -- line: 125
+		-- upvalues: p5 (copy), GetTextSize (copy)
+		local iconImage = p5.props.iconImage
+		local v35 = p5.getIconSize()
+		local buttonText = p5.props.buttonText
+		local padding = p5.props.padding
+		local toastSubtitle = p5.props.toastSubtitle
+		local toastTitle = p5.props.toastTitle
+		local p8Font = p8.Font
+		local Header2 = p8Font.Header2
+		local CaptionBody = p8Font.CaptionBody
+		local v43 = p5.state.containerWidth - padding * 2
+
+		if iconImage then
+			v43 = v43 - v35.X - padding
+		end
+
+		if buttonText and not p5.showCompactToast() then
+			v43 -= p5.getButtonDimensions(p8).X
+		end
+
+		local Header2Font = Header2.Font
+		local v45 = Header2.RelativeSize * p8Font.BaseSize
+		local vector2_3 = Vector2.new(v43, 10000)
+		local v47 = math.max(0, GetTextSize(toastTitle, v45, Header2Font, vector2_3).Y)
+		local n1 = 0
+
+		if toastSubtitle then
+			local CaptionBodyFont = CaptionBody.Font
+			local v50 = CaptionBody.RelativeSize * p8Font.BaseSize
+			local vector2_4 = Vector2.new(v43, 10000)
+
+			n1 = math.max(0, GetTextSize(toastSubtitle, v50, CaptionBodyFont, vector2_4).Y)
+		end
+
+		return n1, v47
+	end
+	function p5.showCompactToast() -- line: 160
+		-- upvalues: p5 (copy)
+		return p5.state.containerWidth < 400
+	end
+	function p5.showPressed() -- line: 164
+		-- upvalues: p5 (copy)
+		if not p5.props.buttonText and p5.props.onActivated then
+			return p5.state.pressed
+		end
+
+		return nil
+	end
+
+	p5.getButtonDimensions = memoize(function(p9) -- line: 172
+		-- upvalues: p5 (copy), GetTextSize (copy)
+		local buttonText = p5.props.buttonText
+		local onActivated = p5.props.onActivated
+
+		if not buttonText or not onActivated then
+			return Vector2.new(0, 0)
+		end
+
+		local Header2Font = p9.Font.Header2.Font
+		local v56 = p9.Font.Header2.RelativeSize * p9.Font.BaseSize
+		local v57 = Vector2.new(30, 30) + Vector2.new(10, 10) + GetTextSize(buttonText, v56, Header2Font, Vector2.new(1000, 1000))
+
+		if not p5.showCompactToast() then
+			return v57
+		end
+
+		return Vector2.new(math.min(v57.X, 200), v57.Y)
+	end)
+end
+function v14.render(p10) -- line: 193
+	-- upvalues: withStyle (copy), Roact (copy)
+	local iconImage = p10.props.iconImage
+	local v23 = p10.getIconSize()
+	local padding = p10.props.padding
+	local toastSubtitle = p10.props.toastSubtitle
+	local toastTitle = p10.props.toastTitle
+
+	return withStyle(function(p11) -- line: 199
+		-- upvalues: p10 (copy), v23 (copy), padding (copy), Roact (copy), iconImage (copy), toastSubtitle (copy), toastTitle (copy)
+		local v59, v60 = p10.getTextHeights(p11)
+		local v61 = v60 + v59
+		local Y = p10.getButtonDimensions(p11).Y
+		local size = p10.props.size
+
+		if p10.props.fitHeight then
+			local v64 = math.max(v23.Y, v61) + padding * 2 + ((not p10.showCompactToast() or not p10.props.buttonText) and 0 or Y)
+
+			size = UDim2.new(size.X.Scale, size.X.Offset, 0, v64)
+		end
+
+		local Theme = p11.Theme
+		local p11Font = p11.Font
+		local Header2 = p11Font.Header2
+		local CaptionBody = p11Font.CaptionBody
+
+		return Roact.createElement("TextButton", {
+			AnchorPoint = p10.props.anchorPoint,
+			BackgroundTransparency = 1,
+			LayoutOrder = p10.props.layoutOrder,
+			Position = p10.props.position,
+			Size = size,
+			Text = "",
+			[Roact.Change.AbsoluteSize] = function(p12) -- line: 225
+				-- upvalues: p10 (copy)
+				if p10.state.containerWidth ~= p12.AbsoluteSize.X then
+					p10:setState({
+						containerWidth = p12.AbsoluteSize.X
+					})
+				end
+			end,
+			[Roact.Event.Activated] = if p10.props.buttonText then nil else p10.props.onActivated,
+			[Roact.Event.InputBegan] = p10.onButtonInputBegan,
+			[Roact.Event.InputEnded] = p10.onButtonInputEnded,
+			[Roact.Event.TouchSwipe] = p10.props.onTouchSwipe,
+			[Roact.Ref] = p10.containerRef
+		}, {
+			UISizeConstraint = Roact.createElement("UISizeConstraint", p10.props.sizeConstraint),
+			Toast = p10.props.renderToast({
+				buttonProps = if not p10.props.buttonText or not p10.props.onActivated then nil else {
+					buttonDimensions = p10.getButtonDimensions(p11),
+					buttonText = p10.props.buttonText,
+					onActivated = p10.props.onActivated,
+					buttonType = p10.props.buttonType
+				},
+				iconProps = iconImage and {
+					colorStyle = p10.props.iconColorStyle,
+					Image = iconImage,
+					Size = UDim2.new(0, v23.X, 0, v23.Y)
+				} or nil,
+				iconChildren = p10.props.iconChildren,
+				isCompact = if not p10.props.buttonText or not p10.props.onActivated then nil else p10.showCompactToast(),
+				padding = padding,
+				pressed = p10.showPressed(),
+				pressedScale = p10.props.pressedScale,
+				subtitleTextProps = toastSubtitle and {
+					colorStyle = Theme.TextEmphasis,
+					fontStyle = CaptionBody,
+					Size = UDim2.new(1, 0, 0, v59),
+					Text = toastSubtitle
+				} or nil,
+				textFrameSize = UDim2.new(1, iconImage and -v23.X - padding or 0, 0, v61),
+				titleTextProps = {
+					colorStyle = Theme.TextEmphasis,
+					fontStyle = Header2,
+					Size = UDim2.new(1, 0, 0, v60),
+					Text = toastTitle
+				}
+			})
+		})
+	end)
+end
+function v14.didMount(p13) -- line: 278
+	p13:setState({
+		containerWidth = p13.containerRef.current and p13.containerRef.current.AbsoluteSize.X or 0
+	})
+end
+
+return v14

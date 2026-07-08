@@ -1,4 +1,4 @@
 return {
-    APP = "in-app", 
-    EXPERIENCE = "in-experience"
-};
+	APP = "in-app",
+	EXPERIENCE = "in-experience"
+}

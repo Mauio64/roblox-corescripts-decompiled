@@ -1,2 +1,3 @@
-local l_Pages_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("Settings"):WaitForChild("Pages");
-return (require(l_Pages_0:WaitForChild("ReportAbuseMenuNewContainerPage")));
+local Pages = game:GetService("CoreGui"):WaitForChild("RobloxGui"):WaitForChild("Modules"):WaitForChild("Settings"):WaitForChild("Pages")
+
+return (require(Pages:WaitForChild("ReportAbuseMenuNewContainerPage")))

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DebugAlwaysShowSystemTrayModal", false);
+return game:DefineFastFlag("DebugAlwaysShowSystemTrayModal", false)

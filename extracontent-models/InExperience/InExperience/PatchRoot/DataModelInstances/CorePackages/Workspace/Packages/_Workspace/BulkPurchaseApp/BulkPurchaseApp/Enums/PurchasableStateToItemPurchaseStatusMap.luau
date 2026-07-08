@@ -1,8 +1,9 @@
-local v0 = require(script.Parent.PurchasableStateEnum);
+local PurchasableStateEnum = require(script.Parent.PurchasableStateEnum)
+
 return {
-    [v0.Unknown] = Enum.MarketplaceItemPurchaseStatus.SystemError, 
-    [v0.AlreadyOwned] = Enum.MarketplaceItemPurchaseStatus.AlreadyOwned, 
-    [v0.QuantityLimitExceeded] = Enum.MarketplaceItemPurchaseStatus.QuantityLimitExceeded, 
-    [v0.NotForSale] = Enum.MarketplaceItemPurchaseStatus.NotForSale, 
-    [v0.SoldOut] = Enum.MarketplaceItemPurchaseStatus.NotForSale
-};
+	[PurchasableStateEnum.Unknown] = Enum.MarketplaceItemPurchaseStatus.SystemError,
+	[PurchasableStateEnum.AlreadyOwned] = Enum.MarketplaceItemPurchaseStatus.AlreadyOwned,
+	[PurchasableStateEnum.QuantityLimitExceeded] = Enum.MarketplaceItemPurchaseStatus.QuantityLimitExceeded,
+	[PurchasableStateEnum.NotForSale] = Enum.MarketplaceItemPurchaseStatus.NotForSale,
+	[PurchasableStateEnum.SoldOut] = Enum.MarketplaceItemPurchaseStatus.NotForSale
+}

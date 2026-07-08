@@ -1,1 +1,1 @@
-return require(script.ContactImporterManager);
+return require(script.ContactImporterManager)

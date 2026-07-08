@@ -1,44 +1,55 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(script.Parent.Parent.Actions.UpdateChatSettings);
-local v4 = require(script.Parent.Parent.ChatSettings);
-local function v5(v6) --[[ Line: 9 ]] --[[ Name: deepCopy ]]
-    -- upvalues: v5 (copy)
-    if type(v6) ~= "table" then
-        return v6;
-    else
-        local v7 = {};
-        for v8, v9 in pairs(v6) do
-            v7[v8] = v5(v9);
-        end;
-        return v7;
-    end;
-end;
-local function v10(v11, v12) --[[ Line: 22 ]] --[[ Name: mergeInto ]]
-    -- upvalues: v10 (copy)
-    for v13, v14 in pairs(v12) do
-        if type(v14) ~= "table" then
-            v11[v13] = v14;
-        elseif v11[v13] then
-            v10(v11[v13], v14);
-        end;
-    end;
-end;
-return (v2.createReducer(v4, {
-    [v3.name] = function(_, v16) --[[ Line: 33 ]]
-        -- upvalues: v5 (copy), v4 (copy), v10 (copy)
-        local v17 = v5(v4);
-        v10(v17, v16.settings);
-        local l_UserSpecificSettings_0 = v16.settings.UserSpecificSettings;
-        if l_UserSpecificSettings_0 then
-            for v19, v20 in pairs(l_UserSpecificSettings_0) do
-                local v21 = v5(v4);
-                v21.UserSpecificSettings = nil;
-                v10(v21, v20);
-                v17.UserSpecificSettings[v19] = v21;
-            end;
-        end;
-        return v17;
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+
+require(CorePackages.Packages.Cryo)
+
+local Rodux = require(CorePackages.Packages.Rodux)
+local UpdateChatSettings = require(script.Parent.Parent.Actions.UpdateChatSettings)
+local ChatSettings = require(script.Parent.Parent.ChatSettings)
+
+local function deepCopy(p1) -- line: 9
+	-- upvalues: deepCopy (copy)
+	if type(p1) ~= "table" then
+		return p1
+	end
+
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		t1[k] = deepCopy(v)
+	end
+
+	return t1
+end
+local function mergeInto(p2, p3) -- line: 22
+	-- upvalues: mergeInto (copy)
+	for k, v in pairs(p3) do
+		if type(v) ~= "table" then
+			p2[k] = v
+		elseif p2[k] then
+			mergeInto(p2[k], v)
+		end
+	end
+end
+
+return (Rodux.createReducer(ChatSettings, {
+	[UpdateChatSettings.name] = function(_, p5) -- line: 33
+		-- upvalues: deepCopy (copy), ChatSettings (copy), mergeInto (copy)
+		local v17 = deepCopy(ChatSettings)
+
+		mergeInto(v17, p5.settings)
+
+		local UserSpecificSettings = p5.settings.UserSpecificSettings
+
+		if UserSpecificSettings then
+			for k, v in pairs(UserSpecificSettings) do
+				local v21 = deepCopy(ChatSettings)
+
+				v21.UserSpecificSettings = nil
+				mergeInto(v21, v)
+				v17.UserSpecificSettings[k] = v21
+			end
+		end
+
+		return v17
+	end
+}))

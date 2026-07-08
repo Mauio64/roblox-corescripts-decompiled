@@ -1,33 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.DataHydrationTypes);
-local v3 = require(l_Parent_0.t);
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+
+require(DataHydration.DataHydrationTypes)
+require(DataHydrationParent.Signals)
+
+local t = require(DataHydrationParent.t)
+
 return {
-    userVoteFeedbackMetadataResponseValidator = v3.interface({
-        capabilities = v3.interface({
-            can_submit_review = v3.boolean, 
-            can_submit_category_options = v3.optional(v3.boolean), 
-            can_submit_comment = v3.boolean
-        }), 
-        categories = v3.array(v3.interface({
-            type = v3.string, 
-            label = v3.string, 
-            allows_multiple_selections = v3.boolean, 
-            options = v3.array(v3.interface({
-                id = v3.string, 
-                label = v3.string
-            }))
-        })), 
-        comment = v3.interface({
-            label = v3.string, 
-            placeholder_text = v3.string, 
-            minimum_length = v3.number, 
-            maximum_length = v3.number
-        }), 
-        metadata = v3.interface({
-            disclaimer_label = v3.string, 
-            submit_button_label = v3.string, 
-            form_title_label = v3.string
-        })
-    })
-};
+	userVoteFeedbackMetadataResponseValidator = t.interface({
+		capabilities = t.interface({
+			can_submit_review = t.boolean,
+			can_submit_category_options = t.optional(t.boolean),
+			can_submit_comment = t.boolean
+		}),
+		categories = t.array(t.interface({
+			type = t.string,
+			label = t.string,
+			allows_multiple_selections = t.boolean,
+			options = t.array(t.interface({
+				id = t.string,
+				label = t.string
+			}))
+		})),
+		comment = t.interface({
+			label = t.string,
+			placeholder_text = t.string,
+			minimum_length = t.number,
+			maximum_length = t.number
+		}),
+		metadata = t.interface({
+			disclaimer_label = t.string,
+			submit_button_label = t.string,
+			form_title_label = t.string
+		})
+	})
+}

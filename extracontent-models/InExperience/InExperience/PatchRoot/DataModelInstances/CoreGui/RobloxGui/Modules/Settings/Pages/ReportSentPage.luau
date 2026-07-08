@@ -1,148 +1,168 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Players_0 = game:GetService("Players");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Modules_0 = l_CoreGui_0:WaitForChild("RobloxGui"):WaitForChild("Modules");
-local v5 = require(l_CorePackages_0.Workspace.Packages.BlockingUtility);
-local v6 = require(l_Modules_0.Settings.SettingsPageFactory);
-local v7 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v8 = require(script:FindFirstAncestor("Settings").onBlockButtonActivated);
-local v9 = require(script:FindFirstAncestor("Settings").Analytics.BlockingAnalytics);
-local v10 = require(l_Modules_0.Settings.Utility);
-local v11 = require(l_Modules_0.Settings.Theme);
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0.ChildAdded:wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v14 = v9.new(l_LocalPlayer_0.UserId, {
-    EventStream = l_RbxAnalyticsService_0
-});
-local v15 = v11.textSize(36);
-local v16 = v11.textSize(24);
-local v17 = v11.textSize(16);
-local v39 = (function() --[[ Line: 36 ]] --[[ Name: Initialize ]]
-    -- upvalues: v6 (copy), l_Create_0 (copy), v11 (copy), v10 (copy), v7 (copy), v15 (copy), v16 (copy), v17 (copy)
-    local l_v6_NewPage_0 = v6:CreateNewPage();
-    l_v6_NewPage_0.TabHeader = nil;
-    l_v6_NewPage_0.PageListLayout.Parent = nil;
-    l_v6_NewPage_0.ShouldShowBottomBar = false;
-    l_v6_NewPage_0.ShouldShowHubBar = false;
-    l_v6_NewPage_0.IsPageClipped = false;
-    l_v6_NewPage_0.Page.Name = "ReportSentPage";
-    l_v6_NewPage_0.Page.Size = UDim2.fromScale(1, 0);
-    l_v6_NewPage_0.Page.AutomaticSize = Enum.AutomaticSize.Y;
-    l_v6_NewPage_0.Root = l_Create_0("Frame")({
-        BackgroundTransparency = 1, 
-        Size = UDim2.fromScale(1, 1), 
-        Name = "ReportSentContents", 
-        Parent = l_v6_NewPage_0.Page
-    });
-    l_v6_NewPage_0.RootLayout = l_Create_0("UIListLayout")({
-        Name = "RootLayout", 
-        FillDirection = Enum.FillDirection.Vertical, 
-        VerticalAlignment = Enum.VerticalAlignment.Center, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        Parent = l_v6_NewPage_0.Root
-    });
-    local function v23(v19, v20, v21, v22) --[[ Line: 64 ]] --[[ Name: createTextLabel ]]
-        -- upvalues: l_Create_0 (ref), v11 (ref), l_v6_NewPage_0 (copy)
-        return l_Create_0("TextLabel")({
-            Name = v19, 
-            LayoutOrder = v22, 
-            Size = UDim2.fromScale(1, 0), 
-            BackgroundTransparency = 1, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Text = v20, 
-            TextSize = v21, 
-            Font = v11.font(Enum.Font.SourceSansBold, "Bold"), 
-            TextWrap = true, 
-            TextColor3 = Color3.fromRGB(255, 255, 255), 
-            TextXAlignment = Enum.TextXAlignment.Center, 
-            Parent = l_v6_NewPage_0.Root
-        });
-    end;
-    local function _(v24, v25, v26, v27) --[[ Line: 81 ]] --[[ Name: createButton ]]
-        -- upvalues: v10 (ref), l_v6_NewPage_0 (copy)
-        local v28, v29 = v10:MakeStyledButton(v24, v25, UDim2.new(1, 0, 0, 50), v27);
-        v28.LayoutOrder = v26;
-        v28.Parent = l_v6_NewPage_0.Root;
-        return v28, v29;
-    end;
-    local function v33(v31, v32) --[[ Line: 89 ]] --[[ Name: createSpacer ]]
-        -- upvalues: l_Create_0 (ref), l_v6_NewPage_0 (copy)
-        return l_Create_0("Frame")({
-            LayoutOrder = v32, 
-            Name = "Spacer" .. tostring(v32), 
-            Size = UDim2.fromOffset(0, v31), 
-            Parent = l_v6_NewPage_0.Root
-        });
-    end;
-    l_v6_NewPage_0.TitleLabel = v23("TitleLabel", v7:FormatByKey("Feature.SettingsHub.Heading.Report.ThanksForReport"), v15, 0);
-    l_v6_NewPage_0.BodyLabel = v23("BodyLabel", v7:FormatByKey("Feature.SettingsHub.Label.Report.ReceivedReportBody"), v16, 1);
-    l_v6_NewPage_0.TopSpacer = v33(10, 2);
-    l_v6_NewPage_0.ActionHeader = v23("ActionHeader", v7:FormatByKey("Feature.SettingsHub.Label.Report.OtherActionsHeader"), v17, 3);
-    l_v6_NewPage_0.ActionHeader.TextXAlignment = Enum.TextXAlignment.Left;
-    local v34 = v7:FormatByKey("Feature.SettingsHub.Action.Block");
-    local v35, v36 = v10:MakeStyledButton("BlockButton", v34, UDim2.new(1, 0, 0, 50), function() --[[ Line: 111 ]]
-        -- upvalues: l_v6_NewPage_0 (copy)
-        l_v6_NewPage_0:HandleBlock();
-    end);
-    v35.LayoutOrder = 4;
-    v35.Parent = l_v6_NewPage_0.Root;
-    local l_v35_0 = v35;
-    local l_v36_0 = v36;
-    l_v6_NewPage_0.BlockButton = l_v35_0;
-    l_v6_NewPage_0.BlockLabel = l_v36_0;
-    l_v6_NewPage_0.MiddleSpacer = v33(20, 6);
-    l_v35_0 = v7:FormatByKey("Feature.SettingsHub.Action.Report.Done");
-    v35, v36 = v10:MakeStyledButton("DoneButton", l_v35_0, UDim2.new(1, 0, 0, 50), function() --[[ Line: 118 ]]
-        -- upvalues: l_v6_NewPage_0 (copy)
-        l_v6_NewPage_0:HandleDone();
-    end);
-    v35.LayoutOrder = 7;
-    v35.Parent = l_v6_NewPage_0.Root;
-    l_v6_NewPage_0.DoneButton = v35;
-    return l_v6_NewPage_0;
-end)();
-v39.UpdateActions = function(v40) --[[ Line: 127 ]] --[[ Name: UpdateActions ]]
-    -- upvalues: v5 (copy), v7 (copy)
-    if v40.ReportedPlayer then
-        v40.TopSpacer.Visible = true;
-        v40.ActionHeader.Visible = true;
-        local v41 = v5:IsPlayerBlockedByUserId(v40.ReportedPlayer.UserId);
-        v40.BlockButton.Visible = not v41;
-        local l_DisplayName_0 = v40.ReportedPlayer.DisplayName;
-        local l_Name_0 = v40.ReportedPlayer.Name;
-        local v44 = v7:FormatByKey("Feature.SettingsHub.Label.Report.BlockDisplayName", {
-            DISPLAY_NAME = l_DisplayName_0, 
-            RBX_NAME = l_Name_0
-        });
-        v40.BlockLabel.Text = v44;
-        return;
-    else
-        v40.TopSpacer.Visible = false;
-        v40.ActionHeader.Visible = false;
-        v40.BlockButton.Visible = false;
-        return;
-    end;
-end;
-v39.ShowReportedPlayer = function(v45, v46) --[[ Line: 149 ]] --[[ Name: ShowReportedPlayer ]]
-    -- upvalues: v39 (copy)
-    v45.ReportedPlayer = v46;
-    v45:UpdateActions();
-    v45.HubRef:SwitchToPage(v39, true);
-end;
-v39.HandleBlock = function(v47) --[[ Line: 156 ]] --[[ Name: HandleBlock ]]
-    -- upvalues: v8 (copy), v14 (copy)
-    if v47.ReportedPlayer then
-        v8(v47.ReportedPlayer, v14);
-    end;
-    v47:HandleDone();
-end;
-v39.HandleDone = function(v48) --[[ Line: 163 ]] --[[ Name: HandleDone ]]
-    v48.HubRef:SetVisibility(false, true);
-end;
-return v39;
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CorePackages = game:GetService("CorePackages")
+local Modules = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules")
+local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
+local SettingsPageFactory = require(Modules.Settings.SettingsPageFactory)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local onBlockButtonActivated = require(script:FindFirstAncestor("Settings").onBlockButtonActivated)
+local BlockingAnalytics = require(script:FindFirstAncestor("Settings").Analytics.BlockingAnalytics)
+local Utility = require(Modules.Settings.Utility)
+local Theme = require(Modules.Settings.Theme)
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local LocalPlayer = Players.LocalPlayer
+
+while not LocalPlayer do
+	Players.ChildAdded:wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local v15 = BlockingAnalytics.new(LocalPlayer.UserId, {
+	EventStream = RbxAnalyticsService
+})
+local v16 = Theme.textSize(36)
+local v17 = Theme.textSize(24)
+local v18 = Theme.textSize(16)
+
+local function Initialize() -- line: 36
+	-- upvalues: SettingsPageFactory (copy), Create (copy), Theme (copy), Utility (copy), RobloxTranslator (copy), v16 (copy), v17 (copy), v18 (copy)
+	local v21 = SettingsPageFactory:CreateNewPage()
+
+	v21.TabHeader = nil
+	v21.PageListLayout.Parent = nil
+	v21.ShouldShowBottomBar = false
+	v21.ShouldShowHubBar = false
+	v21.IsPageClipped = false
+	v21.Page.Name = "ReportSentPage"
+	v21.Page.Size = UDim2.fromScale(1, 0)
+	v21.Page.AutomaticSize = Enum.AutomaticSize.Y
+	v21.Root = Create("Frame")({
+		BackgroundTransparency = 1,
+		Name = "ReportSentContents",
+		Size = UDim2.fromScale(1, 1),
+		Parent = v21.Page
+	})
+	v21.RootLayout = Create("UIListLayout")({
+		Name = "RootLayout",
+		FillDirection = Enum.FillDirection.Vertical,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Parent = v21.Root
+	})
+
+	local function createTextLabel(p1, p2, p3, p4) -- line: 64
+		-- upvalues: Create (copy), Theme (copy), v21 (copy)
+		return Create("TextLabel")({
+			BackgroundTransparency = 1,
+			TextWrap = true,
+			Name = p1,
+			LayoutOrder = p4,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Text = p2,
+			TextSize = p3,
+			Font = Theme.font(Enum.Font.SourceSansBold, "Bold"),
+			TextColor3 = Color3.fromRGB(255, 255, 255),
+			TextXAlignment = Enum.TextXAlignment.Center,
+			Parent = v21.Root
+		})
+	end
+	local function createButton(p5, p6, p7, p8) -- line: 81
+		-- upvalues: Utility (copy), v21 (copy)
+		local v48, v49 = Utility:MakeStyledButton(p5, p6, UDim2.new(1, 0, 0, 50), p8)
+
+		v48.LayoutOrder = p7
+		v48.Parent = v21.Root
+
+		return v48, v49
+	end
+	local function createSpacer(p9, p10) -- line: 89
+		-- upvalues: Create (copy), v21 (copy)
+		return Create("Frame")({
+			LayoutOrder = p10,
+			Name = "Spacer" .. tostring(p10),
+			Size = UDim2.fromOffset(0, p9),
+			Parent = v21.Root
+		})
+	end
+
+	v21.TitleLabel = createTextLabel("TitleLabel", RobloxTranslator:FormatByKey("Feature.SettingsHub.Heading.Report.ThanksForReport"), v16, 0)
+	v21.BodyLabel = createTextLabel("BodyLabel", RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Report.ReceivedReportBody"), v17, 1)
+	v21.TopSpacer = createSpacer(10, 2)
+	v21.ActionHeader = createTextLabel("ActionHeader", RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Report.OtherActionsHeader"), v18, 3)
+	v21.ActionHeader.TextXAlignment = Enum.TextXAlignment.Left
+
+	local v25 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Block")
+	local v26, v27 = Utility:MakeStyledButton("BlockButton", v25, UDim2.new(1, 0, 0, 50), function() -- line: 111
+		-- upvalues: v21 (copy)
+		v21:HandleBlock()
+	end)
+
+	v26.LayoutOrder = 4
+	v26.Parent = v21.Root
+	v21.BlockButton = v26
+	v21.BlockLabel = v27
+	v21.MiddleSpacer = createSpacer(20, 6)
+
+	local v28 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Action.Report.Done")
+	local v29, _ = Utility:MakeStyledButton("DoneButton", v28, UDim2.new(1, 0, 0, 50), function() -- line: 118
+		-- upvalues: v21 (copy)
+		v21:HandleDone()
+	end)
+
+	v29.LayoutOrder = 7
+	v29.Parent = v21.Root
+	v21.DoneButton = v29
+
+	return v21
+end
+
+local v20 = Initialize()
+
+function v20.UpdateActions(p11) -- line: 127
+	-- upvalues: BlockingUtility (copy), RobloxTranslator (copy)
+	if p11.ReportedPlayer then
+		p11.TopSpacer.Visible = true
+		p11.ActionHeader.Visible = true
+
+		local v32 = BlockingUtility:IsPlayerBlockedByUserId(p11.ReportedPlayer.UserId)
+
+		p11.BlockButton.Visible = not v32
+
+		local DisplayName = p11.ReportedPlayer.DisplayName
+		local ReportedPlayerName = p11.ReportedPlayer.Name
+		local v35 = RobloxTranslator:FormatByKey("Feature.SettingsHub.Label.Report.BlockDisplayName", {
+			DISPLAY_NAME = DisplayName,
+			RBX_NAME = ReportedPlayerName
+		})
+
+		p11.BlockLabel.Text = v35
+
+		return
+	end
+
+	p11.TopSpacer.Visible = false
+	p11.ActionHeader.Visible = false
+	p11.BlockButton.Visible = false
+end
+function v20.ShowReportedPlayer(p12, p13) -- line: 149
+	-- upvalues: v20 (copy)
+	p12.ReportedPlayer = p13
+	p12:UpdateActions()
+	p12.HubRef:SwitchToPage(v20, true)
+end
+function v20.HandleBlock(p14) -- line: 156
+	-- upvalues: onBlockButtonActivated (copy), v15 (copy)
+	if p14.ReportedPlayer then
+		onBlockButtonActivated(p14.ReportedPlayer, v15)
+	end
+
+	p14:HandleDone()
+end
+function v20.HandleDone(p15) -- line: 163
+	p15.HubRef:SetVisibility(false, true)
+end
+
+return v20

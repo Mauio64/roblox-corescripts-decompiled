@@ -1,105 +1,125 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.tutils);
-local v4 = require(l_Parent_0.RoactUtils);
-local v5 = require(l_Parent_0.CollectionViews);
-local v6 = require(l_Parent_0.GameTile);
-local l_GameTileLayoutType_0 = v6.GameTileTypes.GameTileLayoutType;
-local l_TopicContentsReducer_0 = require(l_Parent_0.TopicContentsRodux).TopicContentsReducer;
-local v9 = require(l_Parent_0.DiscoveryTypes);
-local l_useSelector_0 = v4.Hooks.RoactRodux.useSelector;
-local l_getGameTileCollectionItemSize_0 = v6.getGameTileCollectionItemSize;
-local l_OmniFeedTypes_0 = v9.OmniFeedTypes;
-local l_OmniFeedConstants_0 = v9.OmniFeedConstants;
-local v14 = require(l_script_FirstAncestor_0.DataStore.getSduiFeedStore);
-local v15 = require(l_script_FirstAncestor_0.DataStore.ApportioningPreprocessingHelpers);
-local l_FFlagLuaAppUseEffectInSignalPreprocessing_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppUseEffectInSignalPreprocessing;
-local l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppAddRequestIdToRfySignalApportioning;
-local l_FFlagLuaAppCompositionSupport_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionSupport;
-local l_FFlagLuaAppCompositionAlways_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppCompositionAlways;
-local l_getMainCollectionLayoutStore_0 = v5.getMainCollectionLayoutStore;
-return function(v21, v22, v23) --[[ Line: 36 ]] --[[ Name: useApportioningPreprocessingFromOmniRecommendations ]]
-    -- upvalues: l_FFlagLuaAppCompositionAlways_0 (copy), l_FFlagLuaAppCompositionSupport_0 (copy), l_useSelector_0 (copy), v3 (copy), l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 (copy), l_TopicContentsReducer_0 (copy), l_FFlagLuaAppUseEffectInSignalPreprocessing_0 (copy), v2 (copy), v14 (copy), l_getMainCollectionLayoutStore_0 (copy), l_OmniFeedTypes_0 (copy), l_GameTileLayoutType_0 (copy), l_OmniFeedConstants_0 (copy), l_getGameTileCollectionItemSize_0 (copy), v15 (copy)
-    local v24 = l_FFlagLuaAppCompositionAlways_0 or l_FFlagLuaAppCompositionSupport_0 and v23;
-    local v27 = l_useSelector_0(function(v25) --[[ Line: 44 ]]
-        -- upvalues: v21 (copy)
-        local v26 = v25.OmniRecommendations[v21];
-        if v26 then
-            return v26.sorts;
-        else
-            return {};
-        end;
-    end, v3.shallowEqual);
-    local v28 = nil;
-    if l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 then
-        v28 = l_useSelector_0(function(v29) --[[ Line: 54 ]]
-            -- upvalues: v21 (copy)
-            local v30 = v29.OmniRecommendations[v21];
-            if v30 then
-                return v30.recommendationsId;
-            else
-                return nil;
-            end;
-        end);
-    end;
-    local v32 = l_useSelector_0(function(v31) --[[ Line: 63 ]]
-        -- upvalues: l_TopicContentsReducer_0 (ref)
-        return v31.Personalization[l_TopicContentsReducer_0.key];
-    end);
-    (if l_FFlagLuaAppUseEffectInSignalPreprocessing_0 then v2.useEffect else v2.useLayoutEffect)(function() --[[ Line: 71 ]]
-        -- upvalues: v14 (ref), v21 (copy), v24 (copy), l_getMainCollectionLayoutStore_0 (ref), v27 (copy), l_OmniFeedTypes_0 (ref), l_GameTileLayoutType_0 (ref), l_OmniFeedConstants_0 (ref), l_getGameTileCollectionItemSize_0 (ref), v22 (copy), v15 (ref), v32 (copy), l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 (ref), v28 (ref)
-        local v33 = v14(v21);
-        local v34 = {};
-        local v35 = nil;
-        if v24 then
-            v35 = l_getMainCollectionLayoutStore_0(false).getNumItemsForAllCategories(false);
-        end;
-        for v36, v37 in v27 do
-            local l_topicId_0 = v37.topicId;
-            if l_topicId_0 and v37.treatmentType == l_OmniFeedTypes_0.HomeGameGrid then
-                local l_Narrow_0 = l_GameTileLayoutType_0.Narrow;
-                if v37.topicLayoutData then
-                    local v40 = v37.topicLayoutData[l_OmniFeedConstants_0.TopicLayoutDataKeys.ComponentType];
-                    if v40 then
-                        if v40 == l_OmniFeedConstants_0.ComponentTypeDataKeys.EventTile then
-                            l_Narrow_0 = l_GameTileLayoutType_0.Event;
-                        elseif v40 == l_OmniFeedConstants_0.ComponentTypeDataKeys.GridTile then
-                            l_Narrow_0 = l_GameTileLayoutType_0.Wide;
-                        end;
-                    end;
-                end;
-                local v41 = l_getGameTileCollectionItemSize_0(l_Narrow_0);
-                local v42 = nil;
-                v42 = if v24 then v35[v41] else v22[v41](false).numColumns;
-                local v43 = v37.numberOfRows or 99999;
-                if v43 == -1 then
-                    v43 = 99999;
-                end;
-                local v44 = v42 * v43;
-                v15.addToApportioningData(v34, l_topicId_0, v44, v36);
-            end;
-        end;
-        v15.populateStartingItemIndices(v34);
-        for v45, v46 in v34 do
-            local v47 = nil;
-            if v45 then
-                v47 = v32 and v32[v45] or nil;
-            end;
-            v46.items = v47 and v47.entries or {};
-        end;
-        v33.updateData({
-            apportioningData = v34
-        }, if l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 then v28 else nil);
-        return function() --[[ Line: 138 ]]
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local React = require(ServerDrivenUiParent.React)
+local tutils = require(ServerDrivenUiParent.tutils)
+local RoactUtils = require(ServerDrivenUiParent.RoactUtils)
+local CollectionViews = require(ServerDrivenUiParent.CollectionViews)
+local GameTile = require(ServerDrivenUiParent.GameTile)
+local GameTileLayoutType = GameTile.GameTileTypes.GameTileLayoutType
+local TopicContentsReducer = require(ServerDrivenUiParent.TopicContentsRodux).TopicContentsReducer
+local DiscoveryTypes = require(ServerDrivenUiParent.DiscoveryTypes)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local getGameTileCollectionItemSize = GameTile.getGameTileCollectionItemSize
+local OmniFeedTypes = DiscoveryTypes.OmniFeedTypes
+local OmniFeedConstants = DiscoveryTypes.OmniFeedConstants
+local getSduiFeedStore = require(ServerDrivenUi.DataStore.getSduiFeedStore)
+local ApportioningPreprocessingHelpers = require(ServerDrivenUi.DataStore.ApportioningPreprocessingHelpers)
+local FFlagLuaAppUseEffectInSignalPreprocessing = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppUseEffectInSignalPreprocessing
+local FFlagLuaAppAddRequestIdToRfySignalApportioning = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppAddRequestIdToRfySignalApportioning
+local FFlagLuaAppCompositionAlways = require(ServerDrivenUiParent.SharedFlags).FFlagLuaAppCompositionAlways
+local getMainCollectionLayoutStore = CollectionViews.getMainCollectionLayoutStore
 
-        end;
-    end, {
-        v27, 
-        v32, 
-        if not l_FFlagLuaAppCompositionAlways_0 then v22 else nil, 
-        v21, 
-        if l_FFlagLuaAppAddRequestIdToRfySignalApportioning_0 then v28 else nil, 
-        if l_FFlagLuaAppCompositionSupport_0 then v24 else nil
-    });
-end;
+local function useApportioningPreprocessingFromOmniRecommendations(s1: string, p1, b1: boolean?) -- line: 39
+	-- upvalues: FFlagLuaAppCompositionAlways (copy), useSelector (copy), tutils (copy), FFlagLuaAppAddRequestIdToRfySignalApportioning (copy), TopicContentsReducer (copy), FFlagLuaAppUseEffectInSignalPreprocessing (copy), React (copy), getSduiFeedStore (copy), getMainCollectionLayoutStore (copy), OmniFeedTypes (copy), GameTileLayoutType (copy), OmniFeedConstants (copy), getGameTileCollectionItemSize (copy), ApportioningPreprocessingHelpers (copy)
+	local v25 = FFlagLuaAppCompositionAlways or b1
+	local v26 = useSelector(function(p2) -- line: 46
+		-- upvalues: s1 (copy)
+		local v30 = p2.OmniRecommendations[s1]
+
+		if v30 then
+			return v30.sorts
+		end
+
+		return {}
+	end, tutils.shallowEqual)
+	local u27 = nil
+
+	if FFlagLuaAppAddRequestIdToRfySignalApportioning then
+		u27 = useSelector(function(p3) -- line: 56
+			-- upvalues: s1 (copy)
+			local v32 = p3.OmniRecommendations[s1]
+
+			if v32 then
+				return v32.recommendationsId
+			end
+
+			return nil
+		end)
+	end
+
+	local v28 = useSelector(function(p4) -- line: 65
+		-- upvalues: TopicContentsReducer (copy)
+		return p4.Personalization[TopicContentsReducer.key]
+	end);
+
+	((if not FFlagLuaAppUseEffectInSignalPreprocessing then React.useLayoutEffect else React.useEffect))(function() -- line: 73
+		-- upvalues: getSduiFeedStore (copy), s1 (copy), v25 (copy), getMainCollectionLayoutStore (copy), v26 (copy), OmniFeedTypes (copy), GameTileLayoutType (copy), OmniFeedConstants (copy), getGameTileCollectionItemSize (copy), p1 (copy), ApportioningPreprocessingHelpers (copy), v28 (copy), FFlagLuaAppAddRequestIdToRfySignalApportioning (copy), u27 (ref)
+		local v34 = getSduiFeedStore(s1)
+		local t1 = {}
+		local v36 = nil
+
+		if v25 then
+			v36 = getMainCollectionLayoutStore(false).getNumItemsForAllCategories(false)
+		end
+
+		for v37, v38 in v26 do
+			local topicId = v38.topicId
+
+			if topicId and v38.treatmentType == OmniFeedTypes.HomeGameGrid then
+				local Narrow = GameTileLayoutType.Narrow
+
+				if v38.topicLayoutData then
+					local v41 = v38.topicLayoutData[OmniFeedConstants.TopicLayoutDataKeys.ComponentType]
+
+					if v41 then
+						if v41 == OmniFeedConstants.ComponentTypeDataKeys.EventTile then
+							Narrow = GameTileLayoutType.Event
+						elseif v41 == OmniFeedConstants.ComponentTypeDataKeys.GridTile then
+							Narrow = GameTileLayoutType.Wide
+						end
+					end
+				end
+
+				local v42 = getGameTileCollectionItemSize(Narrow)
+				local v43 = if not v25 then p1[v42](false).numColumns else v36[v42]
+				local v44 = v38.numberOfRows or 99999
+
+				if v44 == -1 then
+					v44 = 99999
+				end
+
+				local v45 = v43 * v44
+
+				ApportioningPreprocessingHelpers.addToApportioningData(t1, topicId, v45, v37)
+			end
+		end
+
+		ApportioningPreprocessingHelpers.populateStartingItemIndices(t1)
+
+		for v46, v47 in t1 do
+			local v48 = nil
+
+			if v46 then
+				v48 = v28 and v28[v46] or nil
+			end
+
+			v47.items = v48 and v48.entries or {}
+		end
+
+		v34.updateData({
+			apportioningData = t1
+		}, if not FFlagLuaAppAddRequestIdToRfySignalApportioning then nil else u27)
+
+		return function() -- line: 140
+		end
+	end, {
+		v26,
+		v28,
+		if FFlagLuaAppCompositionAlways then nil else p1,
+		s1,
+		if not FFlagLuaAppAddRequestIdToRfySignalApportioning then nil else u27,
+		v25
+	})
+end
+
+return useApportioningPreprocessingFromOmniRecommendations

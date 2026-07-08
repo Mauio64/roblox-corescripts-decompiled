@@ -1,16 +1,16 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Dev.JestConfigs);
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local JestConfigs = require(scriptParentParent.Dev.JestConfigs)
+
 return {
-    displayName = "FriendsLanding", 
-    testMatch = {
-        "**/*.test"
-    }, 
-    setupFilesAfterEnv = {
-        v2.setupFiles.LogHandler, 
-        v2.setupFiles.UIBloxInitializer, 
-        v2.setupFiles.createPromiseRejectionHandler(), 
-        l_Parent_0.TestHelpers.CollisionMatchersSetup, 
-        l_Parent_0.TestHelpers.NetworkImplHandler
-    }
-};
+	displayName = "FriendsLanding",
+	testMatch = { "**/*.test" },
+	setupFilesAfterEnv = {
+		JestConfigs.setupFiles.LogHandler,
+		JestConfigs.setupFiles.UIBloxInitializer,
+		JestConfigs.setupFiles.createPromiseRejectionHandler(),
+		scriptParent.TestHelpers.CollisionMatchersSetup,
+		scriptParent.TestHelpers.NetworkImplHandler,
+		JestConfigs.setupFiles.RetryTimes
+	}
+}

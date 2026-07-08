@@ -1,64 +1,71 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.Roact);
-local v4 = require(l_Parent_0.Parent.t);
-local l_Label_0 = require(l_Parent_0.Core.ImageSet.ImageSetComponent).Label;
-local v6 = v3.PureComponent:extend("SpinningImage");
-v6.validateProps = v4.strictInterface({
-    image = v4.table, 
-    size = v4.optional(v4.UDim2), 
-    anchorPoint = v4.optional(v4.Vector2), 
-    position = v4.optional(v4.union(v4.UDim2, v4.table)), 
-    rotationRate = v4.optional(v4.number)
-});
-v6.defaultProps = {
-    rotationRate = 360
-};
-v6.init = function(v7) --[[ Line: 25 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy)
-    local v8, v9 = v3.createBinding(0);
-    v7.angle = v8;
-    v7.updateAngle = v9;
-end;
-v6.didMount = function(v10) --[[ Line: 29 ]] --[[ Name: didMount ]]
-    -- upvalues: l_RunService_0 (copy)
-    v10.heartbeatConnection = l_RunService_0.Heartbeat:Connect(function(v11) --[[ Line: 30 ]]
-        -- upvalues: v10 (copy)
-        local v12 = v10.angle:getValue() + v10.props.rotationRate * v11;
-        if v12 > 360 then
-            v12 = v12 - 360;
-        elseif v12 < 0 then
-            v12 = v12 + 360;
-        end;
-        v10.updateAngle(v12);
-    end);
-end;
-v6.willUnmount = function(v13) --[[ Line: 41 ]] --[[ Name: willUnmount ]]
-    v13.heartbeatConnection:Disconnect();
-end;
-v6.getDerivedStateFromProps = function(v14, _) --[[ Line: 45 ]] --[[ Name: getDerivedStateFromProps ]]
-    local l_ImageRectSize_0 = v14.image.ImageRectSize;
-    return {
-        size = v14.size or UDim2.fromOffset(l_ImageRectSize_0.X, l_ImageRectSize_0.Y)
-    };
-end;
-v6.render = function(v17) --[[ Line: 52 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), l_Label_0 (copy)
-    return v3.createElement("Frame", {
-        Size = v17.state.size, 
-        AnchorPoint = v17.props.anchorPoint, 
-        Position = v17.props.position, 
-        BackgroundTransparency = 1
-    }, {
-        inner = v3.createElement(l_Label_0, {
-            Size = v17.state.size, 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Image = v17.props.image, 
-            Rotation = v17.angle, 
-            BackgroundTransparency = 1
-        })
-    });
-end;
-return v6;
+local RunService = game:GetService("RunService")
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local t = require(ParentParent.Parent.t)
+local Label = require(ParentParent.Core.ImageSet.ImageSetComponent).Label
+local v7 = Roact.PureComponent:extend("SpinningImage")
+
+v7.validateProps = t.strictInterface({
+	image = t.table,
+	size = t.optional(t.UDim2),
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.union(t.UDim2, t.table)),
+	rotationRate = t.optional(t.number)
+})
+v7.defaultProps = {
+	rotationRate = 360
+}
+
+function v7.init(p1) -- line: 25
+	-- upvalues: Roact (copy)
+	local v9, v10 = Roact.createBinding(0)
+
+	p1.angle = v9
+	p1.updateAngle = v10
+end
+function v7.didMount(p2) -- line: 29
+	-- upvalues: RunService (copy)
+	p2.heartbeatConnection = RunService.Heartbeat:Connect(function(dt) -- line: 30
+		-- upvalues: p2 (copy)
+		local v18 = p2.angle:getValue() + p2.props.rotationRate * dt
+
+		if v18 > 360 then
+			v18 -= 360
+		elseif v18 < 0 then
+			v18 += 360
+		end
+
+		p2.updateAngle(v18)
+	end)
+end
+function v7.willUnmount(p3) -- line: 41
+	p3.heartbeatConnection:Disconnect()
+end
+function v7.getDerivedStateFromProps(p4, _) -- line: 45
+	local ImageRectSize = p4.image.ImageRectSize
+
+	return {
+		size = p4.size or UDim2.fromOffset(ImageRectSize.X, ImageRectSize.Y)
+	}
+end
+function v7.render(p6) -- line: 52
+	-- upvalues: Roact (copy), Label (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = p6.state.size,
+		AnchorPoint = p6.props.anchorPoint,
+		Position = p6.props.position
+	}, {
+		inner = Roact.createElement(Label, {
+			BackgroundTransparency = 1,
+			Size = p6.state.size,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			Image = p6.props.image,
+			Rotation = p6.angle
+		})
+	})
+end
+
+return v7

@@ -1,71 +1,74 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_Images_0 = v3.App.ImageSet.Images;
-local l_Toast_0 = v3.App.Dialog.Toast;
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v7 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v9 = require(l_RobloxGui_0.Modules.Common.renderWithCoreScriptsStyleProvider);
-local v10 = v2.PureComponent:extend("LuobuWarningToastComponent");
-local v11 = v7:FormatByKey("InGame.CommonUI.Message.LuobuGameJoinWarning");
-v10.init = function(v12) --[[ Line: 18 ]] --[[ Name: init ]]
-    -- upvalues: l_Images_0 (copy), l_ContentProvider_0 (copy), v11 (copy)
-    v12.state = {
-        isLoaded = false
-    };
-    task.spawn(function() --[[ Line: 23 ]]
-        -- upvalues: l_Images_0 (ref), l_ContentProvider_0 (ref), v12 (copy)
-        local l_Image_0 = l_Images_0["icons/status/alert"].Image;
-        pcall(function() --[[ Line: 25 ]]
-            -- upvalues: l_ContentProvider_0 (ref), l_Image_0 (copy)
-            l_ContentProvider_0:PreloadAsync({
-                l_Image_0
-            });
-        end);
-        v12:setState({
-            isLoaded = true
-        });
-    end);
-    v12.getToastContent = function() --[[ Line: 33 ]]
-        -- upvalues: l_Images_0 (ref), v11 (ref)
-        return {
-            iconImage = l_Images_0["icons/status/alert"], 
-            iconColorStyle = {
-                Color = Color3.new(1, 1, 1), 
-                Transparency = 0
-            }, 
-            toastTitle = v11
-        };
-    end;
-end;
-v10.render = function(v14) --[[ Line: 45 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), l_Toast_0 (copy), v9 (copy)
-    if not v14.state.isLoaded then
-        return nil;
-    else
-        local v15 = v2.createElement("ScreenGui", {
-            AutoLocalize = false, 
-            DisplayOrder = 9, 
-            IgnoreGuiInset = true, 
-            OnTopOfCoreBlur = true, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        }, {
-            Content = v2.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0)
-            }, {
-                WarningToast = v2.createElement(l_Toast_0, {
-                    duration = 5, 
-                    show = true, 
-                    toastContent = v14.getToastContent()
-                })
-            })
-        });
-        return v9({
-            RobloxCaptureNotificationGui = v15
-        });
-    end;
-end;
-return v10;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local Toast = UIBlox.App.Dialog.Toast
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ContentProvider = game:GetService("ContentProvider")
+local renderWithCoreScriptsStyleProvider = require(RobloxGui.Modules.Common.renderWithCoreScriptsStyleProvider)
+local v11 = Roact.PureComponent:extend("LuobuWarningToastComponent")
+local v12 = RobloxTranslator:FormatByKey("InGame.CommonUI.Message.LuobuGameJoinWarning")
+
+function v11.init(p1) -- line: 18
+	-- upvalues: Images (copy), ContentProvider (copy), v12 (copy)
+	p1.state = {
+		isLoaded = false
+	}
+	task.spawn(function() -- line: 23
+		-- upvalues: Images (copy), ContentProvider (copy), p1 (copy)
+		local v16 = Images["icons/status/alert"].Image
+
+		pcall(function() -- line: 25
+			-- upvalues: ContentProvider (copy), v16 (copy)
+			ContentProvider:PreloadAsync({ v16 })
+		end)
+		p1:setState({
+			isLoaded = true
+		})
+	end)
+
+	function p1.getToastContent() -- line: 33
+		-- upvalues: Images (copy), v12 (copy)
+		return {
+			iconImage = Images["icons/status/alert"],
+			iconColorStyle = {
+				Transparency = 0,
+				Color = Color3.new(1, 1, 1)
+			},
+			toastTitle = v12
+		}
+	end
+end
+function v11.render(p2) -- line: 45
+	-- upvalues: Roact (copy), Toast (copy), renderWithCoreScriptsStyleProvider (copy)
+	if not p2.state.isLoaded then
+		return nil
+	end
+
+	local v15 = Roact.createElement("ScreenGui", {
+		AutoLocalize = false,
+		DisplayOrder = 9,
+		IgnoreGuiInset = true,
+		OnTopOfCoreBlur = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	}, {
+		Content = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			WarningToast = Roact.createElement(Toast, {
+				duration = 5,
+				show = true,
+				toastContent = p2.getToastContent()
+			})
+		})
+	})
+
+	return renderWithCoreScriptsStyleProvider({
+		RobloxCaptureNotificationGui = v15
+	})
+end
+
+return v11

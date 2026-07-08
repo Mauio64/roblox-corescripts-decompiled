@@ -1,0 +1,3 @@
+return {
+	FilterPlayWithReward = "filterPlayWithReward"
+}

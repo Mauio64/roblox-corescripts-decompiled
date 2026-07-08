@@ -1,210 +1,281 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Workspace_0 = game:GetService("Workspace");
-local l_Players_0 = game:GetService("Players");
-local l_ExperienceAuthService_0 = game:GetService("ExperienceAuthService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v6 = require(l_Parent_0.IAPExperience);
-local l_isEconomicRestrictionResponse_0 = v6.Utility.isEconomicRestrictionResponse;
-local l_parseEconomicRestrictionsFailureReason_0 = v6.Utility.parseEconomicRestrictionsFailureReason;
-local l_parseEconomicRestrictionsExpirationTimeInMinutes_0 = v6.Utility.parseEconomicRestrictionsExpirationTimeInMinutes;
-local v10 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v11 = require(l_script_FirstAncestor_0.Actions.StartPurchase);
-local v12 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v13 = require(l_script_FirstAncestor_0.Actions.SetEconomicRestrictionError);
-local v14 = require(l_script_FirstAncestor_0.Enums.PurchaseFlow);
-local v15 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v16 = require(l_script_FirstAncestor_0.Enums.ItemType);
-local v17 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v18 = require(l_script_FirstAncestor_0.Enums.RequestType);
-local v19 = require(l_script_FirstAncestor_0.Network.getToolAsset);
-local v20 = require(l_script_FirstAncestor_0.Network.performPurchase);
-local v21 = require(l_script_FirstAncestor_0.Network.performPurchaseV2);
-local v22 = require(l_script_FirstAncestor_0.Network.performCreatorStorePurchase);
-local v23 = require(l_script_FirstAncestor_0.Services.Network);
-local v24 = require(l_script_FirstAncestor_0.Services.Analytics);
-local v25 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v26 = require(l_script_FirstAncestor_0.Utils.getPlayerPrice);
-local v27 = require(l_script_FirstAncestor_0.Utils.isCreatorStoreAssetType);
-local v28 = require(l_script_FirstAncestor_0.Thunk);
-local v29 = require(l_script_FirstAncestor_0.Promise);
-local _ = require(l_script_FirstAncestor_0.types);
-local l_ProductTypeEnum_0 = require(l_script_FirstAncestor_0.types).ProductTypeEnum;
-local v32 = require(l_script_FirstAncestor_0.Selectors.selectProductPrice);
-local v33 = require(l_script_FirstAncestor_0.Thunks.performLuaPurchase);
-local v34 = require(script.Parent.completePurchase);
-local l_FFlagEnableUnifiedProductPurchaseFlow_0 = require(l_Parent_0.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow;
-local v36 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableCreatorStorePurchasingCutover);
-local v37 = require(l_script_FirstAncestor_0.Utils.logUnifiedPurchaseTelemetryCounter);
-local v38 = require(l_script_FirstAncestor_0.Events.UnifiedPurchaseTelemetry);
-local v39 = require(l_script_FirstAncestor_0.Flags.FFlagPurchasePromptPriceShouldUseProductInfoPrice);
-local l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 = require(l_Parent_0.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow;
-local l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 = require(l_Parent_0.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs;
-local v42 = {
-    v23, 
-    v24, 
-    v25
-};
-isLuaPurchase = function(v43) --[[ Line: 70 ]] --[[ Name: isLuaPurchase ]]
-    -- upvalues: l_ProductTypeEnum_0 (copy), l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 (copy)
-    if v43 == nil then
-        return false;
-    else
-        return v43.kind == l_ProductTypeEnum_0.Product and v43.universeId ~= nil or v43.kind == l_ProductTypeEnum_0.Experience or v43.kind == l_ProductTypeEnum_0.Look or l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 and v43.kind == l_ProductTypeEnum_0.DeveloperSubscription;
-    end;
-end;
-return function() --[[ Line: 83 ]] --[[ Name: purchaseItem ]]
-    -- upvalues: v28 (copy), v42 (copy), v23 (copy), v25 (copy), v24 (copy), v11 (copy), l_Workspace_0 (copy), l_FFlagEnableUnifiedProductPurchaseFlow_0 (copy), v37 (copy), v38 (copy), v18 (copy), l_ExperienceAuthService_0 (copy), v34 (copy), v14 (copy), v10 (copy), v15 (copy), l_HttpService_0 (copy), v39 (copy), v32 (copy), v26 (copy), l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (copy), v33 (copy), v36 (copy), v27 (copy), v22 (copy), v29 (copy), v12 (copy), v21 (copy), l_isEconomicRestrictionResponse_0 (copy), l_parseEconomicRestrictionsFailureReason_0 (copy), l_parseEconomicRestrictionsExpirationTimeInMinutes_0 (copy), v13 (copy), v17 (copy), v20 (copy), v16 (copy), v19 (copy), l_Players_0 (copy)
-    return v28.new(script.Name, v42, function(v44, v45) --[[ Line: 84 ]]
-        -- upvalues: v23 (ref), v25 (ref), v24 (ref), v11 (ref), l_Workspace_0 (ref), l_FFlagEnableUnifiedProductPurchaseFlow_0 (ref), v37 (ref), v38 (ref), v18 (ref), l_ExperienceAuthService_0 (ref), v34 (ref), v14 (ref), v10 (ref), v15 (ref), l_HttpService_0 (ref), v39 (ref), v32 (ref), v26 (ref), l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 (ref), v33 (ref), v36 (ref), v27 (ref), v22 (ref), v29 (ref), v12 (ref), v21 (ref), l_isEconomicRestrictionResponse_0 (ref), l_parseEconomicRestrictionsFailureReason_0 (ref), l_parseEconomicRestrictionsExpirationTimeInMinutes_0 (ref), v13 (ref), v17 (ref), v20 (ref), v16 (ref), v19 (ref), l_Players_0 (ref)
-        local v46 = v45[v23];
-        local v47 = v45[v25];
-        local v48 = v45[v24];
-        local v49 = v44:getState();
-        local l_purchaseFlow_0 = v49.purchaseFlow;
-        local l_requestType_0 = v49.promptRequest.requestType;
-        local v52 = v47.getPlatform();
-        v44:dispatch(v11(l_Workspace_0.DistributedGameTime));
-        if l_FFlagEnableUnifiedProductPurchaseFlow_0 and v44:getState().isUserEligibleForUnifiedPurchaseFlow then
-            v37(v38.UnifiedProductPurchaseModalPurchaseAttemptedCounter, v49.purchaseAnalyticsMetadata.surface, v49.purchaseAnalyticsMetadata.productType);
-            if v49.purchaseCallbacks and v49.purchaseCallbacks.onPurchaseAttempt then
-                v49.purchaseCallbacks.onPurchaseAttempt();
-            end;
-        end;
-        if l_requestType_0 == v18.AvatarCreationFee then
-            local v53 = {
-                avatarName = v49.productInfo.name, 
-                avatarDescription = v49.productInfo.description, 
-                priceFromToken = v49.productInfo.price
-            };
-            local v54 = {
-                [1] = Enum.ExperienceAuthScope.CreatorAssetsCreate
-            };
-            l_ExperienceAuthService_0:ScopeCheckUIComplete(v49.promptRequest.id, v54, Enum.ScopeCheckResult.ConsentAccepted, v53);
-            v48.signalAvatarCreationPurchaseSubmit();
-            v44:dispatch(v34());
-            return;
-        else
-            if l_purchaseFlow_0 == v14.RobuxUpsellV2 or l_purchaseFlow_0 == v14.LargeRobuxUpsell then
-                v44:dispatch(v10(v15.PurchaseInProgress));
-            end;
-            local v55 = v44:getState();
-            local v56 = l_HttpService_0:GenerateGUID(false);
-            local l_id_0 = v55.promptRequest.id;
-            local l_infoType_0 = v55.promptRequest.infoType;
-            local l_equipIfPurchased_0 = v55.promptRequest.equipIfPurchased;
-            local l_isRobloxPurchase_0 = v55.promptRequest.isRobloxPurchase;
-            local l_purchaseAuthToken_0 = v55.promptRequest.purchaseAuthToken;
-            local l_idempotencyKey_0 = v55.promptRequest.idempotencyKey;
-            local l_collectibleItemId_0 = v55.promptRequest.collectibleItemId;
-            local l_collectibleItemInstanceId_0 = v55.promptRequest.collectibleItemInstanceId;
-            local l_collectibleProductId_0 = v55.promptRequest.collectibleProductId;
-            local v66 = nil;
-            if v39 then
-                v66 = v32(v55);
-            else
-                local l_expectedPrice_0 = v55.promptRequest.expectedPrice;
-                local v68 = v55.accountInfo.membershipType == 4;
-                v66 = v26(v55.productInfo, v68);
-                if l_collectibleItemInstanceId_0 and l_collectibleItemInstanceId_0 ~= "" or l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 and v55.productPayload and v55.productPayload.timedOptionDays ~= nil then
-                    v66 = l_expectedPrice_0;
-                end;
-            end;
-            local l_assetTypeId_0 = v55.productInfo.assetTypeId;
-            local l_assetType_0 = v55.productInfo.assetType;
-            local l_productId_0 = v55.productInfo.productId;
-            local l_collectibleItemId_1 = v55.productInfo.collectibleItemId;
-            local l_collectibleProductId_1 = v55.productInfo.collectibleProductId;
-            local l_itemType_0 = v55.productInfo.itemType;
-            v48.signalProductPurchaseConfirmed(l_productId_0, v55.requestType);
-            local v75 = l_collectibleItemId_0 and l_collectibleItemId_0 ~= "" and l_infoType_0 == Enum.InfoType.Bundle;
-            if l_FFlagEnableUnifiedProductPurchaseFlow_0 and isLuaPurchase(v55.productPayload) then
-                v44:dispatch(v33());
-                return;
-            elseif v36() and v27(l_assetType_0) then
-                return v22(v46, l_productId_0, l_assetType_0):andThen(function(v76) --[[ Line: 207 ]]
-                    -- upvalues: v44 (copy), v34 (ref), v48 (copy), l_id_0 (copy), l_infoType_0 (copy), v66 (ref), v29 (ref)
-                    v44:dispatch(v34());
-                    v48.signalPurchaseSuccess(l_id_0, l_infoType_0, v66, v76);
-                    return v29.resolve();
-                end):catch(function(v77) --[[ Line: 216 ]]
-                    -- upvalues: v44 (copy), v12 (ref)
-                    v44:dispatch(v12(v77));
-                end);
-            elseif v75 or l_collectibleItemInstanceId_0 and l_collectibleItemInstanceId_0 ~= "" then
-                return v21(v46, l_infoType_0, l_productId_0, v66, v56, l_isRobloxPurchase_0, l_collectibleItemId_0, l_collectibleProductId_0, l_idempotencyKey_0, l_purchaseAuthToken_0, l_collectibleItemInstanceId_0):andThen(function(v78) --[[ Line: 233 ]]
-                    -- upvalues: l_FFlagEnableUnifiedProductPurchaseFlow_0 (ref), v44 (copy), v34 (ref), v48 (copy), l_id_0 (copy), l_infoType_0 (copy), v66 (ref), v29 (ref)
-                    if l_FFlagEnableUnifiedProductPurchaseFlow_0 then
-                        v44:dispatch(v34(v78));
-                    else
-                        v44:dispatch(v34());
-                    end;
-                    v48.signalPurchaseSuccess(l_id_0, l_infoType_0, v66, v78);
-                    return v29.resolve();
-                end):catch(function(v79) --[[ Line: 248 ]]
-                    -- upvalues: l_isEconomicRestrictionResponse_0 (ref), l_parseEconomicRestrictionsFailureReason_0 (ref), l_parseEconomicRestrictionsExpirationTimeInMinutes_0 (ref), v44 (copy), v13 (ref), v12 (ref), v17 (ref), v48 (copy), l_productId_0 (copy), l_infoType_0 (copy), v52 (copy)
-                    if l_isEconomicRestrictionResponse_0(v79) then
-                        local v80 = l_parseEconomicRestrictionsFailureReason_0(v79);
-                        local v81 = l_parseEconomicRestrictionsExpirationTimeInMinutes_0(v79);
-                        v44:dispatch(v13(v80, v81));
-                        v44:dispatch(v12(v17.EconomicRestriction));
-                        return;
-                    else
-                        if v79 == v17.TwoFactorNeeded then
-                            v48.signalTwoSVSettingsErrorShown(l_productId_0, l_infoType_0);
-                            if v52 == Enum.Platform.Windows or v52 == Enum.Platform.OSX then
-                                v79 = v17.TwoFactorNeededSettings;
-                            end;
-                        end;
-                        v44:dispatch(v12(v79));
-                        return;
-                    end;
-                end);
-            else
-                local v82 = nil;
-                if l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 then
-                    v82 = v55.productPayload and v55.productPayload.timedOptionDays;
-                end;
-                return v20(v46, l_infoType_0, l_productId_0, v66, v56, l_isRobloxPurchase_0, l_collectibleItemId_1, l_collectibleProductId_1, l_idempotencyKey_0, l_purchaseAuthToken_0, if l_FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow_0 then v82 else nil):andThen(function(v83) --[[ Line: 285 ]]
-                    -- upvalues: l_FFlagEnableUnifiedProductPurchaseFlow_0 (ref), v44 (copy), v34 (ref), l_itemType_0 (copy), v16 (ref), v48 (copy), l_id_0 (copy), l_infoType_0 (copy), v66 (ref), l_equipIfPurchased_0 (copy), l_assetTypeId_0 (copy), v19 (ref), v46 (copy), l_Players_0 (ref), v29 (ref)
-                    if l_FFlagEnableUnifiedProductPurchaseFlow_0 then
-                        v44:dispatch(v34(v83));
-                    else
-                        v44:dispatch(v34());
-                    end;
-                    if l_itemType_0 ~= v16.Bundle then
-                        v48.signalPurchaseSuccess(l_id_0, l_infoType_0, v66, v83);
-                    end;
-                    if l_equipIfPurchased_0 and l_assetTypeId_0 == 19 then
-                        return v19(v46, l_id_0):andThen(function(v84) --[[ Line: 303 ]]
-                            -- upvalues: l_Players_0 (ref)
-                            if v84 then
-                                v84.Parent = l_Players_0.LocalPlayer.Backpack;
-                            end;
-                        end);
-                    else
-                        return v29.resolve();
-                    end;
-                end):catch(function(v85) --[[ Line: 312 ]]
-                    -- upvalues: l_isEconomicRestrictionResponse_0 (ref), l_parseEconomicRestrictionsFailureReason_0 (ref), l_parseEconomicRestrictionsExpirationTimeInMinutes_0 (ref), v44 (copy), v13 (ref), v12 (ref), v17 (ref), v48 (copy), l_productId_0 (copy), l_infoType_0 (copy), v52 (copy)
-                    if l_isEconomicRestrictionResponse_0(v85) then
-                        local v86 = l_parseEconomicRestrictionsFailureReason_0(v85);
-                        local v87 = l_parseEconomicRestrictionsExpirationTimeInMinutes_0(v85);
-                        v44:dispatch(v13(v86, v87));
-                        v44:dispatch(v12(v17.EconomicRestriction));
-                        return;
-                    else
-                        if v85 == v17.TwoFactorNeeded then
-                            v48.signalTwoSVSettingsErrorShown(l_productId_0, l_infoType_0);
-                            if v52 == Enum.Platform.Windows or v52 == Enum.Platform.OSX then
-                                v85 = v17.TwoFactorNeededSettings;
-                            end;
-                        end;
-                        v44:dispatch(v12(v85));
-                        return;
-                    end;
-                end);
-            end;
-        end;
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local HttpService = game:GetService("HttpService")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local ExperienceAuthService = game:GetService("ExperienceAuthService")
+local PurchasePromptParent = PurchasePrompt.Parent
+local IAPExperience = require(PurchasePromptParent.IAPExperience)
+local isEconomicRestrictionResponse = IAPExperience.Utility.isEconomicRestrictionResponse
+local parseEconomicRestrictionsFailureReason = IAPExperience.Utility.parseEconomicRestrictionsFailureReason
+local parseEconomicRestrictionsExpirationTimeInMinutes = IAPExperience.Utility.parseEconomicRestrictionsExpirationTimeInMinutes
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local StartPurchase = require(PurchasePrompt.Actions.StartPurchase)
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local SetEconomicRestrictionError = require(PurchasePrompt.Actions.SetEconomicRestrictionError)
+local PurchaseFlow = require(PurchasePrompt.Enums.PurchaseFlow)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local ItemType = require(PurchasePrompt.Enums.ItemType)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local RequestType = require(PurchasePrompt.Enums.RequestType)
+local getToolAsset = require(PurchasePrompt.Network.getToolAsset)
+local performPurchase = require(PurchasePrompt.Network.performPurchase)
+local performPurchaseV2 = require(PurchasePrompt.Network.performPurchaseV2)
+local performCreatorStorePurchase = require(PurchasePrompt.Network.performCreatorStorePurchase)
+local Network = require(PurchasePrompt.Services.Network)
+local Analytics = require(PurchasePrompt.Services.Analytics)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local getPlayerPrice = require(PurchasePrompt.Utils.getPlayerPrice)
+local isCreatorStoreAssetType = require(PurchasePrompt.Utils.isCreatorStoreAssetType)
+local Thunk = require(PurchasePrompt.Thunk)
+local Promise = require(PurchasePrompt.Promise)
+
+require(PurchasePrompt.types)
+
+local ProductTypeEnum = require(PurchasePrompt.types).ProductTypeEnum
+local selectProductPrice = require(PurchasePrompt.Selectors.selectProductPrice)
+local derivePurchaseOptionsFromCartPricingResponse = require(PurchasePrompt.Utils.derivePurchaseOptionsFromCartPricingResponse)
+local performLuaPurchase = require(PurchasePrompt.Thunks.performLuaPurchase)
+local handlePriceChangedError = require(PurchasePrompt.Utils.handlePriceChangedError)
+local completePurchase = require(script.Parent.completePurchase)
+local FFlagEnableUnifiedProductPurchaseFlow = require(PurchasePromptParent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
+local GetFFlagEnableCreatorStorePurchasingCutover = require(PurchasePrompt.Flags.GetFFlagEnableCreatorStorePurchasingCutover)
+local logUnifiedPurchaseTelemetryCounter = require(PurchasePrompt.Utils.logUnifiedPurchaseTelemetryCounter)
+local UnifiedPurchaseTelemetry = require(PurchasePrompt.Events.UnifiedPurchaseTelemetry)
+local FFlagPurchasePromptPriceShouldUseProductInfoPrice = require(PurchasePrompt.Flags.FFlagPurchasePromptPriceShouldUseProductInfoPrice)
+local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
+local FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow = require(PurchasePromptParent.SharedFlags).FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow
+local FFlagEnablePurchasePayloadInExperienceShop = require(PurchasePromptParent.SharedFlags).FFlagEnablePurchasePayloadInExperienceShop
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(PurchasePromptParent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
+local t1 = {
+	Network,
+	Analytics,
+	ExternalSettings
+}
+
+function isLuaPurchase(p1) -- line: 76
+	-- upvalues: ProductTypeEnum (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy)
+	if p1 == nil then
+		return false
+	end
+
+	return p1.kind == ProductTypeEnum.Product and p1.universeId ~= nil or (p1.kind == ProductTypeEnum.Experience or (p1.kind == ProductTypeEnum.Look or FFlagEnableUnifiedPurchaseFlowForDevSubs and p1.kind == ProductTypeEnum.DeveloperSubscription))
+end
+
+local function purchaseItem() -- line: 89
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), ExternalSettings (copy), Analytics (copy), FFlagPurchasePromptCartPricingEnabled (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), StartPurchase (copy), Workspace (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), RequestType (copy), ExperienceAuthService (copy), completePurchase (copy), PurchaseFlow (copy), SetPromptState (copy), PromptState (copy), HttpService (copy), FFlagPurchasePromptPriceShouldUseProductInfoPrice (copy), selectProductPrice (copy), getPlayerPrice (copy), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), derivePurchaseOptionsFromCartPricingResponse (copy), performLuaPurchase (copy), GetFFlagEnableCreatorStorePurchasingCutover (copy), isCreatorStoreAssetType (copy), performCreatorStorePurchase (copy), Promise (copy), ErrorOccurred (copy), performPurchaseV2 (copy), isEconomicRestrictionResponse (copy), parseEconomicRestrictionsFailureReason (copy), parseEconomicRestrictionsExpirationTimeInMinutes (copy), SetEconomicRestrictionError (copy), PurchaseError (copy), handlePriceChangedError (copy), FFlagEnablePurchasePayloadInExperienceShop (copy), performPurchase (copy), ItemType (copy), getToolAsset (copy), Players (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 90
+		-- upvalues: Network (copy), ExternalSettings (copy), Analytics (copy), FFlagPurchasePromptCartPricingEnabled (copy), logUnifiedPurchaseTelemetryCounter (copy), UnifiedPurchaseTelemetry (copy), StartPurchase (copy), Workspace (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), RequestType (copy), ExperienceAuthService (copy), completePurchase (copy), PurchaseFlow (copy), SetPromptState (copy), PromptState (copy), HttpService (copy), FFlagPurchasePromptPriceShouldUseProductInfoPrice (copy), selectProductPrice (copy), getPlayerPrice (copy), FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow (copy), derivePurchaseOptionsFromCartPricingResponse (copy), performLuaPurchase (copy), GetFFlagEnableCreatorStorePurchasingCutover (copy), isCreatorStoreAssetType (copy), performCreatorStorePurchase (copy), Promise (copy), ErrorOccurred (copy), performPurchaseV2 (copy), isEconomicRestrictionResponse (copy), parseEconomicRestrictionsFailureReason (copy), parseEconomicRestrictionsExpirationTimeInMinutes (copy), SetEconomicRestrictionError (copy), PurchaseError (copy), handlePriceChangedError (copy), FFlagEnablePurchasePayloadInExperienceShop (copy), performPurchase (copy), ItemType (copy), getToolAsset (copy), Players (copy)
+		local v51 = p3[Network]
+		local v52 = p3[ExternalSettings]
+		local v53 = p3[Analytics]
+		local v54 = p2:getState()
+		local purchaseFlow = v54.purchaseFlow
+		local requestType = v54.promptRequest.requestType
+
+		if FFlagPurchasePromptCartPricingEnabled and (v54.cartPricing ~= nil and v54.cartPricing.isFetching) then
+			local purchaseAnalyticsMetadata = v54.purchaseAnalyticsMetadata
+
+			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedCartPricingBuyBlockedWhileFetchingCounter, purchaseAnalyticsMetadata and purchaseAnalyticsMetadata.surface, purchaseAnalyticsMetadata and purchaseAnalyticsMetadata.productType)
+
+			return
+		end
+
+		local v58 = v52.getPlatform()
+
+		p2:dispatch(StartPurchase(Workspace.DistributedGameTime))
+
+		if FFlagEnableUnifiedProductPurchaseFlow and p2:getState().isUserEligibleForUnifiedPurchaseFlow then
+			logUnifiedPurchaseTelemetryCounter(UnifiedPurchaseTelemetry.UnifiedProductPurchaseModalPurchaseAttemptedCounter, v54.purchaseAnalyticsMetadata.surface, v54.purchaseAnalyticsMetadata.productType)
+
+			if v54.purchaseCallbacks and v54.purchaseCallbacks.onPurchaseAttempt then
+				v54.purchaseCallbacks.onPurchaseAttempt()
+			end
+		end
+
+		if requestType == RequestType.AvatarCreationFee then
+			local t2 = {
+				avatarName = v54.productInfo.name,
+				avatarDescription = v54.productInfo.description,
+				priceFromToken = v54.productInfo.price
+			}
+			local t3 = {
+				[1] = Enum.ExperienceAuthScope.CreatorAssetsCreate
+			}
+
+			ExperienceAuthService:ScopeCheckUIComplete(v54.promptRequest.id, t3, Enum.ScopeCheckResult.ConsentAccepted, t2)
+			v53.signalAvatarCreationPurchaseSubmit()
+			p2:dispatch(completePurchase())
+
+			return
+		end
+
+		if purchaseFlow == PurchaseFlow.RobuxUpsellV2 or purchaseFlow == PurchaseFlow.LargeRobuxUpsell then
+			p2:dispatch(SetPromptState(PromptState.PurchaseInProgress))
+		end
+
+		local v61 = p2:getState()
+		local guid = HttpService:GenerateGUID(false)
+		local id = v61.promptRequest.id
+		local infoType = v61.promptRequest.infoType
+		local equipIfPurchased = v61.promptRequest.equipIfPurchased
+		local isRobloxPurchase = v61.promptRequest.isRobloxPurchase
+		local purchaseAuthToken = v61.promptRequest.purchaseAuthToken
+		local idempotencyKey = v61.promptRequest.idempotencyKey
+		local collectibleItemId = v61.promptRequest.collectibleItemId
+		local collectibleItemInstanceId = v61.promptRequest.collectibleItemInstanceId
+		local collectibleProductId = v61.promptRequest.collectibleProductId
+		local u72
+
+		if FFlagPurchasePromptPriceShouldUseProductInfoPrice then
+			u72 = selectProductPrice(v61)
+		else
+			local expectedPrice = v61.promptRequest.expectedPrice
+			local v74 = v61.accountInfo.membershipType == 4
+
+			u72 = getPlayerPrice(v61.productInfo, v74)
+
+			if collectibleItemInstanceId and collectibleItemInstanceId ~= "" or FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow and v61.productPayload and v61.productPayload.timedOptionDays ~= nil then
+				u72 = expectedPrice
+			end
+		end
+
+		local assetTypeId = v61.productInfo.assetTypeId
+		local assetType = v61.productInfo.assetType
+		local productId = v61.productInfo.productId
+		local collectibleItemId2 = v61.productInfo.collectibleItemId
+		local collectibleProductId2 = v61.productInfo.collectibleProductId
+		local v80 = nil
+
+		if FFlagPurchasePromptCartPricingEnabled then
+			v80 = derivePurchaseOptionsFromCartPricingResponse(v61.cartPricing and v61.cartPricing.response)
+		end
+
+		local itemType = v61.productInfo.itemType
+
+		v53.signalProductPurchaseConfirmed(productId, v61.requestType)
+
+		local v82 = collectibleItemId and (collectibleItemId ~= "" and infoType == Enum.InfoType.Bundle)
+
+		if FFlagEnableUnifiedProductPurchaseFlow and isLuaPurchase(v61.productPayload) then
+			p2:dispatch(performLuaPurchase())
+
+			return
+		end
+
+		if GetFFlagEnableCreatorStorePurchasingCutover() and isCreatorStoreAssetType(assetType) then
+			return performCreatorStorePurchase(v51, productId, assetType):andThen(function(p4) -- line: 232
+				-- upvalues: p2 (copy), completePurchase (copy), v53 (copy), id (copy), infoType (copy), u72 (ref), Promise (copy)
+				p2:dispatch(completePurchase())
+				v53.signalPurchaseSuccess(id, infoType, u72, p4)
+
+				return Promise.resolve()
+			end):catch(function(p5) -- line: 241
+				-- upvalues: p2 (copy), ErrorOccurred (copy)
+				p2:dispatch(ErrorOccurred(p5))
+			end)
+		end
+
+		if v82 or collectibleItemInstanceId and collectibleItemInstanceId ~= "" then
+			return performPurchaseV2(v51, infoType, productId, u72, guid, isRobloxPurchase, collectibleItemId, collectibleProductId, idempotencyKey, purchaseAuthToken, collectibleItemInstanceId, (if not FFlagPurchasePromptCartPricingEnabled then nil else v80)):andThen(function(p6) -- line: 259
+				-- upvalues: FFlagEnableUnifiedProductPurchaseFlow (copy), p2 (copy), completePurchase (copy), v53 (copy), id (copy), infoType (copy), u72 (ref), Promise (copy)
+				if FFlagEnableUnifiedProductPurchaseFlow then
+					p2:dispatch(completePurchase(p6))
+				else
+					p2:dispatch(completePurchase())
+				end
+
+				v53.signalPurchaseSuccess(id, infoType, u72, p6)
+
+				return Promise.resolve()
+			end):catch(function(p7) -- line: 274
+				-- upvalues: isEconomicRestrictionResponse (copy), parseEconomicRestrictionsFailureReason (copy), parseEconomicRestrictionsExpirationTimeInMinutes (copy), p2 (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy), handlePriceChangedError (copy), v61 (copy), v53 (copy), productId (copy), infoType (copy), v58 (copy)
+				if isEconomicRestrictionResponse(p7) then
+					local v89 = parseEconomicRestrictionsFailureReason(p7)
+					local v90 = parseEconomicRestrictionsExpirationTimeInMinutes(p7)
+
+					p2:dispatch(SetEconomicRestrictionError(v89, v90))
+					p2:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
+
+					return
+				end
+
+				if handlePriceChangedError(p2, p7, v61.productPayload and v61.productPayload.kind) then
+					return
+				end
+
+				if p7 == PurchaseError.TwoFactorNeeded then
+					v53.signalTwoSVSettingsErrorShown(productId, infoType)
+
+					if v58 == Enum.Platform.Windows or v58 == Enum.Platform.OSX then
+						p7 = PurchaseError.TwoFactorNeededSettings
+					end
+				end
+
+				p2:dispatch(ErrorOccurred(p7))
+			end)
+		end
+
+		local v83 = nil
+
+		if FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then
+			v83 = v61.productPayload and v61.productPayload.timedOptionDays
+		end
+
+		local v84 = nil
+
+		if FFlagEnablePurchasePayloadInExperienceShop then
+			v84 = v61.productPayload and v61.productPayload.purchasePayload
+		end
+
+		return performPurchase(v51, infoType, productId, u72, guid, isRobloxPurchase, collectibleItemId2, collectibleProductId2, idempotencyKey, purchaseAuthToken, (if not FFlagAXSupportRentalPurchaseInUnifiedProductPurchaseFlow then nil else v83), (if not FFlagEnablePurchasePayloadInExperienceShop then nil else v84), (if not FFlagPurchasePromptCartPricingEnabled then nil else v80)):andThen(function(p8) -- line: 323
+			-- upvalues: FFlagEnableUnifiedProductPurchaseFlow (copy), p2 (copy), completePurchase (copy), itemType (copy), ItemType (copy), v53 (copy), id (copy), infoType (copy), u72 (ref), equipIfPurchased (copy), assetTypeId (copy), getToolAsset (copy), v51 (copy), Players (copy), Promise (copy)
+			if FFlagEnableUnifiedProductPurchaseFlow then
+				p2:dispatch(completePurchase(p8))
+			else
+				p2:dispatch(completePurchase())
+			end
+
+			if itemType ~= ItemType.Bundle then
+				v53.signalPurchaseSuccess(id, infoType, u72, p8)
+			end
+
+			if equipIfPurchased and assetTypeId == 19 then
+				return getToolAsset(v51, id):andThen(function(p9) -- line: 341
+					-- upvalues: Players (copy)
+					if p9 then
+						p9.Parent = Players.LocalPlayer.Backpack
+					end
+				end)
+			end
+
+			return Promise.resolve()
+		end):catch(function(p10) -- line: 350
+			-- upvalues: isEconomicRestrictionResponse (copy), parseEconomicRestrictionsFailureReason (copy), parseEconomicRestrictionsExpirationTimeInMinutes (copy), p2 (copy), SetEconomicRestrictionError (copy), ErrorOccurred (copy), PurchaseError (copy), handlePriceChangedError (copy), v61 (copy), v53 (copy), productId (copy), infoType (copy), v58 (copy)
+			if isEconomicRestrictionResponse(p10) then
+				local v93 = parseEconomicRestrictionsFailureReason(p10)
+				local v94 = parseEconomicRestrictionsExpirationTimeInMinutes(p10)
+
+				p2:dispatch(SetEconomicRestrictionError(v93, v94))
+				p2:dispatch(ErrorOccurred(PurchaseError.EconomicRestriction))
+
+				return
+			end
+
+			if handlePriceChangedError(p2, p10, v61.productPayload and v61.productPayload.kind) then
+				return
+			end
+
+			if p10 == PurchaseError.TwoFactorNeeded then
+				v53.signalTwoSVSettingsErrorShown(productId, infoType)
+
+				if v58 == Enum.Platform.Windows or v58 == Enum.Platform.OSX then
+					p10 = PurchaseError.TwoFactorNeededSettings
+				end
+			end
+
+			p2:dispatch(ErrorOccurred(p10))
+		end)
+	end)
+end
+
+return purchaseItem

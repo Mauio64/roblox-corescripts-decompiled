@@ -1,6 +1,6 @@
-return require(script.Parent.Parent.ActionCreator)("SetGameStatText", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        statName = v0, 
-        text = v1
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetGameStatText", function(p1, p2) -- line: 4
+	return {
+		statName = p1,
+		text = p2
+	}
+end)

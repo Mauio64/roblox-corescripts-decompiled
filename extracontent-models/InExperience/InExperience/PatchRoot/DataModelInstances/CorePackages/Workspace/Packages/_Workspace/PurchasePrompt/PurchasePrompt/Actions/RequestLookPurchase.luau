@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "lookId");
+return require(script.Parent.makeActionCreator)(script.Name, "lookId")

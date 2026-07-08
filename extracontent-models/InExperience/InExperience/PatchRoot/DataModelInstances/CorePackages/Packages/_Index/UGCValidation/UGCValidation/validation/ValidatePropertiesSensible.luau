@@ -1,65 +1,77 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Analytics);
-local l_util_0 = l_Parent_0.util;
-local v4 = require(l_util_0.FailureReasonsAccumulator);
-local _ = require(l_util_0.Types);
-local v6 = require(l_Parent_0.flags.getFIntUGCValidateMaxHSRDataLen);
-local v7 = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidatePropertiesSensible);
-local v8 = {};
-local v9 = nil;
-local function _() --[[ Line: 23 ]] --[[ Name: createPropertyLengthRestrictions ]]
-    -- upvalues: v9 (ref), v6 (copy)
-    if v9 then
-        return;
-    else
-        v9 = {
-            HiddenSurfaceRemovalAsset = {
-                HSRData = v6()
-            }
-        };
-        return;
-    end;
-end;
-v8.resetPropertyLengthRestrictions = function() --[[ Line: 33 ]] --[[ Name: resetPropertyLengthRestrictions ]]
-    -- upvalues: v9 (ref)
-    v9 = nil;
-end;
-local function v14(v11) --[[ Line: 37 ]] --[[ Name: validateIndividual ]]
-    -- upvalues: l_UGCValidationService_0 (copy), v9 (ref)
-    local v12, v13 = l_UGCValidationService_0:ValidatePropertiesSensible(v11, v9[v11.ClassName]);
-    if not v12 then
-        return false, {
-            string.format("%s %s has invalid properties: %s. These properties may be numeric values with NaNs or Infs, or strings/BinaryStrings longer than the max number of characters.", v11.ClassName, v11:GetFullName(), table.concat(v13, ", "))
-        };
-    else
-        return true;
-    end;
-end;
-v8.validate = function(v15, v16) --[[ Line: 58 ]] --[[ Name: validate ]]
-    -- upvalues: v7 (copy), v9 (ref), v6 (copy), v4 (copy), v14 (copy), v2 (copy)
-    if not v7() then
-        return true;
-    else
-        local v17 = tick();
-        if not v9 then
-            v9 = {
-                HiddenSurfaceRemovalAsset = {
-                    HSRData = v6()
-                }
-            };
-        end;
-        local v18 = v4.new();
-        local l_v15_Descendants_0 = v15:GetDescendants();
-        table.insert(l_v15_Descendants_0, v15);
-        for _, v21 in l_v15_Descendants_0 do
-            v18:updateReasons(v14(v21));
-        end;
-        if not v18:getFinalResults() then
-            v2.reportFailure(v2.ErrorType.validatePropertiesSensible_IncorrectPropertiesFound, nil, v16);
-        end;
-        v2.recordScriptTime(script.Name, v17, v16);
-        return v18:getFinalResults();
-    end;
-end;
-return v8;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local util = ParentParent.util
+local FailureReasonsAccumulator = require(util.FailureReasonsAccumulator)
+
+require(util.Types)
+
+local getFIntUGCValidateMaxHSRDataLen = require(ParentParent.flags.getFIntUGCValidateMaxHSRDataLen)
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(ParentParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+local t1 = {}
+local t2 = nil
+
+local function createPropertyLengthRestrictions() -- line: 23
+	-- upvalues: t2 (ref), getFIntUGCValidateMaxHSRDataLen (copy)
+	if t2 then
+		return
+	end
+
+	t2 = {
+		HiddenSurfaceRemovalAsset = {
+			HSRData = getFIntUGCValidateMaxHSRDataLen()
+		}
+	}
+end
+
+function t1.resetPropertyLengthRestrictions() -- line: 33
+	-- upvalues: t2 (ref)
+	t2 = nil
+end
+
+local function validateIndividual(p1) -- line: 37
+	-- upvalues: UGCValidationService (copy), t2 (ref)
+	local v13, v14 = UGCValidationService:ValidatePropertiesSensible(p1, t2[p1.ClassName])
+
+	if not v13 then
+		return false, { string.format("%s %s has invalid properties: %s. These properties may be numeric values with NaNs or Infs, or strings/BinaryStrings longer than the max number of characters.", p1.ClassName, p1:GetFullName(), table.concat(v14, ", ")) }
+	end
+
+	return true
+end
+
+function t1.validate(p2, p3) -- line: 58
+	-- upvalues: getEngineFeatureEngineUGCValidatePropertiesSensible (copy), t2 (ref), getFIntUGCValidateMaxHSRDataLen (copy), FailureReasonsAccumulator (copy), validateIndividual (copy), Analytics (copy)
+	if not getEngineFeatureEngineUGCValidatePropertiesSensible() then
+		return true
+	end
+
+	local timestamp = tick()
+
+	if not t2 then
+		t2 = {
+			HiddenSurfaceRemovalAsset = {
+				HSRData = getFIntUGCValidateMaxHSRDataLen()
+			}
+		}
+	end
+
+	local v18 = FailureReasonsAccumulator.new()
+	local descendants = p2:GetDescendants()
+
+	table.insert(descendants, p2)
+
+	for _, v21 in descendants do
+		v18:updateReasons(validateIndividual(v21))
+	end
+
+	if not v18:getFinalResults() then
+		Analytics.reportFailure(Analytics.ErrorType.validatePropertiesSensible_IncorrectPropertiesFound, nil, p3)
+	end
+
+	Analytics.recordScriptTime(script.Name, timestamp, p3)
+
+	return v18:getFinalResults()
+end
+
+return t1

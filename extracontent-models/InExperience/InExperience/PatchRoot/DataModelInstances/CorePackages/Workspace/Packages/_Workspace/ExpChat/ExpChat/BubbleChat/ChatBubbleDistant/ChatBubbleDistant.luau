@@ -1,275 +1,289 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.Otter);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local v5 = require(l_script_FirstAncestor_0.Config);
-local l_Helpers_0 = l_script_FirstAncestor_0.BubbleChat.Helpers;
-local v7 = require(l_Helpers_0.getSpringFromSettings);
-local v8 = require(l_Helpers_0.getAbsolutePaddingbyDimension);
-local v9 = require(l_script_FirstAncestor_0.ClientSettings.ClientSettingsUtility);
-local v10 = v2.Component:extend("ChatBubbleDistant");
-v10.defaultProps = {
-    width = 32, 
-    height = 16
-};
-local function v16(v11) --[[ Line: 21 ]] --[[ Name: getFullHeight ]]
-    -- upvalues: v8 (copy)
-    local l_height_0 = v11.height;
-    if v11.renderInsert then
-        l_height_0 = math.max(l_height_0, v11.insertSize.Y);
-    end;
-    if v11.chatSettings.UIPadding then
-        local l_UIPadding_0 = v11.chatSettings.UIPadding;
-        local v14 = v8(l_UIPadding_0.PaddingTop, l_height_0);
-        local v15 = v8(l_UIPadding_0.PaddingBottom, l_height_0);
-        if v11.renderInsert then
-            l_height_0 = math.max(l_height_0, v11.insertSize.Y);
-        end;
-        return l_height_0 + (v14 + v15);
-    else
-        if v11.renderInsert then
-            l_height_0 = math.max(l_height_0, v11.insertSize.Y);
-        end;
-        return l_height_0 + v11.chatSettings.Padding * 2;
-    end;
-end;
-v10.init = function(v17) --[[ Line: 49 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy), v3 (copy), v16 (copy)
-    v17.state = {};
-    local v18, v19 = v2.createBinding(0);
-    v17.width = v18;
-    v17.updateWidth = v19;
-    v17.widthMotor = v3.createSingleMotor(0);
-    v17.widthMotor:onStep(function(v20) --[[ Line: 54 ]]
-        -- upvalues: v17 (copy)
-        v17.updateWidth((math.round(v20)));
-    end);
-    v18, v19 = v2.createBinding((v16(v17.props)));
-    v17.height = v18;
-    v17.updateHeight = v19;
-    v17.frameSize = v2.joinBindings({
-        v17.width, 
-        v17.height
-    }):map(function(v21) --[[ Line: 60 ]]
-        return UDim2.fromOffset(v21[1], v21[2]);
-    end);
-    v18, v19 = v2.createBinding(1);
-    v17.transparency = v18;
-    v17.updateTransparency = v19;
-    v17.transparencyMotor = v3.createSingleMotor(1);
-    v17.transparencyMotor:onStep(v17.updateTransparency);
-    v18, v19 = v2.createBinding(1);
-    v17.backgroundTransparency = v18;
-    v17.updateBackgroundTransparency = v19;
-    v17.backgroundTransparencyMotor = v3.createSingleMotor(1);
-    v17.backgroundTransparencyMotor:onStep(v17.updateBackgroundTransparency);
-    if v17.props.fadingOut then
-        v17:fadeOut();
-    end;
-end;
-v10.getDerivedStateFromProps = function(v22, v23) --[[ Line: 79 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: v8 (copy), v16 (copy)
-    local v24 = nil;
-    if v22.chatSettings.UIPadding then
-        v24 = v22.width;
-        if v22.renderInsert then
-            v24 = v24 + v22.insertSize.X;
-        end;
-        local l_UIPadding_1 = v22.chatSettings.UIPadding;
-        v24 = v24 + (v8(l_UIPadding_1.PaddingLeft, v24) + v8(l_UIPadding_1.PaddingRight, v24));
-    else
-        v24 = if v22.renderInsert then v22.width + v22.insertSize.X + v22.chatSettings.Padding * 2 else v22.width + v22.chatSettings.Padding * 2;
-    end;
-    local v26 = v16(v22);
-    if v24 ~= v23.fullWidth or v26 ~= v23.fullHeight then
-        return {
-            fullWidth = v24, 
-            fullHeight = v26
-        };
-    else
-        return nil;
-    end;
-end;
-v10.render = function(v27) --[[ Line: 112 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v2 (copy), l_Dictionary_0 (copy)
-    local l_chatSettings_0 = v27.props.chatSettings;
-    local v29 = nil;
-    local v30 = nil;
-    local v31 = nil;
-    local v32 = nil;
-    if v27.props.isTextChatServiceOn then
-        v29 = l_chatSettings_0.ImageLabel;
-        v30 = l_chatSettings_0.UIGradient;
-        v31 = l_chatSettings_0.UICorner;
-        v32 = l_chatSettings_0.UIPadding;
-    else
-        v29 = l_chatSettings_0.BackgroundImage;
-        v30 = l_chatSettings_0.BackgroundGradient;
-        if l_chatSettings_0.CornerEnabled then
-            v31 = {
-                CornerRadius = l_chatSettings_0.CornerRadius
-            };
-        elseif l_chatSettings_0.CornerEnabled == false then
-            v31 = {
-                CornerRadius = UDim.new(0, 0)
-            };
-        end;
-        v32 = l_chatSettings_0.Padding and {
-            PaddingTop = UDim.new(0, l_chatSettings_0.Padding), 
-            PaddingRight = UDim.new(0, l_chatSettings_0.Padding), 
-            PaddingBottom = UDim.new(0, l_chatSettings_0.Padding), 
-            PaddingLeft = UDim.new(0, l_chatSettings_0.Padding)
-        } or nil;
-    end;
-    local l_CornerRadius_0 = v5.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius;
-    local l_UIPadding_2 = v5.DefaultBubbleChatChildrenCustomizationProperties.UIPadding;
-    local v35 = v27.props.renderInsert and v27.props.insertSize.X or 0;
-    local v36 = v27.props.chatSettings.TailVisible and v27.props.showCaret;
-    local l_createElement_0 = v2.createElement;
-    local v38 = "Frame";
-    local v39 = {
-        AnchorPoint = Vector2.new(0.5, 1), 
-        Size = UDim2.fromOffset(v27.state.fullWidth, v27.state.fullHeight), 
-        Position = UDim2.new(0.5, 0, 1, -8), 
-        Transparency = 1
-    };
-    local v40 = {
-        Scale = v2.createElement("UIScale", {
-            Scale = 0.75
-        })
-    };
-    local l_TailVisible_0 = v27.props.chatSettings.TailVisible;
-    if l_TailVisible_0 then
-        l_TailVisible_0 = v36;
-        if l_TailVisible_0 then
-            l_TailVisible_0 = v2.createElement;
-            local v42 = "ImageLabel";
-            local v43 = {
-                AnchorPoint = Vector2.new(0.5, 0), 
-                BackgroundTransparency = 1, 
-                Position = UDim2.new(0.5, 0, 1, -1), 
-                Size = UDim2.fromOffset(12, 8), 
-                Image = "rbxasset://textures/ui/InGameChat/Caret.png", 
-                ImageColor3 = l_chatSettings_0.BackgroundColor3, 
-                ImageTransparency = v27.backgroundTransparency
-            };
-            local v44 = {};
-            local v45 = false;
-            if v30 ~= nil then
-                v45 = v2.createElement("UIGradient", v30);
-            end;
-            v44.Gradient = v45;
-            l_TailVisible_0 = l_TailVisible_0(v42, v43, v44);
-        end;
-    end;
-    v40.Carat = l_TailVisible_0;
-    l_TailVisible_0 = v2.createElement;
-    local v46 = "ImageLabel";
-    local v47 = l_Dictionary_0.join(v29, {
-        Size = v27.frameSize, 
-        BackgroundColor3 = l_chatSettings_0.BackgroundColor3, 
-        BackgroundTransparency = v29 and v29.Image ~= "" and 1 or v27.backgroundTransparency or v27.transparency, 
-        BorderSizePixel = 0, 
-        AnchorPoint = Vector2.new(0.5, 0), 
-        Position = UDim2.new(0.5, 0, 0, 0), 
-        ClipsDescendants = true, 
-        ImageTransparency = v27.backgroundTransparency or v27.transparency, 
-        Image = v29 and v29.Image or ""
-    });
-    local v48 = {
-        UICorner = v31 and v2.createElement("UICorner", {
-            CornerRadius = v31.CornerRadius
-        }) or v2.createElement("UICorner", {
-            CornerRadius = l_CornerRadius_0
-        }), 
-        Contents = v2.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1
-        }, {
-            Padding = v32 and v2.createElement("UIPadding", v32) or v2.createElement("UIPadding", l_UIPadding_2), 
-            UIListLayout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Insert = v27.props.renderInsert and v27.props.renderInsert(), 
-            Ellipsis = v2.createElement("TextLabel", {
-                BackgroundTransparency = 1, 
-                Text = "\226\128\166", 
-                TextColor3 = l_chatSettings_0.TextColor3, 
-                TextTransparency = v27.transparency, 
-                Font = Enum.Font.BuilderSansExtraBold, 
-                TextScaled = false, 
-                TextSize = l_chatSettings_0.TextSize, 
-                Size = UDim2.new(1, -v35, 1, 0), 
-                LayoutOrder = 2
-            })
-        })
-    };
-    local v49 = false;
-    if v30 ~= nil then
-        v49 = v2.createElement("UIGradient", v30);
-    end;
-    v48.Gradient = v49;
-    v40.RoundedFrame = l_TailVisible_0(v46, v47, v48);
-    return l_createElement_0(v38, v39, v40);
-end;
-v10.fadeIn = function(v50) --[[ Line: 229 ]] --[[ Name: fadeIn ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v51 = v7(v50.props.chatSettings, "transparency");
-    v50.transparencyMotor:setGoal(v51(v50.props.chatSettings.Transparency));
-    local v52 = v9.getBackgroundTransparency(v50.props.chatSettings, v50.props.clientSettings);
-    v50.backgroundTransparencyMotor:setGoal(v51(v52));
-    local v53 = v7(v50.props.chatSettings, "size");
-    v50.widthMotor:setGoal(v53(v50.state.fullWidth));
-end;
-v10.fadeOut = function(v54) --[[ Line: 243 ]] --[[ Name: fadeOut ]]
-    -- upvalues: v7 (copy)
-    v54.transparencyMotor:onComplete(function() --[[ Line: 244 ]]
-        -- upvalues: v54 (copy)
-        if v54.props.onFadeOut then
-            v54.props.onFadeOut();
-        end;
-    end);
-    local v55 = v7(v54.props.chatSettings, "transparency");
-    v54.transparencyMotor:setGoal(v55(1));
-    v54.backgroundTransparencyMotor:setGoal(v55(1));
-end;
-v10.didUpdate = function(v56, v57, v58) --[[ Line: 255 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v7 (copy)
-    if v57.fadingOut ~= v56.props.fadingOut then
-        if v56.props.fadingOut then
-            v56:fadeOut();
-            return;
-        else
-            v56:fadeIn();
-            return;
-        end;
-    else
-        if v56.state.fullHeight ~= v58.fullHeight then
-            v56.updateHeight(v56.state.fullHeight);
-        end;
-        if v56.state.fullWidth ~= v58.fullWidth then
-            local v59 = v7(v56.props.chatSettings, "size");
-            v56.widthMotor:setGoal(v59(v56.state.fullWidth));
-        end;
-        return;
-    end;
-end;
-v10.didMount = function(v60) --[[ Line: 273 ]] --[[ Name: didMount ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    if not v60.props.fadingOut then
-        local v61 = v7(v60.props.chatSettings, "size");
-        local v62 = v7(v60.props.chatSettings, "transparency");
-        v60.transparencyMotor:setGoal(v62(v60.props.chatSettings.Transparency));
-        local v63 = v9.getBackgroundTransparency(v60.props.chatSettings, v60.props.clientSettings);
-        v60.backgroundTransparencyMotor:setGoal(v62(v63));
-        v60.widthMotor:setGoal(v61(v60.state.fullWidth));
-    end;
-end;
-v10.willUnmount = function(v64) --[[ Line: 289 ]] --[[ Name: willUnmount ]]
-    v64.transparencyMotor:destroy();
-    v64.backgroundTransparencyMotor:destroy();
-    v64.widthMotor:destroy();
-end;
-return v10;
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Roact = require(ExpChatParent.Roact)
+local Otter = require(ExpChatParent.Otter)
+local Dictionary = require(ExpChatParent.llama).Dictionary
+local Config = require(ExpChat.Config)
+local Helpers = ExpChat.BubbleChat.Helpers
+local getSpringFromSettings = require(Helpers.getSpringFromSettings)
+local getAbsolutePaddingbyDimension = require(Helpers.getAbsolutePaddingbyDimension)
+local ClientSettingsUtility = require(ExpChat.ClientSettings.ClientSettingsUtility)
+local v11 = Roact.Component:extend("ChatBubbleDistant")
+
+v11.defaultProps = {
+	width = 32,
+	height = 16
+}
+
+local function getFullHeight(p1) -- line: 21
+	-- upvalues: getAbsolutePaddingbyDimension (copy)
+	local height = p1.height
+
+	if p1.renderInsert then
+		height = math.max(height, p1.insertSize.Y)
+	end
+
+	if p1.chatSettings.UIPadding then
+		local UIPadding = p1.chatSettings.UIPadding
+		local v16 = getAbsolutePaddingbyDimension(UIPadding.PaddingTop, height)
+		local v17 = getAbsolutePaddingbyDimension(UIPadding.PaddingBottom, height)
+
+		if p1.renderInsert then
+			height = math.max(height, p1.insertSize.Y)
+		end
+
+		return height + (v16 + v17)
+	end
+
+	if p1.renderInsert then
+		height = math.max(height, p1.insertSize.Y)
+	end
+
+	return height + p1.chatSettings.Padding * 2
+end
+
+function v11.init(p2) -- line: 49
+	-- upvalues: Roact (copy), Otter (copy), getFullHeight (copy)
+	p2.state = {}
+
+	local v19, v20 = Roact.createBinding(0)
+
+	p2.width = v19
+	p2.updateWidth = v20
+	p2.widthMotor = Otter.createSingleMotor(0)
+	p2.widthMotor:onStep(function(p3) -- line: 54
+		-- upvalues: p2 (copy)
+		p2.updateWidth((math.round(p3)))
+	end)
+
+	local v21, v22 = Roact.createBinding((getFullHeight(p2.props)))
+
+	p2.height = v21
+	p2.updateHeight = v22
+	p2.frameSize = Roact.joinBindings({
+		p2.width,
+		p2.height
+	}):map(function(p4) -- line: 60
+		return UDim2.fromOffset(p4[1], p4[2])
+	end)
+
+	local v23, v24 = Roact.createBinding(1)
+
+	p2.transparency = v23
+	p2.updateTransparency = v24
+	p2.transparencyMotor = Otter.createSingleMotor(1)
+	p2.transparencyMotor:onStep(p2.updateTransparency)
+
+	local v25, v26 = Roact.createBinding(1)
+
+	p2.backgroundTransparency = v25
+	p2.updateBackgroundTransparency = v26
+	p2.backgroundTransparencyMotor = Otter.createSingleMotor(1)
+	p2.backgroundTransparencyMotor:onStep(p2.updateBackgroundTransparency)
+
+	if p2.props.fadingOut then
+		p2:fadeOut()
+	end
+end
+function v11.getDerivedStateFromProps(p5, p6) -- line: 79
+	-- upvalues: getAbsolutePaddingbyDimension (copy), getFullHeight (copy)
+	local v31
+
+	if p5.chatSettings.UIPadding then
+		local width = p5.width
+
+		if p5.renderInsert then
+			width += p5.insertSize.X
+		end
+
+		local UIPadding = p5.chatSettings.UIPadding
+
+		v31 = width + (getAbsolutePaddingbyDimension(UIPadding.PaddingLeft, width) + getAbsolutePaddingbyDimension(UIPadding.PaddingRight, width))
+	else
+		v31 = if not p5.renderInsert then p5.width + p5.chatSettings.Padding * 2 else p5.width + p5.insertSize.X + p5.chatSettings.Padding * 2
+	end
+
+	local v32 = getFullHeight(p5)
+
+	if v31 ~= p6.fullWidth or v32 ~= p6.fullHeight then
+		return {
+			fullWidth = v31,
+			fullHeight = v32
+		}
+	end
+
+	return nil
+end
+function v11.render(p7) -- line: 112
+	-- upvalues: Config (copy), Roact (copy), Dictionary (copy)
+	local chatSettings = p7.props.chatSettings
+	local UICorner = nil
+	local ImageLabel, UIGradient, UIPadding
+
+	if p7.props.isTextChatServiceOn then
+		ImageLabel = chatSettings.ImageLabel
+		UIGradient = chatSettings.UIGradient
+		UICorner = chatSettings.UICorner
+		UIPadding = chatSettings.UIPadding
+	else
+		ImageLabel = chatSettings.BackgroundImage
+		UIGradient = chatSettings.BackgroundGradient
+
+		if chatSettings.CornerEnabled then
+			UICorner = {
+				CornerRadius = chatSettings.CornerRadius
+			}
+		elseif chatSettings.CornerEnabled == false then
+			UICorner = {
+				CornerRadius = UDim.new(0, 0)
+			}
+		end
+
+		UIPadding = chatSettings.Padding and {
+			PaddingTop = UDim.new(0, chatSettings.Padding),
+			PaddingRight = UDim.new(0, chatSettings.Padding),
+			PaddingBottom = UDim.new(0, chatSettings.Padding),
+			PaddingLeft = UDim.new(0, chatSettings.Padding)
+		} or nil
+	end
+
+	local CornerRadius = Config.DefaultBubbleChatChildrenCustomizationProperties.UICorner.CornerRadius
+	local UIPadding2 = Config.DefaultBubbleChatChildrenCustomizationProperties.UIPadding
+	local v41 = p7.props.renderInsert and p7.props.insertSize.X or 0
+	local v42 = p7.props.chatSettings.TailVisible and p7.props.showCaret
+
+	return Roact.createElement("Frame", {
+		Transparency = 1,
+		AnchorPoint = Vector2.new(0.5, 1),
+		Size = UDim2.fromOffset(p7.state.fullWidth, p7.state.fullHeight),
+		Position = UDim2.new(0.5, 0, 1, -8)
+	}, {
+		Scale = Roact.createElement("UIScale", {
+			Scale = 0.75
+		}),
+		Carat = p7.props.chatSettings.TailVisible and (v42 and Roact.createElement("ImageLabel", {
+			BackgroundTransparency = 1,
+			Image = "rbxasset://textures/ui/InGameChat/Caret.png",
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.new(0.5, 0, 1, -1),
+			Size = UDim2.fromOffset(12, 8),
+			ImageColor3 = chatSettings.BackgroundColor3,
+			ImageTransparency = p7.backgroundTransparency
+		}, {
+			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
+		})),
+		RoundedFrame = Roact.createElement("ImageLabel", Dictionary.join(ImageLabel, {
+			BorderSizePixel = 0,
+			ClipsDescendants = true,
+			Size = p7.frameSize,
+			BackgroundColor3 = chatSettings.BackgroundColor3,
+			BackgroundTransparency = if not ImageLabel or ImageLabel.Image == "" then p7.backgroundTransparency or p7.transparency else 1,
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.new(0.5, 0, 0, 0),
+			ImageTransparency = p7.backgroundTransparency or p7.transparency,
+			Image = ImageLabel and ImageLabel.Image or ""
+		}), {
+			UICorner = UICorner and Roact.createElement("UICorner", {
+				CornerRadius = UICorner.CornerRadius
+			}) or Roact.createElement("UICorner", {
+				CornerRadius = CornerRadius
+			}),
+			Contents = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, {
+				Padding = UIPadding and Roact.createElement("UIPadding", UIPadding) or Roact.createElement("UIPadding", UIPadding2),
+				UIListLayout = Roact.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				Insert = p7.props.renderInsert and p7.props.renderInsert(),
+				Ellipsis = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = "…",
+					TextScaled = false,
+					LayoutOrder = 2,
+					TextColor3 = chatSettings.TextColor3,
+					TextTransparency = p7.transparency,
+					Font = Enum.Font.BuilderSansExtraBold,
+					TextSize = chatSettings.TextSize,
+					Size = UDim2.new(1, -v41, 1, 0)
+				})
+			}),
+			Gradient = UIGradient ~= nil and Roact.createElement("UIGradient", UIGradient)
+		})
+	})
+end
+function v11.fadeIn(p8) -- line: 229
+	-- upvalues: getSpringFromSettings (copy), ClientSettingsUtility (copy)
+	local v44 = getSpringFromSettings(p8.props.chatSettings, "transparency")
+
+	p8.transparencyMotor:setGoal(v44(p8.props.chatSettings.Transparency))
+
+	local v45 = ClientSettingsUtility.getBackgroundTransparency(p8.props.chatSettings, p8.props.clientSettings)
+
+	p8.backgroundTransparencyMotor:setGoal(v44(v45))
+
+	local v46 = getSpringFromSettings(p8.props.chatSettings, "size")
+
+	p8.widthMotor:setGoal(v46(p8.state.fullWidth))
+end
+function v11.fadeOut(p9) -- line: 243
+	-- upvalues: getSpringFromSettings (copy)
+	p9.transparencyMotor:onComplete(function() -- line: 244
+		-- upvalues: p9 (copy)
+		if p9.props.onFadeOut then
+			p9.props.onFadeOut()
+		end
+	end)
+
+	local v48 = getSpringFromSettings(p9.props.chatSettings, "transparency")
+
+	p9.transparencyMotor:setGoal(v48(1))
+	p9.backgroundTransparencyMotor:setGoal(v48(1))
+end
+function v11.didUpdate(p10, p11, p12) -- line: 255
+	-- upvalues: getSpringFromSettings (copy)
+	if p11.fadingOut ~= p10.props.fadingOut then
+		if p10.props.fadingOut then
+			p10:fadeOut()
+
+			return
+		end
+
+		p10:fadeIn()
+
+		return
+	end
+
+	if p10.state.fullHeight ~= p12.fullHeight then
+		p10.updateHeight(p10.state.fullHeight)
+	end
+
+	if p10.state.fullWidth ~= p12.fullWidth then
+		local v52 = getSpringFromSettings(p10.props.chatSettings, "size")
+
+		p10.widthMotor:setGoal(v52(p10.state.fullWidth))
+	end
+end
+function v11.didMount(p13) -- line: 273
+	-- upvalues: getSpringFromSettings (copy), ClientSettingsUtility (copy)
+	if not p13.props.fadingOut then
+		local v54 = getSpringFromSettings(p13.props.chatSettings, "size")
+		local v55 = getSpringFromSettings(p13.props.chatSettings, "transparency")
+
+		p13.transparencyMotor:setGoal(v55(p13.props.chatSettings.Transparency))
+
+		local v56 = ClientSettingsUtility.getBackgroundTransparency(p13.props.chatSettings, p13.props.clientSettings)
+
+		p13.backgroundTransparencyMotor:setGoal(v55(v56))
+		p13.widthMotor:setGoal(v54(p13.state.fullWidth))
+	end
+end
+function v11.willUnmount(p14) -- line: 289
+	p14.transparencyMotor:destroy()
+	p14.backgroundTransparencyMotor:destroy()
+	p14.widthMotor:destroy()
+end
+
+return v11

@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("EnableAppNavGamepadRemoval", false);
+return game:DefineFastFlag("EnableAppNavGamepadRemoval", false)

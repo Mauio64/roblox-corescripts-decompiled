@@ -1,19 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Hooks.useCurrentSquadId);
-local v3 = require(l_Parent_0.React);
-local l_usePrevious_0 = require(l_Parent_0.RoactUtils).Hooks.usePrevious;
-return function(v5) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), l_usePrevious_0 (copy), v3 (copy)
-    local v6 = v2() or "";
-    local v7 = l_usePrevious_0(v6) or "";
-    v3.useEffect(function() --[[ Line: 12 ]]
-        -- upvalues: v6 (copy), v7 (copy), v5 (copy)
-        if v6 ~= v7 and v7 ~= "" and v5 then
-            v5();
-        end;
-    end, {
-        v6, 
-        v5
-    });
-end;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local useCurrentSquadId = require(SquadsCore.Hooks.useCurrentSquadId)
+local React = require(SquadsCoreParent.React)
+local usePrevious = require(SquadsCoreParent.RoactUtils).Hooks.usePrevious
+
+return function(p1: ((...any) -> ...any)?) -- line: 9
+	-- upvalues: useCurrentSquadId (copy), usePrevious (copy), React (copy)
+	local v7 = useCurrentSquadId() or ""
+	local v8 = usePrevious(v7) or ""
+
+	React.useEffect(function() -- line: 12
+		-- upvalues: v7 (copy), v8 (copy), p1 (copy)
+		if v7 ~= v8 and (v8 ~= "" and p1) then
+			p1()
+		end
+	end, {
+		v7,
+		p1
+	})
+end

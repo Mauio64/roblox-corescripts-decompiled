@@ -1,44 +1,53 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Error_0 = require(l_Parent_0.LuauPolyfill).Error;
-local v2 = {};
-v2.__index = v2;
-v2.new = function() --[[ Line: 20 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), l_Error_0 (copy)
-    local v3 = {};
-    setmetatable(v3, v2);
-    v3.aborted = false;
-    v3.reason = l_Error_0.new("Undefined Error");
-    v3._signal = Instance.new("BindableEvent");
-    return v3;
-end;
-v2.abort = function(v4) --[[ Line: 32 ]] --[[ Name: abort ]]
-    -- upvalues: v2 (copy), l_Error_0 (copy)
-    local v5 = v2.new();
-    v5.reason = v4 or l_Error_0.new("Signal Aborted");
-    return v5;
-end;
-v2.timeout = function(v6) --[[ Line: 38 ]] --[[ Name: timeout ]]
-    -- upvalues: v2 (copy), l_Error_0 (copy)
-    local v7 = v2.new();
-    v7.reason = l_Error_0.new("TimeoutError");
-    task.delay(v6 / 1000, function() --[[ Line: 41 ]]
-        -- upvalues: v7 (copy)
-        v7:fire();
-    end);
-    return v7;
-end;
-v2.throwIfAborted = function(v8) --[[ Line: 47 ]] --[[ Name: throwIfAborted ]]
-    if v8.aborted then
-        error(v8.reason);
-    end;
-end;
-v2.connect = function(v9, v10) --[[ Line: 55 ]] --[[ Name: connect ]]
-    return v9._signal.Event:Connect(v10);
-end;
-v2.fire = function(v11) --[[ Line: 60 ]] --[[ Name: fire ]]
-    v11.aborted = true;
-    v11._signal:Fire();
-end;
+local ParentParent = script.Parent.Parent
+local Error = require(ParentParent.LuauPolyfill).Error
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 20
+	-- upvalues: t1 (copy), Error (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2.aborted = false
+	t2.reason = Error.new("Undefined Error")
+	t2._signal = Instance.new("BindableEvent")
+
+	return t2
+end
+function t1.abort(p1) -- line: 32
+	-- upvalues: t1 (copy), Error (copy)
+	local v6 = t1.new()
+
+	v6.reason = p1 or Error.new("Signal Aborted")
+
+	return v6
+end
+function t1.timeout(n1: number) -- line: 38
+	-- upvalues: t1 (copy), Error (copy)
+	local v8 = t1.new()
+
+	v8.reason = Error.new("TimeoutError")
+	task.delay(n1 / 1000, function() -- line: 41
+		-- upvalues: v8 (copy)
+		v8:fire()
+	end)
+
+	return v8
+end
+function t1.throwIfAborted(p2) -- line: 47
+	if p2.aborted then
+		error(p2.reason)
+	end
+end
+function t1.connect(p3, p4) -- line: 55
+	return p3._signal.Event:Connect(p4)
+end
+function t1.fire(p5) -- line: 60
+	p5.aborted = true
+	p5._signal:Fire()
+end
+
 return {
-    AbortSignal = v2
-};
+	AbortSignal = t1
+}

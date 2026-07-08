@@ -1,64 +1,140 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameCollections");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GameCollectionItemTypes_0 = require(l_Parent_0.DiscoveryTypes).GameCollectionItemTypes;
-local v3 = require(l_script_FirstAncestor_0.calculateGridLayout);
-local v4 = require(l_script_FirstAncestor_0.renderEmphasisTile);
-local v5 = require(l_script_FirstAncestor_0.renderTwoByOneTile);
-local v6 = require(l_script_FirstAncestor_0.renderBlankTile);
-local v7 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.React);
-local v9 = require(l_script_FirstAncestor_0.GridLayoutTelemetry);
-local v10 = require(l_Parent_0.SharedFlags);
-local l_FFlagLuaAppEnableHomepageTwoByOneTile_0 = v10.FFlagLuaAppEnableHomepageTwoByOneTile;
-local l_FFlagLuaAppTwoByOneTileTelemetryFix_0 = v10.FFlagLuaAppTwoByOneTileTelemetryFix;
-local v13 = if l_FFlagLuaAppEnableHomepageTwoByOneTile_0 then {
-    [l_GameCollectionItemTypes_0.GameCollectionItemType.EmphasisTile] = v4, 
-    [l_GameCollectionItemTypes_0.GameCollectionItemType.TwoByOneTile] = v5, 
-    [l_GameCollectionItemTypes_0.GameCollectionItemType.Blank] = v6
-} else nil;
+local GameCollections = script:FindFirstAncestor("GameCollections")
+local GameCollectionsParent = GameCollections.Parent
+local GameCollectionItemTypes = require(GameCollectionsParent.DiscoveryTypes).GameCollectionItemTypes
+local calculateGridLayout = require(GameCollections.calculateGridLayout)
+local renderEmphasisTile = require(GameCollections.renderEmphasisTile)
+local renderTwoByOneTile = require(GameCollections.renderTwoByOneTile)
+local renderOneByTwoTile = require(GameCollections.renderOneByTwoTile)
+local renderBlankTile = require(GameCollections.renderBlankTile)
+local Cryo = require(GameCollectionsParent.Cryo)
+
+require(GameCollectionsParent.React)
+
+local GridLayoutTelemetry = require(GameCollections.GridLayoutTelemetry)
+local DiscoveryEventErrorLogger = require(GameCollectionsParent.DiscoveryUtils).DiscoveryEventErrorLogger
+local SharedFlags = require(GameCollectionsParent.SharedFlags)
+local FFlagLuaAppFixTotalColsBound = SharedFlags.FFlagLuaAppFixTotalColsBound
+local FFlagLuaAppEnableNxMRoduxApportioning = SharedFlags.FFlagLuaAppEnableNxMRoduxApportioning
+local FFlagLuaAppEnableHomepageOneByTwoTile = SharedFlags.FFlagLuaAppEnableHomepageOneByTwoTile
+local t1 = {
+	[GameCollectionItemTypes.GameCollectionItemType.EmphasisTile] = renderEmphasisTile,
+	[GameCollectionItemTypes.GameCollectionItemType.TwoByOneTile] = renderTwoByOneTile,
+	[GameCollectionItemTypes.GameCollectionItemType.Blank] = renderBlankTile
+}
+
+if FFlagLuaAppEnableHomepageOneByTwoTile then
+	t1[GameCollectionItemTypes.GameCollectionItemType.OneByTwoTile] = renderOneByTwoTile
+end
+
+local v17 = if not FFlagLuaAppEnableNxMRoduxApportioning then nil else GameCollectionItemTypes.SpanForItemType
+
 return {
-    BuildCollectionEntries = function(v14, v15, v16, v17, v18, v19, v20, v21) --[[ Line: 35 ]] --[[ Name: BuildCollectionEntries ]]
-        -- upvalues: v3 (copy), l_FFlagLuaAppEnableHomepageTwoByOneTile_0 (copy), v9 (copy), v7 (copy), l_FFlagLuaAppTwoByOneTileTelemetryFix_0 (copy), l_GameCollectionItemTypes_0 (copy), v13 (copy), v4 (copy), v6 (copy)
-        local v22 = {};
-        local v23 = v3(#v14, v15, v16);
-        local l_layout_0 = v23.layout;
-        local l_totalRows_0 = v23.totalRows;
-        local l_totalCols_0 = v23.totalCols;
-        local v27 = if l_FFlagLuaAppEnableHomepageTwoByOneTile_0 then {} else nil;
-        for v28 = 1, l_totalRows_0 do
-            for v29 = 1, l_totalCols_0 do
-                local v30 = l_layout_0[v28] and l_layout_0[v28][v29];
-                if v30 and v30 > 0 then
-                    local v31 = v17 and v17[v30] or nil;
-                    if l_FFlagLuaAppEnableHomepageTwoByOneTile_0 and v31 then
-                        v27[v30] = true;
-                        local v32 = v14[v30];
-                        local v33 = #v22 + 1;
-                        v9.logTilePlaced(v32 and v32.adId, v32 and v32.universeId, v31, v19, v15, l_totalRows_0, v30, v33, v20, v21);
-                    end;
-                    table.insert(v22, v7.Dictionary.join(v14[v30], {
-                        spanOverride = v16 and v16[v30] or nil, 
-                        gameCollectionItemTypeOverride = v31, 
-                        tileType = if l_FFlagLuaAppTwoByOneTileTelemetryFix_0 then v31 or l_GameCollectionItemTypes_0.GameCollectionItemType.GameTile else nil, 
-                        showDescription = v31 == l_GameCollectionItemTypes_0.GameCollectionItemType.EmphasisTile and v18 or nil, 
-                        customRenderFunction = if l_FFlagLuaAppEnableHomepageTwoByOneTile_0 then v31 and v13 and v13[v31] or nil else v31 == l_GameCollectionItemTypes_0.GameCollectionItemType.EmphasisTile and v4 or nil
-                    }));
-                else
-                    table.insert(v22, {
-                        gameCollectionItemTypeOverride = l_GameCollectionItemTypes_0.GameCollectionItemType.Blank, 
-                        customRenderFunction = v6
-                    });
-                end;
-            end;
-        end;
-        if l_FFlagLuaAppEnableHomepageTwoByOneTile_0 and v17 then
-            for v34, v35 in v17 do
-                if not v27[v34] then
-                    local v36 = v14[v34];
-                    v9.logTileSkipped(v36 and v36.adId, v36 and v36.universeId, v35, v19, v15, l_totalRows_0, v34, v20, v21);
-                end;
-            end;
-        end;
-        return v22;
-    end
-};
+	BuildCollectionEntries = function(t2: {[any]: any}, n1: number, t3: {[any]: any}?, t4: {[any]: any}?, b1: boolean?, s1: string, n2: number?, s2: string?, t5: {[any]: any}?) -- line: 46
+		-- upvalues: FFlagLuaAppEnableNxMRoduxApportioning (copy), t1 (copy), v17 (copy), calculateGridLayout (copy), FFlagLuaAppFixTotalColsBound (copy), GridLayoutTelemetry (copy), DiscoveryEventErrorLogger (copy), GameCollectionItemTypes (copy), renderBlankTile (copy), Cryo (copy)
+		local t6 = {}
+
+		if FFlagLuaAppEnableNxMRoduxApportioning then
+			t4 = {}
+			t3 = {}
+
+			for v28, v29 in t2 do
+				if v29 and v29.componentType then
+					if t1[v29.componentType] then
+						t4[v28] = v29.componentType
+					end
+
+					local v30 = v17[v29.componentType]
+
+					if v30 then
+						t3[v28] = {
+							colSpan = v30.colSpan,
+							rowSpan = v30.rowSpan,
+							alignmentType = v29.alignmentType,
+							minRowPadding = tonumber(v29.minRowPadding) or 0
+						}
+					end
+				end
+			end
+		end
+
+		local totalCols = nil
+		local v32
+
+		if FFlagLuaAppEnableNxMRoduxApportioning and t5 then
+			v32 = #t5
+		else
+			local v33 = calculateGridLayout(#t2, n1, t3)
+
+			t5 = v33.layout
+			v32 = v33.totalRows
+			totalCols = v33.totalCols
+		end
+
+		local t7 = {}
+
+		for i = 1, v32 do
+			for j = 1, if not FFlagLuaAppEnableNxMRoduxApportioning and not FFlagLuaAppFixTotalColsBound then totalCols else n1 do
+				local v37 = t5[i] and t5[i][j]
+
+				if v37 and v37 > 0 then
+					local v38 = t4 and t4[v37] or nil
+					local v39 = if not FFlagLuaAppEnableNxMRoduxApportioning then nil else t2[v37]
+
+					if v38 then
+						t7[v37] = true
+
+						if FFlagLuaAppEnableNxMRoduxApportioning then
+							local v40 = #t6 + 1
+
+							GridLayoutTelemetry.logTilePlaced(v39 and v39.adId, v39 and v39.universeId, v38, s1, n1, v32, v37, v40, n2, s2, nil)
+						else
+							local v41 = t2[v37]
+							local v42 = #t6 + 1
+
+							GridLayoutTelemetry.logTilePlaced(v41 and v41.adId, v41 and v41.universeId, v38, s1, n1, v32, v37, v42, n2, s2, if not FFlagLuaAppFixTotalColsBound then nil else totalCols)
+						end
+					end
+
+					if FFlagLuaAppEnableNxMRoduxApportioning and not v39 then
+						DiscoveryEventErrorLogger.reportError("GameCollectionItemBuilder_StaleLayoutEntry", "layout entryIndex points past end of entries", {
+							entryIndex = v37,
+							entriesCount = #t2,
+							pageContext = s1,
+							sortIndex = n2,
+							topicId = s2
+						})
+						table.insert(t6, {
+							gameCollectionItemTypeOverride = GameCollectionItemTypes.GameCollectionItemType.Blank,
+							customRenderFunction = renderBlankTile
+						})
+					else
+						table.insert(t6, Cryo.Dictionary.join(if not FFlagLuaAppEnableNxMRoduxApportioning then t2[v37] else v39, {
+							spanOverride = t3 and t3[v37] or nil,
+							gameCollectionItemTypeOverride = v38,
+							tileType = v38 or GameCollectionItemTypes.GameCollectionItemType.GameTile,
+							showDescription = v38 == GameCollectionItemTypes.GameCollectionItemType.EmphasisTile and b1 or nil,
+							customRenderFunction = v38 and t1[v38] or nil
+						}))
+					end
+				else
+					table.insert(t6, {
+						gameCollectionItemTypeOverride = GameCollectionItemTypes.GameCollectionItemType.Blank,
+						customRenderFunction = renderBlankTile
+					})
+				end
+			end
+		end
+
+		if t4 then
+			for v43, v44 in t4 do
+				if not t7[v43] then
+					local v45 = t2[v43]
+
+					GridLayoutTelemetry.logTileSkipped(v45 and v45.adId, v45 and v45.universeId, v44, s1, n1, v32, v43, n2, s2)
+				end
+			end
+		end
+
+		return t6
+	end
+}

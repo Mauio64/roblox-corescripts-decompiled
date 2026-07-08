@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAdaptiveScrollingFixForward", false);
+return game:DefineFastFlag("AXAdaptiveScrollingFixForward", false)

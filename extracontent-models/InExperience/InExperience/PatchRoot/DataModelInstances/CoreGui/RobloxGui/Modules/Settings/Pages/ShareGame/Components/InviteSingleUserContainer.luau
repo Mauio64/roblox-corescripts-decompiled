@@ -155,13 +155,13 @@ local function v33(p1) -- line: 52
 	local v44 = not v43 and "Feature.SettingsHub.Action.InviteFriend" or "Feature.SettingsHub.Label.Invited"
 
 	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 0.1,
 		Size = UDim2.new(1, 0, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Position = UDim2.new(0.5, 0, 0.5, 0),
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		BorderSizePixel = 0,
-		BackgroundColor3 = color3,
-		BackgroundTransparency = 0.1
+		BackgroundColor3 = color3
 	}, {
 		SizeConstraint = React.createElement("UISizeConstraint", {
 			MaxSize = Vector2.new(442, 1e999),
@@ -185,16 +185,16 @@ local function v33(p1) -- line: 52
 			textXAlignment = Enum.TextXAlignment.Center
 		}),
 		Divider = React.createElement("Frame", {
+			BorderSizePixel = 0,
 			Position = UDim2.new(0, 0, 0, 48),
 			Size = UDim2.new(1, 0, 0, 1),
-			BorderSizePixel = 0,
 			BackgroundColor3 = COLORS.GRAPHITE
 		}),
 		Wrapper = React.createElement("Frame", {
+			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
-			Position = UDim2.new(0, 0, 0, 56),
-			BackgroundTransparency = 1
+			Position = UDim2.new(0, 0, 0, 56)
 		}, {
 			ListLayout = React.createElement("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -203,13 +203,14 @@ local function v33(p1) -- line: 52
 				Padding = UDim.new(0, 24)
 			}),
 			Thumbnail = React.createElement(SingleUserThumbnail, {
-				user = v35,
-				size = UDim2.new(0, 95, 0, 95),
 				layoutOrder = 1,
 				square = true,
-				backgroundTransparency = 1
+				backgroundTransparency = 1,
+				user = v35,
+				size = UDim2.new(0, 95, 0, 95)
 			}),
 			TextBody = React.createElement(StyledTextLabel, {
+				layoutOrder = 2,
 				fontStyle = v37.Font.Header2,
 				colorStyle = v37.Theme.TextEmphasis,
 				text = p1.promptMessage or v15:FormatByKey("Feature.SettingsHub.Label.DefaultInviteMessage", {
@@ -217,13 +218,12 @@ local function v33(p1) -- line: 52
 				}),
 				textXAlignment = Enum.TextXAlignment.Center,
 				automaticSize = Enum.AutomaticSize.Y,
-				size = UDim2.new(1, 0, 0, 0),
-				layoutOrder = 2
+				size = UDim2.new(1, 0, 0, 0)
 			}),
 			ButtonWrapper = React.createElement("Frame", {
-				Size = UDim2.new(1, 0, 0, 48),
 				LayoutOrder = 3,
-				BackgroundTransparency = 1
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 48)
 			}, {
 				CancelButton = React.createElement(Button, {
 					buttonType = ButtonType.Secondary,
@@ -256,7 +256,7 @@ return RoactRodux.connect(function(p9) -- line: 280
 end, function(p10: ((...any) -> ...any)) -- line: 287
 	-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetFFlagEnableNewInviteSendEndpoint (copy), InviteUserIdToPlaceIdCustomized (copy), Constants (copy), InviteUserIdToPlaceId (copy)
 	return {
-		inviteUser = function(s1: string, p11, s2: string?, s3: string?) --[[ inviteUser ]] -- line: 289
+		inviteUser = function(s1: string, p11, s2: string?, s3: string?) -- line: 289
 			-- upvalues: httpRequest (copy), HttpRbxApiService (copy), GetFFlagEnableNewInviteSendEndpoint (copy), p10 (copy), InviteUserIdToPlaceIdCustomized (copy), Constants (copy), InviteUserIdToPlaceId (copy)
 			local v55 = httpRequest(HttpRbxApiService)
 			local str = tostring(game.PlaceId)

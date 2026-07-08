@@ -12,6 +12,5 @@ return {
 	FFlagTraversalExpCardFontSizeFix = game:DefineFastFlag("TraversalExpCardFontSizeFix", false),
 	FFlagTraversalExpPagePaddingFixes = game:DefineFastFlag("TraversalExpPagePaddingFixes709", false),
 	FFlagTraversalHistoryMenuFocusNavFix = game:DefineFastFlag("TraversalHistoryMenuFocusNavFix709", false),
-	FFlagTraversalPerfFixes = game:DefineFastFlag("TraversalPerfFixes4", false),
 	FFlagFixTraversalHistoryMenuFixesV3 = game:DefineFastFlag("FixTraversalHistoryMenuFixesV3v1", false)
 }

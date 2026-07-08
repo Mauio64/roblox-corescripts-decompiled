@@ -1,22 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.SocialCommon);
-return v1.createContext({
-    getParentContainer = function() --[[ Line: 18 ]] --[[ Name: getParentContainer ]]
-        return nil;
-    end, 
-    visibilitySignal = Instance.new("BindableEvent"), 
-    getShouldSetAppChatVisible = function() --[[ Line: 22 ]] --[[ Name: getShouldSetAppChatVisible ]]
-        return false;
-    end, 
-    entryPoint = v2.Enums.ChatEntryPointNames.Unknown, 
-    showParentContainer = function() --[[ Line: 26 ]] --[[ Name: showParentContainer ]]
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local SocialCommon = require(Parent.SocialCommon)
 
-    end, 
-    hideParentContainer = function() --[[ Line: 27 ]] --[[ Name: hideParentContainer ]]
-
-    end, 
-    updateCurrentSquadId = function() --[[ Line: 28 ]] --[[ Name: updateCurrentSquadId ]]
-
-    end
-});
+return React.createContext({
+	getParentContainer = function() -- line: 18
+		return nil
+	end,
+	visibilitySignal = Instance.new("BindableEvent"),
+	getShouldSetAppChatVisible = function() -- line: 22
+		return false
+	end,
+	entryPoint = SocialCommon.Enums.ChatEntryPointNames.Unknown,
+	showParentContainer = function() -- line: 26
+	end,
+	hideParentContainer = function() -- line: 27
+	end,
+	updateCurrentSquadId = function() -- line: 28
+	end
+})

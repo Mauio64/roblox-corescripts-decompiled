@@ -1,65 +1,75 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_Tile_0 = require(l_script_FirstAncestor_0.Common.Enums).Tile;
-local v4 = require(l_script_FirstAncestor_0.Components.Tiles.UserTile);
-local v5 = require(l_script_FirstAncestor_0.Components.Tiles.AddFriendsTile);
-local v6 = require(l_script_FirstAncestor_0.Components.Tiles.FriendsHintTile);
-local v7 = require(l_script_FirstAncestor_0.Components.Tiles.StartSquadTile);
-local v8 = require(l_script_FirstAncestor_0.Components.Tiles.ShareQRTile);
-local l_FFlagSocialCarouselShareQREnabled_0 = require(l_Parent_0.SharedFlags).FFlagSocialCarouselShareQREnabled;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local React = require(SocialCarouselParent.React)
+local Tile = require(SocialCarousel.Common.Enums).Tile
+local UserTile = require(SocialCarousel.Components.Tiles.UserTile)
+local AddFriendsTile = require(SocialCarousel.Components.Tiles.AddFriendsTile)
+local FriendsHintTile = require(SocialCarousel.Components.Tiles.FriendsHintTile)
+local StartSquadTile = require(SocialCarousel.Components.Tiles.StartSquadTile)
+local ShareQRTile = require(SocialCarousel.Components.Tiles.ShareQRTile)
+local Tile2 = require(SocialCarousel.BaseComponents.Tile)
+local FFlagSocialCarouselShareQREnabled = require(SocialCarouselParent.SharedFlags).FFlagSocialCarouselShareQREnabled
+
 return {
-    [l_Tile_0.Friend] = function(v10, v11, v12, v13, v14) --[[ Line: 13 ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        return v2.createElement(v4, {
-            item = v10, 
-            index = v11, 
-            itemSize = v12, 
-            selectionOrder = v13, 
-            onTileContentChanged = v14
-        });
-    end, 
-    [l_Tile_0.Recommendation] = function(v15, v16, v17, v18, v19) --[[ Line: 28 ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        return v2.createElement(v4, {
-            item = v15, 
-            index = v16, 
-            itemSize = v17, 
-            selectionOrder = v18, 
-            onTileContentChanged = v19
-        });
-    end, 
-    [l_Tile_0.AddFriends] = function(_, v21, v22, v23, _) --[[ Line: 43 ]]
-        -- upvalues: v2 (copy), v5 (copy)
-        return v2.createElement(v5, {
-            index = v21, 
-            itemSize = v22, 
-            selectionOrder = v23
-        });
-    end, 
-    [l_Tile_0.FriendsHint] = function(_, v26, v27, v28, _) --[[ Line: 50 ]]
-        -- upvalues: v2 (copy), v6 (copy)
-        return v2.createElement(v6, {
-            index = v26, 
-            itemSize = v27, 
-            selectionOrder = v28
-        });
-    end, 
-    [l_Tile_0.StartSquad] = function(v30, v31, v32, v33, _) --[[ Line: 57 ]]
-        -- upvalues: v2 (copy), v7 (copy)
-        return v2.createElement(v7, {
-            index = v31, 
-            item = v30, 
-            itemSize = v32, 
-            selectionOrder = v33
-        });
-    end, 
-    [l_Tile_0.ShareQR] = l_FFlagSocialCarouselShareQREnabled_0 and function(_, v36, v37, v38, _) --[[ Line: 66 ]]
-        -- upvalues: v2 (copy), v8 (copy)
-        return v2.createElement(v8, {
-            index = v36, 
-            itemSize = v37, 
-            selectionOrder = v38
-        });
-    end or nil
-};
+	[Tile.Friend] = function(p1, n1: number, uDim2: UDim2, n2: number?, p2) -- line: 14
+		-- upvalues: React (copy), UserTile (copy)
+		return React.createElement(UserTile, {
+			item = p1,
+			index = n1,
+			itemSize = uDim2,
+			selectionOrder = n2,
+			onTileContentChanged = p2
+		})
+	end,
+	[Tile.Recommendation] = function(p3, n3: number, uDim2: UDim2, n4: number?, p4) -- line: 29
+		-- upvalues: React (copy), UserTile (copy)
+		return React.createElement(UserTile, {
+			item = p3,
+			index = n3,
+			itemSize = uDim2,
+			selectionOrder = n4,
+			onTileContentChanged = p4
+		})
+	end,
+	[Tile.AddFriends] = function(_, n5: number, uDim2: UDim2, n6: number?, _) -- line: 44
+		-- upvalues: React (copy), AddFriendsTile (copy)
+		return React.createElement(AddFriendsTile, {
+			index = n5,
+			itemSize = uDim2,
+			selectionOrder = n6
+		})
+	end,
+	[Tile.FriendsHint] = function(_, n7: number, uDim2: UDim2, n8: number?, _) -- line: 51
+		-- upvalues: React (copy), FriendsHintTile (copy)
+		return React.createElement(FriendsHintTile, {
+			index = n7,
+			itemSize = uDim2,
+			selectionOrder = n8
+		})
+	end,
+	[Tile.StartSquad] = function(p9, n9: number, uDim2: UDim2, n10: number?, _) -- line: 58
+		-- upvalues: React (copy), StartSquadTile (copy)
+		return React.createElement(StartSquadTile, {
+			index = n9,
+			item = p9,
+			itemSize = uDim2,
+			selectionOrder = n10
+		})
+	end,
+	[Tile.ShareQR] = if not FFlagSocialCarouselShareQREnabled then nil else function(_, n11: number, uDim2: UDim2, n12: number?, _) -- line: 67
+		-- upvalues: React (copy), ShareQRTile (copy)
+		return React.createElement(ShareQRTile, {
+			index = n11,
+			itemSize = uDim2,
+			selectionOrder = n12
+		})
+	end,
+	[Tile.Skeleton] = function(_, n13: number, uDim2: UDim2, _: number?, _) -- line: 75
+		-- upvalues: React (copy), Tile2 (copy)
+		return React.createElement(Tile2, {
+			isLoading = true,
+			index = n13,
+			itemSize = uDim2
+		})
+	end
+}

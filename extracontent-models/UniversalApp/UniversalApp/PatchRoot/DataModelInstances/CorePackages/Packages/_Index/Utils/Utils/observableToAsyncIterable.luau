@@ -1,140 +1,145 @@
-local l_Boolean_0 = require((nil).LuauPolyfill).Boolean;
+local Boolean = require((nil).LuauPolyfill).Boolean
+
 return {
-    observableToAsyncIterable = function(v1) --[[ Line: 15 ]] --[[ Name: observableToAsyncIterable ]]
-        -- upvalues: l_Boolean_0 (copy)
-        local v2 = {};
-        local v3 = {};
-        local v4 = true;
-        local function v6(v5) --[[ Line: 19 ]] --[[ Name: pushValue ]]
-            -- upvalues: v2 (copy), v3 (copy)
-            if v2.length ~= 0 then
-                table.remove(v2, 1)({
-                    value = v5, 
-                    done = false
-                });
-                return;
-            else
-                table.insert(v3, {
-                    value = v5, 
-                    done = false
-                });
-                return;
-            end;
-        end;
-        local function v8(v7) --[[ Line: 30 ]] --[[ Name: pushError ]]
-            -- upvalues: v2 (copy), v3 (copy)
-            if v2.length ~= 0 then
-                table.remove(v2, 1)({
-                    value = {
-                        errors = {
-                            v7
-                        }
-                    }, 
-                    done = false
-                });
-                return;
-            else
-                table.insert(v3, {
-                    value = {
-                        errors = {
-                            v7
-                        }
-                    }, 
-                    done = false
-                });
-                return;
-            end;
-        end;
-        local function v9() --[[ Line: 41 ]] --[[ Name: pushDone ]]
-            -- upvalues: v2 (copy), v3 (copy)
-            if v2.length ~= 0 then
-                table.remove(v2, 1)({
-                    done = true
-                });
-                return;
-            else
-                table.insert(v3, {
-                    done = true
-                });
-                return;
-            end;
-        end;
-        local function _() --[[ Line: 49 ]] --[[ Name: pullValue ]]
-            -- upvalues: v3 (copy), v2 (copy)
-            return Promise.new(function(v10) --[[ Line: 50 ]]
-                -- upvalues: v3 (ref), v2 (ref)
-                if v3.length ~= 0 then
-                    v10((table.remove(v3, 1)));
-                    return;
-                else
-                    table.insert(v2, v10);
-                    return;
-                end;
-            end);
-        end;
-        local v17 = v1:subscribe({
-            next = function(_, v13) --[[ Line: 60 ]] --[[ Name: next ]]
-                -- upvalues: v6 (copy)
-                v6(v13);
-            end, 
-            error = function(_, v15) --[[ Line: 63 ]] --[[ Name: error ]]
-                -- upvalues: v8 (copy)
-                v8(v15);
-            end, 
-            complete = function(_) --[[ Line: 66 ]] --[[ Name: complete ]]
-                -- upvalues: v9 (copy)
-                v9();
-            end
-        });
-        local function v20() --[[ Line: 70 ]] --[[ Name: emptyQueue ]]
-            -- upvalues: l_Boolean_0 (ref), v4 (ref), v17 (copy), v2 (copy), v3 (copy)
-            if l_Boolean_0.toJSBoolean(v4) then
-                v4 = false;
-                v17:unsubscribe();
-                for _, v19 in v2 do
-                    v19({
-                        value = nil, 
-                        done = true
-                    });
-                end;
-                v2.length = 0;
-                v3.length = 0;
-            end;
-        end;
-        return {
-            next = function(v21) --[[ Line: 82 ]] --[[ Name: next ]]
-                -- upvalues: l_Boolean_0 (ref), v4 (ref), v3 (copy), v2 (copy)
-                if l_Boolean_0.toJSBoolean(v4) then
-                    return (Promise.new(function(v22) --[[ Line: 50 ]]
-                        -- upvalues: v3 (ref), v2 (ref)
-                        if v3.length ~= 0 then
-                            v22((table.remove(v3, 1)));
-                            return;
-                        else
-                            table.insert(v2, v22);
-                            return;
-                        end;
-                    end));
-                else
-                    return (v21["return"]());
-                end;
-            end, 
-            ["return"] = function(_) --[[ Line: 86 ]]
-                -- upvalues: v20 (copy)
-                v20();
-                return Promise.resolve({
-                    value = nil, 
-                    done = true
-                });
-            end, 
-            throw = function(_, v25) --[[ Line: 90 ]] --[[ Name: throw ]]
-                -- upvalues: v20 (copy)
-                v20();
-                return Promise.reject(v25);
-            end, 
-            [tostring(Symbol.asyncIterator)] = function(v26) --[[ Line: 94 ]]
-                return v26;
-            end
-        };
-    end
-};
+	observableToAsyncIterable = function(t1: {[any]: any}) -- line: 15
+		-- upvalues: Boolean (copy)
+		local t2 = {}
+		local t3 = {}
+		local u5 = true
+
+		local function pushValue(p1) -- line: 19
+			-- upvalues: t2 (copy), t3 (copy)
+			if t2.length ~= 0 then
+				table.remove(t2, 1)({
+					done = false,
+					value = p1
+				})
+
+				return
+			end
+
+			table.insert(t3, {
+				done = false,
+				value = p1
+			})
+		end
+		local function pushError(p2) -- line: 30
+			-- upvalues: t2 (copy), t3 (copy)
+			if t2.length ~= 0 then
+				table.remove(t2, 1)({
+					done = false,
+					value = {
+						errors = { p2 }
+					}
+				})
+
+				return
+			end
+
+			table.insert(t3, {
+				done = false,
+				value = {
+					errors = { p2 }
+				}
+			})
+		end
+		local function pushDone() -- line: 41
+			-- upvalues: t2 (copy), t3 (copy)
+			if t2.length ~= 0 then
+				table.remove(t2, 1)({
+					done = true
+				})
+
+				return
+			end
+
+			table.insert(t3, {
+				done = true
+			})
+		end
+		local function pullValue() -- line: 49
+			-- upvalues: t3 (copy), t2 (copy)
+			return Promise.new(function(resolve) -- line: 50
+				-- upvalues: t3 (copy), t2 (copy)
+				if t3.length ~= 0 then
+					resolve((table.remove(t3, 1)))
+
+					return
+				end
+
+				table.insert(t2, resolve)
+			end)
+		end
+
+		local v10 = t1:subscribe({
+			next = function(_, p4) -- line: 60
+				-- upvalues: pushValue (copy)
+				pushValue(p4)
+			end,
+			error = function(_, p6) -- line: 63
+				-- upvalues: pushError (copy)
+				pushError(p6)
+			end,
+			complete = function(_) -- line: 66
+				-- upvalues: pushDone (copy)
+				pushDone()
+			end
+		})
+
+		local function emptyQueue() -- line: 70
+			-- upvalues: Boolean (copy), u5 (ref), v10 (copy), t2 (copy), t3 (copy)
+			if Boolean.toJSBoolean(u5) then
+				u5 = false
+				v10:unsubscribe()
+
+				for _, v20 in t2 do
+					v20({
+						value = nil,
+						done = true
+					})
+				end
+
+				t2.length = 0
+				t3.length = 0
+			end
+		end
+
+		return {
+			next = function(p8) -- line: 82
+				-- upvalues: Boolean (copy), u5 (ref), t3 (copy), t2 (copy)
+				if Boolean.toJSBoolean(u5) then
+					return (Promise.new(function(resolve) -- line: 50
+						-- upvalues: t3 (copy), t2 (copy)
+						if t3.length ~= 0 then
+							resolve((table.remove(t3, 1)))
+
+							return
+						end
+
+						table.insert(t2, resolve)
+					end))
+				end
+
+				return (p8["return"]())
+			end,
+			["return"] = function(_) -- line: 86
+				-- upvalues: emptyQueue (copy)
+				emptyQueue()
+
+				return Promise.resolve({
+					value = nil,
+					done = true
+				})
+			end,
+			throw = function(_, p11) -- line: 90
+				-- upvalues: emptyQueue (copy)
+				emptyQueue()
+
+				return Promise.reject(p11)
+			end,
+			[tostring(Symbol.asyncIterator)] = function(p12) -- line: 94
+				return p12
+			end
+		}
+	end
+}

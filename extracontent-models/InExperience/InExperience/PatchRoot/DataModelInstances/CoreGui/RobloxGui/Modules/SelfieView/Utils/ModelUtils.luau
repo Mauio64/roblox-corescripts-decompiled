@@ -1,293 +1,319 @@
-local l_CollectionService_0 = game:GetService("CollectionService");
-local v1 = game:DefineFastFlag("SelfViewNeckCheck", false);
-local v2 = game:DefineFastFlag("SelfViewR15PlusSupport", false);
-local v3 = {
-    Accessory = "Accessory", 
-    CharacterMesh = "CharacterMesh", 
-    Decal = "Decal", 
-    MeshPart = "MeshPart", 
-    Pants = "Pants", 
-    Part = "Part", 
-    Shirt = "Shirt", 
-    ShirtGraphic = "ShirtGraphic", 
-    SpecialMesh = "SpecialMesh", 
-    SurfaceAppearance = "SurfaceAppearance"
-};
-local function v5(v4) --[[ Line: 26 ]] --[[ Name: getFaceControls ]]
-    if v4 == nil then
-        return;
-    else
-        return (v4:FindFirstChildWhichIsA("FaceControls", true));
-    end;
-end;
-local function v15(v6, v7) --[[ Line: 33 ]] --[[ Name: getNeck ]]
-    -- upvalues: v1 (copy)
-    if v6 == nil or v7 == nil then
-        return nil;
-    else
-        local l_v6_Descendants_0 = v6:GetDescendants();
-        for _, v10 in l_v6_Descendants_0 do
-            if v10:IsA("Motor6D") and (v10.Part1 == v7 or v10.Name == "Neck") then
-                return v10;
-            end;
-        end;
-        if v1 == true then
-            for _, v12 in l_v6_Descendants_0 do
-                if v12:IsA("AnimationConstraint") and v12.Parent == v7 and (v12.Attachment0 ~= nil and v12.Attachment0.Name == "NeckRigAttachment" or v12.Name == "Neck") then
-                    return v12;
-                end;
-            end;
-        else
-            for _, v14 in l_v6_Descendants_0 do
-                if v14:IsA("AnimationConstraint") and v14.Parent == v7 and (v14.Attachment0.Name == "NeckRigAttachment" or v14.Name == "Neck") then
-                    return v14;
-                end;
-            end;
-        end;
-        return nil;
-    end;
-end;
-local function v21(v16, v17, v18) --[[ Line: 74 ]] --[[ Name: findObjectOfNameAndTypeName ]]
-    if v18 == nil then
-        return nil;
-    else
-        for _, v20 in (v18:GetDescendants()) do
-            if v20:IsA(v17) and v20.Name == v16 then
-                return v20;
-            end;
-        end;
-        return nil;
-    end;
-end;
-local function v25(v22) --[[ Line: 87 ]] --[[ Name: getHead ]]
-    -- upvalues: v21 (copy)
-    if not v22 then
-        return nil;
-    else
-        local v23 = nil;
-        local v24 = if v22 == nil then nil else v22:FindFirstChildWhichIsA("FaceControls", true);
-        if v24 ~= nil and v24.Parent and (v24.Parent.ClassName == "MeshPart" or v24.Parent.ClassName == "Part") then
-            v23 = v24.Parent;
-        end;
-        if not v23 then
-            v23 = v21("Head", "MeshPart", v22);
-        end;
-        if not v23 then
-            v23 = v21("Head", "Part", v22);
-        end;
-        return v23;
-    end;
-end;
-local function v31(v26, v27) --[[ Line: 120 ]] --[[ Name: getAnimator ]]
-    local v28 = nil;
-    local v29 = nil;
-    if v27 > 0 then
-        local v30 = v26:WaitForChild("Humanoid", v27);
-        v29 = if v30 then if v30:IsA("Humanoid") then v30 else v26:FindFirstChildWhichIsA("Humanoid") else v26:FindFirstChildWhichIsA("Humanoid");
-    else
-        v29 = v26:FindFirstChildWhichIsA("Humanoid");
-    end;
-    if v29 ~= nil then
-        v28 = if v27 > 0 then v29:WaitForChild("Animator", v27) else v29:FindFirstChild("Animator");
-    end;
-    if v28 == nil then
-        v28 = v26:FindFirstChildWhichIsA("Animator", true);
-    end;
-    return v28;
-end;
-local v32 = {
-    "Head", 
-    "UpperTorso", 
-    "LowerTorso", 
-    "Torso", 
-    "LeftFoot", 
-    "LeftLowerLeg", 
-    "LeftUpperLeg", 
-    "RightFoot", 
-    "RightLowerLeg", 
-    "RightUpperLeg", 
-    "LeftHand", 
-    "LeftLowerArm", 
-    "LeftUpperArm", 
-    "RightHand", 
-    "RightLowerArm", 
-    "RightUpperArm"
-};
-local function v37(v33, v34) --[[ Line: 174 ]] --[[ Name: updateTransparency ]]
-    -- upvalues: v32 (copy), l_CollectionService_0 (copy)
-    for _, v36 in ipairs(v33:GetDescendants()) do
-        if v36:IsA("Decal") then
-            v36.Transparency = 0;
-        elseif v36:IsA("MeshPart") then
-            if v36.Parent and v36.Parent:IsA("Accessory") or table.find(v32, v36.Name) then
-                if not table.find(v34, v36.MeshId) then
-                    v34[v36.MeshId] = v36.Transparency;
-                else
-                    v36.Transparency = v34[v36.MeshId];
-                end;
-            end;
-        elseif v36:IsA("Part") then
-            if v36.Parent and v36.Parent:IsA("Accessory") or table.find(v32, v36.Name) then
-                v36.Transparency = 0;
-            end;
-            if l_CollectionService_0:HasTag(v36, "__RBX__LOCKED_TRANSPARENT") then
-                v36.Transparency = 1;
-            end;
-        end;
-    end;
-end;
-local function v39(v38) --[[ Line: 203 ]] --[[ Name: shouldMarkCloneDirtyForDescendant ]]
-    -- upvalues: v3 (copy)
-    if v38:IsA("MeshPart") or v38:IsA("Part") or v38:IsA("Decal") then
-        if v38.Transparency < 1 then
-            return true;
-        end;
-    elseif v3[v38.ClassName] then
-        return true;
-    end;
-    return false;
-end;
-local function v43(v40) --[[ Line: 216 ]] --[[ Name: resetPartOrientation ]]
-    for _, v42 in ipairs(v40:GetDescendants()) do
-        if v42:IsA("Motor6D") then
-            v42.C0 = CFrame.new(v42.C0.Position);
-            v42.C1 = CFrame.new(v42.C1.Position);
-        end;
-    end;
-end;
-local function _(v44, v45) --[[ Line: 225 ]] --[[ Name: removeChild ]]
-    local l_v44_FirstChild_0 = v44:FindFirstChild(v45);
-    if l_v44_FirstChild_0 then
-        l_v44_FirstChild_0:Destroy();
-    end;
-end;
-local function v52(v48) --[[ Line: 231 ]] --[[ Name: removeScripts ]]
-    local l_Animate_0 = v48:FindFirstChild("Animate");
-    if l_Animate_0 then
-        l_Animate_0:Destroy();
-    end;
-    l_Animate_0 = v48:FindFirstChild("Health");
-    if l_Animate_0 then
-        l_Animate_0:Destroy();
-    end;
-    for _, v51 in pairs(v48:GetDescendants()) do
-        if v51:IsA("BaseScript") then
-            v51:Destroy();
-        end;
-    end;
-end;
-local function v62(v53) --[[ Line: 242 ]] --[[ Name: removeTags ]]
-    -- upvalues: l_CollectionService_0 (copy)
-    local l_l_CollectionService_0_Tags_0 = l_CollectionService_0:GetTags(v53);
-    for _, v56 in ipairs(l_l_CollectionService_0_Tags_0) do
-        if v56 ~= "NoFace" then
-            l_CollectionService_0:RemoveTag(v53, v56);
-        end;
-    end;
-    for _, v58 in ipairs(v53:GetDescendants()) do
-        local l_l_CollectionService_0_Tags_1 = l_CollectionService_0:GetTags(v58);
-        for _, v61 in ipairs(l_l_CollectionService_0_Tags_1) do
-            if v61 ~= "NoFace" then
-                l_CollectionService_0:RemoveTag(v58, v61);
-            end;
-        end;
-    end;
-    l_l_CollectionService_0_Tags_0 = l_CollectionService_0:GetTags(v53);
-end;
-local v63 = {
-    Accessory = "Accessory", 
-    Animator = "Animator", 
-    Attachment = "Attachment", 
-    AnimationConstraint = "AnimationConstraint", 
-    BallSocketConstraint = "BallSocketConstraint", 
-    BodyColors = "BodyColors", 
-    Bone = v2 and "Bone" or nil, 
-    CharacterMesh = "CharacterMesh", 
-    Decal = "Decal", 
-    DigitsRigDescription = v2 and "DigitsRigDescription" or nil, 
-    FaceControls = "FaceControls", 
-    Humanoid = "Humanoid", 
-    HumanoidDescription = "HumanoidDescription", 
-    HumanoidRigDescription = v2 and "HumanoidRigDescription" or nil, 
-    MeshPart = "MeshPart", 
-    Motor6D = "Motor6D", 
-    NumberValue = "NumberValue", 
-    Pants = "Pants", 
-    Part = "Part", 
-    Shirt = "Shirt", 
-    ShirtGraphic = "ShirtGraphic", 
-    SpecialMesh = "SpecialMesh", 
-    StringValue = "StringValue", 
-    SurfaceAppearance = "SurfaceAppearance", 
-    Vector3Value = "Vector3Value", 
-    WrapTarget = "WrapTarget", 
-    Weld = "Weld", 
-    WrapLayer = "WrapLayer", 
-    WeldConstraint = "WeldConstraint", 
-    AccessoryWeld = "AccessoryWeld", 
-    PackageLink = "PackageLink", 
-    Folder = "Folder", 
-    RigidConstraint = "RigidConstraint", 
-    WrapTextureTransfer = "WrapTextureTransfer"
-};
-local function v64(v65) --[[ Line: 300 ]] --[[ Name: disableScripts ]]
-    -- upvalues: v64 (copy)
-    for _, v67 in v65:GetChildren() do
-        if v67:IsA("Script") then
-            v67.Disabled = true;
-            v67.Parent = nil;
-        end;
-        v64(v67);
-    end;
-end;
-local function v68(v69) --[[ Line: 310 ]] --[[ Name: removeUI ]]
-    -- upvalues: v68 (copy)
-    for _, v71 in v69:GetChildren() do
-        if v71:IsA("GuiObject") or v71:IsA("ScreenGui") or v71:IsA("BillboardGui") or v71:IsA("AdGui") or v71:IsA("SurfaceGui") then
-            v71.Parent = nil;
-        end;
-        v68(v71);
-    end;
-end;
-local function v72(v73) --[[ Line: 325 ]] --[[ Name: removeInstancesStrict ]]
-    -- upvalues: v63 (copy), v72 (copy)
-    for _, v75 in v73:GetChildren() do
-        if not v63[v75.ClassName] then
-            v75.Parent = nil;
-        end;
-        v72(v75);
-    end;
-end;
+local CollectionService = game:GetService("CollectionService")
+local v2 = game:DefineFastFlag("SelfViewNeckCheck", false)
+local t1 = {
+	Accessory = "Accessory",
+	CharacterMesh = "CharacterMesh",
+	Decal = "Decal",
+	MeshPart = "MeshPart",
+	Pants = "Pants",
+	Part = "Part",
+	Shirt = "Shirt",
+	ShirtGraphic = "ShirtGraphic",
+	SpecialMesh = "SpecialMesh",
+	SurfaceAppearance = "SurfaceAppearance"
+}
+
+local function findObjectOfNameAndTypeName(s1: string, s2: string, p1) -- line: 72
+	if p1 == nil then
+		return nil
+	end
+
+	for _, descendant in (p1:GetDescendants()) do
+		if descendant:IsA(s2) and s1 == descendant.Name then
+			return descendant
+		end
+	end
+
+	return nil
+end
+local function getHead(p2) -- line: 85
+	-- upvalues: findObjectOfNameAndTypeName (copy)
+	if not p2 then
+		return nil
+	end
+
+	local Parent = nil
+	local v30 = if p2 ~= nil then p2:FindFirstChildWhichIsA("FaceControls", true) else nil
+
+	if v30 ~= nil and v30.Parent and (v30.Parent.ClassName == "MeshPart" or v30.Parent.ClassName == "Part") then
+		Parent = v30.Parent
+	end
+
+	if not Parent then
+		Parent = findObjectOfNameAndTypeName("Head", "MeshPart", p2)
+	end
+
+	if not Parent then
+		Parent = findObjectOfNameAndTypeName("Head", "Part", p2)
+	end
+
+	return Parent
+end
+local function getAnimator(p3, n1: number) -- line: 118
+	local v33 = nil
+	local v35
+
+	if n1 > 0 then
+		local Humanoid = p3:WaitForChild("Humanoid", n1)
+
+		v35 = if not Humanoid then p3:FindFirstChildWhichIsA("Humanoid") else if not Humanoid:IsA("Humanoid") then p3:FindFirstChildWhichIsA("Humanoid") else Humanoid
+	else
+		v35 = p3:FindFirstChildWhichIsA("Humanoid")
+	end
+
+	if v35 ~= nil then
+		v33 = if not (n1 > 0) then v35:FindFirstChild("Animator") else v35:WaitForChild("Animator", n1)
+	end
+
+	if v33 == nil then
+		v33 = p3:FindFirstChildWhichIsA("Animator", true)
+	end
+
+	return v33
+end
+
+local t2 = {
+	"Head",
+	"UpperTorso",
+	"LowerTorso",
+	"Torso",
+	"LeftFoot",
+	"LeftLowerLeg",
+	"LeftUpperLeg",
+	"RightFoot",
+	"RightLowerLeg",
+	"RightUpperLeg",
+	"LeftHand",
+	"LeftLowerArm",
+	"LeftUpperArm",
+	"RightHand",
+	"RightLowerArm",
+	"RightUpperArm"
+}
+
+local function removeChild(p4, s3: string) -- line: 223
+	local s3_2 = p4:FindFirstChild(s3)
+
+	if s3_2 then
+		s3_2:Destroy()
+	end
+end
+
+local t3 = {
+	Accessory = "Accessory",
+	Animator = "Animator",
+	Attachment = "Attachment",
+	AnimationConstraint = "AnimationConstraint",
+	BallSocketConstraint = "BallSocketConstraint",
+	BodyColors = "BodyColors",
+	Bone = "Bone",
+	CharacterMesh = "CharacterMesh",
+	Decal = "Decal",
+	DigitsRigDescription = "DigitsRigDescription",
+	FaceControls = "FaceControls",
+	Humanoid = "Humanoid",
+	HumanoidDescription = "HumanoidDescription",
+	HumanoidRigDescription = "HumanoidRigDescription",
+	MeshPart = "MeshPart",
+	Motor6D = "Motor6D",
+	NumberValue = "NumberValue",
+	Pants = "Pants",
+	Part = "Part",
+	Shirt = "Shirt",
+	ShirtGraphic = "ShirtGraphic",
+	SpecialMesh = "SpecialMesh",
+	StringValue = "StringValue",
+	SurfaceAppearance = "SurfaceAppearance",
+	Vector3Value = "Vector3Value",
+	WrapTarget = "WrapTarget",
+	Weld = "Weld",
+	WrapLayer = "WrapLayer",
+	WeldConstraint = "WeldConstraint",
+	AccessoryWeld = "AccessoryWeld",
+	PackageLink = "PackageLink",
+	Folder = "Folder",
+	RigidConstraint = "RigidConstraint",
+	WrapTextureTransfer = "WrapTextureTransfer"
+}
+
+local function disableScripts(p5) -- line: 298
+	-- upvalues: disableScripts (copy)
+	for _, child in p5:GetChildren() do
+		if child:IsA("Script") then
+			child.Disabled = true
+			child.Parent = nil
+		end
+
+		disableScripts(child)
+	end
+end
+local function removeUI(p6) -- line: 308
+	-- upvalues: removeUI (copy)
+	for _, child in p6:GetChildren() do
+		if child:IsA("GuiObject") or child:IsA("ScreenGui") or child:IsA("BillboardGui") or child:IsA("AdGui") or child:IsA("SurfaceGui") then
+			child.Parent = nil
+		end
+
+		removeUI(child)
+	end
+end
+local function removeInstancesStrict(p7) -- line: 323
+	-- upvalues: t3 (copy), removeInstancesStrict (copy)
+	for _, child in p7:GetChildren() do
+		if not t3[child.ClassName] then
+			child.Parent = nil
+		end
+
+		removeInstancesStrict(child)
+	end
+end
+
 return {
-    getFaceControls = v5, 
-    getNeck = v15, 
-    getHead = v25, 
-    getAnimator = v31, 
-    updateTransparency = v37, 
-    shouldMarkCloneDirtyForDescendant = v39, 
-    resetPartOrientation = v43, 
-    removeScripts = v52, 
-    removeTags = v62, 
-    sanitizeCharacter = function(v76) --[[ Line: 334 ]] --[[ Name: sanitizeCharacter ]]
-        -- upvalues: v72 (copy)
-        if not v76 then
-            return;
-        else
-            v72(v76);
-            return;
-        end;
-    end, 
-    isValidAvatar = function(v77) --[[ Line: 342 ]] --[[ Name: isValidAvatar ]]
-        -- upvalues: v31 (copy), v25 (copy)
-        if not v31(v77, 10) then
-            return false;
-        elseif not v25(v77) then
-            return false;
-        else
-            return true;
-        end;
-    end, 
-    hasDynamicHead = function(v78) --[[ Line: 356 ]] --[[ Name: hasDynamicHead ]]
-        return (if v78 == nil then nil else v78:FindFirstChildWhichIsA("FaceControls", true)) ~= nil;
-    end
-};
+	getFaceControls = function(p8) -- line: 24
+		if p8 == nil then
+			return
+		end
+
+		return (p8:FindFirstChildWhichIsA("FaceControls", true))
+	end,
+	getNeck = function(p9, p10) -- line: 31
+		-- upvalues: v2 (copy)
+		if p9 == nil or p10 == nil then
+			return nil
+		end
+
+		local descendants = p9:GetDescendants()
+
+		for _, v18 in descendants do
+			if v18:IsA("Motor6D") and (p10 == v18.Part1 or v18.Name == "Neck") then
+				return v18
+			end
+		end
+
+		if v2 == true then
+			for _, v20 in descendants do
+				if v20:IsA("AnimationConstraint") and p10 == v20.Parent and (v20.Attachment0 ~= nil and v20.Attachment0.Name == "NeckRigAttachment" or v20.Name == "Neck") then
+					return v20
+				end
+			end
+		else
+			for _, v22 in descendants do
+				if v22:IsA("AnimationConstraint") and p10 == v22.Parent and (v22.Attachment0.Name == "NeckRigAttachment" or v22.Name == "Neck") then
+					return v22
+				end
+			end
+		end
+
+		return nil
+	end,
+	getHead = getHead,
+	getAnimator = getAnimator,
+	updateTransparency = function(p11, p12) -- line: 172
+		-- upvalues: t2 (copy), CollectionService (copy)
+		for _, descendant in ipairs(p11:GetDescendants()) do
+			if descendant:IsA("Decal") then
+				descendant.Transparency = 0
+			elseif descendant:IsA("MeshPart") then
+				if descendant.Parent and descendant.Parent:IsA("Accessory") or table.find(t2, descendant.Name) then
+					if not table.find(p12, descendant.MeshId) then
+						p12[descendant.MeshId] = descendant.Transparency
+					else
+						descendant.Transparency = p12[descendant.MeshId]
+					end
+				end
+			elseif descendant:IsA("Part") then
+				if descendant.Parent and descendant.Parent:IsA("Accessory") or table.find(t2, descendant.Name) then
+					descendant.Transparency = 0
+				end
+
+				if CollectionService:HasTag(descendant, "__RBX__LOCKED_TRANSPARENT") then
+					descendant.Transparency = 1
+				end
+			end
+		end
+	end,
+	shouldMarkCloneDirtyForDescendant = function(p13) -- line: 201
+		-- upvalues: t1 (copy)
+		if p13:IsA("MeshPart") or (p13:IsA("Part") or p13:IsA("Decal")) then
+			if p13.Transparency < 1 then
+				return true
+			end
+		elseif t1[p13.ClassName] then
+			return true
+		end
+
+		return false
+	end,
+	resetPartOrientation = function(p14) -- line: 214
+		for _, descendant in ipairs(p14:GetDescendants()) do
+			if descendant:IsA("Motor6D") then
+				descendant.C0 = CFrame.new(descendant.C0.Position)
+				descendant.C1 = CFrame.new(descendant.C1.Position)
+			end
+		end
+	end,
+	removeScripts = function(p15) -- line: 229
+		local Animate = p15:FindFirstChild("Animate")
+
+		if Animate then
+			Animate:Destroy()
+		end
+
+		local Health = p15:FindFirstChild("Health")
+
+		if Health then
+			Health:Destroy()
+		end
+
+		for _, descendant in pairs(p15:GetDescendants()) do
+			if descendant:IsA("BaseScript") then
+				descendant:Destroy()
+			end
+		end
+	end,
+	removeTags = function(p16) -- line: 240
+		-- upvalues: CollectionService (copy)
+		local Tags = CollectionService:GetTags(p16)
+
+		for _, v in ipairs(Tags) do
+			if v ~= "NoFace" then
+				CollectionService:RemoveTag(p16, v)
+			end
+		end
+
+		for _, descendant in ipairs(p16:GetDescendants()) do
+			local Tags2 = CollectionService:GetTags(descendant)
+
+			for _, v in ipairs(Tags2) do
+				if v ~= "NoFace" then
+					CollectionService:RemoveTag(descendant, v)
+				end
+			end
+		end
+
+		CollectionService:GetTags(p16)
+	end,
+	sanitizeCharacter = function(p17) -- line: 332
+		-- upvalues: removeInstancesStrict (copy)
+		if not p17 then
+			return
+		end
+
+		removeInstancesStrict(p17)
+	end,
+	isValidAvatar = function(p18) -- line: 340
+		-- upvalues: getAnimator (copy), getHead (copy)
+		if not getAnimator(p18, 10) then
+			return false
+		end
+
+		if not getHead(p18) then
+			return false
+		end
+
+		return true
+	end,
+	hasDynamicHead = function(p19) -- line: 354
+		return ((if p19 ~= nil then p19:FindFirstChildWhichIsA("FaceControls", true) else nil)) ~= nil
+	end
+}

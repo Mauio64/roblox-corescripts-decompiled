@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RemoveAcountInfoFetchFromPurchase", false);
+return game:DefineFastFlag("RemoveAcountInfoFetchFromPurchase", false)

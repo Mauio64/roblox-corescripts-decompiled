@@ -1,391 +1,398 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.UIBlox);
-local v2 = require(l_Parent_0.React);
-local l_withStyle_0 = v1.Style.withStyle;
-local l_ImageSetLabel_0 = v1.Core.ImageSet.ImageSetLabel;
-local v5 = require(l_Parent_0.Roact);
-local v6 = require(l_Parent_0.t);
-local v7 = v5.PureComponent:extend("SubscriptionTitle");
-v7.validateProps = v6.strictInterface({
-    name = v6.string, 
-    displayPrice = v6.string, 
-    subscriptionProviderName = v6.string, 
-    period = v6.string, 
-    disclaimerText = v6.string, 
-    layoutOrder = v6.number, 
-    contentHeight = v6.number, 
-    itemIcon = v6.any
-});
-local function _(v8, v9) --[[ Line: 53 ]] --[[ Name: createSubscriptionInfo ]]
-    -- upvalues: l_withStyle_0 (copy), v2 (copy)
-    return l_withStyle_0(function(v10) --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), v8 (copy), v9 (copy)
-        local l_Theme_0 = v10.Theme;
-        local l_Font_0 = v10.Font.Body.Font;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v8.layoutOrder
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = v9 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 8)
-            })
-        }, {
-            AppName = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v8.subscriptionProviderName, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                Font = l_Font_0, 
-                TextXAlignment = v9 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v8.layoutOrder
-            })
-        }, {
-            Title = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v8.name, 
-                TextSize = 20, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                Font = l_Font_0, 
-                TextXAlignment = v9 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v8.layoutOrder + 1
-            })
-        }, {
-            PriceFrame = v2.createElement("Frame", {
-                BorderSizePixel = 0, 
-                BackgroundColor3 = Color3.fromRGB(255, 0, 0), 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = v8.layoutOrder + 2
-            }, {
-                Layout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = v9 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                    FillDirection = Enum.FillDirection.Horizontal
-                }), 
-                Price = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v8.displayPrice, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency, 
-                    Font = l_Font_0, 
-                    RichText = true, 
-                    TextXAlignment = v9 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v8.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                }), 
-                Period = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v8.period, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_0.TextDefault.Color, 
-                    TextTransparency = l_Theme_0.TextDefault.Transparency, 
-                    Font = l_Font_0, 
-                    RichText = true, 
-                    TextXAlignment = v9 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v8.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                })
-            })
-        }, {
-            DisclaimerText = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 16), 
-                BackgroundTransparency = 1, 
-                Text = v8.disclaimerText, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_0.TextDefault.Color, 
-                Font = l_Font_0, 
-                TextXAlignment = v9 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v8.layoutOrder + 3
-            })
-        });
-    end);
-end;
-local function v24(v14) --[[ Line: 157 ]] --[[ Name: createCompactSubscriptionTitle ]]
-    -- upvalues: v2 (copy), l_ImageSetLabel_0 (copy), l_withStyle_0 (copy)
-    local l_createElement_0 = v2.createElement;
-    local v16 = "Frame";
-    local v17 = {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = 1
-    };
-    local v18 = {
-        Layout = v2.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            Padding = UDim.new(0, 24)
-        }), 
-        Icon = v2.createElement(l_ImageSetLabel_0, {
-            LayoutOrder = 1, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 96, 0, 96), 
-            ScaleType = Enum.ScaleType.Fit, 
-            AutomaticSize = Enum.AutomaticSize.X, 
-            Image = v14.itemIcon
-        })
-    };
-    local l_l_withStyle_0_0 = l_withStyle_0;
-    local v20 = true;
-    v18.SubscriptionInfo = l_l_withStyle_0_0(function(v21) --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), v14 (copy), v20 (copy)
-        local l_Theme_1 = v21.Theme;
-        local l_Font_1 = v21.Font.Body.Font;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v14.layoutOrder
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = v20 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 8)
-            })
-        }, {
-            AppName = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v14.subscriptionProviderName, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                TextTransparency = l_Theme_1.TextEmphasis.Transparency, 
-                Font = l_Font_1, 
-                TextXAlignment = v20 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v14.layoutOrder
-            })
-        }, {
-            Title = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v14.name, 
-                TextSize = 20, 
-                TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                TextTransparency = l_Theme_1.TextEmphasis.Transparency, 
-                Font = l_Font_1, 
-                TextXAlignment = v20 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v14.layoutOrder + 1
-            })
-        }, {
-            PriceFrame = v2.createElement("Frame", {
-                BorderSizePixel = 0, 
-                BackgroundColor3 = Color3.fromRGB(255, 0, 0), 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = v14.layoutOrder + 2
-            }, {
-                Layout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = v20 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                    FillDirection = Enum.FillDirection.Horizontal
-                }), 
-                Price = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v14.displayPrice, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_1.TextDefault.Transparency, 
-                    Font = l_Font_1, 
-                    RichText = true, 
-                    TextXAlignment = v20 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v14.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                }), 
-                Period = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v14.period, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_1.TextDefault.Color, 
-                    TextTransparency = l_Theme_1.TextDefault.Transparency, 
-                    Font = l_Font_1, 
-                    RichText = true, 
-                    TextXAlignment = v20 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v14.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                })
-            })
-        }, {
-            DisclaimerText = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 16), 
-                BackgroundTransparency = 1, 
-                Text = v14.disclaimerText, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_1.TextDefault.Color, 
-                Font = l_Font_1, 
-                TextXAlignment = v20 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v14.layoutOrder + 3
-            })
-        });
-    end);
-    return l_createElement_0(v16, v17, v18);
-end;
-local function v35(v25) --[[ Line: 182 ]] --[[ Name: createNormalSubscriptionTitle ]]
-    -- upvalues: v2 (copy), l_ImageSetLabel_0 (copy), l_withStyle_0 (copy)
-    local l_createElement_1 = v2.createElement;
-    local v27 = "Frame";
-    local v28 = {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = 1
-    };
-    local v29 = {
-        Layout = v2.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            Padding = UDim.new(0, 24)
-        }), 
-        Icon = v2.createElement(l_ImageSetLabel_0, {
-            LayoutOrder = 1, 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 96, 0, 96), 
-            ScaleType = Enum.ScaleType.Fit, 
-            AutomaticSize = Enum.AutomaticSize.X, 
-            Image = v25.itemIcon
-        })
-    };
-    local l_l_withStyle_0_1 = l_withStyle_0;
-    local v31 = false;
-    v29.SubscriptionInfo = l_l_withStyle_0_1(function(v32) --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), v25 (copy), v31 (copy)
-        local l_Theme_2 = v32.Theme;
-        local l_Font_2 = v32.Font.Body.Font;
-        return v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v25.layoutOrder
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = v31 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 8)
-            })
-        }, {
-            AppName = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v25.subscriptionProviderName, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_2.TextEmphasis.Color, 
-                TextTransparency = l_Theme_2.TextEmphasis.Transparency, 
-                Font = l_Font_2, 
-                TextXAlignment = v31 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v25.layoutOrder
-            })
-        }, {
-            Title = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 20), 
-                BackgroundTransparency = 1, 
-                Text = v25.name, 
-                TextSize = 20, 
-                TextColor3 = l_Theme_2.TextEmphasis.Color, 
-                TextTransparency = l_Theme_2.TextEmphasis.Transparency, 
-                Font = l_Font_2, 
-                TextXAlignment = v31 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v25.layoutOrder + 1
-            })
-        }, {
-            PriceFrame = v2.createElement("Frame", {
-                BorderSizePixel = 0, 
-                BackgroundColor3 = Color3.fromRGB(255, 0, 0), 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = v25.layoutOrder + 2
-            }, {
-                Layout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = v31 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center, 
-                    FillDirection = Enum.FillDirection.Horizontal
-                }), 
-                Price = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v25.displayPrice, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_2.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_2.TextDefault.Transparency, 
-                    Font = l_Font_2, 
-                    RichText = true, 
-                    TextXAlignment = v31 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v25.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                }), 
-                Period = v2.createElement("TextLabel", {
-                    Size = UDim2.new(0, 0, 0, 16), 
-                    BackgroundTransparency = 1, 
-                    Text = v25.period, 
-                    TextSize = 16, 
-                    TextColor3 = l_Theme_2.TextDefault.Color, 
-                    TextTransparency = l_Theme_2.TextDefault.Transparency, 
-                    Font = l_Font_2, 
-                    RichText = true, 
-                    TextXAlignment = v31 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                    TextWrapped = true, 
-                    LayoutOrder = v25.layoutOrder + 1, 
-                    AutomaticSize = Enum.AutomaticSize.X
-                })
-            })
-        }, {
-            DisclaimerText = v2.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 0, 16), 
-                BackgroundTransparency = 1, 
-                Text = v25.disclaimerText, 
-                TextSize = 16, 
-                TextColor3 = l_Theme_2.TextDefault.Color, 
-                Font = l_Font_2, 
-                TextXAlignment = v31 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center, 
-                TextWrapped = true, 
-                LayoutOrder = v25.layoutOrder + 3
-            })
-        });
-    end);
-    return l_createElement_1(v27, v28, v29);
-end;
-v7.getTitleHeight = function(_, v37) --[[ Line: 207 ]] --[[ Name: getTitleHeight ]]
-    if v37 > 216 then
-        return 216;
-    else
-        return 96;
-    end;
-end;
-v7.render = function(v38) --[[ Line: 215 ]] --[[ Name: render ]]
-    -- upvalues: v35 (copy), v24 (copy)
-    if v38.props.contentHeight > 216 then
-        return v35(v38.props);
-    else
-        return v24(v38.props);
-    end;
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent
+local UIBlox = require(ParentParent.UIBlox)
+local React = require(ParentParent.React)
+local withStyle = UIBlox.Style.withStyle
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Roact = require(ParentParent.Roact)
+local t = require(ParentParent.t)
+local v8 = Roact.PureComponent:extend("SubscriptionTitle")
+
+v8.validateProps = t.strictInterface({
+	name = t.string,
+	displayPrice = t.string,
+	subscriptionProviderName = t.string,
+	period = t.string,
+	disclaimerText = t.string,
+	layoutOrder = t.number,
+	contentHeight = t.number,
+	itemIcon = t.any
+})
+
+local function createSubscriptionInfo(t1: {[any]: any}, p1) -- line: 53
+	-- upvalues: withStyle (copy), React (copy)
+	return withStyle(function(p2) -- line: 54
+		-- upvalues: React (copy), t1 (copy), p1 (copy)
+		local Theme = p2.Theme
+		local BodyFont = p2.Font.Body.Font
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = t1.layoutOrder
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = p1 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 8)
+			})
+		}, {
+			AppName = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = t1.subscriptionProviderName,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = p1 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = t1.layoutOrder
+			})
+		}, {
+			Title = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 20,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = t1.name,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = p1 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = t1.layoutOrder + 1
+			})
+		}, {
+			PriceFrame = React.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = t1.layoutOrder + 2
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = p1 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+					FillDirection = Enum.FillDirection.Horizontal
+				}),
+				Price = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = t1.displayPrice,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = p1 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = t1.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				}),
+				Period = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = t1.period,
+					TextColor3 = Theme.TextDefault.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = p1 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = t1.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				})
+			})
+		}, {
+			DisclaimerText = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 16),
+				Text = t1.disclaimerText,
+				TextColor3 = Theme.TextDefault.Color,
+				Font = BodyFont,
+				TextXAlignment = p1 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = t1.layoutOrder + 3
+			})
+		})
+	end)
+end
+local function createCompactSubscriptionTitle(p3) -- line: 157
+	-- upvalues: React (copy), ImageSetLabel (copy), withStyle (copy)
+	local createElement = React.createElement
+	local t2 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y
+	}
+	local t3 = {
+		Layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			FillDirection = Enum.FillDirection.Horizontal,
+			Padding = UDim.new(0, 24)
+		}),
+		Icon = React.createElement(ImageSetLabel, {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 96, 0, 96),
+			ScaleType = Enum.ScaleType.Fit,
+			AutomaticSize = Enum.AutomaticSize.X,
+			Image = p3.itemIcon
+		})
+	}
+	local v18 = true
+
+	t3.SubscriptionInfo = withStyle(function(p4) -- line: 54
+		-- upvalues: React (copy), p3 (copy), v18 (copy)
+		local Theme = p4.Theme
+		local BodyFont = p4.Font.Body.Font
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = p3.layoutOrder
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = v18 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 8)
+			})
+		}, {
+			AppName = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = p3.subscriptionProviderName,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = v18 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p3.layoutOrder
+			})
+		}, {
+			Title = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 20,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = p3.name,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = v18 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p3.layoutOrder + 1
+			})
+		}, {
+			PriceFrame = React.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = p3.layoutOrder + 2
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = v18 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+					FillDirection = Enum.FillDirection.Horizontal
+				}),
+				Price = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = p3.displayPrice,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = v18 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = p3.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				}),
+				Period = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = p3.period,
+					TextColor3 = Theme.TextDefault.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = v18 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = p3.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				})
+			})
+		}, {
+			DisclaimerText = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 16),
+				Text = p3.disclaimerText,
+				TextColor3 = Theme.TextDefault.Color,
+				Font = BodyFont,
+				TextXAlignment = v18 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p3.layoutOrder + 3
+			})
+		})
+	end)
+
+	return createElement("Frame", t2, t3)
+end
+local function createNormalSubscriptionTitle(p5) -- line: 182
+	-- upvalues: React (copy), ImageSetLabel (copy), withStyle (copy)
+	local createElement = React.createElement
+	local t4 = {
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y
+	}
+	local t5 = {
+		Layout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			FillDirection = Enum.FillDirection.Vertical,
+			Padding = UDim.new(0, 24)
+		}),
+		Icon = React.createElement(ImageSetLabel, {
+			LayoutOrder = 1,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 96, 0, 96),
+			ScaleType = Enum.ScaleType.Fit,
+			AutomaticSize = Enum.AutomaticSize.X,
+			Image = p5.itemIcon
+		})
+	}
+	local v23 = false
+
+	t5.SubscriptionInfo = withStyle(function(p6) -- line: 54
+		-- upvalues: React (copy), p5 (copy), v23 (copy)
+		local Theme = p6.Theme
+		local BodyFont = p6.Font.Body.Font
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			LayoutOrder = p5.layoutOrder
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = v23 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 8)
+			})
+		}, {
+			AppName = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = p5.subscriptionProviderName,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = v23 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p5.layoutOrder
+			})
+		}, {
+			Title = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 20,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = p5.name,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				Font = BodyFont,
+				TextXAlignment = v23 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p5.layoutOrder + 1
+			})
+		}, {
+			PriceFrame = React.createElement("Frame", {
+				BorderSizePixel = 0,
+				BackgroundTransparency = 1,
+				BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				LayoutOrder = p5.layoutOrder + 2
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = v23 and Enum.HorizontalAlignment.Left or Enum.HorizontalAlignment.Center,
+					FillDirection = Enum.FillDirection.Horizontal
+				}),
+				Price = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = p5.displayPrice,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = v23 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = p5.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				}),
+				Period = React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextSize = 16,
+					RichText = true,
+					TextWrapped = true,
+					Size = UDim2.new(0, 0, 0, 16),
+					Text = p5.period,
+					TextColor3 = Theme.TextDefault.Color,
+					TextTransparency = Theme.TextDefault.Transparency,
+					Font = BodyFont,
+					TextXAlignment = v23 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+					LayoutOrder = p5.layoutOrder + 1,
+					AutomaticSize = Enum.AutomaticSize.X
+				})
+			})
+		}, {
+			DisclaimerText = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				TextSize = 16,
+				TextWrapped = true,
+				Size = UDim2.new(1, 0, 0, 16),
+				Text = p5.disclaimerText,
+				TextColor3 = Theme.TextDefault.Color,
+				Font = BodyFont,
+				TextXAlignment = v23 and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+				LayoutOrder = p5.layoutOrder + 3
+			})
+		})
+	end)
+
+	return createElement("Frame", t4, t5)
+end
+
+function v8.getTitleHeight(_, p8) -- line: 207
+	if p8 > 216 then
+		return 216
+	end
+
+	return 96
+end
+function v8.render(p9) -- line: 215
+	-- upvalues: createNormalSubscriptionTitle (copy), createCompactSubscriptionTitle (copy)
+	if p9.props.contentHeight > 216 then
+		return createNormalSubscriptionTitle(p9.props)
+	end
+
+	return createCompactSubscriptionTitle(p9.props)
+end
+
+return v8

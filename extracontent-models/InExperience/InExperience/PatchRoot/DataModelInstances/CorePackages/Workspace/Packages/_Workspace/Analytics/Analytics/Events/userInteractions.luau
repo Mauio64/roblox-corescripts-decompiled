@@ -1,4 +1,4 @@
-return function(v0, v1) --[[ Line: 4 ]]
-    assert(type(v1) == "string", "Expected eventContext to be a string");
-    v0:setRBXEventStream(v1, "userInteractions", nil);
-end;
+return function(p1, p2) -- line: 4
+	assert(type(p2) == "string", "Expected eventContext to be a string")
+	p1:setRBXEventStream(p2, "userInteractions", nil)
+end

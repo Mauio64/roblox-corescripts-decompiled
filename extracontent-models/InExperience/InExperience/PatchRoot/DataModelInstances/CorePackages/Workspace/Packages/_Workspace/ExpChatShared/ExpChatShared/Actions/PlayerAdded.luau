@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChatShared").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2, v3, v4) --[[ Line: 15 ]]
-    return {
-        userId = tostring(v1), 
-        username = v2, 
-        displayName = v3, 
-        hasVerifiedBadge = v4
-    };
-end);
+local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1, s1: string, s2: string, b1: boolean?) -- line: 15
+	return {
+		userId = tostring(p1),
+		username = s1,
+		displayName = s2,
+		hasVerifiedBadge = b1
+	}
+end)

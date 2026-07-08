@@ -1,4 +1,4 @@
 return {
-    SetContactImporterDisplayLogic = require(script.SetContactImporterDisplayLogic), 
-    SetIsPhoneVerified = require(script.SetIsPhoneVerified)
-};
+	SetContactImporterDisplayLogic = require(script.SetContactImporterDisplayLogic),
+	SetIsPhoneVerified = require(script.SetIsPhoneVerified)
+}

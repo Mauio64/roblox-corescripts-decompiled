@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppDataHydrationDataResolverOnClear", false);
+return game:DefineFastFlag("LuaAppDataHydrationDataResolverOnClear", false)

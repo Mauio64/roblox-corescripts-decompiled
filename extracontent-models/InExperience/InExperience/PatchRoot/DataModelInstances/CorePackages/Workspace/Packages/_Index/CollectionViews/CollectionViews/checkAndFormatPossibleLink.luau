@@ -1,21 +1,22 @@
-return function(v0, v1, v2, v3, v4) --[[ Line: 7 ]] --[[ Name: checkAndFormatPossibleLink ]]
-    if v0 == nil or v0 == "" or typeof(v0) ~= "string" then
-        return false, v0;
-    else
-        assert(v0 ~= nil, "Text can't be nil");
-        assert(typeof(v0) == "string", "Text must be a string");
-        local v5 = v1 or "{linkStart}";
-        local v6 = v2 or "{linkEnd}";
-        local v7 = v3 or "<u><b>";
-        local v8 = v4 or "</b></u>";
-        local v9 = false;
-        if string.find(v0, v5) ~= nil then
-            v9 = string.find(v0, v6) ~= nil;
-        end;
-        if v9 then
-            return v9, (string.gsub(v0, v5, v7):gsub(v6, v8));
-        else
-            return v9, v0;
-        end;
-    end;
-end;
+local function checkAndFormatPossibleLink(s1: string?, s2: string?, s3: string?, s4: string?, s5: string?) -- line: 7
+	if s1 == nil or (s1 == "" or typeof(s1) ~= "string") then
+		return false, s1
+	end
+
+	assert(s1 ~= nil, "Text can't be nil")
+	assert(typeof(s1) == "string", "Text must be a string")
+
+	local v7 = s2 or "{linkStart}"
+	local v8 = s3 or "{linkEnd}"
+	local v9 = s4 or "<u><b>"
+	local v10 = s5 or "</b></u>"
+	local v11 = string.find(s1, v7) ~= nil and string.find(s1, v8) ~= nil
+
+	if v11 then
+		return v11, (string.gsub(s1, v7, v9):gsub(v8, v10))
+	end
+
+	return v11, s1
+end
+
+return checkAndFormatPossibleLink

@@ -1,24 +1,29 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3) --[[ Line: 8 ]] --[[ Name: useScrollbarOffset ]]
-    -- upvalues: v1 (copy)
-    local v4, v5 = v1.useState(false);
-    v1.useEffect(function() --[[ Line: 11 ]]
-        -- upvalues: v2 (copy), v3 (copy), v5 (copy)
-        if v2.Y > v3.Y then
-            v5(true);
-            return;
-        else
-            v5(false);
-            return;
-        end;
-    end, {
-        v2, 
-        v3
-    });
-    if v4 then
-        return 16;
-    else
-        return 0;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+
+local function useScrollbarOffset(vector2: Vector2, vector2_2: Vector2) -- line: 8
+	-- upvalues: React (copy)
+	local v6, v7 = React.useState(false)
+
+	React.useEffect(function() -- line: 11
+		-- upvalues: vector2 (copy), vector2_2 (copy), v7 (copy)
+		if vector2.Y > vector2_2.Y then
+			v7(true)
+
+			return
+		end
+
+		v7(false)
+	end, {
+		vector2,
+		vector2_2
+	})
+
+	if v6 then
+		return 16
+	end
+
+	return 0
+end
+
+return useScrollbarOffset

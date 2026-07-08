@@ -1,19 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_ClientAppLoaded_0 = require(l_Parent_0.ExpChatShared).Actions.ClientAppLoaded;
-local v4 = require(l_script_FirstAncestor_0.Actions.LastInputTypeChanged);
-return v2.createReducer(false, {
-    [l_ClientAppLoaded_0.name] = function(_, v6) --[[ Line: 10 ]]
-        return v6.isTouchEnabled;
-    end, 
-    [v4.name] = function(v7, v8) --[[ Line: 13 ]]
-        if v8.lastInputTypeUsed == Enum.UserInputType.Touch then
-            return true;
-        elseif v8.lastInputTypeUsed == Enum.UserInputType.Keyboard then
-            return false;
-        else
-            return v7;
-        end;
-    end
-});
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Rodux = require(ExpChatParent.Rodux)
+local ClientAppLoaded = require(ExpChatParent.ExpChatShared).Actions.ClientAppLoaded
+local LastInputTypeChanged = require(ExpChat.Actions.LastInputTypeChanged)
+
+return Rodux.createReducer(false, {
+	[ClientAppLoaded.name] = function(_: boolean, p1) -- line: 10
+		return p1.isTouchEnabled
+	end,
+	[LastInputTypeChanged.name] = function(b2: boolean, p2) -- line: 13
+		if p2.lastInputTypeUsed == Enum.UserInputType.Touch then
+			return true
+		end
+
+		if p2.lastInputTypeUsed == Enum.UserInputType.Keyboard then
+			return false
+		end
+
+		return b2
+	end
+})

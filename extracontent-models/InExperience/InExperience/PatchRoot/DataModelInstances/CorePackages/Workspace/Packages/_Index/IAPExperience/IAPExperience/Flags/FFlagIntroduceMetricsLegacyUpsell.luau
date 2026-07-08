@@ -1,1 +1,1 @@
-return game:DefineFastFlag("IntroduceMetricsLegacyUpsell", false);
+return game:DefineFastFlag("IntroduceMetricsLegacyUpsell", false)

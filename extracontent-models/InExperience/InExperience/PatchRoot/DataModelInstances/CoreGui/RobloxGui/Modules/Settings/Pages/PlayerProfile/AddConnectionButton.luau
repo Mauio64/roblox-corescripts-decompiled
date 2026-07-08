@@ -1,54 +1,56 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.SignalsReact);
-local v4 = require(l_CorePackages_0.Packages.Foundation);
-local l_ButtonVariant_0 = v4.Enums.ButtonVariant;
-local l_FillBehavior_0 = v4.Enums.FillBehavior;
-local l_Button_0 = v4.Button;
-local l_useLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).Hooks.useLocalization;
-local v9 = require(l_CorePackages_0.Workspace.Packages.PeopleService);
-return v2.memo(function(v10) --[[ Line: 22 ]] --[[ Name: AddConnectionButton ]]
-    -- upvalues: l_useLocalization_0 (copy), v2 (copy), v9 (copy), l_Players_0 (copy), v3 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_FillBehavior_0 (copy)
-    local v11 = l_useLocalization_0({
-        isFriend = "CommonUI.Features.Label.Connection", 
-        addPerson = "CommonUI.Features.Label.Add", 
-        requestSent = "CommonUI.Features.Label.Sent"
-    });
-    local v12 = v2.useMemo(function() --[[ Line: 29 ]]
-        -- upvalues: v9 (ref)
-        return v9.getService("Constants");
-    end, {});
-    local v13 = v2.useMemo(function() --[[ Line: 33 ]]
-        -- upvalues: v9 (ref)
-        return v9.getService("PeopleAnalyticsManager");
-    end, {});
-    local v14 = v2.useMemo(function() --[[ Line: 37 ]]
-        -- upvalues: v9 (ref)
-        return v9.getService("FriendStatusStore");
-    end, {});
-    local v15 = v2.useMemo(function() --[[ Line: 41 ]]
-        -- upvalues: v10 (copy), l_Players_0 (ref)
-        if v10.userId then
-            return (l_Players_0:GetPlayerByUserId(v10.userId));
-        else
-            return nil;
-        end;
-    end, {
-        v10.userId
-    });
-    local v16 = v3.useSignalState(v14.getFriendButtonText(v10.userId, v11));
-    local v17 = v3.useSignalState(v14.getIsFriendButtonDisabled(v10.userId));
-    return v2.createElement(l_Button_0, {
-        text = v16, 
-        variant = if v17 then l_ButtonVariant_0.Subtle else l_ButtonVariant_0.Emphasis, 
-        fillBehavior = l_FillBehavior_0.Fill, 
-        isDisabled = v17, 
-        LayoutOrder = v10.layoutOrder, 
-        onActivated = function() --[[ Line: 54 ]] --[[ Name: onActivated ]]
-            -- upvalues: v13 (copy), v12 (copy), v14 (copy), v15 (copy)
-            v13:trackRequestFriendship(v12.ANALYTICS.ENTRY_POINT.PLAYER_PROFILE);
-            v14.sendFriendRequest(v15);
-        end
-    });
-end);
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local React = require(CorePackages.Packages.React)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local Foundation = require(CorePackages.Packages.Foundation)
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local FillBehavior = Foundation.Enums.FillBehavior
+local Button = Foundation.Button
+local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local PeopleService = require(CorePackages.Workspace.Packages.PeopleService)
+
+local function AddConnectionButton(t1: {[any]: any}) -- line: 22
+	-- upvalues: useLocalization (copy), React (copy), PeopleService (copy), Players (copy), SignalsReact (copy), Button (copy), ButtonVariant (copy), FillBehavior (copy)
+	local v13 = useLocalization({
+		isFriend = "CommonUI.Features.Label.Connection",
+		addPerson = "CommonUI.Features.Label.Add",
+		requestSent = "CommonUI.Features.Label.Sent"
+	})
+	local v14 = React.useMemo(function() -- line: 29
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("Constants")
+	end, {})
+	local v15 = React.useMemo(function() -- line: 33
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("PeopleAnalyticsManager")
+	end, {})
+	local v16 = React.useMemo(function() -- line: 37
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("FriendStatusStore")
+	end, {})
+	local v17 = React.useMemo(function() -- line: 41
+		-- upvalues: t1 (copy), Players (copy)
+		if t1.userId then
+			return (Players:GetPlayerByUserId(t1.userId))
+		end
+
+		return nil
+	end, { t1.userId })
+	local v18 = SignalsReact.useSignalState(v16.getFriendButtonText(t1.userId, v13))
+	local v19 = SignalsReact.useSignalState(v16.getIsFriendButtonDisabled(t1.userId))
+
+	return React.createElement(Button, {
+		text = v18,
+		variant = if not v19 then ButtonVariant.Emphasis else ButtonVariant.Subtle,
+		fillBehavior = FillBehavior.Fill,
+		isDisabled = v19,
+		LayoutOrder = t1.layoutOrder,
+		onActivated = function() -- line: 54
+			-- upvalues: v15 (copy), v14 (copy), v16 (copy), v17 (copy)
+			v15:trackRequestFriendship(v14.ANALYTICS.ENTRY_POINT.PLAYER_PROFILE)
+			v16.sendFriendRequest(v17)
+		end
+	})
+end
+
+return React.memo(AddConnectionButton)

@@ -1,5 +1,5 @@
 return {
-    Enums = {
-        LocalStorageKey = require(script.Enums.LocalStorageKey)
-    }
-};
+	Enums = {
+		LocalStorageKey = require(script.Enums.LocalStorageKey)
+	}
+}

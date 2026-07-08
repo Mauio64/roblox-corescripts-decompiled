@@ -1,348 +1,348 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.RoactGamepad);
-local v5 = require(l_Parent_3.React);
-local v6 = require(l_Parent_3.Cryo);
-local v7 = require(l_Parent_3.t);
-local v8 = require(l_Parent_2.Core.Style.withStyle);
-local v9 = require(l_Parent_2.Core.Style.Validator.validateFontInfo);
-local v10 = require(l_Parent_2.Core.Style.Validator.validateTypographyInfo);
-local v11 = require(l_Parent_2.Core.Text.GetTextSize);
-local v12 = require(l_Parent_2.Core.Text.GetWrappedTextWithIcon);
-local v13 = require(l_Parent_2.Core.Style.withTextSizeOffset);
-local v14 = require(l_Parent_1.SelectionImage.CursorKind);
-local v15 = require(l_Parent_1.SelectionImage.withSelectionCursorProvider);
-local v16 = require(l_Parent_2.App.SelectionCursor.useCursor);
-local v17 = require(l_Parent_0.TileName);
-local v18 = require(l_Parent_0.TileThumbnail);
-local v19 = require(l_Parent_0.TileBanner);
-local v20 = require(l_Parent_1.Text.StyledTextLabel);
-local v21 = require(l_Parent_2.App.ImageSet.Images);
-local v22 = require(l_Parent_2.Core.Control.Interactable);
-local v23 = UDim.new(0, 10);
-local v24 = v5.PureComponent:extend("Tile");
-local v25 = v7.strictInterface({
-    footer = v7.optional(v7.table), 
-    name = v7.optional(v7.string), 
-    nameTextColor = v7.optional(v7.Color3), 
-    nameTextTransparency = v7.optional(v7.number), 
-    nameOverThumbnail = v7.optional(v7.boolean), 
-    titleRichText = v7.optional(v7.boolean), 
-    subtitle = v7.optional(v7.string), 
-    hasVerifiedBadge = v7.optional(v7.boolean), 
-    titleTextLineCount = v7.optional(v7.integer), 
-    innerPadding = v7.optional(v7.number), 
-    titleTopPadding = v7.optional(v7.number), 
-    subtitleTopPadding = v7.optional(v7.number), 
-    footerTopPadding = v7.optional(v7.number), 
-    onActivated = v7.optional(v7.callback), 
-    thumbnail = v7.optional(v7.union(v7.string, v7.table)), 
-    thumbnailSize = v7.optional(v7.UDim2), 
-    thumbnailFrameSize = v7.optional(v7.UDim2), 
-    thumbnailColor = v7.optional(v7.Color3), 
-    thumbnailTransparency = v7.optional(v7.number), 
-    thumbnailAspectRatio = v7.optional(v7.number), 
-    thumbnailScaleType = v7.optional(v7.enum(Enum.ScaleType)), 
-    bannerText = v7.optional(v7.string), 
-    backgroundImage = v7.optional(v7.union(v7.string, v7.table)), 
-    isSelected = v7.optional(v7.boolean), 
-    Selectable = v7.optional(v7.boolean), 
-    multiSelect = v7.optional(v7.boolean), 
-    isDisabled = v7.optional(v7.boolean), 
-    hasRoundedCorners = v7.optional(v7.boolean), 
-    titleIcon = v7.optional(v7.table), 
-    thumbnailOverlayComponents = v7.optional(v7.table), 
-    NextSelectionLeft = v7.optional(v7.table), 
-    NextSelectionRight = v7.optional(v7.table), 
-    NextSelectionUp = v7.optional(v7.table), 
-    NextSelectionDown = v7.optional(v7.table), 
-    thumbnailRef = v7.optional(v7.table), 
-    textButtonRef = v7.optional(v7.table), 
-    inputBindings = v7.optional(v7.table), 
-    useMaxTitleHeight = v7.optional(v7.boolean), 
-    addSubtitleSpace = v7.optional(v7.boolean), 
-    titleFontStyle = v7.optional(v7.union(v9, v10)), 
-    subtitleFontStyle = v7.optional(v7.union(v9, v10)), 
-    renderTileInset = v7.optional(v7.callback), 
-    [v5.Tag] = v7.optional(v7.string), 
-    cursor = v7.optional(v7.any), 
-    isCircular = v7.optional(v7.boolean), 
-    horizontalAlignment = v7.optional(v7.EnumItem), 
-    openTypeFeatures = v7.optional(v7.string), 
-    onThumbnailLoaded = v7.optional(v7.callback), 
-    isRoactGamepadEnabled = v7.optional(v7.boolean)
-});
-v24.validateProps = v7.intersection(v25, function(v26) --[[ Line: 175 ]] --[[ Name: tileBannerUseValidator ]]
-    if v26.bannerText and v26.footer then
-        return false, "A custom footer and bannerText can't be used together";
-    else
-        return true;
-    end;
-end);
-v24.defaultProps = {
-    titleTextLineCount = 2, 
-    innerPadding = 8, 
-    titleTopPadding = 0, 
-    subtitleTopPadding = 0, 
-    footerTopPadding = 0, 
-    isSelected = false, 
-    multiSelect = false, 
-    isDisabled = false, 
-    hasRoundedCorners = true, 
-    Selectable = false, 
-    isCircular = false, 
-    horizontalAlignment = nil, 
-    thumbnailFrameSize = UDim2.new(1, 0, 1, 0), 
-    titleRichText = false, 
-    isRoactGamepadEnabled = true
-};
-v24.init = function(v27) --[[ Line: 203 ]] --[[ Name: init ]]
-    v27.state = {
-        tileWidth = 0, 
-        tileHeight = 0
-    };
-    v27.onAbsoluteSizeChange = function(v28) --[[ Line: 209 ]]
-        -- upvalues: v27 (copy)
-        local l_X_0 = v28.AbsoluteSize.X;
-        local l_Y_0 = v28.AbsoluteSize.Y;
-        v27:setState({
-            tileWidth = l_X_0, 
-            tileHeight = l_Y_0
-        });
-    end;
-end;
-v24.render = function(v31) --[[ Line: 219 ]] --[[ Name: render ]]
-    -- upvalues: v13 (copy), v8 (copy), v15 (copy), v21 (copy), v12 (copy), v11 (copy), v5 (copy), v4 (copy), v22 (copy), v14 (copy), v18 (copy), v23 (copy), v17 (copy), v20 (copy), v19 (copy)
-    local l_footer_0 = v31.props.footer;
-    local l_name_0 = v31.props.name;
-    local l_subtitle_0 = v31.props.subtitle;
-    local l_hasVerifiedBadge_0 = v31.props.hasVerifiedBadge;
-    local l_titleTextLineCount_0 = v31.props.titleTextLineCount;
-    local l_innerPadding_0 = v31.props.innerPadding;
-    local l_titleTopPadding_0 = v31.props.titleTopPadding;
-    local l_subtitleTopPadding_0 = v31.props.subtitleTopPadding;
-    local l_footerTopPadding_0 = v31.props.footerTopPadding;
-    local l_onActivated_0 = v31.props.onActivated;
-    local l_thumbnail_0 = v31.props.thumbnail;
-    local l_thumbnailSize_0 = v31.props.thumbnailSize;
-    local l_thumbnailFrameSize_0 = v31.props.thumbnailFrameSize;
-    local l_thumbnailColor_0 = v31.props.thumbnailColor;
-    local l_thumbnailTransparency_0 = v31.props.thumbnailTransparency;
-    local l_bannerText_0 = v31.props.bannerText;
-    local l_hasRoundedCorners_0 = v31.props.hasRoundedCorners;
-    local l_isSelected_0 = v31.props.isSelected;
-    local l_multiSelect_0 = v31.props.multiSelect;
-    local l_isDisabled_0 = v31.props.isDisabled;
-    local l_titleIcon_0 = v31.props.titleIcon;
-    local l_thumbnailOverlayComponents_0 = v31.props.thumbnailOverlayComponents;
-    local l_backgroundImage_0 = v31.props.backgroundImage;
-    local l_useMaxTitleHeight_0 = v31.props.useMaxTitleHeight;
-    local l_addSubtitleSpace_0 = v31.props.addSubtitleSpace;
-    local l_horizontalAlignment_0 = v31.props.horizontalAlignment;
-    return v13(function(v58) --[[ Line: 247 ]]
-        -- upvalues: v8 (ref), v15 (ref), v31 (copy), l_titleTextLineCount_0 (copy), l_innerPadding_0 (copy), l_titleTopPadding_0 (copy), l_addSubtitleSpace_0 (copy), l_useMaxTitleHeight_0 (copy), l_name_0 (copy), l_titleIcon_0 (copy), v21 (ref), v12 (ref), v11 (ref), l_subtitle_0 (copy), l_footer_0 (copy), l_bannerText_0 (copy), v5 (ref), l_isDisabled_0 (copy), l_onActivated_0 (copy), v4 (ref), v22 (ref), v14 (ref), l_horizontalAlignment_0 (copy), l_thumbnailFrameSize_0 (copy), v18 (ref), l_thumbnail_0 (copy), l_hasRoundedCorners_0 (copy), v23 (ref), l_isSelected_0 (copy), l_multiSelect_0 (copy), l_thumbnailOverlayComponents_0 (copy), l_thumbnailSize_0 (copy), l_thumbnailColor_0 (copy), l_thumbnailTransparency_0 (copy), l_backgroundImage_0 (copy), l_subtitleTopPadding_0 (copy), v17 (ref), l_hasVerifiedBadge_0 (copy), v20 (ref), l_footerTopPadding_0 (copy), v19 (ref)
-        return v8(function(v59) --[[ Line: 248 ]]
-            -- upvalues: v15 (ref), v31 (ref), l_titleTextLineCount_0 (ref), v58 (copy), l_innerPadding_0 (ref), l_titleTopPadding_0 (ref), l_addSubtitleSpace_0 (ref), l_useMaxTitleHeight_0 (ref), l_name_0 (ref), l_titleIcon_0 (ref), v21 (ref), v12 (ref), v11 (ref), l_subtitle_0 (ref), l_footer_0 (ref), l_bannerText_0 (ref), v5 (ref), l_isDisabled_0 (ref), l_onActivated_0 (ref), v4 (ref), v22 (ref), v14 (ref), l_horizontalAlignment_0 (ref), l_thumbnailFrameSize_0 (ref), v18 (ref), l_thumbnail_0 (ref), l_hasRoundedCorners_0 (ref), v23 (ref), l_isSelected_0 (ref), l_multiSelect_0 (ref), l_thumbnailOverlayComponents_0 (ref), l_thumbnailSize_0 (ref), l_thumbnailColor_0 (ref), l_thumbnailTransparency_0 (ref), l_backgroundImage_0 (ref), l_subtitleTopPadding_0 (ref), v17 (ref), l_hasVerifiedBadge_0 (ref), v20 (ref), l_footerTopPadding_0 (ref), v19 (ref)
-            return v15(function(v60) --[[ Line: 249 ]]
-                -- upvalues: v59 (copy), v31 (ref), l_titleTextLineCount_0 (ref), v58 (ref), l_innerPadding_0 (ref), l_titleTopPadding_0 (ref), l_addSubtitleSpace_0 (ref), l_useMaxTitleHeight_0 (ref), l_name_0 (ref), l_titleIcon_0 (ref), v21 (ref), v12 (ref), v11 (ref), l_subtitle_0 (ref), l_footer_0 (ref), l_bannerText_0 (ref), v5 (ref), l_isDisabled_0 (ref), l_onActivated_0 (ref), v4 (ref), v22 (ref), v14 (ref), l_horizontalAlignment_0 (ref), l_thumbnailFrameSize_0 (ref), v18 (ref), l_thumbnail_0 (ref), l_hasRoundedCorners_0 (ref), v23 (ref), l_isSelected_0 (ref), l_multiSelect_0 (ref), l_thumbnailOverlayComponents_0 (ref), l_thumbnailSize_0 (ref), l_thumbnailColor_0 (ref), l_thumbnailTransparency_0 (ref), l_backgroundImage_0 (ref), l_subtitleTopPadding_0 (ref), v17 (ref), l_hasVerifiedBadge_0 (ref), v20 (ref), l_footerTopPadding_0 (ref), v19 (ref)
-                local l_Font_0 = v59.Font;
-                local l_Theme_0 = v59.Theme;
-                local l_tileHeight_0 = v31.state.tileHeight;
-                local l_tileWidth_0 = v31.state.tileWidth;
-                local v65 = v31.props.titleFontStyle or l_Font_0.Header2;
-                local l_titleRichText_0 = v31.props.titleRichText;
-                local v67 = v31.props.subtitleFontStyle or l_Font_0.CaptionHeader;
-                local v68 = if v65.RelativeSize then l_Font_0.BaseSize * v65.RelativeSize else v65.FontSize;
-                local v69 = if v67.RelativeSize then l_Font_0.BaseSize * v67.RelativeSize else v67.FontSize;
-                local v70 = math.ceil(v68 * l_titleTextLineCount_0);
-                v70 = math.ceil((v68 + v58) * l_titleTextLineCount_0);
-                local v71 = l_tileHeight_0 - l_tileWidth_0 / (v31.props.thumbnailAspectRatio or 1) - l_innerPadding_0 - v70 - l_innerPadding_0 - l_titleTopPadding_0;
-                local v72 = Vector2.new(0, 0);
-                local v73 = 0;
-                if l_addSubtitleSpace_0 then
-                    v72 = Vector2.new(0, v70);
-                    v73 = math.ceil(v69) + v58;
-                    v71 = v71 - v73;
-                else
-                    if l_useMaxTitleHeight_0 then
-                        v72 = Vector2.new(0, v70);
-                    else
-                        local v74 = l_name_0 or "";
-                        local l_Font_1 = v65.Font;
-                        if l_titleIcon_0 then
-                            local v76 = l_titleIcon_0.ImageRectSize.X / v21.ImagesResolutionScale;
-                            v74 = v12(v74, v68, l_Font_1, v76, 4);
-                        end;
-                        v72 = v11(v74, v68, l_Font_1, Vector2.new(l_tileWidth_0, v70));
-                        v72 = Vector2.new(v72.X, (math.min(v72.Y, v70)));
-                    end;
-                    if l_subtitle_0 ~= nil and l_subtitle_0 ~= "" then
-                        v73 = math.ceil(v69) + v58;
-                        v71 = v71 - v73;
-                    end;
-                end;
-                v71 = math.max(0, v71);
-                local v77 = true;
-                if l_footer_0 == nil then
-                    v77 = l_bannerText_0 ~= nil;
-                end;
-                local l_renderTileInset_0 = v31.props.renderTileInset;
-                local v79 = UDim2.new(1, 0, 0, v72.Y + v73 + l_titleTopPadding_0);
-                local v80 = nil;
-                if v31.props.nameOverThumbnail then
-                    v79 = UDim2.new(0, l_tileWidth_0 - 10, 0, -(v72.Y + 20));
-                    v80 = v5.createElement("UIPadding", {
-                        PaddingLeft = UDim.new(0, 10)
-                    });
-                end;
-                local v81 = v31.props.inputBindings or not l_isDisabled_0 and l_onActivated_0 and {
-                    Activate = v4.Input.onBegin(Enum.KeyCode.ButtonA, l_onActivated_0)
-                } or nil;
-                local l_createElement_0 = v5.createElement;
-                local l_v22_0 = v22;
-                local v84 = {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1, 
-                    Selectable = v31.props.Selectable, 
-                    [v5.Event.Activated] = if l_isDisabled_0 then nil else l_onActivated_0, 
-                    [v5.Change.AbsoluteSize] = v31.onAbsoluteSizeChange, 
-                    ref = v31.props.textButtonRef, 
-                    SelectionImageObject = if v31.props.cursor then v31.props.cursor else v60(v14.RoundedRect)
-                };
-                local v85 = {
-                    UIListLayout = v5.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        Padding = UDim.new(0, l_innerPadding_0), 
-                        HorizontalAlignment = if not v31.props.nameOverThumbnail then l_horizontalAlignment_0 else nil
-                    }), 
-                    Thumbnail = v5.createElement(if v31.props.isRoactGamepadEnabled then v4.Focusable.Frame else "Frame", {
-                        Size = l_thumbnailFrameSize_0, 
-                        SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                        BackgroundTransparency = 1, 
-                        LayoutOrder = 1, 
-                        NextSelectionLeft = v31.props.NextSelectionLeft, 
-                        NextSelectionRight = v31.props.NextSelectionRight, 
-                        NextSelectionUp = v31.props.NextSelectionUp, 
-                        NextSelectionDown = v31.props.NextSelectionDown, 
-                        ref = v31.props.thumbnailRef, 
-                        [v5.Tag] = v31.props[v5.Tag], 
-                        SelectionImageObject = if v31.props.cursor then v31.props.cursor else v60(v14.RoundedRectNoInset), 
-                        inputBindings = if v31.props.isRoactGamepadEnabled then v81 else nil
-                    }, {
-                        Image = v5.createElement(v18, {
-                            Image = l_thumbnail_0, 
-                            hasRoundedCorners = l_hasRoundedCorners_0, 
-                            cornerRadius = if v31.props.isCircular then UDim.new(0.5, 0) else v23, 
-                            isSelected = l_isSelected_0, 
-                            multiSelect = l_multiSelect_0, 
-                            overlayComponents = l_thumbnailOverlayComponents_0, 
-                            imageSize = l_thumbnailSize_0, 
-                            imageColor = l_thumbnailColor_0, 
-                            imageTransparency = l_thumbnailTransparency_0, 
-                            backgroundImage = l_backgroundImage_0, 
-                            scaleType = v31.props.thumbnailScaleType, 
-                            onThumbnailLoaded = v31.props.onThumbnailLoaded
-                        }), 
-                        TileInset = l_renderTileInset_0 and l_renderTileInset_0() or nil, 
-                        UIAspectRatioConstraint = if v31.props.thumbnailAspectRatio ~= nil then v5.createElement("UIAspectRatioConstraint", {
-                            AspectRatio = v31.props.thumbnailAspectRatio, 
-                            AspectType = Enum.AspectType.ScaleWithParentSize
-                        }) else nil
-                    })
-                };
-                local l_createElement_1 = v5.createElement;
-                local v87 = "Frame";
-                local v88 = {
-                    Size = v79, 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 2
-                };
-                local v89 = {
-                    TitleTopPadding = v5.createElement("UIPadding", {
-                        PaddingTop = UDim.new(0, l_titleTopPadding_0)
-                    }), 
-                    UIListLayout = v5.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        Padding = UDim.new(0, l_subtitleTopPadding_0), 
-                        HorizontalAlignment = l_horizontalAlignment_0
-                    }), 
-                    NameOverThumbnailPadding = v80
-                };
-                local v90 = false;
-                if l_titleTextLineCount_0 > 0 then
-                    v90 = false;
-                    if l_tileWidth_0 > 0 then
-                        v90 = v5.createElement(v17, {
-                            titleIcon = l_titleIcon_0, 
-                            name = l_name_0, 
-                            nameTextColor = v31.props.nameTextColor, 
-                            nameTextTransparency = v31.props.nameTextTransparency, 
-                            hasVerifiedBadge = l_hasVerifiedBadge_0, 
-                            maxHeight = v70, 
-                            maxWidth = l_tileWidth_0, 
-                            LayoutOrder = 1, 
-                            useMaxHeight = l_useMaxTitleHeight_0, 
-                            titleFontStyle = v65, 
-                            richText = l_titleRichText_0, 
-                            horizontalAlignment = l_horizontalAlignment_0
-                        });
-                    end;
-                end;
-                v89.Name = v90;
-                v90 = false;
-                if l_subtitle_0 ~= "" then
-                    v90 = false;
-                    if l_subtitle_0 ~= nil then
-                        v90 = v5.createElement(v20, {
-                            size = UDim2.new(0, 0, 0, v73), 
-                            automaticSize = Enum.AutomaticSize.X, 
-                            text = l_subtitle_0, 
-                            colorStyle = l_Theme_0.TextDefault, 
-                            fontStyle = v67, 
-                            openTypeFeatures = v31.props.openTypeFeatures, 
-                            layoutOrder = 2, 
-                            fluidSizing = false, 
-                            textTruncate = Enum.TextTruncate.AtEnd, 
-                            richText = false, 
-                            lineHeight = 1
-                        });
-                    end;
-                end;
-                v89.Subtitle = v90;
-                v85.TitleArea = l_createElement_1(v87, v88, v89);
-                v85.FooterContainer = v77 and v5.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v71), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 3
-                }, {
-                    FooterTopPadding = v5.createElement("UIPadding", {
-                        PaddingTop = UDim.new(0, l_footerTopPadding_0)
-                    }), 
-                    Banner = l_bannerText_0 and v5.createElement(v19, {
-                        bannerText = l_bannerText_0
-                    }), 
-                    Footer = not l_bannerText_0 and l_footer_0
-                });
-                return l_createElement_0(l_v22_0, v84, v85);
-            end);
-        end);
-    end);
-end;
-local function v94(v91) --[[ Line: 463 ]]
-    -- upvalues: v16 (copy), v23 (copy), v6 (copy), v5 (copy), v24 (copy)
-    local v92 = v16(v23);
-    local v93 = v6.Dictionary.join({
-        cursor = v92
-    }, v91);
-    return v5.createElement(v24, v93);
-end;
-return v5.forwardRef(function(v95, v96) --[[ Line: 471 ]]
-    -- upvalues: v5 (copy), v94 (copy), v6 (copy)
-    return v5.createElement(v94, v6.Dictionary.join(v95, {
-        thumbnailRef = v96
-    }));
-end);
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
+local React = require(ParentParentParentParent.React)
+local Cryo = require(ParentParentParentParent.Cryo)
+local t = require(ParentParentParentParent.t)
+local withStyle = require(ParentParentParent.Core.Style.withStyle)
+local validateFontInfo = require(ParentParentParent.Core.Style.Validator.validateFontInfo)
+local validateTypographyInfo = require(ParentParentParent.Core.Style.Validator.validateTypographyInfo)
+local GetTextSize = require(ParentParentParent.Core.Text.GetTextSize)
+local GetWrappedTextWithIcon = require(ParentParentParent.Core.Text.GetWrappedTextWithIcon)
+local withTextSizeOffset = require(ParentParentParent.Core.Style.withTextSizeOffset)
+local CursorKind = require(ParentParent.SelectionImage.CursorKind)
+local withSelectionCursorProvider = require(ParentParent.SelectionImage.withSelectionCursorProvider)
+local useCursor = require(ParentParentParent.App.SelectionCursor.useCursor)
+local TileName = require(scriptParent.TileName)
+local TileThumbnail = require(scriptParent.TileThumbnail)
+local TileBanner = require(scriptParent.TileBanner)
+local StyledTextLabel = require(ParentParent.Text.StyledTextLabel)
+local Images = require(ParentParentParent.App.ImageSet.Images)
+local Interactable = require(ParentParentParent.Core.Control.Interactable)
+local uDim = UDim.new(0, 10)
+local v25 = React.PureComponent:extend("Tile")
+local v26 = t.strictInterface({
+	footer = t.optional(t.table),
+	name = t.optional(t.string),
+	nameTextColor = t.optional(t.Color3),
+	nameTextTransparency = t.optional(t.number),
+	nameOverThumbnail = t.optional(t.boolean),
+	titleRichText = t.optional(t.boolean),
+	subtitle = t.optional(t.string),
+	hasVerifiedBadge = t.optional(t.boolean),
+	titleTextLineCount = t.optional(t.integer),
+	innerPadding = t.optional(t.number),
+	titleTopPadding = t.optional(t.number),
+	subtitleTopPadding = t.optional(t.number),
+	footerTopPadding = t.optional(t.number),
+	onActivated = t.optional(t.callback),
+	thumbnail = t.optional(t.union(t.string, t.table)),
+	thumbnailSize = t.optional(t.UDim2),
+	thumbnailFrameSize = t.optional(t.UDim2),
+	thumbnailColor = t.optional(t.Color3),
+	thumbnailTransparency = t.optional(t.number),
+	thumbnailAspectRatio = t.optional(t.number),
+	thumbnailScaleType = t.optional(t.enum(Enum.ScaleType)),
+	bannerText = t.optional(t.string),
+	backgroundImage = t.optional(t.union(t.string, t.table)),
+	isSelected = t.optional(t.boolean),
+	Selectable = t.optional(t.boolean),
+	multiSelect = t.optional(t.boolean),
+	isDisabled = t.optional(t.boolean),
+	hasRoundedCorners = t.optional(t.boolean),
+	titleIcon = t.optional(t.table),
+	thumbnailOverlayComponents = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	thumbnailRef = t.optional(t.table),
+	textButtonRef = t.optional(t.table),
+	inputBindings = t.optional(t.table),
+	useMaxTitleHeight = t.optional(t.boolean),
+	addSubtitleSpace = t.optional(t.boolean),
+	titleFontStyle = t.optional(t.union(validateFontInfo, validateTypographyInfo)),
+	subtitleFontStyle = t.optional(t.union(validateFontInfo, validateTypographyInfo)),
+	renderTileInset = t.optional(t.callback),
+	[React.Tag] = t.optional(t.string),
+	cursor = t.optional(t.any),
+	isCircular = t.optional(t.boolean),
+	horizontalAlignment = t.optional(t.EnumItem),
+	openTypeFeatures = t.optional(t.string),
+	onThumbnailLoaded = t.optional(t.callback),
+	isRoactGamepadEnabled = t.optional(t.boolean)
+})
+
+local function tileBannerUseValidator(p1) -- line: 175
+	if p1.bannerText and p1.footer then
+		return false, "A custom footer and bannerText can't be used together"
+	end
+
+	return true
+end
+
+v25.validateProps = t.intersection(v26, tileBannerUseValidator)
+v25.defaultProps = {
+	titleTextLineCount = 2,
+	innerPadding = 8,
+	titleTopPadding = 0,
+	subtitleTopPadding = 0,
+	footerTopPadding = 0,
+	isSelected = false,
+	multiSelect = false,
+	isDisabled = false,
+	hasRoundedCorners = true,
+	Selectable = false,
+	isCircular = false,
+	horizontalAlignment = nil,
+	titleRichText = false,
+	isRoactGamepadEnabled = true,
+	thumbnailFrameSize = UDim2.new(1, 0, 1, 0)
+}
+
+function v25.init(p2) -- line: 203
+	p2.state = {
+		tileWidth = 0,
+		tileHeight = 0
+	}
+
+	function p2.onAbsoluteSizeChange(p3) -- line: 209
+		-- upvalues: p2 (copy)
+		local AbsoluteSizeX = p3.AbsoluteSize.X
+		local AbsoluteSizeY = p3.AbsoluteSize.Y
+
+		p2:setState({
+			tileWidth = AbsoluteSizeX,
+			tileHeight = AbsoluteSizeY
+		})
+	end
+end
+function v25.render(p4) -- line: 219
+	-- upvalues: withTextSizeOffset (copy), withStyle (copy), withSelectionCursorProvider (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), React (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), TileThumbnail (copy), uDim (copy), TileName (copy), StyledTextLabel (copy), TileBanner (copy)
+	local footer = p4.props.footer
+	local name = p4.props.name
+	local subtitle = p4.props.subtitle
+	local hasVerifiedBadge = p4.props.hasVerifiedBadge
+	local titleTextLineCount = p4.props.titleTextLineCount
+	local innerPadding = p4.props.innerPadding
+	local titleTopPadding = p4.props.titleTopPadding
+	local subtitleTopPadding = p4.props.subtitleTopPadding
+	local footerTopPadding = p4.props.footerTopPadding
+	local onActivated = p4.props.onActivated
+	local thumbnail = p4.props.thumbnail
+	local thumbnailSize = p4.props.thumbnailSize
+	local thumbnailFrameSize = p4.props.thumbnailFrameSize
+	local thumbnailColor = p4.props.thumbnailColor
+	local thumbnailTransparency = p4.props.thumbnailTransparency
+	local bannerText = p4.props.bannerText
+	local hasRoundedCorners = p4.props.hasRoundedCorners
+	local isSelected = p4.props.isSelected
+	local multiSelect = p4.props.multiSelect
+	local isDisabled = p4.props.isDisabled
+	local titleIcon = p4.props.titleIcon
+	local thumbnailOverlayComponents = p4.props.thumbnailOverlayComponents
+	local backgroundImage = p4.props.backgroundImage
+	local useMaxTitleHeight = p4.props.useMaxTitleHeight
+	local addSubtitleSpace = p4.props.addSubtitleSpace
+	local horizontalAlignment = p4.props.horizontalAlignment
+
+	return withTextSizeOffset(function(p5) -- line: 247
+		-- upvalues: withStyle (copy), withSelectionCursorProvider (copy), p4 (copy), titleTextLineCount (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
+		return withStyle(function(p6) -- line: 248
+			-- upvalues: withSelectionCursorProvider (copy), p4 (copy), titleTextLineCount (copy), p5 (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
+			return withSelectionCursorProvider(function(p7) -- line: 249
+				-- upvalues: p6 (copy), p4 (copy), titleTextLineCount (copy), p5 (copy), innerPadding (copy), titleTopPadding (copy), addSubtitleSpace (copy), useMaxTitleHeight (copy), name (copy), titleIcon (copy), Images (copy), GetWrappedTextWithIcon (copy), GetTextSize (copy), subtitle (copy), footer (copy), bannerText (copy), React (copy), isDisabled (copy), onActivated (copy), RoactGamepad (copy), Interactable (copy), CursorKind (copy), horizontalAlignment (copy), thumbnailFrameSize (copy), TileThumbnail (copy), thumbnail (copy), hasRoundedCorners (copy), uDim (copy), isSelected (copy), multiSelect (copy), thumbnailOverlayComponents (copy), thumbnailSize (copy), thumbnailColor (copy), thumbnailTransparency (copy), backgroundImage (copy), subtitleTopPadding (copy), TileName (copy), hasVerifiedBadge (copy), StyledTextLabel (copy), footerTopPadding (copy), TileBanner (copy)
+				local p6Font = p6.Font
+				local Theme = p6.Theme
+				local tileHeight = p4.state.tileHeight
+				local tileWidth = p4.state.tileWidth
+				local v73 = p4.props.titleFontStyle or p6Font.Header2
+				local titleRichText = p4.props.titleRichText
+				local v75 = p4.props.subtitleFontStyle or p6Font.CaptionHeader
+				local v76 = if not v73.RelativeSize then v73.FontSize else p6Font.BaseSize * v73.RelativeSize
+				local v77 = if not v75.RelativeSize then v75.FontSize else p6Font.BaseSize * v75.RelativeSize
+
+				math.ceil(v76 * titleTextLineCount)
+
+				local v78 = math.ceil((v76 + p5) * titleTextLineCount)
+				local v79 = tileHeight - tileWidth / (p4.props.thumbnailAspectRatio or 1) - innerPadding - v78 - innerPadding - titleTopPadding
+
+				Vector2.new(0, 0)
+
+				local n1 = 0
+				local vector2
+
+				if addSubtitleSpace then
+					vector2 = Vector2.new(0, v78)
+					n1 = math.ceil(v77) + p5
+					v79 -= n1
+				else
+					if useMaxTitleHeight then
+						vector2 = Vector2.new(0, v78)
+					else
+						local v82 = name or ""
+						local Font = v73.Font
+
+						if titleIcon then
+							local v84 = titleIcon.ImageRectSize.X / Images.ImagesResolutionScale
+
+							v82 = GetWrappedTextWithIcon(v82, v76, Font, v84, 4)
+						end
+
+						local v85 = GetTextSize(v82, v76, Font, Vector2.new(tileWidth, v78))
+
+						vector2 = Vector2.new(v85.X, (math.min(v85.Y, v78)))
+					end
+
+					if subtitle ~= nil and subtitle ~= "" then
+						n1 = math.ceil(v77) + p5
+						v79 -= n1
+					end
+				end
+
+				local v86 = math.max(0, v79)
+				local v87 = footer ~= nil or bannerText ~= nil
+				local renderTileInset = p4.props.renderTileInset
+				local uDim2 = UDim2.new(1, 0, 0, vector2.Y + n1 + titleTopPadding)
+				local v90 = nil
+
+				if p4.props.nameOverThumbnail then
+					uDim2 = UDim2.new(0, tileWidth - 10, 0, -(vector2.Y + 20))
+					v90 = React.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, 10)
+					})
+				end
+
+				local v91 = p4.props.inputBindings or (not isDisabled and (not not onActivated and {
+					Activate = RoactGamepad.Input.onBegin(Enum.KeyCode.ButtonA, onActivated)
+				}) or nil)
+
+				return React.createElement(Interactable, {
+					Size = UDim2.new(1, 0, 1, 0),
+					BackgroundTransparency = 1,
+					Selectable = p4.props.Selectable,
+					[React.Event.Activated] = if not isDisabled then onActivated else nil,
+					[React.Change.AbsoluteSize] = p4.onAbsoluteSizeChange,
+					ref = p4.props.textButtonRef,
+					SelectionImageObject = if not p4.props.cursor then p7(CursorKind.RoundedRect) else p4.props.cursor
+				}, {
+					UIListLayout = React.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, innerPadding),
+						HorizontalAlignment = if p4.props.nameOverThumbnail then nil else horizontalAlignment
+					}),
+					Thumbnail = React.createElement(not p4.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
+						Size = thumbnailFrameSize,
+						SizeConstraint = Enum.SizeConstraint.RelativeXX,
+						BackgroundTransparency = 1,
+						LayoutOrder = 1,
+						NextSelectionLeft = p4.props.NextSelectionLeft,
+						NextSelectionRight = p4.props.NextSelectionRight,
+						NextSelectionUp = p4.props.NextSelectionUp,
+						NextSelectionDown = p4.props.NextSelectionDown,
+						ref = p4.props.thumbnailRef,
+						[React.Tag] = p4.props[React.Tag],
+						SelectionImageObject = if not p4.props.cursor then p7(CursorKind.RoundedRectNoInset) else p4.props.cursor,
+						inputBindings = if not p4.props.isRoactGamepadEnabled then nil else v91
+					}, {
+						Image = React.createElement(TileThumbnail, {
+							Image = thumbnail,
+							hasRoundedCorners = hasRoundedCorners,
+							cornerRadius = if not p4.props.isCircular then uDim else UDim.new(0.5, 0),
+							isSelected = isSelected,
+							multiSelect = multiSelect,
+							overlayComponents = thumbnailOverlayComponents,
+							imageSize = thumbnailSize,
+							imageColor = thumbnailColor,
+							imageTransparency = thumbnailTransparency,
+							backgroundImage = backgroundImage,
+							scaleType = p4.props.thumbnailScaleType,
+							onThumbnailLoaded = p4.props.onThumbnailLoaded
+						}),
+						TileInset = renderTileInset and renderTileInset() or nil,
+						UIAspectRatioConstraint = if p4.props.thumbnailAspectRatio == nil then nil else React.createElement("UIAspectRatioConstraint", {
+							AspectRatio = p4.props.thumbnailAspectRatio,
+							AspectType = Enum.AspectType.ScaleWithParentSize
+						})
+					}),
+					TitleArea = React.createElement("Frame", {
+						BackgroundTransparency = 1,
+						LayoutOrder = 2,
+						Size = uDim2
+					}, {
+						TitleTopPadding = React.createElement("UIPadding", {
+							PaddingTop = UDim.new(0, titleTopPadding)
+						}),
+						UIListLayout = React.createElement("UIListLayout", {
+							FillDirection = Enum.FillDirection.Vertical,
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							Padding = UDim.new(0, subtitleTopPadding),
+							HorizontalAlignment = horizontalAlignment
+						}),
+						NameOverThumbnailPadding = v90,
+						Name = titleTextLineCount > 0 and (tileWidth > 0 and React.createElement(TileName, {
+							LayoutOrder = 1,
+							titleIcon = titleIcon,
+							name = name,
+							nameTextColor = p4.props.nameTextColor,
+							nameTextTransparency = p4.props.nameTextTransparency,
+							hasVerifiedBadge = hasVerifiedBadge,
+							maxHeight = v78,
+							maxWidth = tileWidth,
+							useMaxHeight = useMaxTitleHeight,
+							titleFontStyle = v73,
+							richText = titleRichText,
+							horizontalAlignment = horizontalAlignment
+						})),
+						Subtitle = subtitle ~= "" and (subtitle ~= nil and React.createElement(StyledTextLabel, {
+							layoutOrder = 2,
+							fluidSizing = false,
+							richText = false,
+							lineHeight = 1,
+							size = UDim2.new(0, 0, 0, n1),
+							automaticSize = Enum.AutomaticSize.X,
+							text = subtitle,
+							colorStyle = Theme.TextDefault,
+							fontStyle = v75,
+							openTypeFeatures = p4.props.openTypeFeatures,
+							textTruncate = Enum.TextTruncate.AtEnd
+						}))
+					}),
+					FooterContainer = v87 and React.createElement("Frame", {
+						BackgroundTransparency = 1,
+						LayoutOrder = 3,
+						Size = UDim2.new(1, 0, 0, v86)
+					}, {
+						FooterTopPadding = React.createElement("UIPadding", {
+							PaddingTop = UDim.new(0, footerTopPadding)
+						}),
+						Banner = bannerText and React.createElement(TileBanner, {
+							bannerText = bannerText
+						}),
+						Footer = not bannerText and footer
+					})
+				})
+			end)
+		end)
+	end)
+end
+
+local function v28(p8) -- line: 463
+	-- upvalues: useCursor (copy), uDim (copy), Cryo (copy), React (copy), v25 (copy)
+	local v59 = useCursor(uDim)
+	local v60 = Cryo.Dictionary.join({
+		cursor = v59
+	}, p8)
+
+	return React.createElement(v25, v60)
+end
+
+return React.forwardRef(function(p9, p10) -- line: 471
+	-- upvalues: React (copy), v28 (copy), Cryo (copy)
+	return React.createElement(v28, Cryo.Dictionary.join(p9, {
+		thumbnailRef = p10
+	}))
+end)

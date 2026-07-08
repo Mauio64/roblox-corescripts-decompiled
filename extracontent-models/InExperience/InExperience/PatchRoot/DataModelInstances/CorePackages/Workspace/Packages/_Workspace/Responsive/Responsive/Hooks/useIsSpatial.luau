@@ -1,20 +1,27 @@
-local l_Parent_0 = script:FindFirstAncestor("Responsive").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.AppCommonLib);
-return function() --[[ Line: 5 ]] --[[ Name: useIsSpatial ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v3, v4 = v1.useState(v2.isSpatial);
-    v1.useEffect(function() --[[ Line: 7 ]]
-        -- upvalues: v4 (copy), v2 (ref)
-        v4(v2.isSpatial());
-        local v6 = v2.connectToIsSpatialChanged(function(v5) --[[ Line: 9 ]]
-            -- upvalues: v4 (ref)
-            v4(v5);
-        end);
-        return function() --[[ Line: 12 ]]
-            -- upvalues: v6 (copy)
-            v6:Disconnect();
-        end;
-    end, {});
-    return v3;
-end;
+local Parent = script:FindFirstAncestor("Responsive").Parent
+local React = require(Parent.React)
+local AppCommonLib = require(Parent.AppCommonLib)
+
+local function useIsSpatial() -- line: 5
+	-- upvalues: React (copy), AppCommonLib (copy)
+	local v5, v6 = React.useState(AppCommonLib.isSpatial)
+
+	React.useEffect(function() -- line: 7
+		-- upvalues: v6 (copy), AppCommonLib (copy)
+		v6(AppCommonLib.isSpatial())
+
+		local v7 = AppCommonLib.connectToIsSpatialChanged(function(b1: boolean) -- line: 9
+			-- upvalues: v6 (copy)
+			v6(b1)
+		end)
+
+		return function() -- line: 12
+			-- upvalues: v7 (copy)
+			v7:Disconnect()
+		end
+	end, {})
+
+	return v5
+end
+
+return useIsSpatial

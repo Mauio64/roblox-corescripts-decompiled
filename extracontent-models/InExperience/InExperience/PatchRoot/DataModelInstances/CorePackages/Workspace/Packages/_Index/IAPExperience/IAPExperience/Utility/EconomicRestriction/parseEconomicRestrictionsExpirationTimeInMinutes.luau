@@ -1,7 +1,9 @@
-return function(v0) --[[ Line: 3 ]] --[[ Name: parseEconomicRestrictionsExpirationTimeInMinutes ]]
-    if not v0 then
-        return nil;
-    else
-        return v0.ExpirationTimeInMinutes or v0.expirationTimeInMinutes or v0.timeoutMinutes;
-    end;
-end;
+local function parseEconomicRestrictionsExpirationTimeInMinutes(p1) -- line: 3
+	if not p1 then
+		return nil
+	end
+
+	return p1.ExpirationTimeInMinutes or (p1.expirationTimeInMinutes or p1.timeoutMinutes)
+end
+
+return parseEconomicRestrictionsExpirationTimeInMinutes

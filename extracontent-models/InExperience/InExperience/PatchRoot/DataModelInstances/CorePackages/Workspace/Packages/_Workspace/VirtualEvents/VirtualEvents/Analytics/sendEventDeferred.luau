@@ -1,10 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_getPlatformTarget_0 = require(l_script_FirstAncestor_0.Parent.Analytics).getPlatformTarget;
-local v4 = require(l_script_FirstAncestor_0.logger);
-return function(v5, v6) --[[ Line: 9 ]] --[[ Name: sendEventDeferred ]]
-    -- upvalues: v4 (copy), l_HttpService_0 (copy), l_EventIngestService_0 (copy), l_getPlatformTarget_0 (copy)
-    v4:debug(string.format("Fired %q with payload %s", v5, l_HttpService_0:JSONEncode(v6)));
-    l_EventIngestService_0:SendEventDeferred(l_getPlatformTarget_0(), "virtualEvents", v5, v6);
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+local EventIngestService = game:GetService("EventIngestService")
+local HttpService = game:GetService("HttpService")
+local getPlatformTarget = require(VirtualEvents.Parent.Analytics).getPlatformTarget
+local logger = require(VirtualEvents.logger)
+
+local function sendEventDeferred(s1: string, t1: {[any]: any}) -- line: 9
+	-- upvalues: logger (copy), HttpService (copy), EventIngestService (copy), getPlatformTarget (copy)
+	logger:debug(string.format("Fired %q with payload %s", s1, HttpService:JSONEncode(t1)))
+	EventIngestService:SendEventDeferred(getPlatformTarget(), "virtualEvents", s1, t1)
+end
+
+return sendEventDeferred

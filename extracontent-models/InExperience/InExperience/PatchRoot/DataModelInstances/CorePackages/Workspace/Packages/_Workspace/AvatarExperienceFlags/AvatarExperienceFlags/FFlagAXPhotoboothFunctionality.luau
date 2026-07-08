@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothFunctionality12", false);
+return game:DefineFastFlag("AXPhotoboothFunctionality12", false)

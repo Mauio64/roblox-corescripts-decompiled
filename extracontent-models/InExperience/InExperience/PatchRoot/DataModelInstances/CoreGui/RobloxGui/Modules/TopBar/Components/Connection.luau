@@ -1,31 +1,35 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Flags.FFlagTopBarDeprecateCoreGuiRodux);
-local v4 = require(l_Parent_0.Flags.FFlagTopBarDeprecateChatRodux);
-local v5 = require(l_Parent_0.Flags.FFlagTopBarDeprecateDisplayOptionsRodux);
-local v6 = require(l_Parent_0.Flags.FFlagTopBarDeprecateRespawnRodux);
-local v7 = require(l_Parent_0.Flags.FFlagTopBarDeprecateMoreMenuRodux);
-local v8 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local l_FFlagTopBarSignalizeHealthBar_0 = v8.Flags.FFlagTopBarSignalizeHealthBar;
-local l_FFlagTopBarSignalizeMenuOpen_0 = v8.Flags.FFlagTopBarSignalizeMenuOpen;
-local v11 = require(script.CoreGuiConnector);
-local v12 = require(script.MenuConnector);
-local v13 = require(script.ChatConnector);
-local v14 = require(script.HealthConnector);
-local v15 = require(script.EnabledNotifier);
-local v16 = require(script.OpenUIConnector);
-local _ = require(script.LastInputTypeConnector);
-local v18 = v1.PureComponent:extend("Connection");
-v18.render = function(_) --[[ Line: 26 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v3 (copy), v11 (copy), l_FFlagTopBarSignalizeMenuOpen_0 (copy), v6 (copy), v12 (copy), v4 (copy), v13 (copy), l_FFlagTopBarSignalizeHealthBar_0 (copy), v14 (copy), v5 (copy), v15 (copy), v7 (copy), v16 (copy)
-    return v1.createFragment({
-        CoreGuiConnector = if v3 then nil else v1.createElement(v11), 
-        MenuConnector = if l_FFlagTopBarSignalizeMenuOpen_0 and v6 then nil else v1.createElement(v12), 
-        ChatConnector = if v4 then nil else v1.createElement(v13), 
-        HealthConnector = if l_FFlagTopBarSignalizeHealthBar_0 then nil else v1.createElement(v14), 
-        EnabledNotifier = if v5 then nil else v1.createElement(v15), 
-        OpenUIConnector = if v7 then nil else v1.createElement(v16)
-    });
-end;
-return v18;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local ParentParent = script.Parent.Parent
+local FFlagTopBarDeprecateCoreGuiRodux = require(ParentParent.Flags.FFlagTopBarDeprecateCoreGuiRodux)
+local FFlagTopBarDeprecateChatRodux = require(ParentParent.Flags.FFlagTopBarDeprecateChatRodux)
+local FFlagTopBarDeprecateDisplayOptionsRodux = require(ParentParent.Flags.FFlagTopBarDeprecateDisplayOptionsRodux)
+local FFlagTopBarDeprecateRespawnRodux = require(ParentParent.Flags.FFlagTopBarDeprecateRespawnRodux)
+local FFlagTopBarDeprecateMoreMenuRodux = require(ParentParent.Flags.FFlagTopBarDeprecateMoreMenuRodux)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeHealthBar = CoreGuiCommon.Flags.FFlagTopBarSignalizeHealthBar
+local FFlagTopBarSignalizeMenuOpen = CoreGuiCommon.Flags.FFlagTopBarSignalizeMenuOpen
+local CoreGuiConnector = require(script.CoreGuiConnector)
+local MenuConnector = require(script.MenuConnector)
+local ChatConnector = require(script.ChatConnector)
+local HealthConnector = require(script.HealthConnector)
+local EnabledNotifier = require(script.EnabledNotifier)
+local OpenUIConnector = require(script.OpenUIConnector)
+
+require(script.LastInputTypeConnector)
+
+local v18 = Roact.PureComponent:extend("Connection")
+
+function v18.render(_) -- line: 26
+	-- upvalues: Roact (copy), FFlagTopBarDeprecateCoreGuiRodux (copy), CoreGuiConnector (copy), FFlagTopBarSignalizeMenuOpen (copy), FFlagTopBarDeprecateRespawnRodux (copy), MenuConnector (copy), FFlagTopBarDeprecateChatRodux (copy), ChatConnector (copy), FFlagTopBarSignalizeHealthBar (copy), HealthConnector (copy), FFlagTopBarDeprecateDisplayOptionsRodux (copy), EnabledNotifier (copy), FFlagTopBarDeprecateMoreMenuRodux (copy), OpenUIConnector (copy)
+	return Roact.createFragment({
+		CoreGuiConnector = if not FFlagTopBarDeprecateCoreGuiRodux then Roact.createElement(CoreGuiConnector) else nil,
+		MenuConnector = if not FFlagTopBarSignalizeMenuOpen or not FFlagTopBarDeprecateRespawnRodux then Roact.createElement(MenuConnector) else nil,
+		ChatConnector = if not FFlagTopBarDeprecateChatRodux then Roact.createElement(ChatConnector) else nil,
+		HealthConnector = if not FFlagTopBarSignalizeHealthBar then Roact.createElement(HealthConnector) else nil,
+		EnabledNotifier = if not FFlagTopBarDeprecateDisplayOptionsRodux then Roact.createElement(EnabledNotifier) else nil,
+		OpenUIConnector = if not FFlagTopBarDeprecateMoreMenuRodux then Roact.createElement(OpenUIConnector) else nil
+	})
+end
+
+return v18

@@ -1,35 +1,22 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_Modules_0 = l_CoreGui_0.RobloxGui.Modules;
-local v3 = require(l_Modules_0.Settings.getCamMicPermissions);
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_default_0 = require(l_CorePackages_0.Workspace.Packages.PermissionsProtocol).PermissionsProtocol.default;
-if require(l_RobloxGui_0.Modules.Flags.getFFlagDoNotPromptCameraPermissionsOnMount)() then
-    return function(v6, v7, v8) --[[ Line: 18 ]]
-        -- upvalues: l_default_0 (copy), v3 (copy)
-        local v9 = nil;
-        if v7 then
-            if v7 == "camera" then
-                v9 = {
-                    l_default_0.Permissions.CAMERA_ACCESS
-                };
-            elseif v7 == "microphone" then
-                v9 = {
-                    l_default_0.Permissions.MICROPHONE_ACCESS
-                };
-            end;
-        end;
-        v3(function(v10) --[[ Line: 29 ]]
-            -- upvalues: v6 (copy)
-            v6(v10.hasCameraPermissions, v10.hasMicPermissions);
-        end, v9, v8, "ExperienceChat.getPermissions");
-    end;
-else
-    return function(v11) --[[ Line: 37 ]]
-        -- upvalues: v3 (copy)
-        v3(function(v12) --[[ Line: 38 ]]
-            -- upvalues: v11 (copy)
-            v11(v12.hasCameraPermissions, v12.hasMicPermissions);
-        end);
-    end;
-end;
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local getCamMicPermissions = require(Modules.Settings.getCamMicPermissions)
+local CorePackages = game:GetService("CorePackages")
+local default = require(CorePackages.Workspace.Packages.PermissionsProtocol).PermissionsProtocol.default
+
+return function(p1, s1: string?, b1: boolean?) -- line: 13
+	-- upvalues: default (copy), getCamMicPermissions (copy)
+	local t1 = nil
+
+	if s1 then
+		if s1 == "camera" then
+			t1 = { default.Permissions.CAMERA_ACCESS }
+		elseif s1 == "microphone" then
+			t1 = { default.Permissions.MICROPHONE_ACCESS }
+		end
+	end
+
+	getCamMicPermissions(function(p2) -- line: 24
+		-- upvalues: p1 (copy)
+		p1(p2.hasCameraPermissions, p2.hasMicPermissions)
+	end, t1, b1, "ExperienceChat.getPermissions")
+end

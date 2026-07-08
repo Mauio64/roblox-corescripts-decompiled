@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CapturesUpdateUsePlayShutterSoundTesting", false);
+return game:DefineFastFlag("CapturesUpdateUsePlayShutterSoundTesting", false)

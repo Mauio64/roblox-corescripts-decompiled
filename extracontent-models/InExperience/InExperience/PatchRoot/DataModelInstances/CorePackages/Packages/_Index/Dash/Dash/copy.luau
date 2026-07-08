@@ -1,5 +1,9 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-return function(v2) --[[ Line: 15 ]] --[[ Name: copy ]]
-    return table.clone(v2);
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local function copy(p1) -- line: 15
+	return table.clone(p1)
+end
+
+return copy

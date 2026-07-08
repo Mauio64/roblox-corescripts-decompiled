@@ -1,112 +1,116 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_withStyle_0 = l_UIBlox_0.Style.withStyle;
-local l_withLocalization_0 = v1.withLocalization;
-local l_ContextualMenu_0 = l_UIBlox_0.App.Menu.ContextualMenu;
-local l_MenuDirection_0 = l_UIBlox_0.App.Menu.MenuDirection;
-local v8 = require(l_script_FirstAncestor_0.FriendsLandingContext);
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local v10 = require(l_script_FirstAncestor_0.Components.FriendsLandingContainer.mapStateToProps);
-local l_RoactRodux_0 = v1.RoactRodux;
-local l_compose_0 = v1.SocialLibraries.RoduxTools.compose;
-local l_FriendsNetworking_0 = v1.FriendsNetworking;
-local v14 = require(l_script_FirstAncestor_0.EnumScreens);
-local l_memoize_0 = v1.memoize;
-local l_Otter_0 = v1.Otter;
-local v17 = l_Roact_0.PureComponent:extend("FriendsLandingContextualMenu");
-local v18 = {
-    motorCallback = l_Otter_0.instant, 
-    open = {
-        targetValue = 1
-    }, 
-    close = {
-        targetValue = 0
-    }
-};
-v17.init = function(v19) --[[ Line: 35 ]] --[[ Name: init ]]
-    -- upvalues: l_memoize_0 (copy), v14 (copy), l_Images_0 (copy)
-    v19.onClose = function() --[[ Line: 36 ]]
-        -- upvalues: v19 (copy)
-        if v19.props.navigation then
-            v19.props.navigation.goBack();
-        end;
-    end;
-    v19.onUnfriend = l_memoize_0(function(v20, v21) --[[ Line: 42 ]]
-        -- upvalues: v19 (copy), v14 (ref)
-        v19.props.navigation.navigate(v14.GenericToast, {
-            toastProps = {
-                toastContent = {
-                    toastTitle = v20, 
-                    iconImage = v21
-                }
-            }
-        });
-    end);
-    v19.onActivated = l_memoize_0(function(v22, v23) --[[ Line: 53 ]]
-        -- upvalues: v19 (copy), l_Images_0 (ref)
-        return function() --[[ Line: 54 ]]
-            -- upvalues: v19 (ref), v22 (copy), l_Images_0 (ref), v23 (copy)
-            local l_userId_0 = v19.props.navigation.state.params.userId;
-            if l_userId_0 ~= nil then
-                v19.props.unfriendTargetUserId({
-                    targetUserId = l_userId_0, 
-                    currentUserId = v19.props.localUserId
-                }):andThen(function() --[[ Line: 59 ]]
-                    -- upvalues: v19 (ref), v22 (ref), l_Images_0 (ref)
-                    v19.onUnfriend(v22, l_Images_0["icons/actions/friends/friendRemove"]);
-                end):catch(function() --[[ Line: 62 ]]
-                    -- upvalues: v19 (ref), v23 (ref)
-                    v19.onUnfriend(v23);
-                end);
-            end;
-            v19.onClose();
-        end;
-    end);
-end;
-v17.render = function(v25) --[[ Line: 71 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), l_withLocalization_0 (copy), l_Roact_0 (copy), l_ContextualMenu_0 (copy), l_Images_0 (copy), l_MenuDirection_0 (copy), v18 (copy)
-    return l_withStyle_0(function(_) --[[ Line: 72 ]]
-        -- upvalues: l_withLocalization_0 (ref), l_Roact_0 (ref), l_ContextualMenu_0 (ref), l_Images_0 (ref), v25 (copy), l_MenuDirection_0 (ref), v18 (ref)
-        return l_withLocalization_0({
-            unfriend = "Feature.Friends.Action.Unfriend", 
-            error = "Feature.Toast.NetworkingError.SomethingIsWrong", 
-            success = "Feature.Friends.Action.FriendRemoved"
-        })(function(v27) --[[ Line: 77 ]]
-            -- upvalues: l_Roact_0 (ref), l_ContextualMenu_0 (ref), l_Images_0 (ref), v25 (ref), l_MenuDirection_0 (ref), v18 (ref)
-            local l_unfriend_0 = v27.unfriend;
-            local l_success_0 = v27.success;
-            local l_error_0 = v27.error;
-            return l_Roact_0.createElement(l_ContextualMenu_0, {
-                buttonProps = {
-                    {
-                        icon = l_Images_0["icons/actions/friends/friendRemove"], 
-                        text = l_unfriend_0, 
-                        onActivated = v25.onActivated(l_success_0, l_error_0)
-                    }
-                }, 
-                open = true, 
-                menuDirection = l_MenuDirection_0.Up, 
-                openPositionY = UDim.new(1, -24), 
-                screenSize = v25.props.screenSize, 
-                onDismiss = v25.onClose, 
-                closeBackgroundVisible = false, 
-                motorOverrideOptions = v18
-            });
-        end);
-    end);
-end;
-return l_compose_0(l_RoactRodux_0.connect(v10, function(v31) --[[ Line: 103 ]]
-    -- upvalues: l_FriendsNetworking_0 (copy)
-    return {
-        unfriendTargetUserId = function(v32) --[[ Line: 105 ]] --[[ Name: unfriendTargetUserId ]]
-            -- upvalues: v31 (copy), l_FriendsNetworking_0 (ref)
-            return v31(l_FriendsNetworking_0.UnfriendTargetUserId.API(v32));
-        end
-    };
-end), v8.connect(function(v33, _) --[[ Line: 110 ]]
-    return {
-        screenSize = v33.screenSize
-    };
-end))(v17);
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local withStyle = UIBlox.Style.withStyle
+local withLocalization = dependencies.withLocalization
+local ContextualMenu = UIBlox.App.Menu.ContextualMenu
+local MenuDirection = UIBlox.App.Menu.MenuDirection
+local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
+local Images = UIBlox.App.ImageSet.Images
+local mapStateToProps = require(FriendsLanding.Components.FriendsLandingContainer.mapStateToProps)
+local RoactRodux = dependencies.RoactRodux
+local compose = dependencies.SocialLibraries.RoduxTools.compose
+local FriendsNetworking = dependencies.FriendsNetworking
+local EnumScreens = require(FriendsLanding.EnumScreens)
+local memoize = dependencies.memoize
+local Otter = dependencies.Otter
+local v18 = Roact.PureComponent:extend("FriendsLandingContextualMenu")
+local t1 = {
+	motorCallback = Otter.instant,
+	open = {
+		targetValue = 1
+	},
+	close = {
+		targetValue = 0
+	}
+}
+
+function v18.init(p1) -- line: 35
+	-- upvalues: memoize (copy), EnumScreens (copy), Images (copy)
+	function p1.onClose() -- line: 36
+		-- upvalues: p1 (copy)
+		if p1.props.navigation then
+			p1.props.navigation.goBack()
+		end
+	end
+
+	p1.onUnfriend = memoize(function(p2, p3) -- line: 42
+		-- upvalues: p1 (copy), EnumScreens (copy)
+		p1.props.navigation.navigate(EnumScreens.GenericToast, {
+			toastProps = {
+				toastContent = {
+					toastTitle = p2,
+					iconImage = p3
+				}
+			}
+		})
+	end)
+	p1.onActivated = memoize(function(p4, p5) -- line: 53
+		-- upvalues: p1 (copy), Images (copy)
+		return function() -- line: 54
+			-- upvalues: p1 (copy), p4 (copy), Images (copy), p5 (copy)
+			local userId = p1.props.navigation.state.params.userId
+
+			if userId ~= nil then
+				p1.props.unfriendTargetUserId({
+					targetUserId = userId,
+					currentUserId = p1.props.localUserId
+				}):andThen(function() -- line: 59
+					-- upvalues: p1 (copy), p4 (copy), Images (copy)
+					p1.onUnfriend(p4, Images["icons/actions/friends/friendRemove"])
+				end):catch(function() -- line: 62
+					-- upvalues: p1 (copy), p5 (copy)
+					p1.onUnfriend(p5)
+				end)
+			end
+
+			p1.onClose()
+		end
+	end)
+end
+function v18.render(p6) -- line: 71
+	-- upvalues: withStyle (copy), withLocalization (copy), Roact (copy), ContextualMenu (copy), Images (copy), MenuDirection (copy), t1 (copy)
+	return withStyle(function(_) -- line: 72
+		-- upvalues: withLocalization (copy), Roact (copy), ContextualMenu (copy), Images (copy), p6 (copy), MenuDirection (copy), t1 (copy)
+		return withLocalization({
+			unfriend = "Feature.Friends.Action.Unfriend",
+			error = "Feature.Toast.NetworkingError.SomethingIsWrong",
+			success = "Feature.Friends.Action.FriendRemoved"
+		})(function(p8) -- line: 77
+			-- upvalues: Roact (copy), ContextualMenu (copy), Images (copy), p6 (copy), MenuDirection (copy), t1 (copy)
+			local unfriend = p8.unfriend
+			local success = p8.success
+			local error = p8.error
+
+			return Roact.createElement(ContextualMenu, {
+				open = true,
+				closeBackgroundVisible = false,
+				buttonProps = {{
+					icon = Images["icons/actions/friends/friendRemove"],
+					text = unfriend,
+					onActivated = p6.onActivated(success, error)
+				}},
+				menuDirection = MenuDirection.Up,
+				openPositionY = UDim.new(1, -24),
+				screenSize = p6.props.screenSize,
+				onDismiss = p6.onClose,
+				motorOverrideOptions = t1
+			})
+		end)
+	end)
+end
+
+return compose(RoactRodux.connect(mapStateToProps, function(p9) -- line: 103
+	-- upvalues: FriendsNetworking (copy)
+	return {
+		unfriendTargetUserId = function(p10) -- line: 105
+			-- upvalues: p9 (copy), FriendsNetworking (copy)
+			return p9(FriendsNetworking.UnfriendTargetUserId.API(p10))
+		end
+	}
+end), FriendsLandingContext.connect(function(p11, _) -- line: 110
+	return {
+		screenSize = p11.screenSize
+	}
+end))(v18)

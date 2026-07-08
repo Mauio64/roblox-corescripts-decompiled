@@ -1,5 +1,5 @@
 return {
-    Completed = "Completed", 
-    Error = "Error", 
-    Pending = "Pending"
-};
+	Completed = "Completed",
+	Error = "Error",
+	Pending = "Pending"
+}

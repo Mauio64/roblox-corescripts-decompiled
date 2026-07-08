@@ -1,11 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GroupsNetworking");
-local v1 = require(l_script_FirstAncestor_0.GROUPS_URL);
-return function(v2) --[[ Line: 10 ]]
-    -- upvalues: v1 (copy)
-    return v2.roduxNetworking.DELETE({
-        Name = "RemovePrimaryGroup"
-    }, function(v3) --[[ Line: 13 ]]
-        -- upvalues: v1 (ref)
-        return v3(v1):path("v1"):path("user"):path("groups"):path("primary");
-    end);
-end;
+local GroupsNetworking = script:FindFirstAncestor("GroupsNetworking")
+local GROUPS_URL = require(GroupsNetworking.GROUPS_URL)
+
+return function(p1) -- line: 10
+	-- upvalues: GROUPS_URL (copy)
+	return p1.roduxNetworking.DELETE({
+		Name = "RemovePrimaryGroup"
+	}, function(p2) -- line: 13
+		-- upvalues: GROUPS_URL (copy)
+		return p2(GROUPS_URL):path("v1"):path("user"):path("groups"):path("primary")
+	end)
+end

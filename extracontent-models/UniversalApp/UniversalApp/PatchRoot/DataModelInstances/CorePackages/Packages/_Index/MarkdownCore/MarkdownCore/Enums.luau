@@ -1,3 +1,3 @@
 return {
-    InlineEngineTag = require(script.InlineEngineTag)
-};
+	InlineEngineTag = require(script.InlineEngineTag)
+}

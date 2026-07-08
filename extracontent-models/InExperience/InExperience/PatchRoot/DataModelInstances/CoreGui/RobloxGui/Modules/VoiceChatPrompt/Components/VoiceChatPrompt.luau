@@ -1,38 +1,39 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(script.Parent.Parent.Parent.InGameMenu.InGameMenuPolicy);
-local v4 = require(script.Parent.VoiceChatPromptFrame);
-local v5 = v1.PureComponent:extend("VoiceChatPrompt");
-v5.validateProps = v2.strictInterface({
-    promptSignal = v2.optional(v2.RBXScriptSignal), 
-    errorText = v2.optional(v2.string), 
-    bannedUntil = v2.optional(v2.string), 
-    onContinueFunc = v2.optional(v2.callback), 
-    onPrimaryActivated = v2.optional(v2.callback), 
-    onSecondaryActivated = v2.optional(v2.callback), 
-    onReadyForSignal = v2.optional(v2.callback), 
-    Analytics = v2.optional(v2.table), 
-    VoiceChatServiceManager = v2.optional(v2.table), 
-    policyMapper = v2.optional(v2.callback), 
-    settingsAppAvailable = v2.optional(v2.boolean)
-});
-v5.render = function(v6) --[[ Line: 27 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v3 (copy), v4 (copy)
-    return v1.createElement("ScreenGui", {
-        AutoLocalize = false, 
-        DisplayOrder = 9, 
-        IgnoreGuiInset = true, 
-        OnTopOfCoreBlur = true, 
-        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    }, {
-        PolicyProvider = v1.createElement(v3.Provider, {
-            policy = {
-                v6.props.policyMapper or v3.Mapper
-            }
-        }, {
-            Content = v1.createElement(v4, v6.props)
-        })
-    });
-end;
-return v5;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local InGameMenuPolicy = require(script.Parent.Parent.Parent.InGameMenu.InGameMenuPolicy)
+local VoiceChatPromptFrame = require(script.Parent.VoiceChatPromptFrame)
+local v6 = Roact.PureComponent:extend("VoiceChatPrompt")
+
+v6.validateProps = t.strictInterface({
+	promptSignal = t.optional(t.RBXScriptSignal),
+	errorText = t.optional(t.string),
+	bannedUntil = t.optional(t.string),
+	onContinueFunc = t.optional(t.callback),
+	onPrimaryActivated = t.optional(t.callback),
+	onSecondaryActivated = t.optional(t.callback),
+	onReadyForSignal = t.optional(t.callback),
+	Analytics = t.optional(t.table),
+	VoiceChatServiceManager = t.optional(t.table),
+	policyMapper = t.optional(t.callback),
+	settingsAppAvailable = t.optional(t.boolean)
+})
+
+function v6.render(p1) -- line: 27
+	-- upvalues: Roact (copy), InGameMenuPolicy (copy), VoiceChatPromptFrame (copy)
+	return Roact.createElement("ScreenGui", {
+		AutoLocalize = false,
+		DisplayOrder = 9,
+		IgnoreGuiInset = true,
+		OnTopOfCoreBlur = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	}, {
+		PolicyProvider = Roact.createElement(InGameMenuPolicy.Provider, {
+			policy = { p1.props.policyMapper or InGameMenuPolicy.Mapper }
+		}, {
+			Content = Roact.createElement(VoiceChatPromptFrame, p1.props)
+		})
+	})
+end
+
+return v6

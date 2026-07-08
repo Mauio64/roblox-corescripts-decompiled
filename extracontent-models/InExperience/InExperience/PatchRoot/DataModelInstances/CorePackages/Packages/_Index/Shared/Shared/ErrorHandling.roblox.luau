@@ -1,145 +1,173 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Error_0 = v1.Error;
-local l_inspect_0 = v1.util.inspect;
-local l_filterInternalStackFrames_0 = require(script.Parent.ReactFeatureFlags).filterInternalStackFrames;
-local v5 = {
-    "React", 
-    "ReactDevtoolsShared", 
-    "ReactNoopRenderer", 
-    "ReactReconciler", 
-    "ReactRefresh", 
-    "ReactRoblox", 
-    "RoactCompat", 
-    "Scheduler", 
-    "Shared"
-};
-local v6 = nil;
-local function v11() --[[ Line: 52 ]] --[[ Name: getReactPackagePrefixes ]]
-    -- upvalues: v6 (ref), v5 (copy), l_Parent_0 (copy)
-    if v6 then
-        return v6;
-    else
-        local v7 = {};
-        for _, v9 in v5 do
-            local l_FirstChild_0 = l_Parent_0.Parent:FindFirstChild(v9);
-            if l_FirstChild_0 then
-                table.insert(v7, (l_FirstChild_0:GetFullName():gsub("^game%.", "")));
-            end;
-        end;
-        v6 = v7;
-        return v7;
-    end;
-end;
-local _ = function(v12) --[[ Line: 79 ]] --[[ Name: isInternalFrame ]]
-    -- upvalues: v11 (copy)
-    for _, v14 in (v11()) do
-        if string.sub(v12, 1, #v14) == v14 then
-            return true;
-        end;
-    end;
-    return false;
-end;
-local function v32(v16) --[[ Line: 98 ]] --[[ Name: buildStackString ]]
-    -- upvalues: v11 (copy)
-    local v17 = false;
-    local v18 = false;
-    local v19 = "";
-    local v20 = false;
-    local v21 = false;
-    for v22 = v16 + 1, 1e999 do
-        local v23, v24, v25 = debug.info(v22, "sln");
-        if v23 then
-            if v23 ~= "[C]" then
-                if not v20 then
-                    local v26;
-                    for _, v28 in (v11()) do
-                        if string.sub(v23, 1, #v28) == v28 then
-                            v26 = true;
-                            v17 = true;
-                        end;
-                        if v17 then
-                            break;
-                        end;
-                    end;
-                    if not v17 then
-                        v26 = false;
-                    end;
-                    v17 = false;
-                    v21 = not v26;
-                    v20 = true;
-                end;
-                if v21 then
-                    local v29;
-                    for _, v31 in (v11()) do
-                        if string.sub(v23, 1, #v31) == v31 then
-                            v29 = true;
-                            v18 = true;
-                        end;
-                        if v18 then
-                            break;
-                        end;
-                    end;
-                    if not v18 then
-                        v29 = false;
-                    end;
-                    v18 = false;
-                    if v29 then
-                        continue;
-                    end;
-                end;
-                v19 = v19 .. ("%*:%* function %*\n"):format(v23, v24, v25 or "?");
-            end;
-        else
-            break;
-        end;
-    end;
-    return (string.gsub(v19, "\n$", ""));
-end;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Error = LuauPolyfill.Error
+local inspect = LuauPolyfill.util.inspect
+local filterInternalStackFrames = require(script.Parent.ReactFeatureFlags).filterInternalStackFrames
+local t1 = {
+	"React",
+	"ReactDevtoolsShared",
+	"ReactNoopRenderer",
+	"ReactReconciler",
+	"ReactRefresh",
+	"ReactRoblox",
+	"RoactCompat",
+	"Scheduler",
+	"Shared"
+}
+local u7 = nil
+
+local function getReactPackagePrefixes() -- line: 52
+	-- upvalues: u7 (ref), t1 (copy), ParentParent (copy)
+	if u7 then
+		return u7
+	end
+
+	local t2 = {}
+
+	for _, v13 in t1 do
+		local v14 = ParentParent.Parent:FindFirstChild(v13)
+
+		if v14 then
+			table.insert(t2, (v14:GetFullName():gsub("^game%.", "")))
+		end
+	end
+
+	u7 = t2
+
+	return t2
+end
+local function isInternalFrame(s1: string) -- line: 79
+	-- upvalues: getReactPackagePrefixes (copy)
+	for _, v17 in (getReactPackagePrefixes()) do
+		if v17 == string.sub(s1, 1, #v17) then
+			return true
+		end
+	end
+
+	return false
+end
+local function buildStackString(n1: number) -- line: 98
+	-- upvalues: getReactPackagePrefixes (copy)
+	local s2 = ""
+	local v20 = false
+	local v21 = false
+	local g29 = nil
+	local v28 = nil
+	local g33 = nil
+	local v32 = nil
+
+	for i = n1 + 1, 1e999 do
+		local v23, v24, v25 = debug.info(i, "sln")
+
+		if not v23 then
+			return (string.gsub(s2, "\n$", ""))
+		end
+
+		if v23 == "[C]" then
+			continue
+		end
+
+		if not v20 then
+			for _, v27 in (getReactPackagePrefixes()) do
+				if v27 == string.sub(v23, 1, #v27) then
+					v28 = true
+					g29 = true
+				end
+
+				if g29 then
+					break
+				end
+			end
+
+			if not g29 then
+				v28 = false
+			end
+
+			g29 = false
+			v21 = not v28
+			v20 = true
+		end
+
+		if v21 then
+			for _, v31 in (getReactPackagePrefixes()) do
+				if v31 == string.sub(v23, 1, #v31) then
+					v32 = true
+					g33 = true
+				end
+
+				if g33 then
+					break
+				end
+			end
+
+			if not g33 then
+				v32 = false
+			end
+
+			g33 = false
+
+			if v32 then
+				continue
+			end
+		end
+
+		s2 ..= ("%*:%* function %*\n"):format(v23, v24, v25 or "?")
+	end
+
+	return (string.gsub(s2, "\n$", ""))
+end
+
 return {
-    describeError = function(v33) --[[ Line: 141 ]] --[[ Name: describeError ]]
-        -- upvalues: v1 (copy), l_filterInternalStackFrames_0 (copy), v32 (copy)
-        if typeof(v33) == "string" then
-            local _, v35 = string.find(v33, ":[%d]+: ");
-            local v36 = if v35 then string.sub(v33, v35 + 1) else v33;
-            local v37 = v1.Error.new(v36);
-            if l_filterInternalStackFrames_0 then
-                v37.stack = v32(2);
-                return v37;
-            else
-                v37.stack = debug.traceback(nil, 2);
-                return v37;
-            end;
-        else
-            return v33;
-        end;
-    end, 
-    errorToString = function(v38) --[[ Line: 165 ]] --[[ Name: errorToString ]]
-        -- upvalues: l_inspect_0 (copy)
-        local _ = nil;
-        if typeof(v38) == "table" then
-            if v38.message and v38.stack then
-                return "\n------ Error caught by React ------\n" .. v38.message .. "\n------ Error caught by React ------\n" .. tostring(v38.stack);
-            else
-                return (l_inspect_0(v38));
-            end;
-        else
-            return (l_inspect_0(v38));
-        end;
-    end, 
-    parseReactError = function(v40) --[[ Line: 191 ]] --[[ Name: parseReactError ]]
-        -- upvalues: l_Error_0 (copy)
-        local v41 = string.split(v40, "\n------ Error caught by React ------\n");
-        if #v41 == 3 then
-            local v42, v43, v44 = table.unpack(v41);
-            local v45 = l_Error_0.new(v43);
-            v45.stack = v44;
-            return v45, v42;
-        else
-            local v46 = l_Error_0.new(v40);
-            v46.stack = nil;
-            return v46, "";
-        end;
-    end, 
-    __ERROR_DIVIDER = "\n------ Error caught by React ------\n"
-};
+	__ERROR_DIVIDER = "\n------ Error caught by React ------\n",
+	describeError = function(p1) -- line: 141
+		-- upvalues: LuauPolyfill (copy), filterInternalStackFrames (copy), buildStackString (copy)
+		if typeof(p1) == "string" then
+			local _, stop = string.find(p1, ":[%d]+: ")
+			local v37 = if not stop then p1 else string.sub(p1, stop + 1)
+			local v38 = LuauPolyfill.Error.new(v37)
+
+			if filterInternalStackFrames then
+				v38.stack = buildStackString(2)
+
+				return v38
+			end
+
+			v38.stack = debug.traceback(nil, 2)
+
+			return v38
+		end
+
+		return p1
+	end,
+	errorToString = function(p2) -- line: 165
+		-- upvalues: inspect (copy)
+		if typeof(p2) == "table" then
+			if p2.message and p2.stack then
+				return "\n------ Error caught by React ------\n" .. p2.message .. "\n------ Error caught by React ------\n" .. tostring(p2.stack)
+			end
+
+			return (inspect(p2))
+		end
+
+		return (inspect(p2))
+	end,
+	parseReactError = function(s3: string) -- line: 191
+		-- upvalues: Error (copy)
+		local parts = string.split(s3, "\n------ Error caught by React ------\n")
+
+		if #parts == 3 then
+			local v42, v43, v44 = table.unpack(parts)
+			local v45 = Error.new(v43)
+
+			v45.stack = v44
+
+			return v45, v42
+		end
+
+		local v46 = Error.new(s3)
+
+		v46.stack = nil
+
+		return v46, ""
+	end
+}

@@ -1,43 +1,37 @@
 return {
-    definitions = {
-        {
-            selectionSet = {
-                kind = "SelectionSet", 
-                selections = {
-                    {
-                        selectionSet = {
-                            kind = "SelectionSet", 
-                            selections = {
-                                {
-                                    arguments = {}, 
-                                    name = {
-                                        value = "enablePushNotifications", 
-                                        kind = "Name"
-                                    }, 
-                                    kind = "Field", 
-                                    directives = {}
-                                }
-                            }
-                        }, 
-                        arguments = {}, 
-                        name = {
-                            value = "virtualEvents", 
-                            kind = "Name"
-                        }, 
-                        kind = "Field", 
-                        directives = {}
-                    }
-                }
-            }, 
-            directives = {}, 
-            name = {
-                value = "EnablePushNotifications", 
-                kind = "Name"
-            }, 
-            operation = "mutation", 
-            kind = "OperationDefinition", 
-            variableDefinitions = {}
-        }
-    }, 
-    kind = "Document"
-};
+	kind = "Document",
+	definitions = {{
+		operation = "mutation",
+		kind = "OperationDefinition",
+		selectionSet = {
+			kind = "SelectionSet",
+			selections = {{
+				kind = "Field",
+				selectionSet = {
+					kind = "SelectionSet",
+					selections = {{
+						kind = "Field",
+						arguments = {},
+						name = {
+							value = "enablePushNotifications",
+							kind = "Name"
+						},
+						directives = {}
+					}}
+				},
+				arguments = {},
+				name = {
+					value = "virtualEvents",
+					kind = "Name"
+				},
+				directives = {}
+			}}
+		},
+		directives = {},
+		name = {
+			value = "EnablePushNotifications",
+			kind = "Name"
+		},
+		variableDefinitions = {}
+	}}
+}

@@ -1,1 +1,1 @@
-return require(script.CloseAffordance);
+return require(script.CloseAffordance)

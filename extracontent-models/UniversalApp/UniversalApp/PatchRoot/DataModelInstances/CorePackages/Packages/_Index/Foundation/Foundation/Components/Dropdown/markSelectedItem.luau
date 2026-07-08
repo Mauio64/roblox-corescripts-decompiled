@@ -1,32 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Components.BaseMenu);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local function v3(v4, v5) --[[ Line: 10 ]] --[[ Name: markSelectedItem ]]
-    -- upvalues: v3 (copy)
-    if v5 == nil then
-        return v4, nil;
-    else
-        local v6 = {};
-        local v7 = nil;
-        for _, v9 in v4 do
-            if v9.id then
-                local l_v9_0 = v9;
-                if v9.id == v5 then
-                    l_v9_0 = table.clone(v9);
-                    l_v9_0.isChecked = true;
-                    v7 = l_v9_0;
-                end;
-                table.insert(v6, l_v9_0);
-            elseif v9.items then
-                local v11, v12 = v3(v9.items, v5);
-                table.insert(v6, {
-                    title = v9.title, 
-                    items = v11
-                });
-                v7 = v7 or v12;
-            end;
-        end;
-        return v6, v7;
-    end;
-end;
-return v3;
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Components.BaseMenu)
+require(Foundation.Components.Types)
+
+local function markSelectedItem(p1, p2) -- line: 10
+	-- upvalues: markSelectedItem (copy)
+	if p2 == nil then
+		return p1, nil
+	end
+
+	local t1 = {}
+	local v6 = nil
+
+	for _, v8 in p1 do
+		if v8.id then
+			local v9 = v8
+
+			if p2 == v8.id then
+				v9 = table.clone(v8)
+				v9.isChecked = true
+				v6 = v9
+			end
+
+			table.insert(t1, v9)
+		elseif v8.items then
+			local v10, v11 = markSelectedItem(v8.items, p2)
+
+			table.insert(t1, {
+				title = v8.title,
+				items = v10
+			})
+			v6 = v6 or v11
+		end
+	end
+
+	return t1, v6
+end
+
+return markSelectedItem

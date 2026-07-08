@@ -1,23 +1,29 @@
-local l_UGCValidationService_0 = game:GetService("UGCValidationService");
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.util.pcallDeferred);
-return function(v4, v5) --[[ Line: 12 ]] --[[ Name: getVerts ]]
-    -- upvalues: v3 (copy), l_UGCValidationService_0 (copy)
-    local l_isServer_0 = v5.isServer;
-    local v7, v8 = v3(function() --[[ Line: 18 ]]
-        -- upvalues: l_UGCValidationService_0 (ref), v4 (copy)
-        return l_UGCValidationService_0:GetEditableMeshVerts(v4.editableMesh);
-    end, v5);
-    if not v7 then
-        local v9 = "Failed to read mesh: " .. v4.fullName;
-        if l_isServer_0 then
-            error(v9);
-        end;
-        return false, {
-            v9
-        };
-    else
-        return true, nil, v8;
-    end;
-end;
+local UGCValidationService = game:GetService("UGCValidationService")
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+
+local function getVerts(p1, p2) -- line: 12
+	-- upvalues: pcallDeferred (copy), UGCValidationService (copy)
+	local isServer = p2.isServer
+	local v8, v9 = pcallDeferred(function() -- line: 18
+		-- upvalues: UGCValidationService (copy), p1 (copy)
+		return UGCValidationService:GetEditableMeshVerts(p1.editableMesh)
+	end, p2)
+
+	if not v8 then
+		local v10 = "Failed to read mesh: " .. p1.fullName
+
+		if isServer then
+			error(v10)
+		end
+
+		return false, { v10 }
+	end
+
+	return true, nil, v9
+end
+
+return getVerts

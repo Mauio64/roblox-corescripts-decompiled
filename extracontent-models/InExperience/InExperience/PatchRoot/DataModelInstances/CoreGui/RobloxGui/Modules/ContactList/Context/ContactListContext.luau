@@ -1,5 +1,6 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Dash);
-return require(l_CorePackages_0.Packages.React).createContext({
-    fireAnalyticsEvent = v1.noop
-});
+local CorePackages = game:GetService("CorePackages")
+local Dash = require(CorePackages.Packages.Dash)
+
+return require(CorePackages.Packages.React).createContext({
+	fireAnalyticsEvent = Dash.noop
+})

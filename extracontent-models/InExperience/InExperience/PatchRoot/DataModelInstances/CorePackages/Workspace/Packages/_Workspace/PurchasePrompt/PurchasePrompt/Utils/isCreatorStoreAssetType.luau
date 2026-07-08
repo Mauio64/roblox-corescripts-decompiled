@@ -1,22 +1,25 @@
-local _ = script.Parent.Parent;
-isCreatorStoreAssetType = function(v1) --[[ Line: 3 ]] --[[ Name: isCreatorStoreAssetType ]]
-    if v1 == nil or type(v1) ~= "string" then
-        return false;
-    else
-        for _, v3 in {
-            "Model", 
-            "Plugin", 
-            "Audio", 
-            "Decal", 
-            "FontFamily", 
-            "MeshPart", 
-            "Video"
-        } do
-            if v1 == v3 then
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
-return isCreatorStoreAssetType;
+local _ = script.Parent.Parent
+
+function isCreatorStoreAssetType(s1: string) -- line: 3
+	if s1 == nil or type(s1) ~= "string" then
+		return false
+	end
+
+	for _, v4 in {
+		"Model",
+		"Plugin",
+		"Audio",
+		"Decal",
+		"FontFamily",
+		"MeshPart",
+		"Video"
+	} do
+		if s1 == v4 then
+			return true
+		end
+	end
+
+	return false
+end
+
+return isCreatorStoreAssetType

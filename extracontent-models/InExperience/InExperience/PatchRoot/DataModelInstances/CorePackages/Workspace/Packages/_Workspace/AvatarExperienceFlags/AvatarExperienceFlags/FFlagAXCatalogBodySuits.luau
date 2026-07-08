@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogBodySuits", false);
+return game:DefineFastFlag("AXCatalogBodySuits", false)

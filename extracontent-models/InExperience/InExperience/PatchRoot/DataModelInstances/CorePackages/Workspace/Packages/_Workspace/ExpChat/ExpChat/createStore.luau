@@ -1,11 +1,14 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local l_RaiseActionAsEventMiddleware_0 = require(l_Parent_0.ExpChatShared).RaiseActionAsEventMiddleware;
-local v3 = require(script.Parent.installReducer);
-return function(v4) --[[ Line: 8 ]] --[[ Name: createStore ]]
-    -- upvalues: v1 (copy), v3 (copy), l_RaiseActionAsEventMiddleware_0 (copy)
-    return v1.Store.new(v3, v4, {
-        v1.thunkMiddleware, 
-        l_RaiseActionAsEventMiddleware_0
-    });
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Rodux = require(Parent.Rodux)
+local RaiseActionAsEventMiddleware = require(Parent.ExpChatShared).RaiseActionAsEventMiddleware
+local installReducer = require(script.Parent.installReducer)
+
+local function createStore(p1) -- line: 8
+	-- upvalues: Rodux (copy), installReducer (copy), RaiseActionAsEventMiddleware (copy)
+	return Rodux.Store.new(installReducer, p1, {
+		Rodux.thunkMiddleware,
+		RaiseActionAsEventMiddleware
+	})
+end
+
+return createStore

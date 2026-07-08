@@ -1,763 +1,905 @@
-local l_Players_0 = game:GetService("Players");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.AppChatNetworking);
-local v4 = require(l_Parent_0.Rodux);
-local v5 = require(l_Parent_0.LuauPolyfill);
-local v6 = require(l_script_FirstAncestor_0.Conversations);
-local v7 = require(l_script_FirstAncestor_0.Conversations.Actions.ChangedParticipants);
-local v8 = require(l_script_FirstAncestor_0.Conversations.Actions.HasUnreadMessages);
-local v9 = require(l_script_FirstAncestor_0.Conversations.Actions.FetchedOldestMessage);
-local v10 = require(l_script_FirstAncestor_0.Conversations.Actions.FetchingOlderMessages);
-local l_MessageFailedToSend_0 = v6.Actions.MessageFailedToSend;
-local l_MessageModerated_0 = v6.Actions.MessageModerated;
-local v13 = require(l_script_FirstAncestor_0.Conversations.Actions.ReadConversation);
-local v14 = require(l_script_FirstAncestor_0.Conversations.Actions.ReceivedConversation);
-local l_ReceivedMessages_0 = v6.Actions.ReceivedMessages;
-local v16 = require(l_script_FirstAncestor_0.Conversations.Actions.RemovedConversation);
-local v17 = require(l_script_FirstAncestor_0.Conversations.Actions.ReceivedChannelsMigrationConflict);
-local v18 = require(l_script_FirstAncestor_0.Conversations.Actions.RenamedGroupConversation);
-local l_SendingMessage_0 = v6.Actions.SendingMessage;
-local l_SentMessage_0 = v6.Actions.SentMessage;
-local v21 = require(l_script_FirstAncestor_0.Conversations.Actions.SetConversationLoadingStatus);
-local v22 = require(l_script_FirstAncestor_0.Conversations.Actions.SetPinnedGameForConversation);
-local v23 = require(l_script_FirstAncestor_0.Conversations.Actions.SetUserLeavingConversation);
-local v24 = require(l_script_FirstAncestor_0.Conversations.Actions.SetUserTyping);
-local v25 = require(l_script_FirstAncestor_0.Conversations.Actions.FriendConversationCreated);
-local v26 = require(l_script_FirstAncestor_0.Actions.FriendshipDestroyed);
-local v27 = require(l_script_FirstAncestor_0.Conversations.Actions.ReloadedMessagesForConversations);
-local v28 = require(l_script_FirstAncestor_0.Conversations.Actions.ConversationModerationTypeChanged);
-local v29 = require(l_script_FirstAncestor_0.Http.NetworkingChat);
-local v30 = require(l_script_FirstAncestor_0.Http.NetworkingBlocking);
-local v31 = require(l_script_FirstAncestor_0.Models.Conversation);
-local v32 = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local l_OrderedMap_0 = require(l_Parent_0.AppCommonLib).OrderedMap;
-local l_Functional_0 = require(l_Parent_0.AppCommonLib).Functional;
-local v36 = require(l_script_FirstAncestor_0.Models.MessageModel);
-local v37 = require(l_Parent_0.Cryo);
-local v38 = require(l_script_FirstAncestor_0.Utils.addConversation);
-local l_getFFlagAppChatPCMFixBlocking_0 = require(l_Parent_0.SharedFlags).getFFlagAppChatPCMFixBlocking;
-local v40 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatHandleAgeChange);
-local l_FFlagAppChatExcludeSyntheticPreviewFromMessages_0 = require(l_script_FirstAncestor_0.Flags).FFlagAppChatExcludeSyntheticPreviewFromMessages;
-local v42 = require(script.Parent.updateConversationReducer);
-local v43 = require(l_script_FirstAncestor_0.Utils.getOneToOneConversationIdFromFriendId);
-local v44 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatEnableManualTranslation);
-local l_FFlagAppChatEnableDoubleOptIn_0 = require(l_Parent_0.SharedFlags).FFlagAppChatEnableDoubleOptIn;
-local v46 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatUpdateConvAfterRecordModalSequence);
-local l_FFlagAppChatEnableU13ChatOptIn_0 = require(l_Parent_0.SharedFlags).FFlagAppChatEnableU13ChatOptIn;
-local v48 = require(l_script_FirstAncestor_0.Constants);
-local v49 = {
-    [v48.OptInVariant.OsaContextCard] = if v46 then {
-        field = "osaAcknowledgementStatus", 
-        value = v32.OsaAcknowledgementStatus.Acknowledged
-    } else nil, 
-    [v48.OptInVariant.ChatOptInInfoCard] = if l_FFlagAppChatEnableU13ChatOptIn_0 then {
-        field = "userOptedIntoChatMessages", 
-        value = v32.UserOptedIntoChatMessagesStatus.OptedIn
-    } else nil
-};
-local function v56(v50, v51) --[[ Line: 78 ]] --[[ Name: markConversationAndMessagesAsRead ]]
-    -- upvalues: l_Immutable_0 (copy)
-    local v52 = v50[v51];
-    if not v52 then
-        warn("Conversation " .. v51 .. " not found in ReadConversation reducer");
-        return v50;
-    else
-        assert(v52, "FFlagLuauTinyControlFlowAnalysis");
-        local v54 = v52.messages:Map(function(v53) --[[ Line: 87 ]]
-            -- upvalues: l_Immutable_0 (ref)
-            if v53.read then
-                return v53;
-            else
-                return l_Immutable_0.Set(v53, "read", true);
-            end;
-        end);
-        local v55 = l_Immutable_0.Set(v52, "messages", v54);
-        v55 = l_Immutable_0.Set(v55, "hasUnreadMessages", false);
-        return (l_Immutable_0.Set(v50, v55.id, v55));
-    end;
-end;
-local function v75(v57, v58, v59) --[[ Line: 103 ]] --[[ Name: addMessagesToConversation ]]
-    -- upvalues: l_Immutable_0 (copy), l_OrderedMap_0 (copy)
-    local v60 = v57[v58];
-    if v60 then
-        local v61 = nil;
-        local l_previewMessageId_0 = v60.previewMessageId;
-        local v63 = 0;
-        if l_previewMessageId_0 and v60.messages then
-            local v64 = v60.messages:Get(l_previewMessageId_0);
-            if v64 then
-                v63 = v64.sent:GetUnixTimestamp();
-            end;
-        end;
-        for v65 = 1, #v59.messages do
-            local v66 = v59.messages[v65];
-            local v67 = v60.messages:Get(v66.id);
-            if v67 then
-                if v61 then
-                    v61.previousMessageId = v67.id;
-                end;
-                if v66.previousMessageId == nil and v67.previousMessageId ~= nil then
-                    v66.previousMessageId = v67.previousMessageId;
-                end;
-                v66.read = v66.read or v67.read;
-            elseif v66.isPreviewable and v63 < v66.sent:GetUnixTimestamp() then
-                l_previewMessageId_0 = v66.id;
-                v63 = v66.sent:GetUnixTimestamp();
-            end;
-            v61 = v66;
-        end;
-        v60 = l_Immutable_0.JoinDictionaries(v60, {
-            previewMessageId = l_previewMessageId_0
-        });
-        local v68 = l_OrderedMap_0.Insert(v60.messages, unpack(v59.messages));
-        if v59.exclusiveStartMessageId and #v59.messages > 0 and v68:Get(v59.exclusiveStartMessageId) then
-            local v69 = v59.messages[1];
-            local v70 = v68:Get(v59.exclusiveStartMessageId);
-            v68 = v68:Insert((l_Immutable_0.Set(v70, "previousMessageId", v69.id)));
-        end;
-        local v71 = l_previewMessageId_0 and v68 and v68:Get(l_previewMessageId_0);
-        local l_lastUpdated_0 = v60.lastUpdated;
-        if v71 then
-            l_lastUpdated_0 = (l_lastUpdated_0 and l_lastUpdated_0:GetUnixTimestamp() or 0) < v71.sent:GetUnixTimestamp() and v71.sent or v60.lastUpdated;
-        end;
-        local v73 = v59.shouldMarkConversationUnread or v60.hasUnreadMessages;
-        local v74 = l_Immutable_0.JoinDictionaries(v60, {
-            messages = v68, 
-            lastUpdated = l_lastUpdated_0, 
-            hasUnreadMessages = v73, 
-            nextCursor = v59.nextCursor, 
-            previousCursor = v59.previousCursor
-        });
-        v74 = l_Immutable_0.Set(v74, "usersTyping", {});
-        return l_Immutable_0.Set(v57, v74.id, v74);
-    else
-        return v57;
-    end;
-end;
-local function v85(v76, v77, v78, v79) --[[ Line: 188 ]] --[[ Name: updateMessageContentToDisplay ]]
-    -- upvalues: l_Immutable_0 (copy)
-    local v80 = v76[v77];
-    if v80 then
-        local v81 = v80.messages:Get(v78);
-        if v81 then
-            local v82 = l_Immutable_0.Set(v81, "contentToDisplay", v79);
-            local v83 = v80.messages:Insert(v82);
-            local v84 = l_Immutable_0.Set(v80, "messages", v83);
-            return l_Immutable_0.Set(v76, v84.id, v84);
-        end;
-    end;
-    return v76;
-end;
-local function _(v86, v87) --[[ Line: 208 ]] --[[ Name: messagesFromResponse ]]
-    -- upvalues: l_Functional_0 (copy), v36 (copy)
-    if not v87 then
-        return {};
-    else
-        local v88 = nil;
-        return (l_Functional_0.MapReverse(v87, function(v89) --[[ Line: 215 ]]
-            -- upvalues: v36 (ref), v86 (copy), v88 (ref)
-            local v90 = v36.fromWeb(v89, v86, v88);
-            v88 = v90.id;
-            return v90;
-        end));
-    end;
-end;
-local function v99(v92, v93) --[[ Line: 223 ]] --[[ Name: messagesFromResponseOfChannelsApi ]]
-    -- upvalues: v36 (copy)
-    if not v93 then
-        return {};
-    else
-        local v94 = nil;
-        local v95 = {};
-        for v96 = #v93, 1, -1 do
-            local v97 = v93[v96];
-            local v98 = v36.fromChannelsApi(v97, v92, v94);
-            if v98 then
-                table.insert(v95, v98);
-                v94 = v98.id;
-            end;
-        end;
-        return v95;
-    end;
-end;
-local function v102(v100) --[[ Line: 245 ]] --[[ Name: getMessagesFromConversationResponse ]]
-    -- upvalues: l_FFlagAppChatExcludeSyntheticPreviewFromMessages_0 (copy), l_Immutable_0 (copy)
-    local v101 = v100.messages or {};
-    if v100.preview_message and not l_FFlagAppChatExcludeSyntheticPreviewFromMessages_0 then
-        v101 = l_Immutable_0.JoinLists({
-            v100.preview_message
-        }, v101);
-    end;
-    return v101;
-end;
-local function _(v103) --[[ Line: 256 ]] --[[ Name: isMessageFromSelf ]]
-    -- upvalues: l_Players_0 (copy)
-    local v104 = v103 and v103[#v103] or nil;
-    return v104 and v104.senderTargetId == tostring(l_Players_0.LocalPlayer.UserId) or false;
-end;
-local function v113(v106, v107) --[[ Line: 262 ]] --[[ Name: getShouldMarkConversationUnread ]]
-    -- upvalues: l_Players_0 (copy)
-    if not v106 or not v106.messages or not v107 then
-        return false;
-    else
-        local v108 = v106.messages.keys[#v106.messages.keys];
-        local v109 = v106.messages.values[v108];
-        local v110 = v109 and v109.sent and v109.sent:GetUnixTimestamp() or 0;
-        for v111 = #v107, 1, -1 do
-            local v112 = v107[v111];
-            if v112 then
-                if v112.sent:GetUnixTimestamp() <= v110 then
-                    return false;
-                elseif v112.senderTargetId ~= tostring(l_Players_0.LocalPlayer.UserId) and v112.isBadgeable then
-                    return true;
-                end;
-            end;
-        end;
-        return false;
-    end;
-end;
-return v4.createReducer({}, {
-    [v14.name] = function(v114, v115) --[[ Line: 299 ]]
-        -- upvalues: v42 (copy)
-        return v42(v114, v115.conversation);
-    end, 
-    [v29.StartGroupConversation.Succeeded.name] = function(v116, v117) --[[ Line: 302 ]]
-        -- upvalues: v31 (copy), v42 (copy)
-        local l_responseBody_0 = v117.responseBody;
-        local v119 = v31.fromWeb(l_responseBody_0.conversation);
-        return v42(v116, v119);
-    end, 
-    [v29.StartOneToOneConversation.Succeeded.name] = function(v120, v121) --[[ Line: 307 ]]
-        -- upvalues: v31 (copy), v42 (copy)
-        local l_responseBody_1 = v121.responseBody;
-        local v123 = v31.fromWeb(l_responseBody_1.conversation);
-        return v42(v120, v123);
-    end, 
-    [v3.rodux.CreateConversation.Succeeded.name] = function(v124, v125) --[[ Line: 312 ]]
-        -- upvalues: v32 (copy), v42 (copy)
-        local l_responseBody_2 = v125.responseBody;
-        if l_responseBody_2 and l_responseBody_2.conversations and l_responseBody_2.conversations[1] and l_responseBody_2.conversations[1].status == "success" then
-            local v127 = v32.fromChannelsApi(l_responseBody_2.conversations[1]);
-            v124 = v42(v124, v127);
-        end;
-        return v124;
-    end, 
-    [v3.rodux.DuplicateConversation.Succeeded.name] = function(v128, v129) --[[ Line: 326 ]]
-        -- upvalues: v32 (copy), v38 (copy)
-        local l_responseBody_3 = v129.responseBody;
-        if l_responseBody_3 and l_responseBody_3.conversations and l_responseBody_3.conversations[1] then
-            local v131 = v32.fromChannelsApi(l_responseBody_3.conversations[1]);
-            v128 = v38(v128, v131);
-        end;
-        return v128;
-    end, 
-    [l_ReceivedMessages_0.name] = function(v132, v133) --[[ Line: 335 ]]
-        -- upvalues: v75 (copy)
-        return v75(v132, v133.conversationId, v133);
-    end, 
-    [l_SendingMessage_0.name] = function(v134, v135) --[[ Line: 338 ]]
-        -- upvalues: l_OrderedMap_0 (copy), l_Immutable_0 (copy)
-        local v136 = v134[v135.conversationId];
-        if v136 then
-            local v137 = l_OrderedMap_0.Insert(v136.sendingMessages, v135.message);
-            local v138 = l_Immutable_0.Set(v136, "sendingMessages", v137);
-            v134 = l_Immutable_0.Set(v134, v138.id, v138);
-        end;
-        return v134;
-    end, 
-    [l_SentMessage_0.name] = function(v139, v140) --[[ Line: 349 ]]
-        -- upvalues: l_OrderedMap_0 (copy), l_Immutable_0 (copy)
-        local v141 = v139[v140.conversationId];
-        if v141 then
-            local v142 = l_OrderedMap_0.Delete(v141.sendingMessages, v140.messageId);
-            local v143 = l_Immutable_0.Set(v141, "sendingMessages", v142);
-            v139 = l_Immutable_0.Set(v139, v143.id, v143);
-        end;
-        return v139;
-    end, 
-    [v18.name] = function(v144, v145) --[[ Line: 360 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local l_conversationId_0 = v145.conversationId;
-        local v147 = v144[l_conversationId_0];
-        if v147 then
-            local v148 = l_Immutable_0.JoinDictionaries(v147, {
-                lastUpdated = v145.lastUpdated, 
-                title = v145.title, 
-                isDefaultTitle = v145.isDefaultTitle
-            });
-            v144 = l_Immutable_0.Set(v144, l_conversationId_0, v148);
-        end;
-        return v144;
-    end, 
-    [v8.name] = function(v149, v150) --[[ Line: 375 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v151 = v150.conversation and v149[v150.conversation.id];
-        if v151 then
-            local v152 = l_Immutable_0.Set(v151, "hasUnreadMessages", true);
-            v149 = l_Immutable_0.Set(v149, v150.conversation.id, v152);
-        end;
-        return v149;
-    end, 
-    [v7.name] = function(v153, v154) --[[ Line: 384 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local l_conversationId_1 = v154.conversationId;
-        local l_participants_0 = v154.participants;
-        local v157 = v153[l_conversationId_1];
-        if v157 then
-            local v158 = l_Immutable_0.JoinDictionaries(v157, {
-                participants = l_participants_0, 
-                lastUpdated = v154.lastUpdated, 
-                title = v154.title
-            });
-            v153 = l_Immutable_0.Set(v153, l_conversationId_1, v158);
-        end;
-        return v153;
-    end, 
-    [v16.name] = function(v159, v160) --[[ Line: 400 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local l_conversationId_2 = v160.conversationId;
-        return l_Immutable_0.Set(v159, l_conversationId_2, nil);
-    end, 
-    [v24.name] = function(v162, v163) --[[ Line: 404 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v164 = v162[v163.conversationId];
-        if v164 then
-            local l_usersTyping_0 = v164.usersTyping;
-            local v166 = l_Immutable_0.Set(l_usersTyping_0, v163.userId, v163.value);
-            local v167 = l_Immutable_0.Set(v164, "usersTyping", v166);
-            v162 = l_Immutable_0.Set(v162, v167.id, v167);
-        end;
-        return v162;
-    end, 
-    [v10.name] = function(v168, v169) --[[ Line: 415 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v170 = v168[v169.conversationId];
-        if v170 then
-            local v171 = l_Immutable_0.Set(v170, "fetchingOlderMessages", v169.fetchingOlderMessages);
-            v168 = l_Immutable_0.Set(v168, v171.id, v171);
-        end;
-        return v168;
-    end, 
-    [v9.name] = function(v172, v173) --[[ Line: 424 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v174 = v172[v173.conversationId];
-        if v174 then
-            local v175 = l_Immutable_0.Set(v174, "fetchedOldestMessage", v173.fetchedOldestMessage);
-            return l_Immutable_0.Set(v172, v175.id, v175);
-        else
-            return v172;
-        end;
-    end, 
-    [v13.name] = function(v176, v177) --[[ Line: 433 ]]
-        -- upvalues: v56 (copy)
-        return (v56(v176, v177.conversationId));
-    end, 
-    [l_MessageModerated_0.name] = function(v178, v179) --[[ Line: 436 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v180 = v178[v179.conversationId];
-        if v180 then
-            local v181 = v180.sendingMessages:Get(v179.messageId);
-            if v181 then
-                local v182 = l_Immutable_0.Set(v181, "moderated", true);
-                local v183 = v180.sendingMessages:Insert(v182);
-                local v184 = l_Immutable_0.Set(v180, "sendingMessages", v183);
-                v178 = l_Immutable_0.Set(v178, v184.id, v184);
-            end;
-        end;
-        return v178;
-    end, 
-    [l_MessageFailedToSend_0.name] = function(v185, v186) --[[ Line: 450 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v187 = v185[v186.conversationId];
-        if v187 then
-            local v188 = v187.sendingMessages:Get(v186.messageId);
-            if v188 then
-                local v189 = l_Immutable_0.Set(v188, "failed", true);
-                local v190 = v187.sendingMessages:Insert(v189);
-                local v191 = l_Immutable_0.Set(v187, "sendingMessages", v190);
-                v185 = l_Immutable_0.Set(v185, v191.id, v191);
-            end;
-        end;
-        return v185;
-    end, 
-    [v21.name] = function(v192, v193) --[[ Line: 464 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v194 = v192[v193.conversationId];
-        if v194 then
-            local v195 = l_Immutable_0.Set(v194, "initialLoadingStatus", v193.value);
-            return l_Immutable_0.Set(v192, v195.id, v195);
-        else
-            return v192;
-        end;
-    end, 
-    [v23.name] = function(v196, v197) --[[ Line: 473 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local v198 = v196[v197.id];
-        if v198 then
-            local v199 = l_Immutable_0.Set(v198, "isUserLeaving", v197.isLeaving);
-            v196 = l_Immutable_0.Set(v196, v199.id, v199);
-        end;
-        return v196;
-    end, 
-    [v22.name] = function(v200, v201) --[[ Line: 481 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local l_conversationId_3 = v201.conversationId;
-        local v203 = v200[l_conversationId_3];
-        if v203 then
-            local v204 = {
-                rootPlaceId = v201.rootPlaceId, 
-                universeId = v201.universeId
-            };
-            local v205 = l_Immutable_0.JoinDictionaries(v203, {
-                pinnedGame = v204
-            });
-            v200 = l_Immutable_0.Set(v200, l_conversationId_3, v205);
-        end;
-        return v200;
-    end, 
-    [v29.GetUserConversations.Succeeded.name] = function(v206, v207) --[[ Line: 499 ]]
-        -- upvalues: v31 (copy), v42 (copy)
-        local l_responseBody_4 = v207.responseBody;
-        for _, v210 in ipairs(l_responseBody_4) do
-            local v211 = v31.fromWeb(v210);
-            v206 = v42(v206, v211);
-        end;
-        return v206;
-    end, 
-    [v3.rodux.GetUserConversations.Succeeded.name] = function(v212, v213) --[[ Line: 508 ]]
-        -- upvalues: v32 (copy), v42 (copy), v102 (copy), v5 (copy), v36 (copy), v75 (copy)
-        local l_responseBody_5 = v213.responseBody;
-        if l_responseBody_5 and l_responseBody_5.conversations then
-            for _, v216 in l_responseBody_5.conversations do
-                local v217 = v32.fromChannelsApi(v216);
-                v212 = v42(v212, v217);
-                local v218 = v102(v216);
-                if v218 and #v218 > 0 then
-                    local v220 = {
-                        messages = v5.Array.map(v218, function(v219) --[[ Line: 518 ]]
-                            -- upvalues: v36 (ref), v217 (copy)
-                            return v36.fromChannelsApi(v219, v217.id);
-                        end)
-                    };
-                    v212 = v75(v212, v217.id, v220);
-                end;
-            end;
-        end;
-        return v212;
-    end, 
-    [v29.GetConversations.Succeeded.name] = function(v221, v222) --[[ Line: 533 ]]
-        -- upvalues: v31 (copy), v42 (copy)
-        local l_responseBody_6 = v222.responseBody;
-        for _, v225 in ipairs(l_responseBody_6) do
-            local v226 = v31.fromWeb(v225);
-            v221 = v42(v221, v226);
-        end;
-        return v221;
-    end, 
-    [v3.rodux.GetOlderMessages.Succeeded.name] = function(v227, v228) --[[ Line: 542 ]]
-        -- upvalues: v99 (copy), v75 (copy), l_Immutable_0 (copy)
-        local l_conversation_id_0 = v228.queryArgs.conversation_id;
-        local l_responseBody_7 = v228.responseBody;
-        local v231 = {};
-        local v232 = v227[l_conversation_id_0];
-        if not v232 then
-            return v227;
-        else
-            assert(v232, "FFlagLuauTinyControlFlowAnalysis");
-            local v233 = v232.previousCursor or nil;
-            local v234 = v232.nextCursor or nil;
-            if not l_responseBody_7 then
-                return v227;
-            else
-                v231 = v99(l_conversation_id_0, l_responseBody_7.messages);
-                local v235 = if l_responseBody_7.next_cursor == "" then nil else l_responseBody_7.next_cursor;
-                if v235 then
-                    v234 = v235;
-                end;
-                if v233 == nil then
-                    v233 = if l_responseBody_7.previous_cursor == "" then nil else l_responseBody_7.previous_cursor;
-                end;
-                local v236 = {
-                    messages = v231, 
-                    nextCursor = v234, 
-                    previousCursor = v233
-                };
-                v227 = v75(v227, l_conversation_id_0, v236);
-                if not v235 then
-                    local v237 = v227[l_conversation_id_0];
-                    if v237 then
-                        local v238 = l_Immutable_0.Set(v237, "fetchedOldestMessage", true);
-                        v227 = l_Immutable_0.Set(v227, v238.id, v238);
-                    end;
-                end;
-                return v227;
-            end;
-        end;
-    end, 
-    [v3.rodux.GetNewerMessages.Succeeded.name] = function(v239, v240) --[[ Line: 595 ]]
-        -- upvalues: v99 (copy), v113 (copy), v75 (copy)
-        local l_conversation_id_1 = v240.queryArgs.conversation_id;
-        local l_responseBody_8 = v240.responseBody;
-        local v243 = v239[l_conversation_id_1];
-        if not v243 then
-            return v239;
-        else
-            assert(v243, "FFlagLuauTinyControlFlowAnalysis");
-            local v244 = v243.previousCursor or nil;
-            local v245 = v243.nextCursor or nil;
-            if not l_responseBody_8 then
-                return v239;
-            else
-                local v246 = v99(l_conversation_id_1, l_responseBody_8.messages);
-                if v245 == nil then
-                    v245 = if l_responseBody_8.next_cursor == "" then nil else l_responseBody_8.next_cursor;
-                end;
-                local v247 = if l_responseBody_8.previous_cursor == "" then nil else l_responseBody_8.previous_cursor;
-                if v247 then
-                    v244 = v247;
-                end;
-                local v248 = v113(v243, v246);
-                local v249 = {
-                    messages = v246, 
-                    nextCursor = v245, 
-                    previousCursor = v244, 
-                    shouldMarkConversationUnread = v248
-                };
-                return (v75(v239, l_conversation_id_1, v249));
-            end;
-        end;
-    end, 
-    [v29.GetMessages.Succeeded.name] = function(v250, v251) --[[ Line: 637 ]]
-        -- upvalues: l_Functional_0 (copy), v36 (copy), l_Players_0 (copy), v75 (copy), l_Immutable_0 (copy)
-        local l_conversationId_4 = v251.queryArgs.conversationId;
-        local l_responseBody_9 = v251.responseBody;
-        local v254;
-        if not l_responseBody_9 then
-            v254 = {};
-        else
-            local v255 = nil;
-            do
-                local l_v255_0 = v255;
-                v254 = l_Functional_0.MapReverse(l_responseBody_9, function(v257) --[[ Line: 215 ]]
-                    -- upvalues: v36 (ref), l_conversationId_4 (copy), l_v255_0 (ref)
-                    local v258 = v36.fromWeb(v257, l_conversationId_4, l_v255_0);
-                    l_v255_0 = v258.id;
-                    return v258;
-                end);
-            end;
-        end;
-        l_responseBody_9 = {
-            messages = v254
-        };
-        local v259 = v254 and v254[#v254] or nil;
-        l_responseBody_9.shouldMarkConversationUnread = not (v259 and v259.senderTargetId == tostring(l_Players_0.LocalPlayer.UserId) or false);
-        v250 = v75(v250, l_conversationId_4, l_responseBody_9);
-        local l_pageSize_0 = v251.queryArgs.pageSize;
-        if l_pageSize_0 and #v254 < l_pageSize_0 then
-            local v261 = v250[l_conversationId_4];
-            if not v261 then
-                return v250;
-            else
-                assert(v261, "FFlagLuauTinyControlFlowAnalysis");
-                v259 = v250[l_conversationId_4];
-                if v259 then
-                    local v262 = l_Immutable_0.Set(v259, "fetchedOldestMessage", true);
-                    v250 = l_Immutable_0.Set(v250, v262.id, v262);
-                end;
-            end;
-        end;
-        return v250;
-    end, 
-    [v29.GetLatestMessages.Succeeded.name] = function(v263, v264) --[[ Line: 663 ]]
-        -- upvalues: l_Functional_0 (copy), v36 (copy), v75 (copy)
-        local l_responseBody_10 = v264.responseBody;
-        for _, v267 in ipairs(l_responseBody_10) do
-            local v268 = tostring(v267.conversationId);
-            local l_chatMessages_0 = v267.chatMessages;
-            local v270;
-            if not l_chatMessages_0 then
-                v270 = {};
-            else
-                local v271 = nil;
-                do
-                    local l_v271_0 = v271;
-                    v270 = l_Functional_0.MapReverse(l_chatMessages_0, function(v273) --[[ Line: 215 ]]
-                        -- upvalues: v36 (ref), v268 (copy), l_v271_0 (ref)
-                        local v274 = v36.fromWeb(v273, v268, l_v271_0);
-                        l_v271_0 = v274.id;
-                        return v274;
-                    end);
-                end;
-            end;
-            l_chatMessages_0 = {
-                messages = v270
-            };
-            v263 = v75(v263, v268, l_chatMessages_0);
-        end;
-        return v263;
-    end, 
-    [v3.rodux.GetConversationDetails.Succeeded.name] = function(v275, v276) --[[ Line: 675 ]]
-        -- upvalues: v32 (copy), v42 (copy), v102 (copy), v5 (copy), v36 (copy), v75 (copy)
-        local v277 = v276.responseBody.conversations[1];
-        if not v277 then
-            return v275;
-        else
-            local v278 = v32.fromChannelsApi(v277);
-            v275 = v42(v275, v278);
-            local v279 = v102(v277);
-            if v279 and #v279 > 0 then
-                local v281 = {
-                    messages = v5.Array.map(v279, function(v280) --[[ Line: 689 ]]
-                        -- upvalues: v36 (ref), v278 (copy)
-                        return v36.fromChannelsApi(v280, v278.id);
-                    end)
-                };
-                v275 = v75(v275, v278.id, v281);
-            end;
-            return v275;
-        end;
-    end, 
-    [v3.rodux.MultiGetConversationDetails.Succeeded.name] = function(v282, v283) --[[ Line: 702 ]]
-        -- upvalues: v32 (copy), v42 (copy), v102 (copy), v5 (copy), v36 (copy), v75 (copy)
-        local l_responseBody_11 = v283.responseBody;
-        if not l_responseBody_11 or not l_responseBody_11.conversations then
-            return v282;
-        else
-            for _, v286 in l_responseBody_11.conversations do
-                local v287 = v32.fromChannelsApi(v286);
-                v282 = v42(v282, v287);
-                local v288 = v102(v286);
-                if v288 and #v288 > 0 then
-                    local v290 = {
-                        messages = v5.Array.map(v288, function(v289) --[[ Line: 714 ]]
-                            -- upvalues: v36 (ref), v287 (copy)
-                            return v36.fromChannelsApi(v289, v287.id);
-                        end)
-                    };
-                    v282 = v75(v282, v287.id, v290);
-                end;
-            end;
-            return v282;
-        end;
-    end, 
-    [v3.rodux.MarkConversation.Succeeded.name] = function(v291, v292) --[[ Line: 727 ]]
-        -- upvalues: v56 (copy)
-        local v293 = v292.postBody.conversation_ids[1];
-        return (v56(v291, v293));
-    end, 
-    [v29.MarkAsRead.Succeeded.name] = function(v294, v295) --[[ Line: 731 ]]
-        -- upvalues: v56 (copy)
-        local l_conversationId_5 = v295.postBody.conversationId;
-        return (v56(v294, l_conversationId_5));
-    end, 
-    [v3.rodux.TranslateUserMessage.Succeeded.name] = v44() and function(v297, v298) --[[ Line: 736 ]]
-        -- upvalues: v85 (copy)
-        local l_content_to_display_0 = v298.responseBody.content_to_display;
-        if v298.postBody.conversation_id and v298.postBody.message_id then
-            return v85(v297, v298.postBody.conversation_id, v298.postBody.message_id, l_content_to_display_0);
-        else
-            return v297;
-        end;
-    end or nil, 
-    [v17.name] = function(_, _) --[[ Line: 752 ]]
-        return {};
-    end, 
-    [v25.name] = function(v302, v303) --[[ Line: 755 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        if v302[v303.oldFriendConversationId] then
-            return l_Immutable_0.Set(v302, v303.oldFriendConversationId, nil);
-        else
-            return v302;
-        end;
-    end, 
-    [v26.name] = function(v304, v305) --[[ Line: 762 ]]
-        -- upvalues: v32 (copy), l_Immutable_0 (copy)
-        local v306 = if v305.userId1 ~= "localUserId" then v305.userId1 else if v305.userId2 ~= "localUserId" then v305.userId2 else nil;
-        if not v306 then
-            return v304;
-        else
-            assert(v306, "FFlagLuauTinyControlFlowAnalysis");
-            local v307 = v32.getFriendConversationId({
-                v306
-            });
-            if v304[v307] then
-                return l_Immutable_0.Set(v304, v307, nil);
-            else
-                return v304;
-            end;
-        end;
-    end, 
-    [v30.BlockUserById.Succeeded.name] = l_getFFlagAppChatPCMFixBlocking_0() and function(v308, v309) --[[ Line: 780 ]]
-        -- upvalues: v43 (copy), l_Immutable_0 (copy), v32 (copy)
-        local v310 = tostring(v309.namedIds.users);
-        if not v310 then
-            return v308;
-        else
-            local v311 = v43(v308, v310);
-            local l_v308_0 = v308;
-            if v311 and v308[v311] then
-                l_v308_0 = l_Immutable_0.Set(l_v308_0, v311, nil);
-            end;
-            local v313 = v32.getFriendConversationId({
-                v310
-            });
-            if v313 and v308[v313] then
-                l_v308_0 = l_Immutable_0.Set(v308, v313, nil);
-            end;
-            return l_v308_0;
-        end;
-    end or nil, 
-    [v27.name] = v40 and function(v314, v315) --[[ Line: 804 ]]
-        -- upvalues: v37 (copy), v32 (copy)
-        local l_v314_0 = v314;
-        for _, v318 in v315.conversationIds do
-            local v319 = l_v314_0[v318];
-            l_v314_0 = v37.Dictionary.join(l_v314_0, {
-                [v318] = v37.Dictionary.join(v319, {
-                    messages = v32.getEmptyMessages(), 
-                    sendingMessages = v32.getEmptySendingMessages(), 
-                    previousCursor = v37.None, 
-                    nextCursor = v37.None, 
-                    fetchedOldestMessage = false
-                })
-            });
-        end;
-        return l_v314_0;
-    end or nil, 
-    [v28.name] = l_FFlagAppChatEnableDoubleOptIn_0 and function(v320, v321) --[[ Line: 822 ]]
-        -- upvalues: l_Immutable_0 (copy)
-        local l_conversationId_6 = v321.conversationId;
-        local l_moderationType_0 = v321.moderationType;
-        local v324 = v320[l_conversationId_6];
-        if v324 then
-            local v325 = l_Immutable_0.Set(v324, "moderationType", l_moderationType_0);
-            return l_Immutable_0.Set(v320, l_conversationId_6, v325);
-        else
-            return v320;
-        end;
-    end or nil, 
-    [v3.rodux.RecordModalSequenceResponse.Succeeded.name] = (not not v46 or l_FFlagAppChatEnableU13ChatOptIn_0) and function(v326, v327) --[[ Line: 835 ]]
-        -- upvalues: v48 (copy), v49 (copy), v32 (copy), l_Immutable_0 (copy)
-        local l_postBody_0 = v327.postBody;
-        if l_postBody_0.action_type ~= v48.ModalAction.Accept then
-            return v326;
-        else
-            local v329 = v49[l_postBody_0.modal_variant];
-            if not v329 then
-                return v326;
-            else
-                local v330 = l_postBody_0.conversation_id or v32.getFriendConversationId({
-                    l_postBody_0.friend_id
-                });
-                local v331 = v330 and v326[v330];
-                if not v331 then
-                    return v326;
-                else
-                    return l_Immutable_0.Set(v326, v330, l_Immutable_0.Set(v331, v329.field, v329.value));
-                end;
-            end;
-        end;
-    end or nil
-});
+local Players = game:GetService("Players")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local Rodux = require(AppChatParent.Rodux)
+local LuauPolyfill = require(AppChatParent.LuauPolyfill)
+local Conversations = require(AppChat.Conversations)
+local ChangedParticipants = require(AppChat.Conversations.Actions.ChangedParticipants)
+local HasUnreadMessages = require(AppChat.Conversations.Actions.HasUnreadMessages)
+local FetchedOldestMessage = require(AppChat.Conversations.Actions.FetchedOldestMessage)
+local FetchingOlderMessages = require(AppChat.Conversations.Actions.FetchingOlderMessages)
+local MessageFailedToSend = Conversations.Actions.MessageFailedToSend
+local MessageModerated = Conversations.Actions.MessageModerated
+local ReadConversation = require(AppChat.Conversations.Actions.ReadConversation)
+local ReceivedConversation = require(AppChat.Conversations.Actions.ReceivedConversation)
+local ReceivedMessages = Conversations.Actions.ReceivedMessages
+local RemovedConversation = require(AppChat.Conversations.Actions.RemovedConversation)
+local ReceivedChannelsMigrationConflict = require(AppChat.Conversations.Actions.ReceivedChannelsMigrationConflict)
+local RenamedGroupConversation = require(AppChat.Conversations.Actions.RenamedGroupConversation)
+local SendingMessage = Conversations.Actions.SendingMessage
+local SentMessage = Conversations.Actions.SentMessage
+local SetConversationLoadingStatus = require(AppChat.Conversations.Actions.SetConversationLoadingStatus)
+local SetPinnedGameForConversation = require(AppChat.Conversations.Actions.SetPinnedGameForConversation)
+local SetUserLeavingConversation = require(AppChat.Conversations.Actions.SetUserLeavingConversation)
+local SetUserTyping = require(AppChat.Conversations.Actions.SetUserTyping)
+local FriendConversationCreated = require(AppChat.Conversations.Actions.FriendConversationCreated)
+local FriendshipDestroyed = require(AppChat.Actions.FriendshipDestroyed)
+local ReloadedMessagesForConversations = require(AppChat.Conversations.Actions.ReloadedMessagesForConversations)
+local ConversationModerationTypeChanged = require(AppChat.Conversations.Actions.ConversationModerationTypeChanged)
+local NetworkingChat = require(AppChat.Http.NetworkingChat)
+local NetworkingBlocking = require(AppChat.Http.NetworkingBlocking)
+local Conversation = require(AppChat.Models.Conversation)
+local ConversationChannels = require(AppChat.Models.ConversationChannels)
+local Immutable = require(AppChatParent.AppCommonLib).Immutable
+local OrderedMap = require(AppChatParent.AppCommonLib).OrderedMap
+local Functional = require(AppChatParent.AppCommonLib).Functional
+local MessageModel = require(AppChat.Models.MessageModel)
+local Cryo = require(AppChatParent.Cryo)
+local addConversation = require(AppChat.Utils.addConversation)
+local getFFlagAppChatPCMFixBlocking = require(AppChatParent.SharedFlags).getFFlagAppChatPCMFixBlocking
+local updateConversationReducer = require(script.Parent.updateConversationReducer)
+local getOneToOneConversationIdFromFriendId = require(AppChat.Utils.getOneToOneConversationIdFromFriendId)
+local getFFlagAppChatEnableManualTranslation = require(AppChat.Flags.getFFlagAppChatEnableManualTranslation)
+local FFlagAppChatEnableDoubleOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableDoubleOptIn
+local FFlagAppChatEnableU13ChatOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableU13ChatOptIn
+local Constants = require(AppChat.Constants)
+local t1 = {
+	[Constants.OptInVariant.OsaContextCard] = {
+		field = "osaAcknowledgementStatus",
+		value = ConversationChannels.OsaAcknowledgementStatus.Acknowledged
+	},
+	[Constants.OptInVariant.ChatOptInInfoCard] = if not FFlagAppChatEnableU13ChatOptIn then nil else {
+		field = "userOptedIntoChatMessages",
+		value = ConversationChannels.UserOptedIntoChatMessagesStatus.OptedIn
+	}
+}
+
+local function markConversationAndMessagesAsRead(t2: {[any]: any}, s1: string) -- line: 76
+	-- upvalues: Immutable (copy)
+	local v58 = t2[s1]
+
+	if not v58 then
+		warn("Conversation " .. s1 .. " not found in ReadConversation reducer")
+
+		return t2
+	end
+
+	assert(v58, "FFlagLuauTinyControlFlowAnalysis")
+
+	local v59 = v58.messages:Map(function(p1) -- line: 85
+		-- upvalues: Immutable (copy)
+		if p1.read then
+			return p1
+		end
+
+		return Immutable.Set(p1, "read", true)
+	end)
+	local v60 = Immutable.Set(v58, "messages", v59)
+	local v61 = Immutable.Set(v60, "hasUnreadMessages", false)
+
+	return (Immutable.Set(t2, v61.id, v61))
+end
+local function addMessagesToConversation(t3: {[any]: any}, s2: string, t4: {[any]: any}) -- line: 101
+	-- upvalues: Immutable (copy), OrderedMap (copy)
+	local v65 = t3[s2]
+
+	if v65 then
+		local v66 = nil
+		local previewMessageId = v65.previewMessageId
+		local n1 = 0
+
+		if previewMessageId and v65.messages then
+			local v69 = v65.messages:Get(previewMessageId)
+
+			if v69 then
+				n1 = v69.sent:GetUnixTimestamp()
+			end
+		end
+
+		for i = 1, #t4.messages do
+			local v71 = t4.messages[i]
+			local v72 = v65.messages:Get(v71.id)
+
+			if v72 then
+				if v66 then
+					v66.previousMessageId = v72.id
+				end
+
+				if v71.previousMessageId == nil and v72.previousMessageId ~= nil then
+					v71.previousMessageId = v72.previousMessageId
+				end
+
+				v71.read = v71.read or v72.read
+			elseif v71.isPreviewable and n1 < v71.sent:GetUnixTimestamp() then
+				previewMessageId = v71.id
+				n1 = v71.sent:GetUnixTimestamp()
+			end
+
+			v66 = v71
+		end
+
+		local v73 = Immutable.JoinDictionaries(v65, {
+			previewMessageId = previewMessageId
+		})
+		local v74 = OrderedMap.Insert(v73.messages, unpack(t4.messages))
+
+		if t4.exclusiveStartMessageId and #t4.messages > 0 and v74:Get(t4.exclusiveStartMessageId) then
+			local v75 = t4.messages[1]
+			local v76 = v74:Get(t4.exclusiveStartMessageId)
+
+			v74 = v74:Insert((Immutable.Set(v76, "previousMessageId", v75.id)))
+		end
+
+		local v77 = previewMessageId and (v74 and v74:Get(previewMessageId))
+		local lastUpdated = v73.lastUpdated
+
+		if v77 then
+			lastUpdated = (lastUpdated and lastUpdated:GetUnixTimestamp() or 0) < v77.sent:GetUnixTimestamp() and v77.sent or v73.lastUpdated
+		end
+
+		local v79 = t4.shouldMarkConversationUnread or v73.hasUnreadMessages
+		local v80 = Immutable.JoinDictionaries(v73, {
+			messages = v74,
+			lastUpdated = lastUpdated,
+			hasUnreadMessages = v79,
+			nextCursor = t4.nextCursor,
+			previousCursor = t4.previousCursor
+		})
+		local v81 = Immutable.Set(v80, "usersTyping", {})
+
+		return Immutable.Set(t3, v81.id, v81)
+	end
+
+	return t3
+end
+local function updateMessageContentToDisplay(t5: {[any]: any}, s3: string, s4: string, s5: string) -- line: 186
+	-- upvalues: Immutable (copy)
+	local v86 = t5[s3]
+
+	if v86 then
+		local v87 = v86.messages:Get(s4)
+
+		if v87 then
+			local v88 = Immutable.Set(v87, "contentToDisplay", s5)
+			local v89 = v86.messages:Insert(v88)
+			local v90 = Immutable.Set(v86, "messages", v89)
+
+			return Immutable.Set(t5, v90.id, v90)
+		end
+	end
+
+	return t5
+end
+local function messagesFromResponse(s6: string, p2) -- line: 206
+	-- upvalues: Functional (copy), MessageModel (copy)
+	if not p2 then
+		return {}
+	end
+
+	local id = nil
+
+	return (Functional.MapReverse(p2, function(p3) -- line: 213
+		-- upvalues: MessageModel (copy), s6 (copy), id (ref)
+		local v327 = MessageModel.fromWeb(p3, s6, id)
+
+		id = v327.id
+
+		return v327
+	end))
+end
+local function messagesFromResponseOfChannelsApi(s7: string, p4) -- line: 221
+	-- upvalues: MessageModel (copy)
+	if not p4 then
+		return {}
+	end
+
+	local id = nil
+	local t6 = {}
+
+	for i = #p4, 1, -1 do
+		local v99 = p4[i]
+		local v100 = MessageModel.fromChannelsApi(v99, s7, id)
+
+		if v100 then
+			table.insert(t6, v100)
+			id = v100.id
+		end
+	end
+
+	return t6
+end
+local function getMessagesFromConversationResponse(p5) -- line: 243
+	return p5.messages or {}
+end
+local function isMessageFromSelf(p6) -- line: 249
+	-- upvalues: Players (copy)
+	local v103 = p6 and p6[#p6] or nil
+
+	return not not v103 and (v103.senderTargetId == tostring(Players.LocalPlayer.UserId) or false)
+end
+local function getShouldMarkConversationUnread(p7, p8) -- line: 255
+	-- upvalues: Players (copy)
+	if not p7 or (not p7.messages or not p8) then
+		return false
+	end
+
+	local v106 = p7.messages.keys[#p7.messages.keys]
+	local v107 = p7.messages.values[v106]
+	local v108 = v107 and (not not v107.sent and v107.sent:GetUnixTimestamp()) or 0
+
+	for i = #p8, 1, -1 do
+		local v110 = p8[i]
+
+		if not v110 then
+			continue
+		end
+
+		if v108 >= v110.sent:GetUnixTimestamp() then
+			return false
+		end
+
+		if v110.senderTargetId ~= tostring(Players.LocalPlayer.UserId) and v110.isBadgeable then
+			return true
+		end
+	end
+
+	return false
+end
+
+return Rodux.createReducer({}, {
+	[ReceivedConversation.name] = function(p9, p10) -- line: 292
+		-- upvalues: updateConversationReducer (copy)
+		return updateConversationReducer(p9, p10.conversation)
+	end,
+	[NetworkingChat.StartGroupConversation.Succeeded.name] = function(p11, p12) -- line: 295
+		-- upvalues: Conversation (copy), updateConversationReducer (copy)
+		local responseBody = p12.responseBody
+		local v116 = Conversation.fromWeb(responseBody.conversation)
+
+		return updateConversationReducer(p11, v116)
+	end,
+	[NetworkingChat.StartOneToOneConversation.Succeeded.name] = function(p13, p14) -- line: 300
+		-- upvalues: Conversation (copy), updateConversationReducer (copy)
+		local responseBody = p14.responseBody
+		local v120 = Conversation.fromWeb(responseBody.conversation)
+
+		return updateConversationReducer(p13, v120)
+	end,
+	[AppChatNetworking.rodux.CreateConversation.Succeeded.name] = function(p15, p16) -- line: 305
+		-- upvalues: ConversationChannels (copy), updateConversationReducer (copy)
+		local responseBody = p16.responseBody
+
+		if responseBody and (responseBody.conversations and responseBody.conversations[1] and responseBody.conversations[1].status == "success") then
+			local v124 = ConversationChannels.fromChannelsApi(responseBody.conversations[1])
+
+			p15 = updateConversationReducer(p15, v124)
+		end
+
+		return p15
+	end,
+	[AppChatNetworking.rodux.DuplicateConversation.Succeeded.name] = function(p17, p18) -- line: 319
+		-- upvalues: ConversationChannels (copy), addConversation (copy)
+		local responseBody = p18.responseBody
+
+		if responseBody and (responseBody.conversations and responseBody.conversations[1]) then
+			local v128 = ConversationChannels.fromChannelsApi(responseBody.conversations[1])
+
+			p17 = addConversation(p17, v128)
+		end
+
+		return p17
+	end,
+	[ReceivedMessages.name] = function(p19, p20) -- line: 328
+		-- upvalues: addMessagesToConversation (copy)
+		return addMessagesToConversation(p19, p20.conversationId, p20)
+	end,
+	[SendingMessage.name] = function(p21, p22) -- line: 331
+		-- upvalues: OrderedMap (copy), Immutable (copy)
+		local v133 = p21[p22.conversationId]
+
+		if v133 then
+			local v134 = OrderedMap.Insert(v133.sendingMessages, p22.message)
+			local v135 = Immutable.Set(v133, "sendingMessages", v134)
+
+			p21 = Immutable.Set(p21, v135.id, v135)
+		end
+
+		return p21
+	end,
+	[SentMessage.name] = function(p23, p24) -- line: 342
+		-- upvalues: OrderedMap (copy), Immutable (copy)
+		local v138 = p23[p24.conversationId]
+
+		if v138 then
+			local v139 = OrderedMap.Delete(v138.sendingMessages, p24.messageId)
+			local v140 = Immutable.Set(v138, "sendingMessages", v139)
+
+			p23 = Immutable.Set(p23, v140.id, v140)
+		end
+
+		return p23
+	end,
+	[RenamedGroupConversation.name] = function(p25, p26) -- line: 353
+		-- upvalues: Immutable (copy)
+		local conversationId = p26.conversationId
+		local v144 = p25[conversationId]
+
+		if v144 then
+			local v145 = Immutable.JoinDictionaries(v144, {
+				lastUpdated = p26.lastUpdated,
+				title = p26.title,
+				isDefaultTitle = p26.isDefaultTitle
+			})
+
+			p25 = Immutable.Set(p25, conversationId, v145)
+		end
+
+		return p25
+	end,
+	[HasUnreadMessages.name] = function(p27, p28) -- line: 368
+		-- upvalues: Immutable (copy)
+		local v148 = p28.conversation and p27[p28.conversation.id]
+
+		if v148 then
+			local v149 = Immutable.Set(v148, "hasUnreadMessages", true)
+
+			p27 = Immutable.Set(p27, p28.conversation.id, v149)
+		end
+
+		return p27
+	end,
+	[ChangedParticipants.name] = function(p29, p30) -- line: 377
+		-- upvalues: Immutable (copy)
+		local conversationId = p30.conversationId
+		local participants = p30.participants
+		local v154 = p29[conversationId]
+
+		if v154 then
+			local v155 = Immutable.JoinDictionaries(v154, {
+				participants = participants,
+				lastUpdated = p30.lastUpdated,
+				title = p30.title
+			})
+
+			p29 = Immutable.Set(p29, conversationId, v155)
+		end
+
+		return p29
+	end,
+	[RemovedConversation.name] = function(p31, p32) -- line: 393
+		-- upvalues: Immutable (copy)
+		local conversationId = p32.conversationId
+
+		return Immutable.Set(p31, conversationId, nil)
+	end,
+	[SetUserTyping.name] = function(p33, p34) -- line: 397
+		-- upvalues: Immutable (copy)
+		local v161 = p33[p34.conversationId]
+
+		if v161 then
+			local usersTyping = v161.usersTyping
+			local v163 = Immutable.Set(usersTyping, p34.userId, p34.value)
+			local v164 = Immutable.Set(v161, "usersTyping", v163)
+
+			p33 = Immutable.Set(p33, v164.id, v164)
+		end
+
+		return p33
+	end,
+	[FetchingOlderMessages.name] = function(p35, p36) -- line: 408
+		-- upvalues: Immutable (copy)
+		local v167 = p35[p36.conversationId]
+
+		if v167 then
+			local v168 = Immutable.Set(v167, "fetchingOlderMessages", p36.fetchingOlderMessages)
+
+			p35 = Immutable.Set(p35, v168.id, v168)
+		end
+
+		return p35
+	end,
+	[FetchedOldestMessage.name] = function(p37, p38) -- line: 417
+		-- upvalues: Immutable (copy)
+		local v171 = p37[p38.conversationId]
+
+		if v171 then
+			local v172 = Immutable.Set(v171, "fetchedOldestMessage", p38.fetchedOldestMessage)
+
+			return Immutable.Set(p37, v172.id, v172)
+		end
+
+		return p37
+	end,
+	[ReadConversation.name] = function(p39, p40) -- line: 426
+		-- upvalues: markConversationAndMessagesAsRead (copy)
+		return (markConversationAndMessagesAsRead(p39, p40.conversationId))
+	end,
+	[MessageModerated.name] = function(p41, p42) -- line: 429
+		-- upvalues: Immutable (copy)
+		local v177 = p41[p42.conversationId]
+
+		if v177 then
+			local v178 = v177.sendingMessages:Get(p42.messageId)
+
+			if v178 then
+				local v179 = Immutable.Set(v178, "moderated", true)
+				local v180 = v177.sendingMessages:Insert(v179)
+				local v181 = Immutable.Set(v177, "sendingMessages", v180)
+
+				p41 = Immutable.Set(p41, v181.id, v181)
+			end
+		end
+
+		return p41
+	end,
+	[MessageFailedToSend.name] = function(p43, p44) -- line: 443
+		-- upvalues: Immutable (copy)
+		local v184 = p43[p44.conversationId]
+
+		if v184 then
+			local v185 = v184.sendingMessages:Get(p44.messageId)
+
+			if v185 then
+				local v186 = Immutable.Set(v185, "failed", true)
+				local v187 = v184.sendingMessages:Insert(v186)
+				local v188 = Immutable.Set(v184, "sendingMessages", v187)
+
+				p43 = Immutable.Set(p43, v188.id, v188)
+			end
+		end
+
+		return p43
+	end,
+	[SetConversationLoadingStatus.name] = function(p45, p46) -- line: 457
+		-- upvalues: Immutable (copy)
+		local v191 = p45[p46.conversationId]
+
+		if v191 then
+			local v192 = Immutable.Set(v191, "initialLoadingStatus", p46.value)
+
+			return Immutable.Set(p45, v192.id, v192)
+		end
+
+		return p45
+	end,
+	[SetUserLeavingConversation.name] = function(p47, p48) -- line: 466
+		-- upvalues: Immutable (copy)
+		local v195 = p47[p48.id]
+
+		if v195 then
+			local v196 = Immutable.Set(v195, "isUserLeaving", p48.isLeaving)
+
+			p47 = Immutable.Set(p47, v196.id, v196)
+		end
+
+		return p47
+	end,
+	[SetPinnedGameForConversation.name] = function(p49, p50) -- line: 474
+		-- upvalues: Immutable (copy)
+		local conversationId = p50.conversationId
+		local v200 = p49[conversationId]
+
+		if v200 then
+			local t7 = {
+				rootPlaceId = p50.rootPlaceId,
+				universeId = p50.universeId
+			}
+			local v202 = Immutable.JoinDictionaries(v200, {
+				pinnedGame = t7
+			})
+
+			p49 = Immutable.Set(p49, conversationId, v202)
+		end
+
+		return p49
+	end,
+	[NetworkingChat.GetUserConversations.Succeeded.name] = function(p51, p52) -- line: 492
+		-- upvalues: Conversation (copy), updateConversationReducer (copy)
+		local responseBody = p52.responseBody
+
+		for _, v in ipairs(responseBody) do
+			local v208 = Conversation.fromWeb(v)
+
+			p51 = updateConversationReducer(p51, v208)
+		end
+
+		return p51
+	end,
+	[AppChatNetworking.rodux.GetUserConversations.Succeeded.name] = function(p53, p54) -- line: 501
+		-- upvalues: ConversationChannels (copy), updateConversationReducer (copy), LuauPolyfill (copy), MessageModel (copy), addMessagesToConversation (copy)
+		local responseBody = p54.responseBody
+
+		if responseBody and responseBody.conversations then
+			for _, v213 in responseBody.conversations do
+				local v214 = ConversationChannels.fromChannelsApi(v213)
+
+				p53 = updateConversationReducer(p53, v214)
+
+				local v215 = v213.messages or {}
+
+				if v215 and #v215 > 0 then
+					local t8 = {
+						messages = LuauPolyfill.Array.map(v215, function(p55) -- line: 511
+							-- upvalues: MessageModel (copy), v214 (copy)
+							return MessageModel.fromChannelsApi(p55, v214.id)
+						end)
+					}
+
+					p53 = addMessagesToConversation(p53, v214.id, t8)
+				end
+			end
+		end
+
+		return p53
+	end,
+	[NetworkingChat.GetConversations.Succeeded.name] = function(p56, p57) -- line: 526
+		-- upvalues: Conversation (copy), updateConversationReducer (copy)
+		local responseBody = p57.responseBody
+
+		for _, v in ipairs(responseBody) do
+			local v222 = Conversation.fromWeb(v)
+
+			p56 = updateConversationReducer(p56, v222)
+		end
+
+		return p56
+	end,
+	[AppChatNetworking.rodux.GetOlderMessages.Succeeded.name] = function(p58, p59) -- line: 535
+		-- upvalues: messagesFromResponseOfChannelsApi (copy), addMessagesToConversation (copy), Immutable (copy)
+		local conversation_id = p59.queryArgs.conversation_id
+		local responseBody = p59.responseBody
+		local v227 = p58[conversation_id]
+
+		if not v227 then
+			return p58
+		end
+
+		assert(v227, "FFlagLuauTinyControlFlowAnalysis")
+
+		local v228 = v227.previousCursor or nil
+		local v229 = v227.nextCursor or nil
+
+		if not responseBody then
+			return p58
+		end
+
+		local v230 = messagesFromResponseOfChannelsApi(conversation_id, responseBody.messages)
+		local v231 = if responseBody.next_cursor ~= "" then responseBody.next_cursor else nil
+
+		if v231 then
+			v229 = v231
+		end
+
+		if v228 == nil then
+			v228 = if responseBody.previous_cursor ~= "" then responseBody.previous_cursor else nil
+		end
+
+		local t9 = {
+			messages = v230,
+			nextCursor = v229,
+			previousCursor = v228
+		}
+		local v233 = addMessagesToConversation(p58, conversation_id, t9)
+
+		if not v231 then
+			local v234 = v233[conversation_id]
+
+			if v234 then
+				local v235 = Immutable.Set(v234, "fetchedOldestMessage", true)
+
+				v233 = Immutable.Set(v233, v235.id, v235)
+			end
+		end
+
+		return v233
+	end,
+	[AppChatNetworking.rodux.GetNewerMessages.Succeeded.name] = function(p60, p61) -- line: 588
+		-- upvalues: messagesFromResponseOfChannelsApi (copy), getShouldMarkConversationUnread (copy), addMessagesToConversation (copy)
+		local conversation_id = p61.queryArgs.conversation_id
+		local responseBody = p61.responseBody
+		local v240 = p60[conversation_id]
+
+		if not v240 then
+			return p60
+		end
+
+		assert(v240, "FFlagLuauTinyControlFlowAnalysis")
+
+		local v241 = v240.previousCursor or nil
+		local v242 = v240.nextCursor or nil
+
+		if not responseBody then
+			return p60
+		end
+
+		local v243 = messagesFromResponseOfChannelsApi(conversation_id, responseBody.messages)
+
+		if v242 == nil then
+			v242 = if responseBody.next_cursor ~= "" then responseBody.next_cursor else nil
+		end
+
+		local v244 = if responseBody.previous_cursor ~= "" then responseBody.previous_cursor else nil
+
+		if v244 then
+			v241 = v244
+		end
+
+		local v245 = getShouldMarkConversationUnread(v240, v243)
+		local t10 = {
+			messages = v243,
+			nextCursor = v242,
+			previousCursor = v241,
+			shouldMarkConversationUnread = v245
+		}
+
+		return (addMessagesToConversation(p60, conversation_id, t10))
+	end,
+	[NetworkingChat.GetMessages.Succeeded.name] = function(p62, p63) -- line: 630
+		-- upvalues: Functional (copy), MessageModel (copy), Players (copy), addMessagesToConversation (copy), Immutable (copy)
+		local conversationId = p63.queryArgs.conversationId
+		local responseBody = p63.responseBody
+		local t11
+
+		if not responseBody then
+			t11 = {}
+		else
+			local id = nil
+
+			t11 = Functional.MapReverse(responseBody, function(p64) -- line: 213
+				-- upvalues: MessageModel (copy), conversationId (copy), id (ref)
+				local v330 = MessageModel.fromWeb(p64, conversationId, id)
+
+				id = v330.id
+
+				return v330
+			end)
+		end
+
+		local t12 = {
+			messages = t11
+		}
+		local v254 = t11 and t11[#t11] or nil
+
+		t12.shouldMarkConversationUnread = not (not not v254 and (v254.senderTargetId == tostring(Players.LocalPlayer.UserId) or false))
+
+		local v255 = addMessagesToConversation(p62, conversationId, t12)
+		local pageSize = p63.queryArgs.pageSize
+
+		if pageSize and pageSize > #t11 then
+			local v257 = v255[conversationId]
+
+			if not v257 then
+				return v255
+			end
+
+			assert(v257, "FFlagLuauTinyControlFlowAnalysis")
+
+			local v258 = v255[conversationId]
+
+			if v258 then
+				local v259 = Immutable.Set(v258, "fetchedOldestMessage", true)
+
+				v255 = Immutable.Set(v255, v259.id, v259)
+			end
+		end
+
+		return v255
+	end,
+	[NetworkingChat.GetLatestMessages.Succeeded.name] = function(p65, p66) -- line: 656
+		-- upvalues: Functional (copy), MessageModel (copy), addMessagesToConversation (copy)
+		local responseBody = p66.responseBody
+
+		for _, v in ipairs(responseBody) do
+			local str = tostring(v.conversationId)
+			local chatMessages = v.chatMessages
+			local t13
+
+			if not chatMessages then
+				t13 = {}
+			else
+				local id = nil
+
+				t13 = Functional.MapReverse(chatMessages, function(p67) -- line: 213
+					-- upvalues: MessageModel (copy), str (copy), id (ref)
+					local v332 = MessageModel.fromWeb(p67, str, id)
+
+					id = v332.id
+
+					return v332
+				end)
+			end
+
+			local t14 = {
+				messages = t13
+			}
+
+			p65 = addMessagesToConversation(p65, str, t14)
+		end
+
+		return p65
+	end,
+	[AppChatNetworking.rodux.GetConversationDetails.Succeeded.name] = function(p68, p69) -- line: 668
+		-- upvalues: ConversationChannels (copy), updateConversationReducer (copy), LuauPolyfill (copy), MessageModel (copy), addMessagesToConversation (copy)
+		local v272 = p69.responseBody.conversations[1]
+
+		if not v272 then
+			return p68
+		end
+
+		local v273 = ConversationChannels.fromChannelsApi(v272)
+		local v274 = updateConversationReducer(p68, v273)
+		local v275 = v272.messages or {}
+
+		if v275 and #v275 > 0 then
+			local t15 = {
+				messages = LuauPolyfill.Array.map(v275, function(p70) -- line: 682
+					-- upvalues: MessageModel (copy), v273 (copy)
+					return MessageModel.fromChannelsApi(p70, v273.id)
+				end)
+			}
+
+			v274 = addMessagesToConversation(v274, v273.id, t15)
+		end
+
+		return v274
+	end,
+	[AppChatNetworking.rodux.MultiGetConversationDetails.Succeeded.name] = function(p71, p72) -- line: 695
+		-- upvalues: ConversationChannels (copy), updateConversationReducer (copy), LuauPolyfill (copy), MessageModel (copy), addMessagesToConversation (copy)
+		local responseBody = p72.responseBody
+
+		if not responseBody or not responseBody.conversations then
+			return p71
+		end
+
+		for _, v281 in responseBody.conversations do
+			local v282 = ConversationChannels.fromChannelsApi(v281)
+
+			p71 = updateConversationReducer(p71, v282)
+
+			local v283 = v281.messages or {}
+
+			if v283 and #v283 > 0 then
+				local t16 = {
+					messages = LuauPolyfill.Array.map(v283, function(p73) -- line: 707
+						-- upvalues: MessageModel (copy), v282 (copy)
+						return MessageModel.fromChannelsApi(p73, v282.id)
+					end)
+				}
+
+				p71 = addMessagesToConversation(p71, v282.id, t16)
+			end
+		end
+
+		return p71
+	end,
+	[AppChatNetworking.rodux.MarkConversation.Succeeded.name] = function(p74, p75) -- line: 720
+		-- upvalues: markConversationAndMessagesAsRead (copy)
+		local v287 = p75.postBody.conversation_ids[1]
+
+		return (markConversationAndMessagesAsRead(p74, v287))
+	end,
+	[NetworkingChat.MarkAsRead.Succeeded.name] = function(p76, p77) -- line: 724
+		-- upvalues: markConversationAndMessagesAsRead (copy)
+		local conversationId = p77.postBody.conversationId
+
+		return (markConversationAndMessagesAsRead(p76, conversationId))
+	end,
+	[AppChatNetworking.rodux.TranslateUserMessage.Succeeded.name] = if not getFFlagAppChatEnableManualTranslation() then nil else function(p78, p79) -- line: 729
+		-- upvalues: updateMessageContentToDisplay (copy)
+		local content_to_display = p79.responseBody.content_to_display
+
+		if p79.postBody.conversation_id and p79.postBody.message_id then
+			return updateMessageContentToDisplay(p78, p79.postBody.conversation_id, p79.postBody.message_id, content_to_display)
+		end
+
+		return p78
+	end,
+	[ReceivedChannelsMigrationConflict.name] = function(_, _) -- line: 745
+		return {}
+	end,
+	[FriendConversationCreated.name] = function(p82, p83) -- line: 748
+		-- upvalues: Immutable (copy)
+		if p82[p83.oldFriendConversationId] then
+			return Immutable.Set(p82, p83.oldFriendConversationId, nil)
+		end
+
+		return p82
+	end,
+	[FriendshipDestroyed.name] = function(p84, p85) -- line: 755
+		-- upvalues: ConversationChannels (copy), Immutable (copy)
+		local v300 = if p85.userId1 == "localUserId" then if p85.userId2 == "localUserId" then nil else p85.userId2 else p85.userId1
+
+		if not v300 then
+			return p84
+		end
+
+		assert(v300, "FFlagLuauTinyControlFlowAnalysis")
+
+		local v301 = ConversationChannels.getFriendConversationId({ v300 })
+
+		if p84[v301] then
+			return Immutable.Set(p84, v301, nil)
+		end
+
+		return p84
+	end,
+	[NetworkingBlocking.BlockUserById.Succeeded.name] = if not getFFlagAppChatPCMFixBlocking() then nil else function(p86, p87) -- line: 773
+		-- upvalues: getOneToOneConversationIdFromFriendId (copy), Immutable (copy), ConversationChannels (copy)
+		local str = tostring(p87.namedIds.users)
+
+		if not str then
+			return p86
+		end
+
+		local v305 = getOneToOneConversationIdFromFriendId(p86, str)
+		local v306 = p86
+
+		if v305 and p86[v305] then
+			v306 = Immutable.Set(v306, v305, nil)
+		end
+
+		local v307 = ConversationChannels.getFriendConversationId({ str })
+
+		if v307 and p86[v307] then
+			v306 = Immutable.Set(p86, v307, nil)
+		end
+
+		return v306
+	end,
+	[ReloadedMessagesForConversations.name] = function(t17: {[any]: any}, p88) -- line: 796
+		-- upvalues: Cryo (copy), ConversationChannels (copy)
+		for _, v311 in p88.conversationIds do
+			local v312 = t17[v311]
+
+			t17 = Cryo.Dictionary.join(t17, {
+				[v311] = Cryo.Dictionary.join(v312, {
+					fetchedOldestMessage = false,
+					messages = ConversationChannels.getEmptyMessages(),
+					sendingMessages = ConversationChannels.getEmptySendingMessages(),
+					previousCursor = Cryo.None,
+					nextCursor = Cryo.None
+				})
+			})
+		end
+
+		return t17
+	end,
+	[ConversationModerationTypeChanged.name] = if not FFlagAppChatEnableDoubleOptIn then nil else function(p89, p90) -- line: 816
+		-- upvalues: Immutable (copy)
+		local conversationId = p90.conversationId
+		local moderationType = p90.moderationType
+		local v317 = p89[conversationId]
+
+		if v317 then
+			local v318 = Immutable.Set(v317, "moderationType", moderationType)
+
+			return Immutable.Set(p89, conversationId, v318)
+		end
+
+		return p89
+	end,
+	[AppChatNetworking.rodux.RecordModalSequenceResponse.Succeeded.name] = function(p91, p92) -- line: 827
+		-- upvalues: Constants (copy), t1 (copy), ConversationChannels (copy), Immutable (copy)
+		local postBody = p92.postBody
+
+		if postBody.action_type ~= Constants.ModalAction.Accept then
+			return p91
+		end
+
+		local v322 = t1[postBody.modal_variant]
+
+		if not v322 then
+			return p91
+		end
+
+		local v323 = postBody.conversation_id or ConversationChannels.getFriendConversationId({ postBody.friend_id })
+		local v324 = v323 and p91[v323]
+
+		if not v324 then
+			return p91
+		end
+
+		return Immutable.Set(p91, v323, Immutable.Set(v324, v322.field, v322.value))
+	end
+})

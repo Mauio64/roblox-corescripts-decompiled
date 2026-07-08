@@ -1,14 +1,16 @@
-local v0 = require(script.Parent.fmtArgs);
-return function(v1, v2) --[[ Line: 4 ]]
-    -- upvalues: v0 (copy)
-    if v1.n ~= v2.n then
-        return false, "number of args in " .. v0(v2) .. " does not match number of predicates";
-    else
-        for v3 = 1, v2.n do
-            if not v1[v3](v2[v3]) then
-                return false, v0(v2) .. " does not match predicates at position " .. v3;
-            end;
-        end;
-        return true;
-    end;
-end;
+local fmtArgs = require(script.Parent.fmtArgs)
+
+return function(p1, p2) -- line: 4
+	-- upvalues: fmtArgs (copy)
+	if p1.n ~= p2.n then
+		return false, "number of args in " .. fmtArgs(p2) .. " does not match number of predicates"
+	end
+
+	for i = 1, p2.n do
+		if not p1[i](p2[i]) then
+			return false, fmtArgs(p2) .. " does not match predicates at position " .. i
+		end
+	end
+
+	return true
+end

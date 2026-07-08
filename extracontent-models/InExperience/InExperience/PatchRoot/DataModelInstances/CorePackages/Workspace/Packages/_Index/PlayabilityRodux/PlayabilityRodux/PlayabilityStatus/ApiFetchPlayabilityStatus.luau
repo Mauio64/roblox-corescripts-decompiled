@@ -1,61 +1,72 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlayabilityRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local v3 = require(l_Parent_0.Result);
-local l_PerformFetch_0 = require(l_Parent_0.Http).PerformFetch;
-local v5 = require(l_script_FirstAncestor_0.PlayabilityStatus.GamesMultigetPlayabilityStatus);
-local v6 = require(l_script_FirstAncestor_0.PlayabilityStatus.SetPlayabilityStatus);
-local v7 = require(l_script_FirstAncestor_0.PlayabilityStatus.PlayabilityStatusModel);
-local v8 = require(l_script_FirstAncestor_0.Logger);
-local function v10(v9) --[[ Line: 15 ]] --[[ Name: keyMapper ]]
-    return "luaapp.gamesapi.playabilitystatus." .. v9;
-end;
+local PlayabilityRodux = script:FindFirstAncestor("PlayabilityRodux")
+local PlayabilityRoduxParent = PlayabilityRodux.Parent
+local Promise = require(PlayabilityRoduxParent.Promise)
+local Result = require(PlayabilityRoduxParent.Result)
+local PerformFetch = require(PlayabilityRoduxParent.Http).PerformFetch
+local GamesMultigetPlayabilityStatus = require(PlayabilityRodux.PlayabilityStatus.GamesMultigetPlayabilityStatus)
+local SetPlayabilityStatus = require(PlayabilityRodux.PlayabilityStatus.SetPlayabilityStatus)
+local PlayabilityStatusModel = require(PlayabilityRodux.PlayabilityStatus.PlayabilityStatusModel)
+local Logger = require(PlayabilityRodux.Logger)
+
+local function keyMapper(p1) -- line: 15
+	return "luaapp.gamesapi.playabilitystatus." .. p1
+end
+
 return {
-    KeyMapper = v10, 
-    Fetch = function(v11, v12) --[[ Line: 23 ]] --[[ Name: Fetch ]]
-        -- upvalues: l_PerformFetch_0 (copy), v10 (copy), v5 (copy), v3 (copy), v7 (copy), v6 (copy), v8 (copy), v2 (copy)
-        assert(type(v12) == "table", "ApiFetchPlayabilityStatus thunk expects universeIds to be a table");
-        assert(#v12 > 0, "ApiFetchPlayabilityStatus thunk expects universeIds count to be greater than 0");
-        assert(#v12 <= 100, "ApiFetchPlayabilityStatus thunk expects universeIds count to not exceed " .. 100);
-        return l_PerformFetch_0.Batch(v12, v10, function(v13, v14) --[[ Line: 31 ]]
-            -- upvalues: v5 (ref), v11 (copy), v3 (ref), v7 (ref), v6 (ref), v8 (ref), v2 (ref)
-            return v5(v11, v14):andThen(function(v15) --[[ Line: 32 ]]
-                -- upvalues: v14 (copy), v3 (ref), v7 (ref), v13 (copy), v6 (ref), v8 (ref), v2 (ref)
-                local v16 = {};
-                for _, v18 in ipairs(v14) do
-                    v16["luaapp.gamesapi.playabilitystatus." .. v18] = v3.new(false, nil);
-                end;
-                local v19 = v15 and v15.responseBody;
-                if v19 ~= nil then
-                    local v20 = {};
-                    for _, v22 in pairs(v19) do
-                        v7.fromJsonData(v22):match(function(v23) --[[ Line: 45 ]]
-                            -- upvalues: v20 (copy), v16 (copy), v22 (copy), v3 (ref)
-                            v20[v23.universeId] = v23;
-                            v16["luaapp.gamesapi.playabilitystatus." .. tostring(v22.universeId)] = v3.new(true, nil);
-                        end):matchError(function(v24) --[[ Line: 49 ]]
-                            warn(v24);
-                        end);
-                    end;
-                    if next(v20) then
-                        v13:dispatch(v6(v20));
-                    end;
-                else
-                    v8:warning("Response from GameGetVotes is malformed!");
-                end;
-                return v2.resolve(v16);
-            end, function(_) --[[ Line: 62 ]]
-                -- upvalues: v14 (copy), v3 (ref), v2 (ref)
-                local v26 = {};
-                for _, v28 in ipairs(v14) do
-                    v26["luaapp.gamesapi.playabilitystatus." .. v28] = v3.new(false, nil);
-                end;
-                return v2.resolve(v26);
-            end);
-        end);
-    end, 
-    GetFetchingStatus = function(v29, v30) --[[ Line: 72 ]] --[[ Name: GetFetchingStatus ]]
-        -- upvalues: l_PerformFetch_0 (copy)
-        return l_PerformFetch_0.GetStatus(v29, "luaapp.gamesapi.playabilitystatus." .. v30);
-    end
-};
+	KeyMapper = keyMapper,
+	Fetch = function(p2, p3) -- line: 23
+		-- upvalues: PerformFetch (copy), keyMapper (copy), GamesMultigetPlayabilityStatus (copy), Result (copy), PlayabilityStatusModel (copy), SetPlayabilityStatus (copy), Logger (copy), Promise (copy)
+		assert(type(p3) == "table", "ApiFetchPlayabilityStatus thunk expects universeIds to be a table")
+		assert(#p3 > 0, "ApiFetchPlayabilityStatus thunk expects universeIds count to be greater than 0")
+		assert(#p3 <= 100, "ApiFetchPlayabilityStatus thunk expects universeIds count to not exceed " .. 100)
+
+		return PerformFetch.Batch(p3, keyMapper, function(p4, p5) -- line: 31
+			-- upvalues: GamesMultigetPlayabilityStatus (copy), p2 (copy), Result (copy), PlayabilityStatusModel (copy), SetPlayabilityStatus (copy), Logger (copy), Promise (copy)
+			return GamesMultigetPlayabilityStatus(p2, p5):andThen(function(p6) -- line: 32
+				-- upvalues: p5 (copy), Result (copy), PlayabilityStatusModel (copy), p4 (copy), SetPlayabilityStatus (copy), Logger (copy), Promise (copy)
+				local t1 = {}
+
+				for _, v in ipairs(p5) do
+					t1["luaapp.gamesapi.playabilitystatus." .. v] = Result.new(false, nil)
+				end
+
+				local v22 = p6 and p6.responseBody
+
+				if v22 ~= nil then
+					local t2 = {}
+
+					for _, v in pairs(v22) do
+						PlayabilityStatusModel.fromJsonData(v):match(function(p7) -- line: 45
+							-- upvalues: t2 (copy), t1 (copy), v (copy), Result (copy)
+							t2[p7.universeId] = p7
+							t1["luaapp.gamesapi.playabilitystatus." .. tostring(v.universeId)] = Result.new(true, nil)
+						end):matchError(function(p8) -- line: 49
+							warn(p8)
+						end)
+					end
+
+					if next(t2) then
+						p4:dispatch(SetPlayabilityStatus(t2))
+					end
+				else
+					Logger:warning("Response from GameGetVotes is malformed!")
+				end
+
+				return Promise.resolve(t1)
+			end, function(_) -- line: 62
+				-- upvalues: p5 (copy), Result (copy), Promise (copy)
+				local t3 = {}
+
+				for _, v in ipairs(p5) do
+					t3["luaapp.gamesapi.playabilitystatus." .. v] = Result.new(false, nil)
+				end
+
+				return Promise.resolve(t3)
+			end)
+		end)
+	end,
+	GetFetchingStatus = function(p10, p11) -- line: 72
+		-- upvalues: PerformFetch (copy)
+		return PerformFetch.GetStatus(p10, "luaapp.gamesapi.playabilitystatus." .. p11)
+	end
+}

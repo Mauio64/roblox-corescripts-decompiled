@@ -1,1 +1,1 @@
-return game:DefineFastInt("LuaAppSmallScreenDesignWidth", 960);
+return game:DefineFastInt("LuaAppSmallScreenDesignWidth", 960)

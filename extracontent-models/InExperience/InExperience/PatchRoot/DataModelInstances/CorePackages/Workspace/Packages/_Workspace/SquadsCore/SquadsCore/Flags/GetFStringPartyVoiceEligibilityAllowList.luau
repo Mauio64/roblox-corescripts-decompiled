@@ -1,4 +1,5 @@
-game:DefineFastString("PartyVoiceEligibilityAllowList", "");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("PartyVoiceEligibilityAllowList");
-end;
+game:DefineFastString("PartyVoiceEligibilityAllowList", "")
+
+return function() -- line: 3
+	return game:GetFastString("PartyVoiceEligibilityAllowList")
+end

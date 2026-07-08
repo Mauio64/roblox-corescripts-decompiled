@@ -89,7 +89,7 @@ function v17.setRotation(p6) -- line: 94
 
 	if model then
 		local HumanoidRootPart = model.HumanoidRootPart
-		local v27 = p6.initialHrpPosition or HumanoidRootPart.Position
+		local v28 = p6.initialHrpPosition or HumanoidRootPart.Position
 		local defaultCameraOffset
 
 		if FFlagEnableNewAvatarViewportProps and p6.props.offsetOptions then
@@ -100,18 +100,18 @@ function v17.setRotation(p6) -- line: 94
 			end
 		else
 			local view = p6.props.view
-			local v30 = p6.props.views[view]
+			local v31 = p6.props.views[view]
 
-			defaultCameraOffset = v30.DefaultCameraOffset
+			defaultCameraOffset = v31.DefaultCameraOffset
 
 			if p6.model:FindFirstChildOfClass("Tool") then
-				defaultCameraOffset = v30.ToolOffset
+				defaultCameraOffset = v31.ToolOffset
 			end
 		end
 
-		local p = (CFrame.new(v27) * CFrame.Angles(0, -p6.yRotation, 0) * CFrame.Angles(p6.xRotation, 0, 0) * defaultCameraOffset).p
+		local p = (CFrame.new(v28) * CFrame.Angles(0, -p6.yRotation, 0) * CFrame.Angles(p6.xRotation, 0, 0) * defaultCameraOffset).p
 
-		p6.viewportCamera.CFrame = CFrame.new(p, v27)
+		p6.viewportCamera.CFrame = CFrame.new(p, v28)
 
 		if FFlagEnableNewAvatarViewportProps and p6.props.cameraFieldOfView then
 			p6.viewportCamera.FieldOfView = p6.props.cameraFieldOfView
@@ -150,18 +150,18 @@ function v17.render(p7) -- line: 135
 					setScrollingEnabled(false)
 				end
 
-				local v52 = UserInputService.InputChanged:connect(function(p10, _) -- line: 166
+				local v53 = UserInputService.InputChanged:connect(function(p10, _) -- line: 166
 					-- upvalues: p7 (copy)
 					if p10.UserInputType == Enum.UserInputType.MouseMovement and p7.mouseOrTouchDown or p10.UserInputType == Enum.UserInputType.Touch then
-						local v65 = p10.Position - p7.lastPosition
+						local v67 = p10.Position - p7.lastPosition
 
 						p7.lastPosition = p10.Position
-						p7.yRotation = p7.yRotation + v65.x * 0.0065
-						p7.xRotation = p7.xRotation + v65.y * 0.0065
+						p7.yRotation = p7.yRotation + v67.x * 0.0065
+						p7.xRotation = p7.xRotation + v67.y * 0.0065
 						p7.lastInputTime = tick()
 					end
 				end)
-				local v53 = UserInputService.InputEnded:connect(function(p12, _) -- line: 179
+				local v54 = UserInputService.InputEnded:connect(function(p12, _) -- line: 179
 					-- upvalues: p7 (copy), FFlagEnableNewAvatarViewportProps (copy), setScrollingEnabled (copy)
 					if p12.UserInputType == Enum.UserInputType.MouseButton1 or p12.UserInputType == Enum.UserInputType.Touch then
 						if p7.mouseOrTouchDown then
@@ -182,8 +182,8 @@ function v17.render(p7) -- line: 135
 					end
 				end)
 
-				table.insert(p7.connections, v52)
 				table.insert(p7.connections, v53)
+				table.insert(p7.connections, v54)
 			end
 		end
 	}, {
@@ -194,51 +194,72 @@ function v17.render(p7) -- line: 135
 end
 function v17.handleSpin(p14) -- line: 214
 	-- upvalues: FFlagEnableNewAvatarViewportProps (copy), RunService (copy)
-	local u39 = false
+	local u40 = false
 
 	spawn(function() -- line: 216
-		-- upvalues: p14 (copy), FFlagEnableNewAvatarViewportProps (copy), u39 (ref), RunService (copy)
-		local g56 = nil
-		local v57 = nil
+		-- upvalues: p14 (copy), FFlagEnableNewAvatarViewportProps (copy), u40 (ref), RunService (copy)
+		local g58 = nil
+		local v59 = nil
 
 		while p14.isMounted do
 			if tick() - p14.lastInputTime > 2 and not p14.mouseOrTouchDown and not p14.gamepadRotating then
 				if not FFlagEnableNewAvatarViewportProps or not p14.props.disableAutoRotation then
-					u39 = true
+					u40 = true
 				end
 			else
-				u39 = false
+				u40 = false
 			end
 
-			if u39 then
-				local v54 = p14
-				local v55 = p14.xRotation % 6.283185307179586
+			local function returnToDefaultPosition(p15, p16) -- line: 231
+				local v72 = p15 % 6.283185307179586
+				local v73
+
+				if v72 > 3.141592653589793 then
+					v73 = v72 + p16
+
+					if v73 > 6.283185307179586 then
+						return 0
+					end
+				else
+					v73 = v72 - p16
+
+					if v73 < 0 then
+						return 0
+					end
+				end
+
+				return v73
+			end
+
+			if u40 then
+				local v56 = p14
+				local v57 = p14.xRotation % 6.283185307179586
 
 				repeat
-					if not g56 and v55 > 3.141592653589793 then
-						v57 = v55 + 0.03490658503988659
+					if not g58 and v57 > 3.141592653589793 then
+						v59 = v57 + 0.03490658503988659
 
-						if not (v57 > 6.283185307179586) then
-							g56 = true
+						if not (v59 > 6.283185307179586) then
+							g58 = true
 						end
 
-						if not g56 then
-							v57 = 0
+						if not g58 then
+							v59 = 0
 						end
 					else
-						if not g56 then
-							v57 = v55 - 0.03490658503988659
+						if not g58 then
+							v59 = v57 - 0.03490658503988659
 						end
 
-						if not g56 and v57 < 0 then
-							v57 = 0
+						if not g58 and v59 < 0 then
+							v59 = 0
 						else
-							g56 = false
+							g58 = false
 						end
 					end
-				until not g56
+				until not g58
 
-				v54.xRotation = v57
+				v56.xRotation = v59
 				p14.yRotation = p14.yRotation + 0.012217304763960306
 			elseif p14.gamepadRotating then
 				p14.yRotation = p14.yRotation + p14.delta * p14.rotationDeltaY
@@ -250,7 +271,7 @@ function v17.handleSpin(p14) -- line: 214
 		end
 	end)
 end
-function v17.setUpGamepad(p15) -- line: 261
+function v17.setUpGamepad(p17) -- line: 261
 	-- upvalues: isInExperienceUIVREnabled (copy), FFlagEnableInExperienceUIPCVRFix (copy), isSpatial (copy), FFlagEnableInspectAndBuyV2RootFlag (copy), UserInputService (copy), ContextActionService (copy)
 	if isInExperienceUIVREnabled and (FFlagEnableInExperienceUIPCVRFix and isSpatial() and FFlagEnableInspectAndBuyV2RootFlag) then
 		return
@@ -260,19 +281,19 @@ function v17.setUpGamepad(p15) -- line: 261
 		local vector2 = Vector2.new(0, 0)
 
 		ContextActionService:UnbindCoreAction("RotateModel")
-		ContextActionService:BindCoreAction("RotateModel", function(_, p17, p18) -- line: 277
-			-- upvalues: vector2 (ref), p15 (copy)
-			if p17 == Enum.UserInputState.Change then
-				vector2 = p18.Position or vector2
+		ContextActionService:BindCoreAction("RotateModel", function(_, p19, p20) -- line: 277
+			-- upvalues: vector2 (ref), p17 (copy)
+			if p19 == Enum.UserInputState.Change then
+				vector2 = p20.Position or vector2
 				vector2 = Vector2.new(vector2.X, vector2.Y)
 
 				if math.abs(vector2.X) > 0.2 or math.abs(vector2.Y) > 0.2 then
-					p15.lastInputTime = tick()
-					p15.gamepadRotating = true
-					p15.rotationDeltaY = 3 * vector2.X
-					p15.rotationDeltaX = 3 * vector2.Y
+					p17.lastInputTime = tick()
+					p17.gamepadRotating = true
+					p17.rotationDeltaY = 3 * vector2.X
+					p17.rotationDeltaX = 3 * vector2.Y
 				else
-					p15.gamepadRotating = false
+					p17.gamepadRotating = false
 				end
 			end
 
@@ -284,38 +305,40 @@ function v17.unbindActions(_) -- line: 296
 	-- upvalues: ContextActionService (copy)
 	ContextActionService:UnbindCoreAction("RotateModel")
 end
-function v17.removeConnections(p20) -- line: 300
-	for _, v in pairs(p20.connections) do
+function v17.removeConnections(p22) -- line: 300
+	for _, v in pairs(p22.connections) do
 		v:disconnect()
 	end
 end
-function v17.willUnmount(p21) -- line: 306
-	p21.isMounted = false
+function v17.willUnmount(p23) -- line: 306
+	p23.isMounted = false
 
-	if p21.characterModelPool then
-		p21.characterModelPool:onDestroy()
+	if p23.characterModelPool then
+		p23.characterModelPool:onDestroy()
 	end
 
-	p21:unbindActions()
-	p21:removeConnections()
+	p23:unbindActions()
+	p23:removeConnections()
 end
 
-return RoactRodux.UNSTABLE_connect2(function(p22, _) -- line: 325
-	return {
-		view = p22.view,
-		tryingOnInfo = p22.tryingOnInfo,
-		gamepadEnabled = p22.gamepadEnabled
-	}
-end)(function(p24) --[[ AvatarViewportWrapper ]] -- line: 316
+local function AvatarViewportWrapper(p24) -- line: 316
 	-- upvalues: Roact (copy), InspectAndBuyContext (copy), Cryo (copy), v17 (copy)
 	return Roact.createElement(InspectAndBuyContext.Consumer, {
-		render = function(p25) --[[ render ]] -- line: 318
+		render = function(p25) -- line: 318
 			-- upvalues: Cryo (copy), p24 (copy), Roact (copy), v17 (copy)
-			local v62 = Cryo.Dictionary.join(p24, {
+			local v64 = Cryo.Dictionary.join(p24, {
 				views = p25
 			})
 
-			return Roact.createElement(v17, v62)
+			return Roact.createElement(v17, v64)
 		end
 	})
-end)
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p26, _) -- line: 325
+	return {
+		view = p26.view,
+		tryingOnInfo = p26.tryingOnInfo,
+		gamepadEnabled = p26.gamepadEnabled
+	}
+end)(AvatarViewportWrapper)

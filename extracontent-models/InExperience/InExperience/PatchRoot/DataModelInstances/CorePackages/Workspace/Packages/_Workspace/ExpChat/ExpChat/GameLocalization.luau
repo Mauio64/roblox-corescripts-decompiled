@@ -1,6 +1,7 @@
-local v3 = {
-    TranslateGameText = function(_, _, v2) --[[ Line: 2 ]] --[[ Name: TranslateGameText ]]
-        return v2;
-    end
-};
-return require(script.GameLocalization)(v3);
+local t1 = {
+	TranslateGameText = function(_, _, p3) -- line: 2
+		return p3
+	end
+}
+
+return require(script.GameLocalization)(t1)

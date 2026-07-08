@@ -1,59 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PhoneUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Components.PhoneVerificationUpsellOverlay);
-local v4 = require(l_script_FirstAncestor_0.Components.UpsellContainer);
-local v5 = require(l_script_FirstAncestor_0.Components.PhoneVerificationStatusOverlay);
-local v6 = require(l_Parent_0.Cryo);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v8 = require(l_script_FirstAncestor_0.Utils.mergeProps);
-local v9 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v9.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v9.Core.ImageSet.ImageSetLabel;
-local v12 = require(l_script_FirstAncestor_0.Flags.FFlagFixUpsellVerificationToNavigateToOverlays);
-local v13 = {
-    onSuccess = function() --[[ Line: 24 ]] --[[ Name: onSuccess ]]
+local PhoneUpsell = script:FindFirstAncestor("PhoneUpsell")
+local PhoneUpsellParent = PhoneUpsell.Parent
+local React = require(PhoneUpsellParent.React)
 
-    end, 
-    closeUpsell = function() --[[ Line: 25 ]] --[[ Name: closeUpsell ]]
+require(PhoneUpsell.Components.PhoneVerificationUpsellOverlay)
 
-    end
-};
-return function(v14) --[[ Line: 30 ]] --[[ Name: PhoneVerificationUpsellOverlayWrapper ]]
-    -- upvalues: v8 (copy), v13 (copy), v2 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), v12 (copy), l_useLocalization_0 (copy), v4 (copy), v6 (copy), v5 (copy)
-    local v15 = v8(v13, v14);
-    local v16, v17 = v2.useState(false);
-    local v18 = v2.createElement(l_ImageSetLabel_0, {
-        Size = UDim2.fromOffset(40, 40), 
-        Image = l_Images_0["icons/status/success_large"], 
-        BackgroundTransparency = 1
-    });
-    local function v19() --[[ Line: 41 ]]
-        -- upvalues: v17 (copy), v12 (ref), v15 (copy)
-        v17(true);
-        task.delay(3, function() --[[ Line: 43 ]]
-            -- upvalues: v12 (ref), v15 (ref)
-            if v12 then
-                v15.closeUpsell();
-                v15.onSuccess();
-                return;
-            else
-                v15.onSuccess();
-                v15.closeUpsell();
-                return;
-            end;
-        end);
-    end;
-    local v20 = l_useLocalization_0({
-        verifySuccessKey = "Feature.VerificationUpsell.Heading.VerifiedSuccessfully.V2"
-    });
-    return v2.createElement(v2.Fragment, nil, {
-        PhoneVerificationUpsellOverlay = v2.createElement(v4, v6.Dictionary.join(v15, {
-            onSuccess = v19
-        })), 
-        SuccessOverlay = v16 and v2.createElement(v5, {
-            image = v18, 
-            text = v20.verifySuccessKey
-        })
-    });
-end;
+local UpsellContainer = require(PhoneUpsell.Components.UpsellContainer)
+local PhoneVerificationStatusOverlay = require(PhoneUpsell.Components.PhoneVerificationStatusOverlay)
+local Cryo = require(PhoneUpsellParent.Cryo)
+local useLocalization = require(PhoneUpsellParent.Localization).Hooks.useLocalization
+local mergeProps = require(PhoneUpsell.Utils.mergeProps)
+local UIBlox = require(PhoneUpsellParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local FFlagFixUpsellVerificationToNavigateToOverlays = require(PhoneUpsell.Flags.FFlagFixUpsellVerificationToNavigateToOverlays)
+local t1 = {
+	onSuccess = function() -- line: 24
+	end,
+	closeUpsell = function() -- line: 25
+	end
+}
+
+local function PhoneVerificationUpsellOverlayWrapper(p1) -- line: 30
+	-- upvalues: mergeProps (copy), t1 (copy), React (copy), ImageSetLabel (copy), Images (copy), FFlagFixUpsellVerificationToNavigateToOverlays (copy), useLocalization (copy), UpsellContainer (copy), Cryo (copy), PhoneVerificationStatusOverlay (copy)
+	local v16 = mergeProps(t1, p1)
+	local v17, v18 = React.useState(false)
+	local v19 = React.createElement(ImageSetLabel, {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromOffset(40, 40),
+		Image = Images["icons/status/success_large"]
+	})
+	local v20 = useLocalization({
+		verifySuccessKey = "Feature.VerificationUpsell.Heading.VerifiedSuccessfully.V2"
+	})
+
+	return React.createElement(React.Fragment, nil, {
+		PhoneVerificationUpsellOverlay = React.createElement(UpsellContainer, Cryo.Dictionary.join(v16, {
+			onSuccess = function() -- line: 41
+				-- upvalues: v18 (copy), FFlagFixUpsellVerificationToNavigateToOverlays (copy), v16 (copy)
+				v18(true)
+				task.delay(3, function() -- line: 43
+					-- upvalues: FFlagFixUpsellVerificationToNavigateToOverlays (copy), v16 (copy)
+					if FFlagFixUpsellVerificationToNavigateToOverlays then
+						v16.closeUpsell()
+						v16.onSuccess()
+
+						return
+					end
+
+					v16.onSuccess()
+					v16.closeUpsell()
+				end)
+			end
+		})),
+		SuccessOverlay = v17 and React.createElement(PhoneVerificationStatusOverlay, {
+			image = v19,
+			text = v20.verifySuccessKey
+		})
+	})
+end
+
+return PhoneVerificationUpsellOverlayWrapper

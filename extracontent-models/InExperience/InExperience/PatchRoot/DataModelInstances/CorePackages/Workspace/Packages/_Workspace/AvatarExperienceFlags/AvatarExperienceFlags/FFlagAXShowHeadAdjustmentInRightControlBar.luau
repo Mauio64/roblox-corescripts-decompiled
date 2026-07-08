@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXShowHeadAdjustmentInRightControlBar2", false);
+return game:DefineFastFlag("AXShowHeadAdjustmentInRightControlBar2", false)

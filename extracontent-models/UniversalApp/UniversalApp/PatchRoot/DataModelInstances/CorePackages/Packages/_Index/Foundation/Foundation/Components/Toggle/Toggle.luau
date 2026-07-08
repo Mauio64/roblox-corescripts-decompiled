@@ -1,109 +1,121 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Otter);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Constants);
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local v6 = require(l_Components_0.InternalInput);
-local v7 = require(l_Components_0.Knob);
-local v8 = require(l_script_FirstAncestor_0.Providers.Style.PresentationContext);
-local _ = require(l_Components_0.Types);
-local v10 = require(l_Components_0.InternalInput.useUncontrolledState);
-local v11 = require(l_Parent_0.BuilderIcons);
-local v12 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v13 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v14 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v15 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v16 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v18 = require(script.Parent.useToggleVariants);
-local v19 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local _ = require(l_script_FirstAncestor_0.Enums.InputLabelSize);
-local v21 = require(l_script_FirstAncestor_0.Enums.InputPlacement);
-local v22 = {
-    frequency = 4
-};
-local v23 = {
-    size = v19.Medium, 
-    placement = v21.Start, 
-    Selectable = true, 
-    testId = "--foundation-toggle"
-};
-local v24 = {
-    colorMode = v16.Color
-};
-return v3.memo(v3.forwardRef(function(v25, v26) --[[ Line: 66 ]] --[[ Name: Toggle ]]
-    -- upvalues: v15 (copy), v23 (copy), v13 (copy), v18 (copy), v10 (copy), v12 (copy), v19 (copy), v3 (copy), v2 (copy), v22 (copy), v6 (copy), v14 (copy), v4 (copy), v8 (copy), v24 (copy), v7 (copy), v11 (copy)
-    local v27 = v15(v25, v23);
-    local v28 = v13();
-    local v29 = v18(v28, v27.size);
-    local v30, v31 = v10(v27.isChecked, v27.onActivated);
-    local v32 = if v12.FoundationToggleVisualUpdate then if v25.size == v19.Large then v19.Medium else v27.size else v27.size;
-    local v33 = not v12.FoundationToggleVisualUpdate or false;
-    local v34 = v30 and 1 or 0;
-    local v35, v36 = v3.useBinding(v34);
-    local v37 = v3.useRef(nil);
-    local v39 = v35:map(function(v38) --[[ Line: 82 ]]
-        -- upvalues: v29 (copy)
-        return v29.knob.offPosition:Lerp(v29.knob.onPosition, v38);
-    end);
-    v3.useEffect(function() --[[ Line: 86 ]]
-        -- upvalues: v2 (ref), v34 (copy), v37 (copy), v36 (copy)
-        local v40 = v2.createSingleMotor(v34);
-        v37.current = v40;
-        v40:start();
-        v40:onStep(function(v41) --[[ Line: 91 ]]
-            -- upvalues: v36 (ref)
-            v36(v41);
-        end);
-        return function() --[[ Line: 95 ]]
-            -- upvalues: v40 (copy)
-            v40:destroy();
-        end;
-    end, {});
-    v3.useEffect(function() --[[ Line: 100 ]]
-        -- upvalues: v30 (copy), v37 (copy), v2 (ref), v22 (ref)
-        local v42 = v30 and 1 or 0;
-        if v37.current then
-            v37.current:setGoal(v2.spring(v42, v22));
-        end;
-    end, {
-        v30
-    });
-    return v3.createElement(v6, v14(v27, {
-        isChecked = v30, 
-        isDisabled = v27.isDisabled, 
-        onActivated = v31, 
-        label = {
-            text = v27.label, 
-            position = v4.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v27.placement]
-        }, 
-        customVariantProps = v29.input, 
-        size = v27.size, 
-        Selectable = v27.Selectable, 
-        NextSelectionUp = v27.NextSelectionUp, 
-        NextSelectionDown = v27.NextSelectionDown, 
-        NextSelectionLeft = v27.NextSelectionLeft, 
-        NextSelectionRight = v27.NextSelectionRight, 
-        ref = v26
-    }), v3.createElement(v8.Provider, {
-        value = v24
-    }, {
-        Knob = if v12.FoundationToggleVisualUpdate then v3.createElement(v7, {
-            size = v32, 
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = v39, 
-            hasShadow = v33, 
-            icon = if v30 then {
-                name = v11.Icon.Check, 
-                variant = v11.IconVariant.Regular
-            } else nil, 
-            testId = ("%*--knob"):format(v27.testId)
-        }) else v3.createElement(v7, {
-            size = v32, 
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = v39, 
-            testId = ("%*--knob"):format(v27.testId)
-        })
-    }));
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Otter = require(FoundationParent.Otter)
+local React = require(FoundationParent.React)
+local Constants = require(Foundation.Constants)
+local Components = Foundation.Components
+local InternalInput = require(Components.InternalInput)
+local Knob = require(Components.Knob)
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+
+require(Components.Types)
+
+local useUncontrolledState = require(Components.InternalInput.useUncontrolledState)
+local BuilderIcons = require(FoundationParent.BuilderIcons)
+local Flags = require(Foundation.Utility.Flags)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local ColorMode = require(Foundation.Enums.ColorMode)
+
+require(Foundation.Enums.ControlState)
+
+local useToggleVariants = require(script.Parent.useToggleVariants)
+local InputSize = require(Foundation.Enums.InputSize)
+
+require(Foundation.Enums.InputLabelSize)
+
+local InputPlacement = require(Foundation.Enums.InputPlacement)
+local t1 = {
+	frequency = 4
+}
+local t2 = {
+	Selectable = true,
+	testId = "--foundation-toggle",
+	size = InputSize.Medium,
+	placement = InputPlacement.Start
+}
+local t3 = {
+	colorMode = ColorMode.Color
+}
+
+local function Toggle(p1, p2) -- line: 66
+	-- upvalues: withDefaults (copy), t2 (copy), useTokens (copy), useToggleVariants (copy), useUncontrolledState (copy), Flags (copy), InputSize (copy), React (copy), Otter (copy), t1 (copy), InternalInput (copy), withCommonProps (copy), Constants (copy), PresentationContext (copy), t3 (copy), Knob (copy), BuilderIcons (copy)
+	local v26 = withDefaults(p1, t2)
+	local v27 = useTokens()
+	local v28 = useToggleVariants(v27, v26.size)
+	local v29, v30 = useUncontrolledState(v26.isChecked, v26.onActivated)
+	local v31 = if not Flags.FoundationToggleVisualUpdate then v26.size else if p1.size ~= InputSize.Large then v26.size else InputSize.Medium
+	local v32 = not Flags.FoundationToggleVisualUpdate
+	local v33 = not v29 and 0 or 1
+	local v34, v35 = React.useBinding(v33)
+	local v36 = React.useRef(nil)
+	local v37 = v34:map(function(p3) -- line: 82
+		-- upvalues: v28 (copy)
+		return v28.knob.offPosition:Lerp(v28.knob.onPosition, p3)
+	end)
+
+	React.useEffect(function() -- line: 86
+		-- upvalues: Otter (copy), v33 (copy), v36 (copy), v35 (copy)
+		local v39 = Otter.createSingleMotor(v33)
+
+		v36.current = v39
+		v39:start()
+		v39:onStep(function(p4) -- line: 91
+			-- upvalues: v35 (copy)
+			v35(p4)
+		end)
+
+		return function() -- line: 95
+			-- upvalues: v39 (copy)
+			v39:destroy()
+		end
+	end, {})
+	React.useEffect(function() -- line: 100
+		-- upvalues: v29 (copy), v36 (copy), Otter (copy), t1 (copy)
+		local v40 = not v29 and 0 or 1
+
+		if v36.current then
+			v36.current:setGoal(Otter.spring(v40, t1))
+		end
+	end, { v29 })
+
+	return React.createElement(InternalInput, withCommonProps(v26, {
+		isChecked = v29,
+		isDisabled = v26.isDisabled,
+		onActivated = v30,
+		label = {
+			text = v26.label,
+			position = Constants.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v26.placement]
+		},
+		customVariantProps = v28.input,
+		size = v26.size,
+		Selectable = v26.Selectable,
+		NextSelectionUp = v26.NextSelectionUp,
+		NextSelectionDown = v26.NextSelectionDown,
+		NextSelectionLeft = v26.NextSelectionLeft,
+		NextSelectionRight = v26.NextSelectionRight,
+		ref = p2
+	}), React.createElement(PresentationContext.Provider, {
+		value = t3
+	}, {
+		Knob = if not Flags.FoundationToggleVisualUpdate then React.createElement(Knob, {
+			size = v31,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = v37,
+			testId = `{ v26.testId }--knob`
+		}) else React.createElement(Knob, {
+			size = v31,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = v37,
+			hasShadow = v32,
+			icon = if not v29 then nil else {
+				name = BuilderIcons.Icon.Check,
+				variant = BuilderIcons.IconVariant.Regular
+			},
+			testId = `{ v26.testId }--knob`
+		})
+	}))
+end
+
+return React.memo(React.forwardRef(Toggle))

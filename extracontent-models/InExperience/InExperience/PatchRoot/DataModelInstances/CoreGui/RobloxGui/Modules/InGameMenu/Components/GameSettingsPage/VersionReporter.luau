@@ -1,236 +1,253 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_RunService_0 = game:GetService("RunService");
-local l_StarterPlayer_0 = game:GetService("StarterPlayer");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v11 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v11.Roact;
-local l_t_0 = v11.t;
-local l_Skeleton_0 = require(l_CorePackages_0.Packages.Foundation).Skeleton;
-local v15 = require(l_CoreGui_0.RobloxGui.Modules.PlayerPermissionsModule);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v17 = require(l_Parent_0.Resources.Constants);
-local v18 = require(l_Parent_0.Components.Divider);
-local v19 = require(l_Parent_0.Components.ThemedTextLabel);
-local v20 = require(l_Parent_0.Utility.ExternalEventConnection);
-local v21 = require(l_Parent_0.Localization.withLocalization);
-local l_game_EngineFeature_0 = game:GetEngineFeature("CoreScriptVersionEnabled");
-local v23 = require(l_RobloxGui_0.Modules.Flags.GetFFlagNewEventIngestPlayerScriptsDimensions);
-local v24 = require(l_RobloxGui_0.Modules.Flags.GetFFlagRemoveAssetVersionEndpoint);
-local v25 = l_Roact_0.PureComponent:extend("VersionReporter");
-v25.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.integer
-});
-local function v32(v26) --[[ Line: 46 ]] --[[ Name: inferPlayerScriptStatus ]]
-    -- upvalues: v17 (copy), l_RbxAnalyticsService_0 (copy), v23 (copy)
-    local l_PlayerScriptsLoader_0 = v26:FindFirstChild("PlayerScriptsLoader");
-    local l_PlayerModule_0 = v26:FindFirstChild("PlayerModule");
-    local v29 = nil;
-    if l_PlayerScriptsLoader_0 ~= nil and l_PlayerModule_0 ~= nil then
-        v29 = if not not l_PlayerModule_0.Archivable or l_PlayerScriptsLoader_0.Archivable then v17.PlayerScriptStatusStrings.PossiblyCustom else v17.PlayerScriptStatusStrings.Default;
-    else
-        local l_CameraScript_0 = v26:FindFirstChild("CameraScript");
-        local l_ControlScript_0 = v26:FindFirstChild("ControlScript");
-        v29 = if not (l_CameraScript_0 == nil) or l_ControlScript_0 ~= nil then v17.PlayerScriptStatusStrings.CustomOld else v17.PlayerScriptStatusStrings.Custom;
-    end;
-    l_RbxAnalyticsService_0:SetRBXEventStream(v17.AnalyticsTargetName, "player_scripts_status", "player_scripts_status_action", {
-        defaultPlayerScripts = v29 == v17.PlayerScriptStatusStrings.Default, 
-        placeID = tostring(game.PlaceId), 
-        rawValue = if v23() then v29 else nil, 
-        context = v23() and "IGMv2" or nil
-    });
-    return v29;
-end;
-v25.init = function(v33) --[[ Line: 82 ]] --[[ Name: init ]]
-    -- upvalues: l_StarterPlayer_0 (copy), v32 (copy), l_ContentProvider_0 (copy), l_RunService_0 (copy), l_game_EngineFeature_0 (copy)
-    local v34 = "PlayerScript Status: Unknown";
-    local l_StarterPlayerScripts_0 = l_StarterPlayer_0:FindFirstChild("StarterPlayerScripts");
-    if l_StarterPlayerScripts_0 then
-        v34 = v32(l_StarterPlayerScripts_0);
-    else
-        v33.playerScriptsAddedConnection = l_StarterPlayer_0.ChildAdded:Connect(function(v36) --[[ Line: 88 ]]
-            -- upvalues: v33 (copy), v32 (ref)
-            if v36.Name == "StarterPlayerScripts" then
-                v33.playerScriptsAddedConnection:Disconnect();
-                v33.playerScriptsAddedConnection = nil;
-                v33:setState({
-                    playerScriptStatus = v32(v36)
-                });
-            end;
-        end);
-    end;
-    v33:setState({
-        baseUrl = l_ContentProvider_0.BaseUrl, 
-        clientVersion = l_RunService_0:GetRobloxVersion(), 
-        isAdmin = false, 
-        latestPlaceVersion = nil, 
-        placeVersion = game.PlaceVersion, 
-        serverVersion = nil, 
-        playerScriptStatus = v34, 
-        coreScriptVersion = l_game_EngineFeature_0 and l_RunService_0:GetCoreScriptVersion() or nil
-    });
-end;
-v25.render = function(v37) --[[ Line: 111 ]] --[[ Name: render ]]
-    -- upvalues: v21 (copy), l_game_EngineFeature_0 (copy), l_RunService_0 (copy), l_Roact_0 (copy), v19 (copy), l_Skeleton_0 (copy), v18 (copy), v20 (copy)
-    local v38 = v37.state.serverVersion ~= nil;
-    local v39 = v37.state.latestPlaceVersion ~= nil;
-    local v40 = not v37.state.baseUrl:find("www.roblox.com");
-    local v41 = v40 or v37.state.isAdmin;
-    return v21({
-        clientVersion = {
-            "CoreScripts.InGameMenu.GameSettings.ClientVersion"; 
-            CLIENT_VERSION = v37.state.clientVersion
-        }, 
-        serverVersion = {
-            "CoreScripts.InGameMenu.GameSettings.ServerVersion"; 
-            SERVER_VERSION = v37.state.serverVersion
-        }, 
-        placeVersion = {
-            v39 and "CoreScripts.InGameMenu.GameSettings.PlaceVersionWithLatest" or "CoreScripts.InGameMenu.GameSettings.PlaceVersion"; 
-            PLACE_VERSION = v37.state.placeVersion, 
-            LATEST_PLACE_VERSION = v37.state.latestPlaceVersion
-        }, 
-        coreScriptVersion = l_game_EngineFeature_0 and {
-            "CoreScripts.InGameMenu.GameSettings.ClientCoreScriptVersion"; 
-            CLIENT_CORESCRIPT_VERSION = v37.state.coreScriptVersion
-        } or nil
-    })(function(v42) --[[ Line: 136 ]]
-        -- upvalues: l_RunService_0 (ref), l_Roact_0 (ref), v37 (copy), v19 (ref), v38 (copy), l_Skeleton_0 (ref), v40 (copy), v41 (copy), v18 (ref), l_game_EngineFeature_0 (ref), v20 (ref)
-        local l_clientVersion_0 = v42.clientVersion;
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 139 ]]
-            -- upvalues: l_RunService_0 (ref)
-            return l_RunService_0.ClientGitHash;
-        end);
-        if l_status_0 then
-            l_clientVersion_0 = string.format("%s (%.6s)", l_clientVersion_0, l_result_0);
-        end;
-        return l_Roact_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 80), 
-            LayoutOrder = v37.props.LayoutOrder
-        }, {
-            Padding = l_Roact_0.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 14), 
-                PaddingLeft = UDim.new(0, 24), 
-                PaddingBottom = UDim.new(0, 14)
-            }), 
-            Layout = l_Roact_0.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 10)
-            }), 
-            ClientVersion = l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = l_clientVersion_0, 
-                LayoutOrder = 1, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }), 
-            ServerVersion = l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = v38 and v42.serverVersion or "", 
-                LayoutOrder = 2, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }, {
-                not v38 and l_Roact_0.createElement(l_Skeleton_0, {
-                    Size = UDim2.new(1, 0, 1, 0)
-                })
-            }), 
-            PlaceVersion = l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = v42.placeVersion, 
-                LayoutOrder = 3, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }), 
-            Divider = (not not v40 or v41) and l_Roact_0.createElement(v18, {
-                Size = UDim2.new(1, 0, 0, 1), 
-                LayoutOrder = 4
-            }), 
-            PlayerScriptStatus = v41 and l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = v37.state.playerScriptStatus, 
-                LayoutOrder = 5, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }), 
-            Environment = v40 and l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = ("Base URL: %s"):format(v37.state.baseUrl), 
-                LayoutOrder = 6, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }), 
-            Divider2 = l_game_EngineFeature_0 and l_Roact_0.createElement(v18, {
-                Size = UDim2.new(1, 0, 0, 1), 
-                LayoutOrder = 7
-            }), 
-            CoreScriptVersion = l_game_EngineFeature_0 and l_Roact_0.createElement(v19, {
-                themeKey = "TextDefault", 
-                fontKey = "Footer", 
-                Text = v42.coreScriptVersion, 
-                LayoutOrder = 8, 
-                Size = UDim2.new(1, -24, 0, 14)
-            }), 
-            VersionWatcher = l_Roact_0.createElement(v20, {
-                event = game:GetPropertyChangedSignal("PlaceVersion"), 
-                callback = function() --[[ Line: 217 ]] --[[ Name: callback ]]
-                    -- upvalues: v37 (ref)
-                    v37:setState({
-                        placeVersion = game.PlaceVersion
-                    });
-                end
-            })
-        });
-    end);
-end;
-v25.didMount = function(v46) --[[ Line: 227 ]] --[[ Name: didMount ]]
-    -- upvalues: l_RobloxReplicatedStorage_0 (copy), v24 (copy), l_HttpRbxApiService_0 (copy), l_HttpService_0 (copy), v15 (copy), l_Players_0 (copy)
-    v46.mounted = true;
-    coroutine.wrap(function() --[[ Line: 230 ]]
-        -- upvalues: l_RobloxReplicatedStorage_0 (ref), v46 (copy)
-        local v47 = l_RobloxReplicatedStorage_0:WaitForChild("GetServerVersion", 1e999):InvokeServer();
-        if v46.mounted then
-            v46:setState({
-                serverVersion = v47
-            });
-        end;
-    end)();
-    if not v24() then
-        coroutine.wrap(function() --[[ Line: 244 ]]
-            -- upvalues: l_HttpRbxApiService_0 (ref), l_HttpService_0 (ref), v46 (copy)
-            pcall(function() --[[ Line: 245 ]]
-                -- upvalues: l_HttpRbxApiService_0 (ref), l_HttpService_0 (ref), v46 (ref)
-                local l_l_HttpRbxApiService_0_Async_0 = l_HttpRbxApiService_0:GetAsync(string.format("assets/%d/versions", game.PlaceId));
-                local l_VersionNumber_0 = l_HttpService_0:JSONDecode(l_l_HttpRbxApiService_0_Async_0)[1].VersionNumber;
-                if v46.mounted then
-                    v46:setState({
-                        latestPlaceVersion = l_VersionNumber_0
-                    });
-                end;
-            end);
-        end)();
-    end;
-    coroutine.wrap(function() --[[ Line: 259 ]]
-        -- upvalues: v15 (ref), l_Players_0 (ref), v46 (copy)
-        local v50 = v15.IsPlayerAdminAsync(l_Players_0.LocalPlayer);
-        if v46.mounted then
-            v46:setState({
-                isAdmin = v50
-            });
-        end;
-    end)();
-end;
-v25.willUnmount = function(v51) --[[ Line: 270 ]] --[[ Name: willUnmount ]]
-    v51.mounted = false;
-    if v51.playerScriptsAddedConnection then
-        v51.playerScriptsAddedConnection:Disconnect();
-    end;
-end;
-return v25;
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local ContentProvider = game:GetService("ContentProvider")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local RunService = game:GetService("RunService")
+local StarterPlayer = game:GetService("StarterPlayer")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local Skeleton = require(CorePackages.Packages.Foundation).Skeleton
+local PlayerPermissionsModule = require(CoreGui.RobloxGui.Modules.PlayerPermissionsModule)
+local ParentParent = script.Parent.Parent.Parent
+local Constants = require(ParentParent.Resources.Constants)
+local Divider = require(ParentParent.Components.Divider)
+local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
+local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local EngineFeature = game:GetEngineFeature("CoreScriptVersionEnabled")
+local GetFFlagNewEventIngestPlayerScriptsDimensions = require(RobloxGui.Modules.Flags.GetFFlagNewEventIngestPlayerScriptsDimensions)
+local GetFFlagRemoveAssetVersionEndpoint = require(RobloxGui.Modules.Flags.GetFFlagRemoveAssetVersionEndpoint)
+local v26 = Roact.PureComponent:extend("VersionReporter")
+
+v26.validateProps = t.strictInterface({
+	LayoutOrder = t.integer
+})
+
+local function inferPlayerScriptStatus(p1) -- line: 46
+	-- upvalues: Constants (copy), RbxAnalyticsService (copy), GetFFlagNewEventIngestPlayerScriptsDimensions (copy)
+	local PlayerScriptsLoader = p1:FindFirstChild("PlayerScriptsLoader")
+	local PlayerModule = p1:FindFirstChild("PlayerModule")
+	local v31
+
+	if PlayerScriptsLoader ~= nil and PlayerModule ~= nil then
+		v31 = if PlayerModule.Archivable or PlayerScriptsLoader.Archivable then Constants.PlayerScriptStatusStrings.PossiblyCustom else Constants.PlayerScriptStatusStrings.Default
+	else
+		local CameraScript = p1:FindFirstChild("CameraScript")
+		local ControlScript = p1:FindFirstChild("ControlScript")
+
+		v31 = if CameraScript == nil and ControlScript == nil then Constants.PlayerScriptStatusStrings.Custom else Constants.PlayerScriptStatusStrings.CustomOld
+	end
+
+	RbxAnalyticsService:SetRBXEventStream(Constants.AnalyticsTargetName, "player_scripts_status", "player_scripts_status_action", {
+		defaultPlayerScripts = v31 == Constants.PlayerScriptStatusStrings.Default,
+		placeID = tostring(game.PlaceId),
+		rawValue = if not GetFFlagNewEventIngestPlayerScriptsDimensions() then nil else v31,
+		context = if not GetFFlagNewEventIngestPlayerScriptsDimensions() then nil else "IGMv2"
+	})
+
+	return v31
+end
+
+function v26.init(p2) -- line: 82
+	-- upvalues: StarterPlayer (copy), inferPlayerScriptStatus (copy), ContentProvider (copy), RunService (copy), EngineFeature (copy)
+	local s1 = "PlayerScript Status: Unknown"
+	local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts")
+
+	if StarterPlayerScripts then
+		s1 = inferPlayerScriptStatus(StarterPlayerScripts)
+	else
+		p2.playerScriptsAddedConnection = StarterPlayer.ChildAdded:Connect(function(child) -- line: 88
+			-- upvalues: p2 (copy), inferPlayerScriptStatus (copy)
+			if child.Name == "StarterPlayerScripts" then
+				p2.playerScriptsAddedConnection:Disconnect()
+				p2.playerScriptsAddedConnection = nil
+				p2:setState({
+					playerScriptStatus = inferPlayerScriptStatus(child)
+				})
+			end
+		end)
+	end
+
+	p2:setState({
+		isAdmin = false,
+		latestPlaceVersion = nil,
+		serverVersion = nil,
+		baseUrl = ContentProvider.BaseUrl,
+		clientVersion = RunService:GetRobloxVersion(),
+		placeVersion = game.PlaceVersion,
+		playerScriptStatus = s1,
+		coreScriptVersion = EngineFeature and RunService:GetCoreScriptVersion() or nil
+	})
+end
+function v26.render(p3) -- line: 111
+	-- upvalues: withLocalization (copy), EngineFeature (copy), RunService (copy), Roact (copy), ThemedTextLabel (copy), Skeleton (copy), Divider (copy), ExternalEventConnection (copy)
+	local v38 = p3.state.serverVersion ~= nil
+	local v39 = p3.state.latestPlaceVersion ~= nil
+	local v40 = not p3.state.baseUrl:find("www.roblox.com")
+	local v41 = v40 or p3.state.isAdmin
+
+	return withLocalization({
+		clientVersion = {
+			"CoreScripts.InGameMenu.GameSettings.ClientVersion",
+			CLIENT_VERSION = p3.state.clientVersion
+		},
+		serverVersion = {
+			"CoreScripts.InGameMenu.GameSettings.ServerVersion",
+			SERVER_VERSION = p3.state.serverVersion
+		},
+		placeVersion = {
+			not v39 and "CoreScripts.InGameMenu.GameSettings.PlaceVersion" or "CoreScripts.InGameMenu.GameSettings.PlaceVersionWithLatest",
+			PLACE_VERSION = p3.state.placeVersion,
+			LATEST_PLACE_VERSION = p3.state.latestPlaceVersion
+		},
+		coreScriptVersion = EngineFeature and {
+			"CoreScripts.InGameMenu.GameSettings.ClientCoreScriptVersion",
+			CLIENT_CORESCRIPT_VERSION = p3.state.coreScriptVersion
+		} or nil
+	})(function(p4) -- line: 136
+		-- upvalues: RunService (copy), Roact (copy), p3 (copy), ThemedTextLabel (copy), v38 (copy), Skeleton (copy), v40 (copy), v41 (copy), Divider (copy), EngineFeature (copy), ExternalEventConnection (copy)
+		local clientVersion = p4.clientVersion
+		local ok, result = pcall(function() -- line: 139
+			-- upvalues: RunService (copy)
+			return RunService.ClientGitHash
+		end)
+
+		if ok then
+			clientVersion = string.format("%s (%.6s)", clientVersion, result)
+		end
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 80),
+			LayoutOrder = p3.props.LayoutOrder
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 14),
+				PaddingLeft = UDim.new(0, 24),
+				PaddingBottom = UDim.new(0, 14)
+			}),
+			Layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 10)
+			}),
+			ClientVersion = Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 1,
+				Text = clientVersion,
+				Size = UDim2.new(1, -24, 0, 14)
+			}),
+			ServerVersion = Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 2,
+				Text = v38 and p4.serverVersion or "",
+				Size = UDim2.new(1, -24, 0, 14)
+			}, { not v38 and Roact.createElement(Skeleton, {
+				Size = UDim2.new(1, 0, 1, 0)
+			}) }),
+			PlaceVersion = Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 3,
+				Text = p4.placeVersion,
+				Size = UDim2.new(1, -24, 0, 14)
+			}),
+			Divider = (v40 or v41) and Roact.createElement(Divider, {
+				LayoutOrder = 4,
+				Size = UDim2.new(1, 0, 0, 1)
+			}),
+			PlayerScriptStatus = v41 and Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 5,
+				Text = p3.state.playerScriptStatus,
+				Size = UDim2.new(1, -24, 0, 14)
+			}),
+			Environment = v40 and Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 6,
+				Text = ("Base URL: %s"):format(p3.state.baseUrl),
+				Size = UDim2.new(1, -24, 0, 14)
+			}),
+			Divider2 = EngineFeature and Roact.createElement(Divider, {
+				LayoutOrder = 7,
+				Size = UDim2.new(1, 0, 0, 1)
+			}),
+			CoreScriptVersion = EngineFeature and Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextDefault",
+				fontKey = "Footer",
+				LayoutOrder = 8,
+				Text = p4.coreScriptVersion,
+				Size = UDim2.new(1, -24, 0, 14)
+			}),
+			VersionWatcher = Roact.createElement(ExternalEventConnection, {
+				event = game:GetPropertyChangedSignal("PlaceVersion"),
+				callback = function() -- line: 217
+					-- upvalues: p3 (copy)
+					p3:setState({
+						placeVersion = game.PlaceVersion
+					})
+				end
+			})
+		})
+	end)
+end
+function v26.didMount(p5) -- line: 227
+	-- upvalues: RobloxReplicatedStorage (copy), GetFFlagRemoveAssetVersionEndpoint (copy), HttpRbxApiService (copy), HttpService (copy), PlayerPermissionsModule (copy), Players (copy)
+	p5.mounted = true
+	coroutine.wrap(function() -- line: 230
+		-- upvalues: RobloxReplicatedStorage (copy), p5 (copy)
+		local v49 = RobloxReplicatedStorage:WaitForChild("GetServerVersion", 1e999):InvokeServer()
+
+		if p5.mounted then
+			p5:setState({
+				serverVersion = v49
+			})
+		end
+	end)()
+
+	if not GetFFlagRemoveAssetVersionEndpoint() then
+		coroutine.wrap(function() -- line: 244
+			-- upvalues: HttpRbxApiService (copy), HttpService (copy), p5 (copy)
+			pcall(function() -- line: 245
+				-- upvalues: HttpRbxApiService (copy), HttpService (copy), p5 (copy)
+				local Async = HttpRbxApiService:GetAsync(string.format("assets/%d/versions", game.PlaceId))
+				local VersionNumber = HttpService:JSONDecode(Async)[1].VersionNumber
+
+				if p5.mounted then
+					p5:setState({
+						latestPlaceVersion = VersionNumber
+					})
+				end
+			end)
+		end)()
+	end
+
+	coroutine.wrap(function() -- line: 259
+		-- upvalues: PlayerPermissionsModule (copy), Players (copy), p5 (copy)
+		local v50 = PlayerPermissionsModule.IsPlayerAdminAsync(Players.LocalPlayer)
+
+		if p5.mounted then
+			p5:setState({
+				isAdmin = v50
+			})
+		end
+	end)()
+end
+function v26.willUnmount(p6) -- line: 270
+	p6.mounted = false
+
+	if p6.playerScriptsAddedConnection then
+		p6.playerScriptsAddedConnection:Disconnect()
+	end
+end
+
+return v26

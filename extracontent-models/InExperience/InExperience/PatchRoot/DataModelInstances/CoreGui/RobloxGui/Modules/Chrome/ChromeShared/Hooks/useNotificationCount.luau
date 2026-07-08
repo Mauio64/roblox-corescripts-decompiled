@@ -1,32 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_script_FirstAncestor_0.Service.Types);
-return function(v4) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy)
-    if v4 and v4.notification then
-        local l_notification_0 = v4.notification;
-        local v6, v7 = v2.useState(l_notification_0:get());
-        v2.useEffect(function() --[[ Line: 15 ]]
-            -- upvalues: v4 (copy), v7 (copy), l_notification_0 (copy)
-            local v8 = v4.notification:connect(function() --[[ Line: 16 ]]
-                -- upvalues: v7 (ref), l_notification_0 (ref)
-                v7(l_notification_0:get());
-            end);
-            return function() --[[ Line: 20 ]]
-                -- upvalues: v8 (copy)
-                v8:disconnect();
-            end;
-        end, {
-            v4.id
-        });
-        if v6 and v6.type == "count" then
-            return v6.value;
-        else
-            return 0;
-        end;
-    else
-        warn("notification object not found");
-        return 0;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+
+require(CorePackages.Workspace.Packages.Chrome)
+
+return function(p1) -- line: 9
+	-- upvalues: React (copy)
+	if p1 and p1.notification then
+		local notification = p1.notification
+		local v5, v6 = React.useState(notification:get())
+
+		React.useEffect(function() -- line: 15
+			-- upvalues: p1 (copy), v6 (copy), notification (copy)
+			local v7 = p1.notification:connect(function() -- line: 16
+				-- upvalues: v6 (copy), notification (copy)
+				v6(notification:get())
+			end)
+
+			return function() -- line: 20
+				-- upvalues: v7 (copy)
+				v7:disconnect()
+			end
+		end, { p1.id })
+
+		if v5 and v5.type == "count" then
+			return v5.value
+		end
+
+		return 0
+	end
+
+	warn("notification object not found")
+
+	return 0
+end

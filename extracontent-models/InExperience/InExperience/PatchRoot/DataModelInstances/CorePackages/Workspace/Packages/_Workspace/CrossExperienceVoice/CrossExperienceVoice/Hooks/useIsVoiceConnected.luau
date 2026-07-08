@@ -1,7 +1,8 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local l_Constants_0 = require(l_script_FirstAncestor_0.dependencies).CrossExperience.Constants;
-local v2 = require(l_script_FirstAncestor_0.Hooks.useVoiceStatus);
-return function() --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), l_Constants_0 (copy)
-    return v2() == l_Constants_0.VOICE_STATUS.VOICE_CONNECTED;
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local Constants = require(CrossExperienceVoice.dependencies).CrossExperience.Constants
+local useVoiceStatus = require(CrossExperienceVoice.Hooks.useVoiceStatus)
+
+return function() -- line: 8
+	-- upvalues: useVoiceStatus (copy), Constants (copy)
+	return useVoiceStatus() == Constants.VOICE_STATUS.VOICE_CONNECTED
+end

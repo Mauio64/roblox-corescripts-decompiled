@@ -1,2 +1,3 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return (require(l_CorePackages_0.Packages.llama));
+local CorePackages = game:GetService("CorePackages")
+
+return (require(CorePackages.Packages.llama))

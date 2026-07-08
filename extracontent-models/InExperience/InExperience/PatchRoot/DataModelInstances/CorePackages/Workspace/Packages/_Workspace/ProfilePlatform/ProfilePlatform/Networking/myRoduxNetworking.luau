@@ -1,29 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.LuaSocialLibrariesDeps);
-local l_httpRequest_0 = v2.httpRequest;
-local l_RODUX_KEY_0 = require(l_script_FirstAncestor_0.Common.Constants).RODUX_KEY;
-local v5 = require(l_Parent_0.Lumberyak).Logger.new(nil, l_RODUX_KEY_0):new(l_RODUX_KEY_0 .. " Networking");
-local v6 = game:DefineFastInt("ProfilePlatformHttpRetryCount", 3);
-local l_ChallengeRequestWrapper_0 = require(l_Parent_0.GenericChallenges).Middleware.ChallengeRequestWrapper;
-local v8 = game:DefineFastFlag("EnableProfilePlatformChallengeInterceptor", false);
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformUseRoduxNetworkingRefactor);
-local v10 = require(l_script_FirstAncestor_0.Networking.myRoduxNetworkingImpl);
-local v16 = l_httpRequest_0.config({
-    requestFunction = function(v11, v12, v13) --[[ Line: 22 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v5 (copy), l_httpRequest_0 (copy)
-        v5:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v12, v11));
-        return l_httpRequest_0.requestFunctions.RequestInternal(v11, v12, v13);
-    end, 
-    postRequestFunction = function(v14, v15) --[[ Line: 26 ]] --[[ Name: postRequestFunction ]]
-        -- upvalues: v5 (copy)
-        v5:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", v15.requestMethod, v15.url, v14.StatusCode, v14.Body));
-    end, 
-    maxRetryCount = v6
-});
-local l_RoduxNetworking_0 = v2.RoduxNetworking;
-local v18 = if v9 then v10 else v16;
-return (l_RoduxNetworking_0.config({
-    keyPath = l_RODUX_KEY_0 .. ".NetworkStatus", 
-    networkImpl = v8 and l_ChallengeRequestWrapper_0(v18) or v18
-}));
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local LuaSocialLibrariesDeps = require(ProfilePlatformParent.LuaSocialLibrariesDeps)
+local httpRequest = LuaSocialLibrariesDeps.httpRequest
+local RODUX_KEY = require(ProfilePlatform.Common.Constants).RODUX_KEY
+local v6 = require(ProfilePlatformParent.Lumberyak).Logger.new(nil, RODUX_KEY):new(RODUX_KEY .. " Networking")
+local v7 = game:DefineFastInt("ProfilePlatformHttpRetryCount", 3)
+local ChallengeRequestWrapper = require(ProfilePlatformParent.GenericChallenges).Middleware.ChallengeRequestWrapper
+local v9 = game:DefineFastFlag("EnableProfilePlatformChallengeInterceptor", false)
+local FFlagProfilePlatformUseRoduxNetworkingRefactor = require(ProfilePlatform.Flags.FFlagProfilePlatformUseRoduxNetworkingRefactor)
+local myRoduxNetworkingImpl = require(ProfilePlatform.Networking.myRoduxNetworkingImpl)
+local v12 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 22
+		-- upvalues: v6 (copy), httpRequest (copy)
+		v6:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		return httpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+	end,
+	postRequestFunction = function(p4, p5) -- line: 26
+		-- upvalues: v6 (copy)
+		v6:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", p5.requestMethod, p5.url, p4.StatusCode, p4.Body))
+	end,
+	maxRetryCount = v7
+})
+local v13 = if not FFlagProfilePlatformUseRoduxNetworkingRefactor then v12 else myRoduxNetworkingImpl
+
+return (LuaSocialLibrariesDeps.RoduxNetworking.config({
+	keyPath = RODUX_KEY .. ".NetworkStatus",
+	networkImpl = v9 and ChallengeRequestWrapper(v13) or v13
+}))

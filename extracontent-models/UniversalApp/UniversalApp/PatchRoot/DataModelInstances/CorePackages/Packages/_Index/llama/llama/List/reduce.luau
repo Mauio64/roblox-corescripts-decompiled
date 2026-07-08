@@ -1,15 +1,23 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: reduce ]]
-    local v3 = type(v0);
-    assert(v3 == "table", "expected a table for first argument, got " .. v3);
-    local v4 = type(v1);
-    assert(v4 == "function", "expected a function for second argument, got " .. v4);
-    local l_v2_0 = v2;
-    if l_v2_0 == nil then
-        l_v2_0 = v0[1];
-    end;
-    local v6 = v2 == nil and 2 or 1;
-    for v7 = v6, #v0 do
-        l_v2_0 = v1(l_v2_0, v0[v7], v7);
-    end;
-    return l_v2_0;
-end;
+local function reduce(p1, p2, p3) -- line: 2
+	local v5 = type(p1)
+
+	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+
+	local v6 = type(p2)
+
+	assert(v6 == "function", "expected a function for second argument, got " .. v6)
+
+	local v7 = p3
+
+	if v7 == nil then
+		v7 = p1[1]
+	end
+
+	for i = p3 ~= nil and 1 or 2, #p1 do
+		v7 = p2(v7, p1[i], i)
+	end
+
+	return v7
+end
+
+return reduce

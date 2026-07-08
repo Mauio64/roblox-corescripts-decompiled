@@ -1,3 +1,4 @@
-local v0 = require(script.Parent.FFlagAXCatalogCategoriesSDUI);
-local v1 = game:DefineFastFlag("AXCatalogCategoriesSDUIPillTitleNormalization", false);
-return v0 and v1;
+local FFlagAXCatalogCategoriesSDUI = require(script.Parent.FFlagAXCatalogCategoriesSDUI)
+local v2 = game:DefineFastFlag("AXCatalogCategoriesSDUIPillTitleNormalization", false)
+
+return FFlagAXCatalogCategoriesSDUI and v2

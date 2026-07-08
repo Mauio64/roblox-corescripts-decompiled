@@ -1,1 +1,1 @@
-return require(script.BottomLockedScrollViewV3);
+return require(script.BottomLockedScrollViewV3)

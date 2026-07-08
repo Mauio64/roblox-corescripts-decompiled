@@ -1,39 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.DataHydration);
-local v3 = require(l_Parent_0.Foundation);
-local l_Button_0 = v3.Button;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_IconName_0 = v3.Enums.IconName;
-local l_Skeleton_0 = v3.Skeleton;
-local l_Radius_0 = v3.Enums.Radius;
-local l_useTokens_0 = v3.Hooks.useTokens;
-return function(v10) --[[ Line: 22 ]] --[[ Name: InExperienceDetailsPromptPlayButton ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), v1 (copy), l_Skeleton_0 (copy), l_Radius_0 (copy), l_Button_0 (copy), l_IconName_0 (copy), l_ButtonVariant_0 (copy)
-    local v11 = l_useTokens_0();
-    if not v10.rootPlaceId or not v10.playability and v10.playabilityRetrievalStatus ~= v2.DataStatus.Failed then
-        return v1.createElement(l_Skeleton_0, {
-            LayoutOrder = 1, 
-            Size = UDim2.new(1, 0, 0, v11.Size.Size_1000), 
-            radius = l_Radius_0.Medium
-        });
-    elseif not v10.playability then
-        return v1.createElement(l_Button_0, {
-            LayoutOrder = 1, 
-            width = UDim.new(1, 0), 
-            icon = l_IconName_0.PlayLarge, 
-            variant = l_ButtonVariant_0.Emphasis, 
-            onActivated = v10.onJoin
-        });
-    else
-        return v1.createElement(l_Button_0, {
-            LayoutOrder = 1, 
-            width = UDim.new(1, 0), 
-            text = if v10.playability.isPlayable then nil else v10.playButtonUnavailableText, 
-            icon = if v10.playability.isPlayable then l_IconName_0.PlayLarge else l_IconName_0.CircleSlash, 
-            variant = if v10.playability.isPlayable then l_ButtonVariant_0.Emphasis else l_ButtonVariant_0.Standard, 
-            onActivated = v10.onJoin, 
-            isDisabled = not v10.playability.isPlayable
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("InExperienceDetailsPrompt").Parent
+local React = require(Parent.React)
+local DataHydration = require(Parent.DataHydration)
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local IconName = Foundation.Enums.IconName
+local Skeleton = Foundation.Skeleton
+local EnumsRadius = Foundation.Enums.Radius
+local useTokens = Foundation.Hooks.useTokens
+
+local function InExperienceDetailsPromptPlayButton(t1: {[any]: any}) -- line: 22
+	-- upvalues: useTokens (copy), DataHydration (copy), React (copy), Skeleton (copy), EnumsRadius (copy), Button (copy), IconName (copy), ButtonVariant (copy)
+	local v13 = useTokens()
+
+	if not t1.rootPlaceId or not t1.playability and t1.playabilityRetrievalStatus ~= DataHydration.DataStatus.Failed then
+		return React.createElement(Skeleton, {
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, v13.Size.Size_1000),
+			radius = EnumsRadius.Medium
+		})
+	end
+
+	if not t1.playability then
+		return React.createElement(Button, {
+			LayoutOrder = 1,
+			width = UDim.new(1, 0),
+			icon = IconName.PlayLarge,
+			variant = ButtonVariant.Emphasis,
+			onActivated = t1.onJoin
+		})
+	end
+
+	return React.createElement(Button, {
+		LayoutOrder = 1,
+		width = UDim.new(1, 0),
+		text = if not t1.playability.isPlayable then t1.playButtonUnavailableText else nil,
+		icon = if not t1.playability.isPlayable then IconName.CircleSlash else IconName.PlayLarge,
+		variant = if not t1.playability.isPlayable then ButtonVariant.Standard else ButtonVariant.Emphasis,
+		onActivated = t1.onJoin,
+		isDisabled = not t1.playability.isPlayable
+	})
+end
+
+return InExperienceDetailsPromptPlayButton

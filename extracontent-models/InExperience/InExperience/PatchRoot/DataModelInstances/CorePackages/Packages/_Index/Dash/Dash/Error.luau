@@ -1,26 +1,31 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-local v2 = require(l_Parent_0.class);
-local v3 = require(l_Parent_0.format);
-local v4 = require(l_Parent_0.join);
-local v8 = v2("Error", function(v5, v6, v7) --[[ Line: 18 ]]
-    return {
-        name = v5, 
-        message = v6 or "An error occurred", 
-        tags = v7 or {}
-    };
-end);
-v8.toString = function(v9) --[[ Line: 26 ]] --[[ Name: toString ]]
-    -- upvalues: v3 (copy)
-    return v3("{}: {}\n{}", v9.name, v3(v9.message, v9.tags), v9.stack);
-end;
-v8.joinTags = function(v10, v11) --[[ Line: 36 ]] --[[ Name: joinTags ]]
-    -- upvalues: v8 (copy), v4 (copy)
-    return v8.new(v10.name, v10.message, v4(v10.tags, v11 or {}));
-end;
-v8.throw = function(v12, v13) --[[ Line: 49 ]] --[[ Name: throw ]]
-    local v14 = v12:joinTags(v13);
-    v14.stack = debug.traceback();
-    error(v14);
-end;
-return v8;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local class = require(scriptParent.class)
+local format = require(scriptParent.format)
+local join = require(scriptParent.join)
+local v5 = class("Error", function(s1: string, s2: string, p1) -- line: 18
+	return {
+		name = s1,
+		message = s2 or "An error occurred",
+		tags = p1 or {}
+	}
+end)
+
+function v5.toString(p2) -- line: 26
+	-- upvalues: format (copy)
+	return format("{}: {}\n{}", p2.name, format(p2.message, p2.tags), p2.stack)
+end
+function v5.joinTags(p3, p4) -- line: 36
+	-- upvalues: v5 (copy), join (copy)
+	return v5.new(p3.name, p3.message, join(p3.tags, p4 or {}))
+end
+function v5.throw(p5, p6) -- line: 49
+	local v14 = p5:joinTags(p6)
+
+	v14.stack = debug.traceback()
+	error(v14)
+end
+
+return v5

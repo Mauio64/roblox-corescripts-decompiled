@@ -1,3 +1,3 @@
 return {
-    RoundedVariant = require(script.RoundedVariant)
-};
+	RoundedVariant = require(script.RoundedVariant)
+}

@@ -1,1 +1,1 @@
-return require(script.ContactImporterLandingPage);
+return require(script.ContactImporterLandingPage)

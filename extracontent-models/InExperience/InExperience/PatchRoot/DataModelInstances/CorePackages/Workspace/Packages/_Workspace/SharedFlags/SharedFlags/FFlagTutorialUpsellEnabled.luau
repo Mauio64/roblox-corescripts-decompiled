@@ -1,1 +1,1 @@
-return game:DefineFastFlag("TutorialUpsellEnabled", false);
+return game:DefineFastFlag("TutorialUpsellEnabled", false)

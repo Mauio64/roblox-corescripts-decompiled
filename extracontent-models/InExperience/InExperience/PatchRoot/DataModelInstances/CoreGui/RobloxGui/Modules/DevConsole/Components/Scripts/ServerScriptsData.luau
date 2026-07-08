@@ -1,146 +1,171 @@
-local v0 = require(script.Parent.Parent.Parent.CircularBuffer);
-local v1 = require(script.Parent.Parent.Parent.Signal);
-local v2 = require(script.Parent.Parent.Parent.Constants);
-local v3 = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"));
-local l_ChartHeaderNames_0 = v2.ServerScriptsFormatting.ChartHeaderNames;
-local v11 = {
-    [l_ChartHeaderNames_0[1]] = function(v5, v6) --[[ Line: 11 ]]
-        return v5.dataStats.dataSet:back().name < v6.dataStats.dataSet:back().name;
-    end, 
-    [l_ChartHeaderNames_0[2]] = function(v7, v8) --[[ Line: 14 ]]
-        return v7.dataStats.dataSet:back().data[1] < v8.dataStats.dataSet:back().data[1];
-    end, 
-    [l_ChartHeaderNames_0[3]] = function(v9, v10) --[[ Line: 17 ]]
-        return v9.dataStats.dataSet:back().data[2] < v10.dataStats.dataSet:back().data[2];
-    end
-};
-local v12 = require(script.Parent.Parent.Parent.Util.minOfTable);
-local v13 = require(script.Parent.Parent.Parent.Util.maxOfTable);
-local v14 = require(script.Parent.Parent.Parent.Util.getClientReplicator);
-local v15 = {};
-v15.__index = v15;
-v15.new = function() --[[ Line: 29 ]] --[[ Name: new ]]
-    -- upvalues: v15 (copy), v1 (copy), l_ChartHeaderNames_0 (copy)
-    local v16 = {};
-    setmetatable(v16, v15);
-    v16._serverScriptsUpdated = v1.new();
-    v16._serverScriptsData = {};
-    v16._lastUpdate = 0;
-    v16._sortedScriptsData = {};
-    v16._sortType = l_ChartHeaderNames_0[1];
-    v16._isRunning = false;
-    return v16;
-end;
-v15.setSortType = function(v17, v18) --[[ Line: 43 ]] --[[ Name: setSortType ]]
-    -- upvalues: v11 (copy)
-    if v11[v18] then
-        v17._sortType = v18;
-        table.sort(v17._sortedScriptsData, v11[v17._sortType]);
-        return;
-    else
-        error(string.format("attempted to pass invalid sortType: %s", (tostring(v18))), 2);
-        return;
-    end;
-end;
-v15.getSortType = function(v19) --[[ Line: 53 ]] --[[ Name: getSortType ]]
-    return v19._sortType;
-end;
-v15.Signal = function(v20) --[[ Line: 57 ]] --[[ Name: Signal ]]
-    return v20._serverScriptsUpdated;
-end;
-v15.getCurrentData = function(v21) --[[ Line: 61 ]] --[[ Name: getCurrentData ]]
-    return v21._sortedScriptsData;
-end;
-v15.updateScriptsData = function(v22, v23) --[[ Line: 66 ]] --[[ Name: updateScriptsData ]]
-    -- upvalues: v0 (copy), v3 (copy), v13 (copy), v12 (copy)
-    v22._lastUpdate = os.time();
-    for v24, v25 in pairs(v23) do
-        if not v22._serverScriptsData[v24] then
-            local v26 = v0.new(v3);
-            v26:push_back({
-                data = v25, 
-                time = v22._lastUpdate
-            });
-            v22._serverScriptsData[v24] = {
-                max = v25, 
-                min = v25, 
-                dataSet = v26
-            };
-            local v27 = {
-                name = v24, 
-                dataStats = v22._serverScriptsData[v24]
-            };
-            table.insert(v22._sortedScriptsData, v27);
-        else
-            local v28 = {};
-            for v29, v30 in pairs(v22._serverScriptsData[v24].max) do
-                v28[v29] = v30;
-            end;
-            local v31 = {};
-            for v32, v33 in pairs(v22._serverScriptsData[v24].min) do
-                v31[v32] = v33;
-            end;
-            local v34 = {
-                data = v25, 
-                time = v22._lastUpdate
-            };
-            local v35 = v22._serverScriptsData[v24].dataSet:push_back(v34);
-            if v35 then
-                for v36, v37 in pairs(v35.data) do
-                    if v28[v36] == v37 then
-                        local v38 = v22._serverScriptsData[v24].dataSet:iterator();
-                        local v39 = v38:next();
-                        v28[v36] = v31[v36];
-                        while v39 do
-                            v28[v36] = v39.data[v36] < v28[v36] and v28[v36] or v39.data[v36];
-                            v39 = v38:next();
-                        end;
-                    end;
-                end;
-                for v40, v41 in pairs(v35.data) do
-                    if v31[v40] == v41 then
-                        local v42 = v22._serverScriptsData[v24].dataSet:iterator();
-                        local v43 = v42:next();
-                        v31[v40] = v28[v40];
-                        while v43 do
-                            v31[v40] = v31[v40] < v43.data[v40] and v31[v40] or v43.data[v40];
-                            v43 = v42:next();
-                        end;
-                    end;
-                end;
-            end;
-            v22._serverScriptsData[v24].max = v13(v28, v25);
-            v22._serverScriptsData[v24].min = v12(v31, v25);
-        end;
-    end;
-end;
-v15.isRunning = function(v44) --[[ Line: 139 ]] --[[ Name: isRunning ]]
-    return v44._isRunning;
-end;
-v15.start = function(v45) --[[ Line: 143 ]] --[[ Name: start ]]
-    -- upvalues: v14 (copy)
-    local v46 = v14();
-    if v46 and not v45._statsListenerConnection then
-        v45._statsListenerConnection = v46.StatsReceived:connect(function(v47) --[[ Line: 146 ]]
-            -- upvalues: v45 (copy)
-            if v47 then
-                v45._lastUpdate = os.time();
-                local l_Scripts_0 = v47.Scripts;
-                if l_Scripts_0 then
-                    v45:updateScriptsData(l_Scripts_0);
-                end;
-                v45._serverScriptsUpdated:Fire(v45._sortedScriptsData);
-            end;
-        end);
-        v46:RequestServerStats(true);
-        v45._isRunning = true;
-    end;
-end;
-v15.stop = function(v49) --[[ Line: 163 ]] --[[ Name: stop ]]
-    if v49._statsListenerConnection then
-        v49._statsListenerConnection:Disconnect();
-        v49._statsListenerConnection = nil;
-    end;
-    v49._isRunning = false;
-end;
-return v15;
+local CircularBuffer = require(script.Parent.Parent.Parent.CircularBuffer)
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local num = tonumber(settings():GetFVariable("NewDevConsoleMaxGraphCount"))
+local ChartHeaderNames = Constants.ServerScriptsFormatting.ChartHeaderNames
+local t1 = {
+	[ChartHeaderNames[1]] = function(p1, p2) -- line: 11
+		return p1.dataStats.dataSet:back().name < p2.dataStats.dataSet:back().name
+	end,
+	[ChartHeaderNames[2]] = function(p3, p4) -- line: 14
+		return p3.dataStats.dataSet:back().data[1] < p4.dataStats.dataSet:back().data[1]
+	end,
+	[ChartHeaderNames[3]] = function(p5, p6) -- line: 17
+		return p5.dataStats.dataSet:back().data[2] < p6.dataStats.dataSet:back().data[2]
+	end
+}
+local minOfTable = require(script.Parent.Parent.Parent.Util.minOfTable)
+local maxOfTable = require(script.Parent.Parent.Parent.Util.maxOfTable)
+local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new() -- line: 29
+	-- upvalues: t2 (copy), Signal (copy), ChartHeaderNames (copy)
+	local t3 = {}
+
+	setmetatable(t3, t2)
+	t3._serverScriptsUpdated = Signal.new()
+	t3._serverScriptsData = {}
+	t3._lastUpdate = 0
+	t3._sortedScriptsData = {}
+	t3._sortType = ChartHeaderNames[1]
+	t3._isRunning = false
+
+	return t3
+end
+function t2.setSortType(p7, p8) -- line: 43
+	-- upvalues: t1 (copy)
+	if t1[p8] then
+		p7._sortType = p8
+		table.sort(p7._sortedScriptsData, t1[p7._sortType])
+
+		return
+	end
+
+	error(string.format("attempted to pass invalid sortType: %s", (tostring(p8))), 2)
+end
+function t2.getSortType(p9) -- line: 53
+	return p9._sortType
+end
+function t2.Signal(p10) -- line: 57
+	return p10._serverScriptsUpdated
+end
+function t2.getCurrentData(p11) -- line: 61
+	return p11._sortedScriptsData
+end
+function t2.updateScriptsData(p12, p13) -- line: 66
+	-- upvalues: CircularBuffer (copy), num (copy), maxOfTable (copy), minOfTable (copy)
+	p12._lastUpdate = os.time()
+
+	for k, v in pairs(p13) do
+		if not p12._serverScriptsData[k] then
+			local v27 = CircularBuffer.new(num)
+
+			v27:push_back({
+				data = v,
+				time = p12._lastUpdate
+			})
+			p12._serverScriptsData[k] = {
+				max = v,
+				min = v,
+				dataSet = v27
+			}
+
+			local t4 = {
+				name = k,
+				dataStats = p12._serverScriptsData[k]
+			}
+
+			table.insert(p12._sortedScriptsData, t4)
+		else
+			local t5 = {}
+
+			for k2, v2 in pairs(p12._serverScriptsData[k].max) do
+				t5[k2] = v2
+			end
+
+			local t6 = {}
+
+			for k3, v3 in pairs(p12._serverScriptsData[k].min) do
+				t6[k3] = v3
+			end
+
+			local t7 = {
+				data = v,
+				time = p12._lastUpdate
+			}
+			local v36 = p12._serverScriptsData[k].dataSet:push_back(t7)
+
+			if v36 then
+				for k4, v4 in pairs(v36.data) do
+					if v4 == t5[k4] then
+						local v39 = p12._serverScriptsData[k].dataSet:iterator()
+						local v40 = v39:next()
+
+						t5[k4] = t6[k4]
+
+						while v40 do
+							t5[k4] = v40.data[k4] < t5[k4] and t5[k4] or v40.data[k4]
+							v40 = v39:next()
+						end
+					end
+				end
+
+				for k5, v5 in pairs(v36.data) do
+					if v5 == t6[k5] then
+						local v43 = p12._serverScriptsData[k].dataSet:iterator()
+						local v44 = v43:next()
+
+						t6[k5] = t5[k5]
+
+						while v44 do
+							t6[k5] = t6[k5] < v44.data[k5] and t6[k5] or v44.data[k5]
+							v44 = v43:next()
+						end
+					end
+				end
+			end
+
+			p12._serverScriptsData[k].max = maxOfTable(t5, v)
+			p12._serverScriptsData[k].min = minOfTable(t6, v)
+		end
+	end
+end
+function t2.isRunning(p14) -- line: 139
+	return p14._isRunning
+end
+function t2.start(p15) -- line: 143
+	-- upvalues: getClientReplicator (copy)
+	local v47 = getClientReplicator()
+
+	if v47 and not p15._statsListenerConnection then
+		p15._statsListenerConnection = v47.StatsReceived:connect(function(p16) -- line: 146
+			-- upvalues: p15 (copy)
+			if p16 then
+				p15._lastUpdate = os.time()
+
+				local Scripts = p16.Scripts
+
+				if Scripts then
+					p15:updateScriptsData(Scripts)
+				end
+
+				p15._serverScriptsUpdated:Fire(p15._sortedScriptsData)
+			end
+		end)
+		v47:RequestServerStats(true)
+		p15._isRunning = true
+	end
+end
+function t2.stop(p17) -- line: 163
+	if p17._statsListenerConnection then
+		p17._statsListenerConnection:Disconnect()
+		p17._statsListenerConnection = nil
+	end
+
+	p17._isRunning = false
+end
+
+return t2

@@ -1,63 +1,67 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactNavigation);
-local v4 = require(l_Parent_0.SocialServerDrivenUi);
-local v5 = require(l_Parent_0.RobloxAppHooks);
-local l_SocialSduiComponentWrapper_0 = v4.SocialSduiComponentWrapper;
-local v7 = require(l_script_FirstAncestor_0.Contexts.useProfileAnalyticsContext);
-local v8 = require(l_script_FirstAncestor_0.Hooks.useDynamicSizeMargin);
-local v9 = require(l_script_FirstAncestor_0.Hooks.useProfileCompletionSduiContext);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useProfileCompletionData);
-local v11 = require(l_script_FirstAncestor_0.Common.Enums);
-local l_useScreenSize_0 = v5.useScreenSize;
-return v2.memo(function(v13) --[[ Line: 22 ]] --[[ Name: ProfileCompletionContainer ]]
-    -- upvalues: v7 (copy), l_useScreenSize_0 (copy), v8 (copy), v2 (copy), v9 (copy), v4 (copy), v10 (copy), v3 (copy), l_SocialSduiComponentWrapper_0 (copy), v11 (copy)
-    local v14 = v7();
-    local v15 = l_useScreenSize_0();
-    local v16, v17 = v8();
-    local v18, v19 = v2.useState(v15.X);
-    local v20 = v9({
-        sideMargin = v16, 
-        containerWidth = v18
-    });
-    local v21 = v2.useMemo(function() --[[ Line: 33 ]]
-        -- upvalues: v13 (copy)
-        return {
-            collectionPosition = v13.layoutOrder
-        };
-    end, {
-        v13.layoutOrder
-    });
-    local v22 = v2.useRef(nil);
-    local v24 = v2.useCallback(function(v23) --[[ Line: 38 ]]
-        -- upvalues: v17 (copy), v19 (copy)
-        v17(v23);
-        v19(v23.AbsoluteSize.X);
-    end, {
-        v17, 
-        v19
-    });
-    v2.useEffect(function() --[[ Line: 43 ]]
-        -- upvalues: v4 (ref)
-        v4.registerSocialActions();
-    end, {});
-    local v25, v26 = v10();
-    return v2.createElement(v2.Fragment, nil, {
-        NavEvents = v2.createElement(v3.NavigationEvents, {
-            onDidFocus = v26
-        }), 
-        Content = if v25 then v2.createElement(l_SocialSduiComponentWrapper_0, {
-            layoutOrder = v13.layoutOrder, 
-            sduiContext = v20, 
-            sduiComponentConfig = v25, 
-            pageSideMargin = v16, 
-            onFrameResized = v24, 
-            verticalScrollingFrameRef = v22, 
-            scrollViewPositionChangedSignal = v14.scrollViewPositionChangedSignal, 
-            analyticsContext = v21, 
-            debugName = v11.Components.ProfileCompletion, 
-            testId = "profile-completion"
-        }) else nil
-    });
-end);
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local RoactNavigation = require(ProfilePlatformParent.RoactNavigation)
+local SocialServerDrivenUi = require(ProfilePlatformParent.SocialServerDrivenUi)
+local RobloxAppHooks = require(ProfilePlatformParent.RobloxAppHooks)
+local SocialSduiComponentWrapper = SocialServerDrivenUi.SocialSduiComponentWrapper
+local useProfileAnalyticsContext = require(ProfilePlatform.Contexts.useProfileAnalyticsContext)
+local useDynamicSizeMargin = require(ProfilePlatform.Hooks.useDynamicSizeMargin)
+local useProfileCompletionSduiContext = require(ProfilePlatform.Hooks.useProfileCompletionSduiContext)
+local useProfileCompletionData = require(ProfilePlatform.Hooks.useProfileCompletionData)
+local Enums = require(ProfilePlatform.Common.Enums)
+local useScreenSize = RobloxAppHooks.useScreenSize
+
+local function ProfileCompletionContainer(t1: {[any]: any}) -- line: 22
+	-- upvalues: useProfileAnalyticsContext (copy), useScreenSize (copy), useDynamicSizeMargin (copy), React (copy), useProfileCompletionSduiContext (copy), SocialServerDrivenUi (copy), useProfileCompletionData (copy), RoactNavigation (copy), SocialSduiComponentWrapper (copy), Enums (copy)
+	local v16 = useProfileAnalyticsContext()
+	local v17 = useScreenSize()
+	local v18, v19 = useDynamicSizeMargin()
+	local v20, v21 = React.useState(v17.X)
+	local v22 = useProfileCompletionSduiContext({
+		sideMargin = v18,
+		containerWidth = v20
+	})
+	local v23 = React.useMemo(function() -- line: 33
+		-- upvalues: t1 (copy)
+		return {
+			collectionPosition = t1.layoutOrder
+		}
+	end, { t1.layoutOrder })
+	local v24 = React.useRef(nil)
+	local v25 = React.useCallback(function(p1) -- line: 38
+		-- upvalues: v19 (copy), v21 (copy)
+		v19(p1)
+		v21(p1.AbsoluteSize.X)
+	end, {
+		v19,
+		v21
+	})
+
+	React.useEffect(function() -- line: 43
+		-- upvalues: SocialServerDrivenUi (copy)
+		SocialServerDrivenUi.registerSocialActions()
+	end, {})
+
+	local v26, v27 = useProfileCompletionData()
+
+	return React.createElement(React.Fragment, nil, {
+		NavEvents = React.createElement(RoactNavigation.NavigationEvents, {
+			onDidFocus = v27
+		}),
+		Content = if not v26 then nil else React.createElement(SocialSduiComponentWrapper, {
+			testId = "profile-completion",
+			layoutOrder = t1.layoutOrder,
+			sduiContext = v22,
+			sduiComponentConfig = v26,
+			pageSideMargin = v18,
+			onFrameResized = v25,
+			verticalScrollingFrameRef = v24,
+			scrollViewPositionChangedSignal = v16.scrollViewPositionChangedSignal,
+			analyticsContext = v23,
+			debugName = Enums.Components.ProfileCompletion
+		})
+	})
+end
+
+return React.memo(ProfileCompletionContainer)

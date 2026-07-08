@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CIDeeplinkEnabledForAll", false);
+return game:DefineFastFlag("CIDeeplinkEnabledForAll", false)

@@ -1,107 +1,111 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = require(l_Parent_0.Foundation);
-local l_Toast_0 = v3.Toast;
-local l_View_0 = v3.View;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local v7 = {
-    dampingRatio = 1, 
-    frequency = 3
-};
-local v8 = UDim.new(0, 296);
-return function(v9) --[[ Line: 36 ]] --[[ Name: ToastController ]]
-    -- upvalues: v1 (copy), v2 (copy), v7 (copy), l_ButtonVariant_0 (copy), l_View_0 (copy), l_Toast_0 (copy), v8 (copy)
-    local v10, v11 = v1.useState(false);
-    local v12 = v1.useCallback(function() --[[ Line: 39 ]]
-        -- upvalues: v10 (copy), v9 (copy)
-        if not v10 then
-            v9.onDismissed();
-        end;
-    end, {
-        v10, 
-        v9.onDismissed
-    });
-    local v13, v14 = v2.useAnimatedBinding(-200, v12);
-    local v15 = v1.useCallback(function() --[[ Line: 47 ]]
-        -- upvalues: v11 (copy), v14 (copy), v2 (ref), v7 (ref)
-        v11(false);
-        v14(v2.spring(-200, v7));
-    end, {
-        v14
-    });
-    v1.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v9 (copy), v11 (copy), v14 (copy), v2 (ref), v7 (ref), v15 (copy)
-        if v9.show then
-            v11(true);
-            v14(v2.spring(20, v7));
-            return;
-        else
-            v15();
-            return;
-        end;
-    end, {
-        v9.show, 
-        v14, 
-        v15
-    });
-    v1.useEffect(function() --[[ Line: 61 ]]
-        -- upvalues: v9 (copy), v15 (copy)
-        if v9.show and v9.duration > 0 then
-            local v16 = task.delay(v9.duration, function() --[[ Line: 63 ]]
-                -- upvalues: v15 (ref)
-                v15();
-            end);
-            return function() --[[ Line: 66 ]]
-                -- upvalues: v16 (copy)
-                task.cancel(v16);
-            end;
-        else
-            return nil;
-        end;
-    end, {
-        v9.show, 
-        v9.duration, 
-        v15
-    });
-    local l_onAction_0 = v9.onAction;
-    local v18 = v1.useMemo(function() --[[ Line: 74 ]]
-        -- upvalues: v9 (copy), l_onAction_0 (copy), v15 (copy), l_ButtonVariant_0 (ref)
-        if not v9.actionText then
-            return nil;
-        else
-            return {
-                {
-                    text = v9.actionText, 
-                    onActivated = function() --[[ Line: 81 ]] --[[ Name: onActivated ]]
-                        -- upvalues: l_onAction_0 (ref), v15 (ref)
-                        if l_onAction_0 then
-                            l_onAction_0();
-                        end;
-                        v15();
-                    end, 
-                    variant = l_ButtonVariant_0.Emphasis
-                }
-            };
-        end;
-    end, {
-        v9.actionText, 
-        l_onAction_0, 
-        v15
-    });
-    local v20 = v13:map(function(v19) --[[ Line: 92 ]]
-        return UDim2.new(0.5, 0, 0, v19);
-    end);
-    return v1.createElement(l_View_0, {
-        tag = "size-full-0 auto-y col align-x-center anchor-top-center", 
-        Position = v20
-    }, {
-        Toast = v1.createElement(l_Toast_0, {
-            title = v9.title, 
-            text = v9.text, 
-            icon = v9.icon, 
-            actions = v18, 
-            width = v8
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local ReactOtter = require(ParentParent.ReactOtter)
+local Foundation = require(ParentParent.Foundation)
+local Toast = Foundation.Toast
+local View = Foundation.View
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local t1 = {
+	dampingRatio = 1,
+	frequency = 3
+}
+local uDim = UDim.new(0, 296)
+
+local function ToastController(t2: {[any]: any}) -- line: 36
+	-- upvalues: React (copy), ReactOtter (copy), t1 (copy), ButtonVariant (copy), View (copy), Toast (copy), uDim (copy)
+	local v12, v13 = React.useState(false)
+	local v14 = React.useCallback(function() -- line: 39
+		-- upvalues: v12 (copy), t2 (copy)
+		if not v12 then
+			t2.onDismissed()
+		end
+	end, {
+		v12,
+		t2.onDismissed
+	})
+	local v15, v16 = ReactOtter.useAnimatedBinding(-200, v14)
+	local v17 = React.useCallback(function() -- line: 47
+		-- upvalues: v13 (copy), v16 (copy), ReactOtter (copy), t1 (copy)
+		v13(false)
+		v16(ReactOtter.spring(-200, t1))
+	end, { v16 })
+
+	React.useEffect(function() -- line: 52
+		-- upvalues: t2 (copy), v13 (copy), v16 (copy), ReactOtter (copy), t1 (copy), v17 (copy)
+		if t2.show then
+			v13(true)
+			v16(ReactOtter.spring(20, t1))
+
+			return
+		end
+
+		v17()
+	end, {
+		t2.show,
+		v16,
+		v17
+	})
+	React.useEffect(function() -- line: 61
+		-- upvalues: t2 (copy), v17 (copy)
+		if t2.show and t2.duration > 0 then
+			local thread = task.delay(t2.duration, function() -- line: 63
+				-- upvalues: v17 (copy)
+				v17()
+			end)
+
+			return function() -- line: 66
+				-- upvalues: thread (copy)
+				task.cancel(thread)
+			end
+		end
+
+		return nil
+	end, {
+		t2.show,
+		t2.duration,
+		v17
+	})
+
+	local onAction = t2.onAction
+	local v19 = React.useMemo(function() -- line: 74
+		-- upvalues: t2 (copy), onAction (copy), v17 (copy), ButtonVariant (copy)
+		if not t2.actionText then
+			return nil
+		end
+
+		return {{
+			text = t2.actionText,
+			onActivated = function() -- line: 81
+				-- upvalues: onAction (copy), v17 (copy)
+				if onAction then
+					onAction()
+				end
+
+				v17()
+			end,
+			variant = ButtonVariant.Emphasis
+		}}
+	end, {
+		t2.actionText,
+		onAction,
+		v17
+	})
+	local v20 = v15:map(function(p1) -- line: 92
+		return UDim2.new(0.5, 0, 0, p1)
+	end)
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y col align-x-center anchor-top-center",
+		Position = v20
+	}, {
+		Toast = React.createElement(Toast, {
+			title = t2.title,
+			text = t2.text,
+			icon = t2.icon,
+			actions = v19,
+			width = uDim
+		})
+	})
+end
+
+return ToastController

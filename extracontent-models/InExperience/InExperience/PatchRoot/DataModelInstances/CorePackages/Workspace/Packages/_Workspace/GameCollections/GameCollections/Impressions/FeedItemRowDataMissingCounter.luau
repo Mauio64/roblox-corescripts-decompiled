@@ -1,16 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("GameCollections").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local v2 = require(script.Parent.FIntFeedItemRowDataCounterThrottle);
+local Parent = script:FindFirstAncestor("GameCollections").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local FIntFeedItemRowDataCounterThrottle = require(script.Parent.FIntFeedItemRowDataCounterThrottle)
+
 return {
-    eventName = "feedItemRowDataMissingCounter", 
-    backends = {
-        v1.TelemetryBackends.Counter
-    }, 
-    throttlingPercentage = v2, 
-    lastUpdated = {
-        24, 
-        5, 
-        29
-    }, 
-    description = "Count the number of times feed item data is missing when game impression is sent"
-};
+	eventName = "feedItemRowDataMissingCounter",
+	description = "Count the number of times feed item data is missing when game impression is sent",
+	backends = { LoggingProtocol.TelemetryBackends.Counter },
+	throttlingPercentage = FIntFeedItemRowDataCounterThrottle,
+	lastUpdated = {
+		24,
+		5,
+		29
+	}
+}

@@ -1,19 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_script_FirstAncestor_0.Utils.getMutualFriendsText);
-local l_FFlagConnectionsToFriendsRename_0 = require(l_Parent_0.SharedFlags).FFlagConnectionsToFriendsRename;
-return function(v5) --[[ Line: 14 ]]
-    -- upvalues: l_useLocalization_0 (copy), l_FFlagConnectionsToFriendsRename_0 (copy), v3 (copy)
-    local v6 = l_useLocalization_0({
-        singularMutualConnection = l_FFlagConnectionsToFriendsRename_0 and "Feature.Friends.Label.MutualFriendTitle" or "Feature.Friends.Label.MutualConnection", 
-        mutualConnections = {
-            l_FFlagConnectionsToFriendsRename_0 and "Feature.Friends.Label.MutualFriendsTitle" or "Feature.Friends.Label.MutualConnections"; 
-            numConnections = v5
-        }
-    });
-    return v3({
-        mutualFriendsCount = v5, 
-        localized = v6
-    });
-end;
+local SocialCommon = script:FindFirstAncestor("SocialCommon")
+local SocialCommonParent = SocialCommon.Parent
+local useLocalization = require(SocialCommonParent.Localization).Hooks.useLocalization
+local getMutualFriendsText = require(SocialCommon.Utils.getMutualFriendsText)
+local FFlagConnectionsToFriendsRename = require(SocialCommonParent.SharedFlags).FFlagConnectionsToFriendsRename
+
+return function(n1: number) -- line: 14
+	-- upvalues: useLocalization (copy), FFlagConnectionsToFriendsRename (copy), getMutualFriendsText (copy)
+	local v7 = useLocalization({
+		singularMutualConnection = not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.MutualConnection" or "Feature.Friends.Label.MutualFriendTitle",
+		mutualConnections = {
+			not FFlagConnectionsToFriendsRename and "Feature.Friends.Label.MutualConnections" or "Feature.Friends.Label.MutualFriendsTitle",
+			numConnections = n1
+		}
+	})
+
+	return getMutualFriendsText({
+		mutualFriendsCount = n1,
+		localized = v7
+	})
+end

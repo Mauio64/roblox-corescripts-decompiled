@@ -1,1 +1,1 @@
-return game:DefineFastString("PVCIAfterSignupLayer", "HomePage.UpsellCard");
+return game:DefineFastString("PVCIAfterSignupLayer", "HomePage.UpsellCard")

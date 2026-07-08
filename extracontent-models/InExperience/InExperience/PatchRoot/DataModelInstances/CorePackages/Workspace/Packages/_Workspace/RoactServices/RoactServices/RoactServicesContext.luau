@@ -1,4 +1,6 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Roact);
-local _ = require(script.Parent.RoactServicesTypes);
-return (v1.createContext(nil));
+local ParentParent = script.Parent.Parent
+local Roact = require(ParentParent.Roact)
+
+require(script.Parent.RoactServicesTypes)
+
+return (Roact.createContext(nil))

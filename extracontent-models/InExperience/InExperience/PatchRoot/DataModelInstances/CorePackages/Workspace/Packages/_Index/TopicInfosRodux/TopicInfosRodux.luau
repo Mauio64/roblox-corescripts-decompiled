@@ -1,7 +1,8 @@
-local v0 = require(script.TopicInfoModel);
+local TopicInfoModel = require(script.TopicInfoModel)
+
 return {
-    AddTopicInfos = require(script.AddTopicInfos), 
-    TopicInfoModel = v0, 
-    TopicInfosReducer = require(script.TopicInfosReducer), 
-    ["jest.config"] = script["jest.config"]
-};
+	AddTopicInfos = require(script.AddTopicInfos),
+	TopicInfoModel = TopicInfoModel,
+	TopicInfosReducer = require(script.TopicInfosReducer),
+	["jest.config"] = script["jest.config"]
+}

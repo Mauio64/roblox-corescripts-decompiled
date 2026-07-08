@@ -1,6 +1,6 @@
 return {
-    Circle = "Circle", 
-    Square = "Square", 
-    Portrait = "Portrait", 
-    Landscape = "Landscape"
-};
+	Circle = "Circle",
+	Square = "Square",
+	Portrait = "Portrait",
+	Landscape = "Landscape"
+}

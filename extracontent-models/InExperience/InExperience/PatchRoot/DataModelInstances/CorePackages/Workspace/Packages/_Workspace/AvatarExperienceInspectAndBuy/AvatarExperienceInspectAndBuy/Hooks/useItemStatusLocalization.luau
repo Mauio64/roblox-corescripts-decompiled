@@ -1,39 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.AXCommon);
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_ItemTypeEnum_0 = v3.Enums.ItemTypeEnum;
-local v6 = require(l_script_FirstAncestor_0.Constants);
-local l_AssetLocalizationKeys_0 = v6.AssetLocalizationKeys;
-local l_BundleLocalizationKeys_0 = v6.BundleLocalizationKeys;
-local l_PriceStatusLocalizationKeys_0 = v6.PriceStatusLocalizationKeys;
-local l_ItemDetailsLocalizationKeys_0 = v6.ItemDetailsLocalizationKeys;
-local v11 = require(l_Parent_0.Cryo);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function(v13) --[[ Line: 17 ]]
-    -- upvalues: v2 (copy), l_ItemTypeEnum_0 (copy), l_BundleLocalizationKeys_0 (copy), l_AssetLocalizationKeys_0 (copy), v11 (copy), l_PriceStatusLocalizationKeys_0 (copy), l_ItemDetailsLocalizationKeys_0 (copy), l_useLocalization_0 (copy)
-    local v14 = v2.useMemo(function() --[[ Line: 18 ]]
-        -- upvalues: v13 (copy), l_ItemTypeEnum_0 (ref), l_BundleLocalizationKeys_0 (ref), l_AssetLocalizationKeys_0 (ref)
-        if v13 and v13.itemType == l_ItemTypeEnum_0.Bundle then
-            return l_BundleLocalizationKeys_0;
-        else
-            return l_AssetLocalizationKeys_0;
-        end;
-    end, {
-        v13
-    });
-    local v15 = v2.useMemo(function() --[[ Line: 22 ]]
-        -- upvalues: v11 (ref), v14 (copy), l_PriceStatusLocalizationKeys_0 (ref), l_ItemDetailsLocalizationKeys_0 (ref), v13 (copy)
-        return v11.Dictionary.join(v14, l_PriceStatusLocalizationKeys_0, l_ItemDetailsLocalizationKeys_0, {
-            ownedItems = {
-                l_ItemDetailsLocalizationKeys_0.ownedItems; 
-                QUANTITY = if v13 and v13.collectibleItemDetails then v13.collectibleItemDetails.resellableCount else 0
-            }
-        });
-    end, {
-        v14, 
-        v13
-    });
-    return (l_useLocalization_0(v15));
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local AXCommon = require(AvatarExperienceInspectAndBuyParent.AXCommon)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local ItemTypeEnum = AXCommon.Enums.ItemTypeEnum
+local Constants = require(AvatarExperienceInspectAndBuy.Constants)
+local AssetLocalizationKeys = Constants.AssetLocalizationKeys
+local BundleLocalizationKeys = Constants.BundleLocalizationKeys
+local PriceStatusLocalizationKeys = Constants.PriceStatusLocalizationKeys
+local ItemDetailsLocalizationKeys = Constants.ItemDetailsLocalizationKeys
+local Cryo = require(AvatarExperienceInspectAndBuyParent.Cryo)
+local useLocalization = require(AvatarExperienceInspectAndBuyParent.Localization).Hooks.useLocalization
+
+return function(p1) -- line: 17
+	-- upvalues: React (copy), ItemTypeEnum (copy), BundleLocalizationKeys (copy), AssetLocalizationKeys (copy), Cryo (copy), PriceStatusLocalizationKeys (copy), ItemDetailsLocalizationKeys (copy), useLocalization (copy)
+	local v14 = React.useMemo(function() -- line: 18
+		-- upvalues: p1 (copy), ItemTypeEnum (copy), BundleLocalizationKeys (copy), AssetLocalizationKeys (copy)
+		if p1 and p1.itemType == ItemTypeEnum.Bundle then
+			return BundleLocalizationKeys
+		end
+
+		return AssetLocalizationKeys
+	end, { p1 })
+	local v15 = React.useMemo(function() -- line: 22
+		-- upvalues: Cryo (copy), v14 (copy), PriceStatusLocalizationKeys (copy), ItemDetailsLocalizationKeys (copy), p1 (copy)
+		return Cryo.Dictionary.join(v14, PriceStatusLocalizationKeys, ItemDetailsLocalizationKeys, {
+			ownedItems = {
+				ItemDetailsLocalizationKeys.ownedItems,
+				QUANTITY = (not p1 or not p1.collectibleItemDetails) and 0 or p1.collectibleItemDetails.resellableCount
+			}
+		})
+	end, {
+		v14,
+		p1
+	})
+
+	return (useLocalization(v15))
+end

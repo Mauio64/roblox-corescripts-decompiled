@@ -1,125 +1,150 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 5 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    assert(v1, "Cannot initialize CircularBuffer with nil");
-    assert(v1 > 0, "Cannot initialize CircularBuffer to size < 1");
-    local v2 = {};
-    setmetatable(v2, v0);
-    v2._data = {};
-    v2._backIndex = 0;
-    v2._maxSize = v1;
-    return v2;
-end;
-v0.reset = function(v3) --[[ Line: 19 ]] --[[ Name: reset ]]
-    v3._data = {};
-    v3._backIndex = 0;
-end;
-v0.getSize = function(v4) --[[ Line: 24 ]] --[[ Name: getSize ]]
-    return #v4._data;
-end;
-v0.getMaxSize = function(v5) --[[ Line: 28 ]] --[[ Name: getMaxSize ]]
-    return v5._maxSize;
-end;
-v0.setSize = function(v6, v7) --[[ Line: 32 ]] --[[ Name: setSize ]]
-    assert(v7, "Cannot set CircularBuffer with nil");
-    assert(v7 > 0, "Cannot set CircularBuffer to size < 1");
-    if v7 == v6._maxSize then
-        return;
-    else
-        local v8 = v6:iterator();
-        local v9 = v8:next();
-        local v10 = {};
-        local v11 = 0;
-        while v9 and v11 < v7 do
-            local v12 = v11 + 1;
-            v10[v12] = {
-                entry = v9
-            };
-            if v10[v11] then
-                v10[v11]._next = v10[v12];
-            end;
-            v11 = v12;
-            v9 = v8:next();
-        end;
-        v6._data = v10;
-        v6._backIndex = v11;
-        v6._maxSize = v7;
-        return;
-    end;
-end;
-v0.getFrontIndex = function(v13) --[[ Line: 63 ]] --[[ Name: getFrontIndex ]]
-    local v14 = v13._backIndex + 1;
-    if not v13._data[v14] then
-        return 1;
-    else
-        return v14;
-    end;
-end;
-v0.front = function(v15) --[[ Line: 71 ]] --[[ Name: front ]]
-    local v16 = v15:getFrontIndex();
-    if v15._data[v16] then
-        return v15._data[v16].entry;
-    else
-        return nil;
-    end;
-end;
-v0.back = function(v17) --[[ Line: 79 ]] --[[ Name: back ]]
-    if v17._data[v17._backIndex] then
-        return v17._data[v17._backIndex].entry;
-    else
-        return nil;
-    end;
-end;
-v0.iterator = function(v18) --[[ Line: 86 ]] --[[ Name: iterator ]]
-    return {
-        data = v18._data[v18:getFrontIndex()], 
-        next = function(v19) --[[ Line: 91 ]] --[[ Name: next ]]
-            local l_data_0 = v19.data;
-            if l_data_0 then
-                v19.data = v19.data._next;
-            end;
-            return l_data_0 and l_data_0.entry;
-        end
-    };
-end;
-v0.getData = function(v21) --[[ Line: 103 ]] --[[ Name: getData ]]
-    return v21._data;
-end;
-v0.at = function(v22, v23) --[[ Line: 107 ]] --[[ Name: at ]]
-    assert(v23, "Cannot index CircularBuffer with nil");
-    local v24 = (v22:getFrontIndex() + v23 - 2) % v22._maxSize + 1;
-    if v22._data[v24] then
-        return v22._data[v24].entry;
-    else
-        return nil;
-    end;
-end;
-v0.reverseAt = function(v25, v26) --[[ Line: 118 ]] --[[ Name: reverseAt ]]
-    local v27 = (v25._backIndex - v26) % v25._maxSize + 1;
-    if v25._data[v27] then
-        return v25._data[v27].entry;
-    else
-        return nil;
-    end;
-end;
-v0.push_back = function(v28, v29) --[[ Line: 129 ]] --[[ Name: push_back ]]
-    local l__backIndex_0 = v28._backIndex;
-    local v31 = v28._backIndex + 1;
-    if v28._maxSize < v31 then
-        v31 = 1;
-    end;
-    local v32 = v28._data[v31];
-    v28._data[v31] = {
-        entry = v29
-    };
-    if l__backIndex_0 > 0 then
-        v28._data[l__backIndex_0]._next = v28._data[v31];
-        if v32 then
-            v32._next = nil;
-        end;
-    end;
-    v28._backIndex = v31;
-    return v32 and v32.entry;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 5
+	-- upvalues: t1 (copy)
+	assert(p1, "Cannot initialize CircularBuffer with nil")
+	assert(p1 > 0, "Cannot initialize CircularBuffer to size < 1")
+
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._data = {}
+	t2._backIndex = 0
+	t2._maxSize = p1
+
+	return t2
+end
+function t1.reset(p2) -- line: 19
+	p2._data = {}
+	p2._backIndex = 0
+end
+function t1.getSize(p3) -- line: 24
+	return #p3._data
+end
+function t1.getMaxSize(p4) -- line: 28
+	return p4._maxSize
+end
+function t1.setSize(p5, p6) -- line: 32
+	assert(p6, "Cannot set CircularBuffer with nil")
+	assert(p6 > 0, "Cannot set CircularBuffer to size < 1")
+
+	if p6 == p5._maxSize then
+		return
+	end
+
+	local v9 = p5:iterator()
+	local v10 = v9:next()
+	local t3 = {}
+	local n1 = 0
+
+	while v10 and n1 < p6 do
+		local v13 = n1 + 1
+
+		t3[v13] = {
+			entry = v10
+		}
+
+		if t3[n1] then
+			t3[n1]._next = t3[v13]
+		end
+
+		n1 = v13
+		v10 = v9:next()
+	end
+
+	p5._data = t3
+	p5._backIndex = n1
+	p5._maxSize = p6
+end
+function t1.getFrontIndex(p7) -- line: 63
+	local v15 = p7._backIndex + 1
+
+	if not p7._data[v15] then
+		return 1
+	end
+
+	return v15
+end
+function t1.front(p8) -- line: 71
+	local v17 = p8:getFrontIndex()
+
+	if p8._data[v17] then
+		return p8._data[v17].entry
+	end
+
+	return nil
+end
+function t1.back(p9) -- line: 79
+	if p9._data[p9._backIndex] then
+		return p9._data[p9._backIndex].entry
+	end
+
+	return nil
+end
+function t1.iterator(p10) -- line: 86
+	return {
+		data = p10._data[p10:getFrontIndex()],
+		next = function(p11) -- line: 91
+			local data = p11.data
+
+			if data then
+				p11.data = p11.data._next
+			end
+
+			return data and data.entry
+		end
+	}
+end
+function t1.getData(p12) -- line: 103
+	return p12._data
+end
+function t1.at(p13, p14) -- line: 107
+	assert(p14, "Cannot index CircularBuffer with nil")
+
+	local v23 = (p13:getFrontIndex() + p14 - 2) % p13._maxSize + 1
+
+	if p13._data[v23] then
+		return p13._data[v23].entry
+	end
+
+	return nil
+end
+function t1.reverseAt(p15, p16) -- line: 118
+	local v26 = (p15._backIndex - p16) % p15._maxSize + 1
+
+	if p15._data[v26] then
+		return p15._data[v26].entry
+	end
+
+	return nil
+end
+function t1.push_back(p17, p18) -- line: 129
+	local _backIndex = p17._backIndex
+	local v30 = p17._backIndex + 1
+
+	if v30 > p17._maxSize then
+		v30 = 1
+	end
+
+	local v31 = p17._data[v30]
+
+	p17._data[v30] = {
+		entry = p18
+	}
+
+	if _backIndex > 0 then
+		p17._data[_backIndex]._next = p17._data[v30]
+
+		if v31 then
+			v31._next = nil
+		end
+	end
+
+	p17._backIndex = v30
+
+	return v31 and v31.entry
+end
+
+return t1

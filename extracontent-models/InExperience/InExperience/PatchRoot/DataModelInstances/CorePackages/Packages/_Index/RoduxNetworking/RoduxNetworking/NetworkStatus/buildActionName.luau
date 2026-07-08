@@ -1,3 +1,3 @@
-return function(v0) --[[ Line: 1 ]]
-    return "networkStatus:" .. tostring(v0.keyPath);
-end;
+return function(p1) -- line: 1
+	return "networkStatus:" .. tostring(p1.keyPath)
+end

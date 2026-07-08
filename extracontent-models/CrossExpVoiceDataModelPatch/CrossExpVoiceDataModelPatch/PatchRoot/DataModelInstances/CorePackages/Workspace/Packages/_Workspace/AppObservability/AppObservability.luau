@@ -1,4 +1,4 @@
 return {
-    ["jest.config"] = script["jest.config"], 
-    SessionWithErrorReporter = require(script.SessionWithErrorReporter)
-};
+	["jest.config"] = script["jest.config"],
+	SessionWithErrorReporter = require(script.SessionWithErrorReporter)
+}

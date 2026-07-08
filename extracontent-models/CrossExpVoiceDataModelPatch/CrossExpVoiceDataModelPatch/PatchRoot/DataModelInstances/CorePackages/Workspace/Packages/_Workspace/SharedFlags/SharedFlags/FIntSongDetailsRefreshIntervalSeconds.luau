@@ -1,1 +1,1 @@
-return game:DefineFastInt("SongDetailsRefreshIntervalSeconds", 3600);
+return game:DefineFastInt("SongDetailsRefreshIntervalSeconds", 3600)

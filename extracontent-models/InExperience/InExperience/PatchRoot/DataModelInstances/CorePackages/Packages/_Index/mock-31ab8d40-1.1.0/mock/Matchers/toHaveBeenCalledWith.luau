@@ -1,47 +1,50 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.MagicMock);
-local v2 = require(l_Parent_0.Spy);
-local v3 = require(l_Parent_0.AnyCallMatches);
-local v4 = require(l_Parent_0.fmtArgs);
-local v5 = require(l_Parent_0.symbols);
-local function _(v6) --[[ Line: 8 ]] --[[ Name: getLiteralPredicate ]]
-    return function(v7) --[[ Line: 9 ]]
-        -- upvalues: v6 (copy)
-        return v7 == v6;
-    end;
-end;
-local function _(v9) --[[ Line: 14 ]] --[[ Name: isPredicate ]]
-    -- upvalues: v5 (copy), v1 (copy)
-    if type(v9) == "table" and v9[v5.isPredicate] then
-        return not v1.is(v9);
-    else
-        return;
-    end;
-end;
-return function(v11, ...) --[[ Line: 20 ]]
-    -- upvalues: v1 (copy), v2 (copy), v5 (copy), v3 (copy), v4 (copy)
-    if not (v1.is(v11) or v2.is(v11)) then
-        return {
-            pass = false, 
-            message = string.format("expect(mock) must be a MagicMock or Spy when .toHaveBeenCalledWith is used. Given %s instead", (tostring(v11)))
-        };
-    else
-        local v12 = table.pack(...);
-        local v13 = {};
-        for _, v15 in ipairs(v12) do
-            if if type(v15) == "table" and v15[v5.isPredicate] then not v1.is(v15) else nil then
-                table.insert(v13, v15.predicate);
-            else
-                table.insert(v13, function(v16) --[[ Line: 9 ]]
-                    -- upvalues: v15 (copy)
-                    return v16 == v15;
-                end);
-            end;
-        end;
-        local v17, v18 = v3.predicates(v11, table.unpack(v13));
-        return {
-            pass = v17, 
-            message = v17 and string.format("Expected %s to never have been called with args: %s", tostring(v11), v4(v12)) or string.format("Expected %s to have been called with args: %s", tostring(v11), v18)
-        };
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local MagicMock = require(ParentParent.MagicMock)
+local Spy = require(ParentParent.Spy)
+local AnyCallMatches = require(ParentParent.AnyCallMatches)
+local fmtArgs = require(ParentParent.fmtArgs)
+local symbols = require(ParentParent.symbols)
+
+local function getLiteralPredicate(p1) -- line: 8
+	return function(p2) -- line: 9
+		-- upvalues: p1 (copy)
+		return p2 == p1
+	end
+end
+local function isPredicate(p3) -- line: 14
+	-- upvalues: symbols (copy), MagicMock (copy)
+	if type(p3) == "table" and p3[symbols.isPredicate] then
+		return not MagicMock.is(p3)
+	end
+end
+
+return function(p4, ...) -- line: 20
+	-- upvalues: MagicMock (copy), Spy (copy), symbols (copy), AnyCallMatches (copy), fmtArgs (copy)
+	if not MagicMock.is(p4) and not Spy.is(p4) then
+		return {
+			pass = false,
+			message = string.format("expect(mock) must be a MagicMock or Spy when .toHaveBeenCalledWith is used. Given %s instead", (tostring(p4)))
+		}
+	end
+
+	local v12 = table.pack(...)
+	local t1 = {}
+
+	for _, v in ipairs(v12) do
+		if if type(v) ~= "table" or not v[symbols.isPredicate] then nil else not MagicMock.is(v) then
+			table.insert(t1, v.predicate)
+		else
+			table.insert(t1, function(p5) -- line: 9
+				-- upvalues: v (copy)
+				return p5 == v
+			end)
+		end
+	end
+
+	local v16, v17 = AnyCallMatches.predicates(p4, table.unpack(t1))
+
+	return {
+		pass = v16,
+		message = v16 and string.format("Expected %s to never have been called with args: %s", tostring(p4), fmtArgs(v12)) or string.format("Expected %s to have been called with args: %s", tostring(p4), v17)
+	}
+end

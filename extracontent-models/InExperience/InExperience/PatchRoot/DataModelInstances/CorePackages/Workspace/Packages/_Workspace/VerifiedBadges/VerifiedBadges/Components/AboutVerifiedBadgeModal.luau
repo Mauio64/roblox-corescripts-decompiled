@@ -1,88 +1,86 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VerifiedBadges");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v6 = require(l_script_FirstAncestor_0.constants);
-local v7 = UDim.new(0, 24);
-local v8 = UDim.new(0, 12);
-local function v10(v9) --[[ Line: 20 ]] --[[ Name: selectScreenSize ]]
-    return v9.ScreenSize;
-end;
-return function(v11) --[[ Line: 24 ]] --[[ Name: AboutVerifiedBadgeModal ]]
-    -- upvalues: v3 (copy), l_useSelector_0 (copy), v10 (copy), l_useLocalization_0 (copy), v2 (copy), v7 (copy), v8 (copy), v6 (copy)
-    local v12 = v3.Core.Style.useStyle();
-    local v13 = l_useSelector_0(v10);
-    local v14 = l_useLocalization_0({
-        titleText = "Feature.ProfileBadges.VerifiedBadgeInfoTitle", 
-        bodyText = "Feature.ProfileBadges.VerifiedBadgeInfo", 
-        learnMoreText = "Feature.ProfileBadges.VerifiedBadgeInfoLink"
-    });
-    local v15 = v2.useCallback(function() --[[ Line: 34 ]]
-        -- upvalues: v11 (copy)
-        if v11.onClose then
-            v11.onClose();
-        end;
-    end, {
-        v11
-    });
-    local v16 = v2.useCallback(function() --[[ Line: 40 ]]
-        -- upvalues: v11 (copy)
-        if v11.onConfirm then
-            v11.onConfirm();
-        end;
-    end, {
-        v11
-    });
-    return v2.createElement(v3.App.Dialog.Modal.PartialPageModal, {
-        title = v14.titleText, 
-        screenSize = v13, 
-        buttonStackProps = {
-            buttons = {
-                {
-                    buttonType = v3.App.Button.Enum.ButtonType.PrimarySystem, 
-                    props = {
-                        onActivated = v16, 
-                        text = v14.learnMoreText
-                    }
-                }
-            }
-        }, 
-        contentPadding = v7, 
-        onCloseClicked = v15
-    }, {
-        Wrapper = v2.createElement("Frame", {
-            Size = UDim2.fromScale(1, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = v8
-            }), 
-            Padding = v2.createElement("UIPadding", {
-                PaddingTop = v8, 
-                PaddingBottom = v8
-            }), 
-            Icon = v2.createElement(v3.App.Text.StyledTextLabel, {
-                layoutOrder = 1, 
-                text = v6.VERIFIED_EMOJI, 
-                fontStyle = v12.Font.Title, 
-                colorStyle = v12.Theme.TextEmphasis, 
-                automaticSize = Enum.AutomaticSize.XY, 
-                fluidSizing = false
-            }), 
-            Body = v2.createElement(v3.App.Text.StyledTextLabel, {
-                layoutOrder = 2, 
-                text = v14.bodyText, 
-                fontStyle = v12.Font.Body, 
-                colorStyle = v12.Theme.TextMuted, 
-                size = UDim2.fromScale(1, 0), 
-                automaticSize = Enum.AutomaticSize.Y, 
-                fluidSizing = false
-            })
-        })
-    });
-end;
+local VerifiedBadges = script:FindFirstAncestor("VerifiedBadges")
+local VerifiedBadgesParent = VerifiedBadges.Parent
+local React = require(VerifiedBadgesParent.React)
+local UIBlox = require(VerifiedBadgesParent.UIBlox)
+local useSelector = require(VerifiedBadgesParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useLocalization = require(VerifiedBadgesParent.Localization).Hooks.useLocalization
+local constants = require(VerifiedBadges.constants)
+local uDim = UDim.new(0, 24)
+local uDim2 = UDim.new(0, 12)
+
+local function selectScreenSize(p1) -- line: 20
+	return p1.ScreenSize
+end
+local function AboutVerifiedBadgeModal(t1: {[any]: any}) -- line: 24
+	-- upvalues: UIBlox (copy), useSelector (copy), selectScreenSize (copy), useLocalization (copy), React (copy), uDim (copy), uDim2 (copy), constants (copy)
+	local v14 = UIBlox.Core.Style.useStyle()
+	local v15 = useSelector(selectScreenSize)
+	local v16 = useLocalization({
+		titleText = "Feature.ProfileBadges.VerifiedBadgeInfoTitle",
+		bodyText = "Feature.ProfileBadges.VerifiedBadgeInfo",
+		learnMoreText = "Feature.ProfileBadges.VerifiedBadgeInfoLink"
+	})
+	local v17 = React.useCallback(function() -- line: 34
+		-- upvalues: t1 (copy)
+		if t1.onClose then
+			t1.onClose()
+		end
+	end, { t1 })
+	local v18 = React.useCallback(function() -- line: 40
+		-- upvalues: t1 (copy)
+		if t1.onConfirm then
+			t1.onConfirm()
+		end
+	end, { t1 })
+
+	return React.createElement(UIBlox.App.Dialog.Modal.PartialPageModal, {
+		title = v16.titleText,
+		screenSize = v15,
+		buttonStackProps = {
+			buttons = {{
+				buttonType = UIBlox.App.Button.Enum.ButtonType.PrimarySystem,
+				props = {
+					onActivated = v18,
+					text = v16.learnMoreText
+				}
+			}}
+		},
+		contentPadding = uDim,
+		onCloseClicked = v17
+	}, {
+		Wrapper = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = uDim2
+			}),
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = uDim2,
+				PaddingBottom = uDim2
+			}),
+			Icon = React.createElement(UIBlox.App.Text.StyledTextLabel, {
+				layoutOrder = 1,
+				fluidSizing = false,
+				text = constants.VERIFIED_EMOJI,
+				fontStyle = v14.Font.Title,
+				colorStyle = v14.Theme.TextEmphasis,
+				automaticSize = Enum.AutomaticSize.XY
+			}),
+			Body = React.createElement(UIBlox.App.Text.StyledTextLabel, {
+				layoutOrder = 2,
+				fluidSizing = false,
+				text = v16.bodyText,
+				fontStyle = v14.Font.Body,
+				colorStyle = v14.Theme.TextMuted,
+				size = UDim2.fromScale(1, 0),
+				automaticSize = Enum.AutomaticSize.Y
+			})
+		})
+	})
+end
+
+return AboutVerifiedBadgeModal

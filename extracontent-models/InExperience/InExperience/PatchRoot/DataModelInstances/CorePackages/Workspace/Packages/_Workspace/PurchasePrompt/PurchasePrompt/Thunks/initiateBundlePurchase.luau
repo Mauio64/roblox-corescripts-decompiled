@@ -1,130 +1,200 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Players_0 = game:GetService("Players");
-local l_HttpService_0 = game:GetService("HttpService");
-local v4 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v5 = require(l_script_FirstAncestor_0.Actions.RequestBundlePurchase);
-local v6 = require(l_script_FirstAncestor_0.Actions.SetProductPayload);
-local v7 = require(l_script_FirstAncestor_0.Utils.buildProductPayloadFromInitiateArgs);
-local v8 = require(l_script_FirstAncestor_0.Actions.SetPurchaseFlowUUID);
-local v9 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v10 = require(l_script_FirstAncestor_0.Network.getBundleDetails);
-local v11 = require(l_script_FirstAncestor_0.Network.getProductPurchasableDetails);
-local v12 = require(l_script_FirstAncestor_0.Network.getCatalogItemDetails);
-local v13 = require(l_script_FirstAncestor_0.Network.getAccountInfo);
-local v14 = require(l_script_FirstAncestor_0.Network.getBalanceInfo);
-local v15 = require(l_script_FirstAncestor_0.Network.getIsAlreadyOwned);
-local v16 = require(l_script_FirstAncestor_0.Services.Network);
-local v17 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v18 = require(l_script_FirstAncestor_0.Utils.hasPendingRequest);
-local v19 = require(l_script_FirstAncestor_0.Promise);
-local v20 = require(l_script_FirstAncestor_0.Thunk);
-local _ = require(l_Parent_0.AppCommonLib).Logging;
-local v22 = require(l_Parent_0.LoggingProtocol);
-local l_FFlagEnableUnifiedProductPurchaseFlow_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow;
-local v24 = require(l_script_FirstAncestor_0.Network.getUnifiedPurchaseFlowEligibility);
-local v25 = require(l_script_FirstAncestor_0.Flags.FFlagRemoveAcountInfoFetchFromPurchase);
-local v26 = require(script.Parent.resolveBundlePromptState);
-local v27 = require(l_script_FirstAncestor_0.Flags.GetFFlagUseCatalogItemDetailsToResolveBundlePurchase);
-local v28 = require(l_script_FirstAncestor_0.Flags.FFlagEnablePurchaseFlowUUIDMigration);
-local l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).FFlagUnifiedPurchaseOptimizeTTIMarketplace;
-local l_getRobloxSubscriptionProducts_0 = require(l_Parent_0.RobloxSubscriptionPurchaseApp).Network.getRobloxSubscriptionProducts;
-local l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal;
-local v32 = require(l_script_FirstAncestor_0.Events.PurchaseFlowUUIDTelemetry);
-local v33 = {
-    v16, 
-    v17
-};
-return function(v34, v35, v36, v37, v38, v39, v40, v41) --[[ Line: 52 ]] --[[ Name: initiateBundlePurchase ]]
-    -- upvalues: v20 (copy), v33 (copy), v16 (copy), v17 (copy), v18 (copy), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (copy), v7 (copy), v6 (copy), v28 (copy), l_HttpService_0 (copy), v8 (copy), v22 (copy), v32 (copy), v5 (copy), v4 (copy), v9 (copy), l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 (copy), v19 (copy), v10 (copy), v25 (copy), l_Players_0 (copy), v13 (copy), v14 (copy), v15 (copy), l_FFlagEnableUnifiedProductPurchaseFlow_0 (copy), v24 (copy), l_getRobloxSubscriptionProducts_0 (copy), v26 (copy), v27 (copy), v12 (copy), v11 (copy)
-    return v20.new(script.Name, v33, function(v42, v43) --[[ Line: 62 ]]
-        -- upvalues: v16 (ref), v17 (ref), v18 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref), v41 (copy), v7 (ref), v34 (copy), v35 (copy), v36 (copy), v37 (copy), v38 (copy), v39 (copy), v40 (copy), v6 (ref), v28 (ref), l_HttpService_0 (ref), v8 (ref), v22 (ref), v32 (ref), v5 (ref), v4 (ref), v9 (ref), l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 (ref), v19 (ref), v10 (ref), v25 (ref), l_Players_0 (ref), v13 (ref), v14 (ref), v15 (ref), l_FFlagEnableUnifiedProductPurchaseFlow_0 (ref), v24 (ref), l_getRobloxSubscriptionProducts_0 (ref), v26 (ref), v27 (ref), v12 (ref), v11 (ref)
-        local v44 = v43[v16];
-        local v45 = v43[v17];
-        if v18(v42:getState()) and (not l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 or not v41) then
-            return nil;
-        else
-            if l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then
-                local l_productPayload_0 = v42:getState().productPayload;
-                if not l_productPayload_0 or not l_productPayload_0.kind then
-                    local v47 = v7(v34, Enum.InfoType.Bundle, nil, nil, v35, v36, v37, v38, v39, v40, nil);
-                    if v47 then
-                        v42:dispatch(v6(v47));
-                    end;
-                end;
-            end;
-            if v28 then
-                local v48 = l_HttpService_0:GenerateGUID(false);
-                v42:dispatch(v8(v48));
-                v22.default:logRobloxTelemetryCounter(v32.InitiatePurchaseCounter, 1, {
-                    method = "initiateBundlePurchase"
-                });
-            end;
-            v42:dispatch(v5(v34, v35, v36, v37, v38, v39, v40));
-            if v45.getFlagOrder66() then
-                v42:dispatch(v4(v9.PurchaseDisabled));
-                return nil;
-            else
-                local v49 = nil;
-                local v50 = nil;
-                local v51 = nil;
-                if l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 then
-                    local v52 = v42:getState();
-                    local l_purchaseOptions_0 = v52.purchaseOptions;
-                    local l_purchaseCallbacks_0 = v52.purchaseCallbacks;
-                    if l_purchaseOptions_0 ~= nil and l_purchaseOptions_0.shouldSkipOwnershipCheck == true then
-                        v49 = true;
-                    end;
-                    if l_purchaseOptions_0 ~= nil and l_purchaseOptions_0.providedRobuxBalance ~= nil then
-                        v50 = l_purchaseOptions_0.providedRobuxBalance;
-                    end;
-                    if l_purchaseCallbacks_0 ~= nil and l_purchaseCallbacks_0.fetchProductInfo ~= nil then
-                        v51 = l_purchaseCallbacks_0.fetchProductInfo;
-                    end;
-                end;
-                return v19.all({
-                    bundleDetails = if not (l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 and v51 ~= nil) or l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 and v41 then v10(v44, v34) else v51(), 
-                    accountInfo = if v25 then v19.resolve({
-                        isPremium = l_Players_0.LocalPlayer.MembershipType == Enum.MembershipType.Premium
-                    }) else v13(v44, v45), 
-                    balanceInfo = v14(v44, v45, false, nil, if l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 then v50 else nil), 
-                    alreadyOwned = v15(v44, v34, Enum.InfoType.Bundle, if l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 then v49 else nil), 
-                    isUserEligibleForUnifiedPurchaseFlow = if l_FFlagEnableUnifiedProductPurchaseFlow_0 then v24(v44) else nil, 
-                    robloxSubscriptionProducts = if l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then l_getRobloxSubscriptionProducts_0(v44):catch(function() --[[ Line: 171 ]]
-                        return nil;
-                    end) else nil
-                }):andThen(function(v55) --[[ Line: 176 ]]
-                    -- upvalues: l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 (ref), v42 (copy), v26 (ref), v40 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref), v27 (ref), v12 (ref), v44 (copy), v34 (ref), v4 (ref), v11 (ref), v9 (ref)
-                    if v55.bundleDetails.product then
-                        if l_FFlagUnifiedPurchaseOptimizeTTIMarketplace_0 then
-                            v42:dispatch(v26(nil, v55.bundleDetails, v55.accountInfo, v55.balanceInfo, v40, v55.alreadyOwned, v55.isUserEligibleForUnifiedPurchaseFlow, if l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then v55.robloxSubscriptionProducts else nil));
-                            return;
-                        elseif v27() then
-                            v12(v44, v34, "bundle"):andThen(function(v56) --[[ Line: 198 ]]
-                                -- upvalues: v42 (ref), v26 (ref), v55 (copy), v40 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref)
-                                v42:dispatch(v26(v56, v55.bundleDetails, v55.accountInfo, v55.balanceInfo, v40, v55.alreadyOwned, v55.isUserEligibleForUnifiedPurchaseFlow, if l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then v55.robloxSubscriptionProducts else nil));
-                            end):catch(function(v57) --[[ Line: 214 ]]
-                                -- upvalues: v42 (ref), v4 (ref)
-                                v42:dispatch(v4(v57));
-                            end);
-                            return;
-                        else
-                            local l_id_0 = v55.bundleDetails.product.id;
-                            v11(v44, l_id_0):andThen(function(v59) --[[ Line: 220 ]]
-                                -- upvalues: v42 (ref), v26 (ref), v55 (copy), v40 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref)
-                                v42:dispatch(v26(v59, v55.bundleDetails, v55.accountInfo, v55.balanceInfo, v40, v55.alreadyOwned, v55.isUserEligibleForUnifiedPurchaseFlow, if l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then v55.robloxSubscriptionProducts else nil));
-                            end);
-                            return;
-                        end;
-                    else
-                        v42:dispatch(v4(v9.NotForSale));
-                        return;
-                    end;
-                end):catch(function(v60) --[[ Line: 243 ]]
-                    -- upvalues: v42 (copy), v4 (ref)
-                    v42:dispatch(v4(v60));
-                end);
-            end;
-        end;
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local RequestBundlePurchase = require(PurchasePrompt.Actions.RequestBundlePurchase)
+local SetProductPayload = require(PurchasePrompt.Actions.SetProductPayload)
+local buildProductPayloadFromInitiateArgs = require(PurchasePrompt.Utils.buildProductPayloadFromInitiateArgs)
+local SetPurchaseFlowUUID = require(PurchasePrompt.Actions.SetPurchaseFlowUUID)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local getBundleDetails = require(PurchasePrompt.Network.getBundleDetails)
+local getProductPurchasableDetails = require(PurchasePrompt.Network.getProductPurchasableDetails)
+local getCatalogItemDetails = require(PurchasePrompt.Network.getCatalogItemDetails)
+local getAccountInfo = require(PurchasePrompt.Network.getAccountInfo)
+local getBalanceInfo = require(PurchasePrompt.Network.getBalanceInfo)
+local getIsAlreadyOwned = require(PurchasePrompt.Network.getIsAlreadyOwned)
+local Network = require(PurchasePrompt.Services.Network)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local hasPendingRequest = require(PurchasePrompt.Utils.hasPendingRequest)
+local Promise = require(PurchasePrompt.Promise)
+local Thunk = require(PurchasePrompt.Thunk)
+local _ = require(PurchasePromptParent.AppCommonLib).Logging
+local LoggingProtocol = require(PurchasePromptParent.LoggingProtocol)
+local FFlagEnableUnifiedProductPurchaseFlow = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
+local getUnifiedPurchaseFlowEligibility = require(PurchasePrompt.Network.getUnifiedPurchaseFlowEligibility)
+local FFlagRemoveAcountInfoFetchFromPurchase = require(PurchasePrompt.Flags.FFlagRemoveAcountInfoFetchFromPurchase)
+local resolveBundlePromptState = require(script.Parent.resolveBundlePromptState)
+local fetchCartPricing = require(script.Parent.fetchCartPricing)
+local FFlagPurchasePromptCartPricingEnabled = require(PurchasePrompt.Flags.FFlagPurchasePromptCartPricingEnabled)
+
+local function maybeDispatchCartPricingFetch(p1) -- line: 37
+	-- upvalues: FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy)
+	if FFlagPurchasePromptCartPricingEnabled then
+		p1:dispatch(fetchCartPricing())
+	end
+end
+
+local GetFFlagUseCatalogItemDetailsToResolveBundlePurchase = require(PurchasePrompt.Flags.GetFFlagUseCatalogItemDetailsToResolveBundlePurchase)
+local FFlagEnablePurchaseFlowUUIDMigration = require(PurchasePrompt.Flags.FFlagEnablePurchaseFlowUUIDMigration)
+local FFlagUnifiedPurchaseOptimizeTTIMarketplace = require(PurchasePrompt.Parent.SharedFlags).FFlagUnifiedPurchaseOptimizeTTIMarketplace
+local FFlagRefreshPriceOnRetryAfterUpsell = require(PurchasePrompt.Flags.FFlagRefreshPriceOnRetryAfterUpsell)
+local v35 = if not FFlagRefreshPriceOnRetryAfterUpsell then nil else require(PurchasePrompt.Utils.applyRefreshedPrice)
+local getRobloxSubscriptionProducts = require(PurchasePromptParent.RobloxSubscriptionPurchaseApp).Network.getRobloxSubscriptionProducts
+local FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal
+local PurchaseFlowUUIDTelemetry = require(PurchasePrompt.Events.PurchaseFlowUUIDTelemetry)
+local t1 = {
+	Network,
+	ExternalSettings
+}
+
+local function initiateBundlePurchase(p2, p3, p4, p5, p6, p7, p8, b1: boolean?) -- line: 66
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), ExternalSettings (copy), hasPendingRequest (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), buildProductPayloadFromInitiateArgs (copy), SetProductPayload (copy), FFlagEnablePurchaseFlowUUIDMigration (copy), HttpService (copy), SetPurchaseFlowUUID (copy), LoggingProtocol (copy), PurchaseFlowUUIDTelemetry (copy), RequestBundlePurchase (copy), ErrorOccurred (copy), PurchaseError (copy), FFlagUnifiedPurchaseOptimizeTTIMarketplace (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), Promise (copy), getBundleDetails (copy), FFlagRemoveAcountInfoFetchFromPurchase (copy), Players (copy), getAccountInfo (copy), getBalanceInfo (copy), getIsAlreadyOwned (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getUnifiedPurchaseFlowEligibility (copy), getRobloxSubscriptionProducts (copy), v35 (copy), resolveBundlePromptState (copy), FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy), GetFFlagUseCatalogItemDetailsToResolveBundlePurchase (copy), getCatalogItemDetails (copy), getProductPurchasableDetails (copy)
+	return Thunk.new(script.Name, t1, function(p9, p10) -- line: 76
+		-- upvalues: Network (copy), ExternalSettings (copy), hasPendingRequest (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), b1 (copy), buildProductPayloadFromInitiateArgs (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy), p6 (copy), p7 (copy), p8 (copy), SetProductPayload (copy), FFlagEnablePurchaseFlowUUIDMigration (copy), HttpService (copy), SetPurchaseFlowUUID (copy), LoggingProtocol (copy), PurchaseFlowUUIDTelemetry (copy), RequestBundlePurchase (copy), ErrorOccurred (copy), PurchaseError (copy), FFlagUnifiedPurchaseOptimizeTTIMarketplace (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), Promise (copy), getBundleDetails (copy), FFlagRemoveAcountInfoFetchFromPurchase (copy), Players (copy), getAccountInfo (copy), getBalanceInfo (copy), getIsAlreadyOwned (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), getUnifiedPurchaseFlowEligibility (copy), getRobloxSubscriptionProducts (copy), v35 (copy), resolveBundlePromptState (copy), FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy), GetFFlagUseCatalogItemDetailsToResolveBundlePurchase (copy), getCatalogItemDetails (copy), getProductPurchasableDetails (copy)
+		local v52 = p10[Network]
+		local v53 = p10[ExternalSettings]
+
+		if hasPendingRequest(p9:getState()) and (not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal or not b1) then
+			return nil
+		end
+
+		if FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then
+			local productPayload = p9:getState().productPayload
+
+			if not productPayload or not productPayload.kind then
+				local v55 = buildProductPayloadFromInitiateArgs(p2, Enum.InfoType.Bundle, nil, nil, p3, p4, p5, p6, p7, p8, nil)
+
+				if v55 then
+					p9:dispatch(SetProductPayload(v55))
+				end
+			end
+		end
+
+		if FFlagEnablePurchaseFlowUUIDMigration then
+			local guid = HttpService:GenerateGUID(false)
+
+			p9:dispatch(SetPurchaseFlowUUID(guid))
+			LoggingProtocol.default:logRobloxTelemetryCounter(PurchaseFlowUUIDTelemetry.InitiatePurchaseCounter, 1, {
+				method = "initiateBundlePurchase"
+			})
+		end
+
+		p9:dispatch(RequestBundlePurchase(p2, p3, p4, p5, p6, p7, p8))
+
+		if v53.getFlagOrder66() then
+			p9:dispatch(ErrorOccurred(PurchaseError.PurchaseDisabled))
+
+			return nil
+		end
+
+		local v57 = nil
+		local providedRobuxBalance = nil
+		local fetchProductInfo = nil
+
+		if FFlagUnifiedPurchaseOptimizeTTIMarketplace then
+			local v60 = p9:getState()
+			local purchaseOptions = v60.purchaseOptions
+			local purchaseCallbacks = v60.purchaseCallbacks
+
+			if purchaseOptions ~= nil and purchaseOptions.shouldSkipOwnershipCheck == true then
+				v57 = true
+			end
+
+			if purchaseOptions ~= nil and purchaseOptions.providedRobuxBalance ~= nil then
+				providedRobuxBalance = purchaseOptions.providedRobuxBalance
+			end
+
+			if purchaseCallbacks ~= nil and purchaseCallbacks.fetchProductInfo ~= nil then
+				fetchProductInfo = purchaseCallbacks.fetchProductInfo
+			end
+		end
+
+		local t2 = nil
+
+		if FFlagRefreshPriceOnRetryAfterUpsell and b1 then
+			local productPayload = p9:getState().productPayload
+
+			t2 = {
+				collectibleItemId = p5,
+				collectibleItemInstanceId = p6,
+				timedOptionDays = if not productPayload then nil else productPayload.timedOptionDays
+			}
+		end
+
+		return Promise.all({
+			bundleDetails = if not FFlagUnifiedPurchaseOptimizeTTIMarketplace or (fetchProductInfo == nil or not not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal and b1) then getBundleDetails(v52, p2, if not FFlagRefreshPriceOnRetryAfterUpsell then nil else t2) else fetchProductInfo(),
+			accountInfo = if not FFlagRemoveAcountInfoFetchFromPurchase then getAccountInfo(v52, v53) else Promise.resolve({
+				isPremium = Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium
+			}),
+			balanceInfo = getBalanceInfo(v52, v53, false, nil, if not FFlagUnifiedPurchaseOptimizeTTIMarketplace then nil else providedRobuxBalance),
+			alreadyOwned = getIsAlreadyOwned(v52, p2, Enum.InfoType.Bundle, if not FFlagUnifiedPurchaseOptimizeTTIMarketplace then nil else v57),
+			isUserEligibleForUnifiedPurchaseFlow = if not FFlagEnableUnifiedProductPurchaseFlow then nil else getUnifiedPurchaseFlowEligibility(v52),
+			robloxSubscriptionProducts = if not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then nil else getRobloxSubscriptionProducts(v52):catch(function() -- line: 199
+				return nil
+			end)
+		}):andThen(function(p11) -- line: 204
+			-- upvalues: p8 (copy), FFlagRefreshPriceOnRetryAfterUpsell (copy), b1 (copy), v35 (copy), p9 (copy), FFlagUnifiedPurchaseOptimizeTTIMarketplace (copy), resolveBundlePromptState (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy), GetFFlagUseCatalogItemDetailsToResolveBundlePurchase (copy), getCatalogItemDetails (copy), v52 (copy), p2 (copy), ErrorOccurred (copy), getProductPurchasableDetails (copy), PurchaseError (copy)
+			local u66 = p8
+
+			if FFlagRefreshPriceOnRetryAfterUpsell and b1 then
+				local refreshedExpectedPrice = p11.bundleDetails.refreshedExpectedPrice
+
+				if refreshedExpectedPrice ~= nil then
+					u66 = refreshedExpectedPrice
+					v35(p9, refreshedExpectedPrice)
+				end
+			end
+
+			if p11.bundleDetails.product then
+				if FFlagUnifiedPurchaseOptimizeTTIMarketplace then
+					p9:dispatch(resolveBundlePromptState(nil, p11.bundleDetails, p11.accountInfo, p11.balanceInfo, u66, p11.alreadyOwned, p11.isUserEligibleForUnifiedPurchaseFlow, if not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then nil else p11.robloxSubscriptionProducts))
+
+					local v68 = p9
+
+					if FFlagPurchasePromptCartPricingEnabled then
+						v68:dispatch(fetchCartPricing())
+					end
+
+					return
+				end
+
+				if GetFFlagUseCatalogItemDetailsToResolveBundlePurchase() then
+					getCatalogItemDetails(v52, p2, "bundle"):andThen(function(p12) -- line: 236
+						-- upvalues: p9 (copy), resolveBundlePromptState (copy), p11 (copy), u66 (ref), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy)
+						p9:dispatch(resolveBundlePromptState(p12, p11.bundleDetails, p11.accountInfo, p11.balanceInfo, u66, p11.alreadyOwned, p11.isUserEligibleForUnifiedPurchaseFlow, if not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then nil else p11.robloxSubscriptionProducts))
+
+						local v72 = p9
+
+						if FFlagPurchasePromptCartPricingEnabled then
+							v72:dispatch(fetchCartPricing())
+						end
+					end):catch(function(p13) -- line: 253
+						-- upvalues: p9 (copy), ErrorOccurred (copy)
+						p9:dispatch(ErrorOccurred(p13))
+					end)
+				else
+					local id = p11.bundleDetails.product.id
+
+					getProductPurchasableDetails(v52, id):andThen(function(p14) -- line: 259
+						-- upvalues: p9 (copy), resolveBundlePromptState (copy), p11 (copy), u66 (ref), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), FFlagPurchasePromptCartPricingEnabled (copy), fetchCartPricing (copy)
+						p9:dispatch(resolveBundlePromptState(p14, p11.bundleDetails, p11.accountInfo, p11.balanceInfo, u66, p11.alreadyOwned, p11.isUserEligibleForUnifiedPurchaseFlow, if not FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then nil else p11.robloxSubscriptionProducts))
+
+						local v75 = p9
+
+						if FFlagPurchasePromptCartPricingEnabled then
+							v75:dispatch(fetchCartPricing())
+						end
+					end)
+				end
+			else
+				p9:dispatch(ErrorOccurred(PurchaseError.NotForSale))
+			end
+		end):catch(function(p15) -- line: 283
+			-- upvalues: p9 (copy), ErrorOccurred (copy)
+			p9:dispatch(ErrorOccurred(p15))
+		end)
+	end)
+end
+
+return initiateBundlePurchase

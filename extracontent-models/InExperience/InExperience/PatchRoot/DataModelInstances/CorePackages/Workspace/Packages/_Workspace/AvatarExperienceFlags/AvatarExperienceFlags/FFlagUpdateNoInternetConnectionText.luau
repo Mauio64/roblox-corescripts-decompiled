@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FFlagUpdateNoInternetConnectionText", false);
+return game:DefineFastFlag("FFlagUpdateNoInternetConnectionText", false)

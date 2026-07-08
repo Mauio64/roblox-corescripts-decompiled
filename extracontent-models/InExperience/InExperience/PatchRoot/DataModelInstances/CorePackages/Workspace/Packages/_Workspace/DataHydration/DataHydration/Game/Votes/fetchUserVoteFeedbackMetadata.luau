@@ -1,14 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local _ = require(l_Parent_0.Http);
-local v3 = require(script.Parent.UserVoteFeedbackMetdataUrlBuilder);
-return function(v4) --[[ Line: 13 ]] --[[ Name: fetchUserVoteFeedbackMetadata ]]
-    -- upvalues: v3 (copy), v1 (copy)
-    local v5 = v3.buildUserVoteFeedbackMetadataUrl(v4);
-    return v1.config({
-        requestFunction = function(v6, v7, v8) --[[ Line: 17 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v1 (ref)
-            return v1.requestFunctions.HttpRbxApi(v6, v7, v8);
-        end
-    })(v5, "GET");
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+
+require(Parent.Http)
+
+local UserVoteFeedbackMetdataUrlBuilder = require(script.Parent.UserVoteFeedbackMetdataUrlBuilder)
+
+local function fetchUserVoteFeedbackMetadata(s1: string) -- line: 13
+	-- upvalues: UserVoteFeedbackMetdataUrlBuilder (copy), HttpRequest (copy)
+	local v6 = UserVoteFeedbackMetdataUrlBuilder.buildUserVoteFeedbackMetadataUrl(s1)
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 17
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.HttpRbxApi(s2, s3, p1)
+		end
+	})(v6, "GET")
+end
+
+return fetchUserVoteFeedbackMetadata

@@ -1,130 +1,133 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_Parent_0.Foundation);
-local l_IconName_0 = v4.Enums.IconName;
-local l_InputSize_0 = v4.Enums.InputSize;
-local l_Menu_0 = v4.Menu;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v9 = require(l_script_FirstAncestor_0.Configs.PersonButtonConfigs);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useGetPeopleService);
-local v11 = require(l_script_FirstAncestor_0.Components.Buttons.PersonButton);
-local v12 = require(l_script_FirstAncestor_0.Constants);
-return v2.memo(function(v13) --[[ Line: 29 ]] --[[ Name: CardMenu ]]
-    -- upvalues: l_useLocalization_0 (copy), v12 (copy), v10 (copy), v9 (copy), v3 (copy), v2 (copy), l_IconName_0 (copy), l_Menu_0 (copy), l_InputSize_0 (copy), v11 (copy)
-    local v14 = l_useLocalization_0({
-        unblock = v12.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNBLOCK, 
-        block = v12.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.BLOCK, 
-        unmute = v12.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNMUTE, 
-        mute = v12.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.MUTE, 
-        report = v12.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.REPORT
-    });
-    local v15 = v10("PeopleBlockStatusStore");
-    local v16 = v10("PeopleVoiceChatStore");
-    local v17 = v10("PeopleAnalyticsManager");
-    local v18 = v10("Constants");
-    local v19 = v9(v13.person.UserId);
-    local v20 = v3.useSignalState(v15.getPlayerBlockStatus(v13.person.UserId));
-    local v21 = v3.useSignalState(v16.getPlayerIsLocalMuted(v13.person.UserId));
-    local v22 = v3.useSignalState(v16.getPlayerIsTalking(v13.person.UserId));
-    local v23, v24 = v2.useState(false);
-    local v26 = v2.useCallback(function(v25) --[[ Line: 51 ]]
-        -- upvalues: v13 (copy), v24 (copy)
-        v13.onIsOpenChanged(v25);
-        v24(v25);
-    end, {
-        v13.onIsOpenChanged
-    });
-    local v27 = v2.useCallback(function() --[[ Line: 56 ]]
-        -- upvalues: v17 (copy), v26 (copy)
-        v17:trackPersonCardMenuToggled(false);
-        v26(false);
-    end, {
-        v26
-    });
-    local v29 = v2.useCallback(function() --[[ Line: 61 ]]
-        -- upvalues: v23 (copy), v17 (copy), v26 (copy)
-        local v28 = not v23;
-        v17:trackPersonCardMenuToggled(v28);
-        v26(v28);
-    end, {
-        v23, 
-        v26
-    });
-    local v30 = v2.useMemo(function() --[[ Line: 67 ]]
-        -- upvalues: v19 (copy), v18 (copy)
-        return v19[v18.PERSON_BUTTONS.MUTE_PLAYER].animatedIcon;
-    end, {
-        v19
-    });
-    local v35 = v2.useMemo(function() --[[ Line: 71 ]]
-        -- upvalues: v19 (copy), v18 (copy), v21 (copy), v14 (copy), l_IconName_0 (ref), v20 (copy), v26 (copy)
-        local v31 = v19[v18.PERSON_BUTTONS.MUTE_PLAYER];
-        local v32 = v19[v18.PERSON_BUTTONS.BLOCK_PLAYER];
-        local v33 = v19[v18.PERSON_BUTTONS.REPORT_PLAYER];
-        local v34 = {};
-        if v31.shouldShow() then
-            table.insert(v34, {
-                id = "mute", 
-                text = if v21 then v14.unmute else v14.mute, 
-                icon = if v21 then l_IconName_0.SpeakerSlash else l_IconName_0.Speaker, 
-                onActivated = function() --[[ Line: 83 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v31 (copy), v18 (ref)
-                    v31.onActivated(v18.ANALYTICS.ENTRY_POINT.PEOPLE_CARD);
-                end
-            });
-        end;
-        if v32.shouldShow() then
-            table.insert(v34, {
-                id = "block", 
-                text = if v20 then v14.unblock else v14.block, 
-                icon = l_IconName_0.CircleSlash, 
-                onActivated = function() --[[ Line: 93 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v32 (copy), v18 (ref), v26 (ref)
-                    v32.onActivated(v18.ANALYTICS.ENTRY_POINT.PEOPLE_CARD);
-                    v26(false);
-                end
-            });
-        end;
-        if v33.shouldShow() then
-            table.insert(v34, {
-                id = "report", 
-                text = v14.report, 
-                icon = l_IconName_0.Flag, 
-                onActivated = function() --[[ Line: 104 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v33 (copy), v18 (ref)
-                    v33.onActivated(v18.ANALYTICS.ENTRY_POINT.PEOPLE_CARD);
-                end
-            });
-        end;
-        return v34;
-    end, {
-        v20, 
-        v21, 
-        v26, 
-        v19, 
-        v14
-    });
-    if next(v35) == nil then
-        return nil;
-    else
-        return v2.createElement(l_Menu_0, {
-            isOpen = v23, 
-            items = v35, 
-            size = l_InputSize_0.Medium, 
-            onPressedOutside = v27
-        }, {
-            MenuAnchor = v2.createElement(v11, {
-                icon = {
-                    on = if v22 then nil else l_IconName_0.ThreeDotsHorizontal
-                }, 
-                animatedIcon = if v22 then v30 else nil, 
-                onActivated = v29, 
-                isBuilderIcon = not v22, 
-                isBackgroundTransparent = true, 
-                LayoutOrder = 1
-            })
-        });
-    end;
-end);
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local Foundation = require(PeopleReactViewParent.Foundation)
+local IconName = Foundation.Enums.IconName
+local InputSize = Foundation.Enums.InputSize
+local Menu = Foundation.Menu
+local useLocalization = require(PeopleReactViewParent.Localization).Hooks.useLocalization
+local PersonButtonConfigs = require(PeopleReactView.Configs.PersonButtonConfigs)
+local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
+local PersonButton = require(PeopleReactView.Components.Buttons.PersonButton)
+local Constants = require(PeopleReactView.Constants)
+
+local function CardMenu(t1: {[any]: any}) -- line: 29
+	-- upvalues: useLocalization (copy), Constants (copy), useGetPeopleService (copy), PersonButtonConfigs (copy), SignalsReact (copy), React (copy), IconName (copy), Menu (copy), InputSize (copy), PersonButton (copy)
+	local v16 = useLocalization({
+		unblock = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNBLOCK,
+		block = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.BLOCK,
+		unmute = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.UNMUTE,
+		mute = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.MUTE,
+		report = Constants.PEOPLEPAGE.PERSON_BUTTONS.LOCALIZED_STRINGS.REPORT
+	})
+	local v17 = useGetPeopleService("PeopleBlockStatusStore")
+	local v18 = useGetPeopleService("PeopleVoiceChatStore")
+	local v19 = useGetPeopleService("PeopleAnalyticsManager")
+	local v20 = useGetPeopleService("Constants")
+	local v21 = PersonButtonConfigs(t1.person.UserId)
+	local v22 = SignalsReact.useSignalState(v17.getPlayerBlockStatus(t1.person.UserId))
+	local v23 = SignalsReact.useSignalState(v18.getPlayerIsLocalMuted(t1.person.UserId))
+	local v24 = SignalsReact.useSignalState(v18.getPlayerIsTalking(t1.person.UserId))
+	local v25, v26 = React.useState(false)
+	local v27 = React.useCallback(function(b1: boolean) -- line: 51
+		-- upvalues: t1 (copy), v26 (copy)
+		t1.onIsOpenChanged(b1)
+		v26(b1)
+	end, { t1.onIsOpenChanged })
+	local v28 = React.useCallback(function() -- line: 56
+		-- upvalues: v19 (copy), v27 (copy)
+		v19:trackPersonCardMenuToggled(false)
+		v27(false)
+	end, { v27 })
+	local v29 = React.useCallback(function() -- line: 61
+		-- upvalues: v25 (copy), v19 (copy), v27 (copy)
+		local v33 = not v25
+
+		v19:trackPersonCardMenuToggled(v33)
+		v27(v33)
+	end, {
+		v25,
+		v27
+	})
+	local v30 = React.useMemo(function() -- line: 67
+		-- upvalues: v21 (copy), v20 (copy)
+		return v21[v20.PERSON_BUTTONS.MUTE_PLAYER].animatedIcon
+	end, { v21 })
+	local v31 = React.useMemo(function() -- line: 71
+		-- upvalues: v21 (copy), v20 (copy), v23 (copy), v16 (copy), IconName (copy), v22 (copy), v27 (copy)
+		local v34 = v21[v20.PERSON_BUTTONS.MUTE_PLAYER]
+		local v35 = v21[v20.PERSON_BUTTONS.BLOCK_PLAYER]
+		local v36 = v21[v20.PERSON_BUTTONS.REPORT_PLAYER]
+		local t2 = {}
+
+		if v34.shouldShow() then
+			table.insert(t2, {
+				id = "mute",
+				text = if not v23 then v16.mute else v16.unmute,
+				icon = if not v23 then IconName.Speaker else IconName.SpeakerSlash,
+				onActivated = function() -- line: 83
+					-- upvalues: v34 (copy), v20 (copy)
+					v34.onActivated(v20.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+				end
+			})
+		end
+
+		if v35.shouldShow() then
+			table.insert(t2, {
+				id = "block",
+				text = if not v22 then v16.block else v16.unblock,
+				icon = IconName.CircleSlash,
+				onActivated = function() -- line: 93
+					-- upvalues: v35 (copy), v20 (copy), v27 (copy)
+					v35.onActivated(v20.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+					v27(false)
+				end
+			})
+		end
+
+		if v36.shouldShow() then
+			table.insert(t2, {
+				id = "report",
+				text = v16.report,
+				icon = IconName.Flag,
+				onActivated = function() -- line: 104
+					-- upvalues: v36 (copy), v20 (copy)
+					v36.onActivated(v20.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+				end
+			})
+		end
+
+		return t2
+	end, {
+		v22,
+		v23,
+		v27,
+		v21,
+		v16
+	})
+
+	if next(v31) == nil then
+		return nil
+	end
+
+	return React.createElement(Menu, {
+		isOpen = v25,
+		items = v31,
+		size = InputSize.Medium,
+		onPressedOutside = v28
+	}, {
+		MenuAnchor = React.createElement(PersonButton, {
+			isBackgroundTransparent = true,
+			LayoutOrder = 1,
+			icon = {
+				on = if not v24 then IconName.ThreeDotsHorizontal else nil
+			},
+			animatedIcon = if not v24 then nil else v30,
+			onActivated = v29,
+			isBuilderIcon = not v24
+		})
+	})
+end
+
+return React.memo(CardMenu)

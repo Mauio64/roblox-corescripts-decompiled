@@ -2,7 +2,7 @@ local GamepadService = game:GetService("GamepadService")
 local ParentParent = script.Parent.Parent
 local FocusOnChromeSignal = require(ParentParent.FocusUtils.FocusOnChromeSignal)
 
-return function(p1: ((...any) -> ...any)?, s1: string?) --[[ focusOnChrome ]] -- line: 8
+local function focusOnChrome(p1: ((...any) -> ...any)?, s1: string?) -- line: 8
 	-- upvalues: GamepadService (copy), FocusOnChromeSignal (copy)
 	if GamepadService.GamepadCursorEnabled then
 		return
@@ -14,3 +14,5 @@ return function(p1: ((...any) -> ...any)?, s1: string?) --[[ focusOnChrome ]] --
 
 	FocusOnChromeSignal:fire(s1)
 end
+
+return focusOnChrome

@@ -1,4 +1,4 @@
 return {
-    Games = "Games", 
-    Songs = "Songs"
-};
+	Games = "Games",
+	Songs = "Songs"
+}

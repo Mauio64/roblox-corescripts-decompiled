@@ -1,214 +1,231 @@
-local l_CollectionService_0 = game:GetService("CollectionService");
-local l_Parent_0 = script:FindFirstAncestor("Impressions").Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.ArgCheck);
-local v4 = require(l_Parent_0.t);
-local l_withNavigationFocus_0 = require(l_Parent_0.RoactNavigation).withNavigationFocus;
-local v6 = require(script.Parent.Constants);
-local v7 = require(script.Parent.ImpressionDetectorWithoutNavigation);
-local v8 = v2.PureComponent:extend("ImpressionsDetector");
-v8.validateProps = v4.strictInterface({
-    scanDebounceSeconds = v4.optional(v4.number), 
-    viewFillPercent = v4.optional(v4.number), 
-    parentRef = v4.optional(v4.table), 
-    impressionsTag = v4.string, 
-    onRequestImpressionsSignal = v4.table, 
-    viewPortBounds = v4.strictInterface({
-        min = v4.Vector2, 
-        max = v4.Vector2
-    }), 
-    filterImpressionFunc = v4.optional(v4.callback), 
-    onImpressionsDetected = v4.union(v4.callback, v4.table), 
-    skipZeroSizes = v4.optional(v4.boolean), 
-    isFocused = v4.boolean, 
-    navigation = v4.table
-});
-v8.defaultProps = {
-    scanDebounceSeconds = 1, 
-    viewFillPercent = 0.25
-};
-v8.init = function(v9) --[[ Line: 43 ]] --[[ Name: init ]]
-    v9.isMounted = false;
-    v9.lastImpressionTick = nil;
-    v9.nextImpressionTick = nil;
-end;
-v8._boundingBoxIntersectsView = function(v10, v11) --[[ Line: 49 ]] --[[ Name: _boundingBoxIntersectsView ]]
-    -- upvalues: v3 (copy)
-    if not v11 then
-        return false;
-    else
-        local l_viewPortBounds_0 = v10.props.viewPortBounds;
-        v3.assert(l_viewPortBounds_0 ~= nil);
-        if not l_viewPortBounds_0 then
-            return false;
-        else
-            local l_AbsoluteSize_0 = v11.AbsoluteSize;
-            local l_AbsolutePosition_0 = v11.AbsolutePosition;
-            local v15 = l_AbsolutePosition_0 + l_AbsoluteSize_0;
-            local v16 = false;
-            if v15.X > l_viewPortBounds_0.min.X then
-                v16 = l_AbsolutePosition_0.X < l_viewPortBounds_0.max.X;
-            end;
-            local v17 = false;
-            if v15.Y > l_viewPortBounds_0.min.Y then
-                v17 = l_AbsolutePosition_0.Y < l_viewPortBounds_0.max.Y;
-            end;
-            if v16 and v17 then
-                return true;
-            else
-                return false;
-            end;
-        end;
-    end;
-end;
-v8._isInstanceVisible = function(v18, v19) --[[ Line: 74 ]] --[[ Name: _isInstanceVisible ]]
-    -- upvalues: v3 (copy)
-    if not v18:_boundingBoxIntersectsView(v19) then
-        return false;
-    else
-        local l_viewPortBounds_1 = v18.props.viewPortBounds;
-        v3.assert(l_viewPortBounds_1 ~= nil);
-        local v21 = nil;
-        local v22 = l_viewPortBounds_1.max - l_viewPortBounds_1.min;
-        if v22.X <= 0 or v22.Y <= 0 then
-            return false;
-        else
-            v21 = v22 * v18.props.viewFillPercent;
-            v22 = v3.assert;
-            local v23 = false;
-            if v21.X > 0 then
-                v23 = v21.Y > 0;
-            end;
-            v22(v23);
-            if v21.X <= 0 or v21.Y <= 0 then
-                return false;
-            else
-                v22 = v19.AbsolutePosition;
-                v23 = v19.AbsoluteSize;
-                if v18.props.skipZeroSizes and (v23.X == 0 or v23.Y == 0) then
-                    return false;
-                else
-                    local v24 = v22 + v23 / 2;
-                    local v25 = v22 + v23;
-                    local v26 = false;
-                    if v24.X > l_viewPortBounds_1.min.X then
-                        v26 = v24.X < l_viewPortBounds_1.max.X;
-                    end;
-                    local v27 = false;
-                    if v24.Y > l_viewPortBounds_1.min.Y then
-                        v27 = v24.Y < l_viewPortBounds_1.max.Y;
-                    end;
-                    if v26 and v27 then
-                        return true;
-                    else
-                        local v28 = v22:Max(l_viewPortBounds_1.min);
-                        local v29 = v25:Min(l_viewPortBounds_1.max) - v28;
-                        local v30 = v29.X >= v21.X;
-                        if v27 and v30 then
-                            return true;
-                        else
-                            local v31 = v29.Y >= v21.Y;
-                            if v26 and v31 then
-                                return true;
-                            elseif v30 and v31 then
-                                return true;
-                            else
-                                return false;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
-v8._calculateImpressions = function(v32) --[[ Line: 144 ]] --[[ Name: _calculateImpressions ]]
-    -- upvalues: l_CollectionService_0 (copy), v6 (copy), v3 (copy)
-    if not v32.isMounted then
-        return;
-    elseif not v32.props.isFocused then
-        return;
-    else
-        v32.lastImpressionTick = tick();
-        if v32.props.parentRef ~= nil then
-            local l_current_0 = v32.props.parentRef.current;
-            if l_current_0 == nil or not v32:_boundingBoxIntersectsView(l_current_0) then
-                return;
-            end;
-        end;
-        local l_impressionsTag_0 = v32.props.impressionsTag;
-        local v35 = {};
-        local l_l_CollectionService_0_Tagged_0 = l_CollectionService_0:GetTagged(l_impressionsTag_0);
-        for _, v38 in ipairs(l_l_CollectionService_0_Tagged_0) do
-            local l_v38_Attribute_0 = v38:GetAttribute(v6.ItemIndex);
-            if l_v38_Attribute_0 and v38:IsA("GuiObject") and v32:_isInstanceVisible(v38) and (v32.props.filterImpressionFunc == nil or v32.props.filterImpressionFunc(l_v38_Attribute_0)) then
-                table.insert(v35, l_v38_Attribute_0);
-            end;
-        end;
-        if #v35 > 0 then
-            v3.assert(v32.props.onImpressionsDetected ~= nil);
-            v32.props.onImpressionsDetected(v35);
-        end;
-        return;
-    end;
-end;
-v8._requestImpressions = function(v40) --[[ Line: 183 ]] --[[ Name: _requestImpressions ]]
-    -- upvalues: v3 (copy)
-    if not v40.isMounted then
-        return;
-    elseif not v40.props.isFocused then
-        return;
-    elseif v40.nextImpressionTick ~= nil then
-        return;
-    elseif not v40.props.impressionsTag then
-        return;
-    else
-        local v41 = 0;
-        if v40.lastImpressionTick ~= nil then
-            v40.nextImpressionTick = v40.lastImpressionTick + v40.props.scanDebounceSeconds;
-            v41 = v40.nextImpressionTick - tick();
-        end;
-        if v41 > 0 then
-            task.delay(v41, function() --[[ Line: 206 ]]
-                -- upvalues: v3 (ref), v40 (copy)
-                local l_assert_0 = v3.assert;
-                local v43 = false;
-                if v40.nextImpressionTick ~= nil then
-                    v43 = tick() > v40.nextImpressionTick;
-                end;
-                l_assert_0(v43);
-                v40.nextImpressionTick = nil;
-                v40:_calculateImpressions();
-            end);
-            return;
-        else
-            v40.nextImpressionTick = nil;
-            v40:_calculateImpressions();
-            return;
-        end;
-    end;
-end;
-v8.render = function(_) --[[ Line: 218 ]] --[[ Name: render ]]
-    return nil;
-end;
-v8.didMount = function(v45) --[[ Line: 222 ]] --[[ Name: didMount ]]
-    v45.isMounted = true;
-    v45:_requestImpressions();
-    if v45.props.onRequestImpressionsSignal then
-        v45.onRequestImpressionsConnection = v45.props.onRequestImpressionsSignal:connect(function() --[[ Line: 226 ]]
-            -- upvalues: v45 (copy)
-            v45:_requestImpressions();
-        end);
-    end;
-end;
-v8.willUnmount = function(v46) --[[ Line: 232 ]] --[[ Name: willUnmount ]]
-    v46.isMounted = false;
-    if v46.onRequestImpressionsConnection ~= nil then
-        v46.onRequestImpressionsConnection:disconnect();
-        v46.onRequestImpressionsConnection = nil;
-    end;
-end;
-v8.didUpdate = function(v47, _, _) --[[ Line: 240 ]] --[[ Name: didUpdate ]]
-    v47:_requestImpressions();
-end;
-return (l_withNavigationFocus_0(v7));
+local CollectionService = game:GetService("CollectionService")
+local Parent = script:FindFirstAncestor("Impressions").Parent
+local Roact = require(Parent.Roact)
+local ArgCheck = require(Parent.ArgCheck)
+local t = require(Parent.t)
+local withNavigationFocus = require(Parent.RoactNavigation).withNavigationFocus
+local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = require(Parent.SharedFlags).FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local Constants = require(script.Parent.Constants)
+local ImpressionDetectorWithoutNavigation = require(script.Parent.ImpressionDetectorWithoutNavigation)
+local v10 = Roact.PureComponent:extend("ImpressionsDetector")
+
+v10.validateProps = t.strictInterface({
+	scanDebounceSeconds = t.optional(t.number),
+	viewFillPercent = t.optional(t.number),
+	parentRef = t.optional(t.table),
+	impressionsTag = t.string,
+	onRequestImpressionsSignal = t.table,
+	viewPortBounds = t.strictInterface({
+		min = t.Vector2,
+		max = t.Vector2
+	}),
+	viewPortFillBounds = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else t.optional(t.strictInterface({
+		min = t.Vector2,
+		max = t.Vector2
+	})),
+	filterImpressionFunc = t.optional(t.callback),
+	onImpressionsDetected = t.union(t.callback, t.table),
+	skipZeroSizes = t.optional(t.boolean),
+	isFocused = t.boolean,
+	navigation = t.table
+})
+v10.defaultProps = {
+	scanDebounceSeconds = 1,
+	viewFillPercent = 0.25
+}
+
+function v10.init(p1) -- line: 55
+	p1.isMounted = false
+	p1.lastImpressionTick = nil
+	p1.nextImpressionTick = nil
+end
+function v10._boundingBoxIntersectsView(p2, p3) -- line: 61
+	-- upvalues: ArgCheck (copy)
+	if not p3 then
+		return false
+	end
+
+	local viewPortBounds = p2.props.viewPortBounds
+
+	ArgCheck.assert(viewPortBounds ~= nil)
+
+	if not viewPortBounds then
+		return false
+	end
+
+	local AbsoluteSize = p3.AbsoluteSize
+	local AbsolutePosition = p3.AbsolutePosition
+	local v17 = AbsolutePosition + AbsoluteSize
+	local v18 = v17.X > viewPortBounds.min.X and AbsolutePosition.X < viewPortBounds.max.X
+	local v19 = v17.Y > viewPortBounds.min.Y and AbsolutePosition.Y < viewPortBounds.max.Y
+
+	if v18 and v19 then
+		return true
+	end
+
+	return false
+end
+function v10._isInstanceVisible(p4, p5) -- line: 86
+	-- upvalues: ArgCheck (copy), FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy)
+	if not p4:_boundingBoxIntersectsView(p5) then
+		return false
+	end
+
+	local viewPortBounds = p4.props.viewPortBounds
+
+	ArgCheck.assert(viewPortBounds ~= nil)
+
+	local v23 = if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then viewPortBounds else p4.props.viewPortFillBounds or viewPortBounds
+	local v24 = v23.max - v23.min
+
+	if v24.X <= 0 or v24.Y <= 0 then
+		return false
+	end
+
+	local v25 = v24 * p4.props.viewFillPercent
+
+	ArgCheck.assert(v25.X > 0 and v25.Y > 0)
+
+	if v25.X <= 0 or v25.Y <= 0 then
+		return false
+	end
+
+	local AbsolutePosition = p5.AbsolutePosition
+	local AbsoluteSize = p5.AbsoluteSize
+
+	if p4.props.skipZeroSizes and (AbsoluteSize.X == 0 or AbsoluteSize.Y == 0) then
+		return false
+	end
+
+	local v28 = AbsolutePosition + AbsoluteSize / 2
+	local v29 = AbsolutePosition + AbsoluteSize
+	local v30 = v28.X > viewPortBounds.min.X and v28.X < viewPortBounds.max.X
+	local v31 = v28.Y > viewPortBounds.min.Y and v28.Y < viewPortBounds.max.Y
+
+	if v30 and v31 then
+		return true
+	end
+
+	local v32 = AbsolutePosition:Max(viewPortBounds.min)
+	local v33 = v29:Min(viewPortBounds.max) - v32
+	local v34 = v33.X >= v25.X
+
+	if v31 and v34 then
+		return true
+	end
+
+	local v35 = v33.Y >= v25.Y
+
+	if v30 and v35 then
+		return true
+	end
+
+	if v34 and v35 then
+		return true
+	end
+
+	return false
+end
+function v10._calculateImpressions(p6) -- line: 159
+	-- upvalues: CollectionService (copy), Constants (copy), ArgCheck (copy)
+	if not p6.isMounted then
+		return
+	end
+
+	if not p6.props.isFocused then
+		return
+	end
+
+	p6.lastImpressionTick = tick()
+
+	if p6.props.parentRef ~= nil then
+		local current = p6.props.parentRef.current
+
+		if current == nil or not p6:_boundingBoxIntersectsView(current) then
+			return
+		end
+	end
+
+	local impressionsTag = p6.props.impressionsTag
+	local t1 = {}
+	local impressionsTag2 = CollectionService:GetTagged(impressionsTag)
+
+	for _, v in ipairs(impressionsTag2) do
+		local ConstantsItemIndex = v:GetAttribute(Constants.ItemIndex)
+
+		if ConstantsItemIndex and v:IsA("GuiObject") and p6:_isInstanceVisible(v) and (p6.props.filterImpressionFunc == nil or p6.props.filterImpressionFunc(ConstantsItemIndex)) then
+			table.insert(t1, ConstantsItemIndex)
+		end
+	end
+
+	if #t1 > 0 then
+		ArgCheck.assert(p6.props.onImpressionsDetected ~= nil)
+		p6.props.onImpressionsDetected(t1)
+	end
+end
+function v10._requestImpressions(p7) -- line: 198
+	-- upvalues: ArgCheck (copy)
+	if not p7.isMounted then
+		return
+	end
+
+	if not p7.props.isFocused then
+		return
+	end
+
+	if p7.nextImpressionTick ~= nil then
+		return
+	end
+
+	if not p7.props.impressionsTag then
+		return
+	end
+
+	local n1 = 0
+
+	if p7.lastImpressionTick ~= nil then
+		p7.nextImpressionTick = p7.lastImpressionTick + p7.props.scanDebounceSeconds
+		n1 = p7.nextImpressionTick - tick()
+	end
+
+	if n1 > 0 then
+		task.delay(n1, function() -- line: 221
+			-- upvalues: ArgCheck (copy), p7 (copy)
+			ArgCheck.assert(p7.nextImpressionTick ~= nil and tick() > p7.nextImpressionTick)
+			p7.nextImpressionTick = nil
+			p7:_calculateImpressions()
+		end)
+
+		return
+	end
+
+	p7.nextImpressionTick = nil
+	p7:_calculateImpressions()
+end
+function v10.render(_) -- line: 233
+	return nil
+end
+function v10.didMount(p9) -- line: 237
+	p9.isMounted = true
+	p9:_requestImpressions()
+
+	if p9.props.onRequestImpressionsSignal then
+		p9.onRequestImpressionsConnection = p9.props.onRequestImpressionsSignal:connect(function() -- line: 241
+			-- upvalues: p9 (copy)
+			p9:_requestImpressions()
+		end)
+	end
+end
+function v10.willUnmount(p10) -- line: 247
+	p10.isMounted = false
+
+	if p10.onRequestImpressionsConnection ~= nil then
+		p10.onRequestImpressionsConnection:disconnect()
+		p10.onRequestImpressionsConnection = nil
+	end
+end
+function v10.didUpdate(p11, _, _) -- line: 255
+	p11:_requestImpressions()
+end
+
+return (withNavigationFocus(ImpressionDetectorWithoutNavigation))

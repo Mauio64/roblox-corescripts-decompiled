@@ -1,41 +1,63 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local l_VRService_0 = game:GetService("VRService");
-local l_AppLinking_0 = require(l_Parent_0.RoactServiceTags).AppLinking;
-local v3 = require(l_Parent_0.NavigationRodux);
-local v4 = require(l_Parent_0.React);
-local v5 = require(l_Parent_0.Responsive);
-local v6 = require(l_Parent_0.RoactUtils);
-local v7 = require(l_Parent_0.RobloxAppEnums);
-local v8 = require(l_Parent_0.RobloxAppHooks);
-local l_AppPage_0 = v7.AppPage;
-local l_NavigateDown_0 = v3.Thunks.NavigateDown;
-local l_useDispatch_0 = v6.Hooks.RoactRodux.useDispatch;
-local l_usePreferredInput_0 = v5.usePreferredInput;
-local l_useRoactService_0 = v8.useRoactService;
-return function() --[[ Line: 24 ]] --[[ Name: useOpenLink ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useRoactService_0 (copy), l_AppLinking_0 (copy), l_usePreferredInput_0 (copy), v5 (copy), v4 (copy), l_VRService_0 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy)
-    local v14 = l_useDispatch_0();
-    local v15 = l_useRoactService_0(l_AppLinking_0);
-    local v16 = l_usePreferredInput_0() == v5.Input.Directional;
-    return v4.useCallback(function(v17, v18) --[[ Line: 29 ]]
-        -- upvalues: v16 (copy), l_VRService_0 (ref), v15 (copy), v14 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref)
-        if v18 then
-            if v16 or l_VRService_0.VREnabled then
-                v15:openURL(v18);
-                return;
-            else
-                v14(l_NavigateDown_0({
-                    name = l_AppPage_0.GenericWebPage, 
-                    detail = v18, 
-                    extraProps = {
-                        title = v17
-                    }
-                }));
-            end;
-        end;
-    end, {
-        v15, 
-        v14, 
-        v16
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local VRService = game:GetService("VRService")
+local AppLinking = require(Parent.RoactServiceTags).AppLinking
+local default = require(Parent.LinkingProtocol).LinkingProtocol.default
+local NavigationRodux = require(Parent.NavigationRodux)
+local React = require(Parent.React)
+local Responsive = require(Parent.Responsive)
+local RoactUtils = require(Parent.RoactUtils)
+local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local RobloxAppHooks = require(Parent.RobloxAppHooks)
+local AppPage = RobloxAppEnums.AppPage
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local usePreferredInput = Responsive.usePreferredInput
+local useRoactService = RobloxAppHooks.useRoactService
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v17 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+
+local function useOpenLink() -- line: 30
+	-- upvalues: useDispatch (copy), useRoactService (copy), AppLinking (copy), usePreferredInput (copy), Responsive (copy), React (copy), VRService (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), NavigateDown (copy), default (copy)
+	local v19 = useDispatch()
+	local v20 = useRoactService(AppLinking)
+	local v21 = usePreferredInput() == Responsive.Input.Directional
+
+	return React.useCallback(function(s1: string, s2: string?) -- line: 35
+		-- upvalues: v20 (copy), v21 (copy), VRService (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), v19 (copy), NavigateDown (copy), default (copy)
+		if s2 then
+			if v20 then
+				if v21 or VRService.VREnabled then
+					v20:openURL(s2)
+
+					return
+				end
+
+				local t1 = {
+					name = AppPage.GenericWebPage,
+					detail = s2,
+					extraProps = {
+						title = s1
+					}
+				}
+
+				if FFlagSignalsNavP3Dispatch then
+					v17.down(v17.fromLegacyPage(t1))
+
+					return
+				end
+
+				v19(NavigateDown(t1))
+
+				return
+			end
+
+			default:openURL(s2)
+		end
+	end, {
+		v20,
+		v19,
+		v21
+	})
+end
+
+return useOpenLink

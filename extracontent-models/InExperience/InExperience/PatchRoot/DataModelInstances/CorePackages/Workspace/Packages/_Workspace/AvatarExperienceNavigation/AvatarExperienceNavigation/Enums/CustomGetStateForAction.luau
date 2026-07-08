@@ -1,10 +1,9 @@
-local v0 = {
-    BlockAXExitOnUnsavedChanges = "BlockAXExitOnUnsavedChanges"
-};
-local v1 = {
-    v0.BlockAXExitOnUnsavedChanges
-};
+local t1 = {
+	BlockAXExitOnUnsavedChanges = "BlockAXExitOnUnsavedChanges"
+}
+local t2 = { t1.BlockAXExitOnUnsavedChanges }
+
 return {
-    HandlerId = v0, 
-    Ordering = v1
-};
+	HandlerId = t1,
+	Ordering = t2
+}

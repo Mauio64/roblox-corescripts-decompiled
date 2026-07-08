@@ -1,14 +1,7 @@
-return function(v0) --[[ Line: 8 ]]
-    if not v0 then
-        return false;
-    else
-        local v1 = false;
-        if v0.userPresenceType == "InGame" then
-            v1 = false;
-            if v0.universeId ~= nil then
-                v1 = v0.universeId ~= "";
-            end;
-        end;
-        return v1;
-    end;
-end;
+return function(t1: {[any]: any}?) -- line: 8
+	if not t1 then
+		return false
+	end
+
+	return t1.userPresenceType == "InGame" and (t1.universeId ~= nil and t1.universeId ~= "")
+end

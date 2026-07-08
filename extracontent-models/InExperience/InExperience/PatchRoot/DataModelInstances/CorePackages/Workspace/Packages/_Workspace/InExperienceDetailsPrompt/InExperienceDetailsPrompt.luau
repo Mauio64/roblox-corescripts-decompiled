@@ -1,4 +1,4 @@
 return {
-    renderInExperienceDetailsPrompt = require(script.renderInExperienceDetailsPrompt), 
-    ["jest.config"] = script["jest.config"]
-};
+	renderInExperienceDetailsPrompt = require(script.renderInExperienceDetailsPrompt),
+	["jest.config"] = script["jest.config"]
+}

@@ -1,47 +1,60 @@
-local v0 = {};
-local function _(v1) --[[ Line: 3 ]] --[[ Name: isPascalCase ]]
-    -- upvalues: v0 (copy)
-    if v0[v1] then
-        return true;
-    elseif typeof(v1) ~= "string" then
-        return false;
-    else
-        local v2 = v1:sub(1, 1);
-        local v3 = v2 == v2:upper();
-        if v3 then
-            v0[v1] = true;
-        end;
-        return v3;
-    end;
-end;
-return function(v5, v6) --[[ Line: 30 ]] --[[ Name: mapServerBindingProps ]]
-    -- upvalues: v0 (copy)
-    local v7 = nil;
-    local v8 = nil;
-    for v9, v10 in v5 do
-        local v11 = v6[v9];
-        if v11 ~= nil then
-            v7 = v7 or {};
-            v7[v11] = v10;
-        else
-            local v12;
-            if v0[v9] then
-                v12 = true;
-            elseif typeof(v9) ~= "string" then
-                v12 = false;
-            else
-                local v13 = v9:sub(1, 1);
-                local v14 = v13 == v13:upper();
-                if v14 then
-                    v0[v9] = true;
-                end;
-                v12 = v14;
-            end;
-            if v12 then
-                v8 = v8 or {};
-                table.insert(v8, v9);
-            end;
-        end;
-    end;
-    return v7, v8;
-end;
+local t1 = {}
+
+local function isPascalCase(s1: string) -- line: 7
+	-- upvalues: t1 (copy)
+	if t1[s1] then
+		return true
+	end
+
+	if typeof(s1) ~= "string" then
+		return false
+	end
+
+	local v5 = s1:sub(1, 1)
+	local v6 = v5 == v5:upper()
+
+	if v6 then
+		t1[s1] = true
+	end
+
+	return v6
+end
+local function mapServerBindingProps(t2: {[any]: any}, t3: {[any]: any}) -- line: 34
+	-- upvalues: t1 (copy)
+	local v9 = nil
+	local v10 = nil
+
+	for v11, v12 in t2 do
+		local v13 = t3[v11]
+
+		if v13 ~= nil then
+			v9 = v9 or {}
+			v9[v13] = v12
+		else
+			local v14
+
+			if t1[v11] then
+				v14 = true
+			elseif typeof(v11) ~= "string" then
+				v14 = false
+			else
+				local v15 = v11:sub(1, 1)
+
+				v14 = v15 == v15:upper()
+
+				if v14 then
+					t1[v11] = true
+				end
+			end
+
+			if v14 then
+				v10 = v10 or {}
+				table.insert(v10, v11)
+			end
+		end
+	end
+
+	return v9, v10
+end
+
+return mapServerBindingProps

@@ -1,3 +1,3 @@
 return {
-    RectangularIcon = require(script.RectangularIcon)
-};
+	RectangularIcon = require(script.RectangularIcon)
+}

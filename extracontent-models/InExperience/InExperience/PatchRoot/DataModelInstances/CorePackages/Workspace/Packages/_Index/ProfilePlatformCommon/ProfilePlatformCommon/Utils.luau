@@ -1,3 +1,3 @@
 return {
-    createProfileCompletionPromptsConfig = require(script.createProfileCompletionPromptsConfig)
-};
+	createProfileCompletionPromptsConfig = require(script.createProfileCompletionPromptsConfig)
+}

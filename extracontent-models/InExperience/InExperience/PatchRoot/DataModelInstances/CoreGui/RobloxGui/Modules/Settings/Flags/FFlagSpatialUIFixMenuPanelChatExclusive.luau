@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SpatialUIFixMenuPanelChatExclusive", false);
+return game:DefineFastFlag("SpatialUIFixMenuPanelChatExclusive", false)

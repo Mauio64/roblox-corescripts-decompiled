@@ -1,402 +1,422 @@
-local l_VRService_0 = game:GetService("VRService");
-local l_RunService_0 = game:GetService("RunService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_VRHub_0 = require(l_CorePackages_0.Workspace.Packages.VrCommon).VRHub;
-local l_Parent_0 = script.Parent;
-local v5 = require(l_Parent_0.Constants);
-local v6 = require(l_Parent_0.Utils);
-local l_PanelType_0 = v5.PanelType;
-local l_SpatialUIType_0 = v5.SpatialUIType;
-local v9 = require(script.Parent.createCompatPanel);
-local v10 = require(script.Parent.createUIGroupDragBar);
-local _ = require(l_Parent_0.DragBar);
-local l_Players_0 = game:GetService("Players");
-local v13 = game:DefineFastInt("FIntUIResetDelayInSec", 3);
-local v14 = CFrame.Angles(-0.3141592653589793, 0.17453292519943295, 0);
-local v15 = CFrame.new(-0.46666666666666673, -0.8, -2.1333333333333333);
-local v16 = Vector2.new(2.666666666666667, 1.866666666666667);
-local v17 = v15 * v14;
-local _ = function(v18) --[[ Line: 52 ]] --[[ Name: getZAxisStablizedCFrame ]]
-    local v19, v20, _ = v18:ToOrientation();
-    return CFrame.new(v18.Position) * CFrame.fromOrientation(v19, v20, 0);
-end;
-local _ = function(v23) --[[ Line: 57 ]] --[[ Name: getCameraOffsetFromHeadRotationWithZAxisStabl ]]
-    -- upvalues: l_VRService_0 (copy)
-    local l_CFrame_0 = workspace.CurrentCamera.CFrame;
-    local v25 = (l_CFrame_0 * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(v23);
-    local v26, v27, _ = v25:ToOrientation();
-    return l_CFrame_0:ToObjectSpace(CFrame.new(v25.Position) * CFrame.fromOrientation(v26, v27, 0));
-end;
-local function _(v30) --[[ Line: 66 ]] --[[ Name: getPanelPart ]]
-    -- upvalues: l_SpatialUIType_0 (copy)
-    if v30.uiType == l_SpatialUIType_0.SpatialUI or v30.uiType == l_SpatialUIType_0.SpatialUIRoact then
-        return v30.panelObject.Adornee;
-    elseif v30.uiType == l_SpatialUIType_0.SpatialUIPartOnly then
-        return v30.panelObject;
-    else
-        return nil;
-    end;
-end;
-local function _(v32) --[[ Line: 77 ]] --[[ Name: panelExistsInSpace ]]
-    -- upvalues: l_SpatialUIType_0 (copy)
-    local v33 = false;
-    if v32 ~= nil then
-        v33 = false;
-        if v32.panelObject ~= nil then
-            v33 = v32.uiType ~= l_SpatialUIType_0.ScreenUI;
-        end;
-    end;
-    return v33;
-end;
-local v35 = {};
-local v36 = nil;
-v35.__index = v35;
-v35.removeRoactPanel = function(v37, v38) --[[ Line: 97 ]] --[[ Name: removeRoactPanel ]]
-    v37.uiElements[v38] = nil;
-end;
-v35.registerRoactPanel = function(v39, v40, v41) --[[ Line: 101 ]] --[[ Name: registerRoactPanel ]]
-    v39.uiElements[v40] = v41;
-    v39:rescaleUIForCurrentHeadScale();
-    v39:updateUIGroupsForCurHeadCFrame();
-end;
-v35.createUI = function(v42, v43) --[[ Line: 113 ]] --[[ Name: createUI ]]
-    -- upvalues: v9 (copy)
-    local v44 = v9(v43);
-    if v44 == nil then
-        return nil;
-    else
-        v42.uiElements[v43.panelType] = v44;
-        v42:updatePanelForCurHeadCFrame(v43.panelType);
-        return {
-            type = v44.uiType, 
-            panelObject = v44.panelObject
-        };
-    end;
-end;
-v35.updateUIGroupForCurHeadCFrame = function(v45, v46, v47) --[[ Line: 126 ]] --[[ Name: updateUIGroupForCurHeadCFrame ]]
-    -- upvalues: l_VRService_0 (copy)
-    local v48 = v45.uiGroups[v46];
-    local l_uiGroupHeadRotation_0 = v48.positionProps.uiGroupHeadRotation;
-    local l_CFrame_1 = workspace.CurrentCamera.CFrame;
-    local v51 = (l_CFrame_1 * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(l_uiGroupHeadRotation_0);
-    local v52, v53, _ = v51:ToOrientation();
-    local v55 = l_CFrame_1:ToObjectSpace(CFrame.new(v51.Position) * CFrame.fromOrientation(v52, v53, 0));
-    v48.positionProps.uiGroupCameraOffSet = v55;
-    l_uiGroupHeadRotation_0 = v47 or false;
-    if v48.draggable and v48.dragBar and not l_uiGroupHeadRotation_0 then
-        v48.dragBar:setCFrame(workspace.CurrentCamera.CFrame * v55:ToWorldSpace(v48.dragBarOffset));
-    end;
-    v45:updatePanelsInUIGroupForCurHeadCFrame(v46);
-end;
-v35.updateUIGroupsForCurHeadCFrame = function(v56) --[[ Line: 147 ]] --[[ Name: updateUIGroupsForCurHeadCFrame ]]
-    for v57, _ in pairs(v56.uiGroups) do
-        v56:updateUIGroupForCurHeadCFrame(v57);
-    end;
-end;
-v35.updatePanelForCurHeadCFrame = function(v59, v60) --[[ Line: 153 ]] --[[ Name: updatePanelForCurHeadCFrame ]]
-    -- upvalues: l_SpatialUIType_0 (copy), l_VRService_0 (copy)
-    local v61 = v59.uiElements[v60];
-    local v62 = false;
-    if v61 ~= nil then
-        v62 = false;
-        if v61.panelObject ~= nil then
-            v62 = v61.uiType ~= l_SpatialUIType_0.ScreenUI;
-        end;
-    end;
-    if v62 and v61.panelPositionProps and v61.panelPositionProps.cameraFixedPanelProp then
-        v62 = v61.panelPositionProps;
-        local l_cameraFixedPanelProp_0 = v62.cameraFixedPanelProp;
-        local l_uiGroupHeadRotation_1 = v59.uiGroups[v62.uiGroup].positionProps.uiGroupHeadRotation;
-        local l_CFrame_2 = workspace.CurrentCamera.CFrame;
-        local v66 = (l_CFrame_2 * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(l_uiGroupHeadRotation_1);
-        local v67, v68, _ = v66:ToOrientation();
-        local v70 = l_CFrame_2:ToObjectSpace(CFrame.new(v66.Position) * CFrame.fromOrientation(v67, v68, 0));
-        l_uiGroupHeadRotation_1 = if not (v61.uiType ~= l_SpatialUIType_0.SpatialUI) or v61.uiType == l_SpatialUIType_0.SpatialUIRoact then v61.panelObject.Adornee else if v61.uiType == l_SpatialUIType_0.SpatialUIPartOnly then v61.panelObject else nil;
-        if l_uiGroupHeadRotation_1 == nil then
-            return;
-        else
-            l_uiGroupHeadRotation_1.CFrame = workspace.CurrentCamera.CFrame * v70;
-            l_uiGroupHeadRotation_1.CFrame = l_uiGroupHeadRotation_1.CFrame:ToWorldSpace(l_cameraFixedPanelProp_0.uiGroupElementOffset);
-        end;
-    end;
-end;
-v35.updatePanelsInUIGroupForCurHeadCFrame = function(v71, v72) --[[ Line: 175 ]] --[[ Name: updatePanelsInUIGroupForCurHeadCFrame ]]
-    for v73, v74 in pairs(v71.uiElements) do
-        if v74.panelPositionProps and v74.panelPositionProps.uiGroup == v72 then
-            v71:updatePanelForCurHeadCFrame(v73);
-        end;
-    end;
-end;
-v35.updatePanelsForCurHeadCFrame = function(v75) --[[ Line: 189 ]] --[[ Name: updatePanelsForCurHeadCFrame ]]
-    for v76, _ in pairs(v75.uiElements) do
-        v75:updatePanelForCurHeadCFrame(v76);
-    end;
-end;
-v35.dragUiGroupStart = function(v78, v79) --[[ Line: 195 ]] --[[ Name: dragUiGroupStart ]]
-    if v78.uiGroups[v79].draggable == false then
-        return;
-    else
-        local l_dragBar_0 = v78.uiGroups[v79].dragBar;
-        local v81 = workspace.CurrentCamera.CFrame:ToWorldSpace(v78.uiGroups[v79].positionProps.uiGroupCameraOffSet);
-        l_dragBar_0:startDrag((l_dragBar_0:getCFrame():ToObjectSpace(v81)));
-        return;
-    end;
-end;
-v35.dragUiGroupEnd = function(v82, v83) --[[ Line: 207 ]] --[[ Name: dragUiGroupEnd ]]
-    if v82.uiGroups[v83].draggable == false then
-        return;
-    else
-        v82.uiGroups[v83].dragBar:dragEnd();
-        return;
-    end;
-end;
-v35.dragUiGroupStep = function(v84, v85) --[[ Line: 215 ]] --[[ Name: dragUiGroupStep ]]
-    -- upvalues: l_VRService_0 (copy)
-    if v84.uiGroups[v85].draggable == false then
-        return;
-    else
-        local l_dragBar_1 = v84.uiGroups[v85].dragBar;
-        local v87 = workspace.CurrentCamera.CFrame * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head);
-        local v88 = l_dragBar_1:getCFrame();
-        local v89 = Vector3.new(v87.Position.X, v87.Position.Y - 0.6666666666666667, v87.Position.Z);
-        local v90, v91, _ = (CFrame.lookAt(v88.Position, v89) * CFrame.Angles(0, 3.141592653589793, 0)):ToEulerAnglesXYZ();
-        local _, _, v95 = v88:ToEulerAnglesXYZ();
-        local v96 = CFrame.new(v88.Position) * CFrame.Angles(v90, v91, v95);
-        local v97, v98, _ = v96:ToOrientation();
-        l_dragBar_1:setCFrame(CFrame.new(v96.Position) * CFrame.fromOrientation(v97, v98, 0));
-        local v100 = l_dragBar_1:getCFrame():ToWorldSpace(l_dragBar_1.uiGroupOffSet);
-        v84.uiGroups[v85].positionProps.uiGroupHeadRotation = v87:ToObjectSpace(v100);
-        v84:updateUIGroupForCurHeadCFrame(v85, true);
-        return;
-    end;
-end;
-v35.setUpUiGroups = function(v101) --[[ Line: 247 ]] --[[ Name: setUpUiGroups ]]
-    -- upvalues: v10 (copy), v5 (copy), v17 (copy), l_VRService_0 (copy), v16 (copy), l_PanelType_0 (copy)
-    local v115 = v10({
-        name = "MainUIGroup", 
-        dragFunction = function(_, _, _, _, _) --[[ Line: 251 ]] --[[ Name: dragFunction ]]
-            -- upvalues: v101 (copy), v5 (ref)
-            v101:dragUiGroupStep(v5.SpatialUIGroupType.MainUIGroup);
-        end, 
-        dragStartFunction = function(_, _, _, _, _, _, _) --[[ Line: 254 ]] --[[ Name: dragStartFunction ]]
-            -- upvalues: v101 (copy), v5 (ref)
-            v101:dragUiGroupStart(v5.SpatialUIGroupType.MainUIGroup);
-        end, 
-        dragEndFunction = function(_) --[[ Line: 257 ]] --[[ Name: dragEndFunction ]]
-            -- upvalues: v101 (copy), v5 (ref)
-            v101:dragUiGroupEnd(v5.SpatialUIGroupType.MainUIGroup);
-        end
-    });
-    local v116 = {};
-    local v117 = {
-        uiGroupHeadRotation = v17
-    };
-    local l_v17_0 = v17;
-    local l_CFrame_3 = workspace.CurrentCamera.CFrame;
-    local v120 = (l_CFrame_3 * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(l_v17_0);
-    local v121, v122, _ = v120:ToOrientation();
-    v117.uiGroupCameraOffSet = l_CFrame_3:ToObjectSpace(CFrame.new(v120.Position) * CFrame.fromOrientation(v121, v122, 0));
-    v117.defaultGroupHeadRotation = v17;
-    v116.positionProps = v117;
-    v116.uiContainerSize = v16;
-    v116.draggable = true;
-    v116.dragBar = v115;
-    v116.dragBarOffset = CFrame.new(0, v5.ROACT_PANEL_UIGROUP_ELEMENT_OFFSET_MAP[l_PanelType_0.BottomBar].Y - 0.075 - 0.06666666666666667, 0);
-    v116.headScale = 1;
-    v101.uiGroups[v5.SpatialUIGroupType.MainUIGroup] = v116;
-end;
-v35.step = function(v124) --[[ Line: 282 ]] --[[ Name: step ]]
-    -- upvalues: l_VRService_0 (copy), l_SpatialUIType_0 (copy), l_PanelType_0 (copy), v13 (copy)
-    if not l_VRService_0.VREnabled then
-        return;
-    else
-        for v125, v126 in pairs(v124.uiElements) do
-            local v127 = false;
-            if v126 ~= nil then
-                v127 = false;
-                if v126.panelObject ~= nil then
-                    v127 = v126.uiType ~= l_SpatialUIType_0.ScreenUI;
-                end;
-            end;
-            if v127 and v125 == l_PanelType_0.RobloxGui then
-                v127 = nil;
-                local v128, v129, _ = (if v126.uiType == l_SpatialUIType_0.SpatialUI then v126.panelObject.Adornee else v126.panelObject).CFrame:ToOrientation();
-                local v131, v132, _ = (workspace.CurrentCamera.CFrame * l_VRService_0:GetUserCFrame(Enum.UserCFrame.Head)):ToOrientation();
-                if math.abs(v129 - v132) > 1.7453292519943295 or math.abs(v128 - v131) > 1.7453292519943295 then
-                    if v124.uiGroupsOutOfViewTimeStamp then
-                        if os.clock() - v124.uiGroupsOutOfViewTimeStamp >= v13 then
-                            v124:updateUIGroupsForCurHeadCFrame();
-                            v124.uiGroupsOutOfViewTimeStamp = nil;
-                        end;
-                    else
-                        v124.uiGroupsOutOfViewTimeStamp = os.clock();
-                    end;
-                else
-                    v124.uiGroupsOutOfViewTimeStamp = nil;
-                end;
-            end;
-        end;
-        return;
-    end;
-end;
-v35.onShowTopBarChanged = function(v134) --[[ Line: 321 ]] --[[ Name: onShowTopBarChanged ]]
-    -- upvalues: l_VRService_0 (copy), l_VRHub_0 (copy), l_SpatialUIType_0 (copy)
-    if not l_VRService_0.VREnabled then
-        return;
-    elseif l_VRHub_0.ShowTopBar then
-        for _, v136 in pairs(v134.uiGroups) do
-            if v136.draggable and v136.dragBar then
-                v136.dragBar:show();
-            end;
-        end;
-        for _, v138 in pairs(v134.uiElements) do
-            if v138.uiType == l_SpatialUIType_0.SpatialUI or v138.uiType == l_SpatialUIType_0.SpatialUIRoact then
-                local l_panelObject_0 = v138.panelObject;
-                l_panelObject_0.Enabled = true;
-                l_panelObject_0.Adornee.Parent = workspace;
-            elseif v138.uiType == l_SpatialUIType_0.SpatialUIPartOnly then
-                v138.panelObject.Parent = workspace;
-            end;
-        end;
-        return;
-    else
-        for _, v141 in pairs(v134.uiGroups) do
-            if v141.draggable and v141.dragBar then
-                v141.dragBar:hide();
-            end;
-        end;
-        for _, v143 in pairs(v134.uiElements) do
-            if v143.uiType == l_SpatialUIType_0.SpatialUI or v143.uiType == l_SpatialUIType_0.SpatialUIRoact then
-                local l_panelObject_1 = v143.panelObject;
-                l_panelObject_1.Enabled = false;
-                l_panelObject_1.Adornee.Parent = nil;
-            elseif v143.uiType == l_SpatialUIType_0.SpatialUIPartOnly then
-                v143.panelObject.Parent = nil;
-            end;
-        end;
-        return;
-    end;
-end;
-v35.updateUIGroupsForCurCamera = function(v145) --[[ Line: 362 ]] --[[ Name: updateUIGroupsForCurCamera ]]
-    -- upvalues: l_VRService_0 (copy), l_SpatialUIType_0 (copy)
-    if not l_VRService_0.VREnabled then
-        return;
-    else
-        for _, v147 in pairs(v145.uiGroups) do
-            if v147.draggable then
-                v147.dragBar:setCFrame(workspace.CurrentCamera.CFrame * v147.positionProps.uiGroupCameraOffSet:ToWorldSpace(v147.dragBarOffset));
-            end;
-        end;
-        for _, v149 in pairs(v145.uiElements) do
-            local v150 = false;
-            if v149 ~= nil then
-                v150 = false;
-                if v149.panelObject ~= nil then
-                    v150 = v149.uiType ~= l_SpatialUIType_0.ScreenUI;
-                end;
-            end;
-            if v150 and v149.panelPositionProps and v149.panelPositionProps.cameraFixedPanelProp then
-                v150 = v149.panelPositionProps;
-                local l_cameraFixedPanelProp_1 = v150.cameraFixedPanelProp;
-                local v152 = if not (v149.uiType ~= l_SpatialUIType_0.SpatialUI) or v149.uiType == l_SpatialUIType_0.SpatialUIRoact then v149.panelObject.Adornee else if v149.uiType == l_SpatialUIType_0.SpatialUIPartOnly then v149.panelObject else nil;
-                if v152 == nil then
-                    return;
-                else
-                    v152.CFrame = workspace.CurrentCamera.CFrame * v145.uiGroups[v150.uiGroup].positionProps.uiGroupCameraOffSet:ToWorldSpace(l_cameraFixedPanelProp_1.uiGroupElementOffset);
-                end;
-            end;
-        end;
-        return;
-    end;
-end;
-v35.onMouseTargetChanged = function(v153, v154) --[[ Line: 398 ]] --[[ Name: onMouseTargetChanged ]]
-    for _, v156 in pairs(v153.uiGroups) do
-        if v156.draggable then
-            if v156.dragBar and v156.dragBar.part == v154 then
-                v156.dragBar:startHover();
-            elseif v156.dragBar and v156.dragBar.part ~= v154 then
-                v156.dragBar:hoverEnd();
-            end;
-        end;
-    end;
-end;
-v35.rescaleUIForCurrentHeadScale = function(v157) --[[ Line: 410 ]] --[[ Name: rescaleUIForCurrentHeadScale ]]
-    -- upvalues: v6 (copy), l_SpatialUIType_0 (copy)
-    local l_HeadScale_0 = workspace.CurrentCamera.HeadScale;
-    for _, v160 in pairs(v157.uiGroups) do
-        local v161 = l_HeadScale_0 / v160.headScale;
-        v160.positionProps.uiGroupHeadRotation = v6.rescaleCFramePosition(v160.positionProps.uiGroupHeadRotation, v161);
-        v160.positionProps.uiGroupCameraOffSet = v6.rescaleCFramePosition(v160.positionProps.uiGroupCameraOffSet, v161);
-        v160.positionProps.defaultGroupHeadRotation = v6.rescaleCFramePosition(v160.positionProps.defaultGroupHeadRotation, v161);
-        if v160.draggable then
-            v160.dragBarOffset = v6.rescaleCFramePosition(v160.dragBarOffset, v161);
-            v160.dragBar:rescale(v161);
-        end;
-        v160.headScale = l_HeadScale_0;
-    end;
-    for _, v163 in pairs(v157.uiElements) do
-        local v164 = l_HeadScale_0 / v163.headScale;
-        if v163.uiType ~= l_SpatialUIType_0.SpatialUIRoact then
-            local v165 = if not (v163.uiType ~= l_SpatialUIType_0.SpatialUI) or v163.uiType == l_SpatialUIType_0.SpatialUIRoact then v163.panelObject.Adornee else if v163.uiType == l_SpatialUIType_0.SpatialUIPartOnly then v163.panelObject else nil;
-            if v165 ~= nil then
-                v165.Size = v165.Size * v164;
-            end;
-        end;
-        local l_panelPositionProps_0 = v163.panelPositionProps;
-        if l_panelPositionProps_0 and l_panelPositionProps_0.cameraFixedPanelProp then
-            l_panelPositionProps_0.cameraFixedPanelProp.uiGroupElementOffset = v6.rescaleCFramePosition(l_panelPositionProps_0.cameraFixedPanelProp.uiGroupElementOffset, v164);
-        end;
-        v163.headScale = l_HeadScale_0;
-    end;
-end;
-v35.new = function() --[[ Line: 450 ]] --[[ Name: new ]]
-    -- upvalues: v35 (copy), l_RunService_0 (copy), l_VRHub_0 (copy), l_Players_0 (copy)
-    local v167 = {
-        currentMouseTarget = nil, 
-        uiGroupsOutOfViewTimeStamp = nil, 
-        uiElements = {}, 
-        uiGroups = {}
-    };
-    setmetatable(v167, v35);
-    v167:setUpUiGroups();
-    v167:rescaleUIForCurrentHeadScale();
-    v167:updateUIGroupsForCurCamera();
-    l_RunService_0:BindToRenderStep("UIManagerRenderStep", Enum.RenderPriority.Last.Value, function() --[[ Line: 465 ]]
-        -- upvalues: v167 (copy)
-        v167:step();
-    end);
-    l_VRHub_0.ShowTopBarChanged.Event:connect(function() --[[ Line: 469 ]]
-        -- upvalues: v167 (copy)
-        v167:onShowTopBarChanged();
-    end);
-    local l_CurrentCamera_0 = workspace.CurrentCamera;
-    l_CurrentCamera_0:GetPropertyChangedSignal("CFrame"):Connect(function() --[[ Line: 474 ]]
-        -- upvalues: v167 (copy)
-        v167:updateUIGroupsForCurCamera();
-    end);
-    l_CurrentCamera_0:GetPropertyChangedSignal("HeadScale"):Connect(function() --[[ Line: 478 ]]
-        -- upvalues: v167 (copy)
-        v167:rescaleUIForCurrentHeadScale();
-        v167:updateUIGroupsForCurHeadCFrame();
-    end);
-    local l_Mouse_0 = l_Players_0.LocalPlayer:GetMouse();
-    if l_Mouse_0 then
-        l_Mouse_0.Move:Connect(function() --[[ Line: 486 ]]
-            -- upvalues: l_Players_0 (ref), v167 (copy)
-            local l_Mouse_1 = l_Players_0.LocalPlayer:GetMouse();
-            if l_Mouse_1.Target ~= v167.currentMouseTarget then
-                v167:onMouseTargetChanged(l_Mouse_1.Target);
-                v167.currentMouseTarget = l_Mouse_1.Target;
-            end;
-        end);
-    end;
-    return v167;
-end;
-v35.getInstance = function() --[[ Line: 499 ]] --[[ Name: getInstance ]]
-    -- upvalues: v36 (ref), v35 (copy)
-    if v36 == nil then
-        v36 = v35.new();
-    end;
-    return v36;
-end;
-return v35;
+local VRService = game:GetService("VRService")
+local RunService = game:GetService("RunService")
+local CorePackages = game:GetService("CorePackages")
+local VRHub = require(CorePackages.Workspace.Packages.VrCommon).VRHub
+local scriptParent = script.Parent
+local Constants = require(scriptParent.Constants)
+local Utils = require(scriptParent.Utils)
+local PanelType = Constants.PanelType
+local SpatialUIType = Constants.SpatialUIType
+local createCompatPanel = require(script.Parent.createCompatPanel)
+local createUIGroupDragBar = require(script.Parent.createUIGroupDragBar)
+
+require(scriptParent.DragBar)
+
+local Players = game:GetService("Players")
+local v13 = game:DefineFastInt("FIntUIResetDelayInSec", 3)
+local cFrame = CFrame.Angles(-0.3141592653589793, 0.17453292519943295, 0)
+local cFrame2 = CFrame.new(-0.46666666666666673, -0.8, -2.1333333333333333)
+local vector2 = Vector2.new(2.666666666666667, 1.866666666666667)
+local v17 = cFrame2 * cFrame
+
+local function getZAxisStablizedCFrame(cFrame3: CFrame) -- line: 52
+	local v25, v26, _ = cFrame3:ToOrientation()
+
+	return CFrame.new(cFrame3.Position) * CFrame.fromOrientation(v25, v26, 0)
+end
+local function getCameraOffsetFromHeadRotationWithZAxisStabl(p1) -- line: 57
+	-- upvalues: VRService (copy)
+	local CurrentCameraCFrame = workspace.CurrentCamera.CFrame
+	local v30 = (CurrentCameraCFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(p1)
+	local v31, v32, _ = v30:ToOrientation()
+
+	return CurrentCameraCFrame:ToObjectSpace(CFrame.new(v30.Position) * CFrame.fromOrientation(v31, v32, 0))
+end
+local function getPanelPart(p2) -- line: 66
+	-- upvalues: SpatialUIType (copy)
+	if p2.uiType == SpatialUIType.SpatialUI or p2.uiType == SpatialUIType.SpatialUIRoact then
+		return p2.panelObject.Adornee
+	end
+
+	if p2.uiType == SpatialUIType.SpatialUIPartOnly then
+		return p2.panelObject
+	end
+
+	return nil
+end
+local function panelExistsInSpace(p3) -- line: 77
+	-- upvalues: SpatialUIType (copy)
+	return p3 ~= nil and (p3.panelObject ~= nil and p3.uiType ~= SpatialUIType.ScreenUI)
+end
+
+local t1 = {}
+local u23 = nil
+
+t1.__index = t1
+
+function t1.removeRoactPanel(p4, p5) -- line: 97
+	p4.uiElements[p5] = nil
+end
+function t1.registerRoactPanel(p6, p7, p8) -- line: 101
+	p6.uiElements[p7] = p8
+	p6:rescaleUIForCurrentHeadScale()
+	p6:updateUIGroupsForCurHeadCFrame()
+end
+function t1.createUI(p9, p10) -- line: 113
+	-- upvalues: createCompatPanel (copy)
+	local v43 = createCompatPanel(p10)
+
+	if v43 == nil then
+		return nil
+	end
+
+	p9.uiElements[p10.panelType] = v43
+	p9:updatePanelForCurHeadCFrame(p10.panelType)
+
+	return {
+		type = v43.uiType,
+		panelObject = v43.panelObject
+	}
+end
+function t1.updateUIGroupForCurHeadCFrame(p11, p12, b1: boolean?) -- line: 126
+	-- upvalues: VRService (copy)
+	local v47 = p11.uiGroups[p12]
+	local uiGroupHeadRotation = v47.positionProps.uiGroupHeadRotation
+	local CurrentCameraCFrame = workspace.CurrentCamera.CFrame
+	local v50 = (CurrentCameraCFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(uiGroupHeadRotation)
+	local v51, v52, _ = v50:ToOrientation()
+	local v54 = CurrentCameraCFrame:ToObjectSpace(CFrame.new(v50.Position) * CFrame.fromOrientation(v51, v52, 0))
+
+	v47.positionProps.uiGroupCameraOffSet = v54
+
+	local v55 = b1 or false
+
+	if v47.draggable and (v47.dragBar and not v55) then
+		v47.dragBar:setCFrame(workspace.CurrentCamera.CFrame * v54:ToWorldSpace(v47.dragBarOffset))
+	end
+
+	p11:updatePanelsInUIGroupForCurHeadCFrame(p12)
+end
+function t1.updateUIGroupsForCurHeadCFrame(p13) -- line: 147
+	for k, _ in pairs(p13.uiGroups) do
+		p13:updateUIGroupForCurHeadCFrame(k)
+	end
+end
+function t1.updatePanelForCurHeadCFrame(p14, p15) -- line: 153
+	-- upvalues: SpatialUIType (copy), VRService (copy)
+	local v61 = p14.uiElements[p15]
+
+	if v61 ~= nil and (v61.panelObject ~= nil and v61.uiType ~= SpatialUIType.ScreenUI) and (v61.panelPositionProps and v61.panelPositionProps.cameraFixedPanelProp) then
+		local panelPositionProps = v61.panelPositionProps
+		local cameraFixedPanelProp = panelPositionProps.cameraFixedPanelProp
+		local uiGroupHeadRotation = p14.uiGroups[panelPositionProps.uiGroup].positionProps.uiGroupHeadRotation
+		local CurrentCameraCFrame = workspace.CurrentCamera.CFrame
+		local v66 = (CurrentCameraCFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(uiGroupHeadRotation)
+		local v67, v68, _ = v66:ToOrientation()
+		local v70 = CurrentCameraCFrame:ToObjectSpace(CFrame.new(v66.Position) * CFrame.fromOrientation(v67, v68, 0))
+		local v71 = if v61.uiType ~= SpatialUIType.SpatialUI and v61.uiType ~= SpatialUIType.SpatialUIRoact then if v61.uiType ~= SpatialUIType.SpatialUIPartOnly then nil else v61.panelObject else v61.panelObject.Adornee
+
+		if v71 == nil then
+			return
+		end
+
+		v71.CFrame = workspace.CurrentCamera.CFrame * v70
+		v71.CFrame = v71.CFrame:ToWorldSpace(cameraFixedPanelProp.uiGroupElementOffset)
+	end
+end
+function t1.updatePanelsInUIGroupForCurHeadCFrame(p16, p17) -- line: 175
+	for k, v in pairs(p16.uiElements) do
+		if v.panelPositionProps and p17 == v.panelPositionProps.uiGroup then
+			p16:updatePanelForCurHeadCFrame(k)
+		end
+	end
+end
+function t1.updatePanelsForCurHeadCFrame(p18) -- line: 189
+	for k, _ in pairs(p18.uiElements) do
+		p18:updatePanelForCurHeadCFrame(k)
+	end
+end
+function t1.dragUiGroupStart(p19, p20) -- line: 195
+	if p19.uiGroups[p20].draggable == false then
+		return
+	end
+
+	local dragBar = p19.uiGroups[p20].dragBar
+	local v82 = workspace.CurrentCamera.CFrame:ToWorldSpace(p19.uiGroups[p20].positionProps.uiGroupCameraOffSet)
+
+	dragBar:startDrag((dragBar:getCFrame():ToObjectSpace(v82)))
+end
+function t1.dragUiGroupEnd(p21, p22) -- line: 207
+	if p21.uiGroups[p22].draggable == false then
+		return
+	end
+
+	p21.uiGroups[p22].dragBar:dragEnd()
+end
+function t1.dragUiGroupStep(p23, p24) -- line: 215
+	-- upvalues: VRService (copy)
+	if p23.uiGroups[p24].draggable == false then
+		return
+	end
+
+	local dragBar = p23.uiGroups[p24].dragBar
+	local v88 = workspace.CurrentCamera.CFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)
+	local v89 = dragBar:getCFrame()
+	local vector3 = Vector3.new(v88.Position.X, v88.Position.Y - 0.6666666666666667, v88.Position.Z)
+	local v91, v92, _ = (CFrame.lookAt(v89.Position, vector3) * CFrame.Angles(0, 3.141592653589793, 0)):ToEulerAnglesXYZ()
+	local _, _, v96 = v89:ToEulerAnglesXYZ()
+	local v97 = CFrame.new(v89.Position) * CFrame.Angles(v91, v92, v96)
+	local v98, v99, _ = v97:ToOrientation()
+
+	dragBar:setCFrame(CFrame.new(v97.Position) * CFrame.fromOrientation(v98, v99, 0))
+
+	local v101 = dragBar:getCFrame():ToWorldSpace(dragBar.uiGroupOffSet)
+
+	p23.uiGroups[p24].positionProps.uiGroupHeadRotation = v88:ToObjectSpace(v101)
+	p23:updateUIGroupForCurHeadCFrame(p24, true)
+end
+function t1.setUpUiGroups(p25) -- line: 247
+	-- upvalues: createUIGroupDragBar (copy), Constants (copy), v17 (copy), VRService (copy), vector2 (copy), PanelType (copy)
+	local v103 = createUIGroupDragBar({
+		name = "MainUIGroup",
+		dragFunction = function(_, _, _, _, _) -- line: 251
+			-- upvalues: p25 (copy), Constants (copy)
+			p25:dragUiGroupStep(Constants.SpatialUIGroupType.MainUIGroup)
+		end,
+		dragStartFunction = function(_, _, _, _, _, _, _) -- line: 254
+			-- upvalues: p25 (copy), Constants (copy)
+			p25:dragUiGroupStart(Constants.SpatialUIGroupType.MainUIGroup)
+		end,
+		dragEndFunction = function(_) -- line: 257
+			-- upvalues: p25 (copy), Constants (copy)
+			p25:dragUiGroupEnd(Constants.SpatialUIGroupType.MainUIGroup)
+		end
+	})
+	local t2 = {
+		draggable = true,
+		headScale = 1
+	}
+	local t3 = {
+		uiGroupHeadRotation = v17
+	}
+	local v106 = v17
+	local CurrentCameraCFrame = workspace.CurrentCamera.CFrame
+	local v108 = (CurrentCameraCFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)):ToWorldSpace(v106)
+	local v109, v110, _ = v108:ToOrientation()
+
+	t3.uiGroupCameraOffSet = CurrentCameraCFrame:ToObjectSpace(CFrame.new(v108.Position) * CFrame.fromOrientation(v109, v110, 0))
+	t3.defaultGroupHeadRotation = v17
+	t2.positionProps = t3
+	t2.uiContainerSize = vector2
+	t2.dragBar = v103
+	t2.dragBarOffset = CFrame.new(0, Constants.ROACT_PANEL_UIGROUP_ELEMENT_OFFSET_MAP[PanelType.BottomBar].Y - 0.075 - 0.06666666666666667, 0)
+	p25.uiGroups[Constants.SpatialUIGroupType.MainUIGroup] = t2
+end
+function t1.step(p39) -- line: 282
+	-- upvalues: VRService (copy), SpatialUIType (copy), PanelType (copy), v13 (copy)
+	if not VRService.VREnabled then
+		return
+	end
+
+	for k, v in pairs(p39.uiElements) do
+		if v ~= nil and (v.panelObject ~= nil and v.uiType ~= SpatialUIType.ScreenUI) and k == PanelType.RobloxGui then
+			local v115, v116, _ = ((if v.uiType ~= SpatialUIType.SpatialUI then v.panelObject else v.panelObject.Adornee)).CFrame:ToOrientation()
+			local v118, v119, _ = (workspace.CurrentCamera.CFrame * VRService:GetUserCFrame(Enum.UserCFrame.Head)):ToOrientation()
+
+			if math.abs(v116 - v119) > 1.7453292519943295 or math.abs(v115 - v118) > 1.7453292519943295 then
+				if p39.uiGroupsOutOfViewTimeStamp then
+					if os.clock() - p39.uiGroupsOutOfViewTimeStamp >= v13 then
+						p39:updateUIGroupsForCurHeadCFrame()
+						p39.uiGroupsOutOfViewTimeStamp = nil
+					end
+				else
+					p39.uiGroupsOutOfViewTimeStamp = os.clock()
+				end
+			else
+				p39.uiGroupsOutOfViewTimeStamp = nil
+			end
+		end
+	end
+end
+function t1.onShowTopBarChanged(p40) -- line: 321
+	-- upvalues: VRService (copy), VRHub (copy), SpatialUIType (copy)
+	if not VRService.VREnabled then
+		return
+	end
+
+	if VRHub.ShowTopBar then
+		for _, v in pairs(p40.uiGroups) do
+			if v.draggable and v.dragBar then
+				v.dragBar:show()
+			end
+		end
+
+		for _, v in pairs(p40.uiElements) do
+			if v.uiType == SpatialUIType.SpatialUI or v.uiType == SpatialUIType.SpatialUIRoact then
+				local panelObject = v.panelObject
+
+				panelObject.Enabled = true
+				panelObject.Adornee.Parent = workspace
+			elseif v.uiType == SpatialUIType.SpatialUIPartOnly then
+				v.panelObject.Parent = workspace
+			end
+		end
+
+		return
+	end
+
+	for _, v in pairs(p40.uiGroups) do
+		if v.draggable and v.dragBar then
+			v.dragBar:hide()
+		end
+	end
+
+	for _, v in pairs(p40.uiElements) do
+		if v.uiType == SpatialUIType.SpatialUI or v.uiType == SpatialUIType.SpatialUIRoact then
+			local panelObject = v.panelObject
+
+			panelObject.Enabled = false
+			panelObject.Adornee.Parent = nil
+		elseif v.uiType == SpatialUIType.SpatialUIPartOnly then
+			v.panelObject.Parent = nil
+		end
+	end
+end
+function t1.updateUIGroupsForCurCamera(p41) -- line: 362
+	-- upvalues: VRService (copy), SpatialUIType (copy)
+	if not VRService.VREnabled then
+		return
+	end
+
+	for _, v in pairs(p41.uiGroups) do
+		if v.draggable then
+			v.dragBar:setCFrame(workspace.CurrentCamera.CFrame * v.positionProps.uiGroupCameraOffSet:ToWorldSpace(v.dragBarOffset))
+		end
+	end
+
+	for _, v in pairs(p41.uiElements) do
+		if not (v ~= nil and (v.panelObject ~= nil and v.uiType ~= SpatialUIType.ScreenUI)) or not v.panelPositionProps or not v.panelPositionProps.cameraFixedPanelProp then
+			continue
+		end
+
+		local panelPositionProps = v.panelPositionProps
+		local cameraFixedPanelProp = panelPositionProps.cameraFixedPanelProp
+		local v139 = if v.uiType ~= SpatialUIType.SpatialUI and v.uiType ~= SpatialUIType.SpatialUIRoact then if v.uiType ~= SpatialUIType.SpatialUIPartOnly then nil else v.panelObject else v.panelObject.Adornee
+
+		if v139 == nil then
+			return
+		end
+
+		v139.CFrame = workspace.CurrentCamera.CFrame * p41.uiGroups[panelPositionProps.uiGroup].positionProps.uiGroupCameraOffSet:ToWorldSpace(cameraFixedPanelProp.uiGroupElementOffset)
+	end
+end
+function t1.onMouseTargetChanged(p42, p43) -- line: 398
+	for _, v in pairs(p42.uiGroups) do
+		if v.draggable then
+			if v.dragBar and p43 == v.dragBar.part then
+				v.dragBar:startHover()
+			elseif v.dragBar and p43 ~= v.dragBar.part then
+				v.dragBar:hoverEnd()
+			end
+		end
+	end
+end
+function t1.rescaleUIForCurrentHeadScale(p44) -- line: 410
+	-- upvalues: Utils (copy), SpatialUIType (copy)
+	local HeadScale = workspace.CurrentCamera.HeadScale
+
+	for _, v in pairs(p44.uiGroups) do
+		local v148 = HeadScale / v.headScale
+
+		v.positionProps.uiGroupHeadRotation = Utils.rescaleCFramePosition(v.positionProps.uiGroupHeadRotation, v148)
+		v.positionProps.uiGroupCameraOffSet = Utils.rescaleCFramePosition(v.positionProps.uiGroupCameraOffSet, v148)
+		v.positionProps.defaultGroupHeadRotation = Utils.rescaleCFramePosition(v.positionProps.defaultGroupHeadRotation, v148)
+
+		if v.draggable then
+			v.dragBarOffset = Utils.rescaleCFramePosition(v.dragBarOffset, v148)
+			v.dragBar:rescale(v148)
+		end
+
+		v.headScale = HeadScale
+	end
+
+	for _, v in pairs(p44.uiElements) do
+		local v151 = HeadScale / v.headScale
+
+		if v.uiType ~= SpatialUIType.SpatialUIRoact then
+			local v152 = if v.uiType ~= SpatialUIType.SpatialUI and v.uiType ~= SpatialUIType.SpatialUIRoact then if v.uiType ~= SpatialUIType.SpatialUIPartOnly then nil else v.panelObject else v.panelObject.Adornee
+
+			if v152 ~= nil then
+				v152.Size = v152.Size * v151
+			end
+		end
+
+		local panelPositionProps = v.panelPositionProps
+
+		if panelPositionProps and panelPositionProps.cameraFixedPanelProp then
+			panelPositionProps.cameraFixedPanelProp.uiGroupElementOffset = Utils.rescaleCFramePosition(panelPositionProps.cameraFixedPanelProp.uiGroupElementOffset, v151)
+		end
+
+		v.headScale = HeadScale
+	end
+end
+function t1.new() -- line: 450
+	-- upvalues: t1 (copy), RunService (copy), VRHub (copy), Players (copy)
+	local t4 = {
+		currentMouseTarget = nil,
+		uiGroupsOutOfViewTimeStamp = nil,
+		uiElements = {},
+		uiGroups = {}
+	}
+
+	setmetatable(t4, t1)
+	t4:setUpUiGroups()
+	t4:rescaleUIForCurrentHeadScale()
+	t4:updateUIGroupsForCurCamera()
+	RunService:BindToRenderStep("UIManagerRenderStep", Enum.RenderPriority.Last.Value, function() -- line: 465
+		-- upvalues: t4 (copy)
+		t4:step()
+	end)
+	VRHub.ShowTopBarChanged.Event:connect(function() -- line: 469
+		-- upvalues: t4 (copy)
+		t4:onShowTopBarChanged()
+	end)
+
+	local CurrentCamera = workspace.CurrentCamera
+
+	CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(function() -- line: 474
+		-- upvalues: t4 (copy)
+		t4:updateUIGroupsForCurCamera()
+	end)
+	CurrentCamera:GetPropertyChangedSignal("HeadScale"):Connect(function() -- line: 478
+		-- upvalues: t4 (copy)
+		t4:rescaleUIForCurrentHeadScale()
+		t4:updateUIGroupsForCurHeadCFrame()
+	end)
+
+	local Mouse = Players.LocalPlayer:GetMouse()
+
+	if Mouse then
+		Mouse.Move:Connect(function() -- line: 486
+			-- upvalues: Players (copy), t4 (copy)
+			local Mouse2 = Players.LocalPlayer:GetMouse()
+
+			if Mouse2.Target ~= t4.currentMouseTarget then
+				t4:onMouseTargetChanged(Mouse2.Target)
+				t4.currentMouseTarget = Mouse2.Target
+			end
+		end)
+	end
+
+	return t4
+end
+function t1.getInstance() -- line: 499
+	-- upvalues: u23 (ref), t1 (copy)
+	if u23 == nil then
+		u23 = t1.new()
+	end
+
+	return u23
+end
+
+return t1

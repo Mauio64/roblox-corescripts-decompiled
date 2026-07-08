@@ -1,57 +1,70 @@
-local v0 = {};
-v0.new = function(v1) --[[ Line: 19 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = {
-        defaultConfig = v1, 
-        defaultConfigKeys = {}
-    };
-    for v3 in pairs(v1) do
-        table.insert(v2.defaultConfigKeys, v3);
-    end;
-    v2._currentConfig = setmetatable({}, {
-        __index = function(_, v5) --[[ Line: 29 ]] --[[ Name: __index ]]
-            -- upvalues: v2 (copy)
-            local v6 = ("Invalid global configuration key %q. Valid configuration keys are: %s"):format(tostring(v5), table.concat(v2.defaultConfigKeys, ", "));
-            error(v6, 3);
-        end
-    });
-    v2.set = function(...) --[[ Line: 42 ]]
-        -- upvalues: v0 (ref), v2 (copy)
-        return v0.set(v2, ...);
-    end;
-    v2.get = function(...) --[[ Line: 46 ]]
-        -- upvalues: v0 (ref), v2 (copy)
-        return v0.get(v2, ...);
-    end;
-    v2.scoped = function(...) --[[ Line: 50 ]]
-        -- upvalues: v0 (ref), v2 (copy)
-        return v0.scoped(v2, ...);
-    end;
-    v2.set(v1);
-    return v2;
-end;
-v0.set = function(v7, v8) --[[ Line: 59 ]] --[[ Name: set ]]
-    local v9 = {};
-    local v10 = {};
-    for v11, v12 in pairs(v8) do
-        if v7.defaultConfig[v11] == nil then
-            table.insert(v9, v11);
-        elseif typeof(v12) ~= "boolean" then
-            table.insert(v10, tostring(v11) .. " (type " .. typeof(v12) .. ")");
-        else
-            v7._currentConfig[v11] = v12;
-        end;
-    end;
-    if next(v9) ~= nil then
-        local v13 = ("Invalid global configuration keys %s. Valid configuration keys are: %s"):format(table.concat(v9, ", "), table.concat(v7.defaultConfigKeys, ", "));
-        error(v13, 3);
-    end;
-    if next(v10) ~= nil then
-        local v14 = ("Invalid global configuration types for keys %s. All configuration values must be boolean."):format(table.concat(v10, ", "));
-        error(v14, 3);
-    end;
-end;
-v0.get = function(v15) --[[ Line: 98 ]] --[[ Name: get ]]
-    return v15._currentConfig;
-end;
-return v0;
+local t1 = {}
+
+function t1.new(p1) -- line: 19
+	-- upvalues: t1 (copy)
+	local t2 = {
+		defaultConfig = p1,
+		defaultConfigKeys = {}
+	}
+
+	for k in pairs(p1) do
+		table.insert(t2.defaultConfigKeys, k)
+	end
+
+	t2._currentConfig = setmetatable({}, {
+		__index = function(_, p3) -- line: 29
+			-- upvalues: t2 (copy)
+			local v16 = ("Invalid global configuration key %q. Valid configuration keys are: %s"):format(tostring(p3), table.concat(t2.defaultConfigKeys, ", "))
+
+			error(v16, 3)
+		end
+	})
+
+	function t2.set(...) -- line: 42
+		-- upvalues: t1 (copy), t2 (copy)
+		return t1.set(t2, ...)
+	end
+	function t2.get(...) -- line: 46
+		-- upvalues: t1 (copy), t2 (copy)
+		return t1.get(t2, ...)
+	end
+	function t2.scoped(...) -- line: 50
+		-- upvalues: t1 (copy), t2 (copy)
+		return t1.scoped(t2, ...)
+	end
+
+	t2.set(p1)
+
+	return t2
+end
+function t1.set(p4, p5) -- line: 59
+	local t3 = {}
+	local t4 = {}
+
+	for k, v in pairs(p5) do
+		if p4.defaultConfig[k] == nil then
+			table.insert(t3, k)
+		elseif typeof(v) ~= "boolean" then
+			table.insert(t4, tostring(k) .. " (type " .. typeof(v) .. ")")
+		else
+			p4._currentConfig[k] = v
+		end
+	end
+
+	if next(t3) ~= nil then
+		local v11 = ("Invalid global configuration keys %s. Valid configuration keys are: %s"):format(table.concat(t3, ", "), table.concat(p4.defaultConfigKeys, ", "))
+
+		error(v11, 3)
+	end
+
+	if next(t4) ~= nil then
+		local v12 = ("Invalid global configuration types for keys %s. All configuration values must be boolean."):format(table.concat(t4, ", "))
+
+		error(v12, 3)
+	end
+end
+function t1.get(p6) -- line: 98
+	return p6._currentConfig
+end
+
+return t1

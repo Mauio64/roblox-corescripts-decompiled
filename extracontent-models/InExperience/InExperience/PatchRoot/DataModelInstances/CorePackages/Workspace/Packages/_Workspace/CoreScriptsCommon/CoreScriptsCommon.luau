@@ -1,11 +1,12 @@
-local v0 = require(script.ConnectionUtil);
+local ConnectionUtil = require(script.ConnectionUtil)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    AvatarUtil = require(script.AvatarUtil), 
-    ConnectionUtil = v0, 
-    Constants = require(script.Constants), 
-    Url = require(script.Url), 
-    SettingsUtility = require(script.SettingsUtility), 
-    SettingsShowSignal = require(script.SettingsUtility).CreateSignal(), 
-    MouseIconOverrideService = require(script.MouseIconOverrideService)
-};
+	["jest.config"] = script["jest.config"],
+	AvatarUtil = require(script.AvatarUtil),
+	ConnectionUtil = ConnectionUtil,
+	Constants = require(script.Constants),
+	Url = require(script.Url),
+	SettingsUtility = require(script.SettingsUtility),
+	SettingsShowSignal = require(script.SettingsUtility).CreateSignal(),
+	MouseIconOverrideService = require(script.MouseIconOverrideService)
+}

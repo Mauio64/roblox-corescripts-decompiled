@@ -1,87 +1,112 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.React);
-local v4 = require(l_Parent_0.useAnimatedValue);
-local _ = require(l_Parent_1.Types);
-local v6 = require(l_Parent_0.TimingConfigs);
-local v7 = require(l_Parent_1.Enums.TransitionPreset);
-return function(v8) --[[ Line: 20 ]] --[[ Name: useMotion ]]
-    -- upvalues: v3 (copy), v4 (copy), v7 (copy), v6 (copy)
-    local v9 = {};
-    local v10 = {};
-    local v11 = v3.useRef({});
-    for v12, v13 in v8 do
-        if type(v13) ~= "table" or v12 ~= "transition" then
-            local v14, v15 = v4(v13);
-            v9[v12] = v14;
-            v10[v12] = v15;
-        end;
-    end;
-    return v9, function(v16, v17) --[[ Line: 40 ]] --[[ Name: animate ]]
-        -- upvalues: v10 (copy), v11 (copy), v7 (ref), v6 (ref)
-        if not v16 then
-            return;
-        else
-            local v18 = 0;
-            local v19 = {};
-            for v20 in v10 do
-                if v20 ~= "transition" and v16[v20] ~= nil then
-                    v18 = v18 + 1;
-                end;
-            end;
-            local v21 = 0;
-            local function _(v22) --[[ Line: 57 ]] --[[ Name: propertyOnComplete ]]
-                -- upvalues: v19 (copy), v16 (copy), v21 (ref), v17 (copy), v18 (ref)
-                v19[v22] = v16[v22];
-                v21 = v21 + 1;
-                if v17 and v17.onAnimationComplete then
-                    v17.onAnimationComplete(v22);
-                end;
-                if v21 == v18 and v17 and v17.onAnimationComplete then
-                    v17.onAnimationComplete(true);
-                end;
-            end;
-            for v24, v25 in v10 do
-                if v24 ~= "transition" and v16[v24] ~= nil then
-                    if v11.current[v24] then
-                        local v26 = v11.current[v24];
-                        if v26 then
-                            task.cancel(v26);
-                        end;
-                        v11.current[v24] = nil;
-                    end;
-                    local v27 = v16.transition or {
-                        [v7.Default] = v6.getDefaultTransition()
-                    };
-                    local v28 = v27[v24] or v27[v7.Default] or v6.getDefaultTransition();
-                    local v29 = table.clone(v28);
-                    v29.onComplete = function() --[[ Line: 94 ]]
-                        -- upvalues: v24 (copy), v19 (copy), v16 (copy), v21 (ref), v17 (copy), v18 (ref)
-                        local l_v24_0 = v24;
-                        v19[l_v24_0] = v16[l_v24_0];
-                        v21 = v21 + 1;
-                        if v17 and v17.onAnimationComplete then
-                            v17.onAnimationComplete(l_v24_0);
-                        end;
-                        if v21 == v18 and v17 and v17.onAnimationComplete then
-                            v17.onAnimationComplete(true);
-                        end;
-                    end;
-                    local v31 = v29.delay or 0;
-                    if v31 > 0 then
-                        local v32 = task.delay(v31, function() --[[ Line: 103 ]]
-                            -- upvalues: v11 (ref), v24 (copy), v25 (copy), v16 (copy), v29 (copy)
-                            v11.current[v24] = nil;
-                            v25(v16[v24], v29);
-                        end);
-                        v11.current[v24] = v32;
-                    else
-                        v25(v16[v24], v29);
-                    end;
-                end;
-            end;
-            return;
-        end;
-    end;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local React = require(scriptParentParentParent.React)
+local useAnimatedValue = require(scriptParent.useAnimatedValue)
+
+require(scriptParentParent.Types)
+
+local TimingConfigs = require(scriptParent.TimingConfigs)
+local TransitionPreset = require(scriptParentParent.Enums.TransitionPreset)
+
+local function useMotion(p1) -- line: 20
+	-- upvalues: React (copy), useAnimatedValue (copy), TransitionPreset (copy), TimingConfigs (copy)
+	local t1 = {}
+	local t2 = {}
+	local v12 = React.useRef({})
+
+	for v13, v14 in p1 do
+		if type(v14) ~= "table" or v13 ~= "transition" then
+			local v15, v16 = useAnimatedValue(v14)
+
+			t1[v13] = v15
+			t2[v13] = v16
+		end
+	end
+
+	local function animate(p2, t3: {[any]: any}?) -- line: 40
+		-- upvalues: t2 (copy), v12 (copy), TransitionPreset (copy), TimingConfigs (copy)
+		if not p2 then
+			return
+		end
+
+		local n1 = 0
+		local t4 = {}
+
+		for v22 in t2 do
+			if v22 ~= "transition" and p2[v22] ~= nil then
+				n1 += 1
+			end
+		end
+
+		local n2 = 0
+
+		local function propertyOnComplete(s1: string) -- line: 57
+			-- upvalues: t4 (copy), p2 (copy), n2 (ref), t3 (copy), n1 (ref)
+			t4[s1] = p2[s1]
+			n2 += 1
+
+			if t3 and t3.onAnimationComplete then
+				t3.onAnimationComplete(s1)
+			end
+
+			if n2 == n1 and t3 and t3.onAnimationComplete then
+				t3.onAnimationComplete(true)
+			end
+		end
+
+		for v25, v26 in t2 do
+			if v25 ~= "transition" and p2[v25] ~= nil then
+				if v12.current[v25] then
+					local v27 = v12.current[v25]
+
+					if v27 then
+						task.cancel(v27)
+					end
+
+					v12.current[v25] = nil
+				end
+
+				local v28 = p2.transition or {
+					[TransitionPreset.Default] = TimingConfigs.getDefaultTransition()
+				}
+				local v29 = v28[v25] or (v28[TransitionPreset.Default] or TimingConfigs.getDefaultTransition())
+				local v30 = table.clone(v29)
+
+				function v30.onComplete() -- line: 94
+					-- upvalues: v25 (copy), t4 (copy), p2 (copy), n2 (ref), t3 (copy), n1 (ref)
+					local v34 = v25
+
+					t4[v34] = p2[v34]
+					n2 += 1
+
+					if t3 and t3.onAnimationComplete then
+						t3.onAnimationComplete(v34)
+					end
+
+					if n2 == n1 and t3 and t3.onAnimationComplete then
+						t3.onAnimationComplete(true)
+					end
+				end
+
+				local v31 = v30.delay or 0
+
+				if v31 > 0 then
+					local thread = task.delay(v31, function() -- line: 103
+						-- upvalues: v12 (copy), v25 (copy), v26 (copy), p2 (copy), v30 (copy)
+						v12.current[v25] = nil
+						v26(p2[v25], v30)
+					end)
+
+					v12.current[v25] = thread
+				else
+					v26(p2[v25], v30)
+				end
+			end
+		end
+	end
+
+	return t1, animate
+end
+
+return useMotion

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatReplyComposeBarContainer2", false);
+return game:DefineFastFlag("AppChatReplyComposeBarContainer2", false)

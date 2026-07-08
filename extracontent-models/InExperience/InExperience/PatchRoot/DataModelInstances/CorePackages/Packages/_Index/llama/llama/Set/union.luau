@@ -1,9 +1,13 @@
-return function(...) --[[ Line: 2 ]] --[[ Name: union ]]
-    local v0 = {};
-    for v1 = 1, select("#", ...) do
-        for v2, _ in pairs(select(v1, ...)) do
-            v0[v2] = true;
-        end;
-    end;
-    return v0;
-end;
+local function union(...) -- line: 2
+	local t1 = {}
+
+	for i = 1, select("#", ...) do
+		for k, _ in pairs(select(i, ...)) do
+			t1[k] = true
+		end
+	end
+
+	return t1
+end
+
+return union

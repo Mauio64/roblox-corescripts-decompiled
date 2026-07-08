@@ -1,115 +1,125 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.Signals);
-local v4 = require(l_Parent_1.Cryo);
-local v5 = require(l_Parent_1.Display);
-local l_createSignal_0 = v3.createSignal;
-local l_createEffect_0 = v3.createEffect;
-return function() --[[ Line: 41 ]]
-    -- upvalues: l_createSignal_0 (copy), v4 (copy), l_GuiService_0 (copy), v5 (copy), l_createEffect_0 (copy)
-    local v8, v9 = l_createSignal_0({}, v4.Dictionary.equals);
-    local function v26(v10, v11, v12) --[[ Line: 44 ]]
-        local v13 = {};
-        local l_X_0 = v10.X;
-        local l_Y_0 = v10.Y;
-        local l_X_1 = v11.X;
-        local v17 = v11.Y - l_Y_0;
-        local l_l_X_0_0 = l_X_0;
-        local v19 = 0;
-        for _, v21 in ipairs(v12) do
-            local v22 = l_l_X_0_0 + v19;
-            local v23 = v21.position.X - v22;
-            table.insert(v13, {
-                Position = {
-                    X = v22, 
-                    Y = l_Y_0
-                }, 
-                Size = {
-                    X = v23, 
-                    Y = v17
-                }
-            });
-            l_l_X_0_0 = v21.position.X;
-            v19 = v21.size.X;
-        end;
-        local v24 = l_l_X_0_0 + v19;
-        local v25 = l_X_1 - v24;
-        table.insert(v13, {
-            Position = {
-                X = v24, 
-                Y = l_Y_0
-            }, 
-            Size = {
-                X = v25, 
-                Y = v17
-            }
-        });
-        return v13;
-    end;
-    local function v43(v27) --[[ Line: 96 ]]
-        -- upvalues: l_GuiService_0 (ref), v5 (ref), v26 (copy)
-        local v28 = {};
-        local v29 = {};
-        for _, v31 in pairs(v27) do
-            table.insert(v29, {
-                id = v31.id, 
-                size = v31.size, 
-                position = v31.position
-            });
-        end;
-        table.sort(v29, function(v32, v33) --[[ Line: 111 ]]
-            local v34 = false;
-            if v32.position.X < v33.position.X then
-                v34 = v32.position.X + v32.size.X < v33.size.X + v33.position.X;
-            end;
-            return v34;
-        end);
-        local l_l_GuiService_0_GuiInset_0, _ = l_GuiService_0:GetGuiInset();
-        local v37 = v5.GetDisplayStore(false).getViewportSize(false);
-        local v38 = Vector2.new(0, 0);
-        local v39 = Vector2.new(v37.X, l_l_GuiService_0_GuiInset_0.Y);
-        v28 = v26(v38, v39, v29);
-        local v40 = nil;
-        for _, v42 in ipairs(v28) do
-            if not v40 or v42.Size.X > v40.Width then
-                v40 = Rect.new(v42.Position.X, v42.Position.Y, v42.Position.X + v42.Size.X, v42.Position.Y + v42.Size.Y);
-            end;
-        end;
-        return v40;
-    end;
-    local function v48(v44, v45, v46) --[[ Line: 140 ]] --[[ Name: setKeepOutArea ]]
-        -- upvalues: v9 (copy), v4 (ref), v8 (copy)
-        local v47 = {
-            [v44] = {
-                id = v44, 
-                position = v45, 
-                size = v46
-            }
-        };
-        v9(v4.Dictionary.join(v8(false), v47));
-    end;
-    local function v51(v49) --[[ Line: 151 ]] --[[ Name: removeKeepOutArea ]]
-        -- upvalues: v8 (copy), v9 (copy)
-        local v50 = v8(false);
-        v50[v49] = nil;
-        v9(v50);
-    end;
-    local v55 = l_createEffect_0(function(v52) --[[ Line: 157 ]]
-        -- upvalues: v5 (ref), v43 (copy), v8 (copy), l_GuiService_0 (ref)
-        local _ = v5.GetDisplayStore(v52).getViewportSize(v52);
-        local v54 = v43(v8(v52));
-        if v54 then
-            l_GuiService_0:SetTopbarInset(v54);
-        end;
-    end);
-    return {
-        getKeepOutAreas = v8, 
-        setKeepOutArea = v48, 
-        removeKeepOutArea = v51, 
-        cleanup = function() --[[ Line: 165 ]] --[[ Name: cleanup ]]
-            -- upvalues: v55 (copy)
-            v55();
-        end
-    };
-end;
+local ParentParent = script.Parent.Parent.Parent
+local GuiService = game:GetService("GuiService")
+local ParentParentParent = ParentParent.Parent
+local Signals = require(ParentParentParent.Signals)
+local Cryo = require(ParentParentParent.Cryo)
+local Display = require(ParentParentParent.Display)
+local createSignal = Signals.createSignal
+local createEffect = Signals.createEffect
+
+return function() -- line: 41
+	-- upvalues: createSignal (copy), Cryo (copy), GuiService (copy), Display (copy), createEffect (copy)
+	local v9, v10 = createSignal({}, Cryo.Dictionary.equals)
+
+	local function v11(vector2: Vector2, vector2_2: Vector2, t1: {[any]: any}) -- line: 44
+		local t2 = {}
+		local vector2X = vector2.X
+		local vector2Y = vector2.Y
+		local vector2_2X = vector2_2.X
+		local v21 = vector2_2.Y - vector2Y
+		local n1 = 0
+
+		for _, v in ipairs(t1) do
+			local v25 = vector2X + n1
+			local v26 = v.position.X - v25
+
+			table.insert(t2, {
+				Position = {
+					X = v25,
+					Y = vector2Y
+				},
+				Size = {
+					X = v26,
+					Y = v21
+				}
+			})
+			vector2X = v.position.X
+			n1 = v.size.X
+		end
+
+		local v27 = vector2X + n1
+		local v28 = vector2_2X - v27
+
+		table.insert(t2, {
+			Position = {
+				X = v27,
+				Y = vector2Y
+			},
+			Size = {
+				X = v28,
+				Y = v21
+			}
+		})
+
+		return t2
+	end
+	local function v12(t3: {[any]: any}) -- line: 96
+		-- upvalues: GuiService (copy), Display (copy), v11 (copy)
+		local t4 = {}
+
+		for _, v in pairs(t3) do
+			table.insert(t4, {
+				id = v.id,
+				size = v.size,
+				position = v.position
+			})
+		end
+
+		table.sort(t4, function(p1, p2) -- line: 111
+			return p1.position.X < p2.position.X and p1.position.X + p1.size.X < p2.size.X + p2.position.X
+		end)
+
+		local v33, _ = GuiService:GetGuiInset()
+		local v35 = Display.GetDisplayStore(false).getViewportSize(false)
+		local vector2 = Vector2.new(0, 0)
+		local vector2_3 = Vector2.new(v35.X, v33.Y)
+		local v38 = v11(vector2, vector2_3, t4)
+		local rect = nil
+
+		for _, v in ipairs(v38) do
+			if not rect or v.Size.X > rect.Width then
+				rect = Rect.new(v.Position.X, v.Position.Y, v.Position.X + v.Size.X, v.Position.Y + v.Size.Y)
+			end
+		end
+
+		return rect
+	end
+
+	local v13 = createEffect(function(p3) -- line: 157
+		-- upvalues: Display (copy), v12 (copy), v9 (copy), GuiService (copy)
+		Display.GetDisplayStore(p3).getViewportSize(p3)
+
+		local v49 = v12(v9(p3))
+
+		if v49 then
+			GuiService:SetTopbarInset(v49)
+		end
+	end)
+
+	return {
+		getKeepOutAreas = v9,
+		setKeepOutArea = function(s1: string, vector2: Vector2, vector2_4: Vector2) -- line: 140
+			-- upvalues: v10 (copy), Cryo (copy), v9 (copy)
+			local t5 = {
+				[s1] = {
+					id = s1,
+					position = vector2,
+					size = vector2_4
+				}
+			}
+
+			v10(Cryo.Dictionary.join(v9(false), t5))
+		end,
+		removeKeepOutArea = function(s2: string) -- line: 151
+			-- upvalues: v9 (copy), v10 (copy)
+			local v47 = v9(false)
+
+			v47[s2] = nil
+			v10(v47)
+		end,
+		cleanup = function() -- line: 165
+			-- upvalues: v13 (copy)
+			v13()
+		end
+	}
+end

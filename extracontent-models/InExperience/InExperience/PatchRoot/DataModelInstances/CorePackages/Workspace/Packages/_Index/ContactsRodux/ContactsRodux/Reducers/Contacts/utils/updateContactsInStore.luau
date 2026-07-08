@@ -1,22 +1,27 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Types_0 = l_Parent_0.Types;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Types_0.ActionTypes);
-local _ = require(l_Types_0.ReducerTypes);
-local v5 = require(l_Parent_1.Dash);
-return function(v6, v7) --[[ Line: 8 ]]
-    -- upvalues: v5 (copy)
-    local l_userContactsEntities_0 = v7.responseBody.userContactsEntities;
-    local v9 = {};
-    v5.forEach(l_userContactsEntities_0, function(v10) --[[ Line: 12 ]]
-        -- upvalues: v9 (copy)
-        v9[v10.id] = {
-            contactName = v10.name, 
-            mutualContacts = v10.mutualContacts, 
-            avatarAssetHashId = v10.avatarAssetHashId, 
-            headshotThumbnailUrl = v10.headshotThumbnailUrl, 
-            avatarThumbnailUrl = v10.avatarThumbnailUrl
-        };
-    end);
-    return v5.join(v6, v9);
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Types = ParentParent.Types
+local ParentParentParent = ParentParent.Parent
+
+require(Types.ActionTypes)
+require(Types.ReducerTypes)
+
+local Dash = require(ParentParentParent.Dash)
+
+return function(p1, p2) -- line: 8
+	-- upvalues: Dash (copy)
+	local userContactsEntities = p2.responseBody.userContactsEntities
+	local t1 = {}
+
+	Dash.forEach(userContactsEntities, function(p3) -- line: 12
+		-- upvalues: t1 (copy)
+		t1[p3.id] = {
+			contactName = p3.name,
+			mutualContacts = p3.mutualContacts,
+			avatarAssetHashId = p3.avatarAssetHashId,
+			headshotThumbnailUrl = p3.headshotThumbnailUrl,
+			avatarThumbnailUrl = p3.avatarThumbnailUrl
+		}
+	end)
+
+	return Dash.join(p1, t1)
+end

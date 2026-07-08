@@ -1,3 +1,3 @@
 return {
-    getDeepValue = require(script.getDeepValue)
-};
+	getDeepValue = require(script.getDeepValue)
+}

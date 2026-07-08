@@ -1,191 +1,206 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_View_0 = v2.View;
-local l_Text_0 = v2.Text;
-local l_Icon_0 = v2.Icon;
-local l_Skeleton_0 = v2.Skeleton;
-local l_Button_0 = v2.Button;
-local l_Radius_0 = v2.Enums.Radius;
-local l_ButtonVariant_0 = v2.Enums.ButtonVariant;
-local l_useTokens_0 = v2.Hooks.useTokens;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v12 = require(l_Parent_0.DataHydration);
-local v13 = require(l_Parent_0.SignalsReact);
-local l_CompositionTags_0 = require(l_Parent_0.AppComposition).CompositionTags;
-local v15 = require(script.Parent.ExperienceDetailsFallbackAttributionRow);
-local v16 = require(script.Parent.Parent.useGameInfo);
-local function v21(v17) --[[ Line: 41 ]] --[[ Name: ExperienceDetailsFeedSkeleton ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_View_0 (copy), l_CompositionTags_0 (copy), v15 (copy), l_Skeleton_0 (copy), l_Radius_0 (copy)
-    local l_universeId_0 = v17.universeId;
-    local v19 = l_useTokens_0();
-    local l_isSmallScreen_0 = v17.isSmallScreen;
-    return v1.createElement(l_View_0, {
-        tag = {
-            ["col gap-xlarge size-full auto-y"] = true, 
-            ["padding-x-xlarge"] = l_isSmallScreen_0, 
-            ["align-x-left"] = not l_isSmallScreen_0, 
-            [l_CompositionTags_0.ContentRegion.Body] = true
-        }, 
-        testId = "--edp-fallback-feed-skeleton"
-    }, {
-        AttributionRow = v1.createElement(v15, {
-            universeId = l_universeId_0, 
-            isLoading = true, 
-            isSmallScreen = l_isSmallScreen_0, 
-            launchSource = v17.launchSource, 
-            referralSource = v17.referralSource, 
-            experienceJoinData = v17.experienceJoinData, 
-            placeIdOverride = v17.placeIdOverride
-        }), 
-        MediaGallerySkeleton = v1.createElement(l_View_0, {
-            tag = "size-full-0", 
-            LayoutOrder = l_isSmallScreen_0 and 2 or 3, 
-            aspectRatio = {
-                AspectRatio = 1.7777777777777777, 
-                AspectType = Enum.AspectType.ScaleWithParentSize, 
-                DominantAxis = Enum.DominantAxis.Width
-            }
-        }, {
-            Skeleton = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromScale(1, 1), 
-                radius = l_Radius_0.Medium
-            })
-        }), 
-        ActionModuleSkeleton = v1.createElement(l_View_0, {
-            tag = "row gap-small size-full-0 auto-y", 
-            LayoutOrder = l_isSmallScreen_0 and 3 or 2
-        }, {
-            Chip1 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(v19.Size.Size_2400, v19.Size.Size_800), 
-                radius = l_Radius_0.Large, 
-                LayoutOrder = 1
-            }), 
-            Chip2 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(v19.Size.Size_2000, v19.Size.Size_800), 
-                radius = l_Radius_0.Large, 
-                LayoutOrder = 2
-            }), 
-            Chip3 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(v19.Size.Size_2000, v19.Size.Size_800), 
-                radius = l_Radius_0.Large, 
-                LayoutOrder = 3
-            }), 
-            Chip4 = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(v19.Size.Size_2000, v19.Size.Size_800), 
-                radius = l_Radius_0.Large, 
-                LayoutOrder = 4
-            })
-        }), 
-        DescriptionSkeleton = v1.createElement(l_View_0, {
-            tag = "col gap-medium size-full-0 auto-y", 
-            LayoutOrder = 4
-        }, {
-            HeaderSkeleton = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.fromOffset(v19.Size.Size_2800 * 2, v19.Typography.HeadingSmall.LineHeight * v19.Typography.HeadingSmall.FontSize), 
-                radius = l_Radius_0.Small, 
-                LayoutOrder = 1
-            }), 
-            TextSkeleton = v1.createElement(l_Skeleton_0, {
-                Size = UDim2.new(1, 0, 0, v19.Typography.BodyLarge.LineHeight * v19.Typography.BodyLarge.FontSize * 3), 
-                radius = l_Radius_0.Small, 
-                LayoutOrder = 2
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Icon = Foundation.Icon
+local Skeleton = Foundation.Skeleton
+local Button = Foundation.Button
+local EnumsRadius = Foundation.Enums.Radius
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local useTokens = Foundation.Hooks.useTokens
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local DataHydration = require(Parent.DataHydration)
+local SignalsReact = require(Parent.SignalsReact)
+local CompositionTags = require(Parent.AppComposition).CompositionTags
+local ExperienceDetailsFallbackAttributionRow = require(script.Parent.ExperienceDetailsFallbackAttributionRow)
+local useGameInfo = require(script.Parent.Parent.useGameInfo)
+
+local function ExperienceDetailsFeedSkeleton(t1: {[any]: any}) -- line: 41
+	-- upvalues: useTokens (copy), React (copy), View (copy), CompositionTags (copy), ExperienceDetailsFallbackAttributionRow (copy), Skeleton (copy), EnumsRadius (copy)
+	local universeId = t1.universeId
+	local v22 = useTokens()
+	local isSmallScreen = t1.isSmallScreen
+
+	return React.createElement(View, {
+		testId = "--edp-fallback-feed-skeleton",
+		tag = {
+			["col size-full auto-y"] = true,
+			["gap-xlarge"] = isSmallScreen,
+			["gap-xxlarge"] = not isSmallScreen,
+			["padding-x-xlarge"] = isSmallScreen,
+			["align-x-left"] = not isSmallScreen,
+			[CompositionTags.ContentRegion.Body] = true
+		}
+	}, {
+		AttributionRow = React.createElement(ExperienceDetailsFallbackAttributionRow, {
+			isLoading = true,
+			universeId = universeId,
+			isSmallScreen = isSmallScreen,
+			launchSource = t1.launchSource,
+			referralSource = t1.referralSource,
+			experienceJoinData = t1.experienceJoinData,
+			placeIdOverride = t1.placeIdOverride
+		}),
+		MediaGallerySkeleton = React.createElement(View, {
+			tag = "size-full-0",
+			LayoutOrder = not isSmallScreen and 3 or 2,
+			aspectRatio = {
+				AspectRatio = 1.7777777777777777,
+				AspectType = Enum.AspectType.ScaleWithParentSize,
+				DominantAxis = Enum.DominantAxis.Width
+			}
+		}, {
+			Skeleton = React.createElement(Skeleton, {
+				Size = UDim2.fromScale(1, 1),
+				radius = EnumsRadius.Medium
+			})
+		}),
+		ActionModuleSkeleton = React.createElement(View, {
+			tag = "row gap-small size-full-0 auto-y",
+			LayoutOrder = not isSmallScreen and 2 or 3
+		}, {
+			Chip1 = React.createElement(Skeleton, {
+				LayoutOrder = 1,
+				Size = UDim2.fromOffset(v22.Size.Size_2800, v22.Size.Size_800),
+				radius = EnumsRadius.Large
+			}),
+			Chip2 = React.createElement(Skeleton, {
+				LayoutOrder = 2,
+				Size = UDim2.fromOffset(v22.Size.Size_2800, v22.Size.Size_800),
+				radius = EnumsRadius.Large
+			}),
+			Chip3 = React.createElement(Skeleton, {
+				LayoutOrder = 3,
+				Size = UDim2.fromOffset(v22.Size.Size_2800, v22.Size.Size_800),
+				radius = EnumsRadius.Large
+			}),
+			Chip4 = React.createElement(Skeleton, {
+				LayoutOrder = 4,
+				Size = UDim2.fromOffset(v22.Size.Size_2800, v22.Size.Size_800),
+				radius = EnumsRadius.Large
+			}),
+			Chip5 = React.createElement(Skeleton, {
+				LayoutOrder = 5,
+				Size = UDim2.fromOffset(v22.Size.Size_2800, v22.Size.Size_800),
+				radius = EnumsRadius.Large
+			})
+		}),
+		DescriptionSkeleton = React.createElement(View, {
+			tag = "col gap-medium size-full-0 auto-y",
+			LayoutOrder = 4
+		}, {
+			HeaderSkeleton = React.createElement(Skeleton, {
+				LayoutOrder = 1,
+				Size = UDim2.fromOffset(v22.Size.Size_2800 * 2, v22.Typography.HeadingSmall.LineHeight * v22.Typography.HeadingSmall.FontSize),
+				radius = EnumsRadius.Small
+			}),
+			TextSkeleton = React.createElement(Skeleton, {
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, v22.Typography.BodyLarge.LineHeight * v22.Typography.BodyLarge.FontSize * 3),
+				radius = EnumsRadius.Small
+			})
+		})
+	})
+end
+local function ExperienceDetailsFeedError(t2: {[any]: any}) -- line: 148
+	-- upvalues: useTokens (copy), useGameInfo (copy), SignalsReact (copy), DataHydration (copy), useLocalization (copy), React (copy), ExperienceDetailsFeedSkeleton (copy), View (copy), Icon (copy), Foundation (copy), FoundationText (copy), CompositionTags (copy), ExperienceDetailsFallbackAttributionRow (copy), Button (copy), ButtonVariant (copy)
+	local universeId = t2.universeId
+	local isSmallScreen = t2.isSmallScreen
+	local v27 = useTokens()
+	local v28 = useGameInfo(universeId)
+	local v29 = SignalsReact.useSignalState(DataHydration.Game.getAgeRecommendationStore(false).getAgeRecommendation(universeId).data)
+	local v30 = useLocalization({
+		somethingWentWrongMessage = "Feature.Toast.NetworkingError.SomethingIsWrong",
+		experienceUnavailableMessage = "Feature.GamePage.QuickLaunch.LaunchError.TemporarilyUnavailable",
+		retryButtonText = "InGame.CommonUI.Button.Retry"
+	})
+
+	if v28 == nil then
+		return React.createElement(ExperienceDetailsFeedSkeleton, {
+			universeId = universeId,
+			isSmallScreen = isSmallScreen,
+			launchSource = t2.launchSource,
+			referralSource = t2.referralSource,
+			experienceJoinData = t2.experienceJoinData,
+			placeIdOverride = t2.placeIdOverride
+		})
+	end
+
+	local creator = v28.creator
+	local name = v28.name
+	local v33 = creator and creator.name
+	local v34 = not not creator and creator.hasVerifiedBadge == true
+	local v35 = v29 and v29.displayNameWithHeaderShort
+
+	if v28.isUnavailable == true then
+		return React.createElement(View, {
+			tag = "col align-x-center align-y-center size-full-0 auto-y",
+			testId = "--edp-fallback-feed-unavailable"
+		}, {
+			ErrorIcon = React.createElement(Icon, {
+				LayoutOrder = 1,
+				size = v27.Size.Size_2500,
+				name = Foundation.Enums.IconName.TriangleExclamation
+			}),
+			ErrorText = React.createElement(FoundationText, {
+				tag = "auto-xy padding-top-medium text-body-large text-align-x-center content-default",
+				LayoutOrder = 2,
+				Text = v30.experienceUnavailableMessage
+			})
+		})
+	end
+
+	return React.createElement(View, {
+		testId = "--edp-fallback-feed-error",
+		tag = {
+			["col size-full auto-y"] = true,
+			["gap-xlarge"] = isSmallScreen,
+			["gap-xxlarge"] = not isSmallScreen,
+			["padding-x-xlarge"] = isSmallScreen,
+			["align-x-left"] = not isSmallScreen,
+			[CompositionTags.ContentRegion.Body] = true
+		}
+	}, {
+		AttributionRow = React.createElement(ExperienceDetailsFallbackAttributionRow, {
+			universeId = universeId,
+			gameName = name,
+			creatorName = v33,
+			hasVerifiedBadge = v34,
+			ageRecDisplayName = v35,
+			isSmallScreen = isSmallScreen,
+			launchSource = t2.launchSource,
+			referralSource = t2.referralSource,
+			experienceJoinData = t2.experienceJoinData,
+			placeIdOverride = t2.placeIdOverride
+		}),
+		ErrorBlock = React.createElement(View, {
+			tag = "col align-x-center size-full-0 auto-y padding-top-xxlarge",
+			LayoutOrder = 2,
+			testId = "--edp-fallback-error-state"
+		}, {
+			ErrorIcon = React.createElement(Icon, {
+				LayoutOrder = 1,
+				size = v27.Size.Size_2500,
+				name = Foundation.Enums.IconName.TriangleExclamation
+			}),
+			ErrorText = React.createElement(FoundationText, {
+				tag = "auto-xy padding-bottom-medium text-body-large text-align-x-center content-default",
+				LayoutOrder = 2,
+				Text = v30.somethingWentWrongMessage
+			}),
+			RetryButton = React.createElement(Button, {
+				LayoutOrder = 3,
+				testId = "--edp-fallback-error-state-retry",
+				text = v30.retryButtonText,
+				onActivated = t2.refresh,
+				variant = ButtonVariant.Standard
+			})
+		})
+	})
+end
+
 return {
-    Skeleton = v1.memo(v21), 
-    Error = v1.memo(function(v22) --[[ Line: 141 ]] --[[ Name: ExperienceDetailsFeedError ]]
-        -- upvalues: l_useTokens_0 (copy), v16 (copy), v13 (copy), v12 (copy), l_useLocalization_0 (copy), v1 (copy), v21 (copy), l_View_0 (copy), l_Icon_0 (copy), v2 (copy), l_Text_0 (copy), l_CompositionTags_0 (copy), v15 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy)
-        local l_universeId_1 = v22.universeId;
-        local l_isSmallScreen_1 = v22.isSmallScreen;
-        local v25 = l_useTokens_0();
-        local v26 = v16(l_universeId_1);
-        local v27 = v13.useSignalState(v12.Game.getAgeRecommendationStore(false).getAgeRecommendation(l_universeId_1).data);
-        local v28 = l_useLocalization_0({
-            somethingWentWrongMessage = "Feature.Toast.NetworkingError.SomethingIsWrong", 
-            experienceUnavailableMessage = "Feature.GamePage.QuickLaunch.LaunchError.TemporarilyUnavailable", 
-            retryButtonText = "InGame.CommonUI.Button.Retry"
-        });
-        if v26 == nil then
-            return v1.createElement(v21, {
-                universeId = l_universeId_1, 
-                isSmallScreen = l_isSmallScreen_1, 
-                launchSource = v22.launchSource, 
-                referralSource = v22.referralSource, 
-                experienceJoinData = v22.experienceJoinData, 
-                placeIdOverride = v22.placeIdOverride
-            });
-        else
-            local l_creator_0 = v26.creator;
-            local l_name_0 = v26.name;
-            local v31 = l_creator_0 and l_creator_0.name;
-            local v32 = if l_creator_0 then l_creator_0.hasVerifiedBadge == true else false;
-            local v33 = v27 and v27.displayNameWithHeaderShort;
-            if v26.isUnavailable == true then
-                return v1.createElement(l_View_0, {
-                    tag = "col align-x-center align-y-center size-full-0 auto-y", 
-                    testId = "--edp-fallback-feed-unavailable"
-                }, {
-                    ErrorIcon = v1.createElement(l_Icon_0, {
-                        size = v25.Size.Size_2500, 
-                        name = v2.Enums.IconName.TriangleExclamation, 
-                        LayoutOrder = 1
-                    }), 
-                    ErrorText = v1.createElement(l_Text_0, {
-                        tag = "auto-xy padding-top-medium text-body-large text-align-x-center content-default", 
-                        Text = v28.experienceUnavailableMessage, 
-                        LayoutOrder = 2
-                    })
-                });
-            else
-                return v1.createElement(l_View_0, {
-                    tag = {
-                        ["col gap-xlarge size-full auto-y"] = true, 
-                        ["padding-x-xlarge"] = l_isSmallScreen_1, 
-                        ["align-x-left"] = not l_isSmallScreen_1, 
-                        [l_CompositionTags_0.ContentRegion.Body] = true
-                    }, 
-                    testId = "--edp-fallback-feed-error"
-                }, {
-                    AttributionRow = v1.createElement(v15, {
-                        universeId = l_universeId_1, 
-                        gameName = l_name_0, 
-                        creatorName = v31, 
-                        hasVerifiedBadge = v32, 
-                        ageRecDisplayName = v33, 
-                        isSmallScreen = l_isSmallScreen_1, 
-                        launchSource = v22.launchSource, 
-                        referralSource = v22.referralSource, 
-                        experienceJoinData = v22.experienceJoinData, 
-                        placeIdOverride = v22.placeIdOverride
-                    }), 
-                    ErrorBlock = v1.createElement(l_View_0, {
-                        tag = "col align-x-center size-full-0 auto-y padding-top-xxlarge", 
-                        LayoutOrder = 2, 
-                        testId = "--edp-fallback-error-state"
-                    }, {
-                        ErrorIcon = v1.createElement(l_Icon_0, {
-                            size = v25.Size.Size_2500, 
-                            name = v2.Enums.IconName.TriangleExclamation, 
-                            LayoutOrder = 1
-                        }), 
-                        ErrorText = v1.createElement(l_Text_0, {
-                            tag = "auto-xy padding-bottom-medium text-body-large text-align-x-center content-default", 
-                            Text = v28.somethingWentWrongMessage, 
-                            LayoutOrder = 2
-                        }), 
-                        RetryButton = v1.createElement(l_Button_0, {
-                            text = v28.retryButtonText, 
-                            onActivated = v22.refresh, 
-                            variant = l_ButtonVariant_0.Standard, 
-                            LayoutOrder = 3, 
-                            testId = "--edp-fallback-error-state-retry"
-                        })
-                    })
-                });
-            end;
-        end;
-    end)
-};
+	Skeleton = React.memo(ExperienceDetailsFeedSkeleton),
+	Error = React.memo(ExperienceDetailsFeedError)
+}

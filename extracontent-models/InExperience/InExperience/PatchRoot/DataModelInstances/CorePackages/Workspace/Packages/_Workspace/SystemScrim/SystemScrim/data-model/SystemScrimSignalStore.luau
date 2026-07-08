@@ -1,22 +1,25 @@
-local l_Parent_0 = script:FindFirstAncestor("SystemScrim").Parent;
-local v1 = require(l_Parent_0.Signals);
-local function v9() --[[ Line: 17 ]] --[[ Name: createDefaultStates ]]
-    -- upvalues: v1 (copy)
-    local v2, v3 = v1.createSignal(false);
-    local v4, v5 = v1.createSignal(1);
-    local v6, v7 = v1.createSignal(true);
-    local l_BindableEvent_0 = Instance.new("BindableEvent");
-    return {
-        visible = v2, 
-        setVisibility = v3, 
-        transparency = v4, 
-        setTransparency = v5, 
-        autoDismiss = v6, 
-        setAutoDismiss = v7, 
-        backgroundScrimActivated = l_BindableEvent_0
-    };
-end;
-return v1.createComputed(function(_) --[[ Line: 35 ]]
-    -- upvalues: v9 (copy)
-    return (v9());
-end);
+local Parent = script:FindFirstAncestor("SystemScrim").Parent
+local Signals = require(Parent.Signals)
+
+local function createDefaultStates() -- line: 17
+	-- upvalues: Signals (copy)
+	local v4, v5 = Signals.createSignal(false)
+	local v6, v7 = Signals.createSignal(1)
+	local v8, v9 = Signals.createSignal(true)
+	local BindableEvent = Instance.new("BindableEvent")
+
+	return {
+		visible = v4,
+		setVisibility = v5,
+		transparency = v6,
+		setTransparency = v7,
+		autoDismiss = v8,
+		setAutoDismiss = v9,
+		backgroundScrimActivated = BindableEvent
+	}
+end
+
+return Signals.createComputed(function(_) -- line: 35
+	-- upvalues: createDefaultStates (copy)
+	return (createDefaultStates())
+end)

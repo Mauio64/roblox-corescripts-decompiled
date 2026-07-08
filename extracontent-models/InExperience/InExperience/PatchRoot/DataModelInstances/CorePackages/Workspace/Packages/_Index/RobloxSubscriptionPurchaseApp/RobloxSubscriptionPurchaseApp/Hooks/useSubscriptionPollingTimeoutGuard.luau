@@ -1,47 +1,56 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v5 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v6 = require(l_script_FirstAncestor_0.Actions.finalizeRobloxSubscriptionUpsellFlow);
-local v7 = require(l_script_FirstAncestor_0.Actions.transitionToError);
-local v8 = require(l_script_FirstAncestor_0.Enums.ErrorReason);
-local v9 = game:DefineFastInt("RobloxSubscriptionPurchasePollingTimeoutSeconds", 4);
-return function() --[[ Line: 20 ]] --[[ Name: useSubscriptionPollingTimeoutGuard ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy), v5 (copy), v9 (copy), v7 (copy), v8 (copy), v6 (copy)
-    local v10 = v4.get();
-    local v11 = v3.useSignalState(v10.getPromptState);
-    local v12 = v3.useSignalState(v10.getIsNativePurchase);
-    v2.useEffect(function() --[[ Line: 25 ]]
-        -- upvalues: v11 (copy), v5 (ref), v9 (ref), v10 (copy), v12 (copy), v7 (ref), v8 (ref), v6 (ref)
-        if v11 ~= v5.SubscriptionStatusPolling then
-            return;
-        else
-            local v13 = false;
-            task.delay(v9, function() --[[ Line: 32 ]]
-                -- upvalues: v13 (ref), v10 (ref), v5 (ref), v12 (ref), v7 (ref), v8 (ref), v6 (ref)
-                if v13 then
-                    return;
-                else
-                    if v10.getPromptState() == v5.SubscriptionStatusPolling then
-                        if v12 then
-                            v7(v8.GenericError, "useSubscriptionPollingTimeoutGuard");
-                            return;
-                        else
-                            v6(false);
-                        end;
-                    end;
-                    return;
-                end;
-            end);
-            return function() --[[ Line: 49 ]]
-                -- upvalues: v13 (ref)
-                v13 = true;
-            end;
-        end;
-    end, {
-        v11, 
-        v12
-    });
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionPurchaseAppParent = RobloxSubscriptionPurchaseApp.Parent
+local React = require(RobloxSubscriptionPurchaseAppParent.React)
+local SignalsReact = require(RobloxSubscriptionPurchaseAppParent.SignalsReact)
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+local finalizeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.finalizeRobloxSubscriptionUpsellFlow)
+local transitionToError = require(RobloxSubscriptionPurchaseApp.Actions.transitionToError)
+local ErrorReason = require(RobloxSubscriptionPurchaseApp.Enums.ErrorReason)
+local v10 = game:DefineFastInt("RobloxSubscriptionPurchasePollingTimeoutSeconds", 4)
+
+local function useSubscriptionPollingTimeoutGuard() -- line: 20
+	-- upvalues: RobloxSubscriptionStore (copy), React (copy), SignalsReact (copy), PromptState (copy), v10 (copy), transitionToError (copy), ErrorReason (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+	local v12 = RobloxSubscriptionStore.get()
+	local v13 = React.useRef(v12)
+	local v14 = SignalsReact.useSignalState(v12.getPromptState)
+	local v15 = SignalsReact.useSignalState(v12.getIsNativePurchase)
+
+	React.useEffect(function() -- line: 28
+		-- upvalues: v14 (copy), PromptState (copy), v10 (copy), v13 (copy), transitionToError (copy), ErrorReason (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+		if v14 ~= PromptState.SubscriptionStatusPolling then
+			return
+		end
+
+		local u16 = false
+
+		task.delay(v10, function() -- line: 36
+			-- upvalues: u16 (ref), v13 (copy), PromptState (copy), transitionToError (copy), ErrorReason (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+			if u16 then
+				return
+			end
+
+			local current = v13.current
+
+			if current.getPromptState() == PromptState.SubscriptionStatusPolling then
+				if current.getIsNativePurchase() then
+					transitionToError(ErrorReason.GenericError, "useSubscriptionPollingTimeoutGuard")
+
+					return
+				end
+
+				finalizeRobloxSubscriptionUpsellFlow(false)
+			end
+		end)
+
+		return function() -- line: 55
+			-- upvalues: u16 (ref)
+			u16 = true
+		end
+	end, {
+		v14,
+		v15
+	})
+end
+
+return useSubscriptionPollingTimeoutGuard

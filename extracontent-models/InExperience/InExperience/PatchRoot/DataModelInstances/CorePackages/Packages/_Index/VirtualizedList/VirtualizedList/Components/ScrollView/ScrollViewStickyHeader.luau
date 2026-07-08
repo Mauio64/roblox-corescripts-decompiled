@@ -1,239 +1,259 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Boolean_0 = v2.Boolean;
-local l_clearTimeout_0 = v2.clearTimeout;
-local l_setTimeout_0 = v2.setTimeout;
-local v6 = {
-    new = function(...) --[[ Line: 29 ]] --[[ Name: new ]]
-        return nil;
-    end
-};
-local v7 = {
-    new = function(...) --[[ Line: 35 ]] --[[ Name: new ]]
-        return nil;
-    end
-};
-local v8 = require(l_Parent_1.React);
-local v9 = require(l_Parent_0.StyleSheet.StyleSheet);
-local v10 = {
-    OS = "roblox"
-};
-local v11 = nil;
-local v12 = v8.Component:extend("ScrollViewStickyHeader");
-v12.init = function(v13, v14) --[[ Line: 108 ]] --[[ Name: init ]]
-    -- upvalues: v10 (copy), v8 (copy)
-    warn("ScrollViewStickyHeader not fully implemented");
-    v13.props = v14;
-    v13.state = {
-        measured = false, 
-        layoutY = 0, 
-        layoutHeight = 0, 
-        nextHeaderLayoutY = v13.props.nextHeaderLayoutY, 
-        translateY = nil
-    };
-    v13._translateY = nil;
-    v13._shouldRecreateTranslateY = true;
-    v13._haveReceivedInitialZeroTranslateY = true;
-    v13._debounceTimeout = v10.OS == "android" and 15 or 64;
-    v13.setNextHeaderY = function(_, v16) --[[ Line: 130 ]]
-        -- upvalues: v13 (copy)
-        v13._shouldRecreateTranslateY = true;
-        v13.setState({
-            nextHeaderLayoutY = v16
-        });
-    end;
-    v13._onLayout = function(_, v18) --[[ Line: 135 ]]
-        -- upvalues: v13 (copy), v8 (ref)
-        local l_y_0 = v18.nativeEvent.layout.y;
-        local l_height_0 = v18.nativeEvent.layout.height;
-        if l_y_0 ~= v13.state.layoutY or l_height_0 ~= v13.state.layoutHeight or v13.state.measured ~= true then
-            v13._shouldRecreateTranslateY = true;
-        end;
-        v13:setState({
-            measured = true, 
-            layoutY = l_y_0, 
-            layoutHeight = l_height_0
-        });
-        v13.props:onLayout(v18);
-        local v21 = v8.Children.only(v13.props.children);
-        if v21.props.onLayout then
-            v21.props:onLayout(v18);
-        end;
-    end;
-    v13._setComponentRef = function(_, v23) --[[ Line: 154 ]]
-        -- upvalues: v13 (copy)
-        v13._ref = v23;
-    end;
-end;
-v12.componentWillUnmount = function(v24) --[[ Line: 159 ]] --[[ Name: componentWillUnmount ]]
-    -- upvalues: l_Boolean_0 (copy), l_clearTimeout_0 (copy)
-    if v24._translateY ~= nil and v24._animatedValueListenerId ~= nil then
-        v24._translateY:removeListener(v24._animatedValueListenerId);
-    end;
-    if l_Boolean_0.toJSBoolean(v24._timer) then
-        l_clearTimeout_0(v24._timer);
-    end;
-end;
-v12.UNSAFE_componentWillReceiveProps = function(v25, v26) --[[ Line: 168 ]] --[[ Name: UNSAFE_componentWillReceiveProps ]]
-    if v26.scrollViewHeight ~= v25.props.scrollViewHeight or v26.scrollAnimatedValue ~= v25.props.scrollAnimatedValue or v26.inverted ~= v25.props.inverted then
-        v25._shouldRecreateTranslateY = true;
-    end;
-end;
-v12.updateTranslateListener = function(v27, v28, v29, v30) --[[ Line: 178 ]] --[[ Name: updateTranslateListener ]]
-    -- upvalues: l_Boolean_0 (copy), v6 (copy), l_clearTimeout_0 (copy), l_setTimeout_0 (copy)
-    if v27._translateY ~= nil and v27._animatedValueListenerId ~= nil then
-        v27._translateY:removeListener(v27._animatedValueListenerId);
-    end;
-    v27.translateY = if l_Boolean_0.toJSBoolean(v30) then v6.new(v28, v30) else v28;
-    v27._shouldRecreateTranslateY = false;
-    if not v29 then
-        return;
-    else
-        if not v27._animatedValueListener then
-            v27._animatedValueListener = function(v31) --[[ Line: 209 ]]
-                -- upvalues: v27 (copy), l_Boolean_0 (ref), l_clearTimeout_0 (ref), l_setTimeout_0 (ref)
-                local l_value_0 = v31.value;
-                if l_value_0 == 0 and not v27._haveReceivedInitialZeroTranslateY then
-                    v27._haveReceivedInitialZeroTranslateY = true;
-                    return;
-                else
-                    if l_Boolean_0.toJSBoolean(v27._timer) then
-                        l_clearTimeout_0(v27._timer);
-                    end;
-                    v27._timer = l_setTimeout_0(function() --[[ Line: 220 ]]
-                        -- upvalues: l_value_0 (copy), v27 (ref)
-                        if l_value_0 ~= v27.state.translateY then
-                            v27:setState({
-                                translateY = l_value_0
-                            });
-                        end;
-                    end, v27._debounceTimeout);
-                    return;
-                end;
-            end;
-        end;
-        if v27.state.translateY ~= 0 and v27.state.translateY ~= nil then
-            v27._haveReceivedInitialZeroTranslateY = false;
-        end;
-        v27._animatedValueListenerId = v28:addListener(v27._animatedValueListener);
-        return;
-    end;
-end;
-v12.render = function(v33) --[[ Line: 233 ]] --[[ Name: render ]]
-    -- upvalues: l_Boolean_0 (copy), v7 (copy), v8 (copy), v11 (ref)
-    local v34 = v33._ref and v33._ref._internalInstanceHandle and v33._ref._internalInstanceHandle.stateNode and l_Boolean_0.toJSBoolean(v33._ref._internalInstanceHandle.stateNode.canonical);
-    if v33._shouldRecreateTranslateY then
-        local l_inverted_0 = v33.props.inverted;
-        local l_scrollViewHeight_0 = v33.props.scrollViewHeight;
-        local l_measured_0 = v33.state.measured;
-        local l_layoutHeight_0 = v33.state.layoutHeight;
-        local l_layoutY_0 = v33.state.layoutY;
-        local l_nextHeaderLayoutY_0 = v33.state.nextHeaderLayoutY;
-        local v41 = {
-            -1, 
-            0
-        };
-        local v42 = {
-            0, 
-            0
-        };
-        if l_measured_0 then
-            if l_inverted_0 then
-                if l_scrollViewHeight_0 ~= nil then
-                    local v43 = l_layoutY_0 + l_layoutHeight_0 - l_scrollViewHeight_0;
-                    if v43 > 0 then
-                        table.insert(v41, v43);
-                        table.insert(v42, 0);
-                        table.insert(v41, v43 + 1);
-                        table.insert(v42, 1);
-                        local v44 = (l_nextHeaderLayoutY_0 or 0) - l_layoutHeight_0 - l_scrollViewHeight_0;
-                        if v43 < v44 then
-                            table.insert(v41, v44);
-                            table.insert(v41, v44 + 1);
-                            table.insert(v42, v44 - v43);
-                            table.insert(v42, v44 - v43);
-                        end;
-                    end;
-                end;
-            else
-                table.insert(v41, l_layoutY_0);
-                table.insert(v42, 0);
-                local v45 = (l_nextHeaderLayoutY_0 or 0) - l_layoutHeight_0;
-                if l_layoutY_0 <= v45 then
-                    table.insert(v41, v45);
-                    table.insert(v41, v45 + 1);
-                    table.insert(v42, v45 - l_layoutY_0);
-                    table.insert(v42, v45 - l_layoutY_0);
-                else
-                    table.insert(v41, l_layoutY_0 + 1);
-                    table.insert(v42, 1);
-                end;
-            end;
-        end;
-        v33:updateTranslateListener(v33.props.scrollAnimatedValue:interpolate({
-            inputRange = v41, 
-            outputRange = v42
-        }), v34, if v33.props.hiddenOnScroll then v7.new(v33.props.scrollAnimatedValue:interpolate({
-            extrapolateLeft = "clamp", 
-            inputRange = {
-                l_layoutY_0, 
-                l_layoutY_0 + 1
-            }, 
-            outputRange = {
-                0, 
-                1
-            }
-        }):interpolate({
-            inputRange = {
-                0, 
-                1
-            }, 
-            outputRange = {
-                0, 
-                -1
-            }
-        }), -v33.state.layoutHeight, 0) else nil);
-    end;
-    local v46 = v8.Children.only(v33.props.children);
-    local v47 = if v34 and v33.state.translateY ~= nil then {
-        style = {
-            transform = {
-                {
-                    translateY = v33.state.translateY
-                }
-            }
-        }
-    } else nil;
-    return v8.createElement("AnimatedView", {
-        collapsable = false, 
-        nativeID = v33.props.nativeID, 
-        onLayout = v33._onLayout, 
-        ref = v33._setComponentRef, 
-        style = {
-            v46.props.style, 
-            v11.header, 
-            {
-                transform = {
-                    {
-                        translateY = v33._translateY
-                    }
-                }
-            }
-        }, 
-        passthroughAnimatedPropExplicitValues = v47
-    }, v8.cloneElement(v46, {
-        style = v11.fill, 
-        onLayout = nil
-    }));
-end;
-v11 = v9.create({
-    header = {
-        zIndex = 10, 
-        position = "relative"
-    }, 
-    fill = {
-        flex = 1
-    }
-});
-return v12;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local clearTimeout = LuauPolyfill.clearTimeout
+local setTimeout = LuauPolyfill.setTimeout
+local t1 = {
+	new = function(...) -- line: 29
+		return nil
+	end
+}
+local t2 = {
+	new = function(...) -- line: 35
+		return nil
+	end
+}
+local React = require(ParentParentParent.React)
+local StyleSheet = require(ParentParent.StyleSheet.StyleSheet)
+local _ = {
+	OS = "roblox"
+}
+local u12 = nil
+local v13 = React.Component:extend("ScrollViewStickyHeader")
+
+function v13.init(p1, p2) -- line: 108
+	-- upvalues: React (copy)
+	warn("ScrollViewStickyHeader not fully implemented")
+	p1.props = p2
+	p1.state = {
+		measured = false,
+		layoutY = 0,
+		layoutHeight = 0,
+		translateY = nil,
+		nextHeaderLayoutY = p1.props.nextHeaderLayoutY
+	}
+	p1._translateY = nil
+	p1._shouldRecreateTranslateY = true
+	p1._haveReceivedInitialZeroTranslateY = true
+	p1._debounceTimeout = 64
+
+	function p1.setNextHeaderY(_, n1: number) -- line: 130
+		-- upvalues: p1 (copy)
+		p1._shouldRecreateTranslateY = true
+		p1.setState({
+			nextHeaderLayoutY = n1
+		})
+	end
+	function p1._onLayout(_, p5) -- line: 135
+		-- upvalues: p1 (copy), React (copy)
+		local y = p5.nativeEvent.layout.y
+		local height = p5.nativeEvent.layout.height
+
+		if y ~= p1.state.layoutY or (height ~= p1.state.layoutHeight or p1.state.measured ~= true) then
+			p1._shouldRecreateTranslateY = true
+		end
+
+		p1:setState({
+			measured = true,
+			layoutY = y,
+			layoutHeight = height
+		})
+		p1.props:onLayout(p5)
+
+		local v44 = React.Children.only(p1.props.children)
+
+		if v44.props.onLayout then
+			v44.props:onLayout(p5)
+		end
+	end
+	function p1._setComponentRef(_, p7) -- line: 154
+		-- upvalues: p1 (copy)
+		p1._ref = p7
+	end
+end
+function v13.componentWillUnmount(p8) -- line: 159
+	-- upvalues: Boolean (copy), clearTimeout (copy)
+	if p8._translateY ~= nil and p8._animatedValueListenerId ~= nil then
+		p8._translateY:removeListener(p8._animatedValueListenerId)
+	end
+
+	if Boolean.toJSBoolean(p8._timer) then
+		clearTimeout(p8._timer)
+	end
+end
+function v13.UNSAFE_componentWillReceiveProps(p9, p10) -- line: 168
+	if p10.scrollViewHeight ~= p9.props.scrollViewHeight or (p10.scrollAnimatedValue ~= p9.props.scrollAnimatedValue or p10.inverted ~= p9.props.inverted) then
+		p9._shouldRecreateTranslateY = true
+	end
+end
+function v13.updateTranslateListener(t3: {[any]: any}, p11, b1: boolean, p12) -- line: 178
+	-- upvalues: Boolean (copy), t1 (copy), clearTimeout (copy), setTimeout (copy)
+	if t3._translateY ~= nil and t3._animatedValueListenerId ~= nil then
+		t3._translateY:removeListener(t3._animatedValueListenerId)
+	end
+
+	t3.translateY = if not Boolean.toJSBoolean(p12) then p11 else t1.new(p11, p12)
+	t3._shouldRecreateTranslateY = false
+
+	if not b1 then
+		return
+	end
+
+	if not t3._animatedValueListener then
+		function t3._animatedValueListener(p13) -- line: 209
+			-- upvalues: t3 (copy), Boolean (copy), clearTimeout (copy), setTimeout (copy)
+			local value = p13.value
+
+			if value == 0 and not t3._haveReceivedInitialZeroTranslateY then
+				t3._haveReceivedInitialZeroTranslateY = true
+
+				return
+			end
+
+			if Boolean.toJSBoolean(t3._timer) then
+				clearTimeout(t3._timer)
+			end
+
+			t3._timer = setTimeout(function() -- line: 220
+				-- upvalues: value (copy), t3 (copy)
+				if value ~= t3.state.translateY then
+					t3:setState({
+						translateY = value
+					})
+				end
+			end, t3._debounceTimeout)
+		end
+	end
+
+	if t3.state.translateY ~= 0 and t3.state.translateY ~= nil then
+		t3._haveReceivedInitialZeroTranslateY = false
+	end
+
+	t3._animatedValueListenerId = p11:addListener(t3._animatedValueListener)
+end
+function v13.render(p14) -- line: 233
+	-- upvalues: Boolean (copy), t2 (copy), React (copy), u12 (ref)
+	local v24 = p14._ref and (p14._ref._internalInstanceHandle and (p14._ref._internalInstanceHandle.stateNode and Boolean.toJSBoolean(p14._ref._internalInstanceHandle.stateNode.canonical)))
+
+	if p14._shouldRecreateTranslateY then
+		local inverted = p14.props.inverted
+		local scrollViewHeight = p14.props.scrollViewHeight
+		local measured = p14.state.measured
+		local layoutHeight = p14.state.layoutHeight
+		local layoutY = p14.state.layoutY
+		local nextHeaderLayoutY = p14.state.nextHeaderLayoutY
+		local t4 = {
+			-1,
+			0
+		}
+		local t5 = {
+			0,
+			0
+		}
+
+		if measured then
+			if inverted then
+				if scrollViewHeight ~= nil then
+					local v33 = layoutY + layoutHeight - scrollViewHeight
+
+					if v33 > 0 then
+						table.insert(t4, v33)
+						table.insert(t5, 0)
+						table.insert(t4, v33 + 1)
+						table.insert(t5, 1)
+
+						local v34 = (nextHeaderLayoutY or 0) - layoutHeight - scrollViewHeight
+
+						if v33 < v34 then
+							table.insert(t4, v34)
+							table.insert(t4, v34 + 1)
+							table.insert(t5, v34 - v33)
+							table.insert(t5, v34 - v33)
+						end
+					end
+				end
+			else
+				table.insert(t4, layoutY)
+				table.insert(t5, 0)
+
+				local v35 = (nextHeaderLayoutY or 0) - layoutHeight
+
+				if layoutY <= v35 then
+					table.insert(t4, v35)
+					table.insert(t4, v35 + 1)
+					table.insert(t5, v35 - layoutY)
+					table.insert(t5, v35 - layoutY)
+				else
+					table.insert(t4, layoutY + 1)
+					table.insert(t5, 1)
+				end
+			end
+		end
+
+		p14:updateTranslateListener(p14.props.scrollAnimatedValue:interpolate({
+			inputRange = t4,
+			outputRange = t5
+		}), v24, if not p14.props.hiddenOnScroll then nil else t2.new(p14.props.scrollAnimatedValue:interpolate({
+			extrapolateLeft = "clamp",
+			inputRange = {
+				layoutY,
+				layoutY + 1
+			},
+			outputRange = {
+				0,
+				1
+			}
+		}):interpolate({
+			inputRange = {
+				0,
+				1
+			},
+			outputRange = {
+				0,
+				-1
+			}
+		}), -p14.state.layoutHeight, 0))
+	end
+
+	local v36 = React.Children.only(p14.props.children)
+	local v37 = if not v24 or p14.state.translateY == nil then nil else {
+		style = {
+			transform = {{
+				translateY = p14.state.translateY
+			}}
+		}
+	}
+
+	return React.createElement("AnimatedView", {
+		collapsable = false,
+		nativeID = p14.props.nativeID,
+		onLayout = p14._onLayout,
+		ref = p14._setComponentRef,
+		style = {
+			v36.props.style,
+			u12.header,
+			{
+				transform = {{
+					translateY = p14._translateY
+				}}
+			}
+		},
+		passthroughAnimatedPropExplicitValues = v37
+	}, React.cloneElement(v36, {
+		onLayout = nil,
+		style = u12.fill
+	}))
+end
+
+u12 = StyleSheet.create({
+	header = {
+		zIndex = 10,
+		position = "relative"
+	},
+	fill = {
+		flex = 1
+	}
+})
+
+return v13

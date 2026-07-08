@@ -1,32 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local v2 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v3 = require(l_script_FirstAncestor_0.Parent.LoggingProtocol);
-local _ = require(l_script_FirstAncestor_0.types);
-local v5 = require(l_script_FirstAncestor_0.Flags.getFIntSongbirdTelemetryThrottle);
-local l_default_0 = v3.default;
-local v7 = {
-    eventName = "NowPlayingChromeWindowAnalytics", 
-    backends = {
-        v3.TelemetryBackends.EventIngest
-    }, 
-    throttlingPercentage = v5(), 
-    lastUpdated = {
-        24, 
-        12, 
-        10
-    }, 
-    description = " Now Playing Chrome Window UI related analytics ", 
-    links = "https://roblox.atlassian.net/wiki/x/I4Fcqw"
-};
-return function(v8) --[[ Line: 30 ]] --[[ Name: sendChromeWindowAnalytics ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), v2 (copy), l_default_0 (copy), v7 (copy)
-    local v9 = {
-        placeid = tostring(game.PlaceId), 
-        sessionid = l_RbxAnalyticsService_0:GetSessionId(), 
-        universeid = tostring(game.GameId)
-    };
-    local v10 = v2.Dictionary.join(v8, v9);
-    l_default_0:logRobloxTelemetryEvent(v7, nil, v10);
-    return nil;
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local Cryo = require(Songbird.Parent.Cryo)
+local LoggingProtocol = require(Songbird.Parent.LoggingProtocol)
+
+require(Songbird.types)
+
+local getFIntSongbirdTelemetryThrottle = require(Songbird.Flags.getFIntSongbirdTelemetryThrottle)
+local default = LoggingProtocol.default
+local t1 = {
+	eventName = "NowPlayingChromeWindowAnalytics",
+	description = " Now Playing Chrome Window UI related analytics ",
+	links = "https://roblox.atlassian.net/wiki/x/I4Fcqw",
+	backends = { LoggingProtocol.TelemetryBackends.EventIngest },
+	throttlingPercentage = getFIntSongbirdTelemetryThrottle(),
+	lastUpdated = {
+		24,
+		12,
+		10
+	}
+}
+
+local function sendChromeWindowAnalytics(p1) -- line: 30
+	-- upvalues: RbxAnalyticsService (copy), Cryo (copy), default (copy), t1 (copy)
+	local t2 = {
+		placeid = tostring(game.PlaceId),
+		sessionid = RbxAnalyticsService:GetSessionId(),
+		universeid = tostring(game.GameId)
+	}
+	local v11 = Cryo.Dictionary.join(p1, t2)
+
+	default:logRobloxTelemetryEvent(t1, nil, v11)
+
+	return nil
+end
+
+return sendChromeWindowAnalytics

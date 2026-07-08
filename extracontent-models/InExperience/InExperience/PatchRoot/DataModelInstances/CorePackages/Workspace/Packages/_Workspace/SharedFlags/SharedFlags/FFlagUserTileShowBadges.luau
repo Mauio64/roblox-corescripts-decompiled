@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserTileShowBadges", false);
+return game:DefineFastFlag("UserTileShowBadges", false)

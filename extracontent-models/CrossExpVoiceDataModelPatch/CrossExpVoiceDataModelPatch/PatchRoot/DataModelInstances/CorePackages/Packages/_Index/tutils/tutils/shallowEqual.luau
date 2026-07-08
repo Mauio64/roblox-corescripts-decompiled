@@ -1,22 +1,27 @@
-return function(v0, v1, v2) --[[ Line: 5 ]]
-    if not v0 or not v1 then
-        return false;
-    elseif v0 == v1 then
-        return true;
-    else
-        if not v2 then
-            v2 = {};
-        end;
-        for v3, v4 in pairs(v0) do
-            if v1[v3] ~= v4 and not v2[v3] then
-                return false;
-            end;
-        end;
-        for v5, v6 in pairs(v1) do
-            if v0[v5] ~= v6 and not v2[v5] then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
+return function(p1, p2, p3) -- line: 5
+	if not p1 or not p2 then
+		return false
+	end
+
+	if p1 == p2 then
+		return true
+	end
+
+	if not p3 then
+		p3 = {}
+	end
+
+	for k, v in pairs(p1) do
+		if v ~= p2[k] and not p3[k] then
+			return false
+		end
+	end
+
+	for k, v in pairs(p2) do
+		if v ~= p1[k] and not p3[k] then
+			return false
+		end
+	end
+
+	return true
+end

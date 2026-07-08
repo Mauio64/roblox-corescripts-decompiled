@@ -1,6 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-local _ = require(l_script_FirstAncestor_0.Enums.BulkPurchasePromptStateEnum);
-return function(v3) --[[ Line: 9 ]] --[[ Name: selectPromptState ]]
-    return v3.promptState;
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+
+require(BulkPurchaseApp.Store.Types)
+require(BulkPurchaseApp.Enums.BulkPurchasePromptStateEnum)
+
+local function selectPromptState(p1) -- line: 9
+	return p1.promptState
+end
+
+return selectPromptState

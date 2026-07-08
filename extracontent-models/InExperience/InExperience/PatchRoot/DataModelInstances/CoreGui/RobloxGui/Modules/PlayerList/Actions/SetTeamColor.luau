@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.ActionCreator)("SetTeamColor", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        isTeamAction = true, 
-        team = v0, 
-        teamColor = v1
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetTeamColor", function(p1, p2) -- line: 4
+	return {
+		isTeamAction = true,
+		team = p1,
+		teamColor = p2
+	}
+end)

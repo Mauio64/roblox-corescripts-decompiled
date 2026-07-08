@@ -1,73 +1,80 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(script.Parent.Parent.Immutable);
-return function(v3, v4) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createReducer({
-        clientSearchTerm = "", 
-        clientTypeFilters = {}, 
-        serverSearchTerm = "", 
-        serverTypeFilters = {}
-    }, {
-        ClientLogAppendMessage = function(v5, v6) --[[ Line: 13 ]] --[[ Name: ClientLogAppendMessage ]]
-            -- upvalues: v2 (ref)
-            return v2.JoinDictionaries(v5, {
-                clientData = v2.Append(v5.clientData, v6.newMessage)
-            });
-        end, 
-        ServerLogAppendMessage = function(v7, v8) --[[ Line: 19 ]] --[[ Name: ServerLogAppendMessage ]]
-            -- upvalues: v2 (ref)
-            return v2.JoinDictionaries(v7, {
-                serverData = v2.Append(v7.serverData, v8.newMessage)
-            });
-        end, 
-        ClientLogAppendFilteredMessage = function(v9, v10) --[[ Line: 25 ]] --[[ Name: ClientLogAppendFilteredMessage ]]
-            -- upvalues: v2 (ref)
-            local v11 = {
-                clientData = v2.Append(v9.clientData, v10.newMessage), 
-                clientDataFiltered = v2.Append(v9.clientDataFiltered, v10.newMessage)
-            };
-            return v2.JoinDictionaries(v9, v11);
-        end, 
-        ServerLogAppendFilteredMessage = function(v12, v13) --[[ Line: 32 ]] --[[ Name: ServerLogAppendFilteredMessage ]]
-            -- upvalues: v2 (ref)
-            local v14 = {
-                serverData = v2.Append(v12.serverData, v13.newMessage), 
-                serverDataFiltered = v2.Append(v12.serverDataFiltered, v13.newMessage)
-            };
-            return v2.JoinDictionaries(v12, v14);
-        end, 
-        ClientLogSetData = function(v15, v16) --[[ Line: 39 ]] --[[ Name: ClientLogSetData ]]
-            -- upvalues: v2 (ref)
-            local v17 = {
-                clientData = v16.newData, 
-                clientDataFiltered = v16.newDataFiltered
-            };
-            return v2.JoinDictionaries(v15, v17);
-        end, 
-        ServerLogSetData = function(v18, v19) --[[ Line: 46 ]] --[[ Name: ServerLogSetData ]]
-            -- upvalues: v2 (ref)
-            local v20 = {
-                serverData = v19.newData, 
-                serverDataFiltered = v19.newDataFiltered
-            };
-            return v2.JoinDictionaries(v18, v20);
-        end, 
-        ClientLogUpdateSearchFilter = function(v21, v22) --[[ Line: 53 ]] --[[ Name: ClientLogUpdateSearchFilter ]]
-            -- upvalues: v2 (ref)
-            local v23 = {
-                clientSearchTerm = v22.searchTerm, 
-                clientTypeFilters = v2.JoinDictionaries(v21.clientTypeFilters, v22.filterTypes)
-            };
-            return v2.JoinDictionaries(v21, v23);
-        end, 
-        ServerLogUpdateSearchFilter = function(v24, v25) --[[ Line: 60 ]] --[[ Name: ServerLogUpdateSearchFilter ]]
-            -- upvalues: v2 (ref)
-            local v26 = {
-                serverSearchTerm = v25.searchTerm, 
-                serverTypeFilters = v2.JoinDictionaries(v24.serverTypeFilters, v25.filterTypes)
-            };
-            return v2.JoinDictionaries(v24, v26);
-        end
-    })(v3, v4);
-end;
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Immutable = require(script.Parent.Parent.Immutable)
+
+return function(p1, p2) -- line: 5
+	-- upvalues: Rodux (copy), Immutable (copy)
+	return Rodux.createReducer({
+		clientSearchTerm = "",
+		serverSearchTerm = "",
+		clientTypeFilters = {},
+		serverTypeFilters = {}
+	}, {
+		ClientLogAppendMessage = function(p3, p4) -- line: 13
+			-- upvalues: Immutable (copy)
+			return Immutable.JoinDictionaries(p3, {
+				clientData = Immutable.Append(p3.clientData, p4.newMessage)
+			})
+		end,
+		ServerLogAppendMessage = function(p5, p6) -- line: 19
+			-- upvalues: Immutable (copy)
+			return Immutable.JoinDictionaries(p5, {
+				serverData = Immutable.Append(p5.serverData, p6.newMessage)
+			})
+		end,
+		ClientLogAppendFilteredMessage = function(p7, p8) -- line: 25
+			-- upvalues: Immutable (copy)
+			local t1 = {
+				clientData = Immutable.Append(p7.clientData, p8.newMessage),
+				clientDataFiltered = Immutable.Append(p7.clientDataFiltered, p8.newMessage)
+			}
+
+			return Immutable.JoinDictionaries(p7, t1)
+		end,
+		ServerLogAppendFilteredMessage = function(p9, p10) -- line: 32
+			-- upvalues: Immutable (copy)
+			local t2 = {
+				serverData = Immutable.Append(p9.serverData, p10.newMessage),
+				serverDataFiltered = Immutable.Append(p9.serverDataFiltered, p10.newMessage)
+			}
+
+			return Immutable.JoinDictionaries(p9, t2)
+		end,
+		ClientLogSetData = function(p11, p12) -- line: 39
+			-- upvalues: Immutable (copy)
+			local t3 = {
+				clientData = p12.newData,
+				clientDataFiltered = p12.newDataFiltered
+			}
+
+			return Immutable.JoinDictionaries(p11, t3)
+		end,
+		ServerLogSetData = function(p13, p14) -- line: 46
+			-- upvalues: Immutable (copy)
+			local t4 = {
+				serverData = p14.newData,
+				serverDataFiltered = p14.newDataFiltered
+			}
+
+			return Immutable.JoinDictionaries(p13, t4)
+		end,
+		ClientLogUpdateSearchFilter = function(p15, p16) -- line: 53
+			-- upvalues: Immutable (copy)
+			local t5 = {
+				clientSearchTerm = p16.searchTerm,
+				clientTypeFilters = Immutable.JoinDictionaries(p15.clientTypeFilters, p16.filterTypes)
+			}
+
+			return Immutable.JoinDictionaries(p15, t5)
+		end,
+		ServerLogUpdateSearchFilter = function(p17, p18) -- line: 60
+			-- upvalues: Immutable (copy)
+			local t6 = {
+				serverSearchTerm = p18.searchTerm,
+				serverTypeFilters = Immutable.JoinDictionaries(p17.serverTypeFilters, p18.filterTypes)
+			}
+
+			return Immutable.JoinDictionaries(p17, t6)
+		end
+	})(p1, p2)
+end

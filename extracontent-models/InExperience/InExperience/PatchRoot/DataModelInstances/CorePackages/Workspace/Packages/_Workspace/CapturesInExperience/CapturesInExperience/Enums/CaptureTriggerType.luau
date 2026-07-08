@@ -1,5 +1,5 @@
 return {
-    UserCapture = "UserCapture", 
-    DeveloperCapture = "DeveloperCapture", 
-    LegacyCapture = "LegacyCapture"
-};
+	UserCapture = "UserCapture",
+	DeveloperCapture = "DeveloperCapture",
+	LegacyCapture = "LegacyCapture"
+}

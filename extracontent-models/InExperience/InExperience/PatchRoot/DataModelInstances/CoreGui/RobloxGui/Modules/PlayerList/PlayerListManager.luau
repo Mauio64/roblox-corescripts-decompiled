@@ -1,1 +1,1 @@
-return require(script.Parent.PlayerListMaster).new();
+return require(script.Parent.PlayerListController).new()

@@ -1,4 +1,4 @@
 return {
-    getTextSizeStore = require(script.getTextSizeStore), 
-    ["jest.config"] = script["jest.config"]
-};
+	getTextSizeStore = require(script.getTextSizeStore),
+	["jest.config"] = script["jest.config"]
+}

@@ -1,18 +1,18 @@
-local v3 = {
-    RgbFromHex = function(v0) --[[ Line: 3 ]] --[[ Name: RgbFromHex ]]
-        local v1 = false;
-        if v0 >= 0 then
-            v1 = v0 <= 16777215;
-        end;
-        assert(v1, "RgbFromHex: Out of range");
-        local v2 = v0 % 256;
-        v0 = (v0 - v2) / 256;
-        v1 = v0 % 256;
-        return (v0 - v1) / 256, v1, v2;
-    end
-};
-v3.Color3FromHex = function(v4) --[[ Line: 15 ]] --[[ Name: Color3FromHex ]]
-    -- upvalues: v3 (copy)
-    return Color3.fromRGB(v3.RgbFromHex(v4));
-end;
-return v3;
+local t1 = {
+	RgbFromHex = function(p1) -- line: 3
+		assert(p1 >= 0 and p1 <= 16777215, "RgbFromHex: Out of range")
+
+		local v3 = p1 % 256
+		local v4 = (p1 - v3) / 256
+		local v5 = v4 % 256
+
+		return (v4 - v5) / 256, v5, v3
+	end
+}
+
+function t1.Color3FromHex(p2) -- line: 15
+	-- upvalues: t1 (copy)
+	return Color3.fromRGB(t1.RgbFromHex(p2))
+end
+
+return t1

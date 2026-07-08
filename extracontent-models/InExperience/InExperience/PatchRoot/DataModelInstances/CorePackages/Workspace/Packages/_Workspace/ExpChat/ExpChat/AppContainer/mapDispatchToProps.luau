@@ -1,126 +1,216 @@
-local l_Players_0 = game:GetService("Players");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local v3 = require(l_script_FirstAncestor_0.Stores.GetTransparencyStore);
-local v4 = require(l_script_FirstAncestor_0.Stores.GetMessagesStore);
-local v5 = require(l_script_FirstAncestor_0.runGlobalChatCommand);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v7 = require(l_Parent_0.Promise);
-local l_List_0 = require(l_Parent_0.llama).List;
-local v9 = require(l_Parent_0.ExpChatShared);
-local l_Analytics_0 = v9.Analytics;
-local v11 = require(script.Parent.Logger);
-local v12 = require(l_script_FirstAncestor_0.Config);
-local l_autoCastCommand_0 = v9.Commands.autoCastCommand;
-local l_RBXWhisperCommand_0 = v9.Commands.Whisper.RBXWhisperCommand;
-local l_ChatInputBarResetTargetChannel_0 = v9.Actions.ChatInputBarResetTargetChannel;
-local v16 = require(l_script_FirstAncestor_0.Actions.ChatTranslationGlobalToggled);
-local v17 = require(l_script_FirstAncestor_0.Actions.ChatTranslationMessageToggled);
-local l_FFlagExpChatUseMessagesStore_0 = require(l_Parent_0.SharedFlags).FFlagExpChatUseMessagesStore;
-return function(v19) --[[ Line: 27 ]]
-    -- upvalues: l_Players_0 (copy), l_autoCastCommand_0 (copy), l_RBXWhisperCommand_0 (copy), v7 (copy), v11 (copy), l_FFlagExpChatUseMessagesStore_0 (copy), v4 (copy), v16 (copy), l_Analytics_0 (copy), v17 (copy), l_ChatInputBarResetTargetChannel_0 (copy), v3 (copy), l_TextChatService_0 (copy), l_List_0 (copy), v12 (copy), v5 (copy)
-    return {
-        activateWhisperMode = function(v20) --[[ Line: 29 ]] --[[ Name: activateWhisperMode ]]
-            -- upvalues: l_Players_0 (ref), l_autoCastCommand_0 (ref), l_RBXWhisperCommand_0 (ref), v7 (ref), v11 (ref)
-            local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v20);
-            local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-            if not l_l_Players_0_PlayerByUserId_0 then
-                return;
-            elseif l_l_Players_0_PlayerByUserId_0 == l_LocalPlayer_0 then
-                return;
-            else
-                assert(l_LocalPlayer_0, "Players.LocalPlayer should be non-nil");
-                local l_Name_0 = l_l_Players_0_PlayerByUserId_0.Name;
-                local v24 = {
-                    l_autoCastCommand_0(l_RBXWhisperCommand_0, l_LocalPlayer_0.UserId, "/w @" .. l_Name_0)
-                };
-                v7.any(v24):catch(function(v25) --[[ Line: 45 ]]
-                    -- upvalues: v11 (ref)
-                    v11:debug("Could not send autoCastCommand. Error: {}", v25);
-                end);
-                return;
-            end;
-        end, 
-        onToggleTranslation = function(v26) --[[ Line: 50 ]] --[[ Name: onToggleTranslation ]]
-            -- upvalues: l_FFlagExpChatUseMessagesStore_0 (ref), v4 (ref), v19 (copy), v16 (ref)
-            if l_FFlagExpChatUseMessagesStore_0 then
-                v4(false).toggleGlobalTranslation(v26);
-                return;
-            else
-                v19(v16(v26));
-                return;
-            end;
-        end, 
-        onToggleIndividualTranslation = function(v27, v28) --[[ Line: 59 ]] --[[ Name: onToggleIndividualTranslation ]]
-            -- upvalues: l_Players_0 (ref), l_Analytics_0 (ref), l_FFlagExpChatUseMessagesStore_0 (ref), v4 (ref), v19 (copy), v17 (ref)
-            local v29 = {
-                useTranslation = v27, 
-                senderUserId = if l_Players_0.LocalPlayer then l_Players_0.LocalPlayer.UserId else nil, 
-                localeId = if l_Players_0.LocalPlayer then l_Players_0.LocalPlayer.LocaleId else nil
-            };
-            l_Analytics_0.FireClientAnalyticsWithEventName("MessageTranslationToggled", v29);
-            if l_FFlagExpChatUseMessagesStore_0 then
-                v4(false).toggleMessageTranslation(v27, v28);
-                return;
-            else
-                v19(v17(v27, v28));
-                return;
-            end;
-        end, 
-        resetTargetChannel = function() --[[ Line: 76 ]] --[[ Name: resetTargetChannel ]]
-            -- upvalues: v19 (copy), l_ChatInputBarResetTargetChannel_0 (ref)
-            v19(l_ChatInputBarResetTargetChannel_0());
-        end, 
-        onHovered = function() --[[ Line: 80 ]] --[[ Name: onHovered ]]
-            -- upvalues: v3 (ref)
-            v3(false).resetAllTransparency();
-        end, 
-        onUnhovered = function() --[[ Line: 84 ]] --[[ Name: onUnhovered ]]
-            -- upvalues: v3 (ref)
-            v3(false).resetAllTransparency();
-        end, 
-        onSendChat = function(v30) --[[ Line: 88 ]] --[[ Name: onSendChat ]]
-            -- upvalues: l_TextChatService_0 (ref), v11 (ref), v7 (ref), l_List_0 (ref), l_Players_0 (ref), v12 (ref), l_Analytics_0 (ref)
-            local l_ChatInputBarConfiguration_0 = l_TextChatService_0:FindFirstChildOfClass("ChatInputBarConfiguration");
-            local v32 = nil;
-            if l_ChatInputBarConfiguration_0 then
-                v32 = l_ChatInputBarConfiguration_0.TargetTextChannel;
-            end;
-            v11:debug("onSendChat: {} to {}", v30, if v32 then v32.Name else "nil");
-            if v32 then
-                v7.try(function() --[[ Line: 97 ]]
-                    -- upvalues: v32 (ref), v30 (copy), l_List_0 (ref), l_Players_0 (ref), v12 (ref), l_Analytics_0 (ref)
-                    v32:SendAsync(v30);
-                    local v34 = l_List_0.count(v32:GetChildren(), function(v33) --[[ Line: 100 ]]
-                        return v33:IsA("TextSource");
-                    end);
-                    local v35 = {
-                        channelName = v32.Name, 
-                        senderUserId = if l_Players_0.LocalPlayer then l_Players_0.LocalPlayer.UserId else nil, 
-                        numParticipants = v34, 
-                        isDefaultChannel = v12[v32.Name] and "true" or "false"
-                    };
-                    l_Analytics_0.FireClientAnalyticsWithEventName("LuaMessageSent", v35);
-                end):catch(function(v36) --[[ Line: 112 ]]
-                    warn(v36.error);
-                end);
-            else
-                v11:warning("TargetTextChannel was nil!");
-            end;
-        end, 
-        onSendGlobalChat = function(v37) --[[ Line: 120 ]] --[[ Name: onSendGlobalChat ]]
-            -- upvalues: v5 (ref), l_Players_0 (ref), v7 (ref), l_TextChatService_0 (ref)
-            if string.sub(v37, 1, 1) == "/" and v5(v37, l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId or 0) then
-                return;
-            else
-                v7.try(function() --[[ Line: 127 ]]
-                    -- upvalues: l_TextChatService_0 (ref), v37 (copy)
-                    l_TextChatService_0:SendUniverseChatMessageAsync(v37, "");
-                end):catch(function(v38) --[[ Line: 129 ]]
-                    warn(v38.error);
-                end);
-                return;
-            end;
-        end
-    };
-end;
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local GetTransparencyStore = require(ExpChat.Stores.GetTransparencyStore)
+local GetMessagesStore = require(ExpChat.Stores.GetMessagesStore)
+local runGlobalChatCommand = require(ExpChat.runGlobalChatCommand)
+local runVirtualChatCommand = require(ExpChat.runVirtualChatCommand)
+local ExpChatParent = ExpChat.Parent
+local Promise = require(ExpChatParent.Promise)
+local List = require(ExpChatParent.llama).List
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local Analytics = ExpChatShared.Analytics
+local Logger = require(script.Parent.Logger)
+local Config = require(ExpChat.Config)
+local DictationAnalytics = require(ExpChat.ChatInput.UI.ChatInputBar.Dictation.DictationAnalytics)
+local computeEditDistance = require(ExpChat.ChatInput.UI.ChatInputBar.Dictation.computeEditDistance)
+
+local function truncateToCharLimit(s1: string) -- line: 28
+	-- upvalues: Config (copy)
+	if #s1 > Config.MessageCharacterLimit then
+		return string.sub(s1, 1, Config.MessageCharacterLimit), true
+	end
+
+	return s1, false
+end
+
+local Commands = ExpChatShared.Commands
+local GlobalCommands = ExpChatShared.GlobalCommands
+local autoCastCommand = ExpChatShared.Commands.autoCastCommand
+local RBXWhisperCommand = ExpChatShared.Commands.Whisper.RBXWhisperCommand
+local ChatInputBarResetTargetChannel = ExpChatShared.Actions.ChatInputBarResetTargetChannel
+local ChatTranslationGlobalToggled = require(ExpChat.Actions.ChatTranslationGlobalToggled)
+local ChatTranslationMessageToggled = require(ExpChat.Actions.ChatTranslationMessageToggled)
+local SharedFlags = require(ExpChatParent.SharedFlags)
+local FFlagExpChatUseMessagesStore = SharedFlags.FFlagExpChatUseMessagesStore
+local FFlagExpChatDictatedSpeechEnabled = require(ExpChat.Flags.FFlagExpChatDictatedSpeechEnabled)
+local v28 = game:DefineFastFlag("ExpChatUseVirtualCommandRunner", false)
+local getFFlagExpChatProtectedChatInternalAPIs = SharedFlags.getFFlagExpChatProtectedChatInternalAPIs
+local FFlagExpChatDictation = SharedFlags.FFlagExpChatDictation
+
+return function(p1) -- line: 53
+	-- upvalues: Players (copy), autoCastCommand (copy), RBXWhisperCommand (copy), Promise (copy), Logger (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), ChatTranslationGlobalToggled (copy), Analytics (copy), ChatTranslationMessageToggled (copy), ChatInputBarResetTargetChannel (copy), GetTransparencyStore (copy), runVirtualChatCommand (copy), Commands (copy), TextChatService (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), FFlagExpChatDictatedSpeechEnabled (copy), List (copy), Config (copy), FFlagExpChatDictation (copy), DictationAnalytics (copy), computeEditDistance (copy), v28 (copy), GlobalCommands (copy), runGlobalChatCommand (copy)
+	return {
+		activateWhisperMode = function(n1: number) -- line: 55
+			-- upvalues: Players (copy), autoCastCommand (copy), RBXWhisperCommand (copy), Promise (copy), Logger (copy)
+			local PlayerByUserId = Players:GetPlayerByUserId(n1)
+			local LocalPlayer = Players.LocalPlayer
+
+			if not PlayerByUserId then
+				return
+			end
+
+			if PlayerByUserId == LocalPlayer then
+				return
+			end
+
+			assert(LocalPlayer, "Players.LocalPlayer should be non-nil")
+
+			local PlayerByUserIdName = PlayerByUserId.Name
+			local t1 = { autoCastCommand(RBXWhisperCommand, LocalPlayer.UserId, "/w @" .. PlayerByUserIdName) }
+
+			Promise.any(t1):catch(function(p2) -- line: 71
+				-- upvalues: Logger (copy)
+				Logger:debug("Could not send autoCastCommand. Error: {}", p2)
+			end)
+		end,
+		onToggleTranslation = function(b1: boolean) -- line: 76
+			-- upvalues: FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), p1 (copy), ChatTranslationGlobalToggled (copy)
+			if FFlagExpChatUseMessagesStore then
+				GetMessagesStore(false).toggleGlobalTranslation(b1)
+
+				return
+			end
+
+			p1(ChatTranslationGlobalToggled(b1))
+		end,
+		onToggleIndividualTranslation = function(b2: boolean, s2: string) -- line: 85
+			-- upvalues: Players (copy), Analytics (copy), FFlagExpChatUseMessagesStore (copy), GetMessagesStore (copy), p1 (copy), ChatTranslationMessageToggled (copy)
+			local t2 = {
+				useTranslation = b2,
+				senderUserId = if not Players.LocalPlayer then nil else Players.LocalPlayer.UserId,
+				localeId = if not Players.LocalPlayer then nil else Players.LocalPlayer.LocaleId
+			}
+
+			Analytics.FireClientAnalyticsWithEventName("MessageTranslationToggled", t2)
+
+			if FFlagExpChatUseMessagesStore then
+				GetMessagesStore(false).toggleMessageTranslation(b2, s2)
+
+				return
+			end
+
+			p1(ChatTranslationMessageToggled(b2, s2))
+		end,
+		resetTargetChannel = function() -- line: 102
+			-- upvalues: p1 (copy), ChatInputBarResetTargetChannel (copy)
+			p1(ChatInputBarResetTargetChannel())
+		end,
+		onHovered = function() -- line: 106
+			-- upvalues: GetTransparencyStore (copy)
+			GetTransparencyStore(false).resetAllTransparency()
+		end,
+		onUnhovered = function() -- line: 110
+			-- upvalues: GetTransparencyStore (copy)
+			GetTransparencyStore(false).resetAllTransparency()
+		end,
+		onSendChat = function(s3: string, t3: {[any]: any}?, b3: boolean?) -- line: 114
+			-- upvalues: runVirtualChatCommand (copy), Players (copy), Commands (copy), TextChatService (copy), Logger (copy), Promise (copy), getFFlagExpChatProtectedChatInternalAPIs (copy), FFlagExpChatDictatedSpeechEnabled (copy), List (copy), Config (copy), FFlagExpChatDictation (copy), DictationAnalytics (copy), Analytics (copy), computeEditDistance (copy)
+			if string.sub(s3, 1, 1) == "/" and runVirtualChatCommand(s3, Players.LocalPlayer and Players.LocalPlayer.UserId or 0, Commands.getVirtualLocalEnabledCommands(), "RBXGeneral") then
+				return
+			end
+
+			local ChatInputBarConfiguration = TextChatService:FindFirstChildOfClass("ChatInputBarConfiguration")
+			local TargetTextChannel = nil
+
+			if ChatInputBarConfiguration then
+				TargetTextChannel = ChatInputBarConfiguration.TargetTextChannel
+			end
+
+			Logger:debug("onSendChat: {} to {}", s3, not TargetTextChannel and "nil" or TargetTextChannel.Name)
+
+			if TargetTextChannel then
+				Promise.try(function() -- line: 135
+					-- upvalues: getFFlagExpChatProtectedChatInternalAPIs (copy), TargetTextChannel (ref), s3 (copy), FFlagExpChatDictatedSpeechEnabled (copy), b3 (copy), List (copy), Players (copy), Config (copy), FFlagExpChatDictation (copy), t3 (copy), DictationAnalytics (copy), Analytics (copy), computeEditDistance (copy)
+					if getFFlagExpChatProtectedChatInternalAPIs() then
+						TargetTextChannel:SendInternalAsync(s3)
+					elseif FFlagExpChatDictatedSpeechEnabled and b3 then
+						TargetTextChannel:SendDictatedSpeechAsync(s3)
+					else
+						TargetTextChannel:SendAsync(s3)
+					end
+
+					local v52 = List.count(TargetTextChannel:GetChildren(), function(p3) -- line: 144
+						return p3:IsA("TextSource")
+					end)
+					local t4 = {
+						channelName = TargetTextChannel.Name,
+						senderUserId = if not Players.LocalPlayer then nil else Players.LocalPlayer.UserId,
+						numParticipants = v52,
+						isDefaultChannel = not Config[TargetTextChannel.Name] and "false" or "true"
+					}
+
+					if FFlagExpChatDictation and t3 then
+						t4[DictationAnalytics.Properties.SttMode] = t3.mode
+						t4[DictationAnalytics.Properties.SttOutcome] = t3.outcome
+					end
+
+					Analytics.FireClientAnalyticsWithEventName("LuaMessageSent", t4)
+
+					if FFlagExpChatDictation and t3 then
+						local v54 = t3.textStt or ""
+						local v55 = t3.textSent or s3
+						local v56, v57
+
+						if #v54 > Config.MessageCharacterLimit then
+							v56 = string.sub(v54, 1, Config.MessageCharacterLimit)
+							v57 = true
+						else
+							v56 = v54
+							v57 = false
+						end
+
+						local v58, v59
+
+						if #v55 > Config.MessageCharacterLimit then
+							v58 = string.sub(v55, 1, Config.MessageCharacterLimit)
+							v59 = true
+						else
+							v58 = v55
+							v59 = false
+						end
+
+						DictationAnalytics.fire(DictationAnalytics.Events.MessageSent, {
+							[DictationAnalytics.Properties.SttMode] = t3.mode,
+							[DictationAnalytics.Properties.SttOutcome] = t3.outcome,
+							[DictationAnalytics.Properties.FinalCharCount] = #v55,
+							[DictationAnalytics.Properties.WasEdited] = v54 ~= v55,
+							[DictationAnalytics.Properties.EditDistance] = computeEditDistance(v54, v55),
+							[DictationAnalytics.Properties.TextStt] = v56,
+							[DictationAnalytics.Properties.TextSent] = v58,
+							[DictationAnalytics.Properties.TextSttTruncated] = v57,
+							[DictationAnalytics.Properties.TextSentTruncated] = v59
+						})
+					end
+				end):catch(function(p4) -- line: 178
+					warn(p4.error)
+				end)
+			else
+				Logger:warning("TargetTextChannel was nil!")
+			end
+		end,
+		onSendGlobalChat = function(s4: string, _: {[any]: any}?, b4: boolean?) -- line: 186
+			-- upvalues: Players (copy), v28 (copy), runVirtualChatCommand (copy), GlobalCommands (copy), runGlobalChatCommand (copy), Promise (copy), FFlagExpChatDictatedSpeechEnabled (copy), TextChatService (copy)
+			if string.sub(s4, 1, 1) == "/" then
+				local v50 = Players.LocalPlayer and Players.LocalPlayer.UserId or 0
+
+				if if not v28 then runGlobalChatCommand(s4, v50) else runVirtualChatCommand(s4, v50, GlobalCommands.getGlobalEnabledCommands(), "RBXGlobal") then
+					return
+				end
+			end
+
+			Promise.try(function() -- line: 204
+				-- upvalues: FFlagExpChatDictatedSpeechEnabled (copy), b4 (copy), TextChatService (copy), s4 (copy)
+				if FFlagExpChatDictatedSpeechEnabled and b4 then
+					TextChatService:SendDictatedSpeechUniverseChatAsync(s4)
+
+					return
+				end
+
+				TextChatService:SendUniverseChatMessageAsync(s4, "")
+			end):catch(function(p5) -- line: 210
+				warn(p5.error)
+			end)
+		end
+	}
+end

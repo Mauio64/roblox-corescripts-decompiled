@@ -1,138 +1,144 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_SoundService_0 = game:GetService("SoundService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v4.Roact;
-local l_t_0 = v4.t;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v8 = require(l_Parent_0.Components.DropDownSelection);
-local v9 = require(l_Parent_0.Components.ThemedTextLabel);
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local v11 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local v12 = l_Roact_0.PureComponent:extend("DeviceSelectionEntry");
-local l_Flags_0 = l_Parent_0.Flags;
-local v14 = require(l_Flags_0.GetFFlagTruncateDeviceSelection);
-local v15 = require(l_RobloxGui_0.Modules.Flags.GetFFlagVoiceChatUILogging);
-v12.DeviceType = {
-    Input = "Input", 
-    Output = "Output"
-};
-v12.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.integer, 
-    deviceType = l_t_0.string, 
-    isMenuOpen = l_t_0.boolean, 
-    canOpen = l_t_0.optional(l_t_0.boolean), 
-    canCaptureFocus = l_t_0.optional(l_t_0.boolean)
-});
-v12.defaultProps = {
-    canOpen = true
-};
-v12.init = function(v16) --[[ Line: 41 ]] --[[ Name: init ]]
-    -- upvalues: l_default_0 (copy), l_SoundService_0 (copy), v15 (copy), v11 (copy)
-    v16:setState({
-        deviceNames = {}, 
-        deviceGuids = {}, 
-        selectedIndex = 0, 
-        ready = false
-    });
-    l_default_0:asyncInit():andThen(function() --[[ Line: 50 ]]
-        -- upvalues: v16 (copy), l_default_0 (ref), l_SoundService_0 (ref)
-        v16:setState({
-            ready = true
-        });
-        l_default_0:SetupParticipantListeners();
-        if l_SoundService_0.DeviceListChanged then
-            l_SoundService_0.DeviceListChanged:Connect(function() --[[ Line: 56 ]]
-                -- upvalues: v16 (ref)
-                if v16.props.isMenuOpen then
-                    v16:pollDevices(v16.props.deviceType);
-                end;
-            end);
-        end;
-    end):catch(function() --[[ Line: 63 ]]
-        -- upvalues: v15 (ref), v11 (ref)
-        if v15() then
-            v11:warning("Failed to init VoiceChatServiceManager");
-        end;
-    end);
-end;
-v12.render = function(v17) --[[ Line: 70 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), v9 (copy), v12 (copy), v8 (copy), v14 (copy), l_default_0 (copy)
-    if not v17.state.ready or v17.state.deviceNames == nil or #v17.state.deviceNames == 0 then
-        return nil;
-    else
-        return l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, 120), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = v17.props.LayoutOrder, 
-            ZIndex = 2
-        }, {
-            Padding = l_Roact_0.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, 24), 
-                PaddingRight = UDim.new(0, 24)
-            }), 
-            InputLabel = l_Roact_0.createElement(v9, {
-                fontKey = "Body", 
-                themeKey = "TextDefault", 
-                Size = UDim2.new(1, 0, 0, 56), 
-                Position = UDim2.new(0, 0, 0, 0), 
-                AnchorPoint = Vector2.new(0, 0), 
-                Text = v17.props.deviceType == v12.DeviceType.Input and "Input Device" or "Output Device", 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left
-            }), 
-            Dropdown = l_Roact_0.createElement(v8, {
-                Size = UDim2.new(1, 0, 0, 44), 
-                Position = UDim2.new(0, 0, 0, 56), 
-                truncate = v14(), 
-                selections = v17.state.deviceNames, 
-                selectedIndex = v17.state.selectedIndex, 
-                placeHolderText = "", 
-                enabled = true, 
-                localize = false, 
-                selectionParentName = v17.props.deviceType .. "DeviceSelectionEntryDropdown", 
-                canOpen = v17.props.canOpen, 
-                canCaptureFocus = v17.props.canCaptureFocus, 
-                selectionChanged = function(v18) --[[ Line: 107 ]] --[[ Name: selectionChanged ]]
-                    -- upvalues: l_default_0 (ref), v17 (copy)
-                    l_default_0:SwitchDevice(v17.props.deviceType, v17.state.deviceNames[v18], v17.state.deviceGuids[v18]);
-                    v17:setState({
-                        selectedIndex = v18
-                    });
-                end
-            })
-        });
-    end;
-end;
-v12.pollDevices = function(v19, v20) --[[ Line: 122 ]] --[[ Name: pollDevices ]]
-    -- upvalues: l_default_0 (copy), v15 (copy), v11 (copy)
-    spawn(function() --[[ Line: 123 ]]
-        -- upvalues: l_default_0 (ref), v20 (copy), v19 (copy), v15 (ref), v11 (ref)
-        local l_l_default_0_Devices_0, v22, v23, v24 = l_default_0:GetDevices(v20);
-        if l_l_default_0_Devices_0 then
-            v19:setState({
-                deviceNames = v22, 
-                deviceGuids = v23, 
-                selectedIndex = v24
-            });
-            return;
-        else
-            if v15() then
-                v11:warning("Errors in get {} Device info", v20);
-            end;
-            v19:setState({
-                deviceNames = {}, 
-                deviceGuids = {}, 
-                selectedIndex = 0
-            });
-            return;
-        end;
-    end);
-end;
-v12.willUpdate = function(v25, v26) --[[ Line: 144 ]] --[[ Name: willUpdate ]]
-    if not v25.props.isMenuOpen and v26.isMenuOpen then
-        v25:pollDevices(v26.deviceType);
-    end;
-end;
-return v12;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local SoundService = game:GetService("SoundService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local ParentParent = script.Parent.Parent.Parent
+local DropDownSelection = require(ParentParent.Components.DropDownSelection)
+local ThemedTextLabel = require(ParentParent.Components.ThemedTextLabel)
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local v12 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local v13 = Roact.PureComponent:extend("DeviceSelectionEntry")
+local Flags = ParentParent.Flags
+local GetFFlagTruncateDeviceSelection = require(Flags.GetFFlagTruncateDeviceSelection)
+local GetFFlagVoiceChatUILogging = require(RobloxGui.Modules.Flags.GetFFlagVoiceChatUILogging)
+
+v13.DeviceType = {
+	Input = "Input",
+	Output = "Output"
+}
+v13.validateProps = t.strictInterface({
+	LayoutOrder = t.integer,
+	deviceType = t.string,
+	isMenuOpen = t.boolean,
+	canOpen = t.optional(t.boolean),
+	canCaptureFocus = t.optional(t.boolean)
+})
+v13.defaultProps = {
+	canOpen = true
+}
+
+function v13.init(p1) -- line: 41
+	-- upvalues: default (copy), SoundService (copy), GetFFlagVoiceChatUILogging (copy), v12 (copy)
+	p1:setState({
+		selectedIndex = 0,
+		ready = false,
+		deviceNames = {},
+		deviceGuids = {}
+	})
+	default:asyncInit():andThen(function() -- line: 50
+		-- upvalues: p1 (copy), default (copy), SoundService (copy)
+		p1:setState({
+			ready = true
+		})
+		default:SetupParticipantListeners()
+
+		if SoundService.DeviceListChanged then
+			SoundService.DeviceListChanged:Connect(function() -- line: 56
+				-- upvalues: p1 (copy)
+				if p1.props.isMenuOpen then
+					p1:pollDevices(p1.props.deviceType)
+				end
+			end)
+		end
+	end):catch(function() -- line: 63
+		-- upvalues: GetFFlagVoiceChatUILogging (copy), v12 (copy)
+		if GetFFlagVoiceChatUILogging() then
+			v12:warning("Failed to init VoiceChatServiceManager")
+		end
+	end)
+end
+function v13.render(p2) -- line: 70
+	-- upvalues: Roact (copy), ThemedTextLabel (copy), v13 (copy), DropDownSelection (copy), GetFFlagTruncateDeviceSelection (copy), default (copy)
+	if not p2.state.ready or (p2.state.deviceNames == nil or #p2.state.deviceNames == 0) then
+		return nil
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Size = UDim2.new(1, 0, 0, 120),
+		LayoutOrder = p2.props.LayoutOrder
+	}, {
+		Padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 24),
+			PaddingRight = UDim.new(0, 24)
+		}),
+		InputLabel = Roact.createElement(ThemedTextLabel, {
+			fontKey = "Body",
+			themeKey = "TextDefault",
+			Size = UDim2.new(1, 0, 0, 56),
+			Position = UDim2.new(0, 0, 0, 0),
+			AnchorPoint = Vector2.new(0, 0),
+			Text = p2.props.deviceType ~= v13.DeviceType.Input and "Output Device" or "Input Device",
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left
+		}),
+		Dropdown = Roact.createElement(DropDownSelection, {
+			placeHolderText = "",
+			enabled = true,
+			localize = false,
+			Size = UDim2.new(1, 0, 0, 44),
+			Position = UDim2.new(0, 0, 0, 56),
+			truncate = GetFFlagTruncateDeviceSelection(),
+			selections = p2.state.deviceNames,
+			selectedIndex = p2.state.selectedIndex,
+			selectionParentName = p2.props.deviceType .. "DeviceSelectionEntryDropdown",
+			canOpen = p2.props.canOpen,
+			canCaptureFocus = p2.props.canCaptureFocus,
+			selectionChanged = function(p3) -- line: 107
+				-- upvalues: default (copy), p2 (copy)
+				default:SwitchDevice(p2.props.deviceType, p2.state.deviceNames[p3], p2.state.deviceGuids[p3])
+				p2:setState({
+					selectedIndex = p3
+				})
+			end
+		})
+	})
+end
+function v13.pollDevices(p4, p5) -- line: 122
+	-- upvalues: default (copy), GetFFlagVoiceChatUILogging (copy), v12 (copy)
+	spawn(function() -- line: 123
+		-- upvalues: default (copy), p5 (copy), p4 (copy), GetFFlagVoiceChatUILogging (copy), v12 (copy)
+		local v24, v25, v26, v27 = default:GetDevices(p5)
+
+		if v24 then
+			p4:setState({
+				deviceNames = v25,
+				deviceGuids = v26,
+				selectedIndex = v27
+			})
+
+			return
+		end
+
+		if GetFFlagVoiceChatUILogging() then
+			v12:warning("Errors in get {} Device info", p5)
+		end
+
+		p4:setState({
+			selectedIndex = 0,
+			deviceNames = {},
+			deviceGuids = {}
+		})
+	end)
+end
+function v13.willUpdate(p6, p7) -- line: 144
+	if not p6.props.isMenuOpen and p7.isMenuOpen then
+		p6:pollDevices(p7.deviceType)
+	end
+end
+
+return v13

@@ -1,13 +1,14 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-if require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeKeepOutAreas then
-    return nil;
-else
-    return (l_makeActionCreator_0(script.Name, function(v2, v3, v4) --[[ Line: 11 ]]
-        return {
-            id = v2, 
-            position = v3, 
-            size = v4
-        };
-    end));
-end;
+local CorePackages = game:GetService("CorePackages")
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+if require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeKeepOutAreas then
+	return nil
+end
+
+return (makeActionCreator(script.Name, function(p1, p2, p3) -- line: 11
+	return {
+		id = p1,
+		position = p2,
+		size = p3
+	}
+end))

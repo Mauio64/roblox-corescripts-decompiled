@@ -1,41 +1,55 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.InternalHttpStore);
-local _ = require(l_Parent_1.Signals);
-local v4 = require(l_Parent_0.Handlers.createErrorStatusHandler);
-local l_GetHttpStore_0 = v2.GetHttpStore;
-local _ = require(l_Parent_0.Types);
-local v7 = require(l_Parent_0.HttpSessionTracker);
-return function(v8, v9) --[[ Line: 25 ]] --[[ Name: createHttpStore ]]
-    -- upvalues: l_GetHttpStore_0 (copy), v7 (copy), v4 (copy)
-    local v10 = l_GetHttpStore_0(v9);
-    local v11 = {};
-    return {
-        fetch = function(v12, v13) --[[ Line: 30 ]] --[[ Name: fetch ]]
-            -- upvalues: v7 (ref), v11 (copy), v10 (copy), v4 (ref), v8 (copy)
-            local v14 = v7.currentSession();
-            if v11[v14] == nil then
-                v11[v14] = {};
-            end;
-            local v15, v16 = v10.fetch(v12, v13);
-            v15 = v4(v8)(v15);
-            v11[v14][v12] = {
-                getFetchSignal = v15, 
-                cancelRequest = v16
-            };
-            return v15, v16;
-        end, 
-        cancelAll = function() --[[ Line: 46 ]] --[[ Name: cancelAll ]]
-            -- upvalues: v7 (ref), v11 (copy)
-            local v17 = v7.currentSession();
-            if v11[v17] then
-                for _, v19 in v11[v17] do
-                    v19.cancelRequest();
-                end;
-            end;
-            v11[v17] = nil;
-            v7.cancelAll();
-            v11[v7.currentSession()] = {};
-        end
-    };
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local InternalHttpStore = require(scriptParentParent.InternalHttpStore)
+
+require(scriptParentParent.Signals)
+
+local createErrorStatusHandler = require(scriptParent.Handlers.createErrorStatusHandler)
+local GetHttpStore = InternalHttpStore.GetHttpStore
+
+require(scriptParent.Types)
+
+local HttpSessionTracker = require(scriptParent.HttpSessionTracker)
+
+local function createHttpStore(p1, p2) -- line: 25
+	-- upvalues: GetHttpStore (copy), HttpSessionTracker (copy), createErrorStatusHandler (copy)
+	local v10 = GetHttpStore(p2)
+	local t1 = {}
+
+	return {
+		fetch = function(s1: string, p3) -- line: 30
+			-- upvalues: HttpSessionTracker (copy), t1 (copy), v10 (copy), createErrorStatusHandler (copy), p1 (copy)
+			local v14 = HttpSessionTracker.currentSession()
+
+			if t1[v14] == nil then
+				t1[v14] = {}
+			end
+
+			local v15, v16 = v10.fetch(s1, p3)
+			local v17 = createErrorStatusHandler(p1)(v15)
+
+			t1[v14][s1] = {
+				getFetchSignal = v17,
+				cancelRequest = v16
+			}
+
+			return v17, v16
+		end,
+		cancelAll = function() -- line: 46
+			-- upvalues: HttpSessionTracker (copy), t1 (copy)
+			local v18 = HttpSessionTracker.currentSession()
+
+			if t1[v18] then
+				for _, v20 in t1[v18] do
+					v20.cancelRequest()
+				end
+			end
+
+			t1[v18] = nil
+			HttpSessionTracker.cancelAll()
+			t1[HttpSessionTracker.currentSession()] = {}
+		end
+	}
+end
+
+return createHttpStore

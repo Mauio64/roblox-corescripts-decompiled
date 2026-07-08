@@ -1,26 +1,27 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GraphQLServer");
-local v1 = require(l_script_FirstAncestor_0.graphql.connectors.AmpUpsellConnector);
+local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
+local AmpUpsellConnector = require(GraphQLServer.graphql.connectors.AmpUpsellConnector)
+
 return {
-    default = {
-        UpsellFeatureAccessResponse = {
-            featureAccess = function(v2) --[[ Line: 7 ]] --[[ Name: featureAccess ]]
-                return {
-                    featureName = v2.featureName, 
-                    access = v2.access, 
-                    recourse = v2.recourse, 
-                    recourses = v2.recourses
-                };
-            end
-        }, 
-        Query = {
-            getFeatureAccess = function(_, v4, v5) --[[ Line: 18 ]] --[[ Name: getFeatureAccess ]]
-                -- upvalues: v1 (copy)
-                return v1.getFeatureAccessFromFeatureNamesList(v4.featureNames, v5.fetchImpl);
-            end, 
-            getUpsellFeatureAccess = function(_, v7, v8) --[[ Line: 21 ]] --[[ Name: getUpsellFeatureAccess ]]
-                -- upvalues: v1 (copy)
-                return v1.getUpsellFeatureAccessFromFeatureName(v7.featureName, v7.successfulActions, v8.fetchImpl, v7.nameSpace, v7.extraParameters);
-            end
-        }
-    }
-};
+	default = {
+		UpsellFeatureAccessResponse = {
+			featureAccess = function(p1) -- line: 7
+				return {
+					featureName = p1.featureName,
+					access = p1.access,
+					recourse = p1.recourse,
+					recourses = p1.recourses
+				}
+			end
+		},
+		Query = {
+			getFeatureAccess = function(_, p3, p4) -- line: 18
+				-- upvalues: AmpUpsellConnector (copy)
+				return AmpUpsellConnector.getFeatureAccessFromFeatureNamesList(p3.featureNames, p4.fetchImpl)
+			end,
+			getUpsellFeatureAccess = function(_, p6, p7) -- line: 21
+				-- upvalues: AmpUpsellConnector (copy)
+				return AmpUpsellConnector.getUpsellFeatureAccessFromFeatureName(p6.featureName, p6.successfulActions, p7.fetchImpl, p6.nameSpace, p6.extraParameters)
+			end
+		}
+	}
+}

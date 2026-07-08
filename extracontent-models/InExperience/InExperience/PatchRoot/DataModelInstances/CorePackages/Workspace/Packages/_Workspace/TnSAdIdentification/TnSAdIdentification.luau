@@ -1,3 +1,3 @@
 return {
-    AdIdentification = require(script.AdIdentification)
-};
+	AdIdentification = require(script.AdIdentification)
+}

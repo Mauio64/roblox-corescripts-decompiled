@@ -1,49 +1,59 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.assign);
-return function(v2, v3, v4) --[[ Line: 30 ]] --[[ Name: debounce ]]
-    -- upvalues: v1 (copy)
-    local v5 = {
-        leading = false, 
-        trailing = true
-    };
-    local v6 = v1(v5, v4);
-    local v7 = 0;
-    local v8 = nil;
-    local v9 = false;
-    local function v10() --[[ Line: 41 ]]
+local scriptParent = script.Parent
+local assign = require(scriptParent.assign)
 
-    end;
-    if v6.trailing then
-        v10 = function(v11, v12, ...) --[[ Line: 44 ]]
-            -- upvalues: v7 (ref), v9 (ref), v2 (copy)
-            if v7 == v11 then
-                v9 = false;
-                if not v12 then
-                    v2(...);
-                end;
-            end;
-        end;
-    elseif v6.leading then
-        v10 = function(v13) --[[ Line: 56 ]]
-            -- upvalues: v7 (ref), v9 (ref)
-            if v7 == v13 then
-                v9 = false;
-            end;
-        end;
-    end;
-    return function(...) --[[ Line: 63 ]]
-        -- upvalues: v7 (ref), v6 (copy), v9 (ref), v8 (ref), v2 (copy), v3 (copy), v10 (ref)
-        v7 = v7 + 1;
-        local l_v7_0 = v7;
-        local v15 = v6.leading and not v9;
-        if v8 then
-            task.cancel(v8);
-            v8 = nil;
-        end;
-        if v15 then
-            v9 = true;
-            v2(...);
-        end;
-        v8 = task.delay(v3, v10, l_v7_0, v15, ...);
-    end;
-end;
+local function debounce(p1, n1: number, t1: {[any]: any}?) -- line: 30
+	-- upvalues: assign (copy)
+	local t2 = {
+		leading = false,
+		trailing = true
+	}
+	local v8 = assign(t2, t1)
+	local n2 = 0
+	local u10 = nil
+	local u11 = false
+
+	local function u12() -- line: 41
+	end
+
+	if v8.trailing then
+		function u12(n3: number, b1: boolean, ...) -- line: 44
+			-- upvalues: n2 (ref), u11 (ref), p1 (copy)
+			if n3 == n2 then
+				u11 = false
+
+				if not b1 then
+					p1(...)
+				end
+			end
+		end
+	elseif v8.leading then
+		function u12(n4: number) -- line: 56
+			-- upvalues: n2 (ref), u11 (ref)
+			if n4 == n2 then
+				u11 = false
+			end
+		end
+	end
+
+	return function(...) -- line: 63
+		-- upvalues: n2 (ref), v8 (copy), u11 (ref), u10 (ref), p1 (copy), n1 (copy), u12 (ref)
+		n2 += 1
+
+		local v16 = n2
+		local v17 = v8.leading and not u11
+
+		if u10 then
+			task.cancel(u10)
+			u10 = nil
+		end
+
+		if v17 then
+			u11 = true
+			p1(...)
+		end
+
+		u10 = task.delay(n1, u12, v16, v17, ...)
+	end
+end
+
+return debounce

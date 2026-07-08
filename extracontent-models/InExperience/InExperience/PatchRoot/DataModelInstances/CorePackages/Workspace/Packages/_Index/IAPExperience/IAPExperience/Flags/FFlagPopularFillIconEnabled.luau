@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PopularFillIconEnabled", false);
+return game:DefineFastFlag("PopularFillIconEnabled", false)

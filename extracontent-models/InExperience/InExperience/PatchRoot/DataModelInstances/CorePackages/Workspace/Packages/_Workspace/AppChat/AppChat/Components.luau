@@ -1,7 +1,9 @@
-local v0 = require(script.Parent.Flags.getFFlagEnableModularExternalNavigationHandler);
+local getFFlagEnableModularExternalNavigationHandler = require(script.Parent.Flags.getFFlagEnableModularExternalNavigationHandler)
+
 return {
-    ChatConversation = require(script.ChatConversation), 
-    EventReceivers = require(script.EventReceivers), 
-    ExternalNavigationHandlerContainer = if v0() then require(script.ExternalNavigationHandler.Container) else nil, 
-    Cells = require(script.Cells)
-};
+	ChatConversation = require(script.ChatConversation),
+	EventReceivers = require(script.EventReceivers),
+	ExternalNavigationHandlerContainer = if not getFFlagEnableModularExternalNavigationHandler() then nil else require(script.ExternalNavigationHandler.Container),
+	Cells = require(script.Cells),
+	ChatLanding = require(script.ChatLanding)
+}

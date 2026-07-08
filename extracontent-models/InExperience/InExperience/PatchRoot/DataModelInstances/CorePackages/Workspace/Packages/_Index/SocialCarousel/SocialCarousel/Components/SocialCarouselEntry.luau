@@ -1,1 +1,1 @@
-return require(script.SocialCarouselEntry);
+return require(script.SocialCarouselEntry)

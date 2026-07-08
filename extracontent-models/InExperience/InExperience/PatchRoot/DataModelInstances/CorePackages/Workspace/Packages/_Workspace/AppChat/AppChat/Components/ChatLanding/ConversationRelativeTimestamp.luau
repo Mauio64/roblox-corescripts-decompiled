@@ -1,27 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatConversationListUnreadDot);
-return function(v5) --[[ Line: 14 ]] --[[ Name: ConversationRelativeTimestamp ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy)
-    local v6 = v4 and v5.hasUnreadMessages;
-    local v7 = not v4 and v5.hasUnreadMessages;
-    return v2.createElement(v3.View, {
-        tag = "row auto-xy align-y-center gap-xsmall"
-    }, {
-        timestamp = v2.createElement(v3.Text, {
-            tag = {
-                ["auto-xy"] = true, 
-                ["text-title-small content-emphasis"] = v7, 
-                ["text-body-small content-default"] = not v7
-            }, 
-            LayoutOrder = 1, 
-            Text = v5.timestampText
-        }), 
-        unreadDot = if v6 then v2.createElement(v3.View, {
-            tag = "size-200-200 radius-circle bg-action-emphasis", 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+local function ConversationRelativeTimestamp(t1: {[any]: any}) -- line: 12
+	-- upvalues: React (copy), Foundation (copy)
+	local hasUnreadMessages = t1.hasUnreadMessages
+
+	return React.createElement(Foundation.View, {
+		tag = "row auto-xy align-y-center gap-xsmall"
+	}, {
+		timestamp = React.createElement(Foundation.Text, {
+			tag = "auto-xy text-body-small content-default",
+			LayoutOrder = 1,
+			Text = t1.timestampText
+		}),
+		unreadDot = if not hasUnreadMessages then nil else React.createElement(Foundation.View, {
+			tag = "size-200-200 radius-circle bg-action-emphasis",
+			LayoutOrder = 2
+		})
+	})
+end
+
+return ConversationRelativeTimestamp

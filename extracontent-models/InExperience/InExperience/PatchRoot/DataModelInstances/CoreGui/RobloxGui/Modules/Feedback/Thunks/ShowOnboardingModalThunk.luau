@@ -1,9 +1,10 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Actions.ShowOnboardingModal);
-return function(v2) --[[ Line: 7 ]]
-    -- upvalues: v1 (copy)
-    return function(v3) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), v2 (copy)
-        v3:dispatch(v1(v2));
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ShowOnboardingModal = require(ParentParent.Actions.ShowOnboardingModal)
+
+return function(p1) -- line: 7
+	-- upvalues: ShowOnboardingModal (copy)
+	return function(p2) -- line: 8
+		-- upvalues: ShowOnboardingModal (copy), p1 (copy)
+		p2:dispatch(ShowOnboardingModal(p1))
+	end
+end

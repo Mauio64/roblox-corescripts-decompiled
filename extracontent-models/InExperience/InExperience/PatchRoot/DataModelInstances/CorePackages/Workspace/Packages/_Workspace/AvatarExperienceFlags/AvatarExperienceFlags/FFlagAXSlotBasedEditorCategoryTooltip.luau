@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSlotBasedEditorCategoryTooltip2", false);
+return game:DefineFastFlag("AXSlotBasedEditorCategoryTooltip2", false)

@@ -1,5 +1,5 @@
 return {
-    GetPropertyChangedSignal = function(v0, v1) --[[ Line: 2 ]] --[[ Name: GetPropertyChangedSignal ]]
-        return v0:GetPropertyChangedSignal(v1);
-    end
-};
+	GetPropertyChangedSignal = function(p1, s1: string) -- line: 2
+		return p1:GetPropertyChangedSignal(s1)
+	end
+}

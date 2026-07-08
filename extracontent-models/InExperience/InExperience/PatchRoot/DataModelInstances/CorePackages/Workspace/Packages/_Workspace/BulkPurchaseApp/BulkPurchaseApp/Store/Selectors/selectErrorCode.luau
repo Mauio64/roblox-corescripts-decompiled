@@ -1,6 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local _ = require(l_script_FirstAncestor_0.Enums.ErrorCodeEnum);
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-return function(v3) --[[ Line: 8 ]] --[[ Name: selectErrorCode ]]
-    return v3.errorCode;
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+
+require(BulkPurchaseApp.Enums.ErrorCodeEnum)
+require(BulkPurchaseApp.Store.Types)
+
+local function selectErrorCode(p1) -- line: 8
+	return p1.errorCode
+end
+
+return selectErrorCode

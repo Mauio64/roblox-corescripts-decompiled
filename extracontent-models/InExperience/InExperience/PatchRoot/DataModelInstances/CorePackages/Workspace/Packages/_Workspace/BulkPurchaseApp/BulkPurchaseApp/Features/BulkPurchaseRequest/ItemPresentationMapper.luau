@@ -1,93 +1,127 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.Style);
-local l_ItemCardThumbnail_0 = require(l_Parent_0.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail;
-local _ = require(l_Parent_0.AvatarExperienceCommon);
-local v6 = require(l_script_FirstAncestor_0.Enums.ItemStatusToItemStatusKey);
-local _ = require(script.Parent.BulkPurchaseRequestItem);
-local _ = require(script.Parent.BulkPurchaseRequestOwnedItem);
-local _ = require(script.Parent.BulkPurchaseRequestUnpurchasableItem);
-local function _(v10, v11) --[[ Line: 24 ]] --[[ Name: toCardPropsWithId ]]
-    local v12 = table.clone(v10);
-    v12.id = v11;
-    return v12;
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+
+require(BulkPurchaseAppParent.Style)
+
+local ItemCardThumbnail = require(BulkPurchaseAppParent.AvatarExperienceUIKit).ItemCardComponents.ItemCardThumbnail
+
+require(BulkPurchaseAppParent.AvatarExperienceCommon)
+
+local ItemStatusToItemStatusKey = require(BulkPurchaseApp.Enums.ItemStatusToItemStatusKey)
+local FFlagBulkPurchaseEnablePurchaseOptions = require(BulkPurchaseApp.Flags.FFlagBulkPurchaseEnablePurchaseOptions)
+
+require(script.Parent.BulkPurchaseRequestItem)
+require(script.Parent.BulkPurchaseRequestOwnedItem)
+require(script.Parent.BulkPurchaseRequestUnpurchasableItem)
+
+local function toCardPropsWithId(p1, s1: string) -- line: 36
+	local v10 = table.clone(p1)
+
+	v10.id = s1
+
+	return v10
+end
+
 return {
-    mapItemsToRowPresentation = function(v14) --[[ Line: 32 ]] --[[ Name: mapItemsToRowPresentation ]]
-        -- upvalues: v2 (copy), l_ItemCardThumbnail_0 (copy)
-        local v15 = {};
-        for _, v17 in v14 do
-            local v18 = {
-                type = "price", 
-                price = v17.cost
-            };
-            local v19 = {
-                presentationSlot = v2.createElement(l_ItemCardThumbnail_0, {
-                    url = v17.image
-                }), 
-                title = v17.name, 
-                priceLineContent = {
-                    v18
-                }
-            };
-            local l_id_0 = v17.id;
-            local v21 = table.clone(v19);
-            v21.id = l_id_0;
-            table.insert(v15, v21);
-        end;
-        return v15;
-    end, 
-    mapOwnedItemsToRowPresentation = function(v22, v23, v24) --[[ Line: 48 ]] --[[ Name: mapOwnedItemsToRowPresentation ]]
-        -- upvalues: v2 (copy), l_ItemCardThumbnail_0 (copy)
-        local v25 = {};
-        for _, v27 in v22 do
-            local v28 = {
-                type = "text", 
-                text = v24.itemOwned:gsub("{.*}", (tostring(v27.ownedCount))), 
-                colorStyle = v23
-            };
-            local v29 = {
-                presentationSlot = v2.createElement(l_ItemCardThumbnail_0, {
-                    url = v27.image
-                }), 
-                title = v27.name, 
-                priceLineContent = {
-                    v28
-                }
-            };
-            local l_id_1 = v27.id;
-            local v31 = table.clone(v29);
-            v31.id = l_id_1;
-            table.insert(v25, v31);
-        end;
-        return v25;
-    end, 
-    mapUnpurchasableItemsToRowPresentation = function(v32, v33, v34, v35) --[[ Line: 70 ]] --[[ Name: mapUnpurchasableItemsToRowPresentation ]]
-        -- upvalues: v6 (copy), v2 (copy), l_ItemCardThumbnail_0 (copy)
-        local v36 = {};
-        for _, v38 in v32 do
-            local v39 = v33[v6[v38.status]];
-            local v40 = if v38.status == Enum.MarketplaceItemPurchaseStatus.Success then v34 else v35;
-            local v41 = {
-                type = "text", 
-                text = v39, 
-                colorStyle = v40
-            };
-            local v42 = {
-                presentationSlot = v2.createElement(l_ItemCardThumbnail_0, {
-                    url = v38.image
-                }), 
-                title = v38.name, 
-                priceLineContent = {
-                    v41
-                }
-            };
-            local l_id_2 = v38.id;
-            local v44 = table.clone(v42);
-            v44.id = l_id_2;
-            table.insert(v36, v44);
-        end;
-        return v36;
-    end
-};
+	mapItemsToRowPresentation = function(t1: {[any]: any}, t2: {[any]: any}?) -- line: 44
+		-- upvalues: FFlagBulkPurchaseEnablePurchaseOptions (copy), React (copy), ItemCardThumbnail (copy)
+		local t3 = {}
+
+		for _, v15 in t1 do
+			local t4 = {{
+				type = "price",
+				price = v15.cost
+			}}
+
+			if v15.originalPrice then
+				table.insert(t4, {
+					type = "price",
+					strikethrough = true,
+					price = v15.originalPrice
+				})
+			end
+
+			if FFlagBulkPurchaseEnablePurchaseOptions and t2 and v15.timedOptionDays and v15.timedOptionDays > 0 then
+				local timedOptionDays = v15.timedOptionDays
+				local v18 = t2:Format(timedOptionDays ~= 1 and "Feature.Durables.ItemDetails.WearTimeOptions.Button.XDays" or "Feature.Durables.ItemDetails.WearTimeOptions.Button.XDay", {
+					num = tostring(timedOptionDays)
+				})
+
+				table.insert(t4, {
+					type = "badge",
+					text = v18
+				})
+			end
+
+			local t5 = {
+				presentationSlot = React.createElement(ItemCardThumbnail, {
+					url = v15.image
+				}),
+				title = v15.name,
+				priceLineContent = t4
+			}
+			local id = v15.id
+			local v21 = table.clone(t5)
+
+			v21.id = id
+			table.insert(t3, v21)
+		end
+
+		return t3
+	end,
+	mapOwnedItemsToRowPresentation = function(t6: {[any]: any}, p2, t7: {[any]: any}) -- line: 76
+		-- upvalues: React (copy), ItemCardThumbnail (copy)
+		local t8 = {}
+
+		for _, v27 in t6 do
+			local t9 = {
+				type = "text",
+				text = t7.itemOwned:gsub("{.*}", (tostring(v27.ownedCount))),
+				colorStyle = p2
+			}
+			local t10 = {
+				presentationSlot = React.createElement(ItemCardThumbnail, {
+					url = v27.image
+				}),
+				title = v27.name,
+				priceLineContent = { t9 }
+			}
+			local id = v27.id
+			local v31 = table.clone(t10)
+
+			v31.id = id
+			table.insert(t8, v31)
+		end
+
+		return t8
+	end,
+	mapUnpurchasableItemsToRowPresentation = function(t11: {[any]: any}, t12: {[any]: any}, p3, p4) -- line: 98
+		-- upvalues: ItemStatusToItemStatusKey (copy), React (copy), ItemCardThumbnail (copy)
+		local t13 = {}
+
+		for _, v38 in t11 do
+			local v39 = t12[ItemStatusToItemStatusKey[v38.status]]
+			local v40 = if v38.status ~= Enum.MarketplaceItemPurchaseStatus.Success then p4 else p3
+			local t14 = {
+				type = "text",
+				text = v39,
+				colorStyle = v40
+			}
+			local t15 = {
+				presentationSlot = React.createElement(ItemCardThumbnail, {
+					url = v38.image
+				}),
+				title = v38.name,
+				priceLineContent = { t14 }
+			}
+			local id = v38.id
+			local v44 = table.clone(t15)
+
+			v44.id = id
+			table.insert(t13, v44)
+		end
+
+		return t13
+	end
+}

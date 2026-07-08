@@ -1,110 +1,139 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local l_naturalCompare_0 = require(script.Parent.naturalCompare).naturalCompare;
-local v3 = {};
-local function v16(v4, v5) --[[ Line: 34 ]] --[[ Name: suggestionList ]]
-    -- upvalues: v3 (copy), l_Object_0 (copy), l_naturalCompare_0 (copy)
-    local v6 = {};
-    local v7 = v3.new(v4);
-    local v8 = math.floor(v4:len() * 0.4) + 1;
-    for v9 = 1, #v5 do
-        local v10 = v5[v9];
-        local v11 = v7:measure(v10, v8);
-        if v11 ~= nil then
-            v6[v10] = v11;
-        end;
-    end;
-    local v12 = l_Object_0.keys(v6);
-    table.sort(v12, function(v13, v14) --[[ Line: 49 ]]
-        -- upvalues: v6 (copy), l_naturalCompare_0 (ref)
-        local v15 = v6[v13] - v6[v14];
-        if v15 ~= 0 then
-            return v15 < 0;
-        else
-            return l_naturalCompare_0(v13, v14) < 0;
-        end;
-    end);
-    return v12;
-end;
-local v17 = nil;
-v3.__index = v3;
-v3.new = function(v18) --[[ Line: 78 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), v17 (ref)
-    local v19 = setmetatable({}, v3);
-    v19._input = v18;
-    v19._inputLowerCase = v18:lower();
-    v19._inputArray = v17(v19._inputLowerCase);
-    local v20 = v18:len();
-    v19._rows = {
-        table.create(v20 + 1, 0), 
-        table.create(v20 + 1, 0), 
-        table.create(v20 + 1, 0)
-    };
-    return v19;
-end;
-v3.measure = function(v21, v22, v23) --[[ Line: 93 ]] --[[ Name: measure ]]
-    -- upvalues: v17 (ref)
-    if v21._input == v22 then
-        return 0;
-    else
-        local v24 = v22:lower();
-        if v21._inputLowerCase == v24 then
-            return 1;
-        else
-            local v25 = v17(v24);
-            local l__inputArray_0 = v21._inputArray;
-            if #v25 < #l__inputArray_0 then
-                local l_v25_0 = v25;
-                v25 = l__inputArray_0;
-                l__inputArray_0 = l_v25_0;
-            end;
-            local v28 = #v25;
-            local v29 = #l__inputArray_0;
-            if v23 < v28 - v29 then
-                return nil;
-            else
-                local l__rows_0 = v21._rows;
-                for v31 = 0, v29 do
-                    l__rows_0[1][v31 + 1] = v31;
-                end;
-                for v32 = 1, v28 do
-                    local v33 = l__rows_0[(v32 - 1) % 3 + 1];
-                    local v34 = l__rows_0[v32 % 3 + 1];
-                    v34[1] = v32;
-                    local l_v32_0 = v32;
-                    for v36 = 1, v29 do
-                        local v37 = v25[v32] == l__inputArray_0[v36] and 0 or 1;
-                        local v38 = math.min(v33[v36 + 1] + 1, v34[v36] + 1, v33[v36] + v37);
-                        if v32 > 1 and v36 > 1 and v25[v32] == l__inputArray_0[v36 - 1] and v25[v32 - 1] == l__inputArray_0[v36] then
-                            v38 = math.min(v38, l__rows_0[(v32 - 2) % 3 + 1][v36 - 1] + 1);
-                        end;
-                        if v38 < l_v32_0 then
-                            l_v32_0 = v38;
-                        end;
-                        v34[v36 + 1] = v38;
-                    end;
-                    if v23 < l_v32_0 then
-                        return nil;
-                    end;
-                end;
-                local v39 = l__rows_0[v28 % 3 + 1][v29 + 1];
-                if v39 <= v23 then
-                    return v39;
-                else
-                    return nil;
-                end;
-            end;
-        end;
-    end;
-end;
-v17 = function(v40) --[[ Line: 168 ]] --[[ Name: stringToArray ]]
-    local v41 = v40:len();
-    local v42 = {};
-    for v43 = 1, v41 do
-        v42[v43] = v40:byte(v43);
-    end;
-    return v42;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local naturalCompare = require(script.Parent.naturalCompare).naturalCompare
+local t1 = {}
+local stringToArray = nil
+
+t1.__index = t1
+
+function t1.new(s1: string) -- line: 78
+	-- upvalues: t1 (copy), stringToArray (ref)
+	local self = setmetatable({}, t1)
+
+	self._input = s1
+	self._inputLowerCase = s1:lower()
+	self._inputArray = stringToArray(self._inputLowerCase)
+
+	local v17 = s1:len()
+
+	self._rows = {
+		table.create(v17 + 1, 0),
+		table.create(v17 + 1, 0),
+		table.create(v17 + 1, 0)
+	}
+
+	return self
+end
+function t1.measure(t2: {[any]: any}, s2: string, n1: number) -- line: 93
+	-- upvalues: stringToArray (ref)
+	if s2 == t2._input then
+		return 0
+	end
+
+	local v21 = s2:lower()
+
+	if v21 == t2._inputLowerCase then
+		return 1
+	end
+
+	local v22 = stringToArray(v21)
+	local _inputArray = t2._inputArray
+
+	if #v22 < #_inputArray then
+		local v24 = _inputArray
+
+		_inputArray = v22
+		v22 = v24
+	end
+
+	local v25 = #v22
+	local v26 = #_inputArray
+
+	if n1 < v25 - v26 then
+		return nil
+	end
+
+	local _rows = t2._rows
+
+	for i = 0, v26 do
+		_rows[1][i + 1] = i
+	end
+
+	for i = 1, v25 do
+		local v30 = _rows[(i - 1) % 3 + 1]
+		local v31 = _rows[i % 3 + 1]
+
+		v31[1] = i
+
+		local v32 = i
+
+		for j = 1, v26 do
+			local v34 = v22[i] ~= _inputArray[j] and 1 or 0
+			local v35 = math.min(v30[j + 1] + 1, v31[j] + 1, v30[j] + v34)
+
+			if i > 1 and j > 1 and v22[i] == _inputArray[j - 1] and v22[i - 1] == _inputArray[j] then
+				v35 = math.min(v35, _rows[(i - 2) % 3 + 1][j - 1] + 1)
+			end
+
+			if v35 < v32 then
+				v32 = v35
+			end
+
+			v31[j + 1] = v35
+		end
+
+		if n1 < v32 then
+			return nil
+		end
+	end
+
+	local v36 = _rows[v25 % 3 + 1][v26 + 1]
+
+	if v36 <= n1 then
+		return v36
+	end
+
+	return nil
+end
+function stringToArray(s3: string) -- line: 168
+	local t3 = {}
+
+	for i = 1, s3:len() do
+		t3[i] = s3:byte(i)
+	end
+
+	return t3
+end
+
 return {
-    suggestionList = v16
-};
+	suggestionList = function(s4: string, p1) -- line: 34
+		-- upvalues: t1 (copy), Object (copy), naturalCompare (copy)
+		local t4 = {}
+		local v9 = t1.new(s4)
+		local v10 = math.floor(s4:len() * 0.4) + 1
+
+		for i = 1, #p1 do
+			local v12 = p1[i]
+			local v13 = v9:measure(v12, v10)
+
+			if v13 ~= nil then
+				t4[v12] = v13
+			end
+		end
+
+		local v14 = Object.keys(t4)
+
+		table.sort(v14, function(p2, p3) -- line: 49
+			-- upvalues: t4 (copy), naturalCompare (copy)
+			local v42 = t4[p2] - t4[p3]
+
+			if v42 ~= 0 then
+				return v42 < 0
+			end
+
+			return naturalCompare(p2, p3) < 0
+		end)
+
+		return v14
+	end
+}

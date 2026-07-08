@@ -9,6 +9,8 @@ local NetworkingPresence = require(ProfilePlatform.Networking.NetworkingPresence
 local myRoduxNetworking = require(ProfilePlatform.Networking.myRoduxNetworking)
 local IconName = require(ProfilePlatformParent.Foundation).Enums.IconName
 local NavigateDown = require(ProfilePlatformParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(ProfilePlatformParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v13 = if not FFlagSignalsNavP3Dispatch then nil else require(ProfilePlatformParent.RobloxAppNavigation).NavigationCommands
 local NetworkStatus = myRoduxNetworking.Enum.NetworkStatus
 local Enums = require(ProfilePlatform.Common.Enums)
 local useProfileActions = require(ProfilePlatform.Hooks.useProfileActions)
@@ -21,6 +23,7 @@ local FFlagEnableProfilePlatformDisabledReasonText = require(ProfilePlatform.Fla
 local FFlagProfilePlatformEnableUserProfileButtonsBacktest = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableUserProfileButtonsBacktest)
 local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
 local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
 local FFlagProfilePlatformEnableEditLook = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditLook)
 local FFlagProfilePlatformAddCurrentlyPlaying = require(ProfilePlatform.Flags.FFlagProfilePlatformAddCurrentlyPlaying)
 local FFlagProfilePlatformEnableUnlockChat = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableUnlockChat)
@@ -36,6 +39,7 @@ local t1 = {
 	[Enums.ProfileActions.UnlockChat] = not not FFlagProfilePlatformEnableUnlockChat or nil,
 	[Enums.ProfileActions.EditAlias] = true,
 	[Enums.ProfileActions.EditAppearance] = not not FFlagProfilePlatformEnableEditAppearanceMenu or nil,
+	[Enums.ProfileActions.EditBackground] = FFlagProfilePlatformEnableEditAppearanceMenu and not not FFlagProfilePlatformEditBackgroundMenuItem or nil,
 	[Enums.ProfileActions.EditAvatar] = true,
 	[Enums.ProfileActions.EditLook] = not not FFlagProfilePlatformEnableEditLook or nil,
 	[Enums.ProfileActions.EditProfile] = true,
@@ -52,10 +56,10 @@ local t1 = {
 	[Enums.ProfileActions.CurrencyTransfer] = not not FFlagProfilePlatformEnableCurrencyTransfer or nil
 }
 
-function isJoinExperience(p1) -- line: 77
+function isJoinExperience(p1) -- line: 87
 	-- upvalues: Enums (copy)
-	for _, v31 in p1 do
-		if v31.type == Enums.ProfileActions.JoinExperience then
+	for _, v34 in p1 do
+		if v34.type == Enums.ProfileActions.JoinExperience then
 			return true
 		end
 	end
@@ -63,90 +67,96 @@ function isJoinExperience(p1) -- line: 77
 	return false
 end
 
-return function(s1: string) -- line: 86
-	-- upvalues: useDispatch (copy), useProfileJsonComponent (copy), Enums (copy), useSelector (copy), NetworkingPresence (copy), NetworkStatus (copy), useProfileActions (copy), FFlagProfilePlatformAddCurrentlyPlaying (copy), React (copy), useEffectOnce (copy), FFlagProfilePlatformEnableUserProfileButtonsBacktest (copy), Dash (copy), t1 (copy), FFlagProfilePlatformEnableEditAppearanceMenu (copy), FFlagEnableProfilePlatformDisabledActions (copy), FFlagEnableCommunityVerificationModal (copy), FFlagPortEnableCommunityVerificationModal (copy), IconName (copy), NavigateDown (copy), FFlagEnableProfilePlatformDisabledReasonText (copy)
-	local v33 = useDispatch()
-	local v34 = useProfileJsonComponent(Enums.Components.Actions) or {}
-	local v35 = useSelector(function(p2) -- line: 90
+return function(s1: string) -- line: 96
+	-- upvalues: useDispatch (copy), useProfileJsonComponent (copy), Enums (copy), useSelector (copy), NetworkingPresence (copy), NetworkStatus (copy), useProfileActions (copy), FFlagProfilePlatformAddCurrentlyPlaying (copy), React (copy), useEffectOnce (copy), FFlagProfilePlatformEnableUserProfileButtonsBacktest (copy), Dash (copy), t1 (copy), FFlagProfilePlatformEnableEditAppearanceMenu (copy), FFlagEnableProfilePlatformDisabledActions (copy), FFlagEnableCommunityVerificationModal (copy), FFlagPortEnableCommunityVerificationModal (copy), IconName (copy), FFlagSignalsNavP3Dispatch (copy), v13 (copy), NavigateDown (copy), FFlagEnableProfilePlatformDisabledReasonText (copy)
+	local v36 = useDispatch()
+	local v37 = useProfileJsonComponent(Enums.Components.Actions) or {}
+	local v38 = useSelector(function(p2) -- line: 100
 		-- upvalues: NetworkingPresence (copy), s1 (copy), NetworkStatus (copy)
 		return NetworkingPresence.GetPresencesFromUserIds.getStatus(p2, s1) == NetworkStatus.NotStarted
 	end)
-	local v36 = useProfileActions(Enums.ButtonSurface.Actions)
+	local v39 = useProfileActions(Enums.ButtonSurface.Actions)
 	local t2 = {}
 	local t3 = {}
 	local t4 = {}
 
 	if FFlagProfilePlatformAddCurrentlyPlaying then
-		React.useEffect(function() -- line: 103
-			-- upvalues: v34 (copy), v33 (copy), NetworkingPresence (copy), s1 (copy)
-			if isJoinExperience(v34.buttons) then
-				v33(NetworkingPresence.GetPresencesFromUserIds.API({ s1 }))
+		React.useEffect(function() -- line: 113
+			-- upvalues: v37 (copy), v36 (copy), NetworkingPresence (copy), s1 (copy)
+			if isJoinExperience(v37.buttons) then
+				v36(NetworkingPresence.GetPresencesFromUserIds.API({ s1 }))
 			end
 		end, {
-			v34.buttons,
-			v33,
+			v37.buttons,
+			v36,
 			s1
 		})
 	else
-		useEffectOnce(function() -- line: 109
-			-- upvalues: v33 (copy), NetworkingPresence (copy), s1 (copy)
-			v33(NetworkingPresence.GetPresencesFromUserIds.API({ s1 }))
-		end, isJoinExperience(v34.buttons) and v35)
+		useEffectOnce(function() -- line: 119
+			-- upvalues: v36 (copy), NetworkingPresence (copy), s1 (copy)
+			v36(NetworkingPresence.GetPresencesFromUserIds.API({ s1 }))
+		end, isJoinExperience(v37.buttons) and v38)
 	end
 
-	local v40 = FFlagProfilePlatformEnableUserProfileButtonsBacktest and Dash.find(v34.buttons, function(p3) -- line: 115
+	local v43 = FFlagProfilePlatformEnableUserProfileButtonsBacktest and Dash.find(v37.buttons, function(p3) -- line: 125
 		-- upvalues: Enums (copy)
 		return p3.type == Enums.ProfileActions.JoinExperience
 	end)
 
-	for _, v in ipairs(v34.buttons) do
-		if not v40 or v.type == Enums.ProfileActions.JoinExperience or not t1[v.type] then
-			local v43 = v36[v.type]
+	for _, v in ipairs(v37.buttons) do
+		if not v43 or v.type == Enums.ProfileActions.JoinExperience or not t1[v.type] then
+			local v46 = v39[v.type]
 
 			if FFlagProfilePlatformEnableEditAppearanceMenu and v.subActions then
 				local t5 = {}
 
-				for _, v46 in v.subActions do
-					local v47 = v36[v46]
+				for _, v49 in v.subActions do
+					local v50 = v39[v49]
 
-					if v47 then
+					if v50 then
 						table.insert(t5, {
-							id = v46,
-							text = v47.text,
-							icon = v47.icon,
-							onActivated = v47.onActivated
+							id = v49,
+							text = v50.text,
+							icon = v50.icon,
+							onActivated = v50.onActivated
 						})
 					end
 				end
 
 				if #t5 > 0 then
-					v43.menuItems = t5
+					v46.menuItems = t5
 				end
 			end
 
 			if FFlagEnableProfilePlatformDisabledActions and v.disabledReason then
 				if FFlagEnableCommunityVerificationModal and v.type == Enums.ProfileActions.JoinCommunity and (v.disabledReason == Enums.DisabledReasons.InsufficientVerificationLevelLow or v.disabledReason == Enums.DisabledReasons.InsufficientVerificationLevelMedium or v.disabledReason == Enums.DisabledReasons.InsufficientVerificationLevelHigh) then
-					v43.icon = if not FFlagEnableCommunityVerificationModal or not FFlagPortEnableCommunityVerificationModal then nil else IconName.LockClosed
+					v46.icon = if not FFlagEnableCommunityVerificationModal or not FFlagPortEnableCommunityVerificationModal then nil else IconName.LockClosed
 
-					function v43.onActivated() -- line: 164
-						-- upvalues: v33 (copy), NavigateDown (copy), Enums (copy), v (copy)
-						return v33(NavigateDown({
+					function v46.onActivated() -- line: 174
+						-- upvalues: Enums (copy), v (copy), FFlagSignalsNavP3Dispatch (copy), v13 (copy), v36 (copy), NavigateDown (copy)
+						local t6 = {
 							name = Enums.Screens.CommunityVerificationModal,
 							extraProps = {
 								disabledReason = v.disabledReason
 							}
-						}))
+						}
+
+						if FFlagSignalsNavP3Dispatch then
+							return v13.down(v13.fromLegacyPage(t6))
+						end
+
+						return v36(NavigateDown(t6))
 					end
 				else
-					v43.isDisabled = true
-					v43.disabledReason = if not FFlagEnableProfilePlatformDisabledReasonText then nil else v.disabledReason
+					v46.isDisabled = true
+					v46.disabledReason = if not FFlagEnableProfilePlatformDisabledReasonText then nil else v.disabledReason
 				end
 			end
 
 			if t1[v.type] then
-				table.insert(t3, v43)
+				table.insert(t3, v46)
 			else
-				table.insert(t4, v43)
+				table.insert(t4, v46)
 			end
 		end
 	end
@@ -159,5 +169,5 @@ return function(s1: string) -- line: 86
 		t2.secondary = t4
 	end
 
-	return t2, not not v34.contextual
+	return t2, not not v37.contextual
 end

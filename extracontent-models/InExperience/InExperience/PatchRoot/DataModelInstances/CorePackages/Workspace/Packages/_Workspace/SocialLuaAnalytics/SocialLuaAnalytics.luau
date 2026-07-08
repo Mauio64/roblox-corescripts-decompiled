@@ -1,15 +1,17 @@
-local _ = require(script.Analytics.Types);
-local _ = require(script.Analytics.Enums.Contexts);
-local _ = require(script.Analytics.Enums.PlatformSpecificity);
-local v3 = require(script.Telemetry.telemetryNewConfig);
-local v4 = require(script.Performance);
+require(script.Analytics.Types)
+require(script.Analytics.Enums.Contexts)
+require(script.Analytics.Enums.PlatformSpecificity)
+
+local telemetryNewConfig = require(script.Telemetry.telemetryNewConfig)
+local Performance = require(script.Performance)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    Analytics = require(script.Analytics), 
-    TestingAnalytics = require(script.TestingAnalytics), 
-    Performance = v4, 
-    Telemetry = {
-        new = v3, 
-        createEmitter = require(script.Telemetry.telemetryCreateEmitter)
-    }
-};
+	["jest.config"] = script["jest.config"],
+	Analytics = require(script.Analytics),
+	TestingAnalytics = require(script.TestingAnalytics),
+	Performance = Performance,
+	Telemetry = {
+		new = telemetryNewConfig,
+		createEmitter = require(script.Telemetry.telemetryCreateEmitter)
+	}
+}

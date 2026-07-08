@@ -1,30 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local v2 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v3 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local _ = require(l_script_FirstAncestor_0.Models.GetRobloxSubscriptionProductsModel);
-local v5 = require(l_script_FirstAncestor_0.Actions.finalizeRobloxSubscriptionUpsellFlow);
-local l_game_EngineFeature_0 = game:GetEngineFeature("EnablePromptSignalRobloxSubscriptionPurchaseFinished");
-return function() --[[ Line: 15 ]] --[[ Name: completeRobloxSubscriptionUpsellFlow ]]
-    -- upvalues: v2 (copy), v3 (copy), v5 (copy), l_game_EngineFeature_0 (copy), l_MarketplaceService_0 (copy)
-    local v7 = v2.get();
-    local v8 = v7.getDidTryPurchasing();
-    local v9 = v7.getRobloxSubscriptionProductId();
-    local l_skipWaitingForPurchaseResult_0 = v7.getPurchaseFlowOptions().skipWaitingForPurchaseResult;
-    if v7.getPromptState() == v3.Error then
-        v5(false);
-        return;
-    else
-        v7.setPromptState(v3.SubscriptionPurchaseCompleted);
-        if l_game_EngineFeature_0 then
-            l_MarketplaceService_0:signalPromptRobloxSubscriptionPurchaseFinished(v9, v8);
-        end;
-        if l_skipWaitingForPurchaseResult_0 or not v8 then
-            v5(false);
-            return;
-        else
-            v7.setPromptState(v3.SubscriptionStatusPolling);
-            return;
-        end;
-    end;
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local MarketplaceService = game:GetService("MarketplaceService")
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local PromptState = require(RobloxSubscriptionPurchaseApp.Enums.PromptState)
+
+require(RobloxSubscriptionPurchaseApp.Models.GetRobloxSubscriptionProductsModel)
+
+local finalizeRobloxSubscriptionUpsellFlow = require(RobloxSubscriptionPurchaseApp.Actions.finalizeRobloxSubscriptionUpsellFlow)
+local FFlagFixSignalFinishedOnError = require(RobloxSubscriptionPurchaseApp.Flags.FFlagFixSignalFinishedOnError)
+local EngineFeature = game:GetEngineFeature("EnablePromptSignalRobloxSubscriptionPurchaseFinished")
+
+local function completeRobloxSubscriptionUpsellFlow() -- line: 16
+	-- upvalues: RobloxSubscriptionStore (copy), PromptState (copy), FFlagFixSignalFinishedOnError (copy), EngineFeature (copy), MarketplaceService (copy), finalizeRobloxSubscriptionUpsellFlow (copy)
+	local v9 = RobloxSubscriptionStore.get()
+	local v10 = v9.getDidTryPurchasing()
+	local v11 = v9.getRobloxSubscriptionProductId()
+	local skipWaitingForPurchaseResult = v9.getPurchaseFlowOptions().skipWaitingForPurchaseResult
+	local v13 = v9.getPromptState()
+
+	if v13 == PromptState.Error or v13 == PromptState.SubscriptionStatusPolling then
+		if v13 == PromptState.Error and FFlagFixSignalFinishedOnError and EngineFeature then
+			MarketplaceService:signalPromptRobloxSubscriptionPurchaseFinished(v11, v10)
+		end
+
+		finalizeRobloxSubscriptionUpsellFlow(false)
+
+		return
+	end
+
+	v9.setPromptState(PromptState.SubscriptionPurchaseCompleted)
+
+	if EngineFeature then
+		MarketplaceService:signalPromptRobloxSubscriptionPurchaseFinished(v11, v10)
+	end
+
+	if skipWaitingForPurchaseResult or not v10 then
+		finalizeRobloxSubscriptionUpsellFlow(false)
+
+		return
+	end
+
+	v9.setPromptState(PromptState.SubscriptionStatusPolling)
+end
+
+return completeRobloxSubscriptionUpsellFlow

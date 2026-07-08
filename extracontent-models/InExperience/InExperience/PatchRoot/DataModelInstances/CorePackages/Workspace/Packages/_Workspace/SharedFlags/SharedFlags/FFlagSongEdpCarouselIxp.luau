@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FFlagSongEdpCarouselIxp2", false);
+return game:DefineFastFlag("FFlagSongEdpCarouselIxp2", false)

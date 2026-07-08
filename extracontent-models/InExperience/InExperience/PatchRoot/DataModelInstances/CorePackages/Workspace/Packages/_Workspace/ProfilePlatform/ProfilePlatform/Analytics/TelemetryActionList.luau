@@ -1,718 +1,680 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_SupportedTelemetryBackends_0 = require(l_Parent_0.SocialLuaAnalytics).Analytics.Enums.SupportedTelemetryBackends;
-local v3 = require(script.Parent.EventNames);
-local l_FFlagProfilePlatformEnableStore_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableStore;
-local l_FFlagEnablePlatformProfileContextualMenuOption_0 = require(l_Parent_0.SharedFlags).FFlagEnablePlatformProfileContextualMenuOption;
-local v6 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformUseCatalogItemOpenedNewFields);
-local l_FFlagTCShareLinkSenderUI_0 = require(l_Parent_0.SharedFlags).FFlagTCShareLinkSenderUI;
-local l_FFlagProfilePlatformEnableCurrencyTransfer_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local SupportedTelemetryBackends = require(ProfilePlatformParent.SocialLuaAnalytics).Analytics.Enums.SupportedTelemetryBackends
+local EventNames = require(script.Parent.EventNames)
+local FFlagProfilePlatformEnableStore = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableStore
+local FFlagEnablePlatformProfileContextualMenuOption = require(ProfilePlatformParent.SharedFlags).FFlagEnablePlatformProfileContextualMenuOption
+local FFlagProfilePlatformUseCatalogItemOpenedNewFields = require(ProfilePlatform.Flags.FFlagProfilePlatformUseCatalogItemOpenedNewFields)
+local FFlagProfilePlatformEnableCurrencyTransfer = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableCurrencyTransfer
+local FFlagProfilePlatformEnableEditAppearanceMenu = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceMenu)
+local FFlagProfilePlatformEditBackgroundMenuItem = require(ProfilePlatform.Flags.FFlagProfilePlatformEditBackgroundMenuItem)
+local FFlagProfilePlatformEnableEditAppearanceAnalytics = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableEditAppearanceAnalytics)
+
 return {
-    defaults = {
-        throttlingThousandths = game:DefineFastInt("ProfilePlatformAnalyticsThrottlingThousandths", 1000), 
-        links = ""
-    }, 
-    [v3.ProfileLoadingStage] = {
-        description = "Stage of loading profile", 
-        lastUpdated = {
-            24, 
-            6, 
-            6
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = {
-                    status = function(v9) --[[ Line: 30 ]] --[[ Name: status ]]
-                        return v9;
-                    end
-                }
-            }, 
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryStat, 
-                overrideName = function(v10) --[[ Line: 37 ]] --[[ Name: overrideName ]]
-                    -- upvalues: v3 (copy)
-                    return v3.ProfileLoadingStage .. "Time" .. v10.status;
-                end, 
-                dynamicCustomFields = {
-                    status = function(v11) --[[ Line: 41 ]] --[[ Name: status ]]
-                        return v11;
-                    end, 
-                    isProfilePlatform = function(v12) --[[ Line: 44 ]] --[[ Name: isProfilePlatform ]]
-                        return v12 or false;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.ProfilePlatformPageReloaded] = {
-        description = "ReloadedProfilePlatform", 
-        lastUpdated = {
-            25, 
-            4, 
-            25
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = {
-                    reloadCount = function(v13) --[[ Line: 58 ]] --[[ Name: reloadCount ]]
-                        if v13 <= 10 then
-                            return (("ReloadCount$%*"):format(v13));
-                        else
-                            return "ReloadCount5+";
-                        end;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.ProfileInExperienceUserLoadingStage] = {
-        description = "User in experience opened", 
-        lastUpdated = {
-            24, 
-            6, 
-            10
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryStat, 
-                dynamicCustomFields = {
-                    status = function(v14) --[[ Line: 78 ]] --[[ Name: status ]]
-                        return v14;
-                    end, 
-                    isInExperience = function(v15) --[[ Line: 81 ]] --[[ Name: isInExperience ]]
-                        return v15;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.ProfilePageLoadedWithData] = {
-        description = "Profile page loaded with data", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = {
-                    friendStatus = function(v16) --[[ Line: 95 ]] --[[ Name: friendStatus ]]
-                        return v16;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.ProfilePresenceLoaded] = {
-        description = "Profile presence loaded", 
-        lastUpdated = {
-            25, 
-            2, 
-            19
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = {
-                    presenceType = function(v17) --[[ Line: 109 ]] --[[ Name: presenceType ]]
-                        return v17;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonChat] = {
-        description = "Chat button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonIgnoreFriendRequest] = {
-        description = "Ignore friend request button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonReport] = {
-        description = "Report button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonUnfriend] = {
-        description = "Unfriend button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonBlock] = {
-        description = "Block button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonSetAlias] = {
-        description = "Set alias button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonCopyLink] = {
-        description = "Copy Link button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonLeaveCommunity] = {
-        description = "Leave Community button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonMakePrimaryCommunity] = {
-        description = "Make Primary Community button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonRemovePrimaryCommunity] = {
-        description = "Remove Primary Community button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonRemoveTrustedConnection] = {
-        description = "Remove Trusted Connection button clicked", 
-        lastUpdated = {
-            25, 
-            6, 
-            16
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonAddTrustedConnection] = {
-        description = "Add Trusted Connection button clicked", 
-        lastUpdated = {
-            25, 
-            9, 
-            17
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = if l_FFlagTCShareLinkSenderUI_0 then {
-                    modalVariantOverride = function(v18) --[[ Line: 223 ]] --[[ Name: modalVariantOverride ]]
-                        return v18;
-                    end
-                } else nil
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonAddIncomingTrustedConnection] = {
-        description = "Accept Trusted Connection button clicked", 
-        lastUpdated = {
-            25, 
-            9, 
-            17
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonOpenEditProfilePage] = {
-        description = "Open edit profile page button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonChat] = {
-        description = "Chat button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonUnfriend] = {
-        description = "Unfriend button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonUnblock] = {
-        description = "Unblock button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonAddFriend] = {
-        description = "Add friend button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonAddFriendFromContacts] = {
-        description = "Add friend from contacts clicked", 
-        lastUpdated = {
-            24, 
-            9, 
-            12
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonAcceptFriendRequest] = {
-        description = "Accept friend request button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonEditAvatar] = {
-        description = "Edit avatar button clicked", 
-        lastUpdated = {
-            25, 
-            9, 
-            17
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonEditLook] = {
-        description = "Edit look button clicked", 
-        lastUpdated = {
-            26, 
-            3, 
-            18
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonShareProfile] = {
-        description = "Share profile button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            12
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonShareProfileQRCode] = {
-        description = "Share profile QR code button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonJoinCommunity] = {
-        description = "Join Community button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonViewCommunity] = {
-        description = "View Community button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CTAButtonCancelJoinCommunityRequest] = {
-        description = "Cancel Join Community Request button clicked", 
-        lastUpdated = {
-            25, 
-            3, 
-            4
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.FriendsButton] = {
-        description = "Friends button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.FollowersButton] = {
-        description = "Followers button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.FollowingsButton] = {
-        description = "Following button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.MutualFriendsButton] = {
-        description = "Mutual friends button clicked", 
-        lastUpdated = {
-            25, 
-            8, 
-            19
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ViewPlayerProfileButton] = {
-        description = "View player profile button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButton] = {
-        description = "Contextual menu button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.GameDetailsButton] = {
-        description = "Game details button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.EditDisplayNameButton] = {
-        description = "Edit display name button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.SetAliasButton] = {
-        description = "Set alias button clicked", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ProfileClosed] = {
-        description = "Profile closed", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryStat
-            }
-        }
-    }, 
-    [v3.StoreHeaderButton] = {
-        description = "Store header button clicked", 
-        lastUpdated = {
-            25, 
-            4, 
-            23
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.CatalogItemOpened] = {
-        description = "Catalog item opened", 
-        lastUpdated = {
-            24, 
-            7, 
-            31
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryStat, 
-                dynamicCustomFields = if l_FFlagProfilePlatformEnableStore_0 then if v6 then {
-                    btnContext = function(v19) --[[ Line: 474 ]] --[[ Name: btnContext ]]
-                        return v19;
-                    end
-                } else {
-                    source = function(v20) --[[ Line: 479 ]] --[[ Name: source ]]
-                        return v20;
-                    end
-                } else nil
-            }
-        }
-    }, 
-    [v3.ProfileImpressionsSent] = {
-        description = "Impressions sent", 
-        lastUpdated = {
-            25, 
-            2, 
-            24
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter, 
-                dynamicCustomFields = {
-                    component = function(v21) --[[ Line: 494 ]] --[[ Name: component ]]
-                        return v21;
-                    end
-                }
-            }
-        }
-    }, 
-    [v3.UsernameCopied] = {
-        description = "Username copied to clipboard", 
-        lastUpdated = {
-            25, 
-            8, 
-            5
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    }, 
-    [v3.ContextualMenuButtonViewPlatformProfile] = if l_FFlagEnablePlatformProfileContextualMenuOption_0 then {
-        description = "View platform profile button clicked", 
-        lastUpdated = {
-            25, 
-            9, 
-            11
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    } else nil, 
-    [v3.ContextualMenuButtonCurrencyTransfer] = if l_FFlagProfilePlatformEnableCurrencyTransfer_0 then {
-        description = "Currency transfer button clicked from contextual menu", 
-        lastUpdated = {
-            26, 
-            3, 
-            24
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    } else nil, 
-    [v3.CTAButtonCurrencyTransfer] = if l_FFlagProfilePlatformEnableCurrencyTransfer_0 then {
-        description = "Currency transfer CTA button clicked", 
-        lastUpdated = {
-            26, 
-            3, 
-            24
-        }, 
-        backendsList = {
-            {
-                type = l_SupportedTelemetryBackends_0.RobloxTelemetryCounter
-            }
-        }
-    } else nil
-};
+	defaults = {
+		links = "",
+		throttlingThousandths = game:DefineFastInt("ProfilePlatformAnalyticsThrottlingThousandths", 1000)
+	},
+	[EventNames.ProfileLoadingStage] = {
+		description = "Stage of loading profile",
+		lastUpdated = {
+			24,
+			6,
+			6
+		},
+		backendsList = {
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+				dynamicCustomFields = {
+					status = function(p1) -- line: 35
+						return p1
+					end
+				}
+			},
+			{
+				type = SupportedTelemetryBackends.RobloxTelemetryStat,
+				overrideName = function(p2) -- line: 42
+					-- upvalues: EventNames (copy)
+					return EventNames.ProfileLoadingStage .. "Time" .. p2.status
+				end,
+				dynamicCustomFields = {
+					status = function(p3) -- line: 46
+						return p3
+					end,
+					isProfilePlatform = function(p4) -- line: 49
+						return p4 or false
+					end
+				}
+			}
+		}
+	},
+	[EventNames.ProfilePlatformPageReloaded] = {
+		description = "ReloadedProfilePlatform",
+		lastUpdated = {
+			25,
+			4,
+			25
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+			dynamicCustomFields = {
+				reloadCount = function(p5) -- line: 63
+					if p5 <= 10 then
+						return `ReloadCount${ p5 }`
+					end
+
+					return "ReloadCount5+"
+				end
+			}
+		}}
+	},
+	[EventNames.ProfileInExperienceUserLoadingStage] = {
+		description = "User in experience opened",
+		lastUpdated = {
+			24,
+			6,
+			10
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryStat,
+			dynamicCustomFields = {
+				status = function(p6) -- line: 83
+					return p6
+				end,
+				isInExperience = function(p7) -- line: 86
+					return p7
+				end
+			}
+		}}
+	},
+	[EventNames.ProfilePageLoadedWithData] = {
+		description = "Profile page loaded with data",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+			dynamicCustomFields = {
+				friendStatus = function(p8) -- line: 100
+					return p8
+				end
+			}
+		}}
+	},
+	[EventNames.ProfilePresenceLoaded] = {
+		description = "Profile presence loaded",
+		lastUpdated = {
+			25,
+			2,
+			19
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+			dynamicCustomFields = {
+				presenceType = function(p9) -- line: 114
+					return p9
+				end
+			}
+		}}
+	},
+	[EventNames.ContextualMenuButtonChat] = {
+		description = "Chat button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonIgnoreFriendRequest] = {
+		description = "Ignore friend request button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonReport] = {
+		description = "Report button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonUnfriend] = {
+		description = "Unfriend button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonBlock] = {
+		description = "Block button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonSetAlias] = {
+		description = "Set alias button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonCopyLink] = {
+		description = "Copy Link button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonLeaveCommunity] = {
+		description = "Leave Community button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonMakePrimaryCommunity] = {
+		description = "Make Primary Community button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonRemovePrimaryCommunity] = {
+		description = "Remove Primary Community button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonRemoveTrustedConnection] = {
+		description = "Remove Trusted Connection button clicked",
+		lastUpdated = {
+			25,
+			6,
+			16
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonAddTrustedConnection] = {
+		description = "Add Trusted Connection button clicked",
+		lastUpdated = {
+			25,
+			9,
+			17
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+			dynamicCustomFields = {
+				modalVariantOverride = function(p10) -- line: 227
+					return p10
+				end
+			}
+		}}
+	},
+	[EventNames.ContextualMenuButtonAddIncomingTrustedConnection] = {
+		description = "Accept Trusted Connection button clicked",
+		lastUpdated = {
+			25,
+			9,
+			17
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonOpenEditProfilePage] = {
+		description = "Open edit profile page button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonChat] = {
+		description = "Chat button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonUnfriend] = {
+		description = "Unfriend button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonUnblock] = {
+		description = "Unblock button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonAddFriend] = {
+		description = "Add friend button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonAddFriendFromContacts] = {
+		description = "Add friend from contacts clicked",
+		lastUpdated = {
+			24,
+			9,
+			12
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonAcceptFriendRequest] = {
+		description = "Accept friend request button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonEditAvatar] = {
+		description = "Edit avatar button clicked",
+		lastUpdated = {
+			25,
+			9,
+			17
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonEditLook] = {
+		description = "Edit look button clicked",
+		lastUpdated = {
+			26,
+			3,
+			18
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonShareProfile] = {
+		description = "Share profile button clicked",
+		lastUpdated = {
+			25,
+			3,
+			12
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonShareProfileQRCode] = {
+		description = "Share profile QR code button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonJoinCommunity] = {
+		description = "Join Community button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonViewCommunity] = {
+		description = "View Community button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonCancelJoinCommunityRequest] = {
+		description = "Cancel Join Community Request button clicked",
+		lastUpdated = {
+			25,
+			3,
+			4
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.FriendsButton] = {
+		description = "Friends button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.FollowersButton] = {
+		description = "Followers button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.FollowingsButton] = {
+		description = "Following button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.MutualFriendsButton] = {
+		description = "Mutual friends button clicked",
+		lastUpdated = {
+			25,
+			8,
+			19
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ViewPlayerProfileButton] = {
+		description = "View player profile button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButton] = {
+		description = "Contextual menu button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.GameDetailsButton] = {
+		description = "Game details button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.EditDisplayNameButton] = {
+		description = "Edit display name button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.SetAliasButton] = {
+		description = "Set alias button clicked",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ProfileClosed] = {
+		description = "Profile closed",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryStat
+		}}
+	},
+	[EventNames.StoreHeaderButton] = {
+		description = "Store header button clicked",
+		lastUpdated = {
+			25,
+			4,
+			23
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CatalogItemOpened] = {
+		description = "Catalog item opened",
+		lastUpdated = {
+			24,
+			7,
+			31
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryStat,
+			dynamicCustomFields = if not FFlagProfilePlatformEnableStore then nil else if not FFlagProfilePlatformUseCatalogItemOpenedNewFields then {
+				source = function(p11) -- line: 482
+					return p11
+				end
+			} else {
+				btnContext = function(p12) -- line: 477
+					return p12
+				end
+			}
+		}}
+	},
+	[EventNames.ProfileImpressionsSent] = {
+		description = "Impressions sent",
+		lastUpdated = {
+			25,
+			2,
+			24
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter,
+			dynamicCustomFields = {
+				component = function(p13) -- line: 497
+					return p13
+				end
+			}
+		}}
+	},
+	[EventNames.UsernameCopied] = {
+		description = "Username copied to clipboard",
+		lastUpdated = {
+			25,
+			8,
+			5
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonViewPlatformProfile] = if not FFlagEnablePlatformProfileContextualMenuOption then nil else {
+		description = "View platform profile button clicked",
+		lastUpdated = {
+			25,
+			9,
+			11
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.ContextualMenuButtonCurrencyTransfer] = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else {
+		description = "Currency transfer button clicked from contextual menu",
+		lastUpdated = {
+			26,
+			3,
+			24
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonCurrencyTransfer] = if not FFlagProfilePlatformEnableCurrencyTransfer then nil else {
+		description = "Currency transfer CTA button clicked",
+		lastUpdated = {
+			26,
+			3,
+			24
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.CTAButtonEditAppearance] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+		description = "Edit appearance menu opened",
+		lastUpdated = {
+			26,
+			3,
+			30
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.EditAppearanceMenuEditAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+		description = "Edit avatar clicked from edit appearance menu",
+		lastUpdated = {
+			26,
+			3,
+			30
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.EditAppearanceMenuEditEmote] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+		description = "Edit emote clicked from edit appearance menu",
+		lastUpdated = {
+			26,
+			3,
+			30
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.EditAppearanceMenuSwitchAvatar] = if not FFlagProfilePlatformEnableEditAppearanceMenu or not FFlagProfilePlatformEnableEditAppearanceAnalytics then nil else {
+		description = "Switch avatar clicked from edit appearance menu",
+		lastUpdated = {
+			26,
+			3,
+			30
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	},
+	[EventNames.EditAppearanceMenuEditBackground] = if not FFlagProfilePlatformEnableEditAppearanceMenu or (not FFlagProfilePlatformEnableEditAppearanceAnalytics or not FFlagProfilePlatformEditBackgroundMenuItem) then nil else {
+		description = "Edit background clicked from edit appearance menu",
+		lastUpdated = {
+			26,
+			5,
+			14
+		},
+		backendsList = {{
+			type = SupportedTelemetryBackends.RobloxTelemetryCounter
+		}}
+	}
+}

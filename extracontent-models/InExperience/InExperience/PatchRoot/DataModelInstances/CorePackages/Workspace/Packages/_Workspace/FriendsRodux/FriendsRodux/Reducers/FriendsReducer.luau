@@ -1,46 +1,49 @@
-local v0 = require(script.Parent.Friends.byUserId);
-local v1 = require(script.Parent.Friends.countsByUserId);
-local v2 = require(script.Parent.Friends.requests);
-local v3 = require(script.Parent.Friends.recommendations);
-local v4 = require(script.Parent.Friends.followings);
-local v5 = require(script.Parent.Friends.friendshipStatus);
-local v6 = require(script.Parent.Friends.friendsRankByUserId);
-local v7 = require(script.Parent.Friends.contactNamesByUserId);
-local v8 = {
-    countsByUserId = {}, 
-    byUserId = {}, 
-    requests = {
-        receivedCount = 0, 
-        newFriendRequestsCount = 0
-    }, 
-    recommendations = {}, 
-    followings = {}, 
-    friendshipStatus = {}, 
-    friendsRankByUserId = {}, 
-    contactNamesByUserId = {}
-};
-return function(v9) --[[ Line: 24 ]]
-    -- upvalues: v0 (copy), v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy), v7 (copy), v8 (copy)
-    local v10 = v0(v9);
-    local v11 = v1(v9);
-    local v12 = v2(v9);
-    local v13 = v3(v9);
-    local v14 = v4(v9);
-    local v15 = v5(v9);
-    local v16 = v6(v9);
-    local v17 = v7(v9);
-    return function(v18, v19) --[[ Line: 34 ]]
-        -- upvalues: v8 (ref), v10 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v15 (copy), v16 (copy), v17 (copy)
-        local v20 = v18 or v8;
-        return {
-            byUserId = v10(v20.byUserId, v19), 
-            countsByUserId = v11(v20.countsByUserId, v19), 
-            requests = v12(v20.requests, v19), 
-            recommendations = v13(v20.recommendations, v19), 
-            followings = v14(v20.followings, v19), 
-            friendshipStatus = v15(v20.friendshipStatus, v19), 
-            friendsRankByUserId = v16(v20.friendsRankByUserId, v19), 
-            contactNamesByUserId = v17(v20.contactNamesByUserId, v19)
-        };
-    end;
-end;
+local byUserId = require(script.Parent.Friends.byUserId)
+local countsByUserId = require(script.Parent.Friends.countsByUserId)
+local requests = require(script.Parent.Friends.requests)
+local recommendations = require(script.Parent.Friends.recommendations)
+local followings = require(script.Parent.Friends.followings)
+local friendshipStatus = require(script.Parent.Friends.friendshipStatus)
+local friendsRankByUserId = require(script.Parent.Friends.friendsRankByUserId)
+local contactNamesByUserId = require(script.Parent.Friends.contactNamesByUserId)
+local t1 = {
+	countsByUserId = {},
+	byUserId = {},
+	requests = {
+		receivedCount = 0,
+		newFriendRequestsCount = 0
+	},
+	recommendations = {},
+	followings = {},
+	friendshipStatus = {},
+	friendsRankByUserId = {},
+	contactNamesByUserId = {}
+}
+
+return function(p1) -- line: 24
+	-- upvalues: byUserId (copy), countsByUserId (copy), requests (copy), recommendations (copy), followings (copy), friendshipStatus (copy), friendsRankByUserId (copy), contactNamesByUserId (copy), t1 (copy)
+	local v11 = byUserId(p1)
+	local v12 = countsByUserId(p1)
+	local v13 = requests(p1)
+	local v14 = recommendations(p1)
+	local v15 = followings(p1)
+	local v16 = friendshipStatus(p1)
+	local v17 = friendsRankByUserId(p1)
+	local v18 = contactNamesByUserId(p1)
+
+	return function(p2, p3) -- line: 34
+		-- upvalues: t1 (copy), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v15 (copy), v16 (copy), v17 (copy), v18 (copy)
+		local v21 = p2 or t1
+
+		return {
+			byUserId = v11(v21.byUserId, p3),
+			countsByUserId = v12(v21.countsByUserId, p3),
+			requests = v13(v21.requests, p3),
+			recommendations = v14(v21.recommendations, p3),
+			followings = v15(v21.followings, p3),
+			friendshipStatus = v16(v21.friendshipStatus, p3),
+			friendsRankByUserId = v17(v21.friendsRankByUserId, p3),
+			contactNamesByUserId = v18(v21.contactNamesByUserId, p3)
+		}
+	end
+end

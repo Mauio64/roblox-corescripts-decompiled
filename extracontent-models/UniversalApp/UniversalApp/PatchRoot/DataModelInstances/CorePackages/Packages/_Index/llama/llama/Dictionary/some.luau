@@ -1,10 +1,15 @@
-return function(v0, v1) --[[ Line: 2 ]] --[[ Name: some ]]
-    local v2 = type(v1);
-    assert(v2 == "function", "expected a function for second argument, got " .. v2);
-    for v3, v4 in pairs(v0) do
-        if v1(v4, v3) then
-            return true;
-        end;
-    end;
-    return false;
-end;
+local function some(p1, p2) -- line: 2
+	local v4 = type(p2)
+
+	assert(v4 == "function", "expected a function for second argument, got " .. v4)
+
+	for k, v in pairs(p1) do
+		if p2(v, k) then
+			return true
+		end
+	end
+
+	return false
+end
+
+return some

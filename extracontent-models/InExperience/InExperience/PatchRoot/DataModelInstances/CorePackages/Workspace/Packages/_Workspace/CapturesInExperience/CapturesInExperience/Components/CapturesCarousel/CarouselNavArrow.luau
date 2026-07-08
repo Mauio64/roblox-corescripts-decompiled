@@ -1,120 +1,127 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_RunService_0 = game:GetService("RunService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v4 = require(l_Parent_1.React);
-local v5 = require(l_Parent_1.RoactUtils);
-local v6 = require(l_Parent_1.SocialCommon);
-local v7 = require(l_Parent_1.UIBlox);
-local v8 = require(l_Parent_1.ReactUtils);
-local l_Images_0 = v7.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v7.Core.ImageSet.ImageSetLabel;
-local l_InputUtilities_0 = v6.Utils.InputUtilities;
-local l_useDispatch_0 = v5.Hooks.RoactRodux.useDispatch;
-local l_useEventConnection_0 = v8.useEventConnection;
-local l_useStyle_0 = v7.Core.Style.useStyle;
-local v15 = require(l_Parent_0.Thunks.CarouselNavigated);
-local v16 = require(l_Parent_0.Constants);
-local v17 = require(l_Parent_0.Analytics.EventNames);
-local v18 = require(l_Parent_0.Analytics.useAnalytics);
-local v19 = l_Images_0["icons/actions/cycleLeft"];
-local v20 = l_Images_0["icons/actions/cycleRight"];
-return function(v21) --[[ Line: 39 ]]
-    -- upvalues: v18 (copy), l_useDispatch_0 (copy), l_useStyle_0 (copy), v4 (copy), v16 (copy), v19 (copy), v20 (copy), l_InputUtilities_0 (copy), v17 (copy), v15 (copy), l_RunService_0 (copy), l_useEventConnection_0 (copy), l_UserInputService_0 (copy), l_ImageSetLabel_0 (copy)
-    local v22 = v18();
-    local v23 = l_useDispatch_0();
-    local v24 = l_useStyle_0();
-    local v25 = v4.useRef(nil);
-    local v26 = v21.direction == v16.CarouselDirection.Left;
-    local v27 = if v26 then Vector2.new(0, 0.5) else Vector2.new(1, 0.5);
-    local v28 = if v26 then v19 else v20;
-    local v29 = if v26 then UDim2.fromScale(0, 0.5) else UDim2.fromScale(1, 0.5);
-    v4.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v25 (copy)
-        return function() --[[ Line: 53 ]]
-            -- upvalues: v25 (ref)
-            if v25.current then
-                v25.current:Disconnect();
-                v25.current = nil;
-            end;
-        end;
-    end, {});
-    v4.useEffect(function() --[[ Line: 61 ]]
-        -- upvalues: v21 (copy), v25 (copy)
-        if v21.isDisabled and v25.current then
-            v25.current:Disconnect();
-            v25.current = nil;
-        end;
-    end, {
-        v21.isDisabled
-    });
-    local v35 = v4.useCallback(function(_, v31) --[[ Line: 68 ]]
-        -- upvalues: v21 (copy), l_InputUtilities_0 (ref), v25 (copy), v22 (copy), v17 (ref), v23 (copy), v15 (ref), l_RunService_0 (ref)
-        if v21.isDisabled then
-            return;
-        elseif v31.UserInputState ~= Enum.UserInputState.Begin then
-            return;
-        elseif not l_InputUtilities_0.isActivationInput(v31) then
-            return;
-        else
-            if v25.current then
-                v25.current:Disconnect();
-                v25.current = nil;
-            end;
-            v22.fireEvent(v17.CapturesCarouselNavigated, {
-                direction = v21.direction
-            });
-            v23(v15(v21.direction));
-            local v32 = tick();
-            local l_v32_0 = v32;
-            v25.current = l_RunService_0.RenderStepped:Connect(function(_) --[[ Line: 94 ]]
-                -- upvalues: l_v32_0 (copy), v32 (ref), v22 (ref), v17 (ref), v21 (ref), v23 (ref), v15 (ref)
-                if math.max(0.5 / (tick() - l_v32_0), 0.15) < tick() - v32 then
-                    v22.fireEvent(v17.CapturesCarouselNavigated, {
-                        direction = v21.direction
-                    });
-                    v23(v15(v21.direction));
-                    v32 = tick();
-                end;
-            end);
-            return;
-        end;
-    end, {
-        v21.isDisabled
-    });
-    local v38 = v4.useCallback(function(_, v37) --[[ Line: 108 ]]
-        -- upvalues: l_InputUtilities_0 (ref), v25 (copy)
-        if l_InputUtilities_0.isActivationInput(v37) and v25.current then
-            v25.current:Disconnect();
-            v25.current = nil;
-        end;
-    end, {});
-    l_useEventConnection_0(l_UserInputService_0.InputEnded, function(v39) --[[ Line: 117 ]]
-        -- upvalues: l_InputUtilities_0 (ref), v25 (copy)
-        if l_InputUtilities_0.isActivationInput(v39) and v25.current then
-            v25.current:Disconnect();
-            v25.current = nil;
-        end;
-    end);
-    return v4.createElement("TextButton", {
-        AnchorPoint = v27, 
-        BackgroundTransparency = 1, 
-        Position = v29, 
-        Size = v21.Size, 
-        Text = "", 
-        ZIndex = v21.ZIndex, 
-        Visible = not v21.isDisabled, 
-        [v4.Event.InputBegan] = v35, 
-        [v4.Event.InputEnded] = v38
-    }, {
-        Arrow = v4.createElement(l_ImageSetLabel_0, {
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Image = v28, 
-            ImageColor3 = v24.Theme.IconEmphasis.Color, 
-            ImageTransparency = v24.Theme.IconEmphasis.Transparency, 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            Size = UDim2.fromOffset(36, 36)
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local React = require(ParentParentParent.React)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local SocialCommon = require(ParentParentParent.SocialCommon)
+local UIBlox = require(ParentParentParent.UIBlox)
+local ReactUtils = require(ParentParentParent.ReactUtils)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local InputUtilities = SocialCommon.Utils.InputUtilities
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEventConnection = ReactUtils.useEventConnection
+local useStyle = UIBlox.Core.Style.useStyle
+local CarouselNavigated = require(ParentParent.Thunks.CarouselNavigated)
+local Constants = require(ParentParent.Constants)
+local EventNames = require(ParentParent.Analytics.EventNames)
+local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+local v20 = Images["icons/actions/cycleLeft"]
+local v21 = Images["icons/actions/cycleRight"]
+
+return function(t1: {[any]: any}) -- line: 39
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useStyle (copy), React (copy), Constants (copy), v20 (copy), v21 (copy), InputUtilities (copy), EventNames (copy), CarouselNavigated (copy), RunService (copy), useEventConnection (copy), UserInputService (copy), ImageSetLabel (copy)
+	local v23 = useAnalytics()
+	local v24 = useDispatch()
+	local v25 = useStyle()
+	local v26 = React.useRef(nil)
+	local v27 = t1.direction == Constants.CarouselDirection.Left
+	local v28 = if not v27 then Vector2.new(1, 0.5) else Vector2.new(0, 0.5)
+	local v29 = if not v27 then v21 else v20
+	local v30 = if not v27 then UDim2.fromScale(1, 0.5) else UDim2.fromScale(0, 0.5)
+
+	React.useEffect(function() -- line: 52
+		-- upvalues: v26 (copy)
+		return function() -- line: 53
+			-- upvalues: v26 (copy)
+			if v26.current then
+				v26.current:Disconnect()
+				v26.current = nil
+			end
+		end
+	end, {})
+	React.useEffect(function() -- line: 61
+		-- upvalues: t1 (copy), v26 (copy)
+		if t1.isDisabled and v26.current then
+			v26.current:Disconnect()
+			v26.current = nil
+		end
+	end, { t1.isDisabled })
+
+	local v31 = React.useCallback(function(_, p2) -- line: 68
+		-- upvalues: t1 (copy), InputUtilities (copy), v26 (copy), v23 (copy), EventNames (copy), v24 (copy), CarouselNavigated (copy), RunService (copy)
+		if t1.isDisabled then
+			return
+		end
+
+		if p2.UserInputState ~= Enum.UserInputState.Begin then
+			return
+		end
+
+		if not InputUtilities.isActivationInput(p2) then
+			return
+		end
+
+		if v26.current then
+			v26.current:Disconnect()
+			v26.current = nil
+		end
+
+		v23.fireEvent(EventNames.CapturesCarouselNavigated, {
+			direction = t1.direction
+		})
+		v24(CarouselNavigated(t1.direction))
+
+		local timestamp = tick()
+		local v36 = timestamp
+
+		v26.current = RunService.RenderStepped:Connect(function(_) -- line: 94
+			-- upvalues: v36 (copy), timestamp (ref), v23 (copy), EventNames (copy), t1 (copy), v24 (copy), CarouselNavigated (copy)
+			if math.max(0.5 / (tick() - v36), 0.15) < tick() - timestamp then
+				v23.fireEvent(EventNames.CapturesCarouselNavigated, {
+					direction = t1.direction
+				})
+				v24(CarouselNavigated(t1.direction))
+				timestamp = tick()
+			end
+		end)
+	end, { t1.isDisabled })
+	local v32 = React.useCallback(function(_, p5) -- line: 108
+		-- upvalues: InputUtilities (copy), v26 (copy)
+		if InputUtilities.isActivationInput(p5) and v26.current then
+			v26.current:Disconnect()
+			v26.current = nil
+		end
+	end, {})
+
+	useEventConnection(UserInputService.InputEnded, function(p6) -- line: 117
+		-- upvalues: InputUtilities (copy), v26 (copy)
+		if InputUtilities.isActivationInput(p6) and v26.current then
+			v26.current:Disconnect()
+			v26.current = nil
+		end
+	end)
+
+	return React.createElement("TextButton", {
+		AnchorPoint = v28,
+		BackgroundTransparency = 1,
+		Position = v30,
+		Size = t1.Size,
+		Text = "",
+		ZIndex = t1.ZIndex,
+		Visible = not t1.isDisabled,
+		[React.Event.InputBegan] = v31,
+		[React.Event.InputEnded] = v32
+	}, {
+		Arrow = React.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Image = v29,
+			ImageColor3 = v25.Theme.IconEmphasis.Color,
+			ImageTransparency = v25.Theme.IconEmphasis.Transparency,
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromOffset(36, 36)
+		})
+	})
+end

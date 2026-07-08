@@ -1,35 +1,42 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3) --[[ Line: 17 ]] --[[ Name: useAsync ]]
-    -- upvalues: v1 (copy)
-    local v4, v5 = v1.useState({
-        status = "loading"
-    });
-    v1.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: v5 (copy), v2 (copy)
-        v5({
-            status = "loading"
-        });
-        local v7 = task.spawn(function() --[[ Line: 27 ]]
-            -- upvalues: v5 (ref), v2 (ref)
-            xpcall(function() --[[ Line: 28 ]]
-                -- upvalues: v5 (ref), v2 (ref)
-                v5({
-                    status = "ok", 
-                    value = v2()
-                });
-            end, function(v6) --[[ Line: 33 ]]
-                -- upvalues: v5 (ref)
-                v5({
-                    status = "error", 
-                    problem = v6
-                });
-            end);
-        end);
-        return function() --[[ Line: 41 ]]
-            -- upvalues: v7 (copy)
-            task.cancel(v7);
-        end;
-    end, v3);
-    return v4;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useAsync(p1: ((...any) -> ...any), t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy)
+	local v6, v7 = React.useState({
+		status = "loading"
+	})
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: v7 (copy), p1 (copy)
+		v7({
+			status = "loading"
+		})
+
+		local thread = task.spawn(function() -- line: 27
+			-- upvalues: v7 (copy), p1 (copy)
+			xpcall(function() -- line: 28
+				-- upvalues: v7 (copy), p1 (copy)
+				v7({
+					status = "ok",
+					value = p1()
+				})
+			end, function(err) -- line: 33
+				-- upvalues: v7 (copy)
+				v7({
+					status = "error",
+					problem = err
+				})
+			end)
+		end)
+
+		return function() -- line: 41
+			-- upvalues: thread (copy)
+			task.cancel(thread)
+		end
+	end, t1)
+
+	return v6
+end
+
+return useAsync

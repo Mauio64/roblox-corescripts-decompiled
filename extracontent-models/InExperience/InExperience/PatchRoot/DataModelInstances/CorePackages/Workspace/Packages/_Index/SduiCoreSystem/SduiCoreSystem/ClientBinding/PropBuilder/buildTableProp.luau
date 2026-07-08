@@ -1,26 +1,38 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.Signals);
-local v3 = require(l_script_FirstAncestor_0.ClientBinding.SduiClientBindingBuilder);
-local l_PropResultCategory_0 = require(l_script_FirstAncestor_0.ClientBinding.SduiClientBindingTypes).PropResultCategory;
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.ClientBinding.SduiDataBindingContentType);
-local v7 = require(l_script_FirstAncestor_0.ClientBinding.PropBuilder.SduiPropUtils);
-local function v8(v9, v10, v11, v12, v13, v14, v15) --[[ Line: 18 ]] --[[ Name: buildTableProp ]]
-    -- upvalues: v7 (copy), v3 (copy), l_PropResultCategory_0 (copy), v8 (copy)
-    if v9 == "literal" then
-        return v7.generateTablePropSignalValue(v10, v11, v13, v14, v12, v3.buildPropTable, v15), l_PropResultCategory_0.PropSignal;
-    elseif v9 == "binding_path" then
-        local function v21(v16, v17) --[[ Line: 40 ]] --[[ Name: evaluatePropTable ]]
-            -- upvalues: v3 (ref), v11 (copy), v12 (copy), v13 (copy), v14 (copy), v7 (ref)
-            local v18, v19, v20 = v3.buildPropTable(v16, v11, v12, v13, v14);
-            return v7.resolveTablePropValue(v17, v18, v19, v20, v11, v13, v14, v12, v3.buildPropTable);
-        end;
-        return v7.generateDynamicBindingPropValue(v10, v11, v13, v12, v21), l_PropResultCategory_0.PropSignal;
-    elseif v9 == "conditional" then
-        return v7.generateConditionalPropValue(v10, v11, v13, v14, v12, v8, v15), l_PropResultCategory_0.PropSignal;
-    else
-        return nil, l_PropResultCategory_0.Failed;
-    end;
-end;
-return v8;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+
+require(SduiCoreSystemParent.Signals)
+
+local SduiClientBindingBuilder = require(SduiCoreSystem.ClientBinding.SduiClientBindingBuilder)
+local PropResultCategory = require(SduiCoreSystem.ClientBinding.SduiClientBindingTypes).PropResultCategory
+
+require(SduiCoreSystem.SduiBuilderTypes)
+require(SduiCoreSystem.ClientBinding.SduiDataBindingContentType)
+
+local SduiPropUtils = require(SduiCoreSystem.ClientBinding.PropBuilder.SduiPropUtils)
+
+local function buildTableProp(s1: string, p1, p2, p3, p4, p5, p6: ((...any) -> ...any)?) -- line: 18
+	-- upvalues: SduiPropUtils (copy), SduiClientBindingBuilder (copy), PropResultCategory (copy), buildTableProp (copy)
+	if s1 == "literal" then
+		return SduiPropUtils.generateTablePropSignalValue(p1, p2, p4, p5, p3, SduiClientBindingBuilder.buildPropTable, p6), PropResultCategory.PropSignal
+	end
+
+	if s1 == "binding_path" then
+		local function evaluatePropTable(t1: {[any]: any}, p7) -- line: 40
+			-- upvalues: SduiClientBindingBuilder (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy), SduiPropUtils (copy)
+			local v17, v18, v19 = SduiClientBindingBuilder.buildPropTable(t1, p2, p3, p4, p5)
+
+			return SduiPropUtils.resolveTablePropValue(p7, v17, v18, v19, p2, p4, p5, p3, SduiClientBindingBuilder.buildPropTable)
+		end
+
+		return SduiPropUtils.generateDynamicBindingPropValue(p1, p2, p4, p3, evaluatePropTable), PropResultCategory.PropSignal
+	end
+
+	if s1 == "conditional" then
+		return SduiPropUtils.generateConditionalPropValue(p1, p2, p4, p5, p3, buildTableProp, p6), PropResultCategory.PropSignal
+	end
+
+	return nil, PropResultCategory.Failed
+end
+
+return buildTableProp

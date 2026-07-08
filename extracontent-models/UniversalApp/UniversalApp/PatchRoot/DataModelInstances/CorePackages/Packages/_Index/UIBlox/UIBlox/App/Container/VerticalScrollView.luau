@@ -1,309 +1,334 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = script.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent.Parent;
-local v5 = require(l_Parent_2.Cryo);
-local v6 = require(l_Parent_2.Otter);
-local v7 = require(l_Parent_2.Roact);
-local v8 = require(l_Parent_2.t);
-local l_Focusable_0 = require(l_Parent_2.RoactGamepad).Focusable;
-local v10 = require(l_Parent_2.UIBlox.Core.Style.withStyle);
-local v11 = require(l_Parent_1.SelectionCursor.useCursorByType);
-local v12 = require(l_Parent_1.SelectionCursor.CursorType);
-local v13 = require(l_Parent_2.UIBlox.App.ImageSet.Images);
-local v14 = require(l_Parent_0.Enum.ScrollBarType);
-local v15 = require(script.Parent.ScrollBar);
-local v16 = {
-    frequency = 3, 
-    dampingRatio = 1.5
-};
-local v17 = v7.Component:extend("VerticalScrollView");
-v17.validateProps = v8.strictInterface({
-    size = v8.optional(v8.UDim2), 
-    position = v8.optional(v8.UDim2), 
-    layoutOrder = v8.optional(v8.number), 
-    elasticBehavior = v8.optional(v8.EnumItem), 
-    canvasSizeY = v8.optional(v8.UDim), 
-    automaticSize = v8.optional(v8.enum(Enum.AutomaticSize)), 
-    useAutomaticCanvasSize = v8.optional(v8.boolean), 
-    isGamepadFocusable = v8.optional(v8.boolean), 
-    scrollingEnabled = v8.optional(v8.boolean), 
-    selectable = v8.optional(v8.boolean), 
-    [v7.Change.CanvasPosition] = v8.optional(v8.callback), 
-    [v7.Change.CanvasSize] = v8.optional(v8.callback), 
-    scrollingFrameRef = v8.optional(v8.table), 
-    NextSelectionLeft = v8.optional(v8.table), 
-    NextSelectionRight = v8.optional(v8.table), 
-    NextSelectionUp = v8.optional(v8.table), 
-    NextSelectionDown = v8.optional(v8.table), 
-    [v7.Children] = v8.optional(v8.table), 
-    scrollBarType = v8.optional(v8.string), 
-    cursor = v8.table
-});
-v17.defaultProps = {
-    size = UDim2.new(1, 0, 1, 0), 
-    canvasSizeY = UDim.new(2, 0), 
-    automaticSize = Enum.AutomaticSize.None, 
-    useAutomaticCanvasSize = false, 
-    isGamepadFocusable = false, 
-    selectable = nil, 
-    scrollingEnabled = true, 
-    scrollBarType = v14.Compact
-};
-v17.init = function(v18) --[[ Line: 90 ]] --[[ Name: init ]]
-    -- upvalues: v7 (copy), v6 (copy), v16 (copy), l_UserInputService_0 (copy), l_RunService_0 (copy)
-    v18.parentFrameRef = v7.createRef();
-    v18.mainCanvasRef = v7.createRef();
-    local v19, v20 = v7.createBinding(0);
-    v18.scrollPosition = v19;
-    v18.updateScroll = v20;
-    v19, v20 = v7.createBinding(Vector2.new(0, 0));
-    v18.mainCanvasSize = v19;
-    v18.updateCanvasSize = v20;
-    v18:setState({
-        scrollingWithTouch = false
-    });
-    v19, v20 = v7.createBinding(1);
-    v18.scrollBarImageTransparency = v19;
-    v18.updateScrollBarImageTransparency = v20;
-    v18.scrollBarImageTransparencyMotor = v6.createSingleMotor(0);
-    v18.scrollBarImageTransparencyMotor:onStep(v18.updateScrollBarImageTransparency);
-    v18.lastTimeCanvasPositionChanged = tick();
-    v18.waitToHideSidebarConnection = nil;
-    v18.waitToHideSidebar = function() --[[ Line: 108 ]]
-        -- upvalues: v18 (copy), v6 (ref), v16 (ref)
-        if tick() - v18.lastTimeCanvasPositionChanged > 0.7 then
-            v18.scrollBarImageTransparencyMotor:setGoal(v6.spring(1, v16));
-            v18.disconnectWaitToHideSidebar();
-        end;
-    end;
-    v18.disconnectWaitToHideSidebar = function() --[[ Line: 116 ]]
-        -- upvalues: v18 (copy)
-        if v18.waitToHideSidebarConnection then
-            v18.waitToHideSidebarConnection:Disconnect();
-            v18.waitToHideSidebarConnection = nil;
-        end;
-    end;
-    v18.inputBegan = function(_, v22) --[[ Line: 122 ]]
-        -- upvalues: v18 (copy), v6 (ref)
-        if not v18.props.scrollingEnabled then
-            return;
-        else
-            if v22.UserInputType == Enum.UserInputType.MouseMovement then
-                v18.disconnectWaitToHideSidebar();
-                v18.scrollBarImageTransparencyMotor:setGoal(v6.instant(0));
-            end;
-            return;
-        end;
-    end;
-    v18.inputEnded = function(_, v24) --[[ Line: 132 ]]
-        -- upvalues: v18 (copy), v6 (ref)
-        if not v18.props.scrollingEnabled then
-            return;
-        else
-            if v24.UserInputType == Enum.UserInputType.MouseMovement then
-                v18.disconnectWaitToHideSidebar();
-                v18.scrollBarImageTransparencyMotor:setGoal(v6.instant(1));
-            end;
-            return;
-        end;
-    end;
-    v18.canvasPosition = function(v25) --[[ Line: 142 ]]
-        -- upvalues: v18 (copy), l_UserInputService_0 (ref), v6 (ref), l_RunService_0 (ref), v7 (ref)
-        v18.lastTimeCanvasPositionChanged = tick();
-        if not v18.waitToHideSidebarConnection and l_UserInputService_0:GetLastInputType() == Enum.UserInputType.Touch then
-            v18.scrollBarImageTransparencyMotor:setGoal(v6.instant(0));
-            v18.waitToHideSidebarConnection = l_RunService_0.Heartbeat:Connect(v18.waitToHideSidebar);
-        end;
-        v18.updateScroll(v25.CanvasPosition.Y);
-        if v18.props[v7.Change.CanvasPosition] then
-            v18.props[v7.Change.CanvasPosition](v25);
-        end;
-    end;
-    v18.onGamepadFocused = function() --[[ Line: 156 ]]
-        -- upvalues: v18 (copy), v6 (ref)
-        v18.scrollBarImageTransparencyMotor:setGoal(v6.instant(0));
-    end;
-    v18.onGamepadFocusLost = function() --[[ Line: 160 ]]
-        -- upvalues: v18 (copy), v6 (ref)
-        v18.scrollBarImageTransparencyMotor:setGoal(v6.instant(1));
-    end;
-    v18.getMainCanvasPosition = function() --[[ Line: 164 ]]
-        -- upvalues: v18 (copy)
-        return v18.scrollPosition:map(function(v26) --[[ Line: 165 ]]
-            return Vector2.new(0, v26);
-        end);
-    end;
-    v18.onMainCanvasSizeChange = function(v27) --[[ Line: 170 ]]
-        -- upvalues: v18 (copy)
-        v18.updateCanvasSize(v27.AbsoluteCanvasSize);
-    end;
-    v18.getMainCanvasSize = function() --[[ Line: 174 ]]
-        -- upvalues: v18 (copy)
-        return v18.mainCanvasSize:map(function(v28) --[[ Line: 175 ]]
-            return UDim2.new(0, 2, 0, v28.Y);
-        end);
-    end;
-    v19, v20 = v7.createBinding(Vector2.new(0, 0));
-    v18.viewSize = v19;
-    v18.updateViewSize = v20;
-    v19, v20 = v7.createBinding(Vector2.new(0, 0));
-    v18.mainCanvasPosition = v19;
-    v18.updateMainCanvasPosition = v20;
-    v18.onScrollBarDragging = function(v29) --[[ Line: 183 ]]
-        -- upvalues: v18 (copy)
-        v18.updateMainCanvasPosition(Vector2.new(0, v29));
-    end;
-    v18.onViewSizeChange = function(v30) --[[ Line: 187 ]]
-        -- upvalues: v18 (copy)
-        v18.updateViewSize(v30.AbsoluteSize);
-    end;
-    v18.onSelectionChanged = function(v31, v32, _, v34) --[[ Line: 191 ]]
-        -- upvalues: v18 (copy)
-        if not v32 and v34 == nil then
-            v18.onGamepadFocusLost();
-            return;
-        elseif v32 or v34:IsDescendantOf(v31) then
-            v18.onGamepadFocused();
-            return;
-        else
-            v18.onGamepadFocusLost();
-            return;
-        end;
-    end;
-end;
-v17.getScrollBarStyleProps = function(_, v36, v37) --[[ Line: 205 ]] --[[ Name: getScrollBarStyleProps ]]
-    -- upvalues: v14 (copy), v13 (copy)
-    local l_Tokens_0 = v36.Tokens;
-    if v37 == v14.Wide then
-        return {
-            userInteractionEnabled = true, 
-            width = l_Tokens_0.Global.Size_200, 
-            handleWidth = l_Tokens_0.Global.Size_100, 
-            paddingStartEnd = l_Tokens_0.Global.Space_50, 
-            marginRight = 0
-        };
-    elseif v37 == v14.Gamepad then
-        return {
-            userInteractionEnabled = false, 
-            width = l_Tokens_0.Global.Space_200, 
-            handleWidth = l_Tokens_0.Global.Space_100, 
-            handleIcon = v13["icons/controls/keys/xboxRSVertical"], 
-            handleIconSize = l_Tokens_0.Semantic.Icon.Size.Medium, 
-            handleIconColor = {
-                Color = l_Tokens_0.Semantic.Color.Icon.Emphasis.Color3, 
-                Transparency = l_Tokens_0.Semantic.Color.Icon.Emphasis.Transparency
-            }, 
-            paddingStartEnd = l_Tokens_0.Global.Space_300, 
-            marginRight = l_Tokens_0.Global.Space_300
-        };
-    else
-        return {
-            userInteractionEnabled = false, 
-            width = l_Tokens_0.Global.Space_150, 
-            handleWidth = l_Tokens_0.Global.Size_25, 
-            paddingStartEnd = l_Tokens_0.Global.Space_50, 
-            marginRight = 0
-        };
-    end;
-end;
-v17.renderScrollBar = function(v39, v40) --[[ Line: 242 ]] --[[ Name: renderScrollBar ]]
-    -- upvalues: v7 (copy), v15 (copy)
-    local l_Tokens_1 = v40.Tokens;
-    local v42 = v39:getScrollBarStyleProps(v40, v39.props.scrollBarType);
-    return v7.createElement(v15, {
-        userInteractionEnabled = v42.userInteractionEnabled, 
-        width = v42.width, 
-        anchorPoint = Vector2.new(1, 0), 
-        position = UDim2.new(1, -v42.marginRight, 0, 0), 
-        zIndex = 2, 
-        transparency = v39.scrollBarImageTransparency, 
-        backgroundColor = v42.backgroundColor, 
-        paddingStartEnd = v42.paddingStartEnd, 
-        handleWidth = v42.handleWidth, 
-        handleColor = {
-            Color = l_Tokens_1.Semantic.Color.Ui.Emphasis.Color3, 
-            Transparency = l_Tokens_1.Semantic.Color.Ui.Emphasis.Transparency
-        }, 
-        handleCornerRadius = l_Tokens_1.Semantic.Radius.Circle, 
-        handleIcon = v42.handleIcon, 
-        handleIconColor = v42.handleIconColor, 
-        handleIconSize = v42.handleIconSize, 
-        onDragging = v39.onScrollBarDragging, 
-        viewSize = v39.viewSize, 
-        canvasSize = v39.mainCanvasSize, 
-        canvasPosition = v39.getMainCanvasPosition()
-    });
-end;
-v17.renderWithProviders = function(v43, v44, _, v46) --[[ Line: 274 ]] --[[ Name: renderWithProviders ]]
-    -- upvalues: v7 (copy), l_Focusable_0 (copy)
-    local l_position_0 = v43.props.position;
-    local l_size_0 = v43.props.size;
-    local l_layoutOrder_0 = v43.props.layoutOrder;
-    local l_canvasSizeY_0 = v43.props.canvasSizeY;
-    local l_automaticSize_0 = v43.props.automaticSize;
-    local v52 = v43.props.useAutomaticCanvasSize and Enum.AutomaticSize.Y or nil;
-    local l_isGamepadFocusable_0 = v43.props.isGamepadFocusable;
-    local l_scrollingEnabled_0 = v43.props.scrollingEnabled;
-    return v7.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Position = l_position_0, 
-        Size = l_size_0, 
-        AutomaticSize = l_automaticSize_0, 
-        LayoutOrder = l_layoutOrder_0, 
-        ClipsDescendants = true, 
-        [v7.Ref] = v43.parentFrameRef
-    }, {
-        MainCanvas = v7.createElement(l_isGamepadFocusable_0 and l_Focusable_0.ScrollingFrame or "ScrollingFrame", {
-            Active = false, 
-            AutomaticSize = l_automaticSize_0, 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            Size = UDim2.fromScale(1, 1), 
-            ElasticBehavior = v43.props.elasticBehavior, 
-            CanvasSize = UDim2.new(UDim.new(1, 0), l_canvasSizeY_0), 
-            AutomaticCanvasSize = v52, 
-            CanvasPosition = v43.mainCanvasPosition, 
-            ScrollingEnabled = l_scrollingEnabled_0, 
-            ScrollingDirection = Enum.ScrollingDirection.Y, 
-            ScrollBarImageTransparency = 1, 
-            ScrollBarThickness = 0, 
-            Selectable = v43.props.selectable, 
-            SelectionImageObject = v46, 
-            onFocusGained = l_isGamepadFocusable_0 and v43.onGamepadFocused or nil, 
-            onFocusLost = l_isGamepadFocusable_0 and v43.onGamepadFocusLost or nil, 
-            NextSelectionLeft = v43.props.NextSelectionLeft, 
-            NextSelectionRight = v43.props.NextSelectionRight, 
-            NextSelectionUp = v43.props.NextSelectionUp, 
-            NextSelectionDown = v43.props.NextSelectionDown, 
-            [v7.Event.InputBegan] = v43.inputBegan, 
-            [v7.Event.InputEnded] = v43.inputEnded, 
-            [v7.Change.CanvasPosition] = v43.canvasPosition, 
-            [v7.Change.AbsoluteCanvasSize] = v43.onMainCanvasSizeChange, 
-            [v7.Change.CanvasSize] = v43.props[v7.Change.CanvasSize], 
-            [v7.Ref] = v43.props.scrollingFrameRef, 
-            [v7.Change.AbsoluteSize] = v43.onViewSizeChange, 
-            [v7.Event.SelectionChanged] = if l_isGamepadFocusable_0 then v43.onSelectionChanged else nil
-        }, v43.props[v7.Children]), 
-        ScrollBar = v43:renderScrollBar(v44)
-    });
-end;
-v17.render = function(v55) --[[ Line: 345 ]] --[[ Name: render ]]
-    -- upvalues: v10 (copy)
-    return v10(function(v56) --[[ Line: 346 ]]
-        -- upvalues: v55 (copy)
-        return v55:renderWithProviders(v56, nil, v55.props.cursor);
-    end);
-end;
-v17.willUnmount = function(v57) --[[ Line: 351 ]] --[[ Name: willUnmount ]]
-    v57.disconnectWaitToHideSidebar();
-end;
-return v7.forwardRef(function(v58, v59) --[[ Line: 355 ]]
-    -- upvalues: v11 (copy), v12 (copy), v7 (copy), v17 (copy), v5 (copy)
-    local v60 = v11(v12.RoundedRect);
-    return v7.createElement(v17, v5.Dictionary.join(v58, {
-        scrollingFrameRef = v59, 
-        cursor = v60
-    }));
-end);
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local scriptParent = script.Parent
+local ParentParent = script.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent
+local Cryo = require(ParentParent2.Cryo)
+local Otter = require(ParentParent2.Otter)
+local Roact = require(ParentParent2.Roact)
+local t = require(ParentParent2.t)
+local Focusable = require(ParentParent2.RoactGamepad).Focusable
+local withStyle = require(ParentParent2.UIBlox.Core.Style.withStyle)
+local useCursorByType = require(ParentParent.SelectionCursor.useCursorByType)
+local CursorType = require(ParentParent.SelectionCursor.CursorType)
+local Images = require(ParentParent2.UIBlox.App.ImageSet.Images)
+local ScrollBarType = require(scriptParent.Enum.ScrollBarType)
+local ScrollBar = require(script.Parent.ScrollBar)
+local t1 = {
+	frequency = 3,
+	dampingRatio = 1.5
+}
+local v18 = Roact.Component:extend("VerticalScrollView")
+
+v18.validateProps = t.strictInterface({
+	size = t.optional(t.UDim2),
+	position = t.optional(t.UDim2),
+	layoutOrder = t.optional(t.number),
+	elasticBehavior = t.optional(t.EnumItem),
+	canvasSizeY = t.optional(t.UDim),
+	automaticSize = t.optional(t.enum(Enum.AutomaticSize)),
+	useAutomaticCanvasSize = t.optional(t.boolean),
+	isGamepadFocusable = t.optional(t.boolean),
+	scrollingEnabled = t.optional(t.boolean),
+	selectable = t.optional(t.boolean),
+	[Roact.Change.CanvasPosition] = t.optional(t.callback),
+	[Roact.Change.CanvasSize] = t.optional(t.callback),
+	scrollingFrameRef = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	[Roact.Children] = t.optional(t.table),
+	scrollBarType = t.optional(t.string),
+	cursor = t.table
+})
+v18.defaultProps = {
+	useAutomaticCanvasSize = false,
+	isGamepadFocusable = false,
+	selectable = nil,
+	scrollingEnabled = true,
+	size = UDim2.new(1, 0, 1, 0),
+	canvasSizeY = UDim.new(2, 0),
+	automaticSize = Enum.AutomaticSize.None,
+	scrollBarType = ScrollBarType.Compact
+}
+
+function v18.init(p1) -- line: 90
+	-- upvalues: Roact (copy), Otter (copy), t1 (copy), UserInputService (copy), RunService (copy)
+	p1.parentFrameRef = Roact.createRef()
+	p1.mainCanvasRef = Roact.createRef()
+
+	local v20, v21 = Roact.createBinding(0)
+
+	p1.scrollPosition = v20
+	p1.updateScroll = v21
+
+	local v22, v23 = Roact.createBinding(Vector2.new(0, 0))
+
+	p1.mainCanvasSize = v22
+	p1.updateCanvasSize = v23
+	p1:setState({
+		scrollingWithTouch = false
+	})
+
+	local v24, v25 = Roact.createBinding(1)
+
+	p1.scrollBarImageTransparency = v24
+	p1.updateScrollBarImageTransparency = v25
+	p1.scrollBarImageTransparencyMotor = Otter.createSingleMotor(0)
+	p1.scrollBarImageTransparencyMotor:onStep(p1.updateScrollBarImageTransparency)
+	p1.lastTimeCanvasPositionChanged = tick()
+	p1.waitToHideSidebarConnection = nil
+
+	function p1.waitToHideSidebar() -- line: 108
+		-- upvalues: p1 (copy), Otter (copy), t1 (copy)
+		if tick() - p1.lastTimeCanvasPositionChanged > 0.7 then
+			p1.scrollBarImageTransparencyMotor:setGoal(Otter.spring(1, t1))
+			p1.disconnectWaitToHideSidebar()
+		end
+	end
+	function p1.disconnectWaitToHideSidebar() -- line: 116
+		-- upvalues: p1 (copy)
+		if p1.waitToHideSidebarConnection then
+			p1.waitToHideSidebarConnection:Disconnect()
+			p1.waitToHideSidebarConnection = nil
+		end
+	end
+	function p1.inputBegan(_, p3) -- line: 122
+		-- upvalues: p1 (copy), Otter (copy)
+		if not p1.props.scrollingEnabled then
+			return
+		end
+
+		if p3.UserInputType == Enum.UserInputType.MouseMovement then
+			p1.disconnectWaitToHideSidebar()
+			p1.scrollBarImageTransparencyMotor:setGoal(Otter.instant(0))
+		end
+	end
+	function p1.inputEnded(_, p5) -- line: 132
+		-- upvalues: p1 (copy), Otter (copy)
+		if not p1.props.scrollingEnabled then
+			return
+		end
+
+		if p5.UserInputType == Enum.UserInputType.MouseMovement then
+			p1.disconnectWaitToHideSidebar()
+			p1.scrollBarImageTransparencyMotor:setGoal(Otter.instant(1))
+		end
+	end
+	function p1.canvasPosition(p6) -- line: 142
+		-- upvalues: p1 (copy), UserInputService (copy), Otter (copy), RunService (copy), Roact (copy)
+		p1.lastTimeCanvasPositionChanged = tick()
+
+		if not p1.waitToHideSidebarConnection and UserInputService:GetLastInputType() == Enum.UserInputType.Touch then
+			p1.scrollBarImageTransparencyMotor:setGoal(Otter.instant(0))
+			p1.waitToHideSidebarConnection = RunService.Heartbeat:Connect(p1.waitToHideSidebar)
+		end
+
+		p1.updateScroll(p6.CanvasPosition.Y)
+
+		if p1.props[Roact.Change.CanvasPosition] then
+			p1.props[Roact.Change.CanvasPosition](p6)
+		end
+	end
+	function p1.onGamepadFocused() -- line: 156
+		-- upvalues: p1 (copy), Otter (copy)
+		p1.scrollBarImageTransparencyMotor:setGoal(Otter.instant(0))
+	end
+	function p1.onGamepadFocusLost() -- line: 160
+		-- upvalues: p1 (copy), Otter (copy)
+		p1.scrollBarImageTransparencyMotor:setGoal(Otter.instant(1))
+	end
+	function p1.getMainCanvasPosition() -- line: 164
+		-- upvalues: p1 (copy)
+		return p1.scrollPosition:map(function(p7) -- line: 165
+			return Vector2.new(0, p7)
+		end)
+	end
+	function p1.onMainCanvasSizeChange(p8) -- line: 170
+		-- upvalues: p1 (copy)
+		p1.updateCanvasSize(p8.AbsoluteCanvasSize)
+	end
+	function p1.getMainCanvasSize() -- line: 174
+		-- upvalues: p1 (copy)
+		return p1.mainCanvasSize:map(function(p9) -- line: 175
+			return UDim2.new(0, 2, 0, p9.Y)
+		end)
+	end
+
+	local v26, v27 = Roact.createBinding(Vector2.new(0, 0))
+
+	p1.viewSize = v26
+	p1.updateViewSize = v27
+
+	local v28, v29 = Roact.createBinding(Vector2.new(0, 0))
+
+	p1.mainCanvasPosition = v28
+	p1.updateMainCanvasPosition = v29
+
+	function p1.onScrollBarDragging(p10) -- line: 183
+		-- upvalues: p1 (copy)
+		p1.updateMainCanvasPosition(Vector2.new(0, p10))
+	end
+	function p1.onViewSizeChange(p11) -- line: 187
+		-- upvalues: p1 (copy)
+		p1.updateViewSize(p11.AbsoluteSize)
+	end
+	function p1.onSelectionChanged(p12, p13, _, p15) -- line: 191
+		-- upvalues: p1 (copy)
+		if not p13 and p15 == nil then
+			p1.onGamepadFocusLost()
+
+			return
+		end
+
+		if p13 or p15:IsDescendantOf(p12) then
+			p1.onGamepadFocused()
+
+			return
+		end
+
+		p1.onGamepadFocusLost()
+	end
+end
+function v18.getScrollBarStyleProps(_, p17, p18) -- line: 205
+	-- upvalues: ScrollBarType (copy), Images (copy)
+	local Tokens = p17.Tokens
+
+	if p18 == ScrollBarType.Wide then
+		return {
+			userInteractionEnabled = true,
+			marginRight = 0,
+			width = Tokens.Global.Size_200,
+			handleWidth = Tokens.Global.Size_100,
+			paddingStartEnd = Tokens.Global.Space_50
+		}
+	end
+
+	if p18 == ScrollBarType.Gamepad then
+		return {
+			userInteractionEnabled = false,
+			width = Tokens.Global.Space_200,
+			handleWidth = Tokens.Global.Space_100,
+			handleIcon = Images["icons/controls/keys/xboxRSVertical"],
+			handleIconSize = Tokens.Semantic.Icon.Size.Medium,
+			handleIconColor = {
+				Color = Tokens.Semantic.Color.Icon.Emphasis.Color3,
+				Transparency = Tokens.Semantic.Color.Icon.Emphasis.Transparency
+			},
+			paddingStartEnd = Tokens.Global.Space_300,
+			marginRight = Tokens.Global.Space_300
+		}
+	end
+
+	return {
+		userInteractionEnabled = false,
+		marginRight = 0,
+		width = Tokens.Global.Space_150,
+		handleWidth = Tokens.Global.Size_25,
+		paddingStartEnd = Tokens.Global.Space_50
+	}
+end
+function v18.renderScrollBar(p19, p20) -- line: 242
+	-- upvalues: Roact (copy), ScrollBar (copy)
+	local Tokens = p20.Tokens
+	local v37 = p19:getScrollBarStyleProps(p20, p19.props.scrollBarType)
+
+	return Roact.createElement(ScrollBar, {
+		zIndex = 2,
+		userInteractionEnabled = v37.userInteractionEnabled,
+		width = v37.width,
+		anchorPoint = Vector2.new(1, 0),
+		position = UDim2.new(1, -v37.marginRight, 0, 0),
+		transparency = p19.scrollBarImageTransparency,
+		backgroundColor = v37.backgroundColor,
+		paddingStartEnd = v37.paddingStartEnd,
+		handleWidth = v37.handleWidth,
+		handleColor = {
+			Color = Tokens.Semantic.Color.Ui.Emphasis.Color3,
+			Transparency = Tokens.Semantic.Color.Ui.Emphasis.Transparency
+		},
+		handleCornerRadius = Tokens.Semantic.Radius.Circle,
+		handleIcon = v37.handleIcon,
+		handleIconColor = v37.handleIconColor,
+		handleIconSize = v37.handleIconSize,
+		onDragging = p19.onScrollBarDragging,
+		viewSize = p19.viewSize,
+		canvasSize = p19.mainCanvasSize,
+		canvasPosition = p19.getMainCanvasPosition()
+	})
+end
+function v18.renderWithProviders(p21, p22, _, p24) -- line: 274
+	-- upvalues: Roact (copy), Focusable (copy)
+	local position = p21.props.position
+	local size = p21.props.size
+	local layoutOrder = p21.props.layoutOrder
+	local canvasSizeY = p21.props.canvasSizeY
+	local automaticSize = p21.props.automaticSize
+	local v47 = p21.props.useAutomaticCanvasSize and Enum.AutomaticSize.Y or nil
+	local isGamepadFocusable = p21.props.isGamepadFocusable
+	local scrollingEnabled = p21.props.scrollingEnabled
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Position = position,
+		Size = size,
+		AutomaticSize = automaticSize,
+		LayoutOrder = layoutOrder,
+		ClipsDescendants = true,
+		[Roact.Ref] = p21.parentFrameRef
+	}, {
+		MainCanvas = Roact.createElement(isGamepadFocusable and Focusable.ScrollingFrame or "ScrollingFrame", {
+			Active = false,
+			AutomaticSize = automaticSize,
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.fromScale(1, 1),
+			ElasticBehavior = p21.props.elasticBehavior,
+			CanvasSize = UDim2.new(UDim.new(1, 0), canvasSizeY),
+			AutomaticCanvasSize = v47,
+			CanvasPosition = p21.mainCanvasPosition,
+			ScrollingEnabled = scrollingEnabled,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ScrollBarImageTransparency = 1,
+			ScrollBarThickness = 0,
+			Selectable = p21.props.selectable,
+			SelectionImageObject = p24,
+			onFocusGained = isGamepadFocusable and p21.onGamepadFocused or nil,
+			onFocusLost = isGamepadFocusable and p21.onGamepadFocusLost or nil,
+			NextSelectionLeft = p21.props.NextSelectionLeft,
+			NextSelectionRight = p21.props.NextSelectionRight,
+			NextSelectionUp = p21.props.NextSelectionUp,
+			NextSelectionDown = p21.props.NextSelectionDown,
+			[Roact.Event.InputBegan] = p21.inputBegan,
+			[Roact.Event.InputEnded] = p21.inputEnded,
+			[Roact.Change.CanvasPosition] = p21.canvasPosition,
+			[Roact.Change.AbsoluteCanvasSize] = p21.onMainCanvasSizeChange,
+			[Roact.Change.CanvasSize] = p21.props[Roact.Change.CanvasSize],
+			[Roact.Ref] = p21.props.scrollingFrameRef,
+			[Roact.Change.AbsoluteSize] = p21.onViewSizeChange,
+			[Roact.Event.SelectionChanged] = if not isGamepadFocusable then nil else p21.onSelectionChanged
+		}, p21.props[Roact.Children]),
+		ScrollBar = p21:renderScrollBar(p22)
+	})
+end
+function v18.render(p25) -- line: 345
+	-- upvalues: withStyle (copy)
+	return withStyle(function(p26) -- line: 346
+		-- upvalues: p25 (copy)
+		return p25:renderWithProviders(p26, nil, p25.props.cursor)
+	end)
+end
+function v18.willUnmount(p27) -- line: 351
+	p27.disconnectWaitToHideSidebar()
+end
+
+return Roact.forwardRef(function(p28, p29) -- line: 355
+	-- upvalues: useCursorByType (copy), CursorType (copy), Roact (copy), v18 (copy), Cryo (copy)
+	local v54 = useCursorByType(CursorType.RoundedRect)
+
+	return Roact.createElement(v18, Cryo.Dictionary.join(p28, {
+		scrollingFrameRef = p29,
+		cursor = v54
+	}))
+end)

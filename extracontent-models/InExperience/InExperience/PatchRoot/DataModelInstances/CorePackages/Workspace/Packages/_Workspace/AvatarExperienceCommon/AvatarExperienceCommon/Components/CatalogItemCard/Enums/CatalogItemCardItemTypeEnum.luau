@@ -1,4 +1,4 @@
 return {
-    Limited = "Limited", 
-    Collectible = "Collectible"
-};
+	Limited = "Limited",
+	Collectible = "Collectible"
+}

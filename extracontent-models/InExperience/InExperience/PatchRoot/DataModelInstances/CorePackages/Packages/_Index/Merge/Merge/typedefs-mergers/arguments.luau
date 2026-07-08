@@ -1,37 +1,42 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local v4 = {};
-local _ = require(l_Parent_0.GraphQL);
-local _ = require(script.Parent["merge-typedefs_types"]);
-local v7 = require(l_Parent_0.Utils);
-local l_compareNodes_0 = v7.compareNodes;
-local l_isSome_0 = v7.isSome;
-local v10 = nil;
-v4.mergeArguments = function(v11, v12, v13) --[[ Line: 30 ]] --[[ Name: mergeArguments ]]
-    -- upvalues: v10 (ref), l_Array_0 (copy), l_isSome_0 (copy), l_compareNodes_0 (copy)
-    local v14 = v10(l_Array_0.filter(l_Array_0.concat({}, v12, v11), l_isSome_0));
-    if v13 and v13.sort then
-        l_Array_0.sort(v14, l_compareNodes_0);
-    end;
-    return v14;
-end;
-v10 = function(v15) --[[ Line: 52 ]] --[[ Name: deduplicateArguments ]]
-    -- upvalues: l_Array_0 (copy), l_Boolean_0 (copy)
-    return l_Array_0.reduce(v15, function(v16, v17) --[[ Line: 56 ]]
-        -- upvalues: l_Array_0 (ref), l_Boolean_0 (ref)
-        local v19 = l_Array_0.find(v16, function(v18) --[[ Line: 57 ]]
-            -- upvalues: v17 (copy)
-            return v18.name.value == v17.name.value;
-        end);
-        if not l_Boolean_0.toJSBoolean(v19) then
-            return l_Array_0.concat(v16, {
-                v17
-            });
-        else
-            return v16;
-        end;
-    end, {});
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local t1 = {}
+
+require(ParentParent.GraphQL)
+require(script.Parent["merge-typedefs_types"])
+
+local Utils = require(ParentParent.Utils)
+local compareNodes = Utils.compareNodes
+local isSome = Utils.isSome
+local deduplicateArguments = nil
+
+function t1.mergeArguments(p1, p2, p3) -- line: 30
+	-- upvalues: deduplicateArguments (ref), Array (copy), isSome (copy), compareNodes (copy)
+	local v13 = deduplicateArguments(Array.filter(Array.concat({}, p2, p1), isSome))
+
+	if p3 and p3.sort then
+		Array.sort(v13, compareNodes)
+	end
+
+	return v13
+end
+function deduplicateArguments(p4) -- line: 52
+	-- upvalues: Array (copy), Boolean (copy)
+	return Array.reduce(p4, function(p5, p6) -- line: 56
+		-- upvalues: Array (copy), Boolean (copy)
+		local v17 = Array.find(p5, function(p7) -- line: 57
+			-- upvalues: p6 (copy)
+			return p7.name.value == p6.name.value
+		end)
+
+		if not Boolean.toJSBoolean(v17) then
+			return Array.concat(p5, { p6 })
+		end
+
+		return p5
+	end, {})
+end
+
+return t1

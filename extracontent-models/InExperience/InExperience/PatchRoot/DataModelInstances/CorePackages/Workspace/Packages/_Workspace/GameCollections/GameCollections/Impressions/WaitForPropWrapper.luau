@@ -1,65 +1,67 @@
-local l_Parent_0 = script:FindFirstAncestor("GameCollections").Parent;
-local v1 = require(l_Parent_0.React);
-local l_usePrevious_0 = require(l_Parent_0.RoactUtils).Hooks.usePrevious;
-local v3 = require(l_Parent_0.ArgCheck);
-local v4 = game:DefineFastFlag("LuaAppEnableWaitForPropWrapperAssert", false);
-return function(v5) --[[ Line: 15 ]] --[[ Name: WaitForPropWrapper ]]
-    -- upvalues: l_usePrevious_0 (copy), v1 (copy), v4 (copy), v3 (copy)
-    local l_waitForProp_0 = v5.waitForProp;
-    local l_maxUpdatesToDelay_0 = v5.maxUpdatesToDelay;
-    local l_wrappedComponent_0 = v5.wrappedComponent;
-    local v9 = l_usePrevious_0(l_waitForProp_0);
-    local v10, v11 = v1.useState(l_maxUpdatesToDelay_0);
-    local v12 = false;
-    if v9 ~= nil then
-        v12 = false;
-        if l_waitForProp_0 == nil then
-            v12 = false;
-            if l_maxUpdatesToDelay_0 ~= nil then
-                v12 = v10 < l_maxUpdatesToDelay_0;
-            end;
-        end;
-    end;
-    v1.useEffect(function() --[[ Line: 27 ]]
-        -- upvalues: l_maxUpdatesToDelay_0 (copy), l_waitForProp_0 (copy), v12 (copy), v11 (copy), v10 (copy)
-        if not l_maxUpdatesToDelay_0 then
-            return;
-        elseif l_waitForProp_0 ~= nil then
-            return;
-        elseif v12 then
-            task.delay(0, function() --[[ Line: 38 ]]
-                -- upvalues: v11 (ref), l_maxUpdatesToDelay_0 (ref)
-                v11(l_maxUpdatesToDelay_0);
-            end);
-            return;
-        else
-            if v10 and v10 > 0 then
-                task.delay(0, function() --[[ Line: 43 ]]
-                    -- upvalues: v11 (ref), v10 (ref)
-                    v11(v10 - 1);
-                end);
-            end;
-            return;
-        end;
-    end, {
-        l_waitForProp_0, 
-        l_maxUpdatesToDelay_0, 
-        v10, 
-        v12
-    });
-    local v13 = true;
-    if l_waitForProp_0 == nil and l_maxUpdatesToDelay_0 ~= nil then
-        if v12 then
-            v13 = false;
-        elseif v10 and v10 > 0 then
-            v13 = false;
-        elseif v4 then
-            v3.assert(l_waitForProp_0, (("Missing data for prop for this game collection, after waiting %* updates"):format(l_maxUpdatesToDelay_0)));
-        end;
-    end;
-    if v13 then
-        return l_wrappedComponent_0;
-    else
-        return nil;
-    end;
-end;
+local Parent = script:FindFirstAncestor("GameCollections").Parent
+local React = require(Parent.React)
+local usePrevious = require(Parent.RoactUtils).Hooks.usePrevious
+local ArgCheck = require(Parent.ArgCheck)
+local v5 = game:DefineFastFlag("LuaAppEnableWaitForPropWrapperAssert", false)
+
+local function WaitForPropWrapper(t1: {[any]: any}) -- line: 15
+	-- upvalues: usePrevious (copy), React (copy), v5 (copy), ArgCheck (copy)
+	local waitForProp = t1.waitForProp
+	local maxUpdatesToDelay = t1.maxUpdatesToDelay
+	local wrappedComponent = t1.wrappedComponent
+	local v11 = usePrevious(waitForProp)
+	local v12, v13 = React.useState(maxUpdatesToDelay)
+	local v14 = v11 ~= nil and (waitForProp == nil and (maxUpdatesToDelay ~= nil and v12 < maxUpdatesToDelay))
+
+	React.useEffect(function() -- line: 27
+		-- upvalues: maxUpdatesToDelay (copy), waitForProp (copy), v14 (copy), v13 (copy), v12 (copy)
+		if not maxUpdatesToDelay then
+			return
+		end
+
+		if waitForProp ~= nil then
+			return
+		end
+
+		if v14 then
+			task.delay(0, function() -- line: 38
+				-- upvalues: v13 (copy), maxUpdatesToDelay (copy)
+				v13(maxUpdatesToDelay)
+			end)
+
+			return
+		end
+
+		if v12 and v12 > 0 then
+			task.delay(0, function() -- line: 43
+				-- upvalues: v13 (copy), v12 (copy)
+				v13(v12 - 1)
+			end)
+		end
+	end, {
+		waitForProp,
+		maxUpdatesToDelay,
+		v12,
+		v14
+	})
+
+	local v15 = true
+
+	if waitForProp == nil and maxUpdatesToDelay ~= nil then
+		if v14 then
+			v15 = false
+		elseif v12 and v12 > 0 then
+			v15 = false
+		elseif v5 then
+			ArgCheck.assert(waitForProp, `Missing data for prop for this game collection, after waiting { maxUpdatesToDelay } updates`)
+		end
+	end
+
+	if v15 then
+		return wrappedComponent
+	end
+
+	return nil
+end
+
+return WaitForPropWrapper

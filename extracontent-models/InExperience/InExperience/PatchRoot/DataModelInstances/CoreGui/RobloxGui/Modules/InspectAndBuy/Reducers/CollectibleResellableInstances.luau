@@ -1,20 +1,24 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetCollectibleResellableInstances);
-local v5 = require(l_Parent_0.Models.CollectibleInstance);
-return v1.createReducer({}, {
-    [v4.name] = function(v6, v7) --[[ Line: 13 ]]
-        -- upvalues: v5 (copy), v2 (copy)
-        local l_collectibleItemId_0 = v7.collectibleItemId;
-        local v9 = {};
-        for _, v11 in v7.collectibleItemInstances do
-            local v12 = v5.fromGetCollectibleItemInstances(v11);
-            v9[v12.collectibleInstanceId] = v12;
-        end;
-        return v2.Dictionary.join(v6, {
-            [l_collectibleItemId_0] = v9
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+local SetCollectibleResellableInstances = require(ParentParent.Actions.SetCollectibleResellableInstances)
+local CollectibleInstance = require(ParentParent.Models.CollectibleInstance)
+
+return Rodux.createReducer({}, {
+	[SetCollectibleResellableInstances.name] = function(p1, p2) -- line: 13
+		-- upvalues: CollectibleInstance (copy), Cryo (copy)
+		local collectibleItemId = p2.collectibleItemId
+		local t1 = {}
+
+		for _, v12 in p2.collectibleItemInstances do
+			local v13 = CollectibleInstance.fromGetCollectibleItemInstances(v12)
+
+			t1[v13.collectibleInstanceId] = v13
+		end
+
+		return Cryo.Dictionary.join(p1, {
+			[collectibleItemId] = t1
+		})
+	end
+})

@@ -20,10 +20,10 @@ function t1.new(s1: string?) -- line: 51
 		_historyKey = "",
 		_history = {}
 	}
-	local v17, v18 = Signals.createSignal({})
+	local v19, v20 = Signals.createSignal({})
 
-	t2._historySignal = v17
-	t2._setHistorySignal = v18
+	t2._historySignal = v19
+	t2._setHistorySignal = v20
 
 	if s1 == nil or s1 == "" then
 		return (setmetatable(t2, t1))
@@ -67,105 +67,131 @@ function t1.addHistoryEntries(t5: {[any]: any}, t6: {[any]: any}) -- line: 95
 	t5._history = Cryo.List.join(t6, t5._history)
 	t5._setHistorySignal(t5._history)
 end
-function t1.getHistory(t7: {[any]: any}, n1: number?) -- line: 112
-	local _history = t7._history
 
+local function getNMostRecent(t7: {[any]: any}, n1: number?) -- line: 101
 	if n1 == nil then
-		return _history
+		return t7
 	end
 
 	local t8 = {}
 
 	for i = 1, n1 do
-		table.insert(t8, _history[i])
+		table.insert(t8, t7[i])
 	end
 
 	return t8
 end
-function t1.getUniverseHistorySignal(t9: {[any]: any}, n2: number?) -- line: 115
+
+function t1.getHistory(t9: {[any]: any}, n2: number?) -- line: 112
+	local _history = t9._history
+
+	if n2 == nil then
+		return _history
+	end
+
+	local t10 = {}
+
+	for i = 1, n2 do
+		table.insert(t10, _history[i])
+	end
+
+	return t10
+end
+function t1.getUniverseHistorySignal(t11: {[any]: any}, n3: number?) -- line: 115
 	-- upvalues: Signals (copy)
 	return Signals.createComputed(function(p1) -- line: 116
-		-- upvalues: t9 (copy), n2 (copy)
-		local v55 = t9._historySignal(p1)
-		local v56 = n2
+		-- upvalues: t11 (copy), n3 (copy)
+		local v57 = t11._historySignal(p1)
+		local v58 = n3
 
-		if v56 == nil then
+		if v58 == nil then
 		else
-			local t10 = {}
+			local t12 = {}
 
-			for i = 1, v56 do
-				table.insert(t10, v55[i])
+			for i = 1, v58 do
+				table.insert(t12, v57[i])
 			end
 
-			v55 = t10
+			v57 = t12
 		end
 
-		local t11 = {}
+		local t13 = {}
 
-		for _, v61 in v55 do
-			table.insert(t11, v61.universeId)
+		for _, v63 in v57 do
+			table.insert(t13, v63.universeId)
 		end
 
-		return t11
+		return t13
 	end)
 end
-function t1.getUniverseHistory(t12: {[any]: any}, n3: number?) -- line: 127
+function t1.getUniverseHistory(t14: {[any]: any}, n4: number?) -- line: 127
 	-- upvalues: FFlagUseTeleportTraversalHistory (copy), EngineFeature (copy), TeleportService (copy), Cryo (copy)
-	local t13 = {}
+	local t15 = {}
 
 	if FFlagUseTeleportTraversalHistory and EngineFeature then
-		local v38 = TeleportService:TeleportedUniversesBackHistory()
-		local v39 = Cryo.List.map(v38, tostring)
+		local v40 = TeleportService:TeleportedUniversesBackHistory()
+		local v41 = Cryo.List.map(v40, tostring)
 
-		if n3 == nil then
-			return v39
+		if n4 == nil then
+			return v41
 		end
 
-		local t14 = {}
+		local t16 = {}
 
-		for i = 1, n3 do
-			table.insert(t14, v39[i])
+		for i = 1, n4 do
+			table.insert(t16, v41[i])
 		end
 
-		return t14
+		return t16
 	end
 
-	local _history = t12._history
+	local _history = t14._history
 
-	if n3 == nil then
+	if n4 == nil then
 	else
-		local t15 = {}
+		local t17 = {}
 
-		for i = 1, n3 do
-			table.insert(t15, _history[i])
+		for i = 1, n4 do
+			table.insert(t17, _history[i])
 		end
 
-		_history = t15
+		_history = t17
 	end
 
-	for _, v46 in _history do
-		table.insert(t13, v46.universeId)
+	for _, v48 in _history do
+		table.insert(t15, v48.universeId)
 	end
 
-	return t13
+	return t15
 end
 function t1.writeHistory(p2) -- line: 143
 	-- upvalues: MemStorageService (copy), HttpService (copy)
 	MemStorageService:SetItem(p2._historyKey, HttpService:JSONEncode(p2._history))
 end
 function t1.disconnect(p3) -- line: 147
-	for _, v50 in p3._connections do
-		v50:Disconnect()
+	for _, v52 in p3._connections do
+		v52:Disconnect()
 	end
 
 	p3._connections = {}
 end
 
+local function getDefaultId() -- line: 154
+	-- upvalues: Players (copy)
+	local v53 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
+
+	if v53 == nil or v53 <= 0 then
+		return "Local"
+	end
+
+	return (tostring(v53))
+end
+
 if FFlagUseLocalTraversalHistory or FFlagUseTeleportTraversalHistory then
 	local new = t1.new
-	local v14 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
+	local v16 = Players.LocalPlayer and Players.LocalPlayer.UserId or nil
 
-	t1.default = new(if v14 ~= nil and not (v14 <= 0) then tostring(v14) else "Local")
+	t1.default = new(if v16 ~= nil and not (v16 <= 0) then tostring(v16) else "Local")
 
 	return t1
 end

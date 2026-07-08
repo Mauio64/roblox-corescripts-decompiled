@@ -1,200 +1,222 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.RoactUtils);
-local v3 = require(l_Parent_0.UniversalAppPolicy);
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local l_default_0 = require(l_Parent_0.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default;
-local v7 = require(l_Parent_0.UrlBuilder);
-local v8 = require(l_Parent_0.RobloxAppEnums);
-local v9 = require(l_Parent_0.NavigationRodux);
-local v10 = require(l_Parent_0.ToastRodux);
-local v11 = require(l_Parent_0.HttpRequest);
-local _ = require(l_Parent_0.LuauPolyfill);
-local v13 = require(l_Parent_0.DiscoveryAnalytics);
-local v14 = require(l_Parent_0.DiscoveryUtils);
-local l_useDispatch_0 = v2.Hooks.RoactRodux.useDispatch;
-local l_useAppPolicy_0 = v3.useAppPolicy;
-local l_UrlBuilder_0 = v7.UrlBuilder;
-local l_UrlBase_0 = v7.UrlBase;
-local l_AppPage_0 = v8.AppPage;
-local l_NavigateDown_0 = v9.Thunks.NavigateDown;
-local l_ToastType_0 = v10.Enums.ToastType;
-local l_SetCurrentToastMessage_0 = v10.Actions.SetCurrentToastMessage;
-local l_gameCopyExperienceLink_0 = v13.Events.gameCopyExperienceLink;
-local l_gameShareExperienceLink_0 = v13.Events.gameShareExperienceLink;
-local l_logResponseError_0 = v14.logResponseError;
-local l_DiscoveryEventErrorLogger_0 = v14.DiscoveryEventErrorLogger;
-local function v39(v27) --[[ Line: 40 ]] --[[ Name: fetchShareLinkId ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_UrlBase_0 (copy), l_HttpService_0 (copy), v11 (copy), l_DiscoveryEventErrorLogger_0 (copy), l_logResponseError_0 (copy)
-    local v28 = l_UrlBuilder_0.new({
-        base = l_UrlBase_0.APIS, 
-        path = "sharelinks/v1/get-or-create-link"
-    })();
-    local v29 = {
-        linkType = "ExperienceDetails", 
-        data = {
-            universeId = v27
-        }
-    };
-    local v30 = l_HttpService_0:JSONEncode(v29.data);
-    local v31 = l_HttpService_0:JSONEncode({
-        linkType = v29.linkType, 
-        data = v30
-    });
-    return v11.config({
-        requestFunction = function(v32, v33, v34) --[[ Line: 59 ]] --[[ Name: requestFunction ]]
-            -- upvalues: v11 (ref)
-            return v11.requestFunctions.RequestInternal(v32, v33, v34);
-        end
-    })(v28, "POST", {
-        postBody = v31
-    }):andThen(function(v35) --[[ Line: 67 ]]
-        -- upvalues: l_DiscoveryEventErrorLogger_0 (ref), v27 (copy)
-        local v36 = v35.responseBody or v35.result;
-        if v36 and v36.linkId then
-            return v36.linkId;
-        else
-            l_DiscoveryEventErrorLogger_0.reportError("FetchShareLinkIdInvalidResponse", "Share link response missing linkId", {
-                universeId = v27, 
-                responseBody = v35.responseBody or v35.result
-            });
-            error("Failed to fetch share link id");
-            return;
-        end;
-    end):catch(function(v37) --[[ Line: 83 ]]
-        -- upvalues: l_logResponseError_0 (ref), l_DiscoveryEventErrorLogger_0 (ref), v27 (copy)
-        local v38 = if type(v37) == "table" and v37.StatusCode then v37.StatusCode else nil;
-        l_logResponseError_0("sharelinks/v1/get-or-create-link", {
-            StatusCode = v38
-        });
-        l_DiscoveryEventErrorLogger_0.reportError("FetchShareLinkIdFailed", "Failed to fetch share link id", {
-            universeId = v27, 
-            statusCode = v38, 
-            error = tostring(v37)
-        });
-        error(v37);
-    end);
-end;
-local function v45(v40, v41, v42) --[[ Line: 95 ]] --[[ Name: generateExperienceDetailsShareLinkUrl ]]
-    -- upvalues: l_UrlBuilder_0 (copy)
-    local _ = nil;
-    local v44 = nil;
-    if v40 then
-        v44 = tostring(DateTime.now().UnixTimestampMillis);
-        return l_UrlBuilder_0.sharelinks.shortUrl({
-            linkId = v40, 
-            type = "ExperienceDetails", 
-            stamp = v44
-        }), v44;
-    else
-        return l_UrlBuilder_0.game.info.appsflyer({
-            universeId = v41, 
-            placeId = v42
-        }), v44;
-    end;
-end;
-local function v55(v46, v47, v48, v49) --[[ Line: 113 ]] --[[ Name: handleCopyLink ]]
-    -- upvalues: v39 (copy), v45 (copy), l_Players_0 (copy), l_gameCopyExperienceLink_0 (copy), l_default_0 (copy), l_SetCurrentToastMessage_0 (copy), l_ToastType_0 (copy)
-    v39(v46):andThen(function(v50) --[[ Line: 115 ]]
-        -- upvalues: v45 (ref), v46 (copy), v47 (copy), l_Players_0 (ref), l_gameCopyExperienceLink_0 (ref), v48 (copy), l_default_0 (ref), v49 (copy), l_SetCurrentToastMessage_0 (ref), l_ToastType_0 (ref)
-        local v51, v52 = v45(v50, v46, v47);
-        local v53 = l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId;
-        l_gameCopyExperienceLink_0({
-            ctx = v48, 
-            uid = tostring(v53), 
-            placeId = v47, 
-            stamp = v52
-        }, v48);
-        l_default_0:shareUrl({
-            context = "GameDetailsMoreWebURL", 
-            url = v51
-        });
-        v49(l_SetCurrentToastMessage_0({
-            toastMessage = "Feature.GameDetails.Toast.LinkCopied", 
-            toastType = l_ToastType_0.SuccessConfirmation
-        }));
-    end):catch(function(_) --[[ Line: 136 ]]
-        -- upvalues: v49 (copy), l_SetCurrentToastMessage_0 (ref), l_ToastType_0 (ref)
-        v49(l_SetCurrentToastMessage_0({
-            toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong", 
-            toastType = l_ToastType_0.NetworkingError
-        }));
-    end);
-end;
-return function(v56, v57, v58) --[[ Line: 149 ]] --[[ Name: useExperienceDetailsShare ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useAppPolicy_0 (copy), v1 (copy), v55 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v39 (copy), v45 (copy), l_Players_0 (copy), l_gameShareExperienceLink_0 (copy), l_default_0 (copy), l_UrlBuilder_0 (copy)
-    local v59 = l_useDispatch_0();
-    local v61 = l_useAppPolicy_0(function(v60) --[[ Line: 155 ]]
-        return v60.shouldShareToAccountProvider();
-    end);
-    return v1.useCallback(function() --[[ Line: 159 ]]
-        -- upvalues: v57 (copy), v61 (copy), v55 (ref), v56 (copy), v58 (copy), v59 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v39 (ref), v45 (ref), l_Players_0 (ref), l_gameShareExperienceLink_0 (ref), l_default_0 (ref), l_UrlBuilder_0 (ref)
-        if not v57 then
-            return;
-        elseif not v61 then
-            v55(v56, v57, v58, v59);
-            return;
-        elseif v61 then
-            v59(l_NavigateDown_0({
-                name = l_AppPage_0.SdkShare, 
-                extraProps = {
-                    universeId = v56, 
-                    context = "GameDetailsMoreWebURL"
-                }
-            }));
-            return;
-        else
-            v39(v56):andThen(function(v62) --[[ Line: 182 ]]
-                -- upvalues: v45 (ref), v56 (ref), v57 (ref), l_Players_0 (ref), l_gameShareExperienceLink_0 (ref), v58 (ref), l_default_0 (ref)
-                local v63, v64 = v45(v62, v56, v57);
-                local v65 = l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId;
-                l_gameShareExperienceLink_0({
-                    ctx = v58, 
-                    uid = tostring(v65), 
-                    placeId = v57, 
-                    shortShareLinkFailed = not v62, 
-                    shareToAppsflyer = true, 
-                    stamp = v64, 
-                    linkId = v62
-                }, v58);
-                l_default_0:shareUrl({
-                    url = v63, 
-                    context = "GameDetailsMoreWebURL"
-                });
-            end):catch(function(_) --[[ Line: 204 ]]
-                -- upvalues: v56 (ref), v57 (ref), l_UrlBuilder_0 (ref), l_Players_0 (ref), l_gameShareExperienceLink_0 (ref), v58 (ref), l_default_0 (ref)
-                local l_v56_0 = v56;
-                local l_v57_0 = v57;
-                local _ = nil;
-                local v70 = nil;
-                local v71 = l_UrlBuilder_0.game.info.appsflyer({
-                    universeId = l_v56_0, 
-                    placeId = l_v57_0
-                });
-                local l_v70_0 = v70;
-                l_v56_0 = l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId;
-                l_gameShareExperienceLink_0({
-                    ctx = v58, 
-                    uid = tostring(l_v56_0), 
-                    placeId = v57, 
-                    shortShareLinkFailed = true, 
-                    shareToAppsflyer = true, 
-                    stamp = l_v70_0, 
-                    linkId = nil
-                }, v58);
-                l_default_0:shareUrl({
-                    url = v71, 
-                    context = "GameDetailsMoreWebURL"
-                });
-            end);
-            return;
-        end;
-    end, {
-        v56, 
-        v57, 
-        v61, 
-        v59, 
-        v58
-    });
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local React = require(Parent.React)
+local RoactUtils = require(Parent.RoactUtils)
+local UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local default = require(Parent.ExternalContentSharingProtocol).ExternalContentSharingProtocol.default
+local UrlBuilder = require(Parent.UrlBuilder)
+local RobloxAppEnums = require(Parent.RobloxAppEnums)
+local NavigationRodux = require(Parent.NavigationRodux)
+local ToastRodux = require(Parent.ToastRodux)
+local HttpRequest = require(Parent.HttpRequest)
+
+require(Parent.LuauPolyfill)
+
+local DiscoveryAnalytics = require(Parent.DiscoveryAnalytics)
+local DiscoveryUtils = require(Parent.DiscoveryUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useAppPolicy = UniversalAppPolicy.useAppPolicy
+local UrlBuilder2 = UrlBuilder.UrlBuilder
+local UrlBase = UrlBuilder.UrlBase
+local AppPage = RobloxAppEnums.AppPage
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v22 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local ToastType = ToastRodux.Enums.ToastType
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+local gameCopyExperienceLink = DiscoveryAnalytics.Events.gameCopyExperienceLink
+local gameShareExperienceLink = DiscoveryAnalytics.Events.gameShareExperienceLink
+local logResponseError = DiscoveryUtils.logResponseError
+local DiscoveryEventErrorLogger = DiscoveryUtils.DiscoveryEventErrorLogger
+
+local function fetchShareLinkId(s1: string) -- line: 44
+	-- upvalues: UrlBuilder2 (copy), UrlBase (copy), HttpService (copy), HttpRequest (copy), DiscoveryEventErrorLogger (copy), logResponseError (copy)
+	local v34 = UrlBuilder2.new({
+		path = "sharelinks/v1/get-or-create-link",
+		base = UrlBase.APIS
+	})()
+	local t1 = {
+		linkType = "ExperienceDetails",
+		data = {
+			universeId = s1
+		}
+	}
+	local json = HttpService:JSONEncode(t1.data)
+	local json2 = HttpService:JSONEncode({
+		linkType = t1.linkType,
+		data = json
+	})
+
+	return HttpRequest.config({
+		requestFunction = function(s2: string, s3: string, p1) -- line: 63
+			-- upvalues: HttpRequest (copy)
+			return HttpRequest.requestFunctions.RequestInternal(s2, s3, p1)
+		end
+	})(v34, "POST", {
+		postBody = json2
+	}):andThen(function(p2) -- line: 71
+		-- upvalues: DiscoveryEventErrorLogger (copy), s1 (copy)
+		local v55 = p2.responseBody or p2.result
+
+		if v55 and v55.linkId then
+			return v55.linkId
+		end
+
+		DiscoveryEventErrorLogger.reportError("FetchShareLinkIdInvalidResponse", "Share link response missing linkId", {
+			universeId = s1,
+			responseBody = p2.responseBody or p2.result
+		})
+		error("Failed to fetch share link id")
+	end):catch(function(p3) -- line: 87
+		-- upvalues: logResponseError (copy), DiscoveryEventErrorLogger (copy), s1 (copy)
+		local v57 = if type(p3) ~= "table" or not p3.StatusCode then nil else p3.StatusCode
+
+		logResponseError("sharelinks/v1/get-or-create-link", {
+			StatusCode = v57
+		})
+		DiscoveryEventErrorLogger.reportError("FetchShareLinkIdFailed", "Failed to fetch share link id", {
+			universeId = s1,
+			statusCode = v57,
+			error = tostring(p3)
+		})
+		error(p3)
+	end)
+end
+local function generateExperienceDetailsShareLinkUrl(s4: string?, s5: string, s6: string) -- line: 99
+	-- upvalues: UrlBuilder2 (copy)
+	if s4 then
+		local str = tostring(DateTime.now().UnixTimestampMillis)
+
+		return UrlBuilder2.sharelinks.shortUrl({
+			type = "ExperienceDetails",
+			linkId = s4,
+			stamp = str
+		}), str
+	end
+
+	return UrlBuilder2.game.info.appsflyer({
+		universeId = s5,
+		placeId = s6
+	}), nil
+end
+local function handleCopyLink(s7: string, s8: string, s9: string, p4) -- line: 117
+	-- upvalues: fetchShareLinkId (copy), generateExperienceDetailsShareLinkUrl (copy), Players (copy), gameCopyExperienceLink (copy), default (copy), SetCurrentToastMessage (copy), ToastType (copy)
+	fetchShareLinkId(s7):andThen(function(p5) -- line: 119
+		-- upvalues: generateExperienceDetailsShareLinkUrl (copy), s7 (copy), s8 (copy), Players (copy), gameCopyExperienceLink (copy), s9 (copy), default (copy), p4 (copy), SetCurrentToastMessage (copy), ToastType (copy)
+		local v59, v60 = generateExperienceDetailsShareLinkUrl(p5, s7, s8)
+		local v61 = Players.LocalPlayer and Players.LocalPlayer.UserId
+
+		gameCopyExperienceLink({
+			ctx = s9,
+			uid = tostring(v61),
+			placeId = s8,
+			stamp = v60
+		}, s9)
+		default:shareUrl({
+			context = "GameDetailsMoreWebURL",
+			url = v59
+		})
+		p4(SetCurrentToastMessage({
+			toastMessage = "Feature.GameDetails.Toast.LinkCopied",
+			toastType = ToastType.SuccessConfirmation
+		}))
+	end):catch(function(_) -- line: 140
+		-- upvalues: p4 (copy), SetCurrentToastMessage (copy), ToastType (copy)
+		p4(SetCurrentToastMessage({
+			toastMessage = "Feature.Toast.NetworkingError.SomethingIsWrong",
+			toastType = ToastType.NetworkingError
+		}))
+	end)
+end
+local function useExperienceDetailsShare(s10: string, s11: string?, s12: string) -- line: 153
+	-- upvalues: useDispatch (copy), useAppPolicy (copy), React (copy), handleCopyLink (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), NavigateDown (copy), fetchShareLinkId (copy), generateExperienceDetailsShareLinkUrl (copy), Players (copy), gameShareExperienceLink (copy), default (copy), UrlBuilder2 (copy)
+	local v49 = useDispatch()
+	local v50 = useAppPolicy(function(p7) -- line: 159
+		return p7.shouldShareToAccountProvider()
+	end)
+
+	return React.useCallback(function() -- line: 163
+		-- upvalues: s11 (copy), v50 (copy), handleCopyLink (copy), s10 (copy), s12 (copy), v49 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), NavigateDown (copy), fetchShareLinkId (copy), generateExperienceDetailsShareLinkUrl (copy), Players (copy), gameShareExperienceLink (copy), default (copy), UrlBuilder2 (copy)
+		if not s11 then
+			return
+		end
+
+		if not v50 then
+			handleCopyLink(s10, s11, s12, v49)
+
+			return
+		end
+
+		if v50 then
+			local t2 = {
+				name = AppPage.SdkShare,
+				extraProps = {
+					context = "GameDetailsMoreWebURL",
+					universeId = s10
+				}
+			}
+
+			if FFlagSignalsNavP3Dispatch then
+				v22.down(v22.fromLegacyPage(t2))
+
+				return
+			end
+
+			v49(NavigateDown(t2))
+
+			return
+		end
+
+		fetchShareLinkId(s10):andThen(function(p8) -- line: 191
+			-- upvalues: generateExperienceDetailsShareLinkUrl (copy), s10 (copy), s11 (copy), Players (copy), gameShareExperienceLink (copy), s12 (copy), default (copy)
+			local v66, v67 = generateExperienceDetailsShareLinkUrl(p8, s10, s11)
+			local v68 = Players.LocalPlayer and Players.LocalPlayer.UserId
+
+			gameShareExperienceLink({
+				shareToAppsflyer = true,
+				ctx = s12,
+				uid = tostring(v68),
+				placeId = s11,
+				shortShareLinkFailed = not p8,
+				stamp = v67,
+				linkId = p8
+			}, s12)
+			default:shareUrl({
+				context = "GameDetailsMoreWebURL",
+				url = v66
+			})
+		end):catch(function(_) -- line: 213
+			-- upvalues: s10 (copy), s11 (copy), UrlBuilder2 (copy), Players (copy), gameShareExperienceLink (copy), s12 (copy), default (copy)
+			local v70 = s10
+			local v71 = s11
+			local v72 = UrlBuilder2.game.info.appsflyer({
+				universeId = v70,
+				placeId = v71
+			})
+			local v73 = Players.LocalPlayer and Players.LocalPlayer.UserId
+
+			gameShareExperienceLink({
+				shortShareLinkFailed = true,
+				shareToAppsflyer = true,
+				linkId = nil,
+				ctx = s12,
+				uid = tostring(v73),
+				placeId = s11,
+				stamp = nil
+			}, s12)
+			default:shareUrl({
+				context = "GameDetailsMoreWebURL",
+				url = v72
+			})
+		end)
+	end, {
+		s10,
+		s11,
+		v50,
+		v49,
+		s12
+	})
+end
+
+return useExperienceDetailsShare

@@ -1,1 +1,1 @@
-return require(script.RobloxTranslator);
+return require(script.RobloxTranslator)

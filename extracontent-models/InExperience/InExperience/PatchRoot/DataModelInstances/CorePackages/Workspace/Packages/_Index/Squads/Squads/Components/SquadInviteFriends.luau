@@ -1,8 +1,9 @@
-local v0 = require(script.QuickStartSquadInviteFriendsContainer);
-local v1 = require(script.SquadInviteFriends);
-local v2 = require(script.SquadInviteFriendsContainer);
+local QuickStartSquadInviteFriendsContainer = require(script.QuickStartSquadInviteFriendsContainer)
+local SquadInviteFriends = require(script.SquadInviteFriends)
+local SquadInviteFriendsContainer = require(script.SquadInviteFriendsContainer)
+
 return {
-    QuickStartSquadInviteFriendsContainer = v0, 
-    SquadInviteFriends = v1, 
-    SquadInviteFriendsContainer = v2
-};
+	QuickStartSquadInviteFriendsContainer = QuickStartSquadInviteFriendsContainer,
+	SquadInviteFriends = SquadInviteFriends,
+	SquadInviteFriendsContainer = SquadInviteFriendsContainer
+}

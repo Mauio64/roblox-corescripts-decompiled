@@ -1,27 +1,32 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v4 = {};
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-local _ = require(script.Parent["merge-typedefs_types"]);
-v4.mergeScalar = function(v8, v9, v10) --[[ Line: 24 ]] --[[ Name: mergeScalar ]]
-    -- upvalues: l_Boolean_0 (copy), l_mergeDirectives_0 (copy), l_Object_0 (copy), l_Kind_0 (copy)
-    if v9 then
-        return {
-            name = v8.name, 
-            description = if l_Boolean_0.toJSBoolean(v8.description) then v8.description else v9.description, 
-            kind = (not (not (v10 and l_Boolean_0.toJSBoolean(v10.convertExtensions)) and v8.kind ~= "ScalarTypeDefinition") or v9.kind == "ScalarTypeDefinition") and "ScalarTypeDefinition" or "ScalarTypeExtension", 
-            loc = v8.loc, 
-            directives = l_mergeDirectives_0(v8.directives, v9.directives, v10)
-        };
-    elseif v10 and l_Boolean_0.toJSBoolean(v10.convertExtensions) then
-        return (l_Object_0.assign({}, v8, {
-            kind = l_Kind_0.SCALAR_TYPE_DEFINITION
-        }));
-    else
-        return v8;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local Kind = require(ParentParent.GraphQL).Kind
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+
+require(script.Parent["merge-typedefs_types"])
+
+function t1.mergeScalar(p1, p2, p3) -- line: 24
+	-- upvalues: Boolean (copy), mergeDirectives (copy), Object (copy), Kind (copy)
+	if p2 then
+		return {
+			name = p1.name,
+			description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
+			kind = not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "ScalarTypeDefinition" and p2.kind ~= "ScalarTypeDefinition") and "ScalarTypeExtension" or "ScalarTypeDefinition",
+			loc = p1.loc,
+			directives = mergeDirectives(p1.directives, p2.directives, p3)
+		}
+	end
+
+	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
+		return (Object.assign({}, p1, {
+			kind = Kind.SCALAR_TYPE_DEFINITION
+		}))
+	end
+
+	return p1
+end
+
+return t1

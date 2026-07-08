@@ -1,4 +1,4 @@
 return {
-    ExperimentCacheManager = require(script.ExperimentCacheManager), 
-    ["jest.config"] = script["jest.config"]
-};
+	ExperimentCacheManager = require(script.ExperimentCacheManager),
+	["jest.config"] = script["jest.config"]
+}

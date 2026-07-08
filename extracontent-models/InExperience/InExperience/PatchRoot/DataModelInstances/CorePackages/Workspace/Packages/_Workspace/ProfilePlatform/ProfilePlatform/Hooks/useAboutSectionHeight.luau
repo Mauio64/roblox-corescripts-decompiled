@@ -1,37 +1,41 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local l_TextService_0 = game:GetService("TextService");
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.Responsive);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_useIsSpatial_0 = v4.useIsSpatial;
-local l_usePreferredInput_0 = v4.usePreferredInput;
-return function(v8, v9, v10) --[[ Line: 11 ]]
-    -- upvalues: l_useTokens_0 (copy), l_useIsSpatial_0 (copy), l_usePreferredInput_0 (copy), v4 (copy), v2 (copy), l_TextService_0 (copy)
-    local v11 = l_useTokens_0();
-    local l_BodyMedium_0 = v11.Typography.BodyMedium;
-    local v13 = l_useIsSpatial_0();
-    local v14 = l_usePreferredInput_0() == v4.Input.Directional;
-    local v15 = v13 or v14;
-    local v20, v21 = v2.useMemo(function() --[[ Line: 19 ]]
-        -- upvalues: v8 (copy), l_TextService_0 (ref), l_BodyMedium_0 (copy), v15 (copy), v9 (copy), v11 (copy)
-        local v16 = string.gsub(v8 or "", "[\r\n]+", " ");
-        local l_Y_0 = l_TextService_0:GetTextSize(v16, l_BodyMedium_0.FontSize, l_BodyMedium_0.Font, Vector2.new(1e999, 1e999)).Y;
-        local v18 = l_Y_0 * ((v15 and 1.3 or 1) * l_BodyMedium_0.LineHeight) + l_Y_0;
-        if v8 and v8 ~= "" then
-            local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(v8, l_BodyMedium_0.FontSize, l_BodyMedium_0.Font, Vector2.new(v9, 1e999));
-            return if v18 < l_l_TextService_0_TextSize_0.Y then v18 + l_Y_0 + v11.Gap.XSmall else l_l_TextService_0_TextSize_0.Y, v18;
-        else
-            return 0, v18;
-        end;
-    end, {
-        v8, 
-        l_BodyMedium_0.FontSize, 
-        l_BodyMedium_0.Font, 
-        v9, 
-        v10, 
-        v15, 
-        v11.Gap.XSmall
-    });
-    return v20, v21;
-end;
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+local TextService = game:GetService("TextService")
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local Responsive = require(Parent.Responsive)
+local useTokens = Foundation.Hooks.useTokens
+local useIsSpatial = Responsive.useIsSpatial
+local usePreferredInput = Responsive.usePreferredInput
+
+return function(s1: string?, n1: number, n2: number) -- line: 11
+	-- upvalues: useTokens (copy), useIsSpatial (copy), usePreferredInput (copy), Responsive (copy), React (copy), TextService (copy)
+	local v12 = useTokens()
+	local BodyMedium = v12.Typography.BodyMedium
+	local v14 = useIsSpatial()
+	local v15 = usePreferredInput() == Responsive.Input.Directional
+	local v16 = v14 or v15
+	local v17, v18 = React.useMemo(function() -- line: 19
+		-- upvalues: s1 (copy), TextService (copy), BodyMedium (copy), v16 (copy), n1 (copy), v12 (copy)
+		local v19 = string.gsub(s1 or "", "[\r\n]+", " ")
+		local Y = TextService:GetTextSize(v19, BodyMedium.FontSize, BodyMedium.Font, Vector2.new(1e999, 1e999)).Y
+		local v21 = Y * ((not v16 and 1 or 1.3) * BodyMedium.LineHeight) + Y
+
+		if s1 and s1 ~= "" then
+			local TextSize = TextService:GetTextSize(s1, BodyMedium.FontSize, BodyMedium.Font, Vector2.new(n1, 1e999))
+
+			return if not (v21 < TextSize.Y) then TextSize.Y else v21 + Y + v12.Gap.XSmall, v21
+		end
+
+		return 0, v21
+	end, {
+		s1,
+		BodyMedium.FontSize,
+		BodyMedium.Font,
+		n1,
+		n2,
+		v16,
+		v12.Gap.XSmall
+	})
+
+	return v17, v18
+end

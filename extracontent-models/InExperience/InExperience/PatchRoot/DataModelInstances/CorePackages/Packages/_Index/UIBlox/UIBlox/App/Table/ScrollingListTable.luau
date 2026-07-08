@@ -1,70 +1,76 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Core_0 = l_Parent_0.Core;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local l_VirtualizedList_0 = require(l_Parent_1.VirtualizedList).VirtualizedList;
-local v5 = require(l_Parent_1.Cryo);
-local v6 = require(l_Core_0.Style.withStyle);
-local v7 = {
-    selectable = true, 
-    size = UDim2.fromScale(1, 1)
-};
-return function(v8) --[[ Line: 39 ]] --[[ Name: ScrollingListTable ]]
-    -- upvalues: v6 (copy), v5 (copy), v7 (copy), v3 (copy), l_VirtualizedList_0 (copy)
-    return v6(function(v9) --[[ Line: 40 ]]
-        -- upvalues: v5 (ref), v7 (ref), v8 (copy), v3 (ref), l_VirtualizedList_0 (ref)
-        local v10 = v5.Dictionary.join(v7, v8);
-        local v11 = {};
-        local l_cells_0 = v10.cells;
-        for v13, v14 in ipairs(l_cells_0) do
-            local v15 = "Cell " .. v13;
-            v11[v15] = v3.createElement("Frame", {
-                LayoutOrder = v13, 
-                Size = UDim2.fromScale(1, 0), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Name = v15
-            }, {
-                Content = v14, 
-                Divider = v13 < #l_cells_0 and v3.createElement("Frame", {
-                    Size = UDim2.new(1, -24, 0, 1), 
-                    Position = UDim2.new(0, 24, 1, -1), 
-                    BorderSizePixel = 0, 
-                    BackgroundColor3 = v9.Theme.Divider.Color, 
-                    BackgroundTransparency = v9.Theme.Divider.Transparency, 
-                    ZIndex = 100
-                }) or nil
-            });
-        end;
-        return v3.createElement(l_VirtualizedList_0, {
-            Size = v10.size, 
-            data = v11, 
-            renderItem = function(v16) --[[ Line: 70 ]] --[[ Name: renderItem ]]
-                return v16.item;
-            end, 
-            getItemCount = function(_) --[[ Line: 73 ]] --[[ Name: getItemCount ]]
-                -- upvalues: l_cells_0 (copy)
-                return #l_cells_0;
-            end, 
-            getItem = function(v18, v19) --[[ Line: 76 ]] --[[ Name: getItem ]]
-                return v18["Cell " .. tostring(v19)];
-            end, 
-            keyExtractor = function(_, v21) --[[ Line: 80 ]] --[[ Name: keyExtractor ]]
-                return "Cell " .. tostring(v21);
-            end, 
-            style = {
-                AnchorPoint = v10.anchorPoint, 
-                Position = v10.position, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = v10.layoutOrder, 
-                Name = v10.Name or "ListTable", 
-                ScrollBarThickness = 0, 
-                Selectable = v10.selectable
-            }, 
-            contentContainerStyle = {
-                BackgroundTransparency = 1
-            }
-        });
-    end);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Core = ParentParent.Core
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local VirtualizedList = require(ParentParentParent.VirtualizedList).VirtualizedList
+local Cryo = require(ParentParentParent.Cryo)
+local withStyle = require(Core.Style.withStyle)
+local t1 = {
+	selectable = true,
+	size = UDim2.fromScale(1, 1)
+}
+
+local function ScrollingListTable(t2: {[any]: any}) -- line: 39
+	-- upvalues: withStyle (copy), Cryo (copy), t1 (copy), React (copy), VirtualizedList (copy)
+	return withStyle(function(p1) -- line: 40
+		-- upvalues: Cryo (copy), t1 (copy), t2 (copy), React (copy), VirtualizedList (copy)
+		local v12 = Cryo.Dictionary.join(t1, t2)
+		local t3 = {}
+		local cells = v12.cells
+
+		for i, v in ipairs(cells) do
+			local v17 = "Cell " .. i
+
+			t3[v17] = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = i,
+				Size = UDim2.fromScale(1, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Name = v17
+			}, {
+				Content = v,
+				Divider = i < #cells and React.createElement("Frame", {
+					BorderSizePixel = 0,
+					ZIndex = 100,
+					Size = UDim2.new(1, -24, 0, 1),
+					Position = UDim2.new(0, 24, 1, -1),
+					BackgroundColor3 = p1.Theme.Divider.Color,
+					BackgroundTransparency = p1.Theme.Divider.Transparency
+				}) or nil
+			})
+		end
+
+		return React.createElement(VirtualizedList, {
+			Size = v12.size,
+			data = t3,
+			renderItem = function(p2) -- line: 70
+				return p2.item
+			end,
+			getItemCount = function(_) -- line: 73
+				-- upvalues: cells (copy)
+				return #cells
+			end,
+			getItem = function(p4, n1: number) -- line: 76
+				return p4["Cell " .. tostring(n1)]
+			end,
+			keyExtractor = function(_, n2: number) -- line: 80
+				return "Cell " .. tostring(n2)
+			end,
+			style = {
+				BackgroundTransparency = 1,
+				ScrollBarThickness = 0,
+				AnchorPoint = v12.anchorPoint,
+				Position = v12.position,
+				LayoutOrder = v12.layoutOrder,
+				Name = v12.Name or "ListTable",
+				Selectable = v12.selectable
+			},
+			contentContainerStyle = {
+				BackgroundTransparency = 1
+			}
+		})
+	end)
+end
+
+return ScrollingListTable

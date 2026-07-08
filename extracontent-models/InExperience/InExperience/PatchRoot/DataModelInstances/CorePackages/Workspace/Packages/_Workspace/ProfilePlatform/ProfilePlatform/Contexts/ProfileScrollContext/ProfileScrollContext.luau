@@ -1,11 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-return (require(l_Parent_0.React).createContext({
-    scrollY = 0, 
-    setAbsoluteYPosition = function() --[[ Line: 14 ]] --[[ Name: setAbsoluteYPosition ]]
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
 
-    end, 
-    peekViewOpenPercent = 0, 
-    setPeekViewOpenPercent = function() --[[ Line: 16 ]] --[[ Name: setPeekViewOpenPercent ]]
-
-    end
-}));
+return (require(Parent.React).createContext({
+	scrollY = 0,
+	peekViewOpenPercent = 0,
+	setAbsoluteYPosition = function() -- line: 14
+	end,
+	setPeekViewOpenPercent = function() -- line: 16
+	end
+}))

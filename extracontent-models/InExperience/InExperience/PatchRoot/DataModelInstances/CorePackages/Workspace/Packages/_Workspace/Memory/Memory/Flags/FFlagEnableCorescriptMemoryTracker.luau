@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableCorescriptMemoryTracker", false);
+return game:DefineFastFlag("EnableCorescriptMemoryTracker", false)

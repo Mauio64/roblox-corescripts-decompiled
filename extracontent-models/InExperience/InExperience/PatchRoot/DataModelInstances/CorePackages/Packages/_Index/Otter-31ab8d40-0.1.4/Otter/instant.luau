@@ -1,13 +1,15 @@
-local function v3(v0, _, _) --[[ Line: 1 ]] --[[ Name: step ]]
-    return {
-        value = v0.__targetValue, 
-        complete = true
-    };
-end;
-return function(v4) --[[ Line: 8 ]] --[[ Name: instant ]]
-    -- upvalues: v3 (copy)
-    return {
-        __targetValue = v4, 
-        step = v3
-    };
-end;
+local function step(p1, _, _) -- line: 1
+	return {
+		complete = true,
+		value = p1.__targetValue
+	}
+end
+local function instant(p4) -- line: 8
+	-- upvalues: step (copy)
+	return {
+		__targetValue = p4,
+		step = step
+	}
+end
+
+return instant

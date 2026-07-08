@@ -1,5 +1,5 @@
 return {
-    View = "View", 
-    Create = "Create", 
-    Join = "Join"
-};
+	View = "View",
+	Create = "Create",
+	Join = "Join"
+}

@@ -1,33 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("IAPExperience");
-local v1 = require(l_script_FirstAncestor_0.Enums.EconomicRestrictionsViolationType);
-local v2 = require(l_script_FirstAncestor_0.Utility.logger);
-return function(v3, v4) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    if v4 == v1.Chargeback then
-        return v3.chargebackViolationLabel;
-    elseif v4 == v1.AbuseOfAffiliateSystem then
-        return v3.fraudAbuseOfAffiliateSystemViolationLabel;
-    elseif v4 == v1.AttemptedUnauthorizedPaymentMethodUse then
-        return v3.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel;
-    elseif v4 == v1.PaymentAuthorizationAttempt then
-        return v3.fraudPaymentAbuseViolationLabel;
-    elseif v4 == v1.RepeatedRefundRequests then
-        return v3.fraudRepeatedRefundRequestsViolationLabel;
-    elseif v4 == v1.SuspiciousAccountPatterns then
-        return v3.fraudSuspiciousAccountPatternsViolationLabel;
-    elseif v4 == v1.SuspiciousRefundRequests then
-        return v3.fraudSuspiciousRefundRequestsViolationLabel;
-    elseif v4 == v1.UnauthorizedPurchase then
-        return v3.fraudUnauthorizedPurchaseViolationLabel;
-    elseif v4 == v1.UseOfUnauthorizedOffPlatformTransactions then
-        return v3.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel;
-    elseif v4 == v1.VirtualEconomyAbuse then
-        return v3.fraudVirtualEconomyAbuseViolationLabel;
-    else
-        v2.error({
-            message = "Invalid violation type", 
-            violationType = v4
-        });
-        return "";
-    end;
-end;
+local IAPExperience = script:FindFirstAncestor("IAPExperience")
+local EconomicRestrictionsViolationType = require(IAPExperience.Enums.EconomicRestrictionsViolationType)
+local logger = require(IAPExperience.Utility.logger)
+
+return function(t1: {[any]: any}, p1) -- line: 9
+	-- upvalues: EconomicRestrictionsViolationType (copy), logger (copy)
+	if p1 == EconomicRestrictionsViolationType.Chargeback then
+		return t1.chargebackViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.AbuseOfAffiliateSystem then
+		return t1.fraudAbuseOfAffiliateSystemViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.AttemptedUnauthorizedPaymentMethodUse then
+		return t1.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.PaymentAuthorizationAttempt then
+		return t1.fraudPaymentAbuseViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.RepeatedRefundRequests then
+		return t1.fraudRepeatedRefundRequestsViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.SuspiciousAccountPatterns then
+		return t1.fraudSuspiciousAccountPatternsViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.SuspiciousRefundRequests then
+		return t1.fraudSuspiciousRefundRequestsViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.UnauthorizedPurchase then
+		return t1.fraudUnauthorizedPurchaseViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.UseOfUnauthorizedOffPlatformTransactions then
+		return t1.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel
+	end
+
+	if p1 == EconomicRestrictionsViolationType.VirtualEconomyAbuse then
+		return t1.fraudVirtualEconomyAbuseViolationLabel
+	end
+
+	logger.error({
+		message = "Invalid violation type",
+		violationType = p1
+	})
+
+	return ""
+end

@@ -1,26 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_t_0 = v1.t;
-local l_llama_0 = v1.llama;
-local v4 = require(script.Parent.friendsPerLoadGroup);
-local v5 = l_t_0.interface({
-    visibleRows = l_t_0.number, 
-    itemSize = l_t_0.number, 
-    filter = l_t_0.string
-});
-local v6 = l_t_0.interface({
-    width = l_t_0.number, 
-    filterFriendCounts = l_t_0.table
-});
-return function(v7, v8) --[[ Line: 19 ]]
-    -- upvalues: v6 (copy), v5 (copy), v4 (copy), l_llama_0 (copy)
-    assert(v6(v7));
-    assert(v5(v8));
-    local v9 = v4(v7, v8);
-    local v10 = v7.filterFriendCounts[v8.filter] + v9;
-    return {
-        filterFriendCounts = l_llama_0.Dictionary.join(v7.filterFriendCounts, {
-            [v8.filter] = v10
-        })
-    };
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local t = dependencies.t
+local llama = dependencies.llama
+local friendsPerLoadGroup = require(script.Parent.friendsPerLoadGroup)
+local v6 = t.interface({
+	visibleRows = t.number,
+	itemSize = t.number,
+	filter = t.string
+})
+local v7 = t.interface({
+	width = t.number,
+	filterFriendCounts = t.table
+})
+
+return function(p1, p2) -- line: 19
+	-- upvalues: v7 (copy), v6 (copy), friendsPerLoadGroup (copy), llama (copy)
+	assert(v7(p1))
+	assert(v6(p2))
+
+	local v10 = friendsPerLoadGroup(p1, p2)
+	local v11 = p1.filterFriendCounts[p2.filter] + v10
+
+	return {
+		filterFriendCounts = llama.Dictionary.join(p1.filterFriendCounts, {
+			[p2.filter] = v11
+		})
+	}
+end

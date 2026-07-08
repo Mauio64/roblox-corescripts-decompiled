@@ -1,6 +1,6 @@
 return {
-    addUniverseId = "addUniverseId", 
-    addPlaySessionId = "addPlaySessionId", 
-    addPlaceId = "addPlaceId", 
-    addSessionInfo = "addSessionInfo"
-};
+	addUniverseId = "addUniverseId",
+	addPlaySessionId = "addPlaySessionId",
+	addPlaceId = "addPlaceId",
+	addSessionInfo = "addSessionInfo"
+}

@@ -1,50 +1,72 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.RoactUtils);
-local v5 = require(l_Parent_0.NavigationRodux);
-local v6 = require(l_Parent_0.RobloxAppEnums);
-local v7 = require(l_Parent_0.Navigation);
-local l_AppPage_0 = v6.AppPage;
-local l_NavigateDown_0 = v5.Thunks.NavigateDown;
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useNavigation_0 = v7.useNavigation;
-local v12 = require(script.Parent.AddFriendsTile);
-local v13 = require(l_script_FirstAncestor_0.Analytics.useSocialCarouselAnalytics);
-local v14 = require(l_script_FirstAncestor_0.Contexts.useSocialCarouselContext);
-local v15 = require(l_script_FirstAncestor_0.Common.Constants);
-local v16 = require(l_script_FirstAncestor_0.Hooks.useNewFriendRequestsCount);
-local l_FFlagCreateConnectionsHub_0 = require(l_Parent_0.SharedFlags).FFlagCreateConnectionsHub;
-return function(v18) --[[ Line: 26 ]] --[[ Name: AddFriendsTileContainer ]]
-    -- upvalues: l_useNavigation_0 (copy), l_useDispatch_0 (copy), v13 (copy), v14 (copy), v16 (copy), v3 (copy), l_FFlagCreateConnectionsHub_0 (copy), l_AppPage_0 (copy), l_NavigateDown_0 (copy), v15 (copy), v12 (copy), v2 (copy)
-    local v19 = l_useNavigation_0();
-    local v20 = l_useDispatch_0();
-    local v21 = v13();
-    local v22 = v14();
-    local v23 = v16();
-    local v24 = v3.useCallback(function() --[[ Line: 32 ]]
-        -- upvalues: v21 (copy), v18 (copy), l_FFlagCreateConnectionsHub_0 (ref), v19 (copy), l_AppPage_0 (ref), v20 (copy), l_NavigateDown_0 (ref)
-        v21.addFriendsPressed(v18.index);
-        if l_FFlagCreateConnectionsHub_0 then
-            v19.navigate(l_AppPage_0.CoHubAddConnections);
-            return;
-        else
-            v20(l_NavigateDown_0({
-                name = l_AppPage_0.AddFriendsPage
-            }));
-            return;
-        end;
-    end, {
-        v20, 
-        v19
-    });
-    v3.useEffect(function() --[[ Line: 41 ]]
-        -- upvalues: v22 (copy), v15 (ref)
-        v22.onSuccessfulRender(v15.ANALYTICS.UI_LOADING_EVENTS.ADD_FRIENDS);
-    end, {});
-    return v3.createElement(v12, v2.Dictionary.join(v18, {
-        onActivated = v24, 
-        badge = v23
-    }));
-end;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local Cryo = require(SocialCarouselParent.Cryo)
+local React = require(SocialCarouselParent.React)
+local RoactUtils = require(SocialCarouselParent.RoactUtils)
+local NavigationRodux = require(SocialCarouselParent.NavigationRodux)
+local RobloxAppEnums = require(SocialCarouselParent.RobloxAppEnums)
+local Navigation = require(SocialCarouselParent.Navigation)
+local SocialStopwatch = require(SocialCarouselParent.SocialStopwatch)
+local AppPage = RobloxAppEnums.AppPage
+local NavigateDown = NavigationRodux.Thunks.NavigateDown
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useNavigation = Navigation.useNavigation
+local AddFriendsTile = require(script.Parent.AddFriendsTile)
+local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCarouselAnalytics)
+local useSocialCarouselContext = require(SocialCarousel.Contexts.useSocialCarouselContext)
+local Constants = require(SocialCarousel.Common.Constants)
+local useNewFriendRequestsCount = require(SocialCarousel.Hooks.useNewFriendRequestsCount)
+local FFlagCreateConnectionsHub = require(SocialCarouselParent.SharedFlags).FFlagCreateConnectionsHub
+local FFlagAddFriendsTileLoadFromHomeCarouselAnalytics = require(SocialCarouselParent.SharedFlags).FFlagAddFriendsTileLoadFromHomeCarouselAnalytics
+local FFlagSignalsNavP3Dispatch = require(SocialCarouselParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v22 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialCarouselParent.RobloxAppNavigation).NavigationCommands
+
+local function AddFriendsTileContainer(t1: {[any]: any}) -- line: 33
+	-- upvalues: useNavigation (copy), useDispatch (copy), useSocialCarouselAnalytics (copy), useSocialCarouselContext (copy), useNewFriendRequestsCount (copy), React (copy), FFlagAddFriendsTileLoadFromHomeCarouselAnalytics (copy), SocialStopwatch (copy), FFlagCreateConnectionsHub (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), NavigateDown (copy), Constants (copy), AddFriendsTile (copy), Cryo (copy)
+	local v25 = useNavigation()
+	local v26 = useDispatch()
+	local v27 = useSocialCarouselAnalytics()
+	local v28 = useSocialCarouselContext()
+	local v29 = useNewFriendRequestsCount()
+	local v30 = React.useCallback(function() -- line: 39
+		-- upvalues: v27 (copy), t1 (copy), FFlagAddFriendsTileLoadFromHomeCarouselAnalytics (copy), SocialStopwatch (copy), FFlagCreateConnectionsHub (copy), v25 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v22 (copy), v26 (copy), NavigateDown (copy)
+		v27.addFriendsPressed(t1.index)
+
+		if FFlagAddFriendsTileLoadFromHomeCarouselAnalytics then
+			SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.AFPUserTileLoadFromHomeCarousel)
+		end
+
+		if FFlagCreateConnectionsHub then
+			v25.navigate(AppPage.CoHubAddConnections)
+
+			return
+		end
+
+		if FFlagSignalsNavP3Dispatch then
+			v22.down(v22.fromLegacyPage({
+				name = AppPage.AddFriendsPage
+			}))
+
+			return
+		end
+
+		v26(NavigateDown({
+			name = AppPage.AddFriendsPage
+		}))
+	end, {
+		v26,
+		v25
+	})
+
+	React.useEffect(function() -- line: 53
+		-- upvalues: v28 (copy), Constants (copy)
+		v28.onSuccessfulRender(Constants.ANALYTICS.UI_LOADING_EVENTS.ADD_FRIENDS)
+	end, {})
+
+	return React.createElement(AddFriendsTile, Cryo.Dictionary.join(t1, {
+		onActivated = v30,
+		badge = v29
+	}))
+end
+
+return AddFriendsTileContainer

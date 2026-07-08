@@ -1,888 +1,1298 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RunService_0 = game:GetService("RunService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_TeleportService_0 = game:GetService("TeleportService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_VRService_0 = game:GetService("VRService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local v10 = game:DefineFastFlag("ConnectionRemoveLoadingTimeout", false);
-l_CorePackages_0:WaitForChild("Workspace"):WaitForChild("Packages", v10 and 1e999 or nil);
-local l_Create_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Create;
-local v12 = require(l_RobloxGui_0.Modules.ErrorPrompt);
-local l_Localization_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceLocales).Localization;
-local l_Logging_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Logging;
-local _ = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).Url;
-local l_mutedError_0 = require(l_CorePackages_0.Workspace.Packages.Loggers).mutedError;
-local v17 = game:DefineFastFlag("DebugEnableErrorStringTesting", false);
-local v18 = game:DefineFastFlag("ShouldMuteUnlocalizedError", false);
-local v19 = game:DefineFastFlag("UpdateConnectionErrorLoc", false);
-local v20 = game:DefineFastFlag("ShowScreentimeLockoutKickMessage", false);
-local v21 = game:DefineFastFlag("AddConnectionErrorLocalizationKeys", false);
-local v22 = game:DefineFastFlag("AddClientDisconnectVerboselyModeratedGame", false);
-local v23 = {
-    eventName = "ConnectionEvent", 
-    backends = {
-        "RobloxTelemetryCounter"
-    }, 
-    lastUpdated = {
-        2025, 
-        7, 
-        31
-    }, 
-    description = "Counter to track connection events.", 
-    links = "https://roblox.atlassian.net/browse/CSC-585"
-};
-local v24 = game:DefineFastInt("PotentialClientTimeoutSeconds", 7200);
-local v25 = game:DefineFastInt("MaxKickMessageLength", 200);
-local v26 = game:DefineFastFlag("RefactorReconnectUnblockTeleport", false);
-local l_game_EngineFeature_0 = game:GetEngineFeature("CoreGuiOverflowDetection");
-local v28 = require(l_RobloxGui_0.Modules.Flags.FFlagCoreScriptShowTeleportPrompt);
-local v29 = require(l_RobloxGui_0.Modules.Flags.FFlagAllowDisconnectGuiForOkUnknown);
-local v30 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingConnection2", false);
-local v31 = require(l_RobloxGui_0.Modules.Flags.GetFFlagDisplayChannelNameOnErrorPrompt);
-local function _(v32, v33) --[[ Line: 61 ]] --[[ Name: safeGetFInt ]]
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 62 ]]
-        -- upvalues: v32 (copy)
-        return (tonumber(settings():GetFVariable(v32)));
-    end);
-    return l_status_0 and l_result_0 or v33;
-end;
-local function _(v37, v38) --[[ Line: 68 ]] --[[ Name: safeGetFString ]]
-    local l_status_1, l_result_1 = pcall(function() --[[ Line: 69 ]]
-        -- upvalues: v37 (copy)
-        return settings():GetFVariable(v37);
-    end);
-    return l_status_1 and l_result_1 or v38;
-end;
-local l_pcall_0 = pcall;
-local v43 = "DefaultTimeoutTimeMs";
-local l_v43_0 = v43 --[[ copy: 38 -> 79 ]];
-local v45;
-l_pcall_0, v45 = l_pcall_0(function() --[[ Line: 62 ]]
-    -- upvalues: l_v43_0 (copy)
-    return (tonumber(settings():GetFVariable(l_v43_0)));
-end);
-local v46 = (l_pcall_0 and v45 or 10000) / 1000;
-local l_FFlag_0 = settings():GetFFlag("ReconnectDisabled");
-v45 = pcall;
-local v48 = "ReconnectDisabledReason";
-local l_v48_0 = v48 --[[ copy: 39 -> 80 ]];
-v45, v43 = v45(function() --[[ Line: 69 ]]
-    -- upvalues: l_v48_0 (copy)
-    return settings():GetFVariable(l_v48_0);
-end);
-l_pcall_0 = v45 and v43 or "We're sorry, Roblox is temporarily unavailable.  Please try again later.";
-v45 = tick();
-v43 = game:DefineFastFlag("UpdateConnectionLocWarning", false);
-v48 = game:DefineFastFlag("AddPlacelaunchDeviceBlock2", false);
-local function v56(v50, v51) --[[ Line: 96 ]] --[[ Name: translateString ]]
-    -- upvalues: l_LocalizationService_0 (copy), l_Localization_0 (copy), v43 (copy), l_Logging_0 (copy)
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    local v53 = l_Localization_0.new(l_RobloxLocaleId_0);
-    v53:SetLocale(l_RobloxLocaleId_0);
-    local l_status_2, l_result_2 = pcall(function() --[[ Line: 101 ]]
-        -- upvalues: v53 (copy), v50 (copy), v51 (copy)
-        return v53:Format(v50, v51);
-    end);
-    if l_status_2 then
-        return l_result_2;
-    else
-        if v43 then
-            l_Logging_0.warn("Failed to translate string with key: " .. v50 .. ", LocaleId: " .. l_RobloxLocaleId_0);
-        else
-            l_Logging_0.warn("Failed to translate string with key: " .. v50);
-        end;
-        return "";
-    end;
-end;
-local v57 = nil;
-local v58 = -1;
-local l_X_0 = l_RobloxGui_0.AbsoluteSize.X;
-local l_Y_0 = l_RobloxGui_0.AbsoluteSize.Y;
-local v61 = {
-    NONE = 1, 
-    RECONNECT_PLACELAUNCH = 2, 
-    RECONNECT_DISCONNECT = 3, 
-    TELEPORT_FAILED = 4, 
-    IS_RECONNECTING = 5, 
-    RECONNECT_DISABLED_DISCONNECT = 6, 
-    RECONNECT_DISABLED_PLACELAUNCH = 7, 
-    RECONNECT_DISABLED = 8, 
-    OUT_OF_MEMORY_KEEPPLAYING_LEAVE = 9, 
-    RECONNECT_CONNECT_FAILURE = 10, 
-    RECONNECT_DISABLED_CONNECT_FAILURE = 11
-};
-local l_NONE_0 = v61.NONE;
-local l_OK_0 = Enum.ConnectionError.OK;
-local v64 = {
-    [v61.RECONNECT_PLACELAUNCH] = "Join Error", 
-    [v61.RECONNECT_DISABLED_PLACELAUNCH] = "Join Error", 
-    [v61.RECONNECT_DISCONNECT] = "Disconnected", 
-    [v61.RECONNECT_DISABLED_DISCONNECT] = "Disconnected", 
-    [v61.TELEPORT_FAILED] = "Teleport Failed", 
-    [v61.RECONNECT_DISABLED] = "Error", 
-    [v61.OUT_OF_MEMORY_KEEPPLAYING_LEAVE] = "Low Memory Warning", 
-    [v61.RECONNECT_CONNECT_FAILURE] = "Connection Failed", 
-    [v61.RECONNECT_DISABLED_CONNECT_FAILURE] = "Connection Failed"
-};
-local v65 = {
-    [v61.RECONNECT_PLACELAUNCH] = "InGame.ConnectionError.Title.JoinError", 
-    [v61.RECONNECT_DISABLED_PLACELAUNCH] = "InGame.ConnectionError.Title.JoinError", 
-    [v61.RECONNECT_DISCONNECT] = "InGame.ConnectionError.Title.Disconnected", 
-    [v61.RECONNECT_DISABLED_DISCONNECT] = "InGame.ConnectionError.Title.Disconnected", 
-    [v61.TELEPORT_FAILED] = "InGame.ConnectionError.Title.TeleportFailed", 
-    [v61.RECONNECT_DISABLED] = "InGame.CommonUI.Title.Error", 
-    [v61.OUT_OF_MEMORY_KEEPPLAYING_LEAVE] = "InGame.ConnectionError.Title.LowMemoryWarning", 
-    [v61.RECONNECT_CONNECT_FAILURE] = "InGame.ConnectionError.Title.ConnectionFailed", 
-    [v61.RECONNECT_DISABLED_CONNECT_FAILURE] = "InGame.ConnectionError.Title.ConnectionFailed"
-};
-local v66 = l_Create_0("ScreenGui")({
-    Parent = l_CoreGui_0, 
-    Name = "RobloxPromptGui", 
-    OnTopOfCoreBlur = true, 
-    DisplayOrder = 9, 
-    AutoLocalize = false
-});
-local v67 = l_Create_0("Frame")({
-    Name = "promptOverlay", 
-    BackgroundColor3 = Color3.new(0, 0, 0), 
-    BackgroundTransparency = 1, 
-    Size = UDim2.new(1, 0, 1, 36), 
-    Position = UDim2.new(0, 0, 0, -36), 
-    Active = false, 
-    Parent = v66
-});
-coroutine.wrap(function() --[[ Line: 185 ]]
-    -- upvalues: l_RobloxGui_0 (copy), v67 (copy)
-    local v68 = require(l_RobloxGui_0.Modules.TopBar.Constants);
-    local v69 = v68.ApplyDisplayScale(v68.TopBarHeight);
-    v67.Size = UDim2.new(1, 0, 1, v69);
-    v67.Position = UDim2.new(0, 0, 0, -v69);
-end)();
-local function v71() --[[ Line: 194 ]]
-    -- upvalues: l_NONE_0 (ref), v61 (copy), l_TelemetryService_0 (copy), v23 (copy), l_RbxAnalyticsService_0 (copy), v57 (ref), l_TeleportService_0 (copy), v28 (copy), v26 (copy), l_GuiService_0 (copy)
-    local _ = tick();
-    if l_NONE_0 == v61.IS_RECONNECTING then
-        l_TelemetryService_0:LogCounter(v23, {
-            customFields = {
-                selectedItem = "UserClickWhileReconnecting"
-            }
-        }, 1);
-        return;
-    else
-        l_TelemetryService_0:LogCounter(v23, {
-            customFields = {
-                selectedItem = "ReconnectInitiated"
-            }
-        }, 1);
-        l_RbxAnalyticsService_0:ReportCounter("ReconnectPrompt-ReconnectActivated");
-        l_NONE_0 = v61.IS_RECONNECTING;
-        v57:primaryShimmerPlay();
-        l_TelemetryService_0:LogCounter(v23, {
-            customFields = {
-                selectedItem = "ReconnectSameServer"
-            }
-        }, 1);
-        l_TeleportService_0:TeleportReconnect();
-        if v28 then
-            if v26 then
-                l_TeleportService_0:UnblockAsync();
-                return;
-            else
-                l_GuiService_0:SetMenuIsOpen(false, "ErrorPrompt");
-            end;
-        end;
-        return;
-    end;
-end;
-local function v72() --[[ Line: 219 ]]
-    -- upvalues: l_TelemetryService_0 (copy), v23 (copy), l_GuiService_0 (copy), l_RunService_0 (copy)
-    l_TelemetryService_0:LogCounter(v23, {
-        customFields = {
-            selectedItem = "LeaveInitiated"
-        }
-    }, 1);
-    l_GuiService_0.SelectedCoreObject = nil;
-    l_RunService_0.RenderStepped:wait();
-    l_RunService_0.RenderStepped:wait();
-    game:Shutdown();
-end;
-local function v73() --[[ Line: 228 ]]
-    -- upvalues: l_GuiService_0 (copy)
-    l_GuiService_0:ClearError();
-end;
-local v74 = {
-    [Enum.ConnectionError.IPRecentlyConnected] = true, 
-    [Enum.ConnectionError.ConnectionBanned] = true, 
-    [Enum.ConnectionError.InvalidPassword] = true, 
-    [Enum.ConnectionError.OurSystemRequiresSecurity] = true, 
-    [Enum.ConnectionError.IncompatibleProtocolVersion] = true, 
-    [Enum.ConnectionError.DisconnectLuaKick] = true, 
-    [Enum.ConnectionError.DisconnectSecurityKeyMismatch] = true, 
-    [Enum.ConnectionError.DisconnectNewSecurityKeyMismatch] = true, 
-    [Enum.ConnectionError.DisconnectDuplicateTicket] = true, 
-    [Enum.ConnectionError.DisconnectWrongVersion] = true, 
-    [Enum.ConnectionError.DisconnectProtocolMismatch] = true, 
-    [Enum.ConnectionError.DisconnectBadhash] = true, 
-    [Enum.ConnectionError.DisconnectIllegalTeleport] = true, 
-    [Enum.ConnectionError.DisconnectDuplicatePlayer] = true, 
-    [Enum.ConnectionError.DisconnectCloudEditKick] = true, 
-    [Enum.ConnectionError.DisconnectOnRemoteSysStats] = true, 
-    [Enum.ConnectionError.DisconnectPrivateServerKickout] = true, 
-    [Enum.ConnectionError.PlacelaunchFlooded] = true, 
-    [Enum.ConnectionError.PlacelaunchHashException] = true, 
-    [Enum.ConnectionError.PlacelaunchHashExpired] = true, 
-    [Enum.ConnectionError.PlacelaunchUnauthorized] = true, 
-    [Enum.ConnectionError.PlacelaunchUserLeft] = true, 
-    [Enum.ConnectionError.PlacelaunchRestricted] = true, 
-    [Enum.ConnectionError.PlacelaunchUserPrivacyUnauthorized] = true, 
-    [Enum.ConnectionError.PlacelaunchCreatorBan] = true, 
-    [Enum.ConnectionError.AndroidAnticheatKick] = true, 
-    [Enum.ConnectionError.AndroidEmulatorKick] = true, 
-    [Enum.ConnectionError.AndroidRootedKick] = true
-};
-if l_game_EngineFeature_0 then
-    v74[Enum.ConnectionError.DisconnectClientFailure] = true;
-end;
-if v20 then
-    v74[Enum.ConnectionError.ScreentimeLockoutKick] = true;
-end;
-if v21 then
-    v74[Enum.ConnectionError.DisconnectBySecurityPolicy] = true;
-    v74[Enum.ConnectionError.DisconnectBlockedIP] = true;
-    v74[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = true;
-    v74[Enum.ConnectionError.DisconnectCollaboratorUnderage] = true;
-end;
+local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local TeleportService = game:GetService("TeleportService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local LocalizationService = game:GetService("LocalizationService")
+local VRService = game:GetService("VRService")
+local CorePackages = game:GetService("CorePackages")
+local TelemetryService = game:GetService("TelemetryService")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local HttpService = game:GetService("HttpService")
+local v13 = game:DefineFastFlag("ConnectionRemoveLoadingTimeout", false)
+
+CorePackages:WaitForChild("Workspace"):WaitForChild("Packages", if not v13 then nil else 1e999)
+
+local Create = require(CorePackages.Workspace.Packages.AppCommonLib).Create
+local ErrorPrompt = require(RobloxGui.Modules.ErrorPrompt)
+local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local Logging = require(CorePackages.Workspace.Packages.AppCommonLib).Logging
+local Url = require(CorePackages.Workspace.Packages.CoreScriptsCommon).Url
+local mutedError = require(CorePackages.Workspace.Packages.Loggers).mutedError
+local LinkingProtocol = require(CorePackages.Workspace.Packages.LinkingProtocol).LinkingProtocol
+local v21 = game:DefineFastFlag("DebugEnableErrorStringTesting", false)
+local v22 = game:DefineFastFlag("ShouldMuteUnlocalizedError", false)
+local v23 = game:DefineFastFlag("UpdateConnectionErrorLoc", false)
+local v24 = game:DefineFastFlag("ShowScreentimeLockoutKickMessage", false)
+local v25 = game:DefineFastFlag("AddConnectionErrorLocalizationKeys", false)
+local t1 = {
+	eventName = "ConnectionEvent",
+	description = "Counter to track connection events.",
+	links = "https://roblox.atlassian.net/browse/CSC-585",
+	backends = { "RobloxTelemetryCounter" },
+	lastUpdated = {
+		2025,
+		7,
+		31
+	}
+}
+local v27 = game:DefineFastInt("PotentialClientTimeoutSeconds", 7200)
+local v28 = game:DefineFastInt("MaxKickMessageLength", 200)
+local v29 = game:DefineFastFlag("RefactorReconnectUnblockTeleport", false)
+local EngineFeature = game:GetEngineFeature("CoreGuiOverflowDetection")
+local FFlagCoreScriptShowTeleportPrompt = require(RobloxGui.Modules.Flags.FFlagCoreScriptShowTeleportPrompt)
+local FFlagAllowDisconnectGuiForOkUnknown = require(RobloxGui.Modules.Flags.FFlagAllowDisconnectGuiForOkUnknown)
+local v33 = game:DefineFastFlag("EnableExperienceGenericChallengeRenderingConnection2", false)
+local GetFFlagDisplayChannelNameOnErrorPrompt = require(RobloxGui.Modules.Flags.GetFFlagDisplayChannelNameOnErrorPrompt)
+
+local function safeGetFInt(p1, p2) -- line: 62
+	local ok, result = pcall(function() -- line: 63
+		-- upvalues: p1 (copy)
+		return (tonumber(settings():GetFVariable(p1)))
+	end)
+
+	return ok and result or p2
+end
+local function safeGetFString(p3, p4) -- line: 69
+	local ok, result = pcall(function() -- line: 70
+		-- upvalues: p3 (copy)
+		return settings():GetFVariable(p3)
+	end)
+
+	return ok and result or p4
+end
+
+local s1 = "DefaultTimeoutTimeMs"
+local ok, result = pcall(function() -- line: 63
+	-- upvalues: s1 (copy)
+	return (tonumber(settings():GetFVariable(s1)))
+end)
+local v40 = (ok and result or 10000) / 1000
+local FFlag = settings():GetFFlag("ReconnectDisabled")
+local s2 = "ReconnectDisabledReason"
+local ok2, result2 = pcall(function() -- line: 70
+	-- upvalues: s2 (copy)
+	return settings():GetFVariable(s2)
+end)
+local v45 = ok2 and result2 or "We're sorry, Roblox is temporarily unavailable.  Please try again later."
+local timestamp = tick()
+local v47 = game:DefineFastFlag("UpdateConnectionLocWarning", false)
+local v48 = game:DefineFastFlag("AddPlacelaunchDeviceBlock2", false)
+local v49 = game:DefineFastFlag("AddContextualPlayabilityConnectionErrors", false)
+local v50 = game:DefineFastFlag("AddVipOwnerNotPresentConnectionError", false)
+local v51 = game:DefineFastFlag("VipOwnerNotPresentEnableReconnect", false)
+local v52 = game:DefineFastFlag("RAKickLogic2", false)
+local v53 = game:DefineFastInt("RAMinEngineVersion", 725)
+local v54 = false
+
+if v52 then
+	local RobloxVersion = RunService:GetRobloxVersion()
+	local num = tonumber(string.match(RobloxVersion, "%.(%d+)%."))
+
+	if num and v53 <= num then
+		v54 = true
+	end
+end
+
+local FFlagConnectionAmpUpsellOnLeave = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionAmpUpsellOnLeave
+local FFlagConnectionAmpParentalApprovalUpsell = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionAmpParentalApprovalUpsell
+local FFlagConnectionUpsellAnalytics = require(CorePackages.Workspace.Packages.SharedFlags).FFlagConnectionUpsellAnalytics
+local v60 = game:DefineFastFlag("AddCollaborationCoreGatedConnectionError2", false)
+local EngineFeature2 = game:GetEngineFeature("PlacelaunchCollaborationCoreGatedConnectionError")
+local ConnectionAmpUpsellOnLeave = nil
+
+if FFlagConnectionAmpUpsellOnLeave then
+	ConnectionAmpUpsellOnLeave = require(RobloxGui.Modules.ConnectionAmpUpsellOnLeave)
+end
+
+local function fetchUniverseIdFromPlaceId(p5) -- line: 128
+	-- upvalues: Url (copy), HttpRbxApiService (copy), HttpService (copy)
+	local v112 = string.format("%suniverses/v1/places/%d/universe", Url.APIS_URL, p5)
+	local ok3, result3 = pcall(HttpRbxApiService.GetAsyncFullUrl, HttpRbxApiService, v112)
+
+	if not ok3 or type(result3) ~= "string" then
+		return nil
+	end
+
+	local ok4, result4 = pcall(HttpService.JSONDecode, HttpService, result3)
+
+	if not ok4 or type(result4) ~= "table" then
+		return nil
+	end
+
+	local universeId = result4.universeId
+
+	if type(universeId) ~= "number" or universeId <= 0 then
+		return nil
+	end
+
+	return universeId
+end
+local function translateString(s3: string, t2: {[any]: any}?) -- line: 148
+	-- upvalues: LocalizationService (copy), Localization (copy), v47 (copy), Logging (copy)
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local v121 = Localization.new(RobloxLocaleId)
+
+	v121:SetLocale(RobloxLocaleId)
+
+	local ok5, result5 = pcall(function() -- line: 153
+		-- upvalues: v121 (copy), s3 (copy), t2 (copy)
+		return v121:Format(s3, t2)
+	end)
+
+	if ok5 then
+		return result5
+	end
+
+	if v47 then
+		Logging.warn("Failed to translate string with key: " .. s3 .. ", LocaleId: " .. RobloxLocaleId)
+	else
+		Logging.warn("Failed to translate string with key: " .. s3)
+	end
+
+	return ""
+end
+
+local u65 = nil
+local n1 = -1
+local AbsoluteSizeX = RobloxGui.AbsoluteSize.X
+local AbsoluteSizeY = RobloxGui.AbsoluteSize.Y
+local t3 = {
+	NONE = 1,
+	RECONNECT_PLACELAUNCH = 2,
+	RECONNECT_DISCONNECT = 3,
+	TELEPORT_FAILED = 4,
+	IS_RECONNECTING = 5,
+	RECONNECT_DISABLED_DISCONNECT = 6,
+	RECONNECT_DISABLED_PLACELAUNCH = 7,
+	RECONNECT_DISABLED = 8,
+	OUT_OF_MEMORY_KEEPPLAYING_LEAVE = 9,
+	RECONNECT_CONNECT_FAILURE = 10,
+	RECONNECT_DISABLED_CONNECT_FAILURE = 11,
+	RECONNECT_AGE_CHECK_REQUIRED = 12,
+	RECONNECT_PARENT_APPROVAL_REQUIRED = 13,
+	RECONNECT_COLLABORATION_CORE_GATED = 14
+}
+local n2 = 1
+local OK = Enum.ConnectionError.OK
+local t4 = {
+	[2] = "Join Error",
+	[7] = "Join Error",
+	[3] = "Disconnected",
+	[6] = "Disconnected",
+	[4] = "Teleport Failed",
+	[8] = "Error",
+	[9] = "Low Memory Warning",
+	[10] = "Connection Failed",
+	[11] = "Connection Failed"
+}
+
+if FFlagConnectionAmpUpsellOnLeave then
+	t4[12] = "Join Error"
+	t4[13] = "Join Error"
+end
+
+if v60 then
+	t4[14] = "Join Error"
+end
+
+local t5 = {
+	[2] = "InGame.ConnectionError.Title.JoinError",
+	[7] = "InGame.ConnectionError.Title.JoinError",
+	[3] = "InGame.ConnectionError.Title.Disconnected",
+	[6] = "InGame.ConnectionError.Title.Disconnected",
+	[4] = "InGame.ConnectionError.Title.TeleportFailed",
+	[8] = "InGame.CommonUI.Title.Error",
+	[9] = "InGame.ConnectionError.Title.LowMemoryWarning",
+	[10] = "InGame.ConnectionError.Title.ConnectionFailed",
+	[11] = "InGame.ConnectionError.Title.ConnectionFailed"
+}
+
+if FFlagConnectionAmpUpsellOnLeave then
+	t5[12] = "InGame.ConnectionError.Title.JoinError"
+	t5[13] = "InGame.ConnectionError.Title.JoinError"
+end
+
+if v60 then
+	t5[14] = "InGame.ConnectionError.Title.JoinError"
+end
+
+local v74 = Create("ScreenGui")({
+	Name = "RobloxPromptGui",
+	OnTopOfCoreBlur = true,
+	DisplayOrder = 9,
+	AutoLocalize = false,
+	Parent = CoreGui
+})
+local v75 = Create("Frame")({
+	Name = "promptOverlay",
+	BackgroundTransparency = 1,
+	Active = false,
+	BackgroundColor3 = Color3.new(0, 0, 0),
+	Size = UDim2.new(1, 0, 1, 36),
+	Position = UDim2.new(0, 0, 0, -36),
+	Parent = v74
+})
+
+coroutine.wrap(function() -- line: 264
+	-- upvalues: RobloxGui (copy), v75 (copy)
+	local Constants = require(RobloxGui.Modules.TopBar.Constants)
+	local v125 = Constants.ApplyDisplayScale(Constants.TopBarHeight)
+
+	v75.Size = UDim2.new(1, 0, 1, v125)
+	v75.Position = UDim2.new(0, 0, 0, -v125)
+end)()
+
+local function openCollaboratorsPageForUniverseId(p6) -- line: 273
+	-- upvalues: TelemetryService (copy), t1 (copy), Url (copy), LinkingProtocol (copy)
+	TelemetryService:LogCounter(t1, {
+		customFields = {
+			selectedItem = "ViewCollaboratorsOpenUrl"
+		}
+	}, 1)
+
+	local v127 = string.format("%sdashboard/creations/experiences/%s/safety/collaborators", Url.CREATE_URL, (tostring(p6)))
+
+	LinkingProtocol.default:openURL(v127)
+end
+local function v77() -- line: 309
+	-- upvalues: n2 (ref), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), u65 (ref), TeleportService (copy), FFlagCoreScriptShowTeleportPrompt (copy), v29 (copy), GuiService (copy)
+	tick()
+
+	if n2 == 5 then
+		TelemetryService:LogCounter(t1, {
+			customFields = {
+				selectedItem = "UserClickWhileReconnecting"
+			}
+		}, 1)
+
+		return
+	end
+
+	TelemetryService:LogCounter(t1, {
+		customFields = {
+			selectedItem = "ReconnectInitiated"
+		}
+	}, 1)
+	RbxAnalyticsService:ReportCounter("ReconnectPrompt-ReconnectActivated")
+	n2 = 5
+	u65:primaryShimmerPlay()
+	TelemetryService:LogCounter(t1, {
+		customFields = {
+			selectedItem = "ReconnectSameServer"
+		}
+	}, 1)
+	TeleportService:TeleportReconnect()
+
+	if FFlagCoreScriptShowTeleportPrompt then
+		if v29 then
+			TeleportService:UnblockAsync()
+
+			return
+		end
+
+		GuiService:SetMenuIsOpen(false, "ErrorPrompt")
+	end
+end
+local function v78() -- line: 341
+	-- upvalues: n2 (ref), TelemetryService (copy), t1 (copy), u65 (ref), GuiService (copy), TeleportService (copy)
+	if n2 == 5 then
+		TelemetryService:LogCounter(t1, {
+			customFields = {
+				selectedItem = "UserClickWhileReconnecting"
+			}
+		}, 1)
+
+		return
+	end
+
+	local PlaceId = game.PlaceId
+
+	if not PlaceId or PlaceId == 0 then
+		TelemetryService:LogCounter(t1, {
+			customFields = {
+				selectedItem = "PlacelaunchRetryMissingPlaceId"
+			}
+		}, 1)
+
+		return
+	end
+
+	TelemetryService:LogCounter(t1, {
+		customFields = {
+			selectedItem = "PlacelaunchRetryInitiated"
+		}
+	}, 1)
+	n2 = 5
+	u65:primaryShimmerPlay()
+	GuiService:ClearError()
+	TeleportService:Teleport(PlaceId)
+end
+local function v79() -- line: 361
+	-- upvalues: TelemetryService (copy), t1 (copy), GuiService (copy), RunService (copy)
+	TelemetryService:LogCounter(t1, {
+		customFields = {
+			selectedItem = "LeaveInitiated"
+		}
+	}, 1)
+	GuiService.SelectedCoreObject = nil
+	RunService.RenderStepped:wait()
+	RunService.RenderStepped:wait()
+	game:Shutdown()
+end
+local function v80() -- line: 370
+	-- upvalues: GuiService (copy)
+	GuiService:ClearError()
+end
+
+local t6 = {
+	[Enum.ConnectionError.IPRecentlyConnected] = true,
+	[Enum.ConnectionError.ConnectionBanned] = true,
+	[Enum.ConnectionError.InvalidPassword] = true,
+	[Enum.ConnectionError.OurSystemRequiresSecurity] = true,
+	[Enum.ConnectionError.IncompatibleProtocolVersion] = true,
+	[Enum.ConnectionError.DisconnectLuaKick] = true,
+	[Enum.ConnectionError.DisconnectSecurityKeyMismatch] = true,
+	[Enum.ConnectionError.DisconnectNewSecurityKeyMismatch] = true,
+	[Enum.ConnectionError.DisconnectDuplicateTicket] = true,
+	[Enum.ConnectionError.DisconnectWrongVersion] = true,
+	[Enum.ConnectionError.DisconnectProtocolMismatch] = true,
+	[Enum.ConnectionError.DisconnectBadhash] = true,
+	[Enum.ConnectionError.DisconnectIllegalTeleport] = true,
+	[Enum.ConnectionError.DisconnectDuplicatePlayer] = true,
+	[Enum.ConnectionError.DisconnectCloudEditKick] = true,
+	[Enum.ConnectionError.DisconnectOnRemoteSysStats] = true,
+	[Enum.ConnectionError.DisconnectPrivateServerKickout] = true,
+	[Enum.ConnectionError.PlacelaunchFlooded] = true,
+	[Enum.ConnectionError.PlacelaunchHashException] = true,
+	[Enum.ConnectionError.PlacelaunchHashExpired] = true,
+	[Enum.ConnectionError.PlacelaunchUnauthorized] = true,
+	[Enum.ConnectionError.PlacelaunchUserLeft] = true,
+	[Enum.ConnectionError.PlacelaunchRestricted] = true,
+	[Enum.ConnectionError.PlacelaunchUserPrivacyUnauthorized] = true,
+	[Enum.ConnectionError.PlacelaunchCreatorBan] = true,
+	[Enum.ConnectionError.AndroidAnticheatKick] = true,
+	[Enum.ConnectionError.AndroidEmulatorKick] = true,
+	[Enum.ConnectionError.AndroidRootedKick] = true
+}
+
+if EngineFeature then
+	t6[Enum.ConnectionError.DisconnectClientFailure] = true
+end
+
+if v24 then
+	t6[Enum.ConnectionError.ScreentimeLockoutKick] = true
+end
+
+if v25 then
+	t6[Enum.ConnectionError.DisconnectBySecurityPolicy] = true
+	t6[Enum.ConnectionError.DisconnectBlockedIP] = true
+	t6[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = true
+	t6[Enum.ConnectionError.DisconnectCollaboratorUnderage] = true
+end
+
 if v48 then
-    v74[Enum.ConnectionError.PlacelaunchDeviceBlock] = true;
-end;
-local v75 = {
-    [v61.RECONNECT_PLACELAUNCH] = {
-        {
-            Text = "Retry", 
-            LocalizationKey = "InGame.CommonUI.Button.Retry", 
-            LayoutOrder = 2, 
-            Callback = v71, 
-            Primary = true
-        }, 
-        {
-            Text = "Cancel", 
-            LocalizationKey = "Feature.SettingsHub.Action.CancelSearch", 
-            LayoutOrder = 1, 
-            Callback = v72
-        }
-    }, 
-    [v61.RECONNECT_DISCONNECT] = {
-        {
-            Text = "Reconnect", 
-            LocalizationKey = "InGame.ConnectionError.Button.Reconnect", 
-            LayoutOrder = 2, 
-            Callback = v71, 
-            Primary = true
-        }, 
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 1, 
-            Callback = v72
-        }
-    }, 
-    [v61.TELEPORT_FAILED] = {
-        {
-            Text = "OK", 
-            LocalizationKey = "InGame.CommonUI.Button.Ok", 
-            LayoutOrder = 1, 
-            Callback = v73, 
-            Primary = true
-        }
-    }, 
-    [v61.RECONNECT_DISABLED_DISCONNECT] = {
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 1, 
-            Callback = v72, 
-            Primary = true
-        }
-    }, 
-    [v61.RECONNECT_DISABLED_PLACELAUNCH] = {
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 1, 
-            Callback = v72, 
-            Primary = true
-        }
-    }, 
-    [v61.RECONNECT_DISABLED] = {
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 1, 
-            Callback = v72, 
-            Primary = true
-        }
-    }, 
-    [v61.OUT_OF_MEMORY_KEEPPLAYING_LEAVE] = {
-        {
-            Text = "Keep Playing", 
-            LocalizationKey = "InGame.CommonUI.Button.KeepPlaying", 
-            LayoutOrder = 1, 
-            Callback = v73
-        }, 
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 2, 
-            Callback = v72, 
-            Primary = true
-        }
-    }, 
-    [v61.RECONNECT_CONNECT_FAILURE] = {
-        {
-            Text = "Retry", 
-            LocalizationKey = "InGame.CommonUI.Button.Retry", 
-            LayoutOrder = 2, 
-            Callback = v71, 
-            Primary = true
-        }, 
-        {
-            Text = "Cancel", 
-            LocalizationKey = "Feature.SettingsHub.Action.CancelSearch", 
-            LayoutOrder = 1, 
-            Callback = v72
-        }
-    }, 
-    [v61.RECONNECT_DISABLED_CONNECT_FAILURE] = {
-        {
-            Text = "Leave", 
-            LocalizationKey = "Feature.SettingsHub.Label.LeaveButton", 
-            LayoutOrder = 1, 
-            Callback = v72, 
-            Primary = true
-        }
-    }
-};
-local v76 = {
-    [v61.NONE] = function() --[[ Line: 395 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = false;
-        v67.Transparency = 1;
-    end, 
-    [v61.RECONNECT_DISCONNECT] = function() --[[ Line: 400 ]]
-        -- upvalues: l_VRService_0 (copy), l_RunService_0 (copy), v67 (copy)
-        if l_VRService_0.VREnabled then
-            l_RunService_0:SetRobloxGuiFocused(false);
-        else
-            l_RunService_0:SetRobloxGuiFocused(true);
-        end;
-        v67.Active = true;
-        v67.Transparency = 1;
-    end, 
-    [v61.RECONNECT_PLACELAUNCH] = function() --[[ Line: 409 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = true;
-        v67.Transparency = 0.3;
-    end, 
-    [v61.TELEPORT_FAILED] = function() --[[ Line: 414 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = true;
-        v67.Transparency = 0.3;
-    end, 
-    [v61.RECONNECT_DISABLED_DISCONNECT] = function() --[[ Line: 419 ]]
-        -- upvalues: l_VRService_0 (copy), l_RunService_0 (copy), v67 (copy)
-        if l_VRService_0.VREnabled then
-            l_RunService_0:SetRobloxGuiFocused(false);
-        else
-            l_RunService_0:SetRobloxGuiFocused(true);
-        end;
-        v67.Active = true;
-        v67.Transparency = 1;
-    end, 
-    [v61.RECONNECT_DISABLED_PLACELAUNCH] = function() --[[ Line: 428 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = true;
-        v67.Transparency = 0.3;
-    end, 
-    [v61.RECONNECT_DISABLED] = function() --[[ Line: 433 ]]
-        -- upvalues: l_VRService_0 (copy), l_RunService_0 (copy), v67 (copy)
-        if l_VRService_0.VREnabled then
-            l_RunService_0:SetRobloxGuiFocused(false);
-        else
-            l_RunService_0:SetRobloxGuiFocused(true);
-        end;
-        v67.Active = true;
-        v67.Transparency = 1;
-    end, 
-    [v61.RECONNECT_CONNECT_FAILURE] = function() --[[ Line: 442 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = true;
-        v67.Transparency = 0.3;
-    end, 
-    [v61.RECONNECT_DISABLED_CONNECT_FAILURE] = function() --[[ Line: 447 ]]
-        -- upvalues: l_RunService_0 (copy), v67 (copy)
-        l_RunService_0:SetRobloxGuiFocused(false);
-        v67.Active = true;
-        v67.Transparency = 0.3;
-    end
-};
-local function v79(v77) --[[ Line: 454 ]] --[[ Name: onEnter ]]
-    -- upvalues: v57 (ref), v17 (copy), v12 (copy), v67 (copy), l_X_0 (ref), l_Y_0 (ref), v76 (copy), v64 (copy), v65 (copy), v75 (copy)
-    if not v57 then
-        local v78 = {
-            MenuIsOpenKey = "ConnectionErrorPrompt", 
-            PlayAnimation = not v17
-        };
-        v57 = v12.new("Default", v78);
-        v57:setParent(v67);
-        v57:resizeWidthAndHeight(l_X_0, l_Y_0);
-    end;
-    if v76[v77] then
-        v76[v77]();
-    end;
-    v57:setErrorTitle(v64[v77], v65[v77]);
-    v57:updateButtons(v75[v77]);
-end;
-local function _(v80) --[[ Line: 471 ]] --[[ Name: onExit ]]
-    -- upvalues: v61 (copy), v57 (ref)
-    if v80 == v61.IS_RECONNECTING then
-        v57:primaryShimmerStop();
-    end;
-end;
-local function v85(v82, v83, v84) --[[ Line: 478 ]] --[[ Name: stateTransit ]]
-    -- upvalues: v29 (copy), v61 (copy), l_FFlag_0 (copy), v45 (ref), v58 (ref), v46 (copy), l_OK_0 (ref), v74 (copy), l_TelemetryService_0 (copy), v23 (copy), l_RbxAnalyticsService_0 (copy), v24 (copy)
-    if v29 then
-        if v83 == Enum.ConnectionError.OK then
-            return v61.NONE;
-        end;
-    elseif v82 == Enum.ConnectionError.OK then
-        return v61.NONE;
-    end;
-    if v84 == v61.NONE then
-        if l_FFlag_0 then
-            return v61.RECONNECT_DISABLED;
-        else
-            v45 = tick();
-            if v29 then
-                assert(v83 ~= Enum.ConnectionError.OK);
-                if v82 == Enum.ConnectionError.OK then
-                    return v61.RECONNECT_DISCONNECT;
-                end;
-            end;
-            if v82 == Enum.ConnectionError.ConnectErrors then
-                v58 = tick() + v46;
-                l_OK_0 = Enum.ConnectionError.ConnectErrors;
-                if v74[v83] then
-                    return v61.RECONNECT_DISABLED_CONNECT_FAILURE;
-                else
-                    l_TelemetryService_0:LogCounter(v23, {
-                        customFields = {
-                            selectedItem = "ConnectError"
-                        }
-                    }, 1);
-                    l_TelemetryService_0:LogCounter(v23, {
-                        customFields = {
-                            selectedItem = "ConnectFailed"
-                        }
-                    }, 1);
-                    return v61.RECONNECT_CONNECT_FAILURE;
-                end;
-            elseif v82 == Enum.ConnectionError.DisconnectErrors then
-                v58 = tick() + v46;
-                l_OK_0 = Enum.ConnectionError.DisconnectErrors;
-                if v83 == Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave then
-                    return v61.OUT_OF_MEMORY_KEEPPLAYING_LEAVE;
-                elseif v74[v83] then
-                    return v61.RECONNECT_DISABLED_DISCONNECT;
-                else
-                    l_TelemetryService_0:LogCounter(v23, {
-                        customFields = {
-                            selectedItem = "Disconnected"
-                        }
-                    }, 1);
-                    l_RbxAnalyticsService_0:ReportCounter("ReconnectPrompt-Disconnect");
-                    return v61.RECONNECT_DISCONNECT;
-                end;
-            elseif v82 == Enum.ConnectionError.PlacelaunchErrors then
-                l_OK_0 = Enum.ConnectionError.PlacelaunchErrors;
-                if v74[v83] then
-                    return v61.RECONNECT_DISABLED_PLACELAUNCH;
-                else
-                    l_TelemetryService_0:LogCounter(v23, {
-                        customFields = {
-                            selectedItem = "PlaceLaunchError"
-                        }
-                    }, 1);
-                    l_RbxAnalyticsService_0:ReportCounter("ReconnectPrompt-PlaceLaunch");
-                    return v61.RECONNECT_PLACELAUNCH;
-                end;
-            elseif v82 == Enum.ConnectionError.TeleportErrors then
-                l_TelemetryService_0:LogCounter(v23, {
-                    customFields = {
-                        selectedItem = "TeleportError"
-                    }
-                }, 1);
-                l_RbxAnalyticsService_0:ReportCounter("ReconnectPrompt-TeleportFailed");
-                return v61.TELEPORT_FAILED;
-            end;
-        end;
-    end;
-    if v84 == v61.IS_RECONNECTING then
-        l_TelemetryService_0:LogCounter(v23, {
-            customFields = {
-                selectedItem = "ReconnectFailed"
-            }
-        }, 1);
-        l_RbxAnalyticsService_0:ReportCounter("ReconnectPrompt-ReconnectFailed");
-        if v82 == Enum.ConnectionError.TeleportErrors then
-            if tick() > v45 + v24 then
-                l_TelemetryService_0:LogCounter(v23, {
-                    customFields = {
-                        selectedItem = "ReconnectTimedOut"
-                    }
-                }, 1);
-                if l_OK_0 == Enum.ConnectionError.PlacelaunchErrors then
-                    return v61.RECONNECT_DISABLED_PLACELAUNCH;
-                else
-                    return v61.RECONNECT_DISABLED_DISCONNECT;
-                end;
-            elseif l_OK_0 == Enum.ConnectionError.PlacelaunchErrors then
-                l_TelemetryService_0:LogCounter(v23, {
-                    customFields = {
-                        selectedItem = "PlaceLaunchReconnectFailed"
-                    }
-                }, 1);
-                return v61.RECONNECT_PLACELAUNCH;
-            elseif l_OK_0 == Enum.ConnectionError.DisconnectErrors then
-                l_TelemetryService_0:LogCounter(v23, {
-                    customFields = {
-                        selectedItem = "DisconnectReconnectFailed"
-                    }
-                }, 1);
-                return v61.RECONNECT_DISCONNECT;
-            elseif l_OK_0 == Enum.ConnectionError.ConnectErrors then
-                l_TelemetryService_0:LogCounter(v23, {
-                    customFields = {
-                        selectedItem = "ConnectReconnectFailed"
-                    }
-                }, 1);
-                return v61.RECONNECT_CONNECT_FAILURE;
-            end;
-        end;
-    end;
-    return v84;
-end;
-local function v99(v86) --[[ Line: 577 ]] --[[ Name: getCreatorBanString ]]
-    -- upvalues: l_GuiService_0 (copy), v56 (copy)
-    local l_l_GuiService_0_ErrorDetails_0 = l_GuiService_0:GetErrorDetails();
-    if l_l_GuiService_0_ErrorDetails_0 then
-        local l_time_0 = l_l_GuiService_0_ErrorDetails_0.time;
-        local v89 = nil;
-        if l_time_0 then
-            local l_minutes_0 = l_l_GuiService_0_ErrorDetails_0.minutes;
-            local l_hours_0 = l_l_GuiService_0_ErrorDetails_0.hours;
-            local l_days_0 = l_l_GuiService_0_ErrorDetails_0.days;
-            local v93 = nil;
-            v93 = if l_minutes_0 == 1 then v56("InGame.ConnectionError.CreatorBanMinutesSingular") else v56("InGame.ConnectionError.CreatorBanMinutesPlural", {
-                RBX_TIME_MINUTES = l_minutes_0
-            });
-            local v94 = nil;
-            v94 = if l_hours_0 == 1 then v56("InGame.ConnectionError.CreatorBanHoursSingular") else v56("InGame.ConnectionError.CreatorBanHoursPlural", {
-                RBX_TIME_HOURS = l_hours_0
-            });
-            local v95 = nil;
-            v95 = if l_days_0 == 1 then v56("InGame.ConnectionError.CreatorBanDaysSingular") else v56("InGame.ConnectionError.CreatorBanDaysPlural", {
-                RBX_TIME_DAYS = l_days_0
-            });
-            if v93 ~= "" and v94 ~= "" and v95 ~= "" then
-                local l_v93_0 = v93;
-                if l_hours_0 > 0 then
-                    l_v93_0 = v94 .. ", " .. l_v93_0;
-                end;
-                if l_days_0 > 0 then
-                    l_v93_0 = v95 .. ", " .. l_v93_0;
-                end;
-                v89 = v56("InGame.ConnectionError.CreatorBanWithTime", {
-                    RBX_TIME_REMAINING = l_v93_0
-                });
-            else
-                return v86;
-            end;
-        else
-            v89 = v56("InGame.ConnectionError.CreatorBanNoTime");
-        end;
-        if v89 == "" then
-            return v86;
-        else
-            local l_displayReason_0 = l_l_GuiService_0_ErrorDetails_0.displayReason;
-            if l_displayReason_0 and l_displayReason_0 ~= "" then
-                local v98 = v56("InGame.ConnectionError.CreatorBanMessage", {
-                    RBX_STR = l_displayReason_0
-                });
-                if v98 ~= "" then
-                    return v89 .. " " .. v98;
-                else
-                    return v86;
-                end;
-            else
-                return v89;
-            end;
-        end;
-    else
-        return v86;
-    end;
-end;
-local v100 = game:DefineFastFlag("RemoveRefToMissingLocInConnection", false);
-local v101 = {
-    [Enum.ConnectionError.ConnectErrors] = "InGame.ConnectionError.ConnectErrors", 
-    [Enum.ConnectionError.AlreadyConnected] = "InGame.ConnectionError.ConnectionFailedWaitAndTry", 
-    [Enum.ConnectionError.NoFreeIncomingConnections] = "InGame.ConnectionError.ConnectionFailedWaitAndTry", 
-    [Enum.ConnectionError.IPRecentlyConnected] = "InGame.ConnectionError.ConnectErrors", 
-    [Enum.ConnectionError.ConnectionBanned] = "InGame.ConnectionError.ConnectionBanned", 
-    [Enum.ConnectionError.InvalidPassword] = "InGame.ConnectionError.ConnectionFailedRobloxVersion", 
-    [Enum.ConnectionError.OurSystemRequiresSecurity] = "InGame.ConnectionError.ConnectionFailedRobloxVersion", 
-    [Enum.ConnectionError.IncompatibleProtocolVersion] = "InGame.ConnectionError.ConnectionFailedRobloxVersion", 
-    [Enum.ConnectionError.DisconnectErrors] = "InGame.ConnectionError.DisconnectErrors", 
-    [Enum.ConnectionError.DisconnectBadhash] = "InGame.ConnectionError.DisconnectBadhash", 
-    [Enum.ConnectionError.DisconnectSecurityKeyMismatch] = "InGame.ConnectionError.DisconnectSecurityKeyMismatch", 
-    [Enum.ConnectionError.DisconnectProtocolMismatch] = "InGame.ConnectionError.DisconnectProtocolMismatch", 
-    [Enum.ConnectionError.DisconnectReceivePacketError] = "InGame.ConnectionError.DisconnectReceivePacketError", 
-    [Enum.ConnectionError.DisconnectReceivePacketStreamError] = "InGame.ConnectionError.DisconnectReceivePacketStreamError", 
-    [Enum.ConnectionError.DisconnectSendPacketError] = "InGame.ConnectionError.DisconnectSendPacketError", 
-    [Enum.ConnectionError.DisconnectIllegalTeleport] = "InGame.ConnectionError.DisconnectIllegalTeleport", 
-    [Enum.ConnectionError.DisconnectDuplicatePlayer] = "InGame.ConnectionError.DisconnectDuplicatePlayer", 
-    [Enum.ConnectionError.DisconnectDuplicateTicket] = "InGame.ConnectionError.DisconnectDuplicateTicket", 
-    [Enum.ConnectionError.DisconnectTimeout] = "InGame.ConnectionError.DisconnectTimeout", 
-    [Enum.ConnectionError.DisconnectLuaKick] = "InGame.ConnectionError.DisconnectLuaKick", 
-    [Enum.ConnectionError.DisconnectOnRemoteSysStats] = "InGame.ConnectionError.DisconnectOnRemoteSysStats", 
-    [Enum.ConnectionError.DisconnectHashTimeout] = "InGame.ConnectionError.DisconnectHashTimeout", 
-    [Enum.ConnectionError.DisconnectCloudEditKick] = "InGame.ConnectionError.DisconnectCloudEditKick", 
-    [Enum.ConnectionError.DisconnectPlayerless] = "InGame.ConnectionError.DisconnectPlayerless", 
-    [Enum.ConnectionError.DisconnectNewSecurityKeyMismatch] = "InGame.ConnectionError.DisconnectNewSecurityKeyMismatch", 
-    [Enum.ConnectionError.DisconnectEvicted] = "InGame.ConnectionError.DisconnectEvicted", 
-    [Enum.ConnectionError.DisconnectDevMaintenance] = "InGame.ConnectionError.DisconnectDevMaintenance", 
-    [Enum.ConnectionError.DisconnectRobloxMaintenance] = "InGame.ConnectionError.DisconnectRobloxMaintenance", 
-    [Enum.ConnectionError.DisconnectRejoin] = "InGame.ConnectionError.DisconnectRejoin", 
-    [Enum.ConnectionError.DisconnectConnectionLost] = "InGame.ConnectionError.DisconnectConnectionLost", 
-    [Enum.ConnectionError.DisconnectIdle] = "InGame.ConnectionError.DisconnectIdle", 
-    [Enum.ConnectionError.DisconnectRaknetErrors] = "InGame.ConnectionError.DisconnectRaknetErrors", 
-    [Enum.ConnectionError.DisconnectWrongVersion] = "InGame.ConnectionError.DisconnectWrongVersion", 
-    [Enum.ConnectionError.DisconnectBySecurityPolicy] = if v100 then nil else "InGame.ConnectionError.DisconnectBySecurityPolicy", 
-    [Enum.ConnectionError.DisconnectBlockedIP] = if v100 then nil else "InGame.ConnectionError.DisconnectBlockedIP", 
-    [Enum.ConnectionError.DisconnectClientFailure] = if v100 then nil else "InGame.ConnectionError.DisconnectClientFailure", 
-    [Enum.ConnectionError.DisconnectClientRequest] = if v100 then nil else "InGame.ConnectionError.DisconnectClientRequest", 
-    [Enum.ConnectionError.DisconnectPrivateServerKickout] = "InGame.ConnectionError.DisconnectPrivateServerKickout", 
-    [Enum.ConnectionError.DisconnectModeratedGame] = if v100 then nil else "InGame.ConnectionError.DisconnectModeratedGame", 
-    [Enum.ConnectionError.ServerShutdown] = if v100 then nil else "InGame.ConnectionError.ServerShutdown", 
-    [Enum.ConnectionError.ReplicatorTimeout] = if v100 then nil else "InGame.ConnectionError.ReplicatorTimeout", 
-    [Enum.ConnectionError.PlayerRemoved] = if v100 then nil else "InGame.ConnectionError.PlayerRemoved", 
-    [Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave] = "InGame.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave", 
-    [Enum.ConnectionError.DisconnectRomarkEndOfTest] = if v100 then nil else "InGame.ConnectionError.DisconnectRomarkEndOfTest", 
-    [Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = if v100 then nil else "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked", 
-    [Enum.ConnectionError.DisconnectCollaboratorUnderage] = if v100 then nil else "InGame.ConnectionError.DisconnectCollaboratorUnderage", 
-    [Enum.ConnectionError.NetworkInternal] = if v100 then nil else "InGame.ConnectionError.NetworkInternal", 
-    [Enum.ConnectionError.NetworkSend] = if v100 then nil else "InGame.ConnectionError.NetworkSend", 
-    [Enum.ConnectionError.NetworkTimeout] = if v100 then nil else "InGame.ConnectionError.NetworkTimeout", 
-    [Enum.ConnectionError.NetworkMisbehavior] = if v100 then nil else "InGame.ConnectionError.NetworkMisbehavior", 
-    [Enum.ConnectionError.NetworkSecurity] = if v100 then nil else "InGame.ConnectionError.NetworkSecurity", 
-    [Enum.ConnectionError.ReplacementReady] = if v100 then nil else "InGame.ConnectionError.ReplacementReady", 
-    [Enum.ConnectionError.ServerEmpty] = if v100 then nil else "InGame.ConnectionError.ServerEmpty", 
-    [Enum.ConnectionError.PhantomFreeze] = if v100 then nil else "InGame.ConnectionError.PhantomFreeze", 
-    [Enum.ConnectionError.AndroidAnticheatKick] = "InGame.ConnectionError.AndroidAnticheatKick", 
-    [Enum.ConnectionError.AndroidEmulatorKick] = "InGame.ConnectionError.AndroidEmulatorKick", 
-    [Enum.ConnectionError.PlacelaunchErrors] = "InGame.ConnectionError.PlacelaunchErrors", 
-    [Enum.ConnectionError.PlacelaunchDisabled] = "InGame.ConnectionError.PlacelaunchDisabled", 
-    [Enum.ConnectionError.PlacelaunchError] = "InGame.ConnectionError.PlacelaunchError", 
-    [Enum.ConnectionError.PlacelaunchGameEnded] = "InGame.ConnectionError.PlacelaunchGameEnded", 
-    [Enum.ConnectionError.PlacelaunchGameFull] = "InGame.ConnectionError.PlacelaunchGameFull", 
-    [Enum.ConnectionError.PlacelaunchUserLeft] = "InGame.ConnectionError.PlacelaunchUserLeft", 
-    [Enum.ConnectionError.PlacelaunchRestricted] = "InGame.ConnectionError.PlacelaunchRestricted", 
-    [Enum.ConnectionError.PlacelaunchUnauthorized] = "InGame.ConnectionError.PlacelaunchUnauthorized", 
-    [Enum.ConnectionError.PlacelaunchFlooded] = "InGame.ConnectionError.PlacelaunchFlooded", 
-    [Enum.ConnectionError.PlacelaunchHashExpired] = "InGame.ConnectionError.PlacelaunchHashExpired", 
-    [Enum.ConnectionError.PlacelaunchHashException] = "InGame.ConnectionError.PlacelaunchHashException", 
-    [Enum.ConnectionError.PlacelaunchPartyCannotFit] = "InGame.ConnectionError.PlacelaunchPartyCannotFit", 
-    [Enum.ConnectionError.PlacelaunchHttpError] = "InGame.ConnectionError.PlacelaunchHttpError", 
-    [Enum.ConnectionError.PlacelaunchUserPrivacyUnauthorized] = "InGame.ConnectionError.PlacelaunchUserPrivacyUnauthorized", 
-    [Enum.ConnectionError.PlacelaunchCreatorBan] = if v100 then nil else "InGame.ConnectionError.PlacelaunchCreatorBan", 
-    [Enum.ConnectionError.PlacelaunchCustomMessage] = if v100 then nil else "InGame.ConnectionError.PlacelaunchCustomMessage", 
-    [Enum.ConnectionError.PlacelaunchOtherError] = "InGame.ConnectionError.PlacelaunchOtherError", 
-    [Enum.ConnectionError.TeleportErrors] = "InGame.ConnectionError.TeleportErrors", 
-    [Enum.ConnectionError.TeleportFailure] = "InGame.ConnectionError.TeleportFailure", 
-    [Enum.ConnectionError.TeleportGameNotFound] = "InGame.ConnectionError.TeleportGameNotFound", 
-    [Enum.ConnectionError.TeleportGameEnded] = "InGame.ConnectionError.TeleportGameEnded", 
-    [Enum.ConnectionError.TeleportGameFull] = "InGame.ConnectionError.TeleportGameFull", 
-    [Enum.ConnectionError.TeleportUnauthorized] = "InGame.ConnectionError.TeleportUnauthorized", 
-    [Enum.ConnectionError.TeleportFlooded] = "InGame.ConnectionError.TeleportFlooded", 
-    [Enum.ConnectionError.TeleportIsTeleporting] = if v100 then nil else "InGame.ConnectionError.TeleportIsTeleporting"
-};
-if v22 then
-    v101[Enum.ConnectionError.DisconnectVerboselyModeratedGame] = "InGame.ConnectionError.DisconnectVerboselyModeratedGame";
-end;
-if v20 then
-    v101[Enum.ConnectionError.ScreentimeLockoutKick] = "Feature.Screentime.Content.ScreentimeLimitDialog";
-end;
-if v21 then
-    v101[Enum.ConnectionError.DisconnectBySecurityPolicy] = "InGame.ConnectionError.DisconnectBlockedConnection";
-    v101[Enum.ConnectionError.DisconnectBlockedIP] = "InGame.ConnectionError.DisconnectBlockedConnection";
-    v101[Enum.ConnectionError.DisconnectClientFailure] = "InGame.ConnectionError.DisconnectClientFailure";
-    v101[Enum.ConnectionError.DisconnectClientRequest] = "InGame.ConnectionError.DisconnectClientRequest";
-    v101[Enum.ConnectionError.DisconnectModeratedGame] = "InGame.ConnectionError.ServerShutdown";
-    v101[Enum.ConnectionError.ServerShutdown] = "InGame.ConnectionError.ServerShutdown";
-    v101[Enum.ConnectionError.ReplicatorTimeout] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.PlayerRemoved] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.DisconnectRomarkEndOfTest] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked";
-    v101[Enum.ConnectionError.DisconnectCollaboratorUnderage] = "InGame.ConnectionError.DisconnectCollaboratorUnderage";
-    v101[Enum.ConnectionError.NetworkInternal] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.NetworkSend] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.NetworkTimeout] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.NetworkMisbehavior] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.NetworkSecurity] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.ReplacementReady] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.ServerEmpty] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.PhantomFreeze] = "InGame.ConnectionError.DisconnectTryAgain";
-    v101[Enum.ConnectionError.PlacelaunchCreatorBan] = "InGame.ConnectionError.CreatorBanNoTime";
-end;
+	t6[Enum.ConnectionError.PlacelaunchDeviceBlock] = true
+end
+
+if v49 then
+	t6[Enum.ConnectionError.PlacelaunchAgeVerificationRequired] = true
+	t6[Enum.ConnectionError.PlacelaunchParentalApprovalRequired] = true
+	t6[Enum.ConnectionError.PlacelaunchCoreGated] = true
+end
+
+if v50 and not v51 then
+	t6[Enum.ConnectionError.PlacelaunchVipOwnerNotPresent] = true
+end
+
+local v82 = if not v60 or not EngineFeature2 then nil else Enum.ConnectionError.PlacelaunchCollaborationCoreGated
+
+if v60 and v82 then
+	t6[v82] = true
+end
+
+if v52 and v54 then
+	t6[Enum.ConnectionError.DisconnectRemoteAttestationUnsupported] = true
+	t6[Enum.ConnectionError.DisconnectRemoteAttestationGeneralFailure] = true
+	t6[Enum.ConnectionError.DisconnectRemoteAttestationOSOutOfDate] = true
+	t6[Enum.ConnectionError.DisconnectRemoteAttestationBootValidationFailure] = true
+end
+
+local t7 = {
+	[2] = {
+		{
+			Text = "Retry",
+			LocalizationKey = "InGame.CommonUI.Button.Retry",
+			LayoutOrder = 2,
+			Primary = true,
+			Callback = v77
+		},
+		{
+			Text = "Cancel",
+			LocalizationKey = "Feature.SettingsHub.Action.CancelSearch",
+			LayoutOrder = 1,
+			Callback = v79
+		}
+	},
+	[3] = {
+		{
+			Text = "Reconnect",
+			LocalizationKey = "InGame.ConnectionError.Button.Reconnect",
+			LayoutOrder = 2,
+			Primary = true,
+			Callback = v77
+		},
+		{
+			Text = "Leave",
+			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+			LayoutOrder = 1,
+			Callback = v79
+		}
+	},
+	[4] = {{
+		Text = "OK",
+		LocalizationKey = "InGame.CommonUI.Button.Ok",
+		LayoutOrder = 1,
+		Primary = true,
+		Callback = v80
+	}},
+	[6] = {{
+		Text = "Leave",
+		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+		LayoutOrder = 1,
+		Primary = true,
+		Callback = v79
+	}},
+	[7] = {{
+		Text = "Leave",
+		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+		LayoutOrder = 1,
+		Primary = true,
+		Callback = v79
+	}},
+	[8] = {{
+		Text = "Leave",
+		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+		LayoutOrder = 1,
+		Primary = true,
+		Callback = v79
+	}},
+	[9] = {
+		{
+			Text = "Keep Playing",
+			LocalizationKey = "InGame.CommonUI.Button.KeepPlaying",
+			LayoutOrder = 1,
+			Callback = v80
+		},
+		{
+			Text = "Leave",
+			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+			LayoutOrder = 2,
+			Primary = true,
+			Callback = v79
+		}
+	},
+	[10] = {
+		{
+			Text = "Retry",
+			LocalizationKey = "InGame.CommonUI.Button.Retry",
+			LayoutOrder = 2,
+			Primary = true,
+			Callback = v77
+		},
+		{
+			Text = "Cancel",
+			LocalizationKey = "Feature.SettingsHub.Action.CancelSearch",
+			LayoutOrder = 1,
+			Callback = v79
+		}
+	},
+	[11] = {{
+		Text = "Leave",
+		LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+		LayoutOrder = 1,
+		Primary = true,
+		Callback = v79
+	}}
+}
+
+if FFlagConnectionAmpUpsellOnLeave then
+	local v84 = ConnectionAmpUpsellOnLeave.createAgeCheckCallback(t1, v78, 9)
+
+	t7[12] = {
+		{
+			Text = "Leave",
+			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+			LayoutOrder = 1,
+			Callback = v79
+		},
+		{
+			LayoutOrder = 2,
+			Primary = true,
+			Text = ConnectionAmpUpsellOnLeave.PrimaryButtonText,
+			LocalizationKey = ConnectionAmpUpsellOnLeave.PrimaryButtonLocalizationKey,
+			Callback = v84
+		}
+	}
+end
+
+if FFlagConnectionAmpParentalApprovalUpsell then
+	local v85 = ConnectionAmpUpsellOnLeave.createParentalApprovalCallback(t1, v78, 9)
+
+	t7[13] = {
+		{
+			Text = "Leave",
+			LocalizationKey = "Feature.SettingsHub.Label.LeaveButton",
+			LayoutOrder = 1,
+			Callback = v79
+		},
+		{
+			LayoutOrder = 2,
+			Primary = true,
+			Text = ConnectionAmpUpsellOnLeave.PrimaryButtonText,
+			LocalizationKey = ConnectionAmpUpsellOnLeave.PrimaryButtonLocalizationKey,
+			Callback = v85
+		}
+	}
+end
+
+if v60 then
+	t7[14] = {
+		{
+			Text = "Ok",
+			LocalizationKey = "InGame.ConnectionError.Action.Ok",
+			LayoutOrder = 1,
+			Callback = v79
+		},
+		{
+			Text = "View collaborators",
+			LocalizationKey = "InGame.ConnectionError.Action.ViewCollaborators",
+			LayoutOrder = 2,
+			Primary = true,
+			Callback = function() -- line: 284
+				-- upvalues: TelemetryService (copy), t1 (copy), openCollaboratorsPageForUniverseId (copy), fetchUniverseIdFromPlaceId (copy)
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "ViewCollaboratorsInitiated"
+					}
+				}, 1)
+
+				local GameId = game.GameId
+
+				if GameId and GameId ~= 0 then
+					openCollaboratorsPageForUniverseId(GameId)
+
+					return
+				end
+
+				local PlaceId = game.PlaceId
+
+				if not PlaceId or PlaceId == 0 then
+					TelemetryService:LogCounter(t1, {
+						customFields = {
+							selectedItem = "ViewCollaboratorsMissingPlaceId"
+						}
+					}, 1)
+
+					return
+				end
+
+				coroutine.wrap(function() -- line: 299
+					-- upvalues: fetchUniverseIdFromPlaceId (copy), PlaceId (copy), TelemetryService (copy), t1 (copy), openCollaboratorsPageForUniverseId (copy)
+					local v171 = fetchUniverseIdFromPlaceId(PlaceId)
+
+					if not v171 then
+						TelemetryService:LogCounter(t1, {
+							customFields = {
+								selectedItem = "ViewCollaboratorsUniverseIdLookupFailed"
+							}
+						}, 1)
+
+						return
+					end
+
+					openCollaboratorsPageForUniverseId(v171)
+				end)()
+			end
+		}
+	}
+end
+
+local t8 = {
+	[1] = function() -- line: 627
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = false
+		v75.Transparency = 1
+	end,
+	[3] = function() -- line: 632
+		-- upvalues: VRService (copy), RunService (copy), v75 (copy)
+		if VRService.VREnabled then
+			RunService:SetRobloxGuiFocused(false)
+		else
+			RunService:SetRobloxGuiFocused(true)
+		end
+
+		v75.Active = true
+		v75.Transparency = 1
+	end,
+	[2] = function() -- line: 641
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end,
+	[4] = function() -- line: 646
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end,
+	[6] = function() -- line: 651
+		-- upvalues: VRService (copy), RunService (copy), v75 (copy)
+		if VRService.VREnabled then
+			RunService:SetRobloxGuiFocused(false)
+		else
+			RunService:SetRobloxGuiFocused(true)
+		end
+
+		v75.Active = true
+		v75.Transparency = 1
+	end,
+	[7] = function() -- line: 660
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end,
+	[8] = function() -- line: 665
+		-- upvalues: VRService (copy), RunService (copy), v75 (copy)
+		if VRService.VREnabled then
+			RunService:SetRobloxGuiFocused(false)
+		else
+			RunService:SetRobloxGuiFocused(true)
+		end
+
+		v75.Active = true
+		v75.Transparency = 1
+	end,
+	[10] = function() -- line: 674
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end,
+	[11] = function() -- line: 679
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end
+}
+
+if FFlagConnectionAmpUpsellOnLeave then
+	local v87 = t8[2]
+
+	t8[12] = v87
+
+	if FFlagConnectionAmpParentalApprovalUpsell then
+		t8[13] = v87
+	end
+end
+
+if v60 then
+	t8[14] = function() -- line: 699
+		-- upvalues: RunService (copy), v75 (copy)
+		RunService:SetRobloxGuiFocused(false)
+		v75.Active = true
+		v75.Transparency = 0.3
+	end
+end
+
+local function onEnter(p7) -- line: 706
+	-- upvalues: u65 (ref), v21 (copy), ErrorPrompt (copy), v75 (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref), t8 (copy), t4 (copy), t5 (copy), t7 (copy)
+	if not u65 then
+		local t9 = {
+			MenuIsOpenKey = "ConnectionErrorPrompt",
+			PlayAnimation = not v21
+		}
+
+		u65 = ErrorPrompt.new("Default", t9)
+		u65:setParent(v75)
+		u65:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+
+	if t8[p7] then
+		t8[p7]()
+	end
+
+	u65:setErrorTitle(t4[p7], t5[p7])
+	u65:updateButtons(t7[p7])
+end
+local function onExit(p8) -- line: 723
+	-- upvalues: u65 (ref)
+	if p8 == 5 then
+		u65:primaryShimmerStop()
+	end
+end
+local function stateTransit(p9, p10, p11) -- line: 730
+	-- upvalues: FFlagAllowDisconnectGuiForOkUnknown (copy), FFlag (copy), timestamp (ref), n1 (ref), v40 (copy), OK (ref), t6 (copy), TelemetryService (copy), t1 (copy), RbxAnalyticsService (copy), FFlagConnectionAmpUpsellOnLeave (copy), ConnectionAmpUpsellOnLeave (ref), FFlagConnectionUpsellAnalytics (copy), FFlagConnectionAmpParentalApprovalUpsell (copy), v60 (copy), v82 (copy), v27 (copy)
+	if FFlagAllowDisconnectGuiForOkUnknown then
+		if p10 == Enum.ConnectionError.OK then
+			return 1
+		end
+	elseif p9 == Enum.ConnectionError.OK then
+		return 1
+	end
+
+	if p11 == 1 then
+		if FFlag then
+			return 8
+		end
+
+		timestamp = tick()
+
+		if FFlagAllowDisconnectGuiForOkUnknown then
+			assert(p10 ~= Enum.ConnectionError.OK)
+
+			if p9 == Enum.ConnectionError.OK then
+				return 3
+			end
+		end
+
+		if p9 == Enum.ConnectionError.ConnectErrors then
+			n1 = tick() + v40
+			OK = Enum.ConnectionError.ConnectErrors
+
+			if t6[p10] then
+				return 11
+			end
+
+			TelemetryService:LogCounter(t1, {
+				customFields = {
+					selectedItem = "ConnectError"
+				}
+			}, 1)
+			TelemetryService:LogCounter(t1, {
+				customFields = {
+					selectedItem = "ConnectFailed"
+				}
+			}, 1)
+
+			return 10
+		end
+
+		if p9 == Enum.ConnectionError.DisconnectErrors then
+			n1 = tick() + v40
+			OK = Enum.ConnectionError.DisconnectErrors
+
+			if p10 == Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave then
+				return 9
+			end
+
+			if t6[p10] then
+				return 6
+			end
+
+			TelemetryService:LogCounter(t1, {
+				customFields = {
+					selectedItem = "Disconnected"
+				}
+			}, 1)
+			RbxAnalyticsService:ReportCounter("ReconnectPrompt-Disconnect")
+
+			return 3
+		end
+
+		if p9 == Enum.ConnectionError.PlacelaunchErrors then
+			OK = Enum.ConnectionError.PlacelaunchErrors
+
+			if FFlagConnectionAmpUpsellOnLeave then
+				local AgeVerificationRequiredEnum = ConnectionAmpUpsellOnLeave.AgeVerificationRequiredEnum
+
+				if AgeVerificationRequiredEnum and p10 == AgeVerificationRequiredEnum then
+					TelemetryService:LogCounter(t1, {
+						customFields = {
+							selectedItem = "PlaceLaunchAgeVerificationRequired"
+						}
+					}, 1)
+
+					if FFlagConnectionUpsellAnalytics then
+						ConnectionAmpUpsellOnLeave.fireImpressionAgeCheck(t1, game.PlaceId)
+					end
+
+					return 12
+				end
+			end
+
+			if FFlagConnectionAmpParentalApprovalUpsell then
+				local ParentalApprovalRequiredEnum = ConnectionAmpUpsellOnLeave.ParentalApprovalRequiredEnum
+
+				if ParentalApprovalRequiredEnum and p10 == ParentalApprovalRequiredEnum then
+					TelemetryService:LogCounter(t1, {
+						customFields = {
+							selectedItem = "PlaceLaunchParentalApprovalRequired"
+						}
+					}, 1)
+
+					if FFlagConnectionUpsellAnalytics then
+						ConnectionAmpUpsellOnLeave.fireImpressionParentalApproval(t1, game.PlaceId)
+					end
+
+					return 13
+				end
+			end
+
+			if v60 and v82 and p10 == v82 then
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "PlaceLaunchCollaborationCoreGated"
+					}
+				}, 1)
+
+				return 14
+			end
+
+			if t6[p10] then
+				return 7
+			end
+
+			TelemetryService:LogCounter(t1, {
+				customFields = {
+					selectedItem = "PlaceLaunchError"
+				}
+			}, 1)
+			RbxAnalyticsService:ReportCounter("ReconnectPrompt-PlaceLaunch")
+
+			return 2
+		end
+
+		if p9 == Enum.ConnectionError.TeleportErrors then
+			TelemetryService:LogCounter(t1, {
+				customFields = {
+					selectedItem = "TeleportError"
+				}
+			}, 1)
+			RbxAnalyticsService:ReportCounter("ReconnectPrompt-TeleportFailed")
+
+			return 4
+		end
+	end
+
+	if p11 == 5 then
+		TelemetryService:LogCounter(t1, {
+			customFields = {
+				selectedItem = "ReconnectFailed"
+			}
+		}, 1)
+		RbxAnalyticsService:ReportCounter("ReconnectPrompt-ReconnectFailed")
+
+		if p9 == Enum.ConnectionError.TeleportErrors then
+			if tick() > timestamp + v27 then
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "ReconnectTimedOut"
+					}
+				}, 1)
+
+				if OK == Enum.ConnectionError.PlacelaunchErrors then
+					return 7
+				end
+
+				return 6
+			end
+
+			if OK == Enum.ConnectionError.PlacelaunchErrors then
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "PlaceLaunchReconnectFailed"
+					}
+				}, 1)
+
+				return 2
+			end
+
+			if OK == Enum.ConnectionError.DisconnectErrors then
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "DisconnectReconnectFailed"
+					}
+				}, 1)
+
+				return 3
+			end
+
+			if OK == Enum.ConnectionError.ConnectErrors then
+				TelemetryService:LogCounter(t1, {
+					customFields = {
+						selectedItem = "ConnectReconnectFailed"
+					}
+				}, 1)
+
+				return 10
+			end
+		end
+	end
+
+	return p11
+end
+local function getCreatorBanString(s4: string) -- line: 853
+	-- upvalues: GuiService (copy), translateString (copy)
+	local ErrorDetails = GuiService:GetErrorDetails()
+
+	if ErrorDetails then
+		local v147
+
+		if ErrorDetails.time then
+			local minutes = ErrorDetails.minutes
+			local hours = ErrorDetails.hours
+			local days = ErrorDetails.days
+			local v144 = if minutes ~= 1 then translateString("InGame.ConnectionError.CreatorBanMinutesPlural", {
+				RBX_TIME_MINUTES = minutes
+			}) else translateString("InGame.ConnectionError.CreatorBanMinutesSingular")
+			local v145 = if hours ~= 1 then translateString("InGame.ConnectionError.CreatorBanHoursPlural", {
+				RBX_TIME_HOURS = hours
+			}) else translateString("InGame.ConnectionError.CreatorBanHoursSingular")
+			local v146 = if days ~= 1 then translateString("InGame.ConnectionError.CreatorBanDaysPlural", {
+				RBX_TIME_DAYS = days
+			}) else translateString("InGame.ConnectionError.CreatorBanDaysSingular")
+
+			if v144 == "" or v145 == "" or v146 == "" then
+				return s4
+			end
+
+			if hours > 0 then
+				v144 = v145 .. ", " .. v144
+			end
+
+			if days > 0 then
+				v144 = v146 .. ", " .. v144
+			end
+
+			v147 = translateString("InGame.ConnectionError.CreatorBanWithTime", {
+				RBX_TIME_REMAINING = v144
+			})
+		else
+			v147 = translateString("InGame.ConnectionError.CreatorBanNoTime")
+		end
+
+		if v147 == "" then
+			return s4
+		end
+
+		local displayReason = ErrorDetails.displayReason
+
+		if displayReason and displayReason ~= "" then
+			local v149 = translateString("InGame.ConnectionError.CreatorBanMessage", {
+				RBX_STR = displayReason
+			})
+
+			if v149 ~= "" then
+				return v147 .. " " .. v149
+			end
+
+			return s4
+		end
+
+		return v147
+	end
+
+	return s4
+end
+
+local v92 = game:DefineFastFlag("RemoveRefToMissingLocInConnection", false)
+local t10 = {
+	[Enum.ConnectionError.ConnectErrors] = "InGame.ConnectionError.ConnectErrors",
+	[Enum.ConnectionError.AlreadyConnected] = "InGame.ConnectionError.ConnectionFailedWaitAndTry",
+	[Enum.ConnectionError.NoFreeIncomingConnections] = "InGame.ConnectionError.ConnectionFailedWaitAndTry",
+	[Enum.ConnectionError.IPRecentlyConnected] = "InGame.ConnectionError.ConnectErrors",
+	[Enum.ConnectionError.ConnectionBanned] = "InGame.ConnectionError.ConnectionBanned",
+	[Enum.ConnectionError.InvalidPassword] = "InGame.ConnectionError.ConnectionFailedRobloxVersion",
+	[Enum.ConnectionError.OurSystemRequiresSecurity] = "InGame.ConnectionError.ConnectionFailedRobloxVersion",
+	[Enum.ConnectionError.IncompatibleProtocolVersion] = "InGame.ConnectionError.ConnectionFailedRobloxVersion",
+	[Enum.ConnectionError.DisconnectErrors] = "InGame.ConnectionError.DisconnectErrors",
+	[Enum.ConnectionError.DisconnectBadhash] = "InGame.ConnectionError.DisconnectBadhash",
+	[Enum.ConnectionError.DisconnectSecurityKeyMismatch] = "InGame.ConnectionError.DisconnectSecurityKeyMismatch",
+	[Enum.ConnectionError.DisconnectProtocolMismatch] = "InGame.ConnectionError.DisconnectProtocolMismatch",
+	[Enum.ConnectionError.DisconnectReceivePacketError] = "InGame.ConnectionError.DisconnectReceivePacketError",
+	[Enum.ConnectionError.DisconnectReceivePacketStreamError] = "InGame.ConnectionError.DisconnectReceivePacketStreamError",
+	[Enum.ConnectionError.DisconnectSendPacketError] = "InGame.ConnectionError.DisconnectSendPacketError",
+	[Enum.ConnectionError.DisconnectIllegalTeleport] = "InGame.ConnectionError.DisconnectIllegalTeleport",
+	[Enum.ConnectionError.DisconnectDuplicatePlayer] = "InGame.ConnectionError.DisconnectDuplicatePlayer",
+	[Enum.ConnectionError.DisconnectDuplicateTicket] = "InGame.ConnectionError.DisconnectDuplicateTicket",
+	[Enum.ConnectionError.DisconnectTimeout] = "InGame.ConnectionError.DisconnectTimeout",
+	[Enum.ConnectionError.DisconnectLuaKick] = "InGame.ConnectionError.DisconnectLuaKick",
+	[Enum.ConnectionError.DisconnectOnRemoteSysStats] = "InGame.ConnectionError.DisconnectOnRemoteSysStats",
+	[Enum.ConnectionError.DisconnectHashTimeout] = "InGame.ConnectionError.DisconnectHashTimeout",
+	[Enum.ConnectionError.DisconnectCloudEditKick] = "InGame.ConnectionError.DisconnectCloudEditKick",
+	[Enum.ConnectionError.DisconnectPlayerless] = "InGame.ConnectionError.DisconnectPlayerless",
+	[Enum.ConnectionError.DisconnectNewSecurityKeyMismatch] = "InGame.ConnectionError.DisconnectNewSecurityKeyMismatch",
+	[Enum.ConnectionError.DisconnectEvicted] = "InGame.ConnectionError.DisconnectEvicted",
+	[Enum.ConnectionError.DisconnectDevMaintenance] = "InGame.ConnectionError.DisconnectDevMaintenance",
+	[Enum.ConnectionError.DisconnectRobloxMaintenance] = "InGame.ConnectionError.DisconnectRobloxMaintenance",
+	[Enum.ConnectionError.DisconnectRejoin] = "InGame.ConnectionError.DisconnectRejoin",
+	[Enum.ConnectionError.DisconnectConnectionLost] = "InGame.ConnectionError.DisconnectConnectionLost",
+	[Enum.ConnectionError.DisconnectIdle] = "InGame.ConnectionError.DisconnectIdle",
+	[Enum.ConnectionError.DisconnectRaknetErrors] = "InGame.ConnectionError.DisconnectRaknetErrors",
+	[Enum.ConnectionError.DisconnectWrongVersion] = "InGame.ConnectionError.DisconnectWrongVersion",
+	[Enum.ConnectionError.DisconnectBySecurityPolicy] = not v92 and "InGame.ConnectionError.DisconnectBySecurityPolicy" or nil,
+	[Enum.ConnectionError.DisconnectBlockedIP] = not v92 and "InGame.ConnectionError.DisconnectBlockedIP" or nil,
+	[Enum.ConnectionError.DisconnectClientFailure] = not v92 and "InGame.ConnectionError.DisconnectClientFailure" or nil,
+	[Enum.ConnectionError.DisconnectClientRequest] = not v92 and "InGame.ConnectionError.DisconnectClientRequest" or nil,
+	[Enum.ConnectionError.DisconnectPrivateServerKickout] = "InGame.ConnectionError.DisconnectPrivateServerKickout",
+	[Enum.ConnectionError.DisconnectModeratedGame] = not v92 and "InGame.ConnectionError.DisconnectModeratedGame" or nil,
+	[Enum.ConnectionError.ServerShutdown] = not v92 and "InGame.ConnectionError.ServerShutdown" or nil,
+	[Enum.ConnectionError.ReplicatorTimeout] = not v92 and "InGame.ConnectionError.ReplicatorTimeout" or nil,
+	[Enum.ConnectionError.PlayerRemoved] = not v92 and "InGame.ConnectionError.PlayerRemoved" or nil,
+	[Enum.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave] = "InGame.ConnectionError.DisconnectOutOfMemoryKeepPlayingLeave",
+	[Enum.ConnectionError.DisconnectRomarkEndOfTest] = not v92 and "InGame.ConnectionError.DisconnectRomarkEndOfTest" or nil,
+	[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = not v92 and "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked" or nil,
+	[Enum.ConnectionError.DisconnectCollaboratorUnderage] = not v92 and "InGame.ConnectionError.DisconnectCollaboratorUnderage" or nil,
+	[Enum.ConnectionError.NetworkInternal] = not v92 and "InGame.ConnectionError.NetworkInternal" or nil,
+	[Enum.ConnectionError.NetworkSend] = not v92 and "InGame.ConnectionError.NetworkSend" or nil,
+	[Enum.ConnectionError.NetworkTimeout] = not v92 and "InGame.ConnectionError.NetworkTimeout" or nil,
+	[Enum.ConnectionError.NetworkMisbehavior] = not v92 and "InGame.ConnectionError.NetworkMisbehavior" or nil,
+	[Enum.ConnectionError.NetworkSecurity] = not v92 and "InGame.ConnectionError.NetworkSecurity" or nil,
+	[Enum.ConnectionError.ReplacementReady] = not v92 and "InGame.ConnectionError.ReplacementReady" or nil,
+	[Enum.ConnectionError.ServerEmpty] = not v92 and "InGame.ConnectionError.ServerEmpty" or nil,
+	[Enum.ConnectionError.PhantomFreeze] = not v92 and "InGame.ConnectionError.PhantomFreeze" or nil,
+	[Enum.ConnectionError.AndroidAnticheatKick] = "InGame.ConnectionError.AndroidAnticheatKick",
+	[Enum.ConnectionError.AndroidEmulatorKick] = "InGame.ConnectionError.AndroidEmulatorKick",
+	[Enum.ConnectionError.PlacelaunchErrors] = "InGame.ConnectionError.PlacelaunchErrors",
+	[Enum.ConnectionError.PlacelaunchDisabled] = "InGame.ConnectionError.PlacelaunchDisabled",
+	[Enum.ConnectionError.PlacelaunchError] = "InGame.ConnectionError.PlacelaunchError",
+	[Enum.ConnectionError.PlacelaunchGameEnded] = "InGame.ConnectionError.PlacelaunchGameEnded",
+	[Enum.ConnectionError.PlacelaunchGameFull] = "InGame.ConnectionError.PlacelaunchGameFull",
+	[Enum.ConnectionError.PlacelaunchUserLeft] = "InGame.ConnectionError.PlacelaunchUserLeft",
+	[Enum.ConnectionError.PlacelaunchRestricted] = "InGame.ConnectionError.PlacelaunchRestricted",
+	[Enum.ConnectionError.PlacelaunchUnauthorized] = "InGame.ConnectionError.PlacelaunchUnauthorized",
+	[Enum.ConnectionError.PlacelaunchFlooded] = "InGame.ConnectionError.PlacelaunchFlooded",
+	[Enum.ConnectionError.PlacelaunchHashExpired] = "InGame.ConnectionError.PlacelaunchHashExpired",
+	[Enum.ConnectionError.PlacelaunchHashException] = "InGame.ConnectionError.PlacelaunchHashException",
+	[Enum.ConnectionError.PlacelaunchPartyCannotFit] = "InGame.ConnectionError.PlacelaunchPartyCannotFit",
+	[Enum.ConnectionError.PlacelaunchHttpError] = "InGame.ConnectionError.PlacelaunchHttpError",
+	[Enum.ConnectionError.PlacelaunchUserPrivacyUnauthorized] = "InGame.ConnectionError.PlacelaunchUserPrivacyUnauthorized",
+	[Enum.ConnectionError.PlacelaunchCreatorBan] = not v92 and "InGame.ConnectionError.PlacelaunchCreatorBan" or nil,
+	[Enum.ConnectionError.PlacelaunchCustomMessage] = not v92 and "InGame.ConnectionError.PlacelaunchCustomMessage" or nil,
+	[Enum.ConnectionError.PlacelaunchOtherError] = "InGame.ConnectionError.PlacelaunchOtherError",
+	[Enum.ConnectionError.TeleportErrors] = "InGame.ConnectionError.TeleportErrors",
+	[Enum.ConnectionError.TeleportFailure] = "InGame.ConnectionError.TeleportFailure",
+	[Enum.ConnectionError.TeleportGameNotFound] = "InGame.ConnectionError.TeleportGameNotFound",
+	[Enum.ConnectionError.TeleportGameEnded] = "InGame.ConnectionError.TeleportGameEnded",
+	[Enum.ConnectionError.TeleportGameFull] = "InGame.ConnectionError.TeleportGameFull",
+	[Enum.ConnectionError.TeleportUnauthorized] = "InGame.ConnectionError.TeleportUnauthorized",
+	[Enum.ConnectionError.TeleportFlooded] = "InGame.ConnectionError.TeleportFlooded",
+	[Enum.ConnectionError.TeleportIsTeleporting] = not v92 and "InGame.ConnectionError.TeleportIsTeleporting" or nil,
+	[Enum.ConnectionError.DisconnectVerboselyModeratedGame] = "InGame.ConnectionError.DisconnectVerboselyModeratedGame"
+}
+
+if v24 then
+	t10[Enum.ConnectionError.ScreentimeLockoutKick] = "Feature.Screentime.Content.ScreentimeLimitDialog"
+end
+
+if v25 then
+	t10[Enum.ConnectionError.DisconnectBySecurityPolicy] = "InGame.ConnectionError.DisconnectBlockedConnection"
+	t10[Enum.ConnectionError.DisconnectBlockedIP] = "InGame.ConnectionError.DisconnectBlockedConnection"
+	t10[Enum.ConnectionError.DisconnectClientFailure] = "InGame.ConnectionError.DisconnectClientFailure"
+	t10[Enum.ConnectionError.DisconnectClientRequest] = "InGame.ConnectionError.DisconnectClientRequest"
+	t10[Enum.ConnectionError.DisconnectModeratedGame] = "InGame.ConnectionError.ServerShutdown"
+	t10[Enum.ConnectionError.ServerShutdown] = "InGame.ConnectionError.ServerShutdown"
+	t10[Enum.ConnectionError.ReplicatorTimeout] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.PlayerRemoved] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.DisconnectRomarkEndOfTest] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.DisconnectCollaboratorPermissionRevoked] = "InGame.ConnectionError.DisconnectCollaboratorPermissionRevoked"
+	t10[Enum.ConnectionError.DisconnectCollaboratorUnderage] = "InGame.ConnectionError.DisconnectCollaboratorUnderage"
+	t10[Enum.ConnectionError.NetworkInternal] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.NetworkSend] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.NetworkTimeout] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.NetworkMisbehavior] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.NetworkSecurity] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.ReplacementReady] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.ServerEmpty] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.PhantomFreeze] = "InGame.ConnectionError.DisconnectTryAgain"
+	t10[Enum.ConnectionError.PlacelaunchCreatorBan] = "InGame.ConnectionError.CreatorBanNoTime"
+end
+
 if v48 then
-    v101[Enum.ConnectionError.PlacelaunchDeviceBlock] = "InGame.ConnectionError.PlacelaunchDeviceBlock";
-end;
-local function v109(v102, v103, v104) --[[ Line: 769 ]] --[[ Name: getErrorString ]]
-    -- upvalues: v56 (copy), v25 (copy), v19 (copy), v101 (copy), l_mutedError_0 (copy), v18 (copy)
-    if v103 == Enum.ConnectionError.OK then
-        return "";
-    elseif v104 then
-        local v105 = v56("InGame.ConnectionError.ReconnectFailed");
-        if v105 ~= "" then
-            return v105;
-        else
-            return "Reconnect was unsuccessful. Please try again.";
-        end;
-    elseif v103 == Enum.ConnectionError.DisconnectLuaKick and v102 ~= "" then
-        v102 = v102:sub(1, v25);
-        local v106 = v56("InGame.ConnectionError.DisconnectLuaKickWithMessage", {
-            RBX_STR = v102
-        });
-        if v106 ~= "" then
-            return v106;
-        else
-            return v102;
-        end;
-    else
-        local v107 = nil;
-        if v19 then
-            v107 = v101[v103];
-            if not v107 then
-                l_mutedError_0("Cannot find localization key for " .. tostring(v103));
-                v107 = "InGame.ConnectionError.UnknownError";
-            end;
-        else
-            v107 = string.gsub(tostring(v103), "Enum", "InGame");
-        end;
-        local v108 = nil;
-        v108 = if v103 == Enum.ConnectionError.DisconnectIdle then v56(v107, {
-            RBX_NUM = tostring(20)
-        }) else v56(v107);
-        if v108 ~= "" then
-            return v108;
-        elseif v18 then
-            return (v56("InGame.ConnectionError.UnknownError"));
-        else
-            return v102;
-        end;
-    end;
-end;
-local function v116(v110, v111, v112) --[[ Line: 823 ]] --[[ Name: updateErrorPrompt ]]
-    -- upvalues: v85 (copy), l_NONE_0 (ref), v61 (copy), v57 (ref), v79 (copy), v99 (copy), v56 (copy), v109 (copy), l_pcall_0 (copy), v31 (copy)
-    local v113 = v85(v112, v111, l_NONE_0);
-    if v113 ~= l_NONE_0 then
-        if l_NONE_0 == v61.IS_RECONNECTING then
-            v57:primaryShimmerStop();
-        end;
-        l_NONE_0 = v113;
-        v79(v113);
-    end;
-    if v111 == Enum.ConnectionError.PlacelaunchCreatorBan then
-        v110 = v99(v110);
-    elseif v112 == Enum.ConnectionError.TeleportErrors and l_NONE_0 ~= v61.TELEPORT_FAILED then
-        local _ = v110;
-        if v111 == Enum.ConnectionError.OK then
-            v110 = "";
-        else
-            local v115 = v56("InGame.ConnectionError.ReconnectFailed");
-            v110 = if v115 ~= "" then v115 else "Reconnect was unsuccessful. Please try again.";
-        end;
-    else
-        v110 = v109(v110, v111);
-    end;
-    if l_NONE_0 == v61.RECONNECT_DISABLED then
-        v110 = l_pcall_0;
-    end;
-    if v57 then
-        if v31() then
-            v57:onErrorChanged(v110, v111, true);
-            return;
-        else
-            v57:onErrorChanged(v110, v111);
-        end;
-    end;
-end;
-local function v120() --[[ Line: 854 ]] --[[ Name: onErrorMessageChanged ]]
-    -- upvalues: l_GuiService_0 (copy), v116 (copy)
-    local l_l_GuiService_0_ErrorMessage_0 = l_GuiService_0:GetErrorMessage();
-    local l_l_GuiService_0_ErrorCode_0 = l_GuiService_0:GetErrorCode();
-    local l_l_GuiService_0_ErrorType_0 = l_GuiService_0:GetErrorType();
-    v116(l_l_GuiService_0_ErrorMessage_0, l_l_GuiService_0_ErrorCode_0, l_l_GuiService_0_ErrorType_0);
-end;
-local function v123() --[[ Line: 861 ]] --[[ Name: onScreenSizeChanged ]]
-    -- upvalues: v57 (ref), l_RobloxGui_0 (copy), l_X_0 (ref), l_Y_0 (ref)
-    if not v57 then
-        return;
-    else
-        local l_X_1 = l_RobloxGui_0.AbsoluteSize.X;
-        local l_Y_1 = l_RobloxGui_0.AbsoluteSize.Y;
-        if l_X_0 ~= l_X_1 or l_Y_0 ~= l_Y_1 then
-            l_X_0 = l_X_1;
-            l_Y_0 = l_Y_1;
-            v57:resizeWidthAndHeight(l_X_0, l_Y_0);
-        end;
-        return;
-    end;
-end;
-l_RobloxGui_0:GetPropertyChangedSignal("AbsoluteSize"):connect(v123);
-v116(l_GuiService_0:GetErrorMessage(), l_GuiService_0:GetErrorCode(), (l_GuiService_0:GetErrorType()));
-l_GuiService_0.ErrorMessageChanged:connect(v120);
-if v17 then
-    local v124 = require(l_RobloxGui_0.Modules.ErrorTestSets);
-    for v125, v126 in pairs(v124) do
-        for _, v128 in pairs(v126) do
-            v116("Should show localized strings, please file a jira ticket for missing translation.", v128, v125);
-            wait(2);
-            l_NONE_0 = v61.NONE;
-        end;
-    end;
-end;
-if l_game_EngineFeature_0 then
-    l_GuiService_0.CoreGuiRenderOverflowed:Connect(function() --[[ Line: 897 ]]
-        -- upvalues: l_CoreGui_0 (copy)
-        for _, v130 in pairs(l_CoreGui_0:GetChildren()) do
-            if v130:IsA("ScreenGui") and v130.Name ~= "RobloxPromptGui" then
-                v130.Enabled = false;
-            end;
-        end;
-    end);
-end;
-if v30 then
-    coroutine.wrap(function() --[[ Line: 914 ]]
-        -- upvalues: l_CorePackages_0 (copy)
-        require(l_CorePackages_0.Workspace.Packages.GenericChallenges).Middleware.InitExperienceChallengeInterceptor();
-    end)();
-end;
+	t10[Enum.ConnectionError.PlacelaunchDeviceBlock] = "InGame.ConnectionError.PlacelaunchDeviceBlock"
+end
+
+if v49 then
+	t10[Enum.ConnectionError.PlacelaunchAgeVerificationRequired] = "InGame.ConnectionError.Description.AgeCheckRequired"
+	t10[Enum.ConnectionError.PlacelaunchParentalApprovalRequired] = "InGame.ConnectionError.Description.ParentalApprovalRequired"
+	t10[Enum.ConnectionError.PlacelaunchCoreGated] = "InGame.ConnectionError.Description.LockedByAge"
+end
+
+if v50 then
+	t10[Enum.ConnectionError.PlacelaunchVipOwnerNotPresent] = "InGame.ConnectionError.Description.VipOwnerNotPresent"
+end
+
+if v60 and v82 then
+	t10[v82] = "InGame.ConnectionError.Description.CollaborationRequiresTrustedFriends"
+end
+
+if v52 and v54 then
+	t10[Enum.ConnectionError.DisconnectRemoteAttestationTimeout] = "InGame.ConnectionError.RemoteAttestationTimeout"
+	t10[Enum.ConnectionError.DisconnectRemoteAttestationUnsupported] = "InGame.ConnectionError.RemoteAttestationUnsupported"
+	t10[Enum.ConnectionError.DisconnectRemoteAttestationGeneralFailure] = "InGame.ConnectionError.RemoteAttestationGeneralFailure"
+	t10[Enum.ConnectionError.DisconnectRemoteAttestationOSOutOfDate] = "InGame.ConnectionError.RemoteAttestationOSOutOfDate"
+	t10[Enum.ConnectionError.DisconnectRemoteAttestationBootValidationFailure] = "InGame.ConnectionError.RemoteAttestationBootValidationFailure"
+end
+
+local function getErrorString(s5: string, p12, p13) -- line: 1064
+	-- upvalues: translateString (copy), v28 (copy), v23 (copy), t10 (copy), mutedError (copy), v22 (copy)
+	if p12 == Enum.ConnectionError.OK then
+		return ""
+	end
+
+	if p13 then
+		local v153 = translateString("InGame.ConnectionError.ReconnectFailed")
+
+		if v153 ~= "" then
+			return v153
+		end
+
+		return "Reconnect was unsuccessful. Please try again."
+	end
+
+	if p12 == Enum.ConnectionError.DisconnectLuaKick and s5 ~= "" then
+		local v154 = s5:sub(1, v28)
+		local v155 = translateString("InGame.ConnectionError.DisconnectLuaKickWithMessage", {
+			RBX_STR = v154
+		})
+
+		if v155 ~= "" then
+			return v155
+		end
+
+		return v154
+	end
+
+	local v156
+
+	if v23 then
+		v156 = t10[p12]
+
+		if not v156 then
+			mutedError("Cannot find localization key for " .. tostring(p12))
+			v156 = "InGame.ConnectionError.UnknownError"
+		end
+	else
+		v156 = string.gsub(tostring(p12), "Enum", "InGame")
+	end
+
+	local v157 = if p12 ~= Enum.ConnectionError.DisconnectIdle then translateString(v156) else translateString(v156, {
+		RBX_NUM = tostring(20)
+	})
+
+	if v157 ~= "" then
+		return v157
+	end
+
+	if v22 then
+		return (translateString("InGame.ConnectionError.UnknownError"))
+	end
+
+	return s5
+end
+local function updateErrorPrompt(p14, p15, p16) -- line: 1118
+	-- upvalues: stateTransit (copy), n2 (ref), t3 (copy), u65 (ref), onEnter (copy), getCreatorBanString (copy), translateString (copy), getErrorString (copy), v45 (copy), GetFFlagDisplayChannelNameOnErrorPrompt (copy)
+	local v161 = stateTransit(p16, p15, n2)
+
+	if v161 ~= n2 then
+		if n2 == t3.IS_RECONNECTING then
+			u65:primaryShimmerStop()
+		end
+
+		n2 = v161
+		onEnter(v161)
+	end
+
+	local v162
+
+	if p15 == Enum.ConnectionError.PlacelaunchCreatorBan then
+		v162 = getCreatorBanString(p14)
+	elseif p16 == Enum.ConnectionError.TeleportErrors and n2 ~= 4 then
+		if p15 == Enum.ConnectionError.OK then
+			v162 = ""
+		else
+			local v163 = translateString("InGame.ConnectionError.ReconnectFailed")
+
+			v162 = v163 == "" and "Reconnect was unsuccessful. Please try again." or v163
+		end
+	else
+		v162 = getErrorString(p14, p15)
+	end
+
+	if n2 == 8 then
+		v162 = v45
+	end
+
+	if u65 then
+		if GetFFlagDisplayChannelNameOnErrorPrompt() then
+			u65:onErrorChanged(v162, p15, true)
+
+			return
+		end
+
+		u65:onErrorChanged(v162, p15)
+	end
+end
+local function onErrorMessageChanged() -- line: 1149
+	-- upvalues: GuiService (copy), updateErrorPrompt (copy)
+	local ErrorMessage = GuiService:GetErrorMessage()
+	local ErrorCode = GuiService:GetErrorCode()
+	local ErrorType = GuiService:GetErrorType()
+
+	updateErrorPrompt(ErrorMessage, ErrorCode, ErrorType)
+end
+local function onScreenSizeChanged() -- line: 1156
+	-- upvalues: u65 (ref), RobloxGui (copy), AbsoluteSizeX (ref), AbsoluteSizeY (ref)
+	if not u65 then
+		return
+	end
+
+	local AbsoluteSizeX2 = RobloxGui.AbsoluteSize.X
+	local AbsoluteSizeY2 = RobloxGui.AbsoluteSize.Y
+
+	if AbsoluteSizeX2 ~= AbsoluteSizeX or AbsoluteSizeY2 ~= AbsoluteSizeY then
+		AbsoluteSizeX = AbsoluteSizeX2
+		AbsoluteSizeY = AbsoluteSizeY2
+		u65:resizeWidthAndHeight(AbsoluteSizeX, AbsoluteSizeY)
+	end
+end
+
+RobloxGui:GetPropertyChangedSignal("AbsoluteSize"):connect(onScreenSizeChanged)
+updateErrorPrompt(GuiService:GetErrorMessage(), GuiService:GetErrorCode(), (GuiService:GetErrorType()))
+GuiService.ErrorMessageChanged:connect(onErrorMessageChanged)
+
+if v21 then
+	local ErrorTestSets = require(RobloxGui.Modules.ErrorTestSets)
+
+	for k, v in pairs(ErrorTestSets) do
+		for _, v2 in pairs(v) do
+			updateErrorPrompt("Should show localized strings, please file a jira ticket for missing translation.", v2, k)
+			wait(2)
+			n2 = 1
+		end
+	end
+end
+
+if EngineFeature then
+	GuiService.CoreGuiRenderOverflowed:Connect(function() -- line: 1192
+		-- upvalues: CoreGui (copy)
+		for _, child in pairs(CoreGui:GetChildren()) do
+			if child:IsA("ScreenGui") and child.Name ~= "RobloxPromptGui" then
+				child.Enabled = false
+			end
+		end
+	end)
+end
+
+if v33 then
+	coroutine.wrap(function() -- line: 1209
+		-- upvalues: CorePackages (copy)
+		require(CorePackages.Workspace.Packages.GenericChallenges).Middleware.InitExperienceChallengeInterceptor()
+	end)()
+end

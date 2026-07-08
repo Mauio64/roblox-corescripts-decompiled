@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixCustomOutfitNamesDisabled", false);
+return game:DefineFastFlag("AXFixCustomOutfitNamesDisabled", false)

@@ -1,6 +1,7 @@
-local v0 = require(script.SquadAppChatEventReceiver);
-local v1 = require(script.SquadEventReceiver);
+local SquadAppChatEventReceiver = require(script.SquadAppChatEventReceiver)
+local SquadEventReceiver = require(script.SquadEventReceiver)
+
 return {
-    SquadAppChatEventReceiver = v0, 
-    SquadEventReceiver = v1
-};
+	SquadAppChatEventReceiver = SquadAppChatEventReceiver,
+	SquadEventReceiver = SquadEventReceiver
+}

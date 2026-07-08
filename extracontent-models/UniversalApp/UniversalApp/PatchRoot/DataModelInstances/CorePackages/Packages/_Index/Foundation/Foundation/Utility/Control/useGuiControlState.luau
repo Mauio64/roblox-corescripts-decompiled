@@ -1,71 +1,78 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useForwardRef_0 = require(l_Parent_0.ReactUtils).useForwardRef;
-local v4 = require(l_script_FirstAncestor_0.Enums.ControlState);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlStateEvent);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v7 = {
-    [Enum.GuiState.Idle] = v4.Default, 
-    [Enum.GuiState.Hover] = v4.Hover, 
-    [Enum.GuiState.Press] = v4.Pressed, 
-    [Enum.GuiState.NonInteractable] = v4.Disabled
-};
-return function(v8, v9) --[[ Line: 22 ]] --[[ Name: useGuiControlState ]]
-    -- upvalues: v2 (copy), v4 (copy), v7 (copy), l_useForwardRef_0 (copy)
-    local v10 = v2.useRef(false);
-    local v11 = v2.useRef(v4.Initialize);
-    local v14 = v2.useCallback(function(v12) --[[ Line: 26 ]]
-        -- upvalues: v11 (copy), v10 (copy), v4 (ref), v9 (copy)
-        local l_current_0 = v11.current;
-        if v10.current then
-            if v12 == v4.Default or v12 == v4.Hover then
-                v12 = v4.Selected;
-            elseif v12 == v4.Pressed then
-                v12 = v4.SelectedPressed;
-            end;
-        end;
-        if l_current_0 == v12 then
-            return;
-        else
-            v11.current = v12;
-            if v9 ~= nil then
-                v9(v12);
-            end;
-            return;
-        end;
-    end, {
-        v9
-    });
-    local v20 = v2.useCallback(function(v15) --[[ Line: 48 ]]
-        -- upvalues: v14 (copy), v7 (ref), v10 (copy), v11 (copy)
-        local v16 = {};
-        if v15 then
-            v14(v7[v15.GuiState]);
-            table.insert(v16, v15:GetPropertyChangedSignal("GuiState"):Connect(function() --[[ Line: 55 ]]
-                -- upvalues: v7 (ref), v15 (copy), v14 (ref)
-                local v17 = v7[v15.GuiState];
-                v14(v17);
-            end));
-            table.insert(v16, v15.SelectionGained:Connect(function() --[[ Line: 64 ]]
-                -- upvalues: v10 (ref), v14 (ref), v11 (ref)
-                v10.current = true;
-                v14(v11.current);
-            end));
-            table.insert(v16, v15.SelectionLost:Connect(function() --[[ Line: 71 ]]
-                -- upvalues: v10 (ref), v14 (ref), v11 (ref)
-                v10.current = false;
-                v14(v11.current);
-            end));
-        end;
-        return function() --[[ Line: 78 ]]
-            -- upvalues: v16 (copy)
-            for _, v19 in v16 do
-                v19:Disconnect();
-            end;
-        end;
-    end, {
-        v14
-    });
-    return l_useForwardRef_0(v8, v20);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local useForwardRef = require(FoundationParent.ReactUtils).useForwardRef
+local ControlState = require(Foundation.Enums.ControlState)
+
+require(Foundation.Enums.ControlStateEvent)
+require(Foundation.Components.Types)
+
+local t1 = {
+	[Enum.GuiState.Idle] = ControlState.Default,
+	[Enum.GuiState.Hover] = ControlState.Hover,
+	[Enum.GuiState.Press] = ControlState.Pressed,
+	[Enum.GuiState.NonInteractable] = ControlState.Disabled
+}
+
+local function useGuiControlState(p1, p2) -- line: 22
+	-- upvalues: React (copy), ControlState (copy), t1 (copy), useForwardRef (copy)
+	local v10 = React.useRef(false)
+	local v11 = React.useRef(ControlState.Initialize)
+	local v12 = React.useCallback(function(p3) -- line: 26
+		-- upvalues: v11 (copy), v10 (copy), ControlState (copy), p2 (copy)
+		local current = v11.current
+
+		if v10.current then
+			if p3 == ControlState.Default or p3 == ControlState.Hover then
+				p3 = ControlState.Selected
+			elseif p3 == ControlState.Pressed then
+				p3 = ControlState.SelectedPressed
+			end
+		end
+
+		if current == p3 then
+			return
+		end
+
+		v11.current = p3
+
+		if p2 ~= nil then
+			p2(p3)
+		end
+	end, { p2 })
+	local v13 = React.useCallback(function(p4) -- line: 48
+		-- upvalues: v12 (copy), t1 (copy), v10 (copy), v11 (copy)
+		local t2 = {}
+
+		if p4 then
+			v12(t1[p4.GuiState])
+			table.insert(t2, p4:GetPropertyChangedSignal("GuiState"):Connect(function() -- line: 55
+				-- upvalues: t1 (copy), p4 (copy), v12 (copy)
+				local v18 = t1[p4.GuiState]
+
+				v12(v18)
+			end))
+			table.insert(t2, p4.SelectionGained:Connect(function() -- line: 64
+				-- upvalues: v10 (copy), v12 (copy), v11 (copy)
+				v10.current = true
+				v12(v11.current)
+			end))
+			table.insert(t2, p4.SelectionLost:Connect(function() -- line: 71
+				-- upvalues: v10 (copy), v12 (copy), v11 (copy)
+				v10.current = false
+				v12(v11.current)
+			end))
+		end
+
+		return function() -- line: 78
+			-- upvalues: t2 (copy)
+			for _, v20 in t2 do
+				v20:Disconnect()
+			end
+		end
+	end, { v12 })
+
+	return useForwardRef(p1, v13)
+end
+
+return useGuiControlState

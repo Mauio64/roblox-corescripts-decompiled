@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileNavigateToAvatar", false);
+return game:DefineFastFlag("EditProfileNavigateToAvatar", false)

@@ -1,10 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local _ = require(l_Parent_0.Shared);
-local _ = require(script.Parent.ReactWorkTags);
-local _ = require(script.Parent.ReactTypeOfMode);
-local _ = require(script.Parent.ReactFiberFlags);
-local _ = require(script.Parent.ReactRootTags);
-local _ = require(l_Parent_0.Shared);
-local _ = require(l_Parent_0.Scheduler);
-return {};
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+require(ParentParent.Shared)
+require(script.Parent.ReactWorkTags)
+require(script.Parent.ReactTypeOfMode)
+require(script.Parent.ReactFiberFlags)
+require(script.Parent.ReactRootTags)
+require(ParentParent.Shared)
+require(ParentParent.Scheduler)
+
+return {}

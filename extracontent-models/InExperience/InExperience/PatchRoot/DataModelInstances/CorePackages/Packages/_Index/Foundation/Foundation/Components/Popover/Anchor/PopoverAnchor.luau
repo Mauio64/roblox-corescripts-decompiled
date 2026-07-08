@@ -1,35 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(script.Parent.Parent.PopoverContext);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v4 = require(l_script_FirstAncestor_0.Components.View);
-local v5 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v6 = require(l_Parent_0.React);
-return v6.forwardRef(function(v7, v8) --[[ Line: 18 ]] --[[ Name: PopoverAnchor ]]
-    -- upvalues: v6 (copy), v2 (copy), v4 (copy), v5 (copy)
-    local v9 = v6.useContext(v2);
-    local v10 = v6.useRef(nil);
-    v6.useImperativeHandle(v8, function() --[[ Line: 23 ]]
-        -- upvalues: v10 (copy)
-        return v10.current;
-    end, {});
-    v6.useLayoutEffect(function() --[[ Line: 27 ]]
-        -- upvalues: v7 (copy), v9 (copy), v10 (copy)
-        if typeof(v7.anchorRef) == "table" and v7.anchorRef.current then
-            v9.setAnchor(v7.anchorRef.current);
-            return;
-        else
-            v9.setAnchor(v10.current);
-            return;
-        end;
-    end);
-    if v7.anchorRef then
-        return nil;
-    else
-        v7.testId = ("%*--anchor"):format(v9.testId);
-        return v6.createElement(v4, v5(v7, {
-            tag = "auto-xy", 
-            ref = v10
-        }), v7.children);
-    end;
-end);
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Flags = require(Foundation.Utility.Flags)
+local PopoverContext = require(script.Parent.Parent.PopoverContext)
+local StudioUri = require(Foundation.Utility.Plugin.StudioUri)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local React = require(FoundationParent.React)
+
+local function PopoverAnchor(p1, p2) -- line: 22
+	-- upvalues: React (copy), PopoverContext (copy), Flags (copy), StudioUri (copy), View (copy), withCommonProps (copy)
+	local v12 = React.useContext(PopoverContext)
+	local v13 = React.useRef(nil)
+
+	React.useImperativeHandle(p2, function() -- line: 27
+		-- upvalues: v13 (copy)
+		return v13.current
+	end, {})
+	React.useLayoutEffect(function() -- line: 31
+		-- upvalues: Flags (copy), StudioUri (copy), p1 (copy), v12 (copy), v13 (copy)
+		if Flags.FoundationPopoverPluginUriAnchor and StudioUri.isStudioUri(p1.anchorRef) then
+			v12.setAnchorUri(p1.anchorRef)
+
+			return
+		end
+
+		if typeof(p1.anchorRef) == "table" and p1.anchorRef.current then
+			v12.setAnchor(p1.anchorRef.current)
+
+			return
+		end
+
+		v12.setAnchor(v13.current)
+	end)
+
+	if p1.anchorRef then
+		return nil
+	end
+
+	p1.testId = `{ v12.testId }--anchor`
+
+	return React.createElement(View, withCommonProps(p1, {
+		tag = "auto-xy",
+		ref = v13
+	}), p1.children)
+end
+
+return React.forwardRef(PopoverAnchor)

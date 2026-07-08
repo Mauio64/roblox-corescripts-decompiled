@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatUseChannelTabsStore", false);
+return game:DefineFastFlag("ExpChatUseChannelTabsStore3", false)

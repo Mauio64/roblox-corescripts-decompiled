@@ -1,30 +1,35 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_ShareGame_0 = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame;
-local l_Immutable_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Immutable;
-local v3 = require(l_ShareGame_0.Actions.ReceivedUserInviteStatus);
-local v4 = require(l_ShareGame_0.Actions.StoppedToastTimer);
-local l_InviteStatus_0 = require(l_ShareGame_0.Constants).InviteStatus;
-return function(v6, v7) --[[ Line: 13 ]]
-    -- upvalues: v3 (copy), l_InviteStatus_0 (copy), l_Immutable_0 (copy), v4 (copy)
-    v6 = v6 or {
-        failedInvites = {}
-    };
-    if v7.type == v3.name then
-        local l_inviteStatus_0 = v7.inviteStatus;
-        if l_inviteStatus_0 == l_InviteStatus_0.Moderated or l_inviteStatus_0 == l_InviteStatus_0.Failed then
-            local v9 = {
-                timeStamp = tick(), 
-                userId = v7.userId, 
-                status = l_inviteStatus_0
-            };
-            return (l_Immutable_0.JoinDictionaries(v6, {
-                failedInvites = l_Immutable_0.JoinDictionaries(v6.failedInvites, l_Immutable_0.Append(v6.failedInvites, v9))
-            }));
-        end;
-    elseif v7.type == v4.name then
-        v6 = l_Immutable_0.JoinDictionaries(v6, {
-            failedInvites = {}
-        });
-    end;
-    return v6;
-end;
+local CorePackages = game:GetService("CorePackages")
+local ShareGame = game:GetService("CoreGui").RobloxGui.Modules.Settings.Pages.ShareGame
+local Immutable = require(CorePackages.Workspace.Packages.AppCommonLib).Immutable
+local ReceivedUserInviteStatus = require(ShareGame.Actions.ReceivedUserInviteStatus)
+local StoppedToastTimer = require(ShareGame.Actions.StoppedToastTimer)
+local InviteStatus = require(ShareGame.Constants).InviteStatus
+
+return function(p1, p2) -- line: 13
+	-- upvalues: ReceivedUserInviteStatus (copy), InviteStatus (copy), Immutable (copy), StoppedToastTimer (copy)
+	local v9 = p1 or {
+		failedInvites = {}
+	}
+
+	if p2.type == ReceivedUserInviteStatus.name then
+		local inviteStatus = p2.inviteStatus
+
+		if inviteStatus == InviteStatus.Moderated or inviteStatus == InviteStatus.Failed then
+			local t1 = {
+				timeStamp = tick(),
+				userId = p2.userId,
+				status = inviteStatus
+			}
+
+			return (Immutable.JoinDictionaries(v9, {
+				failedInvites = Immutable.JoinDictionaries(v9.failedInvites, Immutable.Append(v9.failedInvites, t1))
+			}))
+		end
+	elseif p2.type == StoppedToastTimer.name then
+		v9 = Immutable.JoinDictionaries(v9, {
+			failedInvites = {}
+		})
+	end
+
+	return v9
+end

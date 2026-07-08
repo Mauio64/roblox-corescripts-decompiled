@@ -1,56 +1,59 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_t_0 = v1.t;
-local l_Roact_0 = v1.Roact;
-local l_Cryo_0 = v1.Cryo;
-local l_UIBlox_0 = v1.UIBlox;
-local l_withSelectionCursorProvider_0 = l_UIBlox_0.App.SelectionImage.withSelectionCursorProvider;
-local l_CursorKind_0 = l_UIBlox_0.App.SelectionImage.CursorKind;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v9 = require(l_Parent_0.Components.GameIcon);
-local v10 = UDim.new(0, 8);
-local v11 = l_Roact_0.PureComponent:extend("GameIconButton");
-v11.validateProps = l_t_0.strictInterface({
-    anchorPoint = l_t_0.optional(l_t_0.Vector2), 
-    position = l_t_0.optional(l_t_0.UDim2), 
-    layoutOrder = l_t_0.optional(l_t_0.integer), 
-    onActivated = l_t_0.callback, 
-    onSelectionGained = l_t_0.optional(l_t_0.callback), 
-    onSelectionLost = l_t_0.optional(l_t_0.callback), 
-    forwardRef = l_t_0.optional(l_t_0.table)
-});
-v11.renderWithSelectionCursor = function(v12, v13) --[[ Line: 30 ]] --[[ Name: renderWithSelectionCursor ]]
-    -- upvalues: l_Roact_0 (copy), l_CursorKind_0 (copy), v9 (copy), v10 (copy)
-    return l_Roact_0.createElement("TextButton", {
-        Text = "", 
-        AnchorPoint = v12.props.anchorPoint, 
-        BackgroundTransparency = 1, 
-        Position = v12.props.position, 
-        Size = UDim2.fromOffset(32, 32), 
-        LayoutOrder = v12.props.layoutOrder, 
-        SelectionImageObject = v13(l_CursorKind_0.RoundedRect), 
-        [l_Roact_0.Event.Activated] = v12.props.onActivated, 
-        [l_Roact_0.Event.SelectionGained] = v12.props.onSelectionGained, 
-        [l_Roact_0.Event.SelectionLost] = v12.props.onSelectionLost, 
-        [l_Roact_0.Ref] = v12.props.forwardRef
-    }, {
-        GameIconButton = l_Roact_0.createElement(v9, {
-            gameId = game.GameId, 
-            iconSize = 32, 
-            cornerRadius = v10
-        })
-    });
-end;
-v11.render = function(v14) --[[ Line: 53 ]] --[[ Name: render ]]
-    -- upvalues: l_withSelectionCursorProvider_0 (copy)
-    return l_withSelectionCursorProvider_0(function(v15) --[[ Line: 54 ]]
-        -- upvalues: v14 (copy)
-        return v14:renderWithSelectionCursor(v15);
-    end);
-end;
-return l_Roact_0.forwardRef(function(v16, v17) --[[ Line: 59 ]]
-    -- upvalues: l_Roact_0 (copy), v11 (copy), l_Cryo_0 (copy)
-    return l_Roact_0.createElement(v11, l_Cryo_0.Dictionary.join(v16, {
-        forwardRef = v17
-    }));
-end);
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local t = InGameMenuDependencies.t
+local Roact = InGameMenuDependencies.Roact
+local Cryo = InGameMenuDependencies.Cryo
+local UIBlox = InGameMenuDependencies.UIBlox
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local ParentParent = script.Parent.Parent.Parent
+local GameIcon = require(ParentParent.Components.GameIcon)
+local uDim = UDim.new(0, 8)
+local v12 = Roact.PureComponent:extend("GameIconButton")
+
+v12.validateProps = t.strictInterface({
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	layoutOrder = t.optional(t.integer),
+	onActivated = t.callback,
+	onSelectionGained = t.optional(t.callback),
+	onSelectionLost = t.optional(t.callback),
+	forwardRef = t.optional(t.table)
+})
+
+function v12.renderWithSelectionCursor(p1, p2) -- line: 30
+	-- upvalues: Roact (copy), CursorKind (copy), GameIcon (copy), uDim (copy)
+	return Roact.createElement("TextButton", {
+		Text = "",
+		AnchorPoint = p1.props.anchorPoint,
+		BackgroundTransparency = 1,
+		Position = p1.props.position,
+		Size = UDim2.fromOffset(32, 32),
+		LayoutOrder = p1.props.layoutOrder,
+		SelectionImageObject = p2(CursorKind.RoundedRect),
+		[Roact.Event.Activated] = p1.props.onActivated,
+		[Roact.Event.SelectionGained] = p1.props.onSelectionGained,
+		[Roact.Event.SelectionLost] = p1.props.onSelectionLost,
+		[Roact.Ref] = p1.props.forwardRef
+	}, {
+		GameIconButton = Roact.createElement(GameIcon, {
+			iconSize = 32,
+			gameId = game.GameId,
+			cornerRadius = uDim
+		})
+	})
+end
+function v12.render(p3) -- line: 53
+	-- upvalues: withSelectionCursorProvider (copy)
+	return withSelectionCursorProvider(function(p4) -- line: 54
+		-- upvalues: p3 (copy)
+		return p3:renderWithSelectionCursor(p4)
+	end)
+end
+
+return Roact.forwardRef(function(p5, p6) -- line: 59
+	-- upvalues: Roact (copy), v12 (copy), Cryo (copy)
+	return Roact.createElement(v12, Cryo.Dictionary.join(p5, {
+		forwardRef = p6
+	}))
+end)

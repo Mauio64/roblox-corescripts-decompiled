@@ -47,168 +47,168 @@ local t2 = {
 local SHADOW_IMAGE = Constants.SHADOW_IMAGE
 local SHADOW_SIZE = Constants.SHADOW_SIZE
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ SideSheet ]] -- line: 69
+local function SideSheet(p1, p2) -- line: 69
 	-- upvalues: withDefaults (copy), t2 (copy), useOverlay (copy), useTokens (copy), useElevation (copy), ElevationLayer (copy), usePreferences (copy), useHardwareInsets (copy), Flags (copy), useScreenSize (copy), t1 (copy), useScaledValue (copy), React (copy), useAnimatedBinding (copy), childrenHasFullBleed (copy), Otter (copy), Dash (copy), SheetType (copy), ReactRoblox (copy), View (copy), StateLayerAffordance (copy), Types (copy), SheetContext (copy), ElevationOwnerScope (copy), CloseAffordance (copy), CloseAffordanceVariant (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy)
-	local v37 = withDefaults(p1, t2)
-	local v38 = useOverlay()
-	local v39 = useTokens()
-	local v40 = useElevation(ElevationLayer.Sheet, {
+	local v38 = withDefaults(p1, t2)
+	local v39 = useOverlay()
+	local v40 = useTokens()
+	local v41 = useElevation(ElevationLayer.Sheet, {
 		stackAboveOwner = false
 	})
 	local reducedMotion = usePreferences().reducedMotion
-	local v42 = useHardwareInsets(v38)
-	local v43 = if not Flags.FoundationSideSheetNewWidthCalculation then nil else useScreenSize()
-	local right = v42.right
-	local v45 = v37.displaySize == Enum.DisplaySize.Small
+	local v43 = useHardwareInsets(v39)
+	local v44 = if not Flags.FoundationSideSheetNewWidthCalculation then nil else useScreenSize()
+	local right = v43.right
+	local v46 = v38.displaySize == Enum.DisplaySize.Small
 	local TARGET_WIDTH = nil
-	local v47 = nil
 	local v48 = nil
+	local v49 = nil
 
 	if Flags.FoundationSideSheetNewWidthCalculation then
-		local UIScale = v39.Config.UI.Scale
+		local UIScale = v40.Config.UI.Scale
 
-		TARGET_WIDTH = t1[v37.size].TARGET_WIDTH
-		v47 = t1[v37.size].MIN * UIScale
-		v48 = t1[v37.size].MAX * UIScale
+		TARGET_WIDTH = t1[v38.size].TARGET_WIDTH
+		v48 = t1[v38.size].MIN * UIScale
+		v49 = t1[v38.size].MAX * UIScale
 	end
 
-	local v50 = if not Flags.FoundationSideSheetNewWidthCalculation then useScaledValue(not v45 and 360 or 400) else math.clamp(v43.X * TARGET_WIDTH, v47, v48)
-	local Medium = v39.Padding.Medium
-	local v52 = React.useRef(false)
-	local v53, v54 = useAnimatedBinding(1, function() -- line: 99
-		-- upvalues: v52 (copy), v37 (copy)
-		if v52.current then
-			v37.onClose()
+	local v51 = if not Flags.FoundationSideSheetNewWidthCalculation then useScaledValue(not v46 and 360 or 400) else math.clamp(v44.X * TARGET_WIDTH, v48, v49)
+	local Medium = v40.Padding.Medium
+	local v53 = React.useRef(false)
+	local v54, v55 = useAnimatedBinding(1, function() -- line: 99
+		-- upvalues: v53 (copy), v38 (copy)
+		if v53.current then
+			v38.onClose()
 		end
 	end)
-	local v55 = -(right + if not v45 then Medium else 0)
-	local v56, v57 = useAnimatedBinding(v55)
-	local v58, v59 = React.useBinding(false)
-	local v60, v61 = React.useBinding(false)
-	local u62 = nil
+	local v56 = -(right + if not v46 then Medium else 0)
+	local v57, v58 = useAnimatedBinding(v56)
+	local v59, v60 = React.useBinding(false)
+	local v61, v62 = React.useBinding(false)
 	local u63 = nil
 	local u64 = nil
+	local u65 = nil
 
 	if Flags.FoundationSheetFullBleed then
-		u62 = childrenHasFullBleed(v37.children)
+		u63 = childrenHasFullBleed(v38.children)
 
-		local v65, v66 = React.useBinding(0)
+		local v66, v67 = React.useBinding(0)
 
-		u63 = v65
 		u64 = v66
+		u65 = v67
 	end
 
-	local v67, v68 = React.useBinding(0)
-	local v69 = React.useRef(nil)
-	local v70, v71 = React.useState(nil)
+	local v68, v69 = React.useBinding(0)
+	local v70 = React.useRef(nil)
+	local v71, v72 = React.useState(nil)
 
 	React.useEffect(function() -- line: 123
-		-- upvalues: reducedMotion (copy), v57 (copy), Otter (copy), v50 (copy), v54 (copy), v39 (copy)
+		-- upvalues: reducedMotion (copy), v58 (copy), Otter (copy), v51 (copy), v55 (copy), v40 (copy)
 		if reducedMotion then
-			v57((Otter.instant(v50)))
-			v54((Otter.instant(0)))
+			v58((Otter.instant(v51)))
+			v55((Otter.instant(0)))
 
 			return
 		end
 
-		v57(Otter.ease(v50, {
-			easingStyle = v39.Ease.StandardOut,
-			duration = v39.Time.Time_300
+		v58(Otter.ease(v51, {
+			easingStyle = v40.Ease.StandardOut,
+			duration = v40.Time.Time_300
 		}))
-		v54(Otter.ease(0, {
-			duration = v39.Time.Time_100
+		v55(Otter.ease(0, {
+			duration = v40.Time.Time_100
 		}))
 	end, {
-		v50,
+		v51,
 		reducedMotion
 	})
 
-	local v72 = React.useCallback(function() -- line: 139
-		-- upvalues: v52 (copy), reducedMotion (copy), v57 (copy), Otter (copy), v55 (copy), v54 (copy), v39 (copy)
-		if v52.current then
+	local v73 = React.useCallback(function() -- line: 139
+		-- upvalues: v53 (copy), reducedMotion (copy), v58 (copy), Otter (copy), v56 (copy), v55 (copy), v40 (copy)
+		if v53.current then
 			return
 		end
 
 		if reducedMotion then
-			v52.current = true
-			v57(Otter.instant(v55))
-			v54(Otter.instant(1))
+			v53.current = true
+			v58(Otter.instant(v56))
+			v55(Otter.instant(1))
 
 			return
 		end
 
-		v57(Otter.ease(v55, {
-			easingStyle = v39.Ease.StandardIn,
-			duration = v39.Time.Time_100
+		v58(Otter.ease(v56, {
+			easingStyle = v40.Ease.StandardIn,
+			duration = v40.Time.Time_100
 		}))
-		v54(Otter.ease(1, {
-			duration = v39.Time.Time_100
+		v55(Otter.ease(1, {
+			duration = v40.Time.Time_100
 		}))
-		v52.current = true
+		v53.current = true
 	end, {
-		v55,
+		v56,
 		reducedMotion
 	})
 
-	React.useImperativeHandle(v37.sheetRef, function() -- line: 159
-		-- upvalues: v72 (copy)
+	React.useImperativeHandle(v38.sheetRef, function() -- line: 159
+		-- upvalues: v73 (copy)
 		return {
-			close = v72
+			close = v73
 		}
 	end, {})
 
-	local uDim2 = UDim2.new(0, v50 + (not v45 and 0 or right), 1, if not v45 then -Medium * 2 else 0)
-	local v74 = v56:map(function(n1: number) -- line: 172
-		-- upvalues: v45 (copy), Medium (copy)
-		return UDim2.new(1, if not v45 then -(n1 + Medium) else -n1, 0, if not v45 then Medium else 0)
+	local uDim2 = UDim2.new(0, v51 + (not v46 and 0 or right), 1, if not v46 then -Medium * 2 else 0)
+	local v75 = v57:map(function(n1: number) -- line: 172
+		-- upvalues: v46 (copy), Medium (copy)
+		return UDim2.new(1, if not v46 then -(n1 + Medium) else -n1, 0, if not v46 then Medium else 0)
 	end)
-	local v75 = React.useMemo(function() -- line: 182
-		-- upvalues: Dash (copy), v58 (copy), v59 (copy), v67 (copy), v68 (copy), v60 (copy), v61 (copy), Flags (copy), u62 (ref), u63 (ref), u64 (ref), v72 (copy), v45 (copy), SheetType (copy), v37 (copy), v69 (copy), v70 (copy), v71 (copy)
+	local v76 = React.useMemo(function() -- line: 182
+		-- upvalues: Dash (copy), v59 (copy), v60 (copy), v68 (copy), v69 (copy), v61 (copy), v62 (copy), Flags (copy), u63 (ref), u64 (ref), u65 (ref), v73 (copy), v46 (copy), SheetType (copy), v38 (copy), v70 (copy), v71 (copy), v72 (copy)
 		return {
 			actionsHeight = 0,
-			setActionsHeight = Dash.noop,
-			hasActionsDivider = v58,
-			setHasActionsDivider = v59,
 			sheetHeightAvailable = 0,
-			setSheetHeightAvailable = Dash.noop,
 			safeAreaPadding = 0,
 			bottomPadding = 0,
 			innerScrollingEnabled = true,
-			innerScrollY = v67,
-			setInnerScrollY = v68,
-			hasHeader = v60,
-			setHasHeader = v61,
-			hasFullBleed = if not Flags.FoundationSheetFullBleed then nil else u62,
-			fullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u63,
-			setFullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u64,
-			closeSheet = v72,
-			hasRadius = if not Flags.FoundationSheetFullBleed then nil else not v45,
+			setActionsHeight = Dash.noop,
+			hasActionsDivider = v59,
+			setHasActionsDivider = v60,
+			setSheetHeightAvailable = Dash.noop,
+			innerScrollY = v68,
+			setInnerScrollY = v69,
+			hasHeader = v61,
+			setHasHeader = v62,
+			hasFullBleed = if not Flags.FoundationSheetFullBleed then nil else u63,
+			fullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u64,
+			setFullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u65,
+			closeSheet = v73,
+			hasRadius = if not Flags.FoundationSheetFullBleed then nil else not v46,
 			sheetType = SheetType.Side,
-			testId = v37.testId,
-			closeAffordanceRef = v69,
-			contentStartRef = v70,
-			setContentStartRef = v71
+			testId = v38.testId,
+			closeAffordanceRef = v70,
+			contentStartRef = v71,
+			setContentStartRef = v72
 		}
 	end, {
-		v37.testId,
-		v72,
+		v38.testId,
+		v73,
+		v71,
 		v70,
-		v69,
-		u62,
-		if not Flags.FoundationSheetFullBleed then nil else v45
+		u63,
+		if not Flags.FoundationSheetFullBleed then nil else v46
 	})
 
-	return v38 and ReactRoblox.createPortal(React.createElement(View, {
-		ZIndex = v40.zIndex,
+	return v39 and ReactRoblox.createPortal(React.createElement(View, {
 		tag = "size-full",
-		testId = `{ v37.testId }--surface`
+		ZIndex = v41.zIndex,
+		testId = `{ v38.testId }--surface`
 	}, {
 		Sheet = React.createElement(View, {
-			Size = uDim2,
-			Position = v74,
 			ClipsDescendants = true,
 			ZIndex = 3,
-			padding = if not v45 or not (right > 0) then nil else {
+			Size = uDim2,
+			Position = v75,
+			padding = if not v46 or not (right > 0) then nil else {
 				right = UDim.new(0, right)
 			},
 			stateLayer = {
@@ -220,60 +220,62 @@ return React.memo(React.forwardRef(function(p1, p2) --[[ SideSheet ]] -- line: 6
 			selectionGroup = Types.isolatedSelectionGroup,
 			tag = {
 				["stroke-standard stroke-default bg-surface-100"] = true,
-				["radius-large"] = not v45
+				["radius-large"] = not v46
 			},
-			testId = v37.testId
+			testId = v38.testId
 		}, {
 			Content = React.createElement(View, {
 				tag = "col items-center size-full-full clip"
 			}, React.createElement(SheetContext.Provider, {
-				value = v75
+				value = v76
 			}, React.createElement(ElevationOwnerScope, {
-				owner = v40
-			}, v37.children))),
+				owner = v41
+			}, v38.children))),
 			CloseAffordance = React.createElement(CloseAffordance, {
-				onActivated = v72,
-				ref = v69,
-				NextSelectionDown = v70,
-				variant = if not Flags.FoundationSheetFullBleed or not u62 then CloseAffordanceVariant.Utility else CloseAffordanceVariant.OverMedia,
-				Position = UDim2.new(1, -v39.Margin.Small, 0, v39.Margin.Small),
+				onActivated = v73,
+				ref = v70,
+				NextSelectionDown = v71,
+				variant = if not Flags.FoundationSheetFullBleed or not u63 then CloseAffordanceVariant.Utility else CloseAffordanceVariant.OverMedia,
+				Position = UDim2.new(1, -v40.Margin.Small, 0, v40.Margin.Small),
 				AnchorPoint = Vector2.new(1, 0),
-				Visible = v60:map(function(b1: boolean) -- line: 268
+				Visible = v61:map(function(b1: boolean) -- line: 268
 					return not b1
 				end),
-				testId = `{ v37.testId }--close-affordance`
+				testId = `{ v38.testId }--close-affordance`
 			})
 		}),
 		Shadow = React.createElement(Image, {
+			ZIndex = 2,
 			Image = SHADOW_IMAGE,
 			Size = uDim2 + UDim2.fromOffset(SHADOW_SIZE * 2, SHADOW_SIZE * 2),
-			Position = v74:map(function(uDim2_2: UDim2) -- line: 277
+			Position = v75:map(function(uDim2_2: UDim2) -- line: 277
 				-- upvalues: SHADOW_SIZE (copy)
 				return uDim2_2 + UDim2.fromOffset(-SHADOW_SIZE, -SHADOW_SIZE)
 			end),
-			ZIndex = 2,
 			slice = {
-				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1),
-				scale = 2
+				scale = 2,
+				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1)
 			},
-			imageStyle = v39.Color.Extended.Black.Black_10
+			imageStyle = v40.Color.Extended.Black.Black_10
 		}),
 		Backdrop = React.createElement(View, {
+			ZIndex = 1,
 			Size = UDim2.fromScale(2, 2),
 			Position = UDim2.fromScale(-0.5, -0.5),
-			ZIndex = 1,
 			stateLayer = {
 				affordance = StateLayerAffordance.None
 			},
-			backgroundStyle = v53:map(function(n2: number) -- line: 294
-				-- upvalues: v39 (copy)
+			backgroundStyle = v54:map(function(n2: number) -- line: 294
+				-- upvalues: v40 (copy)
 				return {
-					Color3 = v39.Color.Common.Backdrop.Color3,
-					Transparency = math.lerp(v39.Color.Common.Backdrop.Transparency, 1, n2)
+					Color3 = v40.Color.Common.Backdrop.Color3,
+					Transparency = math.lerp(v40.Color.Common.Backdrop.Transparency, 1, n2)
 				}
 			end),
-			onActivated = v72,
-			testId = `{ v37.testId }--backdrop`
+			onActivated = v73,
+			testId = `{ v38.testId }--backdrop`
 		})
-	}), v38)
-end))
+	}), v39)
+end
+
+return React.memo(React.forwardRef(SideSheet))

@@ -1,6 +1,4 @@
 return {
-    displayName = "VoiceChatCore", 
-    testMatch = {
-        "**/*.test"
-    }
-};
+	displayName = "VoiceChatCore",
+	testMatch = { "**/*.test" }
+}

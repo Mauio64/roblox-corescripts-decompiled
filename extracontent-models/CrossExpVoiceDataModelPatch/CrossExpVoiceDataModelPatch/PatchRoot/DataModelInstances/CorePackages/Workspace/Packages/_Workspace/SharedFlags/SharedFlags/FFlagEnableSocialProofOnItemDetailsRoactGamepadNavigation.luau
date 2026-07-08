@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagEnableSocialProofOnItemDetails) and game:DefineFastFlag("EnableSocialProofOnItemDetailsRoactGamepadNavigation", false);
+return require(script.Parent.FFlagEnableSocialProofOnItemDetails) and game:DefineFastFlag("EnableSocialProofOnItemDetailsRoactGamepadNavigation", false)

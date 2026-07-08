@@ -1,27 +1,34 @@
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v1 = require(l_Modules_0.Settings.Pages.ShareGame.Constants);
-return function(v2, v3) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy)
-    local v4 = if v2 and v2.InviteUser ~= 0 then v2.InviteUser else nil;
-    local v5, v6 = v3(if v4 then v1.Triggers.DeveloperSingle else v1.Triggers.DeveloperMultiple, v4);
-    if not v5 then
-        return nil;
-    else
-        local v7 = {};
-        if v6 and v2 then
-            if v2.InviteMessageId ~= "" then
-                v7.inviteMessageId = v2.InviteMessageId;
-            end;
-            if v2.InviteUser ~= 0 then
-                v7.inviteUserId = v2.InviteUser;
-            end;
-            if v2.PromptMessage ~= "" then
-                v7.promptMessage = v2.PromptMessage;
-            end;
-            if v2.LaunchData ~= "" then
-                v7.launchData = v2.LaunchData;
-            end;
-        end;
-        return v7;
-    end;
-end;
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local Constants = require(Modules.Settings.Pages.ShareGame.Constants)
+
+return function(p1, p2: ((...any) -> ...any)) -- line: 9
+	-- upvalues: Constants (copy)
+	local v5 = if not p1 or p1.InviteUser == 0 then nil else p1.InviteUser
+	local v6, v7 = p2(if not v5 then Constants.Triggers.DeveloperMultiple else Constants.Triggers.DeveloperSingle, v5)
+
+	if not v6 then
+		return nil
+	end
+
+	local t1 = {}
+
+	if v7 and p1 then
+		if p1.InviteMessageId ~= "" then
+			t1.inviteMessageId = p1.InviteMessageId
+		end
+
+		if p1.InviteUser ~= 0 then
+			t1.inviteUserId = p1.InviteUser
+		end
+
+		if p1.PromptMessage ~= "" then
+			t1.promptMessage = p1.PromptMessage
+		end
+
+		if p1.LaunchData ~= "" then
+			t1.launchData = p1.LaunchData
+		end
+	end
+
+	return t1
+end

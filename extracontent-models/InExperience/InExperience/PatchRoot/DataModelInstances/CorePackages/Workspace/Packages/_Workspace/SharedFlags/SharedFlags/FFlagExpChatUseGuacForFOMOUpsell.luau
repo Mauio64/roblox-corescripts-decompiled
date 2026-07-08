@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatUseGuacForFOMOUpsell", false);
+return game:DefineFastFlag("ExpChatUseGuacForFOMOUpsell", false)

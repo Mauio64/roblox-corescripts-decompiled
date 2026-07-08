@@ -1,3 +1,3 @@
 return {
-    InExpChatRewrite = "InExpChatRewrite"
-};
+	InExpChatRewrite = "InExpChatRewrite"
+}

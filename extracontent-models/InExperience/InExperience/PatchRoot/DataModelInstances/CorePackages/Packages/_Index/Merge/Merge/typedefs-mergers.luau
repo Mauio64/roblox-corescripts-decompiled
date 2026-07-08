@@ -1,32 +1,60 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v2 = {};
-local v3 = require(script.arguments);
-l_Object_0.assign(v2, v3);
-local v4 = require(script.directives);
-l_Object_0.assign(v2, v4);
-local v5 = require(script["enum-values"]);
-l_Object_0.assign(v2, v5);
-local v6 = require(script.enum);
-l_Object_0.assign(v2, v6);
-local v7 = require(script.fields);
-l_Object_0.assign(v2, v7);
-local v8 = require(script["input-type"]);
-l_Object_0.assign(v2, v8);
-local v9 = require(script.interface);
-l_Object_0.assign(v2, v9);
-local v10 = require(script["merge-named-type-array"]);
-l_Object_0.assign(v2, v10);
-local v11 = require(script["merge-nodes"]);
-l_Object_0.assign(v2, v11);
-local v12 = require(script["merge-typedefs"]);
-l_Object_0.assign(v2, v12);
-local v13 = require(script.scalar);
-l_Object_0.assign(v2, v13);
-local v14 = require(script.type);
-l_Object_0.assign(v2, v14);
-local v15 = require(script.union);
-l_Object_0.assign(v2, v15);
-local v16 = require(script.utils);
-l_Object_0.assign(v2, v16);
-return v2;
+local ParentParent = script.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local t1 = {}
+local arguments = require(script.arguments)
+
+Object.assign(t1, arguments)
+
+local directives = require(script.directives)
+
+Object.assign(t1, directives)
+
+local lib = require(script["enum-values"])
+
+Object.assign(t1, lib)
+
+local enum = require(script.enum)
+
+Object.assign(t1, enum)
+
+local fields = require(script.fields)
+
+Object.assign(t1, fields)
+
+local lib2 = require(script["input-type"])
+
+Object.assign(t1, lib2)
+
+local interface = require(script.interface)
+
+Object.assign(t1, interface)
+
+local lib3 = require(script["merge-named-type-array"])
+
+Object.assign(t1, lib3)
+
+local lib4 = require(script["merge-nodes"])
+
+Object.assign(t1, lib4)
+
+local lib5 = require(script["merge-typedefs"])
+
+Object.assign(t1, lib5)
+
+local scalar = require(script.scalar)
+
+Object.assign(t1, scalar)
+
+local type = require(script.type)
+
+Object.assign(t1, type)
+
+local union = require(script.union)
+
+Object.assign(t1, union)
+
+local utils = require(script.utils)
+
+Object.assign(t1, utils)
+
+return t1

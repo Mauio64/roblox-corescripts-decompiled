@@ -13,6 +13,16 @@ local OverlayProvider = Foundation.OverlayProvider
 local PopoverAlign = Foundation.Enums.PopoverAlign
 local InputSize = Foundation.Enums.InputSize
 
+local function getVROverlaySurfaceGui() -- line: 30
+	-- upvalues: CoreGui (copy)
+	local LuaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
+
+	if LuaAppScreenGui then
+		return (LuaAppScreenGui:FindFirstChild("MainAppScreen_SurfaceGui"))
+	end
+
+	return nil
+end
 local function convertToMenuItems(p1, p2: ((...any) -> ...any)) -- line: 38
 	-- upvalues: Dash (copy)
 	return Dash.map(p1, function(p3) -- line: 42
@@ -37,13 +47,12 @@ local function convertToMenuItems(p1, p2: ((...any) -> ...any)) -- line: 38
 		}
 	end)
 end
-
-return function(t1: {[any]: any}) --[[ ContextualMenu ]] -- line: 63
+local function ContextualMenu(t1: {[any]: any}) -- line: 63
 	-- upvalues: useIsSpatial (copy), React (copy), CoreGui (copy), convertToMenuItems (copy), OverlayProvider (copy), Menu (copy), PopoverAlign (copy), InputSize (copy)
-	local v17 = useIsSpatial()
-	local v18 = React.useMemo(function() -- line: 65
-		-- upvalues: v17 (copy), CoreGui (copy)
-		if v17 then
+	local v19 = useIsSpatial()
+	local v20 = React.useMemo(function() -- line: 65
+		-- upvalues: v19 (copy), CoreGui (copy)
+		if v19 then
 			local LuaAppScreenGui = CoreGui:FindFirstChild("LuaAppScreenGui")
 
 			if LuaAppScreenGui then
@@ -54,8 +63,8 @@ return function(t1: {[any]: any}) --[[ ContextualMenu ]] -- line: 63
 		end
 
 		return nil
-	end, { v17 })
-	local v19 = React.useMemo(function() -- line: 69
+	end, { v19 })
+	local v21 = React.useMemo(function() -- line: 69
 		-- upvalues: convertToMenuItems (copy), t1 (copy)
 		return convertToMenuItems(t1.menuItems, t1.closeMenu)
 	end, {
@@ -64,16 +73,18 @@ return function(t1: {[any]: any}) --[[ ContextualMenu ]] -- line: 63
 	})
 
 	return (React.createElement(OverlayProvider, {
-		gui = v18
+		gui = v20
 	}, {
 		Menu = React.createElement(Menu, {
 			isOpen = t1.isOpen,
 			align = t1.align or PopoverAlign.End,
 			anchorRef = t1.anchorRef,
-			items = v19,
+			items = v21,
 			onPressedOutside = t1.closeMenu,
 			ref = t1.menuRef,
 			size = InputSize.Medium
 		})
 	}))
 end
+
+return ContextualMenu

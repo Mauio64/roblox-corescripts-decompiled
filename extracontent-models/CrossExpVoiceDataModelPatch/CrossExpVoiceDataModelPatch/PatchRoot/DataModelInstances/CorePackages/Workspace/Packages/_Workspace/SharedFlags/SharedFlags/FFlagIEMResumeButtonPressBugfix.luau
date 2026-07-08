@@ -1,4 +1,5 @@
-local l_Parent_0 = script.Parent;
-local l_FFlagIEMFocusNavToButtons_0 = require(l_Parent_0:WaitForChild("FFlagIEMFocusNavToButtons"));
-local v2 = game:DefineFastFlag("IEMResumeButtonPressBugfix", false);
-return l_FFlagIEMFocusNavToButtons_0 and v2;
+local scriptParent = script.Parent
+local FFlagIEMFocusNavToButtons = require(scriptParent:WaitForChild("FFlagIEMFocusNavToButtons"))
+local v3 = game:DefineFastFlag("IEMResumeButtonPressBugfix", false)
+
+return FFlagIEMFocusNavToButtons and v3

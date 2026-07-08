@@ -1,1 +1,1 @@
-return game:DefineFastFlag("RemoveHardcodedStringsInReportNodes", false);
+return game:DefineFastFlag("RemoveHardcodedStringsInReportNodes", false)

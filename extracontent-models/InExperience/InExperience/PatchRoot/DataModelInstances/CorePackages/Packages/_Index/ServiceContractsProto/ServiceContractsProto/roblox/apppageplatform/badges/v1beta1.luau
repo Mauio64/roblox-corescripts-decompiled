@@ -1,7 +1,9 @@
-local _ = require(script.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.badge_details_page);
-local v2 = require(script.badges_see_all);
+require(script.Parent.Parent.Parent.Parent.proto)
+
+local badge_details_page = require(script.badge_details_page)
+local badges_see_all = require(script.badges_see_all)
+
 return {
-    badge_details_page = v1, 
-    badges_see_all = v2
-};
+	badge_details_page = badge_details_page,
+	badges_see_all = badges_see_all
+}

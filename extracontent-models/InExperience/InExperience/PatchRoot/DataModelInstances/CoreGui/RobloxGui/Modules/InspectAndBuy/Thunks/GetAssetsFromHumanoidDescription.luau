@@ -1,66 +1,81 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Thunk);
-local v2 = require(l_Parent_0.Thunks.GetProductInfo);
-local v3 = require(l_Parent_0.Thunks.GetVersionInfo);
-local v4 = require(l_Parent_0.Models.AssetInfo);
-local v5 = require(l_Parent_0.Actions.SetAssets);
-local v6 = require(l_Parent_0.Actions.SetEquippedAssets);
-local v7 = require(l_Parent_0.Constants);
-local v8 = require(l_Parent_0.Thunks.GetAssetBundles);
-local v9 = require(l_Parent_0.Thunks.BatchGetAssets);
-local v10 = require(l_Parent_0.Flags.FFlagAXEnableRegionalFilteringofAssets);
-local v11 = {};
-local function v27(v12) --[[ Line: 18 ]] --[[ Name: getAssetIds ]]
-    -- upvalues: v7 (copy), v4 (copy)
-    local v13 = {};
-    for v14, v15 in pairs(v7.AssetTypeIdStringToHumanoidDescriptionProp) do
-        if v7.AssetTypeIdToAccessoryTypeEnum[v14] == nil then
-            local v16 = v12[v15] or "";
-            for _, v18 in pairs(string.split(v16)) do
-                if tonumber(v18) and v18 ~= "0" then
-                    table.insert(v13, v4.fromHumanoidDescription(v18));
-                end;
-            end;
-        end;
-    end;
-    local l_v12_Accessories_0 = v12:GetAccessories(true);
-    for _, v21 in pairs(l_v12_Accessories_0) do
-        v13[#v13 + 1] = v4.fromHumanoidDescription(v21.AssetId);
-    end;
-    local l_v12_Emotes_0 = v12:GetEmotes();
-    for _, v24 in pairs(l_v12_Emotes_0) do
-        for _, v26 in pairs(v24) do
-            v13[#v13 + 1] = v4.fromHumanoidDescription(v26);
-        end;
-    end;
-    return v13;
-end;
-return function(v28, v29) --[[ Line: 52 ]] --[[ Name: GetAssetsFromHumanoidDescription ]]
-    -- upvalues: v1 (copy), v11 (copy), v27 (copy), v10 (copy), v9 (copy), v2 (copy), v8 (copy), v3 (copy), v5 (copy), v6 (copy)
-    return v1.new(script.Name, v11, function(v30, _) --[[ Line: 53 ]]
-        -- upvalues: v27 (ref), v28 (copy), v29 (copy), v10 (ref), v9 (ref), v2 (ref), v8 (ref), v3 (ref), v5 (ref), v6 (ref)
-        local v32 = v27(v28);
-        if not v29 then
-            if v10 then
-                v30:dispatch(v9(v32));
-                return;
-            else
-                for _, v34 in ipairs(v32) do
-                    coroutine.wrap(function() --[[ Line: 61 ]]
-                        -- upvalues: v30 (copy), v2 (ref), v34 (copy), v8 (ref), v3 (ref)
-                        v30:dispatch(v2(v34.assetId));
-                        if v34.parentBundleId == nil then
-                            v30:dispatch(v8(v34.assetId));
-                        end;
-                        v30:dispatch(v3(v34.assetId));
-                    end)();
-                end;
-                v30:dispatch(v5(v32));
-                return;
-            end;
-        else
-            v30:dispatch(v6(v32));
-            return;
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local GetProductInfo = require(ParentParent.Thunks.GetProductInfo)
+local GetVersionInfo = require(ParentParent.Thunks.GetVersionInfo)
+local AssetInfo = require(ParentParent.Models.AssetInfo)
+local SetAssets = require(ParentParent.Actions.SetAssets)
+local SetEquippedAssets = require(ParentParent.Actions.SetEquippedAssets)
+local Constants = require(ParentParent.Constants)
+local GetAssetBundles = require(ParentParent.Thunks.GetAssetBundles)
+local BatchGetAssets = require(ParentParent.Thunks.BatchGetAssets)
+local FFlagAXEnableRegionalFilteringofAssets = require(ParentParent.Flags.FFlagAXEnableRegionalFilteringofAssets)
+local t1 = {}
+
+local function getAssetIds(p1) -- line: 18
+	-- upvalues: Constants (copy), AssetInfo (copy)
+	local t2 = {}
+
+	for k, v in pairs(Constants.AssetTypeIdStringToHumanoidDescriptionProp) do
+		if Constants.AssetTypeIdToAccessoryTypeEnum[k] == nil then
+			local v19 = p1[v] or ""
+
+			for _, v2 in pairs(string.split(v19)) do
+				if tonumber(v2) and v2 ~= "0" then
+					table.insert(t2, AssetInfo.fromHumanoidDescription(v2))
+				end
+			end
+		end
+	end
+
+	local Accessories = p1:GetAccessories(true)
+
+	for _, v in pairs(Accessories) do
+		t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v.AssetId)
+	end
+
+	local Emotes = p1:GetEmotes()
+
+	for _, v in pairs(Emotes) do
+		for _, v3 in pairs(v) do
+			t2[#t2 + 1] = AssetInfo.fromHumanoidDescription(v3)
+		end
+	end
+
+	return t2
+end
+local function GetAssetsFromHumanoidDescription(p2, p3) -- line: 52
+	-- upvalues: Thunk (copy), t1 (copy), getAssetIds (copy), FFlagAXEnableRegionalFilteringofAssets (copy), BatchGetAssets (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SetEquippedAssets (copy)
+	return Thunk.new(script.Name, t1, function(p4, _) -- line: 53
+		-- upvalues: getAssetIds (copy), p2 (copy), p3 (copy), FFlagAXEnableRegionalFilteringofAssets (copy), BatchGetAssets (copy), GetProductInfo (copy), GetAssetBundles (copy), GetVersionInfo (copy), SetAssets (copy), SetEquippedAssets (copy)
+		local v34 = getAssetIds(p2)
+
+		if not p3 then
+			if FFlagAXEnableRegionalFilteringofAssets then
+				p4:dispatch(BatchGetAssets(v34))
+
+				return
+			end
+
+			for _, v in ipairs(v34) do
+				coroutine.wrap(function() -- line: 61
+					-- upvalues: p4 (copy), GetProductInfo (copy), v (copy), GetAssetBundles (copy), GetVersionInfo (copy)
+					p4:dispatch(GetProductInfo(v.assetId))
+
+					if v.parentBundleId == nil then
+						p4:dispatch(GetAssetBundles(v.assetId))
+					end
+
+					p4:dispatch(GetVersionInfo(v.assetId))
+				end)()
+			end
+
+			p4:dispatch(SetAssets(v34))
+
+			return
+		end
+
+		p4:dispatch(SetEquippedAssets(v34))
+	end)
+end
+
+return GetAssetsFromHumanoidDescription

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppForumsDeeplinkFix", false);
+return game:DefineFastFlag("LuaAppForumsDeeplinkFix", false)

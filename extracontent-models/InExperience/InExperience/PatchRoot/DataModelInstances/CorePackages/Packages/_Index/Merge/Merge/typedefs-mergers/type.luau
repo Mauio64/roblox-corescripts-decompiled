@@ -1,39 +1,47 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local l_Object_0 = v1.Object;
-local v5 = {};
-local _ = require(script.Parent["merge-typedefs_types"]);
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_mergeFields_0 = require(script.Parent.fields).mergeFields;
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-local l_mergeNamedTypeArray_0 = require(script.Parent["merge-named-type-array"]).mergeNamedTypeArray;
-v5.mergeType = function(v11, v12, v13) --[[ Line: 29 ]] --[[ Name: mergeType ]]
-    -- upvalues: l_Boolean_0 (copy), l_mergeFields_0 (copy), l_mergeDirectives_0 (copy), l_mergeNamedTypeArray_0 (copy), l_Error_0 (copy), l_Object_0 (copy), l_Kind_0 (copy)
-    if v12 then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 41 ]]
-            -- upvalues: v11 (copy), l_Boolean_0 (ref), v12 (copy), v13 (copy), l_mergeFields_0 (ref), l_mergeDirectives_0 (ref), l_mergeNamedTypeArray_0 (ref)
-            return {
-                name = v11.name, 
-                description = if l_Boolean_0.toJSBoolean(v11.description) then v11.description else v12.description, 
-                kind = (not (not (v13 and l_Boolean_0.toJSBoolean(v13.convertExtensions)) and v11.kind ~= "ObjectTypeDefinition") or v12.kind == "ObjectTypeDefinition") and "ObjectTypeDefinition" or "ObjectTypeExtension", 
-                loc = v11.loc, 
-                fields = l_mergeFields_0(v11, v11.fields, v12.fields, v13), 
-                directives = l_mergeDirectives_0(v11.directives, v12.directives, v13), 
-                interfaces = l_mergeNamedTypeArray_0(v11.interfaces, v12.interfaces, v13)
-            };
-        end);
-        if not l_status_0 then
-            error(l_Error_0.new(("Unable to merge GraphQL type \"%s\": %s"):format(tostring(v11.name.value), (tostring(l_result_0.message)))));
-        end;
-        return l_result_0;
-    elseif v13 and l_Boolean_0.toJSBoolean(v13.convertExtensions) then
-        return (l_Object_0.assign({}, v11, {
-            kind = l_Kind_0.OBJECT_TYPE_DEFINITION
-        }));
-    else
-        return v11;
-    end;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local Object = LuauPolyfill.Object
+local t1 = {}
+
+require(script.Parent["merge-typedefs_types"])
+
+local Kind = require(ParentParent.GraphQL).Kind
+local mergeFields = require(script.Parent.fields).mergeFields
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+local mergeNamedTypeArray = require(script.Parent["merge-named-type-array"]).mergeNamedTypeArray
+
+function t1.mergeType(p1, p2, p3) -- line: 29
+	-- upvalues: Boolean (copy), mergeFields (copy), mergeDirectives (copy), mergeNamedTypeArray (copy), Error (copy), Object (copy), Kind (copy)
+	if p2 then
+		local ok, result = pcall(function() -- line: 41
+			-- upvalues: p1 (copy), Boolean (copy), p2 (copy), p3 (copy), mergeFields (copy), mergeDirectives (copy), mergeNamedTypeArray (copy)
+			return {
+				name = p1.name,
+				description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
+				kind = not (not not p3 and Boolean.toJSBoolean(p3.convertExtensions)) and (p1.kind ~= "ObjectTypeDefinition" and p2.kind ~= "ObjectTypeDefinition") and "ObjectTypeExtension" or "ObjectTypeDefinition",
+				loc = p1.loc,
+				fields = mergeFields(p1, p1.fields, p2.fields, p3),
+				directives = mergeDirectives(p1.directives, p2.directives, p3),
+				interfaces = mergeNamedTypeArray(p1.interfaces, p2.interfaces, p3)
+			}
+		end)
+
+		if not ok then
+			error(Error.new(("Unable to merge GraphQL type \"%s\": %s"):format(tostring(p1.name.value), (tostring(result.message)))))
+		end
+
+		return result
+	end
+
+	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
+		return (Object.assign({}, p1, {
+			kind = Kind.OBJECT_TYPE_DEFINITION
+		}))
+	end
+
+	return p1
+end
+
+return t1

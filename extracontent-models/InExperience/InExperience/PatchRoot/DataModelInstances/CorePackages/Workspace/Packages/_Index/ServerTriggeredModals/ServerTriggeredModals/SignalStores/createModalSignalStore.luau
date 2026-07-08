@@ -1,47 +1,79 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerTriggeredModals");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Signals);
-local _ = require(l_Parent_0.ServerDrivenUi);
-local _ = require(l_script_FirstAncestor_0.EntryPoint);
-return function() --[[ Line: 33 ]]
-    -- upvalues: v2 (copy)
-    local v5 = {};
-    local function v12(v6) --[[ Line: 36 ]] --[[ Name: getOrCreateEntry ]]
-        -- upvalues: v5 (copy), v2 (ref)
-        local v7 = v5[v6];
-        if v7 == nil then
-            local v8, v9 = v2.createSignal(nil);
-            local v10, v11 = v2.createSignal(false);
-            v7 = {
-                metadata = {
-                    get = v8, 
-                    set = v9
-                }, 
-                hasShown = {
-                    get = v10, 
-                    set = v11
-                }
-            };
-            v5[v6] = v7;
-        end;
-        return v7;
-    end;
-    return {
-        getMetadataGetter = function(v13) --[[ Line: 56 ]] --[[ Name: getMetadataGetter ]]
-            -- upvalues: v12 (copy)
-            return v12(v13).metadata.get;
-        end, 
-        setMetadata = function(v14, v15) --[[ Line: 60 ]] --[[ Name: setMetadata ]]
-            -- upvalues: v12 (copy)
-            v12(v14).metadata.set(v15);
-        end, 
-        getHasShownGetter = function(v16) --[[ Line: 64 ]] --[[ Name: getHasShownGetter ]]
-            -- upvalues: v12 (copy)
-            return v12(v16).hasShown.get;
-        end, 
-        setHasShown = function(v17, v18) --[[ Line: 68 ]] --[[ Name: setHasShown ]]
-            -- upvalues: v12 (copy)
-            v12(v17).hasShown.set(v18);
-        end
-    };
-end;
+local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
+local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
+local Signals = require(ServerTriggeredModalsParent.Signals)
+
+require(ServerTriggeredModalsParent.ServerDrivenUi)
+require(ServerTriggeredModals.EntryPoint)
+
+return function() -- line: 42
+	-- upvalues: Signals (copy)
+	local t1 = {}
+
+	local function getOrCreateEntry(p1) -- line: 45
+		-- upvalues: t1 (copy), Signals (copy)
+		local v7 = t1[p1]
+
+		if v7 == nil then
+			local v8, v9 = Signals.createSignal(nil)
+			local v10, v11 = Signals.createSignal(false)
+			local v12, v13 = Signals.createSignal(false)
+
+			v7 = {
+				metadata = {
+					get = v8,
+					set = v9
+				},
+				hasShown = {
+					get = v10,
+					set = v11
+				},
+				primaryHandlerClaimed = {
+					get = v12,
+					set = v13
+				}
+			}
+			t1[p1] = v7
+		end
+
+		return v7
+	end
+
+	return {
+		getMetadataGetter = function(p2) -- line: 70
+			-- upvalues: getOrCreateEntry (copy)
+			return getOrCreateEntry(p2).metadata.get
+		end,
+		setMetadata = function(p3, t2: {[any]: any}?) -- line: 74
+			-- upvalues: getOrCreateEntry (copy)
+			getOrCreateEntry(p3).metadata.set(t2)
+		end,
+		getHasShownGetter = function(p4) -- line: 78
+			-- upvalues: getOrCreateEntry (copy)
+			return getOrCreateEntry(p4).hasShown.get
+		end,
+		setHasShown = function(p5, b1: boolean) -- line: 82
+			-- upvalues: getOrCreateEntry (copy)
+			getOrCreateEntry(p5).hasShown.set(b1)
+		end,
+		getPrimaryHandlerClaimedGetter = function(p6) -- line: 86
+			-- upvalues: getOrCreateEntry (copy)
+			return getOrCreateEntry(p6).primaryHandlerClaimed.get
+		end,
+		tryClaimPrimaryHandler = function(p7) -- line: 90
+			-- upvalues: getOrCreateEntry (copy)
+			local v22 = getOrCreateEntry(p7)
+
+			if v22.primaryHandlerClaimed.get() then
+				return false
+			end
+
+			v22.primaryHandlerClaimed.set(true)
+
+			return true
+		end,
+		releasePrimaryHandler = function(p8) -- line: 99
+			-- upvalues: getOrCreateEntry (copy)
+			getOrCreateEntry(p8).primaryHandlerClaimed.set(false)
+		end
+	}
+end

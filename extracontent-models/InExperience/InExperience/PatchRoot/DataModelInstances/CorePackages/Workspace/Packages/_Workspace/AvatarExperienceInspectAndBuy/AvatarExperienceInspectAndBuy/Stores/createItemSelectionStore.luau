@@ -1,38 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent;
-local v1 = require(l_Parent_0.Signals);
-local _ = require(l_Parent_0.AXCommon);
-return function() --[[ Line: 38 ]] --[[ Name: createItemSelectionStore ]]
-    -- upvalues: v1 (copy)
-    local v3, v4 = v1.createSignal({});
-    local v5 = {};
-    local function v8(v6) --[[ Line: 44 ]] --[[ Name: getItemData ]]
-        -- upvalues: v5 (copy), v1 (ref), v3 (copy)
-        if v5[v6] == nil then
-            v5[v6] = v1.createComputed(function(v7) --[[ Line: 46 ]]
-                -- upvalues: v3 (ref), v6 (copy)
-                return v3(v7)[v6];
-            end);
-        end;
-        return v5[v6];
-    end;
-    return {
-        getItemDataMap = v3, 
-        getItemData = v8, 
-        setItemData = function(v9, v10) --[[ Line: 54 ]] --[[ Name: setItemData ]]
-            -- upvalues: v3 (copy), v4 (copy)
-            local v11 = table.clone(v3(false));
-            v11[v9] = v10;
-            v4(v11);
-        end, 
-        clearItemData = function(v12) --[[ Line: 60 ]] --[[ Name: clearItemData ]]
-            -- upvalues: v3 (copy), v4 (copy)
-            local v13 = table.clone(v3(false));
-            v13[v12] = nil;
-            v4(v13);
-        end, 
-        clearAll = function() --[[ Line: 66 ]] --[[ Name: clearAll ]]
-            -- upvalues: v4 (copy)
-            v4({});
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceInspectAndBuy").Parent
+local Signals = require(Parent.Signals)
+
+require(Parent.AXCommon)
+
+local function createItemSelectionStore() -- line: 38
+	-- upvalues: Signals (copy)
+	local v4, v5 = Signals.createSignal({})
+	local t1 = {}
+
+	return {
+		getItemDataMap = v4,
+		getItemData = function(s1: string) -- line: 44
+			-- upvalues: t1 (copy), Signals (copy), v4 (copy)
+			if t1[s1] == nil then
+				t1[s1] = Signals.createComputed(function(p1) -- line: 46
+					-- upvalues: v4 (copy), s1 (copy)
+					return v4(p1)[s1]
+				end)
+			end
+
+			return t1[s1]
+		end,
+		setItemData = function(s2: string, t2: {[any]: any}) -- line: 54
+			-- upvalues: v4 (copy), v5 (copy)
+			local v10 = table.clone(v4(false))
+
+			v10[s2] = t2
+			v5(v10)
+		end,
+		clearItemData = function(s3: string) -- line: 60
+			-- upvalues: v4 (copy), v5 (copy)
+			local v12 = table.clone(v4(false))
+
+			v12[s3] = nil
+			v5(v12)
+		end,
+		clearAll = function() -- line: 66
+			-- upvalues: v5 (copy)
+			v5({})
+		end
+	}
+end
+
+return createItemSelectionStore

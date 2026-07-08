@@ -1,1 +1,1 @@
-return game:DefineFastFlag("VngLogoutGlobalAppSessionsOnConversion", false);
+return game:DefineFastFlag("VngLogoutGlobalAppSessionsOnConversion", false)

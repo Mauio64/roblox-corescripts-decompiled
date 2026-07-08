@@ -1,260 +1,314 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Error_0 = v1.Error;
-local l_Object_0 = v1.Object;
-local l_console_0 = v1.console;
-local v6 = {};
-local v7 = require(l_Parent_0.GraphQL);
-local l_GraphQLDirective_0 = v7.GraphQLDirective;
-local l_GraphQLEnumType_0 = v7.GraphQLEnumType;
-local l_GraphQLInputObjectType_0 = v7.GraphQLInputObjectType;
-local l_GraphQLInterfaceType_0 = v7.GraphQLInterfaceType;
-local l_GraphQLList_0 = v7.GraphQLList;
-local l_GraphQLObjectType_0 = v7.GraphQLObjectType;
-local l_GraphQLNonNull_0 = v7.GraphQLNonNull;
-local l_GraphQLScalarType_0 = v7.GraphQLScalarType;
-local l_GraphQLUnionType_0 = v7.GraphQLUnionType;
-local l_isInterfaceType_0 = v7.isInterfaceType;
-local l_isEnumType_0 = v7.isEnumType;
-local l_isInputObjectType_0 = v7.isInputObjectType;
-local l_isListType_0 = v7.isListType;
-local l_isNamedType_0 = v7.isNamedType;
-local l_isNonNullType_0 = v7.isNonNullType;
-local l_isObjectType_0 = v7.isObjectType;
-local l_isScalarType_0 = v7.isScalarType;
-local l_isUnionType_0 = v7.isUnionType;
-local l_isSpecifiedScalarType_0 = v7.isSpecifiedScalarType;
-local l_isSpecifiedDirective_0 = v7.isSpecifiedDirective;
-local v28 = require(script.Parent.stub);
-local l_getBuiltInForStub_0 = v28.getBuiltInForStub;
-local l_isNamedStub_0 = v28.isNamedStub;
-local l_Map_0 = v1.Map;
-local l_String_0 = v1.String;
-v6.rewireTypes = function(v33, v34) --[[ Line: 92 ]] --[[ Name: rewireTypes ]]
-    -- upvalues: l_isSpecifiedDirective_0 (copy), l_GraphQLDirective_0 (copy), l_Map_0 (copy), l_isObjectType_0 (copy), l_Object_0 (copy), l_GraphQLObjectType_0 (copy), l_isInterfaceType_0 (copy), l_Array_0 (copy), l_GraphQLInterfaceType_0 (copy), l_isUnionType_0 (copy), l_GraphQLUnionType_0 (copy), l_isInputObjectType_0 (copy), l_GraphQLInputObjectType_0 (copy), l_isEnumType_0 (copy), l_GraphQLEnumType_0 (copy), l_isScalarType_0 (copy), l_isSpecifiedScalarType_0 (copy), l_GraphQLScalarType_0 (copy), l_Error_0 (copy), l_isListType_0 (copy), l_GraphQLList_0 (copy), l_isNonNullType_0 (copy), l_GraphQLNonNull_0 (copy), l_isNamedType_0 (copy), l_isNamedStub_0 (copy), l_getBuiltInForStub_0 (copy), l_String_0 (copy), l_console_0 (copy)
-    local v35 = nil;
-    local v36 = nil;
-    local v37 = nil;
-    local v38 = nil;
-    local v39 = nil;
-    local v40 = nil;
-    local v41 = nil;
-    local v42 = nil;
-    local v43 = nil;
-    v37 = function(v44) --[[ Line: 114 ]] --[[ Name: rewireDirective ]]
-        -- upvalues: l_isSpecifiedDirective_0 (ref), v38 (ref), l_GraphQLDirective_0 (ref)
-        if l_isSpecifiedDirective_0(v44) then
-            return v44;
-        else
-            local v45 = v44:toConfig();
-            v45.args = v38(v45.args);
-            return l_GraphQLDirective_0.new(v45);
-        end;
-    end;
-    v38 = function(v46) --[[ Line: 123 ]] --[[ Name: rewireArgs ]]
-        -- upvalues: l_Map_0 (ref), v43 (ref)
-        local v47 = l_Map_0.new();
-        for _, v49 in v46 do
-            local v50 = v49[1];
-            local v51 = v46:get(v50);
-            local v52 = v43(v51.type);
-            if v52 ~= nil then
-                v51.type = v52;
-                v47:set(v50, v51);
-            end;
-        end;
-        return v47;
-    end;
-    v39 = function(v53) --[[ Line: 138 ]] --[[ Name: rewireNamedType ]]
-        -- upvalues: l_isObjectType_0 (ref), l_Object_0 (ref), v40 (ref), v42 (ref), l_GraphQLObjectType_0 (ref), l_isInterfaceType_0 (ref), l_Array_0 (ref), l_GraphQLInterfaceType_0 (ref), l_isUnionType_0 (ref), l_GraphQLUnionType_0 (ref), l_isInputObjectType_0 (ref), v41 (ref), l_GraphQLInputObjectType_0 (ref), l_isEnumType_0 (ref), l_GraphQLEnumType_0 (ref), l_isScalarType_0 (ref), l_isSpecifiedScalarType_0 (ref), l_GraphQLScalarType_0 (ref), l_Error_0 (ref)
-        if l_isObjectType_0(v53) then
-            local v54 = v53:toConfig();
-            local v55 = l_Object_0.assign({}, v54, {
-                fields = function() --[[ Line: 143 ]] --[[ Name: fields ]]
-                    -- upvalues: v40 (ref), v54 (copy)
-                    return v40(v54.fields);
-                end, 
-                interfaces = function() --[[ Line: 146 ]] --[[ Name: interfaces ]]
-                    -- upvalues: v42 (ref), v54 (copy)
-                    return v42(v54.interfaces);
-                end
-            });
-            return l_GraphQLObjectType_0.new(v55);
-        elseif l_isInterfaceType_0(v53) then
-            local v56 = v53:toConfig();
-            local v57 = l_Object_0.assign({}, v56, {
-                fields = function() --[[ Line: 154 ]] --[[ Name: fields ]]
-                    -- upvalues: v40 (ref), v56 (copy)
-                    return v40(v56.fields);
-                end
-            });
-            if l_Array_0.indexOf(l_Object_0.keys(v57), "interfaces") ~= -1 then
-                v57.interfaces = function(_) --[[ Line: 159 ]]
-                    -- upvalues: v42 (ref), v56 (copy)
-                    return v42(v56.interfaces);
-                end;
-            end;
-            return l_GraphQLInterfaceType_0.new(v57);
-        elseif l_isUnionType_0(v53) then
-            local v59 = v53:toConfig();
-            local v60 = l_Object_0.assign({}, v59, {
-                types = function() --[[ Line: 169 ]] --[[ Name: types ]]
-                    -- upvalues: v42 (ref), v59 (copy)
-                    return v42(v59.types);
-                end
-            });
-            return l_GraphQLUnionType_0.new(v60);
-        elseif l_isInputObjectType_0(v53) then
-            local v61 = v53:toConfig();
-            local v62 = l_Object_0.assign({}, v61, {
-                fields = function() --[[ Line: 177 ]] --[[ Name: fields ]]
-                    -- upvalues: v41 (ref), v61 (copy)
-                    return v41(v61.fields);
-                end
-            });
-            return l_GraphQLInputObjectType_0.new(v62);
-        elseif l_isEnumType_0(v53) then
-            local v63 = v53:toConfig();
-            return l_GraphQLEnumType_0.new(v63);
-        elseif l_isScalarType_0(v53) then
-            if l_isSpecifiedScalarType_0(v53) then
-                return v53;
-            else
-                local v64 = v53:toConfig();
-                local l_serialize_0 = v64.serialize;
-                local l_parseValue_0 = v64.parseValue;
-                local l_parseLiteral_0 = v64.parseLiteral;
-                if l_serialize_0 then
-                    v64.serialize = function(...) --[[ Line: 196 ]]
-                        -- upvalues: l_serialize_0 (copy), v64 (copy)
-                        return l_serialize_0(v64, ...);
-                    end;
-                end;
-                if l_parseValue_0 then
-                    v64.parseValue = function(...) --[[ Line: 202 ]]
-                        -- upvalues: l_parseValue_0 (copy), v64 (copy)
-                        return l_parseValue_0(v64, ...);
-                    end;
-                end;
-                if l_parseLiteral_0 then
-                    v64.parseLiteral = function(...) --[[ Line: 208 ]]
-                        -- upvalues: l_parseLiteral_0 (copy), v64 (copy)
-                        return l_parseLiteral_0(v64, ...);
-                    end;
-                end;
-                return l_GraphQLScalarType_0.new(v64);
-            end;
-        else
-            error(l_Error_0.new(("Unexpected schema type: %s"):format((tostring(v53)))));
-            return;
-        end;
-    end;
-    v40 = function(v68) --[[ Line: 220 ]] --[[ Name: rewireFields ]]
-        -- upvalues: l_Map_0 (ref), v43 (ref), v38 (ref)
-        local v69 = l_Map_0.new();
-        for _, v71 in v68 do
-            local v72 = v71[1];
-            local v73 = v68:get(v72);
-            local v74 = v43(v73.type);
-            if v74 ~= nil and v73.args then
-                v73.type = v74;
-                v73.args = v38(v73.args);
-                v69:set(v72, v73);
-            end;
-        end;
-        return v69;
-    end;
-    v41 = function(v75) --[[ Line: 235 ]] --[[ Name: rewireInputFields ]]
-        -- upvalues: l_Map_0 (ref), v43 (ref)
-        local v76 = l_Map_0.new();
-        for _, v78 in v75 do
-            local v79 = v78[1];
-            local v80 = v75:get(v79);
-            local v81 = v43(v80.type);
-            if v81 ~= nil then
-                v80.type = v81;
-                v76:set(v79, v80);
-            end;
-        end;
-        return v76;
-    end;
-    v42 = function(v82) --[[ Line: 249 ]] --[[ Name: rewireNamedTypes ]]
-        -- upvalues: v43 (ref), l_Object_0 (ref)
-        local v83 = {};
-        for _, v85 in v82 do
-            local v86 = v43(v85);
-            if v86 ~= nil and v86 ~= l_Object_0.None then
-                table.insert(v83, v86);
-            end;
-        end;
-        return v83;
-    end;
-    v43 = function(v87) --[[ Line: 260 ]] --[[ Name: rewireType ]]
-        -- upvalues: l_isListType_0 (ref), v43 (ref), l_Object_0 (ref), l_GraphQLList_0 (ref), l_isNonNullType_0 (ref), l_GraphQLNonNull_0 (ref), l_isNamedType_0 (ref), v35 (ref), l_isNamedStub_0 (ref), l_getBuiltInForStub_0 (ref), v39 (ref), v36 (ref)
-        if l_isListType_0(v87) then
-            local v88 = v43(v87.ofType);
-            if v88 ~= nil and v88 ~= l_Object_0.None then
-                return (l_GraphQLList_0.new(v88));
-            else
-                return nil;
-            end;
-        elseif l_isNonNullType_0(v87) then
-            local v89 = v43(v87.ofType);
-            if v89 ~= nil and v89 ~= l_Object_0.None then
-                return (l_GraphQLNonNull_0.new(v89));
-            else
-                return nil;
-            end;
-        elseif l_isNamedType_0(v87) then
-            local v90 = v35:get(v87.name);
-            if v90 == nil then
-                v90 = if l_isNamedStub_0(v87) then l_getBuiltInForStub_0(v87) else v39(v87);
-                v35:set(v87.name, v90);
-                v36:set(v90.name, (v35:get(v87.name)));
-            end;
-            if v90 ~= nil and v90 ~= l_Object_0.None then
-                return (v36:get(v90.name));
-            else
-                return nil;
-            end;
-        else
-            return nil;
-        end;
-    end;
-    v35 = l_Map_0.new();
-    for _, v92 in v33 do
-        local v93 = v92[1];
-        local l_v93_0 = v93;
-        local v95 = v33:get(v93);
-        v35:set(l_v93_0, v95);
-    end;
-    v36 = l_Map_0.new();
-    for _, v97 in v35 do
-        local v98 = v97[1];
-        local v99 = v35:get(v98);
-        if v99 ~= nil and v99 ~= l_Object_0.None and not l_String_0.startsWith(v98, "__") then
-            local l_name_0 = v99.name;
-            if not l_String_0.startsWith(l_name_0, "__") then
-                if v36:get(l_name_0) ~= nil then
-                    l_console_0.warn(("Duplicate schema type name %s found; keeping the existing one found in the schema"):format((tostring(l_name_0))));
-                else
-                    v36:set(l_name_0, v99);
-                end;
-            end;
-        end;
-    end;
-    for _, v102 in v36 do
-        local v103 = v102[1];
-        v36:set(v103, v39(v36:get(v103)));
-    end;
-    local v105 = l_Array_0.map(v34, function(v104) --[[ Line: 360 ]]
-        -- upvalues: v37 (ref)
-        return v37(v104);
-    end);
-    return {
-        typeMap = v36, 
-        directives = v105
-    };
-end;
-return v6;
+local ParentParent = script.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local Object = LuauPolyfill.Object
+local console = LuauPolyfill.console
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local GraphQLDirective = GraphQL.GraphQLDirective
+local GraphQLEnumType = GraphQL.GraphQLEnumType
+local GraphQLInputObjectType = GraphQL.GraphQLInputObjectType
+local GraphQLInterfaceType = GraphQL.GraphQLInterfaceType
+local GraphQLList = GraphQL.GraphQLList
+local GraphQLObjectType = GraphQL.GraphQLObjectType
+local GraphQLNonNull = GraphQL.GraphQLNonNull
+local GraphQLScalarType = GraphQL.GraphQLScalarType
+local GraphQLUnionType = GraphQL.GraphQLUnionType
+local isInterfaceType = GraphQL.isInterfaceType
+local isEnumType = GraphQL.isEnumType
+local isInputObjectType = GraphQL.isInputObjectType
+local isListType = GraphQL.isListType
+local isNamedType = GraphQL.isNamedType
+local isNonNullType = GraphQL.isNonNullType
+local isObjectType = GraphQL.isObjectType
+local isScalarType = GraphQL.isScalarType
+local isUnionType = GraphQL.isUnionType
+local isSpecifiedScalarType = GraphQL.isSpecifiedScalarType
+local isSpecifiedDirective = GraphQL.isSpecifiedDirective
+local stub = require(script.Parent.stub)
+local getBuiltInForStub = stub.getBuiltInForStub
+local isNamedStub = stub.isNamedStub
+local Map = LuauPolyfill.Map
+local String = LuauPolyfill.String
+
+function t1.rewireTypes(p1, p2) -- line: 92
+	-- upvalues: isSpecifiedDirective (copy), GraphQLDirective (copy), Map (copy), isObjectType (copy), Object (copy), GraphQLObjectType (copy), isInterfaceType (copy), Array (copy), GraphQLInterfaceType (copy), isUnionType (copy), GraphQLUnionType (copy), isInputObjectType (copy), GraphQLInputObjectType (copy), isEnumType (copy), GraphQLEnumType (copy), isScalarType (copy), isSpecifiedScalarType (copy), GraphQLScalarType (copy), Error (copy), isListType (copy), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), isNamedType (copy), isNamedStub (copy), getBuiltInForStub (copy), String (copy), console (copy)
+	local u36 = nil
+	local u37 = nil
+	local rewireArgs = nil
+	local rewireFields = nil
+	local rewireInputFields = nil
+	local rewireNamedTypes = nil
+	local rewireType = nil
+
+	local function rewireDirective(p3) -- line: 114
+		-- upvalues: isSpecifiedDirective (copy), rewireArgs (ref), GraphQLDirective (copy)
+		if isSpecifiedDirective(p3) then
+			return p3
+		end
+
+		local v58 = p3:toConfig()
+
+		v58.args = rewireArgs(v58.args)
+
+		return GraphQLDirective.new(v58)
+	end
+
+	function rewireArgs(p4) -- line: 123
+		-- upvalues: Map (copy), rewireType (ref)
+		local v60 = Map.new()
+
+		for _, v62 in p4 do
+			local v63 = v62[1]
+			local v64 = p4:get(v63)
+			local v65 = rewireType(v64.type)
+
+			if v65 ~= nil then
+				v64.type = v65
+				v60:set(v63, v64)
+			end
+		end
+
+		return v60
+	end
+
+	local function rewireNamedType(p5) -- line: 138
+		-- upvalues: isObjectType (copy), Object (copy), rewireFields (ref), rewireNamedTypes (ref), GraphQLObjectType (copy), isInterfaceType (copy), Array (copy), GraphQLInterfaceType (copy), isUnionType (copy), GraphQLUnionType (copy), isInputObjectType (copy), rewireInputFields (ref), GraphQLInputObjectType (copy), isEnumType (copy), GraphQLEnumType (copy), isScalarType (copy), isSpecifiedScalarType (copy), GraphQLScalarType (copy), Error (copy)
+		if isObjectType(p5) then
+			local v67 = p5:toConfig()
+			local v68 = Object.assign({}, v67, {
+				fields = function() -- line: 143
+					-- upvalues: rewireFields (ref), v67 (copy)
+					return rewireFields(v67.fields)
+				end,
+				interfaces = function() -- line: 146
+					-- upvalues: rewireNamedTypes (ref), v67 (copy)
+					return rewireNamedTypes(v67.interfaces)
+				end
+			})
+
+			return GraphQLObjectType.new(v68)
+		end
+
+		if isInterfaceType(p5) then
+			local v69 = p5:toConfig()
+			local v70 = Object.assign({}, v69, {
+				fields = function() -- line: 154
+					-- upvalues: rewireFields (ref), v69 (copy)
+					return rewireFields(v69.fields)
+				end
+			})
+
+			if Array.indexOf(Object.keys(v70), "interfaces") ~= -1 then
+				function v70.interfaces(_) -- line: 159
+					-- upvalues: rewireNamedTypes (ref), v69 (copy)
+					return rewireNamedTypes(v69.interfaces)
+				end
+			end
+
+			return GraphQLInterfaceType.new(v70)
+		end
+
+		if isUnionType(p5) then
+			local v71 = p5:toConfig()
+			local v72 = Object.assign({}, v71, {
+				types = function() -- line: 169
+					-- upvalues: rewireNamedTypes (ref), v71 (copy)
+					return rewireNamedTypes(v71.types)
+				end
+			})
+
+			return GraphQLUnionType.new(v72)
+		end
+
+		if isInputObjectType(p5) then
+			local v73 = p5:toConfig()
+			local v74 = Object.assign({}, v73, {
+				fields = function() -- line: 177
+					-- upvalues: rewireInputFields (ref), v73 (copy)
+					return rewireInputFields(v73.fields)
+				end
+			})
+
+			return GraphQLInputObjectType.new(v74)
+		end
+
+		if isEnumType(p5) then
+			local v75 = p5:toConfig()
+
+			return GraphQLEnumType.new(v75)
+		end
+
+		if isScalarType(p5) then
+			if isSpecifiedScalarType(p5) then
+				return p5
+			end
+
+			local v76 = p5:toConfig()
+			local serialize = v76.serialize
+			local parseValue = v76.parseValue
+			local parseLiteral = v76.parseLiteral
+
+			if serialize then
+				function v76.serialize(...) -- line: 196
+					-- upvalues: serialize (copy), v76 (copy)
+					return serialize(v76, ...)
+				end
+			end
+
+			if parseValue then
+				function v76.parseValue(...) -- line: 202
+					-- upvalues: parseValue (copy), v76 (copy)
+					return parseValue(v76, ...)
+				end
+			end
+
+			if parseLiteral then
+				function v76.parseLiteral(...) -- line: 208
+					-- upvalues: parseLiteral (copy), v76 (copy)
+					return parseLiteral(v76, ...)
+				end
+			end
+
+			return GraphQLScalarType.new(v76)
+		end
+
+		error(Error.new(("Unexpected schema type: %s"):format((tostring(p5)))))
+	end
+
+	function rewireFields(p7) -- line: 220
+		-- upvalues: Map (copy), rewireType (ref), rewireArgs (ref)
+		local v81 = Map.new()
+
+		for _, v83 in p7 do
+			local v84 = v83[1]
+			local v85 = p7:get(v84)
+			local v86 = rewireType(v85.type)
+
+			if v86 ~= nil and v85.args then
+				v85.type = v86
+				v85.args = rewireArgs(v85.args)
+				v81:set(v84, v85)
+			end
+		end
+
+		return v81
+	end
+	function rewireInputFields(p8) -- line: 235
+		-- upvalues: Map (copy), rewireType (ref)
+		local v88 = Map.new()
+
+		for _, v90 in p8 do
+			local v91 = v90[1]
+			local v92 = p8:get(v91)
+			local v93 = rewireType(v92.type)
+
+			if v93 ~= nil then
+				v92.type = v93
+				v88:set(v91, v92)
+			end
+		end
+
+		return v88
+	end
+	function rewireNamedTypes(p9) -- line: 249
+		-- upvalues: rewireType (ref), Object (copy)
+		local t2 = {}
+
+		for _, v97 in p9 do
+			local v98 = rewireType(v97)
+
+			if v98 ~= nil and v98 ~= Object.None then
+				table.insert(t2, v98)
+			end
+		end
+
+		return t2
+	end
+	function rewireType(p10) -- line: 260
+		-- upvalues: isListType (copy), rewireType (ref), Object (copy), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), isNamedType (copy), u36 (ref), isNamedStub (copy), getBuiltInForStub (copy), rewireNamedType (ref), u37 (ref)
+		if isListType(p10) then
+			local v100 = rewireType(p10.ofType)
+
+			if v100 ~= nil and v100 ~= Object.None then
+				return (GraphQLList.new(v100))
+			end
+
+			return nil
+		end
+
+		if isNonNullType(p10) then
+			local v101 = rewireType(p10.ofType)
+
+			if v101 ~= nil and v101 ~= Object.None then
+				return (GraphQLNonNull.new(v101))
+			end
+
+			return nil
+		end
+
+		if isNamedType(p10) then
+			local v102 = u36:get(p10.name)
+
+			if v102 == nil then
+				v102 = if not isNamedStub(p10) then rewireNamedType(p10) else getBuiltInForStub(p10)
+				u36:set(p10.name, v102)
+				u37:set(v102.name, (u36:get(p10.name)))
+			end
+
+			if v102 ~= nil and v102 ~= Object.None then
+				return (u37:get(v102.name))
+			end
+
+			return nil
+		end
+
+		return nil
+	end
+
+	u36 = Map.new()
+
+	for _, v46 in p1 do
+		local v47 = v46[1]
+
+		u36:set(v47, (p1:get(v47)))
+	end
+
+	u37 = Map.new()
+
+	for _, v49 in u36 do
+		local v50 = v49[1]
+		local v51 = u36:get(v50)
+
+		if v51 ~= nil and v51 ~= Object.None and not String.startsWith(v50, "__") then
+			local name = v51.name
+
+			if not String.startsWith(name, "__") then
+				if u37:get(name) ~= nil then
+					console.warn(("Duplicate schema type name %s found; keeping the existing one found in the schema"):format((tostring(name))))
+				else
+					u37:set(name, v51)
+				end
+			end
+		end
+	end
+
+	for _, v54 in u37 do
+		local v55 = v54[1]
+
+		u37:set(v55, rewireNamedType(u37:get(v55)))
+	end
+
+	local v56 = Array.map(p2, function(p11) -- line: 360
+		-- upvalues: rewireDirective (ref)
+		return rewireDirective(p11)
+	end)
+
+	return {
+		typeMap = u37,
+		directives = v56
+	}
+end
+
+return t1

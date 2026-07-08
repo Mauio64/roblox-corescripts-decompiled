@@ -1,44 +1,52 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Logger_0 = require(l_Parent_0.Loggers).Logger;
-local l_HttpService_0 = game:GetService("HttpService");
-local function _(v3) --[[ Line: 9 ]] --[[ Name: attachPackageName ]]
-    if not v3 then
-        v3 = {};
-    end;
-    v3.packageName = "IAPExperience";
-    return v3;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local Logger = require(ParentParent.Loggers).Logger
+local HttpService = game:GetService("HttpService")
+
+local function attachPackageName(t1: {[any]: any}) -- line: 9
+	if not t1 then
+		t1 = {}
+	end
+
+	t1.packageName = "IAPExperience"
+
+	return t1
+end
+
 return {
-    debug = function(v5) --[[ Line: 17 ]] --[[ Name: debug ]]
-        -- upvalues: l_Logger_0 (copy), l_HttpService_0 (copy)
-        local l_l_Logger_0_0 = l_Logger_0;
-        local l_l_HttpService_0_0 = l_HttpService_0;
-        local v8 = v5 or {};
-        v8.packageName = "IAPExperience";
-        l_l_Logger_0_0:debug(l_l_HttpService_0_0:JSONEncode(v8));
-    end, 
-    info = function(v9) --[[ Line: 20 ]] --[[ Name: info ]]
-        -- upvalues: l_Logger_0 (copy), l_HttpService_0 (copy)
-        local l_l_Logger_0_1 = l_Logger_0;
-        local l_l_HttpService_0_1 = l_HttpService_0;
-        local v12 = v9 or {};
-        v12.packageName = "IAPExperience";
-        l_l_Logger_0_1:info(l_l_HttpService_0_1:JSONEncode(v12));
-    end, 
-    warn = function(v13) --[[ Line: 23 ]] --[[ Name: warn ]]
-        -- upvalues: l_Logger_0 (copy), l_HttpService_0 (copy)
-        local l_l_Logger_0_2 = l_Logger_0;
-        local l_l_HttpService_0_2 = l_HttpService_0;
-        local v16 = v13 or {};
-        v16.packageName = "IAPExperience";
-        l_l_Logger_0_2:warn(l_l_HttpService_0_2:JSONEncode(v16));
-    end, 
-    error = function(v17) --[[ Line: 26 ]] --[[ Name: error ]]
-        -- upvalues: l_Logger_0 (copy), l_HttpService_0 (copy)
-        local l_l_Logger_0_3 = l_Logger_0;
-        local l_l_HttpService_0_3 = l_HttpService_0;
-        local v20 = v17 or {};
-        v20.packageName = "IAPExperience";
-        l_l_Logger_0_3:error(l_l_HttpService_0_3:JSONEncode(v20));
-    end
-};
+	debug = function(t2: {[any]: any}) -- line: 17
+		-- upvalues: Logger (copy), HttpService (copy)
+		local v7 = Logger
+		local v8 = HttpService
+		local v9 = t2 or {}
+
+		v9.packageName = "IAPExperience"
+		v7:debug(v8:JSONEncode(v9))
+	end,
+	info = function(t3: {[any]: any}) -- line: 20
+		-- upvalues: Logger (copy), HttpService (copy)
+		local v11 = Logger
+		local v12 = HttpService
+		local v13 = t3 or {}
+
+		v13.packageName = "IAPExperience"
+		v11:info(v12:JSONEncode(v13))
+	end,
+	warn = function(t4: {[any]: any}) -- line: 23
+		-- upvalues: Logger (copy), HttpService (copy)
+		local v15 = Logger
+		local v16 = HttpService
+		local v17 = t4 or {}
+
+		v17.packageName = "IAPExperience"
+		v15:warn(v16:JSONEncode(v17))
+	end,
+	error = function(t5: {[any]: any}) -- line: 26
+		-- upvalues: Logger (copy), HttpService (copy)
+		local v19 = Logger
+		local v20 = HttpService
+		local v21 = t5 or {}
+
+		v21.packageName = "IAPExperience"
+		v19:error(v20:JSONEncode(v21))
+	end
+}

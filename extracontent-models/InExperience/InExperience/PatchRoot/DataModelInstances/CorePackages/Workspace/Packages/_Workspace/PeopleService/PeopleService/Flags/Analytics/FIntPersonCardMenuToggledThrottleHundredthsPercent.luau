@@ -1,4 +1,5 @@
-game:DefineFastInt("FIntPersonCardMenuToggledThrottleHundredthsPercent", 0);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("FIntPersonCardMenuToggledThrottleHundredthsPercent");
-end;
+game:DefineFastInt("FIntPersonCardMenuToggledThrottleHundredthsPercent", 0)
+
+return function() -- line: 3
+	return game:GetFastInt("FIntPersonCardMenuToggledThrottleHundredthsPercent")
+end

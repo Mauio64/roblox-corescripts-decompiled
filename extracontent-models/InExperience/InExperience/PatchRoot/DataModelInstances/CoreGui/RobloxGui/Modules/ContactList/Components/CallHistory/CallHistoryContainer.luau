@@ -1,291 +1,311 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v3 = require(l_CorePackages_0.Packages.ApolloClient);
-local v4 = require(l_CorePackages_0.Packages.Cryo);
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_CorePackages_0.Packages.Roact);
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local l_RetrievalStatus_0 = require(l_CorePackages_0.Workspace.Packages.Http).Enum.RetrievalStatus;
-local v9 = require(l_CorePackages_0.Workspace.Packages.UserProfiles);
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_useApolloClient_0 = v3.useApolloClient;
-local l_ContactList_0 = l_RobloxGui_0.Modules.ContactList;
-local v13 = require(l_ContactList_0.Actions.SetCurrentPage);
-local v14 = require(l_ContactList_0.Enums.Pages);
-local v15 = require(l_ContactList_0.dependencies);
-local l_NetworkingCall_0 = v15.NetworkingCall;
-local l_dependencyArray_0 = v15.Hooks.dependencyArray;
-local l_useDispatch_0 = v15.Hooks.useDispatch;
-local l_UIBlox_0 = v15.UIBlox;
-local l_useLocalization_0 = v15.Hooks.useLocalization;
-local l_useSelector_0 = v15.Hooks.useSelector;
-local l_useStyle_0 = l_UIBlox_0.Core.Style.useStyle;
-local l_LoadingSpinner_0 = l_UIBlox_0.App.Loading.LoadingSpinner;
-local v24 = require(l_ContactList_0.Analytics.useAnalytics);
-local v25 = require(l_ContactList_0.Analytics.EventNamesEnum);
-local v26 = require(l_ContactList_0.Components.CallHistory.CallHistoryItem);
-local v27 = require(l_ContactList_0.Components.ContactListCommon.NoItemView);
-local v28 = require(l_ContactList_0.Components.ContactListCommon.Constants);
-local v29 = require(l_CorePackages_0.Workspace.Packages.BlockingUtility);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-local v32 = l_LocalPlayer_0 and l_LocalPlayer_0.UserId or 0;
-return function(v33) --[[ Line: 54 ]] --[[ Name: CallHistoryContainer ]]
-    -- upvalues: l_useApolloClient_0 (copy), v24 (copy), l_useDispatch_0 (copy), l_useStyle_0 (copy), l_useLocalization_0 (copy), v5 (copy), l_RetrievalStatus_0 (copy), l_useSelector_0 (copy), l_NetworkingCall_0 (copy), v9 (copy), v4 (copy), v25 (copy), v14 (copy), v13 (copy), v27 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v28 (copy), v32 (copy), v29 (copy), v26 (copy), l_LoadingSpinner_0 (copy), v6 (copy), l_ExternalEventConnection_0 (copy), l_UserInputService_0 (copy)
-    local v34 = l_useApolloClient_0();
-    local v35 = v24();
-    local v36 = l_useDispatch_0();
-    local l_Theme_0 = l_useStyle_0().Theme;
-    local v38 = l_useLocalization_0({
-        genericErrorLabel = "Feature.Call.Error.Description.Generic", 
-        noCallsLabel = "Feature.Call.Prompt.FirstCall"
-    });
-    local v39 = v5.useRef(true);
-    local v40 = v5.useRef(nil);
-    local v41 = v5.useRef(0);
-    local v42, v43 = v5.useState(l_RetrievalStatus_0.Fetching);
-    local v44, v45 = v5.useState(false);
-    local v46, v47 = v5.useState({});
-    local v48, v49 = v5.useState("");
-    local v51 = l_useSelector_0(function(v50) --[[ Line: 76 ]]
-        return v50.LastRemovedFriend.lastRemovedFriendId;
-    end);
-    local v53 = v5.useCallback(function(v52) --[[ Line: 80 ]]
-        return v52.Navigation.currentPage;
-    end, {});
-    local v54 = l_useSelector_0(v53);
-    local v69 = v5.useCallback(function(v55, v56) --[[ Line: 85 ]]
-        -- upvalues: v39 (copy), v43 (copy), l_RetrievalStatus_0 (ref), v36 (copy), l_NetworkingCall_0 (ref), v34 (copy), v9 (ref), v4 (ref), v47 (copy), v49 (copy)
-        v39.current = true;
-        v43(l_RetrievalStatus_0.Fetching);
-        local v57 = v56 == "" and 16 or 8;
-        v36(l_NetworkingCall_0.GetCallHistory.API({
-            cursor = v56, 
-            limit = v57, 
-            universeId = game.GameId
-        })):andThen(function(v58) --[[ Line: 90 ]]
-            -- upvalues: v55 (copy), v34 (ref), v9 (ref), v4 (ref), v47 (ref), v49 (ref), v43 (ref), l_RetrievalStatus_0 (ref)
-            local v59 = {};
-            for _, v61 in ipairs(v55) do
-                table.insert(v59, v61);
-            end;
-            for _, v63 in ipairs(v58.responseBody.callRecords) do
-                table.insert(v59, v63);
-            end;
-            local v64 = {};
-            for _, v66 in ipairs(v59) do
-                for _, v68 in ipairs(v66.participants) do
-                    v64[tostring(v68.userId)] = true;
-                end;
-            end;
-            v34:query({
-                query = v9.Queries.userProfilesCombinedNameAndUsernameByUserIds, 
-                variables = {
-                    userIds = v4.Dictionary.keys(v64)
-                }
-            }):andThen(function() --[[ Line: 111 ]]
-                -- upvalues: v47 (ref), v59 (copy), v49 (ref), v58 (copy), v43 (ref), l_RetrievalStatus_0 (ref)
-                v47(v59);
-                v49(v58.responseBody.nextPageCursor);
-                v43(l_RetrievalStatus_0.Done);
-            end):catch(function() --[[ Line: 117 ]]
-                -- upvalues: v43 (ref), l_RetrievalStatus_0 (ref)
-                v43(l_RetrievalStatus_0.Failed);
-            end);
-        end, function() --[[ Line: 121 ]]
-            -- upvalues: v43 (ref), l_RetrievalStatus_0 (ref)
-            v43(l_RetrievalStatus_0.Failed);
-        end);
-    end, {
-        v51
-    });
-    v5.useEffect(function() --[[ Line: 127 ]]
-        -- upvalues: v69 (copy), v47 (copy), v49 (copy)
-        v69({}, "");
-        return function() --[[ Line: 130 ]]
-            -- upvalues: v47 (ref), v49 (ref)
-            v47({});
-            v49("");
-        end;
-    end, {
-        v69
-    });
-    local v70 = v5.useCallback(function() --[[ Line: 136 ]]
-        -- upvalues: v35 (copy), v25 (ref), v54 (copy), v14 (ref), v36 (copy), v13 (ref)
-        v35.fireEvent(v25.PhoneBookNavigate, {
-            eventTimestampMs = os.time() * 1000, 
-            startingPage = v54, 
-            destinationPage = v14.FriendList
-        });
-        v36(v13(v14.FriendList));
-    end, {
-        v54
-    });
-    v5.useEffect(function() --[[ Line: 145 ]]
-        -- upvalues: v42 (copy), l_RetrievalStatus_0 (ref), v39 (copy)
-        if v42 ~= l_RetrievalStatus_0.Fetching then
-            v39.current = false;
-        end;
-    end, {
-        v42
-    });
-    local v72 = v5.useMemo(function() --[[ Line: 152 ]]
-        -- upvalues: v42 (copy), l_RetrievalStatus_0 (ref), v38 (copy), v5 (ref), v27 (ref), v69 (copy), v46 (copy), v48 (copy), v70 (copy)
-        local v71 = nil;
-        v71 = if v42 == l_RetrievalStatus_0.Failed then v38.genericErrorLabel else v38.noCallsLabel;
-        return v5.createElement(v27, {
-            isImageEnabled = v42 ~= l_RetrievalStatus_0.Failed, 
-            imageName = "icons/graphic/findfriends_xlarge", 
-            isFailedButtonEnabled = v42 == l_RetrievalStatus_0.Failed, 
-            onFailedButtonActivated = function() --[[ Line: 164 ]] --[[ Name: onFailedButtonActivated ]]
-                -- upvalues: v69 (ref), v46 (ref), v48 (ref)
-                v69(v46, v48);
-            end, 
-            isCallButtonEnabled = v42 == l_RetrievalStatus_0.Done, 
-            onCallButtonActivated = v70, 
-            messageText = v71
-        });
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v46, 
-        v69, 
-        v38.genericErrorLabel, 
-        v38.noCallsLabel, 
-        v70, 
-        v48, 
-        v42
-    } else l_dependencyArray_0(v46, v69, v38.genericErrorLabel, v38.noCallsLabel, v70, v48, v42));
-    local v74 = v5.useCallback(function(v73) --[[ Line: 193 ]]
-        -- upvalues: v41 (copy)
-        v41.current = v73.Position.Y;
-    end, {});
-    local v76 = v5.useCallback(function(v75) --[[ Line: 197 ]]
-        -- upvalues: v41 (copy), v28 (ref), v40 (copy), v45 (copy)
-        if v75.Position.Y - v41.current > v28.TOUCH_SLOP and v40.current and v40.current.CanvasPosition.Y == 0 then
-            v45(true);
-        end;
-    end, {});
-    local v77 = v5.useCallback(function() --[[ Line: 212 ]]
-        -- upvalues: v45 (copy)
-        v45(false);
-    end, {});
-    local v86 = v5.useMemo(function() --[[ Line: 217 ]]
-        -- upvalues: v5 (ref), v46 (copy), v32 (ref), v29 (ref), v26 (ref), v33 (copy), v48 (copy), v42 (copy), l_RetrievalStatus_0 (ref), v72 (copy), v28 (ref), l_LoadingSpinner_0 (ref)
-        local v78 = {
-            UIListLayout = v5.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-        };
-        local v79 = {};
-        for _, v81 in ipairs(v46) do
-            local l_userId_0 = v81.participants[1].userId;
-            if l_userId_0 == v32 then
-                l_userId_0 = v81.participants[2].userId;
-            end;
-            if not v29:IsPlayerBlockedByUserId(l_userId_0) then
-                table.insert(v79, v81);
-            end;
-        end;
-        for v83, v84 in ipairs(v79) do
-            v78[v83] = v5.createElement(v26, {
-                callRecord = v84, 
-                localUserId = v32, 
-                showDivider = v83 ~= #v79, 
-                dismissCallback = v33.dismissCallback, 
-                layoutOrder = v83
-            });
-        end;
-        if v48 ~= "" then
-            local v85 = #v78 + 1;
-            if v42 == l_RetrievalStatus_0.Failed then
-                v78[v85] = v72;
-                return v78;
-            else
-                v78[v85] = v5.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v28.ITEM_HEIGHT), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = v85
-                }, {
-                    LoadingSpinner = v5.createElement(l_LoadingSpinner_0, {
-                        size = UDim2.fromOffset(48, 48), 
-                        position = UDim2.fromScale(0.5, 0.5), 
-                        anchorPoint = Vector2.new(0.5, 0.5)
-                    })
-                });
-            end;
-        end;
-        return v78;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v46, 
-        v48, 
-        v72, 
-        v42
-    } else l_dependencyArray_0(v46, v48, v72, v42));
-    local v88 = v5.useCallback(function(v87) --[[ Line: 275 ]]
-        -- upvalues: v39 (copy), v42 (copy), l_RetrievalStatus_0 (ref), v48 (copy), v69 (copy), v46 (copy)
-        if not v39.current and v42 ~= l_RetrievalStatus_0.Failed and v48 ~= "" and v87.CanvasPosition.Y >= v87.AbsoluteCanvasSize.Y - v87.AbsoluteSize.Y - 50 then
-            v69(v46, v48);
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v46, 
-        v69, 
-        v48, 
-        v42
-    } else l_dependencyArray_0(v46, v69, v48, v42));
-    v5.useEffect(function() --[[ Line: 291 ]]
-        -- upvalues: v86 (copy), v28 (ref), v40 (copy), v88 (copy)
-        local v89 = (#v86 - 1) * v28.ITEM_HEIGHT;
-        if v40.current and v89 <= v40.current.AbsoluteSize.Y then
-            v88(v40.current);
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v86, 
-        v88
-    } else l_dependencyArray_0(v86, v88));
-    if #v46 == 0 and v42 == l_RetrievalStatus_0.Fetching then
-        return (v5.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v28.ITEM_HEIGHT), 
-            BackgroundTransparency = 1
-        }, {
-            LoadingSpinner = v5.createElement(l_LoadingSpinner_0, {
-                size = UDim2.fromOffset(48, 48), 
-                position = UDim2.fromScale(0.5, 0.5), 
-                anchorPoint = Vector2.new(0.5, 0.5)
-            })
-        }));
-    elseif #v46 == 0 then
-        return v72;
-    else
-        return (v6.createFragment({
-            v5.createElement("ScrollingFrame", {
-                Size = UDim2.fromScale(1, 1), 
-                AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-                BackgroundTransparency = l_Theme_0.BackgroundDefault.Transparency, 
-                BorderSizePixel = 0, 
-                CanvasSize = UDim2.new(), 
-                ElasticBehavior = Enum.ElasticBehavior.Never, 
-                ScrollingDirection = Enum.ScrollingDirection.Y, 
-                ScrollingEnabled = not v44 and v33.scrollingEnabled, 
-                ScrollBarImageColor3 = l_Theme_0.UIEmphasis.Color, 
-                ScrollBarImageTransparency = l_Theme_0.UIEmphasis.Transparency, 
-                ScrollBarThickness = 4, 
-                ref = v40, 
-                [v5.Change.CanvasPosition] = v88
-            }, v86); 
-            TouchStartedUserInputConnection = v33.isSmallScreen and v33.scrollingEnabled and v5.createElement(l_ExternalEventConnection_0, {
-                event = l_UserInputService_0.TouchStarted, 
-                callback = v74
-            }), 
-            TouchMovedUserInputConnection = v33.isSmallScreen and v33.scrollingEnabled and v5.createElement(l_ExternalEventConnection_0, {
-                event = l_UserInputService_0.TouchMoved, 
-                callback = v76
-            }), 
-            TouchEndedUserInputConnection = v33.isSmallScreen and v33.scrollingEnabled and v5.createElement(l_ExternalEventConnection_0, {
-                event = l_UserInputService_0.TouchEnded, 
-                callback = v77
-            })
-        }));
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local ApolloClient = require(CorePackages.Packages.ApolloClient)
+local Cryo = require(CorePackages.Packages.Cryo)
+local React = require(CorePackages.Packages.React)
+local Roact = require(CorePackages.Packages.Roact)
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local RetrievalStatus = require(CorePackages.Workspace.Packages.Http).Enum.RetrievalStatus
+local UserProfiles = require(CorePackages.Workspace.Packages.UserProfiles)
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local useApolloClient = ApolloClient.useApolloClient
+local ContactList = RobloxGui.Modules.ContactList
+local SetCurrentPage = require(ContactList.Actions.SetCurrentPage)
+local Pages = require(ContactList.Enums.Pages)
+local dependencies = require(ContactList.dependencies)
+local NetworkingCall = dependencies.NetworkingCall
+local useDispatch = dependencies.Hooks.useDispatch
+local UIBlox = dependencies.UIBlox
+local Foundation = dependencies.Foundation
+local IconSize = Foundation.Enums.IconSize
+local Loading = Foundation.Loading
+local useLocalization = dependencies.Hooks.useLocalization
+local useSelector = dependencies.Hooks.useSelector
+local useStyle = UIBlox.Core.Style.useStyle
+local useAnalytics = require(ContactList.Analytics.useAnalytics)
+local EventNamesEnum = require(ContactList.Analytics.EventNamesEnum)
+local CallHistoryItem = require(ContactList.Components.CallHistory.CallHistoryItem)
+local NoItemView = require(ContactList.Components.ContactListCommon.NoItemView)
+local Constants = require(ContactList.Components.ContactListCommon.Constants)
+local BlockingUtility = require(CorePackages.Workspace.Packages.BlockingUtility)
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local v33 = LocalPlayer and LocalPlayer.UserId or 0
+
+local function CallHistoryContainer(t1: {[any]: any}) -- line: 53
+	-- upvalues: useApolloClient (copy), useAnalytics (copy), useDispatch (copy), useStyle (copy), useLocalization (copy), React (copy), RetrievalStatus (copy), useSelector (copy), NetworkingCall (copy), UserProfiles (copy), Cryo (copy), EventNamesEnum (copy), Pages (copy), SetCurrentPage (copy), NoItemView (copy), Constants (copy), v33 (copy), BlockingUtility (copy), CallHistoryItem (copy), Loading (copy), IconSize (copy), Roact (copy), ExternalEventConnection (copy), UserInputService (copy)
+	local v36 = useApolloClient()
+	local v37 = useAnalytics()
+	local v38 = useDispatch()
+	local Theme = useStyle().Theme
+	local v40 = useLocalization({
+		genericErrorLabel = "Feature.Call.Error.Description.Generic",
+		noCallsLabel = "Feature.Call.Prompt.FirstCall"
+	})
+	local v41 = React.useRef(true)
+	local v42 = React.useRef(nil)
+	local v43 = React.useRef(0)
+	local v44, v45 = React.useState(RetrievalStatus.Fetching)
+	local v46, v47 = React.useState(false)
+	local v48, v49 = React.useState({})
+	local v50, v51 = React.useState("")
+	local v52 = useSelector(function(p1) -- line: 75
+		return p1.LastRemovedFriend.lastRemovedFriendId
+	end)
+	local v53 = React.useCallback(function(p2) -- line: 79
+		return p2.Navigation.currentPage
+	end, {})
+	local v54 = useSelector(v53)
+	local v55 = React.useCallback(function(p3, p4) -- line: 84
+		-- upvalues: v41 (copy), v45 (copy), RetrievalStatus (copy), v38 (copy), NetworkingCall (copy), v36 (copy), UserProfiles (copy), Cryo (copy), v49 (copy), v51 (copy)
+		v41.current = true
+		v45(RetrievalStatus.Fetching)
+
+		local v67 = p4 ~= "" and 8 or 16
+
+		v38(NetworkingCall.GetCallHistory.API({
+			cursor = p4,
+			limit = v67,
+			universeId = game.GameId
+		})):andThen(function(p5) -- line: 89
+			-- upvalues: p3 (copy), v36 (copy), UserProfiles (copy), Cryo (copy), v49 (copy), v51 (copy), v45 (copy), RetrievalStatus (copy)
+			local t2 = {}
+
+			for _, v in ipairs(p3) do
+				table.insert(t2, v)
+			end
+
+			for _, v in ipairs(p5.responseBody.callRecords) do
+				table.insert(t2, v)
+			end
+
+			local t3 = {}
+
+			for _, v in ipairs(t2) do
+				for _, v2 in ipairs(v.participants) do
+					t3[tostring(v2.userId)] = true
+				end
+			end
+
+			v36:query({
+				query = UserProfiles.Queries.userProfilesCombinedNameAndUsernameByUserIds,
+				variables = {
+					userIds = Cryo.Dictionary.keys(t3)
+				}
+			}):andThen(function() -- line: 110
+				-- upvalues: v49 (copy), t2 (copy), v51 (copy), p5 (copy), v45 (copy), RetrievalStatus (copy)
+				v49(t2)
+				v51(p5.responseBody.nextPageCursor)
+				v45(RetrievalStatus.Done)
+			end):catch(function() -- line: 116
+				-- upvalues: v45 (copy), RetrievalStatus (copy)
+				v45(RetrievalStatus.Failed)
+			end)
+		end, function() -- line: 120
+			-- upvalues: v45 (copy), RetrievalStatus (copy)
+			v45(RetrievalStatus.Failed)
+		end)
+	end, { v52 })
+
+	React.useEffect(function() -- line: 126
+		-- upvalues: v55 (copy), v49 (copy), v51 (copy)
+		v55({}, "")
+
+		return function() -- line: 129
+			-- upvalues: v49 (copy), v51 (copy)
+			v49({})
+			v51("")
+		end
+	end, { v55 })
+
+	local v56 = React.useCallback(function() -- line: 135
+		-- upvalues: v37 (copy), EventNamesEnum (copy), v54 (copy), Pages (copy), v38 (copy), SetCurrentPage (copy)
+		v37.fireEvent(EventNamesEnum.PhoneBookNavigate, {
+			eventTimestampMs = os.time() * 1000,
+			startingPage = v54,
+			destinationPage = Pages.FriendList
+		})
+		v38(SetCurrentPage(Pages.FriendList))
+	end, { v54 })
+
+	React.useEffect(function() -- line: 144
+		-- upvalues: v44 (copy), RetrievalStatus (copy), v41 (copy)
+		if v44 ~= RetrievalStatus.Fetching then
+			v41.current = false
+		end
+	end, { v44 })
+
+	local v57 = React.useMemo(function() -- line: 150
+		-- upvalues: v44 (copy), RetrievalStatus (copy), v40 (copy), React (copy), NoItemView (copy), v55 (copy), v48 (copy), v50 (copy), v56 (copy)
+		local v68 = if v44 ~= RetrievalStatus.Failed then v40.noCallsLabel else v40.genericErrorLabel
+
+		return React.createElement(NoItemView, {
+			imageName = "icons/graphic/findfriends_xlarge",
+			isImageEnabled = v44 ~= RetrievalStatus.Failed,
+			isFailedButtonEnabled = v44 == RetrievalStatus.Failed,
+			onFailedButtonActivated = function() -- line: 162
+				-- upvalues: v55 (copy), v48 (copy), v50 (copy)
+				v55(v48, v50)
+			end,
+			isCallButtonEnabled = v44 == RetrievalStatus.Done,
+			onCallButtonActivated = v56,
+			messageText = v68
+		})
+	end, {
+		v48,
+		v55,
+		v40.genericErrorLabel,
+		v40.noCallsLabel,
+		v56,
+		v50,
+		v44
+	})
+	local v58 = React.useCallback(function(p6) -- line: 179
+		-- upvalues: v43 (copy)
+		v43.current = p6.Position.Y
+	end, {})
+	local v59 = React.useCallback(function(p7) -- line: 183
+		-- upvalues: v43 (copy), Constants (copy), v42 (copy), v47 (copy)
+		if p7.Position.Y - v43.current > Constants.TOUCH_SLOP and (v42.current and v42.current.CanvasPosition.Y == 0) then
+			v47(true)
+		end
+	end, {})
+	local v60 = React.useCallback(function() -- line: 198
+		-- upvalues: v47 (copy)
+		v47(false)
+	end, {})
+	local v61 = React.useMemo(function() -- line: 202
+		-- upvalues: React (copy), v48 (copy), v33 (copy), BlockingUtility (copy), CallHistoryItem (copy), t1 (copy), v50 (copy), v44 (copy), RetrievalStatus (copy), v57 (copy), Constants (copy), Loading (copy), IconSize (copy)
+		local t4 = {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+		}
+		local t5 = {}
+
+		for _, v in ipairs(v48) do
+			local userId = v.participants[1].userId
+
+			if userId == v33 then
+				userId = v.participants[2].userId
+			end
+
+			if not BlockingUtility:IsPlayerBlockedByUserId(userId) then
+				table.insert(t5, v)
+			end
+		end
+
+		for i, v in ipairs(t5) do
+			t4[i] = React.createElement(CallHistoryItem, {
+				callRecord = v,
+				localUserId = v33,
+				showDivider = i ~= #t5,
+				dismissCallback = t1.dismissCallback,
+				layoutOrder = i
+			})
+		end
+
+		if v50 ~= "" then
+			local v78 = #t4 + 1
+
+			if v44 == RetrievalStatus.Failed then
+				t4[v78] = v57
+
+				return t4
+			end
+
+			t4[v78] = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, Constants.ITEM_HEIGHT),
+				LayoutOrder = v78
+			}, {
+				LoadingSpinner = React.createElement(Loading, {
+					size = IconSize.Large,
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5)
+				})
+			})
+		end
+
+		return t4
+	end, {
+		v48,
+		v50,
+		v57,
+		v44
+	})
+	local v62 = React.useCallback(function(p8) -- line: 255
+		-- upvalues: v41 (copy), v44 (copy), RetrievalStatus (copy), v50 (copy), v55 (copy), v48 (copy)
+		if not v41.current and (v44 ~= RetrievalStatus.Failed and v50 ~= "" and p8.CanvasPosition.Y >= p8.AbsoluteCanvasSize.Y - p8.AbsoluteSize.Y - 50) then
+			v55(v48, v50)
+		end
+	end, {
+		v48,
+		v55,
+		v50,
+		v44
+	})
+
+	React.useEffect(function() -- line: 266
+		-- upvalues: v61 (copy), Constants (copy), v42 (copy), v62 (copy)
+		local v80 = (#v61 - 1) * Constants.ITEM_HEIGHT
+
+		if v42.current and v80 <= v42.current.AbsoluteSize.Y then
+			v62(v42.current)
+		end
+	end, {
+		v61,
+		v62
+	})
+
+	if #v48 == 0 and v44 == RetrievalStatus.Fetching then
+		return (React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, Constants.ITEM_HEIGHT)
+		}, {
+			LoadingSpinner = React.createElement(Loading, {
+				size = IconSize.Large,
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5)
+			})
+		}))
+	end
+
+	if #v48 == 0 then
+		return v57
+	end
+
+	return (Roact.createFragment({
+		React.createElement("ScrollingFrame", {
+			Size = UDim2.fromScale(1, 1),
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			BackgroundColor3 = Theme.BackgroundDefault.Color,
+			BackgroundTransparency = Theme.BackgroundDefault.Transparency,
+			BorderSizePixel = 0,
+			CanvasSize = UDim2.new(),
+			ElasticBehavior = Enum.ElasticBehavior.Never,
+			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ScrollingEnabled = not v46 and t1.scrollingEnabled,
+			ScrollBarImageColor3 = Theme.UIEmphasis.Color,
+			ScrollBarImageTransparency = Theme.UIEmphasis.Transparency,
+			ScrollBarThickness = 4,
+			ref = v42,
+			[React.Change.CanvasPosition] = v62
+		}, v61),
+		TouchStartedUserInputConnection = t1.isSmallScreen and (t1.scrollingEnabled and React.createElement(ExternalEventConnection, {
+			event = UserInputService.TouchStarted,
+			callback = v58
+		})),
+		TouchMovedUserInputConnection = t1.isSmallScreen and (t1.scrollingEnabled and React.createElement(ExternalEventConnection, {
+			event = UserInputService.TouchMoved,
+			callback = v59
+		})),
+		TouchEndedUserInputConnection = t1.isSmallScreen and (t1.scrollingEnabled and React.createElement(ExternalEventConnection, {
+			event = UserInputService.TouchEnded,
+			callback = v60
+		}))
+	}))
+end
+
+return CallHistoryContainer

@@ -1,44 +1,48 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.AvatarOneToOne);
-local v4 = require(script.AvatarGroup);
-local v5 = {
-    presenceIndicatorSize = 14
-};
-return function(v6) --[[ Line: 32 ]] --[[ Name: AvatarCircle ]]
-    -- upvalues: v1 (copy), v5 (copy), v2 (copy), v3 (copy), v4 (copy)
-    local v7 = v1.Dictionary.union(v6, v5);
-    if #v7.thumbnails == 1 then
-        return v2.createElement(v3, {
-            circleColor3 = v7.circleColor3, 
-            circleDividerColor3 = v7.circleDividerColor3, 
-            circleDividerTransparency = v7.circleDividerTransparency, 
-            circleInteriorBackgroundColor3 = v7.circleInteriorBackgroundColor3, 
-            circleInteriorBackgroundTransparency = v7.circleInteriorBackgroundTransparency, 
-            circleTransparency = v7.circleTransparency, 
-            onActivated = v7.onActivated, 
-            overlaySize = v7.overlaySize, 
-            presenceImage = v7.presenceImage, 
-            presenceImageColor3 = v7.presenceImageColor3, 
-            presenceImageTransparency = v7.presenceImageTransparency, 
-            presenceIndicatorSize = v7.presenceIndicatorSize, 
-            selectable = v7.selectable, 
-            showNewPresenceImage = v7.showNewPresenceImage, 
-            thumbnail = v7.thumbnails[1]
-        });
-    else
-        return v2.createElement(v4, {
-            circleColor3 = v7.circleColor3, 
-            circleDividerColor3 = v7.circleDividerColor3, 
-            circleDividerTransparency = v7.circleDividerTransparency, 
-            circleInteriorBackgroundColor3 = v7.circleInteriorBackgroundColor3, 
-            circleInteriorBackgroundTransparency = v7.circleInteriorBackgroundTransparency, 
-            circleTransparency = v7.circleTransparency, 
-            onActivated = v7.onActivated, 
-            overlaySize = v7.overlaySize, 
-            selectable = v7.selectable, 
-            thumbnails = v7.thumbnails
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+local AvatarOneToOne = require(script.AvatarOneToOne)
+local AvatarGroup = require(script.AvatarGroup)
+local t1 = {
+	presenceIndicatorSize = 14
+}
+
+local function AvatarCircle(t2: {[any]: any}) -- line: 32
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), AvatarOneToOne (copy), AvatarGroup (copy)
+	local v9 = Cryo.Dictionary.union(t2, t1)
+
+	if #v9.thumbnails == 1 then
+		return React.createElement(AvatarOneToOne, {
+			circleColor3 = v9.circleColor3,
+			circleDividerColor3 = v9.circleDividerColor3,
+			circleDividerTransparency = v9.circleDividerTransparency,
+			circleInteriorBackgroundColor3 = v9.circleInteriorBackgroundColor3,
+			circleInteriorBackgroundTransparency = v9.circleInteriorBackgroundTransparency,
+			circleTransparency = v9.circleTransparency,
+			onActivated = v9.onActivated,
+			overlaySize = v9.overlaySize,
+			presenceImage = v9.presenceImage,
+			presenceImageColor3 = v9.presenceImageColor3,
+			presenceImageTransparency = v9.presenceImageTransparency,
+			presenceIndicatorSize = v9.presenceIndicatorSize,
+			selectable = v9.selectable,
+			showNewPresenceImage = v9.showNewPresenceImage,
+			thumbnail = v9.thumbnails[1]
+		})
+	end
+
+	return React.createElement(AvatarGroup, {
+		circleColor3 = v9.circleColor3,
+		circleDividerColor3 = v9.circleDividerColor3,
+		circleDividerTransparency = v9.circleDividerTransparency,
+		circleInteriorBackgroundColor3 = v9.circleInteriorBackgroundColor3,
+		circleInteriorBackgroundTransparency = v9.circleInteriorBackgroundTransparency,
+		circleTransparency = v9.circleTransparency,
+		onActivated = v9.onActivated,
+		overlaySize = v9.overlaySize,
+		selectable = v9.selectable,
+		thumbnails = v9.thumbnails
+	})
+end
+
+return AvatarCircle

@@ -1,4 +1,4 @@
 return {
-    GameInfoModel = require(script.GameInfoModel), 
-    ["jest.config"] = script["jest.config"]
-};
+	GameInfoModel = require(script.GameInfoModel),
+	["jest.config"] = script["jest.config"]
+}

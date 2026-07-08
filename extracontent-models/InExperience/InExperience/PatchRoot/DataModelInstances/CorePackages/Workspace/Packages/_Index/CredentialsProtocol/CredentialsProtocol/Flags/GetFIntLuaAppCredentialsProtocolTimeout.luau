@@ -1,9 +1,11 @@
-game:DefineFastInt("LuaAppCredentialsProtocolTimeout", 20);
-return function() --[[ Line: 5 ]]
-    local l_game_FastInt_0 = game:GetFastInt("LuaAppCredentialsProtocolTimeout");
-    if l_game_FastInt_0 <= 20 then
-        return 20;
-    else
-        return l_game_FastInt_0;
-    end;
-end;
+game:DefineFastInt("LuaAppCredentialsProtocolTimeout", 20)
+
+return function() -- line: 5
+	local FastInt = game:GetFastInt("LuaAppCredentialsProtocolTimeout")
+
+	if FastInt <= 20 then
+		return 20
+	end
+
+	return FastInt
+end

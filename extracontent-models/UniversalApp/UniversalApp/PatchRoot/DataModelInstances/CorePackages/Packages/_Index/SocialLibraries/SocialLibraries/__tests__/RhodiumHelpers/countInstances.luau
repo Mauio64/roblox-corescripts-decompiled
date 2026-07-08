@@ -1,9 +1,11 @@
-return function(v0, v1) --[[ Line: 7 ]]
-    local v2 = 0;
-    for _, v4 in pairs(v0:GetChildren()) do
-        if not v1 or v4:IsA(v1) then
-            v2 = v2 + 1;
-        end;
-    end;
-    return v2;
-end;
+return function(p1, p2) -- line: 7
+	local n1 = 0
+
+	for _, child in pairs(p1:GetChildren()) do
+		if not p2 or child:IsA(p2) then
+			n1 += 1
+		end
+	end
+
+	return n1
+end

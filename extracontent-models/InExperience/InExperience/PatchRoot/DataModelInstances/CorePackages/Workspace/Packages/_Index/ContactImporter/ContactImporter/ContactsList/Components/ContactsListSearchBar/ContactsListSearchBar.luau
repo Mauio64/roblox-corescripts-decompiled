@@ -1,80 +1,83 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ContactImporter");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_React_0 = v1.React;
-local l_UIBlox_0 = v1.UIBlox;
-local l_SocialLibraries_0 = v1.SocialLibraries;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local l_IconSize_0 = l_UIBlox_0.App.Constant.IconSize;
-local l_CallbackInputBox_0 = l_SocialLibraries_0.Components.CallbackInputBox;
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local v10 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_useStyle_0 = v1.useStyle;
-local l_useLocalization_0 = v1.useLocalization;
-local v13 = l_Images_0["icons/common/search"];
-local v14 = l_Images_0["icons/actions/edit/clear_small"];
-ContactsListSearchBar = function(v15) --[[ Line: 29 ]] --[[ Name: ContactsListSearchBar ]]
-    -- upvalues: l_useLocalization_0 (copy), v10 (copy), l_useStyle_0 (copy), l_React_0 (copy), l_Roact_0 (copy), l_ImageSetLabel_0 (copy), l_IconSize_0 (copy), v13 (copy), l_CallbackInputBox_0 (copy), v14 (copy)
-    local v16 = l_useLocalization_0({
-        searchContacts = v10.SEARCH_CONTACTS
-    });
-    local v17 = l_useStyle_0();
-    local v18, v19 = l_React_0.useState(false);
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = v17.Theme.BackgroundMuted.Transparency, 
-        BorderSizePixel = 0, 
-        BackgroundColor3 = v17.Theme.BackgroundMuted.Color, 
-        Size = UDim2.new(1, 0, 0, v15.height), 
-        LayoutOrder = v15.layoutOrder
-    }, {
-        layout = l_Roact_0.createElement("UIListLayout", {
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 4)
-        }), 
-        BorderRadius = l_Roact_0.createElement("UICorner", {
-            CornerRadius = UDim.new(0, 4)
-        }), 
-        Border = l_React_0.createElement("UIStroke", {
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border, 
-            Color = if v18 then v17.Theme.SecondaryOnHover.Color else v17.Theme.Divider.Color, 
-            Transparency = if v18 then v17.Theme.SecondaryOnHover.Transparency else v17.Theme.Divider.Transparency, 
-            Thickness = 1
-        }), 
-        padding = l_Roact_0.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, 13), 
-            PaddingRight = UDim.new(0, 13)
-        }), 
-        icon = l_Roact_0.createElement(l_ImageSetLabel_0, {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, l_IconSize_0.Small, 0, l_IconSize_0.Small), 
-            Image = v13, 
-            ImageColor3 = v17.Theme.IconEmphasis.Color, 
-            LayoutOrder = 1
-        }), 
-        searchBarWrapper = l_Roact_0.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            LayoutOrder = 2, 
-            Size = UDim2.new(1, -l_IconSize_0.Small, 0, v15.height)
-        }, {
-            searchBar = l_Roact_0.createElement(l_CallbackInputBox_0, {
-                clearIcon = v14, 
-                clearIconColor3 = v17.Theme.IconEmphasis.Color, 
-                clearIconTransparency = v17.Theme.IconEmphasis.Transparency, 
-                clearButtonSize = l_IconSize_0.Small, 
-                clearButtonDisabled = false, 
-                focusChangedCallback = v19, 
-                inputTextColor3 = v17.Theme.TextEmphasis.Color, 
-                inputTextTransparency = v17.Theme.TextEmphasis.Transparency, 
-                placeholderText = v16.searchContacts, 
-                placeholderTextColor3 = v17.Theme.TextMuted.Color, 
-                placeholderTextTransparency = v17.Theme.TextMuted.Transparency, 
-                inputTextXAlignment = Enum.TextXAlignment.Left, 
-                textChangedCallback = v15.textChangeCallback
-            })
-        })
-    });
-end;
-return ContactsListSearchBar;
+local ContactImporter = script:FindFirstAncestor("ContactImporter")
+local dependencies = require(ContactImporter.dependencies)
+local Roact = dependencies.Roact
+local React = dependencies.React
+local UIBlox = dependencies.UIBlox
+local SocialLibraries = dependencies.SocialLibraries
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local IconSize = UIBlox.App.Constant.IconSize
+local CallbackInputBox = SocialLibraries.Components.CallbackInputBox
+local Images = UIBlox.App.ImageSet.Images
+local TextKeys = require(ContactImporter.Common.TextKeys)
+local useStyle = dependencies.useStyle
+local useLocalization = dependencies.useLocalization
+local v14 = Images["icons/common/search"]
+local v15 = Images["icons/actions/edit/clear_small"]
+
+function ContactsListSearchBar(t1: {[any]: any}) -- line: 29
+	-- upvalues: useLocalization (copy), TextKeys (copy), useStyle (copy), React (copy), Roact (copy), ImageSetLabel (copy), IconSize (copy), v14 (copy), CallbackInputBox (copy), v15 (copy)
+	local v17 = useLocalization({
+		searchContacts = TextKeys.SEARCH_CONTACTS
+	})
+	local v18 = useStyle()
+	local v19, v20 = React.useState(false)
+
+	return Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = v18.Theme.BackgroundMuted.Transparency,
+		BackgroundColor3 = v18.Theme.BackgroundMuted.Color,
+		Size = UDim2.new(1, 0, 0, t1.height),
+		LayoutOrder = t1.layoutOrder
+	}, {
+		layout = Roact.createElement("UIListLayout", {
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 4)
+		}),
+		BorderRadius = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 4)
+		}),
+		Border = React.createElement("UIStroke", {
+			Thickness = 1,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Color = if not v19 then v18.Theme.Divider.Color else v18.Theme.SecondaryOnHover.Color,
+			Transparency = if not v19 then v18.Theme.Divider.Transparency else v18.Theme.SecondaryOnHover.Transparency
+		}),
+		padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, 13),
+			PaddingRight = UDim.new(0, 13)
+		}),
+		icon = Roact.createElement(ImageSetLabel, {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(0, IconSize.Small, 0, IconSize.Small),
+			Image = v14,
+			ImageColor3 = v18.Theme.IconEmphasis.Color
+		}),
+		searchBarWrapper = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, -IconSize.Small, 0, t1.height)
+		}, {
+			searchBar = Roact.createElement(CallbackInputBox, {
+				clearButtonDisabled = false,
+				clearIcon = v15,
+				clearIconColor3 = v18.Theme.IconEmphasis.Color,
+				clearIconTransparency = v18.Theme.IconEmphasis.Transparency,
+				clearButtonSize = IconSize.Small,
+				focusChangedCallback = v20,
+				inputTextColor3 = v18.Theme.TextEmphasis.Color,
+				inputTextTransparency = v18.Theme.TextEmphasis.Transparency,
+				placeholderText = v17.searchContacts,
+				placeholderTextColor3 = v18.Theme.TextMuted.Color,
+				placeholderTextTransparency = v18.Theme.TextMuted.Transparency,
+				inputTextXAlignment = Enum.TextXAlignment.Left,
+				textChangedCallback = t1.textChangeCallback
+			})
+		})
+	})
+end
+
+return ContactsListSearchBar

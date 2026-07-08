@@ -1,1 +1,1 @@
-return game:DefineFastString("CanAccessTrustedContactsAmpFeature", "CanAccessTrustedContacts");
+return game:DefineFastString("CanAccessTrustedContactsAmpFeature", "CanAccessTrustedContacts")

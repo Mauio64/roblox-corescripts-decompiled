@@ -1,166 +1,192 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v4 = require(l_script_FirstAncestor_0.Actions.SetPromptState);
-local v5 = require(l_script_FirstAncestor_0.Enums.UpsellFlow);
-local v6 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v7 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local _ = require(l_script_FirstAncestor_0.Enums.PurchaseFlow);
-local v9 = require(l_script_FirstAncestor_0.NativeUpsell.getUpsellFlow);
-local v10 = require(l_script_FirstAncestor_0.Misc.Constants);
-local v11 = require(l_script_FirstAncestor_0.Network.postPurchaseWarningAcknowledge);
-local v12 = require(l_script_FirstAncestor_0.Services.Analytics);
-local v13 = require(l_script_FirstAncestor_0.Services.ExternalSettings);
-local v14 = require(l_script_FirstAncestor_0.Services.Network);
-local v15 = require(l_script_FirstAncestor_0.Services.PlatformInterface);
-local v16 = require(l_script_FirstAncestor_0.Thunk);
-local v17 = require(l_script_FirstAncestor_0.Promise);
-local l_getAppFeaturePolicies_0 = require(l_Parent_0.UniversalAppPolicy).getAppFeaturePolicies;
-local l_GetFStringVNGWebshopUrl_0 = require(l_Parent_0.SharedFlags).GetFStringVNGWebshopUrl;
-local v20 = require(script.Parent.retryAfterUpsell);
-local v21 = require(l_Parent_0.IAPExperience);
-local l_PreparePaymentCheck_0 = v21.PreparePaymentCheck;
-local l_GetEnableConsolePreparePaymentCheck_0 = v21.GetEnableConsolePreparePaymentCheck;
-local v24 = require(l_script_FirstAncestor_0.Utils.SelectedRobuxPackage);
-local l_DesktopUpsellExperiment_0 = v21.Utility.DesktopUpsellExperiment;
-local v26 = {
-    v12, 
-    v13, 
-    v14, 
-    v15
-};
-return function() --[[ Line: 41 ]] --[[ Name: launchRobuxUpsell ]]
-    -- upvalues: v16 (copy), v26 (copy), v12 (copy), v13 (copy), v14 (copy), v15 (copy), v9 (copy), v5 (copy), v24 (copy), l_GetEnableConsolePreparePaymentCheck_0 (copy), l_PreparePaymentCheck_0 (copy), v3 (copy), v7 (copy), v6 (copy), v11 (copy), l_getAppFeaturePolicies_0 (copy), v4 (copy), l_GetFStringVNGWebshopUrl_0 (copy), l_DesktopUpsellExperiment_0 (copy), l_Players_0 (copy), v17 (copy), v10 (copy), v20 (copy)
-    return v16.new(script.Name, v26, function(v27, v28) --[[ Line: 42 ]]
-        -- upvalues: v12 (ref), v13 (ref), v14 (ref), v15 (ref), v9 (ref), v5 (ref), v24 (ref), l_GetEnableConsolePreparePaymentCheck_0 (ref), l_PreparePaymentCheck_0 (ref), v3 (ref), v7 (ref), v6 (ref), v11 (ref), l_getAppFeaturePolicies_0 (ref), v4 (ref), l_GetFStringVNGWebshopUrl_0 (ref), l_DesktopUpsellExperiment_0 (ref), l_Players_0 (ref), v17 (ref), v10 (ref), v20 (ref)
-        local v29 = v28[v12];
-        local v30 = v28[v13];
-        local v31 = v28[v14];
-        local v32 = v28[v15];
-        local v33 = v27:getState();
-        local v34 = v9(v30.getPlatform());
-        local v35 = false;
-        if v34 ~= v5.Web then
-            v35 = v24.getRobuxProductId(v33);
-        end;
-        local l_productId_0 = v33.productInfo.productId;
-        if l_GetEnableConsolePreparePaymentCheck_0() and not l_PreparePaymentCheck_0(v35) then
-            v27:dispatch(v3(v7.NotEnoughRobuxNoUpsell));
-            return;
-        else
-            if v33.promptState == v6.U13PaymentModal then
-                v29.signalScaryModalConfirmed(l_productId_0, "U13PaymentModal", v35);
-            elseif v33.promptState == v6.U13MonthlyThreshold1Modal then
-                v29.signalScaryModalConfirmed(l_productId_0, "U13MonthlyThreshold1Modal", v35);
-            elseif v33.promptState == v6.U13MonthlyThreshold2Modal then
-                v29.signalScaryModalConfirmed(l_productId_0, "U13MonthlyThreshold2Modal", v35);
-            elseif v33.promptState == v6.ParentalConsentWarningPaymentModal13To17 then
-                v29.signalScaryModalConfirmed(l_productId_0, "ConfirmedParentalConsentWarningPaymentModal13To17", v35);
-            end;
-            if v33.promptState == v6.U13PaymentModal then
-                v11.Post(v31, v11.UserActionType.ConfirmedU13PaymentModal);
-            elseif v33.promptState == v6.U13MonthlyThreshold1Modal then
-                v11.Post(v31, v11.UserActionType.ConfirmedU13MonthlyThreshold1Modal);
-            elseif v33.promptState == v6.U13MonthlyThreshold2Modal then
-                v11.Post(v31, v11.UserActionType.ConfirmedU13MonthlyThreshold2Modal);
-            elseif v33.promptState == v6.ParentalConsentWarningPaymentModal13To17 then
-                v11.Post(v31, v11.UserActionType.ConfirmedParentalConsentWarningPaymentModal13To17);
-            end;
-            if v30.getFFlagDisableRobuxUpsell() then
-                v27:dispatch(v3(v7.NotEnoughRobuxNoUpsell));
-                return;
-            elseif v34 == v5.Web then
-                local l_requestType_0 = v33.requestType;
-                v29.signalProductPurchaseUpsellConfirmed(l_productId_0, l_requestType_0, v24.getProductId(v33));
-                if l_getAppFeaturePolicies_0().getRedirectBuyRobuxToVNG() then
-                    if v33.promptState == v6.LeaveRobloxWarning then
-                        v31:getVngShopUrl():andThen(function(v38) --[[ Line: 112 ]]
-                            -- upvalues: v32 (copy), v27 (copy), v4 (ref), v6 (ref)
-                            v32.openVngStore(v38.vngShopRedirectUrl);
-                            v27:dispatch(v4(v6.UpsellInProgress));
-                        end):catch(function() --[[ Line: 116 ]]
-                            -- upvalues: v32 (copy), l_GetFStringVNGWebshopUrl_0 (ref), v27 (copy), v4 (ref), v6 (ref)
-                            v32.openVngStore(l_GetFStringVNGWebshopUrl_0());
-                            v27:dispatch(v4(v6.UpsellInProgress));
-                        end);
-                        return;
-                    else
-                        v27:dispatch(v4(v6.LeaveRobloxWarning));
-                        return;
-                    end;
-                else
-                    local v39 = {
-                        analyticId = v33.purchaseFlowUUID
-                    };
-                    local v40 = l_DesktopUpsellExperiment_0.getVariant();
-                    if v40 == l_DesktopUpsellExperiment_0.variants.OpenRobuxStore then
-                        v32.openRobuxStoreWithContext(v39, v24.getProductId(v33));
-                    elseif v40 == l_DesktopUpsellExperiment_0.variants.OpenPaymentsPage then
-                        v32.openPaymentsPageWithContext(v39, v24.getProductId(v33));
-                    else
-                        v32.startRobuxUpsellWebByFlowWithContext(v39, v33.purchaseFlow, v24.getProductId(v33));
-                    end;
-                    v27:dispatch(v4(v6.UpsellInProgress));
-                    return;
-                end;
-            elseif v34 == v5.Mobile then
-                local v41 = v24.getRobuxProductId(v33);
-                local l_productId_1 = v33.productInfo.productId;
-                local l_requestType_1 = v33.requestType;
-                local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-                v29.signalProductPurchaseUpsellConfirmed(l_productId_1, l_requestType_1, v41);
-                if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
-                    v32.promptNativePurchaseWithLocalPlayer(v41);
-                else
-                    v32.promptNativePurchase(l_LocalPlayer_0, v41);
-                end;
-                v27:dispatch(v4(v6.UpsellInProgress));
-                return;
-            elseif v34 == v5.Xbox then
-                local v45 = v24.getRobuxProductId(v33);
-                local l_productId_2 = v33.productInfo.productId;
-                local l_requestType_2 = v33.requestType;
-                v29.signalProductPurchaseUpsellConfirmed(l_productId_2, l_requestType_2, v45);
-                v27:dispatch(v4(v6.UpsellInProgress));
-                return v17.new(function(v48, v49) --[[ Line: 162 ]]
-                    -- upvalues: v32 (copy), v45 (copy)
-                    local v50 = nil;
-                    local v51 = nil;
-                    local v52 = nil;
-                    local l_status_0, l_result_0 = pcall(function() --[[ Line: 168 ]]
-                        -- upvalues: v50 (ref), v32 (ref), v45 (ref)
-                        v50 = v32.beginPlatformStorePurchase(v45);
-                    end);
-                    v51 = l_status_0;
-                    v52 = l_result_0;
-                    if v51 then
-                        v48(v50);
-                    else
-                        v49(v52);
-                    end;
-                end):andThen(function(v55) --[[ Line: 177 ]]
-                    -- upvalues: v10 (ref), v29 (copy), l_productId_2 (copy), l_requestType_2 (copy), v45 (copy), v27 (copy), v20 (ref), v3 (ref), v7 (ref)
-                    if v55 == v10.PlatformPurchaseResult.PurchaseResult_Success then
-                        v29.signalXboxInGamePurchaseSuccess(l_productId_2, l_requestType_2, v45);
-                    elseif v55 == v10.PlatformPurchaseResult.PurchaseResult_UserCancelled then
-                        v29.signalXboxInGamePurchaseCanceled(l_productId_2, l_requestType_2, v45);
-                    else
-                        v29.signalXboxInGamePurchaseFailure(l_productId_2, l_requestType_2, v45);
-                    end;
-                    if v55 == v10.PlatformPurchaseResult.PurchaseResult_Success or v55 == v10.PlatformPurchaseResult.PurchaseResult_RobuxUpdated then
-                        return v27:dispatch(v20());
-                    else
-                        return v27:dispatch(v3(v7.UnknownFailure));
-                    end;
-                end);
-            elseif v34 == v5.Unavailable then
-                v27:dispatch(v3(v7.NotEnoughRobuxNoUpsell));
-                return;
-            else
-                warn("Need more Robux: platform not supported for Robux purchase");
-                return;
-            end;
-        end;
-    end);
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Players = game:GetService("Players")
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local SetPromptState = require(PurchasePrompt.Actions.SetPromptState)
+local UpsellFlow = require(PurchasePrompt.Enums.UpsellFlow)
+local PromptState = require(PurchasePrompt.Enums.PromptState)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+
+require(PurchasePrompt.Enums.PurchaseFlow)
+
+local getUpsellFlow = require(PurchasePrompt.NativeUpsell.getUpsellFlow)
+local Constants = require(PurchasePrompt.Misc.Constants)
+local postPurchaseWarningAcknowledge = require(PurchasePrompt.Network.postPurchaseWarningAcknowledge)
+local Analytics = require(PurchasePrompt.Services.Analytics)
+local ExternalSettings = require(PurchasePrompt.Services.ExternalSettings)
+local Network = require(PurchasePrompt.Services.Network)
+local PlatformInterface = require(PurchasePrompt.Services.PlatformInterface)
+local Thunk = require(PurchasePrompt.Thunk)
+local Promise = require(PurchasePrompt.Promise)
+local getAppFeaturePolicies = require(PurchasePromptParent.UniversalAppPolicy).getAppFeaturePolicies
+local GetFStringVNGWebshopUrl = require(PurchasePromptParent.SharedFlags).GetFStringVNGWebshopUrl
+local retryAfterUpsell = require(script.Parent.retryAfterUpsell)
+local IAPExperience = require(PurchasePromptParent.IAPExperience)
+local PreparePaymentCheck = IAPExperience.PreparePaymentCheck
+local GetEnableConsolePreparePaymentCheck = IAPExperience.GetEnableConsolePreparePaymentCheck
+local SelectedRobuxPackage = require(PurchasePrompt.Utils.SelectedRobuxPackage)
+local DesktopUpsellExperiment = IAPExperience.Utility.DesktopUpsellExperiment
+local t1 = {
+	Analytics,
+	ExternalSettings,
+	Network,
+	PlatformInterface
+}
+
+local function launchRobuxUpsell() -- line: 41
+	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), ExternalSettings (copy), Network (copy), PlatformInterface (copy), getUpsellFlow (copy), UpsellFlow (copy), SelectedRobuxPackage (copy), GetEnableConsolePreparePaymentCheck (copy), PreparePaymentCheck (copy), ErrorOccurred (copy), PurchaseError (copy), PromptState (copy), postPurchaseWarningAcknowledge (copy), getAppFeaturePolicies (copy), SetPromptState (copy), GetFStringVNGWebshopUrl (copy), DesktopUpsellExperiment (copy), Players (copy), Promise (copy), Constants (copy), retryAfterUpsell (copy)
+	return Thunk.new(script.Name, t1, function(p1, p2) -- line: 42
+		-- upvalues: Analytics (copy), ExternalSettings (copy), Network (copy), PlatformInterface (copy), getUpsellFlow (copy), UpsellFlow (copy), SelectedRobuxPackage (copy), GetEnableConsolePreparePaymentCheck (copy), PreparePaymentCheck (copy), ErrorOccurred (copy), PurchaseError (copy), PromptState (copy), postPurchaseWarningAcknowledge (copy), getAppFeaturePolicies (copy), SetPromptState (copy), GetFStringVNGWebshopUrl (copy), DesktopUpsellExperiment (copy), Players (copy), Promise (copy), Constants (copy), retryAfterUpsell (copy)
+		local v30 = p2[Analytics]
+		local v31 = p2[ExternalSettings]
+		local v32 = p2[Network]
+		local v33 = p2[PlatformInterface]
+		local v34 = p1:getState()
+		local v35 = getUpsellFlow(v31.getPlatform())
+		local v36 = v35 ~= UpsellFlow.Web and SelectedRobuxPackage.getRobuxProductId(v34)
+		local productId = v34.productInfo.productId
+
+		if GetEnableConsolePreparePaymentCheck() and not PreparePaymentCheck(v36) then
+			p1:dispatch(ErrorOccurred(PurchaseError.NotEnoughRobuxNoUpsell))
+
+			return
+		end
+
+		if v34.promptState == PromptState.U13PaymentModal then
+			v30.signalScaryModalConfirmed(productId, "U13PaymentModal", v36)
+		elseif v34.promptState == PromptState.U13MonthlyThreshold1Modal then
+			v30.signalScaryModalConfirmed(productId, "U13MonthlyThreshold1Modal", v36)
+		elseif v34.promptState == PromptState.U13MonthlyThreshold2Modal then
+			v30.signalScaryModalConfirmed(productId, "U13MonthlyThreshold2Modal", v36)
+		elseif v34.promptState == PromptState.ParentalConsentWarningPaymentModal13To17 then
+			v30.signalScaryModalConfirmed(productId, "ConfirmedParentalConsentWarningPaymentModal13To17", v36)
+		end
+
+		if v34.promptState == PromptState.U13PaymentModal then
+			postPurchaseWarningAcknowledge.Post(v32, postPurchaseWarningAcknowledge.UserActionType.ConfirmedU13PaymentModal)
+		elseif v34.promptState == PromptState.U13MonthlyThreshold1Modal then
+			postPurchaseWarningAcknowledge.Post(v32, postPurchaseWarningAcknowledge.UserActionType.ConfirmedU13MonthlyThreshold1Modal)
+		elseif v34.promptState == PromptState.U13MonthlyThreshold2Modal then
+			postPurchaseWarningAcknowledge.Post(v32, postPurchaseWarningAcknowledge.UserActionType.ConfirmedU13MonthlyThreshold2Modal)
+		elseif v34.promptState == PromptState.ParentalConsentWarningPaymentModal13To17 then
+			postPurchaseWarningAcknowledge.Post(v32, postPurchaseWarningAcknowledge.UserActionType.ConfirmedParentalConsentWarningPaymentModal13To17)
+		end
+
+		if v31.getFFlagDisableRobuxUpsell() then
+			p1:dispatch(ErrorOccurred(PurchaseError.NotEnoughRobuxNoUpsell))
+
+			return
+		end
+
+		if v35 == UpsellFlow.Web then
+			local requestType = v34.requestType
+
+			v30.signalProductPurchaseUpsellConfirmed(productId, requestType, SelectedRobuxPackage.getProductId(v34))
+
+			if getAppFeaturePolicies().getRedirectBuyRobuxToVNG() then
+				if v34.promptState == PromptState.LeaveRobloxWarning then
+					v32:getVngShopUrl():andThen(function(p3) -- line: 112
+						-- upvalues: v33 (copy), p1 (copy), SetPromptState (copy), PromptState (copy)
+						v33.openVngStore(p3.vngShopRedirectUrl)
+						p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+					end):catch(function() -- line: 116
+						-- upvalues: v33 (copy), GetFStringVNGWebshopUrl (copy), p1 (copy), SetPromptState (copy), PromptState (copy)
+						v33.openVngStore(GetFStringVNGWebshopUrl())
+						p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+					end)
+
+					return
+				end
+
+				p1:dispatch(SetPromptState(PromptState.LeaveRobloxWarning))
+
+				return
+			end
+
+			local t2 = {
+				analyticId = v34.purchaseFlowUUID
+			}
+			local v40 = DesktopUpsellExperiment.getVariant()
+
+			if v40 == DesktopUpsellExperiment.variants.OpenRobuxStore then
+				v33.openRobuxStoreWithContext(t2, SelectedRobuxPackage.getProductId(v34))
+			elseif v40 == DesktopUpsellExperiment.variants.OpenPaymentsPage then
+				v33.openPaymentsPageWithContext(t2, SelectedRobuxPackage.getProductId(v34))
+			else
+				v33.startRobuxUpsellWebByFlowWithContext(t2, v34.purchaseFlow, SelectedRobuxPackage.getProductId(v34))
+			end
+
+			p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+
+			return
+		end
+
+		if v35 == UpsellFlow.Mobile then
+			local v41 = SelectedRobuxPackage.getRobuxProductId(v34)
+			local productId2 = v34.productInfo.productId
+			local requestType = v34.requestType
+			local LocalPlayer = Players.LocalPlayer
+
+			v30.signalProductPurchaseUpsellConfirmed(productId2, requestType, v41)
+
+			if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
+				v33.promptNativePurchaseWithLocalPlayer(v41)
+			else
+				v33.promptNativePurchase(LocalPlayer, v41)
+			end
+
+			p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+
+			return
+		end
+
+		if v35 == UpsellFlow.Xbox then
+			local v45 = SelectedRobuxPackage.getRobuxProductId(v34)
+			local productId3 = v34.productInfo.productId
+			local requestType = v34.requestType
+
+			v30.signalProductPurchaseUpsellConfirmed(productId3, requestType, v45)
+			p1:dispatch(SetPromptState(PromptState.UpsellInProgress))
+
+			return Promise.new(function(resolve, reject) -- line: 162
+				-- upvalues: v33 (copy), v45 (copy)
+				local u51 = nil
+				local ok, result = pcall(function() -- line: 168
+					-- upvalues: u51 (ref), v33 (copy), v45 (copy)
+					u51 = v33.beginPlatformStorePurchase(v45)
+				end)
+
+				if ok then
+					resolve(u51)
+				else
+					reject(result)
+				end
+			end):andThen(function(p4) -- line: 177
+				-- upvalues: Constants (copy), v30 (copy), productId3 (copy), requestType (copy), v45 (copy), p1 (copy), retryAfterUpsell (copy), ErrorOccurred (copy), PurchaseError (copy)
+				if p4 == Constants.PlatformPurchaseResult.PurchaseResult_Success then
+					v30.signalXboxInGamePurchaseSuccess(productId3, requestType, v45)
+				elseif p4 == Constants.PlatformPurchaseResult.PurchaseResult_UserCancelled then
+					v30.signalXboxInGamePurchaseCanceled(productId3, requestType, v45)
+				else
+					v30.signalXboxInGamePurchaseFailure(productId3, requestType, v45)
+				end
+
+				if p4 == Constants.PlatformPurchaseResult.PurchaseResult_Success or p4 == Constants.PlatformPurchaseResult.PurchaseResult_RobuxUpdated then
+					return p1:dispatch(retryAfterUpsell())
+				end
+
+				return p1:dispatch(ErrorOccurred(PurchaseError.UnknownFailure))
+			end)
+		end
+
+		if v35 == UpsellFlow.Unavailable then
+			p1:dispatch(ErrorOccurred(PurchaseError.NotEnoughRobuxNoUpsell))
+
+			return
+		end
+
+		warn("Need more Robux: platform not supported for Robux purchase")
+	end)
+end
+
+return launchRobuxUpsell

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAvatarSortInDiscoveryUnifiedPurchase", false);
+return game:DefineFastFlag("AXAvatarSortInDiscoveryUnifiedPurchase", false)

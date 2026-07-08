@@ -1,3 +1,3 @@
 return {
-    ProfileSharePolicyEnum = require(script.ProfileSharePolicyEnum)
-};
+	ProfileSharePolicyEnum = require(script.ProfileSharePolicyEnum)
+}

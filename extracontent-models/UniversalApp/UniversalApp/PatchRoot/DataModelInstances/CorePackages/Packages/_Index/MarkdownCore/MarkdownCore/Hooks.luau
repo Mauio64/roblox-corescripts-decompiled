@@ -1,3 +1,3 @@
 return {
-    useStudioThemeColors = require(script.useStudioThemeColors)
-};
+	useStudioThemeColors = require(script.useStudioThemeColors)
+}

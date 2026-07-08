@@ -1,26 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local l_DynamicHead_0 = require(l_script_FirstAncestor_0.Constants).ASSET_TYPE_NAME_TO_ID_STRING.DynamicHead;
-local v2 = game:DefineFastFlag("AXDHEquippedAssetsNilCheck", false);
-return function(v3) --[[ Line: 7 ]] --[[ Name: selectHasDynamicHead ]]
-    -- upvalues: v2 (copy), l_DynamicHead_0 (copy)
-    local l_EquippedAssets_0 = v3.AvatarExperience.AvatarEditor.Character.EquippedAssets;
-    if v2 and not l_EquippedAssets_0 then
-        return false;
-    else
-        local v5 = l_EquippedAssets_0[l_DynamicHead_0];
-        if v5 then
-            for _ in v5 do
-                return true;
-            end;
-        end;
-        local v7 = v3.AvatarExperience.AvatarScene.OutfitTryOn and v3.AvatarExperience.AvatarScene.OutfitTryOn.TryOnItems;
-        if v7 then
-            for _, v9 in v7 do
-                if v9.assetType == l_DynamicHead_0 then
-                    return true;
-                end;
-            end;
-        end;
-        return false;
-    end;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local DynamicHead = require(AvatarExperienceCommon.Constants).ASSET_TYPE_NAME_TO_ID_STRING.DynamicHead
+local v3 = game:DefineFastFlag("AXDHEquippedAssetsNilCheck", false)
+
+local function selectHasDynamicHead(p1) -- line: 7
+	-- upvalues: v3 (copy), DynamicHead (copy)
+	local EquippedAssets = p1.AvatarExperience.AvatarEditor.Character.EquippedAssets
+
+	if v3 and not EquippedAssets then
+		return false
+	end
+
+	local v7 = EquippedAssets[DynamicHead]
+
+	if v7 then
+		for _ in v7 do
+			return true
+		end
+	end
+
+	local v9 = p1.AvatarExperience.AvatarScene.OutfitTryOn and p1.AvatarExperience.AvatarScene.OutfitTryOn.TryOnItems
+
+	if v9 then
+		for _, v11 in v9 do
+			if v11.assetType == DynamicHead then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+return selectHasDynamicHead

@@ -1,19 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_useSelector_0 = v1.RoactUtils.Hooks.RoactRodux.useSelector;
-local l_GetFFlagEnableCrossExpVoice_0 = v1.SharedFlags.GetFFlagEnableCrossExpVoice;
-return function(v4, v5) --[[ Line: 8 ]]
-    -- upvalues: l_GetFFlagEnableCrossExpVoice_0 (copy), l_useSelector_0 (copy)
-    if not l_GetFFlagEnableCrossExpVoice_0() then
-        return nil;
-    else
-        return l_useSelector_0(function(v6) --[[ Line: 12 ]]
-            -- upvalues: v4 (copy), v5 (copy)
-            if v6 and v6.Squad and v6.Squad.CrossExperienceVoice then
-                return v6.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds[v4] == true ~= (v6.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds[v5] == true);
-            else
-                return nil;
-            end;
-        end);
-    end;
-end;
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local useSelector = dependencies.RoactUtils.Hooks.RoactRodux.useSelector
+local GetFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
+
+return function(n1: number, n2: number) -- line: 8
+	-- upvalues: GetFFlagEnableCrossExpVoice (copy), useSelector (copy)
+	if not GetFFlagEnableCrossExpVoice() then
+		return nil
+	end
+
+	return useSelector(function(p1) -- line: 12
+		-- upvalues: n1 (copy), n2 (copy)
+		if p1 and (p1.Squad and p1.Squad.CrossExperienceVoice) then
+			return p1.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds[n1] == true ~= (p1.Squad.CrossExperienceVoice.Participants.publicVoiceFocusedUserIds[n2] == true)
+		end
+
+		return nil
+	end)
+end

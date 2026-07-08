@@ -1,18 +1,19 @@
-local l_networkRequests_0 = script.Parent.networkRequests;
-local v1 = require(l_networkRequests_0.createGetSkinnyUsersFromUserIds);
-local v2 = require(l_networkRequests_0.createGetUsernameHistoryFromUserId);
-local v3 = require(l_networkRequests_0.createGetUserV2FromUserId);
-local v4 = require(l_networkRequests_0.createGetDisplayNameValidation);
-local v5 = require(l_networkRequests_0.createSetDisplayName);
-local v6 = require(l_networkRequests_0.createSetDescription);
-return function(v7) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy)
-    return {
-        GetSkinnyUsersFromUserIds = v1(v7), 
-        GetUsernameHistoryFromUserId = v2(v7), 
-        GetUserV2FromUserId = v3(v7), 
-        GetDisplayNameValidation = v4(v7), 
-        SetDisplayName = v5(v7), 
-        SetDescription = v6(v7)
-    };
-end;
+local networkRequests = script.Parent.networkRequests
+local createGetSkinnyUsersFromUserIds = require(networkRequests.createGetSkinnyUsersFromUserIds)
+local createGetUsernameHistoryFromUserId = require(networkRequests.createGetUsernameHistoryFromUserId)
+local createGetUserV2FromUserId = require(networkRequests.createGetUserV2FromUserId)
+local createGetDisplayNameValidation = require(networkRequests.createGetDisplayNameValidation)
+local createSetDisplayName = require(networkRequests.createSetDisplayName)
+local createSetDescription = require(networkRequests.createSetDescription)
+
+return function(p1) -- line: 9
+	-- upvalues: createGetSkinnyUsersFromUserIds (copy), createGetUsernameHistoryFromUserId (copy), createGetUserV2FromUserId (copy), createGetDisplayNameValidation (copy), createSetDisplayName (copy), createSetDescription (copy)
+	return {
+		GetSkinnyUsersFromUserIds = createGetSkinnyUsersFromUserIds(p1),
+		GetUsernameHistoryFromUserId = createGetUsernameHistoryFromUserId(p1),
+		GetUserV2FromUserId = createGetUserV2FromUserId(p1),
+		GetDisplayNameValidation = createGetDisplayNameValidation(p1),
+		SetDisplayName = createSetDisplayName(p1),
+		SetDescription = createSetDescription(p1)
+	}
+end

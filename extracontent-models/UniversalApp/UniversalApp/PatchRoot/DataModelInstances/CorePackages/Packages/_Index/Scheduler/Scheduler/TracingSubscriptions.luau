@@ -1,126 +1,149 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v3 = require(script.Parent.Tracing);
-local l_enableSchedulerTracing_0 = require(l_Parent_0.Shared).ReactFeatureFlags.enableSchedulerTracing;
-local l___subscriberRef_0 = v3.__subscriberRef;
-local v6 = {};
-if l_enableSchedulerTracing_0 then
-    v6 = {};
-end;
-v0.unstable_subscribe = function(v7) --[[ Line: 30 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v6 (ref), l_Object_0 (copy), l___subscriberRef_0 (copy)
-    if l_enableSchedulerTracing_0 then
-        v6[v7] = true;
-        if #l_Object_0.keys(v6) == 1 then
-            l___subscriberRef_0.current = {
-                onInteractionScheduledWorkCompleted = onInteractionScheduledWorkCompleted, 
-                onInteractionTraced = onInteractionTraced, 
-                onWorkCanceled = onWorkCanceled, 
-                onWorkScheduled = onWorkScheduled, 
-                onWorkStarted = onWorkStarted, 
-                onWorkStopped = onWorkStopped
-            };
-        end;
-    end;
-end;
-v0.unstable_unsubscribe = function(v8) --[[ Line: 47 ]]
-    -- upvalues: l_enableSchedulerTracing_0 (copy), v6 (ref), l_Object_0 (copy), l___subscriberRef_0 (copy)
-    if l_enableSchedulerTracing_0 then
-        v6[v8] = nil;
-        if #l_Object_0.keys(v6) == 0 then
-            l___subscriberRef_0.current = nil;
-        end;
-    end;
-end;
-onInteractionTraced = function(v9) --[[ Line: 57 ]] --[[ Name: onInteractionTraced ]]
-    -- upvalues: v6 (ref)
-    local v10 = false;
-    local v11 = nil;
-    for v12, _ in v6 do
-        local l_status_0, l_result_0 = pcall(v12.onInteractionTraced, v9);
-        if not l_status_0 and not v10 then
-            v10 = true;
-            v11 = l_result_0;
-        end;
-    end;
-    if v10 then
-        error(v11);
-    end;
-end;
-onInteractionScheduledWorkCompleted = function(v16) --[[ Line: 79 ]] --[[ Name: onInteractionScheduledWorkCompleted ]]
-    -- upvalues: v6 (ref)
-    local v17 = false;
-    local v18 = nil;
-    for v19, _ in v6 do
-        local l_status_1, l_result_1 = pcall(v19.onInteractionScheduledWorkCompleted, v16);
-        if not l_status_1 and not v17 then
-            v17 = true;
-            v18 = l_result_1;
-        end;
-    end;
-    if v17 then
-        error(v18);
-    end;
-end;
-onWorkScheduled = function(v23, v24) --[[ Line: 102 ]] --[[ Name: onWorkScheduled ]]
-    -- upvalues: v6 (ref)
-    local v25 = false;
-    local v26 = nil;
-    for v27, _ in v6 do
-        local l_status_2, l_result_2 = pcall(v27.onWorkScheduled, v23, v24);
-        if not l_status_2 and not v25 then
-            v25 = true;
-            v26 = l_result_2;
-        end;
-    end;
-    if v25 then
-        error(v26);
-    end;
-end;
-onWorkStarted = function(v31, v32) --[[ Line: 124 ]] --[[ Name: onWorkStarted ]]
-    -- upvalues: v6 (ref)
-    local v33 = false;
-    local v34 = nil;
-    for v35, _ in v6 do
-        local l_status_3, l_result_3 = pcall(v35.onWorkStarted, v31, v32);
-        if not l_status_3 and not v33 then
-            v33 = true;
-            v34 = l_result_3;
-        end;
-    end;
-    if v33 then
-        error(v34);
-    end;
-end;
-onWorkStopped = function(v39, v40) --[[ Line: 146 ]] --[[ Name: onWorkStopped ]]
-    -- upvalues: v6 (ref)
-    local v41 = false;
-    local v42 = nil;
-    for v43, _ in v6 do
-        local l_status_4, l_result_4 = pcall(v43.onWorkStopped, v39, v40);
-        if not l_status_4 and not v41 then
-            v41 = true;
-            v42 = l_result_4;
-        end;
-    end;
-    if v41 then
-        error(v42);
-    end;
-end;
-onWorkCanceled = function(v47, v48) --[[ Line: 168 ]] --[[ Name: onWorkCanceled ]]
-    -- upvalues: v6 (ref)
-    local v49 = false;
-    local v50 = nil;
-    for v51, _ in v6 do
-        local l_status_5, l_result_5 = pcall(v51.onWorkCanceled, v47, v48);
-        if not l_status_5 and not v49 then
-            v49 = true;
-            v50 = l_result_5;
-        end;
-    end;
-    if v49 then
-        error(v50);
-    end;
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local Tracing = require(script.Parent.Tracing)
+local enableSchedulerTracing = require(ParentParent.Shared).ReactFeatureFlags.enableSchedulerTracing
+local __subscriberRef = Tracing.__subscriberRef
+local t2 = {}
+
+if enableSchedulerTracing then
+	t2 = {}
+end
+
+function t1.unstable_subscribe(p1) -- line: 30
+	-- upvalues: enableSchedulerTracing (copy), t2 (ref), Object (copy), __subscriberRef (copy)
+	if enableSchedulerTracing then
+		t2[p1] = true
+
+		if #Object.keys(t2) == 1 then
+			__subscriberRef.current = {
+				onInteractionScheduledWorkCompleted = onInteractionScheduledWorkCompleted,
+				onInteractionTraced = onInteractionTraced,
+				onWorkCanceled = onWorkCanceled,
+				onWorkScheduled = onWorkScheduled,
+				onWorkStarted = onWorkStarted,
+				onWorkStopped = onWorkStopped
+			}
+		end
+	end
+end
+function t1.unstable_unsubscribe(p2) -- line: 47
+	-- upvalues: enableSchedulerTracing (copy), t2 (ref), Object (copy), __subscriberRef (copy)
+	if enableSchedulerTracing then
+		t2[p2] = nil
+
+		if #Object.keys(t2) == 0 then
+			__subscriberRef.current = nil
+		end
+	end
+end
+function onInteractionTraced(p3) -- line: 57
+	-- upvalues: t2 (ref)
+	local v11 = false
+	local v12 = nil
+
+	for v13, _ in t2 do
+		local ok, result = pcall(v13.onInteractionTraced, p3)
+
+		if not ok and not v11 then
+			v11 = true
+			v12 = result
+		end
+	end
+
+	if v11 then
+		error(v12)
+	end
+end
+function onInteractionScheduledWorkCompleted(p4) -- line: 79
+	-- upvalues: t2 (ref)
+	local v18 = false
+	local v19 = nil
+
+	for v20, _ in t2 do
+		local ok, result = pcall(v20.onInteractionScheduledWorkCompleted, p4)
+
+		if not ok and not v18 then
+			v18 = true
+			v19 = result
+		end
+	end
+
+	if v18 then
+		error(v19)
+	end
+end
+function onWorkScheduled(t3: {[any]: any}, n1: number) -- line: 102
+	-- upvalues: t2 (ref)
+	local v26 = false
+	local v27 = nil
+
+	for v28, _ in t2 do
+		local ok, result = pcall(v28.onWorkScheduled, t3, n1)
+
+		if not ok and not v26 then
+			v26 = true
+			v27 = result
+		end
+	end
+
+	if v26 then
+		error(v27)
+	end
+end
+function onWorkStarted(t4: {[any]: any}, n2: number) -- line: 124
+	-- upvalues: t2 (ref)
+	local v34 = false
+	local v35 = nil
+
+	for v36, _ in t2 do
+		local ok, result = pcall(v36.onWorkStarted, t4, n2)
+
+		if not ok and not v34 then
+			v34 = true
+			v35 = result
+		end
+	end
+
+	if v34 then
+		error(v35)
+	end
+end
+function onWorkStopped(t5: {[any]: any}, n3: number) -- line: 146
+	-- upvalues: t2 (ref)
+	local v42 = false
+	local v43 = nil
+
+	for v44, _ in t2 do
+		local ok, result = pcall(v44.onWorkStopped, t5, n3)
+
+		if not ok and not v42 then
+			v42 = true
+			v43 = result
+		end
+	end
+
+	if v42 then
+		error(v43)
+	end
+end
+function onWorkCanceled(t6: {[any]: any}, n4: number) -- line: 168
+	-- upvalues: t2 (ref)
+	local v50 = false
+	local v51 = nil
+
+	for v52, _ in t2 do
+		local ok, result = pcall(v52.onWorkCanceled, t6, n4)
+
+		if not ok and not v50 then
+			v50 = true
+			v51 = result
+		end
+	end
+
+	if v50 then
+		error(v51)
+	end
+end
+
+return t1

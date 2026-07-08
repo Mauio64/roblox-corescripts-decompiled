@@ -1,34 +1,35 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Foundation);
-local v5 = require(l_Parent_1.ReactRoblox);
-local l_Localization_0 = require(l_Parent_1.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_1.Localization).LocalizationProvider;
-local v8 = require(l_Parent_0.Context.KeybindContextProvider);
-local v9 = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId);
-local l_FoundationProvider_0 = v4.FoundationProvider;
+local LocalizationService = game:GetService("LocalizationService")
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local React = require(scriptParentParent.React)
+local Foundation = require(scriptParentParent.Foundation)
+local ReactRoblox = require(scriptParentParent.ReactRoblox)
+local Localization = require(scriptParentParent.InExperienceLocales).Localization
+local LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider
+local KeybindContextProvider = require(scriptParent.Context.KeybindContextProvider)
+local v10 = Localization.new(LocalizationService.RobloxLocaleId)
+local FoundationProvider = Foundation.FoundationProvider
+
+local function StoryBookMapStory(p1) -- line: 19
+	-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), KeybindContextProvider (copy), FoundationProvider (copy), Foundation (copy)
+	return function(p2) -- line: 20
+		-- upvalues: React (copy), LocalizationProvider (copy), v10 (copy), KeybindContextProvider (copy), FoundationProvider (copy), Foundation (copy), p1 (copy)
+		return React.createElement(LocalizationProvider, {
+			localization = v10
+		}, {
+			KeybindContextProvider = React.createElement(KeybindContextProvider, nil, {
+				FoundationProvider = React.createElement(FoundationProvider, {
+					theme = Foundation.Enums.Theme.Dark
+				}, { React.createElement(p1, p2) })
+			})
+		})
+	end
+end
+
 return {
-    name = l_Parent_0.Name, 
-    storyRoot = l_Parent_0, 
-    roact = v3, 
-    reactRoblox = v5, 
-    mapStory = function(v11) --[[ Line: 19 ]] --[[ Name: StoryBookMapStory ]]
-        -- upvalues: v3 (copy), l_LocalizationProvider_0 (copy), v9 (copy), v8 (copy), l_FoundationProvider_0 (copy), v4 (copy)
-        return function(v12) --[[ Line: 20 ]]
-            -- upvalues: v3 (ref), l_LocalizationProvider_0 (ref), v9 (ref), v8 (ref), l_FoundationProvider_0 (ref), v4 (ref), v11 (copy)
-            return v3.createElement(l_LocalizationProvider_0, {
-                localization = v9
-            }, {
-                KeybindContextProvider = v3.createElement(v8, nil, {
-                    FoundationProvider = v3.createElement(l_FoundationProvider_0, {
-                        theme = v4.Enums.Theme.Dark
-                    }, {
-                        v3.createElement(v11, v12)
-                    })
-                })
-            });
-        end;
-    end
-};
+	name = scriptParent.Name,
+	storyRoot = scriptParent,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = StoryBookMapStory
+}

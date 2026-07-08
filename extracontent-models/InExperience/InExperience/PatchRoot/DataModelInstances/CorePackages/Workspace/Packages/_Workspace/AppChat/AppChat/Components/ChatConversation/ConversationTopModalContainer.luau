@@ -1,94 +1,100 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v3 = require(l_Parent_0.Foundation);
-local _ = require(l_script_FirstAncestor_0.types);
-local v5 = require(l_Parent_0.Cryo);
-local v6 = require(l_Parent_0.React);
-local v7 = require(l_Parent_0.AppChatNetworking);
-local l_ConversationTopModal_0 = v7.Constants.ConversationTopModal;
-local v9 = require(l_script_FirstAncestor_0.Models.ModalConfiguration);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v11 = require(l_script_FirstAncestor_0.Utils.getDeepValue2);
-local v12 = require(l_script_FirstAncestor_0.Hooks.useRecordModalSeenWithDelay);
-local l_ModalSequence_0 = v7.Constants.ModalSequence;
-local v14 = require(l_script_FirstAncestor_0.Hooks.useRecordModalSequenceResponseForConversation);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local v16 = require(l_script_FirstAncestor_0.Conversations.Actions.DismissedChatModal);
-local v17 = require(l_script_FirstAncestor_0.Hooks.useIsGuiInChatVisible);
-local v18 = require(script.Parent.ConversationBanner.ConversationBannerContainer);
-local v19 = require(l_script_FirstAncestor_0.Flags.FIntAppChatModalSeenImpressionDelayMs);
-local v21 = {
-    setModalHeight = function(_) --[[ Line: 34 ]] --[[ Name: setModalHeight ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local v3 = require(AppChat.Logger):new(script.Name)
+local Foundation = require(AppChatParent.Foundation)
 
-    end
-};
-local v22 = {
-    [l_ConversationTopModal_0.AddTrustedConnection] = v18, 
-    [l_ConversationTopModal_0.TrustedConnectionRequest] = v18
-};
-return v6.memo(function(v23) --[[ Line: 43 ]] --[[ Name: ConversationTopModalContainer ]]
-    -- upvalues: v5 (copy), v21 (copy), l_useSelector_0 (copy), v11 (copy), v9 (copy), v22 (copy), l_useDispatch_0 (copy), v14 (copy), v6 (copy), v17 (copy), v12 (copy), l_ModalSequence_0 (copy), v19 (copy), v2 (copy), v16 (copy), v7 (copy), l_ConversationTopModal_0 (copy), v3 (copy)
-    local v24 = v5.Dictionary.union(v21, v23);
-    local v26 = l_useSelector_0(function(v25) --[[ Line: 46 ]]
-        -- upvalues: v11 (ref), v24 (copy), v9 (ref)
-        return v11(v25, (("ChatAppReducer.Modals.conversationTopModals.%*"):format(v24.conversationId))) or v9.default;
-    end);
-    local l_modal_layout_0 = v26.modal_layout;
-    local v28 = v22[v26.modal_variant];
-    local v29 = l_useDispatch_0();
-    local v30 = v14(v24.conversationId);
-    local v31 = v6.useRef(nil);
-    local v32 = v17(v31, {
-        v31.current, 
-        v28
-    });
-    v12({
-        modalSequence = l_ModalSequence_0.ConversationTopModal, 
-        modalVariant = v26.modal_variant, 
-        actionToRecord = l_modal_layout_0.seen_record_action, 
-        delayMs = v19, 
-        canRecordAction = v32 and v28 ~= nil, 
-        conversationId = v24.conversationId
-    });
-    local v34 = v6.useCallback(function() --[[ Line: 68 ]]
-        -- upvalues: v30 (copy), v26 (copy), l_ModalSequence_0 (ref), v2 (ref), v29 (copy), v16 (ref), v7 (ref), v24 (copy)
-        v30(v26.modal_layout.dismissed_record_action, l_ModalSequence_0.ConversationTopModal, nil, v26.modal_variant):catch(function(v33) --[[ Line: 74 ]]
-            -- upvalues: v2 (ref), v26 (ref)
-            v2:warning((("Error in ConversationOverlayContainer %* -> RecordModalSequenceResponse: %*"):format(v26.modal_layout.id, (tostring(v33)))));
-        end);
-        v29(v16(v7.Constants.ModalSequence.ConversationTopModal, v24.conversationId));
-    end, {
-        v24.conversationId, 
-        v26.modal_layout.dismissed_record_action, 
-        v26.modal_variant, 
-        v30, 
-        v29
-    });
-    local v36 = v6.useCallback(function(v35) --[[ Line: 94 ]]
-        -- upvalues: v24 (copy)
-        v24.setModalHeight(v35.AbsoluteSize.Y);
-    end, {
-        v24.setModalHeight
-    });
-    local v37 = nil;
-    if v28 then
-        v37 = v6.createElement(v28, {
-            conversationId = v24.conversationId, 
-            modalVariant = v26.modal_variant, 
-            onDismissed = v34, 
-            bodyText = l_modal_layout_0.body and l_modal_layout_0.body.text, 
-            actionText = l_modal_layout_0.buttons and l_modal_layout_0.buttons[1] and l_modal_layout_0.buttons[1].text
-        });
-    elseif v26.modal_variant ~= nil and v26.modal_variant ~= l_ConversationTopModal_0.None then
-        v2:warning((("Unsupported ConversationTopModal variant: %*"):format(v26.modal_variant)));
-    end;
-    return v6.createElement(v3.View, {
-        LayoutOrder = v24.layoutOrder, 
-        onAbsoluteSizeChanged = v36, 
-        ref = v31, 
-        tag = "gui-objects-default auto-y size-full-0"
-    }, {
-        conversationTopModal = v37
-    });
-end);
+require(AppChat.types)
+
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local ConversationTopModal = AppChatNetworking.Constants.ConversationTopModal
+local ModalConfiguration = require(AppChat.Models.ModalConfiguration)
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+local useRecordModalSeenWithDelay = require(AppChat.Hooks.useRecordModalSeenWithDelay)
+local ModalSequence = AppChatNetworking.Constants.ModalSequence
+local useRecordModalSequenceResponseForConversation = require(AppChat.Hooks.useRecordModalSequenceResponseForConversation)
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local DismissedChatModal = require(AppChat.Conversations.Actions.DismissedChatModal)
+local useIsGuiInChatVisible = require(AppChat.Hooks.useIsGuiInChatVisible)
+local ConversationBannerContainer = require(script.Parent.ConversationBanner.ConversationBannerContainer)
+local FIntAppChatModalSeenImpressionDelayMs = require(AppChat.Flags.FIntAppChatModalSeenImpressionDelayMs)
+local t1 = {
+	setModalHeight = function(_) -- line: 34
+	end
+}
+local t2 = {
+	[ConversationTopModal.AddTrustedConnection] = ConversationBannerContainer,
+	[ConversationTopModal.TrustedConnectionRequest] = ConversationBannerContainer
+}
+
+local function ConversationTopModalContainer(t3: {[any]: any}) -- line: 43
+	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), getDeepValue2 (copy), ModalConfiguration (copy), t2 (copy), useDispatch (copy), useRecordModalSequenceResponseForConversation (copy), React (copy), useIsGuiInChatVisible (copy), useRecordModalSeenWithDelay (copy), ModalSequence (copy), FIntAppChatModalSeenImpressionDelayMs (copy), v3 (copy), DismissedChatModal (copy), AppChatNetworking (copy), ConversationTopModal (copy), Foundation (copy)
+	local v25 = Cryo.Dictionary.union(t1, t3)
+	local v26 = useSelector(function(p2) -- line: 46
+		-- upvalues: getDeepValue2 (copy), v25 (copy), ModalConfiguration (copy)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationTopModals.{ v25.conversationId }`) or ModalConfiguration.default
+	end)
+	local modal_layout = v26.modal_layout
+	local v28 = t2[v26.modal_variant]
+	local v29 = useDispatch()
+	local v30 = useRecordModalSequenceResponseForConversation(v25.conversationId)
+	local v31 = React.useRef(nil)
+	local v32 = useIsGuiInChatVisible(v31, {
+		v31.current,
+		v28
+	})
+
+	useRecordModalSeenWithDelay({
+		modalSequence = ModalSequence.ConversationTopModal,
+		modalVariant = v26.modal_variant,
+		actionToRecord = modal_layout.seen_record_action,
+		delayMs = FIntAppChatModalSeenImpressionDelayMs,
+		canRecordAction = v32 and v28 ~= nil,
+		conversationId = v25.conversationId
+	})
+
+	local v33 = React.useCallback(function() -- line: 68
+		-- upvalues: v30 (copy), v26 (copy), ModalSequence (copy), v3 (copy), v29 (copy), DismissedChatModal (copy), AppChatNetworking (copy), v25 (copy)
+		v30(v26.modal_layout.dismissed_record_action, ModalSequence.ConversationTopModal, nil, v26.modal_variant):catch(function(p3) -- line: 74
+			-- upvalues: v3 (copy), v26 (copy)
+			v3:warning(`Error in ConversationOverlayContainer { v26.modal_layout.id } -> RecordModalSequenceResponse: { tostring(p3) }`)
+		end)
+		v29(DismissedChatModal(AppChatNetworking.Constants.ModalSequence.ConversationTopModal, v25.conversationId))
+	end, {
+		v25.conversationId,
+		v26.modal_layout.dismissed_record_action,
+		v26.modal_variant,
+		v30,
+		v29
+	})
+	local v34 = React.useCallback(function(p4) -- line: 94
+		-- upvalues: v25 (copy)
+		v25.setModalHeight(p4.AbsoluteSize.Y)
+	end, { v25.setModalHeight })
+	local v35 = nil
+
+	if v28 then
+		v35 = React.createElement(v28, {
+			conversationId = v25.conversationId,
+			modalVariant = v26.modal_variant,
+			onDismissed = v33,
+			bodyText = modal_layout.body and modal_layout.body.text,
+			actionText = modal_layout.buttons and (modal_layout.buttons[1] and modal_layout.buttons[1].text)
+		})
+	elseif v26.modal_variant ~= nil and v26.modal_variant ~= ConversationTopModal.None then
+		v3:warning(`Unsupported ConversationTopModal variant: { v26.modal_variant }`)
+	end
+
+	return React.createElement(Foundation.View, {
+		tag = "gui-objects-default auto-y size-full-0",
+		LayoutOrder = v25.layoutOrder,
+		onAbsoluteSizeChanged = v34,
+		ref = v31
+	}, {
+		conversationTopModal = v35
+	})
+end
+
+return React.memo(ConversationTopModalContainer)

@@ -1,80 +1,101 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.UIBlox);
-local l_ImageSetLabel_0 = v2.Core.ImageSet.ImageSetLabel;
-local l_Images_0 = v2.App.ImageSet.Images;
-local v5 = require(l_Parent_0.React);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v8 = require(l_script_FirstAncestor_0.Common.Constants);
-local l_DisplayBackground_0 = require(l_Parent_0.EditProfileBackground).DisplayBackground;
-local v10 = require(l_script_FirstAncestor_0.Common.Enums);
-local v11 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local l_FFlagProfilePlatformNewProfileHeader_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformNewProfileHeader;
-local l_FFlagPPVBackgroundUse2DAsLoadingState_0 = require(l_Parent_0.SharedFlags).FFlagPPVBackgroundUse2DAsLoadingState;
-local l_FFlagPPVEnable3DBackground_0 = require(l_Parent_0.SharedFlags).FFlagPPVEnable3DBackground;
-return function(v15) --[[ Line: 31 ]] --[[ Name: UserProfileAvatar ]]
-    -- upvalues: l_useStyle_0 (copy), v11 (copy), v10 (copy), l_FFlagPPVEnable3DBackground_0 (copy), l_FFlagProfilePlatformNewProfileHeader_0 (copy), v8 (copy), v5 (copy), l_View_0 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy), l_DisplayBackground_0 (copy), l_FFlagPPVBackgroundUse2DAsLoadingState_0 (copy)
-    local v16 = l_useStyle_0();
-    local v17 = v11(v10.Components.ProfileBackground);
-    local v18 = if l_FFlagPPVEnable3DBackground_0 then v17 and v17.assetId or -1 else nil;
-    local v19 = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 1), 
-        NumberSequenceKeypoint.new(0.25, 0.75), 
-        NumberSequenceKeypoint.new(0.55, 0.4), 
-        NumberSequenceKeypoint.new(0.8, 0.15), 
-        NumberSequenceKeypoint.new(1, 0)
-    });
-    local v20 = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 1), 
-        NumberSequenceKeypoint.new(1, 0)
-    });
-    local v21 = if l_FFlagProfilePlatformNewProfileHeader_0 and v15.height then v15.height else v8.USER_PROFILE_HEADER_HEIGHT;
-    return v5.createElement(if l_FFlagProfilePlatformNewProfileHeader_0 then l_View_0 else v5.Fragment, {
-        Size = if l_FFlagProfilePlatformNewProfileHeader_0 then UDim2.new(1, 0, 0, v21) else nil
-    }, {
-        Background = if l_FFlagPPVEnable3DBackground_0 then nil else v5.createElement(l_ImageSetLabel_0, {
-            Size = UDim2.fromScale(1, 1), 
-            BorderSizePixel = 0, 
-            Image = l_Images_0[v16.Theme.PlayerBackgroundDefault.Image], 
-            ZIndex = 1
-        }), 
-        AvatarThumbnail = v5.createElement(l_DisplayBackground_0, {
-            height = v21, 
-            currentBackgroundId = v18, 
-            userId = v15.userId, 
-            userThumbnail = if l_FFlagPPVBackgroundUse2DAsLoadingState_0 then v15.userThumbnail else nil
-        }), 
-        TopGradient = if not not l_FFlagPPVEnable3DBackground_0 or l_FFlagProfilePlatformNewProfileHeader_0 then nil else v5.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, v8.USER_PROFILE_GRADIENT_HEIGHT), 
-            Position = UDim2.fromScale(0, 0), 
-            BackgroundColor3 = v16.Theme.BackgroundDefault.Color, 
-            BorderSizePixel = 0, 
-            ZIndex = 3
-        }, {
-            UIGradient = v5.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0), 
-                    NumberSequenceKeypoint.new(1, 1)
-                })
-            })
-        }), 
-        BottomGradient = v5.createElement("Frame", {
-            Size = if l_FFlagProfilePlatformNewProfileHeader_0 then UDim2.new(1, 0, 0, v8.USER_PROFILE_GRADIENT_HEIGHT) else UDim2.new(1, 0, 0, v21 / 2), 
-            Position = UDim2.fromScale(0, 1), 
-            AnchorPoint = Vector2.new(0, 1), 
-            BackgroundColor3 = v16.Theme.BackgroundDefault.Color, 
-            BorderSizePixel = 0, 
-            ZIndex = 3
-        }, {
-            UIGradient = v5.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = if l_FFlagPPVEnable3DBackground_0 then v19 else v20
-            })
-        }), 
-        CornerRadius = if l_FFlagProfilePlatformNewProfileHeader_0 and v15.isPeekView then v5.createElement("UICorner", {
-            CornerRadius = UDim.new(0, 8)
-        }) else nil
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local UIBlox = require(ProfilePlatformParent.UIBlox)
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local Images = UIBlox.App.ImageSet.Images
+local React = require(ProfilePlatformParent.React)
+local useStyle = UIBlox.Core.Style.useStyle
+local useStyleMetadata = UIBlox.Core.Style.useStyleMetadata
+local Foundation = require(ProfilePlatformParent.Foundation)
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local Constants = require(ProfilePlatform.Common.Constants)
+local DisplayBackground = require(ProfilePlatformParent.EditProfileBackground).DisplayBackground
+local Enums = require(ProfilePlatform.Common.Enums)
+local useAvatarBackgroundFromWrapper = require(ProfilePlatform.Hooks.useAvatarBackgroundFromWrapper)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
+local FFlagPPVBackgroundUse2DAsLoadingState = require(ProfilePlatformParent.SharedFlags).FFlagPPVBackgroundUse2DAsLoadingState
+local FFlagPPVEnable3DBackground = require(ProfilePlatformParent.SharedFlags).FFlagPPVEnable3DBackground
+local FFlagProfilePlatformEnableAvatarBackground = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableAvatarBackground
+
+local function UserProfileAvatar(t1: {[any]: any}) -- line: 36
+	-- upvalues: useStyle (copy), useStyleMetadata (copy), useProfileJsonComponent (copy), Enums (copy), FFlagPPVEnable3DBackground (copy), FFlagProfilePlatformEnableAvatarBackground (copy), useAvatarBackgroundFromWrapper (copy), FFlagProfilePlatformNewProfileHeader (copy), Constants (copy), React (copy), FoundationImage (copy), ImageSetLabel (copy), Images (copy), View (copy), DisplayBackground (copy), FFlagPPVBackgroundUse2DAsLoadingState (copy)
+	local v23 = useStyle()
+	local v24 = useStyleMetadata()
+	local v25 = useProfileJsonComponent(Enums.Components.ProfileBackground)
+	local v26 = if FFlagPPVEnable3DBackground or not FFlagProfilePlatformEnableAvatarBackground then nil else useAvatarBackgroundFromWrapper()
+	local v27 = if not FFlagPPVEnable3DBackground then nil else v25 and v25.assetId or -1
+	local v28 = FFlagProfilePlatformEnableAvatarBackground and v26 ~= nil
+	local numberSequence = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.25, 0.75),
+		NumberSequenceKeypoint.new(0.55, 0.4),
+		NumberSequenceKeypoint.new(0.8, 0.15),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	local numberSequence2 = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(1, 0)
+	})
+	local v31 = if not FFlagProfilePlatformNewProfileHeader or not t1.height then Constants.USER_PROFILE_HEADER_HEIGHT else t1.height
+	local v32 = if not FFlagPPVEnable3DBackground then if not FFlagProfilePlatformEnableAvatarBackground or v26 == nil then React.createElement(ImageSetLabel, {
+		BorderSizePixel = 0,
+		ZIndex = 1,
+		Size = UDim2.fromScale(1, 1),
+		Image = Images[v23.Theme.PlayerBackgroundDefault.Image],
+		ImageColor3 = if not v24 or not v24.HasSurfaceOverrides then nil else v23.Theme.BackgroundUIDefault.Color:Lerp(v23.Theme.PlayerBackgroundDefault.Color, v23.Theme.Overlay.Transparency)
+	}) else React.createElement(FoundationImage, {
+		ZIndex = 1,
+		Size = UDim2.fromScale(1.35, 1.35),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.4),
+		Image = v26,
+		ScaleType = Enum.ScaleType.Crop
+	}) else nil
+
+	return React.createElement(if not FFlagProfilePlatformNewProfileHeader then React.Fragment else View, {
+		Size = if not FFlagProfilePlatformNewProfileHeader then nil else UDim2.new(1, 0, 0, v31)
+	}, {
+		Background = v32,
+		AvatarThumbnail = React.createElement(DisplayBackground, {
+			height = v31,
+			currentBackgroundId = v27,
+			userId = t1.userId,
+			userThumbnail = if not FFlagPPVBackgroundUse2DAsLoadingState then nil else t1.userThumbnail
+		}),
+		TopGradient = if not FFlagPPVEnable3DBackground and (not (not not FFlagProfilePlatformEnableAvatarBackground and v28) and not FFlagProfilePlatformNewProfileHeader) then React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			Size = UDim2.new(1, 0, 0, Constants.USER_PROFILE_GRADIENT_HEIGHT),
+			Position = UDim2.fromScale(0, 0),
+			BackgroundColor3 = v23.Theme.BackgroundDefault.Color
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(1, 1)
+				})
+			})
+		}) else nil,
+		BottomGradient = if not FFlagProfilePlatformEnableAvatarBackground or not v28 then React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 3,
+			Size = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(1, 0, 0, v31 / 2) else UDim2.new(1, 0, 0, Constants.USER_PROFILE_GRADIENT_HEIGHT),
+			Position = UDim2.fromScale(0, 1),
+			AnchorPoint = Vector2.new(0, 1),
+			BackgroundColor3 = v23.Theme.BackgroundDefault.Color
+		}, {
+			UIGradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = if not FFlagPPVEnable3DBackground then numberSequence2 else numberSequence
+			})
+		}) else nil,
+		CornerRadius = if not FFlagProfilePlatformNewProfileHeader or not t1.isPeekView then nil else React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 8)
+		})
+	})
+end
+
+return UserProfileAvatar

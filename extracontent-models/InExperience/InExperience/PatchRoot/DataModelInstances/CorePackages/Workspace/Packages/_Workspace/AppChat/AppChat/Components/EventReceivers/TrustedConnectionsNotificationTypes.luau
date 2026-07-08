@@ -1,2 +1,3 @@
-local _ = require(script.Parent.SharedTypes);
-return {};
+require(script.Parent.SharedTypes)
+
+return {}

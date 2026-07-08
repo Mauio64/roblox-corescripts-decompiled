@@ -1,61 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_shouldShowPriceLabel_0 = require(l_script_FirstAncestor_0.Utils.itemDetailsUtils).shouldShowPriceLabel;
-local _ = v3.Enums.ButtonVariant;
-local _ = require(l_script_FirstAncestor_0.Enums.PriceStatus);
-local l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXHideInspectAndBuyPriceIfUnavailable;
-return function(v9) --[[ Line: 57 ]] --[[ Name: BuyActionBar ]]
-    -- upvalues: l_useTokens_0 (copy), l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 (copy), v2 (copy), l_shouldShowPriceLabel_0 (copy), v3 (copy)
-    local v10 = l_useTokens_0();
-    local v11 = not l_FFlagAXHideInspectAndBuyPriceIfUnavailable_0 or v2.useMemo(function() --[[ Line: 61 ]]
-        -- upvalues: l_shouldShowPriceLabel_0 (ref), v9 (copy)
-        return l_shouldShowPriceLabel_0(v9.priceStatus);
-    end, {
-        v9.priceStatus
-    });
-    return v2.createElement(v3.View, {
-        tag = "size-full col gap-xsmall align-x-center padding-x-large padding-bottom-medium", 
-        LayoutOrder = 1
-    }, {
-        InfoFrame = if v9.priceLabel then v2.createElement(v3.View, {
-            tag = "size-full-800 row flex-x-between align-y-center gap-small", 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1
-        }, {
-            PriceDescriptionLabel = v2.createElement(v3.Text, {
-                tag = "auto-xy text-title-medium content-emphasis text-truncate-end", 
-                Text = if v11 then v9.priceLabel.leftLabel else "", 
-                LayoutOrder = 1
-            }), 
-            RobuxLabel = if v11 then v2.createElement(v3.View, {
-                tag = "auto-xy row align-x-left align-y-center gap-xsmall", 
-                LayoutOrder = 2
-            }, {
-                PriceText = v2.createElement(v3.Text, {
-                    tag = "auto-xy text-body-large content-emphasis text-truncate-end", 
-                    Text = v9.priceLabel.priceInRobux, 
-                    LayoutOrder = 2
-                }), 
-                Robux = v2.createElement(v3.Icon, {
-                    name = "robux", 
-                    style = v10.Color.ActionStandard.Foreground, 
-                    size = v3.Enums.IconSize.Small, 
-                    LayoutOrder = 1
-                })
-            }) else nil
-        }) else nil, 
-        PurchaseButton = v2.createElement(v3.Button, {
-            size = v3.Enums.InputSize.Medium, 
-            fillBehavior = v3.Enums.FillBehavior.Fill, 
-            width = UDim.new(1, 0), 
-            text = v9.purchaseButtonProps.purchaseButtonText, 
-            variant = v9.purchaseButtonProps.variant, 
-            isDisabled = v9.purchaseButtonProps.isDisabled, 
-            onActivated = v9.purchaseButtonProps.onPurchase, 
-            LayoutOrder = 2
-        })
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local shouldShowPriceLabel = require(AvatarExperienceInspectAndBuy.Utils.itemDetailsUtils).shouldShowPriceLabel
+local _ = Foundation.Enums.ButtonVariant
+
+require(AvatarExperienceInspectAndBuy.Enums.PriceStatus)
+
+local function BuyActionBar(t1: {[any]: any}) -- line: 55
+	-- upvalues: useTokens (copy), React (copy), shouldShowPriceLabel (copy), Foundation (copy)
+	local v10 = useTokens()
+	local v11 = React.useMemo(function() -- line: 58
+		-- upvalues: shouldShowPriceLabel (copy), t1 (copy)
+		return shouldShowPriceLabel(t1.priceStatus)
+	end, { t1.priceStatus })
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full col gap-xsmall align-x-center padding-x-large padding-bottom-medium",
+		LayoutOrder = 1
+	}, {
+		InfoFrame = if not t1.priceLabel then nil else React.createElement(Foundation.View, {
+			tag = "size-full-800 row flex-x-between align-y-center gap-small",
+			BackgroundTransparency = 1,
+			LayoutOrder = 1
+		}, {
+			PriceDescriptionLabel = React.createElement(Foundation.Text, {
+				tag = "auto-xy text-title-medium content-emphasis text-truncate-end",
+				LayoutOrder = 1,
+				Text = not v11 and "" or t1.priceLabel.leftLabel
+			}),
+			RobuxLabel = if not v11 then nil else React.createElement(Foundation.View, {
+				tag = "auto-xy row align-x-left align-y-center gap-xsmall",
+				LayoutOrder = 2
+			}, {
+				PriceText = React.createElement(Foundation.Text, {
+					tag = "auto-xy text-body-large content-emphasis text-truncate-end",
+					LayoutOrder = 2,
+					Text = t1.priceLabel.priceInRobux
+				}),
+				Robux = React.createElement(Foundation.Icon, {
+					name = "robux",
+					LayoutOrder = 1,
+					style = v10.Color.ActionStandard.Foreground,
+					size = Foundation.Enums.IconSize.Small
+				})
+			})
+		}),
+		PurchaseButton = React.createElement(Foundation.Button, {
+			LayoutOrder = 2,
+			size = Foundation.Enums.InputSize.Medium,
+			fillBehavior = Foundation.Enums.FillBehavior.Fill,
+			width = UDim.new(1, 0),
+			text = t1.purchaseButtonProps.purchaseButtonText,
+			variant = t1.purchaseButtonProps.variant,
+			isDisabled = t1.purchaseButtonProps.isDisabled,
+			onActivated = t1.purchaseButtonProps.onPurchase
+		})
+	})
+end
+
+return BuyActionBar

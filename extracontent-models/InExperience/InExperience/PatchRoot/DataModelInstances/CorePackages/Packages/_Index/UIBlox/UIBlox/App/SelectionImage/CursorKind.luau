@@ -1,21 +1,22 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-return require(l_Parent_0.enumerate)(script.Name, {
-    RoundedRect = "RoundedRect", 
-    RoundedRectNoInset = "RoundedRectNoInset", 
-    RoundedSlot = "RoundedSlot", 
-    SmallPill = "SmallPill", 
-    LargePill = "LargePill", 
-    XLargePill = "XLargePill", 
-    SelectedKnob = "SelectedKnob", 
-    UnselectedKnob = "UnselectedKnob", 
-    NavHighlight = "NavHighlight", 
-    SkinToneCircle = "SkinToneCircle", 
-    Square = "Square", 
-    Toggle = "Toggle", 
-    InputFields = "InputFields", 
-    BulletUp = "BulletUp", 
-    BulletDown = "BulletDown", 
-    SelectionCell = "SelectionCell", 
-    Invisible = "Invisible", 
-    InputButton = "InputButton"
-});
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+return require(ParentParent.enumerate)(script.Name, {
+	RoundedRect = "RoundedRect",
+	RoundedRectNoInset = "RoundedRectNoInset",
+	RoundedSlot = "RoundedSlot",
+	SmallPill = "SmallPill",
+	LargePill = "LargePill",
+	XLargePill = "XLargePill",
+	SelectedKnob = "SelectedKnob",
+	UnselectedKnob = "UnselectedKnob",
+	NavHighlight = "NavHighlight",
+	SkinToneCircle = "SkinToneCircle",
+	Square = "Square",
+	Toggle = "Toggle",
+	InputFields = "InputFields",
+	BulletUp = "BulletUp",
+	BulletDown = "BulletDown",
+	SelectionCell = "SelectionCell",
+	Invisible = "Invisible",
+	InputButton = "InputButton"
+})

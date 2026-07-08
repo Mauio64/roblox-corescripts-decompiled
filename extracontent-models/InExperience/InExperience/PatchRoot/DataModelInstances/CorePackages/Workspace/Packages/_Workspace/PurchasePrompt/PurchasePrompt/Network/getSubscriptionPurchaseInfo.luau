@@ -1,10 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Promise);
-local v2 = require(l_Parent_0.Utils.parseSubscriptionError);
-return function(v3, v4) --[[ Line: 5 ]] --[[ Name: getSubscriptionPurchaseInfo ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v3.getSubscriptionPurchaseInfo(v4):catch(function(v5) --[[ Line: 6 ]]
-        -- upvalues: v1 (ref), v2 (ref)
-        return v1.reject(v2(v5));
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Promise = require(ParentParent.Promise)
+local parseSubscriptionError = require(ParentParent.Utils.parseSubscriptionError)
+
+local function getSubscriptionPurchaseInfo(p1, p2) -- line: 5
+	-- upvalues: Promise (copy), parseSubscriptionError (copy)
+	return p1.getSubscriptionPurchaseInfo(p2):catch(function(p3) -- line: 6
+		-- upvalues: Promise (copy), parseSubscriptionError (copy)
+		return Promise.reject(parseSubscriptionError(p3))
+	end)
+end
+
+return getSubscriptionPurchaseInfo

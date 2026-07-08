@@ -1,42 +1,44 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.BuilderIcons);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_LoadableImage_0 = require(l_Parent_0.UIBlox).App.Loading.LoadableImage;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_getStandardSizeAvatarHeadShotRbxthumb_0 = require(l_Parent_0.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb;
-return function() --[[ Line: 13 ]] --[[ Name: FlyoutAlternateEntryPoint ]]
-    -- upvalues: l_useTokens_0 (copy), l_useSelector_0 (copy), v1 (copy), l_getStandardSizeAvatarHeadShotRbxthumb_0 (copy), v3 (copy), v2 (copy), l_LoadableImage_0 (copy)
-    local v8 = l_useTokens_0();
-    local v10 = l_useSelector_0(function(v9) --[[ Line: 15 ]]
-        return v9.Users[v9.LocalUserId];
-    end);
-    local v11 = v1.useMemo(function() --[[ Line: 18 ]]
-        -- upvalues: v10 (copy), l_getStandardSizeAvatarHeadShotRbxthumb_0 (ref)
-        if v10 and v10.id then
-            return l_getStandardSizeAvatarHeadShotRbxthumb_0(v10.id);
-        else
-            return nil;
-        end;
-    end, {
-        v10
-    });
-    return v1.createElement(v3.Icon, {
-        tag = "position-center-center anchor-center-center content-emphasis align-y-center", 
-        name = v2.Icon.ThreeHorizontalBarsWrappingRight, 
-        size = v8.Size.Size_800
-    }, {
-        UserAvatar = v1.createElement(l_LoadableImage_0, {
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = UDim2.new(0, v8.Size.Size_50, 0.5, 0), 
-            Size = UDim2.new(0, v8.Size.Size_400, 0, v8.Size.Size_400), 
-            BackgroundColor3 = v8.Semantic.Color.Common.Placeholder.Color3, 
-            BackgroundTransparency = v8.Semantic.Color.Common.Placeholder.Transparency, 
-            Image = v11, 
-            useShimmerAnimationWhileLoading = true, 
-            cornerRadius = UDim.new(0.5, 0), 
-            shouldHandleReloads = true
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local BuilderIcons = require(Parent.BuilderIcons)
+local Foundation = require(Parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local LoadableImage = require(Parent.UIBlox).App.Loading.LoadableImage
+local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local getStandardSizeAvatarHeadShotRbxthumb = require(Parent.UserLib).Utils.getStandardSizeAvatarHeadShotRbxthumb
+
+local function FlyoutAlternateEntryPoint() -- line: 14
+	-- upvalues: useTokens (copy), useSelector (copy), React (copy), getStandardSizeAvatarHeadShotRbxthumb (copy), Foundation (copy), BuilderIcons (copy), LoadableImage (copy)
+	local v10 = useTokens()
+	local v11 = useSelector(function(p1) -- line: 16
+		return p1.Users[p1.LocalUserId]
+	end)
+	local v12 = React.useMemo(function() -- line: 19
+		-- upvalues: v11 (copy), getStandardSizeAvatarHeadShotRbxthumb (copy)
+		if v11 and v11.id then
+			return getStandardSizeAvatarHeadShotRbxthumb(v11.id)
+		end
+
+		return nil
+	end, { v11 })
+
+	return React.createElement(Foundation.Icon, {
+		tag = "position-center-center anchor-center-center content-emphasis align-y-center",
+		name = BuilderIcons.Icon.ThreeHorizontalBarsWrappingRight,
+		size = v10.Size.Size_800
+	}, {
+		UserAvatar = React.createElement(LoadableImage, {
+			useShimmerAnimationWhileLoading = true,
+			shouldHandleReloads = true,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.new(0, v10.Size.Size_50, 0.5, 0),
+			Size = UDim2.new(0, v10.Size.Size_400, 0, v10.Size.Size_400),
+			BackgroundColor3 = v10.Color.Common.Shimmer.Color3,
+			BackgroundTransparency = v10.Color.Common.Shimmer.Transparency,
+			Image = v12,
+			cornerRadius = UDim.new(0.5, 0)
+		})
+	})
+end
+
+return FlyoutAlternateEntryPoint

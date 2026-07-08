@@ -1,5 +1,8 @@
-local v0 = require(script.Parent.useProperty);
-return function(v1) --[[ Line: 9 ]] --[[ Name: useGuiState ]]
-    -- upvalues: v0 (copy)
-    return v0(v1, "GuiState");
-end;
+local useProperty = require(script.Parent.useProperty)
+
+local function useGuiState(t1: {[any]: any}) -- line: 9
+	-- upvalues: useProperty (copy)
+	return useProperty(t1, "GuiState")
+end
+
+return useGuiState

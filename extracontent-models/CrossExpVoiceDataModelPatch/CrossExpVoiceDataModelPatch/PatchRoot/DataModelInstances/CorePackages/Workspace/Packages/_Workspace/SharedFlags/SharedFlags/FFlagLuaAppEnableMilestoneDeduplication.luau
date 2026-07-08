@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableMilestoneDeduplication", false);
+return game:DefineFastFlag("LuaAppEnableMilestoneDeduplication", false)

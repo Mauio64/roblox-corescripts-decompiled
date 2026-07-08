@@ -1,70 +1,77 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-return function(v3) --[[ Line: 23 ]] --[[ Name: ItemCardAnimationStateIndicator ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy)
-    local v4 = l_useTokens_0();
-    local v5 = {
-        TabsLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            HorizontalFlex = Enum.UIFlexAlignment.Fill, 
-            Padding = UDim.new(0, v4.Gap.XSmall)
-        })
-    };
-    local v6 = nil;
-    for v7, v8 in v3.states do
-        local v9 = if v8.isSelected then v4.Color.Stroke.Emphasis else v4.Color.Stroke.Muted;
-        v5[("%*-%*"):format(v7, v8.text)] = v1.createElement("Frame", {
-            BorderSizePixel = 0, 
-            BackgroundColor3 = v9.Color3, 
-            Transparency = v9.Transparency, 
-            Size = UDim2.new(1, 0, 0, v4.Size.Size_150), 
-            LayoutOrder = v7
-        });
-        if v8.isSelected then
-            v6 = v8.text;
-        end;
-    end;
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        ZIndex = v3.ZIndex
-    }, {
-        ListLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 0)
-        }), 
-        Padding = if not not v3.paddingTop or v3.paddingBottom or v3.paddingLeft or v3.paddingRight then v1.createElement("UIPadding", {
-            PaddingTop = v3.paddingTop, 
-            PaddingBottom = v3.paddingBottom, 
-            PaddingLeft = v3.paddingLeft, 
-            PaddingRight = v3.paddingRight
-        }) else nil, 
-        Tabs = v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 0), 
-            BorderSizePixel = 0, 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            LayoutOrder = 1
-        }, v5), 
-        Label = if v6 then v1.createElement("TextLabel", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromScale(1, 0), 
-            Text = v6, 
-            Font = v4.Typography.TitleLarge.Font, 
-            TextSize = v4.Typography.TitleLarge.FontSize, 
-            TextColor3 = v4.Color.Content.Emphasis.Color3, 
-            TextTruncate = Enum.TextTruncate.AtEnd, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Top, 
-            TextWrapped = true, 
-            LayoutOrder = 2
-        }) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local useTokens = require(Parent.Foundation).Hooks.useTokens
+
+local function ItemCardAnimationStateIndicator(t1: {[any]: any}) -- line: 23
+	-- upvalues: useTokens (copy), React (copy)
+	local v6 = useTokens()
+	local t2 = {
+		TabsLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			HorizontalFlex = Enum.UIFlexAlignment.Fill,
+			Padding = UDim.new(0, v6.Gap.XSmall)
+		})
+	}
+	local text = nil
+
+	for v9, v10 in t1.states do
+		local v11 = if not v10.isSelected then v6.Color.Stroke.Muted else v6.Color.Stroke.Emphasis
+
+		t2[`{ v9 }-{ v10.text }`] = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundColor3 = v11.Color3,
+			Transparency = v11.Transparency,
+			Size = UDim2.new(1, 0, 0, v6.Size.Size_150),
+			LayoutOrder = v9
+		})
+
+		if v10.isSelected then
+			text = v10.text
+		end
+	end
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = t1.ZIndex
+	}, {
+		ListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 0)
+		}),
+		Padding = if not t1.paddingTop and (not t1.paddingBottom and (not t1.paddingLeft and not t1.paddingRight)) then nil else React.createElement("UIPadding", {
+			PaddingTop = t1.paddingTop,
+			PaddingBottom = t1.paddingBottom,
+			PaddingLeft = t1.paddingLeft,
+			PaddingRight = t1.paddingRight
+		}),
+		Tabs = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y
+		}, t2),
+		Label = if not text then nil else React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			LayoutOrder = 2,
+			Size = UDim2.fromScale(1, 0),
+			Text = text,
+			Font = v6.Typography.TitleLarge.Font,
+			TextSize = v6.Typography.TitleLarge.FontSize,
+			TextColor3 = v6.Color.Content.Emphasis.Color3,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top
+		})
+	})
+end
+
+return ItemCardAnimationStateIndicator

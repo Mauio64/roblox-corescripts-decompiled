@@ -1,161 +1,180 @@
-local v0 = require(game.LoadedCode.Packages.Lumberyak.Logger);
-local function v6(v1, v2) --[[ Line: 5 ]] --[[ Name: timeit ]]
-    local v3 = v1();
-    local v4 = tick();
-    for _ = 1, 2000000 do
-        v2(v3);
-    end;
-    return (tick() - v4) / 2000000;
-end;
-local function v8(v7) --[[ Line: 15 ]] --[[ Name: callSimple ]]
-    v7:info("foo");
-end;
-local function v10(v9) --[[ Line: 19 ]] --[[ Name: callInterp ]]
-    v9:info("foo {}", 2);
-end;
-local function v17() --[[ Line: 23 ]] --[[ Name: simple ]]
-    -- upvalues: v0 (copy)
-    local v11 = 0;
-    local v15 = {
-        maxLevel = v0.Levels.Info, 
-        log = function(_, _, v14) --[[ Line: 27 ]] --[[ Name: log ]]
-            -- upvalues: v11 (ref)
-            v11 = v11 + v14.number;
-        end
-    };
-    local v16 = v0.new();
-    v16:setContext({
-        number = 1
-    });
-    v16:addSink(v15);
-    return v16;
-end;
-local function v18() --[[ Line: 38 ]] --[[ Name: empty ]]
-    return {
-        info = function() --[[ Line: 40 ]] --[[ Name: info ]]
+local Logger = require(game.LoadedCode.Packages.Lumberyak.Logger)
 
-        end
-    };
-end;
-local function v25() --[[ Line: 44 ]] --[[ Name: off ]]
-    -- upvalues: v0 (copy)
-    local v19 = 0;
-    local v23 = {
-        maxLevel = v0.Levels.Error, 
-        log = function(_, _, v22) --[[ Line: 48 ]] --[[ Name: log ]]
-            -- upvalues: v19 (ref)
-            v19 = v19 + v22.number;
-        end
-    };
-    local v24 = v0.new();
-    v24:setContext({
-        number = 1
-    });
-    v24:addSink(v23);
-    return v24;
-end;
-local function v33() --[[ Line: 59 ]] --[[ Name: short ]]
-    -- upvalues: v0 (copy)
-    local v26 = 0;
-    local v30 = {
-        maxLevel = v0.Levels.Info, 
-        log = function(_, _, v29) --[[ Line: 63 ]] --[[ Name: log ]]
-            -- upvalues: v26 (ref)
-            v26 = v26 + v29.number;
-        end
-    };
-    local v31 = v0.new();
-    local v32 = v31:new();
-    v31:setContext({
-        number = 1
-    });
-    v31:addSink(v30);
-    return v32;
-end;
-local function v40() --[[ Line: 75 ]] --[[ Name: long ]]
-    -- upvalues: v0 (copy)
-    local v34 = 0;
-    local v38 = {
-        maxLevel = v0.Levels.Info, 
-        log = function(_, _, v37) --[[ Line: 79 ]] --[[ Name: log ]]
-            -- upvalues: v34 (ref)
-            v34 = v34 + v37.number;
-        end
-    };
-    local v39 = v0.new();
-    v39:setContext({
-        number = 1
-    });
-    v39:addSink(v38);
-    return (v39:new():new():new():new());
-end;
-local function v63() --[[ Line: 94 ]] --[[ Name: many ]]
-    -- upvalues: v0 (copy)
-    local v41 = 0;
-    local v45 = {
-        maxLevel = v0.Levels.Error, 
-        log = function(_, _, v44) --[[ Line: 98 ]] --[[ Name: log ]]
-            -- upvalues: v41 (ref)
-            v41 = v41 + v44.number;
-        end
-    };
-    local v49 = {
-        maxLevel = v0.Levels.Warning, 
-        log = function(_, _, v48) --[[ Line: 104 ]] --[[ Name: log ]]
-            -- upvalues: v41 (ref)
-            v41 = v41 + v48.number;
-        end
-    };
-    local v53 = {
-        maxLevel = v0.Levels.Info, 
-        log = function(_, _, v52) --[[ Line: 110 ]] --[[ Name: log ]]
-            -- upvalues: v41 (ref)
-            v41 = v41 + v52.number;
-        end
-    };
-    local v57 = {
-        maxLevel = v0.Levels.Debug, 
-        log = function(_, _, v56) --[[ Line: 116 ]] --[[ Name: log ]]
-            -- upvalues: v41 (ref)
-            v41 = v41 + v56.number;
-        end
-    };
-    local v61 = {
-        maxLevel = v0.Levels.Trace, 
-        log = function(_, _, v60) --[[ Line: 122 ]] --[[ Name: log ]]
-            -- upvalues: v41 (ref)
-            v41 = v41 + v60.number;
-        end
-    };
-    local v62 = v0.new();
-    v62:setContext({
-        number = 1
-    });
-    v62:addSink(v45);
-    v62:addSink(v49);
-    v62:addSink(v53);
-    v62:addSink(v57);
-    v62:addSink(v61);
-    return v62;
-end;
-local v64 = v6(v18, v8);
-local v65 = v6(v18, v10);
-local v66 = {
-    ["Log level off"] = v25, 
-    ["Simple logger"] = v17, 
-    ["Short chain"] = v33, 
-    ["Long chain"] = v40, 
-    ["Many sinks"] = v63
-};
-local function _(v67, v68, v69) --[[ Line: 148 ]] --[[ Name: fmt ]]
-    -- upvalues: v64 (copy)
-    print(string.format("%-40s %0.3e [%0.4fx]", v67 .. " - " .. v68, v69, v69 / v64));
-end;
-print(string.format("%-40s %0.3e [%0.4fx]", "Empty function - Simple", v64, v64 / v64));
-print(string.format("%-40s %0.3e [%0.4fx]", "Empty function - Interpolation", v65, v65 / v64));
-for v71, v72 in pairs(v66) do
-    local v73 = v6(v72, v8);
-    print(string.format("%-40s %0.3e [%0.4fx]", v71 .. " - " .. "Simple", v73, v73 / v64));
-    local v74 = v6(v72, v10);
-    print(string.format("%-40s %0.3e [%0.4fx]", v71 .. " - " .. "Interpolation", v74, v74 / v64));
-end;
+local function timeit(p1, p2) -- line: 5
+	local v21 = p1()
+	local timestamp = tick()
+
+	for _ = 1, 2000000 do
+		p2(v21)
+	end
+
+	return (tick() - timestamp) / 2000000
+end
+local function callSimple(p3) -- line: 15
+	p3:info("foo")
+end
+local function callInterp(p4) -- line: 19
+	p4:info("foo {}", 2)
+end
+local function simple() -- line: 23
+	-- upvalues: Logger (copy)
+	local n1 = 0
+	local t1 = {
+		maxLevel = Logger.Levels.Info,
+		log = function(_, _, p7) -- line: 27
+			-- upvalues: n1 (ref)
+			n1 += p7.number
+		end
+	}
+	local v28 = Logger.new()
+
+	v28:setContext({
+		number = 1
+	})
+	v28:addSink(t1)
+
+	return v28
+end
+local function empty() -- line: 38
+	return {
+		info = function() -- line: 40
+		end
+	}
+end
+local function off() -- line: 44
+	-- upvalues: Logger (copy)
+	local n2 = 0
+	local t2 = {
+		maxLevel = Logger.Levels.Error,
+		log = function(_, _, p10) -- line: 48
+			-- upvalues: n2 (ref)
+			n2 += p10.number
+		end
+	}
+	local v31 = Logger.new()
+
+	v31:setContext({
+		number = 1
+	})
+	v31:addSink(t2)
+
+	return v31
+end
+local function short() -- line: 59
+	-- upvalues: Logger (copy)
+	local n3 = 0
+	local t3 = {
+		maxLevel = Logger.Levels.Info,
+		log = function(_, _, p13) -- line: 63
+			-- upvalues: n3 (ref)
+			n3 += p13.number
+		end
+	}
+	local v34 = Logger.new()
+	local v35 = v34:new()
+
+	v34:setContext({
+		number = 1
+	})
+	v34:addSink(t3)
+
+	return v35
+end
+local function long() -- line: 75
+	-- upvalues: Logger (copy)
+	local n4 = 0
+	local t4 = {
+		maxLevel = Logger.Levels.Info,
+		log = function(_, _, p16) -- line: 79
+			-- upvalues: n4 (ref)
+			n4 += p16.number
+		end
+	}
+	local v38 = Logger.new()
+
+	v38:setContext({
+		number = 1
+	})
+	v38:addSink(t4)
+
+	return (v38:new():new():new():new())
+end
+local function many() -- line: 94
+	-- upvalues: Logger (copy)
+	local n5 = 0
+	local t5 = {
+		maxLevel = Logger.Levels.Error,
+		log = function(_, _, p19) -- line: 98
+			-- upvalues: n5 (ref)
+			n5 += p19.number
+		end
+	}
+	local t6 = {
+		maxLevel = Logger.Levels.Warning,
+		log = function(_, _, p22) -- line: 104
+			-- upvalues: n5 (ref)
+			n5 += p22.number
+		end
+	}
+	local t7 = {
+		maxLevel = Logger.Levels.Info,
+		log = function(_, _, p25) -- line: 110
+			-- upvalues: n5 (ref)
+			n5 += p25.number
+		end
+	}
+	local t8 = {
+		maxLevel = Logger.Levels.Debug,
+		log = function(_, _, p28) -- line: 116
+			-- upvalues: n5 (ref)
+			n5 += p28.number
+		end
+	}
+	local t9 = {
+		maxLevel = Logger.Levels.Trace,
+		log = function(_, _, p31) -- line: 122
+			-- upvalues: n5 (ref)
+			n5 += p31.number
+		end
+	}
+	local v45 = Logger.new()
+
+	v45:setContext({
+		number = 1
+	})
+	v45:addSink(t5)
+	v45:addSink(t6)
+	v45:addSink(t7)
+	v45:addSink(t8)
+	v45:addSink(t9)
+
+	return v45
+end
+
+local v11 = timeit(empty, callSimple)
+local v12 = timeit(empty, callInterp)
+local t10 = {
+	["Log level off"] = off,
+	["Simple logger"] = simple,
+	["Short chain"] = short,
+	["Long chain"] = long,
+	["Many sinks"] = many
+}
+
+local function fmt(p32, p33, p34) -- line: 148
+	-- upvalues: v11 (copy)
+	print(string.format("%-40s %0.3e [%0.4fx]", p32 .. " - " .. p33, p34, p34 / v11))
+end
+
+print(string.format("%-40s %0.3e [%0.4fx]", "Empty function - Simple", v11, v11 / v11))
+print(string.format("%-40s %0.3e [%0.4fx]", "Empty function - Interpolation", v12, v12 / v11))
+
+for k, v in pairs(t10) do
+	local v17 = timeit(v, callSimple)
+
+	print(string.format("%-40s %0.3e [%0.4fx]", k .. " - " .. "Simple", v17, v17 / v11))
+
+	local v18 = timeit(v, callInterp)
+
+	print(string.format("%-40s %0.3e [%0.4fx]", k .. " - " .. "Interpolation", v18, v18 / v11))
+end

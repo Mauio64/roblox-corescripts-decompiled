@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSocialProofVerticalUserListSheet_2", false);
+return game:DefineFastFlag("EnableSocialProofVerticalUserListSheet_2", false)

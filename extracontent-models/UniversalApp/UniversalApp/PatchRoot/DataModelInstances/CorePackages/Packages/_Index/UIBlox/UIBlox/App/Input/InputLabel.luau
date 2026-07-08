@@ -1,44 +1,51 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_0.Translations.Translator);
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_0.Core.Style.useStyle);
-local function _(v5, v6) --[[ Line: 21 ]] --[[ Name: labelText ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    if v6 == nil or v6 == v3.None then
-        return v5;
-    elseif v6 then
-        return v5 .. "*";
-    else
-        return (v2:FormatByKey("CommonUI.Controls.Input.Optional", {
-            inputLabel = v5
-        }));
-    end;
-end;
-return function(v8) --[[ Line: 31 ]] --[[ Name: InputLabel ]]
-    -- upvalues: v4 (copy), v3 (copy), v2 (copy)
-    local l_InputLabel_0 = v4().Tokens.Component.InputLabel;
-    local l_Typography_0 = l_InputLabel_0.Base.Typography;
-    local l_ContentColor_0 = l_InputLabel_0.Base.ContentColor;
-    local l_createElement_0 = v3.createElement;
-    local v13 = "TextLabel";
-    local v14 = {};
-    local l_text_0 = v8.text;
-    local l_required_0 = v8.required;
-    v14.Text = if not (l_required_0 ~= nil) or l_required_0 == v3.None then l_text_0 else if l_required_0 then l_text_0 .. "*" else v2:FormatByKey("CommonUI.Controls.Input.Optional", {
-        inputLabel = l_text_0
-    });
-    v14.TextTransparency = l_ContentColor_0.Transparency;
-    v14.TextXAlignment = Enum.TextXAlignment.Left;
-    v14.TextYAlignment = Enum.TextYAlignment.Top;
-    v14.TextWrapped = true;
-    v14.BackgroundTransparency = 1;
-    v14.TextColor3 = l_ContentColor_0.Color3;
-    v14.Font = l_Typography_0.Font;
-    v14.TextSize = l_Typography_0.FontSize;
-    v14.LineHeight = l_Typography_0.LineHeight;
-    v14.Size = UDim2.new(1, 0, 0, 0);
-    v14.AutomaticSize = Enum.AutomaticSize.Y;
-    v14.LayoutOrder = v8.LayoutOrder;
-    return l_createElement_0(v13, v14);
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Translator = require(ParentParent.Translations.Translator)
+local React = require(ParentParentParent.React)
+local useStyle = require(ParentParent.Core.Style.useStyle)
+
+local function labelText(s1: string, b1: boolean?) -- line: 21
+	-- upvalues: React (copy), Translator (copy)
+	if b1 == nil or b1 == React.None then
+		return s1
+	end
+
+	if b1 then
+		return s1 .. "*"
+	end
+
+	return (Translator:FormatByKey("CommonUI.Controls.Input.Optional", {
+		inputLabel = s1
+	}))
+end
+local function InputLabel(t1: {[any]: any}) -- line: 31
+	-- upvalues: useStyle (copy), React (copy), Translator (copy)
+	local InputLabel2 = useStyle().Tokens.Component.InputLabel
+	local Typography = InputLabel2.Base.Typography
+	local ContentColor = InputLabel2.Base.ContentColor
+	local createElement = React.createElement
+	local t2 = {
+		TextWrapped = true,
+		BackgroundTransparency = 1
+	}
+	local text = t1.text
+	local required = t1.required
+
+	t2.Text = if required ~= nil and required ~= React.None then if not required then Translator:FormatByKey("CommonUI.Controls.Input.Optional", {
+		inputLabel = text
+	}) else text .. "*" else text
+	t2.TextTransparency = ContentColor.Transparency
+	t2.TextXAlignment = Enum.TextXAlignment.Left
+	t2.TextYAlignment = Enum.TextYAlignment.Top
+	t2.TextColor3 = ContentColor.Color3
+	t2.Font = Typography.Font
+	t2.TextSize = Typography.FontSize
+	t2.LineHeight = Typography.LineHeight
+	t2.Size = UDim2.new(1, 0, 0, 0)
+	t2.AutomaticSize = Enum.AutomaticSize.Y
+	t2.LayoutOrder = t1.LayoutOrder
+
+	return createElement("TextLabel", t2)
+end
+
+return InputLabel

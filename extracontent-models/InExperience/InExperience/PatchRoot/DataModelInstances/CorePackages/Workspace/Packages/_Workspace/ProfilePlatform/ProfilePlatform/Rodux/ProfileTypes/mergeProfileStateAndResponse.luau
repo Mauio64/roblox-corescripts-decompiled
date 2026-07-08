@@ -1,22 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-local v4 = require(l_script_FirstAncestor_0.Utils.getDeepValue);
-local v5 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformEnableLazyLoadingComponents);
-return function(v6, v7) --[[ Line: 11 ]]
-    -- upvalues: v4 (copy), v5 (copy), v2 (copy)
-    local v8 = v4(v6, (("%*"):format(v7.profileId))) or {};
-    local v9 = if v5 and v7.onlyEssentialComponents then v8.componentOrdering or v7.componentOrdering else v7.componentOrdering or v8.componentOrdering;
-    local v10 = v8.components or {};
-    local v11 = v2.Dictionary.join(v10, v7.components);
-    local v12 = {
-        profileType = v7.profileType, 
-        profileId = v7.profileId, 
-        componentOrdering = v9, 
-        components = v11
-    };
-    return v2.Dictionary.join(v6, {
-        [v7.profileId] = v12
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local Cryo = require(ProfilePlatformParent.Cryo)
+
+require(ProfilePlatform.Common.Types)
+
+local getDeepValue = require(ProfilePlatform.Utils.getDeepValue)
+local FFlagProfilePlatformEnableLazyLoadingComponents = require(ProfilePlatform.Flags.FFlagProfilePlatformEnableLazyLoadingComponents)
+
+return function(p1, p2) -- line: 11
+	-- upvalues: getDeepValue (copy), FFlagProfilePlatformEnableLazyLoadingComponents (copy), Cryo (copy)
+	local v8 = getDeepValue(p1, `{ p2.profileId }`) or {}
+	local v9 = if not FFlagProfilePlatformEnableLazyLoadingComponents or not p2.onlyEssentialComponents then p2.componentOrdering or v8.componentOrdering else v8.componentOrdering or p2.componentOrdering
+	local v10 = v8.components or {}
+	local v11 = Cryo.Dictionary.join(v10, p2.components)
+	local t1 = {
+		profileType = p2.profileType,
+		profileId = p2.profileId,
+		componentOrdering = v9,
+		components = v11
+	}
+
+	return Cryo.Dictionary.join(p1, {
+		[p2.profileId] = t1
+	})
+end

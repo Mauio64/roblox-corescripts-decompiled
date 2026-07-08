@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatUseSwipeForReplies2", false);
+return game:DefineFastFlag("AppChatUseSwipeForReplies2", false)

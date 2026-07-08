@@ -1,89 +1,219 @@
-local l_Parent_0 = script:FindFirstAncestor("GamePlayButton").Parent;
-local l_PromiseUtilities_0 = require(l_Parent_0.AppCommonLib).Utils.PromiseUtilities;
-local l_RetrievalStatus_0 = require(l_Parent_0.Http).Enum.RetrievalStatus;
-local v3 = require(l_Parent_0.GameDetailRodux);
-local l_ApiFetchGameDetails_0 = v3.GameDetails.ApiFetchGameDetails;
-local l_FetchGamePlayabilityAndProductInfo_0 = v3.FetchGamePlayabilityAndProductInfo;
-local l_FetchUserGameVotes_0 = require(l_Parent_0.GameVotesRodux).UserGameVotes.FetchUserGameVotes;
-local v7 = require(l_Parent_0.NextDataExpirationTimeRodux);
-local l_SetNextDataExpirationTime_0 = v7.SetNextDataExpirationTime;
-local l_NextDataExpirationTimeReducer_0 = v7.NextDataExpirationTimeReducer;
-local l_ExpirationTimeNamespace_0 = v7.ExpirationTimeNamespace;
-local l_ApiFetchShowAgeVerificationOverlay_0 = require(l_Parent_0.VoiceChat).AgeVerificationOverlay.ApiFetchShowAgeVerificationOverlay;
-local l_GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds_0 = require(l_Parent_0.SharedFlags).GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds;
-local l_RunService_0 = game:GetService("RunService");
-local v14 = {};
-local function v22(v15, v16, v17, v18, v19) --[[ Line: 25 ]] --[[ Name: playButtonDataFetchPromises ]]
-    -- upvalues: l_ApiFetchGameDetails_0 (copy), l_RetrievalStatus_0 (copy), l_FetchGamePlayabilityAndProductInfo_0 (copy), l_ApiFetchShowAgeVerificationOverlay_0 (copy), l_FetchUserGameVotes_0 (copy)
-    local v20 = {};
-    if l_ApiFetchGameDetails_0.GetFetchingStatus(v16:getState(), v17) ~= l_RetrievalStatus_0.Fetching and (v18 or v16:getState().GameDetails[v17] == nil) then
-        table.insert(v20, v16:dispatch(l_ApiFetchGameDetails_0.Fetch(v15, {
-            v17
-        })));
-    end;
-    local v21 = l_FetchGamePlayabilityAndProductInfo_0.GetFetchingStatus(v16:getState(), v17);
-    if v18 or v19 or v21 == l_RetrievalStatus_0.NotStarted or v21 == l_RetrievalStatus_0.Failed then
-        table.insert(v20, v16:dispatch(l_FetchGamePlayabilityAndProductInfo_0.Fetch(v15, v17)));
-    end;
-    if game:GetEngineFeature("VoiceChatSupported") and l_ApiFetchShowAgeVerificationOverlay_0.GetFetchingStatus(v16:getState(), v17) ~= l_RetrievalStatus_0.Fetching and (v18 or v16:getState().ShowAgeVerificationOverlay[v17] == nil) then
-        table.insert(v20, v16:dispatch(l_ApiFetchShowAgeVerificationOverlay_0.Fetch(v15, v17)));
-    end;
-    if l_FetchUserGameVotes_0.GetFetchingStatus(v16:getState(), v17) ~= l_RetrievalStatus_0.Fetching and (v18 or v16:getState().UserGameVotes[v17] == nil) then
-        v16:dispatch(l_FetchUserGameVotes_0.Fetch(v15, v17));
-    end;
-    return v20;
-end;
-v14.IsLoading = function(v23, v24) --[[ Line: 80 ]] --[[ Name: IsLoading ]]
-    -- upvalues: l_ApiFetchGameDetails_0 (copy), l_RetrievalStatus_0 (copy), l_FetchGamePlayabilityAndProductInfo_0 (copy), l_ApiFetchShowAgeVerificationOverlay_0 (copy)
-    local v25 = l_ApiFetchGameDetails_0.GetFetchingStatus(v23, v24);
-    if v25 == l_RetrievalStatus_0.NotStarted or v25 == l_RetrievalStatus_0.Fetching then
-        return true;
-    else
-        local v26 = l_FetchGamePlayabilityAndProductInfo_0.GetFetchingStatus(v23, v24);
-        if v26 == l_RetrievalStatus_0.NotStarted or v26 == l_RetrievalStatus_0.Fetching then
-            return true;
-        else
-            if game:GetEngineFeature("VoiceChatSupported") then
-                local v27 = l_ApiFetchShowAgeVerificationOverlay_0.GetFetchingStatus(v23, v24);
-                if v27 == l_RetrievalStatus_0.NotStarted or v27 == l_RetrievalStatus_0.Fetching then
-                    return true;
-                end;
-            end;
-            return false;
-        end;
-    end;
-end;
-v14.Fetch = function(v28, v29, v30) --[[ Line: 115 ]] --[[ Name: Fetch ]]
-    -- upvalues: l_NextDataExpirationTimeReducer_0 (copy), l_ExpirationTimeNamespace_0 (copy), v22 (copy), l_RunService_0 (copy), l_PromiseUtilities_0 (copy), l_GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds_0 (copy), l_SetNextDataExpirationTime_0 (copy)
-    return function(v31) --[[ Line: 116 ]]
-        -- upvalues: l_NextDataExpirationTimeReducer_0 (ref), l_ExpirationTimeNamespace_0 (ref), v29 (copy), v22 (ref), v28 (copy), v30 (copy), l_RunService_0 (ref), l_PromiseUtilities_0 (ref), l_GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds_0 (ref), l_SetNextDataExpirationTime_0 (ref)
-        local v32 = tick();
-        local v33 = nil;
-        local v34 = v31:getState().Personalization[l_NextDataExpirationTimeReducer_0.key][l_ExpirationTimeNamespace_0.GameDetailPlayability];
-        if v34 then
-            v33 = v34[v29];
-        end;
-        local v35 = false;
-        if v33 == nil or v33 < v32 then
-            v35 = true;
-        end;
-        local v36 = v22(v28, v31, v29, v35, v30);
-        if #v36 > 0 then
-            local v37 = nil;
-            if _G.__TESTEZ_RUNNING_TEST__ or l_RunService_0:IsStudio() then
-                v37 = warn;
-            end;
-            return l_PromiseUtilities_0.Batch(v36, v37):andThen(function(v38) --[[ Line: 139 ]]
-                -- upvalues: l_PromiseUtilities_0 (ref), v32 (ref), v33 (ref), l_GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds_0 (ref), v31 (copy), l_SetNextDataExpirationTime_0 (ref), v29 (ref), l_ExpirationTimeNamespace_0 (ref)
-                if l_PromiseUtilities_0.CountResults(v38).failureCount == 0 then
-                    v32 = tick();
-                    v33 = math.floor(v32 + l_GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds_0());
-                    v31:dispatch(l_SetNextDataExpirationTime_0(v29, v33, l_ExpirationTimeNamespace_0.GameDetailPlayability));
-                end;
-            end);
-        else
-            return;
-        end;
-    end;
-end;
-return v14;
+local Parent = script:FindFirstAncestor("GamePlayButton").Parent
+local PromiseUtilities = require(Parent.AppCommonLib).Utils.PromiseUtilities
+local RetrievalStatus = require(Parent.Http).Enum.RetrievalStatus
+local GameDetailRodux = require(Parent.GameDetailRodux)
+local ApiFetchGameDetails = GameDetailRodux.GameDetails.ApiFetchGameDetails
+local FetchGamePlayabilityAndProductInfo = GameDetailRodux.FetchGamePlayabilityAndProductInfo
+local ApiFetchAgeRecommendations = GameDetailRodux.AgeRecommendations.ApiFetchAgeRecommendations
+local FetchUserGameVotes = require(Parent.GameVotesRodux).UserGameVotes.FetchUserGameVotes
+local GameInfosReducer = require(Parent.GameInfosRodux).GameInfosReducer
+local NextDataExpirationTimeRodux = require(Parent.NextDataExpirationTimeRodux)
+local SetNextDataExpirationTime = NextDataExpirationTimeRodux.SetNextDataExpirationTime
+local NextDataExpirationTimeReducer = NextDataExpirationTimeRodux.NextDataExpirationTimeReducer
+local ExpirationTimeNamespace = NextDataExpirationTimeRodux.ExpirationTimeNamespace
+local PlayabilityStatusEnum = require(Parent.DiscoveryTypes).PlayabilityStatusEnum
+local ApiFetchShowAgeVerificationOverlay = require(Parent.VoiceChat).AgeVerificationOverlay.ApiFetchShowAgeVerificationOverlay
+local Promise = require(Parent.Promise)
+local GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds = require(Parent.SharedFlags).GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds
+local v18 = game:DefineFastFlag("LuaAppFetchContentMaturityWithPlayability", false)
+local RunService = game:GetService("RunService")
+local t1 = {}
+
+local function hasContentMaturity(p1, p2) -- line: 32
+	-- upvalues: GameInfosReducer (copy)
+	local v26 = p1.AgeRecommendations and p1.AgeRecommendations[p2]
+
+	if v26 and (v26.summary and v26.summary.ageRecommendation and v26.summary.ageRecommendation.contentMaturity) then
+		return true
+	end
+
+	local v27 = p1.Personalization and (p1.Personalization[GameInfosReducer.key] and p1.Personalization[GameInfosReducer.key][p2])
+
+	return v27 and v27.contentMaturity ~= nil
+end
+local function shouldFetchAgeRecommendations(p3, p4, p5) -- line: 49
+	-- upvalues: v18 (copy), PlayabilityStatusEnum (copy), GameInfosReducer (copy)
+	local v31 = v18
+
+	if v31 then
+		v31 = false
+
+		if p5 == PlayabilityStatusEnum.ContextualPlayabilityAgeRecommendationParentalControls then
+			local v32 = p3.AgeRecommendations and p3.AgeRecommendations[p4]
+			local v33
+
+			if v32 and v32.summary and v32.summary.ageRecommendation and v32.summary.ageRecommendation.contentMaturity then
+				v33 = true
+			else
+				local v34 = p3.Personalization and (p3.Personalization[GameInfosReducer.key] and p3.Personalization[GameInfosReducer.key][p4])
+
+				v33 = v34 and v34.contentMaturity ~= nil
+			end
+
+			v31 = not v33
+		end
+	end
+
+	return v31
+end
+local function playButtonDataFetchPromises(p6, p7, p8, p9, b1: boolean?) -- line: 55
+	-- upvalues: ApiFetchGameDetails (copy), RetrievalStatus (copy), FetchGamePlayabilityAndProductInfo (copy), v18 (copy), PlayabilityStatusEnum (copy), GameInfosReducer (copy), ApiFetchAgeRecommendations (copy), Promise (copy), ApiFetchShowAgeVerificationOverlay (copy), FetchUserGameVotes (copy)
+	local t2 = {}
+
+	if ApiFetchGameDetails.GetFetchingStatus(p7:getState(), p8) ~= RetrievalStatus.Fetching and (p9 or p7:getState().GameDetails[p8] == nil) then
+		table.insert(t2, p7:dispatch(ApiFetchGameDetails.Fetch(p6, { p8 })))
+	end
+
+	local v41 = FetchGamePlayabilityAndProductInfo.GetFetchingStatus(p7:getState(), p8)
+
+	if p9 or b1 or v41 == RetrievalStatus.NotStarted or v41 == RetrievalStatus.Failed then
+		local v42 = p7:dispatch(FetchGamePlayabilityAndProductInfo.Fetch(p6, p8))
+
+		if v18 then
+			v42 = v42:andThen(function(p10) -- line: 84
+				-- upvalues: p7 (copy), p8 (copy), v18 (copy), PlayabilityStatusEnum (copy), GameInfosReducer (copy), ApiFetchAgeRecommendations (copy), p6 (copy), Promise (copy)
+				local v59 = p7:getState()
+				local v60 = p8
+				local v61 = v18
+
+				if v61 then
+					v61 = false
+
+					if p10 == PlayabilityStatusEnum.ContextualPlayabilityAgeRecommendationParentalControls then
+						local v62 = v59.AgeRecommendations and v59.AgeRecommendations[v60]
+						local v63
+
+						if v62 and v62.summary and v62.summary.ageRecommendation and v62.summary.ageRecommendation.contentMaturity then
+							v63 = true
+						else
+							local v64 = v59.Personalization and (v59.Personalization[GameInfosReducer.key] and v59.Personalization[GameInfosReducer.key][v60])
+
+							v63 = v64 and v64.contentMaturity ~= nil
+						end
+
+						v61 = not v63
+					end
+				end
+
+				if v61 then
+					return p7:dispatch(ApiFetchAgeRecommendations.Fetch(p6, p8))
+				end
+
+				return Promise.resolve(p10)
+			end)
+		end
+
+		table.insert(t2, v42)
+	end
+
+	if game:GetEngineFeature("VoiceChatSupported") and ApiFetchShowAgeVerificationOverlay.GetFetchingStatus(p7:getState(), p8) ~= RetrievalStatus.Fetching and (p9 or p7:getState().ShowAgeVerificationOverlay[p8] == nil) then
+		table.insert(t2, p7:dispatch(ApiFetchShowAgeVerificationOverlay.Fetch(p6, p8)))
+	end
+
+	if FetchUserGameVotes.GetFetchingStatus(p7:getState(), p8) ~= RetrievalStatus.Fetching and (p9 or p7:getState().UserGameVotes[p8] == nil) then
+		p7:dispatch(FetchUserGameVotes.Fetch(p6, p8))
+	end
+
+	return t2
+end
+
+function t1.IsLoading(p11, p12) -- line: 119
+	-- upvalues: ApiFetchGameDetails (copy), RetrievalStatus (copy), FetchGamePlayabilityAndProductInfo (copy), v18 (copy), PlayabilityStatusEnum (copy), GameInfosReducer (copy), ApiFetchAgeRecommendations (copy), ApiFetchShowAgeVerificationOverlay (copy)
+	local v45 = ApiFetchGameDetails.GetFetchingStatus(p11, p12)
+
+	if v45 == RetrievalStatus.NotStarted or v45 == RetrievalStatus.Fetching then
+		return true
+	end
+
+	local v46 = FetchGamePlayabilityAndProductInfo.GetFetchingStatus(p11, p12)
+
+	if v46 == RetrievalStatus.NotStarted or v46 == RetrievalStatus.Fetching then
+		return true
+	end
+
+	if v18 then
+		local v47 = p11.PlayabilityStatus and p11.PlayabilityStatus[p12]
+
+		if v47 then
+			local playabilityStatus = v47.playabilityStatus
+			local v49 = v18
+
+			if v49 then
+				v49 = false
+
+				if playabilityStatus == PlayabilityStatusEnum.ContextualPlayabilityAgeRecommendationParentalControls then
+					local v50 = p11.AgeRecommendations and p11.AgeRecommendations[p12]
+					local v51
+
+					if v50 and v50.summary and v50.summary.ageRecommendation and v50.summary.ageRecommendation.contentMaturity then
+						v51 = true
+					else
+						local v52 = p11.Personalization and (p11.Personalization[GameInfosReducer.key] and p11.Personalization[GameInfosReducer.key][p12])
+
+						v51 = v52 and v52.contentMaturity ~= nil
+					end
+
+					v49 = not v51
+				end
+			end
+
+			if v49 then
+				local v53 = ApiFetchAgeRecommendations.GetFetchingStatus(p11, p12)
+
+				if v53 == RetrievalStatus.NotStarted or v53 == RetrievalStatus.Fetching then
+					return true
+				end
+			end
+		end
+	end
+
+	if game:GetEngineFeature("VoiceChatSupported") then
+		local v54 = ApiFetchShowAgeVerificationOverlay.GetFetchingStatus(p11, p12)
+
+		if v54 == RetrievalStatus.NotStarted or v54 == RetrievalStatus.Fetching then
+			return true
+		end
+	end
+
+	return false
+end
+function t1.Fetch(p13, s1: string, b2: boolean?) -- line: 170
+	-- upvalues: NextDataExpirationTimeReducer (copy), ExpirationTimeNamespace (copy), playButtonDataFetchPromises (copy), RunService (copy), PromiseUtilities (copy), GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds (copy), SetNextDataExpirationTime (copy)
+	return function(p14) -- line: 171
+		-- upvalues: NextDataExpirationTimeReducer (copy), ExpirationTimeNamespace (copy), s1 (copy), playButtonDataFetchPromises (copy), p13 (copy), b2 (copy), RunService (copy), PromiseUtilities (copy), GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds (copy), SetNextDataExpirationTime (copy)
+		local timestamp = tick()
+		local u67 = nil
+		local v68 = p14:getState().Personalization[NextDataExpirationTimeReducer.key][ExpirationTimeNamespace.GameDetailPlayability]
+
+		if v68 then
+			u67 = v68[s1]
+		end
+
+		local v69 = false
+
+		if u67 == nil or u67 < timestamp then
+			v69 = true
+		end
+
+		local v70 = playButtonDataFetchPromises(p13, p14, s1, v69, b2)
+
+		if #v70 > 0 then
+			local _warn = nil
+
+			if _G.__TESTEZ_RUNNING_TEST__ or RunService:IsStudio() then
+				_warn = warn
+			end
+
+			return PromiseUtilities.Batch(v70, _warn):andThen(function(p15) -- line: 194
+				-- upvalues: PromiseUtilities (copy), timestamp (ref), u67 (ref), GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds (copy), p14 (copy), SetNextDataExpirationTime (copy), s1 (copy), ExpirationTimeNamespace (copy)
+				if PromiseUtilities.CountResults(p15).failureCount == 0 then
+					timestamp = tick()
+					u67 = math.floor(timestamp + GetFIntLuaAppThrottleRefreshPlayabilityIntervalSeconds())
+					p14:dispatch(SetNextDataExpirationTime(s1, u67, ExpirationTimeNamespace.GameDetailPlayability))
+				end
+			end)
+		end
+	end
+end
+
+return t1

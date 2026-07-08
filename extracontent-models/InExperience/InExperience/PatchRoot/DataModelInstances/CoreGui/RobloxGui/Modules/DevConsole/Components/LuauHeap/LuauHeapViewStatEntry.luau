@@ -1,97 +1,108 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v3 = require(l_Components_0.CellLabel);
-local v4 = require(l_Components_0.BannerButton);
-local _ = require(script.Parent.LuauHeapTypes);
-local v6 = require(script.Parent.Parent.Parent.Constants);
-local l_LineWidth_0 = v6.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v6.GeneralFormatting.LineColor;
-local l_StatEntryFrameHeight_0 = v6.LuauHeapFormatting.StatEntryFrameHeight;
-local _ = v6.LuauHeapFormatting.DepthIndent;
-local l_ValueCellWidth_0 = v6.LuauHeapFormatting.ValueCellWidth;
-local l_CellPadding_0 = v6.LuauHeapFormatting.CellPadding;
-local l_ValuePadding_0 = v6.LuauHeapFormatting.ValuePadding;
-local v14 = v1.PureComponent:extend("LuauHeapViewStatEntry");
-local function v16(v15) --[[ Line: 31 ]] --[[ Name: BorderedCellLabel ]]
-    -- upvalues: v1 (copy), v3 (copy), l_LineWidth_0 (copy), l_ValuePadding_0 (copy), l_LineColor_0 (copy)
-    return v1.createFragment({
-        Label = v1.createElement(v3, {
-            text = v15.text, 
-            size = v15.size, 
-            pos = v15.pos, 
-            richText = true
-        }), 
-        LeftBorder = v1.createElement("Frame", {
-            Size = UDim2.new(UDim.new(0, l_LineWidth_0), v15.size.Y), 
-            Position = UDim2.fromOffset(-l_ValuePadding_0, 0) + v15.pos, 
-            AnchorPoint = Vector2.new(0, 0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        })
-    });
-end;
-v14.renderValues = function(_, v18) --[[ Line: 49 ]] --[[ Name: renderValues ]]
-    -- upvalues: l_ValueCellWidth_0 (copy), l_ValuePadding_0 (copy), l_StatEntryFrameHeight_0 (copy), v1 (copy), v16 (copy)
-    local v19 = {};
-    local v20 = UDim2.new(l_ValueCellWidth_0, -l_ValuePadding_0, 0, l_StatEntryFrameHeight_0);
-    local v21 = UDim2.new(1 - l_ValueCellWidth_0 * #v18, l_ValuePadding_0, 0, 0);
-    for v22, v23 in v18 do
-        v19[tostring(v22)] = v1.createElement(v16, {
-            text = tostring(v23), 
-            size = v20, 
-            pos = v21 + UDim2.fromScale(l_ValueCellWidth_0 * (v22 - 1), 0)
-        });
-    end;
-    return v19;
-end;
-v14.render = function(v24) --[[ Line: 64 ]] --[[ Name: render ]]
-    -- upvalues: l_StatEntryFrameHeight_0 (copy), l_ValueCellWidth_0 (copy), v1 (copy), v4 (copy), v3 (copy), l_CellPadding_0 (copy)
-    local l_props_0 = v24.props;
-    local v26 = l_props_0.size or UDim2.new(1, 0, 0, l_StatEntryFrameHeight_0);
-    local v27 = l_props_0.layoutOrder or 0;
-    local l_data_0 = l_props_0.data;
-    local l_compare_0 = l_props_0.compare;
-    local v30 = string.format("%.0f", l_data_0.Size);
-    local v31 = string.format("%.0f", l_data_0.Count);
-    if l_compare_0 then
-        if l_compare_0.Size ~= l_data_0.Size then
-            v30 = string.format("%d <font color=\"#%s\">(%s%d)</font>", l_data_0.Size, l_compare_0.Size > l_data_0.Size and "0f0" or "f00", l_compare_0.Size > l_data_0.Size and "" or "+", l_data_0.Size - l_compare_0.Size);
-        end;
-        if l_compare_0.Count ~= l_data_0.Count then
-            v31 = string.format("%d <font color=\"#%s\">(%s%d)</font>", l_data_0.Count, l_compare_0.Count > l_data_0.Count and "0f0" or "f00", l_compare_0.Count > l_data_0.Count and "" or "+", l_data_0.Count - l_compare_0.Count);
-        end;
-    end;
-    local v32 = {
-        v30, 
-        v31
-    };
-    local v33 = UDim.new(1 - l_ValueCellWidth_0 * #v32, 0);
-    return v1.createElement("Frame", {
-        Size = v26, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v27, 
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, {
-        layout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        button = v1.createElement(v4, {
-            size = UDim2.new(1, 0, 0, l_StatEntryFrameHeight_0), 
-            inset = 0, 
-            isExpanded = false, 
-            isExpandable = false, 
-            layoutOrder = -1
-        }, {
-            name = v1.createElement(v3, {
-                text = l_data_0.Name, 
-                size = UDim2.new(v33, UDim.new(1, 0)), 
-                pos = UDim2.new(0, l_CellPadding_0, 0, 0)
-            }), 
-            values = v1.createFragment(v24:renderValues(v32))
-        })
-    });
-end;
-return v14;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local CellLabel = require(Components.CellLabel)
+local BannerButton = require(Components.BannerButton)
+
+require(script.Parent.LuauHeapTypes)
+
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local StatEntryFrameHeight = Constants.LuauHeapFormatting.StatEntryFrameHeight
+local _ = Constants.LuauHeapFormatting.DepthIndent
+local ValueCellWidth = Constants.LuauHeapFormatting.ValueCellWidth
+local CellPadding = Constants.LuauHeapFormatting.CellPadding
+local ValuePadding = Constants.LuauHeapFormatting.ValuePadding
+local v14 = Roact.PureComponent:extend("LuauHeapViewStatEntry")
+
+local function BorderedCellLabel(t1: {[any]: any}) -- line: 31
+	-- upvalues: Roact (copy), CellLabel (copy), LineWidth (copy), ValuePadding (copy), LineColor (copy)
+	return Roact.createFragment({
+		Label = Roact.createElement(CellLabel, {
+			richText = true,
+			text = t1.text,
+			size = t1.size,
+			pos = t1.pos
+		}),
+		LeftBorder = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(UDim.new(0, LineWidth), t1.size.Y),
+			Position = UDim2.fromOffset(-ValuePadding, 0) + t1.pos,
+			AnchorPoint = Vector2.new(0, 0),
+			BackgroundColor3 = LineColor
+		})
+	})
+end
+
+function v14.renderValues(_, p2) -- line: 49
+	-- upvalues: ValueCellWidth (copy), ValuePadding (copy), StatEntryFrameHeight (copy), Roact (copy), BorderedCellLabel (copy)
+	local t2 = {}
+	local uDim2 = UDim2.new(ValueCellWidth, -ValuePadding, 0, StatEntryFrameHeight)
+	local uDim2_2 = UDim2.new(1 - ValueCellWidth * #p2, ValuePadding, 0, 0)
+
+	for v22, v23 in p2 do
+		t2[tostring(v22)] = Roact.createElement(BorderedCellLabel, {
+			text = tostring(v23),
+			size = uDim2,
+			pos = uDim2_2 + UDim2.fromScale(ValueCellWidth * (v22 - 1), 0)
+		})
+	end
+
+	return t2
+end
+function v14.render(p3) -- line: 64
+	-- upvalues: StatEntryFrameHeight (copy), ValueCellWidth (copy), Roact (copy), BannerButton (copy), CellLabel (copy), CellPadding (copy)
+	local props = p3.props
+	local v26 = props.size or UDim2.new(1, 0, 0, StatEntryFrameHeight)
+	local v27 = props.layoutOrder or 0
+	local data = props.data
+	local compare = props.compare
+	local v30 = string.format("%.0f", data.Size)
+	local v31 = string.format("%.0f", data.Count)
+
+	if compare then
+		if compare.Size ~= data.Size then
+			v30 = string.format("%d <font color=\"#%s\">(%s%d)</font>", data.Size, not (compare.Size > data.Size) and "f00" or "0f0", not (compare.Size > data.Size) and "+" or "", data.Size - compare.Size)
+		end
+
+		if compare.Count ~= data.Count then
+			v31 = string.format("%d <font color=\"#%s\">(%s%d)</font>", data.Count, not (compare.Count > data.Count) and "f00" or "0f0", not (compare.Count > data.Count) and "+" or "", data.Count - compare.Count)
+		end
+	end
+
+	local t3 = {
+		v30,
+		v31
+	}
+	local uDim = UDim.new(1 - ValueCellWidth * #t3, 0)
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = v26,
+		LayoutOrder = v27,
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, {
+		layout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		button = Roact.createElement(BannerButton, {
+			inset = 0,
+			isExpanded = false,
+			isExpandable = false,
+			layoutOrder = -1,
+			size = UDim2.new(1, 0, 0, StatEntryFrameHeight)
+		}, {
+			name = Roact.createElement(CellLabel, {
+				text = data.Name,
+				size = UDim2.new(uDim, UDim.new(1, 0)),
+				pos = UDim2.new(0, CellPadding, 0, 0)
+			}),
+			values = Roact.createFragment(p3:renderValues(t3))
+		})
+	})
+end
+
+return v14

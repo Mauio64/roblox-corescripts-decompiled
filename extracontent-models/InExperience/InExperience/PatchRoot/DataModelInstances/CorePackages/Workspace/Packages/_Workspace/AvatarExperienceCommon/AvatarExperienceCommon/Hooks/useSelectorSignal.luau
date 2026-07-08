@@ -1,39 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Signals);
-local l_useStore_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useStore;
-local function v6(v4, v5) --[[ Line: 16 ]]
-    return v4 == v5;
-end;
-return function(v7, v8) --[[ Line: 20 ]] --[[ Name: useSelectorSignal ]]
-    -- upvalues: l_useStore_0 (copy), v1 (copy), v2 (copy), v6 (copy)
-    local v9 = l_useStore_0();
-    local v10 = v9:getState();
-    local v11, v12 = v1.useMemo(function() --[[ Line: 24 ]]
-        -- upvalues: v2 (ref), v10 (copy)
-        return v2.createSignal(v10);
-    end, {});
-    v1.useEffect(function() --[[ Line: 28 ]]
-        -- upvalues: v9 (copy), v12 (copy)
-        local v13 = v9:getState();
-        v12(v13);
-        local v14 = v9.changed:connect(v12);
-        return function() --[[ Line: 32 ]]
-            -- upvalues: v14 (copy)
-            v14:disconnect();
-        end;
-    end, {
-        v9
-    });
-    return v1.useMemo(function() --[[ Line: 37 ]]
-        -- upvalues: v2 (ref), v7 (copy), v11 (copy), v8 (copy), v6 (ref)
-        return v2.createComputed(function(v15) --[[ Line: 38 ]]
-            -- upvalues: v7 (ref), v11 (ref)
-            return v7(v11(v15));
-        end, v8 or v6);
-    end, {
-        v11, 
-        v7, 
-        v8
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local Signals = require(Parent.Signals)
+local useStore = require(Parent.RoactUtils).Hooks.RoactRodux.useStore
+
+local function v5(p1, p2) -- line: 16
+	return p1 == p2
+end
+local function useSelectorSignal(p3: ((...any) -> ...any), p4: ((...any) -> ...any)?) -- line: 20
+	-- upvalues: useStore (copy), React (copy), Signals (copy), v5 (copy)
+	local v11 = useStore()
+	local v12 = v11:getState()
+	local v13, v14 = React.useMemo(function() -- line: 24
+		-- upvalues: Signals (copy), v12 (copy)
+		return Signals.createSignal(v12)
+	end, {})
+
+	React.useEffect(function() -- line: 28
+		-- upvalues: v11 (copy), v14 (copy)
+		local v15 = v11:getState()
+
+		v14(v15)
+
+		local v16 = v11.changed:connect(v14)
+
+		return function() -- line: 32
+			-- upvalues: v16 (copy)
+			v16:disconnect()
+		end
+	end, { v11 })
+
+	return React.useMemo(function() -- line: 37
+		-- upvalues: Signals (copy), p3 (copy), v13 (copy), p4 (copy), v5 (copy)
+		return Signals.createComputed(function(p5) -- line: 38
+			-- upvalues: p3 (copy), v13 (copy)
+			return p3(v13(p5))
+		end, p4 or v5)
+	end, {
+		v13,
+		p3,
+		p4
+	})
+end
+
+return useSelectorSignal

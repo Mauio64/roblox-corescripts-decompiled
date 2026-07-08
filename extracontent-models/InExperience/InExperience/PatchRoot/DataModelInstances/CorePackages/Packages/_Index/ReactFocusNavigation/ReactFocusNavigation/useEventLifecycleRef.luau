@@ -1,19 +1,25 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3) --[[ Line: 8 ]] --[[ Name: useEventLifecycleRef ]]
-    -- upvalues: v1 (copy)
-    local v4 = v1.useRef(nil);
-    return (v1.useCallback(function(v5) --[[ Line: 10 ]]
-        -- upvalues: v4 (copy), v3 (copy), v2 (copy)
-        if v4.current and v3 then
-            v3(v4.current);
-        end;
-        if v5 then
-            v2(v5);
-        end;
-        v4.current = v5;
-    end, {
-        v2, 
-        v3
-    }));
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+
+local function useEventLifecycleRef(p1: ((...any) -> ...any), p2: ((...any) -> ...any)?) -- line: 8
+	-- upvalues: React (copy)
+	local v6 = React.useRef(nil)
+
+	return (React.useCallback(function(p3) -- line: 10
+		-- upvalues: v6 (copy), p2 (copy), p1 (copy)
+		if v6.current and p2 then
+			p2(v6.current)
+		end
+
+		if p3 then
+			p1(p3)
+		end
+
+		v6.current = p3
+	end, {
+		p1,
+		p2
+	}))
+end
+
+return useEventLifecycleRef

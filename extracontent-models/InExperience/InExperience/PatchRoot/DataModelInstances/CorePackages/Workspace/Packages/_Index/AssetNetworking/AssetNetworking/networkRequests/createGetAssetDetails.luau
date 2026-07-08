@@ -1,11 +1,12 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AssetNetworking");
-local v1 = require(l_script_FirstAncestor_0.ASSETS_API_URL);
-return function(v2) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "GetAssetDetails"
-    }, function(v3, v4) --[[ Line: 12 ]]
-        -- upvalues: v1 (ref)
-        return v3(v1):path("v1"):path("assets"):path(v4);
-    end);
-end;
+local AssetNetworking = script:FindFirstAncestor("AssetNetworking")
+local ASSETS_API_URL = require(AssetNetworking.ASSETS_API_URL)
+
+return function(p1) -- line: 9
+	-- upvalues: ASSETS_API_URL (copy)
+	return p1.roduxNetworking.GET({
+		Name = "GetAssetDetails"
+	}, function(p2, s1: string) -- line: 12
+		-- upvalues: ASSETS_API_URL (copy)
+		return p2(ASSETS_API_URL):path("v1"):path("assets"):path(s1)
+	end)
+end

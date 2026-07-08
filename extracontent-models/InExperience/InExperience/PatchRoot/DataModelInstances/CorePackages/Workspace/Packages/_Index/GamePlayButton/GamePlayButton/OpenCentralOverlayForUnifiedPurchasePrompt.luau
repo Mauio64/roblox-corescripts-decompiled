@@ -1,10 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("GamePlayButton").Parent;
-local l_CentralOverlayType_0 = require(l_Parent_0.RobloxAppEnums).CentralOverlayType;
-local l_SetCentralOverlay_0 = require(l_Parent_0.CentralOverlay).Actions.SetCentralOverlay;
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: l_SetCentralOverlay_0 (copy), l_CentralOverlayType_0 (copy)
-    return function(v4) --[[ Line: 7 ]]
-        -- upvalues: l_SetCentralOverlay_0 (ref), l_CentralOverlayType_0 (ref), v3 (copy)
-        v4:dispatch(l_SetCentralOverlay_0(l_CentralOverlayType_0.UnifiedProductPurchaseModal, v3));
-    end;
-end;
+local Parent = script:FindFirstAncestor("GamePlayButton").Parent
+local CentralOverlayType = require(Parent.RobloxAppEnums).CentralOverlayType
+local SetCentralOverlay = require(Parent.CentralOverlay).Actions.SetCentralOverlay
+
+return function(p1) -- line: 6
+	-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy)
+	return function(p2) -- line: 7
+		-- upvalues: SetCentralOverlay (copy), CentralOverlayType (copy), p1 (copy)
+		p2:dispatch(SetCentralOverlay(CentralOverlayType.UnifiedProductPurchaseModal, p1))
+	end
+end

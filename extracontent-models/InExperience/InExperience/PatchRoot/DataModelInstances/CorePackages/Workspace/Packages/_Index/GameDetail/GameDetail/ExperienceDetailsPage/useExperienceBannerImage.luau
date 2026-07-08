@@ -1,49 +1,101 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.SignalsReact);
-local l_GameMediaImageType_0 = require(l_Parent_0.DiscoveryTypes).GameMediaImageType;
-local v4 = require(l_Parent_0.DataHydration);
-local l_DataStatus_0 = v4.DataStatus;
-local l_getGameMediaStore_0 = v4.Game.getGameMediaStore;
-local v7 = {
-    Loading = "Loading", 
-    Success = "Success", 
-    NotFound = "NotFound"
-};
-return function(v8) --[[ Line: 25 ]] --[[ Name: useExperienceBannerImage ]]
-    -- upvalues: l_getGameMediaStore_0 (copy), v2 (copy), v1 (copy), l_DataStatus_0 (copy), v7 (copy), l_GameMediaImageType_0 (copy)
-    local v9 = l_getGameMediaStore_0(false).getAndFetchGameMedia(v8);
-    local v10 = v2.useSignalState(v9.data);
-    local v11 = v2.useSignalState(v9.status);
-    return v1.useMemo(function() --[[ Line: 30 ]]
-        -- upvalues: v11 (copy), l_DataStatus_0 (ref), v7 (ref), v10 (copy), l_GameMediaImageType_0 (ref)
-        if v11 == l_DataStatus_0.NotReady then
-            return {
-                status = v7.Loading, 
-                url = nil
-            };
-        elseif v11 == l_DataStatus_0.Failed or not v10 then
-            return {
-                status = v7.NotFound, 
-                url = nil
-            };
-        else
-            for _, v13 in v10 do
-                if v13.assetTypeId == l_GameMediaImageType_0.Image and v13.imageId then
-                    local v14 = string.format("rbxthumb://type=Asset&id=%s&w=768&h=432", (tostring(v13.imageId)));
-                    return {
-                        status = v7.Success, 
-                        url = v14
-                    };
-                end;
-            end;
-            return {
-                status = v7.NotFound, 
-                url = nil
-            };
-        end;
-    end, {
-        v11, 
-        v10
-    });
-end;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local React = require(Parent.React)
+local SignalsReact = require(Parent.SignalsReact)
+local GameMediaImageType = require(Parent.DiscoveryTypes).GameMediaImageType
+local DataHydration = require(Parent.DataHydration)
+local DataStatus = DataHydration.DataStatus
+local getGameMediaStore = DataHydration.Game.getGameMediaStore
+local Url = require(Parent.Http).Url
+local v9 = game:DefineFastFlag("ExperienceBannerImageAllowCustomDimensions", false)
+local v10 = game:DefineFastFlag("ExperienceBannerImageDefaultFallback", false)
+local _ = {
+	Loading = "Loading",
+	Success = "Success",
+	NotFound = "NotFound",
+	Fallback = "Fallback",
+	Failed = "Failed"
+}
+
+local function useExperienceBannerImage(s1: string, s2: string?, n1: number?, n2: number?) -- line: 37
+	-- upvalues: getGameMediaStore (copy), SignalsReact (copy), v9 (copy), React (copy), DataStatus (copy), v10 (copy), GameMediaImageType (copy), Url (copy)
+	local v17 = getGameMediaStore(false).getAndFetchGameMedia(s1)
+	local v18 = SignalsReact.useSignalState(v17.data)
+	local v19 = SignalsReact.useSignalState(v17.status)
+	local v20 = not v9 and 768 or (n1 or 768)
+	local v21 = not v9 and 432 or (n2 or 432)
+
+	return React.useMemo(function() -- line: 54
+		-- upvalues: v19 (copy), DataStatus (copy), v10 (copy), v18 (copy), GameMediaImageType (copy), v20 (copy), v21 (copy), s2 (copy), Url (copy)
+		if v19 == DataStatus.NotReady then
+			return {
+				status = "Loading",
+				url = nil
+			}
+		end
+
+		if v10 then
+			if v19 == DataStatus.Failed then
+				return {
+					status = "Failed",
+					url = nil
+				}
+			end
+
+			if v18 then
+				for _, v23 in v18 do
+					if v23.assetTypeId == GameMediaImageType.Image and v23.imageId then
+						local v24 = string.format("rbxthumb://type=Asset&id=%s&w=%d&h=%d", tostring(v23.imageId), v20, v21)
+
+						return {
+							status = "Success",
+							url = v24
+						}
+					end
+				end
+			end
+
+			if s2 ~= nil and s2 ~= "" then
+				return {
+					status = "Fallback",
+					url = Url:getPlaceDefaultThumbnailUrl(s2, v20, v21)
+				}
+			end
+
+			return {
+				status = "NotFound",
+				url = nil
+			}
+		end
+
+		if v19 == DataStatus.Failed or not v18 then
+			return {
+				status = "NotFound",
+				url = nil
+			}
+		end
+
+		for _, v26 in v18 do
+			if v26.assetTypeId == GameMediaImageType.Image and v26.imageId then
+				local v27 = string.format("rbxthumb://type=Asset&id=%s&w=%d&h=%d", tostring(v26.imageId), v20, v21)
+
+				return {
+					status = "Success",
+					url = v27
+				}
+			end
+		end
+
+		return {
+			status = "NotFound",
+			url = nil
+		}
+	end, {
+		v19,
+		v18,
+		v20,
+		v21,
+		s2
+	})
+end
+
+return useExperienceBannerImage

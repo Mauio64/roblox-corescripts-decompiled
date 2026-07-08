@@ -1,14 +1,17 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.ReactUtils);
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_Parent_0.React);
-local l_useEventConnection_0 = v1.useEventConnection;
-return function() --[[ Line: 11 ]]
-    -- upvalues: v3 (copy), l_GuiService_0 (copy), l_useEventConnection_0 (copy)
-    local v5, v6 = v3.useState(l_GuiService_0.TopbarInset);
-    l_useEventConnection_0(l_GuiService_0:GetPropertyChangedSignal("TopbarInset"), function() --[[ Line: 14 ]]
-        -- upvalues: v6 (copy), l_GuiService_0 (ref)
-        v6(l_GuiService_0.TopbarInset);
-    end);
-    return v5;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ReactUtils = require(ParentParent.ReactUtils)
+local GuiService = game:GetService("GuiService")
+local React = require(ParentParent.React)
+local useEventConnection = ReactUtils.useEventConnection
+
+return function() -- line: 11
+	-- upvalues: React (copy), GuiService (copy), useEventConnection (copy)
+	local v6, v7 = React.useState(GuiService.TopbarInset)
+
+	useEventConnection(GuiService:GetPropertyChangedSignal("TopbarInset"), function() -- line: 14
+		-- upvalues: v7 (copy), GuiService (copy)
+		v7(GuiService.TopbarInset)
+	end)
+
+	return v6
+end

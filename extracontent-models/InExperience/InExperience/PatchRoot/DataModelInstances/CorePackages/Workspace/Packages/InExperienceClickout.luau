@@ -1,2 +1,3 @@
-local l__Workspace_0 = script.Parent._Workspace;
-return (require(l__Workspace_0.InExperienceClickout.InExperienceClickout));
+local _Workspace = script.Parent._Workspace
+
+return (require(_Workspace.InExperienceClickout.InExperienceClickout))

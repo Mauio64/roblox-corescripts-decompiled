@@ -1,29 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v4 = require(l_script_FirstAncestor_0.BaseComponents.EditProfileHeaderBar);
-local l_useProfileCardWidth_0 = require(l_Parent_0.ProfilePlatformCommon).Hooks.useProfileCardWidth;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-return function(v7) --[[ Line: 22 ]]
-    -- upvalues: l_useProfileCardWidth_0 (copy), l_useLocalization_0 (copy), v2 (copy), l_View_0 (copy), v4 (copy)
-    local v8 = l_useProfileCardWidth_0();
-    local v9 = l_useLocalization_0({
-        title = v7.titleKey
-    });
-    return v2.createElement(l_View_0, {
-        tag = "col bg-surface-0 anchor-top-right position-top-right items-start", 
-        Size = UDim2.new(0, v8, 1, 0)
-    }, {
-        TopBar = v2.createElement(v4, {
-            onClose = v7.onClose, 
-            headerText = v9.title, 
-            onSave = v7.onSave, 
-            isLoading = v7.isLoading, 
-            isDisabled = v7.isDisabled
-        }), 
-        Content = v2.createElement(l_View_0, {
-            tag = "col padding-xlarge gap-xxlarge size-full-0 auto-y"
-        }, v7.component)
-    });
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local View = require(EditProfileParent.Foundation).View
+local EditProfileHeaderBar = require(EditProfile.BaseComponents.EditProfileHeaderBar)
+local useProfileCardWidth = require(EditProfileParent.ProfilePlatformCommon).Hooks.useProfileCardWidth
+local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
+local FFlagAXEnableProfileTab = require(EditProfileParent.SharedFlags).FFlagAXEnableProfileTab
+
+return function(t1: {[any]: any}) -- line: 24
+	-- upvalues: useProfileCardWidth (copy), useLocalization (copy), FFlagAXEnableProfileTab (copy), React (copy), View (copy), EditProfileHeaderBar (copy)
+	local v10 = useProfileCardWidth()
+	local v11 = useLocalization({
+		title = t1.titleKey
+	})
+	local v12 = FFlagAXEnableProfileTab and t1.fullBleed == true
+
+	return React.createElement(View, {
+		tag = not FFlagAXEnableProfileTab and "col bg-surface-0 anchor-top-right position-top-right items-start" or {
+			["col items-start bg-surface-0"] = true,
+			["position-top-right anchor-top-right"] = not v12,
+			["size-full-full"] = v12
+		},
+		Size = if not v12 then UDim2.new(0, v10, 1, 0) else nil
+	}, {
+		TopBar = React.createElement(EditProfileHeaderBar, {
+			onClose = t1.onClose,
+			headerText = v11.title,
+			onSave = t1.onSave,
+			isLoading = t1.isLoading,
+			isDisabled = t1.isDisabled
+		}),
+		Content = React.createElement(View, {
+			tag = "col padding-xlarge gap-xxlarge size-full-0 auto-y"
+		}, t1.component)
+	})
+end

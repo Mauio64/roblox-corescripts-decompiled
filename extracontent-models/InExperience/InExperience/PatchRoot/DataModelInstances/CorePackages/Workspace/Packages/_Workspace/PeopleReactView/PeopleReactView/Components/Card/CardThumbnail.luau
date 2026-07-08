@@ -1,119 +1,120 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SignalsReact);
-local v4 = require(l_Parent_0.Responsive);
-local l_usePreferredInput_0 = v4.usePreferredInput;
-local l_Input_0 = v4.Input;
-local l_useLastInputMode_0 = require(l_Parent_0.FocusNavigationUtils).useLastInputMode;
-local v8 = require(l_Parent_0.Foundation);
-local l_getRbxThumb_0 = v8.Utility.getRbxThumb;
-local l_ControlState_0 = v8.Enums.ControlState;
-local l_StateLayerAffordance_0 = v8.Enums.StateLayerAffordance;
-local l_ThumbnailType_0 = v8.Enums.ThumbnailType;
-local l_ThumbnailSize_0 = v8.Enums.ThumbnailSize;
-local l_Image_0 = v8.Image;
-local l_View_0 = v8.View;
-local v16 = require(l_Parent_0.PeopleService);
-local v17 = require(l_script_FirstAncestor_0.Configs.PersonButtonConfigs);
-local v18 = require(l_script_FirstAncestor_0.Hooks.useGetPeopleService);
-local v19 = require(l_script_FirstAncestor_0.Hooks.useIsComponentInputEnded);
-local v20 = require(l_script_FirstAncestor_0.Components.Card.CardMenu);
-local l_GetFFlagPeoplePageLazyRenderCards_0 = v16.getService("Flags").GetFFlagPeoplePageLazyRenderCards;
-local v22 = game:DefineFastFlag("PeoplePageCardMenuUseVisibleProperty", false);
-return v2.memo(function(v23) --[[ Line: 43 ]] --[[ Name: CardThumbnail ]]
-    -- upvalues: v2 (copy), l_GetFFlagPeoplePageLazyRenderCards_0 (copy), l_usePreferredInput_0 (copy), l_useLastInputMode_0 (copy), v18 (copy), v17 (copy), v3 (copy), v19 (copy), l_ControlState_0 (copy), l_Input_0 (copy), l_View_0 (copy), l_StateLayerAffordance_0 (copy), l_Image_0 (copy), l_getRbxThumb_0 (copy), l_ThumbnailType_0 (copy), l_ThumbnailSize_0 (copy), v22 (copy), v20 (copy)
-    local v24 = v2.useRef(nil);
-    local v25 = if not l_GetFFlagPeoplePageLazyRenderCards_0() then l_usePreferredInput_0() else nil;
-    local v26 = if not l_GetFFlagPeoplePageLazyRenderCards_0() then l_useLastInputMode_0() else nil;
-    local v27 = v18("Constants");
-    local v28 = v18("PeopleVoiceChatStore");
-    local v29 = v17(v23.person.UserId);
-    local v30 = v2.useMemo(function() --[[ Line: 54 ]]
-        -- upvalues: v29 (copy), v27 (copy)
-        return v29[v27.PERSON_BUTTONS.INSPECT];
-    end, {
-        v29
-    });
-    local v31 = v3.useSignalState(v28.getPlayerIsTalking(v23.person.UserId));
-    local v32, v33 = v2.useState(false);
-    local v34, v35 = v2.useState(false);
-    local v36, v37 = v2.useState(false);
-    local v38 = v19(v24);
-    local v40 = v2.useCallback(function(v39) --[[ Line: 65 ]]
-        -- upvalues: v33 (copy), l_ControlState_0 (ref)
-        v33(v39 == l_ControlState_0.Hover);
-    end, {});
-    local v42 = v2.useCallback(function(v41) --[[ Line: 69 ]]
-        -- upvalues: v35 (copy), l_ControlState_0 (ref)
-        v35(v41 == l_ControlState_0.Hover);
-    end, {});
-    local v44 = v2.useMemo(function() --[[ Line: 73 ]]
-        -- upvalues: l_GetFFlagPeoplePageLazyRenderCards_0 (ref), v23 (copy), v26 (copy), v25 (copy), l_Input_0 (ref), v32 (copy), v36 (copy), v31 (copy)
-        local v43 = if l_GetFFlagPeoplePageLazyRenderCards_0() then v23.shouldShowMenu else v26 == "Focus" or v25 ~= l_Input_0.Pointer;
-        return v32 or v36 or v31 or v43;
-    end, {
-        v32, 
-        v36, 
-        v31, 
-        v25, 
-        v26, 
-        v23.shouldShowMenu
-    });
-    local v45 = v2.useMemo(function() --[[ Line: 81 ]]
-        -- upvalues: v34 (copy), v36 (copy), v38 (copy)
-        return v34 or v36 or v38;
-    end, {
-        v34, 
-        v36, 
-        v38
-    });
-    local v46 = v2.useCallback(function() --[[ Line: 85 ]]
-        -- upvalues: v30 (copy), v27 (copy)
-        v30.onActivated(v27.ANALYTICS.ENTRY_POINT.PEOPLE_CARD);
-    end, {
-        v30.onActivated
-    });
-    return v2.createElement(l_View_0, {
-        tag = "size-full aspect-1-1 radius-medium", 
-        selection = {
-            Selectable = v30.shouldShow()
-        }, 
-        LayoutOrder = v23.layoutOrder, 
-        stateLayer = {
-            affordance = if v45 then l_StateLayerAffordance_0.None else l_StateLayerAffordance_0.Background
-        }, 
-        onActivated = if v30.shouldShow() then v46 else nil, 
-        onStateChanged = v40, 
-        ref = v24
-    }, {
-        AvatarThumbnailContainer = v2.createElement(l_View_0, {
-            tag = "size-full padding-medium"
-        }, {
-            AvatarThumbnail = v2.createElement(l_Image_0, {
-                tag = "size-full", 
-                Image = l_getRbxThumb_0(l_ThumbnailType_0.Avatar, v23.person.UserId, l_ThumbnailSize_0.Medium)
-            })
-        }), 
-        ThumbnailHeaderBar = v2.createElement(l_View_0, {
-            tag = "row size-full-0 auto-y align-x-right padding-small"
-        }, {
-            CardMenuBackground = if not not v22 or v44 then v2.createElement(l_View_0, {
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                selection = {
-                    Selectable = false
-                }, 
-                stateLayer = {
-                    affordance = l_StateLayerAffordance_0.None
-                }, 
-                onStateChanged = v42, 
-                Visible = if v22 then v44 else nil
-            }, {
-                CardMenu = v2.createElement(v20, {
-                    person = v23.person, 
-                    onIsOpenChanged = v37
-                })
-            }) else nil
-        })
-    });
-end);
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local SignalsReact = require(PeopleReactViewParent.SignalsReact)
+local Responsive = require(PeopleReactViewParent.Responsive)
+local usePreferredInput = Responsive.usePreferredInput
+local Input = Responsive.Input
+local useLastInputMode = require(PeopleReactViewParent.FocusNavigationUtils).useLastInputMode
+local Foundation = require(PeopleReactViewParent.Foundation)
+local getRbxThumb = Foundation.Utility.getRbxThumb
+local ControlState = Foundation.Enums.ControlState
+local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
+local ThumbnailType = Foundation.Enums.ThumbnailType
+local ThumbnailSize = Foundation.Enums.ThumbnailSize
+local FoundationImage = Foundation.Image
+local View = Foundation.View
+local PeopleService = require(PeopleReactViewParent.PeopleService)
+local PersonButtonConfigs = require(PeopleReactView.Configs.PersonButtonConfigs)
+local useGetPeopleService = require(PeopleReactView.Hooks.useGetPeopleService)
+local useIsComponentInputEnded = require(PeopleReactView.Hooks.useIsComponentInputEnded)
+local CardMenu = require(PeopleReactView.Components.Card.CardMenu)
+local GetFFlagPeoplePageLazyRenderCards = PeopleService.getService("Flags").GetFFlagPeoplePageLazyRenderCards
+local v23 = game:DefineFastFlag("PeoplePageCardMenuUseVisibleProperty", false)
+
+local function CardThumbnail(t1: {[any]: any}) -- line: 43
+	-- upvalues: React (copy), GetFFlagPeoplePageLazyRenderCards (copy), usePreferredInput (copy), useLastInputMode (copy), useGetPeopleService (copy), PersonButtonConfigs (copy), SignalsReact (copy), useIsComponentInputEnded (copy), ControlState (copy), Input (copy), View (copy), StateLayerAffordance (copy), FoundationImage (copy), getRbxThumb (copy), ThumbnailType (copy), ThumbnailSize (copy), v23 (copy), CardMenu (copy)
+	local v26 = React.useRef(nil)
+	local v27 = if GetFFlagPeoplePageLazyRenderCards() then nil else usePreferredInput()
+	local v28 = if GetFFlagPeoplePageLazyRenderCards() then nil else useLastInputMode()
+	local v29 = useGetPeopleService("Constants")
+	local v30 = useGetPeopleService("PeopleVoiceChatStore")
+	local v31 = PersonButtonConfigs(t1.person.UserId)
+	local v32 = React.useMemo(function() -- line: 54
+		-- upvalues: v31 (copy), v29 (copy)
+		return v31[v29.PERSON_BUTTONS.INSPECT]
+	end, { v31 })
+	local v33 = SignalsReact.useSignalState(v30.getPlayerIsTalking(t1.person.UserId))
+	local v34, v35 = React.useState(false)
+	local v36, v37 = React.useState(false)
+	local v38, v39 = React.useState(false)
+	local v40 = useIsComponentInputEnded(v26)
+	local v41 = React.useCallback(function(p1) -- line: 65
+		-- upvalues: v35 (copy), ControlState (copy)
+		v35(p1 == ControlState.Hover)
+	end, {})
+	local v42 = React.useCallback(function(p2) -- line: 69
+		-- upvalues: v37 (copy), ControlState (copy)
+		v37(p2 == ControlState.Hover)
+	end, {})
+	local v43 = React.useMemo(function() -- line: 73
+		-- upvalues: GetFFlagPeoplePageLazyRenderCards (copy), t1 (copy), v28 (copy), v27 (copy), Input (copy), v34 (copy), v38 (copy), v33 (copy)
+		local v48 = if not GetFFlagPeoplePageLazyRenderCards() then v28 == "Focus" or v27 ~= Input.Pointer else t1.shouldShowMenu
+
+		return v34 or (v38 or (v33 or v48))
+	end, {
+		v34,
+		v38,
+		v33,
+		v27,
+		v28,
+		t1.shouldShowMenu
+	})
+	local v44 = React.useMemo(function() -- line: 81
+		-- upvalues: v36 (copy), v38 (copy), v40 (copy)
+		return v36 or (v38 or v40)
+	end, {
+		v36,
+		v38,
+		v40
+	})
+	local v45 = React.useCallback(function() -- line: 85
+		-- upvalues: v32 (copy), v29 (copy)
+		v32.onActivated(v29.ANALYTICS.ENTRY_POINT.PEOPLE_CARD)
+	end, { v32.onActivated })
+
+	return React.createElement(View, {
+		tag = "size-full aspect-1-1 radius-medium",
+		selection = {
+			Selectable = v32.shouldShow()
+		},
+		LayoutOrder = t1.layoutOrder,
+		stateLayer = {
+			affordance = if not v44 then StateLayerAffordance.Background else StateLayerAffordance.None
+		},
+		onActivated = if not v32.shouldShow() then nil else v45,
+		onStateChanged = v41,
+		ref = v26
+	}, {
+		AvatarThumbnailContainer = React.createElement(View, {
+			tag = "size-full padding-medium"
+		}, {
+			AvatarThumbnail = React.createElement(FoundationImage, {
+				tag = "size-full",
+				Image = getRbxThumb(ThumbnailType.Avatar, t1.person.UserId, ThumbnailSize.Medium)
+			})
+		}),
+		ThumbnailHeaderBar = React.createElement(View, {
+			tag = "row size-full-0 auto-y align-x-right padding-small"
+		}, {
+			CardMenuBackground = if not v23 and not v43 then nil else React.createElement(View, {
+				AutomaticSize = Enum.AutomaticSize.XY,
+				selection = {
+					Selectable = false
+				},
+				stateLayer = {
+					affordance = StateLayerAffordance.None
+				},
+				onStateChanged = v42,
+				Visible = if not v23 then nil else v43
+			}, {
+				CardMenu = React.createElement(CardMenu, {
+					person = t1.person,
+					onIsOpenChanged = v39
+				})
+			})
+		})
+	})
+end
+
+return React.memo(CardThumbnail)

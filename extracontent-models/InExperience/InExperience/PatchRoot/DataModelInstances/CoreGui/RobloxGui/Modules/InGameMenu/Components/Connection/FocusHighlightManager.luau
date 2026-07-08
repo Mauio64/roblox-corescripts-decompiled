@@ -1,41 +1,44 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_RoactRodux_0 = v2.RoactRodux;
-local l_t_0 = v2.t;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_InputType_0 = require(l_Parent_0.Resources.Constants).InputType;
-local v8 = require(l_Parent_0.Flags.GetFFlagIGMGamepadSelectionHistory);
-local v9 = require(script.Parent.FocusHandler);
-local v10 = l_Roact_0.PureComponent:extend("FocusHighlightManager");
-v10.validateProps = l_t_0.strictInterface({
-    menuOpen = l_t_0.boolean, 
-    inputType = l_t_0.string
-});
-v10.render = function(v11) --[[ Line: 22 ]] --[[ Name: render ]]
-    -- upvalues: v8 (copy), l_Roact_0 (copy), v9 (copy), l_InputType_0 (copy), l_GuiService_0 (copy)
-    if v8() then
-        return l_Roact_0.createElement(v9, {
-            isFocused = not v11.props.menuOpen or v11.props.inputType ~= l_InputType_0.Gamepad, 
-            didFocus = function() --[[ Line: 26 ]] --[[ Name: didFocus ]]
-                -- upvalues: l_GuiService_0 (ref)
-                l_GuiService_0.SelectedCoreObject = nil;
-            end
-        });
-    else
-        return l_Roact_0.createElement(v9, {
-            isFocused = v11.props.menuOpen and v11.props.inputType == l_InputType_0.Gamepad, 
-            didBlur = function() --[[ Line: 33 ]] --[[ Name: didBlur ]]
-                -- upvalues: l_GuiService_0 (ref)
-                l_GuiService_0.SelectedCoreObject = nil;
-            end
-        });
-    end;
-end;
-return l_RoactRodux_0.UNSTABLE_connect2(function(v12) --[[ Line: 40 ]]
-    return {
-        menuOpen = v12.isMenuOpen, 
-        inputType = v12.displayOptions.inputType
-    };
-end)(v10);
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local t = InGameMenuDependencies.t
+local ParentParent = script.Parent.Parent.Parent
+local InputType = require(ParentParent.Resources.Constants).InputType
+local GetFFlagIGMGamepadSelectionHistory = require(ParentParent.Flags.GetFFlagIGMGamepadSelectionHistory)
+local FocusHandler = require(script.Parent.FocusHandler)
+local v11 = Roact.PureComponent:extend("FocusHighlightManager")
+
+v11.validateProps = t.strictInterface({
+	menuOpen = t.boolean,
+	inputType = t.string
+})
+
+function v11.render(p1) -- line: 22
+	-- upvalues: GetFFlagIGMGamepadSelectionHistory (copy), Roact (copy), FocusHandler (copy), InputType (copy), GuiService (copy)
+	if GetFFlagIGMGamepadSelectionHistory() then
+		return Roact.createElement(FocusHandler, {
+			isFocused = not p1.props.menuOpen or p1.props.inputType ~= InputType.Gamepad,
+			didFocus = function() -- line: 26
+				-- upvalues: GuiService (copy)
+				GuiService.SelectedCoreObject = nil
+			end
+		})
+	end
+
+	return Roact.createElement(FocusHandler, {
+		isFocused = p1.props.menuOpen and p1.props.inputType == InputType.Gamepad,
+		didBlur = function() -- line: 33
+			-- upvalues: GuiService (copy)
+			GuiService.SelectedCoreObject = nil
+		end
+	})
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p2) -- line: 40
+	return {
+		menuOpen = p2.isMenuOpen,
+		inputType = p2.displayOptions.inputType
+	}
+end)(v11)

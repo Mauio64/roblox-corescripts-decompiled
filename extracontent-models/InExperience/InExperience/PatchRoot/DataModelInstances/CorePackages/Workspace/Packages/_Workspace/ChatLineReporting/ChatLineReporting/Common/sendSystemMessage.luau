@@ -1,19 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_TextChatService_0 = game:GetService("TextChatService");
-local v2 = require(l_script_FirstAncestor_0.Common.Constants);
-local function v5(v3) --[[ Line: 8 ]] --[[ Name: findTextChannel ]]
-    -- upvalues: l_TextChatService_0 (copy)
-    local l_l_TextChatService_0_FirstChild_0 = l_TextChatService_0:FindFirstChild(v3, true);
-    while not l_l_TextChatService_0_FirstChild_0 do
-        wait();
-        l_l_TextChatService_0_FirstChild_0 = l_TextChatService_0:FindFirstChild(v3, true);
-    end;
-    return l_l_TextChatService_0_FirstChild_0;
-end;
-sendSystemMessage = function(v6) --[[ Line: 17 ]] --[[ Name: sendSystemMessage ]]
-    -- upvalues: v5 (copy), v2 (copy)
-    if v6 then
-        v5(v2.ChannelTypes.System):DisplaySystemMessage(v6);
-    end;
-end;
-return sendSystemMessage;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local TextChatService = game:GetService("TextChatService")
+local Constants = require(ChatLineReporting.Common.Constants)
+
+local function findTextChannel(s1: string) -- line: 8
+	-- upvalues: TextChatService (copy)
+	local s1_2 = TextChatService:FindFirstChild(s1, true)
+
+	while not s1_2 do
+		wait()
+		s1_2 = TextChatService:FindFirstChild(s1, true)
+	end
+
+	return s1_2
+end
+
+function sendSystemMessage(s2: string) -- line: 17
+	-- upvalues: findTextChannel (copy), Constants (copy)
+	if s2 then
+		findTextChannel(Constants.ChannelTypes.System):DisplaySystemMessage(s2)
+	end
+end
+
+return sendSystemMessage

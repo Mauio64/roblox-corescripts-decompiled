@@ -1,4 +1,4 @@
 return {
-    LayeredSlot = "LayeredSlot", 
-    BaseSlot = "BaseSlot"
-};
+	LayeredSlot = "LayeredSlot",
+	BaseSlot = "BaseSlot"
+}

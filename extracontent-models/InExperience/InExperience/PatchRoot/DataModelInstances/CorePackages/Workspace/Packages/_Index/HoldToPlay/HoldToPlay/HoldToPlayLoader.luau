@@ -1,40 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("HoldToPlay").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local v3 = require(l_Parent_0.RoactServiceTags);
-local l_RoactNetworking_0 = v3.RoactNetworking;
-local l_AppSessionService_0 = v3.AppSessionService;
-local v6 = require(l_Parent_0.GamePlayButton);
-local l_useOnPlayButtonCallback_0 = v6.useOnPlayButtonCallback;
-local l_usePlayButtonState_0 = v6.usePlayButtonState;
-local l_PlayButtonStates_0 = v6.PlayButtonStates;
-local v10 = require(l_Parent_0.RobloxAppSessionization);
-local l_SetGamePlaySession_0 = v10.SetGamePlaySession;
-local l_SessionType_0 = v10.SessionType;
-local l_HoldToPlayLauncher_0 = require(l_Parent_0.ExperienceAnalytics).Constants.Context.HoldToPlayLauncher;
-return function(v14) --[[ Line: 33 ]] --[[ Name: HoldToPlayLoader ]]
-    -- upvalues: l_useRoactService_0 (copy), l_RoactNetworking_0 (copy), l_AppSessionService_0 (copy), l_usePlayButtonState_0 (copy), l_useOnPlayButtonCallback_0 (copy), l_HoldToPlayLauncher_0 (copy), v1 (copy), l_SetGamePlaySession_0 (copy), l_SessionType_0 (copy), l_PlayButtonStates_0 (copy)
-    local v15 = l_useRoactService_0(l_RoactNetworking_0);
-    local v16 = l_useRoactService_0(l_AppSessionService_0);
-    local v17 = l_usePlayButtonState_0(v15, v14.universeId);
-    local v18 = l_useOnPlayButtonCallback_0(v14.universeId, nil, l_HoldToPlayLauncher_0, nil, nil);
-    v1.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: v17 (copy), v14 (copy), l_SetGamePlaySession_0 (ref), v16 (copy), l_SessionType_0 (ref), v18 (copy), l_PlayButtonStates_0 (ref)
-        local l_playButtonState_0 = v17.playButtonState;
-        if v14.shouldAttemptLaunch then
-            l_SetGamePlaySession_0(v16, l_SessionType_0.StructuralIdentifier.GamePlayFromHoldToPlay, true);
-            v18(l_playButtonState_0, v14.reportExperienceLaunched);
-            if v14.onLaunched and l_playButtonState_0 == l_PlayButtonStates_0.Playable then
-                v14.onLaunched();
-            end;
-        end;
-    end, {
-        v14.shouldAttemptLaunch, 
-        v14.onLaunched, 
-        v17.playButtonState, 
-        v16, 
-        v14.reportExperienceLaunched, 
-        v18
-    });
-    return nil;
-end;
+local Parent = script:FindFirstAncestor("HoldToPlay").Parent
+local React = require(Parent.React)
+local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+local RoactServiceTags = require(Parent.RoactServiceTags)
+local RoactNetworking = RoactServiceTags.RoactNetworking
+local AppSessionService = RoactServiceTags.AppSessionService
+local GamePlayButton = require(Parent.GamePlayButton)
+local useOnPlayButtonCallback = GamePlayButton.useOnPlayButtonCallback
+local usePlayButtonState = GamePlayButton.usePlayButtonState
+local PlayButtonStates = GamePlayButton.PlayButtonStates
+local RobloxAppSessionization = require(Parent.RobloxAppSessionization)
+local SetGamePlaySession = RobloxAppSessionization.SetGamePlaySession
+local SessionType = RobloxAppSessionization.SessionType
+local HoldToPlayLauncher = require(Parent.ExperienceAnalytics).Constants.Context.HoldToPlayLauncher
+
+local function HoldToPlayLoader(t1: {[any]: any}) -- line: 33
+	-- upvalues: useRoactService (copy), RoactNetworking (copy), AppSessionService (copy), usePlayButtonState (copy), useOnPlayButtonCallback (copy), HoldToPlayLauncher (copy), React (copy), SetGamePlaySession (copy), SessionType (copy), PlayButtonStates (copy)
+	local v17 = useRoactService(RoactNetworking)
+	local v18 = useRoactService(AppSessionService)
+	local v19 = usePlayButtonState(v17, t1.universeId)
+	local v20 = useOnPlayButtonCallback(t1.universeId, nil, HoldToPlayLauncher, nil, nil)
+
+	React.useEffect(function() -- line: 40
+		-- upvalues: v19 (copy), t1 (copy), SetGamePlaySession (copy), v18 (copy), SessionType (copy), v20 (copy), PlayButtonStates (copy)
+		local playButtonState = v19.playButtonState
+
+		if t1.shouldAttemptLaunch then
+			SetGamePlaySession(v18, SessionType.StructuralIdentifier.GamePlayFromHoldToPlay, true)
+			v20(playButtonState, t1.reportExperienceLaunched)
+
+			if t1.onLaunched and playButtonState == PlayButtonStates.Playable then
+				t1.onLaunched()
+			end
+		end
+	end, {
+		t1.shouldAttemptLaunch,
+		t1.onLaunched,
+		v19.playButtonState,
+		v18,
+		t1.reportExperienceLaunched,
+		v20
+	})
+
+	return nil
+end
+
+return HoldToPlayLoader

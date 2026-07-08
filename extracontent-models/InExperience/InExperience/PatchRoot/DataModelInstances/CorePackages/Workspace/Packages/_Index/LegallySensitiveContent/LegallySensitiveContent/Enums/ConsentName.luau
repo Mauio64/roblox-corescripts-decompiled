@@ -1,4 +1,4 @@
 return {
-    phoneNumberDiscoverabilityUpsell = "phoneNumberDiscoverabilityUpsell", 
-    PhotoToAvatar = "PhotoToAvatar"
-};
+	phoneNumberDiscoverabilityUpsell = "phoneNumberDiscoverabilityUpsell",
+	PhotoToAvatar = "PhotoToAvatar"
+}

@@ -1,42 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("PhoneUpsell").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_Colors_0 = v2.App.Style.Colors;
-return function(v5) --[[ Line: 17 ]] --[[ Name: PhoneVerificationStatusOverlay ]]
-    -- upvalues: l_useStyle_0 (copy), v1 (copy), l_Colors_0 (copy)
-    local v6 = l_useStyle_0();
-    return v1.createElement("Frame", {
-        BackgroundTransparency = 0.3, 
-        BackgroundColor3 = l_Colors_0.Black, 
-        Size = UDim2.new(1, 0, 1, 0)
-    }, {
-        MiddleContent = v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1
-        }, {
-            ListLayout = v1.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                Padding = UDim.new(0, 24)
-            }), 
-            Image = v5.image, 
-            Padding = v1.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, v6.Tokens.Global.Size_300), 
-                PaddingRight = UDim.new(0, v6.Tokens.Global.Size_300)
-            }), 
-            VerifyingText = v1.createElement("TextLabel", {
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                TextSize = v6.Font.BaseSize * v6.Font.Header1.RelativeSize, 
-                TextColor3 = l_Colors_0.White, 
-                Text = v5.text, 
-                Font = v6.Font.Header1.Font, 
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                TextWrapped = true
-            })
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("PhoneUpsell").Parent
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local Colors = UIBlox.App.Style.Colors
+
+local function PhoneVerificationStatusOverlay(t1: {[any]: any}) -- line: 17
+	-- upvalues: useStyle (copy), React (copy), Colors (copy)
+	local v8 = useStyle()
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 0.3,
+		BackgroundColor3 = Colors.Black,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		MiddleContent = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			ListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, 24)
+			}),
+			Image = t1.image,
+			Padding = React.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, v8.Tokens.Size.Size_600),
+				PaddingRight = UDim.new(0, v8.Tokens.Size.Size_600)
+			}),
+			VerifyingText = React.createElement("TextLabel", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+				AutomaticSize = Enum.AutomaticSize.XY,
+				TextSize = v8.Font.BaseSize * v8.Font.Header1.RelativeSize,
+				TextColor3 = Colors.White,
+				Text = t1.text,
+				Font = v8.Font.Header1.Font
+			})
+		})
+	})
+end
+
+return PhoneVerificationStatusOverlay

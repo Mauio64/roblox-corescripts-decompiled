@@ -1,309 +1,346 @@
-local v0 = require(script.base64);
-local _ = require(script.message);
-local _ = require(script.typeRegistry);
-local v3 = {};
-local function v11(v4, v5) --[[ Line: 21 ]] --[[ Name: readVarIntBytes ]]
-    local v6 = 0;
-    local v7 = 0;
-    local v8 = 0;
-    repeat
-        local v9 = buffer.readu8(v4, v5);
-        local v10 = bit32.band(v9, 127);
-        v6 = bit32.bor(v6, (bit32.lshift(v10, v8)));
-        v7 = bit32.bor(v7, (bit32.lshift(v10, v8 - 32)));
-        v8 = v8 + 7;
-        v5 = v5 + 1;
-    until not bit32.btest(v9, 128);
-    return v6, v7, v5;
-end;
-v3.readVarIntU64 = function(v12, v13) --[[ Line: 38 ]] --[[ Name: readVarIntU64 ]]
-    -- upvalues: v11 (copy)
-    local _ = nil;
-    local _ = nil;
-    local v16, v17, v18 = v11(v12, v13);
-    return v17 * 4294967296 + v16, v18;
-end;
-v3.readVarIntU32 = function(v19, v20) --[[ Line: 45 ]] --[[ Name: readVarIntU32 ]]
-    -- upvalues: v11 (copy)
-    local v21 = nil;
-    local v22 = nil;
-    local v23, v24, v25 = v11(v19, v20);
-    v21 = v23;
-    v22 = v24;
-    return v21, v25;
-end;
-v3.readVarIntI64 = function(v26, v27) --[[ Line: 52 ]] --[[ Name: readVarIntI64 ]]
-    -- upvalues: v11 (copy)
-    local v28 = nil;
-    local v29 = nil;
-    local v30, v31, v32 = v11(v26, v27);
-    v28 = v30;
-    v29 = v31;
-    v27 = v32;
-    if v29 < 2147483648 then
-        return v29 * 4294967296 + v28, v27;
-    else
-        v28 = bit32.bnot(v28) + 1;
-        v29 = bit32.bnot(v29);
-        if v28 > 4294967295 then
-            v28 = 0;
-            v29 = v29 + 1;
-        end;
-        return -(v29 * 4294967296 + v28), v27;
-    end;
-end;
-v3.readVarIntI32 = function(v33, v34) --[[ Line: 71 ]] --[[ Name: readVarIntI32 ]]
-    -- upvalues: v11 (copy)
-    local v35 = nil;
-    local v36 = nil;
-    local v37, v38, v39 = v11(v33, v34);
-    v35 = v37;
-    v36 = v38;
-    v34 = v39;
-    if v35 < 2147483648 then
-        return v35, v34;
-    else
-        return v35 - 4294967296, v34;
-    end;
-end;
-v3.readVarIntS64 = function(v40, v41) --[[ Line: 82 ]] --[[ Name: readVarIntS64 ]]
-    -- upvalues: v11 (copy)
-    local v42 = nil;
-    local v43 = nil;
-    local v44, v45, v46 = v11(v40, v41);
-    v42 = v44;
-    v43 = v45;
-    v41 = v46;
-    v44 = bit32.btest(v42, 1);
-    if v44 then
-        v42 = v42 + 1;
-        if v42 > 4294967295 then
-            v42 = 0;
-            v43 = v43 + 1;
-        end;
-    end;
-    if v43 > 4294967295 then
-        return -9.223372036854776E18, v41;
-    else
-        v42 = bit32.bor(bit32.rshift(v42, 1), (bit32.lshift(bit32.band(v43, 1), 31)));
-        v43 = bit32.rshift(v43, 1);
-        if v44 then
-            return -(v43 * 4294967296 + v42), v41;
-        else
-            return v43 * 4294967296 + v42, v41;
-        end;
-    end;
-end;
-v3.readVarIntS32 = function(v47, v48) --[[ Line: 113 ]] --[[ Name: readVarIntS32 ]]
-    -- upvalues: v11 (copy)
-    local v49 = nil;
-    local v50 = nil;
-    local v51, v52, v53 = v11(v47, v48);
-    v49 = v51;
-    v50 = v52;
-    v48 = v53;
-    if bit32.btest(v49, 1) then
-        return -(v49 + 1) / 2, v48;
-    else
-        return v49 / 2, v48;
-    end;
-end;
-v3.readVarInt = v3.readVarIntI64;
-v3.readFloat = function(v54, v55) --[[ Line: 126 ]] --[[ Name: readFloat ]]
-    return buffer.readf32(v54, v55), v55 + 4;
-end;
-v3.readDouble = function(v56, v57) --[[ Line: 130 ]] --[[ Name: readDouble ]]
-    return buffer.readf64(v56, v57), v57 + 8;
-end;
-v3.readFixed32 = function(v58, v59) --[[ Line: 134 ]] --[[ Name: readFixed32 ]]
-    return buffer.readu32(v58, v59), v59 + 4;
-end;
-v3.readSignedFixed32 = function(v60, v61) --[[ Line: 138 ]] --[[ Name: readSignedFixed32 ]]
-    return buffer.readi32(v60, v61), v61 + 4;
-end;
-v3.readFixed64 = function(v62, v63) --[[ Line: 143 ]] --[[ Name: readFixed64 ]]
-    return assert(tonumber(string.format("%08x", (buffer.readu32(v62, v63 + 4))) .. string.format("%08x", (buffer.readu32(v62, v63))), 16), "Couldn't parse created hex"), v63 + 8;
-end;
-v3.readSignedFixed64 = function(_, _) --[[ Line: 151 ]] --[[ Name: readSignedFixed64 ]]
-    error("TODO: Read sfixed64");
-end;
-v3.readTag = function(v66, v67) --[[ Line: 155 ]] --[[ Name: readTag ]]
-    -- upvalues: v3 (copy)
-    local v68, v69 = v3.readVarInt(v66, v67);
-    return bit32.rshift(v68, 3), bit32.band(v68, 7), v69;
-end;
-v3.readBuffer = function(v70, v71) --[[ Line: 160 ]] --[[ Name: readBuffer ]]
-    -- upvalues: v3 (copy)
-    local v72, v73 = v3.readVarInt(v70, v71);
-    local v74 = buffer.create(v72);
-    buffer.copy(v74, 0, v70, v73, v72);
-    return v74, v73 + v72;
-end;
-local function v79(v75, v76, v77) --[[ Line: 167 ]] --[[ Name: reserveBuffer ]]
-    if buffer.len(v75) - v76 < v77 then
-        local v78 = buffer.create(3 ^ math.ceil((math.log(buffer.len(v75) + v77, 3))));
-        buffer.copy(v78, 0, v75, 0, v76);
-        return v78;
-    else
-        return v75;
-    end;
-end;
-v3.wireTypes = {
-    varint = 0, 
-    i64 = 1, 
-    lengthDelimited = 2, 
-    sgroup = 3, 
-    egroup = 4, 
-    i32 = 5
-};
-v3.writeVarInt = function(v80, v81, v82) --[[ Line: 186 ]] --[[ Name: writeVarInt ]]
-    -- upvalues: v79 (copy)
-    if v82 >= 0 then
-        repeat
-            v80 = v79(v80, v81, 1);
-            local v83 = v82 % 128;
-            v82 = v82 // 128;
-            buffer.writeu8(v80, v81, if v82 == 0 then v83 else v83 + 128);
-            v81 = v81 + 1;
-        until v82 == 0;
-    else
-        local v84 = -v82;
-        local v85 = bit32.bnot(v84 // 4294967296);
-        local v86 = bit32.bnot(v84 % 4294967296) + 1;
-        if v86 == 4294967296 then
-            v86 = 0;
-            v85 = v85 + 1;
-        end;
-        v80 = v79(v80, v81, 10);
-        buffer.writeu8(v80, v81, (bit32.bor(128, (bit32.band(v86, 127)))));
-        buffer.writeu8(v80, v81 + 1, (bit32.bor(128, (bit32.band(bit32.rshift(v86, 7), 127)))));
-        buffer.writeu8(v80, v81 + 2, (bit32.bor(128, (bit32.band(bit32.rshift(v86, 14), 127)))));
-        buffer.writeu8(v80, v81 + 3, (bit32.bor(128, (bit32.band(bit32.rshift(v86, 21), 127)))));
-        buffer.writeu8(v80, v81 + 4, (bit32.bor(128, bit32.lshift(bit32.band(v85, 7), 4), (bit32.rshift(v86, 28)))));
-        buffer.writeu8(v80, v81 + 5, (bit32.bor(128, (bit32.band(bit32.rshift(v85, 3), 127)))));
-        buffer.writeu8(v80, v81 + 6, (bit32.bor(128, (bit32.band(bit32.rshift(v85, 10), 127)))));
-        buffer.writeu8(v80, v81 + 7, (bit32.bor(128, (bit32.band(bit32.rshift(v85, 17), 127)))));
-        buffer.writeu8(v80, v81 + 8, (bit32.bor(128, (bit32.band(bit32.rshift(v85, 24), 127)))));
-        buffer.writeu8(v80, v81 + 9, (bit32.rshift(v85, 31)));
-        v81 = v81 + 10;
-    end;
-    return v80, v81;
-end;
-v3.writeVarIntZigZag = function(v87, v88, v89) --[[ Line: 225 ]] --[[ Name: writeVarIntZigZag ]]
-    -- upvalues: v79 (copy)
-    local v90 = v89 < 0;
-    v89 = math.abs(v89);
-    local v91 = v89 // 4294967296;
-    local v92 = v89 % 4294967296;
-    local v93 = bit32.extract(v92, 31);
-    v92 = bit32.lshift(v92, 1);
-    v91 = bit32.bor(bit32.lshift(v91, 1), v93);
-    if v90 then
-        v92 = v92 - 1;
-        if v92 < 0 then
-            v92 = 4294967295;
-            v91 = v91 - 1;
-        end;
-    end;
-    repeat
-        v87 = v79(v87, v88, 1);
-        local v94 = v92 % 128;
-        v92 = bit32.bor(bit32.rshift(v92, 7), (bit32.lshift(bit32.band(v91, 127), 25)));
-        v91 = bit32.rshift(v91, 7);
-        local v95 = false;
-        if v92 == 0 then
-            v95 = v91 == 0;
-        end;
-        buffer.writeu8(v87, v88, if v95 then v94 else v94 + 128);
-        v88 = v88 + 1;
-    until v95;
-    return v87, v88;
-end;
-v3.writeFloat = function(v96, v97, v98) --[[ Line: 259 ]] --[[ Name: writeFloat ]]
-    -- upvalues: v79 (copy)
-    v96 = v79(v96, v97, 4);
-    buffer.writef32(v96, v97, v98);
-    return v96, v97 + 4;
-end;
-v3.writeDouble = function(v99, v100, v101) --[[ Line: 265 ]] --[[ Name: writeDouble ]]
-    -- upvalues: v79 (copy)
-    v99 = v79(v99, v100, 8);
-    buffer.writef64(v99, v100, v101);
-    return v99, v100 + 8;
-end;
-v3.writeFixed32 = function(v102, v103, v104) --[[ Line: 271 ]] --[[ Name: writeFixed32 ]]
-    -- upvalues: v79 (copy)
-    v102 = v79(v102, v103, 4);
-    buffer.writeu32(v102, v103, v104);
-    return v102, v103 + 4;
-end;
-v3.writeSignedFixed32 = function(v105, v106, v107) --[[ Line: 277 ]] --[[ Name: writeSignedFixed32 ]]
-    -- upvalues: v79 (copy)
-    v105 = v79(v105, v106, 4);
-    buffer.writei32(v105, v106, v107);
-    return v105, v106 + 4;
-end;
-v3.writeFixed64 = function(v108, v109, v110) --[[ Line: 283 ]] --[[ Name: writeFixed64 ]]
-    -- upvalues: v79 (copy)
-    v108 = v79(v108, v109, 8);
-    local v111 = string.format("%016x", v110);
-    buffer.writeu32(v108, v109, (assert(tonumber(v111:sub(9, 16), 16), "Couldn't parse created hex")));
-    buffer.writeu32(v108, v109 + 4, (assert(tonumber(v111:sub(1, 8), 16), "Couldn't parse created hex")));
-    return v108, v109 + 8;
-end;
-v3.writeSignedFixed64 = function(_, _, _) --[[ Line: 294 ]] --[[ Name: writeSignedFixed64 ]]
-    error("TODO: Write sfixed64");
-end;
-v3.writeTag = function(v115, v116, v117, v118) --[[ Line: 298 ]] --[[ Name: writeTag ]]
-    -- upvalues: v3 (copy)
-    return v3.writeVarInt(v115, v116, bit32.lshift(v117, 3) + v118);
-end;
-v3.writeBuffer = function(v119, v120, v121, v122) --[[ Line: 302 ]] --[[ Name: writeBuffer ]]
-    -- upvalues: v3 (copy), v79 (copy)
-    local v123, v124 = v3.writeVarInt(v119, v120, v122);
-    v119 = v123;
-    v120 = v124;
-    v119 = v79(v119, v120, v122);
-    buffer.copy(v119, v120, v121, 0, v122);
-    return v119, v120 + v122;
-end;
-v3.writeString = function(v125, v126, v127) --[[ Line: 311 ]] --[[ Name: writeString ]]
-    -- upvalues: v3 (copy)
-    return v3.writeBuffer(v125, v126, buffer.fromstring(v127), #v127);
-end;
-v3.json = {};
-v3.json.serializeNumber = function(v128) --[[ Line: 317 ]] --[[ Name: serializeNumber ]]
-    if v128 == 1e999 then
-        return "Infinity";
-    elseif v128 == -1e999 then
-        return "-Infinity";
-    elseif v128 ~= v128 then
-        return "NaN";
-    else
-        return v128;
-    end;
-end;
-v3.json.deserializeNumber = function(v129) --[[ Line: 325 ]] --[[ Name: deserializeNumber ]]
-    if v129 == "Infinity" then
-        return 1e999;
-    elseif v129 == "-Infinity" then
-        return -1e999;
-    elseif v129 == "NaN" then
-        return (0/0);
-    elseif typeof(v129) == "string" then
-        local v130 = tonumber(v129);
-        assert(v130 ~= nil, "Number given that could not be parsed");
-        return v130;
-    else
-        return v129;
-    end;
-end;
-v3.json.serializeBuffer = function(v131) --[[ Line: 341 ]] --[[ Name: serializeBuffer ]]
-    -- upvalues: v0 (copy)
-    return v0.encode(buffer.tostring(v131));
-end;
-v3.json.deserializeBuffer = function(v132) --[[ Line: 345 ]] --[[ Name: deserializeBuffer ]]
-    -- upvalues: v0 (copy)
-    return buffer.fromstring(v0.decode(v132));
-end;
-return v3;
+local base64 = require(script.base64)
+
+require(script.message)
+require(script.typeRegistry)
+
+local t1 = {}
+
+local function readVarIntBytes(p1: buffer, n1: number) -- line: 21
+	local n2 = 0
+	local n3 = 0
+	local n4 = 0
+
+	repeat
+		local v10 = buffer.readu8(p1, n1)
+		local v11 = bit32.band(v10, 127)
+
+		n2 = bit32.bor(n2, (bit32.lshift(v11, n4)))
+		n3 = bit32.bor(n3, (bit32.lshift(v11, n4 - 32)))
+		n4 += 7
+		n1 += 1
+	until not bit32.btest(v10, 128)
+
+	return n2, n3, n1
+end
+
+function t1.readVarIntU64(p2: buffer, n5: number) -- line: 38
+	-- upvalues: readVarIntBytes (copy)
+	local v14, v15, v16 = readVarIntBytes(p2, n5)
+
+	return v15 * 4294967296 + v14, v16
+end
+function t1.readVarIntU32(p3: buffer, n6: number) -- line: 45
+	-- upvalues: readVarIntBytes (copy)
+	local v19, _, v21 = readVarIntBytes(p3, n6)
+
+	return v19, v21
+end
+function t1.readVarIntI64(p4: buffer, n7: number) -- line: 52
+	-- upvalues: readVarIntBytes (copy)
+	local v24, v25, v26 = readVarIntBytes(p4, n7)
+
+	if v25 < 2147483648 then
+		return v25 * 4294967296 + v24, v26
+	end
+
+	local v27 = bit32.bnot(v24) + 1
+	local v28 = bit32.bnot(v25)
+
+	if v27 > 4294967295 then
+		v27 = 0
+		v28 += 1
+	end
+
+	return -(v28 * 4294967296 + v27), v26
+end
+function t1.readVarIntI32(p5: buffer, n8: number) -- line: 71
+	-- upvalues: readVarIntBytes (copy)
+	local v31, _, v33 = readVarIntBytes(p5, n8)
+
+	if v31 < 2147483648 then
+		return v31, v33
+	end
+
+	return v31 - 4294967296, v33
+end
+function t1.readVarIntS64(p6: buffer, n9: number) -- line: 82
+	-- upvalues: readVarIntBytes (copy)
+	local v36, v37, v38 = readVarIntBytes(p6, n9)
+	local v39 = bit32.btest(v36, 1)
+
+	if v39 then
+		v36 += 1
+
+		if v36 > 4294967295 then
+			v36 = 0
+			v37 += 1
+		end
+	end
+
+	if v37 > 4294967295 then
+		return -9.223372036854776E+18, v38
+	end
+
+	local v40 = bit32.bor(bit32.rshift(v36, 1), (bit32.lshift(bit32.band(v37, 1), 31)))
+	local v41 = bit32.rshift(v37, 1)
+
+	if v39 then
+		return -(v41 * 4294967296 + v40), v38
+	end
+
+	return v41 * 4294967296 + v40, v38
+end
+function t1.readVarIntS32(p7: buffer, n10: number) -- line: 113
+	-- upvalues: readVarIntBytes (copy)
+	local v44, _, v46 = readVarIntBytes(p7, n10)
+
+	if bit32.btest(v44, 1) then
+		return -(v44 + 1) / 2, v46
+	end
+
+	return v44 / 2, v46
+end
+
+t1.readVarInt = t1.readVarIntI64
+
+function t1.readFloat(p8: buffer, n11: number) -- line: 126
+	return buffer.readf32(p8, n11), n11 + 4
+end
+function t1.readDouble(p9: buffer, n12: number) -- line: 130
+	return buffer.readf64(p9, n12), n12 + 8
+end
+function t1.readFixed32(p10: buffer, n13: number) -- line: 134
+	return buffer.readu32(p10, n13), n13 + 4
+end
+function t1.readSignedFixed32(p11: buffer, n14: number) -- line: 138
+	return buffer.readi32(p11, n14), n14 + 4
+end
+function t1.readFixed64(p12: buffer, n15: number) -- line: 143
+	return assert(tonumber(string.format("%08x", (buffer.readu32(p12, n15 + 4))) .. string.format("%08x", (buffer.readu32(p12, n15))), 16), "Couldn't parse created hex"), n15 + 8
+end
+function t1.readSignedFixed64(_: buffer, _: number) -- line: 151
+	error("TODO: Read sfixed64")
+end
+function t1.readTag(p14: buffer, n17: number) -- line: 155
+	-- upvalues: t1 (copy)
+	local v61, v62 = t1.readVarInt(p14, n17)
+
+	return bit32.rshift(v61, 3), bit32.band(v61, 7), v62
+end
+function t1.readBuffer(p15: buffer, n18: number) -- line: 160
+	-- upvalues: t1 (copy)
+	local v65, v66 = t1.readVarInt(p15, n18)
+	local buf = buffer.create(v65)
+
+	buffer.copy(buf, 0, p15, v66, v65)
+
+	return buf, v66 + v65
+end
+
+local function reserveBuffer(p16: buffer, n19: number, n20: number) -- line: 167
+	if n20 > buffer.len(p16) - n19 then
+		local buf = buffer.create(3 ^ math.ceil((math.log(buffer.len(p16) + n20, 3))))
+
+		buffer.copy(buf, 0, p16, 0, n19)
+
+		return buf
+	end
+
+	return p16
+end
+
+t1.wireTypes = {
+	varint = 0,
+	i64 = 1,
+	lengthDelimited = 2,
+	sgroup = 3,
+	egroup = 4,
+	i32 = 5
+}
+
+function t1.writeVarInt(p17: buffer, n21: number, n22: number) -- line: 186
+	-- upvalues: reserveBuffer (copy)
+	if n22 >= 0 then
+		repeat
+			p17 = reserveBuffer(p17, n21, 1)
+
+			local v75 = n22 % 128
+
+			n22 //= 128
+			buffer.writeu8(p17, n21, if n22 ~= 0 then v75 + 128 else v75)
+			n21 += 1
+		until n22 == 0
+	else
+		local v76 = -n22
+		local v77 = bit32.bnot(v76 // 4294967296)
+		local v78 = bit32.bnot(v76 % 4294967296) + 1
+
+		if v78 == 4294967296 then
+			v78 = 0
+			v77 += 1
+		end
+
+		p17 = reserveBuffer(p17, n21, 10)
+		buffer.writeu8(p17, n21, (bit32.bor(128, (bit32.band(v78, 127)))))
+		buffer.writeu8(p17, n21 + 1, (bit32.bor(128, (bit32.band(bit32.rshift(v78, 7), 127)))))
+		buffer.writeu8(p17, n21 + 2, (bit32.bor(128, (bit32.band(bit32.rshift(v78, 14), 127)))))
+		buffer.writeu8(p17, n21 + 3, (bit32.bor(128, (bit32.band(bit32.rshift(v78, 21), 127)))))
+		buffer.writeu8(p17, n21 + 4, (bit32.bor(128, bit32.lshift(bit32.band(v77, 7), 4), (bit32.rshift(v78, 28)))))
+		buffer.writeu8(p17, n21 + 5, (bit32.bor(128, (bit32.band(bit32.rshift(v77, 3), 127)))))
+		buffer.writeu8(p17, n21 + 6, (bit32.bor(128, (bit32.band(bit32.rshift(v77, 10), 127)))))
+		buffer.writeu8(p17, n21 + 7, (bit32.bor(128, (bit32.band(bit32.rshift(v77, 17), 127)))))
+		buffer.writeu8(p17, n21 + 8, (bit32.bor(128, (bit32.band(bit32.rshift(v77, 24), 127)))))
+		buffer.writeu8(p17, n21 + 9, (bit32.rshift(v77, 31)))
+		n21 += 10
+	end
+
+	return p17, n21
+end
+function t1.writeVarIntZigZag(p18: buffer, n23: number, n24: number) -- line: 225
+	-- upvalues: reserveBuffer (copy)
+	local v82 = n24 < 0
+	local v83 = math.abs(n24)
+	local v84 = v83 // 4294967296
+	local v85 = v83 % 4294967296
+	local v86 = bit32.extract(v85, 31)
+	local v87 = bit32.lshift(v85, 1)
+	local v88 = bit32.bor(bit32.lshift(v84, 1), v86)
+
+	if v82 then
+		v87 -= 1
+
+		if v87 < 0 then
+			v87 = 4294967295
+			v88 -= 1
+		end
+	end
+
+	repeat
+		p18 = reserveBuffer(p18, n23, 1)
+
+		local v89 = v87 % 128
+
+		v87 = bit32.bor(bit32.rshift(v87, 7), (bit32.lshift(bit32.band(v88, 127), 25)))
+		v88 = bit32.rshift(v88, 7)
+
+		local v90 = v87 == 0 and v88 == 0
+
+		buffer.writeu8(p18, n23, if not v90 then v89 + 128 else v89)
+		n23 += 1
+	until v90
+
+	return p18, n23
+end
+function t1.writeFloat(p19: buffer, n25: number, n26: number) -- line: 259
+	-- upvalues: reserveBuffer (copy)
+	local v94 = reserveBuffer(p19, n25, 4)
+
+	buffer.writef32(v94, n25, n26)
+
+	return v94, n25 + 4
+end
+function t1.writeDouble(p20: buffer, n27: number, n28: number) -- line: 265
+	-- upvalues: reserveBuffer (copy)
+	local v98 = reserveBuffer(p20, n27, 8)
+
+	buffer.writef64(v98, n27, n28)
+
+	return v98, n27 + 8
+end
+function t1.writeFixed32(p21: buffer, n29: number, n30: number) -- line: 271
+	-- upvalues: reserveBuffer (copy)
+	local v102 = reserveBuffer(p21, n29, 4)
+
+	buffer.writeu32(v102, n29, n30)
+
+	return v102, n29 + 4
+end
+function t1.writeSignedFixed32(p22: buffer, n31: number, n32: number) -- line: 277
+	-- upvalues: reserveBuffer (copy)
+	local v106 = reserveBuffer(p22, n31, 4)
+
+	buffer.writei32(v106, n31, n32)
+
+	return v106, n31 + 4
+end
+function t1.writeFixed64(p23: buffer, n33: number, n34: number) -- line: 283
+	-- upvalues: reserveBuffer (copy)
+	local v110 = reserveBuffer(p23, n33, 8)
+	local v111 = string.format("%016x", n34)
+
+	buffer.writeu32(v110, n33, (assert(tonumber(v111:sub(9, 16), 16), "Couldn't parse created hex")))
+	buffer.writeu32(v110, n33 + 4, (assert(tonumber(v111:sub(1, 8), 16), "Couldn't parse created hex")))
+
+	return v110, n33 + 8
+end
+function t1.writeSignedFixed64(_: buffer, _: number, _: number) -- line: 294
+	error("TODO: Write sfixed64")
+end
+function t1.writeTag(p25: buffer, n37: number, n38: number, n39: number) -- line: 298
+	-- upvalues: t1 (copy)
+	return t1.writeVarInt(p25, n37, bit32.lshift(n38, 3) + n39)
+end
+function t1.writeBuffer(p26: buffer, n40: number, p27: buffer, n41: number) -- line: 302
+	-- upvalues: t1 (copy), reserveBuffer (copy)
+	local v123, v124 = t1.writeVarInt(p26, n40, n41)
+	local v125 = reserveBuffer(v123, v124, n41)
+
+	buffer.copy(v125, v124, p27, 0, n41)
+
+	return v125, v124 + n41
+end
+function t1.writeString(p28: buffer, n42: number, s1: string) -- line: 311
+	-- upvalues: t1 (copy)
+	return t1.writeBuffer(p28, n42, buffer.fromstring(s1), #s1)
+end
+
+t1.json = {}
+
+function t1.json.serializeNumber(n43: number) -- line: 317
+	if n43 == 1e999 then
+		return "Infinity"
+	end
+
+	if n43 == -1e999 then
+		return "-Infinity"
+	end
+
+	if n43 ~= n43 then
+		return "NaN"
+	end
+
+	return n43
+end
+function t1.json.deserializeNumber(p29) -- line: 325
+	if p29 == "Infinity" then
+		return 1e999
+	end
+
+	if p29 == "-Infinity" then
+		return -1e999
+	end
+
+	if p29 == "NaN" then
+		return (0/0)
+	end
+
+	if typeof(p29) == "string" then
+		local num = tonumber(p29)
+
+		assert(num ~= nil, "Number given that could not be parsed")
+
+		return num
+	end
+
+	return p29
+end
+function t1.json.serializeBuffer(p30: buffer) -- line: 341
+	-- upvalues: base64 (copy)
+	return base64.encode(buffer.tostring(p30))
+end
+function t1.json.deserializeBuffer(s2: string) -- line: 345
+	-- upvalues: base64 (copy)
+	return buffer.fromstring(base64.decode(s2))
+end
+
+return t1

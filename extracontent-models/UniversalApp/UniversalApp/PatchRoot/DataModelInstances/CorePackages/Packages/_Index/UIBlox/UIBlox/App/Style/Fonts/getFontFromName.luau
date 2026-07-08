@@ -1,21 +1,27 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Constants);
-local v2 = require(l_Parent_0.Validator.validateFont);
-local v3 = require(script.Parent.FontLoader);
-local _ = require(l_Parent_0.StyleTypes);
-return function(v5, v6) --[[ Line: 9 ]]
-    -- upvalues: v3 (copy), v1 (copy), v2 (copy)
-    local v7 = v3.new(v6);
-    local v8 = {
-        [v1.FontName.Gotham:lower()] = v7:loadFont()
-    };
-    local v9 = nil;
-    if v5 ~= nil and #v5 > 0 then
-        v9 = v8[v5:lower()];
-    end;
-    if v9 == nil then
-        v9 = v8[v1.DefaultFontName:lower()];
-    end;
-    assert(v2(v9));
-    return v9;
-end;
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local validateFont = require(ParentParent.Validator.validateFont)
+local FontLoader = require(script.Parent.FontLoader)
+
+require(ParentParent.StyleTypes)
+
+return function(p1, p2) -- line: 9
+	-- upvalues: FontLoader (copy), Constants (copy), validateFont (copy)
+	local v7 = FontLoader.new(p2)
+	local t1 = {
+		[Constants.FontName.Gotham:lower()] = v7:loadFont()
+	}
+	local v9 = nil
+
+	if p1 ~= nil and #p1 > 0 then
+		v9 = t1[p1:lower()]
+	end
+
+	if v9 == nil then
+		v9 = t1[Constants.DefaultFontName:lower()]
+	end
+
+	assert(validateFont(v9))
+
+	return v9
+end

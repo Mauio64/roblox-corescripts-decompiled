@@ -1,129 +1,144 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_script_FirstAncestor_0.Utils.Base64);
-local v5 = require(l_Parent_0.Promise);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local l_default_0 = require(l_Parent_0.CredentialsProtocol).CredentialsProtocol.default;
-local l_Logger_0 = require(l_Parent_0.Loggers).Logger;
-local v9 = require(l_script_FirstAncestor_0.Common.PasskeyConstants);
-local v10 = game:DefineFastFlag("FlowQueryParamEnabledStartRegistration", false);
-local function _() --[[ Line: 17 ]] --[[ Name: getFinishRegistrationUrl ]]
-    -- upvalues: l_Url_0 (copy)
-    return string.format("%sv1/passkey/FinishRegistration", l_Url_0.AUTH_URL);
-end;
-local function v17(v12, v13) --[[ Line: 21 ]] --[[ Name: finishPasskeyRegistration ]]
-    -- upvalues: l_Url_0 (copy), v5 (copy), l_HttpService_0 (copy), v9 (copy)
-    return v12(string.format("%sv1/passkey/FinishRegistration", l_Url_0.AUTH_URL), "POST", {
-        postBody = v13
-    }):andThen(function(v14) --[[ Line: 22 ]]
-        -- upvalues: v5 (ref)
-        return v5.resolve(v14);
-    end, function(v15) --[[ Line: 24 ]]
-        -- upvalues: l_HttpService_0 (ref), v5 (ref), v9 (ref)
-        local v16 = if type(v15) == "table" then l_HttpService_0:JSONEncode(v15) else nil;
-        return v5.reject({
-            body = v16, 
-            name = v9.BACKEND_CREATION_ERROR_NAME, 
-            source = v9.FINISH_STEP
-        });
-    end);
-end;
-local function _(v18) --[[ Line: 35 ]] --[[ Name: getStartRegistrationUrl ]]
-    -- upvalues: l_Url_0 (copy), v10 (copy)
-    local v19 = string.format("%sv1/passkey/StartRegistration", l_Url_0.AUTH_URL);
-    if v10 and v18 then
-        return string.format("%s?flow=%s", v19, v18);
-    else
-        return v19;
-    end;
-end;
-local function v30(v21, v22, v23) --[[ Line: 50 ]] --[[ Name: startPasskeyRegistration ]]
-    -- upvalues: l_HttpService_0 (copy), l_Url_0 (copy), v10 (copy), v5 (copy), v9 (copy)
-    local v24 = {
-        postBody = l_HttpService_0:JSONEncode({
-            isSilentUpgrade = v23
-        })
-    };
-    local l_v21_0 = v21;
-    local v26 = string.format("%sv1/passkey/StartRegistration", l_Url_0.AUTH_URL);
-    return l_v21_0(if v10 and v22 then string.format("%s?flow=%s", v26, v22) else v26, "POST", v24, v23):andThen(function(v27) --[[ Line: 58 ]]
-        -- upvalues: v5 (ref)
-        return v5.resolve(v27[1]);
-    end, function(v28) --[[ Line: 61 ]]
-        -- upvalues: l_HttpService_0 (ref), v5 (ref), v9 (ref)
-        local v29 = if type(v28) == "table" then l_HttpService_0:JSONEncode(v28) else nil;
-        return v5.reject({
-            body = v29, 
-            name = v9.BACKEND_CREATION_ERROR_NAME, 
-            source = v9.START_STEP
-        });
-    end);
-end;
-return function(v31, v32, v33) --[[ Line: 73 ]] --[[ Name: attemptPasskeyRegistration ]]
-    -- upvalues: v30 (copy), l_HttpService_0 (copy), l_UserInputService_0 (copy), v4 (copy), l_default_0 (copy), v5 (copy), v9 (copy), l_Logger_0 (copy), v17 (copy)
-    return v30(v31, v32, v33):andThen(function(v34) --[[ Line: 74 ]]
-        -- upvalues: l_HttpService_0 (ref), v33 (copy), l_UserInputService_0 (ref), v4 (ref), l_default_0 (ref), v5 (ref), v9 (ref), l_Logger_0 (ref), v17 (ref), v31 (copy)
-        local v35 = l_HttpService_0:JSONDecode(v34.creationOptions);
-        local l_sessionId_0 = v34.sessionId;
-        local v37 = tonumber(v35.publicKey.timeout);
-        v35.keyType = "platform";
-        v35.deviceBoundOnly = true;
-        v35.isSilentPasskeyUpgrade = v33;
-        if l_UserInputService_0:GetPlatform() ~= Enum.Platform.Android then
-            v35.publicKey.challenge = v4.FromUrlSafeBase64(v35.publicKey.challenge);
-            v35.publicKey.user.id = v4.FromUrlSafeBase64(v35.publicKey.user.id);
-        end;
-        local v38 = l_HttpService_0:JSONEncode(v35);
-        return l_default_0:registerCredentials(l_default_0.CredentialsTypes.FIDO2, v38, v37 / 1000):andThen(function(v39) --[[ Line: 93 ]]
-            -- upvalues: l_HttpService_0 (ref), v5 (ref), v9 (ref), l_Logger_0 (ref), v4 (ref), l_sessionId_0 (copy), v17 (ref), v31 (ref)
-            local v40 = l_HttpService_0:JSONDecode(v39);
-            if v40 == nil or next(v40) == nil then
-                return v5.reject({
-                    body = "Null resultTable", 
-                    name = v9.USER_OS_DIALOG_ERROR_NAME, 
-                    source = v9.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_EMPTY_RESPONSE
-                });
-            elseif v40.errorCode ~= nil then
-                l_Logger_0:warning("Passkey credential signing failed. Error {} ({}) returned.", v40.errorCode, v40.errorMsg);
-                return v5.reject({
-                    body = v40.errorMsg, 
-                    name = v9.USER_OS_DIALOG_ERROR_NAME, 
-                    source = v9.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_ERROR_CODE
-                });
-            else
-                v40.id = v4.ToUrlSafeBase64(v40.id);
-                v40.rawId = v4.ToUrlSafeBase64(v40.rawId);
-                v40.response.attestationObject = v4.ToUrlSafeBase64(v40.response.attestationObject);
-                v40.response.clientDataJSON = v4.ToUrlSafeBase64(v40.response.clientDataJSON);
-                local v41 = l_HttpService_0:JSONEncode(v40);
-                local v42 = {
-                    sessionId = l_sessionId_0, 
-                    credentialNickname = "Passkey", 
-                    attestationResponse = v41
-                };
-                local v43 = l_HttpService_0:JSONEncode(v42);
-                return v17(v31, v43);
-            end;
-        end, function(v44) --[[ Line: 128 ]]
-            -- upvalues: v5 (ref), v9 (ref)
-            return v5.reject({
-                body = v44, 
-                name = v9.USER_OS_DIALOG_ERROR_NAME, 
-                source = v9.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_OTHER_ERR
-            });
-        end);
-    end, function(v45) --[[ Line: 135 ]]
-        -- upvalues: v5 (ref), v9 (ref)
-        if type(v45) == "table" and v45.name then
-            return v5.reject(v45);
-        else
-            return v5.reject({
-                body = v45, 
-                name = v9.BACKEND_CREATION_ERROR_NAME, 
-                source = v9.UNKNOWN_BACKEND_ERROR
-            });
-        end;
-    end);
-end;
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Base64 = require(AuthCommon.Utils.Base64)
+local Promise = require(AuthCommonParent.Promise)
+local Url = require(AuthCommonParent.Http).Url
+local default = require(AuthCommonParent.CredentialsProtocol).CredentialsProtocol.default
+local Logger = require(AuthCommonParent.Loggers).Logger
+local PasskeyConstants = require(AuthCommon.Common.PasskeyConstants)
+
+local function getFinishRegistrationUrl() -- line: 16
+	-- upvalues: Url (copy)
+	return string.format("%sv1/passkey/FinishRegistration", Url.AUTH_URL)
+end
+local function finishPasskeyRegistration(p1, p2) -- line: 20
+	-- upvalues: Url (copy), Promise (copy), HttpService (copy), PasskeyConstants (copy)
+	return p1(string.format("%sv1/passkey/FinishRegistration", Url.AUTH_URL), "POST", {
+		postBody = p2
+	}):andThen(function(p3) -- line: 21
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p3)
+	end, function(p4) -- line: 23
+		-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy)
+		local v30 = if type(p4) ~= "table" then nil else HttpService:JSONEncode(p4)
+
+		return Promise.reject({
+			body = v30,
+			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME,
+			source = PasskeyConstants.FINISH_STEP
+		})
+	end)
+end
+local function getStartRegistrationUrl(p5) -- line: 34
+	-- upvalues: Url (copy)
+	local v19 = string.format("%sv1/passkey/StartRegistration", Url.AUTH_URL)
+
+	if p5 then
+		return string.format("%s?flow=%s", v19, p5)
+	end
+
+	return v19
+end
+local function startPasskeyRegistration(p6, p7, p8) -- line: 49
+	-- upvalues: HttpService (copy), Url (copy), Promise (copy), PasskeyConstants (copy)
+	local t1 = {
+		postBody = HttpService:JSONEncode({
+			isSilentUpgrade = p8
+		})
+	}
+	local v24 = string.format("%sv1/passkey/StartRegistration", Url.AUTH_URL)
+
+	return p6((if not p7 then v24 else string.format("%s?flow=%s", v24, p7)), "POST", t1, p8):andThen(function(p9) -- line: 57
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p9[1])
+	end, function(p10) -- line: 60
+		-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy)
+		local v33 = if type(p10) ~= "table" then nil else HttpService:JSONEncode(p10)
+
+		return Promise.reject({
+			body = v33,
+			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME,
+			source = PasskeyConstants.START_STEP
+		})
+	end)
+end
+local function attemptPasskeyRegistration(p11, p12, p13) -- line: 72
+	-- upvalues: startPasskeyRegistration (copy), HttpService (copy), UserInputService (copy), Base64 (copy), default (copy), Promise (copy), PasskeyConstants (copy), Logger (copy), finishPasskeyRegistration (copy)
+	return startPasskeyRegistration(p11, p12, p13):andThen(function(p14) -- line: 73
+		-- upvalues: HttpService (copy), p13 (copy), UserInputService (copy), Base64 (copy), default (copy), Promise (copy), PasskeyConstants (copy), Logger (copy), finishPasskeyRegistration (copy), p11 (copy)
+		local data = HttpService:JSONDecode(p14.creationOptions)
+		local sessionId = p14.sessionId
+		local num = tonumber(data.publicKey.timeout)
+
+		data.keyType = "platform"
+		data.deviceBoundOnly = true
+		data.isSilentPasskeyUpgrade = p13
+
+		if UserInputService:GetPlatform() ~= Enum.Platform.Android then
+			data.publicKey.challenge = Base64.FromUrlSafeBase64(data.publicKey.challenge)
+			data.publicKey.user.id = Base64.FromUrlSafeBase64(data.publicKey.user.id)
+		end
+
+		local json = HttpService:JSONEncode(data)
+
+		return default:registerCredentials(default.CredentialsTypes.FIDO2, json, num / 1000):andThen(function(p15) -- line: 92
+			-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy), Logger (copy), Base64 (copy), sessionId (copy), finishPasskeyRegistration (copy), p11 (copy)
+			local data2 = HttpService:JSONDecode(p15)
+
+			if data2 == nil or next(data2) == nil then
+				return Promise.reject({
+					body = "Null resultTable",
+					name = PasskeyConstants.USER_OS_DIALOG_ERROR_NAME,
+					source = PasskeyConstants.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_EMPTY_RESPONSE
+				})
+			end
+
+			if data2.errorCode ~= nil then
+				Logger:warning("Passkey credential signing failed. Error {} ({}) returned.", data2.errorCode, data2.errorMsg)
+
+				return Promise.reject({
+					body = data2.errorMsg,
+					name = PasskeyConstants.USER_OS_DIALOG_ERROR_NAME,
+					source = PasskeyConstants.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_ERROR_CODE
+				})
+			end
+
+			data2.id = Base64.ToUrlSafeBase64(data2.id)
+			data2.rawId = Base64.ToUrlSafeBase64(data2.rawId)
+			data2.response.attestationObject = Base64.ToUrlSafeBase64(data2.response.attestationObject)
+			data2.response.clientDataJSON = Base64.ToUrlSafeBase64(data2.response.clientDataJSON)
+
+			local json2 = HttpService:JSONEncode(data2)
+			local t2 = {
+				credentialNickname = "Passkey",
+				sessionId = sessionId,
+				attestationResponse = json2
+			}
+			local json3 = HttpService:JSONEncode(t2)
+
+			return finishPasskeyRegistration(p11, json3)
+		end, function(p16) -- line: 127
+			-- upvalues: Promise (copy), PasskeyConstants (copy)
+			return Promise.reject({
+				body = p16,
+				name = PasskeyConstants.USER_OS_DIALOG_ERROR_NAME,
+				source = PasskeyConstants.CREDENTIALS_PROTOCOL_REGISTER_CREDENTIALS_OTHER_ERR
+			})
+		end)
+	end, function(p17) -- line: 134
+		-- upvalues: Promise (copy), PasskeyConstants (copy)
+		if type(p17) == "table" and p17.name then
+			return Promise.reject(p17)
+		end
+
+		return Promise.reject({
+			body = p17,
+			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME,
+			source = PasskeyConstants.UNKNOWN_BACKEND_ERROR
+		})
+	end)
+end
+
+return attemptPasskeyRegistration

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAuthAnalyticsPrintDebuggingDev", false);
+return game:DefineFastFlag("EnableAuthAnalyticsPrintDebuggingDev", false)

@@ -1,91 +1,97 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script:FindFirstAncestor("GraphQLServer").Parent;
-local v2 = require(l_Parent_0.ApolloClient);
-local l_ApolloClient_0 = v2.ApolloClient;
-local l_HttpLink_0 = v2.HttpLink;
-local l_InMemoryCache_0 = v2.InMemoryCache;
-local l_typePolicies_0 = require(l_Parent_0.ApolloLocalState).typePolicies;
-local v7 = require(script.Parent.Server);
-local l_buildFetch_0 = require(l_Parent_0.Fetch).buildFetch;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local _ = require(script.ApolloClientTestUtilsTypes);
+local HttpService = game:GetService("HttpService")
+local Parent = script:FindFirstAncestor("GraphQLServer").Parent
+local ApolloClient = require(Parent.ApolloClient)
+local ApolloClient2 = ApolloClient.ApolloClient
+local HttpLink = ApolloClient.HttpLink
+local InMemoryCache = ApolloClient.InMemoryCache
+local typePolicies = require(Parent.ApolloLocalState).typePolicies
+local Server = require(script.Parent.Server)
+local buildFetch = require(Parent.Fetch).buildFetch
+local Object = require(Parent.LuauPolyfill).Object
+
+require(script.ApolloClientTestUtilsTypes)
+
 return {
-    mockApolloClient = function(v11) --[[ Line: 53 ]] --[[ Name: mockApolloClient ]]
-        -- upvalues: l_HttpService_0 (copy), v7 (copy), l_buildFetch_0 (copy), l_ApolloClient_0 (copy), l_InMemoryCache_0 (copy), l_typePolicies_0 (copy), l_HttpLink_0 (copy)
-        local v17 = {
-            RequestInternal = function(_, v13) --[[ Line: 25 ]] --[[ Name: RequestInternal ]]
-                -- upvalues: v11 (copy), l_HttpService_0 (ref)
-                return {
-                    Start = function(_, v15) --[[ Line: 27 ]] --[[ Name: Start ]]
-                        -- upvalues: v11 (ref), v13 (copy), l_HttpService_0 (ref)
-                        local v16 = nil;
-                        v16 = if v11.responseMap and v11.responseMap[v13.Url] then v11.responseMap[v13.Url] else v11.defaultResponse or {};
-                        v15(true, {
-                            Body = l_HttpService_0:JSONEncode(v16.Body), 
-                            Success = v16.Success == nil or v16.Success, 
-                            StatusCode = if v16.StatusCode then v16.StatusCode else 200, 
-                            StatusMessage = if v16.StatusMessage then v16.StatusMessage else "OK", 
-                            Headers = if v16.Headers then v16.Headers else {}
-                        });
-                        if v11.responseSpy then
-                            v11.responseSpy(v13);
-                        end;
-                    end
-                };
-            end
-        };
-        local v18 = v7.new({
-            mockResolvers = v11.mockResolvers, 
-            fetchImpl = l_buildFetch_0(v17)
-        });
-        return (l_ApolloClient_0.new({
-            cache = l_InMemoryCache_0.new({
-                typePolicies = l_typePolicies_0
-            }), 
-            link = l_HttpLink_0.new({
-                uri = "/api", 
-                fetch = function(_, v20) --[[ Line: 65 ]] --[[ Name: fetch ]]
-                    -- upvalues: v18 (copy)
-                    return v18:fetchLocal(v20);
-                end
-            })
-        }));
-    end, 
-    mockHttpService = function(v21) --[[ Line: 23 ]] --[[ Name: mockHttpService ]]
-        -- upvalues: l_HttpService_0 (copy)
-        return {
-            RequestInternal = function(_, v23) --[[ Line: 25 ]] --[[ Name: RequestInternal ]]
-                -- upvalues: v21 (copy), l_HttpService_0 (ref)
-                return {
-                    Start = function(_, v25) --[[ Line: 27 ]] --[[ Name: Start ]]
-                        -- upvalues: v21 (ref), v23 (copy), l_HttpService_0 (ref)
-                        local v26 = nil;
-                        v26 = if v21.responseMap and v21.responseMap[v23.Url] then v21.responseMap[v23.Url] else v21.defaultResponse or {};
-                        v25(true, {
-                            Body = l_HttpService_0:JSONEncode(v26.Body), 
-                            Success = v26.Success == nil or v26.Success, 
-                            StatusCode = if v26.StatusCode then v26.StatusCode else 200, 
-                            StatusMessage = if v26.StatusMessage then v26.StatusMessage else "OK", 
-                            Headers = if v26.Headers then v26.Headers else {}
-                        });
-                        if v21.responseSpy then
-                            v21.responseSpy(v23);
-                        end;
-                    end
-                };
-            end
-        };
-    end, 
-    appendApolloClientToReducer = function(v27, v28) --[[ Line: 74 ]] --[[ Name: appendApolloClientToReducer ]]
-        -- upvalues: l_Object_0 (copy)
-        return function(v29, v30) --[[ Line: 75 ]]
-            -- upvalues: v27 (copy), l_Object_0 (ref), v28 (copy)
-            v29 = v27(v29 or {}, v30);
-            return (l_Object_0.assign(table.clone(v29), {
-                ApolloClient = {
-                    apolloClient = v28
-                }
-            }));
-        end;
-    end
-};
+	mockApolloClient = function(p1) -- line: 53
+		-- upvalues: HttpService (copy), Server (copy), buildFetch (copy), ApolloClient2 (copy), InMemoryCache (copy), typePolicies (copy), HttpLink (copy)
+		local t1 = {
+			RequestInternal = function(_, p3) -- line: 25
+				-- upvalues: p1 (copy), HttpService (copy)
+				return {
+					Start = function(_, p5) -- line: 27
+						-- upvalues: p1 (copy), p3 (copy), HttpService (copy)
+						local v31 = if not p1.responseMap or not p1.responseMap[p3.Url] then p1.defaultResponse or {} else p1.responseMap[p3.Url]
+
+						p5(true, {
+							Body = HttpService:JSONEncode(v31.Body),
+							Success = v31.Success == nil or v31.Success,
+							StatusCode = not v31.StatusCode and 200 or v31.StatusCode,
+							StatusMessage = not v31.StatusMessage and "OK" or v31.StatusMessage,
+							Headers = if not v31.Headers then {} else v31.Headers
+						})
+
+						if p1.responseSpy then
+							p1.responseSpy(p3)
+						end
+					end
+				}
+			end
+		}
+		local v14 = Server.new({
+			mockResolvers = p1.mockResolvers,
+			fetchImpl = buildFetch(t1)
+		})
+
+		return (ApolloClient2.new({
+			cache = InMemoryCache.new({
+				typePolicies = typePolicies
+			}),
+			link = HttpLink.new({
+				uri = "/api",
+				fetch = function(_, p7) -- line: 65
+					-- upvalues: v14 (copy)
+					return v14:fetchLocal(p7)
+				end
+			})
+		}))
+	end,
+	mockHttpService = function(p8) -- line: 23
+		-- upvalues: HttpService (copy)
+		return {
+			RequestInternal = function(_, p10) -- line: 25
+				-- upvalues: p8 (copy), HttpService (copy)
+				return {
+					Start = function(_, p12) -- line: 27
+						-- upvalues: p8 (copy), p10 (copy), HttpService (copy)
+						local v28 = if not p8.responseMap or not p8.responseMap[p10.Url] then p8.defaultResponse or {} else p8.responseMap[p10.Url]
+
+						p12(true, {
+							Body = HttpService:JSONEncode(v28.Body),
+							Success = v28.Success == nil or v28.Success,
+							StatusCode = not v28.StatusCode and 200 or v28.StatusCode,
+							StatusMessage = not v28.StatusMessage and "OK" or v28.StatusMessage,
+							Headers = if not v28.Headers then {} else v28.Headers
+						})
+
+						if p8.responseSpy then
+							p8.responseSpy(p10)
+						end
+					end
+				}
+			end
+		}
+	end,
+	appendApolloClientToReducer = function(p13, p14) -- line: 74
+		-- upvalues: Object (copy)
+		return function(p15, p16) -- line: 75
+			-- upvalues: p13 (copy), Object (copy), p14 (copy)
+			local v25 = p13(p15 or {}, p16)
+
+			return (Object.assign(table.clone(v25), {
+				ApolloClient = {
+					apolloClient = p14
+				}
+			}))
+		end
+	end
+}

@@ -1,129 +1,140 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.t);
-local l_EventConnection_0 = require(l_Parent_0.ReactUtils).EventConnection;
-local v5 = require(l_Parent_0.UIBlox.Core.ImageSet.ImageSetComponent);
-local v6 = require(l_Parent_0.UIBlox.App.ImageSet.Images);
-local v7 = require(l_Parent_0.UIBlox.Core.Style.withStyle);
-local v8 = require(l_Parent_0.UIBlox.Utility.divideTransparency);
-local v9 = v2.PureComponent:extend("SliderTextInput");
-v9.validateProps = v3.strictInterface({
-    position = v3.optional(v3.union(v3.UDim2, v3.table)), 
-    anchorPoint = v3.optional(v3.Vector2), 
-    value = v3.number, 
-    min = v3.number, 
-    max = v3.number, 
-    disabled = v3.optional(v3.boolean), 
-    stepInterval = v3.numberPositive, 
-    onValueChanged = v3.callback, 
-    layoutOrder = v3.optional(v3.integer)
-});
-v9.defaultProps = {
-    disabled = false
-};
-v9.init = function(v10) --[[ Line: 37 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    v10.textBoxRef = v2.createRef();
-end;
-v9.render = function(v11) --[[ Line: 41 ]] --[[ Name: render ]]
-    -- upvalues: v7 (copy), v8 (copy), v2 (copy), v5 (copy), v6 (copy), l_EventConnection_0 (copy), l_UserInputService_0 (copy)
-    return v7(function(v12) --[[ Line: 42 ]]
-        -- upvalues: v11 (copy), v8 (ref), v2 (ref), v5 (ref), v6 (ref), l_EventConnection_0 (ref), l_UserInputService_0 (ref)
-        local v13 = v11.props.disabled and 2 or 1;
-        local v14 = v8(v12.Theme.TextDefault.Transparency, v13);
-        local v15 = v8(v12.Theme.Divider.Transparency, v13);
-        local v16 = v8(v12.Theme.BackgroundUIContrast.Transparency, v13);
-        return v2.createElement(v5.Label, {
-            BackgroundTransparency = 1, 
-            Image = v6["component_assets/circle_16"], 
-            ImageColor3 = v12.Theme.BackgroundUIContrast.Color, 
-            ImageTransparency = v16, 
-            Position = v11.props.position, 
-            AnchorPoint = v11.props.anchorPoint, 
-            ScaleType = Enum.ScaleType.Slice, 
-            Size = UDim2.fromOffset(56, 36), 
-            SliceCenter = Rect.new(8, 8, 8, 8), 
-            LayoutOrder = v11.props.layoutOrder
-        }, {
-            Border = v2.createElement(v5.Label, {
-                BackgroundTransparency = 1, 
-                Image = v6["component_assets/circle_17_stroke_1"], 
-                ImageColor3 = v12.Theme.Divider.Color, 
-                ImageTransparency = v15, 
-                ScaleType = Enum.ScaleType.Slice, 
-                Size = UDim2.fromScale(1, 1), 
-                SliceCenter = Rect.new(8, 8, 8, 8)
-            }), 
-            TextBox = v2.createElement("TextBox", {
-                [v2.Ref] = v11.textBoxRef, 
-                BackgroundTransparency = 1, 
-                ClearTextOnFocus = false, 
-                Font = v12.Font.Body.Font, 
-                TextSize = v12.Font.Body.RelativeSize * v12.Font.BaseSize, 
-                TextColor3 = v12.Theme.TextDefault.Color, 
-                TextTransparency = v14, 
-                Size = UDim2.fromScale(1, 1), 
-                Text = tostring(v11.props.value), 
-                TextScaled = true, 
-                TextEditable = not v11.props.disabled, 
-                ZIndex = 2, 
-                [v2.Event.Focused] = v11.props.disabled and function(v17) --[[ Line: 86 ]]
-                    v17:ReleaseFocus();
-                end or nil, 
-                [v2.Event.FocusLost] = function(v18, _) --[[ Line: 89 ]]
-                    -- upvalues: v11 (ref)
-                    local v20 = tonumber(v18.Text);
-                    if v20 == nil then
-                        v18.Text = tostring(v11.props.value);
-                        return;
-                    else
-                        v20 = math.clamp(math.floor(v20 / v11.props.stepInterval + 0.5) * v11.props.stepInterval, v11.props.min, v11.props.max);
-                        v11.props.onValueChanged(v20);
-                        return;
-                    end;
-                end
-            }, {
-                TextSizeConstraint = v2.createElement("UITextSizeConstraint", {
-                    MinTextSize = v12.Font.Body.RelativeMinSize * v12.Font.BaseSize, 
-                    MaxTextSize = v12.Font.Body.RelativeSize * v12.Font.BaseSize
-                })
-            }), 
-            UserInputConnection = not v11.props.disabled and v2.createElement(l_EventConnection_0, {
-                event = l_UserInputService_0.InputBegan, 
-                callback = function(v21, _) --[[ Line: 113 ]] --[[ Name: callback ]]
-                    -- upvalues: l_UserInputService_0 (ref), v11 (ref)
-                    if v21.UserInputType ~= Enum.UserInputType.Keyboard then
-                        return;
-                    elseif l_UserInputService_0:GetFocusedTextBox() ~= v11.textBoxRef.current then
-                        return;
-                    else
-                        local v23 = 0;
-                        if v21.KeyCode == Enum.KeyCode.Up then
-                            v23 = 1;
-                        elseif v21.KeyCode == Enum.KeyCode.Down then
-                            v23 = -1;
-                        end;
-                        if l_UserInputService_0:IsKeyDown(Enum.KeyCode.LeftShift) or l_UserInputService_0:IsKeyDown(Enum.KeyCode.RightShift) then
-                            v23 = v23 * 10;
-                        end;
-                        if v23 ~= 0 then
-                            local v24 = math.clamp(math.floor((v11.props.value + v11.props.stepInterval * v23) / v11.props.stepInterval + 0.5) * v11.props.stepInterval, v11.props.min, v11.props.max);
-                            if v24 ~= v11.props.value then
-                                v11.props.onValueChanged(v24);
-                            end;
-                        end;
-                        return;
-                    end;
-                end
-            })
-        });
-    end);
-end;
-v9.didMount = function(v25) --[[ Line: 154 ]] --[[ Name: didMount ]]
-    pcall(function() --[[ Line: 157 ]]
-        -- upvalues: v25 (copy)
-        v25.textBoxRef.current.TextInputType = Enum.TextInputType.Number;
-    end);
-end;
-return v9;
+local UserInputService = game:GetService("UserInputService")
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local t = require(ParentParent.t)
+local EventConnection = require(ParentParent.ReactUtils).EventConnection
+local ImageSetComponent = require(ParentParent.UIBlox.Core.ImageSet.ImageSetComponent)
+local Images = require(ParentParent.UIBlox.App.ImageSet.Images)
+local withStyle = require(ParentParent.UIBlox.Core.Style.withStyle)
+local divideTransparency = require(ParentParent.UIBlox.Utility.divideTransparency)
+local v10 = Roact.PureComponent:extend("SliderTextInput")
+
+v10.validateProps = t.strictInterface({
+	position = t.optional(t.union(t.UDim2, t.table)),
+	anchorPoint = t.optional(t.Vector2),
+	value = t.number,
+	min = t.number,
+	max = t.number,
+	disabled = t.optional(t.boolean),
+	stepInterval = t.numberPositive,
+	onValueChanged = t.callback,
+	layoutOrder = t.optional(t.integer)
+})
+v10.defaultProps = {
+	disabled = false
+}
+
+function v10.init(p1) -- line: 37
+	-- upvalues: Roact (copy)
+	p1.textBoxRef = Roact.createRef()
+end
+function v10.render(p2) -- line: 41
+	-- upvalues: withStyle (copy), divideTransparency (copy), Roact (copy), ImageSetComponent (copy), Images (copy), EventConnection (copy), UserInputService (copy)
+	return withStyle(function(p3) -- line: 42
+		-- upvalues: p2 (copy), divideTransparency (copy), Roact (copy), ImageSetComponent (copy), Images (copy), EventConnection (copy), UserInputService (copy)
+		local v15 = not p2.props.disabled and 1 or 2
+		local v16 = divideTransparency(p3.Theme.TextDefault.Transparency, v15)
+		local v17 = divideTransparency(p3.Theme.Divider.Transparency, v15)
+		local v18 = divideTransparency(p3.Theme.BackgroundUIContrast.Transparency, v15)
+
+		return Roact.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			Image = Images["component_assets/circle_16"],
+			ImageColor3 = p3.Theme.BackgroundUIContrast.Color,
+			ImageTransparency = v18,
+			Position = p2.props.position,
+			AnchorPoint = p2.props.anchorPoint,
+			ScaleType = Enum.ScaleType.Slice,
+			Size = UDim2.fromOffset(56, 36),
+			SliceCenter = Rect.new(8, 8, 8, 8),
+			LayoutOrder = p2.props.layoutOrder
+		}, {
+			Border = Roact.createElement(ImageSetComponent.Label, {
+				BackgroundTransparency = 1,
+				Image = Images["component_assets/circle_17_stroke_1"],
+				ImageColor3 = p3.Theme.Divider.Color,
+				ImageTransparency = v17,
+				ScaleType = Enum.ScaleType.Slice,
+				Size = UDim2.fromScale(1, 1),
+				SliceCenter = Rect.new(8, 8, 8, 8)
+			}),
+			TextBox = Roact.createElement("TextBox", {
+				[Roact.Ref] = p2.textBoxRef,
+				BackgroundTransparency = 1,
+				ClearTextOnFocus = false,
+				Font = p3.Font.Body.Font,
+				TextSize = p3.Font.Body.RelativeSize * p3.Font.BaseSize,
+				TextColor3 = p3.Theme.TextDefault.Color,
+				TextTransparency = v16,
+				Size = UDim2.fromScale(1, 1),
+				Text = tostring(p2.props.value),
+				TextScaled = true,
+				TextEditable = not p2.props.disabled,
+				ZIndex = 2,
+				[Roact.Event.Focused] = p2.props.disabled and function(p4) -- line: 86
+					p4:ReleaseFocus()
+				end or nil,
+				[Roact.Event.FocusLost] = function(p5, _) -- line: 89
+					-- upvalues: p2 (copy)
+					local num = tonumber(p5.Text)
+
+					if num == nil then
+						p5.Text = tostring(p2.props.value)
+
+						return
+					end
+
+					local v23 = math.clamp(math.floor(num / p2.props.stepInterval + 0.5) * p2.props.stepInterval, p2.props.min, p2.props.max)
+
+					p2.props.onValueChanged(v23)
+				end
+			}, {
+				TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+					MinTextSize = p3.Font.Body.RelativeMinSize * p3.Font.BaseSize,
+					MaxTextSize = p3.Font.Body.RelativeSize * p3.Font.BaseSize
+				})
+			}),
+			UserInputConnection = not p2.props.disabled and Roact.createElement(EventConnection, {
+				event = UserInputService.InputBegan,
+				callback = function(p7, _) -- line: 113
+					-- upvalues: UserInputService (copy), p2 (copy)
+					if p7.UserInputType ~= Enum.UserInputType.Keyboard then
+						return
+					end
+
+					if UserInputService:GetFocusedTextBox() ~= p2.textBoxRef.current then
+						return
+					end
+
+					local n1 = 0
+
+					if p7.KeyCode == Enum.KeyCode.Up then
+						n1 = 1
+					elseif p7.KeyCode == Enum.KeyCode.Down then
+						n1 = -1
+					end
+
+					if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
+						n1 *= 10
+					end
+
+					if n1 ~= 0 then
+						local v27 = math.clamp(math.floor((p2.props.value + p2.props.stepInterval * n1) / p2.props.stepInterval + 0.5) * p2.props.stepInterval, p2.props.min, p2.props.max)
+
+						if v27 ~= p2.props.value then
+							p2.props.onValueChanged(v27)
+						end
+					end
+				end
+			})
+		})
+	end)
+end
+function v10.didMount(p9) -- line: 154
+	pcall(function() -- line: 157
+		-- upvalues: p9 (copy)
+		p9.textBoxRef.current.TextInputType = Enum.TextInputType.Number
+	end)
+end
+
+return v10

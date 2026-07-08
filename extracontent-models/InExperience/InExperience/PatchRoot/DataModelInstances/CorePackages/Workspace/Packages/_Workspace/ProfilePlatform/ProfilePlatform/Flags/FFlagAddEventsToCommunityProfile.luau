@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddEventsToCommunityProfile", false);
+return game:DefineFastFlag("AddEventsToCommunityProfile", false)

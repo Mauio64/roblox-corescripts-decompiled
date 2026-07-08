@@ -1,63 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_InteractiveAlert_0 = v3.App.Dialog.Alert.InteractiveAlert;
-local l_useScreenSize_0 = require(l_Parent_0.RobloxAppHooks).useScreenSize;
-local v6 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagEditProfileFixFocusNavigation);
-local v10 = require(l_script_FirstAncestor_0.Hooks.useDisplayNameText);
-local v11 = require(l_script_FirstAncestor_0.Utils.FocusNavigatorWrapper);
-return function(v12) --[[ Line: 19 ]] --[[ Name: EditDisplayNameErrorModal ]]
-    -- upvalues: l_useScreenSize_0 (copy), v10 (copy), l_useLocalization_0 (copy), v6 (copy), v9 (copy), v11 (copy), v2 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    local v13 = l_useScreenSize_0();
-    local v14 = v10();
-    local v15 = l_useLocalization_0({
-        OK = v6.OK
-    });
-    local function v16() --[[ Line: 26 ]] --[[ Name: onClose ]]
-        -- upvalues: v12 (copy)
-        v12.navigation.goBack();
-    end;
-    if v9 then
-        return v11({
-            onClose = v16
-        }, {
-            v2.createElement(l_InteractiveAlert_0, {
-                screenSize = v13, 
-                title = v14.displayNameEditMessage, 
-                bodyText = v14.displayNameCoolDownMessage, 
-                buttonStackInfo = {
-                    buttons = {
-                        {
-                            buttonType = l_ButtonType_0.PrimarySystem, 
-                            props = {
-                                onActivated = v16, 
-                                text = v15.OK
-                            }
-                        }
-                    }
-                }
-            })
-        });
-    else
-        return v2.createElement(l_InteractiveAlert_0, {
-            screenSize = v13, 
-            title = v14.displayNameEditMessage, 
-            bodyText = v14.displayNameCoolDownMessage, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = v16, 
-                            text = v15.OK
-                        }
-                    }
-                }
-            }
-        });
-    end;
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local UIBlox = require(EditProfileParent.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local useScreenSize = require(EditProfileParent.RobloxAppHooks).useScreenSize
+local TextKeys = require(EditProfile.Common.TextKeys)
+local useLocalization = require(EditProfileParent.Localization).Hooks.useLocalization
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local FFlagEditProfileFixFocusNavigation = require(EditProfile.Flags.FFlagEditProfileFixFocusNavigation)
+local useDisplayNameText = require(EditProfile.Hooks.useDisplayNameText)
+local FocusNavigatorWrapper = require(EditProfile.Utils.FocusNavigatorWrapper)
+
+local function EditDisplayNameErrorModal(t1: {[any]: any}) -- line: 19
+	-- upvalues: useScreenSize (copy), useDisplayNameText (copy), useLocalization (copy), TextKeys (copy), FFlagEditProfileFixFocusNavigation (copy), FocusNavigatorWrapper (copy), React (copy), InteractiveAlert (copy), ButtonType (copy)
+	local v15 = useScreenSize()
+	local v16 = useDisplayNameText()
+	local v17 = useLocalization({
+		OK = TextKeys.OK
+	})
+
+	local function onClose() -- line: 26
+		-- upvalues: t1 (copy)
+		t1.navigation.goBack()
+	end
+
+	if FFlagEditProfileFixFocusNavigation then
+		return FocusNavigatorWrapper({
+			onClose = onClose
+		}, { React.createElement(InteractiveAlert, {
+			screenSize = v15,
+			title = v16.displayNameEditMessage,
+			bodyText = v16.displayNameCoolDownMessage,
+			buttonStackInfo = {
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = onClose,
+						text = v17.OK
+					}
+				}}
+			}
+		}) })
+	end
+
+	return React.createElement(InteractiveAlert, {
+		screenSize = v15,
+		title = v16.displayNameEditMessage,
+		bodyText = v16.displayNameCoolDownMessage,
+		buttonStackInfo = {
+			buttons = {{
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					onActivated = onClose,
+					text = v17.OK
+				}
+			}}
+		}
+	})
+end
+
+return EditDisplayNameErrorModal

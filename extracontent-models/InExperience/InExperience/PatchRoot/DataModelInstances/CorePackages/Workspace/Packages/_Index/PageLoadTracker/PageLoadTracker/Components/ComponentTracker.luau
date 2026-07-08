@@ -1,171 +1,192 @@
-local l_Parent_0 = script:FindFirstAncestor("PageLoadTracker").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v3 = require(l_Parent_0.SharedFlags);
-local v4 = require(script.Parent.Parent.createPageTracker);
-local v5 = require(script.Parent.Parent.PageTrackerContext);
-local v6 = require(script.Parent.Parent.isElementInScreenBounds);
-local v7 = require(script.Parent.Parent.PageLoadConfig);
-local v8 = require(script.Parent.Parent.VisualDebugManager);
-local l_ExperienceService_0 = require(l_Parent_0.ExperienceService).ExperienceService;
-local function v14(v10, v11) --[[ Line: 16 ]] --[[ Name: usePageTracker ]]
-    -- upvalues: v1 (copy), v4 (copy), v3 (copy), l_ExperienceService_0 (copy)
-    local v12 = v1.useMemo(function() --[[ Line: 17 ]]
-        -- upvalues: v4 (ref)
-        return v4();
-    end, {});
-    if v10 then
-        v12:start(v11);
-    else
-        v12:stop();
-    end;
-    v1.useEffect(function() --[[ Line: 27 ]]
-        -- upvalues: v12 (copy), v3 (ref), l_ExperienceService_0 (ref)
-        v12:sendMilestone("first_react_frame_rendered");
-        local v13 = nil;
-        if v3.FFlagLuaAppPageLoadTrackerJoinExperienceFix then
-            v13 = l_ExperienceService_0:RegisterForExperienceJoin(function() --[[ Line: 35 ]]
-                -- upvalues: v12 (ref)
-                v12:stop();
-            end);
-        end;
-        return function() --[[ Line: 40 ]]
-            -- upvalues: v12 (ref), v3 (ref), v13 (ref)
-            v12:stop();
-            if v3.FFlagLuaAppPageLoadTrackerJoinExperienceFix and v13 then
-                v13:Disconnect();
-            end;
-        end;
-    end, {});
-    return v12;
-end;
-return function(v15) --[[ Line: 57 ]] --[[ Name: ComponentTracker ]]
-    -- upvalues: v14 (copy), v1 (copy), v3 (copy), v8 (copy), l_useSelector_0 (copy), v7 (copy), v6 (copy), v5 (copy)
-    local v16 = v14(v15.isActive, v15.componentName);
-    local v17 = v1.useRef(nil);
-    local v18 = v1.useRef(nil);
-    if v3.FFlagDebugEnablePageLoadTrackerVisualizer and v17.current == nil then
-        v17.current = v8.new();
-    end;
-    local v20 = l_useSelector_0(function(v19) --[[ Line: 69 ]]
-        -- upvalues: v7 (ref)
-        return v19.ScreenSize or v7.SCREEN_BOUNDS.DEFAULT_SCREEN_SIZE;
-    end);
-    local v22 = l_useSelector_0(function(v21) --[[ Line: 73 ]]
-        -- upvalues: v7 (ref)
-        return v21.TopBar and v21.TopBar.topBarHeight or v7.SCREEN_BOUNDS.DEFAULT_TOP_BAR_HEIGHT;
-    end);
-    local function _(v23) --[[ Line: 77 ]] --[[ Name: addTrackingToChild ]]
-        -- upvalues: v6 (ref), v20 (copy), v22 (copy), v16 (copy), v3 (ref), v17 (copy)
-        if not v23:IsA("GuiObject") then
-            return;
-        else
-            if v6(v23, v20, v22) then
-                v16:onComponentAdded(v23);
-                if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-                    v17.current:highlightComponent(v23);
-                end;
-            end;
-            return;
-        end;
-    end;
-    local function v31(v25) --[[ Line: 90 ]] --[[ Name: setupChildTracking ]]
-        -- upvalues: v3 (ref), v6 (ref), v20 (copy), v22 (copy), v16 (copy), v17 (copy)
-        for _, v27 in v25:GetDescendants() do
-            if v3.FFlagLuaAppImproveComponentTrackingTiming then
-                task.defer(function() --[[ Line: 93 ]]
-                    -- upvalues: v27 (copy), v6 (ref), v20 (ref), v22 (ref), v16 (ref), v3 (ref), v17 (ref)
-                    local l_v27_0 = v27;
-                    if not l_v27_0:IsA("GuiObject") then
-                        return;
-                    else
-                        if v6(l_v27_0, v20, v22) then
-                            v16:onComponentAdded(l_v27_0);
-                            if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-                                v17.current:highlightComponent(l_v27_0);
-                            end;
-                        end;
-                        return;
-                    end;
-                end);
-            elseif v27:IsA("GuiObject") and v6(v27, v20, v22) then
-                v16:onComponentAdded(v27);
-                if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-                    v17.current:highlightComponent(v27);
-                end;
-            end;
-        end;
-        return (v25.DescendantAdded:Connect(function(v29) --[[ Line: 100 ]]
-            -- upvalues: v3 (ref), v6 (ref), v20 (ref), v22 (ref), v16 (ref), v17 (ref)
-            if v3.FFlagLuaAppImproveComponentTrackingTiming then
-                task.defer(function() --[[ Line: 106 ]]
-                    -- upvalues: v29 (copy), v6 (ref), v20 (ref), v22 (ref), v16 (ref), v3 (ref), v17 (ref)
-                    local l_v29_0 = v29;
-                    if not l_v29_0:IsA("GuiObject") then
-                        return;
-                    else
-                        if v6(l_v29_0, v20, v22) then
-                            v16:onComponentAdded(l_v29_0);
-                            if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-                                v17.current:highlightComponent(l_v29_0);
-                            end;
-                        end;
-                        return;
-                    end;
-                end);
-                return;
-            elseif not v29:IsA("GuiObject") then
-                return;
-            else
-                if v6(v29, v20, v22) then
-                    v16:onComponentAdded(v29);
-                    if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-                        v17.current:highlightComponent(v29);
-                    end;
-                end;
-                return;
-            end;
-        end));
-    end;
-    if v3.FFlagDebugEnablePageLoadTrackerVisualizer then
-        v1.useEffect(function() --[[ Line: 117 ]]
-            -- upvalues: v17 (copy)
-            return function() --[[ Line: 118 ]]
-                -- upvalues: v17 (ref)
-                v17.current:destroy();
-            end;
-        end, {});
-    end;
-    v1.useLayoutEffect(function() --[[ Line: 124 ]]
-        -- upvalues: v15 (copy), v18 (copy), v31 (copy), v3 (ref), v16 (copy)
-        if v15.isActive then
-            local l_current_0 = v18.current;
-            local v33 = v31(l_current_0);
-            if v3.FFlagPageLoadAllowImprovedDisconnectTiming then
-                v16.onCompleteSignal:connect(function() --[[ Line: 129 ]]
-                    -- upvalues: v33 (copy)
-                    v33:Disconnect();
-                end);
-                return;
-            else
-                return function() --[[ Line: 134 ]]
-                    -- upvalues: v33 (copy)
-                    v33:Disconnect();
-                end;
-            end;
-        else
-            return;
-        end;
-    end, {
-        v15.isActive
-    });
-    return v1.createElement("Frame", {
-        ref = v18, 
-        Size = UDim2.fromScale(1, 1), 
-        BackgroundTransparency = 1
-    }, {
-        PageTrackerContext = v1.createElement(v5.Provider, {
-            value = v16
-        }, v15.children)
-    });
-end;
+local Parent = script:FindFirstAncestor("PageLoadTracker").Parent
+local React = require(Parent.React)
+local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local SharedFlags = require(Parent.SharedFlags)
+local createPageTracker = require(script.Parent.Parent.createPageTracker)
+local PageTrackerContext = require(script.Parent.Parent.PageTrackerContext)
+local isElementInScreenBounds = require(script.Parent.Parent.isElementInScreenBounds)
+local PageLoadConfig = require(script.Parent.Parent.PageLoadConfig)
+local VisualDebugManager = require(script.Parent.Parent.VisualDebugManager)
+local ExperienceService = require(Parent.ExperienceService).ExperienceService
+
+local function usePageTracker(b1: boolean, s1: string) -- line: 16
+	-- upvalues: React (copy), createPageTracker (copy), SharedFlags (copy), ExperienceService (copy)
+	local v15 = React.useMemo(function() -- line: 17
+		-- upvalues: createPageTracker (copy)
+		return createPageTracker()
+	end, {})
+
+	if b1 then
+		v15:start(s1)
+	else
+		v15:stop()
+	end
+
+	React.useEffect(function() -- line: 27
+		-- upvalues: v15 (copy), SharedFlags (copy), ExperienceService (copy)
+		v15:sendMilestone("first_react_frame_rendered")
+
+		local u24 = nil
+
+		if SharedFlags.FFlagLuaAppPageLoadTrackerJoinExperienceFix then
+			u24 = ExperienceService:RegisterForExperienceJoin(function() -- line: 35
+				-- upvalues: v15 (copy)
+				v15:stop()
+			end)
+		end
+
+		return function() -- line: 40
+			-- upvalues: v15 (copy), SharedFlags (copy), u24 (ref)
+			v15:stop()
+
+			if SharedFlags.FFlagLuaAppPageLoadTrackerJoinExperienceFix and u24 then
+				u24:Disconnect()
+			end
+		end
+	end, {})
+
+	return v15
+end
+local function ComponentTracker(t1: {[any]: any}) -- line: 57
+	-- upvalues: usePageTracker (copy), React (copy), SharedFlags (copy), VisualDebugManager (copy), useSelector (copy), PageLoadConfig (copy), isElementInScreenBounds (copy), PageTrackerContext (copy)
+	local v17 = usePageTracker(t1.isActive, t1.componentName)
+	local v18 = React.useRef(nil)
+	local v19 = React.useRef(nil)
+
+	if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer and v18.current == nil then
+		v18.current = VisualDebugManager.new()
+	end
+
+	local v20 = useSelector(function(p1) -- line: 69
+		-- upvalues: PageLoadConfig (copy)
+		return p1.ScreenSize or PageLoadConfig.SCREEN_BOUNDS.DEFAULT_SCREEN_SIZE
+	end)
+	local v21 = useSelector(function(p2) -- line: 73
+		-- upvalues: PageLoadConfig (copy)
+		return p2.TopBar and p2.TopBar.topBarHeight or PageLoadConfig.SCREEN_BOUNDS.DEFAULT_TOP_BAR_HEIGHT
+	end)
+
+	local function addTrackingToChild(p3) -- line: 77
+		-- upvalues: isElementInScreenBounds (copy), v20 (copy), v21 (copy), v17 (copy), SharedFlags (copy), v18 (copy)
+		if not p3:IsA("GuiObject") then
+			return
+		end
+
+		if isElementInScreenBounds(p3, v20, v21) then
+			v17:onComponentAdded(p3)
+
+			if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+				v18.current:highlightComponent(p3)
+			end
+		end
+	end
+	local function setupChildTracking(p4) -- line: 90
+		-- upvalues: SharedFlags (copy), isElementInScreenBounds (copy), v20 (copy), v21 (copy), v17 (copy), v18 (copy)
+		for _, descendant in p4:GetDescendants() do
+			if SharedFlags.FFlagLuaAppImproveComponentTrackingTiming then
+				task.defer(function() -- line: 93
+					-- upvalues: descendant (copy), isElementInScreenBounds (copy), v20 (copy), v21 (copy), v17 (copy), SharedFlags (copy), v18 (copy)
+					local v33 = descendant
+
+					if not v33:IsA("GuiObject") then
+						return
+					end
+
+					if isElementInScreenBounds(v33, v20, v21) then
+						v17:onComponentAdded(v33)
+
+						if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+							v18.current:highlightComponent(v33)
+						end
+					end
+				end)
+			elseif descendant:IsA("GuiObject") and isElementInScreenBounds(descendant, v20, v21) then
+				v17:onComponentAdded(descendant)
+
+				if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+					v18.current:highlightComponent(descendant)
+				end
+			end
+		end
+
+		return (p4.DescendantAdded:Connect(function(descendant) -- line: 100
+			-- upvalues: SharedFlags (copy), isElementInScreenBounds (copy), v20 (copy), v21 (copy), v17 (copy), v18 (copy)
+			if SharedFlags.FFlagLuaAppImproveComponentTrackingTiming then
+				task.defer(function() -- line: 106
+					-- upvalues: descendant (copy), isElementInScreenBounds (copy), v20 (copy), v21 (copy), v17 (copy), SharedFlags (copy), v18 (copy)
+					local v35 = descendant
+
+					if not v35:IsA("GuiObject") then
+						return
+					end
+
+					if isElementInScreenBounds(v35, v20, v21) then
+						v17:onComponentAdded(v35)
+
+						if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+							v18.current:highlightComponent(v35)
+						end
+					end
+				end)
+
+				return
+			end
+
+			if not descendant:IsA("GuiObject") then
+				return
+			end
+
+			if isElementInScreenBounds(descendant, v20, v21) then
+				v17:onComponentAdded(descendant)
+
+				if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+					v18.current:highlightComponent(descendant)
+				end
+			end
+		end))
+	end
+
+	if SharedFlags.FFlagDebugEnablePageLoadTrackerVisualizer then
+		React.useEffect(function() -- line: 117
+			-- upvalues: v18 (copy)
+			return function() -- line: 118
+				-- upvalues: v18 (copy)
+				v18.current:destroy()
+			end
+		end, {})
+	end
+
+	React.useLayoutEffect(function() -- line: 124
+		-- upvalues: t1 (copy), v19 (copy), setupChildTracking (copy), SharedFlags (copy), v17 (copy)
+		if t1.isActive then
+			local current = v19.current
+			local v32 = setupChildTracking(current)
+
+			if SharedFlags.FFlagPageLoadAllowImprovedDisconnectTiming then
+				v17.onCompleteSignal:connect(function() -- line: 129
+					-- upvalues: v32 (copy)
+					v32:Disconnect()
+				end)
+
+				return
+			end
+
+			return function() -- line: 134
+				-- upvalues: v32 (copy)
+				v32:Disconnect()
+			end
+		end
+	end, { t1.isActive })
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ref = v19,
+		Size = UDim2.fromScale(1, 1)
+	}, {
+		PageTrackerContext = React.createElement(PageTrackerContext.Provider, {
+			value = v17
+		}, t1.children)
+	})
+end
+
+return ComponentTracker

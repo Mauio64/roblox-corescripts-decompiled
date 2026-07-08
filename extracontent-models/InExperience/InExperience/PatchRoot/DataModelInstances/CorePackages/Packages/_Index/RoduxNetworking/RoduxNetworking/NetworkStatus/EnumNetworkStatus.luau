@@ -1,18 +1,20 @@
-local v0 = {};
-local v1 = {
-    NotStarted = "NotStarted", 
-    Fetching = "Fetching", 
-    Done = "Done", 
-    Failed = "Failed"
-};
-setmetatable(v0, {
-    __newindex = function(_, _, _) --[[ Line: 12 ]] --[[ Name: __newindex ]]
+local t1 = {}
+local t2 = {
+	NotStarted = "NotStarted",
+	Fetching = "Fetching",
+	Done = "Done",
+	Failed = "Failed"
+}
 
-    end, 
-    __index = function(_, v6) --[[ Line: 14 ]] --[[ Name: __index ]]
-        -- upvalues: v1 (copy)
-        assert(v1[v6] ~= nil, "EnumNetworkStatus has no value: " .. tostring(v6));
-        return v1[v6];
-    end
-});
-return v0;
+setmetatable(t1, {
+	__newindex = function(_, _, _) -- line: 12
+	end,
+	__index = function(_, p5) -- line: 14
+		-- upvalues: t2 (copy)
+		assert(t2[p5] ~= nil, "EnumNetworkStatus has no value: " .. tostring(p5))
+
+		return t2[p5]
+	end
+})
+
+return t1

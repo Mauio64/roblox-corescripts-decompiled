@@ -1,1 +1,1 @@
-return require(script.Parent.buildApiSiteUrl)("chat");
+return require(script.Parent.buildApiSiteUrl)("chat")

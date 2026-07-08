@@ -1,18 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v2 = require(l_script_FirstAncestor_0.Components.Constants);
-return {
-    componentType = "dropdown", 
-    getIsVisible = function(_) --[[ Line: 7 ]] --[[ Name: getIsVisible ]]
-        return true;
-    end, 
-    getMenuItems = function(_) --[[ Line: 10 ]] --[[ Name: getMenuItems ]]
-        return {};
-    end, 
-    onUpdateSelectedOption = function(_, _) --[[ Line: 13 ]] --[[ Name: onUpdateSelectedOption ]]
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
 
-    end, 
-    readonlyValue = v2.InappropriateContentAbuseReason, 
-    fieldLabel = "ReasonForAbuse", 
-    componentName = "AbuseReason"
-};
+require(AbuseReportMenu.Components.Types)
+
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+return {
+	componentType = "dropdown",
+	fieldLabel = "ReasonForAbuse",
+	componentName = "AbuseReason",
+	getIsVisible = function(_) -- line: 7
+		return true
+	end,
+	getMenuItems = function(_) -- line: 10
+		return {}
+	end,
+	onUpdateSelectedOption = function(_, _) -- line: 13
+	end,
+	readonlyValue = Constants.InappropriateContentAbuseReason
+}

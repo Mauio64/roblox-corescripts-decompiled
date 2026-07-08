@@ -6,17 +6,17 @@ require(ancestor.Dimensions)
 
 local exhaustiveMatch = require(ancestor.Util.exhaustiveMatch)
 
-return function(p1, p2: ((...any) -> ...any), n1: number, n2: number, p3) --[[ binarySearchIndexRangeInView ]] -- line: 8
+local function binarySearchIndexRangeInView(p1, p2: ((...any) -> ...any), n1: number, n2: number, s1: string) -- line: 8
 	-- upvalues: exhaustiveMatch (copy), DataSourceMethods (copy)
-	local function compareInView(p4) -- line: 18
-		-- upvalues: p3 (copy), exhaustiveMatch (copy), n1 (copy), n2 (copy)
-		local v19 = if p3 ~= "x" then if p3 ~= "y" then exhaustiveMatch(p3) else p4.position.Y.Offset else p4.position.X.Offset
+	local function compareInView(p3) -- line: 18
+		-- upvalues: s1 (copy), exhaustiveMatch (copy), n1 (copy), n2 (copy)
+		local v20 = if s1 ~= "x" then if s1 ~= "y" then exhaustiveMatch(s1) else p3.position.Y.Offset else p3.position.X.Offset
 
-		if v19 + (if p3 ~= "x" then (if p3 ~= "y" then exhaustiveMatch(p3) else p4.size.Y.Offset) else p4.size.X.Offset) < n1 then
+		if v20 + (if s1 ~= "x" then (if s1 ~= "y" then exhaustiveMatch(s1) else p3.size.Y.Offset) else p3.size.X.Offset) < n1 then
 			return "before"
 		end
 
-		if v19 > n1 + n2 then
+		if v20 > n1 + n2 then
 			return "after"
 		end
 
@@ -24,58 +24,60 @@ return function(p1, p2: ((...any) -> ...any), n1: number, n2: number, p3) --[[ b
 	end
 
 	local n3 = 1
-	local v11 = DataSourceMethods.length(p1)
-	local v12 = v11
+	local v12 = DataSourceMethods.length(p1)
+	local v13 = v12
 
-	while n3 <= v12 do
-		local v13 = (n3 + v12) // 2
-		local v14 = DataSourceMethods.get(p1, v13)
+	while n3 <= v13 do
+		local v14 = (n3 + v13) // 2
+		local v15 = DataSourceMethods.get(p1, v14)
 
-		assert(v14 ~= nil, "get() returned nil, meaning the length is inaccurate")
+		assert(v15 ~= nil, "get() returned nil, meaning the length is inaccurate")
 
-		local v15 = compareInView((p2(v14.value, v13)))
+		local v16 = compareInView((p2(v15.value, v14)))
 
-		if v15 ~= "after" then
-			if v15 == "before" then
-				n3 = v13 + 1
+		if v16 ~= "after" then
+			if v16 == "before" then
+				n3 = v14 + 1
 
 				continue
 			end
 
-			if v15 == "inside" then
-				local v16 = v13
+			if v16 == "inside" then
 				local v17 = v14
+				local v18 = v15
 
-				while v16 > 1 do
-					v17 = v17.before()
+				while v17 > 1 do
+					v18 = v18.before()
 
-					if v17 == nil or compareInView(p2(v17.value, v16 - 1)) ~= "inside" then
+					if v18 == nil or compareInView(p2(v18.value, v17 - 1)) ~= "inside" then
 						break
 					end
 
-					v16 -= 1
+					v17 -= 1
 				end
 
-				while v13 < v11 do
-					v14 = v14.after()
+				while v14 < v12 do
+					v15 = v15.after()
 
-					if v14 == nil or compareInView(p2(v14.value, v13 + 1)) ~= "inside" then
-						return (Vector3.new(v16, v13))
+					if v15 == nil or compareInView(p2(v15.value, v14 + 1)) ~= "inside" then
+						return (Vector3.new(v17, v14))
 					end
 
-					v13 += 1
+					v14 += 1
 				end
 
-				return (Vector3.new(v16, v13))
+				return (Vector3.new(v17, v14))
 			end
 
-			exhaustiveMatch(v15)
+			exhaustiveMatch(v16)
 
 			continue
 		end
 
-		v12 = v13 - 1
+		v13 = v14 - 1
 	end
 
 	return (Vector3.new(0, 0, 0))
 end
+
+return binarySearchIndexRangeInView

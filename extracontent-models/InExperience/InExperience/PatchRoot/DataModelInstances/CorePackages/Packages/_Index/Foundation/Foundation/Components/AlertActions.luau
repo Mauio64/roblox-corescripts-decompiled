@@ -1,3 +1,5 @@
-local v0 = require(script.AlertActions);
-local _ = require(script.AlertConstants);
-return v0;
+local AlertActions = require(script.AlertActions)
+
+require(script.AlertConstants)
+
+return AlertActions

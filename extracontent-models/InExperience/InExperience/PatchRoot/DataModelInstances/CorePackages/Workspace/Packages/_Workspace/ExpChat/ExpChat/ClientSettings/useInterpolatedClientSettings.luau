@@ -1,25 +1,28 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent);
-local v3 = require(script.Parent.ClientSettingsUtility);
-local v4 = game:DefineFastFlag("ExpChatAddressFrame0Flash", false);
-return function(v5) --[[ Line: 11 ]]
-    -- upvalues: v1 (copy), v2 (copy), v4 (copy), v3 (copy)
-    local v6 = v1.useContext(v2);
-    local v7, v8 = v1.useState({
-        BackgroundColor3 = if v4 then v3.getBackgroundColor(v5, v6) else nil, 
-        BackgroundColor = if not v4 then v3.getBackgroundColor(v5, v6) else nil, 
-        BackgroundTransparency = v3.getBackgroundTransparency(v5, v6)
-    });
-    v1.useEffect(function() --[[ Line: 24 ]]
-        -- upvalues: v8 (copy), v3 (ref), v5 (copy), v6 (copy)
-        v8({
-            BackgroundColor3 = v3.getBackgroundColor(v5, v6), 
-            BackgroundTransparency = v3.getBackgroundTransparency(v5, v6)
-        });
-    end, {
-        v5, 
-        v6
-    });
-    return v7;
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local React = require(Parent.React)
+local Parent2 = require(script.Parent)
+local ClientSettingsUtility = require(script.Parent.ClientSettingsUtility)
+local FFlagExpChatAddressFrame0Flash = require(Parent.ChatUIPrimitives).Flags.FFlagExpChatAddressFrame0Flash
+
+return function(p1) -- line: 11
+	-- upvalues: React (copy), Parent2 (copy), FFlagExpChatAddressFrame0Flash (copy), ClientSettingsUtility (copy)
+	local v7 = React.useContext(Parent2)
+	local v8, v9 = React.useState({
+		BackgroundColor3 = if not FFlagExpChatAddressFrame0Flash then nil else ClientSettingsUtility.getBackgroundColor(p1, v7),
+		BackgroundColor = if FFlagExpChatAddressFrame0Flash then nil else ClientSettingsUtility.getBackgroundColor(p1, v7),
+		BackgroundTransparency = ClientSettingsUtility.getBackgroundTransparency(p1, v7)
+	})
+
+	React.useEffect(function() -- line: 24
+		-- upvalues: v9 (copy), ClientSettingsUtility (copy), p1 (copy), v7 (copy)
+		v9({
+			BackgroundColor3 = ClientSettingsUtility.getBackgroundColor(p1, v7),
+			BackgroundTransparency = ClientSettingsUtility.getBackgroundTransparency(p1, v7)
+		})
+	end, {
+		p1,
+		v7
+	})
+
+	return v8
+end

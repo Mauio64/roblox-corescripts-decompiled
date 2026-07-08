@@ -1,30 +1,39 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_0.isArray);
-local v3 = require(l_Parent_1.instanceof);
-local v4 = require(l_Parent_1.Set);
-local v5 = require(l_Parent_1.Map);
-local v6 = require(script.fromString);
-local v7 = require(script.fromSet);
-local v8 = require(script.fromMap);
-local v9 = require(script.fromArray);
-local _ = require(l_Parent_1.types);
-return function(v11, v12, v13) --[[ Line: 23 ]]
-    -- upvalues: v2 (copy), v9 (copy), v3 (copy), v4 (copy), v7 (copy), v5 (copy), v8 (copy), v6 (copy)
-    if v11 == nil then
-        error("cannot create array from a nil value");
-    end;
-    local v14 = typeof(v11);
-    local _ = nil;
-    if v14 == "table" and v2(v11) then
-        return (v9(v11, v12, v13));
-    elseif v3(v11, v4) then
-        return (v7(v11, v12, v13));
-    elseif v3(v11, v5) then
-        return (v8(v11, v12, v13));
-    elseif v14 == "string" then
-        return (v6(v11, v12, v13));
-    else
-        return {};
-    end;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local isArray = require(scriptParent.isArray)
+local instanceof = require(scriptParentParent.instanceof)
+local Set = require(scriptParentParent.Set)
+local Map = require(scriptParentParent.Map)
+local fromString = require(script.fromString)
+local fromSet = require(script.fromSet)
+local fromMap = require(script.fromMap)
+local fromArray = require(script.fromArray)
+
+require(scriptParentParent.types)
+
+return function(p1, p2: ((...any) -> ...any)?, p3) -- line: 23
+	-- upvalues: isArray (copy), fromArray (copy), instanceof (copy), Set (copy), fromSet (copy), Map (copy), fromMap (copy), fromString (copy)
+	if p1 == nil then
+		error("cannot create array from a nil value")
+	end
+
+	local v14 = typeof(p1)
+
+	if v14 == "table" and isArray(p1) then
+		return (fromArray(p1, p2, p3))
+	end
+
+	if instanceof(p1, Set) then
+		return (fromSet(p1, p2, p3))
+	end
+
+	if instanceof(p1, Map) then
+		return (fromMap(p1, p2, p3))
+	end
+
+	if v14 == "string" then
+		return (fromString(p1, p2, p3))
+	end
+
+	return {}
+end

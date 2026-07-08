@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddFocusNavigationToUnifiedPurchase", false);
+return game:DefineFastFlag("AddFocusNavigationToUnifiedPurchase", false)

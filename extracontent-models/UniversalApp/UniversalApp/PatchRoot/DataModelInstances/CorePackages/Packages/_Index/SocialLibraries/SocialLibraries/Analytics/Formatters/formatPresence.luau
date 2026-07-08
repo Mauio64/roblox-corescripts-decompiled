@@ -1,14 +1,15 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_PresenceTypes_0 = require(l_Parent_0.Analytics.Enums).PresenceTypes;
-local l_PresenceType_0 = v1.RoduxPresence.Enums.PresenceType;
-local v4 = {
-    [l_PresenceType_0.InGame] = l_PresenceTypes_0.InGame.rawValue(), 
-    [l_PresenceType_0.InStudio] = l_PresenceTypes_0.InStudio.rawValue(), 
-    [l_PresenceType_0.Offline] = l_PresenceTypes_0.Offline.rawValue(), 
-    [l_PresenceType_0.Online] = l_PresenceTypes_0.Online.rawValue()
-};
-return function(v5) --[[ Line: 15 ]]
-    -- upvalues: v4 (copy)
-    return v4[v5];
-end;
+local ParentParent = script.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local PresenceTypes = require(ParentParent.Analytics.Enums).PresenceTypes
+local PresenceType = dependencies.RoduxPresence.Enums.PresenceType
+local t1 = {
+	[PresenceType.InGame] = PresenceTypes.InGame.rawValue(),
+	[PresenceType.InStudio] = PresenceTypes.InStudio.rawValue(),
+	[PresenceType.Offline] = PresenceTypes.Offline.rawValue(),
+	[PresenceType.Online] = PresenceTypes.Online.rawValue()
+}
+
+return function(p1) -- line: 15
+	-- upvalues: t1 (copy)
+	return t1[p1]
+end

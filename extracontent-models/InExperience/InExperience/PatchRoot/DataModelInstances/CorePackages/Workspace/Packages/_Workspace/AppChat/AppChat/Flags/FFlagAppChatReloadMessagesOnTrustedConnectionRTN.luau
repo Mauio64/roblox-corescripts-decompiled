@@ -1,1 +1,1 @@
-return (require(script.Parent.FFlagAppChatEnableHiddenMessages));
+return true

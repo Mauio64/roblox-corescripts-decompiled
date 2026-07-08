@@ -1,1 +1,1 @@
-return game:DefineFastString("SpatialRobloxUIIXPUITypeVariableName", "ui_type");
+return game:DefineFastString("SpatialRobloxUIIXPUITypeVariableName", "ui_type")

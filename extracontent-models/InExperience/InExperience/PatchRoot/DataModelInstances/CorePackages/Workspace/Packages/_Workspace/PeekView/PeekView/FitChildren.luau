@@ -1,163 +1,188 @@
-local l_Parent_0 = script:FindFirstAncestor("PeekView").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.Roact);
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local l_Symbol_0 = require(l_Parent_0.AppCommonLib).Symbol;
-local v5 = {
-    FitAxis = {
-        Width = l_Symbol_0.named("Width"), 
-        Height = l_Symbol_0.named("Height"), 
-        Both = l_Symbol_0.named("Both")
-    }
-};
-v5.wrap = function(v6) --[[ Line: 23 ]] --[[ Name: wrap ]]
-    -- upvalues: v2 (copy), v5 (copy), l_Immutable_0 (copy), v1 (copy)
-    local v7 = v2.PureComponent:extend(("FitChildren(%s)"):format((tostring(v6))));
-    v7.disconnectSignals = function(v8) --[[ Line: 26 ]] --[[ Name: disconnectSignals ]]
-        for _, v10 in ipairs(v8.signals) do
-            v10:Disconnect();
-        end;
-    end;
-    v7.resize = function(v11) --[[ Line: 32 ]] --[[ Name: resize ]]
-        -- upvalues: v5 (ref)
-        local v12 = v11.props.fitFields or if v11.props.fitAxis then {
-            Size = v11.props.fitAxis
-        } else {
-            Size = v5.FitAxis.Both
-        };
-        v11:disconnectSignals();
-        v11.signals = {};
-        local l_current_0 = v11.ref.current;
-        if l_current_0 == nil then
-            return;
-        else
-            local l_UIGridStyleLayout_0 = l_current_0:FindFirstChildWhichIsA("UIGridStyleLayout");
-            if l_UIGridStyleLayout_0 then
-                local function v16() --[[ Line: 59 ]] --[[ Name: update ]]
-                    -- upvalues: l_UIGridStyleLayout_0 (copy), v11 (copy), v12 (ref)
-                    local l_AbsoluteContentSize_0 = l_UIGridStyleLayout_0.AbsoluteContentSize;
-                    v11:applyFit(v12, l_AbsoluteContentSize_0.x, l_AbsoluteContentSize_0.y);
-                end;
-                local v17 = l_UIGridStyleLayout_0:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(v16);
-                table.insert(v11.signals, v17);
-                local l_AbsoluteContentSize_1 = l_UIGridStyleLayout_0.AbsoluteContentSize;
-                v11:applyFit(v12, l_AbsoluteContentSize_1.x, l_AbsoluteContentSize_1.y);
-            else
-                v11:resizeFromChildren(v12);
-                local l_l_current_0_Children_0 = l_current_0:GetChildren();
-                for _, v21 in ipairs(l_l_current_0_Children_0) do
-                    if v21:IsA("GuiBase2d") then
-                        local v22 = v21:GetPropertyChangedSignal("Size"):Connect(function() --[[ Line: 73 ]]
-                            -- upvalues: v11 (copy), v12 (ref)
-                            v11:resizeFromChildren(v12);
-                        end);
-                        table.insert(v11.signals, v22);
-                        local v23 = v21:GetPropertyChangedSignal("Position"):Connect(function() --[[ Line: 77 ]]
-                            -- upvalues: v11 (copy), v12 (ref)
-                            v11:resizeFromChildren(v12);
-                        end);
-                        table.insert(v11.signals, v23);
-                    end;
-                end;
-            end;
-            return;
-        end;
-    end;
-    v7.resizeFromChildren = function(v24, v25) --[[ Line: 86 ]] --[[ Name: resizeFromChildren ]]
-        local l_current_1 = v24.ref.current;
-        if l_current_1 == nil then
-            return;
-        else
-            local l_AbsolutePosition_0 = l_current_1.AbsolutePosition;
-            local l_l_current_1_Children_0 = l_current_1:GetChildren();
-            local v29 = 0;
-            local v30 = 0;
-            for _, v32 in ipairs(l_l_current_1_Children_0) do
-                if v32:IsA("GuiBase2d") then
-                    local l_AbsoluteSize_0 = v32.AbsoluteSize;
-                    local l_AbsolutePosition_1 = v32.AbsolutePosition;
-                    v29 = math.max(v29, l_AbsolutePosition_1.x - l_AbsolutePosition_0.x + l_AbsoluteSize_0.x);
-                    v30 = math.max(v30, l_AbsolutePosition_1.y - l_AbsolutePosition_0.y + l_AbsoluteSize_0.y);
-                end;
-            end;
-            v24:applyFit(v25, v29, v30);
-            return;
-        end;
-    end;
-    v7.applyFit = function(v35, v36, v37, v38) --[[ Line: 108 ]] --[[ Name: applyFit ]]
-        -- upvalues: v5 (ref)
-        local l_current_2 = v35.ref.current;
-        if l_current_2 == nil then
-            return;
-        else
-            local l_UIPadding_0 = l_current_2:FindFirstChildOfClass("UIPadding");
-            local v41 = v35.props.Size or UDim2.new(0, 0, 0, 0);
-            local l_Width_0 = v5.FitAxis.Width;
-            local l_Height_0 = v5.FitAxis.Height;
-            local function v55(v44, v45, v46, v47, v48, v49) --[[ Line: 119 ]] --[[ Name: calculateAxis ]]
-                -- upvalues: v5 (ref), l_UIPadding_0 (copy)
-                local v50 = true;
-                if v44 ~= v45 then
-                    v50 = v44 == v5.FitAxis.Both;
-                end;
-                local v51 = nil;
-                local v52 = nil;
-                if v50 then
-                    v51 = 0;
-                    if l_UIPadding_0 then
-                        local v53 = l_UIPadding_0[v48].Scale + l_UIPadding_0[v49].Scale;
-                        local v54 = l_UIPadding_0[v48].Offset + l_UIPadding_0[v49].Offset;
-                        if v53 == 1 then
-                            error("Can not apply FitChildren to a component with 100% padding width");
-                            return v51, v52;
-                        else
-                            return v51, (v46 + v54) / (1 - v53);
-                        end;
-                    else
-                        return v51, v46;
-                    end;
-                else
-                    return v47.Scale, v47.Offset;
-                end;
-            end;
-            for v56, v57 in pairs(v36) do
-                local v58, v59 = v55(v57, l_Width_0, v37, v41.X, "PaddingLeft", "PaddingRight");
-                local v60, v61 = v55(v57, l_Height_0, v38, v41.Y, "PaddingTop", "PaddingBottom");
-                l_current_2[v56] = UDim2.new(v58, v59, v60, v61);
-            end;
-            return;
-        end;
-    end;
-    v7.init = function(v62) --[[ Line: 150 ]] --[[ Name: init ]]
-        -- upvalues: v7 (copy), v2 (ref)
-        v62.signals = {};
-        local l_forwardRef_0 = v62.props.forwardRef;
-        assert(type(l_forwardRef_0) ~= "function", ("%s does not support function ref forwarding"):format((tostring(v7))));
-        v62.ref = l_forwardRef_0 or v2.createRef();
-    end;
-    v7.render = function(v64) --[[ Line: 164 ]] --[[ Name: render ]]
-        -- upvalues: l_Immutable_0 (ref), v2 (ref), v6 (copy)
-        local v65 = l_Immutable_0.RemoveFromDictionary(v64.props, "fitAxis", "fitFields", "forwardRef");
-        v65[v2.Ref] = v64.ref;
-        return v2.createElement(v6, v65);
-    end;
-    v7.didMount = function(v66) --[[ Line: 171 ]] --[[ Name: didMount ]]
-        v66:resize();
-    end;
-    v7.didUpdate = function(v67) --[[ Line: 175 ]] --[[ Name: didUpdate ]]
-        v67:resize();
-    end;
-    v7.willUnmount = function(v68) --[[ Line: 179 ]] --[[ Name: willUnmount ]]
-        v68:disconnectSignals();
-    end;
-    return v2.forwardRef(function(v69, v70) --[[ Line: 183 ]]
-        -- upvalues: v2 (ref), v7 (copy), v1 (ref)
-        return v2.createElement(v7, v1.Dictionary.join(v69, {
-            forwardRef = v70
-        }));
-    end);
-end;
-v5.FitFrame = v5.wrap("Frame");
-v5.FitScrollingFrame = v5.wrap("ScrollingFrame");
-v5.FitTextButton = v5.wrap("TextButton");
-return v5;
+local Parent = script:FindFirstAncestor("PeekView").Parent
+local Cryo = require(Parent.Cryo)
+local Roact = require(Parent.Roact)
+local Immutable = require(Parent.AppCommonLib).Immutable
+local Symbol = require(Parent.AppCommonLib).Symbol
+local t1 = {
+	FitAxis = {
+		Width = Symbol.named("Width"),
+		Height = Symbol.named("Height"),
+		Both = Symbol.named("Both")
+	}
+}
+
+function t1.wrap(p1) -- line: 23
+	-- upvalues: Roact (copy), t1 (copy), Immutable (copy), Cryo (copy)
+	local v8 = Roact.PureComponent:extend(("FitChildren(%s)"):format((tostring(p1))))
+
+	function v8.disconnectSignals(p2) -- line: 26
+		for _, v in ipairs(p2.signals) do
+			v:Disconnect()
+		end
+	end
+	function v8.resize(p3) -- line: 32
+		-- upvalues: t1 (copy)
+		local u13 = p3.props.fitFields or if not p3.props.fitAxis then {
+			Size = t1.FitAxis.Both
+		} else {
+			Size = p3.props.fitAxis
+		}
+
+		p3:disconnectSignals()
+		p3.signals = {}
+
+		local current = p3.ref.current
+
+		if current == nil then
+			return
+		end
+
+		local UIGridStyleLayout = current:FindFirstChildWhichIsA("UIGridStyleLayout")
+
+		if UIGridStyleLayout then
+			local function update() -- line: 59
+				-- upvalues: UIGridStyleLayout (copy), p3 (copy), u13 (ref)
+				local AbsoluteContentSize = UIGridStyleLayout.AbsoluteContentSize
+
+				p3:applyFit(u13, AbsoluteContentSize.x, AbsoluteContentSize.y)
+			end
+
+			local connection = UIGridStyleLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(update)
+
+			table.insert(p3.signals, connection)
+
+			local AbsoluteContentSize = UIGridStyleLayout.AbsoluteContentSize
+
+			p3:applyFit(u13, AbsoluteContentSize.x, AbsoluteContentSize.y)
+		else
+			p3:resizeFromChildren(u13)
+
+			local children = current:GetChildren()
+
+			for _, v in ipairs(children) do
+				if v:IsA("GuiBase2d") then
+					local connection = v:GetPropertyChangedSignal("Size"):Connect(function() -- line: 73
+						-- upvalues: p3 (copy), u13 (ref)
+						p3:resizeFromChildren(u13)
+					end)
+
+					table.insert(p3.signals, connection)
+
+					local connection2 = v:GetPropertyChangedSignal("Position"):Connect(function() -- line: 77
+						-- upvalues: p3 (copy), u13 (ref)
+						p3:resizeFromChildren(u13)
+					end)
+
+					table.insert(p3.signals, connection2)
+				end
+			end
+		end
+	end
+	function v8.resizeFromChildren(p4, p5) -- line: 86
+		local current = p4.ref.current
+
+		if current == nil then
+			return
+		end
+
+		local AbsolutePosition = current.AbsolutePosition
+		local children = current:GetChildren()
+		local n1 = 0
+		local n2 = 0
+
+		for _, v in ipairs(children) do
+			if v:IsA("GuiBase2d") then
+				local AbsoluteSize = v.AbsoluteSize
+				local AbsolutePosition2 = v.AbsolutePosition
+
+				n1 = math.max(n1, AbsolutePosition2.x - AbsolutePosition.x + AbsoluteSize.x)
+				n2 = math.max(n2, AbsolutePosition2.y - AbsolutePosition.y + AbsoluteSize.y)
+			end
+		end
+
+		p4:applyFit(p5, n1, n2)
+	end
+	function v8.applyFit(p6, p7, p8, p9) -- line: 108
+		-- upvalues: t1 (copy)
+		local current = p6.ref.current
+
+		if current == nil then
+			return
+		end
+
+		local UIPadding = current:FindFirstChildOfClass("UIPadding")
+		local v41 = p6.props.Size or UDim2.new(0, 0, 0, 0)
+		local Width = t1.FitAxis.Width
+		local FitAxisHeight = t1.FitAxis.Height
+
+		local function calculateAxis(p10, p11, p12, p13, p14, p15) -- line: 119
+			-- upvalues: t1 (copy), UIPadding (copy)
+			if p10 == p11 or p10 == t1.FitAxis.Both then
+				local n3 = 0
+
+				if UIPadding then
+					local v68 = UIPadding[p14].Scale + UIPadding[p15].Scale
+					local v69 = UIPadding[p14].Offset + UIPadding[p15].Offset
+
+					if v68 == 1 then
+						error("Can not apply FitChildren to a component with 100% padding width")
+
+						return n3, nil
+					end
+
+					return n3, (p12 + v69) / (1 - v68)
+				end
+
+				return n3, p12
+			end
+
+			return p13.Scale, p13.Offset
+		end
+
+		for k, v in pairs(p7) do
+			local v47, v48 = calculateAxis(v, Width, p8, v41.X, "PaddingLeft", "PaddingRight")
+			local v49, v50 = calculateAxis(v, FitAxisHeight, p9, v41.Y, "PaddingTop", "PaddingBottom")
+
+			current[k] = UDim2.new(v47, v48, v49, v50)
+		end
+	end
+	function v8.init(p16) -- line: 150
+		-- upvalues: v8 (copy), Roact (copy)
+		p16.signals = {}
+
+		local forwardRef = p16.props.forwardRef
+
+		assert(type(forwardRef) ~= "function", ("%s does not support function ref forwarding"):format((tostring(v8))))
+		p16.ref = forwardRef or Roact.createRef()
+	end
+	function v8.render(p17) -- line: 164
+		-- upvalues: Immutable (copy), Roact (copy), p1 (copy)
+		local v54 = Immutable.RemoveFromDictionary(p17.props, "fitAxis", "fitFields", "forwardRef")
+
+		v54[Roact.Ref] = p17.ref
+
+		return Roact.createElement(p1, v54)
+	end
+	function v8.didMount(p18) -- line: 171
+		p18:resize()
+	end
+	function v8.didUpdate(p19) -- line: 175
+		p19:resize()
+	end
+	function v8.willUnmount(p20) -- line: 179
+		p20:disconnectSignals()
+	end
+
+	return Roact.forwardRef(function(p21, p22) -- line: 183
+		-- upvalues: Roact (copy), v8 (copy), Cryo (copy)
+		return Roact.createElement(v8, Cryo.Dictionary.join(p21, {
+			forwardRef = p22
+		}))
+	end)
+end
+
+t1.FitFrame = t1.wrap("Frame")
+t1.FitScrollingFrame = t1.wrap("ScrollingFrame")
+t1.FitTextButton = t1.wrap("TextButton")
+
+return t1

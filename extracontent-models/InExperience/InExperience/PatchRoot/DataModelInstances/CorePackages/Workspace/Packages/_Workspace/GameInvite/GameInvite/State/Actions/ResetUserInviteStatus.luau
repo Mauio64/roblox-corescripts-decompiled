@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("GameInvite").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function() --[[ Line: 6 ]]
-    return {};
-end);
+local Parent = script:FindFirstAncestor("GameInvite").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function() -- line: 6
+	return {}
+end)

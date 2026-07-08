@@ -1,33 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerTriggeredModals");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SocialUpsell);
-local v4 = require(l_script_FirstAncestor_0.CustomModalType);
-local v5 = require(l_script_FirstAncestor_0.reportModalImpression);
-local v6 = require(l_script_FirstAncestor_0.sendModalImpressionEvent);
-local l_SocialUpsellType_0 = v3.Enums.SocialUpsellType;
-local l_UpsellEntrySurfaceType_0 = v3.Analytics.Enum.UpsellEntrySurfaceType;
-local l_UpsellComponent_0 = v3.Analytics.Enum.UpsellComponent;
-local l_useSocialUpsellOverlayController_0 = v3.Hooks.useSocialUpsellOverlayController;
-return function(v11, v12) --[[ Line: 16 ]]
-    -- upvalues: l_useSocialUpsellOverlayController_0 (copy), v2 (copy), v4 (copy), l_SocialUpsellType_0 (copy), l_UpsellEntrySurfaceType_0 (copy), l_UpsellComponent_0 (copy), v5 (copy), v6 (copy)
-    local v13 = l_useSocialUpsellOverlayController_0(false);
-    return v2.useCallback(function(v14) --[[ Line: 19 ]]
-        -- upvalues: v4 (ref), v13 (copy), l_SocialUpsellType_0 (ref), l_UpsellEntrySurfaceType_0 (ref), l_UpsellComponent_0 (ref), v5 (ref), v12 (copy), v6 (ref)
-        if v14.modalType == v4.SocialFaceAgeEstimationUpsell then
-            v13.openSocialOverlay(l_SocialUpsellType_0.FacialAgeEstimation, {
-                upsellEntrySurface = l_UpsellEntrySurfaceType_0.Homepage, 
-                upsellEntryComponent = l_UpsellComponent_0.Modal, 
-                onMounted = function() --[[ Line: 24 ]] --[[ Name: onMounted ]]
-                    -- upvalues: v5 (ref), v12 (ref), v14 (copy), v6 (ref)
-                    v5(v12, v14.modalId, v14.modalType);
-                    v6(v14.modalId, v14.modalType);
-                end
-            });
-        end;
-    end, {
-        v12, 
-        v11, 
-        v13.openSocialOverlay
-    });
-end;
+local ServerTriggeredModals = script:FindFirstAncestor("ServerTriggeredModals")
+local ServerTriggeredModalsParent = ServerTriggeredModals.Parent
+local React = require(ServerTriggeredModalsParent.React)
+local SocialUpsell = require(ServerTriggeredModalsParent.SocialUpsell)
+local CustomModalType = require(ServerTriggeredModals.CustomModalType)
+local reportModalImpression = require(ServerTriggeredModals.reportModalImpression)
+local sendModalImpressionEvent = require(ServerTriggeredModals.sendModalImpressionEvent)
+local SocialUpsellType = SocialUpsell.Enums.SocialUpsellType
+local UpsellEntrySurfaceType = SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType
+local UpsellComponent = SocialUpsell.Analytics.Enum.UpsellComponent
+local useSocialUpsellOverlayController = SocialUpsell.Hooks.useSocialUpsellOverlayController
+
+return function(p1, p2) -- line: 16
+	-- upvalues: useSocialUpsellOverlayController (copy), React (copy), CustomModalType (copy), SocialUpsellType (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy), reportModalImpression (copy), sendModalImpressionEvent (copy)
+	local v14 = useSocialUpsellOverlayController(false)
+
+	return React.useCallback(function(p3) -- line: 19
+		-- upvalues: CustomModalType (copy), v14 (copy), SocialUpsellType (copy), UpsellEntrySurfaceType (copy), UpsellComponent (copy), reportModalImpression (copy), p2 (copy), sendModalImpressionEvent (copy)
+		if p3.modalType == CustomModalType.SocialFaceAgeEstimationUpsell then
+			v14.openSocialOverlay(SocialUpsellType.FacialAgeEstimation, {
+				upsellEntrySurface = UpsellEntrySurfaceType.Homepage,
+				upsellEntryComponent = UpsellComponent.Modal,
+				onMounted = function() -- line: 24
+					-- upvalues: reportModalImpression (copy), p2 (copy), p3 (copy), sendModalImpressionEvent (copy)
+					reportModalImpression(p2, p3.modalId, p3.modalType)
+					sendModalImpressionEvent(p3.modalId, p3.modalType)
+				end
+			})
+		end
+	end, {
+		p2,
+		p1,
+		v14.openSocialOverlay
+	})
+end

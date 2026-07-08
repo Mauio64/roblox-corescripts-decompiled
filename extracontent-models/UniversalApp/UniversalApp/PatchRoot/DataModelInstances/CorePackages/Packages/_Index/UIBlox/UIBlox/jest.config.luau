@@ -1,9 +1,6 @@
-local l_Parent_0 = script.Parent.Parent;
+local ParentParent = script.Parent.Parent
+
 return {
-    testMatch = {
-        "**/*.spec"
-    }, 
-    setupFilesAfterEnv = {
-        l_Parent_0.Utilities.UIBloxInitializer
-    }
-};
+	testMatch = { "**/*.spec" },
+	setupFilesAfterEnv = { ParentParent.Utilities.UIBloxInitializer }
+}

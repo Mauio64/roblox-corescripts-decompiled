@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatNavigateBackIfOSAUnacknowledged", false);
+return game:DefineFastFlag("AppChatNavigateBackIfOSAUnacknowledged", false)

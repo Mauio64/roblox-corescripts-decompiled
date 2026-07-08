@@ -1,4 +1,4 @@
 return {
-    None = "None", 
-    ActiveSquad = "ActiveSquad"
-};
+	None = "None",
+	ActiveSquad = "ActiveSquad"
+}

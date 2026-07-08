@@ -1,236 +1,250 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfileBackground");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v4 = require(l_script_FirstAncestor_0.Components.editProfileBackgroundTopBar);
-local l_useScreenSize_0 = require(l_Parent_0.RobloxAppHooks).useScreenSize;
-local l_useLocalUserId_0 = require(l_Parent_0.RobloxAppHooks).useLocalUserId;
-local v7 = require(l_script_FirstAncestor_0.Components.SelectionCarousel);
-local v8 = require(l_script_FirstAncestor_0.Components.DisplayBackground);
-local v9 = require(l_script_FirstAncestor_0.Networking.ProfileCustomizationNetworking);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useEffectOnMount_0 = require(l_Parent_0.RoactUtils).Hooks.useEffectOnMount;
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v14 = require(l_Parent_0.SocialToast);
-local v15 = require(l_script_FirstAncestor_0.Common.ErrorHandling);
-local v16 = require(l_script_FirstAncestor_0.Common.Constants);
-local v17 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceWrapper_0 = v17.FocusNavigableSurfaceWrapper;
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v17.FocusNavigableSurfaceIdentifierEnum;
-local l_FocusNavigationEventNameEnum_0 = v17.FocusNavigationEventNameEnum;
-local v21 = require(l_Parent_0.InputHandlers);
-local v22 = require(l_Parent_0.Cryo);
-local v23 = require(l_script_FirstAncestor_0.Analytics);
-local l_useAnalytics_0 = v23.useAnalytics;
-local l_EventNames_0 = v23.EventNames;
-local l_ErrorTypes_0 = v23.ErrorTypes;
-local v27 = v16.BACKGROUND_ASSET_IDS[1];
-local l_DEFAULT_ERROR_MESSAGES_0 = v15.DEFAULT_ERROR_MESSAGES;
-local l_InsertService_0 = game:GetService("InsertService");
-local _ = function(v30) --[[ Line: 52 ]] --[[ Name: preloadBackgroundAssets ]]
-    -- upvalues: v22 (copy), v16 (copy), v27 (copy), l_InsertService_0 (copy), l_EventNames_0 (copy), l_ErrorTypes_0 (copy)
-    task.spawn(function() --[[ Line: 53 ]]
-        -- upvalues: v22 (ref), v16 (ref), v27 (ref), l_InsertService_0 (ref), v30 (copy), l_EventNames_0 (ref), l_ErrorTypes_0 (ref)
-        local v32 = v22.Dictionary.join(v16.DEFAULT_BACKGROUND_ASSET_IDS, v22.List.filter(v16.BACKGROUND_ASSET_IDS, function(v31) --[[ Line: 57 ]]
-            -- upvalues: v27 (ref)
-            return v31 ~= v27;
-        end));
-        for _, v34 in ipairs(v32) do
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 63 ]]
-                -- upvalues: l_InsertService_0 (ref), v34 (copy)
-                return l_InsertService_0:LoadAsset(v34);
-            end);
-            if l_status_0 and l_result_0 then
-                l_result_0:Destroy();
-            else
-                v30.fireAnalyticsEvent(l_EventNames_0.EditProfileBackgroundFailure, {
-                    errorType = l_ErrorTypes_0.AssetPreloadFailed
-                });
-            end;
-        end;
-    end);
-end;
-return function(v38) --[[ Line: 84 ]] --[[ Name: EditProfileBackgroundPage ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useLocalUserId_0 (copy), l_useDispatch_0 (copy), v14 (copy), l_useAnalytics_0 (copy), l_useSelector_0 (copy), l_useEffectOnMount_0 (copy), l_EventNames_0 (copy), v22 (copy), v16 (copy), v27 (copy), l_InsertService_0 (copy), l_ErrorTypes_0 (copy), v2 (copy), l_useNavigation_0 (copy), v9 (copy), l_DEFAULT_ERROR_MESSAGES_0 (copy), l_FocusNavigableSurfaceWrapper_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy), l_FocusNavigationEventNameEnum_0 (copy), v21 (copy), l_View_0 (copy), v4 (copy), v8 (copy), v7 (copy)
-    local v39 = l_useScreenSize_0();
-    local v40 = l_useLocalUserId_0();
-    local v41 = l_useDispatch_0();
-    local v42 = v14.useOpenToast();
-    local v43 = l_useAnalytics_0();
-    local v45 = l_useSelector_0(function(v44) --[[ Line: 92 ]]
-        if v44.GlobalGuiInset then
-            return v44.GlobalGuiInset.bottom + 5;
-        else
-            return 0;
-        end;
-    end);
-    l_useEffectOnMount_0(function() --[[ Line: 96 ]]
-        -- upvalues: v43 (copy), l_EventNames_0 (ref), v22 (ref), v16 (ref), v27 (ref), l_InsertService_0 (ref), l_ErrorTypes_0 (ref)
-        v43.fireAnalyticsEvent(l_EventNames_0.EditProfileBackgroundOpened);
-        local v46 = tick();
-        local l_v43_0 = v43;
-        task.spawn(function() --[[ Line: 53 ]]
-            -- upvalues: v22 (ref), v16 (ref), v27 (ref), l_InsertService_0 (ref), l_v43_0 (copy), l_EventNames_0 (ref), l_ErrorTypes_0 (ref)
-            local v49 = v22.Dictionary.join(v16.DEFAULT_BACKGROUND_ASSET_IDS, v22.List.filter(v16.BACKGROUND_ASSET_IDS, function(v48) --[[ Line: 57 ]]
-                -- upvalues: v27 (ref)
-                return v48 ~= v27;
-            end));
-            for _, v51 in ipairs(v49) do
-                local l_status_1, l_result_1 = pcall(function() --[[ Line: 63 ]]
-                    -- upvalues: l_InsertService_0 (ref), v51 (copy)
-                    return l_InsertService_0:LoadAsset(v51);
-                end);
-                if l_status_1 and l_result_1 then
-                    l_result_1:Destroy();
-                else
-                    l_v43_0.fireAnalyticsEvent(l_EventNames_0.EditProfileBackgroundFailure, {
-                        errorType = l_ErrorTypes_0.AssetPreloadFailed
-                    });
-                end;
-            end;
-        end);
-        local v54 = tick() - v46;
-        v43.fireAnalyticsEvent(l_EventNames_0.EditProfileBackgroundLoadingStage, {
-            statValue = v54, 
-            status = "loaded"
-        });
-    end);
-    local v55 = if v38.profileBackgroundData and v38.profileBackgroundData.assetId then v38.profileBackgroundData.assetId else v27;
-    local v56, v57 = v2.useState(nil);
-    local v58 = v56 or v55;
-    local v66 = v2.useMemo(function() --[[ Line: 121 ]]
-        -- upvalues: v39 (copy), v45 (copy)
-        local v59 = math.min(640, v39.X);
-        local v60 = v59 >= 540 and 8 or 4;
-        local v61 = math.ceil(8 / v60);
-        local v62 = (v59 - 32 - (v60 - 1) * 16) / v60;
-        local v63 = v61 * v62 + (v61 + 1) * 16;
-        local v64 = v39.Y - 48 - 40 - 24 - v45;
-        local v65 = v64 - v63;
-        return {
-            width = v59, 
-            buttonSize = v62, 
-            carouselHeight = v63, 
-            contentAreaHeight = v64, 
-            displayBackgroundHeight = v65, 
-            buttonsPerRow = v60, 
-            numRows = v61
-        };
-    end, {
-        v39, 
-        v45
-    });
-    local v67 = l_useNavigation_0();
-    local function v68() --[[ Line: 143 ]] --[[ Name: onClose ]]
-        -- upvalues: v38 (copy), v67 (copy)
-        if v38.onBackgroundChanged then
-            v38.onBackgroundChanged();
-        end;
-        v67.goBack();
-    end;
-    local function v73(v69) --[[ Line: 151 ]] --[[ Name: onBackgroundSelected ]]
-        -- upvalues: v43 (copy), l_EventNames_0 (ref), v57 (copy), v40 (copy), v41 (copy), v9 (ref), v38 (copy), l_ErrorTypes_0 (ref), v42 (copy), l_DEFAULT_ERROR_MESSAGES_0 (ref)
-        v43.fireAnalyticsEvent(l_EventNames_0.BackgroundSelected, {
-            backgroundId = v69
-        });
-        v57(v69);
-        task.spawn(function() --[[ Line: 158 ]]
-            -- upvalues: v40 (ref), v69 (copy), v41 (ref), v9 (ref), v38 (ref), v43 (ref), l_EventNames_0 (ref), l_ErrorTypes_0 (ref), v42 (ref), l_DEFAULT_ERROR_MESSAGES_0 (ref)
-            local v70 = {
-                profileEntity = {
-                    id = tostring(v40), 
-                    type = "User"
-                }, 
-                customizedComponents = {
-                    profileBackground = {
-                        assetId = v69
-                    }
-                }
-            };
-            v41(v9.UpdateProfileCustomization.API(v70)):andThen(function(_) --[[ Line: 172 ]]
-                -- upvalues: v38 (ref)
-                if v38.onBackgroundChanged then
-                    v38.onBackgroundChanged();
-                end;
-            end):catch(function(v72) --[[ Line: 177 ]]
-                -- upvalues: v43 (ref), l_EventNames_0 (ref), l_ErrorTypes_0 (ref), v42 (ref), l_DEFAULT_ERROR_MESSAGES_0 (ref)
-                v43.fireAnalyticsEvent(l_EventNames_0.EditProfileBackgroundFailure, {
-                    errorType = l_ErrorTypes_0.BackgroundSaveFailed, 
-                    errorCode = tostring(v72 and v72.StatusCode or "unknown")
-                });
-                v42({
-                    toastTitle = l_DEFAULT_ERROR_MESSAGES_0.SAVE_BACKGROUND, 
-                    iconImage = {
-                        Image = "icons/actions/error"
-                    }
-                });
-            end);
-        end);
-    end;
-    return v2.createElement(l_FocusNavigableSurfaceWrapper_0, {
-        surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.PopUp, 
-        isIsolated = true, 
-        customEventHandlers = {
-            [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                handler = v21.onRelease(function(v74) --[[ Line: 197 ]]
-                    -- upvalues: v38 (copy), v67 (copy)
-                    if v38.onBackgroundChanged then
-                        v38.onBackgroundChanged();
-                    end;
-                    v67.goBack();
-                    v74:cancel();
-                end)
-            }
-        }
-    }, {
-        v2.createElement(l_View_0, {
-            tag = "size-full bg-surface-0 anchor-top-right position-top-right"
-        }, {
-            SizeConstraint = v2.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(640, 1e999)
-            }), 
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 24)
-            }), 
-            TopPadding = v2.createElement(l_View_0, {
-                tag = "size-full-500"
-            }), 
-            TopBar = v2.createElement(v4, {
-                layoutOrder = 1, 
-                onClose = v68
-            }), 
-            ContentArea = v2.createElement(l_View_0, {
-                Size = UDim2.new(1, 0, 0, v66.contentAreaHeight), 
-                LayoutOrder = 2
-            }, {
-                Layout = v2.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    Padding = UDim.new(0, 0)
-                }), 
-                BackgroundDisplay = v2.createElement(v8, {
-                    LayoutOrder = 1, 
-                    height = v66.displayBackgroundHeight, 
-                    currentBackgroundId = v58, 
-                    userId = tonumber(v40), 
-                    analytics = v43
-                }), 
-                SelectionCarousel = v2.createElement(v7, {
-                    LayoutOrder = 2, 
-                    height = v66.carouselHeight, 
-                    width = v66.width, 
-                    buttonSize = v66.buttonSize, 
-                    buttonsPerRow = v66.buttonsPerRow, 
-                    numRows = v66.numRows, 
-                    onBackgroundSelected = v73, 
-                    currentBackgroundId = v58
-                })
-            })
-        })
-    });
-end;
+local EditProfileBackground = script:FindFirstAncestor("EditProfileBackground")
+local EditProfileBackgroundParent = EditProfileBackground.Parent
+local React = require(EditProfileBackgroundParent.React)
+local useNavigation = require(EditProfileBackgroundParent.Navigation).useNavigation
+local editProfileBackgroundTopBar = require(EditProfileBackground.Components.editProfileBackgroundTopBar)
+local useScreenSize = require(EditProfileBackgroundParent.RobloxAppHooks).useScreenSize
+local useLocalUserId = require(EditProfileBackgroundParent.RobloxAppHooks).useLocalUserId
+local SelectionCarousel = require(EditProfileBackground.Components.SelectionCarousel)
+local DisplayBackground = require(EditProfileBackground.Components.DisplayBackground)
+local ProfileCustomizationNetworking = require(EditProfileBackground.Networking.ProfileCustomizationNetworking)
+local useDispatch = require(EditProfileBackgroundParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useSelector = require(EditProfileBackgroundParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useEffectOnMount = require(EditProfileBackgroundParent.RoactUtils).Hooks.useEffectOnMount
+local View = require(EditProfileBackgroundParent.Foundation).View
+local SocialToast = require(EditProfileBackgroundParent.SocialToast)
+local ErrorHandling = require(EditProfileBackground.Common.ErrorHandling)
+local Constants = require(EditProfileBackground.Common.Constants)
+local FocusNavigationUtils = require(EditProfileBackgroundParent.FocusNavigationUtils)
+local FocusNavigableSurfaceWrapper = FocusNavigationUtils.FocusNavigableSurfaceWrapper
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local InputHandlers = require(EditProfileBackgroundParent.InputHandlers)
+local Cryo = require(EditProfileBackgroundParent.Cryo)
+local Analytics = require(EditProfileBackground.Analytics)
+local useAnalytics = Analytics.useAnalytics
+local EventNames = Analytics.EventNames
+local ErrorTypes = Analytics.ErrorTypes
+local v28 = Constants.BACKGROUND_ASSET_IDS[1]
+local DEFAULT_ERROR_MESSAGES = ErrorHandling.DEFAULT_ERROR_MESSAGES
+local InsertService = game:GetService("InsertService")
+
+local function preloadBackgroundAssets(p1) -- line: 52
+	-- upvalues: Cryo (copy), Constants (copy), v28 (copy), InsertService (copy), EventNames (copy), ErrorTypes (copy)
+	task.spawn(function() -- line: 53
+		-- upvalues: Cryo (copy), Constants (copy), v28 (copy), InsertService (copy), p1 (copy), EventNames (copy), ErrorTypes (copy)
+		local v47 = Cryo.Dictionary.join(Constants.DEFAULT_BACKGROUND_ASSET_IDS, Cryo.List.filter(Constants.BACKGROUND_ASSET_IDS, function(p2) -- line: 57
+			-- upvalues: v28 (copy)
+			return p2 ~= v28
+		end))
+
+		for _, v in ipairs(v47) do
+			local ok, result = pcall(function() -- line: 63
+				-- upvalues: InsertService (copy), v (copy)
+				return InsertService:LoadAsset(v)
+			end)
+
+			if ok and result then
+				result:Destroy()
+			else
+				p1.fireAnalyticsEvent(EventNames.EditProfileBackgroundFailure, {
+					errorType = ErrorTypes.AssetPreloadFailed
+				})
+			end
+		end
+	end)
+end
+local function EditProfileBackgroundPage(t1: {[any]: any}) -- line: 84
+	-- upvalues: useScreenSize (copy), useLocalUserId (copy), useDispatch (copy), SocialToast (copy), useAnalytics (copy), useSelector (copy), useEffectOnMount (copy), EventNames (copy), Cryo (copy), Constants (copy), v28 (copy), InsertService (copy), ErrorTypes (copy), React (copy), useNavigation (copy), ProfileCustomizationNetworking (copy), DEFAULT_ERROR_MESSAGES (copy), FocusNavigableSurfaceWrapper (copy), FocusNavigableSurfaceIdentifierEnum (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), View (copy), editProfileBackgroundTopBar (copy), DisplayBackground (copy), SelectionCarousel (copy)
+	local v35 = useScreenSize()
+	local v36 = useLocalUserId()
+	local v37 = useDispatch()
+	local v38 = SocialToast.useOpenToast()
+	local v39 = useAnalytics()
+	local v40 = useSelector(function(p3) -- line: 92
+		if p3.GlobalGuiInset then
+			return p3.GlobalGuiInset.bottom + 5
+		end
+
+		return 0
+	end)
+
+	useEffectOnMount(function() -- line: 96
+		-- upvalues: v39 (copy), EventNames (copy), Cryo (copy), Constants (copy), v28 (copy), InsertService (copy), ErrorTypes (copy)
+		v39.fireAnalyticsEvent(EventNames.EditProfileBackgroundOpened)
+
+		local timestamp = tick()
+		local v54 = v39
+
+		task.spawn(function() -- line: 53
+			-- upvalues: Cryo (copy), Constants (copy), v28 (copy), InsertService (copy), v54 (copy), EventNames (copy), ErrorTypes (copy)
+			local v66 = Cryo.Dictionary.join(Constants.DEFAULT_BACKGROUND_ASSET_IDS, Cryo.List.filter(Constants.BACKGROUND_ASSET_IDS, function(p4) -- line: 57
+				-- upvalues: v28 (copy)
+				return p4 ~= v28
+			end))
+
+			for _, v in ipairs(v66) do
+				local ok, result = pcall(function() -- line: 63
+					-- upvalues: InsertService (copy), v (copy)
+					return InsertService:LoadAsset(v)
+				end)
+
+				if ok and result then
+					result:Destroy()
+				else
+					v54.fireAnalyticsEvent(EventNames.EditProfileBackgroundFailure, {
+						errorType = ErrorTypes.AssetPreloadFailed
+					})
+				end
+			end
+		end)
+
+		local v55 = tick() - timestamp
+
+		v39.fireAnalyticsEvent(EventNames.EditProfileBackgroundLoadingStage, {
+			status = "loaded",
+			statValue = v55
+		})
+	end)
+
+	local v41 = if not t1.profileBackgroundData or not t1.profileBackgroundData.assetId then v28 else t1.profileBackgroundData.assetId
+	local v42, v43 = React.useState(nil)
+	local v44 = v42 or v41
+	local v45 = React.useMemo(function() -- line: 121
+		-- upvalues: v35 (copy), v40 (copy)
+		local v56 = math.min(640, v35.X)
+		local v57 = not (v56 >= 540) and 4 or 8
+		local v58 = math.ceil(8 / v57)
+		local v59 = (v56 - 32 - (v57 - 1) * 16) / v57
+		local v60 = v58 * v59 + (v58 + 1) * 16
+		local v61 = v35.Y - 48 - 40 - 24 - v40
+		local v62 = v61 - v60
+
+		return {
+			width = v56,
+			buttonSize = v59,
+			carouselHeight = v60,
+			contentAreaHeight = v61,
+			displayBackgroundHeight = v62,
+			buttonsPerRow = v57,
+			numRows = v58
+		}
+	end, {
+		v35,
+		v40
+	})
+	local v46 = useNavigation()
+
+	return React.createElement(FocusNavigableSurfaceWrapper, {
+		isIsolated = true,
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.PopUp,
+		customEventHandlers = {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function(p5) -- line: 197
+					-- upvalues: t1 (copy), v46 (copy)
+					if t1.onBackgroundChanged then
+						t1.onBackgroundChanged()
+					end
+
+					v46.goBack()
+					p5:cancel()
+				end)
+			}
+		}
+	}, { React.createElement(View, {
+		tag = "size-full bg-surface-0 anchor-top-right position-top-right"
+	}, {
+		SizeConstraint = React.createElement("UISizeConstraint", {
+			MaxSize = Vector2.new(640, 1e999)
+		}),
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 24)
+		}),
+		TopPadding = React.createElement(View, {
+			tag = "size-full-500"
+		}),
+		TopBar = React.createElement(editProfileBackgroundTopBar, {
+			layoutOrder = 1,
+			onClose = function() -- line: 143
+				-- upvalues: t1 (copy), v46 (copy)
+				if t1.onBackgroundChanged then
+					t1.onBackgroundChanged()
+				end
+
+				v46.goBack()
+			end
+		}),
+		ContentArea = React.createElement(View, {
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, v45.contentAreaHeight)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 0)
+			}),
+			BackgroundDisplay = React.createElement(DisplayBackground, {
+				LayoutOrder = 1,
+				height = v45.displayBackgroundHeight,
+				currentBackgroundId = v44,
+				userId = tonumber(v36),
+				analytics = v39
+			}),
+			SelectionCarousel = React.createElement(SelectionCarousel, {
+				LayoutOrder = 2,
+				height = v45.carouselHeight,
+				width = v45.width,
+				buttonSize = v45.buttonSize,
+				buttonsPerRow = v45.buttonsPerRow,
+				numRows = v45.numRows,
+				onBackgroundSelected = function(n1: number) -- line: 151
+					-- upvalues: v39 (copy), EventNames (copy), v43 (copy), v36 (copy), v37 (copy), ProfileCustomizationNetworking (copy), t1 (copy), ErrorTypes (copy), v38 (copy), DEFAULT_ERROR_MESSAGES (copy)
+					v39.fireAnalyticsEvent(EventNames.BackgroundSelected, {
+						backgroundId = n1
+					})
+					v43(n1)
+					task.spawn(function() -- line: 158
+						-- upvalues: v36 (copy), n1 (copy), v37 (copy), ProfileCustomizationNetworking (copy), t1 (copy), v39 (copy), EventNames (copy), ErrorTypes (copy), v38 (copy), DEFAULT_ERROR_MESSAGES (copy)
+						local t2 = {
+							profileEntity = {
+								type = "User",
+								id = tostring(v36)
+							},
+							customizedComponents = {
+								profileBackground = {
+									assetId = n1
+								}
+							}
+						}
+
+						v37(ProfileCustomizationNetworking.UpdateProfileCustomization.API(t2)):andThen(function(_) -- line: 172
+							-- upvalues: t1 (copy)
+							if t1.onBackgroundChanged then
+								t1.onBackgroundChanged()
+							end
+						end):catch(function(p7) -- line: 177
+							-- upvalues: v39 (copy), EventNames (copy), ErrorTypes (copy), v38 (copy), DEFAULT_ERROR_MESSAGES (copy)
+							v39.fireAnalyticsEvent(EventNames.EditProfileBackgroundFailure, {
+								errorType = ErrorTypes.BackgroundSaveFailed,
+								errorCode = tostring(p7 and p7.StatusCode or "unknown")
+							})
+							v38({
+								toastTitle = DEFAULT_ERROR_MESSAGES.SAVE_BACKGROUND,
+								iconImage = {
+									Image = "icons/actions/error"
+								}
+							})
+						end)
+					end)
+				end,
+				currentBackgroundId = v44
+			})
+		})
+	}) })
+end
+
+return EditProfileBackgroundPage

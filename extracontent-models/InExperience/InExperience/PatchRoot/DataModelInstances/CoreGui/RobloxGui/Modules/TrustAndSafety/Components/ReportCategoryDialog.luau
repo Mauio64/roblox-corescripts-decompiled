@@ -1,320 +1,343 @@
-local _ = game:GetService("ContextActionService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("GuiService");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.UIBlox);
-local v6 = require(l_CorePackages_0.Packages.t);
-local v7 = require(l_CorePackages_0.Packages.Cryo);
-local v8 = require(l_CorePackages_0.Packages.Signals);
-local v9 = require(l_CorePackages_0.Workspace.Packages.Display);
-local l_Parent_0 = script.Parent.Parent;
-local v11 = require(l_Parent_0.Dependencies);
-local _ = require(v11.FocusHandler);
-local v13 = require(v11.playerInterface);
-local v14 = require(v11.ThemedTextLabel);
-local v15 = require(v11.withLocalization);
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_withVoiceState_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceStateContext).withVoiceState;
-local l_default_0 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-local l_ImageSetLabel_0 = v5.Core.ImageSet.ImageSetLabel;
-local v20 = require(v11.GameIcon);
-local _ = require(l_Parent_0.Components.BlockPlayerItem);
-local v22 = require(l_Parent_0.Actions.EndReportFlow);
-local _ = require(l_Parent_0.Actions.OpenBlockPlayerDialog);
-local v24 = require(l_Parent_0.Actions.SelectReportCategory);
-local v25 = require(l_Parent_0.Utility.SendAnalytics);
-local v26 = require(l_Parent_0.Utility.SessionUtility);
-local v27 = require(l_Parent_0.Resources.Constants);
-local v28 = require(l_Parent_0.Components.ModalDialog);
-local v29 = require(l_Parent_0.Resources.Assets);
-local _ = require(l_Parent_0.Components.GameCell);
-local v31 = require(v11.BarOnTopScrollingFrame);
-local l_Cell_0 = v5.App.Table.Cell;
-local l_Provider_0 = v5.Core.Style.Provider;
-local l_withStyle_0 = v5.Core.Style.withStyle;
-local l_Colors_0 = v5.App.Style.Colors;
-local l_FFlagTopBarSignalizeScreenSize_0 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize;
-local v37 = require(l_RobloxGui_0.Modules.Flags.GetFFlagReportMenuCellToUseAutomaticSize);
-local v38 = {
-    BackgroundDefault = {
-        Color = l_Colors_0.Flint, 
-        Transparency = 1
-    }, 
-    BackgroundOnHover = {
-        Color = l_Colors_0.Graphite, 
-        Transparency = 0.666
-    }, 
-    BackgroundOnPress = {
-        Color = l_Colors_0.Graphite, 
-        Transparency = 0
-    }
-};
-local function v40(v39) --[[ Line: 70 ]] --[[ Name: Divider ]]
-    -- upvalues: v3 (copy), v7 (copy), l_Colors_0 (copy)
-    return v3.createElement("Frame", v7.Dictionary.join({
-        Size = UDim2.new(1, 0, 0, 1)
-    }, v39, {
-        BorderSizePixel = 0, 
-        BackgroundColor3 = l_Colors_0.Graphite, 
-        BackgroundTransparency = 0.5, 
-        theme = v7.None
-    }));
-end;
-local function v42(v41) --[[ Line: 88 ]] --[[ Name: CategoryCellContent ]]
-    -- upvalues: v3 (copy), v37 (copy), l_ImageSetLabel_0 (copy), v14 (copy)
-    return v3.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 72), 
-        AutomaticSize = if v37() then Enum.AutomaticSize.XY else nil
-    }, {
-        ListLayout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        IconFrame = v3.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 68, 1, 0), 
-            LayoutOrder = 1
-        }, {
-            Layout = v3.createElement("UIListLayout", {
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            CustomIcon = v41.iconComponent or nil, 
-            Icon = v41.icon and v3.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = v41.icon.Image, 
-                Size = v41.icon.Size
-            })
-        }), 
-        TextFrame = v3.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, -68, 1, 0), 
-            LayoutOrder = 2
-        }, {
-            ListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                Padding = UDim.new(0, 2)
-            }), 
-            Text = v3.createElement(v14, {
-                AnchorPoint = Vector2.new(0, 0.5), 
-                themeKey = "TextEmphasis", 
-                fontKey = "Header2", 
-                Size = UDim2.new(1, 0, 0, 20), 
-                Text = v41.text, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left
-            }), 
-            SubText = v3.createElement(v14, {
-                AnchorPoint = Vector2.new(0, 0.5), 
-                fontKey = "CaptionBody", 
-                themeKey = "TextMuted", 
-                Size = UDim2.new(1, 0, 0, 14), 
-                Text = v41.subtext, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
-        })
-    });
-end;
-local function v44(v43) --[[ Line: 147 ]] --[[ Name: CategoryCell ]]
-    -- upvalues: v3 (copy), l_Cell_0 (copy), v42 (copy)
-    return v3.createElement(l_Cell_0, {
-        userInteractionEnabled = true, 
-        onActivated = v43.onActivated, 
-        layoutOrder = v43.layoutOrder, 
-        size = UDim2.new(1, 0, 0, 72), 
-        head = v42(v43), 
-        tail = v3.createElement("Frame")
-    });
-end;
-local v45 = v3.PureComponent:extend("ReportCategoryDialog");
-v45.validateProps = v6.strictInterface({
-    isReportCategoryMenuOpen = v6.boolean, 
-    screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v6.Vector2, 
-    inputType = v6.optional(v6.string), 
-    reportType = v6.optional(v6.valueOf(v27.ReportType)), 
-    targetPlayer = v6.optional(v13), 
-    closeDialog = v6.callback, 
-    selectReportCategory = v6.optional(v6.callback), 
-    playerFocusedFlow = v6.boolean
-});
-v45.init = function(v46) --[[ Line: 171 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), v9 (copy), v8 (copy)
-    v46.buttonRef = v3.createRef();
-    v46.onCancel = function() --[[ Line: 174 ]]
-        -- upvalues: v46 (copy)
-        v46.props.closeDialog();
-    end;
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        local l_getViewportSize_0 = v9.GetDisplayStore(false).getViewportSize;
-        v46.disposeScreenSize = v8.createEffect(function(v48) --[[ Line: 181 ]]
-            -- upvalues: v46 (copy), l_getViewportSize_0 (copy)
-            v46:setState({
-                screenSize = l_getViewportSize_0(v48)
-            });
-        end);
-    end;
-end;
-v45.willUnmount = function(v49) --[[ Line: 189 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        v49.disposeScreenSize();
-    end;
-end;
-v45.renderContents = function(v50, v51, v52) --[[ Line: 195 ]] --[[ Name: renderContents ]]
-    -- upvalues: v3 (copy), l_default_0 (copy), v7 (copy), v44 (copy), v29 (copy), v27 (copy), v40 (copy), v20 (copy), l_withStyle_0 (copy), v38 (copy), l_Provider_0 (copy), v31 (copy)
-    local _ = v50.props;
-    local v54 = {
-        ListLayout = v3.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        })
-    };
-    local l_v51_0 = v51;
-    if v51 then
-        local v56 = l_default_0:getRecentUsersInteractionData();
-        if v56 and not v7.isEmpty(v56) then
-            if v50.props.playerFocusedFlow then
-                l_v51_0 = v50.props.targetPlayer and v56[tostring(v50.props.targetPlayer.UserId)] ~= nil;
-            end;
-        else
-            l_v51_0 = false;
-        end;
-    end;
-    if l_v51_0 then
-        table.insert(v54, v3.createElement(v44, {
-            text = v52.voiceHeader, 
-            subtext = v52.voiceDescription, 
-            icon = v29.Images.VoiceChatIcon, 
-            layoutOrder = #v54 + 1, 
-            onActivated = function() --[[ Line: 229 ]] --[[ Name: onActivated ]]
-                -- upvalues: v50 (copy), v27 (ref)
-                v50.props.selectReportCategory(v27.Category.Voice);
-            end
-        }));
-        table.insert(v54, v3.createElement(v40, {
-            LayoutOrder = #v54 + 1
-        }));
-    end;
-    table.insert(v54, v3.createElement(v44, {
-        text = v52.textHeader, 
-        subtext = v52.textDescription, 
-        icon = v29.Images.TextChatIcon, 
-        layoutOrder = #v54 + 1, 
-        onActivated = function() --[[ Line: 249 ]] --[[ Name: onActivated ]]
-            -- upvalues: v50 (copy), v27 (ref)
-            v50.props.selectReportCategory(v27.Category.Text);
-        end
-    }));
-    table.insert(v54, v3.createElement(v40, {
-        LayoutOrder = #v54 + 1
-    }));
-    if not v50.props.playerFocusedFlow then
-        table.insert(v54, v3.createElement(v44, {
-            iconComponent = v3.createElement(v20, {
-                gameId = game.GameId, 
-                iconSize = 33, 
-                cornerRadius = UDim.new(0, 8)
-            }), 
-            text = v52.experienceHeader, 
-            subtext = v52.experienceDescription, 
-            layoutOrder = #v54 + 1, 
-            onActivated = function() --[[ Line: 273 ]] --[[ Name: onActivated ]]
-                -- upvalues: v50 (copy), v27 (ref)
-                v50.props.selectReportCategory(v27.Category.Experience);
-            end
-        }));
-        table.insert(v54, v3.createElement(v40, {
-            LayoutOrder = #v54 + 1
-        }));
-    end;
-    table.insert(v54, v3.createElement(v44, {
-        text = v52.otherHeader, 
-        subtext = v52.otherDescription, 
-        icon = v29.Images.OtherIcon, 
-        layoutOrder = #v54 + 1, 
-        onActivated = function() --[[ Line: 294 ]] --[[ Name: onActivated ]]
-            -- upvalues: v50 (copy), v27 (ref)
-            v50.props.selectReportCategory(v27.Category.Other);
-        end
-    }));
-    table.insert(v54, v3.createElement(v40, {
-        LayoutOrder = #v54 + 1
-    }));
-    return l_withStyle_0(function(v57) --[[ Line: 307 ]]
-        -- upvalues: v7 (ref), v38 (ref), v3 (ref), l_Provider_0 (ref), v31 (ref), v50 (copy), v54 (copy)
-        local v58 = v7.Dictionary.join(v57.Theme, v38);
-        local v59 = v7.Dictionary.join(v57, {
-            Theme = v58
-        });
-        return v3.createElement(l_Provider_0, {
-            style = v59
-        }, {
-            v3.createElement(v31, {
-                Size = UDim2.fromScale(1, 1), 
-                CanvasSize = UDim2.new(1, 0, 0, 72), 
-                scrollingFrameRef = v50.scrollingFrameRef
-            }, v54)
-        });
-    end);
-end;
-v45.render = function(v60) --[[ Line: 324 ]] --[[ Name: render ]]
-    -- upvalues: l_withVoiceState_0 (copy), v15 (copy), v3 (copy), v28 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    return l_withVoiceState_0(function(v61) --[[ Line: 325 ]]
-        -- upvalues: v15 (ref), v3 (ref), v28 (ref), v60 (copy), l_FFlagTopBarSignalizeScreenSize_0 (ref)
-        return v15({
-            titleText = "CoreScripts.InGameMenu.Report.MenuTitle", 
-            dismissText = "CoreScripts.InGameMenu.Report.Done", 
-            voiceHeader = "CoreScripts.InGameMenu.Report.Category.Header.Voice", 
-            voiceDescription = "CoreScripts.InGameMenu.Report.Category.Description.Voice", 
-            textHeader = "CoreScripts.InGameMenu.Report.Category.Header.Text", 
-            textDescription = "CoreScripts.InGameMenu.Report.Category.Description.Text", 
-            experienceHeader = "CoreScripts.InGameMenu.Report.Category.Header.Experience", 
-            experienceDescription = "CoreScripts.InGameMenu.Report.Category.Description.Experience", 
-            otherHeader = "CoreScripts.InGameMenu.Report.Category.Header.Other", 
-            otherDescription = "CoreScripts.InGameMenu.Report.Category.Description.Other"
-        })(function(v62) --[[ Line: 337 ]]
-            -- upvalues: v3 (ref), v28 (ref), v60 (ref), l_FFlagTopBarSignalizeScreenSize_0 (ref), v61 (copy)
-            return v3.createFragment({
-                ModalDialog = v3.createElement(v28, {
-                    visible = v60.props.isReportCategoryMenuOpen, 
-                    screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then v60.state.screenSize else v60.props.screenSize, 
-                    titleText = v62.titleText, 
-                    contents = v60:renderContents(v61.voiceEnabled, v62), 
-                    showCloseButton = true, 
-                    onDismiss = v60.onCancel
-                })
-            });
-        end);
-    end);
-end;
-return v4.UNSTABLE_connect2(function(v63, _) --[[ Line: 352 ]]
-    -- upvalues: v27 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    return {
-        isReportCategoryMenuOpen = v63.report.currentPage == v27.Page.Category, 
-        reportType = v63.report.reportType, 
-        targetPlayer = v63.report.targetPlayer, 
-        screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v63.displayOptions.screenSize, 
-        playerFocusedFlow = v63.report.beginningReportType == v27.ReportType.Player
-    };
-end, function(v65) --[[ Line: 361 ]]
-    -- upvalues: v24 (copy), v22 (copy), v25 (copy), v27 (copy), v26 (copy)
-    return {
-        selectReportCategory = function(v66) --[[ Line: 363 ]] --[[ Name: selectReportCategory ]]
-            -- upvalues: v65 (copy), v24 (ref)
-            v65(v24(v66));
-        end, 
-        closeDialog = function() --[[ Line: 366 ]] --[[ Name: closeDialog ]]
-            -- upvalues: v65 (copy), v22 (ref), v25 (ref), v27 (ref), v26 (ref)
-            v65(v22());
-            v25(v27.Analytics.ReportType, v27.Analytics.ReportFlowAbandoned, {
-                source = v27.Analytics.ReportType
-            });
-            v26.endAbuseReportSession();
-        end
-    };
-end)(v45);
+game:GetService("ContextActionService")
+
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("GuiService")
+
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local Cryo = require(CorePackages.Packages.Cryo)
+local Signals = require(CorePackages.Packages.Signals)
+local Display = require(CorePackages.Workspace.Packages.Display)
+local ParentParent = script.Parent.Parent
+local Dependencies = require(ParentParent.Dependencies)
+
+require(Dependencies.FocusHandler)
+
+local playerInterface = require(Dependencies.playerInterface)
+local ThemedTextLabel = require(Dependencies.ThemedTextLabel)
+local withLocalization = require(Dependencies.withLocalization)
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local withVoiceState = require(RobloxGui.Modules.VoiceChat.VoiceStateContext).withVoiceState
+local default = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GameIcon = require(Dependencies.GameIcon)
+
+require(ParentParent.Components.BlockPlayerItem)
+
+local EndReportFlow = require(ParentParent.Actions.EndReportFlow)
+
+require(ParentParent.Actions.OpenBlockPlayerDialog)
+
+local SelectReportCategory = require(ParentParent.Actions.SelectReportCategory)
+local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
+local SessionUtility = require(ParentParent.Utility.SessionUtility)
+local Constants = require(ParentParent.Resources.Constants)
+local ModalDialog = require(ParentParent.Components.ModalDialog)
+local Assets = require(ParentParent.Resources.Assets)
+
+require(ParentParent.Components.GameCell)
+
+local BarOnTopScrollingFrame = require(Dependencies.BarOnTopScrollingFrame)
+local Cell = UIBlox.App.Table.Cell
+local Provider = UIBlox.Core.Style.Provider
+local withStyle = UIBlox.Core.Style.withStyle
+local Colors = UIBlox.App.Style.Colors
+local FFlagTopBarSignalizeScreenSize = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize
+local t1 = {
+	BackgroundDefault = {
+		Transparency = 1,
+		Color = Colors.Flint
+	},
+	BackgroundOnHover = {
+		Transparency = 0.666,
+		Color = Colors.Graphite
+	},
+	BackgroundOnPress = {
+		Transparency = 0,
+		Color = Colors.Graphite
+	}
+}
+
+local function Divider(p1) -- line: 68
+	-- upvalues: Roact (copy), Cryo (copy), Colors (copy)
+	return Roact.createElement("Frame", Cryo.Dictionary.join({
+		Size = UDim2.new(1, 0, 0, 1)
+	}, p1, {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 0.5,
+		BackgroundColor3 = Colors.Graphite,
+		theme = Cryo.None
+	}))
+end
+local function CategoryCellContent(p2) -- line: 86
+	-- upvalues: Roact (copy), ImageSetLabel (copy), ThemedTextLabel (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 0, 72),
+		AutomaticSize = Enum.AutomaticSize.XY
+	}, {
+		ListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		IconFrame = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(0, 68, 1, 0)
+		}, {
+			Layout = Roact.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			CustomIcon = p2.iconComponent or nil,
+			Icon = p2.icon and Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = p2.icon.Image,
+				Size = p2.icon.Size
+			})
+		}),
+		TextFrame = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 2,
+			Size = UDim2.new(1, -68, 1, 0)
+		}, {
+			ListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				Padding = UDim.new(0, 2)
+			}),
+			Text = Roact.createElement(ThemedTextLabel, {
+				themeKey = "TextEmphasis",
+				fontKey = "Header2",
+				AnchorPoint = Vector2.new(0, 0.5),
+				Size = UDim2.new(1, 0, 0, 20),
+				Text = p2.text,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Left
+			}),
+			SubText = Roact.createElement(ThemedTextLabel, {
+				fontKey = "CaptionBody",
+				themeKey = "TextMuted",
+				AnchorPoint = Vector2.new(0, 0.5),
+				Size = UDim2.new(1, 0, 0, 14),
+				Text = p2.subtext,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Left
+			})
+		})
+	})
+end
+local function CategoryCell(p3) -- line: 145
+	-- upvalues: Roact (copy), Cell (copy), CategoryCellContent (copy)
+	return Roact.createElement(Cell, {
+		userInteractionEnabled = true,
+		onActivated = p3.onActivated,
+		layoutOrder = p3.layoutOrder,
+		size = UDim2.new(1, 0, 0, 72),
+		head = CategoryCellContent(p3),
+		tail = Roact.createElement("Frame")
+	})
+end
+
+local v36 = Roact.PureComponent:extend("ReportCategoryDialog")
+
+v36.validateProps = t.strictInterface({
+	isReportCategoryMenuOpen = t.boolean,
+	screenSize = if not FFlagTopBarSignalizeScreenSize then t.Vector2 else nil,
+	inputType = t.optional(t.string),
+	reportType = t.optional(t.valueOf(Constants.ReportType)),
+	targetPlayer = t.optional(playerInterface),
+	closeDialog = t.callback,
+	selectReportCategory = t.optional(t.callback),
+	playerFocusedFlow = t.boolean
+})
+
+function v36.init(p4) -- line: 169
+	-- upvalues: Roact (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), Signals (copy)
+	p4.buttonRef = Roact.createRef()
+
+	function p4.onCancel() -- line: 172
+		-- upvalues: p4 (copy)
+		p4.props.closeDialog()
+	end
+
+	if FFlagTopBarSignalizeScreenSize then
+		local getViewportSize = Display.GetDisplayStore(false).getViewportSize
+
+		p4.disposeScreenSize = Signals.createEffect(function(p5) -- line: 179
+			-- upvalues: p4 (copy), getViewportSize (copy)
+			p4:setState({
+				screenSize = getViewportSize(p5)
+			})
+		end)
+	end
+end
+function v36.willUnmount(p6) -- line: 187
+	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
+	if FFlagTopBarSignalizeScreenSize then
+		p6.disposeScreenSize()
+	end
+end
+function v36.renderContents(p7, p8, p9) -- line: 193
+	-- upvalues: Roact (copy), default (copy), Cryo (copy), CategoryCell (copy), Assets (copy), Constants (copy), Divider (copy), GameIcon (copy), withStyle (copy), t1 (copy), Provider (copy), BarOnTopScrollingFrame (copy)
+	local _ = p7.props
+	local t2 = {
+		ListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		})
+	}
+
+	if p8 then
+		local v48 = default:getRecentUsersInteractionData()
+
+		if v48 and not Cryo.isEmpty(v48) then
+			if p7.props.playerFocusedFlow then
+				p8 = p7.props.targetPlayer and v48[tostring(p7.props.targetPlayer.UserId)] ~= nil
+			end
+		else
+			p8 = false
+		end
+	end
+
+	if p8 then
+		table.insert(t2, Roact.createElement(CategoryCell, {
+			text = p9.voiceHeader,
+			subtext = p9.voiceDescription,
+			icon = Assets.Images.VoiceChatIcon,
+			layoutOrder = #t2 + 1,
+			onActivated = function() -- line: 227
+				-- upvalues: p7 (copy), Constants (copy)
+				p7.props.selectReportCategory(Constants.Category.Voice)
+			end
+		}))
+		table.insert(t2, Roact.createElement(Divider, {
+			LayoutOrder = #t2 + 1
+		}))
+	end
+
+	table.insert(t2, Roact.createElement(CategoryCell, {
+		text = p9.textHeader,
+		subtext = p9.textDescription,
+		icon = Assets.Images.TextChatIcon,
+		layoutOrder = #t2 + 1,
+		onActivated = function() -- line: 247
+			-- upvalues: p7 (copy), Constants (copy)
+			p7.props.selectReportCategory(Constants.Category.Text)
+		end
+	}))
+	table.insert(t2, Roact.createElement(Divider, {
+		LayoutOrder = #t2 + 1
+	}))
+
+	if not p7.props.playerFocusedFlow then
+		table.insert(t2, Roact.createElement(CategoryCell, {
+			iconComponent = Roact.createElement(GameIcon, {
+				iconSize = 33,
+				gameId = game.GameId,
+				cornerRadius = UDim.new(0, 8)
+			}),
+			text = p9.experienceHeader,
+			subtext = p9.experienceDescription,
+			layoutOrder = #t2 + 1,
+			onActivated = function() -- line: 271
+				-- upvalues: p7 (copy), Constants (copy)
+				p7.props.selectReportCategory(Constants.Category.Experience)
+			end
+		}))
+		table.insert(t2, Roact.createElement(Divider, {
+			LayoutOrder = #t2 + 1
+		}))
+	end
+
+	table.insert(t2, Roact.createElement(CategoryCell, {
+		text = p9.otherHeader,
+		subtext = p9.otherDescription,
+		icon = Assets.Images.OtherIcon,
+		layoutOrder = #t2 + 1,
+		onActivated = function() -- line: 292
+			-- upvalues: p7 (copy), Constants (copy)
+			p7.props.selectReportCategory(Constants.Category.Other)
+		end
+	}))
+	table.insert(t2, Roact.createElement(Divider, {
+		LayoutOrder = #t2 + 1
+	}))
+
+	return withStyle(function(p10) -- line: 305
+		-- upvalues: Cryo (copy), t1 (copy), Roact (copy), Provider (copy), BarOnTopScrollingFrame (copy), p7 (copy), t2 (copy)
+		local v55 = Cryo.Dictionary.join(p10.Theme, t1)
+		local v56 = Cryo.Dictionary.join(p10, {
+			Theme = v55
+		})
+
+		return Roact.createElement(Provider, {
+			style = v56
+		}, { Roact.createElement(BarOnTopScrollingFrame, {
+			Size = UDim2.fromScale(1, 1),
+			CanvasSize = UDim2.new(1, 0, 0, 72),
+			scrollingFrameRef = p7.scrollingFrameRef
+		}, t2) })
+	end)
+end
+function v36.render(p11) -- line: 322
+	-- upvalues: withVoiceState (copy), withLocalization (copy), Roact (copy), ModalDialog (copy), FFlagTopBarSignalizeScreenSize (copy)
+	return withVoiceState(function(p12) -- line: 323
+		-- upvalues: withLocalization (copy), Roact (copy), ModalDialog (copy), p11 (copy), FFlagTopBarSignalizeScreenSize (copy)
+		return withLocalization({
+			titleText = "CoreScripts.InGameMenu.Report.MenuTitle",
+			dismissText = "CoreScripts.InGameMenu.Report.Done",
+			voiceHeader = "CoreScripts.InGameMenu.Report.Category.Header.Voice",
+			voiceDescription = "CoreScripts.InGameMenu.Report.Category.Description.Voice",
+			textHeader = "CoreScripts.InGameMenu.Report.Category.Header.Text",
+			textDescription = "CoreScripts.InGameMenu.Report.Category.Description.Text",
+			experienceHeader = "CoreScripts.InGameMenu.Report.Category.Header.Experience",
+			experienceDescription = "CoreScripts.InGameMenu.Report.Category.Description.Experience",
+			otherHeader = "CoreScripts.InGameMenu.Report.Category.Header.Other",
+			otherDescription = "CoreScripts.InGameMenu.Report.Category.Description.Other"
+		})(function(p13) -- line: 335
+			-- upvalues: Roact (copy), ModalDialog (copy), p11 (copy), FFlagTopBarSignalizeScreenSize (copy), p12 (copy)
+			return Roact.createFragment({
+				ModalDialog = Roact.createElement(ModalDialog, {
+					showCloseButton = true,
+					visible = p11.props.isReportCategoryMenuOpen,
+					screenSize = if not FFlagTopBarSignalizeScreenSize then p11.props.screenSize else p11.state.screenSize,
+					titleText = p13.titleText,
+					contents = p11:renderContents(p12.voiceEnabled, p13),
+					onDismiss = p11.onCancel
+				})
+			})
+		end)
+	end)
+end
+
+return RoactRodux.UNSTABLE_connect2(function(p14, _) -- line: 350
+	-- upvalues: Constants (copy), FFlagTopBarSignalizeScreenSize (copy)
+	return {
+		isReportCategoryMenuOpen = p14.report.currentPage == Constants.Page.Category,
+		reportType = p14.report.reportType,
+		targetPlayer = p14.report.targetPlayer,
+		screenSize = if not FFlagTopBarSignalizeScreenSize then p14.displayOptions.screenSize else nil,
+		playerFocusedFlow = p14.report.beginningReportType == Constants.ReportType.Player
+	}
+end, function(p16) -- line: 359
+	-- upvalues: SelectReportCategory (copy), EndReportFlow (copy), SendAnalytics (copy), Constants (copy), SessionUtility (copy)
+	return {
+		selectReportCategory = function(p17) -- line: 361
+			-- upvalues: p16 (copy), SelectReportCategory (copy)
+			p16(SelectReportCategory(p17))
+		end,
+		closeDialog = function() -- line: 364
+			-- upvalues: p16 (copy), EndReportFlow (copy), SendAnalytics (copy), Constants (copy), SessionUtility (copy)
+			p16(EndReportFlow())
+			SendAnalytics(Constants.Analytics.ReportType, Constants.Analytics.ReportFlowAbandoned, {
+				source = Constants.Analytics.ReportType
+			})
+			SessionUtility.endAbuseReportSession()
+		end
+	}
+end)(v36)

@@ -1,119 +1,128 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_UserInputService_0 = require(l_script_FirstAncestor_0.Utility.Wrappers).Services.UserInputService;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.ReactOtter);
-local v5 = require(l_Parent_0.ReactUtils);
-local v6 = require(script.Parent.getVisualForKey);
-local v7 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v8 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v9 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v10 = require(l_script_FirstAncestor_0.Components.CircularProgressBar);
-local v11 = require(l_script_FirstAncestor_0.Components.Image);
-local v12 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v14 = require(l_script_FirstAncestor_0.Components.View);
-local l_EventConnection_0 = v5.EventConnection;
-local v16 = {
-    holdTime = 1, 
-    resetTime = 0.5
-};
-local v17 = {
-    testId = "--foundation-key-label"
-};
-local v18 = Rect.new(Vector2.new(10, 9), Vector2.new(25, 25));
-return v3.memo(v3.forwardRef(function(v19, v20) --[[ Line: 53 ]] --[[ Name: KeyLabel ]]
-    -- upvalues: v9 (copy), v17 (copy), v16 (copy), v7 (copy), v3 (copy), v4 (copy), v6 (copy), v14 (copy), v8 (copy), v11 (copy), v18 (copy), v12 (copy), v10 (copy), l_EventConnection_0 (copy), l_UserInputService_0 (copy)
-    local v21 = v9(v19, v17);
-    local v22 = if v21.holdBehavior then v9(v21.holdBehavior, v16) else nil;
-    local v23 = v7();
-    local v24, v25 = v3.useState(nil);
-    local v26 = nil;
-    local v27 = nil;
-    local v29, v30 = v4.useAnimatedBinding(0, function(v28) --[[ Line: 61 ]]
-        -- upvalues: v22 (copy), v24 (copy), v27 (ref), v4 (ref), v25 (copy)
-        if v22 and v28 == 1 and v24 then
-            v27(v4.ease(0, {
-                duration = v22.resetTime, 
-                easingStyle = Enum.EasingStyle.Linear
-            }));
-            v25(nil);
-            v22.onEndHold(true);
-        end;
-    end);
-    v26 = v29;
-    v27 = v30;
-    v29 = v6(v21.keyCode);
-    v30 = v29.keyVisualType == "Image";
-    return v3.createElement(v14, v8(v21, {
-        Size = v21.Size, 
-        ref = v20
-    }), {
-        Image = v3.createElement(v11, {
-            Image = if v30 then v29.key else "icons/controls/keys/key_single", 
-            Size = v29.size, 
-            ScaleType = if not v30 then Enum.ScaleType.Slice else nil, 
-            imageStyle = if v24 then v23.Color.Content.Emphasis else v23.Color.Content.Muted, 
-            slice = if not v30 then {
-                center = v18
-            } else nil, 
-            tag = "position-center-center anchor-center-center"
-        }, {
-            CustomPadding = if not v30 then v3.createElement("UIPadding", {
-                PaddingBottom = UDim.new(0, 3)
-            }) else nil, 
-            Text = if not v30 then v3.createElement(v12, {
-                Text = v29.key, 
-                textStyle = if v24 then v23.Color.Content.Emphasis else v23.Color.Content.Muted, 
-                tag = "text-body-medium auto-xy size-full-full text-align-x-center"
-            }) else nil
-        }), 
-        Indicator = if v22 and v22.holdTime > 0 then v3.createElement(v10, {
-            progress = v26, 
-            tag = "size-full-full", 
-            testId = ("%*--indicator"):format(v21.testId)
-        }, {}) else nil, 
-        InputBeganConnection = if v22 then v3.createElement(l_EventConnection_0, {
-            event = l_UserInputService_0.InputBegan, 
-            callback = function(v31) --[[ Line: 121 ]] --[[ Name: callback ]]
-                -- upvalues: v24 (copy), v21 (copy), v22 (copy), v25 (copy), v27 (ref), v4 (ref), v26 (ref)
-                if v24 then
-                    return;
-                else
-                    if v31.KeyCode == v21.keyCode then
-                        if v22.onBeginHold then
-                            v22.onBeginHold();
-                        end;
-                        if v22.holdTime == 0 then
-                            v22.onEndHold(true);
-                            return;
-                        else
-                            v25(v31);
-                            v27(v4.ease(1, {
-                                duration = (1 - v26:getValue()) * v22.holdTime, 
-                                easingStyle = Enum.EasingStyle.Linear
-                            }));
-                        end;
-                    end;
-                    return;
-                end;
-            end
-        }) else nil, 
-        InputEndedConnection = if v22 then v3.createElement(l_EventConnection_0, {
-            event = l_UserInputService_0.InputEnded, 
-            callback = function(v32) --[[ Line: 147 ]] --[[ Name: callback ]]
-                -- upvalues: v24 (copy), v22 (copy), v25 (copy), v27 (ref), v4 (ref), v26 (ref)
-                if v32 == v24 then
-                    if v22.onEndHold then
-                        v22.onEndHold(false);
-                    end;
-                    v25(nil);
-                    v27(v4.ease(0, {
-                        duration = v26:getValue() * v22.resetTime, 
-                        easingStyle = Enum.EasingStyle.Linear
-                    }));
-                end;
-            end
-        }) else nil
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local UserInputService = require(Foundation.Utility.Wrappers).Services.UserInputService
+local React = require(FoundationParent.React)
+local ReactOtter = require(FoundationParent.ReactOtter)
+local ReactUtils = require(FoundationParent.ReactUtils)
+local getVisualForKey = require(script.Parent.getVisualForKey)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local CircularProgressBar = require(Foundation.Components.CircularProgressBar)
+local Image = require(Foundation.Components.Image)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local EventConnection = ReactUtils.EventConnection
+local t1 = {
+	holdTime = 1,
+	resetTime = 0.5
+}
+local t2 = {
+	testId = "--foundation-key-label"
+}
+local rect = Rect.new(Vector2.new(10, 9), Vector2.new(25, 25))
+
+local function KeyLabel(p1, p2) -- line: 53
+	-- upvalues: withDefaults (copy), t2 (copy), t1 (copy), useTokens (copy), React (copy), ReactOtter (copy), getVisualForKey (copy), View (copy), withCommonProps (copy), Image (copy), rect (copy), Text (copy), CircularProgressBar (copy), EventConnection (copy), UserInputService (copy)
+	local v22 = withDefaults(p1, t2)
+	local v23 = if not v22.holdBehavior then nil else withDefaults(v22.holdBehavior, t1)
+	local v24 = useTokens()
+	local v25, v26 = React.useState(nil)
+	local u27 = nil
+	local v28, v29 = ReactOtter.useAnimatedBinding(0, function(n1: number) -- line: 61
+		-- upvalues: v23 (copy), v25 (copy), u27 (ref), ReactOtter (copy), v26 (copy)
+		if v23 and (n1 == 1 and v25) then
+			u27(ReactOtter.ease(0, {
+				duration = v23.resetTime,
+				easingStyle = Enum.EasingStyle.Linear
+			}))
+			v26(nil)
+			v23.onEndHold(true)
+		end
+	end)
+	local u30 = v28
+
+	u27 = v29
+
+	local v31 = getVisualForKey(v22.keyCode)
+	local v32 = v31.keyVisualType == "Image"
+
+	return React.createElement(View, withCommonProps(v22, {
+		Size = v22.Size,
+		ref = p2
+	}), {
+		Image = React.createElement(Image, {
+			tag = "position-center-center anchor-center-center",
+			Image = not v32 and "icons/controls/keys/key_single" or v31.key,
+			Size = v31.size,
+			ScaleType = if v32 then nil else Enum.ScaleType.Slice,
+			imageStyle = if not v25 then v24.Color.Content.Muted else v24.Color.Content.Emphasis,
+			slice = if v32 then nil else {
+				center = rect
+			}
+		}, {
+			CustomPadding = if v32 then nil else React.createElement("UIPadding", {
+				PaddingBottom = UDim.new(0, 3)
+			}),
+			Text = if v32 then nil else React.createElement(Text, {
+				tag = "size-full-full auto-xy text-body-medium text-align-x-center",
+				Text = v31.key,
+				textStyle = if not v25 then v24.Color.Content.Muted else v24.Color.Content.Emphasis
+			})
+		}),
+		Indicator = if not v23 or not (v23.holdTime > 0) then nil else React.createElement(CircularProgressBar, {
+			tag = "size-full-full",
+			progress = u30,
+			testId = `{ v22.testId }--indicator`
+		}, {}),
+		InputBeganConnection = if not v23 then nil else React.createElement(EventConnection, {
+			event = UserInputService.InputBegan,
+			callback = function(p3) -- line: 121
+				-- upvalues: v25 (copy), v22 (copy), v23 (copy), v26 (copy), u27 (ref), ReactOtter (copy), u30 (ref)
+				if v25 then
+					return
+				end
+
+				if p3.KeyCode == v22.keyCode then
+					if v23.onBeginHold then
+						v23.onBeginHold()
+					end
+
+					if v23.holdTime == 0 then
+						v23.onEndHold(true)
+
+						return
+					end
+
+					v26(p3)
+					u27(ReactOtter.ease(1, {
+						duration = (1 - u30:getValue()) * v23.holdTime,
+						easingStyle = Enum.EasingStyle.Linear
+					}))
+				end
+			end
+		}),
+		InputEndedConnection = if not v23 then nil else React.createElement(EventConnection, {
+			event = UserInputService.InputEnded,
+			callback = function(p4) -- line: 147
+				-- upvalues: v25 (copy), v23 (copy), v26 (copy), u27 (ref), ReactOtter (copy), u30 (ref)
+				if p4 == v25 then
+					if v23.onEndHold then
+						v23.onEndHold(false)
+					end
+
+					v26(nil)
+					u27(ReactOtter.ease(0, {
+						duration = u30:getValue() * v23.resetTime,
+						easingStyle = Enum.EasingStyle.Linear
+					}))
+				end
+			end
+		})
+	})
+end
+
+return React.memo(React.forwardRef(KeyLabel))

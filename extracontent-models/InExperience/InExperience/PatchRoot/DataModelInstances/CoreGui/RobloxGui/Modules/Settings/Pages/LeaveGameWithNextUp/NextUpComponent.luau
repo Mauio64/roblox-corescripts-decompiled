@@ -1,165 +1,177 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Workspace.Packages.RobloxAppHooks);
-local v2 = require(l_CorePackages_0.Workspace.Packages.RoactServiceTags);
-local l_SendGameImpressions_0 = require(l_CorePackages_0.Workspace.Packages.GameCollections).SendGameImpressions;
-local v4 = require(l_CorePackages_0.Packages.React);
-local v5 = require(l_CorePackages_0.Packages.Foundation);
-local v6 = require(l_CorePackages_0.Workspace.Packages.Localization);
-local v7 = require(script.Parent.useNextUpSort);
-local v8 = require(script.Parent.NextUpTile);
-local v9 = require(script.Parent.NextUpState);
-local v10 = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry);
-local v11 = require(script.Parent.Flags.FFlagEnableInGameExitModalNextUpUiRequestCache);
-local v12 = require(script.Parent.Flags.FFlagInGameExitModalFixModalPadding);
-local l_useRoactService_0 = v1.useRoactService;
-local l_AppEventIngestService_0 = v2.AppEventIngestService;
-local l_RoactAnalytics_0 = v2.RoactAnalytics;
-local l_View_0 = v5.View;
-local l_Text_0 = v5.Text;
-local l_Divider_0 = v5.Divider;
-local l_useTokens_0 = v5.Hooks.useTokens;
-local l_useLocalization_0 = v6.Hooks.useLocalization;
-local function v22(v21) --[[ Line: 32 ]] --[[ Name: tilePairComponent ]]
-    -- upvalues: v4 (copy), l_View_0 (copy)
-    return v4.createElement(l_View_0, {
-        tag = "row flex-x-fill auto-y gap-medium no-wrap align-x-center", 
-        Size = UDim2.fromOffset(v21.tilePairWidth, 0), 
-        LayoutOrder = v21.LayoutOrder
-    }, v21.children);
-end;
-local function v26(v23) --[[ Line: 40 ]] --[[ Name: getImpressionIndices ]]
-    local v24 = {};
-    for v25 = 1, math.min(4, #v23) do
-        table.insert(v24, v23[v25].uiIndex);
-    end;
-    return v24;
-end;
-return v4.memo(function(v27) --[[ Line: 58 ]] --[[ Name: NextUpComponent ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppEventIngestService_0 (copy), l_RoactAnalytics_0 (copy), l_useTokens_0 (copy), l_useLocalization_0 (copy), v11 (copy), v7 (copy), v4 (copy), l_SendGameImpressions_0 (copy), v10 (copy), v9 (copy), v26 (copy), v8 (copy), l_Divider_0 (copy), l_View_0 (copy), v12 (copy), l_Text_0 (copy), v22 (copy)
-    local v28 = l_useRoactService_0(l_AppEventIngestService_0);
-    local v29 = l_useRoactService_0(l_RoactAnalytics_0);
-    local v30 = l_useTokens_0();
-    local v31 = l_useLocalization_0({
-        NextUpHeader = "CoreScripts.InGameMenu.NextUpExitMenu.Title"
-    });
-    local v32 = if v11 then v27.nextUpSort else v7();
-    local l_data_0 = v32.data;
-    local l_loading_0 = v32.loading;
-    local v38 = v4.useCallback(function(v35, v36, v37) --[[ Line: 73 ]]
-        -- upvalues: l_SendGameImpressions_0 (ref), v28 (copy), v29 (copy)
-        l_SendGameImpressions_0.sendFromInGameExitModal(v28, v29, v37, v35, v36);
-    end, {
-        v28, 
-        v29
-    });
-    if v10 then
-        v4.useEffect(function() --[[ Line: 86 ]]
-            -- upvalues: v9 (ref)
-            v9.nextUpComponentShown();
-            return function() --[[ Line: 89 ]]
-                -- upvalues: v9 (ref)
-                v9.resetNextUpLatencyTelemetry();
-            end;
-        end, {});
-    end;
-    local v39, v40 = v4.useState(false);
-    local v41, v42 = v4.useState(nil);
-    v4.useEffect(function() --[[ Line: 98 ]]
-        -- upvalues: l_data_0 (copy), v42 (copy), v26 (ref), v40 (copy), v10 (ref), v9 (ref)
-        if not l_data_0 then
-            return;
-        else
-            v42((v26(l_data_0.entries)));
-            v40(false);
-            if v10 then
-                v9.nextUpComponentSortDataLoaded();
-            else
-                v9.setNextUpTilesLoaded(true);
-            end;
-            return function() --[[ Line: 111 ]]
-                -- upvalues: v42 (ref), v10 (ref), v9 (ref)
-                v42(nil);
-                if not v10 then
-                    v9.setNextUpTilesLoaded(false);
-                end;
-            end;
-        end;
-    end, {
-        l_data_0
-    });
-    v4.useEffect(function() --[[ Line: 120 ]]
-        -- upvalues: l_data_0 (copy), v41 (copy), v39 (copy), v40 (copy), v38 (copy)
-        if not l_data_0 or not v41 then
-            return;
-        elseif v39 then
-            return;
-        else
-            v40(true);
-            v38(v41, l_data_0.entries, l_data_0.topicId);
-            return;
-        end;
-    end, {
-        l_data_0, 
-        v41, 
-        v39, 
-        v38
-    });
-    local v45 = v4.useCallback(function(v43) --[[ Line: 140 ]]
-        -- upvalues: l_data_0 (copy), v4 (ref), v8 (ref), v10 (ref), v9 (ref)
-        local v44 = if l_data_0 then l_data_0.entries[v43] else nil;
-        return v4.createElement(v8, {
-            entryData = v44, 
-            topicId = if l_data_0 then l_data_0.topicId else "", 
-            positionIndex = v43, 
-            onTileImageLoaded = v10 and v44 and function() --[[ Line: 147 ]]
-                -- upvalues: v9 (ref), v43 (copy)
-                v9.nextUpTileImageTextureLoaded(v43);
-            end or nil
-        });
-    end, {
-        l_data_0
-    });
-    if not l_data_0 and not l_loading_0 then
-        return v4.None;
-    else
-        return v4.createElement(v4.Fragment, nil, {
-            divider = v4.createElement(l_Divider_0, {
-                LayoutOrder = 2
-            }), 
-            nextUpSection = v4.createElement(l_View_0, {
-                tag = v12 and "size-full-0 auto-y col gap-large" or "size-full-0 auto-y col gap-xxlarge", 
-                LayoutOrder = 3
-            }, {
-                header = v4.createElement(l_View_0, {
-                    tag = "size-full-0 auto-y row align-x-left gap-small", 
-                    LayoutOrder = 1
-                }, {
-                    text = v4.createElement(l_Text_0, {
-                        tag = "text-heading-small text-wrap auto-xy shrink", 
-                        Text = v31.NextUpHeader, 
-                        textStyle = v30.Color.Extended.White.White_100
-                    })
-                }), 
-                rowContainer = v4.createElement(l_View_0, {
-                    tag = "size-full-0 auto-y row gap-medium wrap align-x-center flex-x-fill", 
-                    LayoutOrder = 2
-                }, {
-                    tilesSection1 = v4.createElement(v22, {
-                        LayoutOrder = 1, 
-                        tilePairWidth = v27.tilePairWidth
-                    }, {
-                        tile1 = v45(1), 
-                        tile2 = v45(2)
-                    }), 
-                    tilesSection2 = v4.createElement(v22, {
-                        LayoutOrder = 2, 
-                        tilePairWidth = v27.tilePairWidth
-                    }, {
-                        tile3 = v45(3), 
-                        tile4 = v45(4)
-                    })
-                })
-            })
-        });
-    end;
-end);
+local CorePackages = game:GetService("CorePackages")
+local RobloxAppHooks = require(CorePackages.Workspace.Packages.RobloxAppHooks)
+local RoactServiceTags = require(CorePackages.Workspace.Packages.RoactServiceTags)
+local SendGameImpressions = require(CorePackages.Workspace.Packages.GameCollections).SendGameImpressions
+local React = require(CorePackages.Packages.React)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Localization = require(CorePackages.Workspace.Packages.Localization)
+local useNextUpSort = require(script.Parent.useNextUpSort)
+local NextUpTile = require(script.Parent.NextUpTile)
+local NextUpState = require(script.Parent.NextUpState)
+local FFlagEnableNextUpImageLatencyTelemetry = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry)
+local FFlagEnableInGameExitModalNextUpUiRequestCache = require(script.Parent.Flags.FFlagEnableInGameExitModalNextUpUiRequestCache)
+local FFlagInGameExitModalFixModalPadding = require(script.Parent.Flags.FFlagInGameExitModalFixModalPadding)
+local useRoactService = RobloxAppHooks.useRoactService
+local AppEventIngestService = RoactServiceTags.AppEventIngestService
+local RoactAnalytics = RoactServiceTags.RoactAnalytics
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Divider = Foundation.Divider
+local useTokens = Foundation.Hooks.useTokens
+local useLocalization = Localization.Hooks.useLocalization
+
+local function tilePairComponent(t1: {[any]: any}) -- line: 32
+	-- upvalues: React (copy), View (copy)
+	return React.createElement(View, {
+		tag = "row flex-x-fill auto-y gap-medium no-wrap align-x-center",
+		Size = UDim2.fromOffset(t1.tilePairWidth, 0),
+		LayoutOrder = t1.LayoutOrder
+	}, t1.children)
+end
+local function getImpressionIndices(t2: {[any]: any}) -- line: 40
+	local t3 = {}
+
+	for i = 1, math.min(4, #t2) do
+		table.insert(t3, t2[i].uiIndex)
+	end
+
+	return t3
+end
+local function NextUpComponent(t4: {[any]: any}) -- line: 58
+	-- upvalues: useRoactService (copy), AppEventIngestService (copy), RoactAnalytics (copy), useTokens (copy), useLocalization (copy), FFlagEnableInGameExitModalNextUpUiRequestCache (copy), useNextUpSort (copy), React (copy), SendGameImpressions (copy), FFlagEnableNextUpImageLatencyTelemetry (copy), NextUpState (copy), getImpressionIndices (copy), NextUpTile (copy), Divider (copy), View (copy), FFlagInGameExitModalFixModalPadding (copy), FoundationText (copy), tilePairComponent (copy)
+	local v30 = useRoactService(AppEventIngestService)
+	local v31 = useRoactService(RoactAnalytics)
+	local v32 = useTokens()
+	local v33 = useLocalization({
+		NextUpHeader = "CoreScripts.InGameMenu.NextUpExitMenu.Title"
+	})
+	local v34 = if not FFlagEnableInGameExitModalNextUpUiRequestCache then useNextUpSort() else t4.nextUpSort
+	local data = v34.data
+	local loading = v34.loading
+	local v37 = React.useCallback(function(t5: {[any]: any}, t6: {[any]: any}, s1: string) -- line: 73
+		-- upvalues: SendGameImpressions (copy), v30 (copy), v31 (copy)
+		SendGameImpressions.sendFromInGameExitModal(v30, v31, s1, t5, t6)
+	end, {
+		v30,
+		v31
+	})
+
+	if FFlagEnableNextUpImageLatencyTelemetry then
+		React.useEffect(function() -- line: 86
+			-- upvalues: NextUpState (copy)
+			NextUpState.nextUpComponentShown()
+
+			return function() -- line: 89
+				-- upvalues: NextUpState (copy)
+				NextUpState.resetNextUpLatencyTelemetry()
+			end
+		end, {})
+	end
+
+	local v38, v39 = React.useState(false)
+	local v40, v41 = React.useState(nil)
+
+	React.useEffect(function() -- line: 98
+		-- upvalues: data (copy), v41 (copy), getImpressionIndices (copy), v39 (copy), FFlagEnableNextUpImageLatencyTelemetry (copy), NextUpState (copy)
+		if not data then
+			return
+		end
+
+		v41((getImpressionIndices(data.entries)))
+		v39(false)
+
+		if FFlagEnableNextUpImageLatencyTelemetry then
+			NextUpState.nextUpComponentSortDataLoaded()
+		else
+			NextUpState.setNextUpTilesLoaded(true)
+		end
+
+		return function() -- line: 111
+			-- upvalues: v41 (copy), FFlagEnableNextUpImageLatencyTelemetry (copy), NextUpState (copy)
+			v41(nil)
+
+			if not FFlagEnableNextUpImageLatencyTelemetry then
+				NextUpState.setNextUpTilesLoaded(false)
+			end
+		end
+	end, { data })
+	React.useEffect(function() -- line: 120
+		-- upvalues: data (copy), v40 (copy), v38 (copy), v39 (copy), v37 (copy)
+		if not data or not v40 then
+			return
+		end
+
+		if v38 then
+			return
+		end
+
+		v39(true)
+		v37(v40, data.entries, data.topicId)
+	end, {
+		data,
+		v40,
+		v38,
+		v37
+	})
+
+	local v42 = React.useCallback(function(n1: number) -- line: 140
+		-- upvalues: data (copy), React (copy), NextUpTile (copy), FFlagEnableNextUpImageLatencyTelemetry (copy), NextUpState (copy)
+		local v47 = if not data then nil else data.entries[n1]
+
+		return React.createElement(NextUpTile, {
+			entryData = v47,
+			topicId = not data and "" or data.topicId,
+			positionIndex = n1,
+			onTileImageLoaded = if not FFlagEnableNextUpImageLatencyTelemetry or not v47 then nil else function() -- line: 147
+				-- upvalues: NextUpState (copy), n1 (copy)
+				NextUpState.nextUpTileImageTextureLoaded(n1)
+			end
+		})
+	end, { data })
+
+	if not data and not loading then
+		return React.None
+	end
+
+	return React.createElement(React.Fragment, nil, {
+		divider = React.createElement(Divider, {
+			LayoutOrder = 2
+		}),
+		nextUpSection = React.createElement(View, {
+			LayoutOrder = 3,
+			tag = not FFlagInGameExitModalFixModalPadding and "size-full-0 auto-y col gap-xxlarge" or "size-full-0 auto-y col gap-large"
+		}, {
+			header = React.createElement(View, {
+				tag = "size-full-0 auto-y row align-x-left gap-small",
+				LayoutOrder = 1
+			}, {
+				text = React.createElement(FoundationText, {
+					tag = "text-heading-small text-wrap auto-xy shrink",
+					Text = v33.NextUpHeader,
+					textStyle = v32.Color.Extended.White.White_100
+				})
+			}),
+			rowContainer = React.createElement(View, {
+				tag = "size-full-0 auto-y row gap-medium wrap align-x-center flex-x-fill",
+				LayoutOrder = 2
+			}, {
+				tilesSection1 = React.createElement(tilePairComponent, {
+					LayoutOrder = 1,
+					tilePairWidth = t4.tilePairWidth
+				}, {
+					tile1 = v42(1),
+					tile2 = v42(2)
+				}),
+				tilesSection2 = React.createElement(tilePairComponent, {
+					LayoutOrder = 2,
+					tilePairWidth = t4.tilePairWidth
+				}, {
+					tile3 = v42(3),
+					tile4 = v42(4)
+				})
+			})
+		})
+	})
+end
+
+return React.memo(NextUpComponent)

@@ -1,7 +1,10 @@
-return function(v0, v1, v2) --[[ Line: 21 ]] --[[ Name: leftPad ]]
-    local v3 = v2 or " ";
-    local v4 = v1 - v0:len();
-    local v5 = v4 % v3:len();
-    local v6 = (v4 - v5) / v3:len();
-    return string.rep(v3 or " ", v6) .. v3:sub(1, v5) .. v0;
-end;
+local function leftPad(s1: string, n1: number, s2: string?) -- line: 21
+	local v5 = s2 or " "
+	local v6 = n1 - s1:len()
+	local v7 = v6 % v5:len()
+	local v8 = (v6 - v7) / v5:len()
+
+	return string.rep(v5 or " ", v8) .. v5:sub(1, v7) .. s1
+end
+
+return leftPad

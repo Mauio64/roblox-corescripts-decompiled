@@ -1,126 +1,164 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local l_Parent_1 = l_Parent_0.Parent;
-local v3 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Object_0 = v3.Object;
-local l_inspect_0 = require(l_jsutils_0.inspect).inspect;
-local l_invariant_0 = require(l_jsutils_0.invariant).invariant;
-local l_didYouMean_0 = require(l_jsutils_0.didYouMean).didYouMean;
-local l_suggestionList_0 = require(l_jsutils_0.suggestionList).suggestionList;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local l_language_0 = l_Parent_0.language;
-local l_Kind_0 = require(l_language_0.kinds).Kind;
-local l_isTypeDefinitionNode_0 = require(l_language_0.predicates).isTypeDefinitionNode;
-local v14 = require(l_Parent_0.type.definition);
-local l_isScalarType_0 = v14.isScalarType;
-local l_isObjectType_0 = v14.isObjectType;
-local l_isInterfaceType_0 = v14.isInterfaceType;
-local l_isUnionType_0 = v14.isUnionType;
-local l_isEnumType_0 = v14.isEnumType;
-local l_isInputObjectType_0 = v14.isInputObjectType;
-local v21 = {};
-local v22 = nil;
-local v23 = nil;
-local v24 = nil;
-v21.PossibleTypeExtensionsRule = function(v25) --[[ Line: 45 ]]
-    -- upvalues: l_isTypeDefinitionNode_0 (copy), v22 (ref), v23 (ref), v24 (ref), l_GraphQLError_0 (copy), l_Object_0 (copy), l_Array_0 (copy), l_suggestionList_0 (copy), l_didYouMean_0 (copy)
-    local v26 = v25:getSchema();
-    local v27 = {};
-    for _, v29 in ipairs(v25:getDocument().definitions) do
-        if l_isTypeDefinitionNode_0(v29) then
-            v27[v29.name.value] = v29;
-        end;
-    end;
-    local function v38(v30) --[[ Line: 55 ]] --[[ Name: checkExtension ]]
-        -- upvalues: v27 (copy), v26 (copy), v22 (ref), v23 (ref), v24 (ref), v25 (copy), l_GraphQLError_0 (ref), l_Object_0 (ref), l_Array_0 (ref), l_suggestionList_0 (ref), l_didYouMean_0 (ref)
-        local l_value_0 = v30.name.value;
-        local v32 = v27[l_value_0];
-        local v33 = nil;
-        if v26 then
-            v33 = v26:getType(l_value_0);
-        end;
-        local v34 = nil;
-        if v32 then
-            v34 = v22[v32.kind];
-        elseif v33 then
-            v34 = v23(v33);
-        end;
-        if v34 then
-            if v34 ~= v30.kind then
-                local v35 = v24(v30.kind);
-                v25:reportError(l_GraphQLError_0.new(("Cannot extend non-%s type \"%s\"."):format(v35, l_value_0), v32 and {
-                    v32, 
-                    v30
-                } or v30));
-                return;
-            end;
-        else
-            local v36 = l_Object_0.keys(v27);
-            if v26 then
-                v36 = l_Array_0.concat(v36, v26:getTypeMap():keys());
-            end;
-            local v37 = l_suggestionList_0(l_value_0, v36);
-            v25:reportError(l_GraphQLError_0.new(("Cannot extend type \"%s\" because it is not defined."):format(l_value_0) .. l_didYouMean_0(v37), v30.name));
-        end;
-    end;
-    local function v40(_, ...) --[[ Line: 100 ]]
-        -- upvalues: v38 (copy)
-        return v38(...);
-    end;
-    return {
-        ScalarTypeExtension = v40, 
-        ObjectTypeExtension = v40, 
-        InterfaceTypeExtension = v40, 
-        UnionTypeExtension = v40, 
-        EnumTypeExtension = v40, 
-        InputObjectTypeExtension = v40
-    };
-end;
-v22 = {
-    [l_Kind_0.SCALAR_TYPE_DEFINITION] = l_Kind_0.SCALAR_TYPE_EXTENSION, 
-    [l_Kind_0.OBJECT_TYPE_DEFINITION] = l_Kind_0.OBJECT_TYPE_EXTENSION, 
-    [l_Kind_0.INTERFACE_TYPE_DEFINITION] = l_Kind_0.INTERFACE_TYPE_EXTENSION, 
-    [l_Kind_0.UNION_TYPE_DEFINITION] = l_Kind_0.UNION_TYPE_EXTENSION, 
-    [l_Kind_0.ENUM_TYPE_DEFINITION] = l_Kind_0.ENUM_TYPE_EXTENSION, 
-    [l_Kind_0.INPUT_OBJECT_TYPE_DEFINITION] = l_Kind_0.INPUT_OBJECT_TYPE_EXTENSION
-};
-v23 = function(v41) --[[ Line: 122 ]] --[[ Name: typeToExtKind ]]
-    -- upvalues: l_isScalarType_0 (copy), l_Kind_0 (copy), l_isObjectType_0 (copy), l_isInterfaceType_0 (copy), l_isUnionType_0 (copy), l_isEnumType_0 (copy), l_isInputObjectType_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy)
-    if l_isScalarType_0(v41) then
-        return l_Kind_0.SCALAR_TYPE_EXTENSION;
-    elseif l_isObjectType_0(v41) then
-        return l_Kind_0.OBJECT_TYPE_EXTENSION;
-    elseif l_isInterfaceType_0(v41) then
-        return l_Kind_0.INTERFACE_TYPE_EXTENSION;
-    elseif l_isUnionType_0(v41) then
-        return l_Kind_0.UNION_TYPE_EXTENSION;
-    elseif l_isEnumType_0(v41) then
-        return l_Kind_0.ENUM_TYPE_EXTENSION;
-    elseif l_isInputObjectType_0(v41) then
-        return l_Kind_0.INPUT_OBJECT_TYPE_EXTENSION;
-    else
-        l_invariant_0(false, "Unexpected type: " .. l_inspect_0(v41));
-        return nil;
-    end;
-end;
-v24 = function(v42) --[[ Line: 150 ]] --[[ Name: extensionKindToTypeName ]]
-    -- upvalues: l_Kind_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy)
-    if v42 == l_Kind_0.SCALAR_TYPE_EXTENSION then
-        return "scalar";
-    elseif v42 == l_Kind_0.OBJECT_TYPE_EXTENSION then
-        return "object";
-    elseif v42 == l_Kind_0.INTERFACE_TYPE_EXTENSION then
-        return "interface";
-    elseif v42 == l_Kind_0.UNION_TYPE_EXTENSION then
-        return "union";
-    elseif v42 == l_Kind_0.ENUM_TYPE_EXTENSION then
-        return "enum";
-    elseif v42 == l_Kind_0.INPUT_OBJECT_TYPE_EXTENSION then
-        return "input object";
-    else
-        l_invariant_0(false, "Unexpected kind: " .. l_inspect_0(v42));
-        return "";
-    end;
-end;
-return v21;
+local ParentParent = script.Parent.Parent.Parent
+local jsutils = ParentParent.jsutils
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local inspect = require(jsutils.inspect).inspect
+local invariant = require(jsutils.invariant).invariant
+local didYouMean = require(jsutils.didYouMean).didYouMean
+local suggestionList = require(jsutils.suggestionList).suggestionList
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local language = ParentParent.language
+local Kind = require(language.kinds).Kind
+local isTypeDefinitionNode = require(language.predicates).isTypeDefinitionNode
+local definition = require(ParentParent.type.definition)
+local isScalarType = definition.isScalarType
+local isObjectType = definition.isObjectType
+local isInterfaceType = definition.isInterfaceType
+local isUnionType = definition.isUnionType
+local isEnumType = definition.isEnumType
+local isInputObjectType = definition.isInputObjectType
+local t1 = {}
+local t3 = nil
+local typeToExtKind = nil
+local extensionKindToTypeName = nil
+
+function t1.PossibleTypeExtensionsRule(p1) -- line: 45
+	-- upvalues: isTypeDefinitionNode (copy), t3 (ref), typeToExtKind (ref), extensionKindToTypeName (ref), GraphQLError (copy), Object (copy), Array (copy), suggestionList (copy), didYouMean (copy)
+	local v27 = p1:getSchema()
+	local t2 = {}
+
+	for _, v in ipairs(p1:getDocument().definitions) do
+		if isTypeDefinitionNode(v) then
+			t2[v.name.value] = v
+		end
+	end
+
+	local function checkExtension(p2) -- line: 55
+		-- upvalues: t2 (copy), v27 (copy), t3 (ref), typeToExtKind (ref), extensionKindToTypeName (ref), p1 (copy), GraphQLError (copy), Object (copy), Array (copy), suggestionList (copy), didYouMean (copy)
+		local value = p2.name.value
+		local v37 = t2[value]
+		local v38 = nil
+
+		if v27 then
+			v38 = v27:getType(value)
+		end
+
+		local v39 = nil
+
+		if v37 then
+			v39 = t3[v37.kind]
+		elseif v38 then
+			v39 = typeToExtKind(v38)
+		end
+
+		if v39 then
+			if v39 ~= p2.kind then
+				local v40 = extensionKindToTypeName(p2.kind)
+
+				p1:reportError(GraphQLError.new(("Cannot extend non-%s type \"%s\"."):format(v40, value), v37 and {
+					v37,
+					p2
+				} or p2))
+
+				return
+			end
+		else
+			local v41 = Object.keys(t2)
+
+			if v27 then
+				v41 = Array.concat(v41, v27:getTypeMap():keys())
+			end
+
+			local v42 = suggestionList(value, v41)
+
+			p1:reportError(GraphQLError.new(("Cannot extend type \"%s\" because it is not defined."):format(value) .. didYouMean(v42), p2.name))
+		end
+	end
+	local function v32(_, ...) -- line: 100
+		-- upvalues: checkExtension (copy)
+		return checkExtension(...)
+	end
+
+	return {
+		ScalarTypeExtension = v32,
+		ObjectTypeExtension = v32,
+		InterfaceTypeExtension = v32,
+		UnionTypeExtension = v32,
+		EnumTypeExtension = v32,
+		InputObjectTypeExtension = v32
+	}
+end
+
+t3 = {
+	[Kind.SCALAR_TYPE_DEFINITION] = Kind.SCALAR_TYPE_EXTENSION,
+	[Kind.OBJECT_TYPE_DEFINITION] = Kind.OBJECT_TYPE_EXTENSION,
+	[Kind.INTERFACE_TYPE_DEFINITION] = Kind.INTERFACE_TYPE_EXTENSION,
+	[Kind.UNION_TYPE_DEFINITION] = Kind.UNION_TYPE_EXTENSION,
+	[Kind.ENUM_TYPE_DEFINITION] = Kind.ENUM_TYPE_EXTENSION,
+	[Kind.INPUT_OBJECT_TYPE_DEFINITION] = Kind.INPUT_OBJECT_TYPE_EXTENSION
+}
+
+function typeToExtKind(p4) -- line: 122
+	-- upvalues: isScalarType (copy), Kind (copy), isObjectType (copy), isInterfaceType (copy), isUnionType (copy), isEnumType (copy), isInputObjectType (copy), invariant (copy), inspect (copy)
+	if isScalarType(p4) then
+		return Kind.SCALAR_TYPE_EXTENSION
+	end
+
+	if isObjectType(p4) then
+		return Kind.OBJECT_TYPE_EXTENSION
+	end
+
+	if isInterfaceType(p4) then
+		return Kind.INTERFACE_TYPE_EXTENSION
+	end
+
+	if isUnionType(p4) then
+		return Kind.UNION_TYPE_EXTENSION
+	end
+
+	if isEnumType(p4) then
+		return Kind.ENUM_TYPE_EXTENSION
+	end
+
+	if isInputObjectType(p4) then
+		return Kind.INPUT_OBJECT_TYPE_EXTENSION
+	end
+
+	invariant(false, "Unexpected type: " .. inspect(p4))
+
+	return nil
+end
+function extensionKindToTypeName(p5) -- line: 150
+	-- upvalues: Kind (copy), invariant (copy), inspect (copy)
+	if p5 == Kind.SCALAR_TYPE_EXTENSION then
+		return "scalar"
+	end
+
+	if p5 == Kind.OBJECT_TYPE_EXTENSION then
+		return "object"
+	end
+
+	if p5 == Kind.INTERFACE_TYPE_EXTENSION then
+		return "interface"
+	end
+
+	if p5 == Kind.UNION_TYPE_EXTENSION then
+		return "union"
+	end
+
+	if p5 == Kind.ENUM_TYPE_EXTENSION then
+		return "enum"
+	end
+
+	if p5 == Kind.INPUT_OBJECT_TYPE_EXTENSION then
+		return "input object"
+	end
+
+	invariant(false, "Unexpected kind: " .. inspect(p5))
+
+	return ""
+end
+
+return t1

@@ -1,1 +1,1 @@
-return game:DefineFastString("RMLayer", "Social.RM");
+return game:DefineFastString("RMLayer", "Social.RM")

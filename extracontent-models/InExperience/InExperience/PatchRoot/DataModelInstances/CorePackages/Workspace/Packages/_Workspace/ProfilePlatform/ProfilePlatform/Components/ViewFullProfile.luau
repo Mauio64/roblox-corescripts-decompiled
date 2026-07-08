@@ -1,1 +1,1 @@
-return require(script.ViewFullProfile);
+return require(script.ViewFullProfile)

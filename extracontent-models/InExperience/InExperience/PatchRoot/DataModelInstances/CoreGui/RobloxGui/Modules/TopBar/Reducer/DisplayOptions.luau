@@ -1,105 +1,117 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-if require(l_Parent_0.Flags.FFlagTopBarDeprecateDisplayOptionsRodux) then
-    return nil;
-else
-    local l_Actions_0 = l_Parent_0.Actions;
-    local v5 = require(l_Actions_0.SetMenuOpen);
-    local v6 = require(l_Actions_0.SetTopBarEnabled);
-    local v7 = require(l_Actions_0.SetSmallTouchDevice);
-    local v8 = require(l_Actions_0.SetScreenSize);
-    local v9 = require(l_Actions_0.SetKeepOutArea);
-    local v10 = require(l_Actions_0.RemoveKeepOutArea);
-    local _ = require(l_Actions_0.SetInputType);
-    local v12 = require(l_Actions_0.SetInspectMenuOpen);
-    local v13 = require(l_Actions_0.SetGamepadMenuOpen);
-    local v14 = require(l_Actions_0.SetGamepadNavigationDialogOpen);
-    local v15 = require(script.Parent.Parent.Flags.FFlagGamepadNavigationDialogABTest);
-    local v16 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-    local l_FFlagTopBarSignalizeMenuOpen_0 = v16.Flags.FFlagTopBarSignalizeMenuOpen;
-    local l_FFlagTopBarSignalizeKeepOutAreas_0 = v16.Flags.FFlagTopBarSignalizeKeepOutAreas;
-    local l_FFlagTopBarSignalizeScreenSize_0 = v16.Flags.FFlagTopBarSignalizeScreenSize;
-    local _ = require(l_Parent_0.Constants).InputType;
-    local _ = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-    local v22 = {
-        menuOpen = false, 
-        inspectMenuOpen = false, 
-        topbarEnabled = true, 
-        isSmallTouchDevice = false, 
-        screenSize = Vector2.new(0, 0), 
-        isGamepadMenuOpen = false, 
-        isGamepadNavigationDialogOpen = not v15 and nil, 
-        keepOutAreas = {}
-    };
-    return (v1.createReducer(v22, {
-        [l_FFlagTopBarSignalizeMenuOpen_0 and "" or v5.name] = if l_FFlagTopBarSignalizeMenuOpen_0 then nil else function(v23, v24) --[[ Line: 51 ]]
-            -- upvalues: v2 (copy)
-            local l_isGamepadMenuOpen_0 = v23.isGamepadMenuOpen;
-            if not v23.menuOpen and v24.menuOpen then
-                l_isGamepadMenuOpen_0 = false;
-            end;
-            return v2.Dictionary.join(v23, {
-                menuOpen = v24.menuOpen, 
-                isGamepadMenuOpen = l_isGamepadMenuOpen_0
-            });
-        end, 
-        [v6.name] = function(v26, v27) --[[ Line: 64 ]]
-            -- upvalues: v2 (copy)
-            return v2.Dictionary.join(v26, {
-                topbarEnabled = v27.enabled
-            });
-        end, 
-        [v7.name] = function(v28, v29) --[[ Line: 70 ]]
-            -- upvalues: v2 (copy)
-            return v2.Dictionary.join(v28, {
-                isSmallTouchDevice = v29.isSmallTouchDevice
-            });
-        end, 
-        [l_FFlagTopBarSignalizeScreenSize_0 and "" or v8.name] = if l_FFlagTopBarSignalizeScreenSize_0 then nil else function(v30, v31) --[[ Line: 76 ]]
-            -- upvalues: v2 (copy)
-            return v2.Dictionary.join(v30, {
-                screenSize = v31.screenSize
-            });
-        end, 
-        [l_FFlagTopBarSignalizeMenuOpen_0 and "" or v12.name] = if l_FFlagTopBarSignalizeMenuOpen_0 then nil else function(v32, v33) --[[ Line: 82 ]]
-            -- upvalues: v2 (copy)
-            return v2.Dictionary.join(v32, {
-                inspectMenuOpen = v33.inspectMenuOpen
-            });
-        end, 
-        [v13.name] = function(v34, v35) --[[ Line: 88 ]]
-            -- upvalues: v2 (copy), v15 (copy)
-            return v2.Dictionary.join(v34, {
-                isGamepadMenuOpen = v35.open, 
-                isGamepadNavigationDialogOpen = not v15 and nil
-            });
-        end, 
-        [v14.name] = v15 and function(v36, v37) --[[ Line: 96 ]]
-            -- upvalues: v2 (copy)
-            return v2.Dictionary.join(v36, {
-                isGamepadNavigationDialogOpen = v37.open
-            });
-        end or nil, 
-        [l_FFlagTopBarSignalizeKeepOutAreas_0 and "" or v9.name] = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else function(v38, v39) --[[ Line: 103 ]]
-            -- upvalues: v2 (copy)
-            local v40 = table.clone(v38.keepOutAreas);
-            v40[v39.id] = {
-                size = v39.size, 
-                position = v39.position
-            };
-            return v2.Dictionary.join(v38, {
-                keepOutAreas = v40
-            });
-        end, 
-        [l_FFlagTopBarSignalizeKeepOutAreas_0 and "" or v10.name] = if l_FFlagTopBarSignalizeKeepOutAreas_0 then nil else function(v41, v42) --[[ Line: 115 ]]
-            -- upvalues: v2 (copy)
-            local v43 = table.clone(v41.keepOutAreas);
-            v43[v42.id] = nil;
-            return v2.Dictionary.join(v41, {
-                keepOutAreas = v43
-            });
-        end
-    }));
-end;
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+
+if require(ParentParent.Flags.FFlagTopBarDeprecateDisplayOptionsRodux) then
+	return nil
+end
+
+local Actions = ParentParent.Actions
+local SetMenuOpen = require(Actions.SetMenuOpen)
+local SetTopBarEnabled = require(Actions.SetTopBarEnabled)
+local SetSmallTouchDevice = require(Actions.SetSmallTouchDevice)
+local SetScreenSize = require(Actions.SetScreenSize)
+local SetKeepOutArea = require(Actions.SetKeepOutArea)
+local RemoveKeepOutArea = require(Actions.RemoveKeepOutArea)
+
+require(Actions.SetInputType)
+
+local SetInspectMenuOpen = require(Actions.SetInspectMenuOpen)
+local SetGamepadMenuOpen = require(Actions.SetGamepadMenuOpen)
+local SetGamepadNavigationDialogOpen = require(Actions.SetGamepadNavigationDialogOpen)
+local FFlagGamepadNavigationDialogABTest = require(script.Parent.Parent.Flags.FFlagGamepadNavigationDialogABTest)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeMenuOpen = CoreGuiCommon.Flags.FFlagTopBarSignalizeMenuOpen
+local FFlagTopBarSignalizeKeepOutAreas = CoreGuiCommon.Flags.FFlagTopBarSignalizeKeepOutAreas
+local FFlagTopBarSignalizeScreenSize = CoreGuiCommon.Flags.FFlagTopBarSignalizeScreenSize
+local _ = require(ParentParent.Constants).InputType
+
+game:GetService("CoreGui"):WaitForChild("RobloxGui")
+
+local t1 = {
+	menuOpen = false,
+	inspectMenuOpen = false,
+	topbarEnabled = true,
+	isSmallTouchDevice = false,
+	isGamepadMenuOpen = false,
+	screenSize = Vector2.new(0, 0),
+	isGamepadNavigationDialogOpen = not FFlagGamepadNavigationDialogABTest and nil,
+	keepOutAreas = {}
+}
+
+return (Rodux.createReducer(t1, {
+	[if not FFlagTopBarSignalizeMenuOpen then SetMenuOpen.name else ""] = not FFlagTopBarSignalizeMenuOpen and function(p1, p2) -- line: 51
+		-- upvalues: Cryo (copy)
+		local isGamepadMenuOpen = p1.isGamepadMenuOpen
+
+		if not p1.menuOpen and p2.menuOpen then
+			isGamepadMenuOpen = false
+		end
+
+		return Cryo.Dictionary.join(p1, {
+			menuOpen = p2.menuOpen,
+			isGamepadMenuOpen = isGamepadMenuOpen
+		})
+	end or nil,
+	[SetTopBarEnabled.name] = function(p3, p4) -- line: 64
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			topbarEnabled = p4.enabled
+		})
+	end,
+	[SetSmallTouchDevice.name] = function(p5, p6) -- line: 70
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p5, {
+			isSmallTouchDevice = p6.isSmallTouchDevice
+		})
+	end,
+	[if not FFlagTopBarSignalizeScreenSize then SetScreenSize.name else ""] = not FFlagTopBarSignalizeScreenSize and function(p7, p8) -- line: 76
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p7, {
+			screenSize = p8.screenSize
+		})
+	end or nil,
+	[if not FFlagTopBarSignalizeMenuOpen then SetInspectMenuOpen.name else ""] = not FFlagTopBarSignalizeMenuOpen and function(p9, p10) -- line: 82
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p9, {
+			inspectMenuOpen = p10.inspectMenuOpen
+		})
+	end or nil,
+	[SetGamepadMenuOpen.name] = function(p11, p12) -- line: 88
+		-- upvalues: Cryo (copy), FFlagGamepadNavigationDialogABTest (copy)
+		return Cryo.Dictionary.join(p11, {
+			isGamepadMenuOpen = p12.open,
+			isGamepadNavigationDialogOpen = not FFlagGamepadNavigationDialogABTest and nil
+		})
+	end,
+	[SetGamepadNavigationDialogOpen.name] = if not FFlagGamepadNavigationDialogABTest then nil else function(p13, p14) -- line: 96
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p13, {
+			isGamepadNavigationDialogOpen = p14.open
+		})
+	end,
+	[if not FFlagTopBarSignalizeKeepOutAreas then SetKeepOutArea.name else ""] = not FFlagTopBarSignalizeKeepOutAreas and function(p15, p16) -- line: 103
+		-- upvalues: Cryo (copy)
+		local v39 = table.clone(p15.keepOutAreas)
+
+		v39[p16.id] = {
+			size = p16.size,
+			position = p16.position
+		}
+
+		return Cryo.Dictionary.join(p15, {
+			keepOutAreas = v39
+		})
+	end or nil,
+	[if not FFlagTopBarSignalizeKeepOutAreas then RemoveKeepOutArea.name else ""] = not FFlagTopBarSignalizeKeepOutAreas and function(p17, p18) -- line: 115
+		-- upvalues: Cryo (copy)
+		local v42 = table.clone(p17.keepOutAreas)
+
+		v42[p18.id] = nil
+
+		return Cryo.Dictionary.join(p17, {
+			keepOutAreas = v42
+		})
+	end or nil
+}))

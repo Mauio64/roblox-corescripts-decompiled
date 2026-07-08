@@ -1,90 +1,137 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local v4 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local _ = require(l_script_FirstAncestor_0.Enums.ButtonVariant);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v7 = require(l_script_FirstAncestor_0.Enums.IconSize);
-local v8 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local v9 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local v10 = require(l_script_FirstAncestor_0.Enums.CloseAffordanceVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v12 = require(l_script_FirstAncestor_0.Constants);
-local v13 = require(l_script_FirstAncestor_0.Components.Button.getSharedVariants);
-local function v21(v14) --[[ Line: 48 ]]
-    -- upvalues: v13 (copy), v4 (copy), v7 (copy), v10 (copy), v2 (copy), v3 (copy), v12 (copy)
-    local v15 = {
-        container = {
-            tag = "auto-xy row align-y-center align-x-center clip"
-        }
-    };
-    local v16 = v13(v14);
-    local v17 = {
-        [v4.XSmall] = {
-            container = {
-                size = UDim2.fromOffset(v16.sizes[v4.XSmall].container.height, v16.sizes[v4.XSmall].container.height), 
-                padding = UDim.new(0, v14.Size.Size_100)
-            }, 
-            content = {
-                iconSize = v7.Small
-            }
-        }, 
-        [v4.Small] = {
-            container = {
-                size = UDim2.fromOffset(v16.sizes[v4.Small].container.height, v16.sizes[v4.Small].container.height), 
-                padding = UDim.new(0, v14.Size.Size_150)
-            }, 
-            content = {
-                iconSize = v7.Medium
-            }
-        }, 
-        [v4.Medium] = {
-            container = {
-                size = UDim2.fromOffset(v16.sizes[v4.Medium].container.height, v16.sizes[v4.Medium].container.height), 
-                padding = UDim.new(0, v14.Size.Size_200)
-            }, 
-            content = {
-                iconSize = v7.Large
-            }
-        }
-    };
-    local v20 = {
-        [v10.OverMedia] = v2.map(v3, function(_) --[[ Line: 97 ]]
-            -- upvalues: v14 (copy)
-            return {
-                container = {
-                    radius = v14.Radius.Circle, 
-                    tag = "bg-over-media-100"
-                }, 
-                content = {
-                    style = v14.Color.Content.Emphasis
-                }
-            };
-        end), 
-        [v10.Utility] = v2.map(v3, function(v19) --[[ Line: 106 ]]
-            -- upvalues: v14 (copy), v12 (ref)
-            return {
-                container = {
-                    radius = v14.Radius.Medium, 
-                    stateLayer = {
-                        mode = v12.COLOR_MODE_TO_STATE_LAYER_MODE[false][v19]
-                    }
-                }, 
-                content = {
-                    style = v14[v19].Content.Emphasis
-                }
-            };
-        end)
-    };
-    return {
-        common = v15, 
-        sizes = v17, 
-        types = v20
-    };
-end;
-return function(v22, v23, v24, v25) --[[ Line: 122 ]]
-    -- upvalues: v8 (copy), v21 (copy), v9 (copy), v3 (copy)
-    local v26 = v8.useVariants("CloseAffordance", v21, v22);
-    return v9(v26.common, v26.sizes[v23], v26.types[v24][v25 or v3.Color]);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local ColorMode = require(Foundation.Enums.ColorMode)
+local InputSize = require(Foundation.Enums.InputSize)
+
+require(Foundation.Components.Types)
+
+local IconSize = require(Foundation.Enums.IconSize)
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+local CloseAffordanceVariant = require(Foundation.Enums.CloseAffordanceVariant)
+
+require(Foundation.Providers.Style.Tokens)
+
+local Constants = require(Foundation.Constants)
+local getSharedVariants = require(Foundation.Components.Button.getSharedVariants)
+
+local function v12(p1) -- line: 45
+	-- upvalues: getSharedVariants (copy), InputSize (copy), IconSize (copy), CloseAffordanceVariant (copy), Dash (copy), ColorMode (copy), Constants (copy)
+	local t1 = {
+		container = {
+			tag = "row align-x-center align-y-center auto-xy clip"
+		}
+	}
+	local v15 = getSharedVariants(p1)
+	local t2 = {
+		[true] = {
+			[InputSize.XSmall] = {
+				container = {
+					size = UDim2.fromOffset(v15.sizes[InputSize.XSmall].container.height, v15.sizes[InputSize.XSmall].container.height),
+					padding = UDim.new(0, p1.Size.Size_100)
+				},
+				content = {
+					iconSize = IconSize.Small
+				}
+			},
+			[InputSize.Small] = {
+				container = {
+					size = UDim2.fromOffset(v15.sizes[InputSize.Small].container.height, v15.sizes[InputSize.Small].container.height),
+					padding = UDim.new(0, p1.Size.Size_150)
+				},
+				content = {
+					iconSize = IconSize.Medium
+				}
+			},
+			[InputSize.Medium] = {
+				container = {
+					size = UDim2.fromOffset(v15.sizes[InputSize.Medium].container.height, v15.sizes[InputSize.Medium].container.height),
+					padding = UDim.new(0, p1.Size.Size_200)
+				},
+				content = {
+					iconSize = IconSize.Large
+				}
+			}
+		},
+		[false] = {
+			[InputSize.XSmall] = {
+				content = {
+					iconSize = IconSize.XSmall
+				}
+			},
+			[InputSize.Small] = {
+				content = {
+					iconSize = IconSize.Small
+				}
+			},
+			[InputSize.Medium] = {
+				content = {
+					iconSize = IconSize.Large
+				}
+			}
+		}
+	}
+	local t3 = {
+		[CloseAffordanceVariant.OverMedia] = Dash.map(ColorMode, function() -- line: 101
+			-- upvalues: p1 (copy)
+			return {
+				container = {
+					tag = "bg-over-media-100"
+				},
+				content = {
+					style = p1.Color.Content.Emphasis
+				}
+			}
+		end),
+		[CloseAffordanceVariant.Utility] = Dash.map(ColorMode, function(p2) -- line: 107
+			-- upvalues: Constants (copy), p1 (copy)
+			return {
+				container = {
+					stateLayer = {
+						mode = Constants.COLOR_MODE_TO_STATE_LAYER_MODE[false][p2]
+					}
+				},
+				content = {
+					style = p1[p2].Content.Emphasis
+				}
+			}
+		end)
+	}
+	local t4 = {
+		[true] = {
+			container = {
+				radius = p1.Radius.Medium
+			}
+		},
+		[false] = {
+			container = {
+				radius = 0
+			}
+		}
+	}
+	local t5 = {
+		[true] = {
+			container = {
+				radius = p1.Radius.Circle
+			}
+		},
+		[false] = {}
+	}
+
+	return {
+		common = t1,
+		types = t3,
+		sizes = t2,
+		padding = t4,
+		circular = t5
+	}
+end
+
+return function(p3, p4, p5, p6, b1: boolean, b2: boolean) -- line: 138
+	-- upvalues: VariantsContext (copy), v12 (copy), CloseAffordanceVariant (copy), composeStyleVariant (copy), ColorMode (copy)
+	local v26 = VariantsContext.useVariants("CloseAffordance", v12, p3)
+	local v27 = p5 == CloseAffordanceVariant.OverMedia or b2
+
+	return composeStyleVariant(v26.common, v26.types[p5][p6 or ColorMode.Color], v26.sizes[b1][p4], v26.padding[b1], v26.circular[v27])
+end

@@ -1,1 +1,1 @@
-return require(script.useMutualFriendsNamesWithLimit);
+return require(script.useMutualFriendsNamesWithLimit)

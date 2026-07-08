@@ -1,144 +1,166 @@
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local v1 = require(script.Parent.Parent.Parent.Signal);
-local l_ChartHeaderNames_0 = require(script.Parent.Parent.Parent.Constants).ActionBindingsFormatting.ChartHeaderNames;
-local v13 = {
-    [l_ChartHeaderNames_0[1]] = function(v3, v4) --[[ Line: 9 ]]
-        return v3.counter < v4.counter;
-    end, 
-    [l_ChartHeaderNames_0[2]] = function(v5, v6) --[[ Line: 12 ]]
-        if v5.actionInfo.priorityLevel == v6.actionInfo.priorityLevel then
-            return v5.counter < v6.counter;
-        else
-            return v5.actionInfo.priorityLevel < v6.actionInfo.priorityLevel;
-        end;
-    end, 
-    [l_ChartHeaderNames_0[3]] = function(v7, v8) --[[ Line: 18 ]]
-        if v7.actionInfo.isCore == v8.actionInfo.isCore then
-            return v7.counter < v8.counter;
-        else
-            return v7.actionInfo.isCore;
-        end;
-    end, 
-    [l_ChartHeaderNames_0[4]] = function(v9, v10) --[[ Line: 25 ]]
-        return v9.name:lower() < v10.name:lower();
-    end, 
-    [l_ChartHeaderNames_0[5]] = function(v11, v12) --[[ Line: 28 ]]
-        return tostring(v11.actionInfo.inputTypes[1]) < tostring(v12.actionInfo.inputTypes[1]);
-    end
-};
-local v14 = {};
-v14.__index = v14;
-v14.new = function() --[[ Line: 36 ]] --[[ Name: new ]]
-    -- upvalues: v14 (copy), v1 (copy), l_ChartHeaderNames_0 (copy)
-    local v15 = {};
-    setmetatable(v15, v14);
-    v15._bindingsUpdated = v1.new();
-    v15._bindingsData = {};
-    v15._bindingCounter = 0;
-    v15._sortedBindingData = {};
-    v15._sortType = l_ChartHeaderNames_0[1];
-    v15._isRunning = false;
-    return v15;
-end;
-v14.setSortType = function(v16, v17) --[[ Line: 49 ]] --[[ Name: setSortType ]]
-    -- upvalues: v13 (copy)
-    if v13[v17] then
-        v16._sortType = v17;
-        table.sort(v16._sortedBindingData, v13[v16._sortType]);
-        v16._bindingsUpdated:Fire(v16._sortedBindingData);
-        return;
-    else
-        error(string.format("attempted to pass invalid sortType: %s", (tostring(v17))), 2);
-        return;
-    end;
-end;
-v14.getSortType = function(v18) --[[ Line: 59 ]] --[[ Name: getSortType ]]
-    return v18._sortType;
-end;
-v14.Signal = function(v19) --[[ Line: 63 ]] --[[ Name: Signal ]]
-    return v19._bindingsUpdated;
-end;
-v14.getCurrentData = function(v20) --[[ Line: 67 ]] --[[ Name: getCurrentData ]]
-    return v20._sortedBindingData;
-end;
-v14.updateBindingDataEntry = function(v21, v22, v23) --[[ Line: 73 ]] --[[ Name: updateBindingDataEntry ]]
-    if v23 == nil then
-        v21._bindingsData[v22] = nil;
-        for v24, v25 in pairs(v21._sortedBindingData) do
-            if v25.name == v22 then
-                table.remove(v21._sortedBindingData, v24);
-                return;
-            end;
-        end;
-        return;
-    elseif not v21._bindingsData[v22] then
-        v21._bindingCounter = v21._bindingCounter + 1;
-        v21._bindingsData[v22] = v23;
-        local v26 = {
-            name = v22, 
-            actionInfo = v21._bindingsData[v22], 
-            counter = v21._bindingCounter
-        };
-        table.insert(v21._sortedBindingData, v26);
-        return;
-    else
-        v21._bindingsData[v22] = v23;
-        return;
-    end;
-end;
-v14.isRunning = function(v27) --[[ Line: 98 ]] --[[ Name: isRunning ]]
-    return v27._isRunning;
-end;
-v14.start = function(v28) --[[ Line: 102 ]] --[[ Name: start ]]
-    -- upvalues: l_ContextActionService_0 (copy)
-    local l_l_ContextActionService_0_AllBoundActionInfo_0 = l_ContextActionService_0:GetAllBoundActionInfo();
-    for v30, v31 in pairs(l_l_ContextActionService_0_AllBoundActionInfo_0) do
-        v31.isCore = false;
-        v28:updateBindingDataEntry(v30, v31);
-    end;
-    local l_l_ContextActionService_0_AllBoundCoreActionInfo_0 = l_ContextActionService_0:GetAllBoundCoreActionInfo();
-    for v33, v34 in pairs(l_l_ContextActionService_0_AllBoundCoreActionInfo_0) do
-        v34.isCore = true;
-        v28:updateBindingDataEntry(v33, v34);
-    end;
-    if not v28._actionChangedConnection then
-        v28._actionChangedConnection = l_ContextActionService_0.BoundActionChanged:connect(function(v35, v36, v37) --[[ Line: 117 ]]
-            -- upvalues: v28 (copy)
-            v28:updateBindingDataEntry(v35, nil);
-            v28:updateBindingDataEntry(v36, v37);
-            v28._bindingsUpdated:Fire(v28._sortedBindingData);
-        end);
-    end;
-    if not v28._actionAddedConnection then
-        v28._actionAddedConnection = l_ContextActionService_0.BoundActionAdded:connect(function(v38, _, v40, v41) --[[ Line: 126 ]]
-            -- upvalues: v28 (copy)
-            v40.isCore = v41;
-            v28:updateBindingDataEntry(v38, v40);
-            v28._bindingsUpdated:Fire(v28._sortedBindingData);
-        end);
-    end;
-    if not v28._actionRemovedConnection then
-        v28._actionRemovedConnection = l_ContextActionService_0.BoundActionRemoved:connect(function(v42, _, _) --[[ Line: 135 ]]
-            -- upvalues: v28 (copy)
-            v28:updateBindingDataEntry(v42, nil);
-            v28._bindingsUpdated:Fire(v28._sortedBindingData);
-        end);
-    end;
-    v28._isRunning = true;
-end;
-v14.stop = function(v45) --[[ Line: 143 ]] --[[ Name: stop ]]
-    if v45.actionChangedConnector then
-        v45.actionChangedConnector:Disconnect();
-        v45.actionChangedConnector = nil;
-    end;
-    if v45.actionAddedConnector then
-        v45.actionAddedConnector:Disconnect();
-        v45.actionAddedConnector = nil;
-    end;
-    if v45.actionRemovedConnector then
-        v45.actionRemovedConnector:Disconnect();
-        v45.actionRemovedConnector = nil;
-    end;
-    v45._isRunning = false;
-end;
-return v14;
+local ContextActionService = game:GetService("ContextActionService")
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local ChartHeaderNames = require(script.Parent.Parent.Parent.Constants).ActionBindingsFormatting.ChartHeaderNames
+local t1 = {
+	[ChartHeaderNames[1]] = function(p1, p2) -- line: 9
+		return p1.counter < p2.counter
+	end,
+	[ChartHeaderNames[2]] = function(p3, p4) -- line: 12
+		if p3.actionInfo.priorityLevel == p4.actionInfo.priorityLevel then
+			return p3.counter < p4.counter
+		end
+
+		return p3.actionInfo.priorityLevel < p4.actionInfo.priorityLevel
+	end,
+	[ChartHeaderNames[3]] = function(p5, p6) -- line: 18
+		if p5.actionInfo.isCore == p6.actionInfo.isCore then
+			return p5.counter < p6.counter
+		end
+
+		return p5.actionInfo.isCore
+	end,
+	[ChartHeaderNames[4]] = function(p7, p8) -- line: 25
+		return p7.name:lower() < p8.name:lower()
+	end,
+	[ChartHeaderNames[5]] = function(p9, p10) -- line: 28
+		return tostring(p9.actionInfo.inputTypes[1]) < tostring(p10.actionInfo.inputTypes[1])
+	end
+}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new() -- line: 36
+	-- upvalues: t2 (copy), Signal (copy), ChartHeaderNames (copy)
+	local t3 = {}
+
+	setmetatable(t3, t2)
+	t3._bindingsUpdated = Signal.new()
+	t3._bindingsData = {}
+	t3._bindingCounter = 0
+	t3._sortedBindingData = {}
+	t3._sortType = ChartHeaderNames[1]
+	t3._isRunning = false
+
+	return t3
+end
+function t2.setSortType(p11, p12) -- line: 49
+	-- upvalues: t1 (copy)
+	if t1[p12] then
+		p11._sortType = p12
+		table.sort(p11._sortedBindingData, t1[p11._sortType])
+		p11._bindingsUpdated:Fire(p11._sortedBindingData)
+
+		return
+	end
+
+	error(string.format("attempted to pass invalid sortType: %s", (tostring(p12))), 2)
+end
+function t2.getSortType(p13) -- line: 59
+	return p13._sortType
+end
+function t2.Signal(p14) -- line: 63
+	return p14._bindingsUpdated
+end
+function t2.getCurrentData(p15) -- line: 67
+	return p15._sortedBindingData
+end
+function t2.updateBindingDataEntry(p16, p17, p18) -- line: 73
+	if p18 == nil then
+		p16._bindingsData[p17] = nil
+
+		for k, v in pairs(p16._sortedBindingData) do
+			if p17 == v.name then
+				table.remove(p16._sortedBindingData, k)
+
+				return
+			end
+		end
+
+		return
+	end
+
+	if not p16._bindingsData[p17] then
+		p16._bindingCounter = p16._bindingCounter + 1
+		p16._bindingsData[p17] = p18
+
+		local t4 = {
+			name = p17,
+			actionInfo = p16._bindingsData[p17],
+			counter = p16._bindingCounter
+		}
+
+		table.insert(p16._sortedBindingData, t4)
+
+		return
+	end
+
+	p16._bindingsData[p17] = p18
+end
+function t2.isRunning(p19) -- line: 98
+	return p19._isRunning
+end
+function t2.start(p20) -- line: 102
+	-- upvalues: ContextActionService (copy)
+	local AllBoundActionInfo = ContextActionService:GetAllBoundActionInfo()
+
+	for k, v in pairs(AllBoundActionInfo) do
+		v.isCore = false
+		p20:updateBindingDataEntry(k, v)
+	end
+
+	local AllBoundCoreActionInfo = ContextActionService:GetAllBoundCoreActionInfo()
+
+	for k, v in pairs(AllBoundCoreActionInfo) do
+		v.isCore = true
+		p20:updateBindingDataEntry(k, v)
+	end
+
+	if not p20._actionChangedConnection then
+		p20._actionChangedConnection = ContextActionService.BoundActionChanged:connect(function(p21, p22, p23) -- line: 117
+			-- upvalues: p20 (copy)
+			p20:updateBindingDataEntry(p21, nil)
+			p20:updateBindingDataEntry(p22, p23)
+			p20._bindingsUpdated:Fire(p20._sortedBindingData)
+		end)
+	end
+
+	if not p20._actionAddedConnection then
+		p20._actionAddedConnection = ContextActionService.BoundActionAdded:connect(function(p24, _, p26, p27) -- line: 126
+			-- upvalues: p20 (copy)
+			p26.isCore = p27
+			p20:updateBindingDataEntry(p24, p26)
+			p20._bindingsUpdated:Fire(p20._sortedBindingData)
+		end)
+	end
+
+	if not p20._actionRemovedConnection then
+		p20._actionRemovedConnection = ContextActionService.BoundActionRemoved:connect(function(p28, _, _) -- line: 135
+			-- upvalues: p20 (copy)
+			p20:updateBindingDataEntry(p28, nil)
+			p20._bindingsUpdated:Fire(p20._sortedBindingData)
+		end)
+	end
+
+	p20._isRunning = true
+end
+function t2.stop(p31) -- line: 143
+	if p31.actionChangedConnector then
+		p31.actionChangedConnector:Disconnect()
+		p31.actionChangedConnector = nil
+	end
+
+	if p31.actionAddedConnector then
+		p31.actionAddedConnector:Disconnect()
+		p31.actionAddedConnector = nil
+	end
+
+	if p31.actionRemovedConnector then
+		p31.actionRemovedConnector:Disconnect()
+		p31.actionRemovedConnector = nil
+	end
+
+	p31._isRunning = false
+end
+
+return t2

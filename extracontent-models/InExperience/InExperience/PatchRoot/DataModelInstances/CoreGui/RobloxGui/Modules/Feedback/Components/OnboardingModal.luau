@@ -1,123 +1,127 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.UIBlox);
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.Signals);
-local v5 = require(l_CorePackages_0.Workspace.Packages.Display);
-local l_ExperienceStateCaptureService_0 = game:GetService("ExperienceStateCaptureService");
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_Parent_0.Components.PortedComponents.ThemedTextLabel);
-local v9 = require(l_Parent_0.Components.ModalDialog);
-local l_ButtonStack_0 = v1.App.Button.ButtonStack;
-local l_ButtonType_0 = v1.App.Button.Enum.ButtonType;
-local v12 = require(l_Parent_0.Thunks.ShowOnboardingModalThunk);
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local v14 = v2.PureComponent:extend("OnboardingModal");
-local l_FFlagTopBarSignalizeScreenSize_0 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize;
-v14.init = function(v16) --[[ Line: 35 ]] --[[ Name: init ]]
-    -- upvalues: l_ExperienceStateCaptureService_0 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), v5 (copy), v4 (copy)
-    v16.onDismiss = function() --[[ Line: 36 ]]
-        -- upvalues: v16 (copy)
-        v16.props.showOnboardingModal(false);
-    end;
-    v16.onCancel = function() --[[ Line: 40 ]]
-        -- upvalues: l_ExperienceStateCaptureService_0 (ref)
-        l_ExperienceStateCaptureService_0:ToggleCaptureMode();
-    end;
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        local l_getViewportSize_0 = v5.GetDisplayStore(false).getViewportSize;
-        v16.disposeScreenSize = v4.createEffect(function(v18) --[[ Line: 47 ]]
-            -- upvalues: v16 (copy), l_getViewportSize_0 (copy)
-            v16:setState({
-                screenSize = l_getViewportSize_0(v18)
-            });
-        end);
-    end;
-end;
-v14.willUnmount = function(v19) --[[ Line: 55 ]] --[[ Name: willUnmount ]]
-    -- upvalues: l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    if l_FFlagTopBarSignalizeScreenSize_0 then
-        v19.disposeScreenSize();
-    end;
-end;
-v14.render = function(v20) --[[ Line: 61 ]] --[[ Name: render ]]
-    -- upvalues: l_withLocalization_0 (copy), v2 (copy), v9 (copy), l_FFlagTopBarSignalizeScreenSize_0 (copy), l_ButtonStack_0 (copy), l_ButtonType_0 (copy), v8 (copy)
-    return l_withLocalization_0({
-        mainHeader = "CoreScripts.Feedback.Onboarding.MainHeader", 
-        instructionLabel = "CoreScripts.Feedback.Onboarding.Instructions", 
-        cancel = "CoreScripts.Feedback.Onboarding.Cancel", 
-        start = "CoreScripts.Feedback.Onboarding.Start"
-    })(function(v21) --[[ Line: 67 ]]
-        -- upvalues: v2 (ref), v9 (ref), v20 (copy), l_FFlagTopBarSignalizeScreenSize_0 (ref), l_ButtonStack_0 (ref), l_ButtonType_0 (ref), v8 (ref)
-        return v2.createElement(v9, {
-            visible = v20.props.visible, 
-            screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then v20.state.screenSize else v20.props.screenSize, 
-            titleText = v21.mainHeader, 
-            maxHeight = 200, 
-            maxWidth = 540, 
-            showCloseButton = true, 
-            actionButtons = v2.createElement(l_ButtonStack_0, {
-                buttonHeight = 36, 
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = {
-                            onActivated = v20.onCancel, 
-                            text = v21.cancel
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            isDisabled = false, 
-                            onActivated = v20.onDismiss, 
-                            text = v21.start
-                        }
-                    }
-                }
-            }), 
-            contents = v2.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(1, 1)
-            }, {
-                Padding = v2.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, 24), 
-                    PaddingRight = UDim.new(0, 24), 
-                    PaddingBottom = UDim.new(0, 24)
-                }), 
-                Layout = v2.createElement("UIListLayout", {
-                    HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    VerticalAlignment = Enum.VerticalAlignment.Top
-                }), 
-                InstructionLabel = v2.createElement(v8, {
-                    LayoutOrder = 1, 
-                    fontKey = "Body", 
-                    themeKey = "TextDefault", 
-                    AnchorPoint = Vector2.new(0, 0.5), 
-                    Position = UDim2.new(0, 76, 0.5, 0), 
-                    Size = UDim2.new(1, 0, 0.4, 36), 
-                    Text = v21.instructionLabel, 
-                    TextWrapped = true, 
-                    TextXAlignment = Enum.TextXAlignment.Left
-                })
-            }), 
-            onDismiss = v20.onDismiss
-        });
-    end);
-end;
-return v3.connect(function(v22) --[[ Line: 126 ]]
-    -- upvalues: l_FFlagTopBarSignalizeScreenSize_0 (copy)
-    return {
-        screenSize = if l_FFlagTopBarSignalizeScreenSize_0 then nil else v22.displayOptions.screenSize, 
-        visible = v22.common.showOnboardingModal
-    };
-end, function(v23) --[[ Line: 131 ]]
-    -- upvalues: v12 (copy)
-    return {
-        showOnboardingModal = function(v24) --[[ Line: 133 ]] --[[ Name: showOnboardingModal ]]
-            -- upvalues: v23 (copy), v12 (ref)
-            v23(v12(v24));
-        end
-    };
-end)(v14);
+local CorePackages = game:GetService("CorePackages")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local Signals = require(CorePackages.Packages.Signals)
+local Display = require(CorePackages.Workspace.Packages.Display)
+local ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
+local ParentParent = script.Parent.Parent
+local ThemedTextLabel = require(ParentParent.Components.PortedComponents.ThemedTextLabel)
+local ModalDialog = require(ParentParent.Components.ModalDialog)
+local ButtonStack = UIBlox.App.Button.ButtonStack
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local ShowOnboardingModalThunk = require(ParentParent.Thunks.ShowOnboardingModalThunk)
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local v15 = Roact.PureComponent:extend("OnboardingModal")
+local FFlagTopBarSignalizeScreenSize = require(CorePackages.Workspace.Packages.CoreGuiCommon).Flags.FFlagTopBarSignalizeScreenSize
+
+function v15.init(p1) -- line: 35
+	-- upvalues: ExperienceStateCaptureService (copy), FFlagTopBarSignalizeScreenSize (copy), Display (copy), Signals (copy)
+	function p1.onDismiss() -- line: 36
+		-- upvalues: p1 (copy)
+		p1.props.showOnboardingModal(false)
+	end
+	function p1.onCancel() -- line: 40
+		-- upvalues: ExperienceStateCaptureService (copy)
+		ExperienceStateCaptureService:ToggleCaptureMode()
+	end
+
+	if FFlagTopBarSignalizeScreenSize then
+		local getViewportSize = Display.GetDisplayStore(false).getViewportSize
+
+		p1.disposeScreenSize = Signals.createEffect(function(p2) -- line: 47
+			-- upvalues: p1 (copy), getViewportSize (copy)
+			p1:setState({
+				screenSize = getViewportSize(p2)
+			})
+		end)
+	end
+end
+function v15.willUnmount(p3) -- line: 55
+	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
+	if FFlagTopBarSignalizeScreenSize then
+		p3.disposeScreenSize()
+	end
+end
+function v15.render(p4) -- line: 61
+	-- upvalues: withLocalization (copy), Roact (copy), ModalDialog (copy), FFlagTopBarSignalizeScreenSize (copy), ButtonStack (copy), ButtonType (copy), ThemedTextLabel (copy)
+	return withLocalization({
+		mainHeader = "CoreScripts.Feedback.Onboarding.MainHeader",
+		instructionLabel = "CoreScripts.Feedback.Onboarding.Instructions",
+		cancel = "CoreScripts.Feedback.Onboarding.Cancel",
+		start = "CoreScripts.Feedback.Onboarding.Start"
+	})(function(p5) -- line: 67
+		-- upvalues: Roact (copy), ModalDialog (copy), p4 (copy), FFlagTopBarSignalizeScreenSize (copy), ButtonStack (copy), ButtonType (copy), ThemedTextLabel (copy)
+		return Roact.createElement(ModalDialog, {
+			maxHeight = 200,
+			maxWidth = 540,
+			showCloseButton = true,
+			visible = p4.props.visible,
+			screenSize = if not FFlagTopBarSignalizeScreenSize then p4.props.screenSize else p4.state.screenSize,
+			titleText = p5.mainHeader,
+			actionButtons = Roact.createElement(ButtonStack, {
+				buttonHeight = 36,
+				buttons = {
+					{
+						buttonType = ButtonType.Secondary,
+						props = {
+							onActivated = p4.onCancel,
+							text = p5.cancel
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							isDisabled = false,
+							onActivated = p4.onDismiss,
+							text = p5.start
+						}
+					}
+				}
+			}),
+			contents = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(1, 1)
+			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 24),
+					PaddingRight = UDim.new(0, 24),
+					PaddingBottom = UDim.new(0, 24)
+				}),
+				Layout = Roact.createElement("UIListLayout", {
+					HorizontalAlignment = Enum.HorizontalAlignment.Right,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					VerticalAlignment = Enum.VerticalAlignment.Top
+				}),
+				InstructionLabel = Roact.createElement(ThemedTextLabel, {
+					LayoutOrder = 1,
+					fontKey = "Body",
+					themeKey = "TextDefault",
+					TextWrapped = true,
+					AnchorPoint = Vector2.new(0, 0.5),
+					Position = UDim2.new(0, 76, 0.5, 0),
+					Size = UDim2.new(1, 0, 0.4, 36),
+					Text = p5.instructionLabel,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			}),
+			onDismiss = p4.onDismiss
+		})
+	end)
+end
+
+return RoactRodux.connect(function(p6) -- line: 126
+	-- upvalues: FFlagTopBarSignalizeScreenSize (copy)
+	return {
+		screenSize = if not FFlagTopBarSignalizeScreenSize then p6.displayOptions.screenSize else nil,
+		visible = p6.common.showOnboardingModal
+	}
+end, function(p7) -- line: 131
+	-- upvalues: ShowOnboardingModalThunk (copy)
+	return {
+		showOnboardingModal = function(p8) -- line: 133
+			-- upvalues: p7 (copy), ShowOnboardingModalThunk (copy)
+			p7(ShowOnboardingModalThunk(p8))
+		end
+	}
+end)(v15)

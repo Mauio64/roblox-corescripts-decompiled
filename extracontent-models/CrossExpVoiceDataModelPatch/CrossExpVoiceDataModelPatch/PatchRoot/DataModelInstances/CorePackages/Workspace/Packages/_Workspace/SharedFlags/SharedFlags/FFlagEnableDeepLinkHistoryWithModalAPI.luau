@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableDeepLinkHistoryWithModalAPI2", false);
+return game:DefineFastFlag("EnableDeepLinkHistoryWithModalAPI2", false)

@@ -1,4 +1,5 @@
-local l_Parent_0 = script.Parent;
-local l_FFlagEnableConsoleExpControls_0 = require(l_Parent_0:WaitForChild("FFlagEnableConsoleExpControls"));
-local v2 = game:DefineFastFlag("UnibarMenuOpenSelectionIXP2", false);
-return l_FFlagEnableConsoleExpControls_0 and v2;
+local scriptParent = script.Parent
+local FFlagEnableConsoleExpControls = require(scriptParent:WaitForChild("FFlagEnableConsoleExpControls"))
+local v3 = game:DefineFastFlag("UnibarMenuOpenSelectionIXP2", false)
+
+return FFlagEnableConsoleExpControls and v3

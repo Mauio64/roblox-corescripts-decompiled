@@ -1,24 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.EnumScreens);
-return function(v2) --[[ Line: 12 ]] --[[ Name: createBackFunc ]]
-    -- upvalues: v1 (copy)
-    local l_navigateToRootStack_0 = v2.navigateToRootStack;
-    if l_navigateToRootStack_0 then
-        return function() --[[ Line: 16 ]]
-            -- upvalues: v2 (copy), v1 (ref), l_navigateToRootStack_0 (copy)
-            if v2.closeInputBar then
-                v2.closeInputBar();
-            end;
-            if v2.isRoot then
-                v2.navigation.navigate(v1.EmptyConversation);
-                l_navigateToRootStack_0();
-                return;
-            else
-                v2.navigation.pop();
-                return;
-            end;
-        end;
-    else
-        return v2.navigation.pop;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local EnumScreens = require(AppChat.EnumScreens)
+local FFlagAppChatFixBackButtonOnRotation = require(AppChat.Flags.FFlagAppChatFixBackButtonOnRotation)
+local canPopParentStack = require(AppChat.Utils.canPopParentStack)
+
+local function createBackFunc(t1: {[any]: any}) -- line: 14
+	-- upvalues: FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), EnumScreens (copy)
+	local navigateToRootStack = t1.navigateToRootStack
+
+	if navigateToRootStack then
+		return function() -- line: 18
+			-- upvalues: t1 (copy), FFlagAppChatFixBackButtonOnRotation (copy), canPopParentStack (copy), EnumScreens (copy), navigateToRootStack (copy)
+			if t1.closeInputBar then
+				t1.closeInputBar()
+			end
+
+			if t1.isRoot then
+				if FFlagAppChatFixBackButtonOnRotation and canPopParentStack(t1.navigation) then
+					t1.navigation.pop()
+
+					return
+				end
+
+				t1.navigation.navigate(EnumScreens.EmptyConversation)
+				navigateToRootStack()
+
+				return
+			end
+
+			t1.navigation.pop()
+		end
+	end
+
+	return t1.navigation.pop
+end
+
+return createBackFunc

@@ -1,1 +1,1 @@
-return require(script.CurrentlyPlaying);
+return require(script.CurrentlyPlaying)

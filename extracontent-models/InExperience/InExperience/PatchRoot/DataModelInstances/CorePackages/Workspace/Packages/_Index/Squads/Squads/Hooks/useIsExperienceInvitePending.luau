@@ -1,26 +1,33 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_NetworkingSquads_0 = v1.NetworkingSquads;
-local l_NetworkStatus_0 = v1.RoduxNetworking.Enum.NetworkStatus;
-local l_useSelector_0 = v1.Hooks.useSelector;
-return function() --[[ Line: 8 ]] --[[ Name: useIsExperienceInvitePending ]]
-    -- upvalues: l_useSelector_0 (copy), l_NetworkingSquads_0 (copy), l_NetworkStatus_0 (copy)
-    return (l_useSelector_0(function(v5) --[[ Line: 9 ]]
-        -- upvalues: l_NetworkingSquads_0 (ref), l_NetworkStatus_0 (ref)
-        local v6 = v5.Squad and v5.Squad.Squad;
-        local v7 = v6 and v6.currentSquad and v6.currentSquad.squadId;
-        if not v7 then
-            return false;
-        elseif v6 and v6.currentExperienceInviteStatus then
-            return true;
-        else
-            local v8 = l_NetworkingSquads_0.CreateExperienceInvite.getStatus(v5, v7);
-            local v9 = v6 and v6.currentExperienceInvite;
-            if v8 == l_NetworkStatus_0.Fetching or v9 then
-                return true;
-            else
-                return false;
-            end;
-        end;
-    end));
-end;
+local Squads = script:FindFirstAncestor("Squads")
+local dependencies = require(Squads.dependencies)
+local NetworkingSquads = dependencies.NetworkingSquads
+local NetworkStatus = dependencies.RoduxNetworking.Enum.NetworkStatus
+local useSelector = dependencies.Hooks.useSelector
+
+local function useIsExperienceInvitePending() -- line: 8
+	-- upvalues: useSelector (copy), NetworkingSquads (copy), NetworkStatus (copy)
+	return (useSelector(function(p1) -- line: 9
+		-- upvalues: NetworkingSquads (copy), NetworkStatus (copy)
+		local v8 = p1.Squad and p1.Squad.Squad
+		local v9 = v8 and (v8.currentSquad and v8.currentSquad.squadId)
+
+		if not v9 then
+			return false
+		end
+
+		if v8 and v8.currentExperienceInviteStatus then
+			return true
+		end
+
+		local v10 = NetworkingSquads.CreateExperienceInvite.getStatus(p1, v9)
+		local v11 = v8 and v8.currentExperienceInvite
+
+		if v10 == NetworkStatus.Fetching or v11 then
+			return true
+		end
+
+		return false
+	end))
+end
+
+return useIsExperienceInvitePending

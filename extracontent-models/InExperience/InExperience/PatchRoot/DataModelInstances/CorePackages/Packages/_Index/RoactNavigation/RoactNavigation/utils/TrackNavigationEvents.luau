@@ -1,90 +1,108 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Array_0 = require(l_Parent_1.LuauPolyfill).Array;
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Dev.ReactRoblox);
-local v5 = require(l_Parent_0.views.NavigationEvents);
-local v6 = require(l_Parent_0.Events);
-local v7 = require(script.Parent.invariant);
-local v8 = require(script.Parent.PageNavigationEvent);
-local v9 = {};
-v9.__index = v9;
-v9.new = function() --[[ Line: 16 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy)
-    local v10 = {
-        navigationEvents = {}
-    };
-    setmetatable(v10, v9);
-    return v10;
-end;
-v9.getNavigationEvents = function(v11) --[[ Line: 26 ]] --[[ Name: getNavigationEvents ]]
-    return v11.navigationEvents;
-end;
-v9.printNavigationEvents = function(v12) --[[ Line: 30 ]] --[[ Name: printNavigationEvents ]]
-    print("Total Events: ", #v12.navigationEvents);
-    for _, v14 in v12.navigationEvents do
-        print(v14);
-    end;
-end;
-v9.waitForNumberEventsMaxWaitTime = function(v15, v16, v17) --[[ Line: 37 ]] --[[ Name: waitForNumberEventsMaxWaitTime ]]
-    -- upvalues: v4 (copy)
-    local v18 = 0;
-    while #v15.navigationEvents < v16 and v18 <= v17 do
-        v4.act(function() --[[ Line: 40 ]]
-            -- upvalues: v18 (ref)
-            v18 = v18 + task.wait();
-        end);
-    end;
-end;
-v9.resetNavigationEvents = function(v19) --[[ Line: 46 ]] --[[ Name: resetNavigationEvents ]]
-    v19.navigationEvents = {};
-end;
-local v20 = {
-    onWillFocus = v6.WillFocus, 
-    onDidFocus = v6.DidFocus, 
-    onWillBlur = v6.WillBlur, 
-    onDidBlur = v6.DidBlur
-};
-v9.createNavigationAdapter = function(v21, v22) --[[ Line: 57 ]] --[[ Name: createNavigationAdapter ]]
-    -- upvalues: v20 (copy), v8 (copy), v3 (copy), v5 (copy)
-    local v23 = {};
-    for v24, v25 in v20 do
-        v23[v24] = function() --[[ Line: 60 ]]
-            -- upvalues: v8 (ref), v22 (copy), v25 (copy), v21 (copy)
-            v8.new(v22, v25);
-            table.insert(v21.navigationEvents, v8.new(v22, v25));
-        end;
-    end;
-    return v3.createElement(v5, v23);
-end;
-v9.equalTo = function(v26, v27) --[[ Line: 69 ]] --[[ Name: equalTo ]]
-    -- upvalues: v7 (copy)
-    v7(type(v27) == "table", "should be a list");
-    local v28 = #v26.navigationEvents;
-    if v28 ~= #v27 then
-        return false, "different amount of events";
-    else
-        for v29 = 1, v28 do
-            if not v26.navigationEvents[v29]:equalTo(v27[v29]) then
-                return false, ("events at position %d do not match"):format(v29);
-            end;
-        end;
-        return true;
-    end;
-end;
-v9.expect = function(v30, v31) --[[ Line: 86 ]] --[[ Name: expect ]]
-    -- upvalues: l_Array_0 (copy)
-    local v32, v33 = v30:equalTo(v31);
-    if not v32 then
-        local v34 = "{}";
-        local v35 = "{}";
-        if #v30.navigationEvents > 0 then
-            v34 = ("{\n  %s,\n}"):format(table.concat(l_Array_0.map(v30.navigationEvents, tostring), ",\n  "));
-        end;
-        if #v31 > 0 then
-            v35 = ("{\n  %s,\n}"):format(table.concat(l_Array_0.map(v31, tostring), ",\n  "));
-        end;
-        error(("%s\nGot events: %s\n\nExpected events: %s"):format(v33, v34, v35));
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Array = require(ParentParentParent.LuauPolyfill).Array
+local React = require(ParentParentParent.React)
+local ReactRoblox = require(ParentParentParent.Dev.ReactRoblox)
+local NavigationEvents = require(ParentParent.views.NavigationEvents)
+local Events = require(ParentParent.Events)
+local invariant = require(script.Parent.invariant)
+local PageNavigationEvent = require(script.Parent.PageNavigationEvent)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 16
+	-- upvalues: t1 (copy)
+	local t2 = {
+		navigationEvents = {}
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.getNavigationEvents(p1) -- line: 26
+	return p1.navigationEvents
+end
+function t1.printNavigationEvents(p2) -- line: 30
+	print("Total Events: ", #p2.navigationEvents)
+
+	for _, v16 in p2.navigationEvents do
+		print(v16)
+	end
+end
+function t1.waitForNumberEventsMaxWaitTime(p3, p4, p5) -- line: 37
+	-- upvalues: ReactRoblox (copy)
+	local n1 = 0
+
+	while p4 > #p3.navigationEvents and p5 >= n1 do
+		ReactRoblox.act(function() -- line: 40
+			-- upvalues: n1 (ref)
+			n1 += task.wait()
+		end)
+	end
+end
+function t1.resetNavigationEvents(p6) -- line: 46
+	p6.navigationEvents = {}
+end
+
+local t3 = {
+	onWillFocus = Events.WillFocus,
+	onDidFocus = Events.DidFocus,
+	onWillBlur = Events.WillBlur,
+	onDidBlur = Events.DidBlur
+}
+
+function t1.createNavigationAdapter(p7, p8) -- line: 57
+	-- upvalues: t3 (copy), PageNavigationEvent (copy), React (copy), NavigationEvents (copy)
+	local t4 = {}
+
+	for v25, v26 in t3 do
+		t4[v25] = function() -- line: 60
+			-- upvalues: PageNavigationEvent (copy), p8 (copy), v26 (copy), p7 (copy)
+			PageNavigationEvent.new(p8, v26)
+			table.insert(p7.navigationEvents, PageNavigationEvent.new(p8, v26))
+		end
+	end
+
+	return React.createElement(NavigationEvents, t4)
+end
+function t1.equalTo(p9, p10) -- line: 69
+	-- upvalues: invariant (copy)
+	invariant(type(p10) == "table", "should be a list")
+
+	local v29 = #p9.navigationEvents
+
+	if v29 ~= #p10 then
+		return false, "different amount of events"
+	end
+
+	for i = 1, v29 do
+		if not p9.navigationEvents[i]:equalTo(p10[i]) then
+			return false, ("events at position %d do not match"):format(i)
+		end
+	end
+
+	return true
+end
+function t1.expect(p11, p12) -- line: 86
+	-- upvalues: Array (copy)
+	local v33, v34 = p11:equalTo(p12)
+
+	if not v33 then
+		local s1 = "{}"
+		local s2 = "{}"
+
+		if #p11.navigationEvents > 0 then
+			s1 = ("{\n  %s,\n}"):format(table.concat(Array.map(p11.navigationEvents, tostring), ",\n  "))
+		end
+
+		if #p12 > 0 then
+			s2 = ("{\n  %s,\n}"):format(table.concat(Array.map(p12, tostring), ",\n  "))
+		end
+
+		error(("%s\nGot events: %s\n\nExpected events: %s"):format(v34, s1, s2))
+	end
+end
+
+return t1

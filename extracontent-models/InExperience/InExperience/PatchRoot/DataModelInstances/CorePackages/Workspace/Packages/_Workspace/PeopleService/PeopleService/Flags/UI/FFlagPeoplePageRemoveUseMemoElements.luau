@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PeoplePageRemoveUseMemoElements", false);
+return game:DefineFastFlag("PeoplePageRemoveUseMemoElements", false)

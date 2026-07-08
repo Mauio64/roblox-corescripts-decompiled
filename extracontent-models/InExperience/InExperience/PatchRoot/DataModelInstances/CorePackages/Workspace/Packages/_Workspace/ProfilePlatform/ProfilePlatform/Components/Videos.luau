@@ -1,1 +1,1 @@
-return require(script.VideoContainer);
+return require(script.VideoContainer)

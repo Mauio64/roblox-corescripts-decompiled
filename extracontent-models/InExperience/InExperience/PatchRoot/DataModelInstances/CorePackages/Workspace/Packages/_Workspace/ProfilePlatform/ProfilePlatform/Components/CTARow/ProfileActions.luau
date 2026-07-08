@@ -27,7 +27,27 @@ require(ProfilePlatform.Components.CTARow.Types)
 local SupportedProfileTypes = require(script.SupportedProfileTypes)
 local t1 = {}
 
-for _, v26 in {
+local function withValidation(s1: string, p1) -- line: 54
+	-- upvalues: SupportedProfileTypes (copy)
+	return function(p2) -- line: 55
+		-- upvalues: p1 (copy), s1 (copy), SupportedProfileTypes (copy)
+		local v41 = p1(p2)
+
+		if v41 ~= nil then
+			assert(type(v41.onActivated) == "table", s1 .. " has onActivated as " .. type(v41.onActivated) .. ", expected table")
+
+			for v42 in v41.onActivated do
+				local v43 = SupportedProfileTypes[v42]
+
+				assert(v43 and table.find(v43, s1), s1 .. " has onActivated for " .. tostring(v42) .. " but is missing from SupportedProfileTypes")
+			end
+		end
+
+		return v41
+	end
+end
+
+for _, v27 in {
 	AcceptFriendRequestActions,
 	AddFriendActions,
 	BlockActions,
@@ -50,30 +70,30 @@ for _, v26 in {
 	ViewAboutAction,
 	ViewPlatformProfileAction
 } do
-	for v27, v28 in v26 do
-		assert(t1[v27] == nil, "Duplicate ProfileAction key: " .. tostring(v27))
-		t1[v27] = function(p1) -- line: 55
-			-- upvalues: v28 (copy), v27 (copy), SupportedProfileTypes (copy)
-			local v36 = v28(p1)
+	for v28, v29 in v27 do
+		assert(t1[v28] == nil, "Duplicate ProfileAction key: " .. tostring(v28))
+		t1[v28] = function(p3) -- line: 55
+			-- upvalues: v29 (copy), v28 (copy), SupportedProfileTypes (copy)
+			local v37 = v29(p3)
 
-			if v36 ~= nil then
-				assert(type(v36.onActivated) == "table", v27 .. " has onActivated as " .. type(v36.onActivated) .. ", expected table")
+			if v37 ~= nil then
+				assert(type(v37.onActivated) == "table", v28 .. " has onActivated as " .. type(v37.onActivated) .. ", expected table")
 
-				for v37 in v36.onActivated do
-					local v38 = SupportedProfileTypes[v37]
+				for v38 in v37.onActivated do
+					local v39 = SupportedProfileTypes[v38]
 
-					assert(v38 and table.find(v38, v27), v27 .. " has onActivated for " .. tostring(v37) .. " but is missing from SupportedProfileTypes")
+					assert(v39 and table.find(v39, v28), v28 .. " has onActivated for " .. tostring(v38) .. " but is missing from SupportedProfileTypes")
 				end
 			end
 
-			return v36
+			return v37
 		end
 	end
 end
 
-for v29, v30 in SupportedProfileTypes do
-	for _, v32 in v30 do
-		assert(t1[v32] ~= nil, v32 .. " is listed in SupportedProfileTypes for " .. tostring(v29) .. " but has no matching factory")
+for v30, v31 in SupportedProfileTypes do
+	for _, v33 in v31 do
+		assert(t1[v33] ~= nil, v33 .. " is listed in SupportedProfileTypes for " .. tostring(v30) .. " but has no matching factory")
 	end
 end
 

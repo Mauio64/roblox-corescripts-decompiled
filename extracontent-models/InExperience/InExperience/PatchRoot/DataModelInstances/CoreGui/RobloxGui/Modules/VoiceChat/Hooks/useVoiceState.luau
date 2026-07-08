@@ -1,251 +1,288 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local l_Players_0 = game:GetService("Players");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_BlockedStatusChangedEvent_0 = require(l_CorePackages_0.Workspace.Packages.BlockingUtility):GetBlockedStatusChangedEvent();
-local l_default_0 = require(script.Parent.Parent.VoiceChatServiceManager).default;
-local v6 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceStateContext);
-local l_VOICE_STATE_0 = require(l_CorePackages_0.Workspace.Packages.VoiceChat).Constants.VOICE_STATE;
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v9 = l_LocalPlayer_0 and l_LocalPlayer_0.UserId or 0;
-local v10 = nil;
-v10 = if game:GetEngineFeature("VoiceChatSupported") then Enum.VoiceChatState else {
-    Idle = 1, 
-    Joining = 2, 
-    JoiningRetry = 3, 
-    Joined = 4, 
-    Leaving = 5, 
-    Ended = 6, 
-    Failed = 7
-};
-local v11 = {
-    [v10.Idle] = l_VOICE_STATE_0.HIDDEN, 
-    [v10.Joining] = l_VOICE_STATE_0.CONNECTING, 
-    [v10.JoiningRetry] = l_VOICE_STATE_0.CONNECTING, 
-    [v10.Joined] = l_VOICE_STATE_0.MUTED, 
-    [v10.Leaving] = l_VOICE_STATE_0.MUTED, 
-    [v10.Ended] = l_VOICE_STATE_0.HIDDEN, 
-    [v10.Failed] = l_VOICE_STATE_0.ERROR
-};
-local function _(v12) --[[ Line: 74 ]] --[[ Name: mapVoiceChatStateToVoiceState ]]
-    -- upvalues: v11 (copy), l_VOICE_STATE_0 (copy)
-    if not v11[v12] then
-        return l_VOICE_STATE_0.MUTED;
-    else
-        return v11[v12];
-    end;
-end;
-local function _(v14) --[[ Line: 82 ]] --[[ Name: mapParticipantStateToVoiceState ]]
-    -- upvalues: l_VOICE_STATE_0 (copy)
-    local l_INACTIVE_0 = l_VOICE_STATE_0.INACTIVE;
-    if v14.subscriptionFailed then
-        return l_VOICE_STATE_0.ERROR;
-    elseif not v14.subscriptionCompleted then
-        return l_VOICE_STATE_0.CONNECTING;
-    elseif v14.isMutedLocally then
-        return l_VOICE_STATE_0.LOCAL_MUTED;
-    elseif v14.isMuted then
-        return l_VOICE_STATE_0.MUTED;
-    else
-        if v14.isSignalActive then
-            l_INACTIVE_0 = l_VOICE_STATE_0.TALKING;
-        end;
-        return l_INACTIVE_0;
-    end;
-end;
-return function(v17, v18, v19) --[[ Line: 98 ]] --[[ Name: useVoiceState ]]
-    -- upvalues: l_default_0 (copy), v1 (copy), v6 (copy), l_VOICE_STATE_0 (copy), v9 (copy), v11 (copy), v10 (ref), l_BlockedStatusChangedEvent_0 (copy)
-    local v20 = v19 and v19.voiceChatServiceManager or l_default_0;
-    local v21 = v1.useContext(v6.Context);
-    local v22, v23 = v1.useState(l_VOICE_STATE_0.HIDDEN);
-    v1.useEffect(function() --[[ Line: 103 ]]
-        -- upvalues: v21 (copy), v17 (copy), v18 (copy), v23 (copy), l_VOICE_STATE_0 (ref), v9 (ref), v22 (copy), v11 (ref), v20 (copy), v10 (ref), l_BlockedStatusChangedEvent_0 (ref)
-        if not v21.voiceEnabled or not v17 or v18 then
-            v23(l_VOICE_STATE_0.HIDDEN);
-            return function() --[[ Line: 106 ]]
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local Players = game:GetService("Players")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local BlockedStatusChangedEvent = require(CorePackages.Workspace.Packages.BlockingUtility):GetBlockedStatusChangedEvent()
+local default = require(script.Parent.Parent.VoiceChatServiceManager).default
+local VoiceStateContext = require(RobloxGui.Modules.VoiceChat.VoiceStateContext)
+local VOICE_STATE = require(CorePackages.Workspace.Packages.VoiceChat).Constants.VOICE_STATE
+local LocalPlayer = Players.LocalPlayer
 
-            end;
-        else
-            local v24 = tonumber(v17);
-            local v25 = tostring(v17);
-            local v26 = v9 == v24;
-            local v27 = nil;
-            local v28 = {};
-            local v29 = false;
-            local function _(v30) --[[ Line: 117 ]] --[[ Name: updateVoiceState ]]
-                -- upvalues: v29 (ref), v23 (ref)
-                if not v29 then
-                    v23(v30);
-                end;
-            end;
-            local function v37(v32) --[[ Line: 123 ]] --[[ Name: setVoiceEnabled ]]
-                -- upvalues: v22 (ref), v26 (copy), v11 (ref), l_VOICE_STATE_0 (ref), v20 (ref), v25 (copy), v27 (ref), v10 (ref), v29 (ref), v23 (ref)
-                local l_v22_0 = v22;
-                if v26 then
-                    l_v22_0 = if not v11[v32] then l_VOICE_STATE_0.MUTED else v11[v32];
-                else
-                    local v34 = v20.participants[v25];
-                    if v34 and not v27 then
-                        local l_INACTIVE_1 = l_VOICE_STATE_0.INACTIVE;
-                        if v34.subscriptionFailed then
-                            l_INACTIVE_1 = l_VOICE_STATE_0.ERROR;
-                        elseif not v34.subscriptionCompleted then
-                            l_INACTIVE_1 = l_VOICE_STATE_0.CONNECTING;
-                        elseif v34.isMutedLocally then
-                            l_INACTIVE_1 = l_VOICE_STATE_0.LOCAL_MUTED;
-                        elseif v34.isMuted then
-                            l_INACTIVE_1 = l_VOICE_STATE_0.MUTED;
-                        elseif v34.isSignalActive then
-                            l_INACTIVE_1 = l_VOICE_STATE_0.TALKING;
-                        end;
-                        l_v22_0 = l_INACTIVE_1;
-                    end;
-                end;
-                if v32 == v10.Failed then
-                    if not v26 then
-                        l_v22_0 = l_VOICE_STATE_0.HIDDEN;
-                    end;
-                elseif v32 == v10.Joined and not v20.localMuted and v26 then
-                    l_v22_0 = if v20.isTalking then l_VOICE_STATE_0.TALKING else if v20.localMuted then l_VOICE_STATE_0.MUTED else l_VOICE_STATE_0.INACTIVE;
-                end;
-                local l_l_v22_0_0 = l_v22_0;
-                if not v29 then
-                    v23(l_l_v22_0_0);
-                end;
-            end;
-            v37(v21.voiceState);
-            delay(0, function() --[[ Line: 157 ]]
-                -- upvalues: v29 (ref), v37 (copy), v21 (ref), v26 (copy), v28 (copy), v20 (ref), l_VOICE_STATE_0 (ref), v23 (ref), v25 (copy), v27 (ref), v24 (copy), l_BlockedStatusChangedEvent_0 (ref)
-                if v29 then
-                    return;
-                else
-                    v37(v21.voiceState);
-                    if v26 then
-                        table.insert(v28, v20.talkingChanged.Event:Connect(function(v38) --[[ Line: 168 ]]
-                            -- upvalues: l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref)
-                            local v39 = if v38 then l_VOICE_STATE_0.TALKING else l_VOICE_STATE_0.INACTIVE;
-                            if not v29 then
-                                v23(v39);
-                            end;
-                        end));
-                        table.insert(v28, v20.muteChanged.Event:Connect(function(v40) --[[ Line: 175 ]]
-                            -- upvalues: l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref)
-                            local v41 = if v40 then l_VOICE_STATE_0.MUTED else l_VOICE_STATE_0.INACTIVE;
-                            if not v29 then
-                                v23(v41);
-                            end;
-                        end));
-                        return;
-                    else
-                        table.insert(v28, v20.participantsUpdate.Event:Connect(function(v42) --[[ Line: 183 ]]
-                            -- upvalues: v25 (ref), v27 (ref), l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref)
-                            local v43 = v42[v25];
-                            if v43 and not v27 then
-                                local l_INACTIVE_2 = l_VOICE_STATE_0.INACTIVE;
-                                if v43.subscriptionFailed then
-                                    l_INACTIVE_2 = l_VOICE_STATE_0.ERROR;
-                                elseif not v43.subscriptionCompleted then
-                                    l_INACTIVE_2 = l_VOICE_STATE_0.CONNECTING;
-                                elseif v43.isMutedLocally then
-                                    l_INACTIVE_2 = l_VOICE_STATE_0.LOCAL_MUTED;
-                                elseif v43.isMuted then
-                                    l_INACTIVE_2 = l_VOICE_STATE_0.MUTED;
-                                elseif v43.isSignalActive then
-                                    l_INACTIVE_2 = l_VOICE_STATE_0.TALKING;
-                                end;
-                                local l_l_INACTIVE_2_0 = l_INACTIVE_2;
-                                if not v29 then
-                                    v23(l_l_INACTIVE_2_0);
-                                    return;
-                                end;
-                            else
-                                local l_HIDDEN_0 = l_VOICE_STATE_0.HIDDEN;
-                                if not v29 then
-                                    v23(l_HIDDEN_0);
-                                end;
-                            end;
-                        end));
-                        table.insert(v28, v20.participantLeft.Event:Connect(function(_, v48) --[[ Line: 195 ]]
-                            -- upvalues: v24 (ref), l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref)
-                            if v48 == v24 then
-                                local l_HIDDEN_1 = l_VOICE_STATE_0.HIDDEN;
-                                if not v29 then
-                                    v23(l_HIDDEN_1);
-                                end;
-                            end;
-                        end));
-                        table.insert(v28, v20.participantJoined.Event:Connect(function(_, v51) --[[ Line: 204 ]]
-                            -- upvalues: v24 (ref), l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref)
-                            if v51 == v24 then
-                                local l_HIDDEN_2 = l_VOICE_STATE_0.HIDDEN;
-                                if not v29 then
-                                    v23(l_HIDDEN_2);
-                                end;
-                            end;
-                        end));
-                        table.insert(v28, l_BlockedStatusChangedEvent_0:Connect(function(v53, v54) --[[ Line: 215 ]]
-                            -- upvalues: v24 (ref), v27 (ref), l_VOICE_STATE_0 (ref), v29 (ref), v23 (ref), v20 (ref), v25 (ref)
-                            if v24 == v53 then
-                                if v54 then
-                                    v27 = true;
-                                    local l_HIDDEN_3 = l_VOICE_STATE_0.HIDDEN;
-                                    if not v29 then
-                                        v23(l_HIDDEN_3);
-                                        return;
-                                    end;
-                                else
-                                    v27 = nil;
-                                    local v56 = v20.participants[v25];
-                                    if v56 then
-                                        local l_INACTIVE_3 = l_VOICE_STATE_0.INACTIVE;
-                                        if v56.subscriptionFailed then
-                                            l_INACTIVE_3 = l_VOICE_STATE_0.ERROR;
-                                        elseif not v56.subscriptionCompleted then
-                                            l_INACTIVE_3 = l_VOICE_STATE_0.CONNECTING;
-                                        elseif v56.isMutedLocally then
-                                            l_INACTIVE_3 = l_VOICE_STATE_0.LOCAL_MUTED;
-                                        elseif v56.isMuted then
-                                            l_INACTIVE_3 = l_VOICE_STATE_0.MUTED;
-                                        elseif v56.isSignalActive then
-                                            l_INACTIVE_3 = l_VOICE_STATE_0.TALKING;
-                                        end;
-                                        local l_l_INACTIVE_3_0 = l_INACTIVE_3;
-                                        if not v29 then
-                                            v23(l_l_INACTIVE_3_0);
-                                            return;
-                                        end;
-                                    else
-                                        local l_HIDDEN_4 = l_VOICE_STATE_0.HIDDEN;
-                                        if not v29 then
-                                            v23(l_HIDDEN_4);
-                                        end;
-                                    end;
-                                end;
-                            end;
-                        end));
-                        return;
-                    end;
-                end;
-            end);
-            return function() --[[ Line: 235 ]]
-                -- upvalues: v29 (ref), v28 (copy)
-                v29 = true;
-                delay(0, function() --[[ Line: 238 ]]
-                    -- upvalues: v28 (ref)
-                    for _, v61 in v28 do
-                        v61:disconnect();
-                    end;
-                end);
-            end;
-        end;
-    end, {
-        v17, 
-        v21.voiceState, 
-        v18 == true
-    });
-    return v22;
-end;
+while not LocalPlayer do
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local v10 = LocalPlayer and LocalPlayer.UserId or 0
+local u11 = if not game:GetEngineFeature("VoiceChatSupported") then {
+	Idle = 1,
+	Joining = 2,
+	JoiningRetry = 3,
+	Joined = 4,
+	Leaving = 5,
+	Ended = 6,
+	Failed = 7
+} else Enum.VoiceChatState
+local t1 = {
+	[u11.Idle] = VOICE_STATE.HIDDEN,
+	[u11.Joining] = VOICE_STATE.CONNECTING,
+	[u11.JoiningRetry] = VOICE_STATE.CONNECTING,
+	[u11.Joined] = VOICE_STATE.MUTED,
+	[u11.Leaving] = VOICE_STATE.MUTED,
+	[u11.Ended] = VOICE_STATE.HIDDEN,
+	[u11.Failed] = VOICE_STATE.ERROR
+}
+
+local function mapVoiceChatStateToVoiceState(p1) -- line: 74
+	-- upvalues: t1 (copy), VOICE_STATE (copy)
+	if not t1[p1] then
+		return VOICE_STATE.MUTED
+	end
+
+	return t1[p1]
+end
+local function mapParticipantStateToVoiceState(p2) -- line: 82
+	-- upvalues: VOICE_STATE (copy)
+	local INACTIVE = VOICE_STATE.INACTIVE
+
+	if p2.subscriptionFailed then
+		return VOICE_STATE.ERROR
+	end
+
+	if not p2.subscriptionCompleted then
+		return VOICE_STATE.CONNECTING
+	end
+
+	if p2.isMutedLocally then
+		return VOICE_STATE.LOCAL_MUTED
+	end
+
+	if p2.isMuted then
+		return VOICE_STATE.MUTED
+	end
+
+	if p2.isSignalActive then
+		INACTIVE = VOICE_STATE.TALKING
+	end
+
+	return INACTIVE
+end
+local function useVoiceState(p3, b1: boolean?, p4) -- line: 98
+	-- upvalues: default (copy), React (copy), VoiceStateContext (copy), VOICE_STATE (copy), v10 (copy), t1 (copy), u11 (ref), BlockedStatusChangedEvent (copy)
+	local v22 = p4 and p4.voiceChatServiceManager or default
+	local v23 = React.useContext(VoiceStateContext.Context)
+	local v24, v25 = React.useState(VOICE_STATE.HIDDEN)
+
+	React.useEffect(function() -- line: 103
+		-- upvalues: v23 (copy), p3 (copy), b1 (copy), v25 (copy), VOICE_STATE (copy), v10 (copy), v24 (copy), t1 (copy), v22 (copy), u11 (ref), BlockedStatusChangedEvent (copy)
+		if not v23.voiceEnabled or (not p3 or b1) then
+			v25(VOICE_STATE.HIDDEN)
+
+			return function() -- line: 106
+			end
+		end
+
+		local num = tonumber(p3)
+		local str = tostring(p3)
+		local v28 = num == v10
+		local u29 = nil
+		local t2 = {}
+		local u31 = false
+
+		local function updateVoiceState(p5) -- line: 117
+			-- upvalues: u31 (ref), v25 (copy)
+			if not u31 then
+				v25(p5)
+			end
+		end
+		local function setVoiceEnabled(p6) -- line: 123
+			-- upvalues: v24 (copy), v28 (copy), t1 (copy), VOICE_STATE (copy), v22 (copy), str (copy), u29 (ref), u11 (ref), u31 (ref), v25 (copy)
+			local v36 = v24
+
+			if v28 then
+				v36 = if t1[p6] then t1[p6] else VOICE_STATE.MUTED
+			else
+				local v37 = v22.participants[str]
+
+				if v37 and not u29 then
+					v36 = VOICE_STATE.INACTIVE
+
+					if v37.subscriptionFailed then
+						v36 = VOICE_STATE.ERROR
+					elseif not v37.subscriptionCompleted then
+						v36 = VOICE_STATE.CONNECTING
+					elseif v37.isMutedLocally then
+						v36 = VOICE_STATE.LOCAL_MUTED
+					elseif v37.isMuted then
+						v36 = VOICE_STATE.MUTED
+					elseif v37.isSignalActive then
+						v36 = VOICE_STATE.TALKING
+					end
+				end
+			end
+
+			if p6 == u11.Failed then
+				if not v28 then
+					v36 = VOICE_STATE.HIDDEN
+				end
+			elseif p6 == u11.Joined and not v22.localMuted and v28 then
+				v36 = if not v22.isTalking then if not v22.localMuted then VOICE_STATE.INACTIVE else VOICE_STATE.MUTED else VOICE_STATE.TALKING
+			end
+
+			if not u31 then
+				v25(v36)
+			end
+		end
+
+		setVoiceEnabled(v23.voiceState)
+		delay(0, function() -- line: 157
+			-- upvalues: u31 (ref), setVoiceEnabled (copy), v23 (copy), v28 (copy), t2 (copy), v22 (copy), VOICE_STATE (copy), v25 (copy), str (copy), u29 (ref), num (copy), BlockedStatusChangedEvent (copy)
+			if u31 then
+				return
+			end
+
+			setVoiceEnabled(v23.voiceState)
+
+			if v28 then
+				table.insert(t2, v22.talkingChanged.Event:Connect(function(p7) -- line: 168
+					-- upvalues: VOICE_STATE (copy), u31 (ref), v25 (copy)
+					local v39 = if not p7 then VOICE_STATE.INACTIVE else VOICE_STATE.TALKING
+
+					if not u31 then
+						v25(v39)
+					end
+				end))
+				table.insert(t2, v22.muteChanged.Event:Connect(function(p8) -- line: 175
+					-- upvalues: VOICE_STATE (copy), u31 (ref), v25 (copy)
+					local v41 = if not p8 then VOICE_STATE.INACTIVE else VOICE_STATE.MUTED
+
+					if not u31 then
+						v25(v41)
+					end
+				end))
+
+				return
+			end
+
+			table.insert(t2, v22.participantsUpdate.Event:Connect(function(p9) -- line: 183
+				-- upvalues: str (copy), u29 (ref), VOICE_STATE (copy), u31 (ref), v25 (copy)
+				local v43 = p9[str]
+
+				if v43 and not u29 then
+					local INACTIVE = VOICE_STATE.INACTIVE
+
+					if v43.subscriptionFailed then
+						INACTIVE = VOICE_STATE.ERROR
+					elseif not v43.subscriptionCompleted then
+						INACTIVE = VOICE_STATE.CONNECTING
+					elseif v43.isMutedLocally then
+						INACTIVE = VOICE_STATE.LOCAL_MUTED
+					elseif v43.isMuted then
+						INACTIVE = VOICE_STATE.MUTED
+					elseif v43.isSignalActive then
+						INACTIVE = VOICE_STATE.TALKING
+					end
+
+					if not u31 then
+						v25(INACTIVE)
+
+						return
+					end
+				else
+					local HIDDEN = VOICE_STATE.HIDDEN
+
+					if not u31 then
+						v25(HIDDEN)
+					end
+				end
+			end))
+			table.insert(t2, v22.participantLeft.Event:Connect(function(_, p11) -- line: 195
+				-- upvalues: num (copy), VOICE_STATE (copy), u31 (ref), v25 (copy)
+				if p11 == num then
+					local HIDDEN = VOICE_STATE.HIDDEN
+
+					if not u31 then
+						v25(HIDDEN)
+					end
+				end
+			end))
+			table.insert(t2, v22.participantJoined.Event:Connect(function(_, p13) -- line: 204
+				-- upvalues: num (copy), VOICE_STATE (copy), u31 (ref), v25 (copy)
+				if p13 == num then
+					local HIDDEN = VOICE_STATE.HIDDEN
+
+					if not u31 then
+						v25(HIDDEN)
+					end
+				end
+			end))
+			table.insert(t2, BlockedStatusChangedEvent:Connect(function(p14, p15) -- line: 215
+				-- upvalues: num (copy), u29 (ref), VOICE_STATE (copy), u31 (ref), v25 (copy), v22 (copy), str (copy)
+				if p14 == num then
+					if p15 then
+						u29 = true
+
+						local HIDDEN = VOICE_STATE.HIDDEN
+
+						if not u31 then
+							v25(HIDDEN)
+
+							return
+						end
+					else
+						u29 = nil
+
+						local v55 = v22.participants[str]
+
+						if v55 then
+							local INACTIVE = VOICE_STATE.INACTIVE
+
+							if v55.subscriptionFailed then
+								INACTIVE = VOICE_STATE.ERROR
+							elseif not v55.subscriptionCompleted then
+								INACTIVE = VOICE_STATE.CONNECTING
+							elseif v55.isMutedLocally then
+								INACTIVE = VOICE_STATE.LOCAL_MUTED
+							elseif v55.isMuted then
+								INACTIVE = VOICE_STATE.MUTED
+							elseif v55.isSignalActive then
+								INACTIVE = VOICE_STATE.TALKING
+							end
+
+							if not u31 then
+								v25(INACTIVE)
+
+								return
+							end
+						else
+							local HIDDEN = VOICE_STATE.HIDDEN
+
+							if not u31 then
+								v25(HIDDEN)
+							end
+						end
+					end
+				end
+			end))
+		end)
+
+		return function() -- line: 235
+			-- upvalues: u31 (ref), t2 (copy)
+			u31 = true
+			delay(0, function() -- line: 238
+				-- upvalues: t2 (copy)
+				for _, v59 in t2 do
+					v59:disconnect()
+				end
+			end)
+		end
+	end, {
+		p3,
+		v23.voiceState,
+		b1 == true
+	})
+
+	return v24
+end
+
+return useVoiceState

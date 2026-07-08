@@ -1,22 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsCarousel");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_RoduxNetworking_0 = v1.RoduxNetworking;
-local l_RoduxUserPermissions_0 = v1.RoduxUserPermissions;
-local l_RoduxAnalytics_0 = v1.RoduxAnalytics;
-local v6 = require(script.Parent.Users);
-local v7 = require(script.Parent.Friends);
-local v8 = require(script.Parent.Presence);
-local l_ShowContactImporterParams_0 = v1.ShowContactImporterParams;
-return function() --[[ Line: 15 ]]
-    -- upvalues: l_Rodux_0 (copy), v6 (copy), v7 (copy), v8 (copy), l_RoduxUserPermissions_0 (copy), l_RoduxNetworking_0 (copy), l_ShowContactImporterParams_0 (copy), l_RoduxAnalytics_0 (copy)
-    return l_Rodux_0.combineReducers({
-        Users = v6, 
-        Friends = v7, 
-        Presence = v8, 
-        UserPermissions = l_RoduxUserPermissions_0.installReducer(), 
-        NetworkStatus = l_RoduxNetworking_0.installReducer(), 
-        ShowContactImporterParams = l_ShowContactImporterParams_0, 
-        Analytics = l_RoduxAnalytics_0.installReducer()
-    });
-end;
+local FriendsCarousel = script:FindFirstAncestor("FriendsCarousel")
+local dependencies = require(FriendsCarousel.dependencies)
+local Rodux = dependencies.Rodux
+local RoduxNetworking = dependencies.RoduxNetworking
+local RoduxUserPermissions = dependencies.RoduxUserPermissions
+local RoduxAnalytics = dependencies.RoduxAnalytics
+local Users = require(script.Parent.Users)
+local Friends = require(script.Parent.Friends)
+local Presence = require(script.Parent.Presence)
+local ShowContactImporterParams = dependencies.ShowContactImporterParams
+
+return function() -- line: 15
+	-- upvalues: Rodux (copy), Users (copy), Friends (copy), Presence (copy), RoduxUserPermissions (copy), RoduxNetworking (copy), ShowContactImporterParams (copy), RoduxAnalytics (copy)
+	return Rodux.combineReducers({
+		Users = Users,
+		Friends = Friends,
+		Presence = Presence,
+		UserPermissions = RoduxUserPermissions.installReducer(),
+		NetworkStatus = RoduxNetworking.installReducer(),
+		ShowContactImporterParams = ShowContactImporterParams,
+		Analytics = RoduxAnalytics.installReducer()
+	})
+end

@@ -1,5 +1,5 @@
 return {
-    Bottom = "Bottom", 
-    Left = "Left", 
-    VR = "VR"
-};
+	Bottom = "Bottom",
+	Left = "Left",
+	VR = "VR"
+}

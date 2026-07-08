@@ -1,53 +1,58 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.Types);
-local v2 = require(l_Parent_0.Enums.TransitionPreset);
-local v3 = {
-    presets = {
-        [v2.Default] = {
-            duration = 0.3, 
-            easingStyle = {
-                0.2, 
-                0, 
-                0, 
-                1
-            }, 
-            delay = 0
-        }, 
-        [v2.Quick] = {
-            duration = 0.05, 
-            easingStyle = {
-                0.2, 
-                0, 
-                0, 
-                1
-            }, 
-            delay = 0
-        }, 
-        [v2.Slow] = {
-            duration = 1, 
-            easingStyle = {
-                0.2, 
-                0, 
-                0, 
-                1
-            }, 
-            delay = 0
-        }
-    }
-};
-v3.getDefaultTransition = function() --[[ Line: 28 ]] --[[ Name: getDefaultTransition ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v4 = v3.presets[v2.Default];
-    return {
-        duration = v4.duration, 
-        easingStyle = v4.easingStyle, 
-        delay = v4.delay
-    };
-end;
-v3.createDefaultTransitionState = function() --[[ Line: 39 ]] --[[ Name: createDefaultTransitionState ]]
-    -- upvalues: v3 (copy)
-    return {
-        default = v3.getDefaultTransition()
-    };
-end;
-return v3;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.Types)
+
+local TransitionPreset = require(ParentParent.Enums.TransitionPreset)
+local t1 = {
+	presets = {
+		[TransitionPreset.Default] = {
+			duration = 0.3,
+			delay = 0,
+			easingStyle = {
+				0.2,
+				0,
+				0,
+				1
+			}
+		},
+		[TransitionPreset.Quick] = {
+			duration = 0.05,
+			delay = 0,
+			easingStyle = {
+				0.2,
+				0,
+				0,
+				1
+			}
+		},
+		[TransitionPreset.Slow] = {
+			duration = 1,
+			delay = 0,
+			easingStyle = {
+				0.2,
+				0,
+				0,
+				1
+			}
+		}
+	}
+}
+
+function t1.getDefaultTransition() -- line: 28
+	-- upvalues: t1 (copy), TransitionPreset (copy)
+	local v4 = t1.presets[TransitionPreset.Default]
+
+	return {
+		duration = v4.duration,
+		easingStyle = v4.easingStyle,
+		delay = v4.delay
+	}
+end
+function t1.createDefaultTransitionState() -- line: 39
+	-- upvalues: t1 (copy)
+	return {
+		default = t1.getDefaultTransition()
+	}
+end
+
+return t1

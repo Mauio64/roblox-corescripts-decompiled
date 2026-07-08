@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXAddTransparencyToItemCardHeader", false);
+return game:DefineFastFlag("AXAddTransparencyToItemCardHeader", false)

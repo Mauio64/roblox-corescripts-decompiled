@@ -1,58 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.BuilderIcons);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Constants);
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local v6 = require(l_Components_0.InternalInput);
-local v7 = require(l_Components_0.Text);
-local _ = require(l_Components_0.Types);
-local v9 = require(l_Components_0.InternalInput.useUncontrolledState);
-local v10 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v11 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v12 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v13 = require(script.Parent.useCheckboxVariants);
-local v14 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v15 = require(l_script_FirstAncestor_0.Enums.InputPlacement);
-local v16 = {
-    size = v14.Medium, 
-    placement = v15.Start, 
-    Selectable = true, 
-    testId = "--foundation-checkbox"
-};
-return v3.memo(v3.forwardRef(function(v17, v18) --[[ Line: 53 ]] --[[ Name: Checkbox ]]
-    -- upvalues: v12 (copy), v16 (copy), v10 (copy), v13 (copy), v9 (copy), v3 (copy), v6 (copy), v11 (copy), v4 (copy), v7 (copy), v2 (copy)
-    local v19 = v12(v17, v16);
-    local v20 = v10();
-    local v21 = v13(v20, v19.size);
-    local v22, v23 = v9(v19.isChecked, v19.onActivated);
-    local v24 = v19.isIndeterminate or false;
-    return v3.createElement(v6, v11(v19, {
-        isChecked = v22, 
-        isIndeterminate = v24, 
-        isDisabled = v19.isDisabled, 
-        onActivated = v23, 
-        label = {
-            text = v19.label, 
-            position = v4.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v19.placement]
-        }, 
-        customVariantProps = v21.input, 
-        size = v19.size, 
-        Selectable = v19.Selectable, 
-        NextSelectionUp = v19.NextSelectionUp, 
-        NextSelectionDown = v19.NextSelectionDown, 
-        NextSelectionLeft = v19.NextSelectionLeft, 
-        NextSelectionRight = v19.NextSelectionRight, 
-        ref = v18
-    }), {
-        Checkmark = if not not v22 or v24 then v3.createElement(v7, {
-            Text = if v24 then v2.Icon.Minus else v2.Icon.Check, 
-            fontStyle = {
-                Font = v2.Font[v2.IconVariant.Filled]
-            }, 
-            TextScaled = true, 
-            tag = v21.checkmark.tag, 
-            testId = ("%*--checkmark"):format(v19.testId)
-        }) else nil
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local BuilderIcons = require(FoundationParent.BuilderIcons)
+local React = require(FoundationParent.React)
+local Constants = require(Foundation.Constants)
+local Components = Foundation.Components
+local InternalInput = require(Components.InternalInput)
+local Text = require(Components.Text)
+
+require(Components.Types)
+
+local useUncontrolledState = require(Components.InternalInput.useUncontrolledState)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useCheckboxVariants = require(script.Parent.useCheckboxVariants)
+local InputSize = require(Foundation.Enums.InputSize)
+local InputPlacement = require(Foundation.Enums.InputPlacement)
+local t1 = {
+	Selectable = true,
+	testId = "--foundation-checkbox",
+	size = InputSize.Medium,
+	placement = InputPlacement.Start
+}
+
+local function Checkbox(p1, p2) -- line: 53
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useCheckboxVariants (copy), useUncontrolledState (copy), React (copy), InternalInput (copy), withCommonProps (copy), Constants (copy), Text (copy), BuilderIcons (copy)
+	local v20 = withDefaults(p1, t1)
+	local v21 = useTokens()
+	local v22 = useCheckboxVariants(v21, v20.size)
+	local v23, v24 = useUncontrolledState(v20.isChecked, v20.onActivated)
+	local v25 = v20.isIndeterminate or false
+
+	return React.createElement(InternalInput, withCommonProps(v20, {
+		isChecked = v23,
+		isIndeterminate = v25,
+		isDisabled = v20.isDisabled,
+		onActivated = v24,
+		label = {
+			text = v20.label,
+			position = Constants.INPUT_PLACEMENT_TO_LABEL_ALIGNMENT[v20.placement]
+		},
+		customVariantProps = v22.input,
+		size = v20.size,
+		Selectable = v20.Selectable,
+		NextSelectionUp = v20.NextSelectionUp,
+		NextSelectionDown = v20.NextSelectionDown,
+		NextSelectionLeft = v20.NextSelectionLeft,
+		NextSelectionRight = v20.NextSelectionRight,
+		ref = p2
+	}), {
+		Checkmark = if not v23 and not v25 then nil else React.createElement(Text, {
+			TextScaled = true,
+			Text = if not v25 then BuilderIcons.Icon.Check else BuilderIcons.Icon.Minus,
+			fontStyle = {
+				Font = BuilderIcons.Font[BuilderIcons.IconVariant.Filled]
+			},
+			tag = v22.checkmark.tag,
+			testId = `{ v20.testId }--checkmark`
+		})
+	})
+end
+
+return React.memo(React.forwardRef(Checkbox))

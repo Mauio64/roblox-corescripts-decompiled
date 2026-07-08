@@ -1,18 +1,25 @@
-return function(...) --[[ Line: 2 ]] --[[ Name: intersect ]]
-    local v0 = {};
-    local v1 = select("#", ...);
-    local v2 = select(1, ...);
-    for v3, _ in pairs(v2) do
-        local v5 = true;
-        for v6 = 2, v1 do
-            if select(v6, ...)[v3] == nil then
-                v5 = false;
-                break;
-            end;
-        end;
-        if v5 then
-            v0[v3] = true;
-        end;
-    end;
-    return v0;
-end;
+local function intersect(...) -- line: 2
+	local t1 = {}
+	local v3 = select("#", ...)
+	local v4 = select(1, ...)
+
+	for k, _ in pairs(v4) do
+		local v7 = true
+
+		for i = 2, v3 do
+			if select(i, ...)[k] == nil then
+				v7 = false
+
+				break
+			end
+		end
+
+		if v7 then
+			t1[k] = true
+		end
+	end
+
+	return t1
+end
+
+return intersect

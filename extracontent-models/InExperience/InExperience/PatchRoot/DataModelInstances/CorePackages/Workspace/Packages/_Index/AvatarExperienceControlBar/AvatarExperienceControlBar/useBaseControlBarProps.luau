@@ -1,129 +1,134 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.RoactGamepad);
-local v5 = require(l_Parent_0.AvatarExperienceCommon);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_debounce_0 = v5.Utils.debounce;
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local v9 = {
-    [Enum.KeyCode.Up] = true, 
-    [Enum.KeyCode.Down] = true, 
-    [Enum.KeyCode.Left] = true, 
-    [Enum.KeyCode.Right] = true, 
-    [Enum.KeyCode.DPadDown] = true, 
-    [Enum.KeyCode.DPadUp] = true, 
-    [Enum.KeyCode.DPadLeft] = true, 
-    [Enum.KeyCode.DPadRight] = true, 
-    [Enum.KeyCode.Thumbstick1] = true
-};
-return function(v10) --[[ Line: 37 ]] --[[ Name: useBaseControlBarProps ]]
-    -- upvalues: l_useTokens_0 (copy), v2 (copy), v4 (copy), l_debounce_0 (copy), v9 (copy)
-    local v11 = l_useTokens_0();
-    local v12 = v2.useRef(false);
-    local v13 = v2.useRef(nil);
-    local v14 = v2.useRef(nil);
-    local v15 = v4.useRefCache();
-    local v20 = v2.useCallback(function() --[[ Line: 50 ]]
-        -- upvalues: v10 (copy), v15 (copy)
-        local v16 = {};
-        local v17 = {};
-        if v10.config then
-            for _, v19 in v10.config do
-                if v19.children then
-                    v17[v19.id] = v19.children;
-                end;
-                v19.ref = v15[v19.id];
-                table.insert(v16, v19);
-            end;
-        end;
-        return v16, v17;
-    end, {
-        v10.config
-    });
-    local v21, v22 = v20();
-    local v23, v24 = v2.useState(v21);
-    local v25, v26 = v2.useState(v22);
-    local v27, v28 = v2.useState("");
-    v2.useEffect(function() --[[ Line: 77 ]]
-        -- upvalues: v20 (copy), v24 (copy), v26 (copy)
-        local v29, v30 = v20();
-        v24(v29);
-        v26(v30);
-    end, {
-        v20
-    });
-    v2.useEffect(function() --[[ Line: 83 ]]
-        -- upvalues: v10 (copy), v27 (copy), v25 (copy)
-        if v10.onActiveMenuItemChanged then
-            v10.onActiveMenuItemChanged(v27, v25[v27] ~= nil);
-        end;
-    end, {
-        v27, 
-        v25
-    });
-    local v31 = v2.useMemo(function() --[[ Line: 89 ]]
-        -- upvalues: v25 (copy), v27 (copy)
-        return v25[v27];
-    end, {
-        v27, 
-        v25
-    });
-    local v37 = v2.useMemo(function() --[[ Line: 93 ]]
-        -- upvalues: v15 (copy), v27 (copy), v13 (copy), v14 (copy), v11 (copy)
-        local v32 = v15[v27];
-        if v32 and v32.current and v13.current and v14.current then
-            local l_AbsolutePosition_0 = v32.current.AbsolutePosition;
-            local l_AbsolutePosition_1 = v13.current.AbsolutePosition;
-            local l_AbsoluteSize_0 = v14.current.AbsoluteSize;
-            local v36 = l_AbsolutePosition_0 - l_AbsolutePosition_1 + Vector2.new(l_AbsoluteSize_0.X + v11.Size.Size_50, 0);
-            return UDim2.new(0, v36.X, 0, v36.Y);
-        else
-            return nil;
-        end;
-    end, {
-        v27
-    });
-    local v38 = v2.useCallback(l_debounce_0(function() --[[ Line: 110 ]]
-        -- upvalues: v12 (copy)
-        v12.current = false;
-    end, 0.1), {});
-    local v40 = v2.useCallback(function(v39) --[[ Line: 116 ]]
-        -- upvalues: v28 (copy), v27 (copy), v12 (copy), v38 (copy)
-        v28(v39 == v27 and "" or v39);
-        v12.current = true;
-        v38();
-    end, {
-        v27
-    });
-    local v42 = v2.useCallback(function(_) --[[ Line: 122 ]]
-        -- upvalues: v28 (copy), v12 (copy), v38 (copy)
-        v28("");
-        v12.current = true;
-        v38();
-    end, {});
-    local v44 = v2.useCallback(function(v43) --[[ Line: 132 ]]
-        -- upvalues: v27 (copy), v12 (copy), v9 (ref), v28 (copy)
-        if v27 ~= "" and not v12.current and not v9[v43.KeyCode] then
-            v28("");
-        end;
-        v12.current = false;
-    end, {
-        v27
-    });
-    return {
-        activeMenuItemId = v27, 
-        menus = v23, 
-        submenus = v25, 
-        submenuItems = v31, 
-        submenuPosition = v37, 
-        onMenuItemActivated = v40, 
-        onSubmenuItemActivated = v42, 
-        onInputEnded = v44, 
-        containerRef = v13, 
-        iconMenuRef = v14, 
-        menuItemsRefCache = v15, 
-        LayoutOrder = v10.LayoutOrder
-    };
-end;
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local RoactGamepad = require(AvatarExperienceControlBarParent.RoactGamepad)
+local AvatarExperienceCommon = require(AvatarExperienceControlBarParent.AvatarExperienceCommon)
+local useTokens = Foundation.Hooks.useTokens
+local debounce = AvatarExperienceCommon.Utils.debounce
+
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local t1 = {
+	[Enum.KeyCode.Up] = true,
+	[Enum.KeyCode.Down] = true,
+	[Enum.KeyCode.Left] = true,
+	[Enum.KeyCode.Right] = true,
+	[Enum.KeyCode.DPadDown] = true,
+	[Enum.KeyCode.DPadUp] = true,
+	[Enum.KeyCode.DPadLeft] = true,
+	[Enum.KeyCode.DPadRight] = true,
+	[Enum.KeyCode.Thumbstick1] = true
+}
+
+local function useBaseControlBarProps(p1) -- line: 37
+	-- upvalues: useTokens (copy), React (copy), RoactGamepad (copy), debounce (copy), t1 (copy)
+	local v12 = useTokens()
+	local v13 = React.useRef(false)
+	local v14 = React.useRef(nil)
+	local v15 = React.useRef(nil)
+	local v16 = RoactGamepad.useRefCache()
+	local v17 = React.useCallback(function() -- line: 50
+		-- upvalues: p1 (copy), v16 (copy)
+		local t2 = {}
+		local t3 = {}
+
+		if p1.config then
+			for _, v35 in p1.config do
+				if v35.children then
+					t3[v35.id] = v35.children
+				end
+
+				v35.ref = v16[v35.id]
+				table.insert(t2, v35)
+			end
+		end
+
+		return t2, t3
+	end, { p1.config })
+	local v18, v19 = v17()
+	local v20, v21 = React.useState(v18)
+	local v22, v23 = React.useState(v19)
+	local v24, v25 = React.useState("")
+
+	React.useEffect(function() -- line: 77
+		-- upvalues: v17 (copy), v21 (copy), v23 (copy)
+		local v36, v37 = v17()
+
+		v21(v36)
+		v23(v37)
+	end, { v17 })
+	React.useEffect(function() -- line: 83
+		-- upvalues: p1 (copy), v24 (copy), v22 (copy)
+		if p1.onActiveMenuItemChanged then
+			p1.onActiveMenuItemChanged(v24, v22[v24] ~= nil)
+		end
+	end, {
+		v24,
+		v22
+	})
+
+	local v26 = React.useMemo(function() -- line: 89
+		-- upvalues: v22 (copy), v24 (copy)
+		return v22[v24]
+	end, {
+		v24,
+		v22
+	})
+	local v27 = React.useMemo(function() -- line: 93
+		-- upvalues: v16 (copy), v24 (copy), v14 (copy), v15 (copy), v12 (copy)
+		local v38 = v16[v24]
+
+		if v38 and (v38.current and v14.current and v15.current) then
+			local AbsolutePosition = v38.current.AbsolutePosition
+			local AbsolutePosition2 = v14.current.AbsolutePosition
+			local AbsoluteSize = v15.current.AbsoluteSize
+			local v42 = AbsolutePosition - AbsolutePosition2 + Vector2.new(AbsoluteSize.X + v12.Size.Size_50, 0)
+
+			return UDim2.new(0, v42.X, 0, v42.Y)
+		end
+
+		return nil
+	end, { v24 })
+	local v28 = React.useCallback(debounce(function() -- line: 110
+		-- upvalues: v13 (copy)
+		v13.current = false
+	end, 0.1), {})
+	local v29 = React.useCallback(function(s1: string) -- line: 116
+		-- upvalues: v25 (copy), v24 (copy), v13 (copy), v28 (copy)
+		v25(if s1 ~= v24 then s1 else "")
+		v13.current = true
+		v28()
+	end, { v24 })
+	local v30 = React.useCallback(function(_: string) -- line: 122
+		-- upvalues: v25 (copy), v13 (copy), v28 (copy)
+		v25("")
+		v13.current = true
+		v28()
+	end, {})
+	local v31 = React.useCallback(function(p2) -- line: 132
+		-- upvalues: v24 (copy), v13 (copy), t1 (copy), v25 (copy)
+		if v24 ~= "" and (not v13.current and not t1[p2.KeyCode]) then
+			v25("")
+		end
+
+		v13.current = false
+	end, { v24 })
+
+	return {
+		activeMenuItemId = v24,
+		menus = v20,
+		submenus = v22,
+		submenuItems = v26,
+		submenuPosition = v27,
+		onMenuItemActivated = v29,
+		onSubmenuItemActivated = v30,
+		onInputEnded = v31,
+		containerRef = v14,
+		iconMenuRef = v15,
+		menuItemsRefCache = v16,
+		LayoutOrder = p1.LayoutOrder
+	}
+end
+
+return useBaseControlBarProps

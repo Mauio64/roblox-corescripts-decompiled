@@ -1,33 +1,35 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local l_Image_0 = v2.Image;
-local l_useTokens_0 = v2.Hooks.useTokens;
-return function(v7) --[[ Line: 19 ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_View_0 (copy), l_Image_0 (copy), l_Text_0 (copy)
-    local l_Emphasis_0 = l_useTokens_0().LightMode.Content.Emphasis;
-    local v9 = Color3.fromRGB(239, 215, 140);
-    return v1.createElement(l_View_0, {
-        LayoutOrder = v7.LayoutOrder, 
-        tag = "radius-circle padding-small row gap-xsmall align-y-center align-x-center auto-xy", 
-        backgroundStyle = {
-            Color3 = v9, 
-            Transparency = 0
-        }
-    }, {
-        Icon = if v7.Icon then v1.createElement(l_Image_0, {
-            LayoutOrder = 1, 
-            Image = v7.Icon, 
-            imageStyle = l_Emphasis_0, 
-            tag = "size-300"
-        }) else nil, 
-        Text = v1.createElement(l_Text_0, {
-            LayoutOrder = 2, 
-            Text = v7.Text, 
-            textStyle = l_Emphasis_0, 
-            tag = "text-caption-small content-emphasis text-align-x-center auto-xy"
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local Foundation = require(ParentParent.Foundation)
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local useTokens = Foundation.Hooks.useTokens
+
+return function(t1: {[any]: any}) -- line: 19
+	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationImage (copy), FoundationText (copy)
+	local Emphasis = useTokens().LightMode.Content.Emphasis
+	local color3 = Color3.fromRGB(239, 215, 140)
+
+	return React.createElement(View, {
+		tag = "radius-circle padding-small row gap-xsmall align-y-center align-x-center auto-xy",
+		LayoutOrder = t1.LayoutOrder,
+		backgroundStyle = {
+			Transparency = 0,
+			Color3 = color3
+		}
+	}, {
+		Icon = if not t1.Icon then nil else React.createElement(FoundationImage, {
+			LayoutOrder = 1,
+			tag = "size-300",
+			Image = t1.Icon,
+			imageStyle = Emphasis
+		}),
+		Text = React.createElement(FoundationText, {
+			LayoutOrder = 2,
+			tag = "text-caption-small content-emphasis text-align-x-center auto-xy",
+			Text = t1.Text,
+			textStyle = Emphasis
+		})
+	})
+end

@@ -9,37 +9,36 @@ local useTokens = Foundation.Hooks.useTokens
 local useLocalization = require(AppChatParent.Localization).Hooks.useLocalization
 local useFoundationPresence = require(AppChat.Hooks.useFoundationPresence)
 local FFlagAppChatContextCardNameLoadingShimmer = require(AppChat.Flags.FFlagAppChatContextCardNameLoadingShimmer)
-local FFlagAppChatUseTCUserTileForOSACard = require(AppChat.Flags.FFlagAppChatUseTCUserTileForOSACard)
 local FFlagEnableBlackbirdCheck = require(AppChatParent.SharedFlags).FFlagEnableBlackbirdCheck
 
-return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
-	-- upvalues: useTokens (copy), useFoundationPresence (copy), useLocalization (copy), FFlagAppChatContextCardNameLoadingShimmer (copy), React (copy), Foundation (copy), Skeleton (copy), FFlagAppChatUseTCUserTileForOSACard (copy), UserTile (copy), LayoutMode (copy), FFlagEnableBlackbirdCheck (copy)
-	local v16 = useTokens()
-	local Size = v16.Size
-	local v18 = useFoundationPresence(t1.userId)
-	local v19 = useLocalization({
+return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 35
+	-- upvalues: useTokens (copy), useFoundationPresence (copy), useLocalization (copy), FFlagAppChatContextCardNameLoadingShimmer (copy), React (copy), Foundation (copy), Skeleton (copy), UserTile (copy), LayoutMode (copy), FFlagEnableBlackbirdCheck (copy)
+	local v15 = useTokens()
+	local Size = v15.Size
+	local v17 = useFoundationPresence(t1.userId)
+	local v18 = useLocalization({
 		firstConversationWithThisUserHeadingText = "Feature.Chat.Heading.FirstConversationWithThisUser",
+		firstInteractionWithThisPersonHeadingText = "Feature.Chat.Heading.FirstInteractionWithThisPerson",
+		osaContextCardDescriptionText = "Feature.Chat.Description.OSAContextCardDescription",
+		user = "Feature.Chat.Label.User",
 		firstConversationWithHeadingText = {
 			"Feature.Chat.Heading.FirstConversationWith",
 			displayName = t1.displayName
 		},
-		firstInteractionWithThisPersonHeadingText = "Feature.Chat.Heading.FirstInteractionWithThisPerson",
 		firstInteractionWithHeadingText = {
 			"Feature.Chat.Heading.FirstInteractionWith",
 			displayName = t1.displayName
-		},
-		osaContextCardDescriptionText = "Feature.Chat.Description.OSAContextCardDescription",
-		user = "Feature.Chat.Label.User"
+		}
 	})
 	local isChatUserMessagesEnabled = t1.isChatUserMessagesEnabled
-	local v21 = if not isChatUserMessagesEnabled then v19.firstInteractionWithHeadingText else v19.firstConversationWithHeadingText
-	local v22 = if not isChatUserMessagesEnabled then v19.firstInteractionWithThisPersonHeadingText else v19.firstConversationWithThisUserHeadingText
+	local v20 = if not isChatUserMessagesEnabled then v18.firstInteractionWithHeadingText else v18.firstConversationWithHeadingText
+	local v21 = if not isChatUserMessagesEnabled then v18.firstInteractionWithThisPersonHeadingText else v18.firstConversationWithThisUserHeadingText
 
 	if FFlagAppChatContextCardNameLoadingShimmer then
-		local v23 = not t1.displayName and not t1.hasError
-		local v24 = not t1.username and not t1.hasError
-		local v25 = not t1.avatarThumbnail and not t1.hasError
-		local v26 = not v23 and (not v24 and not v25)
+		local v22 = not t1.displayName and not t1.hasError
+		local v23 = not t1.username and not t1.hasError
+		local v24 = not t1.avatarThumbnail and not t1.hasError
+		local v25 = not v22 and (not v23 and not v24)
 
 		return React.createElement(Foundation.View, {
 			tag = "col align-x-center size-full-0 auto-y padding-xxlarge radius-large bg-shift-100 gap-xlarge",
@@ -50,38 +49,33 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 			AvatarContainer = React.createElement(Foundation.View, {
 				tag = "col auto-xy bg-action-subtle align-x-center gap-medium radius-large padding-small",
 				LayoutOrder = 1,
-				onActivated = if not v26 then nil else t1.onAvatarActivated
+				onActivated = if not v25 then nil else t1.onAvatarActivated
 			}, {
-				AvatarCircle = if not v25 then if not FFlagAppChatUseTCUserTileForOSACard then React.createElement(Foundation.Image, {
-					tag = "size-1200-1200 bg-shift-200",
-					cornerRadius = UDim.new(0, v16.Radius.Circle),
-					Image = t1.avatarThumbnail,
-					LayoutOrder = 1
-				}) else React.createElement(Foundation.View, {
+				AvatarCircle = if not v24 then React.createElement(Foundation.View, {
 					tag = "size-1200-1200",
 					LayoutOrder = 1
 				}, { React.createElement(UserTile, {
+					dontTruncateTitle = true,
 					userId = tostring(t1.userId),
 					layoutMode = LayoutMode.compact,
-					userPresenceType = v18.presence,
-					dontTruncateTitle = true,
+					userPresenceType = v17.presence,
 					onActivated = t1.onAvatarActivated,
 					isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else t1.isRobloxSubscriber
 				}) }) else React.createElement(Skeleton, {
+					LayoutOrder = 1,
 					Size = UDim2.new(0, Size.Size_1200, 0, Size.Size_1200),
-					radius = Foundation.Enums.Radius.Circle,
-					LayoutOrder = 1
+					radius = Foundation.Enums.Radius.Circle
 				}),
 				AvatarTextContainer = React.createElement(Foundation.View, {
 					tag = "col auto-xy align-x-center gap-xxsmall",
 					LayoutOrder = 2
 				}, {
-					DisplayName = if not v23 then if not FFlagEnableBlackbirdCheck or (not t1.isRobloxSubscriber or t1.hasError) then React.createElement(Foundation.Text, {
+					DisplayName = if not v22 then if not FFlagEnableBlackbirdCheck or (not t1.isRobloxSubscriber or t1.hasError) then React.createElement(Foundation.Text, {
 						tag = "auto-xy",
 						LayoutOrder = 1,
-						Text = if not t1.hasError then t1.displayName else v19.user,
-						fontStyle = v16.Typography.TitleMedium,
-						textStyle = v16.Color.Content.Emphasis
+						Text = if not t1.hasError then t1.displayName else v18.user,
+						fontStyle = v15.Typography.TitleMedium,
+						textStyle = v15.Color.Content.Emphasis
 					}) else React.createElement(Foundation.View, {
 						tag = "row auto-xy align-y-center gap-xsmall",
 						LayoutOrder = 1
@@ -90,30 +84,30 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 							tag = "auto-xy",
 							LayoutOrder = 1,
 							Text = t1.displayName,
-							fontStyle = v16.Typography.TitleMedium,
-							textStyle = v16.Color.Content.Emphasis
+							fontStyle = v15.Typography.TitleMedium,
+							textStyle = v15.Color.Content.Emphasis
 						}),
 						Badge = React.createElement(Foundation.Icon, {
 							LayoutOrder = 2,
 							name = Foundation.Enums.IconName.RobloxPlus,
 							size = Foundation.Enums.IconSize.Small,
-							style = v16.Color.Content.Emphasis
+							style = v15.Color.Content.Emphasis
 						})
 					}) else React.createElement(Skeleton, {
-						Size = UDim2.new(0, Size.Size_2500, 0, v16.Typography.TitleMedium.FontSize),
-						radius = Foundation.Enums.Radius.Large,
-						LayoutOrder = 1
+						LayoutOrder = 1,
+						Size = UDim2.new(0, Size.Size_2500, 0, v15.Typography.TitleMedium.FontSize),
+						radius = Foundation.Enums.Radius.Large
 					}),
-					Username = if not v24 then React.createElement(Foundation.Text, {
+					Username = if not v23 then React.createElement(Foundation.Text, {
 						tag = "auto-xy",
 						LayoutOrder = 2,
-						Text = if not t1.hasError then t1.username else v19.user,
-						fontStyle = v16.Typography.BodySmall,
-						textStyle = v16.Color.Content.Muted
+						Text = if not t1.hasError then t1.username else v18.user,
+						fontStyle = v15.Typography.BodySmall,
+						textStyle = v15.Color.Content.Muted
 					}) else React.createElement(Skeleton, {
-						Size = UDim2.new(0, Size.Size_2000, 0, v16.Typography.BodySmall.FontSize),
-						radius = Foundation.Enums.Radius.Large,
-						LayoutOrder = 2
+						LayoutOrder = 2,
+						Size = UDim2.new(0, Size.Size_2000, 0, v15.Typography.BodySmall.FontSize),
+						radius = Foundation.Enums.Radius.Large
 					})
 				})
 			}),
@@ -122,23 +116,23 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 				LayoutOrder = 2,
 				ref = p1
 			}, {
-				HeadingText = if not v23 then React.createElement(Foundation.Text, {
+				HeadingText = if not v22 then React.createElement(Foundation.Text, {
 					tag = "auto-xy text-wrap",
 					LayoutOrder = 1,
-					Text = if not t1.hasError then v21 else v22,
-					fontStyle = v16.Typography.TitleLarge,
-					textStyle = v16.Color.Content.Emphasis
+					Text = if not t1.hasError then v20 else v21,
+					fontStyle = v15.Typography.TitleLarge,
+					textStyle = v15.Color.Content.Emphasis
 				}) else React.createElement(Skeleton, {
-					Size = UDim2.new(0, Size.Size_3000, 0, v16.Typography.TitleLarge.FontSize + v16.Gap.XXSmall),
-					radius = Foundation.Enums.Radius.Large,
-					LayoutOrder = 1
+					LayoutOrder = 1,
+					Size = UDim2.new(0, Size.Size_3000, 0, v15.Typography.TitleLarge.FontSize + v15.Gap.XXSmall),
+					radius = Foundation.Enums.Radius.Large
 				}),
 				DescriptionText = React.createElement(Foundation.Text, {
 					tag = "auto-xy text-wrap",
 					LayoutOrder = 2,
-					Text = v19.osaContextCardDescriptionText,
-					fontStyle = v16.Typography.BodyLarge,
-					textStyle = v16.Color.Content.Default
+					Text = v18.osaContextCardDescriptionText,
+					fontStyle = v15.Typography.BodyLarge,
+					textStyle = v15.Color.Content.Default
 				})
 			})
 		})
@@ -167,19 +161,14 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 			LayoutOrder = 1,
 			onActivated = t1.onAvatarActivated
 		}, {
-			AvatarCircle = if not FFlagAppChatUseTCUserTileForOSACard then React.createElement(Foundation.Image, {
-				tag = "size-1200-1200 bg-shift-200",
-				cornerRadius = UDim.new(0, v16.Radius.Circle),
-				Image = t1.avatarThumbnail,
-				LayoutOrder = 1
-			}) else React.createElement(Foundation.View, {
+			AvatarCircle = React.createElement(Foundation.View, {
 				tag = "size-1200-1200",
 				LayoutOrder = 1
 			}, { React.createElement(UserTile, {
+				dontTruncateTitle = true,
 				userId = tostring(t1.userId),
 				layoutMode = LayoutMode.compact,
-				userPresenceType = v18.presence,
-				dontTruncateTitle = true,
+				userPresenceType = v17.presence,
 				onActivated = t1.onAvatarActivated,
 				isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else t1.isRobloxSubscriber
 			}) }),
@@ -191,8 +180,8 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 					tag = "auto-xy",
 					LayoutOrder = 1,
 					Text = t1.displayName,
-					fontStyle = v16.Typography.TitleMedium,
-					textStyle = v16.Color.Content.Emphasis
+					fontStyle = v15.Typography.TitleMedium,
+					textStyle = v15.Color.Content.Emphasis
 				}) else React.createElement(Foundation.View, {
 					tag = "row auto-xy align-y-center gap-xsmall",
 					LayoutOrder = 1
@@ -201,22 +190,22 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 						tag = "auto-xy",
 						LayoutOrder = 1,
 						Text = t1.displayName,
-						fontStyle = v16.Typography.TitleMedium,
-						textStyle = v16.Color.Content.Emphasis
+						fontStyle = v15.Typography.TitleMedium,
+						textStyle = v15.Color.Content.Emphasis
 					}),
 					Badge = React.createElement(Foundation.Icon, {
 						LayoutOrder = 2,
 						name = Foundation.Enums.IconName.RobloxPlus,
 						size = Foundation.Enums.IconSize.Small,
-						style = v16.Color.Content.Emphasis
+						style = v15.Color.Content.Emphasis
 					})
 				}),
 				Username = React.createElement(Foundation.Text, {
 					tag = "auto-xy",
 					LayoutOrder = 2,
 					Text = t1.username,
-					fontStyle = v16.Typography.BodySmall,
-					textStyle = v16.Color.Content.Muted
+					fontStyle = v15.Typography.BodySmall,
+					textStyle = v15.Color.Content.Muted
 				})
 			})
 		}) else nil,
@@ -228,16 +217,16 @@ return React.memo(React.forwardRef(function(t1: {[any]: any}, p1) -- line: 36
 			HeadingText = React.createElement(Foundation.Text, {
 				tag = "auto-xy text-wrap",
 				LayoutOrder = 1,
-				Text = if not t1.hasError then v21 else v22,
-				fontStyle = v16.Typography.TitleLarge,
-				textStyle = v16.Color.Content.Emphasis
+				Text = if not t1.hasError then v20 else v21,
+				fontStyle = v15.Typography.TitleLarge,
+				textStyle = v15.Color.Content.Emphasis
 			}),
 			DescriptionText = React.createElement(Foundation.Text, {
 				tag = "auto-xy text-wrap",
 				LayoutOrder = 2,
-				Text = v19.osaContextCardDescriptionText,
-				fontStyle = v16.Typography.BodyLarge,
-				textStyle = v16.Color.Content.Default
+				Text = v18.osaContextCardDescriptionText,
+				fontStyle = v15.Typography.BodyLarge,
+				textStyle = v15.Color.Content.Default
 			})
 		})
 	})

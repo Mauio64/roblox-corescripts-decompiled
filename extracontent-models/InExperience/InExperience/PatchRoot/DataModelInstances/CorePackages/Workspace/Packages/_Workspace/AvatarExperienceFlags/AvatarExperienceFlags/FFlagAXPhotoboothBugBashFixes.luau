@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothBugBashFixes4", false);
+return game:DefineFastFlag("AXPhotoboothBugBashFixes4", false)

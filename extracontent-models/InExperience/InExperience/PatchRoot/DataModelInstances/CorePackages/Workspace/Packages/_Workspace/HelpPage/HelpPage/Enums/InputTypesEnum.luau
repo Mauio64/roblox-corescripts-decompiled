@@ -1,11 +1,13 @@
-local v0 = {
-    InputType = {
-        KEYBOARD = "KEYBOARD", 
-        GAMEPAD = "GAMEPAD", 
-        TOUCH = "TOUCH", 
-        SPATIAL_GAMEPAD = "SPATIAL_GAMEPAD"
-    }
-};
-table.freeze(v0.InputType);
-table.freeze(v0);
-return v0;
+local t1 = {
+	InputType = {
+		KEYBOARD = "KEYBOARD",
+		GAMEPAD = "GAMEPAD",
+		TOUCH = "TOUCH",
+		SPATIAL_GAMEPAD = "SPATIAL_GAMEPAD"
+	}
+}
+
+table.freeze(t1.InputType)
+table.freeze(t1)
+
+return t1

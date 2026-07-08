@@ -1,9 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceSave");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local _ = require(l_script_FirstAncestor_0.Context.AvatarSaveContext);
-return function(v4) --[[ Line: 14 ]] --[[ Name: checkCharacterDataHasTryOnItems ]]
-    -- upvalues: v2 (copy)
-    local v5 = v4.tryOn.OutfitTryOn and v4.tryOn.OutfitTryOn.TryOnItems or {};
-    return v2.fieldCount(v5) > 0;
-end;
+local AvatarExperienceSave = script:FindFirstAncestor("AvatarExperienceSave")
+local AvatarExperienceSaveParent = AvatarExperienceSave.Parent
+local tutils = require(AvatarExperienceSaveParent.tutils)
+
+require(AvatarExperienceSave.Context.AvatarSaveContext)
+
+local function checkCharacterDataHasTryOnItems(p1) -- line: 14
+	-- upvalues: tutils (copy)
+	local v6 = p1.tryOn.OutfitTryOn and p1.tryOn.OutfitTryOn.TryOnItems or {}
+
+	return tutils.fieldCount(v6) > 0
+end
+
+return checkCharacterDataHasTryOnItems

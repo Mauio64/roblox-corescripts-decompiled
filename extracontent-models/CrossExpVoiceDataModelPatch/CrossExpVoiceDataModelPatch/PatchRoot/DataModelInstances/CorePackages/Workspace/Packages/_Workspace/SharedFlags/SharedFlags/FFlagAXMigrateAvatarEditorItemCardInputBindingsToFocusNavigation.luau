@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation3", false);
+return game:DefineFastFlag("AXMigrateAvatarEditorItemCardInputBindingsToFocusNavigation3", false)

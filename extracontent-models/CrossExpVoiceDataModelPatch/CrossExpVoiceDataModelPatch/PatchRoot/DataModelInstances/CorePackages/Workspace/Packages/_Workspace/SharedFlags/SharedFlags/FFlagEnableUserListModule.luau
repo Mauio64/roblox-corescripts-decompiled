@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableUserListModule_2", false);
+return game:DefineFastFlag("EnableUserListModule_2", false)

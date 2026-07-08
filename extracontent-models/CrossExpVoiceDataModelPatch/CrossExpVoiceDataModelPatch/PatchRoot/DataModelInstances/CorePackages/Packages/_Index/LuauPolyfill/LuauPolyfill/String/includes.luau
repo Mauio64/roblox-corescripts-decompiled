@@ -1,26 +1,38 @@
-local v0 = "([" .. ("$%^()-[].?"):gsub("(.)", "%%%1") .. "])";
-return function(v1, v2, v3) --[[ Line: 6 ]] --[[ Name: includes ]]
-    -- upvalues: v0 (copy)
-    local v4, v5 = utf8.len(v1);
-    assert(v4 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v1, (tostring(v5))));
-    if v4 == 0 then
-        return false;
-    elseif #v2 == 0 then
-        return true;
-    else
-        local v6 = 1;
-        if v3 ~= nil then
-            v6 = tonumber(v3) or 1;
-            if v4 < v6 then
-                return false;
-            end;
-        end;
-        if v6 < 1 then
-            v6 = 1;
-        end;
-        local v7 = utf8.offset(v1, v6);
-        local v8 = v2:gsub(v0, "%%%1");
-        local v9, _ = string.find(v1, v8, v7);
-        return v9 ~= nil;
-    end;
-end;
+local v1 = "([" .. ("$%^()-[].?"):gsub("(.)", "%%%1") .. "])"
+
+local function includes(s1: string, s2: string, p1) -- line: 6
+	-- upvalues: v1 (copy)
+	local v6, v7 = utf8.len(s1)
+
+	assert(v6 ~= nil, ("string `%s` has an invalid byte at position %s"):format(s1, (tostring(v7))))
+
+	if v6 == 0 then
+		return false
+	end
+
+	if #s2 == 0 then
+		return true
+	end
+
+	local n1 = 1
+
+	if p1 ~= nil then
+		n1 = tonumber(p1) or 1
+
+		if v6 < n1 then
+			return false
+		end
+	end
+
+	if n1 < 1 then
+		n1 = 1
+	end
+
+	local v9 = utf8.offset(s1, n1)
+	local v10 = s2:gsub(v1, "%%%1")
+	local start, _ = string.find(s1, v10, v9)
+
+	return start ~= nil
+end
+
+return includes

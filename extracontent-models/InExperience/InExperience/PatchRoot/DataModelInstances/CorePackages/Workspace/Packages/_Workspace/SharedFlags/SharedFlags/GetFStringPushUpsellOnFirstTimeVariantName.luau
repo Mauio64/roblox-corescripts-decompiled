@@ -1,4 +1,5 @@
-game:DefineFastString("PushUpsellOnFirstTimeVariantName", "pushUpsellOnFirstTimeVariant");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("PushUpsellOnFirstTimeVariantName");
-end;
+game:DefineFastString("PushUpsellOnFirstTimeVariantName", "pushUpsellOnFirstTimeVariant")
+
+return function() -- line: 3
+	return game:GetFastString("PushUpsellOnFirstTimeVariantName")
+end

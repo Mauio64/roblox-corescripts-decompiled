@@ -1,27 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.Rodux.Presence);
-local v4 = {
-    "OFFLINE", 
-    "ONLINE", 
-    "IN_GAME", 
-    "IN_STUDIO"
-};
-local function v7(v5) --[[ Line: 16 ]] --[[ Name: convertFromOldPresenceModel ]]
-    -- upvalues: v3 (copy), v2 (copy), v4 (copy)
-    local v6 = v3.Models.Presence.new(v2.Dictionary.join(v5, {
-        userPresenceType = (table.find(v4, v5.presence) or 1) - 1, 
-        gameId = v5.gameInstanceId, 
-        lastOnline = ""
-    }));
-    return v3.Actions.ReceivedUserPresence(v6);
-end;
-local v8 = v3.installReducer();
-return function(v9, v10) --[[ Line: 28 ]]
-    -- upvalues: v7 (copy), v8 (copy)
-    if v10.type == "ReceivedUserPresence" and not v10.payload then
-        v10 = v7(v10);
-    end;
-    return v8(v9, v10);
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local Cryo = require(ProfilePlatformParent.Cryo)
+local Presence = require(ProfilePlatform.Rodux.Presence)
+local t1 = {
+	"OFFLINE",
+	"ONLINE",
+	"IN_GAME",
+	"IN_STUDIO"
+}
+
+local function convertFromOldPresenceModel(p1) -- line: 16
+	-- upvalues: Presence (copy), Cryo (copy), t1 (copy)
+	local v9 = Presence.Models.Presence.new(Cryo.Dictionary.join(p1, {
+		lastOnline = "",
+		userPresenceType = (table.find(t1, p1.presence) or 1) - 1,
+		gameId = p1.gameInstanceId
+	}))
+
+	return Presence.Actions.ReceivedUserPresence(v9)
+end
+
+local v7 = Presence.installReducer()
+
+return function(p2, p3) -- line: 28
+	-- upvalues: convertFromOldPresenceModel (copy), v7 (copy)
+	if p3.type == "ReceivedUserPresence" and not p3.payload then
+		p3 = convertFromOldPresenceModel(p3)
+	end
+
+	return v7(p2, p3)
+end

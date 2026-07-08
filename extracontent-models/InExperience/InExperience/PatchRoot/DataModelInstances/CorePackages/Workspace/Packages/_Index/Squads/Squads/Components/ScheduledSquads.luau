@@ -1,5 +1,5 @@
 return {
-    ScheduledSquadSheet = require(script.ScheduledSquadSheet), 
-    ScheduledSquadsListSheet = require(script.ScheduledSquadsListSheet), 
-    ScheduledSquadsMoreInfoSheet = require(script.ScheduledSquadsMoreInfoSheet)
-};
+	ScheduledSquadSheet = require(script.ScheduledSquadSheet),
+	ScheduledSquadsListSheet = require(script.ScheduledSquadsListSheet),
+	ScheduledSquadsMoreInfoSheet = require(script.ScheduledSquadsMoreInfoSheet)
+}

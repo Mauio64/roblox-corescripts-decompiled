@@ -1,18 +1,31 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_UnifiedPurchaseModalTypeEnum_0 = require(l_Parent_0.IAPExperience).Enums.UnifiedPurchaseModalTypeEnum;
-local v3 = require(l_script_FirstAncestor_0.Utils.isMultiItemPurchase);
-local v4 = require(l_script_FirstAncestor_0.Enums.RequestType);
-local l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs;
-return function(v6) --[[ Line: 12 ]] --[[ Name: getUnifiedPurchaseModalType ]]
-    -- upvalues: v4 (copy), l_UnifiedPurchaseModalTypeEnum_0 (copy), v3 (copy), l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 (copy)
-    if v6 == v4.Experience then
-        return l_UnifiedPurchaseModalTypeEnum_0.Experience;
-    elseif v3(v6) then
-        return l_UnifiedPurchaseModalTypeEnum_0.MultiItem;
-    elseif l_FFlagEnableUnifiedPurchaseFlowForDevSubs_0 and v6 == v4.DeveloperSubscription then
-        return l_UnifiedPurchaseModalTypeEnum_0.DeveloperSubscription;
-    else
-        return l_UnifiedPurchaseModalTypeEnum_0.SingleItem;
-    end;
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local SharedFlags = require(PurchasePromptParent.SharedFlags)
+local UnifiedPurchaseModalTypeEnum = require(PurchasePromptParent.IAPExperience).Enums.UnifiedPurchaseModalTypeEnum
+local isMultiItemPurchase = require(PurchasePrompt.Utils.isMultiItemPurchase)
+local RequestType = require(PurchasePrompt.Enums.RequestType)
+local FFlagEnableUnifiedPurchaseFlowForDevSubs = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableUnifiedPurchaseFlowForDevSubs
+local FFlagAXMISWithBlackbird = SharedFlags.FFlagAXMISWithBlackbird
+
+local function getUnifiedPurchaseModalType(p1) -- line: 14
+	-- upvalues: RequestType (copy), UnifiedPurchaseModalTypeEnum (copy), FFlagAXMISWithBlackbird (copy), isMultiItemPurchase (copy), FFlagEnableUnifiedPurchaseFlowForDevSubs (copy)
+	if p1 == RequestType.Experience then
+		return UnifiedPurchaseModalTypeEnum.Experience
+	end
+
+	if FFlagAXMISWithBlackbird and p1 == RequestType.RobuxUpsell then
+		return UnifiedPurchaseModalTypeEnum.MultiItem
+	end
+
+	if isMultiItemPurchase(p1) then
+		return UnifiedPurchaseModalTypeEnum.MultiItem
+	end
+
+	if FFlagEnableUnifiedPurchaseFlowForDevSubs and p1 == RequestType.DeveloperSubscription then
+		return UnifiedPurchaseModalTypeEnum.DeveloperSubscription
+	end
+
+	return UnifiedPurchaseModalTypeEnum.SingleItem
+end
+
+return getUnifiedPurchaseModalType

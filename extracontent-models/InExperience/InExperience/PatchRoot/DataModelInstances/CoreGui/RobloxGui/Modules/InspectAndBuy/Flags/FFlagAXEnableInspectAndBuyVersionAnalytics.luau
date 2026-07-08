@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableInspectAndBuyVersionAnalytics", false);
+return game:DefineFastFlag("AXEnableInspectAndBuyVersionAnalytics", false)

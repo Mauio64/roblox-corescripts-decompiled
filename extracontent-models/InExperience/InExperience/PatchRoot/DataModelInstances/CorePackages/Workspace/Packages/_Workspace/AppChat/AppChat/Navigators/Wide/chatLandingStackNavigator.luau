@@ -1,77 +1,74 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.RoactNavigation);
-local l_SquadQuickStartExperimentation_0 = require(l_Parent_0.SocialExperiments).SquadQuickStartExperimentation;
-local v4 = require(l_script_FirstAncestor_0.EnumScreens);
-local v5 = require(l_script_FirstAncestor_0.Components.ChatLanding.ChatLandingScreenWithSwitchNavigator);
-local v6 = require(l_script_FirstAncestor_0.Components.CreateNewChat.CreateNewChatScreen);
-local v7 = require(l_script_FirstAncestor_0.Components.EditChatMembers.EditChatMembersScreen);
-local v8 = require(l_script_FirstAncestor_0.Components.Squads.QuickStartSquadInviteFriendsScreen);
-local l_script_FirstAncestor_1 = script:FindFirstAncestor("Navigators");
-local v10 = require(l_script_FirstAncestor_1.createOverlayTopBarStackNavigator);
-local v11 = require(l_script_FirstAncestor_0.Navigators.createOverlayTopBarStackNavigatorWithFocus);
-local v12 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatRemoveDynamicRequires);
-local l_FFlagEnablePartyQuickStartButton_0 = require(l_Parent_0.SharedFlags).FFlagEnablePartyQuickStartButton;
-local l_FFlagEnableAppChatFocusableFixes_0 = require(l_Parent_0.SharedFlags).FFlagEnableAppChatFocusableFixes;
-local function v17(v15, v16) --[[ Line: 25 ]] --[[ Name: wrapScreenInOverlayNavigator ]]
-    -- upvalues: l_FFlagEnableAppChatFocusableFixes_0 (copy), v11 (copy), v10 (copy)
-    if l_FFlagEnableAppChatFocusableFixes_0 then
-        return (v11({
-            {
-                [v15] = v16
-            }
-        }));
-    else
-        return (v10({
-            {
-                [v15] = v16
-            }
-        }));
-    end;
-end;
-local v18 = {
-    backButtonEnabled = true, 
-    tabBarVisible = true, 
-    overlayEnabled = true, 
-    overlayTransparency = 0.5, 
-    absorbInput = true
-};
-local v19 = {
-    {
-        [v4.ChatLanding] = {
-            screen = v5, 
-            navigationOptions = v12() and function() --[[ Line: 53 ]]
-                return {
-                    backButtonEnabled = false, 
-                    tabBarVisible = true
-                };
-            end or {
-                backButtonEnabled = false, 
-                tabBarVisible = true
-            }
-        }
-    }, 
-    {
-        CreateNewChatScreenWrapper = {
-            screen = v17(v4.CreateNewChat, v6), 
-            navigationOptions = v18
-        }
-    }, 
-    {
-        EditChatMembersScreenWrapper = {
-            screen = v17(v4.EditChatMembers, v7), 
-            navigationOptions = v18
-        }
-    }
-};
-if l_SquadQuickStartExperimentation_0.getPartyQuickStartChangesEnabled() and l_FFlagEnablePartyQuickStartButton_0 then
-    table.insert(v19, {
-        CreatePartyQuickStartWrapper = {
-            screen = v17(v4.QuickStartSquadInviteFriends, v8), 
-            navigationOptions = v18
-        }
-    });
-end;
-return v2.createRobloxStackNavigator(v19, {
-    mode = v2.StackPresentationStyle.Overlay
-});
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local RoactNavigation = require(AppChatParent.RoactNavigation)
+local SquadQuickStartExperimentation = require(AppChatParent.SocialExperiments).SquadQuickStartExperimentation
+local EnumScreens = require(AppChat.EnumScreens)
+local ChatLandingScreenWithSwitchNavigator = require(AppChat.Components.ChatLanding.ChatLandingScreenWithSwitchNavigator)
+local CreateNewChatScreen = require(AppChat.Components.CreateNewChat.CreateNewChatScreen)
+local EditChatMembersScreen = require(AppChat.Components.EditChatMembers.EditChatMembersScreen)
+local QuickStartSquadInviteFriendsScreen = require(AppChat.Components.Squads.QuickStartSquadInviteFriendsScreen)
+local createOverlayTopBarStackNavigatorWithFocus = require(AppChat.Navigators.createOverlayTopBarStackNavigatorWithFocus)
+local getFFlagAppChatRemoveDynamicRequires = require(AppChat.Flags.getFFlagAppChatRemoveDynamicRequires)
+local FFlagEnablePartyQuickStartButton = require(AppChatParent.SharedFlags).FFlagEnablePartyQuickStartButton
+
+local function wrapScreenInOverlayNavigator(p1, p2) -- line: 22
+	-- upvalues: createOverlayTopBarStackNavigatorWithFocus (copy)
+	return createOverlayTopBarStackNavigatorWithFocus({{
+		[p1] = p2
+	}})
+end
+
+local t1 = {
+	backButtonEnabled = true,
+	tabBarVisible = true,
+	overlayEnabled = true,
+	overlayTransparency = 0.5,
+	absorbInput = true
+}
+local t2 = {
+	{
+		[EnumScreens.ChatLanding] = {
+			screen = ChatLandingScreenWithSwitchNavigator,
+			navigationOptions = if not getFFlagAppChatRemoveDynamicRequires() then {
+				backButtonEnabled = false,
+				tabBarVisible = true
+			} else function() -- line: 44
+				return {
+					backButtonEnabled = false,
+					tabBarVisible = true
+				}
+			end
+		}
+	},
+	{
+		CreateNewChatScreenWrapper = {
+			screen = createOverlayTopBarStackNavigatorWithFocus({{
+				[EnumScreens.CreateNewChat] = CreateNewChatScreen
+			}}),
+			navigationOptions = t1
+		}
+	},
+	{
+		EditChatMembersScreenWrapper = {
+			screen = createOverlayTopBarStackNavigatorWithFocus({{
+				[EnumScreens.EditChatMembers] = EditChatMembersScreen
+			}}),
+			navigationOptions = t1
+		}
+	}
+}
+
+if SquadQuickStartExperimentation.getPartyQuickStartChangesEnabled() and FFlagEnablePartyQuickStartButton then
+	table.insert(t2, {
+		CreatePartyQuickStartWrapper = {
+			screen = createOverlayTopBarStackNavigatorWithFocus({{
+				[EnumScreens.QuickStartSquadInviteFriends] = QuickStartSquadInviteFriendsScreen
+			}}),
+			navigationOptions = t1
+		}
+	})
+end
+
+return RoactNavigation.createRobloxStackNavigator(t2, {
+	mode = RoactNavigation.StackPresentationStyle.Overlay
+})

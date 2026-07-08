@@ -1,1 +1,1 @@
-return (require(script.EditTextButton));
+return (require(script.EditTextButton))

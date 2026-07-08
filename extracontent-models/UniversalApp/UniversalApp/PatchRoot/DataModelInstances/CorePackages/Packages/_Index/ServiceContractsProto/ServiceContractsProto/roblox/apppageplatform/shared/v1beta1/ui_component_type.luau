@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	UiComponentType = ({
 		UiComponentType = {
-			fromNumber = function(n1: number) --[[ fromNumber ]] -- line: 78
+			fromNumber = function(n1: number) -- line: 101
 				if n1 == 0 then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -23,6 +23,18 @@ return {
 
 				if n1 == 12 then
 					return "UI_COMPONENT_TYPE_SINGLE_ITEM_COLLECTION"
+				end
+
+				if n1 == 13 then
+					return "UI_COMPONENT_TYPE_COLLECTION_CAROUSEL_PLACEHOLDER"
+				end
+
+				if n1 == 14 then
+					return "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL"
+				end
+
+				if n1 == 15 then
+					return "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION"
 				end
 
 				if n1 == 100 then
@@ -47,6 +59,10 @@ return {
 
 				if n1 == 105 then
 					return "UI_COMPONENT_TYPE_EVENT_TILE"
+				end
+
+				if n1 == 106 then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER_TILE"
 				end
 
 				if n1 == 200 then
@@ -205,6 +221,62 @@ return {
 					return "UI_COMPONENT_TYPE_SHEET_FULL_BLEED"
 				end
 
+				if n1 == 239 then
+					return "UI_COMPONENT_TYPE_SYSTEM_BANNER"
+				end
+
+				if n1 == 240 then
+					return "UI_COMPONENT_TYPE_PLAY_WITH_REWARD"
+				end
+
+				if n1 == 241 then
+					return "UI_COMPONENT_TYPE_ICON_BUTTON"
+				end
+
+				if n1 == 242 then
+					return "UI_COMPONENT_TYPE_AGE_CHECK_UPSELL_ROW"
+				end
+
+				if n1 == 243 then
+					return "UI_COMPONENT_TYPE_PAGE_HEADER"
+				end
+
+				if n1 == 244 then
+					return "UI_COMPONENT_TYPE_AVATAR_GROUP"
+				end
+
+				if n1 == 245 then
+					return "UI_COMPONENT_TYPE_TOOLTIP"
+				end
+
+				if n1 == 246 then
+					return "UI_COMPONENT_TYPE_AI_OVERVIEW"
+				end
+
+				if n1 == 247 then
+					return "UI_COMPONENT_TYPE_SKELETON"
+				end
+
+				if n1 == 248 then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER"
+				end
+
+				if n1 == 249 then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER_WRAPPER"
+				end
+
+				if n1 == 250 then
+					return "UI_COMPONENT_TYPE_REVEAL_TEXT"
+				end
+
+				if n1 == 251 then
+					return "UI_COMPONENT_TYPE_SHIMMER_TEXT"
+				end
+
+				if n1 == 252 then
+					return "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON"
+				end
+
 				if n1 == 300 then
 					return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 				end
@@ -233,8 +305,28 @@ return {
 					return "UI_COMPONENT_TYPE_CATALOG_CATEGORY_MENU"
 				end
 
+				if n1 == 604 then
+					return "UI_COMPONENT_TYPE_CATALOG_HERO_UNIT"
+				end
+
+				if n1 == 605 then
+					return "UI_COMPONENT_TYPE_MARKETPLACE_FAVORITES_CATEGORY_MENU"
+				end
+
+				if n1 == 606 then
+					return "UI_COMPONENT_TYPE_CATALOG_ITEM_GRID"
+				end
+
 				if n1 == 700 then
 					return "UI_COMPONENT_TYPE_FILTER_PILLS_CAROUSEL"
+				end
+
+				if n1 == 800 then
+					return "UI_COMPONENT_TYPE_USER_LIST"
+				end
+
+				if n1 == 801 then
+					return "UI_COMPONENT_TYPE_FRIEND_REQUEST_BUTTON"
 				end
 
 				if n1 == 9999 then
@@ -243,7 +335,7 @@ return {
 
 				return nil
 			end,
-			toNumber = function(p1) --[[ toNumber ]] -- line: 202
+			toNumber = function(p1) -- line: 271
 				if p1 == "UI_COMPONENT_TYPE_INVALID" then
 					return 0
 				end
@@ -262,6 +354,18 @@ return {
 
 				if p1 == "UI_COMPONENT_TYPE_SINGLE_ITEM_COLLECTION" then
 					return 12
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_COLLECTION_CAROUSEL_PLACEHOLDER" then
+					return 13
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL" then
+					return 14
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION" then
+					return 15
 				end
 
 				if p1 == "UI_COMPONENT_TYPE_TILE" then
@@ -286,6 +390,10 @@ return {
 
 				if p1 == "UI_COMPONENT_TYPE_EVENT_TILE" then
 					return 105
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_PLACEHOLDER_TILE" then
+					return 106
 				end
 
 				if p1 == "UI_COMPONENT_TYPE_BUTTON" then
@@ -444,6 +552,62 @@ return {
 					return 238
 				end
 
+				if p1 == "UI_COMPONENT_TYPE_SYSTEM_BANNER" then
+					return 239
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_PLAY_WITH_REWARD" then
+					return 240
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_ICON_BUTTON" then
+					return 241
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_AGE_CHECK_UPSELL_ROW" then
+					return 242
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_PAGE_HEADER" then
+					return 243
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_AVATAR_GROUP" then
+					return 244
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_TOOLTIP" then
+					return 245
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_AI_OVERVIEW" then
+					return 246
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_SKELETON" then
+					return 247
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_PLACEHOLDER" then
+					return 248
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_PLACEHOLDER_WRAPPER" then
+					return 249
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_REVEAL_TEXT" then
+					return 250
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_SHIMMER_TEXT" then
+					return 251
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON" then
+					return 252
+				end
+
 				if p1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 					return 300
 				end
@@ -472,8 +636,28 @@ return {
 					return 603
 				end
 
+				if p1 == "UI_COMPONENT_TYPE_CATALOG_HERO_UNIT" then
+					return 604
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_MARKETPLACE_FAVORITES_CATEGORY_MENU" then
+					return 605
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_CATALOG_ITEM_GRID" then
+					return 606
+				end
+
 				if p1 == "UI_COMPONENT_TYPE_FILTER_PILLS_CAROUSEL" then
 					return 700
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_USER_LIST" then
+					return 800
+				end
+
+				if p1 == "UI_COMPONENT_TYPE_FRIEND_REQUEST_BUTTON" then
+					return 801
 				end
 
 				if p1 == "UI_COMPONENT_TYPE_MOCK_COMPONENT" then
@@ -482,7 +666,7 @@ return {
 
 				return p1
 			end,
-			fromName = function(s1: string) --[[ fromName ]] -- line: 326
+			fromName = function(s1: string) -- line: 441
 				if s1 == "UI_COMPONENT_TYPE_INVALID" then
 					return "UI_COMPONENT_TYPE_INVALID"
 				end
@@ -501,6 +685,18 @@ return {
 
 				if s1 == "UI_COMPONENT_TYPE_SINGLE_ITEM_COLLECTION" then
 					return "UI_COMPONENT_TYPE_SINGLE_ITEM_COLLECTION"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_COLLECTION_CAROUSEL_PLACEHOLDER" then
+					return "UI_COMPONENT_TYPE_COLLECTION_CAROUSEL_PLACEHOLDER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL" then
+					return "UI_COMPONENT_TYPE_VARIABLE_ITEM_WIDTH_CAROUSEL"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION" then
+					return "UI_COMPONENT_TYPE_OPTION_SELECTOR_COLLECTION"
 				end
 
 				if s1 == "UI_COMPONENT_TYPE_TILE" then
@@ -525,6 +721,10 @@ return {
 
 				if s1 == "UI_COMPONENT_TYPE_EVENT_TILE" then
 					return "UI_COMPONENT_TYPE_EVENT_TILE"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_PLACEHOLDER_TILE" then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER_TILE"
 				end
 
 				if s1 == "UI_COMPONENT_TYPE_BUTTON" then
@@ -683,6 +883,62 @@ return {
 					return "UI_COMPONENT_TYPE_SHEET_FULL_BLEED"
 				end
 
+				if s1 == "UI_COMPONENT_TYPE_SYSTEM_BANNER" then
+					return "UI_COMPONENT_TYPE_SYSTEM_BANNER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_PLAY_WITH_REWARD" then
+					return "UI_COMPONENT_TYPE_PLAY_WITH_REWARD"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_ICON_BUTTON" then
+					return "UI_COMPONENT_TYPE_ICON_BUTTON"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_AGE_CHECK_UPSELL_ROW" then
+					return "UI_COMPONENT_TYPE_AGE_CHECK_UPSELL_ROW"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_PAGE_HEADER" then
+					return "UI_COMPONENT_TYPE_PAGE_HEADER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_AVATAR_GROUP" then
+					return "UI_COMPONENT_TYPE_AVATAR_GROUP"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_TOOLTIP" then
+					return "UI_COMPONENT_TYPE_TOOLTIP"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_AI_OVERVIEW" then
+					return "UI_COMPONENT_TYPE_AI_OVERVIEW"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_SKELETON" then
+					return "UI_COMPONENT_TYPE_SKELETON"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_PLACEHOLDER" then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_PLACEHOLDER_WRAPPER" then
+					return "UI_COMPONENT_TYPE_PLACEHOLDER_WRAPPER"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_REVEAL_TEXT" then
+					return "UI_COMPONENT_TYPE_REVEAL_TEXT"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_SHIMMER_TEXT" then
+					return "UI_COMPONENT_TYPE_SHIMMER_TEXT"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON" then
+					return "UI_COMPONENT_TYPE_APP_DOWNLOAD_BUTTON"
+				end
+
 				if s1 == "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS" then
 					return "UI_COMPONENT_TYPE_FOCUS_NAV_ACTIONS"
 				end
@@ -711,8 +967,28 @@ return {
 					return "UI_COMPONENT_TYPE_CATALOG_CATEGORY_MENU"
 				end
 
+				if s1 == "UI_COMPONENT_TYPE_CATALOG_HERO_UNIT" then
+					return "UI_COMPONENT_TYPE_CATALOG_HERO_UNIT"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_MARKETPLACE_FAVORITES_CATEGORY_MENU" then
+					return "UI_COMPONENT_TYPE_MARKETPLACE_FAVORITES_CATEGORY_MENU"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_CATALOG_ITEM_GRID" then
+					return "UI_COMPONENT_TYPE_CATALOG_ITEM_GRID"
+				end
+
 				if s1 == "UI_COMPONENT_TYPE_FILTER_PILLS_CAROUSEL" then
 					return "UI_COMPONENT_TYPE_FILTER_PILLS_CAROUSEL"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_USER_LIST" then
+					return "UI_COMPONENT_TYPE_USER_LIST"
+				end
+
+				if s1 == "UI_COMPONENT_TYPE_FRIEND_REQUEST_BUTTON" then
+					return "UI_COMPONENT_TYPE_FRIEND_REQUEST_BUTTON"
 				end
 
 				if s1 == "UI_COMPONENT_TYPE_MOCK_COMPONENT" then

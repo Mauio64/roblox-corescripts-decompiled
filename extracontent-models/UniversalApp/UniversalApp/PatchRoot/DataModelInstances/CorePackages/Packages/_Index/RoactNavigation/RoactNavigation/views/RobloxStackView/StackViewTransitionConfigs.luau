@@ -1,45 +1,49 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local l_Object_0 = require(l_Parent_1.LuauPolyfill).Object;
-local v3 = require(l_Parent_0.StackViewInterpolator);
-local v4 = require(l_Parent_0.StackPresentationStyle);
-local v5 = {
-    frequency = 3, 
-    dampingRatio = 1
-};
-local v6 = {
-    transitionSpec = v5, 
-    screenInterpolator = v3.forHorizontal
-};
-local v7 = {
-    transitionSpec = v5, 
-    screenInterpolator = v3.forVertical
-};
-local v8 = {
-    transitionSpec = v5, 
-    screenInterpolator = v3.forFade
-};
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local StackViewInterpolator = require(scriptParent.StackViewInterpolator)
+local StackPresentationStyle = require(scriptParent.StackPresentationStyle)
+local t1 = {
+	frequency = 3,
+	dampingRatio = 1
+}
+local t2 = {
+	transitionSpec = t1,
+	screenInterpolator = StackViewInterpolator.forHorizontal
+}
+local t3 = {
+	transitionSpec = t1,
+	screenInterpolator = StackViewInterpolator.forVertical
+}
+local t4 = {
+	transitionSpec = t1,
+	screenInterpolator = StackViewInterpolator.forFade
+}
+
 return {
-    getDefaultTransitionConfig = function(_, _, v11) --[[ Line: 31 ]] --[[ Name: getDefaultTransitionConfig ]]
-        -- upvalues: v4 (copy), v7 (copy), v8 (copy), v6 (copy)
-        if v11 == v4.Modal then
-            return v7;
-        elseif v11 == v4.Overlay then
-            return v8;
-        else
-            return v6;
-        end;
-    end, 
-    getTransitionConfig = function(v12, v13, v14, v15) --[[ Line: 41 ]] --[[ Name: getTransitionConfig ]]
-        -- upvalues: v4 (copy), v7 (copy), v8 (copy), v6 (copy), l_Object_0 (copy)
-        local v16 = if v15 == v4.Modal then v7 else if v15 == v4.Overlay then v8 else v6;
-        if v12 then
-            return l_Object_0.assign(table.clone(v16), v12(v13, v14, v15));
-        else
-            return v16;
-        end;
-    end, 
-    SlideFromRight = v6, 
-    ModalSlideFromBottom = v7, 
-    FadeInPlace = v8
-};
+	getDefaultTransitionConfig = function(_, _, p3) -- line: 31
+		-- upvalues: StackPresentationStyle (copy), t3 (copy), t4 (copy), t2 (copy)
+		if p3 == StackPresentationStyle.Modal then
+			return t3
+		end
+
+		if p3 == StackPresentationStyle.Overlay then
+			return t4
+		end
+
+		return t2
+	end,
+	getTransitionConfig = function(p4, p5, p6, p7) -- line: 41
+		-- upvalues: StackPresentationStyle (copy), t3 (copy), t4 (copy), t2 (copy), Object (copy)
+		local v17 = if p7 ~= StackPresentationStyle.Modal then if p7 ~= StackPresentationStyle.Overlay then t2 else t4 else t3
+
+		if p4 then
+			return Object.assign(table.clone(v17), p4(p5, p6, p7))
+		end
+
+		return v17
+	end,
+	SlideFromRight = t2,
+	ModalSlideFromBottom = t3,
+	FadeInPlace = t4
+}

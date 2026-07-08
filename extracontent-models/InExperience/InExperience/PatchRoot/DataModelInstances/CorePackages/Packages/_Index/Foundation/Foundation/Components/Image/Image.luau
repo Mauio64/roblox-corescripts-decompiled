@@ -1,379 +1,511 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v3 = require(l_Parent_0.Dash);
-local v4 = require(l_Parent_0.FoundationCloudAssets);
-local v5 = require(l_Parent_0.FoundationImages);
-local v6 = require(l_Parent_0.React);
-local v7 = require(l_Parent_0.ReactIs);
-local v8 = require(script.Parent.useOnLoaded);
-local l_Assets_0 = v4.Assets;
-local v10 = require(l_script_FirstAncestor_0.Components.Interactable);
-local l_Images_0 = v5.Images;
-local v12 = require(script.Parent.ImageSet.getScaledSlice);
-local v13 = require(script.Parent.CloudAsset.isCloudAsset);
-local v14 = require(script.Parent.ImageSet.isFoundationImage);
-local v15 = require(l_script_FirstAncestor_0.Utility.GuiObjectChildren);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v17 = require(l_script_FirstAncestor_0.Utility.indexBindable);
-local v18 = require(l_script_FirstAncestor_0.Utility.useDefaultTags);
-local v19 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v20 = require(l_script_FirstAncestor_0.Utility.withGuiObjectProps);
-local v21 = require(l_script_FirstAncestor_0.Providers.Style.useStyleTags);
-local v22 = {
-    AutoLocalize = false, 
-    AutoButtonColor = false, 
-    BorderSizePixel = 0, 
-    isDisabled = false
-};
-local function _(v23) --[[ Line: 61 ]] --[[ Name: getAspectRatio ]]
-    return v23.X / v23.Y;
-end;
-local v25 = _G.__DEV__ == true;
-local function _(v26) --[[ Line: 67 ]] --[[ Name: getFoundationImageAsset ]]
-    -- upvalues: v25 (copy), l_Images_0 (copy)
-    if v25 then
-        return l_Images_0[v26];
-    else
-        return (rawget(l_Images_0, v26));
-    end;
-end;
-local function _(v28) --[[ Line: 78 ]] --[[ Name: shouldUseFoundationSlice ]]
-    -- upvalues: v14 (copy), v13 (copy), v25 (copy), l_Images_0 (copy)
-    if not v14(v28) then
-        return false;
-    else
-        return v13(v28) or (if v25 then l_Images_0[v28] else rawget(l_Images_0, v28)) ~= nil;
-    end;
-end;
-return v6.memo(v6.forwardRef(function(v30, v31) --[[ Line: 89 ]] --[[ Name: Image ]]
-    -- upvalues: v19 (copy), v22 (copy), v6 (copy), v7 (copy), v14 (copy), v13 (copy), l_Assets_0 (copy), v2 (copy), v25 (copy), l_Images_0 (copy), v12 (copy), v18 (copy), v21 (copy), v8 (copy), v20 (copy), v17 (copy), v10 (copy), v15 (copy), v3 (copy)
-    local v32 = v19(v30, v22);
-    local v33 = true;
-    if v32.onStateChanged == nil then
-        v33 = true;
-        if v32.onActivated == nil then
-            v33 = v32.onSecondaryActivated ~= nil;
-        end;
-    end;
-    local l_aspectRatio_0 = v32.aspectRatio;
-    local v65, v66, v67, v68 = v6.useMemo(function() --[[ Line: 96 ]]
-        -- upvalues: v32 (copy), l_aspectRatio_0 (copy), v7 (ref), v14 (ref), v13 (ref), l_Assets_0 (ref), v2 (ref), v25 (ref), l_Images_0 (ref)
-        local l_Image_0 = v32.Image;
-        local v36 = if v32.imageRect then v32.imageRect.offset else nil;
-        local v37 = if v32.imageRect then v32.imageRect.size else nil;
-        local l_l_aspectRatio_0_0 = l_aspectRatio_0;
-        if v7.isBinding(v32.Image) then
-            local function _(v39) --[[ Line: 107 ]] --[[ Name: getImageBindingValue ]]
-                -- upvalues: v32 (ref), v14 (ref), v13 (ref), l_Assets_0 (ref), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref)
-                return v32.Image:map(function(v40) --[[ Line: 108 ]]
-                    -- upvalues: v14 (ref), v13 (ref), l_Assets_0 (ref), v39 (copy), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref), v32 (ref)
-                    if v14(v40) then
-                        local v41 = nil;
-                        if v13(v40) then
-                            v41 = l_Assets_0[v40];
-                            if v39 == "Image" then
-                                return v41.assetId;
-                            elseif v39 == "AspectRatio" then
-                                local l_size_0 = v41.size;
-                                return l_size_0.X / l_size_0.Y;
-                            else
-                                return nil;
-                            end;
-                        else
-                            v41 = if v2.FoundationImageSafeLookup then if v25 then l_Images_0[v40] else rawget(l_Images_0, v40) else l_Images_0[v40];
-                            if v39 == "AspectRatio" then
-                                return l_aspectRatio_0;
-                            elseif v41 then
-                                return v41[v39];
-                            elseif v2.FoundationImageSafeLookup and v39 == "Image" then
-                                return v40;
-                            else
-                                return nil;
-                            end;
-                        end;
-                    elseif v39 == "Image" then
-                        return v40;
-                    elseif v39 == "ImageRectOffset" and v32.imageRect then
-                        return v32.imageRect.offset;
-                    elseif v39 == "ImageRectSize" and v32.imageRect then
-                        return v32.imageRect.size;
-                    else
-                        return nil;
-                    end;
-                end);
-            end;
-            local l_Image_1 = v32.Image;
-            local v45 = "AspectRatio";
-            local l_v45_0 = v45 --[[ copy: 8 -> 9 ]];
-            l_l_aspectRatio_0_0 = l_Image_1:map(function(v47) --[[ Line: 108 ]]
-                -- upvalues: v14 (ref), v13 (ref), l_Assets_0 (ref), l_v45_0 (copy), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref), v32 (ref)
-                if v14(v47) then
-                    local v48 = nil;
-                    if v13(v47) then
-                        v48 = l_Assets_0[v47];
-                        if l_v45_0 == "Image" then
-                            return v48.assetId;
-                        elseif l_v45_0 == "AspectRatio" then
-                            local l_size_1 = v48.size;
-                            return l_size_1.X / l_size_1.Y;
-                        else
-                            return nil;
-                        end;
-                    else
-                        v48 = if v2.FoundationImageSafeLookup then if v25 then l_Images_0[v47] else rawget(l_Images_0, v47) else l_Images_0[v47];
-                        if l_v45_0 == "AspectRatio" then
-                            return l_aspectRatio_0;
-                        elseif v48 then
-                            return v48[l_v45_0];
-                        elseif v2.FoundationImageSafeLookup and l_v45_0 == "Image" then
-                            return v47;
-                        else
-                            return nil;
-                        end;
-                    end;
-                elseif l_v45_0 == "Image" then
-                    return v47;
-                elseif l_v45_0 == "ImageRectOffset" and v32.imageRect then
-                    return v32.imageRect.offset;
-                elseif l_v45_0 == "ImageRectSize" and v32.imageRect then
-                    return v32.imageRect.size;
-                else
-                    return nil;
-                end;
-            end);
-            l_Image_1 = v32.Image;
-            v45 = "Image";
-            local l_v45_1 = v45 --[[ copy: 8 -> 10 ]];
-            l_Image_0 = l_Image_1:map(function(v51) --[[ Line: 108 ]]
-                -- upvalues: v14 (ref), v13 (ref), l_Assets_0 (ref), l_v45_1 (copy), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref), v32 (ref)
-                if v14(v51) then
-                    local v52 = nil;
-                    if v13(v51) then
-                        v52 = l_Assets_0[v51];
-                        if l_v45_1 == "Image" then
-                            return v52.assetId;
-                        elseif l_v45_1 == "AspectRatio" then
-                            local l_size_2 = v52.size;
-                            return l_size_2.X / l_size_2.Y;
-                        else
-                            return nil;
-                        end;
-                    else
-                        v52 = if v2.FoundationImageSafeLookup then if v25 then l_Images_0[v51] else rawget(l_Images_0, v51) else l_Images_0[v51];
-                        if l_v45_1 == "AspectRatio" then
-                            return l_aspectRatio_0;
-                        elseif v52 then
-                            return v52[l_v45_1];
-                        elseif v2.FoundationImageSafeLookup and l_v45_1 == "Image" then
-                            return v51;
-                        else
-                            return nil;
-                        end;
-                    end;
-                elseif l_v45_1 == "Image" then
-                    return v51;
-                elseif l_v45_1 == "ImageRectOffset" and v32.imageRect then
-                    return v32.imageRect.offset;
-                elseif l_v45_1 == "ImageRectSize" and v32.imageRect then
-                    return v32.imageRect.size;
-                else
-                    return nil;
-                end;
-            end);
-            l_Image_1 = v32.Image;
-            v45 = "ImageRectOffset";
-            local l_v45_2 = v45 --[[ copy: 8 -> 11 ]];
-            v36 = l_Image_1:map(function(v55) --[[ Line: 108 ]]
-                -- upvalues: v14 (ref), v13 (ref), l_Assets_0 (ref), l_v45_2 (copy), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref), v32 (ref)
-                if v14(v55) then
-                    local v56 = nil;
-                    if v13(v55) then
-                        v56 = l_Assets_0[v55];
-                        if l_v45_2 == "Image" then
-                            return v56.assetId;
-                        elseif l_v45_2 == "AspectRatio" then
-                            local l_size_3 = v56.size;
-                            return l_size_3.X / l_size_3.Y;
-                        else
-                            return nil;
-                        end;
-                    else
-                        v56 = if v2.FoundationImageSafeLookup then if v25 then l_Images_0[v55] else rawget(l_Images_0, v55) else l_Images_0[v55];
-                        if l_v45_2 == "AspectRatio" then
-                            return l_aspectRatio_0;
-                        elseif v56 then
-                            return v56[l_v45_2];
-                        elseif v2.FoundationImageSafeLookup and l_v45_2 == "Image" then
-                            return v55;
-                        else
-                            return nil;
-                        end;
-                    end;
-                elseif l_v45_2 == "Image" then
-                    return v55;
-                elseif l_v45_2 == "ImageRectOffset" and v32.imageRect then
-                    return v32.imageRect.offset;
-                elseif l_v45_2 == "ImageRectSize" and v32.imageRect then
-                    return v32.imageRect.size;
-                else
-                    return nil;
-                end;
-            end);
-            l_Image_1 = v32.Image;
-            v45 = "ImageRectSize";
-            return l_Image_0, v36, l_Image_1:map(function(v58) --[[ Line: 108 ]]
-                -- upvalues: v14 (ref), v13 (ref), l_Assets_0 (ref), v45 (copy), v2 (ref), v25 (ref), l_Images_0 (ref), l_aspectRatio_0 (ref), v32 (ref)
-                if v14(v58) then
-                    local v59 = nil;
-                    if v13(v58) then
-                        v59 = l_Assets_0[v58];
-                        if v45 == "Image" then
-                            return v59.assetId;
-                        elseif v45 == "AspectRatio" then
-                            local l_size_4 = v59.size;
-                            return l_size_4.X / l_size_4.Y;
-                        else
-                            return nil;
-                        end;
-                    else
-                        v59 = if v2.FoundationImageSafeLookup then if v25 then l_Images_0[v58] else rawget(l_Images_0, v58) else l_Images_0[v58];
-                        if v45 == "AspectRatio" then
-                            return l_aspectRatio_0;
-                        elseif v59 then
-                            return v59[v45];
-                        elseif v2.FoundationImageSafeLookup and v45 == "Image" then
-                            return v58;
-                        else
-                            return nil;
-                        end;
-                    end;
-                elseif v45 == "Image" then
-                    return v58;
-                elseif v45 == "ImageRectOffset" and v32.imageRect then
-                    return v32.imageRect.offset;
-                elseif v45 == "ImageRectSize" and v32.imageRect then
-                    return v32.imageRect.size;
-                else
-                    return nil;
-                end;
-            end), l_l_aspectRatio_0_0;
-        else
-            if typeof(v32.Image) == "string" and v14(v32.Image) then
-                if v13(v32.Image) then
-                    local v61 = l_Assets_0[v32.Image];
-                    l_Image_0 = v61.assetId;
-                    local l_size_5 = v61.size;
-                    return l_Image_0, v36, v37, l_size_5.X / l_size_5.Y;
-                else
-                    local v63;
-                    if v2.FoundationImageSafeLookup then
-                        local l_Image_2 = v32.Image;
-                        v63 = if v25 then l_Images_0[l_Image_2] else rawget(l_Images_0, l_Image_2);
-                    else
-                        v63 = l_Images_0[v32.Image];
-                    end;
-                    if v63 then
-                        l_Image_0 = v63.Image;
-                        v36 = v63.ImageRectOffset;
-                        v37 = v63.ImageRectSize;
-                    end;
-                end;
-            end;
-            return l_Image_0, v36, v37, l_l_aspectRatio_0_0;
-        end;
-    end, {
-        v32.Image, 
-        v32.imageRect, 
-        l_aspectRatio_0, 
-        l_Images_0
-    });
-    local v69 = nil;
-    local v70 = nil;
-    local l_ScaleType_0 = v32.ScaleType;
-    if v32.slice then
-        if v7.isBinding(v32.Image) then
-            local v73 = v32.Image:map(function(v72) --[[ Line: 173 ]]
-                -- upvalues: v2 (ref), v14 (ref), v13 (ref), v25 (ref), l_Images_0 (ref), v12 (ref), v32 (copy)
-                if if v2.FoundationImageSafeLookup then if v14(v72) then v13(v72) or (if v25 then l_Images_0[v72] else rawget(l_Images_0, v72)) ~= nil else false else v14(v72) then
-                    return v12(v32.slice.center, v32.slice.scale);
-                else
-                    return v32.slice;
-                end;
-            end);
-            v69 = v73:map(function(v74) --[[ Line: 184 ]]
-                return v74.center;
-            end);
-            v70 = v73:map(function(v75) --[[ Line: 187 ]]
-                return v75.scale;
-            end);
-        elseif typeof(v32.Image) == "string" then
-            local v76;
-            if v2.FoundationImageSafeLookup then
-                local l_Image_3 = v32.Image;
-                v76 = not not v14(l_Image_3) and (v13(l_Image_3) or (if v25 then l_Images_0[l_Image_3] else rawget(l_Images_0, l_Image_3)) ~= nil);
-            else
-                v76 = v14(v32.Image);
-            end;
-            if v76 then
-                v76 = v12(v32.slice.center, v32.slice.scale);
-                v69 = v76.center;
-                v70 = v76.scale;
-            else
-                v69 = v32.slice.center;
-                v70 = v32.slice.scale;
-            end;
-        end;
-        l_ScaleType_0 = Enum.ScaleType.Slice;
-    end;
-    v32.aspectRatio = v68;
-    local v78 = v32.backgroundStyle ~= nil and "gui-object-defaults x-default-transparency" or "gui-object-defaults";
-    local v79 = v18(v32.tag, v78);
-    local v80 = v21(v79);
-    if v2.FoundationImageOnLoadedCallback then
-        v8(v65, v32.onLoaded);
-    end;
-    local v81 = v33 and "ImageButton" or "ImageLabel";
-    local v82 = v20(v32, {
-        AutoButtonColor = if v81 == "ImageButton" then v32.AutoButtonColor else nil, 
-        Image = v65, 
-        ImageColor3 = if v32.imageStyle then v17(v32.imageStyle, "Color3") else nil, 
-        ImageTransparency = if v32.imageStyle then v17(v32.imageStyle, "Transparency") else nil, 
-        ImageRectOffset = v66, 
-        ImageRectSize = v67, 
-        ResampleMode = v32.ResampleMode, 
-        ScaleType = l_ScaleType_0, 
-        SliceCenter = v69, 
-        SliceScale = v70, 
-        TileSize = v32.TileSize, 
-        ref = v31, 
-        [v6.Tag] = v80
-    });
-    if v2.FoundationBuildingBlocksRemoveDashUnion then
-        local l_v81_0 = v81;
-        if v33 then
-            l_v81_0 = v10;
-            v82.component = v81;
-            v82.onActivated = v32.onActivated;
-            v82.onSecondaryActivated = v32.onSecondaryActivated;
-            v82.onStateChanged = v32.onStateChanged;
-            v82.stateLayer = v32.stateLayer;
-            v82.isDisabled = v32.isDisabled;
-            v82.cursor = v32.cursor;
-        end;
-        return v6.createElement(l_v81_0, v82, v15(v32));
-    else
-        local v84 = if v33 then v10 else v81;
-        local v85 = {
-            component = v81, 
-            onActivated = v32.onActivated, 
-            onSecondaryActivated = v32.onSecondaryActivated, 
-            onStateChanged = v32.onStateChanged, 
-            stateLayer = v32.stateLayer, 
-            isDisabled = v32.isDisabled, 
-            cursor = v32.cursor
-        };
-        local v86 = if v33 then v3.union(v82, v85) else v82;
-        return v6.createElement(v84, v86, v15(v32));
-    end;
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local FoundationCloudAssets = require(FoundationParent.FoundationCloudAssets)
+local FoundationImages = require(FoundationParent.FoundationImages)
+local React = require(FoundationParent.React)
+local ReactIs = require(FoundationParent.ReactIs)
+local useOnLoaded = require(script.Parent.useOnLoaded)
+local Assets = FoundationCloudAssets.Assets
+local Interactable = require(Foundation.Components.Interactable)
+local Images = FoundationImages.Images
+local IconImages_DEPRECATED = FoundationImages.IconImages_DEPRECATED
+local getScaledSlice = require(script.Parent.ImageSet.getScaledSlice)
+local isCloudAsset = require(script.Parent.CloudAsset.isCloudAsset)
+local isFoundationImage = require(script.Parent.ImageSet.isFoundationImage)
+local GuiObjectChildren = require(Foundation.Utility.GuiObjectChildren)
+
+require(Foundation.Components.Types)
+
+local indexBindable = require(Foundation.Utility.indexBindable)
+local useDefaultTags = require(Foundation.Utility.useDefaultTags)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local withGuiObjectProps = require(Foundation.Utility.withGuiObjectProps)
+local useStyleTags = require(Foundation.Providers.Style.useStyleTags)
+local t1 = {
+	AutoLocalize = false,
+	AutoButtonColor = false,
+	BorderSizePixel = 0,
+	isDisabled = false
+}
+
+local function getAspectRatio(vector2: Vector2) -- line: 60
+	return vector2.X / vector2.Y
+end
+
+local v23 = _G.__DEV__ == true
+
+local function getFoundationImageAsset(s1: string) -- line: 66
+	-- upvalues: IconImages_DEPRECATED (copy), v23 (copy), Images (copy)
+	local v29 = IconImages_DEPRECATED[s1]
+
+	if v29 then
+		return v29
+	end
+
+	if v23 then
+		return Images[s1]
+	end
+
+	return (rawget(Images, s1))
+end
+local function shouldUseFoundationSlice(s2: string) -- line: 82
+	-- upvalues: isFoundationImage (copy), isCloudAsset (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy)
+	if not isFoundationImage(s2) then
+		return false
+	end
+
+	local v31 = isCloudAsset(s2)
+
+	if not v31 then
+		local v32 = IconImages_DEPRECATED[s2]
+
+		v31 = ((if not v32 then (if not v23 then rawget(Images, s2) else Images[s2]) else v32)) ~= nil
+	end
+
+	return v31
+end
+local function Image(p1, p2) -- line: 93
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), ReactIs (copy), isCloudAsset (copy), isFoundationImage (copy), Assets (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), getScaledSlice (copy), useDefaultTags (copy), useStyleTags (copy), useOnLoaded (copy), withGuiObjectProps (copy), indexBindable (copy), Interactable (copy), GuiObjectChildren (copy)
+	local v35 = withDefaults(p1, t1)
+	local v36 = v35.onStateChanged ~= nil or (v35.onActivated ~= nil or v35.onSecondaryActivated ~= nil)
+	local aspectRatio = v35.aspectRatio
+	local v38, v39 = React.useState(false)
+
+	React.useEffect(function() -- line: 101
+		-- upvalues: ReactIs (copy), v35 (copy), v39 (copy), isCloudAsset (copy), React (copy)
+		if not ReactIs.isBinding(v35.Image) then
+			return
+		end
+
+		local Image2 = v35.Image
+
+		v39(isCloudAsset(Image2:getValue()))
+
+		local v59 = React.__subscribeToBinding(Image2, function(s3: string) -- line: 109
+			-- upvalues: v39 (copy), isCloudAsset (copy)
+			v39(isCloudAsset(s3))
+		end)
+
+		return function() -- line: 113
+			-- upvalues: v59 (copy)
+			v59()
+		end
+	end, {
+		v35.Image,
+		aspectRatio
+	})
+
+	local v40, v41, v42, v43 = React.useMemo(function() -- line: 119
+		-- upvalues: v35 (copy), aspectRatio (copy), ReactIs (copy), isFoundationImage (copy), isCloudAsset (copy), Assets (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), v38 (copy)
+		local Image3 = v35.Image
+		local v61 = if not v35.imageRect then nil else v35.imageRect.offset
+		local v62 = if not v35.imageRect then nil else v35.imageRect.size
+		local v63 = aspectRatio
+
+		if ReactIs.isBinding(v35.Image) then
+			local function getImageBindingValue(p3) -- line: 130
+				-- upvalues: v35 (copy), isFoundationImage (copy), isCloudAsset (copy), Assets (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy)
+				return v35.Image:map(function(s4: string) -- line: 131
+					-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), p3 (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy), v35 (copy)
+					if isFoundationImage(s4) then
+						if isCloudAsset(s4) then
+							local v104 = Assets[s4]
+
+							if p3 == "Image" then
+								return v104.assetId
+							end
+
+							if p3 == "AspectRatio" then
+								local size = v104.size
+
+								return size.X / size.Y
+							end
+
+							return nil
+						end
+
+						local v106 = IconImages_DEPRECATED[s4]
+						local v107 = if not v106 then if not v23 then rawget(Images, s4) else Images[s4] else v106
+
+						if p3 == "AspectRatio" then
+							return aspectRatio
+						end
+
+						if v107 then
+							return v107[p3]
+						end
+
+						if p3 == "Image" then
+							return s4
+						end
+
+						return nil
+					end
+
+					if p3 == "Image" then
+						return s4
+					end
+
+					if p3 == "ImageRectOffset" and v35.imageRect then
+						return v35.imageRect.offset
+					end
+
+					if p3 == "ImageRectSize" and v35.imageRect then
+						return v35.imageRect.size
+					end
+
+					return nil
+				end)
+			end
+
+			local v66
+
+			if v38 then
+				local s5 = "AspectRatio"
+
+				v66 = v35.Image:map(function(s6: string) -- line: 131
+					-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s5 (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy), v35 (copy)
+					if isFoundationImage(s6) then
+						if isCloudAsset(s6) then
+							local v84 = Assets[s6]
+
+							if s5 == "Image" then
+								return v84.assetId
+							end
+
+							if s5 == "AspectRatio" then
+								local size = v84.size
+
+								return size.X / size.Y
+							end
+
+							return nil
+						end
+
+						local v86 = IconImages_DEPRECATED[s6]
+						local v87 = if not v86 then if not v23 then rawget(Images, s6) else Images[s6] else v86
+
+						if s5 == "AspectRatio" then
+							return aspectRatio
+						end
+
+						if v87 then
+							return v87[s5]
+						end
+
+						if s5 == "Image" then
+							return s6
+						end
+
+						return nil
+					end
+
+					if s5 == "Image" then
+						return s6
+					end
+
+					if s5 == "ImageRectOffset" and v35.imageRect then
+						return v35.imageRect.offset
+					end
+
+					if s5 == "ImageRectSize" and v35.imageRect then
+						return v35.imageRect.size
+					end
+
+					return nil
+				end)
+			else
+				v66 = aspectRatio
+			end
+
+			local s7 = "Image"
+			local s8 = "ImageRectOffset"
+			local s9 = "ImageRectSize"
+
+			return v35.Image:map(function(s10: string) -- line: 131
+				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s7 (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy), v35 (copy)
+				if isFoundationImage(s10) then
+					if isCloudAsset(s10) then
+						local v89 = Assets[s10]
+
+						if s7 == "Image" then
+							return v89.assetId
+						end
+
+						if s7 == "AspectRatio" then
+							local size = v89.size
+
+							return size.X / size.Y
+						end
+
+						return nil
+					end
+
+					local v91 = IconImages_DEPRECATED[s10]
+					local v92 = if not v91 then if not v23 then rawget(Images, s10) else Images[s10] else v91
+
+					if s7 == "AspectRatio" then
+						return aspectRatio
+					end
+
+					if v92 then
+						return v92[s7]
+					end
+
+					if s7 == "Image" then
+						return s10
+					end
+
+					return nil
+				end
+
+				if s7 == "Image" then
+					return s10
+				end
+
+				if s7 == "ImageRectOffset" and v35.imageRect then
+					return v35.imageRect.offset
+				end
+
+				if s7 == "ImageRectSize" and v35.imageRect then
+					return v35.imageRect.size
+				end
+
+				return nil
+			end), v35.Image:map(function(s11: string) -- line: 131
+				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s8 (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy), v35 (copy)
+				if isFoundationImage(s11) then
+					if isCloudAsset(s11) then
+						local v94 = Assets[s11]
+
+						if s8 == "Image" then
+							return v94.assetId
+						end
+
+						if s8 == "AspectRatio" then
+							local size = v94.size
+
+							return size.X / size.Y
+						end
+
+						return nil
+					end
+
+					local v96 = IconImages_DEPRECATED[s11]
+					local v97 = if not v96 then if not v23 then rawget(Images, s11) else Images[s11] else v96
+
+					if s8 == "AspectRatio" then
+						return aspectRatio
+					end
+
+					if v97 then
+						return v97[s8]
+					end
+
+					if s8 == "Image" then
+						return s11
+					end
+
+					return nil
+				end
+
+				if s8 == "Image" then
+					return s11
+				end
+
+				if s8 == "ImageRectOffset" and v35.imageRect then
+					return v35.imageRect.offset
+				end
+
+				if s8 == "ImageRectSize" and v35.imageRect then
+					return v35.imageRect.size
+				end
+
+				return nil
+			end), v35.Image:map(function(s12: string) -- line: 131
+				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), Assets (copy), s9 (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), aspectRatio (copy), v35 (copy)
+				if isFoundationImage(s12) then
+					if isCloudAsset(s12) then
+						local v99 = Assets[s12]
+
+						if s9 == "Image" then
+							return v99.assetId
+						end
+
+						if s9 == "AspectRatio" then
+							local size = v99.size
+
+							return size.X / size.Y
+						end
+
+						return nil
+					end
+
+					local v101 = IconImages_DEPRECATED[s12]
+					local v102 = if not v101 then if not v23 then rawget(Images, s12) else Images[s12] else v101
+
+					if s9 == "AspectRatio" then
+						return aspectRatio
+					end
+
+					if v102 then
+						return v102[s9]
+					end
+
+					if s9 == "Image" then
+						return s12
+					end
+
+					return nil
+				end
+
+				if s9 == "Image" then
+					return s12
+				end
+
+				if s9 == "ImageRectOffset" and v35.imageRect then
+					return v35.imageRect.offset
+				end
+
+				if s9 == "ImageRectSize" and v35.imageRect then
+					return v35.imageRect.size
+				end
+
+				return nil
+			end), v66
+		end
+
+		if typeof(v35.Image) == "string" and isFoundationImage(v35.Image) then
+			if isCloudAsset(v35.Image) then
+				local v70 = Assets[v35.Image]
+				local assetId = v70.assetId
+				local size = v70.size
+
+				return assetId, v61, v62, size.X / size.Y
+			end
+
+			local Image4 = v35.Image
+			local v74 = IconImages_DEPRECATED[Image4]
+			local v75 = if not v74 then if not v23 then rawget(Images, Image4) else Images[Image4] else v74
+
+			if v75 then
+				Image3 = v75.Image
+				v61 = v75.ImageRectOffset
+				v62 = v75.ImageRectSize
+			end
+		end
+
+		return Image3, v61, v62, v63
+	end, {
+		v35.Image,
+		v35.imageRect,
+		v38,
+		aspectRatio,
+		Images
+	})
+	local v44 = nil
+	local v45 = nil
+	local ScaleType = v35.ScaleType
+
+	if v35.slice then
+		if ReactIs.isBinding(v35.Image) then
+			local v47 = v35.Image:map(function(s13: string) -- line: 196
+				-- upvalues: isFoundationImage (copy), isCloudAsset (copy), IconImages_DEPRECATED (copy), v23 (copy), Images (copy), getScaledSlice (copy), v35 (copy)
+				local v77
+
+				if not isFoundationImage(s13) then
+					v77 = false
+				else
+					v77 = isCloudAsset(s13)
+
+					if not v77 then
+						local v78 = IconImages_DEPRECATED[s13]
+
+						v77 = ((if not v78 then (if not v23 then rawget(Images, s13) else Images[s13]) else v78)) ~= nil
+					end
+				end
+
+				if v77 then
+					return getScaledSlice(v35.slice.center, v35.slice.scale)
+				end
+
+				return v35.slice
+			end)
+
+			v44 = v47:map(function(p4) -- line: 203
+				return p4.center
+			end)
+			v45 = v47:map(function(p5) -- line: 206
+				return p5.scale
+			end)
+		elseif typeof(v35.Image) == "string" then
+			local Image5 = v35.Image
+			local v49
+
+			if not isFoundationImage(Image5) then
+				v49 = false
+			else
+				v49 = isCloudAsset(Image5)
+
+				if not v49 then
+					local v50 = IconImages_DEPRECATED[Image5]
+
+					v49 = ((if not v50 then (if not v23 then rawget(Images, Image5) else Images[Image5]) else v50)) ~= nil
+				end
+			end
+
+			if v49 then
+				local v51 = getScaledSlice(v35.slice.center, v35.slice.scale)
+
+				v44 = v51.center
+				v45 = v51.scale
+			else
+				v44 = v35.slice.center
+				v45 = v35.slice.scale
+			end
+		end
+
+		ScaleType = Enum.ScaleType.Slice
+	end
+
+	v35.aspectRatio = v43
+
+	local v52 = v35.backgroundStyle == nil and "gui-object-defaults" or "gui-object-defaults x-default-transparency"
+	local v53 = useDefaultTags(v35.tag, v52)
+	local v54 = useStyleTags(v53)
+
+	useOnLoaded(v40, v35.onLoaded)
+
+	local v55 = not v36 and "ImageLabel" or "ImageButton"
+	local v56 = withGuiObjectProps(v35, {
+		AutoButtonColor = if v55 ~= "ImageButton" then nil else v35.AutoButtonColor,
+		Image = v40,
+		ImageColor3 = if not v35.imageStyle then nil else indexBindable(v35.imageStyle, "Color3"),
+		ImageTransparency = if not v35.imageStyle then nil else indexBindable(v35.imageStyle, "Transparency"),
+		ImageRectOffset = v41,
+		ImageRectSize = v42,
+		ResampleMode = v35.ResampleMode,
+		ScaleType = ScaleType,
+		SliceCenter = v44,
+		SliceScale = v45,
+		TileSize = v35.TileSize,
+		ref = p2,
+		[React.Tag] = v54
+	})
+	local v57 = v55
+
+	if v36 then
+		v57 = Interactable
+		v56.component = v55
+		v56.onActivated = v35.onActivated
+		v56.onSecondaryActivated = v35.onSecondaryActivated
+		v56.onStateChanged = v35.onStateChanged
+		v56.stateLayer = v35.stateLayer
+		v56.isDisabled = v35.isDisabled
+		v56.cursor = v35.cursor
+	end
+
+	return React.createElement(v57, v56, GuiObjectChildren(v35))
+end
+
+return React.memo(React.forwardRef(Image))

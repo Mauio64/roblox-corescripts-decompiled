@@ -1,9 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = {};
-local _ = require(script.Parent.anyEntryTypes);
-v1.parentEntrySlot = require(l_Parent_0.wry.context).Slot.new();
-local v3 = require(l_Parent_0.wry.context);
-v1.bindContext = v3.bind;
-v1.noContext = v3.noContext;
-v1.setTimeout = v3.setTimeout;
-return v1;
+local ParentParent = script.Parent.Parent
+local t1 = {}
+
+require(script.Parent.anyEntryTypes)
+t1.parentEntrySlot = require(ParentParent.wry.context).Slot.new()
+
+local context = require(ParentParent.wry.context)
+
+t1.bindContext = context.bind
+t1.noContext = context.noContext
+t1.setTimeout = context.setTimeout
+
+return t1

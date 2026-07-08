@@ -1,49 +1,50 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_Cryo_0 = v1.Cryo;
-local l_Parent_0 = script.Parent.Parent;
-local v5 = require(l_Parent_0.Actions.OpenReportDialog);
-local v6 = require(l_Parent_0.Actions.CloseReportDialog);
-local v7 = require(l_Parent_0.Actions.OpenReportSentDialog);
-local v8 = require(l_Parent_0.Actions.CloseReportSentDialog);
-local v9 = require(l_Parent_0.Actions.SetCurrentPage);
-return l_Rodux_0.createReducer({
-    dialogOpen = false, 
-    reportSentOpen = false, 
-    userId = nil, 
-    userName = nil
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Rodux = InGameMenuDependencies.Rodux
+local Cryo = InGameMenuDependencies.Cryo
+local ParentParent = script.Parent.Parent
+local OpenReportDialog = require(ParentParent.Actions.OpenReportDialog)
+local CloseReportDialog = require(ParentParent.Actions.CloseReportDialog)
+local OpenReportSentDialog = require(ParentParent.Actions.OpenReportSentDialog)
+local CloseReportSentDialog = require(ParentParent.Actions.CloseReportSentDialog)
+local SetCurrentPage = require(ParentParent.Actions.SetCurrentPage)
+
+return Rodux.createReducer({
+	dialogOpen = false,
+	reportSentOpen = false,
+	userId = nil,
+	userName = nil
 }, {
-    [v5.name] = function(v10, v11) --[[ Line: 21 ]]
-        return {
-            dialogOpen = true, 
-            reportSentOpen = v10.reportSentOpen, 
-            userId = v11.userId, 
-            userName = v11.userName
-        };
-    end, 
-    [v9.name] = function(v12, _) --[[ Line: 31 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        return l_Cryo_0.Dictionary.join(v12, {
-            dialogOpen = false
-        });
-    end, 
-    [v6.name] = function(v14, _) --[[ Line: 36 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        return l_Cryo_0.Dictionary.join(v14, {
-            dialogOpen = false
-        });
-    end, 
-    [v7.name] = function(v16, _) --[[ Line: 41 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        return l_Cryo_0.Dictionary.join(v16, {
-            reportSentOpen = true
-        });
-    end, 
-    [v8.name] = function(v18, _) --[[ Line: 46 ]]
-        -- upvalues: l_Cryo_0 (copy)
-        return l_Cryo_0.Dictionary.join(v18, {
-            reportSentOpen = false
-        });
-    end
-});
+	[OpenReportDialog.name] = function(p1, p2) -- line: 21
+		return {
+			dialogOpen = true,
+			reportSentOpen = p1.reportSentOpen,
+			userId = p2.userId,
+			userName = p2.userName
+		}
+	end,
+	[SetCurrentPage.name] = function(p3, _) -- line: 31
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			dialogOpen = false
+		})
+	end,
+	[CloseReportDialog.name] = function(p5, _) -- line: 36
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p5, {
+			dialogOpen = false
+		})
+	end,
+	[OpenReportSentDialog.name] = function(p7, _) -- line: 41
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p7, {
+			reportSentOpen = true
+		})
+	end,
+	[CloseReportSentDialog.name] = function(p9, _) -- line: 46
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p9, {
+			reportSentOpen = false
+		})
+	end
+})

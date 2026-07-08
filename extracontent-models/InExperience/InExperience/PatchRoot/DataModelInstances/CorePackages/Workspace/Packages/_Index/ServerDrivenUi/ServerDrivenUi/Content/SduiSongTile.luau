@@ -10,13 +10,13 @@ local executeAction = SduiCoreSystem.executeAction
 local SduiTile = require(ServerDrivenUi.Content.SduiTile)
 local SduiTileFooter = require(ServerDrivenUi.Content.SduiTileFooter)
 
-return React.memo(function(p1) --[[ SduiSongTile ]] -- line: 28
+local function SduiSongTile(p1) -- line: 28
 	-- upvalues: useTokens (copy), useSongAlbumArt (copy), React (copy), SduiActionType (copy), executeAction (copy), SduiTileFooter (copy), SduiTile (copy), Cryo (copy)
-	local v13 = useTokens()
+	local v14 = useTokens()
 	local songId = p1.songId
-	local v15 = useSongAlbumArt(songId)
-	local v16 = if not p1.image or p1.image == "" then v15.value else p1.image
-	local v17 = React.useCallback(function() -- line: 35
+	local v16 = useSongAlbumArt(songId)
+	local v17 = if not p1.image or p1.image == "" then v16.value else p1.image
+	local v18 = React.useCallback(function() -- line: 35
 		-- upvalues: p1 (copy), SduiActionType (copy), songId (copy), executeAction (copy)
 		if p1.onActivated then
 			p1.onActivated()
@@ -38,26 +38,28 @@ return React.memo(function(p1) --[[ SduiSongTile ]] -- line: 28
 		p1.analyticsContext,
 		songId
 	})
-	local v18 = React.useMemo(function() -- line: 49
+	local v19 = React.useMemo(function() -- line: 49
 		-- upvalues: p1 (copy), React (copy), SduiTileFooter (copy)
 		if p1.footerComponent then
 			return p1.footerComponent
 		end
 
 		return React.createElement(SduiTileFooter, {
-			leftText = p1.artistText,
-			testId = "--sdui-song-tile-footer-artist"
+			testId = "--sdui-song-tile-footer-artist",
+			leftText = p1.artistText
 		})
 	end, {
 		p1.footerComponent,
 		p1.artistText,
-		v13
+		v14
 	})
 
 	return React.createElement(SduiTile, Cryo.Dictionary.join(p1, {
-		image = v16,
-		onActivated = v17,
-		footerComponent = v18,
-		testId = "--sdui-song-tile"
+		testId = "--sdui-song-tile",
+		image = v17,
+		onActivated = v18,
+		footerComponent = v19
 	}))
-end)
+end
+
+return React.memo(SduiSongTile)

@@ -1,46 +1,49 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.Signals);
-return function() --[[ Line: 56 ]] --[[ Name: createTopBarStore ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v3, v4 = v2.createSignal({});
-    local v5 = {};
-    local function v8(v6) --[[ Line: 61 ]] --[[ Name: getScreenTopBar ]]
-        -- upvalues: v5 (copy), v2 (ref), v3 (copy)
-        if v5[v6] == nil then
-            v5[v6] = v2.createComputed(function(v7) --[[ Line: 63 ]]
-                -- upvalues: v3 (ref), v6 (copy)
-                return v3(v7)[v6] or {};
-            end);
-        end;
-        return v5[v6];
-    end;
-    local function v13(v9, v10) --[[ Line: 71 ]] --[[ Name: setScreenTopBar ]]
-        -- upvalues: v4 (copy), v1 (ref)
-        v4(function(v11) --[[ Line: 72 ]]
-            -- upvalues: v1 (ref), v9 (copy), v10 (copy)
-            local v12 = v1.Dictionary.union(v11[v9] or {}, v10);
-            return v1.Dictionary.union(v11, {
-                [v9] = v12
-            });
-        end);
-    end;
-    local function v16(v14) --[[ Line: 80 ]] --[[ Name: clearScreenTopBar ]]
-        -- upvalues: v4 (copy), v1 (ref)
-        v4(function(v15) --[[ Line: 81 ]]
-            -- upvalues: v1 (ref), v14 (copy)
-            return v1.Dictionary.union(v15, {
-                [v14] = {}
-            });
-        end);
-    end;
-    return {
-        getScreenTopBar = v8, 
-        setScreenTopBar = v13, 
-        clearScreenTopBar = v16, 
-        resetStore = function() --[[ Line: 88 ]] --[[ Name: resetStore ]]
-            -- upvalues: v4 (copy)
-            v4({});
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+local Signals = require(Parent.Signals)
+
+local function createTopBarStore() -- line: 56
+	-- upvalues: Signals (copy), Cryo (copy)
+	local v5, v6 = Signals.createSignal({})
+	local t1 = {}
+
+	return {
+		getScreenTopBar = function(s1: string) -- line: 61
+			-- upvalues: t1 (copy), Signals (copy), v5 (copy)
+			if t1[s1] == nil then
+				t1[s1] = Signals.createComputed(function(p1) -- line: 63
+					-- upvalues: v5 (copy), s1 (copy)
+					return v5(p1)[s1] or {}
+				end)
+			end
+
+			return t1[s1]
+		end,
+		setScreenTopBar = function(s2: string, t2: {[any]: any}) -- line: 71
+			-- upvalues: v6 (copy), Cryo (copy)
+			v6(function(p2) -- line: 72
+				-- upvalues: Cryo (copy), s2 (copy), t2 (copy)
+				local v14 = Cryo.Dictionary.union(p2[s2] or {}, t2)
+
+				return Cryo.Dictionary.union(p2, {
+					[s2] = v14
+				})
+			end)
+		end,
+		clearScreenTopBar = function(s3: string) -- line: 80
+			-- upvalues: v6 (copy), Cryo (copy)
+			v6(function(p3) -- line: 81
+				-- upvalues: Cryo (copy), s3 (copy)
+				return Cryo.Dictionary.union(p3, {
+					[s3] = {}
+				})
+			end)
+		end,
+		resetStore = function() -- line: 88
+			-- upvalues: v6 (copy)
+			v6({})
+		end
+	}
+end
+
+return createTopBarStore

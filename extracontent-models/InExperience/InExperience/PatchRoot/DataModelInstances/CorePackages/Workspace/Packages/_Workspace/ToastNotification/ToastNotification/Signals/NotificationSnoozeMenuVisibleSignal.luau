@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent;
-return require(l_Parent_0.dependencies).Signal.new();
+local ParentParent = script.Parent.Parent
+
+return require(ParentParent.dependencies).Signal.new()

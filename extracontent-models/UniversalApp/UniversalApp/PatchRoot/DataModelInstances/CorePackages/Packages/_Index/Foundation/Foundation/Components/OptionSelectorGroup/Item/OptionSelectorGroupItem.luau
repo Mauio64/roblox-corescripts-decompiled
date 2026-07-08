@@ -1,197 +1,208 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useMotion_0 = require(l_Parent_0.Motion).useMotion;
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local v5 = require(l_Components_0.Icon);
-local v6 = require(l_Components_0.Text);
-local _ = require(l_Components_0.Types);
-local v8 = require(l_Components_0.View);
-local v9 = require(l_script_FirstAncestor_0.Constants);
-local v10 = require(l_script_FirstAncestor_0.Utility.escapeRichText);
-local v11 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v12 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v13 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v14 = require(script.Parent.useOptionSelectorGroupItemMotionStates);
-local v15 = require(script.Parent.useOptionSelectorGroupItemVariants);
-local v16 = require(l_script_FirstAncestor_0.Enums.FillBehavior);
-local v17 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v18 = require(l_script_FirstAncestor_0.Enums.Orientation);
-local v19 = require(script.Parent.Parent.useOptionSelectorGroup);
-local function _(v20, v21) --[[ Line: 35 ]] --[[ Name: getTransparency ]]
-    return v21:map(function(v22) --[[ Line: 39 ]]
-        -- upvalues: v20 (copy)
-        if v20 ~= nil then
-            return v20 + (1 - v20) * v22;
-        else
-            return v22;
-        end;
-    end);
-end;
-local function v29(v24, v25, v26) --[[ Line: 47 ]] --[[ Name: getTextStyle ]]
-    -- upvalues: v2 (copy)
-    return v2.joinBindings({
-        v24, 
-        v25
-    }):map(function(v27) --[[ Line: 52 ]]
-        -- upvalues: v26 (copy)
-        local v28 = v27[2];
-        return {
-            Color3 = v26, 
-            Transparency = v28
-        };
-    end);
-end;
-local v30 = {
-    isDisabled = false, 
-    size = v17.Medium, 
-    width = UDim.new(0, 0)
-};
-return v2.memo(v2.forwardRef(function(v31, v32) --[[ Line: 89 ]] --[[ Name: OptionSelectorGroupItem ]]
-    -- upvalues: v13 (copy), v30 (copy), v19 (copy), v18 (copy), v16 (copy), v11 (copy), v15 (copy), v14 (copy), v9 (copy), l_useMotion_0 (copy), v2 (copy), v6 (copy), v10 (copy), v29 (copy), v8 (copy), v12 (copy), v5 (copy)
-    local v33 = v13(v31, v30);
-    local v34 = v19();
-    local v35 = v34.value == v33.value;
-    local v36 = v33.label or v33.value;
-    local v37 = if v34.orientation == v18.Vertical then v18.Horizontal else v18.Vertical;
-    local v38 = if v37 == v18.Horizontal then v16.Fit else v33.fillBehavior or v16.Fill;
-    local v39 = UDim2.fromScale(1, 0);
-    local v40 = v11();
-    local v41 = v15(v40, v33.size);
-    local l_Color3_0 = v41.content.Color3;
-    local v43 = if v35 then v40.Color.System.Contrast else v40.Color.Stroke.Emphasis;
-    local v44 = v14(0, v9.DISABLED_TRANSPARENCY);
-    local v45, v46 = l_useMotion_0(v44.Default);
-    local v47, _ = l_useMotion_0(v44.Default);
-    v2.useEffect(function() --[[ Line: 119 ]]
-        -- upvalues: v33 (copy), v46 (copy), v44 (copy)
-        if v33.isDisabled then
-            v46(v44.Disabled);
-            return;
-        else
-            v46(v44.Default);
-            return;
-        end;
-    end, {
-        v33.isDisabled
-    });
-    local v49 = v2.useCallback(function() --[[ Line: 128 ]]
-        -- upvalues: v34 (copy), v33 (copy)
-        v34.onValueChanged(if v34.value == v33.value then nil else v33.value);
-    end, {
-        v33.isDisabled, 
-        v33.value, 
-        v34.onValueChanged, 
-        v34.value
-    });
-    v33.testId = ("%*--item-%*"):format(v34.testId, v33.value);
-    local v50 = v2.useMemo(function() --[[ Line: 138 ]]
-        -- upvalues: v41 (copy), v40 (copy)
-        return {
-            radius = UDim.new(0, v41.container.radius), 
-            offset = v40.Size.Size_200, 
-            borderWidth = v40.Stroke.Thicker
-        };
-    end, {
-        v40, 
-        v41.container.radius
-    });
-    local v51 = v2.createElement(v6, {
-        Text = v10(v36), 
-        TextWrapped = true, 
-        TextXAlignment = Enum.TextXAlignment.Left, 
-        RichText = true, 
-        tag = v41.label.tag, 
-        textStyle = v29(v47.textTransparency, v45.transparency, l_Color3_0), 
-        LayoutOrder = 2
-    });
-    local l_createElement_0 = v2.createElement;
-    local l_v8_0 = v8;
-    local l_v12_0 = v12;
-    local l_v33_0 = v33;
-    local v56 = {};
-    local v57 = {
-        Color = v43.Color3
-    };
-    local l_Transparency_0 = v43.Transparency;
-    v57.Transparency = v45.transparency:map(function(v59) --[[ Line: 39 ]]
-        -- upvalues: l_Transparency_0 (copy)
-        if l_Transparency_0 ~= nil then
-            return l_Transparency_0 + (1 - l_Transparency_0) * v59;
-        else
-            return v59;
-        end;
-    end);
-    v56.stroke = v57;
-    v56.Size = v39;
-    v56.selection = {
-        Selectable = not v33.isDisabled and v34.Selectable
-    };
-    v56.cursor = v50;
-    v56.onActivated = v49;
-    v56.isDisabled = v33.isDisabled;
-    v56.tag = {
-        ["auto-xy"] = v38 ~= v16.Fill, 
-        ["fill auto-y"] = v38 == v16.Fill, 
-        [v41.container.tag] = true
-    };
-    v56.ref = v32;
-    return l_createElement_0(l_v8_0, l_v12_0(l_v33_0, v56), {
-        ItemInner = v2.createElement(v8, {
-            tag = v41.itemInner.tag, 
-            Size = v39
-        }, {
-            IconRow = v2.createElement(v8, {
-                tag = "size-full-0 auto-y row gap-small align-y-center", 
-                LayoutOrder = 1
-            }, {
-                Icon = if v33.icon then v2.createElement(v5, {
-                    name = v33.icon, 
-                    size = v41.icon.size, 
-                    style = v45.transparency:map(function(v60) --[[ Line: 190 ]]
-                        -- upvalues: l_Color3_0 (copy)
-                        return {
-                            Color3 = l_Color3_0, 
-                            Transparency = v60
-                        };
-                    end), 
-                    LayoutOrder = 0
-                }) else nil, 
-                Label = if v37 == v18.Horizontal then v51 else v2.createElement(v8, {
-                    tag = "grow"
-                }), 
-                Checkmark = v2.createElement(v5, {
-                    name = "check-large", 
-                    size = v41.icon.size, 
-                    style = v45.transparency:map(function(v61) --[[ Line: 205 ]]
-                        -- upvalues: l_Color3_0 (copy), v35 (copy)
-                        return {
-                            Color3 = l_Color3_0, 
-                            Transparency = if v35 then v61 else 1
-                        };
-                    end), 
-                    LayoutOrder = 3
-                })
-            }), 
-            Label = if v37 == v18.Vertical then v51 else nil, 
-            Metadata = if v33.metadata then v2.createElement(v6, {
-                Text = v10(v33.metadata), 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                RichText = true, 
-                tag = v41.metadata.tag, 
-                textStyle = v29(v47.textTransparency, v45.transparency, l_Color3_0), 
-                LayoutOrder = 3
-            }) else nil, 
-            Description = if v33.description then v2.createElement(v6, {
-                Text = v10(v33.description), 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                RichText = true, 
-                tag = v41.description.tag, 
-                textStyle = v29(v47.textTransparency, v45.transparency, l_Color3_0), 
-                LayoutOrder = 4
-            }) else nil
-        })
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local useMotion = require(FoundationParent.Motion).useMotion
+local Components = Foundation.Components
+local Icon = require(Components.Icon)
+local Text = require(Components.Text)
+
+require(Components.Types)
+
+local View = require(Components.View)
+local Constants = require(Foundation.Constants)
+local escapeRichText = require(Foundation.Utility.escapeRichText)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useOptionSelectorGroupItemMotionStates = require(script.Parent.useOptionSelectorGroupItemMotionStates)
+local useOptionSelectorGroupItemVariants = require(script.Parent.useOptionSelectorGroupItemVariants)
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+local InputSize = require(Foundation.Enums.InputSize)
+local Orientation = require(Foundation.Enums.Orientation)
+local useOptionSelectorGroup = require(script.Parent.Parent.useOptionSelectorGroup)
+
+local function getTransparency(n1: number?, p1) -- line: 35
+	return p1:map(function(p2) -- line: 39
+		-- upvalues: n1 (copy)
+		if n1 ~= nil then
+			return n1 + (1 - n1) * p2
+		end
+
+		return p2
+	end)
+end
+local function getTextStyle(p3, p4, color3: Color3) -- line: 47
+	-- upvalues: React (copy)
+	return React.joinBindings({
+		p3,
+		p4
+	}):map(function(p5) -- line: 52
+		-- upvalues: color3 (copy)
+		local v58 = p5[2]
+
+		return {
+			Color3 = color3,
+			Transparency = v58
+		}
+	end)
+end
+
+local t1 = {
+	isDisabled = false,
+	size = InputSize.Medium,
+	width = UDim.new(0, 0)
+}
+
+local function OptionSelectorGroupItem(p6, p7) -- line: 89
+	-- upvalues: withDefaults (copy), t1 (copy), useOptionSelectorGroup (copy), Orientation (copy), FillBehavior (copy), useTokens (copy), useOptionSelectorGroupItemVariants (copy), useOptionSelectorGroupItemMotionStates (copy), Constants (copy), useMotion (copy), React (copy), Text (copy), escapeRichText (copy), getTextStyle (copy), View (copy), withCommonProps (copy), Icon (copy)
+	local v31 = withDefaults(p6, t1)
+	local v32 = useOptionSelectorGroup()
+	local v33 = v32.value == v31.value
+	local v34 = v31.label or v31.value
+	local v35 = if v32.orientation ~= Orientation.Vertical then Orientation.Vertical else Orientation.Horizontal
+	local v36 = if v35 ~= Orientation.Horizontal then v31.fillBehavior or FillBehavior.Fill else FillBehavior.Fit
+	local uDim2 = UDim2.fromScale(1, 0)
+	local v38 = useTokens()
+	local v39 = useOptionSelectorGroupItemVariants(v38, v31.size)
+	local contentColor3 = v39.content.Color3
+	local v41 = if not v33 then v38.Color.Stroke.Emphasis else v38.Color.System.Contrast
+	local v42 = useOptionSelectorGroupItemMotionStates(0, Constants.DISABLED_TRANSPARENCY)
+	local v43, v44 = useMotion(v42.Default)
+	local v45, _ = useMotion(v42.Default)
+
+	React.useEffect(function() -- line: 119
+		-- upvalues: v31 (copy), v44 (copy), v42 (copy)
+		if v31.isDisabled then
+			v44(v42.Disabled)
+
+			return
+		end
+
+		v44(v42.Default)
+	end, { v31.isDisabled })
+
+	local v47 = React.useCallback(function() -- line: 128
+		-- upvalues: v32 (copy), v31 (copy)
+		v32.onValueChanged(if v32.value ~= v31.value then v31.value else nil)
+	end, {
+		v31.isDisabled,
+		v31.value,
+		v32.onValueChanged,
+		v32.value
+	})
+
+	v31.testId = `{ v32.testId }--item-{ v31.value }`
+
+	local v48 = React.useMemo(function() -- line: 138
+		-- upvalues: v39 (copy), v38 (copy)
+		return {
+			radius = UDim.new(0, v39.container.radius),
+			offset = v38.Size.Size_200,
+			borderWidth = v38.Stroke.Thicker
+		}
+	end, {
+		v38,
+		v39.container.radius
+	})
+	local v49 = React.createElement(Text, {
+		TextWrapped = true,
+		RichText = true,
+		LayoutOrder = 2,
+		Text = escapeRichText(v34),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		tag = v39.label.tag,
+		textStyle = getTextStyle(v45.textTransparency, v43.transparency, contentColor3)
+	})
+	local createElement = React.createElement
+	local v51 = View
+	local v52 = withCommonProps
+	local t2 = {}
+	local t3 = {
+		Color = v41.Color3
+	}
+	local Transparency = v41.Transparency
+
+	t3.Transparency = v43.transparency:map(function(p8) -- line: 39
+		-- upvalues: Transparency (copy)
+		if Transparency ~= nil then
+			return Transparency + (1 - Transparency) * p8
+		end
+
+		return p8
+	end)
+	t2.stroke = t3
+	t2.Size = uDim2
+	t2.selection = {
+		Selectable = not v31.isDisabled and v32.Selectable
+	}
+	t2.cursor = v48
+	t2.onActivated = v47
+	t2.isDisabled = v31.isDisabled
+	t2.tag = {
+		["auto-xy"] = v36 ~= FillBehavior.Fill,
+		["fill auto-y"] = v36 == FillBehavior.Fill,
+		[v39.container.tag] = true
+	}
+	t2.ref = p7
+
+	return createElement(v51, v52(v31, t2), {
+		ItemInner = React.createElement(View, {
+			tag = v39.itemInner.tag,
+			Size = uDim2
+		}, {
+			IconRow = React.createElement(View, {
+				tag = "row align-y-center gap-small size-full-0 auto-y",
+				LayoutOrder = 1
+			}, {
+				Icon = if not v31.icon then nil else React.createElement(Icon, {
+					LayoutOrder = 0,
+					name = v31.icon,
+					size = v39.icon.size,
+					style = v43.transparency:map(function(p9) -- line: 190
+						-- upvalues: contentColor3 (copy)
+						return {
+							Color3 = contentColor3,
+							Transparency = p9
+						}
+					end)
+				}),
+				Label = if v35 ~= Orientation.Horizontal then React.createElement(View, {
+					tag = "grow"
+				}) else v49,
+				Checkmark = React.createElement(Icon, {
+					name = "check-large",
+					LayoutOrder = 3,
+					size = v39.icon.size,
+					style = v43.transparency:map(function(p10) -- line: 205
+						-- upvalues: contentColor3 (copy), v33 (copy)
+						return {
+							Color3 = contentColor3,
+							Transparency = not v33 and 1 or p10
+						}
+					end)
+				})
+			}),
+			Label = if v35 ~= Orientation.Vertical then nil else v49,
+			Metadata = if not v31.metadata then nil else React.createElement(Text, {
+				RichText = true,
+				LayoutOrder = 3,
+				Text = escapeRichText(v31.metadata),
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				tag = v39.metadata.tag,
+				textStyle = getTextStyle(v45.textTransparency, v43.transparency, contentColor3)
+			}),
+			Description = if not v31.description then nil else React.createElement(Text, {
+				TextWrapped = true,
+				RichText = true,
+				LayoutOrder = 4,
+				Text = escapeRichText(v31.description),
+				TextXAlignment = Enum.TextXAlignment.Left,
+				tag = v39.description.tag,
+				textStyle = getTextStyle(v45.textTransparency, v43.transparency, contentColor3)
+			})
+		})
+	})
+end
+
+return React.memo(React.forwardRef(OptionSelectorGroupItem))

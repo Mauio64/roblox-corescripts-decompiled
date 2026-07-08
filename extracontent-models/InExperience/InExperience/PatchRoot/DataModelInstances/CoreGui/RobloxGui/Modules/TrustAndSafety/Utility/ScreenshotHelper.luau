@@ -1,18 +1,23 @@
-local v0 = nil;
+local u1 = nil
+
 if game:GetEngineFeature("ReportAnythingScreenshot") then
-    game:GetService("SafetyService").ScreenshotContentReady:Connect(function(_, v2) --[[ Line: 7 ]]
-        -- upvalues: v0 (ref)
-        v0 = v2;
-    end);
-end;
-local v3 = {};
-v3.__index = v3;
-v3.GetScreenshotContentId = function(_) --[[ Line: 17 ]] --[[ Name: GetScreenshotContentId ]]
-    -- upvalues: v0 (ref)
-    return v0;
-end;
-v3.SetScreenshotContentId = function(_, v6) --[[ Line: 22 ]] --[[ Name: SetScreenshotContentId ]]
-    -- upvalues: v0 (ref)
-    v0 = v6;
-end;
-return v3;
+	game:GetService("SafetyService").ScreenshotContentReady:Connect(function(_, p2) -- line: 7
+		-- upvalues: u1 (ref)
+		u1 = p2
+	end)
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.GetScreenshotContentId(_) -- line: 17
+	-- upvalues: u1 (ref)
+	return u1
+end
+function t1.SetScreenshotContentId(_, p5) -- line: 22
+	-- upvalues: u1 (ref)
+	u1 = p5
+end
+
+return t1

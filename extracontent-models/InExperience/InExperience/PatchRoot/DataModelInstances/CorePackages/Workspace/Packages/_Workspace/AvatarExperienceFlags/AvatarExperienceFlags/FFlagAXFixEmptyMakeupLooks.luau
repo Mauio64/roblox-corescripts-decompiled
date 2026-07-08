@@ -1,2 +1,3 @@
-local v0 = require(script.Parent.FFlagAXCustomizeMakeupSupport);
-return game:DefineFastFlag("AXFixEmptyMakeupLooks", false) and v0;
+local FFlagAXCustomizeMakeupSupport = require(script.Parent.FFlagAXCustomizeMakeupSupport)
+
+return game:DefineFastFlag("AXFixEmptyMakeupLooks", false) and FFlagAXCustomizeMakeupSupport

@@ -1,1 +1,1 @@
-return require(script.ContextualInformationContainer);
+return require(script.ContextualInformationContainer)

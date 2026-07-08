@@ -1,176 +1,219 @@
-local l_Chat_0 = game:GetService("Chat");
-local l_ServerScriptService_0 = game:GetService("ServerScriptService");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v3 = require(l_RobloxGui_0.Modules.Server.ServerUtil);
-local v4 = require(l_RobloxGui_0.Modules.Server.SendChatAnalytics);
-local function v9(v5, v6) --[[ Line: 11 ]] --[[ Name: LoadScript ]]
-    -- upvalues: v3 (copy)
-    local v7 = script.Parent:WaitForChild(v5);
-    local l_Script_0 = Instance.new("Script");
-    l_Script_0.Name = v5;
-    if v3.getFFlagServerCoreScriptSourceCode() then
-        l_Script_0.Source = v3.getSourceForServerScript(v7);
-    else
-        l_Script_0.Source = v7.Source;
-    end;
-    l_Script_0.Parent = v6;
-    return l_Script_0;
-end;
-local function _(v10, v11, v12) --[[ Line: 24 ]] --[[ Name: LoadModule ]]
-    -- upvalues: v3 (copy)
-    local v13 = v10:WaitForChild(v11);
-    local l_ModuleScript_0 = Instance.new("ModuleScript");
-    l_ModuleScript_0.Name = v11;
-    if v3.getFFlagServerCoreScriptSourceCode() then
-        l_ModuleScript_0.Source = v3.getSourceForServerScript(v13);
-    else
-        l_ModuleScript_0.Source = v13.Source;
-    end;
-    l_ModuleScript_0.Parent = v12;
-    return l_ModuleScript_0;
-end;
-local function _(v16, v17, v18) --[[ Line: 37 ]] --[[ Name: GetBoolValue ]]
-    local l_v16_FirstChild_0 = v16:FindFirstChild(v17);
-    if l_v16_FirstChild_0 and l_v16_FirstChild_0:IsA("BoolValue") then
-        return l_v16_FirstChild_0.Value;
-    else
-        return v18;
-    end;
-end;
-local function v23(v21) --[[ Line: 47 ]] --[[ Name: makeDefaultLocalizationTable ]]
-    local l_LocalizationTable_0 = Instance.new("LocalizationTable");
-    l_LocalizationTable_0.Name = "ChatLocalization";
-    l_LocalizationTable_0.Archivable = false;
-    l_LocalizationTable_0.SourceLocaleId = "en-us";
-    l_LocalizationTable_0:SetEntries(require(script.Parent:WaitForChild("DefaultChatLocalization")));
-    l_LocalizationTable_0:SetIsExemptFromUGCAnalytics(true);
-    l_LocalizationTable_0.Parent = v21;
-end;
-return function() --[[ Line: 57 ]] --[[ Name: Install ]]
-    -- upvalues: l_Chat_0 (copy), v23 (copy), v9 (copy), v3 (copy), l_ServerScriptService_0 (copy), v4 (copy)
-    local v24 = {};
-    local l_ChatLocalization_0 = l_Chat_0:FindFirstChild("ChatLocalization");
-    if l_ChatLocalization_0 then
-        if l_ChatLocalization_0:IsA("LocalizationTable") then
-            l_ChatLocalization_0:SetIsExemptFromUGCAnalytics(true);
-        end;
-    else
-        v23(l_Chat_0);
-    end;
-    local v26 = true;
-    local l_ChatServiceRunner_0 = l_Chat_0:FindFirstChild("ChatServiceRunner");
-    if not l_ChatServiceRunner_0 then
-        v26 = false;
-        l_ChatServiceRunner_0 = v9("ChatServiceRunner", l_Chat_0);
-        local l_Parent_0 = script.Parent;
-        local l_l_ChatServiceRunner_0_0 = l_ChatServiceRunner_0;
-        local l_ChatService_0 = l_Parent_0:WaitForChild("ChatService");
-        local l_ModuleScript_1 = Instance.new("ModuleScript");
-        l_ModuleScript_1.Name = "ChatService";
-        if v3.getFFlagServerCoreScriptSourceCode() then
-            l_ModuleScript_1.Source = v3.getSourceForServerScript(l_ChatService_0);
-        else
-            l_ModuleScript_1.Source = l_ChatService_0.Source;
-        end;
-        l_ModuleScript_1.Parent = l_l_ChatServiceRunner_0_0;
-        l_Parent_0 = script.Parent;
-        l_l_ChatServiceRunner_0_0 = l_ChatServiceRunner_0;
-        l_ChatService_0 = l_Parent_0:WaitForChild("ChatChannel");
-        l_ModuleScript_1 = Instance.new("ModuleScript");
-        l_ModuleScript_1.Name = "ChatChannel";
-        if v3.getFFlagServerCoreScriptSourceCode() then
-            l_ModuleScript_1.Source = v3.getSourceForServerScript(l_ChatService_0);
-        else
-            l_ModuleScript_1.Source = l_ChatService_0.Source;
-        end;
-        l_ModuleScript_1.Parent = l_l_ChatServiceRunner_0_0;
-        l_Parent_0 = script.Parent;
-        l_l_ChatServiceRunner_0_0 = l_ChatServiceRunner_0;
-        l_ChatService_0 = l_Parent_0:WaitForChild("Speaker");
-        l_ModuleScript_1 = Instance.new("ModuleScript");
-        l_ModuleScript_1.Name = "Speaker";
-        if v3.getFFlagServerCoreScriptSourceCode() then
-            l_ModuleScript_1.Source = v3.getSourceForServerScript(l_ChatService_0);
-        else
-            l_ModuleScript_1.Source = l_ChatService_0.Source;
-        end;
-        l_ModuleScript_1.Parent = l_l_ChatServiceRunner_0_0;
-        l_Parent_0 = script.Parent;
-        l_l_ChatServiceRunner_0_0 = l_ChatServiceRunner_0;
-        l_ChatService_0 = l_Parent_0:WaitForChild("Util");
-        l_ModuleScript_1 = Instance.new("ModuleScript");
-        l_ModuleScript_1.Name = "Util";
-        if v3.getFFlagServerCoreScriptSourceCode() then
-            l_ModuleScript_1.Source = v3.getSourceForServerScript(l_ChatService_0);
-        else
-            l_ModuleScript_1.Source = l_ChatService_0.Source;
-        end;
-        l_ModuleScript_1.Parent = l_l_ChatServiceRunner_0_0;
-    else
-        v24.ChatServiceRunner = "True";
-    end;
-    local l_ChatModules_0 = l_Chat_0:FindFirstChild("ChatModules");
-    if not l_ChatModules_0 then
-        l_ChatModules_0 = Instance.new("Folder");
-        l_ChatModules_0.Name = "ChatModules";
-        l_ChatModules_0.Archivable = false;
-        local l_BoolValue_0 = Instance.new("BoolValue");
-        l_BoolValue_0.Name = "InsertDefaultModules";
-        l_BoolValue_0.Value = true;
-        l_BoolValue_0.Parent = l_ChatModules_0;
-        l_ChatModules_0.Parent = l_Chat_0;
-    end;
-    assert(l_ChatModules_0, "");
-    local l_InsertDefaultModules_0 = l_ChatModules_0:FindFirstChild("InsertDefaultModules");
-    if if l_InsertDefaultModules_0 and l_InsertDefaultModules_0:IsA("BoolValue") then l_InsertDefaultModules_0.Value else false then
-        if not l_ChatModules_0:FindFirstChild("Utility") then
-            local l_Folder_0 = Instance.new("Folder");
-            l_Folder_0.Name = "Utility";
-            l_Folder_0.Parent = l_ChatModules_0;
-        end;
-        local l_Children_0 = script.Parent.DefaultChatModules:GetChildren();
-        for v37 = 1, #l_Children_0 do
-            if l_Children_0.className ~= "Folder" and not l_ChatModules_0:FindFirstChild(l_Children_0[v37].Name) then
-                local l_DefaultChatModules_0 = script.Parent.DefaultChatModules;
-                local l_Name_0 = l_Children_0[v37].Name;
-                local l_l_ChatModules_0_0 = l_ChatModules_0;
-                local v41 = l_DefaultChatModules_0:WaitForChild(l_Name_0);
-                local l_ModuleScript_2 = Instance.new("ModuleScript");
-                l_ModuleScript_2.Name = l_Name_0;
-                if v3.getFFlagServerCoreScriptSourceCode() then
-                    l_ModuleScript_2.Source = v3.getSourceForServerScript(v41);
-                else
-                    l_ModuleScript_2.Source = v41.Source;
-                end;
-                l_ModuleScript_2.Parent = l_l_ChatModules_0_0;
-            elseif l_Children_0.className ~= "Folder" then
-                v24[l_Children_0[v37].Name] = "True";
-            end;
-        end;
-        for _, v44 in pairs(script.Parent.DefaultChatModules.Utility:GetChildren()) do
-            if not l_ChatModules_0.Utility:FindFirstChild(v44.Name) then
-                local l_Utility_0 = script.Parent.DefaultChatModules.Utility;
-                local l_Name_1 = v44.Name;
-                local l_Utility_1 = l_ChatModules_0.Utility;
-                local v48 = l_Utility_0:WaitForChild(l_Name_1);
-                local l_ModuleScript_3 = Instance.new("ModuleScript");
-                l_ModuleScript_3.Name = l_Name_1;
-                if v3.getFFlagServerCoreScriptSourceCode() then
-                    l_ModuleScript_3.Source = v3.getSourceForServerScript(v48);
-                else
-                    l_ModuleScript_3.Source = v48.Source;
-                end;
-                l_ModuleScript_3.Parent = l_Utility_1;
-            else
-                v24[v44.Name] = "True";
-            end;
-        end;
-    end;
-    if not l_ServerScriptService_0:FindFirstChild("ChatServiceRunner") then
-        local v50 = l_ChatServiceRunner_0:Clone();
-        v50.Archivable = false;
-        v50.Parent = l_ServerScriptService_0;
-    end;
-    l_ChatServiceRunner_0.Archivable = v26;
-    v4("LoadServerDefaultChatForkedModules", v24);
-end;
+local Chat = game:GetService("Chat")
+local ServerScriptService = game:GetService("ServerScriptService")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local ServerUtil = require(RobloxGui.Modules.Server.ServerUtil)
+local SendChatAnalytics = require(RobloxGui.Modules.Server.SendChatAnalytics)
+
+local function LoadScript(p1, p2) -- line: 11
+	-- upvalues: ServerUtil (copy)
+	local p1_2 = script.Parent:WaitForChild(p1)
+	local Script = Instance.new("Script")
+
+	Script.Name = p1
+
+	if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+		Script.Source = ServerUtil.getSourceForServerScript(p1_2)
+	else
+		Script.Source = p1_2.Source
+	end
+
+	Script.Parent = p2
+
+	return Script
+end
+local function LoadModule(p3, p4, p5) -- line: 24
+	-- upvalues: ServerUtil (copy)
+	local p4_2 = p3:WaitForChild(p4)
+	local ModuleScript = Instance.new("ModuleScript")
+
+	ModuleScript.Name = p4
+
+	if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+		ModuleScript.Source = ServerUtil.getSourceForServerScript(p4_2)
+	else
+		ModuleScript.Source = p4_2.Source
+	end
+
+	ModuleScript.Parent = p5
+
+	return ModuleScript
+end
+local function GetBoolValue(p6, p7, p8) -- line: 37
+	local p7_2 = p6:FindFirstChild(p7)
+
+	if p7_2 and p7_2:IsA("BoolValue") then
+		return p7_2.Value
+	end
+
+	return p8
+end
+local function makeDefaultLocalizationTable(p9) -- line: 47
+	local LocalizationTable = Instance.new("LocalizationTable")
+
+	LocalizationTable.Name = "ChatLocalization"
+	LocalizationTable.Archivable = false
+	LocalizationTable.SourceLocaleId = "en-us"
+	LocalizationTable:SetEntries(require(script.Parent:WaitForChild("DefaultChatLocalization")))
+	LocalizationTable:SetIsExemptFromUGCAnalytics(true)
+	LocalizationTable.Parent = p9
+end
+local function Install() -- line: 57
+	-- upvalues: Chat (copy), makeDefaultLocalizationTable (copy), LoadScript (copy), ServerUtil (copy), ServerScriptService (copy), SendChatAnalytics (copy)
+	local t1 = {}
+	local ChatLocalization = Chat:FindFirstChild("ChatLocalization")
+
+	if ChatLocalization then
+		if ChatLocalization:IsA("LocalizationTable") then
+			ChatLocalization:SetIsExemptFromUGCAnalytics(true)
+		end
+	else
+		makeDefaultLocalizationTable(Chat)
+	end
+
+	local v28 = true
+	local ChatServiceRunner = Chat:FindFirstChild("ChatServiceRunner")
+
+	if not ChatServiceRunner then
+		v28 = false
+		ChatServiceRunner = LoadScript("ChatServiceRunner", Chat)
+
+		local ChatService = script.Parent:WaitForChild("ChatService")
+		local ModuleScript = Instance.new("ModuleScript")
+
+		ModuleScript.Name = "ChatService"
+
+		if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+			ModuleScript.Source = ServerUtil.getSourceForServerScript(ChatService)
+		else
+			ModuleScript.Source = ChatService.Source
+		end
+
+		ModuleScript.Parent = ChatServiceRunner
+
+		local ChatChannel = script.Parent:WaitForChild("ChatChannel")
+		local ModuleScript2 = Instance.new("ModuleScript")
+
+		ModuleScript2.Name = "ChatChannel"
+
+		if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+			ModuleScript2.Source = ServerUtil.getSourceForServerScript(ChatChannel)
+		else
+			ModuleScript2.Source = ChatChannel.Source
+		end
+
+		ModuleScript2.Parent = ChatServiceRunner
+
+		local Speaker = script.Parent:WaitForChild("Speaker")
+		local ModuleScript3 = Instance.new("ModuleScript")
+
+		ModuleScript3.Name = "Speaker"
+
+		if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+			ModuleScript3.Source = ServerUtil.getSourceForServerScript(Speaker)
+		else
+			ModuleScript3.Source = Speaker.Source
+		end
+
+		ModuleScript3.Parent = ChatServiceRunner
+
+		local Util = script.Parent:WaitForChild("Util")
+		local ModuleScript4 = Instance.new("ModuleScript")
+
+		ModuleScript4.Name = "Util"
+
+		if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+			ModuleScript4.Source = ServerUtil.getSourceForServerScript(Util)
+		else
+			ModuleScript4.Source = Util.Source
+		end
+
+		ModuleScript4.Parent = ChatServiceRunner
+	else
+		t1.ChatServiceRunner = "True"
+	end
+
+	local ChatModules = Chat:FindFirstChild("ChatModules")
+
+	if not ChatModules then
+		ChatModules = Instance.new("Folder")
+		ChatModules.Name = "ChatModules"
+		ChatModules.Archivable = false
+
+		local BoolValue = Instance.new("BoolValue")
+
+		BoolValue.Name = "InsertDefaultModules"
+		BoolValue.Value = true
+		BoolValue.Parent = ChatModules
+		ChatModules.Parent = Chat
+	end
+
+	assert(ChatModules, "")
+
+	local InsertDefaultModules = ChatModules:FindFirstChild("InsertDefaultModules")
+
+	if not not InsertDefaultModules and (not not InsertDefaultModules:IsA("BoolValue") and InsertDefaultModules.Value) then
+		if not ChatModules:FindFirstChild("Utility") then
+			local Folder = Instance.new("Folder")
+
+			Folder.Name = "Utility"
+			Folder.Parent = ChatModules
+		end
+
+		local children = script.Parent.DefaultChatModules:GetChildren()
+
+		for i = 1, #children do
+			if children.className ~= "Folder" and not ChatModules:FindFirstChild(children[i].Name) then
+				local DefaultChatModules = script.Parent.DefaultChatModules
+				local Name = children[i].Name
+				local Name2 = DefaultChatModules:WaitForChild(Name)
+				local ModuleScript = Instance.new("ModuleScript")
+
+				ModuleScript.Name = Name
+
+				if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+					ModuleScript.Source = ServerUtil.getSourceForServerScript(Name2)
+				else
+					ModuleScript.Source = Name2.Source
+				end
+
+				ModuleScript.Parent = ChatModules
+			elseif children.className ~= "Folder" then
+				t1[children[i].Name] = "True"
+			end
+		end
+
+		for _, child in pairs(script.Parent.DefaultChatModules.Utility:GetChildren()) do
+			if not ChatModules.Utility:FindFirstChild(child.Name) then
+				local Utility = script.Parent.DefaultChatModules.Utility
+				local childName = child.Name
+				local Utility2 = ChatModules.Utility
+				local childName2 = Utility:WaitForChild(childName)
+				local ModuleScript = Instance.new("ModuleScript")
+
+				ModuleScript.Name = childName
+
+				if ServerUtil.getFFlagServerCoreScriptSourceCode() then
+					ModuleScript.Source = ServerUtil.getSourceForServerScript(childName2)
+				else
+					ModuleScript.Source = childName2.Source
+				end
+
+				ModuleScript.Parent = Utility2
+			else
+				t1[child.Name] = "True"
+			end
+		end
+	end
+
+	if not ServerScriptService:FindFirstChild("ChatServiceRunner") then
+		local clone = ChatServiceRunner:Clone()
+
+		clone.Archivable = false
+		clone.Parent = ServerScriptService
+	end
+
+	ChatServiceRunner.Archivable = v28
+	SendChatAnalytics("LoadServerDefaultChatForkedModules", t1)
+end
+
+return Install

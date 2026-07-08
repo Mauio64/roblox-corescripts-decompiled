@@ -1,248 +1,283 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = require(l_script_FirstAncestor_0.Common.Constants);
-local v4 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local v5 = require(l_script_FirstAncestor_0.Enums.SquadGameJoinOrigin);
-local v6 = require(l_script_FirstAncestor_0.Enums.SquadToastActionsAndStates);
-local v7 = require(l_script_FirstAncestor_0.Components.SquadExternalContractProvider.SquadExternalContractContext);
-local v8 = require(l_script_FirstAncestor_0.Thunks.actOnPartyNudge);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v10 = require(l_Parent_0.ExperienceService);
-local v11 = require(l_Parent_0.React);
-local v12 = require(l_Parent_0.ToastNotification);
-local v13 = require(l_Parent_0.ToastNotificationsProtocol);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_ExperienceService_0 = v10.ExperienceService;
-local l_GameParams_0 = v10.GameParams;
-local l_LifecycleEvents_0 = v12.LifecycleEvents;
-local l_NotificationTypeEnum_0 = v12.ToastNotificationTypeModule.NotificationTypeEnum;
-local l_default_0 = v13.ToastNotificationProtocol.default;
-return function(v21) --[[ Line: 37 ]]
-    -- upvalues: l_useDispatch_0 (copy), v11 (copy), v7 (copy), l_default_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_HttpService_0 (copy), v4 (copy), v6 (copy), v3 (copy), l_NotificationTypeEnum_0 (copy), v8 (copy), l_LifecycleEvents_0 (copy), l_GameParams_0 (copy), l_ExperienceService_0 (copy), v5 (copy)
-    local v22 = l_useDispatch_0();
-    local v23 = v11.useContext(v7);
-    local v24 = v23.useIsChatEnabled();
-    local v25 = v23.useIsLoadingChatSettings();
-    local v26 = v11.useRef({});
-    local v28 = v11.useCallback(function(v27) --[[ Line: 47 ]]
-        -- upvalues: v25 (copy), v24 (copy), l_default_0 (ref)
-        if not v25 and not v24 then
-            l_default_0:dismissNotification(v27);
-            return true;
-        else
-            return false;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v25, 
-        v24
-    } else l_dependencyArray_0(v25, v24));
-    local v32 = v11.useCallback(function(v29, v30, v31) --[[ Line: 60 ]]
-        -- upvalues: v26 (copy), l_HttpService_0 (ref)
-        v26.current[v29] = {
-            toastType = v30.notificationType, 
-            partyAttemptId = l_HttpService_0:GenerateGUID(false), 
-            shouldActWhenDismiss = true, 
-            nudgeId = v31.nudgeId, 
-            nudgeType = v31.nudgeType
-        };
-    end, {});
-    local v35 = v11.useCallback(function(v33, v34) --[[ Line: 73 ]]
-        -- upvalues: v23 (copy), v4 (ref), v26 (copy)
-        v23.fireSquadAnalytics(v4.SquadToastActions, {
-            toastAction = v34, 
-            toastType = if v26.current[v33] then v26.current[v33].toastType else nil, 
-            nudgeId = if v26.current[v33] then v26.current[v33].nudgeId else nil, 
-            nudgeType = if v26.current[v33] then v26.current[v33].nudgeType else nil, 
-            partyAttemptId = if v26.current[v33] then v26.current[v33].partyAttemptId else nil, 
-            squadLocation = v23.squadLocation
-        });
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v23.fireSquadAnalytics, 
-        v23.squadLocation
-    } else l_dependencyArray_0(v23.fireSquadAnalytics, v23.squadLocation));
-    v11.useEffect(function() --[[ Line: 97 ]]
-        -- upvalues: l_default_0 (ref), v26 (copy), v35 (copy), v6 (ref), v3 (ref), l_NotificationTypeEnum_0 (ref), v22 (copy), v8 (ref), v23 (copy), v24 (copy)
-        local v41 = l_default_0:listenToDismissNotification(function(v36) --[[ Line: 99 ]]
-            -- upvalues: v26 (ref), v35 (ref), v6 (ref), v3 (ref), l_NotificationTypeEnum_0 (ref), v22 (ref), v8 (ref), v23 (ref), v24 (ref)
-            if v36.notificationId and v26.current[v36.notificationId] then
-                v35(v36.notificationId, v6.PartyNudgeGeneralDismiss);
-                if v26.current[v36.notificationId].shouldActWhenDismiss then
-                    local v37 = v26.current[v36.notificationId];
-                    local l_nudgeType_0 = v37.nudgeType;
-                    local l_toastType_0 = v37.toastType;
-                    if (l_nudgeType_0 == v3.PARTY_TO_ONE_NUDGE_TYPE or l_nudgeType_0 == v3.PARTY_TO_PARTY_NUDGE_TYPE) and l_toastType_0 == l_NotificationTypeEnum_0.SquadNudgeInvite then
-                        local l_REJECT_PARTY_INVITE_ACTION_0 = v3.REJECT_PARTY_INVITE_ACTION;
-                        v22(v8(l_REJECT_PARTY_INVITE_ACTION_0, v37.nudgeId, false, v23.setSquadPrompt, v23.fireSquadAnalytics, v23.squadLocation, v24));
-                    end;
-                end;
-            end;
-            v26.current[v36.notificationId] = nil;
-        end);
-        return function() --[[ Line: 135 ]]
-            -- upvalues: v41 (copy)
-            if v41 then
-                v41:Disconnect();
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v35, 
-        v24, 
-        v23.setSquadPrompt, 
-        v23.fireSquadAnalytics, 
-        v23.squadLocation
-    } else l_dependencyArray_0(v35, v24, v23.setSquadPrompt, v23.fireSquadAnalytics, v23.squadLocation));
-    v11.useEffect(function() --[[ Line: 159 ]]
-        -- upvalues: l_LifecycleEvents_0 (ref), l_NotificationTypeEnum_0 (ref), v26 (copy), v28 (copy), l_HttpService_0 (ref), v3 (ref), l_default_0 (ref), v35 (copy), v6 (ref), l_GameParams_0 (ref), l_ExperienceService_0 (ref), v5 (ref)
-        local v45 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.UserAction, l_NotificationTypeEnum_0.SquadNudgeInvite, function(v42) --[[ Line: 163 ]]
-            -- upvalues: v26 (ref), v28 (ref), l_HttpService_0 (ref), v3 (ref)
-            if v42 and v42.userActionType == "click" and v42.notificationData and v42.visualItem and v42.visualItem.actionEventParams and v42.visualItem.visualItemName then
-                local l_id_0 = v42.notificationData.id;
-                if v26.current[l_id_0] then
-                    v26.current[l_id_0].shouldActWhenDismiss = false;
-                end;
-                if v28(l_id_0) then
-                    return;
-                else
-                    local v44 = l_HttpService_0:JSONDecode(v42.visualItem.actionEventParams);
-                    if v44.nudgeType == v3.PARTY_TO_ONE_NUDGE_TYPE or v44.nudgeType == v3.PARTY_TO_PARTY_NUDGE_TYPE then
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local HttpService = game:GetService("HttpService")
+local Constants = require(SquadsCore.Common.Constants)
+local EventNames = require(SquadsCore.Analytics.EventNames)
+local SquadGameJoinOrigin = require(SquadsCore.Enums.SquadGameJoinOrigin)
+local SquadToastActionsAndStates = require(SquadsCore.Enums.SquadToastActionsAndStates)
+local SquadExternalContractContext = require(SquadsCore.Components.SquadExternalContractProvider.SquadExternalContractContext)
+local actOnPartyNudge = require(SquadsCore.Thunks.actOnPartyNudge)
+local ExperienceService = require(SquadsCoreParent.ExperienceService)
+local React = require(SquadsCoreParent.React)
+local ToastNotification = require(SquadsCoreParent.ToastNotification)
+local ToastNotificationsProtocol = require(SquadsCoreParent.ToastNotificationsProtocol)
+local useDispatch = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local ExperienceService2 = ExperienceService.ExperienceService
+local GameParams = ExperienceService.GameParams
+local LifecycleEvents = ToastNotification.LifecycleEvents
+local NotificationTypeEnum = ToastNotification.ToastNotificationTypeModule.NotificationTypeEnum
+local default = ToastNotificationsProtocol.ToastNotificationProtocol.default
 
-                    end;
-                end;
-            end;
-        end);
-        local v50 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.UserAction, l_NotificationTypeEnum_0.NudgeForInviterSquad, function(v46) --[[ Line: 196 ]]
-            -- upvalues: v26 (ref), v28 (ref), l_HttpService_0 (ref), v3 (ref), l_default_0 (ref), v35 (ref), v6 (ref), l_GameParams_0 (ref), l_ExperienceService_0 (ref), v5 (ref)
-            if v46 and v46.userActionType == "click" and v46.notificationData and v46.visualItem and v46.visualItem.actionEventParams and v46.visualItem.visualItemName then
-                local l_id_1 = v46.notificationData.id;
-                if v26.current[l_id_1] then
-                    v26.current[l_id_1].shouldActWhenDismiss = false;
-                end;
-                if v28(l_id_1) then
-                    return;
-                else
-                    local v48 = l_HttpService_0:JSONDecode(v46.visualItem.actionEventParams);
-                    if v48.nudgeType == v3.PARTY_TO_ONE_NUDGE_TYPE or v48.nudgeType == v3.PARTY_TO_PARTY_NUDGE_TYPE then
-                        if v46.visualItem.visualItemName == v3.JOIN_EXPERIENCE_FROM_NUDGE_BUTTON_TYPE then
-                            l_default_0:dismissNotification(l_id_1);
-                            v35(l_id_1, v6.PartyNudgeAccept);
-                            local v49 = l_GameParams_0.fromPlaceId(v48.placeId);
-                            l_ExperienceService_0:LaunchExperience(v49, v5.NudgeForInviterSquad, nil);
-                            return;
-                        elseif v46.visualItem.visualItemName == v3.DISMISS_INVITER_SQUAD_NUDGE_BUTTON_TYPE then
-                            v35(l_id_1, v6.PartyNudgeButtonDismiss);
-                        end;
-                    end;
-                end;
-            end;
-        end);
-        return function() --[[ Line: 244 ]]
-            -- upvalues: v45 (copy), v50 (copy)
-            if v45 then
-                v45();
-            end;
-            if v50 then
-                v50();
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v28, 
-        v35, 
-        v23, 
-        v23.setSquadPrompt, 
-        v23.fireSquadAnalytics, 
-        v23.squadLocation, 
-        v21.currentSquadId
-    } else l_dependencyArray_0(v28, v35, v23, v23.setSquadPrompt, v23.fireSquadAnalytics, v23.squadLocation, v21.currentSquadId));
-    v11.useEffect(function() --[[ Line: 276 ]]
-        -- upvalues: l_LifecycleEvents_0 (ref), l_NotificationTypeEnum_0 (ref), v28 (copy), l_HttpService_0 (ref), v3 (ref), v21 (copy), l_default_0 (ref), v32 (copy), v35 (copy), v6 (ref)
-        local v55 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.Display, l_NotificationTypeEnum_0.SquadNudgeInvite, function(v51) --[[ Line: 280 ]]
-            -- upvalues: v28 (ref), l_HttpService_0 (ref), v3 (ref), v21 (ref), l_default_0 (ref), v32 (ref), v35 (ref), v6 (ref)
-            local l_actionEventParams_0 = v51.state.visualItems.button[1].actionEventParams;
-            local l_id_2 = v51.id;
-            if v28(l_id_2) then
-                return;
-            else
-                local v54 = l_HttpService_0:JSONDecode(l_actionEventParams_0);
-                if (v54.nudgeType == v3.PARTY_TO_ONE_NUDGE_TYPE or v54.nudgeType == v3.PARTY_TO_PARTY_NUDGE_TYPE) and v21.currentSquadId ~= "" and v21.currentSquadId == v54.squadId then
-                    l_default_0:dismissNotification(l_id_2);
-                    return;
-                else
-                    v32(l_id_2, v51, v54);
-                    v35(l_id_2, v6.PartyNudgeDisplay);
-                    return;
-                end;
-            end;
-        end);
-        local v60 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.Display, l_NotificationTypeEnum_0.NudgeForInviterSquad, function(v56) --[[ Line: 309 ]]
-            -- upvalues: v28 (ref), l_HttpService_0 (ref), v3 (ref), l_default_0 (ref), v21 (ref), v32 (ref), v35 (ref), v6 (ref)
-            local l_actionEventParams_1 = v56.state.visualItems.button[1].actionEventParams;
-            local l_id_3 = v56.id;
-            if v28(l_id_3) then
-                return;
-            else
-                local v59 = l_HttpService_0:JSONDecode(l_actionEventParams_1);
-                if v59.nudgeType == v3.PARTY_TO_ONE_NUDGE_TYPE or v59.nudgeType == v3.PARTY_TO_PARTY_NUDGE_TYPE then
-                    if v59.gameInstanceId == game.JobId then
-                        l_default_0:dismissNotification(l_id_3);
-                        return;
-                    elseif v21.currentSquadId == "" or v21.currentSquadId ~= v59.squadId then
-                        l_default_0:dismissNotification(l_id_3);
-                        return;
-                    end;
-                end;
-                v32(l_id_3, v56, v59);
-                v35(l_id_3, v6.PartyNudgeDisplay);
-                return;
-            end;
-        end);
-        local v65 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.Display, l_NotificationTypeEnum_0.SquadJoinRequestPrompt, function(v61) --[[ Line: 343 ]]
-            -- upvalues: v28 (ref), l_HttpService_0 (ref), v32 (ref), v35 (ref), v6 (ref)
-            local l_actionEventParams_2 = v61.state.visualItems.button[1].actionEventParams;
-            local l_id_4 = v61.id;
-            if v28(l_id_4) then
-                return;
-            else
-                local v64 = l_HttpService_0:JSONDecode(l_actionEventParams_2);
-                v32(l_id_4, v61, v64);
-                v35(l_id_4, v6.PartyNudgeDisplay);
-                return;
-            end;
-        end);
-        local v70 = l_LifecycleEvents_0:RegisterCallback(l_LifecycleEvents_0.ToastEvents.Display, l_NotificationTypeEnum_0.SquadAcceptJoinRequest, function(v66) --[[ Line: 360 ]]
-            -- upvalues: v28 (ref), l_HttpService_0 (ref), v32 (ref), v35 (ref), v6 (ref)
-            local l_actionEventParams_3 = v66.state.visualItems.button[1].actionEventParams;
-            local l_id_5 = v66.id;
-            if v28(l_id_5) then
-                return;
-            else
-                local v69 = l_HttpService_0:JSONDecode(l_actionEventParams_3);
-                v32(l_id_5, v66, v69);
-                v35(l_id_5, v6.PartyNudgeDisplay);
-                return;
-            end;
-        end);
-        return function() --[[ Line: 374 ]]
-            -- upvalues: v55 (copy), v60 (copy), v65 (copy), v70 (copy)
-            if v55 then
-                v55();
-            end;
-            if v60 then
-                v60();
-            end;
-            if v65 then
-                v65();
-            end;
-            if v70 then
-                v70();
-            end;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v28, 
-        v32, 
-        v35, 
-        v21.currentSquadId
-    } else l_dependencyArray_0(v28, v32, v35, v21.currentSquadId));
-    return nil;
-end;
+return function(t1: {[any]: any}) -- line: 34
+	-- upvalues: useDispatch (copy), React (copy), SquadExternalContractContext (copy), default (copy), HttpService (copy), EventNames (copy), SquadToastActionsAndStates (copy), Constants (copy), NotificationTypeEnum (copy), actOnPartyNudge (copy), LifecycleEvents (copy), GameParams (copy), ExperienceService2 (copy), SquadGameJoinOrigin (copy)
+	local v21 = useDispatch()
+	local v22 = React.useContext(SquadExternalContractContext)
+	local v23 = v22.useIsChatEnabled()
+	local v24 = v22.useIsLoadingChatSettings()
+	local v25 = React.useRef({})
+	local v26 = React.useCallback(function(s1: string) -- line: 43
+		-- upvalues: v24 (copy), v23 (copy), default (copy)
+		if not v24 and not v23 then
+			default:dismissNotification(s1)
+
+			return true
+		end
+
+		return false
+	end, {
+		v24,
+		v23
+	})
+	local v27 = React.useCallback(function(s2: string, p1, p2) -- line: 52
+		-- upvalues: v25 (copy), HttpService (copy)
+		v25.current[s2] = {
+			shouldActWhenDismiss = true,
+			toastType = p1.notificationType,
+			partyAttemptId = HttpService:GenerateGUID(false),
+			nudgeId = p2.nudgeId,
+			nudgeType = p2.nudgeType
+		}
+	end, {})
+	local v28 = React.useCallback(function(s3: string, s4: string) -- line: 64
+		-- upvalues: v22 (copy), EventNames (copy), v25 (copy)
+		v22.fireSquadAnalytics(EventNames.SquadToastActions, {
+			toastAction = s4,
+			toastType = if not v25.current[s3] then nil else v25.current[s3].toastType,
+			nudgeId = if not v25.current[s3] then nil else v25.current[s3].nudgeId,
+			nudgeType = if not v25.current[s3] then nil else v25.current[s3].nudgeType,
+			partyAttemptId = if not v25.current[s3] then nil else v25.current[s3].partyAttemptId,
+			squadLocation = v22.squadLocation
+		})
+	end, {
+		v22.fireSquadAnalytics,
+		v22.squadLocation
+	})
+
+	React.useEffect(function() -- line: 83
+		-- upvalues: default (copy), v25 (copy), v28 (copy), SquadToastActionsAndStates (copy), Constants (copy), NotificationTypeEnum (copy), v21 (copy), actOnPartyNudge (copy), v22 (copy), v23 (copy)
+		local v35 = default:listenToDismissNotification(function(p3) -- line: 85
+			-- upvalues: v25 (copy), v28 (copy), SquadToastActionsAndStates (copy), Constants (copy), NotificationTypeEnum (copy), v21 (copy), actOnPartyNudge (copy), v22 (copy), v23 (copy)
+			if p3.notificationId and v25.current[p3.notificationId] then
+				v28(p3.notificationId, SquadToastActionsAndStates.PartyNudgeGeneralDismiss)
+
+				if v25.current[p3.notificationId].shouldActWhenDismiss then
+					local v43 = v25.current[p3.notificationId]
+					local nudgeType = v43.nudgeType
+					local toastType = v43.toastType
+
+					if (nudgeType == Constants.PARTY_TO_ONE_NUDGE_TYPE or nudgeType == Constants.PARTY_TO_PARTY_NUDGE_TYPE) and toastType == NotificationTypeEnum.SquadNudgeInvite then
+						local REJECT_PARTY_INVITE_ACTION = Constants.REJECT_PARTY_INVITE_ACTION
+
+						v21(actOnPartyNudge(REJECT_PARTY_INVITE_ACTION, v43.nudgeId, false, v22.setSquadPrompt, v22.fireSquadAnalytics, v22.squadLocation, v23))
+					end
+				end
+			end
+
+			v25.current[p3.notificationId] = nil
+		end)
+
+		return function() -- line: 121
+			-- upvalues: v35 (copy)
+			if v35 then
+				v35:Disconnect()
+			end
+		end
+	end, {
+		v28,
+		v23,
+		v22.setSquadPrompt,
+		v22.fireSquadAnalytics,
+		v22.squadLocation
+	})
+	React.useEffect(function() -- line: 134
+		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v25 (copy), v26 (copy), HttpService (copy), Constants (copy), default (copy), v28 (copy), SquadToastActionsAndStates (copy), GameParams (copy), ExperienceService2 (copy), SquadGameJoinOrigin (copy)
+		local v36 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.SquadNudgeInvite, function(p4) -- line: 138
+			-- upvalues: v25 (copy), v26 (copy), HttpService (copy), Constants (copy)
+			if p4 and (p4.userActionType == "click" and p4.notificationData and p4.visualItem and p4.visualItem.actionEventParams and p4.visualItem.visualItemName) then
+				local id = p4.notificationData.id
+
+				if v25.current[id] then
+					v25.current[id].shouldActWhenDismiss = false
+				end
+
+				if v26(id) then
+					return
+				end
+
+				local data = HttpService:JSONDecode(p4.visualItem.actionEventParams)
+
+				if data.nudgeType ~= Constants.PARTY_TO_ONE_NUDGE_TYPE then
+					if data.nudgeType ~= Constants.PARTY_TO_PARTY_NUDGE_TYPE then
+					end
+				end
+			end
+		end)
+		local v37 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.UserAction, NotificationTypeEnum.NudgeForInviterSquad, function(p5) -- line: 171
+			-- upvalues: v25 (copy), v26 (copy), HttpService (copy), Constants (copy), default (copy), v28 (copy), SquadToastActionsAndStates (copy), GameParams (copy), ExperienceService2 (copy), SquadGameJoinOrigin (copy)
+			if p5 and (p5.userActionType == "click" and p5.notificationData and p5.visualItem and p5.visualItem.actionEventParams and p5.visualItem.visualItemName) then
+				local id = p5.notificationData.id
+
+				if v25.current[id] then
+					v25.current[id].shouldActWhenDismiss = false
+				end
+
+				if v26(id) then
+					return
+				end
+
+				local data = HttpService:JSONDecode(p5.visualItem.actionEventParams)
+
+				if data.nudgeType == Constants.PARTY_TO_ONE_NUDGE_TYPE or data.nudgeType == Constants.PARTY_TO_PARTY_NUDGE_TYPE then
+					if p5.visualItem.visualItemName == Constants.JOIN_EXPERIENCE_FROM_NUDGE_BUTTON_TYPE then
+						default:dismissNotification(id)
+						v28(id, SquadToastActionsAndStates.PartyNudgeAccept)
+
+						local v53 = GameParams.fromPlaceId(data.placeId)
+
+						ExperienceService2:LaunchExperience(v53, SquadGameJoinOrigin.NudgeForInviterSquad, nil)
+
+						return
+					end
+
+					if p5.visualItem.visualItemName == Constants.DISMISS_INVITER_SQUAD_NUDGE_BUTTON_TYPE then
+						v28(id, SquadToastActionsAndStates.PartyNudgeButtonDismiss)
+					end
+				end
+			end
+		end)
+
+		return function() -- line: 217
+			-- upvalues: v36 (copy), v37 (copy)
+			if v36 then
+				v36()
+			end
+
+			if v37 then
+				v37()
+			end
+		end
+	end, {
+		v26,
+		v28,
+		v22,
+		v22.setSquadPrompt,
+		v22.fireSquadAnalytics,
+		v22.squadLocation,
+		t1.currentSquadId
+	})
+	React.useEffect(function() -- line: 236
+		-- upvalues: LifecycleEvents (copy), NotificationTypeEnum (copy), v26 (copy), HttpService (copy), Constants (copy), t1 (copy), default (copy), v27 (copy), v28 (copy), SquadToastActionsAndStates (copy)
+		local v38 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.SquadNudgeInvite, function(p6) -- line: 240
+			-- upvalues: v26 (copy), HttpService (copy), Constants (copy), t1 (copy), default (copy), v27 (copy), v28 (copy), SquadToastActionsAndStates (copy)
+			local actionEventParams = p6.state.visualItems.button[1].actionEventParams
+			local id = p6.id
+
+			if v26(id) then
+				return
+			end
+
+			local data = HttpService:JSONDecode(actionEventParams)
+
+			if (data.nudgeType == Constants.PARTY_TO_ONE_NUDGE_TYPE or data.nudgeType == Constants.PARTY_TO_PARTY_NUDGE_TYPE) and t1.currentSquadId ~= "" and t1.currentSquadId == data.squadId then
+				default:dismissNotification(id)
+
+				return
+			end
+
+			v27(id, p6, data)
+			v28(id, SquadToastActionsAndStates.PartyNudgeDisplay)
+		end)
+		local v39 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.NudgeForInviterSquad, function(p7) -- line: 269
+			-- upvalues: v26 (copy), HttpService (copy), Constants (copy), default (copy), t1 (copy), v27 (copy), v28 (copy), SquadToastActionsAndStates (copy)
+			local actionEventParams = p7.state.visualItems.button[1].actionEventParams
+			local id = p7.id
+
+			if v26(id) then
+				return
+			end
+
+			local data = HttpService:JSONDecode(actionEventParams)
+
+			if data.nudgeType == Constants.PARTY_TO_ONE_NUDGE_TYPE or data.nudgeType == Constants.PARTY_TO_PARTY_NUDGE_TYPE then
+				if data.gameInstanceId == game.JobId then
+					default:dismissNotification(id)
+
+					return
+				end
+
+				if t1.currentSquadId == "" or t1.currentSquadId ~= data.squadId then
+					default:dismissNotification(id)
+
+					return
+				end
+			end
+
+			v27(id, p7, data)
+			v28(id, SquadToastActionsAndStates.PartyNudgeDisplay)
+		end)
+		local v40 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.SquadJoinRequestPrompt, function(p8) -- line: 301
+			-- upvalues: v26 (copy), HttpService (copy), v27 (copy), v28 (copy), SquadToastActionsAndStates (copy)
+			local actionEventParams = p8.state.visualItems.button[1].actionEventParams
+			local id = p8.id
+
+			if v26(id) then
+				return
+			end
+
+			local data = HttpService:JSONDecode(actionEventParams)
+
+			v27(id, p8, data)
+			v28(id, SquadToastActionsAndStates.PartyNudgeDisplay)
+		end)
+		local v41 = LifecycleEvents:RegisterCallback(LifecycleEvents.ToastEvents.Display, NotificationTypeEnum.SquadAcceptJoinRequest, function(p9) -- line: 318
+			-- upvalues: v26 (copy), HttpService (copy), v27 (copy), v28 (copy), SquadToastActionsAndStates (copy)
+			local actionEventParams = p9.state.visualItems.button[1].actionEventParams
+			local id = p9.id
+
+			if v26(id) then
+				return
+			end
+
+			local data = HttpService:JSONDecode(actionEventParams)
+
+			v27(id, p9, data)
+			v28(id, SquadToastActionsAndStates.PartyNudgeDisplay)
+		end)
+
+		return function() -- line: 332
+			-- upvalues: v38 (copy), v39 (copy), v40 (copy), v41 (copy)
+			if v38 then
+				v38()
+			end
+
+			if v39 then
+				v39()
+			end
+
+			if v40 then
+				v40()
+			end
+
+			if v41 then
+				v41()
+			end
+		end
+	end, {
+		v26,
+		v27,
+		v28,
+		t1.currentSquadId
+	})
+
+	return nil
+end

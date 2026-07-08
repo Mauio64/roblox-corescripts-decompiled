@@ -1,71 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_ExperienceService_0 = require(l_Parent_0.ExperienceService).ExperienceService;
-local v3 = require(script.Parent.AppSquadTopBannerEventReceiver);
-local v4 = require(l_script_FirstAncestor_0.dependencies);
-local l_React_0 = v4.React;
-local l_RoduxSquads_0 = v4.RoduxSquads;
-local l_SquadEventReceiver_0 = v4.SquadsCore.SquadEventReceiver;
-local l_useDispatch_0 = v4.Hooks.useDispatch;
-local l_useSelector_0 = v4.Hooks.useSelector;
-local l_useCanAccessParty_0 = require(l_Parent_0.Squads).Hooks.useCanAccessParty;
-local v11 = require(l_Parent_0.SharedFlags);
-local l_FFlagIsSquadEnabledAMP_0 = v11.FFlagIsSquadEnabledAMP;
-local l_GetFFlagIsSquadEnabled_0 = v11.GetFFlagIsSquadEnabled;
-local l_CurrentSquadUpdated_0 = l_RoduxSquads_0.Actions.CurrentSquadUpdated;
-return function(_) --[[ Line: 22 ]]
-    -- upvalues: l_useDispatch_0 (copy), l_React_0 (copy), l_useSelector_0 (copy), l_ExperienceService_0 (copy), l_RoduxSquads_0 (copy), l_FFlagIsSquadEnabledAMP_0 (copy), l_useCanAccessParty_0 (copy), l_GetFFlagIsSquadEnabled_0 (copy), l_CurrentSquadUpdated_0 (copy), v3 (copy), l_SquadEventReceiver_0 (copy)
-    local v16 = l_useDispatch_0();
-    local v18 = l_React_0.useCallback(function(v17) --[[ Line: 25 ]]
-        if v17.Squad and v17.Squad.Squad then
-            return v17.Squad.Squad.currentExperienceInvite;
-        else
-            return nil;
-        end;
-    end, {});
-    local v19 = l_useSelector_0(v18);
-    local v21 = l_React_0.useCallback(function(v20) --[[ Line: 30 ]]
-        if v20.Squad and v20.Squad.Squad and v20.Squad.Squad.currentSquadPersist then
-            return v20.Squad.Squad.currentSquadPersist.isPaused;
-        else
-            return false;
-        end;
-    end, {});
-    local v22 = l_useSelector_0(v21);
-    l_React_0.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: l_ExperienceService_0 (ref), l_RoduxSquads_0 (ref), v16 (copy)
-        l_ExperienceService_0:RegisterForExperienceJoin(function() --[[ Line: 41 ]]
-            -- upvalues: l_RoduxSquads_0 (ref), v16 (ref)
-            l_RoduxSquads_0.PersistManagers.currentSquadPersistManager.pause(v16);
-        end);
-        l_ExperienceService_0:RegisterForExperienceLeave(function() --[[ Line: 46 ]]
-            -- upvalues: l_RoduxSquads_0 (ref), v16 (ref)
-            l_RoduxSquads_0.PersistManagers.currentSquadPersistManager.persistAndUpdateState(v16);
-        end);
-    end, {
-        v16
-    });
-    l_React_0.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v19 (copy), v22 (copy), v16 (copy), l_RoduxSquads_0 (ref)
-        if v19 and v22 then
-            v16(l_RoduxSquads_0.Actions.CurrentExperienceInviteDismissed(v19.notification.notificationId));
-        end;
-    end, {
-        v19, 
-        v22
-    });
-    local v23 = if l_FFlagIsSquadEnabledAMP_0 then l_useCanAccessParty_0() else nil;
-    local v24 = if l_FFlagIsSquadEnabledAMP_0 then v23 else l_GetFFlagIsSquadEnabled_0();
-    l_React_0.useEffect(function() --[[ Line: 69 ]]
-        -- upvalues: v24 (copy), v16 (copy), l_CurrentSquadUpdated_0 (ref)
-        if not v24 then
-            v16(l_CurrentSquadUpdated_0(nil));
-        end;
-    end, {
-        v24
-    });
-    return l_React_0.createElement(l_React_0.Fragment, nil, {
-        appSquadTopBannerEventReceiver = l_React_0.createElement(v3), 
-        squadEventReceiver = if not v24 or v22 then nil else l_React_0.createElement(l_SquadEventReceiver_0)
-    });
-end;
+local Squads = script:FindFirstAncestor("Squads")
+local SquadsParent = Squads.Parent
+local ExperienceService = require(SquadsParent.ExperienceService).ExperienceService
+local AppSquadTopBannerEventReceiver = require(script.Parent.AppSquadTopBannerEventReceiver)
+local dependencies = require(Squads.dependencies)
+local React = dependencies.React
+local RoduxSquads = dependencies.RoduxSquads
+local SquadEventReceiver = require(SquadsParent.SquadsCore.SquadEventReceiver)
+local useDispatch = dependencies.Hooks.useDispatch
+local useSelector = dependencies.Hooks.useSelector
+local useCanAccessParty = require(Squads.Hooks.useCanAccessParty)
+local CurrentSquadUpdated = RoduxSquads.Actions.CurrentSquadUpdated
+
+return function(_) -- line: 18
+	-- upvalues: useDispatch (copy), React (copy), useSelector (copy), ExperienceService (copy), RoduxSquads (copy), useCanAccessParty (copy), CurrentSquadUpdated (copy), AppSquadTopBannerEventReceiver (copy), SquadEventReceiver (copy)
+	local v14 = useDispatch()
+	local v15 = React.useCallback(function(p2) -- line: 21
+		if p2.Squad and p2.Squad.Squad then
+			return p2.Squad.Squad.currentExperienceInvite
+		end
+
+		return nil
+	end, {})
+	local v16 = useSelector(v15)
+	local v17 = React.useCallback(function(p3) -- line: 26
+		if p3.Squad and (p3.Squad.Squad and p3.Squad.Squad.currentSquadPersist) then
+			return p3.Squad.Squad.currentSquadPersist.isPaused
+		end
+
+		return false
+	end, {})
+	local v18 = useSelector(v17)
+
+	React.useEffect(function() -- line: 36
+		-- upvalues: ExperienceService (copy), RoduxSquads (copy), v14 (copy)
+		ExperienceService:RegisterForExperienceJoin(function() -- line: 37
+			-- upvalues: RoduxSquads (copy), v14 (copy)
+			RoduxSquads.PersistManagers.currentSquadPersistManager.pause(v14)
+		end)
+		ExperienceService:RegisterForExperienceLeave(function() -- line: 42
+			-- upvalues: RoduxSquads (copy), v14 (copy)
+			RoduxSquads.PersistManagers.currentSquadPersistManager.persistAndUpdateState(v14)
+		end)
+	end, { v14 })
+	React.useEffect(function() -- line: 48
+		-- upvalues: v16 (copy), v18 (copy), v14 (copy), RoduxSquads (copy)
+		if v16 and v18 then
+			v14(RoduxSquads.Actions.CurrentExperienceInviteDismissed(v16.notification.notificationId))
+		end
+	end, {
+		v16,
+		v18
+	})
+
+	local v19 = useCanAccessParty()
+
+	React.useEffect(function() -- line: 64
+		-- upvalues: v19 (copy), v14 (copy), CurrentSquadUpdated (copy)
+		if not v19 then
+			v14(CurrentSquadUpdated(nil))
+		end
+	end, { v19 })
+
+	return React.createElement(React.Fragment, nil, {
+		appSquadTopBannerEventReceiver = React.createElement(AppSquadTopBannerEventReceiver),
+		squadEventReceiver = if not v19 or v18 then nil else React.createElement(SquadEventReceiver)
+	})
+end

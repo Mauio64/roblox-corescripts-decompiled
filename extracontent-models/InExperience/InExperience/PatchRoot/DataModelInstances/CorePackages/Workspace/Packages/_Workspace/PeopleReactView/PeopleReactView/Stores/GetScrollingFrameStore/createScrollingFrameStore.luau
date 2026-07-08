@@ -1,57 +1,80 @@
-local l_Parent_0 = script:FindFirstAncestor("PeopleReactView").Parent;
-local v1 = require(l_Parent_0.Signals);
-return function() --[[ Line: 15 ]] --[[ Name: createScrollingFrameStore ]]
-    -- upvalues: v1 (copy)
-    local v2, v3 = v1.createSignal(0);
-    local v4, v5 = v1.createSignal(0);
-    local v6, v7 = v1.createSignal(0);
-    local v8 = nil;
-    local v9 = nil;
-    local v10 = nil;
-    local function v12(v11) --[[ Line: 24 ]]
-        -- upvalues: v8 (ref), v9 (ref), v10 (ref), v3 (copy), v5 (copy), v7 (copy)
-        if v8 then
-            v8:Disconnect();
-        end;
-        if v9 then
-            v9:Disconnect();
-        end;
-        if v10 then
-            v10:Disconnect();
-        end;
-        v3(v11.AbsolutePosition.Y);
-        v5(v11.AbsoluteSize.Y);
-        v7(v11.CanvasPosition.Y);
-        v8 = v11:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() --[[ Line: 39 ]]
-            -- upvalues: v3 (ref), v11 (copy)
-            v3(v11.AbsolutePosition.Y);
-        end);
-        v9 = v11:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 43 ]]
-            -- upvalues: v5 (ref), v11 (copy)
-            v5(v11.AbsoluteSize.Y);
-        end);
-        v10 = v11:GetPropertyChangedSignal("CanvasPosition"):Connect(function() --[[ Line: 47 ]]
-            -- upvalues: v7 (ref), v11 (copy)
-            v7(v11.CanvasPosition.Y);
-        end);
-    end;
-    local function v13() --[[ Line: 52 ]]
-        -- upvalues: v8 (ref), v9 (ref), v10 (ref)
-        if v8 then
-            v8:Disconnect();
-        end;
-        if v9 then
-            v9:Disconnect();
-        end;
-        if v10 then
-            v10:Disconnect();
-        end;
-    end;
-    return {
-        getAbsolutePositionY = v2, 
-        getAbsoluteSizeY = v4, 
-        getCanvasPositionY = v6, 
-        setScrollingFrame = v12, 
-        cleanUp = v13
-    };
-end;
+local Parent = script:FindFirstAncestor("PeopleReactView").Parent
+local Signals = require(Parent.Signals)
+local FFlagFixVirtualizedGridNumItems = require(Parent.PeopleService).getService("Flags").FFlagFixVirtualizedGridNumItems
+
+local function createScrollingFrameStore() -- line: 21
+	-- upvalues: Signals (copy), FFlagFixVirtualizedGridNumItems (copy)
+	local v5, v6 = Signals.createSignal(0)
+	local v7, v8 = Signals.createSignal(0)
+	local v9, v10 = Signals.createSignal(0)
+	local u11 = nil
+	local v12 = nil
+
+	if FFlagFixVirtualizedGridNumItems then
+		local v13
+
+		v13, v12 = Signals.createSignal(0)
+		u11 = v13
+	end
+
+	local v14 = if not FFlagFixVirtualizedGridNumItems then nil else Signals.createComputed(function(p1) -- line: 33
+		-- upvalues: v9 (copy), u11 (ref)
+		return v9(p1) + u11(p1)
+	end)
+	local connection = nil
+	local connection2 = nil
+	local connection3 = nil
+
+	return {
+		getAbsolutePositionY = v5,
+		getAbsoluteSizeY = v7,
+		getCanvasPositionY = if not FFlagFixVirtualizedGridNumItems then v9 else v14,
+		setScrollingFrame = function(p2) -- line: 42
+			-- upvalues: connection (ref), connection2 (ref), connection3 (ref), v6 (copy), v8 (copy), v10 (copy)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+
+			if connection3 then
+				connection3:Disconnect()
+			end
+
+			v6(p2.AbsolutePosition.Y)
+			v8(p2.AbsoluteSize.Y)
+			v10(p2.CanvasPosition.Y)
+			connection = p2:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 57
+				-- upvalues: v6 (copy), p2 (copy)
+				v6(p2.AbsolutePosition.Y)
+			end)
+			connection2 = p2:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 61
+				-- upvalues: v8 (copy), p2 (copy)
+				v8(p2.AbsoluteSize.Y)
+			end)
+			connection3 = p2:GetPropertyChangedSignal("CanvasPosition"):Connect(function() -- line: 65
+				-- upvalues: v10 (copy), p2 (copy)
+				v10(p2.CanvasPosition.Y)
+			end)
+		end,
+		setCanvasPositionYOffset = if not FFlagFixVirtualizedGridNumItems then nil else v12,
+		cleanUp = function() -- line: 70
+			-- upvalues: connection (ref), connection2 (ref), connection3 (ref)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+
+			if connection3 then
+				connection3:Disconnect()
+			end
+		end
+	}
+end
+
+return createScrollingFrameStore

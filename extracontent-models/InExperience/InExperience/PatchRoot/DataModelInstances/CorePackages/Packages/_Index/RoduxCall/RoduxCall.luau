@@ -1,27 +1,29 @@
-local v0 = require(script.Actions);
-local v1 = require(script.Enums);
-local v2 = require(script.Reducers);
-local v3 = require(script.Models);
-local l_Parent_0 = script.Parent;
-local v5 = require(l_Parent_0.Cryo);
-local v6 = require(l_Parent_0.RoduxNetworking);
-local v7 = require(l_Parent_0.NetworkingCall);
+local Actions = require(script.Actions)
+local Enums = require(script.Enums)
+local Reducers = require(script.Reducers)
+local Models = require(script.Models)
+local scriptParent = script.Parent
+local Cryo = require(scriptParent.Cryo)
+local RoduxNetworking = require(scriptParent.RoduxNetworking)
+local NetworkingCall = require(scriptParent.NetworkingCall)
+
 return {
-    config = function(v8) --[[ Line: 12 ]] --[[ Name: config ]]
-        -- upvalues: v5 (copy), v7 (copy), v6 (copy), v2 (copy), v0 (copy), v1 (copy), v3 (copy)
-        v8 = v5.Dictionary.join(v8, {
-            NetworkingCall = v7.config({
-                roduxNetworking = v6.mock()
-            })
-        });
-        return {
-            installReducer = function() --[[ Line: 20 ]] --[[ Name: installReducer ]]
-                -- upvalues: v2 (ref), v8 (ref)
-                return v2(v8);
-            end, 
-            Actions = v0, 
-            Enums = v1, 
-            Models = v3
-        };
-    end
-};
+	config = function(p1) -- line: 12
+		-- upvalues: Cryo (copy), NetworkingCall (copy), RoduxNetworking (copy), Reducers (copy), Actions (copy), Enums (copy), Models (copy)
+		local u10 = Cryo.Dictionary.join(p1, {
+			NetworkingCall = NetworkingCall.config({
+				roduxNetworking = RoduxNetworking.mock()
+			})
+		})
+
+		return {
+			installReducer = function() -- line: 20
+				-- upvalues: Reducers (copy), u10 (ref)
+				return Reducers(u10)
+			end,
+			Actions = Actions,
+			Enums = Enums,
+			Models = Models
+		}
+	end
+}

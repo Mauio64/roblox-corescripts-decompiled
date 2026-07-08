@@ -1,86 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.PeekView);
-local l_PeekView_0 = v3.PeekView;
-local l_PeekViewState_0 = v3.PeekViewState;
-local v6 = require(l_Parent_0.RoactUtils);
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v8 = require(l_script_FirstAncestor_0.Common.Enums);
-local l_FFlagProfilePlatformNewProfileHeader_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformNewProfileHeader;
-local l_useSelector_0 = v6.Hooks.RoactRodux.useSelector;
-local v11 = l_FFlagProfilePlatformNewProfileHeader_0 and 0 or 25;
-return function(v12) --[[ Line: 37 ]] --[[ Name: ProfilePeekView ]]
-    -- upvalues: l_useSelector_0 (copy), v2 (copy), l_PeekViewState_0 (copy), l_View_0 (copy), v11 (copy), l_PeekView_0 (copy), l_FFlagProfilePlatformNewProfileHeader_0 (copy), v8 (copy)
-    local v14 = v12.statusBarHeight or l_useSelector_0(function(v13) --[[ Line: 39 ]]
-        return v13.TopBar.statusBarHeight;
-    end);
-    local v18 = v2.useCallback(function(v15, v16, v17) --[[ Line: 43 ]]
-        -- upvalues: l_PeekViewState_0 (ref), v12 (copy)
-        if v15 == l_PeekViewState_0.Closed and v12.onClosed then
-            v12.onClosed();
-        end;
-        if v12.onViewStateChanged then
-            v12.onViewStateChanged(v15, v16, v17);
-        end;
-    end, {
-        v12.onClosed, 
-        v12.onViewStateChanged
-    });
-    local v19, v20 = v2.useBinding(0);
-    return v2.createElement(l_View_0, {
-        tag = "position-top-left", 
-        Size = UDim2.new(v12.viewWidth or UDim.new(1, 0), UDim.new(1, 0))
-    }, {
-        StatusBarSpace = v2.createElement(l_View_0, {
-            tag = "position-top-left bg-surface-0", 
-            Size = UDim2.new(1, 0, 0, v14), 
-            BorderSizePixel = 0, 
-            ZIndex = 999
-        }), 
-        ProfileContent = v2.createElement(l_View_0, {
-            Size = UDim2.new(1, 0, 1, -v14 + v11), 
-            Position = UDim2.new(0, 0, 0, v14 - v11)
-        }, {
-            PeekView = v2.createElement(l_PeekView_0, {
-                hasScrim = true, 
-                fullViewContentHeight = v12.fullViewContentHeight, 
-                briefViewContentHeight = if v12.briefViewContentHeight then v12.briefViewContentHeight else UDim.new(0.5, 0), 
-                bottomDockedContainerHeight = v12.bottomDockedContainerHeight, 
-                bottomDockedContainerContent = {
-                    PeekViewBottomBar = v12.bottomBarSlot
-                }, 
-                mountAsFullView = v12.mountAsFullView, 
-                mountAnimation = v12.mountAnimation, 
-                viewStateChanged = v18, 
-                briefToFullTransitionPercent = function(v21) --[[ Line: 56 ]]
-                    -- upvalues: v20 (copy), v12 (copy)
-                    v20(v21);
-                    if v12.transitionPercentCallback then
-                        v12.transitionPercentCallback(v21);
-                    end;
-                end, 
-                hasSolidDragger = (not l_FFlagProfilePlatformNewProfileHeader_0 or v12.profileType ~= v8.ProfileTypes.User) and nil
-            }, {
-                UIListLayout = v2.createElement("UIListLayout", {
-                    Padding = UDim.new(0, 0), 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Top
-                }), 
-                Content = v12.contentSlot
-            })
-        }), 
-        TransparentTopBarOverlay = v2.createElement("CanvasGroup", {
-            Size = UDim2.new(1, 0, 0, 56), 
-            Position = UDim2.new(0, 0, 0, v14), 
-            BackgroundTransparency = 1, 
-            ZIndex = 1000, 
-            GroupTransparency = v19:map(function(v22) --[[ Line: 113 ]]
-                return 1 - v22;
-            end)
-        }, {
-            TopBar = v12.topBarSlot
-        })
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local PeekView = require(ProfilePlatformParent.PeekView)
+local PeekView2 = PeekView.PeekView
+local PeekViewState = PeekView.PeekViewState
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local View = require(ProfilePlatformParent.Foundation).View
+local useStyle = require(ProfilePlatformParent.UIBlox).Core.Style.useStyle
+local Enums = require(ProfilePlatform.Common.Enums)
+local FFlagProfilePlatformNewProfileHeader = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformNewProfileHeader
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local v13 = not FFlagProfilePlatformNewProfileHeader and 25 or 0
+
+local function ProfilePeekView(t1: {[any]: any}) -- line: 39
+	-- upvalues: useSelector (copy), FFlagProfilePlatformNewProfileHeader (copy), useStyle (copy), React (copy), PeekViewState (copy), v13 (copy), View (copy), PeekView2 (copy), Enums (copy)
+	local v16 = t1.statusBarHeight or useSelector(function(p1) -- line: 41
+		return p1.TopBar.statusBarHeight
+	end)
+	local v17 = if not FFlagProfilePlatformNewProfileHeader then nil else useStyle()
+	local v18 = React.useCallback(function(p2, p3, p4) -- line: 46
+		-- upvalues: PeekViewState (copy), t1 (copy)
+		if p2 == PeekViewState.Closed and t1.onClosed then
+			t1.onClosed()
+		end
+
+		if t1.onViewStateChanged then
+			t1.onViewStateChanged(p2, p3, p4)
+		end
+	end, {
+		t1.onClosed,
+		t1.onViewStateChanged
+	})
+	local v19, v20 = React.useBinding(0)
+	local v21 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(1, 0, 1, -v16 + v13) else UDim2.new(1, 0, 1, -v16)
+	local v22 = if not FFlagProfilePlatformNewProfileHeader then UDim2.new(0, 0, 0, v16 - v13) else UDim2.new(0, 0, 0, v16)
+
+	return React.createElement(View, {
+		tag = "position-top-left",
+		Size = UDim2.new(t1.viewWidth or UDim.new(1, 0), UDim.new(1, 0))
+	}, {
+		StatusBarSpace = if not FFlagProfilePlatformNewProfileHeader then React.createElement(View, {
+			tag = "position-top-left bg-surface-0",
+			BorderSizePixel = 0,
+			ZIndex = 999,
+			Size = UDim2.new(1, 0, 0, v16)
+		}) else nil,
+		ProfileContent = React.createElement(View, {
+			Size = v21,
+			Position = v22
+		}, {
+			PeekView = React.createElement(PeekView2, {
+				hasScrim = true,
+				fullViewContentHeight = t1.fullViewContentHeight,
+				briefViewContentHeight = if not t1.briefViewContentHeight then UDim.new(0.5, 0) else t1.briefViewContentHeight,
+				bottomDockedContainerHeight = t1.bottomDockedContainerHeight,
+				bottomDockedContainerContent = {
+					PeekViewBottomBar = t1.bottomBarSlot
+				},
+				mountAsFullView = t1.mountAsFullView,
+				mountAnimation = t1.mountAnimation,
+				viewStateChanged = v18,
+				briefToFullTransitionPercent = function(p5) -- line: 59
+					-- upvalues: v20 (copy), t1 (copy)
+					v20(p5)
+
+					if t1.transitionPercentCallback then
+						t1.transitionPercentCallback(p5)
+					end
+				end,
+				hasSolidDragger = (not FFlagProfilePlatformNewProfileHeader or t1.profileType ~= Enums.ProfileTypes.User) and nil
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					Padding = UDim.new(0, 0),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Top
+				}),
+				Content = t1.contentSlot
+			})
+		}),
+		PeekViewTopBar = if not FFlagProfilePlatformNewProfileHeader then nil else React.createElement("CanvasGroup", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 1000,
+			Position = UDim2.new(0, 0, 0, 0),
+			Size = UDim2.new(1, 0, 0, v16 + 56),
+			GroupTransparency = v19:map(function(p6) -- line: 124
+				return 1 - p6
+			end)
+		}, {
+			StatusBarBackground = React.createElement("Frame", {
+				BackgroundTransparency = 0,
+				BorderSizePixel = 0,
+				Position = UDim2.new(0, 0, 0, 0),
+				Size = UDim2.new(1, 0, 0, v16),
+				BackgroundColor3 = v17.Theme.BackgroundDefault.Color
+			}),
+			TopBarSlotContainer = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Position = UDim2.new(0, 0, 0, v16),
+				Size = UDim2.new(1, 0, 0, 56)
+			}, {
+				TopBar = t1.topBarSlot
+			})
+		}),
+		TransparentTopBarOverlay = if not FFlagProfilePlatformNewProfileHeader then React.createElement("CanvasGroup", {
+			BackgroundTransparency = 1,
+			ZIndex = 1000,
+			Size = UDim2.new(1, 0, 0, 56),
+			Position = UDim2.new(0, 0, 0, v16),
+			GroupTransparency = v19:map(function(p7) -- line: 153
+				return 1 - p7
+			end)
+		}, {
+			TopBar = t1.topBarSlot
+		}) else nil
+	})
+end
+
+return ProfilePeekView

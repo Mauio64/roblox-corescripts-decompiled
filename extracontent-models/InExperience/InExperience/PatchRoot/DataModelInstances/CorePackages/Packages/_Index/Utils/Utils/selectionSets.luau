@@ -1,9 +1,12 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = {};
-local l_parse_0 = require(l_Parent_0.GraphQL).parse;
-local _ = require(script.Parent.Interfaces);
-v1.parseSelectionSet = function(v4, v5) --[[ Line: 17 ]] --[[ Name: parseSelectionSet ]]
-    -- upvalues: l_parse_0 (copy)
-    return l_parse_0(v4, v5).definitions[1].selectionSet;
-end;
-return v1;
+local ParentParent = script.Parent.Parent
+local t1 = {}
+local parse = require(ParentParent.GraphQL).parse
+
+require(script.Parent.Interfaces)
+
+function t1.parseSelectionSet(s1: string, p1) -- line: 17
+	-- upvalues: parse (copy)
+	return parse(s1, p1).definitions[1].selectionSet
+end
+
+return t1

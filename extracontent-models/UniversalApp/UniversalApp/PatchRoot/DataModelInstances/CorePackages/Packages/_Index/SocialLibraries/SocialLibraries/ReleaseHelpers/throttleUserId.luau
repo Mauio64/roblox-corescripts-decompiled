@@ -1,3 +1,3 @@
-return function(v0) --[[ Line: 1 ]]
-    return v0.userId % 100 + 1 <= v0.throttle;
-end;
+return function(t1: {[any]: any}) -- line: 1
+	return t1.userId % 100 + 1 <= t1.throttle
+end

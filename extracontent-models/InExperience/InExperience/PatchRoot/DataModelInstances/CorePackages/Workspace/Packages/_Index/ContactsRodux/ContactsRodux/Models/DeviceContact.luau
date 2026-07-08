@@ -1,43 +1,50 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(script.Parent.getMockName);
-local _ = require(script.Parent.Parent.Types.ContactTypes);
-local v3 = require(l_Parent_0.Dash);
-local v4 = {};
-v4.new = function(v5) --[[ Line: 9 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    v4.__index = v4;
-    local v6 = {
-        id = v5.id, 
-        phoneNumbers = v5.phoneNumbers, 
-        contactName = v5.contactName
-    };
-    setmetatable(v6, v4);
-    return v6;
-end;
-v4.mock = function(v7) --[[ Line: 23 ]] --[[ Name: mock ]]
-    -- upvalues: v1 (copy), v3 (copy), v4 (copy)
-    local v8 = v1();
-    local v9 = {
-        id = v8, 
-        contactName = v8, 
-        phoneNumbers = {
-            "123456"
-        }
-    };
-    local v10 = v3.join(v9, v7);
-    return v4.new(v10);
-end;
-v4.formatFromDevice = function(v11) --[[ Line: 39 ]] --[[ Name: formatFromDevice ]]
-    -- upvalues: v4 (copy)
-    local v12 = v11.firstname or "";
-    local v13 = v11.lastname or "";
-    return v4.new({
-        id = v4.generateId(v11), 
-        contactName = v12 .. " " .. v13, 
-        phoneNumbers = v11.phonenumber
-    });
-end;
-v4.generateId = function(v14) --[[ Line: 49 ]] --[[ Name: generateId ]]
-    return (v14.firstname or "") .. (v14.lastname or "") .. tostring(v14.phonenumber[1]);
-end;
-return v4;
+local ParentParent = script.Parent.Parent.Parent
+local getMockName = require(script.Parent.getMockName)
+
+require(script.Parent.Parent.Types.ContactTypes)
+
+local Dash = require(ParentParent.Dash)
+local t1 = {}
+
+function t1.new(p1) -- line: 9
+	-- upvalues: t1 (copy)
+	t1.__index = t1
+
+	local t2 = {
+		id = p1.id,
+		phoneNumbers = p1.phoneNumbers,
+		contactName = p1.contactName
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.mock(t3: {[any]: any}?) -- line: 23
+	-- upvalues: getMockName (copy), Dash (copy), t1 (copy)
+	local v8 = getMockName()
+	local t4 = {
+		id = v8,
+		contactName = v8,
+		phoneNumbers = { "123456" }
+	}
+	local v10 = Dash.join(t4, t3)
+
+	return t1.new(v10)
+end
+function t1.formatFromDevice(t5: {[any]: any}) -- line: 39
+	-- upvalues: t1 (copy)
+	local v12 = t5.firstname or ""
+	local v13 = t5.lastname or ""
+
+	return t1.new({
+		id = t1.generateId(t5),
+		contactName = v12 .. " " .. v13,
+		phoneNumbers = t5.phonenumber
+	})
+end
+function t1.generateId(t6: {[any]: any}) -- line: 49
+	return (t6.firstname or "") .. (t6.lastname or "") .. tostring(t6.phonenumber[1])
+end
+
+return t1

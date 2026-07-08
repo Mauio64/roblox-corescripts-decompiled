@@ -1,14 +1,9 @@
-local l__Workspace_0 = script:FindFirstAncestor("Packages")._Workspace;
-local l_setupJest_0 = script.Parent.setupJest;
+local _Workspace = script:FindFirstAncestor("Packages")._Workspace
+local setupJest = script.Parent.setupJest
+
 return {
-    testMatch = {
-        "**/*.test"
-    }, 
-    testPathIgnorePatterns = {
-        "_Index"
-    }, 
-    setupFilesAfterEnv = {
-        l_setupJest_0
-    }, 
-    rootDir = l__Workspace_0
-};
+	testMatch = { "**/*.test" },
+	testPathIgnorePatterns = { "_Index" },
+	setupFilesAfterEnv = { setupJest },
+	rootDir = _Workspace
+}

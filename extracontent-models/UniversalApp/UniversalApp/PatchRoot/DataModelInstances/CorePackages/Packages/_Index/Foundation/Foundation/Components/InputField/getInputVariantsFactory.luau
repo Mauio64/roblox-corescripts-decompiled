@@ -1,6 +1,7 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 local Dash = require(FoundationParent.Dash)
+local Flags = require(Foundation.Utility.Flags)
 
 require(Foundation.Components.Types)
 
@@ -14,11 +15,11 @@ local Radius = require(Foundation.Enums.Radius)
 require(Foundation.Utility.composeStyleVariant)
 require(Foundation.Providers.Style.Tokens)
 
-return function(p1) --[[ getInputVariantsFactory ]] -- line: 39
-	-- upvalues: InputSize (copy), InputVariant (copy), Dash (copy), Radius (copy)
+local function getInputVariantsFactory(p1) -- line: 40
+	-- upvalues: Flags (copy), InputSize (copy), InputVariant (copy), Dash (copy), Radius (copy)
 	local t1 = {
 		container = {
-			bgStyle = p1.Color.Shift.Shift_100,
+			bgStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then p1.Color.Shift.Shift_100 else nil,
 			strokeStyle = p1.Color.Stroke.Emphasis,
 			strokeThickness = p1.Stroke.Standard
 		}
@@ -46,11 +47,11 @@ return function(p1) --[[ getInputVariantsFactory ]] -- line: 39
 		}
 	}
 	local t3 = {
-		[InputVariant.Standard] = {
+		[InputVariant.Standard] = if not Flags.FoundationTextInputRemoveBackgroundStyle then {
 			container = {
 				bgStyle = p1.Color.Shift.Shift_100
 			}
-		},
+		} else {},
 		[InputVariant.Contrast] = {
 			container = {
 				bgStyle = p1.Color.Shift.Shift_200,
@@ -168,3 +169,5 @@ return function(p1) --[[ getInputVariantsFactory ]] -- line: 39
 		hoverState = t6
 	}
 end
+
+return getInputVariantsFactory

@@ -1,4 +1,5 @@
-game:DefineFastString("ConnectTooltipLocalStorageKey", "HasSeenRobloxConnectUnibarIconFTUX");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("ConnectTooltipLocalStorageKey");
-end;
+game:DefineFastString("ConnectTooltipLocalStorageKey", "HasSeenRobloxConnectUnibarIconFTUX")
+
+return function() -- line: 3
+	return game:GetFastString("ConnectTooltipLocalStorageKey")
+end

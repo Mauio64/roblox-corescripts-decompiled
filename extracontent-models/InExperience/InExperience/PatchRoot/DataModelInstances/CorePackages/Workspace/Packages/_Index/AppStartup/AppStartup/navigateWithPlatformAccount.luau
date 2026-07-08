@@ -1,12 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("AppStartup").Parent;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-return function(v2, v3) --[[ Line: 8 ]] --[[ Name: navigateWithPlatformAccount ]]
-    -- upvalues: l_AppPage_0 (copy)
-    if v2 then
-        v3(l_AppPage_0.SingleSignOnContainer);
-        return;
-    else
-        v3(l_AppPage_0.Startup);
-        return;
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppStartup").Parent
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+
+local function navigateWithPlatformAccount(b1: boolean, p1: ((...any) -> ...any)) -- line: 8
+	-- upvalues: AppPage (copy)
+	if b1 then
+		p1(AppPage.SingleSignOnContainer)
+
+		return
+	end
+
+	p1(AppPage.Startup)
+end
+
+return navigateWithPlatformAccount

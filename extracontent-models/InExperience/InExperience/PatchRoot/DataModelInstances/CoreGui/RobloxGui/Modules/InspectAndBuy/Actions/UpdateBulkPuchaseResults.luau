@@ -1,8 +1,10 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-local _ = require(l_CorePackages_0.Workspace.Packages.AvatarExperienceInspectAndBuy);
-return l_makeActionCreator_0(script.Name, function(v3) --[[ Line: 12 ]]
-    return {
-        result = v3 or {}
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+require(CorePackages.Workspace.Packages.AvatarExperienceInspectAndBuy)
+
+return makeActionCreator(script.Name, function(p1) -- line: 12
+	return {
+		result = p1 or {}
+	}
+end)

@@ -1,22 +1,25 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Rodux_0 = require(l_Parent_0.PurchasePromptDeps).Rodux;
-local v3 = require(l_script_FirstAncestor_0.Actions.AccountInfoReceived);
-local v4 = require(l_script_FirstAncestor_0.Actions.BalanceInfoRecieved);
-return (l_Rodux_0.createReducer({}, {
-    [v3.name] = function(v5, v6) --[[ Line: 11 ]]
-        local l_accountInfo_0 = v6.accountInfo;
-        return {
-            balance = v5.balance, 
-            membershipType = l_accountInfo_0.isPremium and 4 or 0
-        };
-    end, 
-    [v4.name] = function(v8, v9) --[[ Line: 23 ]]
-        local l_balanceInfo_0 = v9.balanceInfo;
-        return {
-            balance = l_balanceInfo_0.robux, 
-            hasFailed = l_balanceInfo_0.hasFailed, 
-            membershipType = v8.membershipType
-        };
-    end
-}));
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Rodux = require(PurchasePromptParent.PurchasePromptDeps).Rodux
+local AccountInfoReceived = require(PurchasePrompt.Actions.AccountInfoReceived)
+local BalanceInfoRecieved = require(PurchasePrompt.Actions.BalanceInfoRecieved)
+
+return (Rodux.createReducer({}, {
+	[AccountInfoReceived.name] = function(p1, p2) -- line: 11
+		local accountInfo = p2.accountInfo
+
+		return {
+			balance = p1.balance,
+			membershipType = not accountInfo.isPremium and 0 or 4
+		}
+	end,
+	[BalanceInfoRecieved.name] = function(p3, p4) -- line: 23
+		local balanceInfo = p4.balanceInfo
+
+		return {
+			balance = balanceInfo.robux,
+			hasFailed = balanceInfo.hasFailed,
+			membershipType = p3.membershipType
+		}
+	end
+}))

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXResetFetchMarketplaceLogicV2", false);
+return game:DefineFastFlag("AXResetFetchMarketplaceLogicV2", false)

@@ -1,31 +1,34 @@
-local v0 = false;
-local v1 = {};
-local function v5(v2) --[[ Line: 7 ]] --[[ Name: batch ]]
-    -- upvalues: v0 (ref), v1 (copy)
-    if not v0 then
-        v0 = true;
-        v2();
-        for _, v4 in v1 do
-            v4();
-        end;
-        table.clear(v1);
-        v0 = false;
-        return;
-    else
-        v2();
-        return;
-    end;
-end;
-return {
-    batch = v5, 
-    flush = function() --[[ Line: 21 ]] --[[ Name: flush ]]
-        -- upvalues: v5 (copy)
-        v5(function() --[[ Line: 22 ]]
+local u1 = false
+local t1 = {}
 
-        end);
-    end, 
-    schedule = function(v6) --[[ Line: 25 ]] --[[ Name: schedule ]]
-        -- upvalues: v1 (copy)
-        table.insert(v1, v6);
-    end
-};
+local function batch(p1: ((...any) -> ...any)) -- line: 7
+	-- upvalues: u1 (ref), t1 (copy)
+	if not u1 then
+		u1 = true
+		p1()
+
+		for _, v6 in t1 do
+			v6()
+		end
+
+		table.clear(t1)
+		u1 = false
+
+		return
+	end
+
+	p1()
+end
+
+return {
+	batch = batch,
+	flush = function() -- line: 21
+		-- upvalues: batch (copy)
+		batch(function() -- line: 22
+		end)
+	end,
+	schedule = function(p2: ((...any) -> ...any)) -- line: 25
+		-- upvalues: t1 (copy)
+		table.insert(t1, p2)
+	end
+}

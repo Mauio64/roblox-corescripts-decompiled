@@ -1,30 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-local l_GenerateStringId_0 = require(l_Parent_0.AppCommonLib).GenerateStringId;
-local v3 = require(script.Parent.MessageModel);
-local v8 = {
-    mock = function(v4) --[[ Line: 11 ]] --[[ Name: mock ]]
-        -- upvalues: v3 (copy), l_GenerateStringId_0 (copy), l_DateTime_0 (copy)
-        local v5 = v3.new();
-        v5.id = l_GenerateStringId_0();
-        v5.senderTargetId = l_GenerateStringId_0();
-        v5.conversationId = l_GenerateStringId_0();
-        v5.senderType = v3.SenderTypes.User;
-        v5.content = "MESSAGE CONTENT";
-        v5.messageType = v3.MessageTypes.PlainText;
-        v5.read = false;
-        v5.sent = l_DateTime_0.now();
-        v5.previousMessageId = nil;
-        v5.filteredForReceivers = false;
-        if v4 ~= nil then
-            for v6, v7 in pairs(v4) do
-                v5[v6] = v7;
-            end;
-        end;
-        return v5;
-    end
-};
-setmetatable(v8, {
-    __index = v3
-});
-return v8;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local DateTime = require(Parent.Time).DateTime
+local GenerateStringId = require(Parent.AppCommonLib).GenerateStringId
+local MessageModel = require(script.Parent.MessageModel)
+local t1 = {
+	mock = function(p1) -- line: 11
+		-- upvalues: MessageModel (copy), GenerateStringId (copy), DateTime (copy)
+		local v7 = MessageModel.new()
+
+		v7.id = GenerateStringId()
+		v7.senderTargetId = GenerateStringId()
+		v7.conversationId = GenerateStringId()
+		v7.senderType = MessageModel.SenderTypes.User
+		v7.content = "MESSAGE CONTENT"
+		v7.messageType = MessageModel.MessageTypes.PlainText
+		v7.read = false
+		v7.sent = DateTime.now()
+		v7.previousMessageId = nil
+		v7.filteredForReceivers = false
+
+		if p1 ~= nil then
+			for k, v in pairs(p1) do
+				v7[k] = v
+			end
+		end
+
+		return v7
+	end
+}
+
+setmetatable(t1, {
+	__index = MessageModel
+})
+
+return t1

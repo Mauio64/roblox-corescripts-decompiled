@@ -1,216 +1,221 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.UIBlox);
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_ButtonStack_0 = v1.App.Button.ButtonStack;
-local l_ButtonType_0 = v1.App.Button.Enum.ButtonType;
-local l_HeaderBar_0 = v1.App.Bar.HeaderBar;
-local l_IconButton_0 = v1.App.Button.IconButton;
-local l_IconSize_0 = v1.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v1.App.ImageSet.Images;
-local l_withStyle_0 = v1.Style.withStyle;
-local function _(v11) --[[ Line: 30 ]] --[[ Name: renderWrappingCenter ]]
-    -- upvalues: l_withStyle_0 (copy), v2 (copy)
-    return function() --[[ Line: 31 ]]
-        -- upvalues: l_withStyle_0 (ref), v2 (ref), v11 (copy)
-        return l_withStyle_0(function(v12) --[[ Line: 32 ]]
-            -- upvalues: v2 (ref), v11 (ref)
-            local l_Theme_0 = v12.Theme;
-            local l_Font_0 = v12.Font;
-            return v2.createElement("TextLabel", {
-                Text = v11, 
-                Font = l_Font_0.Header2.Font, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                TextSize = 20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1
-            });
-        end);
-    end;
-end;
-local function _(v16, v17, v18, v19, v20) --[[ Line: 52 ]] --[[ Name: renderHeaderBarLeft ]]
-    -- upvalues: v2 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy)
-    local v21 = v19 or v20;
-    return function() --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), v16 (copy), v21 (copy), v20 (copy), v17 (copy), v19 (copy), v18 (copy)
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 120, 1, 0)
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            BackButton = v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/pushBack"], 
-                layoutOrder = 1, 
-                onActivated = v16
-            }), 
-            UndoButton = v21 and v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/actions/edit/undo"], 
-                isDisabled = not v20, 
-                layoutOrder = 2, 
-                onActivated = v17
-            }), 
-            RedoButton = v21 and v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/actions/edit/redo"], 
-                isDisabled = not v19, 
-                layoutOrder = 3, 
-                onActivated = v18
-            })
-        });
-    end;
-end;
-local function _(v23, v24) --[[ Line: 89 ]] --[[ Name: renderHeaderBarRight ]]
-    -- upvalues: v2 (copy), l_ButtonStack_0 (copy), l_ButtonType_0 (copy), v3 (copy)
-    return function() --[[ Line: 90 ]]
-        -- upvalues: v2 (ref), l_ButtonStack_0 (ref), l_ButtonType_0 (ref), v23 (copy), v24 (copy), v3 (ref)
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 144, 1, 0)
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            Buttons = v2.createElement(l_ButtonStack_0, {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = function() --[[ Line: 105 ]] --[[ Name: onActivated ]]
-                                -- upvalues: v23 (ref), v24 (ref)
-                                v23(v24);
-                            end, 
-                            text = v3:FormatByKey("Feature.ReportAbuse.Action.Next")
-                        }
-                    }
-                }
-            })
-        });
-    end;
-end;
-return function(v26) --[[ Line: 116 ]] --[[ Name: LandscapeModeHeader ]]
-    -- upvalues: v2 (copy), l_HeaderBar_0 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy), l_ButtonStack_0 (copy), l_ButtonType_0 (copy), v3 (copy), l_withStyle_0 (copy)
-    local l_createElement_0 = v2.createElement;
-    local v28 = "Frame";
-    local v29 = {
-        BackgroundTransparency = 0, 
-        BackgroundColor3 = Color3.fromHex("#4F545F"), 
-        LayoutOrder = 1, 
-        Size = UDim2.new(1, 0, 0, 47), 
-        ZIndex = 2
-    };
-    local v30 = {};
-    local l_createElement_1 = v2.createElement;
-    local l_l_HeaderBar_0_0 = l_HeaderBar_0;
-    local v33 = {
-        backgroundTransparency = 1, 
-        barHeight = 48
-    };
-    local l_backAction_0 = v26.backAction;
-    local l_undoAnnotationPoints_0 = v26.undoAnnotationPoints;
-    local l_redoAnnotationPoints_0 = v26.redoAnnotationPoints;
-    local l_isRedoEnabled_0 = v26.isRedoEnabled;
-    local l_isUndoEnabled_0 = v26.isUndoEnabled;
-    local v39 = l_isRedoEnabled_0 or l_isUndoEnabled_0;
-    local l_l_backAction_0_0 = l_backAction_0 --[[ copy: 9 -> 15 ]];
-    local l_l_undoAnnotationPoints_0_0 = l_undoAnnotationPoints_0 --[[ copy: 10 -> 16 ]];
-    v33.renderLeft = function() --[[ Line: 54 ]]
-        -- upvalues: v2 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), l_l_backAction_0_0 (copy), v39 (copy), l_isUndoEnabled_0 (copy), l_l_undoAnnotationPoints_0_0 (copy), l_isRedoEnabled_0 (copy), l_redoAnnotationPoints_0 (copy)
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 120, 1, 0)
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            BackButton = v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/pushBack"], 
-                layoutOrder = 1, 
-                onActivated = l_l_backAction_0_0
-            }), 
-            UndoButton = v39 and v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/actions/edit/undo"], 
-                isDisabled = not l_isUndoEnabled_0, 
-                layoutOrder = 2, 
-                onActivated = l_l_undoAnnotationPoints_0_0
-            }), 
-            RedoButton = v39 and v2.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/actions/edit/redo"], 
-                isDisabled = not l_isRedoEnabled_0, 
-                layoutOrder = 3, 
-                onActivated = l_redoAnnotationPoints_0
-            })
-        });
-    end;
-    l_backAction_0 = v26.finishAnnotationAction;
-    l_undoAnnotationPoints_0 = v26.annotationPoints;
-    local l_l_backAction_0_1 = l_backAction_0 --[[ copy: 9 -> 17 ]];
-    v33.renderRight = function() --[[ Line: 90 ]]
-        -- upvalues: v2 (ref), l_ButtonStack_0 (ref), l_ButtonType_0 (ref), l_l_backAction_0_1 (copy), l_undoAnnotationPoints_0 (copy), v3 (ref)
-        return v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 144, 1, 0)
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            Buttons = v2.createElement(l_ButtonStack_0, {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = function() --[[ Line: 105 ]] --[[ Name: onActivated ]]
-                                -- upvalues: l_l_backAction_0_1 (ref), l_undoAnnotationPoints_0 (ref)
-                                l_l_backAction_0_1(l_undoAnnotationPoints_0);
-                            end, 
-                            text = v3:FormatByKey("Feature.ReportAbuse.Action.Next")
-                        }
-                    }
-                }
-            })
-        });
-    end;
-    l_backAction_0 = v26.titleText;
-    v33.renderCenter = function() --[[ Line: 31 ]]
-        -- upvalues: l_withStyle_0 (ref), v2 (ref), l_backAction_0 (copy)
-        return l_withStyle_0(function(v43) --[[ Line: 32 ]]
-            -- upvalues: v2 (ref), l_backAction_0 (ref)
-            local l_Theme_1 = v43.Theme;
-            local l_Font_1 = v43.Font;
-            return v2.createElement("TextLabel", {
-                Text = l_backAction_0, 
-                Font = l_Font_1.Header2.Font, 
-                TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                TextTransparency = l_Theme_1.TextEmphasis.Transparency, 
-                TextSize = 20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundTransparency = 1
-            });
-        end);
-    end;
-    v30.Bar = l_createElement_1(l_l_HeaderBar_0_0, v33);
-    return l_createElement_0(v28, v29, v30);
-end;
+local CorePackages = game:GetService("CorePackages")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local React = require(CorePackages.Packages.React)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ButtonStack = UIBlox.App.Button.ButtonStack
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local withStyle = UIBlox.Style.withStyle
+
+local function renderWrappingCenter(p1) -- line: 30
+	-- upvalues: withStyle (copy), React (copy)
+	return function() -- line: 31
+		-- upvalues: withStyle (copy), React (copy), p1 (copy)
+		return withStyle(function(p2) -- line: 32
+			-- upvalues: React (copy), p1 (copy)
+			local Theme = p2.Theme
+			local p2Font = p2.Font
+
+			return React.createElement("TextLabel", {
+				TextSize = 20,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = p1,
+				Font = p2Font.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0)
+			})
+		end)
+	end
+end
+local function renderHeaderBarLeft(p3, p4, p5, p6, p7) -- line: 52
+	-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy)
+	local v22 = p6 or p7
+
+	return function() -- line: 54
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), p3 (copy), v22 (copy), p7 (copy), p4 (copy), p6 (copy), p5 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 120, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			BackButton = React.createElement(IconButton, {
+				layoutOrder = 1,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = p3
+			}),
+			UndoButton = v22 and React.createElement(IconButton, {
+				layoutOrder = 2,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/actions/edit/undo"],
+				isDisabled = not p7,
+				onActivated = p4
+			}),
+			RedoButton = v22 and React.createElement(IconButton, {
+				layoutOrder = 3,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/actions/edit/redo"],
+				isDisabled = not p6,
+				onActivated = p5
+			})
+		})
+	end
+end
+local function renderHeaderBarRight(p8, p9) -- line: 89
+	-- upvalues: React (copy), ButtonStack (copy), ButtonType (copy), RobloxTranslator (copy)
+	return function() -- line: 90
+		-- upvalues: React (copy), ButtonStack (copy), ButtonType (copy), p8 (copy), p9 (copy), RobloxTranslator (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 144, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			Buttons = React.createElement(ButtonStack, {
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = function() -- line: 105
+							-- upvalues: p8 (copy), p9 (copy)
+							p8(p9)
+						end,
+						text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.Next")
+					}
+				}}
+			})
+		})
+	end
+end
+local function LandscapeModeHeader(t1: {[any]: any}) -- line: 116
+	-- upvalues: React (copy), HeaderBar (copy), IconButton (copy), IconSize (copy), Images (copy), ButtonStack (copy), ButtonType (copy), RobloxTranslator (copy), withStyle (copy)
+	local createElement = React.createElement
+	local t2 = {
+		BackgroundTransparency = 0,
+		LayoutOrder = 1,
+		ZIndex = 2,
+		BackgroundColor3 = Color3.fromHex("#4F545F"),
+		Size = UDim2.new(1, 0, 0, 47)
+	}
+	local t3 = {}
+	local createElement2 = React.createElement
+	local v30 = HeaderBar
+	local t4 = {
+		backgroundTransparency = 1,
+		barHeight = 48
+	}
+	local backAction = t1.backAction
+	local undoAnnotationPoints = t1.undoAnnotationPoints
+	local redoAnnotationPoints = t1.redoAnnotationPoints
+	local isRedoEnabled = t1.isRedoEnabled
+	local isUndoEnabled = t1.isUndoEnabled
+	local v37 = isRedoEnabled or isUndoEnabled
+
+	function t4.renderLeft() -- line: 54
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), backAction (copy), v37 (copy), isUndoEnabled (copy), undoAnnotationPoints (copy), isRedoEnabled (copy), redoAnnotationPoints (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 120, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			BackButton = React.createElement(IconButton, {
+				layoutOrder = 1,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = backAction
+			}),
+			UndoButton = v37 and React.createElement(IconButton, {
+				layoutOrder = 2,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/actions/edit/undo"],
+				isDisabled = not isUndoEnabled,
+				onActivated = undoAnnotationPoints
+			}),
+			RedoButton = v37 and React.createElement(IconButton, {
+				layoutOrder = 3,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/actions/edit/redo"],
+				isDisabled = not isRedoEnabled,
+				onActivated = redoAnnotationPoints
+			})
+		})
+	end
+
+	local finishAnnotationAction = t1.finishAnnotationAction
+	local annotationPoints = t1.annotationPoints
+
+	function t4.renderRight() -- line: 90
+		-- upvalues: React (copy), ButtonStack (copy), ButtonType (copy), finishAnnotationAction (copy), annotationPoints (copy), RobloxTranslator (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 144, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			Buttons = React.createElement(ButtonStack, {
+				buttons = {{
+					buttonType = ButtonType.PrimarySystem,
+					props = {
+						onActivated = function() -- line: 105
+							-- upvalues: finishAnnotationAction (copy), annotationPoints (copy)
+							finishAnnotationAction(annotationPoints)
+						end,
+						text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.Next")
+					}
+				}}
+			})
+		})
+	end
+
+	local titleText = t1.titleText
+
+	function t4.renderCenter() -- line: 31
+		-- upvalues: withStyle (copy), React (copy), titleText (copy)
+		return withStyle(function(p10) -- line: 32
+			-- upvalues: React (copy), titleText (copy)
+			local Theme = p10.Theme
+			local p10Font = p10.Font
+
+			return React.createElement("TextLabel", {
+				TextSize = 20,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = titleText,
+				Font = p10Font.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(1, 0, 1, 0)
+			})
+		end)
+	end
+
+	t3.Bar = createElement2(v30, t4)
+
+	return createElement("Frame", t2, t3)
+end
+
+return LandscapeModeHeader

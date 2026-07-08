@@ -1,16 +1,20 @@
-local v0 = require(script.Parent.symbols);
-local function v1(v2, v3) --[[ Line: 3 ]] --[[ Name: resetMock ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    local v4 = getmetatable(v2);
-    v4[v0.Calls] = {};
-    for _, v6 in pairs(v4[v0.Children]) do
-        if not v3[v6] then
-            v3[v6] = true;
-            v1(v6, v3);
-        end;
-    end;
-end;
-return function(v7) --[[ Line: 15 ]]
-    -- upvalues: v1 (copy)
-    v1(v7, {});
-end;
+local symbols = require(script.Parent.symbols)
+
+local function resetMock(p1, p2) -- line: 3
+	-- upvalues: symbols (copy), resetMock (copy)
+	local mt = getmetatable(p1)
+
+	mt[symbols.Calls] = {}
+
+	for _, v in pairs(mt[symbols.Children]) do
+		if not p2[v] then
+			p2[v] = true
+			resetMock(v, p2)
+		end
+	end
+end
+
+return function(p3) -- line: 15
+	-- upvalues: resetMock (copy)
+	resetMock(p3, {})
+end

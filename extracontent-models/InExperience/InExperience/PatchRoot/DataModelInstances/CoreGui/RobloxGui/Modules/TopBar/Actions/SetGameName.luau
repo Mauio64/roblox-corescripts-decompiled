@@ -1,13 +1,14 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Flags.FFlagTopBarDeprecateGameInfoRodux);
-local l_makeActionCreator_0 = require(l_CorePackages_0.Packages.Rodux).makeActionCreator;
-if v2 then
-    return nil;
-else
-    return (l_makeActionCreator_0(script.Name, function(v4) --[[ Line: 11 ]]
-        return {
-            gameName = v4
-        };
-    end));
-end;
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent
+local FFlagTopBarDeprecateGameInfoRodux = require(ParentParent.Flags.FFlagTopBarDeprecateGameInfoRodux)
+local makeActionCreator = require(CorePackages.Packages.Rodux).makeActionCreator
+
+if FFlagTopBarDeprecateGameInfoRodux then
+	return nil
+end
+
+return (makeActionCreator(script.Name, function(p1) -- line: 11
+	return {
+		gameName = p1
+	}
+end))

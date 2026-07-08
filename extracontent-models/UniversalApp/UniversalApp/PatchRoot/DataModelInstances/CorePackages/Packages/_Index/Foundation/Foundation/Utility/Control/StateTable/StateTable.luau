@@ -1,61 +1,79 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Enums.ControlState);
-local _ = require(l_script_FirstAncestor_0.Enums.ControlStateEvent);
-local v3 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5, v6, v7) --[[ Line: 53 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    assert(#v5 > 0, "name must not be an empty string");
-    assert(v7[v6] ~= nil, "initialState must be present in transitionTable");
-    local v8 = {};
-    setmetatable(v8, v4);
-    v8.name = v5;
-    v8.currentState = v6;
-    v8.transitionTable = {};
-    v8.events = {};
-    for v9, v10 in v7 do
-        local v11 = {};
-        for v12, v13 in v10 do
-            local l_nextState_0 = v13.nextState;
-            if l_nextState_0 ~= nil then
-                assert(v7[l_nextState_0] ~= nil, "nextState does not exist in transitionTable");
-            end;
-            v11[v12] = v13;
-            if v8.events[v12] == nil then
-                v8.events[v12] = function() --[[ Line: 79 ]]
-                    -- upvalues: v8 (copy), v12 (copy)
-                    return v8:handleEvent(v12);
-                end;
-            end;
-        end;
-        v8.transitionTable[v9] = v11;
-    end;
-    setmetatable(v8.events, {
-        __index = function(_, v16) --[[ Line: 90 ]] --[[ Name: __index ]]
-            -- upvalues: v8 (copy)
-            error(string.format("'%s' is not a valid event in StateTable '%s'", tostring(v16), v8.name), 2);
-        end
-    });
-    return v8;
-end;
-v4.handleEvent = function(v17, v18) --[[ Line: 109 ]] --[[ Name: handleEvent ]]
-    -- upvalues: v3 (copy)
-    local l_currentState_0 = v17.currentState;
-    local v20 = v17.transitionTable[l_currentState_0][v18];
-    if v20 == nil then
-        v3:debug("No transition found for event " .. v18 .. " in state " .. l_currentState_0);
-        return;
-    else
-        local l_nextState_1 = v20.nextState;
-        v17.currentState = l_nextState_1;
-        if v17.stateChangeHandler ~= nil then
-            v17.stateChangeHandler(l_nextState_1);
-        end;
-        return;
-    end;
-end;
-v4.onStateChange = function(v22, v23) --[[ Line: 137 ]] --[[ Name: onStateChange ]]
-    v22.stateChangeHandler = v23;
-end;
-return v4;
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Enums.ControlState)
+require(Foundation.Enums.ControlStateEvent)
+
+local Logger = require(Foundation.Utility.Logger)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(s1: string, p1, t2: {[any]: any}) -- line: 53
+	-- upvalues: t1 (copy)
+	assert(#s1 > 0, "name must not be an empty string")
+	assert(t2[p1] ~= nil, "initialState must be present in transitionTable")
+
+	local t3 = {}
+
+	setmetatable(t3, t1)
+	t3.name = s1
+	t3.currentState = p1
+	t3.transitionTable = {}
+	t3.events = {}
+
+	for v8, v9 in t2 do
+		local t4 = {}
+
+		for v11, v12 in v9 do
+			local nextState = v12.nextState
+
+			if nextState ~= nil then
+				assert(t2[nextState] ~= nil, "nextState does not exist in transitionTable")
+			end
+
+			t4[v11] = v12
+
+			if t3.events[v11] == nil then
+				t3.events[v11] = function() -- line: 79
+					-- upvalues: t3 (copy), v11 (copy)
+					return t3:handleEvent(v11)
+				end
+			end
+		end
+
+		t3.transitionTable[v8] = t4
+	end
+
+	setmetatable(t3.events, {
+		__index = function(_, p3) -- line: 90
+			-- upvalues: t3 (copy)
+			error(string.format("'%s' is not a valid event in StateTable '%s'", tostring(p3), t3.name), 2)
+		end
+	})
+
+	return t3
+end
+function t1.handleEvent(t5: {[any]: any}, s2: string) -- line: 109
+	-- upvalues: Logger (copy)
+	local currentState = t5.currentState
+	local v17 = t5.transitionTable[currentState][s2]
+
+	if v17 == nil then
+		Logger:debug("No transition found for event " .. s2 .. " in state " .. currentState)
+
+		return
+	end
+
+	local nextState = v17.nextState
+
+	t5.currentState = nextState
+
+	if t5.stateChangeHandler ~= nil then
+		t5.stateChangeHandler(nextState)
+	end
+end
+function t1.onStateChange(t6: {[any]: any}, p4: ((...any) -> ...any)?) -- line: 137
+	t6.stateChangeHandler = p4
+end
+
+return t1

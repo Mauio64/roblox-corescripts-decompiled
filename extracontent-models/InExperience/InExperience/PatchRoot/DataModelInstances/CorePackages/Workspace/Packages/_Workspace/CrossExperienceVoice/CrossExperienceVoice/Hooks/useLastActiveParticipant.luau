@@ -1,34 +1,39 @@
-local l_game_EngineFeature_0 = game:GetEngineFeature("AudioFocusManagement");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CrossExperienceVoice");
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_useSelector_0 = v2.RoactUtils.Hooks.RoactRodux.useSelector;
-local v4 = require(l_script_FirstAncestor_0.Hooks.useIsVoiceFocused);
-local l_GetFFlagEnableCrossExpVoice_0 = v2.SharedFlags.GetFFlagEnableCrossExpVoice;
-return function() --[[ Line: 13 ]]
-    -- upvalues: l_GetFFlagEnableCrossExpVoice_0 (copy), v4 (copy), l_useSelector_0 (copy), l_game_EngineFeature_0 (copy)
-    if not l_GetFFlagEnableCrossExpVoice_0() then
-        return nil;
-    else
-        local v6 = v4();
-        local v12 = l_useSelector_0(function(v7) --[[ Line: 19 ]]
-            if v7 and v7.Squad and v7.Squad.CrossExperienceVoice then
-                local l_activeUserIds_0 = v7.Squad.CrossExperienceVoice.Participants.activeUserIds;
-                for v9 = #l_activeUserIds_0, 1, -1 do
-                    local v10 = l_activeUserIds_0[v9];
-                    local v11 = v7.Squad.CrossExperienceVoice.Participants.participants[v10];
-                    if v11 and not v11.isMuted then
-                        return v11;
-                    end;
-                end;
-                return nil;
-            else
-                return nil;
-            end;
-        end);
-        if l_game_EngineFeature_0 and not v6 then
-            return nil;
-        else
-            return v12;
-        end;
-    end;
-end;
+local EngineFeature = game:GetEngineFeature("AudioFocusManagement")
+local CrossExperienceVoice = script:FindFirstAncestor("CrossExperienceVoice")
+local dependencies = require(CrossExperienceVoice.dependencies)
+local useSelector = dependencies.RoactUtils.Hooks.RoactRodux.useSelector
+local useIsVoiceFocused = require(CrossExperienceVoice.Hooks.useIsVoiceFocused)
+local GetFFlagEnableCrossExpVoice = dependencies.SharedFlags.GetFFlagEnableCrossExpVoice
+
+return function() -- line: 13
+	-- upvalues: GetFFlagEnableCrossExpVoice (copy), useIsVoiceFocused (copy), useSelector (copy), EngineFeature (copy)
+	if not GetFFlagEnableCrossExpVoice() then
+		return nil
+	end
+
+	local v7 = useIsVoiceFocused()
+	local v8 = useSelector(function(p1) -- line: 19
+		if p1 and (p1.Squad and p1.Squad.CrossExperienceVoice) then
+			local activeUserIds = p1.Squad.CrossExperienceVoice.Participants.activeUserIds
+
+			for i = #activeUserIds, 1, -1 do
+				local v12 = activeUserIds[i]
+				local v13 = p1.Squad.CrossExperienceVoice.Participants.participants[v12]
+
+				if v13 and not v13.isMuted then
+					return v13
+				end
+			end
+
+			return nil
+		end
+
+		return nil
+	end)
+
+	if EngineFeature and not v7 then
+		return nil
+	end
+
+	return v8
+end

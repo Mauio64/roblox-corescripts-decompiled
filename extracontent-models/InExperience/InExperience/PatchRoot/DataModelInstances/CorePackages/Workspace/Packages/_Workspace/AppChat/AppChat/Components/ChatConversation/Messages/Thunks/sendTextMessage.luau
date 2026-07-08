@@ -1,8 +1,10 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Conversations.Thunks.SendTextMessage);
-local v2 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-return function(...) --[[ Line: 5 ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    v2:info("Sending text message");
-    return v1(...);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local SendTextMessage = require(AppChat.Conversations.Thunks.SendTextMessage)
+local v3 = require(AppChat.Logger):new(script.Name)
+
+return function(...) -- line: 5
+	-- upvalues: v3 (copy), SendTextMessage (copy)
+	v3:info("Sending text message")
+
+	return SendTextMessage(...)
+end

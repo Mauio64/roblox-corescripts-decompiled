@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LowCogsBannerExperiment", false);
+return game:DefineFastFlag("LowCogsBannerExperiment", false)

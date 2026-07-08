@@ -1,52 +1,66 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InExperienceIntervention");
-local _ = require(l_script_FirstAncestor_0.Utils.Types);
-local v2 = require(l_script_FirstAncestor_0.Utils.Constants);
-local l_UIStateActions_0 = v2.UIStateActions;
-local v4 = game:DefineFastInt("ChatInterventionUIRateLimitWindowSec", 5);
-local v5 = game:DefineFastFlag("RateLimitNudgeToast", false);
-local v6 = game:DefineFastFlag("RateLimitTimeoutToast", false);
-local v7 = game:DefineFastFlag("RateLimitNudgeDialog", false);
-local v8 = game:DefineFastFlag("RateLimitTimeoutDialog", false);
-return function(v9, v10) --[[ Line: 12 ]] --[[ Name: InExperienceInterventionUIStateReducer ]]
-    -- upvalues: v4 (copy), v6 (copy), v2 (copy), v5 (copy), v7 (copy), v8 (copy), l_UIStateActions_0 (copy)
-    local v11 = table.clone(v9);
-    local l_type_0 = v10.type;
-    local v13 = false;
-    local v14 = DateTime.now().UnixTimestamp - v9.dispatchTimestamp < v4;
-    local v15 = v10.treatmentType == v9.treatmentType;
-    local v16 = false;
-    if v6 then
-        local v17 = v10.treatmentType == v2.TreatmentType.ChatTimeoutChatAttempt and v9.treatmentType == v2.TreatmentType.ChatTimeoutGameJoin or v10.treatmentType == v2.TreatmentType.ChatTimeoutGameJoin and v9.treatmentType == v2.TreatmentType.ChatTimeoutChatAttempt;
-        local v18 = true;
-        if v10.treatmentType ~= v2.TreatmentType.ChatTimeoutChatAttempt then
-            v18 = v10.treatmentType == v2.TreatmentType.ChatTimeoutGameJoin;
-        end;
-        v16 = v15 and v18 or v17;
-    end;
-    local v19 = false;
-    if v5 then
-        v19 = v10.treatmentType == v2.TreatmentType.ChatNudgeToast and v15;
-    end;
-    local v20 = false;
-    if v7 then
-        v20 = v10.treatmentType == v2.TreatmentType.ChatNudgeDialog and v15;
-    end;
-    local v21 = false;
-    if v8 then
-        v21 = v10.treatmentType == v2.TreatmentType.ChatTimeoutDialog and v15;
-    end;
-    v13 = (not not v16 or v19 or v20 or v21) and v14;
-    if l_type_0 == l_UIStateActions_0.ToggleNotificationDialog and not v13 then
-        v11.isShown = v10.isShown;
-        v11.treatmentType = v10.treatmentType;
-        v11.detail = v10.detail or {};
-        v11.endTime = v10.endTime or 0;
-        v11.dispatchTimestamp = v10.dispatchTimestamp;
-        return v11;
-    else
-        if v13 then
-            print("Chat intervention UI treatment rate limited: ", v10.treatmentType);
-        end;
-        return v9;
-    end;
-end;
+local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
+local InExperienceInterventionParent = InExperienceIntervention.Parent
+
+require(InExperienceIntervention.Utils.Types)
+
+local Constants = require(InExperienceInterventionParent.InterventionShared).Utils.Constants
+local UIStateActions = Constants.UIStateActions
+local v5 = game:DefineFastInt("ChatInterventionUIRateLimitWindowSec", 5)
+local v6 = game:DefineFastFlag("RateLimitNudgeToast", false)
+local v7 = game:DefineFastFlag("RateLimitTimeoutToast", false)
+local v8 = game:DefineFastFlag("RateLimitNudgeDialog", false)
+local v9 = game:DefineFastFlag("RateLimitTimeoutDialog", false)
+
+local function InExperienceInterventionUIStateReducer(p1, p2) -- line: 13
+	-- upvalues: v5 (copy), v7 (copy), Constants (copy), v6 (copy), v8 (copy), v9 (copy), UIStateActions (copy)
+	local v13 = table.clone(p1)
+	local type = p2.type
+	local v15 = DateTime.now().UnixTimestamp - p1.dispatchTimestamp < v5
+	local v16 = p2.treatmentType == p1.treatmentType
+	local v17 = false
+
+	if v7 then
+		local v18 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt and p1.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin or p2.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin and p1.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt
+		local v19 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutChatAttempt or p2.treatmentType == Constants.TreatmentType.ChatTimeoutGameJoin
+
+		v17 = v16 and v19 or v18
+	end
+
+	local v20 = false
+
+	if v6 then
+		v20 = p2.treatmentType == Constants.TreatmentType.ChatNudgeToast and v16
+	end
+
+	local v21 = false
+
+	if v8 then
+		v21 = p2.treatmentType == Constants.TreatmentType.ChatNudgeDialog and v16
+	end
+
+	local v22 = false
+
+	if v9 then
+		v22 = p2.treatmentType == Constants.TreatmentType.ChatTimeoutDialog and v16
+	end
+
+	local v23 = (v17 or (v20 or (v21 or v22))) and v15
+
+	if type == UIStateActions.ToggleNotificationDialog and not v23 then
+		v13.isShown = p2.isShown
+		v13.treatmentType = p2.treatmentType
+		v13.detail = p2.detail or {}
+		v13.endTime = p2.endTime or 0
+		v13.dispatchTimestamp = p2.dispatchTimestamp
+
+		return v13
+	end
+
+	if v23 then
+		print("Chat intervention UI treatment rate limited: ", p2.treatmentType)
+	end
+
+	return p1
+end
+
+return InExperienceInterventionUIStateReducer

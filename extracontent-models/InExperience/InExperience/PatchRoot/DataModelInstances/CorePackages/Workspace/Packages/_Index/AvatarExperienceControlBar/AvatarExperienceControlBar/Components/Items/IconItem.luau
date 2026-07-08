@@ -1,236 +1,247 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.ReactOtter);
-local v5 = require(l_script_FirstAncestor_0.Components.Tooltip);
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local l_FFlagAXAddToolTipToIconItemMenu_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXAddToolTipToIconItemMenu;
-local l_FFlagAXMigrateBuilderIcons_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons;
-local l_isBuilderIcon_0 = v3.Utility.isBuilderIcon;
-local l_IconVariant_0 = v3.Enums.IconVariant;
-local v11 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local v12 = require(l_script_FirstAncestor_0.Hooks.useHoverBinding);
-local v13 = if l_FFlagAXMigrateBuilderIcons_0 then v3.Enums.IconName.X else "icons/navigation/close";
-local v14 = {
-    dampingRatio = 1, 
-    frequency = 5
-};
-return v2.forwardRef(function(v15, v16) --[[ Line: 44 ]] --[[ Name: IconItem ]]
-    -- upvalues: v11 (copy), v12 (copy), v4 (copy), l_FFlagAXMigrateBuilderIcons_0 (copy), v13 (copy), l_IconVariant_0 (copy), v2 (copy), v14 (copy), l_FFlagAXAddToolTipToIconItemMenu_0 (copy), v3 (copy), v5 (copy), l_isBuilderIcon_0 (copy)
-    local v17 = v11();
-    local v18, v19 = v12();
-    local v20, v21 = v4.useAnimatedBinding(0);
-    local v22 = v15.isActive or false;
-    local v23 = if v15.size then v15.size else v17.defaultIconContainerSize;
-    local v24 = if v15.iconSize then v15.iconSize else if l_FFlagAXMigrateBuilderIcons_0 then v17.defaultLegacyIconSize else v17.defaultIconSize;
-    local v25 = if v15.activeIcon then v15.activeIcon else v13;
-    local v26 = if l_FFlagAXMigrateBuilderIcons_0 then if v15.activeIconVariant then v15.activeIconVariant else l_IconVariant_0.Regular else nil;
-    local v27 = if v15.activeIconSize then v15.activeIconSize else if v25 == v13 then v17.closeIconSize else v24;
-    v2.useEffect(function() --[[ Line: 64 ]]
-        -- upvalues: v15 (copy), v21 (copy), v4 (ref), v22 (copy), v14 (ref)
-        if v15.animate then
-            v21(v4.spring(v22 and 1 or 0, v14));
-            return;
-        else
-            v21((v4.instant(v22 and 1 or 0)));
-            return;
-        end;
-    end, {
-        v22, 
-        v15.animate
-    });
-    if l_FFlagAXAddToolTipToIconItemMenu_0 then
-        return v2.createElement(v3.View, {
-            Size = UDim2.new(0, v23, 0, v23), 
-            LayoutOrder = v15.LayoutOrder, 
-            tag = "row align-x-center align-y-center"
-        }, {
-            TooltipIconItem = v2.createElement(v5, v15.toolTipConfig, v2.createElement(v3.View, {
-                Size = UDim2.new(0, v23, 0, v23), 
-                onStateChanged = v19, 
-                stateLayer = {
-                    affordance = v3.Enums.StateLayerAffordance.None
-                }, 
-                tag = "radius-circle", 
-                onActivated = v15.onActivated, 
-                disabled = v15.disabled, 
-                ref = v16, 
-                LayoutOrder = v15.LayoutOrder
-            }, {
-                Icon = v2.createElement(v3.View, {
-                    Size = UDim2.fromScale(1, 1), 
-                    Visible = not v15.isActive or v15.animate and true or false, 
-                    backgroundStyle = if v15.disabled then nil else v18:map(function(v28) --[[ Line: 98 ]]
-                        -- upvalues: v17 (copy)
-                        return {
-                            Color3 = v17.hoverIconBackgroundStyle.Color3, 
-                            Transparency = if v28 then v17.hoverIconBackgroundStyle.Transparency else 1
-                        };
-                    end), 
-                    tag = if l_FFlagAXMigrateBuilderIcons_0 then {
-                        ["radius-circle position-center-center anchor-center-center clip"] = true, 
-                        ["row align-x-center align-y-center"] = l_isBuilderIcon_0(v15.icon)
-                    } else "radius-circle position-center-center anchor-center-center clip"
-                }, {
-                    IconImage = if l_FFlagAXMigrateBuilderIcons_0 and l_isBuilderIcon_0(v15.icon) then v2.createElement(v3.Icon, {
-                        name = v15.icon, 
-                        size = v20:map(function(v29) --[[ Line: 114 ]]
-                            -- upvalues: v24 (copy)
-                            return (math.round((1 - v29) * v24));
-                        end), 
-                        variant = if v15.iconVariant then v15.iconVariant else l_IconVariant_0.Regular, 
-                        style = {
-                            Color3 = v17.contentForegroundStyle.Color3, 
-                            Transparency = if v15.disabled then v17.contentDisabledTransparency else v17.contentForegroundStyle.Transparency
-                        }, 
-                        tag = "position-center-center anchor-center-center content-emphasis"
-                    }) else v2.createElement(v3.Image, {
-                        Image = v15.icon, 
-                        Size = v20:map(function(v30) --[[ Line: 129 ]]
-                            -- upvalues: v24 (copy)
-                            local v31 = math.round((1 - v30) * v24);
-                            return UDim2.fromOffset(v31, v31);
-                        end), 
-                        imageStyle = {
-                            Color3 = v17.contentForegroundStyle.Color3, 
-                            Transparency = if v15.disabled then v17.contentDisabledTransparency else v17.contentForegroundStyle.Transparency
-                        }, 
-                        tag = "position-center-center anchor-center-center content-emphasis"
-                    })
-                }), 
-                ActiveIcon = if not not v22 or v15.animate then v2.createElement(v3.View, {
-                    Size = UDim2.fromScale(1, 1), 
-                    GroupTransparency = v20:map(function(v32) --[[ Line: 145 ]]
-                        return 1 - v32;
-                    end), 
-                    backgroundStyle = if v15.disabled then nil else v18:map(function(v33) --[[ Line: 150 ]]
-                        -- upvalues: v17 (copy)
-                        if v33 then
-                            return v17.hoverIconBackgroundStyle;
-                        else
-                            return v17.activeIconBackgroundStyle;
-                        end;
-                    end), 
-                    tag = if l_FFlagAXMigrateBuilderIcons_0 then {
-                        ["radius-circle position-center-center anchor-center-center clip"] = true, 
-                        ["row align-x-center align-y-center"] = l_isBuilderIcon_0(v25)
-                    } else "radius-circle position-center-center anchor-center-center clip"
-                }, {
-                    ActiveIconImage = if l_FFlagAXMigrateBuilderIcons_0 and l_isBuilderIcon_0(v25) then v2.createElement(v3.Icon, {
-                        name = v25, 
-                        size = v20:map(function(v34) --[[ Line: 166 ]]
-                            -- upvalues: v24 (copy)
-                            return (math.round(v34 * v24));
-                        end), 
-                        variant = v26, 
-                        style = {
-                            Color3 = v17.contentForegroundStyle.Color3, 
-                            Transparency = if v15.disabled then v17.contentDisabledTransparency else v17.contentForegroundStyle.Transparency
-                        }, 
-                        tag = "size-full-full position-center-center anchor-center-center content-emphasis"
-                    }) else v2.createElement(v3.Image, {
-                        Image = v25, 
-                        Size = v20:map(function(v35) --[[ Line: 181 ]]
-                            -- upvalues: v27 (copy)
-                            local v36 = math.round(v35 * v27);
-                            return UDim2.fromOffset(v36, v36);
-                        end), 
-                        tag = "position-center-center anchor-center-center clip content-emphasis"
-                    })
-                }) else nil
-            }))
-        });
-    else
-        return v2.createElement(v3.View, {
-            Size = UDim2.new(0, v23, 0, v23), 
-            onStateChanged = v19, 
-            stateLayer = {
-                affordance = v3.Enums.StateLayerAffordance.None
-            }, 
-            tag = "radius-circle", 
-            onActivated = v15.onActivated, 
-            disabled = v15.disabled, 
-            ref = v16, 
-            LayoutOrder = v15.LayoutOrder
-        }, {
-            Icon = v2.createElement(v3.View, {
-                Size = UDim2.fromScale(1, 1), 
-                Visible = not v15.isActive or v15.animate and true or false, 
-                backgroundStyle = if v15.disabled then nil else v18:map(function(v37) --[[ Line: 210 ]]
-                    -- upvalues: v17 (copy)
-                    return {
-                        Color3 = v17.hoverIconBackgroundStyle.Color3, 
-                        Transparency = if v37 then v17.hoverIconBackgroundStyle.Transparency else 1
-                    };
-                end), 
-                tag = if l_FFlagAXMigrateBuilderIcons_0 then {
-                    ["radius-circle position-center-center anchor-center-center clip"] = true, 
-                    ["row align-x-center align-y-center"] = l_isBuilderIcon_0(v15.icon)
-                } else "radius-circle position-center-center anchor-center-center clip"
-            }, {
-                IconImage = if l_FFlagAXMigrateBuilderIcons_0 and l_isBuilderIcon_0(v15.icon) then v2.createElement(v3.Icon, {
-                    name = v15.icon, 
-                    size = v20:map(function(v38) --[[ Line: 226 ]]
-                        -- upvalues: v24 (copy)
-                        return (math.round((1 - v38) * v24));
-                    end), 
-                    variant = if v15.iconVariant then v15.iconVariant else l_IconVariant_0.Regular, 
-                    style = {
-                        Color3 = v17.contentForegroundStyle.Color3, 
-                        Transparency = if v15.disabled then v17.contentDisabledTransparency else v17.contentForegroundStyle.Transparency
-                    }, 
-                    tag = "position-center-center anchor-center-center content-emphasis"
-                }) else v2.createElement(v3.Image, {
-                    Image = v15.icon, 
-                    Size = v20:map(function(v39) --[[ Line: 241 ]]
-                        -- upvalues: v24 (copy)
-                        local v40 = math.round((1 - v39) * v24);
-                        return UDim2.fromOffset(v40, v40);
-                    end), 
-                    imageStyle = {
-                        Color3 = v17.contentForegroundStyle.Color3, 
-                        Transparency = if v15.disabled then v17.contentDisabledTransparency else v17.contentForegroundStyle.Transparency
-                    }, 
-                    tag = "position-center-center anchor-center-center content-emphasis"
-                })
-            }), 
-            ActiveIcon = if not not v22 or v15.animate then v2.createElement(v3.View, {
-                Size = UDim2.fromScale(1, 1), 
-                GroupTransparency = v20:map(function(v41) --[[ Line: 257 ]]
-                    return 1 - v41;
-                end), 
-                backgroundStyle = if v15.disabled then nil else v18:map(function(v42) --[[ Line: 262 ]]
-                    -- upvalues: v17 (copy)
-                    if v42 then
-                        return v17.hoverIconBackgroundStyle;
-                    else
-                        return v17.activeIconBackgroundStyle;
-                    end;
-                end), 
-                tag = if l_FFlagAXMigrateBuilderIcons_0 then {
-                    ["radius-circle position-center-center anchor-center-center clip"] = true, 
-                    ["row align-x-center align-y-center"] = l_isBuilderIcon_0(v25)
-                } else "radius-circle position-center-center anchor-center-center clip"
-            }, {
-                ActiveIconImage = if l_FFlagAXMigrateBuilderIcons_0 and l_isBuilderIcon_0(v25) then v2.createElement(v3.Icon, {
-                    name = v25, 
-                    size = v20:map(function(v43) --[[ Line: 278 ]]
-                        -- upvalues: v24 (copy)
-                        return (math.round((1 - v43) * v24));
-                    end), 
-                    variant = v26, 
-                    tag = "position-center-center anchor-center-center clip content-emphasis"
-                }) else v2.createElement(v3.Image, {
-                    Image = v25, 
-                    Size = v20:map(function(v44) --[[ Line: 287 ]]
-                        -- upvalues: v27 (copy)
-                        local v45 = math.round(v44 * v27);
-                        return UDim2.fromOffset(v45, v45);
-                    end), 
-                    tag = "position-center-center anchor-center-center clip content-emphasis"
-                })
-            }) else nil
-        });
-    end;
-end);
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local ReactOtter = require(AvatarExperienceControlBarParent.ReactOtter)
+local Tooltip = require(AvatarExperienceControlBar.Components.Tooltip)
+
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local FFlagAXAddToolTipToIconItemMenu = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXAddToolTipToIconItemMenu
+local FFlagAXMigrateBuilderIcons = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXMigrateBuilderIcons
+local isBuilderIcon = Foundation.Utility.isBuilderIcon
+local IconVariant = Foundation.Enums.IconVariant
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+local v13 = not FFlagAXMigrateBuilderIcons and "icons/navigation/close" or Foundation.Enums.IconName.X
+local t1 = {
+	dampingRatio = 1,
+	frequency = 5
+}
+
+local function IconItem(t2: {[any]: any}, p1) -- line: 44
+	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), ReactOtter (copy), FFlagAXMigrateBuilderIcons (copy), v13 (copy), IconVariant (copy), React (copy), t1 (copy), FFlagAXAddToolTipToIconItemMenu (copy), Foundation (copy), Tooltip (copy), isBuilderIcon (copy)
+	local v18 = useSemanticTokens()
+	local v19, v20 = useHoverBinding()
+	local v21, v22 = ReactOtter.useAnimatedBinding(0)
+	local v23 = t2.isActive or false
+	local v24 = if not t2.size then v18.defaultIconContainerSize else t2.size
+	local v25 = if not t2.iconSize then if not FFlagAXMigrateBuilderIcons then v18.defaultIconSize else v18.defaultLegacyIconSize else t2.iconSize
+	local v26 = if not t2.activeIcon then v13 else t2.activeIcon
+	local v27 = if not FFlagAXMigrateBuilderIcons then nil else if not t2.activeIconVariant then IconVariant.Regular else t2.activeIconVariant
+	local v28 = if not t2.activeIconSize then if v26 ~= v13 then v25 else v18.closeIconSize else t2.activeIconSize
+
+	React.useEffect(function() -- line: 64
+		-- upvalues: t2 (copy), v22 (copy), ReactOtter (copy), v23 (copy), t1 (copy)
+		if t2.animate then
+			v22(ReactOtter.spring(not v23 and 0 or 1, t1))
+
+			return
+		end
+
+		v22((ReactOtter.instant(not v23 and 0 or 1)))
+	end, {
+		v23,
+		t2.animate
+	})
+
+	if FFlagAXAddToolTipToIconItemMenu then
+		return React.createElement(Foundation.View, {
+			tag = "row align-x-center align-y-center",
+			Size = UDim2.new(0, v24, 0, v24),
+			LayoutOrder = t2.LayoutOrder
+		}, {
+			TooltipIconItem = React.createElement(Tooltip, t2.toolTipConfig, React.createElement(Foundation.View, {
+				tag = "radius-circle",
+				Size = UDim2.new(0, v24, 0, v24),
+				onStateChanged = v20,
+				stateLayer = {
+					affordance = Foundation.Enums.StateLayerAffordance.None
+				},
+				onActivated = t2.onActivated,
+				disabled = t2.disabled,
+				ref = p1,
+				LayoutOrder = t2.LayoutOrder
+			}, {
+				Icon = React.createElement(Foundation.View, {
+					Size = UDim2.fromScale(1, 1),
+					Visible = not t2.isActive or (t2.animate and true or false),
+					backgroundStyle = if not t2.disabled then v19:map(function(p2) -- line: 98
+						-- upvalues: v18 (copy)
+						return {
+							Color3 = v18.hoverIconBackgroundStyle.Color3,
+							Transparency = not p2 and 1 or v18.hoverIconBackgroundStyle.Transparency
+						}
+					end) else nil,
+					tag = not FFlagAXMigrateBuilderIcons and "radius-circle position-center-center anchor-center-center clip" or {
+						["radius-circle position-center-center anchor-center-center clip"] = true,
+						["row align-x-center align-y-center"] = isBuilderIcon(t2.icon)
+					}
+				}, {
+					IconImage = if not FFlagAXMigrateBuilderIcons or not isBuilderIcon(t2.icon) then React.createElement(Foundation.Image, {
+						tag = "position-center-center anchor-center-center content-emphasis",
+						Image = t2.icon,
+						Size = v21:map(function(n1: number) -- line: 129
+							-- upvalues: v25 (copy)
+							local v32 = math.round((1 - n1) * v25)
+
+							return UDim2.fromOffset(v32, v32)
+						end),
+						imageStyle = {
+							Color3 = v18.contentForegroundStyle.Color3,
+							Transparency = if not t2.disabled then v18.contentForegroundStyle.Transparency else v18.contentDisabledTransparency
+						}
+					}) else React.createElement(Foundation.Icon, {
+						tag = "position-center-center anchor-center-center content-emphasis",
+						name = t2.icon,
+						size = v21:map(function(n2: number) -- line: 114
+							-- upvalues: v25 (copy)
+							return (math.round((1 - n2) * v25))
+						end),
+						variant = if not t2.iconVariant then IconVariant.Regular else t2.iconVariant,
+						style = {
+							Color3 = v18.contentForegroundStyle.Color3,
+							Transparency = if not t2.disabled then v18.contentForegroundStyle.Transparency else v18.contentDisabledTransparency
+						}
+					})
+				}),
+				ActiveIcon = if not v23 and not t2.animate then nil else React.createElement(Foundation.View, {
+					Size = UDim2.fromScale(1, 1),
+					GroupTransparency = v21:map(function(n3: number) -- line: 145
+						return 1 - n3
+					end),
+					backgroundStyle = if not t2.disabled then v19:map(function(p3) -- line: 150
+						-- upvalues: v18 (copy)
+						if p3 then
+							return v18.hoverIconBackgroundStyle
+						end
+
+						return v18.activeIconBackgroundStyle
+					end) else nil,
+					tag = not FFlagAXMigrateBuilderIcons and "radius-circle position-center-center anchor-center-center clip" or {
+						["radius-circle position-center-center anchor-center-center clip"] = true,
+						["row align-x-center align-y-center"] = isBuilderIcon(v26)
+					}
+				}, {
+					ActiveIconImage = if not FFlagAXMigrateBuilderIcons or not isBuilderIcon(v26) then React.createElement(Foundation.Image, {
+						tag = "position-center-center anchor-center-center clip content-emphasis",
+						Image = v26,
+						Size = v21:map(function(n4: number) -- line: 181
+							-- upvalues: v28 (copy)
+							local v37 = math.round(n4 * v28)
+
+							return UDim2.fromOffset(v37, v37)
+						end)
+					}) else React.createElement(Foundation.Icon, {
+						tag = "size-full-full position-center-center anchor-center-center content-emphasis",
+						name = v26,
+						size = v21:map(function(n5: number) -- line: 166
+							-- upvalues: v25 (copy)
+							return (math.round(n5 * v25))
+						end),
+						variant = v27,
+						style = {
+							Color3 = v18.contentForegroundStyle.Color3,
+							Transparency = if not t2.disabled then v18.contentForegroundStyle.Transparency else v18.contentDisabledTransparency
+						}
+					})
+				})
+			}))
+		})
+	end
+
+	return React.createElement(Foundation.View, {
+		tag = "radius-circle",
+		Size = UDim2.new(0, v24, 0, v24),
+		onStateChanged = v20,
+		stateLayer = {
+			affordance = Foundation.Enums.StateLayerAffordance.None
+		},
+		onActivated = t2.onActivated,
+		disabled = t2.disabled,
+		ref = p1,
+		LayoutOrder = t2.LayoutOrder
+	}, {
+		Icon = React.createElement(Foundation.View, {
+			Size = UDim2.fromScale(1, 1),
+			Visible = not t2.isActive or (t2.animate and true or false),
+			backgroundStyle = if not t2.disabled then v19:map(function(p4) -- line: 210
+				-- upvalues: v18 (copy)
+				return {
+					Color3 = v18.hoverIconBackgroundStyle.Color3,
+					Transparency = not p4 and 1 or v18.hoverIconBackgroundStyle.Transparency
+				}
+			end) else nil,
+			tag = not FFlagAXMigrateBuilderIcons and "radius-circle position-center-center anchor-center-center clip" or {
+				["radius-circle position-center-center anchor-center-center clip"] = true,
+				["row align-x-center align-y-center"] = isBuilderIcon(t2.icon)
+			}
+		}, {
+			IconImage = if not FFlagAXMigrateBuilderIcons or not isBuilderIcon(t2.icon) then React.createElement(Foundation.Image, {
+				tag = "position-center-center anchor-center-center content-emphasis",
+				Image = t2.icon,
+				Size = v21:map(function(n6: number) -- line: 241
+					-- upvalues: v25 (copy)
+					local v41 = math.round((1 - n6) * v25)
+
+					return UDim2.fromOffset(v41, v41)
+				end),
+				imageStyle = {
+					Color3 = v18.contentForegroundStyle.Color3,
+					Transparency = if not t2.disabled then v18.contentForegroundStyle.Transparency else v18.contentDisabledTransparency
+				}
+			}) else React.createElement(Foundation.Icon, {
+				tag = "position-center-center anchor-center-center content-emphasis",
+				name = t2.icon,
+				size = v21:map(function(n7: number) -- line: 226
+					-- upvalues: v25 (copy)
+					return (math.round((1 - n7) * v25))
+				end),
+				variant = if not t2.iconVariant then IconVariant.Regular else t2.iconVariant,
+				style = {
+					Color3 = v18.contentForegroundStyle.Color3,
+					Transparency = if not t2.disabled then v18.contentForegroundStyle.Transparency else v18.contentDisabledTransparency
+				}
+			})
+		}),
+		ActiveIcon = if not v23 and not t2.animate then nil else React.createElement(Foundation.View, {
+			Size = UDim2.fromScale(1, 1),
+			GroupTransparency = v21:map(function(n8: number) -- line: 257
+				return 1 - n8
+			end),
+			backgroundStyle = if not t2.disabled then v19:map(function(p5) -- line: 262
+				-- upvalues: v18 (copy)
+				if p5 then
+					return v18.hoverIconBackgroundStyle
+				end
+
+				return v18.activeIconBackgroundStyle
+			end) else nil,
+			tag = not FFlagAXMigrateBuilderIcons and "radius-circle position-center-center anchor-center-center clip" or {
+				["radius-circle position-center-center anchor-center-center clip"] = true,
+				["row align-x-center align-y-center"] = isBuilderIcon(v26)
+			}
+		}, {
+			ActiveIconImage = if not FFlagAXMigrateBuilderIcons or not isBuilderIcon(v26) then React.createElement(Foundation.Image, {
+				tag = "position-center-center anchor-center-center clip content-emphasis",
+				Image = v26,
+				Size = v21:map(function(n9: number) -- line: 287
+					-- upvalues: v28 (copy)
+					local v46 = math.round(n9 * v28)
+
+					return UDim2.fromOffset(v46, v46)
+				end)
+			}) else React.createElement(Foundation.Icon, {
+				tag = "position-center-center anchor-center-center clip content-emphasis",
+				name = v26,
+				size = v21:map(function(n10: number) -- line: 278
+					-- upvalues: v25 (copy)
+					return (math.round((1 - n10) * v25))
+				end),
+				variant = v27
+			})
+		})
+	})
+end
+
+return React.forwardRef(IconItem)

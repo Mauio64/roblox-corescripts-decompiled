@@ -1,14 +1,19 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(script.WatermarkComponent);
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 11 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v2 (copy), v3 (copy), l_CoreGui_0 (copy)
-    local v5 = setmetatable({}, v4);
-    v5.root = v2.createElement(v3);
-    v5.element = v2.mount(v5.root, l_CoreGui_0, "Watermark");
-    return v5;
-end;
-return v4.new();
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local WatermarkComponent = require(script.WatermarkComponent)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 11
+	-- upvalues: t1 (copy), Roact (copy), WatermarkComponent (copy), CoreGui (copy)
+	local self = setmetatable({}, t1)
+
+	self.root = Roact.createElement(WatermarkComponent)
+	self.element = Roact.mount(self.root, CoreGui, "Watermark")
+
+	return self
+end
+
+return t1.new()

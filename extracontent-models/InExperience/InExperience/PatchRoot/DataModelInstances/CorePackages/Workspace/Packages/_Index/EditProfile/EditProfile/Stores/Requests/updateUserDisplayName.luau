@@ -1,46 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Http);
-local v3 = require(l_Parent_0.HttpRequest);
-local v4 = require(l_Parent_0.Promise);
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Url_0 = v2.Url;
-local v7 = require(l_script_FirstAncestor_0.Common.Enums);
-local v11 = v3.config({
-    requestFunction = function(v8, v9, v10) --[[ Line: 16 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v3 (copy)
-        return v3.requestFunctions.RequestInternal(v8, v9, v10);
-    end
-});
-return function(v12, v13) --[[ Line: 21 ]] --[[ Name: updateUserDisplayName ]]
-    -- upvalues: l_Url_0 (copy), v11 (copy), v7 (copy), l_HttpService_0 (copy), v4 (copy)
-    local v14 = string.format("%s/users/%s/display-names", l_Url_0.USERS_URL, v12);
-    return v11(v14, v7.RequestMethods.PATCH, {
-        postBody = l_HttpService_0:JSONEncode({
-            newDisplayName = v13
-        })
-    }):andThen(function(v15) --[[ Line: 29 ]]
-        -- upvalues: v13 (copy)
-        return v15.responseBody and v15.responseBody.displayName or v13;
-    end):catch(function(v16) --[[ Line: 32 ]]
-        -- upvalues: l_HttpService_0 (ref), v4 (ref)
-        if v16 then
-            local v17 = {
-                statusCode = v16.StatusCode, 
-                errors = {}
-            };
-            if v16.Body then
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 39 ]]
-                    -- upvalues: l_HttpService_0 (ref), v16 (copy)
-                    return l_HttpService_0:JSONDecode(v16.Body);
-                end);
-                if l_status_0 and l_result_0 and l_result_0.errors then
-                    v17.errors = l_result_0.errors;
-                end;
-            end;
-            return v4.reject(v17);
-        else
-            return v4.reject(v16);
-        end;
-    end);
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local Http = require(EditProfileParent.Http)
+local HttpRequest = require(EditProfileParent.HttpRequest)
+local Promise = require(EditProfileParent.Promise)
+local HttpService = game:GetService("HttpService")
+local Url = Http.Url
+local Enums = require(EditProfile.Common.Enums)
+local v9 = HttpRequest.config({
+	requestFunction = function(s1: string, p1, p2) -- line: 16
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.RequestInternal(s1, p1, p2)
+	end
+})
+
+local function updateUserDisplayName(s2: string, s3: string) -- line: 21
+	-- upvalues: Url (copy), v9 (copy), Enums (copy), HttpService (copy), Promise (copy)
+	local v16 = string.format("%s/users/%s/display-names", Url.USERS_URL, s2)
+
+	return v9(v16, Enums.RequestMethods.PATCH, {
+		postBody = HttpService:JSONEncode({
+			newDisplayName = s3
+		})
+	}):andThen(function(p3) -- line: 29
+		-- upvalues: s3 (copy)
+		return p3.responseBody and p3.responseBody.displayName or s3
+	end):catch(function(p4) -- line: 32
+		-- upvalues: HttpService (copy), Promise (copy)
+		if p4 then
+			local t1 = {
+				statusCode = p4.StatusCode,
+				errors = {}
+			}
+
+			if p4.Body then
+				local ok, result = pcall(function() -- line: 39
+					-- upvalues: HttpService (copy), p4 (copy)
+					return HttpService:JSONDecode(p4.Body)
+				end)
+
+				if ok and result and result.errors then
+					t1.errors = result.errors
+				end
+			end
+
+			return Promise.reject(t1)
+		end
+
+		return Promise.reject(p4)
+	end)
+end
+
+return updateUserDisplayName

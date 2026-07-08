@@ -1,206 +1,214 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.Cryo);
-local v5 = require(l_Parent_2.t);
-local v6 = require(l_Parent_2.RoactGamepad);
-local v7 = require(l_Parent_1.Core.Text.GenericTextLabel.GenericTextLabel);
-local v8 = require(l_Parent_1.Core.ImageSet.ImageSetComponent);
-local v9 = require(l_Parent_1.Core.ImageSet.Validator.validateImage);
-local v10 = require(l_Parent_1.Core.Style.withStyle);
-local v11 = require(l_Parent_0.Container.getPageMargin);
-local v12 = require(l_Parent_0.ImageSet.Enum.IconSize);
-local v13 = require(l_Parent_0.ImageSet.getIconSize);
-local v14 = require(l_Parent_0.ImageSet.Images);
-local v15 = require(l_Parent_0.Button.Button);
-local v16 = require(l_Parent_0.Button.Enum.ButtonType);
-local v17 = v3.PureComponent:extend("EmptyState");
-v17.validateProps = v5.strictInterface({
-    text = v5.string, 
-    icon = v5.optional(v9), 
-    size = v5.optional(v5.UDim2), 
-    position = v5.optional(v5.UDim2), 
-    anchorPoint = v5.optional(v5.Vector2), 
-    buttonIcon = v5.optional(v9), 
-    buttonText = v5.optional(v5.string), 
-    buttonType = v5.optional(v16.isEnumValue), 
-    onActivated = v5.optional(v5.callback), 
-    frameRef = v5.optional(v5.table), 
-    NextSelectionUp = v5.optional(v5.table), 
-    NextSelectionDown = v5.optional(v5.table), 
-    NextSelectionLeft = v5.optional(v5.table), 
-    NextSelectionRight = v5.optional(v5.table), 
-    maxSizeTextLabel = v5.optional(v5.Vector2), 
-    iconColor = v5.optional(v5.Color3), 
-    iconSize = v5.optional(v5.UDim2), 
-    titleProps = v5.optional(v5.strictInterface({
-        titleText = v5.optional(v5.string)
-    }))
-});
-v17.defaultProps = {
-    icon = v14["icons/status/oof_xlarge"], 
-    size = UDim2.fromScale(1, 1), 
-    position = UDim2.fromScale(0.5, 0.5), 
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    buttonIcon = v14["icons/common/refresh"], 
-    buttonType = v16.Secondary, 
-    iconSize = UDim2.fromOffset(v13(v12.XLarge), v13(v12.XLarge))
-};
-local function _(v18) --[[ Line: 73 ]] --[[ Name: getCorrectedIconValue ]]
-    if v18 == "" then
-        return nil;
-    else
-        return v18;
-    end;
-end;
-v17.init = function(v20) --[[ Line: 77 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy)
-    v20:setState({
-        absoluteSize = Vector2.new(0, 0)
-    });
-    v20.onAbsoluteSizeChange = function(v21) --[[ Line: 81 ]]
-        -- upvalues: v20 (copy)
-        v20:setState({
-            absoluteSize = v21.AbsoluteSize
-        });
-    end;
-    v20.buttonRef = v3.createRef();
-end;
-v17.render = function(v22) --[[ Line: 90 ]] --[[ Name: render ]]
-    -- upvalues: v10 (copy), v3 (copy), v6 (copy), v8 (copy), v7 (copy), v11 (copy), v15 (copy)
-    return v10(function(v23) --[[ Line: 91 ]]
-        -- upvalues: v3 (ref), v6 (ref), v22 (copy), v8 (ref), v7 (ref), v11 (ref), v15 (ref)
-        local l_createElement_0 = v3.createElement;
-        local l_Frame_0 = v6.Focusable.Frame;
-        local v26 = {
-            [v3.Change.AbsoluteSize] = v22.onAbsoluteSizeChange, 
-            Size = v22.props.size, 
-            Position = v22.props.position, 
-            AnchorPoint = v22.props.anchorPoint, 
-            BackgroundTransparency = 1, 
-            [v3.Ref] = v22.props.frameRef, 
-            NextSelectionUp = v22.props.NextSelectionUp, 
-            NextSelectionDown = v22.props.NextSelectionDown, 
-            NextSelectionULeft = v22.props.NextSelectionLeft, 
-            NextSelectionRight = v22.props.NextSelectionRight, 
-            defaultChild = v22.buttonRef
-        };
-        local v27 = {};
-        local l_createElement_1 = v3.createElement;
-        local v29 = "Frame";
-        local v30 = {
-            Size = UDim2.new(1, 0, 0, 187), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1
-        };
-        local v31 = {
-            UIListLayout = v3.createElement("UIListLayout", {
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Icon = v3.createElement(v8.Label, {
-                AnchorPoint = Vector2.new(0.5, 0), 
-                Size = v22.props.iconSize, 
-                LayoutOrder = 1, 
-                Image = v22.props.icon, 
-                BackgroundTransparency = 1, 
-                ImageColor3 = v22.props.iconColor or v23.Theme.IconEmphasis.Color, 
-                ImageTransparency = v23.Theme.IconEmphasis.Transparency
-            }), 
-            iconTextPadding = v3.createElement("Frame", {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Size = UDim2.fromOffset(0, 12), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 2
-            }), 
-            TitleFrame = if v22.props.titleProps and v22.props.titleProps.titleText then v3.createElement("Frame", {
-                Size = UDim2.fromScale(1, 0), 
-                Position = UDim2.fromScale(0, 0), 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 3
-            }, {
-                TitlePadding = v3.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 14), 
-                    PaddingBottom = UDim.new(0, 14)
-                }), 
-                TitleText = v3.createElement("TextLabel", {
-                    BackgroundTransparency = 1, 
-                    Text = v22.props.titleProps.titleText, 
-                    TextXAlignment = Enum.TextXAlignment.Center, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    Font = v23.Font.Title.Font, 
-                    TextSize = v23.Font.Header1.RelativeSize * v23.Font.BaseSize, 
-                    TextColor3 = v23.Theme.TextEmphasis.Color, 
-                    TextTransparency = v23.Theme.TextEmphasis.Transparency, 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    Size = UDim2.fromScale(1, 0), 
-                    TextWrapped = true, 
-                    LayoutOrder = 1
-                })
-            }) else nil, 
-            Text = v3.createElement(v7, {
-                Text = v22.props.text, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                LayoutOrder = 4, 
-                fontStyle = v23.Font.Body, 
-                colorStyle = v23.Theme.TextDefault, 
-                maxSize = v22.props.maxSizeTextLabel
-            }), 
-            textButtonPadding = v3.createElement("Frame", {
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Size = UDim2.fromOffset(0, 24), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 5
-            })
-        };
-        local l_onActivated_0 = v22.props.onActivated;
-        if l_onActivated_0 then
-            l_onActivated_0 = v3.createElement;
-            local v33 = "Frame";
-            local v34 = {
-                Size = UDim2.new(1, 0, 0, 48), 
-                AnchorPoint = Vector2.new(0.5, 0), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 6
-            };
-            local v35 = {
-                UIPadding = v3.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, v11(v22.state.absoluteSize.X)), 
-                    PaddingRight = UDim.new(0, v11(v22.state.absoluteSize.X))
-                }), 
-                UISizeConstraint = v3.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(640, 48)
-                })
-            };
-            local l_createElement_2 = v3.createElement;
-            local l_v15_0 = v15;
-            local v38 = {
-                buttonType = v22.props.buttonType, 
-                size = UDim2.fromScale(1, 1), 
-                position = UDim2.fromScale(0.5, 0.5), 
-                anchorPoint = Vector2.new(0.5, 0.5), 
-                onActivated = v22.props.onActivated
-            };
-            local l_buttonIcon_0 = v22.props.buttonIcon;
-            v38.icon = if l_buttonIcon_0 == "" then nil else l_buttonIcon_0;
-            v38.text = v22.props.buttonText;
-            v38[v3.Ref] = v22.buttonRef;
-            v35.Button = l_createElement_2(l_v15_0, v38);
-            l_onActivated_0 = l_onActivated_0(v33, v34, v35);
-        end;
-        v31.buttonFrame = l_onActivated_0;
-        v27.Content = l_createElement_1(v29, v30, v31);
-        return l_createElement_0(l_Frame_0, v26, v27);
-    end);
-end;
-return v3.forwardRef(function(v40, v41) --[[ Line: 203 ]]
-    -- upvalues: v3 (copy), v17 (copy), v4 (copy)
-    return v3.createElement(v17, v4.Dictionary.join(v40, {
-        frameRef = v41
-    }));
-end);
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Roact = require(ParentParentParentParent.Roact)
+local Cryo = require(ParentParentParentParent.Cryo)
+local t = require(ParentParentParentParent.t)
+local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
+local GenericTextLabel = require(ParentParentParent.Core.Text.GenericTextLabel.GenericTextLabel)
+local ImageSetComponent = require(ParentParentParent.Core.ImageSet.ImageSetComponent)
+local validateImage = require(ParentParentParent.Core.ImageSet.Validator.validateImage)
+local withStyle = require(ParentParentParent.Core.Style.withStyle)
+local getPageMargin = require(ParentParent.Container.getPageMargin)
+local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
+local getIconSize = require(ParentParent.ImageSet.getIconSize)
+local Images = require(ParentParent.ImageSet.Images)
+local Button = require(ParentParent.Button.Button)
+local ButtonType = require(ParentParent.Button.Enum.ButtonType)
+local v18 = Roact.PureComponent:extend("EmptyState")
+
+v18.validateProps = t.strictInterface({
+	text = t.string,
+	icon = t.optional(validateImage),
+	size = t.optional(t.UDim2),
+	position = t.optional(t.UDim2),
+	anchorPoint = t.optional(t.Vector2),
+	buttonIcon = t.optional(validateImage),
+	buttonText = t.optional(t.string),
+	buttonType = t.optional(ButtonType.isEnumValue),
+	onActivated = t.optional(t.callback),
+	frameRef = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	maxSizeTextLabel = t.optional(t.Vector2),
+	iconColor = t.optional(t.Color3),
+	iconSize = t.optional(t.UDim2),
+	titleProps = t.optional(t.strictInterface({
+		titleText = t.optional(t.string)
+	}))
+})
+v18.defaultProps = {
+	icon = Images["icons/status/oof_xlarge"],
+	size = UDim2.fromScale(1, 1),
+	position = UDim2.fromScale(0.5, 0.5),
+	anchorPoint = Vector2.new(0.5, 0.5),
+	buttonIcon = Images["icons/common/refresh"],
+	buttonType = ButtonType.Secondary,
+	iconSize = UDim2.fromOffset(getIconSize(IconSize.XLarge), getIconSize(IconSize.XLarge))
+}
+
+local function getCorrectedIconValue(p1) -- line: 73
+	if p1 == "" then
+		return nil
+	end
+
+	return p1
+end
+
+function v18.init(p2) -- line: 77
+	-- upvalues: Roact (copy)
+	p2:setState({
+		absoluteSize = Vector2.new(0, 0)
+	})
+
+	function p2.onAbsoluteSizeChange(p3) -- line: 81
+		-- upvalues: p2 (copy)
+		p2:setState({
+			absoluteSize = p3.AbsoluteSize
+		})
+	end
+
+	p2.buttonRef = Roact.createRef()
+end
+function v18.render(p4) -- line: 90
+	-- upvalues: withStyle (copy), Roact (copy), RoactGamepad (copy), ImageSetComponent (copy), GenericTextLabel (copy), getPageMargin (copy), Button (copy)
+	return withStyle(function(p5) -- line: 91
+		-- upvalues: Roact (copy), RoactGamepad (copy), p4 (copy), ImageSetComponent (copy), GenericTextLabel (copy), getPageMargin (copy), Button (copy)
+		local createElement = Roact.createElement
+		local Frame = RoactGamepad.Focusable.Frame
+		local t1 = {
+			[Roact.Change.AbsoluteSize] = p4.onAbsoluteSizeChange,
+			Size = p4.props.size,
+			Position = p4.props.position,
+			AnchorPoint = p4.props.anchorPoint,
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p4.props.frameRef,
+			NextSelectionUp = p4.props.NextSelectionUp,
+			NextSelectionDown = p4.props.NextSelectionDown,
+			NextSelectionULeft = p4.props.NextSelectionLeft,
+			NextSelectionRight = p4.props.NextSelectionRight,
+			defaultChild = p4.buttonRef
+		}
+		local t2 = {}
+		local createElement2 = Roact.createElement
+		local t3 = {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 187),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5)
+		}
+		local t4 = {
+			UIListLayout = Roact.createElement("UIListLayout", {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Icon = Roact.createElement(ImageSetComponent.Label, {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(0.5, 0),
+				Size = p4.props.iconSize,
+				Image = p4.props.icon,
+				ImageColor3 = p4.props.iconColor or p5.Theme.IconEmphasis.Color,
+				ImageTransparency = p5.Theme.IconEmphasis.Transparency
+			}),
+			iconTextPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Size = UDim2.fromOffset(0, 12)
+			}),
+			TitleFrame = if not p4.props.titleProps or not p4.props.titleProps.titleText then nil else Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 3,
+				Size = UDim2.fromScale(1, 0),
+				Position = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				TitlePadding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 14),
+					PaddingBottom = UDim.new(0, 14)
+				}),
+				TitleText = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextWrapped = true,
+					LayoutOrder = 1,
+					Text = p4.props.titleProps.titleText,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					Font = p5.Font.Title.Font,
+					TextSize = p5.Font.Header1.RelativeSize * p5.Font.BaseSize,
+					TextColor3 = p5.Theme.TextEmphasis.Color,
+					TextTransparency = p5.Theme.TextEmphasis.Transparency,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.fromScale(1, 0)
+				})
+			}),
+			Text = Roact.createElement(GenericTextLabel, {
+				LayoutOrder = 4,
+				Text = p4.props.text,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				fontStyle = p5.Font.Body,
+				colorStyle = p5.Theme.TextDefault,
+				maxSize = p4.props.maxSizeTextLabel
+			}),
+			textButtonPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 5,
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Size = UDim2.fromOffset(0, 24)
+			})
+		}
+		local onActivated = p4.props.onActivated
+
+		if onActivated then
+			local createElement3 = Roact.createElement
+			local t5 = {
+				BackgroundTransparency = 1,
+				LayoutOrder = 6,
+				Size = UDim2.new(1, 0, 0, 48),
+				AnchorPoint = Vector2.new(0.5, 0)
+			}
+			local t6 = {
+				UIPadding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, getPageMargin(p4.state.absoluteSize.X)),
+					PaddingRight = UDim.new(0, getPageMargin(p4.state.absoluteSize.X))
+				}),
+				UISizeConstraint = Roact.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(640, 48)
+				})
+			}
+			local createElement4 = Roact.createElement
+			local v39 = Button
+			local t7 = {
+				buttonType = p4.props.buttonType,
+				size = UDim2.fromScale(1, 1),
+				position = UDim2.fromScale(0.5, 0.5),
+				anchorPoint = Vector2.new(0.5, 0.5),
+				onActivated = p4.props.onActivated
+			}
+			local buttonIcon = p4.props.buttonIcon
+
+			t7.icon = if buttonIcon ~= "" then buttonIcon else nil
+			t7.text = p4.props.buttonText
+			t7[Roact.Ref] = p4.buttonRef
+			t6.Button = createElement4(v39, t7)
+			onActivated = createElement3("Frame", t5, t6)
+		end
+
+		t4.buttonFrame = onActivated
+		t2.Content = createElement2("Frame", t3, t4)
+
+		return createElement(Frame, t1, t2)
+	end)
+end
+
+return Roact.forwardRef(function(p6, p7) -- line: 203
+	-- upvalues: Roact (copy), v18 (copy), Cryo (copy)
+	return Roact.createElement(v18, Cryo.Dictionary.join(p6, {
+		frameRef = p7
+	}))
+end)

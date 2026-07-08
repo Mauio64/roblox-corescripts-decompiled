@@ -1,44 +1,46 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.t);
-local v5 = require(l_Parent_1.Core.Style.withStyle);
-local l_Core_0 = l_Parent_1.Core;
-local v7 = require(l_Parent_0.ImageSet.getIconSize);
-local v8 = require(l_Parent_0.ImageSet.Enum.IconSize);
-local v9 = require(l_Core_0.Control.Interactable);
-local v10 = require(l_Core_0.ImageSet.ImageSetComponent);
-local v11 = v3.PureComponent:extend("ScrollButton");
-v11.validateProps = v4.strictInterface({
-    icon = v4.table, 
-    callback = v4.callback
-});
-v11.render = function(v12) --[[ Line: 28 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v3 (copy), v9 (copy), v10 (copy), v7 (copy), v8 (copy)
-    return v5(function(v13) --[[ Line: 29 ]]
-        -- upvalues: v3 (ref), v9 (ref), v12 (copy), v10 (ref), v7 (ref), v8 (ref)
-        return v3.createElement(v9, {
-            AutoButtonColor = false, 
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = v13.Theme.BackgroundUIContrast.Color, 
-            BackgroundTransparency = v13.Theme.BackgroundUIContrast.Transparency, 
-            BorderSizePixel = 0, 
-            [v3.Event.Activated] = v12.props.callback, 
-            onStateChanged = function() --[[ Line: 38 ]] --[[ Name: onStateChanged ]]
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Roact = require(ParentParentParentParent.Roact)
+local t = require(ParentParentParentParent.t)
+local withStyle = require(ParentParentParent.Core.Style.withStyle)
+local Core = ParentParentParent.Core
+local getIconSize = require(ParentParent.ImageSet.getIconSize)
+local IconSize = require(ParentParent.ImageSet.Enum.IconSize)
+local Interactable = require(Core.Control.Interactable)
+local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
+local v12 = Roact.PureComponent:extend("ScrollButton")
 
-            end
-        }, {
-            Icon = v3.createElement(v10.Label, {
-                Size = UDim2.fromOffset(v7(v8.Medium), v7(v8.Medium)), 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundTransparency = 1, 
-                Image = v12.props.icon, 
-                ImageColor3 = v13.Theme.IconEmphasis.Color, 
-                ImageTransparency = v13.Theme.IconEmphasis.Transparency
-            })
-        });
-    end);
-end;
-return v11;
+v12.validateProps = t.strictInterface({
+	icon = t.table,
+	callback = t.callback
+})
+
+function v12.render(p1) -- line: 28
+	-- upvalues: withStyle (copy), Roact (copy), Interactable (copy), ImageSetComponent (copy), getIconSize (copy), IconSize (copy)
+	return withStyle(function(p2) -- line: 29
+		-- upvalues: Roact (copy), Interactable (copy), p1 (copy), ImageSetComponent (copy), getIconSize (copy), IconSize (copy)
+		return Roact.createElement(Interactable, {
+			AutoButtonColor = false,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = p2.Theme.BackgroundUIContrast.Color,
+			BackgroundTransparency = p2.Theme.BackgroundUIContrast.Transparency,
+			BorderSizePixel = 0,
+			[Roact.Event.Activated] = p1.props.callback,
+			onStateChanged = function() -- line: 38
+			end
+		}, {
+			Icon = Roact.createElement(ImageSetComponent.Label, {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(getIconSize(IconSize.Medium), getIconSize(IconSize.Medium)),
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = p1.props.icon,
+				ImageColor3 = p2.Theme.IconEmphasis.Color,
+				ImageTransparency = p2.Theme.IconEmphasis.Transparency
+			})
+		})
+	end)
+end
+
+return v12

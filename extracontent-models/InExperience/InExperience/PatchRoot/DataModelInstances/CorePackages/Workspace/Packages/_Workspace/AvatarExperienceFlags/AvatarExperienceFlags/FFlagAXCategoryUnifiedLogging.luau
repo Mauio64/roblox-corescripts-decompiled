@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCategoryUnifiedLogging", false);
+return game:DefineFastFlag("AXCategoryUnifiedLogging", false)

@@ -1,12 +1,13 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(script.SetAliasAnalyticsContext);
-local l_Context_0 = require(l_Parent_0.dependencies).SocialLibraries.Context;
+local scriptParent = script.Parent
+local SetAliasAnalyticsContext = require(script.SetAliasAnalyticsContext)
+local Context = require(scriptParent.dependencies).SocialLibraries.Context
+
 return {
-    AnalyticsService = require(script.AnalyticsService), 
-    Context = v1, 
-    connect = l_Context_0.getConnect(v1), 
-    EventNames = require(script.Enums.EventNames), 
-    EntryPoints = require(script.Enums.EntryPoints), 
-    setupFireAnalyticsEvents = require(script.setupFireAnalyticsEvents), 
-    useAnalytics = require(script.useAnalytics)
-};
+	AnalyticsService = require(script.AnalyticsService),
+	Context = SetAliasAnalyticsContext,
+	connect = Context.getConnect(SetAliasAnalyticsContext),
+	EventNames = require(script.Enums.EventNames),
+	EntryPoints = require(script.Enums.EntryPoints),
+	setupFireAnalyticsEvents = require(script.setupFireAnalyticsEvents),
+	useAnalytics = require(script.useAnalytics)
+}

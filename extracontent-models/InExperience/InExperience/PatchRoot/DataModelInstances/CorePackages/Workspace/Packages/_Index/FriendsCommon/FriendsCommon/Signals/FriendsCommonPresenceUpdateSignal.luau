@@ -1,3 +1,3 @@
-return function() --[[ Line: 1 ]]
-    return Instance.new("BindableEvent");
-end;
+return function() -- line: 1
+	return Instance.new("BindableEvent")
+end

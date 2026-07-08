@@ -1,361 +1,361 @@
-return function(v0) --[[ Line: 1 ]]
-    return {
-        Typography = {
-            Title = {
-                Font = Enum.Font.BuilderSansBold, 
-                FontSize = 35.28 * v0, 
-                LineHeight = 1.032, 
-                LetterSpacing = -0.01
-            }, 
-            Header = {
-                Font = Enum.Font.BuilderSansBold, 
-                FontSize = 25.2 * v0, 
-                LineHeight = 0.952, 
-                LetterSpacing = -0.01
-            }, 
-            Subheader = {
-                Font = Enum.Font.BuilderSansBold, 
-                FontSize = 20.16 * v0, 
-                LineHeight = 1.111, 
-                LetterSpacing = 0
-            }, 
-            Body = {
-                Font = Enum.Font.BuilderSans, 
-                FontSize = 20.16 * v0, 
-                LineHeight = 1.111, 
-                LetterSpacing = 0
-            }, 
-            CaptionHeader = {
-                Font = Enum.Font.BuilderSansMedium, 
-                FontSize = 15.12 * v0, 
-                LineHeight = 1.032, 
-                LetterSpacing = 0.01
-            }, 
-            CaptionBody = {
-                Font = Enum.Font.BuilderSans, 
-                FontSize = 15.12 * v0, 
-                LineHeight = 1.032, 
-                LetterSpacing = 0
-            }, 
-            Footer = {
-                Font = Enum.Font.BuilderSansMedium, 
-                FontSize = 12.6 * v0, 
-                LineHeight = 1.111, 
-                LetterSpacing = 0.01
-            }
-        }, 
-        Color = {
-            Background = {
-                Default = {
-                    Color3 = Color3.new(0.94902, 0.95686, 0.96078), 
-                    Transparency = 0
-                }, 
-                Contrast = {
-                    Color3 = Color3.new(0.87059, 0.88235, 0.8902), 
-                    Transparency = 0
-                }, 
-                Muted = {
-                    Color3 = Color3.new(0.78039, 0.79608, 0.80784), 
-                    Transparency = 0
-                }, 
-                OnHover = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.9
-                }, 
-                OnPress = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.9
-                }
-            }, 
-            BackgroundUi = {
-                Default = {
-                    Color3 = Color3.new(1, 1, 1), 
-                    Transparency = 0
-                }, 
-                Contrast = {
-                    Color3 = Color3.new(1, 1, 1), 
-                    Transparency = 0.1
-                }
-            }, 
-            Ui = {
-                Default = {
-                    Color3 = Color3.new(0.74118, 0.7451, 0.7451), 
-                    Transparency = 0
-                }, 
-                Muted = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.9
-                }, 
-                Emphasis = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.7
-                }
-            }, 
-            Text = {
-                Default = {
-                    Color3 = Color3.new(0.37647, 0.38039, 0.38431), 
-                    Transparency = 0
-                }, 
-                Muted = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.4
-                }, 
-                Emphasis = {
-                    Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                    Transparency = 0
-                }, 
-                Link = {
-                    Color3 = Color3.new(0.32157, 0.67843, 0.95686), 
-                    Transparency = 0
-                }, 
-                Inverse = {
-                    Color3 = Color3.new(1, 1, 1), 
-                    Transparency = 0
-                }
-            }, 
-            Icon = {
-                Default = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.4
-                }, 
-                Emphasis = {
-                    Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                    Transparency = 0
-                }, 
-                OnHover = {
-                    Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                    Transparency = 0
-                }
-            }, 
-            Action = {
-                Primary = {
-                    Background = {
-                        Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                        Transparency = 0
-                    }, 
-                    Border = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Content = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0
-                    }
-                }, 
-                PrimaryBrand = {
-                    Background = {
-                        Color3 = Color3.new(0, 0.70588, 0.42745), 
-                        Transparency = 0
-                    }, 
-                    Border = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Content = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0
-                    }
-                }, 
-                Secondary = {
-                    Background = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Border = {
-                        Color3 = Color3.new(0.39608, 0.4, 0.40784), 
-                        Transparency = 0
-                    }, 
-                    Content = {
-                        Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                        Transparency = 0
-                    }
-                }, 
-                Alert = {
-                    Background = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Border = {
-                        Color3 = Color3.new(0.96863, 0.29412, 0.32157), 
-                        Transparency = 0
-                    }, 
-                    Content = {
-                        Color3 = Color3.new(0.96863, 0.29412, 0.32157), 
-                        Transparency = 0
-                    }
-                }, 
-                Subtle = {
-                    Background = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Border = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Content = {
-                        Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                        Transparency = 0
-                    }
-                }
-            }, 
-            State = {
-                Standard = {
-                    Default = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Hover = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 0.88
-                    }, 
-                    Pressed = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 0.8
-                    }
-                }, 
-                Lighten = {
-                    Default = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Hover = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0.88
-                    }, 
-                    Pressed = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0.8
-                    }
-                }, 
-                Inverse = {
-                    Default = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Hover = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0.88
-                    }, 
-                    Pressed = {
-                        Color3 = Color3.new(1, 1, 1), 
-                        Transparency = 0.8
-                    }
-                }, 
-                Darken = {
-                    Default = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 1
-                    }, 
-                    Hover = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 0.88
-                    }, 
-                    Pressed = {
-                        Color3 = Color3.new(0, 0, 0), 
-                        Transparency = 0.8
-                    }
-                }
-            }, 
-            Focus = {
-                Start = {
-                    Color3 = Color3.new(0.74118, 0.7451, 0.7451), 
-                    Transparency = 0
-                }, 
-                End = {
-                    Color3 = Color3.new(0.74118, 0.7451, 0.7451), 
-                    Transparency = 0
-                }, 
-                Gradient = {
-                    Color3 = Color3.new(0.74118, 0.7451, 0.7451), 
-                    Transparency = 0
-                }
-            }, 
-            Common = {
-                Divider = {
-                    Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                    Transparency = 0.8
-                }, 
-                Overlay = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.7
-                }, 
-                DropShadow = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.7
-                }, 
-                NavigationBar = {
-                    Color3 = Color3.new(1, 1, 1), 
-                    Transparency = 0
-                }, 
-                Badge = {
-                    Color3 = Color3.new(0.22353, 0.23137, 0.23922), 
-                    Transparency = 0
-                }, 
-                BadgeContent = {
-                    Color3 = Color3.new(1, 1, 1), 
-                    Transparency = 0
-                }, 
-                Placeholder = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.9
-                }, 
-                Online = {
-                    Color3 = Color3.new(0, 0.70588, 0.42745), 
-                    Transparency = 0
-                }, 
-                Offline = {
-                    Color3 = Color3.new(0, 0, 0), 
-                    Transparency = 0.5
-                }, 
-                Alert = {
-                    Color3 = Color3.new(0.96863, 0.29412, 0.32157), 
-                    Transparency = 0
-                }, 
-                Success = {
-                    Color3 = Color3.new(0, 0.70588, 0.42745), 
-                    Transparency = 0
-                }
-            }
-        }, 
-        Radius = {
-            None = 0, 
-            Small = 4 * v0, 
-            Medium = 8 * v0, 
-            Large = 12 * v0, 
-            XLarge = 16 * v0, 
-            Circle = 9999
-        }, 
-        Icon = {
-            Size = {
-                Small = 16 * v0, 
-                Medium = 36 * v0, 
-                Large = 48 * v0, 
-                XLarge = 96 * v0, 
-                XxLarge = 192 * v0
-            }
-        }, 
-        Stroke = {
-            Input = 1 * v0, 
-            Focus = 2 * v0
-        }, 
-        Offset = {
-            Focus = {
-                Standard = 6 * v0, 
-                Inset = 0
-            }
-        }, 
-        Opacity = {
-            State = {
-                Lighten = {
-                    Hover = 0.88, 
-                    Pressed = 0.8
-                }, 
-                Darken = {
-                    Hover = 0.88, 
-                    Pressed = 0.8
-                }
-            }
-        }
-    };
-end;
+return function(p1) -- line: 1
+	return {
+		Typography = {
+			Title = {
+				LineHeight = 1.032,
+				LetterSpacing = -0.01,
+				Font = Enum.Font.BuilderSansBold,
+				FontSize = 35.28 * p1
+			},
+			Header = {
+				LineHeight = 0.952,
+				LetterSpacing = -0.01,
+				Font = Enum.Font.BuilderSansBold,
+				FontSize = 25.2 * p1
+			},
+			Subheader = {
+				LineHeight = 1.111,
+				LetterSpacing = 0,
+				Font = Enum.Font.BuilderSansBold,
+				FontSize = 20.16 * p1
+			},
+			Body = {
+				LineHeight = 1.111,
+				LetterSpacing = 0,
+				Font = Enum.Font.BuilderSans,
+				FontSize = 20.16 * p1
+			},
+			CaptionHeader = {
+				LineHeight = 1.032,
+				LetterSpacing = 0.01,
+				Font = Enum.Font.BuilderSansMedium,
+				FontSize = 15.12 * p1
+			},
+			CaptionBody = {
+				LineHeight = 1.032,
+				LetterSpacing = 0,
+				Font = Enum.Font.BuilderSans,
+				FontSize = 15.12 * p1
+			},
+			Footer = {
+				LineHeight = 1.111,
+				LetterSpacing = 0.01,
+				Font = Enum.Font.BuilderSansMedium,
+				FontSize = 12.6 * p1
+			}
+		},
+		Color = {
+			Background = {
+				Default = {
+					Transparency = 0,
+					Color3 = Color3.new(0.94902, 0.95686, 0.96078)
+				},
+				Contrast = {
+					Transparency = 0,
+					Color3 = Color3.new(0.87059, 0.88235, 0.8902)
+				},
+				Muted = {
+					Transparency = 0,
+					Color3 = Color3.new(0.78039, 0.79608, 0.80784)
+				},
+				OnHover = {
+					Transparency = 0.9,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				OnPress = {
+					Transparency = 0.9,
+					Color3 = Color3.new(0, 0, 0)
+				}
+			},
+			BackgroundUi = {
+				Default = {
+					Transparency = 0,
+					Color3 = Color3.new(1, 1, 1)
+				},
+				Contrast = {
+					Transparency = 0.1,
+					Color3 = Color3.new(1, 1, 1)
+				}
+			},
+			Ui = {
+				Default = {
+					Transparency = 0,
+					Color3 = Color3.new(0.74118, 0.7451, 0.7451)
+				},
+				Muted = {
+					Transparency = 0.9,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				Emphasis = {
+					Transparency = 0.7,
+					Color3 = Color3.new(0, 0, 0)
+				}
+			},
+			Text = {
+				Default = {
+					Transparency = 0,
+					Color3 = Color3.new(0.37647, 0.38039, 0.38431)
+				},
+				Muted = {
+					Transparency = 0.4,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				Emphasis = {
+					Transparency = 0,
+					Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+				},
+				Link = {
+					Transparency = 0,
+					Color3 = Color3.new(0.32157, 0.67843, 0.95686)
+				},
+				Inverse = {
+					Transparency = 0,
+					Color3 = Color3.new(1, 1, 1)
+				}
+			},
+			Icon = {
+				Default = {
+					Transparency = 0.4,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				Emphasis = {
+					Transparency = 0,
+					Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+				},
+				OnHover = {
+					Transparency = 0,
+					Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+				}
+			},
+			Action = {
+				Primary = {
+					Background = {
+						Transparency = 0,
+						Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+					},
+					Border = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Content = {
+						Transparency = 0,
+						Color3 = Color3.new(1, 1, 1)
+					}
+				},
+				PrimaryBrand = {
+					Background = {
+						Transparency = 0,
+						Color3 = Color3.new(0, 0.70588, 0.42745)
+					},
+					Border = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Content = {
+						Transparency = 0,
+						Color3 = Color3.new(1, 1, 1)
+					}
+				},
+				Secondary = {
+					Background = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Border = {
+						Transparency = 0,
+						Color3 = Color3.new(0.39608, 0.4, 0.40784)
+					},
+					Content = {
+						Transparency = 0,
+						Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+					}
+				},
+				Alert = {
+					Background = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Border = {
+						Transparency = 0,
+						Color3 = Color3.new(0.96863, 0.29412, 0.32157)
+					},
+					Content = {
+						Transparency = 0,
+						Color3 = Color3.new(0.96863, 0.29412, 0.32157)
+					}
+				},
+				Subtle = {
+					Background = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Border = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Content = {
+						Transparency = 0,
+						Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+					}
+				}
+			},
+			State = {
+				Standard = {
+					Default = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Hover = {
+						Transparency = 0.88,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Pressed = {
+						Transparency = 0.8,
+						Color3 = Color3.new(0, 0, 0)
+					}
+				},
+				Lighten = {
+					Default = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Hover = {
+						Transparency = 0.88,
+						Color3 = Color3.new(1, 1, 1)
+					},
+					Pressed = {
+						Transparency = 0.8,
+						Color3 = Color3.new(1, 1, 1)
+					}
+				},
+				Inverse = {
+					Default = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Hover = {
+						Transparency = 0.88,
+						Color3 = Color3.new(1, 1, 1)
+					},
+					Pressed = {
+						Transparency = 0.8,
+						Color3 = Color3.new(1, 1, 1)
+					}
+				},
+				Darken = {
+					Default = {
+						Transparency = 1,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Hover = {
+						Transparency = 0.88,
+						Color3 = Color3.new(0, 0, 0)
+					},
+					Pressed = {
+						Transparency = 0.8,
+						Color3 = Color3.new(0, 0, 0)
+					}
+				}
+			},
+			Focus = {
+				Start = {
+					Transparency = 0,
+					Color3 = Color3.new(0.74118, 0.7451, 0.7451)
+				},
+				End = {
+					Transparency = 0,
+					Color3 = Color3.new(0.74118, 0.7451, 0.7451)
+				},
+				Gradient = {
+					Transparency = 0,
+					Color3 = Color3.new(0.74118, 0.7451, 0.7451)
+				}
+			},
+			Common = {
+				Divider = {
+					Transparency = 0.8,
+					Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+				},
+				Overlay = {
+					Transparency = 0.7,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				DropShadow = {
+					Transparency = 0.7,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				NavigationBar = {
+					Transparency = 0,
+					Color3 = Color3.new(1, 1, 1)
+				},
+				Badge = {
+					Transparency = 0,
+					Color3 = Color3.new(0.22353, 0.23137, 0.23922)
+				},
+				BadgeContent = {
+					Transparency = 0,
+					Color3 = Color3.new(1, 1, 1)
+				},
+				Placeholder = {
+					Transparency = 0.9,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				Online = {
+					Transparency = 0,
+					Color3 = Color3.new(0, 0.70588, 0.42745)
+				},
+				Offline = {
+					Transparency = 0.5,
+					Color3 = Color3.new(0, 0, 0)
+				},
+				Alert = {
+					Transparency = 0,
+					Color3 = Color3.new(0.96863, 0.29412, 0.32157)
+				},
+				Success = {
+					Transparency = 0,
+					Color3 = Color3.new(0, 0.70588, 0.42745)
+				}
+			}
+		},
+		Radius = {
+			None = 0,
+			Circle = 9999,
+			Small = 4 * p1,
+			Medium = 8 * p1,
+			Large = 12 * p1,
+			XLarge = 16 * p1
+		},
+		Icon = {
+			Size = {
+				Small = 16 * p1,
+				Medium = 36 * p1,
+				Large = 48 * p1,
+				XLarge = 96 * p1,
+				XxLarge = 192 * p1
+			}
+		},
+		Stroke = {
+			Input = 1 * p1,
+			Focus = 2 * p1
+		},
+		Offset = {
+			Focus = {
+				Inset = 0,
+				Standard = 6 * p1
+			}
+		},
+		Opacity = {
+			State = {
+				Lighten = {
+					Hover = 0.88,
+					Pressed = 0.8
+				},
+				Darken = {
+					Hover = 0.88,
+					Pressed = 0.8
+				}
+			}
+		}
+	}
+end

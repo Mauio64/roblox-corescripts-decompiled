@@ -1,206 +1,230 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Map_0 = v2.Map;
-local l_Object_0 = v2.Object;
-local l_inspect_0 = require(l_Parent_0.jsutils.inspect).inspect;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_keyValMap_0 = require(l_Parent_0.jsutils.keyValMap).keyValMap;
-local l_naturalCompare_0 = require(l_Parent_0.jsutils.naturalCompare).naturalCompare;
-local l_GraphQLSchema_0 = require(l_Parent_0.type.schema).GraphQLSchema;
-local l_GraphQLDirective_0 = require(l_Parent_0.type.directives).GraphQLDirective;
-local v12 = require(l_Parent_0.type.definition);
-local _ = require(l_Parent_0.language.ast);
-local l_isIntrospectionType_0 = require(l_Parent_0.type.introspection).isIntrospectionType;
-local l_GraphQLList_0 = v12.GraphQLList;
-local l_GraphQLNonNull_0 = v12.GraphQLNonNull;
-local l_GraphQLObjectType_0 = v12.GraphQLObjectType;
-local l_GraphQLInterfaceType_0 = v12.GraphQLInterfaceType;
-local l_GraphQLUnionType_0 = v12.GraphQLUnionType;
-local l_GraphQLEnumType_0 = v12.GraphQLEnumType;
-local l_GraphQLInputObjectType_0 = v12.GraphQLInputObjectType;
-local l_isListType_0 = v12.isListType;
-local l_isNonNullType_0 = v12.isNonNullType;
-local l_isScalarType_0 = v12.isScalarType;
-local l_isObjectType_0 = v12.isObjectType;
-local l_isInterfaceType_0 = v12.isInterfaceType;
-local l_isUnionType_0 = v12.isUnionType;
-local l_isEnumType_0 = v12.isEnumType;
-local l_isInputObjectType_0 = v12.isInputObjectType;
-local v30 = nil;
-local v31 = nil;
-local v32 = nil;
-local function v66(v33) --[[ Line: 78 ]] --[[ Name: lexicographicSortSchema ]]
-    -- upvalues: l_isListType_0 (copy), l_GraphQLList_0 (copy), l_isNonNullType_0 (copy), l_GraphQLNonNull_0 (copy), l_GraphQLDirective_0 (copy), l_Object_0 (copy), v32 (ref), v30 (ref), l_Array_0 (copy), v31 (ref), l_isScalarType_0 (copy), l_isIntrospectionType_0 (copy), l_isObjectType_0 (copy), l_GraphQLObjectType_0 (copy), l_isInterfaceType_0 (copy), l_GraphQLInterfaceType_0 (copy), l_isUnionType_0 (copy), l_GraphQLUnionType_0 (copy), l_isEnumType_0 (copy), l_GraphQLEnumType_0 (copy), l_isInputObjectType_0 (copy), l_GraphQLInputObjectType_0 (copy), l_invariant_0 (copy), l_inspect_0 (copy), l_keyValMap_0 (copy), l_GraphQLSchema_0 (copy)
-    local v34 = nil;
-    local v35 = nil;
-    local v36 = nil;
-    local v37 = nil;
-    local v38 = nil;
-    local v39 = nil;
-    local v40 = nil;
-    local v41 = nil;
-    local v42 = nil;
-    local v43 = v33:toConfig();
-    local function v44(v45) --[[ Line: 86 ]] --[[ Name: replaceType ]]
-        -- upvalues: l_isListType_0 (ref), l_GraphQLList_0 (ref), v44 (copy), l_isNonNullType_0 (ref), l_GraphQLNonNull_0 (ref), v35 (ref)
-        if l_isListType_0(v45) then
-            return l_GraphQLList_0.new(v44(v45.ofType));
-        elseif l_isNonNullType_0(v45) then
-            return l_GraphQLNonNull_0.new(v44(v45.ofType));
-        else
-            return v35(v45);
-        end;
-    end;
-    v35 = function(v46) --[[ Line: 102 ]] --[[ Name: replaceNamedType ]]
-        -- upvalues: v34 (ref)
-        return v34[v46.name];
-    end;
-    v36 = function(v47) --[[ Line: 108 ]] --[[ Name: replaceMaybeType ]]
-        -- upvalues: v35 (ref)
-        if v47 then
-            return (v35(v47));
-        else
-            return nil;
-        end;
-    end;
-    v37 = function(v48) --[[ Line: 112 ]] --[[ Name: sortDirective ]]
-        -- upvalues: l_GraphQLDirective_0 (ref), l_Object_0 (ref), v32 (ref), v38 (ref)
-        local v49 = v48:toConfig();
-        return l_GraphQLDirective_0.new(l_Object_0.assign({}, v49, {
-            locations = v32(v49.locations, function(v50) --[[ Line: 116 ]]
-                return v50;
-            end), 
-            args = v38(v49.args)
-        }));
-    end;
-    v38 = function(v51) --[[ Line: 123 ]] --[[ Name: sortArgs ]]
-        -- upvalues: v30 (ref), l_Object_0 (ref), v44 (copy)
-        return v30(v51, function(v52) --[[ Line: 124 ]]
-            -- upvalues: l_Object_0 (ref), v44 (ref)
-            return l_Object_0.assign({}, v52, {
-                type = v44(v52.type)
-            });
-        end);
-    end;
-    v39 = function(v53) --[[ Line: 131 ]] --[[ Name: sortFields ]]
-        -- upvalues: v30 (ref), l_Object_0 (ref), v44 (copy), v38 (ref)
-        return v30(v53, function(v54) --[[ Line: 132 ]]
-            -- upvalues: l_Object_0 (ref), v44 (ref), v38 (ref)
-            return l_Object_0.assign({}, v54, {
-                type = v44(v54.type), 
-                args = if v54.args then v38(v54.args) else nil
-            });
-        end);
-    end;
-    v40 = function(v55) --[[ Line: 140 ]] --[[ Name: sortInputFields ]]
-        -- upvalues: v30 (ref), l_Object_0 (ref), v44 (copy)
-        return v30(v55, function(v56) --[[ Line: 141 ]]
-            -- upvalues: l_Object_0 (ref), v44 (ref)
-            return l_Object_0.assign({}, v56, {
-                type = v44(v56.type)
-            });
-        end);
-    end;
-    v41 = function(v57) --[[ Line: 148 ]] --[[ Name: sortTypes ]]
-        -- upvalues: l_Array_0 (ref), v31 (ref), v35 (ref)
-        return l_Array_0.map(v31(v57), v35);
-    end;
-    v42 = function(v58) --[[ Line: 152 ]] --[[ Name: sortNamedType ]]
-        -- upvalues: l_isScalarType_0 (ref), l_isIntrospectionType_0 (ref), l_isObjectType_0 (ref), l_GraphQLObjectType_0 (ref), l_Object_0 (ref), v41 (ref), v39 (ref), l_isInterfaceType_0 (ref), l_GraphQLInterfaceType_0 (ref), l_isUnionType_0 (ref), l_GraphQLUnionType_0 (ref), l_isEnumType_0 (ref), l_GraphQLEnumType_0 (ref), v30 (ref), l_isInputObjectType_0 (ref), l_GraphQLInputObjectType_0 (ref), v40 (ref), l_invariant_0 (ref), l_inspect_0 (ref)
-        if l_isScalarType_0(v58) or l_isIntrospectionType_0(v58) then
-            return v58;
-        elseif l_isObjectType_0(v58) then
-            local v59 = v58:toConfig();
-            return l_GraphQLObjectType_0.new(l_Object_0.assign({}, v59, {
-                interfaces = function() --[[ Line: 161 ]] --[[ Name: interfaces ]]
-                    -- upvalues: v41 (ref), v59 (copy)
-                    return v41(v59.interfaces);
-                end, 
-                fields = function() --[[ Line: 164 ]] --[[ Name: fields ]]
-                    -- upvalues: v39 (ref), v59 (copy)
-                    return v39(v59.fields);
-                end
-            }));
-        elseif l_isInterfaceType_0(v58) then
-            local v60 = v58:toConfig();
-            return l_GraphQLInterfaceType_0.new(l_Object_0.assign({}, v60, {
-                interfaces = function() --[[ Line: 174 ]] --[[ Name: interfaces ]]
-                    -- upvalues: v41 (ref), v60 (copy)
-                    return v41(v60.interfaces);
-                end, 
-                fields = function() --[[ Line: 177 ]] --[[ Name: fields ]]
-                    -- upvalues: v39 (ref), v60 (copy)
-                    return v39(v60.fields);
-                end
-            }));
-        elseif l_isUnionType_0(v58) then
-            local v61 = v58:toConfig();
-            return l_GraphQLUnionType_0.new(l_Object_0.assign({}, v61, {
-                types = function() --[[ Line: 187 ]] --[[ Name: types ]]
-                    -- upvalues: v41 (ref), v61 (copy)
-                    return v41(v61.types);
-                end
-            }));
-        elseif l_isEnumType_0(v58) then
-            local v62 = v58:toConfig();
-            return l_GraphQLEnumType_0.new(l_Object_0.assign({}, v62, {
-                values = v30(v62.values, function(v63) --[[ Line: 197 ]]
-                    return v63;
-                end)
-            }));
-        elseif l_isInputObjectType_0(v58) then
-            local v64 = v58:toConfig();
-            return l_GraphQLInputObjectType_0.new(l_Object_0.assign({}, v64, {
-                fields = function() --[[ Line: 208 ]] --[[ Name: fields ]]
-                    -- upvalues: v40 (ref), v64 (copy)
-                    return v40(v64.fields);
-                end
-            }));
-        else
-            l_invariant_0(false, "Unexpected type: " .. l_inspect_0(v58));
-            error("Unexpected type: " .. l_inspect_0(v58));
-            return;
-        end;
-    end;
-    v34 = l_keyValMap_0(v31(v43.types), function(v65) --[[ Line: 220 ]]
-        return v65.name;
-    end, v42);
-    return l_GraphQLSchema_0.new(l_Object_0.assign({}, v43, {
-        types = v34:values(), 
-        directives = l_Array_0.map(v31(v43.directives), v37), 
-        query = v36(v43.query), 
-        mutation = v36(v43.mutation), 
-        subscription = v36(v43.subscription)
-    }));
-end;
-v30 = function(v67, v68) --[[ Line: 235 ]] --[[ Name: sortObjMap ]]
-    -- upvalues: l_Map_0 (copy), v32 (ref)
-    local v69 = l_Map_0.new();
-    local v71 = v32(v67:keys(), function(v70) --[[ Line: 238 ]]
-        return v70;
-    end);
-    for _, v73 in ipairs(v71) do
-        v69[v73] = v68(v67[v73]);
-    end;
-    return v69;
-end;
-v31 = function(v74) --[[ Line: 249 ]] --[[ Name: sortByName ]]
-    -- upvalues: v32 (ref)
-    return v32(v74, function(v75) --[[ Line: 250 ]]
-        return v75.name;
-    end);
-end;
-v32 = function(v76, v77) --[[ Line: 256 ]] --[[ Name: sortBy ]]
-    -- upvalues: l_Array_0 (copy), l_naturalCompare_0 (copy)
-    return l_Array_0.sort(l_Array_0.slice(v76), function(v78, v79) --[[ Line: 257 ]]
-        -- upvalues: v77 (copy), l_naturalCompare_0 (ref)
-        local v80 = v77(v78);
-        local v81 = v77(v79);
-        return l_naturalCompare_0(v80, v81);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Map = LuauPolyfill.Map
+local Object = LuauPolyfill.Object
+local inspect = require(ParentParent.jsutils.inspect).inspect
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local keyValMap = require(ParentParent.jsutils.keyValMap).keyValMap
+local naturalCompare = require(ParentParent.jsutils.naturalCompare).naturalCompare
+local GraphQLSchema = require(ParentParent.type.schema).GraphQLSchema
+local GraphQLDirective = require(ParentParent.type.directives).GraphQLDirective
+local definition = require(ParentParent.type.definition)
+
+require(ParentParent.language.ast)
+
+local isIntrospectionType = require(ParentParent.type.introspection).isIntrospectionType
+local GraphQLList = definition.GraphQLList
+local GraphQLNonNull = definition.GraphQLNonNull
+local GraphQLObjectType = definition.GraphQLObjectType
+local GraphQLInterfaceType = definition.GraphQLInterfaceType
+local GraphQLUnionType = definition.GraphQLUnionType
+local GraphQLEnumType = definition.GraphQLEnumType
+local GraphQLInputObjectType = definition.GraphQLInputObjectType
+local isListType = definition.isListType
+local isNonNullType = definition.isNonNullType
+local isScalarType = definition.isScalarType
+local isObjectType = definition.isObjectType
+local isInterfaceType = definition.isInterfaceType
+local isUnionType = definition.isUnionType
+local isEnumType = definition.isEnumType
+local isInputObjectType = definition.isInputObjectType
+local sortObjMap = nil
+local sortByName = nil
+local sortBy = nil
+
+function sortObjMap(p1, p2: ((...any) -> ...any)) -- line: 235
+	-- upvalues: Map (copy), sortBy (ref)
+	local v47 = Map.new()
+	local v48 = sortBy(p1:keys(), function(p3) -- line: 238
+		return p3
+	end)
+
+	for _, v in ipairs(v48) do
+		v47[v] = p2(p1[v])
+	end
+
+	return v47
+end
+function sortByName(p4) -- line: 249
+	-- upvalues: sortBy (ref)
+	return sortBy(p4, function(p5) -- line: 250
+		return p5.name
+	end)
+end
+function sortBy(p6, p7: ((...any) -> ...any)) -- line: 256
+	-- upvalues: Array (copy), naturalCompare (copy)
+	return Array.sort(Array.slice(p6), function(p8, p9) -- line: 257
+		-- upvalues: p7 (copy), naturalCompare (copy)
+		local v74 = p7(p8)
+		local v75 = p7(p9)
+
+		return naturalCompare(v74, v75)
+	end)
+end
+
 return {
-    lexicographicSortSchema = v66
-};
+	lexicographicSortSchema = function(p10) -- line: 78
+		-- upvalues: isListType (copy), GraphQLList (copy), isNonNullType (copy), GraphQLNonNull (copy), GraphQLDirective (copy), Object (copy), sortBy (ref), sortObjMap (ref), Array (copy), sortByName (ref), isScalarType (copy), isIntrospectionType (copy), isObjectType (copy), GraphQLObjectType (copy), isInterfaceType (copy), GraphQLInterfaceType (copy), isUnionType (copy), GraphQLUnionType (copy), isEnumType (copy), GraphQLEnumType (copy), isInputObjectType (copy), GraphQLInputObjectType (copy), invariant (copy), inspect (copy), keyValMap (copy), GraphQLSchema (copy)
+		local u34 = nil
+		local replaceNamedType = nil
+		local sortArgs = nil
+		local v37 = p10:toConfig()
+
+		local function replaceType(p11) -- line: 86
+			-- upvalues: isListType (copy), GraphQLList (copy), replaceType (copy), isNonNullType (copy), GraphQLNonNull (copy), replaceNamedType (ref)
+			if isListType(p11) then
+				return GraphQLList.new(replaceType(p11.ofType))
+			end
+
+			if isNonNullType(p11) then
+				return GraphQLNonNull.new(replaceType(p11.ofType))
+			end
+
+			return replaceNamedType(p11)
+		end
+
+		function replaceNamedType(p12) -- line: 102
+			-- upvalues: u34 (ref)
+			return u34[p12.name]
+		end
+
+		local function replaceMaybeType(p13) -- line: 108
+			-- upvalues: replaceNamedType (ref)
+			if p13 then
+				return (replaceNamedType(p13))
+			end
+
+			return nil
+		end
+		local function sortDirective(p14) -- line: 112
+			-- upvalues: GraphQLDirective (copy), Object (copy), sortBy (ref), sortArgs (ref)
+			local v58 = p14:toConfig()
+
+			return GraphQLDirective.new(Object.assign({}, v58, {
+				locations = sortBy(v58.locations, function(p15) -- line: 116
+					return p15
+				end),
+				args = sortArgs(v58.args)
+			}))
+		end
+
+		function sortArgs(p16) -- line: 123
+			-- upvalues: sortObjMap (ref), Object (copy), replaceType (copy)
+			return sortObjMap(p16, function(p17) -- line: 124
+				-- upvalues: Object (copy), replaceType (copy)
+				return Object.assign({}, p17, {
+					type = replaceType(p17.type)
+				})
+			end)
+		end
+
+		local function sortFields(p18) -- line: 131
+			-- upvalues: sortObjMap (ref), Object (copy), replaceType (copy), sortArgs (ref)
+			return sortObjMap(p18, function(p19) -- line: 132
+				-- upvalues: Object (copy), replaceType (copy), sortArgs (ref)
+				return Object.assign({}, p19, {
+					type = replaceType(p19.type),
+					args = if not p19.args then nil else sortArgs(p19.args)
+				})
+			end)
+		end
+		local function sortInputFields(p20) -- line: 140
+			-- upvalues: sortObjMap (ref), Object (copy), replaceType (copy)
+			return sortObjMap(p20, function(p21) -- line: 141
+				-- upvalues: Object (copy), replaceType (copy)
+				return Object.assign({}, p21, {
+					type = replaceType(p21.type)
+				})
+			end)
+		end
+		local function sortTypes(p22) -- line: 148
+			-- upvalues: Array (copy), sortByName (ref), replaceNamedType (ref)
+			return Array.map(sortByName(p22), replaceNamedType)
+		end
+		local function sortNamedType(p23) -- line: 152
+			-- upvalues: isScalarType (copy), isIntrospectionType (copy), isObjectType (copy), GraphQLObjectType (copy), Object (copy), sortTypes (ref), sortFields (ref), isInterfaceType (copy), GraphQLInterfaceType (copy), isUnionType (copy), GraphQLUnionType (copy), isEnumType (copy), GraphQLEnumType (copy), sortObjMap (ref), isInputObjectType (copy), GraphQLInputObjectType (copy), sortInputFields (ref), invariant (copy), inspect (copy)
+			if isScalarType(p23) or isIntrospectionType(p23) then
+				return p23
+			end
+
+			if isObjectType(p23) then
+				local v64 = p23:toConfig()
+
+				return GraphQLObjectType.new(Object.assign({}, v64, {
+					interfaces = function() -- line: 161
+						-- upvalues: sortTypes (ref), v64 (copy)
+						return sortTypes(v64.interfaces)
+					end,
+					fields = function() -- line: 164
+						-- upvalues: sortFields (ref), v64 (copy)
+						return sortFields(v64.fields)
+					end
+				}))
+			end
+
+			if isInterfaceType(p23) then
+				local v65 = p23:toConfig()
+
+				return GraphQLInterfaceType.new(Object.assign({}, v65, {
+					interfaces = function() -- line: 174
+						-- upvalues: sortTypes (ref), v65 (copy)
+						return sortTypes(v65.interfaces)
+					end,
+					fields = function() -- line: 177
+						-- upvalues: sortFields (ref), v65 (copy)
+						return sortFields(v65.fields)
+					end
+				}))
+			end
+
+			if isUnionType(p23) then
+				local v66 = p23:toConfig()
+
+				return GraphQLUnionType.new(Object.assign({}, v66, {
+					types = function() -- line: 187
+						-- upvalues: sortTypes (ref), v66 (copy)
+						return sortTypes(v66.types)
+					end
+				}))
+			end
+
+			if isEnumType(p23) then
+				local v67 = p23:toConfig()
+
+				return GraphQLEnumType.new(Object.assign({}, v67, {
+					values = sortObjMap(v67.values, function(p24) -- line: 197
+						return p24
+					end)
+				}))
+			end
+
+			if isInputObjectType(p23) then
+				local v68 = p23:toConfig()
+
+				return GraphQLInputObjectType.new(Object.assign({}, v68, {
+					fields = function() -- line: 208
+						-- upvalues: sortInputFields (ref), v68 (copy)
+						return sortInputFields(v68.fields)
+					end
+				}))
+			end
+
+			invariant(false, "Unexpected type: " .. inspect(p23))
+			error("Unexpected type: " .. inspect(p23))
+		end
+
+		u34 = keyValMap(sortByName(v37.types), function(p25) -- line: 220
+			return p25.name
+		end, sortNamedType)
+
+		return GraphQLSchema.new(Object.assign({}, v37, {
+			types = u34:values(),
+			directives = Array.map(sortByName(v37.directives), sortDirective),
+			query = replaceMaybeType(v37.query),
+			mutation = replaceMaybeType(v37.mutation),
+			subscription = replaceMaybeType(v37.subscription)
+		}))
+	end
+}

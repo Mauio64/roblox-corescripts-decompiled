@@ -1,3 +1,3 @@
 return {
-    SocialSduiComponentWrapper = require(script.SocialSduiComponentWrapper)
-};
+	SocialSduiComponentWrapper = require(script.SocialSduiComponentWrapper)
+}

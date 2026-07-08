@@ -1,29 +1,30 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.Action);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local v3 = nil;
-    v3 = if type(v2) == "string" then v2 else v2.Name;
-    return {
-        Succeeded = v1(v3 .. "_Succeeded", function(v4, v5, v6, v7, v8) --[[ Line: 14 ]]
-            return {
-                ids = v4, 
-                responseBody = v5, 
-                namedIds = v6, 
-                postBody = v7 and v7.postBody or nil, 
-                queryArgs = v7 and v7.queryArgs, 
-                additionalData = v8
-            };
-        end), 
-        Failed = v1(v3 .. "_Failed", function(v9, v10, v11, v12, v13) --[[ Line: 24 ]]
-            return {
-                ids = v9, 
-                error = v10, 
-                namedIds = v11, 
-                postBody = v12 and v12.postBody or nil, 
-                queryArgs = v12 and v12.queryArgs or nil, 
-                additionalData = v13
-            };
-        end)
-    };
-end;
+local scriptParent = script.Parent
+local Action = require(scriptParent.Action)
+
+return function(p1) -- line: 5
+	-- upvalues: Action (copy)
+	local v4 = if type(p1) ~= "string" then p1.Name else p1
+
+	return {
+		Succeeded = Action(v4 .. "_Succeeded", function(p2, p3, p4, p5, p6) -- line: 14
+			return {
+				ids = p2,
+				responseBody = p3,
+				namedIds = p4,
+				postBody = p5 and p5.postBody or nil,
+				queryArgs = p5 and p5.queryArgs,
+				additionalData = p6
+			}
+		end),
+		Failed = Action(v4 .. "_Failed", function(p7, p8, p9, p10, p11) -- line: 24
+			return {
+				ids = p7,
+				error = p8,
+				namedIds = p9,
+				postBody = p10 and p10.postBody or nil,
+				queryArgs = p10 and p10.queryArgs or nil,
+				additionalData = p11
+			}
+		end)
+	}
+end

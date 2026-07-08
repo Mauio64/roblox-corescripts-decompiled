@@ -1,5 +1,7 @@
-local v0 = require(script.MessageBus);
-local _ = require(script.MessageBusTypes);
+local MessageBus = require(script.MessageBus)
+
+require(script.MessageBusTypes)
+
 return {
-    MessageBus = v0
-};
+	MessageBus = MessageBus
+}

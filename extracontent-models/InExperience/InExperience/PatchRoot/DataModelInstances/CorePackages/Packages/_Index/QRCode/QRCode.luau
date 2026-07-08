@@ -1,3 +1,3 @@
 return {
-    qrcode = require(script.qrencode).qrcode
-};
+	qrcode = require(script.qrencode).qrcode
+}

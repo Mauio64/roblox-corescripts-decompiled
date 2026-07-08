@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AuthSecExclusions8", false);
+return game:DefineFastFlag("AuthSecExclusions8", false)

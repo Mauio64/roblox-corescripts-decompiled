@@ -1,8 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp");
-local v1 = require(l_script_FirstAncestor_0.Store.RobloxSubscriptionStore);
-local v2 = require(l_script_FirstAncestor_0.Actions.cleanupSubscriptionFlow);
-return function() --[[ Line: 6 ]] --[[ Name: handleBackButtonAction ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    v1.get().triggerOnBackButtonActivated();
-    v2();
-end;
+local RobloxSubscriptionPurchaseApp = script:FindFirstAncestor("RobloxSubscriptionPurchaseApp")
+local RobloxSubscriptionStore = require(RobloxSubscriptionPurchaseApp.Store.RobloxSubscriptionStore)
+local cleanupSubscriptionFlow = require(RobloxSubscriptionPurchaseApp.Actions.cleanupSubscriptionFlow)
+
+local function handleBackButtonAction() -- line: 6
+	-- upvalues: RobloxSubscriptionStore (copy), cleanupSubscriptionFlow (copy)
+	RobloxSubscriptionStore.get().triggerOnBackButtonActivated()
+	cleanupSubscriptionFlow()
+end
+
+return handleBackButtonAction

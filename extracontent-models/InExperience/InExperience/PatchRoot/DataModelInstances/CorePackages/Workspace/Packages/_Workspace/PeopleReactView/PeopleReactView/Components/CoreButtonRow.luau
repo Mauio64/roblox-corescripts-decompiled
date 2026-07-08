@@ -1,179 +1,184 @@
-local l_select_0 = select;
-local function v6(v1, v2, ...)
-    local v3, v4 = {
-        ...
-    }, l_select_0("#", ...);
-    for v5 = v2, v2 + v4 - 1 do
-        v1[v5] = v3[v5 - v2 + 1];
-    end;
-end;
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v9 = require(l_Parent_0.Foundation);
-local v10 = require(l_Parent_0.React);
-local v11 = require(l_Parent_0.PeopleService);
-local l_View_0 = v9.View;
-local v13 = require(l_script_FirstAncestor_0.Components.Buttons.CoreButton);
-local v14 = require(l_script_FirstAncestor_0.Configs.CoreButtonConfigs);
-local l_GetFFlagAddPeoplePageCardLayout_0 = v11.getService("Flags").GetFFlagAddPeoplePageCardLayout;
-local function v20(v16) --[[ Line: 19 ]] --[[ Name: MemoizedButton ]]
-    -- upvalues: v10 (copy), v13 (copy)
-    local l_config_0 = v16.config;
-    local v19 = v10.useCallback(function(v18) --[[ Line: 25 ]]
-        -- upvalues: v16 (copy), l_config_0 (copy)
-        v16.onButtonMount(v18, l_config_0.id);
-    end, {
-        v16.onButtonMount, 
-        l_config_0.id
-    });
-    return v10.useMemo(function() --[[ Line: 29 ]]
-        -- upvalues: v10 (ref), v13 (ref), l_config_0 (copy), v19 (copy)
-        return v10.createElement(v13, {
-            text = l_config_0.text, 
-            icon = {
-                on = l_config_0.onIcon, 
-                off = l_config_0.offIcon
-            }, 
-            animatedIcon = l_config_0.animatedIcon, 
-            buttonState = l_config_0.buttonState, 
-            isNewIcon = l_config_0.isNewIcon, 
-            LayoutOrder = l_config_0.layoutOrder, 
-            onActivated = l_config_0.onActivated, 
-            onMount = v19
-        });
-    end, {
-        l_config_0.text, 
-        l_config_0.onIcon, 
-        l_config_0.offIcon, 
-        l_config_0.animatedIcon, 
-        l_config_0.buttonState, 
-        l_config_0.isNewIcon, 
-        l_config_0.layoutOrder, 
-        l_config_0.onActivated, 
-        v19
-    });
-end;
-return function(v21) --[[ Line: 57 ]]
-    -- upvalues: v14 (copy), v10 (copy), v11 (copy), v20 (copy), l_View_0 (copy), l_GetFFlagAddPeoplePageCardLayout_0 (copy)
-    local v22 = v14(v21.chromeEnabled);
-    local v23 = v10.useMemo(function() --[[ Line: 60 ]]
-        -- upvalues: v11 (ref)
-        return v11.getService("FocusNavigationService");
-    end, {});
-    local v24 = v10.useRef(nil);
-    local v25 = v10.useRef({});
-    local v28 = v10.useCallback(function(v26, v27) --[[ Line: 70 ]]
-        -- upvalues: v25 (copy)
-        if v26 then
-            v25.current[v27] = v26;
-            return;
-        else
-            v25.current[v27] = nil;
-            return;
-        end;
-    end, {});
-    local v32 = v10.useCallback(function(v29) --[[ Line: 78 ]]
-        -- upvalues: v24 (copy), v11 (ref), v23 (copy)
-        v24.current = v29;
-        if v29 then
-            local function v31() --[[ Line: 82 ]]
-                -- upvalues: v11 (ref), v24 (ref)
-                local v30 = v11.getService("SettingsHubService").hubRef();
-                if v30 and v30.ScrollToFrame and v24.current then
-                    v30:ScrollToFrame(v24.current, true);
-                end;
-            end;
-            v23.registerScrollCallback(-1, v31);
-        end;
-    end, {
-        v23
-    });
-    local v36 = v10.useMemo(function() --[[ Line: 94 ]]
-        -- upvalues: v22 (copy)
-        local v33 = {};
-        for _, v35 in ipairs(v22) do
-            if v35.shouldShow() then
-                table.insert(v33, v35.id);
-            end;
-        end;
-        table.sort(v33);
-        return table.concat(v33, ",");
-    end, {
-        v22
-    });
-    v10.useEffect(function() --[[ Line: 105 ]]
-        -- upvalues: v22 (copy), v25 (copy), v23 (copy)
-        local v37 = {};
-        for _, v39 in ipairs(v22) do
-            if v39.shouldShow() then
-                local v40 = v25.current[v39.id];
-                if v40 then
-                    table.insert(v37, v40);
-                end;
-            end;
-        end;
-        if #v37 > 0 then
-            table.sort(v37, function(v41, v42) --[[ Line: 119 ]]
-                return v41.LayoutOrder < v42.LayoutOrder;
-            end);
-            v23.registerButtonRow(-1, v37, 0);
-        end;
-    end, {
-        v23, 
-        v36
-    });
-    v10.useEffect(function() --[[ Line: 128 ]]
-        -- upvalues: v23 (copy)
-        return function() --[[ Line: 129 ]]
-            -- upvalues: v23 (ref)
-            v23.unregisterScrollCallback(-1);
-            v23.unregisterButtonRow(-1);
-        end;
-    end, {
-        v23
-    });
-    local v46 = v10.useMemo(function() --[[ Line: 136 ]]
-        -- upvalues: v22 (copy), v10 (ref), v20 (ref), v28 (copy)
-        local v43 = {};
-        for _, v45 in ipairs(v22) do
-            if v45.shouldShow() then
-                table.insert(v43, v10.createElement(v20, {
-                    key = v45.id, 
-                    config = v45, 
-                    onButtonMount = v28
-                }));
-            end;
-        end;
-        return v43;
-    end, {
-        v22, 
-        v28
-    });
-    if #v46 == 0 then
-        return nil;
-    else
-        local function _() --[[ Line: 162 ]] --[[ Name: getButtonElements ]]
-            -- upvalues: v46 (copy)
-            local v47 = {};
-            for v48, v49 in ipairs(v46) do
-                v47["Button" .. v48] = v49;
-            end;
-            return v47;
-        end;
-        local l_createElement_0 = v10.createElement;
-        local l_l_View_0_0 = l_View_0;
-        local v53 = {
-            tag = "size-full-0 auto-y row gap-large", 
-            LayoutOrder = if l_GetFFlagAddPeoplePageCardLayout_0() then v21.LayoutOrder else 1, 
-            ref = v32
-        };
-        local v54 = {};
-        local v55 = {};
-        for v56, v57 in ipairs(v46) do
-            v55["Button" .. v56] = v57;
-        end;
-        local l_v55_0 = v55;
-        v6(v54, 1, l_v55_0);
-        return l_createElement_0(l_l_View_0_0, v53, v54);
-    end;
-end;
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local Foundation = require(PeopleReactViewParent.Foundation)
+local React = require(PeopleReactViewParent.React)
+local PeopleService = require(PeopleReactViewParent.PeopleService)
+local View = Foundation.View
+local CoreButton = require(PeopleReactView.Components.Buttons.CoreButton)
+local CoreButtonConfigs = require(PeopleReactView.Configs.CoreButtonConfigs)
+local GetFFlagAddPeoplePageCardLayout = PeopleService.getService("Flags").GetFFlagAddPeoplePageCardLayout
+
+local function MemoizedButton(t1: {[any]: any}) -- line: 19
+	-- upvalues: React (copy), CoreButton (copy)
+	local config = t1.config
+	local v13 = React.useCallback(function(p1) -- line: 25
+		-- upvalues: t1 (copy), config (copy)
+		t1.onButtonMount(p1, config.id)
+	end, {
+		t1.onButtonMount,
+		config.id
+	})
+
+	return React.useMemo(function() -- line: 29
+		-- upvalues: React (copy), CoreButton (copy), config (copy), v13 (copy)
+		return React.createElement(CoreButton, {
+			text = config.text,
+			icon = {
+				on = config.onIcon,
+				off = config.offIcon
+			},
+			animatedIcon = config.animatedIcon,
+			buttonState = config.buttonState,
+			isNewIcon = config.isNewIcon,
+			LayoutOrder = config.layoutOrder,
+			onActivated = config.onActivated,
+			onMount = v13
+		})
+	end, {
+		config.text,
+		config.onIcon,
+		config.offIcon,
+		config.animatedIcon,
+		config.buttonState,
+		config.isNewIcon,
+		config.layoutOrder,
+		config.onActivated,
+		v13
+	})
+end
+
+return function(t2: {[any]: any}) -- line: 57
+	-- upvalues: CoreButtonConfigs (copy), React (copy), PeopleService (copy), MemoizedButton (copy), View (copy), GetFFlagAddPeoplePageCardLayout (copy)
+	local v15 = CoreButtonConfigs(t2.chromeEnabled, t2.buttonActivatedTable)
+	local v16 = React.useMemo(function() -- line: 62
+		-- upvalues: PeopleService (copy)
+		return PeopleService.getService("FocusNavigationService")
+	end, {})
+	local v17 = React.useRef(nil)
+	local v18 = React.useRef({})
+	local v19 = React.useCallback(function(p2, s1: string) -- line: 72
+		-- upvalues: v18 (copy)
+		if p2 then
+			v18.current[s1] = p2
+
+			return
+		end
+
+		v18.current[s1] = nil
+	end, {})
+	local v20 = React.useCallback(function(p3) -- line: 80
+		-- upvalues: v17 (copy), PeopleService (copy), v16 (copy)
+		v17.current = p3
+
+		if p3 then
+			v16.registerScrollCallback(-1, function() -- line: 84
+				-- upvalues: PeopleService (copy), v17 (copy)
+				local v48 = PeopleService.getService("SettingsHubService").hubRef()
+
+				if v48 and (v48.ScrollToFrame and v17.current) then
+					v48:ScrollToFrame(v17.current, true)
+				end
+			end)
+		end
+	end, { v16 })
+	local v21 = React.useMemo(function() -- line: 96
+		-- upvalues: v15 (copy)
+		local t3 = {}
+
+		for _, v in ipairs(v15) do
+			if v.shouldShow() then
+				table.insert(t3, v.id)
+			end
+		end
+
+		table.sort(t3)
+
+		return table.concat(t3, ",")
+	end, { v15 })
+
+	React.useEffect(function() -- line: 107
+		-- upvalues: v15 (copy), v18 (copy), v16 (copy)
+		local t4 = {}
+
+		for _, v in ipairs(v15) do
+			if v.shouldShow() then
+				local v41 = v18.current[v.id]
+
+				if v41 then
+					table.insert(t4, v41)
+				end
+			end
+		end
+
+		if #t4 > 0 then
+			table.sort(t4, function(p4, p5) -- line: 121
+				return p4.LayoutOrder < p5.LayoutOrder
+			end)
+			v16.registerButtonRow(-1, t4, 0)
+		end
+	end, {
+		v16,
+		v21
+	})
+	React.useEffect(function() -- line: 130
+		-- upvalues: v16 (copy)
+		return function() -- line: 131
+			-- upvalues: v16 (copy)
+			v16.unregisterScrollCallback(-1)
+			v16.unregisterButtonRow(-1)
+		end
+	end, { v16 })
+
+	local v22 = React.useMemo(function() -- line: 138
+		-- upvalues: v15 (copy), React (copy), MemoizedButton (copy), v19 (copy)
+		local t5 = {}
+
+		for _, v in ipairs(v15) do
+			if v.shouldShow() then
+				table.insert(t5, React.createElement(MemoizedButton, {
+					key = v.id,
+					config = v,
+					onButtonMount = v19
+				}))
+			end
+		end
+
+		return t5
+	end, {
+		v15,
+		v19
+	})
+
+	if #v22 == 0 then
+		return nil
+	end
+
+	local function getButtonElements() -- line: 164
+		-- upvalues: v22 (copy)
+		local t6 = {}
+
+		for i, v in ipairs(v22) do
+			t6["Button" .. i] = v
+		end
+
+		return t6
+	end
+
+	local createElement = React.createElement
+	local v25 = View
+	local t7 = {
+		tag = "size-full-0 auto-y row gap-large",
+		LayoutOrder = not GetFFlagAddPeoplePageCardLayout() and 1 or t2.LayoutOrder,
+		ref = v20
+	}
+	local t8 = {}
+	local t9 = {}
+
+	for i, v in ipairs(v22) do
+		t9["Button" .. i] = v
+	end
+
+	t8[1] = t9
+
+	return createElement(v25, t7, t8)
+end

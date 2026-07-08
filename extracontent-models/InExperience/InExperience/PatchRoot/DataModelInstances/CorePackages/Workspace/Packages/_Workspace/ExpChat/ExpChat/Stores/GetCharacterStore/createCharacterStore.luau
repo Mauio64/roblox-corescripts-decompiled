@@ -1,32 +1,43 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local l_createSignal_0 = require(l_Parent_0.Signals).createSignal;
-return function() --[[ Line: 19 ]] --[[ Name: createCharacterStore ]]
-    -- upvalues: l_createSignal_0 (copy)
-    local v2, v3 = l_createSignal_0({});
-    local function _(v4) --[[ Line: 23 ]] --[[ Name: getKey ]]
-        return (tostring(v4));
-    end;
-    return {
-        getCharacters = v2, 
-        handleCharacterAdded = function(v6, v7) --[[ Line: 27 ]] --[[ Name: handleCharacterAdded ]]
-            -- upvalues: v3 (copy)
-            local v8 = tostring(v6);
-            v3(function(v9) --[[ Line: 30 ]]
-                -- upvalues: v8 (copy), v7 (copy)
-                local v10 = table.clone(v9);
-                v10[v8] = v7;
-                return v10;
-            end);
-        end, 
-        handlePlayerRemoved = function(v11) --[[ Line: 37 ]] --[[ Name: handlePlayerRemoved ]]
-            -- upvalues: v3 (copy)
-            local v12 = tostring(v11);
-            v3(function(v13) --[[ Line: 40 ]]
-                -- upvalues: v12 (copy)
-                local v14 = table.clone(v13);
-                v14[v12] = nil;
-                return v14;
-            end);
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local createSignal = require(Parent.Signals).createSignal
+
+local function createCharacterStore() -- line: 19
+	-- upvalues: createSignal (copy)
+	local v4, v5 = createSignal({})
+
+	local function getKey(p1) -- line: 23
+		return (tostring(p1))
+	end
+
+	return {
+		getCharacters = v4,
+		handleCharacterAdded = function(p2, p3) -- line: 27
+			-- upvalues: v5 (copy)
+			local str = tostring(p2)
+
+			v5(function(p4) -- line: 30
+				-- upvalues: str (copy), p3 (copy)
+				local v14 = table.clone(p4)
+
+				v14[str] = p3
+
+				return v14
+			end)
+		end,
+		handlePlayerRemoved = function(p5) -- line: 37
+			-- upvalues: v5 (copy)
+			local str = tostring(p5)
+
+			v5(function(p6) -- line: 40
+				-- upvalues: str (copy)
+				local v16 = table.clone(p6)
+
+				v16[str] = nil
+
+				return v16
+			end)
+		end
+	}
+end
+
+return createCharacterStore

@@ -1,69 +1,73 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v4 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v5 = require(l_Parent_0.Foundation);
-local l_Skeleton_0 = v5.Skeleton;
-local l_Radius_0 = v5.Enums.Radius;
-local l_View_0 = v5.View;
-local l_useTextSizeOffset_0 = v5.Hooks.useTextSizeOffset;
-local v10 = require(l_Parent_0.GameCollections);
-local l_CollectionCarousel_0 = require(l_Parent_0.CollectionViews).CollectionCarousel;
-local l_useGetGameTileHeight_0 = v10.useGetGameTileHeight;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-return function(v14) --[[ Line: 21 ]] --[[ Name: EventsSkeleton ]]
-    -- upvalues: l_useLocalization_0 (copy), v4 (copy), l_useTextSizeOffset_0 (copy), l_useDesignTokens_0 (copy), l_useGetGameTileHeight_0 (copy), v2 (copy), l_View_0 (copy), l_Skeleton_0 (copy), l_Radius_0 (copy), l_CollectionCarousel_0 (copy)
-    local v15 = l_useLocalization_0({
-        events = v4.EventsListTitle
-    });
-    local v16 = l_useTextSizeOffset_0();
-    local v17 = l_useDesignTokens_0();
-    local v18 = l_useGetGameTileHeight_0(false, "Event", true, false, false, v16, v17.Global.Size_350 + v17.Global.Space_100);
-    local v22 = v2.useCallback(function(_, v20, v21) --[[ Line: 38 ]]
-        -- upvalues: v2 (ref), l_View_0 (ref), l_Skeleton_0 (ref), l_Radius_0 (ref)
-        return v2.createElement(l_View_0, {
-            tag = "col gap-medium radius-medium", 
-            LayoutOrder = v20, 
-            Size = v21
-        }, {
-            ThumbnailSkeleton = v2.createElement(l_Skeleton_0, {
-                LayoutOrder = 1, 
-                Size = UDim2.fromScale(1, 0.6), 
-                radius = l_Radius_0.Medium
-            }), 
-            NameSkeleton = v2.createElement(l_Skeleton_0, {
-                LayoutOrder = 2, 
-                Size = UDim2.fromScale(0.8, 0.15), 
-                radius = l_Radius_0.Medium
-            }), 
-            ButtonSkeleton = v2.createElement(l_Skeleton_0, {
-                LayoutOrder = 3, 
-                Size = UDim2.fromScale(1, 0.1), 
-                radius = l_Radius_0.Medium
-            })
-        }), "Skeleton_" .. v20;
-    end, {});
-    local v25 = v2.useMemo(function() --[[ Line: 63 ]]
-        -- upvalues: v14 (copy)
-        local v23 = {};
-        for v24 = 1, v14.numSkeletons do
-            table.insert(v23, v24);
-        end;
-        return v23;
-    end, {
-        v14.numSkeletons
-    });
-    return v2.createElement(l_CollectionCarousel_0, {
-        scrollingFrameRef = nil, 
-        title = v15.events, 
-        hideHeaderButton = true, 
-        items = v25, 
-        renderItem = v22, 
-        getItemHeight = v18, 
-        numColumns = 1, 
-        columnGap = v17.Global.Space_150, 
-        fractionalItemAmount = 0.33, 
-        sideMargin = 0
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local Foundation = require(ProfilePlatformParent.Foundation)
+local Skeleton = Foundation.Skeleton
+local EnumsRadius = Foundation.Enums.Radius
+local View = Foundation.View
+local useTextSizeOffset = Foundation.Hooks.useTextSizeOffset
+local GameCollections = require(ProfilePlatformParent.GameCollections)
+local CollectionCarousel = require(ProfilePlatformParent.CollectionViews).CollectionCarousel
+local useGetGameTileHeight = GameCollections.useGetGameTileHeight
+local useDesignTokens = require(ProfilePlatformParent.Style).useDesignTokens
+
+local function EventsSkeleton(t1: {[any]: any}) -- line: 21
+	-- upvalues: useLocalization (copy), TextKeys (copy), useTextSizeOffset (copy), useDesignTokens (copy), useGetGameTileHeight (copy), React (copy), View (copy), Skeleton (copy), EnumsRadius (copy), CollectionCarousel (copy)
+	local v17 = useLocalization({
+		events = TextKeys.EventsListTitle
+	})
+	local v18 = useTextSizeOffset()
+	local v19 = useDesignTokens()
+	local v20 = useGetGameTileHeight(false, "Event", true, false, false, v18, v19.Size.Size_700 + v19.Size.Size_200)
+	local v21 = React.useCallback(function(_, n1: number, p2) -- line: 38
+		-- upvalues: React (copy), View (copy), Skeleton (copy), EnumsRadius (copy)
+		return React.createElement(View, {
+			tag = "col gap-medium radius-medium",
+			LayoutOrder = n1,
+			Size = p2
+		}, {
+			ThumbnailSkeleton = React.createElement(Skeleton, {
+				LayoutOrder = 1,
+				Size = UDim2.fromScale(1, 0.6),
+				radius = EnumsRadius.Medium
+			}),
+			NameSkeleton = React.createElement(Skeleton, {
+				LayoutOrder = 2,
+				Size = UDim2.fromScale(0.8, 0.15),
+				radius = EnumsRadius.Medium
+			}),
+			ButtonSkeleton = React.createElement(Skeleton, {
+				LayoutOrder = 3,
+				Size = UDim2.fromScale(1, 0.1),
+				radius = EnumsRadius.Medium
+			})
+		}), "Skeleton_" .. n1
+	end, {})
+	local v22 = React.useMemo(function() -- line: 63
+		-- upvalues: t1 (copy)
+		local t2 = {}
+
+		for i = 1, t1.numSkeletons do
+			table.insert(t2, i)
+		end
+
+		return t2
+	end, { t1.numSkeletons })
+
+	return React.createElement(CollectionCarousel, {
+		scrollingFrameRef = nil,
+		hideHeaderButton = true,
+		numColumns = 1,
+		fractionalItemAmount = 0.33,
+		sideMargin = 0,
+		title = v17.events,
+		items = v22,
+		renderItem = v21,
+		getItemHeight = v20,
+		columnGap = v19.Size.Size_300
+	})
+end
+
+return EventsSkeleton

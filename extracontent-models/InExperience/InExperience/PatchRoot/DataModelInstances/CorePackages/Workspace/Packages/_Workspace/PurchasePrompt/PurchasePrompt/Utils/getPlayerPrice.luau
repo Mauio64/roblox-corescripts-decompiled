@@ -1,14 +1,17 @@
-local _ = script.Parent.Parent;
-return function(v1, v2, v3) --[[ Line: 4 ]]
-    if v3 and v3 > 0 then
-        return v3;
-    elseif v2 then
-        if v1.premiumPrice ~= nil then
-            return v1.premiumPrice;
-        else
-            return v1.price;
-        end;
-    else
-        return v1.price;
-    end;
-end;
+local _ = script.Parent.Parent
+
+return function(t1: {[any]: any}, b1: boolean, n1: number?) -- line: 4
+	if n1 and n1 > 0 then
+		return n1
+	end
+
+	if b1 then
+		if t1.premiumPrice ~= nil then
+			return t1.premiumPrice
+		end
+
+		return t1.price
+	end
+
+	return t1.price
+end

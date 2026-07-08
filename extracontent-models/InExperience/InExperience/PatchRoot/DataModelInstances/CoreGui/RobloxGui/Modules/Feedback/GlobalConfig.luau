@@ -1,5 +1,5 @@
 return {
-    propValidation = true, 
-    elementTracing = false, 
-    logStore = false
-};
+	propValidation = true,
+	elementTracing = false,
+	logStore = false
+}

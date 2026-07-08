@@ -1,15 +1,21 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_FriendStatuses_0 = require(l_Parent_0.dependencies).SocialLuaAnalytics.Analytics.Enums.FriendStatuses;
-local _ = require(l_Parent_0.Common.LocalTypes);
-return function(v3) --[[ Line: 9 ]]
-    -- upvalues: l_FriendStatuses_0 (copy)
-    if v3.isFriendWithUser then
-        return l_FriendStatuses_0.Friends;
-    elseif v3.hasPendingFriendRequest then
-        return l_FriendStatuses_0.RequestSent;
-    elseif v3.hasIncomingFriendRequest then
-        return l_FriendStatuses_0.RequestReceived;
-    else
-        return l_FriendStatuses_0.NotFriends;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local FriendStatuses = require(ParentParent.dependencies).SocialLuaAnalytics.Analytics.Enums.FriendStatuses
+
+require(ParentParent.Common.LocalTypes)
+
+return function(p1) -- line: 9
+	-- upvalues: FriendStatuses (copy)
+	if p1.isFriendWithUser then
+		return FriendStatuses.Friends
+	end
+
+	if p1.hasPendingFriendRequest then
+		return FriendStatuses.RequestSent
+	end
+
+	if p1.hasIncomingFriendRequest then
+		return FriendStatuses.RequestReceived
+	end
+
+	return FriendStatuses.NotFriends
+end

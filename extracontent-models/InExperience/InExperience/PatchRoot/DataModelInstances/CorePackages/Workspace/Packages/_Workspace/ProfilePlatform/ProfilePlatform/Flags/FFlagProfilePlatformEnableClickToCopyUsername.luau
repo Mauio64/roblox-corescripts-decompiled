@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableClickToCopyUsername", false);
+return game:DefineFastFlag("ProfilePlatformEnableClickToCopyUsername", false)

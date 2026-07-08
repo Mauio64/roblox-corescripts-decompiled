@@ -1,268 +1,350 @@
-local _ = require(script.Parent.ErrorReport);
-local _ = script:FindFirstAncestor("ErrorReporters").Parent;
-local v2 = {};
-local function _(v3) --[[ Line: 124 ]] --[[ Name: toUnsignedInt ]]
-    if v3 == nil then
-        return nil;
-    else
-        local v4 = tonumber(v3);
-        if v4 == nil then
-            return nil;
-        elseif v4 < 0 then
-            return 0;
-        else
-            return (math.floor(v4));
-        end;
-    end;
-end;
-local function v8(v6) --[[ Line: 184 ]] --[[ Name: convertErrorStackToSentryFrame ]]
-    local v7 = {
-        lineno = tonumber(v6.line) or 0
-    };
-    if v6.funcName then
-        v7["function"] = v6.funcName;
-    end;
-    if v6.sourceCode then
-        v7.filename = v6.sourceCode;
-        v7.abs_path = v6.sourceCode;
-    end;
-    if v6.column then
-        v7.colno = tonumber(v6.column);
-    end;
-    if v6.library then
-        v7.module = v6.library;
-    end;
-    if v6.address then
-        v7.instruction_addr = v6.address;
-    end;
-    if v6.guessed_frame == false then
-        v7.in_app = true;
-    end;
-    return v7;
-end;
-v2.parseThreadsToSentry = function(v9) --[[ Line: 286 ]] --[[ Name: parseThreadsToSentry ]]
-    -- upvalues: v8 (copy)
-    if not v9 then
-        return nil;
-    else
-        local v10 = {};
-        local v11 = 1;
-        for v12, v13 in pairs(v9) do
-            local v14 = {
-                id = v11, 
-                name = v13.name or v12
-            };
-            if v12 == "main" or v13.name == "main" then
-                v14.main = true;
-            end;
-            if v13.fault == true then
-                v14.crashed = true;
-            end;
-            if v13.stack and #v13.stack > 0 then
-                local v15 = {};
-                for _, v17 in ipairs(v13.stack) do
-                    table.insert(v15, (v8(v17)));
-                end;
-                local v18 = {};
-                for v19 = #v15, 1, -1 do
-                    table.insert(v18, v15[v19]);
-                end;
-                v14.stacktrace = {
-                    frames = v18
-                };
-            end;
-            table.insert(v10, v14);
-            v11 = v11 + 1;
-        end;
-        if #v10 == 0 then
-            return nil;
-        else
-            return {
-                values = v10
-            };
-        end;
-    end;
-end;
-local function v23(v20) --[[ Line: 371 ]] --[[ Name: parseAppContext ]]
-    local v21 = {};
-    local l_attributes_0 = v20.attributes;
-    if l_attributes_0.appVersion ~= nil then
-        v21.app_version = l_attributes_0.appVersion;
-    end;
-    if l_attributes_0.AppInstallationId ~= nil then
-        v21.device_app_hash = l_attributes_0.AppInstallationId;
-    end;
-    if l_attributes_0.CoreScriptVersion ~= nil then
-        v21.core_script_version = l_attributes_0.CoreScriptVersion;
-    end;
-    if l_attributes_0.DiscoveryScriptVersion ~= nil then
-        v21.discovery_script_version = l_attributes_0.DiscoveryScriptVersion;
-    end;
-    if l_attributes_0.RobloxChannel ~= nil then
-        v21.roblox_channel = l_attributes_0.RobloxChannel;
-    end;
-    if l_attributes_0.AppRunningTime ~= nil then
-        v21.app_running_time = l_attributes_0.AppRunningTime;
-    end;
-    if l_attributes_0.UserAgent ~= nil then
-        v21.user_agent = l_attributes_0.UserAgent;
-    end;
-    if l_attributes_0.BaseUrl ~= nil then
-        v21.base_url = l_attributes_0.BaseUrl;
-    end;
-    if l_attributes_0.WindowsLaunchType ~= nil then
-        v21.windows_launch_type = l_attributes_0.WindowsLaunchType;
-    end;
-    return v21;
-end;
-local function _(v24) --[[ Line: 436 ]] --[[ Name: parseNetworkContext ]]
-    local v25 = {};
-    if v24.attributes.networkType ~= nil then
-        v25.network_type = v24.attributes.networkType;
-    end;
-    return v25;
-end;
-local function _(v27) --[[ Line: 470 ]] --[[ Name: parseOSContext ]]
-    local v28 = {};
-    local l_attributes_1 = v27.attributes;
-    if l_attributes_1.baseOs ~= nil then
-        v28.name = l_attributes_1.baseOs;
-    end;
-    if l_attributes_1.systemVersion ~= nil then
-        v28.version = l_attributes_1.systemVersion;
-    end;
-    if l_attributes_1.systemVersion ~= nil then
-        v28.version = l_attributes_1.systemVersion;
-    end;
-    return v28;
-end;
-local function v53(v31) --[[ Line: 541 ]] --[[ Name: parseDeviceContext ]]
-    local v32 = {};
-    local l_attributes_2 = v31.attributes;
-    if l_attributes_2.deviceName ~= nil then
-        v32.name = l_attributes_2.deviceName;
-    end;
-    if l_attributes_2.batteryLevel ~= nil then
-        local v34 = tonumber(l_attributes_2.batteryLevel);
-        if v34 ~= nil then
-            v32.battery_level = v34;
-        end;
-    end;
-    if l_attributes_2.manufacturer ~= nil then
-        v32.manufacturer = l_attributes_2.manufacturer;
-    end;
-    if l_attributes_2.maxMemory ~= nil then
-        local l_maxMemory_0 = l_attributes_2.maxMemory;
-        local v36;
-        if l_maxMemory_0 == nil then
-            v36 = nil;
-        else
-            local v37 = tonumber(l_maxMemory_0);
-            v36 = if v37 == nil then nil else v37 < 0 and 0 or math.floor(v37);
-        end;
-        if v36 ~= nil then
-            v32.memory_size = v36;
-        end;
-    end;
-    if l_attributes_2.availRAM ~= nil then
-        local l_availRAM_0 = l_attributes_2.availRAM;
-        local v39;
-        if l_availRAM_0 == nil then
-            v39 = nil;
-        else
-            local v40 = tonumber(l_availRAM_0);
-            v39 = if v40 == nil then nil else v40 < 0 and 0 or math.floor(v40);
-        end;
-        if v39 ~= nil then
-            v32.free_memory = v39;
-        end;
-    end;
-    if l_attributes_2.maxResolution ~= nil then
-        v32.screen_resolution = l_attributes_2.maxResolution;
-    end;
-    if l_attributes_2.thermalStatus ~= nil then
-        v32.thermal_status = l_attributes_2.thermalStatus;
-    end;
-    if l_attributes_2.cpuLogicalCount ~= nil then
-        local l_cpuLogicalCount_0 = l_attributes_2.cpuLogicalCount;
-        local v42;
-        if l_cpuLogicalCount_0 == nil then
-            v42 = nil;
-        else
-            local v43 = tonumber(l_cpuLogicalCount_0);
-            v42 = if v43 == nil then nil else v43 < 0 and 0 or math.floor(v43);
-        end;
-        if v42 ~= nil then
-            v32.processor_count = v42;
-        end;
-    end;
-    if l_attributes_2.cpuCoreCount ~= nil then
-        local l_cpuCoreCount_0 = l_attributes_2.cpuCoreCount;
-        local v45;
-        if l_cpuCoreCount_0 == nil then
-            v45 = nil;
-        else
-            local v46 = tonumber(l_cpuCoreCount_0);
-            v45 = if v46 == nil then nil else v46 < 0 and 0 or math.floor(v46);
-        end;
-        if v45 ~= nil then
-            v32.cpu_core_count = v45;
-        end;
-    end;
-    if l_attributes_2.cpuMake ~= nil then
-        v32.cpu_description = l_attributes_2.cpuMake;
-    end;
-    if l_attributes_2.cpuPhysCount ~= nil then
-        local l_cpuPhysCount_0 = l_attributes_2.cpuPhysCount;
-        local v48;
-        if l_cpuPhysCount_0 == nil then
-            v48 = nil;
-        else
-            local v49 = tonumber(l_cpuPhysCount_0);
-            v48 = if v49 == nil then nil else v49 < 0 and 0 or math.floor(v49);
-        end;
-        if v48 ~= nil then
-            v32.cpu_physical_count = v48;
-        end;
-    end;
-    if l_attributes_2.cpuSpeed ~= nil then
-        local l_cpuSpeed_0 = l_attributes_2.cpuSpeed;
-        local v51;
-        if l_cpuSpeed_0 == nil then
-            v51 = nil;
-        else
-            local v52 = tonumber(l_cpuSpeed_0);
-            v51 = if v52 == nil then nil else v52 < 0 and 0 or math.floor(v52);
-        end;
-        if v51 ~= nil then
-            v32.cpu_speed = v51;
-        end;
-    end;
-    return v32;
-end;
-v2.parseErrorToContext = function(v54) --[[ Line: 655 ]] --[[ Name: parseErrorToContext ]]
-    -- upvalues: v23 (copy), v53 (copy)
-    local v55 = {
-        app = v23(v54)
-    };
-    local v56 = {};
-    if v54.attributes.networkType ~= nil then
-        v56.network_type = v54.attributes.networkType;
-    end;
-    v55.network = v56;
-    v56 = {};
-    local l_attributes_3 = v54.attributes;
-    if l_attributes_3.baseOs ~= nil then
-        v56.name = l_attributes_3.baseOs;
-    end;
-    if l_attributes_3.systemVersion ~= nil then
-        v56.version = l_attributes_3.systemVersion;
-    end;
-    if l_attributes_3.systemVersion ~= nil then
-        v56.version = l_attributes_3.systemVersion;
-    end;
-    v55.os = v56;
-    v55.device = v53(v54);
-    return v55;
-end;
-return v2;
+require(script.Parent.ErrorReport)
+
+local _ = script:FindFirstAncestor("ErrorReporters").Parent
+local t1 = {}
+
+local function toUnsignedInt(p1) -- line: 124
+	if p1 == nil then
+		return nil
+	end
+
+	local num = tonumber(p1)
+
+	if num == nil then
+		return nil
+	end
+
+	if num < 0 then
+		return 0
+	end
+
+	return (math.floor(num))
+end
+local function convertErrorStackToSentryFrame(p2) -- line: 184
+	local t2 = {
+		lineno = tonumber(p2.line) or 0
+	}
+
+	if p2.funcName then
+		t2["function"] = p2.funcName
+	end
+
+	if p2.sourceCode then
+		t2.filename = p2.sourceCode
+		t2.abs_path = p2.sourceCode
+	end
+
+	if p2.column then
+		t2.colno = tonumber(p2.column)
+	end
+
+	if p2.library then
+		t2.module = p2.library
+	end
+
+	if p2.address then
+		t2.instruction_addr = p2.address
+	end
+
+	if p2.guessed_frame == false then
+		t2.in_app = true
+	end
+
+	return t2
+end
+
+function t1.parseThreadsToSentry(p3) -- line: 286
+	-- upvalues: convertErrorStackToSentryFrame (copy)
+	if not p3 then
+		return nil
+	end
+
+	local t3 = {}
+	local n1 = 1
+
+	for k, v in pairs(p3) do
+		local t4 = {
+			id = n1,
+			name = v.name or k
+		}
+
+		if k == "main" or v.name == "main" then
+			t4.main = true
+		end
+
+		if v.fault == true then
+			t4.crashed = true
+		end
+
+		if v.stack and #v.stack > 0 then
+			local t5 = {}
+
+			for _, v2 in ipairs(v.stack) do
+				table.insert(t5, (convertErrorStackToSentryFrame(v2)))
+			end
+
+			local t6 = {}
+
+			for i = #t5, 1, -1 do
+				table.insert(t6, t5[i])
+			end
+
+			t4.stacktrace = {
+				frames = t6
+			}
+		end
+
+		table.insert(t3, t4)
+		n1 += 1
+	end
+
+	if #t3 == 0 then
+		return nil
+	end
+
+	return {
+		values = t3
+	}
+end
+
+local function parseAppContext(p4) -- line: 371
+	local t7 = {}
+	local attributes = p4.attributes
+
+	if attributes.appVersion ~= nil then
+		t7.app_version = attributes.appVersion
+	end
+
+	if attributes.AppInstallationId ~= nil then
+		t7.device_app_hash = attributes.AppInstallationId
+	end
+
+	if attributes.CoreScriptVersion ~= nil then
+		t7.core_script_version = attributes.CoreScriptVersion
+	end
+
+	if attributes.RobloxChannel ~= nil then
+		t7.roblox_channel = attributes.RobloxChannel
+	end
+
+	if attributes.AppRunningTime ~= nil then
+		t7.app_running_time = attributes.AppRunningTime
+	end
+
+	if attributes.UserAgent ~= nil then
+		t7.user_agent = attributes.UserAgent
+	end
+
+	if attributes.BaseUrl ~= nil then
+		t7.base_url = attributes.BaseUrl
+	end
+
+	if attributes.WindowsLaunchType ~= nil then
+		t7.windows_launch_type = attributes.WindowsLaunchType
+	end
+
+	if attributes.CountryCode ~= nil then
+		t7.country_code = attributes.CountryCode
+	end
+
+	return t7
+end
+local function parseNetworkContext(p5) -- line: 436
+	local t8 = {}
+
+	if p5.attributes.networkType ~= nil then
+		t8.network_type = p5.attributes.networkType
+	end
+
+	return t8
+end
+local function parseOSContext(p6) -- line: 470
+	local t9 = {}
+	local attributes = p6.attributes
+
+	if attributes.baseOs ~= nil then
+		t9.name = attributes.baseOs
+	end
+
+	if attributes.systemVersion ~= nil then
+		t9.version = attributes.systemVersion
+	end
+
+	if attributes.systemVersion ~= nil then
+		t9.version = attributes.systemVersion
+	end
+
+	return t9
+end
+local function parseDeviceContext(p7) -- line: 541
+	local t10 = {}
+	local attributes = p7.attributes
+
+	if attributes.deviceName ~= nil then
+		t10.name = attributes.deviceName
+	end
+
+	if attributes.batteryLevel ~= nil then
+		local num = tonumber(attributes.batteryLevel)
+
+		if num ~= nil then
+			t10.battery_level = num
+		end
+	end
+
+	if attributes.manufacturer ~= nil then
+		t10.manufacturer = attributes.manufacturer
+	end
+
+	if attributes.maxMemory ~= nil then
+		local maxMemory = attributes.maxMemory
+		local v37
+
+		if maxMemory == nil then
+			v37 = nil
+		else
+			local num = tonumber(maxMemory)
+
+			v37 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v37 ~= nil then
+			t10.memory_size = v37
+		end
+	end
+
+	if attributes.availRAM ~= nil then
+		local availRAM = attributes.availRAM
+		local v40
+
+		if availRAM == nil then
+			v40 = nil
+		else
+			local num = tonumber(availRAM)
+
+			v40 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v40 ~= nil then
+			t10.free_memory = v40
+		end
+	end
+
+	if attributes.maxResolution ~= nil then
+		t10.screen_resolution = attributes.maxResolution
+	end
+
+	if attributes.thermalStatus ~= nil then
+		t10.thermal_status = attributes.thermalStatus
+	end
+
+	if attributes.cpuLogicalCount ~= nil then
+		local cpuLogicalCount = attributes.cpuLogicalCount
+		local v43
+
+		if cpuLogicalCount == nil then
+			v43 = nil
+		else
+			local num = tonumber(cpuLogicalCount)
+
+			v43 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v43 ~= nil then
+			t10.processor_count = v43
+		end
+	end
+
+	if attributes.cpuCoreCount ~= nil then
+		local cpuCoreCount = attributes.cpuCoreCount
+		local v46
+
+		if cpuCoreCount == nil then
+			v46 = nil
+		else
+			local num = tonumber(cpuCoreCount)
+
+			v46 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v46 ~= nil then
+			t10.cpu_core_count = v46
+		end
+	end
+
+	if attributes.cpuMake ~= nil then
+		t10.cpu_description = attributes.cpuMake
+	end
+
+	if attributes.cpuPhysCount ~= nil then
+		local cpuPhysCount = attributes.cpuPhysCount
+		local v49
+
+		if cpuPhysCount == nil then
+			v49 = nil
+		else
+			local num = tonumber(cpuPhysCount)
+
+			v49 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v49 ~= nil then
+			t10.cpu_physical_count = v49
+		end
+	end
+
+	if attributes.cpuSpeed ~= nil then
+		local cpuSpeed = attributes.cpuSpeed
+		local v52
+
+		if cpuSpeed == nil then
+			v52 = nil
+		else
+			local num = tonumber(cpuSpeed)
+
+			v52 = if num ~= nil then if not (num < 0) then math.floor(num) else 0 else nil
+		end
+
+		if v52 ~= nil then
+			t10.cpu_speed = v52
+		end
+	end
+
+	return t10
+end
+
+function t1.parseErrorToContext(p8) -- line: 655
+	-- upvalues: parseAppContext (copy), parseDeviceContext (copy)
+	local t11 = {
+		app = parseAppContext(p8)
+	}
+	local t12 = {}
+
+	if p8.attributes.networkType ~= nil then
+		t12.network_type = p8.attributes.networkType
+	end
+
+	t11.network = t12
+
+	local t13 = {}
+	local attributes = p8.attributes
+
+	if attributes.baseOs ~= nil then
+		t13.name = attributes.baseOs
+	end
+
+	if attributes.systemVersion ~= nil then
+		t13.version = attributes.systemVersion
+	end
+
+	if attributes.systemVersion ~= nil then
+		t13.version = attributes.systemVersion
+	end
+
+	t11.os = t13
+	t11.device = parseDeviceContext(p8)
+
+	return t11
+end
+
+return t1

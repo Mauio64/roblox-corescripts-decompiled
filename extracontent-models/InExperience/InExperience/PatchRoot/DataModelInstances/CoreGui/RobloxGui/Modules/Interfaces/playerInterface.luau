@@ -1,7 +1,8 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.t);
-return v1.union(v1.instanceIsA("Player"), v1.interface({
-    UserId = v1.integer, 
-    Name = v1.string, 
-    DisplayName = v1.string
-}));
+local CorePackages = game:GetService("CorePackages")
+local t = require(CorePackages.Packages.t)
+
+return t.union(t.instanceIsA("Player"), t.interface({
+	UserId = t.integer,
+	Name = t.string,
+	DisplayName = t.string
+}))

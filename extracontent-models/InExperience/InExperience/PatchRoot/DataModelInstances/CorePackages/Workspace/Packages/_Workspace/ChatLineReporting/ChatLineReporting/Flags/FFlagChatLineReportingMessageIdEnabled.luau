@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChatLineReportingMessageIdEnabled", false);
+return game:DefineFastFlag("ChatLineReportingMessageIdEnabled", false)

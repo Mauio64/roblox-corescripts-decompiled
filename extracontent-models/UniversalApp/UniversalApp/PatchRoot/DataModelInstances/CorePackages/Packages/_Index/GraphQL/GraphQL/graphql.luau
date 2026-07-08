@@ -1,79 +1,90 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Error_0 = require(l_Parent_1.LuauPolyfill).Error;
-local v3 = require(l_Parent_1.Promise);
-local _ = require(l_Parent_0.jsutils.PromiseOrValue);
-local l_isPromise_0 = require(l_Parent_0.jsutils.isPromise).isPromise;
-local _ = require(l_Parent_0.language.source);
-local l_parse_0 = require(l_Parent_0.language.parser).parse;
-local _ = require(l_Parent_0.type.definition);
-local _ = require(l_Parent_0.type.schema);
-local l_validate_0 = require(l_Parent_0.validation.validate).validate;
-local l_validateSchema_0 = require(l_Parent_0.type.validate).validateSchema;
-local l_execute_0 = require(l_Parent_0.execution.execute).execute;
-local v13 = {};
-local v14 = nil;
-v13.graphql = function(v15) --[[ Line: 93 ]]
-    -- upvalues: v3 (copy), v14 (ref)
-    return v3.new(function(v16) --[[ Line: 95 ]]
-        -- upvalues: v14 (ref), v15 (copy)
-        return v16(v14(v15));
-    end);
-end;
-v13.graphqlSync = function(v17) --[[ Line: 106 ]]
-    -- upvalues: v14 (ref), l_isPromise_0 (copy), l_Error_0 (copy)
-    local v18 = v14(v17);
-    if l_isPromise_0(v18) then
-        error(l_Error_0.new("GraphQL execution failed to complete synchronously."));
-    end;
-    return v18;
-end;
-v14 = function(v19) --[[ Line: 119 ]] --[[ Name: graphqlImpl ]]
-    -- upvalues: l_validateSchema_0 (copy), l_parse_0 (copy), l_validate_0 (copy), l_execute_0 (copy)
-    local l_schema_0 = v19.schema;
-    local l_source_0 = v19.source;
-    local l_rootValue_0 = v19.rootValue;
-    local l_contextValue_0 = v19.contextValue;
-    local l_variableValues_0 = v19.variableValues;
-    local l_operationName_0 = v19.operationName;
-    local l_fieldResolver_0 = v19.fieldResolver;
-    local l_typeResolver_0 = v19.typeResolver;
-    local v28 = l_validateSchema_0(l_schema_0);
-    if #v28 > 0 then
-        return {
-            errors = v28
-        };
-    else
-        local v29 = nil;
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 138 ]]
-            -- upvalues: v29 (ref), l_parse_0 (ref), l_source_0 (copy)
-            v29 = l_parse_0(l_source_0);
-        end);
-        if not l_status_0 then
-            return {
-                errors = {
-                    l_result_0
-                }
-            };
-        else
-            local v32 = l_validate_0(l_schema_0, v29);
-            if #v32 > 0 then
-                return {
-                    errors = v32
-                };
-            else
-                return l_execute_0({
-                    schema = l_schema_0, 
-                    document = v29, 
-                    rootValue = l_rootValue_0, 
-                    contextValue = l_contextValue_0, 
-                    variableValues = l_variableValues_0, 
-                    operationName = l_operationName_0, 
-                    fieldResolver = l_fieldResolver_0, 
-                    typeResolver = l_typeResolver_0
-                });
-            end;
-        end;
-    end;
-end;
-return v13;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local Error = require(scriptParentParent.LuauPolyfill).Error
+local Promise = require(scriptParentParent.Promise)
+
+require(scriptParent.jsutils.PromiseOrValue)
+
+local isPromise = require(scriptParent.jsutils.isPromise).isPromise
+
+require(scriptParent.language.source)
+
+local parse = require(scriptParent.language.parser).parse
+
+require(scriptParent.type.definition)
+require(scriptParent.type.schema)
+
+local validate = require(scriptParent.validation.validate).validate
+local validateSchema = require(scriptParent.type.validate).validateSchema
+local execute = require(scriptParent.execution.execute).execute
+local t1 = {}
+local graphqlImpl = nil
+
+function t1.graphql(t2: {[any]: any}) -- line: 93
+	-- upvalues: Promise (copy), graphqlImpl (ref)
+	return Promise.new(function(resolve) -- line: 95
+		-- upvalues: graphqlImpl (ref), t2 (copy)
+		return resolve(graphqlImpl(t2))
+	end)
+end
+function t1.graphqlSync(t3: {[any]: any}) -- line: 106
+	-- upvalues: graphqlImpl (ref), isPromise (copy), Error (copy)
+	local v14 = graphqlImpl(t3)
+
+	if isPromise(v14) then
+		error(Error.new("GraphQL execution failed to complete synchronously."))
+	end
+
+	return v14
+end
+function graphqlImpl(t4: {[any]: any}) -- line: 119
+	-- upvalues: validateSchema (copy), parse (copy), validate (copy), execute (copy)
+	local schema = t4.schema
+	local source = t4.source
+	local rootValue = t4.rootValue
+	local contextValue = t4.contextValue
+	local variableValues = t4.variableValues
+	local operationName = t4.operationName
+	local fieldResolver = t4.fieldResolver
+	local typeResolver = t4.typeResolver
+	local v24 = validateSchema(schema)
+
+	if #v24 > 0 then
+		return {
+			errors = v24
+		}
+	end
+
+	local u25 = nil
+	local ok, result = pcall(function() -- line: 138
+		-- upvalues: u25 (ref), parse (copy), source (copy)
+		u25 = parse(source)
+	end)
+
+	if not ok then
+		return {
+			errors = { result }
+		}
+	end
+
+	local v28 = validate(schema, u25)
+
+	if #v28 > 0 then
+		return {
+			errors = v28
+		}
+	end
+
+	return execute({
+		schema = schema,
+		document = u25,
+		rootValue = rootValue,
+		contextValue = contextValue,
+		variableValues = variableValues,
+		operationName = operationName,
+		fieldResolver = fieldResolver,
+		typeResolver = typeResolver
+	})
+end
+
+return t1

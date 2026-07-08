@@ -1,70 +1,84 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactUtils);
-local l_useDispatch_0 = v3.Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = v3.Hooks.RoactRodux.useSelector;
-local l_useEffectOnMount_0 = v3.Hooks.useEffectOnMount;
-local l_getDeepValue_0 = require(l_Parent_0.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue;
-local v8 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local v9 = require(l_script_FirstAncestor_0.Contexts.useProfileWrapperContext);
-local v10 = require(l_script_FirstAncestor_0.Common.Enums);
-local l_HorizontalPageMargin_0 = require(l_Parent_0.UIBlox).App.Container.HorizontalPageMargin;
-local v12 = require(l_script_FirstAncestor_0.Networking.NetworkingGames);
-local v13 = require(script.Parent.ContextualGeneric);
-local v14 = require(script.Parent.ContextualPresence);
-local v15 = require(script.Parent.ContextualMutualFriends);
-local v16 = require(script.Parent.ContextualPlayedTogether);
-local v17 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName);
-return function(v18) --[[ Line: 40 ]] --[[ Name: ContextualInformationContainer ]]
-    -- upvalues: v9 (copy), v8 (copy), v10 (copy), v17 (copy), l_useDispatch_0 (copy), l_useEffectOnMount_0 (copy), v12 (copy), l_useSelector_0 (copy), l_getDeepValue_0 (copy), v2 (copy), v14 (copy), v15 (copy), v16 (copy), v13 (copy), l_HorizontalPageMargin_0 (copy)
-    local l_sourceInfo_0 = v9().sourceInfo;
-    local l_contextualInformation_0 = (v8(v10.Components.UserProfileHeader) or {}).contextualInformation;
-    local l_context_0 = l_contextualInformation_0.context;
-    local l_contextDetails_0 = l_contextualInformation_0.contextDetails;
-    local v23 = if l_context_0 == v10.ContextualTypes.SentFromExperience then l_contextDetails_0[l_context_0].sourceUniverseId else if v17 and l_context_0 == v10.ContextualTypes.PlayedTogether then l_contextDetails_0[l_context_0].mostFrequentUniverseId else nil;
-    local v24 = l_useDispatch_0();
-    l_useEffectOnMount_0(function() --[[ Line: 59 ]]
-        -- upvalues: l_context_0 (copy), v10 (ref), v17 (ref), v24 (copy), v12 (ref), v23 (copy)
-        if l_context_0 == v10.ContextualTypes.SentFromExperience or v17 and l_context_0 == v10.ContextualTypes.PlayedTogether then
-            v24(v12.GetExperiencesDetails.API({
-                v23
-            })):catch(function(_) --[[ Line: 67 ]]
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useEffectOnMount = RoactUtils.Hooks.useEffectOnMount
+local getDeepValue = require(ProfilePlatformParent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
+local Enums = require(ProfilePlatform.Common.Enums)
+local HorizontalPageMargin = require(ProfilePlatformParent.UIBlox).App.Container.HorizontalPageMargin
+local NetworkingGames = require(ProfilePlatform.Networking.NetworkingGames)
+local IXPService = game:GetService("IXPService")
+local ContextualGeneric = require(script.Parent.ContextualGeneric)
+local ContextualPresence = require(script.Parent.ContextualPresence)
+local ContextualMutualFriends = require(script.Parent.ContextualMutualFriends)
+local ContextualPlayedTogether = require(script.Parent.ContextualPlayedTogether)
+local FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName = require(ProfilePlatform.Flags.FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName)
+local FStringSocialProfileCurrentlyPlayingLayer = require(ProfilePlatform.Flags.FStringSocialProfileCurrentlyPlayingLayer)
+local FFlagProfileCurrentlyPlayingIXPEnabled = require(ProfilePlatform.Flags.FFlagProfileCurrentlyPlayingIXPEnabled)
 
-            end);
-        end;
-    end);
-    local v27 = l_useSelector_0(function(v26) --[[ Line: 71 ]]
-        -- upvalues: l_getDeepValue_0 (ref), v23 (copy)
-        return l_getDeepValue_0(v26, (("ProfilePlatform.Games.byGameId.%*.name"):format((tostring(v23))))) or "";
-    end);
-    local v28 = l_getDeepValue_0(l_sourceInfo_0, "contextualOverride.icon");
-    local v29 = l_getDeepValue_0(l_sourceInfo_0, "contextualOverride.text");
-    local v30 = nil;
-    if l_context_0 == v10.ContextualTypes.Presence then
-        v30 = v2.createElement(v14);
-    elseif l_context_0 == v10.ContextualTypes.MutualFriends then
-        local v31 = l_contextDetails_0[l_context_0];
-        v30 = v2.createElement(v15, {
-            mutualFriends = v31.mutualFriends, 
-            mutualFriendsCount = v31.mutualFriendsCount
-        });
-    else
-        v30 = if v17 and l_context_0 == v10.ContextualTypes.PlayedTogether then v2.createElement(v16, {
-            experienceName = v27
-        }) else v2.createElement(v13, {
-            contextualType = l_context_0, 
-            experienceName = v27, 
-            iconOverride = v28, 
-            textOverride = v29
-        });
-    end;
-    return v2.createElement(l_HorizontalPageMargin_0, {
-        size = v18.size, 
-        layoutOrder = v18.layoutOrder, 
-        useAutomaticSizing = true, 
-        backgroundTransparency = 1
-    }, {
-        contextualInformation = v30
-    });
-end;
+local function ContextualInformationContainer(t1: {[any]: any}) -- line: 45
+	-- upvalues: useProfileWrapperContext (copy), useProfileJsonComponent (copy), Enums (copy), FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName (copy), useDispatch (copy), useEffectOnMount (copy), NetworkingGames (copy), React (copy), FFlagProfileCurrentlyPlayingIXPEnabled (copy), IXPService (copy), FStringSocialProfileCurrentlyPlayingLayer (copy), useSelector (copy), getDeepValue (copy), ContextualPresence (copy), ContextualMutualFriends (copy), ContextualPlayedTogether (copy), ContextualGeneric (copy), HorizontalPageMargin (copy)
+	local sourceInfo = useProfileWrapperContext().sourceInfo
+	local contextualInformation = (useProfileJsonComponent(Enums.Components.UserProfileHeader) or {}).contextualInformation
+	local context = contextualInformation.context
+	local contextDetails = contextualInformation.contextDetails
+	local v28 = if context ~= Enums.ContextualTypes.SentFromExperience then if not FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName or context ~= Enums.ContextualTypes.PlayedTogether then nil else contextDetails[context].mostFrequentUniverseId else contextDetails[context].sourceUniverseId
+	local v29 = useDispatch()
+
+	useEffectOnMount(function() -- line: 64
+		-- upvalues: context (copy), Enums (copy), FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName (copy), v29 (copy), NetworkingGames (copy), v28 (copy)
+		if context == Enums.ContextualTypes.SentFromExperience or FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName and context == Enums.ContextualTypes.PlayedTogether then
+			v29(NetworkingGames.GetExperiencesDetails.API({ v28 })):catch(function(_) -- line: 72
+			end)
+		end
+	end)
+	React.useEffect(function() -- line: 76
+		-- upvalues: FFlagProfileCurrentlyPlayingIXPEnabled (copy), context (copy), Enums (copy), IXPService (copy), FStringSocialProfileCurrentlyPlayingLayer (copy)
+		if FFlagProfileCurrentlyPlayingIXPEnabled and context == Enums.ContextualTypes.Presence then
+			IXPService:LogFlagLinkedUserLayerExposure(FStringSocialProfileCurrentlyPlayingLayer)
+		end
+	end, { context })
+
+	local v30 = useSelector(function(p2) -- line: 82
+		-- upvalues: getDeepValue (copy), v28 (copy)
+		return getDeepValue(p2, `ProfilePlatform.Games.byGameId.{ tostring(v28) }.name`) or ""
+	end)
+	local v31 = getDeepValue(sourceInfo, "contextualOverride.icon")
+	local v32 = getDeepValue(sourceInfo, "contextualOverride.text")
+	local v33
+
+	if context == Enums.ContextualTypes.Presence then
+		v33 = React.createElement(ContextualPresence)
+	elseif context == Enums.ContextualTypes.MutualFriends then
+		local v34 = contextDetails[context]
+
+		v33 = React.createElement(ContextualMutualFriends, {
+			mutualFriends = v34.mutualFriends,
+			mutualFriendsCount = v34.mutualFriendsCount
+		})
+	else
+		v33 = if not FFlagProfilePlatformEnablePlayedTogetherContextFrequentExperienceName or context ~= Enums.ContextualTypes.PlayedTogether then React.createElement(ContextualGeneric, {
+			contextualType = context,
+			experienceName = v30,
+			iconOverride = v31,
+			textOverride = v32
+		}) else React.createElement(ContextualPlayedTogether, {
+			experienceName = v30
+		})
+	end
+
+	return React.createElement(HorizontalPageMargin, {
+		useAutomaticSizing = true,
+		backgroundTransparency = 1,
+		size = t1.size,
+		layoutOrder = t1.layoutOrder
+	}, {
+		contextualInformation = v33
+	})
+end
+
+return ContextualInformationContainer

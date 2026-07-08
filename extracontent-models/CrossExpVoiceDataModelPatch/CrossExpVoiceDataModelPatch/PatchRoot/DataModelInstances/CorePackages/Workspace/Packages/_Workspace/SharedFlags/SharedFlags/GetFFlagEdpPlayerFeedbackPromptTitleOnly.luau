@@ -1,4 +1,5 @@
-game:DefineFastFlag("EdpPlayerFeedbackPromptTitleOnly", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EdpPlayerFeedbackPromptTitleOnly");
-end;
+game:DefineFastFlag("EdpPlayerFeedbackPromptTitleOnly", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EdpPlayerFeedbackPromptTitleOnly")
+end

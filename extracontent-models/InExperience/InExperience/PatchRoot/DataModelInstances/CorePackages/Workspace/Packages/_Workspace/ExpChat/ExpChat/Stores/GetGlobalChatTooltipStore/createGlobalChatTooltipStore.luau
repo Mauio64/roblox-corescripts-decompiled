@@ -24,7 +24,7 @@ return function() -- line: 28
 		getIsGlobalChatTooltipEligible = v11,
 		setIsGlobalChatTooltipEligible = v12,
 		getIsScreenWideEnough = v13,
-		reportImpression = function() --[[ reportImpression ]] -- line: 49
+		reportImpression = function() -- line: 49
 		end
 	}
 end

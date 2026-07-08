@@ -1,61 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_StyledTextLabel_0 = require(l_Parent_0.UIBlox).App.Text.StyledTextLabel;
-local v4 = require(l_script_FirstAncestor_0.Components.Price);
-local v5 = require(l_script_FirstAncestor_0.Components.ItemStatus);
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+local StyledTextLabel = require(BulkPurchaseAppParent.UIBlox).App.Text.StyledTextLabel
+local Price_DEPRECATED = require(BulkPurchaseApp.Components.Price_DEPRECATED)
+local ItemStatus = require(BulkPurchaseApp.Components.ItemStatus)
+
 return {
-    mapItemsToPresentation_DEPRECATED = function(v6, v7, v8) --[[ Line: 10 ]] --[[ Name: mapItemsToPresentation_DEPRECATED ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        local v9 = {};
-        for _, v11 in v6 do
-            table.insert(v9, {
-                id = v11.id, 
-                name = v11.name, 
-                image = v11.image, 
-                endSlot = v2.createElement(v4, {
-                    amount = v11.cost, 
-                    fontStyle = v7, 
-                    colorStyle = v8
-                })
-            });
-        end;
-        return v9;
-    end, 
-    mapOwnedItemsToPresentation_DEPRECATED = function(v12, v13, v14, v15) --[[ Line: 26 ]] --[[ Name: mapOwnedItemsToPresentation_DEPRECATED ]]
-        -- upvalues: v2 (copy), l_StyledTextLabel_0 (copy)
-        local v16 = {};
-        for _, v18 in v12 do
-            table.insert(v16, {
-                id = v18.id, 
-                name = v18.name, 
-                image = v18.image, 
-                endSlot = v2.createElement(l_StyledTextLabel_0, {
-                    fontStyle = v13, 
-                    colorStyle = v14, 
-                    textXAlignment = Enum.TextXAlignment.Right, 
-                    textYAlignment = Enum.TextYAlignment.Top, 
-                    lineHeight = v13.LineHeight, 
-                    size = UDim2.fromScale(1, 1), 
-                    text = v15.itemOwned:gsub("{.*}", (tostring(v18.ownedCount)))
-                })
-            });
-        end;
-        return v16;
-    end, 
-    mapUnpurchasableItemsToPresentation_DEPRECATED = function(v19) --[[ Line: 47 ]] --[[ Name: mapUnpurchasableItemsToPresentation_DEPRECATED ]]
-        -- upvalues: v2 (copy), v5 (copy)
-        local v20 = {};
-        for _, v22 in v19 do
-            table.insert(v20, {
-                id = v22.id, 
-                name = v22.name, 
-                image = v22.image, 
-                endSlot = v2.createElement(v5, {
-                    status = v22.status
-                })
-            });
-        end;
-        return v20;
-    end
-};
+	mapItemsToPresentation_DEPRECATED = function(p1, p2, p3) -- line: 10
+		-- upvalues: React (copy), Price_DEPRECATED (copy)
+		local t1 = {}
+
+		for _, v12 in p1 do
+			table.insert(t1, {
+				id = v12.id,
+				name = v12.name,
+				image = v12.image,
+				endSlot = React.createElement(Price_DEPRECATED, {
+					amount = v12.cost,
+					fontStyle = p2,
+					colorStyle = p3
+				})
+			})
+		end
+
+		return t1
+	end,
+	mapOwnedItemsToPresentation_DEPRECATED = function(p4, p5, p6, p7) -- line: 26
+		-- upvalues: React (copy), StyledTextLabel (copy)
+		local t2 = {}
+
+		for _, v19 in p4 do
+			table.insert(t2, {
+				id = v19.id,
+				name = v19.name,
+				image = v19.image,
+				endSlot = React.createElement(StyledTextLabel, {
+					fontStyle = p5,
+					colorStyle = p6,
+					textXAlignment = Enum.TextXAlignment.Right,
+					textYAlignment = Enum.TextYAlignment.Top,
+					lineHeight = p5.LineHeight,
+					size = UDim2.fromScale(1, 1),
+					text = p7.itemOwned:gsub("{.*}", (tostring(v19.ownedCount)))
+				})
+			})
+		end
+
+		return t2
+	end,
+	mapUnpurchasableItemsToPresentation_DEPRECATED = function(p8) -- line: 47
+		-- upvalues: React (copy), ItemStatus (copy)
+		local t3 = {}
+
+		for _, v23 in p8 do
+			table.insert(t3, {
+				id = v23.id,
+				name = v23.name,
+				image = v23.image,
+				endSlot = React.createElement(ItemStatus, {
+					status = v23.status
+				})
+			})
+		end
+
+		return t3
+	end
+}

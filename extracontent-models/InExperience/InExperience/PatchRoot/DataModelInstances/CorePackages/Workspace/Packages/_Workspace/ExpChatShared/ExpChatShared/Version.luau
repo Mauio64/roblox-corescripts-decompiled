@@ -1,4 +1,4 @@
 return {
-    "4.3.2", 
-    "lua-apps"
-};
+	"4.3.2",
+	"lua-apps"
+}

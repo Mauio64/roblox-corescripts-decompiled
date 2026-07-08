@@ -1,79 +1,90 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Promise);
-local v3 = nil;
-local v4 = nil;
-local function v16(v5, v6, v7) --[[ Line: 14 ]] --[[ Name: removeDefaultClothing ]]
-    -- upvalues: l_AvatarEditorService_0 (copy)
-    local v8 = nil;
-    v8 = if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then l_AvatarEditorService_0:GetAvatarRulesAsync() else l_AvatarEditorService_0:GetAvatarRules();
-    if not v8.DefaultClothingAssetLists then
-        v7("No default clothing in avatar rules");
-        return;
-    else
-        local l_DefaultShirtAssetIds_0 = v8.DefaultClothingAssetLists.DefaultShirtAssetIds;
-        local l_DefaultPantAssetIds_0 = v8.DefaultClothingAssetLists.DefaultPantAssetIds;
-        if not l_DefaultShirtAssetIds_0 or not l_DefaultPantAssetIds_0 then
-            v7("No default clothing ids in avatar rules");
-            return;
-        else
-            local v11 = nil;
-            for _, v13 in ipairs(l_DefaultShirtAssetIds_0) do
-                if v13 == v5.Shirt then
-                    v11 = v11 or v5:Clone();
-                    v11.Shirt = 0;
-                end;
-            end;
-            for _, v15 in ipairs(l_DefaultPantAssetIds_0) do
-                if v15 == v5.Pants then
-                    v11 = v11 or v5:Clone();
-                    v11.Pants = 0;
-                end;
-            end;
-            v6(v11 or v5);
-            return;
-        end;
-    end;
-end;
-return function(v17, v18) --[[ Line: 53 ]] --[[ Name: GetConformedHumanoidDescription ]]
-    -- upvalues: v3 (ref), v2 (copy), v4 (ref), v16 (copy), l_AvatarEditorService_0 (copy)
-    if v17 == v3 then
-        if v18 then
-            return v2.resolve(v4);
-        else
-            return v2.new(function(v19, v20) --[[ Line: 58 ]]
-                -- upvalues: v16 (ref), v4 (ref)
-                v16(v4, v19, v20);
-            end);
-        end;
-    else
-        return v2.new(function(v21, v22) --[[ Line: 64 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref), v17 (copy), v3 (ref), v4 (ref), v18 (copy), v16 (ref)
-            coroutine.wrap(function() --[[ Line: 65 ]]
-                -- upvalues: l_AvatarEditorService_0 (ref), v17 (ref), v3 (ref), v4 (ref), v18 (ref), v21 (copy), v16 (ref), v22 (copy)
-                local l_status_0, l_result_0 = pcall(function() --[[ Line: 66 ]]
-                    -- upvalues: l_AvatarEditorService_0 (ref), v17 (ref)
-                    if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
-                        return l_AvatarEditorService_0:ConformToAvatarRulesAsync(v17);
-                    else
-                        return l_AvatarEditorService_0:ConformToAvatarRules(v17);
-                    end;
-                end);
-                if l_status_0 then
-                    v3 = v17;
-                    v4 = l_result_0;
-                    if v18 then
-                        v21(l_result_0);
-                        return;
-                    else
-                        v16(l_result_0, v21, v22);
-                        return;
-                    end;
-                else
-                    v22(l_result_0);
-                    return;
-                end;
-            end)();
-        end);
-    end;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local CorePackages = game:GetService("CorePackages")
+local Promise = require(CorePackages.Packages.Promise)
+local u4 = nil
+local u5 = nil
+
+local function removeDefaultClothing(p1, p2, p3) -- line: 14
+	-- upvalues: AvatarEditorService (copy)
+	local v11 = if not game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then AvatarEditorService:GetAvatarRules() else AvatarEditorService:GetAvatarRulesAsync()
+
+	if not v11.DefaultClothingAssetLists then
+		p3("No default clothing in avatar rules")
+
+		return
+	end
+
+	local DefaultShirtAssetIds = v11.DefaultClothingAssetLists.DefaultShirtAssetIds
+	local DefaultPantAssetIds = v11.DefaultClothingAssetLists.DefaultPantAssetIds
+
+	if not DefaultShirtAssetIds or not DefaultPantAssetIds then
+		p3("No default clothing ids in avatar rules")
+
+		return
+	end
+
+	local v14 = nil
+
+	for _, v in ipairs(DefaultShirtAssetIds) do
+		if v == p1.Shirt then
+			v14 = v14 or p1:Clone()
+			v14.Shirt = 0
+		end
+	end
+
+	for _, v in ipairs(DefaultPantAssetIds) do
+		if v == p1.Pants then
+			v14 = v14 or p1:Clone()
+			v14.Pants = 0
+		end
+	end
+
+	p2(v14 or p1)
+end
+local function GetConformedHumanoidDescription(p4, p5) -- line: 53
+	-- upvalues: u4 (ref), Promise (copy), u5 (ref), removeDefaultClothing (copy), AvatarEditorService (copy)
+	if p4 == u4 then
+		if p5 then
+			return Promise.resolve(u5)
+		end
+
+		return Promise.new(function(resolve, reject) -- line: 58
+			-- upvalues: removeDefaultClothing (copy), u5 (ref)
+			removeDefaultClothing(u5, resolve, reject)
+		end)
+	end
+
+	return Promise.new(function(resolve, reject) -- line: 64
+		-- upvalues: AvatarEditorService (copy), p4 (copy), u4 (ref), u5 (ref), p5 (copy), removeDefaultClothing (copy)
+		coroutine.wrap(function() -- line: 65
+			-- upvalues: AvatarEditorService (copy), p4 (copy), u4 (ref), u5 (ref), p5 (copy), resolve (copy), removeDefaultClothing (copy), reject (copy)
+			local ok, result = pcall(function() -- line: 66
+				-- upvalues: AvatarEditorService (copy), p4 (copy)
+				if game:GetEngineFeature("AsyncRenamesUsedInLuaApps") then
+					return AvatarEditorService:ConformToAvatarRulesAsync(p4)
+				end
+
+				return AvatarEditorService:ConformToAvatarRules(p4)
+			end)
+
+			if ok then
+				u4 = p4
+				u5 = result
+
+				if p5 then
+					resolve(result)
+
+					return
+				end
+
+				removeDefaultClothing(result, resolve, reject)
+
+				return
+			end
+
+			reject(result)
+		end)()
+	end)
+end
+
+return GetConformedHumanoidDescription

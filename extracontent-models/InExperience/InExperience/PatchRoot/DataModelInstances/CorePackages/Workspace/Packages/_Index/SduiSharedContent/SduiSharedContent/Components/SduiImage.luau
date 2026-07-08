@@ -1,30 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.SduiCompat);
-return function(v4) --[[ Line: 39 ]] --[[ Name: SduiImage ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Image, {
-        AnchorPoint = v4.anchorPoint, 
-        AutomaticSize = v4.automaticSize, 
-        ClipsDescendants = v4.clipsDescendants, 
-        Image = v4.image, 
-        LayoutOrder = v4.layoutOrder, 
-        Position = v4.position, 
-        ResampleMode = v4.resampleMode, 
-        ScaleType = v4.scaleType, 
-        Size = v4.size, 
-        SizeConstraint = v4.sizeConstraint, 
-        TileSize = v4.tileSize, 
-        Visible = v4.visible, 
-        ZIndex = v4.zIndex, 
-        aspectRatio = v4.aspectRatio, 
-        backgroundStyle = v4.backgroundStyle, 
-        cornerRadius = v4.cornerRadius, 
-        cursor = v4.cursorType, 
-        imageStyle = v4.imageStyle, 
-        onActivated = v4.onActivated, 
-        tag = v4.tag, 
-        testId = v4.testId
-    });
-end;
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+require(Parent.SduiCompat)
+
+local function SduiImage(t1: {[any]: any}) -- line: 39
+	-- upvalues: React (copy), Foundation (copy)
+	return React.createElement(Foundation.Image, {
+		AnchorPoint = t1.anchorPoint,
+		AutomaticSize = t1.automaticSize,
+		ClipsDescendants = t1.clipsDescendants,
+		Image = t1.image,
+		LayoutOrder = t1.layoutOrder,
+		Position = t1.position,
+		ResampleMode = t1.resampleMode,
+		ScaleType = t1.scaleType,
+		Size = t1.size,
+		SizeConstraint = t1.sizeConstraint,
+		TileSize = t1.tileSize,
+		Visible = t1.visible,
+		ZIndex = t1.zIndex,
+		aspectRatio = t1.aspectRatio,
+		backgroundStyle = t1.backgroundStyle,
+		cornerRadius = t1.cornerRadius,
+		cursor = t1.cursorType,
+		imageStyle = t1.imageStyle,
+		onActivated = t1.onActivated,
+		tag = t1.tag,
+		testId = t1.testId
+	})
+end
+
+return SduiImage

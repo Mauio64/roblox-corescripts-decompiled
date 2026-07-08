@@ -1,41 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.RoactUtils);
-local v4 = require(l_script_FirstAncestor_0.EnumScreens);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local l_dependencyArray_0 = v3.Hooks.dependencyArray;
-local l_useDispatch_0 = v3.Hooks.RoactRodux.useDispatch;
-local l_useMemo_0 = v2.useMemo;
-return function() --[[ Line: 18 ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useMemo_0 (copy), v4 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy)
-    local v9 = l_useDispatch_0();
-    return l_useMemo_0(function() --[[ Line: 21 ]]
-        -- upvalues: v4 (ref)
-        return {
-            [v4.GameDetail] = function() --[[ Line: 23 ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local RoactUtils = require(AppChatParent.RoactUtils)
+local EnumScreens = require(AppChat.EnumScreens)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useMemo = React.useMemo
 
-            end, 
-            [v4.Notifications] = function() --[[ Line: 24 ]]
+return function() -- line: 15
+	-- upvalues: useDispatch (copy), useMemo (copy), EnumScreens (copy)
+	local v8 = useDispatch()
 
-            end, 
-            [v4.PrivacySettings] = function() --[[ Line: 25 ]]
-
-            end, 
-            [v4.ReportAbuse] = function() --[[ Line: 26 ]]
-
-            end, 
-            [v4.ViewUserProfile] = function() --[[ Line: 27 ]]
-
-            end, 
-            [v4.Groups] = function() --[[ Line: 28 ]]
-
-            end, 
-            [v4.Home] = function() --[[ Line: 29 ]]
-
-            end
-        };
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v9
-    } else l_dependencyArray_0(v9));
-end;
+	return useMemo(function() -- line: 18
+		-- upvalues: EnumScreens (copy)
+		return {
+			[EnumScreens.GameDetail] = function() -- line: 20
+			end,
+			[EnumScreens.Notifications] = function() -- line: 21
+			end,
+			[EnumScreens.PrivacySettings] = function() -- line: 22
+			end,
+			[EnumScreens.ReportAbuse] = function() -- line: 23
+			end,
+			[EnumScreens.ViewUserProfile] = function() -- line: 24
+			end,
+			[EnumScreens.Groups] = function() -- line: 25
+			end,
+			[EnumScreens.Home] = function() -- line: 26
+			end
+		}
+	end, { v8 })
+end

@@ -1,56 +1,65 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3) --[[ Line: 36 ]] --[[ Name: new ]]
-    -- upvalues: l_Array_0 (copy), v2 (copy)
-    local v4 = {};
-    local v5 = nil;
-    if l_Array_0.isArray(v3) then
-        v5 = {};
-        for _, v7 in v3 do
-            v5[v7[1]] = v7[2];
-        end;
-    else
-        v5 = v3 or {};
-    end;
-    v4.headerList = v5;
-    v4.guard = "none";
-    setmetatable(v4, v2);
-    return v4;
-end;
-v2.append = function(v8, v9, v10) --[[ Line: 56 ]] --[[ Name: append ]]
-    if v8.guard == "immutable" then
-        error("TypeError: tried to append header to immutable Headers object");
-    end;
-    v8.headerList[v9] = v10;
-end;
-v2.delete = function(v11, v12) --[[ Line: 64 ]] --[[ Name: delete ]]
-    if v11.guard == "immutable" then
-        error("TypeError: tried to delete key on immutable Headers object");
-    end;
-    if not v11:has(v12) then
-        return;
-    else
-        v11.headerList[v12] = nil;
-        return;
-    end;
-end;
-v2.get = function(v13, v14) --[[ Line: 76 ]] --[[ Name: get ]]
-    return v13.headerList[v14];
-end;
-v2.has = function(v15, v16) --[[ Line: 80 ]] --[[ Name: has ]]
-    return v15.headerList[v16] ~= nil;
-end;
-v2.set = function(v17, v18, v19) --[[ Line: 84 ]] --[[ Name: set ]]
-    if v17.guard == "immutable" then
-        error("TypeError: tried to set key on immutable Headers object");
-    end;
-    v17.headerList[v18] = v19;
-end;
-v2.__iter = function(v20) --[[ Line: 91 ]] --[[ Name: __iter ]]
-    return next, v20.headerList;
-end;
+local ParentParent = script.Parent.Parent
+local Array = require(ParentParent.LuauPolyfill).Array
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 36
+	-- upvalues: Array (copy), t1 (copy)
+	local t2 = {}
+	local t3
+
+	if Array.isArray(p1) then
+		t3 = {}
+
+		for _, v8 in p1 do
+			t3[v8[1]] = v8[2]
+		end
+	else
+		t3 = p1 or {}
+	end
+
+	t2.headerList = t3
+	t2.guard = "none"
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.append(t4: {[any]: any}, s1: string, s2: string) -- line: 56
+	if t4.guard == "immutable" then
+		error("TypeError: tried to append header to immutable Headers object")
+	end
+
+	t4.headerList[s1] = s2
+end
+function t1.delete(t5: {[any]: any}, s3: string) -- line: 64
+	if t5.guard == "immutable" then
+		error("TypeError: tried to delete key on immutable Headers object")
+	end
+
+	if not t5:has(s3) then
+		return
+	end
+
+	t5.headerList[s3] = nil
+end
+function t1.get(t6: {[any]: any}, s4: string) -- line: 76
+	return t6.headerList[s4]
+end
+function t1.has(t7: {[any]: any}, s5: string) -- line: 80
+	return t7.headerList[s5] ~= nil
+end
+function t1.set(t8: {[any]: any}, s6: string, s7: string) -- line: 84
+	if t8.guard == "immutable" then
+		error("TypeError: tried to set key on immutable Headers object")
+	end
+
+	t8.headerList[s6] = s7
+end
+function t1.__iter(p2) -- line: 91
+	return next, p2.headerList
+end
+
 return {
-    Headers = v2
-};
+	Headers = t1
+}

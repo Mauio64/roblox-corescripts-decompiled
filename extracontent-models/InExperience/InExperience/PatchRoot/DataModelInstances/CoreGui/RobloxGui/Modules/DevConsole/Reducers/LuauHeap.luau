@@ -1,66 +1,85 @@
-local v0 = require(script.Parent.Parent.Immutable);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v2 = require(l_Actions_0.SetLuauHeapState);
-local v3 = require(l_Actions_0.SetLuauHeapProfileTarget);
-local v4 = require(l_Actions_0.SetLuauHeapActiveSnapshot);
-local v5 = require(l_Actions_0.SetLuauHeapCompareSnapshot);
-local _ = require(script.Parent.Parent.Components.LuauHeap.LuauHeapTypes);
-local v7 = {
-    isClientView = true, 
-    client = {
-        snapshots = {}, 
-        active = 0, 
-        compare = 0
-    }, 
-    server = {
-        snapshots = {}, 
-        active = 0, 
-        compare = 0
-    }
-};
-return function(v8, v9) --[[ Line: 33 ]]
-    -- upvalues: v7 (copy), v2 (copy), v0 (copy), v3 (copy), v4 (copy), v5 (copy)
-    local v10 = v8 or v7;
-    if v9.type == v2.name then
-        local v11 = if v9.isClientState then {
-            client = v9.sessionState
-        } else {
-            server = v9.sessionState
-        };
-        return (v0.JoinDictionaries(v10, v11));
-    elseif v9.type == v3.name then
-        return v0.JoinDictionaries(v10, {
-            isClientView = v9.isClientView
-        });
-    elseif v9.type == v4.name then
-        if v10.isClientView then
-            local v12 = table.clone(v10.client);
-            v12.active = v9.active;
-            return v0.JoinDictionaries(v10, {
-                client = v12
-            });
-        else
-            local v13 = table.clone(v10.server);
-            v13.active = v9.active;
-            return v0.JoinDictionaries(v10, {
-                server = v13
-            });
-        end;
-    elseif v9.type == v5.name then
-        if v10.isClientView then
-            local v14 = table.clone(v10.client);
-            v14.compare = v9.compare;
-            return v0.JoinDictionaries(v10, {
-                client = v14
-            });
-        else
-            local v15 = table.clone(v10.server);
-            v15.compare = v9.compare;
-            return v0.JoinDictionaries(v10, {
-                server = v15
-            });
-        end;
-    else
-        return v10;
-    end;
-end;
+local Immutable = require(script.Parent.Parent.Immutable)
+local Actions = script.Parent.Parent.Actions
+local SetLuauHeapState = require(Actions.SetLuauHeapState)
+local SetLuauHeapProfileTarget = require(Actions.SetLuauHeapProfileTarget)
+local SetLuauHeapActiveSnapshot = require(Actions.SetLuauHeapActiveSnapshot)
+local SetLuauHeapCompareSnapshot = require(Actions.SetLuauHeapCompareSnapshot)
+
+require(script.Parent.Parent.Components.LuauHeap.LuauHeapTypes)
+
+local t1 = {
+	isClientView = true,
+	client = {
+		active = 0,
+		compare = 0,
+		snapshots = {}
+	},
+	server = {
+		active = 0,
+		compare = 0,
+		snapshots = {}
+	}
+}
+
+return function(t2: {[any]: any}?, t3: {[any]: any}) -- line: 33
+	-- upvalues: t1 (copy), SetLuauHeapState (copy), Immutable (copy), SetLuauHeapProfileTarget (copy), SetLuauHeapActiveSnapshot (copy), SetLuauHeapCompareSnapshot (copy)
+	local v10 = t2 or t1
+
+	if t3.type == SetLuauHeapState.name then
+		local v11 = if not t3.isClientState then {
+			server = t3.sessionState
+		} else {
+			client = t3.sessionState
+		}
+
+		return (Immutable.JoinDictionaries(v10, v11))
+	end
+
+	if t3.type == SetLuauHeapProfileTarget.name then
+		return Immutable.JoinDictionaries(v10, {
+			isClientView = t3.isClientView
+		})
+	end
+
+	if t3.type == SetLuauHeapActiveSnapshot.name then
+		if v10.isClientView then
+			local v12 = table.clone(v10.client)
+
+			v12.active = t3.active
+
+			return Immutable.JoinDictionaries(v10, {
+				client = v12
+			})
+		end
+
+		local v13 = table.clone(v10.server)
+
+		v13.active = t3.active
+
+		return Immutable.JoinDictionaries(v10, {
+			server = v13
+		})
+	end
+
+	if t3.type == SetLuauHeapCompareSnapshot.name then
+		if v10.isClientView then
+			local v14 = table.clone(v10.client)
+
+			v14.compare = t3.compare
+
+			return Immutable.JoinDictionaries(v10, {
+				client = v14
+			})
+		end
+
+		local v15 = table.clone(v10.server)
+
+		v15.compare = t3.compare
+
+		return Immutable.JoinDictionaries(v10, {
+			server = v15
+		})
+	end
+
+	return v10
+end

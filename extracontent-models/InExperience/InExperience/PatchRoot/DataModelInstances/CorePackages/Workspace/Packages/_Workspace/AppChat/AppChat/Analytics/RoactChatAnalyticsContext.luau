@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.DefaultAnalytics);
-return v1.createContext(v2);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local DefaultAnalytics = require(script.Parent.DefaultAnalytics)
+
+return React.createContext(DefaultAnalytics)

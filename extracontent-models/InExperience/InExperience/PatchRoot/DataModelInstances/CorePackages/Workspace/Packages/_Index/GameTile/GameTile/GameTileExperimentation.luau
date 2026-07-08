@@ -1,41 +1,47 @@
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local l_ExperimentCacheManager_0 = require(l_Parent_0.ExperimentCacheManager).ExperimentCacheManager;
-local v2 = game:DefineFastString("LuaAppGameTileMigrationExpLayer", "PlayerApp.HomePage.UX.TileLayer");
-local l_FFlagLuaAppUnifyPlayButtonTileIxp_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppUnifyPlayButtonTileIxp;
-local function _(v4) --[[ Line: 9 ]] --[[ Name: getIsUserInTreatmentAndSendExposureLog ]]
-    -- upvalues: v2 (copy), l_ExperimentCacheManager_0 (copy)
-    local l_v2_0 = v2;
-    local v6 = l_ExperimentCacheManager_0.default:getLayerVariables(l_v2_0, true);
-    if v6 and v6[v4] ~= nil then
-        l_ExperimentCacheManager_0.default:sendCustomExposureLog(l_v2_0);
-        return v6[v4];
-    else
-        return false;
-    end;
-end;
-local function v10() --[[ Line: 21 ]] --[[ Name: getIsTileMigrationEnabled ]]
-    -- upvalues: v2 (copy), l_ExperimentCacheManager_0 (copy)
-    local l_v2_1 = v2;
-    local v9 = l_ExperimentCacheManager_0.default:getLayerVariables(l_v2_1, true);
-    if v9 and v9.IsTileMigrationEnabled ~= nil then
-        l_ExperimentCacheManager_0.default:sendCustomExposureLog(l_v2_1);
-        return v9.IsTileMigrationEnabled;
-    else
-        return false;
-    end;
-end;
-local v13 = l_FFlagLuaAppUnifyPlayButtonTileIxp_0 and function() --[[ Line: 26 ]]
-    -- upvalues: v2 (copy), l_ExperimentCacheManager_0 (copy)
-    local l_v2_2 = v2;
-    local v12 = l_ExperimentCacheManager_0.default:getLayerVariables(l_v2_2, true);
-    if v12 and v12.IsPlayButtonMigrationEnabled ~= nil then
-        l_ExperimentCacheManager_0.default:sendCustomExposureLog(l_v2_2);
-        return v12.IsPlayButtonMigrationEnabled;
-    else
-        return false;
-    end;
-end or nil;
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
+local v3 = game:DefineFastString("LuaAppGameTileMigrationExpLayer", "PlayerApp.HomePage.UX.TileLayer")
+local FFlagLuaAppUnifyPlayButtonTileIxp = require(Parent.SharedFlags).FFlagLuaAppUnifyPlayButtonTileIxp
+
+local function getIsUserInTreatmentAndSendExposureLog(s1: string) -- line: 9
+	-- upvalues: v3 (copy), ExperimentCacheManager (copy)
+	local v7 = v3
+	local v8 = ExperimentCacheManager.default:getLayerVariables(v7, true)
+
+	if v8 and v8[s1] ~= nil then
+		ExperimentCacheManager.default:sendCustomExposureLog(v7)
+
+		return v8[s1]
+	end
+
+	return false
+end
+
 return {
-    getIsTileMigrationEnabled = v10, 
-    getIsPlayButtonMigrationEnabled = if l_FFlagLuaAppUnifyPlayButtonTileIxp_0 then v13 else nil
-};
+	getIsTileMigrationEnabled = function() -- line: 21
+		-- upvalues: v3 (copy), ExperimentCacheManager (copy)
+		local v9 = v3
+		local v10 = ExperimentCacheManager.default:getLayerVariables(v9, true)
+
+		if v10 and v10.IsTileMigrationEnabled ~= nil then
+			ExperimentCacheManager.default:sendCustomExposureLog(v9)
+
+			return v10.IsTileMigrationEnabled
+		end
+
+		return false
+	end,
+	getIsPlayButtonMigrationEnabled = if not FFlagLuaAppUnifyPlayButtonTileIxp then nil else if not FFlagLuaAppUnifyPlayButtonTileIxp then nil else function() -- line: 26
+		-- upvalues: v3 (copy), ExperimentCacheManager (copy)
+		local v11 = v3
+		local v12 = ExperimentCacheManager.default:getLayerVariables(v11, true)
+
+		if v12 and v12.IsPlayButtonMigrationEnabled ~= nil then
+			ExperimentCacheManager.default:sendCustomExposureLog(v11)
+
+			return v12.IsPlayButtonMigrationEnabled
+		end
+
+		return false
+	end
+}

@@ -1,27 +1,32 @@
-local l_Parent_0 = script.Parent;
-local v1 = require(l_Parent_0.None);
-local _ = require(l_Parent_0.Types);
-local v3 = require(l_Parent_0.forEach);
-local v4 = require(l_Parent_0.forEachArgs);
-return function(v5, ...) --[[ Line: 54 ]] --[[ Name: assign ]]
-    -- upvalues: v4 (copy), v1 (copy), v3 (copy)
-    v4(function(v6) --[[ Line: 56 ]]
-        -- upvalues: v1 (ref), v3 (ref), v5 (copy)
-        if v6 == nil or v6 == v1 then
-            return;
-        else
-            v3(v6, function(v7, v8) --[[ Line: 62 ]]
-                -- upvalues: v1 (ref), v5 (ref)
-                if v7 == v1 then
-                    v5[v8] = nil;
-                    return;
-                else
-                    v5[v8] = v7;
-                    return;
-                end;
-            end);
-            return;
-        end;
-    end, ...);
-    return v5;
-end;
+local scriptParent = script.Parent
+local None = require(scriptParent.None)
+
+require(scriptParent.Types)
+
+local forEach = require(scriptParent.forEach)
+local forEachArgs = require(scriptParent.forEachArgs)
+
+local function assign(t1: {[any]: any}, ...) -- line: 54
+	-- upvalues: forEachArgs (copy), None (copy), forEach (copy)
+	forEachArgs(function(t2: {[any]: any}?) -- line: 56
+		-- upvalues: None (copy), forEach (copy), t1 (copy)
+		if t2 == nil or t2 == None then
+			return
+		end
+
+		forEach(t2, function(p1, p2) -- line: 62
+			-- upvalues: None (copy), t1 (copy)
+			if p1 == None then
+				t1[p2] = nil
+
+				return
+			end
+
+			t1[p2] = p1
+		end)
+	end, ...)
+
+	return t1
+end
+
+return assign

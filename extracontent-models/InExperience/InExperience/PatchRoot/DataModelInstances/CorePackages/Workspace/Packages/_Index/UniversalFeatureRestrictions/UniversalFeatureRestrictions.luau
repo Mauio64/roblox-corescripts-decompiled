@@ -1,10 +1,16 @@
-local v0 = require(script.Common.AbuseVector);
-local v1 = require(script.Signals.featureRestrictionDisplaySignal);
+local AbuseVector = require(script.Common.AbuseVector)
+local featureRestrictionDisplaySignal = require(script.Signals.featureRestrictionDisplaySignal)
+local featureRestrictionDisplayDirectSignal = require(script.Signals.featureRestrictionDisplayDirectSignal)
+local showFeatureRestriction = require(script.Utils.showFeatureRestriction)
+local showFeatureRestrictionDirect = require(script.Utils.showFeatureRestrictionDirect)
+
 return {
-    showFeatureRestriction = require(script.Utils.showFeatureRestriction), 
-    AbuseVector = v0, 
-    Signals = {
-        featureRestrictionDisplaySignal = v1
-    }, 
-    ["jest.config"] = script["jest.config"]
-};
+	showFeatureRestriction = showFeatureRestriction,
+	showFeatureRestrictionDirect = showFeatureRestrictionDirect,
+	AbuseVector = AbuseVector,
+	Signals = {
+		featureRestrictionDisplaySignal = featureRestrictionDisplaySignal,
+		featureRestrictionDisplayDirectSignal = featureRestrictionDisplayDirectSignal
+	},
+	["jest.config"] = script["jest.config"]
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothIsStandalone", false);
+return game:DefineFastFlag("AXPhotoboothIsStandalone", false)

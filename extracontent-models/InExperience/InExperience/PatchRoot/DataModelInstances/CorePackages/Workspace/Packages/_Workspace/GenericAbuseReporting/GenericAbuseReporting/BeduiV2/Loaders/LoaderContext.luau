@@ -1,35 +1,39 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = v1.createContext(nil);
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+local v3 = React.createContext(nil)
+
 return {
-    LoaderContext = v2, 
-    LoaderProvider = function(v3) --[[ Line: 36 ]] --[[ Name: LoaderProvider ]]
-        -- upvalues: v1 (copy), v2 (copy)
-        local v4 = v1.useRef({});
-        local v5 = v1.useRef(v3.loaders);
-        v5.current = v3.loaders;
-        v1.useEffect(function() --[[ Line: 41 ]]
-            -- upvalues: v3 (copy), v4 (copy)
-            if not v3.open then
-                v4.current = {};
-            end;
-        end, {
-            v3.open
-        });
-        local l_current_0 = v1.useRef({
-            registryRef = v5, 
-            cacheRef = v4
-        }).current;
-        return v1.createElement(v2.Provider, {
-            value = l_current_0
-        }, v3.children);
-    end, 
-    useLoaderContext = function() --[[ Line: 56 ]] --[[ Name: useLoaderContext ]]
-        -- upvalues: v1 (copy), v2 (copy)
-        local v7 = v1.useContext(v2);
-        if not v7 then
-            error("useLoaderContext must be used within a <LoaderProvider>");
-        end;
-        return v7;
-    end
-};
+	LoaderContext = v3,
+	LoaderProvider = function(t1: {[any]: any}) -- line: 44
+		-- upvalues: React (copy), v3 (copy)
+		local v5 = React.useRef({})
+		local v6 = React.useRef(t1.loaders)
+
+		v6.current = t1.loaders
+		React.useEffect(function() -- line: 49
+			-- upvalues: t1 (copy), v5 (copy)
+			if not t1.open then
+				v5.current = {}
+			end
+		end, { t1.open })
+
+		local current = React.useRef({
+			registryRef = v6,
+			cacheRef = v5
+		}).current
+
+		return React.createElement(v3.Provider, {
+			value = current
+		}, t1.children)
+	end,
+	useLoaderContext = function() -- line: 64
+		-- upvalues: React (copy), v3 (copy)
+		local v8 = React.useContext(v3)
+
+		if not v8 then
+			error("useLoaderContext must be used within a <LoaderProvider>")
+		end
+
+		return v8
+	end
+}

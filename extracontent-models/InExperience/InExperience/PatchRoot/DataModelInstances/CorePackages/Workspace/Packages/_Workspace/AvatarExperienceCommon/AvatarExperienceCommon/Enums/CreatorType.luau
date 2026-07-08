@@ -1,4 +1,4 @@
 return {
-    User = "User", 
-    Group = "Group"
-};
+	User = "User",
+	Group = "Group"
+}

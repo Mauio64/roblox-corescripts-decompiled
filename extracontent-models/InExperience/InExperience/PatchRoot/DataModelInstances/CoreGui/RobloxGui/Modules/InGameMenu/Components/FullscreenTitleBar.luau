@@ -53,8 +53,8 @@ function v22.init(p1) -- line: 55
 	function p1.onFullscreenChanged(p2) -- line: 67
 		-- upvalues: p1 (copy)
 		p1:setState({
-			fullscreenEnabled = p2,
-			isTriggered = false
+			isTriggered = false,
+			fullscreenEnabled = p2
 		})
 	end
 	function p1.triggerTitleBar() -- line: 74
@@ -153,8 +153,8 @@ function v22.render(p3) -- line: 149
 			target = CoreGui
 		}, {
 			InGameFullscreenTitleBarScreen = Roact.createElement("ScreenGui", {
-				Enabled = p3.state.fullscreenEnabled,
 				IgnoreGuiInset = true,
+				Enabled = p3.state.fullscreenEnabled,
 				ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 				DisplayOrder = p3.props.displayOrder
 			}, {
@@ -206,11 +206,11 @@ return RoactRodux.UNSTABLE_connect2(function(p9, _) -- line: 207
 end, function(p11) -- line: 211
 	-- upvalues: OpenEducationalPopup (copy), StartLeavingGame (copy)
 	return {
-		openEducationalPopup = function(p12, p13, p14) --[[ openEducationalPopup ]] -- line: 213
+		openEducationalPopup = function(p12, p13, p14) -- line: 213
 			-- upvalues: p11 (copy), OpenEducationalPopup (copy)
 			return p11(OpenEducationalPopup(p12, p13, p14))
 		end,
-		startLeavingGame = function() --[[ startLeavingGame ]] -- line: 216
+		startLeavingGame = function() -- line: 216
 			-- upvalues: p11 (copy), StartLeavingGame (copy)
 			p11(StartLeavingGame())
 		end

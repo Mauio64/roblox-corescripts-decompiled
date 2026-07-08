@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnableBundlesInAssetsCarousel", false);
+return game:DefineFastFlag("ProfilePlatformEnableBundlesInAssetsCarousel", false)

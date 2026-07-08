@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("CancelSubscriptionApp").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator("CancelSubscriptionEnded", function() --[[ Line: 9 ]]
-    return {};
-end);
+local Parent = script:FindFirstAncestor("CancelSubscriptionApp").Parent
+
+return require(Parent.Rodux).makeActionCreator("CancelSubscriptionEnded", function() -- line: 9
+	return {}
+end)

@@ -3,13 +3,22 @@ local isInExperienceUIVREnabled = require(CorePackages.Workspace.Packages.Shared
 local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
 local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
 local FFlagEnableInExperienceAvatarSwitcher = SharedFlags.FFlagEnableInExperienceAvatarSwitcher
-local FFlagAddIGMToSideSheet = SharedFlags.FFlagAddIGMToSideSheet
+local FFlagAddInviteFriendsIntegration = SharedFlags.FFlagAddInviteFriendsIntegration
+local FFlagAppNavMyStatsTab = SharedFlags.FFlagAppNavMyStatsTab
+local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
+local FFlagEnableInExperienceShop = SharedFlags.FFlagEnableInExperienceShop
+local FFlagIntegrateTraversalHistoryInSideSheet = SharedFlags.FFlagIntegrateTraversalHistoryInSideSheet
+local FFlagRemoveFriendsChatUnibarEntrypoints = SharedFlags.FFlagRemoveFriendsChatUnibarEntrypoints
+local FFlagExpChatEnableFriendsTab = SharedFlags.FFlagExpChatEnableFriendsTab
+local FFlagAddTraversalHistory = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).Traversal.Flags.FFlagAddTraversalHistory
+local ArgoPartyExperimentation = require(CorePackages.Workspace.Packages.SocialExperiments).ArgoPartyExperimentation
 
 return {
 	OverflowMenu = require(script.OverflowMenu),
+	AssistantBuild = if not FFlagAppNavMyStatsTab then nil else require(script.AssistantBuild),
 	Chat = require(script.ExpChat.ChatChromeIntegration),
-	ConnectUnibar = require(script.Connect.ConnectIconUnibar),
-	ConnectDropdown = require(script.Connect.ConnectIconDropdown),
+	ConnectUnibar = if not ArgoPartyExperimentation.getIsRenameEnabled() then require(script.Connect.ConnectIconUnibar) else nil,
+	ConnectDropdown = if not FFlagRemoveFriendsChatUnibarEntrypoints or (not FFlagExpChatEnableFriendsTab or not ArgoPartyExperimentation.getIsRenameEnabled()) then require(script.Connect.ConnectIconDropdown) else nil,
 	TrustAndSafety = require(script.TrustAndSafety),
 	DummyWindow = require(script.DummyWindow),
 	DummyWindow2 = require(script.DummyWindow2),
@@ -19,11 +28,17 @@ return {
 	CapturesEntrypoint = require(script.Captures.CapturesEntrypoint),
 	AvatarSwitcherEntryPoint = if not FFlagEnableInExperienceAvatarSwitcher then nil else require(script.AvatarSwitcher.AvatarSwitcherEntrypoint),
 	MusicEntrypoint = require(script.MusicUtility.MusicEntrypoint),
+	PartyEntrypoint = if not ArgoPartyExperimentation.getIsRenameEnabled() then nil else require(script.Party.PartyEntrypoint),
 	PartyMic = require(script.Party.PartyMic),
 	VRToggleButton = if not isInExperienceUIVREnabled or not isSpatial() then nil else require(script.VRToggleButton),
 	VRSafeBubble = if not isInExperienceUIVREnabled or not isSpatial() then nil else require(script.VRSafeBubble),
-	People = if not FFlagAddIGMToSideSheet then nil else require(script.Pages.People),
-	Settings = if not FFlagAddIGMToSideSheet then nil else require(script.Pages.Settings),
-	Gallery = if not FFlagAddIGMToSideSheet then nil else require(script.Pages.Gallery),
-	Help = if not FFlagAddIGMToSideSheet then nil else require(script.Pages.Help)
+	People = require(script.Pages.People),
+	InviteFriends = if not FFlagAddInviteFriendsIntegration then nil else require(script.Pages.InviteFriends),
+	Settings = require(script.Pages.Settings),
+	Gallery = require(script.Pages.Gallery),
+	Help = require(script.Pages.Help),
+	TraversalHistory = if not FFlagAddTraversalHistory or not FFlagIntegrateTraversalHistoryInSideSheet then nil else require(script.Pages.TraversalHistory),
+	LeaveConfirmation = if not FFlagEnableSideSheet then nil else require(script.Pages.LeaveConfirmation),
+	RespawnConfirmation = if not FFlagEnableSideSheet then nil else require(script.Pages.RespawnConfirmation),
+	ShopEntrypoint = if not FFlagEnableInExperienceShop then nil else require(script.InExperienceShop.ShopEntrypoint)
 }

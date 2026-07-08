@@ -1,15 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Models.Conversation);
-local v2 = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    if v3.conversationType ~= v1.Type.MULTI_USER_CONVERSATION then
-        return false;
-    elseif v3.userPendingStatus == v2.UserPendingStatus.Pending then
-        return true;
-    elseif v3.userPendingStatus == v2.UserPendingStatus.Invalid and v3.moderationType == v2.ModerationType.TrustedComms then
-        return true;
-    else
-        return false;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local Conversation = require(AppChat.Models.Conversation)
+local ConversationChannels = require(AppChat.Models.ConversationChannels)
+
+return function(t1: {[any]: any}) -- line: 12
+	-- upvalues: Conversation (copy), ConversationChannels (copy)
+	if t1.conversationType ~= Conversation.Type.MULTI_USER_CONVERSATION then
+		return false
+	end
+
+	if t1.userPendingStatus == ConversationChannels.UserPendingStatus.Pending then
+		return true
+	end
+
+	if t1.userPendingStatus == ConversationChannels.UserPendingStatus.Invalid and t1.moderationType == ConversationChannels.ModerationType.TrustedComms then
+		return true
+	end
+
+	return false
+end

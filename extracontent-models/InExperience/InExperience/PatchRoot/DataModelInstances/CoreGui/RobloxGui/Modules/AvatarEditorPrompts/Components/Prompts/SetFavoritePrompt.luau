@@ -41,20 +41,20 @@ function v17.init(p1) -- line: 42
 			s1 = "BundleThumbnail"
 		end
 
-		local v26 = "rbxthumb://type=" .. s1 .. "&id=" .. p1.props.itemId .. "&w=150&h=150"
+		local v28 = "rbxthumb://type=" .. s1 .. "&id=" .. p1.props.itemId .. "&w=150&h=150"
 
 		return Roact.createElement("Frame", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 150)
 		}, {
 			Thumnail = Roact.createElement(LoadableImage, {
+				BackgroundTransparency = 1,
+				useShimmerAnimationWhileLoading = true,
+				showFailedStateWhenLoadingFailed = true,
 				Position = UDim2.fromScale(0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0),
 				Size = UDim2.fromOffset(150, 150),
-				BackgroundTransparency = 1,
-				Image = v26,
-				useShimmerAnimationWhileLoading = true,
-				showFailedStateWhenLoadingFailed = true
+				Image = v28
 			})
 		})
 	end
@@ -83,53 +83,53 @@ function v17.willUnmount(p5) -- line: 83
 end
 function v17.render(p6) -- line: 90
 	-- upvalues: RobloxTranslator (copy), Roact (copy), InteractiveAlert (copy), ButtonType (copy)
-	local v21, v22
+	local v23, v24
 
 	if p6.props.shouldFavorite then
-		v21 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptTitle")
-		v22 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptText", {
+		v23 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptTitle")
+		v24 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptText", {
 			RBX_NAME = p6.props.itemName
 		})
 	else
-		v21 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UnfavouriteItemPromptTitle")
-		v22 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UnfavouriteItemPromptText", {
+		v23 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UnfavouriteItemPromptTitle")
+		v24 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.UnfavouriteItemPromptText", {
 			RBX_NAME = p6.props.itemName
 		})
 	end
 
 	return Roact.createElement(InteractiveAlert, {
-		title = v21,
-		bodyText = v22,
+		isMiddleContentFocusable = false,
+		title = v23,
+		bodyText = v24,
 		buttonStackInfo = {
 			buttons = {
 				{
+					isDefaultChild = true,
 					props = {
 						onActivated = p6.props.signalSetFavoritePermissionDenied,
 						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptNo")
-					},
-					isDefaultChild = true
+					}
 				},
 				{
+					isDefaultChild = false,
 					buttonType = ButtonType.PrimarySystem,
 					props = {
-						onActivated = p6.props.performSetFavorite,
-						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptYes"),
 						isDelayedInput = true,
 						enableInputDelayed = true,
-						delayInputSeconds = 3
-					},
-					isDefaultChild = false
+						delayInputSeconds = 3,
+						onActivated = p6.props.performSetFavorite,
+						text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.FavouriteItemPromptYes")
+					}
 				}
 			}
 		},
 		position = UDim2.fromScale(0.5, 0.5),
 		screenSize = p6.props.screenSize,
-		middleContent = p6.renderAlertMiddleContent,
-		isMiddleContentFocusable = false
+		middleContent = p6.renderAlertMiddleContent
 	})
 end
 
-return RoactRodux.connect(function(p7) --[[ mapStateToProps ]] -- line: 137
+local function mapStateToProps(p7) -- line: 137
 	return {
 		itemId = p7.promptInfo.itemId,
 		itemType = p7.promptInfo.itemType,
@@ -137,16 +137,19 @@ return RoactRodux.connect(function(p7) --[[ mapStateToProps ]] -- line: 137
 		shouldFavorite = p7.promptInfo.shouldFavorite,
 		screenSize = p7.screenSize
 	}
-end, function(p8) --[[ mapDispatchToProps ]] -- line: 147
+end
+local function mapDispatchToProps(p8) -- line: 147
 	-- upvalues: PerformSetFavorite (copy), SignalSetFavoritePermissionDenied (copy)
 	return {
-		performSetFavorite = function() --[[ performSetFavorite ]] -- line: 149
+		performSetFavorite = function() -- line: 149
 			-- upvalues: p8 (copy), PerformSetFavorite (copy)
 			return p8(PerformSetFavorite)
 		end,
-		signalSetFavoritePermissionDenied = function() --[[ signalSetFavoritePermissionDenied ]] -- line: 153
+		signalSetFavoritePermissionDenied = function() -- line: 153
 			-- upvalues: p8 (copy), SignalSetFavoritePermissionDenied (copy)
 			return p8(SignalSetFavoritePermissionDenied)
 		end
 	}
-end)(v17)
+end
+
+return RoactRodux.connect(mapStateToProps, mapDispatchToProps)(v17)

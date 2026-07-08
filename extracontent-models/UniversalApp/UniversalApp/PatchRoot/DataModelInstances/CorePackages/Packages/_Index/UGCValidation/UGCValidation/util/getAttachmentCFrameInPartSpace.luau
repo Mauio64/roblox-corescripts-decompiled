@@ -1,16 +1,19 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.util.R15plusUtils);
-return function(v2) --[[ Line: 12 ]]
-    -- upvalues: v1 (copy)
-    if not v1.checkFlagEnabledForAllowHrd() then
-        return v2.CFrame;
-    else
-        local l_CFrame_0 = v2.CFrame;
-        local l_Parent_1 = v2.Parent;
-        while l_Parent_1 and l_Parent_1:IsA("Attachment") do
-            l_CFrame_0 = l_Parent_1.CFrame * l_CFrame_0;
-            l_Parent_1 = l_Parent_1.Parent;
-        end;
-        return l_CFrame_0;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local R15plusUtils = require(ParentParent.util.R15plusUtils)
+
+return function(p1) -- line: 12
+	-- upvalues: R15plusUtils (copy)
+	if not R15plusUtils.checkFlagEnabledForAllowHrd() then
+		return p1.CFrame
+	end
+
+	local p1CFrame = p1.CFrame
+	local p1Parent = p1.Parent
+
+	while p1Parent and p1Parent:IsA("Attachment") do
+		p1CFrame = p1Parent.CFrame * p1CFrame
+		p1Parent = p1Parent.Parent
+	end
+
+	return p1CFrame
+end

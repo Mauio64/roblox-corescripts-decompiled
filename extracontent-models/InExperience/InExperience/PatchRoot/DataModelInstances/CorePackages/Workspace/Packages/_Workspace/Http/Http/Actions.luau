@@ -1,4 +1,4 @@
 return {
-    UpdateFetchingStatus = require(script.UpdateFetchingStatus), 
-    BatchUpdateFetchingStatus = require(script.BatchUpdateFetchingStatus)
-};
+	UpdateFetchingStatus = require(script.UpdateFetchingStatus),
+	BatchUpdateFetchingStatus = require(script.BatchUpdateFetchingStatus)
+}

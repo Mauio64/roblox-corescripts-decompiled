@@ -1,18 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Constants);
-local v2 = require(l_Parent_0.flags.getFStringUGCLCAllowedAssetTypeIds);
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local getFStringUGCLCAllowedAssetTypeIds = require(ParentParent.flags.getFStringUGCLCAllowedAssetTypeIds)
+
 return {
-    isRigidAccessoryAllowed = function(v3) --[[ Line: 9 ]] --[[ Name: isRigidAccessoryAllowed ]]
-        -- upvalues: v1 (copy)
-        local v4 = v1.ASSET_TYPE_INFO[v3];
-        if v4 == nil then
-            return false;
-        else
-            return v4.rigidAllowed == true;
-        end;
-    end, 
-    isLayeredClothingAllowed = function(v5) --[[ Line: 18 ]] --[[ Name: isLayeredClothingAllowed ]]
-        -- upvalues: v2 (copy)
-        return table.find(string.split(v2(), ","), (tostring(v5.Value))) ~= nil;
-    end
-};
+	isRigidAccessoryAllowed = function(p1) -- line: 9
+		-- upvalues: Constants (copy)
+		local v5 = Constants.ASSET_TYPE_INFO[p1]
+
+		if v5 == nil then
+			return false
+		end
+
+		return v5.rigidAllowed == true
+	end,
+	isLayeredClothingAllowed = function(p2) -- line: 18
+		-- upvalues: getFStringUGCLCAllowedAssetTypeIds (copy)
+		return table.find(string.split(getFStringUGCLCAllowedAssetTypeIds(), ","), (tostring(p2.Value))) ~= nil
+	end
+}

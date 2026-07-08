@@ -1,4 +1,4 @@
 return {
-    ShowFAESocialUpsellOverlay = require(script.ShowFAESocialUpsellOverlay), 
-    startFacialAgeEstimation = require(script.startFacialAgeEstimation)
-};
+	ShowFAESocialUpsellOverlay = require(script.ShowFAESocialUpsellOverlay),
+	startFacialAgeEstimation = require(script.startFacialAgeEstimation)
+}

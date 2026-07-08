@@ -1,111 +1,114 @@
-local l_Players_0 = game:GetService("Players");
-local l_Parent_0 = script:FindFirstAncestor("UserLib").Parent;
-local l_GetFFlagInviteListRerank_0 = require(l_Parent_0.SharedFlags).GetFFlagInviteListRerank;
-local v3 = {
-    PresenceType = {
-        OFFLINE = "OFFLINE", 
-        ONLINE = "ONLINE", 
-        IN_GAME = "IN_GAME", 
-        IN_STUDIO = "IN_STUDIO"
-    }, 
-    new = function() --[[ Line: 17 ]] --[[ Name: new ]]
-        return {};
-    end
-};
-v3.fromData = function(v4, v5, v6, v7) --[[ Line: 25 ]] --[[ Name: fromData ]]
-    -- upvalues: v3 (copy), l_Players_0 (copy)
-    local v8 = v3.new();
-    v8.id = tostring(v4);
-    v8.isFetching = false;
-    v8.isFriend = v6;
-    v8.friendRank = v7 or 0;
-    v8.lastLocation = nil;
-    v8.name = v5;
-    v8.displayName = v5;
-    v8.externalAppDisplayName = v5;
-    v8.universeId = nil;
-    v8.placeId = nil;
-    v8.rootPlaceId = nil;
-    v8.gameInstanceId = nil;
-    v8.presence = l_Players_0.LocalPlayer and v8.id == tostring(l_Players_0.LocalPlayer.UserId) and v3.PresenceType.ONLINE or nil;
-    v8.DEPRECATED_thumbnails = nil;
-    v8.lastOnline = nil;
-    return v8;
-end;
-v3.fromDataTable = function(v9) --[[ Line: 51 ]] --[[ Name: fromDataTable ]]
-    -- upvalues: v3 (copy), l_Players_0 (copy), l_GetFFlagInviteListRerank_0 (copy)
-    local v10 = v3.new();
-    v10.id = tostring(v9.id);
-    v10.isFriend = v9.isFriend;
-    v10.friendRank = v9.friendRank;
-    v10.presence = l_Players_0.LocalPlayer and v10.id == tostring(l_Players_0.LocalPlayer.UserId) and v3.PresenceType.ONLINE or nil;
-    v10.isFetching = false;
-    v10.lastLocation = nil;
-    v10.name = v9.name;
-    v10.displayName = v9.displayName or v9.name;
-    v10.externalAppDisplayName = v9.externalAppDisplayName;
-    v10.universeId = nil;
-    v10.placeId = nil;
-    v10.rootPlaceId = nil;
-    v10.gameInstanceId = nil;
-    v10.DEPRECATED_thumbnails = nil;
-    v10.lastOnline = nil;
-    v10.hasVerifiedBadge = v9.hasVerifiedBadge;
-    if l_GetFFlagInviteListRerank_0() then
-        v10.friendFrequentRank = v9.friendFrequentRank;
-    end;
-    return v10;
-end;
-v3.compare = function(v11, v12) --[[ Line: 80 ]] --[[ Name: compare ]]
-    local v13 = false;
-    if v11 == nil then
-        v13 = v12 == nil;
-    end;
-    assert(not v13, "user1 and user2 cannot both be nil");
-    local v14 = true;
-    if v11 ~= nil then
-        v14 = typeof(v11) == "table";
-    end;
-    assert(v14, "user1 must be a table or nil");
-    v14 = true;
-    if v12 ~= nil then
-        v14 = typeof(v12) == "table";
-    end;
-    assert(v14, "user2 must be a table or nil");
-    if not v11 or not v12 then
-        return false;
-    else
-        for v15, v16 in pairs(v12) do
-            if v11[v15] ~= v16 then
-                return false;
-            end;
-        end;
-        for v17, v18 in pairs(v11) do
-            if v12[v17] ~= v18 then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
-v3.userPresenceToText = function(v19, v20) --[[ Line: 105 ]] --[[ Name: userPresenceToText ]]
-    -- upvalues: v3 (copy)
-    local l_presence_0 = v20.presence;
-    local l_lastLocation_0 = v20.lastLocation;
-    if not l_presence_0 then
-        return "";
-    elseif l_presence_0 == v3.PresenceType.OFFLINE then
-        return v19:Format("Common.Presence.Label.Offline");
-    elseif l_presence_0 == v3.PresenceType.ONLINE then
-        return v19:Format("Common.Presence.Label.Online");
-    elseif l_presence_0 == v3.PresenceType.IN_GAME or l_presence_0 == v3.PresenceType.IN_STUDIO then
-        if l_lastLocation_0 ~= nil then
-            return l_lastLocation_0;
-        else
-            return v19:Format("Common.Presence.Label.Online");
-        end;
-    else
-        return;
-    end;
-end;
-return v3;
+local Players = game:GetService("Players")
+local Parent = script:FindFirstAncestor("UserLib").Parent
+local GetFFlagInviteListRerank = require(Parent.SharedFlags).GetFFlagInviteListRerank
+local t1 = {
+	PresenceType = {
+		OFFLINE = "OFFLINE",
+		ONLINE = "ONLINE",
+		IN_GAME = "IN_GAME",
+		IN_STUDIO = "IN_STUDIO"
+	},
+	new = function() -- line: 17
+		return {}
+	end
+}
+
+function t1.fromData(p1, p2, p3, p4) -- line: 25
+	-- upvalues: t1 (copy), Players (copy)
+	local v9 = t1.new()
+
+	v9.id = tostring(p1)
+	v9.isFetching = false
+	v9.isFriend = p3
+	v9.friendRank = p4 or 0
+	v9.lastLocation = nil
+	v9.name = p2
+	v9.displayName = p2
+	v9.externalAppDisplayName = p2
+	v9.universeId = nil
+	v9.placeId = nil
+	v9.rootPlaceId = nil
+	v9.gameInstanceId = nil
+	v9.presence = Players.LocalPlayer and (v9.id == tostring(Players.LocalPlayer.UserId) and t1.PresenceType.ONLINE) or nil
+	v9.DEPRECATED_thumbnails = nil
+	v9.lastOnline = nil
+
+	return v9
+end
+function t1.fromDataTable(p5) -- line: 51
+	-- upvalues: t1 (copy), Players (copy), GetFFlagInviteListRerank (copy)
+	local v11 = t1.new()
+
+	v11.id = tostring(p5.id)
+	v11.isFriend = p5.isFriend
+	v11.friendRank = p5.friendRank
+	v11.presence = Players.LocalPlayer and (v11.id == tostring(Players.LocalPlayer.UserId) and t1.PresenceType.ONLINE) or nil
+	v11.isFetching = false
+	v11.lastLocation = nil
+	v11.name = p5.name
+	v11.displayName = p5.displayName or p5.name
+	v11.externalAppDisplayName = p5.externalAppDisplayName
+	v11.universeId = nil
+	v11.placeId = nil
+	v11.rootPlaceId = nil
+	v11.gameInstanceId = nil
+	v11.DEPRECATED_thumbnails = nil
+	v11.lastOnline = nil
+	v11.hasVerifiedBadge = p5.hasVerifiedBadge
+
+	if GetFFlagInviteListRerank() then
+		v11.friendFrequentRank = p5.friendFrequentRank
+	end
+
+	return v11
+end
+function t1.compare(p6, p7) -- line: 80
+	assert(not (p6 == nil and p7 == nil), "user1 and user2 cannot both be nil")
+	assert(p6 == nil or typeof(p6) == "table", "user1 must be a table or nil")
+	assert(p7 == nil or typeof(p7) == "table", "user2 must be a table or nil")
+
+	if not p6 or not p7 then
+		return false
+	end
+
+	for k, v in pairs(p7) do
+		if v ~= p6[k] then
+			return false
+		end
+	end
+
+	for k, v in pairs(p6) do
+		if v ~= p7[k] then
+			return false
+		end
+	end
+
+	return true
+end
+function t1.userPresenceToText(p8, p9) -- line: 105
+	-- upvalues: t1 (copy)
+	local presence = p9.presence
+	local lastLocation = p9.lastLocation
+
+	if not presence then
+		return ""
+	end
+
+	if presence == t1.PresenceType.OFFLINE then
+		return p8:Format("Common.Presence.Label.Offline")
+	end
+
+	if presence == t1.PresenceType.ONLINE then
+		return p8:Format("Common.Presence.Label.Online")
+	end
+
+	if presence == t1.PresenceType.IN_GAME or presence == t1.PresenceType.IN_STUDIO then
+		if lastLocation ~= nil then
+			return lastLocation
+		end
+
+		return p8:Format("Common.Presence.Label.Online")
+	end
+end
+
+return t1

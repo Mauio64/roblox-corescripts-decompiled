@@ -1,14 +1,16 @@
-local l_Parent_0 = script.Parent;
-local l_networkRequests_0 = l_Parent_0.networkRequests;
-local v2 = require(l_networkRequests_0.createGetUserSettings);
-local v3 = require(l_networkRequests_0.createUpdateUserSettings);
-local v4 = require(l_networkRequests_0.createGetUserSettingsMetadata);
-local _ = require(l_Parent_0.Types.networkRequestsTypes);
-return function(v6) --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), v3 (copy), v4 (copy)
-    return {
-        GetUserSettings = v2(v6), 
-        UpdateUserSettings = v3(v6), 
-        GetUserSettingsMetadata = v4(v6)
-    };
-end;
+local scriptParent = script.Parent
+local networkRequests = scriptParent.networkRequests
+local createGetUserSettings = require(networkRequests.createGetUserSettings)
+local createUpdateUserSettings = require(networkRequests.createUpdateUserSettings)
+local createGetUserSettingsMetadata = require(networkRequests.createGetUserSettingsMetadata)
+
+require(scriptParent.Types.networkRequestsTypes)
+
+return function(p1) -- line: 8
+	-- upvalues: createGetUserSettings (copy), createUpdateUserSettings (copy), createGetUserSettingsMetadata (copy)
+	return {
+		GetUserSettings = createGetUserSettings(p1),
+		UpdateUserSettings = createUpdateUserSettings(p1),
+		GetUserSettingsMetadata = createGetUserSettingsMetadata(p1)
+	}
+end

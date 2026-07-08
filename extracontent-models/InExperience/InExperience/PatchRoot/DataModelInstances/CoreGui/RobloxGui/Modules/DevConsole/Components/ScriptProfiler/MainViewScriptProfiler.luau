@@ -1,844 +1,940 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_ScriptProfilerService_0 = game:GetService("ScriptProfilerService");
-local l_Players_0 = game:GetService("Players");
-local v5 = require(script.Parent.Parent.Parent.Immutable);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v7 = require(l_Components_0.UtilAndTab);
-local v8 = require(l_Components_0.BoxButton);
-local v9 = require(l_Components_0.DropDown);
-local v10 = require(script.Parent.ProfilerView);
-local v11 = require(script.Parent.ProfilerFunctionsView);
-local _ = require(script.Parent.ProfilerDataFormatV2);
-local v13 = require(script.Parent.ProfilerExportView);
-local v14 = require(script.Parent.MobileSettingsView);
-local v15 = require(script.Parent.ProfilerUtil);
-local l_getPluginFlag_0 = v15.getPluginFlag;
-local l_getDurations_0 = v15.getDurations;
-local l_formatFrequency_0 = v15.formatFrequency;
-local l_Actions_0 = script.Parent.Parent.Parent.Actions;
-local v20 = require(l_Actions_0.SetScriptProfilerState);
-local v21 = require(script.Parent.Actions.SetIsProfiling);
-local v22 = require(script.Parent.Actions.SetData);
-local v23 = require(script.Parent.Actions.SetThreads);
-local v24 = require(script.Parent.Actions.SetTimerState);
-local v25 = require(script.Parent.Actions.ClearStateForNewProfilingSession);
-local v26 = require(script.Parent.Actions.SetAverage);
-local v27 = require(script.Parent.Actions.SetFrequency);
-local v28 = require(script.Parent.Actions.SetDataView);
-local v29 = require(script.Parent.Actions.SetLiveUpdate);
-local v30 = require(script.Parent.Actions.SetShowPlugins);
-local v31 = require(script.Parent.Actions.SetShowGC);
-local v32 = require(script.Parent.Actions.SetSearchData);
-local v33 = require(script.Parent.Parent.Parent.Constants);
-local l_MainRowPadding_0 = v33.GeneralFormatting.MainRowPadding;
-local l_SmallFrameHeight_0 = v33.UtilityBarFormatting.SmallFrameHeight;
-local l_MainWindowHeader_0 = v33.Font.MainWindowHeader;
-local l_MainWindowHeader_1 = v33.DefaultFontSize.MainWindowHeader;
-local l_Text_0 = v33.Color.Text;
-local l_UnselectedGray_0 = v33.Color.UnselectedGray;
-local v40 = v1.PureComponent:extend("MainViewScriptProfiler");
-local v41 = game:DefineFastFlag("ScriptProfilerShowPlugins2", false);
-local v42 = game:DefineFastInt("ScriptProfilerLiveUpdateIntervalMS", 1000);
-local v43 = {
-    "Callgraph", 
-    "Functions"
-};
-local function v44(v45, v46, v47, v48, v49, v50) --[[ Line: 64 ]] --[[ Name: annotateSearchFilterNodes ]]
-    -- upvalues: v44 (copy)
-    local v51 = v45.Nodes[v49];
-    if not v51.Children then
-        v47[v49] = v48 > 0 and v46[v48] or v50;
-        local v52 = false;
-        if v48 > 0 then
-            v52 = v46[v48];
-        end;
-        return v52;
-    else
-        local l_Children_0 = v51.Children;
-        local v54 = false;
-        if v48 > 0 and v46[v48] then
-            v54 = true;
-            v47[v49] = true;
-            for v55, v56 in pairs(l_Children_0) do
-                v47[v56] = true;
-                v44(v45, v46, v47, v55, v56, true);
-            end;
-            return v54;
-        else
-            for v57, v58 in pairs(l_Children_0) do
-                local v59 = v44(v45, v46, v47, v57, v58, v50);
-                v54 = v54 or v59;
-            end;
-            if v54 or v50 then
-                v47[v49] = true;
-            end;
-            return v54;
-        end;
-    end;
-end;
-local function v80(v60, v61) --[[ Line: 109 ]] --[[ Name: generateSearchFilters ]]
-    -- upvalues: v15 (copy), v44 (copy)
-    if v61 == "" then
-        return nil, nil;
-    else
-        local l_data_0 = v60.data;
-        if not l_data_0 then
-            return nil, nil;
-        else
-            local v63 = table.create(#l_data_0.Functions, false);
-            for v64, v65 in l_data_0.Functions do
-                local v66 = v15.getName(l_data_0, v65);
-                if v66 and string.find(v66, v61, 1, true) then
-                    v63[v64] = true;
-                end;
-            end;
-            local v67 = table.create(#l_data_0.Nodes, false);
-            for _, v69 in l_data_0.Categories do
-                local l_NodeId_0 = v69.NodeId;
-                local v71 = l_data_0.Nodes[l_NodeId_0];
-                if not v71.Children then
-                    v67[l_NodeId_0] = false;
-                else
-                    local l_Children_1 = v71.Children;
-                    local v73 = false;
-                    for v74, v75 in pairs(l_Children_1) do
-                        local v76 = v44(l_data_0, v63, v67, v74, v75, false);
-                        v73 = v73 or v76;
-                    end;
-                    if v73 then
-                        v67[l_NodeId_0] = true;
-                    end;
-                end;
-            end;
-            for v77, v78 in l_data_0.Functions do
-                if v63[v77] ~= true and not v15.getName(l_data_0, v78) then
-                    local v79 = v15.getSourceName(l_data_0, v78);
-                    if v79 and string.find(v79, v61, 1, true) then
-                        v63[v77] = true;
-                    end;
-                end;
-            end;
-            return v63, v67;
-        end;
-    end;
-end;
-local function v96(v81, v82) --[[ Line: 153 ]] --[[ Name: generatePluginDurationOffsets ]]
-    -- upvalues: l_getPluginFlag_0 (copy), l_getDurations_0 (copy)
-    if v82 then
-        assert(v82.Version == 2);
-        local v83 = table.create(#v82.Categories, 0);
-        local v84 = table.create(#v82.Categories, 0);
-        local v85 = 0;
-        local v86 = 0;
-        for v87, v88 in v82.Categories do
-            local v89 = v82.Nodes[v88.NodeId];
-            local v90 = 0;
-            local v91 = 0;
-            local l_Children_2 = v89.Children;
-            if l_Children_2 then
-                for v93, v94 in pairs(l_Children_2) do
-                    local _ = v82.Functions[v93];
-                    if l_getPluginFlag_0(v82, v82.Functions[v93]) then
-                        v90 = v90 + l_getDurations_0(v82, v94);
-                        if #v81 > 0 then
-                            v91 = v91 + v81[v94];
-                        end;
-                    end;
-                end;
-            end;
-            v83[v87] = v90;
-            v84[v87] = v91;
-            v85 = v85 + v90;
-            v86 = v86 + v91;
-        end;
-        v83.Total = v85;
-        v84.Total = v85;
-        return v83, v84;
-    else
-        return {}, {};
-    end;
-end;
-local function v97(v98, v99, v100, v101, v102) --[[ Line: 203 ]] --[[ Name: getGCOverhead ]]
-    -- upvalues: v97 (copy)
-    local v103 = v100.Nodes[v101];
-    local v104 = 0;
-    if v103.Children then
-        for v105, v106 in pairs(v103.Children) do
-            local v107 = nil;
-            v107 = if v105 == v102 then v100.Nodes[v106].TotalDuration else v97(v98, v99, v100, v106, v102);
-            v98[v105] = v98[v105] + v107;
-            v99[v106] = v107;
-            v104 = v104 + v107;
-        end;
-    end;
-    return v104;
-end;
-local function v117(v108) --[[ Line: 231 ]] --[[ Name: generateGCOverheadOffsets ]]
-    -- upvalues: v97 (copy)
-    if v108 and v108.GCFuncId then
-        local l_GCFuncId_0 = v108.GCFuncId;
-        local v110 = table.create(#v108.Functions, 0);
-        local v111 = table.create(#v108.Nodes, 0);
-        local v112 = 0;
-        for _, v114 in v108.Categories do
-            local l_NodeId_1 = v114.NodeId;
-            local v116 = v97(v110, v111, v108, l_NodeId_1, l_GCFuncId_0);
-            v112 = v112 + v116;
-            v111[l_NodeId_1] = v116;
-        end;
-        v111.Total = v112;
-        return v110, v111;
-    else
-        return {}, {};
-    end;
-end;
-v40.getActiveState = function(v118) --[[ Line: 259 ]] --[[ Name: getActiveState ]]
-    local l_isClientView_0 = v118.props.isClientView;
-    if v118.props.isClientView then
-        return l_isClientView_0, v118.props.client;
-    else
-        return l_isClientView_0, v118.props.server;
-    end;
-end;
-v40.getState = function(v120, v121) --[[ Line: 263 ]] --[[ Name: getState ]]
-    if v121 then
-        return v120.props.client;
-    else
-        return v120.props.server;
-    end;
-end;
-v40.UpdateState = function(v122, v123, v124) --[[ Line: 267 ]] --[[ Name: UpdateState ]]
-    if v123 then
-        v122.props.dispatchSetScriptProfilerState(nil, nil, v124, nil);
-        return;
-    else
-        v122.props.dispatchSetScriptProfilerState(nil, nil, nil, v124);
-        return;
-    end;
-end;
-local function v132(v125, v126, v127) --[[ Line: 275 ]] --[[ Name: OnNewProfilingData ]]
-    -- upvalues: l_ScriptProfilerService_0 (copy), v117 (copy), v41 (copy), v96 (copy)
-    v125.serializedData = v127;
-    v125.data = l_ScriptProfilerService_0:DeserializeJSON(v127);
-    local v128, v129 = v117(v125.data);
-    v125.gcFunctionOffsets = v128;
-    v125.gcNodeOffsets = v129;
-    if v41 then
-        v128, v129 = v96(v125.gcNodeOffsets, v125.data);
-        v125.pluginOffsets = v128;
-        v125.pluginGCOffsets = v129;
-    end;
-    v128 = if v125.data then #v125.data.Nodes else 0;
-    v129 = if v126.data then #v126.data.Nodes else 0;
-    local v130 = table.create(v128, false);
-    local l_expandedNodes_0 = v126.expandedNodes;
-    table.move(l_expandedNodes_0, 1, v129, 1, v130);
-    v125.expandedNodes = v130;
-end;
-v40.init = function(v133) --[[ Line: 293 ]] --[[ Name: init ]]
-    -- upvalues: l_ScriptProfilerService_0 (copy), l_Players_0 (copy), v42 (copy), v80 (copy), v1 (copy)
-    local function _(v134, v135) --[[ Line: 294 ]] --[[ Name: StartScriptProfiling ]]
-        -- upvalues: l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        if v134 then
-            l_ScriptProfilerService_0:ClientStart(l_Players_0.LocalPlayer, v135.frequency);
-            return;
-        else
-            l_ScriptProfilerService_0:ServerStart(v135.frequency);
-            return;
-        end;
-    end;
-    local function _(v137) --[[ Line: 302 ]] --[[ Name: StopScriptProfiling ]]
-        -- upvalues: l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        if v137 then
-            l_ScriptProfilerService_0:ClientStop(l_Players_0.LocalPlayer);
-        else
-            l_ScriptProfilerService_0:ServerStop();
-        end;
-        return nil;
-    end;
-    local function _(v139) --[[ Line: 311 ]] --[[ Name: RequestNewData ]]
-        -- upvalues: l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        if v139 then
-            l_ScriptProfilerService_0:ClientRequestData(l_Players_0.LocalPlayer);
-            return;
-        else
-            l_ScriptProfilerService_0:ServerRequestData();
-            return;
-        end;
-    end;
-    local _ = function(v141) --[[ Line: 319 ]] --[[ Name: StopTimedProfiling ]]
-        -- upvalues: v133 (copy), l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        if v133:getState(v141).isProfiling then
-            if v141 then
-                l_ScriptProfilerService_0:ClientStop(l_Players_0.LocalPlayer);
-            else
-                l_ScriptProfilerService_0:ServerStop();
-            end;
-            local _ = nil;
-            v133.props.dispatchSetIsProfiling(v141, false);
-            if v141 then
-                l_ScriptProfilerService_0:ClientRequestData(l_Players_0.LocalPlayer);
-                return;
-            else
-                l_ScriptProfilerService_0:ServerRequestData();
-            end;
-        end;
-    end;
-    v133.onUtilTabHeightChanged = function(v144) --[[ Line: 331 ]]
-        -- upvalues: v133 (copy)
-        v133:setState({
-            utilTabHeight = v144
-        });
-    end;
-    local function v147(v145) --[[ Line: 337 ]] --[[ Name: UpdateTimedProfilingTimer ]]
-        -- upvalues: v133 (copy)
-        while task.wait(0.5) do
-            local l_timedProfilingCountdown_0 = v133:getState(v145).timedProfilingCountdown;
-            if l_timedProfilingCountdown_0 > 0 then
-                v133.props.dispatchSetTimer(v145, {
-                    timedProfilingCountdown = l_timedProfilingCountdown_0 - 0.5
-                });
-            else
-                break;
-            end;
-        end;
-    end;
-    local function v149(v148) --[[ Line: 352 ]] --[[ Name: LiveUpdate ]]
-        -- upvalues: v42 (ref), v133 (copy), l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        while task.wait(v42 / 1000) do
-            if v133:getState(v148).liveUpdate then
-                if v148 then
-                    l_ScriptProfilerService_0:ClientRequestData(l_Players_0.LocalPlayer);
-                else
-                    l_ScriptProfilerService_0:ServerRequestData();
-                end;
-            end;
-        end;
-    end;
-    v133.onBeginProfile = function() --[[ Line: 362 ]]
-        -- upvalues: v133 (copy), l_ScriptProfilerService_0 (ref), l_Players_0 (ref), v147 (copy), v149 (copy)
-        local v150, v151 = v133:getActiveState();
-        if v150 then
-            l_ScriptProfilerService_0:ClientStart(l_Players_0.LocalPlayer, v151.frequency);
-        else
-            l_ScriptProfilerService_0:ServerStart(v151.frequency);
-        end;
-        v133.props.dispatchSetIsProfiling(v150, true);
-        v133.props.dispatchClearStateForNewSession(v150);
-        local v152 = {};
-        if v151.timedProfilingDuration > 0 then
-            v133.props.dispatchSetTimer(v150, {
-                timedProfilingCountdown = v151.timedProfilingDuration
-            });
-            v152.timedProfilingThread = task.delay(v151.timedProfilingDuration, function() --[[ Line: 375 ]]
-                -- upvalues: v150 (copy), v133 (ref), l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-                local l_v150_0 = v150;
-                if v133:getState(l_v150_0).isProfiling then
-                    if l_v150_0 then
-                        l_ScriptProfilerService_0:ClientStop(l_Players_0.LocalPlayer);
-                    else
-                        l_ScriptProfilerService_0:ServerStop();
-                    end;
-                    local _ = nil;
-                    v133.props.dispatchSetIsProfiling(l_v150_0, false);
-                    if l_v150_0 then
-                        l_ScriptProfilerService_0:ClientRequestData(l_Players_0.LocalPlayer);
-                        return;
-                    else
-                        l_ScriptProfilerService_0:ServerRequestData();
-                    end;
-                end;
-            end);
-            v152.timedProfilingTimerThread = task.spawn(function() --[[ Line: 379 ]]
-                -- upvalues: v147 (ref), v150 (copy)
-                v147(v150);
-            end);
-        end;
-        v152.liveUpdateThread = task.spawn(v149, v150);
-        v133.props.dispatchSetThreads(v150, v152);
-    end;
-    v133.onEndProfile = function() --[[ Line: 389 ]]
-        -- upvalues: v133 (copy), l_ScriptProfilerService_0 (ref), l_Players_0 (ref)
-        local v155, v156 = v133:getActiveState();
-        if v155 then
-            l_ScriptProfilerService_0:ClientStop(l_Players_0.LocalPlayer);
-        else
-            l_ScriptProfilerService_0:ServerStop();
-        end;
-        local _ = nil;
-        local v158 = {};
-        if v156.timedProfilingThread then
-            task.cancel(v156.timedProfilingThread);
-            v158.timedProfilingThread = nil;
-        end;
-        if v156.timedProfilingTimerThread then
-            task.cancel(v156.timedProfilingTimerThread);
-            v158.timedProfilingTimerThread = nil;
-        end;
-        if v156.liveUpdateThread then
-            task.cancel(v156.liveUpdateThread);
-            v158.liveUpdateThread = nil;
-        end;
-        v133.props.dispatchSetThreads(v155, {});
-        v133.props.dispatchSetIsProfiling(v155, false);
-        if v155 then
-            l_ScriptProfilerService_0:ClientRequestData(l_Players_0.LocalPlayer);
-            return;
-        else
-            l_ScriptProfilerService_0:ServerRequestData();
-            return;
-        end;
-    end;
-    v133.toggleTimedProfiling = function() --[[ Line: 417 ]]
-        -- upvalues: v133 (copy)
-        local v159, v160 = v133:getActiveState();
-        local l_timedProfilingDuration_0 = v160.timedProfilingDuration;
-        l_timedProfilingDuration_0 = l_timedProfilingDuration_0 == 0 and 60 or l_timedProfilingDuration_0 == 60 and 300 or l_timedProfilingDuration_0 == 300 and 600 or 0;
-        v133.props.dispatchSetTimer(v159, {
-            timedProfilingDuration = l_timedProfilingDuration_0
-        });
-    end;
-    v133.toggleAverage = function() --[[ Line: 435 ]]
-        -- upvalues: v133 (copy)
-        local v162, v163 = v133:getActiveState();
-        local l_average_0 = v163.average;
-        l_average_0 = l_average_0 == 0 and 1 or l_average_0 == 1 and 60 or l_average_0 == 60 and 300 or l_average_0 == 300 and 600 or 0;
-        v133.props.dispatchSetAverage(v162, l_average_0);
-    end;
-    v133.toggleUnits = function() --[[ Line: 455 ]]
-        -- upvalues: v133 (copy)
-        v133.props.dispatchSetScriptProfilerState(nil, not v133.props.usePercentages, nil, nil);
-    end;
-    v133.toggleFrequency = function() --[[ Line: 459 ]]
-        -- upvalues: v133 (copy)
-        local v165, v166 = v133:getActiveState();
-        local v167 = v166.frequency == 1000 and 10000 or 1000;
-        v133.props.dispatchSetFrequency(v165, v167);
-    end;
-    v133.onClientButton = function() --[[ Line: 473 ]]
-        -- upvalues: v133 (copy)
-        v133.props.dispatchSetScriptProfilerState(true);
-    end;
-    v133.onServerButton = function() --[[ Line: 477 ]]
-        -- upvalues: v133 (copy)
-        v133.props.dispatchSetScriptProfilerState(false);
-    end;
-    v133.dataViewDropDownCallback = function(v168) --[[ Line: 481 ]]
-        -- upvalues: v133 (copy)
-        local v169, v170 = v133:getActiveState();
-        local l_isFunctionsView_0 = v170.isFunctionsView;
-        if v168 == 1 then
-            l_isFunctionsView_0 = false;
-        elseif v168 == 2 then
-            l_isFunctionsView_0 = true;
-        end;
-        v133.props.dispatchSetDataView(v169, l_isFunctionsView_0);
-    end;
-    v133.onCheckboxChanged = function(v172, v173) --[[ Line: 495 ]]
-        -- upvalues: v133 (copy)
-        local l_isClientView_1 = v133.props.isClientView;
-        if v172 == "Live" then
-            v133.props.dispatchSetLiveUpdate(l_isClientView_1, v173);
-            return;
-        elseif v172 == "Plugins" then
-            v133.props.dispatchSetShowPlugins(l_isClientView_1, v173);
-            return;
-        else
-            if v172 == "GC" then
-                v133.props.dispatchSetShowGC(l_isClientView_1, v173);
-            end;
-            return;
-        end;
-    end;
-    v133.onSearchTermChanged = function(v175) --[[ Line: 507 ]]
-        -- upvalues: v133 (copy), v80 (ref)
-        local v176, v177 = v133:getActiveState();
-        local v178, v179 = v80(v177, v175);
-        v133.props.dispatchSetSearchData(v176, {
-            searchTerm = v175, 
-            searchFilterFlat = v178 or {}, 
-            searchFilterGraph = v179 or {}
-        });
-    end;
-    v133.utilRef = v1.createRef();
-    v133.state = {
-        utilTabHeight = 0
-    };
-end;
-v40.didMount = function(v180) --[[ Line: 525 ]] --[[ Name: didMount ]]
-    -- upvalues: l_ScriptProfilerService_0 (copy), v132 (copy)
-    v180:setState({
-        utilTabHeight = v180.utilRef.current.Size.Y.Offset
-    });
-    v180.scriptProfilerConnection = l_ScriptProfilerService_0.OnNewData:Connect(function(v181, v182) --[[ Line: 531 ]]
-        -- upvalues: v180 (copy), v132 (ref)
-        local v183 = v181 ~= nil;
-        local v184 = v180:getState(v183);
-        local v185 = {};
-        v132(v185, v184, v182);
-        v180.props.dispatchSetData(v183, v185);
-    end);
-end;
-v40.willUnmount = function(v186) --[[ Line: 543 ]] --[[ Name: willUnmount ]]
-    v186.scriptProfilerConnection:Disconnect();
-    v186.scriptProfilerConnection = nil;
-end;
-v40.didUpdate = function(v187) --[[ Line: 548 ]] --[[ Name: didUpdate ]]
-    local l_Size_0 = v187.utilRef.current.Size;
-    if l_Size_0.Y.Offset ~= v187.state.utilTabHeight then
-        v187:setState({
-            utilTabHeight = l_Size_0.Y.Offset
-        });
-    end;
-end;
-local function _(v189) --[[ Line: 557 ]] --[[ Name: formatTimer ]]
-    -- upvalues: v15 (copy)
-    local v190 = v15.formatTimer(v189);
-    if v190 ~= "" then
-        return ": " .. v190;
-    else
-        return v190;
-    end;
-end;
-v40.renderUtilButtons = function(v192, v193, v194, v195) --[[ Line: 567 ]] --[[ Name: renderUtilButtons ]]
-    -- upvalues: v1 (copy), v8 (copy), l_formatFrequency_0 (copy), l_MainWindowHeader_1 (copy), l_Text_0 (copy), l_MainWindowHeader_0 (copy), v33 (copy), l_UnselectedGray_0 (copy), v15 (copy), v9 (copy), l_SmallFrameHeight_0 (copy), v43 (copy)
-    local l_isProfiling_0 = v193.isProfiling;
-    local v197 = {};
-    table.insert(v197, v1.createElement(v8, {
-        text = l_isProfiling_0 and "Stop" or "Start", 
-        onClicked = l_isProfiling_0 and v192.onEndProfile or v192.onBeginProfile
-    }));
-    if not v195 then
-        table.insert(v197, v1.createElement(v8, {
-            text = v192.props.usePercentages and "Unit: %" or "Unit: ms", 
-            onClicked = v192.toggleUnits
-        }));
-    end;
-    if not v195 then
-        table.insert(v197, v1.createElement("TextButton", {
-            Text = "Freq: " .. l_formatFrequency_0(v193.frequency), 
-            TextSize = l_MainWindowHeader_1, 
-            TextColor3 = l_Text_0, 
-            Font = l_MainWindowHeader_0, 
-            AutoButtonColor = true, 
-            BackgroundColor3 = if l_isProfiling_0 then v33.Color.InactiveBox else l_UnselectedGray_0, 
-            BackgroundTransparency = 0, 
-            [v1.Event.Activated] = function() --[[ Line: 608 ]]
-                -- upvalues: l_isProfiling_0 (copy), v192 (copy)
-                if not l_isProfiling_0 then
-                    v192.toggleFrequency();
-                end;
-            end
-        }));
-    end;
-    if not v195 then
-        local l_v197_0 = v197;
-        local l_createElement_0 = v1.createElement;
-        local v200 = "TextButton";
-        local v201 = {};
-        local v202 = "Time";
-        local v203 = if l_isProfiling_0 then v193.timedProfilingCountdown else v193.timedProfilingDuration;
-        local v204 = v15.formatTimer(v203);
-        v201.Text = v202 .. if v204 ~= "" then ": " .. v204 else v204;
-        v201.TextSize = l_MainWindowHeader_1;
-        v201.TextColor3 = l_Text_0;
-        v201.Font = l_MainWindowHeader_0;
-        v201.AutoButtonColor = true;
-        v201.BackgroundColor3 = if l_isProfiling_0 then v33.Color.InactiveBox else l_UnselectedGray_0;
-        v201.BackgroundTransparency = 0;
-        v201[v1.Event.Activated] = function() --[[ Line: 631 ]]
-            -- upvalues: l_isProfiling_0 (copy), v192 (copy)
-            if not l_isProfiling_0 then
-                v192.toggleTimedProfiling();
-            end;
-        end;
-        table.insert(l_v197_0, l_createElement_0(v200, v201));
-    end;
-    if not v195 then
-        local l_v197_1 = v197;
-        local l_createElement_1 = v1.createElement;
-        local v207 = "TextButton";
-        local v208 = {};
-        local v209 = "Average";
-        local l_average_1 = v193.average;
-        local v211 = v15.formatTimer(l_average_1);
-        v208.Text = v209 .. if v211 ~= "" then ": " .. v211 else v211;
-        v208.TextSize = l_MainWindowHeader_1;
-        v208.TextColor3 = l_Text_0;
-        v208.Font = l_MainWindowHeader_0;
-        v208.AutoButtonColor = true;
-        v208.BackgroundColor3 = if l_isProfiling_0 then v33.Color.InactiveBox else l_UnselectedGray_0;
-        v208.BackgroundTransparency = 0;
-        v208[v1.Event.Activated] = function() --[[ Line: 653 ]]
-            -- upvalues: l_isProfiling_0 (copy), v192 (copy)
-            if not l_isProfiling_0 then
-                v192.toggleAverage();
-            end;
-        end;
-        table.insert(l_v197_1, l_createElement_1(v207, v208));
-    end;
-    if not v195 then
-        table.insert(v197, v1.createElement(v8, {
-            text = "Export", 
-            onClicked = v192.props.dispatchStartExport
-        }));
-    end;
-    if not v195 then
-        table.insert(v197, v1.createElement(v9, {
-            buttonSize = UDim2.new(0, 100, 0, l_SmallFrameHeight_0), 
-            dropDownList = v43, 
-            selectedIndex = v193.isFunctionsView and 2 or 1, 
-            onSelection = v192.dataViewDropDownCallback
-        }));
-    end;
-    if v194 then
-        table.insert(v197, v1.createElement(v8, {
-            text = "More...", 
-            onClicked = function() --[[ Line: 689 ]] --[[ Name: onClicked ]]
-                -- upvalues: v192 (copy)
-                v192.props.dispatchShowMobileSettings();
-            end
-        }));
-    end;
-    return v197;
-end;
-v40.renderUtilAndTab = function(v212, v213, v214) --[[ Line: 699 ]] --[[ Name: renderUtilAndTab ]]
-    -- upvalues: v1 (copy), v7 (copy), v5 (copy)
-    local l_size_0 = v212.props.size;
-    local l_formFactor_0 = v212.props.formFactor;
-    local l_tabList_0 = v212.props.tabList;
-    return v1.createElement(v7, v5.JoinDictionaries({
-        windowWidth = l_size_0.X.Offset, 
-        formFactor = l_formFactor_0, 
-        tabList = l_tabList_0, 
-        layoutOrder = 1, 
-        refForParent = v212.utilRef, 
-        onHeightChanged = v212.onUtilTabHeightChanged
-    }, v213), v214);
-end;
-v40.renderExportView = function(v218) --[[ Line: 719 ]] --[[ Name: renderExportView ]]
-    -- upvalues: v1 (copy), v33 (copy), l_MainRowPadding_0 (copy), v8 (copy), v13 (copy)
-    local l_size_1 = v218.props.size;
-    local l_utilTabHeight_0 = v218.state.utilTabHeight;
-    return v1.createElement("Frame", {
-        Size = l_size_1, 
-        BackgroundColor3 = v33.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 3
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, l_MainRowPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        UtilAndTab = v218:renderUtilAndTab({}, {
-            v1.createElement(v8, {
-                text = "Exit", 
-                onClicked = v218.props.dispatchFinishedExporting
-            })
-        }), 
-        ExportView = v1.createElement(v13, {
-            size = UDim2.new(1, 0, 1, -l_utilTabHeight_0)
-        })
-    });
-end;
-v40.renderMobileSettingsUI = function(v221) --[[ Line: 748 ]] --[[ Name: renderMobileSettingsUI ]]
-    -- upvalues: v1 (copy), v33 (copy), l_MainRowPadding_0 (copy), v8 (copy), v14 (copy)
-    local l_size_2 = v221.props.size;
-    local l_utilTabHeight_1 = v221.state.utilTabHeight;
-    return v1.createElement("Frame", {
-        Size = l_size_2, 
-        BackgroundColor3 = v33.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 3
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, l_MainRowPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        UtilAndTab = v221:renderUtilAndTab({}, {
-            v1.createElement(v8, {
-                text = "Export", 
-                onClicked = v221.props.dispatchStartExport
-            }), 
-            v1.createElement(v8, {
-                text = "Exit", 
-                onClicked = v221.props.dispatchHideMobileSettings
-            })
-        }), 
-        MobileSettingsView = v1.createElement(v14, {
-            size = UDim2.new(1, 0, 1, -l_utilTabHeight_1)
-        })
-    });
-end;
-v40.renderProfilerView = function(v224, v225, v226, v227, v228) --[[ Line: 783 ]] --[[ Name: renderProfilerView ]]
-    -- upvalues: v1 (copy), v33 (copy), l_MainRowPadding_0 (copy), v11 (copy), v10 (copy), v41 (copy)
-    local l_isProfiling_1 = v226.isProfiling;
-    local l_data_1 = v226.data;
-    local l_usePercentages_0 = v224.props.usePercentages;
-    local l_isFunctionsView_1 = v226.isFunctionsView;
-    local l_rootNode_0 = v226.rootNode;
-    local l_rootNodeName_0 = v226.rootNodeName;
-    local l_rootFunc_0 = v226.rootFunc;
-    local l_size_3 = v224.props.size;
-    local l_utilTabHeight_2 = v224.state.utilTabHeight;
-    local v238 = nil;
-    if l_data_1 and l_data_1.SessionStartTime and l_data_1.SessionEndTime then
-        v238 = l_data_1.SessionEndTime - l_data_1.SessionStartTime;
-    end;
-    return v1.createElement("Frame", {
-        Size = l_size_3, 
-        BackgroundColor3 = v33.Color.BaseGray, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 3
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            Padding = UDim.new(0, l_MainRowPadding_0), 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        UtilAndTab = v224:renderUtilAndTab({
-            isClientView = v225, 
-            onClientButton = v224.onClientButton, 
-            onServerButton = v224.onServerButton, 
-            orderedCheckboxState = v228, 
-            onCheckboxChanged = v224.onCheckboxChanged, 
-            onSearchTermChanged = v224.onSearchTermChanged, 
-            searchTerm = v226.searchTerm
-        }, v227), 
-        ProfilerView = v1.createElement(if l_isFunctionsView_1 then v11 else v10, {
-            size = UDim2.new(1, 0, 1, -l_utilTabHeight_2), 
-            searchFilter = if l_isFunctionsView_1 then v226.searchFilterFlat else v226.searchFilterGraph, 
-            layoutOrder = 2, 
-            data = l_data_1, 
-            profiling = l_isProfiling_1, 
-            showAsPercentages = l_usePercentages_0, 
-            sessionLength = v238, 
-            rootNode = l_rootNode_0, 
-            rootFunc = l_rootFunc_0, 
-            rootNodeName = l_rootNodeName_0, 
-            average = v226.average, 
-            showPlugins = v226.showPlugins or not v41, 
-            pluginOffsets = v226.pluginOffsets, 
-            showGC = v226.showGC, 
-            gcFunctionOffsets = v226.gcFunctionOffsets, 
-            gcNodeOffsets = v226.gcNodeOffsets, 
-            pluginGCOffsets = v226.pluginGCOffsets, 
-            expandedNodes = if l_isFunctionsView_1 then nil else v226.expandedNodes
-        })
-    });
-end;
-v40.render = function(v239) --[[ Line: 847 ]] --[[ Name: render ]]
-    -- upvalues: v33 (copy), v41 (copy)
-    if v239.props.isExporting then
-        return v239:renderExportView();
-    elseif v239.props.isShowingMobileSettings then
-        return v239:renderMobileSettingsUI();
-    else
-        local l_formFactor_1 = v239.props.formFactor;
-        local v241, v242 = v239:getActiveState();
-        local v243 = {};
-        local v244 = 1;
-        local v245 = l_formFactor_1 == v33.FormFactor.Small;
-        if not v245 then
-            v243[1] = {
-                name = "Live", 
-                state = v242.liveUpdate
-            };
-            if v41 then
-                v244 = v244 + 1;
-                v243[v244] = {
-                    name = "Plugins", 
-                    state = v242.showPlugins
-                };
-            end;
-            v243[v244 + 1] = {
-                name = "GC", 
-                state = v242.showGC
-            };
-        end;
-        return v239:renderProfilerView(v241, v242, v239:renderUtilButtons(v242, v245, v245), v243);
-    end;
-end;
-return v2.UNSTABLE_connect2(function(v246, _) --[[ Line: 882 ]] --[[ Name: mapStateToProps ]]
-    return {
-        isClientView = v246.ScriptProfiler.isClientView, 
-        usePercentages = v246.ScriptProfiler.usePercentages, 
-        isExporting = v246.ScriptProfiler.isExporting, 
-        isShowingMobileSettings = v246.ScriptProfiler.isShowingMobileSettings, 
-        client = v246.ScriptProfiler.client, 
-        server = v246.ScriptProfiler.server
-    };
-end, function(v248) --[[ Line: 894 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v20 (copy), v21 (copy), v22 (copy), v23 (copy), v24 (copy), v25 (copy), v26 (copy), v27 (copy), v28 (copy), v29 (copy), v30 (copy), v31 (copy), v32 (copy)
-    return {
-        dispatchSetScriptProfilerState = function(v249, v250, v251, v252) --[[ Line: 896 ]] --[[ Name: dispatchSetScriptProfilerState ]]
-            -- upvalues: v248 (copy), v20 (ref)
-            v248(v20(v249, v250, v251, v252));
-        end, 
-        dispatchSetIsProfiling = function(v253, v254) --[[ Line: 900 ]] --[[ Name: dispatchSetIsProfiling ]]
-            -- upvalues: v248 (copy), v21 (ref)
-            v248(v21(v253, v254));
-        end, 
-        dispatchSetData = function(v255, v256) --[[ Line: 904 ]] --[[ Name: dispatchSetData ]]
-            -- upvalues: v248 (copy), v22 (ref)
-            v248(v22(v255, v256));
-        end, 
-        dispatchSetThreads = function(v257, v258) --[[ Line: 908 ]] --[[ Name: dispatchSetThreads ]]
-            -- upvalues: v248 (copy), v23 (ref)
-            v248(v23(v257, v258));
-        end, 
-        dispatchSetTimer = function(v259, v260) --[[ Line: 912 ]] --[[ Name: dispatchSetTimer ]]
-            -- upvalues: v248 (copy), v24 (ref)
-            v248(v24(v259, v260));
-        end, 
-        dispatchClearStateForNewSession = function(v261) --[[ Line: 916 ]] --[[ Name: dispatchClearStateForNewSession ]]
-            -- upvalues: v248 (copy), v25 (ref)
-            v248(v25(v261));
-        end, 
-        dispatchSetAverage = function(v262, v263) --[[ Line: 920 ]] --[[ Name: dispatchSetAverage ]]
-            -- upvalues: v248 (copy), v26 (ref)
-            v248(v26(v262, v263));
-        end, 
-        dispatchSetFrequency = function(v264, v265) --[[ Line: 924 ]] --[[ Name: dispatchSetFrequency ]]
-            -- upvalues: v248 (copy), v27 (ref)
-            v248(v27(v264, v265));
-        end, 
-        dispatchSetDataView = function(v266, v267) --[[ Line: 928 ]] --[[ Name: dispatchSetDataView ]]
-            -- upvalues: v248 (copy), v28 (ref)
-            v248(v28(v266, v267));
-        end, 
-        dispatchSetLiveUpdate = function(v268, v269) --[[ Line: 932 ]] --[[ Name: dispatchSetLiveUpdate ]]
-            -- upvalues: v248 (copy), v29 (ref)
-            v248(v29(v268, v269));
-        end, 
-        dispatchSetShowPlugins = function(v270, v271) --[[ Line: 936 ]] --[[ Name: dispatchSetShowPlugins ]]
-            -- upvalues: v248 (copy), v30 (ref)
-            v248(v30(v270, v271));
-        end, 
-        dispatchSetShowGC = function(v272, v273) --[[ Line: 940 ]] --[[ Name: dispatchSetShowGC ]]
-            -- upvalues: v248 (copy), v31 (ref)
-            v248(v31(v272, v273));
-        end, 
-        dispatchSetSearchData = function(v274, v275) --[[ Line: 944 ]] --[[ Name: dispatchSetSearchData ]]
-            -- upvalues: v248 (copy), v32 (ref)
-            v248(v32(v274, v275));
-        end, 
-        dispatchStartExport = function() --[[ Line: 948 ]] --[[ Name: dispatchStartExport ]]
-            -- upvalues: v248 (copy), v20 (ref)
-            v248(v20(nil, nil, nil, nil, true));
-        end, 
-        dispatchFinishedExporting = function() --[[ Line: 952 ]] --[[ Name: dispatchFinishedExporting ]]
-            -- upvalues: v248 (copy), v20 (ref)
-            v248(v20(nil, nil, nil, nil, false));
-        end, 
-        dispatchShowMobileSettings = function() --[[ Line: 956 ]] --[[ Name: dispatchShowMobileSettings ]]
-            -- upvalues: v248 (copy), v20 (ref)
-            v248(v20(nil, nil, nil, nil, nil, true));
-        end, 
-        dispatchHideMobileSettings = function() --[[ Line: 960 ]] --[[ Name: dispatchHideMobileSettings ]]
-            -- upvalues: v248 (copy), v20 (ref)
-            v248(v20(nil, nil, nil, nil, nil, false));
-        end
-    };
-end)(v40);
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ScriptProfilerService = game:GetService("ScriptProfilerService")
+local Players = game:GetService("Players")
+local Immutable = require(script.Parent.Parent.Parent.Immutable)
+local Components = script.Parent.Parent.Parent.Components
+local UtilAndTab = require(Components.UtilAndTab)
+local BoxButton = require(Components.BoxButton)
+local DropDown = require(Components.DropDown)
+local ProfilerView = require(script.Parent.ProfilerView)
+local ProfilerFunctionsView = require(script.Parent.ProfilerFunctionsView)
+
+require(script.Parent.ProfilerDataFormatV2)
+
+local ProfilerExportView = require(script.Parent.ProfilerExportView)
+local MobileSettingsView = require(script.Parent.MobileSettingsView)
+local ProfilerUtil = require(script.Parent.ProfilerUtil)
+local getPluginFlag = ProfilerUtil.getPluginFlag
+local getDurations = ProfilerUtil.getDurations
+local formatFrequency = ProfilerUtil.formatFrequency
+local Actions = script.Parent.Parent.Parent.Actions
+local SetScriptProfilerState = require(Actions.SetScriptProfilerState)
+local SetIsProfiling = require(script.Parent.Actions.SetIsProfiling)
+local SetData = require(script.Parent.Actions.SetData)
+local SetThreads = require(script.Parent.Actions.SetThreads)
+local SetTimerState = require(script.Parent.Actions.SetTimerState)
+local ClearStateForNewProfilingSession = require(script.Parent.Actions.ClearStateForNewProfilingSession)
+local SetAverage = require(script.Parent.Actions.SetAverage)
+local SetFrequency = require(script.Parent.Actions.SetFrequency)
+local SetDataView = require(script.Parent.Actions.SetDataView)
+local SetLiveUpdate = require(script.Parent.Actions.SetLiveUpdate)
+local SetShowPlugins = require(script.Parent.Actions.SetShowPlugins)
+local SetShowGC = require(script.Parent.Actions.SetShowGC)
+local SetSearchData = require(script.Parent.Actions.SetSearchData)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local MainRowPadding = Constants.GeneralFormatting.MainRowPadding
+local SmallFrameHeight = Constants.UtilityBarFormatting.SmallFrameHeight
+local MainWindowHeader = Constants.Font.MainWindowHeader
+local MainWindowHeader2 = Constants.DefaultFontSize.MainWindowHeader
+local ColorText = Constants.Color.Text
+local UnselectedGray = Constants.Color.UnselectedGray
+local v40 = Roact.PureComponent:extend("MainViewScriptProfiler")
+local v41 = game:DefineFastFlag("ScriptProfilerShowPlugins2", false)
+local v42 = game:DefineFastInt("ScriptProfilerLiveUpdateIntervalMS", 1000)
+local t1 = {
+	"Callgraph",
+	"Functions"
+}
+
+local function annotateSearchFilterNodes(p1, t2: {[any]: any}, t3: {[any]: any}, n1: number, n2: number, b1: boolean) -- line: 64
+	-- upvalues: annotateSearchFilterNodes (copy)
+	local v59 = p1.Nodes[n2]
+
+	if not v59.Children then
+		t3[n2] = n1 > 0 and t2[n1] or b1
+
+		return n1 > 0 and t2[n1]
+	end
+
+	local Children = v59.Children
+	local v61 = false
+
+	if n1 > 0 and t2[n1] then
+		t3[n2] = true
+
+		for k, v in pairs(Children) do
+			t3[v] = true
+			annotateSearchFilterNodes(p1, t2, t3, k, v, true)
+		end
+
+		return true
+	end
+
+	for k, v in pairs(Children) do
+		local v66 = annotateSearchFilterNodes(p1, t2, t3, k, v, b1)
+
+		v61 = v61 or v66
+	end
+
+	if v61 or b1 then
+		t3[n2] = true
+	end
+
+	return v61
+end
+local function generateSearchFilters(p2, s1: string) -- line: 109
+	-- upvalues: ProfilerUtil (copy), annotateSearchFilterNodes (copy)
+	if s1 == "" then
+		return nil, nil
+	end
+
+	local data = p2.data
+
+	if not data then
+		return nil, nil
+	end
+
+	local t4 = table.create(#data.Functions, false)
+
+	for v71, v72 in data.Functions do
+		local v73 = ProfilerUtil.getName(data, v72)
+
+		if v73 and string.find(v73, s1, 1, true) then
+			t4[v71] = true
+		end
+	end
+
+	local t5 = table.create(#data.Nodes, false)
+
+	for _, v76 in data.Categories do
+		local NodeId = v76.NodeId
+		local v78 = data.Nodes[NodeId]
+
+		if not v78.Children then
+			t5[NodeId] = false
+		else
+			local Children = v78.Children
+			local v80 = false
+
+			for k, v in pairs(Children) do
+				local v83 = annotateSearchFilterNodes(data, t4, t5, k, v, false)
+
+				v80 = v80 or v83
+			end
+
+			if v80 then
+				t5[NodeId] = true
+			end
+		end
+	end
+
+	for v84, v85 in data.Functions do
+		if t4[v84] ~= true and not ProfilerUtil.getName(data, v85) then
+			local v86 = ProfilerUtil.getSourceName(data, v85)
+
+			if v86 and string.find(v86, s1, 1, true) then
+				t4[v84] = true
+			end
+		end
+	end
+
+	return t4, t5
+end
+local function generatePluginDurationOffsets(t6: {[any]: any}, p3) -- line: 153
+	-- upvalues: getPluginFlag (copy), getDurations (copy)
+	if p3 then
+		assert(p3.Version == 2)
+
+		local t7 = table.create(#p3.Categories, 0)
+		local t8 = table.create(#p3.Categories, 0)
+		local n3 = 0
+		local n4 = 0
+
+		for v93, v94 in p3.Categories do
+			local n5 = 0
+			local n6 = 0
+			local Children = p3.Nodes[v94.NodeId].Children
+
+			if Children then
+				for k, v in pairs(Children) do
+					local _ = p3.Functions[k]
+
+					if getPluginFlag(p3, p3.Functions[k]) then
+						n5 += getDurations(p3, v)
+
+						if #t6 > 0 then
+							n6 += t6[v]
+						end
+					end
+				end
+			end
+
+			t7[v93] = n5
+			t8[v93] = n6
+			n3 += n5
+			n4 += n6
+		end
+
+		t7.Total = n3
+		t8.Total = n3
+
+		return t7, t8
+	end
+
+	return {}, {}
+end
+local function getGCOverhead(t9: {[any]: any}, t10: {[any]: any}, p4, p5, p6) -- line: 203
+	-- upvalues: getGCOverhead (copy)
+	local v106 = p4.Nodes[p5]
+	local n7 = 0
+
+	if v106.Children then
+		for k, v in pairs(v106.Children) do
+			local v110 = if k ~= p6 then getGCOverhead(t9, t10, p4, v, p6) else p4.Nodes[v].TotalDuration
+
+			t9[k] = t9[k] + v110
+			t10[v] = v110
+			n7 += v110
+		end
+	end
+
+	return n7
+end
+local function generateGCOverheadOffsets(p7) -- line: 231
+	-- upvalues: getGCOverhead (copy)
+	if p7 and p7.GCFuncId then
+		local GCFuncId = p7.GCFuncId
+		local t11 = table.create(#p7.Functions, 0)
+		local t12 = table.create(#p7.Nodes, 0)
+		local n8 = 0
+
+		for _, v117 in p7.Categories do
+			local NodeId = v117.NodeId
+			local v119 = getGCOverhead(t11, t12, p7, NodeId, GCFuncId)
+
+			n8 += v119
+			t12[NodeId] = v119
+		end
+
+		t12.Total = n8
+
+		return t11, t12
+	end
+
+	return {}, {}
+end
+
+function v40.getActiveState(p8) -- line: 259
+	local isClientView = p8.props.isClientView
+
+	if p8.props.isClientView then
+		return isClientView, p8.props.client
+	end
+
+	return isClientView, p8.props.server
+end
+function v40.getState(p9, p10) -- line: 263
+	if p10 then
+		return p9.props.client
+	end
+
+	return p9.props.server
+end
+function v40.UpdateState(p11, p12, p13) -- line: 267
+	if p12 then
+		p11.props.dispatchSetScriptProfilerState(nil, nil, p13, nil)
+
+		return
+	end
+
+	p11.props.dispatchSetScriptProfilerState(nil, nil, nil, p13)
+end
+
+local function OnNewProfilingData(p14, p15, s2: string?) -- line: 275
+	-- upvalues: ScriptProfilerService (copy), generateGCOverheadOffsets (copy), v41 (copy), generatePluginDurationOffsets (copy)
+	p14.serializedData = s2
+	p14.data = ScriptProfilerService:DeserializeJSON(s2)
+
+	local v130, v131 = generateGCOverheadOffsets(p14.data)
+
+	p14.gcFunctionOffsets = v130
+	p14.gcNodeOffsets = v131
+
+	if v41 then
+		local v132, v133 = generatePluginDurationOffsets(p14.gcNodeOffsets, p14.data)
+
+		p14.pluginOffsets = v132
+		p14.pluginGCOffsets = v133
+	end
+
+	local v134 = not p14.data and 0 or #p14.data.Nodes
+	local v135 = not p15.data and 0 or #p15.data.Nodes
+	local t13 = table.create(v134, false)
+	local expandedNodes = p15.expandedNodes
+
+	table.move(expandedNodes, 1, v135, 1, t13)
+	p14.expandedNodes = t13
+end
+
+function v40.init(p16) -- line: 293
+	-- upvalues: ScriptProfilerService (copy), Players (copy), v42 (copy), generateSearchFilters (copy), Roact (copy)
+	local function StartScriptProfiling(p17, p18) -- line: 294
+		-- upvalues: ScriptProfilerService (copy), Players (copy)
+		if p17 then
+			ScriptProfilerService:ClientStart(Players.LocalPlayer, p18.frequency)
+
+			return
+		end
+
+		ScriptProfilerService:ServerStart(p18.frequency)
+	end
+	local function StopScriptProfiling(p19) -- line: 302
+		-- upvalues: ScriptProfilerService (copy), Players (copy)
+		if p19 then
+			ScriptProfilerService:ClientStop(Players.LocalPlayer)
+		else
+			ScriptProfilerService:ServerStop()
+		end
+
+		return nil
+	end
+	local function RequestNewData(p20) -- line: 311
+		-- upvalues: ScriptProfilerService (copy), Players (copy)
+		if p20 then
+			ScriptProfilerService:ClientRequestData(Players.LocalPlayer)
+
+			return
+		end
+
+		ScriptProfilerService:ServerRequestData()
+	end
+	local function StopTimedProfiling(p21) -- line: 319
+		-- upvalues: p16 (copy), ScriptProfilerService (copy), Players (copy)
+		if p16:getState(p21).isProfiling then
+			if p21 then
+				ScriptProfilerService:ClientStop(Players.LocalPlayer)
+			else
+				ScriptProfilerService:ServerStop()
+			end
+
+			p16.props.dispatchSetIsProfiling(p21, false)
+
+			if p21 then
+				ScriptProfilerService:ClientRequestData(Players.LocalPlayer)
+
+				return
+			end
+
+			ScriptProfilerService:ServerRequestData()
+		end
+	end
+
+	function p16.onUtilTabHeightChanged(p22) -- line: 331
+		-- upvalues: p16 (copy)
+		p16:setState({
+			utilTabHeight = p22
+		})
+	end
+
+	local function UpdateTimedProfilingTimer(p23) -- line: 337
+		-- upvalues: p16 (copy)
+		while task.wait(0.5) do
+			local timedProfilingCountdown = p16:getState(p23).timedProfilingCountdown
+
+			if timedProfilingCountdown <= 0 then
+				return
+			end
+
+			p16.props.dispatchSetTimer(p23, {
+				timedProfilingCountdown = timedProfilingCountdown - 0.5
+			})
+		end
+	end
+	local function LiveUpdate(p24) -- line: 352
+		-- upvalues: v42 (copy), p16 (copy), ScriptProfilerService (copy), Players (copy)
+		while task.wait(v42 / 1000) do
+			if p16:getState(p24).liveUpdate then
+				if p24 then
+					ScriptProfilerService:ClientRequestData(Players.LocalPlayer)
+				else
+					ScriptProfilerService:ServerRequestData()
+				end
+			end
+		end
+	end
+
+	function p16.onBeginProfile() -- line: 362
+		-- upvalues: p16 (copy), ScriptProfilerService (copy), Players (copy), UpdateTimedProfilingTimer (copy), LiveUpdate (copy)
+		local v211, v212 = p16:getActiveState()
+
+		if v211 then
+			ScriptProfilerService:ClientStart(Players.LocalPlayer, v212.frequency)
+		else
+			ScriptProfilerService:ServerStart(v212.frequency)
+		end
+
+		p16.props.dispatchSetIsProfiling(v211, true)
+		p16.props.dispatchClearStateForNewSession(v211)
+
+		local t14 = {}
+
+		if v212.timedProfilingDuration > 0 then
+			p16.props.dispatchSetTimer(v211, {
+				timedProfilingCountdown = v212.timedProfilingDuration
+			})
+			t14.timedProfilingThread = task.delay(v212.timedProfilingDuration, function() -- line: 375
+				-- upvalues: v211 (copy), p16 (copy), ScriptProfilerService (copy), Players (copy)
+				local v272 = v211
+
+				if p16:getState(v272).isProfiling then
+					if v272 then
+						ScriptProfilerService:ClientStop(Players.LocalPlayer)
+					else
+						ScriptProfilerService:ServerStop()
+					end
+
+					p16.props.dispatchSetIsProfiling(v272, false)
+
+					if v272 then
+						ScriptProfilerService:ClientRequestData(Players.LocalPlayer)
+
+						return
+					end
+
+					ScriptProfilerService:ServerRequestData()
+				end
+			end)
+			t14.timedProfilingTimerThread = task.spawn(function() -- line: 379
+				-- upvalues: UpdateTimedProfilingTimer (copy), v211 (copy)
+				UpdateTimedProfilingTimer(v211)
+			end)
+		end
+
+		t14.liveUpdateThread = task.spawn(LiveUpdate, v211)
+		p16.props.dispatchSetThreads(v211, t14)
+	end
+	function p16.onEndProfile() -- line: 389
+		-- upvalues: p16 (copy), ScriptProfilerService (copy), Players (copy)
+		local v214, v215 = p16:getActiveState()
+
+		if v214 then
+			ScriptProfilerService:ClientStop(Players.LocalPlayer)
+		else
+			ScriptProfilerService:ServerStop()
+		end
+
+		local t15 = {}
+
+		if v215.timedProfilingThread then
+			task.cancel(v215.timedProfilingThread)
+			t15.timedProfilingThread = nil
+		end
+
+		if v215.timedProfilingTimerThread then
+			task.cancel(v215.timedProfilingTimerThread)
+			t15.timedProfilingTimerThread = nil
+		end
+
+		if v215.liveUpdateThread then
+			task.cancel(v215.liveUpdateThread)
+			t15.liveUpdateThread = nil
+		end
+
+		p16.props.dispatchSetThreads(v214, {})
+		p16.props.dispatchSetIsProfiling(v214, false)
+
+		if v214 then
+			ScriptProfilerService:ClientRequestData(Players.LocalPlayer)
+
+			return
+		end
+
+		ScriptProfilerService:ServerRequestData()
+	end
+	function p16.toggleTimedProfiling() -- line: 417
+		-- upvalues: p16 (copy)
+		local v217, v218 = p16:getActiveState()
+		local timedProfilingDuration = v218.timedProfilingDuration
+		local v220 = if timedProfilingDuration ~= 0 then if timedProfilingDuration ~= 60 then timedProfilingDuration ~= 300 and 0 or 600 else 300 else 60
+
+		p16.props.dispatchSetTimer(v217, {
+			timedProfilingDuration = v220
+		})
+	end
+	function p16.toggleAverage() -- line: 435
+		-- upvalues: p16 (copy)
+		local v221, v222 = p16:getActiveState()
+		local average = v222.average
+		local v224 = if average ~= 0 then if average ~= 1 then if average ~= 60 then average ~= 300 and 0 or 600 else 300 else 60 else 1
+
+		p16.props.dispatchSetAverage(v221, v224)
+	end
+	function p16.toggleUnits() -- line: 455
+		-- upvalues: p16 (copy)
+		p16.props.dispatchSetScriptProfilerState(nil, not p16.props.usePercentages, nil, nil)
+	end
+	function p16.toggleFrequency() -- line: 459
+		-- upvalues: p16 (copy)
+		local v225, v226 = p16:getActiveState()
+		local v227 = v226.frequency ~= 1000 and 1000 or 10000
+
+		p16.props.dispatchSetFrequency(v225, v227)
+	end
+	function p16.onClientButton() -- line: 473
+		-- upvalues: p16 (copy)
+		p16.props.dispatchSetScriptProfilerState(true)
+	end
+	function p16.onServerButton() -- line: 477
+		-- upvalues: p16 (copy)
+		p16.props.dispatchSetScriptProfilerState(false)
+	end
+	function p16.dataViewDropDownCallback(p25) -- line: 481
+		-- upvalues: p16 (copy)
+		local v229, v230 = p16:getActiveState()
+		local isFunctionsView = v230.isFunctionsView
+
+		if p25 == 1 then
+			isFunctionsView = false
+		elseif p25 == 2 then
+			isFunctionsView = true
+		end
+
+		p16.props.dispatchSetDataView(v229, isFunctionsView)
+	end
+	function p16.onCheckboxChanged(p26, p27) -- line: 495
+		-- upvalues: p16 (copy)
+		local isClientView = p16.props.isClientView
+
+		if p26 == "Live" then
+			p16.props.dispatchSetLiveUpdate(isClientView, p27)
+
+			return
+		end
+
+		if p26 == "Plugins" then
+			p16.props.dispatchSetShowPlugins(isClientView, p27)
+
+			return
+		end
+
+		if p26 == "GC" then
+			p16.props.dispatchSetShowGC(isClientView, p27)
+		end
+	end
+	function p16.onSearchTermChanged(p28) -- line: 507
+		-- upvalues: p16 (copy), generateSearchFilters (copy)
+		local v236, v237 = p16:getActiveState()
+		local v238, v239 = generateSearchFilters(v237, p28)
+
+		p16.props.dispatchSetSearchData(v236, {
+			searchTerm = p28,
+			searchFilterFlat = v238 or {},
+			searchFilterGraph = v239 or {}
+		})
+	end
+
+	p16.utilRef = Roact.createRef()
+	p16.state = {
+		utilTabHeight = 0
+	}
+end
+function v40.didMount(p29) -- line: 525
+	-- upvalues: ScriptProfilerService (copy), OnNewProfilingData (copy)
+	p29:setState({
+		utilTabHeight = p29.utilRef.current.Size.Y.Offset
+	})
+	p29.scriptProfilerConnection = ScriptProfilerService.OnNewData:Connect(function(p30, p31) -- line: 531
+		-- upvalues: p29 (copy), OnNewProfilingData (copy)
+		local v242 = p30 ~= nil
+		local v243 = p29:getState(v242)
+		local t16 = {}
+
+		OnNewProfilingData(t16, v243, p31)
+		p29.props.dispatchSetData(v242, t16)
+	end)
+end
+function v40.willUnmount(p32) -- line: 543
+	p32.scriptProfilerConnection:Disconnect()
+	p32.scriptProfilerConnection = nil
+end
+function v40.didUpdate(p33) -- line: 548
+	local currentSize = p33.utilRef.current.Size
+
+	if currentSize.Y.Offset ~= p33.state.utilTabHeight then
+		p33:setState({
+			utilTabHeight = currentSize.Y.Offset
+		})
+	end
+end
+
+local function formatTimer(n9: number?) -- line: 557
+	-- upvalues: ProfilerUtil (copy)
+	local v150 = ProfilerUtil.formatTimer(n9)
+
+	if v150 ~= "" then
+		return ": " .. v150
+	end
+
+	return v150
+end
+
+function v40.renderUtilButtons(p34, p35, p36, p37) -- line: 567
+	-- upvalues: Roact (copy), BoxButton (copy), formatFrequency (copy), MainWindowHeader2 (copy), ColorText (copy), MainWindowHeader (copy), Constants (copy), UnselectedGray (copy), ProfilerUtil (copy), DropDown (copy), SmallFrameHeight (copy), t1 (copy)
+	local isProfiling = p35.isProfiling
+	local t17 = {}
+
+	table.insert(t17, Roact.createElement(BoxButton, {
+		text = not isProfiling and "Start" or "Stop",
+		onClicked = isProfiling and p34.onEndProfile or p34.onBeginProfile
+	}))
+
+	if not p37 then
+		table.insert(t17, Roact.createElement(BoxButton, {
+			text = not p34.props.usePercentages and "Unit: ms" or "Unit: %",
+			onClicked = p34.toggleUnits
+		}))
+	end
+
+	if not p37 then
+		table.insert(t17, Roact.createElement("TextButton", {
+			Text = "Freq: " .. formatFrequency(p35.frequency),
+			TextSize = MainWindowHeader2,
+			TextColor3 = ColorText,
+			Font = MainWindowHeader,
+			AutoButtonColor = true,
+			BackgroundColor3 = if not isProfiling then UnselectedGray else Constants.Color.InactiveBox,
+			BackgroundTransparency = 0,
+			[Roact.Event.Activated] = function() -- line: 608
+				-- upvalues: isProfiling (copy), p34 (copy)
+				if not isProfiling then
+					p34.toggleFrequency()
+				end
+			end
+		}))
+	end
+
+	if not p37 then
+		local createElement = Roact.createElement
+		local t18 = {}
+		local v159 = if not isProfiling then p35.timedProfilingDuration else p35.timedProfilingCountdown
+		local v160 = ProfilerUtil.formatTimer(v159)
+
+		t18.Text = "Time" .. if v160 == "" then v160 else ": " .. v160
+		t18.TextSize = MainWindowHeader2
+		t18.TextColor3 = ColorText
+		t18.Font = MainWindowHeader
+		t18.AutoButtonColor = true
+		t18.BackgroundColor3 = if not isProfiling then UnselectedGray else Constants.Color.InactiveBox
+		t18.BackgroundTransparency = 0
+		t18[Roact.Event.Activated] = function() -- line: 631
+			-- upvalues: isProfiling (copy), p34 (copy)
+			if not isProfiling then
+				p34.toggleTimedProfiling()
+			end
+		end
+		table.insert(t17, createElement("TextButton", t18))
+	end
+
+	if not p37 then
+		local createElement = Roact.createElement
+		local t19 = {}
+		local average = p35.average
+		local v164 = ProfilerUtil.formatTimer(average)
+
+		t19.Text = "Average" .. if v164 == "" then v164 else ": " .. v164
+		t19.TextSize = MainWindowHeader2
+		t19.TextColor3 = ColorText
+		t19.Font = MainWindowHeader
+		t19.AutoButtonColor = true
+		t19.BackgroundColor3 = if not isProfiling then UnselectedGray else Constants.Color.InactiveBox
+		t19.BackgroundTransparency = 0
+		t19[Roact.Event.Activated] = function() -- line: 653
+			-- upvalues: isProfiling (copy), p34 (copy)
+			if not isProfiling then
+				p34.toggleAverage()
+			end
+		end
+		table.insert(t17, createElement("TextButton", t19))
+	end
+
+	if not p37 then
+		table.insert(t17, Roact.createElement(BoxButton, {
+			text = "Export",
+			onClicked = p34.props.dispatchStartExport
+		}))
+	end
+
+	if not p37 then
+		table.insert(t17, Roact.createElement(DropDown, {
+			buttonSize = UDim2.new(0, 100, 0, SmallFrameHeight),
+			dropDownList = t1,
+			selectedIndex = not p35.isFunctionsView and 1 or 2,
+			onSelection = p34.dataViewDropDownCallback
+		}))
+	end
+
+	if p36 then
+		table.insert(t17, Roact.createElement(BoxButton, {
+			text = "More...",
+			onClicked = function() -- line: 689
+				-- upvalues: p34 (copy)
+				p34.props.dispatchShowMobileSettings()
+			end
+		}))
+	end
+
+	return t17
+end
+function v40.renderUtilAndTab(t20: {[any]: any}, t21: {[any]: any}, t22: {[any]: any}) -- line: 699
+	-- upvalues: Roact (copy), UtilAndTab (copy), Immutable (copy)
+	local size = t20.props.size
+	local formFactor = t20.props.formFactor
+	local tabList = t20.props.tabList
+
+	return Roact.createElement(UtilAndTab, Immutable.JoinDictionaries({
+		layoutOrder = 1,
+		windowWidth = size.X.Offset,
+		formFactor = formFactor,
+		tabList = tabList,
+		refForParent = t20.utilRef,
+		onHeightChanged = t20.onUtilTabHeightChanged
+	}, t21), t22)
+end
+function v40.renderExportView(p38) -- line: 719
+	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy), BoxButton (copy), ProfilerExportView (copy)
+	local size = p38.props.size
+	local utilTabHeight = p38.state.utilTabHeight
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = p38:renderUtilAndTab({}, { Roact.createElement(BoxButton, {
+			text = "Exit",
+			onClicked = p38.props.dispatchFinishedExporting
+		}) }),
+		ExportView = Roact.createElement(ProfilerExportView, {
+			size = UDim2.new(1, 0, 1, -utilTabHeight)
+		})
+	})
+end
+function v40.renderMobileSettingsUI(p39) -- line: 748
+	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy), BoxButton (copy), MobileSettingsView (copy)
+	local size = p39.props.size
+	local utilTabHeight = p39.state.utilTabHeight
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = p39:renderUtilAndTab({}, {
+			Roact.createElement(BoxButton, {
+				text = "Export",
+				onClicked = p39.props.dispatchStartExport
+			}),
+			Roact.createElement(BoxButton, {
+				text = "Exit",
+				onClicked = p39.props.dispatchHideMobileSettings
+			})
+		}),
+		MobileSettingsView = Roact.createElement(MobileSettingsView, {
+			size = UDim2.new(1, 0, 1, -utilTabHeight)
+		})
+	})
+end
+function v40.renderProfilerView(p40, p41, p42, p43, p44) -- line: 783
+	-- upvalues: Roact (copy), Constants (copy), MainRowPadding (copy), ProfilerFunctionsView (copy), ProfilerView (copy), v41 (copy)
+	local isProfiling = p42.isProfiling
+	local data = p42.data
+	local usePercentages = p40.props.usePercentages
+	local isFunctionsView = p42.isFunctionsView
+	local rootNode = p42.rootNode
+	local rootNodeName = p42.rootNodeName
+	local rootFunc = p42.rootFunc
+	local size = p40.props.size
+	local utilTabHeight = p40.state.utilTabHeight
+	local v191 = nil
+
+	if data and (data.SessionStartTime and data.SessionEndTime) then
+		v191 = data.SessionEndTime - data.SessionStartTime
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 3,
+		Size = size,
+		BackgroundColor3 = Constants.Color.BaseGray
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, MainRowPadding),
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		UtilAndTab = p40:renderUtilAndTab({
+			isClientView = p41,
+			onClientButton = p40.onClientButton,
+			onServerButton = p40.onServerButton,
+			orderedCheckboxState = p44,
+			onCheckboxChanged = p40.onCheckboxChanged,
+			onSearchTermChanged = p40.onSearchTermChanged,
+			searchTerm = p42.searchTerm
+		}, p43),
+		ProfilerView = Roact.createElement(if not isFunctionsView then ProfilerView else ProfilerFunctionsView, {
+			layoutOrder = 2,
+			size = UDim2.new(1, 0, 1, -utilTabHeight),
+			searchFilter = if not isFunctionsView then p42.searchFilterGraph else p42.searchFilterFlat,
+			data = data,
+			profiling = isProfiling,
+			showAsPercentages = usePercentages,
+			sessionLength = v191,
+			rootNode = rootNode,
+			rootFunc = rootFunc,
+			rootNodeName = rootNodeName,
+			average = p42.average,
+			showPlugins = p42.showPlugins or not v41,
+			pluginOffsets = p42.pluginOffsets,
+			showGC = p42.showGC,
+			gcFunctionOffsets = p42.gcFunctionOffsets,
+			gcNodeOffsets = p42.gcNodeOffsets,
+			pluginGCOffsets = p42.pluginGCOffsets,
+			expandedNodes = if not isFunctionsView then p42.expandedNodes else nil
+		})
+	})
+end
+function v40.render(p45) -- line: 847
+	-- upvalues: Constants (copy), v41 (copy)
+	if p45.props.isExporting then
+		return p45:renderExportView()
+	end
+
+	if p45.props.isShowingMobileSettings then
+		return p45:renderMobileSettingsUI()
+	end
+
+	local formFactor = p45.props.formFactor
+	local v194, v195 = p45:getActiveState()
+	local t23 = {}
+	local n10 = 1
+	local v198 = formFactor == Constants.FormFactor.Small
+
+	if not v198 then
+		t23[1] = {
+			name = "Live",
+			state = v195.liveUpdate
+		}
+
+		if v41 then
+			n10 += 1
+			t23[n10] = {
+				name = "Plugins",
+				state = v195.showPlugins
+			}
+		end
+
+		t23[n10 + 1] = {
+			name = "GC",
+			state = v195.showGC
+		}
+	end
+
+	return p45:renderProfilerView(v194, v195, p45:renderUtilButtons(v195, v198, v198), t23)
+end
+
+local function mapStateToProps(p46, _) -- line: 882
+	return {
+		isClientView = p46.ScriptProfiler.isClientView,
+		usePercentages = p46.ScriptProfiler.usePercentages,
+		isExporting = p46.ScriptProfiler.isExporting,
+		isShowingMobileSettings = p46.ScriptProfiler.isShowingMobileSettings,
+		client = p46.ScriptProfiler.client,
+		server = p46.ScriptProfiler.server
+	}
+end
+local function mapDispatchToProps(p48) -- line: 894
+	-- upvalues: SetScriptProfilerState (copy), SetIsProfiling (copy), SetData (copy), SetThreads (copy), SetTimerState (copy), ClearStateForNewProfilingSession (copy), SetAverage (copy), SetFrequency (copy), SetDataView (copy), SetLiveUpdate (copy), SetShowPlugins (copy), SetShowGC (copy), SetSearchData (copy)
+	return {
+		dispatchSetScriptProfilerState = function(p49, p50, p51, p52) -- line: 896
+			-- upvalues: p48 (copy), SetScriptProfilerState (copy)
+			p48(SetScriptProfilerState(p49, p50, p51, p52))
+		end,
+		dispatchSetIsProfiling = function(p53, p54) -- line: 900
+			-- upvalues: p48 (copy), SetIsProfiling (copy)
+			p48(SetIsProfiling(p53, p54))
+		end,
+		dispatchSetData = function(p55, p56) -- line: 904
+			-- upvalues: p48 (copy), SetData (copy)
+			p48(SetData(p55, p56))
+		end,
+		dispatchSetThreads = function(p57, p58) -- line: 908
+			-- upvalues: p48 (copy), SetThreads (copy)
+			p48(SetThreads(p57, p58))
+		end,
+		dispatchSetTimer = function(p59, p60) -- line: 912
+			-- upvalues: p48 (copy), SetTimerState (copy)
+			p48(SetTimerState(p59, p60))
+		end,
+		dispatchClearStateForNewSession = function(p61) -- line: 916
+			-- upvalues: p48 (copy), ClearStateForNewProfilingSession (copy)
+			p48(ClearStateForNewProfilingSession(p61))
+		end,
+		dispatchSetAverage = function(p62, p63) -- line: 920
+			-- upvalues: p48 (copy), SetAverage (copy)
+			p48(SetAverage(p62, p63))
+		end,
+		dispatchSetFrequency = function(p64, p65) -- line: 924
+			-- upvalues: p48 (copy), SetFrequency (copy)
+			p48(SetFrequency(p64, p65))
+		end,
+		dispatchSetDataView = function(p66, p67) -- line: 928
+			-- upvalues: p48 (copy), SetDataView (copy)
+			p48(SetDataView(p66, p67))
+		end,
+		dispatchSetLiveUpdate = function(p68, p69) -- line: 932
+			-- upvalues: p48 (copy), SetLiveUpdate (copy)
+			p48(SetLiveUpdate(p68, p69))
+		end,
+		dispatchSetShowPlugins = function(p70, p71) -- line: 936
+			-- upvalues: p48 (copy), SetShowPlugins (copy)
+			p48(SetShowPlugins(p70, p71))
+		end,
+		dispatchSetShowGC = function(p72, p73) -- line: 940
+			-- upvalues: p48 (copy), SetShowGC (copy)
+			p48(SetShowGC(p72, p73))
+		end,
+		dispatchSetSearchData = function(p74, p75) -- line: 944
+			-- upvalues: p48 (copy), SetSearchData (copy)
+			p48(SetSearchData(p74, p75))
+		end,
+		dispatchStartExport = function() -- line: 948
+			-- upvalues: p48 (copy), SetScriptProfilerState (copy)
+			p48(SetScriptProfilerState(nil, nil, nil, nil, true))
+		end,
+		dispatchFinishedExporting = function() -- line: 952
+			-- upvalues: p48 (copy), SetScriptProfilerState (copy)
+			p48(SetScriptProfilerState(nil, nil, nil, nil, false))
+		end,
+		dispatchShowMobileSettings = function() -- line: 956
+			-- upvalues: p48 (copy), SetScriptProfilerState (copy)
+			p48(SetScriptProfilerState(nil, nil, nil, nil, nil, true))
+		end,
+		dispatchHideMobileSettings = function() -- line: 960
+			-- upvalues: p48 (copy), SetScriptProfilerState (copy)
+			p48(SetScriptProfilerState(nil, nil, nil, nil, nil, false))
+		end
+	}
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, mapDispatchToProps)(v40)

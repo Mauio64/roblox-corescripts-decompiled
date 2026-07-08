@@ -1,9 +1,13 @@
-return function(v0, v1) --[[ Line: 6 ]] --[[ Name: filter ]]
-    local v2 = {};
-    for v3, v4 in v0 do
-        if v1(v4, v3) then
-            v2[v3] = v4;
-        end;
-    end;
-    return v2;
-end;
+local function filter(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 6
+	local t2 = {}
+
+	for v5, v6 in t1 do
+		if p1(v6, v5) then
+			t2[v5] = v6
+		end
+	end
+
+	return t2
+end
+
+return filter

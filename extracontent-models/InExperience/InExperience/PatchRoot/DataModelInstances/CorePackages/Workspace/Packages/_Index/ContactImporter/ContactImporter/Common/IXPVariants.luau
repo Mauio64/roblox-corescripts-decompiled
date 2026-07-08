@@ -1,5 +1,5 @@
 return {
-    INVITES_ONLY = "invitesOnly", 
-    BLENDED = "blended", 
-    CONTROL = "control"
-};
+	INVITES_ONLY = "invitesOnly",
+	BLENDED = "blended",
+	CONTROL = "control"
+}

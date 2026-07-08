@@ -1,22 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Http);
-local v3 = require(l_Parent_0.HttpRequest);
-local _ = require(l_Parent_0.DataHydration);
-local v5 = require(l_script_FirstAncestor_0.Common.Enums);
-local l_Url_0 = v2.Url;
-local v10 = v3.config({
-    requestFunction = function(v7, v8, v9) --[[ Line: 16 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v3 (copy)
-        return v3.requestFunctions.RequestInternal(v7, v8, v9);
-    end
-});
-return function(v11) --[[ Line: 21 ]] --[[ Name: fetchUserDescription ]]
-    -- upvalues: l_Url_0 (copy), v10 (copy), v5 (copy)
-    local v12 = string.format("%s/users/%s", l_Url_0.USERS_URL, v11);
-    return v10(v12, v5.RequestMethods.GET):andThen(function(v13) --[[ Line: 25 ]]
-        return v13.responseBody.description or "";
-    end):catch(function(v14) --[[ Line: 28 ]]
-        error(v14);
-    end);
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local Http = require(EditProfileParent.Http)
+local HttpRequest = require(EditProfileParent.HttpRequest)
+
+require(EditProfileParent.DataHydration)
+
+local Enums = require(EditProfile.Common.Enums)
+local Url = Http.Url
+local v7 = HttpRequest.config({
+	requestFunction = function(s1: string, p1, p2) -- line: 16
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.RequestInternal(s1, p1, p2)
+	end
+})
+
+local function fetchUserDescription(s2: string) -- line: 21
+	-- upvalues: Url (copy), v7 (copy), Enums (copy)
+	local v13 = string.format("%s/users/%s", Url.USERS_URL, s2)
+
+	return v7(v13, Enums.RequestMethods.GET):andThen(function(p3) -- line: 25
+		return p3.responseBody.description or ""
+	end):catch(function(p4) -- line: 28
+		error(p4)
+	end)
+end
+
+return fetchUserDescription

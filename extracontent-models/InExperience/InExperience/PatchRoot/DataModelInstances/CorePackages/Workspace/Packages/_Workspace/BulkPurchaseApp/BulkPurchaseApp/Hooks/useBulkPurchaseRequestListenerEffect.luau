@@ -1,55 +1,75 @@
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_Players_0 = game:GetService("Players");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local v6 = require(l_script_FirstAncestor_0.Store.Thunks.InitiateBulkPurchaseFlow);
-local l_useNetwork_0 = require(l_Parent_0.EconomyCommonCoreScriptHooks).useNetwork;
-local _ = require(l_script_FirstAncestor_0.Store.Types);
-local v9 = require(l_script_FirstAncestor_0.Enums.PurchasableStateEnum);
-local function v14(v10) --[[ Line: 18 ]] --[[ Name: transformItemDataToBulkPurchaseItemData ]]
-    -- upvalues: v9 (copy)
-    local v11 = {};
-    for _, v13 in v10 do
-        table.insert(v11, {
-            id = v13.id, 
-            name = v13.name, 
-            description = v13.description, 
-            priceRobux = v13.priceRobux, 
-            type = v13.type, 
-            ownedCount = v13.ownedCount, 
-            quantityLimitPerUser = v13.quantityLimitPerUser, 
-            isLimited = v13.isLimited, 
-            purchasableState = if v13.purchaseableState == "Purchaseable" then v9.Purchasable else v13.purchaseableState
-        });
-    end;
-    return v11;
-end;
-return function() --[[ Line: 39 ]] --[[ Name: useBulkPurchaseRequestListenerEffect ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useNetwork_0 (copy), v4 (copy), l_MarketplaceService_0 (copy), l_Players_0 (copy), v6 (copy), v14 (copy)
-    local v15 = l_useDispatch_0();
-    local v16 = l_useNetwork_0();
-    v4.useEffect(function() --[[ Line: 42 ]]
-        -- upvalues: v15 (copy), v16 (copy), l_MarketplaceService_0 (ref), l_Players_0 (ref), v6 (ref), v14 (ref)
-        local v17 = nil;
-        if v15 and v16 then
-            v17 = l_MarketplaceService_0.PromptBulkPurchaseRequested:Connect(function(v18, v19, v20, v21, v22, v23) --[[ Line: 46 ]]
-                -- upvalues: l_Players_0 (ref), v15 (ref), v6 (ref), v16 (ref), v14 (ref)
-                if v18 == l_Players_0.LocalPlayer then
-                    v15(v6(v16, v14(v19), v20, v21, v22, v23));
-                end;
-            end);
-        end;
-        return function() --[[ Line: 69 ]]
-            -- upvalues: v17 (ref)
-            if v17 then
-                v17:Disconnect();
-                v17 = nil;
-            end;
-        end;
-    end, {
-        v15, 
-        v16
-    });
-end;
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+local useDispatch = require(BulkPurchaseAppParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local InitiateBulkPurchaseFlow = require(BulkPurchaseApp.Store.Thunks.InitiateBulkPurchaseFlow)
+local useNetwork = require(BulkPurchaseAppParent.EconomyCommonCoreScriptHooks).useNetwork
+
+require(BulkPurchaseApp.Store.Types)
+
+local PurchasableStateEnum = require(BulkPurchaseApp.Enums.PurchasableStateEnum)
+local FFlagBulkPurchaseEnablePurchaseOptions = require(BulkPurchaseApp.Flags.FFlagBulkPurchaseEnablePurchaseOptions)
+local convertToDiscountInformationOrNil = require(BulkPurchaseApp.Utils.convertToDiscountInformationOrNil)
+
+require(BulkPurchaseApp.Store.Types)
+
+local function transformItemDataToBulkPurchaseItemData(t1: {[any]: any}) -- line: 24
+	-- upvalues: PurchasableStateEnum (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy)
+	local t2 = {}
+
+	for _, v17 in t1 do
+		table.insert(t2, {
+			id = v17.id,
+			name = v17.name,
+			description = v17.description,
+			priceRobux = v17.priceRobux,
+			type = v17.type,
+			ownedCount = v17.ownedCount,
+			quantityLimitPerUser = v17.quantityLimitPerUser,
+			isLimited = v17.isLimited,
+			purchasableState = if v17.purchaseableState ~= "Purchaseable" then v17.purchaseableState else PurchasableStateEnum.Purchasable,
+			discountInformation = v17.discountInformation,
+			purchaseOptions = if not FFlagBulkPurchaseEnablePurchaseOptions then nil else v17.purchaseOptions
+		})
+	end
+
+	return t2
+end
+local function useBulkPurchaseRequestListenerEffect() -- line: 47
+	-- upvalues: useDispatch (copy), useNetwork (copy), React (copy), MarketplaceService (copy), Players (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy), BulkPurchaseApp (copy), InitiateBulkPurchaseFlow (copy), transformItemDataToBulkPurchaseItemData (copy), convertToDiscountInformationOrNil (copy)
+	local v18 = useDispatch()
+	local v19 = useNetwork()
+
+	React.useEffect(function() -- line: 50
+		-- upvalues: v18 (copy), v19 (copy), MarketplaceService (copy), Players (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy), BulkPurchaseApp (copy), InitiateBulkPurchaseFlow (copy), transformItemDataToBulkPurchaseItemData (copy), convertToDiscountInformationOrNil (copy)
+		local connection = nil
+
+		if v18 and v19 then
+			connection = MarketplaceService.PromptBulkPurchaseRequestedV2:Connect(function(p1, t3: {[any]: any}, p2, n1: number, n2: number, p3, p4) -- line: 54
+				-- upvalues: Players (copy), FFlagBulkPurchaseEnablePurchaseOptions (copy), BulkPurchaseApp (copy), v18 (copy), InitiateBulkPurchaseFlow (copy), v19 (copy), transformItemDataToBulkPurchaseItemData (copy), convertToDiscountInformationOrNil (copy)
+				if p1 == Players.LocalPlayer then
+					if FFlagBulkPurchaseEnablePurchaseOptions and require(BulkPurchaseApp.Flags.FFlagBulkPurchaseReportsMissingPurchaseOptions) then
+						require(BulkPurchaseApp.Utils.reportBulkPurchaseRequestIssues)(t3)
+					end
+
+					v18(InitiateBulkPurchaseFlow(v19, transformItemDataToBulkPurchaseItemData(t3), p2, n1, n2, p3, convertToDiscountInformationOrNil(p4)))
+				end
+			end)
+		end
+
+		return function() -- line: 88
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end
+	end, {
+		v18,
+		v19
+	})
+end
+
+return useBulkPurchaseRequestListenerEffect

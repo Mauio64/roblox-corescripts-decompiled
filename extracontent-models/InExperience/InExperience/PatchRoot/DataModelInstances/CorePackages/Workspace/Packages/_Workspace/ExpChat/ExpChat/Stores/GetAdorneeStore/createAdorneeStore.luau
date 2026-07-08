@@ -1,74 +1,88 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local l_createSignal_0 = require(l_Parent_0.Signals).createSignal;
-local function v7(v2, v3, v4) --[[ Line: 20 ]] --[[ Name: findFirstChildByNameAndClass ]]
-    if not v2 then
-        return nil;
-    else
-        for _, v6 in ipairs(v2:GetChildren()) do
-            if v6.Name == v3 and v6:IsA(v4) then
-                return v6;
-            end;
-        end;
-        return nil;
-    end;
-end;
-return function() --[[ Line: 32 ]] --[[ Name: createAdorneeStore ]]
-    -- upvalues: l_createSignal_0 (copy), v7 (copy)
-    local v8 = {};
-    local function _(v9) --[[ Line: 37 ]] --[[ Name: getKey ]]
-        return (tostring(v9));
-    end;
-    local function v15(v11) --[[ Line: 41 ]] --[[ Name: getAdornee ]]
-        -- upvalues: v8 (copy), l_createSignal_0 (ref)
-        local v12 = tostring(v11);
-        if not v8[v12] then
-            local v13, v14 = l_createSignal_0(nil);
-            v8[v12] = {
-                getter = v13, 
-                setter = v14
-            };
-        end;
-        return v8[v12].getter;
-    end;
-    local function v26(v16, v17, v18) --[[ Line: 50 ]] --[[ Name: handleAdorneeAdded ]]
-        -- upvalues: v7 (ref), v8 (copy), l_createSignal_0 (ref)
-        local v19 = tostring(v16);
-        local v20 = v7(v17, "Head", "BasePart");
-        local v21 = if v18.Health == 0 then v20 else v17;
-        if not v8[v19] then
-            local v22 = tostring(v16);
-            if not v8[v22] then
-                local v23, v24 = l_createSignal_0(nil);
-                v8[v22] = {
-                    getter = v23, 
-                    setter = v24
-                };
-            end;
-            local _ = v8[v22].getter;
-        end;
-        v8[v19].setter(v21);
-    end;
-    local function v31(v27) --[[ Line: 61 ]] --[[ Name: handleHumanoidDied ]]
-        -- upvalues: v8 (copy), v7 (ref)
-        local v28 = tostring(v27);
-        local v29 = nil;
-        if v8[v28] then
-            local v30 = v8[v28].getter(false);
-            v29 = if v30 then v7(v30, "Head", "BasePart") or v30 else nil;
-            v8[v28].setter(v29);
-        end;
-    end;
-    return {
-        getAdornee = v15, 
-        handleAdorneeAdded = v26, 
-        handleHumanoidDied = v31, 
-        handlePlayerRemoved = function(v32) --[[ Line: 77 ]] --[[ Name: handlePlayerRemoved ]]
-            -- upvalues: v8 (copy)
-            local v33 = tostring(v32);
-            if v8[v33] then
-                v8[v33].setter(nil);
-            end;
-            v8[v33] = nil;
-        end
-    };
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local createSignal = require(Parent.Signals).createSignal
+
+local function findFirstChildByNameAndClass(p1, s1: string, s2: string) -- line: 20
+	if not p1 then
+		return nil
+	end
+
+	for _, child in ipairs(p1:GetChildren()) do
+		if s1 == child.Name and child:IsA(s2) then
+			return child
+		end
+	end
+
+	return nil
+end
+local function createAdorneeStore() -- line: 32
+	-- upvalues: createSignal (copy), findFirstChildByNameAndClass (copy)
+	local t1 = {}
+
+	local function getKey(p2) -- line: 37
+		return (tostring(p2))
+	end
+
+	return {
+		getAdornee = function(p3) -- line: 41
+			-- upvalues: t1 (copy), createSignal (copy)
+			local str = tostring(p3)
+
+			if not t1[str] then
+				local v15, v16 = createSignal(nil)
+
+				t1[str] = {
+					getter = v15,
+					setter = v16
+				}
+			end
+
+			return t1[str].getter
+		end,
+		handleAdorneeAdded = function(p4, p5, p6) -- line: 50
+			-- upvalues: findFirstChildByNameAndClass (copy), t1 (copy), createSignal (copy)
+			local str = tostring(p4)
+			local v21 = findFirstChildByNameAndClass(p5, "Head", "BasePart")
+			local v22 = if p6.Health ~= 0 then p5 else v21
+
+			if not t1[str] then
+				local str2 = tostring(p4)
+
+				if not t1[str2] then
+					local v24, v25 = createSignal(nil)
+
+					t1[str2] = {
+						getter = v24,
+						setter = v25
+					}
+				end
+
+				local _ = t1[str2].getter
+			end
+
+			t1[str].setter(v22)
+		end,
+		handleHumanoidDied = function(p7) -- line: 61
+			-- upvalues: t1 (copy), findFirstChildByNameAndClass (copy)
+			local str = tostring(p7)
+
+			if t1[str] then
+				local v29 = t1[str].getter(false)
+				local v30 = if not v29 then nil else findFirstChildByNameAndClass(v29, "Head", "BasePart") or v29
+
+				t1[str].setter(v30)
+			end
+		end,
+		handlePlayerRemoved = function(p8) -- line: 77
+			-- upvalues: t1 (copy)
+			local str = tostring(p8)
+
+			if t1[str] then
+				t1[str].setter(nil)
+			end
+
+			t1[str] = nil
+		end
+	}
+end
+
+return createAdorneeStore

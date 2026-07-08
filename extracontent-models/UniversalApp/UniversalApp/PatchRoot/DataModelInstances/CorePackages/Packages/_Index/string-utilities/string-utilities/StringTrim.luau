@@ -1,33 +1,40 @@
-return function(v0, v1, v2) --[[ Line: 3 ]] --[[ Name: StringTrim ]]
-    if not v1 then
-        v1 = "%s";
-    end;
-    if #v1 == 0 then
-        return v0;
-    else
-        if not v2 then
-            v2 = {
-                left = true, 
-                right = true
-            };
-        end;
-        local l_v0_0 = v0;
-        if v2.left then
-            local v4 = string.find(l_v0_0, "[^" .. v1 .. "]");
-            if not v4 then
-                return "";
-            else
-                l_v0_0 = string.sub(l_v0_0, v4);
-            end;
-        end;
-        if v2.right then
-            local v5 = string.find(l_v0_0, "[" .. v1 .. "]+$");
-            if not v5 then
-                return l_v0_0;
-            else
-                l_v0_0 = string.sub(l_v0_0, 1, v5 - 1);
-            end;
-        end;
-        return l_v0_0;
-    end;
-end;
+local function StringTrim(p1, p2, p3) -- line: 3
+	if not p2 then
+		p2 = "%s"
+	end
+
+	if #p2 == 0 then
+		return p1
+	end
+
+	if not p3 then
+		p3 = {
+			left = true,
+			right = true
+		}
+	end
+
+	if p3.left then
+		local v5 = string.find(p1, "[^" .. p2 .. "]")
+
+		if not v5 then
+			return ""
+		end
+
+		p1 = string.sub(p1, v5)
+	end
+
+	if p3.right then
+		local v6 = string.find(p1, "[" .. p2 .. "]+$")
+
+		if not v6 then
+			return p1
+		end
+
+		p1 = string.sub(p1, 1, v6 - 1)
+	end
+
+	return p1
+end
+
+return StringTrim

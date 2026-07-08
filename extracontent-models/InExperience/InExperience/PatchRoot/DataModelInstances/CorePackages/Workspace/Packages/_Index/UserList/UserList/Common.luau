@@ -1,8 +1,9 @@
-local v0 = require(script.Types);
-local v1 = require(script.useCompactTileHeight);
-local v2 = require(script.TextKeys);
+local Types = require(script.Types)
+local useCompactTileHeight = require(script.useCompactTileHeight)
+local TextKeys = require(script.TextKeys)
+
 return {
-    Types = v0, 
-    useCompactTileHeight = v1, 
-    TextKeys = v2
-};
+	Types = Types,
+	useCompactTileHeight = useCompactTileHeight,
+	TextKeys = TextKeys
+}

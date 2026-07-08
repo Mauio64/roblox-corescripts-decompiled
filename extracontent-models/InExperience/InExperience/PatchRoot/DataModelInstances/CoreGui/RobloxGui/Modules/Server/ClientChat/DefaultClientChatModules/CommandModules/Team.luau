@@ -1,113 +1,134 @@
-local l_Players_0 = game:GetService("Players");
-local v1 = {
-    "/team ", 
-    "/t ", 
-    "% "
-};
-IsTeamCommand = function(v2) --[[ Line: 10 ]] --[[ Name: IsTeamCommand ]]
-    -- upvalues: v1 (copy)
-    for v3 = 1, #v1 do
-        local v4 = v1[v3];
-        if string.sub(v2, 1, v4:len()):lower() == v4 then
-            return true;
-        end;
-    end;
-    return false;
-end;
-local v5 = {};
-v5.__index = v5;
-local l_Util_0 = require(script.Parent:WaitForChild("Util"));
-local v7 = {};
-v5.EnterTeamChat = function(v8) --[[ Line: 27 ]] --[[ Name: EnterTeamChat ]]
-    v8.TeamChatEntered = true;
-    v8.MessageModeButton.Size = UDim2.new(0, 1000, 1, 0);
-    v8.MessageModeButton.Text = "[Team]";
-    v8.MessageModeButton.TextColor3 = v8:GetTeamChatColor();
-    local l_X_0 = v8.MessageModeButton.TextBounds.X;
-    v8.MessageModeButton.Size = UDim2.new(0, l_X_0, 1, 0);
-    v8.TextBox.Size = UDim2.new(1, -l_X_0, 1, 0);
-    v8.TextBox.Position = UDim2.new(0, l_X_0, 0, 0);
-    v8.OriginalTeamText = v8.TextBox.Text;
-    v8.TextBox.Text = " ";
-end;
-v5.TextUpdated = function(v10) --[[ Line: 41 ]] --[[ Name: TextUpdated ]]
-    local l_Text_0 = v10.TextBox.Text;
-    if not v10.TeamChatEntered then
-        if IsTeamCommand(l_Text_0) then
-            v10:EnterTeamChat();
-            return;
-        end;
-    elseif l_Text_0 == "" then
-        v10.MessageModeButton.Text = "";
-        v10.MessageModeButton.Size = UDim2.new(0, 0, 0, 0);
-        v10.TextBox.Size = UDim2.new(1, 0, 1, 0);
-        v10.TextBox.Position = UDim2.new(0, 0, 0, 0);
-        v10.TextBox.Text = "";
-        v10.TeamChatEntered = false;
-        v10.ChatBar:ResetCustomState();
-        v10.ChatBar:CaptureFocus();
-    end;
-end;
-v5.GetMessage = function(v12) --[[ Line: 64 ]] --[[ Name: GetMessage ]]
-    if v12.TeamChatEntered then
-        return "/t " .. v12.TextBox.Text;
-    else
-        return v12.TextBox.Text;
-    end;
-end;
-v5.ProcessCompletedMessage = function(_) --[[ Line: 71 ]] --[[ Name: ProcessCompletedMessage ]]
-    return false;
-end;
-v5.Destroy = function(v14) --[[ Line: 75 ]] --[[ Name: Destroy ]]
-    v14.MessageModeConnection:disconnect();
-    v14.Destroyed = true;
-end;
-v5.GetTeamChatColor = function(v15) --[[ Line: 80 ]] --[[ Name: GetTeamChatColor ]]
-    -- upvalues: l_Players_0 (copy)
-    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-    if l_LocalPlayer_0.Team then
-        return l_LocalPlayer_0.Team.TeamColor.Color;
-    elseif v15.ChatSettings.DefaultChannelNameColor then
-        return v15.ChatSettings.DefaultChannelNameColor;
-    else
-        return Color3.fromRGB(35, 76, 142);
-    end;
-end;
-v7.new = function(v17, v18, v19) --[[ Line: 91 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy)
-    local v20 = setmetatable({}, v5);
-    v20.Destroyed = false;
-    v20.ChatWindow = v17;
-    v20.ChatBar = v18;
-    v20.ChatSettings = v19;
-    v20.TextBox = v18:GetTextBox();
-    v20.MessageModeButton = v18:GetMessageModeTextButton();
-    v20.OriginalTeamText = "";
-    v20.TeamChatEntered = false;
-    v20.MessageModeConnection = v20.MessageModeButton.MouseButton1Click:connect(function() --[[ Line: 102 ]]
-        -- upvalues: v20 (copy)
-        local l_Text_1 = v20.TextBox.Text;
-        if string.sub(l_Text_1, 1, 1) == " " then
-            l_Text_1 = string.sub(l_Text_1, 2);
-        end;
-        v20.ChatBar:ResetCustomState();
-        v20.ChatBar:SetTextBoxText(l_Text_1);
-        v20.ChatBar:CaptureFocus();
-    end);
-    v20:EnterTeamChat();
-    return v20;
-end;
-ProcessMessage = function(v22, v23, v24, v25) --[[ Line: 117 ]] --[[ Name: ProcessMessage ]]
-    -- upvalues: v7 (copy)
-    if v24.TargetChannel == "Team" then
-        return;
-    elseif IsTeamCommand(v22) then
-        return v7.new(v23, v24, v25);
-    else
-        return nil;
-    end;
-end;
+local Players = game:GetService("Players")
+local t1 = {
+	"/team ",
+	"/t ",
+	"% "
+}
+
+function IsTeamCommand(p1) -- line: 10
+	-- upvalues: t1 (copy)
+	for i = 1, #t1 do
+		local v8 = t1[i]
+
+		if v8 == string.sub(p1, 1, v8:len()):lower() then
+			return true
+		end
+	end
+
+	return false
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+local Util = require(script.Parent:WaitForChild("Util"))
+local t3 = {}
+
+function t2.EnterTeamChat(p2) -- line: 27
+	p2.TeamChatEntered = true
+	p2.MessageModeButton.Size = UDim2.new(0, 1000, 1, 0)
+	p2.MessageModeButton.Text = "[Team]"
+	p2.MessageModeButton.TextColor3 = p2:GetTeamChatColor()
+
+	local TextBoundsX = p2.MessageModeButton.TextBounds.X
+
+	p2.MessageModeButton.Size = UDim2.new(0, TextBoundsX, 1, 0)
+	p2.TextBox.Size = UDim2.new(1, -TextBoundsX, 1, 0)
+	p2.TextBox.Position = UDim2.new(0, TextBoundsX, 0, 0)
+	p2.OriginalTeamText = p2.TextBox.Text
+	p2.TextBox.Text = " "
+end
+function t2.TextUpdated(p3) -- line: 41
+	local TextBoxText = p3.TextBox.Text
+
+	if not p3.TeamChatEntered then
+		if IsTeamCommand(TextBoxText) then
+			p3:EnterTeamChat()
+
+			return
+		end
+	elseif TextBoxText == "" then
+		p3.MessageModeButton.Text = ""
+		p3.MessageModeButton.Size = UDim2.new(0, 0, 0, 0)
+		p3.TextBox.Size = UDim2.new(1, 0, 1, 0)
+		p3.TextBox.Position = UDim2.new(0, 0, 0, 0)
+		p3.TextBox.Text = ""
+		p3.TeamChatEntered = false
+		p3.ChatBar:ResetCustomState()
+		p3.ChatBar:CaptureFocus()
+	end
+end
+function t2.GetMessage(p4) -- line: 64
+	if p4.TeamChatEntered then
+		return "/t " .. p4.TextBox.Text
+	end
+
+	return p4.TextBox.Text
+end
+function t2.ProcessCompletedMessage(_) -- line: 71
+	return false
+end
+function t2.Destroy(p6) -- line: 75
+	p6.MessageModeConnection:disconnect()
+	p6.Destroyed = true
+end
+function t2.GetTeamChatColor(p7) -- line: 80
+	-- upvalues: Players (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if LocalPlayer.Team then
+		return LocalPlayer.Team.TeamColor.Color
+	end
+
+	if p7.ChatSettings.DefaultChannelNameColor then
+		return p7.ChatSettings.DefaultChannelNameColor
+	end
+
+	return Color3.fromRGB(35, 76, 142)
+end
+function t3.new(p8, p9, p10) -- line: 91
+	-- upvalues: t2 (copy)
+	local self = setmetatable({}, t2)
+
+	self.Destroyed = false
+	self.ChatWindow = p8
+	self.ChatBar = p9
+	self.ChatSettings = p10
+	self.TextBox = p9:GetTextBox()
+	self.MessageModeButton = p9:GetMessageModeTextButton()
+	self.OriginalTeamText = ""
+	self.TeamChatEntered = false
+	self.MessageModeConnection = self.MessageModeButton.MouseButton1Click:connect(function() -- line: 102
+		-- upvalues: self (copy)
+		local TextBoxText = self.TextBox.Text
+
+		if string.sub(TextBoxText, 1, 1) == " " then
+			TextBoxText = string.sub(TextBoxText, 2)
+		end
+
+		self.ChatBar:ResetCustomState()
+		self.ChatBar:SetTextBoxText(TextBoxText)
+		self.ChatBar:CaptureFocus()
+	end)
+	self:EnterTeamChat()
+
+	return self
+end
+function ProcessMessage(p11, p12, p13, p14) -- line: 117
+	-- upvalues: t3 (copy)
+	if p13.TargetChannel == "Team" then
+		return
+	end
+
+	if IsTeamCommand(p11) then
+		return t3.new(p12, p13, p14)
+	end
+
+	return nil
+end
+
 return {
-    [l_Util_0.KEY_COMMAND_PROCESSOR_TYPE] = l_Util_0.IN_PROGRESS_MESSAGE_PROCESSOR, 
-    [l_Util_0.KEY_PROCESSOR_FUNCTION] = ProcessMessage
-};
+	[Util.KEY_COMMAND_PROCESSOR_TYPE] = Util.IN_PROGRESS_MESSAGE_PROCESSOR,
+	[Util.KEY_PROCESSOR_FUNCTION] = ProcessMessage
+}

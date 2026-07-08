@@ -1,50 +1,57 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.React);
-local v5 = require(l_Parent_2.Core.Style.useStyle);
-local _ = require(l_Parent_1.Style.StyleTypes);
-local _ = require(l_Parent_1.Style.Fonts);
-local v8 = require(l_Parent_0.FooterFrame);
-local function v12(v9, v10) --[[ Line: 34 ]] --[[ Name: getStyleProps ]]
-    local v11 = v9 or {};
-    return {
-        cornerRadius = v11.cornerRadius, 
-        textColor = v11.textColor or v10.Theme.TextMuted, 
-        backgroundColor = v11.backgroundColor, 
-        textXAlignment = v11.textXAlignment or Enum.TextXAlignment.Left, 
-        textFont = v11.textFont or v10.Font.CaptionBody
-    };
-end;
-return function(v13) --[[ Line: 45 ]] --[[ Name: TextFooter ]]
-    -- upvalues: v5 (copy), v12 (copy), v4 (copy), v8 (copy)
-    local v14 = v5();
-    local l_Font_0 = v14.Font;
-    local v16 = v12(v13.styleProps, v14);
-    local l_cornerRadius_0 = v16.cornerRadius;
-    local l_textColor_0 = v16.textColor;
-    local l_backgroundColor_0 = v16.backgroundColor;
-    local l_textXAlignment_0 = v16.textXAlignment;
-    local l_textFont_0 = v16.textFont;
-    return v4.createElement(v8, v13, {
-        Text = v4.createElement("TextLabel", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = if l_backgroundColor_0 then l_backgroundColor_0.Color else nil, 
-            BackgroundTransparency = if l_backgroundColor_0 then l_backgroundColor_0.Transparency else 1, 
-            BorderSizePixel = 0, 
-            Text = v13.text, 
-            TextXAlignment = l_textXAlignment_0, 
-            TextYAlignment = Enum.TextYAlignment.Center, 
-            Font = l_textFont_0.Font, 
-            TextSize = l_Font_0.BaseSize * l_textFont_0.RelativeSize, 
-            TextColor3 = l_textColor_0.Color, 
-            TextTransparency = l_textColor_0.Transparency, 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        }, {
-            UICorner = if l_cornerRadius_0 then v4.createElement("UICorner", {
-                CornerRadius = UDim.new(0, l_cornerRadius_0)
-            }) else nil
-        })
-    });
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local React = require(ParentParentParentParent.React)
+local useStyle = require(ParentParentParent.Core.Style.useStyle)
+
+require(ParentParent.Style.StyleTypes)
+require(ParentParent.Style.Fonts)
+
+local FooterFrame = require(scriptParent.FooterFrame)
+
+local function getStyleProps(t1: {[any]: any}?, p1) -- line: 34
+	local v12 = t1 or {}
+
+	return {
+		cornerRadius = v12.cornerRadius,
+		textColor = v12.textColor or p1.Theme.TextMuted,
+		backgroundColor = v12.backgroundColor,
+		textXAlignment = v12.textXAlignment or Enum.TextXAlignment.Left,
+		textFont = v12.textFont or p1.Font.CaptionBody
+	}
+end
+local function TextFooter(p2) -- line: 45
+	-- upvalues: useStyle (copy), getStyleProps (copy), React (copy), FooterFrame (copy)
+	local v14 = useStyle()
+	local Font = v14.Font
+	local v16 = getStyleProps(p2.styleProps, v14)
+	local cornerRadius = v16.cornerRadius
+	local textColor = v16.textColor
+	local backgroundColor = v16.backgroundColor
+	local textXAlignment = v16.textXAlignment
+	local textFont = v16.textFont
+
+	return React.createElement(FooterFrame, p2, {
+		Text = React.createElement("TextLabel", {
+			BorderSizePixel = 0,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = if not backgroundColor then nil else backgroundColor.Color,
+			BackgroundTransparency = not backgroundColor and 1 or backgroundColor.Transparency,
+			Text = p2.text,
+			TextXAlignment = textXAlignment,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			Font = textFont.Font,
+			TextSize = Font.BaseSize * textFont.RelativeSize,
+			TextColor3 = textColor.Color,
+			TextTransparency = textColor.Transparency,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}, {
+			UICorner = if not cornerRadius then nil else React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, cornerRadius)
+			})
+		})
+	})
+end
+
+return TextFooter

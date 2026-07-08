@@ -1,24 +1,31 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.HttpRequest);
-local _ = require(script.Parent.GamePassStoreTypes);
-local v3 = require(script.Parent.GamePassUrlBuilder);
-local v7 = v1.config({
-    requestFunction = function(v4, v5, v6) --[[ Line: 15 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v1 (copy)
-        return v1.requestFunctions.HttpRbxApi(v4, v5, v6);
-    end
-});
-return function(v8) --[[ Line: 20 ]] --[[ Name: fetchGamePasses ]]
-    -- upvalues: v3 (copy), v7 (copy)
-    local v9 = v3.buildGamePassesUrl({
-        universeId = v8
-    });
-    return v7(v9, "GET"):andThen(function(v10) --[[ Line: 22 ]]
-        -- upvalues: v8 (copy)
-        local v11 = v10.responseBody and v10.responseBody.gamePasses or {};
-        return {
-            universeId = v8, 
-            gamePasses = v11
-        };
-    end);
-end;
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local HttpRequest = require(Parent.HttpRequest)
+
+require(script.Parent.GamePassStoreTypes)
+
+local GamePassUrlBuilder = require(script.Parent.GamePassUrlBuilder)
+local v4 = HttpRequest.config({
+	requestFunction = function(s1: string, s2: string, p1) -- line: 15
+		-- upvalues: HttpRequest (copy)
+		return HttpRequest.requestFunctions.HttpRbxApi(s1, s2, p1)
+	end
+})
+
+local function fetchGamePasses(s3: string) -- line: 20
+	-- upvalues: GamePassUrlBuilder (copy), v4 (copy)
+	local v10 = GamePassUrlBuilder.buildGamePassesUrl({
+		universeId = s3
+	})
+
+	return v4(v10, "GET"):andThen(function(p2) -- line: 22
+		-- upvalues: s3 (copy)
+		local v12 = p2.responseBody and p2.responseBody.gamePasses or {}
+
+		return {
+			universeId = s3,
+			gamePasses = v12
+		}
+	end)
+end
+
+return fetchGamePasses

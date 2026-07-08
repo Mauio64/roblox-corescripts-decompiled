@@ -1,1 +1,1 @@
-return require(script.EditProfileBackgroundViewport);
+return require(script.EditProfileBackgroundViewport)

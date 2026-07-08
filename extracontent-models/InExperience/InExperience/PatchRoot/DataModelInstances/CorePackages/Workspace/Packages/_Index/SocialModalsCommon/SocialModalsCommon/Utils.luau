@@ -1,3 +1,3 @@
 return {
-    updateOptedInUsers = require(script.updateOptedInUsers)
-};
+	updateOptedInUsers = require(script.updateOptedInUsers)
+}

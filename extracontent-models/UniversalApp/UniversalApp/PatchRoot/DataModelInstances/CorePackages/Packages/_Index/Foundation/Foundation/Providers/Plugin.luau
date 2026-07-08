@@ -1,1 +1,1 @@
-return require(script.PluginProvider);
+return require(script.PluginProvider)

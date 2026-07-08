@@ -1,29 +1,32 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PlatformEnum);
-local v2 = require(l_Parent_0.Events.VR.VRFTUXEventHandler);
-local v3 = require(l_Parent_0.Events.Events);
-local v4 = {
-    [v1.QuestVR] = v2
-};
+local ParentParent = script.Parent.Parent
+local PlatformEnum = require(ParentParent.Enums.PlatformEnum)
+local VRFTUXEventHandler = require(ParentParent.Events.VR.VRFTUXEventHandler)
+local Events = require(ParentParent.Events.Events)
+local t1 = {
+	[PlatformEnum.QuestVR] = VRFTUXEventHandler
+}
+
 return {
-    StartEvents = function(v5, v6, v7) --[[ Line: 14 ]] --[[ Name: StartEvents ]]
-        -- upvalues: v4 (copy), v3 (copy)
-        local v8 = v4[v5];
-        local v9 = v3[v5][v6];
-        if v9 then
-            for _, v11 in pairs(v9) do
-                v8.StartEvent(v11, v7);
-            end;
-        end;
-    end, 
-    StopEvents = function(v12, v13) --[[ Line: 25 ]] --[[ Name: StopEvents ]]
-        -- upvalues: v4 (copy), v3 (copy)
-        local v14 = v4[v12];
-        local v15 = v3[v12][v13];
-        if v15 then
-            for _, v17 in pairs(v15) do
-                v14.StopEvent(v17);
-            end;
-        end;
-    end
-};
+	StartEvents = function(p1, n1: number, p2: ((...any) -> ...any)) -- line: 14
+		-- upvalues: t1 (copy), Events (copy)
+		local v9 = t1[p1]
+		local v10 = Events[p1][n1]
+
+		if v10 then
+			for _, v in pairs(v10) do
+				v9.StartEvent(v, p2)
+			end
+		end
+	end,
+	StopEvents = function(p3, n2: number) -- line: 25
+		-- upvalues: t1 (copy), Events (copy)
+		local v15 = t1[p3]
+		local v16 = Events[p3][n2]
+
+		if v16 then
+			for _, v in pairs(v16) do
+				v15.StopEvent(v)
+			end
+		end
+	end
+}

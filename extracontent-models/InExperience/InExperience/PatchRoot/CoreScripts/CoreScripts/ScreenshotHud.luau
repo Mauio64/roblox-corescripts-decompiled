@@ -1,467 +1,547 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Players_0 = game:GetService("Players");
-local l_ProximityPromptService_0 = game:GetService("ProximityPromptService");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local v10 = require(l_RobloxGui_0.Modules.CaptureMaster);
-local v11 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_PermissionsProtocol_0 = require(l_CorePackages_0.Workspace.Packages.PermissionsProtocol).PermissionsProtocol;
-local v13 = require(l_CorePackages_0.Packages.Promise);
-local l_AppFonts_0 = require(l_CorePackages_0.Workspace.Packages.Style).AppFonts;
-if not require(l_RobloxGui_0.Modules.Flags.GetFFlagScreenshotHudApi)() then
-    return;
-else
-    local l_ScreenshotHud_0 = l_GuiService_0:WaitForChild("ScreenshotHud");
-    local v16 = {
-        Default = {
-            BackgroundColor3 = Color3.fromRGB(0, 180, 109), 
-            BackgroundTransparency = 0
-        }, 
-        Hovered = {
-            BackgroundColor3 = Color3.fromRGB(0, 232, 126), 
-            BackgroundTransparency = 0
-        }, 
-        Pressed = {
-            BackgroundColor3 = Color3.fromRGB(0, 232, 126), 
-            BackgroundTransparency = 0.5
-        }
-    };
-    local v17 = nil;
-    local v18 = nil;
-    local v19 = {};
-    local v20 = {};
-    local v21 = nil;
-    local v22 = false;
-    local function v28(v23, v24) --[[ Line: 72 ]] --[[ Name: createFrame ]]
-        local l_Frame_0 = Instance.new("Frame");
-        l_Frame_0.BackgroundColor3 = Color3.new(1, 1, 1);
-        l_Frame_0.BackgroundTransparency = 1;
-        l_Frame_0.BorderSizePixel = 0;
-        l_Frame_0.Position = UDim2.new(0, 0, 0, 0);
-        l_Frame_0.Size = UDim2.new(1, 0, 1, 0);
-        for v26, v27 in pairs(v23) do
-            l_Frame_0[v26] = v27;
-        end;
-        l_Frame_0.Parent = v24;
-        return l_Frame_0;
-    end;
-    local function v35(v29, v30, v31) --[[ Line: 89 ]] --[[ Name: createImageLabel ]]
-        local l_ImageLabel_0 = Instance.new("ImageLabel");
-        l_ImageLabel_0.Image = v29;
-        l_ImageLabel_0.BackgroundTransparency = 1;
-        l_ImageLabel_0.BorderSizePixel = 0;
-        l_ImageLabel_0.Position = UDim2.new(0, 0, 0, 0);
-        l_ImageLabel_0.Size = UDim2.new(1, 0, 1, 0);
-        for v33, v34 in pairs(v30) do
-            l_ImageLabel_0[v33] = v34;
-        end;
-        l_ImageLabel_0.Parent = v31;
-        return l_ImageLabel_0;
-    end;
-    local function v42(v36, v37, v38) --[[ Line: 107 ]] --[[ Name: createImageButton ]]
-        local l_ImageButton_0 = Instance.new("ImageButton");
-        l_ImageButton_0.Image = v36;
-        l_ImageButton_0.BackgroundTransparency = 1;
-        l_ImageButton_0.BorderSizePixel = 0;
-        l_ImageButton_0.Position = UDim2.new(0, 0, 0, 0);
-        l_ImageButton_0.Size = UDim2.new(1, 0, 1, 0);
-        for v40, v41 in pairs(v37) do
-            l_ImageButton_0[v40] = v41;
-        end;
-        l_ImageButton_0.Parent = v38;
-        return l_ImageButton_0;
-    end;
-    local function v49(v43, v44, v45) --[[ Line: 125 ]] --[[ Name: createTextLabel ]]
-        -- upvalues: l_AppFonts_0 (copy)
-        local l_TextLabel_0 = Instance.new("TextLabel");
-        l_TextLabel_0.Text = v43;
-        l_TextLabel_0.BackgroundTransparency = 1;
-        l_TextLabel_0.BorderSizePixel = 0;
-        l_TextLabel_0.Font = l_AppFonts_0.default:getMedium();
-        l_TextLabel_0.Position = UDim2.new(0, 0, 0, 0);
-        l_TextLabel_0.Size = UDim2.new(1, 0, 1, 0);
-        l_TextLabel_0.TextColor3 = Color3.new(1, 1, 1);
-        l_TextLabel_0.TextSize = 20;
-        for v47, v48 in pairs(v44) do
-            l_TextLabel_0[v47] = v48;
-        end;
-        l_TextLabel_0.Parent = v45;
-        return l_TextLabel_0;
-    end;
-    local l_l_GuiService_0_GuiInset_0, v51 = l_GuiService_0:GetGuiInset();
-    local v52 = v28({
-        Name = "ScreenshotHudFrame", 
-        Position = UDim2.new(0, -l_l_GuiService_0_GuiInset_0.X, 0, -l_l_GuiService_0_GuiInset_0.Y), 
-        Size = UDim2.new(1, l_l_GuiService_0_GuiInset_0.X + v51.X, 1, l_l_GuiService_0_GuiInset_0.Y + v51.Y), 
-        Visible = false
-    }, l_RobloxGui_0);
-    local v53 = v28({
-        Name = "ScreenshotHudContent", 
-        Position = UDim2.new(0, l_l_GuiService_0_GuiInset_0.X, 0, l_l_GuiService_0_GuiInset_0.Y), 
-        Size = UDim2.new(1, -l_l_GuiService_0_GuiInset_0.X - v51.X, 1, -l_l_GuiService_0_GuiInset_0.Y - v51.Y), 
-        Visible = false
-    }, v52);
-    local v54 = v42("", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        AutoButtonColor = false, 
-        BackgroundColor3 = Color3.fromRGB(0, 180, 109), 
-        BackgroundTransparency = 0.5, 
-        Name = "CameraButton", 
-        Position = UDim2.new(0.5, 0, 1, -50), 
-        Size = UDim2.fromOffset(64, 64)
-    }, nil);
-    local l_UICorner_0 = Instance.new("UICorner");
-    l_UICorner_0.CornerRadius = UDim.new(0, 32);
-    l_UICorner_0.Parent = v54;
-    local v56 = v35("", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = v16.Default.BackgroundColor3, 
-        BackgroundTransparency = v16.Default.BackgroundTransparency, 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromOffset(52, 52)
-    }, v54);
-    local l_UICorner_1 = Instance.new("UICorner");
-    l_UICorner_1.CornerRadius = UDim.new(0, 26);
-    l_UICorner_1.Parent = v56;
-    local v58 = v35("rbxasset://textures/ui/ScreenshotHud/Camera.png", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromOffset(32, 32)
-    }, v56);
-    local v59 = v42("", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = Color3.fromRGB(7, 7, 8), 
-        BackgroundTransparency = 0, 
-        Name = "CloseButton", 
-        Position = UDim2.new(0.5, -66, 1, -50), 
-        Size = UDim2.fromOffset(48, 48)
-    }, nil);
-    local l_UICorner_2 = Instance.new("UICorner");
-    l_UICorner_2.CornerRadius = UDim.new(0, 24);
-    l_UICorner_2.Parent = v59;
-    local _ = v35("rbxasset://textures/ui/ScreenshotHud/Close.png", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        Size = UDim2.fromOffset(32, 32)
-    }, v59);
-    local v62 = v42("", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = Color3.fromRGB(0, 180, 109), 
-        BackgroundTransparency = 0, 
-        Name = "CameraButton", 
-        Position = UDim2.new(1, -94, 1, -78), 
-        Size = UDim2.fromOffset(140, 36)
-    }, nil);
-    local l_UICorner_3 = Instance.new("UICorner");
-    l_UICorner_3.CornerRadius = UDim.new(0, 18);
-    l_UICorner_3.Parent = v62;
-    local _ = v35("rbxasset://textures/ui/Controls/xboxY.png", {
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 6, 0.5, 0), 
-        Size = UDim2.fromOffset(24, 24)
-    }, v62);
-    local _ = v49(v11:FormatByKey("CoreScripts.ScreenshotHud.Action.TakePhoto"), {
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 30, 0.5, 0), 
-        Size = UDim2.new(1, -36, 0, 20), 
-        TextScaled = true, 
-        TextWrapped = true
-    }, v62);
-    local v66 = v42("", {
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        BackgroundColor3 = Color3.fromRGB(7, 7, 8), 
-        BackgroundTransparency = 0, 
-        Name = "CloseButton", 
-        Position = UDim2.new(1, -228, 1, -78), 
-        Size = UDim2.fromOffset(104, 36)
-    }, nil);
-    local l_UICorner_4 = Instance.new("UICorner");
-    l_UICorner_4.CornerRadius = UDim.new(0, 18);
-    l_UICorner_4.Parent = v66;
-    local _ = v35("rbxasset://textures/ui/Controls/xboxB.png", {
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 6, 0.5, 0), 
-        Size = UDim2.fromOffset(24, 24)
-    }, v66);
-    local _ = v49(v11:FormatByKey("CoreScripts.ScreenshotHud.Action.Cancel"), {
-        AnchorPoint = Vector2.new(0, 0.5), 
-        Position = UDim2.new(0, 30, 0.5, 0), 
-        Size = UDim2.new(1, -36, 0, 20), 
-        TextScaled = true, 
-        TextWrapped = true
-    }, v66);
-    local v70 = v28({
-        Active = true, 
-        BackgroundTransparency = 0.5, 
-        Name = "FlashOverlay", 
-        Visible = false, 
-        ZIndex = 3
-    }, v52);
-    local function v72() --[[ Line: 279 ]] --[[ Name: checkOrRequestExternalStoragePermissions ]]
-        -- upvalues: l_PermissionsProtocol_0 (copy), v13 (copy)
-        return l_PermissionsProtocol_0.default:checkOrRequestPermissions({
-            l_PermissionsProtocol_0.Permissions.WRITE_MEDIA_STORAGE
-        }):andThen(function(v71) --[[ Line: 284 ]]
-            -- upvalues: l_PermissionsProtocol_0 (ref), v13 (ref)
-            return v71 == l_PermissionsProtocol_0.Status.AUTHORIZED and v13.resolve() or v13.reject();
-        end);
-    end;
-    local function v77() --[[ Line: 290 ]] --[[ Name: getEnabledPlayerScreenGuis ]]
-        -- upvalues: l_Players_0 (copy)
-        local l_Descendants_0 = l_Players_0.LocalPlayer.PlayerGui:GetDescendants();
-        local v74 = {};
-        for _, v76 in ipairs(l_Descendants_0) do
-            if v76:IsA("ScreenGui") and v76.Enabled then
-                table.insert(v74, v76);
-            end;
-        end;
-        return v74;
-    end;
-    local function v81() --[[ Line: 301 ]] --[[ Name: getEnabledCoreGuiTypes ]]
-        -- upvalues: l_StarterGui_0 (copy)
-        local v78 = {};
-        for _, v80 in ipairs(Enum.CoreGuiType:GetEnumItems()) do
-            if l_StarterGui_0:GetCoreGuiEnabled(v80) then
-                table.insert(v78, v80);
-            end;
-        end;
-        return v78;
-    end;
-    local function v82() --[[ Line: 311 ]]
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local StarterGui = game:GetService("StarterGui")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local RobloxGui = CoreGui.RobloxGui
+local CaptureMaster = require(RobloxGui.Modules.CaptureMaster)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local PermissionsProtocol = require(CorePackages.Workspace.Packages.PermissionsProtocol).PermissionsProtocol
+local Promise = require(CorePackages.Packages.Promise)
+local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
 
-    end;
-    local function v83() --[[ Line: 313 ]] --[[ Name: onCameraButtonActivated ]]
-        -- upvalues: l_UserInputService_0 (copy), v72 (copy), v82 (ref), v10 (copy)
-        if l_UserInputService_0:GetPlatform() == Enum.Platform.Android then
-            v72():andThen(v82, function() --[[ Line: 315 ]]
-                -- upvalues: v10 (ref)
-                v10:ShowPermissionToast();
-            end);
-            return;
-        else
-            v82();
-            return;
-        end;
-    end;
-    v82 = function() --[[ Line: 323 ]]
-        -- upvalues: v10 (copy), v21 (ref), l_ScreenshotHud_0 (copy), v77 (copy), v81 (copy), l_StarterGui_0 (copy), l_ProximityPromptService_0 (copy), v53 (copy), l_Players_0 (copy), l_CoreGui_0 (copy), v70 (copy), v54 (copy), v83 (copy), l_RbxAnalyticsService_0 (copy)
-        v10:DismissNotification();
-        if v21 then
-            v21:Disconnect();
-            v21 = nil;
-        end;
-        local v84 = false;
-        local v85 = false;
-        local v86 = nil;
-        if l_ScreenshotHud_0.HidePlayerGuiForCaptures then
-            v86 = v77();
-            for _, v88 in ipairs(v86) do
-                v88.Enabled = false;
-            end;
-            v85 = true;
-        end;
-        local v89 = nil;
-        if l_ScreenshotHud_0.HideCoreGuiForCaptures then
-            v89 = v81();
-            for _, v91 in ipairs(v89) do
-                l_StarterGui_0:SetCoreGuiEnabled(v91, false);
-            end;
-            v84 = true;
-        end;
-        local l_Enabled_0 = l_ProximityPromptService_0.Enabled;
-        l_ProximityPromptService_0.Enabled = false;
-        v53.Visible = false;
-        wait(0.2);
-        local v93 = {};
-        for _, v95 in pairs(l_Players_0:GetPlayers()) do
-            local v96 = v95.Character and v95.Character:WaitForChild("Humanoid");
-            if v96 then
-                v93[v96] = v96.DisplayDistanceType;
-                v96.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None;
-            end;
-        end;
-        l_CoreGui_0:TakeScreenshot();
-        wait(0.2);
-        v53.Visible = true;
-        v70.Visible = true;
-        wait(0.2);
-        v70.Visible = false;
-        if not v21 then
-            v21 = v54.Activated:connect(v83);
-        end;
-        l_ProximityPromptService_0.Enabled = l_Enabled_0;
-        for _, v98 in pairs(l_Players_0:GetPlayers()) do
-            local v99 = v98.Character and v98.Character:WaitForChild("Humanoid");
-            if v99 and v93[v99] then
-                v99.DisplayDistanceType = v93[v99];
-            end;
-        end;
-        if v85 then
-            for _, v101 in ipairs(v86) do
-                v101.Enabled = true;
-            end;
-        end;
-        if v84 then
-            for _, v103 in ipairs(v89) do
-                l_StarterGui_0:SetCoreGuiEnabled(v103, true);
-            end;
-        end;
-        if l_ScreenshotHud_0.CloseWhenScreenshotTaken then
-            l_ScreenshotHud_0.Visible = false;
-        end;
-        l_RbxAnalyticsService_0:SendEventDeferred("client", "screenshotHud", "TakeScreenshot", {
-            pid = tostring(game.PlaceId)
-        });
-    end;
-    local function _(v104) --[[ Line: 424 ]] --[[ Name: isGamepad ]]
-        return v104.Name:match("^Gamepad*") ~= nil;
-    end;
-    local function v106() --[[ Line: 428 ]] --[[ Name: updateGamepadButtons ]]
-        -- upvalues: v17 (ref), v18 (ref), v22 (ref), v62 (copy), v54 (copy), v66 (copy), v59 (copy), v53 (copy), l_ScreenshotHud_0 (copy)
-        if v17 then
-            v17.Parent = nil;
-        end;
-        if v18 then
-            v18.Parent = nil;
-        end;
-        v17 = if v22 then v62 else v54;
-        v18 = if v22 then v66 else v59;
-        v17.Parent = v53;
-        v18.Parent = v53;
-        if l_ScreenshotHud_0.CameraButtonPosition ~= UDim2.fromOffset(0, 0) then
-            v17.Position = l_ScreenshotHud_0.CameraButtonPosition;
-        end;
-        if l_ScreenshotHud_0.CloseButtonPosition ~= UDim2.fromOffset(0, 0) then
-            v18.Position = l_ScreenshotHud_0.CloseButtonPosition;
-        end;
-    end;
-    local function v110(v107) --[[ Line: 453 ]] --[[ Name: onLastInputTypeChanged ]]
-        -- upvalues: l_UserInputService_0 (copy), v22 (ref), v106 (copy)
-        local _ = nil;
-        local v109 = (v107 or l_UserInputService_0:GetLastInputType()).Name:match("^Gamepad*") ~= nil;
-        if v22 ~= v109 then
-            v22 = v109;
-            v106();
-        end;
-    end;
-    local function v123() --[[ Line: 469 ]] --[[ Name: setupConnections ]]
-        -- upvalues: v54 (copy), v56 (copy), v16 (copy), v19 (ref), v21 (ref), v83 (copy), v59 (copy), l_ScreenshotHud_0 (copy), l_ContextActionService_0 (copy), v20 (ref), l_UserInputService_0 (copy), v22 (ref), v106 (copy), v110 (copy)
-        local v112 = v54.InputBegan:Connect(function(v111) --[[ Line: 470 ]]
-            -- upvalues: v56 (ref), v16 (ref)
-            if v111.UserInputType == Enum.UserInputType.MouseMovement then
-                v56.BackgroundColor3 = v16.Hovered.BackgroundColor3;
-                v56.BackgroundTransparency = v16.Hovered.BackgroundTransparency;
-                return;
-            else
-                if v111.UserInputType == Enum.UserInputType.MouseButton1 or v111.UserInputType == Enum.UserInputType.Touch then
-                    v56.BackgroundColor3 = v16.Pressed.BackgroundColor3;
-                    v56.BackgroundTransparency = v16.Pressed.BackgroundTransparency;
-                end;
-                return;
-            end;
-        end);
-        table.insert(v19, v112);
-        local v113 = v54.InputEnded:Connect(function() --[[ Line: 484 ]]
-            -- upvalues: v56 (ref), v16 (ref)
-            v56.BackgroundColor3 = v16.Default.BackgroundColor3;
-            v56.BackgroundTransparency = v16.Default.BackgroundTransparency;
-        end);
-        table.insert(v19, v113);
-        if v21 then
-            v21:Disconnect();
-            v21 = nil;
-        end;
-        v21 = v54.Activated:connect(v83);
-        table.insert(v19, v21);
-        local v114 = v59.Activated:connect(function() --[[ Line: 497 ]]
-            -- upvalues: l_ScreenshotHud_0 (ref)
-            l_ScreenshotHud_0.Visible = false;
-        end);
-        table.insert(v19, v114);
-        l_ContextActionService_0:BindAction("ScreenshotHudGamepadClose", function(_, v116, v117) --[[ Line: 503 ]] --[[ Name: gamepadHandleClose ]]
-            -- upvalues: l_ScreenshotHud_0 (ref)
-            if v116 == Enum.UserInputState.End and v117.UserInputType.Name:match("^Gamepad*") ~= nil then
-                l_ScreenshotHud_0.Visible = false;
-            end;
-        end, false, Enum.KeyCode.ButtonB);
-        table.insert(v20, "ScreenshotHudGamepadClose");
-        l_ContextActionService_0:BindAction("ScreenshotHudGamepadCamera", function(_, v119, v120) --[[ Line: 513 ]] --[[ Name: gamepadHandleCamera ]]
-            -- upvalues: v83 (ref)
-            if v119 == Enum.UserInputState.End and v120.UserInputType.Name:match("^Gamepad*") ~= nil then
-                v83();
-            end;
-        end, false, Enum.KeyCode.ButtonY);
-        table.insert(v20, "ScreenshotHudGamepadCamera");
-        local v121 = nil;
-        local v122 = l_UserInputService_0:GetLastInputType().Name:match("^Gamepad*") ~= nil;
-        if v22 ~= v122 then
-            v22 = v122;
-            v106();
-        end;
-        v121 = l_UserInputService_0.LastInputTypeChanged:Connect(v110);
-        table.insert(v19, v121);
-    end;
-    local function v128() --[[ Line: 528 ]] --[[ Name: disconnectAll ]]
-        -- upvalues: v19 (ref), v20 (ref), l_ContextActionService_0 (copy)
-        for _, v125 in ipairs(v19) do
-            v125:Disconnect();
-            v125 = nil;
-        end;
-        v19 = {};
-        for _, v127 in ipairs(v20) do
-            l_ContextActionService_0:UnbindAction(v127);
-        end;
-        v20 = {};
-    end;
-    local function v130(v129) --[[ Line: 541 ]] --[[ Name: screenshotHudEnabled ]]
-        -- upvalues: v52 (copy), l_ScreenshotHud_0 (copy), v128 (copy), v53 (copy), v70 (copy), v123 (copy), v10 (copy), l_RbxAnalyticsService_0 (copy)
-        v52.Visible = l_ScreenshotHud_0.Visible;
-        v128();
-        if l_ScreenshotHud_0.Visible then
-            v53.Visible = true;
-            v70.Visible = false;
-            v123();
-            v10:Start();
-        end;
-        l_RbxAnalyticsService_0:SendEventDeferred("client", "screenshotHud", "ScreenshotHudEnabled", {
-            pid = tostring(game.PlaceId), 
-            enabled = v129
-        });
-    end;
-    l_ScreenshotHud_0:GetPropertyChangedSignal("Visible"):Connect(function() --[[ Line: 558 ]]
-        -- upvalues: v130 (copy), l_ScreenshotHud_0 (copy)
-        v130(l_ScreenshotHud_0.Visible);
-    end);
-    l_ScreenshotHud_0:GetPropertyChangedSignal("CameraButtonIcon"):Connect(function() --[[ Line: 562 ]]
-        -- upvalues: v58 (copy), l_ScreenshotHud_0 (copy), l_RbxAnalyticsService_0 (copy)
-        v58.Image = l_ScreenshotHud_0.CameraButtonIcon or "rbxasset://textures/ui/ScreenshotHud/Camera.png";
-        l_RbxAnalyticsService_0:SendEventDeferred("client", "screenshotHud", "CameraButtonIcon", {
-            pid = tostring(game.PlaceId), 
-            icon = l_ScreenshotHud_0.CameraButtonIcon
-        });
-    end);
-    l_ScreenshotHud_0:GetPropertyChangedSignal("CameraButtonPosition"):Connect(function() --[[ Line: 571 ]]
-        -- upvalues: v17 (ref), l_ScreenshotHud_0 (copy), l_RbxAnalyticsService_0 (copy)
-        v17.Position = l_ScreenshotHud_0.CameraButtonPosition;
-        l_RbxAnalyticsService_0:SendEventDeferred("client", "screenshotHud", "CameraButtonPosition", {
-            pid = tostring(game.PlaceId), 
-            position = tostring(l_ScreenshotHud_0.CameraButtonPosition)
-        });
-    end);
-    l_ScreenshotHud_0:GetPropertyChangedSignal("CloseButtonPosition"):Connect(function() --[[ Line: 579 ]]
-        -- upvalues: v18 (ref), l_ScreenshotHud_0 (copy), l_RbxAnalyticsService_0 (copy)
-        v18.Position = l_ScreenshotHud_0.CloseButtonPosition;
-        l_RbxAnalyticsService_0:SendEventDeferred("client", "screenshotHud", "CloseButtonPosition", {
-            pid = tostring(game.PlaceId), 
-            position = tostring(l_ScreenshotHud_0.CloseButtonPosition)
-        });
-    end);
-    v106();
-    v130(l_ScreenshotHud_0.Visible);
-    return;
-end;
+if not require(RobloxGui.Modules.Flags.GetFFlagScreenshotHudApi)() then
+	return
+end
+
+local ScreenshotHud = GuiService:WaitForChild("ScreenshotHud")
+local t1 = {
+	Default = {
+		BackgroundTransparency = 0,
+		BackgroundColor3 = Color3.fromRGB(0, 180, 109)
+	},
+	Hovered = {
+		BackgroundTransparency = 0,
+		BackgroundColor3 = Color3.fromRGB(0, 232, 126)
+	},
+	Pressed = {
+		BackgroundTransparency = 0.5,
+		BackgroundColor3 = Color3.fromRGB(0, 232, 126)
+	}
+}
+local u18 = nil
+local u19 = nil
+local t2 = {}
+local t3 = {}
+local u22 = nil
+local u23 = false
+
+local function createFrame(p1, p2) -- line: 72
+	local Frame = Instance.new("Frame")
+
+	Frame.BackgroundColor3 = Color3.new(1, 1, 1)
+	Frame.BackgroundTransparency = 1
+	Frame.BorderSizePixel = 0
+	Frame.Position = UDim2.new(0, 0, 0, 0)
+	Frame.Size = UDim2.new(1, 0, 1, 0)
+
+	for k, v in pairs(p1) do
+		Frame[k] = v
+	end
+
+	Frame.Parent = p2
+
+	return Frame
+end
+local function createImageLabel(p3, p4, p5) -- line: 89
+	local ImageLabel = Instance.new("ImageLabel")
+
+	ImageLabel.Image = p3
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.BorderSizePixel = 0
+	ImageLabel.Position = UDim2.new(0, 0, 0, 0)
+	ImageLabel.Size = UDim2.new(1, 0, 1, 0)
+
+	for k, v in pairs(p4) do
+		ImageLabel[k] = v
+	end
+
+	ImageLabel.Parent = p5
+
+	return ImageLabel
+end
+local function createImageButton(p6, p7, p8) -- line: 107
+	local ImageButton = Instance.new("ImageButton")
+
+	ImageButton.Image = p6
+	ImageButton.BackgroundTransparency = 1
+	ImageButton.BorderSizePixel = 0
+	ImageButton.Position = UDim2.new(0, 0, 0, 0)
+	ImageButton.Size = UDim2.new(1, 0, 1, 0)
+
+	for k, v in pairs(p7) do
+		ImageButton[k] = v
+	end
+
+	ImageButton.Parent = p8
+
+	return ImageButton
+end
+local function createTextLabel(p9, p10, p11) -- line: 125
+	-- upvalues: AppFonts (copy)
+	local TextLabel = Instance.new("TextLabel")
+
+	TextLabel.Text = p9
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Font = AppFonts.default:getMedium()
+	TextLabel.Position = UDim2.new(0, 0, 0, 0)
+	TextLabel.Size = UDim2.new(1, 0, 1, 0)
+	TextLabel.TextColor3 = Color3.new(1, 1, 1)
+	TextLabel.TextSize = 20
+
+	for k, v in pairs(p10) do
+		TextLabel[k] = v
+	end
+
+	TextLabel.Parent = p11
+
+	return TextLabel
+end
+
+local v28, v29 = GuiService:GetGuiInset()
+local v30 = createFrame({
+	Name = "ScreenshotHudFrame",
+	Visible = false,
+	Position = UDim2.new(0, -v28.X, 0, -v28.Y),
+	Size = UDim2.new(1, v28.X + v29.X, 1, v28.Y + v29.Y)
+}, RobloxGui)
+local v31 = createFrame({
+	Name = "ScreenshotHudContent",
+	Visible = false,
+	Position = UDim2.new(0, v28.X, 0, v28.Y),
+	Size = UDim2.new(1, -v28.X - v29.X, 1, -v28.Y - v29.Y)
+}, v30)
+local v32 = createImageButton("", {
+	AutoButtonColor = false,
+	BackgroundTransparency = 0.5,
+	Name = "CameraButton",
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundColor3 = Color3.fromRGB(0, 180, 109),
+	Position = UDim2.new(0.5, 0, 1, -50),
+	Size = UDim2.fromOffset(64, 64)
+}, nil)
+local UICorner = Instance.new("UICorner")
+
+UICorner.CornerRadius = UDim.new(0, 32)
+UICorner.Parent = v32
+
+local v34 = createImageLabel("", {
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundColor3 = t1.Default.BackgroundColor3,
+	BackgroundTransparency = t1.Default.BackgroundTransparency,
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.fromOffset(52, 52)
+}, v32)
+local UICorner2 = Instance.new("UICorner")
+
+UICorner2.CornerRadius = UDim.new(0, 26)
+UICorner2.Parent = v34
+
+local v36 = createImageLabel("rbxasset://textures/ui/ScreenshotHud/Camera.png", {
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.fromOffset(32, 32)
+}, v34)
+local v37 = createImageButton("", {
+	BackgroundTransparency = 0,
+	Name = "CloseButton",
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundColor3 = Color3.fromRGB(7, 7, 8),
+	Position = UDim2.new(0.5, -66, 1, -50),
+	Size = UDim2.fromOffset(48, 48)
+}, nil)
+local UICorner3 = Instance.new("UICorner")
+
+UICorner3.CornerRadius = UDim.new(0, 24)
+UICorner3.Parent = v37
+createImageLabel("rbxasset://textures/ui/ScreenshotHud/Close.png", {
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.fromOffset(32, 32)
+}, v37)
+
+local v39 = createImageButton("", {
+	BackgroundTransparency = 0,
+	Name = "CameraButton",
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundColor3 = Color3.fromRGB(0, 180, 109),
+	Position = UDim2.new(1, -94, 1, -78),
+	Size = UDim2.fromOffset(140, 36)
+}, nil)
+local UICorner4 = Instance.new("UICorner")
+
+UICorner4.CornerRadius = UDim.new(0, 18)
+UICorner4.Parent = v39
+createImageLabel("rbxasset://textures/ui/Controls/xboxY.png", {
+	AnchorPoint = Vector2.new(0, 0.5),
+	Position = UDim2.new(0, 6, 0.5, 0),
+	Size = UDim2.fromOffset(24, 24)
+}, v39)
+createTextLabel(RobloxTranslator:FormatByKey("CoreScripts.ScreenshotHud.Action.TakePhoto"), {
+	TextScaled = true,
+	TextWrapped = true,
+	AnchorPoint = Vector2.new(0, 0.5),
+	Position = UDim2.new(0, 30, 0.5, 0),
+	Size = UDim2.new(1, -36, 0, 20)
+}, v39)
+
+local v41 = createImageButton("", {
+	BackgroundTransparency = 0,
+	Name = "CloseButton",
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundColor3 = Color3.fromRGB(7, 7, 8),
+	Position = UDim2.new(1, -228, 1, -78),
+	Size = UDim2.fromOffset(104, 36)
+}, nil)
+local UICorner5 = Instance.new("UICorner")
+
+UICorner5.CornerRadius = UDim.new(0, 18)
+UICorner5.Parent = v41
+createImageLabel("rbxasset://textures/ui/Controls/xboxB.png", {
+	AnchorPoint = Vector2.new(0, 0.5),
+	Position = UDim2.new(0, 6, 0.5, 0),
+	Size = UDim2.fromOffset(24, 24)
+}, v41)
+createTextLabel(RobloxTranslator:FormatByKey("CoreScripts.ScreenshotHud.Action.Cancel"), {
+	TextScaled = true,
+	TextWrapped = true,
+	AnchorPoint = Vector2.new(0, 0.5),
+	Position = UDim2.new(0, 30, 0.5, 0),
+	Size = UDim2.new(1, -36, 0, 20)
+}, v41)
+
+local v43 = createFrame({
+	Active = true,
+	BackgroundTransparency = 0.5,
+	Name = "FlashOverlay",
+	Visible = false,
+	ZIndex = 3
+}, v30)
+
+local function checkOrRequestExternalStoragePermissions() -- line: 279
+	-- upvalues: PermissionsProtocol (copy), Promise (copy)
+	return PermissionsProtocol.default:checkOrRequestPermissions({ PermissionsProtocol.Permissions.WRITE_MEDIA_STORAGE }):andThen(function(p12) -- line: 284
+		-- upvalues: PermissionsProtocol (copy), Promise (copy)
+		return p12 == PermissionsProtocol.Status.AUTHORIZED and Promise.resolve() or Promise.reject()
+	end)
+end
+local function getEnabledPlayerScreenGuis() -- line: 290
+	-- upvalues: Players (copy)
+	local descendants = Players.LocalPlayer.PlayerGui:GetDescendants()
+	local t4 = {}
+
+	for _, v in ipairs(descendants) do
+		if v:IsA("ScreenGui") and v.Enabled then
+			table.insert(t4, v)
+		end
+	end
+
+	return t4
+end
+local function getEnabledCoreGuiTypes() -- line: 301
+	-- upvalues: StarterGui (copy)
+	local t5 = {}
+
+	for _, v in ipairs(Enum.CoreGuiType:GetEnumItems()) do
+		if StarterGui:GetCoreGuiEnabled(v) then
+			table.insert(t5, v)
+		end
+	end
+
+	return t5
+end
+local function u47() -- line: 311
+end
+local function onCameraButtonActivated() -- line: 313
+	-- upvalues: UserInputService (copy), checkOrRequestExternalStoragePermissions (copy), u47 (ref), CaptureMaster (copy)
+	if UserInputService:GetPlatform() == Enum.Platform.Android then
+		checkOrRequestExternalStoragePermissions():andThen(u47, function() -- line: 315
+			-- upvalues: CaptureMaster (copy)
+			CaptureMaster:ShowPermissionToast()
+		end)
+
+		return
+	end
+
+	u47()
+end
+
+function u47() -- line: 323
+	-- upvalues: CaptureMaster (copy), u22 (ref), ScreenshotHud (copy), getEnabledPlayerScreenGuis (copy), getEnabledCoreGuiTypes (copy), StarterGui (copy), ProximityPromptService (copy), v31 (copy), Players (copy), CoreGui (copy), v43 (copy), v32 (copy), onCameraButtonActivated (copy), RbxAnalyticsService (copy)
+	CaptureMaster:DismissNotification()
+
+	if u22 then
+		u22:Disconnect()
+		u22 = nil
+	end
+
+	local v85 = false
+	local v86 = false
+	local v87 = nil
+
+	if ScreenshotHud.HidePlayerGuiForCaptures then
+		v87 = getEnabledPlayerScreenGuis()
+
+		for _, v in ipairs(v87) do
+			v.Enabled = false
+		end
+
+		v86 = true
+	end
+
+	local v90 = nil
+
+	if ScreenshotHud.HideCoreGuiForCaptures then
+		v90 = getEnabledCoreGuiTypes()
+
+		for _, v in ipairs(v90) do
+			StarterGui:SetCoreGuiEnabled(v, false)
+		end
+
+		v85 = true
+	end
+
+	local ProximityPromptServiceEnabled = ProximityPromptService.Enabled
+
+	ProximityPromptService.Enabled = false
+	v31.Visible = false
+	wait(0.2)
+
+	local t6 = {}
+
+	for _, player in pairs(Players:GetPlayers()) do
+		local v97 = player.Character and player.Character:WaitForChild("Humanoid")
+
+		if v97 then
+			t6[v97] = v97.DisplayDistanceType
+			v97.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		end
+	end
+
+	CoreGui:TakeScreenshot()
+	wait(0.2)
+	v31.Visible = true
+	v43.Visible = true
+	wait(0.2)
+	v43.Visible = false
+
+	if not u22 then
+		u22 = v32.Activated:connect(onCameraButtonActivated)
+	end
+
+	ProximityPromptService.Enabled = ProximityPromptServiceEnabled
+
+	for _, player in pairs(Players:GetPlayers()) do
+		local v100 = player.Character and player.Character:WaitForChild("Humanoid")
+
+		if v100 and t6[v100] then
+			v100.DisplayDistanceType = t6[v100]
+		end
+	end
+
+	if v86 then
+		for _, v in ipairs(v87) do
+			v.Enabled = true
+		end
+	end
+
+	if v85 then
+		for _, v in ipairs(v90) do
+			StarterGui:SetCoreGuiEnabled(v, true)
+		end
+	end
+
+	if ScreenshotHud.CloseWhenScreenshotTaken then
+		ScreenshotHud.Visible = false
+	end
+
+	RbxAnalyticsService:SendEventDeferred("client", "screenshotHud", "TakeScreenshot", {
+		pid = tostring(game.PlaceId)
+	})
+end
+
+local function isGamepad(p13) -- line: 424
+	return p13.Name:match("^Gamepad*") ~= nil
+end
+local function updateGamepadButtons() -- line: 428
+	-- upvalues: u18 (ref), u19 (ref), u23 (ref), v39 (copy), v32 (copy), v41 (copy), v37 (copy), v31 (copy), ScreenshotHud (copy)
+	if u18 then
+		u18.Parent = nil
+	end
+
+	if u19 then
+		u19.Parent = nil
+	end
+
+	u18 = if not u23 then v32 else v39
+	u19 = if not u23 then v37 else v41
+	u18.Parent = v31
+	u19.Parent = v31
+
+	if ScreenshotHud.CameraButtonPosition ~= UDim2.fromOffset(0, 0) then
+		u18.Position = ScreenshotHud.CameraButtonPosition
+	end
+
+	if ScreenshotHud.CloseButtonPosition ~= UDim2.fromOffset(0, 0) then
+		u19.Position = ScreenshotHud.CloseButtonPosition
+	end
+end
+local function onLastInputTypeChanged(p14) -- line: 453
+	-- upvalues: UserInputService (copy), u23 (ref), updateGamepadButtons (copy)
+	local v107 = (p14 or UserInputService:GetLastInputType()).Name:match("^Gamepad*") ~= nil
+
+	if v107 ~= u23 then
+		u23 = v107
+		updateGamepadButtons()
+	end
+end
+local function setupConnections() -- line: 469
+	-- upvalues: v32 (copy), v34 (copy), t1 (copy), t2 (ref), u22 (ref), onCameraButtonActivated (copy), v37 (copy), ScreenshotHud (copy), ContextActionService (copy), t3 (ref), UserInputService (copy), u23 (ref), updateGamepadButtons (copy), onLastInputTypeChanged (copy)
+	local connection = v32.InputBegan:Connect(function(input) -- line: 470
+		-- upvalues: v34 (copy), t1 (copy)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			v34.BackgroundColor3 = t1.Hovered.BackgroundColor3
+			v34.BackgroundTransparency = t1.Hovered.BackgroundTransparency
+
+			return
+		end
+
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			v34.BackgroundColor3 = t1.Pressed.BackgroundColor3
+			v34.BackgroundTransparency = t1.Pressed.BackgroundTransparency
+		end
+	end)
+
+	table.insert(t2, connection)
+
+	local connection2 = v32.InputEnded:Connect(function() -- line: 484
+		-- upvalues: v34 (copy), t1 (copy)
+		v34.BackgroundColor3 = t1.Default.BackgroundColor3
+		v34.BackgroundTransparency = t1.Default.BackgroundTransparency
+	end)
+
+	table.insert(t2, connection2)
+
+	if u22 then
+		u22:Disconnect()
+		u22 = nil
+	end
+
+	u22 = v32.Activated:connect(onCameraButtonActivated)
+	table.insert(t2, u22)
+
+	local v110 = v37.Activated:connect(function() -- line: 497
+		-- upvalues: ScreenshotHud (copy)
+		ScreenshotHud.Visible = false
+	end)
+
+	table.insert(t2, v110)
+
+	local function gamepadHandleClose(_, p16, p17) -- line: 503
+		-- upvalues: ScreenshotHud (copy)
+		if p16 == Enum.UserInputState.End and p17.UserInputType.Name:match("^Gamepad*") ~= nil then
+			ScreenshotHud.Visible = false
+		end
+	end
+
+	ContextActionService:BindAction("ScreenshotHudGamepadClose", gamepadHandleClose, false, Enum.KeyCode.ButtonB)
+	table.insert(t3, "ScreenshotHudGamepadClose")
+
+	local function gamepadHandleCamera(_, p19, p20) -- line: 513
+		-- upvalues: onCameraButtonActivated (copy)
+		if p19 == Enum.UserInputState.End and p20.UserInputType.Name:match("^Gamepad*") ~= nil then
+			onCameraButtonActivated()
+		end
+	end
+
+	ContextActionService:BindAction("ScreenshotHudGamepadCamera", gamepadHandleCamera, false, Enum.KeyCode.ButtonY)
+	table.insert(t3, "ScreenshotHudGamepadCamera")
+
+	local v113 = UserInputService:GetLastInputType().Name:match("^Gamepad*") ~= nil
+
+	if v113 ~= u23 then
+		u23 = v113
+		updateGamepadButtons()
+	end
+
+	local connection3 = UserInputService.LastInputTypeChanged:Connect(onLastInputTypeChanged)
+
+	table.insert(t2, connection3)
+end
+local function disconnectAll() -- line: 528
+	-- upvalues: t2 (ref), t3 (ref), ContextActionService (copy)
+	for _, v in ipairs(t2) do
+		v:Disconnect()
+	end
+
+	t2 = {}
+
+	for _, v in ipairs(t3) do
+		ContextActionService:UnbindAction(v)
+	end
+
+	t3 = {}
+end
+local function screenshotHudEnabled(b1: boolean) -- line: 541
+	-- upvalues: v30 (copy), ScreenshotHud (copy), disconnectAll (copy), v31 (copy), v43 (copy), setupConnections (copy), CaptureMaster (copy), RbxAnalyticsService (copy)
+	v30.Visible = ScreenshotHud.Visible
+	disconnectAll()
+
+	if ScreenshotHud.Visible then
+		v31.Visible = true
+		v43.Visible = false
+		setupConnections()
+		CaptureMaster:Start()
+	end
+
+	RbxAnalyticsService:SendEventDeferred("client", "screenshotHud", "ScreenshotHudEnabled", {
+		pid = tostring(game.PlaceId),
+		enabled = b1
+	})
+end
+
+ScreenshotHud:GetPropertyChangedSignal("Visible"):Connect(function() -- line: 558
+	-- upvalues: screenshotHudEnabled (copy), ScreenshotHud (copy)
+	screenshotHudEnabled(ScreenshotHud.Visible)
+end)
+ScreenshotHud:GetPropertyChangedSignal("CameraButtonIcon"):Connect(function() -- line: 562
+	-- upvalues: v36 (copy), ScreenshotHud (copy), RbxAnalyticsService (copy)
+	v36.Image = ScreenshotHud.CameraButtonIcon or "rbxasset://textures/ui/ScreenshotHud/Camera.png"
+	RbxAnalyticsService:SendEventDeferred("client", "screenshotHud", "CameraButtonIcon", {
+		pid = tostring(game.PlaceId),
+		icon = ScreenshotHud.CameraButtonIcon
+	})
+end)
+ScreenshotHud:GetPropertyChangedSignal("CameraButtonPosition"):Connect(function() -- line: 571
+	-- upvalues: u18 (ref), ScreenshotHud (copy), RbxAnalyticsService (copy)
+	u18.Position = ScreenshotHud.CameraButtonPosition
+	RbxAnalyticsService:SendEventDeferred("client", "screenshotHud", "CameraButtonPosition", {
+		pid = tostring(game.PlaceId),
+		position = tostring(ScreenshotHud.CameraButtonPosition)
+	})
+end)
+ScreenshotHud:GetPropertyChangedSignal("CloseButtonPosition"):Connect(function() -- line: 579
+	-- upvalues: u19 (ref), ScreenshotHud (copy), RbxAnalyticsService (copy)
+	u19.Position = ScreenshotHud.CloseButtonPosition
+	RbxAnalyticsService:SendEventDeferred("client", "screenshotHud", "CloseButtonPosition", {
+		pid = tostring(game.PlaceId),
+		position = tostring(ScreenshotHud.CloseButtonPosition)
+	})
+end)
+updateGamepadButtons()
+screenshotHudEnabled(ScreenshotHud.Visible)

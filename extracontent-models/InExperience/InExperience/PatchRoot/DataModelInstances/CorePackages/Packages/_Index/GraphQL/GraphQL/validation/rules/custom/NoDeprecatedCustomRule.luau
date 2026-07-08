@@ -1,66 +1,72 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local v3 = require(l_Parent_0.type.definition);
-local l_getNamedType_0 = v3.getNamedType;
-local l_isInputObjectType_0 = v3.isInputObjectType;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local invariant = require(ParentParent.jsutils.invariant).invariant
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local definition = require(ParentParent.type.definition)
+local getNamedType = definition.getNamedType
+local isInputObjectType = definition.isInputObjectType
+
 return {
-    NoDeprecatedCustomRule = function(v6) --[[ Line: 28 ]]
-        -- upvalues: l_invariant_0 (copy), l_GraphQLError_0 (copy), l_getNamedType_0 (copy), l_isInputObjectType_0 (copy)
-        return {
-            Field = function(_, v8) --[[ Line: 30 ]] --[[ Name: Field ]]
-                -- upvalues: v6 (copy), l_invariant_0 (ref), l_GraphQLError_0 (ref)
-                local v9 = v6:getFieldDef();
-                local v10 = v9 and v9.deprecationReason;
-                if v9 and v10 ~= nil then
-                    local v11 = v6:getParentType();
-                    l_invariant_0(v11 ~= nil);
-                    v6:reportError(l_GraphQLError_0.new(("The field %s.%s is deprecated. %s"):format(v11.name, v9.name, v10), v8));
-                end;
-            end, 
-            Argument = function(_, v13) --[[ Line: 48 ]] --[[ Name: Argument ]]
-                -- upvalues: v6 (copy), l_GraphQLError_0 (ref), l_invariant_0 (ref)
-                local v14 = v6:getArgument();
-                local v15 = v14 and v14.deprecationReason;
-                if v14 and v15 ~= nil then
-                    local v16 = v6:getDirective();
-                    if v16 ~= nil then
-                        v6:reportError(l_GraphQLError_0.new(("Directive \"@%s\" argument \"%s\" is deprecated. %s"):format(v16.name, v14.name, v15), v13));
-                        return;
-                    else
-                        local v17 = v6:getParentType();
-                        local v18 = v6:getFieldDef();
-                        local l_l_invariant_0_0 = l_invariant_0;
-                        local v20 = false;
-                        if v17 ~= nil then
-                            v20 = v18 ~= nil;
-                        end;
-                        l_l_invariant_0_0(v20);
-                        v6:reportError(l_GraphQLError_0.new(("Field \"%s.%s\" argument \"%s\" is deprecated. %s"):format(v17.name, v18.name, v14.name, v15), v13));
-                    end;
-                end;
-            end, 
-            ObjectField = function(_, v22) --[[ Line: 82 ]] --[[ Name: ObjectField ]]
-                -- upvalues: l_getNamedType_0 (ref), v6 (copy), l_isInputObjectType_0 (ref), l_GraphQLError_0 (ref)
-                local v23 = l_getNamedType_0(v6:getParentInputType());
-                if l_isInputObjectType_0(v23) then
-                    local v24 = v23:getFields():get(v22.name.value);
-                    local v25 = v24 and v24.deprecationReason;
-                    if v25 ~= nil then
-                        v6:reportError(l_GraphQLError_0.new(("The input field %s.%s is deprecated. %s"):format(v23.name, v24.name, v25), v22));
-                    end;
-                end;
-            end, 
-            EnumValue = function(_, v27) --[[ Line: 103 ]] --[[ Name: EnumValue ]]
-                -- upvalues: v6 (copy), l_getNamedType_0 (ref), l_invariant_0 (ref), l_GraphQLError_0 (ref)
-                local v28 = v6:getEnumValue();
-                local v29 = v28 and v28.deprecationReason;
-                if v28 and v29 ~= nil then
-                    local v30 = l_getNamedType_0(v6:getInputType());
-                    l_invariant_0(v30 ~= nil);
-                    v6:reportError(l_GraphQLError_0.new(("The enum value \"%s.%s\" is deprecated. %s"):format(v30.name, v28.name, v29), v27));
-                end;
-            end
-        };
-    end
-};
+	NoDeprecatedCustomRule = function(p1) -- line: 28
+		-- upvalues: invariant (copy), GraphQLError (copy), getNamedType (copy), isInputObjectType (copy)
+		return {
+			Field = function(_, p3) -- line: 30
+				-- upvalues: p1 (copy), invariant (copy), GraphQLError (copy)
+				local v10 = p1:getFieldDef()
+				local v11 = v10 and v10.deprecationReason
+
+				if v10 and v11 ~= nil then
+					local v12 = p1:getParentType()
+
+					invariant(v12 ~= nil)
+					p1:reportError(GraphQLError.new(("The field %s.%s is deprecated. %s"):format(v12.name, v10.name, v11), p3))
+				end
+			end,
+			Argument = function(_, p5) -- line: 48
+				-- upvalues: p1 (copy), GraphQLError (copy), invariant (copy)
+				local v15 = p1:getArgument()
+				local v16 = v15 and v15.deprecationReason
+
+				if v15 and v16 ~= nil then
+					local v17 = p1:getDirective()
+
+					if v17 ~= nil then
+						p1:reportError(GraphQLError.new(("Directive \"@%s\" argument \"%s\" is deprecated. %s"):format(v17.name, v15.name, v16), p5))
+
+						return
+					end
+
+					local v18 = p1:getParentType()
+					local v19 = p1:getFieldDef()
+
+					invariant(v18 ~= nil and v19 ~= nil)
+					p1:reportError(GraphQLError.new(("Field \"%s.%s\" argument \"%s\" is deprecated. %s"):format(v18.name, v19.name, v15.name, v16), p5))
+				end
+			end,
+			ObjectField = function(_, p7) -- line: 82
+				-- upvalues: getNamedType (copy), p1 (copy), isInputObjectType (copy), GraphQLError (copy)
+				local v22 = getNamedType(p1:getParentInputType())
+
+				if isInputObjectType(v22) then
+					local v23 = v22:getFields():get(p7.name.value)
+					local v24 = v23 and v23.deprecationReason
+
+					if v24 ~= nil then
+						p1:reportError(GraphQLError.new(("The input field %s.%s is deprecated. %s"):format(v22.name, v23.name, v24), p7))
+					end
+				end
+			end,
+			EnumValue = function(_, p9) -- line: 103
+				-- upvalues: p1 (copy), getNamedType (copy), invariant (copy), GraphQLError (copy)
+				local v27 = p1:getEnumValue()
+				local v28 = v27 and v27.deprecationReason
+
+				if v27 and v28 ~= nil then
+					local v29 = getNamedType(p1:getInputType())
+
+					invariant(v29 ~= nil)
+					p1:reportError(GraphQLError.new(("The enum value \"%s.%s\" is deprecated. %s"):format(v29.name, v27.name, v28), p9))
+				end
+			end
+		}
+	end
+}

@@ -1,62 +1,72 @@
-local l_Players_0 = game:GetService("Players");
-local l_Stats_0 = game:GetService("Stats");
-local v2 = {};
-v2.__index = v2;
-v2.EventName = {
-    MenuOpened = "emoteMenuOpened", 
-    EmotePlayed = "emoteTriggered", 
-    EmoteFailed = "emoteTriggerFailed"
-};
-v2.new = function() --[[ Line: 13 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    local v3 = {
-        eventStreamImpl = nil
-    };
-    setmetatable(v3, v2);
-    return v3;
-end;
-v2.withEventStream = function(v4, v5) --[[ Line: 22 ]] --[[ Name: withEventStream ]]
-    v4.eventStreamImpl = v5;
-    return v4;
-end;
-v2.onMenuOpened = function(v6) --[[ Line: 27 ]] --[[ Name: onMenuOpened ]]
-    -- upvalues: l_Players_0 (copy), l_Stats_0 (copy)
-    local l_MenuOpened_0 = v6.EventName.MenuOpened;
-    local v8 = {
-        pid = tostring(game.PlaceId), 
-        uid = tostring(l_Players_0.LocalPlayer.UserId), 
-        btid = l_Stats_0:GetBrowserTrackerId()
-    };
-    v6:_getEventStream():setRBXEventStream("emoteMenu", l_MenuOpened_0, v8);
-end;
-v2.onEmotePlayed = function(v9, v10, v11) --[[ Line: 40 ]] --[[ Name: onEmotePlayed ]]
-    -- upvalues: l_Players_0 (copy), l_Stats_0 (copy)
-    local l_EmotePlayed_0 = v9.EventName.EmotePlayed;
-    local v13 = {
-        pid = tostring(game.PlaceId), 
-        uid = tostring(l_Players_0.LocalPlayer.UserId), 
-        btid = l_Stats_0:GetBrowserTrackerId(), 
-        slotNumber = v10, 
-        assetID = v11
-    };
-    v9:_getEventStream():setRBXEventStream("emoteMenu", l_EmotePlayed_0, v13);
-end;
-v2.onEmoteFailed = function(v14, v15, v16, v17) --[[ Line: 55 ]] --[[ Name: onEmoteFailed ]]
-    -- upvalues: l_Players_0 (copy), l_Stats_0 (copy)
-    local l_EmoteFailed_0 = v14.EventName.EmoteFailed;
-    local v19 = {
-        pid = tostring(game.PlaceId), 
-        uid = tostring(l_Players_0.LocalPlayer.UserId), 
-        btid = l_Stats_0:GetBrowserTrackerId(), 
-        slotNumber = v15, 
-        assetID = v16, 
-        errorType = v17, 
-        invokedByCoreGui = true
-    };
-    v14:_getEventStream():setRBXEventStream("emoteMenu", l_EmoteFailed_0, v19);
-end;
-v2._getEventStream = function(v20) --[[ Line: 72 ]] --[[ Name: _getEventStream ]]
-    assert(v20.eventStreamImpl, "EventStream implementation not found. Did you forget to construct withEventStream?");
-    return v20.eventStreamImpl;
-end;
-return v2;
+local Players = game:GetService("Players")
+local Stats = game:GetService("Stats")
+local t1 = {}
+
+t1.__index = t1
+t1.EventName = {
+	MenuOpened = "emoteMenuOpened",
+	EmotePlayed = "emoteTriggered",
+	EmoteFailed = "emoteTriggerFailed"
+}
+
+function t1.new() -- line: 13
+	-- upvalues: t1 (copy)
+	local t2 = {
+		eventStreamImpl = nil
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.withEventStream(p1, p2) -- line: 22
+	p1.eventStreamImpl = p2
+
+	return p1
+end
+function t1.onMenuOpened(p3) -- line: 27
+	-- upvalues: Players (copy), Stats (copy)
+	local MenuOpened = p3.EventName.MenuOpened
+	local t3 = {
+		pid = tostring(game.PlaceId),
+		uid = tostring(Players.LocalPlayer.UserId),
+		btid = Stats:GetBrowserTrackerId()
+	}
+
+	p3:_getEventStream():setRBXEventStream("emoteMenu", MenuOpened, t3)
+end
+function t1.onEmotePlayed(p4, p5, p6) -- line: 40
+	-- upvalues: Players (copy), Stats (copy)
+	local EmotePlayed = p4.EventName.EmotePlayed
+	local t4 = {
+		pid = tostring(game.PlaceId),
+		uid = tostring(Players.LocalPlayer.UserId),
+		btid = Stats:GetBrowserTrackerId(),
+		slotNumber = p5,
+		assetID = p6
+	}
+
+	p4:_getEventStream():setRBXEventStream("emoteMenu", EmotePlayed, t4)
+end
+function t1.onEmoteFailed(p7, p8, p9, p10) -- line: 55
+	-- upvalues: Players (copy), Stats (copy)
+	local EmoteFailed = p7.EventName.EmoteFailed
+	local t5 = {
+		invokedByCoreGui = true,
+		pid = tostring(game.PlaceId),
+		uid = tostring(Players.LocalPlayer.UserId),
+		btid = Stats:GetBrowserTrackerId(),
+		slotNumber = p8,
+		assetID = p9,
+		errorType = p10
+	}
+
+	p7:_getEventStream():setRBXEventStream("emoteMenu", EmoteFailed, t5)
+end
+function t1._getEventStream(p11) -- line: 72
+	assert(p11.eventStreamImpl, "EventStream implementation not found. Did you forget to construct withEventStream?")
+
+	return p11.eventStreamImpl
+end
+
+return t1

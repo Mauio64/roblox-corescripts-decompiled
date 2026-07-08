@@ -1,11 +1,15 @@
-return function(v0, v1) --[[ Line: 4 ]] --[[ Name: removeValue ]]
-    local v2 = {};
-    local v3 = 1;
-    for v4 = 1, #v0 do
-        if v0[v4] ~= v1 then
-            v2[v3] = v0[v4];
-            v3 = v3 + 1;
-        end;
-    end;
-    return v2;
-end;
+local function removeValue(p1, p2) -- line: 4
+	local t1 = {}
+	local n1 = 1
+
+	for i = 1, #p1 do
+		if p2 ~= p1[i] then
+			t1[n1] = p1[i]
+			n1 += 1
+		end
+	end
+
+	return t1
+end
+
+return removeValue

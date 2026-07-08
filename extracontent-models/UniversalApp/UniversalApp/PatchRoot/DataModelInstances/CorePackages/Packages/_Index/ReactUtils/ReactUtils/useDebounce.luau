@@ -1,27 +1,35 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3) --[[ Line: 7 ]] --[[ Name: useDebounce ]]
-    -- upvalues: v1 (copy)
-    local v4, v5 = v1.useState(v2);
-    v1.useLayoutEffect(function() --[[ Line: 10 ]]
-        -- upvalues: v5 (copy), v2 (copy), v3 (copy)
-        local function v6() --[[ Line: 11 ]] --[[ Name: updateValue ]]
-            -- upvalues: v5 (ref), v2 (ref)
-            v5(v2);
-        end;
-        if v3 == nil or v3 == 0 then
-            v5(v2);
-            return;
-        else
-            local v7 = task.delay(v3, v6);
-            return function() --[[ Line: 22 ]]
-                -- upvalues: v7 (copy)
-                task.cancel(v7);
-            end;
-        end;
-    end, {
-        v2, 
-        v3
-    });
-    return v4;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useDebounce(p1, n1: number?) -- line: 7
+	-- upvalues: React (copy)
+	local v6, v7 = React.useState(p1)
+
+	React.useLayoutEffect(function() -- line: 10
+		-- upvalues: v7 (copy), p1 (copy), n1 (copy)
+		local function updateValue() -- line: 11
+			-- upvalues: v7 (copy), p1 (copy)
+			v7(p1)
+		end
+
+		if n1 == nil or n1 == 0 then
+			v7(p1)
+
+			return
+		end
+
+		local thread = task.delay(n1, updateValue)
+
+		return function() -- line: 22
+			-- upvalues: thread (copy)
+			task.cancel(thread)
+		end
+	end, {
+		p1,
+		n1
+	})
+
+	return v6
+end
+
+return useDebounce

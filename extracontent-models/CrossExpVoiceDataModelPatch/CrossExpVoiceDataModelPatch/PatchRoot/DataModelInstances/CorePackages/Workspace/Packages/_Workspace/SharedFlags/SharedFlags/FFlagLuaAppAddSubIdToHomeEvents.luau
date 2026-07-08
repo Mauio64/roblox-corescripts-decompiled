@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppAddSubIdToHomeEvents", false);
+return game:DefineFastFlag("LuaAppAddSubIdToHomeEvents", false)

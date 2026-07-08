@@ -1,36 +1,42 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(l_Parent_0.FocusNavigation);
-local v3 = require(script.Parent.FocusNavigationContext);
-local v4 = require(script.Parent.useComposedRef);
-local v5 = require(script.Parent.useEventLifecycleRef);
-return function(v6, v7, v8, v9) --[[ Line: 14 ]] --[[ Name: useEventHandler ]]
-    -- upvalues: v1 (copy), v3 (copy), v5 (copy), v4 (copy)
-    local v10 = v1.useContext(v3);
-    local v12 = v1.useCallback(function(v11) --[[ Line: 17 ]]
-        -- upvalues: v10 (copy), v6 (copy), v7 (copy), v8 (copy)
-        if v10 then
-            assert(v11:IsA("GuiObject"), "Event handlers can only be applied to GuiObjects");
-            v10:registerEventHandler(v11, v6, v7, v8);
-        end;
-    end, {
-        v10, 
-        v6, 
-        v7, 
-        v8
-    });
-    local v14 = v1.useCallback(function(v13) --[[ Line: 24 ]]
-        -- upvalues: v10 (copy), v6 (copy), v7 (copy), v8 (copy)
-        if v10 then
-            assert(v13:IsA("GuiObject"), "Event handlers can only be applied to GuiObjects");
-            v10:deregisterEventHandler(v13, v6, v7, v8);
-        end;
-    end, {
-        v10, 
-        v6, 
-        v7, 
-        v8
-    });
-    local v15 = v5(v12, v14);
-    return v4(v15, v9);
-end;
+local ParentParent = script.Parent.Parent
+local React = require(ParentParent.React)
+
+require(ParentParent.FocusNavigation)
+
+local FocusNavigationContext = require(script.Parent.FocusNavigationContext)
+local useComposedRef = require(script.Parent.useComposedRef)
+local useEventLifecycleRef = require(script.Parent.useEventLifecycleRef)
+
+local function useEventHandler(s1: string, p1, p2, p3) -- line: 14
+	-- upvalues: React (copy), FocusNavigationContext (copy), useEventLifecycleRef (copy), useComposedRef (copy)
+	local v11 = React.useContext(FocusNavigationContext)
+	local v12 = React.useCallback(function(p4) -- line: 17
+		-- upvalues: v11 (copy), s1 (copy), p1 (copy), p2 (copy)
+		if v11 then
+			assert(p4:IsA("GuiObject"), "Event handlers can only be applied to GuiObjects")
+			v11:registerEventHandler(p4, s1, p1, p2)
+		end
+	end, {
+		v11,
+		s1,
+		p1,
+		p2
+	})
+	local v13 = React.useCallback(function(p5) -- line: 24
+		-- upvalues: v11 (copy), s1 (copy), p1 (copy), p2 (copy)
+		if v11 then
+			assert(p5:IsA("GuiObject"), "Event handlers can only be applied to GuiObjects")
+			v11:deregisterEventHandler(p5, s1, p1, p2)
+		end
+	end, {
+		v11,
+		s1,
+		p1,
+		p2
+	})
+	local v14 = useEventLifecycleRef(v12, v13)
+
+	return useComposedRef(v14, p3)
+end
+
+return useEventHandler

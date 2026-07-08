@@ -1,196 +1,218 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_MessageBusService_0 = game:GetService("MessageBusService");
-local l_Parent_1 = l_Parent_0.Parent;
-local v5 = require(l_Parent_0.dependencies);
-local v6 = require(l_Parent_1.React);
-local v7 = require(l_Parent_1.Roact);
-local v8 = require(l_Parent_1.Dash);
-local v9 = require(l_Parent_1.Cryo);
-local v10 = require(l_Parent_1.RobloxAppHooks);
-local v11 = require(l_Parent_1.SocialCommon);
-local l_useQuery_0 = require(l_Parent_1.ApolloClient).useQuery;
-local v13 = require(l_Parent_1.ApolloLocalState);
-local v14 = require(l_Parent_1.ApolloFriends);
-local l_queries_0 = v13.queries;
-local l_dependencyArray_0 = require(l_Parent_1.RoactUtils).Hooks.dependencyArray;
-local v17 = require(l_Parent_1.SocialLuaAnalytics);
-local l_AnalyticsFactory_0 = v17.Analytics.AnalyticsFactory;
-local l_DefaultAnalyticsService_0 = v17.Analytics.DefaultAnalyticsService;
-local l_EventTypes_0 = v17.Analytics.Enums.EventTypes;
-local l_Contexts_0 = v17.Analytics.Enums.Contexts;
-local l_ContactsToast_0 = require(l_Parent_1.ContactsToast).ContactsToast;
-local l_ContactsToastIXP_0 = require(l_Parent_1.ContactsToast).ContactsToastIXP;
-local l_useDispatch_0 = require(l_Parent_1.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useFetchContactImporterInfoOnce_0 = require(l_Parent_0.Utils).useFetchContactImporterInfoOnce;
-local l_useAutoSyncContacts_0 = require(l_Parent_0.Utils).useAutoSyncContacts;
-local l_getContactImporterParams_0 = require(l_Parent_0.Utils).getContactImporterParams;
-local l_userIdExists_0 = v11.Utils.userIdExists;
-local l_PermissionsProtocol_0 = require(l_Parent_1.PermissionsProtocol).PermissionsProtocol;
-local l_rolloutByApplicationId_0 = require(l_Parent_1.AppCommonLib).rolloutByApplicationId;
-local v31 = require(l_Parent_1.UserProfiles);
-local l_useLocalUserId_0 = v10.useLocalUserId;
-local l_UniversalAppPolicy_0 = v5.UniversalAppPolicy;
-local l_getAppFeaturePolicies_0 = require(l_Parent_1.UniversalAppPolicy).getAppFeaturePolicies;
-local l_NetworkingFriends_0 = v5.NetworkingFriends;
-local l_GetFFlagContactsToastEnabled_0 = require(l_Parent_1.SharedFlags).GetFFlagContactsToastEnabled;
-local v37 = require(l_Parent_0.Experiments.PaginatedFriendsCarouselIXP);
-local v38 = game:DefineFastFlag("EarlierFetchTimeForFriendsCarousel_v1", false);
-local v39 = game:DefineFastFlag("FixNewFriendRequestCountOnAppResume", false);
-local v40 = game:DefineFastFlag("PrefetchProfileNamesOnStartup_v2", false);
-local l_FIntFriendsCarouselInitialFetchSize_0 = require(l_Parent_1.SharedFlags).FIntFriendsCarouselInitialFetchSize;
-local l_FFlagRegisterQRCodeKeyInEngine_0 = require(l_Parent_1.SharedFlags).FFlagRegisterQRCodeKeyInEngine;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_1.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local v44 = l_FFlagRegisterQRCodeKeyInEngine_0 and "ProfileQrCodeCameraSettingsModalSeen" or "ScreenshotEventTracking";
-local v45 = l_rolloutByApplicationId_0(function() --[[ Line: 62 ]]
-    return game:DefineFastInt("CallFriendCountAtStartupRollout", 0);
-end);
-local v46 = if v39 then l_MessageBusService_0:GetMessageId("Realtime", "appResume") else nil;
-local v47 = if v40 then v31.Stores.UserProfileStore.get() else nil;
-local v48 = {
-    ProfileQRCodeCameraSettingsModalSeen = {
-        context = l_Contexts_0.ProfileQRCode, 
-        eventType = l_EventTypes_0.SettingsModalSeenSinceLastAppStart, 
-        formatRulesForAdditionalInfo = {
-            cameraPermissionResponseStatus = v8.identity
-        }
-    }
-};
-return l_UniversalAppPolicy_0.connect(function(v49) --[[ Line: 245 ]]
-    -- upvalues: l_GetFFlagContactsToastEnabled_0 (copy), l_ContactsToastIXP_0 (copy)
-    return {
-        isContactImporterPolicyEnabled = v49.getContactImporterEnabled(), 
-        isContactsToastPolicyEnabled = if not not l_GetFFlagContactsToastEnabled_0() or l_ContactsToastIXP_0.FFlagContactsToastExperimentEnabled then v49.getContactsToastEnabled() else false
-    };
-end)(function(v50) --[[ Line: 103 ]] --[[ Name: Container ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useLocalUserId_0 (copy), l_getAppFeaturePolicies_0 (copy), l_useFetchContactImporterInfoOnce_0 (copy), v38 (copy), v37 (copy), v14 (copy), l_useQuery_0 (copy), l_queries_0 (copy), l_userIdExists_0 (copy), v9 (copy), l_FIntFriendsCarouselInitialFetchSize_0 (copy), v40 (copy), v6 (copy), v47 (copy), l_useAutoSyncContacts_0 (copy), v45 (copy), l_NetworkingFriends_0 (copy), v39 (copy), l_MessageBusService_0 (copy), v46 (copy), l_AnalyticsFactory_0 (copy), v48 (copy), l_DefaultAnalyticsService_0 (copy), l_AppStorageService_0 (copy), v44 (copy), l_PermissionsProtocol_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_GetFFlagContactsToastEnabled_0 (copy), l_ContactsToastIXP_0 (copy), v7 (copy), l_CoreGui_0 (copy), l_ContactsToast_0 (copy), v8 (copy), l_getContactImporterParams_0 (copy)
-    local v51 = l_useDispatch_0();
-    local v52 = l_useLocalUserId_0();
-    local v53 = v50.isContactImporterPolicyEnabled or l_getAppFeaturePolicies_0().getContactImporterEnabled();
-    l_useFetchContactImporterInfoOnce_0({
-        policyIsEnabled = v53
-    });
-    local v54 = nil;
-    if v38 then
-        local v55, v56 = v37.usePaginatedFriendsCarouselExperiment();
-        local v57 = {
-            userId = v52, 
-            sort = v55 and v56 or v14.Enums.Sort.FriendshipScore
-        };
-        v54 = l_useQuery_0(l_queries_0.allFriendsByUserId, {
-            errorPolicy = "all", 
-            skip = not v55 or not l_userIdExists_0(v52), 
-            notifyOnNetworkStatusChange = true, 
-            variables = v9.Dictionary.join(v57, {
-                pageLimit = l_FIntFriendsCarouselInitialFetchSize_0, 
-                pageCursor = ""
-            })
-        });
-        l_useQuery_0(l_queries_0.onlineFriendsByUserId, {
-            skip = not v55 or not l_userIdExists_0(v52), 
-            notifyOnNetworkStatusChange = true, 
-            variables = v57
-        });
-    end;
-    if v40 then
-        local v58 = v54 and v54.data and v54.data.allFriendsByUserId and v54.data.allFriendsByUserId.friends;
-        local l_v58_0 = v58 --[[ copy: 5 -> 8 ]];
-        v6.useEffect(function() --[[ Line: 149 ]]
-            -- upvalues: l_userIdExists_0 (ref), v52 (copy), l_v58_0 (copy), v47 (ref)
-            if l_userIdExists_0(v52) then
-                local v60 = {
-                    (tostring(v52))
-                };
-                if l_v58_0 then
-                    for _, v62 in l_v58_0 do
-                        if v62 and v62.id then
-                            table.insert(v60, (tostring(v62.id)));
-                        end;
-                    end;
-                end;
-                v47.fetchNamesByUserIds(v60);
-            end;
-        end, {
-            v52, 
-            v58
-        });
-    end;
-    l_useAutoSyncContacts_0();
-    if v45() then
-        v6.useEffect(function() --[[ Line: 170 ]]
-            -- upvalues: l_userIdExists_0 (ref), v52 (copy), v51 (copy), l_NetworkingFriends_0 (ref)
-            if l_userIdExists_0(v52) then
-                v51(l_NetworkingFriends_0.GetFriendsCountFromUserId.API(v52));
-            end;
-        end, {
-            v52
-        });
-    end;
-    v6.useEffect(function() --[[ Line: 177 ]]
-        -- upvalues: l_userIdExists_0 (ref), v52 (copy), v51 (copy), l_NetworkingFriends_0 (ref), v39 (ref), l_MessageBusService_0 (ref), v46 (ref)
-        if l_userIdExists_0(v52) then
-            v51(l_NetworkingFriends_0.GetNewFriendRequestsCount.API({
-                currentUserId = v52
-            }));
-            if v39 then
-                local v63 = l_MessageBusService_0:Subscribe(v46, function() --[[ Line: 183 ]]
-                    -- upvalues: v51 (ref), l_NetworkingFriends_0 (ref), v52 (ref)
-                    v51(l_NetworkingFriends_0.GetNewFriendRequestsCount.API({
-                        currentUserId = v52
-                    }));
-                end, false, true);
-                return function() --[[ Line: 188 ]]
-                    -- upvalues: v63 (copy)
-                    v63:Disconnect();
-                end;
-            end;
-        end;
-        return function() --[[ Line: 193 ]]
+local ParentParent = script.Parent.Parent
+local CoreGui = game:GetService("CoreGui")
+local AppStorageService = game:GetService("AppStorageService")
+local MessageBusService = game:GetService("MessageBusService")
+local ParentParentParent = ParentParent.Parent
+local dependencies = require(ParentParent.dependencies)
+local React = require(ParentParentParent.React)
+local Roact = require(ParentParentParent.Roact)
+local Dash = require(ParentParentParent.Dash)
+local Cryo = require(ParentParentParent.Cryo)
+local RobloxAppHooks = require(ParentParentParent.RobloxAppHooks)
+local SocialCommon = require(ParentParentParent.SocialCommon)
+local useQuery = require(ParentParentParent.ApolloClient).useQuery
+local ApolloLocalState = require(ParentParentParent.ApolloLocalState)
+local ApolloFriends = require(ParentParentParent.ApolloFriends)
+local queries = ApolloLocalState.queries
+local SocialLuaAnalytics = require(ParentParentParent.SocialLuaAnalytics)
+local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EventTypes = SocialLuaAnalytics.Analytics.Enums.EventTypes
+local Contexts = SocialLuaAnalytics.Analytics.Enums.Contexts
+local ContactsToast = require(ParentParentParent.ContactsToast).ContactsToast
+local ContactsToastIXP = require(ParentParentParent.ContactsToast).ContactsToastIXP
+local useDispatch = require(ParentParentParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useFetchContactImporterInfoOnce = require(ParentParent.Utils).useFetchContactImporterInfoOnce
+local useAutoSyncContacts = require(ParentParent.Utils).useAutoSyncContacts
+local getContactImporterParams = require(ParentParent.Utils).getContactImporterParams
+local userIdExists = SocialCommon.Utils.userIdExists
+local PermissionsProtocol = require(ParentParentParent.PermissionsProtocol).PermissionsProtocol
+local rolloutByApplicationId = require(ParentParentParent.AppCommonLib).rolloutByApplicationId
+local UserProfiles = require(ParentParentParent.UserProfiles)
+local useLocalUserId = RobloxAppHooks.useLocalUserId
+local UniversalAppPolicy = dependencies.UniversalAppPolicy
+local getAppFeaturePolicies = require(ParentParentParent.UniversalAppPolicy).getAppFeaturePolicies
+local NetworkingFriends = dependencies.NetworkingFriends
+local GetFFlagContactsToastEnabled = require(ParentParentParent.SharedFlags).GetFFlagContactsToastEnabled
+local PaginatedFriendsCarouselIXP = require(ParentParent.Experiments.PaginatedFriendsCarouselIXP)
+local v38 = game:DefineFastFlag("EarlierFetchTimeForFriendsCarousel_v1", false)
+local v39 = game:DefineFastFlag("PrefetchProfileNamesOnStartup_v2", false)
+local FIntFriendsCarouselInitialFetchSize = require(ParentParentParent.SharedFlags).FIntFriendsCarouselInitialFetchSize
+local FFlagRegisterQRCodeKeyInEngine = require(ParentParentParent.SharedFlags).FFlagRegisterQRCodeKeyInEngine
+local FFlagFriendSortedByPresenceSignalsImplementation = require(ParentParentParent.SharedFlags).FFlagFriendSortedByPresenceSignalsImplementation
+local useSignalState = require(ParentParentParent.SignalsReact).useSignalState
+local DataHydration = require(ParentParentParent.DataHydration)
+local v45 = if not FFlagFriendSortedByPresenceSignalsImplementation then nil else DataHydration.Friends.FriendsStore.get()
+local v46 = not FFlagRegisterQRCodeKeyInEngine and "ScreenshotEventTracking" or "ProfileQrCodeCameraSettingsModalSeen"
+local v47 = rolloutByApplicationId(function() -- line: 67
+	return game:DefineFastInt("CallFriendCountAtStartupRollout", 0)
+end)
+local MessageId = MessageBusService:GetMessageId("Realtime", "appResume")
+local v49 = if not v39 then nil else UserProfiles.Stores.UserProfileStore.get()
+local t1 = {
+	ProfileQRCodeCameraSettingsModalSeen = {
+		context = Contexts.ProfileQRCode,
+		eventType = EventTypes.SettingsModalSeenSinceLastAppStart,
+		formatRulesForAdditionalInfo = {
+			cameraPermissionResponseStatus = Dash.identity
+		}
+	}
+}
 
-        end;
-    end, {
-        v52
-    });
-    local v64 = v6.useMemo(function() --[[ Line: 196 ]]
-        -- upvalues: l_AnalyticsFactory_0 (ref), v48 (ref), l_DefaultAnalyticsService_0 (ref)
-        return l_AnalyticsFactory_0.setUpAnalyticsFactory({
-            eventLists = {
-                EventStream = v48
-            }, 
-            analyticsImpl = {
-                EventStream = l_DefaultAnalyticsService_0.EventStream
-            }
-        })();
-    end, {});
-    v6.useEffect(function() --[[ Line: 207 ]]
-        -- upvalues: l_AppStorageService_0 (ref), v44 (ref), l_PermissionsProtocol_0 (ref), v64 (copy)
-        if l_AppStorageService_0:GetItem(v44) == "true" then
-            l_PermissionsProtocol_0.default:checkOrRequestPermissions({
-                l_PermissionsProtocol_0.Permissions.CAMERA_ACCESS
-            }):andThen(function(v65) --[[ Line: 215 ]]
-                -- upvalues: v64 (ref)
-                v64.fireAnalyticsEvent("ProfileQRCodeCameraSettingsModalSeen", {
-                    cameraPermissionResponseStatus = v65
-                });
-            end);
-            l_AppStorageService_0:SetItem(v44, "false");
-            l_AppStorageService_0:Flush();
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v52, 
-        v64
-    } else l_dependencyArray_0(v52, v64));
-    if l_GetFFlagContactsToastEnabled_0() or l_ContactsToastIXP_0.FFlagContactsToastExperimentEnabled and l_ContactsToastIXP_0.useContactsToastVariant() then
-        return (v6.createElement(v7.Portal, {
-            target = l_CoreGui_0
-        }, {
-            v6.createElement(l_ContactsToast_0, v8.join(v50, {
-                getContactImporterParams = l_getContactImporterParams_0, 
-                isContactsToastPolicyEnabled = v50.isContactsToastPolicyEnabled
-            }))
-        }));
-    else
-        return nil;
-    end;
-end);
+local function Container(t2: {[any]: any}) -- line: 106
+	-- upvalues: useDispatch (copy), useLocalUserId (copy), getAppFeaturePolicies (copy), useFetchContactImporterInfoOnce (copy), v38 (copy), PaginatedFriendsCarouselIXP (copy), ApolloFriends (copy), FFlagFriendSortedByPresenceSignalsImplementation (copy), React (copy), v45 (copy), useSignalState (copy), useQuery (copy), queries (copy), userIdExists (copy), Cryo (copy), FIntFriendsCarouselInitialFetchSize (copy), v39 (copy), v49 (copy), useAutoSyncContacts (copy), v47 (copy), NetworkingFriends (copy), MessageBusService (copy), MessageId (copy), AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy), AppStorageService (copy), v46 (copy), PermissionsProtocol (copy), GetFFlagContactsToastEnabled (copy), ContactsToastIXP (copy), Roact (copy), CoreGui (copy), ContactsToast (copy), Dash (copy), getContactImporterParams (copy)
+	local v53 = useDispatch()
+	local v54 = useLocalUserId()
+	local v55 = t2.isContactImporterPolicyEnabled or getAppFeaturePolicies().getContactImporterEnabled()
+
+	useFetchContactImporterInfoOnce({
+		policyIsEnabled = v55
+	})
+
+	local v56 = nil
+	local v57 = nil
+
+	if v38 then
+		local v58, v59 = PaginatedFriendsCarouselIXP.usePaginatedFriendsCarouselExperiment()
+		local t3 = {
+			userId = v54,
+			sort = v58 and v59 or ApolloFriends.Enums.Sort.FriendshipScore
+		}
+
+		if FFlagFriendSortedByPresenceSignalsImplementation then
+			local v61 = React.useMemo(function() -- line: 130
+				-- upvalues: v45 (copy)
+				return v45.GetAllFriends()
+			end, {})
+			local v62 = useSignalState(v61)
+
+			v57 = v62 and v62.friends or nil
+			React.useEffect(function() -- line: 137
+				-- upvalues: v45 (copy)
+				v45.GetOnlineFriends()
+			end, {})
+		else
+			v56 = useQuery(queries.allFriendsByUserId, {
+				errorPolicy = "all",
+				notifyOnNetworkStatusChange = true,
+				skip = not v58 or not userIdExists(v54),
+				variables = Cryo.Dictionary.join(t3, {
+					pageCursor = "",
+					pageLimit = FIntFriendsCarouselInitialFetchSize
+				})
+			})
+			useQuery(queries.onlineFriendsByUserId, {
+				notifyOnNetworkStatusChange = true,
+				skip = not v58 or not userIdExists(v54),
+				variables = t3
+			})
+		end
+	end
+
+	if v39 then
+		local v63 = if not FFlagFriendSortedByPresenceSignalsImplementation then v56 and (v56.data and (v56.data.allFriendsByUserId and v56.data.allFriendsByUserId.friends)) else v57
+
+		React.useEffect(function() -- line: 168
+			-- upvalues: userIdExists (copy), v54 (copy), v63 (copy), v49 (copy)
+			if userIdExists(v54) then
+				local t4 = { (tostring(v54)) }
+
+				if v63 then
+					for _, v68 in v63 do
+						if v68 and v68.id then
+							table.insert(t4, (tostring(v68.id)))
+						end
+					end
+				end
+
+				v49.fetchNamesByUserIds(t4)
+			end
+		end, {
+			v54,
+			v63
+		})
+	end
+
+	useAutoSyncContacts()
+
+	if v47() then
+		React.useEffect(function() -- line: 189
+			-- upvalues: userIdExists (copy), v54 (copy), v53 (copy), NetworkingFriends (copy)
+			if userIdExists(v54) then
+				v53(NetworkingFriends.GetFriendsCountFromUserId.API(v54))
+			end
+		end, { v54 })
+	end
+
+	React.useEffect(function() -- line: 196
+		-- upvalues: userIdExists (copy), v54 (copy), v53 (copy), NetworkingFriends (copy), MessageBusService (copy), MessageId (copy)
+		if userIdExists(v54) then
+			v53(NetworkingFriends.GetNewFriendRequestsCount.API({
+				currentUserId = v54
+			}))
+
+			local v69 = MessageBusService:Subscribe(MessageId, function() -- line: 201
+				-- upvalues: v53 (copy), NetworkingFriends (copy), v54 (copy)
+				v53(NetworkingFriends.GetNewFriendRequestsCount.API({
+					currentUserId = v54
+				}))
+			end, false, true)
+
+			return function() -- line: 206
+				-- upvalues: v69 (copy)
+				v69:Disconnect()
+			end
+		end
+
+		return function() -- line: 210
+		end
+	end, { v54 })
+
+	local v64 = React.useMemo(function() -- line: 213
+		-- upvalues: AnalyticsFactory (copy), t1 (copy), DefaultAnalyticsService (copy)
+		return AnalyticsFactory.setUpAnalyticsFactory({
+			eventLists = {
+				EventStream = t1
+			},
+			analyticsImpl = {
+				EventStream = DefaultAnalyticsService.EventStream
+			}
+		})()
+	end, {})
+
+	React.useEffect(function() -- line: 223
+		-- upvalues: AppStorageService (copy), v46 (copy), PermissionsProtocol (copy), v64 (copy)
+		if AppStorageService:GetItem(v46) == "true" then
+			PermissionsProtocol.default:checkOrRequestPermissions({ PermissionsProtocol.Permissions.CAMERA_ACCESS }):andThen(function(p1) -- line: 231
+				-- upvalues: v64 (copy)
+				v64.fireAnalyticsEvent("ProfileQRCodeCameraSettingsModalSeen", {
+					cameraPermissionResponseStatus = p1
+				})
+			end)
+			AppStorageService:SetItem(v46, "false")
+			AppStorageService:Flush()
+		end
+	end, {
+		v54,
+		v64
+	})
+
+	if GetFFlagContactsToastEnabled() or ContactsToastIXP.FFlagContactsToastExperimentEnabled and ContactsToastIXP.useContactsToastVariant() then
+		return (React.createElement(Roact.Portal, {
+			target = CoreGui
+		}, { React.createElement(ContactsToast, Dash.join(t2, {
+			getContactImporterParams = getContactImporterParams,
+			isContactsToastPolicyEnabled = t2.isContactsToastPolicyEnabled
+		})) }))
+	end
+
+	return nil
+end
+
+return UniversalAppPolicy.connect(function(p2) -- line: 257
+	-- upvalues: GetFFlagContactsToastEnabled (copy), ContactsToastIXP (copy)
+	return {
+		isContactImporterPolicyEnabled = p2.getContactImporterEnabled(),
+		isContactsToastPolicyEnabled = (GetFFlagContactsToastEnabled() or not not ContactsToastIXP.FFlagContactsToastExperimentEnabled) and p2.getContactsToastEnabled()
+	}
+end)(Container)

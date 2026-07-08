@@ -1,65 +1,75 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v3 = require(l_script_FirstAncestor_0.Hooks.usePositionOffsetForVirtualKeyboard);
-local v4 = require(l_Parent_0.React);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-return function(v6) --[[ Line: 16 ]]
-    -- upvalues: l_useSelector_0 (copy), v3 (copy), v4 (copy), l_UserInputService_0 (copy)
-    local v8 = l_useSelector_0(function(v7) --[[ Line: 17 ]]
-        if v7.GlobalGuiInset then
-            return v7.GlobalGuiInset.top;
-        else
-            return 0;
-        end;
-    end);
-    local v9 = if v6.parentViewRef then v6.parentViewRef.current else nil;
-    local v10 = v3({
-        isNearBottomOfScreen = true
-    });
-    local v12 = v4.useCallback(function() --[[ Line: 23 ]]
-        -- upvalues: l_UserInputService_0 (ref), v10 (copy), v9 (copy), v8 (copy), v6 (copy)
-        local v11 = 0;
-        if l_UserInputService_0.OnScreenKeyboardVisible then
-            if v10 ~= nil then
-                v11 = v10;
-            elseif v9 then
-                v11 = v9.AbsolutePosition.Y + v9.AbsoluteSize.Y - (l_UserInputService_0.OnScreenKeyboardPosition.Y - v8);
-            end;
-        end;
-        if v6.onKeyboardOffsetChanged then
-            v6.onKeyboardOffsetChanged(v11);
-        end;
-    end, {
-        v10, 
-        v8, 
-        v6.onKeyboardOffsetChanged, 
-        v9
-    });
-    v4.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: v12 (copy), l_UserInputService_0 (ref), v9 (copy)
-        v12();
-        local v13 = l_UserInputService_0:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v12);
-        local v14 = l_UserInputService_0:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(v12);
-        local v15 = nil;
-        if v9 then
-            v15 = v9:GetPropertyChangedSignal("AbsoluteSize"):Connect(v12);
-        end;
-        return function() --[[ Line: 53 ]]
-            -- upvalues: v13 (copy), v14 (copy), v15 (ref)
-            if v13 then
-                v13:Disconnect();
-            end;
-            if v14 then
-                v14:Disconnect();
-            end;
-            if v15 then
-                v15:Disconnect();
-            end;
-        end;
-    end, {
-        v12, 
-        v9
-    });
-    return nil;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local UserInputService = game:GetService("UserInputService")
+local usePositionOffsetForVirtualKeyboard = require(AppChat.Hooks.usePositionOffsetForVirtualKeyboard)
+local React = require(AppChatParent.React)
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+return function(t1: {[any]: any}) -- line: 16
+	-- upvalues: useSelector (copy), usePositionOffsetForVirtualKeyboard (copy), React (copy), UserInputService (copy)
+	local v8 = useSelector(function(p1) -- line: 17
+		if p1.GlobalGuiInset then
+			return p1.GlobalGuiInset.top
+		end
+
+		return 0
+	end)
+	local v9 = if not t1.parentViewRef then nil else t1.parentViewRef.current
+	local v10 = usePositionOffsetForVirtualKeyboard({
+		isNearBottomOfScreen = true
+	})
+	local v11 = React.useCallback(function() -- line: 23
+		-- upvalues: UserInputService (copy), v10 (copy), v9 (copy), v8 (copy), t1 (copy)
+		local n1 = 0
+
+		if UserInputService.OnScreenKeyboardVisible then
+			if v10 ~= nil then
+				n1 = v10
+			elseif v9 then
+				n1 = v9.AbsolutePosition.Y + v9.AbsoluteSize.Y - (UserInputService.OnScreenKeyboardPosition.Y - v8)
+			end
+		end
+
+		if t1.onKeyboardOffsetChanged then
+			t1.onKeyboardOffsetChanged(n1)
+		end
+	end, {
+		v10,
+		v8,
+		t1.onKeyboardOffsetChanged,
+		v9
+	})
+
+	React.useEffect(function() -- line: 40
+		-- upvalues: v11 (copy), UserInputService (copy), v9 (copy)
+		v11()
+
+		local connection = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"):Connect(v11)
+		local connection2 = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardPosition"):Connect(v11)
+		local connection3 = nil
+
+		if v9 then
+			connection3 = v9:GetPropertyChangedSignal("AbsoluteSize"):Connect(v11)
+		end
+
+		return function() -- line: 53
+			-- upvalues: connection (copy), connection2 (copy), connection3 (ref)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+
+			if connection3 then
+				connection3:Disconnect()
+			end
+		end
+	end, {
+		v11,
+		v9
+	})
+
+	return nil
+end

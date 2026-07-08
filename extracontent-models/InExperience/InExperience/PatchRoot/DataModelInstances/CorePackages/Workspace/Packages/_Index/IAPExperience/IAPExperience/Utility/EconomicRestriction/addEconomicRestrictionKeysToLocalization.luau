@@ -1,18 +1,18 @@
-return function(v0) --[[ Line: 3 ]]
-    v0.economicRestrictionBaseTextDays = "IAPExperience.PurchaseError.Text.EconomicRestrictionsDays";
-    v0.economicRestrictionBaseTextHours = "IAPExperience.PurchaseError.Text.EconomicRestrictionsHours";
-    v0.economicRestrictionBaseTextDaysGeneral = "IAPExperience.PurchaseError.Text.EconomicRestrictionsDaysGeneral";
-    v0.economicRestrictionBaseTextHoursGeneral = "IAPExperience.PurchaseError.Text.EconomicRestrictionsHoursGeneral";
-    v0.okButtonText = "CoreScripts.PurchasePrompt.Button.OK";
-    v0.chargebackViolationLabel = "Feature.NotApproved.Label.AbuseType.Chargeback";
-    v0.fraudAbuseOfAffiliateSystemViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudAbuseOfTheAffiliateSystem";
-    v0.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudAttemptedUnauthorizedPaymentMethodUse";
-    v0.fraudPaymentAbuseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudPaymentAbuse";
-    v0.fraudRepeatedRefundRequestsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudRepeatedRefundRequests";
-    v0.fraudSuspiciousAccountPatternsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudSuspiciousAccountPatterns";
-    v0.fraudSuspiciousRefundRequestsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudSuspiciousRefundRequests";
-    v0.fraudUnauthorizedPurchaseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudUnauthorizedPurchase";
-    v0.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudUseOfUnauthorizedOffPlatformTransactions";
-    v0.fraudVirtualEconomyAbuseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudVirtualEconomyAbuse";
-    v0.unknownText = "IAPExperience.PurchaseError.Text.UnknownError";
-end;
+return function(t1: {[any]: any}) -- line: 3
+	t1.economicRestrictionBaseTextDays = "IAPExperience.PurchaseError.Text.EconomicRestrictionsDays"
+	t1.economicRestrictionBaseTextHours = "IAPExperience.PurchaseError.Text.EconomicRestrictionsHours"
+	t1.economicRestrictionBaseTextDaysGeneral = "IAPExperience.PurchaseError.Text.EconomicRestrictionsDaysGeneral"
+	t1.economicRestrictionBaseTextHoursGeneral = "IAPExperience.PurchaseError.Text.EconomicRestrictionsHoursGeneral"
+	t1.okButtonText = "CoreScripts.PurchasePrompt.Button.OK"
+	t1.chargebackViolationLabel = "Feature.NotApproved.Label.AbuseType.Chargeback"
+	t1.fraudAbuseOfAffiliateSystemViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudAbuseOfTheAffiliateSystem"
+	t1.fraudAttemptedUnauthorizedPaymentMethodUseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudAttemptedUnauthorizedPaymentMethodUse"
+	t1.fraudPaymentAbuseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudPaymentAbuse"
+	t1.fraudRepeatedRefundRequestsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudRepeatedRefundRequests"
+	t1.fraudSuspiciousAccountPatternsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudSuspiciousAccountPatterns"
+	t1.fraudSuspiciousRefundRequestsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudSuspiciousRefundRequests"
+	t1.fraudUnauthorizedPurchaseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudUnauthorizedPurchase"
+	t1.fraudUseOfUnauthorizedOffPlatformTransactionsViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudUseOfUnauthorizedOffPlatformTransactions"
+	t1.fraudVirtualEconomyAbuseViolationLabel = "Feature.NotApproved.Label.Sublabel.FraudVirtualEconomyAbuse"
+	t1.unknownText = "IAPExperience.PurchaseError.Text.UnknownError"
+end

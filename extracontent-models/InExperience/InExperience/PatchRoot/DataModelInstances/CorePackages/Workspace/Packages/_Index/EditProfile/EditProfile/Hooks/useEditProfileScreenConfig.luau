@@ -1,73 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("EditProfile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Common.Enums);
-local v4 = require(l_script_FirstAncestor_0.Components.EditDisplayName);
-local v5 = require(l_script_FirstAncestor_0.Components.EditBio);
-local v6 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v7 = require(l_script_FirstAncestor_0.Hooks.useRealNamesInDisplayNamesEnabled);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v9 = require(l_Parent_0.Promise);
-local l_ProfileRefreshSignal_0 = require(l_Parent_0.ProfilePlatformCommon).Signals.ProfileRefreshSignal;
-local v11 = {
-    [v3.Screens.EditDisplayName] = {
-        component = v4, 
-        titleKey = v6.EditDisplayName
-    }, 
-    [v3.Screens.EditBio] = {
-        component = v5, 
-        titleKey = v6.About
-    }
-};
-return function(v12) --[[ Line: 38 ]]
-    -- upvalues: v11 (copy), l_useNavigation_0 (copy), v7 (copy), v2 (copy), l_ProfileRefreshSignal_0 (copy), v9 (copy), v3 (copy), v6 (copy)
-    local v13 = v11[v12];
-    local v14 = l_useNavigation_0();
-    local v15 = v7();
-    local v16 = v2.useRef(nil);
-    local v17, v18 = v2.useState(false);
-    local v19, v20 = v2.useState(false);
-    local v22 = v2.useCallback(function(v21) --[[ Line: 47 ]]
-        -- upvalues: v20 (copy)
-        v20(v21);
-    end, {});
-    local v23 = v2.useCallback(function() --[[ Line: 51 ]]
-        -- upvalues: l_ProfileRefreshSignal_0 (ref), v14 (copy)
-        l_ProfileRefreshSignal_0.notifyProfileRefresh();
-        v14.goBack();
-    end, {
-        v14
-    });
-    local v25 = v2.useCallback(function(v24) --[[ Line: 56 ]]
-        -- upvalues: v16 (copy)
-        v16.current = v24;
-    end, {});
-    local v27 = v2.useCallback(function() --[[ Line: 60 ]]
-        -- upvalues: v16 (copy), v19 (copy), v18 (copy), v9 (ref), v23 (copy)
-        if v16.current and not v19 then
-            v18(true);
-            v9.resolve(v16.current()):andThen(function() --[[ Line: 64 ]]
-                -- upvalues: v18 (ref), v23 (ref)
-                v18(false);
-                v23();
-            end):catch(function(_) --[[ Line: 68 ]]
-                -- upvalues: v18 (ref)
-                v18(false);
-            end);
-        end;
-    end, {
-        v19
-    });
-    local v28 = if v12 == v3.Screens.EditDisplayName then if v15 then v6.EditAgedUpDisplayName else v6.EditDisplayName else v13.titleKey;
-    return {
-        component = v13.component, 
-        titleKey = v28, 
-        saveKey = v6.SaveButtonText, 
-        onClose = v23, 
-        onSave = v27, 
-        isLoading = v17, 
-        registerSaveHandler = v25, 
-        updateErrorState = v22, 
-        hasError = v19
-    };
-end;
+local EditProfile = script:FindFirstAncestor("EditProfile")
+local EditProfileParent = EditProfile.Parent
+local React = require(EditProfileParent.React)
+local Enums = require(EditProfile.Common.Enums)
+local EditDisplayName = require(EditProfile.Components.EditDisplayName)
+local EditBio = require(EditProfile.Components.EditBio)
+local TextKeys = require(EditProfile.Common.TextKeys)
+local useRealNamesInDisplayNamesEnabled = require(EditProfile.Hooks.useRealNamesInDisplayNamesEnabled)
+local useNavigation = require(EditProfileParent.Navigation).useNavigation
+local Promise = require(EditProfileParent.Promise)
+local ProfileRefreshSignal = require(EditProfileParent.ProfilePlatformCommon).Signals.ProfileRefreshSignal
+local t1 = {
+	[Enums.Screens.EditDisplayName] = {
+		component = EditDisplayName,
+		titleKey = TextKeys.EditDisplayName
+	},
+	[Enums.Screens.EditBio] = {
+		component = EditBio,
+		titleKey = TextKeys.About
+	}
+}
+
+return function(p1) -- line: 38
+	-- upvalues: t1 (copy), useNavigation (copy), useRealNamesInDisplayNamesEnabled (copy), React (copy), ProfileRefreshSignal (copy), Promise (copy), Enums (copy), TextKeys (copy)
+	local v14 = t1[p1]
+	local v15 = useNavigation()
+	local v16 = useRealNamesInDisplayNamesEnabled()
+	local v17 = React.useRef(nil)
+	local v18, v19 = React.useState(false)
+	local v20, v21 = React.useState(false)
+	local v22 = React.useCallback(function(b1: boolean) -- line: 47
+		-- upvalues: v21 (copy)
+		v21(b1)
+	end, {})
+	local v23 = React.useCallback(function() -- line: 51
+		-- upvalues: ProfileRefreshSignal (copy), v15 (copy)
+		ProfileRefreshSignal.notifyProfileRefresh()
+		v15.goBack()
+	end, { v15 })
+	local v24 = React.useCallback(function(p2: ((...any) -> ...any)) -- line: 56
+		-- upvalues: v17 (copy)
+		v17.current = p2
+	end, {})
+	local v25 = React.useCallback(function() -- line: 60
+		-- upvalues: v17 (copy), v20 (copy), v19 (copy), Promise (copy), v23 (copy)
+		if v17.current and not v20 then
+			v19(true)
+			Promise.resolve(v17.current()):andThen(function() -- line: 64
+				-- upvalues: v19 (copy), v23 (copy)
+				v19(false)
+				v23()
+			end):catch(function(_) -- line: 68
+				-- upvalues: v19 (copy)
+				v19(false)
+			end)
+		end
+	end, { v20 })
+	local v26 = if p1 ~= Enums.Screens.EditDisplayName then v14.titleKey else if not v16 then TextKeys.EditDisplayName else TextKeys.EditAgedUpDisplayName
+
+	return {
+		component = v14.component,
+		titleKey = v26,
+		saveKey = TextKeys.SaveButtonText,
+		onClose = v23,
+		onSave = v25,
+		isLoading = v18,
+		registerSaveHandler = v24,
+		updateErrorState = v22,
+		hasError = v20
+	}
+end

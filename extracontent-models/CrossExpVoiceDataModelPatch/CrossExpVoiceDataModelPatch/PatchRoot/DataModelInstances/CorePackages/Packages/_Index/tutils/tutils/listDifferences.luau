@@ -1,34 +1,45 @@
-local v0 = require(script.Parent.tableDifference);
-local function _(v1) --[[ Line: 8 ]] --[[ Name: membershipTable ]]
-    local v2 = {};
-    for v3 = 1, #v1 do
-        v2[v1[v3]] = true;
-    end;
-    return v2;
-end;
-local _ = function(v5) --[[ Line: 20 ]] --[[ Name: listOfKeys ]]
-    local v6 = {};
-    for v7, _ in pairs(v5) do
-        table.insert(v6, v7);
-    end;
-    return v6;
-end;
-return function(v10, v11) --[[ Line: 33 ]]
-    -- upvalues: v0 (copy)
-    local l_v0_0 = v0;
-    local v13 = {};
-    for v14 = 1, #v10 do
-        v13[v10[v14]] = true;
-    end;
-    local l_v13_0 = v13;
-    local v16 = {};
-    for v17 = 1, #v11 do
-        v16[v11[v17]] = true;
-    end;
-    l_v0_0 = l_v0_0(l_v13_0, v16);
-    l_v13_0 = {};
-    for v18, _ in pairs(l_v0_0) do
-        table.insert(l_v13_0, v18);
-    end;
-    return l_v13_0;
-end;
+local tableDifference = require(script.Parent.tableDifference)
+
+local function membershipTable(p1) -- line: 8
+	local t1 = {}
+
+	for i = 1, #p1 do
+		t1[p1[i]] = true
+	end
+
+	return t1
+end
+local function listOfKeys(p2) -- line: 20
+	local t2 = {}
+
+	for k, _ in pairs(p2) do
+		table.insert(t2, k)
+	end
+
+	return t2
+end
+
+return function(p3, p4) -- line: 33
+	-- upvalues: tableDifference (copy)
+	local v13 = tableDifference
+	local t3 = {}
+
+	for i = 1, #p3 do
+		t3[p3[i]] = true
+	end
+
+	local t4 = {}
+
+	for i = 1, #p4 do
+		t4[p4[i]] = true
+	end
+
+	local v18 = v13(t3, t4)
+	local t5 = {}
+
+	for k, _ in pairs(v18) do
+		table.insert(t5, k)
+	end
+
+	return t5
+end

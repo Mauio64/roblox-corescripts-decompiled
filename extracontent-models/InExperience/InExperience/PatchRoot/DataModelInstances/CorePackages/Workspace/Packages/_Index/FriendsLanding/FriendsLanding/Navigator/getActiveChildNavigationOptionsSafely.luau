@@ -1,12 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("FriendsLanding").Parent;
-local v1 = require(l_Parent_0.RoactNavigation);
-local function _(v2) --[[ Line: 16 ]] --[[ Name: getUpdatedNavigation ]]
-    local v3 = v2._dangerouslyGetParent();
-    return v3 and v2.state and v2.state.key and v3.getChildNavigation(v2.state.key) or v2;
-end;
-return function(v5) --[[ Line: 31 ]]
-    -- upvalues: v1 (copy)
-    local v6 = v5._dangerouslyGetParent();
-    local v7 = v6 and v5.state and v5.state.key and v6.getChildNavigation(v5.state.key) or v5;
-    return v1.getActiveChildNavigationOptions(v7);
-end;
+local Parent = script:FindFirstAncestor("FriendsLanding").Parent
+local RoactNavigation = require(Parent.RoactNavigation)
+
+local function getUpdatedNavigation(p1) -- line: 16
+	local v5 = p1._dangerouslyGetParent()
+
+	return v5 and (not not p1.state and (not not p1.state.key and v5.getChildNavigation(p1.state.key))) or p1
+end
+
+return function(p2) -- line: 31
+	-- upvalues: RoactNavigation (copy)
+	local v7 = p2._dangerouslyGetParent()
+	local v8 = v7 and (not not p2.state and (not not p2.state.key and v7.getChildNavigation(p2.state.key))) or p2
+
+	return RoactNavigation.getActiveChildNavigationOptions(v8)
+end

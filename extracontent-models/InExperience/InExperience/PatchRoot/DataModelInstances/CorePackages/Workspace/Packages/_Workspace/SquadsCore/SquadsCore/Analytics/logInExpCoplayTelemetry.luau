@@ -1,59 +1,69 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Players_0 = game:GetService("Players");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local _ = require(l_script_FirstAncestor_0.Enums.SquadCoplayJoin);
-local v6 = require(l_script_FirstAncestor_0.Enums.SquadLocationEnum);
-local v7 = require(l_script_FirstAncestor_0.Flags.FFlagEncodeSquadMembersUpdated);
-local v8 = require(l_script_FirstAncestor_0.Common.encodeSquadMembers);
-local v9 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.RoduxSquads);
-local v14 = if v7 then require(l_script_FirstAncestor_0.Common.encodeUserIds) else function(v11) --[[ Line: 21 ]]
-    -- upvalues: l_HttpService_0 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 22 ]]
-        -- upvalues: l_HttpService_0 (ref), v11 (copy)
-        return l_HttpService_0:JSONEncode(v11);
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return "[]";
-    end;
-end;
-return function(v15, v16, v17, v18, v19) --[[ Line: 33 ]]
-    -- upvalues: v6 (copy), l_Players_0 (copy), v7 (copy), v14 (copy), v8 (copy), v9 (copy), v4 (copy)
-    if v17 == v6.InExperience then
-        local v20 = {};
-        local v21 = {};
-        for _, v23 in ipairs(v16) do
-            v20[v23.userId] = true;
-        end;
-        for _, v25 in l_Players_0:GetPlayers() do
-            if v20[v25.UserId] then
-                table.insert(v21, v25.UserId);
-            end;
-        end;
-        local v26 = nil;
-        local v27 = nil;
-        local v28 = nil;
-        if v7 then
-            v27 = v14(v21);
-            v28 = v8(v16);
-        else
-            v26 = v9.List.map(v16, function(v29) --[[ Line: 63 ]]
-                return v29.userId;
-            end);
-            v27 = v14(v21);
-            v28 = v14(v26);
-        end;
-        v19(v4.PartyCoplay, {
-            partyCoplayEvent = v18, 
-            partyId = v15, 
-            partyPlayersInGameInstanceCount = #v21, 
-            partyPlayersInGameInstanceUserIds = v27, 
-            partyTotalSize = if v7 then #v16 else #v26, 
-            partyTotalSizeUserIds = v28
-        });
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local EventNames = require(SquadsCore.Analytics.EventNames)
+
+require(SquadsCore.Enums.SquadCoplayJoin)
+
+local SquadLocationEnum = require(SquadsCore.Enums.SquadLocationEnum)
+local FFlagEncodeSquadMembersUpdated = require(SquadsCore.Flags.FFlagEncodeSquadMembersUpdated)
+local encodeSquadMembers = require(SquadsCore.Common.encodeSquadMembers)
+local Cryo = require(SquadsCoreParent.Cryo)
+
+require(SquadsCoreParent.RoduxSquads)
+
+local v10 = not FFlagEncodeSquadMembersUpdated and function(p1) -- line: 21
+	-- upvalues: HttpService (copy)
+	local ok, result = pcall(function() -- line: 22
+		-- upvalues: HttpService (copy), p1 (copy)
+		return HttpService:JSONEncode(p1)
+	end)
+
+	if ok then
+		return result
+	end
+
+	return "[]"
+end or require(SquadsCore.Common.encodeUserIds)
+
+return function(s1: string, t1: {[any]: any}, p2, p3, p4: ((...any) -> ...any)) -- line: 33
+	-- upvalues: SquadLocationEnum (copy), Players (copy), FFlagEncodeSquadMembersUpdated (copy), v10 (copy), encodeSquadMembers (copy), Cryo (copy), EventNames (copy)
+	if p2 == SquadLocationEnum.InExperience then
+		local t2 = {}
+		local t3 = {}
+
+		for _, v in ipairs(t1) do
+			t2[v.userId] = true
+		end
+
+		for _, player in Players:GetPlayers() do
+			if t2[player.UserId] then
+				table.insert(t3, player.UserId)
+			end
+		end
+
+		local v25 = nil
+		local v26, v27
+
+		if FFlagEncodeSquadMembersUpdated then
+			v26 = v10(t3)
+			v27 = encodeSquadMembers(t1)
+		else
+			v25 = Cryo.List.map(t1, function(p5) -- line: 63
+				return p5.userId
+			end)
+			v26 = v10(t3)
+			v27 = v10(v25)
+		end
+
+		p4(EventNames.PartyCoplay, {
+			partyCoplayEvent = p3,
+			partyId = s1,
+			partyPlayersInGameInstanceCount = #t3,
+			partyPlayersInGameInstanceUserIds = v26,
+			partyTotalSize = if not FFlagEncodeSquadMembersUpdated then #v25 else #t1,
+			partyTotalSizeUserIds = v27
+		})
+	end
+end

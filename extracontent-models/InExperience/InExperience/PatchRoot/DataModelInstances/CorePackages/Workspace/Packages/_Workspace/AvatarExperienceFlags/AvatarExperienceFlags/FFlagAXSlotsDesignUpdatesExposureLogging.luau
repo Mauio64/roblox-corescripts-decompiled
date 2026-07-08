@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXSlotsDesignUpdatesExposureLogging2", false);
+return game:DefineFastFlag("AXSlotsDesignUpdatesExposureLogging2", false)

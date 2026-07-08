@@ -1,20 +1,29 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.ES7Types);
-return function(v2, v3, v4) --[[ Line: 28 ]]
-    if typeof(v2) ~= "table" then
-        error(string.format("Array.some called on %s", (typeof(v2))));
-    end;
-    if typeof(v3) ~= "function" then
-        error("callback is not a function");
-    end;
-    for v5, v6 in v2 do
-        if v4 ~= nil then
-            if v6 ~= nil and v3(v4, v6, v5, v2) then
-                return true;
-            end;
-        elseif v6 ~= nil and v3(v6, v5, v2) then
-            return true;
-        end;
-    end;
-    return false;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.ES7Types)
+
+return function(p1, p2: ((...any) -> ...any), p3) -- line: 28
+	if typeof(p1) ~= "table" then
+		error(string.format("Array.some called on %s", (typeof(p1))))
+	end
+
+	if typeof(p2) ~= "function" then
+		error("callback is not a function")
+	end
+
+	for v5, v6 in p1 do
+		if p3 == nil then
+			if v6 == nil or not p2(v6, v5, p1) then
+				continue
+			end
+
+			return true
+		end
+
+		if v6 ~= nil and p2(p3, v6, v5, p1) then
+			return true
+		end
+	end
+
+	return false
+end

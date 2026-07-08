@@ -45,13 +45,14 @@ function t1.new() -- line: 135
 	-- upvalues: CrossExperience (copy), CrossExperienceVoiceAnalytics (copy), t1 (copy)
 	local t2 = {
 		joinRequestPulseCheckId = nil,
-		connections = {},
 		isInitialized = false,
 		isConnected = false,
 		shouldIgnoreMemoryWarning = false,
 		hasExperienceStarted = false,
 		observersInitialized = false,
 		currentCevJoinAttemptId = nil,
+		isActiveDM = true,
+		connections = {},
 		ExperienceJoined = Instance.new("BindableEvent"),
 		ExperienceJoinFailed = Instance.new("BindableEvent"),
 		ExperienceLeft = Instance.new("BindableEvent"),
@@ -63,8 +64,7 @@ function t1.new() -- line: 135
 		VoiceEuModalConsented = Instance.new("BindableEvent"),
 		VoiceEuModalRefused = Instance.new("BindableEvent"),
 		cevEventManager = CrossExperience.EventManager.new(if game.PlaceId ~= 0 then CrossExperience.Constants.EXPERIENCE_TYPE_UGC else CrossExperience.Constants.EXPERIENCE_TYPE_LUAAPP, false),
-		voiceAnalytics = CrossExperienceVoiceAnalytics.default,
-		isActiveDM = true
+		voiceAnalytics = CrossExperienceVoiceAnalytics.default
 	}
 
 	setmetatable(t2, t1)
@@ -216,18 +216,18 @@ function t1.setAsConnected(p13) -- line: 342
 end
 function t1.getIsBackgroundDMActive(_) -- line: 351
 	-- upvalues: Promise (copy), Communication (copy), CrossExperience (copy), BACKGROUND_DM_STATUS (copy)
-	return Promise.new(function(p15, p16) -- line: 352
+	return Promise.new(function(resolve, reject) -- line: 352
 		-- upvalues: Communication (copy), CrossExperience (copy), BACKGROUND_DM_STATUS (copy)
-		Communication.execute(CrossExperience.Constants.COMMUNICATIONS.EXECUTE_GET_BACKGROUND_DM_STATE, {}, function(p17) -- line: 356
-			-- upvalues: p15 (copy), BACKGROUND_DM_STATUS (copy)
-			p15(p17.status == BACKGROUND_DM_STATUS.ACTIVE or p17.status == BACKGROUND_DM_STATUS.BACKGROUND)
+		Communication.execute(CrossExperience.Constants.COMMUNICATIONS.EXECUTE_GET_BACKGROUND_DM_STATE, {}, function(p15) -- line: 356
+			-- upvalues: resolve (copy), BACKGROUND_DM_STATUS (copy)
+			resolve(p15.status == BACKGROUND_DM_STATUS.ACTIVE or p15.status == BACKGROUND_DM_STATUS.BACKGROUND)
 		end, function() -- line: 359
-			-- upvalues: p16 (copy)
-			p16()
+			-- upvalues: reject (copy)
+			reject()
 		end)
 	end)
 end
-function t1.performJoinFeasibilityCheck(p18) -- line: 367
+function t1.performJoinFeasibilityCheck(p16) -- line: 367
 	-- upvalues: getFFlagEnableCrossExpVoiceMemoryCheck (copy), CrossExperience (copy), FFlagFixCrossExperienceVoiceExecutePrint (copy), Logger (copy)
 	if not getFFlagEnableCrossExpVoiceMemoryCheck() then
 		return true
@@ -238,7 +238,7 @@ function t1.performJoinFeasibilityCheck(p18) -- line: 367
 	end)
 
 	if not ok or not result then
-		p18.JoinFeasibilityCheckPerformed:Fire(false)
+		p16.JoinFeasibilityCheckPerformed:Fire(false)
 
 		return false
 	end
@@ -255,12 +255,12 @@ function t1.performJoinFeasibilityCheck(p18) -- line: 367
 			Logger:warn("performJoinFeasibilityCheck() - failed to check feasibility", result2)
 		end
 
-		p18.JoinFeasibilityCheckPerformed:Fire(false)
+		p16.JoinFeasibilityCheckPerformed:Fire(false)
 
 		return false
 	end
 
-	p18.JoinFeasibilityCheckPerformed:Fire(result2)
+	p16.JoinFeasibilityCheckPerformed:Fire(result2)
 
 	return result2
 end
@@ -474,47 +474,47 @@ function t1.unblockVoiceParticipant(t15: {[any]: any}, n8: number) -- line: 612
 		t15.voiceAnalytics:logPartyVoiceUnblockParticipant(t15.currentPartyId, n8)
 	end
 end
-function t1.dumpDebugData(p20) -- line: 622
+function t1.dumpDebugData(p18) -- line: 622
 	-- upvalues: CrossExperience (copy)
-	p20.cevEventManager:notify(CrossExperience.Constants.EVENTS.DEBUG_COMMAND, {
+	p18.cevEventManager:notify(CrossExperience.Constants.EVENTS.DEBUG_COMMAND, {
 		name = "dump_session"
 	})
 end
-function t1.leave(p21) -- line: 628
+function t1.leave(p19) -- line: 628
 	-- upvalues: ExperienceService (copy), CrossExperience (copy), clearTimeout (copy)
 	ExperienceService:StopCrossExperience(CrossExperience.Constants.EXPERIENCE_TYPE_VOICE, {})
 
-	if p21.joinRequestPulseCheckId then
-		clearTimeout(p21.joinRequestPulseCheckId)
-		p21.joinRequestPulseCheckId = nil
+	if p19.joinRequestPulseCheckId then
+		clearTimeout(p19.joinRequestPulseCheckId)
+		p19.joinRequestPulseCheckId = nil
 	end
 
-	p21.voiceAnalytics:reset()
+	p19.voiceAnalytics:reset()
 end
-function t1.rejoinVoice(p22) -- line: 639
+function t1.rejoinVoice(p20) -- line: 639
 	-- upvalues: CrossExperience (copy)
-	p22.cevEventManager:notify(CrossExperience.Constants.EVENTS.PARTY_VOICE_RECONNECT_REQUESTED, {})
+	p20.cevEventManager:notify(CrossExperience.Constants.EVENTS.PARTY_VOICE_RECONNECT_REQUESTED, {})
 end
-function t1.resetCEVMemStorage(p23) -- line: 643
+function t1.resetCEVMemStorage(p21) -- line: 643
 	-- upvalues: MemStorageService (copy), CEV_JOIN_ATTEMPT_ID_KEY (copy)
-	p23.currentCevJoinAttemptId = nil
+	p21.currentCevJoinAttemptId = nil
 	pcall(function() -- line: 645
 		-- upvalues: MemStorageService (copy), CEV_JOIN_ATTEMPT_ID_KEY (copy)
 		MemStorageService:RemoveItem(CEV_JOIN_ATTEMPT_ID_KEY)
 	end)
 end
-function t1.disconnect(p24) -- line: 650
+function t1.disconnect(p22) -- line: 650
 	-- upvalues: Logger (copy), clearTimeout (copy), v30 (copy)
-	p24.isConnected = false
-	p24.currentPartyId = nil
-	p24.hasExperienceStarted = false
-	p24.shouldIgnoreMemoryWarning = false
+	p22.isConnected = false
+	p22.currentPartyId = nil
+	p22.hasExperienceStarted = false
+	p22.shouldIgnoreMemoryWarning = false
 	Logger:info("Disconnecting, resetting observers")
-	p24.observersInitialized = false
+	p22.observersInitialized = false
 
-	if p24.joinRequestPulseCheckId then
-		clearTimeout(p24.joinRequestPulseCheckId)
-		p24.joinRequestPulseCheckId = nil
+	if p22.joinRequestPulseCheckId then
+		clearTimeout(p22.joinRequestPulseCheckId)
+		p22.joinRequestPulseCheckId = nil
 	end
 
 	v30.clean()
@@ -535,8 +535,8 @@ function t1.getAudioFocusService(_) -- line: 668
 
 	return result
 end
-function t1.getCurrentAudioContext(p26) -- line: 684
-	local v93 = p26:getAudioFocusService()
+function t1.getCurrentAudioContext(p24) -- line: 684
+	local v93 = p24:getAudioFocusService()
 
 	if v93 == nil then
 		return -1
@@ -544,9 +544,9 @@ function t1.getCurrentAudioContext(p26) -- line: 684
 
 	return v93:GetFocusedContextId()
 end
-function t1.toggleAudioFocus(p27) -- line: 693
+function t1.toggleAudioFocus(p25) -- line: 693
 	-- upvalues: AUDIO_FOCUS_MANAGEMENT (copy)
-	local v95 = p27:getAudioFocusService()
+	local v95 = p25:getAudioFocusService()
 
 	if v95 == nil then
 		return
@@ -596,13 +596,13 @@ function t1.unmuteAll(t17: {[any]: any}, s8: string?) -- line: 733
 		})
 	end
 end
-function t1.signalCevReadinessSync(p28) -- line: 744
+function t1.signalCevReadinessSync(p26) -- line: 744
 	-- upvalues: CrossExperience (copy)
 	if not game:GetEngineFeature("CevReadinessSync") then
 		return
 	end
 
-	p28.cevEventManager:notify(CrossExperience.Constants.EVENTS.FOREGROUND_UI_READY, {})
+	p26.cevEventManager:notify(CrossExperience.Constants.EVENTS.FOREGROUND_UI_READY, {})
 end
 
 t1.default = t1.new()

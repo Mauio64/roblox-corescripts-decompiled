@@ -1,109 +1,79 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script:FindFirstAncestor("FocusNavigationUtils").Parent;
-local v2 = require(l_Parent_0.React);
-local function _(v3) --[[ Line: 6 ]] --[[ Name: hasFocus ]]
-    -- upvalues: l_GuiService_0 (copy)
-    local l_SelectedCoreObject_0 = l_GuiService_0.SelectedCoreObject;
-    if v3 and l_SelectedCoreObject_0 then
-        local v5 = true;
-        if l_SelectedCoreObject_0 ~= v3 then
-            v5 = l_SelectedCoreObject_0:IsDescendantOf(v3);
-        end;
-        return v5 and l_SelectedCoreObject_0:FindFirstAncestorOfClass("CoreGui") ~= nil;
-    else
-        return false;
-    end;
-end;
-return function(v7) --[[ Line: 18 ]] --[[ Name: useDescendantHasFocus ]]
-    -- upvalues: l_GuiService_0 (copy), v2 (copy)
-    local l_SelectedCoreObject_1 = l_GuiService_0.SelectedCoreObject;
-    local v9;
-    if v7 and l_SelectedCoreObject_1 then
-        local v10 = true;
-        if l_SelectedCoreObject_1 ~= v7 then
-            v10 = l_SelectedCoreObject_1:IsDescendantOf(v7);
-        end;
-        v9 = v10 and l_SelectedCoreObject_1:FindFirstAncestorOfClass("CoreGui") ~= nil;
-    else
-        v9 = false;
-    end;
-    local v11;
-    l_SelectedCoreObject_1, v11 = v2.useState(v9);
-    v2.useEffect(function() --[[ Line: 22 ]]
-        -- upvalues: v7 (copy), v11 (copy), l_GuiService_0 (ref)
-        local v12 = nil;
-        local v13 = nil;
-        if v7 then
-            local l_v11_0 = v11;
-            local l_v7_0 = v7;
-            local l_SelectedCoreObject_2 = l_GuiService_0.SelectedCoreObject;
-            local v17;
-            if l_v7_0 and l_SelectedCoreObject_2 then
-                local v18 = true;
-                if l_SelectedCoreObject_2 ~= l_v7_0 then
-                    v18 = l_SelectedCoreObject_2:IsDescendantOf(l_v7_0);
-                end;
-                v17 = v18 and l_SelectedCoreObject_2:FindFirstAncestorOfClass("CoreGui") ~= nil;
-            else
-                v17 = false;
-            end;
-            l_v11_0(v17);
-            v12 = l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() --[[ Line: 28 ]]
-                -- upvalues: v13 (ref), v7 (ref), l_GuiService_0 (ref), v11 (ref)
-                if v13 then
-                    v13:Disconnect();
-                end;
-                local l_v7_1 = v7;
-                local l_SelectedCoreObject_3 = l_GuiService_0.SelectedCoreObject;
-                local v21;
-                if l_v7_1 and l_SelectedCoreObject_3 then
-                    local v22 = true;
-                    if l_SelectedCoreObject_3 ~= l_v7_1 then
-                        v22 = l_SelectedCoreObject_3:IsDescendantOf(l_v7_1);
-                    end;
-                    v21 = v22 and l_SelectedCoreObject_3:FindFirstAncestorOfClass("CoreGui") ~= nil;
-                else
-                    v21 = false;
-                end;
-                l_v7_1 = l_GuiService_0.SelectedCoreObject;
-                if v21 and l_v7_1 then
-                    v13 = l_v7_1.AncestryChanged:Connect(function() --[[ Line: 36 ]]
-                        -- upvalues: l_v7_1 (copy), v13 (ref), v11 (ref), v7 (ref), l_GuiService_0 (ref)
-                        if l_v7_1:FindFirstAncestorOfClass("CoreGui") == nil then
-                            v13:Disconnect();
-                            local l_v11_1 = v11;
-                            local l_v7_2 = v7;
-                            local l_SelectedCoreObject_4 = l_GuiService_0.SelectedCoreObject;
-                            local v26;
-                            if l_v7_2 and l_SelectedCoreObject_4 then
-                                local v27 = true;
-                                if l_SelectedCoreObject_4 ~= l_v7_2 then
-                                    v27 = l_SelectedCoreObject_4:IsDescendantOf(l_v7_2);
-                                end;
-                                v26 = v27 and l_SelectedCoreObject_4:FindFirstAncestorOfClass("CoreGui") ~= nil;
-                            else
-                                v26 = false;
-                            end;
-                            l_v11_1(v26);
-                        end;
-                    end);
-                end;
-                v11(v21);
-            end);
-        else
-            v11(false);
-        end;
-        return function() --[[ Line: 50 ]]
-            -- upvalues: v12 (ref), v13 (ref)
-            if v12 then
-                v12:Disconnect();
-            end;
-            if v13 then
-                v13:Disconnect();
-            end;
-        end;
-    end, {
-        v7
-    });
-    return l_SelectedCoreObject_1;
-end;
+local GuiService = game:GetService("GuiService")
+local Parent = script:FindFirstAncestor("FocusNavigationUtils").Parent
+local React = require(Parent.React)
+
+local function hasFocus(p1) -- line: 6
+	-- upvalues: GuiService (copy)
+	local SelectedCoreObject = GuiService.SelectedCoreObject
+
+	if p1 and SelectedCoreObject then
+		return (SelectedCoreObject == p1 or SelectedCoreObject:IsDescendantOf(p1)) and SelectedCoreObject:FindFirstAncestorOfClass("CoreGui") ~= nil
+	end
+
+	return false
+end
+local function useDescendantHasFocus(p2) -- line: 18
+	-- upvalues: GuiService (copy), React (copy)
+	local SelectedCoreObject = GuiService.SelectedCoreObject
+	local v10 = not not (p2 and SelectedCoreObject) and ((SelectedCoreObject == p2 or SelectedCoreObject:IsDescendantOf(p2)) and SelectedCoreObject:FindFirstAncestorOfClass("CoreGui") ~= nil)
+	local v11, v12 = React.useState(v10)
+
+	React.useEffect(function() -- line: 22
+		-- upvalues: p2 (copy), v12 (copy), GuiService (copy)
+		local connection = nil
+		local connection2 = nil
+
+		if p2 then
+			local v15 = v12
+			local v16 = p2
+			local SelectedCoreObject2 = GuiService.SelectedCoreObject
+
+			v15(not not (v16 and SelectedCoreObject2) and ((SelectedCoreObject2 == v16 or SelectedCoreObject2:IsDescendantOf(v16)) and SelectedCoreObject2:FindFirstAncestorOfClass("CoreGui") ~= nil))
+			connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(function() -- line: 28
+				-- upvalues: connection2 (ref), p2 (copy), GuiService (copy), v12 (copy)
+				if connection2 then
+					connection2:Disconnect()
+				end
+
+				local v18 = p2
+				local SelectedCoreObject3 = GuiService.SelectedCoreObject
+				local v20 = not not (v18 and SelectedCoreObject3) and ((SelectedCoreObject3 == v18 or SelectedCoreObject3:IsDescendantOf(v18)) and SelectedCoreObject3:FindFirstAncestorOfClass("CoreGui") ~= nil)
+				local SelectedCoreObject4 = GuiService.SelectedCoreObject
+
+				if v20 and SelectedCoreObject4 then
+					connection2 = SelectedCoreObject4.AncestryChanged:Connect(function() -- line: 36
+						-- upvalues: SelectedCoreObject4 (copy), connection2 (ref), v12 (copy), p2 (copy), GuiService (copy)
+						if SelectedCoreObject4:FindFirstAncestorOfClass("CoreGui") == nil then
+							connection2:Disconnect()
+
+							local v22 = v12
+							local v23 = p2
+							local SelectedCoreObject5 = GuiService.SelectedCoreObject
+
+							v22(not not (v23 and SelectedCoreObject5) and ((SelectedCoreObject5 == v23 or SelectedCoreObject5:IsDescendantOf(v23)) and SelectedCoreObject5:FindFirstAncestorOfClass("CoreGui") ~= nil))
+						end
+					end)
+				end
+
+				v12(v20)
+			end)
+		else
+			v12(false)
+		end
+
+		return function() -- line: 50
+			-- upvalues: connection (ref), connection2 (ref)
+			if connection then
+				connection:Disconnect()
+			end
+
+			if connection2 then
+				connection2:Disconnect()
+			end
+		end
+	end, { p2 })
+
+	return v11
+end
+
+return useDescendantHasFocus

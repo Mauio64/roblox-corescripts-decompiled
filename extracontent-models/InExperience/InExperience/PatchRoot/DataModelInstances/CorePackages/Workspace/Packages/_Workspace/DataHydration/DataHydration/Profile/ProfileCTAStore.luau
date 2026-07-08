@@ -1,10 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.Parent.createProfileCTAStore);
-local v3 = v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local Signals = require(Parent.Signals)
+local createProfileCTAStore = require(script.Parent.createProfileCTAStore)
+local v4 = Signals.createComputed(createProfileCTAStore)
+
 return {
-    get = function() --[[ Line: 11 ]] --[[ Name: get ]]
-        -- upvalues: v3 (copy)
-        return v3(false);
-    end
-};
+	get = function() -- line: 11
+		-- upvalues: v4 (copy)
+		return v4(false)
+	end
+}

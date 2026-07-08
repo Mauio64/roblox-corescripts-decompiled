@@ -1,8 +1,11 @@
-return function(v0, v1, v2) --[[ Line: 1 ]] --[[ Name: calculateSliderStepValue ]]
-    if v1 > 0 then
-        local v3 = math.floor((v0 - v2.Min) / v1 + 0.5);
-        return (math.clamp(v2.Min + v3 * v1, v2.Min, v2.Max));
-    else
-        return v0;
-    end;
-end;
+local function calculateSliderStepValue(n1: number, n2: number, numberRange: NumberRange) -- line: 1
+	if n2 > 0 then
+		local v5 = math.floor((n1 - numberRange.Min) / n2 + 0.5)
+
+		return (math.clamp(numberRange.Min + v5 * n2, numberRange.Min, numberRange.Max))
+	end
+
+	return n1
+end
+
+return calculateSliderStepValue

@@ -1,336 +1,318 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent;
-local v1 = require(script.Parent.UnifiedEventLogEnums);
-local l_MarketplaceUnifiedAction_0 = v1.MarketplaceUnifiedAction;
-local l_MarketplaceUnifiedItemType_0 = v1.MarketplaceUnifiedItemType;
-local l_WidgetUiTreatment_0 = v1.WidgetUiTreatment;
-local l_UnifiedLoggingSurface_0 = require(l_Parent_0.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface;
-local v6 = require(script.Parent.sendAXCounterV2);
-local v7 = game:DefineFastFlag("AXSendPurchaseAttempt", false);
-local v8 = {};
-local v9 = {
-    AssetTypeIdStringToName = {}, 
-    BundleTypeIdStringToName = {}
-};
-for _, v11 in (Enum.BundleType:GetEnumItems()) do
-    v9.BundleTypeIdStringToName[tostring(v11.Value)] = v11.Name;
-end;
-for _, v13 in (Enum.AvatarAssetType:GetEnumItems()) do
-    v9.AssetTypeIdStringToName[tostring(v13.Value)] = v13.Name;
-end;
-v8.hasOrganicData = function(v14) --[[ Line: 102 ]] --[[ Name: hasOrganicData ]]
-    if v14.assetType or v14.bundleType or v14.organicItemPrice or v14.organicItemWearAfterPurchase or v14.organicItemSaveToMyAvatars or v14.organicAssetIds or v14.organicBundleIds then
-        return true;
-    else
-        return false;
-    end;
-end;
-v8.hasWidgetData = function(v15) --[[ Line: 118 ]] --[[ Name: hasWidgetData ]]
-    if v15.widgetId or v15.widgetType or v15.assetIds or v15.bundleIds or v15.widgetItemIds or v15.organicResultIds or v15.widgetItemPrice or v15.uiTreatmentType or v15.themeId or v15.widgetItemWearAfterPurchase or v15.widgetItemSaveToMyAvatars then
-        return true;
-    else
-        return false;
-    end;
-end;
-v8.hasUiElementData = function(v16) --[[ Line: 139 ]] --[[ Name: hasUiElementData ]]
-    if v16.elementName then
-        return true;
-    else
-        return false;
-    end;
-end;
-v8.hasItemId = function(v17) --[[ Line: 147 ]] --[[ Name: hasItemId ]]
-    -- upvalues: l_MarketplaceUnifiedAction_0 (copy)
-    local l_action_0 = v17.action;
-    local l_itemId_0 = v17.itemId;
-    if l_action_0 == l_MarketplaceUnifiedAction_0.UNDEFINED_ACTION or l_action_0 == l_MarketplaceUnifiedAction_0.UI_ELEMENT_CLICK or l_action_0 == l_MarketplaceUnifiedAction_0.WIDGET_IMPRESSION then
-        return true;
-    else
-        local v20 = false;
-        if l_itemId_0 ~= nil then
-            v20 = l_itemId_0 ~= "";
-        end;
-        return v20;
-    end;
-end;
-v8.hasValidItemType = function(v21) --[[ Line: 163 ]] --[[ Name: hasValidItemType ]]
-    -- upvalues: l_MarketplaceUnifiedItemType_0 (copy), l_MarketplaceUnifiedAction_0 (copy)
-    local l_itemType_0 = v21.itemType;
-    if l_itemType_0 == l_MarketplaceUnifiedItemType_0.UNDEFINED_ITEM_TYPE or l_itemType_0 == nil then
-        local l_action_1 = v21.action;
-        local v24 = true;
-        if l_action_1 ~= l_MarketplaceUnifiedAction_0.UI_ELEMENT_CLICK then
-            v24 = l_action_1 == l_MarketplaceUnifiedAction_0.WIDGET_IMPRESSION;
-        end;
-        return v24;
-    else
-        local v25 = true;
-        if l_itemType_0 ~= l_MarketplaceUnifiedItemType_0.ASSET then
-            v25 = true;
-            if l_itemType_0 ~= l_MarketplaceUnifiedItemType_0.BUNDLE then
-                v25 = l_itemType_0 == l_MarketplaceUnifiedItemType_0.LOOK;
-            end;
-        end;
-        return v25;
-    end;
-end;
-v8.hasValidAction = function(v26) --[[ Line: 178 ]] --[[ Name: hasValidAction ]]
-    -- upvalues: l_MarketplaceUnifiedAction_0 (copy)
-    local l_action_2 = v26.action;
-    local v28 = false;
-    if l_action_2 ~= nil then
-        v28 = l_action_2 ~= l_MarketplaceUnifiedAction_0.UNDEFINED_ACTION;
-    end;
-    return v28;
-end;
-v8.hasValidSurface = function(v29) --[[ Line: 183 ]] --[[ Name: hasValidSurface ]]
-    -- upvalues: l_UnifiedLoggingSurface_0 (copy)
-    local l_surface_0 = v29.surface;
-    local v31 = false;
-    if l_surface_0 ~= nil then
-        v31 = l_surface_0 ~= l_UnifiedLoggingSurface_0.UNDEFINED_SURFACE;
-    end;
-    return v31;
-end;
-v8.hasRequestIdForWidgetLog = function(v32) --[[ Line: 188 ]] --[[ Name: hasRequestIdForWidgetLog ]]
-    -- upvalues: v8 (copy)
-    if v8.hasWidgetData(v32) then
-        local v33 = false;
-        if v32.requestId ~= nil then
-            v33 = v32.requestId ~= "";
-        end;
-        return v33;
-    else
-        return true;
-    end;
-end;
-v8.hasValidSizeAndPosition = function(v34) --[[ Line: 198 ]] --[[ Name: hasValidSizeAndPosition ]]
-    -- upvalues: l_MarketplaceUnifiedAction_0 (copy)
-    local l_action_3 = v34.action;
-    if l_action_3 == l_MarketplaceUnifiedAction_0.ITEM_IMPRESSION or l_action_3 == l_MarketplaceUnifiedAction_0.ITEM_SELECTED or l_action_3 == l_MarketplaceUnifiedAction_0.ITEM_DESELECTED or l_action_3 == l_MarketplaceUnifiedAction_0.PURCHASE_SUCCESS then
-        local v36 = v34.screenSizeWidth or 0;
-        local v37 = v34.screenSizeHeight or 0;
-        local v38 = false;
-        if v36 > 0 then
-            v38 = v37 > 0;
-        end;
-        local v39 = v34.elementSizeWidth or 0;
-        local v40 = v34.elementSizeHeight or 0;
-        local v41 = false;
-        if v39 > 0 then
-            v41 = v40 > 0;
-        end;
-        local v42 = v34.gridPositionRow or 0;
-        local v43 = v34.gridPositionColumn or 0;
-        local v44 = false;
-        if v42 > 0 then
-            v44 = v43 > 0;
-        end;
-        return v38 and v41 and v44;
-    elseif l_action_3 == l_MarketplaceUnifiedAction_0.WIDGET_IMPRESSION then
-        local v45 = v34.gridPositionRow or 0;
-        local v46 = v34.gridPositionColumn or 0;
-        local v47 = false;
-        if v45 > 0 then
-            v47 = v46 == 1;
-        end;
-        return v47;
-    else
-        return true;
-    end;
-end;
-v8.hasValidFilter = function(v48) --[[ Line: 233 ]] --[[ Name: hasValidFilter ]]
-    -- upvalues: l_MarketplaceUnifiedAction_0 (copy), l_UnifiedLoggingSurface_0 (copy), v1 (copy)
-    local l_surface_1 = v48.surface;
-    local l_keyword_0 = v48.keyword;
-    local l_category_0 = v48.category;
-    local l_subcategory_0 = v48.subcategory;
-    local l_filterPriceMin_0 = v48.filterPriceMin;
-    local l_filterPriceMax_0 = v48.filterPriceMax;
-    local l_filterPrice_0 = v48.filterPrice;
-    local l_filterCreatorsName_0 = v48.filterCreatorsName;
-    local l_filterCreators_0 = v48.filterCreators;
-    local v58 = true;
-    if l_category_0 ~= nil and l_category_0 ~= "" then
-        if l_subcategory_0 ~= nil and l_subcategory_0 == "" then
-            v58 = false;
-        end;
-    else
-        local v59 = true;
-        if v48.action ~= l_MarketplaceUnifiedAction_0.WIDGET_IMPRESSION then
-            v59 = true;
-            if v48.action ~= l_MarketplaceUnifiedAction_0.UI_ELEMENT_CLICK then
-                v59 = v48.action == l_MarketplaceUnifiedAction_0.PURCHASE_ATTEMPT;
-            end;
-        end;
-        v58 = v59;
-    end;
-    local v60 = true;
-    if l_keyword_0 or l_surface_1 == l_UnifiedLoggingSurface_0.SEARCH_RESULTS then
-        local v61 = false;
-        if l_surface_1 == l_UnifiedLoggingSurface_0.SEARCH_RESULTS then
-            v61 = false;
-            if l_keyword_0 ~= nil then
-                v61 = l_keyword_0 ~= "";
-            end;
-        end;
-        v60 = v61;
-    end;
-    local v62 = true;
-    if l_filterPriceMin_0 and l_filterPriceMin_0 ~= "" or l_filterPriceMax_0 and l_filterPriceMax_0 ~= "" then
-        v62 = l_filterPrice_0 == v1.FiltersPrice.PRICE_RANGE;
-    end;
-    local v63 = true;
-    if l_filterCreatorsName_0 and l_filterCreatorsName_0 ~= "" then
-        v63 = l_filterCreators_0 == v1.FiltersCreators.CREATORS_BY_USERNAME;
-    end;
-    return v60 and v58 and v62 and v63;
-end;
-v8.hasValidEntityData = function(v64) --[[ Line: 279 ]] --[[ Name: hasValidEntityData ]]
-    -- upvalues: l_UnifiedLoggingSurface_0 (copy), v7 (copy), l_MarketplaceUnifiedAction_0 (copy), v8 (copy), l_MarketplaceUnifiedItemType_0 (copy), v9 (copy), l_WidgetUiTreatment_0 (copy)
-    if v64.surface == l_UnifiedLoggingSurface_0.CUSTOMIZE then
-        return true;
-    elseif v7 and v64.action == l_MarketplaceUnifiedAction_0.PURCHASE_ATTEMPT then
-        return true;
-    else
-        local v65 = 0;
-        local v66 = v8.hasOrganicData(v64);
-        local v67 = v8.hasWidgetData(v64);
-        local v68 = v8.hasUiElementData(v64);
-        if v66 then
-            v65 = v65 + 1;
-        end;
-        if v67 then
-            v65 = v65 + 1;
-        end;
-        if v68 then
-            v65 = v65 + 1;
-        end;
-        if v65 ~= 1 then
-            return false;
-        elseif v66 then
-            local v69 = false;
-            if v64.organicItemPrice ~= nil then
-                v69 = v64.organicItemPrice >= 0;
-            end;
-            if not v69 then
-                return false;
-            elseif v64.itemType == l_MarketplaceUnifiedItemType_0.LOOK then
-                if v64.action == l_MarketplaceUnifiedAction_0.PURCHASE_ATTEMPT then
-                    return true;
-                else
-                    local v70 = v64.organicAssetIds and v64.organicAssetIds ~= "" or false;
-                    local v71 = v64.organicBundleIds and v64.organicBundleIds ~= "" or false;
-                    return v70 or v71;
-                end;
-            else
-                local v72 = v64.assetType and v9.AssetTypeIdStringToName[tostring(v64.assetType)] ~= nil;
-                local v73 = v64.bundleType and v9.BundleTypeIdStringToName[tostring(v64.bundleType)] ~= nil;
-                if not v72 and not v73 then
-                    return false;
-                else
-                    return true;
-                end;
-            end;
-        elseif v67 then
-            local v74 = false;
-            if v64.widgetId ~= nil then
-                v74 = v64.widgetId ~= "";
-            end;
-            local v75 = false;
-            if v64.widgetType ~= nil then
-                v75 = v64.widgetType ~= "";
-            end;
-            local v76 = v64.widgetItemIds and v64.widgetItemIds ~= "" or false;
-            local v77 = v64.assetIds and v64.assetIds ~= "" or false;
-            local v78 = v64.bundleIds and v64.bundleIds ~= "" or false;
-            local v79 = nil;
-            v79 = v64.itemType ~= l_MarketplaceUnifiedItemType_0.LOOK or not (v64.action ~= l_MarketplaceUnifiedAction_0.PURCHASE_ATTEMPT) or v77 or v78;
-            local v80 = v64.uiTreatmentType and v64.uiTreatmentType ~= l_WidgetUiTreatment_0.UNKNOWN_WIDGET_UI or false;
-            local v81 = v64.widgetType == "ThemedAvatarItemsWidget";
-            local v82 = false;
-            if v64.themeId ~= nil then
-                v82 = v64.themeId ~= "";
-            end;
-            local v83 = not v81 or v82;
-            local v84 = false;
-            if v64.widgetItemPrice ~= nil then
-                v84 = v64.widgetItemPrice >= 0;
-            end;
-            if v64.action == l_MarketplaceUnifiedAction_0.WIDGET_IMPRESSION then
-                v84 = true;
-            end;
-            return v74 and v75 and v76 and v79 and v80 and v83 and v84;
-        elseif v68 then
-            local v85 = false;
-            if v64.elementName ~= nil then
-                v85 = v64.elementName ~= "";
-            end;
-            return v85;
-        else
-            return false;
-        end;
-    end;
-end;
-v8.filter = function(v86) --[[ Line: 389 ]] --[[ Name: filter ]]
-    -- upvalues: v8 (copy), l_MarketplaceUnifiedAction_0 (copy), v6 (copy), l_UnifiedLoggingSurface_0 (copy)
-    local v87 = v8.hasItemId(v86);
-    local v88 = v8.hasValidItemType(v86);
-    local v89 = v8.hasValidAction(v86);
-    local v90 = v8.hasValidSurface(v86);
-    local v91 = v8.hasRequestIdForWidgetLog(v86);
-    local v92 = v8.hasValidSizeAndPosition(v86);
-    local v93 = v8.hasValidFilter(v86);
-    local v94 = v8.hasValidEntityData(v86);
-    local v95 = v87 and v88 and v89 and v90 and v91 and v92 and v93 and v94;
-    if not v95 then
-        local v96 = "";
-        if not v87 then
-            v96 = v96 .. "hasItemId ";
-        end;
-        if not v88 then
-            v96 = v96 .. "hasValidItemType ";
-        end;
-        if not v89 then
-            v96 = v96 .. "hasValidAction ";
-        end;
-        if not v90 then
-            v96 = v96 .. "hasValidSurface ";
-        end;
-        if not v91 then
-            v96 = v96 .. "hasRequestIdForWidgetLog ";
-        end;
-        if not v92 then
-            v96 = v96 .. "hasValidSizeAndPosition ";
-        end;
-        if not v93 then
-            v96 = v96 .. "hasValidFilter ";
-        end;
-        if not v94 then
-            v96 = v96 .. "hasValidEntityData ";
-        end;
-        if v86.action == l_MarketplaceUnifiedAction_0.ITEM_IMPRESSION then
-            warn("Failed to send unified impression event. Failing Check(s): " .. v96);
-        elseif v86.action == l_MarketplaceUnifiedAction_0.ITEM_SELECTED then
-            warn("Failed to send unified click event. Failing Check(s): " .. v96);
-        elseif v86.action == l_MarketplaceUnifiedAction_0.PURCHASE_SUCCESS then
-            warn("Failed to send unified purchase event. Failing Check(s): " .. v96);
-        else
-            warn("Failed to send unified event. Failing Check(s): " .. v96);
-        end;
-    end;
-    v6("AXUnifiedFilter", {
-        success = tostring(v95), 
-        action = tostring(v86.action or l_MarketplaceUnifiedAction_0.UNDEFINED_ACTION), 
-        surface = tostring(v86.surface or l_UnifiedLoggingSurface_0.UNDEFINED_SURFACE), 
-        hasItemId = tostring(v87), 
-        hasValidItemType = tostring(v88), 
-        hasValidAction = tostring(v89), 
-        hasValidSurface = tostring(v90), 
-        hasRequestIdForWidgetLog = tostring(v91), 
-        hasValidSizeAndPosition = tostring(v92), 
-        hasValidFilter = tostring(v93), 
-        hasValidEntityData = tostring(v94)
-    });
-    return v95;
-end;
-return v8;
+local Parent = script:FindFirstAncestor("AvatarExperienceAnalytics").Parent
+local UnifiedEventLogEnums = require(script.Parent.UnifiedEventLogEnums)
+local MarketplaceUnifiedAction = UnifiedEventLogEnums.MarketplaceUnifiedAction
+local MarketplaceUnifiedItemType = UnifiedEventLogEnums.MarketplaceUnifiedItemType
+local WidgetUiTreatment = UnifiedEventLogEnums.WidgetUiTreatment
+local UnifiedLoggingSurface = require(Parent.AvatarExperienceNavigation).Enums.UnifiedLoggingSurface
+local sendAXCounterV2 = require(script.Parent.sendAXCounterV2)
+local v8 = game:DefineFastFlag("AXSendPurchaseAttempt", false)
+local v9 = game:DefineFastFlag("AXUnifiedFilterWidgetLoadedAndUIImpression", false)
+local t1 = {}
+local t2 = {
+	AssetTypeIdStringToName = {},
+	BundleTypeIdStringToName = {}
+}
+
+for _, v13 in (Enum.BundleType:GetEnumItems()) do
+	t2.BundleTypeIdStringToName[tostring(v13.Value)] = v13.Name
+end
+
+for _, v15 in (Enum.AvatarAssetType:GetEnumItems()) do
+	t2.AssetTypeIdStringToName[tostring(v15.Value)] = v15.Name
+end
+
+function t1.hasOrganicData(t3: {[any]: any}) -- line: 104
+	if t3.assetType or (t3.bundleType or t3.organicItemPrice or t3.organicItemWearAfterPurchase or t3.organicItemSaveToMyAvatars or t3.organicAssetIds or t3.organicBundleIds) then
+		return true
+	end
+
+	return false
+end
+function t1.hasWidgetData(t4: {[any]: any}) -- line: 120
+	if t4.widgetId or (t4.widgetType or t4.assetIds or t4.bundleIds or t4.widgetItemIds or t4.organicResultIds or t4.widgetItemPrice or t4.uiTreatmentType or t4.themeId or t4.widgetItemWearAfterPurchase or t4.widgetItemSaveToMyAvatars) then
+		return true
+	end
+
+	return false
+end
+function t1.hasUiElementData(t5: {[any]: any}) -- line: 141
+	if t5.elementName then
+		return true
+	end
+
+	return false
+end
+function t1.hasItemId(t6: {[any]: any}) -- line: 149
+	-- upvalues: MarketplaceUnifiedAction (copy), v9 (copy)
+	local action = t6.action
+	local itemId = t6.itemId
+
+	if action == MarketplaceUnifiedAction.UNDEFINED_ACTION or (action == MarketplaceUnifiedAction.UI_ELEMENT_CLICK or action == MarketplaceUnifiedAction.WIDGET_IMPRESSION) or v9 and (action == MarketplaceUnifiedAction.UI_ELEMENT_IMPRESSION or action == MarketplaceUnifiedAction.WIDGET_LOADED) then
+		return true
+	end
+
+	return itemId ~= nil and itemId ~= ""
+end
+function t1.hasValidItemType(t7: {[any]: any}) -- line: 172
+	-- upvalues: MarketplaceUnifiedItemType (copy), v9 (copy), MarketplaceUnifiedAction (copy)
+	local itemType = t7.itemType
+
+	if itemType == MarketplaceUnifiedItemType.UNDEFINED_ITEM_TYPE or itemType == nil then
+		local action = t7.action
+
+		if v9 then
+			return action == MarketplaceUnifiedAction.UI_ELEMENT_CLICK or (action == MarketplaceUnifiedAction.UI_ELEMENT_IMPRESSION or (action == MarketplaceUnifiedAction.WIDGET_IMPRESSION or action == MarketplaceUnifiedAction.WIDGET_LOADED))
+		end
+
+		return action == MarketplaceUnifiedAction.UI_ELEMENT_CLICK or action == MarketplaceUnifiedAction.WIDGET_IMPRESSION
+	end
+
+	return itemType == MarketplaceUnifiedItemType.ASSET or (itemType == MarketplaceUnifiedItemType.BUNDLE or itemType == MarketplaceUnifiedItemType.LOOK)
+end
+function t1.hasValidAction(t8: {[any]: any}) -- line: 193
+	-- upvalues: MarketplaceUnifiedAction (copy)
+	local action = t8.action
+
+	return action ~= nil and action ~= MarketplaceUnifiedAction.UNDEFINED_ACTION
+end
+function t1.hasValidSurface(t9: {[any]: any}) -- line: 198
+	-- upvalues: UnifiedLoggingSurface (copy)
+	local surface = t9.surface
+
+	return surface ~= nil and surface ~= UnifiedLoggingSurface.UNDEFINED_SURFACE
+end
+function t1.hasRequestIdForWidgetLog(t10: {[any]: any}) -- line: 203
+	-- upvalues: t1 (copy)
+	if t1.hasWidgetData(t10) then
+		return t10.requestId ~= nil and t10.requestId ~= ""
+	end
+
+	return true
+end
+function t1.hasValidSizeAndPosition(t11: {[any]: any}) -- line: 213
+	-- upvalues: MarketplaceUnifiedAction (copy)
+	local action = t11.action
+
+	if action == MarketplaceUnifiedAction.ITEM_IMPRESSION or (action == MarketplaceUnifiedAction.ITEM_SELECTED or action == MarketplaceUnifiedAction.ITEM_DESELECTED or action == MarketplaceUnifiedAction.PURCHASE_SUCCESS) then
+		local v32 = t11.screenSizeWidth or 0
+		local v33 = t11.screenSizeHeight or 0
+		local v34 = v32 > 0 and v33 > 0
+		local v35 = t11.elementSizeWidth or 0
+		local v36 = t11.elementSizeHeight or 0
+		local v37 = v35 > 0 and v36 > 0
+		local v38 = t11.gridPositionRow or 0
+		local v39 = t11.gridPositionColumn or 0
+		local v40 = v38 > 0 and v39 > 0
+
+		return v34 and (v37 and v40)
+	end
+
+	if action == MarketplaceUnifiedAction.WIDGET_IMPRESSION then
+		local v41 = t11.gridPositionRow or 0
+		local v42 = t11.gridPositionColumn or 0
+
+		return v41 > 0 and v42 == 1
+	end
+
+	return true
+end
+function t1.hasValidFilter(t12: {[any]: any}) -- line: 248
+	-- upvalues: MarketplaceUnifiedAction (copy), UnifiedLoggingSurface (copy), UnifiedEventLogEnums (copy)
+	local surface = t12.surface
+	local keyword = t12.keyword
+	local category = t12.category
+	local subcategory = t12.subcategory
+	local filterPriceMin = t12.filterPriceMin
+	local filterPriceMax = t12.filterPriceMax
+	local filterPrice = t12.filterPrice
+	local filterCreatorsName = t12.filterCreatorsName
+	local filterCreators = t12.filterCreators
+	local v53 = true
+
+	if category ~= nil and category ~= "" then
+		if subcategory ~= nil and subcategory == "" then
+			v53 = false
+		end
+	else
+		v53 = t12.action == MarketplaceUnifiedAction.WIDGET_IMPRESSION or (t12.action == MarketplaceUnifiedAction.UI_ELEMENT_CLICK or t12.action == MarketplaceUnifiedAction.PURCHASE_ATTEMPT)
+	end
+
+	local v54 = true
+
+	if keyword or surface == UnifiedLoggingSurface.SEARCH_RESULTS then
+		v54 = surface == UnifiedLoggingSurface.SEARCH_RESULTS and (keyword ~= nil and keyword ~= "")
+	end
+
+	local v55 = true
+
+	if filterPriceMin and filterPriceMin ~= "" or filterPriceMax and filterPriceMax ~= "" then
+		v55 = filterPrice == UnifiedEventLogEnums.FiltersPrice.PRICE_RANGE
+	end
+
+	local v56 = true
+
+	if filterCreatorsName and filterCreatorsName ~= "" then
+		v56 = filterCreators == UnifiedEventLogEnums.FiltersCreators.CREATORS_BY_USERNAME
+	end
+
+	return v54 and (v53 and (v55 and v56))
+end
+function t1.hasValidEntityData(t13: {[any]: any}) -- line: 294
+	-- upvalues: UnifiedLoggingSurface (copy), v8 (copy), MarketplaceUnifiedAction (copy), t1 (copy), MarketplaceUnifiedItemType (copy), t2 (copy), WidgetUiTreatment (copy)
+	if t13.surface == UnifiedLoggingSurface.CUSTOMIZE then
+		return true
+	end
+
+	if v8 and t13.action == MarketplaceUnifiedAction.PURCHASE_ATTEMPT then
+		return true
+	end
+
+	local n1 = 0
+	local v59 = t1.hasOrganicData(t13)
+	local v60 = t1.hasWidgetData(t13)
+	local v61 = t1.hasUiElementData(t13)
+
+	if v59 then
+		n1 += 1
+	end
+
+	if v60 then
+		n1 += 1
+	end
+
+	if v61 then
+		n1 += 1
+	end
+
+	if n1 ~= 1 then
+		return false
+	end
+
+	if v59 then
+		if t13.organicItemPrice == nil or not (t13.organicItemPrice >= 0) then
+			return false
+		end
+
+		if t13.itemType == MarketplaceUnifiedItemType.LOOK then
+			if t13.action == MarketplaceUnifiedAction.PURCHASE_ATTEMPT then
+				return true
+			end
+
+			local v62 = not not t13.organicAssetIds and (t13.organicAssetIds ~= "" or false)
+			local v63 = not not t13.organicBundleIds and (t13.organicBundleIds ~= "" or false)
+
+			return v62 or v63
+		end
+
+		local v64 = t13.assetType and t2.AssetTypeIdStringToName[tostring(t13.assetType)] ~= nil
+		local v65 = t13.bundleType and t2.BundleTypeIdStringToName[tostring(t13.bundleType)] ~= nil
+
+		if not v64 and not v65 then
+			return false
+		end
+
+		return true
+	end
+
+	if v60 then
+		local v66 = t13.widgetId ~= nil and t13.widgetId ~= ""
+		local v67 = t13.widgetType ~= nil and t13.widgetType ~= ""
+		local v68 = not not t13.widgetItemIds and (t13.widgetItemIds ~= "" or false)
+		local v69 = not not t13.assetIds and (t13.assetIds ~= "" or false)
+		local v70 = not not t13.bundleIds and (t13.bundleIds ~= "" or false)
+		local v71 = t13.itemType ~= MarketplaceUnifiedItemType.LOOK or (t13.action == MarketplaceUnifiedAction.PURCHASE_ATTEMPT or (v69 or v70))
+		local v72 = not not t13.uiTreatmentType and (t13.uiTreatmentType ~= WidgetUiTreatment.UNKNOWN_WIDGET_UI or false)
+		local v73 = t13.widgetType == "ThemedAvatarItemsWidget"
+		local v74 = t13.themeId ~= nil and t13.themeId ~= ""
+		local v75 = not v73 or v74
+		local v76 = t13.widgetItemPrice ~= nil and t13.widgetItemPrice >= 0
+
+		if t13.action == MarketplaceUnifiedAction.WIDGET_IMPRESSION then
+			v76 = true
+		end
+
+		return v66 and (v67 and (v68 and (v71 and (v72 and (v75 and v76)))))
+	end
+
+	if v61 then
+		return t13.elementName ~= nil and t13.elementName ~= ""
+	end
+
+	return false
+end
+function t1.filter(p1) -- line: 404
+	-- upvalues: t1 (copy), MarketplaceUnifiedAction (copy), sendAXCounterV2 (copy), UnifiedLoggingSurface (copy)
+	local v78 = t1.hasItemId(p1)
+	local v79 = t1.hasValidItemType(p1)
+	local v80 = t1.hasValidAction(p1)
+	local v81 = t1.hasValidSurface(p1)
+	local v82 = t1.hasRequestIdForWidgetLog(p1)
+	local v83 = t1.hasValidSizeAndPosition(p1)
+	local v84 = t1.hasValidFilter(p1)
+	local v85 = t1.hasValidEntityData(p1)
+	local v86 = v78 and (v79 and (v80 and (v81 and (v82 and (v83 and (v84 and v85))))))
+
+	if not v86 then
+		local s1 = ""
+
+		if not v78 then
+			s1 ..= "hasItemId "
+		end
+
+		if not v79 then
+			s1 ..= "hasValidItemType "
+		end
+
+		if not v80 then
+			s1 ..= "hasValidAction "
+		end
+
+		if not v81 then
+			s1 ..= "hasValidSurface "
+		end
+
+		if not v82 then
+			s1 ..= "hasRequestIdForWidgetLog "
+		end
+
+		if not v83 then
+			s1 ..= "hasValidSizeAndPosition "
+		end
+
+		if not v84 then
+			s1 ..= "hasValidFilter "
+		end
+
+		if not v85 then
+			s1 ..= "hasValidEntityData "
+		end
+
+		if p1.action == MarketplaceUnifiedAction.ITEM_IMPRESSION then
+			warn("Failed to send unified impression event. Failing Check(s): " .. s1)
+		elseif p1.action == MarketplaceUnifiedAction.ITEM_SELECTED then
+			warn("Failed to send unified click event. Failing Check(s): " .. s1)
+		elseif p1.action == MarketplaceUnifiedAction.PURCHASE_SUCCESS then
+			warn("Failed to send unified purchase event. Failing Check(s): " .. s1)
+		else
+			warn("Failed to send unified event. Failing Check(s): " .. s1)
+		end
+	end
+
+	sendAXCounterV2("AXUnifiedFilter", {
+		success = tostring(v86),
+		action = tostring(p1.action or MarketplaceUnifiedAction.UNDEFINED_ACTION),
+		surface = tostring(p1.surface or UnifiedLoggingSurface.UNDEFINED_SURFACE),
+		hasItemId = tostring(v78),
+		hasValidItemType = tostring(v79),
+		hasValidAction = tostring(v80),
+		hasValidSurface = tostring(v81),
+		hasRequestIdForWidgetLog = tostring(v82),
+		hasValidSizeAndPosition = tostring(v83),
+		hasValidFilter = tostring(v84),
+		hasValidEntityData = tostring(v85)
+	})
+
+	return v86
+end
+
+return t1

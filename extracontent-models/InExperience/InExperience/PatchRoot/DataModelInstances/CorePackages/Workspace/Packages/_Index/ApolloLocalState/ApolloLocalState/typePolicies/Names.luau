@@ -1,14 +1,15 @@
-local v0 = require(script.Parent.utils.makeDefaultReadPolicy);
+local makeDefaultReadPolicy = require(script.Parent.utils.makeDefaultReadPolicy)
+
 return {
-    fields = {
-        alias = {
-            read = v0("")
-        }, 
-        contactName = {
-            read = v0("")
-        }, 
-        platformName = {
-            read = v0("")
-        }
-    }
-};
+	fields = {
+		alias = {
+			read = makeDefaultReadPolicy("")
+		},
+		contactName = {
+			read = makeDefaultReadPolicy("")
+		},
+		platformName = {
+			read = makeDefaultReadPolicy("")
+		}
+	}
+}

@@ -1,16 +1,18 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v3 = require(l_Components_0.DataConsumer);
-local v4 = require(l_Components_0.Memory.MemoryView);
-local v5 = v1.Component:extend("ServerMemory");
-v5.render = function(v6) --[[ Line: 10 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v4 (copy)
-    return v1.createElement(v4, {
-        layoutOrder = v6.props.layoutOrder, 
-        size = v6.props.size, 
-        searchTerm = v6.props.searchTerm, 
-        targetMemoryData = v6.props.ServerMemoryData
-    });
-end;
-return v3(v5, "ServerMemoryData");
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local DataConsumer = require(Components.DataConsumer)
+local MemoryView = require(Components.Memory.MemoryView)
+local v6 = Roact.Component:extend("ServerMemory")
+
+function v6.render(p1) -- line: 10
+	-- upvalues: Roact (copy), MemoryView (copy)
+	return Roact.createElement(MemoryView, {
+		layoutOrder = p1.props.layoutOrder,
+		size = p1.props.size,
+		searchTerm = p1.props.searchTerm,
+		targetMemoryData = p1.props.ServerMemoryData
+	})
+end
+
+return DataConsumer(v6, "ServerMemoryData")

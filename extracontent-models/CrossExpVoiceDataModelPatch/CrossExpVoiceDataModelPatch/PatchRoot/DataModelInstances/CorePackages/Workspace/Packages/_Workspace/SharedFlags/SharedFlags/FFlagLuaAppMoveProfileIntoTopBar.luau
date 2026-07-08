@@ -1,2 +1,3 @@
-local v0 = require(script.Parent.FFlagLuaAppMoveProfileIntoTopBarIXP);
-return game:DefineFastFlag("LuaAppMoveProfileIntoTopBar", false) or v0;
+local FFlagLuaAppMoveProfileIntoTopBarIXP = require(script.Parent.FFlagLuaAppMoveProfileIntoTopBarIXP)
+
+return game:DefineFastFlag("LuaAppMoveProfileIntoTopBar", false) or FFlagLuaAppMoveProfileIntoTopBarIXP

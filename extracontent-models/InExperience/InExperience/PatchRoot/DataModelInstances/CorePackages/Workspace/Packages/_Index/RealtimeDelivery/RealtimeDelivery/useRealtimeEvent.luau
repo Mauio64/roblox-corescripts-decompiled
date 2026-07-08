@@ -1,12 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RealtimeDelivery");
-local _ = require(l_script_FirstAncestor_0.RealtimeTypes);
-local v2 = require(script.Parent.useRealtimeNamespace);
-return function(v3, v4, v5, v6) --[[ Line: 8 ]] --[[ Name: useRealtimeEvent ]]
-    -- upvalues: v2 (copy)
-    v2(v3, function(v7) --[[ Line: 14 ]]
-        -- upvalues: v4 (copy), v5 (copy)
-        if v7.Type == v4 then
-            v5(v7);
-        end;
-    end, v6);
-end;
+local RealtimeDelivery = script:FindFirstAncestor("RealtimeDelivery")
+
+require(RealtimeDelivery.RealtimeTypes)
+
+local useRealtimeNamespace = require(script.Parent.useRealtimeNamespace)
+
+local function useRealtimeEvent(s1: string, s2: string, p1: ((...any) -> ...any), t1: {[any]: any}) -- line: 8
+	-- upvalues: useRealtimeNamespace (copy)
+	useRealtimeNamespace(s1, function(p2) -- line: 14
+		-- upvalues: s2 (copy), p1 (copy)
+		if p2.Type == s2 then
+			p1(p2)
+		end
+	end, t1)
+end
+
+return useRealtimeEvent

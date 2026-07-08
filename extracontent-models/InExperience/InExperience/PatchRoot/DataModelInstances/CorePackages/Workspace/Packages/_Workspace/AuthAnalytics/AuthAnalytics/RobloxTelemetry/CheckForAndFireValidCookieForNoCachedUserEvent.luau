@@ -1,21 +1,46 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthAnalytics");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.RobloxTelemetry.TelemetryConfigs);
-local l_LoginStatus_0 = require(l_Parent_0.RobloxAppEnums).LoginStatus;
-return function(v4, v5, v6) --[[ Line: 7 ]]
-    -- upvalues: l_LoginStatus_0 (copy), v2 (copy)
-    return function(v7) --[[ Line: 10 ]]
-        -- upvalues: l_LoginStatus_0 (ref), v6 (copy), v4 (copy), v5 (copy), v2 (ref)
-        if v7:getState().AuthenticationStatus.status == l_LoginStatus_0.LOGGED_IN then
-            return;
-        else
-            v6(v4):andThen(function(_) --[[ Line: 23 ]]
-                -- upvalues: v5 (ref), v2 (ref)
-                v5:logRobloxTelemetryCounter(v2.ValidCookieForNoCachedUserTelemetryConfig, 1);
-            end):catch(function(_) --[[ Line: 31 ]]
+local AuthAnalytics = script:FindFirstAncestor("AuthAnalytics")
+local AuthAnalyticsParent = AuthAnalytics.Parent
+local TelemetryConfigs = require(AuthAnalytics.RobloxTelemetry.TelemetryConfigs)
+local LoginStatus = require(AuthAnalyticsParent.RobloxAppEnums).LoginStatus
+local t1 = {
+	[LoginStatus.UNKNOWN] = true,
+	[LoginStatus.LOGGED_OUT] = true,
+	[LoginStatus.LOGGED_IN] = true
+}
 
-            end);
-            return;
-        end;
-    end;
-end;
+local function normalizeAuthenticationStatusForTelemetry(s1: string?) -- line: 17
+	-- upvalues: t1 (copy)
+	if s1 == nil then
+		return "NIL"
+	end
+
+	if t1[s1] then
+		return s1
+	end
+
+	return "UNRECOGNIZED"
+end
+
+return function(p1, p2, p3) -- line: 27
+	-- upvalues: LoginStatus (copy), TelemetryConfigs (copy), t1 (copy)
+	return function(p4) -- line: 30
+		-- upvalues: LoginStatus (copy), p3 (copy), p1 (copy), p2 (copy), TelemetryConfigs (copy), t1 (copy)
+		local status = p4:getState().AuthenticationStatus.status
+
+		if status == LoginStatus.LOGGED_IN then
+			return
+		end
+
+		p3(p1):andThen(function(_) -- line: 43
+			-- upvalues: p2 (copy), TelemetryConfigs (copy), status (copy), t1 (copy)
+			local v14 = p2
+			local ValidCookieForNoCachedUserTelemetryConfig = TelemetryConfigs.ValidCookieForNoCachedUserTelemetryConfig
+			local t2 = {}
+			local v17 = status
+
+			t2.authenticationStatus = if v17 ~= nil then not t1[v17] and "UNRECOGNIZED" or v17 else "NIL"
+			v14:logRobloxTelemetryCounter(ValidCookieForNoCachedUserTelemetryConfig, 1, t2)
+		end):catch(function(_) -- line: 54
+		end)
+	end
+end

@@ -1,3 +1,3 @@
 return {
-    InExperienceCapabilities = require(script.InExperienceCapabilities)
-};
+	InExperienceCapabilities = require(script.InExperienceCapabilities)
+}

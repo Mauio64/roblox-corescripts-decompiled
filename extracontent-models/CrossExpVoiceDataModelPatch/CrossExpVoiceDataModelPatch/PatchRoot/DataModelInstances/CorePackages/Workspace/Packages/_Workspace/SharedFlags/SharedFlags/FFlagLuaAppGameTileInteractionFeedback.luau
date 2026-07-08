@@ -1,1 +1,1 @@
-return (game:DefineFastFlag("LuaAppGameTileInteractionFeedback", false));
+return (game:DefineFastFlag("LuaAppGameTileInteractionFeedback", false))

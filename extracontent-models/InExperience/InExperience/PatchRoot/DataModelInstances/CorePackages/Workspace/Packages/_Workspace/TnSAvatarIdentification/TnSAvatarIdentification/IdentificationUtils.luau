@@ -1,136 +1,127 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("TnSAvatarIdentification");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Flags.GetFFlagReportAnythingFixConvexHullCalculation);
-local l_GetFFlagAvatarIdentificationSafeAreaFix_0 = require(l_Parent_0.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix;
-local v4 = nil;
-if l_GetFFlagAvatarIdentificationSafeAreaFix_0() then
-    v4 = game:GetService("CoreGui");
-end;
-local function v10() --[[ Line: 24 ]] --[[ Name: getViewportInfo ]]
-    -- upvalues: v4 (ref)
-    assert(v4, "getViewportInfo requires CoreGui to be available");
-    local l__FullscreenTestGui_AvatarID_0 = v4:FindFirstChild("_FullscreenTestGui_AvatarID");
-    if not l__FullscreenTestGui_AvatarID_0 then
-        l__FullscreenTestGui_AvatarID_0 = Instance.new("ScreenGui");
-        l__FullscreenTestGui_AvatarID_0.Name = "_FullscreenTestGui_AvatarID";
-        l__FullscreenTestGui_AvatarID_0.Parent = v4;
-        l__FullscreenTestGui_AvatarID_0.ScreenInsets = Enum.ScreenInsets.None;
-    end;
-    local l__DeviceTestGui_AvatarID_0 = v4:FindFirstChild("_DeviceTestGui_AvatarID");
-    if not l__DeviceTestGui_AvatarID_0 then
-        l__DeviceTestGui_AvatarID_0 = Instance.new("ScreenGui");
-        l__DeviceTestGui_AvatarID_0.Name = "_DeviceTestGui_AvatarID";
-        l__DeviceTestGui_AvatarID_0.Parent = v4;
-        l__DeviceTestGui_AvatarID_0.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets;
-    end;
-    local v7 = l__DeviceTestGui_AvatarID_0.AbsolutePosition - l__FullscreenTestGui_AvatarID_0.AbsolutePosition;
-    local v8 = l__FullscreenTestGui_AvatarID_0.AbsolutePosition + l__FullscreenTestGui_AvatarID_0.AbsoluteSize - (l__DeviceTestGui_AvatarID_0.AbsolutePosition + l__DeviceTestGui_AvatarID_0.AbsoluteSize);
-    local v9 = {
-        left = v7.X, 
-        top = v7.Y, 
-        right = v8.X, 
-        bottom = v8.Y
-    };
-    return {
-        width = l__FullscreenTestGui_AvatarID_0.AbsoluteSize.X, 
-        height = l__FullscreenTestGui_AvatarID_0.AbsoluteSize.Y, 
-        insets = v9
-    };
-end;
-local v11 = Vector2.new(0, 0);
-local v12 = Vector2.new(1e999, 1e999);
-local function _(v13) --[[ Line: 59 ]]
-    local v14 = true;
-    if v13.Y >= 0 then
-        v14 = true;
-        if v13.Y <= 1 then
-            v14 = true;
-            if v13.X >= 0 then
-                v14 = v13.X > 1;
-            end;
-        end;
-    end;
-    return v14;
-end;
-worldToFullViewportPointNormalized = function(v16, v17, v18) --[[ Line: 63 ]] --[[ Name: worldToFullViewportPointNormalized ]]
-    local v19, _ = v17:WorldToViewportPoint(v16);
-    local v21 = Vector2.new((v19.X + v18.insets.left) / v18.width, (v19.Y + v18.insets.top) / v18.height);
-    local l_v21_0 = v21;
-    local l_Z_0 = v19.Z;
-    local v24 = true;
-    if v21.Y >= 0 then
-        v24 = true;
-        if v21.Y <= 1 then
-            v24 = true;
-            if v21.X >= 0 then
-                v24 = v21.X > 1;
-            end;
-        end;
-    end;
-    return l_v21_0, l_Z_0, not v24 and v19.Z > 0;
-end;
-getViewportCorners = function(v25, v26, v27) --[[ Line: 80 ]] --[[ Name: getViewportCorners ]]
-    -- upvalues: v12 (copy), v11 (copy), l_GetFFlagAvatarIdentificationSafeAreaFix_0 (copy), v2 (copy)
-    local l_v12_0 = v12;
-    local l_v11_0 = v11;
-    local l_ViewportSize_0 = v26.ViewportSize;
-    local v31 = 0;
-    for v32, v33 in ipairs(v25) do
-        local v34 = nil;
-        local v35 = nil;
-        local v36 = nil;
-        if l_GetFFlagAvatarIdentificationSafeAreaFix_0() then
-            assert(v27, "getViewportCorners requires viewportInfo when FFlagAvatarIdentificationSafeAreaFix is enabled");
-            local v37, v38, v39 = worldToFullViewportPointNormalized(v33, v26, v27);
-            v34 = v37;
-            v32 = v38;
-            v36 = v39;
-        else
-            local v40, v41 = v26:WorldToViewportPoint(v33);
-            v35 = v40;
-            v36 = v41;
-            v34 = Vector2.new(v35.X / l_ViewportSize_0.X, v35.Y / l_ViewportSize_0.Y);
-        end;
-        if not v36 then
-            v34 = Vector2.new(math.clamp(v34.X, 0, 1), (math.clamp(v34.Y, 0, 1)));
-        end;
-        if v2() then
-            if v36 then
-                v31 = v31 + 1;
-            end;
-        else
-            v31 = v31 + 1;
-        end;
-        l_v12_0 = l_v12_0:Min(v34);
-        l_v11_0 = l_v11_0:Max(v34);
-    end;
-    if v31 <= 2 then
-        return v12, v11;
-    else
-        return l_v12_0, l_v11_0;
-    end;
-end;
-shouldIgnoreLocalCharacter = function(v42) --[[ Line: 125 ]] --[[ Name: shouldIgnoreLocalCharacter ]]
-    local l_Head_0 = v42:FindFirstChild("Head");
-    if l_Head_0 and l_Head_0:IsA("BasePart") then
-        return l_Head_0.LocalTransparencyModifier >= 0.95;
-    else
-        return false;
-    end;
-end;
-getLocalCharacterPosition = function(v44) --[[ Line: 134 ]] --[[ Name: getLocalCharacterPosition ]]
-    local l_HumanoidRootPart_0 = v44:FindFirstChild("HumanoidRootPart");
-    if not l_HumanoidRootPart_0 then
-        return nil;
-    else
-        return l_HumanoidRootPart_0.Position;
-    end;
-end;
+local TnSAvatarIdentification = script:FindFirstAncestor("TnSAvatarIdentification")
+local TnSAvatarIdentificationParent = TnSAvatarIdentification.Parent
+local GetFFlagReportAnythingFixConvexHullCalculation = require(TnSAvatarIdentification.Flags.GetFFlagReportAnythingFixConvexHullCalculation)
+local GetFFlagAvatarIdentificationSafeAreaFix = require(TnSAvatarIdentificationParent.SharedFlags).GetFFlagAvatarIdentificationSafeAreaFix
+local CoreGui = nil
+
+if GetFFlagAvatarIdentificationSafeAreaFix() then
+	CoreGui = game:GetService("CoreGui")
+end
+
+local vector2 = Vector2.new(0, 0)
+local vector2_2 = Vector2.new(1e999, 1e999)
+
+function worldToFullViewportPointNormalized(vector3: Vector3, p1, t1: {[any]: any}) -- line: 63
+	local v17, _ = p1:WorldToViewportPoint(vector3)
+	local vector2_3 = Vector2.new((v17.X + t1.insets.left) / t1.width, (v17.Y + t1.insets.top) / t1.height)
+
+	return vector2_3, v17.Z, not (vector2_3.Y < 0 or (vector2_3.Y > 1 or (vector2_3.X < 0 or vector2_3.X > 1))) and v17.Z > 0
+end
+function getViewportCorners(t2: {[any]: any}, p2, t3: {[any]: any}?) -- line: 80
+	-- upvalues: vector2_2 (copy), vector2 (copy), GetFFlagAvatarIdentificationSafeAreaFix (copy), GetFFlagReportAnythingFixConvexHullCalculation (copy)
+	local v23 = vector2_2
+	local v24 = vector2
+	local ViewportSize = p2.ViewportSize
+	local n1 = 0
+
+	for _, v in ipairs(t2) do
+		local v29, v31
+
+		if GetFFlagAvatarIdentificationSafeAreaFix() then
+			assert(t3, "getViewportCorners requires viewportInfo when FFlagAvatarIdentificationSafeAreaFix is enabled")
+
+			local v30
+
+			v29, v30, v31 = worldToFullViewportPointNormalized(v, p2, t3)
+		else
+			local v32
+
+			v32, v31 = p2:WorldToViewportPoint(v)
+			v29 = Vector2.new(v32.X / ViewportSize.X, v32.Y / ViewportSize.Y)
+		end
+
+		if not v31 then
+			v29 = Vector2.new(math.clamp(v29.X, 0, 1), (math.clamp(v29.Y, 0, 1)))
+		end
+
+		if GetFFlagReportAnythingFixConvexHullCalculation() then
+			if v31 then
+				n1 += 1
+			end
+		else
+			n1 += 1
+		end
+
+		v23 = v23:Min(v29)
+		v24 = v24:Max(v29)
+	end
+
+	if n1 <= 2 then
+		return vector2_2, vector2
+	end
+
+	return v23, v24
+end
+function shouldIgnoreLocalCharacter(p3) -- line: 125
+	local Head = p3:FindFirstChild("Head")
+
+	if Head and Head:IsA("BasePart") then
+		return Head.LocalTransparencyModifier >= 0.95
+	end
+
+	return false
+end
+function getLocalCharacterPosition(p4) -- line: 134
+	local HumanoidRootPart = p4:FindFirstChild("HumanoidRootPart")
+
+	if not HumanoidRootPart then
+		return nil
+	end
+
+	return HumanoidRootPart.Position
+end
+
 return {
-    getViewportInfo = v10, 
-    getViewportCorners = getViewportCorners, 
-    worldToFullViewportPointNormalized = worldToFullViewportPointNormalized, 
-    shouldIgnoreLocalCharacter = shouldIgnoreLocalCharacter, 
-    getLocalCharacterPosition = getLocalCharacterPosition, 
-    defaultMin = v12
-};
+	getViewportInfo = function() -- line: 24
+		-- upvalues: CoreGui (ref)
+		assert(CoreGui, "getViewportInfo requires CoreGui to be available")
+
+		local _FullscreenTestGui_AvatarID = CoreGui:FindFirstChild("_FullscreenTestGui_AvatarID")
+
+		if not _FullscreenTestGui_AvatarID then
+			_FullscreenTestGui_AvatarID = Instance.new("ScreenGui")
+			_FullscreenTestGui_AvatarID.Name = "_FullscreenTestGui_AvatarID"
+			_FullscreenTestGui_AvatarID.Parent = CoreGui
+			_FullscreenTestGui_AvatarID.ScreenInsets = Enum.ScreenInsets.None
+		end
+
+		local _DeviceTestGui_AvatarID = CoreGui:FindFirstChild("_DeviceTestGui_AvatarID")
+
+		if not _DeviceTestGui_AvatarID then
+			_DeviceTestGui_AvatarID = Instance.new("ScreenGui")
+			_DeviceTestGui_AvatarID.Name = "_DeviceTestGui_AvatarID"
+			_DeviceTestGui_AvatarID.Parent = CoreGui
+			_DeviceTestGui_AvatarID.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+		end
+
+		local v10 = _DeviceTestGui_AvatarID.AbsolutePosition - _FullscreenTestGui_AvatarID.AbsolutePosition
+		local v11 = _FullscreenTestGui_AvatarID.AbsolutePosition + _FullscreenTestGui_AvatarID.AbsoluteSize - (_DeviceTestGui_AvatarID.AbsolutePosition + _DeviceTestGui_AvatarID.AbsoluteSize)
+		local t4 = {
+			left = v10.X,
+			top = v10.Y,
+			right = v11.X,
+			bottom = v11.Y
+		}
+
+		return {
+			width = _FullscreenTestGui_AvatarID.AbsoluteSize.X,
+			height = _FullscreenTestGui_AvatarID.AbsoluteSize.Y,
+			insets = t4
+		}
+	end,
+	getViewportCorners = getViewportCorners,
+	worldToFullViewportPointNormalized = worldToFullViewportPointNormalized,
+	shouldIgnoreLocalCharacter = shouldIgnoreLocalCharacter,
+	getLocalCharacterPosition = getLocalCharacterPosition,
+	defaultMin = vector2_2
+}

@@ -1,42 +1,42 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GamePlayButton");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_ApiFetchGameDetails_0 = require(l_Parent_0.GameDetailRodux).GameDetails.ApiFetchGameDetails;
-local l_FetchGamePlayabilityAndProductInfo_0 = require(l_Parent_0.GameDetailRodux).FetchGamePlayabilityAndProductInfo;
-local l_PerformFetch_0 = require(l_Parent_0.Http).PerformFetch;
-local v6 = require(l_Parent_0.Promise);
-local v7 = require(l_script_FirstAncestor_0.FiatPaidAccessPostPreparePurchaseRequest);
-local v8 = require(l_script_FirstAncestor_0.OpenFiatPurchasePage);
-local v9 = {};
-local function _(v10) --[[ Line: 16 ]]
-    return "luaapp.fiatpaidaccess.prepare-purchase." .. v10;
-end;
-v9.GetFetchingStatus = function(v12, v13) --[[ Line: 20 ]] --[[ Name: GetFetchingStatus ]]
-    -- upvalues: l_PerformFetch_0 (copy)
-    return l_PerformFetch_0.GetStatus(v12, "luaapp.fiatpaidaccess.prepare-purchase." .. v13);
-end;
-v9.Fetch = function(v14, v15, v16, v17) --[[ Line: 24 ]] --[[ Name: Fetch ]]
-    -- upvalues: l_PerformFetch_0 (copy), v7 (copy), l_HttpService_0 (copy), v8 (copy), l_ApiFetchGameDetails_0 (copy), l_FetchGamePlayabilityAndProductInfo_0 (copy), v6 (copy)
-    return l_PerformFetch_0.Single("luaapp.fiatpaidaccess.prepare-purchase." .. v16, function(v18) --[[ Line: 25 ]]
-        -- upvalues: v7 (ref), v14 (copy), v15 (copy), v17 (copy), l_HttpService_0 (ref), v8 (ref), l_ApiFetchGameDetails_0 (ref), v16 (copy), l_FetchGamePlayabilityAndProductInfo_0 (ref), v6 (ref)
-        return v7(v14, v15, v17):andThen(function(v19) --[[ Line: 27 ]]
-            -- upvalues: l_HttpService_0 (ref), v18 (copy), v8 (ref), l_ApiFetchGameDetails_0 (ref), v14 (ref), v16 (ref), l_FetchGamePlayabilityAndProductInfo_0 (ref), v6 (ref)
-            local v20 = v19 and v19.responseBody and v19.responseBody.checkoutUrl;
-            if v20 then
-                local v21 = l_HttpService_0:JSONDecode(v20);
-                if v21 and v21.checkoutUrl then
-                    v18:dispatch(v8(v21.checkoutUrl, function() --[[ Line: 34 ]]
-                        -- upvalues: v18 (ref), l_ApiFetchGameDetails_0 (ref), v14 (ref), v16 (ref), l_FetchGamePlayabilityAndProductInfo_0 (ref)
-                        v18:dispatch(l_ApiFetchGameDetails_0.Fetch(v14, {
-                            v16
-                        }));
-                        v18:dispatch(l_FetchGamePlayabilityAndProductInfo_0.Fetch(v14, v16));
-                    end));
-                    return v6.resolve(v19);
-                end;
-            end;
-            return v6.reject("Invalid Response");
-        end);
-    end);
-end;
-return v9;
+local GamePlayButton = script:FindFirstAncestor("GamePlayButton")
+local HttpService = game:GetService("HttpService")
+local GamePlayButtonParent = GamePlayButton.Parent
+local ApiFetchGameDetails = require(GamePlayButtonParent.GameDetailRodux).GameDetails.ApiFetchGameDetails
+local FetchGamePlayabilityAndProductInfo = require(GamePlayButtonParent.GameDetailRodux).FetchGamePlayabilityAndProductInfo
+local PerformFetch = require(GamePlayButtonParent.Http).PerformFetch
+local Promise = require(GamePlayButtonParent.Promise)
+local FiatPaidAccessPostPreparePurchaseRequest = require(GamePlayButton.FiatPaidAccessPostPreparePurchaseRequest)
+local OpenFiatPurchasePage = require(GamePlayButton.OpenFiatPurchasePage)
+
+return {
+	GetFetchingStatus = function(p1, p2) -- line: 20
+		-- upvalues: PerformFetch (copy)
+		return PerformFetch.GetStatus(p1, "luaapp.fiatpaidaccess.prepare-purchase." .. p2)
+	end,
+	Fetch = function(p3, p4, p5, p6) -- line: 24
+		-- upvalues: PerformFetch (copy), FiatPaidAccessPostPreparePurchaseRequest (copy), HttpService (copy), OpenFiatPurchasePage (copy), ApiFetchGameDetails (copy), FetchGamePlayabilityAndProductInfo (copy), Promise (copy)
+		return PerformFetch.Single("luaapp.fiatpaidaccess.prepare-purchase." .. p5, function(p7) -- line: 25
+			-- upvalues: FiatPaidAccessPostPreparePurchaseRequest (copy), p3 (copy), p4 (copy), p6 (copy), HttpService (copy), OpenFiatPurchasePage (copy), ApiFetchGameDetails (copy), p5 (copy), FetchGamePlayabilityAndProductInfo (copy), Promise (copy)
+			return FiatPaidAccessPostPreparePurchaseRequest(p3, p4, p6):andThen(function(p8) -- line: 27
+				-- upvalues: HttpService (copy), p7 (copy), OpenFiatPurchasePage (copy), ApiFetchGameDetails (copy), p3 (copy), p5 (copy), FetchGamePlayabilityAndProductInfo (copy), Promise (copy)
+				local v19 = p8 and (p8.responseBody and p8.responseBody.checkoutUrl)
+
+				if v19 then
+					local data = HttpService:JSONDecode(v19)
+
+					if data and data.checkoutUrl then
+						p7:dispatch(OpenFiatPurchasePage(data.checkoutUrl, function() -- line: 34
+							-- upvalues: p7 (copy), ApiFetchGameDetails (copy), p3 (copy), p5 (copy), FetchGamePlayabilityAndProductInfo (copy)
+							p7:dispatch(ApiFetchGameDetails.Fetch(p3, { p5 }))
+							p7:dispatch(FetchGamePlayabilityAndProductInfo.Fetch(p3, p5))
+						end))
+
+						return Promise.resolve(p8)
+					end
+				end
+
+				return Promise.reject("Invalid Response")
+			end)
+		end)
+	end
+}

@@ -1,20 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("NavigationRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Thunks.SetNavigationLocked);
-local v3 = require(l_Parent_0.ArgCheck);
-local v4 = require(l_Parent_0.RoactNavigation);
-local v5 = require(l_script_FirstAncestor_0.Thunks.RNAdapterThunk);
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: v3 (copy), v5 (copy), v2 (copy), v4 (copy)
-    v3.isTypeOrNil(v6, "boolean", "bypassNavigationLock");
-    return v5.new("NavigateBack", function(v7, v8) --[[ Line: 13 ]]
-        -- upvalues: v6 (copy), v2 (ref), v4 (ref)
-        if v7:getState().Navigation.lockNavigationActions and not v6 then
-            return;
-        else
-            v7:dispatch(v2(true));
-            v8(v4.Actions.back());
-            return;
-        end;
-    end);
-end;
+local NavigationRodux = script:FindFirstAncestor("NavigationRodux")
+local NavigationRoduxParent = NavigationRodux.Parent
+local FFlagSignalsNavP2NavigationPrimitives = require(NavigationRoduxParent.SharedFlags).FFlagSignalsNavP2NavigationPrimitives
+local v4 = if not FFlagSignalsNavP2NavigationPrimitives then nil else require(NavigationRoduxParent.RobloxAppNavigation).NavigationCommands
+local SetNavigationLocked = require(NavigationRodux.Thunks.SetNavigationLocked)
+local ArgCheck = require(NavigationRoduxParent.ArgCheck)
+local RoactNavigation = require(NavigationRoduxParent.RoactNavigation)
+local RNAdapterThunk = require(NavigationRodux.Thunks.RNAdapterThunk)
+
+return function(b1: boolean?) -- line: 17
+	-- upvalues: ArgCheck (copy), FFlagSignalsNavP2NavigationPrimitives (copy), v4 (copy), RNAdapterThunk (copy), SetNavigationLocked (copy), RoactNavigation (copy)
+	ArgCheck.isTypeOrNil(b1, "boolean", "bypassNavigationLock")
+
+	if FFlagSignalsNavP2NavigationPrimitives then
+		return function(_) -- line: 21
+			-- upvalues: v4 (copy), b1 (copy)
+			v4.back(b1)
+		end
+	end
+
+	return RNAdapterThunk.new("NavigateBack", function(p2, p3) -- line: 26
+		-- upvalues: b1 (copy), SetNavigationLocked (copy), RoactNavigation (copy)
+		if p2:getState().Navigation.lockNavigationActions and not b1 then
+			return
+		end
+
+		p2:dispatch(SetNavigationLocked(true))
+		p3(RoactNavigation.Actions.back())
+	end)
+end

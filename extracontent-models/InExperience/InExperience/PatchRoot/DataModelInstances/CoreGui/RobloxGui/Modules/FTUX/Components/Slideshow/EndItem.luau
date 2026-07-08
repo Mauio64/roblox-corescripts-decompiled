@@ -1,34 +1,39 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v6 = require(l_Parent_0.Resources.FTUXSlideshowData);
-local v7 = require(l_Parent_0.Components.Slideshow.Button);
-local _ = require(l_Parent_0.Enums.PlatformEnum);
-return function(v9) --[[ Line: 21 ]] --[[ Name: EndItem ]]
-    -- upvalues: l_useStyle_0 (copy), v6 (copy), l_withLocalization_0 (copy), v1 (copy), v7 (copy), v2 (copy)
-    local v10 = l_useStyle_0();
-    local l_Theme_0 = v10.Theme;
-    local l_Font_0 = v10.Font;
-    local v13 = v6[v9.platform];
-    return l_withLocalization_0({
-        footerText = "CoreScripts.VRFTUX.Label.Footer"
-    })(function(v14) --[[ Line: 31 ]]
-        -- upvalues: v9 (copy), v13 (copy), v1 (ref), v7 (ref), v2 (ref), l_Font_0 (copy), l_Theme_0 (copy)
-        return v9.currentIndex ~= #v13 and v1.createElement(v7, {
-            platform = v9.platform, 
-            currentIndex = v9.currentIndex, 
-            increaseCurrentIndex = v9.increaseCurrentIndex
-        }) or v1.createElement(v2.App.Text.StyledTextLabel, {
-            text = v14.footerText, 
-            fontStyle = l_Font_0.CaptionHeader, 
-            colorStyle = l_Theme_0.TextEmphasis, 
-            textXAlignment = Enum.TextXAlignment.Center, 
-            textYAlignment = Enum.TextYAlignment.Center, 
-            size = UDim2.new(1, 0, 1, 0), 
-            layoutOrder = 2
-        });
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local useStyle = UIBlox.Core.Style.useStyle
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local ParentParent = script.Parent.Parent.Parent
+local FTUXSlideshowData = require(ParentParent.Resources.FTUXSlideshowData)
+local Button = require(ParentParent.Components.Slideshow.Button)
+
+require(ParentParent.Enums.PlatformEnum)
+
+local function EndItem(t1: {[any]: any}) -- line: 21
+	-- upvalues: useStyle (copy), FTUXSlideshowData (copy), withLocalization (copy), React (copy), Button (copy), UIBlox (copy)
+	local v11 = useStyle()
+	local Theme = v11.Theme
+	local Font = v11.Font
+	local v14 = FTUXSlideshowData[t1.platform]
+
+	return withLocalization({
+		footerText = "CoreScripts.VRFTUX.Label.Footer"
+	})(function(p1) -- line: 31
+		-- upvalues: t1 (copy), v14 (copy), React (copy), Button (copy), UIBlox (copy), Font (copy), Theme (copy)
+		return t1.currentIndex ~= #v14 and React.createElement(Button, {
+			platform = t1.platform,
+			currentIndex = t1.currentIndex,
+			increaseCurrentIndex = t1.increaseCurrentIndex
+		}) or React.createElement(UIBlox.App.Text.StyledTextLabel, {
+			layoutOrder = 2,
+			text = p1.footerText,
+			fontStyle = Font.CaptionHeader,
+			colorStyle = Theme.TextEmphasis,
+			textXAlignment = Enum.TextXAlignment.Center,
+			textYAlignment = Enum.TextYAlignment.Center,
+			size = UDim2.new(1, 0, 1, 0)
+		})
+	end)
+end
+
+return EndItem

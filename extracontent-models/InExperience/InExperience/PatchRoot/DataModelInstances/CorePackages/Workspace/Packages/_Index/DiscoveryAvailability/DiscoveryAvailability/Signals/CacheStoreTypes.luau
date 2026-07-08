@@ -1,6 +1,6 @@
 return {
-    HomePageDataSourceType = {
-        API = "API", 
-        Cache = "Cache"
-    }
-};
+	HomePageDataSourceType = {
+		API = "API",
+		Cache = "Cache"
+	}
+}

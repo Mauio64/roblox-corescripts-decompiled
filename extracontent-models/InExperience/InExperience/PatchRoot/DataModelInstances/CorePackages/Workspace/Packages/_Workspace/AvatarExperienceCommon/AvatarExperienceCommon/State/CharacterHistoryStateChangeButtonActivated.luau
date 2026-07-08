@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 24 ]]
-    return {
-        type = script.Name, 
-        isUndo = v1.isUndo, 
-        equipped = v1.equipped, 
-        tryOn = v1.tryOn
-    };
-end);
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(t1: {[any]: any}) -- line: 25
+	return {
+		type = script.Name,
+		isUndo = t1.isUndo,
+		equipped = t1.equipped,
+		tryOn = t1.tryOn
+	}
+end)

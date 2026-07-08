@@ -1,62 +1,68 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry);
-local v3 = {};
-if v2 then
-    local v4 = nil;
-    local v5 = nil;
-    local v6 = nil;
-    v3.getNextUpComponentSortLatency = function() --[[ Line: 14 ]] --[[ Name: getNextUpComponentSortLatency ]]
-        -- upvalues: v6 (ref)
-        return v6;
-    end;
-    v3.nextUpComponentShown = function() --[[ Line: 18 ]] --[[ Name: nextUpComponentShown ]]
-        -- upvalues: v4 (ref)
-        v4 = time();
-    end;
-    v3.nextUpComponentSortDataLoaded = function() --[[ Line: 22 ]] --[[ Name: nextUpComponentSortDataLoaded ]]
-        -- upvalues: v5 (ref), v6 (ref), v4 (ref)
-        if v5 then
-            return;
-        else
-            local v7 = time();
-            v5 = v7;
-            v6 = if v4 then v7 - v4 else 0;
-            return;
-        end;
-    end;
-    local v8 = {};
-    v3.getNextUpTileImageTextureLatencies = function() --[[ Line: 35 ]] --[[ Name: getNextUpTileImageTextureLatencies ]]
-        -- upvalues: v1 (copy), v8 (ref)
-        return v1.Dictionary.values(v8);
-    end;
-    v3.nextUpTileImageTextureLoaded = function(v9) --[[ Line: 39 ]] --[[ Name: nextUpTileImageTextureLoaded ]]
-        -- upvalues: v8 (ref), v5 (ref)
-        local v10 = tostring(v9);
-        if v8[v10] then
-            return;
-        else
-            v8[v10] = if v5 then time() - v5 else 0;
-            return;
-        end;
-    end;
-    v3.resetNextUpLatencyTelemetry = function() --[[ Line: 50 ]] --[[ Name: resetNextUpLatencyTelemetry ]]
-        -- upvalues: v5 (ref), v8 (ref), v4 (ref), v6 (ref)
-        v5 = nil;
-        v8 = {};
-        v4 = nil;
-        v6 = nil;
-    end;
-    return v3;
-else
-    local v11 = false;
-    v3.setNextUpTilesLoaded = function(v12) --[[ Line: 58 ]] --[[ Name: setNextUpTilesLoaded ]]
-        -- upvalues: v11 (ref)
-        v11 = v12;
-    end;
-    v3.getNextUpTilesLoaded = function() --[[ Line: 62 ]] --[[ Name: getNextUpTilesLoaded ]]
-        -- upvalues: v11 (ref)
-        return v11;
-    end;
-    return v3;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local t1 = {}
+
+if require(script.Parent.Flags.FFlagEnableNextUpImageLatencyTelemetry) then
+	local u4 = nil
+	local u5 = nil
+	local u6 = nil
+
+	function t1.getNextUpComponentSortLatency() -- line: 14
+		-- upvalues: u6 (ref)
+		return u6
+	end
+	function t1.nextUpComponentShown() -- line: 18
+		-- upvalues: u4 (ref)
+		u4 = time()
+	end
+	function t1.nextUpComponentSortDataLoaded() -- line: 22
+		-- upvalues: u5 (ref), u6 (ref), u4 (ref)
+		if u5 then
+			return
+		end
+
+		local v9 = time()
+
+		u5 = v9
+		u6 = not u4 and 0 or v9 - u4
+	end
+
+	local t2 = {}
+
+	function t1.getNextUpTileImageTextureLatencies() -- line: 35
+		-- upvalues: Cryo (copy), t2 (ref)
+		return Cryo.Dictionary.values(t2)
+	end
+	function t1.nextUpTileImageTextureLoaded(n1: number) -- line: 39
+		-- upvalues: t2 (ref), u5 (ref)
+		local str = tostring(n1)
+
+		if t2[str] then
+			return
+		end
+
+		t2[str] = not u5 and 0 or time() - u5
+	end
+	function t1.resetNextUpLatencyTelemetry() -- line: 50
+		-- upvalues: u5 (ref), t2 (ref), u4 (ref), u6 (ref)
+		u5 = nil
+		t2 = {}
+		u4 = nil
+		u6 = nil
+	end
+
+	return t1
+end
+
+local u8 = false
+
+function t1.setNextUpTilesLoaded(b1: boolean) -- line: 58
+	-- upvalues: u8 (ref)
+	u8 = b1
+end
+function t1.getNextUpTilesLoaded() -- line: 62
+	-- upvalues: u8 (ref)
+	return u8
+end
+
+return t1

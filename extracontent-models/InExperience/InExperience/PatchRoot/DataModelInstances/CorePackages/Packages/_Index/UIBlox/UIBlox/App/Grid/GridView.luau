@@ -1,293 +1,272 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.RoactGamepad);
-local v3 = require(l_Parent_0.Utility.isCallable);
-local v4 = require(l_Parent_0.UIBloxConfig);
-local v5 = require(l_Parent_1.Roact);
-local v6 = require(l_Parent_1.Cryo);
-local v7 = require(l_Parent_1.t);
-local v8 = require(l_Parent_0.Utility.isPositiveVector2);
-local v9 = v5.PureComponent:extend("GridView");
-v9.validateProps = v7.strictInterface({
-    renderItem = v3, 
-    itemSize = v8, 
-    itemPadding = v7.Vector2, 
-    items = v7.table, 
-    maxHeight = v7.numberMin(0), 
-    windowHeight = v7.optional(v7.numberMin(0)), 
-    LayoutOrder = v7.optional(v7.integer), 
-    onWidthChanged = v7.optional(v3), 
-    onNumItemsPerRowChanged = v7.optional(v3), 
-    NextSelectionLeft = v7.optional(v7.table), 
-    NextSelectionRight = v7.optional(v7.table), 
-    NextSelectionUp = v7.optional(v7.table), 
-    NextSelectionDown = v7.optional(v7.table), 
-    frameRef = v7.optional(v7.table), 
-    restorePreviousChildFocus = v7.optional(v7.boolean), 
-    onFocusGained = v7.optional(v7.callback), 
-    defaultChildIndex = v7.optional(v7.numberMin(1)), 
-    isRoactGamepadEnabled = v7.optional(v7.boolean)
-});
-v9.itemsAreVisible = function(v10) --[[ Line: 60 ]] --[[ Name: itemsAreVisible ]]
-    return v10.state.isInDataModel and v10.state.containerWidth ~= 0 and v10.props.itemSize.X ~= 0;
-end;
-v9.defaultProps = {
-    maxHeight = 1e999, 
-    restorePreviousChildFocus = true, 
-    isRoactGamepadEnabled = true
-};
-v9.init = function(v11) --[[ Line: 74 ]] --[[ Name: init ]]
-    -- upvalues: v5 (copy), v2 (copy)
-    v11.currentItemsPerRow = -1;
-    v11.frameRef = v5.createRef();
-    v11.isMounted = false;
-    v11.state = {
-        containerWidth = 0, 
-        containerYPosition = 0, 
-        isInDataModel = false
-    };
-    v11.focusableRefs = v11.props.isRoactGamepadEnabled and v2.createRefCache() or {};
-    v11.onAncestryChanged = function(v12) --[[ Line: 87 ]]
-        -- upvalues: v11 (copy)
-        if v12:IsDescendantOf(game) then
-            v11:setState(function(v13) --[[ Line: 89 ]]
-                -- upvalues: v12 (copy)
-                if not v13.isInDataModel or v13.containerWidth ~= v12.AbsoluteSize.X then
-                    return {
-                        isInDataModel = true, 
-                        containerWidth = v12.AbsoluteSize.X
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-    end;
-end;
-v9.render = function(v14) --[[ Line: 102 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v2 (copy), v4 (copy)
-    local l_items_0 = v14.props.items;
-    local v16 = #l_items_0;
-    local l_itemSize_0 = v14.props.itemSize;
-    local l_itemPadding_0 = v14.props.itemPadding;
-    local l_maxHeight_0 = v14.props.maxHeight;
-    local l_containerWidth_0 = v14.state.containerWidth;
-    local l_containerYPosition_0 = v14.state.containerYPosition;
-    local l_defaultChildIndex_0 = v14.props.defaultChildIndex;
-    local l_onNumItemsPerRowChanged_0 = v14.props.onNumItemsPerRowChanged;
-    local v24 = 1;
-    local l_v16_0 = v16;
-    local v26 = {};
-    local v27 = 0;
-    local v28 = 0;
-    local v29 = nil;
-    local v30 = nil;
-    local v31 = math.max(1, l_itemSize_0.X + l_itemPadding_0.X);
-    local v32 = math.max(1, l_itemSize_0.Y + l_itemPadding_0.Y);
-    v29 = math.floor((l_containerWidth_0 + l_itemPadding_0.X) / v31);
-    v30 = math.floor((l_maxHeight_0 + l_itemPadding_0.Y) / v32);
-    if v29 ~= v14.currentItemsPerRow then
-        v14.currentItemsPerRow = v29;
-        if l_onNumItemsPerRowChanged_0 then
-            l_onNumItemsPerRowChanged_0(v29);
-        end;
-    end;
-    local v33 = math.min(v30, (math.ceil(v16 / v29)));
-    local v34 = v33 * l_itemSize_0.Y + math.max(v33 - 1, 0) * l_itemPadding_0.Y;
-    if v14.props.windowHeight ~= nil then
-        local v35 = math.floor((v14.props.windowHeight + l_itemPadding_0.Y) / (l_itemSize_0.Y + l_itemPadding_0.Y)) + 2;
-        local v36 = math.floor((l_containerYPosition_0 + l_itemPadding_0.Y) / (l_itemSize_0.Y + l_itemPadding_0.Y));
-        local v37 = math.min(v33, v36 + v35) + 1;
-        v24 = math.max(1, v36 * v29 + 1);
-        l_v16_0 = math.min(v16, v37 * v29);
-        v28 = v36 * l_itemSize_0.Y + v36 * l_itemPadding_0.Y;
-    end;
-    local function _(v38, v39) --[[ Line: 152 ]] --[[ Name: getItemIndexRef ]]
-        -- upvalues: v29 (ref), v24 (ref), l_v16_0 (ref), v14 (copy)
-        local v40 = false;
-        if v38 > 0 then
-            v40 = false;
-            if v39 > 0 then
-                v40 = v39 <= v29;
-            end;
-        end;
-        local v41 = 1 + ((v38 - 1) * v29 + (v39 - 1));
-        local v42 = false;
-        if v24 <= v41 then
-            v42 = v41 <= l_v16_0;
-        end;
-        return v42 and v40 and v14.focusableRefs[v41] or nil;
-    end;
-    local function v55(v44) --[[ Line: 161 ]] --[[ Name: renderItem ]]
-        -- upvalues: v29 (ref), v14 (copy), v5 (ref), v2 (ref), v27 (ref), v28 (ref), l_itemSize_0 (copy), v24 (ref), l_v16_0 (ref), l_items_0 (copy), v4 (ref)
-        local v45 = math.floor((v44 - 1) / v29) + 1;
-        local v46 = 1 + (v44 - 1) % v29;
-        local v47 = v14:itemsAreVisible();
-        if not v14.props.isRoactGamepadEnabled then
-            v14.focusableRefs[v44] = v14.focusableRefs[v44] or v5.createRef();
-        end;
-        local l_createElement_0 = v5.createElement;
-        local v49 = if v14.props.isRoactGamepadEnabled then v2.Focusable.Frame else "Frame";
-        local v50 = {
-            BackgroundTransparency = 1, 
-            Position = UDim2.new(0, v27, 0, v28), 
-            Size = UDim2.new(0, l_itemSize_0.X, 0, l_itemSize_0.Y)
-        };
-        local v51 = v46 - 1;
-        local v52 = false;
-        if v45 > 0 then
-            v52 = false;
-            if v51 > 0 then
-                v52 = v51 <= v29;
-            end;
-        end;
-        local v53 = 1 + ((v45 - 1) * v29 + (v51 - 1));
-        local v54 = false;
-        if v24 <= v53 then
-            v54 = v53 <= l_v16_0;
-        end;
-        v50.NextSelectionLeft = v54 and v52 and v14.focusableRefs[v53] or nil;
-        v51 = v46 + 1;
-        v52 = false;
-        if v45 > 0 then
-            v52 = false;
-            if v51 > 0 then
-                v52 = v51 <= v29;
-            end;
-        end;
-        v53 = 1 + ((v45 - 1) * v29 + (v51 - 1));
-        v54 = false;
-        if v24 <= v53 then
-            v54 = v53 <= l_v16_0;
-        end;
-        v50.NextSelectionRight = v54 and v52 and v14.focusableRefs[v53] or nil;
-        v51 = v45 - 1;
-        v52 = false;
-        if v51 > 0 then
-            v52 = false;
-            if v46 > 0 then
-                v52 = v46 <= v29;
-            end;
-        end;
-        v53 = 1 + ((v51 - 1) * v29 + (v46 - 1));
-        v54 = false;
-        if v24 <= v53 then
-            v54 = v53 <= l_v16_0;
-        end;
-        v50.NextSelectionUp = v54 and v52 and v14.focusableRefs[v53] or nil;
-        v51 = v45 + 1;
-        v52 = false;
-        if v51 > 0 then
-            v52 = false;
-            if v46 > 0 then
-                v52 = v46 <= v29;
-            end;
-        end;
-        v53 = 1 + ((v51 - 1) * v29 + (v46 - 1));
-        v54 = false;
-        if v24 <= v53 then
-            v54 = v53 <= l_v16_0;
-        end;
-        v50.NextSelectionDown = v54 and v52 and v14.focusableRefs[v53] or nil;
-        v50[v5.Ref] = v14.focusableRefs[v44];
-        v50.onFocusGained = if v14.props.isRoactGamepadEnabled then v14.props.onFocusGained else nil;
-        return l_createElement_0(v49, v50, {
-            Content = v47 and v14.props.renderItem(l_items_0[v44], v44, if v4.passRowAndColumnDataToItemInGridView then {
-                row = v45, 
-                column = v46
-            } else nil)
-        });
-    end;
-    if v34 < l_maxHeight_0 then
-        local v56 = false;
-        local v57 = l_defaultChildIndex_0 and l_defaultChildIndex_0 <= v16;
-        for v58 = v24, l_v16_0 do
-            if v58 == l_defaultChildIndex_0 then
-                v56 = true;
-            end;
-            v26[tostring(v58)] = v55(v58);
-            local l_X_0 = l_itemSize_0.X;
-            v27 = math.floor(v27 + l_X_0 + l_itemPadding_0.X);
-            if l_containerWidth_0 < v27 + l_itemSize_0.X and v58 < l_v16_0 then
-                v27 = 0;
-                local l_Y_0 = l_itemPadding_0.Y;
-                v28 = v28 + l_Y_0 + l_itemSize_0.Y;
-            end;
-        end;
-        if v57 and not v56 then
-            v27 = (l_defaultChildIndex_0 - 1) % v29 * (l_itemSize_0.X + l_itemPadding_0.X);
-            v28 = math.floor((l_defaultChildIndex_0 - 1) / v29) * (l_itemPadding_0.Y + l_itemSize_0.Y);
-            v26[tostring(l_defaultChildIndex_0)] = v55(l_defaultChildIndex_0);
-        end;
-    end;
-    return v5.createElement(if v14.props.isRoactGamepadEnabled then v2.Focusable.Frame else "Frame", {
-        BackgroundTransparency = 1, 
-        LayoutOrder = v14.props.LayoutOrder, 
-        Size = UDim2.new(1, 0, 0, v34), 
-        [v5.Change.AbsolutePosition] = v14.props.windowHeight ~= nil and function(v61) --[[ Line: 238 ]]
-            -- upvalues: v14 (copy)
-            if v14.isMounted then
-                v14:setState({
-                    containerYPosition = -math.min(0, v61.AbsolutePosition.Y)
-                });
-            end;
-        end or nil, 
-        [v5.Change.AbsoluteSize] = function(v62) --[[ Line: 245 ]]
-            -- upvalues: v14 (copy)
-            if v14.isMounted then
-                if v14.state.isInDataModel then
-                    v14:setState({
-                        containerWidth = v62.AbsoluteSize.X
-                    });
-                end;
-                if v14.props.onWidthChanged ~= nil then
-                    v14.props.onWidthChanged(v62.AbsoluteSize.X);
-                end;
-            end;
-        end, 
-        [v5.Event.AncestryChanged] = v14.onAncestryChanged, 
-        [v5.Ref] = v14.props.frameRef or v14.frameRef, 
-        NextSelectionLeft = v14.props.NextSelectionLeft, 
-        NextSelectionRight = v14.props.NextSelectionRight, 
-        NextSelectionUp = v14.props.NextSelectionUp, 
-        NextSelectionDown = v14.props.NextSelectionDown, 
-        defaultChild = if v14.props.isRoactGamepadEnabled and l_defaultChildIndex_0 then v14.focusableRefs[l_defaultChildIndex_0] else nil, 
-        restorePreviousChildFocus = if v14.props.isRoactGamepadEnabled then v14.props.restorePreviousChildFocus else nil
-    }, v26);
-end;
-v9.didMount = function(v63) --[[ Line: 273 ]] --[[ Name: didMount ]]
-    v63.isMounted = true;
-    local v64 = v63.props.frameRef or v63.frameRef;
-    if v64:getValue() and v64:getValue().AbsoluteSize.X ~= 0 then
-        if v64:getValue():IsDescendantOf(game) then
-            v63:setState(function(_) --[[ Line: 283 ]]
-                -- upvalues: v64 (copy)
-                if v64:getValue() then
-                    return {
-                        isInDataModel = true, 
-                        containerWidth = v64:getValue().AbsoluteSize.X
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-        if v63.props.onWidthChanged ~= nil then
-            delay(0, function() --[[ Line: 296 ]]
-                -- upvalues: v64 (copy), v63 (copy)
-                if v64:getValue() then
-                    v63.props.onWidthChanged(v64:getValue().AbsoluteSize.X);
-                end;
-            end);
-        end;
-    end;
-end;
-v9.willUnmount = function(v66) --[[ Line: 305 ]] --[[ Name: willUnmount ]]
-    v66.isMounted = false;
-end;
-return v5.forwardRef(function(v67, v68) --[[ Line: 309 ]]
-    -- upvalues: v5 (copy), v9 (copy), v6 (copy)
-    return v5.createElement(v9, v6.Dictionary.join(v67, {
-        frameRef = v68
-    }));
-end);
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local RoactGamepad = require(ParentParentParent.RoactGamepad)
+local isCallable = require(ParentParent.Utility.isCallable)
+local UIBloxConfig = require(ParentParent.UIBloxConfig)
+local Roact = require(ParentParentParent.Roact)
+local Cryo = require(ParentParentParent.Cryo)
+local t = require(ParentParentParent.t)
+local isPositiveVector2 = require(ParentParent.Utility.isPositiveVector2)
+local v10 = Roact.PureComponent:extend("GridView")
+
+v10.validateProps = t.strictInterface({
+	renderItem = isCallable,
+	itemSize = isPositiveVector2,
+	itemPadding = t.Vector2,
+	items = t.table,
+	maxHeight = t.numberMin(0),
+	windowHeight = t.optional(t.numberMin(0)),
+	LayoutOrder = t.optional(t.integer),
+	onWidthChanged = t.optional(isCallable),
+	onNumItemsPerRowChanged = t.optional(isCallable),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	frameRef = t.optional(t.table),
+	restorePreviousChildFocus = t.optional(t.boolean),
+	onFocusGained = t.optional(t.callback),
+	defaultChildIndex = t.optional(t.numberMin(1)),
+	isRoactGamepadEnabled = t.optional(t.boolean)
+})
+
+function v10.itemsAreVisible(p1) -- line: 60
+	return p1.state.isInDataModel and (p1.state.containerWidth ~= 0 and p1.props.itemSize.X ~= 0)
+end
+
+v10.defaultProps = {
+	maxHeight = 1e999,
+	restorePreviousChildFocus = true,
+	isRoactGamepadEnabled = true
+}
+
+function v10.init(p2) -- line: 74
+	-- upvalues: Roact (copy), RoactGamepad (copy)
+	p2.currentItemsPerRow = -1
+	p2.frameRef = Roact.createRef()
+	p2.isMounted = false
+	p2.state = {
+		containerWidth = 0,
+		containerYPosition = 0,
+		isInDataModel = false
+	}
+	p2.focusableRefs = p2.props.isRoactGamepadEnabled and RoactGamepad.createRefCache() or {}
+
+	function p2.onAncestryChanged(p3) -- line: 87
+		-- upvalues: p2 (copy)
+		if p3:IsDescendantOf(game) then
+			p2:setState(function(p4) -- line: 89
+				-- upvalues: p3 (copy)
+				if not p4.isInDataModel or p4.containerWidth ~= p3.AbsoluteSize.X then
+					return {
+						isInDataModel = true,
+						containerWidth = p3.AbsoluteSize.X
+					}
+				end
+
+				return nil
+			end)
+		end
+	end
+end
+function v10.render(p5) -- line: 102
+	-- upvalues: Roact (copy), RoactGamepad (copy), UIBloxConfig (copy)
+	local items = p5.props.items
+	local v15 = #items
+	local itemSize = p5.props.itemSize
+	local itemPadding = p5.props.itemPadding
+	local maxHeight = p5.props.maxHeight
+	local containerWidth = p5.state.containerWidth
+	local containerYPosition = p5.state.containerYPosition
+	local defaultChildIndex = p5.props.defaultChildIndex
+	local onNumItemsPerRowChanged = p5.props.onNumItemsPerRowChanged
+	local n1 = 1
+	local u24 = v15
+	local t1 = {}
+	local n2 = 0
+	local n3 = 0
+	local v28 = math.max(1, itemSize.X + itemPadding.X)
+	local v29 = math.max(1, itemSize.Y + itemPadding.Y)
+	local u30 = math.floor((containerWidth + itemPadding.X) / v28)
+	local v31 = math.floor((maxHeight + itemPadding.Y) / v29)
+
+	if u30 ~= p5.currentItemsPerRow then
+		p5.currentItemsPerRow = u30
+
+		if onNumItemsPerRowChanged then
+			onNumItemsPerRowChanged(u30)
+		end
+	end
+
+	local v32 = math.min(v31, (math.ceil(v15 / u30)))
+	local v33 = v32 * itemSize.Y + math.max(v32 - 1, 0) * itemPadding.Y
+
+	if p5.props.windowHeight ~= nil then
+		local v34 = math.floor((p5.props.windowHeight + itemPadding.Y) / (itemSize.Y + itemPadding.Y)) + 2
+		local v35 = math.floor((containerYPosition + itemPadding.Y) / (itemSize.Y + itemPadding.Y))
+		local v36 = math.min(v32, v35 + v34) + 1
+
+		n1 = math.max(1, v35 * u30 + 1)
+		u24 = math.min(v15, v36 * u30)
+		n3 = v35 * itemSize.Y + v35 * itemPadding.Y
+	end
+
+	local function getItemIndexRef(p6, p7) -- line: 152
+		-- upvalues: u30 (ref), n1 (ref), u24 (ref), p5 (copy)
+		local v50 = p6 > 0 and (p7 > 0 and p7 <= u30)
+		local v51 = 1 + ((p6 - 1) * u30 + (p7 - 1))
+
+		return v51 >= n1 and v51 <= u24 and (not not v50 and p5.focusableRefs[v51]) or nil
+	end
+	local function renderItem(p8) -- line: 161
+		-- upvalues: u30 (ref), p5 (copy), Roact (copy), RoactGamepad (copy), n2 (ref), n3 (ref), itemSize (copy), n1 (ref), u24 (ref), items (copy), UIBloxConfig (copy)
+		local v53 = math.floor((p8 - 1) / u30) + 1
+		local v54 = 1 + (p8 - 1) % u30
+		local v55 = p5:itemsAreVisible()
+
+		if not p5.props.isRoactGamepadEnabled then
+			p5.focusableRefs[p8] = p5.focusableRefs[p8] or Roact.createRef()
+		end
+
+		local createElement = Roact.createElement
+		local v57 = not p5.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame
+		local t2 = {
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, n2, 0, n3),
+			Size = UDim2.new(0, itemSize.X, 0, itemSize.Y)
+		}
+		local v59 = v54 - 1
+		local v60 = v53 > 0 and (v59 > 0 and v59 <= u30)
+		local v61 = 1 + ((v53 - 1) * u30 + (v59 - 1))
+
+		t2.NextSelectionLeft = v61 >= n1 and v61 <= u24 and (not not v60 and p5.focusableRefs[v61]) or nil
+
+		local v62 = v54 + 1
+		local v63 = v53 > 0 and (v62 > 0 and v62 <= u30)
+		local v64 = 1 + ((v53 - 1) * u30 + (v62 - 1))
+
+		t2.NextSelectionRight = v64 >= n1 and v64 <= u24 and (not not v63 and p5.focusableRefs[v64]) or nil
+
+		local v65 = v53 - 1
+		local v66 = v65 > 0 and (v54 > 0 and v54 <= u30)
+		local v67 = 1 + ((v65 - 1) * u30 + (v54 - 1))
+
+		t2.NextSelectionUp = v67 >= n1 and v67 <= u24 and (not not v66 and p5.focusableRefs[v67]) or nil
+
+		local v68 = v53 + 1
+		local v69 = v68 > 0 and (v54 > 0 and v54 <= u30)
+		local v70 = 1 + ((v68 - 1) * u30 + (v54 - 1))
+
+		t2.NextSelectionDown = v70 >= n1 and v70 <= u24 and (not not v69 and p5.focusableRefs[v70]) or nil
+		t2[Roact.Ref] = p5.focusableRefs[p8]
+		t2.onFocusGained = if not p5.props.isRoactGamepadEnabled then nil else p5.props.onFocusGained
+
+		return createElement(v57, t2, {
+			Content = v55 and p5.props.renderItem(items[p8], p8, if not UIBloxConfig.passRowAndColumnDataToItemInGridView then nil else {
+				row = v53,
+				column = v54
+			})
+		})
+	end
+
+	if v33 < maxHeight then
+		local v39 = false
+		local v40 = defaultChildIndex and defaultChildIndex <= v15
+
+		for i = n1, u24 do
+			if i == defaultChildIndex then
+				v39 = true
+			end
+
+			t1[tostring(i)] = renderItem(i)
+			n2 = math.floor(n2 + itemSize.X + itemPadding.X)
+
+			if containerWidth < n2 + itemSize.X and i < u24 then
+				n2 = 0
+				n3 = n3 + itemPadding.Y + itemSize.Y
+			end
+		end
+
+		if v40 and not v39 then
+			n2 = (defaultChildIndex - 1) % u30 * (itemSize.X + itemPadding.X)
+			n3 = math.floor((defaultChildIndex - 1) / u30) * (itemPadding.Y + itemSize.Y)
+			t1[tostring(defaultChildIndex)] = renderItem(defaultChildIndex)
+		end
+	end
+
+	return Roact.createElement(not p5.props.isRoactGamepadEnabled and "Frame" or RoactGamepad.Focusable.Frame, {
+		BackgroundTransparency = 1,
+		LayoutOrder = p5.props.LayoutOrder,
+		Size = UDim2.new(1, 0, 0, v33),
+		[Roact.Change.AbsolutePosition] = p5.props.windowHeight ~= nil and function(p9) -- line: 238
+			-- upvalues: p5 (copy)
+			if p5.isMounted then
+				p5:setState({
+					containerYPosition = -math.min(0, p9.AbsolutePosition.Y)
+				})
+			end
+		end or nil,
+		[Roact.Change.AbsoluteSize] = function(p10) -- line: 245
+			-- upvalues: p5 (copy)
+			if p5.isMounted then
+				if p5.state.isInDataModel then
+					p5:setState({
+						containerWidth = p10.AbsoluteSize.X
+					})
+				end
+
+				if p5.props.onWidthChanged ~= nil then
+					p5.props.onWidthChanged(p10.AbsoluteSize.X)
+				end
+			end
+		end,
+		[Roact.Event.AncestryChanged] = p5.onAncestryChanged,
+		[Roact.Ref] = p5.props.frameRef or p5.frameRef,
+		NextSelectionLeft = p5.props.NextSelectionLeft,
+		NextSelectionRight = p5.props.NextSelectionRight,
+		NextSelectionUp = p5.props.NextSelectionUp,
+		NextSelectionDown = p5.props.NextSelectionDown,
+		defaultChild = if not p5.props.isRoactGamepadEnabled or not defaultChildIndex then nil else p5.focusableRefs[defaultChildIndex],
+		restorePreviousChildFocus = if not p5.props.isRoactGamepadEnabled then nil else p5.props.restorePreviousChildFocus
+	}, t1)
+end
+function v10.didMount(p11) -- line: 273
+	p11.isMounted = true
+
+	local v43 = p11.props.frameRef or p11.frameRef
+
+	if v43:getValue() and v43:getValue().AbsoluteSize.X ~= 0 then
+		if v43:getValue():IsDescendantOf(game) then
+			p11:setState(function(_) -- line: 283
+				-- upvalues: v43 (copy)
+				if v43:getValue() then
+					return {
+						isInDataModel = true,
+						containerWidth = v43:getValue().AbsoluteSize.X
+					}
+				end
+
+				return nil
+			end)
+		end
+
+		if p11.props.onWidthChanged ~= nil then
+			delay(0, function() -- line: 296
+				-- upvalues: v43 (copy), p11 (copy)
+				if v43:getValue() then
+					p11.props.onWidthChanged(v43:getValue().AbsoluteSize.X)
+				end
+			end)
+		end
+	end
+end
+function v10.willUnmount(p13) -- line: 305
+	p13.isMounted = false
+end
+
+return Roact.forwardRef(function(p14, p15) -- line: 309
+	-- upvalues: Roact (copy), v10 (copy), Cryo (copy)
+	return Roact.createElement(v10, Cryo.Dictionary.join(p14, {
+		frameRef = p15
+	}))
+end)

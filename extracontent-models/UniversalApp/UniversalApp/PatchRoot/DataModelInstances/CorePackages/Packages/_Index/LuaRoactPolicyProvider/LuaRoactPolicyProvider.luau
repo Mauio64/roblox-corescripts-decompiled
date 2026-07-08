@@ -1,26 +1,28 @@
-local v0 = require(script.connect);
-local v1 = require(script.Provider);
-local v2 = require(script.Logger);
-local l_getPolicyImplementations_0 = script.getPolicyImplementations;
-local v4 = require(l_getPolicyImplementations_0.fromMemStorageService);
-local v5 = require(l_getPolicyImplementations_0.fromPolicyService);
-local v6 = require(l_getPolicyImplementations_0.fromStaticSource);
-local v7 = require(script.AppPolicyContext);
+local connect = require(script.connect)
+local Provider = require(script.Provider)
+local Logger = require(script.Logger)
+local getPolicyImplementations = script.getPolicyImplementations
+local fromMemStorageService = require(getPolicyImplementations.fromMemStorageService)
+local fromPolicyService = require(getPolicyImplementations.fromPolicyService)
+local fromStaticSource = require(getPolicyImplementations.fromStaticSource)
+local AppPolicyContext = require(script.AppPolicyContext)
+
 return {
-    withGetPolicyImplementation = function(v8) --[[ Line: 12 ]] --[[ Name: withGetPolicyImplementation ]]
-        -- upvalues: v0 (copy), v1 (copy)
-        assert(v8.read, "expected getPolicyImpl to have `read` function");
-        assert(v8.onPolicyChanged, "expected getPolicyImpl to have `onPolicyChanged` function");
-        return {
-            connect = v0(v8), 
-            Provider = v1()
-        };
-    end, 
-    GetPolicyImplementations = {
-        MemStorageService = v4(), 
-        PolicyService = v5(), 
-        Static = v6()
-    }, 
-    Logger = v2, 
-    AppPolicyContext = v7
-};
+	withGetPolicyImplementation = function(p1) -- line: 12
+		-- upvalues: connect (copy), Provider (copy)
+		assert(p1.read, "expected getPolicyImpl to have `read` function")
+		assert(p1.onPolicyChanged, "expected getPolicyImpl to have `onPolicyChanged` function")
+
+		return {
+			connect = connect(p1),
+			Provider = Provider()
+		}
+	end,
+	GetPolicyImplementations = {
+		MemStorageService = fromMemStorageService(),
+		PolicyService = fromPolicyService(),
+		Static = fromStaticSource()
+	},
+	Logger = Logger,
+	AppPolicyContext = AppPolicyContext
+}

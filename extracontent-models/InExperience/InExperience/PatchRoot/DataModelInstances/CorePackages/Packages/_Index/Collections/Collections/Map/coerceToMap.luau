@@ -1,11 +1,15 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_0.Map);
-local v4 = require(l_Parent_1.Object);
-local v5 = require(l_Parent_2.InstanceOf);
-local _ = require(l_Parent_2.ES7Types);
-return function(v7) --[[ Line: 27 ]] --[[ Name: coerceToMap ]]
-    -- upvalues: v5 (copy), v3 (copy), v4 (copy)
-    return v5(v7, v3) and v7 or v3.new(v4.entries(v7));
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Map = require(scriptParent.Map)
+local Object = require(scriptParentParent.Object)
+local InstanceOf = require(scriptParentParentParent.InstanceOf)
+
+require(scriptParentParentParent.ES7Types)
+
+local function coerceToMap(p1) -- line: 27
+	-- upvalues: InstanceOf (copy), Map (copy), Object (copy)
+	return InstanceOf(p1, Map) and p1 or Map.new(Object.entries(p1))
+end
+
+return coerceToMap

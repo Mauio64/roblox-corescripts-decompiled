@@ -32,543 +32,600 @@ local t1 = {
 local SHADOW_IMAGE = Constants.SHADOW_IMAGE
 local SHADOW_SIZE = Constants.SHADOW_SIZE
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ BottomSheet ]] -- line: 77
-	-- upvalues: withDefaults (copy), t1 (copy), useOverlay (copy), useTokens (copy), useElevation (copy), ElevationLayer (copy), usePreferences (copy), useScreenHeight (copy), React (copy), useHardwareInsets (copy), useAnimatedBinding (copy), Flags (copy), childrenHasFullBleed (copy), Otter (copy), ReactUtils (copy), SheetType (copy), View (copy), StateLayerAffordance (copy), ReactRoblox (copy), Types (copy), Dash (copy), SheetContext (copy), ElevationOwnerScope (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy)
-	local v43 = withDefaults(p1, t1)
-	local v44 = useOverlay()
-	local v45 = useTokens()
-	local v46 = useElevation(ElevationLayer.Sheet, {
+local function advanceCriticalDampedSpring(n1: number, n2: number, n3: number, n4: number) -- line: 60
+	local v37 = n1 - n3
+	local v38 = 25.132741228718345 * n4
+	local v39 = math.exp(-v38)
+	local v40 = n2 + 25.132741228718345 * v37
+	local v41 = (v37 + v40 * n4) * v39
+	local v42 = (n2 - v40 * v38) * v39
+
+	return n3 + v41, v42
+end
+local function BottomSheet(p1, p2) -- line: 78
+	-- upvalues: withDefaults (copy), t1 (copy), useOverlay (copy), useTokens (copy), useElevation (copy), ElevationLayer (copy), usePreferences (copy), useScreenHeight (copy), Flags (copy), React (copy), useHardwareInsets (copy), useAnimatedBinding (copy), childrenHasFullBleed (copy), Otter (copy), ReactUtils (copy), SheetType (copy), View (copy), StateLayerAffordance (copy), ReactRoblox (copy), Types (copy), Dash (copy), SheetContext (copy), ElevationOwnerScope (copy), Image (copy), SHADOW_IMAGE (copy), SHADOW_SIZE (copy)
+	local v45 = withDefaults(p1, t1)
+	local v46 = useOverlay()
+	local v47 = useTokens()
+	local v48 = useElevation(ElevationLayer.Sheet, {
 		stackAboveOwner = false
 	})
 	local reducedMotion = usePreferences().reducedMotion
-	local v48 = useScreenHeight()
-	local v49, v50 = React.useState(0)
-	local v51 = React.useMemo(function() -- line: 88
-		-- upvalues: v49 (copy)
-		return { v49 }
-	end, { v49 })
-	local v52 = v43.snapPoints or v51
-	local v53 = React.useCallback(function(n1: number) -- line: 95
-		-- upvalues: v48 (copy)
-		if n1 > 1 then
-			return n1
+	local v50 = useScreenHeight()
+	local v51 = nil
+	local u52 = nil
+
+	if Flags.FoundationBottomSheetCapToOverlayHeight then
+		local v53
+
+		v51, v53 = React.useState(not v46 and 0 or v46.AbsoluteSize.Y)
+		u52 = v53
+	end
+
+	local v54, v55 = React.useState(0)
+	local v56 = React.useMemo(function() -- line: 94
+		-- upvalues: v54 (copy)
+		return { v54 }
+	end, { v54 })
+	local v57 = v45.snapPoints or v56
+	local v58 = React.useCallback(function(n5: number) -- line: 101
+		-- upvalues: v50 (copy)
+		if n5 > 1 then
+			return n5
 		end
 
-		return n1 * v48
-	end, { v48 })
-	local n2 = 0
+		return n5 * v50
+	end, { v50 })
+	local n6 = 0
 
-	for _, v56 in v52 do
-		local v57 = v53(v56)
+	for _, v61 in v57 do
+		local v62 = v58(v61)
 
-		if n2 < v57 then
-			n2 = v57
+		if n6 < v62 then
+			n6 = v62
 		end
 	end
 
-	local u58 = math.min(n2, v48)
-	local bottom = useHardwareInsets(v44).bottom
-	local v60 = React.useRef(0)
-	local v61 = React.useRef(false)
-	local v62, v63 = useAnimatedBinding(1, function() -- line: 115
-		-- upvalues: v61 (copy), v43 (copy)
-		if v61.current then
-			v43.onClose()
+	local u63 = math.min(n6, v50)
+
+	if Flags.FoundationBottomSheetCapToOverlayHeight and v51 > 0 then
+		u63 = math.min(u63, v51)
+	end
+
+	local bottom = useHardwareInsets(v46).bottom
+	local v65 = React.useRef(0)
+	local v66 = React.useRef(false)
+	local v67, v68 = useAnimatedBinding(1, function() -- line: 125
+		-- upvalues: v66 (copy), v45 (copy)
+		if v66.current then
+			v45.onClose()
 		end
 	end)
-	local v64, v65 = React.useBinding(-bottom)
-	local v66, v67 = React.useBinding(0)
-	local v68, v69 = React.useBinding(false)
-	local v70, v71 = React.useBinding(false)
-	local u72 = nil
-	local u73 = nil
-	local u74 = nil
+	local v69, v70 = React.useBinding(-bottom)
+	local v71, v72 = React.useBinding(0)
+	local v73, v74 = React.useBinding(false)
+	local v75, v76 = React.useBinding(false)
+	local u77 = nil
+	local u78 = nil
+	local u79 = nil
 
 	if Flags.FoundationSheetFullBleed then
-		u72 = childrenHasFullBleed(v43.children)
+		u77 = childrenHasFullBleed(v45.children)
 
-		local v75, v76 = React.useBinding(0)
+		local v80, v81 = React.useBinding(0)
 
-		u73 = v75
-		u74 = v76
+		u78 = v80
+		u79 = v81
 	end
 
-	local v77 = React.useRef(0)
-	local v78 = React.useRef(nil)
-	local v79, v80 = React.useBinding(0)
-	local v81, v82 = React.useBinding(false)
-	local v83 = React.useRef(false)
-	local v84 = React.useRef(0)
-	local v85 = React.useRef(nil)
-	local v86 = React.useRef(false)
-	local v87 = React.useRef(0)
-	local v88 = React.useCallback(function() -- line: 142
-		-- upvalues: v85 (copy), v84 (copy), v86 (copy)
-		if v85.current then
-			v85.current:Disconnect()
-			v85.current = nil
+	local v82 = React.useRef(0)
+	local v83 = React.useRef(nil)
+	local v84, v85 = React.useBinding(0)
+	local v86 = if not Flags.FoundationBottomSheetInnerScrollingSync then nil else React.useRef(nil)
+	local v87, v88 = React.useBinding(false)
+	local v89 = React.useRef(false)
+	local v90 = React.useRef(0)
+	local v91 = React.useRef(nil)
+	local v92 = React.useRef(false)
+	local v93 = React.useRef(0)
+	local v94 = React.useCallback(function() -- line: 155
+		-- upvalues: v91 (copy), v90 (copy), v92 (copy)
+		if v91.current then
+			v91.current:Disconnect()
+			v91.current = nil
 		end
 
-		v84.current = 0
-		v86.current = false
+		v90.current = 0
+		v92.current = false
 	end, {})
-	local v89 = React.useCallback(function(n3: number) -- line: 151
-		-- upvalues: v88 (copy), v86 (copy), Flags (copy), v78 (copy), v85 (copy), v87 (copy)
-		v88()
-		v86.current = true
+	local v95 = React.useCallback(function(n7: number) -- line: 164
+		-- upvalues: v94 (copy), v92 (copy), Flags (copy), v83 (copy), v91 (copy), v93 (copy)
+		v94()
+		v92.current = true
 
-		if Flags.FoundationBottomSheetImproveSpring and v78.current then
-			v78.current:ResetScrollVelocity()
+		if Flags.FoundationBottomSheetImproveSpring and v83.current then
+			v83.current:ResetScrollVelocity()
 		end
 
-		local u106 = not v78.current and 0 or v78.current.CanvasPosition.Y
+		local u112 = not v83.current and 0 or v83.current.CanvasPosition.Y
 
-		v85.current = game:GetService("RunService").Heartbeat:Connect(function(dt) -- line: 163
-			-- upvalues: v78 (copy), v86 (copy), v88 (copy), Flags (copy), v87 (copy), n3 (copy), u106 (ref)
-			if not v78.current or not v86.current then
-				v88()
+		v91.current = game:GetService("RunService").Heartbeat:Connect(function(dt) -- line: 176
+			-- upvalues: v83 (copy), v92 (copy), v94 (copy), Flags (copy), v93 (copy), n7 (copy), u112 (ref)
+			if not v83.current or not v92.current then
+				v94()
 
 				return
 			end
 
-			local CanvasPositionY = v78.current.CanvasPosition.Y
-			local v137
+			local CanvasPositionY = v83.current.CanvasPosition.Y
+			local v147
 
 			if Flags.FoundationBottomSheetImproveSpring then
-				local current = v87.current
-				local v129 = n3
-				local v130 = CanvasPositionY - v129
-				local v131 = 25.132741228718345 * dt
-				local v132 = math.exp(-v131)
-				local v133 = current + 25.132741228718345 * v130
-				local v134 = (v130 + v133 * dt) * v132
-				local v135 = (current - v133 * v131) * v132
-				local v136 = v129 + v134
+				local current = v93.current
+				local v139 = n7
+				local v140 = CanvasPositionY - v139
+				local v141 = 25.132741228718345 * dt
+				local v142 = math.exp(-v141)
+				local v143 = current + 25.132741228718345 * v140
+				local v144 = (v140 + v143 * dt) * v142
+				local v145 = (current - v143 * v141) * v142
+				local v146 = v139 + v144
 
-				v87.current = v135
-				v78.current.CanvasPosition = Vector2.new(0, v136)
-				u106 = v78.current.CanvasPosition.Y
-				v137 = n3 - v78.current.CanvasPosition.Y
+				v93.current = v145
+				v83.current.CanvasPosition = Vector2.new(0, v146)
+				u112 = v83.current.CanvasPosition.Y
+				v147 = n7 - v83.current.CanvasPosition.Y
 			else
-				v137 = n3 - CanvasPositionY
+				v147 = n7 - CanvasPositionY
 
-				local v138 = v137 * 18 * 18
-				local v139 = (CanvasPositionY - u106) / dt
-				local v140 = v87
+				local v148 = v147 * 18 * 18
+				local v149 = (CanvasPositionY - u112) / dt
+				local v150 = v93
 
-				v140.current = v140.current - v139
+				v150.current = v150.current - v149
 
-				local v141 = v138 + -v87.current * 2 * 0.9 * 18
-				local v142 = math.min(dt, 0.03333333333333333)
+				local v151 = v148 + -v93.current * 2 * 0.9 * 18
+				local v152 = math.min(dt, 0.03333333333333333)
 
-				v87.current = v87.current + v141 * v142
+				v93.current = v93.current + v151 * v152
 
-				local v143 = CanvasPositionY + v87.current * v142
+				local v153 = CanvasPositionY + v93.current * v152
 
-				v78.current.CanvasPosition = Vector2.new(0, v143)
-				u106 = v78.current.CanvasPosition.Y
+				v83.current.CanvasPosition = Vector2.new(0, v153)
+				u112 = v83.current.CanvasPosition.Y
 			end
 
-			if math.abs(v137) < 0.5 and math.abs(v87.current) < 1 then
-				v78.current.CanvasPosition = Vector2.new(0, n3)
-				v88()
+			if math.abs(v147) < 0.5 and math.abs(v93.current) < 1 then
+				v83.current.CanvasPosition = Vector2.new(0, n7)
+				v94()
 			end
 		end)
-	end, { v88 })
-	local v90 = React.useCallback(function(n4: number) -- line: 210
-		-- upvalues: v53 (copy), bottom (copy)
-		return v53(n4) + bottom
+	end, { v94 })
+	local v96 = React.useCallback(function(n8: number) -- line: 224
+		-- upvalues: Flags (copy), v58 (copy), u63 (ref), bottom (copy)
+		if Flags.FoundationBottomSheetCapToOverlayHeight then
+			return math.min(v58(n8), u63) + bottom
+		end
+
+		return v58(n8) + bottom
 	end, {
 		bottom,
-		v53
+		v58,
+		if not Flags.FoundationBottomSheetCapToOverlayHeight then nil else u63
 	})
-	local v91 = React.useCallback(function(n5: number) -- line: 214
-		-- upvalues: v60 (copy), v89 (copy), v90 (copy), v52 (copy)
-		v60.current = n5
-		v89(v90(v52[n5]))
+	local v97 = React.useCallback(function(n9: number) -- line: 238
+		-- upvalues: v65 (copy), v95 (copy), v96 (copy), v57 (copy)
+		v65.current = n9
+		v95(v96(v57[n9]))
 	end, {
-		v90,
-		v52
+		v96,
+		v57
 	})
-	local v92 = React.useCallback(function(n6: number) -- line: 219
-		-- upvalues: v88 (copy), v60 (copy), v78 (copy), v90 (copy), v52 (copy)
-		v88()
-		v60.current = n6
+	local v98 = React.useCallback(function(n10: number) -- line: 243
+		-- upvalues: v94 (copy), v65 (copy), v83 (copy), v96 (copy), v57 (copy)
+		v94()
+		v65.current = n10
 
-		if v78.current then
-			v78.current.CanvasPosition = Vector2.new(0, v90(v52[n6]))
+		if v83.current then
+			v83.current.CanvasPosition = Vector2.new(0, v96(v57[n10]))
 		end
 	end, {
-		v88,
-		v90,
-		v52
+		v94,
+		v96,
+		v57
 	})
-	local v93 = React.useCallback(function(b1: boolean?) -- line: 227
-		-- upvalues: v61 (copy), reducedMotion (copy), v88 (copy), v78 (copy), v63 (copy), Otter (copy), v87 (copy), v84 (copy), v89 (copy), v45 (copy)
-		if v61.current then
+	local v99 = React.useCallback(function(b1: boolean?) -- line: 251
+		-- upvalues: v66 (copy), reducedMotion (copy), v94 (copy), v83 (copy), v68 (copy), Otter (copy), v93 (copy), v90 (copy), v95 (copy), v47 (copy)
+		if v66.current then
 			return
 		end
 
 		if reducedMotion and not b1 then
-			v61.current = true
-			v88()
+			v66.current = true
+			v94()
 
-			if v78.current then
-				v78.current.CanvasPosition = Vector2.new(0, 0)
+			if v83.current then
+				v83.current.CanvasPosition = Vector2.new(0, 0)
 			end
 
-			v63((Otter.instant(1)))
+			v68((Otter.instant(1)))
 
 			return
 		end
 
-		v87.current = -v84.current
-		v89(0)
-		v63(Otter.ease(1, {
-			duration = v45.Time.Time_100
+		v93.current = -v90.current
+		v95(0)
+		v68(Otter.ease(1, {
+			duration = v47.Time.Time_100
 		}))
-		v61.current = true
+		v66.current = true
 	end, {
-		v89,
-		v88,
+		v95,
+		v94,
 		reducedMotion
 	})
-	local v94 = React.useCallback(function() -- line: 248
-		-- upvalues: v79 (copy), v77 (copy), Flags (copy), u58 (ref), bottom (copy), v84 (copy), v83 (copy), v82 (copy)
-		local v111 = v79:getValue() <= 0
-		local v112 = v77.current >= if not Flags.FoundationBottomSheetImproveSpring then math.round(u58 + bottom) else math.floor(u58 + bottom)
+	local v100 = React.useCallback(function() -- line: 272
+		-- upvalues: v84 (copy), v82 (copy), Flags (copy), u63 (ref), bottom (copy), v90 (copy), v89 (copy), v88 (copy)
+		local v117 = v84:getValue() <= 0
+		local v118 = v82.current >= if not Flags.FoundationBottomSheetImproveSpring then math.round(u63 + bottom) else math.floor(u63 + bottom)
+		local v119 = not v118 and v90.current < 0
 
-		if v84.current > 0 and v111 and v83.current then
-			v82(false)
+		if Flags.FoundationBottomSheetInnerScrollingSync and v119 or v90.current > 0 and v117 and v89.current then
+			v88(false)
 
 			return
 		end
 
-		if (v84.current < 0 or Flags.FoundationBottomSheetImproveSpring and v84.current == 0) and v112 then
-			v82(true)
+		if (v90.current < 0 or Flags.FoundationBottomSheetImproveSpring and v90.current == 0) and v118 then
+			v88(true)
 		end
 	end, {
-		u58,
+		u63,
 		bottom
 	})
-	local v95 = React.useCallback(function() -- line: 265
-		-- upvalues: v84 (copy), v77 (copy), v52 (copy), v90 (copy), v83 (copy), v87 (copy), v93 (copy), v91 (copy)
-		local current = v84.current
-		local v114 = v77.current - current / 2.35
+	local v101 = React.useCallback(function() -- line: 293
+		-- upvalues: v90 (copy), v82 (copy), v57 (copy), v96 (copy), v89 (copy), v93 (copy), v99 (copy), v97 (copy)
+		local current = v90.current
+		local v121 = v82.current - current / 2.35
 		local t2 = {{
 			index = 0,
 			position = 0
 		}}
 
-		for v116, v117 in v52 do
+		for v123, v124 in v57 do
 			table.insert(t2, {
-				index = v116,
-				position = v90(v117)
+				index = v123,
+				position = v96(v124)
 			})
 		end
 
-		table.sort(t2, function(p3, p4) -- line: 283
-			-- upvalues: v114 (copy)
-			return math.abs(p3.position - v114) < math.abs(p4.position - v114)
+		table.sort(t2, function(p3, p4) -- line: 311
+			-- upvalues: v121 (copy)
+			return math.abs(p3.position - v121) < math.abs(p4.position - v121)
 		end)
 
-		local v118 = t2[1]
+		local v125 = t2[1]
 
-		if not v83.current then
-			v87.current = -current
+		if not v89.current then
+			v93.current = -current
 
-			if v118.index == 0 then
-				v93(true)
+			if v125.index == 0 then
+				v99(true)
 
 				return
 			end
 
-			v91(v118.index)
+			v97(v125.index)
 		end
 	end, {
-		v52,
-		v91,
-		v90,
-		v93
+		v57,
+		v97,
+		v96,
+		v99
 	})
 
-	React.useEffect(function() -- line: 299
-		-- upvalues: v44 (copy), reducedMotion (copy), v92 (copy), v43 (copy), v63 (copy), Otter (copy), v91 (copy), v45 (copy), v53 (copy), v52 (copy), u58 (ref), v82 (copy), v88 (copy)
-		if v44 then
+	React.useEffect(function() -- line: 327
+		-- upvalues: v46 (copy), reducedMotion (copy), v98 (copy), v45 (copy), v68 (copy), Otter (copy), v97 (copy), v47 (copy), Flags (copy), v58 (copy), v57 (copy), u63 (ref), v88 (copy), v94 (copy)
+		if v46 then
 			if reducedMotion then
-				v92(v43.defaultSnapPointIndex)
-				v63(Otter.instant(0))
+				v98(v45.defaultSnapPointIndex)
+				v68(Otter.instant(0))
 			else
-				v91(v43.defaultSnapPointIndex)
-				v63(Otter.ease(0, {
-					duration = v45.Time.Time_100
+				v97(v45.defaultSnapPointIndex)
+				v68(Otter.ease(0, {
+					duration = v47.Time.Time_100
 				}))
 			end
 
-			if v53(v52[v43.defaultSnapPointIndex]) == u58 then
-				v82(true)
+			local v126 = if not Flags.FoundationBottomSheetCapToOverlayHeight then v58(v57[v45.defaultSnapPointIndex]) == u63 else v58(v57[v45.defaultSnapPointIndex]) >= u63
+
+			if Flags.FoundationBottomSheetInnerScrollingSync then
+				v88(v126)
+			elseif v126 then
+				v88(true)
 			end
 		end
 
-		return function() -- line: 317
-			-- upvalues: v88 (copy)
-			v88()
+		return function() -- line: 349
+			-- upvalues: v94 (copy)
+			v94()
 		end
 	end, {
-		v44,
-		v52,
-		v43.defaultSnapPointIndex,
-		v91,
-		v53,
-		v92,
+		v46,
+		v57,
+		v45.defaultSnapPointIndex,
+		v97,
+		v58,
+		v98,
 		reducedMotion
 	})
-	React.useEffect(function() -- line: 335
-		-- upvalues: v84 (copy), v94 (copy), v83 (copy), v88 (copy), Flags (copy), v78 (copy), v77 (copy), u58 (ref), bottom (copy), v61 (copy), v82 (copy), v95 (copy)
-		local connection = game:GetService("UserInputService").TouchPan:Connect(function(_, _, p7, _) -- line: 336
-			-- upvalues: v84 (copy), v94 (copy)
-			v84.current = p7.Y
+	React.useEffect(function() -- line: 367
+		-- upvalues: v90 (copy), v100 (copy), v89 (copy), v94 (copy), Flags (copy), v83 (copy), v82 (copy), u63 (ref), bottom (copy), v66 (copy), v88 (copy), v101 (copy)
+		local connection = game:GetService("UserInputService").TouchPan:Connect(function(_, _, p7, _) -- line: 368
+			-- upvalues: v90 (copy), v100 (copy)
+			v90.current = p7.Y
+			v100()
+		end)
+		local connection2 = game:GetService("UserInputService").InputBegan:Connect(function() -- line: 372
+			-- upvalues: v89 (copy), v90 (copy), v94 (copy)
+			v89.current = true
+			v90.current = 0
 			v94()
 		end)
-		local connection2 = game:GetService("UserInputService").InputBegan:Connect(function() -- line: 340
-			-- upvalues: v83 (copy), v84 (copy), v88 (copy)
-			v83.current = true
-			v84.current = 0
-			v88()
-		end)
-		local connection3 = game:GetService("UserInputService").InputEnded:Connect(function() -- line: 345
-			-- upvalues: v83 (copy), Flags (copy), v78 (copy), v84 (copy), v77 (copy), u58 (ref), bottom (copy), v61 (copy), v82 (copy), v95 (copy)
-			if v83.current == false then
+		local connection3 = game:GetService("UserInputService").InputEnded:Connect(function() -- line: 377
+			-- upvalues: v89 (copy), Flags (copy), v83 (copy), v90 (copy), v82 (copy), u63 (ref), bottom (copy), v66 (copy), v88 (copy), v101 (copy)
+			if v89.current == false then
 				return
 			end
 
-			v83.current = false
+			v89.current = false
 
 			if Flags.FoundationBottomSheetImproveSpring then
-				v84.current = not v78.current and 0 or v78.current:GetScrollVelocity().Y
+				v90.current = not v83.current and 0 or v83.current:GetScrollVelocity().Y
 
-				if v77.current >= math.floor(u58 + bottom) or v61.current then
-					v82(true)
+				if v82.current >= math.floor(u63 + bottom) or v66.current then
+					v88(true)
 
 					return
 				end
 			else
-				local v150 = nil
+				local v160 = nil
 
-				if v78.current then
-					local ok, result = pcall(function() -- line: 370
-						-- upvalues: v78 (copy)
-						return v78.current:GetScrollVelocity().Y == 0
+				if v83.current then
+					local ok, result = pcall(function() -- line: 402
+						-- upvalues: v83 (copy)
+						return v83.current:GetScrollVelocity().Y == 0
 					end)
 
 					if ok then
-						v150 = result
+						v160 = result
 					end
 				end
 
-				if v150 or v61.current then
-					v82(true)
+				if v160 or v66.current then
+					v88(true)
 
 					return
 				end
 			end
 
-			v95()
+			v101()
 		end)
 
-		return function() -- line: 391
+		return function() -- line: 423
 			-- upvalues: connection (copy), connection2 (copy), connection3 (copy)
 			connection:Disconnect()
 			connection2:Disconnect()
 			connection3:Disconnect()
 		end
 	end, {
-		v44,
-		v95,
-		v94,
-		v88
+		v46,
+		v101,
+		v100,
+		v94
 	})
 
-	local v96 = React.useRef(nil)
-	local v97, v98 = React.useState(nil)
-	local v99, v100 = React.useState(nil)
-	local v101 = ReactUtils.useComposedRef(p2, v100)
+	local v102 = React.useRef(nil)
+	local v103, v104 = React.useState(nil)
+	local v105, v106 = React.useState(nil)
+	local v107 = ReactUtils.useComposedRef(p2, v106)
 
-	React.useImperativeHandle(v43.sheetRef, function() -- line: 404
-		-- upvalues: v93 (copy)
+	React.useImperativeHandle(v45.sheetRef, function() -- line: 436
+		-- upvalues: v99 (copy)
 		return {
-			close = v93
+			close = v99
 		}
 	end, {})
 
-	local v102 = React.useMemo(function() -- line: 411
-		-- upvalues: v66 (copy), v67 (copy), v68 (copy), v69 (copy), v64 (copy), v65 (copy), bottom (copy), v81 (copy), v79 (copy), v80 (copy), v94 (copy), v70 (copy), v71 (copy), Flags (copy), u72 (ref), u73 (ref), u74 (ref), v93 (copy), SheetType (copy), v99 (copy), v43 (copy), v96 (copy), v97 (copy), v98 (copy)
+	local v108 = React.useMemo(function() -- line: 443
+		-- upvalues: v71 (copy), v72 (copy), v73 (copy), v74 (copy), v69 (copy), v70 (copy), bottom (copy), v87 (copy), v84 (copy), Flags (copy), v86 (copy), v85 (copy), v100 (copy), v75 (copy), v76 (copy), u77 (ref), u78 (ref), u79 (ref), v99 (copy), SheetType (copy), v105 (copy), v45 (copy), v102 (copy), v103 (copy), v104 (copy)
 		return {
-			actionsHeight = v66,
-			setActionsHeight = v67,
-			hasActionsDivider = v68,
-			setHasActionsDivider = v69,
-			sheetHeightAvailable = v64,
-			setSheetHeightAvailable = v65,
-			safeAreaPadding = bottom,
 			bottomPadding = 200,
-			innerScrollingEnabled = v81,
-			innerScrollY = v79,
-			setInnerScrollY = function(n7: number) --[[ setInnerScrollY ]] -- line: 423
-				-- upvalues: v80 (copy), v94 (copy)
-				v80(n7)
-				v94()
+			actionsHeight = v71,
+			setActionsHeight = v72,
+			hasActionsDivider = v73,
+			setHasActionsDivider = v74,
+			sheetHeightAvailable = v69,
+			setSheetHeightAvailable = v70,
+			safeAreaPadding = bottom,
+			innerScrollingEnabled = v87,
+			innerScrollY = v84,
+			innerScrollingRef = if not Flags.FoundationBottomSheetInnerScrollingSync then nil else v86,
+			setInnerScrollY = function(n11: number) -- line: 456
+				-- upvalues: v85 (copy), v100 (copy)
+				v85(n11)
+				v100()
 			end,
-			hasHeader = v70,
-			setHasHeader = v71,
-			hasFullBleed = if not Flags.FoundationSheetFullBleed then nil else u72,
-			fullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u73,
-			setFullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u74,
-			closeSheet = v93,
+			hasHeader = v75,
+			setHasHeader = v76,
+			hasFullBleed = if not Flags.FoundationSheetFullBleed then nil else u77,
+			fullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u78,
+			setFullBleedHeight = if not Flags.FoundationSheetFullBleed then nil else u79,
+			closeSheet = v99,
 			hasRadius = not not Flags.FoundationSheetFullBleed or nil,
 			sheetType = SheetType.Bottom,
-			innerSurface = v99,
-			testId = v43.testId,
-			closeAffordanceRef = v96,
-			contentStartRef = v97,
-			setContentStartRef = v98
+			innerSurface = v105,
+			testId = v45.testId,
+			closeAffordanceRef = v102,
+			contentStartRef = v103,
+			setContentStartRef = v104
 		}
 	end, {
-		v43.testId,
-		v93,
-		bottom,
-		v94,
+		v45.testId,
 		v99,
-		v96,
-		v97,
-		u72
+		bottom,
+		v100,
+		v105,
+		v102,
+		v103,
+		u77
 	})
-	local v103 = React.createElement(View, {
+	local v109 = React.createElement(View, {
 		ZIndex = 3,
-		backgroundStyle = v45.Color.Content.Muted,
-		Position = if not Flags.FoundationSheetFullBleed then nil else UDim2.new(0.5, 0, 0, if not u72 then -v45.Padding.XSmall else v45.Padding.Small),
-		AnchorPoint = if not Flags.FoundationSheetFullBleed then nil else Vector2.new(0.5, 0),
 		tag = "align-y-center size-1000-100 padding-y-small radius-small",
-		testId = `{ v43.testId }--gripper`
+		backgroundStyle = v47.Color.Content.Muted,
+		Position = if not Flags.FoundationSheetFullBleed then nil else UDim2.new(0.5, 0, 0, if not u77 then -v47.Padding.XSmall else v47.Padding.Small),
+		AnchorPoint = if not Flags.FoundationSheetFullBleed then nil else Vector2.new(0.5, 0),
+		testId = `{ v45.testId }--gripper`
 	}, {
 		TouchTarget = React.createElement(View, {
 			tag = "size-1000-600",
 			stateLayer = {
 				affordance = StateLayerAffordance.None
 			},
-			onActivated = function() --[[ onActivated ]] -- line: 469
-				-- upvalues: v83 (copy), v52 (copy), v60 (copy), reducedMotion (copy), v92 (copy), v91 (copy), v53 (copy), u58 (ref), v82 (copy), v93 (copy)
-				v83.current = false
+			onActivated = function() -- line: 502
+				-- upvalues: v89 (copy), Flags (copy), v86 (copy), v85 (copy), v57 (copy), v65 (copy), reducedMotion (copy), v98 (copy), v97 (copy), v58 (copy), u63 (ref), v88 (copy), v99 (copy)
+				v89.current = false
 
-				if #v52 > 1 then
-					local v122 = v60.current % #v52 + 1
+				if Flags.FoundationBottomSheetInnerScrollingSync and v86.current then
+					v85(0)
+					v86.current.CanvasPosition = Vector2.new(0, 0)
+					v86.current:ResetScrollVelocity()
+				end
+
+				if #v57 > 1 then
+					local v130 = v65.current % #v57 + 1
 
 					if reducedMotion then
-						v92(v122)
+						v98(v130)
 					else
-						v91(v122)
+						v97(v130)
 					end
 
-					if v53(v52[v122]) == u58 then
-						v82(true)
+					local v131 = if not Flags.FoundationBottomSheetCapToOverlayHeight then v58(v57[v130]) == u63 else v58(v57[v130]) >= u63
+
+					if Flags.FoundationBottomSheetInnerScrollingSync then
+						v88(v131)
+
+						return
+					end
+
+					if v131 then
+						v88(true)
 
 						return
 					end
 				else
-					v93()
+					v99()
 				end
 			end
 		})
 	})
 
-	return v44 and ReactRoblox.createPortal(React.createElement(View, {
-		ZIndex = v46.zIndex,
-		ref = v101,
+	return v46 and ReactRoblox.createPortal(React.createElement(View, {
+		tag = "size-full",
+		ZIndex = v48.zIndex,
+		ref = v107,
 		selection = Types.nonSelectable,
 		selectionGroup = Types.isolatedSelectionGroup,
-		tag = "size-full",
-		testId = `{ v43.testId }--surface`
+		testId = `{ v45.testId }--surface`,
+		onAbsoluteSizeChanged = if not Flags.FoundationBottomSheetCapToOverlayHeight then nil else function(p9) -- line: 544
+			-- upvalues: u52 (ref)
+			u52(p9.AbsoluteSize.Y)
+		end
 	}, React.createElement("ScrollingFrame", {
 		Size = UDim2.fromScale(1, 1),
-		CanvasSize = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.new(1, 0, 0, v48 + u58 + bottom) else UDim2.new(1, 0, 1, u58 + bottom),
+		CanvasSize = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.new(1, 0, 0, v50 + u63 + bottom) else UDim2.new(1, 0, 1, u63 + bottom),
 		ClipsDescendants = false,
 		BackgroundTransparency = 1,
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 		ScrollBarThickness = 0,
-		ref = v78,
-		[React.Change.CanvasPosition] = function(p9) -- line: 512
-			-- upvalues: v77 (copy), v65 (copy), bottom (copy), v45 (copy), v94 (copy), v93 (copy)
-			v77.current = p9.CanvasPosition.Y
-			v65(v77.current - bottom - v45.Margin.Small)
-			v94()
+		ref = v83,
+		[React.Change.CanvasPosition] = function(p10) -- line: 559
+			-- upvalues: v82 (copy), v70 (copy), bottom (copy), v47 (copy), v100 (copy), v99 (copy)
+			v82.current = p10.CanvasPosition.Y
+			v70(v82.current - bottom - v47.Margin.Small)
+			v100()
 
-			if v77.current <= 0 then
-				v93()
+			if v82.current <= 0 then
+				v99()
 			end
 		end
 	}, {
 		SheetContainer = React.createElement(View, {
-			Size = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.new(1, 0, 0, v48 + 200) else UDim2.new(1, 0, 1, 200 - u58 - bottom),
-			Position = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.fromOffset(0, v48 + bottom) else UDim2.new(0, 0, 1, -u58),
-			ZIndex = 3
+			ZIndex = 3,
+			Size = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.new(1, 0, 0, v50 + 200) else UDim2.new(1, 0, 1, 200 - u63 - bottom),
+			Position = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.fromOffset(0, v50 + bottom) else UDim2.new(0, 0, 1, -u63)
 		}, {
 			Sheet = React.createElement(View, {
-				Size = if v43.snapPoints ~= nil then UDim2.new(1, 0, 0, u58 + 200) else UDim2.fromScale(1, 0),
-				AutomaticSize = if v43.snapPoints ~= nil then nil else Enum.AutomaticSize.Y,
-				onAbsoluteSizeChanged = if v43.snapPoints ~= nil then nil else function(p10) -- line: 536
-					-- upvalues: v50 (copy)
-					v50(p10.AbsoluteSize.Y - 200)
+				Size = if v45.snapPoints ~= nil then UDim2.new(1, 0, 0, u63 + 200) else UDim2.fromScale(1, 0),
+				AutomaticSize = if v45.snapPoints ~= nil then nil else Enum.AutomaticSize.Y,
+				onAbsoluteSizeChanged = if v45.snapPoints ~= nil then nil else function(p11) -- line: 583
+					-- upvalues: v55 (copy)
+					v55(p11.AbsoluteSize.Y - 200)
 				end,
 				stateLayer = {
 					affordance = StateLayerAffordance.None
 				},
 				onActivated = Dash.noop,
-				testId = v43.testId,
+				testId = v45.testId,
 				tag = not Flags.FoundationSheetFullBleed and "col items-center padding-top-small radius-large clip bg-surface-100" or {
 					["col items-center radius-large clip bg-surface-100"] = true,
-					["padding-top-medium"] = not u72
+					["padding-top-medium"] = not u77
 				}
 			}, {
-				GripperContainer = if not Flags.FoundationSheetFullBleed then v103 else React.createElement("Folder", nil, {
-					Gripper = v103
+				GripperContainer = if not Flags.FoundationSheetFullBleed then v109 else React.createElement("Folder", nil, {
+					Gripper = v109
 				}),
 				Content = React.createElement(SheetContext.Provider, {
-					value = v102
+					value = v108
 				}, React.createElement(ElevationOwnerScope, {
-					owner = v46
-				}, v43.children))
+					owner = v48
+				}, v45.children))
 			})
 		}),
 		Shadow = React.createElement(Image, {
-			Image = SHADOW_IMAGE,
-			Size = UDim2.new(1, SHADOW_SIZE * 2, 0, u58 + 200 + SHADOW_SIZE * 2),
-			Position = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.fromOffset(-SHADOW_SIZE, v48 + bottom - SHADOW_SIZE) else UDim2.new(-SHADOW_SIZE, 0, 1, -u58 - SHADOW_SIZE),
 			ZIndex = 2,
+			Image = SHADOW_IMAGE,
+			Size = UDim2.new(1, SHADOW_SIZE * 2, 0, u63 + 200 + SHADOW_SIZE * 2),
+			Position = if not Flags.FoundationSheetPreventCloseOnResize then UDim2.fromOffset(-SHADOW_SIZE, v50 + bottom - SHADOW_SIZE) else UDim2.new(-SHADOW_SIZE, 0, 1, -u63 - SHADOW_SIZE),
 			slice = {
-				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1),
-				scale = 2
+				scale = 2,
+				center = Rect.new(SHADOW_SIZE, SHADOW_SIZE, SHADOW_SIZE + 1, SHADOW_SIZE + 1)
 			},
-			imageStyle = v45.Color.Extended.Black.Black_10
+			imageStyle = v47.Color.Extended.Black.Black_10
 		}),
 		Backdrop = React.createElement(View, {
+			ZIndex = 1,
 			Size = UDim2.fromScale(1, 2),
 			Position = UDim2.fromScale(0, -0.5),
-			ZIndex = 1,
 			stateLayer = {
 				affordance = StateLayerAffordance.None
 			},
-			backgroundStyle = v62:map(function(n8: number) -- line: 585
-				-- upvalues: v45 (copy)
+			backgroundStyle = v67:map(function(n12: number) -- line: 632
+				-- upvalues: v47 (copy)
 				return {
-					Color3 = v45.Color.Common.Backdrop.Color3,
-					Transparency = math.lerp(v45.Color.Common.Backdrop.Transparency, 1, n8)
+					Color3 = v47.Color.Common.Backdrop.Color3,
+					Transparency = math.lerp(v47.Color.Common.Backdrop.Transparency, 1, n12)
 				}
 			end),
-			onActivated = function() --[[ onActivated ]] -- line: 591
-				-- upvalues: v93 (copy)
-				v93()
+			onActivated = function() -- line: 638
+				-- upvalues: v99 (copy)
+				v99()
 			end,
-			testId = `{ v43.testId }--backdrop`
+			testId = `{ v45.testId }--backdrop`
 		})
-	})), v44)
-end))
+	})), v46)
+end
+
+return React.memo(React.forwardRef(BottomSheet))

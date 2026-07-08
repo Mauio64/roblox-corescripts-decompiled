@@ -1,12 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local _ = require(l_Parent_0.Enums.PromptType);
-local _ = require(l_Parent_0.Types);
-return v2.makeActionCreator(script.Name, function(v5, v6, v7) --[[ Line: 15 ]]
-    return {
-        promptData = v7, 
-        promptId = v5, 
-        promptType = v6
-    };
-end);
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+
+require(ParentParent.Enums.PromptType)
+require(ParentParent.Types)
+
+return Rodux.makeActionCreator(script.Name, function(p1, p2, p3) -- line: 15
+	return {
+		promptData = p3,
+		promptId = p1,
+		promptType = p2
+	}
+end)

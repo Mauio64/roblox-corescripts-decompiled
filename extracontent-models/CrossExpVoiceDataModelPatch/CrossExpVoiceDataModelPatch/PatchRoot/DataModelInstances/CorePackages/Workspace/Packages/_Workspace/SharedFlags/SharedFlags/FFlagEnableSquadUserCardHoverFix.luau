@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSquadUserCardHoverFix", false);
+return game:DefineFastFlag("EnableSquadUserCardHoverFix", false)

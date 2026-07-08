@@ -1,21 +1,24 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(script.Parent.ReportConfirmationContainer);
-local v4 = require(script.Parent.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider);
-local v5 = v1.PureComponent:extend("ReportConfirmationScreen");
-v5.validateProps = v2.interface({
-    closeMenu = v2.callback, 
-    player = v2.interface({
-        DisplayName = v2.string, 
-        Name = v2.string, 
-        UserId = v2.number
-    })
-});
-v5.render = function(v6) --[[ Line: 21 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v1 (copy), v3 (copy)
-    return v4({
-        reportConfirmationContainer = v1.createElement(v3, v6.props)
-    });
-end;
-return v5;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local ReportConfirmationContainer = require(script.Parent.ReportConfirmationContainer)
+local renderWithCoreScriptsStyleProvider = require(script.Parent.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider)
+local v6 = Roact.PureComponent:extend("ReportConfirmationScreen")
+
+v6.validateProps = t.interface({
+	closeMenu = t.callback,
+	player = t.interface({
+		DisplayName = t.string,
+		Name = t.string,
+		UserId = t.number
+	})
+})
+
+function v6.render(p1) -- line: 21
+	-- upvalues: renderWithCoreScriptsStyleProvider (copy), Roact (copy), ReportConfirmationContainer (copy)
+	return renderWithCoreScriptsStyleProvider({
+		reportConfirmationContainer = Roact.createElement(ReportConfirmationContainer, p1.props)
+	})
+end
+
+return v6

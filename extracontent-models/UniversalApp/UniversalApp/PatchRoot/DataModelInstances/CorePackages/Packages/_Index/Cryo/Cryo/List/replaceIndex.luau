@@ -1,13 +1,18 @@
-return function(v0, v1, v2) --[[ Line: 5 ]] --[[ Name: replaceIndex ]]
-    local v3 = {};
-    local v4 = #v0;
-    assert(v1 <= v4, "index must be less or equal than the list length");
-    for v5 = 1, v4 do
-        if v5 == v1 then
-            v3[v5] = v2;
-        else
-            v3[v5] = v0[v5];
-        end;
-    end;
-    return v3;
-end;
+local function replaceIndex(p1, p2, p3) -- line: 5
+	local t1 = {}
+	local v6 = #p1
+
+	assert(p2 <= v6, "index must be less or equal than the list length")
+
+	for i = 1, v6 do
+		if i == p2 then
+			t1[i] = p3
+		else
+			t1[i] = p1[i]
+		end
+	end
+
+	return t1
+end
+
+return replaceIndex

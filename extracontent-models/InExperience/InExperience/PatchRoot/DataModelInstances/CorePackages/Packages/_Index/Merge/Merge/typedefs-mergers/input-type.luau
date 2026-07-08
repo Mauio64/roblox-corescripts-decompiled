@@ -1,37 +1,45 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Boolean_0 = v1.Boolean;
-local l_Error_0 = v1.Error;
-local l_Object_0 = v1.Object;
-local v5 = {};
-local _ = require(script.Parent["merge-typedefs_types"]);
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_mergeFields_0 = require(script.Parent.fields).mergeFields;
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-v5.mergeInputType = function(v10, v11, v12) --[[ Line: 29 ]] --[[ Name: mergeInputType ]]
-    -- upvalues: l_Boolean_0 (copy), l_mergeFields_0 (copy), l_mergeDirectives_0 (copy), l_Error_0 (copy), l_Object_0 (copy), l_Kind_0 (copy)
-    if l_Boolean_0.toJSBoolean(v11) then
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 37 ]]
-            -- upvalues: v10 (copy), l_Boolean_0 (ref), v11 (copy), v12 (copy), l_mergeFields_0 (ref), l_mergeDirectives_0 (ref)
-            return {
-                name = v10.name, 
-                description = if l_Boolean_0.toJSBoolean(v10.description) then v10.description else v11.description, 
-                kind = (not (not l_Boolean_0.toJSBoolean(v12 and v12.convertExtensions) and v10.kind ~= "InputObjectTypeDefinition") or v11.kind == "InputObjectTypeDefinition") and "InputObjectTypeDefinition" or "InputObjectTypeExtension", 
-                loc = v10.loc, 
-                fields = l_mergeFields_0(v10, v10.fields, v11.fields, v12), 
-                directives = l_mergeDirectives_0(v10.directives, v11.directives, v12)
-            };
-        end);
-        if not l_status_0 then
-            error(l_Error_0.new(("Unable to merge GraphQL input type \"%s\": %s"):format(tostring(v10.name.value), (tostring(l_result_0.message)))));
-        end;
-        return l_result_0;
-    elseif v12 and l_Boolean_0.toJSBoolean(v12.convertExtensions) then
-        return (l_Object_0.assign({}, v10, {
-            kind = l_Kind_0.INPUT_OBJECT_TYPE_DEFINITION
-        }));
-    else
-        return v10;
-    end;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Error = LuauPolyfill.Error
+local Object = LuauPolyfill.Object
+local t1 = {}
+
+require(script.Parent["merge-typedefs_types"])
+
+local Kind = require(ParentParent.GraphQL).Kind
+local mergeFields = require(script.Parent.fields).mergeFields
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+
+function t1.mergeInputType(p1, p2, p3) -- line: 29
+	-- upvalues: Boolean (copy), mergeFields (copy), mergeDirectives (copy), Error (copy), Object (copy), Kind (copy)
+	if Boolean.toJSBoolean(p2) then
+		local ok, result = pcall(function() -- line: 37
+			-- upvalues: p1 (copy), Boolean (copy), p2 (copy), p3 (copy), mergeFields (copy), mergeDirectives (copy)
+			return {
+				name = p1.name,
+				description = if not Boolean.toJSBoolean(p1.description) then p2.description else p1.description,
+				kind = not Boolean.toJSBoolean(p3 and p3.convertExtensions) and (p1.kind ~= "InputObjectTypeDefinition" and p2.kind ~= "InputObjectTypeDefinition") and "InputObjectTypeExtension" or "InputObjectTypeDefinition",
+				loc = p1.loc,
+				fields = mergeFields(p1, p1.fields, p2.fields, p3),
+				directives = mergeDirectives(p1.directives, p2.directives, p3)
+			}
+		end)
+
+		if not ok then
+			error(Error.new(("Unable to merge GraphQL input type \"%s\": %s"):format(tostring(p1.name.value), (tostring(result.message)))))
+		end
+
+		return result
+	end
+
+	if p3 and Boolean.toJSBoolean(p3.convertExtensions) then
+		return (Object.assign({}, p1, {
+			kind = Kind.INPUT_OBJECT_TYPE_DEFINITION
+		}))
+	end
+
+	return p1
+end
+
+return t1

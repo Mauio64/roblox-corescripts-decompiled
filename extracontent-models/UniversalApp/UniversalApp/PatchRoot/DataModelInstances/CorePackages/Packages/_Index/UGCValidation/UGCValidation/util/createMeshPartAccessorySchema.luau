@@ -1,48 +1,51 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: createMeshPartAccessorySchema ]]
-    assert(v0, "attachmentName cannot be nil");
-    return {
-        ClassName = "Accessory", 
-        _children = {
-            {
-                Name = "ThumbnailConfiguration", 
-                ClassName = "Configuration", 
-                _optional = true, 
-                _children = {
-                    {
-                        Name = "ThumbnailCameraTarget", 
-                        ClassName = "ObjectValue"
-                    }, 
-                    {
-                        Name = "ThumbnailCameraValue", 
-                        ClassName = "CFrameValue"
-                    }
-                }
-            }, 
-            {
-                Name = "Handle", 
-                ClassName = "MeshPart", 
-                _children = {
-                    {
-                        Name = v0, 
-                        ClassName = "Attachment"
-                    }, 
-                    {
-                        ClassName = "SurfaceAppearance", 
-                        Name = "SurfaceAppearance", 
-                        _optional = true
-                    }, 
-                    {
-                        ClassName = "StringValue", 
-                        Name = "AvatarPartScaleType", 
-                        _optional = true
-                    }, 
-                    {
-                        ClassName = "TouchTransmitter", 
-                        Name = "TouchInterest", 
-                        _optional = true
-                    }
-                }
-            }
-        }
-    };
-end;
+local function createMeshPartAccessorySchema(p1) -- line: 2
+	assert(p1, "attachmentName cannot be nil")
+
+	return {
+		ClassName = "Accessory",
+		_children = {
+			{
+				Name = "ThumbnailConfiguration",
+				ClassName = "Configuration",
+				_optional = true,
+				_children = {
+					{
+						Name = "ThumbnailCameraTarget",
+						ClassName = "ObjectValue"
+					},
+					{
+						Name = "ThumbnailCameraValue",
+						ClassName = "CFrameValue"
+					}
+				}
+			},
+			{
+				Name = "Handle",
+				ClassName = "MeshPart",
+				_children = {
+					{
+						ClassName = "Attachment",
+						Name = p1
+					},
+					{
+						ClassName = "SurfaceAppearance",
+						Name = "SurfaceAppearance",
+						_optional = true
+					},
+					{
+						ClassName = "StringValue",
+						Name = "AvatarPartScaleType",
+						_optional = true
+					},
+					{
+						ClassName = "TouchTransmitter",
+						Name = "TouchInterest",
+						_optional = true
+					}
+				}
+			}
+		}
+	}
+end
+
+return createMeshPartAccessorySchema

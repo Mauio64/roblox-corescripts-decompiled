@@ -1,77 +1,91 @@
-local l_RunService_0 = game:GetService("RunService");
-local v1 = require(script.Parent.createSignal);
-local v2 = {
-    prototype = {}
-};
-v2.__index = v2.prototype;
-local function v5(v3) --[[ Line: 9 ]] --[[ Name: createSingleMotor ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    assert(typeof(v3) == "number");
-    local v4 = {
-        __goal = nil, 
-        __state = {
-            value = v3, 
-            complete = true
-        }, 
-        __onComplete = v1(), 
-        __onStep = v1(), 
-        __running = false
-    };
-    setmetatable(v4, v2);
-    return v4;
-end;
-v2.prototype.start = function(v6) --[[ Line: 28 ]] --[[ Name: start ]]
-    -- upvalues: l_RunService_0 (copy)
-    if v6.__running then
-        return;
-    else
-        v6.__connection = l_RunService_0.Heartbeat:Connect(function(v7) --[[ Line: 33 ]]
-            -- upvalues: v6 (copy)
-            v6:step(v7);
-        end);
-        v6.__running = true;
-        return;
-    end;
-end;
-v2.prototype.stop = function(v8) --[[ Line: 40 ]] --[[ Name: stop ]]
-    if v8.__connection ~= nil then
-        v8.__connection:Disconnect();
-    end;
-    v8.__running = false;
-end;
-v2.prototype.step = function(v9, v10) --[[ Line: 48 ]] --[[ Name: step ]]
-    assert(typeof(v10) == "number");
-    if v9.__state.complete then
-        return;
-    elseif v9.__goal == nil then
-        return;
-    else
-        local v11 = v9.__goal:step(v9.__state, v10);
-        if v11 ~= nil then
-            v9.__state = v11;
-        end;
-        v9.__onStep:fire(v9.__state.value);
-        if v9.__state.complete and v9.__running then
-            v9:stop();
-            v9.__onComplete:fire(v9.__state.value);
-        end;
-        return;
-    end;
-end;
-v2.prototype.setGoal = function(v12, v13) --[[ Line: 73 ]] --[[ Name: setGoal ]]
-    v12.__goal = v13;
-    v12.__state.complete = false;
-    v12:start();
-end;
-v2.prototype.onStep = function(v14, v15) --[[ Line: 79 ]] --[[ Name: onStep ]]
-    assert(typeof(v15) == "function");
-    return v14.__onStep:subscribe(v15);
-end;
-v2.prototype.onComplete = function(v16, v17) --[[ Line: 85 ]] --[[ Name: onComplete ]]
-    assert(typeof(v17) == "function");
-    return v16.__onComplete:subscribe(v17);
-end;
-v2.prototype.destroy = function(v18) --[[ Line: 91 ]] --[[ Name: destroy ]]
-    v18:stop();
-end;
-return v5;
+local RunService = game:GetService("RunService")
+local createSignal = require(script.Parent.createSignal)
+local t1 = {
+	prototype = {}
+}
+
+t1.__index = t1.prototype
+
+local function createSingleMotor(p1) -- line: 9
+	-- upvalues: createSignal (copy), t1 (copy)
+	assert(typeof(p1) == "number")
+
+	local t2 = {
+		__goal = nil,
+		__running = false,
+		__state = {
+			complete = true,
+			value = p1
+		},
+		__onComplete = createSignal(),
+		__onStep = createSignal()
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+
+function t1.prototype.start(p2) -- line: 28
+	-- upvalues: RunService (copy)
+	if p2.__running then
+		return
+	end
+
+	p2.__connection = RunService.Heartbeat:Connect(function(dt) -- line: 33
+		-- upvalues: p2 (copy)
+		p2:step(dt)
+	end)
+	p2.__running = true
+end
+function t1.prototype.stop(p3) -- line: 40
+	if p3.__connection ~= nil then
+		p3.__connection:Disconnect()
+	end
+
+	p3.__running = false
+end
+function t1.prototype.step(p4, p5) -- line: 48
+	assert(typeof(p5) == "number")
+
+	if p4.__state.complete then
+		return
+	end
+
+	if p4.__goal == nil then
+		return
+	end
+
+	local v11 = p4.__goal:step(p4.__state, p5)
+
+	if v11 ~= nil then
+		p4.__state = v11
+	end
+
+	p4.__onStep:fire(p4.__state.value)
+
+	if p4.__state.complete and p4.__running then
+		p4:stop()
+		p4.__onComplete:fire(p4.__state.value)
+	end
+end
+function t1.prototype.setGoal(p6, p7) -- line: 73
+	p6.__goal = p7
+	p6.__state.complete = false
+	p6:start()
+end
+function t1.prototype.onStep(p8, p9) -- line: 79
+	assert(typeof(p9) == "function")
+
+	return p8.__onStep:subscribe(p9)
+end
+function t1.prototype.onComplete(p10, p11) -- line: 85
+	assert(typeof(p11) == "function")
+
+	return p10.__onComplete:subscribe(p11)
+end
+function t1.prototype.destroy(p12) -- line: 91
+	p12:stop()
+end
+
+return createSingleMotor

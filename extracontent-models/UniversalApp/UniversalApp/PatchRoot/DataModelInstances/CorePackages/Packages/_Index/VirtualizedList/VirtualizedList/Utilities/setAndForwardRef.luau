@@ -1,20 +1,27 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.React);
-return function(v2) --[[ Line: 57 ]] --[[ Name: setAndForwardRef ]]
-    local l_getForwardedRef_0 = v2.getForwardedRef;
-    local l_setLocalRef_0 = v2.setLocalRef;
-    return function(v5) --[[ Line: 59 ]]
-        -- upvalues: l_getForwardedRef_0 (copy), l_setLocalRef_0 (copy)
-        local v6 = l_getForwardedRef_0();
-        l_setLocalRef_0(v5);
-        if typeof(v6) == "function" then
-            v6(v5);
-            return;
-        else
-            if typeof(v6) == "table" then
-                v6.current = v5;
-            end;
-            return;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.React)
+
+local function setAndForwardRef(p1) -- line: 57
+	local getForwardedRef = p1.getForwardedRef
+	local setLocalRef = p1.setLocalRef
+
+	return function(p2) -- line: 59
+		-- upvalues: getForwardedRef (copy), setLocalRef (copy)
+		local v7 = getForwardedRef()
+
+		setLocalRef(p2)
+
+		if typeof(v7) == "function" then
+			v7(p2)
+
+			return
+		end
+
+		if typeof(v7) == "table" then
+			v7.current = p2
+		end
+	end
+end
+
+return setAndForwardRef

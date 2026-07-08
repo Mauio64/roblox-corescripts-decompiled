@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ConfirmationButtonsUseGreyButtons", false);
+return game:DefineFastFlag("ConfirmationButtonsUseGreyButtons", false)

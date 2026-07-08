@@ -1,40 +1,48 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local function v4(v3) --[[ Line: 15 ]] --[[ Name: CornerSlot ]]
-    -- upvalues: v1 (copy)
-    return v1.createElement("Frame", {
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        AnchorPoint = v3.AnchorPoint, 
-        Position = v3.Position, 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        ZIndex = v3.ZIndex
-    }, v3.children);
-end;
-return function(v5) --[[ Line: 34 ]] --[[ Name: ItemCardHeaderCornersOverlay ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v4 (copy)
-    local l_Small_0 = l_useTokens_0().Gap.Small;
-    return v1.createElement(v1.Fragment, nil, {
-        ItemCardHeaderTopLeftSlot = if v5.topLeftSlot then v1.createElement(v4, {
-            AnchorPoint = Vector2.new(0, 0), 
-            Position = UDim2.fromOffset(l_Small_0, l_Small_0), 
-            ZIndex = v5.ZIndex or 2
-        }, v5.topLeftSlot) else nil, 
-        ItemCardHeaderTopRightSlot = if v5.topRightSlot then v1.createElement(v4, {
-            AnchorPoint = Vector2.new(1, 0), 
-            Position = UDim2.new(1, -l_Small_0, 0, l_Small_0), 
-            ZIndex = v5.ZIndex or 2
-        }, v5.topRightSlot) else nil, 
-        ItemCardHeaderBottomLeftSlot = if v5.bottomLeftSlot then v1.createElement(v4, {
-            AnchorPoint = Vector2.new(0, 1), 
-            Position = UDim2.new(0, l_Small_0, 1, -l_Small_0), 
-            ZIndex = v5.ZIndex or 2
-        }, v5.bottomLeftSlot) else nil, 
-        ItemCardHeaderBottomRightSlot = if v5.bottomRightSlot then v1.createElement(v4, {
-            AnchorPoint = Vector2.new(1, 1), 
-            Position = UDim2.new(1, -l_Small_0, 1, -l_Small_0), 
-            ZIndex = v5.ZIndex or 2
-        }, v5.bottomRightSlot) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local React = require(Parent.React)
+local useTokens = require(Parent.Foundation).Hooks.useTokens
+
+local function CornerSlot(t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		AnchorPoint = t1.AnchorPoint,
+		Position = t1.Position,
+		ZIndex = t1.ZIndex
+	}, t1.children)
+end
+local function ItemCardHeaderCornersOverlay(t2: {[any]: any}) -- line: 36
+	-- upvalues: useTokens (copy), React (copy), CornerSlot (copy)
+	local Small = useTokens().Gap.Small
+
+	return React.createElement(React.Fragment, nil, {
+		ItemCardHeaderTopLeftSlot = if not t2.topLeftSlot then nil else React.createElement(CornerSlot, {
+			AnchorPoint = Vector2.new(0, 0),
+			Position = UDim2.fromOffset(Small, Small),
+			ZIndex = t2.ZIndex or 2
+		}, t2.topLeftSlot),
+		ItemCardHeaderTopRightSlot = if not t2.topRightSlot then nil else React.createElement(CornerSlot, {
+			AnchorPoint = Vector2.new(1, 0),
+			Position = UDim2.new(1, -Small, 0, Small),
+			ZIndex = t2.ZIndex or 2
+		}, t2.topRightSlot),
+		ItemCardHeaderBottomLeftSlot = if not t2.bottomLeftSlot then nil else React.createElement(CornerSlot, {
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.new(0, Small, 1, -Small),
+			ZIndex = t2.ZIndex or 2
+		}, t2.bottomLeftSlot),
+		ItemCardHeaderBottomRightSlot = if not t2.bottomRightSlot then nil else React.createElement(CornerSlot, {
+			AnchorPoint = Vector2.new(1, 1),
+			Position = UDim2.new(1, -Small, 1, -Small),
+			ZIndex = t2.ZIndex or 2
+		}, t2.bottomRightSlot)
+	})
+end
+
+if require(Parent.AvatarExperienceFlags).FFlagAXItemCardComponentsMemo then
+	return (React.memo(ItemCardHeaderCornersOverlay))
+end
+
+return ItemCardHeaderCornersOverlay

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableRegionalFilteringofAssets", false);
+return game:DefineFastFlag("AXEnableRegionalFilteringofAssets", false)

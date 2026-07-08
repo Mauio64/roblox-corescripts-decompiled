@@ -1,64 +1,67 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_Parent_0.RoactRodux);
-local l_RoactServices_0 = require(l_Parent_0.RoactServices).RoactServices;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_Localization_0 = require(l_Parent_0.RobloxAppLocales).Localization;
-local v7 = require(l_Parent_0.Foundation);
-local l_FoundationProvider_0 = v7.FoundationProvider;
-local l_AppStyleProvider_0 = require(l_Parent_0.Style).AppStyleProvider;
-local l_Constants_0 = require(l_Parent_0.Style).Constants;
-local v11 = {
-    themeName = l_Constants_0.ThemeName.Dark, 
-    fontName = l_Constants_0.FontName.Gotham, 
-    Tokens = {
-        Global = {
-            Size_350 = 28, 
-            Size_500 = 40
-        }
-    }
-};
-local v12 = {
-    ScreenSize = Vector2.new(500, 500), 
-    SetAlias = {
-        Aliases = {
-            byUserId = {
-                ["1"] = "foo"
-            }
-        }
-    }
-};
-local function v17(v13, v14) --[[ Line: 42 ]]
-    -- upvalues: v2 (copy)
-    local v16 = v14 or function(v15) --[[ Line: 43 ]]
-        return v15;
-    end;
-    return v2.Store.new(v16, v13 or {}, {
-        v2.thunkMiddleware
-    });
-end;
-local v18 = l_Localization_0.new("en-us");
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local Rodux = require(ParentParent.Rodux)
+local RoactRodux = require(ParentParent.RoactRodux)
+local RoactServices = require(ParentParent.RoactServices).RoactServices
+local LocalizationProvider = require(ParentParent.Localization).LocalizationProvider
+local Localization = require(ParentParent.RobloxAppLocales).Localization
+local Foundation = require(ParentParent.Foundation)
+local FoundationProvider = Foundation.FoundationProvider
+local AppStyleProvider = require(ParentParent.Style).AppStyleProvider
+local Constants = require(ParentParent.Style).Constants
+local t1 = {
+	themeName = Constants.ThemeName.Dark,
+	fontName = Constants.FontName.Gotham,
+	Tokens = {
+		Global = {
+			Size_350 = 28,
+			Size_500 = 40
+		}
+	}
+}
+local t2 = {
+	ScreenSize = Vector2.new(500, 500),
+	SetAlias = {
+		Aliases = {
+			byUserId = {
+				["1"] = "foo"
+			}
+		}
+	}
+}
+
+local function v14(p1, p2) -- line: 42
+	-- upvalues: Rodux (copy)
+	local v18 = p2 or function(p3) -- line: 43
+		return p3
+	end
+
+	return Rodux.Store.new(v18, p1 or {}, { Rodux.thunkMiddleware })
+end
+
+local v15 = Localization.new("en-us")
+
 return {
-    mockServices = function(v19) --[[ Line: 52 ]]
-        -- upvalues: v1 (copy), v3 (copy), v17 (copy), v12 (copy), l_FoundationProvider_0 (copy), v7 (copy), l_AppStyleProvider_0 (copy), v11 (copy), l_LocalizationProvider_0 (copy), v18 (copy), l_RoactServices_0 (copy)
-        local v20 = {
-            storeProvider = v1.createElement(v3.StoreProvider, {
-                store = v17(v12)
-            }, {
-                foundationProvider = v1.createElement(l_FoundationProvider_0, {
-                    theme = v7.Enums.Theme.Dark
-                }, {
-                    styleProvider = v1.createElement(l_AppStyleProvider_0, {
-                        style = v11
-                    }, {
-                        localizationProvider = v1.createElement(l_LocalizationProvider_0, {
-                            localization = v18
-                        }, v19)
-                    })
-                })
-            })
-        };
-        return (v1.createElement(l_RoactServices_0.ServiceProvider, {}, v20));
-    end
-};
+	mockServices = function(p4) -- line: 52
+		-- upvalues: React (copy), RoactRodux (copy), v14 (copy), t2 (copy), FoundationProvider (copy), Foundation (copy), AppStyleProvider (copy), t1 (copy), LocalizationProvider (copy), v15 (copy), RoactServices (copy)
+		local t3 = {
+			storeProvider = React.createElement(RoactRodux.StoreProvider, {
+				store = v14(t2)
+			}, {
+				foundationProvider = React.createElement(FoundationProvider, {
+					theme = Foundation.Enums.Theme.Dark
+				}, {
+					styleProvider = React.createElement(AppStyleProvider, {
+						style = t1
+					}, {
+						localizationProvider = React.createElement(LocalizationProvider, {
+							localization = v15
+						}, p4)
+					})
+				})
+			})
+		}
+
+		return (React.createElement(RoactServices.ServiceProvider, {}, t3))
+	end
+}

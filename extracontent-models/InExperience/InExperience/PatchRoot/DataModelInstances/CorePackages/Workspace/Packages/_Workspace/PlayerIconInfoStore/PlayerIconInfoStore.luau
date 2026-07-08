@@ -1,5 +1,6 @@
-local v0 = require(script.PlayerIconInfoStore);
+local PlayerIconInfoStore = require(script.PlayerIconInfoStore)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    PlayerIconInfoStore = v0
-};
+	["jest.config"] = script["jest.config"],
+	PlayerIconInfoStore = PlayerIconInfoStore
+}

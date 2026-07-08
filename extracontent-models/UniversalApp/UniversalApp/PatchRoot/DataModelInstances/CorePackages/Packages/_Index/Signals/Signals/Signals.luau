@@ -1,269 +1,321 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.SignalsScheduler);
-local l_flush_0 = v1.flush;
-local l_schedule_0 = v1.schedule;
-local v4 = require(script.Parent.callUserSpace);
-local v5 = table.freeze({
-    __mode = "k"
-});
-local function _(v6) --[[ Line: 29 ]] --[[ Name: createWeakSet ]]
-    -- upvalues: v5 (copy)
-    return (setmetatable(v6, v5));
-end;
-local function v10(v8, v9) --[[ Line: 33 ]] --[[ Name: defaultEquals ]]
-    return v8 == v9;
-end;
-local function v12(v11, ...) --[[ Line: 37 ]] --[[ Name: handleError ]]
-    if not v11 then
-        error((...));
-    end;
-end;
-local function v15(v13, v14, ...) --[[ Line: 44 ]] --[[ Name: handleScopeValidation ]]
-    -- upvalues: v12 (copy)
-    v13();
-    v12(v14, ...);
-    return ...;
-end;
-local function v20(v16, v17) --[[ Line: 50 ]] --[[ Name: callUserSpaceWithScopeValidation ]]
-    -- upvalues: v15 (copy), v4 (copy)
-    local v18 = true;
-    return v15(function() --[[ Line: 60 ]] --[[ Name: kill ]]
-        -- upvalues: v18 (ref)
-        v18 = false;
-    end, pcall(v4, v16, function(v19) --[[ Line: 53 ]] --[[ Name: wrappedScope ]]
-        -- upvalues: v18 (ref), v17 (copy)
-        if not v18 then
-            error("attempted to use scope beyond scope's lifetime");
-        end;
-        return v17(v19);
-    end));
-end;
-local v21 = if _G.__SIGNALS_VALIDATION_ENABLED__ or _G.__DEV__ then v20 else v4;
+local ParentParent = script.Parent.Parent
+local SignalsScheduler = require(ParentParent.SignalsScheduler)
+local flush = SignalsScheduler.flush
+local schedule = SignalsScheduler.schedule
+local callUserSpace = require(script.Parent.callUserSpace)
+local v6 = table.freeze({
+	__mode = "k"
+})
+
+local function createWeakSet(t1: {[any]: any}) -- line: 29
+	-- upvalues: v6 (copy)
+	return (setmetatable(t1, v6))
+end
+local function defaultEquals(p1, p2) -- line: 33
+	return p1 == p2
+end
+local function handleError(b1: boolean, ...) -- line: 37
+	if not b1 then
+		error((...))
+	end
+end
+local function handleScopeValidation(p3: ((...any) -> ...any), b2: boolean, ...) -- line: 44
+	-- upvalues: handleError (copy)
+	p3()
+	handleError(b2, ...)
+
+	return ...
+end
+local function callUserSpaceWithScopeValidation(p4: ((...any) -> ...any), p5: ((...any) -> ...any)) -- line: 50
+	-- upvalues: handleScopeValidation (copy), callUserSpace (copy)
+	local u21 = true
+
+	local function wrappedScope(p6: ((...any) -> ...any)) -- line: 53
+		-- upvalues: u21 (ref), p5 (copy)
+		if not u21 then
+			error("attempted to use scope beyond scope's lifetime")
+		end
+
+		return p5(p6)
+	end
+	local function kill() -- line: 60
+		-- upvalues: u21 (ref)
+		u21 = false
+	end
+
+	return handleScopeValidation(kill, pcall(callUserSpace, p4, wrappedScope))
+end
+
+local v12 = if not (_G.__SIGNALS_VALIDATION_ENABLED__ or _G.__DEV__) then callUserSpace else callUserSpaceWithScopeValidation
+
 return {
-    createSignal = function(v22, v23) --[[ Line: 70 ]] --[[ Name: createSignal ]]
-        -- upvalues: v10 (copy), v4 (copy), v5 (copy), l_flush_0 (copy)
-        local v24 = false;
-        local v25 = 0;
-        local v26 = nil;
-        local v27 = nil;
-        local v28 = if v23 ~= nil then v23 else v10;
-        local function v29() --[[ Line: 79 ]] --[[ Name: ensureInitialized ]]
-            -- upvalues: v24 (ref), v26 (ref), v22 (copy), v4 (ref), v25 (ref), v27 (ref), v5 (ref)
-            if not v24 then
-                v24 = true;
-                v26 = if typeof(v22) == "function" then v4(v22) else v22;
-                v25 = os.clock();
-                v27 = setmetatable({}, v5);
-            end;
-        end;
-        local function v32(v30, v31) --[[ Line: 88 ]] --[[ Name: source ]]
-            -- upvalues: v27 (ref), v25 (ref)
-            if v30 ~= nil then
-                if v31 then
-                    v27[v30] = nil;
-                else
-                    v27[v30] = true;
-                end;
-                return 0;
-            else
-                return v25;
-            end;
-        end;
-        local function _(v33) --[[ Line: 101 ]] --[[ Name: connectToScope ]]
-            -- upvalues: v32 (copy), v27 (ref)
-            if v33 then
-                v27[v33(v32)] = true;
-            end;
-        end;
-        local function _() --[[ Line: 108 ]] --[[ Name: notifyObservers ]]
-            -- upvalues: v27 (ref)
-            for v35 in v27 do
-                v35();
-            end;
-            table.clear(v27);
-        end;
-        return function(v37) --[[ Line: 115 ]] --[[ Name: getter ]]
-            -- upvalues: v29 (copy), v32 (copy), v27 (ref), v26 (ref)
-            v29();
-            if v37 then
-                v27[v37(v32)] = true;
-            end;
-            return v26;
-        end, function(v38) --[[ Line: 121 ]] --[[ Name: setter ]]
-            -- upvalues: v29 (copy), v4 (ref), v26 (ref), v28 (copy), v25 (ref), v27 (ref), l_flush_0 (ref)
-            v29();
-            local v39 = if typeof(v38) == "function" then v4(v38, v26) else v38;
-            if not v4(v28, v26, v39) then
-                v26 = v39;
-                v25 = os.clock();
-                for v40 in v27 do
-                    v40();
-                end;
-                table.clear(v27);
-                l_flush_0();
-            end;
-        end;
-    end, 
-    createComputed = function(v41, v42) --[[ Line: 135 ]] --[[ Name: createComputed ]]
-        -- upvalues: v10 (copy), v5 (copy), v21 (copy), v4 (copy)
-        local v43 = false;
-        local v44 = false;
-        local v45 = 0;
-        local v46 = 0;
-        local v47 = nil;
-        local v48 = nil;
-        local v49 = nil;
-        local v50 = if v42 ~= nil then v42 else v10;
-        local function _() --[[ Line: 147 ]] --[[ Name: notifyObservers ]]
-            -- upvalues: v49 (ref)
-            for v51 in v49 do
-                v51();
-            end;
-            table.clear(v49);
-        end;
-        local function v54() --[[ Line: 154 ]] --[[ Name: observer ]]
-            -- upvalues: v44 (ref), v49 (ref)
-            if not v44 then
-                v44 = true;
-                for v53 in v49 do
-                    v53();
-                end;
-                table.clear(v49);
-            end;
-        end;
-        local function v56(v55) --[[ Line: 161 ]] --[[ Name: scope ]]
-            -- upvalues: v48 (ref), v54 (copy)
-            v48[v55] = true;
-            return v54;
-        end;
-        local function v57() --[[ Line: 166 ]] --[[ Name: ensureInitialized ]]
-            -- upvalues: v43 (ref), v49 (ref), v5 (ref), v48 (ref), v47 (ref), v21 (ref), v41 (copy), v56 (copy), v46 (ref), v45 (ref)
-            if not v43 then
-                v43 = true;
-                v49 = setmetatable({}, v5);
-                v48 = {};
-                v47 = v21(v41, v56);
-                v46 = os.clock();
-                v45 = v46;
-            end;
-        end;
-        local function _() --[[ Line: 177 ]] --[[ Name: disconnectSources ]]
-            -- upvalues: v48 (ref), v54 (copy)
-            for v58 in v48 do
-                v58(v54, true);
-            end;
-            table.clear(v48);
-        end;
-        local function v64() --[[ Line: 184 ]] --[[ Name: flushNotifications ]]
-            -- upvalues: v44 (ref), v48 (ref), v46 (ref), v54 (copy), v21 (ref), v41 (copy), v56 (copy), v4 (ref), v50 (copy), v47 (ref), v45 (ref)
-            if v44 then
-                v44 = false;
-                for v60 in v48 do
-                    if v60() > v46 then
-                        for v61 in v48 do
-                            v61(v54, true);
-                        end;
-                        table.clear(v48);
-                        local v62 = v21(v41, v56);
-                        v46 = os.clock();
-                        if not v4(v50, v47, v62) then
-                            v47 = v62;
-                            v45 = v46;
-                        end;
-                        return;
-                    end;
-                end;
-                for v63 in v48 do
-                    v63(v54);
-                end;
-            end;
-        end;
-        local function v67(v65, v66) --[[ Line: 206 ]] --[[ Name: source ]]
-            -- upvalues: v49 (ref), v64 (copy), v45 (ref)
-            if v65 ~= nil then
-                if v66 then
-                    v49[v65] = nil;
-                else
-                    v49[v65] = true;
-                end;
-                return 0;
-            else
-                v64();
-                return v45;
-            end;
-        end;
-        local function _(v68) --[[ Line: 220 ]] --[[ Name: connectToScope ]]
-            -- upvalues: v67 (copy), v49 (ref)
-            if v68 then
-                v49[v68(v67)] = true;
-            end;
-        end;
-        return function(v70) --[[ Line: 227 ]] --[[ Name: getter ]]
-            -- upvalues: v57 (copy), v64 (copy), v67 (copy), v49 (ref), v47 (ref)
-            v57();
-            v64();
-            if v70 then
-                v49[v70(v67)] = true;
-            end;
-            return v47;
-        end;
-    end, 
-    createEffect = function(v71) --[[ Line: 237 ]] --[[ Name: createEffect ]]
-        -- upvalues: v21 (copy), l_schedule_0 (copy)
-        local v72 = false;
-        local v73 = false;
-        local v74 = 0;
-        local v75 = {};
-        local v76 = nil;
-        local function _() --[[ Line: 246 ]] --[[ Name: disconnectSources ]]
-            -- upvalues: v75 (copy), v76 (ref)
-            for v77 in v75 do
-                v77(v76, true);
-            end;
-            table.clear(v75);
-        end;
-        local function v80() --[[ Line: 253 ]] --[[ Name: dispose ]]
-            -- upvalues: v73 (ref), v75 (copy), v76 (ref)
-            v73 = true;
-            for v79 in v75 do
-                v79(v76, true);
-            end;
-            table.clear(v75);
-        end;
-        local function v82(v81) --[[ Line: 258 ]] --[[ Name: scope ]]
-            -- upvalues: v75 (copy), v76 (ref)
-            v75[v81] = true;
-            return v76;
-        end;
-        local function v86() --[[ Line: 263 ]] --[[ Name: processNotification ]]
-            -- upvalues: v73 (ref), v72 (ref), v75 (copy), v74 (ref), v76 (ref), v21 (ref), v71 (copy), v82 (copy)
-            if not v73 then
-                v72 = false;
-                for v83 in v75 do
-                    if v83() > v74 then
-                        for v84 in v75 do
-                            v84(v76, true);
-                        end;
-                        table.clear(v75);
-                        v21(v71, v82);
-                        v74 = os.clock();
-                        return;
-                    end;
-                end;
-                for v85 in v75 do
-                    v85(v76);
-                end;
-            end;
-        end;
-        v76 = function() --[[ Line: 281 ]] --[[ Name: observer ]]
-            -- upvalues: v73 (ref), v72 (ref), l_schedule_0 (ref), v86 (copy)
-            if not v73 and not v72 then
-                v72 = true;
-                l_schedule_0(v86);
-            end;
-        end;
-        v21(v71, v82);
-        v74 = os.clock();
-        return v80;
-    end
-};
+	createSignal = function(p7, p8: ((...any) -> ...any)?) -- line: 70
+		-- upvalues: defaultEquals (copy), callUserSpace (copy), v6 (copy), flush (copy)
+		local u26 = false
+		local n1 = 0
+		local u28 = nil
+		local self = nil
+		local v30 = if p8 == nil then defaultEquals else p8
+
+		local function ensureInitialized() -- line: 79
+			-- upvalues: u26 (ref), u28 (ref), p7 (copy), callUserSpace (copy), n1 (ref), self (ref), v6 (copy)
+			if not u26 then
+				u26 = true
+				u28 = if typeof(p7) ~= "function" then p7 else callUserSpace(p7)
+				n1 = os.clock()
+				self = setmetatable({}, v6)
+			end
+		end
+		local function source(p9: ((...any) -> ...any)?, b3: boolean?) -- line: 88
+			-- upvalues: self (ref), n1 (ref)
+			if p9 ~= nil then
+				if b3 then
+					self[p9] = nil
+				else
+					self[p9] = true
+				end
+
+				return 0
+			end
+
+			return n1
+		end
+		local function connectToScope(p10) -- line: 101
+			-- upvalues: source (copy), self (ref)
+			if p10 then
+				self[p10(source)] = true
+			end
+		end
+		local function notifyObservers() -- line: 108
+			-- upvalues: self (ref)
+			for v70 in self do
+				v70()
+			end
+
+			table.clear(self)
+		end
+		local function getter(p11) -- line: 115
+			-- upvalues: ensureInitialized (copy), source (copy), self (ref), u28 (ref)
+			ensureInitialized()
+
+			if p11 then
+				self[p11(source)] = true
+			end
+
+			return u28
+		end
+		local function setter(p12) -- line: 121
+			-- upvalues: ensureInitialized (copy), callUserSpace (copy), u28 (ref), v30 (copy), n1 (ref), self (ref), flush (copy)
+			ensureInitialized()
+
+			local v73 = if typeof(p12) ~= "function" then p12 else callUserSpace(p12, u28)
+
+			if not callUserSpace(v30, u28, v73) then
+				u28 = v73
+				n1 = os.clock()
+
+				for v74 in self do
+					v74()
+				end
+
+				table.clear(self)
+				flush()
+			end
+		end
+
+		return getter, setter
+	end,
+	createComputed = function(p13: ((...any) -> ...any), p14: ((...any) -> ...any)?) -- line: 135
+		-- upvalues: defaultEquals (copy), v6 (copy), v12 (copy), callUserSpace (copy)
+		local u39 = false
+		local u40 = false
+		local n2 = 0
+		local n3 = 0
+		local u43 = nil
+		local t2 = nil
+		local self = nil
+		local v46 = if p14 == nil then defaultEquals else p14
+
+		local function notifyObservers() -- line: 147
+			-- upvalues: self (ref)
+			for v75 in self do
+				v75()
+			end
+
+			table.clear(self)
+		end
+		local function observer() -- line: 154
+			-- upvalues: u40 (ref), self (ref)
+			if not u40 then
+				u40 = true
+
+				for v76 in self do
+					v76()
+				end
+
+				table.clear(self)
+			end
+		end
+		local function scope(p15: ((...any) -> ...any)) -- line: 161
+			-- upvalues: t2 (ref), observer (copy)
+			t2[p15] = true
+
+			return observer
+		end
+		local function ensureInitialized() -- line: 166
+			-- upvalues: u39 (ref), self (ref), v6 (copy), t2 (ref), u43 (ref), v12 (copy), p13 (copy), scope (copy), n3 (ref), n2 (ref)
+			if not u39 then
+				u39 = true
+				self = setmetatable({}, v6)
+				t2 = {}
+				u43 = v12(p13, scope)
+				n3 = os.clock()
+				n2 = n3
+			end
+		end
+		local function disconnectSources() -- line: 177
+			-- upvalues: t2 (ref), observer (copy)
+			for v78 in t2 do
+				v78(observer, true)
+			end
+
+			table.clear(t2)
+		end
+		local function flushNotifications() -- line: 184
+			-- upvalues: u40 (ref), t2 (ref), n3 (ref), observer (copy), v12 (copy), p13 (copy), scope (copy), callUserSpace (copy), v46 (copy), u43 (ref), n2 (ref)
+			if u40 then
+				u40 = false
+
+				for v79 in t2 do
+					if v79() > n3 then
+						for v80 in t2 do
+							v80(observer, true)
+						end
+
+						table.clear(t2)
+
+						local v81 = v12(p13, scope)
+
+						n3 = os.clock()
+
+						if not callUserSpace(v46, u43, v81) then
+							u43 = v81
+							n2 = n3
+						end
+
+						return
+					end
+				end
+
+				for v82 in t2 do
+					v82(observer)
+				end
+			end
+		end
+		local function source(p16: ((...any) -> ...any)?, b4: boolean?) -- line: 206
+			-- upvalues: self (ref), flushNotifications (copy), n2 (ref)
+			if p16 ~= nil then
+				if b4 then
+					self[p16] = nil
+				else
+					self[p16] = true
+				end
+
+				return 0
+			end
+
+			flushNotifications()
+
+			return n2
+		end
+		local function connectToScope(p17) -- line: 220
+			-- upvalues: source (copy), self (ref)
+			if p17 then
+				self[p17(source)] = true
+			end
+		end
+		local function getter(p18) -- line: 227
+			-- upvalues: ensureInitialized (copy), flushNotifications (copy), source (copy), self (ref), u43 (ref)
+			ensureInitialized()
+			flushNotifications()
+
+			if p18 then
+				self[p18(source)] = true
+			end
+
+			return u43
+		end
+
+		return getter
+	end,
+	createEffect = function(p19: ((...any) -> ...any)) -- line: 237
+		-- upvalues: v12 (copy), schedule (copy)
+		local u57 = false
+		local u58 = false
+		local n4 = 0
+		local t3 = {}
+		local observer = nil
+
+		local function disconnectSources() -- line: 246
+			-- upvalues: t3 (copy), observer (ref)
+			for v87 in t3 do
+				v87(observer, true)
+			end
+
+			table.clear(t3)
+		end
+		local function dispose() -- line: 253
+			-- upvalues: u58 (ref), t3 (copy), observer (ref)
+			u58 = true
+
+			for v88 in t3 do
+				v88(observer, true)
+			end
+
+			table.clear(t3)
+		end
+		local function scope(p20: ((...any) -> ...any)) -- line: 258
+			-- upvalues: t3 (copy), observer (ref)
+			t3[p20] = true
+
+			return observer
+		end
+		local function processNotification() -- line: 263
+			-- upvalues: u58 (ref), u57 (ref), t3 (copy), n4 (ref), observer (ref), v12 (copy), p19 (copy), scope (copy)
+			if not u58 then
+				u57 = false
+
+				for v90 in t3 do
+					if v90() > n4 then
+						for v91 in t3 do
+							v91(observer, true)
+						end
+
+						table.clear(t3)
+						v12(p19, scope)
+						n4 = os.clock()
+
+						return
+					end
+				end
+
+				for v92 in t3 do
+					v92(observer)
+				end
+			end
+		end
+
+		function observer() -- line: 281
+			-- upvalues: u58 (ref), u57 (ref), schedule (copy), processNotification (copy)
+			if not u58 and not u57 then
+				u57 = true
+				schedule(processNotification)
+			end
+		end
+
+		v12(p19, scope)
+		n4 = os.clock()
+
+		return dispose
+	end
+}

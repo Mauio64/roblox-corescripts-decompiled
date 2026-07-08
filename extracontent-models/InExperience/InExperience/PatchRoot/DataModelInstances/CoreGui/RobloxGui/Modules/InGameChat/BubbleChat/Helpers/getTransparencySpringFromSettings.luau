@@ -1,18 +1,23 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Otter);
-return function(v2) --[[ Line: 5 ]] --[[ Name: getTransparencySpringFromSettings ]]
-    -- upvalues: v1 (copy)
-    local l_TransparencyAnimation_0 = v2.TransparencyAnimation;
-    if not l_TransparencyAnimation_0.Enabled then
-        return v1.instant;
-    else
-        local v4 = {
-            dampingRatio = l_TransparencyAnimation_0.SpringDampingRatio, 
-            frequency = l_TransparencyAnimation_0.SpringFrequency
-        };
-        return function(v5) --[[ Line: 15 ]]
-            -- upvalues: v1 (ref), v4 (copy)
-            return v1.spring(v5, v4);
-        end;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Otter = require(CorePackages.Packages.Otter)
+
+local function getTransparencySpringFromSettings(p1) -- line: 5
+	-- upvalues: Otter (copy)
+	local TransparencyAnimation = p1.TransparencyAnimation
+
+	if not TransparencyAnimation.Enabled then
+		return Otter.instant
+	end
+
+	local t1 = {
+		dampingRatio = TransparencyAnimation.SpringDampingRatio,
+		frequency = TransparencyAnimation.SpringFrequency
+	}
+
+	return function(p2) -- line: 15
+		-- upvalues: Otter (copy), t1 (copy)
+		return Otter.spring(p2, t1)
+	end
+end
+
+return getTransparencySpringFromSettings

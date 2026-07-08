@@ -1,3 +1,3 @@
 return {
-    GroupsNavigatorWithProviders = require(script.GroupsNavigatorWithProviders)
-};
+	GroupsNavigatorWithProviders = require(script.GroupsNavigatorWithProviders)
+}

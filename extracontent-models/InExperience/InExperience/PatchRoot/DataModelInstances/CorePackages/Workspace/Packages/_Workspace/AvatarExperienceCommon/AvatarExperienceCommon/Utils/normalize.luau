@@ -1,153 +1,172 @@
-local function v2(v0, v1) --[[ Line: 3 ]] --[[ Name: normalizeType ]]
-    if type(v0) == v1 then
-        return v0;
-    else
-        return nil, (("Type %* required, got %*."):format(v1, (type(v0))));
-    end;
-end;
-local function v7(v3) --[[ Line: 10 ]] --[[ Name: prepareValuesForError ]]
-    local v4 = {};
-    for _, v6 in v3 do
-        table.insert(v4, (tostring(v6)));
-    end;
-    return table.concat(v4, ", ");
-end;
-local function v10(v8, v9) --[[ Line: 18 ]] --[[ Name: normalizeValue ]]
-    -- upvalues: v7 (copy)
-    if table.find(v9, v8) then
-        return v8;
-    else
-        return nil, (("Expected value to be one of %*, got %*."):format(v7(v9), v8));
-    end;
-end;
-local function v12(v11) --[[ Line: 25 ]] --[[ Name: normalizeBoolean ]]
-    -- upvalues: v2 (copy)
-    return v2(v11, "boolean");
-end;
-local function v14(v13) --[[ Line: 29 ]] --[[ Name: normalizeString ]]
-    -- upvalues: v2 (copy)
-    return v2(v13, "string");
-end;
-local function v16(v15) --[[ Line: 33 ]] --[[ Name: normalizeNumber ]]
-    -- upvalues: v2 (copy)
-    return v2(v15, "number");
-end;
-local function v29(v17, v18) --[[ Line: 37 ]] --[[ Name: normalizeTable ]]
-    local v19 = {};
-    if type(v17) == "table" then
-        local v20 = {};
-        for v21, v22 in v18 do
-            local v23 = type(v22) == "table" and v22.required;
-            local v24 = if type(v22) == "table" then v22.fn else v22;
-            local v25 = v17[v21];
-            if type(v25) ~= "nil" or v23 then
-                local v26, v27 = v24(v25);
-                if v27 then
-                    table.insert(v19, (("%* normalization failed with: %*"):format(v21, v27)));
-                end;
-                if v27 and v23 then
-                    return nil, table.concat(v19, " ");
-                else
-                    v20[v21] = v26;
-                end;
-            end;
-        end;
-        local v28 = nil;
-        if next(v19) then
-            v28 = table.concat(v19, " ");
-        end;
-        return v20, v28;
-    else
-        return nil, (("Type table required, got %*."):format((type(v17))));
-    end;
-end;
-local function v39(v30, v31) --[[ Line: 85 ]] --[[ Name: normalizeList ]]
-    if type(v30) == "table" then
-        local v32 = {};
-        local v33 = {};
-        for v34, v35 in v30 do
-            local v36, v37 = v31(v35);
-            if v37 then
-                table.insert(v32, (("%* normalization failed with: %*"):format(v34, v37)));
-            end;
-            if v36 then
-                table.insert(v33, v36);
-            end;
-        end;
-        local v38 = nil;
-        if next(v32) then
-            v38 = table.concat(v32, " ");
-        end;
-        return v33, v38;
-    else
-        return nil, (("Type table required, got %*."):format((type(v30))));
-    end;
-end;
-local function v46(v40, v41) --[[ Line: 107 ]] --[[ Name: normalizeUnion ]]
-    for _, v43 in v41 do
-        local v44, _ = v43(v40);
-        if v44 then
-            return v44;
-        end;
-    end;
-    return nil, "Value did not match any union.";
-end;
+local function normalizeType(p1, p2) -- line: 3
+	if p2 == type(p1) then
+		return p1
+	end
+
+	return nil, `Type { p2 } required, got { type(p1) }.`
+end
+local function prepareValuesForError(t1: {[any]: any}) -- line: 10
+	local t2 = {}
+
+	for _, v13 in t1 do
+		table.insert(t2, (tostring(v13)))
+	end
+
+	return table.concat(t2, ", ")
+end
+local function normalizeValue(p3, t3: {[any]: any}) -- line: 18
+	-- upvalues: prepareValuesForError (copy)
+	if table.find(t3, p3) then
+		return p3
+	end
+
+	return nil, `Expected value to be one of { prepareValuesForError(t3) }, got { p3 }.`
+end
+local function normalizeString(p4) -- line: 29
+	-- upvalues: normalizeType (copy)
+	return normalizeType(p4, "string")
+end
+local function normalizeTable(p5, t4: {[any]: any}) -- line: 37
+	local t5 = {}
+
+	if type(p5) == "table" then
+		local t6 = {}
+
+		for v23, v24 in t4 do
+			local v25 = type(v24) == "table" and v24.required
+			local v26 = if type(v24) ~= "table" then v24 else v24.fn
+			local v27 = p5[v23]
+
+			if type(v27) == "nil" and not v25 then
+				continue
+			end
+
+			local v28, v29 = v26(v27)
+
+			if v29 then
+				table.insert(t5, `{ v23 } normalization failed with: { v29 }`)
+			end
+
+			if v29 and v25 then
+				return nil, table.concat(t5, " ")
+			end
+
+			t6[v23] = v28
+		end
+
+		local v30 = nil
+
+		if next(t5) then
+			v30 = table.concat(t5, " ")
+		end
+
+		return t6, v30
+	end
+
+	return nil, `Type table required, got { type(p5) }.`
+end
+local function normalizeList(p6, p7: ((...any) -> ...any)) -- line: 85
+	if type(p6) == "table" then
+		local t7 = {}
+		local t8 = {}
+
+		for v35, v36 in p6 do
+			local v37, v38 = p7(v36)
+
+			if v38 then
+				table.insert(t7, `{ v35 } normalization failed with: { v38 }`)
+			end
+
+			if v37 then
+				table.insert(t8, v37)
+			end
+		end
+
+		local v39 = nil
+
+		if next(t7) then
+			v39 = table.concat(t7, " ")
+		end
+
+		return t8, v39
+	end
+
+	return nil, `Type table required, got { type(p6) }.`
+end
+local function normalizeUnion(p8, t9: {[any]: any}) -- line: 107
+	for _, v43 in t9 do
+		local v44, _ = v43(p8)
+
+		if v44 then
+			return v44
+		end
+	end
+
+	return nil, "Value did not match any union."
+end
+
 return {
-    normalizeType = v2, 
-    normalizeValue = v10, 
-    normalizeBoolean = v12, 
-    normalizeString = v14, 
-    normalizeNumber = v16, 
-    normalizeTable = v29, 
-    normalizeList = v39, 
-    normalizeUnion = v46, 
-    normalizeStringToBoolean = function(v47) --[[ Line: 118 ]] --[[ Name: normalizeStringToBoolean ]]
-        if v47 then
-            return v47 == "true";
-        else
-            return nil, "value is nil";
-        end;
-    end, 
-    makeNormalizeTableFn = function(v48) --[[ Line: 125 ]] --[[ Name: makeNormalizeTableFn ]]
-        -- upvalues: v29 (copy)
-        return function(v49) --[[ Line: 128 ]]
-            -- upvalues: v29 (ref), v48 (copy)
-            return v29(v49, v48);
-        end;
-    end, 
-    makeNormalizeListFn = function(v50) --[[ Line: 133 ]] --[[ Name: makeNormalizeListFn ]]
-        -- upvalues: v39 (copy)
-        return function(v51) --[[ Line: 134 ]]
-            -- upvalues: v39 (ref), v50 (copy)
-            return v39(v51, v50);
-        end;
-    end, 
-    makeNormalizeUnionFn = function(v52) --[[ Line: 139 ]] --[[ Name: makeNormalizeUnionFn ]]
-        -- upvalues: v46 (copy)
-        return function(v53) --[[ Line: 140 ]]
-            -- upvalues: v46 (ref), v52 (copy)
-            return v46(v53, v52);
-        end;
-    end, 
-    makeNormalizeValueFn = function(v54) --[[ Line: 145 ]] --[[ Name: makeNormalizeValueFn ]]
-        -- upvalues: v10 (copy)
-        return function(v55) --[[ Line: 146 ]]
-            -- upvalues: v10 (ref), v54 (copy)
-            return v10(v55, v54);
-        end;
-    end, 
-    makeRequired = function(v56) --[[ Line: 151 ]] --[[ Name: makeRequired ]]
-        return {
-            fn = v56, 
-            required = true
-        };
-    end, 
-    normalizeNotEmptyString = function(v57) --[[ Line: 156 ]] --[[ Name: normalizeNotEmptyString ]]
-        -- upvalues: v14 (copy)
-        if v57 == nil or v57 == "" then
-            return nil, nil;
-        else
-            return v14(v57);
-        end;
-    end
-};
+	normalizeType = normalizeType,
+	normalizeValue = normalizeValue,
+	normalizeBoolean = function(p9) -- line: 25
+		-- upvalues: normalizeType (copy)
+		return normalizeType(p9, "boolean")
+	end,
+	normalizeString = normalizeString,
+	normalizeNumber = function(p10) -- line: 33
+		-- upvalues: normalizeType (copy)
+		return normalizeType(p10, "number")
+	end,
+	normalizeTable = normalizeTable,
+	normalizeList = normalizeList,
+	normalizeUnion = normalizeUnion,
+	normalizeStringToBoolean = function(s1: string?) -- line: 118
+		if s1 then
+			return s1 == "true"
+		end
+
+		return nil, "value is nil"
+	end,
+	makeNormalizeTableFn = function(t10: {[any]: any}) -- line: 125
+		-- upvalues: normalizeTable (copy)
+		return function(p11) -- line: 128
+			-- upvalues: normalizeTable (copy), t10 (copy)
+			return normalizeTable(p11, t10)
+		end
+	end,
+	makeNormalizeListFn = function(p12: ((...any) -> ...any)) -- line: 133
+		-- upvalues: normalizeList (copy)
+		return function(p13) -- line: 134
+			-- upvalues: normalizeList (copy), p12 (copy)
+			return normalizeList(p13, p12)
+		end
+	end,
+	makeNormalizeUnionFn = function(t11: {[any]: any}) -- line: 139
+		-- upvalues: normalizeUnion (copy)
+		return function(p14) -- line: 140
+			-- upvalues: normalizeUnion (copy), t11 (copy)
+			return normalizeUnion(p14, t11)
+		end
+	end,
+	makeNormalizeValueFn = function(p15) -- line: 145
+		-- upvalues: normalizeValue (copy)
+		return function(p16) -- line: 146
+			-- upvalues: normalizeValue (copy), p15 (copy)
+			return normalizeValue(p16, p15)
+		end
+	end,
+	makeRequired = function(p17: ((...any) -> ...any)) -- line: 151
+		return {
+			required = true,
+			fn = p17
+		}
+	end,
+	normalizeNotEmptyString = function(p18) -- line: 156
+		-- upvalues: normalizeString (copy)
+		if p18 == nil or p18 == "" then
+			return nil, nil
+		end
+
+		return normalizeString(p18)
+	end
+}

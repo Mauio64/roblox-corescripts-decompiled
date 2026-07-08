@@ -1,6 +1,6 @@
-return function(v0) --[[ Line: 1 ]]
-    return {
-        sortContacts = require(script.sortContacts)(v0), 
-        getPhoneNumber = require(script.getPhoneNumber)
-    };
-end;
+return function(p1) -- line: 1
+	return {
+		sortContacts = require(script.sortContacts)(p1),
+		getPhoneNumber = require(script.getPhoneNumber)
+	}
+end

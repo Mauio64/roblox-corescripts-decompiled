@@ -1,6 +1,7 @@
-return function(v0, v1) --[[ Line: 2 ]]
-    for v2 = 1, #v1 do
-        v0:sendText(v1:sub(v2, v2));
-    end;
-    wait(0);
-end;
+return function(p1, p2) -- line: 2
+	for i = 1, #p2 do
+		p1:sendText(p2:sub(i, i))
+	end
+
+	wait(0)
+end

@@ -1,132 +1,179 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.ServiceContractsProto);
-local v3 = require(l_script_FirstAncestor_0.SduiActionType);
-local v4 = require(l_script_FirstAncestor_0.SduiComponentType);
-local v5 = require(l_script_FirstAncestor_0.ClientBinding.SduiDataBindingContentType);
-local l_snakeToCamel_0 = require(l_script_FirstAncestor_0.ClientBinding.SduiDataBinderTransformUtils).snakeToCamel;
-local l_FFlagLuaAppSduiBadgeDetailsComponents_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppSduiBadgeDetailsComponents;
-local v8 = if l_FFlagLuaAppSduiBadgeDetailsComponents_0 then {
-    AUTOMATIC_SIZE_XY = "XY", 
-    SIZE_CONSTRAINT_RELATIVE_XY = "RelativeXY", 
-    SIZE_CONSTRAINT_RELATIVE_XX = "RelativeXX", 
-    SIZE_CONSTRAINT_RELATIVE_YY = "RelativeYY"
-} else {};
-local function v15(v9, v10, v11) --[[ Line: 52 ]] --[[ Name: convertToLuaEnum ]]
-    local v12 = string.match(v9, "^" .. v10 .. "(.*)");
-    if not v12 then
-        return v9;
-    else
-        local v14 = v12:lower():gsub("_(%l)", function(v13) --[[ Line: 66 ]]
-            return v13:upper();
-        end);
-        if v11 then
-            return v14:gsub("^%l", string.upper);
-        else
-            return v14;
-        end;
-    end;
-end;
-local function v20(v16, v17, v18) --[[ Line: 84 ]] --[[ Name: mapProtoEnumFormatToLua ]]
-    -- upvalues: v8 (copy), v15 (copy)
-    local v19 = v8[v16];
-    if not v19 then
-        v19 = v15(v16, v17, v18);
-        v8[v16] = v19;
-    end;
-    return v19;
-end;
-local function v26(v21, v22, v23) --[[ Line: 97 ]] --[[ Name: mapProtoEngineEnumToLua ]]
-    -- upvalues: v8 (copy), v15 (copy)
-    if v21 == nil then
-        return nil;
-    else
-        local v24 = v8[v21];
-        if not v24 then
-            v24 = v15(v21, v22, true);
-            v8[v21] = v24;
-        end;
-        local l_v24_0 = v24;
-        if l_v24_0 then
-            return v23(l_v24_0);
-        else
-            return nil;
-        end;
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+
+require(SduiCoreSystemParent.ServiceContractsProto)
+
+local SduiActionType = require(SduiCoreSystem.SduiActionType)
+local SduiComponentType = require(SduiCoreSystem.SduiComponentType)
+local SduiDataBindingContentType = require(SduiCoreSystem.ClientBinding.SduiDataBindingContentType)
+local snakeToCamel = require(SduiCoreSystem.ClientBinding.SduiDataBinderTransformUtils).snakeToCamel
+local t1 = {
+	AUTOMATIC_SIZE_XY = "XY",
+	SIZE_CONSTRAINT_RELATIVE_XY = "RelativeXY",
+	SIZE_CONSTRAINT_RELATIVE_XX = "RelativeXX",
+	SIZE_CONSTRAINT_RELATIVE_YY = "RelativeYY"
+}
+
+local function convertToLuaEnum(p1, s1: string, b1: boolean?) -- line: 48
+	local match = string.match(p1, "^" .. s1 .. "(.*)")
+
+	if not match then
+		return p1
+	end
+
+	local v13 = match:lower():gsub("_(%l)", function(p2) -- line: 62
+		return p2:upper()
+	end)
+
+	if b1 then
+		return v13:gsub("^%l", string.upper)
+	end
+
+	return v13
+end
+
 return {
-    mapProtoEnumFormatToLua = v20, 
-    mapUiComponentTypeToLua = function(v27) --[[ Line: 118 ]] --[[ Name: mapUiComponentTypeToLua ]]
-        -- upvalues: v8 (copy), v15 (copy), v4 (copy)
-        if v27 == nil then
-            return nil;
-        else
-            local v28 = v8[v27];
-            if not v28 then
-                v28 = v15(v27, "UI_COMPONENT_TYPE_", true);
-                v8[v27] = v28;
-            end;
-            local l_v28_0 = v28;
-            if v4[l_v28_0] then
-                return v4[l_v28_0];
-            else
-                return nil;
-            end;
-        end;
-    end, 
-    mapHydrationContentTypeToLua = function(v30) --[[ Line: 152 ]] --[[ Name: mapHydrationContentTypeToLua ]]
-        -- upvalues: v8 (copy), v5 (copy)
-        if v30 == nil then
-            return nil;
-        else
-            local v31 = v8[v30];
-            if not v31 then
-                local v32 = string.match(v30, "^HYDRATION_CONTENT_TYPE_(.*)");
-                v31 = if not v32 then v30 else v32:lower():gsub("_(%l)", function(v33) --[[ Line: 66 ]]
-                    return v33:upper();
-                end);
-                v8[v30] = v31;
-            end;
-            local l_v31_0 = v31;
-            if v5[l_v31_0] then
-                return v5[l_v31_0];
-            else
-                return nil;
-            end;
-        end;
-    end, 
-    mapActionTypeToLua = function(v35) --[[ Line: 135 ]] --[[ Name: mapActionTypeToLua ]]
-        -- upvalues: v8 (copy), v15 (copy), v3 (copy)
-        if v35 == nil then
-            return nil;
-        else
-            local v36 = v8[v35];
-            if not v36 then
-                v36 = v15(v35, "ACTION_TYPE_", true);
-                v8[v35] = v36;
-            end;
-            local l_v36_0 = v36;
-            if v3[l_v36_0] then
-                return v3[l_v36_0];
-            else
-                return nil;
-            end;
-        end;
-    end, 
-    mapPropName = function(v38) --[[ Line: 172 ]] --[[ Name: mapPropName ]]
-        -- upvalues: v8 (copy), l_snakeToCamel_0 (copy)
-        if v38 == nil then
-            return nil;
-        elseif typeof(v38) == "number" then
-            return v38;
-        else
-            local v39 = v8[v38];
-            if not v39 then
-                v39 = l_snakeToCamel_0(v38);
-                v8[v38] = v39;
-            end;
-            return v39;
-        end;
-    end, 
-    mapProtoEngineEnumToLua = if l_FFlagLuaAppSduiBadgeDetailsComponents_0 then v26 else nil
-};
+	mapProtoEnumFormatToLua = function(p3, s2: string, b2: boolean?) -- line: 80
+		-- upvalues: t1 (copy), convertToLuaEnum (copy)
+		local v17 = t1[p3]
+
+		if not v17 then
+			v17 = convertToLuaEnum(p3, s2, b2)
+			t1[p3] = v17
+		end
+
+		return v17
+	end,
+	mapUiComponentTypeToLua = function(p4) -- line: 114
+		-- upvalues: t1 (copy), convertToLuaEnum (copy), SduiComponentType (copy)
+		if p4 == nil then
+			return nil
+		end
+
+		local v23 = t1[p4]
+
+		if not v23 then
+			v23 = convertToLuaEnum(p4, "UI_COMPONENT_TYPE_", true)
+			t1[p4] = v23
+		end
+
+		if SduiComponentType[v23] then
+			return SduiComponentType[v23]
+		end
+
+		return nil
+	end,
+	mapHydrationContentTypeToLua = function(p5) -- line: 148
+		-- upvalues: t1 (copy), SduiDataBindingContentType (copy)
+		if p5 == nil then
+			return nil
+		end
+
+		local v27 = t1[p5]
+
+		if not v27 then
+			local match = string.match(p5, "^HYDRATION_CONTENT_TYPE_(.*)")
+
+			v27 = if match then match:lower():gsub("_(%l)", function(p6) -- line: 62
+				return p6:upper()
+			end) else p5
+			t1[p5] = v27
+		end
+
+		if SduiDataBindingContentType[v27] then
+			return SduiDataBindingContentType[v27]
+		end
+
+		return nil
+	end,
+	mapActionTypeToLua = function(p7) -- line: 131
+		-- upvalues: t1 (copy), convertToLuaEnum (copy), SduiActionType (copy)
+		if p7 == nil then
+			return nil
+		end
+
+		local v25 = t1[p7]
+
+		if not v25 then
+			v25 = convertToLuaEnum(p7, "ACTION_TYPE_", true)
+			t1[p7] = v25
+		end
+
+		if SduiActionType[v25] then
+			return SduiActionType[v25]
+		end
+
+		return nil
+	end,
+	mapPropName = function(p8) -- line: 168
+		-- upvalues: t1 (copy), snakeToCamel (copy)
+		if p8 == nil then
+			return nil
+		end
+
+		if typeof(p8) == "number" then
+			return p8
+		end
+
+		local v30 = t1[p8]
+
+		if not v30 then
+			v30 = snakeToCamel(p8)
+			t1[p8] = v30
+		end
+
+		return v30
+	end,
+	camelCaseKeys = function(p9) -- line: 189
+		-- upvalues: t1 (copy), snakeToCamel (copy)
+		if type(p9) ~= "table" then
+			return p9
+		end
+
+		local t2 = {}
+
+		for v33, v34 in p9 do
+			local v35
+
+			if type(v33) == "string" then
+				if v33 == nil then
+					v35 = nil
+				elseif typeof(v33) == "number" then
+					v35 = v33
+				else
+					v35 = t1[v33]
+
+					if not v35 then
+						v35 = snakeToCamel(v33)
+						t1[v33] = v35
+					end
+				end
+			else
+				v35 = v33
+			end
+
+			t2[v35] = v34
+		end
+
+		return t2
+	end,
+	mapProtoEngineEnumToLua = function(s3: string, s4: string, p10: ((...any) -> ...any)) -- line: 93
+		-- upvalues: t1 (copy), convertToLuaEnum (copy)
+		if s3 == nil then
+			return nil
+		end
+
+		local v21 = t1[s3]
+
+		if not v21 then
+			v21 = convertToLuaEnum(s3, s4, true)
+			t1[s3] = v21
+		end
+
+		if v21 then
+			return p10(v21)
+		end
+
+		return nil
+	end
+}

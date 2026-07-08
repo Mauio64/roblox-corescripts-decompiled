@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMigrateMainNavigationInputBindings", false);
+return game:DefineFastFlag("AXMigrateMainNavigationInputBindings", false)

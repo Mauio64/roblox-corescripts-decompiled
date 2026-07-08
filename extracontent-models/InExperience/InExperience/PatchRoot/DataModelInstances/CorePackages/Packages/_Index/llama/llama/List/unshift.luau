@@ -1,13 +1,20 @@
-return function(v0, ...) --[[ Line: 2 ]] --[[ Name: unshift ]]
-    local v1 = type(v0);
-    assert(v1 == "table", "expected a table for first argument, got " .. v1);
-    local v2 = select("#", ...);
-    local v3 = {};
-    for v4 = 1, v2 do
-        v3[v4] = select(v4, ...);
-    end;
-    for v5 = 1, #v0 do
-        v3[v2 + v5] = v0[v5];
-    end;
-    return v3;
-end;
+local function unshift(p1, ...) -- line: 2
+	local v3 = type(p1)
+
+	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+
+	local v4 = select("#", ...)
+	local t1 = {}
+
+	for i = 1, v4 do
+		t1[i] = select(i, ...)
+	end
+
+	for i = 1, #p1 do
+		t1[v4 + i] = p1[i]
+	end
+
+	return t1
+end
+
+return unshift

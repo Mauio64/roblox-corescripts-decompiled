@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChatLineReportingFocusFixesEnabled", false);
+return game:DefineFastFlag("ChatLineReportingFocusFixesEnabled", false)

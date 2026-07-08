@@ -1,5 +1,5 @@
 return {
-    FormatByKey = function(_, v1, _) --[[ Line: 3 ]] --[[ Name: FormatByKey ]]
-        return (tostring(v1));
-    end
-};
+	FormatByKey = function(_, p2, _) -- line: 3
+		return (tostring(p2))
+	end
+}

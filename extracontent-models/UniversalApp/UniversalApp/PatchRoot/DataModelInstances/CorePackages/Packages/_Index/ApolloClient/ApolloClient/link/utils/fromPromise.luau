@@ -1,19 +1,23 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local l_Observable_0 = require(script.Parent.Parent.Parent.utilities).Observable;
-v0.fromPromise = function(v4) --[[ Line: 21 ]] --[[ Name: fromPromise ]]
-    -- upvalues: l_Observable_0 (copy)
-    return l_Observable_0.new(function(v5) --[[ Line: 22 ]]
-        -- upvalues: v4 (copy)
-        v4:andThen(function(v6) --[[ Line: 24 ]]
-            -- upvalues: v5 (copy)
-            v5:next(v6);
-            v5:complete();
-        end):catch(function(v7) --[[ Line: 28 ]]
-            -- upvalues: v5 (copy)
-            v5.error(v5, v7);
-        end);
-    end);
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+
+local Observable = require(script.Parent.Parent.Parent.utilities).Observable
+
+function t1.fromPromise(p1) -- line: 21
+	-- upvalues: Observable (copy)
+	return Observable.new(function(p2) -- line: 22
+		-- upvalues: p1 (copy)
+		p1:andThen(function(p3) -- line: 24
+			-- upvalues: p2 (copy)
+			p2:next(p3)
+			p2:complete()
+		end):catch(function(p4) -- line: 28
+			-- upvalues: p2 (copy)
+			p2.error(p2, p4)
+		end)
+	end)
+end
+
+return t1

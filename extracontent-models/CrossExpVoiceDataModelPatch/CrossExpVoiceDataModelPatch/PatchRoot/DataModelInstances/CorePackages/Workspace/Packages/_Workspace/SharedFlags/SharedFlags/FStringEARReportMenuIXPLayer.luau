@@ -1,1 +1,1 @@
-return game:DefineFastString("EARReportMenuIXPLayer", "EducationAndReform.ReportMenu");
+return game:DefineFastString("EARReportMenuIXPLayer", "EducationAndReform.ReportMenu")

@@ -1,271 +1,285 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Motion);
-local l_useMotion_0 = v2.useMotion;
-local l_AnimatePresence_0 = v2.AnimatePresence;
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.ReactOtter);
-local v7 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v8 = require(script.Parent.Spinner);
-local v9 = require(script.Parent.endAlignedIcons);
-local v10 = require(l_script_FirstAncestor_0.Enums.ButtonVariant);
-local _ = require(script.Parent.Types);
-local v12 = require(l_script_FirstAncestor_0.Enums.FillBehavior);
-local v13 = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v14 = require(script.Parent.ButtonIcon);
-local v15 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v17 = require(l_script_FirstAncestor_0.Components.View);
-local v18 = require(l_script_FirstAncestor_0.Constants);
-local v19 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v20 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v21 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v22 = require(script.Parent.useButtonMotionStates);
-local v23 = require(script.Parent.useButtonVariants);
-local v24 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local l_usePresentationContext_0 = require(l_script_FirstAncestor_0.Providers.Style.PresentationContext).usePresentationContext;
-local v26 = {
-    [v10.Link] = {
-        format = "<u>%s</u>", 
-        controlState = {
-            v13.Hover, 
-            v13.Pressed
-        }
-    }
-};
-local function v28(v27) --[[ Line: 54 ]] --[[ Name: onProgressChange ]]
-    -- upvalues: v18 (copy)
-    return NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0), 
-        NumberSequenceKeypoint.new(math.max(0, v27 - 1.0E-4), 0), 
-        NumberSequenceKeypoint.new(math.min(1, v27 + 1.0E-4), v18.DISABLED_TRANSPARENCY), 
-        NumberSequenceKeypoint.new(1, v18.DISABLED_TRANSPARENCY)
-    });
-end;
-local function _(v29, v30) --[[ Line: 63 ]] --[[ Name: getTransparency ]]
-    return v30:map(function(v31) --[[ Line: 67 ]]
-        -- upvalues: v29 (copy)
-        if v29 ~= nil then
-            return v29 + (1 - v29) * v31;
-        else
-            return v31;
-        end;
-    end);
-end;
-local v33 = {
-    isDisabled = false, 
-    isLoading = false, 
-    variant = v10.Standard, 
-    size = v7.Medium, 
-    width = UDim.new(0, 0), 
-    inputDelay = 0, 
-    testId = "--foundation-button"
-};
-return v5.memo(v5.forwardRef(function(v34, v35) --[[ Line: 102 ]] --[[ Name: Button ]]
-    -- upvalues: v20 (copy), v33 (copy), v5 (copy), v13 (copy), v6 (copy), v9 (copy), v24 (copy), l_usePresentationContext_0 (copy), v23 (copy), v22 (copy), v18 (copy), l_useMotion_0 (copy), v26 (copy), v17 (copy), v21 (copy), v19 (copy), v12 (copy), l_AnimatePresence_0 (copy), v8 (copy), v14 (copy), v15 (copy), v28 (copy)
-    local v36 = v20(v34, v33);
-    local l_inputDelay_0 = v36.inputDelay;
-    local v38, v39 = v5.useBinding(v13.Initialize);
-    local v40, v41 = v5.useState(l_inputDelay_0 > 0);
-    local v42, v43 = v6.useAnimatedBinding(0, function() --[[ Line: 108 ]]
-        -- upvalues: v41 (copy)
-        v41(false);
-    end);
-    local v44 = v36.icon and v9[v36.icon];
-    v5.useEffect(function() --[[ Line: 114 ]]
-        -- upvalues: v40 (copy), v43 (copy), v6 (ref)
-        if v40 == false then
-            v43(v6.instant(0));
-        end;
-    end, {
-        v40
-    });
-    v5.useEffect(function() --[[ Line: 120 ]]
-        -- upvalues: v40 (copy), v41 (copy), l_inputDelay_0 (copy), v43 (copy), v6 (ref)
-        if v40 then
-            v41(false);
-        end;
-        if l_inputDelay_0 > 0 then
-            v41(true);
-            v43((v6.ease(1, {
-                duration = l_inputDelay_0, 
-                easingStyle = Enum.EasingStyle.Quad
-            })));
-        end;
-    end, {
-        l_inputDelay_0
-    });
-    local v45 = v24();
-    local v46 = l_usePresentationContext_0();
-    local v47 = v23(v45, v36.size, v36.variant, if v46 then v46.colorMode else nil);
-    local v48 = v22(v47.content.style.Transparency, v18.DISABLED_TRANSPARENCY);
-    local v49, v50 = l_useMotion_0(v48.Default);
-    local v51, v52 = l_useMotion_0(v48.Default);
-    v5.useEffect(function() --[[ Line: 149 ]]
-        -- upvalues: v36 (copy), v52 (copy), v48 (copy)
-        if v36.isLoading then
-            v52(v48.Loading);
-            return;
-        else
-            v52(v48.Default);
-            return;
-        end;
-    end, {
-        v36.isLoading
-    });
-    v5.useEffect(function() --[[ Line: 157 ]]
-        -- upvalues: v36 (copy), v50 (copy), v48 (copy)
-        if v36.isDisabled then
-            v50(v48.Disabled);
-            return;
-        else
-            v50(v48.Default);
-            return;
-        end;
-    end, {
-        v36.isDisabled
-    });
-    local v53 = v5.useMemo(function() --[[ Line: 165 ]]
-        -- upvalues: v47 (copy), v45 (copy)
-        return {
-            radius = UDim.new(0, v47.container.radius), 
-            offset = v45.Size.Size_200, 
-            borderWidth = v45.Stroke.Thicker
-        };
-    end, {
-        v45, 
-        v47.container.radius
-    });
-    local v54 = v36.text and v36.text ~= "";
-    local v57 = v5.useCallback(function(v55) --[[ Line: 175 ]]
-        -- upvalues: v26 (ref), v36 (copy), v54 (copy)
-        local v56 = v26[v36.variant];
-        if v54 and v56 and table.find(v56.controlState, v55) then
-            return (v56.format:format(v36.text));
-        else
-            return v36.text;
-        end;
-    end, {
-        v36.text, 
-        v36.variant, 
-        v54
-    });
-    local l_createElement_0 = v5.createElement;
-    local l_v17_0 = v17;
-    local l_v21_0 = v21;
-    local l_v36_0 = v36;
-    local v62 = {
-        AutomaticSize = if v19.FoundationButtonWidthAutoSize then if v36.width.Scale == 0 and v36.width.Offset == 0 then Enum.AutomaticSize.X else nil else if v36.width.Scale == 0 then Enum.AutomaticSize.X else nil, 
-        cornerRadius = UDim.new(0, v47.container.radius)
-    };
-    local v63;
-    if v47.container.style then
-        local l_Transparency_0 = v47.container.style.Transparency;
-        v63 = v49.transparency:map(function(v65) --[[ Line: 67 ]]
-            -- upvalues: l_Transparency_0 (copy)
-            if l_Transparency_0 ~= nil then
-                return l_Transparency_0 + (1 - l_Transparency_0) * v65;
-            else
-                return v65;
-            end;
-        end):map(function(v66) --[[ Line: 192 ]]
-            -- upvalues: v47 (copy)
-            return {
-                Color3 = v47.container.style.Color3, 
-                Transparency = v66
-            };
-        end);
-    else
-        v63 = nil;
-    end;
-    v62.backgroundStyle = v63;
-    v62.flexItem = if v36.fillBehavior then {
-        FlexMode = if v36.fillBehavior == v12.Fill then Enum.UIFlexMode.Fill else Enum.UIFlexMode.Shrink
-    } else nil;
-    if v47.container.stroke then
-        v63 = {
-            Color = v47.container.stroke.Color
-        };
-        local l_Transparency_1 = v47.container.stroke.Transparency;
-        v63.Transparency = v49.transparency:map(function(v68) --[[ Line: 67 ]]
-            -- upvalues: l_Transparency_1 (copy)
-            if l_Transparency_1 ~= nil then
-                return l_Transparency_1 + (1 - l_Transparency_1) * v68;
-            else
-                return v68;
-            end;
-        end);
-    else
-        v63 = nil;
-    end;
-    v62.stroke = v63;
-    v62.Size = UDim2.new(v36.fillBehavior == v12.Fill and 1 or v36.width.Scale, v36.fillBehavior == v12.Fill and 0 or v36.width.Offset, 0, v47.container.height);
-    v62.selection = {
-        Selectable = not v36.isDisabled and v36.Selectable, 
-        NextSelectionUp = v36.NextSelectionUp, 
-        NextSelectionDown = v36.NextSelectionDown, 
-        NextSelectionLeft = v36.NextSelectionLeft, 
-        NextSelectionRight = v36.NextSelectionRight
-    };
-    v62.cursor = v53;
-    v62.onActivated = v36.onActivated;
-    v62.onStateChanged = v39;
-    v62.isDisabled = v36.isDisabled or v36.isLoading or v40;
-    v62.stateLayer = v47.container.stateLayer;
-    v62.tag = v47.container.tag;
-    v62.ref = v35;
-    return l_createElement_0(l_v17_0, l_v21_0(l_v36_0, v62), {
-        Loading = if v36.isLoading then v5.createElement("Folder", {}, {
-            PresenceWrapper = v5.createElement(l_AnimatePresence_0, {}, {
-                Spinner = v5.createElement(v8, {
-                    Size = v47.icon.size - if v19.FoundationUsePath2DSpinner then UDim2.fromOffset(v45.Padding.XSmall, v45.Padding.XSmall) else UDim2.fromOffset(0, 0), 
-                    style = v49.transparency:map(function(v69) --[[ Line: 246 ]]
-                        -- upvalues: v47 (copy)
-                        return {
-                            Color3 = v47.content.style.Color3, 
-                            Transparency = v69
-                        };
-                    end), 
-                    testId = ("%*--spinner"):format(v36.testId)
-                })
-            })
-        }) else nil, 
-        IconWrapper = if v36.icon then v5.createElement(v17, {
-            Size = if v36.icon then v47.icon.size else nil, 
-            LayoutOrder = if v36.icon then v44 and 3 or 1 else nil, 
-            testId = if v36.icon then ("%*--icon-wrapper"):format(v36.testId) else nil
-        }, {
-            Icon = v5.createElement(v14, {
-                icon = v36.icon, 
-                isLoading = v36.isLoading, 
-                variant = v36.variant, 
-                size = v36.size, 
-                disabledTransparencyBinding = v49.transparency, 
-                textTransparencyBinding = v51.textTransparency, 
-                testId = v36.testId
-            })
-        }) else nil, 
-        Text = if v54 then v5.createElement(v15, {
-            Text = v38:map(v57), 
-            RichText = v26[v36.variant] ~= nil, 
-            tag = v47.text.tag, 
-            textStyle = v5.joinBindings({
-                v49.transparency, 
-                v51.textTransparency
-            }):map(function(v70) --[[ Line: 284 ]]
-                -- upvalues: v47 (copy)
-                local v71 = v70[1];
-                local v72 = v70[2];
-                return {
-                    Color3 = v47.content.style.Color3, 
-                    Transparency = v72 + v71
-                };
-            end), 
-            LayoutOrder = 2, 
-            testId = ("%*--text"):format(v36.testId)
-        }) else nil, 
-        Gradient = if v40 then v5.createElement("UIGradient", {
-            Transparency = v42:map(v28)
-        }) else nil
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Motion = require(FoundationParent.Motion)
+local useMotion = Motion.useMotion
+local AnimatePresence = Motion.AnimatePresence
+local React = require(FoundationParent.React)
+local ReactOtter = require(FoundationParent.ReactOtter)
+local InputSize = require(Foundation.Enums.InputSize)
+local Spinner = require(script.Parent.Spinner)
+local endAlignedIcons = require(script.Parent.endAlignedIcons)
+local ButtonVariant = require(Foundation.Enums.ButtonVariant)
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+local ControlState = require(Foundation.Enums.ControlState)
+local ButtonIcon = require(script.Parent.ButtonIcon)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local Constants = require(Foundation.Constants)
+local Flags = require(Foundation.Utility.Flags)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local useButtonMotionStates = require(script.Parent.useButtonMotionStates)
+local useButtonVariants = require(script.Parent.useButtonVariants)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local usePresentationContext = require(Foundation.Providers.Style.PresentationContext).usePresentationContext
+local t1 = {
+	[ButtonVariant.Link] = {
+		format = "<u>%s</u>",
+		controlState = {
+			ControlState.Hover,
+			ControlState.Pressed
+		}
+	}
+}
+
+local function onProgressChange(n1: number) -- line: 52
+	-- upvalues: Constants (copy)
+	return NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(math.max(0, n1 - 0.0001), 0),
+		NumberSequenceKeypoint.new(math.min(1, n1 + 0.0001), Constants.DISABLED_TRANSPARENCY),
+		NumberSequenceKeypoint.new(1, Constants.DISABLED_TRANSPARENCY)
+	})
+end
+local function getTransparency(n2: number?, p1) -- line: 61
+	return p1:map(function(p2) -- line: 65
+		-- upvalues: n2 (copy)
+		if n2 ~= nil then
+			return n2 + (1 - n2) * p2
+		end
+
+		return p2
+	end)
+end
+
+local t2 = {
+	isDisabled = false,
+	isLoading = false,
+	inputDelay = 0,
+	testId = "--foundation-button",
+	variant = ButtonVariant.Standard,
+	size = InputSize.Medium,
+	width = UDim.new(0, 0)
+}
+
+local function Button(p3, p4) -- line: 100
+	-- upvalues: withDefaults (copy), t2 (copy), React (copy), ControlState (copy), ReactOtter (copy), endAlignedIcons (copy), useTokens (copy), usePresentationContext (copy), useButtonVariants (copy), useButtonMotionStates (copy), Constants (copy), useMotion (copy), t1 (copy), View (copy), withCommonProps (copy), Flags (copy), FillBehavior (copy), AnimatePresence (copy), Spinner (copy), ButtonIcon (copy), Text (copy), onProgressChange (copy)
+	local v35 = withDefaults(p3, t2)
+	local inputDelay = v35.inputDelay
+	local v37, v38 = React.useBinding(ControlState.Initialize)
+	local v39, v40 = React.useState(inputDelay > 0)
+	local v41, v42 = ReactOtter.useAnimatedBinding(0, function() -- line: 106
+		-- upvalues: v40 (copy)
+		v40(false)
+	end)
+	local v43 = v35.icon and endAlignedIcons[v35.icon]
+
+	React.useEffect(function() -- line: 112
+		-- upvalues: v39 (copy), v42 (copy), ReactOtter (copy)
+		if v39 == false then
+			v42(ReactOtter.instant(0))
+		end
+	end, { v39 })
+	React.useEffect(function() -- line: 118
+		-- upvalues: v39 (copy), v40 (copy), inputDelay (copy), v42 (copy), ReactOtter (copy)
+		if v39 then
+			v40(false)
+		end
+
+		if inputDelay > 0 then
+			v40(true)
+			v42((ReactOtter.ease(1, {
+				duration = inputDelay,
+				easingStyle = Enum.EasingStyle.Quad
+			})))
+		end
+	end, { inputDelay })
+
+	local v44 = useTokens()
+	local v45 = usePresentationContext()
+	local v46 = useButtonVariants(v44, v35.size, v35.variant, if not v45 then nil else v45.colorMode)
+	local v47 = useButtonMotionStates(v46.content.style.Transparency, Constants.DISABLED_TRANSPARENCY)
+	local v48, v49 = useMotion(v47.Default)
+	local v50, v51 = useMotion(v47.Default)
+
+	React.useEffect(function() -- line: 147
+		-- upvalues: v35 (copy), v51 (copy), v47 (copy)
+		if v35.isLoading then
+			v51(v47.Loading)
+
+			return
+		end
+
+		v51(v47.Default)
+	end, { v35.isLoading })
+	React.useEffect(function() -- line: 155
+		-- upvalues: v35 (copy), v49 (copy), v47 (copy)
+		if v35.isDisabled then
+			v49(v47.Disabled)
+
+			return
+		end
+
+		v49(v47.Default)
+	end, { v35.isDisabled })
+
+	local v52 = React.useMemo(function() -- line: 163
+		-- upvalues: v46 (copy), v44 (copy)
+		return {
+			radius = UDim.new(0, v46.container.radius),
+			offset = v44.Size.Size_200,
+			borderWidth = v44.Stroke.Thicker
+		}
+	end, {
+		v44,
+		v46.container.radius
+	})
+	local v53 = v35.text and v35.text ~= ""
+	local v54 = React.useCallback(function(p5) -- line: 173
+		-- upvalues: t1 (copy), v35 (copy), v53 (copy)
+		local v65 = t1[v35.variant]
+
+		if v53 and (v65 and table.find(v65.controlState, p5)) then
+			return (v65.format:format(v35.text))
+		end
+
+		return v35.text
+	end, {
+		v35.text,
+		v35.variant,
+		v53
+	})
+	local createElement = React.createElement
+	local v56 = View
+	local v57 = withCommonProps
+	local t3 = {
+		AutomaticSize = if Flags.FoundationButtonFillBehaviorEqualSize and v35.fillBehavior == FillBehavior.Fill or (v35.width.Scale ~= 0 or v35.width.Offset ~= 0) then nil else Enum.AutomaticSize.X,
+		cornerRadius = UDim.new(0, v46.container.radius)
+	}
+	local v60
+
+	if v46.container.style then
+		local styleTransparency = v46.container.style.Transparency
+
+		v60 = v48.transparency:map(function(p6) -- line: 65
+			-- upvalues: styleTransparency (copy)
+			if styleTransparency ~= nil then
+				return styleTransparency + (1 - styleTransparency) * p6
+			end
+
+			return p6
+		end):map(function(p7) -- line: 194
+			-- upvalues: v46 (copy)
+			return {
+				Color3 = v46.container.style.Color3,
+				Transparency = p7
+			}
+		end)
+	else
+		v60 = nil
+	end
+
+	t3.backgroundStyle = v60
+	t3.flexItem = if not v35.fillBehavior then nil else {
+		FlexMode = if v35.fillBehavior ~= FillBehavior.Fill then Enum.UIFlexMode.Shrink else Enum.UIFlexMode.Fill
+	}
+
+	local t4
+
+	if v46.container.stroke then
+		t4 = {
+			Color = v46.container.stroke.Color
+		}
+
+		local strokeTransparency = v46.container.stroke.Transparency
+
+		t4.Transparency = v48.transparency:map(function(p8) -- line: 65
+			-- upvalues: strokeTransparency (copy)
+			if strokeTransparency ~= nil then
+				return strokeTransparency + (1 - strokeTransparency) * p8
+			end
+
+			return p8
+		end)
+	else
+		t4 = nil
+	end
+
+	t3.stroke = t4
+	t3.Size = UDim2.new(if v35.fillBehavior ~= FillBehavior.Fill then v35.width.Scale else 1, if v35.fillBehavior ~= FillBehavior.Fill then v35.width.Offset else 0, 0, v46.container.height)
+	t3.selection = {
+		Selectable = not v35.isDisabled and v35.Selectable,
+		NextSelectionUp = v35.NextSelectionUp,
+		NextSelectionDown = v35.NextSelectionDown,
+		NextSelectionLeft = v35.NextSelectionLeft,
+		NextSelectionRight = v35.NextSelectionRight
+	}
+	t3.cursor = v52
+	t3.onActivated = v35.onActivated
+	t3.onStateChanged = v38
+	t3.isDisabled = v35.isDisabled or (v35.isLoading or v39)
+	t3.stateLayer = v46.container.stateLayer
+	t3.tag = v46.container.tag
+	t3.ref = p4
+
+	return createElement(v56, v57(v35, t3), {
+		Loading = if not v35.isLoading then nil else React.createElement("Folder", {}, {
+			PresenceWrapper = React.createElement(AnimatePresence, {}, {
+				Spinner = React.createElement(Spinner, {
+					Size = v46.icon.size - if not Flags.FoundationUsePath2DSpinner then UDim2.fromOffset(0, 0) else UDim2.fromOffset(v44.Padding.XSmall, v44.Padding.XSmall),
+					style = v48.transparency:map(function(p9) -- line: 248
+						-- upvalues: v46 (copy)
+						return {
+							Color3 = v46.content.style.Color3,
+							Transparency = p9
+						}
+					end),
+					testId = `{ v35.testId }--spinner`
+				})
+			})
+		}),
+		IconWrapper = if not v35.icon then nil else React.createElement(View, {
+			Size = if not v35.icon then nil else v46.icon.size,
+			LayoutOrder = if not v35.icon then nil else not v43 and 1 or 3,
+			testId = if not v35.icon then nil else `{ v35.testId }--icon-wrapper`
+		}, {
+			Icon = React.createElement(ButtonIcon, {
+				icon = v35.icon,
+				isLoading = v35.isLoading,
+				variant = v35.variant,
+				size = v35.size,
+				disabledTransparencyBinding = v48.transparency,
+				textTransparencyBinding = v50.textTransparency,
+				testId = v35.testId
+			})
+		}),
+		Text = if not v53 then nil else React.createElement(Text, {
+			LayoutOrder = 2,
+			Text = v37:map(v54),
+			RichText = t1[v35.variant] ~= nil,
+			tag = v46.text.tag,
+			textStyle = React.joinBindings({
+				v48.transparency,
+				v50.textTransparency
+			}):map(function(p10) -- line: 286
+				-- upvalues: v46 (copy)
+				local v71 = p10[1]
+				local v72 = p10[2]
+
+				return {
+					Color3 = v46.content.style.Color3,
+					Transparency = v72 + v71
+				}
+			end),
+			testId = `{ v35.testId }--text`
+		}),
+		Gradient = if not v39 then nil else React.createElement("UIGradient", {
+			Transparency = v41:map(onProgressChange)
+		})
+	})
+end
+
+return React.memo(React.forwardRef(Button))

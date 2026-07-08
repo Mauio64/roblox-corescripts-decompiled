@@ -1,4 +1,5 @@
 return {
-    Small = "Small", 
-    Medium = "Medium"
-};
+	XSmall = "XSmall",
+	Small = "Small",
+	Medium = "Medium"
+}

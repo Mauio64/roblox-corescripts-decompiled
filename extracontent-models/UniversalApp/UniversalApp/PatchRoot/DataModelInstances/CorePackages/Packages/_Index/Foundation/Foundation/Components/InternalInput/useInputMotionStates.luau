@@ -1,76 +1,81 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v4 = require(l_script_FirstAncestor_0.Utility.Flags);
-local _ = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.Motion);
-local l_TransitionPreset_0 = v6.TransitionPreset;
-return function(v8, v9) --[[ Line: 41 ]] --[[ Name: useInputMotionStates ]]
-    -- upvalues: v4 (copy), v6 (copy), l_TransitionPreset_0 (copy)
-    local v10 = nil;
-    local v11 = nil;
-    local v12 = nil;
-    local v13 = nil;
-    local v14 = nil;
-    if v4.FoundationToggleVisualUpdate then
-        v10 = if v9 and v9.backgroundStyle then v9.backgroundStyle else v8.Color.Content.Default;
-        v11 = if v9 and v9.hoverStyle then v9.hoverStyle else v8.Color.Content.Emphasis;
-        v12 = if v9 and v9.checkedStyle then v9.checkedStyle else v8.Color.ActionSubEmphasis.Background;
-        v13 = if v9 and v9.labelStyle then v9.labelStyle else v8.Color.Content.Default;
-        v14 = if v9 and v9.labelHoverStyle then v9.labelHoverStyle else v8.Color.Content.Emphasis;
-    else
-        v10 = v8.Color.Content.Default;
-        v11 = v8.Color.Content.Emphasis;
-        v13 = v8.Color.Content.Default;
-        v14 = v8.Color.Content.Emphasis;
-        v12 = v9 or v8.Color.ActionSubEmphasis.Background;
-    end;
-    return {
-        Default = v6.createState({
-            backgroundStyle = {
-                Color3 = v10.Color3, 
-                Transparency = if v9 and v9.backgroundStyle then v9.backgroundStyle.Transparency else 1
-            }, 
-            strokeStyle = v10, 
-            labelStyle = v13
-        }, {
-            default = v6.transition(l_TransitionPreset_0.Default, {
-                duration = 0.2
-            }), 
-            transparency = v6.transition({
-                easingStyle = Enum.EasingStyle.Linear, 
-                duration = 0.2
-            })
-        }), 
-        Hover = v6.createState({
-            backgroundStyle = {
-                Color3 = v11.Color3, 
-                Transparency = if v9 and v9.hoverStyle then v9.hoverStyle.Transparency else 1
-            }, 
-            strokeStyle = v11, 
-            labelStyle = v14
-        }, {
-            default = v6.transition(l_TransitionPreset_0.Default, {
-                duration = 0
-            }), 
-            transparency = v6.transition({
-                easingStyle = Enum.EasingStyle.Linear, 
-                duration = 0
-            })
-        }), 
-        Checked = v6.createState({
-            backgroundStyle = v12, 
-            strokeStyle = v12, 
-            labelStyle = v14
-        }, {
-            default = v6.transition(l_TransitionPreset_0.Default, {
-                duration = 0.2
-            }), 
-            transparency = v6.transition({
-                easingStyle = Enum.EasingStyle.Linear, 
-                duration = 0.2
-            })
-        })
-    };
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(Foundation.Components.Types)
+require(Foundation.Providers.Style.Tokens)
+
+local Flags = require(Foundation.Utility.Flags)
+
+require(FoundationParent.React)
+
+local Motion = require(FoundationParent.Motion)
+local TransitionPreset = Motion.TransitionPreset
+
+local function useInputMotionStates(p1, p2) -- line: 41
+	-- upvalues: Flags (copy), Motion (copy), TransitionPreset (copy)
+	local v9, v10, v11, v12, v13
+
+	if Flags.FoundationToggleVisualUpdate then
+		v9 = if not p2 or not p2.backgroundStyle then p1.Color.Content.Default else p2.backgroundStyle
+		v10 = if not p2 or not p2.hoverStyle then p1.Color.Content.Emphasis else p2.hoverStyle
+		v11 = if not p2 or not p2.checkedStyle then p1.Color.ActionSubEmphasis.Background else p2.checkedStyle
+		v12 = if not p2 or not p2.labelStyle then p1.Color.Content.Default else p2.labelStyle
+		v13 = if not p2 or not p2.labelHoverStyle then p1.Color.Content.Emphasis else p2.labelHoverStyle
+	else
+		v9 = p1.Color.Content.Default
+		v10 = p1.Color.Content.Emphasis
+		v12 = p1.Color.Content.Default
+		v13 = p1.Color.Content.Emphasis
+		v11 = p2 or p1.Color.ActionSubEmphasis.Background
+	end
+
+	return {
+		Default = Motion.createState({
+			backgroundStyle = {
+				Color3 = v9.Color3,
+				Transparency = (not p2 or not p2.backgroundStyle) and 1 or p2.backgroundStyle.Transparency
+			},
+			strokeStyle = v9,
+			labelStyle = v12
+		}, {
+			default = Motion.transition(TransitionPreset.Default, {
+				duration = 0.2
+			}),
+			transparency = Motion.transition({
+				duration = 0.2,
+				easingStyle = Enum.EasingStyle.Linear
+			})
+		}),
+		Hover = Motion.createState({
+			backgroundStyle = {
+				Color3 = v10.Color3,
+				Transparency = (not p2 or not p2.hoverStyle) and 1 or p2.hoverStyle.Transparency
+			},
+			strokeStyle = v10,
+			labelStyle = v13
+		}, {
+			default = Motion.transition(TransitionPreset.Default, {
+				duration = 0
+			}),
+			transparency = Motion.transition({
+				duration = 0,
+				easingStyle = Enum.EasingStyle.Linear
+			})
+		}),
+		Checked = Motion.createState({
+			backgroundStyle = v11,
+			strokeStyle = v11,
+			labelStyle = v13
+		}, {
+			default = Motion.transition(TransitionPreset.Default, {
+				duration = 0.2
+			}),
+			transparency = Motion.transition({
+				duration = 0.2,
+				easingStyle = Enum.EasingStyle.Linear
+			})
+		})
+	}
+end
+
+return useInputMotionStates

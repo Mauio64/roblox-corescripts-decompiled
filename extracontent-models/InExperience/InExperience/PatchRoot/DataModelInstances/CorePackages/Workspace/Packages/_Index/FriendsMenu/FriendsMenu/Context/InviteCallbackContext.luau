@@ -1,9 +1,8 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-return (require(l_Parent_0.React).createContext({
-    inviteSingleFriend = function() --[[ Line: 14 ]] --[[ Name: inviteSingleFriend ]]
+local ParentParent = script.Parent.Parent.Parent
 
-    end, 
-    inviteMultiFriends = function() --[[ Line: 15 ]] --[[ Name: inviteMultiFriends ]]
-
-    end
-}));
+return (require(ParentParent.React).createContext({
+	inviteSingleFriend = function() -- line: 14
+	end,
+	inviteMultiFriends = function() -- line: 15
+	end
+}))

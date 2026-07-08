@@ -1,93 +1,149 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("IAPExperience");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_View_0 = require(l_Parent_0.Foundation).View;
-local v4 = require(l_script_FirstAncestor_0.Generic.UnifiedProductDetails);
-local v5 = require(l_script_FirstAncestor_0.Generic.PriceSummaryV2);
-local v6 = require(l_script_FirstAncestor_0.Generic.DiscountSummary);
-local v7 = require(l_script_FirstAncestor_0.Enums.UnifiedPurchaseModalTypeEnum);
-local _ = require(l_script_FirstAncestor_0.ProductPurchase.PricingTypes);
-local _ = require(l_script_FirstAncestor_0.Enums.VirtualItemBadgeType);
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagAddCompactUnifiedUpsellModalMode);
-local function _(v11) --[[ Line: 50 ]] --[[ Name: itemPriceHasDiscountBreakdown ]]
-    if not v11 then
-        return false;
-    else
-        local l_basePriceInRobux_0 = v11.basePriceInRobux;
-        local l_priceInRobux_0 = v11.priceInRobux;
-        local v14 = false;
-        if typeof(l_basePriceInRobux_0) == "number" then
-            v14 = false;
-            if typeof(l_priceInRobux_0) == "number" then
-                v14 = l_priceInRobux_0 < l_basePriceInRobux_0;
-            end;
-        end;
-        return v14;
-    end;
-end;
-return function(v16) --[[ Line: 61 ]] --[[ Name: ProductDetailsContainer ]]
-    -- upvalues: v7 (copy), v2 (copy), l_View_0 (copy), v5 (copy), v6 (copy), v4 (copy), v10 (copy)
-    local v17 = v16.product and v16.product.itemPrice;
-    local v18;
-    if not v17 then
-        v18 = false;
-    else
-        local l_basePriceInRobux_1 = v17.basePriceInRobux;
-        local l_priceInRobux_1 = v17.priceInRobux;
-        v18 = false;
-        if typeof(l_basePriceInRobux_1) == "number" then
-            v18 = false;
-            if typeof(l_priceInRobux_1) == "number" then
-                v18 = l_priceInRobux_1 < l_basePriceInRobux_1;
-            end;
-        end;
-    end;
-    local v21 = UDim2.new(1, 0, 0, 100);
-    if v16.purchaseModalType == v7.MultiItem then
-        if v18 then
-            return v2.createElement(l_View_0, {
-                tag = "col shrink-0 size-full-0 align-x-center align-y-start", 
-                Size = v21
-            }, {
-                Summary = v2.createElement(v5, {
-                    amount = v16.product.itemRobuxCost, 
-                    itemPrice = v17
-                })
-            });
-        else
-            return (v2.createElement(v5, {
-                amount = v16.product.itemRobuxCost, 
-                itemPrice = v17
-            }));
-        end;
-    else
-        local v22 = if v17 then v2.createElement(l_View_0, {
-            tag = "auto-y size-full-0 padding-xxsmall", 
-            LayoutOrder = 2
-        }, {
-            Discount = v2.createElement(v6, {
-                itemPrice = v17
-            })
-        }) else nil;
-        return v2.createElement(l_View_0, {
-            tag = v18 and "col gap-medium shrink-0 auto-y size-full-0 align-x-center align-y-start" or "col gap-medium auto-y size-full-0 align-x-center align-y-start", 
-            Size = if v18 then v21 else nil
-        }, {
-            Details = v2.createElement(v4, {
-                layoutOrder = 1, 
-                isPortrait = false, 
-                isCompact = if v10 then v16.isCompact else nil, 
-                itemIcon = v16.product.itemIcon, 
-                itemName = v16.product.itemName, 
-                itemRobuxCost = v16.product.itemRobuxCost, 
-                itemPrice = v17, 
-                model = v16.product.model, 
-                subtitleView = v16.subtitleView, 
-                itemDisplayPrice = v16.product.itemDisplayPrice, 
-                isLoading = v16.isLoading, 
-                priceSuffix = v16.priceSuffix
-            }), 
-            DiscountSummary = v22
-        });
-    end;
-end;
+local IAPExperience = script:FindFirstAncestor("IAPExperience")
+local IAPExperienceParent = IAPExperience.Parent
+local React = require(IAPExperienceParent.React)
+local View = require(IAPExperienceParent.Foundation).View
+local UnifiedProductDetails = require(IAPExperience.Generic.UnifiedProductDetails)
+local PriceSummaryV2 = require(IAPExperience.Generic.PriceSummaryV2)
+local DiscountSummary = require(IAPExperience.Generic.DiscountSummary)
+local multiItemPriceShowsDiscountAccordion = require(IAPExperience.Generic.multiItemPriceShowsDiscountAccordion)
+local UnifiedPurchaseModalTypeEnum = require(IAPExperience.Enums.UnifiedPurchaseModalTypeEnum)
+
+require(IAPExperience.ProductPurchase.PricingTypes)
+require(IAPExperience.Enums.VirtualItemBadgeType)
+
+local FFlagAddCompactUnifiedUpsellModalMode = require(IAPExperience.Flags.FFlagAddCompactUnifiedUpsellModalMode)
+local FFlagFixUnnecessaryPaddingInUnifiedPurchaseModal = require(IAPExperience.Flags.FFlagFixUnnecessaryPaddingInUnifiedPurchaseModal)
+local FFlagPurchasePromptFetchCartPricing = require(IAPExperienceParent.SharedFlags).FFlagPurchasePromptFetchCartPricing
+
+local function itemPriceHasDiscountBreakdown(p1) -- line: 63
+	if not p1 then
+		return false
+	end
+
+	local basePriceInRobux = p1.basePriceInRobux
+	local priceInRobux = p1.priceInRobux
+
+	return typeof(basePriceInRobux) == "number" and (typeof(priceInRobux) == "number" and priceInRobux < basePriceInRobux)
+end
+local function ProductDetailsContainer(t1: {[any]: any}) -- line: 74
+	-- upvalues: FFlagPurchasePromptFetchCartPricing (copy), multiItemPriceShowsDiscountAccordion (copy), UnifiedPurchaseModalTypeEnum (copy), React (copy), View (copy), UnifiedProductDetails (copy), FFlagAddCompactUnifiedUpsellModalMode (copy), DiscountSummary (copy), PriceSummaryV2 (copy), FFlagFixUnnecessaryPaddingInUnifiedPurchaseModal (copy)
+	local v19 = t1.product and t1.product.itemPrice
+	local v20
+
+	if not v19 then
+		v20 = false
+	else
+		local basePriceInRobux = v19.basePriceInRobux
+		local priceInRobux = v19.priceInRobux
+
+		v20 = typeof(basePriceInRobux) == "number" and (typeof(priceInRobux) == "number" and priceInRobux < basePriceInRobux)
+	end
+
+	local v23 = nil
+
+	if FFlagPurchasePromptFetchCartPricing then
+		v23 = multiItemPriceShowsDiscountAccordion(v19)
+	end
+
+	local uDim2 = UDim2.new(1, 0, 0, 100)
+
+	if t1.purchaseModalType == UnifiedPurchaseModalTypeEnum.MultiItem then
+		if FFlagPurchasePromptFetchCartPricing and multiItemPriceShowsDiscountAccordion(v19) then
+			return React.createElement(View, {
+				tag = "col align-x-center align-y-top gap-medium size-full-0 auto-y"
+			}, {
+				Details = if not t1.hideProductDetails then React.createElement(UnifiedProductDetails, {
+					layoutOrder = 1,
+					isPortrait = false,
+					isCompact = if not FFlagAddCompactUnifiedUpsellModalMode then nil else t1.isCompact,
+					itemIcon = t1.product.itemIcon,
+					itemName = t1.product.itemName,
+					itemRobuxCost = v19.priceInRobux,
+					itemPrice = v19,
+					model = t1.product.model,
+					subtitleView = t1.subtitleView,
+					itemDisplayPrice = t1.product.itemDisplayPrice,
+					isLoading = t1.isLoading,
+					priceSuffix = t1.priceSuffix
+				}) else nil,
+				DiscountSummary = React.createElement(View, {
+					tag = "size-full-0 auto-y padding-xxsmall",
+					LayoutOrder = 2,
+					Visible = not t1.hideDiscountSummary
+				}, {
+					Discount = React.createElement(DiscountSummary, {
+						itemPrice = v19,
+						savingsSummary = t1.savingsSummary
+					})
+				})
+			})
+		end
+
+		if v20 then
+			return React.createElement(View, {
+				tag = {
+					["col align-x-center align-y-top size-full-0"] = FFlagPurchasePromptFetchCartPricing,
+					["col shrink-0 size-full-0 align-x-center align-y-start"] = not FFlagPurchasePromptFetchCartPricing
+				},
+				Size = uDim2
+			}, {
+				Summary = React.createElement(PriceSummaryV2, {
+					amount = t1.product.itemRobuxCost,
+					itemPrice = v19,
+					subtotalItemCount = if not FFlagPurchasePromptFetchCartPricing then nil else t1.subtotalItemCount
+				})
+			})
+		end
+
+		return (React.createElement(PriceSummaryV2, {
+			amount = t1.product.itemRobuxCost,
+			itemPrice = v19,
+			subtotalItemCount = if not FFlagPurchasePromptFetchCartPricing then nil else t1.subtotalItemCount
+		}))
+	end
+
+	local v25 = if not v19 or not not FFlagPurchasePromptFetchCartPricing and not v23 then nil else React.createElement(View, {
+		LayoutOrder = 2,
+		tag = {
+			["size-full-0 auto-y padding-xxsmall"] = FFlagPurchasePromptFetchCartPricing,
+			["auto-y size-full-0 padding-xxsmall"] = not FFlagPurchasePromptFetchCartPricing
+		},
+		Visible = if not FFlagPurchasePromptFetchCartPricing then nil else not t1.hideDiscountSummary
+	}, {
+		Discount = React.createElement(DiscountSummary, {
+			itemPrice = v19,
+			savingsSummary = if not FFlagPurchasePromptFetchCartPricing then nil else t1.savingsSummary
+		})
+	})
+
+	if FFlagFixUnnecessaryPaddingInUnifiedPurchaseModal and not v20 then
+		v25 = nil
+	end
+
+	return React.createElement(View, {
+		tag = {
+			["col align-x-center align-y-top gap-medium size-full-0 auto-y"] = FFlagPurchasePromptFetchCartPricing,
+			["col gap-medium shrink-0 auto-y size-full-0 align-x-center align-y-start"] = not FFlagPurchasePromptFetchCartPricing and v20,
+			["col gap-medium auto-y size-full-0 align-x-center align-y-start"] = not FFlagPurchasePromptFetchCartPricing and not v20
+		},
+		Size = if not if not FFlagPurchasePromptFetchCartPricing then v20 else v23 then nil else uDim2
+	}, {
+		Details = React.createElement(UnifiedProductDetails, {
+			layoutOrder = 1,
+			isPortrait = false,
+			isCompact = if not FFlagAddCompactUnifiedUpsellModalMode then nil else t1.isCompact,
+			itemIcon = t1.product.itemIcon,
+			itemName = t1.product.itemName,
+			itemRobuxCost = t1.product.itemRobuxCost,
+			itemPrice = v19,
+			model = t1.product.model,
+			subtitleView = t1.subtitleView,
+			itemDisplayPrice = t1.product.itemDisplayPrice,
+			isLoading = t1.isLoading,
+			priceSuffix = t1.priceSuffix
+		}),
+		DiscountSummary = v25
+	})
+end
+
+return ProductDetailsContainer

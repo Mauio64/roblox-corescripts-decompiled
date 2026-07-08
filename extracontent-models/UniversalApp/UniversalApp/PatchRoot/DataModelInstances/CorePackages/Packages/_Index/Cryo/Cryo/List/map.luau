@@ -1,7 +1,11 @@
-return function(v0, v1) --[[ Line: 4 ]] --[[ Name: map ]]
-    local v2 = {};
-    for v3 = 1, #v0 do
-        v2[v3] = v1(v0[v3], v3);
-    end;
-    return v2;
-end;
+local function map(p1, p2) -- line: 4
+	local t1 = {}
+
+	for i = 1, #p1 do
+		t1[i] = p2(p1[i], i)
+	end
+
+	return t1
+end
+
+return map

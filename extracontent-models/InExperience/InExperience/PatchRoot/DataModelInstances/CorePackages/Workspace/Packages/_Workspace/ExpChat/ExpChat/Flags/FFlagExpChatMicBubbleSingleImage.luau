@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatMicBubbleSingleImage", false);
+return game:DefineFastFlag("ExpChatMicBubbleSingleImage", false)

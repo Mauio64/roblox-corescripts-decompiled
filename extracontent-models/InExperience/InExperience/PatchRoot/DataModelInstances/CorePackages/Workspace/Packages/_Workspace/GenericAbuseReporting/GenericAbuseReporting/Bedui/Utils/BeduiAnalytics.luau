@@ -1,57 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_LocalPlayer_0 = game:GetService("Players").LocalPlayer;
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local v4 = require(l_Parent_0.ArgCheck);
-local v5 = require(l_Parent_0.Dash);
-local v6 = require(l_script_FirstAncestor_0.Enums.AbuseEntrypoint);
-local _ = require(l_script_FirstAncestor_0.Enums.AbuseVector);
-local v8 = {
-    Abandoned = "EVENT_ABANDONED", 
-    Error = "EVENT_ERROR", 
-    Rendered = "EVENT_RENDERED", 
-    Submitted = "EVENT_SUBMITTED"
-};
-local v9 = {
-    eventName = "DynamicAbuseReportEvent", 
-    description = "Event to track dynamic abuse report", 
-    lastUpdated = {
-        2024, 
-        6, 
-        18
-    }, 
-    backends = {
-        "EventIngest", 
-        "Points"
-    }, 
-    throttlingPercentage = game:DefineFastInt("DynamicAbuseReportThrottleHundredthsPercent", 0), 
-    links = "https://github.rbx.com/Roblox/proto-schemas/pull/6068"
-};
-local function v12(v10) --[[ Line: 60 ]] --[[ Name: buildCustomFields ]]
-    -- upvalues: v5 (copy), l_LocalPlayer_0 (copy), v6 (copy)
-    local v11 = nil;
-    if v10.meta then
-        v11 = v5.pretty(v10.meta, {
-            depth = 10, 
-            multiline = false
-        });
-    end;
-    return {
-        abuse_vector = v10.context.abuseVector, 
-        user_id = if l_LocalPlayer_0 then l_LocalPlayer_0.UserId else 0, 
-        event_type = v10.eventType, 
-        entry_point = v6.APP, 
-        meta = v11
-    };
-end;
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local TelemetryService = game:GetService("TelemetryService")
+local ArgCheck = require(GenericAbuseReportingParent.ArgCheck)
+local Dash = require(GenericAbuseReportingParent.Dash)
+local AbuseEntrypoint = require(GenericAbuseReporting.Enums.AbuseEntrypoint)
+
+require(GenericAbuseReporting.Enums.AbuseVector)
+
+local t1 = {
+	Abandoned = "EVENT_ABANDONED",
+	Error = "EVENT_ERROR",
+	Rendered = "EVENT_RENDERED",
+	Submitted = "EVENT_SUBMITTED"
+}
+local t2 = {
+	eventName = "DynamicAbuseReportEvent",
+	description = "Event to track dynamic abuse report",
+	links = "https://github.rbx.com/Roblox/proto-schemas/pull/6068",
+	lastUpdated = {
+		2024,
+		6,
+		18
+	},
+	backends = {
+		"EventIngest",
+		"Points"
+	},
+	throttlingPercentage = game:DefineFastInt("DynamicAbuseReportThrottleHundredthsPercent", 0)
+}
+
+local function buildCustomFields(t3: {[any]: any}) -- line: 60
+	-- upvalues: Dash (copy), LocalPlayer (copy), AbuseEntrypoint (copy)
+	local v12 = nil
+
+	if t3.meta then
+		v12 = Dash.pretty(t3.meta, {
+			depth = 10,
+			multiline = false
+		})
+	end
+
+	return {
+		abuse_vector = t3.context.abuseVector,
+		user_id = not LocalPlayer and 0 or LocalPlayer.UserId,
+		event_type = t3.eventType,
+		entry_point = AbuseEntrypoint.APP,
+		meta = v12
+	}
+end
+
 return {
-    sendAnalyticsEvent = function(v13) --[[ Line: 76 ]] --[[ Name: sendAnalyticsEvent ]]
-        -- upvalues: v4 (copy), l_TelemetryService_0 (copy), v9 (copy), v12 (copy)
-        v4.assert(v13.context, "customFields must be provided");
-        v4.assert(v13.context.abuseVector, "customFields.abuse_vector must be provided");
-        l_TelemetryService_0:LogEvent(v9, {
-            customFields = v12(v13)
-        });
-    end, 
-    TelemetryEventType = v8
-};
+	sendAnalyticsEvent = function(t4: {[any]: any}) -- line: 76
+		-- upvalues: ArgCheck (copy), TelemetryService (copy), t2 (copy), buildCustomFields (copy)
+		ArgCheck.assert(t4.context, "customFields must be provided")
+		ArgCheck.assert(t4.context.abuseVector, "customFields.abuse_vector must be provided")
+		TelemetryService:LogEvent(t2, {
+			customFields = buildCustomFields(t4)
+		})
+	end,
+	TelemetryEventType = t1
+}

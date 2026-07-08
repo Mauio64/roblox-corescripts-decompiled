@@ -1,82 +1,94 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Boolean_0 = v2.Boolean;
-local l_Object_0 = v2.Object;
-local v5 = {};
-local v6 = {
-    OS = "roblox"
-};
-local v7 = require(l_Parent_1.React);
-local v8 = require(script.Parent.VirtualizedSectionList);
-local _ = require(l_Parent_0.Components.ScrollView.ScrollView);
-local v10 = v7.PureComponent:extend("SectionList");
-v10.init = function(v11, v12) --[[ Line: 195 ]] --[[ Name: init ]]
-    v11.props = v12;
-    v11._captureRef = function(v13) --[[ Line: 197 ]]
-        -- upvalues: v11 (copy)
-        v11._wrapperListRef = v13;
-    end;
-end;
-v10.scrollToLocation = function(v14, v15) --[[ Line: 212 ]] --[[ Name: scrollToLocation ]]
-    if v14._wrapperListRef ~= nil then
-        v14._wrapperListRef:scrollToLocation(v15);
-    end;
-end;
-v10.recordInteraction = function(v16) --[[ Line: 225 ]] --[[ Name: recordInteraction ]]
-    local v17 = if v16._wrapperListRef then v16._wrapperListRef:getListRef() else v16._wrapperListRef;
-    if v17 then
-        v17:recordInteraction();
-    end;
-end;
-v10.flashScrollIndicators = function(v18) --[[ Line: 237 ]] --[[ Name: flashScrollIndicators ]]
-    local v19 = if v18._wrapperListRef then v18._wrapperListRef:getListRef() else v18._wrapperListRef;
-    if v19 then
-        v19:flashScrollIndicators();
-    end;
-end;
-v10.getScrollResponder = function(v20) --[[ Line: 247 ]] --[[ Name: getScrollResponder ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local v21 = if v20._wrapperListRef then v20._wrapperListRef:getListRef() else v20._wrapperListRef;
-    if l_Boolean_0.toJSBoolean(v21) then
-        return v21:getScrollResponder();
-    else
-        return nil;
-    end;
-end;
-v10.getScrollableNode = function(v22) --[[ Line: 255 ]] --[[ Name: getScrollableNode ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local v23 = if v22._wrapperListRefthen then v22._wrapperListRef:getListRef() else v22._wrapperListRef;
-    if l_Boolean_0.toJSBoolean(v23) then
-        return v23:getScrollableNode();
-    else
-        return nil;
-    end;
-end;
-v10.setNativeProps = function(v24, v25) --[[ Line: 263 ]] --[[ Name: setNativeProps ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local v26 = if v24._wrapperListRef then v24._wrapperListRef:getListRef() else v24._wrapperListRef;
-    if l_Boolean_0.toJSBoolean(v26) then
-        v26:setNativeProps(v25);
-    end;
-end;
-v10.render = function(v27) --[[ Line: 270 ]] --[[ Name: render ]]
-    -- upvalues: l_Object_0 (copy), v6 (copy), v7 (copy), v8 (copy)
-    local l_stickySectionHeadersEnabled_0 = v27.props.stickySectionHeadersEnabled;
-    local v29 = l_Object_0.assign({}, v27.props, {
-        stickySectionHeadersEnabled = l_Object_0.None
-    });
-    local v30 = if l_stickySectionHeadersEnabled_0 ~= nil then l_stickySectionHeadersEnabled_0 else v6.OS == "ios";
-    return v7.createElement(v8, l_Object_0.assign({}, v29, {
-        stickySectionHeadersEnabled = v30, 
-        ref = v27._captureRef, 
-        getItemCount = function(v31) --[[ Line: 282 ]] --[[ Name: getItemCount ]]
-            return #v31;
-        end, 
-        getItem = function(v32, v33) --[[ Line: 285 ]] --[[ Name: getItem ]]
-            return v32[v33];
-        end
-    }));
-end;
-v5.default = v10;
-return v5;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local _ = {
+	OS = "roblox"
+}
+local React = require(ParentParentParent.React)
+local VirtualizedSectionList = require(script.Parent.VirtualizedSectionList)
+
+require(ParentParent.Components.ScrollView.ScrollView)
+
+local v10 = React.PureComponent:extend("SectionList")
+
+function v10.init(p1, p2) -- line: 195
+	p1.props = p2
+
+	function p1._captureRef(p3) -- line: 197
+		-- upvalues: p1 (copy)
+		p1._wrapperListRef = p3
+	end
+end
+function v10.scrollToLocation(p4, p5) -- line: 212
+	if p4._wrapperListRef ~= nil then
+		p4._wrapperListRef:scrollToLocation(p5)
+	end
+end
+function v10.recordInteraction(p6) -- line: 225
+	local v16 = if not p6._wrapperListRef then p6._wrapperListRef else p6._wrapperListRef:getListRef()
+
+	if v16 then
+		v16:recordInteraction()
+	end
+end
+function v10.flashScrollIndicators(p7) -- line: 237
+	local v18 = if not p7._wrapperListRef then p7._wrapperListRef else p7._wrapperListRef:getListRef()
+
+	if v18 then
+		v18:flashScrollIndicators()
+	end
+end
+function v10.getScrollResponder(p8) -- line: 247
+	-- upvalues: Boolean (copy)
+	local v20 = if not p8._wrapperListRef then p8._wrapperListRef else p8._wrapperListRef:getListRef()
+
+	if Boolean.toJSBoolean(v20) then
+		return v20:getScrollResponder()
+	end
+
+	return nil
+end
+function v10.getScrollableNode(p9) -- line: 255
+	-- upvalues: Boolean (copy)
+	local v22 = if not p9._wrapperListRefthen then p9._wrapperListRef else p9._wrapperListRef:getListRef()
+
+	if Boolean.toJSBoolean(v22) then
+		return v22:getScrollableNode()
+	end
+
+	return nil
+end
+function v10.setNativeProps(p10, p11) -- line: 263
+	-- upvalues: Boolean (copy)
+	local v25 = if not p10._wrapperListRef then p10._wrapperListRef else p10._wrapperListRef:getListRef()
+
+	if Boolean.toJSBoolean(v25) then
+		v25:setNativeProps(p11)
+	end
+end
+function v10.render(p12) -- line: 270
+	-- upvalues: Object (copy), React (copy), VirtualizedSectionList (copy)
+	local stickySectionHeadersEnabled = p12.props.stickySectionHeadersEnabled
+	local v28 = Object.assign({}, p12.props, {
+		stickySectionHeadersEnabled = Object.None
+	})
+	local v29 = stickySectionHeadersEnabled ~= nil and stickySectionHeadersEnabled
+
+	return React.createElement(VirtualizedSectionList, Object.assign({}, v28, {
+		stickySectionHeadersEnabled = v29,
+		ref = p12._captureRef,
+		getItemCount = function(p13) -- line: 282
+			return #p13
+		end,
+		getItem = function(p14, p15) -- line: 285
+			return p14[p15]
+		end
+	}))
+end
+
+t1.default = v10
+
+return t1

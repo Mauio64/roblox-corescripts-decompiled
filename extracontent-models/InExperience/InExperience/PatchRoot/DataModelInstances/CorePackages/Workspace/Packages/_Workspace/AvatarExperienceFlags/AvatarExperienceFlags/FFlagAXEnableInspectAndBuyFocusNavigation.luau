@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableInspectAndBuyFocusNavigation", false);
+return game:DefineFastFlag("AXEnableInspectAndBuyFocusNavigation", false)

@@ -19,27 +19,27 @@ local ConversationModal = require(script.Parent.ConversationModal)
 local AppChatFAEBanner = require(AppChat.Components.FaeBanner.AppChatFAEBanner)
 local t1 = {
 	shouldShowLegacyBottomModal = false,
-	onHeightChanged = function(_) --[[ onHeightChanged ]] -- line: 38
+	onHeightChanged = function(_) -- line: 38
 	end
 }
 
-return React.memo(function(t2: {[any]: any}) --[[ ConversationBottomModalContainer ]] -- line: 41
+local function ConversationBottomModalContainer(t2: {[any]: any}) -- line: 41
 	-- upvalues: Cryo (copy), t1 (copy), useSelector (copy), getDeepValue2 (copy), ModalConfiguration (copy), React (copy), FFlagEnableAEGIS2AppChatConversationBanner (copy), FFlagAppChatNudgeToChatUpsellEnabled (copy), ConversationBottomModal (copy), AppChatFAEBanner (copy), FFlagTestDeviceForFAEUpsell (copy), deviceMeetsRequirementsForFAE (copy), ConversationModal (copy), Foundation (copy)
-	local v20 = Cryo.Dictionary.union(t1, t2)
-	local v21 = useSelector(function(p2) -- line: 45
-		-- upvalues: getDeepValue2 (copy), v20 (copy), ModalConfiguration (copy)
-		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationBottomModals.{ v20.conversationId }`) or ModalConfiguration.default
+	local v21 = Cryo.Dictionary.union(t1, t2)
+	local v22 = useSelector(function(p2) -- line: 45
+		-- upvalues: getDeepValue2 (copy), v21 (copy), ModalConfiguration (copy)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationBottomModals.{ v21.conversationId }`) or ModalConfiguration.default
 	end)
-	local v22 = React.useCallback(function(p3) -- line: 50
-		-- upvalues: v20 (copy)
-		v20.onHeightChanged(p3.AbsoluteSize.Y)
-	end, { v20.onHeightChanged })
-	local v23 = nil
+	local v23 = React.useCallback(function(p3) -- line: 50
+		-- upvalues: v21 (copy)
+		v21.onHeightChanged(p3.AbsoluteSize.Y)
+	end, { v21.onHeightChanged })
+	local v24 = nil
 
-	if (FFlagEnableAEGIS2AppChatConversationBanner or FFlagAppChatNudgeToChatUpsellEnabled) and (not v20.shouldShowChatInputBar and v21 and v21.modal_variant ~= nil and v21.modal_variant ~= ConversationBottomModal.None) then
-		v23 = React.createElement(AppChatFAEBanner, {
-			modalConfiguration = v21,
-			conversationId = v20.conversationId
+	if (FFlagEnableAEGIS2AppChatConversationBanner or FFlagAppChatNudgeToChatUpsellEnabled) and (not v21.shouldShowChatInputBar and v22 and v22.modal_variant ~= nil and v22.modal_variant ~= ConversationBottomModal.None) then
+		v24 = React.createElement(AppChatFAEBanner, {
+			modalConfiguration = v22,
+			conversationId = v21.conversationId
 		})
 	end
 
@@ -47,17 +47,19 @@ return React.memo(function(t2: {[any]: any}) --[[ ConversationBottomModalContain
 		return nil
 	end
 
-	if not v23 and v20.shouldShowLegacyBottomModal then
-		v23 = React.createElement(ConversationModal, {
-			bodyText = v20.legacyBottomModalText
+	if not v24 and v21.shouldShowLegacyBottomModal then
+		v24 = React.createElement(ConversationModal, {
+			bodyText = v21.legacyBottomModalText
 		})
 	end
 
 	return React.createElement(Foundation.View, {
-		LayoutOrder = v20.layoutOrder,
-		onAbsoluteSizeChanged = v22,
-		tag = "auto-y size-full-0"
+		tag = "auto-y size-full-0",
+		LayoutOrder = v21.layoutOrder,
+		onAbsoluteSizeChanged = v23
 	}, {
-		ConversationBottomModal = v23
+		ConversationBottomModal = v24
 	})
-end)
+end
+
+return React.memo(ConversationBottomModalContainer)

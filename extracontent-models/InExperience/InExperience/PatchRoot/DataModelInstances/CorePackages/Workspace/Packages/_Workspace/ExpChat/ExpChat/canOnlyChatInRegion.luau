@@ -1,14 +1,16 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local l_FFlagAEGIS2UseGuacToShowEnabledMessage_0 = require(l_Parent_0.SharedFlags).FFlagAEGIS2UseGuacToShowEnabledMessage;
-local v2 = nil;
-if l_FFlagAEGIS2UseGuacToShowEnabledMessage_0 then
-    v2 = require(l_Parent_0.UniversalAppPolicy);
-end;
-return function() --[[ Line: 12 ]]
-    -- upvalues: l_FFlagAEGIS2UseGuacToShowEnabledMessage_0 (copy), v2 (ref)
-    if not l_FFlagAEGIS2UseGuacToShowEnabledMessage_0 then
-        return false;
-    else
-        return v2.getAppFeaturePolicies().getInCommsRegionBubble();
-    end;
-end;
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local FFlagAEGIS2UseGuacToShowEnabledMessage = require(Parent.SharedFlags).FFlagAEGIS2UseGuacToShowEnabledMessage
+local UniversalAppPolicy = nil
+
+if FFlagAEGIS2UseGuacToShowEnabledMessage then
+	UniversalAppPolicy = require(Parent.UniversalAppPolicy)
+end
+
+return function() -- line: 12
+	-- upvalues: FFlagAEGIS2UseGuacToShowEnabledMessage (copy), UniversalAppPolicy (ref)
+	if not FFlagAEGIS2UseGuacToShowEnabledMessage then
+		return false
+	end
+
+	return UniversalAppPolicy.getAppFeaturePolicies().getInCommsRegionBubble()
+end

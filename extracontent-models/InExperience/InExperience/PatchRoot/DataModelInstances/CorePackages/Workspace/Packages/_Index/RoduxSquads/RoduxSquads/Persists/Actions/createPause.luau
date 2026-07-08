@@ -1,11 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxSquads").Parent;
-local v1 = require(l_Parent_0.Rodux);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local l_storage_0 = v2.storage;
-    assert(l_storage_0 ~= nil, "Persist storage is required");
-    local v4 = l_storage_0.memStorageKey or "";
-    return v1.makeActionCreator(v4 .. "Pause", function() --[[ Line: 10 ]]
-        return {};
-    end);
-end;
+local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+local Rodux = require(Parent.Rodux)
+
+return function(p1) -- line: 5
+	-- upvalues: Rodux (copy)
+	local storage = p1.storage
+
+	assert(storage ~= nil, "Persist storage is required")
+
+	local v5 = storage.memStorageKey or ""
+
+	return Rodux.makeActionCreator(v5 .. "Pause", function() -- line: 10
+		return {}
+	end)
+end

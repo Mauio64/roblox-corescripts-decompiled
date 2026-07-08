@@ -1,29 +1,33 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: lastIndexOf ]]
-    local v3 = string.len(v0);
-    local v4 = nil;
-    v4 = v2 or v3;
-    if v2 and v2 < 1 then
-        v4 = 1;
-    end;
-    if v2 and v3 < v2 then
-        v4 = v3;
-    end;
-    if v1 == "" then
-        return v4;
-    else
-        local v5 = nil;
-        local v6 = nil;
-        local v7 = 0;
-        repeat
-            v5 = v6;
-            local v8, v9 = string.find(v0, v1, v7 + 1, true);
-            v6 = v8;
-            v7 = v9;
-        until v6 == nil or v4 < v6;
-        if v5 == nil then
-            return -1;
-        else
-            return v5;
-        end;
-    end;
-end;
+local function lastIndexOf(s1: string, s2: string, n1: number?) -- line: 2
+	local v5 = string.len(s1)
+	local v6 = n1 or v5
+
+	if n1 and n1 < 1 then
+		v6 = 1
+	end
+
+	if n1 and v5 < n1 then
+		v6 = v5
+	end
+
+	if s2 == "" then
+		return v6
+	end
+
+	local start = nil
+	local n2 = 0
+	local v9
+
+	repeat
+		v9 = start
+		start, n2 = string.find(s1, s2, n2 + 1, true)
+	until start == nil or v6 < start
+
+	if v9 == nil then
+		return -1
+	end
+
+	return v9
+end
+
+return lastIndexOf

@@ -1,12 +1,19 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = script:FindFirstAncestor("Foundation").Parent;
-local v2 = require(l_Parent_0.GetStories);
-local v3 = require(l_Parent_1.Roact);
-local v4 = require(l_Parent_0.StoryMiddleware);
+local scriptParent = script.Parent
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+local ReactRoblox = require(Parent.ReactRoblox)
+local Roact = require(Parent.Roact)
+local GetStories = require(scriptParent.GetStories)
+local StoryMiddleware = require(scriptParent.StoryMiddleware)
+
 return {
-    name = "Public", 
-    group = "Foundation", 
-    roact = v3, 
-    storyRoots = v2(true), 
-    mapStory = v4
-};
+	name = "Public",
+	group = "Foundation",
+	roact = Roact,
+	storyRoots = GetStories(true),
+	mapStory = StoryMiddleware,
+	packages = {
+		React = React,
+		ReactRoblox = ReactRoblox
+	}
+}

@@ -1,58 +1,60 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.InlineLayout);
-local l_TextElement_0 = v3.Components.InlineLayoutElements.TextElement;
-local l_LinkElement_0 = v3.Components.InlineLayoutElements.LinkElement;
-local v6 = require(l_script_FirstAncestor_0.Enums.LinkBehavior);
-local v7 = require(l_script_FirstAncestor_0.Renderer.NodeRenderers.InlineCustomRenderer);
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(v9, v10) --[[ Line: 13 ]]
-    -- upvalues: v2 (copy), v6 (copy), v7 (copy), l_TextElement_0 (copy), l_LinkElement_0 (copy)
-    local v11 = {
-        textStyle = v10.styles.textStyle, 
-        showUnderline = true
-    };
-    local v12 = v2.Dictionary.union(v11, v10.nodeProps or {});
-    local v13 = v9.attributes.href or "";
-    local v14 = v10.linker.evaluateLinkBehavior(v13);
-    if v14 == v6.Hide then
-        return {};
-    elseif v14 == v6.Disable then
-        return v7(v2.Dictionary.join(v9, {
-            name = "TEXT_SPAN"
-        }), v10);
-    else
-        local v15 = v10.processChildren(v9, v10);
-        local v18 = v2.List.map(v15, function(v16, v17) --[[ Line: 30 ]]
-            -- upvalues: l_TextElement_0 (ref), v12 (copy), v2 (ref), v10 (copy), v11 (copy)
-            return l_TextElement_0.new({
-                LayoutOrder = v17, 
-                EngineTags = if v12.showUnderline then v2.List.join({
-                    {
-                        name = "u", 
-                        attributes = {}
-                    }
-                }, v16.engineTags) else v16.engineTags, 
-                Text = v16.text, 
-                fontStyle = v10.styles.fontStyle, 
-                textStyle = v2.Dictionary.union(v11.textStyle, v12.textStyle)
-            });
-        end);
-        if #v18 > 0 then
-            return {
-                l_LinkElement_0.new(v18, {
-                    onActivated = function() --[[ Line: 44 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v10 (copy), v13 (copy), v14 (copy)
-                        v10.linker.onActivated({
-                            url = v13, 
-                            linkBehavior = v14
-                        });
-                    end
-                })
-            };
-        else
-            return {};
-        end;
-    end;
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+local InlineRichTextParent = InlineRichText.Parent
+local Cryo = require(InlineRichTextParent.Cryo)
+local InlineLayout = require(InlineRichTextParent.InlineLayout)
+local TextElement = InlineLayout.Components.InlineLayoutElements.TextElement
+local LinkElement = InlineLayout.Components.InlineLayoutElements.LinkElement
+local LinkBehavior = require(InlineRichText.Enums.LinkBehavior)
+local InlineCustomRenderer = require(InlineRichText.Renderer.NodeRenderers.InlineCustomRenderer)
+
+require(InlineRichText.Types)
+
+return function(p1, p2) -- line: 13
+	-- upvalues: Cryo (copy), LinkBehavior (copy), InlineCustomRenderer (copy), TextElement (copy), LinkElement (copy)
+	local t1 = {
+		showUnderline = true,
+		textStyle = p2.styles.textStyle
+	}
+	local v12 = Cryo.Dictionary.union(t1, p2.nodeProps or {})
+	local v13 = p1.attributes.href or ""
+	local v14 = p2.linker.evaluateLinkBehavior(v13)
+
+	if v14 == LinkBehavior.Hide then
+		return {}
+	end
+
+	if v14 == LinkBehavior.Disable then
+		return InlineCustomRenderer(Cryo.Dictionary.join(p1, {
+			name = "TEXT_SPAN"
+		}), p2)
+	end
+
+	local v15 = p2.processChildren(p1, p2)
+	local v16 = Cryo.List.map(v15, function(p3, p4) -- line: 30
+		-- upvalues: TextElement (copy), v12 (copy), Cryo (copy), p2 (copy), t1 (copy)
+		return TextElement.new({
+			LayoutOrder = p4,
+			EngineTags = if not v12.showUnderline then p3.engineTags else Cryo.List.join({{
+				name = "u",
+				attributes = {}
+			}}, p3.engineTags),
+			Text = p3.text,
+			fontStyle = p2.styles.fontStyle,
+			textStyle = Cryo.Dictionary.union(t1.textStyle, v12.textStyle)
+		})
+	end)
+
+	if #v16 > 0 then
+		return { LinkElement.new(v16, {
+			onActivated = function() -- line: 44
+				-- upvalues: p2 (copy), v13 (copy), v14 (copy)
+				p2.linker.onActivated({
+					url = v13,
+					linkBehavior = v14
+				})
+			end
+		}) }
+	end
+
+	return {}
+end

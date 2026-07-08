@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXInventoryItemsListImpressionLogging", false);
+return game:DefineFastFlag("AXInventoryItemsListImpressionLogging", false)

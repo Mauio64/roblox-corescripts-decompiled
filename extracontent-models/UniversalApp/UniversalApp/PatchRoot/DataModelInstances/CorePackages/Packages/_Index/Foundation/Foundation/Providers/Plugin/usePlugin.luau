@@ -1,13 +1,18 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useContext_0 = v1.useContext;
-local v3 = require(script.Parent.PluginContext);
-return function() --[[ Line: 9 ]] --[[ Name: usePlugin ]]
-    -- upvalues: l_useContext_0 (copy), v3 (copy), v1 (copy)
-    local v4 = l_useContext_0(v3);
-    if v4 == v1.None then
-        return nil;
-    else
-        return v4;
-    end;
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+local useContext = React.useContext
+local PluginContext = require(script.Parent.PluginContext)
+local isPluginElevated = require(script.Parent.isPluginElevated)
+
+local function usePlugin() -- line: 10
+	-- upvalues: useContext (copy), PluginContext (copy), React (copy), isPluginElevated (copy)
+	local v7 = useContext(PluginContext)
+
+	if v7 and v7 ~= React.None then
+		return v7, isPluginElevated(v7)
+	end
+
+	return nil, false
+end
+
+return usePlugin

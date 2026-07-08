@@ -1,30 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local l_isErrorReasonPrefixWithEconomicRestrictions_0 = require(l_Parent_0.IAPExperience).Utility.isErrorReasonPrefixWithEconomicRestrictions;
-return function(v4) --[[ Line: 8 ]] --[[ Name: parseSubscriptionError ]]
-    -- upvalues: v2 (copy), l_isErrorReasonPrefixWithEconomicRestrictions_0 (copy)
-    if v4 == "UserHasSpendLimitSet" then
-        return v2.SubscriptionExceededUserSpendLimit;
-    elseif v4 == "UnsupportedLocale" then
-        return v2.SubscriptionUnsupportedLocale;
-    elseif v4 == "RestrictedUser" then
-        return v2.RestrictedUser;
-    elseif v4 == "PurchasePlatformNotSupported" then
-        return v2.SubscriptionPurchasePlatformNotSupported;
-    elseif v4 == "InvalidSaleLocation" then
-        return v2.SubscriptionInvalidSaleLocation;
-    elseif v4 == "UserAlreadySubscribed" then
-        return v2.AlreadySubscribed;
-    elseif v4 == "ProductNotForSale" then
-        return v2.SubscriptionNotForSale;
-    elseif v4 == "VpcRequired" then
-        return v2.VpcRequired;
-    elseif v4 == "ExceedParentalSpendLimit" then
-        return v2.ExceedParentalSpendLimit;
-    elseif l_isErrorReasonPrefixWithEconomicRestrictions_0(v4) then
-        return v4;
-    else
-        return v2.UnknownFailure;
-    end;
-end;
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local isErrorReasonPrefixWithEconomicRestrictions = require(PurchasePromptParent.IAPExperience).Utility.isErrorReasonPrefixWithEconomicRestrictions
+
+local function parseSubscriptionError(p1) -- line: 8
+	-- upvalues: PurchaseError (copy), isErrorReasonPrefixWithEconomicRestrictions (copy)
+	if p1 == "UserHasSpendLimitSet" then
+		return PurchaseError.SubscriptionExceededUserSpendLimit
+	end
+
+	if p1 == "UnsupportedLocale" then
+		return PurchaseError.SubscriptionUnsupportedLocale
+	end
+
+	if p1 == "RestrictedUser" then
+		return PurchaseError.RestrictedUser
+	end
+
+	if p1 == "PurchasePlatformNotSupported" then
+		return PurchaseError.SubscriptionPurchasePlatformNotSupported
+	end
+
+	if p1 == "InvalidSaleLocation" then
+		return PurchaseError.SubscriptionInvalidSaleLocation
+	end
+
+	if p1 == "UserAlreadySubscribed" then
+		return PurchaseError.AlreadySubscribed
+	end
+
+	if p1 == "ProductNotForSale" then
+		return PurchaseError.SubscriptionNotForSale
+	end
+
+	if p1 == "VpcRequired" then
+		return PurchaseError.VpcRequired
+	end
+
+	if p1 == "ExceedParentalSpendLimit" then
+		return PurchaseError.ExceedParentalSpendLimit
+	end
+
+	if isErrorReasonPrefixWithEconomicRestrictions(p1) then
+		return p1
+	end
+
+	return PurchaseError.UnknownFailure
+end
+
+return parseSubscriptionError

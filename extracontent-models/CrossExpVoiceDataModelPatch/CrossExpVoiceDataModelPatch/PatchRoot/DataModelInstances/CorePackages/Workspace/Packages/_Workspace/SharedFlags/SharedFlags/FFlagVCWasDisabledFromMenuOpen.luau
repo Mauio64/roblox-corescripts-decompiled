@@ -1,1 +1,1 @@
-return game:DefineFastFlag("VCWasDisabledFromMenuOpen", false);
+return game:DefineFastFlag("VCWasDisabledFromMenuOpen", false)

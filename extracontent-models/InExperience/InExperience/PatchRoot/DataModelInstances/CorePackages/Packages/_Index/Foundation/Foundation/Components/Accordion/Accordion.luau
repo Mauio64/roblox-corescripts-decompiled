@@ -1,31 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v4 = require(l_script_FirstAncestor_0.Components.View);
-local v5 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v6 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v7 = require(script.Parent.AccordionContext);
-local _ = require(script.Parent.useAccordion);
-local v9 = {
-    size = require(l_script_FirstAncestor_0.Enums.InputSize).Medium, 
-    width = UDim.new(1, 0), 
-    testId = "--foundation-accordion"
-};
-return v2.memo(v2.forwardRef(function(v10, v11) --[[ Line: 35 ]] --[[ Name: Accordion ]]
-    -- upvalues: v6 (copy), v9 (copy), v2 (copy), v4 (copy), v5 (copy), v7 (copy)
-    local v12 = v6(v10, v9);
-    return v2.createElement(v4, v5(v12, {
-        tag = "col flex-y-evenly auto-y", 
-        Size = UDim2.new(v12.width, UDim.new(0, 0)), 
-        ref = v11
-    }), {
-        AccordionContext = v2.createElement(v7.Provider, {
-            value = {
-                onAccordionItemActivated = v12.onActivated, 
-                itemSize = v12.size, 
-                testId = v12.testId
-            }
-        }, v12.children)
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local AccordionContext = require(script.Parent.AccordionContext)
+
+require(script.Parent.useAccordion)
+
+local InputSize = require(Foundation.Enums.InputSize)
+local t1 = {
+	testId = "--foundation-accordion",
+	size = InputSize.Medium,
+	width = UDim.new(1, 0)
+}
+
+local function Accordion(p1, p2) -- line: 35
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), View (copy), withCommonProps (copy), AccordionContext (copy)
+	local v13 = withDefaults(p1, t1)
+
+	return React.createElement(View, withCommonProps(v13, {
+		tag = "col flex-y-evenly auto-y",
+		Size = UDim2.new(v13.width, UDim.new(0, 0)),
+		ref = p2
+	}), {
+		AccordionContext = React.createElement(AccordionContext.Provider, {
+			value = {
+				onAccordionItemActivated = v13.onActivated,
+				itemSize = v13.size,
+				testId = v13.testId
+			}
+		}, v13.children)
+	})
+end
+
+return React.memo(React.forwardRef(Accordion))

@@ -1,31 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactIs);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v5, v6) --[[ Line: 9 ]] --[[ Name: joinBindables ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    local v7 = {};
-    local v8 = {};
-    local v9 = false;
-    for v10, v11 in v5 do
-        if v3.isBinding(v11) then
-            v7[v10] = v11;
-            v9 = true;
-        else
-            v8[v10] = v11;
-        end;
-    end;
-    if not v9 then
-        return v6(v8);
-    else
-        return v2.joinBindings(v7):map(function(v12) --[[ Line: 30 ]]
-            -- upvalues: v8 (copy), v6 (copy)
-            local v13 = table.clone(v8);
-            for v14, v15 in v12 do
-                v13[v14] = v15;
-            end;
-            return v6(v13);
-        end);
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ReactIs = require(FoundationParent.ReactIs)
+
+require(Foundation.Components.Types)
+
+local function joinBindables(t1: {[any]: any}, p1: ((...any) -> ...any)) -- line: 9
+	-- upvalues: ReactIs (copy), React (copy)
+	local t2 = {}
+	local t3 = {}
+	local v10 = false
+
+	for v11, v12 in t1 do
+		if ReactIs.isBinding(v12) then
+			t2[v11] = v12
+			v10 = true
+		else
+			t3[v11] = v12
+		end
+	end
+
+	if not v10 then
+		return p1(t3)
+	end
+
+	return React.joinBindings(t2):map(function(p2) -- line: 30
+		-- upvalues: t3 (copy), p1 (copy)
+		local v14 = table.clone(t3)
+
+		for v15, v16 in p2 do
+			v14[v15] = v16
+		end
+
+		return p1(v14)
+	end)
+end
+
+return joinBindables

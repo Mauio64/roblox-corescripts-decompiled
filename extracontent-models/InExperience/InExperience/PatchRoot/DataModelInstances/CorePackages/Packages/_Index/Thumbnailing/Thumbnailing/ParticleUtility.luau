@@ -10,8 +10,8 @@ local function recurFastForwardParticles(p2) -- line: 14
 		p2:FastForward(240)
 	end
 
-	for _, v8 in (p2:GetChildren()) do
-		recurFastForwardParticles(v8)
+	for _, child in (p2:GetChildren()) do
+		recurFastForwardParticles(child)
 	end
 end
 
@@ -65,8 +65,8 @@ local function recurReparentOrphanedEffects(p5) -- line: 60
 		return
 	end
 
-	for _, v18 in p5:GetChildren() do
-		recurReparentOrphanedEffects(v18)
+	for _, child in p5:GetChildren() do
+		recurReparentOrphanedEffects(child)
 	end
 end
 

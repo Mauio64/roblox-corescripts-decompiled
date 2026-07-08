@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableToastLiteRender", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableToastLiteRender");
-end;
+game:DefineFastFlag("EnableToastLiteRender", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableToastLiteRender")
+end

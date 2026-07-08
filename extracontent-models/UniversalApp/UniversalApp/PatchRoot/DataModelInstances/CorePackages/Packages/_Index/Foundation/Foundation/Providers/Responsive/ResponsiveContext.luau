@@ -1,10 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Utility.Responsive.BreakpointConfig);
-local v3 = require(l_script_FirstAncestor_0.Utility.Responsive.GridConfig);
-return require(l_Parent_0.React).createContext({
-    config = {
-        breakpoint = v2, 
-        grid = v3
-    }
-});
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local BreakpointConfig = require(Foundation.Utility.Responsive.BreakpointConfig)
+local GridConfig = require(Foundation.Utility.Responsive.GridConfig)
+
+return require(FoundationParent.React).createContext({
+	config = {
+		breakpoint = BreakpointConfig,
+		grid = GridConfig
+	}
+})

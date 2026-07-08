@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddTypesToWidgetItems", false);
+return game:DefineFastFlag("AddTypesToWidgetItems", false)

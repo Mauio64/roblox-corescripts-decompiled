@@ -1,55 +1,67 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local function _(v2) --[[ Line: 16 ]] --[[ Name: computeChannelId ]]
-    if not v2 then
-        return "";
-    elseif game:GetEngineFeature("VoiceChatServiceExposesChannelId") and v2.service then
-        return (tostring(v2.service:GetChannelId()));
-    elseif v2.service then
-        return (tostring(v2.service:GetGroupId()));
-    else
-        return "";
-    end;
-end;
-local function v8(v4) --[[ Line: 28 ]] --[[ Name: buildState ]]
-    local v5 = {};
-    if v4 and v4.participants then
-        for v6 in pairs(v4.participants) do
-            local v7 = tonumber(v6);
-            if v7 then
-                table.insert(v5, v7);
-            end;
-        end;
-        table.sort(v5);
-    end;
-    return {
-        sortedPlayerListUserIds = v5, 
-        channelId = not v4 and "" or if game:GetEngineFeature("VoiceChatServiceExposesChannelId") and v4.service then tostring(v4.service:GetChannelId()) else if v4.service then tostring(v4.service:GetGroupId()) else "", 
-        voiceUserCount = #v5
-    };
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local React = require(Parent.React)
+
+local function computeChannelId(p1) -- line: 16
+	if not p1 then
+		return ""
+	end
+
+	if game:GetEngineFeature("VoiceChatServiceExposesChannelId") and p1.service then
+		return (tostring(p1.service:GetChannelId()))
+	end
+
+	if p1.service then
+		return (tostring(p1.service:GetGroupId()))
+	end
+
+	return ""
+end
+local function buildState(p2) -- line: 28
+	local t1 = {}
+
+	if p2 and p2.participants then
+		for k in pairs(p2.participants) do
+			local num = tonumber(k)
+
+			if num then
+				table.insert(t1, num)
+			end
+		end
+
+		table.sort(t1)
+	end
+
+	return {
+		sortedPlayerListUserIds = t1,
+		channelId = if p2 then if not game:GetEngineFeature("VoiceChatServiceExposesChannelId") or not p2.service then not p2.service and "" or tostring(p2.service:GetGroupId()) else tostring(p2.service:GetChannelId()) else "",
+		voiceUserCount = #t1
+	}
+end
+
 return {
-    useVoiceSnapshot = function(v9) --[[ Line: 53 ]] --[[ Name: useVoiceSnapshot ]]
-        -- upvalues: v1 (copy), v8 (copy)
-        local v10 = v1.useRef((v8(v9)));
-        v1.useEffect(function() --[[ Line: 56 ]]
-            -- upvalues: v9 (copy), v10 (copy), v8 (ref)
-            if not v9 then
-                return;
-            else
-                v10.current = v8(v9);
-                local v11 = v9.participantsUpdate.Event:Connect(function() --[[ Line: 63 ]]
-                    -- upvalues: v10 (ref), v8 (ref), v9 (ref)
-                    v10.current = v8(v9);
-                end);
-                return function() --[[ Line: 67 ]]
-                    -- upvalues: v11 (copy)
-                    v11:Disconnect();
-                end;
-            end;
-        end, {
-            v9
-        });
-        return v10;
-    end
-};
+	useVoiceSnapshot = function(p3) -- line: 53
+		-- upvalues: React (copy), buildState (copy)
+		local v11 = React.useRef((buildState(p3)))
+
+		React.useEffect(function() -- line: 56
+			-- upvalues: p3 (copy), v11 (copy), buildState (copy)
+			if not p3 then
+				return
+			end
+
+			v11.current = buildState(p3)
+
+			local connection = p3.participantsUpdate.Event:Connect(function() -- line: 63
+				-- upvalues: v11 (copy), buildState (copy), p3 (copy)
+				v11.current = buildState(p3)
+			end)
+
+			return function() -- line: 67
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end, { p3 })
+
+		return v11
+	end
+}

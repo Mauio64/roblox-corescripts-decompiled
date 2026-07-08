@@ -1,36 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CoreScriptsRoactCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactRoblox);
-local l_Localization_0 = require(l_Parent_0.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local v6 = require(script.Parent.FoundationStorybookMiddleware);
-local v7 = l_Localization_0.new("en-us");
-local function _(v8) --[[ Line: 12 ]] --[[ Name: wrapWithProviders ]]
-    -- upvalues: v2 (copy), l_LocalizationProvider_0 (copy), v7 (copy)
-    return function(v9) --[[ Line: 13 ]]
-        -- upvalues: v2 (ref), l_LocalizationProvider_0 (ref), v7 (ref), v8 (copy)
-        return v2.createElement(l_LocalizationProvider_0, {
-            localization = v7
-        }, {
-            Child = v2.createElement(v8, v9)
-        });
-    end;
-end;
+local CoreScriptsRoactCommon = script:FindFirstAncestor("CoreScriptsRoactCommon")
+local CoreScriptsRoactCommonParent = CoreScriptsRoactCommon.Parent
+local React = require(CoreScriptsRoactCommonParent.React)
+local ReactRoblox = require(CoreScriptsRoactCommonParent.ReactRoblox)
+local Localization = require(CoreScriptsRoactCommonParent.InExperienceLocales).Localization
+local LocalizationProvider = require(CoreScriptsRoactCommonParent.Localization).LocalizationProvider
+local FoundationStorybookMiddleware = require(script.Parent.FoundationStorybookMiddleware)
+local v8 = Localization.new("en-us")
+
+local function wrapWithProviders(p1) -- line: 12
+	-- upvalues: React (copy), LocalizationProvider (copy), v8 (copy)
+	return function(p2) -- line: 13
+		-- upvalues: React (copy), LocalizationProvider (copy), v8 (copy), p1 (copy)
+		return React.createElement(LocalizationProvider, {
+			localization = v8
+		}, {
+			Child = React.createElement(p1, p2)
+		})
+	end
+end
+local function StoryBookMapStory(p3) -- line: 22
+	-- upvalues: FoundationStorybookMiddleware (copy), React (copy), LocalizationProvider (copy), v8 (copy)
+	return FoundationStorybookMiddleware(function(p4) -- line: 13
+		-- upvalues: React (copy), LocalizationProvider (copy), v8 (copy), p3 (copy)
+		return React.createElement(LocalizationProvider, {
+			localization = v8
+		}, {
+			Child = React.createElement(p3, p4)
+		})
+	end)
+end
+
 return {
-    name = l_script_FirstAncestor_0.Name, 
-    storyRoot = l_script_FirstAncestor_0, 
-    roact = v2, 
-    reactRoblox = v3, 
-    mapStory = function(v11) --[[ Line: 22 ]] --[[ Name: StoryBookMapStory ]]
-        -- upvalues: v6 (copy), v2 (copy), l_LocalizationProvider_0 (copy), v7 (copy)
-        return v6(function(v12) --[[ Line: 13 ]]
-            -- upvalues: v2 (ref), l_LocalizationProvider_0 (ref), v7 (ref), v11 (copy)
-            return v2.createElement(l_LocalizationProvider_0, {
-                localization = v7
-            }, {
-                Child = v2.createElement(v11, v12)
-            });
-        end);
-    end
-};
+	name = CoreScriptsRoactCommon.Name,
+	storyRoot = CoreScriptsRoactCommon,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	mapStory = StoryBookMapStory
+}

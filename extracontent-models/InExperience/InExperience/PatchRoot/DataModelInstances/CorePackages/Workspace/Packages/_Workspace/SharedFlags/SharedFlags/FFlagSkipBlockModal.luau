@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SkipBlockModal", false);
+return game:DefineFastFlag("SkipBlockModal", false)

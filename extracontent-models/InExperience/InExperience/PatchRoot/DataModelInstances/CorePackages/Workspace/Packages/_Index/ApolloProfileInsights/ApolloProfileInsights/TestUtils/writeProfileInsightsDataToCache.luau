@@ -1,42 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("ApolloProfileInsights").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.ApolloLocalState);
-local _ = require(l_Parent_0.ApolloClient);
-local l_queries_0 = v2.queries;
-return function(v5, v6, v7) --[[ Line: 27 ]]
-    -- upvalues: l_queries_0 (copy), v1 (copy)
-    local v8 = if v7 and v7.query then v7.query else l_queries_0.profilesInsightsByUserIds;
-    for v9, v10 in v6 do
-        local v11 = v10.mutualFriends or {};
-        local v12 = {};
-        for v13, v14 in v11 do
-            table.insert(v12, v1.Dictionary.join({
-                __typename = "MutualFriend", 
-                id = v14.id or tostring(v13), 
-                username = v14.username or "", 
-                displayName = v14.displayName or ""
-            }, v14));
-        end;
-        v5:writeQuery({
-            variables = {
-                userIds = v9
-            }, 
-            query = v8, 
-            data = {
-                profilesInsightsByUserIds = {
-                    {
-                        __typename = "ProfileInsights", 
-                        targetUserId = v10.targetUserId or tostring(v9), 
-                        isOfflineFrequents = v10.isOfflineFrequents or false, 
-                        mutualFriends = v12, 
-                        friendshipAgeUnixSeconds = v10.friendshipAgeUnixSeconds or 0, 
-                        friendRequestOriginSource = v10.friendRequestOriginSource or 0, 
-                        accountCreationDateUnixSeconds = v10.accountCreationDateUnixSeconds or 0, 
-                        localizedCountryName = v10.localizedCountryName or "", 
-                        userAgeVerifiedBracket = v10.userAgeVerifiedBracket or ""
-                    }
-                }
-            }
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
+local Cryo = require(Parent.Cryo)
+local ApolloLocalState = require(Parent.ApolloLocalState)
+
+require(Parent.ApolloClient)
+
+local queries = ApolloLocalState.queries
+
+return function(p1, t1: {[any]: any}, t2: {[any]: any}?) -- line: 27
+	-- upvalues: queries (copy), Cryo (copy)
+	local v8 = if not t2 or not t2.query then queries.profilesInsightsByUserIds else t2.query
+
+	for v9, v10 in t1 do
+		local t3 = {}
+
+		for v12, v13 in v10.mutualFriends or {} do
+			table.insert(t3, Cryo.Dictionary.join({
+				__typename = "MutualFriend",
+				id = v13.id or tostring(v12),
+				username = v13.username or "",
+				displayName = v13.displayName or ""
+			}, v13))
+		end
+
+		p1:writeQuery({
+			variables = {
+				userIds = v9
+			},
+			query = v8,
+			data = {
+				profilesInsightsByUserIds = {{
+					__typename = "ProfileInsights",
+					targetUserId = v10.targetUserId or tostring(v9),
+					isOfflineFrequents = v10.isOfflineFrequents or false,
+					mutualFriends = t3,
+					friendshipAgeUnixSeconds = v10.friendshipAgeUnixSeconds or 0,
+					friendRequestOriginSource = v10.friendRequestOriginSource or 0,
+					accountCreationDateUnixSeconds = v10.accountCreationDateUnixSeconds or 0,
+					localizedCountryName = v10.localizedCountryName or "",
+					userAgeVerifiedBracket = v10.userAgeVerifiedBracket or ""
+				}}
+			}
+		})
+	end
+end

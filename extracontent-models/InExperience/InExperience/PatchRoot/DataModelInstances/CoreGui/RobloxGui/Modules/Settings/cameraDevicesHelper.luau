@@ -1,15 +1,18 @@
-local l_VideoCaptureService_0 = game:GetService("VideoCaptureService");
-local v1 = nil;
-l_VideoCaptureService_0.DevicesChanged:Connect(function() --[[ Line: 4 ]]
-    -- upvalues: v1 (ref), l_VideoCaptureService_0 (copy)
-    v1 = l_VideoCaptureService_0:GetCameraDevices();
-end);
+local VideoCaptureService = game:GetService("VideoCaptureService")
+local CameraDevices = nil
+
+VideoCaptureService.DevicesChanged:Connect(function() -- line: 4
+	-- upvalues: CameraDevices (ref), VideoCaptureService (copy)
+	CameraDevices = VideoCaptureService:GetCameraDevices()
+end)
+
 return {
-    GetDevices = function() --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), l_VideoCaptureService_0 (copy)
-        if not v1 then
-            v1 = l_VideoCaptureService_0:GetCameraDevices();
-        end;
-        return v1;
-    end
-};
+	GetDevices = function() -- line: 8
+		-- upvalues: CameraDevices (ref), VideoCaptureService (copy)
+		if not CameraDevices then
+			CameraDevices = VideoCaptureService:GetCameraDevices()
+		end
+
+		return CameraDevices
+	end
+}

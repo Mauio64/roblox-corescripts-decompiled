@@ -1,5 +1,6 @@
-local v0 = require(script.Parent.getUserProfileFromId);
-return function(v1, v2) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return v0(v1, v2).platformProfileId;
-end;
+local getUserProfileFromId = require(script.Parent.getUserProfileFromId)
+
+return function(p1, p2) -- line: 3
+	-- upvalues: getUserProfileFromId (copy)
+	return getUserProfileFromId(p1, p2).platformProfileId
+end

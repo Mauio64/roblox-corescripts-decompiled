@@ -1,3 +1,3 @@
 return {
-    EventStreamReporter = require(script.EventStreamReporter)
-};
+	EventStreamReporter = require(script.EventStreamReporter)
+}

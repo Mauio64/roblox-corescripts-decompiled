@@ -1,33 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VoiceChat");
-local v1 = require(l_script_FirstAncestor_0.OptInStatus.GetVoiceChatOptInStatus);
-local v2 = require(l_script_FirstAncestor_0.OptInStatus.SetVoiceChatOptInStatus);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.Promise);
-local l_PerformFetch_0 = require(l_Parent_0.Http).PerformFetch;
-local l_Logging_0 = require(l_Parent_0.AppCommonLib).Logging;
+local VoiceChat = script:FindFirstAncestor("VoiceChat")
+local GetVoiceChatOptInStatus = require(VoiceChat.OptInStatus.GetVoiceChatOptInStatus)
+local SetVoiceChatOptInStatus = require(VoiceChat.OptInStatus.SetVoiceChatOptInStatus)
+local VoiceChatParent = VoiceChat.Parent
+local Promise = require(VoiceChatParent.Promise)
+local PerformFetch = require(VoiceChatParent.Http).PerformFetch
+local Logging = require(VoiceChatParent.AppCommonLib).Logging
+
 return {
-    KeyMapper = "luaapp.voicechatoptinstatus", 
-    Fetch = function(v7) --[[ Line: 16 ]] --[[ Name: Fetch ]]
-        -- upvalues: l_PerformFetch_0 (copy), v1 (copy), v2 (copy), v4 (copy), l_Logging_0 (copy)
-        return l_PerformFetch_0.Single("luaapp.voicechatoptinstatus", function(v8) --[[ Line: 17 ]]
-            -- upvalues: v1 (ref), v7 (copy), v2 (ref), v4 (ref), l_Logging_0 (ref)
-            return v1(v7):andThen(function(v9) --[[ Line: 18 ]]
-                -- upvalues: v8 (copy), v2 (ref), v4 (ref), l_Logging_0 (ref)
-                local l_responseBody_0 = v9.responseBody;
-                if l_responseBody_0 ~= nil and l_responseBody_0.isUserOptIn ~= nil then
-                    v8:dispatch(v2(l_responseBody_0.isUserOptIn));
-                    return v4.resolve(v9);
-                else
-                    l_Logging_0.warn("Response from GetVoiceChatOptInStatus is malformed!");
-                    return v4.reject({
-                        HttpError = Enum.HttpError.OK
-                    });
-                end;
-            end);
-        end);
-    end, 
-    GetFetchingStatus = function(v11) --[[ Line: 31 ]] --[[ Name: GetFetchingStatus ]]
-        -- upvalues: l_PerformFetch_0 (copy)
-        return l_PerformFetch_0.GetStatus(v11, "luaapp.voicechatoptinstatus");
-    end
-};
+	KeyMapper = "luaapp.voicechatoptinstatus",
+	Fetch = function(p1) -- line: 16
+		-- upvalues: PerformFetch (copy), GetVoiceChatOptInStatus (copy), SetVoiceChatOptInStatus (copy), Promise (copy), Logging (copy)
+		return PerformFetch.Single("luaapp.voicechatoptinstatus", function(p2) -- line: 17
+			-- upvalues: GetVoiceChatOptInStatus (copy), p1 (copy), SetVoiceChatOptInStatus (copy), Promise (copy), Logging (copy)
+			return GetVoiceChatOptInStatus(p1):andThen(function(p3) -- line: 18
+				-- upvalues: p2 (copy), SetVoiceChatOptInStatus (copy), Promise (copy), Logging (copy)
+				local responseBody = p3.responseBody
+
+				if responseBody ~= nil and responseBody.isUserOptIn ~= nil then
+					p2:dispatch(SetVoiceChatOptInStatus(responseBody.isUserOptIn))
+
+					return Promise.resolve(p3)
+				end
+
+				Logging.warn("Response from GetVoiceChatOptInStatus is malformed!")
+
+				return Promise.reject({
+					HttpError = Enum.HttpError.OK
+				})
+			end)
+		end)
+	end,
+	GetFetchingStatus = function(p4) -- line: 31
+		-- upvalues: PerformFetch (copy)
+		return PerformFetch.GetStatus(p4, "luaapp.voicechatoptinstatus")
+	end
+}

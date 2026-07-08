@@ -1,129 +1,176 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.Constants);
-local v3 = require(l_Parent_0.validationSystem.ValidationEnums);
-local v4 = require(l_Parent_0.util.CreateExpectedSchema);
-local v5 = require(l_Parent_0.validationSystem.ErrorSourceStrings);
-local v6 = require(l_Parent_0.flags.getFFlagUGCValidationExtendSchemaToIgnoreDescendants);
-local v7 = {
-    categories = v2.AllUploadCategories, 
-    requiredData = {
-        v3.SharedDataMember.entrypointInput, 
-        v3.SharedDataMember.rootInstance, 
-        v3.SharedDataMember.uploadCategory, 
-        v3.SharedDataMember.uploadEnum
-    }
-};
-local function _(v8, v9) --[[ Line: 20 ]] --[[ Name: checkName ]]
-    if type(v8) == "table" then
-        return table.find(v8, v9) ~= nil;
-    else
-        return v8 == v9;
-    end;
-end;
-local function _(v11) --[[ Line: 27 ]] --[[ Name: getReadableName ]]
-    if type(v11) == "table" then
-        return table.concat(v11, " or ");
-    elseif type(v11) == "string" then
-        return v11;
-    else
-        return "*";
-    end;
-end;
-local function v13(v14, v15, v16, v17) --[[ Line: 36 ]] --[[ Name: validateInstancesFromSchema ]]
-    -- upvalues: v6 (copy), v13 (copy), v5 (copy)
-    v16[v14] = true;
-    if v6() and v15._ignoreDescendants then
-        assert(not v15._children, "if _ignoreDescendants is true, there should be no descendants in the schema as they would be ignored anyway");
-        for _, v19 in v14:GetDescendants() do
-            v16[v19] = true;
-        end;
-        return;
-    else
-        local v20 = v15._children or {};
-        for _, v22 in v20 do
-            local v23 = false;
-            for _, v25 in v14:GetChildren() do
-                if v16[v25] == nil and v25.ClassName == v22.ClassName then
-                    if v22.Name ~= nil then
-                        local l_Name_0 = v22.Name;
-                        local l_Name_1 = v25.Name;
-                        if not if type(l_Name_0) == "table" then table.find(l_Name_0, l_Name_1) ~= nil else l_Name_0 == l_Name_1 then
-                            continue;
-                        end;
-                    end;
-                    v13(v25, v22, v16, v17);
-                    v23 = true;
-                    break;
-                end;
-            end;
-            if not v23 and not v22._optional then
-                local l_AssetSchemaMissingItem_0 = v5.Keys.AssetSchemaMissingItem;
-                local v29 = {
-                    ParentPath = v14:GetFullName(), 
-                    ExpectedClass = v22.ClassName
-                };
-                local l_Name_2 = v22.Name;
-                v29.ExpectedName = if type(l_Name_2) == "table" then table.concat(l_Name_2, " or ") else if type(l_Name_2) == "string" then l_Name_2 else "*";
-                v17:fail(l_AssetSchemaMissingItem_0, v29);
-            end;
-        end;
-        return;
-    end;
-end;
-local function v37(v31, v32, v33) --[[ Line: 81 ]] --[[ Name: validateNoInstancesOutsideSchema ]]
-    -- upvalues: v5 (copy)
-    local v34 = {};
-    for _, v36 in pairs(v31:GetDescendants()) do
-        if v32[v36] == nil then
-            table.insert(v34, v36:GetFullName());
-        end;
-    end;
-    if #v34 > 0 then
-        v33:fail(v5.Keys.AssetSchemaUnexpectedItems, {
-            UnexpectedDescendantPaths = table.concat(v34, ", ")
-        });
-    end;
-end;
-v7.run = function(v38, v39) --[[ Line: 100 ]]
-    -- upvalues: v5 (copy), v4 (copy), v13 (copy), v37 (copy)
-    local l_rootInstance_0 = v39.rootInstance;
-    local l_uploadCategory_0 = v39.uploadCategory;
-    local l_uploadEnum_0 = v39.uploadEnum;
-    if l_rootInstance_0 == nil then
-        v38:fail(v5.Keys.SelectionCountNotOne);
-        return;
-    else
-        local v43 = nil;
-        if l_uploadEnum_0.bundleType then
-            local l_entrypointInput_0 = v39.entrypointInput;
-            v43 = v4.generateBundleSchema(l_entrypointInput_0);
-        else
-            v43 = v4.generateAssetSchema(l_uploadCategory_0, l_uploadEnum_0.assetType, l_rootInstance_0);
-        end;
-        local v45 = {};
-        if v43.ClassName ~= l_rootInstance_0.ClassName then
-            v38:fail(v5.Keys.AssetSchemaWrongRootClass, {
-                RootClass = l_rootInstance_0.ClassName, 
-                ExpectedClass = v43.ClassName
-            });
-            return;
-        else
-            if v43.Name ~= nil then
-                local l_Name_3 = v43.Name;
-                local l_Name_4 = l_rootInstance_0.Name;
-                if not if type(l_Name_3) == "table" then table.find(l_Name_3, l_Name_4) ~= nil else l_Name_3 == l_Name_4 then
-                    v38:fail(v5.Keys.AssetSchemaWrongRootName, {
-                        RootName = l_rootInstance_0.Name, 
-                        ExpectedName = v43.Name
-                    });
-                    return;
-                end;
-            end;
-            v13(l_rootInstance_0, v43, v45, v38);
-            v37(l_rootInstance_0, v45, v38);
-            return;
-        end;
-    end;
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local Constants = require(ParentParent.Constants)
+local ValidationEnums = require(ParentParent.validationSystem.ValidationEnums)
+local CreateExpectedSchema = require(ParentParent.util.CreateExpectedSchema)
+local ErrorSourceStrings = require(ParentParent.validationSystem.ErrorSourceStrings)
+local getFFlagUGCValidationExtendSchemaToIgnoreDescendants = require(ParentParent.flags.getFFlagUGCValidationExtendSchemaToIgnoreDescendants)
+local getEngineFeatureEngineUGCValidationExpandReturnSchema = require(ParentParent.flags.getEngineFeatureEngineUGCValidationExpandReturnSchema)
+local getFFlagUGCValidationAnimationPackSupport = require(ParentParent.flags.getFFlagUGCValidationAnimationPackSupport)
+local getFFlagUGCValidationAnimationPackFolderStructure = require(ParentParent.flags.getFFlagUGCValidationAnimationPackFolderStructure)
+local t1 = {
+	categories = Constants.AllUploadCategories,
+	requiredData = {
+		ValidationEnums.SharedDataMember.entrypointInput,
+		ValidationEnums.SharedDataMember.rootInstance,
+		ValidationEnums.SharedDataMember.uploadCategory,
+		ValidationEnums.SharedDataMember.uploadEnum
+	}
+}
+
+local function checkName(p1, s1: string) -- line: 25
+	if type(p1) == "table" then
+		return table.find(p1, s1) ~= nil
+	end
+
+	return p1 == s1
+end
+local function getReadableName(p2) -- line: 32
+	if type(p2) == "table" then
+		return table.concat(p2, " or ")
+	end
+
+	if type(p2) == "string" then
+		return p2
+	end
+
+	return "*"
+end
+local function validateInstancesFromSchema(p3, p4, t2: {[any]: any}, p5) -- line: 41
+	-- upvalues: getFFlagUGCValidationExtendSchemaToIgnoreDescendants (copy), validateInstancesFromSchema (copy), ErrorSourceStrings (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy)
+	t2[p3] = true
+
+	if getFFlagUGCValidationExtendSchemaToIgnoreDescendants() and p4._ignoreDescendants then
+		assert(not p4._children, "if _ignoreDescendants is true, there should be no descendants in the schema as they would be ignored anyway")
+
+		for _, descendant in p3:GetDescendants() do
+			t2[descendant] = true
+		end
+
+		return
+	end
+
+	local g29 = nil
+	local g30 = nil
+
+	for _, v25 in p4._children or {} do
+		local v26 = false
+
+		for _, child in p3:GetChildren() do
+			if t2[child] ~= nil or child.ClassName ~= v25.ClassName then
+				continue
+			end
+
+			repeat
+				if g29 or v25.Name == nil then
+					g29 = false
+					validateInstancesFromSchema(child, v25, t2, p5)
+					v26 = true
+					g30 = true
+
+					break
+				end
+
+				local Name = v25.Name
+				local childName = child.Name
+
+				if if type(Name) ~= "table" then Name == childName else table.find(Name, childName) ~= nil then
+					g29 = true
+				end
+			until not g29
+
+			if g30 then
+				g30 = false
+
+				break
+			end
+		end
+
+		if not v26 and not v25._optional then
+			local AssetSchemaMissingItem = ErrorSourceStrings.Keys.AssetSchemaMissingItem
+			local t3 = {
+				ParentPath = p3:GetFullName(),
+				ExpectedClass = v25.ClassName
+			}
+			local Name = v25.Name
+
+			t3.ExpectedName = if type(Name) ~= "table" then type(Name) ~= "string" and "*" or Name else table.concat(Name, " or ")
+			p5:fail(AssetSchemaMissingItem, t3, if not getEngineFeatureEngineUGCValidationExpandReturnSchema() then nil else p3)
+		end
+	end
+end
+local function validateNoInstancesOutsideSchema(p6, t4: {[any]: any}, p7) -- line: 86
+	-- upvalues: ErrorSourceStrings (copy), getEngineFeatureEngineUGCValidationExpandReturnSchema (copy)
+	local t5 = {}
+
+	for _, descendant in pairs(p6:GetDescendants()) do
+		if t4[descendant] == nil then
+			table.insert(t5, descendant:GetFullName())
+		end
+	end
+
+	if #t5 > 0 then
+		p7:fail(ErrorSourceStrings.Keys.AssetSchemaUnexpectedItems, {
+			UnexpectedDescendantPaths = table.concat(t5, ", ")
+		}, if not getEngineFeatureEngineUGCValidationExpandReturnSchema() then nil else p6)
+	end
+end
+
+function t1.run(p8, p9) -- line: 107
+	-- upvalues: ErrorSourceStrings (copy), getFFlagUGCValidationAnimationPackSupport (copy), getFFlagUGCValidationAnimationPackFolderStructure (copy), CreateExpectedSchema (copy), validateInstancesFromSchema (copy), validateNoInstancesOutsideSchema (copy)
+	local rootInstance = p9.rootInstance
+	local uploadCategory = p9.uploadCategory
+	local uploadEnum = p9.uploadEnum
+
+	if rootInstance == nil then
+		p8:fail(ErrorSourceStrings.Keys.SelectionCountNotOne)
+
+		return
+	end
+
+	local v47
+
+	if uploadEnum.bundleType then
+		if getFFlagUGCValidationAnimationPackSupport() and uploadEnum.bundleType == Enum.BundleType.Animations then
+			v47 = if not getFFlagUGCValidationAnimationPackFolderStructure() then CreateExpectedSchema.generateAnimationPackBundleSchema(nil) else CreateExpectedSchema.generateAnimationPackBundleSchema(rootInstance)
+		else
+			local entrypointInput = p9.entrypointInput
+
+			v47 = CreateExpectedSchema.generateBundleSchema(entrypointInput)
+		end
+	else
+		v47 = CreateExpectedSchema.generateAssetSchema(uploadCategory, uploadEnum.assetType, rootInstance)
+	end
+
+	local t6 = {}
+
+	if v47.ClassName ~= rootInstance.ClassName then
+		p8:fail(ErrorSourceStrings.Keys.AssetSchemaWrongRootClass, {
+			RootClass = rootInstance.ClassName,
+			ExpectedClass = v47.ClassName
+		})
+
+		return
+	end
+
+	if v47.Name ~= nil then
+		local Name = v47.Name
+		local rootInstanceName = rootInstance.Name
+
+		if not if type(Name) ~= "table" then Name == rootInstanceName else table.find(Name, rootInstanceName) ~= nil then
+			p8:fail(ErrorSourceStrings.Keys.AssetSchemaWrongRootName, {
+				RootName = rootInstance.Name,
+				ExpectedName = v47.Name
+			})
+
+			return
+		end
+	end
+
+	validateInstancesFromSchema(rootInstance, v47, t6, p8)
+	validateNoInstancesOutsideSchema(rootInstance, t6, p8)
+end
+
+return t1

@@ -1,17 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameVotesRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local v3 = require(l_script_FirstAncestor_0.GameVotes.SetGameVotes);
-return function(v4, v5) --[[ Line: 15 ]]
-    -- upvalues: v3 (copy), l_Immutable_0 (copy)
-    v4 = v4 or {};
-    assert(v4, "");
-    if v5.type == v3.name then
-        local v6 = {
-            upVotes = v5.upVotes, 
-            downVotes = v5.downVotes
-        };
-        v4 = l_Immutable_0.Set(v4, v5.universeId, v6);
-    end;
-    return v4;
-end;
+local GameVotesRodux = script:FindFirstAncestor("GameVotesRodux")
+local GameVotesRoduxParent = GameVotesRodux.Parent
+local Immutable = require(GameVotesRoduxParent.AppCommonLib).Immutable
+local SetGameVotes = require(GameVotesRodux.GameVotes.SetGameVotes)
+
+return function(t1: {[any]: any}?, p1) -- line: 15
+	-- upvalues: SetGameVotes (copy), Immutable (copy)
+	local v7 = t1 or {}
+
+	assert(v7, "")
+
+	if p1.type == SetGameVotes.name then
+		local t2 = {
+			upVotes = p1.upVotes,
+			downVotes = p1.downVotes
+		}
+
+		v7 = Immutable.Set(v7, p1.universeId, t2)
+	end
+
+	return v7
+end

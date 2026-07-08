@@ -1,3 +1,3 @@
 return {
-    Contact = "Contact"
-};
+	Contact = "Contact"
+}

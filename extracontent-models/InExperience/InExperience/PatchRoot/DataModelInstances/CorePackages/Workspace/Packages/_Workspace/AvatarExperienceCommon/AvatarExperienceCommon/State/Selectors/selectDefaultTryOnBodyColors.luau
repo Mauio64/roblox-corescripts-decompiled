@@ -1,20 +1,26 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Constants);
-return function(v2) --[[ Line: 4 ]] --[[ Name: selectDefaultTryOnBodyColors ]]
-    -- upvalues: v1 (copy)
-    local l_OutfitTryOn_0 = v2.AvatarExperience.AvatarScene.OutfitTryOn;
-    local l_OutfitInfos_0 = v2.AvatarExperience.AvatarEditor.OutfitInfos;
-    local l_OutfitIdMap_0 = l_OutfitTryOn_0.OutfitIdMap;
-    for _, v7 in l_OutfitTryOn_0.TryOnItems do
-        if l_OutfitIdMap_0 and v7.itemType == "Bundle" and v7.itemSubType == v1.BODY_BUNDLE_TYPE_ID and v7.receivedBundleInfo then
-            local v8 = l_OutfitIdMap_0[v7.itemId];
-            local v9 = if v8 then l_OutfitInfos_0[v8] else nil;
-            if v9 then
-                return v9.bodyColor3s;
-            else
-                return nil;
-            end;
-        end;
-    end;
-    return nil;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local Constants = require(AvatarExperienceCommon.Constants)
+
+local function selectDefaultTryOnBodyColors(p1) -- line: 4
+	-- upvalues: Constants (copy)
+	local OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn
+	local OutfitInfos = p1.AvatarExperience.AvatarEditor.OutfitInfos
+	local OutfitIdMap = OutfitTryOn.OutfitIdMap
+
+	for _, v9 in OutfitTryOn.TryOnItems do
+		if OutfitIdMap and v9.itemType == "Bundle" and v9.itemSubType == Constants.BODY_BUNDLE_TYPE_ID and v9.receivedBundleInfo then
+			local v10 = OutfitIdMap[v9.itemId]
+			local v11 = if not v10 then nil else OutfitInfos[v10]
+
+			if v11 then
+				return v11.bodyColor3s
+			end
+
+			return nil
+		end
+	end
+
+	return nil
+end
+
+return selectDefaultTryOnBodyColors

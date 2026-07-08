@@ -1,7 +1,8 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1, v2) --[[ Line: 10 ]]
-    return {
-        endTimestamp = v1, 
-        isEnforced = v2
-    };
-end);
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(n1: number, b1: boolean) -- line: 10
+	return {
+		endTimestamp = n1,
+		isEnforced = b1
+	}
+end)

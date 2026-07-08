@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogM41HandAndArm", false);
+return game:DefineFastFlag("AXCatalogM41HandAndArm", false)

@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: selectCurrentAvatarEditorCategory ]]
-    return v0.AvatarExperience.AvatarEditor.Categories.category;
-end;
+local function selectCurrentAvatarEditorCategory(p1) -- line: 4
+	return p1.AvatarExperience.AvatarEditor.Categories.category
+end
+
+return selectCurrentAvatarEditorCategory

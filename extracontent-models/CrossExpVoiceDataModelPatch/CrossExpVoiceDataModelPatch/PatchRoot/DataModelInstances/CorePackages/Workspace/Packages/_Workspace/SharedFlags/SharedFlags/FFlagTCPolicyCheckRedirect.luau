@@ -1,1 +1,1 @@
-return game:DefineFastFlag("TCPolicyCheckRedirect", false);
+return game:DefineFastFlag("TCPolicyCheckRedirect", false)

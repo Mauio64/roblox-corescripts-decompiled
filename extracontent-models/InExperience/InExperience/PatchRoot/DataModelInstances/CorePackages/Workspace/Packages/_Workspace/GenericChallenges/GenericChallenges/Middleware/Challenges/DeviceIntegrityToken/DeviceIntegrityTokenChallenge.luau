@@ -1,120 +1,140 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericChallenges");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_AppLogging_0 = require(l_Parent_0.RoactServiceTags).AppLogging;
-local l_LoadingSpinner_0 = require(l_Parent_0.UIBlox).App.Loading.LoadingSpinner;
-local v7 = require(script.Parent.DeviceIntegrityChallengeEvent);
-local v8 = require(l_script_FirstAncestor_0.Middleware.Flags.GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner);
-local v9 = require(l_script_FirstAncestor_0.Middleware.Flags.GetFFlagEnableNewDeviceIntegrityFailureHandling);
-local l_useEffect_0 = v3.useEffect;
-local v11 = require(l_script_FirstAncestor_0.Utils.ChallengeEventConstants);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-game:DefineFastInt("DeviceIntegrityNativeTimeoutMilliseconds", 450);
-constructAccountServiceParams = function(v13) --[[ Line: 19 ]] --[[ Name: constructAccountServiceParams ]]
-    -- upvalues: l_HttpService_0 (copy)
-    return l_HttpService_0:JSONEncode({
-        requestHash = v13
-    });
-end;
-return function(v14) --[[ Line: 52 ]] --[[ Name: DeviceIntegrityTokenChallenge ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppLogging_0 (copy), l_useEffect_0 (copy), l_HttpService_0 (copy), v7 (copy), v11 (copy), v9 (copy), l_useSelector_0 (copy), v8 (copy), v3 (copy), l_LoadingSpinner_0 (copy)
-    local v15 = l_useRoactService_0(l_AppLogging_0);
-    l_useEffect_0(function() --[[ Line: 55 ]]
-        -- upvalues: l_HttpService_0 (ref), v14 (copy), v15 (copy), v7 (ref), v11 (ref), v9 (ref)
-        local v16 = l_HttpService_0:JSONDecode(v14.challengeMetadata);
-        v15:logRobloxTelemetryEvent(v7, {}, {
-            context = v11.ChallengeLifecycleEventConstants.ChallengeInitialized, 
-            challengeId = v14.challengeId, 
-            integrityType = v16.integrityType
-        });
-        local l_accountService_0 = v14.accountService;
-        if l_accountService_0 and l_accountService_0:DeviceIntegrityAvailable() then
-            local v18 = nil;
-            if v9() then
-                local l_l_accountService_0_DeviceIntegrityTokenYield_0 = l_accountService_0:GetDeviceIntegrityTokenYield((l_HttpService_0:JSONEncode({
-                    requestHash = v16.requestHash, 
-                    timeoutMillis = game:GetFastInt("DeviceIntegrityNativeTimeoutMilliseconds")
-                })));
-                if l_l_accountService_0_DeviceIntegrityTokenYield_0 == nil or l_l_accountService_0_DeviceIntegrityTokenYield_0 == "" then
-                    v15:logRobloxTelemetryEvent(v7, {}, {
-                        context = v11.ChallengeLifecycleEventConstants.ChallengeInvalidated, 
-                        challengeId = v14.challengeId, 
-                        integrityType = v16.integrityType
-                    });
-                    v14.onChallengeCompleted(l_HttpService_0:JSONEncode({
-                        redemptionToken = "", 
-                        integrityType = v16.integrityType
-                    }));
-                    return;
-                else
-                    v18 = l_HttpService_0:JSONDecode(l_l_accountService_0_DeviceIntegrityTokenYield_0);
-                end;
-            else
-                v18 = l_HttpService_0:JSONDecode(l_accountService_0:GetDeviceIntegrityTokenYield(constructAccountServiceParams(v16.requestHash)));
-            end;
-            v14.onChallengeCompleted(l_HttpService_0:JSONEncode({
-                redemptionToken = v18.token, 
-                integrityType = v16.integrityType
-            }));
-            v15:logRobloxTelemetryEvent(v7, {}, {
-                context = v11.ChallengeLifecycleEventConstants.ChallengeCompleted, 
-                challengeId = v14.challengeId, 
-                integrityType = v16.integrityType, 
-                result = v18.result
-            });
-            return;
-        elseif v9() then
-            v15:logRobloxTelemetryEvent(v7, {}, {
-                context = v11.ChallengeLifecycleEventConstants.ChallengeInvalidated, 
-                challengeId = v14.challengeId, 
-                integrityType = v16.integrityType
-            });
-            v14.onChallengeCompleted(l_HttpService_0:JSONEncode({
-                redemptionToken = "", 
-                integrityType = v16.integrityType
-            }));
-            return;
-        else
-            v14.onChallengeFailed();
-            v15:logRobloxTelemetryEvent(v7, {}, {
-                context = v11.ChallengeLifecycleEventConstants.ChallengeInvalidated, 
-                challengeId = v14.challengeId, 
-                integrityType = v16.integrityType
-            });
-            return;
-        end;
-    end, {});
-    local v21 = l_useSelector_0(function(v20) --[[ Line: 129 ]]
-        return {
-            screenSize = v20.ScreenSize
-        };
-    end);
-    local v22 = UDim2.fromOffset(v21.screenSize.X, v21.screenSize.Y);
-    if v8() then
-        return v3.createElement("Frame", {
-            Size = v22, 
-            BackgroundTransparency = 1, 
-            Active = true
-        }, {
-            Spinner = v3.createElement(l_LoadingSpinner_0, {
-                anchorPoint = Vector2.new(0.5, 0.5), 
-                position = UDim2.fromScale(0.5, 0.5), 
-                size = UDim2.fromOffset(48, 48)
-            })
-        });
-    else
-        return v3.createElement("Frame", {
-            Size = v22, 
-            BackgroundTransparency = 0.2, 
-            Active = true
-        }, {
-            Spinner = v3.createElement(l_LoadingSpinner_0, {
-                anchorPoint = Vector2.new(0.5, 0.5), 
-                position = UDim2.fromScale(0.5, 0.5), 
-                size = UDim2.fromOffset(48, 48)
-            })
-        });
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local GenericChallenges = script:FindFirstAncestor("GenericChallenges")
+local GenericChallengesParent = GenericChallenges.Parent
+local React = require(GenericChallengesParent.React)
+local useRoactService = require(GenericChallengesParent.RobloxAppHooks).useRoactService
+local AppLogging = require(GenericChallengesParent.RoactServiceTags).AppLogging
+local Foundation = require(GenericChallengesParent.Foundation)
+local IconSize = Foundation.Enums.IconSize
+local Loading = Foundation.Loading
+local DeviceIntegrityChallengeEvent = require(script.Parent.DeviceIntegrityChallengeEvent)
+local GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner = require(GenericChallenges.Middleware.Flags.GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner)
+local GetFFlagEnableNewDeviceIntegrityFailureHandling = require(GenericChallenges.Middleware.Flags.GetFFlagEnableNewDeviceIntegrityFailureHandling)
+local useEffect = React.useEffect
+local ChallengeEventConstants = require(GenericChallenges.Utils.ChallengeEventConstants)
+local useSelector = require(GenericChallengesParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+game:DefineFastInt("DeviceIntegrityNativeTimeoutMilliseconds", 450)
+
+function constructAccountServiceParams(s1: string) -- line: 21
+	-- upvalues: HttpService (copy)
+	return HttpService:JSONEncode({
+		requestHash = s1
+	})
+end
+
+local function DeviceIntegrityTokenChallenge(t1: {[any]: any}) -- line: 54
+	-- upvalues: useRoactService (copy), AppLogging (copy), useEffect (copy), HttpService (copy), DeviceIntegrityChallengeEvent (copy), ChallengeEventConstants (copy), GetFFlagEnableNewDeviceIntegrityFailureHandling (copy), useSelector (copy), GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner (copy), React (copy), Loading (copy), IconSize (copy)
+	local v19 = useRoactService(AppLogging)
+
+	useEffect(function() -- line: 57
+		-- upvalues: HttpService (copy), t1 (copy), v19 (copy), DeviceIntegrityChallengeEvent (copy), ChallengeEventConstants (copy), GetFFlagEnableNewDeviceIntegrityFailureHandling (copy)
+		local data = HttpService:JSONDecode(t1.challengeMetadata)
+
+		v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInitialized,
+			challengeId = t1.challengeId,
+			integrityType = data.integrityType
+		})
+
+		local accountService = t1.accountService
+
+		if accountService and accountService:DeviceIntegrityAvailable() then
+			local data2
+
+			if GetFFlagEnableNewDeviceIntegrityFailureHandling() then
+				local DeviceIntegrityTokenYield = accountService:GetDeviceIntegrityTokenYield((HttpService:JSONEncode({
+					requestHash = data.requestHash,
+					timeoutMillis = game:GetFastInt("DeviceIntegrityNativeTimeoutMilliseconds")
+				})))
+
+				if DeviceIntegrityTokenYield == nil or DeviceIntegrityTokenYield == "" then
+					v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+						context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
+						challengeId = t1.challengeId,
+						integrityType = data.integrityType
+					})
+					t1.onChallengeCompleted(HttpService:JSONEncode({
+						redemptionToken = "",
+						integrityType = data.integrityType
+					}))
+
+					return
+				end
+
+				data2 = HttpService:JSONDecode(DeviceIntegrityTokenYield)
+			else
+				data2 = HttpService:JSONDecode(accountService:GetDeviceIntegrityTokenYield(constructAccountServiceParams(data.requestHash)))
+			end
+
+			t1.onChallengeCompleted(HttpService:JSONEncode({
+				redemptionToken = data2.token,
+				integrityType = data.integrityType
+			}))
+			v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeCompleted,
+				challengeId = t1.challengeId,
+				integrityType = data.integrityType,
+				result = data2.result
+			})
+
+			return
+		end
+
+		if GetFFlagEnableNewDeviceIntegrityFailureHandling() then
+			v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+				context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
+				challengeId = t1.challengeId,
+				integrityType = data.integrityType
+			})
+			t1.onChallengeCompleted(HttpService:JSONEncode({
+				redemptionToken = "",
+				integrityType = data.integrityType
+			}))
+
+			return
+		end
+
+		t1.onChallengeFailed()
+		v19:logRobloxTelemetryEvent(DeviceIntegrityChallengeEvent, {}, {
+			context = ChallengeEventConstants.ChallengeLifecycleEventConstants.ChallengeInvalidated,
+			challengeId = t1.challengeId,
+			integrityType = data.integrityType
+		})
+	end, {})
+
+	local v20 = useSelector(function(p1) -- line: 131
+		return {
+			screenSize = p1.ScreenSize
+		}
+	end)
+	local uDim2 = UDim2.fromOffset(v20.screenSize.X, v20.screenSize.Y)
+
+	if GetFFlagEnableTransparentDeviceIntegrityChallengeSpinner() then
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Active = true,
+			Size = uDim2
+		}, {
+			Spinner = React.createElement(Loading, {
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+				size = IconSize.Large
+			})
+		})
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 0.2,
+		Active = true,
+		Size = uDim2
+	}, {
+		Spinner = React.createElement(Loading, {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			size = IconSize.Large
+		})
+	})
+end
+
+return DeviceIntegrityTokenChallenge

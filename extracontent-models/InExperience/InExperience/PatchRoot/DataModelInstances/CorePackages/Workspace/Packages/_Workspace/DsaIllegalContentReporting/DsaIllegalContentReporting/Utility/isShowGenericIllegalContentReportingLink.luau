@@ -1,32 +1,40 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Players_0 = game:GetService("Players");
-local v2 = game:DefineFastFlag("EnableGenericIllegalContentReporting3", false);
-local v3 = game:DefineFastString("CountriesWithGenericIllegalContentReporting2", "AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SI,SK,GB,AU");
-local v4 = false;
-if v2 then
-    task.spawn(function() --[[ Line: 18 ]]
-        -- upvalues: l_Players_0 (copy), l_LocalizationService_0 (copy), v3 (copy), v4 (ref)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        while not l_LocalPlayer_0 do
-            l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-            l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        end;
-        local l_status_0, l_result_0 = pcall(l_LocalizationService_0.GetCountryRegionForPlayerAsync, l_LocalizationService_0, l_LocalPlayer_0);
-        if not l_status_0 then
-            return;
-        else
-            local v8 = v3:split(",");
-            for _, v10 in ipairs(v8) do
-                if l_result_0 == v10 then
-                    v4 = true;
-                    return;
-                end;
-            end;
-            return;
-        end;
-    end);
-end;
-return function() --[[ Line: 42 ]] --[[ Name: isShowGenericIllegalContentReportingLink ]]
-    -- upvalues: v2 (copy), v4 (ref)
-    return v2 and v4;
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local Players = game:GetService("Players")
+local v3 = game:DefineFastFlag("EnableGenericIllegalContentReporting3", false)
+local v4 = game:DefineFastString("CountriesWithGenericIllegalContentReporting2", "AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,IE,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SI,SK,GB,AU")
+local u5 = false
+
+if v3 then
+	task.spawn(function() -- line: 18
+		-- upvalues: Players (copy), LocalizationService (copy), v4 (copy), u5 (ref)
+		local LocalPlayer = Players.LocalPlayer
+
+		while not LocalPlayer do
+			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+			LocalPlayer = Players.LocalPlayer
+		end
+
+		local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+
+		if not ok then
+			return
+		end
+
+		local parts = v4:split(",")
+
+		for _, v in ipairs(parts) do
+			if result == v then
+				u5 = true
+
+				return
+			end
+		end
+	end)
+end
+
+local function isShowGenericIllegalContentReportingLink() -- line: 42
+	-- upvalues: v3 (copy), u5 (ref)
+	return v3 and u5
+end
+
+return isShowGenericIllegalContentReportingLink

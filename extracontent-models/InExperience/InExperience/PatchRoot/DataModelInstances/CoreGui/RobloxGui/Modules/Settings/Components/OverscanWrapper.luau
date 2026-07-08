@@ -1,28 +1,31 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreScriptsRootProvider_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local l_FocusRoot_0 = require(l_CorePackages_0.Workspace.Packages.FocusNavigationUtils).FocusRoot;
-local v3 = require(l_CorePackages_0.Packages.React);
-local v4 = require(l_CorePackages_0.Workspace.Packages.RobloxAppEnums);
-local l_FocusNavigableSurfaceIdentifierEnum_0 = require(l_CorePackages_0.Workspace.Packages.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum;
-local l_DeviceType_0 = v4.DeviceType;
-OverscanWrapper = function(v7) --[[ Line: 15 ]] --[[ Name: OverscanWrapper ]]
-    -- upvalues: l_DeviceType_0 (copy), v3 (copy), l_CoreScriptsRootProvider_0 (copy), l_FocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    return function(v8) --[[ Line: 16 ]]
-        -- upvalues: l_DeviceType_0 (ref), v3 (ref), l_CoreScriptsRootProvider_0 (ref), l_FocusRoot_0 (ref), l_FocusNavigableSurfaceIdentifierEnum_0 (ref), v7 (copy)
-        local v9 = {
-            deviceType = l_DeviceType_0.Console
-        };
-        return v3.createElement(l_CoreScriptsRootProvider_0, {
-            styleOverride = v9
-        }, {
-            FocusNavigationCoreScriptsWrapper = v3.createElement(l_FocusRoot_0, {
-                surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-                isIsolated = true, 
-                isAutoFocusRoot = true
-            }, {
-                Overscan = v3.createElement(v7, v8)
-            })
-        });
-    end;
-end;
-return OverscanWrapper;
+local CorePackages = game:GetService("CorePackages")
+local CoreScriptsRootProvider = require(CorePackages.Workspace.Packages.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local FocusRoot = require(CorePackages.Workspace.Packages.FocusNavigationUtils).FocusRoot
+local React = require(CorePackages.Packages.React)
+local RobloxAppEnums = require(CorePackages.Workspace.Packages.RobloxAppEnums)
+local FocusNavigableSurfaceIdentifierEnum = require(CorePackages.Workspace.Packages.FocusNavigationUtils).FocusNavigableSurfaceIdentifierEnum
+local DeviceType = RobloxAppEnums.DeviceType
+
+function OverscanWrapper(p1) -- line: 15
+	-- upvalues: DeviceType (copy), React (copy), CoreScriptsRootProvider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	return function(p2) -- line: 16
+		-- upvalues: DeviceType (copy), React (copy), CoreScriptsRootProvider (copy), FocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), p1 (copy)
+		local t1 = {
+			deviceType = DeviceType.Console
+		}
+
+		return React.createElement(CoreScriptsRootProvider, {
+			styleOverride = t1
+		}, {
+			FocusNavigationCoreScriptsWrapper = React.createElement(FocusRoot, {
+				isIsolated = true,
+				isAutoFocusRoot = true,
+				surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay
+			}, {
+				Overscan = React.createElement(p1, p2)
+			})
+		})
+	end
+end
+
+return OverscanWrapper

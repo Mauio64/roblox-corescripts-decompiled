@@ -1,116 +1,147 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_lib_0 = l_Parent_0.lib;
-local _ = l_Parent_0.src;
-local l_HttpService_0 = game:GetService("HttpService");
-local v4 = require(l_lib_0.mimetypes);
-local v5 = require(l_lib_0.b64);
-local function v9(v6) --[[ Line: 16 ]] --[[ Name: randomString ]]
-    local v7 = "";
-    for _ = 1, v6 do
-        v7 = v7 .. string.char(math.random(97, 122));
-    end;
-    return v7;
-end;
-local v10 = {};
-v10.__index = v10;
-v10.new = function(...) --[[ Line: 30 ]] --[[ Name: new ]]
-    -- upvalues: v10 (copy), v4 (copy)
-    local v11 = setmetatable({}, v10);
-    v11.__IsFile = true;
-    v11.name = "unknown";
-    v11.content = "";
-    v11.content_type = nil;
-    local v12 = {
-        ...
-    };
-    if #v12 == 1 then
-        v11.content = v12[1];
-    elseif #v12 >= 2 then
-        v11.name = v12[1];
-        v11.content = v12[2];
-        v11.content_type = v12[3];
-    end;
-    if not v11.content_type then
-        local v13 = v11.name:split(".");
-        v11.content_type = v4[v13[#v13]:lower()] or "text/plain";
-    end;
-    if type(v11.content) ~= "string" then
-        error(("[http] Invalid file content for file %s"):format(v11.name));
-    end;
-    return v11;
-end;
-v10.__tostring = function(v14) --[[ Line: 71 ]] --[[ Name: __tostring ]]
-    return ("File('%s', '%s')"):format(v14.name, v14.content_type);
-end;
-local v15 = {};
-v15.__index = v15;
-v15.new = function(v16) --[[ Line: 79 ]] --[[ Name: new ]]
-    -- upvalues: v15 (copy), v9 (copy)
-    local v17 = setmetatable({}, v15);
-    v17.__FormData = true;
-    v16 = v16 or {};
-    v17.boundary = "--FormBoundary-" .. v9(28);
-    v17.content_type = "application/x-www-form-urlencoded";
-    v17.fields = {};
-    for v18, v19 in pairs(v16) do
-        v17:AddField(v18, v19);
-    end;
-    return v17;
-end;
-v15.AddField = function(v20, v21, v22) --[[ Line: 96 ]] --[[ Name: AddField ]]
-    if v22.__IsFile then
-        v20.content_type = "multipart/form-data; boundary=\"" .. v20.boundary .. "\"";
-    end;
-    table.insert(v20.fields, {
-        Name = v21, 
-        Value = v22
-    });
-end;
-v15.build = function(v23) --[[ Line: 108 ]] --[[ Name: build ]]
-    -- upvalues: l_HttpService_0 (copy), v5 (copy)
-    local v24 = "";
-    if v23.content_type == "application/x-www-form-urlencoded" then
-        for _, v26 in ipairs(v23.fields) do
-            if v26.Value.__IsFile then
-                error("[http] URL encoded forms cannot contain any files");
-            end;
-            if v26.Name:find("=") or v26.Name:find("&") then
-                error("[http] Form field names must not contain '=' or '&'");
-            end;
-            if type(v26.Value) == "table" then
-                for _, v28 in ipairs(v26.Value) do
-                    if #v24 > 0 then
-                        v24 = v24 .. "&";
-                    end;
-                    v24 = v24 .. v26.Name .. "=" .. l_HttpService_0:UrlEncode(v28);
-                end;
-            else
-                if #v24 > 0 then
-                    v24 = v24 .. "&";
-                end;
-                v24 = v24 .. v26.Name .. "=" .. l_HttpService_0:UrlEncode(v26.Value);
-            end;
-        end;
-        return v24;
-    else
-        for _, v30 in pairs(v23.fields) do
-            v24 = v24 .. "--" .. v23.boundary .. "\r\n";
-            local l_Value_0 = v30.Value;
-            v24 = v24 .. ("Content-Disposition: form-data; name=\"%s\""):format(v30.Name);
-            if v30.Value.__IsFile then
-                l_Value_0 = v30.Value.content;
-                v24 = (v24 .. ("; filename=\"%s\""):format(v30.Value.name)) .. "\r\nContent-Type: " .. v30.Value.content_type;
-                if v30.Value.content_type:sub(1, 5) ~= "text/" then
-                    l_Value_0 = v5.encode(l_Value_0);
-                    v24 = v24 .. "\r\nContent-Transfer-Encoding: base64";
-                end;
-            end;
-            v24 = v24 .. "\r\n\r\n" .. l_Value_0 .. "\r\n";
-        end;
-        return v24 .. "--" .. v23.boundary .. "--";
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local lib = ParentParent.lib
+local _ = ParentParent.src
+local HttpService = game:GetService("HttpService")
+local mimetypes = require(lib.mimetypes)
+local b64 = require(lib.b64)
+
+local function randomString(p1) -- line: 16
+	local s1 = ""
+
+	for _ = 1, p1 do
+		s1 ..= string.char(math.random(97, 122))
+	end
+
+	return s1
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(...) -- line: 30
+	-- upvalues: t1 (copy), mimetypes (copy)
+	local self = setmetatable({}, t1)
+
+	self.__IsFile = true
+	self.name = "unknown"
+	self.content = ""
+	self.content_type = nil
+
+	local t2 = { ... }
+
+	if #t2 == 1 then
+		self.content = t2[1]
+	elseif #t2 >= 2 then
+		self.name = t2[1]
+		self.content = t2[2]
+		self.content_type = t2[3]
+	end
+
+	if not self.content_type then
+		local parts = self.name:split(".")
+
+		self.content_type = mimetypes[parts[#parts]:lower()] or "text/plain"
+	end
+
+	if type(self.content) ~= "string" then
+		error(("[http] Invalid file content for file %s"):format(self.name))
+	end
+
+	return self
+end
+function t1.__tostring(p2) -- line: 71
+	return ("File('%s', '%s')"):format(p2.name, p2.content_type)
+end
+
+local t3 = {}
+
+t3.__index = t3
+
+function t3.new(p3) -- line: 79
+	-- upvalues: t3 (copy), randomString (copy)
+	local self = setmetatable({}, t3)
+
+	self.__FormData = true
+
+	local v19 = p3 or {}
+
+	self.boundary = "--FormBoundary-" .. randomString(28)
+	self.content_type = "application/x-www-form-urlencoded"
+	self.fields = {}
+
+	for k, v in pairs(v19) do
+		self:AddField(k, v)
+	end
+
+	return self
+end
+function t3.AddField(p4, p5, p6) -- line: 96
+	if p6.__IsFile then
+		p4.content_type = "multipart/form-data; boundary=\"" .. p4.boundary .. "\""
+	end
+
+	table.insert(p4.fields, {
+		Name = p5,
+		Value = p6
+	})
+end
+function t3.build(p7) -- line: 108
+	-- upvalues: HttpService (copy), b64 (copy)
+	local s2 = ""
+
+	if p7.content_type == "application/x-www-form-urlencoded" then
+		for _, v in ipairs(p7.fields) do
+			if v.Value.__IsFile then
+				error("[http] URL encoded forms cannot contain any files")
+			end
+
+			if v.Name:find("=") or v.Name:find("&") then
+				error("[http] Form field names must not contain '=' or '&'")
+			end
+
+			if type(v.Value) == "table" then
+				for _, v2 in ipairs(v.Value) do
+					if #s2 > 0 then
+						s2 ..= "&"
+					end
+
+					s2 ..= v.Name .. "=" .. HttpService:UrlEncode(v2)
+				end
+			else
+				if #s2 > 0 then
+					s2 ..= "&"
+				end
+
+				s2 ..= v.Name .. "=" .. HttpService:UrlEncode(v.Value)
+			end
+		end
+
+		return s2
+	end
+
+	for _, v in pairs(p7.fields) do
+		local v33 = s2 .. "--" .. p7.boundary .. "\r\n"
+		local vValue = v.Value
+		local v35 = v33 .. ("Content-Disposition: form-data; name=\"%s\""):format(v.Name)
+
+		if v.Value.__IsFile then
+			vValue = v.Value.content
+			v35 = (v35 .. ("; filename=\"%s\""):format(v.Value.name)) .. "\r\nContent-Type: " .. v.Value.content_type
+
+			if v.Value.content_type:sub(1, 5) ~= "text/" then
+				vValue = b64.encode(vValue)
+				v35 ..= "\r\nContent-Transfer-Encoding: base64"
+			end
+		end
+
+		s2 = v35 .. "\r\n\r\n" .. vValue .. "\r\n"
+	end
+
+	return s2 .. "--" .. p7.boundary .. "--"
+end
+
 return {
-    FormData = v15, 
-    File = v10
-};
+	FormData = t3,
+	File = t1
+}

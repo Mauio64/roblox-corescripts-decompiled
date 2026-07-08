@@ -1,9 +1,12 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Roact);
-local v2 = require(script.Parent.LayerCollectorContext);
-return function(v3) --[[ Line: 9 ]] --[[ Name: LayerCollectorConsumer ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Consumer, {
-        render = v3
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local LayerCollectorContext = require(script.Parent.LayerCollectorContext)
+
+local function LayerCollectorConsumer(p1) -- line: 9
+	-- upvalues: Roact (copy), LayerCollectorContext (copy)
+	return Roact.createElement(LayerCollectorContext.Consumer, {
+		render = p1
+	})
+end
+
+return LayerCollectorConsumer

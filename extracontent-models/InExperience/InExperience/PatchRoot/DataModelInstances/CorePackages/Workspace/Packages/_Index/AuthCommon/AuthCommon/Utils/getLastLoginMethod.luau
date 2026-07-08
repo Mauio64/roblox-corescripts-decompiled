@@ -1,11 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local v1 = require(l_script_FirstAncestor_0.Utils.AppStorageUtilities);
-return function(v2) --[[ Line: 5 ]] --[[ Name: getLastLoginMethod ]]
-    -- upvalues: v1 (copy)
-    for _, v4 in (v1.getPreviousAccountsList()) do
-        if v4.userIdentifier == v2 then
-            return v4.loginMethod;
-        end;
-    end;
-    return nil;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
+
+local function getLastLoginMethod(s1: string) -- line: 5
+	-- upvalues: AppStorageUtilities (copy)
+	for _, v6 in (AppStorageUtilities.getPreviousAccountsList()) do
+		if s1 == v6.userIdentifier then
+			return v6.loginMethod
+		end
+	end
+
+	return nil
+end
+
+return getLastLoginMethod

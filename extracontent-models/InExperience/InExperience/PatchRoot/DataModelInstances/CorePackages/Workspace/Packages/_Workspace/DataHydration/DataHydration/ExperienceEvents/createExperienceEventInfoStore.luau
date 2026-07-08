@@ -17,75 +17,86 @@ local SharedFlags = require(DataHydrationParent.SharedFlags)
 local FFlagSduiExperienceDetailsSupport = SharedFlags.FFlagSduiExperienceDetailsSupport
 local FFlagSduiEventDetailsSupport = SharedFlags.FFlagSduiEventDetailsSupport
 
-return function() --[[ createExperienceEventInfoStore ]] -- line: 30
+local function createExperienceEventInfoStore() -- line: 30
 	-- upvalues: createDataCache (copy), createDataResolver (copy), Promise (copy), ExperienceEventDerivedFields (copy), ExperienceEventTypes (copy), updateEventRsvp (copy), logResponseError (copy), ExperienceEventsUrlBuilder (copy), DiscoveryEventErrorLogger (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiEventDetailsSupport (copy)
-	local v16 = createDataCache()
-	local v17 = createDataResolver({
-		cache = v16,
+	local v17 = createDataCache()
+	local v18 = createDataResolver({
 		supportsMultiGet = false,
-		fetchFn = function(_: {[any]: any}) --[[ fetchFn ]] -- line: 35
+		cache = v17,
+		fetchFn = function(_: {[any]: any}) -- line: 35
 			-- upvalues: Promise (copy)
 			return Promise.resolve({})
 		end
 	})
 
+	local function updateExperienceEventInfos(t2: {[any]: any}) -- line: 44
+		-- upvalues: ExperienceEventDerivedFields (copy), v17 (copy)
+		for v22, v23 in t2 do
+			t2[v22] = ExperienceEventDerivedFields.enrichWithTimestamps(v23)
+		end
+
+		v17.updateItems(t2)
+	end
+
 	return {
-		getExperienceEventInfo = v17.getCachedItem,
-		getExperienceEventInfos = v17.getCachedItems,
-		updateExperienceEventInfo = v16.updateItem,
-		updateExperienceEventInfos = if not FFlagSduiExperienceDetailsSupport and not FFlagSduiEventDetailsSupport then v16.updateItems else function(t2: {[any]: any}) --[[ updateExperienceEventInfos ]] -- line: 44
-			-- upvalues: ExperienceEventDerivedFields (copy), v16 (copy)
-			for v20, v21 in t2 do
-				t2[v20] = ExperienceEventDerivedFields.enrichWithTimestamps(v21)
-			end
-
-			v16.updateItems(t2)
-		end,
+		getExperienceEventInfo = v18.getCachedItem,
+		getExperienceEventInfos = v18.getCachedItems,
+		updateExperienceEventInfo = v17.updateItem,
+		updateExperienceEventInfos = if not FFlagSduiExperienceDetailsSupport and not FFlagSduiEventDetailsSupport then v17.updateItems else updateExperienceEventInfos,
 		calculateDerivedField = if not FFlagSduiExperienceDetailsSupport and not FFlagSduiEventDetailsSupport then nil else ExperienceEventDerivedFields.calculateDerivedField,
-		patchRsvpStatus = function(s1: string, b1: boolean) --[[ patchRsvpStatus ]] -- line: 51
-			-- upvalues: v17 (copy), ExperienceEventTypes (copy), updateEventRsvp (copy), v16 (copy), logResponseError (copy), ExperienceEventsUrlBuilder (copy), DiscoveryEventErrorLogger (copy)
-			local v24 = v17.getCachedItem(s1).data()
-			local v25 = if not b1 then ExperienceEventTypes.EventRsvpTypes.NotGoing else ExperienceEventTypes.EventRsvpTypes.Going
-
-			updateEventRsvp(s1, v25):andThen(function() -- line: 60
-				-- upvalues: v24 (copy), b1 (copy), v16 (copy), s1 (copy)
-				if v24 then
-					local v26 = v24.rsvpCount or 0
+		patchRsvpStatus = function(s1: string, b1: boolean) -- line: 51
+			-- upvalues: v18 (copy), ExperienceEventTypes (copy), updateEventRsvp (copy), v17 (copy), logResponseError (copy), ExperienceEventsUrlBuilder (copy), DiscoveryEventErrorLogger (copy), FFlagSduiExperienceDetailsSupport (copy), FFlagSduiEventDetailsSupport (copy)
+			local v26 = v18.getCachedItem(s1).data()
+			local v27 = if not b1 then ExperienceEventTypes.EventRsvpTypes.NotGoing else ExperienceEventTypes.EventRsvpTypes.Going
+			local v28 = updateEventRsvp(s1, v27):andThen(function(p1) -- line: 60
+				-- upvalues: v26 (copy), b1 (copy), v17 (copy), s1 (copy)
+				if v26 then
+					local v30 = v26.rsvpCount or 0
 					local t3 = {
-						id = v24.id,
-						title = v24.title,
-						subtitle = v24.subtitle,
-						eventStart = v24.eventStart,
-						eventEnd = v24.eventEnd,
+						id = v26.id,
+						title = v26.title,
+						subtitle = v26.subtitle,
+						eventStart = v26.eventStart,
+						eventEnd = v26.eventEnd,
 						userRsvp = b1,
-						mediaAssetId = v24.mediaAssetId,
-						description = v24.description,
-						rsvpCount = v26 + (not b1 and -1 or 1)
+						mediaAssetId = v26.mediaAssetId,
+						description = v26.description,
+						rsvpCount = v30 + (not b1 and -1 or 1)
 					}
 
-					v16.updateItem(s1, t3)
-				end
-			end):catch(function(p1) -- line: 77
-				-- upvalues: v24 (copy), v16 (copy), s1 (copy), logResponseError (copy), ExperienceEventsUrlBuilder (copy), DiscoveryEventErrorLogger (copy), b1 (copy)
-				if v24 then
-					v16.updateItem(s1, v24)
+					v17.updateItem(s1, t3)
 				end
 
-				local v29 = if type(p1) ~= "table" or not p1.StatusCode then nil else p1.StatusCode
-				local v30 = if type(p1) ~= "table" or not p1.StatusMessage then if type(p1) ~= "string" then nil else p1 else p1.StatusMessage
+				return p1 and p1.responseBody
+			end):catch(function(p2) -- line: 78
+				-- upvalues: v26 (copy), v17 (copy), s1 (copy), logResponseError (copy), ExperienceEventsUrlBuilder (copy), DiscoveryEventErrorLogger (copy), b1 (copy)
+				if v26 then
+					v17.updateItem(s1, v26)
+				end
+
+				local v33 = if type(p2) ~= "table" or not p2.StatusCode then nil else p2.StatusCode
+				local v34 = if type(p2) ~= "table" or not p2.StatusMessage then if type(p2) ~= "string" then nil else p2 else p2.StatusMessage
 
 				logResponseError(ExperienceEventsUrlBuilder.RSVP_UPDATE_URL, {
-					StatusCode = v29
+					StatusCode = v33
 				})
 				DiscoveryEventErrorLogger.reportError("patchRsvpStatus", "Error updating event RSVP", {
 					eventId = s1,
 					isRsvpGoing = b1,
-					statusCode = v29,
-					statusMessage = v30
+					statusCode = v33,
+					statusMessage = v34
 				})
 			end)
+
+			if FFlagSduiExperienceDetailsSupport or FFlagSduiEventDetailsSupport then
+				return v28
+			end
+
+			return nil
 		end,
-		clear = v17.clear,
-		dispose = v17.dispose
+		clear = v18.clear,
+		dispose = v18.dispose
 	}
 end
+
+return createExperienceEventInfoStore

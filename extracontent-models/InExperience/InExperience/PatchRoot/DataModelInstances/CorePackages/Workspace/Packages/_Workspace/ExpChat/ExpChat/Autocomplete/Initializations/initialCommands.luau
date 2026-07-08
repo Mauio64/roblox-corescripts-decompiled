@@ -1,12 +1,15 @@
-local v0 = {};
-local function _(v1) --[[ Line: 2 ]] --[[ Name: setAllCommands ]]
-    -- upvalues: v0 (ref)
-    v0 = v1;
-end;
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v0 (ref)
-    if v3 then
-        v0 = v3;
-    end;
-    return v0;
-end;
+local t1 = {}
+
+local function setAllCommands(p1) -- line: 2
+	-- upvalues: t1 (ref)
+	t1 = p1
+end
+
+return function(p2) -- line: 6
+	-- upvalues: t1 (ref)
+	if p2 then
+		t1 = p2
+	end
+
+	return t1
+end

@@ -1,30 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(script.Parent.PriceFooter);
-local v4 = require(l_Parent_0.UserLib);
-local l_Constants_0 = v4.Utils.Constants;
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v4.Utils.getRbxthumbWithTypeSizeAndOptions;
-local v7 = require(l_Parent_0.UIBlox);
-local v8 = require(l_script_FirstAncestor_0.Common.Enums);
-local l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 = require(l_Parent_0.SharedFlags).FFlagProfilePlatformEnableBundlesInAssetsCarousel;
-local v10 = require(l_script_FirstAncestor_0.Flags.FFlagProfilePlatformFixResaleLimitedPrice);
-local l_ItemTile_0 = v7.Tile.ItemTile;
-return function(v12) --[[ Line: 36 ]] --[[ Name: AssetTile ]]
-    -- upvalues: l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 (copy), v8 (copy), l_Constants_0 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), v2 (copy), l_ItemTile_0 (copy), v3 (copy), v10 (copy)
-    local v13 = if l_FFlagProfilePlatformEnableBundlesInAssetsCarousel_0 and v12.itemType and v12.itemType == v8.ItemTypes.Bundle then l_Constants_0.RbxthumbTypes.BundleThumbnail else l_Constants_0.RbxthumbTypes.Asset;
-    local v14 = l_getRbxthumbWithTypeSizeAndOptions_0(v12.assetId, v13, 150);
-    return v2.createElement(l_ItemTile_0, {
-        name = v12.name, 
-        thumbnail = v14, 
-        onActivated = v12.onActivated, 
-        useMaxTitleHeight = false, 
-        titleTextLineCount = 1, 
-        footer = v2.createElement(v3, {
-            price = v12.price, 
-            isOffSale = v12.isOffSale, 
-            lowestResalePrice = if v10 then v12.lowestResalePrice else nil
-        }), 
-        Selectable = true
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local PriceFooter = require(script.Parent.PriceFooter)
+local UserLib = require(ProfilePlatformParent.UserLib)
+local Constants = UserLib.Utils.Constants
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local UIBlox = require(ProfilePlatformParent.UIBlox)
+local Enums = require(ProfilePlatform.Common.Enums)
+local FFlagProfilePlatformEnableBundlesInAssetsCarousel = require(ProfilePlatformParent.SharedFlags).FFlagProfilePlatformEnableBundlesInAssetsCarousel
+local FFlagProfilePlatformFixResaleLimitedPrice = require(ProfilePlatform.Flags.FFlagProfilePlatformFixResaleLimitedPrice)
+local ItemTile = UIBlox.Tile.ItemTile
+
+local function AssetTile(t1: {[any]: any}) -- line: 36
+	-- upvalues: FFlagProfilePlatformEnableBundlesInAssetsCarousel (copy), Enums (copy), Constants (copy), getRbxthumbWithTypeSizeAndOptions (copy), React (copy), ItemTile (copy), PriceFooter (copy), FFlagProfilePlatformFixResaleLimitedPrice (copy)
+	local v15 = if not FFlagProfilePlatformEnableBundlesInAssetsCarousel or (not t1.itemType or t1.itemType ~= Enums.ItemTypes.Bundle) then Constants.RbxthumbTypes.Asset else Constants.RbxthumbTypes.BundleThumbnail
+	local v16 = getRbxthumbWithTypeSizeAndOptions(t1.assetId, v15, 150)
+
+	return React.createElement(ItemTile, {
+		useMaxTitleHeight = false,
+		titleTextLineCount = 1,
+		Selectable = true,
+		name = t1.name,
+		thumbnail = v16,
+		onActivated = t1.onActivated,
+		footer = React.createElement(PriceFooter, {
+			price = t1.price,
+			isOffSale = t1.isOffSale,
+			lowestResalePrice = if not FFlagProfilePlatformFixResaleLimitedPrice then nil else t1.lowestResalePrice
+		})
+	})
+end
+
+return AssetTile

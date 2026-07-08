@@ -1,116 +1,117 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactOtter);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v6 = require(l_script_FirstAncestor_0.Utility.withGuiObjectProps);
-local v7 = require(l_script_FirstAncestor_0.Providers.Cursor.useCursor);
-local v8 = require(l_script_FirstAncestor_0.Providers.Style.useStyleTags);
-local v9 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v10 = require(l_script_FirstAncestor_0.Enums.Visibility);
-local v11 = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v12 = {
-    frequency = 2
-};
-local v13 = {
-    scrollBarVisibility = "Auto"
-};
-return v2.memo(v2.forwardRef(function(v14, v15) --[[ Line: 52 ]] --[[ Name: ScrollingFrame ]]
-    -- upvalues: v5 (copy), v13 (copy), v6 (copy), v9 (copy), v8 (copy), v2 (copy), v10 (copy), v7 (copy), v3 (copy), v12 (copy), v11 (copy)
-    local v16 = v5(v14, v13);
-    local v17 = v6({
-        selection = v16.selection
-    }, {});
-    local v18 = v9();
-    local v19 = v8(v14.tag);
-    local l_Shift_400_0 = v18.Color.Shift.Shift_400;
-    local v21 = v2.useMemo(function() --[[ Line: 58 ]]
-        -- upvalues: v16 (copy), v10 (ref), v18 (copy)
-        if v16.scrollBarVisibility == v10.None then
-            return 0;
-        else
-            return v18.Size.Size_150;
-        end;
-    end, {
-        v16.scrollBarVisibility
-    });
-    local v22 = v7();
-    local v23 = v2.useRef(nil);
-    local v24, v25 = v3.useAnimatedBinding(1);
-    local v28 = v2.useCallback(function(v26, v27) --[[ Line: 69 ]]
-        -- upvalues: v23 (copy), v25 (copy), v3 (ref), l_Shift_400_0 (copy), v12 (ref)
-        if v23.current then
-            task.cancel(v23.current);
-        end;
-        if v26 then
-            v25(v3.spring(l_Shift_400_0.Transparency, v12));
-        end;
-        if v27 ~= nil then
-            v23.current = task.delay(v27, function() --[[ Line: 79 ]]
-                -- upvalues: v25 (ref), v3 (ref), v12 (ref)
-                v25(v3.spring(1, v12));
-            end);
-        end;
-    end, {
-        l_Shift_400_0
-    });
-    v2.useEffect(function() --[[ Line: 85 ]]
-        -- upvalues: v16 (copy), v28 (copy), v11 (ref)
-        if v16.scrollBarVisibility == "None" then
-            v28(false, 0);
-            return;
-        elseif v16.scrollBarVisibility == "Always" then
-            v28(true);
-            return;
-        else
-            local l_v28_0 = v28;
-            local v30 = true;
-            if v16.controlState ~= v11.Hover then
-                v30 = true;
-                if v16.controlState ~= v11.Selected then
-                    v30 = v16.controlState == v11.Pressed;
-                end;
-            end;
-            l_v28_0(v30, v16.controlState == v11.Default and 0 or nil);
-            return;
-        end;
-    end, {
-        v16.scrollBarVisibility, 
-        v16.controlState
-    });
-    return v2.createElement("ScrollingFrame", {
-        AutomaticCanvasSize = v16.AutomaticCanvasSize, 
-        CanvasSize = v16.CanvasSize, 
-        ClipsDescendants = v16.ClipsDescendants, 
-        ScrollingDirection = v16.ScrollingDirection, 
-        ScrollingEnabled = v16.ScrollingEnabled, 
-        ScrollBarImageColor3 = l_Shift_400_0.Color3, 
-        ScrollBarImageTransparency = v24, 
-        ScrollBarThickness = v21, 
-        VerticalScrollBarInset = v16.VerticalScrollBarInset, 
-        HorizontalScrollBarInset = v16.HorizontalScrollBarInset, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        AutomaticSize = v16.AutomaticSize, 
-        Size = UDim2.fromScale(1, 1), 
-        Selectable = v17.Selectable, 
-        NextSelectionUp = v17.NextSelectionUp, 
-        NextSelectionDown = v17.NextSelectionDown, 
-        NextSelectionLeft = v17.NextSelectionLeft, 
-        NextSelectionRight = v17.NextSelectionRight, 
-        SelectionImageObject = v17.SelectionImageObject or v22, 
-        SelectionOrder = v17.SelectionOrder, 
-        [v2.Change.CanvasPosition] = v16.scrollBarVisibility == "Auto" and function(v31) --[[ Line: 132 ]]
-            -- upvalues: v28 (copy), v16 (copy)
-            v28(true, 3);
-            if v16.onCanvasPositionChanged then
-                v16.onCanvasPositionChanged(v31);
-            end;
-        end or v16.onCanvasPositionChanged, 
-        [v2.Change.AbsoluteCanvasSize] = v16.onAbsoluteCanvasSizeChanged, 
-        [v2.Change.AbsoluteWindowSize] = v16.onAbsoluteWindowSizeChanged, 
-        ref = v15, 
-        [v2.Tag] = v19
-    }, v16.children);
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ReactOtter = require(FoundationParent.ReactOtter)
+
+require(Foundation.Components.Types)
+
+local withDefaults = require(Foundation.Utility.withDefaults)
+local withGuiObjectProps = require(Foundation.Utility.withGuiObjectProps)
+local useCursor = require(Foundation.Providers.Cursor.useCursor)
+local useStyleTags = require(Foundation.Providers.Style.useStyleTags)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local Visibility = require(Foundation.Enums.Visibility)
+local ControlState = require(Foundation.Enums.ControlState)
+local t1 = {
+	frequency = 2
+}
+local t2 = {
+	scrollBarVisibility = "Auto"
+}
+
+local function ScrollingFrame(t3: {[any]: any}, p1) -- line: 52
+	-- upvalues: withDefaults (copy), t2 (copy), withGuiObjectProps (copy), useTokens (copy), useStyleTags (copy), React (copy), Visibility (copy), useCursor (copy), ReactOtter (copy), t1 (copy), ControlState (copy)
+	local v17 = withDefaults(t3, t2)
+	local v18 = withGuiObjectProps({
+		selection = v17.selection
+	}, {})
+	local v19 = useTokens()
+	local v20 = useStyleTags(t3.tag)
+	local Shift_400 = v19.Color.Shift.Shift_400
+	local v22 = React.useMemo(function() -- line: 58
+		-- upvalues: v17 (copy), Visibility (copy), v19 (copy)
+		if v17.scrollBarVisibility == Visibility.None then
+			return 0
+		end
+
+		return v19.Size.Size_150
+	end, { v17.scrollBarVisibility })
+	local v23 = useCursor()
+	local v24 = React.useRef(nil)
+	local v25, v26 = ReactOtter.useAnimatedBinding(1)
+	local v27 = React.useCallback(function(b1: boolean, n1: number?) -- line: 69
+		-- upvalues: v24 (copy), v26 (copy), ReactOtter (copy), Shift_400 (copy), t1 (copy)
+		if v24.current then
+			task.cancel(v24.current)
+		end
+
+		if b1 then
+			v26(ReactOtter.spring(Shift_400.Transparency, t1))
+		end
+
+		if n1 ~= nil then
+			v24.current = task.delay(n1, function() -- line: 79
+				-- upvalues: v26 (copy), ReactOtter (copy), t1 (copy)
+				v26(ReactOtter.spring(1, t1))
+			end)
+		end
+	end, { Shift_400 })
+
+	React.useEffect(function() -- line: 85
+		-- upvalues: v17 (copy), v27 (copy), ControlState (copy)
+		if v17.scrollBarVisibility == "None" then
+			v27(false, 0)
+
+			return
+		end
+
+		if v17.scrollBarVisibility == "Always" then
+			v27(true)
+
+			return
+		end
+
+		v27(v17.controlState == ControlState.Hover or (v17.controlState == ControlState.Selected or v17.controlState == ControlState.Pressed), if v17.controlState ~= ControlState.Default then nil else 0)
+	end, {
+		v17.scrollBarVisibility,
+		v17.controlState
+	})
+
+	return React.createElement("ScrollingFrame", {
+		AutomaticCanvasSize = v17.AutomaticCanvasSize,
+		CanvasSize = v17.CanvasSize,
+		ClipsDescendants = v17.ClipsDescendants,
+		ScrollingDirection = v17.ScrollingDirection,
+		ScrollingEnabled = v17.ScrollingEnabled,
+		ScrollBarImageColor3 = Shift_400.Color3,
+		ScrollBarImageTransparency = v25,
+		ScrollBarThickness = v22,
+		VerticalScrollBarInset = v17.VerticalScrollBarInset,
+		HorizontalScrollBarInset = v17.HorizontalScrollBarInset,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		AutomaticSize = v17.AutomaticSize,
+		Size = UDim2.fromScale(1, 1),
+		Selectable = v18.Selectable,
+		NextSelectionUp = v18.NextSelectionUp,
+		NextSelectionDown = v18.NextSelectionDown,
+		NextSelectionLeft = v18.NextSelectionLeft,
+		NextSelectionRight = v18.NextSelectionRight,
+		SelectionImageObject = v18.SelectionImageObject or v23,
+		SelectionOrder = v18.SelectionOrder,
+		[React.Change.CanvasPosition] = if v17.scrollBarVisibility ~= "Auto" then v17.onCanvasPositionChanged else function(p2) -- line: 132
+			-- upvalues: v27 (copy), v17 (copy)
+			v27(true, 3)
+
+			if v17.onCanvasPositionChanged then
+				v17.onCanvasPositionChanged(p2)
+			end
+		end,
+		[React.Change.AbsoluteCanvasSize] = v17.onAbsoluteCanvasSizeChanged,
+		[React.Change.AbsoluteWindowSize] = v17.onAbsoluteWindowSizeChanged,
+		ref = p1,
+		[React.Tag] = v20
+	}, v17.children)
+end
+
+return React.memo(React.forwardRef(ScrollingFrame))

@@ -1,70 +1,74 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_AppStyleProvider_0 = v3.App.Style.AppStyleProvider;
-local l_Dark_0 = v3.App.Style.Constants.ThemeName.Dark;
-local v6 = require(l_CorePackages_0.Packages.Promise);
-local v7 = require(script.Parent.SelfViewTooltipFTUX);
-return function(v8) --[[ Line: 13 ]]
-    -- upvalues: l_CoreGui_0 (copy), v1 (copy), l_AppStyleProvider_0 (copy), l_Dark_0 (copy), v7 (copy), v6 (copy)
-    local l_ScreenGui_0 = Instance.new("ScreenGui");
-    l_ScreenGui_0.Name = "SelfViewTooltipOnOpenGui";
-    l_ScreenGui_0.DisplayOrder = -1;
-    l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-    l_ScreenGui_0.Parent = l_CoreGui_0;
-    local v10 = v1.createElement(l_AppStyleProvider_0, {
-        style = {
-            themeName = l_Dark_0
-        }
-    }, {
-        frame = v1.createElement("Frame", {
-            Position = v8.position, 
-            Size = v8.size, 
-            BackgroundTransparency = 0, 
-            AnchorPoint = v8.anchorPoint, 
-            Visible = false
-        }, {
-            aspectRatioConstraint = v1.createElement("UIAspectRatioConstraint", {
-                AspectRatio = v8.aspectRatio, 
-                AspectType = "ScaleWithParentSize", 
-                DominantAxis = "Width"
-            }), 
-            sizeConstraint = v1.createElement("UISizeConstraint", {
-                MaxSize = v8.maxSize, 
-                MinSize = v8.minSize
-            }), 
-            bottomButtonsMock = v1.createElement("Frame", {
-                Position = v8.bottomButtonsFramePosition, 
-                Size = v8.bottomButtonsFrameSize, 
-                Visible = false, 
-                BackgroundTransparency = 0
-            }, {
-                tooltip = v1.createElement(v7, {
-                    fallbackText = v8.fallbackText, 
-                    translationKey = v8.translationKey, 
-                    tooltipLifetime = v8.tooltipLifetime
-                })
-            })
-        })
-    });
-    local v11 = v1.mount(v10, l_ScreenGui_0, "SelfViewTooltipOnOpenGui");
-    local function v12() --[[ Line: 57 ]]
-        -- upvalues: v1 (ref), v11 (copy)
-        pcall(function() --[[ Line: 58 ]]
-            -- upvalues: v1 (ref), v11 (ref)
-            v1.unmount(v11);
-        end);
-    end;
-    v6.delay(v8.tooltipLifetime + 5):andThen(function() --[[ Line: 62 ]]
-        -- upvalues: v1 (ref), v11 (copy)
-        pcall(function() --[[ Line: 58 ]]
-            -- upvalues: v1 (ref), v11 (ref)
-            v1.unmount(v11);
-        end);
-    end);
-    return {
-        instance = v11, 
-        unmount = v12
-    };
-end;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local CoreGui = game:GetService("CoreGui")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Dark = UIBlox.App.Style.Constants.ThemeName.Dark
+local Promise = require(CorePackages.Packages.Promise)
+local SelfViewTooltipFTUX = require(script.Parent.SelfViewTooltipFTUX)
+
+return function(p1) -- line: 13
+	-- upvalues: CoreGui (copy), Roact (copy), AppStyleProvider (copy), Dark (copy), SelfViewTooltipFTUX (copy), Promise (copy)
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.Name = "SelfViewTooltipOnOpenGui"
+	ScreenGui.DisplayOrder = -1
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	ScreenGui.Parent = CoreGui
+
+	local v11 = Roact.createElement(AppStyleProvider, {
+		style = {
+			themeName = Dark
+		}
+	}, {
+		frame = Roact.createElement("Frame", {
+			BackgroundTransparency = 0,
+			Visible = false,
+			Position = p1.position,
+			Size = p1.size,
+			AnchorPoint = p1.anchorPoint
+		}, {
+			aspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
+				AspectType = "ScaleWithParentSize",
+				DominantAxis = "Width",
+				AspectRatio = p1.aspectRatio
+			}),
+			sizeConstraint = Roact.createElement("UISizeConstraint", {
+				MaxSize = p1.maxSize,
+				MinSize = p1.minSize
+			}),
+			bottomButtonsMock = Roact.createElement("Frame", {
+				Visible = false,
+				BackgroundTransparency = 0,
+				Position = p1.bottomButtonsFramePosition,
+				Size = p1.bottomButtonsFrameSize
+			}, {
+				tooltip = Roact.createElement(SelfViewTooltipFTUX, {
+					fallbackText = p1.fallbackText,
+					translationKey = p1.translationKey,
+					tooltipLifetime = p1.tooltipLifetime
+				})
+			})
+		})
+	})
+	local v12 = Roact.mount(v11, ScreenGui, "SelfViewTooltipOnOpenGui")
+
+	Promise.delay(p1.tooltipLifetime + 5):andThen(function() -- line: 62
+		-- upvalues: Roact (copy), v12 (copy)
+		pcall(function() -- line: 58
+			-- upvalues: Roact (copy), v12 (copy)
+			Roact.unmount(v12)
+		end)
+	end)
+
+	return {
+		instance = v12,
+		unmount = function() -- line: 57
+			-- upvalues: Roact (copy), v12 (copy)
+			pcall(function() -- line: 58
+				-- upvalues: Roact (copy), v12 (copy)
+				Roact.unmount(v12)
+			end)
+		end
+	}
+end

@@ -1,54 +1,57 @@
-local l_Parent_0 = script:FindFirstAncestor("SquadsCore").Parent;
-local v1 = require(l_Parent_0.t);
-local v2 = {};
-v2.new = function(v3) --[[ Line: 8 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    assert(v2.isValid(v3));
-    v2.__index = v2;
-    setmetatable(v3, v2);
-    return v3;
-end;
-v2.mock = function(v4) --[[ Line: 20 ]] --[[ Name: mock ]]
-    -- upvalues: v2 (copy)
-    v4 = v4 or {};
-    return (v2.new({
-        createdAtTime = v4.createdAtTime or "2025-07-02T18:00:00Z", 
-        initiatorId = v4.initiatorId or 54321, 
-        parentChannelId = v4.parentChannelId or "23456", 
-        scheduledGroupUpId = v4.scheduledGroupUpId or 12345, 
-        startTime = v4.startTime or "2500-07-02T18:00:00Z", 
-        subscribers = v4.subscribers or {
-            {
-                userId = 12345
-            }
-        }, 
-        title = v4.title or "Cool Test Scheduled Party", 
-        updatedAtTime = v4.updatedAtTime or "2025-07-02T18:00:00Z"
-    }));
-end;
-v2.format = function(v5) --[[ Line: 37 ]] --[[ Name: format ]]
-    -- upvalues: v2 (copy)
-    return (v2.new({
-        createdAtTime = v5.scheduledGroupUp.createdAtTime, 
-        initiatorId = v5.scheduledGroupUp.initiatorId, 
-        parentChannelId = v5.scheduledGroupUp.parentChannelId, 
-        scheduledGroupUpId = v5.scheduledGroupUp.scheduledGroupUpId, 
-        startTime = v5.scheduledGroupUp.startTime, 
-        subscribers = v5.scheduledGroupUp.subscribers, 
-        title = v5.scheduledGroupUp.title, 
-        updatedAtTime = v5.scheduledGroupUp.updatedAtTime
-    }));
-end;
-v2.isValid = v1.strictInterface({
-    createdAtTime = v1.string, 
-    initiatorId = v1.number, 
-    parentChannelId = v1.string, 
-    scheduledGroupUpId = v1.number, 
-    startTime = v1.string, 
-    subscribers = v1.array(v1.strictInterface({
-        userId = v1.number
-    })), 
-    title = v1.string, 
-    updatedAtTime = v1.string
-});
-return v2;
+local Parent = script:FindFirstAncestor("SquadsCore").Parent
+local t = require(Parent.t)
+local t1 = {}
+
+function t1.new(p1) -- line: 8
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 20
+	-- upvalues: t1 (copy)
+	local v6 = p2 or {}
+
+	return (t1.new({
+		createdAtTime = v6.createdAtTime or "2025-07-02T18:00:00Z",
+		initiatorId = v6.initiatorId or 54321,
+		parentChannelId = v6.parentChannelId or "23456",
+		scheduledGroupUpId = v6.scheduledGroupUpId or 12345,
+		startTime = v6.startTime or "2500-07-02T18:00:00Z",
+		subscribers = v6.subscribers or {{
+			userId = 12345
+		}},
+		title = v6.title or "Cool Test Scheduled Party",
+		updatedAtTime = v6.updatedAtTime or "2025-07-02T18:00:00Z"
+	}))
+end
+function t1.format(p3) -- line: 37
+	-- upvalues: t1 (copy)
+	return (t1.new({
+		createdAtTime = p3.scheduledGroupUp.createdAtTime,
+		initiatorId = p3.scheduledGroupUp.initiatorId,
+		parentChannelId = p3.scheduledGroupUp.parentChannelId,
+		scheduledGroupUpId = p3.scheduledGroupUp.scheduledGroupUpId,
+		startTime = p3.scheduledGroupUp.startTime,
+		subscribers = p3.scheduledGroupUp.subscribers,
+		title = p3.scheduledGroupUp.title,
+		updatedAtTime = p3.scheduledGroupUp.updatedAtTime
+	}))
+end
+
+t1.isValid = t.strictInterface({
+	createdAtTime = t.string,
+	initiatorId = t.number,
+	parentChannelId = t.string,
+	scheduledGroupUpId = t.number,
+	startTime = t.string,
+	subscribers = t.array(t.strictInterface({
+		userId = t.number
+	})),
+	title = t.string,
+	updatedAtTime = t.string
+})
+
+return t1

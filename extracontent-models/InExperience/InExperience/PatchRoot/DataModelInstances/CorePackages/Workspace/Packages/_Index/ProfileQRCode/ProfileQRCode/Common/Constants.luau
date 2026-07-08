@@ -1,3 +1,3 @@
 return {
-    RODUX_KEY = "ProfileQRCode"
-};
+	RODUX_KEY = "ProfileQRCode"
+}

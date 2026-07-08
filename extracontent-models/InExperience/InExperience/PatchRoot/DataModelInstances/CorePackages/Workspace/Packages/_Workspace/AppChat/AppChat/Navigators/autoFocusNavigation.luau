@@ -1,38 +1,44 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.FocusNavigationUtils);
-local v3 = require(l_Parent_0.ReactFocusNavigation);
-return function(v4, _) --[[ Line: 9 ]] --[[ Name: autoFocusNavigation ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    return function(v6) --[[ Line: 10 ]]
-        -- upvalues: v1 (ref), v2 (ref), v3 (ref), v4 (copy)
-        local v7 = v1.useRef(nil);
-        local v8 = {};
-        local v9 = v2.useAutoFocus(v8, 0.1);
-        local v10 = v1.useContext(v3.FocusNavigationContext);
-        v1.useEffect(function() --[[ Line: 15 ]]
-            -- upvalues: v8 (copy), v7 (copy), v10 (copy), v9 (copy)
-            v8[1] = v7.current;
-            local v11 = nil;
-            if v10 and v10.focusedGuiObject:getValue() ~= nil and v9 then
-                v11 = v9();
-            end;
-            return function() --[[ Line: 21 ]]
-                -- upvalues: v11 (ref)
-                if v11 then
-                    v11.cancel();
-                end;
-            end;
-        end, {
-            v9
-        });
-        return v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            Selectable = false, 
-            ref = v7
-        }, {
-            content = v1.createElement(v4, v6)
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
+
+local function autoFocusNavigation(p1, _: number?) -- line: 9
+	-- upvalues: React (copy), FocusNavigationUtils (copy), ReactFocusNavigation (copy)
+	return function(p2) -- line: 10
+		-- upvalues: React (copy), FocusNavigationUtils (copy), ReactFocusNavigation (copy), p1 (copy)
+		local v9 = React.useRef(nil)
+		local t1 = {}
+		local v11 = FocusNavigationUtils.useAutoFocus(t1, 0.1)
+		local v12 = React.useContext(ReactFocusNavigation.FocusNavigationContext)
+
+		React.useEffect(function() -- line: 15
+			-- upvalues: t1 (copy), v9 (copy), v12 (copy), v11 (copy)
+			t1[1] = v9.current
+
+			local u13 = nil
+
+			if v12 and (v12.focusedGuiObject:getValue() ~= nil and v11) then
+				u13 = v11()
+			end
+
+			return function() -- line: 21
+				-- upvalues: u13 (ref)
+				if u13 then
+					u13.cancel()
+				end
+			end
+		end, { v11 })
+
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Selectable = false,
+			Size = UDim2.new(1, 0, 1, 0),
+			ref = v9
+		}, {
+			content = React.createElement(p1, p2)
+		})
+	end
+end
+
+return autoFocusNavigation

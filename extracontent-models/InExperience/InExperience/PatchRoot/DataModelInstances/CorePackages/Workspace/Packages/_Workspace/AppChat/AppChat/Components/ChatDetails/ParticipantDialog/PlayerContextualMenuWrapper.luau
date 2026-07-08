@@ -1,93 +1,90 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Component_0 = require(l_Parent_0.PlayerContextualMenu).Component;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SharedFlags);
-local v5 = require(l_Parent_0.SocialCommon);
-local v6 = require(l_Parent_0.UIBlox);
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v10 = require(l_Parent_0.Responsive);
-local l_memo_0 = v3.memo;
-local l_convertUserPresenceTypeToString_0 = v5.Utils.convertUserPresenceTypeToString;
-local l_Images_0 = v6.App.ImageSet.Images;
-local l_Interactable_0 = v6.Core.Control.Interactable;
-local l_useEffect_0 = v3.useEffect;
-local v16 = require(l_script_FirstAncestor_0.Hooks.useIsInExperience);
-local v17 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v18 = require(l_script_FirstAncestor_0.Http.NetworkingFriends);
-local _ = require(l_script_FirstAncestor_0.types);
-local v20 = game:DefineFastFlag("AppChatDisablePCMExperienceCTAs", false);
-local v21 = game:DefineFastFlag("AppChatDisablePCMExperienceCTAsInExp", false);
-local l_FFlagEnableAppChatFocusableFixes_0 = v4.FFlagEnableAppChatFocusableFixes;
-local l_FFlagSkipBlockModal_0 = v4.FFlagSkipBlockModal;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v4.FFlagRemoveDependencyArrayAntipattern;
-PlayerContextualMenuWrapper = function(v25) --[[ Line: 46 ]] --[[ Name: PlayerContextualMenuWrapper ]]
-    -- upvalues: l_useDispatch_0 (copy), v10 (copy), l_useSelector_0 (copy), l_useEffect_0 (copy), v18 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v16 (copy), v20 (copy), v21 (copy), v3 (copy), l_Interactable_0 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy), l_Component_0 (copy), l_convertUserPresenceTypeToString_0 (copy), v17 (copy), l_FFlagSkipBlockModal_0 (copy), l_Images_0 (copy)
-    local v26 = l_useDispatch_0();
-    local v27 = v10.useBreakpointXOrSmaller(v10.Keys.Small);
-    local v29 = l_useSelector_0(function(v28) --[[ Line: 50 ]]
-        return v28.ChatAppReducer.Presence.byUserId;
-    end)[v25.participantId];
-    local v31 = l_useSelector_0(function(v30) --[[ Line: 55 ]]
-        return v30.ChatAppReducer.Friends.friendshipStatus;
-    end)[v25.participantId];
-    l_useEffect_0(function() --[[ Line: 61 ]]
-        -- upvalues: v26 (copy), v18 (ref), v25 (copy)
-        v26(v18.GetExtendedFriendshipStatus.API({
-            targetUserId = v25.participantId
-        }));
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v25.participantId
-    } else l_dependencyArray_0(v25.participantId));
-    local v32 = v16();
-    local v33 = not v20 and (not v21 or not v32 or false);
-    return v3.createElement(l_Interactable_0, {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        onStateChanged = function() --[[ Line: 78 ]] --[[ Name: onStateChanged ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Component = require(AppChatParent.PlayerContextualMenu).Component
+local React = require(AppChatParent.React)
+local SharedFlags = require(AppChatParent.SharedFlags)
+local SocialCommon = require(AppChatParent.SocialCommon)
+local UIBlox = require(AppChatParent.UIBlox)
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local Responsive = require(AppChatParent.Responsive)
+local memo = React.memo
+local convertUserPresenceTypeToString = SocialCommon.Utils.convertUserPresenceTypeToString
+local Images = UIBlox.App.ImageSet.Images
+local Interactable = UIBlox.Core.Control.Interactable
+local useEffect = React.useEffect
+local useIsInExperience = require(AppChat.Hooks.useIsInExperience)
+local v17 = require(AppChat.Logger):new(script.Name)
+local NetworkingFriends = require(AppChat.Http.NetworkingFriends)
 
-        end, 
-        Selectable = not l_FFlagEnableAppChatFocusableFixes_0 and nil, 
-        [v3.Event.Activated] = v25.onDismiss
-    }, {
-        PCM = v3.createElement(l_Component_0, {
-            enableExperienceCTAs = v33, 
-            subjectPresence = if v29 then {
-                locationString = v29.lastLocation, 
-                locationPlaceId = v29.placeId, 
-                locationRootPlaceId = v29.rootPlaceId, 
-                locationUniverseId = v29.universeId, 
-                status = l_convertUserPresenceTypeToString_0(v29.userPresenceType)
-            } else nil, 
-            subjectUserId = v25.participantId, 
-            robloxFriendshipStatus = v31, 
-            closeCentralOverlayThunk = function() --[[ Line: 95 ]] --[[ Name: closeCentralOverlayThunk ]]
+require(AppChat.types)
 
-            end, 
-            onReportActivated = v25.openReportUser and function() --[[ Line: 96 ]]
-                -- upvalues: v17 (ref), v25 (copy)
-                v17:info("User activated reportUser | userId: {}, conversationId: {}", v25.participantId, v25.conversationId);
-                v25.openReportUser(v25.participantId, v25.conversationId);
-            end, 
-            onBlockActivated = v25.openBlockingModal and function() --[[ Line: 105 ]]
-                -- upvalues: v25 (copy)
-                v25.openBlockingModal(v25.participantId, v25.conversationId);
-            end, 
-            skipBlockModal = l_FFlagSkipBlockModal_0, 
-            additionalButtons = if v25.showRemoveUserButton then {
-                {
-                    icon = l_Images_0["icons/actions/leave"], 
-                    text = v25.removeFromGroupText, 
-                    onActivated = function() --[[ Line: 116 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v25 (copy)
-                        v25.openRemoveUserDialog(v25.participantId, v25.conversationId);
-                    end
-                }
-            } else nil, 
-            width = UDim.new(0, v27 and 300 or 400)
-        })
-    });
-end;
-return l_memo_0(PlayerContextualMenuWrapper);
+local v19 = game:DefineFastFlag("AppChatDisablePCMExperienceCTAs", false)
+local FFlagSkipBlockModal = SharedFlags.FFlagSkipBlockModal
+
+function PlayerContextualMenuWrapper(t1: {[any]: any}) -- line: 41
+	-- upvalues: useDispatch (copy), Responsive (copy), useSelector (copy), useEffect (copy), NetworkingFriends (copy), useIsInExperience (copy), v19 (copy), React (copy), Interactable (copy), Component (copy), convertUserPresenceTypeToString (copy), v17 (copy), FFlagSkipBlockModal (copy), Images (copy)
+	local v22 = useDispatch()
+	local v23 = Responsive.useBreakpointXOrSmaller(Responsive.Keys.Small)
+	local v24 = useSelector(function(p1) -- line: 45
+		return p1.ChatAppReducer.Presence.byUserId
+	end)[t1.participantId]
+	local v25 = useSelector(function(p2) -- line: 50
+		return p2.ChatAppReducer.Friends.friendshipStatus
+	end)[t1.participantId]
+
+	useEffect(function() -- line: 55
+		-- upvalues: v22 (copy), NetworkingFriends (copy), t1 (copy)
+		v22(NetworkingFriends.GetExtendedFriendshipStatus.API({
+			targetUserId = t1.participantId
+		}))
+	end, { t1.participantId })
+
+	local v26 = useIsInExperience()
+	local v27 = not v19 and not v26
+
+	return React.createElement(Interactable, {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		onStateChanged = function() -- line: 69
+		end,
+		Selectable = false,
+		[React.Event.Activated] = t1.onDismiss
+	}, {
+		PCM = React.createElement(Component, {
+			enableExperienceCTAs = v27,
+			subjectPresence = if not v24 then nil else {
+				locationString = v24.lastLocation,
+				locationPlaceId = v24.placeId,
+				locationRootPlaceId = v24.rootPlaceId,
+				locationUniverseId = v24.universeId,
+				status = convertUserPresenceTypeToString(v24.userPresenceType)
+			},
+			subjectUserId = t1.participantId,
+			robloxFriendshipStatus = v25,
+			closeCentralOverlayThunk = function() -- line: 86
+			end,
+			onReportActivated = t1.openReportUser and function() -- line: 87
+				-- upvalues: v17 (copy), t1 (copy)
+				v17:info("User activated reportUser | userId: {}, conversationId: {}", t1.participantId, t1.conversationId)
+				t1.openReportUser(t1.participantId, t1.conversationId)
+			end,
+			onBlockActivated = t1.openBlockingModal and function() -- line: 96
+				-- upvalues: t1 (copy)
+				t1.openBlockingModal(t1.participantId, t1.conversationId)
+			end,
+			skipBlockModal = FFlagSkipBlockModal,
+			additionalButtons = if not t1.showRemoveUserButton then nil else {{
+				icon = Images["icons/actions/leave"],
+				text = t1.removeFromGroupText,
+				onActivated = function() -- line: 107
+					-- upvalues: t1 (copy)
+					t1.openRemoveUserDialog(t1.participantId, t1.conversationId)
+				end
+			}},
+			width = UDim.new(0, not v23 and 400 or 300)
+		})
+	})
+end
+
+return memo(PlayerContextualMenuWrapper)

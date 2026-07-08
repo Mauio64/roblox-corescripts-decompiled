@@ -1,79 +1,89 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v5 = {};
-local l_print_0 = require(l_Parent_0.GraphQL).print;
-local _ = require(script.Parent.Parent.core.types);
-local v8 = nil;
-local v9 = {
-    includeQuery = true, 
-    includeExtensions = false
-};
-local v10 = {
-    accept = "*/*", 
-    ["content-type"] = "application/json"
-};
-local v11 = {
-    method = "POST"
-};
-v5.fallbackHttpConfig = {
-    http = v9, 
-    headers = v10, 
-    options = v11
-};
-v5.selectHttpOptionsAndBody = function(v12, v13, ...) --[[ Line: 112 ]] --[[ Name: selectHttpOptionsAndBody ]]
-    -- upvalues: l_Object_0 (copy), l_Array_0 (copy), v8 (ref), l_Boolean_0 (copy), l_print_0 (copy)
-    local v14 = {
-        ...
-    };
-    local v15 = l_Object_0.assign({}, v13.options, {
-        headers = v13.headers, 
-        credentials = v13.credentials
-    });
-    local v16 = nil;
-    v16 = if v13.http ~= nil then v13.http else {};
-    l_Array_0.forEach(v14, function(v17) --[[ Line: 131 ]]
-        -- upvalues: v15 (ref), l_Object_0 (ref), v8 (ref), l_Boolean_0 (ref), v16 (ref)
-        v15 = l_Object_0.assign({}, v15, v17.options, {
-            headers = l_Object_0.assign({}, v15.headers, v8(v17.headers))
-        });
-        if l_Boolean_0.toJSBoolean(v17.credentials) then
-            v15.credentials = v17.credentials;
-        end;
-        v16 = l_Object_0.assign({}, v16, v17.http);
-    end);
-    local l_operationName_0 = v12.operationName;
-    local l_extensions_0 = v12.extensions;
-    local l_variables_0 = v12.variables;
-    local l_query_0 = v12.query;
-    local v22 = {
-        operationName = l_operationName_0, 
-        variables = l_variables_0
-    };
-    if v16.includeExtensions then
-        v22.extensions = l_extensions_0;
-    end;
-    if v16.includeQuery then
-        v22.query = l_print_0(l_query_0);
-    end;
-    return {
-        options = v15, 
-        body = v22
-    };
-end;
-v8 = function(v23) --[[ Line: 163 ]] --[[ Name: headersToLowerCase ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy)
-    if v23 ~= nil then
-        local v24 = {};
-        l_Array_0.forEach(l_Object_0.keys(v23), function(v25) --[[ Line: 166 ]]
-            -- upvalues: v24 (copy), v23 (copy)
-            v24[string.lower(v25)] = v23[v25];
-        end);
-        return v24;
-    else
-        return v23;
-    end;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local print = require(ParentParent.GraphQL).print
+
+require(script.Parent.Parent.core.types)
+
+local headersToLowerCase = nil
+local t2 = {
+	includeQuery = true,
+	includeExtensions = false
+}
+local t3 = {
+	accept = "*/*",
+	["content-type"] = "application/json"
+}
+local t4 = {
+	method = "POST"
+}
+
+t1.fallbackHttpConfig = {
+	http = t2,
+	headers = t3,
+	options = t4
+}
+
+function t1.selectHttpOptionsAndBody(p1, t5: {[any]: any}, ...) -- line: 112
+	-- upvalues: Object (copy), Array (copy), headersToLowerCase (ref), Boolean (copy), print (copy)
+	local u14 = Object.assign({}, t5.options, {
+		headers = t5.headers,
+		credentials = t5.credentials
+	})
+	local u15 = if t5.http == nil then {} else t5.http
+
+	Array.forEach({ ... }, function(p2) -- line: 131
+		-- upvalues: u14 (ref), Object (copy), headersToLowerCase (ref), Boolean (copy), u15 (ref)
+		u14 = Object.assign({}, u14, p2.options, {
+			headers = Object.assign({}, u14.headers, headersToLowerCase(p2.headers))
+		})
+
+		if Boolean.toJSBoolean(p2.credentials) then
+			u14.credentials = p2.credentials
+		end
+
+		u15 = Object.assign({}, u15, p2.http)
+	end)
+
+	local operationName = p1.operationName
+	local extensions = p1.extensions
+	local variables = p1.variables
+	local query = p1.query
+	local t6 = {
+		operationName = operationName,
+		variables = variables
+	}
+
+	if u15.includeExtensions then
+		t6.extensions = extensions
+	end
+
+	if u15.includeQuery then
+		t6.query = print(query)
+	end
+
+	return {
+		options = u14,
+		body = t6
+	}
+end
+function headersToLowerCase(t7: {[any]: any}?) -- line: 163
+	-- upvalues: Array (copy), Object (copy)
+	if t7 ~= nil then
+		local t8 = {}
+
+		Array.forEach(Object.keys(t7), function(s1: string) -- line: 166
+			-- upvalues: t8 (copy), t7 (copy)
+			t8[string.lower(s1)] = t7[s1]
+		end)
+
+		return t8
+	end
+
+	return t7
+end
+
+return t1

@@ -1,7 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("ProfilePlatform").Parent;
-local _ = require(l_Parent_0.React);
+local Parent = script:FindFirstAncestor("ProfilePlatform").Parent
+
+require(Parent.React)
+
 return {
-    Constants = {
-        DEFAULT_MAX_NUM_ROWS = 2
-    }
-};
+	Constants = {
+		DEFAULT_MAX_NUM_ROWS = 2
+	}
+}

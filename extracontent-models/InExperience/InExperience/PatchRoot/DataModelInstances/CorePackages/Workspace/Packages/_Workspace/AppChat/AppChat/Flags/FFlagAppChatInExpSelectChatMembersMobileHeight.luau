@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatInExpSelectChatMembersMobileHeight", false);
+return game:DefineFastFlag("AppChatInExpSelectChatMembersMobileHeight", false)

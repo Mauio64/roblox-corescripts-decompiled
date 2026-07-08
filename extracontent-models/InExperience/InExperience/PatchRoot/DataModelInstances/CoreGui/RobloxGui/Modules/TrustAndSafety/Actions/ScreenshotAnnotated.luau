@@ -1,8 +1,9 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function(v1, v2, v3) --[[ Line: 8 ]]
-    return {
-        reportCategory = v1, 
-        reportType = v2, 
-        annotationPoints = v3
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1, p2, p3) -- line: 8
+	return {
+		reportCategory = p1,
+		reportType = p2,
+		annotationPoints = p3
+	}
+end)

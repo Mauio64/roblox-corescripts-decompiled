@@ -1,8 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChatShared").Parent;
-local l_List_0 = require(l_Parent_0.llama).List;
-return function(v2) --[[ Line: 5 ]] --[[ Name: getNumberOfParticipants ]]
-    -- upvalues: l_List_0 (copy)
-    return l_List_0.count(v2:GetChildren(), function(v3) --[[ Line: 6 ]]
-        return v3:IsA("TextSource");
-    end);
-end;
+local Parent = script:FindFirstAncestor("ExpChatShared").Parent
+local List = require(Parent.llama).List
+
+local function getNumberOfParticipants(p1) -- line: 5
+	-- upvalues: List (copy)
+	return List.count(p1:GetChildren(), function(p2) -- line: 6
+		return p2:IsA("TextSource")
+	end)
+end
+
+return getNumberOfParticipants

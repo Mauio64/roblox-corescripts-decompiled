@@ -1,293 +1,333 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = game:DefineFastFlag("FixActionBindingSecurity", false);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v4 = require(l_Components_0.DataConsumer);
-local v5 = require(l_Components_0.HeaderButton);
-local v6 = require(l_Components_0.CellLabel);
-local v7 = require(script.Parent.Parent.Parent.Constants);
-local l_GeneralFormatting_0 = v7.GeneralFormatting;
-local l_LineWidth_0 = l_GeneralFormatting_0.LineWidth;
-local l_LineColor_0 = l_GeneralFormatting_0.LineColor;
-local l_ActionBindingsFormatting_0 = v7.ActionBindingsFormatting;
-local l_ChartHeaderNames_0 = l_ActionBindingsFormatting_0.ChartHeaderNames;
-local l_ChartCellWidths_0 = l_ActionBindingsFormatting_0.ChartCellWidths;
-local l_HeaderFrameHeight_0 = l_ActionBindingsFormatting_0.HeaderFrameHeight;
-local l_EntryFrameHeight_0 = l_ActionBindingsFormatting_0.EntryFrameHeight;
-local l_CellPadding_0 = l_ActionBindingsFormatting_0.CellPadding;
-local l_MinFrameWidth_0 = l_ActionBindingsFormatting_0.MinFrameWidth;
-local v18 = 0;
-for _, v20 in ipairs(l_ChartCellWidths_0) do
-    v18 = v18 + v20;
-end;
-local v21 = -v18;
-local v22 = {};
-local v23 = {};
-local v24 = {};
-v21 = v21 / 2;
-table.insert(v22, UDim2.new(0, l_CellPadding_0, 0, 0));
-table.insert(v23, UDim2.new(0.5, v21 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-table.insert(v24, UDim2.new(0.5, v21 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-for _, v26 in ipairs(l_ChartCellWidths_0) do
-    table.insert(v22, UDim2.new(0.5, v21 + l_CellPadding_0, 0, 0));
-    table.insert(v23, UDim2.new(0, v26 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-    table.insert(v24, UDim2.new(0, v26 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-    v21 = v21 + v26;
-end;
-table.insert(v22, UDim2.new(0.5, v21 + l_CellPadding_0, 0, 0));
-table.insert(v23, UDim2.new(0.5, -v18 / 2 - l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-table.insert(v24, UDim2.new(0.5, -v18 / 2 - l_CellPadding_0, 0, l_EntryFrameHeight_0));
-local v27 = {};
-for v28, v29 in ipairs(v22) do
-    v27[v28] = UDim2.new(v29.X.Scale, v29.X.Offset - l_CellPadding_0, v29.Y.Scale, v29.Y.Offset);
-end;
-local v30 = v1.Component:extend("ActionBindingsChart");
-local function v37(v31, v32) --[[ Line: 63 ]] --[[ Name: constructHeader ]]
-    -- upvalues: l_ChartHeaderNames_0 (copy), v1 (copy), v5 (copy), v23 (copy), v22 (copy), l_LineWidth_0 (copy), l_LineColor_0 (copy), v27 (copy), l_HeaderFrameHeight_0 (copy)
-    local v33 = {};
-    for v34, v35 in ipairs(l_ChartHeaderNames_0) do
-        v33[v35] = v1.createElement(v5, {
-            text = v35, 
-            size = v23[v34], 
-            pos = v22[v34], 
-            sortfunction = v31
-        });
-    end;
-    v33.upperHorizontalLine = v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    v33.lowerHorizontalLine = v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-        Position = UDim2.new(0, 0, 1, -l_LineWidth_0), 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    for v36 = 2, #v27 do
-        v33[string.format("VerticalLine_%d", v36)] = v1.createElement("Frame", {
-            Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-            Position = v27[v36], 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-    end;
-    return v1.createElement("Frame", {
-        Size = UDim2.new(0, v32, 0, l_HeaderFrameHeight_0), 
-        BackgroundTransparency = 1
-    }, v33);
-end;
-local function v47(v38, v39, v40) --[[ Line: 105 ]] --[[ Name: constructEntry ]]
-    -- upvalues: v2 (copy), v27 (copy), v1 (copy), l_LineWidth_0 (copy), l_LineColor_0 (copy), v6 (copy), v24 (copy), v22 (copy), l_EntryFrameHeight_0 (copy)
-    local l_name_0 = v38.name;
-    local l_actionInfo_0 = v38.actionInfo;
-    local v43 = tostring(l_actionInfo_0.inputTypes[1]);
-    local v44 = nil;
-    if v2 then
-        v44 = "Developer";
-        if l_actionInfo_0.isCore then
-            v44 = "Core";
-        end;
-    else
-        v44 = "Core";
-        if l_actionInfo_0.isCore then
-            v44 = "Developer";
-        end;
-    end;
-    local v45 = {};
-    for v46 = 2, #v27 do
-        v45[string.format("line_%d", v46)] = v1.createElement("Frame", {
-            Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-            Position = v27[v46], 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-    end;
-    v45[l_name_0] = v1.createElement(v6, {
-        text = v43, 
-        size = v24[1], 
-        pos = v22[1]
-    });
-    v45.priorityLevel = v1.createElement(v6, {
-        text = l_actionInfo_0.priorityLevel, 
-        size = v24[2], 
-        pos = v22[2]
-    });
-    v45.isCore = v1.createElement(v6, {
-        text = v44, 
-        size = v24[3], 
-        pos = v22[3]
-    });
-    v45.actionName = v1.createElement(v6, {
-        text = l_name_0, 
-        size = v24[4], 
-        pos = v22[4]
-    });
-    v45.inputTypes = v1.createElement(v6, {
-        text = v43, 
-        size = v24[5], 
-        pos = v22[5]
-    });
-    v45.lowerHorizontalLine = v1.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-        Position = UDim2.new(0, 0, 1, 0), 
-        BackgroundColor3 = l_LineColor_0, 
-        BorderSizePixel = 0
-    });
-    return v1.createElement("Frame", {
-        Size = UDim2.new(0, v39, 0, l_EntryFrameHeight_0), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v40
-    }, v45);
-end;
-v30.init = function(v48, v49) --[[ Line: 182 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    local v50 = v49.ActionBindingsData:getCurrentData();
-    v48.onSortChanged = function(v51) --[[ Line: 185 ]]
-        -- upvalues: v49 (copy), v48 (copy)
-        if v51 == v49.ActionBindingsData:getSortType() then
-            v48:setState({
-                reverseSort = not v48.state.reverseSort
-            });
-            return;
-        else
-            v49.ActionBindingsData:setSortType(v51);
-            v48:setState({
-                reverseSort = false
-            });
-            return;
-        end;
-    end;
-    v48.onCanvasPosChanged = function() --[[ Line: 199 ]]
-        -- upvalues: v48 (copy)
-        local l_CanvasPosition_0 = v48.scrollingRef.current.CanvasPosition;
-        if v48.state.canvasPos ~= l_CanvasPosition_0 then
-            v48:setState({
-                canvasPos = l_CanvasPosition_0
-            });
-        end;
-    end;
-    v48.scrollingRef = v1.createRef();
-    v48.state = {
-        actionBindingEntries = v50, 
-        reverseSort = false
-    };
-end;
-v30.willUpdate = function(v53) --[[ Line: 216 ]] --[[ Name: willUpdate ]]
-    if v53.canvasPosConnector then
-        v53.canvasPosConnector:Disconnect();
-    end;
-end;
-v30.didUpdate = function(v54) --[[ Line: 222 ]] --[[ Name: didUpdate ]]
-    if v54.scrollingRef.current then
-        v54.canvasPosConnector = v54.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v54.onCanvasPosChanged);
-        local l_AbsoluteSize_0 = v54.scrollingRef.current.AbsoluteSize;
-        local l_absScrollSize_0 = v54.state.absScrollSize;
-        if l_AbsoluteSize_0.X ~= l_absScrollSize_0.X or l_AbsoluteSize_0.Y ~= l_absScrollSize_0.Y then
-            v54:setState({
-                absScrollSize = l_AbsoluteSize_0
-            });
-        end;
-    end;
-end;
-v30.didMount = function(v57) --[[ Line: 237 ]] --[[ Name: didMount ]]
-    v57.bindingsUpdated = v57.props.ActionBindingsData:Signal():Connect(function(v58) --[[ Line: 238 ]]
-        -- upvalues: v57 (copy)
-        v57:setState({
-            actionBindingEntries = v58
-        });
-    end);
-    if v57.scrollingRef.current then
-        v57.canvasPosConnector = v57.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v57.onCanvasPosChanged);
-        v57:setState({
-            absScrollSize = v57.scrollingRef.current.AbsoluteSize, 
-            canvasPos = v57.scrollingRef.current.CanvasPosition
-        });
-    end;
-end;
-v30.willUnmount = function(v59) --[[ Line: 255 ]] --[[ Name: willUnmount ]]
-    v59.bindingsUpdated:Disconnect();
-    v59.bindingsUpdated = nil;
-    v59.canvasPosConnector:Disconnect();
-    v59.canvasPosConnector = nil;
-end;
-v30.render = function(v60) --[[ Line: 262 ]] --[[ Name: render ]]
-    -- upvalues: l_MinFrameWidth_0 (copy), v1 (copy), l_EntryFrameHeight_0 (copy), v47 (copy), l_LineColor_0 (copy), v37 (copy), l_HeaderFrameHeight_0 (copy), v7 (copy)
-    local v61 = {};
-    local l_searchTerm_0 = v60.props.searchTerm;
-    local l_size_0 = v60.props.size;
-    local l_layoutOrder_0 = v60.props.layoutOrder;
-    local l_actionBindingEntries_0 = v60.state.actionBindingEntries;
-    local l_reverseSort_0 = v60.state.reverseSort;
-    local l_canvasPos_0 = v60.state.canvasPos;
-    local l_absScrollSize_1 = v60.state.absScrollSize;
-    local v69 = l_absScrollSize_1 and math.max(l_absScrollSize_1.X, l_MinFrameWidth_0) or l_MinFrameWidth_0;
-    v61.UIListLayout = v1.createElement("UIListLayout", {
-        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-        VerticalAlignment = Enum.VerticalAlignment.Top, 
-        SortOrder = Enum.SortOrder.LayoutOrder
-    });
-    local v70 = #l_actionBindingEntries_0;
-    local v71 = 0;
-    if l_absScrollSize_1 and l_canvasPos_0 then
-        local v72 = -1;
-        local v73 = 0;
-        local v74 = 0;
-        for v75, v76 in ipairs(l_actionBindingEntries_0) do
-            local v77 = false;
-            if l_searchTerm_0 then
-                local v78 = tostring(v76.actionInfo.inputTypes[1]);
-                v77 = string.find(v78:lower(), l_searchTerm_0:lower()) ~= nil or string.find(v76.name:lower(), l_searchTerm_0:lower()) ~= nil;
-            end;
-            if not l_searchTerm_0 or v77 then
-                if v71 + l_EntryFrameHeight_0 >= l_canvasPos_0.Y then
-                    if v73 < l_absScrollSize_1.Y then
-                        local v79 = l_reverseSort_0 and v70 - v75 or v75;
-                        v61[v75] = v47(v76, v69, v79 + 1);
-                    end;
-                    if v72 < 0 then
-                        v72 = v71;
-                    else
-                        v73 = v73 + l_EntryFrameHeight_0;
-                    end;
-                    v74 = v74 + 1;
-                end;
-                v71 = v71 + l_EntryFrameHeight_0;
-            end;
-        end;
-        if v74 == 0 then
-            v61.NoneFound = v1.createElement("TextLabel", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                Text = "No ActionBindings Found", 
-                TextColor3 = l_LineColor_0, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            });
-        else
-            v61.WindowingPadding = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, v72), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            });
-        end;
-    end;
-    return v1.createElement("Frame", {
-        Size = l_size_0, 
-        BackgroundTransparency = 1, 
-        ClipsDescendants = true, 
-        LayoutOrder = l_layoutOrder_0
-    }, {
-        Header = v37(v60.onSortChanged, v69), 
-        MainChart = v1.createElement("ScrollingFrame", {
-            Position = UDim2.new(0, 0, 0, l_HeaderFrameHeight_0), 
-            Size = UDim2.new(1, 0, 1, -l_HeaderFrameHeight_0), 
-            CanvasSize = UDim2.new(0, v69, 0, v71), 
-            ScrollBarThickness = 6, 
-            BackgroundColor3 = v7.Color.BaseGray, 
-            BackgroundTransparency = 1, 
-            [v1.Ref] = v60.scrollingRef
-        }, v61)
-    });
-end;
-return v4(v30, "ActionBindingsData");
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local v3 = game:DefineFastFlag("FixActionBindingSecurity", false)
+local Components = script.Parent.Parent.Parent.Components
+local DataConsumer = require(Components.DataConsumer)
+local HeaderButton = require(Components.HeaderButton)
+local CellLabel = require(Components.CellLabel)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local GeneralFormatting = Constants.GeneralFormatting
+local LineWidth = GeneralFormatting.LineWidth
+local LineColor = GeneralFormatting.LineColor
+local ActionBindingsFormatting = Constants.ActionBindingsFormatting
+local ChartHeaderNames = ActionBindingsFormatting.ChartHeaderNames
+local ChartCellWidths = ActionBindingsFormatting.ChartCellWidths
+local HeaderFrameHeight = ActionBindingsFormatting.HeaderFrameHeight
+local EntryFrameHeight = ActionBindingsFormatting.EntryFrameHeight
+local CellPadding = ActionBindingsFormatting.CellPadding
+local MinFrameWidth = ActionBindingsFormatting.MinFrameWidth
+local n1 = 0
+
+for _, v in ipairs(ChartCellWidths) do
+	n1 += v
+end
+
+local t1 = {}
+local t2 = {}
+local t3 = {}
+local v25 = -n1 / 2
+
+table.insert(t1, UDim2.new(0, CellPadding, 0, 0))
+table.insert(t2, UDim2.new(0.5, v25 - CellPadding, 0, HeaderFrameHeight))
+table.insert(t3, UDim2.new(0.5, v25 - CellPadding, 0, EntryFrameHeight))
+
+for _, v in ipairs(ChartCellWidths) do
+	table.insert(t1, UDim2.new(0.5, v25 + CellPadding, 0, 0))
+	table.insert(t2, UDim2.new(0, v - CellPadding, 0, HeaderFrameHeight))
+	table.insert(t3, UDim2.new(0, v - CellPadding, 0, EntryFrameHeight))
+	v25 += v
+end
+
+table.insert(t1, UDim2.new(0.5, v25 + CellPadding, 0, 0))
+table.insert(t2, UDim2.new(0.5, -n1 / 2 - CellPadding, 0, HeaderFrameHeight))
+table.insert(t3, UDim2.new(0.5, -n1 / 2 - CellPadding, 0, EntryFrameHeight))
+
+local t4 = {}
+
+for i, v in ipairs(t1) do
+	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+end
+
+local v31 = Roact.Component:extend("ActionBindingsChart")
+
+local function constructHeader(p1, p2) -- line: 63
+	-- upvalues: ChartHeaderNames (copy), Roact (copy), HeaderButton (copy), t2 (copy), t1 (copy), LineWidth (copy), LineColor (copy), t4 (copy), HeaderFrameHeight (copy)
+	local t5 = {}
+
+	for i, v in ipairs(ChartHeaderNames) do
+		t5[v] = Roact.createElement(HeaderButton, {
+			text = v,
+			size = t2[i],
+			pos = t1[i],
+			sortfunction = p1
+		})
+	end
+
+	t5.upperHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundColor3 = LineColor
+	})
+	t5.lowerHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 1, -LineWidth),
+		BackgroundColor3 = LineColor
+	})
+
+	for i = 2, #t4 do
+		t5[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, LineWidth, 1, 0),
+			Position = t4[i],
+			BackgroundColor3 = LineColor
+		})
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, p2, 0, HeaderFrameHeight)
+	}, t5)
+end
+local function constructEntry(p3, p4, p5) -- line: 105
+	-- upvalues: v3 (copy), t4 (copy), Roact (copy), LineWidth (copy), LineColor (copy), CellLabel (copy), t3 (copy), t1 (copy), EntryFrameHeight (copy)
+	local name = p3.name
+	local actionInfo = p3.actionInfo
+	local str = tostring(actionInfo.inputTypes[1])
+	local s1
+
+	if v3 then
+		s1 = "Developer"
+
+		if actionInfo.isCore then
+			s1 = "Core"
+		end
+	else
+		s1 = "Core"
+
+		if actionInfo.isCore then
+			s1 = "Developer"
+		end
+	end
+
+	local t6 = {}
+
+	for i = 2, #t4 do
+		t6[string.format("line_%d", i)] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, LineWidth, 1, 0),
+			Position = t4[i],
+			BackgroundColor3 = LineColor
+		})
+	end
+
+	t6[name] = Roact.createElement(CellLabel, {
+		text = str,
+		size = t3[1],
+		pos = t1[1]
+	})
+	t6.priorityLevel = Roact.createElement(CellLabel, {
+		text = actionInfo.priorityLevel,
+		size = t3[2],
+		pos = t1[2]
+	})
+	t6.isCore = Roact.createElement(CellLabel, {
+		text = s1,
+		size = t3[3],
+		pos = t1[3]
+	})
+	t6.actionName = Roact.createElement(CellLabel, {
+		text = name,
+		size = t3[4],
+		pos = t1[4]
+	})
+	t6.inputTypes = Roact.createElement(CellLabel, {
+		text = str,
+		size = t3[5],
+		pos = t1[5]
+	})
+	t6.lowerHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 1, 0),
+		BackgroundColor3 = LineColor
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, p4, 0, EntryFrameHeight),
+		LayoutOrder = p5
+	}, t6)
+end
+
+function v31.init(p6, p7) -- line: 182
+	-- upvalues: Roact (copy)
+	local v51 = p7.ActionBindingsData:getCurrentData()
+
+	function p6.onSortChanged(p8) -- line: 185
+		-- upvalues: p7 (copy), p6 (copy)
+		if p8 == p7.ActionBindingsData:getSortType() then
+			p6:setState({
+				reverseSort = not p6.state.reverseSort
+			})
+
+			return
+		end
+
+		p7.ActionBindingsData:setSortType(p8)
+		p6:setState({
+			reverseSort = false
+		})
+	end
+	function p6.onCanvasPosChanged() -- line: 199
+		-- upvalues: p6 (copy)
+		local CanvasPosition = p6.scrollingRef.current.CanvasPosition
+
+		if CanvasPosition ~= p6.state.canvasPos then
+			p6:setState({
+				canvasPos = CanvasPosition
+			})
+		end
+	end
+
+	p6.scrollingRef = Roact.createRef()
+	p6.state = {
+		reverseSort = false,
+		actionBindingEntries = v51
+	}
+end
+function v31.willUpdate(p9) -- line: 216
+	if p9.canvasPosConnector then
+		p9.canvasPosConnector:Disconnect()
+	end
+end
+function v31.didUpdate(p10) -- line: 222
+	if p10.scrollingRef.current then
+		p10.canvasPosConnector = p10.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p10.onCanvasPosChanged)
+
+		local AbsoluteSize = p10.scrollingRef.current.AbsoluteSize
+		local absScrollSize = p10.state.absScrollSize
+
+		if AbsoluteSize.X ~= absScrollSize.X or AbsoluteSize.Y ~= absScrollSize.Y then
+			p10:setState({
+				absScrollSize = AbsoluteSize
+			})
+		end
+	end
+end
+function v31.didMount(p11) -- line: 237
+	p11.bindingsUpdated = p11.props.ActionBindingsData:Signal():Connect(function(p12) -- line: 238
+		-- upvalues: p11 (copy)
+		p11:setState({
+			actionBindingEntries = p12
+		})
+	end)
+
+	if p11.scrollingRef.current then
+		p11.canvasPosConnector = p11.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p11.onCanvasPosChanged)
+		p11:setState({
+			absScrollSize = p11.scrollingRef.current.AbsoluteSize,
+			canvasPos = p11.scrollingRef.current.CanvasPosition
+		})
+	end
+end
+function v31.willUnmount(p13) -- line: 255
+	p13.bindingsUpdated:Disconnect()
+	p13.bindingsUpdated = nil
+	p13.canvasPosConnector:Disconnect()
+	p13.canvasPosConnector = nil
+end
+function v31.render(p14) -- line: 262
+	-- upvalues: MinFrameWidth (copy), Roact (copy), EntryFrameHeight (copy), constructEntry (copy), LineColor (copy), constructHeader (copy), HeaderFrameHeight (copy), Constants (copy)
+	local t7 = {}
+	local searchTerm = p14.props.searchTerm
+	local size = p14.props.size
+	local layoutOrder = p14.props.layoutOrder
+	local actionBindingEntries = p14.state.actionBindingEntries
+	local reverseSort = p14.state.reverseSort
+	local canvasPos = p14.state.canvasPos
+	local absScrollSize = p14.state.absScrollSize
+	local v67 = absScrollSize and math.max(absScrollSize.X, MinFrameWidth) or MinFrameWidth
+
+	t7.UIListLayout = Roact.createElement("UIListLayout", {
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	local v68 = #actionBindingEntries
+	local n2 = 0
+
+	if absScrollSize and canvasPos then
+		local n3 = -1
+		local n4 = 0
+		local n5 = 0
+
+		for i, v in ipairs(actionBindingEntries) do
+			local v75 = false
+
+			if searchTerm then
+				local str = tostring(v.actionInfo.inputTypes[1])
+
+				v75 = string.find(str:lower(), searchTerm:lower()) ~= nil or string.find(v.name:lower(), searchTerm:lower()) ~= nil
+			end
+
+			if not searchTerm or v75 then
+				if n2 + EntryFrameHeight >= canvasPos.Y then
+					if n4 < absScrollSize.Y then
+						local v77 = reverseSort and v68 - i or i
+
+						t7[i] = constructEntry(v, v67, v77 + 1)
+					end
+
+					if n3 < 0 then
+						n3 = n2
+					else
+						n4 += EntryFrameHeight
+					end
+
+					n5 += 1
+				end
+
+				n2 += EntryFrameHeight
+			end
+		end
+
+		if n5 == 0 then
+			t7.NoneFound = Roact.createElement("TextLabel", {
+				Text = "No ActionBindings Found",
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				TextColor3 = LineColor
+			})
+		else
+			t7.WindowingPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, n3)
+			})
+		end
+	end
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		Size = size,
+		LayoutOrder = layoutOrder
+	}, {
+		Header = constructHeader(p14.onSortChanged, v67),
+		MainChart = Roact.createElement("ScrollingFrame", {
+			Position = UDim2.new(0, 0, 0, HeaderFrameHeight),
+			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
+			CanvasSize = UDim2.new(0, v67, 0, n2),
+			ScrollBarThickness = 6,
+			BackgroundColor3 = Constants.Color.BaseGray,
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p14.scrollingRef
+		}, t7)
+	})
+end
+
+return DataConsumer(v31, "ActionBindingsData")

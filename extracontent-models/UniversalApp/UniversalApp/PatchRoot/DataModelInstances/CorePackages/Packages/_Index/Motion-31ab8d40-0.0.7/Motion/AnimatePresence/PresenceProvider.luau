@@ -1,83 +1,94 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Motion");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.AnimatePresence.PresenceContext);
-local l_useIdFallback_0 = require(l_script_FirstAncestor_0.AnimatePresence.utils).useIdFallback;
-return function(v5) --[[ Line: 30 ]] --[[ Name: PresenceProvider ]]
-    -- upvalues: l_useIdFallback_0 (copy), v2 (copy), v3 (copy)
-    if v5 == nil then
-        error("PresenceProvider: props cannot be nil");
-    end;
-    local l_children_0 = v5.children;
-    local l_isPresent_0 = v5.isPresent;
-    if l_isPresent_0 == nil then
-        l_isPresent_0 = true;
-    end;
-    local l_passThroughData_0 = v5.passThroughData;
-    local v9 = nil;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 53 ]]
-        -- upvalues: v9 (ref), l_useIdFallback_0 (ref)
-        v9 = l_useIdFallback_0();
-    end);
-    if not l_status_0 then
-        warn("PresenceProvider: Error generating ID:", l_result_0);
-        v9 = "presence-" .. l_useIdFallback_0();
-    end;
-    local v12 = nil;
-    local l_status_1, l_result_1 = pcall(function() --[[ Line: 64 ]]
-        -- upvalues: v12 (ref), v2 (ref)
-        v12 = v2.useRef({});
-    end);
-    l_status_0 = l_status_1;
-    l_result_0 = l_result_1;
-    if not l_status_0 then
-        warn("PresenceProvider: Error creating childrenPresence ref:", l_result_0);
-        v12 = {
-            current = {}
-        };
-    end;
-    l_status_1 = function(v15) --[[ Line: 74 ]] --[[ Name: onExitComplete ]]
-        -- upvalues: v12 (ref), v5 (copy)
-        if v12.current then
-            v12.current[v15] = true;
-        end;
-        local v16 = true;
-        for _, v18 in pairs(v12.current) do
-            if not v18 then
-                v16 = false;
-                break;
-            end;
-        end;
-        if v16 and v5.onExitComplete then
-            v5.onExitComplete();
-        end;
-    end;
-    l_result_1 = function(v19) --[[ Line: 95 ]] --[[ Name: register ]]
-        -- upvalues: v12 (ref)
-        v12.current[v19] = false;
-        return function() --[[ Line: 99 ]]
-            -- upvalues: v12 (ref), v19 (copy)
-            v12.current[v19] = nil;
-        end;
-    end;
-    local v20 = {
-        id = v9, 
-        isPresent = l_isPresent_0, 
-        register = l_result_1, 
-        onExitComplete = l_status_1, 
-        passThroughData = l_passThroughData_0
-    };
-    local v21 = nil;
-    local l_status_2, l_result_2 = pcall(function() --[[ Line: 114 ]]
-        -- upvalues: v21 (ref), v2 (ref), v3 (ref), v20 (copy), l_children_0 (copy)
-        v21 = v2.createElement(v3.Provider, {
-            value = v20
-        }, l_children_0);
-    end);
-    l_status_0 = l_status_2;
-    l_result_0 = l_result_2;
-    if not l_status_0 then
-        warn("PresenceProvider: Error creating PresenceContext.Provider:", l_result_0);
-    end;
-    return v21 or v2.createElement(v2.Fragment, {}, l_children_0);
-end;
+local Motion = script:FindFirstAncestor("Motion")
+local MotionParent = Motion.Parent
+local React = require(MotionParent.React)
+local PresenceContext = require(Motion.AnimatePresence.PresenceContext)
+local useIdFallback = require(Motion.AnimatePresence.utils).useIdFallback
+
+local function PresenceProvider(t1: {[any]: any}) -- line: 30
+	-- upvalues: useIdFallback (copy), React (copy), PresenceContext (copy)
+	if t1 == nil then
+		error("PresenceProvider: props cannot be nil")
+	end
+
+	local children = t1.children
+	local isPresent = t1.isPresent
+
+	if isPresent == nil then
+		isPresent = true
+	end
+
+	local passThroughData = t1.passThroughData
+	local u11 = nil
+	local ok, result = pcall(function() -- line: 53
+		-- upvalues: u11 (ref), useIdFallback (copy)
+		u11 = useIdFallback()
+	end)
+
+	if not ok then
+		warn("PresenceProvider: Error generating ID:", result)
+		u11 = "presence-" .. useIdFallback()
+	end
+
+	local u14 = nil
+	local ok2, result2 = pcall(function() -- line: 64
+		-- upvalues: u14 (ref), React (copy)
+		u14 = React.useRef({})
+	end)
+
+	if not ok2 then
+		warn("PresenceProvider: Error creating childrenPresence ref:", result2)
+		u14 = {
+			current = {}
+		}
+	end
+
+	local t2 = {
+		id = u11,
+		isPresent = isPresent,
+		register = function(p1) -- line: 95
+			-- upvalues: u14 (ref)
+			u14.current[p1] = false
+
+			return function() -- line: 99
+				-- upvalues: u14 (ref), p1 (copy)
+				u14.current[p1] = nil
+			end
+		end,
+		onExitComplete = function(p2) -- line: 74
+			-- upvalues: u14 (ref), t1 (copy)
+			if u14.current then
+				u14.current[p2] = true
+			end
+
+			local v22 = true
+
+			for _, v in pairs(u14.current) do
+				if not v then
+					v22 = false
+
+					break
+				end
+			end
+
+			if v22 and t1.onExitComplete then
+				t1.onExitComplete()
+			end
+		end,
+		passThroughData = passThroughData
+	}
+	local u18 = nil
+	local ok3, result3 = pcall(function() -- line: 114
+		-- upvalues: u18 (ref), React (copy), PresenceContext (copy), t2 (copy), children (copy)
+		u18 = React.createElement(PresenceContext.Provider, {
+			value = t2
+		}, children)
+	end)
+
+	if not ok3 then
+		warn("PresenceProvider: Error creating PresenceContext.Provider:", result3)
+	end
+
+	return u18 or React.createElement(React.Fragment, {}, children)
+end
+
+return PresenceProvider

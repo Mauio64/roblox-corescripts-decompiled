@@ -1,4 +1,4 @@
 return {
-    ApiFetchThumbnails = require(script.ApiFetchThumbnails), 
-    ConsoleAuthRequestWrapper = require(script.ConsoleAuthRequestWrapper)
-};
+	ApiFetchThumbnails = require(script.ApiFetchThumbnails),
+	ConsoleAuthRequestWrapper = require(script.ConsoleAuthRequestWrapper)
+}

@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent._Index;
-return (require(l__Index_0.LuaRoactPolicyProvider.LuaRoactPolicyProvider));
+local _Index = script.Parent._Index
+
+return (require(_Index.LuaRoactPolicyProvider.LuaRoactPolicyProvider))

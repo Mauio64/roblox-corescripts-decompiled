@@ -1,27 +1,33 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Players_0 = game:GetService("Players");
-local v2 = game:DefineFastFlag("EnableOSAIllegalContentReporting", false);
-local v3 = false;
-if v2 then
-    task.spawn(function() --[[ Line: 16 ]]
-        -- upvalues: l_Players_0 (copy), l_LocalizationService_0 (copy), v3 (ref)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        while not l_LocalPlayer_0 do
-            l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-            l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        end;
-        local l_status_0, l_result_0 = pcall(l_LocalizationService_0.GetCountryRegionForPlayerAsync, l_LocalizationService_0, l_LocalPlayer_0);
-        if not l_status_0 then
-            return;
-        else
-            if l_result_0 == "GB" then
-                v3 = true;
-            end;
-            return;
-        end;
-    end);
-end;
-return function() --[[ Line: 36 ]] --[[ Name: isShowUKOSAIllegalContentReportingLink ]]
-    -- upvalues: v2 (copy), v3 (ref)
-    return v2 and v3;
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local Players = game:GetService("Players")
+local v3 = game:DefineFastFlag("EnableOSAIllegalContentReporting", false)
+local u4 = false
+
+if v3 then
+	task.spawn(function() -- line: 16
+		-- upvalues: Players (copy), LocalizationService (copy), u4 (ref)
+		local LocalPlayer = Players.LocalPlayer
+
+		while not LocalPlayer do
+			Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+			LocalPlayer = Players.LocalPlayer
+		end
+
+		local ok, result = pcall(LocalizationService.GetCountryRegionForPlayerAsync, LocalizationService, LocalPlayer)
+
+		if not ok then
+			return
+		end
+
+		if result == "GB" then
+			u4 = true
+		end
+	end)
+end
+
+local function isShowUKOSAIllegalContentReportingLink() -- line: 36
+	-- upvalues: v3 (copy), u4 (ref)
+	return v3 and u4
+end
+
+return isShowUKOSAIllegalContentReportingLink

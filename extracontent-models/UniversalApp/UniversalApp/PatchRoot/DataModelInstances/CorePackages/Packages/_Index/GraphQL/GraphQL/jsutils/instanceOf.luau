@@ -1,30 +1,39 @@
-local l_isNillish_0 = require(script.Parent.Parent.luaUtils.isNillish).isNillish;
-local function v5(v1, v2) --[[ Line: 10 ]] --[[ Name: instanceOf ]]
-    -- upvalues: l_isNillish_0 (copy)
-    if l_isNillish_0(v1) then
-        return false;
-    elseif typeof(v1) ~= "table" or typeof(v2) ~= "table" then
-        return false;
-    elseif v2.new ~= nil and v1.new == v2.new then
-        return true;
-    else
-        local v3 = getmetatable(v1);
-        while true do
-            if typeof(v3) ~= "table" then
-                return false;
-            elseif v3.__index == v2 then
-                return true;
-            else
-                local l_v3_0 = v3;
-                v3 = getmetatable(v3.__index);
-                if l_v3_0 == v3 then
-                    return false;
-                end;
-            end;
-        end;
-    end;
-end;
-return function(v6, v7) --[[ Line: 41 ]]
-    -- upvalues: v5 (copy)
-    return v5(v6, v7);
-end;
+local isNillish = require(script.Parent.Parent.luaUtils.isNillish).isNillish
+
+local function instanceOf(p1, p2) -- line: 10
+	-- upvalues: isNillish (copy)
+	if isNillish(p1) then
+		return false
+	end
+
+	if typeof(p1) ~= "table" or typeof(p2) ~= "table" then
+		return false
+	end
+
+	if p2.new ~= nil and p1.new == p2.new then
+		return true
+	end
+
+	local mt = getmetatable(p1)
+
+	repeat
+		local v6 = mt
+
+		if typeof(v6) ~= "table" then
+			return false
+		end
+
+		if p2 == v6.__index then
+			return true
+		end
+
+		mt = getmetatable(v6.__index)
+	until v6 == mt
+
+	return false
+end
+
+return function(p3, p4) -- line: 41
+	-- upvalues: instanceOf (copy)
+	return instanceOf(p3, p4)
+end

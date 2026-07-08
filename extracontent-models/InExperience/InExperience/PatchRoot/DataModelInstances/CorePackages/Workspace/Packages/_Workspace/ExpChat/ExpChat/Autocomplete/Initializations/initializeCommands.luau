@@ -1,35 +1,44 @@
-local l_TextChatService_0 = game:GetService("TextChatService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_List_0 = require(l_Parent_0.llama).List;
-local v4 = require(script.Parent.initialCommands);
-local v5 = require(l_script_FirstAncestor_0.Flags.getFFlagExpChatConnectInitCommands);
-local v6 = {};
-local function v11() --[[ Line: 11 ]] --[[ Name: getCommandKeys ]]
-    -- upvalues: l_TextChatService_0 (copy), v5 (copy), v6 (copy)
-    local v7 = {};
-    local l_l_TextChatService_0_Descendants_0 = l_TextChatService_0:GetDescendants();
-    for _, v10 in ipairs(l_l_TextChatService_0_Descendants_0) do
-        if v10.ClassName == "TextChatCommand" and string.sub(v10.PrimaryAlias, 1, 1) == "/" then
-            if v10.AutocompleteVisible then
-                table.insert(v7, v10.PrimaryAlias);
-            end;
-            if v5() then
-                table.insert(v6, v10);
-            end;
-        end;
-    end;
-    return v7;
-end;
-return function(v12) --[[ Line: 29 ]]
-    -- upvalues: v11 (copy), l_List_0 (copy), v5 (copy), v4 (copy), v6 (copy)
-    local v13 = v11();
-    l_List_0.map(v13, function(v14) --[[ Line: 31 ]]
-        -- upvalues: v12 (copy)
-        v12.trie:insert(v14);
-    end);
-    if v5() then
-        v4(v6);
-    end;
-    return v12.trie;
-end;
+local TextChatService = game:GetService("TextChatService")
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local List = require(Parent.llama).List
+local ExpChatShared = require(Parent.ExpChatShared)
+local initialCommands = require(script.Parent.initialCommands)
+local t1 = {}
+
+local function getCommandKeys() -- line: 10
+	-- upvalues: TextChatService (copy), t1 (copy)
+	local t2 = {}
+	local descendants = TextChatService:GetDescendants()
+
+	for _, v in ipairs(descendants) do
+		if v.ClassName == "TextChatCommand" and string.sub(v.PrimaryAlias, 1, 1) == "/" then
+			if v.AutocompleteVisible then
+				table.insert(t2, v.PrimaryAlias)
+			end
+
+			table.insert(t1, v)
+		end
+	end
+
+	return t2
+end
+
+return function(p1) -- line: 25
+	-- upvalues: getCommandKeys (copy), List (copy), ExpChatShared (copy), initialCommands (copy), t1 (copy)
+	local v13 = getCommandKeys()
+
+	List.map(v13, function(p2) -- line: 27
+		-- upvalues: p1 (copy)
+		p1.trie:insert(p2)
+	end)
+
+	for _, v15 in ExpChatShared.Commands.getVirtualLocalEnabledCommands() do
+		for _, v17 in v15.alias do
+			p1.trie:insert(v17)
+		end
+	end
+
+	initialCommands(t1)
+
+	return p1.trie
+end

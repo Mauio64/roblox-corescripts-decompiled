@@ -1,49 +1,53 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local v3 = require(l_CorePackages_0.Packages.React);
-local l_AppFonts_0 = require(l_CorePackages_0.Workspace.Packages.Style).AppFonts;
-local l_DropdownMenu_0 = v2.App.Menu.DropdownMenu;
-local v6 = require(l_script_FirstAncestor_0.Components.MenuItems.ReportMenuItem);
-local l_useStyle_0 = v2.Core.Style.useStyle;
-local v8 = require(l_script_FirstAncestor_0.Utility.getMenuItemSizings);
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagHideShortcutsOnReportDropdown);
-local v10 = require(l_CorePackages_0.Packages.Cryo);
-return function(v11) --[[ Line: 29 ]] --[[ Name: DropdownReportMenuItem ]]
-    -- upvalues: l_useStyle_0 (copy), v8 (copy), v3 (copy), l_AppFonts_0 (copy), l_DropdownMenu_0 (copy), v10 (copy), v9 (copy), v6 (copy)
-    local l_Theme_0 = l_useStyle_0().Theme;
-    local v13 = v8();
-    local v15 = if v11.readonlyValue ~= nil then v3.createElement("TextLabel", {
-        Text = v11.readonlyValue, 
-        Font = l_AppFonts_0.default:getMedium(), 
-        TextColor3 = l_Theme_0.TextEmphasis.Color, 
-        TextTransparency = l_Theme_0.TextMuted.Transparency, 
-        TextSize = v13.DropdownTextSize, 
-        TextWrapped = true, 
-        TextXAlignment = if v11.isSmallPortraitViewport then Enum.TextXAlignment.Left else Enum.TextXAlignment.Center, 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        Size = UDim2.new(1, 0, 0, v11.minHeight), 
-        BackgroundTransparency = 1
-    }) else v3.createElement(l_DropdownMenu_0, {
-        placeholder = v11.placeholderText, 
-        onChange = v11.onSelect, 
-        height = UDim.new(0, 48), 
-        screenSize = Vector2.new(2400, 1800), 
-        errorState = false, 
-        showDropShadow = true, 
-        fixedListHeight = 180, 
-        cellDatas = v10.List.map(v11.selections, function(v14) --[[ Line: 58 ]]
-            return {
-                text = v14
-            };
-        end), 
-        onMenuOpenChange = if v9 then v11.onMenuOpenChange else nil
-    });
-    return v3.createElement(v6, {
-        label = v11.label, 
-        layoutOrder = v11.layoutOrder, 
-        rightComponent = v15, 
-        menuContainerWidth = v11.menuContainerWidth, 
-        isSmallPortraitViewport = v11.isSmallPortraitViewport
-    });
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local React = require(CorePackages.Packages.React)
+local AppFonts = require(CorePackages.Workspace.Packages.Style).AppFonts
+local DropdownMenu = UIBlox.App.Menu.DropdownMenu
+local ReportMenuItem = require(AbuseReportMenu.Components.MenuItems.ReportMenuItem)
+local useStyle = UIBlox.Core.Style.useStyle
+local getMenuItemSizings = require(AbuseReportMenu.Utility.getMenuItemSizings)
+local FFlagHideShortcutsOnReportDropdown = require(AbuseReportMenu.Flags.FFlagHideShortcutsOnReportDropdown)
+local Cryo = require(CorePackages.Packages.Cryo)
+
+local function DropdownReportMenuItem(p1) -- line: 29
+	-- upvalues: useStyle (copy), getMenuItemSizings (copy), React (copy), AppFonts (copy), DropdownMenu (copy), Cryo (copy), FFlagHideShortcutsOnReportDropdown (copy), ReportMenuItem (copy)
+	local Theme = useStyle().Theme
+	local v15 = getMenuItemSizings()
+	local v16 = if p1.readonlyValue == nil then React.createElement(DropdownMenu, {
+		errorState = false,
+		showDropShadow = true,
+		fixedListHeight = 180,
+		placeholder = p1.placeholderText,
+		onChange = p1.onSelect,
+		height = UDim.new(0, 48),
+		screenSize = Vector2.new(2400, 1800),
+		cellDatas = Cryo.List.map(p1.selections, function(p2) -- line: 58
+			return {
+				text = p2
+			}
+		end),
+		onMenuOpenChange = if not FFlagHideShortcutsOnReportDropdown then nil else p1.onMenuOpenChange
+	}) else React.createElement("TextLabel", {
+		TextWrapped = true,
+		BackgroundTransparency = 1,
+		Text = p1.readonlyValue,
+		Font = AppFonts.default:getMedium(),
+		TextColor3 = Theme.TextEmphasis.Color,
+		TextTransparency = Theme.TextMuted.Transparency,
+		TextSize = v15.DropdownTextSize,
+		TextXAlignment = if not p1.isSmallPortraitViewport then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, p1.minHeight)
+	})
+
+	return React.createElement(ReportMenuItem, {
+		label = p1.label,
+		layoutOrder = p1.layoutOrder,
+		rightComponent = v16,
+		menuContainerWidth = p1.menuContainerWidth,
+		isSmallPortraitViewport = p1.isSmallPortraitViewport
+	})
+end
+
+return DropdownReportMenuItem

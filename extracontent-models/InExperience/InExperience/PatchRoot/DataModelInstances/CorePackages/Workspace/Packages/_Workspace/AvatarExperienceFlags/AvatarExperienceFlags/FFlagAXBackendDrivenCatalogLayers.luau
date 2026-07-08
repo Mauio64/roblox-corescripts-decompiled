@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXBackendDrivenCatalogLayers", false);
+return game:DefineFastFlag("AXBackendDrivenCatalogLayers", false)

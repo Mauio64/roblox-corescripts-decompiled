@@ -1,3 +1,3 @@
 return {
-    NudgeForInviterSquad = "NudgeForInviterSquad"
-};
+	NudgeForInviterSquad = "NudgeForInviterSquad"
+}

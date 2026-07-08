@@ -1,23 +1,26 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local _ = game:GetService("CorePackages");
-local _ = game:GetService("HttpRbxApiService");
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.OpenPrompt);
-local v5 = require(l_Parent_0.Network.GetOutfitName);
-local v6 = require(l_Parent_0.PromptType);
-return function(v7) --[[ Line: 16 ]]
-    -- upvalues: v5 (copy), v4 (copy), v6 (copy), l_AvatarEditorService_0 (copy)
-    return function(v8) --[[ Line: 17 ]]
-        -- upvalues: v5 (ref), v7 (copy), v4 (ref), v6 (ref), l_AvatarEditorService_0 (ref)
-        v5(v7):andThen(function(v9) --[[ Line: 18 ]]
-            -- upvalues: v8 (copy), v4 (ref), v6 (ref), v7 (ref)
-            v8:dispatch(v4(v6.DeleteOutfit, {
-                outfitId = v7, 
-                outfitName = v9
-            }));
-        end, function(_) --[[ Line: 23 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref)
-            l_AvatarEditorService_0:SignalDeleteOutfitFailed();
-        end);
-    end;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+
+game:GetService("CorePackages")
+game:GetService("HttpRbxApiService")
+
+local ParentParent = script.Parent.Parent
+local OpenPrompt = require(ParentParent.Actions.OpenPrompt)
+local GetOutfitName = require(ParentParent.Network.GetOutfitName)
+local PromptType = require(ParentParent.PromptType)
+
+return function(p1) -- line: 16
+	-- upvalues: GetOutfitName (copy), OpenPrompt (copy), PromptType (copy), AvatarEditorService (copy)
+	return function(p2) -- line: 17
+		-- upvalues: GetOutfitName (copy), p1 (copy), OpenPrompt (copy), PromptType (copy), AvatarEditorService (copy)
+		GetOutfitName(p1):andThen(function(p3) -- line: 18
+			-- upvalues: p2 (copy), OpenPrompt (copy), PromptType (copy), p1 (copy)
+			p2:dispatch(OpenPrompt(PromptType.DeleteOutfit, {
+				outfitId = p1,
+				outfitName = p3
+			}))
+		end, function(_) -- line: 23
+			-- upvalues: AvatarEditorService (copy)
+			AvatarEditorService:SignalDeleteOutfitFailed()
+		end)
+	end
+end

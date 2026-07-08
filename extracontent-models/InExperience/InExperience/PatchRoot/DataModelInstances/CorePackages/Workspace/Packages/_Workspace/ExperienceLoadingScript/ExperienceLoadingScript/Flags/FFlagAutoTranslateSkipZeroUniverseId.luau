@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AutoTranslateSkipZeroUniverseId", false);
+return game:DefineFastFlag("AutoTranslateSkipZeroUniverseId", false)

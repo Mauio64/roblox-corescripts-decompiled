@@ -1,2 +1,3 @@
-game:DefineFastFlag("VRBottomBarDebugPositionConfig", false);
-return game:GetFastFlag("VRBottomBarDebugPositionConfig");
+game:DefineFastFlag("VRBottomBarDebugPositionConfig", false)
+
+return game:GetFastFlag("VRBottomBarDebugPositionConfig")

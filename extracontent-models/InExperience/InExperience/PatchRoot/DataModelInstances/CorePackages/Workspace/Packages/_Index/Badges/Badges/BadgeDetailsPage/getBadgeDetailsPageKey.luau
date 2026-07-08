@@ -1,7 +1,9 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getBadgeDetailsPageKey ]]
-    if v0 == nil then
-        return "BadgeDetails-Unknown";
-    else
-        return (("BadgeDetails-%*"):format(v0));
-    end;
-end;
+local function getBadgeDetailsPageKey(s1: string?) -- line: 1
+	if s1 == nil then
+		return "BadgeDetails-Unknown"
+	end
+
+	return `BadgeDetails-{ s1 }`
+end
+
+return getBadgeDetailsPageKey

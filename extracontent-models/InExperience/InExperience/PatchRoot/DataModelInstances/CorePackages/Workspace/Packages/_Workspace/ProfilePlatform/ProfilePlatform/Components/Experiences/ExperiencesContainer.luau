@@ -1,88 +1,93 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local v1 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_script_FirstAncestor_0.Common.Enums);
-local v6 = require(l_Parent_0.RoactUtils);
-local l_useDispatch_0 = v6.Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = v6.Hooks.RoactRodux.useSelector;
-local l_getDeepValue_0 = require(l_Parent_0.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue;
-local v10 = require(l_script_FirstAncestor_0.Networking.NetworkingGames);
-local v11 = require(l_script_FirstAncestor_0.Components.Experiences.Experiences);
-local v12 = require(l_script_FirstAncestor_0.Components.Experiences.ExperiencesSkeleton);
-local l_FetchGameVotes_0 = require(l_Parent_0.GameVotesRodux).GameVotes.FetchGameVotes;
-local v14 = require(l_script_FirstAncestor_0.Networking.myRoduxNetworkingImpl);
-local v15 = require(l_script_FirstAncestor_0.Flags.FFlagEnableCommunityProfileLoadingSkeletons);
-local v16 = {};
-return function(v17) --[[ Line: 38 ]] --[[ Name: ExperiencesContainer ]]
-    -- upvalues: v1 (copy), v5 (copy), v3 (copy), v15 (copy), v16 (copy), v4 (copy), l_useDispatch_0 (copy), v10 (copy), l_FetchGameVotes_0 (copy), v14 (copy), l_useSelector_0 (copy), l_getDeepValue_0 (copy), v12 (copy), v11 (copy)
-    local v18 = v1(v5.Components.Experiences);
-    local v19, v20 = v3.useState(v15 and true or false);
-    local v21 = v18.experiences or v16;
-    local v24 = v3.useMemo(function() --[[ Line: 44 ]]
-        -- upvalues: v4 (ref), v21 (copy)
-        return v4.List.map(v21, function(v22, _) --[[ Line: 45 ]]
-            return (tostring(v22.universeId));
-        end);
-    end, {
-        v21
-    });
-    local v25 = l_useDispatch_0();
-    v3.useEffect(function() --[[ Line: 52 ]]
-        -- upvalues: v4 (ref), v24 (copy), v25 (copy), v10 (ref), v15 (ref), v20 (copy), l_FetchGameVotes_0 (ref), v14 (ref)
-        if not v4.isEmpty(v24) then
-            v25(v10.GetExperiencesDetails.API(v24)):catch(function(_) --[[ Line: 55 ]]
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local Cryo = require(ProfilePlatformParent.Cryo)
+local Enums = require(ProfilePlatform.Common.Enums)
+local RoactUtils = require(ProfilePlatformParent.RoactUtils)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local getDeepValue = require(ProfilePlatformParent.LuaSocialLibrariesDeps).SocialLibraries.config({}).Dictionary.getDeepValue
+local NetworkingGames = require(ProfilePlatform.Networking.NetworkingGames)
+local Experiences = require(ProfilePlatform.Components.Experiences.Experiences)
+local ExperiencesSkeleton = require(ProfilePlatform.Components.Experiences.ExperiencesSkeleton)
+local FetchGameVotes = require(ProfilePlatformParent.GameVotesRodux).GameVotes.FetchGameVotes
+local myRoduxNetworkingImpl = require(ProfilePlatform.Networking.myRoduxNetworkingImpl)
+local FFlagEnableCommunityProfileLoadingSkeletons = require(ProfilePlatform.Flags.FFlagEnableCommunityProfileLoadingSkeletons)
+local t1 = {}
 
-            end):finally(function() --[[ Line: 58 ]]
-                -- upvalues: v15 (ref), v20 (ref)
-                if v15 then
-                    v20(false);
-                end;
-            end);
-            for _, v28 in v24 do
-                v25(l_FetchGameVotes_0.Fetch(v14, v28)):catch(function(_) --[[ Line: 64 ]]
+local function ExperiencesContainer(t2: {[any]: any}) -- line: 38
+	-- upvalues: useProfileJsonComponent (copy), Enums (copy), React (copy), FFlagEnableCommunityProfileLoadingSkeletons (copy), t1 (copy), Cryo (copy), useDispatch (copy), NetworkingGames (copy), FetchGameVotes (copy), myRoduxNetworkingImpl (copy), useSelector (copy), getDeepValue (copy), ExperiencesSkeleton (copy), Experiences (copy)
+	local v20 = useProfileJsonComponent(Enums.Components.Experiences)
+	local v21, v22 = React.useState(not not FFlagEnableCommunityProfileLoadingSkeletons)
+	local v23 = v20.experiences or t1
+	local v24 = React.useMemo(function() -- line: 44
+		-- upvalues: Cryo (copy), v23 (copy)
+		return Cryo.List.map(v23, function(p1, _) -- line: 45
+			return (tostring(p1.universeId))
+		end)
+	end, { v23 })
+	local v25 = useDispatch()
 
-                end);
-            end;
-            return;
-        else
-            if v15 then
-                v20(false);
-            end;
-            return;
-        end;
-    end, {
-        v24
-    });
-    local v31 = l_useSelector_0(function(v30) --[[ Line: 74 ]]
-        -- upvalues: l_getDeepValue_0 (ref), v16 (ref)
-        return l_getDeepValue_0(v30, "ProfilePlatform.Games.byGameId") or v16;
-    end);
-    local v35 = v3.useMemo(function() --[[ Line: 78 ]]
-        -- upvalues: v24 (copy), v31 (copy)
-        local v32 = {};
-        for _, v34 in v24 do
-            if v31[v34] then
-                table.insert(v32, v31[v34]);
-            end;
-        end;
-        return v32;
-    end, {
-        v24, 
-        v31
-    });
-    if v15 and v19 then
-        return v3.createElement(v12, {
-            layoutOrder = v17.layoutOrder, 
-            numSkeletons = #v21
-        });
-    elseif #v35 == 0 then
-        return nil;
-    else
-        return v3.createElement(v11, {
-            layoutOrder = v17.layoutOrder, 
-            experienceDetails = v35
-        });
-    end;
-end;
+	React.useEffect(function() -- line: 52
+		-- upvalues: Cryo (copy), v24 (copy), v25 (copy), NetworkingGames (copy), FFlagEnableCommunityProfileLoadingSkeletons (copy), v22 (copy), FetchGameVotes (copy), myRoduxNetworkingImpl (copy)
+		if not Cryo.isEmpty(v24) then
+			v25(NetworkingGames.GetExperiencesDetails.API(v24)):catch(function(_) -- line: 55
+			end):finally(function() -- line: 58
+				-- upvalues: FFlagEnableCommunityProfileLoadingSkeletons (copy), v22 (copy)
+				if FFlagEnableCommunityProfileLoadingSkeletons then
+					v22(false)
+				end
+			end)
+
+			for _, v29 in v24 do
+				v25(FetchGameVotes.Fetch(myRoduxNetworkingImpl, v29)):catch(function(_) -- line: 64
+				end)
+			end
+
+			return
+		end
+
+		if FFlagEnableCommunityProfileLoadingSkeletons then
+			v22(false)
+		end
+	end, { v24 })
+
+	local v26 = useSelector(function(p5) -- line: 74
+		-- upvalues: getDeepValue (copy), t1 (copy)
+		return getDeepValue(p5, "ProfilePlatform.Games.byGameId") or t1
+	end)
+	local v27 = React.useMemo(function() -- line: 78
+		-- upvalues: v24 (copy), v26 (copy)
+		local t3 = {}
+
+		for _, v33 in v24 do
+			if v26[v33] then
+				table.insert(t3, v26[v33])
+			end
+		end
+
+		return t3
+	end, {
+		v24,
+		v26
+	})
+
+	if FFlagEnableCommunityProfileLoadingSkeletons and v21 then
+		return React.createElement(ExperiencesSkeleton, {
+			layoutOrder = t2.layoutOrder,
+			numSkeletons = #v23
+		})
+	end
+
+	if #v27 == 0 then
+		return nil
+	end
+
+	return React.createElement(Experiences, {
+		layoutOrder = t2.layoutOrder,
+		experienceDetails = v27
+	})
+end
+
+return ExperiencesContainer

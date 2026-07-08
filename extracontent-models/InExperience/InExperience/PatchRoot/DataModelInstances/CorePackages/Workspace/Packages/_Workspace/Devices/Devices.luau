@@ -1,5 +1,6 @@
-local v0 = require(script.DeviceTier);
+local DeviceTier = require(script.DeviceTier)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    DeviceTier = v0
-};
+	["jest.config"] = script["jest.config"],
+	DeviceTier = DeviceTier
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableProfilePlatformDisabledActions", false);
+return game:DefineFastFlag("EnableProfilePlatformDisabledActions", false)

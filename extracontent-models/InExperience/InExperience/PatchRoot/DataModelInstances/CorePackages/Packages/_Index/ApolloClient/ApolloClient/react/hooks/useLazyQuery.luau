@@ -1,13 +1,17 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.GraphQL);
-local _ = require(l_Parent_0.jsutils.typedDocumentNode);
-local _ = require(l_Parent_0.react.types.types);
-local l_useBaseQuery_0 = require(script.Parent.utils.useBaseQuery).useBaseQuery;
-local _ = require(l_Parent_0.core);
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+
+require(ParentParentParent.GraphQL)
+require(ParentParent.jsutils.typedDocumentNode)
+require(ParentParent.react.types.types)
+
+local useBaseQuery = require(script.Parent.utils.useBaseQuery).useBaseQuery
+
+require(ParentParent.core)
+
 return {
-    useLazyQuery = function(v7, v8) --[[ Line: 26 ]] --[[ Name: useLazyQuery ]]
-        -- upvalues: l_useBaseQuery_0 (copy)
-        return l_useBaseQuery_0(v7, v8, true);
-    end
-};
+	useLazyQuery = function(p1, p2) -- line: 26
+		-- upvalues: useBaseQuery (copy)
+		return useBaseQuery(p1, p2, true)
+	end
+}

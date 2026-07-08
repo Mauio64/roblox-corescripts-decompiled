@@ -1,15 +1,18 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameIconRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.BigGameIcons.SetBigGameIcons);
+local GameIconRodux = script:FindFirstAncestor("GameIconRodux")
+local GameIconRoduxParent = GameIconRodux.Parent
+local Cryo = require(GameIconRoduxParent.Cryo)
+local SetBigGameIcons = require(GameIconRodux.BigGameIcons.SetBigGameIcons)
+
 return {
-    key = "BigGameIconsKey", 
-    reducer = function(v4, v5) --[[ Line: 7 ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        v4 = v4 or {};
-        if v5.type == v3.name then
-            v4 = v2.Dictionary.join(v4, v5.gameIcons);
-        end;
-        return v4;
-    end
-};
+	key = "BigGameIconsKey",
+	reducer = function(p1, p2) -- line: 7
+		-- upvalues: SetBigGameIcons (copy), Cryo (copy)
+		local v7 = p1 or {}
+
+		if p2.type == SetBigGameIcons.name then
+			v7 = Cryo.Dictionary.join(v7, p2.gameIcons)
+		end
+
+		return v7
+	end
+}

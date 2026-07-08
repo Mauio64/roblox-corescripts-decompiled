@@ -1,18 +1,21 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v2.App.ImageSet.Images;
-local l_IconButton_0 = v2.App.Button.IconButton;
-local l_IconSize_0 = v2.App.ImageSet.Enum.IconSize;
-return function(v6) --[[ Line: 10 ]] --[[ Name: makeBackButton ]]
-    -- upvalues: v1 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy)
-    return function() --[[ Line: 11 ]]
-        -- upvalues: v1 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), v6 (copy)
-        return v1.createElement(l_IconButton_0, {
-            size = UDim2.fromOffset(0, 0), 
-            iconSize = l_IconSize_0.Medium, 
-            icon = l_Images_0["icons/navigation/pushBack"], 
-            onActivated = v6
-        });
-    end;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local UIBlox = require(ParentParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+
+local function makeBackButton(p1: ((...any) -> ...any)?) -- line: 10
+	-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy)
+	return function() -- line: 11
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), p1 (copy)
+		return React.createElement(IconButton, {
+			size = UDim2.fromOffset(0, 0),
+			iconSize = IconSize.Medium,
+			icon = Images["icons/navigation/pushBack"],
+			onActivated = p1
+		})
+	end
+end
+
+return makeBackButton

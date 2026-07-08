@@ -1,10 +1,12 @@
-local v0 = {};
-local l_Observable_0 = require(script.Parent.Parent.Parent.utilities).Observable;
-v0.fromError = function(v2) --[[ Line: 17 ]] --[[ Name: fromError ]]
-    -- upvalues: l_Observable_0 (copy)
-    return l_Observable_0.new(function(v3) --[[ Line: 18 ]]
-        -- upvalues: v2 (copy)
-        v3:error(v2);
-    end);
-end;
-return v0;
+local t1 = {}
+local Observable = require(script.Parent.Parent.Parent.utilities).Observable
+
+function t1.fromError(p1) -- line: 17
+	-- upvalues: Observable (copy)
+	return Observable.new(function(p2) -- line: 18
+		-- upvalues: p1 (copy)
+		p2:error(p1)
+	end)
+end
+
+return t1

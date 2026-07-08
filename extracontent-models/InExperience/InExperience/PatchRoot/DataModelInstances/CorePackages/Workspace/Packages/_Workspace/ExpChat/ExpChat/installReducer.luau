@@ -1,33 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_Parent_0.ExpChatShared);
-local v4 = require(l_script_FirstAncestor_0.Flags.getEnableChatInputBarConfigurationAutocompleteEnabled);
-local v5 = require(l_script_FirstAncestor_0.Flags.getFFlagUnreduxLastInputTypeChanged);
-local v6 = require(l_script_FirstAncestor_0.Flags.getFFlagExpChatEnableChannelTabsUI);
-local l_FFlagEnableVerifiedBadgeStore_0 = require(l_Parent_0.SharedFlags).FFlagEnableVerifiedBadgeStore;
-return v2.combineReducers({
-    ChatIntervention = require(script.ChatInterventionReducer), 
-    Messages = require(script.Messages), 
-    MutedUsers = v3.Reducers.MutedUsers, 
-    VerifiedUsers = if l_FFlagEnableVerifiedBadgeStore_0 then nil else require(script.VerifiedUsers), 
-    Players = v3.Reducers.Players, 
-    LocalCharacter = v3.Reducers.LocalCharacter, 
-    TextChannels = v3.Reducers.TextChannels, 
-    ChatVisibility = require(script.ChatVisibility), 
-    CanLocalUserChat = require(script.CanLocalUserChat), 
-    LocalTeam = v3.Reducers.LocalTeam, 
-    isUsingTouch = if not v5() then require(script.isUsingTouch) else nil, 
-    isUsingGamepad = if not v5() then require(script.isUsingGamepad) else nil, 
-    shouldFocusChatInputBar = require(script.shouldFocusChatInputBar), 
-    Voice = require(script.Voice), 
-    BubbleChatSettings = require(script.BubbleChat), 
-    LegacyBubbleChatSettings = require(script.BubbleChat.LegacyChatReducer), 
-    ChatLayout = require(script.ChatLayout), 
-    AutoCastCommands = v3.Reducers.AutoCastCommands, 
-    Adornees = require(script.Adornees), 
-    ClientSettings = require(script.ClientSettings), 
-    AutocompleteDropdown = v4() and require(script.AutocompleteDropdown) or nil, 
-    ChannelTabs = v6() and require(script.ChannelTabs) or nil, 
-    ReverseNudgeToxicUsers = require(script.ReverseNudgeToxicUsers)
-});
+local ExpChat = script:FindFirstAncestor("ExpChat")
+local ExpChatParent = ExpChat.Parent
+local Rodux = require(ExpChatParent.Rodux)
+local ExpChatShared = require(ExpChatParent.ExpChatShared)
+local getEnableChatInputBarConfigurationAutocompleteEnabled = require(ExpChat.Flags.getEnableChatInputBarConfigurationAutocompleteEnabled)
+local getFFlagUnreduxLastInputTypeChanged = require(ExpChat.Flags.getFFlagUnreduxLastInputTypeChanged)
+local getFFlagExpChatEnableChannelTabsUI = require(ExpChat.Flags.getFFlagExpChatEnableChannelTabsUI)
+local FFlagEnableVerifiedBadgeStore = require(ExpChatParent.SharedFlags).FFlagEnableVerifiedBadgeStore
+
+return Rodux.combineReducers({
+	ChatIntervention = require(script.ChatInterventionReducer),
+	Messages = require(script.Messages),
+	MutedUsers = ExpChatShared.Reducers.MutedUsers,
+	VerifiedUsers = if not FFlagEnableVerifiedBadgeStore then require(script.VerifiedUsers) else nil,
+	Players = ExpChatShared.Reducers.Players,
+	LocalCharacter = ExpChatShared.Reducers.LocalCharacter,
+	TextChannels = ExpChatShared.Reducers.TextChannels,
+	ChatVisibility = require(script.ChatVisibility),
+	CanLocalUserChat = require(script.CanLocalUserChat),
+	LocalTeam = ExpChatShared.Reducers.LocalTeam,
+	isUsingTouch = if getFFlagUnreduxLastInputTypeChanged() then nil else require(script.isUsingTouch),
+	isUsingGamepad = if getFFlagUnreduxLastInputTypeChanged() then nil else require(script.isUsingGamepad),
+	shouldFocusChatInputBar = require(script.shouldFocusChatInputBar),
+	Voice = require(script.Voice),
+	BubbleChatSettings = require(script.BubbleChat),
+	LegacyBubbleChatSettings = require(script.BubbleChat.LegacyChatReducer),
+	ChatLayout = require(script.ChatLayout),
+	AutoCastCommands = ExpChatShared.Reducers.AutoCastCommands,
+	Adornees = require(script.Adornees),
+	ClientSettings = require(script.ClientSettings),
+	AutocompleteDropdown = getEnableChatInputBarConfigurationAutocompleteEnabled() and require(script.AutocompleteDropdown) or nil,
+	ChannelTabs = getFFlagExpChatEnableChannelTabsUI() and require(script.ChannelTabs) or nil,
+	ReverseNudgeToxicUsers = require(script.ReverseNudgeToxicUsers)
+})

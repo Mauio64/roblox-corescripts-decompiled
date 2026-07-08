@@ -1,1 +1,1 @@
-return require(script.App);
+return require(script.App)

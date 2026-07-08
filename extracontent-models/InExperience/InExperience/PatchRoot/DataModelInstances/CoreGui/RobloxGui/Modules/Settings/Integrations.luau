@@ -1,14 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Settings");
-local l_FFlagRefactorInExpSettingsInDevelopment_0 = require(l_script_FirstAncestor_0.Flags).FFlagRefactorInExpSettingsInDevelopment;
-local l_Integrations_0 = l_script_FirstAncestor_0.Integrations;
-local v3 = nil;
-if l_FFlagRefactorInExpSettingsInDevelopment_0 then
-    v3 = require(l_Integrations_0.Settings);
-end;
-local v4 = require(l_Integrations_0.Constants);
-local v5 = require(l_Integrations_0.Utils);
+local Settings = script:FindFirstAncestor("Settings")
+local FFlagRefactorInExpSettingsInDevelopment = require(Settings.Flags).FFlagRefactorInExpSettingsInDevelopment
+local Integrations = Settings.Integrations
+local Settings2 = nil
+
+if FFlagRefactorInExpSettingsInDevelopment then
+	Settings2 = require(Integrations.Settings)
+end
+
+local Constants = require(Integrations.Constants)
+local Utils = require(Integrations.Utils)
+
 return {
-    Settings = v3, 
-    Constants = v4, 
-    Utils = v5
-};
+	Settings = Settings2,
+	Constants = Constants,
+	Utils = Utils
+}

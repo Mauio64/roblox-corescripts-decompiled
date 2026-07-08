@@ -1,96 +1,107 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Telemetry.AppChatPerfEvent);
-local v2 = require(l_script_FirstAncestor_0.Contexts.ChatPlacementContext);
-local v3 = {
-    ChatLandingTTI = {
-        baseName = "AppChat_TTI_ChatLanding", 
-        page = "ChatLanding"
-    }, 
-    ChatConversationTTI = {
-        baseName = "AppChat_TTI_ChatConversation", 
-        page = "ChatConversation"
-    }
-};
-local v4 = {
-    ScrollConversationList = {
-        name = "AppChat_Scroll_ConversationList", 
-        parentTTI = v1.ChatLandingTTI
-    }, 
-    PaginationConversationList = {
-        name = "AppChat_Pagination_ConversationList", 
-        parentTTI = v1.ChatLandingTTI
-    }, 
-    ScrollMessageList = {
-        name = "AppChat_Scroll_MessageList", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    PaginationMessageList = {
-        name = "AppChat_Pagination_MessageList", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    MessageSendToPendingRender = {
-        name = "AppChat_Message_SendToPendingRender", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    MessageSendResponseToFinalRender = {
-        name = "AppChat_Message_SendResponseToFinalRender", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    MessageSendToFinalRender = {
-        name = "AppChat_Message_SendToFinalRender", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    MessageReceiveToRender = {
-        name = "AppChat_Message_ReceiveToRender", 
-        parentTTI = v1.ChatConversationTTI
-    }, 
-    TopBarRenderInterval = {
-        name = "AppChat_TopBar_RenderInterval", 
-        parentTTI = v1.ChatLandingTTI
-    }
-};
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatPerfEvent = require(AppChat.Telemetry.AppChatPerfEvent)
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+local t1 = {
+	ChatLandingTTI = {
+		baseName = "AppChat_TTI_ChatLanding",
+		page = "ChatLanding"
+	},
+	ChatConversationTTI = {
+		baseName = "AppChat_TTI_ChatConversation",
+		page = "ChatConversation"
+	},
+	MessageSendTTI = {
+		baseName = "AppChat_TTI_MessageSend",
+		page = "ChatConversation"
+	},
+	MessageReceiveTTI = {
+		baseName = "AppChat_TTI_MessageReceive",
+		page = "ChatConversation"
+	}
+}
+local t2 = {
+	ScrollConversationList = {
+		name = "AppChat_Scroll_ConversationList",
+		parentTTI = AppChatPerfEvent.ChatLandingTTI
+	},
+	PaginationConversationList = {
+		name = "AppChat_Pagination_ConversationList",
+		parentTTI = AppChatPerfEvent.ChatLandingTTI
+	},
+	ScrollMessageList = {
+		name = "AppChat_Scroll_MessageList",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	PaginationMessageList = {
+		name = "AppChat_Pagination_MessageList",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	MessageSendToPendingRender = {
+		name = "AppChat_Message_SendToPendingRender",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	MessageSendResponseToFinalRender = {
+		name = "AppChat_Message_SendResponseToFinalRender",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	MessageSendToFinalRender = {
+		name = "AppChat_Message_SendToFinalRender",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	MessageReceiveToRender = {
+		name = "AppChat_Message_ReceiveToRender",
+		parentTTI = AppChatPerfEvent.ChatConversationTTI
+	},
+	TopBarRenderInterval = {
+		name = "AppChat_TopBar_RenderInterval",
+		parentTTI = AppChatPerfEvent.ChatLandingTTI
+	}
+}
+
 return {
-    Events = v1, 
-    TTI_CATEGORY = "AppChat", 
-    isTTIEvent = function(v5) --[[ Line: 92 ]] --[[ Name: isTTIEvent ]]
-        -- upvalues: v3 (copy)
-        return v3[v5] ~= nil;
-    end, 
-    isIntervalEvent = function(v6) --[[ Line: 96 ]] --[[ Name: isIntervalEvent ]]
-        -- upvalues: v4 (copy)
-        return v4[v6] ~= nil;
-    end, 
-    getTTIBaseName = function(v7) --[[ Line: 104 ]] --[[ Name: getTTIBaseName ]]
-        -- upvalues: v3 (copy)
-        return v3[v7].baseName;
-    end, 
-    getTTIPage = function(v8) --[[ Line: 108 ]] --[[ Name: getTTIPage ]]
-        -- upvalues: v3 (copy)
-        return v3[v8].page;
-    end, 
-    getTTICategory = function() --[[ Line: 112 ]] --[[ Name: getTTICategory ]]
-        return "AppChat";
-    end, 
-    buildTTIEventName = function(v9, v10, v11) --[[ Line: 117 ]] --[[ Name: buildTTIEventName ]]
-        -- upvalues: v3 (copy), v2 (copy)
-        return v3[v9].baseName .. (v2.isPlacementInExperience(v10) and "_InExp" or "_UA") .. (v11 and "_Cold" or "_Warm");
-    end, 
-    getIntervalName = function(v12) --[[ Line: 133 ]] --[[ Name: getIntervalName ]]
-        -- upvalues: v4 (copy)
-        return v4[v12].name;
-    end, 
-    getParentTTI = function(v13) --[[ Line: 137 ]] --[[ Name: getParentTTI ]]
-        -- upvalues: v4 (copy)
-        return v4[v13].parentTTI;
-    end, 
-    getIntervalsForTTI = function(v14) --[[ Line: 142 ]] --[[ Name: getIntervalsForTTI ]]
-        -- upvalues: v4 (copy)
-        local v15 = {};
-        for v16, v17 in v4 do
-            if v17.parentTTI == v14 then
-                table.insert(v15, v16);
-            end;
-        end;
-        return v15;
-    end
-};
+	TTI_CATEGORY = "AppChat",
+	Events = AppChatPerfEvent,
+	isTTIEvent = function(p1) -- line: 104
+		-- upvalues: t1 (copy)
+		return t1[p1] ~= nil
+	end,
+	isIntervalEvent = function(p2) -- line: 108
+		-- upvalues: t2 (copy)
+		return t2[p2] ~= nil
+	end,
+	getTTIBaseName = function(p3) -- line: 116
+		-- upvalues: t1 (copy)
+		return t1[p3].baseName
+	end,
+	getTTIPage = function(p4) -- line: 120
+		-- upvalues: t1 (copy)
+		return t1[p4].page
+	end,
+	getTTICategory = function() -- line: 124
+		return "AppChat"
+	end,
+	buildTTIEventName = function(p5, p6, b1: boolean) -- line: 129
+		-- upvalues: t1 (copy), ChatPlacementContext (copy)
+		return t1[p5].baseName .. (not ChatPlacementContext.isPlacementInExperience(p6) and "_UA" or "_InExp") .. (not b1 and "_Warm" or "_Cold")
+	end,
+	getIntervalName = function(p7) -- line: 145
+		-- upvalues: t2 (copy)
+		return t2[p7].name
+	end,
+	getParentTTI = function(p8) -- line: 149
+		-- upvalues: t2 (copy)
+		return t2[p8].parentTTI
+	end,
+	getIntervalsForTTI = function(p9) -- line: 154
+		-- upvalues: t2 (copy)
+		local t3 = {}
+
+		for v17, v18 in t2 do
+			if p9 == v18.parentTTI then
+				table.insert(t3, v17)
+			end
+		end
+
+		return t3
+	end
+}

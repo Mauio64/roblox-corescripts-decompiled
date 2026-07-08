@@ -1,1 +1,1 @@
-return game:DefineFastInt("SafetyBubbleTransparencyPercent", 95);
+return game:DefineFastInt("SafetyBubbleTransparencyPercent", 95)

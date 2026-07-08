@@ -1,58 +1,65 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useMemo_0 = require(l_Parent_0.React).useMemo;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local l_useCapturedAuditContent_0 = require(l_script_FirstAncestor_0.Stores.AuditContentContext.AuditContentContext).useCapturedAuditContent;
-local v5 = require(l_script_FirstAncestor_0.Flags.GetFFlagEnableAuditSystem);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_0.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-local function v12(v7) --[[ Line: 48 ]] --[[ Name: parseTranslationKey ]]
-    if not v7 or v7 == "" then
-        return "", "";
-    else
-        local v8 = string.split(v7, ".");
-        if #v8 >= 3 then
-            local v9 = v8[1] .. "." .. v8[2];
-            local v10 = {};
-            for v11 = 3, #v8 do
-                table.insert(v10, v8[v11]);
-            end;
-            return v9, (table.concat(v10, "."));
-        else
-            return "", v7;
-        end;
-    end;
-end;
-return function(v13) --[[ Line: 73 ]] --[[ Name: RegisterAuditContent ]]
-    -- upvalues: v5 (copy), l_useMemo_0 (copy), v12 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), l_useCapturedAuditContent_0 (copy)
-    if not v5() then
-        return nil;
-    else
-        local l_translationKey_0 = v13.translationKey;
-        local l_translatedSourceString_0 = v13.translatedSourceString;
-        local l_parameters_0 = v13.parameters;
-        local v19 = l_useMemo_0(function() --[[ Line: 83 ]]
-            -- upvalues: l_translationKey_0 (copy), l_translatedSourceString_0 (copy), v12 (ref), l_parameters_0 (copy)
-            if not l_translationKey_0 or not l_translatedSourceString_0 then
-                return nil;
-            else
-                local v17, v18 = v12(l_translationKey_0);
-                if v17 == "" then
-                    return nil;
-                else
-                    return {
-                        translationKey = v18, 
-                        translationNamespace = v17, 
-                        translatedSourceString = l_translatedSourceString_0, 
-                        parameters = l_parameters_0
-                    };
-                end;
-            end;
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            l_translationKey_0, 
-            l_translatedSourceString_0, 
-            l_parameters_0
-        } else l_dependencyArray_0(l_translationKey_0, l_translatedSourceString_0, l_parameters_0));
-        l_useCapturedAuditContent_0(l_translationKey_0, v19);
-        return nil;
-    end;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local useMemo = require(AuthCommonParent.React).useMemo
+local useCapturedAuditContent = require(AuthCommon.Stores.AuditContentContext.AuditContentContext).useCapturedAuditContent
+local GetFFlagEnableAuditSystem = require(AuthCommon.Flags.GetFFlagEnableAuditSystem)
+
+local function parseTranslationKey(s1: string) -- line: 45
+	if not s1 or s1 == "" then
+		return "", ""
+	end
+
+	local parts = string.split(s1, ".")
+
+	if #parts >= 3 then
+		local v10 = parts[1] .. "." .. parts[2]
+		local t1 = {}
+
+		for i = 3, #parts do
+			table.insert(t1, parts[i])
+		end
+
+		return v10, (table.concat(t1, "."))
+	end
+
+	return "", s1
+end
+local function RegisterAuditContent(t2: {[any]: any}) -- line: 70
+	-- upvalues: GetFFlagEnableAuditSystem (copy), useMemo (copy), parseTranslationKey (copy), useCapturedAuditContent (copy)
+	if not GetFFlagEnableAuditSystem() then
+		return nil
+	end
+
+	local translationKey = t2.translationKey
+	local translatedSourceString = t2.translatedSourceString
+	local parameters = t2.parameters
+	local v17 = useMemo(function() -- line: 79
+		-- upvalues: translationKey (copy), translatedSourceString (copy), parseTranslationKey (copy), parameters (copy)
+		if not translationKey or not translatedSourceString then
+			return nil
+		end
+
+		local v18, v19 = parseTranslationKey(translationKey)
+
+		if v18 == "" then
+			return nil
+		end
+
+		return {
+			translationKey = v19,
+			translationNamespace = v18,
+			translatedSourceString = translatedSourceString,
+			parameters = parameters
+		}
+	end, {
+		translationKey,
+		translatedSourceString,
+		parameters
+	})
+
+	useCapturedAuditContent(translationKey, v17)
+
+	return nil
+end
+
+return RegisterAuditContent

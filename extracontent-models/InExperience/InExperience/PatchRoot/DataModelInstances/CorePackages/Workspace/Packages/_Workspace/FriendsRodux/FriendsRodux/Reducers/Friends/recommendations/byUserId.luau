@@ -1,143 +1,138 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local v3 = require(l_Parent_1.llama);
-local l_Models_0 = l_Parent_0.Models;
-local v5 = require(l_Models_0.Recommendation);
-local l_Actions_0 = l_Parent_0.Actions;
-local v7 = require(l_Actions_0.RecommendationCreated);
-local v8 = require(l_Actions_0.FriendshipCreated);
-local v9 = require(l_Actions_0.RecommendationDestroyed);
-local _ = require(l_Parent_0.roduxFriendsTypes);
-local v11 = {};
-local function _(v12, v13) --[[ Line: 17 ]]
-    -- upvalues: v3 (copy)
-    local v14 = v13[v12.baseUserId];
-    if v14 then
-        return (v3.Dictionary.removeKey(v14, v12.recommendedUserId));
-    else
-        return nil;
-    end;
-end;
-local function v24(v16, v17) --[[ Line: 26 ]]
-    -- upvalues: v3 (copy)
-    local l_join_0 = v3.Dictionary.join;
-    local l_v17_0 = v17;
-    local v20 = {};
-    local l_userId1_0 = v16.userId1;
-    local v22 = {
-        baseUserId = v16.userId1, 
-        recommendedUserId = v16.userId2
-    };
-    local v23 = v17[v22.baseUserId];
-    v20[l_userId1_0] = if v23 then v3.Dictionary.removeKey(v23, v22.recommendedUserId) else nil;
-    l_userId1_0 = v16.userId2;
-    v22 = {
-        baseUserId = v16.userId2, 
-        recommendedUserId = v16.userId1
-    };
-    v23 = v17[v22.baseUserId];
-    v20[l_userId1_0] = if v23 then v3.Dictionary.removeKey(v23, v22.recommendedUserId) else nil;
-    return l_join_0(l_v17_0, v20);
-end;
-local function _(v25, v26) --[[ Line: 39 ]]
-    -- upvalues: v3 (copy), v24 (copy)
-    local l_v26_0 = v26;
-    v3.Dictionary.map(v25.users, function(v28) --[[ Line: 42 ]]
-        -- upvalues: l_v26_0 (ref), v24 (ref), v25 (copy)
-        l_v26_0 = v24({
-            userId1 = v25.baseFriendId, 
-            userId2 = tostring(v28.id)
-        }, l_v26_0);
-    end);
-    return l_v26_0;
-end;
-return function(v30) --[[ Line: 52 ]]
-    -- upvalues: v2 (copy), v11 (copy), v7 (copy), v3 (copy), v5 (copy), v9 (copy), v8 (copy), v24 (copy)
-    local l_friendsNetworking_0 = v30.friendsNetworking;
-    local l_networkingBlocking_0 = v30.networkingBlocking;
-    return v2.createReducer(v11, {
-        [v7.name] = function(v33, v34) --[[ Line: 57 ]]
-            -- upvalues: v3 (ref), v5 (ref)
-            local v35 = tostring(v34.payload.baseUserId);
-            local v36 = tostring(v34.payload.recommendedUser.id);
-            local v37 = v33[v35] or {};
-            return v3.Dictionary.join(v33, {
-                [v35] = v3.Dictionary.join(v37, {
-                    [v36] = v5.format(v34.payload.recommendedUser)
-                })
-            });
-        end, 
-        [v9.name] = function(v38, v39) --[[ Line: 74 ]]
-            -- upvalues: v3 (ref)
-            local l_join_1 = v3.Dictionary.join;
-            local l_v38_0 = v38;
-            local v42 = {};
-            local l_baseUserId_0 = v39.payload.baseUserId;
-            local l_payload_0 = v39.payload;
-            local v45 = v38[l_payload_0.baseUserId];
-            v42[l_baseUserId_0] = if v45 then v3.Dictionary.removeKey(v45, l_payload_0.recommendedUserId) else nil;
-            return l_join_1(l_v38_0, v42);
-        end, 
-        [l_friendsNetworking_0.GetFriendRecommendationsFromUserId.Succeeded.name] = function(v46, v47) --[[ Line: 83 ]]
-            -- upvalues: v3 (ref), v5 (ref)
-            local v48 = tostring(v47.namedIds.users);
-            local l_data_0 = v47.responseBody.data;
-            local v53 = v3.Dictionary.map(l_data_0, function(v50, _) --[[ Line: 90 ]]
-                -- upvalues: v5 (ref)
-                local v52 = if v50.contextType == "Contacts" then v50.contactId else tostring(v50.id);
-                return v5.format({
-                    id = v52, 
-                    contactId = v50.contactId, 
-                    mutualFriendsList = v50.mutualFriendsList, 
-                    rank = v50.rank, 
-                    contextType = v50.contextType, 
-                    thumbnailEntities = v50.thumbnailEntities, 
-                    displayName = v50.displayName
-                }), v52;
-            end);
-            local v54 = v46[v48] or {};
-            return v3.Dictionary.join(v46, {
-                [v48] = v3.Dictionary.join(v54, v53)
-            });
-        end, 
-        [v8.name] = function(v55, v56) --[[ Line: 112 ]]
-            -- upvalues: v24 (ref)
-            return v24(v56.payload, v55);
-        end, 
-        [l_friendsNetworking_0.GetFriendsFromUserId.Succeeded.name] = function(v57, v58) --[[ Line: 119 ]]
-            -- upvalues: v3 (ref), v24 (ref)
-            local v59 = {
-                baseFriendId = tostring(v58.namedIds.users), 
-                users = v58.responseBody.data
-            };
-            local l_v57_0 = v57;
-            v3.Dictionary.map(v59.users, function(v61) --[[ Line: 42 ]]
-                -- upvalues: l_v57_0 (ref), v24 (ref), v59 (copy)
-                l_v57_0 = v24({
-                    userId1 = v59.baseFriendId, 
-                    userId2 = tostring(v61.id)
-                }, l_v57_0);
-            end);
-            return l_v57_0;
-        end, 
-        [l_friendsNetworking_0.AcceptFriendRequestFromUserId.Succeeded.name] = function(v62, v63) --[[ Line: 129 ]]
-            -- upvalues: v24 (ref)
-            local v64 = tostring(v63.ids[1]);
-            local v65 = tostring(v63.additionalData.currentUserId);
-            return v24({
-                userId1 = v65, 
-                userId2 = v64
-            }, v62);
-        end, 
-        [l_networkingBlocking_0.BlockUserById.Succeeded.name] = function(v66, v67) --[[ Line: 142 ]]
-            -- upvalues: v24 (ref)
-            local v68 = tostring(v67.additionalData.currentUserId);
-            local v69 = tostring(v67.namedIds.users);
-            return v24({
-                userId1 = v68, 
-                userId2 = v69
-            }, v66);
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+local llama = require(ParentParentParent.llama)
+local Models = ParentParent.Models
+local Recommendation = require(Models.Recommendation)
+local Actions = ParentParent.Actions
+local RecommendationCreated = require(Actions.RecommendationCreated)
+local FriendshipCreated = require(Actions.FriendshipCreated)
+local RecommendationDestroyed = require(Actions.RecommendationDestroyed)
+
+require(ParentParent.roduxFriendsTypes)
+
+local t1 = {}
+
+local function v12(p1, p2) -- line: 26
+	-- upvalues: llama (copy)
+	local join = llama.Dictionary.join
+	local t2 = {}
+	local userId1 = p1.userId1
+	local t3 = {
+		baseUserId = p1.userId1,
+		recommendedUserId = p1.userId2
+	}
+	local v22 = p2[t3.baseUserId]
+
+	t2[userId1] = if not v22 then nil else llama.Dictionary.removeKey(v22, t3.recommendedUserId)
+
+	local userId2 = p1.userId2
+	local t4 = {
+		baseUserId = p1.userId2,
+		recommendedUserId = p1.userId1
+	}
+	local v25 = p2[t4.baseUserId]
+
+	t2[userId2] = if not v25 then nil else llama.Dictionary.removeKey(v25, t4.recommendedUserId)
+
+	return join(p2, t2)
+end
+
+return function(p3) -- line: 52
+	-- upvalues: Rodux (copy), t1 (copy), RecommendationCreated (copy), llama (copy), Recommendation (copy), RecommendationDestroyed (copy), FriendshipCreated (copy), v12 (copy)
+	local friendsNetworking = p3.friendsNetworking
+	local networkingBlocking = p3.networkingBlocking
+
+	return Rodux.createReducer(t1, {
+		[RecommendationCreated.name] = function(p4, p5) -- line: 57
+			-- upvalues: llama (copy), Recommendation (copy)
+			local str = tostring(p5.payload.baseUserId)
+			local str2 = tostring(p5.payload.recommendedUser.id)
+			local v37 = p4[str] or {}
+
+			return llama.Dictionary.join(p4, {
+				[str] = llama.Dictionary.join(v37, {
+					[str2] = Recommendation.format(p5.payload.recommendedUser)
+				})
+			})
+		end,
+		[RecommendationDestroyed.name] = function(p6, p7) -- line: 74
+			-- upvalues: llama (copy)
+			local join = llama.Dictionary.join
+			local t5 = {}
+			local baseUserId = p7.payload.baseUserId
+			local payload = p7.payload
+			local v44 = p6[payload.baseUserId]
+
+			t5[baseUserId] = if not v44 then nil else llama.Dictionary.removeKey(v44, payload.recommendedUserId)
+
+			return join(p6, t5)
+		end,
+		[friendsNetworking.GetFriendRecommendationsFromUserId.Succeeded.name] = function(p8, p9) -- line: 83
+			-- upvalues: llama (copy), Recommendation (copy)
+			local str = tostring(p9.namedIds.users)
+			local data = p9.responseBody.data
+			local v49 = llama.Dictionary.map(data, function(p10, _) -- line: 90
+				-- upvalues: Recommendation (copy)
+				local v67 = if p10.contextType ~= "Contacts" then tostring(p10.id) else p10.contactId
+
+				return Recommendation.format({
+					id = v67,
+					contactId = p10.contactId,
+					mutualFriendsList = p10.mutualFriendsList,
+					rank = p10.rank,
+					contextType = p10.contextType,
+					thumbnailEntities = p10.thumbnailEntities,
+					displayName = p10.displayName
+				}), v67
+			end)
+			local v50 = p8[str] or {}
+
+			return llama.Dictionary.join(p8, {
+				[str] = llama.Dictionary.join(v50, v49)
+			})
+		end,
+		[FriendshipCreated.name] = function(p12, p13) -- line: 112
+			-- upvalues: v12 (copy)
+			return v12(p13.payload, p12)
+		end,
+		[friendsNetworking.GetFriendsFromUserId.Succeeded.name] = function(p14, p15) -- line: 119
+			-- upvalues: llama (copy), v12 (copy)
+			local t6 = {
+				baseFriendId = tostring(p15.namedIds.users),
+				users = p15.responseBody.data
+			}
+			local u56 = p14
+
+			llama.Dictionary.map(t6.users, function(p16) -- line: 42
+				-- upvalues: u56 (ref), v12 (copy), t6 (copy)
+				u56 = v12({
+					userId1 = t6.baseFriendId,
+					userId2 = tostring(p16.id)
+				}, u56)
+			end)
+
+			return u56
+		end,
+		[friendsNetworking.AcceptFriendRequestFromUserId.Succeeded.name] = function(p17, p18) -- line: 129
+			-- upvalues: v12 (copy)
+			local str = tostring(p18.ids[1])
+			local str3 = tostring(p18.additionalData.currentUserId)
+
+			return v12({
+				userId1 = str3,
+				userId2 = str
+			}, p17)
+		end,
+		[networkingBlocking.BlockUserById.Succeeded.name] = function(p19, p20) -- line: 142
+			-- upvalues: v12 (copy)
+			local str = tostring(p20.additionalData.currentUserId)
+			local str4 = tostring(p20.namedIds.users)
+
+			return v12({
+				userId1 = str,
+				userId2 = str4
+			}, p19)
+		end
+	})
+end

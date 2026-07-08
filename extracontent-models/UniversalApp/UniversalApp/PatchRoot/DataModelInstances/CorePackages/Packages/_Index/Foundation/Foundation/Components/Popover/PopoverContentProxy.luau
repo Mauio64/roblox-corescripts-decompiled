@@ -7,33 +7,9 @@ local Flags = require(Foundation.Utility.Flags)
 local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
 local usePlugin = require(Foundation.Providers.Plugin.usePlugin)
 
-return React.forwardRef(function(p1, p2) --[[ PopoverContentProxy ]] -- line: 14
-	-- upvalues: Flags (copy), usePlugin (copy), React (copy), isPluginSecurity (copy), ContentPlugin (copy), Content (copy)
-	local v11 = nil
-	local u13
-
-	if Flags.FoundationFixUserLevelPlugins then
-		local v12
-
-		v12, v11 = usePlugin()
-		u13 = v12
-	else
-		u13 = usePlugin()
-	end
-
-	local v14 = if not Flags.FoundationFixUserLevelPlugins then React.useMemo(function() -- line: 24
-		-- upvalues: u13 (ref)
-		if u13 == nil then
-			return false
-		end
-
-		local ok, _ = pcall(function() -- line: 33
-			-- upvalues: u13 (ref)
-			return u13:GetPluginComponent("Panels")
-		end)
-
-		return ok
-	end, { u13 }) else nil
+local function PopoverContentProxy(p1, p2) -- line: 14
+	-- upvalues: usePlugin (copy), Flags (copy), isPluginSecurity (copy), React (copy), ContentPlugin (copy), Content (copy)
+	local _, v13 = usePlugin()
 
 	if p2 then
 		p1 = table.clone(p1)
@@ -46,13 +22,11 @@ return React.forwardRef(function(p1, p2) --[[ PopoverContentProxy ]] -- line: 14
 		FoundationPopoverPluginSupport = FoundationPopoverPluginSupport and isPluginSecurity()
 	end
 
-	if Flags.FoundationFixUserLevelPlugins then
-		if FoundationPopoverPluginSupport and v11 then
-			return React.createElement(ContentPlugin, p1)
-		end
-	elseif FoundationPopoverPluginSupport and v14 then
+	if FoundationPopoverPluginSupport and v13 then
 		return React.createElement(ContentPlugin, p1)
 	end
 
 	return React.createElement(Content, p1)
-end)
+end
+
+return React.forwardRef(PopoverContentProxy)

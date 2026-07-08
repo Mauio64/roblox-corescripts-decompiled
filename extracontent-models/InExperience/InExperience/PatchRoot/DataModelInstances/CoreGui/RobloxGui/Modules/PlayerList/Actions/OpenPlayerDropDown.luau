@@ -1,5 +1,5 @@
-return require(script.Parent.Parent.ActionCreator)("OpenPlayerDropDown", function(v0) --[[ Line: 4 ]]
-    return {
-        selectedPlayer = v0
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("OpenPlayerDropDown", function(p1) -- line: 4
+	return {
+		selectedPlayer = p1
+	}
+end)

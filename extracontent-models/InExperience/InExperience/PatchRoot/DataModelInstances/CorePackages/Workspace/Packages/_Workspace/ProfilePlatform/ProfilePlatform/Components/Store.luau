@@ -1,1 +1,1 @@
-return require(script.StoreContainer);
+return require(script.StoreContainer)

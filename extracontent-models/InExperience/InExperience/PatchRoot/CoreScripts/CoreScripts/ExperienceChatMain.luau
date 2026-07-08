@@ -35,24 +35,18 @@ local GameTranslator = require(RobloxGui.Modules.GameTranslator)
 local ApolloClient = require(RobloxGui.Modules.ApolloClient)
 local ExpChat = require(CorePackages.Workspace.Packages.ExpChat)
 local getFFlagAddApolloClientToExperienceChat = require(RobloxGui.Modules.Flags.getFFlagAddApolloClientToExperienceChat)
-local GetFFlagShowLikelySpeakingBubbles = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagShowLikelySpeakingBubbles
-local v20 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
+local v19 = require(CorePackages.Workspace.Packages.Chrome).Enabled()
 local IsSpatialRobloxGuiEnabled = require(RobloxGui.Modules.VR.IsSpatialRobloxGuiEnabled)
 local getFFlagExpChatAlwaysRunTCS = require(CorePackages.Workspace.Packages.SharedFlags).getFFlagExpChatAlwaysRunTCS
 local getIconVoiceIndicator = require(RobloxGui.Modules.VoiceChat.Components.getIconVoiceIndicator)
 local onClickedVoiceIndicator = require(RobloxGui.Modules.VoiceChat.Components.onClickedVoiceIndicator)
 local getPermissions = nil
-local onClickedLikelySpeakingBubble = nil
 
-if GetFFlagShowLikelySpeakingBubbles() then
-	onClickedLikelySpeakingBubble = require(RobloxGui.Modules.VoiceChat.Components.onClickedLikelySpeakingBubble)
-end
-
-if v20 then
+if v19 then
 	getPermissions = require(RobloxGui.Modules.VoiceChat.Components.getPermissions)
 end
 
-local v27 = nil
+local v25 = nil
 local panelObject
 
 if IsSpatialRobloxGuiEnabled then
@@ -66,19 +60,19 @@ if IsSpatialRobloxGuiEnabled then
 		}
 	}
 
-	v27 = UIManager.getInstance():createUI(t1)
-	panelObject = v27.panelObject
+	v25 = UIManager.getInstance():createUI(t1)
+	panelObject = v25.panelObject
 
 	if isInExperienceUIVREnabled then
 		local Observable = require(CorePackages.Workspace.Packages.Observable)
 		local ChatSelector = require(CoreGui.RobloxGui.Modules.ChatSelector)
-		local v32 = Observable.ObservableValue.new(ChatSelector:GetVisibility())
+		local v30 = Observable.ObservableValue.new(ChatSelector:GetVisibility())
 
-		ChatSelector.VisibilityStateChanged:connect(function(p1) -- line: 80
-			-- upvalues: v32 (copy)
-			v32:set(p1)
+		ChatSelector.VisibilityStateChanged:connect(function(p1) -- line: 73
+			-- upvalues: v30 (copy)
+			v30:set(p1)
 		end)
-		UIManager.getInstance():connectPanelVisibility(t1.panelType, v32)
+		UIManager.getInstance():connectPanelVisibility(t1.panelType, v30)
 	end
 else
 	panelObject = Instance.new("ScreenGui")
@@ -89,7 +83,7 @@ else
 	panelObject.Parent = CoreGui
 end
 
-local function findTextChannel(s1: string) -- line: 94
+local function findTextChannel(s1: string) -- line: 87
 	-- upvalues: TextChatService (copy)
 	local s1_2 = TextChatService:FindFirstChild(s1, true)
 
@@ -101,7 +95,7 @@ local function findTextChannel(s1: string) -- line: 94
 	return s1_2
 end
 
-StarterGui.CoreGuiChangedSignal:Connect(function(p2, p3) -- line: 104
+StarterGui.CoreGuiChangedSignal:Connect(function(p2, p3) -- line: 97
 	-- upvalues: ExpChat (copy)
 	if p2 == Enum.CoreGuiType.All or p2 == Enum.CoreGuiType.Chat then
 		ExpChat.Events.SetCoreGuiEnabledChanged(p3)
@@ -109,19 +103,22 @@ StarterGui.CoreGuiChangedSignal:Connect(function(p2, p3) -- line: 104
 end)
 
 local IChatSettings = require(RobloxGui.Modules.InGameChat.BubbleChat.Types).IChatSettings
-local v35 = if not getFFlagExpChatAlwaysRunTCS() then TextChatService.ChatVersion == Enum.ChatVersion.TextChatService and TextChatService.CreateDefaultTextChannels else TextChatService.CreateDefaultTextChannels
+local v33 = if not getFFlagExpChatAlwaysRunTCS() then TextChatService.ChatVersion == Enum.ChatVersion.TextChatService and TextChatService.CreateDefaultTextChannels else TextChatService.CreateDefaultTextChannels
+
+if game:GetEngineFeature("TextChatServiceProtectedChatEnabled") and game:DefineFastFlag("DebugExpChatTextChannelWindow", false) then
+	require(CorePackages.Workspace.Packages.TextChannelWindow).start()
+end
 
 ExpChat.mountClientApp({
 	apolloClient = if not getFFlagAddApolloClientToExperienceChat() then nil else ApolloClient,
 	getIconVoiceIndicator = getIconVoiceIndicator or nil,
 	onClickedVoiceIndicator = onClickedVoiceIndicator or nil,
 	getPermissions = getPermissions or nil,
-	defaultTargetTextChannel = if not v35 then nil else findTextChannel("RBXGeneral"),
-	defaultSystemTextChannel = if not v35 then nil else findTextChannel("RBXSystem"),
+	defaultTargetTextChannel = if not v33 then nil else findTextChannel("RBXGeneral"),
+	defaultSystemTextChannel = if not v33 then nil else findTextChannel("RBXSystem"),
 	validateLegacyBubbleChatSettings = IChatSettings or nil,
-	onClickedLikelySpeakingBubble = onClickedLikelySpeakingBubble or nil,
 	translator = RobloxTranslator,
 	gameTranslator = GameTranslator,
 	parent = panelObject,
-	isSpatialUIEnabled = v27 and v27.type == SpatialUIType.SpatialUI
+	isSpatialUIEnabled = v25 and v25.type == SpatialUIType.SpatialUI
 })

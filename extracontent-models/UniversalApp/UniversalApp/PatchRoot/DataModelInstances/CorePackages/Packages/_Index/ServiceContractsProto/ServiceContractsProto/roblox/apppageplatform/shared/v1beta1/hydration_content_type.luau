@@ -4,7 +4,7 @@ require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
 return {
 	HydrationContentType = ({
 		HydrationContentType = {
-			fromNumber = function(n1: number) --[[ fromNumber ]] -- line: 41
+			fromNumber = function(n1: number) -- line: 44
 				if n1 == 0 then
 					return "HYDRATION_CONTENT_TYPE_INVALID"
 				end
@@ -82,7 +82,7 @@ return {
 				end
 
 				if n1 == 19 then
-					return "HYDRATION_CONTENT_TYPE_USER"
+					return "HYDRATION_CONTENT_TYPE_USER_PROFILE"
 				end
 
 				if n1 == 20 then
@@ -93,9 +93,21 @@ return {
 					return "HYDRATION_CONTENT_TYPE_PLAYABILITY"
 				end
 
+				if n1 == 22 then
+					return "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_FOLLOW_LIMIT"
+				end
+
+				if n1 == 23 then
+					return "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_VOTE_FEEDBACK_METADATA"
+				end
+
+				if n1 == 24 then
+					return "HYDRATION_CONTENT_TYPE_MOMENT"
+				end
+
 				return nil
 			end,
-			toNumber = function(p1) --[[ toNumber ]] -- line: 91
+			toNumber = function(p1) -- line: 100
 				if p1 == "HYDRATION_CONTENT_TYPE_INVALID" then
 					return 0
 				end
@@ -172,7 +184,7 @@ return {
 					return 18
 				end
 
-				if p1 == "HYDRATION_CONTENT_TYPE_USER" then
+				if p1 == "HYDRATION_CONTENT_TYPE_USER_PROFILE" then
 					return 19
 				end
 
@@ -184,9 +196,21 @@ return {
 					return 21
 				end
 
+				if p1 == "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_FOLLOW_LIMIT" then
+					return 22
+				end
+
+				if p1 == "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_VOTE_FEEDBACK_METADATA" then
+					return 23
+				end
+
+				if p1 == "HYDRATION_CONTENT_TYPE_MOMENT" then
+					return 24
+				end
+
 				return p1
 			end,
-			fromName = function(s1: string) --[[ fromName ]] -- line: 141
+			fromName = function(s1: string) -- line: 156
 				if s1 == "HYDRATION_CONTENT_TYPE_INVALID" then
 					return "HYDRATION_CONTENT_TYPE_INVALID"
 				end
@@ -263,8 +287,8 @@ return {
 					return "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_VOTE"
 				end
 
-				if s1 == "HYDRATION_CONTENT_TYPE_USER" then
-					return "HYDRATION_CONTENT_TYPE_USER"
+				if s1 == "HYDRATION_CONTENT_TYPE_USER_PROFILE" then
+					return "HYDRATION_CONTENT_TYPE_USER_PROFILE"
 				end
 
 				if s1 == "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_FAVORITE" then
@@ -273,6 +297,18 @@ return {
 
 				if s1 == "HYDRATION_CONTENT_TYPE_PLAYABILITY" then
 					return "HYDRATION_CONTENT_TYPE_PLAYABILITY"
+				end
+
+				if s1 == "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_FOLLOW_LIMIT" then
+					return "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_FOLLOW_LIMIT"
+				end
+
+				if s1 == "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_VOTE_FEEDBACK_METADATA" then
+					return "HYDRATION_CONTENT_TYPE_UNIVERSE_USER_VOTE_FEEDBACK_METADATA"
+				end
+
+				if s1 == "HYDRATION_CONTENT_TYPE_MOMENT" then
+					return "HYDRATION_CONTENT_TYPE_MOMENT"
 				end
 
 				return nil

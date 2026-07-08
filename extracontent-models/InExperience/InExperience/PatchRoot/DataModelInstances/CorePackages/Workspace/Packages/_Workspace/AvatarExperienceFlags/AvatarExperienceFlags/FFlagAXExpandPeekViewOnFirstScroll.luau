@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXExpandPeekViewOnFirstScroll1", false);
+return game:DefineFastFlag("AXExpandPeekViewOnFirstScroll1", false)

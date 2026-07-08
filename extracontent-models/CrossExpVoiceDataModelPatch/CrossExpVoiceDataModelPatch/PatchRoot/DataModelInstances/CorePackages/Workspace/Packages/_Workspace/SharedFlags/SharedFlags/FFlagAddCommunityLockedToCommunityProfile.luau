@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddCommunityLockedToCommunityProfile", false);
+return game:DefineFastFlag("AddCommunityLockedToCommunityProfile", false)

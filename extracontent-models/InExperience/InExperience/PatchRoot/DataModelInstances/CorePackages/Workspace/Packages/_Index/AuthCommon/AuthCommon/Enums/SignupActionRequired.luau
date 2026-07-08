@@ -1,3 +1,3 @@
 return {
-    Auth = "auth"
-};
+	Auth = "auth"
+}

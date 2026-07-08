@@ -1,33 +1,45 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Shared).Symbol.named("Nil");
-local v2 = {};
-local function v5(v3, v4) --[[ Line: 33 ]] --[[ Name: tryPropertyName ]]
-    return v3[v4];
-end;
-return function(v6, v7) --[[ Line: 37 ]] --[[ Name: getDefaultInstanceProperty ]]
-    -- upvalues: v2 (copy), v1 (copy), v5 (copy)
-    local v8 = v2[v6];
-    if v8 then
-        local v9 = v8[v7];
-        if v9 == v1 then
-            return true, nil;
-        elseif v9 ~= nil then
-            return true, v9;
-        end;
-    else
-        v8 = {};
-        v2[v6] = v8;
-    end;
-    local v10 = Instance.new(v6);
-    local l_status_0, l_result_0 = pcall(v5, v10, v7);
-    v10:Destroy();
-    if l_status_0 then
-        if l_result_0 == nil then
-            v8[v7] = v1;
-            return l_status_0, l_result_0;
-        else
-            v8[v7] = l_result_0;
-        end;
-    end;
-    return l_status_0, l_result_0;
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local v2 = require(ParentParent.Shared).Symbol.named("Nil")
+local t1 = {}
+
+local function tryPropertyName(p1, p2) -- line: 33
+	return p1[p2]
+end
+local function getDefaultInstanceProperty(p3, p4) -- line: 37
+	-- upvalues: t1 (copy), v2 (copy), tryPropertyName (copy)
+	local v10 = t1[p3]
+
+	if v10 then
+		local v11 = v10[p4]
+
+		if v11 == v2 then
+			return true, nil
+		end
+
+		if v11 ~= nil then
+			return true, v11
+		end
+	else
+		v10 = {}
+		t1[p3] = v10
+	end
+
+	local v12 = Instance.new(p3)
+	local ok, result = pcall(tryPropertyName, v12, p4)
+
+	v12:Destroy()
+
+	if ok then
+		if result == nil then
+			v10[p4] = v2
+
+			return ok, result
+		end
+
+		v10[p4] = result
+	end
+
+	return ok, result
+end
+
+return getDefaultInstanceProperty

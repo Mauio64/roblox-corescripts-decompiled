@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAbuseReportRevampFlow_1", false);
+return game:DefineFastFlag("EnableAbuseReportRevampFlow_1", false)

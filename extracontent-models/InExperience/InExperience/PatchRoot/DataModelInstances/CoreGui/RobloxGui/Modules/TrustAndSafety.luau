@@ -1,131 +1,144 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.Rodux);
-local v5 = require(l_CorePackages_0.Packages.RoactRodux);
-local v6 = require(l_CorePackages_0.Packages.t);
-local _ = require(l_CorePackages_0.Packages.UIBlox);
-local v8 = require(script.Dependencies);
-local l_Localization_0 = v8.Localization;
-local v10 = require(v8.LocalizationProvider);
-local v11 = require(v8.playerInterface);
-local v12 = require(script.Resources.Constants);
-local v13 = require(script.GlobalConfig);
-local v14 = require(script.Reducers);
-local v15 = require(script.Components.TrustAndSafetyApp);
-local v16 = require(script.TrustAndSafetyAppPolicy);
-local _ = require(script.Actions.OpenReportDialog);
-local _ = require(script.Actions.OpenReportMenu);
-local v19 = require(script.Actions.BeginReportFlow);
-local v20 = require(script.Actions.SetVoiceReportingFlow);
-local v21 = require(script.Thunks.IdentifyAvatars);
-local v22 = require(script.Utility.SessionUtility);
-local v23 = require(script.Utility.ScreenshotHookManager);
-local v24 = require(script.Thunks.FetchPlaceInfo);
-local v25 = require(script.Flags.GetFFlagReportAnythingScreenshot);
-local v39 = {
-    getInstance = function(v26) --[[ Line: 36 ]] --[[ Name: getInstance ]]
-        if not v26._initialized then
-            v26:initialize();
-            v26._initialized = true;
-        end;
-        return v26;
-    end, 
-    initialize = function(v27) --[[ Line: 45 ]] --[[ Name: initialize ]]
-        -- upvalues: v13 (copy), v3 (copy), v24 (copy), v5 (copy), v16 (copy), v10 (copy), v15 (copy), l_CoreGui_0 (copy)
-        if v13.propValidation then
-            v3.setGlobalConfig({
-                propValidation = true
-            });
-        end;
-        if v13.elementTracing then
-            v3.setGlobalConfig({
-                elementTracing = true
-            });
-        end;
-        v27.store = v27:createStore();
-        v27.store:dispatch(v24(game.GameId));
-        v27.localization = v27:createLocalization();
-        v27.root = v3.createElement(v5.StoreProvider, {
-            store = v27.store
-        }, {
-            PolicyProvider = v3.createElement(v16.Provider, {
-                policy = {
-                    v16.Mapper
-                }
-            }, {
-                LocalizationProvider = v3.createElement(v10, {
-                    localization = v27.localization
-                }, {
-                    TrustAndSafety = v3.createElement(v15)
-                })
-            })
-        });
-        v27.element = v3.mount(v27.root, l_CoreGui_0, "TrustAndSafety");
-    end, 
-    createStore = function(_) --[[ Line: 79 ]] --[[ Name: createStore ]]
-        -- upvalues: v14 (copy), v4 (copy), v13 (copy)
-        local l_v14_0 = v14;
-        local v30 = {
-            v4.thunkMiddleware
-        };
-        if v13.logStore then
-            table.insert(v30, v4.loggerMiddleware);
-        end;
-        return v4.Store.new(l_v14_0, nil, v30);
-    end, 
-    createLocalization = function(_) --[[ Line: 90 ]] --[[ Name: createLocalization ]]
-        -- upvalues: l_LocalizationService_0 (copy), l_Localization_0 (copy)
-        local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-        local v33 = l_Localization_0.new(l_RobloxLocaleId_0);
-        l_LocalizationService_0:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function() --[[ Line: 94 ]]
-            -- upvalues: l_LocalizationService_0 (ref), v33 (copy)
-            local l_RobloxLocaleId_1 = l_LocalizationService_0.RobloxLocaleId;
-            v33:SetLocale(l_RobloxLocaleId_1);
-        end);
-        return v33;
-    end, 
-    openReportDialog = function(v35, v36, v37) --[[ Line: 102 ]] --[[ Name: openReportDialog ]]
-        -- upvalues: v20 (copy), v25 (copy), v21 (copy), v19 (copy)
-        v35.store:dispatch(v20(true));
-        if v25() then
-            v35.store:dispatch(v21());
-        end;
-        v35.store:dispatch(v19(v36, v37));
-    end, 
-    openReportMenu = function(v38) --[[ Line: 110 ]] --[[ Name: openReportMenu ]]
-        -- upvalues: v20 (copy), v25 (copy), v21 (copy), v19 (copy)
-        v38.store:dispatch(v20(true));
-        if v25() then
-            v38.store:dispatch(v21());
-        end;
-        v38.store:dispatch(v19());
-    end
-};
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local LocalizationService = game:GetService("LocalizationService")
+local Roact = require(CorePackages.Packages.Roact)
+local Rodux = require(CorePackages.Packages.Rodux)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+
+require(CorePackages.Packages.UIBlox)
+
+local Dependencies = require(script.Dependencies)
+local Localization = Dependencies.Localization
+local LocalizationProvider = require(Dependencies.LocalizationProvider)
+local playerInterface = require(Dependencies.playerInterface)
+local Constants = require(script.Resources.Constants)
+local GlobalConfig = require(script.GlobalConfig)
+local Reducers = require(script.Reducers)
+local TrustAndSafetyApp = require(script.Components.TrustAndSafetyApp)
+local TrustAndSafetyAppPolicy = require(script.TrustAndSafetyAppPolicy)
+
+require(script.Actions.OpenReportDialog)
+require(script.Actions.OpenReportMenu)
+
+local BeginReportFlow = require(script.Actions.BeginReportFlow)
+local SetVoiceReportingFlow = require(script.Actions.SetVoiceReportingFlow)
+local IdentifyAvatars = require(script.Thunks.IdentifyAvatars)
+local SessionUtility = require(script.Utility.SessionUtility)
+local ScreenshotHookManager = require(script.Utility.ScreenshotHookManager)
+local FetchPlaceInfo = require(script.Thunks.FetchPlaceInfo)
+local GetFFlagReportAnythingScreenshot = require(script.Flags.GetFFlagReportAnythingScreenshot)
+local t2 = {
+	getInstance = function(p1) -- line: 36
+		if not p1._initialized then
+			p1:initialize()
+			p1._initialized = true
+		end
+
+		return p1
+	end,
+	initialize = function(p2) -- line: 45
+		-- upvalues: GlobalConfig (copy), Roact (copy), FetchPlaceInfo (copy), RoactRodux (copy), TrustAndSafetyAppPolicy (copy), LocalizationProvider (copy), TrustAndSafetyApp (copy), CoreGui (copy)
+		if GlobalConfig.propValidation then
+			Roact.setGlobalConfig({
+				propValidation = true
+			})
+		end
+
+		if GlobalConfig.elementTracing then
+			Roact.setGlobalConfig({
+				elementTracing = true
+			})
+		end
+
+		p2.store = p2:createStore()
+		p2.store:dispatch(FetchPlaceInfo(game.GameId))
+		p2.localization = p2:createLocalization()
+		p2.root = Roact.createElement(RoactRodux.StoreProvider, {
+			store = p2.store
+		}, {
+			PolicyProvider = Roact.createElement(TrustAndSafetyAppPolicy.Provider, {
+				policy = { TrustAndSafetyAppPolicy.Mapper }
+			}, {
+				LocalizationProvider = Roact.createElement(LocalizationProvider, {
+					localization = p2.localization
+				}, {
+					TrustAndSafety = Roact.createElement(TrustAndSafetyApp)
+				})
+			})
+		})
+		p2.element = Roact.mount(p2.root, CoreGui, "TrustAndSafety")
+	end,
+	createStore = function(_) -- line: 79
+		-- upvalues: Reducers (copy), Rodux (copy), GlobalConfig (copy)
+		local v28 = Reducers
+		local t1 = { Rodux.thunkMiddleware }
+
+		if GlobalConfig.logStore then
+			table.insert(t1, Rodux.loggerMiddleware)
+		end
+
+		return Rodux.Store.new(v28, nil, t1)
+	end,
+	createLocalization = function(_) -- line: 90
+		-- upvalues: LocalizationService (copy), Localization (copy)
+		local RobloxLocaleId = LocalizationService.RobloxLocaleId
+		local v32 = Localization.new(RobloxLocaleId)
+
+		LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function() -- line: 94
+			-- upvalues: LocalizationService (copy), v32 (copy)
+			local RobloxLocaleId2 = LocalizationService.RobloxLocaleId
+
+			v32:SetLocale(RobloxLocaleId2)
+		end)
+
+		return v32
+	end,
+	openReportDialog = function(p5, p6, p7) -- line: 102
+		-- upvalues: SetVoiceReportingFlow (copy), GetFFlagReportAnythingScreenshot (copy), IdentifyAvatars (copy), BeginReportFlow (copy)
+		p5.store:dispatch(SetVoiceReportingFlow(true))
+
+		if GetFFlagReportAnythingScreenshot() then
+			p5.store:dispatch(IdentifyAvatars())
+		end
+
+		p5.store:dispatch(BeginReportFlow(p6, p7))
+	end,
+	openReportMenu = function(p8) -- line: 110
+		-- upvalues: SetVoiceReportingFlow (copy), GetFFlagReportAnythingScreenshot (copy), IdentifyAvatars (copy), BeginReportFlow (copy)
+		p8.store:dispatch(SetVoiceReportingFlow(true))
+
+		if GetFFlagReportAnythingScreenshot() then
+			p8.store:dispatch(IdentifyAvatars())
+		end
+
+		p8.store:dispatch(BeginReportFlow())
+	end
+}
+
 return {
-    openReportDialogForPlayer = function(v40, v41) --[[ Line: 119 ]] --[[ Name: openReportDialogForPlayer ]]
-        -- upvalues: v11 (copy), v6 (copy), v22 (copy), v39 (copy), v12 (copy)
-        assert(v11(v40) and v6.instanceIsA("Player")(v40));
-        v22.startAbuseReportSession(v41);
-        v39:getInstance():openReportDialog(v12.ReportType.Player, v40);
-    end, 
-    openReportDialogForPlace = function(v42) --[[ Line: 124 ]] --[[ Name: openReportDialogForPlace ]]
-        -- upvalues: v22 (copy), v39 (copy), v12 (copy)
-        v22.startAbuseReportSession(v42);
-        v39:getInstance():openReportDialog(v12.ReportType.Place);
-    end, 
-    openReportMenu = function(v43) --[[ Line: 128 ]] --[[ Name: openReportMenu ]]
-        -- upvalues: v22 (copy), v39 (copy)
-        v22.startAbuseReportSession(v43);
-        v39:getInstance():openReportMenu();
-    end, 
-    setPreReportScreenshotHook = function(v44) --[[ Line: 132 ]] --[[ Name: setPreReportScreenshotHook ]]
-        -- upvalues: v23 (copy)
-        v23.setPreScreenshotHook(v44);
-    end, 
-    setPostReportScreenshotHook = function(v45) --[[ Line: 135 ]] --[[ Name: setPostReportScreenshotHook ]]
-        -- upvalues: v23 (copy)
-        v23.setPostScreenshotHook(v45);
-    end
-};
+	openReportDialogForPlayer = function(p9, p10) -- line: 119
+		-- upvalues: playerInterface (copy), t (copy), SessionUtility (copy), t2 (copy), Constants (copy)
+		assert(playerInterface(p9) and t.instanceIsA("Player")(p9))
+		SessionUtility.startAbuseReportSession(p10)
+		t2:getInstance():openReportDialog(Constants.ReportType.Player, p9)
+	end,
+	openReportDialogForPlace = function(p11) -- line: 124
+		-- upvalues: SessionUtility (copy), t2 (copy), Constants (copy)
+		SessionUtility.startAbuseReportSession(p11)
+		t2:getInstance():openReportDialog(Constants.ReportType.Place)
+	end,
+	openReportMenu = function(p12) -- line: 128
+		-- upvalues: SessionUtility (copy), t2 (copy)
+		SessionUtility.startAbuseReportSession(p12)
+		t2:getInstance():openReportMenu()
+	end,
+	setPreReportScreenshotHook = function(p13) -- line: 132
+		-- upvalues: ScreenshotHookManager (copy)
+		ScreenshotHookManager.setPreScreenshotHook(p13)
+	end,
+	setPostReportScreenshotHook = function(p14) -- line: 135
+		-- upvalues: ScreenshotHookManager (copy)
+		ScreenshotHookManager.setPostScreenshotHook(p14)
+	end
+}

@@ -1,107 +1,113 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Analytics.useSocialCarouselAnalytics);
-local l_Tile_0 = require(l_script_FirstAncestor_0.Common.Enums).Tile;
-local v5 = game:DefineFastInt("UserSeenCollectionBatchTimeMs", 200);
-local v6 = {
-    Friend = "Friend", 
-    NotFriend = "NotFriend"
-};
-return function() --[[ Line: 42 ]] --[[ Name: useTilesSeenCollection ]]
-    -- upvalues: v3 (copy), v2 (copy), l_Tile_0 (copy), v6 (copy), v5 (copy)
-    local v7 = v3();
-    local v8 = v2.useRef({});
-    local v9 = v2.useRef(nil);
-    local v10 = v2.useRef({});
-    local v11 = v2.useRef({});
-    local v12 = v2.useRef(0);
-    local v24 = v2.useCallback(function() --[[ Line: 52 ]]
-        -- upvalues: v8 (copy), v10 (copy), v7 (copy), v12 (copy), v11 (copy)
-        local l_current_0 = v8.current;
-        if #l_current_0 == 0 then
-            return;
-        else
-            local v14 = {};
-            local v15 = {};
-            local v16 = {};
-            local v17 = {};
-            local v18 = {};
-            local v19 = {};
-            local v20 = {};
-            local v21 = {};
-            for _, v23 in l_current_0 do
-                if v23 and v23.userId and v23.index then
-                    v10.current[v23.userId] = true;
-                    table.insert(v14, (tostring(v23.userId)));
-                    table.insert(v15, (tostring(v23.index)));
-                    table.insert(v18, v23.friendStatus);
-                    table.insert(v20, (tostring(v23.isRecommendation)));
-                    table.insert(v16, (tostring(v23.presence)));
-                    table.insert(v21, (tostring(v23.universeId)));
-                    table.insert(v19, (tostring(v23.recommendationContextType)));
-                    table.insert(v17, (tostring(v23.recommendationRank)));
-                end;
-            end;
-            if v7.tilesSeenCollection then
-                v12.current = v12.current + 1;
-                v7.tilesSeenCollection({
-                    userIds = table.concat(v14, ","), 
-                    absolutePositions = table.concat(v15, ","), 
-                    presences = table.concat(v16, ","), 
-                    recommendationRanks = table.concat(v17, ","), 
-                    friendStatuses = table.concat(v18, ","), 
-                    recommendationContextTypes = table.concat(v19, ","), 
-                    isRecommendations = table.concat(v20, ","), 
-                    universeIds = table.concat(v21, ","), 
-                    tileCount = #v14, 
-                    sessionEventCount = v12.current
-                });
-            end;
-            v8.current = {};
-            v11.current = {};
-            return;
-        end;
-    end, {
-        v7
-    });
-    local v28 = v2.useCallback(function(v25, v26, v27) --[[ Line: 108 ]]
-        -- upvalues: v10 (copy), v11 (copy), v8 (copy), l_Tile_0 (ref), v6 (ref), v9 (copy), v5 (ref), v24 (copy)
-        if not v25 or not v26 or v10.current[v25] or v11.current[v25] then
-            return;
-        else
-            v11.current[v25] = true;
-            table.insert(v8.current, {
-                userId = v25, 
-                index = v26, 
-                presence = if v27 and v27.presence then v27.presence.userPresenceType else "Offline", 
-                friendStatus = if v27 and v27.tileType == l_Tile_0.Friend then v6.Friend else v6.NotFriend, 
-                recommendationContextType = if v27 and v27.recommendationContextType then v27.recommendationContextType else "None", 
-                recommendationRank = if v27 and v27.recommendationRank then v27.recommendationRank else -1, 
-                isRecommendation = v27 and v27.tileType == l_Tile_0.Recommendation, 
-                universeId = if v27 and v27.presence and v27.presence.universeId and v27.presence.universeId ~= "" then v27.presence.universeId else -1
-            });
-            if v9.current then
-                pcall(task.cancel, v9.current);
-            end;
-            v9.current = task.delay(v5 * 0.001, v24);
-            return;
-        end;
-    end, {
-        v24
-    });
-    v2.useEffect(function() --[[ Line: 148 ]]
-        -- upvalues: v9 (copy), v24 (copy)
-        return function() --[[ Line: 149 ]]
-            -- upvalues: v9 (ref), v24 (ref)
-            if v9.current then
-                pcall(task.cancel, v9.current);
-            end;
-            v9.current = nil;
-            v24();
-        end;
-    end, {});
-    return {
-        addTileToCollection = v28
-    };
-end;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local React = require(SocialCarouselParent.React)
+local useSocialCarouselAnalytics = require(SocialCarousel.Analytics.useSocialCarouselAnalytics)
+local Tile = require(SocialCarousel.Common.Enums).Tile
+local v6 = game:DefineFastInt("UserSeenCollectionBatchTimeMs", 200)
+local _ = {
+	Friend = "Friend",
+	NotFriend = "NotFriend"
+}
+
+local function useTilesSeenCollection() -- line: 42
+	-- upvalues: useSocialCarouselAnalytics (copy), React (copy), Tile (copy), v6 (copy)
+	local v9 = useSocialCarouselAnalytics()
+	local v10 = React.useRef({})
+	local v11 = React.useRef(nil)
+	local v12 = React.useRef({})
+	local v13 = React.useRef({})
+	local v14 = React.useRef(0)
+	local v15 = React.useCallback(function() -- line: 52
+		-- upvalues: v10 (copy), v12 (copy), v9 (copy), v14 (copy), v13 (copy)
+		local current = v10.current
+
+		if #current == 0 then
+			return
+		end
+
+		local t1 = {}
+		local t2 = {}
+		local t3 = {}
+		local t4 = {}
+		local t5 = {}
+		local t6 = {}
+		local t7 = {}
+		local t8 = {}
+
+		for _, v27 in current do
+			if v27 and v27.userId and v27.index then
+				v12.current[v27.userId] = true
+				table.insert(t1, (tostring(v27.userId)))
+				table.insert(t2, (tostring(v27.index)))
+				table.insert(t5, v27.friendStatus)
+				table.insert(t7, (tostring(v27.isRecommendation)))
+				table.insert(t3, (tostring(v27.presence)))
+				table.insert(t8, (tostring(v27.universeId)))
+				table.insert(t6, (tostring(v27.recommendationContextType)))
+				table.insert(t4, (tostring(v27.recommendationRank)))
+			end
+		end
+
+		if v9.tilesSeenCollection then
+			v14.current = v14.current + 1
+			v9.tilesSeenCollection({
+				userIds = table.concat(t1, ","),
+				absolutePositions = table.concat(t2, ","),
+				presences = table.concat(t3, ","),
+				recommendationRanks = table.concat(t4, ","),
+				friendStatuses = table.concat(t5, ","),
+				recommendationContextTypes = table.concat(t6, ","),
+				isRecommendations = table.concat(t7, ","),
+				universeIds = table.concat(t8, ","),
+				tileCount = #t1,
+				sessionEventCount = v14.current
+			})
+		end
+
+		v10.current = {}
+		v13.current = {}
+	end, { v9 })
+	local v16 = React.useCallback(function(s1: string, n1: number, t9: {[any]: any}?) -- line: 108
+		-- upvalues: v12 (copy), v13 (copy), v10 (copy), Tile (copy), v11 (copy), v6 (copy), v15 (copy)
+		if not s1 or (not n1 or v12.current[s1] or v13.current[s1]) then
+			return
+		end
+
+		v13.current[s1] = true
+		table.insert(v10.current, {
+			userId = s1,
+			index = n1,
+			presence = (not t9 or not t9.presence) and "Offline" or t9.presence.userPresenceType,
+			friendStatus = (not t9 or t9.tileType ~= Tile.Friend) and "NotFriend" or "Friend",
+			recommendationContextType = (not t9 or not t9.recommendationContextType) and "None" or t9.recommendationContextType,
+			recommendationRank = (not t9 or not t9.recommendationRank) and -1 or t9.recommendationRank,
+			isRecommendation = t9 and t9.tileType == Tile.Recommendation,
+			universeId = (not t9 or (not t9.presence or (not t9.presence.universeId or t9.presence.universeId == ""))) and -1 or t9.presence.universeId
+		})
+
+		if v11.current then
+			pcall(task.cancel, v11.current)
+		end
+
+		v11.current = task.delay(v6 * 0.001, v15)
+	end, { v15 })
+
+	React.useEffect(function() -- line: 148
+		-- upvalues: v11 (copy), v15 (copy)
+		return function() -- line: 149
+			-- upvalues: v11 (copy), v15 (copy)
+			if v11.current then
+				pcall(task.cancel, v11.current)
+			end
+
+			v11.current = nil
+			v15()
+		end
+	end, {})
+
+	return {
+		addTileToCollection = v16
+	}
+end
+
+return useTilesSeenCollection

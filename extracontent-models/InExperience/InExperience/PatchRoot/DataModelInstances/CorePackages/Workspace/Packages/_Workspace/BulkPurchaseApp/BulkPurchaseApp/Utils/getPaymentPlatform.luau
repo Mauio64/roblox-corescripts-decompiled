@@ -1,19 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_VRService_0 = game:GetService("VRService");
-local v3 = require(l_script_FirstAncestor_0.Enums.PaymentPlatformEnum);
-return function() --[[ Line: 9 ]] --[[ Name: getPaymentPlatform ]]
-    -- upvalues: l_UserInputService_0 (copy), v3 (copy), l_VRService_0 (copy)
-    local l_l_UserInputService_0_Platform_0 = l_UserInputService_0:GetPlatform();
-    if l_l_UserInputService_0_Platform_0 == Enum.Platform.Windows or l_l_UserInputService_0_Platform_0 == Enum.Platform.OSX or l_l_UserInputService_0_Platform_0 == Enum.Platform.Linux then
-        return v3.Desktop;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.IOS or l_l_UserInputService_0_Platform_0 == Enum.Platform.Android or l_l_UserInputService_0_Platform_0 == Enum.Platform.UWP then
-        return v3.Mobile;
-    elseif l_l_UserInputService_0_Platform_0 == Enum.Platform.XBoxOne or l_l_UserInputService_0_Platform_0 == Enum.Platform.XBox360 or l_l_UserInputService_0_Platform_0 == Enum.Platform.PS3 or l_l_UserInputService_0_Platform_0 == Enum.Platform.PS4 or l_l_UserInputService_0_Platform_0 == Enum.Platform.PS5 then
-        return v3.Console;
-    elseif l_VRService_0:IsVRAppBuild() then
-        return v3.VR;
-    else
-        return v3.Unknown;
-    end;
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local UserInputService = game:GetService("UserInputService")
+local VRService = game:GetService("VRService")
+local PaymentPlatformEnum = require(BulkPurchaseApp.Enums.PaymentPlatformEnum)
+
+local function getPaymentPlatform() -- line: 9
+	-- upvalues: UserInputService (copy), PaymentPlatformEnum (copy), VRService (copy)
+	local Platform = UserInputService:GetPlatform()
+
+	if Platform == Enum.Platform.Windows or (Platform == Enum.Platform.OSX or Platform == Enum.Platform.Linux) then
+		return PaymentPlatformEnum.Desktop
+	end
+
+	if Platform == Enum.Platform.IOS or Platform == Enum.Platform.Android or Platform == Enum.Platform.UWP then
+		return PaymentPlatformEnum.Mobile
+	end
+
+	if Platform == Enum.Platform.XBoxOne or Platform == Enum.Platform.XBox360 or Platform == Enum.Platform.PS3 or Platform == Enum.Platform.PS4 or Platform == Enum.Platform.PS5 then
+		return PaymentPlatformEnum.Console
+	end
+
+	if VRService:IsVRAppBuild() then
+		return PaymentPlatformEnum.VR
+	end
+
+	return PaymentPlatformEnum.Unknown
+end
+
+return getPaymentPlatform

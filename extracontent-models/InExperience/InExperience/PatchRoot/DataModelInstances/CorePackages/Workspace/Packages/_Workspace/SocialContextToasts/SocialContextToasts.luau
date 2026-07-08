@@ -1,4 +1,4 @@
 return {
-    ["jest.config"] = script["jest.config"], 
-    SocialContextToastContainer = require(script.SocialContextToastContainer)
-};
+	["jest.config"] = script["jest.config"],
+	SocialContextToastContainer = require(script.SocialContextToastContainer)
+}

@@ -1,15 +1,17 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-v0.isNonEmptyArray = function(v3) --[[ Line: 14 ]] --[[ Name: isNonEmptyArray ]]
-    -- upvalues: l_Array_0 (copy)
-    return (function() --[[ Line: 15 ]]
-        -- upvalues: l_Array_0 (ref), v3 (copy)
-        if l_Array_0.isArray(v3) then
-            return #v3 > 0;
-        else
-            return l_Array_0.isArray(v3);
-        end;
-    end)();
-end;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Array = require(ParentParent.LuauPolyfill).Array
+
+function t1.isNonEmptyArray(p1) -- line: 14
+	-- upvalues: Array (copy)
+	return (function() -- line: 15
+		-- upvalues: Array (copy), p1 (copy)
+		if Array.isArray(p1) then
+			return #p1 > 0
+		end
+
+		return Array.isArray(p1)
+	end)()
+end
+
+return t1

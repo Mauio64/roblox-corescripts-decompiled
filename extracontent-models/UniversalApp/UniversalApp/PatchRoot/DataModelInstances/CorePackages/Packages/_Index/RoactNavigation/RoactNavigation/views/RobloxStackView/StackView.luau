@@ -1,106 +1,115 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Object_0 = require(l_Parent_2.LuauPolyfill).Object;
-local v4 = require(l_Parent_2.React);
-local v5 = require(l_Parent_1.routers.StackActions);
-local v6 = require(l_Parent_0.StackViewLayout);
-local v7 = require(l_Parent_0.Transitioner);
-local v8 = require(l_Parent_0.StackViewTransitionConfigs);
-local v9 = {
-    mode = require(l_Parent_0.StackPresentationStyle).Default
-};
-local v10 = v4.Component:extend("StackView");
-v10.init = function(v11) --[[ Line: 20 ]] --[[ Name: init ]]
-    v11._doRender = function(...) --[[ Line: 21 ]]
-        -- upvalues: v11 (copy)
-        return v11:_render(...);
-    end;
-    v11._doConfigureTransition = function(...) --[[ Line: 25 ]]
-        -- upvalues: v11 (copy)
-        return v11:_configureTransition(...);
-    end;
-    v11._doOnTransitionStart = function(...) --[[ Line: 29 ]]
-        -- upvalues: v11 (copy)
-        return v11:_onTransitionStart(...);
-    end;
-    v11._doOnTransitionEnd = function(...) --[[ Line: 33 ]]
-        -- upvalues: v11 (copy)
-        return v11:_onTransitionEnd(...);
-    end;
-    v11._doOnTransitionStep = function(...) --[[ Line: 37 ]]
-        -- upvalues: v11 (copy)
-        return v11:_onTransitionStep(...);
-    end;
-end;
-v10.render = function(v12) --[[ Line: 42 ]] --[[ Name: render ]]
-    -- upvalues: v4 (copy), v7 (copy)
-    local l_screenProps_0 = v12.props.screenProps;
-    local l_navigation_0 = v12.props.navigation;
-    local l_descriptors_0 = v12.props.descriptors;
-    return v4.createElement(v7, {
-        render = v12._doRender, 
-        configureTransition = v12._doConfigureTransition, 
-        screenProps = l_screenProps_0, 
-        navigation = l_navigation_0, 
-        descriptors = l_descriptors_0, 
-        onTransitionStart = v12._doOnTransitionStart, 
-        onTransitionEnd = v12._doOnTransitionEnd, 
-        onTransitionStep = v12._doOnTransitionStep
-    });
-end;
-v10.didMount = function(v16) --[[ Line: 61 ]] --[[ Name: didMount ]]
-    -- upvalues: v5 (copy)
-    local l_navigation_1 = v16.props.navigation;
-    if l_navigation_1.state.isTransitioning then
-        l_navigation_1.dispatch(v5.completeTransition({
-            key = l_navigation_1.state.key
-        }));
-    end;
-end;
-v10._render = function(v18, v19, v20) --[[ Line: 70 ]] --[[ Name: _render ]]
-    -- upvalues: l_Object_0 (copy), v9 (copy), v4 (copy), v6 (copy)
-    local l_screenProps_1 = v18.props.screenProps;
-    local v22 = l_Object_0.assign(table.clone(v9), v18.props.navigationConfig);
-    local l_descriptors_1 = v18.props.descriptors;
-    return v4.createElement(v6, l_Object_0.assign(v22, {
-        screenProps = l_screenProps_1, 
-        descriptors = l_descriptors_1, 
-        transitionProps = v19, 
-        lastTransitionProps = v20
-    }));
-end;
-v10._configureTransition = function(v24, v25, v26) --[[ Line: 86 ]] --[[ Name: _configureTransition ]]
-    -- upvalues: v8 (copy)
-    return v8.getTransitionConfig(v24.props.navigationConfig.transitionConfig, v25, v26, v24.props.navigationConfig.mode).transitionSpec;
-end;
-v10._onTransitionStart = function(v27, v28, v29) --[[ Line: 95 ]] --[[ Name: _onTransitionStart ]]
-    local v30 = v27.props.onTransitionStart or v27.props.navigationConfig.onTransitionStart;
-    if v30 and v28.index ~= v29.index then
-        v30(v28.navigation, v29.navigation);
-    end;
-end;
-v10._onTransitionEnd = function(v31, v32, v33) --[[ Line: 106 ]] --[[ Name: _onTransitionEnd ]]
-    -- upvalues: v5 (copy)
-    local l_navigationConfig_0 = v31.props.navigationConfig;
-    local l_navigation_2 = v31.props.navigation;
-    local v36 = v31.props.onTransitionEnd or l_navigationConfig_0.onTransitionEnd;
-    local l_key_0 = v32.scene.route.key;
-    local v38 = l_navigation_2.state.routes[l_navigation_2.state.index].key == l_key_0;
-    if v32.navigation.state.isTransitioning and v38 then
-        l_navigation_2.dispatch(v5.completeTransition({
-            key = l_navigation_2.state.key, 
-            toChildKey = l_key_0
-        }));
-    end;
-    if v36 and v32.index ~= v33.index then
-        v36(v32.navigation, v33.navigation);
-    end;
-end;
-v10._onTransitionStep = function(v39, v40, v41, v42) --[[ Line: 128 ]] --[[ Name: _onTransitionStep ]]
-    local v43 = v39.props.onTransitionStep or v39.props.navigationConfig.onTransitionStep;
-    if v43 and v40.index ~= v41.index then
-        v43(v40.navigation, v41.navigation, v42);
-    end;
-end;
-return v10;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Object = require(ParentParentParent.LuauPolyfill).Object
+local React = require(ParentParentParent.React)
+local StackActions = require(ParentParent.routers.StackActions)
+local StackViewLayout = require(scriptParent.StackViewLayout)
+local Transitioner = require(scriptParent.Transitioner)
+local StackViewTransitionConfigs = require(scriptParent.StackViewTransitionConfigs)
+local t1 = {
+	mode = require(scriptParent.StackPresentationStyle).Default
+}
+local v11 = React.Component:extend("StackView")
+
+function v11.init(p1) -- line: 20
+	function p1._doRender(...) -- line: 21
+		-- upvalues: p1 (copy)
+		return p1:_render(...)
+	end
+	function p1._doConfigureTransition(...) -- line: 25
+		-- upvalues: p1 (copy)
+		return p1:_configureTransition(...)
+	end
+	function p1._doOnTransitionStart(...) -- line: 29
+		-- upvalues: p1 (copy)
+		return p1:_onTransitionStart(...)
+	end
+	function p1._doOnTransitionEnd(...) -- line: 33
+		-- upvalues: p1 (copy)
+		return p1:_onTransitionEnd(...)
+	end
+	function p1._doOnTransitionStep(...) -- line: 37
+		-- upvalues: p1 (copy)
+		return p1:_onTransitionStep(...)
+	end
+end
+function v11.render(p2) -- line: 42
+	-- upvalues: React (copy), Transitioner (copy)
+	local screenProps = p2.props.screenProps
+	local navigation = p2.props.navigation
+	local descriptors = p2.props.descriptors
+
+	return React.createElement(Transitioner, {
+		render = p2._doRender,
+		configureTransition = p2._doConfigureTransition,
+		screenProps = screenProps,
+		navigation = navigation,
+		descriptors = descriptors,
+		onTransitionStart = p2._doOnTransitionStart,
+		onTransitionEnd = p2._doOnTransitionEnd,
+		onTransitionStep = p2._doOnTransitionStep
+	})
+end
+function v11.didMount(p3) -- line: 61
+	-- upvalues: StackActions (copy)
+	local navigation = p3.props.navigation
+
+	if navigation.state.isTransitioning then
+		navigation.dispatch(StackActions.completeTransition({
+			key = navigation.state.key
+		}))
+	end
+end
+function v11._render(p4, p5, p6) -- line: 70
+	-- upvalues: Object (copy), t1 (copy), React (copy), StackViewLayout (copy)
+	local screenProps = p4.props.screenProps
+	local v23 = Object.assign(table.clone(t1), p4.props.navigationConfig)
+	local descriptors = p4.props.descriptors
+
+	return React.createElement(StackViewLayout, Object.assign(v23, {
+		screenProps = screenProps,
+		descriptors = descriptors,
+		transitionProps = p5,
+		lastTransitionProps = p6
+	}))
+end
+function v11._configureTransition(p7, p8, p9) -- line: 86
+	-- upvalues: StackViewTransitionConfigs (copy)
+	return StackViewTransitionConfigs.getTransitionConfig(p7.props.navigationConfig.transitionConfig, p8, p9, p7.props.navigationConfig.mode).transitionSpec
+end
+function v11._onTransitionStart(p10, p11, p12) -- line: 95
+	local v31 = p10.props.onTransitionStart or p10.props.navigationConfig.onTransitionStart
+
+	if v31 and p11.index ~= p12.index then
+		v31(p11.navigation, p12.navigation)
+	end
+end
+function v11._onTransitionEnd(p13, p14, p15) -- line: 106
+	-- upvalues: StackActions (copy)
+	local navigationConfig = p13.props.navigationConfig
+	local navigation = p13.props.navigation
+	local v37 = p13.props.onTransitionEnd or navigationConfig.onTransitionEnd
+	local key = p14.scene.route.key
+	local v39 = key == navigation.state.routes[navigation.state.index].key
+
+	if p14.navigation.state.isTransitioning and v39 then
+		navigation.dispatch(StackActions.completeTransition({
+			key = navigation.state.key,
+			toChildKey = key
+		}))
+	end
+
+	if v37 and p14.index ~= p15.index then
+		v37(p14.navigation, p15.navigation)
+	end
+end
+function v11._onTransitionStep(p16, p17, p18, p19) -- line: 128
+	local v44 = p16.props.onTransitionStep or p16.props.navigationConfig.onTransitionStep
+
+	if v44 and p17.index ~= p18.index then
+		v44(p17.navigation, p18.navigation, p19)
+	end
+end
+
+return v11

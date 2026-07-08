@@ -1,278 +1,301 @@
-local function _(v0) --[[ Line: 3 ]] --[[ Name: rine ]]
-    return v0 and #v0 > 0 and v0;
-end;
-local function _(v2) --[[ Line: 6 ]] --[[ Name: rit ]]
-    local v3 = false;
-    if type(v2) == "table" then
-        v3 = v2;
-    end;
-    return v3;
-end;
-local function _() --[[ Line: 10 ]] --[[ Name: dont_crash ]]
-    if math.random() <= 0.004 then
-        wait();
-    end;
-    return true;
-end;
-local function v6() --[[ Line: 18 ]]
+local function rine(p1) -- line: 3
+	return p1 and (#p1 > 0 and p1)
+end
+local function rit(p2) -- line: 6
+	return type(p2) == "table" and p2
+end
+local function dont_crash() -- line: 10
+	if math.random() <= 0.004 then
+		wait()
+	end
 
-end;
-local function _(v7) --[[ Line: 19 ]]
-    return string.gsub(v7, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1");
-end;
-local l_tostring_0 = tostring;
-local l_char_0 = string.char;
-local v11 = {};
-local v16 = v11.silent and v6 or function(v12, v13, ...) --[[ Line: 26 ]]
-    -- upvalues: v11 (copy)
-    local _ = v12 == "i" and "stdout" or "stderr";
-    local v15 = (" [%s] "):format(v12:upper());
-    print("[HTMLParser]" .. v15 .. v13:format(...) .. (v11.nonl or "\n"));
-end;
-local v18 = v11.noerr and v6 or function(v17, ...) --[[ Line: 32 ]]
-    -- upvalues: v16 (copy)
-    v16("e", v17, ...);
-end;
-if not v11.noout or not v6 then
-    local function _(v19, ...) --[[ Line: 36 ]]
-        -- upvalues: v16 (copy)
-        v16("i", v19, ...);
-    end;
-end;
-local v22 = v11.debug and function(v21, ...) --[[ Line: 41 ]]
-    -- upvalues: v16 (copy), v6 (copy), l_tostring_0 (copy)
-    v16("d", v21:gsub("#LINE#", (l_tostring_0(v6(3)))), ...);
-end or v6;
-local v23 = require(script.ElementNode);
-local v24 = require(script.voidelements);
+	return true
+end
+local function v4() -- line: 18
+end
+
+local _tostring = tostring
+local char = string.char
+local t1 = {}
+local v8 = t1.silent and v4 or function(p3, p4, ...) -- line: 26
+	-- upvalues: t1 (copy)
+	if p3 == "i" then
+	end
+
+	local v18 = (" [%s] "):format(p3:upper())
+
+	print("[HTMLParser]" .. v18 .. p4:format(...) .. (t1.nonl or "\n"))
+end
+local v9 = t1.noerr and v4 or function(p5, ...) -- line: 32
+	-- upvalues: v8 (copy)
+	v8("e", p5, ...)
+end
+
+if not t1.noout or not v4 then
+end
+
+local v10 = t1.debug and function(p6, ...) -- line: 41
+	-- upvalues: v8 (copy), v4 (copy), _tostring (copy)
+	v8("d", p6:gsub("#LINE#", (_tostring(v4(3)))), ...)
+end or v4
+local ElementNode = require(script.ElementNode)
+local voidelements = require(script.voidelements)
+
 return {
-    parse = function(v25, v26, v27) --[[ Line: 53 ]] --[[ Name: parse ]]
-        -- upvalues: v11 (copy), l_tostring_0 (copy), l_char_0 (copy), v22 (copy), v18 (copy), v23 (copy), v24 (copy)
-        local l_v11_0 = v11;
-        local v29 = l_v11_0 and #l_v11_0 > 0 and l_v11_0 or {} or {};
-        v29.looplimit = v29.looplimit or 100000000;
-        l_v11_0 = l_tostring_0(v25);
-        local v30 = v26 or v29.looplimit or 100000000;
-        local v31 = false;
-        if not v29.keep_comments then
-            l_v11_0 = l_v11_0:gsub("<!%-%-.-%-%->", "");
-        end;
-        local v32 = {};
-        if not v29.keep_danger_placeholders then
-            local v33 = {};
-            local v34 = 0;
-            repeat
-                local v35 = l_char_0(v34);
-                if not l_v11_0:match(v35) then
-                    if not v32["<"] or not v32[">"] then
-                        if not v33[v34] then
-                            if not v32["<"] then
-                                v32["<"] = v35;
-                            elseif not v32[">"] then
-                                v32[">"] = v35;
-                            end;
-                            v33[v34] = true;
-                            v22("c:{%s}||cc:{%d}||tpr[c]:{%s}", l_tostring_0(c), v35:byte(), (l_tostring_0(v32[c])));
-                            v22("busy[i]:{%s},i:{%d}", l_tostring_0(v33[v34]), v34);
-                            v22("[FindPH]:#LINE# Success! || i=%d", v34);
-                        else
-                            v22("[FindPH]:#LINE# Busy! || i=%d", v34);
-                        end;
-                        v22("c:{%s}||cc:{%d}||tpr[c]:{%s}", c, v35:byte(), (l_tostring_0(v32[c])));
-                        v22("%s", (l_tostring_0(v33[v34])));
-                    else
-                        v22("[FindPH]:#LINE# Done!", v34);
-                        break;
-                    end;
-                else
-                    v22("[FindPH]:#LINE# Text contains this byte! || i=%d", v34);
-                end;
-                local v36 = 1;
-                if v34 == 31 then
-                    v36 = 96;
-                end;
-                v34 = v34 + v36;
-            until v34 == 255;
-            v34 = nil;
-            if not v32["<"] or not v32[">"] then
-                v18("Impossible to find at least two unused byte codes in this HTML-code. We need it to escape bracket-contained placeholders inside tags.");
-                v18("Consider enabling 'keep_danger_placeholders' option (to silence this error, if parser wasn't failed with current HTML-code) or manually replace few random bytes, to free up the codes.");
-            else
-                v22("[FindPH]:#LINE# Found! || '<'=%d, '>'=%d", v32["<"]:byte(), v32[">"]:byte());
-            end;
-            local function v40(v37, ...) --[[ Line: 124 ]] --[[ Name: g ]]
-                -- upvalues: v32 (copy), v31 (ref), v22 (ref), l_tostring_0 (ref)
-                local v38 = {
-                    ...
-                };
-                local v39 = v38[v37];
-                v38[v37] = v38[v37]:gsub("(.)", v32);
-                if v38[v37] ~= v39 then
-                    v31 = true;
-                    v22("[g]:#LINE# orig: %s", (l_tostring_0(v39)));
-                    v22("[g]:#LINE# replaced: %s", (l_tostring_0(v38[v37])));
-                end;
-                v22("[g]:#LINE# called, id: %s, arg[id]: %s, args { " .. ("{%s}, "):rep(#v38):gsub(", $", "") .. " }", v37, v38[v37], ...);
-                v22("[g]:#LINE# concat(arg): %s", table.concat(v38));
-                return table.concat(v38);
-            end;
-            local l_v40_0 = v40 --[[ copy: 10 -> 33 ]];
-            l_v11_0 = l_v11_0:gsub("(=[%s]-)(%b'')", function(...) --[[ Line: 144 ]]
-                -- upvalues: l_v40_0 (copy)
-                return l_v40_0(2, ...);
-            end):gsub("(=[%s]-)(%b\"\")", function(...) --[[ Line: 146 ]]
-                -- upvalues: l_v40_0 (copy)
-                return l_v40_0(2, ...);
-            end):gsub("(<" .. (v29.tpl_skip_pattern or "[^!]") .. ")([^>]+)" .. "(>)", function(...) --[[ Line: 150 ]]
-                -- upvalues: l_v40_0 (copy)
-                return l_v40_0(2, ...);
-            end):gsub("(" .. (v32["<"] or "__FAILED__") .. ")(" .. (v29.tpl_marker_pattern or "[^%w%s]") .. ")([%g%s]-)" .. "(%2)(>)" .. "([^>]*>)", function(...) --[[ Line: 156 ]]
-                -- upvalues: l_v40_0 (copy)
-                return l_v40_0(5, ...);
-            end);
-        end;
-        local v42 = 0;
-        local v43 = v23:new(v42, (l_tostring_0(l_v11_0)));
-        v43.page_url = v27;
-        local l_v43_0 = v43;
-        local v45 = true;
-        local v46 = 1;
-        local v47 = {};
-        while true do
-            if math.random() <= 0.004 then
-                wait();
-            end;
-            if true then
-                if v42 == v30 then
-                    v18("Main loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v30);
-                    break;
-                else
-                    local v48 = nil;
-                    local v49 = nil;
-                    local v50, v51, v52 = v43._text:find("<([%w-]+)[^>]*>", v46);
-                    v48 = v50;
-                    v46 = v51;
-                    v49 = v52;
-                    v22("[MainLoop]:#LINE# openstart=%s || tpos=%s || name=%s", l_tostring_0(v48), l_tostring_0(v46), (l_tostring_0(v49)));
-                    if v49 then
-                        v42 = v42 + 1;
-                        v50 = v23:new(v42, l_tostring_0(v49), l_v43_0 or {}, v45, v48, v46);
-                        v50.page_url = v27;
-                        l_v43_0 = v50;
-                        v51 = nil;
-                        v52 = v50:gettext();
-                        local v53 = 1;
-                        while true do
-                            if math.random() <= 0.004 then
-                                wait();
-                            end;
-                            if true then
-                                if v51 == v30 then
-                                    v18("Tag parsing loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v30);
-                                    break;
-                                else
-                                    local v54 = nil;
-                                    local v55 = nil;
-                                    local v56 = nil;
-                                    local v57 = nil;
-                                    local v58 = nil;
-                                    local v59 = nil;
-                                    local v60, v61, v62, v63, v64, v65, v66 = v52:find("%s+([^%s=/>]+)([%s]-)(=?)([%s]-)(['\"]?)", v53);
-                                    v54 = v60;
-                                    v53 = v61;
-                                    v55 = v62;
-                                    v59 = v63;
-                                    v56 = v64;
-                                    v59 = v65;
-                                    v57 = v66;
-                                    v22("[TagLoop]:#LINE# start=%s || apos=%s || k=%s || zsp='%s' || eq='%s', quote=[%s]", l_tostring_0(v54), l_tostring_0(v53), l_tostring_0(v55), l_tostring_0(v59), l_tostring_0(v56), (l_tostring_0(v57)));
-                                    if v55 and v55 ~= "/>" and v55 ~= ">" then
-                                        if v56 == "=" then
-                                            v60 = "=([^%s>]*)";
-                                            if v57 ~= "" then
-                                                v60 = v57 .. "([^" .. v57 .. "]*)" .. v57;
-                                            end;
-                                            v61, v62, v63 = v52:find(v60, v53);
-                                            v54 = v61;
-                                            v53 = v62;
-                                            v58 = v63;
-                                            v22("[TagLoop]:#LINE# start=%s || apos=%s || v=%s || pattern=%s", l_tostring_0(v54), l_tostring_0(v53), l_tostring_0(v58), (l_tostring_0(v60)));
-                                        end;
-                                        v58 = v58 or "";
-                                        if v31 then
-                                            for v67, v68 in pairs(v32) do
-                                                v58 = v58:gsub(v68, v67);
-                                                v22("[TagLoop]:#LINE# rv=%s || rk=%s", l_tostring_0(v68), (l_tostring_0(v67)));
-                                            end;
-                                        end;
-                                        v22("[TagLoop]:#LINE# k=%s || v=%s", l_tostring_0(v55), (l_tostring_0(v58)));
-                                        v50:addattribute(v55, v58);
-                                        v51 = (v51 or 0) + 1;
-                                    else
-                                        break;
-                                    end;
-                                end;
-                            else
-                                break;
-                            end;
-                        end;
-                        if v24[v50.name:lower()] then
-                            v45 = false;
-                            v50:close();
-                        else
-                            v47[v50.name] = v47[v50.name] or {};
-                            table.insert(v47[v50.name], v50);
-                        end;
-                        local l_v46_0 = v46;
-                        local v70 = nil;
-                        while true do
-                            if math.random() <= 0.004 then
-                                wait();
-                            end;
-                            if true then
-                                if v70 == v30 then
-                                    v18("Tag closing loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v30);
-                                    break;
-                                else
-                                    local v71 = nil;
-                                    local v72 = nil;
-                                    local v73 = nil;
-                                    local v74, v75, v76, v77 = v43._text:find("[^<]*<(/?)([%w-]+)", l_v46_0);
-                                    v71 = v74;
-                                    l_v46_0 = v75;
-                                    v72 = v76;
-                                    v73 = v77;
-                                    v22("[TagCloseLoop]:#LINE# closestart=%s || closeend=%s || closing=%s || closename=%s", l_tostring_0(v71), l_tostring_0(l_v46_0), l_tostring_0(v72), (l_tostring_0(v73)));
-                                    if v72 and v72 ~= "" then
-                                        v50 = table.remove(v47[v73] or {}) or v50;
-                                        v71 = v43._text:find("<", v71);
-                                        v22("[TagCloseLoop]:#LINE# closestart=%s", (l_tostring_0(v71)));
-                                        v50:close(v71, l_v46_0 + 1);
-                                        l_v43_0 = v50.parent;
-                                        v45 = true;
-                                        v70 = (v70 or 0) + 1;
-                                    else
-                                        break;
-                                    end;
-                                end;
-                            else
-                                break;
-                            end;
-                        end;
-                    else
-                        break;
-                    end;
-                end;
-            else
-                break;
-            end;
-        end;
-        if v31 then
-            v22("tpl");
-            for v78, v79 in pairs(v32) do
-                v43._text = v43._text:gsub(v79, v78);
-            end;
-        end;
-        return v43;
-    end
-};
+	parse = function(p7, p8, p9) -- line: 53
+		-- upvalues: t1 (copy), _tostring (copy), char (copy), v10 (copy), v9 (copy), ElementNode (copy), voidelements (copy)
+		local v25 = t1
+		local v26 = v25 and (#v25 > 0 and v25) or ({} or {})
+
+		v26.looplimit = v26.looplimit or 100000000
+
+		local v27 = _tostring(p7)
+		local v28 = p8 or (v26.looplimit or 100000000)
+		local u29 = false
+
+		if not v26.keep_comments then
+			v27 = v27:gsub("<!%-%-.-%-%->", "")
+		end
+
+		local t2 = {}
+
+		if not v26.keep_danger_placeholders then
+			local t3 = {}
+			local n1 = 0
+
+			repeat
+				local v33 = char(n1)
+
+				if not v27:match(v33) then
+					if t2["<"] and t2[">"] then
+						v10("[FindPH]:#LINE# Done!", n1)
+
+						break
+					end
+
+					if not t3[n1] then
+						if not t2["<"] then
+							t2["<"] = v33
+						elseif not t2[">"] then
+							t2[">"] = v33
+						end
+
+						t3[n1] = true
+						v10("c:{%s}||cc:{%d}||tpr[c]:{%s}", _tostring(c), v33:byte(), (_tostring(t2[c])))
+						v10("busy[i]:{%s},i:{%d}", _tostring(t3[n1]), n1)
+						v10("[FindPH]:#LINE# Success! || i=%d", n1)
+					else
+						v10("[FindPH]:#LINE# Busy! || i=%d", n1)
+					end
+
+					v10("c:{%s}||cc:{%d}||tpr[c]:{%s}", c, v33:byte(), (_tostring(t2[c])))
+					v10("%s", (_tostring(t3[n1])))
+				else
+					v10("[FindPH]:#LINE# Text contains this byte! || i=%d", n1)
+				end
+
+				local n2 = 1
+
+				if n1 == 31 then
+					n2 = 96
+				end
+
+				n1 += n2
+			until n1 == 255
+
+			if not t2["<"] or not t2[">"] then
+				v9("Impossible to find at least two unused byte codes in this HTML-code. We need it to escape bracket-contained placeholders inside tags.")
+				v9("Consider enabling 'keep_danger_placeholders' option (to silence this error, if parser wasn't failed with current HTML-code) or manually replace few random bytes, to free up the codes.")
+			else
+				v10("[FindPH]:#LINE# Found! || '<'=%d, '>'=%d", t2["<"]:byte(), t2[">"]:byte())
+			end
+
+			local function g(p10, ...) -- line: 124
+				-- upvalues: t2 (copy), u29 (ref), v10 (copy), _tostring (copy)
+				local t4 = { ... }
+				local v70 = t4[p10]
+
+				t4[p10] = t4[p10]:gsub("(.)", t2)
+
+				if v70 ~= t4[p10] then
+					u29 = true
+					v10("[g]:#LINE# orig: %s", (_tostring(v70)))
+					v10("[g]:#LINE# replaced: %s", (_tostring(t4[p10])))
+				end
+
+				v10("[g]:#LINE# called, id: %s, arg[id]: %s, args { " .. ("{%s}, "):rep(#t4):gsub(", $", "") .. " }", p10, t4[p10], ...)
+				v10("[g]:#LINE# concat(arg): %s", table.concat(t4))
+
+				return table.concat(t4)
+			end
+
+			v27 = v27:gsub("(=[%s]-)(%b'')", function(...) -- line: 144
+				-- upvalues: g (copy)
+				return g(2, ...)
+			end):gsub("(=[%s]-)(%b\"\")", function(...) -- line: 146
+				-- upvalues: g (copy)
+				return g(2, ...)
+			end):gsub("(<" .. (v26.tpl_skip_pattern or "[^!]") .. ")([^>]+)" .. "(>)", function(...) -- line: 150
+				-- upvalues: g (copy)
+				return g(2, ...)
+			end):gsub("(" .. (t2["<"] or "__FAILED__") .. ")(" .. (v26.tpl_marker_pattern or "[^%w%s]") .. ")([%g%s]-)" .. "(%2)(>)" .. "([^>]*>)", function(...) -- line: 156
+				-- upvalues: g (copy)
+				return g(5, ...)
+			end)
+		end
+
+		local n3 = 0
+		local v37 = ElementNode:new(n3, (_tostring(v27)))
+
+		v37.page_url = p9
+
+		local v38 = v37
+		local v39 = true
+		local n4 = 1
+		local t5 = {}
+
+		while true do
+			if math.random() <= 0.004 then
+				wait()
+			end
+
+			if not true then
+				break
+			end
+
+			if n3 == v28 then
+				v9("Main loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v28)
+
+				break
+			end
+
+			local start, v43
+
+			start, n4, v43 = v37._text:find("<([%w-]+)[^>]*>", n4)
+			v10("[MainLoop]:#LINE# openstart=%s || tpos=%s || name=%s", _tostring(start), _tostring(n4), (_tostring(v43)))
+
+			if not v43 then
+				break
+			end
+
+			n3 += 1
+
+			local v44 = ElementNode:new(n3, _tostring(v43), v38 or {}, v39, start, n4)
+
+			v44.page_url = p9
+			v38 = v44
+
+			local v45 = nil
+			local v46 = v44:gettext()
+			local n5 = 1
+
+			while true do
+				if math.random() <= 0.004 then
+					wait()
+				end
+
+				if not true then
+					break
+				end
+
+				if v45 == v28 then
+					v9("Tag parsing loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v28)
+
+					break
+				end
+
+				local v48 = nil
+				local start2, v50, v51, v52, v53, v54
+
+				start2, n5, v50, v51, v52, v53, v54 = v46:find("%s+([^%s=/>]+)([%s]-)(=?)([%s]-)(['\"]?)", n5)
+				v10("[TagLoop]:#LINE# start=%s || apos=%s || k=%s || zsp='%s' || eq='%s', quote=[%s]", _tostring(start2), _tostring(n5), _tostring(v50), _tostring(v53), _tostring(v52), (_tostring(v54)))
+
+				if not v50 or v50 == "/>" or v50 == ">" then
+					break
+				end
+
+				if v52 == "=" then
+					local s1 = "=([^%s>]*)"
+
+					if v54 ~= "" then
+						s1 = v54 .. "([^" .. v54 .. "]*)" .. v54
+					end
+
+					local start3
+
+					start3, n5, v48 = v46:find(s1, n5)
+					v10("[TagLoop]:#LINE# start=%s || apos=%s || v=%s || pattern=%s", _tostring(start3), _tostring(n5), _tostring(v48), (_tostring(s1)))
+				end
+
+				local v57 = v48 or ""
+
+				if u29 then
+					for k, v in pairs(t2) do
+						v57 = v57:gsub(v, k)
+						v10("[TagLoop]:#LINE# rv=%s || rk=%s", _tostring(v), (_tostring(k)))
+					end
+				end
+
+				v10("[TagLoop]:#LINE# k=%s || v=%s", _tostring(v50), (_tostring(v57)))
+				v44:addattribute(v50, v57)
+				v45 = (v45 or 0) + 1
+			end
+
+			if voidelements[v44.name:lower()] then
+				v39 = false
+				v44:close()
+			else
+				t5[v44.name] = t5[v44.name] or {}
+				table.insert(t5[v44.name], v44)
+			end
+
+			local v60 = n4
+			local v61 = nil
+
+			while true do
+				if math.random() <= 0.004 then
+					wait()
+				end
+
+				if not true then
+					break
+				end
+
+				if v61 == v28 then
+					v9("Tag closing loop reached loop limit (%d). Consider either increasing it or checking HTML-code for syntax errors", v28)
+
+					break
+				end
+
+				local start4, v63, v64
+
+				start4, v60, v63, v64 = v37._text:find("[^<]*<(/?)([%w-]+)", v60)
+				v10("[TagCloseLoop]:#LINE# closestart=%s || closeend=%s || closing=%s || closename=%s", _tostring(start4), _tostring(v60), _tostring(v63), (_tostring(v64)))
+
+				if not v63 or v63 == "" then
+					break
+				end
+
+				v44 = table.remove(t5[v64] or {}) or v44
+
+				local v65 = v37._text:find("<", start4)
+
+				v10("[TagCloseLoop]:#LINE# closestart=%s", (_tostring(v65)))
+				v44:close(v65, v60 + 1)
+				v38 = v44.parent
+				v39 = true
+				v61 = (v61 or 0) + 1
+			end
+		end
+
+		if u29 then
+			v10("tpl")
+
+			for k, v in pairs(t2) do
+				v37._text = v37._text:gsub(v, k)
+			end
+		end
+
+		return v37
+	end
+}

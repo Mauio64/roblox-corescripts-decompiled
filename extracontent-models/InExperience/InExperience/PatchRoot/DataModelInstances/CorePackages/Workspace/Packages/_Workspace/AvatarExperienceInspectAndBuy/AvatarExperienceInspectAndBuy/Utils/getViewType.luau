@@ -1,15 +1,20 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local v1 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local v2 = game:DefineFastInt("MobileBreakpointInspectAndBuy", 850);
-return function(v3) --[[ Line: 13 ]] --[[ Name: getViewType ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local l_Wide_0 = v1.Wide;
-    if v3.X > v3.Y and v3.X < v2 then
-        return v1.WideLandscape;
-    else
-        if v3.X < v2 then
-            l_Wide_0 = v1.Compact;
-        end;
-        return l_Wide_0;
-    end;
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+local v3 = game:DefineFastInt("MobileBreakpointInspectAndBuy", 850)
+
+local function getViewType(vector2: Vector2) -- line: 13
+	-- upvalues: ViewType (copy), v3 (copy)
+	local Wide = ViewType.Wide
+
+	if vector2.X > vector2.Y and vector2.X < v3 then
+		return ViewType.WideLandscape
+	end
+
+	if vector2.X < v3 then
+		Wide = ViewType.Compact
+	end
+
+	return Wide
+end
+
+return getViewType

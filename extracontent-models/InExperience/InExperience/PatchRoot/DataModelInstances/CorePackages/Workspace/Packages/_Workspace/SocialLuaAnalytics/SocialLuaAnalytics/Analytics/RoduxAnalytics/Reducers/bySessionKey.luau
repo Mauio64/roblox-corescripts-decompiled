@@ -1,21 +1,25 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_Dash_0 = v1.Dash;
-local l_Parent_1 = script.Parent.Parent;
-local _ = require(l_Parent_1.AnalyticsTypes);
-local v6 = require(l_Parent_1.Actions.SessionIdUpdated);
-local v7 = {};
-return function(_) --[[ Line: 12 ]]
-    -- upvalues: l_Rodux_0 (copy), v7 (copy), v6 (copy), l_Dash_0 (copy)
-    return l_Rodux_0.createReducer(v7, {
-        [v6.name] = function(v9, v10) --[[ Line: 14 ]]
-            -- upvalues: l_Dash_0 (ref), v7 (ref)
-            local l_sessionKey_0 = v10.payload.sessionKey;
-            local l_sessionId_0 = v10.payload.sessionId;
-            return l_Dash_0.join(v9 or v7, {
-                [l_sessionKey_0] = l_sessionId_0
-            });
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local Rodux = dependencies.Rodux
+local Dash = dependencies.Dash
+local ParentParent2 = script.Parent.Parent
+
+require(ParentParent2.AnalyticsTypes)
+
+local SessionIdUpdated = require(ParentParent2.Actions.SessionIdUpdated)
+local t1 = {}
+
+return function(_) -- line: 12
+	-- upvalues: Rodux (copy), t1 (copy), SessionIdUpdated (copy), Dash (copy)
+	return Rodux.createReducer(t1, {
+		[SessionIdUpdated.name] = function(p2, p3) -- line: 14
+			-- upvalues: Dash (copy), t1 (copy)
+			local sessionKey = p3.payload.sessionKey
+			local sessionId = p3.payload.sessionId
+
+			return Dash.join(p2 or t1, {
+				[sessionKey] = sessionId
+			})
+		end
+	})
+end

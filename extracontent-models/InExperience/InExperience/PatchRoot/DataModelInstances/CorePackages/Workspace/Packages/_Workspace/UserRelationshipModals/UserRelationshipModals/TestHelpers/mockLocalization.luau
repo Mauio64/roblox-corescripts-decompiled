@@ -2,7 +2,7 @@ local Parent = script:FindFirstAncestor("UserRelationshipModals").Parent
 local Signal = require(Parent.AppCommonLib).Signal
 
 return {
-	Format = function(_, s1: string) --[[ Format ]] -- line: 8
+	Format = function(_, s1: string) -- line: 8
 		if s1 == "InGame.FriendPlayerPrompt.Title.SendFriendRequest" or s1 == "InGame.FriendPlayerPrompt.Title.SendFriendRequest.FriendsRename" then
 			return "Send Friend Request"
 		end
@@ -21,7 +21,7 @@ return {
 
 		return s1
 	end,
-	GetLocale = function() --[[ GetLocale ]] -- line: 26
+	GetLocale = function() -- line: 26
 		return "en-us"
 	end,
 	changed = Signal.new()

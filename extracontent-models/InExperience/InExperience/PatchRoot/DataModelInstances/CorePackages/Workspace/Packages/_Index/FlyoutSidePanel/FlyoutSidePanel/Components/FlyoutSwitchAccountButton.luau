@@ -1,32 +1,37 @@
-local l_Parent_0 = script:FindFirstAncestor("FlyoutSidePanel").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v3 = require(l_Parent_0.Foundation);
-local l_Button_0 = v3.Button;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_ButtonSize_0 = v3.Enums.ButtonSize;
-return function(v7) --[[ Line: 16 ]] --[[ Name: FlyoutSwitchAccountButton ]]
-    -- upvalues: v1 (copy), l_useLocalization_0 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_ButtonSize_0 (copy)
-    local v8 = v1.useCallback(function() --[[ Line: 17 ]]
-        -- upvalues: v7 (copy)
-        v7.closeDrawer();
-        if v7.onSwitchAccountActivated then
-            v7.onSwitchAccountActivated();
-        end;
-    end, {
-        v7.onSwitchAccountActivated, 
-        v7.closeDrawer
-    });
-    local v9 = l_useLocalization_0({
-        title = "Authentication.AccountSwitch.Action.SwitchAccount"
-    });
-    return v1.createElement(l_Button_0, {
-        text = v9.title, 
-        variant = l_ButtonVariant_0.Standard, 
-        LayoutOrder = v7.layoutOrder, 
-        onActivated = v8, 
-        isDisabled = false, 
-        size = l_ButtonSize_0.Large, 
-        width = UDim.new(1, 0)
-    });
-end;
+local Parent = script:FindFirstAncestor("FlyoutSidePanel").Parent
+local React = require(Parent.React)
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local ButtonSize = Foundation.Enums.ButtonSize
+
+local function FlyoutSwitchAccountButton(p1) -- line: 16
+	-- upvalues: React (copy), useLocalization (copy), Button (copy), ButtonVariant (copy), ButtonSize (copy)
+	local v10 = React.useCallback(function() -- line: 17
+		-- upvalues: p1 (copy)
+		p1.closeDrawer()
+
+		if p1.onSwitchAccountActivated then
+			p1.onSwitchAccountActivated()
+		end
+	end, {
+		p1.onSwitchAccountActivated,
+		p1.closeDrawer
+	})
+	local v11 = useLocalization({
+		title = "Authentication.AccountSwitch.Action.SwitchAccount"
+	})
+
+	return React.createElement(Button, {
+		isDisabled = false,
+		text = v11.title,
+		variant = ButtonVariant.Standard,
+		LayoutOrder = p1.layoutOrder,
+		onActivated = v10,
+		size = ButtonSize.Large,
+		width = UDim.new(1, 0)
+	})
+end
+
+return FlyoutSwitchAccountButton

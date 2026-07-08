@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppSupportNonSduiTypeForServerTriggeredModals", false);
+return game:DefineFastFlag("LuaAppSupportNonSduiTypeForServerTriggeredModals", false)

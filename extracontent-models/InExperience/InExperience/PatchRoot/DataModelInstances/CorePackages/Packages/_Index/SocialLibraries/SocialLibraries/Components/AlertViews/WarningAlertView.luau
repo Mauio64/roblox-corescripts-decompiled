@@ -1,80 +1,79 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local l_ButtonType_0 = v1.UIBlox.App.Button.Enum.ButtonType;
-local v5 = require(l_Components_0.AlertViewBuilder.AlertViewBuilder);
-local v6 = l_Roact_0.Component:extend("WarningAlertView");
-v6.defaultProps = {
-    titleText = "TestTitle", 
-    bodyText = "TestBody", 
-    cancelText = "TestCancel", 
-    confirmText = "TestConfirm", 
-    failureTitleText = "failure title!", 
-    failureBodyText = "Thing failure!", 
-    failureButtonText = "failure Placeholder!", 
-    screenSize = Vector2.new(0, 0), 
-    width = UDim.new(0.5, 0), 
-    displayFailed = false, 
-    onActivated = function() --[[ Line: 24 ]] --[[ Name: onActivated ]]
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Roact = dependencies.Roact
+local Components = SocialLibraries.Components
+local ButtonType = dependencies.UIBlox.App.Button.Enum.ButtonType
+local AlertViewBuilder = require(Components.AlertViewBuilder.AlertViewBuilder)
+local v7 = Roact.Component:extend("WarningAlertView")
 
-    end, 
-    onModalClose = function() --[[ Line: 25 ]] --[[ Name: onModalClose ]]
+v7.defaultProps = {
+	titleText = "TestTitle",
+	bodyText = "TestBody",
+	cancelText = "TestCancel",
+	confirmText = "TestConfirm",
+	failureTitleText = "failure title!",
+	failureBodyText = "Thing failure!",
+	failureButtonText = "failure Placeholder!",
+	displayFailed = false,
+	soakAreaTransparency = 0.9,
+	screenSize = Vector2.new(0, 0),
+	width = UDim.new(0.5, 0),
+	onActivated = function() -- line: 24
+	end,
+	onModalClose = function() -- line: 25
+	end,
+	soakAreaColor3 = Color3.fromRGB(0, 0, 255)
+}
 
-    end, 
-    soakAreaColor3 = Color3.fromRGB(0, 0, 255), 
-    soakAreaTransparency = 0.9
-};
-local function v7() --[[ Line: 31 ]] --[[ Name: No_Op ]]
+local function No_Op() -- line: 31
+end
 
-end;
-v6.render = function(v8) --[[ Line: 33 ]] --[[ Name: render ]]
-    -- upvalues: l_ButtonType_0 (copy), v7 (copy), l_Roact_0 (copy), v5 (copy)
-    local l_props_0 = v8.props;
-    local v10 = nil;
-    local v11 = nil;
-    local v12 = nil;
-    if l_props_0.displayFailed then
-        v11 = v8.props.failureTitleText;
-        v12 = v8.props.failureBodyText;
-        v10 = {
-            {
-                buttonType = l_ButtonType_0.Alert, 
-                props = {
-                    text = l_props_0.failureButtonText, 
-                    onActivated = v7
-                }
-            }
-        };
-    else
-        v11 = v8.props.titleText;
-        v12 = v8.props.bodyText;
-        v10 = {
-            {
-                buttonType = l_ButtonType_0.Secondary, 
-                props = {
-                    text = l_props_0.cancelText, 
-                    onActivated = v7
-                }
-            }, 
-            {
-                buttonType = l_ButtonType_0.PrimarySystem, 
-                props = {
-                    text = l_props_0.confirmText, 
-                    onActivated = l_props_0.onActivated
-                }
-            }
-        };
-    end;
-    return l_Roact_0.createElement(v5, {
-        title = v11, 
-        bodyText = v12, 
-        screenSize = v8.props.screenSize, 
-        width = v8.props.width, 
-        onModalClose = v8.props.onModalClose, 
-        buttons = v10, 
-        soakAreaColor3 = l_props_0.soakAreaColor3, 
-        soakAreaTransparency = l_props_0.soakAreaTransparency
-    });
-end;
-return v6;
+function v7.render(p1) -- line: 33
+	-- upvalues: ButtonType (copy), No_Op (copy), Roact (copy), AlertViewBuilder (copy)
+	local props = p1.props
+	local failureTitleText, failureBodyText, t1
+
+	if props.displayFailed then
+		failureTitleText = p1.props.failureTitleText
+		failureBodyText = p1.props.failureBodyText
+		t1 = {{
+			buttonType = ButtonType.Alert,
+			props = {
+				text = props.failureButtonText,
+				onActivated = No_Op
+			}
+		}}
+	else
+		failureTitleText = p1.props.titleText
+		failureBodyText = p1.props.bodyText
+		t1 = {
+			{
+				buttonType = ButtonType.Secondary,
+				props = {
+					text = props.cancelText,
+					onActivated = No_Op
+				}
+			},
+			{
+				buttonType = ButtonType.PrimarySystem,
+				props = {
+					text = props.confirmText,
+					onActivated = props.onActivated
+				}
+			}
+		}
+	end
+
+	return Roact.createElement(AlertViewBuilder, {
+		title = failureTitleText,
+		bodyText = failureBodyText,
+		screenSize = p1.props.screenSize,
+		width = p1.props.width,
+		onModalClose = p1.props.onModalClose,
+		buttons = t1,
+		soakAreaColor3 = props.soakAreaColor3,
+		soakAreaTransparency = props.soakAreaTransparency
+	})
+end
+
+return v7

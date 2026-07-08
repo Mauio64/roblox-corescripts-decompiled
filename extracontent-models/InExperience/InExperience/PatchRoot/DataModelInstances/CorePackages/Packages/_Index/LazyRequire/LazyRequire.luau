@@ -1,4 +1,4 @@
 return {
-    lazyRequire = require(script.lazyRequire), 
-    createLazyComponent = require(script.createLazyComponent)
-};
+	lazyRequire = require(script.lazyRequire),
+	createLazyComponent = require(script.createLazyComponent)
+}

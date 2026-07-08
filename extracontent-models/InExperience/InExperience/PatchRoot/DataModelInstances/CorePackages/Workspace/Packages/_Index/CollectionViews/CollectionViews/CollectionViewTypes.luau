@@ -1,13 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("CollectionViews").Parent;
-local _ = require(l_Parent_0.Style);
-local _ = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.Signals);
+local Parent = script:FindFirstAncestor("CollectionViews").Parent
+
+require(Parent.Style)
+require(Parent.Foundation)
+require(Parent.Signals)
+
 return {
-    CollectionItemSize = {
-        XSmall = "XSmall", 
-        Small = "Small", 
-        Medium = "Medium", 
-        Large = "Large", 
-        XLarge = "XLarge"
-    }
-};
+	CollectionItemSize = {
+		XSmall = "XSmall",
+		Small = "Small",
+		Medium = "Medium",
+		Large = "Large",
+		XLarge = "XLarge"
+	}
+}

@@ -1,16 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCommon");
-local v1 = require(l_script_FirstAncestor_0.Enums.RecommendationContextType);
-local v2 = require(l_script_FirstAncestor_0.Enums.ContextualInfoTypes);
-return function(v3) --[[ Line: 11 ]] --[[ Name: getRecommendationContextualInfoType ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4 = v3.contextType and v3.contextType.rawValue();
-    if v4 == v1.MutualFriends.rawValue() then
-        return v2.MutualFriends;
-    elseif v4 == v1.Frequents.rawValue() then
-        return v2.Frequents;
-    elseif v4 == v1.Contacts.rawValue() then
-        return v2.Contacts;
-    else
-        return nil;
-    end;
-end;
+local SocialCommon = script:FindFirstAncestor("SocialCommon")
+local RecommendationContextType = require(SocialCommon.Enums.RecommendationContextType)
+local ContextualInfoTypes = require(SocialCommon.Enums.ContextualInfoTypes)
+
+local function getRecommendationContextualInfoType(p1) -- line: 11
+	-- upvalues: RecommendationContextType (copy), ContextualInfoTypes (copy)
+	local v6 = p1.contextType and p1.contextType.rawValue()
+
+	if v6 == RecommendationContextType.MutualFriends.rawValue() then
+		return ContextualInfoTypes.MutualFriends
+	end
+
+	if v6 == RecommendationContextType.Frequents.rawValue() then
+		return ContextualInfoTypes.Frequents
+	end
+
+	if v6 == RecommendationContextType.Contacts.rawValue() then
+		return ContextualInfoTypes.Contacts
+	end
+
+	return nil
+end
+
+return getRecommendationContextualInfoType

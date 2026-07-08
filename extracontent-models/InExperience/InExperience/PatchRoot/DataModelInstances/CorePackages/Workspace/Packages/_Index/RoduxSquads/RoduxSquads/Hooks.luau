@@ -1,3 +1,3 @@
 return {
-    useCurrentSquadSelector = require(script.useCurrentSquadSelector)
-};
+	useCurrentSquadSelector = require(script.useCurrentSquadSelector)
+}

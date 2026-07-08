@@ -1,31 +1,33 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.Promise);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v3 = game:DefineFastFlag("RemoveDuplicatesPlaceMediaAssets", false);
-return function(v4, v5) --[[ Line: 9 ]]
-    -- upvalues: l_Url_0 (copy), v3 (copy), v1 (copy)
-    local v6 = string.format("%sv2/games/%s/media", l_Url_0.GAME_URL, v5);
-    local v7 = {};
-    local v8 = {};
-    return v4(v6, "GET"):andThen(function(v9) --[[ Line: 16 ]]
-        -- upvalues: v3 (ref), v8 (copy), v7 (copy)
-        if v9 and v9.responseBody and v9.responseBody.data then
-            for _, v11 in ipairs(v9.responseBody.data) do
-                if v11.imageId then
-                    if v3 then
-                        local v12 = tostring(v11.imageId);
-                        if not v8[v12] then
-                            v8[v12] = true;
-                            table.insert(v7, v12);
-                        end;
-                    else
-                        table.insert(v7, (tostring(v11.imageId)));
-                    end;
-                end;
-            end;
-        end;
-    end):finally(function() --[[ Line: 33 ]]
-        -- upvalues: v1 (ref), v7 (copy)
-        return v1.resolve(v7);
-    end);
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local Promise = require(Parent.Promise)
+local Url = require(Parent.Http).Url
+local v4 = game:DefineFastFlag("RemoveDuplicatesPlaceMediaAssets", false)
+
+return function(p1, s1: string) -- line: 9
+	-- upvalues: Url (copy), v4 (copy), Promise (copy)
+	local t1 = {}
+	local t2 = {}
+
+	return p1(string.format("%sv2/games/%s/media", Url.GAME_URL, s1), "GET"):andThen(function(p2) -- line: 16
+		-- upvalues: v4 (copy), t2 (copy), t1 (copy)
+		if p2 and (p2.responseBody and p2.responseBody.data) then
+			for _, v in ipairs(p2.responseBody.data) do
+				if v.imageId then
+					if v4 then
+						local str = tostring(v.imageId)
+
+						if not t2[str] then
+							t2[str] = true
+							table.insert(t1, str)
+						end
+					else
+						table.insert(t1, (tostring(v.imageId)))
+					end
+				end
+			end
+		end
+	end):finally(function() -- line: 33
+		-- upvalues: Promise (copy), t1 (copy)
+		return Promise.resolve(t1)
+	end)
+end

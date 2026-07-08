@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddAbilityToDisableIGMScroll", false);
+return game:DefineFastFlag("AddAbilityToDisableIGMScroll", false)

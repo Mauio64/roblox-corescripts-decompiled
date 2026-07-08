@@ -1,238 +1,278 @@
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Squads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.ReactOtter);
-local v4 = require(l_Parent_0.SharedFlags);
-local _ = require(l_script_FirstAncestor_0.Enums.SquadButtonSourceEnum);
-local v6 = require(l_script_FirstAncestor_0.Enums.SquadButtonClickIntentionEnum);
-local v7 = require(l_Parent_0.Responsive);
-local l_usePreferredInput_0 = v7.usePreferredInput;
-local v9 = require(l_script_FirstAncestor_0.dependencies);
-local l_Foundation_0 = v9.Foundation;
-local l_React_0 = v9.React;
-local l_SquadsCore_0 = v9.SquadsCore;
-local l_dependencyArray_0 = v9.Hooks.dependencyArray;
-local l_SquadExternalContractContext_0 = v9.SquadsCore.SquadExternalContractProvider.SquadExternalContractContext;
-local l_SquadState_0 = v9.SquadsCore.Enums.SquadState;
-local l_leaveSquad_0 = v9.SquadsCore.Thunks.leaveSquad;
-local l_useDispatch_0 = v9.Hooks.useDispatch;
-local l_useLocalization_0 = v9.Hooks.useLocalization;
-local l_useSelector_0 = v9.Hooks.useSelector;
-local l_EventNames_0 = l_SquadsCore_0.Analytics.EventNames;
-local l_SquadPromptType_0 = v9.SquadsCore.Enums.SquadPromptType;
-local l_useSquadState_0 = l_SquadsCore_0.Hooks.useSquadState;
-local l_useTokens_0 = l_Foundation_0.Hooks.useTokens;
-local l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 = v4.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled;
-local l_FFlagDebugAppChatEnableDomLocators_0 = v4.FFlagDebugAppChatEnableDomLocators;
-local l_FFlagRemoveDependencyArrayAntipattern_0 = v4.FFlagRemoveDependencyArrayAntipattern;
-local v27 = {
-    dampingRatio = 1, 
-    frequency = 1
-};
-return function(v28) --[[ Line: 60 ]]
-    -- upvalues: l_useLocalization_0 (copy), l_useDispatch_0 (copy), l_usePreferredInput_0 (copy), l_useTokens_0 (copy), l_React_0 (copy), l_SquadExternalContractContext_0 (copy), l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 (copy), l_useSquadState_0 (copy), v3 (copy), v27 (copy), l_useSelector_0 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v6 (copy), l_EventNames_0 (copy), l_leaveSquad_0 (copy), l_SquadPromptType_0 (copy), l_Foundation_0 (copy), l_SquadState_0 (copy), l_FFlagDebugAppChatEnableDomLocators_0 (copy), v7 (copy), l_UserInputService_0 (copy)
-    local v29 = l_useLocalization_0({
-        joinButtonText = "Feature.Squads.Action.Join", 
-        startButtonText = "Feature.Squads.Action.Start", 
-        viewButtonText = "Feature.Squads.Action.View"
-    });
-    local v30 = l_useDispatch_0();
-    local v31 = l_usePreferredInput_0();
-    local v32 = l_useTokens_0();
-    local v33 = l_React_0.useContext(l_SquadExternalContractContext_0);
-    local v34 = v33.useParentChannelHasGroupUp(v28.conversationId);
-    local v35 = not l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 or v33.useIsChatEnabled();
-    local v36 = l_useSquadState_0();
-    local v37 = nil;
-    local v38 = nil;
-    local v40, v41 = v3.useAnimatedBinding(1, function(v39) --[[ Line: 80 ]]
-        -- upvalues: v28 (copy), v38 (ref), v3 (ref), v27 (ref)
-        if v28.shouldAnimate then
-            task.delay(0.5, function() --[[ Line: 82 ]]
-                -- upvalues: v38 (ref), v3 (ref), v39 (copy), v27 (ref)
-                v38(v3.spring(v39 == 1 and 0 or 1, v27));
-            end);
-        end;
-    end);
-    v37 = v40;
-    v38 = v41;
-    l_React_0.useEffect(function() --[[ Line: 88 ]]
-        -- upvalues: v28 (copy), v38 (ref), v3 (ref), v27 (ref)
-        if v28.shouldAnimate then
-            v38(v3.spring(1, v27));
-            return;
-        else
-            v38(v3.instant(1));
-            return;
-        end;
-    end, {
-        v28.shouldAnimate, 
-        v38
-    });
-    v40 = l_React_0.useCallback(function(v42) --[[ Line: 96 ]]
-        if v42.Squad and v42.Squad.Squad then
-            return v42.Squad.Squad.currentSquad;
-        else
-            return nil;
-        end;
-    end, {});
-    v41 = l_useSelector_0(v40);
-    local v43 = l_React_0.useMemo(function() --[[ Line: 106 ]]
-        -- upvalues: v41 (copy), v28 (copy)
-        return v41 and v41.parentChannelId == v28.conversationId;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v41, 
-        v28.conversationId
-    } else l_dependencyArray_0(v41, v28.conversationId));
-    local v44 = l_React_0.useMemo(function() --[[ Line: 115 ]]
-        -- upvalues: v43 (copy), v6 (ref), v34 (copy)
-        if v43 then
-            return v6.View;
-        elseif v34 then
-            return v6.Join;
-        else
-            return v6.Create;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v43, 
-        v34
-    } else l_dependencyArray_0(v43, v34));
-    local v45 = l_React_0.useMemo(function() --[[ Line: 130 ]]
-        -- upvalues: v43 (copy), v29 (copy), v34 (copy)
-        if v43 then
-            return v29.viewButtonText;
-        elseif v34 then
-            return v29.joinButtonText;
-        else
-            return v29.startButtonText;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v34, 
-        v43, 
-        v29.joinButtonText, 
-        v29.startButtonText, 
-        v29.viewButtonText
-    } else l_dependencyArray_0(v34, v43, v29.joinButtonText, v29.startButtonText, v29.viewButtonText));
-    local v46 = l_React_0.useCallback(function() --[[ Line: 157 ]]
-        -- upvalues: v33 (copy), l_EventNames_0 (ref), v28 (copy), v41 (copy), v44 (copy)
-        v33.fireSquadAnalytics(l_EventNames_0.EnterSquadButtonPressed, {
-            conversationId = v28.conversationId, 
-            squadButtonSource = v28.squadButtonSource, 
-            squadId = v41 and v41.squadId, 
-            squadLocation = v28.squadLocation, 
-            userIntention = v44
-        });
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v44, 
-        v41, 
-        v28.conversationId, 
-        v28.squadButtonSource, 
-        v28.squadLocation, 
-        v33.fireSquadAnalytics
-    } else l_dependencyArray_0(v44, v41, v28.conversationId, v28.squadButtonSource, v28.squadLocation, v33.fireSquadAnalytics));
-    local v47 = l_React_0.useCallback(function() --[[ Line: 186 ]]
-        -- upvalues: v46 (copy), v43 (copy), v41 (copy), v30 (copy), l_leaveSquad_0 (ref), l_SquadPromptType_0 (ref), v33 (copy), v28 (copy), l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 (ref), v35 (copy)
-        v46();
-        if not v43 and v41 then
-            v30(l_leaveSquad_0(l_SquadPromptType_0.JoinAnotherSquad, v33.setSquadPrompt, function() --[[ Line: 193 ]]
-                -- upvalues: v28 (ref)
-                v28.onActivated(v28.conversationId);
-            end, v33.squadLocation, not l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 or v35));
-            return;
-        else
-            v28.onActivated(v28.conversationId);
-            return;
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v41, 
-        v43, 
-        v28.onActivated, 
-        v46, 
-        v33.setSquadPrompt, 
-        v33.squadLocation, 
-        if l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 then v35 else nil
-    } else l_dependencyArray_0(v41, v43, v28.onActivated, v46, v33.setSquadPrompt, v33.squadLocation, if l_FFlagPartyDevAPIToRespectThirdPartySettingsEnabled_0 then v35 else nil));
-    local v48 = l_React_0.useMemo(function() --[[ Line: 225 ]]
-        -- upvalues: v32 (copy), v28 (copy)
-        if v32.Config.ColorMode.IsLight == "true" then
-            if v28.isInCard then
-                return v32.Color.Extended.Gray.Gray_300;
-            else
-                return v32.Color.Extended.Gray.Gray_200;
-            end;
-        elseif v28.isInCard then
-            return v32.Color.Extended.Gray.Gray_800;
-        else
-            return v32.Color.Extended.Gray.Gray_900;
-        end;
-    end, {
-        v28.isInCard, 
-        v32.Config.ColorMode.IsLight
-    });
-    return l_React_0.createElement(l_Foundation_0.View, {
-        tag = "row align-x-center align-y-center gap-xsmall stroke-action-standard radius-medium bg-action-standard", 
-        AutomaticSize = if v28.isFullWidth then Enum.AutomaticSize.None else Enum.AutomaticSize.XY, 
-        Size = UDim2.new(v28.isFullWidth and 1 or 0, 0, 0, v32.Size.Size_800), 
-        isDisabled = v36 == l_SquadState_0.Initializing, 
-        onActivated = v47, 
-        LayoutOrder = v28.layoutOrder, 
-        padding = {
-            left = UDim.new(0, v32.Padding.Small), 
-            right = UDim.new(0, v32.Padding.Small)
-        }, 
-        selection = {
-            Selectable = v28.Selectable
-        }, 
-        testId = if l_FFlagDebugAppChatEnableDomLocators_0 then ("%*%*"):format(v28.testId, v44) else nil
-    }, {
-        GroupIconContainer = l_React_0.createElement(l_Foundation_0.View, {
-            tag = "size-400-400", 
-            LayoutOrder = 1
-        }, {
-            GroupIcon = l_React_0.createElement(l_Foundation_0.Icon, {
-                name = l_Foundation_0.Enums.IconName.ThreePeople, 
-                size = l_Foundation_0.Enums.IconSize.Small, 
-                style = v32.Color.ActionStandard.Foreground, 
-                variant = l_Foundation_0.Enums.IconVariant.Regular
-            }), 
-            GreenDot = if not not v34 or v43 then l_React_0.createElement(l_Foundation_0.View, {
-                tag = "radius-circle anchor-top-right", 
-                Size = UDim2.fromOffset(v32.Size.Size_200, v32.Size.Size_200), 
-                backgroundStyle = v37:map(function(v49) --[[ Line: 271 ]]
-                    -- upvalues: v32 (copy)
-                    return {
-                        Color3 = v32.Color.Extended.Green.Green_500.Color3, 
-                        Transparency = 1 + (v32.Color.Extended.Green.Green_500.Transparency - 1) * v49
-                    };
-                end), 
-                Position = UDim2.new(1, v32.Size.Size_50, 0, -v32.Size.Size_50), 
-                stroke = {
-                    Color = v48.Color3, 
-                    Transparency = v37:map(function(v50) --[[ Line: 280 ]]
-                        -- upvalues: v48 (copy)
-                        return 1 + (v48.Transparency - 1) * v50;
-                    end), 
-                    Thickness = v32.Stroke.Thicker
-                }, 
-                ZIndex = 2
-            }) else nil
-        }), 
-        TextLabel = l_React_0.createElement(l_Foundation_0.Text, {
-            tag = "auto-xy text-label-small content-action-standard text-truncate-end text-no-wrap", 
-            LayoutOrder = 2, 
-            Text = v45, 
-            padding = {
-                right = UDim.new(0, v32.Padding.XXSmall)
-            }, 
-            sizeConstraint = if v28.isFullWidth then nil else {
-                MaxSize = Vector2.new(v32.Size.Size_2800, v32.Size.Size_800)
-            }
-        }), 
-        SignifierImage = if v28.shouldShowSignifier and v31 == v7.Input.Directional then l_React_0.createElement(l_Foundation_0.Icon, {
-            LayoutOrder = 3, 
-            name = l_UserInputService_0:GetImageForKeyCode(Enum.KeyCode.ButtonX), 
-            size = l_Foundation_0.Enums.IconSize.Small, 
-            style = v32.Color.ActionStandard.Foreground
-        }) else nil
-    });
-end;
+local IXPService = game:GetService("IXPService")
+local UserInputService = game:GetService("UserInputService")
+local Squads = script:FindFirstAncestor("Squads")
+local SquadsParent = Squads.Parent
+local ReactOtter = require(SquadsParent.ReactOtter)
+local SharedFlags = require(SquadsParent.SharedFlags)
+
+require(Squads.Enums.SquadButtonSourceEnum)
+
+local SquadButtonClickIntentionEnum = require(Squads.Enums.SquadButtonClickIntentionEnum)
+local Responsive = require(SquadsParent.Responsive)
+local usePreferredInput = Responsive.usePreferredInput
+local useIsTvRemoteDevice = require(SquadsParent.RoactUtils).Hooks.useIsTvRemoteDevice
+local dependencies = require(Squads.dependencies)
+local Foundation = dependencies.Foundation
+local React = dependencies.React
+
+require(SquadsParent.SquadsCore.Enums)
+
+local SquadExternalContractContext = require(SquadsParent.SquadsCore.SquadExternalContractProvider).SquadExternalContractContext
+local SquadState = require(SquadsParent.SquadsCore.Enums).SquadState
+local leaveSquad = require(SquadsParent.SquadsCore.Thunks).leaveSquad
+local useDispatch = dependencies.Hooks.useDispatch
+local useLocalization = dependencies.Hooks.useLocalization
+local useSelector = dependencies.Hooks.useSelector
+local EventNames = require(SquadsParent.SquadsCore.EventNames)
+local SquadPromptType = require(SquadsParent.SquadsCore.Enums).SquadPromptType
+local useSquadState = require(SquadsParent.SquadsCore.Hooks).useSquadState
+local useTokens = Foundation.Hooks.useTokens
+local FFlagPartyDevAPIToRespectThirdPartySettingsEnabled = SharedFlags.FFlagPartyDevAPIToRespectThirdPartySettingsEnabled
+local FFlagDebugAppChatEnableDomLocators = SharedFlags.FFlagDebugAppChatEnableDomLocators
+local v26 = game:DefineFastFlag("AppChatNewSquadJoinButtonLookIconless", false)
+local v27 = game:DefineFastFlag("AppChatSquadButtonColorUpdate", false)
+local v28 = game:DefineFastFlag("AppChatSquadButtonColorVariantB", false)
+local v29 = game:DefineFastFlag("AppChatSquadButtonColorUpdateIxpEnabled", false)
+local v30 = game:DefineFastString("AppChatSquadButtonColorUpdateIxpLayer", "Social.AppChat")
+local v31 = game:DefineFastFlag("AppChatSquadButtonHideGamepadIconOnTvRemote", false)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 1
+}
+
+return function(t2: {[any]: any}) -- line: 70
+	-- upvalues: useLocalization (copy), useDispatch (copy), usePreferredInput (copy), v31 (copy), useIsTvRemoteDevice (copy), useTokens (copy), React (copy), SquadExternalContractContext (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), useSquadState (copy), ReactOtter (copy), t1 (copy), useSelector (copy), SquadButtonClickIntentionEnum (copy), EventNames (copy), leaveSquad (copy), SquadPromptType (copy), v28 (copy), v29 (copy), IXPService (copy), v30 (copy), Foundation (copy), v27 (copy), SquadState (copy), FFlagDebugAppChatEnableDomLocators (copy), v26 (copy), Responsive (copy), UserInputService (copy)
+	local v34 = useLocalization({
+		joinButtonText = "Feature.Squads.Action.Join",
+		startButtonText = "Feature.Squads.Action.Start",
+		viewButtonText = "Feature.Squads.Action.View"
+	})
+	local v35 = useDispatch()
+	local v36 = usePreferredInput()
+	local v37 = not not v31 and useIsTvRemoteDevice()
+	local v38 = useTokens()
+	local v39 = React.useContext(SquadExternalContractContext)
+	local v40 = v39.useParentChannelHasGroupUp(t2.conversationId)
+	local v41 = not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v39.useIsChatEnabled()
+	local v42 = useSquadState()
+	local u43 = nil
+	local v44, v45 = ReactOtter.useAnimatedBinding(1, function(p1) -- line: 93
+		-- upvalues: t2 (copy), u43 (ref), ReactOtter (copy), t1 (copy)
+		if t2.shouldAnimate then
+			task.delay(0.5, function() -- line: 95
+				-- upvalues: u43 (ref), ReactOtter (copy), p1 (copy), t1 (copy)
+				u43(ReactOtter.spring(p1 ~= 1 and 1 or 0, t1))
+			end)
+		end
+	end)
+
+	u43 = v45
+	React.useEffect(function() -- line: 101
+		-- upvalues: t2 (copy), u43 (ref), ReactOtter (copy), t1 (copy)
+		if t2.shouldAnimate then
+			u43(ReactOtter.spring(1, t1))
+
+			return
+		end
+
+		u43(ReactOtter.instant(1))
+	end, {
+		t2.shouldAnimate,
+		u43
+	})
+
+	local v46 = React.useCallback(function(p2) -- line: 109
+		if p2.Squad and p2.Squad.Squad then
+			return p2.Squad.Squad.currentSquad
+		end
+
+		return nil
+	end, {})
+	local v47 = useSelector(v46)
+	local v48 = React.useMemo(function() -- line: 118
+		-- upvalues: v47 (copy), t2 (copy)
+		return v47 and v47.parentChannelId == t2.conversationId
+	end, {
+		v47,
+		t2.conversationId
+	})
+	local v49 = React.useMemo(function() -- line: 122
+		-- upvalues: v48 (copy), SquadButtonClickIntentionEnum (copy), v40 (copy)
+		if v48 then
+			return SquadButtonClickIntentionEnum.View
+		end
+
+		if v40 then
+			return SquadButtonClickIntentionEnum.Join
+		end
+
+		return SquadButtonClickIntentionEnum.Create
+	end, {
+		v48,
+		v40
+	})
+	local v50 = React.useMemo(function() -- line: 132
+		-- upvalues: v48 (copy), v34 (copy), v40 (copy)
+		if v48 then
+			return v34.viewButtonText
+		end
+
+		if v40 then
+			return v34.joinButtonText
+		end
+
+		return v34.startButtonText
+	end, {
+		v40,
+		v48,
+		v34.joinButtonText,
+		v34.startButtonText,
+		v34.viewButtonText
+	})
+	local v51 = React.useCallback(function() -- line: 148
+		-- upvalues: v39 (copy), EventNames (copy), t2 (copy), v47 (copy), v49 (copy)
+		v39.fireSquadAnalytics(EventNames.EnterSquadButtonPressed, {
+			conversationId = t2.conversationId,
+			squadButtonSource = t2.squadButtonSource,
+			squadId = v47 and v47.squadId,
+			squadLocation = t2.squadLocation,
+			userIntention = v49
+		})
+	end, {
+		v49,
+		v47,
+		t2.conversationId,
+		t2.squadButtonSource,
+		t2.squadLocation,
+		v39.fireSquadAnalytics
+	})
+	local v52 = React.useCallback(function() -- line: 165
+		-- upvalues: v51 (copy), v48 (copy), v47 (copy), v35 (copy), leaveSquad (copy), SquadPromptType (copy), v39 (copy), t2 (copy), FFlagPartyDevAPIToRespectThirdPartySettingsEnabled (copy), v41 (copy)
+		v51()
+
+		if not v48 and v47 then
+			v35(leaveSquad(SquadPromptType.JoinAnotherSquad, v39.setSquadPrompt, function() -- line: 172
+				-- upvalues: t2 (copy)
+				t2.onActivated(t2.conversationId)
+			end, v39.squadLocation, not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled or v41))
+
+			return
+		end
+
+		t2.onActivated(t2.conversationId)
+	end, {
+		v47,
+		v48,
+		t2.onActivated,
+		v51,
+		v39.setSquadPrompt,
+		v39.squadLocation,
+		if not FFlagPartyDevAPIToRespectThirdPartySettingsEnabled then nil else v41
+	})
+	local v53 = React.useMemo(function() -- line: 192
+		-- upvalues: v38 (copy), t2 (copy)
+		if v38.Config.ColorMode.IsLight == "true" then
+			if t2.isInCard then
+				return v38.Color.Extended.Gray.Gray_300
+			end
+
+			return v38.Color.Extended.Gray.Gray_200
+		end
+
+		if t2.isInCard then
+			return v38.Color.Extended.Gray.Gray_800
+		end
+
+		return v38.Color.Extended.Gray.Gray_900
+	end, {
+		t2.isInCard,
+		v38.Config.ColorMode.IsLight
+	})
+	local v54 = v49 == SquadButtonClickIntentionEnum.View
+	local v55 = v28
+	local v56 = not v55
+
+	React.useEffect(function() -- line: 214
+		-- upvalues: v29 (copy), IXPService (copy), v30 (copy)
+		if v29 then
+			IXPService:LogFlagLinkedUserLayerExposure(v30)
+		end
+	end, {})
+
+	return React.createElement(Foundation.View, {
+		tag = not v27 and "row align-x-center align-y-center gap-xsmall stroke-action-standard radius-medium bg-action-standard" or {
+			["row align-x-center align-y-center gap-xsmall radius-medium"] = true,
+			["bg-action-standard stroke-action-standard"] = not v54,
+			["bg-action-soft-emphasis stroke-action-soft-emphasis"] = v54 and v56,
+			["bg-action-emphasis stroke-action-emphasis"] = v54 and v55
+		},
+		AutomaticSize = if not t2.isFullWidth then Enum.AutomaticSize.XY else Enum.AutomaticSize.None,
+		Size = UDim2.new(not t2.isFullWidth and 0 or 1, 0, 0, v38.Size.Size_800),
+		isDisabled = v42 == SquadState.Initializing,
+		onActivated = v52,
+		LayoutOrder = t2.layoutOrder,
+		padding = {
+			left = UDim.new(0, v38.Padding.Small),
+			right = UDim.new(0, v38.Padding.Small)
+		},
+		selection = {
+			Selectable = t2.Selectable
+		},
+		testId = if not FFlagDebugAppChatEnableDomLocators then nil else `{ t2.testId }{ v49 }`
+	}, {
+		GroupIconContainer = if v26 then nil else React.createElement(Foundation.View, {
+			tag = "size-400-400",
+			LayoutOrder = 1
+		}, {
+			GroupIcon = React.createElement(Foundation.Icon, {
+				name = Foundation.Enums.IconName.ThreePeople,
+				size = Foundation.Enums.IconSize.Small,
+				style = v38.Color.ActionStandard.Foreground,
+				variant = Foundation.Enums.IconVariant.Regular
+			}),
+			GreenDot = if not v40 and not v48 then nil else React.createElement(Foundation.View, {
+				tag = "radius-circle anchor-top-right",
+				ZIndex = 2,
+				Size = UDim2.fromOffset(v38.Size.Size_200, v38.Size.Size_200),
+				backgroundStyle = v44:map(function(p3) -- line: 258
+					-- upvalues: v38 (copy)
+					return {
+						Color3 = v38.Color.Extended.Green.Green_500.Color3,
+						Transparency = 1 + (v38.Color.Extended.Green.Green_500.Transparency - 1) * p3
+					}
+				end),
+				Position = UDim2.new(1, v38.Size.Size_50, 0, -v38.Size.Size_50),
+				stroke = {
+					Color = v53.Color3,
+					Transparency = v44:map(function(p4) -- line: 267
+						-- upvalues: v53 (copy)
+						return 1 + (v53.Transparency - 1) * p4
+					end),
+					Thickness = v38.Stroke.Thicker
+				}
+			})
+		}),
+		TextLabel = React.createElement(Foundation.Text, {
+			LayoutOrder = 2,
+			tag = not v27 and "auto-xy text-label-small content-action-standard text-truncate-end text-no-wrap" or {
+				["auto-xy text-label-small text-no-wrap text-truncate-end"] = true,
+				["content-action-standard"] = not v54,
+				["content-action-soft-emphasis"] = v54 and v56,
+				["content-action-emphasis"] = v54 and v55
+			},
+			Text = v50,
+			padding = {
+				right = UDim.new(0, v38.Padding.XXSmall)
+			},
+			sizeConstraint = if not t2.isFullWidth then {
+				MaxSize = Vector2.new(v38.Size.Size_2800, v38.Size.Size_800)
+			} else nil
+		}),
+		SignifierImage = if not t2.shouldShowSignifier or (v36 ~= Responsive.Input.Directional or v37) then nil else React.createElement(Foundation.Icon, {
+			LayoutOrder = 3,
+			name = UserInputService:GetImageForKeyCode(Enum.KeyCode.ButtonX),
+			size = Foundation.Enums.IconSize.Small,
+			style = if not v27 or not v54 then v38.Color.ActionStandard.Foreground else if not v55 then v38.Color.ActionSoftEmphasis.Foreground else v38.Color.ActionEmphasis.Foreground
+		})
+	})
+end

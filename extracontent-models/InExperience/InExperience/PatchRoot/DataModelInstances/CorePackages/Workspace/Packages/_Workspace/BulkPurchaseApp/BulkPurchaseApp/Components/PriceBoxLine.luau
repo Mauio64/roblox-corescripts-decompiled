@@ -1,37 +1,60 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("BulkPurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_StyledTextLabel_0 = require(l_Parent_0.UIBlox).App.Text.StyledTextLabel;
-local v5 = require(script.Parent.LineItemLayout);
-local v6 = require(script.Parent.Price);
-local v7 = require(l_script_FirstAncestor_0.Enums.PriceBoxLineVariantEnum);
-return function(v8) --[[ Line: 20 ]] --[[ Name: PriceBoxLine ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v7 (copy), v2 (copy), v5 (copy), l_StyledTextLabel_0 (copy), v6 (copy)
-    local v9 = l_useDesignTokens_0();
-    local v10 = if v8.variant == v7.Danger then {
-        LineHeight = v9.Semantic.Typography.Body.LineHeight, 
-        Font = v9.Semantic.Typography.Subheader.Font, 
-        FontSize = v9.Semantic.Typography.Body.FontSize, 
-        LetterSpacing = v9.Semantic.Typography.Body.LetterSpacing
-    } else v9.Semantic.Typography.Body;
-    local l_Default_0 = v9.Semantic.Color.Text.Default;
-    if v8.variant == v7.Highlight then
-        l_Default_0 = v9.Semantic.Color.Text.Emphasis;
-    elseif v8.variant == v7.Danger then
-        l_Default_0 = v9.Semantic.Color.Common.Alert;
-    end;
-    return v2.createElement(v5, {
-        LayoutOrder = v8.LayoutOrder, 
-        startSlot = v2.createElement(l_StyledTextLabel_0, {
-            fontStyle = v10, 
-            colorStyle = l_Default_0, 
-            text = v8.text
-        }), 
-        endSlot = v2.createElement(v6, {
-            colorStyle = l_Default_0, 
-            fontStyle = v10, 
-            amount = v8.amount
-        })
-    });
-end;
+local BulkPurchaseApp = script:FindFirstAncestor("BulkPurchaseApp")
+local BulkPurchaseAppParent = BulkPurchaseApp.Parent
+local React = require(BulkPurchaseAppParent.React)
+local Foundation = require(BulkPurchaseAppParent.Foundation)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local useTokens = Foundation.Hooks.useTokens
+local PriceBoxLineLayout = require(script.Parent.PriceBoxLineLayout)
+local Price = require(script.Parent.Price)
+local PriceBoxLineVariantEnum = require(BulkPurchaseApp.Enums.PriceBoxLineVariantEnum)
+
+local function PriceBoxLine(t1: {[any]: any}) -- line: 22
+	-- upvalues: useTokens (copy), PriceBoxLineVariantEnum (copy), React (copy), PriceBoxLineLayout (copy), FoundationText (copy), View (copy), Price (copy)
+	local v13 = useTokens()
+	local t2 = {
+		LineHeight = v13.Typography.BodyLarge.LineHeight,
+		FontSize = v13.Typography.BodyLarge.FontSize,
+		Font = if t1.variant ~= PriceBoxLineVariantEnum.Danger then v13.Typography.BodyLarge.Font else v13.Typography.TitleLarge.Font
+	}
+	local Default = v13.Color.Content.Default
+
+	if t1.variant == PriceBoxLineVariantEnum.Highlight then
+		Default = v13.Color.Content.Emphasis
+	elseif t1.variant == PriceBoxLineVariantEnum.Danger then
+		Default = v13.Color.System.Alert
+	end
+
+	return React.createElement(PriceBoxLineLayout, {
+		LayoutOrder = t1.LayoutOrder,
+		startSlot = React.createElement(FoundationText, {
+			tag = "auto-xy",
+			fontStyle = t2,
+			textStyle = Default,
+			Text = t1.text
+		}),
+		endSlot = if not t1.originalPrice then React.createElement(Price, {
+			textStyle = Default,
+			fontStyle = t2,
+			amount = t1.amount
+		}) else React.createElement(View, {
+			tag = "row align-y-center gap-small auto-xy"
+		}, {
+			OriginalPrice = React.createElement(Price, {
+				strikethrough = true,
+				LayoutOrder = 1,
+				textStyle = Default,
+				fontStyle = t2,
+				amount = t1.originalPrice
+			}),
+			CurrentPrice = React.createElement(Price, {
+				LayoutOrder = 2,
+				textStyle = Default,
+				fontStyle = t2,
+				amount = t1.amount
+			})
+		})
+	})
+end
+
+return PriceBoxLine

@@ -1,4 +1,5 @@
-game:DefineFastFlag("GetFFlagCountryCodeBoldPrefixEnabled", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("GetFFlagCountryCodeBoldPrefixEnabled");
-end;
+game:DefineFastFlag("GetFFlagCountryCodeBoldPrefixEnabled", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("GetFFlagCountryCodeBoldPrefixEnabled")
+end

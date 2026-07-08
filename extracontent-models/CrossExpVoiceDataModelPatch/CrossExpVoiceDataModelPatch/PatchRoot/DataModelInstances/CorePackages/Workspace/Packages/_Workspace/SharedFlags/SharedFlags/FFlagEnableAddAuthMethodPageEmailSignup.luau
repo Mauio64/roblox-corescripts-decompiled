@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAddAuthMethodPageEmailSignup2", false);
+return game:DefineFastFlag("EnableAddAuthMethodPageEmailSignup5", false)

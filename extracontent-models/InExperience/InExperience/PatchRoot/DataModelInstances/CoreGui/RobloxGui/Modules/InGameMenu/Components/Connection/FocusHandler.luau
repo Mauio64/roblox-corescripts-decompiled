@@ -1,144 +1,141 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_t_0 = v1.t;
-local l_Roact_0 = v1.Roact;
-local l_Cryo_0 = v1.Cryo;
-local v5 = require(script.Parent.Parent.Parent.Flags.GetFFlagIGMGamepadSelectionHistory);
-local v6 = require(script.Parent.FocusHandlerUtils.FocusHandlerContext);
-local v7 = 1;
-local v8 = l_Roact_0.PureComponent:extend("FocusHandler");
-v8.validateProps = l_t_0.strictInterface({
-    isFocused = l_t_0.boolean, 
-    didFocus = l_t_0.optional(l_t_0.callback), 
-    didBlur = l_t_0.optional(l_t_0.callback), 
-    shouldForgetPreviousSelection = v5() and l_t_0.optional(l_t_0.boolean) or nil, 
-    currentHandlerId = v5() and l_t_0.optional(l_t_0.number) or nil, 
-    candidateHandlerId = v5() and l_t_0.optional(l_t_0.number) or nil, 
-    previousSelections = v5() and l_t_0.table or nil, 
-    requestFocusForHandlerId = v5() and l_t_0.callback or nil, 
-    forgetLastSelectionForHandlerId = v5() and l_t_0.callback or nil, 
-    blurCurrentFocusHandler = v5() and l_t_0.callback or nil, 
-    [l_Roact_0.Children] = l_t_0.optional(l_t_0.table)
-});
-if v5() then
-    v8.init = function(v9) --[[ Line: 50 ]] --[[ Name: init ]]
-        -- upvalues: v7 (ref)
-        v9.id = v7;
-        v7 = v7 + 1;
-    end;
-end;
-v8.render = function(v10) --[[ Line: 56 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy)
-    return l_Roact_0.createFragment(v10.props[l_Roact_0.Children]);
-end;
-if v5() then
-    v8.didMount = function(v11) --[[ Line: 61 ]] --[[ Name: didMount ]]
-        if v11.props.isFocused then
-            v11.props.requestFocusForHandlerId(v11.id);
-        end;
-    end;
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local t = InGameMenuDependencies.t
+local Roact = InGameMenuDependencies.Roact
+local Cryo = InGameMenuDependencies.Cryo
+local GetFFlagIGMGamepadSelectionHistory = require(script.Parent.Parent.Parent.Flags.GetFFlagIGMGamepadSelectionHistory)
+local FocusHandlerContext = require(script.Parent.FocusHandlerUtils.FocusHandlerContext)
+local n1 = 1
+local v9 = Roact.PureComponent:extend("FocusHandler")
+
+v9.validateProps = t.strictInterface({
+	isFocused = t.boolean,
+	didFocus = t.optional(t.callback),
+	didBlur = t.optional(t.callback),
+	shouldForgetPreviousSelection = GetFFlagIGMGamepadSelectionHistory() and t.optional(t.boolean) or nil,
+	currentHandlerId = GetFFlagIGMGamepadSelectionHistory() and t.optional(t.number) or nil,
+	candidateHandlerId = GetFFlagIGMGamepadSelectionHistory() and t.optional(t.number) or nil,
+	previousSelections = GetFFlagIGMGamepadSelectionHistory() and t.table or nil,
+	requestFocusForHandlerId = GetFFlagIGMGamepadSelectionHistory() and t.callback or nil,
+	forgetLastSelectionForHandlerId = GetFFlagIGMGamepadSelectionHistory() and t.callback or nil,
+	blurCurrentFocusHandler = GetFFlagIGMGamepadSelectionHistory() and t.callback or nil,
+	[Roact.Children] = t.optional(t.table)
+})
+
+if GetFFlagIGMGamepadSelectionHistory() then
+	function v9.init(p1) -- line: 50
+		-- upvalues: n1 (ref)
+		p1.id = n1
+		n1 += 1
+	end
+end
+
+function v9.render(p2) -- line: 56
+	-- upvalues: Roact (copy)
+	return Roact.createFragment(p2.props[Roact.Children])
+end
+
+if GetFFlagIGMGamepadSelectionHistory() then
+	function v9.didMount(p3) -- line: 61
+		if p3.props.isFocused then
+			p3.props.requestFocusForHandlerId(p3.id)
+		end
+	end
 else
-    v8.didMount = function(v12) --[[ Line: 67 ]] --[[ Name: didMount ]]
-        if v12.props.isFocused then
-            v12.props.didFocus();
-        end;
-    end;
-end;
-if v5() then
-    v8.didUpdate = function(v13, v14) --[[ Line: 75 ]] --[[ Name: didUpdate ]]
-        local v15 = v13.props.shouldForgetPreviousSelection and not v14.shouldForgetPreviousSelection;
-        local v16 = v13.props.previousSelections[v13.id];
-        if v15 or v16 ~= nil and not v16:IsDescendantOf(game) then
-            v13.props.forgetLastSelectionForHandlerId(v13.id);
-            v16 = nil;
-        end;
-        local v17 = false;
-        if v13.props.candidateHandlerId ~= v13.id then
-            v17 = v13.props.candidateHandlerId ~= nil;
-        end;
-        local v18 = false;
-        if v14.candidateHandlerId ~= v13.id then
-            v18 = v14.candidateHandlerId ~= nil;
-        end;
-        local v19 = false;
-        if v13.props.currentHandlerId == v13.id then
-            v19 = v14.currentHandlerId ~= v13.id;
-        end;
-        local v20 = false;
-        if v13.props.currentHandlerId == nil then
-            v20 = false;
-            if v14.currentHandlerId ~= nil then
-                v20 = v14.currentHandlerId ~= v13.id;
-            end;
-        end;
-        local v21 = v20 and not v17 and v13.props.isFocused;
-        local v22 = not v14.isFocused and v13.props.isFocused;
-        local v23 = v14.isFocused and not v13.props.isFocused or v17 and not v18;
-        local v24 = false;
-        if v14.currentHandlerId == v13.id then
-            v24 = v13.props.currentHandlerId ~= v13.id;
-        end;
-        if v22 or v21 then
-            v13.props.requestFocusForHandlerId(v13.id);
-        elseif v19 and v13.props.didFocus then
-            v13.props.didFocus(v16);
-        end;
-        if v23 and v13.props.currentHandlerId == v13.id then
-            v13.props.blurCurrentFocusHandler(v13.id, v13.props.shouldForgetPreviousSelection);
-        end;
-        if v24 and v13.props.didBlur then
-            v13.props.didBlur();
-        end;
-    end;
+	function v9.didMount(p4) -- line: 67
+		if p4.props.isFocused then
+			p4.props.didFocus()
+		end
+	end
+end
+
+if GetFFlagIGMGamepadSelectionHistory() then
+	function v9.didUpdate(p5, p6) -- line: 75
+		local v17 = p5.props.shouldForgetPreviousSelection and not p6.shouldForgetPreviousSelection
+		local v18 = p5.props.previousSelections[p5.id]
+
+		if v17 or v18 ~= nil and not v18:IsDescendantOf(game) then
+			p5.props.forgetLastSelectionForHandlerId(p5.id)
+			v18 = nil
+		end
+
+		local v19 = p5.props.candidateHandlerId ~= p5.id and p5.props.candidateHandlerId ~= nil
+		local v20 = p6.candidateHandlerId ~= p5.id and p6.candidateHandlerId ~= nil
+		local v21 = p5.props.currentHandlerId == p5.id and p6.currentHandlerId ~= p5.id
+		local v22 = p5.props.currentHandlerId == nil and (p6.currentHandlerId ~= nil and p6.currentHandlerId ~= p5.id) and (not v19 and p5.props.isFocused)
+		local v23 = not p6.isFocused and p5.props.isFocused
+		local v24 = p6.isFocused and not p5.props.isFocused or v19 and not v20
+		local v25 = p6.currentHandlerId == p5.id and p5.props.currentHandlerId ~= p5.id
+
+		if v23 or v22 then
+			p5.props.requestFocusForHandlerId(p5.id)
+		elseif v21 and p5.props.didFocus then
+			p5.props.didFocus(v18)
+		end
+
+		if v24 and p5.props.currentHandlerId == p5.id then
+			p5.props.blurCurrentFocusHandler(p5.id, p5.props.shouldForgetPreviousSelection)
+		end
+
+		if v25 and p5.props.didBlur then
+			p5.props.didBlur()
+		end
+	end
 else
-    v8.didUpdate = function(v25, v26) --[[ Line: 135 ]] --[[ Name: didUpdate ]]
-        if v25.props.isFocused and not v26.isFocused and v25.props.didFocus then
-            v25.props.didFocus();
-            return;
-        else
-            if not v25.props.isFocused and v26.isFocused and v25.props.didBlur then
-                v25.props.didBlur();
-            end;
-            return;
-        end;
-    end;
-end;
-if v5() then
-    v8.willUnmount = function(v27) --[[ Line: 145 ]] --[[ Name: willUnmount ]]
-        if v27.props.isFocused then
-            v27.props.blurCurrentFocusHandler(v27.id, true);
-            if v27.props.didBlur then
-                v27.props.didBlur();
-                return;
-            end;
-        else
-            v27.props.forgetLastSelectionForHandlerId(v27.id);
-        end;
-    end;
+	function v9.didUpdate(p7, p8) -- line: 135
+		if p7.props.isFocused and (not p8.isFocused and p7.props.didFocus) then
+			p7.props.didFocus()
+
+			return
+		end
+
+		if not p7.props.isFocused and p8.isFocused and p7.props.didBlur then
+			p7.props.didBlur()
+		end
+	end
+end
+
+if GetFFlagIGMGamepadSelectionHistory() then
+	function v9.willUnmount(p9) -- line: 145
+		if p9.props.isFocused then
+			p9.props.blurCurrentFocusHandler(p9.id, true)
+
+			if p9.props.didBlur then
+				p9.props.didBlur()
+
+				return
+			end
+		else
+			p9.props.forgetLastSelectionForHandlerId(p9.id)
+		end
+	end
 else
-    v8.willUnmount = function(v28) --[[ Line: 156 ]] --[[ Name: willUnmount ]]
-        if v28.props.isFocused and v28.props.didBlur then
-            v28.props.didBlur();
-        end;
-    end;
-end;
-if v5() then
-    return function(v29) --[[ Line: 164 ]] --[[ Name: FocusHandlerWithContext ]]
-        -- upvalues: l_Roact_0 (copy), v6 (copy), v8 (copy), l_Cryo_0 (copy)
-        return l_Roact_0.createElement(v6.Consumer, {
-            render = function(v30) --[[ Line: 166 ]] --[[ Name: render ]]
-                -- upvalues: l_Roact_0 (ref), v8 (ref), l_Cryo_0 (ref), v29 (copy)
-                return l_Roact_0.createElement(v8, l_Cryo_0.Dictionary.join(v29, {
-                    currentHandlerId = v30.currentHandlerId, 
-                    previousSelections = v30.previousSelections, 
-                    requestFocusForHandlerId = v30.requestFocusForHandlerId, 
-                    forgetLastSelectionForHandlerId = v30.forgetLastSelectionForHandlerId, 
-                    blurCurrentFocusHandler = v30.blurCurrentFocusHandler, 
-                    candidateHandlerId = v30.candidateHandlerId
-                }));
-            end
-        });
-    end;
-else
-    return v8;
-end;
+	function v9.willUnmount(p10) -- line: 156
+		if p10.props.isFocused and p10.props.didBlur then
+			p10.props.didBlur()
+		end
+	end
+end
+
+if GetFFlagIGMGamepadSelectionHistory() then
+	local function FocusHandlerWithContext(p11) -- line: 164
+		-- upvalues: Roact (copy), FocusHandlerContext (copy), v9 (copy), Cryo (copy)
+		return Roact.createElement(FocusHandlerContext.Consumer, {
+			render = function(p12) -- line: 166
+				-- upvalues: Roact (copy), v9 (copy), Cryo (copy), p11 (copy)
+				return Roact.createElement(v9, Cryo.Dictionary.join(p11, {
+					currentHandlerId = p12.currentHandlerId,
+					previousSelections = p12.previousSelections,
+					requestFocusForHandlerId = p12.requestFocusForHandlerId,
+					forgetLastSelectionForHandlerId = p12.forgetLastSelectionForHandlerId,
+					blurCurrentFocusHandler = p12.blurCurrentFocusHandler,
+					candidateHandlerId = p12.candidateHandlerId
+				}))
+			end
+		})
+	end
+
+	return FocusHandlerWithContext
+end
+
+return v9

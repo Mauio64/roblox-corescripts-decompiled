@@ -1,5 +1,5 @@
-return function(v0) --[[ Line: 1 ]]
-    return {
-        info = v0.fn()
-    };
-end;
+return function(p1) -- line: 1
+	return {
+		info = p1.fn()
+	}
+end

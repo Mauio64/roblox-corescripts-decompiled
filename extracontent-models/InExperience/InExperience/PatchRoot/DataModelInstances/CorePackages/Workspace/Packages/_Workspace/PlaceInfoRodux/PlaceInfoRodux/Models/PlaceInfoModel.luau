@@ -1,10 +1,12 @@
 return {
-    new = function() --[[ Line: 3 ]] --[[ Name: new ]]
-        return {};
-    end, 
-    fromWeb = function(v0) --[[ Line: 9 ]] --[[ Name: fromWeb ]]
-        local v1 = v0 or {};
-        v1.placeId = tostring(v1.placeId);
-        return v1;
-    end
-};
+	new = function() -- line: 3
+		return {}
+	end,
+	fromWeb = function(p1) -- line: 9
+		local v2 = p1 or {}
+
+		v2.placeId = tostring(v2.placeId)
+
+		return v2
+	end
+}

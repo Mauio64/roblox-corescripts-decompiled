@@ -1,6 +1,7 @@
-local v0 = require(script.SquadOverlay);
-local v1 = require(script.SquadPrompt);
+local SquadOverlay = require(script.SquadOverlay)
+local SquadPrompt = require(script.SquadPrompt)
+
 return {
-    SquadOverlay = v0, 
-    SquadPrompt = v1
-};
+	SquadOverlay = SquadOverlay,
+	SquadPrompt = SquadPrompt
+}

@@ -1,107 +1,109 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuaSocialLibrariesDeps);
-local v3 = require(l_Parent_1.Lumberyak);
-local l_httpRequest_0 = v2.httpRequest;
-local v5 = require(l_Parent_1.ShareLinksNetworking);
-local v6 = require(l_Parent_1.ShareLinksRodux);
-local v7 = require(l_Parent_1.VirtualizedList);
-local v8 = require(l_Parent_1.UrlBuilder);
-local v9 = require(l_Parent_1.SocialLuaAnalytics);
-local v10 = v3.Logger.new(nil, "ContactImporter"):new("ContactImporter Networking");
-local v11 = game:DefineFastInt("ContactImporterHttpRetryCount", 3);
-local v17 = l_httpRequest_0.config({
-    requestFunction = function(v12, v13, v14) --[[ Line: 18 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v10 (copy), l_httpRequest_0 (copy)
-        v10:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v13, v12));
-        return l_httpRequest_0.requestFunctions.HttpRbxApi(v12, v13, v14);
-    end, 
-    postRequestFunction = function(v15, v16) --[[ Line: 22 ]] --[[ Name: postRequestFunction ]]
-        -- upvalues: v10 (copy)
-        v10:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", v16.requestMethod, v16.url, v15.StatusCode, v15.Body));
-    end, 
-    maxRetryCount = v11
-});
-local l_RODUX_KEY_0 = require(l_Parent_0.Common.Constants).RODUX_KEY;
-local v19 = v2.RoduxNetworking.config({
-    keyPath = l_RODUX_KEY_0 .. ".NetworkStatus", 
-    networkImpl = v17
-});
-local v20 = require(l_Parent_1.ContactsRodux).config({
-    keyPath = l_RODUX_KEY_0 .. ".Contacts"
-});
-local v21 = require(l_Parent_1.RoactAppExperiment);
-local v22 = require(l_Parent_1.UIBlox);
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local LuaSocialLibrariesDeps = require(scriptParentParent.LuaSocialLibrariesDeps)
+local Lumberyak = require(scriptParentParent.Lumberyak)
+local httpRequest = LuaSocialLibrariesDeps.httpRequest
+local ShareLinksNetworking = require(scriptParentParent.ShareLinksNetworking)
+local ShareLinksRodux = require(scriptParentParent.ShareLinksRodux)
+local VirtualizedList = require(scriptParentParent.VirtualizedList)
+local UrlBuilder = require(scriptParentParent.UrlBuilder)
+local SocialLuaAnalytics = require(scriptParentParent.SocialLuaAnalytics)
+local v11 = Lumberyak.Logger.new(nil, "ContactImporter"):new("ContactImporter Networking")
+local v12 = game:DefineFastInt("ContactImporterHttpRetryCount", 3)
+local v13 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 18
+		-- upvalues: v11 (copy), httpRequest (copy)
+		v11:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	postRequestFunction = function(p4, p5) -- line: 22
+		-- upvalues: v11 (copy)
+		v11:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s, body = %s ]", p5.requestMethod, p5.url, p4.StatusCode, p4.Body))
+	end,
+	maxRetryCount = v12
+})
+local RODUX_KEY = require(scriptParent.Common.Constants).RODUX_KEY
+local v15 = LuaSocialLibrariesDeps.RoduxNetworking.config({
+	keyPath = RODUX_KEY .. ".NetworkStatus",
+	networkImpl = v13
+})
+local v16 = require(scriptParentParent.ContactsRodux).config({
+	keyPath = RODUX_KEY .. ".Contacts"
+})
+local RoactAppExperiment = require(scriptParentParent.RoactAppExperiment)
+local UIBlox = require(scriptParentParent.UIBlox)
+
 return {
-    SocialLuaAnalytics = v9, 
-    Dash = require(l_Parent_1.Dash), 
-    UIBlox = v22, 
-    Roact = require(l_Parent_1.Roact), 
-    RoactNavigation = require(l_Parent_1.RoactNavigation), 
-    Rodux = require(l_Parent_1.Rodux), 
-    ReactRoblox = require(l_Parent_1.ReactRoblox), 
-    RoactRodux = require(l_Parent_1.RoactRodux), 
-    LocalizationProvider = require(l_Parent_1.Localization).LocalizationProvider, 
-    withLocalization = require(l_Parent_1.Localization).withLocalization, 
-    Url = require(l_Parent_1.Http).Url, 
-    t = require(l_Parent_1.t), 
-    Promise = require(l_Parent_1.Promise), 
-    llama = v2.llama, 
-    memoize = require(l_Parent_1.AppCommonLib).memoize, 
-    RoduxNetworking = v19, 
-    enumerate = require(l_Parent_1.enumerate), 
-    IXPService = game:GetService("IXPService"), 
-    ShareLinksNetworking = v5.config({
-        roduxNetworking = v19
-    }), 
-    SocialLibraries = v2.SocialLibraries.config({}), 
-    SocialModalsCommon = require(l_Parent_1.SocialModalsCommon), 
-    NetworkingContacts = require(l_Parent_1.ContactsNetworking).config({
-        roduxNetworking = v19
-    }), 
-    NetworkingFriends = require(l_Parent_1.FriendsNetworking).config({
-        roduxNetworking = v19
-    }), 
-    NetworkingUserSettings = v2.NetworkingUserSettings.config({
-        roduxNetworking = v19
-    }), 
-    NetworkingAccountInformation = v2.NetworkingAccountInformation.config({
-        roduxNetworking = v19
-    }), 
-    NetworkingAccountSettings = v2.NetworkingAccountSettings.config({
-        roduxNetworking = v19
-    }), 
-    UrlBuilder = v8.UrlBuilder, 
-    ContactsProtocol = require(l_Parent_1.ContactsProtocol).ContactsProtocol, 
-    SMSProtocol = require(l_Parent_1.SMSProtocol).SMSProtocol, 
-    PermissionsProtocol = require(l_Parent_1.PermissionsProtocol).PermissionsProtocol, 
-    RoduxContacts = v20, 
-    RoduxUserPermissions = v2.RoduxUserPermissions.config({
-        keyPath = l_RODUX_KEY_0 .. ".UserPermissions"
-    }), 
-    ShareLinksRodux = v6.config({
-        keyPath = l_RODUX_KEY_0 .. ".ShareLinks"
-    }), 
-    AppStorageService = game:GetService("AppStorageService"), 
-    UserInputService = game:GetService("UserInputService"), 
-    ThrottleUserId = require(l_Parent_1.AppCommonLib).ThrottleUserId, 
-    getFStringSocialFriendsLayer = require(l_Parent_1.SharedFlags).getFStringSocialFriendsLayer, 
-    Players = game:GetService("Players"), 
-    React = require(l_Parent_1.React), 
-    FlatList = v7.FlatList, 
-    SectionList = v7.SectionList, 
-    useSelector = require(l_Parent_1.RoactUtils).Hooks.RoactRodux.useSelector, 
-    useDispatch = require(l_Parent_1.RoactUtils).Hooks.RoactRodux.useDispatch, 
-    usePrevious = require(l_Parent_1.RoactUtils).Hooks.usePrevious, 
-    useNavigation = require(l_Parent_1.Navigation).useNavigation, 
-    useLocalization = require(l_Parent_1.Localization).Hooks.useLocalization, 
-    useStyle = v22.Core.Style.useStyle, 
-    useUserExperiment = v21.useUserExperiment, 
-    useEffectOnce = require(l_Parent_1.RoactUtils).Hooks.useEffectOnce, 
-    DiscoverabilityOverlay = require(l_Parent_1.DiscoverabilityModal).DiscoverabilityOverlay, 
-    DiscoverabilityAnalytics = require(l_Parent_1.DiscoverabilityModal).Analytics, 
-    RoactExperimentProvider = v21.Provider, 
-    UniversalAppPolicy = require(l_Parent_1.UniversalAppPolicy).UniversalAppPolicy, 
-    AmpUpsell = require(l_Parent_1.AmpUpsell), 
-    Foundation = require(l_Parent_1.Foundation)
-};
+	SocialLuaAnalytics = SocialLuaAnalytics,
+	Dash = require(scriptParentParent.Dash),
+	UIBlox = UIBlox,
+	Roact = require(scriptParentParent.Roact),
+	RoactNavigation = require(scriptParentParent.RoactNavigation),
+	Rodux = require(scriptParentParent.Rodux),
+	ReactRoblox = require(scriptParentParent.ReactRoblox),
+	RoactRodux = require(scriptParentParent.RoactRodux),
+	LocalizationProvider = require(scriptParentParent.Localization).LocalizationProvider,
+	withLocalization = require(scriptParentParent.Localization).withLocalization,
+	Url = require(scriptParentParent.Http).Url,
+	t = require(scriptParentParent.t),
+	Promise = require(scriptParentParent.Promise),
+	llama = LuaSocialLibrariesDeps.llama,
+	memoize = require(scriptParentParent.AppCommonLib).memoize,
+	RoduxNetworking = v15,
+	enumerate = require(scriptParentParent.enumerate),
+	IXPService = game:GetService("IXPService"),
+	ShareLinksNetworking = ShareLinksNetworking.config({
+		roduxNetworking = v15
+	}),
+	SocialLibraries = LuaSocialLibrariesDeps.SocialLibraries.config({}),
+	SocialModalsCommon = require(scriptParentParent.SocialModalsCommon),
+	NetworkingContacts = require(scriptParentParent.ContactsNetworking).config({
+		roduxNetworking = v15
+	}),
+	NetworkingFriends = require(scriptParentParent.FriendsNetworking).config({
+		roduxNetworking = v15
+	}),
+	NetworkingUserSettings = LuaSocialLibrariesDeps.NetworkingUserSettings.config({
+		roduxNetworking = v15
+	}),
+	NetworkingAccountInformation = LuaSocialLibrariesDeps.NetworkingAccountInformation.config({
+		roduxNetworking = v15
+	}),
+	NetworkingAccountSettings = LuaSocialLibrariesDeps.NetworkingAccountSettings.config({
+		roduxNetworking = v15
+	}),
+	UrlBuilder = UrlBuilder.UrlBuilder,
+	ContactsProtocol = require(scriptParentParent.ContactsProtocol).ContactsProtocol,
+	SMSProtocol = require(scriptParentParent.SMSProtocol).SMSProtocol,
+	PermissionsProtocol = require(scriptParentParent.PermissionsProtocol).PermissionsProtocol,
+	RoduxContacts = v16,
+	RoduxUserPermissions = LuaSocialLibrariesDeps.RoduxUserPermissions.config({
+		keyPath = RODUX_KEY .. ".UserPermissions"
+	}),
+	ShareLinksRodux = ShareLinksRodux.config({
+		keyPath = RODUX_KEY .. ".ShareLinks"
+	}),
+	AppStorageService = game:GetService("AppStorageService"),
+	UserInputService = game:GetService("UserInputService"),
+	ThrottleUserId = require(scriptParentParent.AppCommonLib).ThrottleUserId,
+	getFStringSocialFriendsLayer = require(scriptParentParent.SharedFlags).getFStringSocialFriendsLayer,
+	Players = game:GetService("Players"),
+	React = require(scriptParentParent.React),
+	FlatList = VirtualizedList.FlatList,
+	SectionList = VirtualizedList.SectionList,
+	useSelector = require(scriptParentParent.RoactUtils).Hooks.RoactRodux.useSelector,
+	useDispatch = require(scriptParentParent.RoactUtils).Hooks.RoactRodux.useDispatch,
+	usePrevious = require(scriptParentParent.RoactUtils).Hooks.usePrevious,
+	useNavigation = require(scriptParentParent.Navigation).useNavigation,
+	useLocalization = require(scriptParentParent.Localization).Hooks.useLocalization,
+	useStyle = UIBlox.Core.Style.useStyle,
+	useUserExperiment = RoactAppExperiment.useUserExperiment,
+	useEffectOnce = require(scriptParentParent.RoactUtils).Hooks.useEffectOnce,
+	DiscoverabilityOverlay = require(scriptParentParent.DiscoverabilityModal).DiscoverabilityOverlay,
+	DiscoverabilityAnalytics = require(scriptParentParent.DiscoverabilityModal).Analytics,
+	RoactExperimentProvider = RoactAppExperiment.Provider,
+	UniversalAppPolicy = require(scriptParentParent.UniversalAppPolicy).UniversalAppPolicy,
+	AmpUpsell = require(scriptParentParent.AmpUpsell),
+	Foundation = require(scriptParentParent.Foundation)
+}

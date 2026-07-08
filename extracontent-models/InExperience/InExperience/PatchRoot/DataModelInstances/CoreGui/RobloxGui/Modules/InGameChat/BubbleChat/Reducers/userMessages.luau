@@ -1,48 +1,49 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local v3 = require(l_CorePackages_0.Packages.Rodux);
-local v4 = require(script.Parent.Parent.Actions.AddMessage);
-local v5 = require(script.Parent.Parent.Actions.RemoveMessage);
-local v6 = require(l_RobloxGui_0.Modules.VoiceChat.Actions.PlayerRemoved);
-return (v3.createReducer({}, {
-    [v4.name] = function(v7, v8) --[[ Line: 18 ]]
-        -- upvalues: v2 (copy)
-        local v9 = v7[v8.message.userId] or {};
-        return v2.Dictionary.join(v7, {
-            [v8.message.userId] = v2.List.join(v9, {
-                v8.message.id
-            })
-        });
-    end, 
-    [v5.name] = function(v10, v11) --[[ Line: 26 ]]
-        -- upvalues: v2 (copy)
-        local v12 = v10[v11.message.userId];
-        if v12 then
-            if #v12 == 1 and v12[1] == v11.message.id then
-                return v2.Dictionary.join(v10, {
-                    [v11.message.userId] = v2.None
-                });
-            else
-                return v2.Dictionary.join(v10, {
-                    [v11.message.userId] = v2.List.filter(v12, function(v13) --[[ Line: 36 ]]
-                        -- upvalues: v11 (copy)
-                        return v13 ~= v11.message.id;
-                    end)
-                });
-            end;
-        else
-            return v10;
-        end;
-    end, 
-    [v6.name] = function(v14, v15) --[[ Line: 46 ]]
-        -- upvalues: v2 (copy)
-        if v14[v15.userId] then
-            return v2.Dictionary.join(v14, {
-                [v15.userId] = v2.None
-            });
-        else
-            return v14;
-        end;
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local AddMessage = require(script.Parent.Parent.Actions.AddMessage)
+local RemoveMessage = require(script.Parent.Parent.Actions.RemoveMessage)
+local PlayerRemoved = require(RobloxGui.Modules.VoiceChat.Actions.PlayerRemoved)
+
+return (Rodux.createReducer({}, {
+	[AddMessage.name] = function(p1, p2) -- line: 18
+		-- upvalues: Cryo (copy)
+		local v10 = p1[p2.message.userId] or {}
+
+		return Cryo.Dictionary.join(p1, {
+			[p2.message.userId] = Cryo.List.join(v10, { p2.message.id })
+		})
+	end,
+	[RemoveMessage.name] = function(p3, p4) -- line: 26
+		-- upvalues: Cryo (copy)
+		local v13 = p3[p4.message.userId]
+
+		if v13 then
+			if #v13 == 1 and v13[1] == p4.message.id then
+				return Cryo.Dictionary.join(p3, {
+					[p4.message.userId] = Cryo.None
+				})
+			end
+
+			return Cryo.Dictionary.join(p3, {
+				[p4.message.userId] = Cryo.List.filter(v13, function(p5) -- line: 36
+					-- upvalues: p4 (copy)
+					return p5 ~= p4.message.id
+				end)
+			})
+		end
+
+		return p3
+	end,
+	[PlayerRemoved.name] = function(p6, p7) -- line: 46
+		-- upvalues: Cryo (copy)
+		if p6[p7.userId] then
+			return Cryo.Dictionary.join(p6, {
+				[p7.userId] = Cryo.None
+			})
+		end
+
+		return p6
+	end
+}))

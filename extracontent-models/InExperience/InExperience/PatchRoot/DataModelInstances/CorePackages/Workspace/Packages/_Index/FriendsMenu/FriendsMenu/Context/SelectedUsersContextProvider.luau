@@ -1,85 +1,83 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_0.SelectedUsersContext);
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.Cryo);
-local l_dependencyArray_0 = require(l_Parent_1.RoactUtils).Hooks.dependencyArray;
-local v6 = require(l_Parent_1.UserProfiles);
-local l_FFlagRemoveDependencyArrayAntipattern_0 = require(l_Parent_1.SharedFlags).FFlagRemoveDependencyArrayAntipattern;
-return function(v8) --[[ Line: 22 ]]
-    -- upvalues: v6 (copy), v3 (copy), v4 (copy), l_FFlagRemoveDependencyArrayAntipattern_0 (copy), l_dependencyArray_0 (copy), v2 (copy)
-    local v9 = v6.Hooks.useUserProfilesFetch({
-        userIds = v8.preselectedUsers or {}, 
-        query = v6.Queries.userProfilesCombinedNameByUserIds
-    });
-    local v15 = v3.useCallback(function(v10) --[[ Line: 28 ]]
-        -- upvalues: v9 (copy), v6 (ref), v8 (copy)
-        local v11 = {};
-        local v12 = "";
-        for _, v14 in pairs(v10) do
-            if v9.data then
-                v12 = v6.Selectors.getCombinedNameFromId(v9.data, v14);
-            end;
-            v11[v14] = {
-                displayName = v12, 
-                layoutOrder = #v11 + 1, 
-                unremovable = v8.preselectedUsersUnremovable
-            };
-        end;
-        return v11;
-    end, nil);
-    local v16 = v3.useRef(if v8.preselectedUsers then #v8.preselectedUsers else 0);
-    local v17, v18 = v3.useState(if v8.preselectedUsers then v15(v8.preselectedUsers) else {});
-    local v19, v20 = v3.useState(if v8.preselectedUsers then #v8.preselectedUsers else 0);
-    local v23 = v3.useCallback(function(v21, v22) --[[ Line: 52 ]]
-        -- upvalues: v8 (copy), v19 (copy), v18 (copy), v4 (ref), v17 (copy), v16 (copy), v20 (copy)
-        if v8.selectionLimit == nil or v19 < v8.selectionLimit then
-            v18(v4.Dictionary.join(v17, {
-                [v21] = {
-                    displayName = v22, 
-                    layoutOrder = v16.current
-                }
-            }));
-            v16.current = v16.current + 1;
-            v20(v19 + 1);
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v17
-    } else l_dependencyArray_0(v17));
-    local v26 = v3.useCallback(function(v24, v25) --[[ Line: 66 ]]
-        -- upvalues: v18 (copy), v4 (ref), v17 (copy), v20 (copy), v19 (copy), v8 (copy)
-        v18(v4.Dictionary.join(v17, {
-            [v24] = v4.None
-        }));
-        v20(v19 - 1);
-        if v8.onRemoveCallback then
-            v8.onRemoveCallback(v24, v25);
-        end;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v17
-    } else l_dependencyArray_0(v17));
-    local v28 = v3.useCallback(function(v27) --[[ Line: 74 ]]
-        -- upvalues: v17 (copy)
-        return v17[v27] ~= nil;
-    end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-        v17
-    } else l_dependencyArray_0(v17));
-    return v3.createElement(v2.Provider, {
-        value = v3.useMemo(function() --[[ Line: 80 ]]
-            -- upvalues: v19 (copy), v17 (copy), v23 (copy), v26 (copy), v28 (copy), v8 (copy)
-            return {
-                selectedFriendsSize = v19, 
-                selectedFriends = v17, 
-                addFriend = v23, 
-                removeFriend = v26, 
-                isFriendSelected = v28, 
-                preselectedUsers = v8.preselectedUsers
-            };
-        end, if l_FFlagRemoveDependencyArrayAntipattern_0 then {
-            v17, 
-            v23, 
-            v26, 
-            v28
-        } else l_dependencyArray_0(v17, v23, v26, v28))
-    }, v8.children);
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local SelectedUsersContext = require(scriptParent.SelectedUsersContext)
+local React = require(ParentParent.React)
+local Cryo = require(ParentParent.Cryo)
+local UserProfiles = require(ParentParent.UserProfiles)
+
+return function(t1: {[any]: any}) -- line: 19
+	-- upvalues: UserProfiles (copy), React (copy), Cryo (copy), SelectedUsersContext (copy)
+	local v8 = UserProfiles.Hooks.useUserProfilesFetch({
+		userIds = t1.preselectedUsers or {},
+		query = UserProfiles.Queries.userProfilesCombinedNameByUserIds
+	})
+	local v9 = React.useCallback(function(p1) -- line: 25
+		-- upvalues: v8 (copy), UserProfiles (copy), t1 (copy)
+		local t2 = {}
+		local s1 = ""
+
+		for _, v in pairs(p1) do
+			if v8.data then
+				s1 = UserProfiles.Selectors.getCombinedNameFromId(v8.data, v)
+			end
+
+			t2[v] = {
+				displayName = s1,
+				layoutOrder = #t2 + 1,
+				unremovable = t1.preselectedUsersUnremovable
+			}
+		end
+
+		return t2
+	end, nil)
+	local v10 = React.useRef(not t1.preselectedUsers and 0 or #t1.preselectedUsers)
+	local v11, v12 = React.useState(if not t1.preselectedUsers then {} else v9(t1.preselectedUsers))
+	local v13, v14 = React.useState(not t1.preselectedUsers and 0 or #t1.preselectedUsers)
+	local v15 = React.useCallback(function(p2, p3) -- line: 49
+		-- upvalues: t1 (copy), v13 (copy), v12 (copy), Cryo (copy), v11 (copy), v10 (copy), v14 (copy)
+		if t1.selectionLimit == nil or v13 < t1.selectionLimit then
+			v12(Cryo.Dictionary.join(v11, {
+				[p2] = {
+					displayName = p3,
+					layoutOrder = v10.current
+				}
+			}))
+			v10.current = v10.current + 1
+			v14(v13 + 1)
+		end
+	end, { v11 })
+	local v16 = React.useCallback(function(p4, p5) -- line: 63
+		-- upvalues: v12 (copy), Cryo (copy), v11 (copy), v14 (copy), v13 (copy), t1 (copy)
+		v12(Cryo.Dictionary.join(v11, {
+			[p4] = Cryo.None
+		}))
+		v14(v13 - 1)
+
+		if t1.onRemoveCallback then
+			t1.onRemoveCallback(p4, p5)
+		end
+	end, { v11 })
+	local v17 = React.useCallback(function(p6) -- line: 71
+		-- upvalues: v11 (copy)
+		return v11[p6] ~= nil
+	end, { v11 })
+
+	return React.createElement(SelectedUsersContext.Provider, {
+		value = React.useMemo(function() -- line: 76
+			-- upvalues: v13 (copy), v11 (copy), v15 (copy), v16 (copy), v17 (copy), t1 (copy)
+			return {
+				selectedFriendsSize = v13,
+				selectedFriends = v11,
+				addFriend = v15,
+				removeFriend = v16,
+				isFriendSelected = v17,
+				preselectedUsers = t1.preselectedUsers
+			}
+		end, {
+			v11,
+			v15,
+			v16,
+			v17
+		})
+	}, t1.children)
+end

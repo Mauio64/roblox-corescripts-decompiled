@@ -1,11 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Flags.GetFFlagEnablePerformPurchaseGCSHandling);
-isGenericChallengeResponse = function(v2) --[[ Line: 5 ]] --[[ Name: isGenericChallengeResponse ]]
-    -- upvalues: v1 (copy)
-    if type(v2) ~= "string" then
-        return false;
-    else
-        return v1() and v2:match("rblx%-challenge%-response") ~= nil and v2:match("rblx%-challenge%-id") ~= nil and v2:match("rblx%-challenge%-metadata") ~= nil and v2:match("rblx%-challenge%-type") ~= nil;
-    end;
-end;
-return isGenericChallengeResponse;
+local ParentParent = script.Parent.Parent
+local GetFFlagEnablePerformPurchaseGCSHandling = require(ParentParent.Flags.GetFFlagEnablePerformPurchaseGCSHandling)
+
+function isGenericChallengeResponse(p1) -- line: 5
+	-- upvalues: GetFFlagEnablePerformPurchaseGCSHandling (copy)
+	if type(p1) ~= "string" then
+		return false
+	end
+
+	return GetFFlagEnablePerformPurchaseGCSHandling() and (p1:match("rblx%-challenge%-response") ~= nil and (p1:match("rblx%-challenge%-id") ~= nil and (p1:match("rblx%-challenge%-metadata") ~= nil and p1:match("rblx%-challenge%-type") ~= nil)))
+end
+
+return isGenericChallengeResponse

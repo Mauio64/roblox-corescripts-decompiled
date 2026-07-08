@@ -1,42 +1,44 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.AppCommonLib);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_Button_0 = v3.App.Button.Button;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local l_Text_0 = v1.Text;
-local l_useStyle_0 = v3.Core.Style.useStyle;
-return function(v8) --[[ Line: 25 ]]
-    -- upvalues: l_useStyle_0 (copy), v2 (copy), l_Text_0 (copy), l_Button_0 (copy), l_ButtonType_0 (copy)
-    local v9 = l_useStyle_0();
-    local l_Font_0 = v9.Font.Header2.Font;
-    local v11 = v9.Font.BaseSize * v9.Font.Header2.RelativeSize;
-    local v12 = v2.useMemo(function() --[[ Line: 31 ]]
-        -- upvalues: v8 (copy), l_Text_0 (ref), l_Font_0 (copy), v11 (copy)
-        if v8.buttonWidth then
-            return v8.buttonWidth;
-        else
-            return l_Text_0.GetTextWidth(v8.text, l_Font_0, v11) + 24;
-        end;
-    end, {
-        v8.text, 
-        l_Font_0, 
-        v11, 
-        v8.buttonWidth
-    });
-    local v13 = if v8.buttonHeight then UDim2.fromOffset(v12, v8.buttonHeight) else UDim2.new(0, v12, 1, 0);
-    return v2.createElement("Frame", {
-        AnchorPoint = v8.AnchorPoint, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v8.LayoutOrder, 
-        Position = v8.Position, 
-        Size = v13
-    }, {
-        ShowMoreButton = v2.createElement(l_Button_0, {
-            buttonType = l_ButtonType_0.Secondary, 
-            onActivated = v8.onActivated, 
-            size = UDim2.fromScale(1, 1), 
-            text = v8.text
-        })
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local AppCommonLib = require(ParentParent.AppCommonLib)
+local React = require(ParentParent.React)
+local UIBlox = require(ParentParent.UIBlox)
+local Button = UIBlox.App.Button.Button
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local AppCommonLibText = AppCommonLib.Text
+local useStyle = UIBlox.Core.Style.useStyle
+
+return function(t1: {[any]: any}) -- line: 25
+	-- upvalues: useStyle (copy), React (copy), AppCommonLibText (copy), Button (copy), ButtonType (copy)
+	local v10 = useStyle()
+	local Header2Font = v10.Font.Header2.Font
+	local v12 = v10.Font.BaseSize * v10.Font.Header2.RelativeSize
+	local v13 = React.useMemo(function() -- line: 31
+		-- upvalues: t1 (copy), AppCommonLibText (copy), Header2Font (copy), v12 (copy)
+		if t1.buttonWidth then
+			return t1.buttonWidth
+		end
+
+		return AppCommonLibText.GetTextWidth(t1.text, Header2Font, v12) + 24
+	end, {
+		t1.text,
+		Header2Font,
+		v12,
+		t1.buttonWidth
+	})
+	local v14 = if not t1.buttonHeight then UDim2.new(0, v13, 1, 0) else UDim2.fromOffset(v13, t1.buttonHeight)
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		AnchorPoint = t1.AnchorPoint,
+		LayoutOrder = t1.LayoutOrder,
+		Position = t1.Position,
+		Size = v14
+	}, {
+		ShowMoreButton = React.createElement(Button, {
+			buttonType = ButtonType.Secondary,
+			onActivated = t1.onActivated,
+			size = UDim2.fromScale(1, 1),
+			text = t1.text
+		})
+	})
+end

@@ -1,4 +1,4 @@
 return {
-    Justified = "Justified", 
-    Centered = "Centered"
-};
+	Justified = "Justified",
+	Centered = "Centered"
+}

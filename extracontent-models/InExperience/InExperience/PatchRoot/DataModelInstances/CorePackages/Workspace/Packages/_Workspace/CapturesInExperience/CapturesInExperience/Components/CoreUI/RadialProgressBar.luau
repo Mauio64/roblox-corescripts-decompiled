@@ -1,64 +1,68 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local l_Image_0 = v2.Image;
-local l_View_0 = v2.View;
-local l_useTokens_0 = v2.Hooks.useTokens;
-return v1.memo(v1.forwardRef(function(v6) --[[ Line: 18 ]] --[[ Name: RadialProgressBar ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_View_0 (copy), l_Image_0 (copy)
-    local v7 = l_useTokens_0();
-    local l_Background_0 = v7.Color.ActionSubtle.Background;
-    local l_Foreground_0 = v7.Color.ActionSubtle.Foreground;
-    local v10 = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, l_Foreground_0.Transparency), 
-        NumberSequenceKeypoint.new(0.4999, l_Foreground_0.Transparency), 
-        NumberSequenceKeypoint.new(0.5, l_Background_0.Transparency), 
-        NumberSequenceKeypoint.new(1, l_Background_0.Transparency)
-    });
-    local v11 = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, l_Foreground_0.Color3), 
-        ColorSequenceKeypoint.new(0.4999, l_Foreground_0.Color3), 
-        ColorSequenceKeypoint.new(0.5, l_Background_0.Color3), 
-        ColorSequenceKeypoint.new(1, l_Background_0.Color3)
-    });
-    return v1.createElement(l_View_0, {
-        BackgroundTransparency = 1, 
-        tag = "anchor-center-center bg-action-subtle position-center-center size-full"
-    }, {
-        LeftGradient = v1.createElement(l_View_0, {
-            Size = UDim2.fromScale(0.5, 1), 
-            tag = "bg-action-subtle clip"
-        }, {
-            Image = v1.createElement(l_Image_0, {
-                Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                Size = UDim2.fromScale(2, 1)
-            }, {
-                Gradient = v1.createElement("UIGradient", {
-                    Transparency = v10, 
-                    Color = v11, 
-                    Rotation = v6.progress:map(function(v12) --[[ Line: 52 ]]
-                        return (math.clamp(v12 * 360, 180, 360));
-                    end)
-                })
-            })
-        }), 
-        RightGradient = v1.createElement(l_View_0, {
-            Size = UDim2.fromScale(0.5, 1), 
-            tag = "bg-action-subtle clip position-top-center"
-        }, {
-            Image = v1.createElement(l_Image_0, {
-                Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                Size = UDim2.fromScale(2, 1), 
-                Position = UDim2.fromScale(-1, 0)
-            }, {
-                Gradient = v1.createElement("UIGradient", {
-                    Transparency = v10, 
-                    Color = v11, 
-                    Rotation = v6.progress:map(function(v13) --[[ Line: 71 ]]
-                        return (math.clamp(v13 * 360, 0, 180));
-                    end)
-                })
-            })
-        })
-    });
-end));
+local ParentParent = script.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+local Foundation = require(ParentParent.Foundation)
+local FoundationImage = Foundation.Image
+local View = Foundation.View
+local useTokens = Foundation.Hooks.useTokens
+
+local function RadialProgressBar(t1: {[any]: any}) -- line: 18
+	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationImage (copy)
+	local v9 = useTokens()
+	local Background = v9.Color.ActionSubtle.Background
+	local Foreground = v9.Color.ActionSubtle.Foreground
+	local numberSequence = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, Foreground.Transparency),
+		NumberSequenceKeypoint.new(0.4999, Foreground.Transparency),
+		NumberSequenceKeypoint.new(0.5, Background.Transparency),
+		NumberSequenceKeypoint.new(1, Background.Transparency)
+	})
+	local colorSequence = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Foreground.Color3),
+		ColorSequenceKeypoint.new(0.4999, Foreground.Color3),
+		ColorSequenceKeypoint.new(0.5, Background.Color3),
+		ColorSequenceKeypoint.new(1, Background.Color3)
+	})
+
+	return React.createElement(View, {
+		BackgroundTransparency = 1,
+		tag = "anchor-center-center bg-action-subtle position-center-center size-full"
+	}, {
+		LeftGradient = React.createElement(View, {
+			tag = "bg-action-subtle clip",
+			Size = UDim2.fromScale(0.5, 1)
+		}, {
+			Image = React.createElement(FoundationImage, {
+				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+				Size = UDim2.fromScale(2, 1)
+			}, {
+				Gradient = React.createElement("UIGradient", {
+					Transparency = numberSequence,
+					Color = colorSequence,
+					Rotation = t1.progress:map(function(n1: number) -- line: 52
+						return (math.clamp(n1 * 360, 180, 360))
+					end)
+				})
+			})
+		}),
+		RightGradient = React.createElement(View, {
+			tag = "bg-action-subtle clip position-top-center",
+			Size = UDim2.fromScale(0.5, 1)
+		}, {
+			Image = React.createElement(FoundationImage, {
+				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+				Size = UDim2.fromScale(2, 1),
+				Position = UDim2.fromScale(-1, 0)
+			}, {
+				Gradient = React.createElement("UIGradient", {
+					Transparency = numberSequence,
+					Color = colorSequence,
+					Rotation = t1.progress:map(function(n2: number) -- line: 71
+						return (math.clamp(n2 * 360, 0, 180))
+					end)
+				})
+			})
+		})
+	})
+end
+
+return React.memo(React.forwardRef(RadialProgressBar))

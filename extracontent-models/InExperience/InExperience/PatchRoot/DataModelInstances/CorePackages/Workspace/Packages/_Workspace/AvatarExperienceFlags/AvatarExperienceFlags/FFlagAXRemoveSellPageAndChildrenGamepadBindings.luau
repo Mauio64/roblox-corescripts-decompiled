@@ -1,2 +1,1 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceFlags").Parent;
-return require(l_Parent_0.SharedFlags).FFlagAXMigrateAXFocusBehaviorRoot and game:DefineFastFlag("AXRemoveSellPageAndChildrenGamepadBindings", false);
+return game:DefineFastFlag("AXRemoveSellPageAndChildrenGamepadBindings", false)

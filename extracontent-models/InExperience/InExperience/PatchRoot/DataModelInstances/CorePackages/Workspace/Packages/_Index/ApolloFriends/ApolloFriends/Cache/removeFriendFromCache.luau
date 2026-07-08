@@ -1,11 +1,14 @@
-return function(v0, v1) --[[ Line: 6 ]] --[[ Name: removeFriendFromCache ]]
-    local v2 = v0.cache:identify({
-        __typename = "Friend", 
-        id = v1.userId, 
-        targetUserId = v1.targetUserId
-    });
-    v0.cache:evict({
-        id = v2
-    });
-    v0.cache:gc();
-end;
+local function removeFriendFromCache(p1, t1: {[any]: any}) -- line: 6
+	local v4 = p1.cache:identify({
+		__typename = "Friend",
+		id = t1.userId,
+		targetUserId = t1.targetUserId
+	})
+
+	p1.cache:evict({
+		id = v4
+	})
+	p1.cache:gc()
+end
+
+return removeFriendFromCache

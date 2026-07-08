@@ -1,63 +1,77 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_Players_0 = game:GetService("Players");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v5 = require(l_RobloxGui_0.Modules.Flags.FFlagRemoveHardCodedFriendLimitPrompt);
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-while not l_LocalPlayer_0 do
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v7 = {};
-v7.__index = v7;
-local v8 = game:GetService("ContentProvider").BaseUrl:lower();
-v8 = string.gsub(v8, "http:", "https:");
-local v9 = string.gsub(v8, "www", "friends") .. "v1/users/{userId}/friends/count";
-v7.GetFriendCountAsync = function(_, v11) --[[ Line: 25 ]] --[[ Name: GetFriendCountAsync ]]
-    -- upvalues: v9 (copy), l_HttpRbxApiService_0 (copy), l_HttpService_0 (copy)
-    local v12 = nil;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 28 ]]
-        -- upvalues: v9 (ref), v11 (copy), l_HttpRbxApiService_0 (ref)
-        local v13 = string.gsub(v9, "{userId}", (tostring(v11)));
-        return l_HttpRbxApiService_0:GetAsyncFullUrl(v13);
-    end);
-    if not l_status_0 then
-        print(v9, "failed because", l_result_0);
-        return nil;
-    else
-        l_result_0 = l_HttpService_0:JSONDecode(l_result_0);
-        if l_result_0.count then
-            v12 = l_result_0.count;
-        end;
-        return v12;
-    end;
-end;
-v7.MaxFriendCount = function(_) --[[ Line: 46 ]] --[[ Name: MaxFriendCount ]]
-    -- upvalues: v5 (copy)
-    assert(not v5, "Should not call MaxFriendCount when FFlagRemoveHardCodedFriendLimitPrompt is enabled");
-    return 200;
-end;
-local l_BindableEvent_0 = Instance.new("BindableEvent");
-local l_BindableEvent_1 = Instance.new("BindableEvent");
-l_LocalPlayer_0.FriendStatusChanged:connect(function(v19, v20) --[[ Line: 54 ]]
-    -- upvalues: l_BindableEvent_0 (copy), l_BindableEvent_1 (copy)
-    if v20 == Enum.FriendStatus.Friend then
-        l_BindableEvent_0:Fire(v19);
-        return;
-    else
-        if v20 == Enum.FriendStatus.NotFriend then
-            l_BindableEvent_1:Fire(v19);
-        end;
-        return;
-    end;
-end);
-l_StarterGui_0:RegisterGetCore("PlayerFriendedEvent", function() --[[ Line: 62 ]]
-    -- upvalues: l_BindableEvent_0 (copy)
-    return l_BindableEvent_0;
-end);
-l_StarterGui_0:RegisterGetCore("PlayerUnfriendedEvent", function() --[[ Line: 63 ]]
-    -- upvalues: l_BindableEvent_1 (copy)
-    return l_BindableEvent_1;
-end);
-return v7;
+local HttpService = game:GetService("HttpService")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local FFlagRemoveHardCodedFriendLimitPrompt = require(RobloxGui.Modules.Flags.FFlagRemoveHardCodedFriendLimitPrompt)
+local LocalPlayer = Players.LocalPlayer
+
+while not LocalPlayer do
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+local v9 = game:GetService("ContentProvider").BaseUrl:lower()
+local v10 = string.gsub(v9, "http:", "https:")
+local v11 = string.gsub(v10, "www", "friends") .. "v1/users/{userId}/friends/count"
+
+function t1.GetFriendCountAsync(_, p2) -- line: 25
+	-- upvalues: v11 (copy), HttpRbxApiService (copy), HttpService (copy)
+	local count = nil
+	local ok, result = pcall(function() -- line: 28
+		-- upvalues: v11 (copy), p2 (copy), HttpRbxApiService (copy)
+		local v23 = string.gsub(v11, "{userId}", (tostring(p2)))
+
+		return HttpRbxApiService:GetAsyncFullUrl(v23)
+	end)
+
+	if not ok then
+		print(v11, "failed because", result)
+
+		return nil
+	end
+
+	local data = HttpService:JSONDecode(result)
+
+	if data.count then
+		count = data.count
+	end
+
+	return count
+end
+function t1.MaxFriendCount(_) -- line: 46
+	-- upvalues: FFlagRemoveHardCodedFriendLimitPrompt (copy)
+	assert(not FFlagRemoveHardCodedFriendLimitPrompt, "Should not call MaxFriendCount when FFlagRemoveHardCodedFriendLimitPrompt is enabled")
+
+	return 200
+end
+
+local BindableEvent = Instance.new("BindableEvent")
+local BindableEvent2 = Instance.new("BindableEvent")
+
+LocalPlayer.FriendStatusChanged:connect(function(p4, p5) -- line: 54
+	-- upvalues: BindableEvent (copy), BindableEvent2 (copy)
+	if p5 == Enum.FriendStatus.Friend then
+		BindableEvent:Fire(p4)
+
+		return
+	end
+
+	if p5 == Enum.FriendStatus.NotFriend then
+		BindableEvent2:Fire(p4)
+	end
+end)
+StarterGui:RegisterGetCore("PlayerFriendedEvent", function() -- line: 62
+	-- upvalues: BindableEvent (copy)
+	return BindableEvent
+end)
+StarterGui:RegisterGetCore("PlayerUnfriendedEvent", function() -- line: 63
+	-- upvalues: BindableEvent2 (copy)
+	return BindableEvent2
+end)
+
+return t1

@@ -1,5 +1,5 @@
 return {
-    None = "None", 
-    SlideInFromRight = "SlideInFromRight", 
-    SlideInFromBottom = "SlideInFromBottom"
-};
+	None = "None",
+	SlideInFromRight = "SlideInFromRight",
+	SlideInFromBottom = "SlideInFromBottom"
+}

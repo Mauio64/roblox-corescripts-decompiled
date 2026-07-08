@@ -1,27 +1,36 @@
-local l_Parent_0 = script.Parent;
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v2 = require(l_Parent_0.Enums.ItemType);
-local l_FFlagEnableUnifiedProductPurchaseFlow_0 = require(l_Parent_0.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow;
-local v4 = string.gsub(l_ContentProvider_0.BaseUrl:lower(), "https?://m.", "https?://www.");
-local v5 = v4 .. "thumbs/asset.ashx?assetid=";
-local v6 = v4 .. "outfit-thumbnail/image?userOutfitId=%s&width=100&height=100&format=png";
-return function(v7, v8) --[[ Line: 15 ]] --[[ Name: getPreviewImageUrl ]]
-    -- upvalues: v2 (copy), v6 (copy), l_FFlagEnableUnifiedProductPurchaseFlow_0 (copy), v5 (copy)
-    local v9 = nil;
-    if v7.itemType == v2.Bundle then
-        if v7.costumeId then
-            return string.format(v6, v7.costumeId);
-        else
-            v9 = v7.items[1].id;
-        end;
-    elseif v7.AssetId ~= nil and v7.AssetId ~= 0 then
-        v9 = v7.AssetId;
-    elseif v7.IconImageAssetId ~= nil then
-        v9 = v7.IconImageAssetId;
-    elseif l_FFlagEnableUnifiedProductPurchaseFlow_0 and v7.ImageUrl ~= nil then
-        return v7.ImageUrl;
-    elseif v8 == Enum.Platform.XBoxOne then
-        return "rbxasset://textures/ui/Shell/Icons/ROBUXIcon@1080.png";
-    end;
-    return v5 .. tostring(v9) .. "&x=100&y=100&format=png";
-end;
+local scriptParent = script.Parent
+local ContentProvider = game:GetService("ContentProvider")
+local ItemType = require(scriptParent.Enums.ItemType)
+local FFlagEnableUnifiedProductPurchaseFlow = require(scriptParent.Parent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
+local v5 = string.gsub(ContentProvider.BaseUrl:lower(), "https?://m.", "https?://www.")
+local v6 = v5 .. "thumbs/asset.ashx?assetid="
+local v7 = v5 .. "outfit-thumbnail/image?userOutfitId=%s&width=100&height=100&format=png"
+
+local function getPreviewImageUrl(p1, p2) -- line: 15
+	-- upvalues: ItemType (copy), v7 (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), v6 (copy)
+	local id = nil
+
+	if p1.itemType == ItemType.Bundle then
+		if p1.costumeId then
+			return string.format(v7, p1.costumeId)
+		end
+
+		id = p1.items[1].id
+	elseif p1.AssetId ~= nil and p1.AssetId ~= 0 then
+		id = p1.AssetId
+	elseif p1.IconImageAssetId ~= nil then
+		id = p1.IconImageAssetId
+	else
+		if FFlagEnableUnifiedProductPurchaseFlow and p1.ImageUrl ~= nil then
+			return p1.ImageUrl
+		end
+
+		if p2 == Enum.Platform.XBoxOne then
+			return "rbxasset://textures/ui/Shell/Icons/ROBUXIcon@1080.png"
+		end
+	end
+
+	return v6 .. tostring(id) .. "&x=100&y=100&format=png"
+end
+
+return getPreviewImageUrl

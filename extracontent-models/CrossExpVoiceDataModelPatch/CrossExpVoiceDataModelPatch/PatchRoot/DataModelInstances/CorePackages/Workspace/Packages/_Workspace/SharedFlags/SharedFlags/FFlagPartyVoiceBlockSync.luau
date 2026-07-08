@@ -1,1 +1,1 @@
-return game:GetEngineFeature("PartyVoiceBlockSync");
+return game:GetEngineFeature("PartyVoiceBlockSync")

@@ -1,19 +1,23 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Foundation);
-local v3 = require(l_CorePackages_0.Packages.React);
-local v4 = require(l_CorePackages_0.Packages.ReactRoblox);
-local l_View_0 = v2.View;
-local l_useStyleSheet_0 = v2.Hooks.useStyleSheet;
-return function(v7) --[[ Line: 16 ]] --[[ Name: PortalWithFoundationStylelink ]]
-    -- upvalues: l_useStyleSheet_0 (copy), v1 (copy), v3 (copy), v4 (copy), l_View_0 (copy)
-    local v8 = l_useStyleSheet_0();
-    local v9 = v1.Dictionary.join({
-        StyleLink = v3.createElement("StyleLink", {
-            StyleSheet = v8
-        })
-    }, v7.children);
-    return v4.createPortal(v3.createElement(l_View_0, {
-        tag = "auto-xy"
-    }, v9), v7.parent);
-end;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Foundation = require(CorePackages.Packages.Foundation)
+local React = require(CorePackages.Packages.React)
+local ReactRoblox = require(CorePackages.Packages.ReactRoblox)
+local View = Foundation.View
+local useStyleSheet = Foundation.Hooks.useStyleSheet
+
+local function PortalWithFoundationStylelink(t1: {[any]: any}) -- line: 16
+	-- upvalues: useStyleSheet (copy), Cryo (copy), React (copy), ReactRoblox (copy), View (copy)
+	local v10 = useStyleSheet()
+	local v11 = Cryo.Dictionary.join({
+		StyleLink = React.createElement("StyleLink", {
+			StyleSheet = v10
+		})
+	}, t1.children)
+
+	return ReactRoblox.createPortal(React.createElement(View, {
+		tag = "auto-xy"
+	}, v11), t1.parent)
+end
+
+return PortalWithFoundationStylelink

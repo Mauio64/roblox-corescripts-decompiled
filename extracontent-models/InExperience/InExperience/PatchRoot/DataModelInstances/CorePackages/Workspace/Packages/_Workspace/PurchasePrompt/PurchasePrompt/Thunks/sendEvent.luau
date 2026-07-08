@@ -1,13 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Services.Analytics);
-local v2 = require(l_Parent_0.Thunk);
-local v3 = {
-    v1
-};
-return function(v4, v5) --[[ Line: 11 ]] --[[ Name: sendEvent ]]
-    -- upvalues: v2 (copy), v3 (copy), v1 (copy)
-    return v2.new(script.Name, v3, function(_, v7) --[[ Line: 12 ]]
-        -- upvalues: v1 (ref), v4 (copy), v5 (copy)
-        v7[v1].signalEvent(v4, v5);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Services.Analytics)
+local Thunk = require(ParentParent.Thunk)
+local t1 = { Analytics }
+
+local function sendEvent(p1, p2) -- line: 11
+	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy)
+	return Thunk.new(script.Name, t1, function(_, p4) -- line: 12
+		-- upvalues: Analytics (copy), p1 (copy), p2 (copy)
+		p4[Analytics].signalEvent(p1, p2)
+	end)
+end
+
+return sendEvent

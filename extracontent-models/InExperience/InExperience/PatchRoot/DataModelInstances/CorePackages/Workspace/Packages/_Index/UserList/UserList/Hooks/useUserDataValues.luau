@@ -1,112 +1,126 @@
-local l_Parent_0 = script:FindFirstAncestor("UserList").Parent;
-local v1 = require(l_Parent_0.Signals);
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local v3 = require(l_Parent_0.UserProfiles);
-local v4 = require(l_Parent_0.React);
-local function _(v5, v6, v7) --[[ Line: 17 ]] --[[ Name: createUserProfileNameGetter ]]
-    -- upvalues: v1 (copy)
-    return v1.createComputed(function(v8) --[[ Line: 18 ]]
-        -- upvalues: v6 (copy), v5 (copy), v7 (copy)
-        if v6(v8) then
-            return "";
-        else
-            local v9 = v5(v8);
-            if not v9.data or #v9.data == 0 then
-                return "";
-            else
-                local l_names_0 = v9.data[1].names;
-                return v7(l_names_0) or "";
-            end;
-        end;
-    end);
-end;
-return function(v12) --[[ Line: 31 ]] --[[ Name: useUserDataValues ]]
-    -- upvalues: v3 (copy), v1 (copy), l_useSignalState_0 (copy), v4 (copy)
-    local v13 = v3.Stores.UserProfileStore.get();
-    local v14 = if v12 and v12 ~= "" then v13.fetchNamesByUserIds({
-        v12
-    }) else nil;
-    local v16 = v1.createComputed(function(v15) --[[ Line: 35 ]]
-        -- upvalues: v14 (copy)
-        if not v14 then
-            return true;
-        else
-            return v14(v15).status ~= "success";
-        end;
-    end);
-    local v17 = l_useSignalState_0(v16);
-    local function v21(v18) --[[ Line: 44 ]]
-        local v19 = v18.getDisplayName(false);
-        local v20 = v18.getUsername(false);
-        return v19 or v20;
-    end;
-    local l_v21_0 = v21 --[[ copy: 6 -> 11 ]];
-    local v26 = v1.createComputed(function(v23) --[[ Line: 18 ]]
-        -- upvalues: v16 (copy), v14 (copy), l_v21_0 (copy)
-        if v16(v23) then
-            return "";
-        else
-            local v24 = v14(v23);
-            if not v24.data or #v24.data == 0 then
-                return "";
-            else
-                local l_names_1 = v24.data[1].names;
-                return l_v21_0(l_names_1) or "";
-            end;
-        end;
-    end);
-    v21 = l_useSignalState_0(v26);
-    local function v28(v27) --[[ Line: 51 ]]
-        return v27.getUsername(false);
-    end;
-    local l_v28_0 = v28 --[[ copy: 8 -> 12 ]];
-    local v33 = v1.createComputed(function(v30) --[[ Line: 18 ]]
-        -- upvalues: v16 (copy), v14 (copy), l_v28_0 (copy)
-        if v16(v30) then
-            return "";
-        else
-            local v31 = v14(v30);
-            if not v31.data or #v31.data == 0 then
-                return "";
-            else
-                local l_names_2 = v31.data[1].names;
-                return l_v28_0(l_names_2) or "";
-            end;
-        end;
-    end);
-    v28 = l_useSignalState_0(v33);
-    local function v35(v34) --[[ Line: 56 ]]
-        return v34.getCombinedName(false);
-    end;
-    local l_v35_0 = v35 --[[ copy: 10 -> 13 ]];
-    local v40 = v1.createComputed(function(v37) --[[ Line: 18 ]]
-        -- upvalues: v16 (copy), v14 (copy), l_v35_0 (copy)
-        if v16(v37) then
-            return "";
-        else
-            local v38 = v14(v37);
-            if not v38.data or #v38.data == 0 then
-                return "";
-            else
-                local l_names_3 = v38.data[1].names;
-                return l_v35_0(l_names_3) or "";
-            end;
-        end;
-    end);
-    v35 = l_useSignalState_0(v40);
-    return v4.useMemo(function() --[[ Line: 62 ]]
-        -- upvalues: v17 (copy), v21 (copy), v35 (copy), v28 (copy)
-        return {
-            isLoading = v17 or false, 
-            displayName = v21 or "", 
-            combinedName = v35 or "", 
-            username = v28 or ""
-        };
-    end, {
-        v12, 
-        v17, 
-        v21, 
-        v35, 
-        v28
-    });
-end;
+local Parent = script:FindFirstAncestor("UserList").Parent
+local Signals = require(Parent.Signals)
+local useSignalState = require(Parent.SignalsReact).useSignalState
+local UserProfiles = require(Parent.UserProfiles)
+local React = require(Parent.React)
+
+local function createUserProfileNameGetter(p1, p2, p3) -- line: 17
+	-- upvalues: Signals (copy)
+	return Signals.createComputed(function(p4) -- line: 18
+		-- upvalues: p2 (copy), p1 (copy), p3 (copy)
+		if p2(p4) then
+			return ""
+		end
+
+		local v26 = p1(p4)
+
+		if not v26.data or #v26.data == 0 then
+			return ""
+		end
+
+		local names = v26.data[1].names
+
+		return p3(names) or ""
+	end)
+end
+local function useUserDataValues(s1: string) -- line: 31
+	-- upvalues: UserProfiles (copy), Signals (copy), useSignalState (copy), React (copy)
+	local v12 = UserProfiles.Stores.UserProfileStore.get()
+	local v13 = if not s1 or s1 == "" then nil else v12.fetchNamesByUserIds({ s1 })
+	local v14 = Signals.createComputed(function(p5) -- line: 35
+		-- upvalues: v13 (copy)
+		if not v13 then
+			return true
+		end
+
+		return v13(p5).status ~= "success"
+	end)
+	local v15 = useSignalState(v14)
+
+	local function v16(p6) -- line: 44
+		local v30 = p6.getDisplayName(false)
+		local v31 = p6.getUsername(false)
+
+		return v30 or v31
+	end
+
+	local v17 = Signals.createComputed(function(p7) -- line: 18
+		-- upvalues: v14 (copy), v13 (copy), v16 (copy)
+		if v14(p7) then
+			return ""
+		end
+
+		local v33 = v13(p7)
+
+		if not v33.data or #v33.data == 0 then
+			return ""
+		end
+
+		local names = v33.data[1].names
+
+		return v16(names) or ""
+	end)
+	local v18 = useSignalState(v17)
+
+	local function v19(p8) -- line: 51
+		return p8.getUsername(false)
+	end
+
+	local v20 = Signals.createComputed(function(p9) -- line: 18
+		-- upvalues: v14 (copy), v13 (copy), v19 (copy)
+		if v14(p9) then
+			return ""
+		end
+
+		local v37 = v13(p9)
+
+		if not v37.data or #v37.data == 0 then
+			return ""
+		end
+
+		local names = v37.data[1].names
+
+		return v19(names) or ""
+	end)
+	local v21 = useSignalState(v20)
+
+	local function v22(p10) -- line: 56
+		return p10.getCombinedName(false)
+	end
+
+	local v23 = Signals.createComputed(function(p11) -- line: 18
+		-- upvalues: v14 (copy), v13 (copy), v22 (copy)
+		if v14(p11) then
+			return ""
+		end
+
+		local v41 = v13(p11)
+
+		if not v41.data or #v41.data == 0 then
+			return ""
+		end
+
+		local names = v41.data[1].names
+
+		return v22(names) or ""
+	end)
+	local v24 = useSignalState(v23)
+
+	return React.useMemo(function() -- line: 62
+		-- upvalues: v15 (copy), v18 (copy), v24 (copy), v21 (copy)
+		return {
+			isLoading = v15 or false,
+			displayName = v18 or "",
+			combinedName = v24 or "",
+			username = v21 or ""
+		}
+	end, {
+		s1,
+		v15,
+		v18,
+		v24,
+		v21
+	})
+end
+
+return useUserDataValues

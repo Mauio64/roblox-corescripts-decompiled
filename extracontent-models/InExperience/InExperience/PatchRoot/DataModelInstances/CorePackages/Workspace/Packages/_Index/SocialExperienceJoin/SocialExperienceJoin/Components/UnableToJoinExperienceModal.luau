@@ -1,1 +1,1 @@
-return require(script.UnableToJoinExperienceModalContainer);
+return require(script.UnableToJoinExperienceModalContainer)

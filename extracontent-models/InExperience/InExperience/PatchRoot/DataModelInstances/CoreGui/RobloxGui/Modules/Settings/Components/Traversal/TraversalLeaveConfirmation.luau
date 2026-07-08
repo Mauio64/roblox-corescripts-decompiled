@@ -19,24 +19,24 @@ local useLocalization = Localization.Hooks.useLocalization
 local GetInputModeStore = Responsive.GetInputModeStore
 local Input = Responsive.Input
 
-return React.memo(function(t1: {[any]: any}) --[[ TraversalLeaveConfirmation ]] -- line: 36
+local function TraversalLeaveConfirmation(t1: {[any]: any}) -- line: 36
 	-- upvalues: React (copy), useLocalization (copy), SignalsReact (copy), getGameInfoStore (copy), Signals (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), Constants (copy), ContextActionService (copy), GuiService (copy), View (copy), TeleportLeaveConfirmation (copy)
-	local v22 = React.useRef(nil)
-	local v23 = useLocalization({
+	local v23 = React.useRef(nil)
+	local v24 = useLocalization({
 		previous = "CoreScripts.TopBar.Traversal.BackButtonDefault"
 	})
-	local v24 = SignalsReact.useSignalState(getGameInfoStore(false).getAndFetchGameInfo((tostring(t1.universeId))).data)
+	local v25 = SignalsReact.useSignalState(getGameInfoStore(false).getAndFetchGameInfo((tostring(t1.universeId))).data)
 	local num = nil
 	local name
 
-	if typeof(v24) == "table" then
-		name = v24.name
-		num = tonumber(v24.rootPlaceId)
+	if typeof(v25) == "table" then
+		name = v25.name
+		num = tonumber(v25.rootPlaceId)
 	else
-		name = v23.previous
+		name = v24.previous
 	end
 
-	local v27 = React.useCallback(function(_, p2) -- line: 53
+	local v28 = React.useCallback(function(_, p2) -- line: 53
 		-- upvalues: t1 (copy)
 		if p2 == Enum.UserInputState.End then
 			t1.onCancel()
@@ -48,31 +48,31 @@ return React.memo(function(t1: {[any]: any}) --[[ TraversalLeaveConfirmation ]] 
 	end, { t1.onCancel })
 
 	React.useEffect(function() -- line: 61
-		-- upvalues: Signals (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), num (ref), Constants (copy), ContextActionService (copy), v27 (copy), GuiService (copy), v22 (copy)
-		local v30 = Signals.createEffect(function(p3) -- line: 62
-			-- upvalues: UserInputService (copy), GetInputModeStore (copy), Input (copy), num (ref), Constants (copy), ContextActionService (copy), v27 (copy), GuiService (copy), v22 (copy)
+		-- upvalues: Signals (copy), UserInputService (copy), GetInputModeStore (copy), Input (copy), num (ref), Constants (copy), ContextActionService (copy), v28 (copy), GuiService (copy), v23 (copy)
+		local v31 = Signals.createEffect(function(p3) -- line: 62
+			-- upvalues: UserInputService (copy), GetInputModeStore (copy), Input (copy), num (ref), Constants (copy), ContextActionService (copy), v28 (copy), GuiService (copy), v23 (copy)
 			local LastInputType = UserInputService:GetLastInputType()
-			local v33 = GetInputModeStore(p3).getLastInputType(p3)
-			local v34 = v33 == Input.Directional or v33 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard
+			local v34 = GetInputModeStore(p3).getLastInputType(p3)
+			local v35 = v34 == Input.Directional or v34 == Input.Pointer and LastInputType == Enum.UserInputType.Keyboard
 
 			if num ~= nil and num > Constants.NO_PLACE_ID then
-				if v34 then
+				if v35 then
 					ContextActionService:BindCoreAction("FREEZE_CONTROLLER", function() -- line: 68
 					end, false, Enum.UserInputType.Gamepad1)
-					ContextActionService:BindCoreAction("EXIT_DIALOG", v27, false, Enum.KeyCode.ButtonB)
-					GuiService.SelectedCoreObject = v22.current
+					ContextActionService:BindCoreAction("EXIT_DIALOG", v28, false, Enum.KeyCode.ButtonB)
+					GuiService.SelectedCoreObject = v23.current
 
 					return
 				end
-			elseif v34 then
+			elseif v35 then
 				ContextActionService:UnbindCoreAction("FREEZE_CONTROLLER")
 				ContextActionService:UnbindCoreAction("EXIT_DIALOG")
 			end
 		end)
 
 		return function() -- line: 79
-			-- upvalues: v30 (copy)
-			v30()
+			-- upvalues: v31 (copy)
+			v31()
 		end
 	end, { num })
 
@@ -96,8 +96,10 @@ return React.memo(function(t1: {[any]: any}) --[[ TraversalLeaveConfirmation ]] 
 				placeId = num,
 				teleportName = name,
 				source = t1.source,
-				ref = v22
+				ref = v23
 			})
 		})
 	}))
-end)
+end
+
+return React.memo(TraversalLeaveConfirmation)

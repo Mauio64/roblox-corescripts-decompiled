@@ -1,34 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local _ = require(l_script_FirstAncestor_0.Telemetry.Layers.AppTelemetryLayer);
-local v2 = require(l_script_FirstAncestor_0.Components.ModalTelemetry);
+local AppChat = script:FindFirstAncestor("AppChat")
+
+require(AppChat.Telemetry.Layers.AppTelemetryLayer)
+
+local ModalTelemetry = require(AppChat.Components.ModalTelemetry)
+
 return {
-    Events = {
-        ModalRendered = v2.Events.modalRenderedWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationOverlay, 
-            counterFormat = function(v3, _) --[[ Line: 12 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v3.modalVariant
-                };
-            end
-        }), 
-        ModalAction = v2.Events.modalActionWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationOverlay, 
-            counterFormat = function(v5, _) --[[ Line: 20 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v5.modalVariant, 
-                    action = v5.action
-                };
-            end
-        }), 
-        ModalActionResult = v2.Events.modalActionResultWithSequence({
-            modalSequence = v2.Enums.ModalSequence.ConversationOverlay, 
-            counterFormat = function(v7, _) --[[ Line: 32 ]] --[[ Name: counterFormat ]]
-                return {
-                    modalVariant = v7.modalVariant, 
-                    action = v7.action, 
-                    actionResult = v7.actionResult
-                };
-            end
-        })
-    }
-};
+	Events = {
+		ModalRendered = ModalTelemetry.Events.modalRenderedWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationOverlay,
+			counterFormat = function(p1, _) -- line: 12
+				return {
+					modalVariant = p1.modalVariant
+				}
+			end
+		}),
+		ModalAction = ModalTelemetry.Events.modalActionWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationOverlay,
+			counterFormat = function(p3, _) -- line: 20
+				return {
+					modalVariant = p3.modalVariant,
+					action = p3.action
+				}
+			end
+		}),
+		ModalActionResult = ModalTelemetry.Events.modalActionResultWithSequence({
+			modalSequence = ModalTelemetry.Enums.ModalSequence.ConversationOverlay,
+			counterFormat = function(p5, _) -- line: 32
+				return {
+					modalVariant = p5.modalVariant,
+					action = p5.action,
+					actionResult = p5.actionResult
+				}
+			end
+		})
+	}
+}

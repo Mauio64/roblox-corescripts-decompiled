@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableSquadCoplayAnalytic", false);
+return game:DefineFastFlag("EnableSquadCoplayAnalytic", false)

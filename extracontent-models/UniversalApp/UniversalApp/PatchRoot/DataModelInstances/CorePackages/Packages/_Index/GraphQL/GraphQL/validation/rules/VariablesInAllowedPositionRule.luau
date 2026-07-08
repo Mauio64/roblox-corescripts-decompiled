@@ -1,68 +1,74 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_inspect_0 = require(l_Parent_0.jsutils.inspect).inspect;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
-local l_Kind_0 = require(l_Parent_0.language.kinds).Kind;
-local l_isNonNullType_0 = require(l_Parent_0.type.definition).isNonNullType;
-local l_utilities_0 = l_Parent_0.utilities;
-local l_typeFromAST_0 = require(l_utilities_0.typeFromAST).typeFromAST;
-local l_isTypeSubTypeOf_0 = require(l_utilities_0.typeComparators).isTypeSubTypeOf;
-local v8 = {};
-local v9 = nil;
-v8.VariablesInAllowedPositionRule = function(v10) --[[ Line: 27 ]]
-    -- upvalues: l_typeFromAST_0 (copy), v9 (ref), l_inspect_0 (copy), l_GraphQLError_0 (copy)
-    local v11 = {};
-    return {
-        OperationDefinition = {
-            enter = function() --[[ Line: 32 ]] --[[ Name: enter ]]
-                -- upvalues: v11 (ref)
-                v11 = {};
-            end, 
-            leave = function(_, v13) --[[ Line: 35 ]] --[[ Name: leave ]]
-                -- upvalues: v10 (copy), v11 (ref), l_typeFromAST_0 (ref), v9 (ref), l_inspect_0 (ref), l_GraphQLError_0 (ref)
-                local v14 = v10:getRecursiveVariableUsages(v13);
-                for _, v16 in ipairs(v14) do
-                    local l_node_0 = v16.node;
-                    local l_type_0 = v16.type;
-                    local l_defaultValue_0 = v16.defaultValue;
-                    local l_value_0 = l_node_0.name.value;
-                    local v21 = v11[l_value_0];
-                    if v21 and l_type_0 then
-                        local v22 = v10:getSchema();
-                        local v23 = l_typeFromAST_0(v22, v21.type);
-                        if v23 and not v9(v22, v23, v21.defaultValue, l_type_0, l_defaultValue_0) then
-                            local v24 = l_inspect_0(v23);
-                            local v25 = l_inspect_0(l_type_0);
-                            v10:reportError(l_GraphQLError_0.new(("Variable \"$%s\" of type \"%s\" used in position expecting type \"%s\"."):format(l_value_0, v24, v25), {
-                                v21, 
-                                l_node_0
-                            }));
-                        end;
-                    end;
-                end;
-            end
-        }, 
-        VariableDefinition = function(_, v27) --[[ Line: 79 ]] --[[ Name: VariableDefinition ]]
-            -- upvalues: v11 (ref)
-            v11[v27.variable.name.value] = v27;
-        end
-    };
-end;
-v9 = function(v28, v29, v30, v31, v32) --[[ Line: 90 ]] --[[ Name: allowedVariableUsage ]]
-    -- upvalues: l_isNonNullType_0 (copy), l_Kind_0 (copy), l_isTypeSubTypeOf_0 (copy)
-    if l_isNonNullType_0(v31) and not l_isNonNullType_0(v29) then
-        local v33 = false;
-        if v30 ~= nil then
-            v33 = v30.kind ~= l_Kind_0.NULL;
-        end;
-        local v34 = v32 ~= nil;
-        if not v33 and not v34 then
-            return false;
-        else
-            local l_ofType_0 = v31.ofType;
-            return l_isTypeSubTypeOf_0(v28, v29, l_ofType_0);
-        end;
-    else
-        return l_isTypeSubTypeOf_0(v28, v29, v31);
-    end;
-end;
-return v8;
+local ParentParent = script.Parent.Parent.Parent
+local inspect = require(ParentParent.jsutils.inspect).inspect
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+local Kind = require(ParentParent.language.kinds).Kind
+local isNonNullType = require(ParentParent.type.definition).isNonNullType
+local utilities = ParentParent.utilities
+local typeFromAST = require(utilities.typeFromAST).typeFromAST
+local isTypeSubTypeOf = require(utilities.typeComparators).isTypeSubTypeOf
+local t1 = {}
+local allowedVariableUsage = nil
+
+function t1.VariablesInAllowedPositionRule(p1) -- line: 27
+	-- upvalues: typeFromAST (copy), allowedVariableUsage (ref), inspect (copy), GraphQLError (copy)
+	local t2 = {}
+
+	return {
+		OperationDefinition = {
+			enter = function() -- line: 32
+				-- upvalues: t2 (ref)
+				t2 = {}
+			end,
+			leave = function(_, p3) -- line: 35
+				-- upvalues: p1 (copy), t2 (ref), typeFromAST (copy), allowedVariableUsage (ref), inspect (copy), GraphQLError (copy)
+				local v23 = p1:getRecursiveVariableUsages(p3)
+
+				for _, v in ipairs(v23) do
+					local node = v.node
+					local type = v.type
+					local defaultValue = v.defaultValue
+					local value = node.name.value
+					local v30 = t2[value]
+
+					if v30 and type then
+						local v31 = p1:getSchema()
+						local v32 = typeFromAST(v31, v30.type)
+
+						if v32 and not allowedVariableUsage(v31, v32, v30.defaultValue, type, defaultValue) then
+							local v33 = inspect(v32)
+							local v34 = inspect(type)
+
+							p1:reportError(GraphQLError.new(("Variable \"$%s\" of type \"%s\" used in position expecting type \"%s\"."):format(value, v33, v34), {
+								v30,
+								node
+							}))
+						end
+					end
+				end
+			end
+		},
+		VariableDefinition = function(_, p5) -- line: 79
+			-- upvalues: t2 (ref)
+			t2[p5.variable.name.value] = p5
+		end
+	}
+end
+function allowedVariableUsage(p6, p7, p8, p9, p10) -- line: 90
+	-- upvalues: isNonNullType (copy), Kind (copy), isTypeSubTypeOf (copy)
+	if isNonNullType(p9) and not isNonNullType(p7) then
+		local v18 = p8 ~= nil and p8.kind ~= Kind.NULL
+		local v19 = p10 ~= nil
+
+		if not v18 and not v19 then
+			return false
+		end
+
+		local ofType = p9.ofType
+
+		return isTypeSubTypeOf(p6, p7, ofType)
+	end
+
+	return isTypeSubTypeOf(p6, p7, p9)
+end
+
+return t1

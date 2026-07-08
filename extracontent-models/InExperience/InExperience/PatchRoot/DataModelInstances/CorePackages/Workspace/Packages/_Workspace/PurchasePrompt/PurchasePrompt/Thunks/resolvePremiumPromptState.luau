@@ -1,59 +1,72 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Players_0 = game:GetService("Players");
-local v2 = require(l_Parent_0.Actions.SetPromptState);
-local v3 = require(l_Parent_0.Actions.ErrorOccurred);
-local v4 = require(l_Parent_0.Actions.PremiumInfoRecieved);
-local v5 = require(l_Parent_0.Actions.AccountInfoReceived);
-local v6 = require(l_Parent_0.Actions.BalanceInfoRecieved);
-local v7 = require(l_Parent_0.Enums.PromptState);
-local v8 = require(l_Parent_0.Enums.PurchaseError);
-local v9 = require(l_Parent_0.Services.Analytics);
-local v10 = require(l_Parent_0.Services.ExternalSettings);
-local v11 = require(l_Parent_0.Services.Network);
-local v12 = require(l_Parent_0.Network.postPremiumImpression);
-local v13 = require(l_Parent_0.Thunks.completeRequest);
-local v14 = require(l_Parent_0.Thunk);
-local v15 = {
-    v11, 
-    v10, 
-    v9
-};
-return function(v16, v17, v18, v19) --[[ Line: 28 ]] --[[ Name: resolvePremiumPromptState ]]
-    -- upvalues: v14 (copy), v15 (copy), v11 (copy), v10 (copy), v9 (copy), v4 (copy), v5 (copy), v6 (copy), v13 (copy), l_Players_0 (copy), v3 (copy), v8 (copy), v12 (copy), v2 (copy), v7 (copy)
-    return v14.new(script.Name, v15, function(v20, v21) --[[ Line: 29 ]]
-        -- upvalues: v11 (ref), v10 (ref), v9 (ref), v4 (ref), v18 (copy), v5 (ref), v16 (copy), v6 (ref), v17 (copy), v19 (copy), v13 (ref), l_Players_0 (ref), v3 (ref), v8 (ref), v12 (ref), v2 (ref), v7 (ref)
-        local v22 = v21[v11];
-        local v23 = v21[v10];
-        local v24 = v21[v9];
-        local v25 = v23.getPlatform();
-        v20:dispatch(v4(v18));
-        v20:dispatch(v5(v16));
-        v20:dispatch(v6(v17));
-        if v19 == false then
-            v24.signalPremiumUpsellPrecheckFail();
-            return v20:dispatch(v13());
-        else
-            if v23.isStudio() then
-                if l_Players_0.LocalPlayer.MembershipType == Enum.MembershipType.Premium then
-                    return v20:dispatch(v3(v8.AlreadyPremium));
-                end;
-            elseif v16.isPremium then
-                v24.signalPremiumUpsellShownPremium();
-                return v20:dispatch(v3(v8.AlreadyPremium));
-            end;
-            if v25 == Enum.Platform.XBoxOne then
-                v24.signalPremiumUpsellInvalidPlatform();
-                return v20:dispatch(v3(v8.PremiumUnavailablePlatform));
-            elseif v18 == nil then
-                v24.signalPremiumUpsellInvalidProducts();
-                return v20:dispatch(v3(v8.PremiumUnavailable));
-            else
-                if not v23.isStudio() then
-                    v24.signalPremiumUpsellShownNonPremium();
-                    v12(v22);
-                end;
-                return v20:dispatch(v2(v7.PremiumUpsell));
-            end;
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Players = game:GetService("Players")
+local SetPromptState = require(ParentParent.Actions.SetPromptState)
+local ErrorOccurred = require(ParentParent.Actions.ErrorOccurred)
+local PremiumInfoRecieved = require(ParentParent.Actions.PremiumInfoRecieved)
+local AccountInfoReceived = require(ParentParent.Actions.AccountInfoReceived)
+local BalanceInfoRecieved = require(ParentParent.Actions.BalanceInfoRecieved)
+local PromptState = require(ParentParent.Enums.PromptState)
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local Analytics = require(ParentParent.Services.Analytics)
+local ExternalSettings = require(ParentParent.Services.ExternalSettings)
+local Network = require(ParentParent.Services.Network)
+local postPremiumImpression = require(ParentParent.Network.postPremiumImpression)
+local completeRequest = require(ParentParent.Thunks.completeRequest)
+local Thunk = require(ParentParent.Thunk)
+local t1 = {
+	Network,
+	ExternalSettings,
+	Analytics
+}
+
+local function resolvePremiumPromptState(p1, p2, p3, p4) -- line: 28
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), ExternalSettings (copy), Analytics (copy), PremiumInfoRecieved (copy), AccountInfoReceived (copy), BalanceInfoRecieved (copy), completeRequest (copy), Players (copy), ErrorOccurred (copy), PurchaseError (copy), postPremiumImpression (copy), SetPromptState (copy), PromptState (copy)
+	return Thunk.new(script.Name, t1, function(p5, p6) -- line: 29
+		-- upvalues: Network (copy), ExternalSettings (copy), Analytics (copy), PremiumInfoRecieved (copy), p3 (copy), AccountInfoReceived (copy), p1 (copy), BalanceInfoRecieved (copy), p2 (copy), p4 (copy), completeRequest (copy), Players (copy), ErrorOccurred (copy), PurchaseError (copy), postPremiumImpression (copy), SetPromptState (copy), PromptState (copy)
+		local v24 = p6[Network]
+		local v25 = p6[ExternalSettings]
+		local v26 = p6[Analytics]
+		local v27 = v25.getPlatform()
+
+		p5:dispatch(PremiumInfoRecieved(p3))
+		p5:dispatch(AccountInfoReceived(p1))
+		p5:dispatch(BalanceInfoRecieved(p2))
+
+		if p4 == false then
+			v26.signalPremiumUpsellPrecheckFail()
+
+			return p5:dispatch(completeRequest())
+		end
+
+		if v25.isStudio() then
+			if Players.LocalPlayer.MembershipType == Enum.MembershipType.Premium then
+				return p5:dispatch(ErrorOccurred(PurchaseError.AlreadyPremium))
+			end
+		elseif p1.isPremium then
+			v26.signalPremiumUpsellShownPremium()
+
+			return p5:dispatch(ErrorOccurred(PurchaseError.AlreadyPremium))
+		end
+
+		if v27 == Enum.Platform.XBoxOne then
+			v26.signalPremiumUpsellInvalidPlatform()
+
+			return p5:dispatch(ErrorOccurred(PurchaseError.PremiumUnavailablePlatform))
+		end
+
+		if p3 == nil then
+			v26.signalPremiumUpsellInvalidProducts()
+
+			return p5:dispatch(ErrorOccurred(PurchaseError.PremiumUnavailable))
+		end
+
+		if not v25.isStudio() then
+			v26.signalPremiumUpsellShownNonPremium()
+			postPremiumImpression(v24)
+		end
+
+		return p5:dispatch(SetPromptState(PromptState.PremiumUpsell))
+	end)
+end
+
+return resolvePremiumPromptState

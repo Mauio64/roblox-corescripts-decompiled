@@ -1,1 +1,1 @@
-return require(script.ApolloClient);
+return require(script.ApolloClient)

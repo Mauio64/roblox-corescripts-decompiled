@@ -1,15 +1,23 @@
-return function(v0, v1, v2) --[[ Line: 2 ]] --[[ Name: slice ]]
-    local v3 = type(v0);
-    assert(v3 == "table", "expected a table for first argument, got " .. v3);
-    local v4 = #v0;
-    v1 = v1 or 1;
-    v2 = v2 or v4;
-    assert(v1 <= v2, "start index must be less than or equal to end index");
-    local v5 = {};
-    local v6 = 1;
-    for v7 = math.max(1, v1), math.min(v2, v4) do
-        v5[v6] = v0[v7];
-        v6 = v6 + 1;
-    end;
-    return v5;
-end;
+local function slice(p1, p2, p3) -- line: 2
+	local v5 = type(p1)
+
+	assert(v5 == "table", "expected a table for first argument, got " .. v5)
+
+	local v6 = #p1
+	local v7 = p2 or 1
+	local v8 = p3 or v6
+
+	assert(v7 <= v8, "start index must be less than or equal to end index")
+
+	local t1 = {}
+	local n1 = 1
+
+	for i = math.max(1, v7), math.min(v8, v6) do
+		t1[n1] = p1[i]
+		n1 += 1
+	end
+
+	return t1
+end
+
+return slice

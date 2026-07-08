@@ -1,34 +1,40 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_FFlagEnableConsoleExpControls_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls;
-dismissRobloxMenuAndRun = function(v5) --[[ Line: 10 ]] --[[ Name: dismissRobloxMenuAndRun ]]
-    -- upvalues: l_FFlagEnableConsoleExpControls_0 (copy), l_UserInputService_0 (copy), l_GuiService_0 (copy), l_RobloxGui_0 (copy)
-    if l_FFlagEnableConsoleExpControls_0 and l_UserInputService_0.GamepadEnabled then
-        l_GuiService_0.SelectedCoreObject = nil;
-    end;
-    local v6 = require(l_RobloxGui_0.Modules.Settings.SettingsHub);
-    if l_GuiService_0.MenuIsOpen then
-        local v7 = tick() + 3;
-        local v8 = nil;
-        v8 = l_GuiService_0.MenuClosed:Connect(function() --[[ Line: 20 ]]
-            -- upvalues: v8 (ref), v7 (copy), v5 (copy)
-            if v8 then
-                v8:Disconnect();
-                v8 = nil;
-            end;
-            if tick() < v7 then
-                v5(true);
-            end;
-        end);
-        v6:SetVisibility(false);
-        return;
-    else
-        v5(false);
-        return;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local UserInputService = game:GetService("UserInputService")
+local FFlagEnableConsoleExpControls = require(CorePackages.Workspace.Packages.SharedFlags).FFlagEnableConsoleExpControls
+
+function dismissRobloxMenuAndRun(p1) -- line: 10
+	-- upvalues: FFlagEnableConsoleExpControls (copy), UserInputService (copy), GuiService (copy), RobloxGui (copy)
+	if FFlagEnableConsoleExpControls and UserInputService.GamepadEnabled then
+		GuiService.SelectedCoreObject = nil
+	end
+
+	local SettingsHub = require(RobloxGui.Modules.Settings.SettingsHub)
+
+	if GuiService.MenuIsOpen then
+		local v8 = tick() + 3
+		local u9 = nil
+
+		u9 = GuiService.MenuClosed:Connect(function() -- line: 20
+			-- upvalues: u9 (ref), v8 (copy), p1 (copy)
+			if u9 then
+				u9:Disconnect()
+				u9 = nil
+			end
+
+			if tick() < v8 then
+				p1(true)
+			end
+		end)
+		SettingsHub:SetVisibility(false)
+
+		return
+	end
+
+	p1(false)
+end
+
 return {
-    dismissRobloxMenuAndRun = dismissRobloxMenuAndRun
-};
+	dismissRobloxMenuAndRun = dismissRobloxMenuAndRun
+}

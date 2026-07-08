@@ -1,25 +1,29 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetail").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.ReactOtter);
-local v3 = {
-    frequency = 3, 
-    dampingRatio = 1
-};
-return function() --[[ Line: 18 ]] --[[ Name: useImageLoadFade ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    local v4, v5 = v1.useState(true);
-    local v6, v7 = v2.useAnimatedBinding(0, function() --[[ Line: 21 ]]
-        -- upvalues: v5 (copy)
-        v5(false);
-    end);
-    return {
-        onLoaded = v1.useCallback(function(v8) --[[ Line: 25 ]]
-            -- upvalues: v7 (copy), v2 (ref), v3 (ref)
-            if v8 == Enum.AssetFetchStatus.Success then
-                v7((v2.spring(1, v3)));
-            end;
-        end, {}), 
-        skeletonVisible = v4, 
-        overlayTransparency = v6
-    };
-end;
+local Parent = script:FindFirstAncestor("GameDetail").Parent
+local React = require(Parent.React)
+local ReactOtter = require(Parent.ReactOtter)
+local t1 = {
+	frequency = 3,
+	dampingRatio = 1
+}
+
+local function useImageLoadFade() -- line: 18
+	-- upvalues: React (copy), ReactOtter (copy), t1 (copy)
+	local v6, v7 = React.useState(true)
+	local v8, v9 = ReactOtter.useAnimatedBinding(0, function() -- line: 21
+		-- upvalues: v7 (copy)
+		v7(false)
+	end)
+
+	return {
+		onLoaded = React.useCallback(function(p1) -- line: 25
+			-- upvalues: v9 (copy), ReactOtter (copy), t1 (copy)
+			if p1 == Enum.AssetFetchStatus.Success then
+				v9((ReactOtter.spring(1, t1)))
+			end
+		end, {}),
+		skeletonVisible = v6,
+		overlayTransparency = v8
+	}
+end
+
+return useImageLoadFade

@@ -1,5 +1,5 @@
 return {
-    canUseDOM = function() --[[ Line: 13 ]]
-        return false;
-    end
-};
+	canUseDOM = function() -- line: 13
+		return false
+	end
+}

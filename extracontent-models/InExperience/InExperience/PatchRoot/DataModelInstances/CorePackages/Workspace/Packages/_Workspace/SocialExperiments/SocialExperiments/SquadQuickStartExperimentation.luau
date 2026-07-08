@@ -5,25 +5,36 @@ local v4 = game:DefineFastString("SquadEnablePartyQuickStartVariant", "enablePar
 local v5 = game:DefineFastFlag("EnablePartyQuickStartChanges2", false)
 local v6 = game:DefineFastFlag("PartyFormationCreateUserExposureEnabled", false)
 
+local function getIsUserInTreatment(s1: string) -- line: 15
+	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
+	local v9 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+	if v9 and v9[s1] ~= nil then
+		return v9[s1]
+	end
+
+	return false
+end
+
 return {
-	getPartyQuickStartChangesEnabled = function() --[[ getPartyQuickStartChangesEnabled ]] -- line: 25
+	getPartyQuickStartChangesEnabled = function() -- line: 25
 		-- upvalues: v5 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
-		local v9 = v5
+		local v10 = v5
 
-		if not v9 then
-			local v10 = v4
-			local v11 = ExperimentCacheManager.default:getLayerVariables(v3)
+		if not v10 then
+			local v11 = v4
+			local v12 = ExperimentCacheManager.default:getLayerVariables(v3)
 
-			if v11 and v11[v10] ~= nil then
-				return v11[v10]
+			if v12 and v12[v11] ~= nil then
+				return v12[v11]
 			end
 
-			v9 = false
+			v10 = false
 		end
 
-		return v9
+		return v10
 	end,
-	logExposure = function() --[[ logExposure ]] -- line: 29
+	logExposure = function() -- line: 29
 		-- upvalues: v6 (copy), ExperimentCacheManager (copy), v3 (copy)
 		if v6 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
 			ExperimentCacheManager.default:logLayerExposure(v3)

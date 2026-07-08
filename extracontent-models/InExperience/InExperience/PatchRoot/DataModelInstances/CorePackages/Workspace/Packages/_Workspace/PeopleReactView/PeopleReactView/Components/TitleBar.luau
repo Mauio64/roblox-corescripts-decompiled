@@ -1,30 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PeopleReactView");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_Text_0 = v3.Text;
-local l_View_0 = v3.View;
-local v7 = require(l_script_FirstAncestor_0.Components.Buttons.LayoutToggleButton);
-local v8 = require(l_script_FirstAncestor_0.Constants);
-return v2.memo(function(v9) --[[ Line: 23 ]] --[[ Name: TitleBar ]]
-    -- upvalues: l_useLocalization_0 (copy), v8 (copy), v2 (copy), l_View_0 (copy), l_Text_0 (copy), v7 (copy)
-    local v10 = l_useLocalization_0({
-        header = v8.PEOPLEPAGE.PEOPLE_LIST.HEADER
-    });
-    return v2.createElement(l_View_0, {
-        tag = "row size-full-0 auto-y align-y-center flex-x-between", 
-        LayoutOrder = v9.LayoutOrder
-    }, {
-        Title = v2.createElement(l_Text_0, {
-            tag = "auto-xy content-default text-heading-small text-align-x-left", 
-            Text = v10.header, 
-            LayoutOrder = 1
-        }), 
-        LayoutToggleButton = v2.createElement(v7, {
-            layout = v9.layout, 
-            setLayout = v9.setLayout, 
-            LayoutOrder = 2
-        })
-    });
-end);
+local PeopleReactView = script:FindFirstAncestor("PeopleReactView")
+local PeopleReactViewParent = PeopleReactView.Parent
+local React = require(PeopleReactViewParent.React)
+local Foundation = require(PeopleReactViewParent.Foundation)
+local useLocalization = require(PeopleReactViewParent.Localization).Hooks.useLocalization
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local LayoutToggleButton = require(PeopleReactView.Components.Buttons.LayoutToggleButton)
+local Constants = require(PeopleReactView.Constants)
+
+local function TitleBar(t1: {[any]: any}) -- line: 23
+	-- upvalues: useLocalization (copy), Constants (copy), React (copy), View (copy), FoundationText (copy), LayoutToggleButton (copy)
+	local v12 = useLocalization({
+		header = Constants.PEOPLEPAGE.PEOPLE_LIST.HEADER
+	})
+
+	return React.createElement(View, {
+		tag = "row size-full-0 auto-y align-y-center flex-x-between",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		Title = React.createElement(FoundationText, {
+			tag = "auto-xy content-default text-heading-small text-align-x-left",
+			LayoutOrder = 1,
+			Text = v12.header
+		}),
+		LayoutToggleButton = React.createElement(LayoutToggleButton, {
+			LayoutOrder = 2,
+			layout = t1.layout,
+			setLayout = t1.setLayout
+		})
+	})
+end
+
+return React.memo(TitleBar)

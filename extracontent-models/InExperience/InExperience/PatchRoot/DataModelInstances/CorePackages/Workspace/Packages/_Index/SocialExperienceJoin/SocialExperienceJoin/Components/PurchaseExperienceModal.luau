@@ -1,1 +1,1 @@
-return require(script.PurchaseExperienceModalContainer);
+return require(script.PurchaseExperienceModalContainer)

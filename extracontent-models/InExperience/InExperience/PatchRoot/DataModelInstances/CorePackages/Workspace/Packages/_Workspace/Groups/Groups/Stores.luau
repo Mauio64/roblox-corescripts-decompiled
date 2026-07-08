@@ -1,3 +1,3 @@
 return {
-    createGroupsListStore = require(script.createGroupsListStore)
-};
+	createGroupsListStore = require(script.createGroupsListStore)
+}

@@ -1,1 +1,1 @@
-return require(script.DefaultAnalyticsService);
+return require(script.DefaultAnalyticsService)

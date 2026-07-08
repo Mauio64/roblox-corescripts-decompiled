@@ -1,34 +1,40 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(script.Parent.getHardwareSafeAreaInsets);
-return function(v3) --[[ Line: 7 ]] --[[ Name: useHardwareInsets ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4, v5 = v1.useState(v2);
-    v1.useEffect(function() --[[ Line: 10 ]]
-        -- upvalues: v3 (copy), v5 (copy), v2 (ref)
-        local v6 = nil;
-        if v3 then
-            v6 = v3:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 14 ]]
-                -- upvalues: v5 (ref), v2 (ref)
-                v5(function(v7) --[[ Line: 15 ]]
-                    -- upvalues: v2 (ref)
-                    local v8 = v2();
-                    if v8.bottom ~= v7.bottom or v8.top ~= v7.top or v8.left ~= v7.left or v8.right ~= v7.right then
-                        return v8;
-                    else
-                        return v7;
-                    end;
-                end);
-            end);
-        end;
-        return function() --[[ Line: 31 ]]
-            -- upvalues: v6 (ref)
-            if v6 then
-                v6:Disconnect();
-            end;
-        end;
-    end, {
-        v3
-    });
-    return v4;
-end;
+local Parent = script:FindFirstAncestor("Foundation").Parent
+local React = require(Parent.React)
+local getHardwareSafeAreaInsets = require(script.Parent.getHardwareSafeAreaInsets)
+
+local function useHardwareInsets(p1) -- line: 7
+	-- upvalues: React (copy), getHardwareSafeAreaInsets (copy)
+	local v6, v7 = React.useState(getHardwareSafeAreaInsets)
+
+	React.useEffect(function() -- line: 10
+		-- upvalues: p1 (copy), v7 (copy), getHardwareSafeAreaInsets (copy)
+		local connection = nil
+
+		if p1 then
+			connection = p1:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 14
+				-- upvalues: v7 (copy), getHardwareSafeAreaInsets (copy)
+				v7(function(p2) -- line: 15
+					-- upvalues: getHardwareSafeAreaInsets (copy)
+					local v10 = getHardwareSafeAreaInsets()
+
+					if v10.bottom ~= p2.bottom or (v10.top ~= p2.top or v10.left ~= p2.left or v10.right ~= p2.right) then
+						return v10
+					end
+
+					return p2
+				end)
+			end)
+		end
+
+		return function() -- line: 31
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { p1 })
+
+	return v6
+end
+
+return useHardwareInsets

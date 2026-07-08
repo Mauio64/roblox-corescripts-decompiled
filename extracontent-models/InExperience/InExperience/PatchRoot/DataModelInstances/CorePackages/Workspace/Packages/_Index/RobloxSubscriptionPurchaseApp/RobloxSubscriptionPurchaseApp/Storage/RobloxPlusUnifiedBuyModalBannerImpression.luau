@@ -1,6 +1,6 @@
 local AppStorageService = game:GetService("AppStorageService")
 local t1 = {
-	canUseAppStorage = function() --[[ canUseAppStorage ]] -- line: 16
+	canUseAppStorage = function() -- line: 16
 		return game:GetEngineFeature("RobloxPlusImpressionStorageKey")
 	end
 }

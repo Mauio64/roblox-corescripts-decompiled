@@ -1,15 +1,18 @@
-local v0 = "id-" .. tostring(math.random(100000, 1000000));
-local v1 = 0;
+local u1 = "id-" .. tostring(math.random(100000, 1000000))
+local n1 = 0
+
 return {
-    _TESTING_ONLY_normalize_keys = function() --[[ Line: 9 ]] --[[ Name: _TESTING_ONLY_normalize_keys ]]
-        -- upvalues: v0 (ref), v1 (ref)
-        v0 = "id-";
-        v1 = 0;
-    end, 
-    generateKey = function() --[[ Line: 15 ]] --[[ Name: generateKey ]]
-        -- upvalues: v0 (ref), v1 (ref)
-        local v2 = v0 .. tostring(v1);
-        v1 = v1 + 1;
-        return v2;
-    end
-};
+	_TESTING_ONLY_normalize_keys = function() -- line: 9
+		-- upvalues: u1 (ref), n1 (ref)
+		u1 = "id-"
+		n1 = 0
+	end,
+	generateKey = function() -- line: 15
+		-- upvalues: u1 (ref), n1 (ref)
+		local v3 = u1 .. tostring(n1)
+
+		n1 += 1
+
+		return v3
+	end
+}

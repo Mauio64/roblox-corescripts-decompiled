@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileBackgroundEnabled", false);
+return game:DefineFastFlag("EditProfileBackgroundEnabled", false)

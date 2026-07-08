@@ -1,74 +1,80 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local v1 = require(l_script_FirstAncestor_0.Flags.FFlagChatLineReportingMessageIdEnabled);
-local v2 = {
-    Variant = {
-        CLRv1 = "CLRv1"
-    }
-};
-buildReport = function(v3, v4, v5, v6, v7) --[[ Line: 10 ]] --[[ Name: buildReport ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v8 = {
-        tags = {
-            ENTRY_POINT = {
-                valueList = {
-                    {
-                        data = "in-experience"
-                    }
-                }
-            }, 
-            SUBMITTER_USER_ID = {
-                valueList = {
-                    {
-                        data = tostring(v3)
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_CATEGORY = {
-                valueList = {
-                    {
-                        data = v5
-                    }
-                }
-            }, 
-            REPORTER_COMMENT = {
-                valueList = {
-                    {
-                        data = v6
-                    }
-                }
-            }, 
-            REPORTED_ABUSE_VECTOR = {
-                valueList = {
-                    {
-                        data = "chat"
-                    }
-                }
-            }, 
-            REPORT_TARGET_USER_ID = {
-                valueList = {
-                    {
-                        data = v4
-                    }
-                }
-            }, 
-            VARIANT = {
-                valueList = {
-                    {
-                        data = v2.Variant.CLRv1
-                    }
-                }
-            }
-        }
-    };
-    if v1 and v7 then
-        v8.tags.REPORT_TARGET_MESSAGE_ID = {
-            valueList = {
-                {
-                    data = v7
-                }
-            }
-        };
-    end;
-    return v8;
-end;
-return buildReport;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local FFlagExpChatPresetChatEnabled = require(ChatLineReportingParent.ExpChatShared).Flags.FFlagExpChatPresetChatEnabled
+local FFlagChatLineReportingMessageIdEnabled = require(ChatLineReporting.Flags.FFlagChatLineReportingMessageIdEnabled)
+local t1 = {
+	Variant = {
+		CLRv1 = "CLRv1"
+	}
+}
+
+function buildReport(n1: number, s1: string, s2: string, s3: string, s4: string?, s5: string?, s6: string?) -- line: 13
+	-- upvalues: t1 (copy), FFlagChatLineReportingMessageIdEnabled (copy), FFlagExpChatPresetChatEnabled (copy)
+	local t2 = {
+		tags = {
+			ENTRY_POINT = {
+				valueList = {{
+					data = "in-experience"
+				}}
+			},
+			SUBMITTER_USER_ID = {
+				valueList = {{
+					data = tostring(n1)
+				}}
+			},
+			REPORTED_ABUSE_CATEGORY = {
+				valueList = {{
+					data = s2
+				}}
+			},
+			REPORTER_COMMENT = {
+				valueList = {{
+					data = s3
+				}}
+			},
+			REPORTED_ABUSE_VECTOR = {
+				valueList = {{
+					data = "chat"
+				}}
+			},
+			REPORT_TARGET_USER_ID = {
+				valueList = {{
+					data = s1
+				}}
+			},
+			VARIANT = {
+				valueList = {{
+					data = t1.Variant.CLRv1
+				}}
+			}
+		}
+	}
+
+	if FFlagChatLineReportingMessageIdEnabled and s4 then
+		t2.tags.REPORT_TARGET_MESSAGE_ID = {
+			valueList = {{
+				data = s4
+			}}
+		}
+	end
+
+	if FFlagExpChatPresetChatEnabled and s5 and s5 ~= "" then
+		t2.tags.REPORT_TARGET_PRESET_ID = {
+			valueList = {{
+				data = s5
+			}}
+		}
+
+		if s6 and s6 ~= "" then
+			t2.tags.REPORT_TARGET_PRESET_VERSION = {
+				valueList = {{
+					data = s6
+				}}
+			}
+		end
+	end
+
+	return t2
+end
+
+return buildReport

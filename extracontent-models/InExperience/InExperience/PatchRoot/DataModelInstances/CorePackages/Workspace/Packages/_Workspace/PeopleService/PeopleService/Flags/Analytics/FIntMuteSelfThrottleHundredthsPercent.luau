@@ -1,4 +1,5 @@
-game:DefineFastInt("FIntMuteSelfThrottleHundredthsPercent4", 10000);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("FIntMuteSelfThrottleHundredthsPercent4");
-end;
+game:DefineFastInt("FIntMuteSelfThrottleHundredthsPercent4", 10000)
+
+return function() -- line: 3
+	return game:GetFastInt("FIntMuteSelfThrottleHundredthsPercent4")
+end

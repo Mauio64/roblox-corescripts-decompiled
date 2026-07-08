@@ -8,6 +8,7 @@ local InternalTextInput = require(Components.InternalTextInput)
 require(Foundation.Components.Types)
 
 local Flags = require(Foundation.Utility.Flags)
+local getInputTextSize = require(Foundation.Utility.getInputTextSize)
 local useTextInputVariants = require(Components.TextInput.useTextInputVariants)
 local useTokens = require(Foundation.Providers.Style.useTokens)
 local withCommonProps = require(Foundation.Utility.withCommonProps)
@@ -18,49 +19,53 @@ require(Foundation.Enums.InputVariant)
 require(Foundation.Enums.ControlState)
 
 local t1 = {
-	size = InputSize.Medium,
 	numLines = 3,
-	testId = "--foundation-text-area"
+	testId = "--foundation-text-area",
+	size = InputSize.Medium
 }
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ TextArea ]] -- line: 39
-	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), Flags (copy), React (copy), InputField (copy), withCommonProps (copy), InternalTextInput (copy)
-	local v16 = withDefaults(p1, t1)
-	local v17 = useTokens()
-	local v18 = useTextInputVariants(v17, v16.size, if not Flags.FoundationTextAreaVariant then nil else v16.variant)
+local function TextArea(p1, p2) -- line: 40
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useTextInputVariants (copy), React (copy), InputField (copy), withCommonProps (copy), Flags (copy), getInputTextSize (copy), InternalTextInput (copy)
+	local v18 = withDefaults(p1, t1)
+	local v19 = useTokens()
+	local v20 = useTextInputVariants(v19, v18.size, v18.variant)
 
-	return React.createElement(InputField, withCommonProps(v16, {
-		width = if not v16.width then nil else v16.width,
-		label = v16.label,
-		hint = v16.hint,
-		hasError = v16.hasError,
-		isDisabled = v16.isDisabled,
-		isRequired = v16.isRequired,
-		input = function(p3) --[[ input ]] -- line: 54
-			-- upvalues: React (copy), InternalTextInput (copy), v16 (copy), Flags (copy), v18 (copy), v17 (copy)
+	return React.createElement(InputField, withCommonProps(v18, {
+		width = if not v18.width then nil else v18.width,
+		label = v18.label,
+		size = if not Flags.FoundationTextInputsBetaUpdate then nil else getInputTextSize(v18.size),
+		hint = v18.hint,
+		hasError = v18.hasError,
+		isDisabled = v18.isDisabled,
+		isRequired = v18.isRequired,
+		input = function(p3) -- line: 55
+			-- upvalues: React (copy), InternalTextInput (copy), v18 (copy), v20 (copy), v19 (copy)
 			return React.createElement(InternalTextInput, {
-				size = v16.size,
-				variant = if not Flags.FoundationTextAreaVariant then nil else v16.variant,
-				numLines = v16.numLines,
-				focusBehavior = if not Flags.FoundationTextInputFocusBehavior then nil else v16.focusBehavior,
-				onFocus = v16.onFocusGained,
-				onFocusLost = v16.onFocusLost,
-				onChanged = v16.onChanged,
-				text = v16.text,
-				hasError = v16.hasError,
-				isDisabled = v16.isDisabled,
-				hasClearButton = if not Flags.FoundationInternalTextInputClearButton then nil else v16.hasClearButton,
-				placeholder = v16.placeholder,
-				horizontalPadding = {
-					left = ((if not Flags.FoundationInputVariantsConsolidateContainer then v18.innerContainer else v18.container)).horizontalPadding,
-					right = ((if not Flags.FoundationInputVariantsConsolidateContainer then v18.innerContainer else v18.container)).horizontalPadding - UDim.new(0, v17.Size.Size_150)
-				},
 				LayoutOrder = 2,
+				inputRef = v18.inputRef,
+				size = v18.size,
+				variant = v18.variant,
+				numLines = v18.numLines,
+				focusBehavior = v18.focusBehavior,
+				onFocus = v18.onFocusGained,
+				onFocusLost = v18.onFocusLost,
+				onChanged = v18.onChanged,
+				text = v18.text,
+				hasError = v18.hasError,
+				isDisabled = v18.isDisabled,
+				hasClearButton = v18.hasClearButton,
+				placeholder = v18.placeholder,
+				horizontalPadding = {
+					left = v20.container.horizontalPadding,
+					right = v20.container.horizontalPadding - UDim.new(0, v19.Size.Size_150)
+				},
 				ref = p3,
-				testId = `{ v16.testId }--input`
+				testId = `{ v18.testId }--input`
 			})
 		end,
-		textBoxRef = v16.textBoxRef,
+		textBoxRef = v18.textBoxRef,
 		ref = p2
 	}))
-end))
+end
+
+return React.memo(React.forwardRef(TextArea))

@@ -1,19 +1,22 @@
-return function(v0, v1) --[[ Line: 9 ]]
-    local v2 = {};
-    for v3, v4 in pairs(v1) do
-        v2[v0[v3]] = v4;
-    end;
-    local v5 = getmetatable(v0);
-    local l___index_0 = v5.__index;
-    v5.__index = function(_, v8) --[[ Line: 17 ]]
-        -- upvalues: v2 (copy), l___index_0 (copy)
-        if v8 == "toRawValue" then
-            return function(v9) --[[ Line: 19 ]]
-                -- upvalues: v2 (ref)
-                return v2[v9];
-            end;
-        else
-            return l___index_0[v8];
-        end;
-    end;
-end;
+return function(p1, p2) -- line: 9
+	local t1 = {}
+
+	for k, v in pairs(p2) do
+		t1[p1[k]] = v
+	end
+
+	local mt = getmetatable(p1)
+	local __index = mt.__index
+
+	function mt.__index(_, p4) -- line: 17
+		-- upvalues: t1 (copy), __index (copy)
+		if p4 == "toRawValue" then
+			return function(p5) -- line: 19
+				-- upvalues: t1 (copy)
+				return t1[p5]
+			end
+		end
+
+		return __index[p4]
+	end
+end

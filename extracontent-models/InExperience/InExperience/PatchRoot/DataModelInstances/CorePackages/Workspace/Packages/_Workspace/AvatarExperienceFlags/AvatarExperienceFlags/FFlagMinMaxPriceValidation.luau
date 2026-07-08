@@ -1,1 +1,1 @@
-return game:DefineFastFlag("MinMaxPriceValidation", false);
+return game:DefineFastFlag("MinMaxPriceValidation", false)

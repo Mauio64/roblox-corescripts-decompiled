@@ -1,31 +1,35 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GraphQLError_0 = require(l_Parent_0.error.GraphQLError).GraphQLError;
+local ParentParent = script.Parent.Parent.Parent
+local GraphQLError = require(ParentParent.error.GraphQLError).GraphQLError
+
 return {
-    UniqueArgumentNamesRule = function(v2) --[[ Line: 20 ]]
-        -- upvalues: l_GraphQLError_0 (copy)
-        local v3 = {};
-        return {
-            Field = function() --[[ Line: 24 ]] --[[ Name: Field ]]
-                -- upvalues: v3 (ref)
-                v3 = {};
-            end, 
-            Directive = function() --[[ Line: 27 ]] --[[ Name: Directive ]]
-                -- upvalues: v3 (ref)
-                v3 = {};
-            end, 
-            Argument = function(_, v5) --[[ Line: 30 ]] --[[ Name: Argument ]]
-                -- upvalues: v3 (ref), v2 (copy), l_GraphQLError_0 (ref)
-                local l_value_0 = v5.name.value;
-                if v3[l_value_0] then
-                    v2:reportError(l_GraphQLError_0.new(("There can be only one argument named \"%s\"."):format(l_value_0), {
-                        v3[l_value_0], 
-                        v5.name
-                    }));
-                else
-                    v3[l_value_0] = v5.name;
-                end;
-                return false;
-            end
-        };
-    end
-};
+	UniqueArgumentNamesRule = function(p1) -- line: 20
+		-- upvalues: GraphQLError (copy)
+		local t1 = {}
+
+		return {
+			Field = function() -- line: 24
+				-- upvalues: t1 (ref)
+				t1 = {}
+			end,
+			Directive = function() -- line: 27
+				-- upvalues: t1 (ref)
+				t1 = {}
+			end,
+			Argument = function(_, p3) -- line: 30
+				-- upvalues: t1 (ref), p1 (copy), GraphQLError (copy)
+				local value = p3.name.value
+
+				if t1[value] then
+					p1:reportError(GraphQLError.new(("There can be only one argument named \"%s\"."):format(value), {
+						t1[value],
+						p3.name
+					}))
+				else
+					t1[value] = p3.name
+				end
+
+				return false
+			end
+		}
+	end
+}

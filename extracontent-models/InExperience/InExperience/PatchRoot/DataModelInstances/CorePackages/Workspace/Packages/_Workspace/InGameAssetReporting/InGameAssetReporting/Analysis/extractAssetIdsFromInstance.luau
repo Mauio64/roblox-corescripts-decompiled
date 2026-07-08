@@ -1,82 +1,125 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InGameAssetReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_script_FirstAncestor_0.Analysis.Types);
-local l_FFlagReportIPInfringement_0 = require(l_Parent_0.SharedFlags).FFlagReportIPInfringement;
-extractAssetIdsFromInstance = function(v4) --[[ Line: 7 ]] --[[ Name: extractAssetIdsFromInstance ]]
-    -- upvalues: l_FFlagReportIPInfringement_0 (copy)
-    local v5 = {
-        Package = {}, 
-        Model = {}, 
-        Image = {}, 
-        Mesh = {}, 
-        Text = {}, 
-        Video = {}
-    };
-    if v4:IsA("PackageLink") and v4.PackageId ~= "" and v4.VersionNumber > 0 then
-        table.insert(v5.Package, {
-            id = v4.PackageId, 
-            version = v4.VersionNumber
-        });
-        return v5;
-    elseif v4:IsA("Model") and v4.SourceAssetId > 0 then
-        table.insert(v5.Model, (tostring(v4.SourceAssetId)));
-        return v5;
-    else
-        if v4:IsA("MeshPart") and v4.MeshId ~= "" then
-            table.insert(v5.Mesh, v4.MeshId);
-            if v4.TextureID ~= "" then
-                table.insert(v5.Image, v4.TextureID);
-                return v5;
-            end;
-        elseif (v4.ClassName == "FileMesh" or v4.ClassName == "SpecialMesh" and v4.MeshType == Enum.MeshType.FileMesh) and v4.MeshId ~= "" then
-            table.insert(v5.Mesh, v4.MeshId);
-            if v4.TextureId ~= "" then
-                table.insert(v5.Image, v4.TextureId);
-                return v5;
-            end;
-        elseif v4:IsA("ImageLabel") and v4.Image ~= "" then
-            table.insert(v5.Image, v4.Image);
-            return v5;
-        elseif v4:IsA("ImageButton") then
-            if v4.Image ~= "" then
-                table.insert(v5.Image, v4.Image);
-            end;
-            if v4.HoverImage ~= "" then
-                table.insert(v5.Image, v4.HoverImage);
-            end;
-            if v4.PressedImage ~= "" then
-                table.insert(v5.Image, v4.PressedImage);
-                return v5;
-            end;
-        elseif v4:IsA("Decal") and v4.Texture ~= "" then
-            table.insert(v5.Image, v4.Texture);
-            return v5;
-        elseif v4:IsA("SurfaceAppearance") and v4.ColorMap ~= "" then
-            table.insert(v5.Image, v4.ColorMap);
-            return v5;
-        elseif v4:IsA("TextLabel") and v4.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-            table.insert(v5.Text, v4.Text);
-            return v5;
-        elseif v4:IsA("TextButton") and v4.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-            table.insert(v5.Text, v4.Text);
-            return v5;
-        elseif v4:IsA("TextBox") and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
-            if v4.Text ~= "" then
-                table.insert(v5.Text, v4.Text);
-                return v5;
-            elseif v4.PlaceholderText ~= "" then
-                table.insert(v5.Text, v4.PlaceholderText);
-                return v5;
-            end;
-        elseif l_FFlagReportIPInfringement_0 and v4:IsA("VideoFrame") then
-            if v4.Video ~= "" then
-                table.insert(v5.Video, v4.Video);
-                return v5;
-            end;
-        else
-            return nil;
-        end;
-        return v5;
-    end;
-end;
-return extractAssetIdsFromInstance;
+local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+local InGameAssetReportingParent = InGameAssetReporting.Parent
+
+require(InGameAssetReporting.Analysis.Types)
+
+local FFlagReportIPInfringement = require(InGameAssetReportingParent.SharedFlags).FFlagReportIPInfringement
+
+function extractAssetIdsFromInstance(p1) -- line: 7
+	-- upvalues: FFlagReportIPInfringement (copy)
+	local t1 = {
+		Package = {},
+		Model = {},
+		Image = {},
+		Mesh = {},
+		Text = {},
+		Video = {}
+	}
+
+	if p1:IsA("PackageLink") and (p1.PackageId ~= "" and p1.VersionNumber > 0) then
+		table.insert(t1.Package, {
+			id = p1.PackageId,
+			version = p1.VersionNumber
+		})
+
+		return t1
+	end
+
+	if p1:IsA("Model") and p1.SourceAssetId > 0 then
+		table.insert(t1.Model, (tostring(p1.SourceAssetId)))
+
+		return t1
+	end
+
+	if p1:IsA("MeshPart") and p1.MeshId ~= "" then
+		table.insert(t1.Mesh, p1.MeshId)
+
+		if p1.TextureID ~= "" then
+			table.insert(t1.Image, p1.TextureID)
+
+			return t1
+		end
+	elseif (p1.ClassName == "FileMesh" or p1.ClassName == "SpecialMesh" and p1.MeshType == Enum.MeshType.FileMesh) and p1.MeshId ~= "" then
+		table.insert(t1.Mesh, p1.MeshId)
+
+		if p1.TextureId ~= "" then
+			table.insert(t1.Image, p1.TextureId)
+
+			return t1
+		end
+	else
+		if p1:IsA("ImageLabel") and p1.Image ~= "" then
+			table.insert(t1.Image, p1.Image)
+
+			return t1
+		end
+
+		if p1:IsA("ImageButton") then
+			if p1.Image ~= "" then
+				table.insert(t1.Image, p1.Image)
+			end
+
+			if p1.HoverImage ~= "" then
+				table.insert(t1.Image, p1.HoverImage)
+			end
+
+			if p1.PressedImage ~= "" then
+				table.insert(t1.Image, p1.PressedImage)
+
+				return t1
+			end
+		else
+			if p1:IsA("Decal") and p1.Texture ~= "" then
+				table.insert(t1.Image, p1.Texture)
+
+				return t1
+			end
+
+			if p1:IsA("SurfaceAppearance") and p1.ColorMap ~= "" then
+				table.insert(t1.Image, p1.ColorMap)
+
+				return t1
+			end
+
+			if p1:IsA("TextLabel") and p1.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
+				table.insert(t1.Text, p1.Text)
+
+				return t1
+			end
+
+			if p1:IsA("TextButton") and p1.Text ~= "" and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
+				table.insert(t1.Text, p1.Text)
+
+				return t1
+			end
+
+			if p1:IsA("TextBox") and game:GetEngineFeature("ExperienceStateCaptureExperienceChatSupport") then
+				if p1.Text ~= "" then
+					table.insert(t1.Text, p1.Text)
+
+					return t1
+				end
+
+				if p1.PlaceholderText ~= "" then
+					table.insert(t1.Text, p1.PlaceholderText)
+
+					return t1
+				end
+			else
+				if not FFlagReportIPInfringement or not p1:IsA("VideoFrame") then
+					return nil
+				end
+
+				if p1.Video ~= "" then
+					table.insert(t1.Video, p1.Video)
+
+					return t1
+				end
+			end
+		end
+	end
+
+	return t1
+end
+
+return extractAssetIdsFromInstance

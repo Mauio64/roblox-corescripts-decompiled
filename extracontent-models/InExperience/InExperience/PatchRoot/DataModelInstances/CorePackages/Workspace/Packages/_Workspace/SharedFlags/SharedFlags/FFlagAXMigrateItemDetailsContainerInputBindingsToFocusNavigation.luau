@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMigrateAXFocusBehaviorRoot) and game:DefineFastFlag("AXMigrateItemDetailsContainerInputBindingsToFocusNavigation2", false);
+return true

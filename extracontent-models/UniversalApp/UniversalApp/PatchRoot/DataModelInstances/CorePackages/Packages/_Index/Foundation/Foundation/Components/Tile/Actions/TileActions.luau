@@ -1,16 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.Tile.useTile);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Components.View);
-return function(v6) --[[ Line: 17 ]] --[[ Name: TileActions ]]
-    -- upvalues: v3 (copy), v2 (copy), v5 (copy)
-    local v7 = v3();
-    return v2.createElement(v5, {
-        Visible = v6.Visible, 
-        LayoutOrder = 3, 
-        tag = "auto-y size-full-0 shrink", 
-        testId = ("%*--actions"):format(v7.testId)
-    }, v6.children);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local useTile = require(Foundation.Components.Tile.useTile)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+
+local function TileActions(t1: {[any]: any}) -- line: 17
+	-- upvalues: useTile (copy), React (copy), View (copy)
+	local v8 = useTile()
+
+	return React.createElement(View, {
+		LayoutOrder = 3,
+		tag = "shrink size-full-0 auto-y",
+		Visible = t1.Visible,
+		testId = `{ v8.testId }--actions`
+	}, t1.children)
+end
+
+return TileActions

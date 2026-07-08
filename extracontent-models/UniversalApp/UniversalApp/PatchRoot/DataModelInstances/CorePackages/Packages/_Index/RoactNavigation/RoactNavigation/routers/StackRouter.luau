@@ -1,541 +1,597 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local v5 = require(l_Parent_0.NavigationActions);
-local v6 = require(script.Parent.StackActions);
-local v7 = require(l_Parent_0.utils.KeyGenerator);
-local v8 = require(l_Parent_0.StateUtils);
-local v9 = require(script.Parent.getScreenForRouteName);
-local v10 = require(script.Parent.createConfigGetter);
-local v11 = require(script.Parent.validateRouteConfigArray);
-local v12 = require(script.Parent.validateRouteConfigMap);
-local v13 = require(l_Parent_0.utils.invariant);
-local l_createPathParser_0 = require(script.Parent.pathUtils).createPathParser;
-local v15 = require(script.Parent["ChildIsScreenRouterSymbol.roblox"]);
-local function v16() --[[ Line: 28 ]]
-    return {};
-end;
-local function _(v17) --[[ Line: 32 ]] --[[ Name: behavesLikePushAction ]]
-    -- upvalues: v5 (copy), v6 (copy)
-    local v18 = true;
-    if v17.type ~= v5.Navigate then
-        v18 = v17.type == v6.Push;
-    end;
-    return v18;
-end;
-local function _(v20) --[[ Line: 36 ]] --[[ Name: isResetToRootStack ]]
-    -- upvalues: v6 (copy)
-    local v21 = false;
-    if v20.type == v6.Reset then
-        v21 = v20.key == nil;
-    end;
-    return v21;
-end;
-local function v24(v23) --[[ Line: 40 ]] --[[ Name: mapToRouteName ]]
-    return (next(v23));
-end;
-local function v30(v25, v26, _) --[[ Line: 45 ]] --[[ Name: foldToRoutes ]]
-    local v28, v29 = next(v26);
-    v25[v28] = v29;
-    return v25;
-end;
-return function(v31, v32) --[[ Line: 51 ]]
-    -- upvalues: v11 (copy), v12 (copy), l_Array_0 (copy), v30 (copy), v24 (copy), v15 (copy), v16 (copy), v5 (copy), v6 (copy), l_Object_0 (copy), v7 (copy), l_createPathParser_0 (copy), v13 (copy), v9 (copy), v8 (copy), v10 (copy)
-    v11(v31);
-    v32 = v32 or {};
-    local v33 = v12(l_Array_0.reduce(v31, v30, {}));
-    local v34 = v32.order or l_Array_0.map(v31, v24);
-    local v35 = {};
-    for _, v37 in v34 do
-        local v38 = v33[v37];
-        local v39 = if type(v38) == "table" and v38.screen then v38.screen else v38;
-        if type(v39) == "table" and v39.router then
-            v35[v37] = v39.router;
-        else
-            v35[v37] = v15;
-        end;
-    end;
-    local l_initialRouteParams_0 = v32.initialRouteParams;
-    local v41 = v32.getCustomActionCreators or v16;
-    local v42 = v32.initialRouteName or v34[1];
-    local v43 = v35[v42];
-    if l_Array_0.indexOf(v34, v42) < 1 then
-        local v44 = "";
-        for _, v46 in v34 do
-            v44 = v44 .. v46 .. ",";
-        end;
-        error(string.format("Invalid initialRouteName '%s'. Must be one of [%s]", v42, v44), 2);
-    end;
-    local function v55(v47) --[[ Line: 97 ]] --[[ Name: getInitialState ]]
-        -- upvalues: v35 (copy), v5 (ref), v6 (ref), v15 (ref), l_Object_0 (ref), v7 (ref), v43 (copy), v42 (copy), l_initialRouteParams_0 (copy), v33 (copy), v32 (ref)
-        local v48 = {};
-        local v49 = v35[v47.routeName];
-        local v50 = true;
-        if v47.type ~= v5.Navigate then
-            v50 = v47.type == v6.Push;
-        end;
-        if v50 and v49 ~= nil then
-            v50 = {};
-            if v49 ~= v15 then
-                local v51 = v47.action or v5.init({
-                    params = v47.params
-                });
-                v50 = v49.getStateForAction(v51);
-            end;
-            return {
-                key = "StackRouterRoot", 
-                isTransitioning = false, 
-                index = 1, 
-                routes = {
-                    l_Object_0.assign({
-                        params = v47.params
-                    }, v50, {
-                        key = v47.key or v7.generateKey(), 
-                        routeName = v47.routeName
-                    })
-                }
-            };
-        else
-            if v43 ~= nil and v43 ~= v15 then
-                v48 = v43.getStateForAction(v5.navigate({
-                    routeName = v42, 
-                    params = l_initialRouteParams_0
-                }));
-            end;
-            v50 = v33[v42];
-            local v52 = false;
-            if type(v50) == "table" then
-                v52 = v50.params;
-            end;
-            local v53 = (not not v52 or v48.params or v47.params or l_initialRouteParams_0) and l_Object_0.assign(if v52 then table.clone(v52) else {}, v48.params or {}, v47.params or {}, l_initialRouteParams_0 or {});
-            local l_initialRouteKey_0 = v32.initialRouteKey;
-            v48 = l_Object_0.assign(table.clone(v48), {
-                params = v53, 
-                routeName = v42, 
-                key = v47.key or l_initialRouteKey_0 or v7.generateKey()
-            });
-            return {
-                key = "StackRouterRoot", 
-                isTransitioning = false, 
-                index = 1, 
-                routes = {
-                    v48
-                }
-            };
-        end;
-    end;
-    local function v59(v56, v57) --[[ Line: 162 ]] --[[ Name: getParamsForRouteAndAction ]]
-        -- upvalues: l_Object_0 (ref), v33 (copy)
-        if v57.params == l_Object_0.None then
-            return nil;
-        else
-            local v58 = v33[v56];
-            if type(v58) == "table" and v58.params then
-                return l_Object_0.assign(table.clone(v58.params), v57.params);
-            elseif v57.params then
-                return l_Object_0.assign({}, v57.params);
-            else
-                return nil;
-            end;
-        end;
-    end;
-    local v60 = l_createPathParser_0(v35, v33, v32);
-    local l_getPathAndParamsForRoute_0 = v60.getPathAndParamsForRoute;
-    local l_getActionForPathAndParams_0 = v60.getActionForPathAndParams;
-    local v63 = {};
-    for v64, v65 in v35 do
-        if v65 ~= v15 then
-            v63[v64] = v65;
-        end;
-    end;
-    return {
-        childRouters = v63, 
-        _CHILD_IS_SCREEN = v15, 
-        getComponentForState = function(v66) --[[ Line: 199 ]] --[[ Name: getComponentForState ]]
-            -- upvalues: v13 (ref), v35 (copy), v15 (ref), v9 (ref), v33 (copy)
-            local v67 = v66.routes[v66.index] or {};
-            local l_routeName_0 = v67.routeName;
-            v13(l_routeName_0, "There is no route defined for index '%d'. Make sure that you passed in a navigation state with a valid stack index.", v66.index);
-            local v69 = v35[l_routeName_0];
-            if v69 ~= nil and v69 ~= v15 then
-                return v35[l_routeName_0].getComponentForState(v67);
-            else
-                return v9(v33, l_routeName_0);
-            end;
-        end, 
-        getComponentForRouteName = function(v70) --[[ Line: 220 ]] --[[ Name: getComponentForRouteName ]]
-            -- upvalues: v9 (ref), v33 (copy)
-            return v9(v33, v70);
-        end, 
-        getActionCreators = function(v71, v72) --[[ Line: 224 ]] --[[ Name: getActionCreators ]]
-            -- upvalues: l_Object_0 (ref), v41 (copy), v6 (ref), v13 (ref), v5 (ref)
-            return l_Object_0.assign(table.clone(v41(v71, v72)), {
-                pop = function(v73, v74) --[[ Line: 226 ]] --[[ Name: pop ]]
-                    -- upvalues: v6 (ref), l_Object_0 (ref)
-                    return v6.pop(l_Object_0.assign({
-                        n = v73
-                    }, v74 or {}));
-                end, 
-                popToTop = function(v75) --[[ Line: 229 ]] --[[ Name: popToTop ]]
-                    -- upvalues: v6 (ref)
-                    return v6.popToTop(v75);
-                end, 
-                push = function(v76, v77, v78) --[[ Line: 232 ]] --[[ Name: push ]]
-                    -- upvalues: v6 (ref)
-                    return v6.push({
-                        routeName = v76, 
-                        params = v77, 
-                        action = v78
-                    });
-                end, 
-                replace = function(v79, v80, v81, v82) --[[ Line: 239 ]] --[[ Name: replace ]]
-                    -- upvalues: v6 (ref), v71 (copy), v13 (ref)
-                    if type(v79) == "string" then
-                        return v6.replace({
-                            routeName = v79, 
-                            params = v80, 
-                            action = v81, 
-                            key = v71.key, 
-                            newKey = v82
-                        });
-                    else
-                        v13(type(v79) == "table", "replaceWith must be a table or string");
-                        v13(v80 == nil, "params must not be provided to .replace() when specifying a table");
-                        v13(v81 == nil, "Child action must not be provided to .replace() when specifying a table");
-                        v13(v82 == nil, "newKey must not be provided to .replace() when specifying a table");
-                        return v6.replace(v79);
-                    end;
-                end, 
-                reset = function(v83, v84) --[[ Line: 257 ]] --[[ Name: reset ]]
-                    -- upvalues: v6 (ref), v72 (copy)
-                    local l_v84_0 = v84;
-                    if v84 == nil then
-                        l_v84_0 = #v83;
-                    end;
-                    return v6.reset({
-                        actions = v83, 
-                        index = l_v84_0, 
-                        key = v72
-                    });
-                end, 
-                dismiss = function() --[[ Line: 269 ]] --[[ Name: dismiss ]]
-                    -- upvalues: v5 (ref), v72 (copy)
-                    return v5.back({
-                        key = v72
-                    });
-                end
-            });
-        end, 
-        getStateForAction = function(v86, v87) --[[ Line: 277 ]] --[[ Name: getStateForAction ]]
-            -- upvalues: v55 (copy), v6 (ref), v5 (ref), v35 (copy), v15 (ref), v8 (ref), l_Object_0 (ref), v13 (ref), l_Array_0 (ref), v59 (copy), v7 (ref)
-            if not v87 then
-                return (v55(v86));
-            else
-                local v88 = v87.routes[v87.index];
-                local v89 = false;
-                if v86.type == v6.Reset then
-                    v89 = v86.key == nil;
-                end;
-                if not v89 and v86.type ~= v5.Navigate then
-                    v89 = v35[v88.routeName];
-                    if v89 ~= nil and v89 ~= v15 then
-                        local v90 = v89.getStateForAction(v86, v88);
-                        if v90 ~= nil and v90 ~= v88 then
-                            return v8.replaceAt(v87, v88.key, v90, v86.type == v5.SetParams);
-                        end;
-                    end;
-                elseif v86.type == v5.Navigate then
-                    for v91 = #v87.routes, 1, -1 do
-                        local v92 = v87.routes[v91];
-                        local v93 = v35[v92.routeName];
-                        local l_v86_0 = v86;
-                        if v86.routeName == v92.routeName and v86.action then
-                            l_v86_0 = v86.action;
-                        end;
-                        if v93 ~= nil and v93 ~= v15 then
-                            local v95 = v93.getStateForAction(l_v86_0, v92);
-                            if v95 == nil or v95 ~= v92 then
-                                local v96 = v8.replaceAndPrune(v87, if v95 then v95.key else v92.key, v95 or v92);
-                                local l_isTransitioning_0 = v87.isTransitioning;
-                                if v87.index ~= v96.index then
-                                    l_isTransitioning_0 = v86.immediate ~= true;
-                                end;
-                                return l_Object_0.assign(table.clone(v96), {
-                                    isTransitioning = l_isTransitioning_0
-                                });
-                            end;
-                        end;
-                    end;
-                end;
-                v89 = true;
-                if v86.type ~= v5.Navigate then
-                    v89 = v86.type == v6.Push;
-                end;
-                if v89 and v35[v86.routeName] ~= nil then
-                    v89 = v35[v86.routeName];
-                    local l_v13_0 = v13;
-                    local v99 = true;
-                    if v86.type == v6.Push then
-                        v99 = v86.key == nil;
-                    end;
-                    l_v13_0(v99, "StackRouter does not support key on the push action");
-                    l_v13_0 = function(v100) --[[ Line: 349 ]]
-                        -- upvalues: v86 (copy)
-                        return v100.routeName == v86.routeName;
-                    end;
-                    if v86.key then
-                        l_v13_0 = function(v101) --[[ Line: 353 ]]
-                            -- upvalues: v86 (copy)
-                            return v101.key == v86.key;
-                        end;
-                    end;
-                    v99 = l_Array_0.findIndex(v87.routes, l_v13_0);
-                    if v86.type ~= v6.Push and v99 > 0 then
-                        if v87.index == v99 and not v86.params then
-                            return nil;
-                        else
-                            local v102 = l_Array_0.slice(v87.routes, 1, v99 + 1);
-                            if v86.params then
-                                local v103 = v87.routes[v99];
-                                v102[v99] = l_Object_0.assign(table.clone(v103), {
-                                    params = if v86.params == l_Object_0.None then l_Object_0.None else if v103.params then l_Object_0.assign(table.clone(v103.params), v86.params) else table.clone(v86.params)
-                                });
-                            end;
-                            local l_isTransitioning_1 = v87.isTransitioning;
-                            if v87.index ~= v99 then
-                                l_isTransitioning_1 = v86.immediate ~= true;
-                            end;
-                            return l_Object_0.assign(table.clone(v87), {
-                                isTransitioning = l_isTransitioning_1, 
-                                index = v99, 
-                                routes = v102
-                            });
-                        end;
-                    else
-                        local v105 = nil;
-                        if v89 ~= v15 then
-                            local v106 = v86.action or v5.init({
-                                params = v59(v86.routeName, v86)
-                            });
-                            v105 = l_Object_0.assign({
-                                params = v59(v86.routeName, v86)
-                            }, v89.getStateForAction(v106), {
-                                routeName = v86.routeName, 
-                                key = v86.key or v7.generateKey()
-                            });
-                        else
-                            v105 = {
-                                params = v59(v86.routeName, v86), 
-                                routeName = v86.routeName, 
-                                key = v86.key or v7.generateKey()
-                            };
-                        end;
-                        return l_Object_0.assign(v8.push(v87, v105), {
-                            isTransitioning = v86.immediate ~= true
-                        });
-                    end;
-                elseif v86.type == v6.Push and v35[v86.routeName] == nil then
-                    return v87;
-                else
-                    v89 = true;
-                    if v86.type ~= v5.Navigate then
-                        v89 = v86.type == v6.Push;
-                    end;
-                    if v89 then
-                        for v107 in v35 do
-                            local v108 = v35[v107];
-                            if v108 ~= nil and v108 ~= v15 then
-                                local v109 = v108.getStateForAction(v5.init());
-                                local v110 = v108.getStateForAction(v86, v109);
-                                local v111 = nil;
-                                if v110 == nil then
-                                    v111 = v109;
-                                elseif v110 ~= v109 then
-                                    v111 = v110;
-                                end;
-                                if v111 then
-                                    local v112 = l_Object_0.assign(table.clone(v111), {
-                                        routeName = v107, 
-                                        key = v86.key or v7.generateKey()
-                                    });
-                                    return l_Object_0.assign(v8.push(v87, v112), {
-                                        isTransitioning = v86.immediate ~= true
-                                    });
-                                end;
-                            end;
-                        end;
-                    end;
-                    if v86.type == v6.PopToTop then
-                        if v86.key and v87.key ~= v86.key then
-                            return v87;
-                        elseif v87.index > 1 then
-                            return l_Object_0.assign(table.clone(v87), {
-                                isTransitioning = v86.immediate ~= true, 
-                                index = 1, 
-                                routes = {
-                                    v87.routes[1]
-                                }
-                            });
-                        else
-                            return v87;
-                        end;
-                    else
-                        if v86.type == v6.Replace then
-                            v89 = nil;
-                            v89 = if v86.key == nil and #v87.routes > 0 then #v87.routes else l_Array_0.findIndex(v87.routes, function(v113) --[[ Line: 496 ]]
-                                -- upvalues: v86 (copy)
-                                return v113.key == v86.key;
-                            end);
-                            if v89 > 0 then
-                                local v114 = v35[v86.routeName];
-                                local v115 = {};
-                                if v114 ~= nil and v114 ~= v15 then
-                                    local v116 = v86.action or v5.init({
-                                        params = v59(v86.routeName, v86)
-                                    });
-                                    v115 = v114.getStateForAction(v116);
-                                end;
-                                local v117 = table.clone(v87.routes);
-                                v117[v89] = l_Object_0.assign({
-                                    params = v59(v86.routeName, v86)
-                                }, v115, {
-                                    routeName = v86.routeName, 
-                                    key = v86.newKey or v7.generateKey()
-                                });
-                                return l_Object_0.assign(table.clone(v87), {
-                                    routes = v117
-                                });
-                            end;
-                        end;
-                        if v86.type == v6.CompleteTransition and (v86.key == nil or v86.key == v87.key) and v86.toChildKey == v87.routes[v87.index].key and v87.isTransitioning then
-                            return l_Object_0.assign(table.clone(v87), {
-                                isTransitioning = false
-                            });
-                        else
-                            if v86.type == v5.SetParams then
-                                v89 = v86.key;
-                                local l_v89_0 = v89 --[[ copy: 3 -> 15 ]];
-                                local v120 = l_Array_0.findIndex(v87.routes, function(v119) --[[ Line: 545 ]]
-                                    -- upvalues: l_v89_0 (copy)
-                                    return v119.key == l_v89_0;
-                                end);
-                                if v120 > 0 then
-                                    local v121 = v87.routes[v120];
-                                    local l_None_0 = l_Object_0.None;
-                                    if v86.params ~= l_Object_0.None then
-                                        l_None_0 = if v121.params and v86.params then l_Object_0.assign(table.clone(v121.params), v86.params) else if v121.params then table.clone(v121.params) else if v86.params then table.clone(v86.params) else {};
-                                    end;
-                                    local v123 = table.clone(v87.routes);
-                                    v123[v120] = l_Object_0.assign(table.clone(v121), {
-                                        params = l_None_0
-                                    });
-                                    return l_Object_0.assign(table.clone(v87), {
-                                        routes = v123
-                                    });
-                                end;
-                            end;
-                            if v86.type == v6.Reset then
-                                if v86.key ~= nil and v86.key ~= v87.key then
-                                    return v87;
-                                else
-                                    v89 = if v86.actions then l_Array_0.map(v86.actions, function(v124) --[[ Line: 576 ]]
-                                        -- upvalues: v35 (ref), v15 (ref), v5 (ref), v59 (ref), l_Object_0 (ref), v7 (ref)
-                                        local v125 = v35[v124.routeName];
-                                        local v126 = {};
-                                        if v125 ~= nil and v125 ~= v15 then
-                                            local v127 = v124.action or v5.init({
-                                                params = v59(v124.routeName, v124)
-                                            });
-                                            v126 = v125.getStateForAction(v127);
-                                        end;
-                                        return l_Object_0.assign({
-                                            params = v59(v124.routeName, v124)
-                                        }, v126, {
-                                            routeName = v124.routeName, 
-                                            key = v124.key or v7.generateKey()
-                                        });
-                                    end) else {};
-                                    return l_Object_0.assign(table.clone(v87), {
-                                        routes = v89, 
-                                        index = v86.index
-                                    });
-                                end;
-                            else
-                                if v86.type == v5.Back or v86.type == v6.Pop then
-                                    v89 = v86.key;
-                                    local l_n_0 = v86.n;
-                                    local l_immediate_0 = v86.immediate;
-                                    local l_prune_0 = v86.prune;
-                                    if v86.type == v6.Pop and l_prune_0 == false and v89 then
-                                        local l_v89_1 = v89 --[[ copy: 3 -> 14 ]];
-                                        local v133 = l_Array_0.findIndex(v87.routes, function(v132) --[[ Line: 617 ]]
-                                            -- upvalues: l_v89_1 (copy)
-                                            return v132.key == l_v89_1;
-                                        end);
-                                        if v133 > 0 then
-                                            local v134 = math.max(v133 - (l_n_0 or 1), 1);
-                                            local v135 = l_Array_0.concat(l_Array_0.slice(v87.routes, 1, v134 + 1), l_Array_0.slice(v87.routes, v133 + 1));
-                                            if #v135 > 0 then
-                                                return l_Object_0.assign(table.clone(v87), {
-                                                    routes = v135, 
-                                                    index = #v135, 
-                                                    isTransitioning = l_immediate_0 ~= true
-                                                });
-                                            end;
-                                        end;
-                                    else
-                                        local l_index_0 = v87.index;
-                                        if v86.type == v6.Pop and l_n_0 ~= nil then
-                                            l_index_0 = math.max(2, v87.index - l_n_0 + 1);
-                                        elseif v89 then
-                                            local l_v89_2 = v89 --[[ copy: 3 -> 13 ]];
-                                            l_index_0 = l_Array_0.findIndex(v87.routes, function(v138) --[[ Line: 642 ]]
-                                                -- upvalues: l_v89_2 (copy)
-                                                return v138.key == l_v89_2;
-                                            end);
-                                        end;
-                                        if l_index_0 > 1 then
-                                            return l_Object_0.assign(table.clone(v87), {
-                                                routes = l_Array_0.slice(v87.routes, 1, l_index_0), 
-                                                index = l_index_0 - 1, 
-                                                isTransitioning = l_immediate_0 ~= true
-                                            });
-                                        end;
-                                    end;
-                                end;
-                                v89 = if v86.key then v8.indexOf(v87, v86.key) else nil;
-                                for v139 = #v87.routes, 1, -1 do
-                                    local v140 = v87.routes[v139];
-                                    if v140.key ~= v88.key and (v89 == 1 or v140.key == v86.key) then
-                                        local v141 = v35[v140.routeName];
-                                        if v141 ~= nil and v141 ~= v15 then
-                                            local v142 = v141.getStateForAction(v86, v140);
-                                            if v142 == nil then
-                                                return v87;
-                                            elseif v142 ~= v140 then
-                                                return v8.replaceAt(v87, v140.key, v142, v86.preserveFocus);
-                                            end;
-                                        end;
-                                    end;
-                                end;
-                                return v87;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end, 
-        getPathAndParamsForState = function(v143) --[[ Line: 696 ]] --[[ Name: getPathAndParamsForState ]]
-            -- upvalues: l_getPathAndParamsForRoute_0 (copy)
-            local v144 = v143.routes[v143.index];
-            return l_getPathAndParamsForRoute_0(v144);
-        end, 
-        getActionForPathAndParams = function(v145, v146) --[[ Line: 701 ]] --[[ Name: getActionForPathAndParams ]]
-            -- upvalues: l_getActionForPathAndParams_0 (copy)
-            return l_getActionForPathAndParams_0(v145, v146);
-        end, 
-        getScreenOptions = v10(v33, v32.defaultNavigationOptions)
-    };
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local NavigationActions = require(ParentParent.NavigationActions)
+local StackActions = require(script.Parent.StackActions)
+local KeyGenerator = require(ParentParent.utils.KeyGenerator)
+local StateUtils = require(ParentParent.StateUtils)
+local getScreenForRouteName = require(script.Parent.getScreenForRouteName)
+local createConfigGetter = require(script.Parent.createConfigGetter)
+local validateRouteConfigArray = require(script.Parent.validateRouteConfigArray)
+local validateRouteConfigMap = require(script.Parent.validateRouteConfigMap)
+local invariant = require(ParentParent.utils.invariant)
+local createPathParser = require(script.Parent.pathUtils).createPathParser
+local lib = require(script.Parent["ChildIsScreenRouterSymbol.roblox"])
+
+local function v17() -- line: 28
+	return {}
+end
+local function behavesLikePushAction(p1) -- line: 32
+	-- upvalues: NavigationActions (copy), StackActions (copy)
+	return p1.type == NavigationActions.Navigate or p1.type == StackActions.Push
+end
+local function isResetToRootStack(p2) -- line: 36
+	-- upvalues: StackActions (copy)
+	return p2.type == StackActions.Reset and p2.key == nil
+end
+local function mapToRouteName(p3) -- line: 40
+	return (next(p3))
+end
+local function foldToRoutes(p4, p5, _) -- line: 45
+	local v28, v29 = next(p5)
+
+	p4[v28] = v29
+
+	return p4
+end
+
+return function(p7, p8) -- line: 51
+	-- upvalues: validateRouteConfigArray (copy), validateRouteConfigMap (copy), Array (copy), foldToRoutes (copy), mapToRouteName (copy), lib (copy), v17 (copy), NavigationActions (copy), StackActions (copy), Object (copy), KeyGenerator (copy), createPathParser (copy), invariant (copy), getScreenForRouteName (copy), StateUtils (copy), createConfigGetter (copy)
+	validateRouteConfigArray(p7)
+
+	local u32 = p8 or {}
+	local v33 = validateRouteConfigMap(Array.reduce(p7, foldToRoutes, {}))
+	local v34 = u32.order or Array.map(p7, mapToRouteName)
+	local t1 = {}
+
+	for _, v37 in v34 do
+		local v38 = v33[v37]
+		local v39 = if type(v38) ~= "table" or not v38.screen then v38 else v38.screen
+
+		if type(v39) == "table" and v39.router then
+			t1[v37] = v39.router
+		else
+			t1[v37] = lib
+		end
+	end
+
+	local initialRouteParams = u32.initialRouteParams
+	local v41 = u32.getCustomActionCreators or v17
+	local v42 = u32.initialRouteName or v34[1]
+	local v43 = t1[v42]
+
+	if Array.indexOf(v34, v42) < 1 then
+		local s1 = ""
+
+		for _, v46 in v34 do
+			s1 ..= v46 .. ","
+		end
+
+		error(string.format("Invalid initialRouteName '%s'. Must be one of [%s]", v42, s1), 2)
+	end
+
+	local function getInitialState(p9) -- line: 97
+		-- upvalues: t1 (copy), NavigationActions (copy), StackActions (copy), lib (copy), Object (copy), KeyGenerator (copy), v43 (copy), v42 (copy), initialRouteParams (copy), v33 (copy), u32 (ref)
+		local t2 = {}
+		local v57 = t1[p9.routeName]
+
+		if (p9.type == NavigationActions.Navigate or p9.type == StackActions.Push) and v57 ~= nil then
+			local t3 = {}
+
+			if v57 ~= lib then
+				local v59 = p9.action or NavigationActions.init({
+					params = p9.params
+				})
+
+				t3 = v57.getStateForAction(v59)
+			end
+
+			return {
+				key = "StackRouterRoot",
+				isTransitioning = false,
+				index = 1,
+				routes = { Object.assign({
+					params = p9.params
+				}, t3, {
+					key = p9.key or KeyGenerator.generateKey(),
+					routeName = p9.routeName
+				}) }
+			}
+		end
+
+		if v43 ~= nil and v43 ~= lib then
+			t2 = v43.getStateForAction(NavigationActions.navigate({
+				routeName = v42,
+				params = initialRouteParams
+			}))
+		end
+
+		local v60 = v33[v42]
+		local v61 = type(v60) == "table" and v60.params
+		local v62 = (v61 or (t2.params or (p9.params or initialRouteParams))) and Object.assign(if not v61 then {} else table.clone(v61), t2.params or {}, p9.params or {}, initialRouteParams or {})
+		local initialRouteKey = u32.initialRouteKey
+		local v64 = Object.assign(table.clone(t2), {
+			params = v62,
+			routeName = v42,
+			key = p9.key or (initialRouteKey or KeyGenerator.generateKey())
+		})
+
+		return {
+			key = "StackRouterRoot",
+			isTransitioning = false,
+			index = 1,
+			routes = { v64 }
+		}
+	end
+	local function getParamsForRouteAndAction(p10, p11) -- line: 162
+		-- upvalues: Object (copy), v33 (copy)
+		if p11.params == Object.None then
+			return nil
+		end
+
+		local v67 = v33[p10]
+
+		if type(v67) == "table" and v67.params then
+			return Object.assign(table.clone(v67.params), p11.params)
+		end
+
+		if p11.params then
+			return Object.assign({}, p11.params)
+		end
+
+		return nil
+	end
+
+	local v49 = createPathParser(t1, v33, u32)
+	local getPathAndParamsForRoute = v49.getPathAndParamsForRoute
+	local getActionForPathAndParams = v49.getActionForPathAndParams
+	local t4 = {}
+
+	for v53, v54 in t1 do
+		if v54 ~= lib then
+			t4[v53] = v54
+		end
+	end
+
+	return {
+		childRouters = t4,
+		_CHILD_IS_SCREEN = lib,
+		getComponentForState = function(p12) -- line: 199
+			-- upvalues: invariant (copy), t1 (copy), lib (copy), getScreenForRouteName (copy), v33 (copy)
+			local v69 = p12.routes[p12.index] or {}
+			local routeName = v69.routeName
+
+			invariant(routeName, "There is no route defined for index '%d'. Make sure that you passed in a navigation state with a valid stack index.", p12.index)
+
+			local v71 = t1[routeName]
+
+			if v71 ~= nil and v71 ~= lib then
+				return t1[routeName].getComponentForState(v69)
+			end
+
+			return getScreenForRouteName(v33, routeName)
+		end,
+		getComponentForRouteName = function(p13) -- line: 220
+			-- upvalues: getScreenForRouteName (copy), v33 (copy)
+			return getScreenForRouteName(v33, p13)
+		end,
+		getActionCreators = function(p14, p15) -- line: 224
+			-- upvalues: Object (copy), v41 (copy), StackActions (copy), invariant (copy), NavigationActions (copy)
+			return Object.assign(table.clone(v41(p14, p15)), {
+				pop = function(p16, p17) -- line: 226
+					-- upvalues: StackActions (copy), Object (copy)
+					return StackActions.pop(Object.assign({
+						n = p16
+					}, p17 or {}))
+				end,
+				popToTop = function(p18) -- line: 229
+					-- upvalues: StackActions (copy)
+					return StackActions.popToTop(p18)
+				end,
+				push = function(p19, p20, p21) -- line: 232
+					-- upvalues: StackActions (copy)
+					return StackActions.push({
+						routeName = p19,
+						params = p20,
+						action = p21
+					})
+				end,
+				replace = function(p22, p23, p24, p25) -- line: 239
+					-- upvalues: StackActions (copy), p14 (copy), invariant (copy)
+					if type(p22) == "string" then
+						return StackActions.replace({
+							routeName = p22,
+							params = p23,
+							action = p24,
+							key = p14.key,
+							newKey = p25
+						})
+					end
+
+					invariant(type(p22) == "table", "replaceWith must be a table or string")
+					invariant(p23 == nil, "params must not be provided to .replace() when specifying a table")
+					invariant(p24 == nil, "Child action must not be provided to .replace() when specifying a table")
+					invariant(p25 == nil, "newKey must not be provided to .replace() when specifying a table")
+
+					return StackActions.replace(p22)
+				end,
+				reset = function(p26, p27) -- line: 257
+					-- upvalues: StackActions (copy), p15 (copy)
+					if p27 == nil then
+						p27 = #p26
+					end
+
+					return StackActions.reset({
+						actions = p26,
+						index = p27,
+						key = p15
+					})
+				end,
+				dismiss = function() -- line: 269
+					-- upvalues: NavigationActions (copy), p15 (copy)
+					return NavigationActions.back({
+						key = p15
+					})
+				end
+			})
+		end,
+		getStateForAction = function(p28, p29) -- line: 277
+			-- upvalues: getInitialState (copy), StackActions (copy), NavigationActions (copy), t1 (copy), lib (copy), StateUtils (copy), Object (copy), invariant (copy), Array (copy), getParamsForRouteAndAction (copy), KeyGenerator (copy)
+			if not p29 then
+				return (getInitialState(p28))
+			end
+
+			local v77 = p29.routes[p29.index]
+
+			if (p28.type ~= StackActions.Reset or p28.key ~= nil) and p28.type ~= NavigationActions.Navigate then
+				local v78 = t1[v77.routeName]
+
+				if v78 ~= nil and v78 ~= lib then
+					local v79 = v78.getStateForAction(p28, v77)
+
+					if v79 ~= nil and v79 ~= v77 then
+						return StateUtils.replaceAt(p29, v77.key, v79, p28.type == NavigationActions.SetParams)
+					end
+				end
+			elseif p28.type == NavigationActions.Navigate then
+				for i = #p29.routes, 1, -1 do
+					local v81 = p29.routes[i]
+					local v82 = t1[v81.routeName]
+					local v83 = p28
+
+					if p28.routeName == v81.routeName and p28.action then
+						v83 = p28.action
+					end
+
+					if v82 == nil or v82 == lib then
+						continue
+					end
+
+					local v84 = v82.getStateForAction(v83, v81)
+
+					if v84 == nil or v84 ~= v81 then
+						local v85 = StateUtils.replaceAndPrune(p29, if not v84 then v81.key else v84.key, v84 or v81)
+						local isTransitioning = p29.isTransitioning
+
+						if p29.index ~= v85.index then
+							isTransitioning = p28.immediate ~= true
+						end
+
+						return Object.assign(table.clone(v85), {
+							isTransitioning = isTransitioning
+						})
+					end
+				end
+			end
+
+			if (p28.type == NavigationActions.Navigate or p28.type == StackActions.Push) and t1[p28.routeName] ~= nil then
+				local v87 = t1[p28.routeName]
+
+				invariant(p28.type ~= StackActions.Push or p28.key == nil, "StackRouter does not support key on the push action")
+
+				local function v88(p30) -- line: 349
+					-- upvalues: p28 (copy)
+					return p30.routeName == p28.routeName
+				end
+
+				if p28.key then
+					function v88(p31) -- line: 353
+						-- upvalues: p28 (copy)
+						return p31.key == p28.key
+					end
+				end
+
+				local v89 = Array.findIndex(p29.routes, v88)
+
+				if p28.type ~= StackActions.Push and v89 > 0 then
+					if v89 == p29.index and not p28.params then
+						return nil
+					end
+
+					local v90 = Array.slice(p29.routes, 1, v89 + 1)
+
+					if p28.params then
+						local v91 = p29.routes[v89]
+
+						v90[v89] = Object.assign(table.clone(v91), {
+							params = if p28.params ~= Object.None then if v91.params then Object.assign(table.clone(v91.params), p28.params) else table.clone(p28.params) else Object.None
+						})
+					end
+
+					local isTransitioning = p29.isTransitioning
+
+					if v89 ~= p29.index then
+						isTransitioning = p28.immediate ~= true
+					end
+
+					return Object.assign(table.clone(p29), {
+						isTransitioning = isTransitioning,
+						index = v89,
+						routes = v90
+					})
+				end
+
+				local v94
+
+				if v87 ~= lib then
+					local v93 = p28.action or NavigationActions.init({
+						params = getParamsForRouteAndAction(p28.routeName, p28)
+					})
+
+					v94 = Object.assign({
+						params = getParamsForRouteAndAction(p28.routeName, p28)
+					}, v87.getStateForAction(v93), {
+						routeName = p28.routeName,
+						key = p28.key or KeyGenerator.generateKey()
+					})
+				else
+					v94 = {
+						params = getParamsForRouteAndAction(p28.routeName, p28),
+						routeName = p28.routeName,
+						key = p28.key or KeyGenerator.generateKey()
+					}
+				end
+
+				return Object.assign(StateUtils.push(p29, v94), {
+					isTransitioning = p28.immediate ~= true
+				})
+			end
+
+			if p28.type == StackActions.Push and t1[p28.routeName] == nil then
+				return p29
+			end
+
+			if p28.type == NavigationActions.Navigate or p28.type == StackActions.Push then
+				for v95 in t1 do
+					local v96 = t1[v95]
+
+					if v96 == nil or v96 == lib then
+						continue
+					end
+
+					local v97 = v96.getStateForAction(NavigationActions.init())
+					local v98 = v96.getStateForAction(p28, v97)
+					local v99 = nil
+
+					if v98 == nil then
+						v99 = v97
+					elseif v98 ~= v97 then
+						v99 = v98
+					end
+
+					if v99 then
+						local v100 = Object.assign(table.clone(v99), {
+							routeName = v95,
+							key = p28.key or KeyGenerator.generateKey()
+						})
+
+						return Object.assign(StateUtils.push(p29, v100), {
+							isTransitioning = p28.immediate ~= true
+						})
+					end
+				end
+			end
+
+			if p28.type == StackActions.PopToTop then
+				if p28.key and p29.key ~= p28.key then
+					return p29
+				end
+
+				if p29.index > 1 then
+					return Object.assign(table.clone(p29), {
+						index = 1,
+						isTransitioning = p28.immediate ~= true,
+						routes = { p29.routes[1] }
+					})
+				end
+
+				return p29
+			end
+
+			if p28.type == StackActions.Replace then
+				local v101 = if p28.key ~= nil or not (#p29.routes > 0) then Array.findIndex(p29.routes, function(p32) -- line: 496
+					-- upvalues: p28 (copy)
+					return p32.key == p28.key
+				end) else #p29.routes
+
+				if v101 > 0 then
+					local v102 = t1[p28.routeName]
+					local t5 = {}
+
+					if v102 ~= nil and v102 ~= lib then
+						local v104 = p28.action or NavigationActions.init({
+							params = getParamsForRouteAndAction(p28.routeName, p28)
+						})
+
+						t5 = v102.getStateForAction(v104)
+					end
+
+					local v105 = table.clone(p29.routes)
+
+					v105[v101] = Object.assign({
+						params = getParamsForRouteAndAction(p28.routeName, p28)
+					}, t5, {
+						routeName = p28.routeName,
+						key = p28.newKey or KeyGenerator.generateKey()
+					})
+
+					return Object.assign(table.clone(p29), {
+						routes = v105
+					})
+				end
+			end
+
+			if p28.type == StackActions.CompleteTransition and ((p28.key == nil or p28.key == p29.key) and p28.toChildKey == p29.routes[p29.index].key and p29.isTransitioning) then
+				return Object.assign(table.clone(p29), {
+					isTransitioning = false
+				})
+			end
+
+			if p28.type == NavigationActions.SetParams then
+				local key = p28.key
+				local v107 = Array.findIndex(p29.routes, function(p33) -- line: 545
+					-- upvalues: key (copy)
+					return p33.key == key
+				end)
+
+				if v107 > 0 then
+					local v108 = p29.routes[v107]
+					local None = Object.None
+
+					if p28.params ~= Object.None then
+						None = if not v108.params or not p28.params then if not v108.params then if not p28.params then {} else table.clone(p28.params) else table.clone(v108.params) else Object.assign(table.clone(v108.params), p28.params)
+					end
+
+					local v110 = table.clone(p29.routes)
+
+					v110[v107] = Object.assign(table.clone(v108), {
+						params = None
+					})
+
+					return Object.assign(table.clone(p29), {
+						routes = v110
+					})
+				end
+			end
+
+			if p28.type == StackActions.Reset then
+				if p28.key ~= nil and p28.key ~= p29.key then
+					return p29
+				end
+
+				local v111 = if not p28.actions then {} else Array.map(p28.actions, function(p34) -- line: 576
+					-- upvalues: t1 (copy), lib (copy), NavigationActions (copy), getParamsForRouteAndAction (copy), Object (copy), KeyGenerator (copy)
+					local v146 = t1[p34.routeName]
+					local t6 = {}
+
+					if v146 ~= nil and v146 ~= lib then
+						local v148 = p34.action or NavigationActions.init({
+							params = getParamsForRouteAndAction(p34.routeName, p34)
+						})
+
+						t6 = v146.getStateForAction(v148)
+					end
+
+					return Object.assign({
+						params = getParamsForRouteAndAction(p34.routeName, p34)
+					}, t6, {
+						routeName = p34.routeName,
+						key = p34.key or KeyGenerator.generateKey()
+					})
+				end)
+
+				return Object.assign(table.clone(p29), {
+					routes = v111,
+					index = p28.index
+				})
+			end
+
+			if p28.type == NavigationActions.Back or p28.type == StackActions.Pop then
+				local key = p28.key
+				local n = p28.n
+				local immediate = p28.immediate
+				local prune = p28.prune
+
+				if p28.type == StackActions.Pop and prune == false and key then
+					local v116 = Array.findIndex(p29.routes, function(p35) -- line: 617
+						-- upvalues: key (copy)
+						return p35.key == key
+					end)
+
+					if v116 > 0 then
+						local v117 = math.max(v116 - (n or 1), 1)
+						local v118 = Array.concat(Array.slice(p29.routes, 1, v117 + 1), Array.slice(p29.routes, v116 + 1))
+
+						if #v118 > 0 then
+							return Object.assign(table.clone(p29), {
+								routes = v118,
+								index = #v118,
+								isTransitioning = immediate ~= true
+							})
+						end
+					end
+				else
+					local index = p29.index
+
+					if p28.type == StackActions.Pop and n ~= nil then
+						index = math.max(2, p29.index - n + 1)
+					elseif key then
+						index = Array.findIndex(p29.routes, function(p36) -- line: 642
+							-- upvalues: key (copy)
+							return p36.key == key
+						end)
+					end
+
+					if index > 1 then
+						return Object.assign(table.clone(p29), {
+							routes = Array.slice(p29.routes, 1, index),
+							index = index - 1,
+							isTransitioning = immediate ~= true
+						})
+					end
+				end
+			end
+
+			local v120 = if not p28.key then nil else StateUtils.indexOf(p29, p28.key)
+
+			for i = #p29.routes, 1, -1 do
+				local v122 = p29.routes[i]
+
+				if v122.key == v77.key or v120 ~= 1 and v122.key ~= p28.key then
+					continue
+				end
+
+				local v123 = t1[v122.routeName]
+
+				if v123 ~= nil and v123 ~= lib then
+					local v124 = v123.getStateForAction(p28, v122)
+
+					if v124 == nil then
+						return p29
+					end
+
+					if v124 == v122 then
+						continue
+					end
+
+					return StateUtils.replaceAt(p29, v122.key, v124, p28.preserveFocus)
+				end
+			end
+
+			return p29
+		end,
+		getPathAndParamsForState = function(p37) -- line: 696
+			-- upvalues: getPathAndParamsForRoute (copy)
+			local v126 = p37.routes[p37.index]
+
+			return getPathAndParamsForRoute(v126)
+		end,
+		getActionForPathAndParams = function(p38, p39) -- line: 701
+			-- upvalues: getActionForPathAndParams (copy)
+			return getActionForPathAndParams(p38, p39)
+		end,
+		getScreenOptions = createConfigGetter(v33, u32.defaultNavigationOptions)
+	}
+end

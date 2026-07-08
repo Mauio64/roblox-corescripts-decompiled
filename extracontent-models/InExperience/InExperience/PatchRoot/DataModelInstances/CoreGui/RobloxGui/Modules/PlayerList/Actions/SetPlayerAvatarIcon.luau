@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerAvatarIcon", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        player = v0, 
-        userId = v0.UserId, 
-        avatarIcon = v1
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetPlayerAvatarIcon", function(p1, p2) -- line: 4
+	return {
+		player = p1,
+		userId = p1.UserId,
+		avatarIcon = p2
+	}
+end)

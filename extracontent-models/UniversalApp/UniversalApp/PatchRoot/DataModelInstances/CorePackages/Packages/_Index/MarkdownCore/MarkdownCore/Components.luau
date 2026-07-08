@@ -1,3 +1,3 @@
 return {
-    BulletList = require(script.BulletList)
-};
+	BulletList = require(script.BulletList)
+}

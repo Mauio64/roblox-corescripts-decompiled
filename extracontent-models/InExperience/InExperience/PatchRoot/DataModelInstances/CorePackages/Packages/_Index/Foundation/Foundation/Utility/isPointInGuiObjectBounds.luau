@@ -1,23 +1,16 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: isPointInGuiObjectBounds ]]
-    if not v0 then
-        return false;
-    else
-        local l_AbsolutePosition_0 = v0.AbsolutePosition;
-        local l_AbsoluteSize_0 = v0.AbsoluteSize;
-        local l_X_0 = l_AbsolutePosition_0.X;
-        local l_Y_0 = l_AbsolutePosition_0.Y;
-        local v6 = l_AbsolutePosition_0.X + l_AbsoluteSize_0.X;
-        local v7 = l_AbsolutePosition_0.Y + l_AbsoluteSize_0.Y;
-        local v8 = false;
-        if l_X_0 <= v1.X then
-            v8 = false;
-            if v1.X <= v6 then
-                v8 = false;
-                if l_Y_0 <= v1.Y then
-                    v8 = v1.Y <= v7;
-                end;
-            end;
-        end;
-        return v8;
-    end;
-end;
+local function isPointInGuiObjectBounds(p1, vector2: Vector2) -- line: 1
+	if not p1 then
+		return false
+	end
+
+	local AbsolutePosition = p1.AbsolutePosition
+	local AbsoluteSize = p1.AbsoluteSize
+	local AbsolutePositionX = AbsolutePosition.X
+	local AbsolutePositionY = AbsolutePosition.Y
+	local v8 = AbsolutePosition.X + AbsoluteSize.X
+	local v9 = AbsolutePosition.Y + AbsoluteSize.Y
+
+	return AbsolutePositionX <= vector2.X and (v8 >= vector2.X and (AbsolutePositionY <= vector2.Y and v9 >= vector2.Y))
+end
+
+return isPointInGuiObjectBounds

@@ -1,1 +1,1 @@
-return game:DefineFastInt("ExpChatVisibleARButtonPadding", 42);
+return game:DefineFastInt("ExpChatVisibleARButtonPadding", 42)

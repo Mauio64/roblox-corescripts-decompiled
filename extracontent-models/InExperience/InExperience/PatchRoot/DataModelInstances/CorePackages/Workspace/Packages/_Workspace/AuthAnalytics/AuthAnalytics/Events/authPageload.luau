@@ -1,35 +1,41 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Logging_0 = require(l_Parent_1.AppCommonLib).Logging;
-local v3 = require(l_Parent_1.SharedFlags);
-local v4 = require(l_Parent_0.Utils.checkAndSendEvent);
-local l_FFlagEnableAuthAnalyticsOriginParam_0 = v3.FFlagEnableAuthAnalyticsOriginParam;
-return function(v6, v7, v8, v9) --[[ Line: 9 ]]
-    -- upvalues: l_Logging_0 (copy), l_FFlagEnableAuthAnalyticsOriginParam_0 (copy), v4 (copy)
-    local v10 = {};
-    if v7 then
-        if type(v7) ~= "string" then
-            l_Logging_0.warn("Failure logging authPageLoad: Expected state to be a string but got " .. type(v7));
-            return;
-        else
-            v10.state = v7;
-        end;
-    end;
-    if v8 ~= nil then
-        if type(v8) ~= "boolean" then
-            l_Logging_0.warn("Failure logging authPageLoad: Expected isAltAttempt to be a boolean but got " .. type(v8));
-            return;
-        else
-            v10.is_alt_attempt = v8;
-        end;
-    end;
-    if l_FFlagEnableAuthAnalyticsOriginParam_0 and v9 then
-        if type(v9) ~= "string" then
-            l_Logging_0.warn("Failure logging authPageLoad: Expected origin to be a string but got " .. type(v9));
-            return;
-        else
-            v10.origin = v9;
-        end;
-    end;
-    v4(v6, "authPageload", v10);
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Logging = require(ParentParentParent.AppCommonLib).Logging
+local checkAndSendEvent = require(ParentParent.Utils.checkAndSendEvent)
+
+return function(s1: string, s2: string?, b1: boolean?, s3: string?) -- line: 6
+	-- upvalues: Logging (copy), checkAndSendEvent (copy)
+	local t1 = {}
+
+	if s2 then
+		if type(s2) ~= "string" then
+			Logging.warn("Failure logging authPageLoad: Expected state to be a string but got " .. type(s2))
+
+			return
+		end
+
+		t1.state = s2
+	end
+
+	if b1 ~= nil then
+		if type(b1) ~= "boolean" then
+			Logging.warn("Failure logging authPageLoad: Expected isAltAttempt to be a boolean but got " .. type(b1))
+
+			return
+		end
+
+		t1.is_alt_attempt = b1
+	end
+
+	if s3 then
+		if type(s3) ~= "string" then
+			Logging.warn("Failure logging authPageLoad: Expected origin to be a string but got " .. type(s3))
+
+			return
+		end
+
+		t1.origin = s3
+	end
+
+	checkAndSendEvent(s1, "authPageload", t1)
+end

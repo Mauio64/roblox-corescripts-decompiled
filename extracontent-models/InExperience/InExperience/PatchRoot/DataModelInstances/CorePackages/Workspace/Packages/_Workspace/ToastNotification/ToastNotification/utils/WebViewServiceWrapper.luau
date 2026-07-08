@@ -1,75 +1,87 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_GetFFlagEnableUnifiedWebViews_0 = require(l_Parent_0.SharedFlags).GetFFlagEnableUnifiedWebViews;
-local l_BrowserService_0 = game:GetService("BrowserService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_WebViewService_0 = game:GetService("WebViewService");
-local v5 = {};
-v5.__index = v5;
-v5.new = function(v6) --[[ Line: 50 ]] --[[ Name: new ]]
-    -- upvalues: l_GetFFlagEnableUnifiedWebViews_0 (copy), l_WebViewService_0 (copy), v5 (copy)
-    local v7 = {};
-    if l_GetFFlagEnableUnifiedWebViews_0() then
-        v7.webViewService = v6.webViewService or l_WebViewService_0;
-    end;
-    v7.title = v6.title;
-    v7.url = v6.url;
-    v7.closeCallbackConnection = nil;
-    local v8 = setmetatable(v7, v5);
-    v8:setCloseCallback(v6.closeCallback or function() --[[ Line: 65 ]]
+local ParentParent = script.Parent.Parent.Parent
+local GetFFlagEnableUnifiedWebViews = require(ParentParent.SharedFlags).GetFFlagEnableUnifiedWebViews
+local BrowserService = game:GetService("BrowserService")
+local HttpService = game:GetService("HttpService")
+local WebViewService = game:GetService("WebViewService")
+local t1 = {}
 
-    end);
-    return v8;
-end;
-v5.setCloseCallback = function(v9, v10) --[[ Line: 70 ]] --[[ Name: setCloseCallback ]]
-    -- upvalues: l_GetFFlagEnableUnifiedWebViews_0 (copy)
-    if l_GetFFlagEnableUnifiedWebViews_0() then
-        v9.closeCallback = function() --[[ Line: 75 ]]
-            -- upvalues: v9 (copy), v10 (copy)
-            v9:close();
-            if v10 ~= nil then
-                v10();
-            end;
-        end;
-        return;
-    else
-        v9.closeCallback = v10;
-        return;
-    end;
-end;
-v5.setOpenCallback = function(v11, v12) --[[ Line: 88 ]] --[[ Name: setOpenCallback ]]
-    v11.openCallback = v12;
-end;
-v5.open = function(v13) --[[ Line: 92 ]] --[[ Name: open ]]
-    -- upvalues: l_GetFFlagEnableUnifiedWebViews_0 (copy), l_HttpService_0 (copy), l_BrowserService_0 (copy)
-    if v13.openCallback ~= nil then
-        v13.openCallback();
-    end;
-    if v13.closeCallback ~= nil and l_GetFFlagEnableUnifiedWebViews_0() then
-        v13.closeCallbackConnection = v13.webViewService.OnWindowClosed:Connect(v13.closeCallback);
-    end;
-    if l_GetFFlagEnableUnifiedWebViews_0() then
-        v13.webViewService:OpenWindow(v13.url, v13.title, true);
-        return;
-    else
-        local v14 = l_HttpService_0:JSONEncode({
-            command = "open", 
-            url = v13.url, 
-            title = v13.title, 
-            visible = true, 
-            isGenericWebview = true, 
-            enableOverlayReplacement = true
-        });
-        l_BrowserService_0:SendCommand(v14);
-        return;
-    end;
-end;
-v5.close = function(v15) --[[ Line: 117 ]] --[[ Name: close ]]
-    -- upvalues: l_GetFFlagEnableUnifiedWebViews_0 (copy)
-    if l_GetFFlagEnableUnifiedWebViews_0() then
-        v15.webViewService:CloseWindow();
-    end;
-    if v15.closeCallbackConnection ~= nil then
-        v15.closeCallbackConnection:Disconnect();
-    end;
-end;
-return v5;
+t1.__index = t1
+
+function t1.new(t2: {[any]: any}) -- line: 50
+	-- upvalues: GetFFlagEnableUnifiedWebViews (copy), WebViewService (copy), t1 (copy)
+	local t3 = {}
+
+	if GetFFlagEnableUnifiedWebViews() then
+		t3.webViewService = t2.webViewService or WebViewService
+	end
+
+	t3.title = t2.title
+	t3.url = t2.url
+	t3.closeCallbackConnection = nil
+
+	local v9 = setmetatable(t3, t1)
+
+	v9:setCloseCallback(t2.closeCallback or function() -- line: 65
+	end)
+
+	return v9
+end
+function t1.setCloseCallback(p1, p2) -- line: 70
+	-- upvalues: GetFFlagEnableUnifiedWebViews (copy)
+	if GetFFlagEnableUnifiedWebViews() then
+		function p1.closeCallback() -- line: 75
+			-- upvalues: p1 (copy), p2 (copy)
+			p1:close()
+
+			if p2 ~= nil then
+				p2()
+			end
+		end
+
+		return
+	end
+
+	p1.closeCallback = p2
+end
+function t1.setOpenCallback(p3, p4) -- line: 88
+	p3.openCallback = p4
+end
+function t1.open(p5) -- line: 92
+	-- upvalues: GetFFlagEnableUnifiedWebViews (copy), HttpService (copy), BrowserService (copy)
+	if p5.openCallback ~= nil then
+		p5.openCallback()
+	end
+
+	if p5.closeCallback ~= nil and GetFFlagEnableUnifiedWebViews() then
+		p5.closeCallbackConnection = p5.webViewService.OnWindowClosed:Connect(p5.closeCallback)
+	end
+
+	if GetFFlagEnableUnifiedWebViews() then
+		p5.webViewService:OpenWindow(p5.url, p5.title, true)
+
+		return
+	end
+
+	local json = HttpService:JSONEncode({
+		command = "open",
+		visible = true,
+		isGenericWebview = true,
+		enableOverlayReplacement = true,
+		url = p5.url,
+		title = p5.title
+	})
+
+	BrowserService:SendCommand(json)
+end
+function t1.close(p6) -- line: 117
+	-- upvalues: GetFFlagEnableUnifiedWebViews (copy)
+	if GetFFlagEnableUnifiedWebViews() then
+		p6.webViewService:CloseWindow()
+	end
+
+	if p6.closeCallbackConnection ~= nil then
+		p6.closeCallbackConnection:Disconnect()
+	end
+end
+
+return t1

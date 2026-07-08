@@ -1,10 +1,13 @@
-local l_networkRequests_0 = script.networkRequests;
-local v1 = require(l_networkRequests_0.createGetUserPremiumMembershipStatus);
+local networkRequests = script.networkRequests
+local createGetUserPremiumMembershipStatus = require(networkRequests.createGetUserPremiumMembershipStatus)
+
+local function createRequestThunks(p1) -- line: 4
+	-- upvalues: createGetUserPremiumMembershipStatus (copy)
+	return {
+		GetUserPremiumMembershipStatus = createGetUserPremiumMembershipStatus(p1)
+	}
+end
+
 return {
-    config = function(v2) --[[ Line: 4 ]] --[[ Name: createRequestThunks ]]
-        -- upvalues: v1 (copy)
-        return {
-            GetUserPremiumMembershipStatus = v1(v2)
-        };
-    end
-};
+	config = createRequestThunks
+}

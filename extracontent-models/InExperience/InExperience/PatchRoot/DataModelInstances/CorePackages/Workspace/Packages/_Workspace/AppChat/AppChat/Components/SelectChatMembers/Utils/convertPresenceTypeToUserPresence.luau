@@ -1,15 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_UserModel_0 = require(l_Parent_0.UserLib).Models.UserModel;
-local l_PresenceType_0 = require(l_Parent_0.GraphQLServer).types.PresenceType;
-return function(v3) --[[ Line: 9 ]]
-    -- upvalues: l_PresenceType_0 (copy), l_UserModel_0 (copy)
-    if v3 == l_PresenceType_0.Online then
-        return l_UserModel_0.PresenceType.ONLINE;
-    elseif v3 == l_PresenceType_0.InGame then
-        return l_UserModel_0.PresenceType.IN_GAME;
-    elseif v3 == l_PresenceType_0.InStudio then
-        return l_UserModel_0.PresenceType.IN_STUDIO;
-    else
-        return l_UserModel_0.PresenceType.OFFLINE;
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local UserModel = require(Parent.UserLib).Models.UserModel
+local PresenceType = require(Parent.GraphQLServer).types.PresenceType
+
+return function(p1) -- line: 9
+	-- upvalues: PresenceType (copy), UserModel (copy)
+	if p1 == PresenceType.Online then
+		return UserModel.PresenceType.ONLINE
+	end
+
+	if p1 == PresenceType.InGame then
+		return UserModel.PresenceType.IN_GAME
+	end
+
+	if p1 == PresenceType.InStudio then
+		return UserModel.PresenceType.IN_STUDIO
+	end
+
+	return UserModel.PresenceType.OFFLINE
+end

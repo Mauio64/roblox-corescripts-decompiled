@@ -1,5 +1,6 @@
-local _ = require(script.CallProtocolTypes);
+require(script.CallProtocolTypes)
+
 return {
-    CallProtocol = require(script.CallProtocol), 
-    Enums = require(script.Enums)
-};
+	CallProtocol = require(script.CallProtocol),
+	Enums = require(script.Enums)
+}

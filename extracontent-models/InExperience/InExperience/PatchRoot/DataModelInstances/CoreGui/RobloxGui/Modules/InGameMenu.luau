@@ -1,179 +1,190 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v5 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v5.Roact;
-local l_RoactRodux_0 = v5.RoactRodux;
-local l_UIBlox_0 = v5.UIBlox;
-local l_FeedbackManagerInjectionContextProvider_0 = require(l_CorePackages_0.Workspace.Packages.InteractionFeedback).FeedbackManagerInjectionContextProvider;
-local l_AppInteractionFeedbackProvider_0 = require(l_CorePackages_0.Workspace.Packages.RobloxAppInteractionFeedbackConfig).AppInteractionFeedbackProvider;
-local l_Localization_0 = require(l_CorePackages_0.Workspace.Packages.InExperienceLocales).Localization;
-local l_LocalizationProvider_0 = require(l_CorePackages_0.Workspace.Packages.Localization).LocalizationProvider;
-local l_SelectionCursorProvider_0 = l_UIBlox_0.App.SelectionImage.SelectionCursorProvider;
-local v14 = require(l_RobloxGui_0.Modules.Common.renderWithCoreScriptsStyleProvider);
-local v15 = require(script.SetupFunctions.bindMenuActions);
-local v16 = require(script.SetupFunctions.registerSetCores);
-local v17 = require(script.SetupFunctions.requestGameNameAndDescription);
-local v18 = require(script.createStore);
-local v19 = require(script.Components.App);
-local v20 = require(script.Components.Connection.FocusHandlerUtils.FocusHandlerContextProvider);
-local v21 = require(l_RobloxGui_0.Modules.VoiceChat.initVoiceChatStore);
-local v22 = require(l_RobloxGui_0.Modules.TrustAndSafety);
-local v23 = require(script.Actions.SetLocaleId);
-local v24 = require(script.Actions.SetInspectMenuEnabled);
-local v25 = require(script.Actions.SetCurrentPage);
-local v26 = require(script.Actions.SetScreenSize);
-local v27 = require(script.Actions.SetMenuIconTooltipOpen);
-local v28 = require(script.Actions.SetRespawning);
-local v29 = require(script.Thunks.OpenMenu);
-local v30 = require(script.Thunks.CloseMenu);
-local v31 = require(script.InGameMenuPolicy);
-local v32 = require(script.GlobalConfig);
-local v33 = require(script.Resources.Constants);
-local v34 = require(script.Flags.GetFFlagIGMGamepadSelectionHistory);
-local l_BindableEvent_0 = Instance.new("BindableEvent");
-local l_BindableEvent_1 = Instance.new("BindableEvent");
-local v37 = v18();
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local LocalizationService = game:GetService("LocalizationService")
+local GuiService = game:GetService("GuiService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local UIBlox = InGameMenuDependencies.UIBlox
+local FeedbackManagerInjectionContextProvider = require(CorePackages.Workspace.Packages.InteractionFeedback).FeedbackManagerInjectionContextProvider
+local AppInteractionFeedbackProvider = require(CorePackages.Workspace.Packages.RobloxAppInteractionFeedbackConfig).AppInteractionFeedbackProvider
+local Localization = require(CorePackages.Workspace.Packages.InExperienceLocales).Localization
+local LocalizationProvider = require(CorePackages.Workspace.Packages.Localization).LocalizationProvider
+local SelectionCursorProvider = UIBlox.App.SelectionImage.SelectionCursorProvider
+local renderWithCoreScriptsStyleProvider = require(RobloxGui.Modules.Common.renderWithCoreScriptsStyleProvider)
+local bindMenuActions = require(script.SetupFunctions.bindMenuActions)
+local registerSetCores = require(script.SetupFunctions.registerSetCores)
+local requestGameNameAndDescription = require(script.SetupFunctions.requestGameNameAndDescription)
+local createStore = require(script.createStore)
+local App = require(script.Components.App)
+local FocusHandlerContextProvider = require(script.Components.Connection.FocusHandlerUtils.FocusHandlerContextProvider)
+local initVoiceChatStore = require(RobloxGui.Modules.VoiceChat.initVoiceChatStore)
+local TrustAndSafety = require(RobloxGui.Modules.TrustAndSafety)
+local SetLocaleId = require(script.Actions.SetLocaleId)
+local SetInspectMenuEnabled = require(script.Actions.SetInspectMenuEnabled)
+local SetCurrentPage = require(script.Actions.SetCurrentPage)
+local SetScreenSize = require(script.Actions.SetScreenSize)
+local SetMenuIconTooltipOpen = require(script.Actions.SetMenuIconTooltipOpen)
+local SetRespawning = require(script.Actions.SetRespawning)
+local OpenMenu = require(script.Thunks.OpenMenu)
+local CloseMenu = require(script.Thunks.CloseMenu)
+local InGameMenuPolicy = require(script.InGameMenuPolicy)
+local GlobalConfig = require(script.GlobalConfig)
+local Constants = require(script.Resources.Constants)
+local GetFFlagIGMGamepadSelectionHistory = require(script.Flags.GetFFlagIGMGamepadSelectionHistory)
+local BindableEvent = Instance.new("BindableEvent")
+local BindableEvent2 = Instance.new("BindableEvent")
+local v38 = createStore()
+
 return {
-    mountInGameMenu = function() --[[ Line: 56 ]] --[[ Name: mountInGameMenu ]]
-        -- upvalues: v16 (copy), v37 (copy), v15 (copy), v17 (copy), v32 (copy), l_Roact_0 (copy), l_BindableEvent_0 (copy), l_BindableEvent_1 (copy), l_Localization_0 (copy), l_LocalizationService_0 (copy), v23 (copy), v24 (copy), l_GuiService_0 (copy), v21 (copy), v14 (copy), l_LocalizationProvider_0 (copy), l_SelectionCursorProvider_0 (copy), v34 (copy), v20 (copy), v19 (copy), l_AppInteractionFeedbackProvider_0 (copy), l_FeedbackManagerInjectionContextProvider_0 (copy), v33 (copy), v26 (copy), l_RoactRodux_0 (copy), v31 (copy), l_CoreGui_0 (copy)
-        v16(v37);
-        v15(v37);
-        v17(v37);
-        if v32.propValidation then
-            l_Roact_0.setGlobalConfig({
-                propValidation = true
-            });
-        end;
-        if v32.elementTracing then
-            l_Roact_0.setGlobalConfig({
-                elementTracing = true
-            });
-        end;
-        v37.changed:connect(function(v38, v39) --[[ Line: 72 ]]
-            -- upvalues: l_BindableEvent_0 (ref), l_BindableEvent_1 (ref)
-            if v38.isMenuOpen ~= v39.isMenuOpen then
-                l_BindableEvent_0:Fire(v38.isMenuOpen);
-            end;
-            local l_enabled_0 = v38.respawn.enabled;
-            local l_enabled_1 = v39.respawn.enabled;
-            local l_customCallback_0 = v38.respawn.customCallback;
-            local l_customCallback_1 = v39.respawn.customCallback;
-            if l_enabled_0 ~= l_enabled_1 and l_customCallback_0 ~= l_customCallback_1 then
-                l_BindableEvent_1:Fire(l_enabled_0, l_customCallback_0);
-            end;
-        end);
-        local v44 = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId);
-        v37:dispatch(v23(l_LocalizationService_0.RobloxLocaleId));
-        l_LocalizationService_0:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function() --[[ Line: 90 ]]
-            -- upvalues: v44 (copy), l_LocalizationService_0 (ref), v37 (ref), v23 (ref)
-            v44:SetLocale(l_LocalizationService_0.RobloxLocaleId);
-            v37:dispatch(v23(l_LocalizationService_0.RobloxLocaleId));
-        end);
-        v37:dispatch(v24(l_GuiService_0:GetInspectMenuEnabled()));
-        l_GuiService_0.InspectMenuEnabledChangedSignal:Connect(function(v45) --[[ Line: 96 ]]
-            -- upvalues: v37 (ref), v24 (ref)
-            v37:dispatch(v24(v45));
-        end);
-        v21(v37);
-        local v46 = v14({
-            LocalizationProvider = l_Roact_0.createElement(l_LocalizationProvider_0, {
-                localization = v44
-            }, {
-                CursorProvider = l_Roact_0.createElement(l_SelectionCursorProvider_0, {}, {
-                    FocusHandlerContextProvider = v34() and l_Roact_0.createElement(v20, {}, {
-                        InGameMenu = l_Roact_0.createElement(v19)
-                    }) or nil, 
-                    InGameMenu = not v34() and l_Roact_0.createElement(v19) or nil
-                })
-            })
-        });
-        v46 = l_Roact_0.createElement(l_AppInteractionFeedbackProvider_0, {}, {
-            tree = l_Roact_0.createElement(l_FeedbackManagerInjectionContextProvider_0, nil, {
-                tree = v46
-            })
-        });
-        local v48 = l_Roact_0.createElement("ScreenGui", {
-            ResetOnSpawn = false, 
-            IgnoreGuiInset = true, 
-            DisplayOrder = v33.DisplayOrder.RootMenu, 
-            ZIndexBehavior = Enum.ZIndexBehavior.Sibling, 
-            AutoLocalize = false, 
-            [l_Roact_0.Change.AbsoluteSize] = function(v47) --[[ Line: 128 ]]
-                -- upvalues: v37 (ref), v26 (ref)
-                v37:dispatch(v26(v47.AbsoluteSize));
-            end
-        }, {
-            StoreProvider = l_Roact_0.createElement(l_RoactRodux_0.StoreProvider, {
-                store = v37
-            }, {
-                PolicyProvider = l_Roact_0.createElement(v31.Provider, {
-                    policy = {
-                        v31.Mapper
-                    }
-                }, {
-                    ThemeProvider = v46
-                })
-            })
-        });
-        l_Roact_0.mount(v48, l_CoreGui_0, "InGameMenu");
-    end, 
-    openInGameMenu = function(v49) --[[ Line: 145 ]] --[[ Name: openInGameMenu ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.TopbarButton, v49));
-    end, 
-    closeInGameMenu = function() --[[ Line: 149 ]] --[[ Name: closeInGameMenu ]]
-        -- upvalues: v30 (copy), v37 (copy)
-        v30(v37);
-    end, 
-    openReportDialog = function(v50, v51) --[[ Line: 153 ]] --[[ Name: openReportDialog ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy), v22 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.ReportAbuseTriggered, v33.ReportDialogKey));
-        local v52 = if v51 ~= nil then v51 else v33.AnalyticsInGameMenuName;
-        v22.openReportDialogForPlayer(v50, v52);
-    end, 
-    openGameSettingsPage = function() --[[ Line: 159 ]] --[[ Name: openGameSettingsPage ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy), v25 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.SettingsTriggered));
-        v37:dispatch(v25("GameSettings"));
-    end, 
-    openGameLeavePage = function() --[[ Line: 164 ]] --[[ Name: openGameLeavePage ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy), v25 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.GamepadLeaveGame));
-        v37:dispatch(v25(v33.LeaveGamePromptPageKey));
-    end, 
-    openCharacterResetPage = function() --[[ Line: 169 ]] --[[ Name: openCharacterResetPage ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy), v25 (copy), v28 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.GamepadResetCharacter));
-        v37:dispatch(v25(v33.MainPagePageKey));
-        v37:dispatch(v28(true));
-    end, 
-    openPlayersPage = function() --[[ Line: 175 ]] --[[ Name: openPlayersPage ]]
-        -- upvalues: v37 (copy), v29 (copy), v33 (copy), v25 (copy)
-        v37:dispatch(v29(v33.AnalyticsMenuOpenTypes.PlayersTriggered));
-        v37:dispatch(v25("Players"));
-    end, 
-    getOpenChangedEvent = function() --[[ Line: 180 ]] --[[ Name: getOpenChangedEvent ]]
-        -- upvalues: l_BindableEvent_0 (copy)
-        return l_BindableEvent_0;
-    end, 
-    getOpen = function() --[[ Line: 184 ]] --[[ Name: getOpen ]]
-        -- upvalues: v37 (copy)
-        return v37:getState().isMenuOpen;
-    end, 
-    getRespawnBehaviour = function() --[[ Line: 188 ]] --[[ Name: getRespawnBehaviour ]]
-        -- upvalues: v37 (copy)
-        local v53 = v37:getState();
-        return v53.respawn.enabled, v53.respawn.customCallback;
-    end, 
-    getRespawnBehaviourChangedEvent = function() --[[ Line: 193 ]] --[[ Name: getRespawnBehaviourChangedEvent ]]
-        -- upvalues: l_BindableEvent_1 (copy)
-        return l_BindableEvent_1;
-    end, 
-    setMenuIconTooltipOpen = function(v54) --[[ Line: 197 ]] --[[ Name: setMenuIconTooltipOpen ]]
-        -- upvalues: v37 (copy), v27 (copy)
-        v37:dispatch(v27(v54));
-    end
-};
+	mountInGameMenu = function() -- line: 56
+		-- upvalues: registerSetCores (copy), v38 (copy), bindMenuActions (copy), requestGameNameAndDescription (copy), GlobalConfig (copy), Roact (copy), BindableEvent (copy), BindableEvent2 (copy), Localization (copy), LocalizationService (copy), SetLocaleId (copy), SetInspectMenuEnabled (copy), GuiService (copy), initVoiceChatStore (copy), renderWithCoreScriptsStyleProvider (copy), LocalizationProvider (copy), SelectionCursorProvider (copy), GetFFlagIGMGamepadSelectionHistory (copy), FocusHandlerContextProvider (copy), App (copy), AppInteractionFeedbackProvider (copy), FeedbackManagerInjectionContextProvider (copy), Constants (copy), SetScreenSize (copy), RoactRodux (copy), InGameMenuPolicy (copy), CoreGui (copy)
+		registerSetCores(v38)
+		bindMenuActions(v38)
+		requestGameNameAndDescription(v38)
+
+		if GlobalConfig.propValidation then
+			Roact.setGlobalConfig({
+				propValidation = true
+			})
+		end
+
+		if GlobalConfig.elementTracing then
+			Roact.setGlobalConfig({
+				elementTracing = true
+			})
+		end
+
+		v38.changed:connect(function(p1, p2) -- line: 72
+			-- upvalues: BindableEvent (copy), BindableEvent2 (copy)
+			if p1.isMenuOpen ~= p2.isMenuOpen then
+				BindableEvent:Fire(p1.isMenuOpen)
+			end
+
+			local enabled = p1.respawn.enabled
+			local enabled2 = p2.respawn.enabled
+			local customCallback = p1.respawn.customCallback
+			local customCallback2 = p2.respawn.customCallback
+
+			if enabled ~= enabled2 and customCallback ~= customCallback2 then
+				BindableEvent2:Fire(enabled, customCallback)
+			end
+		end)
+
+		local v39 = Localization.new(LocalizationService.RobloxLocaleId)
+
+		v38:dispatch(SetLocaleId(LocalizationService.RobloxLocaleId))
+		LocalizationService:GetPropertyChangedSignal("RobloxLocaleId"):Connect(function() -- line: 90
+			-- upvalues: v39 (copy), LocalizationService (copy), v38 (copy), SetLocaleId (copy)
+			v39:SetLocale(LocalizationService.RobloxLocaleId)
+			v38:dispatch(SetLocaleId(LocalizationService.RobloxLocaleId))
+		end)
+		v38:dispatch(SetInspectMenuEnabled(GuiService:GetInspectMenuEnabled()))
+		GuiService.InspectMenuEnabledChangedSignal:Connect(function(p3) -- line: 96
+			-- upvalues: v38 (copy), SetInspectMenuEnabled (copy)
+			v38:dispatch(SetInspectMenuEnabled(p3))
+		end)
+		initVoiceChatStore(v38)
+
+		local v40 = renderWithCoreScriptsStyleProvider({
+			LocalizationProvider = Roact.createElement(LocalizationProvider, {
+				localization = v39
+			}, {
+				CursorProvider = Roact.createElement(SelectionCursorProvider, {}, {
+					FocusHandlerContextProvider = GetFFlagIGMGamepadSelectionHistory() and Roact.createElement(FocusHandlerContextProvider, {}, {
+						InGameMenu = Roact.createElement(App)
+					}) or nil,
+					InGameMenu = not GetFFlagIGMGamepadSelectionHistory() and Roact.createElement(App) or nil
+				})
+			})
+		})
+		local v41 = Roact.createElement(AppInteractionFeedbackProvider, {}, {
+			tree = Roact.createElement(FeedbackManagerInjectionContextProvider, nil, {
+				tree = v40
+			})
+		})
+		local v42 = Roact.createElement("ScreenGui", {
+			ResetOnSpawn = false,
+			IgnoreGuiInset = true,
+			DisplayOrder = Constants.DisplayOrder.RootMenu,
+			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+			AutoLocalize = false,
+			[Roact.Change.AbsoluteSize] = function(p4) -- line: 128
+				-- upvalues: v38 (copy), SetScreenSize (copy)
+				v38:dispatch(SetScreenSize(p4.AbsoluteSize))
+			end
+		}, {
+			StoreProvider = Roact.createElement(RoactRodux.StoreProvider, {
+				store = v38
+			}, {
+				PolicyProvider = Roact.createElement(InGameMenuPolicy.Provider, {
+					policy = { InGameMenuPolicy.Mapper }
+				}, {
+					ThemeProvider = v41
+				})
+			})
+		})
+
+		Roact.mount(v42, CoreGui, "InGameMenu")
+	end,
+	openInGameMenu = function(p5) -- line: 145
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.TopbarButton, p5))
+	end,
+	closeInGameMenu = function() -- line: 149
+		-- upvalues: CloseMenu (copy), v38 (copy)
+		CloseMenu(v38)
+	end,
+	openReportDialog = function(p6, p7) -- line: 153
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy), TrustAndSafety (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.ReportAbuseTriggered, Constants.ReportDialogKey))
+
+		local v46 = if p7 == nil then Constants.AnalyticsInGameMenuName else p7
+
+		TrustAndSafety.openReportDialogForPlayer(p6, v46)
+	end,
+	openGameSettingsPage = function() -- line: 159
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy), SetCurrentPage (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.SettingsTriggered))
+		v38:dispatch(SetCurrentPage("GameSettings"))
+	end,
+	openGameLeavePage = function() -- line: 164
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy), SetCurrentPage (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.GamepadLeaveGame))
+		v38:dispatch(SetCurrentPage(Constants.LeaveGamePromptPageKey))
+	end,
+	openCharacterResetPage = function() -- line: 169
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy), SetCurrentPage (copy), SetRespawning (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.GamepadResetCharacter))
+		v38:dispatch(SetCurrentPage(Constants.MainPagePageKey))
+		v38:dispatch(SetRespawning(true))
+	end,
+	openPlayersPage = function() -- line: 175
+		-- upvalues: v38 (copy), OpenMenu (copy), Constants (copy), SetCurrentPage (copy)
+		v38:dispatch(OpenMenu(Constants.AnalyticsMenuOpenTypes.PlayersTriggered))
+		v38:dispatch(SetCurrentPage("Players"))
+	end,
+	getOpenChangedEvent = function() -- line: 180
+		-- upvalues: BindableEvent (copy)
+		return BindableEvent
+	end,
+	getOpen = function() -- line: 184
+		-- upvalues: v38 (copy)
+		return v38:getState().isMenuOpen
+	end,
+	getRespawnBehaviour = function() -- line: 188
+		-- upvalues: v38 (copy)
+		local v47 = v38:getState()
+
+		return v47.respawn.enabled, v47.respawn.customCallback
+	end,
+	getRespawnBehaviourChangedEvent = function() -- line: 193
+		-- upvalues: BindableEvent2 (copy)
+		return BindableEvent2
+	end,
+	setMenuIconTooltipOpen = function(p8) -- line: 197
+		-- upvalues: v38 (copy), SetMenuIconTooltipOpen (copy)
+		v38:dispatch(SetMenuIconTooltipOpen(p8))
+	end
+}

@@ -1,1 +1,1 @@
-return not UserSettings():GetService("UserGameSettings").ReducedMotion and game:DefineFastFlag("AXCategoryPillPositionAnimation", false);
+return not UserSettings():GetService("UserGameSettings").ReducedMotion and game:DefineFastFlag("AXCategoryPillPositionAnimation", false)

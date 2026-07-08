@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXRefetchAvatarOnTimeout", false);
+return game:DefineFastFlag("AXRefetchAvatarOnTimeout", false)

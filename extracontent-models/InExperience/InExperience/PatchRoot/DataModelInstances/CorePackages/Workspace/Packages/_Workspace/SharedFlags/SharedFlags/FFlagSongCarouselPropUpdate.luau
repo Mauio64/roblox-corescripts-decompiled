@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SongCarouselPropUpdate", false);
+return game:DefineFastFlag("SongCarouselPropUpdate", false)

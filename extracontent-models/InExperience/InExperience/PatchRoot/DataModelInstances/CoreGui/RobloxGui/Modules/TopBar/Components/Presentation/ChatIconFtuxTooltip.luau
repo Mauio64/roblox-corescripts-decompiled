@@ -1,155 +1,160 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GuiService_0 = game:GetService("GuiService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_useLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).Hooks.useLocalization;
-local v5 = require(l_CorePackages_0.Packages.React);
-local v6 = require(l_CorePackages_0.Packages.Cryo);
-local v7 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withTooltip_0 = v7.App.Dialog.TooltipV2.withTooltip;
-local l_TooltipOrientation_0 = v7.App.Dialog.Enum.TooltipOrientation;
-local _ = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Signal;
-local v11 = require(l_CorePackages_0.Packages.LuauPolyfill);
-local l_clearTimeout_0 = v11.clearTimeout;
-local l_setTimeout_0 = v11.setTimeout;
-local v16 = {
-    showDelay = 1000, 
-    dismissDelay = 7000, 
-    onDismissed = function(_, _) --[[ Line: 26 ]] --[[ Name: onDismissed ]]
+local CorePackages = game:GetService("CorePackages")
+local GuiService = game:GetService("GuiService")
+local CoreGui = game:GetService("CoreGui")
+local AppStorageService = game:GetService("AppStorageService")
+local useLocalization = require(CorePackages.Workspace.Packages.Localization).Hooks.useLocalization
+local React = require(CorePackages.Packages.React)
+local Cryo = require(CorePackages.Packages.Cryo)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
+local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local _ = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
+local LuauPolyfill = require(CorePackages.Packages.LuauPolyfill)
+local clearTimeout = LuauPolyfill.clearTimeout
+local setTimeout = LuauPolyfill.setTimeout
+local t1 = {
+	showDelay = 1000,
+	dismissDelay = 7000,
+	onDismissed = function(_: boolean, _: string?) -- line: 26
+	end
+}
 
-    end
-};
-return function(v17) --[[ Line: 41 ]]
-    -- upvalues: v6 (copy), v16 (copy), v5 (copy), l_setTimeout_0 (copy), l_AppStorageService_0 (copy), l_useLocalization_0 (copy), l_GuiService_0 (copy), l_clearTimeout_0 (copy), l_withTooltip_0 (copy), l_CoreGui_0 (copy), l_TooltipOrientation_0 (copy)
-    local v18 = v6.Dictionary.union(v16, v17);
-    local v19, v20 = v5.useState(false);
-    local v21, v22 = v5.useState(false);
-    local v23 = v5.useRef(l_setTimeout_0(function() --[[ Line: 45 ]]
+return function(t2: {[any]: any}) -- line: 41
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), setTimeout (copy), AppStorageService (copy), useLocalization (copy), GuiService (copy), clearTimeout (copy), withTooltip (copy), CoreGui (copy), TooltipOrientation (copy)
+	local v19 = Cryo.Dictionary.union(t1, t2)
+	local v20, v21 = React.useState(false)
+	local v22, v23 = React.useState(false)
+	local v24 = React.useRef(setTimeout(function() -- line: 45
+	end, v19.showDelay))
+	local v25 = React.useRef(setTimeout(function() -- line: 46
+	end, v19.dismissDelay))
+	local v26 = not (React.useMemo(function() -- line: 48
+		-- upvalues: v19 (copy), AppStorageService (copy)
+		local v30 = false
 
-    end, v18.showDelay));
-    local v24 = v5.useRef(l_setTimeout_0(function() --[[ Line: 46 ]]
+		if v19.localStorageKey then
+			local ok, result = pcall(function() -- line: 51
+				-- upvalues: AppStorageService (copy), v19 (copy)
+				return AppStorageService:GetItem(v19.localStorageKey)
+			end)
 
-    end, v18.dismissDelay));
-    local v28 = not (v5.useMemo(function() --[[ Line: 48 ]]
-        -- upvalues: v18 (copy), l_AppStorageService_0 (ref)
-        local v25 = false;
-        if v18.localStorageKey then
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 51 ]]
-                -- upvalues: l_AppStorageService_0 (ref), v18 (ref)
-                return l_AppStorageService_0:GetItem(v18.localStorageKey);
-            end);
-            if l_status_0 then
-                return l_result_0 == "true";
-            else
-                v25 = true;
-            end;
-        end;
-        return v25;
-    end, {
-        v18.localStorageKey
-    }) or v21);
-    local v29 = v19 and v28;
-    local v30 = l_useLocalization_0({
-        headerText = v18.headerKey, 
-        bodyText = v18.bodyKey
-    });
-    local v32 = v5.useCallback(function(v31) --[[ Line: 66 ]]
-        -- upvalues: v18 (copy), v29 (copy), v22 (copy)
-        if v18.onDismissed then
-            v18.onDismissed(v29, v31);
-        end;
-        v22(true);
-    end, {
-        v22, 
-        v29
-    });
-    v5.useEffect(function() --[[ Line: 75 ]]
-        -- upvalues: l_GuiService_0 (ref), v28 (copy), v32 (copy), v18 (copy)
-        local v33 = {
-            l_GuiService_0.MenuOpened:Connect(function() --[[ Line: 77 ]]
-                -- upvalues: v28 (ref), v32 (ref)
-                if v28 then
-                    v32("menuOpened");
-                end;
-            end), 
-            v18.iconClickedSignal:connect(function() --[[ Line: 82 ]]
-                -- upvalues: v28 (ref), v32 (ref)
-                if v28 then
-                    v32("chatIconClicked");
-                end;
-            end)
-        };
-        return function() --[[ Line: 89 ]]
-            -- upvalues: v33 (copy)
-            for _, v35 in v33 do
-                if v35.disconnect then
-                    v35:disconnect();
-                elseif v35.Disconnect then
-                    v35:Disconnect();
-                end;
-            end;
-        end;
-    end, {
-        l_GuiService_0.MenuOpened, 
-        v18.iconClickedSignal, 
-        v28, 
-        v32
-    });
-    v5.useEffect(function() --[[ Line: 101 ]]
-        -- upvalues: l_clearTimeout_0 (ref), v23 (copy), v28 (copy), l_setTimeout_0 (ref), v20 (copy), v18 (copy)
-        l_clearTimeout_0(v23.current);
-        if v28 then
-            v23.current = l_setTimeout_0(function() --[[ Line: 104 ]]
-                -- upvalues: v28 (ref), v20 (ref)
-                if v28 then
-                    v20(true);
-                end;
-            end, v18.showDelay);
-        end;
-    end, {
-        v28, 
-        v23
-    });
-    v5.useEffect(function() --[[ Line: 113 ]]
-        -- upvalues: l_clearTimeout_0 (ref), v24 (copy), v19 (copy), l_setTimeout_0 (ref), v32 (copy), v18 (copy)
-        l_clearTimeout_0(v24.current);
-        if v19 then
-            v24.current = l_setTimeout_0(function() --[[ Line: 116 ]]
-                -- upvalues: v32 (ref)
-                v32("timeout");
-            end, v18.dismissDelay);
-        end;
-    end, {
-        v19, 
-        v24
-    });
-    v5.useEffect(function() --[[ Line: 122 ]]
-        -- upvalues: v29 (copy), v18 (copy), l_AppStorageService_0 (ref)
-        if v29 and v18.localStorageKey then
-            pcall(function() --[[ Line: 124 ]]
-                -- upvalues: l_AppStorageService_0 (ref), v18 (ref)
-                l_AppStorageService_0:SetItem(v18.localStorageKey, "true");
-            end);
-        end;
-    end, {
-        v29, 
-        v18.localStorageKey
-    });
-    return l_withTooltip_0({
-        headerText = v30.headerText, 
-        bodyText = v30.bodyText
-    }, {
-        DisplayOrder = 10, 
-        active = v29, 
-        guiTarget = l_CoreGui_0, 
-        preferredOrientation = l_TooltipOrientation_0.Bottom
-    }, function(v36) --[[ Line: 139 ]]
-        -- upvalues: v5 (ref)
-        return v5.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            [v5.Change.AbsoluteSize] = v36, 
-            [v5.Change.AbsolutePosition] = v36
-        });
-    end);
-end;
+			if ok then
+				return result == "true"
+			end
+
+			v30 = true
+		end
+
+		return v30
+	end, { v19.localStorageKey }) or v22)
+	local v27 = v20 and v26
+	local v28 = useLocalization({
+		headerText = v19.headerKey,
+		bodyText = v19.bodyKey
+	})
+	local v29 = React.useCallback(function(s2: string?) -- line: 66
+		-- upvalues: v19 (copy), v27 (copy), v23 (copy)
+		if v19.onDismissed then
+			v19.onDismissed(v27, s2)
+		end
+
+		v23(true)
+	end, {
+		v23,
+		v27
+	})
+
+	React.useEffect(function() -- line: 75
+		-- upvalues: GuiService (copy), v26 (copy), v29 (copy), v19 (copy)
+		local t3 = {
+			GuiService.MenuOpened:Connect(function() -- line: 77
+				-- upvalues: v26 (copy), v29 (copy)
+				if v26 then
+					v29("menuOpened")
+				end
+			end),
+			v19.iconClickedSignal:connect(function() -- line: 82
+				-- upvalues: v26 (copy), v29 (copy)
+				if v26 then
+					v29("chatIconClicked")
+				end
+			end)
+		}
+
+		return function() -- line: 89
+			-- upvalues: t3 (copy)
+			for _, v37 in t3 do
+				if v37.disconnect then
+					v37:disconnect()
+				elseif v37.Disconnect then
+					v37:Disconnect()
+				end
+			end
+		end
+	end, {
+		GuiService.MenuOpened,
+		v19.iconClickedSignal,
+		v26,
+		v29
+	})
+	React.useEffect(function() -- line: 101
+		-- upvalues: clearTimeout (copy), v24 (copy), v26 (copy), setTimeout (copy), v21 (copy), v19 (copy)
+		clearTimeout(v24.current)
+
+		if v26 then
+			v24.current = setTimeout(function() -- line: 104
+				-- upvalues: v26 (copy), v21 (copy)
+				if v26 then
+					v21(true)
+				end
+			end, v19.showDelay)
+		end
+	end, {
+		v26,
+		v24
+	})
+	React.useEffect(function() -- line: 113
+		-- upvalues: clearTimeout (copy), v25 (copy), v20 (copy), setTimeout (copy), v29 (copy), v19 (copy)
+		clearTimeout(v25.current)
+
+		if v20 then
+			v25.current = setTimeout(function() -- line: 116
+				-- upvalues: v29 (copy)
+				v29("timeout")
+			end, v19.dismissDelay)
+		end
+	end, {
+		v20,
+		v25
+	})
+	React.useEffect(function() -- line: 122
+		-- upvalues: v27 (copy), v19 (copy), AppStorageService (copy)
+		if v27 and v19.localStorageKey then
+			pcall(function() -- line: 124
+				-- upvalues: AppStorageService (copy), v19 (copy)
+				AppStorageService:SetItem(v19.localStorageKey, "true")
+			end)
+		end
+	end, {
+		v27,
+		v19.localStorageKey
+	})
+
+	return withTooltip({
+		headerText = v28.headerText,
+		bodyText = v28.bodyText
+	}, {
+		DisplayOrder = 10,
+		active = v27,
+		guiTarget = CoreGui,
+		preferredOrientation = TooltipOrientation.Bottom
+	}, function(p1) -- line: 139
+		-- upvalues: React (copy)
+		return React.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			[React.Change.AbsoluteSize] = p1,
+			[React.Change.AbsolutePosition] = p1
+		})
+	end)
+end

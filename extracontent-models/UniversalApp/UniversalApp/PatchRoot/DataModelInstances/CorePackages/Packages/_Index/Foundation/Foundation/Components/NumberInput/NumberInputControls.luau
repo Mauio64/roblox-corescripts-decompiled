@@ -27,78 +27,78 @@ local NumberInputControlsVariant = require(Foundation.Enums.NumberInputControlsV
 local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
 
 local function v21(p1) -- line: 63
-	-- upvalues: useTokens (copy), React (copy), View (copy), withCommonProps (copy), Flags (copy), ReactIs (copy), mapBindable (copy)
-	local v25 = useTokens()
-	local uDim = UDim.new(0, v25.Radius.Medium)
-	local v27 = React.useMemo(function() -- line: 67
-		-- upvalues: uDim (copy), v25 (copy)
+	-- upvalues: useTokens (copy), React (copy), View (copy), withCommonProps (copy), ReactIs (copy), mapBindable (copy)
+	local v26 = useTokens()
+	local uDim = UDim.new(0, v26.Radius.Medium)
+	local v28 = React.useMemo(function() -- line: 67
+		-- upvalues: uDim (copy), v26 (copy)
 		return {
 			radius = uDim,
-			offset = v25.Size.Size_150,
-			borderWidth = v25.Stroke.Thicker
+			offset = v26.Size.Size_150,
+			borderWidth = v26.Stroke.Thicker
 		}
-	end, { v25 })
+	end, { v26 })
 
 	return React.createElement(View, withCommonProps(p1, {
 		onActivated = p1.onActivated,
-		isDisabled = (not Flags.FoundationNumberInputBindableValue or not ReactIs.isBinding(p1.isDisabled)) and p1.isDisabled,
+		isDisabled = not ReactIs.isBinding(p1.isDisabled) and p1.isDisabled,
 		selection = {
-			Selectable = if not Flags.FoundationNumberInputBindableValue then not p1.isDisabled else mapBindable(p1.isDisabled, function(p2) -- line: 84
+			Selectable = mapBindable(p1.isDisabled, function(p2) -- line: 81
 				return not p2
 			end)
 		},
-		cursor = v27,
+		cursor = v28,
 		padding = p1.padding,
 		cornerRadius = uDim,
 		tag = p1.tag
 	}), p1.children)
 end
-local function SplitControls(t1: {[any]: any}) -- line: 100
-	-- upvalues: useTokens (copy), useNumberInputVariants (copy), useTextInputVariants (copy), Flags (copy), React (copy), getDisabledStyle (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy), View (copy), ReactIs (copy), StateLayerAffordance (copy), Icon (copy), BuilderIcons (copy)
-	local v29 = useTokens()
-	local v30 = useNumberInputVariants(v29, t1.size, t1.controlsVariant)
-	local v31 = useTextInputVariants(v29, t1.size, if not Flags.FoundationNumberInputVariant then nil else t1.variant)
-	local v32 = if not Flags.FoundationInputVariantsConsolidateContainer then v31.outerView else v31.container
-	local v33 = math.ceil(v29.Stroke.Standard) * 2
-	local uDim2 = UDim2.fromOffset(v30.splitButton.size - v33, v30.splitButton.size - v33)
-	local v35 = if not Flags.FoundationNumberInputVariant then nil else React.useCallback(function(b1: boolean) -- line: 121
-		-- upvalues: v32 (copy), getDisabledStyle (copy)
-		if v32.bgStyle then
-			return (getDisabledStyle(v32.bgStyle, b1))
+local function SplitControls(t1: {[any]: any}) -- line: 94
+	-- upvalues: useTokens (copy), useNumberInputVariants (copy), useTextInputVariants (copy), React (copy), getDisabledStyle (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy), View (copy), ReactIs (copy), StateLayerAffordance (copy), Flags (copy), Icon (copy), BuilderIcons (copy)
+	local v30 = useTokens()
+	local v31 = useNumberInputVariants(v30, t1.size, t1.controlsVariant)
+	local container = useTextInputVariants(v30, t1.size, t1.variant).container
+	local v33 = math.ceil(v30.Stroke.Standard) * 2
+	local uDim2 = UDim2.fromOffset(v31.splitButton.size - v33, v31.splitButton.size - v33)
+	local v35 = React.useCallback(function(b1: boolean) -- line: 107
+		-- upvalues: container (copy), getDisabledStyle (copy)
+		if container.bgStyle then
+			return (getDisabledStyle(container.bgStyle, b1))
 		end
 
 		return nil
-	end, { v32.bgStyle })
-	local v36 = if not Flags.FoundationNumberInputVariant then nil else React.useCallback(function(p3) -- line: 129
-		-- upvalues: v32 (copy), Flags (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy)
-		if v32.strokeStyle and v32.strokeThickness then
+	end, { container.bgStyle })
+	local v36 = React.useCallback(function(p3) -- line: 113
+		-- upvalues: container (copy), mapBindable (copy), blendTransparencies (copy), Constants (copy)
+		if container.strokeStyle and container.strokeThickness then
 			return {
-				Color = v32.strokeStyle.Color3,
-				Transparency = if not Flags.FoundationNumberInputBindableValue then if not p3 then v32.strokeStyle.Transparency else blendTransparencies(v32.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY) else mapBindable(p3, function(p4) -- line: 134
-					-- upvalues: blendTransparencies (copy), v32 (copy), Constants (copy)
+				Color = container.strokeStyle.Color3,
+				Transparency = mapBindable(p3, function(p4) -- line: 117
+					-- upvalues: blendTransparencies (copy), container (copy), Constants (copy)
 					if p4 then
-						return (blendTransparencies(v32.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY))
+						return (blendTransparencies(container.strokeStyle.Transparency, Constants.DISABLED_TRANSPARENCY))
 					end
 
-					return v32.strokeStyle.Transparency
+					return container.strokeStyle.Transparency
 				end),
-				Thickness = v32.strokeThickness,
+				Thickness = container.strokeThickness,
 				BorderStrokePosition = Enum.BorderStrokePosition.Inner
 			}
 		end
 
 		return nil
 	end, {
-		v32.strokeStyle,
-		v32.strokeThickness
+		container.strokeStyle,
+		container.strokeThickness
 	})
 
 	return React.createElement(React.Fragment, {}, {
 		ControlIncrement = React.createElement(View, {
+			LayoutOrder = 1,
 			onActivated = t1.increment.onClick,
-			isDisabled = (not Flags.FoundationNumberInputBindableValue or not ReactIs.isBinding(t1.increment.isDisabled)) and t1.increment.isDisabled,
-			stateLayer = if not Flags.FoundationNumberInputBindableValue then nil else {
-				affordance = mapBindable(t1.increment.isDisabled, function(p5) -- line: 163
+			isDisabled = not ReactIs.isBinding(t1.increment.isDisabled) and t1.increment.isDisabled,
+			stateLayer = {
+				affordance = mapBindable(t1.increment.isDisabled, function(p5) -- line: 138
 					-- upvalues: StateLayerAffordance (copy)
 					if p5 then
 						return StateLayerAffordance.None
@@ -107,37 +107,24 @@ local function SplitControls(t1: {[any]: any}) -- line: 100
 					return StateLayerAffordance.Background
 				end)
 			},
-			padding = v30.button.padding,
+			padding = v31.button.padding,
 			Size = uDim2,
-			backgroundStyle = if not Flags.FoundationNumberInputBindableValue then if not Flags.FoundationNumberInputVariant then getDisabledStyle(v29.Color.Shift.Shift_100, t1.increment.isDisabled) else v35(t1.increment.isDisabled) else mapBindable(t1.increment.isDisabled, function(p6) -- line: 171
-				-- upvalues: Flags (copy), v35 (copy), getDisabledStyle (copy), v29 (copy)
-				if Flags.FoundationNumberInputVariant then
-					return (v35(p6))
-				end
-
-				return (getDisabledStyle(v29.Color.Shift.Shift_100, p6))
-			end),
-			stroke = if not Flags.FoundationNumberInputVariant then {
-				Color = v29.Color.Stroke.Emphasis.Color3,
-				Transparency = if not Flags.FoundationNumberInputBindableValue then math.lerp(v29.Color.Stroke.Emphasis.Transparency, 1, not t1.increment.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY) else mapBindable(t1.increment.isDisabled, function(p7) -- line: 187
-					-- upvalues: v29 (copy), Constants (copy)
-					return (math.lerp(v29.Color.Stroke.Emphasis.Transparency, 1, not p7 and 0 or Constants.DISABLED_TRANSPARENCY))
-				end),
-				Thickness = v29.Stroke.Standard
-			} else v36(t1.increment.isDisabled),
-			tag = v30.splitButton.tag,
-			LayoutOrder = 1,
-			GroupTransparency = if Flags.FoundationNumberInputBindableValue or not t1.increment.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
+			backgroundStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then mapBindable(t1.increment.isDisabled, function(p6) -- line: 146
+				-- upvalues: v35 (copy)
+				return v35(p6)
+			end) else nil,
+			stroke = v36(t1.increment.isDisabled),
+			tag = v31.splitButton.tag,
 			testId = `{ t1.testId }--increment`
 		}, {
 			Icon = React.createElement(Icon, {
 				name = BuilderIcons.Icon.PlusSmall,
 				size = t1.size,
-				style = if not Flags.FoundationNumberInputBindableValue then nil else mapBindable(t1.increment.isDisabled, function(p8) -- line: 212
+				style = mapBindable(t1.increment.isDisabled, function(p7) -- line: 157
 					-- upvalues: Constants (copy)
 					return {
 						Color3 = nil,
-						Transparency = if not p8 then nil else Constants.DISABLED_TRANSPARENCY
+						Transparency = if not p7 then nil else Constants.DISABLED_TRANSPARENCY
 					}
 				end),
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -146,49 +133,37 @@ local function SplitControls(t1: {[any]: any}) -- line: 100
 			})
 		}),
 		ControlDecrement = React.createElement(View, {
+			LayoutOrder = -1,
 			onActivated = t1.decrement.onClick,
-			isDisabled = (not Flags.FoundationNumberInputBindableValue or not ReactIs.isBinding(t1.decrement.isDisabled)) and t1.decrement.isDisabled,
-			stateLayer = if not Flags.FoundationNumberInputBindableValue then nil else {
-				affordance = mapBindable(t1.decrement.isDisabled, function(p9) -- line: 232
+			isDisabled = not ReactIs.isBinding(t1.decrement.isDisabled) and t1.decrement.isDisabled,
+			stateLayer = {
+				affordance = mapBindable(t1.decrement.isDisabled, function(p8) -- line: 174
 					-- upvalues: StateLayerAffordance (copy)
-					if p9 then
+					if p8 then
 						return StateLayerAffordance.None
 					end
 
 					return StateLayerAffordance.Background
 				end)
 			},
-			padding = v30.button.padding,
+			padding = v31.button.padding,
 			Size = uDim2,
-			backgroundStyle = if not Flags.FoundationNumberInputBindableValue then if not Flags.FoundationNumberInputVariant then getDisabledStyle(v29.Color.Shift.Shift_100, t1.decrement.isDisabled) else v35(t1.decrement.isDisabled) else mapBindable(t1.decrement.isDisabled, function(p10) -- line: 240
-				-- upvalues: Flags (copy), v35 (copy), getDisabledStyle (copy), v29 (copy)
-				if Flags.FoundationNumberInputVariant then
-					return (v35(p10))
-				end
-
-				return (getDisabledStyle(v29.Color.Shift.Shift_100, p10))
-			end),
-			stroke = if not Flags.FoundationNumberInputVariant then {
-				Color = v29.Color.Stroke.Emphasis.Color3,
-				Transparency = if not Flags.FoundationNumberInputBindableValue then math.lerp(v29.Color.Stroke.Emphasis.Transparency, 1, not t1.decrement.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY) else mapBindable(t1.decrement.isDisabled, function(p11) -- line: 256
-					-- upvalues: v29 (copy), Constants (copy)
-					return (math.lerp(v29.Color.Stroke.Emphasis.Transparency, 1, not p11 and 0 or Constants.DISABLED_TRANSPARENCY))
-				end),
-				Thickness = v29.Stroke.Standard
-			} else v36(t1.decrement.isDisabled),
-			tag = v30.splitButton.tag,
-			LayoutOrder = -1,
-			GroupTransparency = if Flags.FoundationNumberInputBindableValue or not t1.decrement.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
+			backgroundStyle = if not Flags.FoundationTextInputRemoveBackgroundStyle then mapBindable(t1.decrement.isDisabled, function(p9) -- line: 182
+				-- upvalues: v35 (copy)
+				return v35(p9)
+			end) else nil,
+			stroke = v36(t1.decrement.isDisabled),
+			tag = v31.splitButton.tag,
 			testId = `{ t1.testId }--decrement`
 		}, {
 			Icon = React.createElement(Icon, {
 				name = BuilderIcons.Icon.MinusSmall,
 				size = t1.size,
-				style = if not Flags.FoundationNumberInputBindableValue then nil else mapBindable(t1.decrement.isDisabled, function(p12) -- line: 281
+				style = mapBindable(t1.decrement.isDisabled, function(p10) -- line: 193
 					-- upvalues: Constants (copy)
 					return {
 						Color3 = nil,
-						Transparency = if not p12 then nil else Constants.DISABLED_TRANSPARENCY
+						Transparency = if not p10 then nil else Constants.DISABLED_TRANSPARENCY
 					}
 				end),
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -198,46 +173,32 @@ local function SplitControls(t1: {[any]: any}) -- line: 100
 		})
 	})
 end
-local function StackedControls(t2: {[any]: any}) -- line: 296
-	-- upvalues: useTokens (copy), useNumberInputVariants (copy), React (copy), Flags (copy), mapBindable (copy), Constants (copy), View (copy), v21 (copy), ReactIs (copy), Image (copy)
+local function StackedControls(t2: {[any]: any}) -- line: 207
+	-- upvalues: useTokens (copy), useNumberInputVariants (copy), React (copy), mapBindable (copy), Constants (copy), View (copy), v21 (copy), ReactIs (copy), Image (copy)
 	local v38 = useTokens()
 	local v39 = useNumberInputVariants(v38, t2.size, t2.controlsVariant)
-	local v40 = React.useMemo(function() -- line: 300
-		-- upvalues: Flags (copy), mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return (mapBindable(t2.increment.isDisabled, function(p13) -- line: 302
-				-- upvalues: v38 (copy), Constants (copy)
-				return {
-					Color3 = v38.Color.Stroke.Emphasis.Color3,
-					Transparency = not p13 and 0 or Constants.DISABLED_TRANSPARENCY
-				}
-			end))
-		end
-
-		return {
-			Color3 = v38.Color.Stroke.Emphasis.Color3,
-			Transparency = not t2.increment.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY
-		}
+	local v40 = React.useMemo(function() -- line: 211
+		-- upvalues: mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
+		return mapBindable(t2.increment.isDisabled, function(p11) -- line: 212
+			-- upvalues: v38 (copy), Constants (copy)
+			return {
+				Color3 = v38.Color.Stroke.Emphasis.Color3,
+				Transparency = not p11 and 0 or Constants.DISABLED_TRANSPARENCY
+			}
+		end)
 	end, {
 		v38,
 		t2.increment.isDisabled
 	})
-	local v41 = React.useMemo(function() -- line: 314
-		-- upvalues: Flags (copy), mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
-		if Flags.FoundationNumberInputBindableValue then
-			return (mapBindable(t2.decrement.isDisabled, function(p14) -- line: 316
-				-- upvalues: v38 (copy), Constants (copy)
-				return {
-					Color3 = v38.Color.Stroke.Emphasis.Color3,
-					Transparency = not p14 and 0 or Constants.DISABLED_TRANSPARENCY
-				}
-			end))
-		end
-
-		return {
-			Color3 = v38.Color.Stroke.Emphasis.Color3,
-			Transparency = not t2.decrement.isDisabled and 0 or Constants.DISABLED_TRANSPARENCY
-		}
+	local v41 = React.useMemo(function() -- line: 220
+		-- upvalues: mapBindable (copy), t2 (copy), v38 (copy), Constants (copy)
+		return mapBindable(t2.decrement.isDisabled, function(p12) -- line: 221
+			-- upvalues: v38 (copy), Constants (copy)
+			return {
+				Color3 = v38.Color.Stroke.Emphasis.Color3,
+				Transparency = not p12 and 0 or Constants.DISABLED_TRANSPARENCY
+			}
+		end)
 	end, {
 		v38,
 		t2.decrement.isDisabled
@@ -250,7 +211,7 @@ local function StackedControls(t2: {[any]: any}) -- line: 296
 	}, {
 		ControlIncrement = React.createElement(v21, {
 			onActivated = t2.increment.onClick,
-			isDisabled = (not Flags.FoundationNumberInputBindableValue or not ReactIs.isBinding(t2.increment.isDisabled)) and t2.increment.isDisabled,
+			isDisabled = not ReactIs.isBinding(t2.increment.isDisabled) and t2.increment.isDisabled,
 			padding = v39.button.padding,
 			tag = v39.upButton.tag,
 			testId = `{ t2.testId }--increment`
@@ -265,7 +226,7 @@ local function StackedControls(t2: {[any]: any}) -- line: 296
 		ControlDecrement = React.createElement(v21, {
 			tag = v39.downButton.tag,
 			onActivated = t2.decrement.onClick,
-			isDisabled = (not Flags.FoundationNumberInputBindableValue or not ReactIs.isBinding(t2.decrement.isDisabled)) and t2.decrement.isDisabled,
+			isDisabled = not ReactIs.isBinding(t2.decrement.isDisabled) and t2.decrement.isDisabled,
 			padding = v39.button.padding,
 			testId = `{ t2.testId }--decrement`
 		}, {
@@ -278,8 +239,7 @@ local function StackedControls(t2: {[any]: any}) -- line: 296
 		})
 	})
 end
-
-return function(t3: {[any]: any}) --[[ NumberInputControls ]] -- line: 370
+local function NumberInputControls(t3: {[any]: any}) -- line: 269
 	-- upvalues: NumberInputControlsVariant (copy), React (copy), StackedControls (copy), SplitControls (copy)
 	if t3.controlsVariant == NumberInputControlsVariant.Stacked then
 		return React.createElement(StackedControls, t3)
@@ -287,3 +247,5 @@ return function(t3: {[any]: any}) --[[ NumberInputControls ]] -- line: 370
 
 	return React.createElement(SplitControls, t3)
 end
+
+return NumberInputControls

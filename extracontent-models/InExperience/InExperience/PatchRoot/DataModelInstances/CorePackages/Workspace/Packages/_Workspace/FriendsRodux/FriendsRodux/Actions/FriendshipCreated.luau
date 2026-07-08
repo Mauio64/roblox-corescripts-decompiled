@@ -1,12 +1,14 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local _ = require(l_Parent_0.roduxFriendsTypes);
-return v2.makeActionCreator(script.Name, function(v4, v5) --[[ Line: 8 ]]
-    return {
-        payload = {
-            userId1 = v4, 
-            userId2 = v5
-        }
-    };
-end);
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+
+require(ParentParent.roduxFriendsTypes)
+
+return Rodux.makeActionCreator(script.Name, function(s1: string, s2: string) -- line: 8
+	return {
+		payload = {
+			userId1 = s1,
+			userId2 = s2
+		}
+	}
+end)

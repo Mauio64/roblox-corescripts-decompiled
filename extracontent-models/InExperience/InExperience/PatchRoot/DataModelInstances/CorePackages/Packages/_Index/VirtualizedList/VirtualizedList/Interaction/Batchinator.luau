@@ -1,54 +1,63 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_setTimeout_0 = v1.setTimeout;
-local l_clearTimeout_0 = v1.clearTimeout;
-local v6 = {
-    runAfterInteractions = function(_, v5) --[[ Line: 20 ]] --[[ Name: runAfterInteractions ]]
-        v5();
-        return nil;
-    end
-};
-local v7 = {};
-v7.__index = v7;
-v7.new = function(v8, v9) --[[ Line: 64 ]] --[[ Name: new ]]
-    -- upvalues: v7 (copy)
-    local v10 = setmetatable({}, v7);
-    v10._delay = v9;
-    v10._callback = v8;
-    return v10;
-end;
-v7.dispose = function(v11, v12) --[[ Line: 71 ]] --[[ Name: dispose ]]
-    local v13 = v12 or {
-        abort = false
-    };
-    if v11._taskHandle then
-        v11._taskHandle.cancel();
-        if not v13.abort then
-            v11._callback();
-        end;
-        v11._taskHandle = nil;
-    end;
-end;
-v7.schedule = function(v14) --[[ Line: 85 ]] --[[ Name: schedule ]]
-    -- upvalues: l_setTimeout_0 (copy), v6 (copy), l_clearTimeout_0 (copy)
-    if v14._taskHandle then
-        return;
-    else
-        local v15 = l_setTimeout_0(function() --[[ Line: 90 ]]
-            -- upvalues: v14 (copy), v6 (ref)
-            v14._taskHandle = v6:runAfterInteractions(function() --[[ Line: 91 ]]
-                -- upvalues: v14 (ref)
-                v14._taskHandle = nil;
-                v14._callback();
-            end);
-        end, v14._delay);
-        v14._taskHandle = {
-            cancel = function() --[[ Line: 100 ]] --[[ Name: cancel ]]
-                -- upvalues: l_clearTimeout_0 (ref), v15 (copy)
-                return l_clearTimeout_0(v15);
-            end
-        };
-        return;
-    end;
-end;
-return v7;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local setTimeout = LuauPolyfill.setTimeout
+local clearTimeout = LuauPolyfill.clearTimeout
+local t1 = {
+	runAfterInteractions = function(_, p2: ((...any) -> ...any)) -- line: 20
+		p2()
+
+		return nil
+	end
+}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(p3: ((...any) -> ...any), n1: number) -- line: 64
+	-- upvalues: t2 (copy)
+	local self = setmetatable({}, t2)
+
+	self._delay = n1
+	self._callback = p3
+
+	return self
+end
+function t2.dispose(t3: {[any]: any}, t4: {[any]: any}?) -- line: 71
+	local v14 = t4 or {
+		abort = false
+	}
+
+	if t3._taskHandle then
+		t3._taskHandle.cancel()
+
+		if not v14.abort then
+			t3._callback()
+		end
+
+		t3._taskHandle = nil
+	end
+end
+function t2.schedule(p4) -- line: 85
+	-- upvalues: setTimeout (copy), t1 (copy), clearTimeout (copy)
+	if p4._taskHandle then
+		return
+	end
+
+	local v16 = setTimeout(function() -- line: 90
+		-- upvalues: p4 (copy), t1 (copy)
+		p4._taskHandle = t1:runAfterInteractions(function() -- line: 91
+			-- upvalues: p4 (copy)
+			p4._taskHandle = nil
+			p4._callback()
+		end)
+	end, p4._delay)
+
+	p4._taskHandle = {
+		cancel = function() -- line: 100
+			-- upvalues: clearTimeout (copy), v16 (copy)
+			return clearTimeout(v16)
+		end
+	}
+end
+
+return t2

@@ -1,1156 +1,1394 @@
-local _ = game:GetService("VRService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Players_0 = game:GetService("Players");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = game:GetService("RobloxReplicatedStorage");
-local l_RobloxGui_0 = l_CoreGui_0.RobloxGui;
-local v8 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_IXPServiceWrapper_0 = require(l_CorePackages_0.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper;
-local v10 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local l_default_0 = require(l_CorePackages_0.Workspace.Packages.CallProtocol).CallProtocol.default;
-local l_Enums_0 = require(l_CorePackages_0.Workspace.Packages.CallProtocol).Enums;
-local l_game_EngineFeature_0 = game:GetEngineFeature("LoadStreamAnimationReplaceErrorsWithTelemetryFeature");
-local l_game_EngineFeature_1 = game:GetEngineFeature("FaceAnimatorNotifyLODRecommendCameraInputDisable");
-local v15 = game:DefineFastFlag("FacialAnimationStreamingClearTrackImprovementsV2", false);
-game:DefineFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving", false);
-game:DefineFastFlag("FacialAnimationStreamingSearchForReplacementWhenRemovingAnimator", false);
-game:DefineFastFlag("StopStreamTrackOnDeath", false);
-game:DefineFastFlag("FacialAnimationStreamingClearAllConnectionsFix2", false);
-game:DefineFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C", false);
-local l_GetFFlagAvatarChatServiceEnabled_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagAvatarChatServiceEnabled;
-local v17 = if l_GetFFlagAvatarChatServiceEnabled_0() then game:GetService("AvatarChatService") else nil;
-local l_FaceAnimatorService_0 = game:GetService("FaceAnimatorService");
-local v19 = game:DefineFastFlag("UXForCameraPerformanceEnabled", false);
-local v20 = game:DefineFastFlag("DisableCameraOnLowspecAndroidCalls", false);
-local v21 = game:DefineFastInt("UXForCameraPerformanceSessionDelay", 300);
-local v22 = game:DefineFastInt("UXForCameraPerformanceDeviceDelay", 43200);
-local v23 = require(l_RobloxGui_0.Modules.Flags.GetFFlagUXForCameraPerformanceIXPEnabled);
-local v24 = require(l_RobloxGui_0.Modules.Flags.GetFStringUXForCameraPerformanceIXPLayerName);
-local function v25() --[[ Line: 47 ]]
-    return true;
-end;
-if v20 then
-    v25 = require(l_RobloxGui_0.Modules.Settings.isCamEnabledForUserAndPlace);
-end;
-local v26 = require(l_RobloxGui_0.Modules.FacialAnimationStreaming.FacialAnimationStreamingHeartbeatStats);
-if not l_FaceAnimatorService_0 or not v17 then
-    return;
-else
-    l_FaceAnimatorService_0.FlipHeadOrientation = true;
-    local v27 = require(l_RobloxGui_0.Modules.Emote.EmoteHelper);
-    local v28 = require(l_RobloxGui_0.Modules.Tracker.TrackerMenu);
-    local v29 = require(l_RobloxGui_0.Modules.Tracker.TrackerPromptType);
-    local l_default_1 = require(l_RobloxGui_0.Modules.VoiceChat.VoiceChatServiceManager).default;
-    local v31 = {
-        CharacterAdded = "CharacterAdded", 
-        CharacterRemoving = "CharacterRemoving", 
-        CharacterDescendantAdded = "CharacterDescendantAdded", 
-        CharacterDescendantRemoving = "CharacterDescendantRemoving", 
-        AnimatorDataModelReady = "AnimatorDataModelReady", 
-        PlayerEmoted = "PlayerEmoted", 
-        PlayerChatted = "PlayerChatted", 
-        EmoteFinished = "EmoteFinished", 
-        PlayerDied = "PlayerDied"
-    };
-    local _ = v8:FormatByKey("Feature.FaceChat.Message.PlaceUnavailable");
-    local v33 = false;
-    local v34 = os.time();
-    local v35 = {};
-    local v36 = {};
-    local v37 = {};
-    local v38 = {};
-    local v39 = {};
-    local v40 = {};
-    local v41 = nil;
-    local v42 = nil;
-    local v43 = nil;
-    local v44 = nil;
-    local v45 = nil;
-    local function _(v46, v47) --[[ Line: 106 ]] --[[ Name: playerTrace ]]
-        -- upvalues: v10 (copy)
-        local v48 = "";
-        local v49 = "";
-        if v47 then
-            if v47.UserId then
-                v48 = tostring(v47.UserId);
-            end;
-            if v47.Name then
-                v49 = v47.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", v46, v48, v49));
-    end;
-    local function _(v51, v52) --[[ Line: 120 ]] --[[ Name: clearConnection ]]
-        -- upvalues: v38 (copy)
-        if v38[v51.UserId] and v38[v51.UserId][v52] then
-            v38[v51.UserId][v52]:Disconnect();
-            v38[v51.UserId][v52] = nil;
-        end;
-    end;
-    local function v59(v54) --[[ Line: 127 ]] --[[ Name: clearAllConnections ]]
-        -- upvalues: v31 (copy), v38 (copy)
-        if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") then
-            for _, v56 in pairs(v31) do
-                if v38[v54.UserId] and v38[v54.UserId][v56] then
-                    v38[v54.UserId][v56]:Disconnect();
-                    v38[v54.UserId][v56] = nil;
-                end;
-            end;
-        else
-            for _, v58 in ipairs(v31) do
-                if v38[v54.UserId] and v38[v54.UserId][v58] then
-                    v38[v54.UserId][v58]:Disconnect();
-                    v38[v54.UserId][v58] = nil;
-                end;
-            end;
-        end;
-        v38[v54.UserId] = {};
-    end;
-    local function v63(v60) --[[ Line: 141 ]] --[[ Name: clearCharacterAnimations ]]
-        -- upvalues: v10 (copy), v37 (copy), v15 (copy)
-        local v61 = "";
-        local v62 = "";
-        if v60 then
-            if v60.UserId then
-                v61 = tostring(v60.UserId);
-            end;
-            if v60.Name then
-                v62 = v60.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", "clearCharacterAnimations", v61, v62));
-        if v37[v60.UserId] then
-            if v15 then
-                if v37[v60.UserId].animationTrack then
-                    v37[v60.UserId].animationTrack:Stop(0);
-                    v37[v60.UserId].animationTrack = nil;
-                end;
-                if v37[v60.UserId].animation then
-                    v37[v60.UserId].animation = nil;
-                end;
-            else
-                if v37[v60.UserId].animation then
-                    v37[v60.UserId].animation:Destroy();
-                    v37[v60.UserId].animation = nil;
-                end;
-                if v37[v60.UserId].animationTrack then
-                    v37[v60.UserId].animationTrack:Stop(0);
-                    v37[v60.UserId].animationTrack:Destroy();
-                    v37[v60.UserId].animationTrack = nil;
-                end;
-            end;
-            v37[v60.UserId] = nil;
-        end;
-    end;
-    local function v65(v64) --[[ Line: 168 ]] --[[ Name: getPlayerFaceControls ]]
-        if v64 and v64.Character then
-            return v64.Character:FindFirstChildWhichIsA("FaceControls", true);
-        else
-            return nil;
-        end;
-    end;
-    local function v67(v66) --[[ Line: 176 ]] --[[ Name: getPlayerHumanoid ]]
-        if v66.Character then
-            return v66.Character:FindFirstChildOfClass("Humanoid");
-        else
-            return nil;
-        end;
-    end;
-    local function v70(v68) --[[ Line: 184 ]] --[[ Name: getPlayerAnimator ]]
-        local v69 = if v68.Character then v68.Character:FindFirstChildOfClass("Humanoid") else nil;
-        if v69 then
-            return v69:FindFirstChildOfClass("Animator");
-        else
-            return nil;
-        end;
-    end;
-    local function _(v71) --[[ Line: 193 ]] --[[ Name: pauseStreamingAnimationForPlayer ]]
-        -- upvalues: v37 (copy), v10 (copy)
-        if v37[v71.UserId] and v37[v71.UserId].animationTrack then
-            local v72 = "";
-            local v73 = "";
-            if v71 then
-                if v71.UserId then
-                    v72 = tostring(v71.UserId);
-                end;
-                if v71.Name then
-                    v73 = v71.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v72, v73));
-            v37[v71.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-        end;
-    end;
-    local function _(v75) --[[ Line: 204 ]] --[[ Name: resumeStreamingAnimationForPlayer ]]
-        -- upvalues: v37 (copy), v10 (copy)
-        if v37[v75.UserId] and v37[v75.UserId].animationTrack then
-            local v76 = "";
-            local v77 = "";
-            if v75 then
-                if v75.UserId then
-                    v76 = tostring(v75.UserId);
-                end;
-                if v75.Name then
-                    v77 = v75.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", v76, v77));
-            v37[v75.UserId].animationTrack:AdjustWeight(1, 0.5);
-        end;
-    end;
-    local function _() --[[ Line: 211 ]] --[[ Name: updateStreamTrackStatus ]]
-        -- upvalues: l_Players_0 (copy), l_FaceAnimatorService_0 (copy), v37 (copy), v10 (copy)
-        local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-        if not l_LocalPlayer_0 then
-            return;
-        else
-            if l_FaceAnimatorService_0.AudioAnimationEnabled or l_FaceAnimatorService_0.VideoAnimationEnabled then
-                if v37[l_LocalPlayer_0.UserId] and v37[l_LocalPlayer_0.UserId].animationTrack then
-                    local v80 = "";
-                    local v81 = "";
-                    if l_LocalPlayer_0 then
-                        if l_LocalPlayer_0.UserId then
-                            v80 = tostring(l_LocalPlayer_0.UserId);
-                        end;
-                        if l_LocalPlayer_0.Name then
-                            v81 = l_LocalPlayer_0.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", v80, v81));
-                    v37[l_LocalPlayer_0.UserId].animationTrack:AdjustWeight(1, 0.5);
-                    return;
-                end;
-            elseif v37[l_LocalPlayer_0.UserId] and v37[l_LocalPlayer_0.UserId].animationTrack then
-                local v82 = "";
-                local v83 = "";
-                if l_LocalPlayer_0 then
-                    if l_LocalPlayer_0.UserId then
-                        v82 = tostring(l_LocalPlayer_0.UserId);
-                    end;
-                    if l_LocalPlayer_0.Name then
-                        v83 = l_LocalPlayer_0.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v82, v83));
-                v37[l_LocalPlayer_0.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-            end;
-            return;
-        end;
-    end;
-    local function v97(v85, v86, v87) --[[ Line: 225 ]] --[[ Name: handleEmote ]]
-        -- upvalues: v10 (copy), v31 (copy), v38 (copy), v37 (copy), v27 (copy), l_FaceAnimatorService_0 (copy)
-        local v88 = string.format("handleEmote {isChatTriggered:%s}", (tostring(v87)));
-        local v89 = "";
-        local v90 = "";
-        if v85 then
-            if v85.UserId then
-                v89 = tostring(v85.UserId);
-            end;
-            if v85.Name then
-                v90 = v85.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", v88, v89, v90));
-        if v86 then
-            v88 = v31.EmoteFinished;
-            if v38[v85.UserId] and v38[v85.UserId][v88] then
-                v38[v85.UserId][v88]:Disconnect();
-                v38[v85.UserId][v88] = nil;
-            end;
-            if v37[v85.UserId] and v37[v85.UserId].animationTrack then
-                v88 = "";
-                v89 = "";
-                if v85 then
-                    if v85.UserId then
-                        v88 = tostring(v85.UserId);
-                    end;
-                    if v85.Name then
-                        v89 = v85.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v88, v89));
-                v37[v85.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-            end;
-            v38[v85.UserId][v31.EmoteFinished] = v27.createEmoteFinishEvent(v85, v86, v87):Connect(function() --[[ Line: 240 ]]
-                -- upvalues: v85 (copy), v31 (ref), v38 (ref), l_FaceAnimatorService_0 (ref), v37 (ref), v10 (ref)
-                local l_v85_0 = v85;
-                local l_EmoteFinished_0 = v31.EmoteFinished;
-                if v38[l_v85_0.UserId] and v38[l_v85_0.UserId][l_EmoteFinished_0] then
-                    v38[l_v85_0.UserId][l_EmoteFinished_0]:Disconnect();
-                    v38[l_v85_0.UserId][l_EmoteFinished_0] = nil;
-                end;
-                if l_FaceAnimatorService_0.AudioAnimationEnabled or l_FaceAnimatorService_0.VideoAnimationEnabled then
-                    l_EmoteFinished_0 = v85;
-                    if v37[l_EmoteFinished_0.UserId] and v37[l_EmoteFinished_0.UserId].animationTrack then
-                        local v93 = "";
-                        local v94 = "";
-                        if l_EmoteFinished_0 then
-                            if l_EmoteFinished_0.UserId then
-                                v93 = tostring(l_EmoteFinished_0.UserId);
-                            end;
-                            if l_EmoteFinished_0.Name then
-                                v94 = l_EmoteFinished_0.Name;
-                            end;
-                        end;
-                        v10:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", v93, v94));
-                        v37[l_EmoteFinished_0.UserId].animationTrack:AdjustWeight(1, 0.5);
-                        return;
-                    end;
-                else
-                    l_EmoteFinished_0 = v85;
-                    if v37[l_EmoteFinished_0.UserId] and v37[l_EmoteFinished_0.UserId].animationTrack then
-                        local v95 = "";
-                        local v96 = "";
-                        if l_EmoteFinished_0 then
-                            if l_EmoteFinished_0.UserId then
-                                v95 = tostring(l_EmoteFinished_0.UserId);
-                            end;
-                            if l_EmoteFinished_0.Name then
-                                v96 = l_EmoteFinished_0.Name;
-                            end;
-                        end;
-                        v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v95, v96));
-                        v37[l_EmoteFinished_0.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-                    end;
-                end;
-            end);
-        end;
-    end;
-    local function v102(v98, v99) --[[ Line: 256 ]] --[[ Name: onPlayerChatted ]]
-        -- upvalues: v27 (copy), v97 (copy)
-        if if v98.Character then v98.Character:FindFirstChildOfClass("Humanoid") else nil then
-            local v100 = nil;
-            if string.sub(v99, 1, 3) == "/e " then
-                v100 = string.sub(v99, 4);
-            elseif string.sub(v99, 1, 7) == "/emote " then
-                v100 = string.sub(v99, 8);
-            end;
-            if v100 and v27.LegacyDefaultEmotes[v100] then
-                wait(v27.EMOTE_LOOP_TRANSITION_WAIT_TIME);
-                local v101 = v27.getAnyActiveDefaultChatTriggeredEmoteTrack(v98);
-                if v101 then
-                    v97(v98, v101, true);
-                end;
-            end;
-        end;
-    end;
-    local function v117(v103, v104) --[[ Line: 279 ]] --[[ Name: onAnimatorAdded ]]
-        -- upvalues: v37 (copy), v10 (copy), v31 (copy), v38 (copy), l_game_EngineFeature_0 (copy), l_FaceAnimatorService_0 (copy), l_Players_0 (copy), v39 (copy)
-        if not v104 then
-            return;
-        elseif not v104.Parent or not v104.Parent:IsA("Humanoid") then
-            return;
-        elseif v37[v103.UserId] then
-            local v105 = "";
-            local v106 = "";
-            if v103 then
-                if v103.UserId then
-                    v105 = tostring(v103.UserId);
-                end;
-                if v103.Name then
-                    v106 = v103.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "onAnimatorAdded already done; skipping", v105, v106));
-            return;
-        else
-            local l_AnimatorDataModelReady_0 = v31.AnimatorDataModelReady;
-            if v38[v103.UserId] and v38[v103.UserId][l_AnimatorDataModelReady_0] then
-                v38[v103.UserId][l_AnimatorDataModelReady_0]:Disconnect();
-                v38[v103.UserId][l_AnimatorDataModelReady_0] = nil;
-            end;
-            l_AnimatorDataModelReady_0 = function() --[[ Line: 297 ]]
-                -- upvalues: v104 (copy), v103 (copy), l_game_EngineFeature_0 (ref), v37 (ref), l_FaceAnimatorService_0 (ref), l_Players_0 (ref), v10 (ref), v39 (ref)
-                local v108 = {
-                    animation = Instance.new("TrackerStreamAnimation")
-                };
-                if game:GetEngineFeature("UseNewLoadStreamAnimationAPI") then
-                    v108.animationTrack = v104:LoadStreamAnimationV2(v108.animation, v103);
-                else
-                    v108.animationTrack = v104:LoadStreamAnimation(v108.animation);
-                end;
-                if l_game_EngineFeature_0 and not v108.animationTrack then
-                    return;
-                else
-                    v108.animationTrack.Priority = Enum.AnimationPriority.Idle;
-                    v108.animationTrack:Play(0.1, 1);
-                    v37[v103.UserId] = v108;
-                    local v109 = l_FaceAnimatorService_0.AudioAnimationEnabled or l_FaceAnimatorService_0.VideoAnimationEnabled;
-                    if v103 == l_Players_0.LocalPlayer and not v109 then
-                        local l_v103_0 = v103;
-                        if v37[l_v103_0.UserId] and v37[l_v103_0.UserId].animationTrack then
-                            local v111 = "";
-                            local v112 = "";
-                            if l_v103_0 then
-                                if l_v103_0.UserId then
-                                    v111 = tostring(l_v103_0.UserId);
-                                end;
-                                if l_v103_0.Name then
-                                    v112 = l_v103_0.Name;
-                                end;
-                            end;
-                            v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v111, v112));
-                            v37[l_v103_0.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-                        end;
-                    end;
-                    if game:GetFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving") then
-                        v39[v103.UserId] = v104;
-                    end;
-                    return;
-                end;
-            end;
-            if v104:IsDescendantOf(game) then
-                l_AnimatorDataModelReady_0();
-                return;
-            else
-                v38[v103.UserId][v31.AnimatorDataModelReady] = v104.AncestryChanged:Connect(function(_, _) --[[ Line: 335 ]]
-                    -- upvalues: v104 (copy), v103 (copy), v31 (ref), v38 (ref), l_AnimatorDataModelReady_0 (copy)
-                    if v104:IsDescendantOf(game) then
-                        local l_v103_1 = v103;
-                        local l_AnimatorDataModelReady_1 = v31.AnimatorDataModelReady;
-                        if v38[l_v103_1.UserId] and v38[l_v103_1.UserId][l_AnimatorDataModelReady_1] then
-                            v38[l_v103_1.UserId][l_AnimatorDataModelReady_1]:Disconnect();
-                            v38[l_v103_1.UserId][l_AnimatorDataModelReady_1] = nil;
-                        end;
-                        l_AnimatorDataModelReady_0();
-                    end;
-                end);
-                return;
-            end;
-        end;
-    end;
-    local function v123(v118, v119) --[[ Line: 347 ]] --[[ Name: onHumanoidAdded ]]
-        -- upvalues: v31 (copy), v38 (copy), v97 (copy), v63 (copy)
-        if not v119 then
-            return;
-        else
-            local l_PlayerEmoted_0 = v31.PlayerEmoted;
-            if v38[v118.UserId] and v38[v118.UserId][l_PlayerEmoted_0] then
-                v38[v118.UserId][l_PlayerEmoted_0]:Disconnect();
-                v38[v118.UserId][l_PlayerEmoted_0] = nil;
-            end;
-            v38[v118.UserId][v31.PlayerEmoted] = v119.EmoteTriggered:Connect(function(v121, v122) --[[ Line: 355 ]]
-                -- upvalues: v97 (ref), v118 (copy)
-                if v121 then
-                    v97(v118, v122, false);
-                end;
-            end);
-            if game:GetFastFlag("StopStreamTrackOnDeath") then
-                l_PlayerEmoted_0 = v31.PlayerDied;
-                if v38[v118.UserId] and v38[v118.UserId][l_PlayerEmoted_0] then
-                    v38[v118.UserId][l_PlayerEmoted_0]:Disconnect();
-                    v38[v118.UserId][l_PlayerEmoted_0] = nil;
-                end;
-                v38[v118.UserId][v31.PlayerDied] = v119.Died:Connect(function() --[[ Line: 365 ]]
-                    -- upvalues: v63 (ref), v118 (copy)
-                    v63(v118);
-                end);
-            end;
-            return;
-        end;
-    end;
-    local function v134(v124, v125) --[[ Line: 371 ]] --[[ Name: onFaceControlsAdded ]]
-        -- upvalues: l_Players_0 (copy), v40 (copy), l_default_1 (copy), v10 (copy), l_FaceAnimatorService_0 (copy)
-        assert(game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C"));
-        if v124 ~= l_Players_0.LocalPlayer then
-            return;
-        elseif v40[v124.UserId] ~= nil and v125 == v40[v124.UserId] then
-            return;
-        else
-            v40[v124.UserId] = v125;
-            if v40[v124.UserId] then
-                if l_default_1 and not l_default_1.localMuted then
-                    local v126 = "";
-                    local v127 = "";
-                    if v124 then
-                        if v124.UserId then
-                            v126 = tostring(v124.UserId);
-                        end;
-                        if v124.Name then
-                            v127 = v124.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "FaceControls found -> enabling A2C (Mic is ON)...", v126, v127));
-                    l_FaceAnimatorService_0.AudioAnimationEnabled = true;
-                    return;
-                else
-                    local v128 = "";
-                    local v129 = "";
-                    if v124 then
-                        if v124.UserId then
-                            v128 = tostring(v124.UserId);
-                        end;
-                        if v124.Name then
-                            v129 = v124.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "FaceControls found -> won't enable A2C (Mic is MUTED)...", v128, v129));
-                    return;
-                end;
-            elseif l_FaceAnimatorService_0.AudioAnimationEnabled then
-                local v130 = "";
-                local v131 = "";
-                if v124 then
-                    if v124.UserId then
-                        v130 = tostring(v124.UserId);
-                    end;
-                    if v124.Name then
-                        v131 = v124.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "FaceControls NOT found -> disabling A2C...", v130, v131));
-                l_FaceAnimatorService_0.AudioAnimationEnabled = false;
-                return;
-            else
-                local v132 = "";
-                local v133 = "";
-                if v124 then
-                    if v124.UserId then
-                        v132 = tostring(v124.UserId);
-                    end;
-                    if v124.Name then
-                        v133 = v124.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "FaceControls NOT found -> won't disable A2C (already is disabled)...", v132, v133));
-                return;
-            end;
-        end;
-    end;
-    local function v137(v135, v136) --[[ Line: 406 ]] --[[ Name: onCharacterDescendantAdded ]]
-        -- upvalues: v117 (copy), v123 (copy), v134 (copy), v65 (copy)
-        if v136:IsDescendantOf(game) then
-            if v136:IsA("Animator") then
-                v117(v135, v136);
-                return;
-            elseif v136:IsA("Humanoid") then
-                v123(v135, v136);
-                return;
-            elseif game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and v136:IsA("MeshPart") and v136.Name == "Head" then
-                v134(v135, v65(v135));
-                return;
-            elseif game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and v136:IsA("FaceControls") then
-                v134(v135, v136);
-            end;
-        end;
-    end;
-    local function v144(v138, v139) --[[ Line: 426 ]] --[[ Name: onCharacterDescendantRemoving ]]
-        -- upvalues: v39 (copy), v31 (copy), v38 (copy), v63 (copy), v117 (copy), v134 (copy), v65 (copy)
-        if v139:IsA("Animator") then
-            if game:GetFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving") then
-                if v139 == v39[v138.UserId] then
-                    local l_AnimatorDataModelReady_2 = v31.AnimatorDataModelReady;
-                    if v38[v138.UserId] and v38[v138.UserId][l_AnimatorDataModelReady_2] then
-                        v38[v138.UserId][l_AnimatorDataModelReady_2]:Disconnect();
-                        v38[v138.UserId][l_AnimatorDataModelReady_2] = nil;
-                    end;
-                    v63(v138);
-                    v39[v138.UserId] = nil;
-                    if game:GetFastFlag("FacialAnimationStreamingSearchForReplacementWhenRemovingAnimator") then
-                        local v141 = if v138.Character then v138.Character:FindFirstChildOfClass("Humanoid") else nil;
-                        l_AnimatorDataModelReady_2 = if v141 then v141:FindFirstChildOfClass("Animator") else nil;
-                        if l_AnimatorDataModelReady_2 then
-                            v117(v138, l_AnimatorDataModelReady_2);
-                            return;
-                        end;
-                    end;
-                end;
-            else
-                local l_AnimatorDataModelReady_3 = v31.AnimatorDataModelReady;
-                if v38[v138.UserId] and v38[v138.UserId][l_AnimatorDataModelReady_3] then
-                    v38[v138.UserId][l_AnimatorDataModelReady_3]:Disconnect();
-                    v38[v138.UserId][l_AnimatorDataModelReady_3] = nil;
-                end;
-                v63(v138);
-                return;
-            end;
-        elseif v139:IsA("Humanoid") then
-            local l_PlayerEmoted_1 = v31.PlayerEmoted;
-            if v38[v138.UserId] and v38[v138.UserId][l_PlayerEmoted_1] then
-                v38[v138.UserId][l_PlayerEmoted_1]:Disconnect();
-                v38[v138.UserId][l_PlayerEmoted_1] = nil;
-            end;
-            if game:GetFastFlag("StopStreamTrackOnDeath") then
-                l_PlayerEmoted_1 = v31.PlayerDied;
-                if v38[v138.UserId] and v38[v138.UserId][l_PlayerEmoted_1] then
-                    v38[v138.UserId][l_PlayerEmoted_1]:Disconnect();
-                    v38[v138.UserId][l_PlayerEmoted_1] = nil;
-                    return;
-                end;
-            end;
-        elseif game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and (v139:IsA("MeshPart") and v139.Name == "Head" or v139:IsA("FaceControls")) then
-            v134(v138, v65(v138));
-        end;
-    end;
-    local function v151(v145, v146) --[[ Line: 459 ]] --[[ Name: onCharacterAdded ]]
-        -- upvalues: v10 (copy), v31 (copy), v38 (copy), v137 (copy), v144 (copy), v134 (copy), v65 (copy), v123 (copy), v67 (copy), v117 (copy), v70 (copy)
-        local v147 = "";
-        local v148 = "";
-        if v145 then
-            if v145.UserId then
-                v147 = tostring(v145.UserId);
-            end;
-            if v145.Name then
-                v148 = v145.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", "Player character added", v147, v148));
-        v147 = v31.CharacterDescendantAdded;
-        if v38[v145.UserId] and v38[v145.UserId][v147] then
-            v38[v145.UserId][v147]:Disconnect();
-            v38[v145.UserId][v147] = nil;
-        end;
-        v147 = v31.CharacterDescendantRemoving;
-        if v38[v145.UserId] and v38[v145.UserId][v147] then
-            v38[v145.UserId][v147]:Disconnect();
-            v38[v145.UserId][v147] = nil;
-        end;
-        v38[v145.UserId][v31.CharacterDescendantAdded] = v146.DescendantAdded:Connect(function(v149) --[[ Line: 468 ]]
-            -- upvalues: v137 (ref), v145 (copy)
-            v137(v145, v149);
-        end);
-        v38[v145.UserId][v31.CharacterDescendantRemoving] = v146.DescendantRemoving:Connect(function(v150) --[[ Line: 473 ]]
-            -- upvalues: v144 (ref), v145 (copy)
-            v144(v145, v150);
-        end);
-        if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
-            v134(v145, v65(v145));
-        end;
-        v123(v145, v67(v145));
-        v117(v145, v70(v145));
-    end;
-    local function v156(v152, _) --[[ Line: 487 ]] --[[ Name: onCharacterRemoving ]]
-        -- upvalues: v10 (copy), v31 (copy), v38 (copy), v59 (copy), v63 (copy)
-        local v154 = "";
-        local v155 = "";
-        if v152 then
-            if v152.UserId then
-                v154 = tostring(v152.UserId);
-            end;
-            if v152.Name then
-                v155 = v152.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", "Player character removing", v154, v155));
-        if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") then
-            v154 = v31.CharacterDescendantAdded;
-            if v38[v152.UserId] and v38[v152.UserId][v154] then
-                v38[v152.UserId][v154]:Disconnect();
-                v38[v152.UserId][v154] = nil;
-            end;
-            v154 = v31.CharacterDescendantRemoving;
-            if v38[v152.UserId] and v38[v152.UserId][v154] then
-                v38[v152.UserId][v154]:Disconnect();
-                v38[v152.UserId][v154] = nil;
-            end;
-        else
-            v59(v152);
-        end;
-        v63(v152);
-    end;
-    local function v167(v157) --[[ Line: 501 ]] --[[ Name: playerUpdate ]]
-        -- upvalues: v10 (copy), v36 (copy), v37 (copy), v59 (copy), v151 (copy), v38 (copy), v31 (copy), v156 (copy), v102 (copy), v63 (copy)
-        local v158 = "";
-        local v159 = "";
-        if v157 then
-            if v157.UserId then
-                v158 = tostring(v157.UserId);
-            end;
-            if v157.Name then
-                v159 = v157.Name;
-            end;
-        end;
-        v10:trace(string.format("%s {id: %s, name: %s}.", "Player update", v158, v159));
-        v158 = v36[v157.UserId];
-        if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") and v158 and v37[v157.UserId] then
-            v159 = "";
-            local v160 = "";
-            if v157 then
-                if v157.UserId then
-                    v159 = tostring(v157.UserId);
-                end;
-                if v157.Name then
-                    v160 = v157.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "Player already setup", v159, v160));
-            return;
-        else
-            v59(v157);
-            if v158 then
-                if not game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") and v37[v157.UserId] then
-                    v159 = "";
-                    local v161 = "";
-                    if v157 then
-                        if v157.UserId then
-                            v159 = tostring(v157.UserId);
-                        end;
-                        if v157.Name then
-                            v161 = v157.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "Player already setup", v159, v161));
-                    return;
-                else
-                    v159 = "";
-                    local v162 = "";
-                    if v157 then
-                        if v157.UserId then
-                            v159 = tostring(v157.UserId);
-                        end;
-                        if v157.Name then
-                            v162 = v157.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "Player update - joined", v159, v162));
-                    if v157.Character then
-                        v151(v157, v157.Character);
-                    end;
-                    v38[v157.UserId][v31.CharacterAdded] = v157.CharacterAdded:Connect(function(v163) --[[ Line: 529 ]]
-                        -- upvalues: v151 (ref), v157 (copy)
-                        v151(v157, v163);
-                    end);
-                    v38[v157.UserId][v31.CharacterRemoving] = v157.CharacterRemoving:Connect(function(v164) --[[ Line: 533 ]]
-                        -- upvalues: v156 (ref), v157 (copy)
-                        v156(v157, v164);
-                    end);
-                    v38[v157.UserId][v31.PlayerChatted] = v157.Chatted:Connect(function(v165) --[[ Line: 537 ]]
-                        -- upvalues: v102 (ref), v157 (copy)
-                        v102(v157, v165);
-                    end);
-                    return;
-                end;
-            else
-                v159 = "";
-                local v166 = "";
-                if v157 then
-                    if v157.UserId then
-                        v159 = tostring(v157.UserId);
-                    end;
-                    if v157.Name then
-                        v166 = v157.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "Player update - left", v159, v166));
-                v63(v157);
-                return;
-            end;
-        end;
-    end;
-    local function _(v168, v169) --[[ Line: 546 ]] --[[ Name: toggleMute ]]
-        -- upvalues: v37 (copy)
-        if v37[v168] and v37[v168].animationTrack then
-            v37[v168].animationTrack:TogglePause(v169);
-        end;
-    end;
-    local function v179() --[[ Line: 552 ]] --[[ Name: JoinAllExistingPlayers ]]
-        -- upvalues: l_Players_0 (copy), v36 (copy), v167 (copy), v10 (copy)
-        for _, v172 in ipairs(l_Players_0:GetPlayers()) do
-            v36[v172.UserId] = true;
-            v167(v172);
-        end;
-        l_Players_0.PlayerRemoving:Connect(function(v173) --[[ Line: 558 ]]
-            -- upvalues: v10 (ref), v36 (ref), v167 (ref)
-            local v174 = "";
-            local v175 = "";
-            if v173 then
-                if v173.UserId then
-                    v174 = tostring(v173.UserId);
-                end;
-                if v173.Name then
-                    v175 = v173.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "Player leaving game", v174, v175));
-            v36[v173.UserId] = nil;
-            v167(v173);
-        end);
-        l_Players_0.PlayerAdded:Connect(function(v176) --[[ Line: 564 ]]
-            -- upvalues: v10 (ref), v36 (ref), v167 (ref)
-            local v177 = "";
-            local v178 = "";
-            if v176 then
-                if v176.UserId then
-                    v177 = tostring(v176.UserId);
-                end;
-                if v176.Name then
-                    v178 = v176.Name;
-                end;
-            end;
-            v10:trace(string.format("%s {id: %s, name: %s}.", "Player joining game", v177, v178));
-            v36[v176.UserId] = true;
-            v167(v176);
-        end);
-    end;
-    local function v200() --[[ Line: 571 ]] --[[ Name: ConnectStateChangeCallback ]]
-        -- upvalues: l_default_1 (copy), l_Players_0 (copy), v37 (copy), v10 (copy), v35 (copy), v167 (copy)
-        local v180 = l_default_1:getService();
-        local l_UserId_0 = l_Players_0.LocalPlayer.UserId;
-        l_default_1.participantsUpdate.Event:Connect(function(v182) --[[ Line: 575 ]]
-            -- upvalues: l_UserId_0 (copy), v37 (ref)
-            for v183, v184 in pairs(v182) do
-                local v185 = tonumber(v183);
-                if v185 ~= l_UserId_0 then
-                    local l_isMutedLocally_0 = v184.isMutedLocally;
-                    if v37[v185] and v37[v185].animationTrack then
-                        v37[v185].animationTrack:TogglePause(l_isMutedLocally_0);
-                    end;
-                end;
-            end;
-        end);
-        if v180 then
-            v180.ParticipantsStateChanged:Connect(function(v187, v188, _) --[[ Line: 585 ]]
-                -- upvalues: l_Players_0 (ref), v10 (ref), v35 (ref), v167 (ref)
-                for _, v191 in ipairs(v187) do
-                    local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v191);
-                    if l_l_Players_0_PlayerByUserId_0 then
-                        local v193 = "";
-                        local v194 = "";
-                        if l_l_Players_0_PlayerByUserId_0 then
-                            if l_l_Players_0_PlayerByUserId_0.UserId then
-                                v193 = tostring(l_l_Players_0_PlayerByUserId_0.UserId);
-                            end;
-                            if l_l_Players_0_PlayerByUserId_0.Name then
-                                v194 = l_l_Players_0_PlayerByUserId_0.Name;
-                            end;
-                        end;
-                        v10:trace(string.format("%s {id: %s, name: %s}.", "Player leaving chat", v193, v194));
-                        v35[l_l_Players_0_PlayerByUserId_0.UserId] = nil;
-                        v167(l_l_Players_0_PlayerByUserId_0);
-                    end;
-                end;
-                for _, v196 in ipairs(v188) do
-                    local l_l_Players_0_PlayerByUserId_1 = l_Players_0:GetPlayerByUserId(v196);
-                    if l_l_Players_0_PlayerByUserId_1 then
-                        local v198 = "";
-                        local v199 = "";
-                        if l_l_Players_0_PlayerByUserId_1 then
-                            if l_l_Players_0_PlayerByUserId_1.UserId then
-                                v198 = tostring(l_l_Players_0_PlayerByUserId_1.UserId);
-                            end;
-                            if l_l_Players_0_PlayerByUserId_1.Name then
-                                v199 = l_l_Players_0_PlayerByUserId_1.Name;
-                            end;
-                        end;
-                        v10:trace(string.format("%s {id: %s, name: %s}.", "Player joining chat", v198, v199));
-                        v35[l_l_Players_0_PlayerByUserId_1.UserId] = true;
-                        v167(l_l_Players_0_PlayerByUserId_1);
-                    end;
-                end;
-            end);
-            return;
-        else
-            v10:trace("Could not find VoiceChatService");
-            return;
-        end;
-    end;
-    local function v201(v202) --[[ Line: 611 ]] --[[ Name: AttemptToShowCameraPerformanceToast ]]
-        -- upvalues: v23 (copy), l_IXPServiceWrapper_0 (copy), v24 (copy), v34 (copy), v21 (copy), v201 (copy), l_AppStorageService_0 (copy), v22 (copy), v28 (copy), v29 (copy), l_RbxAnalyticsService_0 (copy), l_Players_0 (copy)
-        if v23() then
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 614 ]]
-                -- upvalues: l_IXPServiceWrapper_0 (ref), v24 (ref)
-                return l_IXPServiceWrapper_0:GetLayerData(v24());
-            end);
-            if not l_status_0 then
-                return;
-            elseif not l_result_0 then
-                return;
-            elseif not l_result_0.UXForCameraPerformanceEnabled then
-                return;
-            end;
-        end;
-        local v205 = os.time() - v34;
-        if not v202 and v205 < v21 then
-            task.delay(v21 - v205, function() --[[ Line: 635 ]]
-                -- upvalues: v201 (ref)
-                v201(true);
-            end);
-            return;
-        else
-            local v206 = 0;
-            local l_status_1, l_result_1 = pcall(function() --[[ Line: 643 ]]
-                -- upvalues: l_AppStorageService_0 (ref)
-                return l_AppStorageService_0:GetItem("CameraPerformanceUXUnixTimestamp");
-            end);
-            if l_status_1 then
-                v206 = tonumber(l_result_1);
-                if os.time() - v206 < v22 then
-                    return;
-                else
-                    pcall(function() --[[ Line: 655 ]]
-                        -- upvalues: l_AppStorageService_0 (ref), v206 (ref), v28 (ref), v29 (ref), l_RbxAnalyticsService_0 (ref), l_Players_0 (ref)
-                        l_AppStorageService_0:SetItem("CameraPerformanceUXUnixTimestamp", (tostring(v206)));
-                        l_AppStorageService_0:Flush();
-                        v28:showPrompt(v29.LODCameraRecommendDisable);
-                        l_RbxAnalyticsService_0:SendEventDeferred("client", "avatarChat", "UXForCameraPerformanceShown", {
-                            userId = l_Players_0.LocalPlayer.UserId, 
-                            pid = tostring(game.PlaceId)
-                        });
-                    end);
-                    return;
-                end;
-            else
-                return;
-            end;
-        end;
-    end;
-    InitializeVoiceChat = function() --[[ Line: 677 ]] --[[ Name: InitializeVoiceChat ]]
-        -- upvalues: v200 (copy), l_default_1 (copy), v10 (copy), v43 (ref), l_Players_0 (copy), l_FaceAnimatorService_0 (copy)
-        local function v209() --[[ Line: 678 ]]
-            -- upvalues: v200 (ref)
-            v200();
-        end;
-        if l_default_1 then
-            l_default_1:asyncInit():catch(function(_) --[[ Line: 684 ]]
-                -- upvalues: v10 (ref)
-                v10:trace("VoiceChat:asyncInit failed (possibly denied mic permission)");
-            end):finally(v209);
-            v43 = l_default_1.muteChanged.Event:connect(function(v211) --[[ Line: 690 ]]
-                -- upvalues: l_Players_0 (ref), v10 (ref), l_FaceAnimatorService_0 (ref)
-                if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
-                    local l_LocalPlayer_1 = l_Players_0.LocalPlayer;
-                    local v213 = if l_LocalPlayer_1 and l_LocalPlayer_1.Character then l_LocalPlayer_1.Character:FindFirstChildWhichIsA("FaceControls", true) else nil;
-                    v10:trace("Syncing audio processing with VoiceChat mute changed: muted=" .. tostring(v211) .. " hasFaceControls=" .. tostring(v213 ~= nil));
-                    l_FaceAnimatorService_0.AudioAnimationEnabled = not v211 and v213 ~= nil;
-                    return;
-                else
-                    v10:trace("Syncing audio processing with VoiceChat mute changed: muted=" .. tostring(v211));
-                    l_FaceAnimatorService_0.AudioAnimationEnabled = not v211;
-                    return;
-                end;
-            end);
-            local v214 = false;
-            if l_default_1.localMuted ~= nil then
-                v10:trace("Syncing audio processing with VoiceChat mute status: muted=" .. tostring(l_default_1.localMuted));
-                v214 = not l_default_1.localMuted;
-            end;
-            if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
-                local l_LocalPlayer_2 = l_Players_0.LocalPlayer;
-                local v216 = if l_LocalPlayer_2 and l_LocalPlayer_2.Character then l_LocalPlayer_2.Character:FindFirstChildWhichIsA("FaceControls", true) else nil;
-                v10:trace("Syncing audio processing with Dynamic Head status: hasFaceControls=" .. tostring(v216 ~= nil));
-                v214 = v214 and v216 ~= nil;
-            end;
-            l_FaceAnimatorService_0.AudioAnimationEnabled = v214;
-            return;
-        else
-            v200();
-            return;
-        end;
-    end;
-    CleanupVoiceChat = function() --[[ Line: 728 ]] --[[ Name: CleanupVoiceChat ]]
-        -- upvalues: v43 (ref)
-        if v43 then
-            v43:Disconnect();
-            v43 = nil;
-        end;
-    end;
-    InitializeFacialAnimationStreaming = function(v217) --[[ Line: 735 ]] --[[ Name: InitializeFacialAnimationStreaming ]]
-        -- upvalues: v33 (ref), v41 (ref), l_FaceAnimatorService_0 (copy), v10 (copy), v28 (copy), v29 (copy), v20 (copy), v25 (ref), l_GetFFlagAvatarChatServiceEnabled_0 (copy), v17 (copy), l_game_EngineFeature_1 (copy), v42 (ref), v19 (copy), v201 (copy), l_default_0 (copy), l_Enums_0 (copy), v179 (copy), v26 (copy)
-        if v33 then
-            return;
-        else
-            v33 = true;
-            v41 = l_FaceAnimatorService_0.TrackerError:Connect(function(v218) --[[ Line: 743 ]]
-                -- upvalues: v10 (ref), v28 (ref), v29 (ref)
-                local v219 = string.format("TrackerError: %s", (tostring(v218)));
-                v10:trace(string.format("%s {id: %s, name: %s}.", v219, "", ""));
-                if v218 == Enum.TrackerError.VideoNoPermission then
-                    v28:showPrompt(v29.VideoNoPermission);
-                    return;
-                elseif v218 == Enum.TrackerError.VideoUnsupported then
-                    v28:showPrompt(v29.VideoUnsupported);
-                    return;
-                elseif v218 == Enum.TrackerError.UnsupportedDevice then
-                    v28:showPrompt(v29.UnsupportedDevice);
-                    return;
-                else
-                    v28:showPrompt(v29.NotAvailable);
-                    return;
-                end;
-            end);
-            if v20 and not v25() then
-                v10:trace("Camera is disabled for user and place");
-                return;
-            else
-                if l_GetFFlagAvatarChatServiceEnabled_0() then
-                    l_FaceAnimatorService_0:Init(v17:IsEnabled(v217, Enum.AvatarChatServiceFeature.UserVideo), v17:IsEnabled(v217, Enum.AvatarChatServiceFeature.UserAudio));
-                end;
-                if l_game_EngineFeature_1 then
-                    v42 = l_FaceAnimatorService_0.TrackerPrompt:Connect(function(v220) --[[ Line: 770 ]]
-                        -- upvalues: v10 (ref), v19 (ref), v201 (ref), v28 (ref), v29 (ref)
-                        local v221 = string.format("TrackerPrompt: %s", (tostring(v220)));
-                        v10:trace(string.format("%s {id: %s, name: %s}.", v221, "", ""));
-                        if v220 == Enum.TrackerPromptEvent.LODCameraRecommendDisable then
-                            if v19 then
-                                v201();
-                                return;
-                            else
-                                v28:showPrompt(v29.LODCameraRecommendDisable);
-                            end;
-                        end;
-                    end);
-                end;
-                l_default_0:getCallState():andThen(function(v222) --[[ Line: 783 ]]
-                    -- upvalues: v33 (ref), l_Enums_0 (ref), l_FaceAnimatorService_0 (ref), v179 (ref), v26 (ref)
-                    if not v33 then
-                        return;
-                    else
-                        if v222.status ~= l_Enums_0.CallStatus.Idle.rawValue() and v222.status ~= l_Enums_0.CallStatus.Ringing.rawValue() then
-                            l_FaceAnimatorService_0.VideoAnimationEnabled = v222.camEnabled;
-                        else
-                            l_FaceAnimatorService_0.VideoAnimationEnabled = false;
-                        end;
-                        InitializeVoiceChat();
-                        v179();
-                        v26.Initialize();
-                        return;
-                    end;
-                end);
-                return;
-            end;
-        end;
-    end;
-    CleanupFacialAnimationStreaming = function() --[[ Line: 808 ]] --[[ Name: CleanupFacialAnimationStreaming ]]
-        -- upvalues: v33 (ref), v26 (copy), l_Players_0 (copy), v36 (copy), v167 (copy), v41 (ref), v44 (ref), v45 (ref), l_game_EngineFeature_1 (copy), v42 (ref)
-        if not v33 then
-            return;
-        else
-            v33 = false;
-            CleanupVoiceChat();
-            v26.Cleanup();
-            for _, v224 in ipairs(l_Players_0:GetPlayers()) do
-                v36[v224.UserId] = nil;
-                v167(v224);
-            end;
-            if v41 then
-                v41:Disconnect();
-                v41 = nil;
-            end;
-            if v44 then
-                v44:Disconnect();
-                v44 = nil;
-            end;
-            if v45 then
-                v45:Disconnect();
-                v45 = nil;
-            end;
-            if l_game_EngineFeature_1 and v42 then
-                v42:Disconnect();
-                v42 = nil;
-            end;
-            return;
-        end;
-    end;
-    local function v226(v225) --[[ Line: 846 ]] --[[ Name: updateWithServiceState ]]
-        -- upvalues: v10 (copy), l_GetFFlagAvatarChatServiceEnabled_0 (copy), v17 (copy)
-        v10:trace(string.format("[updateWithServiceState] state: %s", (tostring(v225))));
-        if l_GetFFlagAvatarChatServiceEnabled_0() then
-            if (v17:IsEnabled(v225, Enum.AvatarChatServiceFeature.UserAudioEligible) or v17:IsEnabled(v225, Enum.AvatarChatServiceFeature.UserVideoEligible)) and v17:IsPlaceEnabled() then
-                InitializeFacialAnimationStreaming(v225);
-                return;
-            else
-                CleanupFacialAnimationStreaming();
-                return;
-            end;
-        else
-            CleanupFacialAnimationStreaming();
-            return;
-        end;
-    end;
-    v44 = l_FaceAnimatorService_0:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(function() --[[ Line: 867 ]]
-        -- upvalues: l_Players_0 (copy), l_FaceAnimatorService_0 (copy), v37 (copy), v10 (copy)
-        local l_LocalPlayer_3 = l_Players_0.LocalPlayer;
-        if not l_LocalPlayer_3 then
-            return;
-        else
-            if l_FaceAnimatorService_0.AudioAnimationEnabled or l_FaceAnimatorService_0.VideoAnimationEnabled then
-                if v37[l_LocalPlayer_3.UserId] and v37[l_LocalPlayer_3.UserId].animationTrack then
-                    local v228 = "";
-                    local v229 = "";
-                    if l_LocalPlayer_3 then
-                        if l_LocalPlayer_3.UserId then
-                            v228 = tostring(l_LocalPlayer_3.UserId);
-                        end;
-                        if l_LocalPlayer_3.Name then
-                            v229 = l_LocalPlayer_3.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", v228, v229));
-                    v37[l_LocalPlayer_3.UserId].animationTrack:AdjustWeight(1, 0.5);
-                    return;
-                end;
-            elseif v37[l_LocalPlayer_3.UserId] and v37[l_LocalPlayer_3.UserId].animationTrack then
-                local v230 = "";
-                local v231 = "";
-                if l_LocalPlayer_3 then
-                    if l_LocalPlayer_3.UserId then
-                        v230 = tostring(l_LocalPlayer_3.UserId);
-                    end;
-                    if l_LocalPlayer_3.Name then
-                        v231 = l_LocalPlayer_3.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v230, v231));
-                v37[l_LocalPlayer_3.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-            end;
-            return;
-        end;
-    end);
-    v45 = l_FaceAnimatorService_0:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(function() --[[ Line: 871 ]]
-        -- upvalues: l_Players_0 (copy), l_FaceAnimatorService_0 (copy), v37 (copy), v10 (copy)
-        local l_LocalPlayer_4 = l_Players_0.LocalPlayer;
-        if not l_LocalPlayer_4 then
-            return;
-        else
-            if l_FaceAnimatorService_0.AudioAnimationEnabled or l_FaceAnimatorService_0.VideoAnimationEnabled then
-                if v37[l_LocalPlayer_4.UserId] and v37[l_LocalPlayer_4.UserId].animationTrack then
-                    local v233 = "";
-                    local v234 = "";
-                    if l_LocalPlayer_4 then
-                        if l_LocalPlayer_4.UserId then
-                            v233 = tostring(l_LocalPlayer_4.UserId);
-                        end;
-                        if l_LocalPlayer_4.Name then
-                            v234 = l_LocalPlayer_4.Name;
-                        end;
-                    end;
-                    v10:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", v233, v234));
-                    v37[l_LocalPlayer_4.UserId].animationTrack:AdjustWeight(1, 0.5);
-                    return;
-                end;
-            elseif v37[l_LocalPlayer_4.UserId] and v37[l_LocalPlayer_4.UserId].animationTrack then
-                local v235 = "";
-                local v236 = "";
-                if l_LocalPlayer_4 then
-                    if l_LocalPlayer_4.UserId then
-                        v235 = tostring(l_LocalPlayer_4.UserId);
-                    end;
-                    if l_LocalPlayer_4.Name then
-                        v236 = l_LocalPlayer_4.Name;
-                    end;
-                end;
-                v10:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", v235, v236));
-                v37[l_LocalPlayer_4.UserId].animationTrack:AdjustWeight(0.1, 0.5);
-            end;
-            return;
-        end;
-    end);
-    if l_GetFFlagAvatarChatServiceEnabled_0() then
-        if v17.ClientFeaturesInitialized then
-            v226(v17.ClientFeatures);
-        else
-            local v237 = nil;
-            do
-                local l_v237_0 = v237;
-                l_v237_0 = v17:GetPropertyChangedSignal("ClientFeatures"):Connect(function() --[[ Line: 881 ]]
-                    -- upvalues: v226 (copy), v17 (copy), l_v237_0 (ref)
-                    v226(v17.ClientFeatures);
-                    l_v237_0:Disconnect();
-                end);
-            end;
-        end;
-    end;
-    return;
-end;
+game:GetService("VRService")
+
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local AppStorageService = game:GetService("AppStorageService")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local CorePackages = game:GetService("CorePackages")
+
+game:GetService("RobloxReplicatedStorage")
+
+local RobloxGui = CoreGui.RobloxGui
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local IXPServiceWrapper = require(CorePackages.Workspace.Packages.IxpServiceWrapper).IXPServiceWrapper
+local v9 = require(CorePackages.Workspace.Packages.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local default = require(CorePackages.Workspace.Packages.CallProtocol).CallProtocol.default
+local Enums = require(CorePackages.Workspace.Packages.CallProtocol).Enums
+local EngineFeature = game:GetEngineFeature("LoadStreamAnimationReplaceErrorsWithTelemetryFeature")
+local EngineFeature2 = game:GetEngineFeature("FaceAnimatorNotifyLODRecommendCameraInputDisable")
+local v14 = game:DefineFastFlag("FacialAnimationStreamingClearTrackImprovementsV2", false)
+
+game:DefineFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving", false)
+game:DefineFastFlag("FacialAnimationStreamingSearchForReplacementWhenRemovingAnimator", false)
+game:DefineFastFlag("StopStreamTrackOnDeath", false)
+game:DefineFastFlag("FacialAnimationStreamingClearAllConnectionsFix2", false)
+game:DefineFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C", false)
+game:DefineFastFlag("FacialAnimationStreamingFixNilMutedCheck", false)
+
+local GetFFlagAvatarChatServiceEnabled = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagAvatarChatServiceEnabled
+local v16 = if not GetFFlagAvatarChatServiceEnabled() then nil else game:GetService("AvatarChatService")
+local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local v18 = game:DefineFastFlag("UXForCameraPerformanceEnabled", false)
+local v19 = game:DefineFastFlag("DisableCameraOnLowspecAndroidCalls", false)
+local v20 = game:DefineFastInt("UXForCameraPerformanceSessionDelay", 300)
+local v21 = game:DefineFastInt("UXForCameraPerformanceDeviceDelay", 43200)
+local GetFFlagUXForCameraPerformanceIXPEnabled = require(RobloxGui.Modules.Flags.GetFFlagUXForCameraPerformanceIXPEnabled)
+local GetFStringUXForCameraPerformanceIXPLayerName = require(RobloxGui.Modules.Flags.GetFStringUXForCameraPerformanceIXPLayerName)
+
+local function u24() -- line: 48
+	return true
+end
+
+if v19 then
+	u24 = require(RobloxGui.Modules.Settings.isCamEnabledForUserAndPlace)
+end
+
+local FacialAnimationStreamingHeartbeatStats = require(RobloxGui.Modules.FacialAnimationStreaming.FacialAnimationStreamingHeartbeatStats)
+
+if not FaceAnimatorService or not v16 then
+	return
+end
+
+FaceAnimatorService.FlipHeadOrientation = true
+
+local EmoteHelper = require(RobloxGui.Modules.Emote.EmoteHelper)
+local TrackerMenu = require(RobloxGui.Modules.Tracker.TrackerMenu)
+local TrackerPromptType = require(RobloxGui.Modules.Tracker.TrackerPromptType)
+local default2 = require(RobloxGui.Modules.VoiceChat.VoiceChatServiceManager).default
+local t1 = {
+	CharacterAdded = "CharacterAdded",
+	CharacterRemoving = "CharacterRemoving",
+	CharacterDescendantAdded = "CharacterDescendantAdded",
+	CharacterDescendantRemoving = "CharacterDescendantRemoving",
+	AnimatorDataModelReady = "AnimatorDataModelReady",
+	PlayerEmoted = "PlayerEmoted",
+	PlayerChatted = "PlayerChatted",
+	EmoteFinished = "EmoteFinished",
+	PlayerDied = "PlayerDied"
+}
+
+RobloxTranslator:FormatByKey("Feature.FaceChat.Message.PlaceUnavailable")
+
+local u31 = false
+local timestamp = os.time()
+local t2 = {}
+local t3 = {}
+local t4 = {}
+local t5 = {}
+local t6 = {}
+local t7 = {}
+local connection = nil
+local connection2 = nil
+local u41 = nil
+local u42 = nil
+local u43 = nil
+
+local function playerTrace(p1, p2) -- line: 107
+	-- upvalues: v9 (copy)
+	local s1 = ""
+	local s2 = ""
+
+	if p2 then
+		if p2.UserId then
+			s1 = tostring(p2.UserId)
+		end
+
+		if p2.Name then
+			s2 = p2.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", p1, s1, s2))
+end
+local function clearConnection(p3, p4) -- line: 121
+	-- upvalues: t5 (copy)
+	if t5[p3.UserId] and t5[p3.UserId][p4] then
+		t5[p3.UserId][p4]:Disconnect()
+		t5[p3.UserId][p4] = nil
+	end
+end
+local function clearAllConnections(p5) -- line: 128
+	-- upvalues: t1 (copy), t5 (copy)
+	if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") then
+		for _, v in pairs(t1) do
+			if t5[p5.UserId] and t5[p5.UserId][v] then
+				t5[p5.UserId][v]:Disconnect()
+				t5[p5.UserId][v] = nil
+			end
+		end
+	else
+		for _, v in ipairs(t1) do
+			if t5[p5.UserId] and t5[p5.UserId][v] then
+				t5[p5.UserId][v]:Disconnect()
+				t5[p5.UserId][v] = nil
+			end
+		end
+	end
+
+	t5[p5.UserId] = {}
+end
+local function clearCharacterAnimations(p6) -- line: 142
+	-- upvalues: v9 (copy), t4 (copy), v14 (copy)
+	local s3 = ""
+	local s4 = ""
+
+	if p6 then
+		if p6.UserId then
+			s3 = tostring(p6.UserId)
+		end
+
+		if p6.Name then
+			s4 = p6.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "clearCharacterAnimations", s3, s4))
+
+	if t4[p6.UserId] then
+		if v14 then
+			if t4[p6.UserId].animationTrack then
+				t4[p6.UserId].animationTrack:Stop(0)
+				t4[p6.UserId].animationTrack = nil
+			end
+
+			if t4[p6.UserId].animation then
+				t4[p6.UserId].animation = nil
+			end
+		else
+			if t4[p6.UserId].animation then
+				t4[p6.UserId].animation:Destroy()
+				t4[p6.UserId].animation = nil
+			end
+
+			if t4[p6.UserId].animationTrack then
+				t4[p6.UserId].animationTrack:Stop(0)
+				t4[p6.UserId].animationTrack:Destroy()
+				t4[p6.UserId].animationTrack = nil
+			end
+		end
+
+		t4[p6.UserId] = nil
+	end
+end
+local function getPlayerFaceControls(p7) -- line: 169
+	if p7 and p7.Character then
+		return p7.Character:FindFirstChildWhichIsA("FaceControls", true)
+	end
+
+	return nil
+end
+local function getPlayerHumanoid(p8) -- line: 177
+	if p8.Character then
+		return p8.Character:FindFirstChildOfClass("Humanoid")
+	end
+
+	return nil
+end
+local function getPlayerAnimator(p9) -- line: 185
+	local v87 = if not p9.Character then nil else p9.Character:FindFirstChildOfClass("Humanoid")
+
+	if v87 then
+		return v87:FindFirstChildOfClass("Animator")
+	end
+
+	return nil
+end
+local function pauseStreamingAnimationForPlayer(p10) -- line: 194
+	-- upvalues: t4 (copy), v9 (copy)
+	if t4[p10.UserId] and t4[p10.UserId].animationTrack then
+		local s5 = ""
+		local s6 = ""
+
+		if p10 then
+			if p10.UserId then
+				s5 = tostring(p10.UserId)
+			end
+
+			if p10.Name then
+				s6 = p10.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s5, s6))
+		t4[p10.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+	end
+end
+local function resumeStreamingAnimationForPlayer(p11) -- line: 205
+	-- upvalues: t4 (copy), v9 (copy)
+	if t4[p11.UserId] and t4[p11.UserId].animationTrack then
+		local s7 = ""
+		local s8 = ""
+
+		if p11 then
+			if p11.UserId then
+				s7 = tostring(p11.UserId)
+			end
+
+			if p11.Name then
+				s8 = p11.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", s7, s8))
+		t4[p11.UserId].animationTrack:AdjustWeight(1, 0.5)
+	end
+end
+local function updateStreamTrackStatus() -- line: 212
+	-- upvalues: Players (copy), FaceAnimatorService (copy), t4 (copy), v9 (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if not LocalPlayer then
+		return
+	end
+
+	if FaceAnimatorService.AudioAnimationEnabled or FaceAnimatorService.VideoAnimationEnabled then
+		if t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+			local s9 = ""
+			local s10 = ""
+
+			if LocalPlayer then
+				if LocalPlayer.UserId then
+					s9 = tostring(LocalPlayer.UserId)
+				end
+
+				if LocalPlayer.Name then
+					s10 = LocalPlayer.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", s9, s10))
+			t4[LocalPlayer.UserId].animationTrack:AdjustWeight(1, 0.5)
+
+			return
+		end
+	elseif t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+		local s11 = ""
+		local s12 = ""
+
+		if LocalPlayer then
+			if LocalPlayer.UserId then
+				s11 = tostring(LocalPlayer.UserId)
+			end
+
+			if LocalPlayer.Name then
+				s12 = LocalPlayer.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s11, s12))
+		t4[LocalPlayer.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+	end
+end
+local function handleEmote(p12, p13, p14) -- line: 226
+	-- upvalues: v9 (copy), t1 (copy), t5 (copy), t4 (copy), EmoteHelper (copy), FaceAnimatorService (copy)
+	local v102 = string.format("handleEmote {isChatTriggered:%s}", (tostring(p14)))
+	local s13 = ""
+	local s14 = ""
+
+	if p12 then
+		if p12.UserId then
+			s13 = tostring(p12.UserId)
+		end
+
+		if p12.Name then
+			s14 = p12.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", v102, s13, s14))
+
+	if p13 then
+		local EmoteFinished = t1.EmoteFinished
+
+		if t5[p12.UserId] and t5[p12.UserId][EmoteFinished] then
+			t5[p12.UserId][EmoteFinished]:Disconnect()
+			t5[p12.UserId][EmoteFinished] = nil
+		end
+
+		if t4[p12.UserId] and t4[p12.UserId].animationTrack then
+			local s15 = ""
+			local s16 = ""
+
+			if p12 then
+				if p12.UserId then
+					s15 = tostring(p12.UserId)
+				end
+
+				if p12.Name then
+					s16 = p12.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s15, s16))
+			t4[p12.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+		end
+
+		t5[p12.UserId][t1.EmoteFinished] = EmoteHelper.createEmoteFinishEvent(p12, p13, p14):Connect(function() -- line: 241
+			-- upvalues: p12 (copy), t1 (copy), t5 (copy), FaceAnimatorService (copy), t4 (copy), v9 (copy)
+			local v196 = p12
+			local EmoteFinished2 = t1.EmoteFinished
+
+			if t5[v196.UserId] and t5[v196.UserId][EmoteFinished2] then
+				t5[v196.UserId][EmoteFinished2]:Disconnect()
+				t5[v196.UserId][EmoteFinished2] = nil
+			end
+
+			if FaceAnimatorService.AudioAnimationEnabled or FaceAnimatorService.VideoAnimationEnabled then
+				local v198 = p12
+
+				if t4[v198.UserId] and t4[v198.UserId].animationTrack then
+					local s17 = ""
+					local s18 = ""
+
+					if v198 then
+						if v198.UserId then
+							s17 = tostring(v198.UserId)
+						end
+
+						if v198.Name then
+							s18 = v198.Name
+						end
+					end
+
+					v9:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", s17, s18))
+					t4[v198.UserId].animationTrack:AdjustWeight(1, 0.5)
+
+					return
+				end
+			else
+				local v201 = p12
+
+				if t4[v201.UserId] and t4[v201.UserId].animationTrack then
+					local s19 = ""
+					local s20 = ""
+
+					if v201 then
+						if v201.UserId then
+							s19 = tostring(v201.UserId)
+						end
+
+						if v201.Name then
+							s20 = v201.Name
+						end
+					end
+
+					v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s19, s20))
+					t4[v201.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+				end
+			end
+		end)
+	end
+end
+local function onPlayerChatted(p15, p16) -- line: 257
+	-- upvalues: EmoteHelper (copy), handleEmote (copy)
+	if if not p15.Character then nil else p15.Character:FindFirstChildOfClass("Humanoid") then
+		local v110 = nil
+
+		if string.sub(p16, 1, 3) == "/e " then
+			v110 = string.sub(p16, 4)
+		elseif string.sub(p16, 1, 7) == "/emote " then
+			v110 = string.sub(p16, 8)
+		end
+
+		if v110 and EmoteHelper.LegacyDefaultEmotes[v110] then
+			wait(EmoteHelper.EMOTE_LOOP_TRANSITION_WAIT_TIME)
+
+			local v111 = EmoteHelper.getAnyActiveDefaultChatTriggeredEmoteTrack(p15)
+
+			if v111 then
+				handleEmote(p15, v111, true)
+			end
+		end
+	end
+end
+local function onAnimatorAdded(p17, p18) -- line: 280
+	-- upvalues: t4 (copy), v9 (copy), t1 (copy), t5 (copy), EngineFeature (copy), FaceAnimatorService (copy), Players (copy), t6 (copy)
+	if not p18 then
+		return
+	end
+
+	if not p18.Parent or not p18.Parent:IsA("Humanoid") then
+		return
+	end
+
+	if t4[p17.UserId] then
+		local s21 = ""
+		local s22 = ""
+
+		if p17 then
+			if p17.UserId then
+				s21 = tostring(p17.UserId)
+			end
+
+			if p17.Name then
+				s22 = p17.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "onAnimatorAdded already done; skipping", s21, s22))
+
+		return
+	end
+
+	local AnimatorDataModelReady = t1.AnimatorDataModelReady
+
+	if t5[p17.UserId] and t5[p17.UserId][AnimatorDataModelReady] then
+		t5[p17.UserId][AnimatorDataModelReady]:Disconnect()
+		t5[p17.UserId][AnimatorDataModelReady] = nil
+	end
+
+	local function v117() -- line: 298
+		-- upvalues: p18 (copy), p17 (copy), EngineFeature (copy), t4 (copy), FaceAnimatorService (copy), Players (copy), v9 (copy), t6 (copy)
+		local t8 = {
+			animation = Instance.new("TrackerStreamAnimation")
+		}
+
+		if game:GetEngineFeature("UseNewLoadStreamAnimationAPI") then
+			t8.animationTrack = p18:LoadStreamAnimationV2(t8.animation, p17)
+		else
+			t8.animationTrack = p18:LoadStreamAnimation(t8.animation)
+		end
+
+		if EngineFeature and not t8.animationTrack then
+			return
+		end
+
+		t8.animationTrack.Priority = Enum.AnimationPriority.Idle
+		t8.animationTrack:Play(0.1, 1)
+		t4[p17.UserId] = t8
+
+		local v205 = FaceAnimatorService.AudioAnimationEnabled or FaceAnimatorService.VideoAnimationEnabled
+
+		if p17 == Players.LocalPlayer and not v205 then
+			local v206 = p17
+
+			if t4[v206.UserId] and t4[v206.UserId].animationTrack then
+				local s23 = ""
+				local s24 = ""
+
+				if v206 then
+					if v206.UserId then
+						s23 = tostring(v206.UserId)
+					end
+
+					if v206.Name then
+						s24 = v206.Name
+					end
+				end
+
+				v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s23, s24))
+				t4[v206.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+			end
+		end
+
+		if game:GetFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving") then
+			t6[p17.UserId] = p18
+		end
+	end
+
+	if p18:IsDescendantOf(game) then
+		v117()
+
+		return
+	end
+
+	t5[p17.UserId][t1.AnimatorDataModelReady] = p18.AncestryChanged:Connect(function(_, _) -- line: 336
+		-- upvalues: p18 (copy), p17 (copy), t1 (copy), t5 (copy), v117 (copy)
+		if p18:IsDescendantOf(game) then
+			local v211 = p17
+			local AnimatorDataModelReady2 = t1.AnimatorDataModelReady
+
+			if t5[v211.UserId] and t5[v211.UserId][AnimatorDataModelReady2] then
+				t5[v211.UserId][AnimatorDataModelReady2]:Disconnect()
+				t5[v211.UserId][AnimatorDataModelReady2] = nil
+			end
+
+			v117()
+		end
+	end)
+end
+local function onHumanoidAdded(p21, p22) -- line: 348
+	-- upvalues: t1 (copy), t5 (copy), handleEmote (copy), clearCharacterAnimations (copy)
+	if not p22 then
+		return
+	end
+
+	local PlayerEmoted = t1.PlayerEmoted
+
+	if t5[p21.UserId] and t5[p21.UserId][PlayerEmoted] then
+		t5[p21.UserId][PlayerEmoted]:Disconnect()
+		t5[p21.UserId][PlayerEmoted] = nil
+	end
+
+	t5[p21.UserId][t1.PlayerEmoted] = p22.EmoteTriggered:Connect(function(p23, p24) -- line: 356
+		-- upvalues: handleEmote (copy), p21 (copy)
+		if p23 then
+			handleEmote(p21, p24, false)
+		end
+	end)
+
+	if game:GetFastFlag("StopStreamTrackOnDeath") then
+		local PlayerDied = t1.PlayerDied
+
+		if t5[p21.UserId] and t5[p21.UserId][PlayerDied] then
+			t5[p21.UserId][PlayerDied]:Disconnect()
+			t5[p21.UserId][PlayerDied] = nil
+		end
+
+		t5[p21.UserId][t1.PlayerDied] = p22.Died:Connect(function() -- line: 366
+			-- upvalues: clearCharacterAnimations (copy), p21 (copy)
+			clearCharacterAnimations(p21)
+		end)
+	end
+end
+local function onFaceControlsAdded(p25, p26) -- line: 372
+	-- upvalues: Players (copy), t7 (copy), default2 (copy), v9 (copy), FaceAnimatorService (copy)
+	assert(game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C"))
+
+	if p25 ~= Players.LocalPlayer then
+		return
+	end
+
+	if t7[p25.UserId] ~= nil and p26 == t7[p25.UserId] then
+		return
+	end
+
+	t7[p25.UserId] = p26
+
+	if t7[p25.UserId] then
+		if if not game:GetFastFlag("FacialAnimationStreamingFixNilMutedCheck") then default2 and not default2.localMuted else default2 and default2.localMuted == false then
+			local s25 = ""
+			local s26 = ""
+
+			if p25 then
+				if p25.UserId then
+					s25 = tostring(p25.UserId)
+				end
+
+				if p25.Name then
+					s26 = p25.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "FaceControls found -> enabling A2C (Mic is ON)...", s25, s26))
+			FaceAnimatorService.AudioAnimationEnabled = true
+
+			return
+		end
+
+		local s27 = ""
+		local s28 = ""
+
+		if p25 then
+			if p25.UserId then
+				s27 = tostring(p25.UserId)
+			end
+
+			if p25.Name then
+				s28 = p25.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "FaceControls found -> won't enable A2C (Mic is MUTED)...", s27, s28))
+
+		return
+	end
+
+	if FaceAnimatorService.AudioAnimationEnabled then
+		local s29 = ""
+		local s30 = ""
+
+		if p25 then
+			if p25.UserId then
+				s29 = tostring(p25.UserId)
+			end
+
+			if p25.Name then
+				s30 = p25.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "FaceControls NOT found -> disabling A2C...", s29, s30))
+		FaceAnimatorService.AudioAnimationEnabled = false
+
+		return
+	end
+
+	local s31 = ""
+	local s32 = ""
+
+	if p25 then
+		if p25.UserId then
+			s31 = tostring(p25.UserId)
+		end
+
+		if p25.Name then
+			s32 = p25.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "FaceControls NOT found -> won't disable A2C (already is disabled)...", s31, s32))
+end
+local function onCharacterDescendantAdded(p27, p28) -- line: 410
+	-- upvalues: onAnimatorAdded (copy), onHumanoidAdded (copy), onFaceControlsAdded (copy), getPlayerFaceControls (copy)
+	if p28:IsDescendantOf(game) then
+		if p28:IsA("Animator") then
+			onAnimatorAdded(p27, p28)
+
+			return
+		end
+
+		if p28:IsA("Humanoid") then
+			onHumanoidAdded(p27, p28)
+
+			return
+		end
+
+		if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and p28:IsA("MeshPart") and p28.Name == "Head" then
+			onFaceControlsAdded(p27, getPlayerFaceControls(p27))
+
+			return
+		end
+
+		if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and p28:IsA("FaceControls") then
+			onFaceControlsAdded(p27, p28)
+		end
+	end
+end
+local function onCharacterDescendantRemoving(p29, p30) -- line: 430
+	-- upvalues: t6 (copy), t1 (copy), t5 (copy), clearCharacterAnimations (copy), onAnimatorAdded (copy), onFaceControlsAdded (copy), getPlayerFaceControls (copy)
+	if p30:IsA("Animator") then
+		if not game:GetFastFlag("FacialAnimationStreamingValidateAnimatorBeforeRemoving") then
+			local AnimatorDataModelReady = t1.AnimatorDataModelReady
+
+			if t5[p29.UserId] and t5[p29.UserId][AnimatorDataModelReady] then
+				t5[p29.UserId][AnimatorDataModelReady]:Disconnect()
+				t5[p29.UserId][AnimatorDataModelReady] = nil
+			end
+
+			clearCharacterAnimations(p29)
+
+			return
+		end
+
+		if p30 == t6[p29.UserId] then
+			local AnimatorDataModelReady = t1.AnimatorDataModelReady
+
+			if t5[p29.UserId] and t5[p29.UserId][AnimatorDataModelReady] then
+				t5[p29.UserId][AnimatorDataModelReady]:Disconnect()
+				t5[p29.UserId][AnimatorDataModelReady] = nil
+			end
+
+			clearCharacterAnimations(p29)
+			t6[p29.UserId] = nil
+
+			if game:GetFastFlag("FacialAnimationStreamingSearchForReplacementWhenRemovingAnimator") then
+				local v138 = if not p29.Character then nil else p29.Character:FindFirstChildOfClass("Humanoid")
+				local v139 = if not v138 then nil else v138:FindFirstChildOfClass("Animator")
+
+				if v139 then
+					onAnimatorAdded(p29, v139)
+
+					return
+				end
+			end
+		end
+	elseif p30:IsA("Humanoid") then
+		local PlayerEmoted = t1.PlayerEmoted
+
+		if t5[p29.UserId] and t5[p29.UserId][PlayerEmoted] then
+			t5[p29.UserId][PlayerEmoted]:Disconnect()
+			t5[p29.UserId][PlayerEmoted] = nil
+		end
+
+		if game:GetFastFlag("StopStreamTrackOnDeath") then
+			local PlayerDied = t1.PlayerDied
+
+			if t5[p29.UserId] and t5[p29.UserId][PlayerDied] then
+				t5[p29.UserId][PlayerDied]:Disconnect()
+				t5[p29.UserId][PlayerDied] = nil
+
+				return
+			end
+		end
+	elseif game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") and (p30:IsA("MeshPart") and p30.Name == "Head" or p30:IsA("FaceControls")) then
+		onFaceControlsAdded(p29, getPlayerFaceControls(p29))
+	end
+end
+local function onCharacterAdded(p31, p32) -- line: 463
+	-- upvalues: v9 (copy), t1 (copy), t5 (copy), onCharacterDescendantAdded (copy), onCharacterDescendantRemoving (copy), onFaceControlsAdded (copy), getPlayerFaceControls (copy), onHumanoidAdded (copy), getPlayerHumanoid (copy), onAnimatorAdded (copy), getPlayerAnimator (copy)
+	local s33 = ""
+	local s34 = ""
+
+	if p31 then
+		if p31.UserId then
+			s33 = tostring(p31.UserId)
+		end
+
+		if p31.Name then
+			s34 = p31.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "Player character added", s33, s34))
+
+	local CharacterDescendantAdded = t1.CharacterDescendantAdded
+
+	if t5[p31.UserId] and t5[p31.UserId][CharacterDescendantAdded] then
+		t5[p31.UserId][CharacterDescendantAdded]:Disconnect()
+		t5[p31.UserId][CharacterDescendantAdded] = nil
+	end
+
+	local CharacterDescendantRemoving = t1.CharacterDescendantRemoving
+
+	if t5[p31.UserId] and t5[p31.UserId][CharacterDescendantRemoving] then
+		t5[p31.UserId][CharacterDescendantRemoving]:Disconnect()
+		t5[p31.UserId][CharacterDescendantRemoving] = nil
+	end
+
+	t5[p31.UserId][t1.CharacterDescendantAdded] = p32.DescendantAdded:Connect(function(descendant) -- line: 472
+		-- upvalues: onCharacterDescendantAdded (copy), p31 (copy)
+		onCharacterDescendantAdded(p31, descendant)
+	end)
+	t5[p31.UserId][t1.CharacterDescendantRemoving] = p32.DescendantRemoving:Connect(function(descendant) -- line: 477
+		-- upvalues: onCharacterDescendantRemoving (copy), p31 (copy)
+		onCharacterDescendantRemoving(p31, descendant)
+	end)
+
+	if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
+		onFaceControlsAdded(p31, getPlayerFaceControls(p31))
+	end
+
+	onHumanoidAdded(p31, getPlayerHumanoid(p31))
+	onAnimatorAdded(p31, getPlayerAnimator(p31))
+end
+local function onCharacterRemoving(p33, _) -- line: 491
+	-- upvalues: v9 (copy), t1 (copy), t5 (copy), clearAllConnections (copy), clearCharacterAnimations (copy)
+	local s35 = ""
+	local s36 = ""
+
+	if p33 then
+		if p33.UserId then
+			s35 = tostring(p33.UserId)
+		end
+
+		if p33.Name then
+			s36 = p33.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "Player character removing", s35, s36))
+
+	if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") then
+		local CharacterDescendantAdded = t1.CharacterDescendantAdded
+
+		if t5[p33.UserId] and t5[p33.UserId][CharacterDescendantAdded] then
+			t5[p33.UserId][CharacterDescendantAdded]:Disconnect()
+			t5[p33.UserId][CharacterDescendantAdded] = nil
+		end
+
+		local CharacterDescendantRemoving = t1.CharacterDescendantRemoving
+
+		if t5[p33.UserId] and t5[p33.UserId][CharacterDescendantRemoving] then
+			t5[p33.UserId][CharacterDescendantRemoving]:Disconnect()
+			t5[p33.UserId][CharacterDescendantRemoving] = nil
+		end
+	else
+		clearAllConnections(p33)
+	end
+
+	clearCharacterAnimations(p33)
+end
+local function playerUpdate(p35) -- line: 505
+	-- upvalues: v9 (copy), t3 (copy), t4 (copy), clearAllConnections (copy), onCharacterAdded (copy), t5 (copy), t1 (copy), onCharacterRemoving (copy), onPlayerChatted (copy), clearCharacterAnimations (copy)
+	local s37 = ""
+	local s38 = ""
+
+	if p35 then
+		if p35.UserId then
+			s37 = tostring(p35.UserId)
+		end
+
+		if p35.Name then
+			s38 = p35.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "Player update", s37, s38))
+
+	local v157 = t3[p35.UserId]
+
+	if game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") and v157 and t4[p35.UserId] then
+		local s39 = ""
+		local s40 = ""
+
+		if p35 then
+			if p35.UserId then
+				s39 = tostring(p35.UserId)
+			end
+
+			if p35.Name then
+				s40 = p35.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Player already setup", s39, s40))
+
+		return
+	end
+
+	clearAllConnections(p35)
+
+	if v157 then
+		if not game:GetFastFlag("FacialAnimationStreamingClearAllConnectionsFix2") and t4[p35.UserId] then
+			local s41 = ""
+			local s42 = ""
+
+			if p35 then
+				if p35.UserId then
+					s41 = tostring(p35.UserId)
+				end
+
+				if p35.Name then
+					s42 = p35.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "Player already setup", s41, s42))
+
+			return
+		end
+
+		local s43 = ""
+		local s44 = ""
+
+		if p35 then
+			if p35.UserId then
+				s43 = tostring(p35.UserId)
+			end
+
+			if p35.Name then
+				s44 = p35.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Player update - joined", s43, s44))
+
+		if p35.Character then
+			onCharacterAdded(p35, p35.Character)
+		end
+
+		t5[p35.UserId][t1.CharacterAdded] = p35.CharacterAdded:Connect(function(character) -- line: 533
+			-- upvalues: onCharacterAdded (copy), p35 (copy)
+			onCharacterAdded(p35, character)
+		end)
+		t5[p35.UserId][t1.CharacterRemoving] = p35.CharacterRemoving:Connect(function(character) -- line: 537
+			-- upvalues: onCharacterRemoving (copy), p35 (copy)
+			onCharacterRemoving(p35, character)
+		end)
+		t5[p35.UserId][t1.PlayerChatted] = p35.Chatted:Connect(function(message) -- line: 541
+			-- upvalues: onPlayerChatted (copy), p35 (copy)
+			onPlayerChatted(p35, message)
+		end)
+
+		return
+	end
+
+	local s45 = ""
+	local s46 = ""
+
+	if p35 then
+		if p35.UserId then
+			s45 = tostring(p35.UserId)
+		end
+
+		if p35.Name then
+			s46 = p35.Name
+		end
+	end
+
+	v9:trace(string.format("%s {id: %s, name: %s}.", "Player update - left", s45, s46))
+	clearCharacterAnimations(p35)
+end
+local function toggleMute(p36, p37) -- line: 550
+	-- upvalues: t4 (copy)
+	if t4[p36] and t4[p36].animationTrack then
+		t4[p36].animationTrack:TogglePause(p37)
+	end
+end
+local function JoinAllExistingPlayers() -- line: 556
+	-- upvalues: Players (copy), t3 (copy), playerUpdate (copy), v9 (copy)
+	for _, player in ipairs(Players:GetPlayers()) do
+		t3[player.UserId] = true
+		playerUpdate(player)
+	end
+
+	Players.PlayerRemoving:Connect(function(player) -- line: 562
+		-- upvalues: v9 (copy), t3 (copy), playerUpdate (copy)
+		local s47 = ""
+		local s48 = ""
+
+		if player then
+			if player.UserId then
+				s47 = tostring(player.UserId)
+			end
+
+			if player.Name then
+				s48 = player.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Player leaving game", s47, s48))
+		t3[player.UserId] = nil
+		playerUpdate(player)
+	end)
+	Players.PlayerAdded:Connect(function(player) -- line: 568
+		-- upvalues: v9 (copy), t3 (copy), playerUpdate (copy)
+		local s49 = ""
+		local s50 = ""
+
+		if player then
+			if player.UserId then
+				s49 = tostring(player.UserId)
+			end
+
+			if player.Name then
+				s50 = player.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Player joining game", s49, s50))
+		t3[player.UserId] = true
+		playerUpdate(player)
+	end)
+end
+local function ConnectStateChangeCallback() -- line: 575
+	-- upvalues: default2 (copy), Players (copy), t4 (copy), v9 (copy), t2 (copy), playerUpdate (copy)
+	local v170 = default2:getService()
+	local UserId = Players.LocalPlayer.UserId
+
+	default2.participantsUpdate.Event:Connect(function(p38) -- line: 579
+		-- upvalues: UserId (copy), t4 (copy)
+		for k, v in pairs(p38) do
+			local num = tonumber(k)
+
+			if num ~= UserId then
+				local isMutedLocally = v.isMutedLocally
+
+				if t4[num] and t4[num].animationTrack then
+					t4[num].animationTrack:TogglePause(isMutedLocally)
+				end
+			end
+		end
+	end)
+
+	if v170 then
+		v170.ParticipantsStateChanged:Connect(function(p39, p40, _) -- line: 589
+			-- upvalues: Players (copy), v9 (copy), t2 (copy), playerUpdate (copy)
+			for _, v in ipairs(p39) do
+				local PlayerByUserId = Players:GetPlayerByUserId(v)
+
+				if PlayerByUserId then
+					local s51 = ""
+					local s52 = ""
+
+					if PlayerByUserId then
+						if PlayerByUserId.UserId then
+							s51 = tostring(PlayerByUserId.UserId)
+						end
+
+						if PlayerByUserId.Name then
+							s52 = PlayerByUserId.Name
+						end
+					end
+
+					v9:trace(string.format("%s {id: %s, name: %s}.", "Player leaving chat", s51, s52))
+					t2[PlayerByUserId.UserId] = nil
+					playerUpdate(PlayerByUserId)
+				end
+			end
+
+			for _, v in ipairs(p40) do
+				local PlayerByUserId = Players:GetPlayerByUserId(v)
+
+				if PlayerByUserId then
+					local s53 = ""
+					local s54 = ""
+
+					if PlayerByUserId then
+						if PlayerByUserId.UserId then
+							s53 = tostring(PlayerByUserId.UserId)
+						end
+
+						if PlayerByUserId.Name then
+							s54 = PlayerByUserId.Name
+						end
+					end
+
+					v9:trace(string.format("%s {id: %s, name: %s}.", "Player joining chat", s53, s54))
+					t2[PlayerByUserId.UserId] = true
+					playerUpdate(PlayerByUserId)
+				end
+			end
+		end)
+
+		return
+	end
+
+	v9:trace("Could not find VoiceChatService")
+end
+local function AttemptToShowCameraPerformanceToast(p42) -- line: 615
+	-- upvalues: GetFFlagUXForCameraPerformanceIXPEnabled (copy), IXPServiceWrapper (copy), GetFStringUXForCameraPerformanceIXPLayerName (copy), timestamp (copy), v20 (copy), AttemptToShowCameraPerformanceToast (copy), AppStorageService (copy), v21 (copy), TrackerMenu (copy), TrackerPromptType (copy), RbxAnalyticsService (copy), Players (copy)
+	if GetFFlagUXForCameraPerformanceIXPEnabled() then
+		local ok, result = pcall(function() -- line: 618
+			-- upvalues: IXPServiceWrapper (copy), GetFStringUXForCameraPerformanceIXPLayerName (copy)
+			return IXPServiceWrapper:GetLayerData(GetFStringUXForCameraPerformanceIXPLayerName())
+		end)
+
+		if not ok then
+			return
+		end
+
+		if not result then
+			return
+		end
+
+		if not result.UXForCameraPerformanceEnabled then
+			return
+		end
+	end
+
+	local v175 = os.time() - timestamp
+
+	if not p42 and v175 < v20 then
+		task.delay(v20 - v175, function() -- line: 639
+			-- upvalues: AttemptToShowCameraPerformanceToast (copy)
+			AttemptToShowCameraPerformanceToast(true)
+		end)
+
+		return
+	end
+
+	local ok, result = pcall(function() -- line: 647
+		-- upvalues: AppStorageService (copy)
+		return AppStorageService:GetItem("CameraPerformanceUXUnixTimestamp")
+	end)
+
+	if ok then
+		local num = tonumber(result)
+
+		if os.time() - num < v21 then
+			return
+		end
+
+		pcall(function() -- line: 659
+			-- upvalues: AppStorageService (copy), num (ref), TrackerMenu (copy), TrackerPromptType (copy), RbxAnalyticsService (copy), Players (copy)
+			AppStorageService:SetItem("CameraPerformanceUXUnixTimestamp", (tostring(num)))
+			AppStorageService:Flush()
+			TrackerMenu:showPrompt(TrackerPromptType.LODCameraRecommendDisable)
+			RbxAnalyticsService:SendEventDeferred("client", "avatarChat", "UXForCameraPerformanceShown", {
+				userId = Players.LocalPlayer.UserId,
+				pid = tostring(game.PlaceId)
+			})
+		end)
+
+		return
+	end
+end
+
+function InitializeVoiceChat() -- line: 681
+	-- upvalues: ConnectStateChangeCallback (copy), default2 (copy), v9 (copy), u41 (ref), Players (copy), FaceAnimatorService (copy)
+	if default2 then
+		default2:asyncInit():catch(function(_) -- line: 688
+			-- upvalues: v9 (copy)
+			v9:trace("VoiceChat:asyncInit failed (possibly denied mic permission)")
+		end):finally(function() -- line: 682
+			-- upvalues: ConnectStateChangeCallback (copy)
+			ConnectStateChangeCallback()
+		end)
+		u41 = default2.muteChanged.Event:connect(function(p44) -- line: 694
+			-- upvalues: Players (copy), v9 (copy), FaceAnimatorService (copy)
+			if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
+				local LocalPlayer = Players.LocalPlayer
+				local v247 = if not LocalPlayer or not LocalPlayer.Character then nil else LocalPlayer.Character:FindFirstChildWhichIsA("FaceControls", true)
+
+				v9:trace("Syncing audio processing with VoiceChat mute changed: muted=" .. tostring(p44) .. " hasFaceControls=" .. tostring(v247 ~= nil))
+				FaceAnimatorService.AudioAnimationEnabled = not p44 and v247 ~= nil
+
+				return
+			end
+
+			v9:trace("Syncing audio processing with VoiceChat mute changed: muted=" .. tostring(p44))
+			FaceAnimatorService.AudioAnimationEnabled = not p44
+		end)
+
+		local v179 = false
+
+		if default2.localMuted ~= nil then
+			v9:trace("Syncing audio processing with VoiceChat mute status: muted=" .. tostring(default2.localMuted))
+			v179 = not default2.localMuted
+		end
+
+		if game:GetFastFlag("FacialAnimationStreamingIfNoDynamicHeadDisableA2C") then
+			local LocalPlayer = Players.LocalPlayer
+			local v181 = if not LocalPlayer or not LocalPlayer.Character then nil else LocalPlayer.Character:FindFirstChildWhichIsA("FaceControls", true)
+
+			v9:trace("Syncing audio processing with Dynamic Head status: hasFaceControls=" .. tostring(v181 ~= nil))
+			v179 = v179 and v181 ~= nil
+		end
+
+		FaceAnimatorService.AudioAnimationEnabled = v179
+
+		return
+	end
+
+	ConnectStateChangeCallback()
+end
+function CleanupVoiceChat() -- line: 732
+	-- upvalues: u41 (ref)
+	if u41 then
+		u41:Disconnect()
+		u41 = nil
+	end
+end
+function InitializeFacialAnimationStreaming(p45) -- line: 739
+	-- upvalues: u31 (ref), connection (ref), FaceAnimatorService (copy), v9 (copy), TrackerMenu (copy), TrackerPromptType (copy), v19 (copy), u24 (ref), GetFFlagAvatarChatServiceEnabled (copy), v16 (copy), EngineFeature2 (copy), connection2 (ref), v18 (copy), AttemptToShowCameraPerformanceToast (copy), default (copy), Enums (copy), JoinAllExistingPlayers (copy), FacialAnimationStreamingHeartbeatStats (copy)
+	if u31 then
+		return
+	end
+
+	u31 = true
+	connection = FaceAnimatorService.TrackerError:Connect(function(p46) -- line: 747
+		-- upvalues: v9 (copy), TrackerMenu (copy), TrackerPromptType (copy)
+		local v249 = string.format("TrackerError: %s", (tostring(p46)))
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", v249, "", ""))
+
+		if p46 == Enum.TrackerError.VideoNoPermission then
+			TrackerMenu:showPrompt(TrackerPromptType.VideoNoPermission)
+
+			return
+		end
+
+		if p46 == Enum.TrackerError.VideoUnsupported then
+			TrackerMenu:showPrompt(TrackerPromptType.VideoUnsupported)
+
+			return
+		end
+
+		if p46 == Enum.TrackerError.UnsupportedDevice then
+			TrackerMenu:showPrompt(TrackerPromptType.UnsupportedDevice)
+
+			return
+		end
+
+		TrackerMenu:showPrompt(TrackerPromptType.NotAvailable)
+	end)
+
+	if v19 and not u24() then
+		v9:trace("Camera is disabled for user and place")
+
+		return
+	end
+
+	if GetFFlagAvatarChatServiceEnabled() then
+		FaceAnimatorService:Init(v16:IsEnabled(p45, Enum.AvatarChatServiceFeature.UserVideo), v16:IsEnabled(p45, Enum.AvatarChatServiceFeature.UserAudio))
+	end
+
+	if EngineFeature2 then
+		connection2 = FaceAnimatorService.TrackerPrompt:Connect(function(p47) -- line: 774
+			-- upvalues: v9 (copy), v18 (copy), AttemptToShowCameraPerformanceToast (copy), TrackerMenu (copy), TrackerPromptType (copy)
+			local v251 = string.format("TrackerPrompt: %s", (tostring(p47)))
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", v251, "", ""))
+
+			if p47 == Enum.TrackerPromptEvent.LODCameraRecommendDisable then
+				if v18 then
+					AttemptToShowCameraPerformanceToast()
+
+					return
+				end
+
+				TrackerMenu:showPrompt(TrackerPromptType.LODCameraRecommendDisable)
+			end
+		end)
+	end
+
+	default:getCallState():andThen(function(p48) -- line: 787
+		-- upvalues: u31 (ref), Enums (copy), FaceAnimatorService (copy), JoinAllExistingPlayers (copy), FacialAnimationStreamingHeartbeatStats (copy)
+		if not u31 then
+			return
+		end
+
+		if p48.status ~= Enums.CallStatus.Idle.rawValue() and p48.status ~= Enums.CallStatus.Ringing.rawValue() then
+			FaceAnimatorService.VideoAnimationEnabled = p48.camEnabled
+		else
+			FaceAnimatorService.VideoAnimationEnabled = false
+		end
+
+		InitializeVoiceChat()
+		JoinAllExistingPlayers()
+		FacialAnimationStreamingHeartbeatStats.Initialize()
+	end)
+end
+function CleanupFacialAnimationStreaming() -- line: 812
+	-- upvalues: u31 (ref), FacialAnimationStreamingHeartbeatStats (copy), Players (copy), t3 (copy), playerUpdate (copy), connection (ref), u42 (ref), u43 (ref), EngineFeature2 (copy), connection2 (ref)
+	if not u31 then
+		return
+	end
+
+	u31 = false
+	CleanupVoiceChat()
+	FacialAnimationStreamingHeartbeatStats.Cleanup()
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		t3[player.UserId] = nil
+		playerUpdate(player)
+	end
+
+	if connection then
+		connection:Disconnect()
+		connection = nil
+	end
+
+	if u42 then
+		u42:Disconnect()
+		u42 = nil
+	end
+
+	if u43 then
+		u43:Disconnect()
+		u43 = nil
+	end
+
+	if EngineFeature2 and connection2 then
+		connection2:Disconnect()
+		connection2 = nil
+	end
+end
+
+local function updateWithServiceState(p49) -- line: 850
+	-- upvalues: v9 (copy), GetFFlagAvatarChatServiceEnabled (copy), v16 (copy)
+	v9:trace(string.format("[updateWithServiceState] state: %s", (tostring(p49))))
+
+	if GetFFlagAvatarChatServiceEnabled() then
+		if (v16:IsEnabled(p49, Enum.AvatarChatServiceFeature.UserAudioEligible) or v16:IsEnabled(p49, Enum.AvatarChatServiceFeature.UserVideoEligible)) and v16:IsPlaceEnabled() then
+			InitializeFacialAnimationStreaming(p49)
+
+			return
+		end
+
+		CleanupFacialAnimationStreaming()
+
+		return
+	end
+
+	CleanupFacialAnimationStreaming()
+end
+
+u42 = FaceAnimatorService:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(function() -- line: 871
+	-- upvalues: Players (copy), FaceAnimatorService (copy), t4 (copy), v9 (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if not LocalPlayer then
+		return
+	end
+
+	if FaceAnimatorService.AudioAnimationEnabled or FaceAnimatorService.VideoAnimationEnabled then
+		if t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+			local s55 = ""
+			local s56 = ""
+
+			if LocalPlayer then
+				if LocalPlayer.UserId then
+					s55 = tostring(LocalPlayer.UserId)
+				end
+
+				if LocalPlayer.Name then
+					s56 = LocalPlayer.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", s55, s56))
+			t4[LocalPlayer.UserId].animationTrack:AdjustWeight(1, 0.5)
+
+			return
+		end
+	elseif t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+		local s57 = ""
+		local s58 = ""
+
+		if LocalPlayer then
+			if LocalPlayer.UserId then
+				s57 = tostring(LocalPlayer.UserId)
+			end
+
+			if LocalPlayer.Name then
+				s58 = LocalPlayer.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s57, s58))
+		t4[LocalPlayer.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+	end
+end)
+u43 = FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(function() -- line: 875
+	-- upvalues: Players (copy), FaceAnimatorService (copy), t4 (copy), v9 (copy)
+	local LocalPlayer = Players.LocalPlayer
+
+	if not LocalPlayer then
+		return
+	end
+
+	if FaceAnimatorService.AudioAnimationEnabled or FaceAnimatorService.VideoAnimationEnabled then
+		if t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+			local s59 = ""
+			local s60 = ""
+
+			if LocalPlayer then
+				if LocalPlayer.UserId then
+					s59 = tostring(LocalPlayer.UserId)
+				end
+
+				if LocalPlayer.Name then
+					s60 = LocalPlayer.Name
+				end
+			end
+
+			v9:trace(string.format("%s {id: %s, name: %s}.", "Resuming facial streaming animations...", s59, s60))
+			t4[LocalPlayer.UserId].animationTrack:AdjustWeight(1, 0.5)
+
+			return
+		end
+	elseif t4[LocalPlayer.UserId] and t4[LocalPlayer.UserId].animationTrack then
+		local s61 = ""
+		local s62 = ""
+
+		if LocalPlayer then
+			if LocalPlayer.UserId then
+				s61 = tostring(LocalPlayer.UserId)
+			end
+
+			if LocalPlayer.Name then
+				s62 = LocalPlayer.Name
+			end
+		end
+
+		v9:trace(string.format("%s {id: %s, name: %s}.", "Pausing facial streaming animations...", s61, s62))
+		t4[LocalPlayer.UserId].animationTrack:AdjustWeight(0.1, 0.5)
+	end
+end)
+
+if GetFFlagAvatarChatServiceEnabled() then
+	if v16.ClientFeaturesInitialized then
+		updateWithServiceState(v16.ClientFeatures)
+	else
+		local connection3 = nil
+
+		connection3 = v16:GetPropertyChangedSignal("ClientFeatures"):Connect(function() -- line: 885
+			-- upvalues: updateWithServiceState (copy), v16 (copy), connection3 (ref)
+			updateWithServiceState(v16.ClientFeatures)
+			connection3:Disconnect()
+		end)
+	end
+end

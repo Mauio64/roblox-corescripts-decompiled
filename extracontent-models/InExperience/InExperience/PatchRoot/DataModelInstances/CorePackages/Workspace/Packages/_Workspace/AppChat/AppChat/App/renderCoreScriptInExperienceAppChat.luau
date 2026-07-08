@@ -1,60 +1,69 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_FFlagEnableAppChatFocusableFixes_0 = require(l_Parent_0.SharedFlags).FFlagEnableAppChatFocusableFixes;
-local v4 = require(l_Parent_0.FocusNavigationUtils);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.ReactFocusNavigation);
-local v7 = require(l_Parent_0.ReactRoblox);
-local v8 = require(l_Parent_0.Rodux);
-local l_Provider_0 = v4.FocusNavigableSurfaceRegistry.Provider;
-local v10 = require(l_script_FirstAncestor_0.App.AppChatReducer);
-local v11 = require(l_script_FirstAncestor_0.App.InExperienceAppChat);
-local v12 = require(l_script_FirstAncestor_0.App.InExperienceAppChatProviders);
-local v13 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatSignalsMessageStore);
-local v14 = require(l_script_FirstAncestor_0.Middleware.SignalsMessageIngestionMiddleware);
-return function(v15, v16, v17) --[[ Line: 23 ]]
-    -- upvalues: l_CoreGui_0 (copy), v7 (copy), v8 (copy), v13 (copy), v14 (copy), v10 (copy), l_FFlagEnableAppChatFocusableFixes_0 (copy), v6 (copy), v5 (copy), l_Provider_0 (copy), v12 (copy), v11 (copy)
-    local l_Folder_0 = Instance.new("Folder");
-    l_Folder_0.Name = "AppChat";
-    l_Folder_0.Parent = l_CoreGui_0;
-    local v19 = v7.createRoot(l_Folder_0);
-    local v20 = {
-        v8.thunkMiddleware
-    };
-    if v13 then
-        table.insert(v20, v14);
-    end;
-    local v21 = v8.Store.new(v10, nil, v20);
-    local v22 = if l_FFlagEnableAppChatFocusableFixes_0 then v6.FocusNavigationService.new(v6.EngineInterface.CoreGui) else nil;
-    local function v23() --[[ Line: 45 ]] --[[ Name: AppChatMainWithFocusRoot ]]
-        -- upvalues: v5 (ref), v6 (ref), v22 (copy), l_Provider_0 (ref), v12 (ref), v21 (copy), v17 (copy), v16 (copy), v15 (copy), v11 (ref)
-        return v5.createElement(v6.FocusNavigationContext.Provider, {
-            value = v22
-        }, {
-            FocusNavigationRegistryProvider = v5.createElement(l_Provider_0, nil, {
-                InExperienceAppChatProviders = v5.createElement(v12, {
-                    store = v21, 
-                    updateAppChatUnreadMessagesCount = v17, 
-                    parentContainerContext = v16, 
-                    apolloClient = v15
-                }, {
-                    appChat = v5.createElement(v11)
-                })
-            })
-        });
-    end;
-    local function v24() --[[ Line: 63 ]] --[[ Name: AppChatMainWithoutFocusRoot ]]
-        -- upvalues: v5 (ref), v12 (ref), v21 (copy), v17 (copy), v16 (copy), v15 (copy), v11 (ref)
-        return v5.createElement(v12, {
-            store = v21, 
-            updateAppChatUnreadMessagesCount = v17, 
-            parentContainerContext = v16, 
-            apolloClient = v15
-        }, {
-            appChat = v5.createElement(v11)
-        });
-    end;
-    v19:render(if l_FFlagEnableAppChatFocusableFixes_0 then v23() else v24());
-    return v19;
-end;
+local CoreGui = game:GetService("CoreGui")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local FocusNavigationUtils = require(AppChatParent.FocusNavigationUtils)
+local React = require(AppChatParent.React)
+local ReactFocusNavigation = require(AppChatParent.ReactFocusNavigation)
+local ReactRoblox = require(AppChatParent.ReactRoblox)
+local Rodux = require(AppChatParent.Rodux)
+local Provider = FocusNavigationUtils.FocusNavigableSurfaceRegistry.Provider
+local AppChatReducer = require(AppChat.App.AppChatReducer)
+local InExperienceAppChat = require(AppChat.App.InExperienceAppChat)
+local InExperienceAppChatProviders = require(AppChat.App.InExperienceAppChatProviders)
+local FFlagAppChatSignalsMessageStore = require(AppChat.Flags.FFlagAppChatSignalsMessageStore)
+local FFlagAppChatConversationStore = require(AppChat.Flags.FFlagAppChatConversationStore)
+local SignalsConversationMiddleware = require(AppChat.Middleware.SignalsConversationMiddleware)
+local SignalsMessageIngestionMiddleware = require(AppChat.Middleware.SignalsMessageIngestionMiddleware)
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+local ChatPlacementContext = require(AppChat.Contexts.ChatPlacementContext)
+
+return function(p1, p2, p3) -- line: 28
+	-- upvalues: CoreGui (copy), FFlagAppChatPerfTracking (copy), AppChatPerfTracker (copy), ChatPlacementContext (copy), ReactRoblox (copy), Rodux (copy), FFlagAppChatSignalsMessageStore (copy), SignalsMessageIngestionMiddleware (copy), FFlagAppChatConversationStore (copy), SignalsConversationMiddleware (copy), AppChatReducer (copy), ReactFocusNavigation (copy), React (copy), Provider (copy), InExperienceAppChatProviders (copy), InExperienceAppChat (copy)
+	local Folder = Instance.new("Folder")
+
+	Folder.Name = "AppChat"
+	Folder.Parent = CoreGui
+
+	if FFlagAppChatPerfTracking then
+		AppChatPerfTracker.setSharedContext({
+			placement = ChatPlacementContext.Enum.InExperienceDefault
+		})
+	end
+
+	local v24 = ReactRoblox.createRoot(Folder)
+	local t1 = { Rodux.thunkMiddleware }
+
+	if FFlagAppChatSignalsMessageStore then
+		table.insert(t1, SignalsMessageIngestionMiddleware)
+	end
+
+	if FFlagAppChatConversationStore then
+		table.insert(t1, SignalsConversationMiddleware)
+	end
+
+	local v26 = Rodux.Store.new(AppChatReducer, nil, t1)
+	local v27 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+
+	local function AppChatMainWithFocusRoot() -- line: 64
+		-- upvalues: React (copy), ReactFocusNavigation (copy), v27 (copy), Provider (copy), InExperienceAppChatProviders (copy), v26 (copy), p3 (copy), p2 (copy), p1 (copy), InExperienceAppChat (copy)
+		return React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
+			value = v27
+		}, {
+			FocusNavigationRegistryProvider = React.createElement(Provider, nil, {
+				InExperienceAppChatProviders = React.createElement(InExperienceAppChatProviders, {
+					store = v26,
+					updateAppChatUnreadMessagesCount = p3,
+					parentContainerContext = p2,
+					apolloClient = p1
+				}, {
+					appChat = React.createElement(InExperienceAppChat)
+				})
+			})
+		})
+	end
+
+	v24:render((AppChatMainWithFocusRoot()))
+
+	return v24
+end

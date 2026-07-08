@@ -1,136 +1,148 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UnifiedLogging");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.t);
-local l_DiscoveryEventErrorLogger_0 = require(l_Parent_0.DiscoveryUtils).DiscoveryEventErrorLogger;
-local v7 = require(l_script_FirstAncestor_0.ContentType);
-local l_FFlagLuaAppLoosenCollectionIdTypeInterface_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppLoosenCollectionIdTypeInterface;
-local v9 = require(script.Parent.FFlagLuaAppUnifiedLoggingDialogContentType);
-local l_FFlagLuaAppMigrateItemEventsTelemetryService_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppMigrateItemEventsTelemetryService;
-local l_FFlagLuaAppItemEventsTelemetryServiceShadowTraffic_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppItemEventsTelemetryServiceShadowTraffic;
-local v12 = game:DefineFastInt("LuaAppItemActionEventThrottlingHundredthsPercent", 10000);
-local v13 = game:DefineFastInt("LuaAppItemActionShadowThrottlingHundredthsPercent", 10000);
-local v14 = nil;
-if l_FFlagLuaAppMigrateItemEventsTelemetryService_0 then
-    v14 = {
-        eventName = "itemAction", 
-        backends = {
-            "EventIngest"
-        }, 
-        throttlingPercentage = v12, 
-        lastUpdated = {
-            26, 
-            2, 
-            4
-        }, 
-        description = "Fires for default user actions, primarily through SDUI"
-    };
-end;
-local v15 = nil;
-if l_FFlagLuaAppItemEventsTelemetryServiceShadowTraffic_0 then
-    v15 = {
-        eventName = "itemActionShadow", 
-        backends = {
-            "EventIngest"
-        }, 
-        throttlingPercentage = v13, 
-        lastUpdated = {
-            26, 
-            3, 
-            4
-        }, 
-        description = "Shadow traffic for itemAction event recovery percentage"
-    };
-end;
-local v16 = nil;
-local v17 = nil;
-local v18 = v5.union(v5.interface({
-    collectionId = if l_FFlagLuaAppLoosenCollectionIdTypeInterface_0 then v5.union(v5.string, v5.number) else v5.number, 
-    collectionIdStr = v5.optional(v5.string)
-}), v5.interface({
-    collectionId = v5.optional(if l_FFlagLuaAppLoosenCollectionIdTypeInterface_0 then v5.union(v5.string, v5.number) else v5.number), 
-    collectionIdStr = v5.string
-}));
-local v19 = {
-    collectionPosition = v5.number, 
-    totalNumberOfItems = v5.number, 
-    contentType = v5.string, 
-    itemId = v5.optional(v5.string), 
-    itemPosition = v5.optional(v5.number), 
-    positionInRow = v5.optional(v5.number), 
-    rowNumber = v5.optional(v5.number), 
-    feedRowNumber = v5.optional(v5.number), 
-    positionInTopic = v5.optional(v5.number), 
-    actionType = v5.string, 
-    interactionUuid = v5.optional(v5.string)
-};
-v16 = v5.intersection(v18, v5.interface(v19));
-v17 = v5.intersection(v18, v5.interface(v4.Dictionary.join(v19, {
-    itemId = v5.string, 
-    itemPosition = v5.number, 
-    sourceCarousel = v5.string, 
-    friendStatus = v5.string, 
-    presence = v5.string, 
-    presenceUniverseId = v5.string
-})));
-local v20 = if v9 then v5.interface({
-    contentType = v5.string, 
-    actionType = v5.string, 
-    interactionUuid = v5.optional(v5.string)
-}) else nil;
-local v21 = {
-    [v7.User] = v17
-};
-if v9 then
-    v21[v7.Dialog] = v20;
-end;
-return function(v22, v23, v24, v25) --[[ Line: 113 ]]
-    -- upvalues: v21 (copy), v16 (ref), l_DiscoveryEventErrorLogger_0 (copy), l_HttpService_0 (copy), l_FFlagLuaAppMigrateItemEventsTelemetryService_0 (copy), l_TelemetryService_0 (copy), v14 (ref), l_FFlagLuaAppItemEventsTelemetryServiceShadowTraffic_0 (copy), v15 (ref)
-    local v26 = v21[v24] or v16;
-    if v26 then
-        local v27, v28 = v26(v25);
-        if not v27 then
-            l_DiscoveryEventErrorLogger_0.reportError("ItemActionEventInvalidInterface", v28);
-        end;
-    end;
-    if not v25.interactionUuid then
-        v25.interactionUuid = l_HttpService_0:GenerateGUID(false);
-    end;
-    if l_FFlagLuaAppMigrateItemEventsTelemetryService_0 then
-        for v29, v30 in v25 do
-            if type(v30) == "boolean" then
-                v25[v29] = v30 == true and "true" or v30 == false and "false" or nil;
-            end;
-        end;
-        l_TelemetryService_0:LogEvent(v14, {
-            eventContext = v23, 
-            standardizedFields = {
-                "addSessionInfo", 
-                "addSessionId", 
-                "addOSInfo"
-            }, 
-            customFields = v25
-        });
-    else
-        v22:sendEventDeferred(v23, "itemAction", v25);
-    end;
-    if l_FFlagLuaAppItemEventsTelemetryServiceShadowTraffic_0 then
-        local v31 = table.clone(v25);
-        for v32, v33 in v31 do
-            if type(v33) == "boolean" then
-                v31[v32] = v33 == true and "true" or v33 == false and "false" or nil;
-            end;
-        end;
-        l_TelemetryService_0:LogEvent(v15, {
-            eventContext = v23, 
-            standardizedFields = {
-                "addSessionInfo", 
-                "addSessionId", 
-                "addOSInfo"
-            }, 
-            customFields = v31
-        });
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local TelemetryService = game:GetService("TelemetryService")
+local UnifiedLogging = script:FindFirstAncestor("UnifiedLogging")
+local UnifiedLoggingParent = UnifiedLogging.Parent
+local Cryo = require(UnifiedLoggingParent.Cryo)
+local getPlatformTarget = require(UnifiedLoggingParent.Analytics).getPlatformTarget
+local t = require(UnifiedLoggingParent.t)
+local DiscoveryEventErrorLogger = require(UnifiedLoggingParent.DiscoveryUtils).DiscoveryEventErrorLogger
+local ContentType = require(UnifiedLogging.ContentType)
+local FFlagLuaAppLoosenCollectionIdTypeInterface = require(UnifiedLoggingParent.SharedFlags).FFlagLuaAppLoosenCollectionIdTypeInterface
+local FFlagLuaAppUnifiedLoggingDialogContentType = require(script.Parent.FFlagLuaAppUnifiedLoggingDialogContentType)
+local FFlagLuaAppMigrateItemEventsTelemetryService = require(UnifiedLoggingParent.SharedFlags).FFlagLuaAppMigrateItemEventsTelemetryService
+local FFlagLuaAppItemEventsTelemetryServiceShadowTraffic = require(UnifiedLoggingParent.SharedFlags).FFlagLuaAppItemEventsTelemetryServiceShadowTraffic
+local FFlagLuaAppGameItemTelemetryServiceTarget = require(UnifiedLoggingParent.SharedFlags).FFlagLuaAppGameItemTelemetryServiceTarget
+local v15 = game:DefineFastInt("LuaAppItemActionEventThrottlingHundredthsPercent", 10000)
+local v16 = game:DefineFastInt("LuaAppItemActionShadowThrottlingHundredthsPercent", 10000)
+local t1 = nil
+
+if FFlagLuaAppMigrateItemEventsTelemetryService then
+	t1 = {
+		eventName = "itemAction",
+		description = "Fires for default user actions, primarily through SDUI",
+		backends = { "EventIngest" },
+		throttlingPercentage = v15,
+		lastUpdated = {
+			26,
+			2,
+			4
+		}
+	}
+end
+
+local t2 = nil
+
+if FFlagLuaAppItemEventsTelemetryServiceShadowTraffic then
+	t2 = {
+		eventName = "itemActionShadow",
+		description = "Shadow traffic for itemAction event recovery percentage",
+		backends = { "EventIngest" },
+		throttlingPercentage = v16,
+		lastUpdated = {
+			26,
+			3,
+			4
+		}
+	}
+end
+
+local v19 = t.union(t.interface({
+	collectionId = if not FFlagLuaAppLoosenCollectionIdTypeInterface then t.number else t.union(t.string, t.number),
+	collectionIdStr = t.optional(t.string)
+}), t.interface({
+	collectionId = t.optional(if not FFlagLuaAppLoosenCollectionIdTypeInterface then t.number else t.union(t.string, t.number)),
+	collectionIdStr = t.string
+}))
+local t3 = {
+	collectionPosition = t.number,
+	totalNumberOfItems = t.number,
+	contentType = t.string,
+	itemId = t.optional(t.string),
+	itemPosition = t.optional(t.number),
+	positionInRow = t.optional(t.number),
+	rowNumber = t.optional(t.number),
+	feedRowNumber = t.optional(t.number),
+	positionInTopic = t.optional(t.number),
+	actionType = t.string,
+	interactionUuid = t.optional(t.string)
+}
+local u21 = t.intersection(v19, t.interface(t3))
+local v22 = t.intersection(v19, t.interface(Cryo.Dictionary.join(t3, {
+	itemId = t.string,
+	itemPosition = t.number,
+	sourceCarousel = t.string,
+	friendStatus = t.string,
+	presence = t.string,
+	presenceUniverseId = t.string
+})))
+local v23 = if not FFlagLuaAppUnifiedLoggingDialogContentType then nil else t.interface({
+	contentType = t.string,
+	actionType = t.string,
+	interactionUuid = t.optional(t.string)
+})
+local t4 = {
+	[ContentType.User] = v22
+}
+
+if FFlagLuaAppUnifiedLoggingDialogContentType then
+	t4[ContentType.Dialog] = v23
+end
+
+return function(p1, s1: string, s2: string, t5: {[any]: any}) -- line: 117
+	-- upvalues: t4 (copy), u21 (ref), DiscoveryEventErrorLogger (copy), HttpService (copy), FFlagLuaAppMigrateItemEventsTelemetryService (copy), TelemetryService (copy), t1 (ref), FFlagLuaAppGameItemTelemetryServiceTarget (copy), getPlatformTarget (copy), FFlagLuaAppItemEventsTelemetryServiceShadowTraffic (copy), t2 (ref)
+	local v29 = t4[s2] or u21
+
+	if v29 then
+		local v30, v31 = v29(t5)
+
+		if not v30 then
+			DiscoveryEventErrorLogger.reportError("ItemActionEventInvalidInterface", v31)
+		end
+	end
+
+	if not t5.interactionUuid then
+		t5.interactionUuid = HttpService:GenerateGUID(false)
+	end
+
+	if FFlagLuaAppMigrateItemEventsTelemetryService then
+		for v32, v33 in t5 do
+			if type(v33) == "boolean" then
+				t5[v32] = if v33 ~= true then if v33 ~= false then nil else "false" else "true"
+			end
+		end
+
+		TelemetryService:LogEvent(t1, {
+			eventContext = s1,
+			standardizedFields = {
+				"addSessionInfo",
+				"addSessionId",
+				"addOSInfo"
+			},
+			customFields = t5,
+			legacyOverrideTargetForEventIngest = if not FFlagLuaAppGameItemTelemetryServiceTarget then nil else getPlatformTarget()
+		})
+	else
+		p1:sendEventDeferred(s1, "itemAction", t5)
+	end
+
+	if FFlagLuaAppItemEventsTelemetryServiceShadowTraffic then
+		local v34 = table.clone(t5)
+
+		for v35, v36 in v34 do
+			if type(v36) == "boolean" then
+				v34[v35] = if v36 ~= true then if v36 ~= false then nil else "false" else "true"
+			end
+		end
+
+		TelemetryService:LogEvent(t2, {
+			eventContext = s1,
+			standardizedFields = {
+				"addSessionInfo",
+				"addSessionId",
+				"addOSInfo"
+			},
+			customFields = v34,
+			legacyOverrideTargetForEventIngest = if not FFlagLuaAppGameItemTelemetryServiceTarget then nil else getPlatformTarget()
+		})
+	end
+end

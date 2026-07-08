@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatDisableAbsorbInputSelectable", false);
+return game:DefineFastFlag("AppChatDisableAbsorbInputSelectable", false)

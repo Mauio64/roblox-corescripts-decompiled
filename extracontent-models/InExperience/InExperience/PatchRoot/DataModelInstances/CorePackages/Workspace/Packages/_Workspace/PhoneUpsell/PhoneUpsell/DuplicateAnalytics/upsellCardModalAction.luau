@@ -1,11 +1,11 @@
-return function(v0, v1, v2, v3, v4, v5, v6) --[[ Line: 7 ]]
-    assert(type(v1) == "string", "Expected eventContext to be a string");
-    assert(type(v3) == "string", "Expected actionType to be a string");
-    v0:setRBXEventStream(v1, "modalAction", {
-        aType = v3, 
-        origin = v4, 
-        section = v5, 
-        errorCode = v6, 
-        field = v2
-    });
-end;
+return function(p1, p2, p3, p4, p5, p6, p7) -- line: 7
+	assert(type(p2) == "string", "Expected eventContext to be a string")
+	assert(type(p4) == "string", "Expected actionType to be a string")
+	p1:setRBXEventStream(p2, "modalAction", {
+		aType = p4,
+		origin = p5,
+		section = p6,
+		errorCode = p7,
+		field = p3
+	})
+end

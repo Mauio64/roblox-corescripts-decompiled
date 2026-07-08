@@ -1,22 +1,28 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceCommon");
-local v1 = require(l_script_FirstAncestor_0.Enums.ItemTypeEnum);
-local v2 = require(l_script_FirstAncestor_0.Constants);
-local function v7(v3) --[[ Line: 6 ]] --[[ Name: getBodiesInTryOns ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4 = {};
-    for _, v6 in v3 do
-        if v6.itemType == v1.Bundle and v6.itemSubType == v2.BODY_BUNDLE_TYPE_ID then
-            table.insert(v4, v6.itemId);
-        end;
-    end;
-    return v4;
-end;
-return function(v8) --[[ Line: 19 ]] --[[ Name: selectTryOnBodyIds ]]
-    -- upvalues: v7 (copy)
-    local l_OutfitTryOn_0 = v8.AvatarExperience.AvatarScene.OutfitTryOn;
-    if l_OutfitTryOn_0 and l_OutfitTryOn_0.TryOnItems then
-        return (v7(l_OutfitTryOn_0.TryOnItems));
-    else
-        return {};
-    end;
-end;
+local AvatarExperienceCommon = script:FindFirstAncestor("AvatarExperienceCommon")
+local ItemTypeEnum = require(AvatarExperienceCommon.Enums.ItemTypeEnum)
+local Constants = require(AvatarExperienceCommon.Constants)
+
+local function getBodiesInTryOns(t1: {[any]: any}) -- line: 6
+	-- upvalues: ItemTypeEnum (copy), Constants (copy)
+	local t2 = {}
+
+	for _, v9 in t1 do
+		if v9.itemType == ItemTypeEnum.Bundle and v9.itemSubType == Constants.BODY_BUNDLE_TYPE_ID then
+			table.insert(t2, v9.itemId)
+		end
+	end
+
+	return t2
+end
+local function selectTryOnBodyIds(p1) -- line: 19
+	-- upvalues: getBodiesInTryOns (copy)
+	local OutfitTryOn = p1.AvatarExperience.AvatarScene.OutfitTryOn
+
+	if OutfitTryOn and OutfitTryOn.TryOnItems then
+		return (getBodiesInTryOns(OutfitTryOn.TryOnItems))
+	end
+
+	return {}
+end
+
+return selectTryOnBodyIds

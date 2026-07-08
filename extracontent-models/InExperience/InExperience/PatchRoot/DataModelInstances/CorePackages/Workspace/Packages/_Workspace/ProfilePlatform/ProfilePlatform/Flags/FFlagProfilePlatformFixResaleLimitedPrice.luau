@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformFixResaleLimitedPrice", false);
+return game:DefineFastFlag("ProfilePlatformFixResaleLimitedPrice", false)

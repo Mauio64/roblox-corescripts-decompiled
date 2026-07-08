@@ -1,3 +1,5 @@
-return function(v0, v1, v2, v3) --[[ Line: 5 ]] --[[ Name: calculateNumberInputValueFromPositions ]]
-    return v0 + (v2 - v1) * v3;
-end;
+local function calculateNumberInputValueFromPositions(n1: number, n2: number, n3: number, n4: number) -- line: 5
+	return n1 + (n3 - n2) * n4
+end
+
+return calculateNumberInputValueFromPositions

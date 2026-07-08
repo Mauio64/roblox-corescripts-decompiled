@@ -1,9 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("AuthCommon").Parent;
-local v1 = require(l_Parent_0.Lumberyak).Logger.new(nil, "Authentication");
-v1:addSink({
-    maxLevel = v1.Levels.Warning, 
-    log = function(_, v3, _) --[[ Line: 10 ]] --[[ Name: log ]]
-        print(v3);
-    end
-});
-return v1;
+local Parent = script:FindFirstAncestor("AuthCommon").Parent
+local v2 = require(Parent.Lumberyak).Logger.new(nil, "Authentication")
+
+v2:addSink({
+	maxLevel = v2.Levels.Warning,
+	log = function(_, p2, _) -- line: 10
+		print(p2)
+	end
+})
+
+return v2

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AllowDisconnectGuiForOkUnknown", false);
+return game:DefineFastFlag("AllowDisconnectGuiForOkUnknown", false)

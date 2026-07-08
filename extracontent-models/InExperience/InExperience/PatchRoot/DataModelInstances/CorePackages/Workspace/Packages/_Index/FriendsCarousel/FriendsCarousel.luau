@@ -1,1 +1,1 @@
-return require(script.FriendsCarouselApi);
+return require(script.FriendsCarouselApi)

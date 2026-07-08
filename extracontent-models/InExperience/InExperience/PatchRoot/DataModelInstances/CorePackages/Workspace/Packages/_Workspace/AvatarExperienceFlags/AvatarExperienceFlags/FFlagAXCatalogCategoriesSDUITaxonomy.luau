@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXCatalogCategoriesSDUI) and game:DefineFastFlag("AXCatalogCategoriesSDUITaxonomy", false);
+return require(script.Parent.FFlagAXCatalogCategoriesSDUI) and game:DefineFastFlag("AXCatalogCategoriesSDUITaxonomy", false)

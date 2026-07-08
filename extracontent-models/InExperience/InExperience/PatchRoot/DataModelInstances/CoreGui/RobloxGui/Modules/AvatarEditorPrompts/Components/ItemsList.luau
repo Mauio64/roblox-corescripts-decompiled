@@ -1,305 +1,338 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactGamepad);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.t);
-local v6 = require(l_CorePackages_0.Packages.UIBlox);
-local l_Skeleton_0 = require(l_CorePackages_0.Packages.Foundation).Skeleton;
-local l_VerticalScrollViewWithMargin_0 = v6.App.Container.VerticalScrollViewWithMargin;
-local l_withStyle_0 = v6.Style.withStyle;
-local l_EmptyState_0 = v6.App.Indicator.EmptyState;
-local v11 = require(script.ListSection);
-local l_Parent_0 = script.Parent.Parent;
-local v13 = require(l_Parent_0.GetAssetsDifference);
-local v14 = require(l_Parent_0.Actions.AddAnalyticsInfo);
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v16 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v17 = v2.PureComponent:extend("ItemsList");
-v17.validateProps = v5.strictInterface({
-    humanoidDescription = v5.optional(v5.instanceOf("HumanoidDescription")), 
-    loadingFailed = v5.boolean, 
-    retryLoadDescription = v5.callback, 
-    itemListScrollableUpdated = v5.optional(v5.callback), 
-    addAnalyticsInfo = v5.callback
-});
-v17.init = function(v18) --[[ Line: 42 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy), v13 (copy)
-    v18:setState({
-        canvasSizeY = 0, 
-        loading = true, 
-        addedAssetNames = nil, 
-        removedAssetNames = nil
-    });
-    v18.mounted = false;
-    v18.frameRef = v2.createRef();
-    local v19, v20 = v2.createBinding(false);
-    v18.topGradientVisibleBinding = v19;
-    v18.updateTopGradientVisibleBinding = v20;
-    v19, v20 = v2.createBinding(false);
-    v18.bottomGradientVisibleBinding = v19;
-    v18.updateBottomGradientVisibleBinding = v20;
-    v18.addedSectionRef = v2.createRef();
-    v18.removedSectionRef = v2.createRef();
-    v18.noChangedAssetsRef = v2.createRef();
-    v18.lastWasScrollable = nil;
-    v18.checkIsScrollable = function() --[[ Line: 61 ]]
-        -- upvalues: v18 (copy)
-        local v21 = v18.frameRef:getValue();
-        if not v21 then
-            return;
-        elseif not v18.props.itemListScrollableUpdated then
-            return;
-        else
-            local v22 = v18.state.canvasSizeY > v21.AbsoluteSize.Y;
-            if v22 ~= v18.lastWasScrollable then
-                v18.lastWasScrollable = v22;
-                v18.props.itemListScrollableUpdated(v22, v21.AbsoluteSize.Y);
-            end;
-            return;
-        end;
-    end;
-    v18.onContentSizeChanged = function(v23) --[[ Line: 79 ]]
-        -- upvalues: v18 (copy)
-        v18:setState({
-            canvasSizeY = v23.AbsoluteContentSize.Y
-        });
-    end;
-    v18.firstEntryPositionChanged = function(v24) --[[ Line: 85 ]]
-        -- upvalues: v18 (copy)
-        local v25 = v18.frameRef:getValue();
-        if not v25 then
-            return;
-        elseif v24.AbsolutePosition.Y < v25.AbsolutePosition.Y then
-            v18.updateTopGradientVisibleBinding(true);
-            return;
-        else
-            v18.updateTopGradientVisibleBinding(false);
-            return;
-        end;
-    end;
-    v18.lastEntryPositionChanged = function(v26) --[[ Line: 98 ]]
-        -- upvalues: v18 (copy)
-        local v27 = v18.frameRef:getValue();
-        if not v27 then
-            return;
-        elseif v26.AbsolutePosition.Y + v26.AbsoluteSize.Y > v27.AbsolutePosition.Y + v27.AbsoluteSize.Y then
-            v18.updateBottomGradientVisibleBinding(true);
-            return;
-        else
-            v18.updateBottomGradientVisibleBinding(false);
-            return;
-        end;
-    end;
-    v18.loadAssetNames = function() --[[ Line: 113 ]]
-        -- upvalues: v13 (ref), v18 (copy)
-        coroutine.wrap(function() --[[ Line: 114 ]]
-            -- upvalues: v13 (ref), v18 (ref)
-            v13(v18.props.humanoidDescription):andThen(function(v28) --[[ Line: 115 ]]
-                -- upvalues: v18 (ref)
-                if v18.mounted then
-                    v18.props.addAnalyticsInfo(v28.addedAssetIds, v28.removedAssetIds);
-                    v18:setState({
-                        loading = false, 
-                        addedAssetNames = v28.addedNames, 
-                        removedAssetNames = v28.removedNames
-                    });
-                end;
-            end, function(_) --[[ Line: 125 ]]
-                -- upvalues: v18 (ref)
-                if v18.mounted then
-                    v18:setState({
-                        loading = false
-                    });
-                end;
-            end);
-        end)();
-    end;
-    v18.onRetryLoading = function() --[[ Line: 135 ]]
-        -- upvalues: v18 (copy)
-        v18:setState({
-            loading = true
-        });
-        if v18.props.humanoidDescription then
-            v18.loadAssetNames();
-            return;
-        else
-            v18.props.retryLoadDescription();
-            return;
-        end;
-    end;
-end;
-v17.createEntriesList = function(v30) --[[ Line: 148 ]] --[[ Name: createEntriesList ]]
-    -- upvalues: v16 (copy), v2 (copy), v3 (copy), v11 (copy)
-    local v31 = {};
-    if #v30.state.addedAssetNames > 0 then
-        local v32 = v16:FormatByKey("CoreScripts.AvatarEditorPrompts.Adding");
-        table.insert(v31, v2.createElement(v3.Focusable[v11], {
-            headerText = v32, 
-            items = v30.state.addedAssetNames, 
-            layoutOrder = 1, 
-            isFirstSection = true, 
-            isLastSection = #v30.state.removedAssetNames == 0, 
-            NextSelectionDown = v30.removedSectionRef, 
-            [v2.Ref] = v30.addedSectionRef
-        }));
-        if #v30.state.removedAssetNames > 0 then
-            table.insert(v31, v2.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 0, 20), 
-                LayoutOrder = 2
-            }));
-        end;
-    end;
-    if #v30.state.removedAssetNames > 0 then
-        local v33 = v16:FormatByKey("CoreScripts.AvatarEditorPrompts.Removing");
-        table.insert(v31, v2.createElement(v3.Focusable[v11], {
-            headerText = v33, 
-            items = v30.state.removedAssetNames, 
-            layoutOrder = 3, 
-            isFirstSection = #v30.state.addedAssetNames == 0, 
-            isLastSection = true, 
-            NextSelectionUp = v30.addedSectionRef, 
-            [v2.Ref] = v30.removedSectionRef
-        }));
-    end;
-    local v34 = false;
-    if #v30.state.addedAssetNames == 0 then
-        v34 = #v30.state.removedAssetNames == 0;
-    end;
-    if v34 then
-        local v35 = v16:FormatByKey("CoreScripts.AvatarEditorPrompts.NoChangedAssets");
-        table.insert(v31, v2.createElement(v3.Focusable[v11], {
-            headerText = v35, 
-            items = {}, 
-            layoutOrder = 1, 
-            isFirstSection = true, 
-            isLastSection = true, 
-            [v2.Ref] = v30.noChangedAssetsRef
-        }));
-    end;
-    return v31;
-end;
-v17.renderItemsList = function(v36) --[[ Line: 217 ]] --[[ Name: renderItemsList ]]
-    -- upvalues: l_withStyle_0 (copy), v2 (copy), v3 (copy), l_VerticalScrollViewWithMargin_0 (copy)
-    return l_withStyle_0(function(v37) --[[ Line: 218 ]]
-        -- upvalues: v36 (copy), v2 (ref), v3 (ref), l_VerticalScrollViewWithMargin_0 (ref)
-        local l_Theme_0 = v37.Theme;
-        local v39 = v36:createEntriesList();
-        v39.Layout = v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            Padding = UDim.new(0, 10), 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            [v2.Change.AbsoluteContentSize] = v36.onContentSizeChanged
-        });
-        return v2.createElement(v3.Focusable.Frame, {
-            defaultChild = v36.addedSectionRef, 
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1, 
-            [v2.Ref] = v36.frameRef
-        }, {
-            TopGradient = v2.createElement("Frame", {
-                Visible = v36.topGradientVisibleBinding, 
-                Size = UDim2.new(1, 0, 0, 30), 
-                Position = UDim2.fromScale(0, 0), 
-                BackgroundColor3 = Color3.new(1, 1, 1), 
-                BorderSizePixel = 0, 
-                ZIndex = 2
-            }, {
-                UIGradient = v2.createElement("UIGradient", {
-                    Rotation = 90, 
-                    Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, l_Theme_0.BackgroundUIDefault.Color), 
-                        ColorSequenceKeypoint.new(1, l_Theme_0.BackgroundUIDefault.Color)
-                    }), 
-                    Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 0), 
-                        NumberSequenceKeypoint.new(1, 1)
-                    })
-                })
-            }), 
-            ScrollView = v2.createElement(l_VerticalScrollViewWithMargin_0, {
-                size = UDim2.fromScale(1, 1), 
-                canvasSizeY = UDim.new(0, v36.state.canvasSizeY)
-            }, v39), 
-            BottomGradient = v2.createElement("Frame", {
-                Visible = v36.bottomGradientVisibleBinding, 
-                Size = UDim2.new(1, 0, 0, 30), 
-                Position = UDim2.fromScale(0, 1), 
-                AnchorPoint = Vector2.new(0, 1), 
-                BackgroundColor3 = Color3.new(1, 1, 1), 
-                BorderSizePixel = 0, 
-                ZIndex = 2
-            }, {
-                UIGradient = v2.createElement("UIGradient", {
-                    Rotation = 90, 
-                    Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, l_Theme_0.BackgroundUIDefault.Color), 
-                        ColorSequenceKeypoint.new(1, l_Theme_0.BackgroundUIDefault.Color)
-                    }), 
-                    Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1), 
-                        NumberSequenceKeypoint.new(1, 0)
-                    })
-                })
-            })
-        });
-    end);
-end;
-v17.renderLoading = function(_) --[[ Line: 294 ]] --[[ Name: renderLoading ]]
-    -- upvalues: v2 (copy), l_Skeleton_0 (copy)
-    return v2.createElement(l_Skeleton_0, {
-        Size = UDim2.fromScale(1, 1), 
-        Position = UDim2.fromScale(0.5, 0.5), 
-        AnchorPoint = Vector2.new(0.5, 0.5)
-    });
-end;
-v17.renderFailed = function(v41) --[[ Line: 302 ]] --[[ Name: renderFailed ]]
-    -- upvalues: v2 (copy), l_EmptyState_0 (copy), v16 (copy)
-    return v2.createElement(l_EmptyState_0, {
-        text = v16:FormatByKey("CoreScripts.AvatarEditorPrompts.ItemsListLoadingFailed"), 
-        size = UDim2.fromScale(1, 1), 
-        onActivated = v41.onRetryLoading
-    });
-end;
-v17.render = function(v42) --[[ Line: 310 ]] --[[ Name: render ]]
-    if v42.state.loading and not v42.props.loadingFailed then
-        return v42:renderLoading();
-    elseif v42.state.addedAssetNames then
-        return v42:renderItemsList();
-    else
-        return v42:renderFailed();
-    end;
-end;
-v17.didMount = function(v43) --[[ Line: 322 ]] --[[ Name: didMount ]]
-    v43.mounted = true;
-    if v43.props.humanoidDescription then
-        v43.loadAssetNames();
-    end;
-    v43.checkIsScrollable();
-end;
-v17.didUpdate = function(v44, v45, _) --[[ Line: 331 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v2 (copy)
-    v44.checkIsScrollable();
-    if v45.humanoidDescription ~= v44.props.humanoidDescription then
-        v44:setState({
-            loading = true, 
-            addedAssetNames = v2.None, 
-            removedAssetNames = v2.None
-        });
-        v44.loadAssetNames();
-    end;
-end;
-v17.willUnmount = function(v47) --[[ Line: 345 ]] --[[ Name: willUnmount ]]
-    v47.mounted = false;
-end;
-return v4.connect(nil, function(v48) --[[ Line: 349 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v14 (copy)
-    return {
-        addAnalyticsInfo = function(v49) --[[ Line: 351 ]] --[[ Name: addAnalyticsInfo ]]
-            -- upvalues: v48 (copy), v14 (ref)
-            return v48(v14(v49));
-        end
-    };
-end)(v17);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local Skeleton = require(CorePackages.Packages.Foundation).Skeleton
+local VerticalScrollViewWithMargin = UIBlox.App.Container.VerticalScrollViewWithMargin
+local withStyle = UIBlox.Style.withStyle
+local EmptyState = UIBlox.App.Indicator.EmptyState
+local ListSection = require(script.ListSection)
+local ParentParent = script.Parent.Parent
+local GetAssetsDifference = require(ParentParent.GetAssetsDifference)
+local AddAnalyticsInfo = require(ParentParent.Actions.AddAnalyticsInfo)
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local v17 = Roact.PureComponent:extend("ItemsList")
+
+v17.validateProps = t.strictInterface({
+	humanoidDescription = t.optional(t.instanceOf("HumanoidDescription")),
+	loadingFailed = t.boolean,
+	retryLoadDescription = t.callback,
+	itemListScrollableUpdated = t.optional(t.callback),
+	addAnalyticsInfo = t.callback
+})
+
+function v17.init(p1) -- line: 42
+	-- upvalues: Roact (copy), GetAssetsDifference (copy)
+	p1:setState({
+		canvasSizeY = 0,
+		loading = true,
+		addedAssetNames = nil,
+		removedAssetNames = nil
+	})
+	p1.mounted = false
+	p1.frameRef = Roact.createRef()
+
+	local v20, v21 = Roact.createBinding(false)
+
+	p1.topGradientVisibleBinding = v20
+	p1.updateTopGradientVisibleBinding = v21
+
+	local v22, v23 = Roact.createBinding(false)
+
+	p1.bottomGradientVisibleBinding = v22
+	p1.updateBottomGradientVisibleBinding = v23
+	p1.addedSectionRef = Roact.createRef()
+	p1.removedSectionRef = Roact.createRef()
+	p1.noChangedAssetsRef = Roact.createRef()
+	p1.lastWasScrollable = nil
+
+	function p1.checkIsScrollable() -- line: 61
+		-- upvalues: p1 (copy)
+		local v39 = p1.frameRef:getValue()
+
+		if not v39 then
+			return
+		end
+
+		if not p1.props.itemListScrollableUpdated then
+			return
+		end
+
+		local v40 = p1.state.canvasSizeY > v39.AbsoluteSize.Y
+
+		if v40 ~= p1.lastWasScrollable then
+			p1.lastWasScrollable = v40
+			p1.props.itemListScrollableUpdated(v40, v39.AbsoluteSize.Y)
+		end
+	end
+	function p1.onContentSizeChanged(p2) -- line: 79
+		-- upvalues: p1 (copy)
+		p1:setState({
+			canvasSizeY = p2.AbsoluteContentSize.Y
+		})
+	end
+	function p1.firstEntryPositionChanged(p3) -- line: 85
+		-- upvalues: p1 (copy)
+		local v43 = p1.frameRef:getValue()
+
+		if not v43 then
+			return
+		end
+
+		if p3.AbsolutePosition.Y < v43.AbsolutePosition.Y then
+			p1.updateTopGradientVisibleBinding(true)
+
+			return
+		end
+
+		p1.updateTopGradientVisibleBinding(false)
+	end
+	function p1.lastEntryPositionChanged(p4) -- line: 98
+		-- upvalues: p1 (copy)
+		local v45 = p1.frameRef:getValue()
+
+		if not v45 then
+			return
+		end
+
+		if p4.AbsolutePosition.Y + p4.AbsoluteSize.Y > v45.AbsolutePosition.Y + v45.AbsoluteSize.Y then
+			p1.updateBottomGradientVisibleBinding(true)
+
+			return
+		end
+
+		p1.updateBottomGradientVisibleBinding(false)
+	end
+	function p1.loadAssetNames() -- line: 113
+		-- upvalues: GetAssetsDifference (copy), p1 (copy)
+		coroutine.wrap(function() -- line: 114
+			-- upvalues: GetAssetsDifference (copy), p1 (copy)
+			GetAssetsDifference(p1.props.humanoidDescription):andThen(function(p5) -- line: 115
+				-- upvalues: p1 (copy)
+				if p1.mounted then
+					p1.props.addAnalyticsInfo(p5.addedAssetIds, p5.removedAssetIds)
+					p1:setState({
+						loading = false,
+						addedAssetNames = p5.addedNames,
+						removedAssetNames = p5.removedNames
+					})
+				end
+			end, function(_) -- line: 125
+				-- upvalues: p1 (copy)
+				if p1.mounted then
+					p1:setState({
+						loading = false
+					})
+				end
+			end)
+		end)()
+	end
+	function p1.onRetryLoading() -- line: 135
+		-- upvalues: p1 (copy)
+		p1:setState({
+			loading = true
+		})
+
+		if p1.props.humanoidDescription then
+			p1.loadAssetNames()
+
+			return
+		end
+
+		p1.props.retryLoadDescription()
+	end
+end
+function v17.createEntriesList(p7) -- line: 148
+	-- upvalues: RobloxTranslator (copy), Roact (copy), RoactGamepad (copy), ListSection (copy)
+	local t1 = {}
+
+	if #p7.state.addedAssetNames > 0 then
+		local v26 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.Adding")
+
+		table.insert(t1, Roact.createElement(RoactGamepad.Focusable[ListSection], {
+			headerText = v26,
+			items = p7.state.addedAssetNames,
+			layoutOrder = 1,
+			isFirstSection = true,
+			isLastSection = #p7.state.removedAssetNames == 0,
+			NextSelectionDown = p7.removedSectionRef,
+			[Roact.Ref] = p7.addedSectionRef
+		}))
+
+		if #p7.state.removedAssetNames > 0 then
+			table.insert(t1, Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, 20)
+			}))
+		end
+	end
+
+	if #p7.state.removedAssetNames > 0 then
+		local v27 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.Removing")
+
+		table.insert(t1, Roact.createElement(RoactGamepad.Focusable[ListSection], {
+			headerText = v27,
+			items = p7.state.removedAssetNames,
+			layoutOrder = 3,
+			isFirstSection = #p7.state.addedAssetNames == 0,
+			isLastSection = true,
+			NextSelectionUp = p7.addedSectionRef,
+			[Roact.Ref] = p7.removedSectionRef
+		}))
+	end
+
+	if #p7.state.addedAssetNames == 0 and #p7.state.removedAssetNames == 0 then
+		local v28 = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.NoChangedAssets")
+
+		table.insert(t1, Roact.createElement(RoactGamepad.Focusable[ListSection], {
+			headerText = v28,
+			items = {},
+			layoutOrder = 1,
+			isFirstSection = true,
+			isLastSection = true,
+			[Roact.Ref] = p7.noChangedAssetsRef
+		}))
+	end
+
+	return t1
+end
+function v17.renderItemsList(p8) -- line: 217
+	-- upvalues: withStyle (copy), Roact (copy), RoactGamepad (copy), VerticalScrollViewWithMargin (copy)
+	return withStyle(function(p9) -- line: 218
+		-- upvalues: p8 (copy), Roact (copy), RoactGamepad (copy), VerticalScrollViewWithMargin (copy)
+		local Theme = p9.Theme
+		local v48 = p8:createEntriesList()
+
+		v48.Layout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			Padding = UDim.new(0, 10),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			[Roact.Change.AbsoluteContentSize] = p8.onContentSizeChanged
+		})
+
+		return Roact.createElement(RoactGamepad.Focusable.Frame, {
+			defaultChild = p8.addedSectionRef,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p8.frameRef
+		}, {
+			TopGradient = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				ZIndex = 2,
+				Visible = p8.topGradientVisibleBinding,
+				Size = UDim2.new(1, 0, 0, 30),
+				Position = UDim2.fromScale(0, 0),
+				BackgroundColor3 = Color3.new(1, 1, 1)
+			}, {
+				UIGradient = Roact.createElement("UIGradient", {
+					Rotation = 90,
+					Color = ColorSequence.new({
+						ColorSequenceKeypoint.new(0, Theme.BackgroundUIDefault.Color),
+						ColorSequenceKeypoint.new(1, Theme.BackgroundUIDefault.Color)
+					}),
+					Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, 0),
+						NumberSequenceKeypoint.new(1, 1)
+					})
+				})
+			}),
+			ScrollView = Roact.createElement(VerticalScrollViewWithMargin, {
+				size = UDim2.fromScale(1, 1),
+				canvasSizeY = UDim.new(0, p8.state.canvasSizeY)
+			}, v48),
+			BottomGradient = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				ZIndex = 2,
+				Visible = p8.bottomGradientVisibleBinding,
+				Size = UDim2.new(1, 0, 0, 30),
+				Position = UDim2.fromScale(0, 1),
+				AnchorPoint = Vector2.new(0, 1),
+				BackgroundColor3 = Color3.new(1, 1, 1)
+			}, {
+				UIGradient = Roact.createElement("UIGradient", {
+					Rotation = 90,
+					Color = ColorSequence.new({
+						ColorSequenceKeypoint.new(0, Theme.BackgroundUIDefault.Color),
+						ColorSequenceKeypoint.new(1, Theme.BackgroundUIDefault.Color)
+					}),
+					Transparency = NumberSequence.new({
+						NumberSequenceKeypoint.new(0, 1),
+						NumberSequenceKeypoint.new(1, 0)
+					})
+				})
+			})
+		})
+	end)
+end
+function v17.renderLoading(_) -- line: 294
+	-- upvalues: Roact (copy), Skeleton (copy)
+	return Roact.createElement(Skeleton, {
+		Size = UDim2.fromScale(1, 1),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5)
+	})
+end
+function v17.renderFailed(p11) -- line: 302
+	-- upvalues: Roact (copy), EmptyState (copy), RobloxTranslator (copy)
+	return Roact.createElement(EmptyState, {
+		text = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.ItemsListLoadingFailed"),
+		size = UDim2.fromScale(1, 1),
+		onActivated = p11.onRetryLoading
+	})
+end
+function v17.render(p12) -- line: 310
+	if p12.state.loading and not p12.props.loadingFailed then
+		return p12:renderLoading()
+	end
+
+	if p12.state.addedAssetNames then
+		return p12:renderItemsList()
+	end
+
+	return p12:renderFailed()
+end
+function v17.didMount(p13) -- line: 322
+	p13.mounted = true
+
+	if p13.props.humanoidDescription then
+		p13.loadAssetNames()
+	end
+
+	p13.checkIsScrollable()
+end
+function v17.didUpdate(p14, p15, _) -- line: 331
+	-- upvalues: Roact (copy)
+	p14.checkIsScrollable()
+
+	if p15.humanoidDescription ~= p14.props.humanoidDescription then
+		p14:setState({
+			loading = true,
+			addedAssetNames = Roact.None,
+			removedAssetNames = Roact.None
+		})
+		p14.loadAssetNames()
+	end
+end
+function v17.willUnmount(p17) -- line: 345
+	p17.mounted = false
+end
+
+local function mapDispatchToProps(p18) -- line: 349
+	-- upvalues: AddAnalyticsInfo (copy)
+	return {
+		addAnalyticsInfo = function(p19) -- line: 351
+			-- upvalues: p18 (copy), AddAnalyticsInfo (copy)
+			return p18(AddAnalyticsInfo(p19))
+		end
+	}
+end
+
+return RoactRodux.connect(nil, mapDispatchToProps)(v17)

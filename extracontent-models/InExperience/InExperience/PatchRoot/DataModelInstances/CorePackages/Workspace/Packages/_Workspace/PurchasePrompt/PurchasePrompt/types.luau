@@ -1,17 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("PurchasePrompt").Parent;
-local _ = require(l_Parent_0.IAPExperience);
-local _ = require(l_Parent_0.PurchasePromptLite);
-local _ = require(l_Parent_0.LuauPolyfill);
+local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+
+require(Parent.IAPExperience)
+
+local PurchasePromptLite = require(Parent.PurchasePromptLite)
+
+require(Parent.LuauPolyfill)
+
 return {
-    ProductTypeEnum = {
-        Asset = "Asset", 
-        Bundle = "Bundle", 
-        Experience = "Experience", 
-        Gamepass = "Gamepass", 
-        Product = "Product", 
-        Look = "Look", 
-        DeveloperSubscription = "DeveloperSubscription", 
-        AvatarCreationFee = "AvatarCreationFee", 
-        Unknown = "Unknown"
-    }
-};
+	ProductTypeEnum = PurchasePromptLite.Enums.ProductKind
+}

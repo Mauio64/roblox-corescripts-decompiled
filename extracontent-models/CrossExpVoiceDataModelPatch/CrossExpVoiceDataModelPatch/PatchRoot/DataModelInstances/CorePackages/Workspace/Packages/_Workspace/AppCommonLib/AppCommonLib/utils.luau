@@ -1,6 +1,7 @@
-local v0 = require(script.PromiseUtilities);
-local v1 = require(script.AppStorageJsonCacheUtils);
+local PromiseUtilities = require(script.PromiseUtilities)
+local AppStorageJsonCacheUtils = require(script.AppStorageJsonCacheUtils)
+
 return {
-    PromiseUtilities = v0, 
-    AppStorageJsonCacheUtils = v1
-};
+	PromiseUtilities = PromiseUtilities,
+	AppStorageJsonCacheUtils = AppStorageJsonCacheUtils
+}

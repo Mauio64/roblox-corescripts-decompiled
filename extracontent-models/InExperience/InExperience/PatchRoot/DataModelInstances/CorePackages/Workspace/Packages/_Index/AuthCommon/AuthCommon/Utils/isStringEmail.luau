@@ -1,8 +1,9 @@
-return function(v0) --[[ Line: 2 ]]
-    if not v0 or v0 == "" then
-        return false;
-    else
-        assert(v0, "");
-        return string.find(v0, "^.+@.+%..+$") ~= nil;
-    end;
-end;
+return function(s1: string?) -- line: 2
+	if not s1 or s1 == "" then
+		return false
+	end
+
+	assert(s1, "")
+
+	return string.find(s1, "^.+@.+%..+$") ~= nil
+end

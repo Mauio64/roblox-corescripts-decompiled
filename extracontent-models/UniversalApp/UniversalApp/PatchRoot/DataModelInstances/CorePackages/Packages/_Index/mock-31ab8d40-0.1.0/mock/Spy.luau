@@ -1,31 +1,42 @@
-local v0 = require(script.Parent.symbols);
-local v1 = {};
-v1.__index = v1;
-local v2 = {};
-setmetatable(v2, {
-    __mode = "kv"
-});
-v1.new = function(v3) --[[ Line: 12 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy), v1 (copy), v2 (copy)
-    local v4 = {
-        [v0.Calls] = {}
-    };
-    setmetatable(v4, v1);
-    local function v6(...) --[[ Line: 18 ]]
-        -- upvalues: v3 (copy), v4 (copy), v0 (ref)
-        local v5 = {
-            args = table.pack(...), 
-            result = table.pack(v3(...))
-        };
-        table.insert(v4[v0.Calls], v5);
-        return table.unpack(v5.result);
-    end;
-    v4.inner = v6;
-    v2[v6] = v4;
-    return v4, v6;
-end;
-v1.lookup = function(v7) --[[ Line: 33 ]] --[[ Name: lookup ]]
-    -- upvalues: v2 (copy)
-    return v2[v7];
-end;
-return v1;
+local symbols = require(script.Parent.symbols)
+local t1 = {}
+
+t1.__index = t1
+
+local t2 = {}
+
+setmetatable(t2, {
+	__mode = "kv"
+})
+
+function t1.new(p1) -- line: 12
+	-- upvalues: symbols (copy), t1 (copy), t2 (copy)
+	local t3 = {
+		[symbols.Calls] = {}
+	}
+
+	setmetatable(t3, t1)
+
+	local function v6(...) -- line: 18
+		-- upvalues: p1 (copy), t3 (copy), symbols (copy)
+		local t4 = {
+			args = table.pack(...),
+			result = table.pack(p1(...))
+		}
+
+		table.insert(t3[symbols.Calls], t4)
+
+		return table.unpack(t4.result)
+	end
+
+	t3.inner = v6
+	t2[v6] = t3
+
+	return t3, v6
+end
+function t1.lookup(p2) -- line: 33
+	-- upvalues: t2 (copy)
+	return t2[p2]
+end
+
+return t1

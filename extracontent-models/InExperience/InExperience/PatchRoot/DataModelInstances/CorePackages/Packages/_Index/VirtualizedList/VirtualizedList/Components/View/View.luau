@@ -1,34 +1,43 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Object_0 = v1.Object;
-local v4 = require(l_Parent_0.React);
-local l_Change_0 = v4.Change;
-local v6 = v4.Component:extend("View");
-v6.init = function(v7, v8) --[[ Line: 41 ]] --[[ Name: init ]]
-    -- upvalues: v4 (copy)
-    v7.props = v8;
-    v7._nativeRef = v7.props.nativeRef or v4.createRef();
-end;
-v6.render = function(v9) --[[ Line: 46 ]] --[[ Name: render ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy), l_Change_0 (copy), v4 (copy)
-    local v12 = if l_Array_0.isArray(v9.props.style) then l_Array_0.reduce(v9.props.style, function(v10, v11) --[[ Line: 48 ]]
-        -- upvalues: l_Object_0 (ref)
-        return l_Object_0.assign(v10, v11);
-    end, {}) else v9.props.style;
-    local v13 = l_Object_0.assign(table.clone(v9.props), v12);
-    v9.nativeProps = {
-        ref = v9._nativeRef, 
-        BackgroundColor3 = v13.BackgroundColor3, 
-        Name = v13.Name or "View", 
-        Size = v13.Size or UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = v13.AutomaticSize or Enum.AutomaticSize.Y, 
-        ZIndex = v13.ZIndex or nil, 
-        LayoutOrder = v13.LayoutOrder or nil, 
-        BorderSizePixel = v13.BorderSizePixel or 0, 
-        BackgroundTransparency = v13.BackgroundTransparency or 1, 
-        [l_Change_0.AbsoluteSize] = v13.onLayout
-    };
-    return v4.createElement("Frame", v9.nativeProps, v9.props.children);
-end;
-return v6;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Object = LuauPolyfill.Object
+local React = require(ParentParent.React)
+local Change = React.Change
+local v7 = React.Component:extend("View")
+
+function v7.init(t1: {[any]: any}, t2: {[any]: any}) -- line: 46
+	-- upvalues: React (copy)
+	t1.props = t2
+	t1._nativeRef = t1.props.nativeRef or React.createRef()
+end
+function v7.render(p1) -- line: 51
+	-- upvalues: Array (copy), Object (copy), Change (copy), React (copy)
+	local v11 = if not Array.isArray(p1.props.style) then p1.props.style else Array.reduce(p1.props.style, function(p2, p3) -- line: 53
+		-- upvalues: Object (copy)
+		return Object.assign(p2, p3)
+	end, {})
+	local v12 = Object.assign(table.clone(p1.props), v11)
+
+	p1.nativeProps = {
+		ref = p1._nativeRef,
+		BackgroundColor3 = v12.BackgroundColor3,
+		Name = v12.Name or "View",
+		Size = v12.Size or UDim2.new(1, 0, 0, 0),
+		AutomaticSize = v12.AutomaticSize or Enum.AutomaticSize.Y,
+		ZIndex = v12.ZIndex or nil,
+		LayoutOrder = v12.LayoutOrder or nil,
+		BorderSizePixel = v12.BorderSizePixel or 0,
+		BackgroundTransparency = v12.BackgroundTransparency or 1,
+		SelectionGroup = v12.SelectionGroup,
+		SelectionBehaviorLeft = v12.SelectionBehaviorLeft,
+		SelectionBehaviorRight = v12.SelectionBehaviorRight,
+		SelectionBehaviorUp = v12.SelectionBehaviorUp,
+		SelectionBehaviorDown = v12.SelectionBehaviorDown,
+		[Change.AbsoluteSize] = v12.onLayout
+	}
+
+	return React.createElement("Frame", p1.nativeProps, p1.props.children)
+end
+
+return v7

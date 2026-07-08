@@ -1,1 +1,1 @@
-return game:DefineFastFlag("QRInSearchProfileQR", false);
+return game:DefineFastFlag("QRInSearchProfileQR", false)

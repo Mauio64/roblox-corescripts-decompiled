@@ -1,13 +1,20 @@
-local l_TextLabel_0 = Instance.new("TextLabel");
-l_TextLabel_0.RichText = true;
-local function _(v1) --[[ Line: 5 ]] --[[ Name: getContentText ]]
-    -- upvalues: l_TextLabel_0 (copy)
-    l_TextLabel_0.Text = v1;
-    return l_TextLabel_0.ContentText;
-end;
-return function(v3) --[[ Line: 10 ]] --[[ Name: isWhitespaceOnly ]]
-    -- upvalues: l_TextLabel_0 (copy)
-    l_TextLabel_0.Text = v3;
-    local l_ContentText_0 = l_TextLabel_0.ContentText;
-    return string.find(l_ContentText_0, "%S") == nil;
-end;
+local TextLabel = Instance.new("TextLabel")
+
+TextLabel.RichText = true
+
+local function getContentText(p1) -- line: 5
+	-- upvalues: TextLabel (copy)
+	TextLabel.Text = p1
+
+	return TextLabel.ContentText
+end
+local function isWhitespaceOnly(p2) -- line: 10
+	-- upvalues: TextLabel (copy)
+	TextLabel.Text = p2
+
+	local ContentText = TextLabel.ContentText
+
+	return string.find(ContentText, "%S") == nil
+end
+
+return isWhitespaceOnly

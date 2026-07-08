@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFixCursorHooks", false);
+return game:DefineFastFlag("LuaAppFixCursorHooks", false)

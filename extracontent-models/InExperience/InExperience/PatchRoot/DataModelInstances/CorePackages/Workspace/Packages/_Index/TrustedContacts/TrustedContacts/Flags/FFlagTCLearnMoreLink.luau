@@ -1,1 +1,1 @@
-return game:DefineFastFlag("TCLearnMoreLink", false);
+return game:DefineFastFlag("TCLearnMoreLink", false)

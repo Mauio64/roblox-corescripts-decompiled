@@ -1,74 +1,76 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local l_UserService_0 = game:GetService("UserService");
-local l_getMessageText_0 = require(l_CorePackages_0.Workspace.Packages.ChatLineReporting).Helpers.getMessageText;
-local v5 = require(l_script_FirstAncestor_0.Components.Constants);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local UserService = game:GetService("UserService")
+local getMessageText = require(CorePackages.Workspace.Packages.ChatLineReporting).Helpers.getMessageText
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+require(AbuseReportMenu.Components.Types)
+
 return {
-    componentType = "chatModalSelector", 
-    getIsVisible = function(v7) --[[ Line: 19 ]] --[[ Name: getIsVisible ]]
-        -- upvalues: v5 (copy)
-        return v7.methodOfAbuse == v5.AbuseMethods.TextChat;
-    end, 
-    getSelectedValue = function(v8) --[[ Line: 27 ]] --[[ Name: getSelectedValue ]]
-        -- upvalues: l_getMessageText_0 (copy)
-        return v8.selectedMessage and l_getMessageText_0(v8.selectedMessage.useTranslation, v8.selectedMessage.translation, v8.selectedMessage.text) or nil;
-    end, 
-    onUpdateSelectedOption = function(v9, v10, v11, v12, v13) --[[ Line: 42 ]] --[[ Name: onUpdateSelectedOption ]]
-        -- upvalues: v5 (copy), l_Players_0 (copy), l_UserService_0 (copy)
-        v13.analyticsDispatch({
-            type = v5.AnalyticsActions.IncrementChatLineChanged
-        });
-        v12({
-            type = v5.PlayerMenuActions.UpdatedSelectedChatAndOrderedMessages, 
-            orderedMessages = v10, 
-            selectedMessage = v9
-        });
-        if v11.allegedAbuserId ~= nil then
-            if v9 == nil or v9.userId == nil then
-                v12({
-                    type = v5.PlayerMenuActions.UpdateAbuser, 
-                    abuseId = nil, 
-                    abuser = nil
-                });
-                return;
-            else
-                local v14 = tonumber(v9.userId);
-                if v14 ~= nil then
-                    task.defer(function() --[[ Line: 73 ]]
-                        -- upvalues: l_Players_0 (ref), v14 (copy), l_UserService_0 (ref), v12 (copy), v5 (ref), v9 (copy)
-                        local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v14);
-                        if l_l_Players_0_PlayerByUserId_0 == nil then
-                            local v16 = false;
-                            local v17 = nil;
-                            local l_status_0, l_result_0 = pcall(function() --[[ Line: 80 ]]
-                                -- upvalues: l_UserService_0 (ref), v14 (ref)
-                                return l_UserService_0:GetUserInfosByUserIdsAsync({
-                                    v14
-                                });
-                            end);
-                            v16 = l_status_0;
-                            v17 = l_result_0;
-                            if v16 and v17 and v17[1] then
-                                l_l_Players_0_PlayerByUserId_0 = {
-                                    Name = v17[1].Username, 
-                                    DisplayName = v17[1].DisplayName
-                                };
-                            end;
-                        end;
-                        if l_l_Players_0_PlayerByUserId_0 ~= nil then
-                            v12({
-                                type = v5.PlayerMenuActions.UpdateAbuser, 
-                                abuseId = v9.userId, 
-                                abuser = l_l_Players_0_PlayerByUserId_0
-                            });
-                        end;
-                    end);
-                end;
-            end;
-        end;
-    end, 
-    fieldLabel = "WhichChat", 
-    componentName = "ChatSelector"
-};
+	componentType = "chatModalSelector",
+	fieldLabel = "WhichChat",
+	componentName = "ChatSelector",
+	getIsVisible = function(p1) -- line: 19
+		-- upvalues: Constants (copy)
+		return p1.methodOfAbuse == Constants.AbuseMethods.TextChat
+	end,
+	getSelectedValue = function(p2) -- line: 27
+		-- upvalues: getMessageText (copy)
+		return p2.selectedMessage and getMessageText(p2.selectedMessage.useTranslation, p2.selectedMessage.translation, p2.selectedMessage.text) or nil
+	end,
+	onUpdateSelectedOption = function(p3, t1: {[any]: any}, p4, p5, p6) -- line: 42
+		-- upvalues: Constants (copy), Players (copy), UserService (copy)
+		p6.analyticsDispatch({
+			type = Constants.AnalyticsActions.IncrementChatLineChanged
+		})
+		p5({
+			type = Constants.PlayerMenuActions.UpdatedSelectedChatAndOrderedMessages,
+			orderedMessages = t1,
+			selectedMessage = p3
+		})
+
+		if p4.allegedAbuserId ~= nil then
+			if p3 == nil or p3.userId == nil then
+				p5({
+					abuseId = nil,
+					abuser = nil,
+					type = Constants.PlayerMenuActions.UpdateAbuser
+				})
+
+				return
+			end
+
+			local num = tonumber(p3.userId)
+
+			if num ~= nil then
+				task.defer(function() -- line: 73
+					-- upvalues: Players (copy), num (copy), UserService (copy), p5 (copy), Constants (copy), p3 (copy)
+					local PlayerByUserId = Players:GetPlayerByUserId(num)
+
+					if PlayerByUserId == nil then
+						local ok, result = pcall(function() -- line: 80
+							-- upvalues: UserService (copy), num (copy)
+							return UserService:GetUserInfosByUserIdsAsync({ num })
+						end)
+
+						if ok and result and result[1] then
+							PlayerByUserId = {
+								Name = result[1].Username,
+								DisplayName = result[1].DisplayName
+							}
+						end
+					end
+
+					if PlayerByUserId ~= nil then
+						p5({
+							type = Constants.PlayerMenuActions.UpdateAbuser,
+							abuseId = p3.userId,
+							abuser = PlayerByUserId
+						})
+					end
+				end)
+			end
+		end
+	end
+}

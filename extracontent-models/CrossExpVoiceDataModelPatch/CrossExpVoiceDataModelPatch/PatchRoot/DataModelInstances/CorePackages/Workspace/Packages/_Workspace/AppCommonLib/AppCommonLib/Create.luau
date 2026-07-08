@@ -1,20 +1,25 @@
-return function(v0) --[[ Line: 21 ]] --[[ Name: create ]]
-    return function(v1) --[[ Line: 22 ]]
-        -- upvalues: v0 (copy)
-        local v2 = Instance.new(v0);
-        local v3 = nil;
-        for v4, v5 in pairs(v1) do
-            if type(v4) == "number" and typeof(v5) == "Instance" then
-                v5.Parent = v2;
-            elseif type(v4) == "string" then
-                if v4 == "Parent" then
-                    v3 = v5;
-                else
-                    v2[v4] = v5;
-                end;
-            end;
-        end;
-        v2.Parent = v3;
-        return v2;
-    end;
-end;
+local function create(s1: string) -- line: 21
+	return function(t1: {[any]: any}) -- line: 22
+		-- upvalues: s1 (copy)
+		local v4 = Instance.new(s1)
+		local v5 = nil
+
+		for k, v in pairs(t1) do
+			if type(k) == "number" and typeof(v) == "Instance" then
+				v.Parent = v4
+			elseif type(k) == "string" then
+				if k == "Parent" then
+					v5 = v
+				else
+					v4[k] = v
+				end
+			end
+		end
+
+		v4.Parent = v5
+
+		return v4
+	end
+end
+
+return create

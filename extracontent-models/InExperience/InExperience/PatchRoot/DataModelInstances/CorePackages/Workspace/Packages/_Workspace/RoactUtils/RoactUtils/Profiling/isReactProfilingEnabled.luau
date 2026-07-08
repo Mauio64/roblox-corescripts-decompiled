@@ -1,1 +1,1 @@
-return _G.__PROFILE__;
+return _G.__PROFILE__

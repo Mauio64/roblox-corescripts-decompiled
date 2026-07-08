@@ -1,48 +1,53 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_IXPServiceWrapper_0 = require(l_Parent_0.IXPServiceWrapper).IXPServiceWrapper;
-local v2 = game:DefineFastFlag("NewUpsellModalExperimentForDesktopV2", false);
-local v3 = game:DefineFastString("DesktopUpsellIXPLayer", "Payments.Optimization.InExperienceUpsell.Desktop.UI");
-local v4 = {
-    Control = 0, 
-    OpenRobuxStore = 1, 
-    OpenPaymentsPage = 2
-};
+local ParentParent = script.Parent.Parent.Parent.Parent
+local IXPServiceWrapper = require(ParentParent.IXPServiceWrapper).IXPServiceWrapper
+local v3 = game:DefineFastFlag("NewUpsellModalExperimentForDesktopV2", false)
+local v4 = game:DefineFastString("DesktopUpsellIXPLayer", "Payments.Optimization.InExperienceUpsell.Desktop.UI")
+local t1 = {
+	Control = 0,
+	OpenRobuxStore = 1,
+	OpenPaymentsPage = 2
+}
+
 return {
-    variants = v4, 
-    getVariant = function() --[[ Line: 14 ]] --[[ Name: getVariant ]]
-        -- upvalues: v2 (copy), v4 (copy), l_IXPServiceWrapper_0 (copy), v3 (copy)
-        if not v2 then
-            return v4.Control;
-        else
-            local l_l_IXPServiceWrapper_0_LayerData_0 = l_IXPServiceWrapper_0:GetLayerData(v3);
-            if not l_l_IXPServiceWrapper_0_LayerData_0 or l_l_IXPServiceWrapper_0_LayerData_0.newUpsellModalVariant == nil then
-                return v4.Control;
-            else
-                return l_l_IXPServiceWrapper_0_LayerData_0.newUpsellModalVariant;
-            end;
-        end;
-    end, 
-    logExposure = function() --[[ Line: 29 ]] --[[ Name: logExposure ]]
-        -- upvalues: v2 (copy), l_IXPServiceWrapper_0 (copy), v3 (copy)
-        if not v2 then
-            return;
-        else
-            l_IXPServiceWrapper_0:LogUserLayerExposure(v3);
-            return;
-        end;
-    end, 
-    shouldShowNewModal = function() --[[ Line: 37 ]] --[[ Name: shouldShowNewModal ]]
-        -- upvalues: v2 (copy), l_IXPServiceWrapper_0 (copy), v3 (copy), v4 (copy)
-        if v2 then
-            l_IXPServiceWrapper_0:LogUserLayerExposure(v3);
-        end;
-        local v6;
-        if not v2 then
-            v6 = v4.Control;
-        else
-            local l_l_IXPServiceWrapper_0_LayerData_1 = l_IXPServiceWrapper_0:GetLayerData(v3);
-            v6 = if not l_l_IXPServiceWrapper_0_LayerData_1 or l_l_IXPServiceWrapper_0_LayerData_1.newUpsellModalVariant == nil then v4.Control else l_l_IXPServiceWrapper_0_LayerData_1.newUpsellModalVariant;
-        end;
-        return v6 ~= v4.Control;
-    end
-};
+	variants = t1,
+	getVariant = function() -- line: 14
+		-- upvalues: v3 (copy), t1 (copy), IXPServiceWrapper (copy), v4 (copy)
+		if not v3 then
+			return t1.Control
+		end
+
+		local LayerData = IXPServiceWrapper:GetLayerData(v4)
+
+		if not LayerData or LayerData.newUpsellModalVariant == nil then
+			return t1.Control
+		end
+
+		return LayerData.newUpsellModalVariant
+	end,
+	logExposure = function() -- line: 29
+		-- upvalues: v3 (copy), IXPServiceWrapper (copy), v4 (copy)
+		if not v3 then
+			return
+		end
+
+		IXPServiceWrapper:LogUserLayerExposure(v4)
+	end,
+	shouldShowNewModal = function() -- line: 37
+		-- upvalues: v3 (copy), IXPServiceWrapper (copy), v4 (copy), t1 (copy)
+		if v3 then
+			IXPServiceWrapper:LogUserLayerExposure(v4)
+		end
+
+		local Control
+
+		if not v3 then
+			Control = t1.Control
+		else
+			local LayerData = IXPServiceWrapper:GetLayerData(v4)
+
+			Control = if not not LayerData and LayerData.newUpsellModalVariant ~= nil then LayerData.newUpsellModalVariant else t1.Control
+		end
+
+		return Control ~= t1.Control
+	end
+}

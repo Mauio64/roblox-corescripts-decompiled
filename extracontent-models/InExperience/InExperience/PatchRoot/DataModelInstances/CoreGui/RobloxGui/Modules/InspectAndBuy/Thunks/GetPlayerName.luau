@@ -1,35 +1,37 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_PerformFetch_0 = require(l_CorePackages_0.Workspace.Packages.Http).PerformFetch;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Thunk);
-local v4 = require(l_Parent_0.Services.Network);
-local v5 = require(l_Parent_0.Actions.SetPlayerName);
-local v6 = require(l_Parent_0.createInspectAndBuyKeyMapper);
-local v7 = require(l_Parent_0.Thunks.SendCounter);
-local v8 = require(l_Parent_0.Constants);
-local v9 = {
-    v4
-};
-local v10 = v6("getPlayerName");
-return function(v11) --[[ Line: 20 ]] --[[ Name: GetPlayerName ]]
-    -- upvalues: v3 (copy), v9 (copy), v4 (copy), v10 (copy), l_PerformFetch_0 (copy), v5 (copy), v7 (copy), v8 (copy)
-    return v3.new(script.Name, v9, function(v12, v13) --[[ Line: 21 ]]
-        -- upvalues: v4 (ref), v10 (ref), v11 (copy), l_PerformFetch_0 (ref), v5 (ref), v7 (ref), v8 (ref)
-        local v14 = v13[v4];
-        local v15 = v10(v12:getState().storeId, v11);
-        return l_PerformFetch_0.Single(v15, function() --[[ Line: 26 ]]
-            -- upvalues: v14 (copy), v11 (ref), v12 (copy), v5 (ref), v7 (ref), v8 (ref)
-            return v14.getPlayerName(v11):andThen(function(v16) --[[ Line: 27 ]]
-                -- upvalues: v12 (ref), v5 (ref), v7 (ref), v8 (ref)
-                v12:dispatch(v5(v16));
-                v12:dispatch(v7(v8.Counters.GetPlayerName .. v8.CounterSuffix.RequestSucceeded));
-            end, function(_) --[[ Line: 32 ]]
-                -- upvalues: v12 (ref), v7 (ref), v8 (ref)
-                v12:dispatch(v7(v8.Counters.GetPlayerName .. v8.CounterSuffix.RequestRejected));
-            end);
-        end)(v12):catch(function(_) --[[ Line: 35 ]]
-            -- upvalues: v12 (copy), v7 (ref), v8 (ref)
-            v12:dispatch(v7(v8.Counters.GetPlayerName .. v8.CounterSuffix.RequestFailed));
-        end);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local Network = require(ParentParent.Services.Network)
+local SetPlayerName = require(ParentParent.Actions.SetPlayerName)
+local createInspectAndBuyKeyMapper = require(ParentParent.createInspectAndBuyKeyMapper)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local Constants = require(ParentParent.Constants)
+local t1 = { Network }
+local v11 = createInspectAndBuyKeyMapper("getPlayerName")
+
+local function GetPlayerName(p1) -- line: 20
+	-- upvalues: Thunk (copy), t1 (copy), Network (copy), v11 (copy), PerformFetch (copy), SetPlayerName (copy), SendCounter (copy), Constants (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 21
+		-- upvalues: Network (copy), v11 (copy), p1 (copy), PerformFetch (copy), SetPlayerName (copy), SendCounter (copy), Constants (copy)
+		local v16 = p3[Network]
+		local v17 = v11(p2:getState().storeId, p1)
+
+		return PerformFetch.Single(v17, function() -- line: 26
+			-- upvalues: v16 (copy), p1 (copy), p2 (copy), SetPlayerName (copy), SendCounter (copy), Constants (copy)
+			return v16.getPlayerName(p1):andThen(function(p4) -- line: 27
+				-- upvalues: p2 (copy), SetPlayerName (copy), SendCounter (copy), Constants (copy)
+				p2:dispatch(SetPlayerName(p4))
+				p2:dispatch(SendCounter(Constants.Counters.GetPlayerName .. Constants.CounterSuffix.RequestSucceeded))
+			end, function(_) -- line: 32
+				-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+				p2:dispatch(SendCounter(Constants.Counters.GetPlayerName .. Constants.CounterSuffix.RequestRejected))
+			end)
+		end)(p2):catch(function(_) -- line: 35
+			-- upvalues: p2 (copy), SendCounter (copy), Constants (copy)
+			p2:dispatch(SendCounter(Constants.Counters.GetPlayerName .. Constants.CounterSuffix.RequestFailed))
+		end)
+	end)
+end
+
+return GetPlayerName

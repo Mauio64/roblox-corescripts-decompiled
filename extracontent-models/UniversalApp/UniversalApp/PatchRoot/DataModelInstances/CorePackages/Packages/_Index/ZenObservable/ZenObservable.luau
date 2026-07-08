@@ -1,3 +1,3 @@
 return {
-    Observable = require(script.Observable).Observable
-};
+	Observable = require(script.Observable).Observable
+}

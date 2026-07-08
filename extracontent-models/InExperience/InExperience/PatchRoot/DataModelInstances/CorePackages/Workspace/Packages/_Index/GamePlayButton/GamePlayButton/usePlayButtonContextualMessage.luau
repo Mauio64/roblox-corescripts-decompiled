@@ -19,105 +19,121 @@ local FFlagLuaAppPlayabilityMessageUpdate = require(GamePlayButtonParent.SharedF
 local u16 = nil
 local s1 = ""
 
-local function v18(p1, p2, p3) -- line: 40
+local function translateString(p1, p2) -- line: 27
+	-- upvalues: LocalizationService (copy), u16 (ref), Localization (copy), s1 (ref)
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+
+	if u16 == nil then
+		u16 = Localization.new(RobloxLocaleId)
+		s1 = RobloxLocaleId
+	end
+
+	if RobloxLocaleId ~= s1 then
+		u16:SetLocale(RobloxLocaleId)
+		s1 = RobloxLocaleId
+	end
+
+	return u16:Format(p1, p2)
+end
+local function v19(p3, p4, p5) -- line: 40
 	-- upvalues: PlayabilityStatusEnum (copy), getAppFeaturePolicies (copy), LaunchErrorLocalizationKeys (copy)
-	if p2 then
-		if p1 == nil or (p2.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p2.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired) and (p3 == nil or p3.isForSale == false) then
+	if p4 then
+		if p3 == nil or (p4.playabilityStatus == PlayabilityStatusEnum.PurchaseRequired or p4.playabilityStatus == PlayabilityStatusEnum.FiatPurchaseRequired) and (p5 == nil or p5.isForSale == false) then
 			return "Feature.ExperienceDetails.UnplayableError.UnplayableOther"
 		end
 
-		if p2.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
-			local v25 = getAppFeaturePolicies().getPlatformDisplayName() or ""
+		if p4.playabilityStatus == PlayabilityStatusEnum.DeviceRestricted then
+			local v26 = getAppFeaturePolicies().getPlatformDisplayName() or ""
 
-			if v25 ~= "" then
+			if v26 ~= "" then
 				return "Feature.ExperienceDetails.UnplayableError.DeviceRestrictedCustom", {
-					device = v25
+					device = v26
 				}
 			end
 		end
 
-		return LaunchErrorLocalizationKeys[p2.playabilityStatus]
+		return LaunchErrorLocalizationKeys[p4.playabilityStatus]
 	end
 
 	return nil
 end
 
-return function(p4, s2: string, p5) -- line: 96
-	-- upvalues: useAppPolicy (copy), useSelector (copy), useGameInfosSelector (copy), useGameProductInfoSelector (copy), FFlagLuaAppPlayabilityMessageUpdate (copy), useLocalization (copy), PlayButtonStates (copy), v18 (copy), ExperienceDetailsNoticeType (copy), LocalizationService (copy), u16 (ref), Localization (copy), s1 (ref)
-	local v35 = useAppPolicy(function(p6) -- line: 97
+return function(p6, s2: string, p7) -- line: 96
+	-- upvalues: useAppPolicy (copy), useSelector (copy), useGameInfosSelector (copy), useGameProductInfoSelector (copy), FFlagLuaAppPlayabilityMessageUpdate (copy), useLocalization (copy), PlayButtonStates (copy), v19 (copy), ExperienceDetailsNoticeType (copy), LocalizationService (copy), u16 (ref), Localization (copy), s1 (ref)
+	local v36 = useAppPolicy(function(p8) -- line: 97
 		return {
-			experienceDetailsNoticeType = p6.getExperienceDetailsNoticeType()
+			experienceDetailsNoticeType = p8.getExperienceDetailsNoticeType()
 		}
 	end)
-	local v36 = useSelector(function(p7) -- line: 103
-		-- upvalues: p4 (copy)
-		return p7.PlayabilityStatus and (not not p7.PlayabilityStatus[p4] and p7.PlayabilityStatus[p4].unplayableDisplayText) or nil
+	local v37 = useSelector(function(p9) -- line: 103
+		-- upvalues: p6 (copy)
+		return p9.PlayabilityStatus and (not not p9.PlayabilityStatus[p6] and p9.PlayabilityStatus[p6].unplayableDisplayText) or nil
 	end)
-	local v37 = useSelector(function(p8) -- line: 110
-		-- upvalues: p4 (copy)
-		return p8.GameDetails[p4]
+	local v38 = useSelector(function(p10) -- line: 110
+		-- upvalues: p6 (copy)
+		return p10.GameDetails[p6]
 	end)
-	local v38 = useGameInfosSelector(p4)
-	local v39 = v37 and v37.rootPlaceId or (v38 and v38.placeId or nil)
-	local v40 = useGameProductInfoSelector(p4)
+	local v39 = useGameInfosSelector(p6)
+	local v40 = v38 and v38.rootPlaceId or (v39 and v39.placeId or nil)
+	local v41 = useGameProductInfoSelector(p6)
 
 	if FFlagLuaAppPlayabilityMessageUpdate then
-		local v41 = useLocalization
+		local v42 = useLocalization
 		local t1 = {
 			agreeToNotice = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
 		}
-		local v45
+		local v46
 
 		if s2 == PlayButtonStates.UnplayableOther then
-			local v43, v44 = v18(v39, p5, v40)
+			local v44, v45 = v19(v40, p7, v41)
 
-			if v43 == nil then
-				v45 = nil
-			elseif v44 then
-				v45 = table.clone(v44)
-				v45[1] = v43
+			if v44 == nil then
+				v46 = nil
+			elseif v45 then
+				v46 = table.clone(v45)
+				v46[1] = v44
 			else
-				v45 = v43
+				v46 = v44
 			end
 		else
-			v45 = nil
+			v46 = nil
 		end
 
-		t1.unplayableOtherFallback = v45
+		t1.unplayableOtherFallback = v46
 
-		local v46 = v41(t1)
+		local v47 = v42(t1)
 
-		if (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v35.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
-			return v46.agreeToNotice
+		if (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v36.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
+			return v47.agreeToNotice
 		end
 
-		if v36 and v36 ~= "" then
-			return v36
+		if v37 and v37 ~= "" then
+			return v37
 		end
 
 		if s2 == PlayButtonStates.UnplayableOther then
-			return v46.unplayableOtherFallback
+			return v47.unplayableOtherFallback
 		end
 
 		return nil
 	end
 
-	local v47 = nil
 	local v48 = nil
+	local v49 = nil
 
 	if s2 == PlayButtonStates.UnplayableOther then
-		if v36 and v36 ~= "" then
-			return v36
+		if v37 and v37 ~= "" then
+			return v37
 		end
 
-		v47, v48 = v18(v39, p5, v40)
-	elseif (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v35.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
-		v47 = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
+		v48, v49 = v19(v40, p7, v41)
+	elseif (s2 == PlayButtonStates.Playable or s2 == PlayButtonStates.PlayableWithParty or s2 == PlayButtonStates.WaitingForParty) and v36.experienceDetailsNoticeType == ExperienceDetailsNoticeType.InExperiencePurchase then
+		v48 = "Feature.ExperienceDetails.PlayButtonMessage.AgreeToNotice"
 	end
 
-	local v50
+	local v51
 
-	if v47 then
+	if v48 then
 		local RobloxLocaleId = LocalizationService.RobloxLocaleId
 
 		if u16 == nil then
@@ -130,14 +146,14 @@ return function(p4, s2: string, p5) -- line: 96
 			s1 = RobloxLocaleId
 		end
 
-		v50 = u16:Format(v47, v48)
+		v51 = u16:Format(v48, v49)
 
-		if v50 then
-			return v50
+		if v51 then
+			return v51
 		end
 	end
 
-	v50 = nil
+	v51 = nil
 
-	return v50
+	return v51
 end

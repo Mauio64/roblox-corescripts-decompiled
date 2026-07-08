@@ -1,5 +1,5 @@
 return {
-    Standard = "Standard", 
-    Contrast = "Contrast", 
-    Utility = "Utility"
-};
+	Standard = "Standard",
+	Contrast = "Contrast",
+	Utility = "Utility"
+}

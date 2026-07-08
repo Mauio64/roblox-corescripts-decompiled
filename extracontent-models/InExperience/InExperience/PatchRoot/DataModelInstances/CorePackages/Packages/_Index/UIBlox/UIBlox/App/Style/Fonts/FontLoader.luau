@@ -1,77 +1,84 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_1.Cryo);
-local _ = require(l_Parent_0.StyleTypes);
-local v4 = {
-    BASE_SIZE = 16, 
-    FACTOR = 1.26
-};
-local v5 = {};
-v5.__index = v5;
-v5.new = function(v6) --[[ Line: 17 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy)
-    local v7 = {
-        _tokens = v6
-    };
-    setmetatable(v7, v5);
-    return v7;
-end;
-v5.loadFont = function(v8) --[[ Line: 25 ]] --[[ Name: loadFont ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    local l__tokens_0 = v8._tokens;
-    local l_BASE_SIZE_0 = v4.BASE_SIZE;
-    local v11 = {
-        BaseSize = l_BASE_SIZE_0 * v4.FACTOR, 
-        HeadingLarge = {
-            Font = Enum.Font.BuilderSansBold, 
-            RelativeSize = l__tokens_0.Global.Size_350 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_300 / l_BASE_SIZE_0
-        }, 
-        HeadingSmall = {
-            Font = Enum.Font.BuilderSansBold, 
-            RelativeSize = l__tokens_0.Global.Size_250 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_200 / l_BASE_SIZE_0
-        }, 
-        TitleLarge = {
-            Font = Enum.Font.BuilderSansBold, 
-            RelativeSize = l__tokens_0.Global.Size_200 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_150 / l_BASE_SIZE_0
-        }, 
-        BodyLarge = {
-            Font = Enum.Font.BuilderSans, 
-            RelativeSize = l__tokens_0.Global.Size_200 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_150 / l_BASE_SIZE_0
-        }, 
-        CaptionLarge = {
-            Font = Enum.Font.BuilderSansMedium, 
-            RelativeSize = l__tokens_0.Global.Size_150 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_100 / l_BASE_SIZE_0
-        }, 
-        BodySmall = {
-            Font = Enum.Font.BuilderSans, 
-            RelativeSize = l__tokens_0.Global.Size_150 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_100 / l_BASE_SIZE_0
-        }, 
-        CaptionSmall = {
-            Font = Enum.Font.BuilderSansMedium, 
-            RelativeSize = l__tokens_0.Global.Size_125 / l_BASE_SIZE_0, 
-            RelativeMinSize = l__tokens_0.Global.Size_100 / l_BASE_SIZE_0
-        }
-    };
-    local v12 = v8:mapLegacyFont(v11, l_BASE_SIZE_0);
-    return v2.Dictionary.join(v12, v11);
-end;
-v5.mapLegacyFont = function(_, v14, _) --[[ Line: 78 ]] --[[ Name: mapLegacyFont ]]
-    return {
-        Title = v14.HeadingLarge, 
-        Header1 = v14.HeadingSmall, 
-        Header2 = v14.TitleLarge, 
-        SubHeader1 = v14.TitleLarge, 
-        Body = v14.BodyLarge, 
-        CaptionHeader = v14.CaptionLarge, 
-        CaptionSubHeader = v14.CaptionLarge, 
-        CaptionBody = v14.BodySmall, 
-        Footer = v14.CaptionSmall
-    };
-end;
-return v5;
+local ParentParent = script.Parent.Parent
+local ParentParent2 = ParentParent.Parent.Parent.Parent
+local Cryo = require(ParentParent2.Cryo)
+
+require(ParentParent.StyleTypes)
+
+local _ = {
+	BASE_SIZE = 16,
+	FACTOR = 1.26
+}
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 17
+	-- upvalues: t1 (copy)
+	local t2 = {
+		_tokens = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.loadFont(p2) -- line: 25
+	-- upvalues: Cryo (copy)
+	local _tokens = p2._tokens
+	local t3 = {
+		BaseSize = 20.16,
+		HeadingLarge = {
+			Font = Enum.Font.BuilderSansBold,
+			RelativeSize = _tokens.Global.Size_350 / 16,
+			RelativeMinSize = _tokens.Global.Size_300 / 16
+		},
+		HeadingSmall = {
+			Font = Enum.Font.BuilderSansBold,
+			RelativeSize = _tokens.Global.Size_250 / 16,
+			RelativeMinSize = _tokens.Global.Size_200 / 16
+		},
+		TitleLarge = {
+			Font = Enum.Font.BuilderSansBold,
+			RelativeSize = _tokens.Global.Size_200 / 16,
+			RelativeMinSize = _tokens.Global.Size_150 / 16
+		},
+		BodyLarge = {
+			Font = Enum.Font.BuilderSans,
+			RelativeSize = _tokens.Global.Size_200 / 16,
+			RelativeMinSize = _tokens.Global.Size_150 / 16
+		},
+		CaptionLarge = {
+			Font = Enum.Font.BuilderSansMedium,
+			RelativeSize = _tokens.Global.Size_150 / 16,
+			RelativeMinSize = _tokens.Global.Size_100 / 16
+		},
+		BodySmall = {
+			Font = Enum.Font.BuilderSans,
+			RelativeSize = _tokens.Global.Size_150 / 16,
+			RelativeMinSize = _tokens.Global.Size_100 / 16
+		},
+		CaptionSmall = {
+			Font = Enum.Font.BuilderSansMedium,
+			RelativeSize = _tokens.Global.Size_125 / 16,
+			RelativeMinSize = _tokens.Global.Size_100 / 16
+		}
+	}
+	local v11 = p2:mapLegacyFont(t3, 16)
+
+	return Cryo.Dictionary.join(v11, t3)
+end
+function t1.mapLegacyFont(_, p4, _) -- line: 78
+	return {
+		Title = p4.HeadingLarge,
+		Header1 = p4.HeadingSmall,
+		Header2 = p4.TitleLarge,
+		SubHeader1 = p4.TitleLarge,
+		Body = p4.BodyLarge,
+		CaptionHeader = p4.CaptionLarge,
+		CaptionSubHeader = p4.CaptionLarge,
+		CaptionBody = p4.BodySmall,
+		Footer = p4.CaptionSmall
+	}
+end
+
+return t1

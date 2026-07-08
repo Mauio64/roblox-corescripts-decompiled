@@ -13,6 +13,7 @@ local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableS
 local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
 local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
 local ContextualMenu = require(ProfilePlatform.Components.CTARow.ContextualMenu)
+local FFlagAddCTAButtonAnalytics = require(ProfilePlatform.Flags.FFlagAddCTAButtonAnalytics)
 local Foundation = require(ProfilePlatformParent.Foundation)
 local View = Foundation.View
 local Button = Foundation.Button
@@ -20,78 +21,98 @@ local IconButton = Foundation.IconButton
 local ButtonVariant = Foundation.Enums.ButtonVariant
 local FillBehavior = Foundation.Enums.FillBehavior
 
-return function(t1: {[any]: any}) --[[ CTAButton ]] -- line: 40
-	-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), ButtonVariant (copy), IconButton (copy), Button (copy), FillBehavior (copy), View (copy), ContextualMenu (copy)
-	local v17, v18 = React.useState(false)
-	local v19 = React.useCallback(function() -- line: 43
-		-- upvalues: v18 (copy)
-		v18(false)
+local function CTAButton(t1: {[any]: any}) -- line: 42
+	-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy), ButtonVariant (copy), FFlagAddCTAButtonAnalytics (copy), IconButton (copy), Button (copy), FillBehavior (copy), View (copy), ContextualMenu (copy)
+	local v19, v20 = React.useState(false)
+	local v21 = React.useCallback(function() -- line: 45
+		-- upvalues: v20 (copy)
+		v20(false)
 	end, {})
-	local v20 = React.useCallback(function() -- line: 47
-		-- upvalues: v18 (copy)
-		v18(function(p1) -- line: 48
+	local v22 = React.useCallback(function() -- line: 49
+		-- upvalues: v20 (copy)
+		v20(function(p1) -- line: 50
 			return not p1
 		end)
 	end, {})
-	local v21 = React.useMemo(function() -- line: 53
-		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v19 (copy)
+	local v23 = React.useMemo(function() -- line: 55
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), v21 (copy)
 		return {
 			[FocusNavigationEventNameEnum.NavigateBack] = {
-				handler = InputHandlers.onRelease(v19)
+				handler = InputHandlers.onRelease(v21)
 			}
 		}
-	end, { v19 })
-	local v22 = useAppFocusRoot({
-		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
-		customEventHandlers = v21,
+	end, { v21 })
+	local v24 = useAppFocusRoot({
 		isAutoFocusRoot = true,
-		isFocusable = v17
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.ContextualMenu,
+		customEventHandlers = v23,
+		isFocusable = v19
 	})
-	local v23 = React.useRef(nil)
+	local v25 = React.useRef(nil)
 	local menuItem = t1.buttonItem.menuItem
 	local displayValue = menuItem.displayValue
 	local icon = displayValue.icon
 	local text = displayValue.text
 	local contextualMenuItems = t1.buttonItem.contextualMenuItems
-	local v29 = if not t1.buttonItem.buttonStyle then ButtonVariant.Standard else t1.buttonItem.buttonStyle
-	local v30 = contextualMenuItems and #contextualMenuItems > 0
+	local v31 = if not t1.buttonItem.buttonStyle then ButtonVariant.Standard else t1.buttonItem.buttonStyle
+	local v32 = contextualMenuItems and #contextualMenuItems > 0
 	local isDisabled = t1.buttonItem.menuItem.isDisabled
-	local v32 = if not v30 then menuItem.onActivated else v20
-	local v33 = icon ~= nil and text == nil
-	local v34 = if not v33 then React.createElement(Button, {
+	local v34 = if not FFlagAddCTAButtonAnalytics then if not v32 then menuItem.onActivated else v22 else React.useCallback(function() -- line: 81
+		-- upvalues: v32 (copy), v19 (copy), menuItem (copy), v22 (copy)
+		if v32 then
+			if not v19 then
+				menuItem.onActivated()
+			end
+
+			v22()
+
+			return
+		end
+
+		menuItem.onActivated()
+	end, {
+		v32,
+		v19,
+		menuItem.onActivated,
+		v22
+	})
+	local v35 = icon ~= nil and text == nil
+	local v36 = if not v35 then React.createElement(Button, {
 		text = text,
 		icon = icon,
-		onActivated = v32,
+		onActivated = v34,
 		fillBehavior = FillBehavior.Fill,
-		variant = v29,
+		variant = v31,
 		isLoading = t1.buttonItem.isLoading,
 		LayoutOrder = t1.layoutOrder,
-		ref = v23,
+		ref = v25,
 		isDisabled = isDisabled
 	}) else React.createElement(IconButton, {
 		icon = icon,
 		LayoutOrder = t1.layoutOrder,
-		onActivated = v32,
+		onActivated = v34,
 		variant = ButtonVariant.Standard,
-		ref = v23,
+		ref = v25,
 		isDisabled = isDisabled
 	})
 
 	return React.createElement(View, {
 		tag = {
-			["auto-xy"] = v33,
-			["fill auto-y"] = not v33
+			["auto-xy"] = v35,
+			["fill auto-y"] = not v35
 		},
 		LayoutOrder = t1.layoutOrder
 	}, {
-		Button = v34,
-		ContextualMenu = if not v30 then nil else React.createElement(ContextualMenu, {
-			isOpen = v17,
+		Button = v36,
+		ContextualMenu = if not v32 then nil else React.createElement(ContextualMenu, {
+			isOpen = v19,
 			menuItems = contextualMenuItems,
-			anchorRef = v23,
-			menuRef = v22,
-			closeMenu = v19,
+			anchorRef = v25,
+			menuRef = v24,
+			closeMenu = v21,
 			align = t1.align
 		})
 	})
 end
+
+return CTAButton

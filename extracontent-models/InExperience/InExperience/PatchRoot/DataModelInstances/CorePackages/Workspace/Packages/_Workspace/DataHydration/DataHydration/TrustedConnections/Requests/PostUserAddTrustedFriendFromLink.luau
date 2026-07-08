@@ -1,15 +1,17 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("DataHydration");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local l_TrustedConnections_0 = l_script_FirstAncestor_0.TrustedConnections;
-local v5 = require(l_TrustedConnections_0.Networking.myHttpRequest);
-return function(v6, v7) --[[ Line: 11 ]]
-    -- upvalues: l_Url_0 (copy), v5 (copy), l_HttpService_0 (copy)
-    local v8 = string.format("%s/users/%s/add-trusted-friend-from-link", l_Url_0.FRIEND_URL, (tostring(v6)));
-    return v5(v8, "POST", {
-        postBody = l_HttpService_0:JSONEncode({
-            Tokens = v7
-        })
-    });
-end;
+local HttpService = game:GetService("HttpService")
+local DataHydration = script:FindFirstAncestor("DataHydration")
+local DataHydrationParent = DataHydration.Parent
+local Url = require(DataHydrationParent.Http).Url
+local TrustedConnections = DataHydration.TrustedConnections
+local myHttpRequest = require(TrustedConnections.Networking.myHttpRequest)
+
+return function(p1, p2) -- line: 11
+	-- upvalues: Url (copy), myHttpRequest (copy), HttpService (copy)
+	local v9 = string.format("%s/users/%s/add-trusted-friend-from-link", Url.FRIEND_URL, (tostring(p1)))
+
+	return myHttpRequest(v9, "POST", {
+		postBody = HttpService:JSONEncode({
+			Tokens = p2
+		})
+	})
+end

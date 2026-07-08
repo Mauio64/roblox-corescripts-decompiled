@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ShipUnifiedPurchaseFlowToPaidAccess", false);
+return game:DefineFastFlag("ShipUnifiedPurchaseFlowToPaidAccess", false)

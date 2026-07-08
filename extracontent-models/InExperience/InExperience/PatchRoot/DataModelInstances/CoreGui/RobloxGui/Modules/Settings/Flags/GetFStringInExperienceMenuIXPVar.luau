@@ -1,4 +1,5 @@
-game:DefineFastString("InExperienceMenuIXPVar", "inExpSettingMenuVariantV1");
-return function() --[[ Line: 3 ]]
-    return game:GetFastString("InExperienceMenuIXPVar");
-end;
+game:DefineFastString("InExperienceMenuIXPVar", "inExpSettingMenuVariantV1")
+
+return function() -- line: 3
+	return game:GetFastString("InExperienceMenuIXPVar")
+end

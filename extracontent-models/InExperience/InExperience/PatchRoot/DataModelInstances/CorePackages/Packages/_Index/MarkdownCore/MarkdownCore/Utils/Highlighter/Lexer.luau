@@ -1,273 +1,322 @@
-local v0 = {};
-local v1 = require(script.Language);
-local l_keyword_0 = v1.keyword;
-local l_builtin_0 = v1.builtin;
-local l_libraries_0 = v1.libraries;
-v0.language = v1;
-local v5 = {
-    {
-        "^[%c%s]*[%a_][%w_]*[%c%s]*", 
-        "var"
-    }, 
-    {
-        "^[%c%s]*0[xX][%da-fA-F_]+[%c%s]*", 
-        "number"
-    }, 
-    {
-        "^[%c%s]*0[bB][01_]+[%c%s]*", 
-        "number"
-    }, 
-    {
-        "^[%c%s]*%d+%.?%d*[eE][%+%-]?%d+[%c%s]*", 
-        "number"
-    }, 
-    {
-        "^[%c%s]*%d+[%._]?[%d_eE]*[%c%s]*", 
-        "number"
-    }, 
-    {
-        "^[%c%s]*(['\"])%1[%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*(['\"])[^\n]-([^\\]%1)[%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*(['\"]).-\n[%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*(['\"])[^\n]*[%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*%[(=*)%[.-%]%1%][%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*%[=*%[.-.*[%c%s]*", 
-        "string"
-    }, 
-    {
-        "^[%c%s]*`[^\n]-`[%c%s]*", 
-        "string_inter"
-    }, 
-    {
-        "^[%c%s]*%-%-%[(=*)%[.-%]%1%][%c%s]*", 
-        "comment"
-    }, 
-    {
-        "^[%c%s]*%-%-%[=*%[.-.*[%c%s]*", 
-        "comment"
-    }, 
-    {
-        "^[%c%s]*%-%-.-\n[%c%s]*", 
-        "comment"
-    }, 
-    {
-        "^[%c%s]*%-%-.*[%c%s]*", 
-        "comment"
-    }, 
-    {
-        "^[%c%s]*[:;<>/~%*%(%)%-={},%.#%^%+%%]+[%c%s]*", 
-        "operator"
-    }, 
-    {
-        "^[%c%s]*[%[%]]+[%c%s]*", 
-        "operator"
-    }, 
-    {
-        "^[%c%s]*[%z\001-\127\194-\244][\128-\191]+[%c%s]*", 
-        "iden"
-    }, 
-    {
-        "^.", 
-        "iden"
-    }
-};
-local v6 = {};
-local v7 = {};
-for v8, v9 in v5 do
-    v6[v8] = v9[1];
-    v7[v8] = v9[2];
-end;
-v0.scan = function(v10) --[[ Line: 105 ]] --[[ Name: scan ]]
-    -- upvalues: v6 (copy), v7 (copy), l_keyword_0 (copy), l_builtin_0 (copy), l_libraries_0 (copy), v0 (copy)
-    local v11 = 1;
-    local v12 = #v10;
-    local v13 = "";
-    local v14 = "";
-    local v15 = "";
-    local v16 = "";
-    local v35 = coroutine.create(function() --[[ Line: 110 ]]
-        -- upvalues: v11 (ref), v12 (copy), v6 (ref), v10 (copy), v7 (ref), l_keyword_0 (ref), l_builtin_0 (ref), v13 (ref), v16 (ref), v14 (ref), l_libraries_0 (ref), v15 (ref), v0 (ref)
-        while true do
-            if v11 <= v12 then
-                local v17 = false;
-                for v18, v19 in ipairs(v6) do
-                    local v20, v21 = string.find(v10, v19, v11);
-                    if v20 ~= nil then
-                        v11 = v21 + 1;
-                        v17 = true;
-                        local v22 = string.sub(v10, v20, v21);
-                        local v23 = v7[v18];
-                        local l_v23_0 = v23;
-                        if v23 == "var" then
-                            local v25 = string.gsub(v22, "[%c%s]+", "");
-                            if l_keyword_0[v25] then
-                                l_v23_0 = "keyword";
-                            elseif l_builtin_0[v25] then
-                                l_v23_0 = "builtin";
-                            elseif string.find(v13, "%.[%s%c]*$") and v16 ~= "comment" then
-                                local v26 = l_libraries_0[string.gsub(v14, "[%c%s]+", "")];
-                                l_v23_0 = (not (v26 and v26[v25]) or string.find(v15, "%.[%s%c]*$")) and "iden" or "builtin";
-                            else
-                                l_v23_0 = "iden";
-                            end;
-                        elseif v23 == "string_inter" then
-                            if not string.find(v22, "[^\\]{") then
-                                l_v23_0 = "string";
-                            else
-                                l_v23_0 = nil;
-                                local v27 = true;
-                                local v28 = 1;
-                                local v29 = #v22;
-                                while v28 <= v29 do
-                                    local v30, v31 = string.find(v22, "^.-[^\\][{}]", v28);
-                                    if v30 == nil then
-                                        coroutine.yield("string", (string.sub(v22, v28)));
-                                        break;
-                                    elseif v27 then
-                                        v28 = v31 + 1;
-                                        coroutine.yield("string", (string.sub(v22, v30, v31)));
-                                        v27 = false;
-                                    else
-                                        v28 = v31;
-                                        local v32 = string.sub(v22, v30, v31 - 1);
-                                        for v33, v34 in v0.scan(v32) do
-                                            coroutine.yield(v33, v34);
-                                        end;
-                                        v27 = true;
-                                    end;
-                                end;
-                            end;
-                        end;
-                        v15 = v14;
-                        v14 = v13;
-                        v13 = v22;
-                        v16 = l_v23_0 or v23;
-                        if l_v23_0 then
-                            coroutine.yield(l_v23_0, v22);
-                            break;
-                        else
-                            break;
-                        end;
-                    end;
-                end;
-                if not v17 then
-                    return;
-                end;
-            else
-                return;
-            end;
-        end;
-    end);
-    return function() --[[ Line: 218 ]]
-        -- upvalues: v35 (copy)
-        if coroutine.status(v35) == "dead" then
-            return;
-        else
-            local v36, v37, v38 = coroutine.resume(v35);
-            if v36 and v37 then
-                return v37, v38;
-            else
-                return;
-            end;
-        end;
-    end;
-end;
-v0.navigator = function() --[[ Line: 232 ]] --[[ Name: navigator ]]
-    -- upvalues: v0 (copy)
-    local v45 = {
-        Source = "", 
-        TokenCache = table.create(50), 
-        _RealIndex = 0, 
-        _UserIndex = 0, 
-        _ScanThread = nil, 
-        Destroy = function(v39) --[[ Line: 242 ]] --[[ Name: Destroy ]]
-            v39.Source = nil;
-            v39._RealIndex = nil;
-            v39._UserIndex = nil;
-            v39.TokenCache = nil;
-            v39._ScanThread = nil;
-        end, 
-        SetSource = function(v40, v41) --[[ Line: 250 ]] --[[ Name: SetSource ]]
-            -- upvalues: v0 (ref)
-            v40.Source = v41;
-            v40._RealIndex = 0;
-            v40._UserIndex = 0;
-            table.clear(v40.TokenCache);
-            v40._ScanThread = coroutine.create(function() --[[ Line: 257 ]]
-                -- upvalues: v0 (ref), v40 (copy)
-                for v42, v43 in v0.scan(v40.Source) do
-                    local l_v40_0 = v40;
-                    l_v40_0._RealIndex = l_v40_0._RealIndex + 1;
-                    v40.TokenCache[v40._RealIndex] = {
-                        v42, 
-                        v43
-                    };
-                    coroutine.yield(v42, v43);
-                end;
-            end);
-        end
-    };
-    v45.Next = function() --[[ Line: 266 ]] --[[ Name: Next ]]
-        -- upvalues: v45 (copy)
-        local l_v45_0 = v45;
-        l_v45_0._UserIndex = l_v45_0._UserIndex + 1;
-        if v45._RealIndex >= v45._UserIndex then
-            return table.unpack(v45.TokenCache[v45._UserIndex]);
-        elseif coroutine.status(v45._ScanThread) == "dead" then
-            return;
-        else
-            local v47, v48;
-            l_v45_0, v47, v48 = coroutine.resume(v45._ScanThread);
-            if l_v45_0 and v47 then
-                return v47, v48;
-            else
-                return;
-            end;
-        end;
-    end;
-    v45.Peek = function(v49) --[[ Line: 289 ]] --[[ Name: Peek ]]
-        -- upvalues: v45 (copy)
-        local v50 = v45._UserIndex + v49;
-        if v50 <= v45._RealIndex then
-            if v50 > 0 then
-                return table.unpack(v45.TokenCache[v50]);
-            else
-                return;
-            end;
-        elseif coroutine.status(v45._ScanThread) == "dead" then
-            return;
-        else
-            local v51 = v50 - v45._RealIndex;
-            local v52 = nil;
-            local v53 = nil;
-            local v54 = nil;
-            for _ = 1, v51 do
-                local v56, v57, v58 = coroutine.resume(v45._ScanThread);
-                v52 = v56;
-                v53 = v57;
-                v54 = v58;
-                if not v52 and not v53 then
-                    break;
-                end;
-            end;
-            return v53, v54;
-        end;
-    end;
-    return v45;
-end;
-return v0;
+local t1 = {}
+local Language = require(script.Language)
+local keyword = Language.keyword
+local builtin = Language.builtin
+local libraries = Language.libraries
+
+t1.language = Language
+
+local t2 = {}
+local t3 = {}
+
+for v8, v9 in {
+	{
+		"^[%c%s]*[%a_][%w_]*[%c%s]*",
+		"var"
+	},
+	{
+		"^[%c%s]*0[xX][%da-fA-F_]+[%c%s]*",
+		"number"
+	},
+	{
+		"^[%c%s]*0[bB][01_]+[%c%s]*",
+		"number"
+	},
+	{
+		"^[%c%s]*%d+%.?%d*[eE][%+%-]?%d+[%c%s]*",
+		"number"
+	},
+	{
+		"^[%c%s]*%d+[%._]?[%d_eE]*[%c%s]*",
+		"number"
+	},
+	{
+		"^[%c%s]*(['\"])%1[%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*(['\"])[^\n]-([^\\]%1)[%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*(['\"]).-\n[%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*(['\"])[^\n]*[%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*%[(=*)%[.-%]%1%][%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*%[=*%[.-.*[%c%s]*",
+		"string"
+	},
+	{
+		"^[%c%s]*`[^\n]-`[%c%s]*",
+		"string_inter"
+	},
+	{
+		"^[%c%s]*%-%-%[(=*)%[.-%]%1%][%c%s]*",
+		"comment"
+	},
+	{
+		"^[%c%s]*%-%-%[=*%[.-.*[%c%s]*",
+		"comment"
+	},
+	{
+		"^[%c%s]*%-%-.-\n[%c%s]*",
+		"comment"
+	},
+	{
+		"^[%c%s]*%-%-.*[%c%s]*",
+		"comment"
+	},
+	{
+		"^[%c%s]*[:;<>/~%*%(%)%-={},%.#%^%+%%]+[%c%s]*",
+		"operator"
+	},
+	{
+		"^[%c%s]*[%[%]]+[%c%s]*",
+		"operator"
+	},
+	{
+		"^[%c%s]*[%z\001-\127\194-\244][\128-\191]+[%c%s]*",
+		"iden"
+	},
+	{
+		"^.",
+		"iden"
+	}
+} do
+	t2[v8] = v9[1]
+	t3[v8] = v9[2]
+end
+
+function t1.scan(s1: string) -- line: 105
+	-- upvalues: t2 (copy), t3 (copy), keyword (copy), builtin (copy), libraries (copy), t1 (copy)
+	local n1 = 1
+	local v12 = #s1
+	local s2 = ""
+	local s3 = ""
+	local s4 = ""
+	local s5 = ""
+	local co = coroutine.create(function() -- line: 110
+		-- upvalues: n1 (ref), v12 (copy), t2 (copy), s1 (copy), t3 (copy), keyword (copy), builtin (copy), s2 (ref), s5 (ref), s3 (ref), libraries (copy), s4 (ref), t1 (copy)
+		local g29 = nil
+
+		repeat
+			if not (n1 <= v12) then
+				return
+			end
+
+			local v19 = false
+
+			for i, v in ipairs(t2) do
+				local start, stop = string.find(s1, v, n1)
+
+				if start ~= nil then
+					n1 = stop + 1
+					v19 = true
+
+					local v24 = string.sub(s1, start, stop)
+					local v25 = t3[i]
+					local v26 = v25
+
+					if v25 == "var" then
+						local v27 = string.gsub(v24, "[%c%s]+", "")
+
+						if keyword[v27] then
+							v26 = "keyword"
+						elseif builtin[v27] then
+							v26 = "builtin"
+						elseif string.find(s2, "%.[%s%c]*$") and s5 ~= "comment" then
+							local v28 = libraries[string.gsub(s3, "[%c%s]+", "")]
+
+							v26 = (not v28 or (not v28[v27] or string.find(s4, "%.[%s%c]*$"))) and "iden" or "builtin"
+						else
+							v26 = "iden"
+						end
+
+						g29 = true
+					end
+
+					if not g29 then
+						if v25 == "string_inter" then
+							if not string.find(v24, "[^\\]{") then
+								v26 = "string"
+								g29 = true
+							end
+
+							if not g29 then
+								v26 = nil
+
+								local v30 = true
+								local n2 = 1
+								local v32 = #v24
+
+								while true do
+									if not (n2 <= v32) then
+										g29 = true
+									end
+
+									if g29 then
+										break
+									end
+
+									local start2, stop2 = string.find(v24, "^.-[^\\][{}]", n2)
+
+									if start2 == nil then
+										break
+									end
+
+									if v30 then
+										n2 = stop2 + 1
+										coroutine.yield("string", (string.sub(v24, start2, stop2)))
+										v30 = false
+									else
+										n2 = stop2
+
+										local v35 = string.sub(v24, start2, stop2 - 1)
+
+										for v36, v37 in t1.scan(v35) do
+											coroutine.yield(v36, v37)
+										end
+
+										v30 = true
+									end
+								end
+
+								if not g29 then
+									coroutine.yield("string", (string.sub(v24, n2)))
+								end
+							end
+						end
+					end
+
+					g29 = false
+					s4 = s3
+					s3 = s2
+					s2 = v24
+					s5 = v26 or v25
+
+					if not v26 then
+						break
+					end
+
+					coroutine.yield(v26, v24)
+
+					break
+				end
+			end
+		until not v19
+	end)
+
+	return function() -- line: 218
+		-- upvalues: co (copy)
+		if coroutine.status(co) == "dead" then
+			return
+		end
+
+		local ok, result, v40 = coroutine.resume(co)
+
+		if ok and result then
+			return result, v40
+		end
+	end
+end
+function t1.navigator() -- line: 232
+	-- upvalues: t1 (copy)
+	local t4 = {
+		Source = "",
+		_RealIndex = 0,
+		_UserIndex = 0,
+		_ScanThread = nil,
+		TokenCache = table.create(50),
+		Destroy = function(p1) -- line: 242
+			p1.Source = nil
+			p1._RealIndex = nil
+			p1._UserIndex = nil
+			p1.TokenCache = nil
+			p1._ScanThread = nil
+		end,
+		SetSource = function(p2, p3) -- line: 250
+			-- upvalues: t1 (copy)
+			p2.Source = p3
+			p2._RealIndex = 0
+			p2._UserIndex = 0
+			table.clear(p2.TokenCache)
+			p2._ScanThread = coroutine.create(function() -- line: 257
+				-- upvalues: t1 (copy), p2 (copy)
+				for v54, v55 in t1.scan(p2.Source) do
+					local v56 = p2
+
+					v56._RealIndex = v56._RealIndex + 1
+					p2.TokenCache[p2._RealIndex] = {
+						v54,
+						v55
+					}
+					coroutine.yield(v54, v55)
+				end
+			end)
+		end
+	}
+
+	function t4.Next() -- line: 266
+		-- upvalues: t4 (copy)
+		local v44 = t4
+
+		v44._UserIndex = v44._UserIndex + 1
+
+		if t4._RealIndex >= t4._UserIndex then
+			return table.unpack(t4.TokenCache[t4._UserIndex])
+		end
+
+		if coroutine.status(t4._ScanThread) == "dead" then
+			return
+		end
+
+		local ok, result, v47 = coroutine.resume(t4._ScanThread)
+
+		if ok and result then
+			return result, v47
+		end
+	end
+	function t4.Peek(p4) -- line: 289
+		-- upvalues: t4 (copy)
+		local v49 = t4._UserIndex + p4
+
+		if v49 <= t4._RealIndex then
+			if v49 > 0 then
+				return table.unpack(t4.TokenCache[v49])
+			end
+
+			return
+		end
+
+		if coroutine.status(t4._ScanThread) == "dead" then
+			return
+		end
+
+		local result = nil
+		local v51 = nil
+
+		for _ = 1, v49 - t4._RealIndex do
+			local ok
+
+			ok, result, v51 = coroutine.resume(t4._ScanThread)
+
+			if not ok and not result then
+				return result, v51
+			end
+		end
+
+		return result, v51
+	end
+
+	return t4
+end
+
+return t1

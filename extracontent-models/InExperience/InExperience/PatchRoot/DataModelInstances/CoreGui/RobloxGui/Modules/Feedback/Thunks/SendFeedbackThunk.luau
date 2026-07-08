@@ -1,20 +1,22 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Promise_0 = require(l_CorePackages_0.Packages.InGameMenuDependencies).Promise;
-local l_PerformFetch_0 = require(l_CorePackages_0.Workspace.Packages.Http).PerformFetch;
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Network.PostFeedback);
-local v5 = require(l_Parent_0.Actions.IncrementFeedbackSubmissionAttempts);
-return function(v6, v7, v8, v9, v10, v11, v12) --[[ Line: 17 ]]
-    -- upvalues: l_PerformFetch_0 (copy), v4 (copy), v5 (copy), l_Promise_0 (copy)
-    return l_PerformFetch_0.Single("PostFeedbackRequest", function(v13) --[[ Line: 27 ]]
-        -- upvalues: v4 (ref), v6 (copy), v7 (copy), v8 (copy), v9 (copy), v10 (copy), v11 (copy), v5 (ref), v12 (copy), l_Promise_0 (ref)
-        return v4(v6, v7, v8, v9, v10, v11):andThen(function(v14) --[[ Line: 35 ]]
-            -- upvalues: v13 (copy), v5 (ref), v12 (ref), l_Promise_0 (ref)
-            v13:dispatch(v5(v12));
-            return l_Promise_0.resolve(v14);
-        end, function(v15) --[[ Line: 38 ]]
-            -- upvalues: l_Promise_0 (ref)
-            return l_Promise_0.reject(v15);
-        end);
-    end);
-end;
+local CorePackages = game:GetService("CorePackages")
+local Promise = require(CorePackages.Packages.InGameMenuDependencies).Promise
+local PerformFetch = require(CorePackages.Workspace.Packages.Http).PerformFetch
+local ParentParent = script.Parent.Parent
+local PostFeedback = require(ParentParent.Network.PostFeedback)
+local IncrementFeedbackSubmissionAttempts = require(ParentParent.Actions.IncrementFeedbackSubmissionAttempts)
+
+return function(p1, p2, p3, p4, p5, p6, p7) -- line: 17
+	-- upvalues: PerformFetch (copy), PostFeedback (copy), IncrementFeedbackSubmissionAttempts (copy), Promise (copy)
+	return PerformFetch.Single("PostFeedbackRequest", function(p8) -- line: 27
+		-- upvalues: PostFeedback (copy), p1 (copy), p2 (copy), p3 (copy), p4 (copy), p5 (copy), p6 (copy), IncrementFeedbackSubmissionAttempts (copy), p7 (copy), Promise (copy)
+		return PostFeedback(p1, p2, p3, p4, p5, p6):andThen(function(p9) -- line: 35
+			-- upvalues: p8 (copy), IncrementFeedbackSubmissionAttempts (copy), p7 (copy), Promise (copy)
+			p8:dispatch(IncrementFeedbackSubmissionAttempts(p7))
+
+			return Promise.resolve(p9)
+		end, function(p10) -- line: 38
+			-- upvalues: Promise (copy)
+			return Promise.reject(p10)
+		end)
+	end)
+end

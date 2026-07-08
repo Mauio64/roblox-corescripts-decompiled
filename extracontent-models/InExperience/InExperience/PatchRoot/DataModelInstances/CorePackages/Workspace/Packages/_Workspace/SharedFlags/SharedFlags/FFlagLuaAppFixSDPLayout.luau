@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFixSDPLayout", false);
+return game:DefineFastFlag("LuaAppFixSDPLayout", false)

@@ -1,19 +1,23 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_CollectionItemSize_0 = require(l_script_FirstAncestor_0.CollectionViewTypes).CollectionItemSize;
-local v4 = require(l_script_FirstAncestor_0.useCollectionLayoutParamsComputed);
-return function(v5, v6) --[[ Line: 15 ]] --[[ Name: useCollectionLayoutConfig ]]
-    -- upvalues: v4 (copy), v2 (copy), l_CollectionItemSize_0 (copy)
-    local v7 = v4(v5, v6);
-    return (v2.useMemo(function() --[[ Line: 21 ]]
-        -- upvalues: l_CollectionItemSize_0 (ref), v7 (copy)
-        local v8 = {};
-        for _, v10 in l_CollectionItemSize_0 do
-            v8[v10] = v7(v10);
-        end;
-        return v8;
-    end, {
-        v7
-    }));
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local CollectionItemSize = require(CollectionViews.CollectionViewTypes).CollectionItemSize
+local useCollectionLayoutParamsComputed = require(CollectionViews.useCollectionLayoutParamsComputed)
+
+local function useCollectionLayoutConfig(p1, n1: number?) -- line: 15
+	-- upvalues: useCollectionLayoutParamsComputed (copy), React (copy), CollectionItemSize (copy)
+	local v9 = useCollectionLayoutParamsComputed(p1, n1)
+
+	return (React.useMemo(function() -- line: 21
+		-- upvalues: CollectionItemSize (copy), v9 (copy)
+		local t1 = {}
+
+		for _, v12 in CollectionItemSize do
+			t1[v12] = v9(v12)
+		end
+
+		return t1
+	end, { v9 }))
+end
+
+return useCollectionLayoutConfig

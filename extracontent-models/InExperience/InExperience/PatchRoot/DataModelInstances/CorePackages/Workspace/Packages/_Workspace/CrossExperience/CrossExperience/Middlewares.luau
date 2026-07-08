@@ -1,3 +1,3 @@
 return {
-    createPersistenceMiddleware = require(script.createPersistenceMiddleware)
-};
+	createPersistenceMiddleware = require(script.createPersistenceMiddleware)
+}

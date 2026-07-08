@@ -1,30 +1,33 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.PolicyProvider);
-local v2 = v1.GetPolicyImplementations.MemStorageService("app-policy");
-local v3 = v1.withGetPolicyImplementation(v2);
-v3.Mapper = function(v4) --[[ Line: 9 ]]
-    return {
-        eligibleForCapturesFeature = function() --[[ Line: 11 ]] --[[ Name: eligibleForCapturesFeature ]]
-            -- upvalues: v4 (copy)
-            return v4.EligibleForCapturesFeature or false;
-        end, 
-        eligibleForVideoCapture = function() --[[ Line: 14 ]] --[[ Name: eligibleForVideoCapture ]]
-            -- upvalues: v4 (copy)
-            return v4.EligibleForVideoCapture or false;
-        end, 
-        enableCapturesBulkManagement = function() --[[ Line: 17 ]] --[[ Name: enableCapturesBulkManagement ]]
-            -- upvalues: v4 (copy)
-            return v4.EnableCapturesBulkManagement or false;
-        end, 
-        enableShareCaptureCTA = function() --[[ Line: 20 ]] --[[ Name: enableShareCaptureCTA ]]
-            -- upvalues: v4 (copy)
-            return v4.EnableShareCaptureCTA or false;
-        end, 
-        hasVideoCaptureCapability = function() --[[ Line: 23 ]] --[[ Name: hasVideoCaptureCapability ]]
-            -- upvalues: v4 (copy)
-            return v4.HasVideoCaptureCapability or false;
-        end
-    };
-end;
-v3.PolicyImplementation = v2;
-return v3;
+local ParentParent = script.Parent.Parent.Parent
+local PolicyProvider = require(ParentParent.PolicyProvider)
+local v3 = PolicyProvider.GetPolicyImplementations.MemStorageService("app-policy")
+local v4 = PolicyProvider.withGetPolicyImplementation(v3)
+
+function v4.Mapper(p1) -- line: 9
+	return {
+		eligibleForCapturesFeature = function() -- line: 11
+			-- upvalues: p1 (copy)
+			return p1.EligibleForCapturesFeature or false
+		end,
+		eligibleForVideoCapture = function() -- line: 14
+			-- upvalues: p1 (copy)
+			return p1.EligibleForVideoCapture or false
+		end,
+		enableCapturesBulkManagement = function() -- line: 17
+			-- upvalues: p1 (copy)
+			return p1.EnableCapturesBulkManagement or false
+		end,
+		enableShareCaptureCTA = function() -- line: 20
+			-- upvalues: p1 (copy)
+			return p1.EnableShareCaptureCTA or false
+		end,
+		hasVideoCaptureCapability = function() -- line: 23
+			-- upvalues: p1 (copy)
+			return p1.HasVideoCaptureCapability or false
+		end
+	}
+end
+
+v4.PolicyImplementation = v3
+
+return v4

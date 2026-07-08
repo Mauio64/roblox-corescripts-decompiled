@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FixUnifiedModalsMountedTwice", false);
+return game:DefineFastFlag("FixUnifiedModalsMountedTwice", false)

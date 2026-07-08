@@ -1,4 +1,4 @@
 return {
-    Right = "Right", 
-    Left = "Left"
-};
+	Right = "Right",
+	Left = "Left"
+}

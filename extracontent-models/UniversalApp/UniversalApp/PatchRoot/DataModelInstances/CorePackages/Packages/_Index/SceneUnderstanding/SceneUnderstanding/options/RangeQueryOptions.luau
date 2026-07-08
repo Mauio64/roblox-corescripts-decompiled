@@ -1,16 +1,19 @@
-local v0 = {
-    maxDistance = 100, 
-    limit = 1e999
-};
+local t1 = {
+	maxDistance = 100,
+	limit = 1e999
+}
+
 return {
-    new = function(v1) --[[ Line: 30 ]] --[[ Name: new ]]
-        -- upvalues: v0 (copy)
-        local v2 = table.clone(v0);
-        if v1 then
-            for v3, v4 in v1 do
-                v2[v3] = v4;
-            end;
-        end;
-        return v2;
-    end
-};
+	new = function(t2: {[any]: any}?) -- line: 30
+		-- upvalues: t1 (copy)
+		local v3 = table.clone(t1)
+
+		if t2 then
+			for v4, v5 in t2 do
+				v3[v4] = v5
+			end
+		end
+
+		return v3
+	end
+}

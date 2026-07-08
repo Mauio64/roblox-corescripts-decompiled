@@ -1,10 +1,12 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.LuauPolyfill).Object;
-local v3 = require(script.useApolloClient);
-local v4 = require(script.useQuery);
-local v5 = require(script.useLazyQuery);
-local v6 = require(script.useMutation);
-local v7 = require(script.useReactiveVar);
-l_Object_0.assign(v0, v3, v4, v5, v6, v7);
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent
+local Object = require(ParentParent.LuauPolyfill).Object
+local useApolloClient = require(script.useApolloClient)
+local useQuery = require(script.useQuery)
+local useLazyQuery = require(script.useLazyQuery)
+local useMutation = require(script.useMutation)
+local useReactiveVar = require(script.useReactiveVar)
+
+Object.assign(t1, useApolloClient, useQuery, useLazyQuery, useMutation, useReactiveVar)
+
+return t1

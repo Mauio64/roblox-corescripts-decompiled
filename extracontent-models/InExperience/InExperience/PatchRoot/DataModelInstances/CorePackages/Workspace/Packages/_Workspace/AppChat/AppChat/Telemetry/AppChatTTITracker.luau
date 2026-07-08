@@ -1,201 +1,363 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Logger):new("AppChatPerf");
-local l_TimeToInteractiveTracker_0 = require(l_Parent_0.TimeToInteractiveTracker).TimeToInteractiveTracker;
-local v4 = require(l_Parent_0.Cryo);
-local _ = require(l_Parent_0.SocialCommon);
-local v6 = require(l_script_FirstAncestor_0.Telemetry.AppChatPerfEventInfo);
-local _ = require(l_script_FirstAncestor_0.Contexts.ChatPlacementContext);
-local v8 = {
-    started = false, 
-    interactive = false, 
-    interactiveTimestamp = nil, 
-    eventName = nil
-};
-local v9 = {};
-local function _(v10) --[[ Line: 55 ]] --[[ Name: getTTIState ]]
-    -- upvalues: v9 (copy), v8 (copy)
-    if not v9[v10] then
-        v9[v10] = table.clone(v8);
-    end;
-    return v9[v10];
-end;
-local v12 = nil;
-local v13 = {};
-local v14 = {
-    category = v6.TTI_CATEGORY
-};
-local v15 = nil;
-local function v17(_) --[[ Line: 90 ]] --[[ Name: alwaysMatch ]]
-    return true, nil;
-end;
-local function v19(v18) --[[ Line: 94 ]] --[[ Name: matchConversation ]]
-    -- upvalues: v12 (ref)
-    if v18.conversationId and v12 and v18.conversationId ~= v12 then
-        return false, "conversation_id_mismatch";
-    else
-        return true, nil;
-    end;
-end;
-local function v22(v20) --[[ Line: 101 ]] --[[ Name: onStartConversation ]]
-    -- upvalues: v12 (ref), v15 (ref)
-    local l_conversationId_0 = v20.conversationId;
-    if l_conversationId_0 ~= nil and l_conversationId_0 ~= v12 then
-        v12 = l_conversationId_0;
-        if v15 then
-            v15("ChatConversationTTI");
-        end;
-    end;
-end;
-local v27 = {
-    ChatLandingTTI = {
-        getColdStart = function(v23) --[[ Line: 114 ]] --[[ Name: getColdStart ]]
-            return v23.coldStart == true;
-        end, 
-        isContextMatching = v17
-    }, 
-    ChatConversationTTI = {
-        getColdStart = function(v24) --[[ Line: 120 ]] --[[ Name: getColdStart ]]
-            -- upvalues: v13 (copy)
-            local l_conversationId_1 = v24.conversationId;
-            local v26 = false;
-            if l_conversationId_1 ~= nil then
-                v26 = not v13[l_conversationId_1];
-            end;
-            if l_conversationId_1 then
-                v13[l_conversationId_1] = true;
-            end;
-            return v26;
-        end, 
-        isContextMatching = v19, 
-        onStart = v22
-    }
-};
-local function v31(v28, v29) --[[ Line: 138 ]] --[[ Name: buildTTIMetadata ]]
-    -- upvalues: v6 (copy), v4 (copy), v14 (ref)
-    local v30 = v6.getTTIPage(v28);
-    return v4.Dictionary.join(v14, {
-        subcategory = v30, 
-        page = v30
-    }, v29 or {});
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local v3 = require(AppChat.Logger):new("AppChatPerf")
+local TimeToInteractiveTracker = require(AppChatParent.TimeToInteractiveTracker).TimeToInteractiveTracker
+local Milestone = TimeToInteractiveTracker.Milestone
+local Cryo = require(AppChatParent.Cryo)
+
+require(AppChatParent.SocialCommon)
+
+local AppChatPerfEventInfo = require(AppChat.Telemetry.AppChatPerfEventInfo)
+
+require(AppChat.Contexts.ChatPlacementContext)
+
+local t1 = {
+	started = false,
+	interactive = false,
+	interactiveTimestamp = nil,
+	eventName = nil
+}
+local t2 = {}
+
+local function getTTIState(p1) -- line: 60
+	-- upvalues: t2 (copy), t1 (copy)
+	if not t2[p1] then
+		t2[p1] = table.clone(t1)
+	end
+
+	return t2[p1]
+end
+
+local u11 = nil
+local t3 = {}
+local t4 = {
+	category = AppChatPerfEventInfo.TTI_CATEGORY
+}
+local u14 = nil
+
+local function alwaysMatch(_: {[any]: any}) -- line: 101
+	return true, nil
+end
+local function matchConversation(t6: {[any]: any}) -- line: 105
+	-- upvalues: u11 (ref)
+	if t6.conversationId and (u11 and t6.conversationId ~= u11) then
+		return false, "conversation_id_mismatch"
+	end
+
+	return true, nil
+end
+local function onStartConversation(t7: {[any]: any}) -- line: 112
+	-- upvalues: u11 (ref), u14 (ref)
+	local conversationId = t7.conversationId
+
+	if conversationId ~= nil and conversationId ~= u11 then
+		u11 = conversationId
+
+		if u14 then
+			u14("ChatConversationTTI")
+		end
+	end
+end
+local function noColdStart(_: {[any]: any}) -- line: 123
+	return false
+end
+
+local t9 = {
+	useBaseName = true,
+	noInteractiveState = true,
+	getColdStart = noColdStart,
+	isContextMatching = matchConversation
+}
+local t12 = {
+	ChatLandingTTI = {
+		getColdStart = function(t10: {[any]: any}) -- line: 136
+			return t10.coldStart == true
+		end,
+		isContextMatching = alwaysMatch
+	},
+	ChatConversationTTI = {
+		getColdStart = function(t11: {[any]: any}) -- line: 142
+			-- upvalues: t3 (copy)
+			local conversationId = t11.conversationId
+			local v31 = conversationId ~= nil and not t3[conversationId]
+
+			if conversationId then
+				t3[conversationId] = true
+			end
+
+			return v31
+		end,
+		isContextMatching = matchConversation,
+		onStart = onStartConversation
+	},
+	MessageSendTTI = t9,
+	MessageReceiveTTI = t9
+}
+
+local function buildTTIMetadata(p2, t13: {[any]: any}?) -- line: 162
+	-- upvalues: AppChatPerfEventInfo (copy), Cryo (copy), t4 (ref)
+	local v34 = AppChatPerfEventInfo.getTTIPage(p2)
+
+	return Cryo.Dictionary.join(t4, {
+		subcategory = v34,
+		page = v34
+	}, t13 or {})
+end
+
 return {
-    setSharedContext = function(v32) --[[ Line: 152 ]] --[[ Name: setSharedContext ]]
-        -- upvalues: v14 (ref), v4 (copy), v2 (copy)
-        v14 = v4.Dictionary.join(v14, v32);
-        v2:debug("Shared context updated: placement={}, entryPoint={}, hasActiveParty={}", v32.placement or "nil", v32.entryPoint or "nil", v32.hasActiveParty or false);
-    end, 
-    getSharedContext = function() --[[ Line: 162 ]] --[[ Name: getSharedContext ]]
-        -- upvalues: v14 (ref)
-        return v14;
-    end, 
-    setOnConversationSwitch = function(v33) --[[ Line: 168 ]] --[[ Name: setOnConversationSwitch ]]
-        -- upvalues: v15 (ref)
-        v15 = v33;
-    end, 
-    start = function(v34, v35) --[[ Line: 172 ]] --[[ Name: start ]]
-        -- upvalues: v27 (copy), v6 (copy), v14 (ref), v9 (copy), v2 (copy), l_TimeToInteractiveTracker_0 (copy), v31 (copy), v4 (copy)
-        local v36 = v27[v34];
-        if v36.onStart then
-            v36.onStart(v35);
-        end;
-        local v37 = v36.getColdStart(v35);
-        local v38 = v6.buildTTIEventName(v34, v14.placement, v37);
-        v9[v34] = {
-            started = true, 
-            interactive = false, 
-            interactiveTimestamp = nil, 
-            eventName = v38
-        };
-        v2:debug("TTI Start: {} (coldStart={}, conversationId={}, entryPoint={})", v38, v37, v35.conversationId, v35.entryPoint);
-        l_TimeToInteractiveTracker_0.trackStart(v38);
-        l_TimeToInteractiveTracker_0.updateMetadata(v38, v31(v34, v4.Dictionary.join(v35, {
-            coldStart = v37
-        })));
-        return true;
-    end, 
-    finish = function(v39, v40) --[[ Line: 205 ]] --[[ Name: finish ]]
-        -- upvalues: v27 (copy), v9 (copy), v8 (copy), v2 (copy), l_TimeToInteractiveTracker_0 (copy), v31 (copy)
-        local v41 = v27[v39];
-        if not v9[v39] then
-            v9[v39] = table.clone(v8);
-        end;
-        local v42 = v9[v39];
-        if not v42.started then
-            v2:debug("TTI End ignored: {} (reason=not_started)", v39);
-            return false;
-        else
-            local v43, v44 = v41.isContextMatching(v40);
-            if not v43 then
-                v2:debug("TTI End ignored: {} (reason={})", v39, v44 or "unknown");
-                return false;
-            else
-                local l_eventName_0 = v42.eventName;
-                if l_eventName_0 == nil then
-                    v2:debug("TTI End ignored: {} (reason=missing_event_name)", v39);
-                    return false;
-                else
-                    v2:debug("TTI End: {} (numElementsRendered={})", l_eventName_0, v40.numElementsRendered);
-                    l_TimeToInteractiveTracker_0.updateMetadata(l_eventName_0, v31(v39, v40));
-                    l_TimeToInteractiveTracker_0.trackEnd(l_eventName_0);
-                    v42.started = false;
-                    v42.interactive = true;
-                    v42.interactiveTimestamp = os.clock();
-                    v42.eventName = nil;
-                    return true;
-                end;
-            end;
-        end;
-    end, 
-    cancel = function(v46, _) --[[ Line: 237 ]] --[[ Name: cancel ]]
-        -- upvalues: v9 (copy), v8 (copy), v2 (copy), l_TimeToInteractiveTracker_0 (copy)
-        if not v9[v46] then
-            v9[v46] = table.clone(v8);
-        end;
-        local v48 = v9[v46];
-        if not v48.started then
-            v2:debug("TTI Cancel ignored: {} (reason=not_started)", v46);
-            return false;
-        else
-            local l_eventName_1 = v48.eventName;
-            if l_eventName_1 == nil then
-                v2:debug("TTI Cancel ignored: {} (reason=missing_event_name)", v46);
-                return false;
-            else
-                v2:debug("TTI Cancel: {}", l_eventName_1);
-                l_TimeToInteractiveTracker_0.resetEvent(l_eventName_1);
-                v48.started = false;
-                v48.interactive = false;
-                v48.interactiveTimestamp = nil;
-                v48.eventName = nil;
-                return true;
-            end;
-        end;
-    end, 
-    isActive = function(v50, v51) --[[ Line: 261 ]] --[[ Name: isActive ]]
-        -- upvalues: v27 (copy), v9 (copy), v8 (copy)
-        local v52 = v27[v50];
-        if not v9[v50] then
-            v9[v50] = table.clone(v8);
-        end;
-        if not v9[v50].started then
-            return false;
-        else
-            return (v52.isContextMatching(v51));
-        end;
-    end, 
-    isInteractive = function(v53) --[[ Line: 274 ]] --[[ Name: isInteractive ]]
-        -- upvalues: v9 (copy), v8 (copy)
-        if not v9[v53] then
-            v9[v53] = table.clone(v8);
-        end;
-        return v9[v53].interactive;
-    end, 
-    getInteractiveTimestamp = function(v54) --[[ Line: 278 ]] --[[ Name: getInteractiveTimestamp ]]
-        -- upvalues: v9 (copy), v8 (copy)
-        if not v9[v54] then
-            v9[v54] = table.clone(v8);
-        end;
-        return v9[v54].interactiveTimestamp;
-    end
-};
+	setSharedContext = function(t14: {[any]: any}) -- line: 176
+		-- upvalues: t4 (ref), Cryo (copy), v3 (copy)
+		t4 = Cryo.Dictionary.join(t4, t14)
+		v3:debug("Shared context updated: placement={}, entryPoint={}, hasActiveParty={}", t14.placement or "nil", t14.entryPoint or "nil", t14.hasActiveParty or false)
+	end,
+	getSharedContext = function() -- line: 186
+		-- upvalues: t4 (ref)
+		return t4
+	end,
+	setOnConversationSwitch = function(p3: ((...any) -> ...any)) -- line: 192
+		-- upvalues: u14 (ref)
+		u14 = p3
+	end,
+	start = function(p4, t15: {[any]: any}) -- line: 196
+		-- upvalues: t2 (copy), v3 (copy), t12 (copy), AppChatPerfEventInfo (copy), t4 (ref), TimeToInteractiveTracker (copy), buildTTIMetadata (copy), Cryo (copy)
+		local v39 = t2[p4]
+
+		if v39 and v39.started then
+			v3:debug("TTI Start ignored: {} (reason=already_started, eventName={})", p4, v39.eventName)
+
+			return false
+		end
+
+		local v40 = t12[p4]
+
+		if v40.onStart then
+			v40.onStart(t15)
+		end
+
+		local v41 = v40.getColdStart(t15)
+		local v42 = if not v40.useBaseName then AppChatPerfEventInfo.buildTTIEventName(p4, t4.placement, v41) else AppChatPerfEventInfo.getTTIBaseName(p4)
+
+		t2[p4] = {
+			started = true,
+			interactive = false,
+			interactiveTimestamp = nil,
+			eventName = v42
+		}
+		v3:debug("TTI Start: {} (coldStart={}, conversationId={}, entryPoint={})", v42, v41, t15.conversationId, t15.entryPoint)
+		TimeToInteractiveTracker.trackStart(v42)
+		TimeToInteractiveTracker.updateMetadata(v42, buildTTIMetadata(p4, Cryo.Dictionary.join(t15, {
+			coldStart = v41
+		})))
+
+		return true
+	end,
+	finish = function(p5, t16: {[any]: any}) -- line: 243
+		-- upvalues: t12 (copy), t2 (copy), t1 (copy), v3 (copy), TimeToInteractiveTracker (copy), buildTTIMetadata (copy), Milestone (copy)
+		local v45 = t12[p5]
+
+		if not t2[p5] then
+			t2[p5] = table.clone(t1)
+		end
+
+		local v46 = t2[p5]
+
+		if not v46.started then
+			v3:debug("TTI End ignored: {} (reason=not_started)", p5)
+
+			return false
+		end
+
+		local v47, v48 = v45.isContextMatching(t16)
+
+		if not v47 then
+			v3:debug("TTI End ignored: {} (reason={})", p5, v48 or "unknown")
+
+			return false
+		end
+
+		local eventName = v46.eventName
+
+		if eventName == nil then
+			v3:debug("TTI End ignored: {} (reason=missing_event_name)", p5)
+
+			return false
+		end
+
+		v3:debug("TTI End: {} (numElementsRendered={})", eventName, t16.numElementsRendered)
+		TimeToInteractiveTracker.updateMetadata(eventName, buildTTIMetadata(p5, t16))
+
+		if TimeToInteractiveTracker.trackMilestone then
+			TimeToInteractiveTracker.trackMilestone(eventName, Milestone.SurfaceReady)
+		end
+
+		TimeToInteractiveTracker.trackEnd(eventName)
+		v46.started = false
+
+		if not v45.noInteractiveState then
+			v46.interactive = true
+			v46.interactiveTimestamp = os.clock()
+		end
+
+		v46.eventName = nil
+
+		return true
+	end,
+	cancel = function(p6, _: {[any]: any}) -- line: 282
+		-- upvalues: t2 (copy), t1 (copy), v3 (copy), TimeToInteractiveTracker (copy)
+		if not t2[p6] then
+			t2[p6] = table.clone(t1)
+		end
+
+		local v52 = t2[p6]
+
+		if not v52.started then
+			v3:debug("TTI Cancel ignored: {} (reason=not_started)", p6)
+
+			return false
+		end
+
+		local eventName = v52.eventName
+
+		if eventName == nil then
+			v3:debug("TTI Cancel ignored: {} (reason=missing_event_name)", p6)
+
+			return false
+		end
+
+		v3:debug("TTI Cancel: {}", eventName)
+		TimeToInteractiveTracker.resetEvent(eventName)
+		v52.started = false
+		v52.interactive = false
+		v52.interactiveTimestamp = nil
+		v52.eventName = nil
+
+		return true
+	end,
+	isActive = function(p7, t18: {[any]: any}) -- line: 306
+		-- upvalues: t12 (copy), t2 (copy), t1 (copy)
+		local v56 = t12[p7]
+
+		if not t2[p7] then
+			t2[p7] = table.clone(t1)
+		end
+
+		if not t2[p7].started then
+			return false
+		end
+
+		return (v56.isContextMatching(t18))
+	end,
+	trackMilestone = function(p8, p9, t19: {[any]: any}) -- line: 320
+		-- upvalues: TimeToInteractiveTracker (copy), t12 (copy), t2 (copy), t1 (copy), v3 (copy)
+		if not TimeToInteractiveTracker.trackMilestone then
+			return false
+		end
+
+		local v60 = t12[p8]
+
+		if not t2[p8] then
+			t2[p8] = table.clone(t1)
+		end
+
+		local v61 = t2[p8]
+
+		if not v61.started or not v61.eventName then
+			return false
+		end
+
+		if not v60.isContextMatching(t19) then
+			return false
+		end
+
+		v3:debug("TTI Milestone: {} -> {}", v61.eventName, p9)
+		TimeToInteractiveTracker.trackMilestone(v61.eventName, p9)
+
+		return true
+	end,
+	trackSubphase = function(p10, p11, p12, t20: {[any]: any}) -- line: 338
+		-- upvalues: TimeToInteractiveTracker (copy), t12 (copy), t2 (copy), t1 (copy), v3 (copy)
+		if not TimeToInteractiveTracker.trackSubphase then
+			return false
+		end
+
+		local v66 = t12[p10]
+
+		if not t2[p10] then
+			t2[p10] = table.clone(t1)
+		end
+
+		local v67 = t2[p10]
+
+		if not v67.started or not v67.eventName then
+			return false
+		end
+
+		if not v66.isContextMatching(t20) then
+			return false
+		end
+
+		v3:debug("TTI Subphase: {} -> {}.{}", v67.eventName, p11, p12)
+		TimeToInteractiveTracker.trackSubphase(v67.eventName, p11, p12)
+
+		return true
+	end,
+	trackRequest = function(p13, p14, s1: string, t21: {[any]: any}) -- line: 361
+		-- upvalues: TimeToInteractiveTracker (copy), t12 (copy), t2 (copy), t1 (copy), v3 (copy)
+		if not TimeToInteractiveTracker.trackRequest then
+			return false
+		end
+
+		local v72 = t12[p13]
+
+		if not t2[p13] then
+			t2[p13] = table.clone(t1)
+		end
+
+		local v73 = t2[p13]
+
+		if not v73.started or not v73.eventName then
+			return false
+		end
+
+		if not v72.isContextMatching(t21) then
+			return false
+		end
+
+		v3:debug("TTI Request: {} -> {}.{}", v73.eventName, p14, s1)
+		TimeToInteractiveTracker.trackRequest(v73.eventName, p14, s1)
+
+		return true
+	end,
+	getEventName = function(p15) -- line: 386
+		-- upvalues: t2 (copy), t1 (copy)
+		if not t2[p15] then
+			t2[p15] = table.clone(t1)
+		end
+
+		local v75 = t2[p15]
+
+		if v75.started then
+			return v75.eventName
+		end
+
+		return nil
+	end,
+	Milestone = Milestone,
+	Hooks = TimeToInteractiveTracker.Hooks,
+	isInteractive = function(p16) -- line: 398
+		-- upvalues: t2 (copy), t1 (copy)
+		if not t2[p16] then
+			t2[p16] = table.clone(t1)
+		end
+
+		return t2[p16].interactive
+	end,
+	getInteractiveTimestamp = function(p17) -- line: 402
+		-- upvalues: t2 (copy), t1 (copy)
+		if not t2[p17] then
+			t2[p17] = table.clone(t1)
+		end
+
+		return t2[p17].interactiveTimestamp
+	end
+}

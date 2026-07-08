@@ -1,70 +1,79 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local v4 = require(l_CorePackages_0.Packages.SignalsReact);
-local v5 = require(l_CorePackages_0.Workspace.Packages.PlayerList);
-local _ = require(l_CorePackages_0.Workspace.Packages.LeaderboardStore);
-local l_useLeaderboardStore_0 = v5.Hooks.useLeaderboardStore;
-local v8 = require(l_Parent_0.Components.PresentationCommon.PlayerListDisplayView);
-local v9 = require(l_Parent_0.Actions.SetPlayerListVisibility);
-local l_FFlagAddNewPlayerListFocusNav_0 = v5.Flags.FFlagAddNewPlayerListFocusNav;
-local function v17(v11) --[[ Line: 46 ]] --[[ Name: PlayerListDisplayContainer ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), v4 (copy), v2 (copy), v8 (copy)
-    local v12 = l_useLeaderboardStore_0();
-    local v13 = v12.getGameStatsList();
-    local v14 = v12.getTeamList();
-    local v15 = v4.useSignalState(v13.getCount);
-    local v16 = v4.useSignalState(v14.getCount);
-    if v12 then
-        return (v2.createElement(v2.Fragment, nil, v2.createElement(v8, {
-            teamList = v14, 
-            teamListCount = v16, 
-            gameStatsCount = v15, 
-            entrySizeX = v11.entrySize, 
-            screenSizeY = v11.screenSizeY, 
-            playerIconInfo = v11.playerIconInfo, 
-            playerRelationship = v11.playerRelationship, 
-            dropDownPlayer = v11.dropDownPlayer, 
-            dropDownVisible = v11.dropDownVisible, 
-            dismissPlayerList = v11.dismissPlayerList, 
-            isVisible = v11.isVisible, 
-            isMinimized = v11.isMinimized, 
-            isSmallTouchDevice = v11.isSmallTouchDevice, 
-            isDirectionalPreferred = v11.isDirectionalPreferred, 
-            isUsingGamepad = v11.isUsingGamepad
-        })));
-    else
-        return nil;
-    end;
-end;
-return v2.memo(v3.connect(function(v18) --[[ Line: 93 ]] --[[ Name: mapStateToProps ]]
-    -- upvalues: l_FFlagAddNewPlayerListFocusNav_0 (copy)
-    local l_isMinimized_0 = v18.displayOptions.isMinimized;
-    return {
-        isVisible = if l_FFlagAddNewPlayerListFocusNav_0 then nil else v18.displayOptions.isVisible, 
-        isMinimized = l_isMinimized_0, 
-        isDirectionalPreferred = v18.displayOptions.isTenFootInterface, 
-        isUsingGamepad = v18.displayOptions.isUsingGamepad, 
-        isSmallTouchDevice = v18.displayOptions.isSmallTouchDevice, 
-        playerIconInfo = v18.playerIconInfo, 
-        playerRelationship = v18.playerRelationship, 
-        dropDownPlayer = v18.playerDropDown.selectedPlayer, 
-        dropDownVisible = v18.playerDropDown.isVisible
-    };
-end, function(v20) --[[ Line: 85 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v9 (copy)
-    return {
-        dismissPlayerList = function() --[[ Line: 87 ]] --[[ Name: dismissPlayerList ]]
-            -- upvalues: v20 (copy), v9 (ref)
-            return v20(v9(false));
-        end
-    };
-end)(function(v21) --[[ Line: 77 ]] --[[ Name: PlayerListDisplayContainerWithLeaderboardStore ]]
-    -- upvalues: l_useLeaderboardStore_0 (copy), v17 (copy)
-    if l_useLeaderboardStore_0() then
-        return (v17(v21));
-    else
-        return nil;
-    end;
-end));
+local CorePackages = game:GetService("CorePackages")
+local ParentParent = script.Parent.Parent.Parent
+local React = require(CorePackages.Packages.React)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local PlayerList = require(CorePackages.Workspace.Packages.PlayerList)
+
+require(CorePackages.Workspace.Packages.LeaderboardStore)
+
+local useLeaderboardStore = PlayerList.Hooks.useLeaderboardStore
+local PlayerListDisplayView = require(ParentParent.Components.PresentationCommon.PlayerListDisplayView)
+local SetPlayerListVisibility = require(ParentParent.Actions.SetPlayerListVisibility)
+local FFlagAddNewPlayerListFocusNav = PlayerList.Flags.FFlagAddNewPlayerListFocusNav
+
+local function PlayerListDisplayContainer(t1: {[any]: any}) -- line: 46
+	-- upvalues: useLeaderboardStore (copy), SignalsReact (copy), React (copy), PlayerListDisplayView (copy)
+	local v16 = useLeaderboardStore()
+	local v17 = v16.getGameStatsList()
+	local v18 = v16.getTeamList()
+	local v19 = SignalsReact.useSignalState(v17.getCount)
+	local v20 = SignalsReact.useSignalState(v18.getCount)
+
+	if v16 then
+		return (React.createElement(React.Fragment, nil, React.createElement(PlayerListDisplayView, {
+			teamList = v18,
+			teamListCount = v20,
+			gameStatsCount = v19,
+			entrySizeX = t1.entrySize,
+			screenSizeY = t1.screenSizeY,
+			playerIconInfo = t1.playerIconInfo,
+			playerRelationship = t1.playerRelationship,
+			dropDownPlayer = t1.dropDownPlayer,
+			dropDownVisible = t1.dropDownVisible,
+			dismissPlayerList = t1.dismissPlayerList,
+			isVisible = t1.isVisible,
+			isMinimized = t1.isMinimized,
+			isSmallTouchDevice = t1.isSmallTouchDevice,
+			isDirectionalPreferred = t1.isDirectionalPreferred,
+			isUsingGamepad = t1.isUsingGamepad
+		})))
+	end
+
+	return nil
+end
+local function PlayerListDisplayContainerWithLeaderboardStore(t2: {[any]: any}) -- line: 77
+	-- upvalues: useLeaderboardStore (copy), PlayerListDisplayContainer (copy)
+	if useLeaderboardStore() then
+		return (PlayerListDisplayContainer(t2))
+	end
+
+	return nil
+end
+local function mapDispatchToProps(p1) -- line: 85
+	-- upvalues: SetPlayerListVisibility (copy)
+	return {
+		dismissPlayerList = function() -- line: 87
+			-- upvalues: p1 (copy), SetPlayerListVisibility (copy)
+			return p1(SetPlayerListVisibility(false))
+		end
+	}
+end
+local function mapStateToProps(p2) -- line: 93
+	-- upvalues: FFlagAddNewPlayerListFocusNav (copy)
+	local isMinimized = p2.displayOptions.isMinimized
+
+	return {
+		isVisible = if not FFlagAddNewPlayerListFocusNav then p2.displayOptions.isVisible else nil,
+		isMinimized = isMinimized,
+		isDirectionalPreferred = p2.displayOptions.isTenFootInterface,
+		isUsingGamepad = p2.displayOptions.isUsingGamepad,
+		isSmallTouchDevice = p2.displayOptions.isSmallTouchDevice,
+		playerIconInfo = p2.playerIconInfo,
+		playerRelationship = p2.playerRelationship,
+		dropDownPlayer = p2.playerDropDown.selectedPlayer,
+		dropDownVisible = p2.playerDropDown.isVisible
+	}
+end
+
+return React.memo(RoactRodux.connect(mapStateToProps, mapDispatchToProps)(PlayerListDisplayContainerWithLeaderboardStore))

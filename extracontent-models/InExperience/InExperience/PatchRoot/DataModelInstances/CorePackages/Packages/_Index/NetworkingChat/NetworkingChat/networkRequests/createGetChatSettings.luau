@@ -1,12 +1,15 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.networkingChatTypes);
-local v2 = require(l_Parent_0.CHAT_URL);
-return function(v3) --[[ Line: 6 ]]
-    -- upvalues: v2 (copy)
-    return v3.roduxNetworking.GET({
-        Name = "GetChatSettings"
-    }, function(v4) --[[ Line: 9 ]]
-        -- upvalues: v2 (ref)
-        return v4(v2):path("v2"):path("chat-settings");
-    end);
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.networkingChatTypes)
+
+local CHAT_URL = require(ParentParent.CHAT_URL)
+
+return function(p1) -- line: 6
+	-- upvalues: CHAT_URL (copy)
+	return p1.roduxNetworking.GET({
+		Name = "GetChatSettings"
+	}, function(p2) -- line: 9
+		-- upvalues: CHAT_URL (copy)
+		return p2(CHAT_URL):path("v2"):path("chat-settings")
+	end)
+end

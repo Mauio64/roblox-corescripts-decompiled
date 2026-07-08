@@ -1,1 +1,1 @@
-return game:DefineFastInt("ExpChatRandomCharChangeUpperBound", 5);
+return game:DefineFastInt("ExpChatRandomCharChangeUpperBound", 5)

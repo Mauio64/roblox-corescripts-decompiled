@@ -1,193 +1,207 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_TextService_0 = game:GetService("TextService");
-local l_ExperienceStateCaptureService_0 = game:GetService("ExperienceStateCaptureService");
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Thunks.ShowHelpModalThunk);
-local l_withLocalization_0 = require(l_CorePackages_0.Workspace.Packages.Localization).withLocalization;
-local v6 = require(script.Parent.FeedbackBarHint);
-local v7 = require(l_CorePackages_0.Packages.Roact);
-local v8 = require(l_CorePackages_0.Packages.RoactRodux);
-local v9 = require(l_CorePackages_0.Packages.UIBlox);
-local v10 = require(l_CorePackages_0.Packages.t);
-local v11 = require(l_CorePackages_0.Packages.Cryo);
-local l_withStyle_0 = v9.Core.Style.withStyle;
-local l_ButtonStack_0 = v9.App.Button.ButtonStack;
-local l_ButtonType_0 = v9.App.Button.Enum.ButtonType;
-local v15 = v7.PureComponent:extend("RefinedFeedbackBar");
-local function v16(...) --[[ Line: 41 ]] --[[ Name: GetTextSize ]]
-    -- upvalues: l_TextService_0 (copy)
-    return l_TextService_0:GetTextSize(...) + Vector2.new(2, 2);
-end;
-local v17 = v10.strictInterface({
-    text = v10.string
-});
-v15.validateProps = v10.strictInterface({
-    leftHint = v17
-});
-v15.init = function(v18) --[[ Line: 55 ]] --[[ Name: init ]]
-    -- upvalues: l_ExperienceStateCaptureService_0 (copy)
-    v18.state = {
-        barWidth = 0, 
-        hintStringsConcat = nil, 
-        requiredSpace = nil, 
-        hintRatios = nil
-    };
-    v18.onExitFeedbackMode = function() --[[ Line: 63 ]]
-        -- upvalues: l_ExperienceStateCaptureService_0 (ref)
-        l_ExperienceStateCaptureService_0:ToggleCaptureMode();
-    end;
-    v18.openHelpModal = function() --[[ Line: 67 ]]
-        -- upvalues: v18 (copy)
-        v18.props.showHelpModal(true);
-    end;
-end;
-v15.calculateHintRatios = function(v19) --[[ Line: 73 ]] --[[ Name: calculateHintRatios ]]
-    -- upvalues: v11 (copy), v16 (copy)
-    local v20 = 84;
-    local v21 = "";
-    local v22 = {};
-    local v23 = 0;
-    local v24 = v11.List.join({
-        v19
-    }, {});
-    for _, v26 in ipairs(v24) do
-        v22[v26.text] = v16(v26.text, 17, 2, Vector2.new(10000, 10000)).X;
-        v23 = v23 + v22[v26.text];
-        v20 = v20 + 36 + 8;
-        v21 = v21 .. v26.text;
-    end;
-    for v27, v28 in pairs(v22) do
-        v22[v27] = v28 / v23;
-    end;
-    return v22, v20 + math.max(#v24 - 2, 0) * 40, v21;
-end;
-v15.getDerivedStateFromProps = function(v29) --[[ Line: 105 ]] --[[ Name: getDerivedStateFromProps ]]
-    -- upvalues: v15 (copy)
-    local v30, v31, v32 = v15.calculateHintRatios(v29.leftHint);
-    return {
-        hintRatios = v30, 
-        requiredSpace = v31, 
-        hintStringsConcat = v32
-    };
-end;
-v15.calculateHintSize = function(v33, v34, v35) --[[ Line: 116 ]] --[[ Name: calculateHintSize ]]
-    -- upvalues: v16 (copy)
-    local v36 = v34 - v33.state.requiredSpace;
-    local v37 = v35.Header2.RelativeSize * v35.BaseSize;
-    local v38 = v35.Header2.RelativeMinSize * v35.BaseSize;
-    local l_X_0 = v16(v33.state.hintStringsConcat, v38, v35.Header2.Font, Vector2.new(10000, 10000)).X;
-    if l_X_0 <= v36 then
-        local l_X_1 = v16(v33.state.hintStringsConcat, v37, v35.Header2.Font, Vector2.new(10000, 10000)).X;
-        local v41 = (v37 - v38) / (l_X_1 - l_X_0);
-        local v42 = v37 - v41 * l_X_1;
-        return nil, (math.clamp(v36 * v41 + v42, v38, v37));
-    else
-        local v43 = {};
-        for v44, v45 in pairs(v33.state.hintRatios) do
-            v43[v44] = v45 * v36;
-        end;
-        return v43;
-    end;
-end;
-v15.render = function(v46) --[[ Line: 155 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v7 (copy), v6 (copy), l_withLocalization_0 (copy), l_ButtonStack_0 (copy), l_ButtonType_0 (copy)
-    return l_withStyle_0(function(v47) --[[ Line: 156 ]]
-        -- upvalues: v7 (ref), v6 (ref), v46 (copy), l_withLocalization_0 (ref), l_ButtonStack_0 (ref), l_ButtonType_0 (ref)
-        local l_Theme_0 = v47.Theme;
-        local function v50(v49) --[[ Line: 158 ]] --[[ Name: makeHint ]]
-            -- upvalues: v7 (ref), v6 (ref)
-            return v7.createElement(v6, v49);
-        end;
-        return v7.createElement("Frame", {
-            BorderSizePixel = 0, 
-            BackgroundTransparency = l_Theme_0.BackgroundUIContrast.Transparency, 
-            BackgroundColor3 = l_Theme_0.BackgroundUIContrast.Color, 
-            Size = UDim2.new(1, 0, 0, 72), 
-            Position = UDim2.fromScale(0, 1), 
-            AnchorPoint = Vector2.new(0, 1), 
-            [v7.Change.AbsoluteSize] = function(v51) --[[ Line: 169 ]]
-                -- upvalues: v46 (ref)
-                v46:setState({
-                    barWidth = v51.AbsoluteSize.X
-                });
-            end, 
-            [v7.Event.AncestryChanged] = function(v52) --[[ Line: 174 ]]
-                -- upvalues: v46 (ref)
-                v46:setState({
-                    barWidth = v52.AbsoluteSize.X
-                });
-            end
-        }, {
-            Padding = v7.createElement("UIPadding", {
-                PaddingLeft = UDim.new(0, 24), 
-                PaddingRight = UDim.new(0, 24)
-            }), 
-            LeftFrame = v7.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(0.5, 1)
-            }, {
-                v7.createElement("UIListLayout", {
-                    key = "Layout", 
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    Padding = UDim.new(0, 40)
-                }), 
-                v50(v46.props.leftHint)
-            }), 
-            RightFrame = v7.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromScale(0.35, 1), 
-                Position = UDim2.fromScale(1, 0), 
-                AnchorPoint = Vector2.new(1, 0)
-            }, {
-                Layout = v7.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    Padding = UDim.new(0, 40)
-                }), 
-                Buttons = l_withLocalization_0({
-                    helpButtonText = "CoreScripts.Feedback.FeedbackBar.HelpButton", 
-                    exitFeedbackButtonText = "CoreScripts.Feedback.FeedbackBar.ExitFeedbackButton"
-                })(function(v53) --[[ Line: 217 ]]
-                    -- upvalues: v7 (ref), l_ButtonStack_0 (ref), l_ButtonType_0 (ref), v46 (ref)
-                    return v7.createElement(l_ButtonStack_0, {
-                        buttonHeight = 50, 
-                        buttons = {
-                            {
-                                buttonType = l_ButtonType_0.Secondary, 
-                                props = {
-                                    onActivated = v46.openHelpModal, 
-                                    text = v53.helpButtonText
-                                }
-                            }, 
-                            {
-                                buttonType = l_ButtonType_0.PrimarySystem, 
-                                props = {
-                                    isDisabled = false, 
-                                    onActivated = v46.onExitFeedbackMode, 
-                                    text = v53.exitFeedbackButtonText
-                                }
-                            }
-                        }, 
-                        forcedFillDirection = Enum.FillDirection.Horizontal
-                    });
-                end)
-            })
-        });
-    end);
-end;
-return v8.connect(function() --[[ Line: 245 ]]
-    return {};
-end, function(v54) --[[ Line: 247 ]]
-    -- upvalues: v4 (copy)
-    return {
-        showHelpModal = function(v55) --[[ Line: 249 ]] --[[ Name: showHelpModal ]]
-            -- upvalues: v54 (copy), v4 (ref)
-            v54(v4(v55));
-        end
-    };
-end)(v15);
+local CorePackages = game:GetService("CorePackages")
+local TextService = game:GetService("TextService")
+local ExperienceStateCaptureService = game:GetService("ExperienceStateCaptureService")
+local ParentParent = script.Parent.Parent
+local ShowHelpModalThunk = require(ParentParent.Thunks.ShowHelpModalThunk)
+local withLocalization = require(CorePackages.Workspace.Packages.Localization).withLocalization
+local FeedbackBarHint = require(script.Parent.FeedbackBarHint)
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local t = require(CorePackages.Packages.t)
+local Cryo = require(CorePackages.Packages.Cryo)
+local withStyle = UIBlox.Core.Style.withStyle
+local ButtonStack = UIBlox.App.Button.ButtonStack
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local v16 = Roact.PureComponent:extend("RefinedFeedbackBar")
+
+local function GetTextSize(...) -- line: 41
+	-- upvalues: TextService (copy)
+	return TextService:GetTextSize(...) + Vector2.new(2, 2)
+end
+
+local v18 = t.strictInterface({
+	text = t.string
+})
+
+v16.validateProps = t.strictInterface({
+	leftHint = v18
+})
+
+function v16.init(p1) -- line: 55
+	-- upvalues: ExperienceStateCaptureService (copy)
+	p1.state = {
+		barWidth = 0,
+		hintStringsConcat = nil,
+		requiredSpace = nil,
+		hintRatios = nil
+	}
+
+	function p1.onExitFeedbackMode() -- line: 63
+		-- upvalues: ExperienceStateCaptureService (copy)
+		ExperienceStateCaptureService:ToggleCaptureMode()
+	end
+	function p1.openHelpModal() -- line: 67
+		-- upvalues: p1 (copy)
+		p1.props.showHelpModal(true)
+	end
+end
+function v16.calculateHintRatios(p2) -- line: 73
+	-- upvalues: Cryo (copy), GetTextSize (copy)
+	local n1 = 84
+	local s1 = ""
+	local t1 = {}
+	local n2 = 0
+	local v25 = Cryo.List.join({ p2 }, {})
+
+	for _, v in ipairs(v25) do
+		t1[v.text] = GetTextSize(v.text, 17, 2, Vector2.new(10000, 10000)).X
+		n2 += t1[v.text]
+		n1 = n1 + 36 + 8
+		s1 ..= v.text
+	end
+
+	for k, v in pairs(t1) do
+		t1[k] = v / n2
+	end
+
+	return t1, n1 + math.max(#v25 - 2, 0) * 40, s1
+end
+function v16.getDerivedStateFromProps(p3) -- line: 105
+	-- upvalues: v16 (copy)
+	local v31, v32, v33 = v16.calculateHintRatios(p3.leftHint)
+
+	return {
+		hintRatios = v31,
+		requiredSpace = v32,
+		hintStringsConcat = v33
+	}
+end
+function v16.calculateHintSize(p4, p5, p6) -- line: 116
+	-- upvalues: GetTextSize (copy)
+	local v37 = p5 - p4.state.requiredSpace
+	local v38 = p6.Header2.RelativeSize * p6.BaseSize
+	local v39 = p6.Header2.RelativeMinSize * p6.BaseSize
+	local X = GetTextSize(p4.state.hintStringsConcat, v39, p6.Header2.Font, Vector2.new(10000, 10000)).X
+
+	if X <= v37 then
+		local X2 = GetTextSize(p4.state.hintStringsConcat, v38, p6.Header2.Font, Vector2.new(10000, 10000)).X
+		local v42 = (v38 - v39) / (X2 - X)
+		local v43 = v38 - v42 * X2
+
+		return nil, (math.clamp(v37 * v42 + v43, v39, v38))
+	end
+
+	local t2 = {}
+
+	for k, v in pairs(p4.state.hintRatios) do
+		t2[k] = v * v37
+	end
+
+	return t2
+end
+function v16.render(p7) -- line: 155
+	-- upvalues: withStyle (copy), Roact (copy), FeedbackBarHint (copy), withLocalization (copy), ButtonStack (copy), ButtonType (copy)
+	return withStyle(function(p8) -- line: 156
+		-- upvalues: Roact (copy), FeedbackBarHint (copy), p7 (copy), withLocalization (copy), ButtonStack (copy), ButtonType (copy)
+		local Theme = p8.Theme
+
+		local function makeHint(p9) -- line: 158
+			-- upvalues: Roact (copy), FeedbackBarHint (copy)
+			return Roact.createElement(FeedbackBarHint, p9)
+		end
+
+		return Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = Theme.BackgroundUIContrast.Transparency,
+			BackgroundColor3 = Theme.BackgroundUIContrast.Color,
+			Size = UDim2.new(1, 0, 0, 72),
+			Position = UDim2.fromScale(0, 1),
+			AnchorPoint = Vector2.new(0, 1),
+			[Roact.Change.AbsoluteSize] = function(p10) -- line: 169
+				-- upvalues: p7 (copy)
+				p7:setState({
+					barWidth = p10.AbsoluteSize.X
+				})
+			end,
+			[Roact.Event.AncestryChanged] = function(p11) -- line: 174
+				-- upvalues: p7 (copy)
+				p7:setState({
+					barWidth = p11.AbsoluteSize.X
+				})
+			end
+		}, {
+			Padding = Roact.createElement("UIPadding", {
+				PaddingLeft = UDim.new(0, 24),
+				PaddingRight = UDim.new(0, 24)
+			}),
+			LeftFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0.5, 1)
+			}, {
+				Roact.createElement("UIListLayout", {
+					key = "Layout",
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 40)
+				}),
+				makeHint(p7.props.leftHint)
+			}),
+			RightFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromScale(0.35, 1),
+				Position = UDim2.fromScale(1, 0),
+				AnchorPoint = Vector2.new(1, 0)
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Right,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					Padding = UDim.new(0, 40)
+				}),
+				Buttons = withLocalization({
+					helpButtonText = "CoreScripts.Feedback.FeedbackBar.HelpButton",
+					exitFeedbackButtonText = "CoreScripts.Feedback.FeedbackBar.ExitFeedbackButton"
+				})(function(p12) -- line: 217
+					-- upvalues: Roact (copy), ButtonStack (copy), ButtonType (copy), p7 (copy)
+					return Roact.createElement(ButtonStack, {
+						buttonHeight = 50,
+						buttons = {
+							{
+								buttonType = ButtonType.Secondary,
+								props = {
+									onActivated = p7.openHelpModal,
+									text = p12.helpButtonText
+								}
+							},
+							{
+								buttonType = ButtonType.PrimarySystem,
+								props = {
+									isDisabled = false,
+									onActivated = p7.onExitFeedbackMode,
+									text = p12.exitFeedbackButtonText
+								}
+							}
+						},
+						forcedFillDirection = Enum.FillDirection.Horizontal
+					})
+				end)
+			})
+		})
+	end)
+end
+
+return RoactRodux.connect(function() -- line: 245
+	return {}
+end, function(p13) -- line: 247
+	-- upvalues: ShowHelpModalThunk (copy)
+	return {
+		showHelpModal = function(p14) -- line: 249
+			-- upvalues: p13 (copy), ShowHelpModalThunk (copy)
+			p13(ShowHelpModalThunk(p14))
+		end
+	}
+end)(v16)

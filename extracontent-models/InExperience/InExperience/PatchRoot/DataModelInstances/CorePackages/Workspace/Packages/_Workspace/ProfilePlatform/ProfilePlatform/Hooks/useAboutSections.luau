@@ -1,24 +1,29 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Common.Enums);
-local v4 = require(l_script_FirstAncestor_0.Hooks.useProfileJsonComponent);
-local v5 = require(l_script_FirstAncestor_0.Contexts.useProfileWrapperContext);
-local v6 = require(l_script_FirstAncestor_0.Components.About.parseSectionsFromData);
-return function() --[[ Line: 10 ]]
-    -- upvalues: v5 (copy), v4 (copy), v3 (copy), v2 (copy), v6 (copy)
-    local l_profileType_0 = v5().profileType;
-    local v8 = v4(v3.Components.About) or {};
-    local v9 = v2.useMemo(function() --[[ Line: 15 ]]
-        -- upvalues: v6 (ref), v8 (copy), l_profileType_0 (copy), v3 (ref)
-        return v6(v8, l_profileType_0, if l_profileType_0 == v3.ProfileTypes.User and v8.name then ("@%*"):format(v8.name) else v8.name or "");
-    end, {
-        v8, 
-        l_profileType_0, 
-        v8.name
-    });
-    return {
-        aboutDetails = v8, 
-        aboutSections = v9
-    };
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local Enums = require(ProfilePlatform.Common.Enums)
+local useProfileJsonComponent = require(ProfilePlatform.Hooks.useProfileJsonComponent)
+local useProfileWrapperContext = require(ProfilePlatform.Contexts.useProfileWrapperContext)
+local parseSectionsFromData = require(ProfilePlatform.Components.About.parseSectionsFromData)
+local FFlagProfileAboutDetailsUseSheet = require(ProfilePlatformParent.SharedFlags).FFlagProfileAboutDetailsUseSheet
+
+return function() -- line: 11
+	-- upvalues: useProfileWrapperContext (copy), useProfileJsonComponent (copy), Enums (copy), React (copy), parseSectionsFromData (copy), FFlagProfileAboutDetailsUseSheet (copy)
+	local profileType = useProfileWrapperContext().profileType
+	local v10 = useProfileJsonComponent(Enums.Components.About) or {}
+	local v11 = React.useMemo(function() -- line: 16
+		-- upvalues: parseSectionsFromData (copy), v10 (copy), profileType (copy), Enums (copy)
+		return parseSectionsFromData(v10, profileType, if profileType ~= Enums.ProfileTypes.User or not v10.name then v10.name or "" else `@{ v10.name }`)
+	end, {
+		v10,
+		profileType,
+		v10.name
+	})
+	local v12 = if not FFlagProfileAboutDetailsUseSheet then nil else if profileType ~= Enums.ProfileTypes.User or not v10.name then v10.name else `@{ v10.name }`
+
+	return {
+		aboutDetails = v10,
+		aboutSections = v11,
+		profileName = v12
+	}
+end

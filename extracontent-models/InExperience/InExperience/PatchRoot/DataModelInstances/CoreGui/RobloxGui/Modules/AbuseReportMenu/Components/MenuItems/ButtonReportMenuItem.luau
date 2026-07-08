@@ -1,14 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local v3 = require(l_script_FirstAncestor_0.Components.MenuItems.ReportMenuItem);
-return function(v4) --[[ Line: 14 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.createElement(v3, {
-        label = v4.label, 
-        layoutOrder = v4.layoutOrder, 
-        rightComponent = v4.button, 
-        menuContainerWidth = v4.menuContainerWidth, 
-        isSmallPortraitViewport = v4.isSmallPortraitViewport
-    });
-end;
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local ReportMenuItem = require(AbuseReportMenu.Components.MenuItems.ReportMenuItem)
+
+return function(p1) -- line: 14
+	-- upvalues: React (copy), ReportMenuItem (copy)
+	return React.createElement(ReportMenuItem, {
+		label = p1.label,
+		layoutOrder = p1.layoutOrder,
+		rightComponent = p1.button,
+		menuContainerWidth = p1.menuContainerWidth,
+		isSmallPortraitViewport = p1.isSmallPortraitViewport
+	})
+end

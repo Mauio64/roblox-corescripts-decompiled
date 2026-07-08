@@ -1,13 +1,15 @@
-local v0 = require(script.Parent.Parent.ALIAS_URL);
-local _ = require(script.Parent.Parent.networkingAliasesTypes);
-return function(v2) --[[ Line: 4 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.POST({
-        Name = "GetTagsFromUserIds"
-    }, function(v3, v4) --[[ Line: 7 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("v1"):path("user"):path("get-tags"):body({
-            targetUserIds = v4
-        });
-    end);
-end;
+local ALIAS_URL = require(script.Parent.Parent.ALIAS_URL)
+
+require(script.Parent.Parent.networkingAliasesTypes)
+
+return function(p1) -- line: 4
+	-- upvalues: ALIAS_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "GetTagsFromUserIds"
+	}, function(p2, p3) -- line: 7
+		-- upvalues: ALIAS_URL (copy)
+		return p2(ALIAS_URL):path("v1"):path("user"):path("get-tags"):body({
+			targetUserIds = p3
+		})
+	end)
+end

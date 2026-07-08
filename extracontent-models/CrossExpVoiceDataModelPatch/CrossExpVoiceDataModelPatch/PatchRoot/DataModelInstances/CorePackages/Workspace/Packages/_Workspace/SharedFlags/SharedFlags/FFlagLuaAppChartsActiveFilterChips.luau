@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppChartsActiveFilterChips3", false);
+return game:DefineFastFlag("LuaAppChartsActiveFilterChips3", false)

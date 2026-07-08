@@ -1,61 +1,71 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Signal_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Signal;
-local v3 = require(l_script_FirstAncestor_0.Service.ViewportUtil);
-local v4 = require(l_script_FirstAncestor_0.Unibar.Constants);
-local l_FFlagChromeWindowSignalConstraintsToggle_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).FFlagChromeWindowSignalConstraintsToggle;
-local function v14(v6, v7, v8) --[[ Line: 14 ]] --[[ Name: getConstrainedWindowSize ]]
-    -- upvalues: v3 (copy), l_FFlagChromeWindowSignalConstraintsToggle_0 (copy), v4 (copy)
-    local v9 = v3.mobileDevice:get();
-    local v10 = v3.screenSize:get();
-    local v11 = v10.Y > v10.X;
-    local l_v6_0 = v6;
-    local l_v7_0 = v7;
-    if v9 and (not l_FFlagChromeWindowSignalConstraintsToggle_0 or not v8) then
-        if v11 then
-            l_v7_0 = math.min(v7, v4.MAX_HEIGHT_PORTRAIT);
-            l_v6_0 = math.min(v6, v4.MAX_WIDTH_PORTRAIT);
-        elseif not v11 then
-            l_v7_0 = math.min(v7, v4.MAX_HEIGHT_LANDSCAPE);
-            l_v6_0 = math.min(v6, v4.MAX_WIDTH_LANDSCAPE);
-        end;
-    end;
-    return UDim2.new(0, l_v6_0, 0, l_v7_0);
-end;
-local v15 = {};
-v15.__index = v15;
-v15.new = function(v16, v17, v18, v19) --[[ Line: 49 ]] --[[ Name: new ]]
-    -- upvalues: l_FFlagChromeWindowSignalConstraintsToggle_0 (copy), v14 (copy), v4 (copy), l_Signal_0 (copy), v15 (copy)
-    return (setmetatable({
-        _state = if l_FFlagChromeWindowSignalConstraintsToggle_0 then v14(v16 or v4.DEFAULT_WIDTH, v17 or v4.DEFAULT_HEIGHT, v19 or false) else v14(v16 or v4.DEFAULT_WIDTH, v17 or v4.DEFAULT_HEIGHT), 
-        _isLarge = v18 or false, 
-        _ignoreConstraints = if l_FFlagChromeWindowSignalConstraintsToggle_0 then v19 or false else nil, 
-        _changeSignal = l_Signal_0.new()
-    }, v15));
-end;
-v15.connect = function(v20, v21) --[[ Line: 73 ]] --[[ Name: connect ]]
-    return v20._changeSignal:connect(v21);
-end;
-v15.requestSize = function(v22, v23, v24) --[[ Line: 78 ]] --[[ Name: requestSize ]]
-    -- upvalues: l_FFlagChromeWindowSignalConstraintsToggle_0 (copy), v14 (copy)
-    local v25 = if l_FFlagChromeWindowSignalConstraintsToggle_0 then v14(v23, v24, v22._ignoreConstraints) else v14(v23, v24);
-    if v22._state ~= v25 then
-        v22._state = v25;
-        v22._changeSignal:fire(v25);
-    end;
-end;
-v15.toggleIsLarge = function(v26) --[[ Line: 89 ]] --[[ Name: toggleIsLarge ]]
-    local v27 = not v26._isLarge;
-    v26._isLarge = v27;
-    v26._changeSignal:fire(v27);
-end;
-v15.get = function(v28) --[[ Line: 95 ]] --[[ Name: get ]]
-    return v28._state;
-end;
-v15.getIsLarge = function(v29) --[[ Line: 99 ]] --[[ Name: getIsLarge ]]
-    return v29._isLarge;
-end;
-v15.updateConstraints = function(v30) --[[ Line: 104 ]] --[[ Name: updateConstraints ]]
-    v30:requestSize(v30._state.Width.Offset, v30._state.Height.Offset);
-end;
-return v15;
+local ChromeShared = script:FindFirstAncestor("ChromeShared")
+local CorePackages = game:GetService("CorePackages")
+local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
+
+require(CorePackages.Workspace.Packages.Chrome)
+
+local ViewportUtil = require(ChromeShared.Service.ViewportUtil)
+local Constants = require(ChromeShared.Unibar.Constants)
+local FFlagChromeWindowSignalConstraintsToggle = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeWindowSignalConstraintsToggle
+
+local function getConstrainedWindowSize(n1: number, n2: number, b1: boolean?) -- line: 18
+	-- upvalues: ViewportUtil (copy), FFlagChromeWindowSignalConstraintsToggle (copy), Constants (copy)
+	local v12 = ViewportUtil.mobileDevice:get()
+	local v13 = ViewportUtil.screenSize:get()
+	local v14 = v13.Y > v13.X
+
+	if v12 and (not FFlagChromeWindowSignalConstraintsToggle or not b1) then
+		if v14 then
+			n2 = math.min(n2, Constants.MAX_HEIGHT_PORTRAIT)
+			n1 = math.min(n1, Constants.MAX_WIDTH_PORTRAIT)
+		elseif not v14 then
+			n2 = math.min(n2, Constants.MAX_HEIGHT_LANDSCAPE)
+			n1 = math.min(n1, Constants.MAX_WIDTH_LANDSCAPE)
+		end
+	end
+
+	return UDim2.new(0, n1, 0, n2)
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(n3: number?, n4: number?, b2: boolean?, b3: boolean?) -- line: 43
+	-- upvalues: FFlagChromeWindowSignalConstraintsToggle (copy), getConstrainedWindowSize (copy), Constants (copy), Signal (copy), t1 (copy)
+	return (setmetatable({
+		_state = if not FFlagChromeWindowSignalConstraintsToggle then getConstrainedWindowSize(n3 or Constants.DEFAULT_WIDTH, n4 or Constants.DEFAULT_HEIGHT) else getConstrainedWindowSize(n3 or Constants.DEFAULT_WIDTH, n4 or Constants.DEFAULT_HEIGHT, b3 or false),
+		_isLarge = b2 or false,
+		_ignoreConstraints = if not FFlagChromeWindowSignalConstraintsToggle then nil else b3 or false,
+		_changeSignal = Signal.new()
+	}, t1))
+end
+function t1.connect(p1, p2) -- line: 67
+	return p1._changeSignal:connect(p2)
+end
+function t1.requestSize(t2: {[any]: any}, n5: number, n6: number) -- line: 72
+	-- upvalues: FFlagChromeWindowSignalConstraintsToggle (copy), getConstrainedWindowSize (copy)
+	local v24 = if not FFlagChromeWindowSignalConstraintsToggle then getConstrainedWindowSize(n5, n6) else getConstrainedWindowSize(n5, n6, t2._ignoreConstraints)
+
+	if v24 ~= t2._state then
+		t2._state = v24
+		t2._changeSignal:fire(v24)
+	end
+end
+function t1.toggleIsLarge(p3) -- line: 83
+	local v26 = not p3._isLarge
+
+	p3._isLarge = v26
+	p3._changeSignal:fire(v26)
+end
+function t1.get(p4) -- line: 89
+	return p4._state
+end
+function t1.getIsLarge(p5) -- line: 93
+	return p5._isLarge
+end
+function t1.updateConstraints(p6) -- line: 98
+	p6:requestSize(p6._state.Width.Offset, p6._state.Height.Offset)
+end
+
+return t1

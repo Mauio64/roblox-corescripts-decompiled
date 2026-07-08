@@ -1,56 +1,62 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(script.Parent.withNavigation);
-local v4 = require(l_Parent_0.Events);
-local v5 = {
-    [v4.WillFocus] = "onWillFocus", 
-    [v4.DidFocus] = "onDidFocus", 
-    [v4.WillBlur] = "onWillBlur", 
-    [v4.DidBlur] = "onDidBlur"
-};
-local v6 = v2.Component:extend("NavigationEvents");
-v6.didMount = function(v7) --[[ Line: 51 ]] --[[ Name: didMount ]]
-    v7:subscribeAll();
-end;
-v6.didUpdate = function(v8, v9) --[[ Line: 58 ]] --[[ Name: didUpdate ]]
-    if v8.props.navigation ~= v9.navigation then
-        v8:removeAll();
-        v8:subscribeAll();
-    end;
-end;
-v6.willUnmount = function(v10) --[[ Line: 66 ]] --[[ Name: willUnmount ]]
-    v10:removeAll();
-end;
-v6.getPropListener = function(v11, v12) --[[ Line: 70 ]] --[[ Name: getPropListener ]]
-    -- upvalues: v5 (copy)
-    return v11.props[v5[v12]];
-end;
-v6.subscribeAll = function(v13) --[[ Line: 74 ]] --[[ Name: subscribeAll ]]
-    -- upvalues: v5 (copy)
-    local l_navigation_0 = v13.props.navigation;
-    v13.subscriptions = {};
-    for v15 in v5 do
-        v13.subscriptions[v15] = l_navigation_0.addListener(v15, function(...) --[[ Line: 80 ]]
-            -- upvalues: v13 (copy), v15 (copy)
-            local v16 = v13:getPropListener(v15);
-            if v16 then
-                v16(...);
-            end;
-        end);
-    end;
-end;
-v6.removeAll = function(v17) --[[ Line: 90 ]] --[[ Name: removeAll ]]
-    -- upvalues: v5 (copy)
-    for v18 in v5 do
-        local v19 = v17.subscriptions[v18];
-        if v19 then
-            v19.remove();
-            v17.subscriptions[v18] = nil;
-        end;
-    end;
-end;
-v6.render = function(_) --[[ Line: 100 ]] --[[ Name: render ]]
-    return nil;
-end;
-return v3(v6);
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local withNavigation = require(script.Parent.withNavigation)
+local Events = require(ParentParent.Events)
+local t1 = {
+	[Events.WillFocus] = "onWillFocus",
+	[Events.DidFocus] = "onDidFocus",
+	[Events.WillBlur] = "onWillBlur",
+	[Events.DidBlur] = "onDidBlur"
+}
+local v7 = React.Component:extend("NavigationEvents")
+
+function v7.didMount(p1) -- line: 51
+	p1:subscribeAll()
+end
+function v7.didUpdate(p2, p3) -- line: 58
+	if p2.props.navigation ~= p3.navigation then
+		p2:removeAll()
+		p2:subscribeAll()
+	end
+end
+function v7.willUnmount(p4) -- line: 66
+	p4:removeAll()
+end
+function v7.getPropListener(p5, p6) -- line: 70
+	-- upvalues: t1 (copy)
+	return p5.props[t1[p6]]
+end
+function v7.subscribeAll(p7) -- line: 74
+	-- upvalues: t1 (copy)
+	local navigation = p7.props.navigation
+
+	p7.subscriptions = {}
+
+	for v16 in t1 do
+		p7.subscriptions[v16] = navigation.addListener(v16, function(...) -- line: 80
+			-- upvalues: p7 (copy), v16 (copy)
+			local v21 = p7:getPropListener(v16)
+
+			if v21 then
+				v21(...)
+			end
+		end)
+	end
+end
+function v7.removeAll(p8) -- line: 90
+	-- upvalues: t1 (copy)
+	for v18 in t1 do
+		local v19 = p8.subscriptions[v18]
+
+		if v19 then
+			v19.remove()
+			p8.subscriptions[v18] = nil
+		end
+	end
+end
+function v7.render(_) -- line: 100
+	return nil
+end
+
+return withNavigation(v7)

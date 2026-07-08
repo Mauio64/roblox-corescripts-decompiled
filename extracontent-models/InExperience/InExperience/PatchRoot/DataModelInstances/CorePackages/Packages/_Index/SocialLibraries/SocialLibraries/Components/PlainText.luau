@@ -1,52 +1,55 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local v2 = require(script.Parent.ChatBubbleContainer);
-local l_Roact_0 = v1.Roact;
-local l_withStyle_0 = v1.UIBlox.Style.withStyle;
-local l_FitTextLabel_0 = v1.RoactFitComponents.FitTextLabel;
-local v6 = l_Roact_0.PureComponent:extend("PlainText");
-v6.defaultProps = {
-    text = "", 
-    maxWidth = 0, 
-    innerPadding = 0, 
-    isIncoming = false, 
-    hasTail = false, 
-    LayoutOrder = 0, 
-    isPending = false, 
-    [l_Roact_0.Change.AbsoluteSize] = function() --[[ Line: 17 ]]
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local ChatBubbleContainer = require(script.Parent.ChatBubbleContainer)
+local Roact = dependencies.Roact
+local withStyle = dependencies.UIBlox.Style.withStyle
+local FitTextLabel = dependencies.RoactFitComponents.FitTextLabel
+local v7 = Roact.PureComponent:extend("PlainText")
 
-    end
-};
-v6.render = function(v7) --[[ Line: 20 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), l_Roact_0 (copy), v2 (copy), l_FitTextLabel_0 (copy)
-    return l_withStyle_0(function(v8) --[[ Line: 21 ]]
-        -- upvalues: v7 (copy), l_Roact_0 (ref), v2 (ref), l_FitTextLabel_0 (ref)
-        local l_maxWidth_0 = v7.props.maxWidth;
-        local l_innerPadding_0 = v7.props.innerPadding;
-        local v11 = math.max(0, l_maxWidth_0 - l_innerPadding_0);
-        local l_Body_0 = v8.Font.Body;
-        local v13 = v8.Font.BaseSize * l_Body_0.RelativeSize;
-        return l_Roact_0.createElement(v2, {
-            isIncoming = v7.props.isIncoming, 
-            hasTail = v7.props.hasTail, 
-            isPending = v7.props.isPending, 
-            padding = l_innerPadding_0, 
-            LayoutOrder = v7.props.LayoutOrder, 
-            [l_Roact_0.Change.AbsoluteSize] = v7.props[l_Roact_0.Change.AbsoluteSize]
-        }, {
-            textContent = l_Roact_0.createElement(l_FitTextLabel_0, {
-                Text = v7.props.text, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                BackgroundTransparency = 1, 
-                TextColor3 = v8.Theme.TextEmphasis.Color, 
-                width = l_FitTextLabel_0.Width.FitToText, 
-                maximumWidth = v11, 
-                Font = v7.props.font or l_Body_0.Font, 
-                TextSize = v7.props.textSize or v13, 
-                TextTransparency = v7.props.isPending and v8.Theme.TextMuted.Transparency or 0, 
-                TextYAlignment = Enum.TextYAlignment.Top
-            })
-        });
-    end);
-end;
-return v6;
+v7.defaultProps = {
+	text = "",
+	maxWidth = 0,
+	innerPadding = 0,
+	isIncoming = false,
+	hasTail = false,
+	LayoutOrder = 0,
+	isPending = false,
+	[Roact.Change.AbsoluteSize] = function() -- line: 17
+	end
+}
+
+function v7.render(p1) -- line: 20
+	-- upvalues: withStyle (copy), Roact (copy), ChatBubbleContainer (copy), FitTextLabel (copy)
+	return withStyle(function(p2) -- line: 21
+		-- upvalues: p1 (copy), Roact (copy), ChatBubbleContainer (copy), FitTextLabel (copy)
+		local maxWidth = p1.props.maxWidth
+		local innerPadding = p1.props.innerPadding
+		local v12 = math.max(0, maxWidth - innerPadding)
+		local Body = p2.Font.Body
+		local v14 = p2.Font.BaseSize * Body.RelativeSize
+
+		return Roact.createElement(ChatBubbleContainer, {
+			isIncoming = p1.props.isIncoming,
+			hasTail = p1.props.hasTail,
+			isPending = p1.props.isPending,
+			padding = innerPadding,
+			LayoutOrder = p1.props.LayoutOrder,
+			[Roact.Change.AbsoluteSize] = p1.props[Roact.Change.AbsoluteSize]
+		}, {
+			textContent = Roact.createElement(FitTextLabel, {
+				BackgroundTransparency = 1,
+				Text = p1.props.text,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextColor3 = p2.Theme.TextEmphasis.Color,
+				width = FitTextLabel.Width.FitToText,
+				maximumWidth = v12,
+				Font = p1.props.font or Body.Font,
+				TextSize = p1.props.textSize or v14,
+				TextTransparency = p1.props.isPending and p2.Theme.TextMuted.Transparency or 0,
+				TextYAlignment = Enum.TextYAlignment.Top
+			})
+		})
+	end)
+end
+
+return v7

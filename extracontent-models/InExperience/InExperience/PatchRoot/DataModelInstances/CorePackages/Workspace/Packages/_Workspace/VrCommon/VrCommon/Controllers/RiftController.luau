@@ -1,76 +1,80 @@
-local l_Parent_0 = script:FindFirstAncestor("VrCommon").Parent;
-local l_Create_0 = require(l_Parent_0.AppCommonLib).Create;
-local l_Granite_0 = Enum.Material.Granite;
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 13 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), l_Create_0 (copy), l_Granite_0 (copy)
-    local v5 = setmetatable({}, v3);
-    v5.userCFrame = v4;
-    v5.model = l_Create_0("Model")({
-        Name = "RiftController", 
-        Archivable = false
-    });
-    v5.origin = l_Create_0("Part")({
-        Parent = v5.model, 
-        Name = "Origin", 
-        Anchored = true, 
-        Transparency = 1, 
-        Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806, 0), 
-        CanCollide = false, 
-        CanQuery = false, 
-        CanTouch = false
-    });
-    v5.parts = {};
-    local v6 = l_Create_0("Part")({
-        Parent = v5.model, 
-        Name = "body", 
-        Anchored = true, 
-        Material = l_Granite_0, 
-        Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806, 0), 
-        Transparency = 0.25, 
-        CFrame = v5.origin.CFrame, 
-        CanCollide = false, 
-        CanQuery = false, 
-        CanTouch = false
-    });
-    v5.mesh = l_Create_0("SpecialMesh")({
-        Parent = v6, 
-        Name = "Mesh", 
-        MeshId = v4 == Enum.UserCFrame.LeftHand and "rbxassetid://9597097835" or "rbxassetid://9597101144", 
-        TextureId = "rbxassetid://9597123835", 
-        Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844, 0)
-    });
-    local _ = l_Create_0("Weld")({
-        Parent = v6, 
-        Name = "Weld", 
-        Part0 = v5.origin, 
-        Part1 = v6
-    });
-    v5.parts.body = v6;
-    v5.model.PrimaryPart = v5.origin;
-    return v5;
-end;
-v3.setCFrame = function(v8, v9) --[[ Line: 68 ]] --[[ Name: setCFrame ]]
-    v8.model:SetPrimaryPartCFrame(v9 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03, 0.06));
-end;
-v3.setCFrameAndScale = function(v10, v11, v12) --[[ Line: 72 ]] --[[ Name: setCFrameAndScale ]]
-    v10.model:SetPrimaryPartCFrame(v11 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03 * v12, 0.06 * v12));
-    v10.mesh.Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844, 0) * v12;
-end;
-v3.onButtonInputChanged = function(_, _, _) --[[ Line: 79 ]] --[[ Name: onButtonInputChanged ]]
+local Parent = script:FindFirstAncestor("VrCommon").Parent
+local Create = require(Parent.AppCommonLib).Create
+local Granite = Enum.Material.Granite
+local t1 = {}
 
-end;
-v3.onInputBegan = function(v16, v17) --[[ Line: 81 ]] --[[ Name: onInputBegan ]]
-    v16:onButtonInputChanged(v17, true);
-end;
-v3.onInputChanged = function(_, _) --[[ Line: 85 ]] --[[ Name: onInputChanged ]]
+t1.__index = t1
 
-end;
-v3.onInputEnded = function(v20, v21) --[[ Line: 87 ]] --[[ Name: onInputEnded ]]
-    v20:onButtonInputChanged(v21, false);
-end;
-v3.onTouchpadModeChanged = function(_, _, _) --[[ Line: 91 ]] --[[ Name: onTouchpadModeChanged ]]
+function t1.new(p1) -- line: 13
+	-- upvalues: t1 (copy), Create (copy), Granite (copy)
+	local self = setmetatable({}, t1)
 
-end;
-return v3;
+	self.userCFrame = p1
+	self.model = Create("Model")({
+		Name = "RiftController",
+		Archivable = false
+	})
+	self.origin = Create("Part")({
+		Name = "Origin",
+		Anchored = true,
+		Transparency = 1,
+		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Parent = self.model
+	})
+	self.parts = {}
+
+	local v7 = Create("Part")({
+		Name = "body",
+		Anchored = true,
+		Size = Vector3.new(0.05000000074505806, 0.05000000074505806, 0.05000000074505806),
+		Transparency = 0.25,
+		CanCollide = false,
+		CanQuery = false,
+		CanTouch = false,
+		Parent = self.model,
+		Material = Granite,
+		CFrame = self.origin.CFrame
+	})
+
+	self.mesh = Create("SpecialMesh")({
+		Name = "Mesh",
+		TextureId = "rbxassetid://9597123835",
+		Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844),
+		Parent = v7,
+		MeshId = p1 ~= Enum.UserCFrame.LeftHand and "rbxassetid://9597101144" or "rbxassetid://9597097835"
+	})
+	Create("Weld")({
+		Name = "Weld",
+		Parent = v7,
+		Part0 = self.origin,
+		Part1 = v7
+	})
+	self.parts.body = v7
+	self.model.PrimaryPart = self.origin
+
+	return self
+end
+function t1.setCFrame(p2, p3) -- line: 68
+	p2.model:SetPrimaryPartCFrame(p3 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03, 0.06))
+end
+function t1.setCFrameAndScale(p4, p5, p6) -- line: 72
+	p4.model:SetPrimaryPartCFrame(p5 * CFrame.Angles(0.3490658503988659, 0, 0) * CFrame.new(0, -0.03 * p6, 0.06 * p6))
+	p4.mesh.Scale = Vector3.new(0.03200000151991844, 0.03200000151991844, 0.03200000151991844) * p6
+end
+function t1.onButtonInputChanged(_, _, _) -- line: 79
+end
+function t1.onInputBegan(p10, p11) -- line: 81
+	p10:onButtonInputChanged(p11, true)
+end
+function t1.onInputChanged(_, _) -- line: 85
+end
+function t1.onInputEnded(p14, p15) -- line: 87
+	p14:onButtonInputChanged(p15, false)
+end
+function t1.onTouchpadModeChanged(_, _, _) -- line: 91
+end
+
+return t1

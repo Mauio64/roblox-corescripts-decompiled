@@ -1,6 +1,9 @@
-return function(v0, v1) --[[ Line: 18 ]] --[[ Name: withFlag ]]
-    local v2 = game:SetFastFlagForTesting(v0, true);
-    local l_status_0, l_result_0 = pcall(v1);
-    game:SetFastFlagForTesting(v0, v2);
-    assert(l_status_0, (tostring(l_result_0)));
-end;
+local function withFlag(p1, p2) -- line: 18
+	local v4 = game:SetFastFlagForTesting(p1, true)
+	local ok, result = pcall(p2)
+
+	game:SetFastFlagForTesting(p1, v4)
+	assert(ok, (tostring(result)))
+end
+
+return withFlag

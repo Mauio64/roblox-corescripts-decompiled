@@ -1,45 +1,47 @@
-local v0 = require(script.Reducers);
-local v1 = require(script.Actions);
-local v2 = require(script.Models);
-local v3 = require(script.Enums);
-local v4 = require(script.Hooks);
-local v5 = require(script.Logger);
-local v6 = require(script.RoduxSquadsTypes);
-local l_Parent_0 = script.Parent;
-local v8 = require(l_Parent_0.Rodux);
-local v9 = require(l_Parent_0.Cryo);
-local v10 = require(l_Parent_0.RoduxNetworking);
-local v11 = require(l_Parent_0.NetworkingSquads);
+local Reducers = require(script.Reducers)
+local Actions = require(script.Actions)
+local Models = require(script.Models)
+local Enums = require(script.Enums)
+local Hooks = require(script.Hooks)
+local Logger = require(script.Logger)
+local RoduxSquadsTypes = require(script.RoduxSquadsTypes)
+local scriptParent = script.Parent
+local Rodux = require(scriptParent.Rodux)
+local Cryo = require(scriptParent.Cryo)
+local RoduxNetworking = require(scriptParent.RoduxNetworking)
+local NetworkingSquads = require(scriptParent.NetworkingSquads)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    config = function(v12) --[[ Line: 21 ]] --[[ Name: config ]]
-        -- upvalues: v9 (copy), v11 (copy), v10 (copy), v0 (copy), v8 (copy), v1 (copy), v2 (copy), v3 (copy)
-        v12 = v9.Dictionary.join(v12, {
-            NetworkingSquads = v11.config({
-                roduxNetworking = v10.mock()
-            })
-        });
-        local v13, v14, v15 = v0.currentSquad(v12);
-        return {
-            installReducer = function() --[[ Line: 30 ]] --[[ Name: installReducer ]]
-                -- upvalues: v8 (ref), v13 (copy), v14 (copy), v0 (ref), v12 (ref)
-                return v8.combineReducers({
-                    currentSquad = v13, 
-                    currentSquadPersist = v14, 
-                    currentExperienceInvite = v0.currentExperienceInvite(v12), 
-                    currentExperienceInviteStatus = v0.currentExperienceInviteStatus(), 
-                    partialSquads = v0.partialSquads()
-                });
-            end, 
-            PersistManagers = {
-                currentSquadPersistManager = v15
-            }, 
-            Actions = v1, 
-            Models = v2, 
-            Enums = v3
-        };
-    end, 
-    Hooks = v4, 
-    Logger = v5, 
-    RoduxSquadsTypes = v6
-};
+	["jest.config"] = script["jest.config"],
+	config = function(p1) -- line: 21
+		-- upvalues: Cryo (copy), NetworkingSquads (copy), RoduxNetworking (copy), Reducers (copy), Rodux (copy), Actions (copy), Models (copy), Enums (copy)
+		local u14 = Cryo.Dictionary.join(p1, {
+			NetworkingSquads = NetworkingSquads.config({
+				roduxNetworking = RoduxNetworking.mock()
+			})
+		})
+		local v15, v16, v17 = Reducers.currentSquad(u14)
+
+		return {
+			installReducer = function() -- line: 30
+				-- upvalues: Rodux (copy), v15 (copy), v16 (copy), Reducers (copy), u14 (ref)
+				return Rodux.combineReducers({
+					currentSquad = v15,
+					currentSquadPersist = v16,
+					currentExperienceInvite = Reducers.currentExperienceInvite(u14),
+					currentExperienceInviteStatus = Reducers.currentExperienceInviteStatus(),
+					partialSquads = Reducers.partialSquads()
+				})
+			end,
+			PersistManagers = {
+				currentSquadPersistManager = v17
+			},
+			Actions = Actions,
+			Models = Models,
+			Enums = Enums
+		}
+	end,
+	Hooks = Hooks,
+	Logger = Logger,
+	RoduxSquadsTypes = RoduxSquadsTypes
+}

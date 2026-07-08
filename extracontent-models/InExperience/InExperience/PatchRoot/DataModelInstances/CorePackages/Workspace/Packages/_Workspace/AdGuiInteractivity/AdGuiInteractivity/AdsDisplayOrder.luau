@@ -1,4 +1,4 @@
 return {
-    AdPlayer = 10, 
-    Modal = 15
-};
+	AdPlayer = 10,
+	Modal = 15
+}

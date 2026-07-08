@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatAddUserAsyncNilCheck", false);
+return game:DefineFastFlag("ExpChatAddUserAsyncNilCheck", false)

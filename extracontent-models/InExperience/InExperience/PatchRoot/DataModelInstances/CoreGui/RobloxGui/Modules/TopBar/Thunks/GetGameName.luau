@@ -1,30 +1,33 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_HttpRbxApiService_0 = game:GetService("HttpRbxApiService");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v4 = require(l_CorePackages_0.Packages.Promise);
-local v5 = require(l_RobloxGui_0.Modules.Common.httpRequest)(l_HttpRbxApiService_0);
-local l_Parent_0 = script.Parent.Parent;
-local v7 = require(l_Parent_0.Actions.SetGameName);
-local l_GetGameNameAndDescription_0 = require(l_CorePackages_0.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription;
-local l_Parent_1 = script.Parent.Parent;
-if require(l_Parent_1.Flags.FFlagTopBarDeprecateGameInfoRodux) then
-    return nil;
-else
-    return function(v10) --[[ Line: 28 ]]
-        -- upvalues: v4 (copy), l_GetGameNameAndDescription_0 (copy), v5 (copy), v7 (copy)
-        if game.GameId == 0 then
-            return v4.resolve();
-        else
-            return l_GetGameNameAndDescription_0(v5, game.GameId):andThen(function(v11) --[[ Line: 33 ]]
-                -- upvalues: v10 (copy), v7 (ref)
-                v10:dispatch(v7(v11.Name));
-                return v11.Name;
-            end, function() --[[ Line: 37 ]]
-                -- upvalues: v4 (ref)
-                warn("Unable to get game name for Gamepad Menu");
-                return v4.reject();
-            end);
-        end;
-    end;
-end;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local HttpRbxApiService = game:GetService("HttpRbxApiService")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local Promise = require(CorePackages.Packages.Promise)
+local v6 = require(RobloxGui.Modules.Common.httpRequest)(HttpRbxApiService)
+local ParentParent = script.Parent.Parent
+local SetGameName = require(ParentParent.Actions.SetGameName)
+local GetGameNameAndDescription = require(CorePackages.Workspace.Packages.GameDetailRodux).GetGameNameAndDescription
+local ParentParent2 = script.Parent.Parent
+
+if require(ParentParent2.Flags.FFlagTopBarDeprecateGameInfoRodux) then
+	return nil
+end
+
+return function(p1) -- line: 28
+	-- upvalues: Promise (copy), GetGameNameAndDescription (copy), v6 (copy), SetGameName (copy)
+	if game.GameId == 0 then
+		return Promise.resolve()
+	end
+
+	return GetGameNameAndDescription(v6, game.GameId):andThen(function(p2) -- line: 33
+		-- upvalues: p1 (copy), SetGameName (copy)
+		p1:dispatch(SetGameName(p2.Name))
+
+		return p2.Name
+	end, function() -- line: 37
+		-- upvalues: Promise (copy)
+		warn("Unable to get game name for Gamepad Menu")
+
+		return Promise.reject()
+	end)
+end

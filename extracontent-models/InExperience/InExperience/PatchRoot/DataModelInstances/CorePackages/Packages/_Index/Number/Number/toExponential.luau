@@ -1,21 +1,23 @@
-return function(v0, v1) --[[ Line: 17 ]]
-    local l_v0_0 = v0;
-    if typeof(v0) == "string" then
-        l_v0_0 = tonumber(v0) or (0/0);
-    end;
-    if typeof(l_v0_0) ~= "number" then
-        return "nan";
-    else
-        if v1 ~= nil then
-            if typeof(v1) ~= "number" then
-                error("TypeError: fractionDigits must be a number between 0 and 100");
-            end;
-            if v1 < 0 or v1 > 100 then
-                error("RangeError: fractionDigits must be between 0 and 100");
-            end;
-        end;
-        local v3 = nil;
-        v3 = v1 == nil and "%e" or "%." .. tostring(v1) .. "e";
-        return (string.format(v3, l_v0_0):gsub("%+0", "+"):gsub("%-0", "-"):gsub("0*e", "e"));
-    end;
-end;
+return function(p1, n1: number?) -- line: 17
+	if typeof(p1) == "string" then
+		p1 = tonumber(p1) or (0/0)
+	end
+
+	if typeof(p1) ~= "number" then
+		return "nan"
+	end
+
+	if n1 ~= nil then
+		if typeof(n1) ~= "number" then
+			error("TypeError: fractionDigits must be a number between 0 and 100")
+		end
+
+		if n1 < 0 or n1 > 100 then
+			error("RangeError: fractionDigits must be between 0 and 100")
+		end
+	end
+
+	local v3 = if n1 ~= nil then "%." .. tostring(n1) .. "e" else "%e"
+
+	return (string.format(v3, p1):gsub("%+0", "+"):gsub("%-0", "-"):gsub("0*e", "e"))
+end

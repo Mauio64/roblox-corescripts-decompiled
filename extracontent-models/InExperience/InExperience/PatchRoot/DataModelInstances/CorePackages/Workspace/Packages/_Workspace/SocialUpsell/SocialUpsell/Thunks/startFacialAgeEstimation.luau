@@ -1,63 +1,107 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AmpUpsell);
-local l_AccessResponseEnum_0 = v2.AmpEnums.AccessResponseEnum;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_NavigateBack_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateBack;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v7 = require(l_script_FirstAncestor_0.Enum.SocialUpsellType);
-local l_FFlagEnableAEGIS2CommsFAEUpsell_0 = require(l_Parent_0.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell;
-local v9 = game:DefineFastFlag("ManuallyInvokeAmpUpsell2", false);
-local v10 = require(l_script_FirstAncestor_0.Utils.manuallyInvokeAmpUpsell);
-local l_InExpAmpWizardController_0 = v2.InExpAmpWizardController;
-local v12 = if v9 then require(l_script_FirstAncestor_0.Flag.FStringCommsFAEFeatureName) else game:DefineFastString("CommsFAEFeatureName", "TriggerAgeVerifyRecourse");
-local v13 = if v9 then require(l_script_FirstAncestor_0.Flag.FStringCommsFAENamespace) else game:DefineFastString("CommsFAENamespace", "social/Upsells");
-return function(v14, v15, v16, v17, v18) --[[ Line: 23 ]]
-    -- upvalues: l_FFlagEnableAEGIS2CommsFAEUpsell_0 (copy), v7 (copy), v9 (copy), v10 (copy), l_InExpAmpWizardController_0 (copy), v12 (copy), l_AccessResponseEnum_0 (copy), v13 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), l_NavigateBack_0 (copy)
-    return function(v19) --[[ Line: 30 ]]
-        -- upvalues: l_FFlagEnableAEGIS2CommsFAEUpsell_0 (ref), v18 (copy), v14 (copy), v7 (ref), v9 (ref), v10 (ref), v15 (copy), v16 (copy), l_InExpAmpWizardController_0 (ref), v12 (ref), l_AccessResponseEnum_0 (ref), v13 (ref), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v17 (copy), l_NavigateBack_0 (ref)
-        if l_FFlagEnableAEGIS2CommsFAEUpsell_0 and v18 then
-            local v20 = v14 or v7.FacialAgeEstimation;
-            if v9 then
-                return (v10(v20, v15, v16));
-            else
-                return (l_InExpAmpWizardController_0.OpenAmpWizardContainerInExp(v12, function(v21, _) --[[ Line: 37 ]]
-                    -- upvalues: l_AccessResponseEnum_0 (ref), v15 (ref), v16 (ref)
-                    if v21 == l_AccessResponseEnum_0.Granted then
-                        if v15 then
-                            v15();
-                            return;
-                        end;
-                    elseif v16 then
-                        v16();
-                    end;
-                end, nil, v20, nil, v13));
-            end;
-        else
-            return v19:dispatch(l_NavigateDown_0({
-                name = l_AppPage_0.AmpWizardContainer, 
-                extraProps = {
-                    featureName = v12, 
-                    nameSpace = v13, 
-                    entryPointEventCtx = v14 or v7.FacialAgeEstimation, 
-                    metadata = {
-                        source = v17
-                    }, 
-                    skipFacialAgeEstimationWebLinkModal = true, 
-                    completionCallback = function(v23, _) --[[ Line: 65 ]] --[[ Name: completionCallback ]]
-                        -- upvalues: v19 (copy), l_NavigateBack_0 (ref), l_AccessResponseEnum_0 (ref), v15 (ref), v16 (ref)
-                        v19:dispatch(l_NavigateBack_0(true));
-                        if v23 == l_AccessResponseEnum_0.Granted then
-                            if v15 then
-                                v15();
-                                return;
-                            end;
-                        elseif v16 then
-                            v16();
-                        end;
-                    end
-                }
-            }));
-        end;
-    end;
-end;
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+local SocialUpsellParent = SocialUpsell.Parent
+local AmpUpsell = require(SocialUpsellParent.AmpUpsell)
+local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
+local OpenAmpWizardContainer = AmpUpsell.OpenAmpWizardContainer
+local AppPage = require(SocialUpsellParent.RobloxAppEnums).AppPage
+local NavigateBack = require(SocialUpsellParent.NavigationRodux).Thunks.NavigateBack
+local NavigateDown = require(SocialUpsellParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(SocialUpsellParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v10 = if not FFlagSignalsNavP3Dispatch then nil else require(SocialUpsellParent.RobloxAppNavigation).NavigationCommands
+local SocialUpsellType = require(SocialUpsell.Enum.SocialUpsellType)
+local FFlagEnableAEGIS2CommsFAEUpsell = require(SocialUpsellParent.SharedFlags).FFlagEnableAEGIS2CommsFAEUpsell
+local v13 = game:DefineFastFlag("ManuallyInvokeAmpUpsell2", false)
+local FFlagSupportVPC = require(SocialUpsell.Flag.FFlagSupportVPC)
+local manuallyInvokeAmpUpsell = require(SocialUpsell.Utils.manuallyInvokeAmpUpsell)
+local FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature = require(SocialUpsellParent.SharedFlags).FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature
+local FStringCoreContentAmpNameSpace = require(SocialUpsellParent.SharedFlags).FStringCoreContentAmpNameSpace
+local InExpAmpWizardController = AmpUpsell.InExpAmpWizardController
+local v19 = if not v13 then game:DefineFastString("CommsFAEFeatureName", "TriggerAgeVerifyRecourse") else require(SocialUpsell.Flag.FStringCommsFAEFeatureName)
+local v20 = if not v13 then game:DefineFastString("CommsFAENamespace", "social/Upsells") else require(SocialUpsell.Flag.FStringCommsFAENamespace)
+
+return function(s1: string?, p1: ((...any) -> ...any)?, p2: ((...any) -> ...any)?, s2: string?, b1: boolean?, b2: boolean?) -- line: 33
+	-- upvalues: FFlagSupportVPC (copy), SocialUpsellType (copy), AccessResponseEnum (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), InExpAmpWizardController (copy), FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature (copy), FStringCoreContentAmpNameSpace (copy), OpenAmpWizardContainer (copy), v13 (copy), manuallyInvokeAmpUpsell (copy), v19 (copy), v20 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), NavigateBack (copy), NavigateDown (copy)
+	return function(p3) -- line: 42
+		-- upvalues: FFlagSupportVPC (copy), b2 (copy), s1 (copy), SocialUpsellType (copy), s2 (copy), AccessResponseEnum (copy), p1 (copy), p2 (copy), FFlagEnableAEGIS2CommsFAEUpsell (copy), b1 (copy), InExpAmpWizardController (copy), FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature (copy), FStringCoreContentAmpNameSpace (copy), OpenAmpWizardContainer (copy), v13 (copy), manuallyInvokeAmpUpsell (copy), v19 (copy), v20 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v10 (copy), NavigateBack (copy), NavigateDown (copy)
+		if FFlagSupportVPC and b2 then
+			local v28 = s1 or SocialUpsellType.FacialAgeEstimation .. (s2 or "")
+
+			local function vpcCompletionCallback(p4, _) -- line: 46
+				-- upvalues: AccessResponseEnum (copy), p1 (copy), p2 (copy)
+				if p4 == AccessResponseEnum.Granted then
+					if p1 then
+						p1()
+
+						return
+					end
+				elseif p2 then
+					p2()
+				end
+			end
+
+			if FFlagEnableAEGIS2CommsFAEUpsell and b1 then
+				return InExpAmpWizardController.OpenAmpWizardContainerInExp(FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature, vpcCompletionCallback, nil, v28, nil, FStringCoreContentAmpNameSpace)
+			end
+
+			return p3:dispatch(OpenAmpWizardContainer(FStringTriggerAgeCheckUpsellIncludingVPCAmpFeature, vpcCompletionCallback, nil, v28, nil, FStringCoreContentAmpNameSpace))
+		end
+
+		if FFlagEnableAEGIS2CommsFAEUpsell and b1 then
+			local v30 = s1 or SocialUpsellType.FacialAgeEstimation
+
+			if v13 then
+				return (manuallyInvokeAmpUpsell(v30, p1, p2))
+			end
+
+			return (InExpAmpWizardController.OpenAmpWizardContainerInExp(v19, function(p6, _) -- line: 85
+				-- upvalues: AccessResponseEnum (copy), p1 (copy), p2 (copy)
+				if p6 == AccessResponseEnum.Granted then
+					if p1 then
+						p1()
+
+						return
+					end
+				elseif p2 then
+					p2()
+				end
+			end, nil, v30, nil, v20))
+		end
+
+		local t1 = {
+			name = AppPage.AmpWizardContainer,
+			extraProps = {
+				skipFacialAgeEstimationWebLinkModal = true,
+				featureName = v19,
+				nameSpace = v20,
+				entryPointEventCtx = s1 or SocialUpsellType.FacialAgeEstimation,
+				metadata = {
+					source = s2
+				},
+				completionCallback = function(p8, _) -- line: 113
+					-- upvalues: FFlagSignalsNavP3Dispatch (copy), v10 (copy), p3 (copy), NavigateBack (copy), AccessResponseEnum (copy), p1 (copy), p2 (copy)
+					if FFlagSignalsNavP3Dispatch then
+						v10.back(true)
+					else
+						p3:dispatch(NavigateBack(true))
+					end
+
+					if p8 == AccessResponseEnum.Granted then
+						if p1 then
+							p1()
+
+							return
+						end
+					elseif p2 then
+						p2()
+					end
+				end
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			return v10.down(v10.fromLegacyPage(t1))
+		end
+
+		return p3:dispatch(NavigateDown(t1))
+	end
+end

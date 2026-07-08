@@ -1,6 +1,6 @@
 return {
-    Color = "Color", 
-    Inverse = "Inverse", 
-    LightMode = "LightMode", 
-    DarkMode = "DarkMode"
-};
+	Color = "Color",
+	Inverse = "Inverse",
+	LightMode = "LightMode",
+	DarkMode = "DarkMode"
+}

@@ -1,1 +1,1 @@
-return game:DefineFastInt("RelocateMobileMenuButtonsVariant", 0);
+return game:DefineFastInt("RelocateMobileMenuButtonsVariant", 0)

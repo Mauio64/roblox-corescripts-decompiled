@@ -1,6 +1,7 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 5 ]]
-    return {
-        segmentIndex = v1
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
+	return {
+		segmentIndex = p1
+	}
+end)

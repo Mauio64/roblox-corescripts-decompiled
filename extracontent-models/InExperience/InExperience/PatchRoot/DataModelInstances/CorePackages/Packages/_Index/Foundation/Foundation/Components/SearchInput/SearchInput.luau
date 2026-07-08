@@ -10,7 +10,6 @@ require(Components.Types)
 
 local View = require(Components.View)
 local Constants = require(Foundation.Constants)
-local Flags = require(Foundation.Utility.Flags)
 local Translator = require(Foundation.Utility.Localization.Translator)
 local useScaledValue = require(Foundation.Utility.useScaledValue)
 local useTextInputVariants = require(Foundation.Components.TextInput.useTextInputVariants)
@@ -26,56 +25,51 @@ local t1 = {
 	[SearchInputShape.Box] = Radius.None
 }
 local t2 = {
+	hasClearButton = true,
+	testId = "--foundation-search-input",
 	size = InputSize.Medium,
 	variant = InputVariant.Standard,
-	shape = SearchInputShape.Pill,
-	hasClearButton = not not Flags.FoundationInternalTextInputClearButton or nil,
-	testId = "--foundation-search-input"
+	shape = SearchInputShape.Pill
 }
 
-return React.memo(React.forwardRef(function(p1, p2) --[[ SearchInput ]] -- line: 76
-	-- upvalues: withDefaults (copy), t2 (copy), useTokens (copy), useTextInputVariants (copy), useScaledValue (copy), Constants (copy), Flags (copy), React (copy), View (copy), withCommonProps (copy), InternalTextInput (copy), t1 (copy), Translator (copy), Icon (copy), BuilderIcons (copy)
+local function SearchInput(p1, p2) -- line: 75
+	-- upvalues: withDefaults (copy), t2 (copy), useTokens (copy), useTextInputVariants (copy), useScaledValue (copy), Constants (copy), React (copy), View (copy), withCommonProps (copy), InternalTextInput (copy), t1 (copy), Translator (copy), Icon (copy), BuilderIcons (copy)
 	local v25 = withDefaults(p1, t2)
 	local v26 = useTokens()
 	local v27 = useTextInputVariants(v26, v25.size, v25.variant)
 	local v28 = useScaledValue(Constants.DEFAULT_INPUT_FIELD_WIDTH_PIXELS)
-
-	if Flags.FoundationInternalTextInputClearButton and v25.hasClearButton == nil then
-		v25.hasClearButton = true
-	end
-
-	local v29 = React.useMemo(function() -- line: 89
-		-- upvalues: Flags (copy), v27 (copy), v26 (copy)
-		return UDim2.fromOffset(0, (((if not Flags.FoundationInputVariantsConsolidateContainer then v27.outerContainer else v27.container)).minHeight - v26.Stroke.Standard) / 2)
+	local v29 = React.useMemo(function() -- line: 83
+		-- upvalues: v27 (copy), v26 (copy)
+		return UDim2.fromOffset(0, (v27.container.minHeight - v26.Stroke.Standard) / 2)
 	end, {
-		((if not Flags.FoundationInputVariantsConsolidateContainer then v27.outerContainer else v27.container)).minHeight,
+		v27.container.minHeight,
 		v26.Stroke.Standard
 	})
 
 	return React.createElement(View, withCommonProps(v25, {
-		Size = if not v25.width then UDim2.new(UDim.new(0, v28), UDim.new(0, 0)) else UDim2.new(v25.width, UDim.new(0, 0)),
-		tag = "auto-y"
+		tag = "auto-y",
+		Size = if not v25.width then UDim2.new(UDim.new(0, v28), UDim.new(0, 0)) else UDim2.new(v25.width, UDim.new(0, 0))
 	}), {
 		Input = React.createElement(InternalTextInput, {
 			ref = p2,
 			hasError = v25.hasError,
 			isDisabled = v25.isDisabled,
-			hasClearButton = if not Flags.FoundationInternalTextInputClearButton then nil else v25.hasClearButton,
+			hasClearButton = v25.hasClearButton,
 			text = v25.text,
 			size = v25.size,
 			radius = t1[v25.shape],
 			variant = v25.variant,
 			horizontalPadding = {
-				left = ((if not Flags.FoundationInputVariantsConsolidateContainer then v27.innerContainer else v27.container)).horizontalPadding,
-				right = ((if not Flags.FoundationInputVariantsConsolidateContainer then v27.innerContainer else v27.container)).horizontalPadding
+				left = v27.container.horizontalPadding,
+				right = v27.container.horizontalPadding
 			},
 			onChanged = v25.onChanged,
 			onFocus = v25.onFocusGained,
 			onFocusLost = v25.onFocusLost,
 			placeholder = if not v25.placeholder then Translator:FormatByKey("CommonUI.Controls.Action.Search") else v25.placeholder,
 			leadingElement = React.createElement(View, {
-				Position = v29,
-				tag = "anchor-center-left auto-xy"
+				tag = "anchor-center-left auto-xy",
+				Position = v29
 			}, {
 				Icon = React.createElement(Icon, {
 					name = BuilderIcons.Icon.MagnifyingGlass,
@@ -86,4 +80,6 @@ return React.memo(React.forwardRef(function(p1, p2) --[[ SearchInput ]] -- line:
 			testId = `{ v25.testId }--input`
 		})
 	})
-end))
+end
+
+return React.memo(React.forwardRef(SearchInput))

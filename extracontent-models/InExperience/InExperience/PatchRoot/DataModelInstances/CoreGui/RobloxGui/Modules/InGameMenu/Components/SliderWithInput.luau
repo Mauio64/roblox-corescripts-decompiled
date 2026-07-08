@@ -1,209 +1,233 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_ContextActionService_0 = game:GetService("ContextActionService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v4 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v4.Roact;
-local l_UIBlox_0 = v4.UIBlox;
-local l_Cryo_0 = v4.Cryo;
-local l_t_0 = v4.t;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_withSelectionCursorProvider_0 = l_UIBlox_0.App.SelectionImage.withSelectionCursorProvider;
-local l_CursorKind_0 = l_UIBlox_0.App.SelectionImage.CursorKind;
-local l_Parent_0 = script.Parent.Parent;
-local v13 = require(l_Parent_0.Utility.ExternalEventConnection);
-local v14 = require(script.Parent.Connection.FocusHandler);
-local v15 = require(script.Parent.Slider);
-local v16 = require(script.Parent.AssetImage);
-local v17 = l_Roact_0.PureComponent:extend("SliderWithInput");
-v17.defaultProps = {
-    width = UDim.new(1, 0)
-};
-v17.validateProps = l_t_0.intersection(l_t_0.strictInterface({
-    min = l_t_0.number, 
-    max = l_t_0.number, 
-    stepInterval = l_t_0.numberPositive, 
-    keyboardInputStepInterval = l_t_0.optional(l_t_0.numberPositive), 
-    value = l_t_0.number, 
-    valueChanged = l_t_0.callback, 
-    disabled = l_t_0.optional(l_t_0.boolean), 
-    width = l_t_0.optional(l_t_0.UDim), 
-    AnchorPoint = l_t_0.optional(l_t_0.Vector2), 
-    LayoutOrder = l_t_0.optional(l_t_0.integer), 
-    Position = l_t_0.optional(l_t_0.UDim2), 
-    canCaptureFocus = l_t_0.optional(l_t_0.boolean), 
-    isMenuOpen = l_t_0.optional(l_t_0.boolean), 
-    sliderDotRef = l_t_0.optional(l_t_0.table), 
-    onSelectionLost = l_t_0.callback, 
-    onSelectionGained = l_t_0.callback
-}), function(v18) --[[ Line: 66 ]]
-    if v18.min > v18.max then
-        return false, "min must be less than or equal to max";
-    elseif v18.value > v18.max or v18.value < v18.min then
-        return false, "value must be within min and max";
-    else
-        return true;
-    end;
-end);
-v17.init = function(v19) --[[ Line: 79 ]] --[[ Name: init ]]
-    -- upvalues: l_Roact_0 (copy)
-    v19.textBoxRef = l_Roact_0.createRef();
-    v19.state = {
-        textEntryMode = false
-    };
-end;
-v17.renderFocusHandler = function(v20) --[[ Line: 87 ]] --[[ Name: renderFocusHandler ]]
-    -- upvalues: l_Roact_0 (copy), v14 (copy), l_GuiService_0 (copy), l_ContextActionService_0 (copy)
-    return l_Roact_0.createElement(v14, {
-        isFocused = v20.props.canCaptureFocus and v20.state.textEntryMode or false, 
-        didFocus = function() --[[ Line: 91 ]] --[[ Name: didFocus ]]
-            -- upvalues: l_GuiService_0 (ref), v20 (copy), l_ContextActionService_0 (ref)
-            l_GuiService_0.CoreGuiNavigationEnabled = false;
-            local l_value_0 = v20.props.value;
-            l_ContextActionService_0:BindCoreAction("LeaveTextEntryMode", function(_, v23) --[[ Line: 100 ]]
-                -- upvalues: v20 (ref), l_value_0 (copy)
-                if v23 == Enum.UserInputState.End then
-                    v20:setState({
-                        textEntryMode = false
-                    });
-                    local l_current_0 = v20.textBoxRef.current;
-                    l_current_0.Text = l_value_0;
-                    l_current_0:ReleaseFocus();
-                    return Enum.ContextActionResult.Sink;
-                else
-                    return Enum.ContextActionResult.Pass;
-                end;
-            end, false, Enum.KeyCode.ButtonB);
-        end, 
-        didBlur = function() --[[ Line: 112 ]] --[[ Name: didBlur ]]
-            -- upvalues: l_GuiService_0 (ref), l_ContextActionService_0 (ref)
-            l_GuiService_0.CoreGuiNavigationEnabled = true;
-            l_ContextActionService_0:UnbindCoreAction("LeaveTextEntryMode");
-        end
-    }) or nil;
-end;
-v17.renderWithSelectionCursor = function(v25, v26) --[[ Line: 119 ]] --[[ Name: renderWithSelectionCursor ]]
-    -- upvalues: l_Cryo_0 (copy), l_Roact_0 (copy), v15 (copy), l_withStyle_0 (copy), v16 (copy), l_CursorKind_0 (copy), v13 (copy), l_UserInputService_0 (copy)
-    local l_props_0 = v25.props;
-    local v28 = l_Cryo_0.Dictionary.join(l_props_0, {
-        width = UDim.new(1, -80), 
-        LayoutOrder = l_Cryo_0.None, 
-        Position = l_Cryo_0.None, 
-        AnchorPoint = l_Cryo_0.None, 
-        keyboardInputStepInterval = l_Cryo_0.None, 
-        NextSelectionRight = v25.textBoxRef
-    });
-    return l_Roact_0.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(l_props_0.width.Scale, l_props_0.width.Offset, 0, 36), 
-        Position = l_props_0.Position, 
-        LayoutOrder = l_props_0.LayoutOrder
-    }, {
-        Slider = l_Roact_0.createElement(v15, v28), 
-        TextContainer = l_withStyle_0(function(v29) --[[ Line: 137 ]]
-            -- upvalues: l_props_0 (copy), l_Roact_0 (ref), v16 (ref), v25 (copy), v26 (copy), l_CursorKind_0 (ref)
-            local v30 = l_props_0.disabled and v29.Theme.TextMuted or v29.Theme.TextDefault;
-            return l_Roact_0.createElement(v16.Label, {
-                BackgroundTransparency = 1, 
-                imageKey = "RoundedRect", 
-                ImageTransparency = v29.Theme.BackgroundUIContrast.Transparency, 
-                ImageColor3 = v29.Theme.BackgroundUIContrast.Color, 
-                Size = UDim2.new(0, 64, 0, 36), 
-                Position = UDim2.new(1, 0, 0.5, 0), 
-                AnchorPoint = Vector2.new(1, 0.5)
-            }, {
-                FocusHandler = v25:renderFocusHandler(), 
-                Box = l_Roact_0.createElement("TextBox", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    Font = v29.Font.Body.Font, 
-                    TextScaled = true, 
-                    ClearTextOnFocus = false, 
-                    TextEditable = not l_props_0.disabled, 
-                    TextColor3 = v30.Color, 
-                    TextTransparency = v30.Transparency, 
-                    Text = tostring(l_props_0.value), 
-                    NextSelectionLeft = v25.props.sliderDotRef, 
-                    SelectionImageObject = v26(l_CursorKind_0.InputFields), 
-                    [l_Roact_0.Event.SelectionLost] = v25.props.onSelectionLost, 
-                    [l_Roact_0.Event.SelectionGained] = v25.props.onSelectionGained, 
-                    [l_Roact_0.Ref] = v25.textBoxRef, 
-                    [l_Roact_0.Event.Focused] = l_props_0.disabled and function(v31) --[[ Line: 167 ]]
-                        v31:ReleaseFocus(false);
-                    end or function() --[[ Line: 169 ]]
-                        -- upvalues: v25 (ref)
-                        v25:setState({
-                            textEntryMode = true
-                        });
-                    end, 
-                    [l_Roact_0.Event.FocusLost] = function(v32, _) --[[ Line: 172 ]]
-                        -- upvalues: v25 (ref), l_props_0 (ref)
-                        v25:setState({
-                            textEntryMode = false
-                        });
-                        local v34 = tonumber(v32.Text);
-                        if v34 ~= l_props_0.value then
-                            if v34 == nil then
-                                v32.Text = tostring(l_props_0.value);
-                                return;
-                            else
-                                local l_stepInterval_0 = l_props_0.stepInterval;
-                                if l_props_0.keyboardInputStepInterval then
-                                    l_stepInterval_0 = l_props_0.keyboardInputStepInterval;
-                                end;
-                                local v36 = math.clamp(math.floor(v34 / l_stepInterval_0 + 0.5) * l_stepInterval_0, l_props_0.min, l_props_0.max);
-                                v32.Text = tostring(v36);
-                                if v36 ~= l_props_0.value then
-                                    l_props_0.valueChanged(v36);
-                                end;
-                            end;
-                        end;
-                    end
-                }, {
-                    TextSizeConstraint = l_Roact_0.createElement("UITextSizeConstraint", {
-                        MinTextSize = v29.Font.Body.RelativeMinSize * v29.Font.BaseSize, 
-                        MaxTextSize = v29.Font.Body.RelativeSize * v29.Font.BaseSize
-                    })
-                })
-            });
-        end), 
-        UserInputConnection = not l_props_0.disabled and l_Roact_0.createElement(v13, {
-            event = l_UserInputService_0.InputBegan, 
-            callback = function(v37, _) --[[ Line: 210 ]] --[[ Name: callback ]]
-                -- upvalues: l_UserInputService_0 (ref), v25 (copy), l_props_0 (copy)
-                if v37.UserInputType ~= Enum.UserInputType.Keyboard then
-                    return;
-                elseif l_UserInputService_0:GetFocusedTextBox() ~= v25.textBoxRef.current then
-                    return;
-                else
-                    local v39 = 0;
-                    if v37.KeyCode == Enum.KeyCode.Up then
-                        v39 = 1;
-                    elseif v37.KeyCode == Enum.KeyCode.Down then
-                        v39 = -1;
-                    end;
-                    if l_UserInputService_0:IsKeyDown(Enum.KeyCode.LeftShift) or l_UserInputService_0:IsKeyDown(Enum.KeyCode.RightShift) then
-                        v39 = v39 * 10;
-                    end;
-                    if v39 ~= 0 then
-                        local v40 = math.clamp(math.floor((l_props_0.value + l_props_0.stepInterval * v39) / l_props_0.stepInterval + 0.5) * l_props_0.stepInterval, l_props_0.min, l_props_0.max);
-                        if v40 ~= l_props_0.value then
-                            l_props_0.valueChanged(v40);
-                        end;
-                    end;
-                    return;
-                end;
-            end
-        })
-    });
-end;
-v17.render = function(v41) --[[ Line: 250 ]] --[[ Name: render ]]
-    -- upvalues: l_withSelectionCursorProvider_0 (copy)
-    return l_withSelectionCursorProvider_0(function(v42) --[[ Line: 251 ]]
-        -- upvalues: v41 (copy)
-        return v41:renderWithSelectionCursor(v42);
-    end);
-end;
-return v17;
+local CorePackages = game:GetService("CorePackages")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local UIBlox = InGameMenuDependencies.UIBlox
+local Cryo = InGameMenuDependencies.Cryo
+local t = InGameMenuDependencies.t
+local withStyle = UIBlox.Core.Style.withStyle
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local ParentParent = script.Parent.Parent
+local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
+local FocusHandler = require(script.Parent.Connection.FocusHandler)
+local Slider = require(script.Parent.Slider)
+local AssetImage = require(script.Parent.AssetImage)
+local v18 = Roact.PureComponent:extend("SliderWithInput")
+
+v18.defaultProps = {
+	width = UDim.new(1, 0)
+}
+v18.validateProps = t.intersection(t.strictInterface({
+	min = t.number,
+	max = t.number,
+	stepInterval = t.numberPositive,
+	keyboardInputStepInterval = t.optional(t.numberPositive),
+	value = t.number,
+	valueChanged = t.callback,
+	disabled = t.optional(t.boolean),
+	width = t.optional(t.UDim),
+	AnchorPoint = t.optional(t.Vector2),
+	LayoutOrder = t.optional(t.integer),
+	Position = t.optional(t.UDim2),
+	canCaptureFocus = t.optional(t.boolean),
+	isMenuOpen = t.optional(t.boolean),
+	sliderDotRef = t.optional(t.table),
+	onSelectionLost = t.callback,
+	onSelectionGained = t.callback
+}), function(p1) -- line: 66
+	if p1.min > p1.max then
+		return false, "min must be less than or equal to max"
+	end
+
+	if p1.value > p1.max or p1.value < p1.min then
+		return false, "value must be within min and max"
+	end
+
+	return true
+end)
+
+function v18.init(p2) -- line: 79
+	-- upvalues: Roact (copy)
+	p2.textBoxRef = Roact.createRef()
+	p2.state = {
+		textEntryMode = false
+	}
+end
+function v18.renderFocusHandler(p3) -- line: 87
+	-- upvalues: Roact (copy), FocusHandler (copy), GuiService (copy), ContextActionService (copy)
+	return Roact.createElement(FocusHandler, {
+		isFocused = not not p3.props.canCaptureFocus and (p3.state.textEntryMode or false),
+		didFocus = function() -- line: 91
+			-- upvalues: GuiService (copy), p3 (copy), ContextActionService (copy)
+			GuiService.CoreGuiNavigationEnabled = false
+
+			local value = p3.props.value
+
+			ContextActionService:BindCoreAction("LeaveTextEntryMode", function(_, p5) -- line: 100
+				-- upvalues: p3 (copy), value (copy)
+				if p5 == Enum.UserInputState.End then
+					p3:setState({
+						textEntryMode = false
+					})
+
+					local current = p3.textBoxRef.current
+
+					current.Text = value
+					current:ReleaseFocus()
+
+					return Enum.ContextActionResult.Sink
+				end
+
+				return Enum.ContextActionResult.Pass
+			end, false, Enum.KeyCode.ButtonB)
+		end,
+		didBlur = function() -- line: 112
+			-- upvalues: GuiService (copy), ContextActionService (copy)
+			GuiService.CoreGuiNavigationEnabled = true
+			ContextActionService:UnbindCoreAction("LeaveTextEntryMode")
+		end
+	}) or nil
+end
+function v18.renderWithSelectionCursor(p6, p7) -- line: 119
+	-- upvalues: Cryo (copy), Roact (copy), Slider (copy), withStyle (copy), AssetImage (copy), CursorKind (copy), ExternalEventConnection (copy), UserInputService (copy)
+	local props = p6.props
+	local v25 = Cryo.Dictionary.join(props, {
+		width = UDim.new(1, -80),
+		LayoutOrder = Cryo.None,
+		Position = Cryo.None,
+		AnchorPoint = Cryo.None,
+		keyboardInputStepInterval = Cryo.None,
+		NextSelectionRight = p6.textBoxRef
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(props.width.Scale, props.width.Offset, 0, 36),
+		Position = props.Position,
+		LayoutOrder = props.LayoutOrder
+	}, {
+		Slider = Roact.createElement(Slider, v25),
+		TextContainer = withStyle(function(p8) -- line: 137
+			-- upvalues: props (copy), Roact (copy), AssetImage (copy), p6 (copy), p7 (copy), CursorKind (copy)
+			local v29 = props.disabled and p8.Theme.TextMuted or p8.Theme.TextDefault
+
+			return Roact.createElement(AssetImage.Label, {
+				BackgroundTransparency = 1,
+				imageKey = "RoundedRect",
+				ImageTransparency = p8.Theme.BackgroundUIContrast.Transparency,
+				ImageColor3 = p8.Theme.BackgroundUIContrast.Color,
+				Size = UDim2.new(0, 64, 0, 36),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(1, 0.5)
+			}, {
+				FocusHandler = p6:renderFocusHandler(),
+				Box = Roact.createElement("TextBox", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					Font = p8.Font.Body.Font,
+					TextScaled = true,
+					ClearTextOnFocus = false,
+					TextEditable = not props.disabled,
+					TextColor3 = v29.Color,
+					TextTransparency = v29.Transparency,
+					Text = tostring(props.value),
+					NextSelectionLeft = p6.props.sliderDotRef,
+					SelectionImageObject = p7(CursorKind.InputFields),
+					[Roact.Event.SelectionLost] = p6.props.onSelectionLost,
+					[Roact.Event.SelectionGained] = p6.props.onSelectionGained,
+					[Roact.Ref] = p6.textBoxRef,
+					[Roact.Event.Focused] = props.disabled and function(p9) -- line: 167
+						p9:ReleaseFocus(false)
+					end or function() -- line: 169
+						-- upvalues: p6 (copy)
+						p6:setState({
+							textEntryMode = true
+						})
+					end,
+					[Roact.Event.FocusLost] = function(p10, _) -- line: 172
+						-- upvalues: p6 (copy), props (copy)
+						p6:setState({
+							textEntryMode = false
+						})
+
+						local num = tonumber(p10.Text)
+
+						if num ~= props.value then
+							if num == nil then
+								p10.Text = tostring(props.value)
+
+								return
+							end
+
+							local stepInterval = props.stepInterval
+
+							if props.keyboardInputStepInterval then
+								stepInterval = props.keyboardInputStepInterval
+							end
+
+							local v43 = math.clamp(math.floor(num / stepInterval + 0.5) * stepInterval, props.min, props.max)
+
+							p10.Text = tostring(v43)
+
+							if v43 ~= props.value then
+								props.valueChanged(v43)
+							end
+						end
+					end
+				}, {
+					TextSizeConstraint = Roact.createElement("UITextSizeConstraint", {
+						MinTextSize = p8.Font.Body.RelativeMinSize * p8.Font.BaseSize,
+						MaxTextSize = p8.Font.Body.RelativeSize * p8.Font.BaseSize
+					})
+				})
+			})
+		end),
+		UserInputConnection = not props.disabled and Roact.createElement(ExternalEventConnection, {
+			event = UserInputService.InputBegan,
+			callback = function(p12, _) -- line: 210
+				-- upvalues: UserInputService (copy), p6 (copy), props (copy)
+				if p12.UserInputType ~= Enum.UserInputType.Keyboard then
+					return
+				end
+
+				if UserInputService:GetFocusedTextBox() ~= p6.textBoxRef.current then
+					return
+				end
+
+				local n1 = 0
+
+				if p12.KeyCode == Enum.KeyCode.Up then
+					n1 = 1
+				elseif p12.KeyCode == Enum.KeyCode.Down then
+					n1 = -1
+				end
+
+				if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
+					n1 *= 10
+				end
+
+				if n1 ~= 0 then
+					local v33 = math.clamp(math.floor((props.value + props.stepInterval * n1) / props.stepInterval + 0.5) * props.stepInterval, props.min, props.max)
+
+					if v33 ~= props.value then
+						props.valueChanged(v33)
+					end
+				end
+			end
+		})
+	})
+end
+function v18.render(p14) -- line: 250
+	-- upvalues: withSelectionCursorProvider (copy)
+	return withSelectionCursorProvider(function(p15) -- line: 251
+		-- upvalues: p14 (copy)
+		return p14:renderWithSelectionCursor(p15)
+	end)
+end
+
+return v18

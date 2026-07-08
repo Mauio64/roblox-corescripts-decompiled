@@ -1,54 +1,67 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-local v2 = require(l_Parent_0.includes);
-local v3 = require(l_Parent_0.keys);
-local l_sort_0 = table.sort;
-local function v5() --[[ Line: 19 ]] --[[ Name: getDefaultCycles ]]
-    return {
-        visited = {}, 
-        refs = {}, 
-        nextRef = 1, 
-        omit = {}
-    };
-end;
-local function v6(v7, v8, v9) --[[ Line: 41 ]] --[[ Name: cycles ]]
-    -- upvalues: v5 (copy), v3 (copy), l_sort_0 (copy), v2 (copy), v6 (copy)
-    if v8 == -1 then
-        return v9;
-    elseif typeof(v7) == "table" then
-        local v10 = v9 or v5();
-        if v10.visited[v7] then
-            if not v10.refs[v7] then
-                v10.refs[v7] = v10.nextRef;
-                v10.nextRef = v10.nextRef + 1;
-            end;
-            return nil;
-        else
-            v10.visited[v7] = true;
-            local v11 = v3(v7);
-            l_sort_0(v11, function(v12, v13) --[[ Line: 62 ]]
-                if typeof(v12) == "number" and typeof(v13) == "number" then
-                    return v12 < v13;
-                else
-                    return tostring(v12) < tostring(v13);
-                end;
-            end);
-            for _, v15 in ipairs(v11) do
-                local v16 = v7[v15];
-                if not v2(v10.omit, v15) then
-                    if v8 then
-                        v6(v15, v8 - 1, v10);
-                        v6(v16, v8 - 1, v10);
-                    else
-                        v6(v15, nil, v10);
-                        v6(v16, nil, v10);
-                    end;
-                end;
-            end;
-            return v10;
-        end;
-    else
-        return nil;
-    end;
-end;
-return v6;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local includes = require(scriptParent.includes)
+local keys = require(scriptParent.keys)
+local sort = table.sort
+
+local function getDefaultCycles() -- line: 19
+	return {
+		nextRef = 1,
+		visited = {},
+		refs = {},
+		omit = {}
+	}
+end
+local function cycles(p1, n1: number?, p2) -- line: 41
+	-- upvalues: getDefaultCycles (copy), keys (copy), sort (copy), includes (copy), cycles (copy)
+	if n1 == -1 then
+		return p2
+	end
+
+	if typeof(p1) == "table" then
+		local v10 = p2 or getDefaultCycles()
+
+		if v10.visited[p1] then
+			if not v10.refs[p1] then
+				v10.refs[p1] = v10.nextRef
+				v10.nextRef = v10.nextRef + 1
+			end
+
+			return nil
+		end
+
+		v10.visited[p1] = true
+
+		local v11 = keys(p1)
+
+		sort(v11, function(p3, p4) -- line: 62
+			if typeof(p3) == "number" and typeof(p4) == "number" then
+				return p3 < p4
+			end
+
+			return tostring(p3) < tostring(p4)
+		end)
+
+		for _, v in ipairs(v11) do
+			local v14 = p1[v]
+
+			if not includes(v10.omit, v) then
+				if n1 then
+					cycles(v, n1 - 1, v10)
+					cycles(v14, n1 - 1, v10)
+				else
+					cycles(v, nil, v10)
+					cycles(v14, nil, v10)
+				end
+			end
+		end
+
+		return v10
+	end
+
+	return nil
+end
+
+return cycles

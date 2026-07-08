@@ -1,67 +1,78 @@
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PurchasePrompt");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Roact_0 = require(l_Parent_0.PurchasePromptDeps).Roact;
-local v4 = require(l_script_FirstAncestor_0.Actions.ErrorOccurred);
-local v5 = require(l_script_FirstAncestor_0.Enums.PurchaseError);
-local v6 = require(l_script_FirstAncestor_0.Thunks.retryAfterUpsell);
-local v7 = require(l_script_FirstAncestor_0.connectToStore);
-local v8 = require(l_script_FirstAncestor_0.Enums.Counter);
-local v9 = require(l_script_FirstAncestor_0.Thunks.sendCounter);
-local v10 = require(l_script_FirstAncestor_0.Thunks.handleNativePurchaseFailureOrCancel);
-local v11 = require(script.Parent.ExternalEventConnection);
-local l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 = require(l_script_FirstAncestor_0.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal;
-return (v7(nil, function(v13) --[[ Line: 51 ]] --[[ Name: mapDispatchToProps ]]
-    -- upvalues: v6 (copy), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (copy), v10 (copy), v4 (copy), v5 (copy), v9 (copy), v8 (copy)
-    return {
-        nativePurchaseFinished = function(_, _, v16) --[[ Line: 53 ]] --[[ Name: nativePurchaseFinished ]]
-            -- upvalues: v13 (copy), v6 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref), v10 (ref), v4 (ref), v5 (ref), v9 (ref), v8 (ref)
-            if v16 then
-                v13(v6());
-                return;
-            elseif l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then
-                v13(v10());
-                return;
-            else
-                v13(v4(v5.InvalidFundsUnknown));
-                v13(v9(v8.UpsellFailedNativePurchase));
-                return;
-            end;
-        end, 
-        nativePurchaseFinishedWithLocalPlayer = function(_, v18) --[[ Line: 65 ]] --[[ Name: nativePurchaseFinishedWithLocalPlayer ]]
-            -- upvalues: v13 (copy), v6 (ref), l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 (ref), v10 (ref), v4 (ref), v5 (ref), v9 (ref), v8 (ref)
-            if v18 then
-                v13(v6());
-                return;
-            elseif l_FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal_0 then
-                v13(v10());
-                return;
-            else
-                v13(v4(v5.InvalidFundsUnknown));
-                v13(v9(v8.UpsellFailedNativePurchase));
-                return;
-            end;
-        end
-    };
-end)(function(v19) --[[ Line: 28 ]] --[[ Name: NativePurchaseFinishedConnector ]]
-    -- upvalues: l_Roact_0 (copy), v11 (copy), l_MarketplaceService_0 (copy)
-    local l_nativePurchaseFinished_0 = v19.nativePurchaseFinished;
-    local l_nativePurchaseFinishedWithLocalPlayer_0 = v19.nativePurchaseFinishedWithLocalPlayer;
-    if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
-        return l_Roact_0.createFragment({
-            NativePurchase = l_Roact_0.createElement(v11, {
-                event = l_MarketplaceService_0.NativePurchaseFinished, 
-                callback = l_nativePurchaseFinished_0
-            }), 
-            NativePurchaseWithLocalPlayer = l_Roact_0.createElement(v11, {
-                event = l_MarketplaceService_0.NativePurchaseFinishedWithLocalPlayer, 
-                callback = l_nativePurchaseFinishedWithLocalPlayer_0
-            })
-        });
-    else
-        return l_Roact_0.createElement(v11, {
-            event = l_MarketplaceService_0.NativePurchaseFinished, 
-            callback = l_nativePurchaseFinished_0
-        });
-    end;
-end));
+local MarketplaceService = game:GetService("MarketplaceService")
+local PurchasePrompt = script:FindFirstAncestor("PurchasePrompt")
+local PurchasePromptParent = PurchasePrompt.Parent
+local Roact = require(PurchasePromptParent.PurchasePromptDeps).Roact
+local ErrorOccurred = require(PurchasePrompt.Actions.ErrorOccurred)
+local PurchaseError = require(PurchasePrompt.Enums.PurchaseError)
+local retryAfterUpsell = require(PurchasePrompt.Thunks.retryAfterUpsell)
+local connectToStore = require(PurchasePrompt.connectToStore)
+local Counter = require(PurchasePrompt.Enums.Counter)
+local sendCounter = require(PurchasePrompt.Thunks.sendCounter)
+local handleNativePurchaseFailureOrCancel = require(PurchasePrompt.Thunks.handleNativePurchaseFailureOrCancel)
+local ExternalEventConnection = require(script.Parent.ExternalEventConnection)
+local FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal = require(PurchasePrompt.Parent.SharedFlags).FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal
+
+local function NativePurchaseFinishedConnector(p1) -- line: 28
+	-- upvalues: Roact (copy), ExternalEventConnection (copy), MarketplaceService (copy)
+	local nativePurchaseFinished = p1.nativePurchaseFinished
+	local nativePurchaseFinishedWithLocalPlayer = p1.nativePurchaseFinishedWithLocalPlayer
+
+	if game:GetEngineFeature("NativePurchaseWithLocalPlayer") then
+		return Roact.createFragment({
+			NativePurchase = Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinished,
+				callback = nativePurchaseFinished
+			}),
+			NativePurchaseWithLocalPlayer = Roact.createElement(ExternalEventConnection, {
+				event = MarketplaceService.NativePurchaseFinishedWithLocalPlayer,
+				callback = nativePurchaseFinishedWithLocalPlayer
+			})
+		})
+	end
+
+	return Roact.createElement(ExternalEventConnection, {
+		event = MarketplaceService.NativePurchaseFinished,
+		callback = nativePurchaseFinished
+	})
+end
+local function mapDispatchToProps(p2) -- line: 51
+	-- upvalues: retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
+	return {
+		nativePurchaseFinished = function(_, _, p5) -- line: 53
+			-- upvalues: p2 (copy), retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
+			if p5 then
+				p2(retryAfterUpsell())
+
+				return
+			end
+
+			if FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then
+				p2(handleNativePurchaseFailureOrCancel())
+
+				return
+			end
+
+			p2(ErrorOccurred(PurchaseError.InvalidFundsUnknown))
+			p2(sendCounter(Counter.UpsellFailedNativePurchase))
+		end,
+		nativePurchaseFinishedWithLocalPlayer = function(_, p7) -- line: 65
+			-- upvalues: p2 (copy), retryAfterUpsell (copy), FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal (copy), handleNativePurchaseFailureOrCancel (copy), ErrorOccurred (copy), PurchaseError (copy), sendCounter (copy), Counter (copy)
+			if p7 then
+				p2(retryAfterUpsell())
+
+				return
+			end
+
+			if FFlagEnableBlackbirdUpsellInUnifiedPurchaseModal then
+				p2(handleNativePurchaseFailureOrCancel())
+
+				return
+			end
+
+			p2(ErrorOccurred(PurchaseError.InvalidFundsUnknown))
+			p2(sendCounter(Counter.UpsellFailedNativePurchase))
+		end
+	}
+end
+
+return (connectToStore(nil, mapDispatchToProps)(NativePurchaseFinishedConnector))

@@ -1,61 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v5 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local v6 = require(l_script_FirstAncestor_0.Components.Common.BackButton);
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local v8 = require(l_script_FirstAncestor_0.Components.Common.SubheaderLabelPrice);
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(v10) --[[ Line: 50 ]] --[[ Name: ItemsViewHeader ]]
-    -- upvalues: l_useTokens_0 (copy), v5 (copy), v2 (copy), v3 (copy), v6 (copy), v8 (copy)
-    local v11 = l_useTokens_0();
-    local v12 = v10.view == v5.WideLandscape;
-    local v13 = v10.view == v5.Compact;
-    return v2.createElement(v3.View, {
-        Size = UDim2.new(1, 0, 0, v10.headerHeight)
-    }, {
-        UIListLayout = v2.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            Padding = UDim.new(0, if not not v12 or v13 then v11.Padding.Medium else v11.Margin.Large * 2), 
-            HorizontalFlex = if not v12 then Enum.UIFlexAlignment.SpaceBetween else nil
-        }), 
-        UIPadding = if v10.padding then v2.createElement("UIPadding", {
-            PaddingLeft = v10.padding.left, 
-            PaddingRight = v10.padding.right, 
-            PaddingTop = v10.padding.top, 
-            PaddingBottom = v10.padding.bottom
-        }) else nil, 
-        BackButton = if v12 then v2.createElement(v6, {
-            onBackButtonClick = v10.onBackButtonClick, 
-            Position = UDim2.new(0, v11.Padding.Small, 0, v11.Padding.Small)
-        }) else nil, 
-        HeaderTextAndSubheader = v2.createElement(v3.View, {
-            BackgroundTransparency = 1, 
-            tag = "size-0-full auto-x col align-y-center", 
-            LayoutOrder = 2
-        }, {
-            HeaderText = v2.createElement(v3.Text, {
-                LayoutOrder = 1, 
-                tag = "auto-xy text-heading-small content-emphasis text-truncate-end", 
-                Text = v10.headerText
-            }), 
-            SubheaderText = if not v10.subheaderText or v12 or v13 then nil else v2.createElement(v8, {
-                subheaderText = v10.subheaderText, 
-                LayoutOrder = 2
-            })
-        }), 
-        BuyButton = if not not v12 or v13 then nil else v2.createElement(v3.Button, {
-            size = v3.Enums.InputSize.Medium, 
-            width = if v13 then UDim.new(0, v11.Size.Size_2100) else UDim.new(0, v11.Size.Size_3000), 
-            LayoutOrder = 3, 
-            text = v10.purchaseButtonProps.purchaseButtonText, 
-            variant = v3.Enums.ButtonVariant.Emphasis, 
-            isDisabled = v10.purchaseButtonProps.isDisabled, 
-            onActivated = v10.purchaseButtonProps.onPurchase
-        })
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+local BackButton = require(AvatarExperienceInspectAndBuy.Components.Common.BackButton)
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+
+local SubheaderLabelPrice = require(AvatarExperienceInspectAndBuy.Components.Common.SubheaderLabelPrice)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local function ItemsViewHeader(t1: {[any]: any}) -- line: 50
+	-- upvalues: useTokens (copy), ViewType (copy), React (copy), Foundation (copy), BackButton (copy), SubheaderLabelPrice (copy)
+	local v11 = useTokens()
+	local v12 = t1.view == ViewType.WideLandscape
+	local v13 = t1.view == ViewType.Compact
+
+	return React.createElement(Foundation.View, {
+		Size = UDim2.new(1, 0, 0, t1.headerHeight)
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			Padding = UDim.new(0, if not v12 and not v13 then v11.Margin.Large * 2 else v11.Padding.Medium),
+			HorizontalFlex = if v12 then nil else Enum.UIFlexAlignment.SpaceBetween
+		}),
+		UIPadding = if not t1.padding then nil else React.createElement("UIPadding", {
+			PaddingLeft = t1.padding.left,
+			PaddingRight = t1.padding.right,
+			PaddingTop = t1.padding.top,
+			PaddingBottom = t1.padding.bottom
+		}),
+		BackButton = if not v12 then nil else React.createElement(BackButton, {
+			onBackButtonClick = t1.onBackButtonClick,
+			Position = UDim2.new(0, v11.Padding.Small, 0, v11.Padding.Small)
+		}),
+		HeaderTextAndSubheader = React.createElement(Foundation.View, {
+			BackgroundTransparency = 1,
+			tag = "size-0-full auto-x col align-y-center",
+			LayoutOrder = 2
+		}, {
+			HeaderText = React.createElement(Foundation.Text, {
+				LayoutOrder = 1,
+				tag = "auto-xy text-heading-small content-emphasis text-truncate-end",
+				Text = t1.headerText
+			}),
+			SubheaderText = if not t1.subheaderText or (v12 or v13) then nil else React.createElement(SubheaderLabelPrice, {
+				LayoutOrder = 2,
+				subheaderText = t1.subheaderText
+			})
+		}),
+		BuyButton = if v12 or v13 then nil else React.createElement(Foundation.Button, {
+			LayoutOrder = 3,
+			size = Foundation.Enums.InputSize.Medium,
+			width = if not v13 then UDim.new(0, v11.Size.Size_3000) else UDim.new(0, v11.Size.Size_2100),
+			text = t1.purchaseButtonProps.purchaseButtonText,
+			variant = Foundation.Enums.ButtonVariant.Emphasis,
+			isDisabled = t1.purchaseButtonProps.isDisabled,
+			onActivated = t1.purchaseButtonProps.onPurchase
+		})
+	})
+end
+
+return ItemsViewHeader

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaEnableLoginAndSignupDifferentiatedStatusValues", false);
+return game:DefineFastFlag("LuaEnableLoginAndSignupDifferentiatedStatusValues", false)

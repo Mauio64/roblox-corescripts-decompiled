@@ -1,1 +1,1 @@
-return require(script.PersistStorage);
+return require(script.PersistStorage)

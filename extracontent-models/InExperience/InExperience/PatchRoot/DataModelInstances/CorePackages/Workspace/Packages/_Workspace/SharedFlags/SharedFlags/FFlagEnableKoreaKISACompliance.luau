@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableKoreaKISACompliance", false);
+return game:DefineFastFlag("EnableKoreaKISACompliance", false)

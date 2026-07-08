@@ -1,35 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameDetailRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_ApiFetchGameIcons_0 = require(l_Parent_0.GameIconRodux).GameIcons.ApiFetchGameIcons;
-local l_Functional_0 = require(l_Parent_0.AppCommonLib).Functional;
-local v4 = require(l_script_FirstAncestor_0.GamesByPlaceId.GamesMultigetPlaceDetails);
-local l_PlaceInfoModel_0 = require(l_Parent_0.PlaceInfoRodux).Models.PlaceInfoModel;
-local l_ReceivedPlacesInfos_0 = require(l_Parent_0.PlaceInfoRodux).Actions.ReceivedPlacesInfos;
-local l_ConvertUniverseIdToString_0 = require(l_Parent_0.SharedFlags).ConvertUniverseIdToString;
-return function(v8, v9) --[[ Line: 12 ]]
-    -- upvalues: v4 (copy), l_Functional_0 (copy), l_PlaceInfoModel_0 (copy), l_ConvertUniverseIdToString_0 (copy), l_ReceivedPlacesInfos_0 (copy), l_ApiFetchGameIcons_0 (copy)
-    return function(v10) --[[ Line: 13 ]]
-        -- upvalues: v9 (copy), v4 (ref), v8 (copy), l_Functional_0 (ref), l_PlaceInfoModel_0 (ref), l_ConvertUniverseIdToString_0 (ref), l_ReceivedPlacesInfos_0 (ref), l_ApiFetchGameIcons_0 (ref)
-        if not v9 or #v9 == 0 then
-            return;
-        else
-            return v4(v8, v9):andThen(function(v11) --[[ Line: 18 ]]
-                -- upvalues: l_Functional_0 (ref), l_PlaceInfoModel_0 (ref), l_ConvertUniverseIdToString_0 (ref), v10 (copy), l_ReceivedPlacesInfos_0 (ref), l_ApiFetchGameIcons_0 (ref), v8 (ref)
-                local l_responseBody_0 = v11.responseBody;
-                local v13 = {};
-                local v17 = l_Functional_0.Map(l_responseBody_0, function(v14) --[[ Line: 22 ]]
-                    -- upvalues: l_PlaceInfoModel_0 (ref), l_ConvertUniverseIdToString_0 (ref), v13 (copy)
-                    local v15 = l_PlaceInfoModel_0.fromWeb(v14);
-                    local v16 = l_ConvertUniverseIdToString_0(v15.universeId);
-                    table.insert(v13, v16);
-                    return v15;
-                end);
-                v10:dispatch(l_ReceivedPlacesInfos_0(v17));
-                if #v13 > 0 then
-                    v10:dispatch(l_ApiFetchGameIcons_0(v8, v13));
-                end;
-                return v17;
-            end);
-        end;
-    end;
-end;
+local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
+local GameDetailRoduxParent = GameDetailRodux.Parent
+local ApiFetchGameIcons = require(GameDetailRoduxParent.GameIconRodux).GameIcons.ApiFetchGameIcons
+local Functional = require(GameDetailRoduxParent.AppCommonLib).Functional
+local GamesMultigetPlaceDetails = require(GameDetailRodux.GamesByPlaceId.GamesMultigetPlaceDetails)
+local PlaceInfoModel = require(GameDetailRoduxParent.PlaceInfoRodux).Models.PlaceInfoModel
+local ReceivedPlacesInfos = require(GameDetailRoduxParent.PlaceInfoRodux).Actions.ReceivedPlacesInfos
+local ConvertUniverseIdToString = require(GameDetailRoduxParent.SharedFlags).ConvertUniverseIdToString
+
+return function(p1, p2) -- line: 12
+	-- upvalues: GamesMultigetPlaceDetails (copy), Functional (copy), PlaceInfoModel (copy), ConvertUniverseIdToString (copy), ReceivedPlacesInfos (copy), ApiFetchGameIcons (copy)
+	return function(p3) -- line: 13
+		-- upvalues: p2 (copy), GamesMultigetPlaceDetails (copy), p1 (copy), Functional (copy), PlaceInfoModel (copy), ConvertUniverseIdToString (copy), ReceivedPlacesInfos (copy), ApiFetchGameIcons (copy)
+		if not p2 or #p2 == 0 then
+			return
+		end
+
+		return GamesMultigetPlaceDetails(p1, p2):andThen(function(p4) -- line: 18
+			-- upvalues: Functional (copy), PlaceInfoModel (copy), ConvertUniverseIdToString (copy), p3 (copy), ReceivedPlacesInfos (copy), ApiFetchGameIcons (copy), p1 (copy)
+			local responseBody = p4.responseBody
+			local t1 = {}
+			local v15 = Functional.Map(responseBody, function(p5) -- line: 22
+				-- upvalues: PlaceInfoModel (copy), ConvertUniverseIdToString (copy), t1 (copy)
+				local v17 = PlaceInfoModel.fromWeb(p5)
+				local v18 = ConvertUniverseIdToString(v17.universeId)
+
+				table.insert(t1, v18)
+
+				return v17
+			end)
+
+			p3:dispatch(ReceivedPlacesInfos(v15))
+
+			if #t1 > 0 then
+				p3:dispatch(ApiFetchGameIcons(p1, t1))
+			end
+
+			return v15
+		end)
+	end
+end

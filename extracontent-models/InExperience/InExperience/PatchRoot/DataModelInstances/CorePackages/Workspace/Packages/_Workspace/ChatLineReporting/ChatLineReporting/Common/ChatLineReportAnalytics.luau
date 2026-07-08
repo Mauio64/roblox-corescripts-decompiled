@@ -1,29 +1,34 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_EventIngest_0 = require(l_Parent_0.Analytics).AnalyticsReporters.EventIngest;
-local v5 = require(l_Parent_0.Analytics).Analytics.new(l_RbxAnalyticsService_0);
-local v6 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.Common.Types);
-local v8 = {
-    ReportTimeSpent = game:DefineFastString("ChatLineReportingTimeSpentStat", "TimeSpent"), 
-    SubmittedAbuseType = game:DefineFastString("ChatLineReportingSubmittedAbuseTypeStat", "SubmittedAbuseType")
-};
-submitAnalytics = function(v9, v10, v11) --[[ Line: 17 ]] --[[ Name: submitAnalytics ]]
-    -- upvalues: l_EventIngest_0 (copy), l_EventIngestService_0 (copy), v5 (copy), v6 (copy), v8 (copy)
-    local v12 = l_EventIngest_0.new(l_EventIngestService_0);
-    local l_Diag_0 = v5.Diag;
-    local v14 = math.floor(workspace:GetServerTimeNow() * 1000 - v9.accumulated_time_ms);
-    local v15 = v6.Dictionary.join(v9, {
-        accumulated_time_ms = v14, 
-        interaction_type = v10, 
-        mute_button_clicked = v11
-    });
-    local v16 = v9.context .. "_" .. v8.ReportTimeSpent;
-    local v17 = v9.context .. "_" .. v8.SubmittedAbuseType .. "_" .. v9.reason_selection;
-    l_Diag_0:reportStats(v16, v14);
-    l_Diag_0:reportCounter(v17, 1);
-    v12:sendEventDeferred(v9.context, v9.event_type, v15);
-end;
-return submitAnalytics;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local EventIngestService = game:GetService("EventIngestService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local EventIngest = require(ChatLineReportingParent.Analytics).AnalyticsReporters.EventIngest
+local v6 = require(ChatLineReportingParent.Analytics).Analytics.new(RbxAnalyticsService)
+local Cryo = require(ChatLineReportingParent.Cryo)
+
+require(ChatLineReporting.Common.Types)
+
+local t1 = {
+	ReportTimeSpent = game:DefineFastString("ChatLineReportingTimeSpentStat", "TimeSpent"),
+	SubmittedAbuseType = game:DefineFastString("ChatLineReportingSubmittedAbuseTypeStat", "SubmittedAbuseType")
+}
+
+function submitAnalytics(p1, n1: number, b1: boolean) -- line: 17
+	-- upvalues: EventIngest (copy), EventIngestService (copy), v6 (copy), Cryo (copy), t1 (copy)
+	local v12 = EventIngest.new(EventIngestService)
+	local Diag = v6.Diag
+	local v14 = math.floor(workspace:GetServerTimeNow() * 1000 - p1.accumulated_time_ms)
+	local v15 = Cryo.Dictionary.join(p1, {
+		accumulated_time_ms = v14,
+		interaction_type = n1,
+		mute_button_clicked = b1
+	})
+	local v16 = p1.context .. "_" .. t1.ReportTimeSpent
+	local v17 = p1.context .. "_" .. t1.SubmittedAbuseType .. "_" .. p1.reason_selection
+
+	Diag:reportStats(v16, v14)
+	Diag:reportCounter(v17, 1)
+	v12:sendEventDeferred(p1.context, p1.event_type, v15)
+end
+
+return submitAnalytics

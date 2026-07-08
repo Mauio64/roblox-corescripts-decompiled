@@ -1,28 +1,34 @@
-return function(v0, v1, v2) --[[ Line: 1 ]] --[[ Name: getIsInstanceVisible ]]
-    if not v0 then
-        return false;
-    else
-        local l_AbsoluteSize_0 = v0.AbsoluteSize;
-        if l_AbsoluteSize_0.X <= 0 or l_AbsoluteSize_0.Y <= 0 then
-            return false;
-        else
-            local l_AbsolutePosition_0 = v0.AbsolutePosition;
-            local v5 = l_AbsolutePosition_0 + l_AbsoluteSize_0;
-            local v6 = math.max(l_AbsolutePosition_0.X, v1.min.X);
-            local v7 = math.min(v5.X, v1.max.X) - v6;
-            if v7 <= 0 then
-                return false;
-            else
-                local v8 = math.max(l_AbsolutePosition_0.Y, v1.min.Y);
-                local v9 = math.min(v5.Y, v1.max.Y) - v8;
-                if v9 <= 0 then
-                    return false;
-                else
-                    local v10 = v7 * v9;
-                    local v11 = l_AbsoluteSize_0.X * l_AbsoluteSize_0.Y;
-                    return v2 <= v10 * 100 / v11;
-                end;
-            end;
-        end;
-    end;
-end;
+local function getIsInstanceVisible(p1, p2, n1: number) -- line: 1
+	if not p1 then
+		return false
+	end
+
+	local AbsoluteSize = p1.AbsoluteSize
+
+	if AbsoluteSize.X <= 0 or AbsoluteSize.Y <= 0 then
+		return false
+	end
+
+	local AbsolutePosition = p1.AbsolutePosition
+	local v7 = AbsolutePosition + AbsoluteSize
+	local v8 = math.max(AbsolutePosition.X, p2.min.X)
+	local v9 = math.min(v7.X, p2.max.X) - v8
+
+	if v9 <= 0 then
+		return false
+	end
+
+	local v10 = math.max(AbsolutePosition.Y, p2.min.Y)
+	local v11 = math.min(v7.Y, p2.max.Y) - v10
+
+	if v11 <= 0 then
+		return false
+	end
+
+	local v12 = v9 * v11
+	local v13 = AbsoluteSize.X * AbsoluteSize.Y
+
+	return n1 <= v12 * 100 / v13
+end
+
+return getIsInstanceVisible

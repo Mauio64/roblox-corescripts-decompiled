@@ -1,77 +1,85 @@
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_t_0 = v2.t;
-local v5 = {
-    l_UserGameSettings_0:GetPropertyChangedSignal("GamepadCameraSensitivity"), 
-    l_UserGameSettings_0:GetPropertyChangedSignal("MouseSensitivity"), 
-    l_UserGameSettings_0:GetPropertyChangedSignal("MouseSensitivityFirstPerson"), 
-    l_UserGameSettings_0:GetPropertyChangedSignal("MouseSensitivityThirdPerson")
-};
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v7 = require(l_Parent_0.Utility.ExternalEventConnection);
-local v8 = require(script.Parent.SliderEntry);
-local v9 = require(l_Parent_0.Utility.SendAnalytics);
-local v10 = require(l_Parent_0.Resources.Constants);
-local _ = function(v11) --[[ Line: 30 ]] --[[ Name: guiToEngineSensitivity ]]
-    local _ = nil;
-    return (math.clamp(if v11 <= 5 then 0.198 * v11 + 0.01 else 0.6 * v11 - 2, 0, 10));
-end;
-local _ = function(v14) --[[ Line: 41 ]] --[[ Name: engineToGuiSensitivity ]]
-    local _ = nil;
-    return (math.clamp(math.floor((if v14 <= 1 then (v14 - 0.01) / 0.198 else (v14 + 2) / 0.6) / 0.01 + 0.5) * 0.01, 0, 10));
-end;
-local v17 = l_Roact_0.PureComponent:extend("CameraSensitivityEntry");
-v17.validateProps = l_t_0.strictInterface({
-    LayoutOrder = l_t_0.integer, 
-    canCaptureFocus = l_t_0.optional(l_t_0.boolean), 
-    isMenuOpen = l_t_0.optional(l_t_0.boolean)
-});
-v17.init = function(v18) --[[ Line: 62 ]] --[[ Name: init ]]
-    -- upvalues: l_UserGameSettings_0 (copy)
-    v18.onSensitivityChanged = function() --[[ Line: 63 ]]
-        -- upvalues: v18 (copy), l_UserGameSettings_0 (ref)
-        v18:setState({
-            engineSensitivity = l_UserGameSettings_0.MouseSensitivityFirstPerson.X
-        });
-    end;
-    v18.onSensitivityChanged();
-end;
-v17.render = function(v19) --[[ Line: 73 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), v8 (copy), l_UserGameSettings_0 (copy), v9 (copy), v10 (copy), v5 (copy), v7 (copy)
-    local v20 = {};
-    local l_createElement_0 = l_Roact_0.createElement;
-    local l_v8_0 = v8;
-    local v23 = {
-        LayoutOrder = v19.props.LayoutOrder, 
-        labelKey = "CoreScripts.InGameMenu.GameSettings.CameraSensitivity"
-    };
-    local l_engineSensitivity_0 = v19.state.engineSensitivity;
-    local _ = nil;
-    v23.value = math.clamp(math.floor((if l_engineSensitivity_0 <= 1 then (l_engineSensitivity_0 - 0.01) / 0.198 else (l_engineSensitivity_0 + 2) / 0.6) / 0.01 + 0.5) * 0.01, 0, 10);
-    v23.min = 0;
-    v23.max = 10;
-    v23.stepInterval = 1;
-    v23.keyboardInputStepInterval = 0.01;
-    v23.valueChanged = function(v26) --[[ Line: 84 ]] --[[ Name: valueChanged ]]
-        -- upvalues: l_UserGameSettings_0 (ref), v9 (ref), v10 (ref)
-        local v27 = nil;
-        local v28 = math.clamp(if v26 <= 5 then 0.198 * v26 + 0.01 else 0.6 * v26 - 2, 0, 10);
-        v27 = Vector2.new(v28, v28);
-        l_UserGameSettings_0.MouseSensitivityFirstPerson = v27;
-        l_UserGameSettings_0.MouseSensitivityThirdPerson = v27;
-        v9(v10.AnalyticsSettingsChangeName, nil, {}, true);
-    end;
-    v23.canCaptureFocus = v19.props.canCaptureFocus;
-    v23.isMenuOpen = v19.props.isMenuOpen;
-    v20.CameraSensitivityMouseSlider = l_createElement_0(l_v8_0, v23);
-    for _, v30 in ipairs(v5) do
-        v20[tostring(v30) .. "CameraSensitivityControlConnection"] = l_Roact_0.createElement(v7, {
-            event = v30, 
-            callback = v19.onSensitivityChanged
-        });
-    end;
-    return l_Roact_0.createFragment(v20);
-end;
-return v17;
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local t = InGameMenuDependencies.t
+local t1 = {
+	UserGameSettings:GetPropertyChangedSignal("GamepadCameraSensitivity"),
+	UserGameSettings:GetPropertyChangedSignal("MouseSensitivity"),
+	UserGameSettings:GetPropertyChangedSignal("MouseSensitivityFirstPerson"),
+	UserGameSettings:GetPropertyChangedSignal("MouseSensitivityThirdPerson")
+}
+local ParentParent = script.Parent.Parent.Parent
+local ExternalEventConnection = require(ParentParent.Utility.ExternalEventConnection)
+local SliderEntry = require(script.Parent.SliderEntry)
+local SendAnalytics = require(ParentParent.Utility.SendAnalytics)
+local Constants = require(ParentParent.Resources.Constants)
+
+local function guiToEngineSensitivity(p1) -- line: 30
+	return (math.clamp(if not (p1 <= 5) then 0.6 * p1 - 2 else 0.198 * p1 + 0.01, 0, 10))
+end
+local function engineToGuiSensitivity(p2) -- line: 41
+	return (math.clamp(math.floor(((if not (p2 <= 1) then (p2 + 2) / 0.6 else (p2 - 0.01) / 0.198)) / 0.01 + 0.5) * 0.01, 0, 10))
+end
+
+local v14 = Roact.PureComponent:extend("CameraSensitivityEntry")
+
+v14.validateProps = t.strictInterface({
+	LayoutOrder = t.integer,
+	canCaptureFocus = t.optional(t.boolean),
+	isMenuOpen = t.optional(t.boolean)
+})
+
+function v14.init(p3) -- line: 62
+	-- upvalues: UserGameSettings (copy)
+	function p3.onSensitivityChanged() -- line: 63
+		-- upvalues: p3 (copy), UserGameSettings (copy)
+		p3:setState({
+			engineSensitivity = UserGameSettings.MouseSensitivityFirstPerson.X
+		})
+	end
+
+	p3.onSensitivityChanged()
+end
+function v14.render(p4) -- line: 73
+	-- upvalues: Roact (copy), SliderEntry (copy), UserGameSettings (copy), SendAnalytics (copy), Constants (copy), t1 (copy), ExternalEventConnection (copy)
+	local t2 = {}
+	local createElement = Roact.createElement
+	local v21 = SliderEntry
+	local t3 = {
+		labelKey = "CoreScripts.InGameMenu.GameSettings.CameraSensitivity",
+		min = 0,
+		max = 10,
+		stepInterval = 1,
+		keyboardInputStepInterval = 0.01,
+		LayoutOrder = p4.props.LayoutOrder
+	}
+	local engineSensitivity = p4.state.engineSensitivity
+
+	t3.value = math.clamp(math.floor(((if not (engineSensitivity <= 1) then (engineSensitivity + 2) / 0.6 else (engineSensitivity - 0.01) / 0.198)) / 0.01 + 0.5) * 0.01, 0, 10)
+
+	function t3.valueChanged(p5) -- line: 84
+		-- upvalues: UserGameSettings (copy), SendAnalytics (copy), Constants (copy)
+		local v27 = math.clamp(if not (p5 <= 5) then 0.6 * p5 - 2 else 0.198 * p5 + 0.01, 0, 10)
+		local vector2 = Vector2.new(v27, v27)
+
+		UserGameSettings.MouseSensitivityFirstPerson = vector2
+		UserGameSettings.MouseSensitivityThirdPerson = vector2
+		SendAnalytics(Constants.AnalyticsSettingsChangeName, nil, {}, true)
+	end
+
+	t3.canCaptureFocus = p4.props.canCaptureFocus
+	t3.isMenuOpen = p4.props.isMenuOpen
+	t2.CameraSensitivityMouseSlider = createElement(v21, t3)
+
+	for _, v in ipairs(t1) do
+		t2[tostring(v) .. "CameraSensitivityControlConnection"] = Roact.createElement(ExternalEventConnection, {
+			event = v,
+			callback = p4.onSensitivityChanged
+		})
+	end
+
+	return Roact.createFragment(t2)
+end
+
+return v14

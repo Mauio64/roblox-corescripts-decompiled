@@ -1,37 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Settings");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GameSettings_0 = UserSettings().GameSettings;
-local v3 = require(l_CorePackages_0.Workspace.Packages.CachedPolicyService);
-local v4 = require(l_CorePackages_0.Workspace.Packages.SettingsService);
-local l_ValueChangedSignal_0 = v4.ValueChangedSignal;
-local l_AvailabilitySignal_0 = v4.AvailabilitySignal;
-local l_SettingEnum_0 = v4.SettingEnum;
-local l_LAYOUT_ORDER_0 = require(l_script_FirstAncestor_0.Integrations.Constants).GAMESETTINGS.LAYOUT_ORDER;
-local function v11() --[[ Line: 23 ]] --[[ Name: PerfStatsValue ]]
-    -- upvalues: l_ValueChangedSignal_0 (copy), l_GameSettings_0 (copy)
-    local v9 = l_ValueChangedSignal_0.new(l_GameSettings_0.PerformanceStatsVisible);
-    v9:connect(function(v10) --[[ Line: 26 ]]
-        -- upvalues: l_GameSettings_0 (ref)
-        if l_GameSettings_0.PerformanceStatsVisible == v10 then
-            return;
-        else
-            l_GameSettings_0.PerformanceStatsVisible = v10;
-            return;
-        end;
-    end);
-    l_GameSettings_0.PerformanceStatsVisibleChanged:Connect(function() --[[ Line: 36 ]]
-        -- upvalues: v9 (copy), l_GameSettings_0 (ref)
-        v9:set(l_GameSettings_0.PerformanceStatsVisible);
-    end);
-    return v9;
-end;
-local v12 = l_AvailabilitySignal_0.new(not v3:IsSubjectToChinaPolicies());
+local Settings = script:FindFirstAncestor("Settings")
+local CorePackages = game:GetService("CorePackages")
+local GameSettings = UserSettings().GameSettings
+local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
+local SettingsService = require(CorePackages.Workspace.Packages.SettingsService)
+local ValueChangedSignal = SettingsService.ValueChangedSignal
+local AvailabilitySignal = SettingsService.AvailabilitySignal
+local SettingEnum = SettingsService.SettingEnum
+local LAYOUT_ORDER = require(Settings.Integrations.Constants).GAMESETTINGS.LAYOUT_ORDER
+
+local function PerfStatsValue() -- line: 23
+	-- upvalues: ValueChangedSignal (copy), GameSettings (copy)
+	local v12 = ValueChangedSignal.new(GameSettings.PerformanceStatsVisible)
+
+	v12:connect(function(p1) -- line: 26
+		-- upvalues: GameSettings (copy)
+		if p1 == GameSettings.PerformanceStatsVisible then
+			return
+		end
+
+		GameSettings.PerformanceStatsVisible = p1
+	end)
+	GameSettings.PerformanceStatsVisibleChanged:Connect(function() -- line: 36
+		-- upvalues: v12 (copy), GameSettings (copy)
+		v12:set(GameSettings.PerformanceStatsVisible)
+	end)
+
+	return v12
+end
+
+local v11 = AvailabilitySignal.new(not CachedPolicyService:IsSubjectToChinaPolicies())
+
 return {
-    id = "perf-stats", 
-    field_type = l_SettingEnum_0.Toggle, 
-    alreadyLocalized = false, 
-    label = "CoreScripts.InGameMenu.GameSettings.ShowPerfStats", 
-    onChanged = v11(), 
-    availability = v12, 
-    layoutOrder = l_LAYOUT_ORDER_0.PerformanceStatsFrame
-};
+	id = "perf-stats",
+	alreadyLocalized = false,
+	label = "CoreScripts.InGameMenu.GameSettings.ShowPerfStats",
+	field_type = SettingEnum.Toggle,
+	onChanged = PerfStatsValue(),
+	availability = v11,
+	layoutOrder = LAYOUT_ORDER.PerformanceStatsFrame
+}

@@ -1,13 +1,14 @@
-local v0 = require(script.Components.AppShortcutBarContainer);
-local v1 = require(script.Components.AppShortcutBarStatusListener);
-local v2 = require(script.Components.AppShortcut);
-local v3 = require(script.Hooks.AppShortcutBarContext);
-local v4 = require(script.Hooks);
+local AppShortcutBarContainer = require(script.Components.AppShortcutBarContainer)
+local AppShortcutBarStatusListener = require(script.Components.AppShortcutBarStatusListener)
+local AppShortcut = require(script.Components.AppShortcut)
+local AppShortcutBarContext = require(script.Hooks.AppShortcutBarContext)
+local Hooks = require(script.Hooks)
+
 return {
-    AppShortcutBarContainer = v0, 
-    AppShortcutBarStatusListener = v1, 
-    IconWithHoldAnimation = v2.IconWithHoldAnimation, 
-    AppShortcutBarContext = v3, 
-    Hooks = v4, 
-    ["jest.config"] = script["jest.config"]
-};
+	AppShortcutBarContainer = AppShortcutBarContainer,
+	AppShortcutBarStatusListener = AppShortcutBarStatusListener,
+	IconWithHoldAnimation = AppShortcut.IconWithHoldAnimation,
+	AppShortcutBarContext = AppShortcutBarContext,
+	Hooks = Hooks,
+	["jest.config"] = script["jest.config"]
+}

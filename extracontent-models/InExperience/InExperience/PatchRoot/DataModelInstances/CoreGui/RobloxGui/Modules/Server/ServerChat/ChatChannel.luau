@@ -1,629 +1,756 @@
-local v0 = false;
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 8 ]]
-    return UserSettings():IsUserFeatureEnabled("UserShouldMuteUnfilteredMessage");
-end);
-v0 = l_status_0 and l_result_0;
-l_status_0 = nil;
-local v3;
-l_result_0, v3 = pcall(function() --[[ Line: 13 ]]
-    return UserSettings():IsUserFeatureEnabled("UserRemoveMessageOnTextFilterFailures");
-end);
-l_status_0 = l_result_0 and v3;
-l_result_0 = false;
-local v4;
-v3, v4 = pcall(function() --[[ Line: 21 ]]
-    return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2");
-end);
-l_result_0 = v3 and v4;
-v3 = {};
-v4 = script.Parent;
-local l_Chat_0 = game:GetService("Chat");
-local l_RunService_0 = game:GetService("RunService");
-local l_ClientChatModules_0 = l_Chat_0:WaitForChild("ClientChatModules");
-local l_ChatSettings_0 = require(l_ClientChatModules_0:WaitForChild("ChatSettings"));
-local l_ChatConstants_0 = require(l_ClientChatModules_0:WaitForChild("ChatConstants"));
-local l_Util_0 = require(v4:WaitForChild("Util"));
-local v11 = nil;
-pcall(function() --[[ Line: 42 ]]
-    -- upvalues: v11 (ref)
-    v11 = require(game:GetService("Chat").ClientChatModules.ChatLocalization);
-end);
-v11 = v11 or {};
-if not v11.FormatMessageToSend or not v11.LocalizeFormattedMessage then
-    v11.FormatMessageToSend = function(_, _, v14) --[[ Line: 46 ]] --[[ Name: FormatMessageToSend ]]
-        return v14;
-    end;
-end;
-local v15 = {};
-v15.__index = v15;
-v15.SendSystemMessage = function(v16, v17, v18) --[[ Line: 55 ]] --[[ Name: SendSystemMessage ]]
-    local v19 = v16:InternalCreateMessageObject(v17, nil, true, v18);
-    local l_status_1, l_result_1 = pcall(function() --[[ Line: 58 ]]
-        -- upvalues: v16 (copy), v19 (copy)
-        v16.eMessagePosted:Fire(v19);
-    end);
-    if not l_status_1 and l_result_1 then
-        print("Error posting message: " .. l_result_1);
-    end;
-    v16:InternalAddMessageToHistoryLog(v19);
-    for _, v23 in pairs(v16.Speakers) do
-        v23:InternalSendSystemMessage(v19, v16.Name);
-    end;
-    return v19;
-end;
-v15.SendSystemMessageToSpeaker = function(v24, v25, v26, v27) --[[ Line: 72 ]] --[[ Name: SendSystemMessageToSpeaker ]]
-    -- upvalues: l_RunService_0 (copy)
-    local v28 = v24.Speakers[v26];
-    if v28 then
-        v28:InternalSendSystemMessage(v24:InternalCreateMessageObject(v25, nil, true, v27), v24.Name);
-        return;
-    else
-        if l_RunService_0:IsStudio() then
-            warn(string.format("Speaker '%s' is not in channel '%s' and cannot be sent a system message", v26, v24.Name));
-        end;
-        return;
-    end;
-end;
-v15.SendMessageObjToFilters = function(v29, v30, v31, v32) --[[ Line: 82 ]] --[[ Name: SendMessageObjToFilters ]]
-    local l_Message_0 = v31.Message;
-    v31.Message = v30;
-    v29:InternalDoMessageFilter(v32.Name, v31, v29.Name);
-    v29.ChatService:InternalDoMessageFilter(v32.Name, v31, v29.Name);
-    local l_Message_1 = v31.Message;
-    v31.Message = l_Message_0;
-    return l_Message_1;
-end;
-v15.CanCommunicateByUserId = function(_, v36, v37) --[[ Line: 92 ]] --[[ Name: CanCommunicateByUserId ]]
-    -- upvalues: l_RunService_0 (copy), l_Chat_0 (copy)
-    if l_RunService_0:IsStudio() then
-        return true;
-    elseif v36 == 0 or v37 == 0 then
-        return true;
-    else
-        local l_status_2, l_result_2 = pcall(function() --[[ Line: 100 ]]
-            -- upvalues: l_Chat_0 (ref), v36 (copy), v37 (copy)
-            return l_Chat_0:CanUsersChatAsync(v36, v37);
-        end);
-        return l_status_2 and l_result_2;
-    end;
-end;
-v15.CanCommunicate = function(v40, v41, v42) --[[ Line: 106 ]] --[[ Name: CanCommunicate ]]
-    local l_v41_Player_0 = v41:GetPlayer();
-    local l_v42_Player_0 = v42:GetPlayer();
-    if l_v41_Player_0 and l_v42_Player_0 then
-        return v40:CanCommunicateByUserId(l_v41_Player_0.UserId, l_v42_Player_0.UserId);
-    else
-        return true;
-    end;
-end;
-v15.SendMessageToSpeaker = function(v45, v46, v47, v48, v49) --[[ Line: 115 ]] --[[ Name: SendMessageToSpeaker ]]
-    -- upvalues: l_RunService_0 (copy)
-    local v50 = v45.Speakers[v47];
-    local l_Speaker_0 = v45.ChatService:GetSpeaker(v48);
-    if v50 and l_Speaker_0 then
-        if v50:IsSpeakerMuted(v48) then
-            return;
-        elseif not v45:CanCommunicate(v50, l_Speaker_0) then
-            return;
-        else
-            local v52 = v45:InternalCreateMessageObject(v46, v48, v47 == v48, v49);
-            v46 = v45:SendMessageObjToFilters(v46, v52, v48);
-            v50:InternalSendMessage(v52, v45.Name);
-            local v53 = v45.Private and Enum.TextFilterContext.PrivateChat or Enum.TextFilterContext.PublicChat;
-            local v54, v55, v56 = v45.ChatService:InternalApplyRobloxFilterNewAPI(v52.FromSpeaker, v46, v53);
-            if v54 then
-                v52.FilterResult = v56;
-                v52.IsFilterResult = v55;
-                v52.IsFiltered = true;
-                v50:InternalSendFilteredMessageWithFilterResult(v52, v45.Name);
-                return;
-            end;
-        end;
-    elseif l_RunService_0:IsStudio() then
-        warn(string.format("Speaker '%s' is not in channel '%s' and cannot be sent a message", v47, v45.Name));
-    end;
-end;
-v15.KickSpeaker = function(v57, v58, v59) --[[ Line: 151 ]] --[[ Name: KickSpeaker ]]
-    local l_Speaker_1 = v57.ChatService:GetSpeaker(v58);
-    if not l_Speaker_1 then
-        error("Speaker \"" .. v58 .. "\" does not exist!");
-    end;
-    local v61 = "";
-    local v62 = "";
-    local l_l_Speaker_1_NameForDisplay_0 = l_Speaker_1:GetNameForDisplay();
-    if v59 then
-        v61 = string.format("You were kicked from '%s' for the following reason(s): %s", v57.Name, v59);
-        v62 = string.format("%s was kicked for the following reason(s): %s", l_l_Speaker_1_NameForDisplay_0, v59);
-    else
-        v61 = string.format("You were kicked from '%s'", v57.Name);
-        v62 = string.format("%s was kicked", l_l_Speaker_1_NameForDisplay_0);
-    end;
-    v57:SendSystemMessageToSpeaker(v61, v58);
-    l_Speaker_1:LeaveChannel(v57.Name);
-    v57:SendSystemMessage(v62);
-end;
-v15.MuteSpeaker = function(v64, v65, v66, v67) --[[ Line: 174 ]] --[[ Name: MuteSpeaker ]]
-    local l_Speaker_2 = v64.ChatService:GetSpeaker(v65);
-    if not l_Speaker_2 then
-        error("Speaker \"" .. v65 .. "\" does not exist!");
-    end;
-    v64.Mutes[v65:lower()] = (not (v67 ~= 0) or v67 == nil) and 0 or os.time() + v67;
-    if v66 then
-        local l_l_Speaker_2_NameForDisplay_0 = l_Speaker_2:GetNameForDisplay();
-        v64:SendSystemMessage(string.format("%s was muted for the following reason(s): %s", l_l_Speaker_2_NameForDisplay_0, v66));
-    end;
-    local l_status_3, l_result_3 = pcall(function() --[[ Line: 188 ]]
-        -- upvalues: v64 (copy), v65 (copy), v66 (copy), v67 (copy)
-        v64.eSpeakerMuted:Fire(v65, v66, v67);
-    end);
-    if not l_status_3 and l_result_3 then
-        print("Error mutting speaker: " .. l_result_3);
-    end;
-    local l_Speaker_3 = v64.ChatService:GetSpeaker(v65);
-    if l_Speaker_3 then
-        local l_status_4, l_result_4 = pcall(function() --[[ Line: 195 ]]
-            -- upvalues: l_Speaker_3 (copy), v64 (copy), v66 (copy), v67 (copy)
-            l_Speaker_3.eMuted:Fire(v64.Name, v66, v67);
-        end);
-        if not l_status_4 and l_result_4 then
-            print("Error mutting speaker: " .. l_result_4);
-        end;
-    end;
-end;
-v15.UnmuteSpeaker = function(v75, v76) --[[ Line: 203 ]] --[[ Name: UnmuteSpeaker ]]
-    if not v75.ChatService:GetSpeaker(v76) then
-        error("Speaker \"" .. v76 .. "\" does not exist!");
-    end;
-    v75.Mutes[v76:lower()] = nil;
-    local l_status_5, l_result_5 = pcall(function() --[[ Line: 211 ]]
-        -- upvalues: v75 (copy), v76 (copy)
-        v75.eSpeakerUnmuted:Fire(v76);
-    end);
-    if not l_status_5 and l_result_5 then
-        print("Error unmuting speaker: " .. l_result_5);
-    end;
-    local l_Speaker_4 = v75.ChatService:GetSpeaker(v76);
-    if l_Speaker_4 then
-        local l_status_6, l_result_6 = pcall(function() --[[ Line: 218 ]]
-            -- upvalues: l_Speaker_4 (copy), v75 (copy)
-            l_Speaker_4.eUnmuted:Fire(v75.Name);
-        end);
-        if not l_status_6 and l_result_6 then
-            print("Error unmuting speaker: " .. l_result_6);
-        end;
-    end;
-end;
-v15.IsSpeakerMuted = function(v82, v83) --[[ Line: 225 ]] --[[ Name: IsSpeakerMuted ]]
-    return v82.Mutes[v83:lower()] ~= nil;
-end;
-v15.GetSpeakerList = function(v84) --[[ Line: 229 ]] --[[ Name: GetSpeakerList ]]
-    local v85 = {};
-    for _, v87 in pairs(v84.Speakers) do
-        table.insert(v85, v87.Name);
-    end;
-    return v85;
-end;
-v15.RegisterFilterMessageFunction = function(v88, v89, v90, v91) --[[ Line: 237 ]] --[[ Name: RegisterFilterMessageFunction ]]
-    if v88.FilterMessageFunctions:HasFunction(v89) then
-        error(string.format("FilterMessageFunction '%s' already exists", v89));
-    end;
-    v88.FilterMessageFunctions:AddFunction(v89, v90, v91);
-end;
-v15.FilterMessageFunctionExists = function(v92, v93) --[[ Line: 244 ]] --[[ Name: FilterMessageFunctionExists ]]
-    return v92.FilterMessageFunctions:HasFunction(v93);
-end;
-v15.UnregisterFilterMessageFunction = function(v94, v95) --[[ Line: 248 ]] --[[ Name: UnregisterFilterMessageFunction ]]
-    if not v94.FilterMessageFunctions:HasFunction(v95) then
-        error(string.format("FilterMessageFunction '%s' does not exists", v95));
-    end;
-    v94.FilterMessageFunctions:RemoveFunction(v95);
-end;
-v15.RegisterProcessCommandsFunction = function(v96, v97, v98, v99) --[[ Line: 255 ]] --[[ Name: RegisterProcessCommandsFunction ]]
-    if v96.ProcessCommandsFunctions:HasFunction(v97) then
-        error(string.format("ProcessCommandsFunction '%s' already exists", v97));
-    end;
-    v96.ProcessCommandsFunctions:AddFunction(v97, v98, v99);
-end;
-v15.ProcessCommandsFunctionExists = function(v100, v101) --[[ Line: 262 ]] --[[ Name: ProcessCommandsFunctionExists ]]
-    return v100.ProcessCommandsFunctions:HasFunction(v101);
-end;
-v15.UnregisterProcessCommandsFunction = function(v102, v103) --[[ Line: 266 ]] --[[ Name: UnregisterProcessCommandsFunction ]]
-    if not v102.ProcessCommandsFunctions:HasFunction(v103) then
-        error(string.format("ProcessCommandsFunction '%s' does not exist", v103));
-    end;
-    v102.ProcessCommandsFunctions:RemoveFunction(v103);
-end;
-local function _(v104) --[[ Line: 273 ]] --[[ Name: ShallowCopy ]]
-    local v105 = {};
-    for v106, v107 in pairs(v104) do
-        v105[v106] = v107;
-    end;
-    return v105;
-end;
-v15.GetHistoryLog = function(v109) --[[ Line: 281 ]] --[[ Name: GetHistoryLog ]]
-    local l_ChatHistory_0 = v109.ChatHistory;
-    local v111 = {};
-    for v112, v113 in pairs(l_ChatHistory_0) do
-        v111[v112] = v113;
-    end;
-    return v111;
-end;
-v15.GetHistoryLogForSpeaker = function(v114, v115) --[[ Line: 285 ]] --[[ Name: GetHistoryLogForSpeaker ]]
-    -- upvalues: l_ChatConstants_0 (copy)
-    local v116 = -1;
-    local l_v115_Player_0 = v115:GetPlayer();
-    if l_v115_Player_0 then
-        v116 = l_v115_Player_0.UserId;
-    end;
-    local v118 = {};
-    for v119 = 1, #v114.ChatHistory do
-        if v114:CanCommunicateByUserId(v116, v114.ChatHistory[v119].SpeakerUserId) then
-            local v120 = v114.ChatHistory[v119];
-            local v121 = {};
-            for v122, v123 in pairs(v120) do
-                v121[v122] = v123;
-            end;
-            local l_v121_0 = v121;
-            if l_v121_0.MessageType == l_ChatConstants_0.MessageTypeDefault or l_v121_0.MessageType == l_ChatConstants_0.MessageTypeMeCommand then
-                v120 = l_v121_0.FilterResult;
-                if l_v121_0.IsFilterResult then
-                    if l_v115_Player_0 then
-                        l_v121_0.Message = v120:GetChatForUserAsync(l_v115_Player_0.UserId);
-                    else
-                        l_v121_0.Message = v120:GetNonChatStringForBroadcastAsync();
-                    end;
-                else
-                    l_v121_0.Message = v120;
-                end;
-            end;
-            table.insert(v118, l_v121_0);
-        end;
-    end;
-    return v118;
-end;
-v15.InternalDestroy = function(v125) --[[ Line: 323 ]] --[[ Name: InternalDestroy ]]
-    for _, v127 in pairs(v125.Speakers) do
-        v127:LeaveChannel(v125.Name);
-    end;
-    v125.eDestroyed:Fire();
-    v125.eDestroyed:Destroy();
-    v125.eMessagePosted:Destroy();
-    v125.eSpeakerJoined:Destroy();
-    v125.eSpeakerLeft:Destroy();
-    v125.eSpeakerMuted:Destroy();
-    v125.eSpeakerUnmuted:Destroy();
-end;
-v15.InternalDoMessageFilter = function(v128, v129, v130, v131) --[[ Line: 338 ]] --[[ Name: InternalDoMessageFilter ]]
-    for v132, v133, _ in (v128.FilterMessageFunctions:GetIterator()) do
-        local l_status_7, l_result_7 = pcall(function() --[[ Line: 341 ]]
-            -- upvalues: v133 (copy), v129 (copy), v130 (copy), v131 (copy)
-            v133(v129, v130, v131);
-        end);
-        if not l_status_7 then
-            warn(string.format("DoMessageFilter Function '%s' failed for reason: %s", v132, l_result_7));
-        end;
-    end;
-end;
-v15.InternalDoProcessCommands = function(v137, v138, v139, v140) --[[ Line: 351 ]] --[[ Name: InternalDoProcessCommands ]]
-    for v141, v142, _ in (v137.ProcessCommandsFunctions:GetIterator()) do
-        local l_status_8, l_result_8 = pcall(function() --[[ Line: 354 ]]
-            -- upvalues: v142 (copy), v138 (copy), v139 (copy), v140 (copy)
-            local v144 = v142(v138, v139, v140);
-            if type(v144) ~= "boolean" then
-                error("Process command functions must return a bool");
-            end;
-            return v144;
-        end);
-        if not l_status_8 then
-            warn(string.format("DoProcessCommands Function '%s' failed for reason: %s", v141, l_result_8));
-        elseif l_result_8 then
-            return true;
-        end;
-    end;
-    return false;
-end;
-getLanguageCodeFromLocale = function(v147) --[[ Line: 372 ]] --[[ Name: getLanguageCodeFromLocale ]]
-    local v148 = string.gmatch(v147, "[^-]+")();
-    if v148 then
-        return v148;
-    else
-        return "en";
-    end;
-end;
-v15.InternalPostMessage = function(v149, v150, v151, v152) --[[ Line: 382 ]] --[[ Name: InternalPostMessage ]]
-    -- upvalues: v11 (ref), l_Chat_0 (copy), v0 (ref), l_result_0 (ref), l_status_0 (ref)
-    if v149:InternalDoProcessCommands(v150.Name, v151, v149.Name) then
-        return false;
-    else
-        if v149.Mutes[v150.Name:lower()] ~= nil then
-            local v153 = v149.Mutes[v150.Name:lower()];
-            if v153 > 0 and v153 < os.time() then
-                v149:UnmuteSpeaker(v150.Name);
-            else
-                v149:SendSystemMessageToSpeaker(v11:FormatMessageToSend("GameChat_ChatChannel_MutedInChannel", "You are muted and cannot talk in this channel"), v150.Name);
-                return false;
-            end;
-        end;
-        local v154 = v149:InternalCreateMessageObject(v151, v150.Name, false, v152);
-        v154.Message = v151;
-        local v155 = nil;
-        pcall(function() --[[ Line: 400 ]]
-            -- upvalues: v155 (ref), l_Chat_0 (ref), v154 (ref)
-            v155 = l_Chat_0:InvokeChatCallback(Enum.ChatCallbackType.OnServerReceivingMessage, v154);
-        end);
-        v154.Message = nil;
-        if v155 then
-            if v155.ShouldDeliver == false then
-                return false;
-            else
-                v154 = v155;
-            end;
-        end;
-        v151 = v149:SendMessageObjToFilters(v151, v154, v150);
-        local v156 = {};
-        for _, v158 in pairs(v149.Speakers) do
-            if not v158:IsSpeakerMuted(v150.Name) and v149:CanCommunicate(v150, v158) then
-                table.insert(v156, v158.Name);
-                if v158.Name == v150.Name then
-                    local l_v154_0 = v154;
-                    local v160 = {};
-                    for v161, v162 in pairs(l_v154_0) do
-                        v160[v161] = v162;
-                    end;
-                    local l_v160_0 = v160;
-                    if v0 then
-                        l_v154_0 = v154.MessageLengthUtf8 or v154.MessageLength;
-                        l_v160_0.Message = string.rep("_", l_v154_0);
-                    else
-                        l_v160_0.Message = v151;
-                    end;
-                    l_v160_0.IsFiltered = true;
-                    v158:InternalSendMessage(l_v160_0, v149.Name);
-                else
-                    v158:InternalSendMessage(v154, v149.Name);
-                end;
-            end;
-        end;
-        local l_status_9, l_result_9 = pcall(function() --[[ Line: 439 ]]
-            -- upvalues: v149 (copy), v154 (ref)
-            v149.eMessagePosted:Fire(v154);
-        end);
-        if not l_status_9 and l_result_9 then
-            print("Error posting message: " .. l_result_9);
-        end;
-        local v166 = v149.Private and Enum.TextFilterContext.PrivateChat or Enum.TextFilterContext.PublicChat;
-        local v167 = nil;
-        if l_result_0 then
-            local v168 = {};
-            local v169 = {};
-            for _, v171 in pairs(v149.Speakers) do
-                local l_v171_Player_0 = v171:GetPlayer();
-                if l_v171_Player_0 ~= nil and l_v171_Player_0.LocaleId ~= nil then
-                    v169[getLanguageCodeFromLocale(l_v171_Player_0.LocaleId)] = true;
-                end;
-            end;
-            for v173, _ in v169 do
-                table.insert(v168, v173);
-            end;
-            local v175, v176, v177 = v149.ChatService:InternalApplyRobloxFilterAndTranslate(v154.FromSpeaker, v168, v151, v166);
-            if v175 then
-                if v176 then
-                    local l_SourceText_0 = v177.SourceText;
-                    v154.FilterResult = l_SourceText_0;
-                else
-                    v154.FilterResult = v177;
-                end;
-                v154.IsFilterResult = v176;
-                if v176 then
-                    v167 = v177;
-                end;
-            elseif l_status_0 then
-                v154.IsFilterResult = false;
-                v154.FilterResult = "";
-                v154.MessageLength = 0;
-            else
-                return false;
-            end;
-        else
-            local v179, v180, v181 = v149.ChatService:InternalApplyRobloxFilterNewAPI(v154.FromSpeaker, v151, v166);
-            if v179 then
-                v154.FilterResult = v181;
-                v154.IsFilterResult = v180;
-            elseif l_status_0 then
-                v154.IsFilterResult = false;
-                v154.FilterResult = "";
-                v154.MessageLength = 0;
-            else
-                return false;
-            end;
-        end;
-        v154.IsFiltered = true;
-        v149:InternalAddMessageToHistoryLog(v154);
-        for _, v183 in pairs(v156) do
-            local v184 = v149.Speakers[v183];
-            if v184 then
-                if l_result_0 and v167 and v150:GetPlayer() ~= nil and v184:GetPlayer() ~= nil and v150:GetPlayer().LocaleId ~= v184:GetPlayer().LocaleId then
-                    v184:InternalSendFilteredMessageWithTranslatedFilterResult(v154, v149.Name, v167);
-                else
-                    v184:InternalSendFilteredMessageWithFilterResult(v154, v149.Name);
-                end;
-            end;
-        end;
-        local v185 = {};
-        for _, v187 in pairs(v149.Speakers) do
-            if not v187:IsSpeakerMuted(v150.Name) and v149:CanCommunicate(v150, v187) then
-                local v188 = false;
-                for _, v190 in pairs(v156) do
-                    if v187.Name == v190 then
-                        v188 = true;
-                        break;
-                    end;
-                end;
-                if not v188 then
-                    table.insert(v185, v187.Name);
-                end;
-            end;
-        end;
-        for _, v192 in pairs(v185) do
-            local v193 = v149.Speakers[v192];
-            if v193 then
-                v193:InternalSendFilteredMessageWithFilterResult(v154, v149.Name);
-            end;
-        end;
-        return v154;
-    end;
-end;
-v15.InternalAddSpeaker = function(v194, v195) --[[ Line: 551 ]] --[[ Name: InternalAddSpeaker ]]
-    if v194.Speakers[v195.Name] then
-        warn("Speaker \"" .. v195.name .. "\" is already in the channel!");
-        return;
-    else
-        v194.Speakers[v195.Name] = v195;
-        local l_status_10, l_result_10 = pcall(function() --[[ Line: 558 ]]
-            -- upvalues: v194 (copy), v195 (copy)
-            v194.eSpeakerJoined:Fire(v195.Name);
-        end);
-        if not l_status_10 and l_result_10 then
-            print("Error removing channel: " .. l_result_10);
-        end;
-        return;
-    end;
-end;
-v15.InternalRemoveSpeaker = function(v198, v199) --[[ Line: 564 ]] --[[ Name: InternalRemoveSpeaker ]]
-    if not v198.Speakers[v199.Name] then
-        warn("Speaker \"" .. v199.name .. "\" is not in the channel!");
-        return;
-    else
-        v198.Speakers[v199.Name] = nil;
-        local l_status_11, l_result_11 = pcall(function() --[[ Line: 571 ]]
-            -- upvalues: v198 (copy), v199 (copy)
-            v198.eSpeakerLeft:Fire(v199.Name);
-        end);
-        if not l_status_11 and l_result_11 then
-            print("Error removing speaker: " .. l_result_11);
-        end;
-        return;
-    end;
-end;
-v15.InternalRemoveExcessMessagesFromLog = function(v202) --[[ Line: 577 ]] --[[ Name: InternalRemoveExcessMessagesFromLog ]]
-    local l_remove_0 = table.remove;
-    while #v202.ChatHistory > v202.MaxHistory do
-        l_remove_0(v202.ChatHistory, 1);
-    end;
-end;
-v15.InternalAddMessageToHistoryLog = function(v204, v205) --[[ Line: 584 ]] --[[ Name: InternalAddMessageToHistoryLog ]]
-    table.insert(v204.ChatHistory, v205);
-    v204:InternalRemoveExcessMessagesFromLog();
-end;
-v15.GetMessageType = function(_, _, v208) --[[ Line: 590 ]] --[[ Name: GetMessageType ]]
-    -- upvalues: l_ChatConstants_0 (copy)
-    if v208 == nil then
-        return l_ChatConstants_0.MessageTypeSystem;
-    else
-        return l_ChatConstants_0.MessageTypeDefault;
-    end;
-end;
-v15.InternalCreateMessageObject = function(v209, v210, v211, v212, v213) --[[ Line: 597 ]] --[[ Name: InternalCreateMessageObject ]]
-    -- upvalues: l_ChatSettings_0 (copy)
-    local l_v209_MessageType_0 = v209:GetMessageType(v210, v211);
-    local v215 = -1;
-    local v216 = nil;
-    local v217 = nil;
-    if v211 then
-        v217 = v209.ChatService:GetSpeaker(v211);
-        if v217 then
-            local l_v217_Player_0 = v217:GetPlayer();
-            if l_v217_Player_0 then
-                v215 = l_v217_Player_0.UserId;
-                if l_ChatSettings_0.PlayerDisplayNamesEnabled then
-                    v216 = v217:GetNameForDisplay();
-                end;
-            else
-                v215 = 0;
-            end;
-        end;
-    end;
-    local v219 = {
-        ID = v209.ChatService:InternalGetUniqueMessageId(), 
-        FromSpeaker = v211, 
-        SpeakerDisplayName = v216, 
-        SpeakerUserId = v215, 
-        OriginalChannel = v209.Name, 
-        MessageLength = string.len(v210), 
-        MessageLengthUtf8 = utf8.len(utf8.nfcnormalize(v210)), 
-        MessageType = l_v209_MessageType_0, 
-        IsFiltered = v212, 
-        Message = v212 and v210 or nil, 
-        Time = os.time(), 
-        ExtraData = {}
-    };
-    if v217 then
-        for v220, v221 in pairs(v217.ExtraData) do
-            v219.ExtraData[v220] = v221;
-        end;
-    end;
-    if v213 then
-        for v222, v223 in pairs(v213) do
-            v219.ExtraData[v222] = v223;
-        end;
-    end;
-    return v219;
-end;
-v15.SetChannelNameColor = function(v224, v225) --[[ Line: 657 ]] --[[ Name: SetChannelNameColor ]]
-    v224.ChannelNameColor = v225;
-    for _, v227 in pairs(v224.Speakers) do
-        v227:UpdateChannelNameColor(v224.Name, v225);
-    end;
-end;
-v15.GetWelcomeMessageForSpeaker = function(v228, v229) --[[ Line: 664 ]] --[[ Name: GetWelcomeMessageForSpeaker ]]
-    if v228.GetWelcomeMessageFunction then
-        local v230 = v228.GetWelcomeMessageFunction(v229);
-        if v230 then
-            return v230;
-        end;
-    end;
-    return v228.WelcomeMessage;
-end;
-v15.RegisterGetWelcomeMessageFunction = function(v231, v232) --[[ Line: 674 ]] --[[ Name: RegisterGetWelcomeMessageFunction ]]
-    if type(v232) ~= "function" then
-        error("RegisterGetWelcomeMessageFunction must be called with a function.");
-    end;
-    v231.GetWelcomeMessageFunction = v232;
-end;
-v15.UnRegisterGetWelcomeMessageFunction = function(v233) --[[ Line: 681 ]] --[[ Name: UnRegisterGetWelcomeMessageFunction ]]
-    v233.GetWelcomeMessageFunction = nil;
-end;
-v3.new = function(v234, v235, v236, v237) --[[ Line: 688 ]] --[[ Name: new ]]
-    -- upvalues: v15 (copy), l_Util_0 (copy)
-    local v238 = setmetatable({}, v15);
-    v238.ChatService = v234;
-    v238.Name = v235;
-    v238.WelcomeMessage = v236 or "";
-    v238.GetWelcomeMessageFunction = nil;
-    v238.ChannelNameColor = v237;
-    v238.Joinable = true;
-    v238.Leavable = true;
-    v238.AutoJoin = false;
-    v238.Private = false;
-    v238.Speakers = {};
-    v238.Mutes = {};
-    v238.MaxHistory = 200;
-    v238.HistoryIndex = 0;
-    v238.ChatHistory = {};
-    v238.FilterMessageFunctions = l_Util_0:NewSortedFunctionContainer();
-    v238.ProcessCommandsFunctions = l_Util_0:NewSortedFunctionContainer();
-    v238.eDestroyed = Instance.new("BindableEvent");
-    v238.eMessagePosted = Instance.new("BindableEvent");
-    v238.eSpeakerJoined = Instance.new("BindableEvent");
-    v238.eSpeakerLeft = Instance.new("BindableEvent");
-    v238.eSpeakerMuted = Instance.new("BindableEvent");
-    v238.eSpeakerUnmuted = Instance.new("BindableEvent");
-    v238.MessagePosted = v238.eMessagePosted.Event;
-    v238.SpeakerJoined = v238.eSpeakerJoined.Event;
-    v238.SpeakerLeft = v238.eSpeakerLeft.Event;
-    v238.SpeakerMuted = v238.eSpeakerMuted.Event;
-    v238.SpeakerUnmuted = v238.eSpeakerUnmuted.Event;
-    v238.Destroyed = v238.eDestroyed.Event;
-    return v238;
-end;
-return v3;
+local ok, result = pcall(function() -- line: 8
+	return UserSettings():IsUserFeatureEnabled("UserShouldMuteUnfilteredMessage")
+end)
+local u3 = ok and result
+local ok2, result2 = pcall(function() -- line: 13
+	return UserSettings():IsUserFeatureEnabled("UserRemoveMessageOnTextFilterFailures")
+end)
+local u6 = ok2 and result2
+local ok3, result3 = pcall(function() -- line: 21
+	return UserSettings():IsUserFeatureEnabled("UserIsChatTranslationEnabled2")
+end)
+local u9 = ok3 and result3
+local t1 = {}
+local scriptParent = script.Parent
+local Chat = game:GetService("Chat")
+local RunService = game:GetService("RunService")
+local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+local ChatConstants = require(ClientChatModules:WaitForChild("ChatConstants"))
+local Util = require(scriptParent:WaitForChild("Util"))
+local ChatLocalization = nil
+
+pcall(function() -- line: 42
+	-- upvalues: ChatLocalization (ref)
+	ChatLocalization = require(game:GetService("Chat").ClientChatModules.ChatLocalization)
+end)
+ChatLocalization = ChatLocalization or {}
+
+if not ChatLocalization.FormatMessageToSend or not ChatLocalization.LocalizeFormattedMessage then
+	function ChatLocalization.FormatMessageToSend(_, _, p3) -- line: 46
+		return p3
+	end
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.SendSystemMessage(p4, p5, p6) -- line: 55
+	local v27 = p4:InternalCreateMessageObject(p5, nil, true, p6)
+	local ok4, result4 = pcall(function() -- line: 58
+		-- upvalues: p4 (copy), v27 (copy)
+		p4.eMessagePosted:Fire(v27)
+	end)
+
+	if not ok4 and result4 then
+		print("Error posting message: " .. result4)
+	end
+
+	p4:InternalAddMessageToHistoryLog(v27)
+
+	for _, v in pairs(p4.Speakers) do
+		v:InternalSendSystemMessage(v27, p4.Name)
+	end
+
+	return v27
+end
+function t2.SendSystemMessageToSpeaker(p7, p8, p9, p10) -- line: 72
+	-- upvalues: RunService (copy)
+	local v36 = p7.Speakers[p9]
+
+	if v36 then
+		v36:InternalSendSystemMessage(p7:InternalCreateMessageObject(p8, nil, true, p10), p7.Name)
+
+		return
+	end
+
+	if RunService:IsStudio() then
+		warn(string.format("Speaker '%s' is not in channel '%s' and cannot be sent a system message", p9, p7.Name))
+	end
+end
+function t2.SendMessageObjToFilters(p11, p12, p13, p14) -- line: 82
+	local p13Message = p13.Message
+
+	p13.Message = p12
+	p11:InternalDoMessageFilter(p14.Name, p13, p11.Name)
+	p11.ChatService:InternalDoMessageFilter(p14.Name, p13, p11.Name)
+
+	local p13Message2 = p13.Message
+
+	p13.Message = p13Message
+
+	return p13Message2
+end
+function t2.CanCommunicateByUserId(_, p16, p17) -- line: 92
+	-- upvalues: RunService (copy), Chat (copy)
+	if RunService:IsStudio() then
+		return true
+	end
+
+	if p16 == 0 or p17 == 0 then
+		return true
+	end
+
+	local ok5, result5 = pcall(function() -- line: 100
+		-- upvalues: Chat (copy), p16 (copy), p17 (copy)
+		return Chat:CanUsersChatAsync(p16, p17)
+	end)
+
+	return ok5 and result5
+end
+function t2.CanCommunicate(p18, p19, p20) -- line: 106
+	local Player = p19:GetPlayer()
+	local Player2 = p20:GetPlayer()
+
+	if Player and Player2 then
+		return p18:CanCommunicateByUserId(Player.UserId, Player2.UserId)
+	end
+
+	return true
+end
+function t2.SendMessageToSpeaker(p21, p22, p23, p24, p25) -- line: 115
+	-- upvalues: RunService (copy)
+	local v58 = p21.Speakers[p23]
+	local Speaker = p21.ChatService:GetSpeaker(p24)
+
+	if v58 and Speaker then
+		if v58:IsSpeakerMuted(p24) then
+			return
+		end
+
+		if not p21:CanCommunicate(v58, Speaker) then
+			return
+		end
+
+		local v60 = p21:InternalCreateMessageObject(p22, p24, p23 == p24, p25)
+		local v61 = p21:SendMessageObjToFilters(p22, v60, p24)
+
+		v58:InternalSendMessage(v60, p21.Name)
+
+		local v62 = p21.Private and Enum.TextFilterContext.PrivateChat or Enum.TextFilterContext.PublicChat
+		local v63, v64, v65 = p21.ChatService:InternalApplyRobloxFilterNewAPI(v60.FromSpeaker, v61, v62)
+
+		if v63 then
+			v60.FilterResult = v65
+			v60.IsFilterResult = v64
+			v60.IsFiltered = true
+			v58:InternalSendFilteredMessageWithFilterResult(v60, p21.Name)
+
+			return
+		end
+	elseif RunService:IsStudio() then
+		warn(string.format("Speaker '%s' is not in channel '%s' and cannot be sent a message", p23, p21.Name))
+	end
+end
+function t2.KickSpeaker(p26, p27, p28) -- line: 151
+	local Speaker = p26.ChatService:GetSpeaker(p27)
+
+	if not Speaker then
+		error("Speaker \"" .. p27 .. "\" does not exist!")
+	end
+
+	local NameForDisplay = Speaker:GetNameForDisplay()
+	local v71, v72
+
+	if p28 then
+		v71 = string.format("You were kicked from '%s' for the following reason(s): %s", p26.Name, p28)
+		v72 = string.format("%s was kicked for the following reason(s): %s", NameForDisplay, p28)
+	else
+		v71 = string.format("You were kicked from '%s'", p26.Name)
+		v72 = string.format("%s was kicked", NameForDisplay)
+	end
+
+	p26:SendSystemMessageToSpeaker(v71, p27)
+	Speaker:LeaveChannel(p26.Name)
+	p26:SendSystemMessage(v72)
+end
+function t2.MuteSpeaker(p29, p30, p31, p32) -- line: 174
+	local Speaker = p29.ChatService:GetSpeaker(p30)
+
+	if not Speaker then
+		error("Speaker \"" .. p30 .. "\" does not exist!")
+	end
+
+	p29.Mutes[p30:lower()] = if p32 ~= 0 and p32 ~= nil then os.time() + p32 else 0
+
+	if p31 then
+		local NameForDisplay = Speaker:GetNameForDisplay()
+
+		p29:SendSystemMessage(string.format("%s was muted for the following reason(s): %s", NameForDisplay, p31))
+	end
+
+	local ok6, result6 = pcall(function() -- line: 188
+		-- upvalues: p29 (copy), p30 (copy), p31 (copy), p32 (copy)
+		p29.eSpeakerMuted:Fire(p30, p31, p32)
+	end)
+
+	if not ok6 and result6 then
+		print("Error mutting speaker: " .. result6)
+	end
+
+	local Speaker2 = p29.ChatService:GetSpeaker(p30)
+
+	if Speaker2 then
+		local ok7, result7 = pcall(function() -- line: 195
+			-- upvalues: Speaker2 (copy), p29 (copy), p31 (copy), p32 (copy)
+			Speaker2.eMuted:Fire(p29.Name, p31, p32)
+		end)
+
+		if not ok7 and result7 then
+			print("Error mutting speaker: " .. result7)
+		end
+	end
+end
+function t2.UnmuteSpeaker(p33, p34) -- line: 203
+	if not p33.ChatService:GetSpeaker(p34) then
+		error("Speaker \"" .. p34 .. "\" does not exist!")
+	end
+
+	p33.Mutes[p34:lower()] = nil
+
+	local ok8, result8 = pcall(function() -- line: 211
+		-- upvalues: p33 (copy), p34 (copy)
+		p33.eSpeakerUnmuted:Fire(p34)
+	end)
+
+	if not ok8 and result8 then
+		print("Error unmuting speaker: " .. result8)
+	end
+
+	local Speaker = p33.ChatService:GetSpeaker(p34)
+
+	if Speaker then
+		local ok9, result9 = pcall(function() -- line: 218
+			-- upvalues: Speaker (copy), p33 (copy)
+			Speaker.eUnmuted:Fire(p33.Name)
+		end)
+
+		if not ok9 and result9 then
+			print("Error unmuting speaker: " .. result9)
+		end
+	end
+end
+function t2.IsSpeakerMuted(p35, p36) -- line: 225
+	return p35.Mutes[p36:lower()] ~= nil
+end
+function t2.GetSpeakerList(p37) -- line: 229
+	local t3 = {}
+
+	for _, v in pairs(p37.Speakers) do
+		table.insert(t3, v.Name)
+	end
+
+	return t3
+end
+function t2.RegisterFilterMessageFunction(p38, p39, p40, p41) -- line: 237
+	if p38.FilterMessageFunctions:HasFunction(p39) then
+		error(string.format("FilterMessageFunction '%s' already exists", p39))
+	end
+
+	p38.FilterMessageFunctions:AddFunction(p39, p40, p41)
+end
+function t2.FilterMessageFunctionExists(p42, p43) -- line: 244
+	return p42.FilterMessageFunctions:HasFunction(p43)
+end
+function t2.UnregisterFilterMessageFunction(p44, p45) -- line: 248
+	if not p44.FilterMessageFunctions:HasFunction(p45) then
+		error(string.format("FilterMessageFunction '%s' does not exists", p45))
+	end
+
+	p44.FilterMessageFunctions:RemoveFunction(p45)
+end
+function t2.RegisterProcessCommandsFunction(p46, p47, p48, p49) -- line: 255
+	if p46.ProcessCommandsFunctions:HasFunction(p47) then
+		error(string.format("ProcessCommandsFunction '%s' already exists", p47))
+	end
+
+	p46.ProcessCommandsFunctions:AddFunction(p47, p48, p49)
+end
+function t2.ProcessCommandsFunctionExists(p50, p51) -- line: 262
+	return p50.ProcessCommandsFunctions:HasFunction(p51)
+end
+function t2.UnregisterProcessCommandsFunction(p52, p53) -- line: 266
+	if not p52.ProcessCommandsFunctions:HasFunction(p53) then
+		error(string.format("ProcessCommandsFunction '%s' does not exist", p53))
+	end
+
+	p52.ProcessCommandsFunctions:RemoveFunction(p53)
+end
+
+local function ShallowCopy(p54) -- line: 273
+	local t4 = {}
+
+	for k, v in pairs(p54) do
+		t4[k] = v
+	end
+
+	return t4
+end
+
+function t2.GetHistoryLog(p55) -- line: 281
+	local ChatHistory = p55.ChatHistory
+	local t5 = {}
+
+	for k, v in pairs(ChatHistory) do
+		t5[k] = v
+	end
+
+	return t5
+end
+function t2.GetHistoryLogForSpeaker(p56, p57) -- line: 285
+	-- upvalues: ChatConstants (copy)
+	local n1 = -1
+	local Player = p57:GetPlayer()
+
+	if Player then
+		n1 = Player.UserId
+	end
+
+	local t6 = {}
+
+	for i = 1, #p56.ChatHistory do
+		if p56:CanCommunicateByUserId(n1, p56.ChatHistory[i].SpeakerUserId) then
+			local v128 = p56.ChatHistory[i]
+			local t7 = {}
+
+			for k, v in pairs(v128) do
+				t7[k] = v
+			end
+
+			if t7.MessageType == ChatConstants.MessageTypeDefault or t7.MessageType == ChatConstants.MessageTypeMeCommand then
+				local FilterResult = t7.FilterResult
+
+				if t7.IsFilterResult then
+					if Player then
+						t7.Message = FilterResult:GetChatForUserAsync(Player.UserId)
+					else
+						t7.Message = FilterResult:GetNonChatStringForBroadcastAsync()
+					end
+				else
+					t7.Message = FilterResult
+				end
+			end
+
+			table.insert(t6, t7)
+		end
+	end
+
+	return t6
+end
+function t2.InternalDestroy(p58) -- line: 323
+	for _, v in pairs(p58.Speakers) do
+		v:LeaveChannel(p58.Name)
+	end
+
+	p58.eDestroyed:Fire()
+	p58.eDestroyed:Destroy()
+	p58.eMessagePosted:Destroy()
+	p58.eSpeakerJoined:Destroy()
+	p58.eSpeakerLeft:Destroy()
+	p58.eSpeakerMuted:Destroy()
+	p58.eSpeakerUnmuted:Destroy()
+end
+function t2.InternalDoMessageFilter(p59, p60, p61, p62) -- line: 338
+	for v140, v141, _ in (p59.FilterMessageFunctions:GetIterator()) do
+		local ok10, result10 = pcall(function() -- line: 341
+			-- upvalues: v141 (copy), p60 (copy), p61 (copy), p62 (copy)
+			v141(p60, p61, p62)
+		end)
+
+		if not ok10 then
+			warn(string.format("DoMessageFilter Function '%s' failed for reason: %s", v140, result10))
+		end
+	end
+end
+function t2.InternalDoProcessCommands(p63, p64, p65, p66) -- line: 351
+	for v149, v150, _ in (p63.ProcessCommandsFunctions:GetIterator()) do
+		local ok11, result11 = pcall(function() -- line: 354
+			-- upvalues: v150 (copy), p64 (copy), p65 (copy), p66 (copy)
+			local v246 = v150(p64, p65, p66)
+
+			if type(v246) ~= "boolean" then
+				error("Process command functions must return a bool")
+			end
+
+			return v246
+		end)
+
+		if ok11 then
+			if not result11 then
+				continue
+			end
+
+			return true
+		end
+
+		warn(string.format("DoProcessCommands Function '%s' failed for reason: %s", v149, result11))
+	end
+
+	return false
+end
+function getLanguageCodeFromLocale(p67) -- line: 372
+	local v155 = string.gmatch(p67, "[^-]+")()
+
+	if v155 then
+		return v155
+	end
+
+	return "en"
+end
+function t2.InternalPostMessage(p68, p69, p70, p71) -- line: 382
+	-- upvalues: ChatLocalization (ref), Chat (copy), u3 (ref), u9 (ref), u6 (ref)
+	if p68:InternalDoProcessCommands(p69.Name, p70, p68.Name) then
+		return false
+	end
+
+	if p68.Mutes[p69.Name:lower()] ~= nil then
+		local v160 = p68.Mutes[p69.Name:lower()]
+
+		if not (v160 > 0) or not (v160 < os.time()) then
+			p68:SendSystemMessageToSpeaker(ChatLocalization:FormatMessageToSend("GameChat_ChatChannel_MutedInChannel", "You are muted and cannot talk in this channel"), p69.Name)
+
+			return false
+		end
+
+		p68:UnmuteSpeaker(p69.Name)
+	end
+
+	local u161 = p68:InternalCreateMessageObject(p70, p69.Name, false, p71)
+
+	u161.Message = p70
+
+	local u162 = nil
+
+	pcall(function() -- line: 400
+		-- upvalues: u162 (ref), Chat (copy), u161 (ref)
+		u162 = Chat:InvokeChatCallback(Enum.ChatCallbackType.OnServerReceivingMessage, u161)
+	end)
+	u161.Message = nil
+
+	if u162 then
+		if u162.ShouldDeliver == false then
+			return false
+		end
+
+		u161 = u162
+	end
+
+	local v163 = p68:SendMessageObjToFilters(p70, u161, p69)
+	local t8 = {}
+
+	for _, v in pairs(p68.Speakers) do
+		if not v:IsSpeakerMuted(p69.Name) and p68:CanCommunicate(p69, v) then
+			table.insert(t8, v.Name)
+
+			if v.Name == p69.Name then
+				local v167 = u161
+				local t9 = {}
+
+				for k, v2 in pairs(v167) do
+					t9[k] = v2
+				end
+
+				if u3 then
+					local v171 = u161.MessageLengthUtf8 or u161.MessageLength
+
+					t9.Message = string.rep("_", v171)
+				else
+					t9.Message = v163
+				end
+
+				t9.IsFiltered = true
+				v:InternalSendMessage(t9, p68.Name)
+			else
+				v:InternalSendMessage(u161, p68.Name)
+			end
+		end
+	end
+
+	local ok12, result12 = pcall(function() -- line: 439
+		-- upvalues: p68 (copy), u161 (ref)
+		p68.eMessagePosted:Fire(u161)
+	end)
+
+	if not ok12 and result12 then
+		print("Error posting message: " .. result12)
+	end
+
+	local v174 = p68.Private and Enum.TextFilterContext.PrivateChat or Enum.TextFilterContext.PublicChat
+	local v175 = nil
+
+	if u9 then
+		local t10 = {}
+		local t11 = {}
+
+		for _, v in pairs(p68.Speakers) do
+			local Player = v:GetPlayer()
+
+			if Player ~= nil and Player.LocaleId ~= nil then
+				t11[getLanguageCodeFromLocale(Player.LocaleId)] = true
+			end
+		end
+
+		for v181, _ in t11 do
+			table.insert(t10, v181)
+		end
+
+		local v183, v184, v185 = p68.ChatService:InternalApplyRobloxFilterAndTranslate(u161.FromSpeaker, t10, v163, v174)
+
+		if v183 then
+			if v184 then
+				u161.FilterResult = v185.SourceText
+			else
+				u161.FilterResult = v185
+			end
+
+			u161.IsFilterResult = v184
+
+			if v184 then
+				v175 = v185
+			end
+		else
+			if not u6 then
+				return false
+			end
+
+			u161.IsFilterResult = false
+			u161.FilterResult = ""
+			u161.MessageLength = 0
+		end
+	else
+		local v186, v187, v188 = p68.ChatService:InternalApplyRobloxFilterNewAPI(u161.FromSpeaker, v163, v174)
+
+		if v186 then
+			u161.FilterResult = v188
+			u161.IsFilterResult = v187
+		else
+			if not u6 then
+				return false
+			end
+
+			u161.IsFilterResult = false
+			u161.FilterResult = ""
+			u161.MessageLength = 0
+		end
+	end
+
+	u161.IsFiltered = true
+	p68:InternalAddMessageToHistoryLog(u161)
+
+	for _, v in pairs(t8) do
+		local v191 = p68.Speakers[v]
+
+		if v191 then
+			if u9 and (v175 and (p69:GetPlayer() ~= nil and (v191:GetPlayer() ~= nil and p69:GetPlayer().LocaleId ~= v191:GetPlayer().LocaleId))) then
+				v191:InternalSendFilteredMessageWithTranslatedFilterResult(u161, p68.Name, v175)
+			else
+				v191:InternalSendFilteredMessageWithFilterResult(u161, p68.Name)
+			end
+		end
+	end
+
+	local t12 = {}
+
+	for _, v in pairs(p68.Speakers) do
+		if not v:IsSpeakerMuted(p69.Name) and p68:CanCommunicate(p69, v) then
+			local v195 = false
+
+			for _, v3 in pairs(t8) do
+				if v3 == v.Name then
+					v195 = true
+
+					break
+				end
+			end
+
+			if not v195 then
+				table.insert(t12, v.Name)
+			end
+		end
+	end
+
+	for _, v in pairs(t12) do
+		local v200 = p68.Speakers[v]
+
+		if v200 then
+			v200:InternalSendFilteredMessageWithFilterResult(u161, p68.Name)
+		end
+	end
+
+	return u161
+end
+function t2.InternalAddSpeaker(p72, p73) -- line: 551
+	if p72.Speakers[p73.Name] then
+		warn("Speaker \"" .. p73.name .. "\" is already in the channel!")
+
+		return
+	end
+
+	p72.Speakers[p73.Name] = p73
+
+	local ok13, result13 = pcall(function() -- line: 558
+		-- upvalues: p72 (copy), p73 (copy)
+		p72.eSpeakerJoined:Fire(p73.Name)
+	end)
+
+	if not ok13 and result13 then
+		print("Error removing channel: " .. result13)
+	end
+end
+function t2.InternalRemoveSpeaker(p74, p75) -- line: 564
+	if not p74.Speakers[p75.Name] then
+		warn("Speaker \"" .. p75.name .. "\" is not in the channel!")
+
+		return
+	end
+
+	p74.Speakers[p75.Name] = nil
+
+	local ok14, result14 = pcall(function() -- line: 571
+		-- upvalues: p74 (copy), p75 (copy)
+		p74.eSpeakerLeft:Fire(p75.Name)
+	end)
+
+	if not ok14 and result14 then
+		print("Error removing speaker: " .. result14)
+	end
+end
+function t2.InternalRemoveExcessMessagesFromLog(p76) -- line: 577
+	local remove = table.remove
+
+	while #p76.ChatHistory > p76.MaxHistory do
+		remove(p76.ChatHistory, 1)
+	end
+end
+function t2.InternalAddMessageToHistoryLog(p77, p78) -- line: 584
+	table.insert(p77.ChatHistory, p78)
+	p77:InternalRemoveExcessMessagesFromLog()
+end
+function t2.GetMessageType(_, _, p81) -- line: 590
+	-- upvalues: ChatConstants (copy)
+	if p81 == nil then
+		return ChatConstants.MessageTypeSystem
+	end
+
+	return ChatConstants.MessageTypeDefault
+end
+function t2.InternalCreateMessageObject(p82, p83, p84, p85, p86) -- line: 597
+	-- upvalues: ChatSettings (copy)
+	local MessageType = p82:GetMessageType(p83, p84)
+	local n2 = -1
+	local NameForDisplay = nil
+	local Speaker = nil
+
+	if p84 then
+		Speaker = p82.ChatService:GetSpeaker(p84)
+
+		if Speaker then
+			local Player = Speaker:GetPlayer()
+
+			if Player then
+				n2 = Player.UserId
+
+				if ChatSettings.PlayerDisplayNamesEnabled then
+					NameForDisplay = Speaker:GetNameForDisplay()
+				end
+			else
+				n2 = 0
+			end
+		end
+	end
+
+	local t13 = {
+		ID = p82.ChatService:InternalGetUniqueMessageId(),
+		FromSpeaker = p84,
+		SpeakerDisplayName = NameForDisplay,
+		SpeakerUserId = n2,
+		OriginalChannel = p82.Name,
+		MessageLength = string.len(p83),
+		MessageLengthUtf8 = utf8.len(utf8.nfcnormalize(p83)),
+		MessageType = MessageType,
+		IsFiltered = p85,
+		Message = p85 and p83 or nil,
+		Time = os.time(),
+		ExtraData = {}
+	}
+
+	if Speaker then
+		for k, v in pairs(Speaker.ExtraData) do
+			t13.ExtraData[k] = v
+		end
+	end
+
+	if p86 then
+		for k, v in pairs(p86) do
+			t13.ExtraData[k] = v
+		end
+	end
+
+	return t13
+end
+function t2.SetChannelNameColor(p87, p88) -- line: 657
+	p87.ChannelNameColor = p88
+
+	for _, v in pairs(p87.Speakers) do
+		v:UpdateChannelNameColor(p87.Name, p88)
+	end
+end
+function t2.GetWelcomeMessageForSpeaker(p89, p90) -- line: 664
+	if p89.GetWelcomeMessageFunction then
+		local v237 = p89.GetWelcomeMessageFunction(p90)
+
+		if v237 then
+			return v237
+		end
+	end
+
+	return p89.WelcomeMessage
+end
+function t2.RegisterGetWelcomeMessageFunction(p91, p92) -- line: 674
+	if type(p92) ~= "function" then
+		error("RegisterGetWelcomeMessageFunction must be called with a function.")
+	end
+
+	p91.GetWelcomeMessageFunction = p92
+end
+function t2.UnRegisterGetWelcomeMessageFunction(p93) -- line: 681
+	p93.GetWelcomeMessageFunction = nil
+end
+function t1.new(p94, p95, p96, p97) -- line: 688
+	-- upvalues: t2 (copy), Util (copy)
+	local self = setmetatable({}, t2)
+
+	self.ChatService = p94
+	self.Name = p95
+	self.WelcomeMessage = p96 or ""
+	self.GetWelcomeMessageFunction = nil
+	self.ChannelNameColor = p97
+	self.Joinable = true
+	self.Leavable = true
+	self.AutoJoin = false
+	self.Private = false
+	self.Speakers = {}
+	self.Mutes = {}
+	self.MaxHistory = 200
+	self.HistoryIndex = 0
+	self.ChatHistory = {}
+	self.FilterMessageFunctions = Util:NewSortedFunctionContainer()
+	self.ProcessCommandsFunctions = Util:NewSortedFunctionContainer()
+	self.eDestroyed = Instance.new("BindableEvent")
+	self.eMessagePosted = Instance.new("BindableEvent")
+	self.eSpeakerJoined = Instance.new("BindableEvent")
+	self.eSpeakerLeft = Instance.new("BindableEvent")
+	self.eSpeakerMuted = Instance.new("BindableEvent")
+	self.eSpeakerUnmuted = Instance.new("BindableEvent")
+	self.MessagePosted = self.eMessagePosted.Event
+	self.SpeakerJoined = self.eSpeakerJoined.Event
+	self.SpeakerLeft = self.eSpeakerLeft.Event
+	self.SpeakerMuted = self.eSpeakerMuted.Event
+	self.SpeakerUnmuted = self.eSpeakerUnmuted.Event
+	self.Destroyed = self.eDestroyed.Event
+
+	return self
+end
+
+return t1

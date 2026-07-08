@@ -1,53 +1,59 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Enums.Orientation);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Components.View);
-local v6 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v7 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v8 = require(script.Parent.OptionSelectorGroupContext);
-local v9 = {
-    orientation = v3.Vertical, 
-    Selectable = true, 
-    testId = "--foundation-option-selector-group"
-};
-return v2.memo(v2.forwardRef(function(v10, v11) --[[ Line: 32 ]] --[[ Name: OptionSelectorGroup ]]
-    -- upvalues: v7 (copy), v9 (copy), v2 (copy), v5 (copy), v6 (copy), v3 (copy), v8 (copy)
-    local v12 = v7(v10, v9);
-    local v13, v14 = v2.useState(v12.value);
-    v2.useEffect(function() --[[ Line: 36 ]]
-        -- upvalues: v12 (copy), v14 (copy)
-        if v12.value ~= nil then
-            v14(v12.value);
-        end;
-    end, {
-        v12.value
-    });
-    local v16 = v2.useCallback(function(v15) --[[ Line: 42 ]]
-        -- upvalues: v14 (copy), v12 (copy)
-        v14(v15);
-        v12.onValueChanged(v15);
-    end, {
-        v14, 
-        v12.onValueChanged
-    });
-    return v2.createElement(v5, v6(v12, {
-        tag = {
-            ["col size-full-0 auto-y"] = v12.orientation == v3.Vertical, 
-            ["row auto-x"] = v12.orientation == v3.Horizontal, 
-            ["gap-small"] = true
-        }, 
-        ref = v11
-    }), {
-        OptionSelectorGroupContext = v2.createElement(v8.Provider, {
-            value = {
-                value = v13, 
-                onValueChanged = v16, 
-                orientation = v12.orientation, 
-                Selectable = v12.Selectable, 
-                testId = v12.testId
-            }
-        }, v12.children)
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Orientation = require(Foundation.Enums.Orientation)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local OptionSelectorGroupContext = require(script.Parent.OptionSelectorGroupContext)
+local t1 = {
+	Selectable = true,
+	testId = "--foundation-option-selector-group",
+	orientation = Orientation.Vertical
+}
+
+local function OptionSelectorGroup(p1, p2) -- line: 32
+	-- upvalues: withDefaults (copy), t1 (copy), React (copy), View (copy), withCommonProps (copy), Orientation (copy), OptionSelectorGroupContext (copy)
+	local v13 = withDefaults(p1, t1)
+	local v14, v15 = React.useState(v13.value)
+
+	React.useEffect(function() -- line: 36
+		-- upvalues: v13 (copy), v15 (copy)
+		if v13.value ~= nil then
+			v15(v13.value)
+		end
+	end, { v13.value })
+
+	local v16 = React.useCallback(function(s1: string) -- line: 42
+		-- upvalues: v15 (copy), v13 (copy)
+		v15(s1)
+		v13.onValueChanged(s1)
+	end, {
+		v15,
+		v13.onValueChanged
+	})
+
+	return React.createElement(View, withCommonProps(v13, {
+		tag = {
+			["col size-full-0 auto-y"] = v13.orientation == Orientation.Vertical,
+			["row auto-x"] = v13.orientation == Orientation.Horizontal,
+			["gap-small"] = true
+		},
+		ref = p2
+	}), {
+		OptionSelectorGroupContext = React.createElement(OptionSelectorGroupContext.Provider, {
+			value = {
+				value = v14,
+				onValueChanged = v16,
+				orientation = v13.orientation,
+				Selectable = v13.Selectable,
+				testId = v13.testId
+			}
+		}, v13.children)
+	})
+end
+
+return React.memo(React.forwardRef(OptionSelectorGroup))

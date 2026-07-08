@@ -1,33 +1,39 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerTriggeredModals").Parent;
-local _ = require(script.Parent.PromptsEntryPoint);
-local _ = require(script.Parent.Types.PromptsTypes);
-local v3 = require(l_Parent_0.SduiSharedUtilities);
-local l_UrlBuilder_0 = require(l_Parent_0.UrlBuilder).UrlBuilder;
-local l_UrlBase_0 = require(l_Parent_0.UrlBuilder).UrlBase;
-local l_SduiResponseType_0 = v3.SduiResponseType;
-local l_getSduiApiStore_0 = v3.getSduiApiStore;
-local l_FFlagSduiAllowNoConfigsBuilt_0 = require(l_Parent_0.SharedFlags).FFlagSduiAllowNoConfigsBuilt;
-local function v10(v9) --[[ Line: 26 ]] --[[ Name: getPromptsUrl ]]
-    -- upvalues: l_UrlBuilder_0 (copy), l_UrlBase_0 (copy)
-    return l_UrlBuilder_0.new({
-        base = l_UrlBase_0.APIS, 
-        path = "modals-api/v1/prompts", 
-        query = {
-            entryPoint = v9
-        }
-    })();
-end;
-return function(v11, v12) --[[ Line: 37 ]] --[[ Name: fetchPrompts ]]
-    -- upvalues: l_Parent_0 (copy), l_getSduiApiStore_0 (copy), l_SduiResponseType_0 (copy), v10 (copy), l_FFlagSduiAllowNoConfigsBuilt_0 (copy)
-    local l_GetEligiblePromptsResponse_0 = require(l_Parent_0.ServiceContractsProto).apppageplatform.prompts.prompts.GetEligiblePromptsResponse;
-    l_getSduiApiStore_0().fetchIfNeeded({
-        responseType = l_SduiResponseType_0.ProtobufJson, 
-        url = v10(v11.entryPoint), 
-        surfaceKey = v11.surfaceKey, 
-        configKey = v11.configKey, 
-        clearOnEmptyResponse = v11.clearOnEmptyResponse, 
-        allowNoConfigsBuilt = if l_FFlagSduiAllowNoConfigsBuilt_0 then v11.allowNoConfigsBuilt else nil, 
-        loadTimer = v11.loadTimer, 
-        apiProto = l_GetEligiblePromptsResponse_0
-    }, v12);
-end;
+local Parent = script:FindFirstAncestor("ServerTriggeredModals").Parent
+
+require(script.Parent.PromptsEntryPoint)
+require(script.Parent.Types.PromptsTypes)
+
+local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
+local UrlBuilder = require(Parent.UrlBuilder).UrlBuilder
+local UrlBase = require(Parent.UrlBuilder).UrlBase
+local SduiResponseType = SduiSharedUtilities.SduiResponseType
+local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
+local FFlagSduiAllowNoConfigsBuilt = require(Parent.SharedFlags).FFlagSduiAllowNoConfigsBuilt
+
+local function getPromptsUrl(p1) -- line: 26
+	-- upvalues: UrlBuilder (copy), UrlBase (copy)
+	return UrlBuilder.new({
+		path = "modals-api/v1/prompts",
+		base = UrlBase.APIS,
+		query = {
+			entryPoint = p1
+		}
+	})()
+end
+local function fetchPrompts(p2, b1: boolean?) -- line: 37
+	-- upvalues: Parent (copy), getSduiApiStore (copy), SduiResponseType (copy), getPromptsUrl (copy), FFlagSduiAllowNoConfigsBuilt (copy)
+	local GetEligiblePromptsResponse = require(Parent.ServiceContractsProto).apppageplatform.prompts.prompts.GetEligiblePromptsResponse
+
+	getSduiApiStore().fetchIfNeeded({
+		responseType = SduiResponseType.ProtobufJson,
+		url = getPromptsUrl(p2.entryPoint),
+		surfaceKey = p2.surfaceKey,
+		configKey = p2.configKey,
+		clearOnEmptyResponse = p2.clearOnEmptyResponse,
+		allowNoConfigsBuilt = if not FFlagSduiAllowNoConfigsBuilt then nil else p2.allowNoConfigsBuilt,
+		loadTimer = p2.loadTimer,
+		apiProto = GetEligiblePromptsResponse
+	}, b1)
+end
+
+return fetchPrompts

@@ -1,11 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SceneUnderstanding");
-local v1 = require(l_script_FirstAncestor_0.wiring.isWirable);
-local _ = require(l_script_FirstAncestor_0.wiring.types);
-return function(v3) --[[ Line: 8 ]] --[[ Name: toWirableInstance ]]
-    -- upvalues: v1 (copy)
-    if v3 and v1(v3) then
-        return v3;
-    else
-        return nil;
-    end;
-end;
+local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+local isWirable = require(SceneUnderstanding.wiring.isWirable)
+
+require(SceneUnderstanding.wiring.types)
+
+local function toWirableInstance(p1) -- line: 8
+	-- upvalues: isWirable (copy)
+	if p1 and isWirable(p1) then
+		return p1
+	end
+
+	return nil
+end
+
+return toWirableInstance

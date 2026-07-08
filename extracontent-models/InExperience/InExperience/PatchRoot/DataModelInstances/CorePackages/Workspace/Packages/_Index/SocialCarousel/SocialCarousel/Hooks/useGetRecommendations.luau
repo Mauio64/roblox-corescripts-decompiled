@@ -1,59 +1,63 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCarousel");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.SocialCommon);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.RoactUtils);
-local v6 = require(l_script_FirstAncestor_0.Utils.getDeepValue);
-local v7 = require(l_script_FirstAncestor_0.Common.Constants);
-local l_RecommendationSourceEnum_0 = v2.Enums.RecommendationSourceEnum;
-local l_useSelector_0 = v5.Hooks.RoactRodux.useSelector;
-local function v12(v10, v11) --[[ Line: 28 ]]
-    return v10.rank < v11.rank;
-end;
-return function(v13) --[[ Line: 32 ]]
-    -- upvalues: l_useSelector_0 (copy), v6 (copy), v7 (copy), l_RecommendationSourceEnum_0 (copy), v3 (copy), v4 (copy), v12 (copy)
-    local v15 = l_useSelector_0(function(v14) --[[ Line: 33 ]]
-        -- upvalues: v6 (ref), v7 (ref), v13 (copy), l_RecommendationSourceEnum_0 (ref)
-        return {
-            recommendationsDict = v6(v14, string.format("%s.Friends.recommendations.byUserId.%s", v7.RODUX_KEY, v13 or "")) or {}, 
-            friendshipStatus = v6(v14, string.format("%s.Friends.friendshipStatus", v7.RODUX_KEY)) or {}, 
-            friendsCarouselRecommendationIds = v6(v14, string.format("%s.Friends.recommendations.bySource.%s", v7.RODUX_KEY, l_RecommendationSourceEnum_0.HomepageFriendsCarousel)) or {}, 
-            hasIncomingFriendRequest = v6(v14, string.format("%s.Friends.recommendations.hasIncomingFriendRequest", v7.RODUX_KEY)), 
-            users = v6(v14, string.format("%s.Users.byUserId", v7.RODUX_KEY))
-        };
-    end);
-    local v17 = v3.useMemo(function() --[[ Line: 57 ]]
-        -- upvalues: v4 (ref), v15 (copy)
-        return v4.List.filter(v4.Dictionary.keys(v15.recommendationsDict), function(v16) --[[ Line: 58 ]]
-            -- upvalues: v15 (ref)
-            return v15.friendsCarouselRecommendationIds[v16];
-        end);
-    end, {
-        v15.recommendationsDict, 
-        v15.friendsCarouselRecommendationIds
-    });
-    local v21 = v3.useCallback(function(v18) --[[ Line: 66 ]]
-        -- upvalues: v15 (copy), v4 (ref)
-        local v19 = v15.recommendationsDict[v18];
-        local v20 = v15.friendshipStatus[v18];
-        return v4.Dictionary.join(v15.users[v18], v19, {
-            isFriendWithUser = if v20 then v20 == Enum.FriendStatus.Friend else false, 
-            hasPendingFriendRequest = if v20 then v20 == Enum.FriendStatus.FriendRequestSent else false, 
-            canSendFriendRequest = not v20 or v20 == Enum.FriendStatus.NotFriend, 
-            hasIncomingFriendRequest = v15.hasIncomingFriendRequest[v18]
-        });
-    end, {
-        v15.recommendationsDict, 
-        v15.friendshipStatus, 
-        v15.users, 
-        v15.hasIncomingFriendRequest
-    });
-    return (v3.useMemo(function() --[[ Line: 87 ]]
-        -- upvalues: v4 (ref), v17 (copy), v21 (copy), v12 (ref)
-        return v4.List.sort(v4.List.map(v17, v21), v12);
-    end, {
-        v17, 
-        v21
-    }));
-end;
+local SocialCarousel = script:FindFirstAncestor("SocialCarousel")
+local SocialCarouselParent = SocialCarousel.Parent
+local SocialCommon = require(SocialCarouselParent.SocialCommon)
+local React = require(SocialCarouselParent.React)
+local Cryo = require(SocialCarouselParent.Cryo)
+local RoactUtils = require(SocialCarouselParent.RoactUtils)
+local getDeepValue = require(SocialCarousel.Utils.getDeepValue)
+local Constants = require(SocialCarousel.Common.Constants)
+local RecommendationSourceEnum = SocialCommon.Enums.RecommendationSourceEnum
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+
+local function v11(t1: {[any]: any}, t2: {[any]: any}) -- line: 28
+	return t1.rank < t2.rank
+end
+
+return function(s1: string) -- line: 32
+	-- upvalues: useSelector (copy), getDeepValue (copy), Constants (copy), RecommendationSourceEnum (copy), React (copy), Cryo (copy), v11 (copy)
+	local v15 = useSelector(function(p1) -- line: 33
+		-- upvalues: getDeepValue (copy), Constants (copy), s1 (copy), RecommendationSourceEnum (copy)
+		return {
+			recommendationsDict = getDeepValue(p1, string.format("%s.Friends.recommendations.byUserId.%s", Constants.RODUX_KEY, s1 or "")) or {},
+			friendshipStatus = getDeepValue(p1, string.format("%s.Friends.friendshipStatus", Constants.RODUX_KEY)) or {},
+			friendsCarouselRecommendationIds = getDeepValue(p1, string.format("%s.Friends.recommendations.bySource.%s", Constants.RODUX_KEY, RecommendationSourceEnum.HomepageFriendsCarousel)) or {},
+			hasIncomingFriendRequest = getDeepValue(p1, string.format("%s.Friends.recommendations.hasIncomingFriendRequest", Constants.RODUX_KEY)),
+			users = getDeepValue(p1, string.format("%s.Users.byUserId", Constants.RODUX_KEY))
+		}
+	end)
+	local v16 = React.useMemo(function() -- line: 57
+		-- upvalues: Cryo (copy), v15 (copy)
+		return Cryo.List.filter(Cryo.Dictionary.keys(v15.recommendationsDict), function(p2) -- line: 58
+			-- upvalues: v15 (copy)
+			return v15.friendsCarouselRecommendationIds[p2]
+		end)
+	end, {
+		v15.recommendationsDict,
+		v15.friendsCarouselRecommendationIds
+	})
+	local v17 = React.useCallback(function(p3) -- line: 66
+		-- upvalues: v15 (copy), Cryo (copy)
+		local v20 = v15.recommendationsDict[p3]
+		local v21 = v15.friendshipStatus[p3]
+
+		return Cryo.Dictionary.join(v15.users[p3], v20, {
+			isFriendWithUser = not not v21 and v21 == Enum.FriendStatus.Friend,
+			hasPendingFriendRequest = not not v21 and v21 == Enum.FriendStatus.FriendRequestSent,
+			canSendFriendRequest = not v21 or v21 == Enum.FriendStatus.NotFriend,
+			hasIncomingFriendRequest = v15.hasIncomingFriendRequest[p3]
+		})
+	end, {
+		v15.recommendationsDict,
+		v15.friendshipStatus,
+		v15.users,
+		v15.hasIncomingFriendRequest
+	})
+
+	return (React.useMemo(function() -- line: 87
+		-- upvalues: Cryo (copy), v16 (copy), v17 (copy), v11 (copy)
+		return Cryo.List.sort(Cryo.List.map(v16, v17), v11)
+	end, {
+		v16,
+		v17
+	}))
+end

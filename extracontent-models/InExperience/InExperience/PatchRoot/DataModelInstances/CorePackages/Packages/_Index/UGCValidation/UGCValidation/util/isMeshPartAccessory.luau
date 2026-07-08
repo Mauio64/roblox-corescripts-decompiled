@@ -1,9 +1,13 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isMeshPartAccessory ]]
-    if v0:IsA("Accessory") then
-        local l_Handle_0 = v0:FindFirstChild("Handle");
-        if l_Handle_0 and l_Handle_0:IsA("MeshPart") then
-            return true;
-        end;
-    end;
-    return false;
-end;
+local function isMeshPartAccessory(p1) -- line: 1
+	if p1:IsA("Accessory") then
+		local Handle = p1:FindFirstChild("Handle")
+
+		if Handle and Handle:IsA("MeshPart") then
+			return true
+		end
+	end
+
+	return false
+end
+
+return isMeshPartAccessory

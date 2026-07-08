@@ -1,43 +1,50 @@
-local l_CommerceService_0 = game:GetService("CommerceService");
-local l_Parent_0 = script:FindFirstAncestor("CommercePurchaseApp").Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v5 = require(l_Parent_0.ToastRodux);
-local l_ToastType_0 = v5.Enums.ToastType;
-local l_SetCurrentToastMessage_0 = v5.Actions.SetCurrentToastMessage;
-return function() --[[ Line: 13 ]] --[[ Name: useBenefitStatusReceivedListenerEffect ]]
-    -- upvalues: l_useDispatch_0 (copy), l_useLocalization_0 (copy), v2 (copy), l_CommerceService_0 (copy), l_ToastType_0 (copy), l_SetCurrentToastMessage_0 (copy)
-    local v8 = l_useDispatch_0();
-    local v9 = l_useLocalization_0({
-        granted = "CoreScripts.CommercePurchasePrompt.SuccessToast.Granted", 
-        pending = "CoreScripts.CommercePurchasePrompt.SuccessToast.GrantPending"
-    });
-    v2.useEffect(function() --[[ Line: 19 ]]
-        -- upvalues: v8 (copy), l_CommerceService_0 (ref), l_ToastType_0 (ref), v9 (copy), l_SetCurrentToastMessage_0 (ref)
-        local v10 = nil;
-        if v8 then
-            v10 = l_CommerceService_0.BenefitStatusReceived:Connect(function(v11) --[[ Line: 22 ]]
-                -- upvalues: l_ToastType_0 (ref), v9 (ref), v8 (ref), l_SetCurrentToastMessage_0 (ref)
-                local v12 = if v11 then {
-                    toastType = l_ToastType_0.SuccessConfirmation, 
-                    toastTitle = v9.granted
-                } else {
-                    toastType = l_ToastType_0.NetworkingError, 
-                    toastTitle = v9.pending
-                };
-                v8(l_SetCurrentToastMessage_0(v12));
-            end);
-        end;
-        return function() --[[ Line: 29 ]]
-            -- upvalues: v10 (ref)
-            if v10 then
-                v10:Disconnect();
-                v10 = nil;
-            end;
-        end;
-    end, {
-        v8, 
-        v9
-    });
-end;
+local CommerceService = game:GetService("CommerceService")
+local Parent = script:FindFirstAncestor("CommercePurchaseApp").Parent
+local React = require(Parent.React)
+local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local ToastRodux = require(Parent.ToastRodux)
+local ToastType = ToastRodux.Enums.ToastType
+local SetCurrentToastMessage = ToastRodux.Actions.SetCurrentToastMessage
+
+local function useBenefitStatusReceivedListenerEffect() -- line: 13
+	-- upvalues: useDispatch (copy), useLocalization (copy), React (copy), CommerceService (copy), ToastType (copy), SetCurrentToastMessage (copy)
+	local v10 = useDispatch()
+	local v11 = useLocalization({
+		granted = "CoreScripts.CommercePurchasePrompt.SuccessToast.Granted",
+		pending = "CoreScripts.CommercePurchasePrompt.SuccessToast.GrantPending"
+	})
+
+	React.useEffect(function() -- line: 19
+		-- upvalues: v10 (copy), CommerceService (copy), ToastType (copy), v11 (copy), SetCurrentToastMessage (copy)
+		local connection = nil
+
+		if v10 then
+			connection = CommerceService.BenefitStatusReceived:Connect(function(p1) -- line: 22
+				-- upvalues: ToastType (copy), v11 (copy), v10 (copy), SetCurrentToastMessage (copy)
+				local v14 = if not p1 then {
+					toastType = ToastType.NetworkingError,
+					toastTitle = v11.pending
+				} else {
+					toastType = ToastType.SuccessConfirmation,
+					toastTitle = v11.granted
+				}
+
+				v10(SetCurrentToastMessage(v14))
+			end)
+		end
+
+		return function() -- line: 29
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end
+	end, {
+		v10,
+		v11
+	})
+end
+
+return useBenefitStatusReceivedListenerEffect

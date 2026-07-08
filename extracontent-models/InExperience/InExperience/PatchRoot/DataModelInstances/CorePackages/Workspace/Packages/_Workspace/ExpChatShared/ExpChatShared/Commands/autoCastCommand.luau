@@ -1,29 +1,37 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChatShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local v3 = require(l_script_FirstAncestor_0.context);
-local l_script_FirstAncestor_1 = script:FindFirstAncestor("Commands");
-local _ = require(l_script_FirstAncestor_1.types);
-local function v10(v6, v7) --[[ Line: 10 ]] --[[ Name: matchesAlias ]]
-    for _, v9 in pairs(v6) do
-        if string.find(v7, "^" .. v9 .. " ") then
-            return true;
-        end;
-    end;
-    return false;
-end;
-return function(v11, v12, v13) --[[ Line: 20 ]]
-    -- upvalues: v2 (copy), v3 (copy), v10 (copy)
-    return v2.try(function() --[[ Line: 21 ]]
-        -- upvalues: v3 (ref), v11 (copy), v10 (ref), v13 (copy), v12 (copy), v2 (ref)
-        assert(v3.store, "Store should exist");
-        local v14 = v3.store:getState().AutoCastCommands[v11.name];
-        if v10(v14, v13) then
-            local v15 = v11.clientRun(v3.store, v12, v13);
-            if v15 and string.find(v15.metadata, "Success") then
-                return v2.resolve(v15);
-            end;
-        end;
-        return v2.reject();
-    end);
-end;
+local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
+local ExpChatSharedParent = ExpChatShared.Parent
+local Promise = require(ExpChatSharedParent.Promise)
+local context = require(ExpChatShared.context)
+local Commands = script:FindFirstAncestor("Commands")
+
+require(Commands.types)
+
+local function matchesAlias(t1: {[any]: any}, s1: string) -- line: 10
+	for _, v in pairs(t1) do
+		if string.find(s1, "^" .. v .. " ") then
+			return true
+		end
+	end
+
+	return false
+end
+
+return function(p1, n1: number, s2: string) -- line: 20
+	-- upvalues: Promise (copy), context (copy), matchesAlias (copy)
+	return Promise.try(function() -- line: 21
+		-- upvalues: context (copy), p1 (copy), matchesAlias (copy), s2 (copy), n1 (copy), Promise (copy)
+		assert(context.store, "Store should exist")
+
+		local v14 = context.store:getState().AutoCastCommands[p1.name]
+
+		if matchesAlias(v14, s2) then
+			local v15 = p1.clientRun(context.store, n1, s2)
+
+			if v15 and string.find(v15.metadata, "Success") then
+				return Promise.resolve(v15)
+			end
+		end
+
+		return Promise.reject()
+	end)
+end

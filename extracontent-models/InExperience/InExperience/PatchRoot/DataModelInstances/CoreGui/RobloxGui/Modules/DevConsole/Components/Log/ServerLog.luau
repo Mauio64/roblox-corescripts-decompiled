@@ -1,32 +1,34 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(script.Parent.Parent.DataConsumer);
-local l_CommandLineHeight_0 = require(script.Parent.Parent.Parent.Constants).LogFormatting.CommandLineHeight;
-local v4 = require(script.Parent.DevConsoleCommandLine);
-local v5 = require(script.Parent.LogOutput);
-local v6 = v1.Component:extend("ServerLog");
-v6.init = function(v7) --[[ Line: 15 ]] --[[ Name: init ]]
-    v7.initServerLogData = function() --[[ Line: 16 ]]
-        -- upvalues: v7 (copy)
-        return v7.props.ServerLogData:getLogData();
-    end;
-end;
-v6.render = function(v8) --[[ Line: 21 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v5 (copy), l_CommandLineHeight_0 (copy), v4 (copy)
-    return v1.createElement("Frame", {
-        Size = v8.props.size, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v8.props.layoutOrder
-    }, {
-        Scroll = v1.createElement(v5, {
-            size = UDim2.new(1, 0, 1, -(l_CommandLineHeight_0 + 4)), 
-            targetSignal = v8.props.ServerLogData:Signal(), 
-            initLogOutput = v8.initServerLogData
-        }), 
-        CommandLine = v1.createElement(v4, {
-            pos = UDim2.new(0, 0, 1, -l_CommandLineHeight_0), 
-            height = l_CommandLineHeight_0
-        })
-    });
-end;
-return v2(v6, "ServerLogData");
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local DataConsumer = require(script.Parent.Parent.DataConsumer)
+local CommandLineHeight = require(script.Parent.Parent.Parent.Constants).LogFormatting.CommandLineHeight
+local DevConsoleCommandLine = require(script.Parent.DevConsoleCommandLine)
+local LogOutput = require(script.Parent.LogOutput)
+local v7 = Roact.Component:extend("ServerLog")
+
+function v7.init(p1) -- line: 15
+	function p1.initServerLogData() -- line: 16
+		-- upvalues: p1 (copy)
+		return p1.props.ServerLogData:getLogData()
+	end
+end
+function v7.render(p2) -- line: 21
+	-- upvalues: Roact (copy), LogOutput (copy), CommandLineHeight (copy), DevConsoleCommandLine (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = p2.props.size,
+		LayoutOrder = p2.props.layoutOrder
+	}, {
+		Scroll = Roact.createElement(LogOutput, {
+			size = UDim2.new(1, 0, 1, -(CommandLineHeight + 4)),
+			targetSignal = p2.props.ServerLogData:Signal(),
+			initLogOutput = p2.initServerLogData
+		}),
+		CommandLine = Roact.createElement(DevConsoleCommandLine, {
+			pos = UDim2.new(0, 0, 1, -CommandLineHeight),
+			height = CommandLineHeight
+		})
+	})
+end
+
+return DataConsumer(v7, "ServerLogData")

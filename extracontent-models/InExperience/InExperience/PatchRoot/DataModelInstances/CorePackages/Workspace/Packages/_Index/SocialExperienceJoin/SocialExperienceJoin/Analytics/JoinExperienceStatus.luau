@@ -1,6 +1,6 @@
 return {
-    Success = "Success", 
-    PurchaseRequired = "PurchaseRequired", 
-    Unable = "Unable", 
-    Failure = "Failure"
-};
+	Success = "Success",
+	PurchaseRequired = "PurchaseRequired",
+	Unable = "Unable",
+	Failure = "Failure"
+}

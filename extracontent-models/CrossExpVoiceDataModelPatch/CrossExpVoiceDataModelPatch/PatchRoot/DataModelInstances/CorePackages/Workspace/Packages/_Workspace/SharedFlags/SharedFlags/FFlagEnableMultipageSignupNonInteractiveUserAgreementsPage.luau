@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableMultipageSignupNonInteractiveUserAgreementsPage", false);
+return game:DefineFastFlag("EnableMultipageSignupNonInteractiveUserAgreementsPage", false)

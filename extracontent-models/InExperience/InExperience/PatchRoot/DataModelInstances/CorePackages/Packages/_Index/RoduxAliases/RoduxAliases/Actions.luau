@@ -1,5 +1,5 @@
 return {
-    AliasRemoved = require(script.AliasRemoved), 
-    AliasUpdated = require(script.AliasUpdated), 
-    ReceivedCanShowUserAlias = require(script.ReceivedCanShowUserAlias)
-};
+	AliasRemoved = require(script.AliasRemoved),
+	AliasUpdated = require(script.AliasUpdated),
+	ReceivedCanShowUserAlias = require(script.ReceivedCanShowUserAlias)
+}

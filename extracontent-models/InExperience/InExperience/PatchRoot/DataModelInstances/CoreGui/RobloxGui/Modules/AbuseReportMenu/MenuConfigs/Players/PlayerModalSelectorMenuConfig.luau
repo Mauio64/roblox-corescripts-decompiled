@@ -12,10 +12,12 @@ local FFlagInGameMenuAddChatLineReporting = require(CorePackages.Workspace.Packa
 
 return {
 	componentType = "modalSelector",
-	getIsVisible = function(_) --[[ getIsVisible ]] -- line: 16
+	fieldLabel = "WhichPerson",
+	componentName = "PlayerSelector",
+	getIsVisible = function(_) -- line: 16
 		return true
 	end,
-	getMenuItems = function(p2) --[[ getMenuItems ]] -- line: 19
+	getMenuItems = function(p2) -- line: 19
 		-- upvalues: Cryo (copy), UserLib (copy), VerifiedBadges (copy), InExperienceCapabilities (copy)
 		return (Cryo.List.map(p2.playerObjects, function(p3) -- line: 20
 			-- upvalues: UserLib (copy), VerifiedBadges (copy), InExperienceCapabilities (copy)
@@ -28,7 +30,7 @@ return {
 			}
 		end))
 	end,
-	getSelectedValue = function(p4) --[[ getSelectedValue ]] -- line: 34
+	getSelectedValue = function(p4) -- line: 34
 		-- upvalues: InExperienceCapabilities (copy)
 		local allegedAbuser = p4.allegedAbuser
 
@@ -41,7 +43,7 @@ return {
 
 		return nil
 	end,
-	onUpdateSelectedOption = function(p5, p6, p7, p8) --[[ onUpdateSelectedOption ]] -- line: 45
+	onUpdateSelectedOption = function(p5, p6, p7, p8) -- line: 45
 		-- upvalues: Constants (copy), FFlagInGameMenuAddChatLineReporting (copy)
 		if p5.identifier then
 			local identifier = p5.identifier
@@ -61,15 +63,13 @@ return {
 
 					if FFlagInGameMenuAddChatLineReporting then
 						p7({
+							selectedMessage = nil,
 							type = Constants.PlayerMenuActions.UpdatedSelectedChatAndOrderedMessages,
-							orderedMessages = {},
-							selectedMessage = nil
+							orderedMessages = {}
 						})
 					end
 				end
 			end
 		end
-	end,
-	fieldLabel = "WhichPerson",
-	componentName = "PlayerSelector"
+	end
 }

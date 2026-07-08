@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePressingCommunityOwnerInPeekView", false);
+return game:DefineFastFlag("EnablePressingCommunityOwnerInPeekView", false)

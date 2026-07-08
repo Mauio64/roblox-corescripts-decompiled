@@ -1,90 +1,108 @@
-local l_ClientChatModules_0 = game:GetService("Chat"):WaitForChild("ClientChatModules");
-local l_StandardPriority_0 = require(l_ClientChatModules_0:WaitForChild("ChatConstants")).StandardPriority;
-if l_StandardPriority_0 == nil then
-    l_StandardPriority_0 = 10;
-end;
-local v2 = {};
-v2.__index = v2;
-local v3 = {};
-local v4 = {};
-v4.__index = v4;
-v4.RebuildProcessCommandsPriorities = function(v5) --[[ Line: 25 ]] --[[ Name: RebuildProcessCommandsPriorities ]]
-    v5.RegisteredPriorites = {};
-    for v6, v7 in pairs(v5.FunctionMap) do
-        local v8 = true;
-        for _, _ in pairs(v7) do
-            v8 = false;
-            break;
-        end;
-        if not v8 then
-            table.insert(v5.RegisteredPriorites, v6);
-        end;
-    end;
-    table.sort(v5.RegisteredPriorites, function(v11, v12) --[[ Line: 37 ]]
-        return v12 < v11;
-    end);
-end;
-v4.HasFunction = function(v13, v14) --[[ Line: 42 ]] --[[ Name: HasFunction ]]
-    if v13.RegisteredFunctions[v14] == nil then
-        return false;
-    else
-        return true;
-    end;
-end;
-v4.RemoveFunction = function(v15, v16) --[[ Line: 49 ]] --[[ Name: RemoveFunction ]]
-    local v17 = v15.RegisteredFunctions[v16];
-    v15.RegisteredFunctions[v16] = nil;
-    v15.FunctionMap[v17][v16] = nil;
-    v15:RebuildProcessCommandsPriorities();
-end;
-v4.AddFunction = function(v18, v19, v20, v21) --[[ Line: 56 ]] --[[ Name: AddFunction ]]
-    -- upvalues: l_StandardPriority_0 (ref)
-    if v21 == nil then
-        v21 = l_StandardPriority_0;
-    end;
-    if v18.RegisteredFunctions[v19] then
-        error(v19 .. " is already in use!");
-    end;
-    v18.RegisteredFunctions[v19] = v21;
-    if v18.FunctionMap[v21] == nil then
-        v18.FunctionMap[v21] = {};
-    end;
-    v18.FunctionMap[v21][v19] = v20;
-    v18:RebuildProcessCommandsPriorities();
-end;
-v4.GetIterator = function(v22) --[[ Line: 75 ]] --[[ Name: GetIterator ]]
-    local v23 = 1;
-    local v24 = nil;
-    local v25 = nil;
-    return function() --[[ Line: 80 ]]
-        -- upvalues: v23 (ref), v22 (copy), v24 (ref), v25 (ref)
-        while true do
-            if v23 > #v22.RegisteredPriorites then
-                return;
-            else
-                local v26 = v22.RegisteredPriorites[v23];
-                local v27, v28 = next(v22.FunctionMap[v26], v24);
-                v24 = v27;
-                v25 = v28;
-                if v24 == nil then
-                    v23 = v23 + 1;
-                else
-                    return v24, v25, v26;
-                end;
-            end;
-        end;
-    end;
-end;
-v3.new = function() --[[ Line: 96 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    local v29 = setmetatable({}, v4);
-    v29.RegisteredFunctions = {};
-    v29.RegisteredPriorites = {};
-    v29.FunctionMap = {};
-    return v29;
-end;
-v2.NewSortedFunctionContainer = function(_) --[[ Line: 107 ]] --[[ Name: NewSortedFunctionContainer ]]
-    -- upvalues: v3 (copy)
-    return v3.new();
-end;
-return v2;
+local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
+local StandardPriority = require(ClientChatModules:WaitForChild("ChatConstants")).StandardPriority
+
+if StandardPriority == nil then
+	StandardPriority = 10
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+local t2 = {}
+local t3 = {}
+
+t3.__index = t3
+
+function t3.RebuildProcessCommandsPriorities(p1) -- line: 25
+	p1.RegisteredPriorites = {}
+
+	for k, v in pairs(p1.FunctionMap) do
+		local v9 = true
+
+		for _, _ in pairs(v) do
+			v9 = false
+
+			break
+		end
+
+		if not v9 then
+			table.insert(p1.RegisteredPriorites, k)
+		end
+	end
+
+	table.sort(p1.RegisteredPriorites, function(p2, p3) -- line: 37
+		return p3 < p2
+	end)
+end
+function t3.HasFunction(p4, p5) -- line: 42
+	if p4.RegisteredFunctions[p5] == nil then
+		return false
+	end
+
+	return true
+end
+function t3.RemoveFunction(p6, p7) -- line: 49
+	local v16 = p6.RegisteredFunctions[p7]
+
+	p6.RegisteredFunctions[p7] = nil
+	p6.FunctionMap[v16][p7] = nil
+	p6:RebuildProcessCommandsPriorities()
+end
+function t3.AddFunction(p8, p9, p10, p11) -- line: 56
+	-- upvalues: StandardPriority (ref)
+	if p11 == nil then
+		p11 = StandardPriority
+	end
+
+	if p8.RegisteredFunctions[p9] then
+		error(p9 .. " is already in use!")
+	end
+
+	p8.RegisteredFunctions[p9] = p11
+
+	if p8.FunctionMap[p11] == nil then
+		p8.FunctionMap[p11] = {}
+	end
+
+	p8.FunctionMap[p11][p9] = p10
+	p8:RebuildProcessCommandsPriorities()
+end
+function t3.GetIterator(p12) -- line: 75
+	local n1 = 1
+	local u23 = nil
+	local u24 = nil
+
+	return function() -- line: 80
+		-- upvalues: n1 (ref), p12 (copy), u23 (ref), u24 (ref)
+		while not (n1 > #p12.RegisteredPriorites) do
+			local v29 = p12.RegisteredPriorites[n1]
+			local v30, v31 = next(p12.FunctionMap[v29], u23)
+
+			u23 = v30
+			u24 = v31
+
+			if u23 ~= nil then
+				return u23, u24, v29
+			end
+
+			n1 += 1
+		end
+	end
+end
+function t2.new() -- line: 96
+	-- upvalues: t3 (copy)
+	local self = setmetatable({}, t3)
+
+	self.RegisteredFunctions = {}
+	self.RegisteredPriorites = {}
+	self.FunctionMap = {}
+
+	return self
+end
+function t1.NewSortedFunctionContainer(_) -- line: 107
+	-- upvalues: t2 (copy)
+	return t2.new()
+end
+
+return t1

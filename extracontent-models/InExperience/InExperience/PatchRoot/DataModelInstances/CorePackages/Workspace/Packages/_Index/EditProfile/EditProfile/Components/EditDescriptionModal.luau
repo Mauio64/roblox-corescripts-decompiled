@@ -1,1 +1,1 @@
-return (require(script.EditDescriptionModalWrapper));
+return (require(script.EditDescriptionModalWrapper))

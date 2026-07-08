@@ -1,152 +1,158 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatLineReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.UIBlox);
-local l_useLayerCollector_0 = v4.Core.Layout.LayerCollector.useLayerCollector;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_FFlagChatLineReportingFocusFixesEnabled_0 = require(l_Parent_0.SharedFlags).FFlagChatLineReportingFocusFixesEnabled;
-local v8 = require(l_script_FirstAncestor_0.Common.Constants);
-local v9 = require(l_script_FirstAncestor_0.Components.ChatLineReportInfo);
-local v10 = require(l_script_FirstAncestor_0.Components.ChatLineReportModalWindow);
-local v11 = require(l_script_FirstAncestor_0.Components.ChatLineReportSelectableLine);
-local v12 = require(l_script_FirstAncestor_0.Common.isSystemMessage);
-local l_ButtonType_0 = v4.App.Button.Enum.ButtonType;
-local v14 = require(l_Parent_0.Foundation);
-local l_Empty_0 = v14.Empty;
-local l_RadioGroup_0 = v14.RadioGroup;
-local l_ScrollView_0 = v14.ScrollView;
-local l_ScrollBarVisibility_0 = v14.Enums.ScrollBarVisibility;
-local function v28(v19, _, v21, v22) --[[ Line: 44 ]] --[[ Name: createChildren ]]
-    -- upvalues: v12 (copy), v2 (copy), l_RadioGroup_0 (copy), v11 (copy)
-    local v23 = {};
-    local v24 = {};
-    local v25 = -1;
-    for v26, v27 in pairs(v19) do
-        if not v12(v27) then
-            v25 = v25 + 1;
-            v24[v26] = v25;
-            table.insert(v23, v2.createElement(l_RadioGroup_0.Item, {
-                value = v26, 
-                label = v2.createElement(v11, {
-                    message = v27, 
-                    localizedText = v21, 
-                    scrollViewSizeX = v22, 
-                    chatLineReportingReworkEnabled = false
-                })
-            }));
-        end;
-    end;
-    return v23, v24;
-end;
-return function(v29) --[[ Line: 72 ]] --[[ Name: ChatLineReportSelectionModalOld ]]
-    -- upvalues: v2 (copy), l_useLocalization_0 (copy), v8 (copy), v28 (copy), v3 (copy), l_useLayerCollector_0 (copy), l_FFlagChatLineReportingFocusFixesEnabled_0 (copy), v10 (copy), l_ButtonType_0 (copy), v9 (copy), l_Empty_0 (copy), l_ScrollView_0 (copy), l_ScrollBarVisibility_0 (copy), l_RadioGroup_0 (copy)
-    local v30, v31 = v2.useState(false);
-    local v32 = v2.useRef(nil);
-    local v33, v34 = v2.useState(0);
-    local v35 = v2.useRef(nil);
-    local v36, v37 = v2.useState(0);
-    local v38 = v2.useRef(nil);
-    local v39 = l_useLocalization_0(v8.ChatLineLocalizationKeys);
-    local v40, v41 = v28(v29.messages, v29.setSelectedMessage, v39, v36);
-    local v42 = v3.isEmpty(v40);
-    local v43 = l_useLayerCollector_0();
-    local l_absoluteSize_0 = v43.absoluteSize;
-    v2.useEffect(function() --[[ Line: 87 ]]
-        -- upvalues: v32 (copy), v34 (copy)
-        if v32.current then
-            v32.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 89 ]]
-                -- upvalues: v34 (ref), v32 (ref)
-                v34(v32.current.AbsoluteSize.Y);
-            end);
-        end;
-    end, {
-        v32.current, 
-        l_absoluteSize_0
-    });
-    v2.useEffect(function() --[[ Line: 95 ]]
-        -- upvalues: v35 (copy), v37 (copy)
-        if v35.current then
-            v35.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() --[[ Line: 97 ]]
-                -- upvalues: v37 (ref), v35 (ref)
-                v37(v35.current.AbsoluteSize.X);
-            end);
-        end;
-    end, {
-        v35.current, 
-        l_absoluteSize_0
-    });
-    v2.useEffect(function() --[[ Line: 104 ]]
-        -- upvalues: v35 (copy), v38 (copy), v8 (ref), l_FFlagChatLineReportingFocusFixesEnabled_0 (ref)
-        if v35.current then
-            local l_FirstChildWhichIsA_0 = v35.current:FindFirstChildWhichIsA("ScrollingFrame", true);
-            if l_FirstChildWhichIsA_0 then
-                v38.current = l_FirstChildWhichIsA_0;
-                v38.current.CanvasPosition = Vector2.new(0, v8.SelectionModalCanvasPositionTopPadding);
-                if l_FFlagChatLineReportingFocusFixesEnabled_0 then
-                    v38.current.Selectable = false;
-                end;
-            end;
-        end;
-    end, {
-        v35.current
-    });
-    local v46 = v2.useCallback(function() --[[ Line: 118 ]]
-        -- upvalues: v31 (copy), v30 (copy)
-        v31(not v30);
-    end, {
-        v30, 
-        v31
-    });
-    return v2.createElement(v10, {
-        screenSize = Vector2.new(l_absoluteSize_0.X, l_absoluteSize_0.Y - v43.insets.top), 
-        position = UDim2.new(0.5, 0, 0, v43.insets.top + v8.SelectionModalPositionOffset), 
-        anchorPoint = Vector2.new(0.5, 0), 
-        title = v39.ChatSelectionModalTitle, 
-        onCloseClicked = v29.onBack, 
-        onInfoClicked = v46, 
-        buttonStackProps = {
-            buttons = {
-                {
-                    buttonType = l_ButtonType_0.Secondary, 
-                    props = {
-                        onActivated = v29.onContinue, 
-                        text = v39.ChatSelectionModalButton, 
-                        isDisabled = v42 or v29.selectedMessage == nil
-                    }
-                }
-            }
-        }
-    }, {
-        infoView = v2.createElement(v9, {
-            visible = v30
-        }), 
-        messageView = if v42 then v2.createElement(l_Empty_0, {}) else v2.createElement(l_ScrollView_0, {
-            Size = UDim2.new(1, 0, 0, (math.min(l_absoluteSize_0.Y - v43.insets.top - v8.SelectionModalScreenSizeOffset, v33 + v8.SelectionModalRadioGroupOffset, if v29.maxContentHeight then v29.maxContentHeight else 1e999))), 
-            scroll = {
-                AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-                CanvasSize = UDim2.new(1, 0, 0, 0), 
-                scrollBarVisibility = l_ScrollBarVisibility_0.Always, 
-                ScrollingDirection = Enum.ScrollingDirection.Y
-            }, 
-            ref = v35, 
-            LayoutOrder = 1
-        }, {
-            UIPadding = v2.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 12), 
-                PaddingBottom = UDim.new(0, 12)
-            }), 
-            RadioGroup = v2.createElement(l_RadioGroup_0.Root, {
-                onValueChanged = function(v47) --[[ Line: 172 ]] --[[ Name: onValueChanged ]]
-                    -- upvalues: v29 (copy), v8 (ref), v41 (copy)
-                    v29.setSelectedMessage(v29.messages[v47]);
-                    v29.analyticsDispatch({
-                        type = v8.AnalyticsActions.SetChatLineSelected, 
-                        selected_chat_line_index = v41[v47]
-                    });
-                end, 
-                ref = v32
-            }, v40)
-        })
-    });
-end;
+local ChatLineReporting = script:FindFirstAncestor("ChatLineReporting")
+local ChatLineReportingParent = ChatLineReporting.Parent
+local React = require(ChatLineReportingParent.React)
+local Cryo = require(ChatLineReportingParent.Cryo)
+local UIBlox = require(ChatLineReportingParent.UIBlox)
+local useLayerCollector = UIBlox.Core.Layout.LayerCollector.useLayerCollector
+local useLocalization = require(ChatLineReportingParent.Localization).Hooks.useLocalization
+local FFlagChatLineReportingFocusFixesEnabled = require(ChatLineReportingParent.SharedFlags).FFlagChatLineReportingFocusFixesEnabled
+local Constants = require(ChatLineReporting.Common.Constants)
+local ChatLineReportInfo = require(ChatLineReporting.Components.ChatLineReportInfo)
+local ChatLineReportModalWindow = require(ChatLineReporting.Components.ChatLineReportModalWindow)
+local ChatLineReportSelectableLine = require(ChatLineReporting.Components.ChatLineReportSelectableLine)
+local isSystemMessage = require(ChatLineReporting.Common.isSystemMessage)
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local Foundation = require(ChatLineReportingParent.Foundation)
+local Empty = Foundation.Empty
+local RadioGroup = Foundation.RadioGroup
+local ScrollView = Foundation.ScrollView
+local ScrollBarVisibility = Foundation.Enums.ScrollBarVisibility
+
+local function createChildren(p1, _, p3, p4) -- line: 44
+	-- upvalues: isSystemMessage (copy), React (copy), RadioGroup (copy), ChatLineReportSelectableLine (copy)
+	local t1 = {}
+	local t2 = {}
+	local n1 = -1
+
+	for k, v in pairs(p1) do
+		if not isSystemMessage(v) then
+			n1 += 1
+			t2[k] = n1
+			table.insert(t1, React.createElement(RadioGroup.Item, {
+				value = k,
+				label = React.createElement(ChatLineReportSelectableLine, {
+					chatLineReportingReworkEnabled = false,
+					message = v,
+					localizedText = p3,
+					scrollViewSizeX = p4
+				})
+			}))
+		end
+	end
+
+	return t1, t2
+end
+local function ChatLineReportSelectionModalOld(t3: {[any]: any}) -- line: 72
+	-- upvalues: React (copy), useLocalization (copy), Constants (copy), createChildren (copy), Cryo (copy), useLayerCollector (copy), FFlagChatLineReportingFocusFixesEnabled (copy), ChatLineReportModalWindow (copy), ButtonType (copy), ChatLineReportInfo (copy), Empty (copy), ScrollView (copy), ScrollBarVisibility (copy), RadioGroup (copy)
+	local v32, v33 = React.useState(false)
+	local v34 = React.useRef(nil)
+	local v35, v36 = React.useState(0)
+	local v37 = React.useRef(nil)
+	local v38, v39 = React.useState(0)
+	local v40 = React.useRef(nil)
+	local v41 = useLocalization(Constants.ChatLineLocalizationKeys)
+	local v42, v43 = createChildren(t3.messages, t3.setSelectedMessage, v41, v38)
+	local v44 = Cryo.isEmpty(v42)
+	local v45 = useLayerCollector()
+	local absoluteSize = v45.absoluteSize
+
+	React.useEffect(function() -- line: 87
+		-- upvalues: v34 (copy), v36 (copy)
+		if v34.current then
+			v34.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 89
+				-- upvalues: v36 (copy), v34 (copy)
+				v36(v34.current.AbsoluteSize.Y)
+			end)
+		end
+	end, {
+		v34.current,
+		absoluteSize
+	})
+	React.useEffect(function() -- line: 95
+		-- upvalues: v37 (copy), v39 (copy)
+		if v37.current then
+			v37.current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 97
+				-- upvalues: v39 (copy), v37 (copy)
+				v39(v37.current.AbsoluteSize.X)
+			end)
+		end
+	end, {
+		v37.current,
+		absoluteSize
+	})
+	React.useEffect(function() -- line: 104
+		-- upvalues: v37 (copy), v40 (copy), Constants (copy), FFlagChatLineReportingFocusFixesEnabled (copy)
+		if v37.current then
+			local ScrollingFrame = v37.current:FindFirstChildWhichIsA("ScrollingFrame", true)
+
+			if ScrollingFrame then
+				v40.current = ScrollingFrame
+				v40.current.CanvasPosition = Vector2.new(0, Constants.SelectionModalCanvasPositionTopPadding)
+
+				if FFlagChatLineReportingFocusFixesEnabled then
+					v40.current.Selectable = false
+				end
+			end
+		end
+	end, { v37.current })
+
+	local v47 = React.useCallback(function() -- line: 118
+		-- upvalues: v33 (copy), v32 (copy)
+		v33(not v32)
+	end, {
+		v32,
+		v33
+	})
+
+	return React.createElement(ChatLineReportModalWindow, {
+		screenSize = Vector2.new(absoluteSize.X, absoluteSize.Y - v45.insets.top),
+		position = UDim2.new(0.5, 0, 0, v45.insets.top + Constants.SelectionModalPositionOffset),
+		anchorPoint = Vector2.new(0.5, 0),
+		title = v41.ChatSelectionModalTitle,
+		onCloseClicked = t3.onBack,
+		onInfoClicked = v47,
+		buttonStackProps = {
+			buttons = {{
+				buttonType = ButtonType.Secondary,
+				props = {
+					onActivated = t3.onContinue,
+					text = v41.ChatSelectionModalButton,
+					isDisabled = v44 or t3.selectedMessage == nil
+				}
+			}}
+		}
+	}, {
+		infoView = React.createElement(ChatLineReportInfo, {
+			visible = v32
+		}),
+		messageView = if not v44 then React.createElement(ScrollView, {
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, (math.min(absoluteSize.Y - v45.insets.top - Constants.SelectionModalScreenSizeOffset, v35 + Constants.SelectionModalRadioGroupOffset, not t3.maxContentHeight and 1e999 or t3.maxContentHeight))),
+			scroll = {
+				AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				CanvasSize = UDim2.new(1, 0, 0, 0),
+				scrollBarVisibility = ScrollBarVisibility.Always,
+				ScrollingDirection = Enum.ScrollingDirection.Y
+			},
+			ref = v37
+		}, {
+			UIPadding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 12),
+				PaddingBottom = UDim.new(0, 12)
+			}),
+			RadioGroup = React.createElement(RadioGroup.Root, {
+				onValueChanged = function(p5) -- line: 172
+					-- upvalues: t3 (copy), Constants (copy), v43 (copy)
+					t3.setSelectedMessage(t3.messages[p5])
+					t3.analyticsDispatch({
+						type = Constants.AnalyticsActions.SetChatLineSelected,
+						selected_chat_line_index = v43[p5]
+					})
+				end,
+				ref = v34
+			}, v42)
+		}) else React.createElement(Empty, {})
+	})
+end
+
+return ChatLineReportSelectionModalOld

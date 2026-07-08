@@ -1,4 +1,4 @@
 return {
-    InExperienceSquadContract = require(script.InExperienceSquadContract), 
-    SquadContract = require(script.SquadContract)
-};
+	InExperienceSquadContract = require(script.InExperienceSquadContract),
+	SquadContract = require(script.SquadContract)
+}

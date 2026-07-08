@@ -1,1 +1,1 @@
-return game:DefineFastString("LuaLoginRevampIxpLayer", "PlayerApp.Login");
+return game:DefineFastString("LuaLoginRevampIxpLayer", "PlayerApp.Login")

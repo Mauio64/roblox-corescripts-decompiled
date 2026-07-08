@@ -1,5 +1,5 @@
 return {
-    Rounded = "Rounded", 
-    Pill = "Pill", 
-    Box = "Box"
-};
+	Rounded = "Rounded",
+	Pill = "Pill",
+	Box = "Box"
+}

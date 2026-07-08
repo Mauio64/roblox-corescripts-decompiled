@@ -1,20 +1,22 @@
-local v0 = require(script.Requests);
-local v1 = require(script.Reducers);
-local v2 = require(script.PerformFetch);
-local v3 = require(script.createPerformFetchMiddleware);
-local _ = require(script.RequestTypes);
+local Requests = require(script.Requests)
+local Reducers = require(script.Reducers)
+local PerformFetch = require(script.PerformFetch)
+local createPerformFetchMiddleware = require(script.createPerformFetchMiddleware)
+
+require(script.RequestTypes)
+
 return {
-    Enum = require(script.Enum), 
-    Requests = v0, 
-    Url = require(script.Url), 
-    Utils = require(script.Utils), 
-    Reducers = v1, 
-    PerformFetch = v2, 
-    StatusCodes = require(script.StatusCodes), 
-    createPerformFetchMiddleware = v3, 
-    NetworkLayers = require(script.NetworkLayers), 
-    NetworkProfiler = require(script.NetworkProfiler), 
-    Logger = {
-        GreenlistedEndpointsForLogging = require(script.Logger.GreenlistedEndpointsForLogging)
-    }
-};
+	Enum = require(script.Enum),
+	Requests = Requests,
+	Url = require(script.Url),
+	Utils = require(script.Utils),
+	Reducers = Reducers,
+	PerformFetch = PerformFetch,
+	StatusCodes = require(script.StatusCodes),
+	createPerformFetchMiddleware = createPerformFetchMiddleware,
+	NetworkLayers = require(script.NetworkLayers),
+	NetworkProfiler = require(script.NetworkProfiler),
+	Logger = {
+		GreenlistedEndpointsForLogging = require(script.Logger.GreenlistedEndpointsForLogging)
+	}
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppLCPTimingFix", false);
+return game:DefineFastFlag("LuaAppLCPTimingFix", false)

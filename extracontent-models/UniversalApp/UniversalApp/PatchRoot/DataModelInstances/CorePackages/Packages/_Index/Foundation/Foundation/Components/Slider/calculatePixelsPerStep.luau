@@ -1,3 +1,5 @@
-return function(v0, v1, v2) --[[ Line: 4 ]] --[[ Name: calculatePixelsPerStep ]]
-    return v0 / ((v2.Max - v2.Min) / v1);
-end;
+local function calculatePixelsPerStep(n1: number, n2: number, numberRange: NumberRange) -- line: 4
+	return n1 / ((numberRange.Max - numberRange.Min) / n2)
+end
+
+return calculatePixelsPerStep

@@ -1,4 +1,5 @@
-game:DefineFastFlag("DebugAppChat", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("DebugAppChat");
-end;
+game:DefineFastFlag("DebugAppChat", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("DebugAppChat")
+end

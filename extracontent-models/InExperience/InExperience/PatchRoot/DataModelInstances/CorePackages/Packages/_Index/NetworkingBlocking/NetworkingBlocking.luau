@@ -1,3 +1,3 @@
 return {
-    config = require(script.createRequestThunks)
-};
+	config = require(script.createRequestThunks)
+}

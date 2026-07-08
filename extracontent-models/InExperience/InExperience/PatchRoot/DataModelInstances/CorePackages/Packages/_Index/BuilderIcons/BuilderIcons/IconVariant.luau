@@ -1,4 +1,4 @@
 return {
-    Regular = "Regular", 
-    Filled = "Filled"
-};
+	Regular = "Regular",
+	Filled = "Filled"
+}

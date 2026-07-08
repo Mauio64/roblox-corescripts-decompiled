@@ -1,9 +1,14 @@
-local l_insert_0 = table.insert;
-return function(v1) --[[ Line: 9 ]] --[[ Name: reverse ]]
-    -- upvalues: l_insert_0 (copy)
-    local v2 = {};
-    for v3 = #v1, 1, -1 do
-        l_insert_0(v2, v1[v3]);
-    end;
-    return v2;
-end;
+local insert = table.insert
+
+local function reverse(t1: {[any]: any}) -- line: 9
+	-- upvalues: insert (copy)
+	local t2 = {}
+
+	for i = #t1, 1, -1 do
+		insert(t2, t1[i])
+	end
+
+	return t2
+end
+
+return reverse

@@ -1,16 +1,18 @@
-local function v0(v1) --[[ Line: 1 ]] --[[ Name: deepcopy ]]
-    -- upvalues: v0 (copy)
-    local v2 = type(v1);
-    local v3 = nil;
-    if v2 == "table" then
-        v3 = {};
-        for v4, v5 in next, v1 do
-            v3[v0(v4)] = v0(v5);
-        end;
-        setmetatable(v3, v0((getmetatable(v1))));
-        return v3;
-    else
-        return v1;
-    end;
-end;
-return v0;
+local function deepcopy(p1) -- line: 1
+	-- upvalues: deepcopy (copy)
+	if type(p1) == "table" then
+		local t1 = {}
+
+		for k, v in next, p1 do
+			t1[deepcopy(k)] = deepcopy(v)
+		end
+
+		setmetatable(t1, deepcopy((getmetatable(p1))))
+
+		return t1
+	end
+
+	return p1
+end
+
+return deepcopy

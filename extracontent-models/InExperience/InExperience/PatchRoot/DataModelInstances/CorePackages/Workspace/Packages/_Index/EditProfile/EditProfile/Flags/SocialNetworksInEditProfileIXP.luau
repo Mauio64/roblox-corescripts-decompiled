@@ -1,35 +1,35 @@
-game:DefineFastFlag("SocialNetworksInEditProfileIXPSetupEnabled_v6", false);
-game:DefineFastFlag("SocialNetworksInEditProfileIXPEnabled", false);
-local v0 = game:DefineFastString("SocialNetworksEditProfileIXPLayer", "Social.EditProfilePage");
-local l_Parent_0 = script:FindFirstAncestor("EditProfile").Parent;
-local l_useUserExperiment_0 = require(l_Parent_0.RoactAppExperiment).useUserExperiment;
-local v3 = {
-    Control = "control", 
-    VisibilityLast = "visibilityLast", 
-    VisibilityFirst = "visibilityFirst"
-};
-local function v4() --[[ Line: 17 ]] --[[ Name: GetFFlagSocialNetworksInEditProfileIXPSetupEnabled ]]
-    return game:GetFastFlag("SocialNetworksInEditProfileIXPSetupEnabled_v6");
-end;
-local function _() --[[ Line: 21 ]] --[[ Name: GetFFlagSocialNetworksInEditProfileIXPEnabled ]]
-    return game:GetFastFlag("SocialNetworksInEditProfileIXPEnabled");
-end;
-local function v7(v6) --[[ Line: 25 ]] --[[ Name: getExperimentVariant ]]
-    -- upvalues: v0 (copy), v3 (copy)
-    if not game:GetFastFlag("SocialNetworksInEditProfileIXPEnabled") then
-        return nil;
-    else
-        return ((v6 or {})[v0] or {}).editSocialNetworks or v3.Control;
-    end;
-end;
+game:DefineFastFlag("SocialNetworksInEditProfileIXPSetupEnabled_v6", false)
+game:DefineFastFlag("SocialNetworksInEditProfileIXPEnabled", false)
+
+local v1 = game:DefineFastString("SocialNetworksEditProfileIXPLayer", "Social.EditProfilePage")
+local Parent = script:FindFirstAncestor("EditProfile").Parent
+local useUserExperiment = require(Parent.RoactAppExperiment).useUserExperiment
+local t1 = {
+	Control = "control",
+	VisibilityLast = "visibilityLast",
+	VisibilityFirst = "visibilityFirst"
+}
+
+local function GetFFlagSocialNetworksInEditProfileIXPEnabled() -- line: 21
+	return game:GetFastFlag("SocialNetworksInEditProfileIXPEnabled")
+end
+local function getExperimentVariant(p1) -- line: 25
+	-- upvalues: v1 (copy), t1 (copy)
+	if not game:GetFastFlag("SocialNetworksInEditProfileIXPEnabled") then
+		return nil
+	end
+
+	return ((p1 or {})[v1] or {}).editSocialNetworks or t1.Control
+end
+
 return {
-    GetFFlagSocialNetworksInEditProfileIXPSetupEnabled = v4, 
-    getExperimentVariant = v7, 
-    useGetExperimentVariant = function(v8) --[[ Line: 39 ]] --[[ Name: useGetExperimentVariant ]]
-        -- upvalues: l_useUserExperiment_0 (copy), v0 (copy), v7 (copy)
-        return l_useUserExperiment_0({
-            v0
-        }, v7, v8.isExposureEnabled);
-    end, 
-    Variants = v3
-};
+	GetFFlagSocialNetworksInEditProfileIXPSetupEnabled = function() -- line: 17
+		return game:GetFastFlag("SocialNetworksInEditProfileIXPSetupEnabled_v6")
+	end,
+	getExperimentVariant = getExperimentVariant,
+	useGetExperimentVariant = function(t2: {[any]: any}) -- line: 39
+		-- upvalues: useUserExperiment (copy), v1 (copy), getExperimentVariant (copy)
+		return useUserExperiment({ v1 }, getExperimentVariant, t2.isExposureEnabled)
+	end,
+	Variants = t1
+}

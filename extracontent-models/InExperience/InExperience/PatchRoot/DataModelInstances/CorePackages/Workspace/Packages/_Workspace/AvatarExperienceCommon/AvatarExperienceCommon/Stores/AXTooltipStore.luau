@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createAXTooltipStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local Signals = require(Parent.Signals)
+local createAXTooltipStore = require(script.createAXTooltipStore)
+
+return Signals.createComputed(createAXTooltipStore)

@@ -1,15 +1,21 @@
-local l_Parent_0 = script.Parent;
-local _ = require(l_Parent_0.Types);
-return function(v2) --[[ Line: 13 ]] --[[ Name: iterator ]]
-    if typeof(v2) == "function" then
-        return v2;
-    elseif typeof(v2) == "table" then
-        if #v2 > 0 then
-            return ipairs(v2);
-        else
-            return pairs(v2);
-        end;
-    else
-        return nil;
-    end;
-end;
+local scriptParent = script.Parent
+
+require(scriptParent.Types)
+
+local function iterator(p1) -- line: 13
+	if typeof(p1) == "function" then
+		return p1
+	end
+
+	if typeof(p1) == "table" then
+		if #p1 > 0 then
+			return ipairs(p1)
+		end
+
+		return pairs(p1)
+	end
+
+	return nil
+end
+
+return iterator

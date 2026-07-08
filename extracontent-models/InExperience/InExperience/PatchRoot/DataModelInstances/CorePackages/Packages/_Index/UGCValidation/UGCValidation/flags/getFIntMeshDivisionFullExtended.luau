@@ -1,4 +1,5 @@
-game:DefineFastInt("UGCValidateMeshDivisionFullExtended", 159);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("UGCValidateMeshDivisionFullExtended");
-end;
+game:DefineFastInt("UGCValidateMeshDivisionFullExtended", 159)
+
+return function() -- line: 3
+	return game:GetFastInt("UGCValidateMeshDivisionFullExtended")
+end

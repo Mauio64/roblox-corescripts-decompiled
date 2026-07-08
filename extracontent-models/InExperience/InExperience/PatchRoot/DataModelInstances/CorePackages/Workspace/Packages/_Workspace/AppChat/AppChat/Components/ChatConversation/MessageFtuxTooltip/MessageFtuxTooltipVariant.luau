@@ -1,4 +1,4 @@
 return {
-    Replies = "Replies", 
-    None = ""
-};
+	Replies = "Replies",
+	None = ""
+}

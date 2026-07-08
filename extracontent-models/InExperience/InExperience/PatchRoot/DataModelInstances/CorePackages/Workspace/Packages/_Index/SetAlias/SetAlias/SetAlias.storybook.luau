@@ -1,50 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SetAlias");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v2.Roact;
-local l_Dash_0 = v2.Dash;
-local l_UIBlox_0 = v2.UIBlox;
-local v6 = require(l_Parent_0.Dev.RobloxAppUIBloxConfig);
-local l_mockLocale_0 = require(l_Parent_0.Dev.SocialTestHelpers).StoryHelpers.mockLocale;
-l_UIBlox_0.init(v6);
-local l_AppStyleProvider_0 = l_UIBlox_0.App.Style.AppStyleProvider;
-local v9 = {
-    Default = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Light = {
-        themeName = "Light", 
-        fontName = "Gotham"
-    }, 
-    Dark = {
-        themeName = "Dark", 
-        fontName = "Gotham"
-    }
-};
-local v10 = {
-    language = "en-us"
-};
+local SetAlias = script:FindFirstAncestor("SetAlias")
+local SetAliasParent = SetAlias.Parent
+local dependencies = require(SetAlias.dependencies)
+local Roact = dependencies.Roact
+local Dash = dependencies.Dash
+local UIBlox = dependencies.UIBlox
+local RobloxAppUIBloxConfig = require(SetAliasParent.Dev.RobloxAppUIBloxConfig)
+local mockLocale = require(SetAliasParent.Dev.SocialTestHelpers).StoryHelpers.mockLocale
+
+UIBlox.init(RobloxAppUIBloxConfig)
+
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local t1 = {
+	Default = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Light = {
+		themeName = "Light",
+		fontName = "Gotham"
+	},
+	Dark = {
+		themeName = "Dark",
+		fontName = "Gotham"
+	}
+}
+local t2 = {
+	language = "en-us"
+}
+
 return {
-    name = "SetAlias", 
-    storyRoot = l_script_FirstAncestor_0, 
-    roact = l_Roact_0, 
-    mapDefinition = function(v11) --[[ Line: 40 ]] --[[ Name: mapDefinition ]]
-        -- upvalues: l_Dash_0 (copy), v10 (copy)
-        local v12 = l_Dash_0.join(v10, v11.controls or {});
-        return l_Dash_0.join(v11, {
-            controls = v12
-        });
-    end, 
-    mapStory = function(v13) --[[ Line: 44 ]] --[[ Name: mapStory ]]
-        -- upvalues: l_Roact_0 (copy), l_AppStyleProvider_0 (copy), v9 (copy), l_mockLocale_0 (copy)
-        return function(v14) --[[ Line: 45 ]]
-            -- upvalues: l_Roact_0 (ref), l_AppStyleProvider_0 (ref), v9 (ref), l_mockLocale_0 (ref), v13 (copy)
-            return l_Roact_0.createElement(l_AppStyleProvider_0, {
-                style = v14 and v9[v14.theme] or v9.Default
-            }, {
-                Child = l_mockLocale_0(v13, v14)
-            });
-        end;
-    end
-};
+	name = "SetAlias",
+	storyRoot = SetAlias,
+	roact = Roact,
+	mapDefinition = function(p1) -- line: 40
+		-- upvalues: Dash (copy), t2 (copy)
+		local v13 = Dash.join(t2, p1.controls or {})
+
+		return Dash.join(p1, {
+			controls = v13
+		})
+	end,
+	mapStory = function(p2) -- line: 44
+		-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy)
+		return function(p3) -- line: 45
+			-- upvalues: Roact (copy), AppStyleProvider (copy), t1 (copy), mockLocale (copy), p2 (copy)
+			return Roact.createElement(AppStyleProvider, {
+				style = p3 and t1[p3.theme] or t1.Default
+			}, {
+				Child = mockLocale(p2, p3)
+			})
+		end
+	end
+}

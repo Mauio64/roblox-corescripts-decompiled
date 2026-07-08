@@ -1,18 +1,21 @@
-local v3 = {
-    Vector3FromXYRotPlusDistance = function(v0, v1, v2) --[[ Line: 5 ]]
-        return CFrame.fromEulerAnglesXYZ(math.rad(v0), math.rad(v1), 0).LookVector * v2;
-    end
-};
-v3.Vector3FromJson = function(v4) --[[ Line: 11 ]]
-    -- upvalues: v3 (copy)
-    local v5, v6, v7 = unpack(v4:split("/"));
-    local v8 = tonumber(v5);
-    local v9 = tonumber(v6);
-    local v10 = tonumber(v7);
-    if v8 and v9 and v10 then
-        return v3.Vector3FromXYRotPlusDistance(v8, v9, v10);
-    else
-        return (Vector3.new(0, 0, 0, 0));
-    end;
-end;
-return v3;
+local t1 = {
+	Vector3FromXYRotPlusDistance = function(n1: number, n2: number, n3: number) -- line: 5
+		return CFrame.fromEulerAnglesXYZ(math.rad(n1), math.rad(n2), 0).LookVector * n3
+	end
+}
+
+function t1.Vector3FromJson(s1: string) -- line: 11
+	-- upvalues: t1 (copy)
+	local v6, v7, v8 = unpack(s1:split("/"))
+	local num = tonumber(v6)
+	local num2 = tonumber(v7)
+	local num3 = tonumber(v8)
+
+	if num and num2 and num3 then
+		return t1.Vector3FromXYRotPlusDistance(num, num2, num3)
+	end
+
+	return (Vector3.new(0, 0, 0))
+end
+
+return t1

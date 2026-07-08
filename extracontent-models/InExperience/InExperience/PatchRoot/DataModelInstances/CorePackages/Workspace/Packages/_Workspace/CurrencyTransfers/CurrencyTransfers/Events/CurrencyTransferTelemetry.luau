@@ -1,278 +1,248 @@
-local l_Parent_0 = script:FindFirstAncestor("CurrencyTransfers").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local v2 = game:DefineFastInt("CurrencyTransferTelemetryCounterThrottleHundredthsPercent", 0);
+local Parent = script:FindFirstAncestor("CurrencyTransfers").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local v3 = game:DefineFastInt("CurrencyTransferTelemetryCounterThrottleHundredthsPercent", 0)
+
 return {
-    CurrencyTransferFlowOpenedCounter = {
-        eventName = "CurrencyTransferFlowOpenedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the currency transfer flow is opened."
-    }, 
-    CurrencyTransferInitiateSucceededCounter = {
-        eventName = "CurrencyTransferInitiateSucceededCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when initiate transfer API succeeds and the send flow reaches input."
-    }, 
-    CurrencyTransferInitiateFailedCounter = {
-        eventName = "CurrencyTransferInitiateFailedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when initiate transfer API fails."
-    }, 
-    CurrencyTransferProcessAttemptedCounter = {
-        eventName = "CurrencyTransferProcessAttemptedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when process transfer is attempted (send)."
-    }, 
-    CurrencyTransferProcessSucceededCounter = {
-        eventName = "CurrencyTransferProcessSucceededCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when process transfer API reports success."
-    }, 
-    CurrencyTransferProcessFailedCounter = {
-        eventName = "CurrencyTransferProcessFailedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when process transfer fails or is invalid (send)."
-    }, 
-    CurrencyTransferAcceptAttemptedCounter = {
-        eventName = "CurrencyTransferAcceptAttemptedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when accept transfer API is invoked (receive)."
-    }, 
-    CurrencyTransferAcceptSucceededCounter = {
-        eventName = "CurrencyTransferAcceptSucceededCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when accept transfer API succeeds."
-    }, 
-    CurrencyTransferAcceptFailedCounter = {
-        eventName = "CurrencyTransferAcceptFailedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when accept transfer fails or is invalid (receive)."
-    }, 
-    CurrencyTransferAmpRecourseRequiredCounter = {
-        eventName = "CurrencyTransferAmpRecourseRequiredCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when AMP recourse blocks the transfer flow."
-    }, 
-    CurrencyTransferInputSheetShownCounter = {
-        eventName = "CurrencyTransferInputSheetShownCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the send transfer input sheet is shown."
-    }, 
-    CurrencyTransferConfirmSheetShownCounter = {
-        eventName = "CurrencyTransferConfirmSheetShownCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the send transfer confirm sheet is shown."
-    }, 
-    CurrencyTransferFAEBlockSheetShownCounter = {
-        eventName = "CurrencyTransferFAEBlockSheetShownCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the FAE (age verification) block sheet is shown."
-    }, 
-    CurrencyTransferFAEBlockContinueClickedCounter = {
-        eventName = "CurrencyTransferFAEBlockContinueClickedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the user taps Continue on the FAE block sheet."
-    }, 
-    CurrencyTransferVPCBlockDialogShownCounter = {
-        eventName = "CurrencyTransferVPCBlockDialogShownCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the VPC (parent consent) block dialog is shown."
-    }, 
-    CurrencyTransferVPCBlockAskClickedCounter = {
-        eventName = "CurrencyTransferVPCBlockAskClickedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the user taps Ask on the VPC block dialog."
-    }, 
-    CurrencyTransferVPCBlockCancelClickedCounter = {
-        eventName = "CurrencyTransferVPCBlockCancelClickedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the user taps Cancel on the VPC block dialog."
-    }, 
-    CurrencyTransferSubscriptionUpsellWizardOpenedCounter = {
-        eventName = "CurrencyTransferSubscriptionUpsellWizardOpenedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the Plus subscription upsell AMP wizard is opened from the transfer flow."
-    }, 
-    CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter = {
-        eventName = "CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the subscription upsell wizard completes with access granted."
-    }, 
-    CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter = {
-        eventName = "CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            3, 
-            19
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the subscription upsell wizard completes without access granted."
-    }, 
-    CurrencyTransferEngineSignalReceivedCounter = {
-        eventName = "CurrencyTransferEngineSignalReceivedCounter", 
-        backends = {
-            v1.TelemetryBackends.Counter
-        }, 
-        lastUpdated = {
-            2026, 
-            4, 
-            1
-        }, 
-        throttlingPercentage = v2, 
-        description = "Counter fired when the PromptRobuxTransferRequested engine signal is received and decoded."
-    }
-};
+	CurrencyTransferFlowOpenedCounter = {
+		eventName = "CurrencyTransferFlowOpenedCounter",
+		description = "Counter fired when the currency transfer flow is opened.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferInitiateSucceededCounter = {
+		eventName = "CurrencyTransferInitiateSucceededCounter",
+		description = "Counter fired when initiate transfer API succeeds and the send flow reaches input.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferInitiateFailedCounter = {
+		eventName = "CurrencyTransferInitiateFailedCounter",
+		description = "Counter fired when initiate transfer API fails.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferProcessAttemptedCounter = {
+		eventName = "CurrencyTransferProcessAttemptedCounter",
+		description = "Counter fired when process transfer is attempted (send).",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferProcessSucceededCounter = {
+		eventName = "CurrencyTransferProcessSucceededCounter",
+		description = "Counter fired when process transfer API reports success.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferProcessFailedCounter = {
+		eventName = "CurrencyTransferProcessFailedCounter",
+		description = "Counter fired when process transfer fails or is invalid (send).",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferAcceptAttemptedCounter = {
+		eventName = "CurrencyTransferAcceptAttemptedCounter",
+		description = "Counter fired when accept transfer API is invoked (receive).",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferAcceptSucceededCounter = {
+		eventName = "CurrencyTransferAcceptSucceededCounter",
+		description = "Counter fired when accept transfer API succeeds.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferAcceptFailedCounter = {
+		eventName = "CurrencyTransferAcceptFailedCounter",
+		description = "Counter fired when accept transfer fails or is invalid (receive).",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferAmpRecourseRequiredCounter = {
+		eventName = "CurrencyTransferAmpRecourseRequiredCounter",
+		description = "Counter fired when AMP recourse blocks the transfer flow.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferInputSheetShownCounter = {
+		eventName = "CurrencyTransferInputSheetShownCounter",
+		description = "Counter fired when the send transfer input sheet is shown.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferConfirmSheetShownCounter = {
+		eventName = "CurrencyTransferConfirmSheetShownCounter",
+		description = "Counter fired when the send transfer confirm sheet is shown.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferFAEBlockSheetShownCounter = {
+		eventName = "CurrencyTransferFAEBlockSheetShownCounter",
+		description = "Counter fired when the FAE (age verification) block sheet is shown.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferFAEBlockContinueClickedCounter = {
+		eventName = "CurrencyTransferFAEBlockContinueClickedCounter",
+		description = "Counter fired when the user taps Continue on the FAE block sheet.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferVPCBlockDialogShownCounter = {
+		eventName = "CurrencyTransferVPCBlockDialogShownCounter",
+		description = "Counter fired when the VPC (parent consent) block dialog is shown.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferVPCBlockAskClickedCounter = {
+		eventName = "CurrencyTransferVPCBlockAskClickedCounter",
+		description = "Counter fired when the user taps Ask on the VPC block dialog.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferVPCBlockCancelClickedCounter = {
+		eventName = "CurrencyTransferVPCBlockCancelClickedCounter",
+		description = "Counter fired when the user taps Cancel on the VPC block dialog.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferSubscriptionUpsellWizardOpenedCounter = {
+		eventName = "CurrencyTransferSubscriptionUpsellWizardOpenedCounter",
+		description = "Counter fired when the Plus subscription upsell AMP wizard is opened from the transfer flow.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter = {
+		eventName = "CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter",
+		description = "Counter fired when the subscription upsell wizard completes with access granted.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter = {
+		eventName = "CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter",
+		description = "Counter fired when the subscription upsell wizard completes without access granted.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			3,
+			19
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferEngineSignalReceivedCounter = {
+		eventName = "CurrencyTransferEngineSignalReceivedCounter",
+		description = "Counter fired when the PromptRobuxTransferRequested engine signal is received and decoded.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			4,
+			1
+		},
+		throttlingPercentage = v3
+	},
+	CurrencyTransferEngineUpsellSignalReceivedCounter = {
+		eventName = "CurrencyTransferEngineUpsellSignalReceivedCounter",
+		description = "Counter fired when the PromptRobuxTransferSubscriptionUpsellRequested engine signal is received.",
+		backends = { LoggingProtocol.TelemetryBackends.Counter },
+		lastUpdated = {
+			2026,
+			5,
+			13
+		},
+		throttlingPercentage = v3
+	}
+}

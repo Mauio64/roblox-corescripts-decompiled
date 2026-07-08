@@ -1,28 +1,30 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("PlayerFeedback");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local l_PerformFetch_0 = require(l_Parent_0.Http).PerformFetch;
-local v4 = require(l_script_FirstAncestor_0.Utils.PostGamePlayerFeedback);
-local v5 = require(l_script_FirstAncestor_0.Enums.FeedbackChannel);
-local function _(v6) --[[ Line: 8 ]] --[[ Name: fetchKeymapper ]]
-    return "luaapp.asset-review-api.channels.reviews" .. v6;
-end;
+local PlayerFeedback = script:FindFirstAncestor("PlayerFeedback")
+local PlayerFeedbackParent = PlayerFeedback.Parent
+local Promise = require(PlayerFeedbackParent.Promise)
+local PerformFetch = require(PlayerFeedbackParent.Http).PerformFetch
+local PostGamePlayerFeedback = require(PlayerFeedback.Utils.PostGamePlayerFeedback)
+local FeedbackChannel = require(PlayerFeedback.Enums.FeedbackChannel)
+
+local function fetchKeymapper(p1) -- line: 8
+	return "luaapp.asset-review-api.channels.reviews" .. p1
+end
+
 return {
-    Post = function(v8, v9, v10, v11, v12) --[[ Line: 14 ]] --[[ Name: Post ]]
-        -- upvalues: l_PerformFetch_0 (copy), v4 (copy), v5 (copy), v2 (copy)
-        return l_PerformFetch_0.Single("luaapp.asset-review-api.channels.reviews" .. v9, function(_) --[[ Line: 21 ]]
-            -- upvalues: v4 (ref), v8 (copy), v5 (ref), v9 (copy), v10 (copy), v11 (copy), v12 (copy), v2 (ref)
-            return v4(v8, v5.ExperienceDiscoveryPage, v9, v10, v11, v12):andThen(function(v14) --[[ Line: 29 ]]
-                -- upvalues: v2 (ref)
-                return v2.resolve(v14);
-            end, function(v15) --[[ Line: 31 ]]
-                -- upvalues: v2 (ref)
-                return v2.reject(v15);
-            end);
-        end);
-    end, 
-    GetPostingStatus = function(v16, v17) --[[ Line: 36 ]] --[[ Name: GetPostingStatus ]]
-        -- upvalues: l_PerformFetch_0 (copy)
-        return l_PerformFetch_0.GetStatus(v16, "luaapp.asset-review-api.channels.reviews" .. v17);
-    end
-};
+	Post = function(p2, s1: string, s2: string, t1: {[any]: any}, s3: string) -- line: 14
+		-- upvalues: PerformFetch (copy), PostGamePlayerFeedback (copy), FeedbackChannel (copy), Promise (copy)
+		return PerformFetch.Single("luaapp.asset-review-api.channels.reviews" .. s1, function(_) -- line: 21
+			-- upvalues: PostGamePlayerFeedback (copy), p2 (copy), FeedbackChannel (copy), s1 (copy), s2 (copy), t1 (copy), s3 (copy), Promise (copy)
+			return PostGamePlayerFeedback(p2, FeedbackChannel.ExperienceDiscoveryPage, s1, s2, t1, s3):andThen(function(p4) -- line: 29
+				-- upvalues: Promise (copy)
+				return Promise.resolve(p4)
+			end, function(p5) -- line: 31
+				-- upvalues: Promise (copy)
+				return Promise.reject(p5)
+			end)
+		end)
+	end,
+	GetPostingStatus = function(p6, p7) -- line: 36
+		-- upvalues: PerformFetch (copy)
+		return PerformFetch.GetStatus(p6, "luaapp.asset-review-api.channels.reviews" .. p7)
+	end
+}

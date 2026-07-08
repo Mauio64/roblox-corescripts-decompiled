@@ -1,78 +1,84 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InGameAssetReporting");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.UIBlox);
-local l_ImageSetButton_0 = v4.Core.ImageSet.ImageSetButton;
-local l_Images_0 = v4.App.ImageSet.Images;
-return function(v7) --[[ Line: 25 ]] --[[ Name: ScreenshotHighlighter ]]
-    -- upvalues: l_RobloxGui_0 (copy), v3 (copy), l_ImageSetButton_0 (copy), l_Images_0 (copy)
-    local l_AbsoluteSize_0 = l_RobloxGui_0.AbsoluteSize;
-    local v9 = (l_AbsoluteSize_0.Y > l_AbsoluteSize_0.X and l_AbsoluteSize_0.X or l_AbsoluteSize_0.Y) / 5;
-    local v10, v11 = v3.useState(false);
-    local function v17(v12, v13) --[[ Line: 35 ]]
-        -- upvalues: v9 (copy), v7 (copy)
-        local v14 = (Vector2.new(v13.X, v13.Y) - v12.AbsolutePosition) / v12.AbsoluteSize;
-        local v15 = if v12.AbsoluteSize.X > v12.AbsoluteSize.Y then v12.AbsoluteSize.X else v12.AbsoluteSize.Y;
-        local v16 = v9 * 0.5 / v15;
-        v7.handleNewAnnotationPoint(v14, v16);
-    end;
-    local function v23(v18, v19) --[[ Line: 45 ]]
-        -- upvalues: v7 (copy), v11 (copy), v17 (copy)
-        local v20 = v19.UserInputState == Enum.UserInputState.Begin;
-        local v21 = v19.UserInputType == Enum.UserInputType.Touch;
-        local v22 = v19.UserInputType == Enum.UserInputType.MouseButton1;
-        if v20 and (v21 or v22) then
-            if #v7.annotationPoints < 5 then
-                v11(true);
-                v17(v18, v19.Position);
-                return;
-            else
-                v7.onExceedMaxAnnotationLimit();
-            end;
-        end;
-    end;
-    local function v26(_, _) --[[ Line: 59 ]]
+local InGameAssetReporting = script:FindFirstAncestor("InGameAssetReporting")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local InGameAssetReportingParent = InGameAssetReporting.Parent
+local React = require(InGameAssetReportingParent.React)
+local UIBlox = require(InGameAssetReportingParent.UIBlox)
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local Images = UIBlox.App.ImageSet.Images
 
-    end;
-    local function v29(_, _) --[[ Line: 71 ]]
-        -- upvalues: v10 (copy), v11 (copy)
-        if v10 then
-            v11(false);
-        end;
-    end;
-    local v30 = {};
-    for v31, v32 in ipairs(v7.annotationPoints) do
-        v30["point" .. v31] = v3.createElement("Frame", {
-            Position = UDim2.fromScale(v32.X, v32.Y), 
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromOffset(v9, v9)
-        }, {
-            Border = v3.createElement(l_ImageSetButton_0, {
-                Size = UDim2.fromOffset(v9, v9), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = l_Images_0["component_assets/circle_49_stroke_1"], 
-                ImageColor3 = Color3.fromHex("#3CF3E9"), 
-                ImageTransparency = 0, 
-                BackgroundTransparency = 1
-            }), 
-            Background = v3.createElement(l_ImageSetButton_0, {
-                Size = UDim2.fromOffset(v9, v9), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = l_Images_0["component_assets/circle_49"], 
-                ImageColor3 = Color3.fromHex("#3CF3E9"), 
-                ImageTransparency = 0.6, 
-                BackgroundTransparency = 1
-            })
-        });
-    end;
-    return v3.createElement("Frame", {
-        Active = false, 
-        BackgroundTransparency = 1, 
-        Size = UDim2.fromScale(1, 1), 
-        [v3.Event.InputBegan] = v23, 
-        [v3.Event.InputChanged] = v26, 
-        [v3.Event.InputEnded] = v29, 
-        ZIndex = 3
-    }, v30);
-end;
+local function ScreenshotHighlighter(t1: {[any]: any}) -- line: 25
+	-- upvalues: RobloxGui (copy), React (copy), ImageSetButton (copy), Images (copy)
+	local AbsoluteSize = RobloxGui.AbsoluteSize
+	local v11 = (AbsoluteSize.Y > AbsoluteSize.X and AbsoluteSize.X or AbsoluteSize.Y) / 5
+	local v12, v13 = React.useState(false)
+
+	local function v14(p1, vector3: Vector3) -- line: 35
+		-- upvalues: v11 (copy), t1 (copy)
+		local v20 = (Vector2.new(vector3.X, vector3.Y) - p1.AbsolutePosition) / p1.AbsoluteSize
+		local v21 = if not (p1.AbsoluteSize.X > p1.AbsoluteSize.Y) then p1.AbsoluteSize.Y else p1.AbsoluteSize.X
+		local v22 = v11 * 0.5 / v21
+
+		t1.handleNewAnnotationPoint(v20, v22)
+	end
+
+	local t2 = {}
+
+	for i, v in ipairs(t1.annotationPoints) do
+		t2["point" .. i] = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(v.X, v.Y),
+			Size = UDim2.fromOffset(v11, v11)
+		}, {
+			Border = React.createElement(ImageSetButton, {
+				ImageTransparency = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v11, v11),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = Images["component_assets/circle_49_stroke_1"],
+				ImageColor3 = Color3.fromHex("#3CF3E9")
+			}),
+			Background = React.createElement(ImageSetButton, {
+				ImageTransparency = 0.6,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v11, v11),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = Images["component_assets/circle_49"],
+				ImageColor3 = Color3.fromHex("#3CF3E9")
+			})
+		})
+	end
+
+	return React.createElement("Frame", {
+		Active = false,
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		[React.Event.InputBegan] = function(p2, p3) -- line: 45
+			-- upvalues: t1 (copy), v13 (copy), v14 (copy)
+			local v25 = p3.UserInputState == Enum.UserInputState.Begin
+			local v26 = p3.UserInputType == Enum.UserInputType.Touch
+			local v27 = p3.UserInputType == Enum.UserInputType.MouseButton1
+
+			if v25 and (v26 or v27) then
+				if #t1.annotationPoints < 5 then
+					v13(true)
+					v14(p2, p3.Position)
+
+					return
+				end
+
+				t1.onExceedMaxAnnotationLimit()
+			end
+		end,
+		[React.Event.InputChanged] = function(_, _) -- line: 59
+		end,
+		[React.Event.InputEnded] = function(_, _) -- line: 71
+			-- upvalues: v12 (copy), v13 (copy)
+			if v12 then
+				v13(false)
+			end
+		end,
+		ZIndex = 3
+	}, t2)
+end
+
+return ScreenshotHighlighter

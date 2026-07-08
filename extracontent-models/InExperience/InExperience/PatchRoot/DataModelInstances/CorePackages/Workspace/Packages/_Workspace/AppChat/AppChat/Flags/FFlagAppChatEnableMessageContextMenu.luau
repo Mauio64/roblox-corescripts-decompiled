@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatEnableMessageContextMenu", false);
+return game:DefineFastFlag("AppChatEnableMessageContextMenu", false)

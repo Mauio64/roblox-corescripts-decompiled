@@ -1,98 +1,107 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameCollections");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.calculateCountdownTime);
-local function _(v5) --[[ Line: 19 ]] --[[ Name: validateTimeValues ]]
-    if v5.days < 0 then
-        return false;
-    elseif v5.hours < 0 or v5.hours > 23 then
-        return false;
-    elseif v5.minutes < 0 or v5.minutes > 59 then
-        return false;
-    else
-        return true;
-    end;
-end;
-local function _(v7) --[[ Line: 35 ]] --[[ Name: getUpdateFrequency ]]
-    if v7 < 15 then
-        return 1;
-    else
-        return 15;
-    end;
-end;
-return function(v9, v10, v11) --[[ Line: 46 ]] --[[ Name: useCountdownSubtitleTextBinding ]]
-    -- upvalues: v3 (copy), v4 (copy), l_RunService_0 (copy)
-    local v12, v13 = v3.useState("");
-    local v18 = v3.useCallback(function() --[[ Line: 52 ]]
-        -- upvalues: v11 (copy), v9 (copy), v10 (copy), v4 (ref), v13 (copy)
-        if v11 ~= nil and v11 ~= "" and v9 ~= nil and v10 ~= nil and v10 ~= "" then
-            local l_v11_0 = v11;
-            local v15 = DateTime.now();
-            local v16 = v9 - v15.UnixTimestamp;
-            local v17 = v4(v16);
-            if v17.days >= 0 and v17.hours >= 0 and not (v17.hours > 23) and v17.minutes >= 0 and v17.minutes <= 59 then
-                l_v11_0 = if v17.days > 0 then v11 else v10:gsub("{hours}", (tostring(v17.hours))):gsub("{minutes}", (tostring(v17.minutes)));
-            end;
-            v13(l_v11_0);
-            return v16;
-        else
-            return 0;
-        end;
-    end, {
-        v11, 
-        v9, 
-        v10
-    });
-    v3.useEffect(function() --[[ Line: 79 ]]
-        -- upvalues: v18 (copy)
-        v18();
-    end, {
-        v18
-    });
-    v3.useEffect(function() --[[ Line: 84 ]]
-        -- upvalues: v11 (copy), v9 (copy), v10 (copy), l_RunService_0 (ref), v18 (copy)
-        local v19 = nil;
-        if v11 ~= nil and v11 ~= "" and v9 ~= nil and v10 ~= nil and v10 ~= "" then
-            local v20 = DateTime.now();
-            local v21 = v9 - v20.UnixTimestamp;
-            do
-                local l_v21_0 = v21;
-                if l_v21_0 > 0 then
-                    local v23 = 0;
-                    local v24 = l_v21_0 < 15 and 1 or 15;
-                    do
-                        local l_v23_0, l_v24_0 = v23, v24;
-                        v19 = l_RunService_0.Heartbeat:Connect(function() --[[ Line: 99 ]]
-                            -- upvalues: l_v23_0 (ref), l_v24_0 (ref), l_v21_0 (ref), v18 (ref), v19 (ref)
-                            local v27 = os.clock();
-                            if v27 - l_v23_0 < l_v24_0 then
-                                return;
-                            else
-                                l_v23_0 = v27;
-                                l_v21_0 = v18();
-                                l_v24_0 = l_v21_0 < 15 and 1 or 15;
-                                if l_v21_0 <= 0 and v19 then
-                                    v19:Disconnect();
-                                    v19 = nil;
-                                end;
-                                return;
-                            end;
-                        end);
-                    end;
-                end;
-            end;
-        end;
-        return function() --[[ Line: 114 ]]
-            -- upvalues: v19 (ref)
-            if v19 ~= nil then
-                v19:Disconnect();
-                v19 = nil;
-            end;
-        end;
-    end, {
-        v9, 
-        v18
-    });
-    return v12;
-end;
+local RunService = game:GetService("RunService")
+local GameCollections = script:FindFirstAncestor("GameCollections")
+local GameCollectionsParent = GameCollections.Parent
+local React = require(GameCollectionsParent.React)
+local calculateCountdownTime = require(GameCollections.calculateCountdownTime)
+
+local function validateTimeValues(p1) -- line: 19
+	if p1.days < 0 then
+		return false
+	end
+
+	if p1.hours < 0 or p1.hours > 23 then
+		return false
+	end
+
+	if p1.minutes < 0 or p1.minutes > 59 then
+		return false
+	end
+
+	return true
+end
+local function getUpdateFrequency(n1: number) -- line: 35
+	if n1 < 15 then
+		return 1
+	end
+
+	return 15
+end
+local function useCountdownSubtitleTextBinding(n2: number?, s1: string?, s2: string?) -- line: 46
+	-- upvalues: React (copy), calculateCountdownTime (copy), RunService (copy)
+	local v14, v15 = React.useState("")
+	local v16 = React.useCallback(function() -- line: 52
+		-- upvalues: s2 (copy), n2 (copy), s1 (copy), calculateCountdownTime (copy), v15 (copy)
+		if s2 ~= nil and (s2 ~= "" and n2 ~= nil and s1 ~= nil and s1 ~= "") then
+			local v17 = s2
+			local dateTime = DateTime.now()
+			local v19 = n2 - dateTime.UnixTimestamp
+			local v20 = calculateCountdownTime(v19)
+
+			if not (v20.days < 0) and (not (v20.hours < 0) and (not (v20.hours > 23) and (not (v20.minutes < 0) and not (v20.minutes > 59)))) then
+				v17 = if not (v20.days > 0) then s1:gsub("{hours}", (tostring(v20.hours))):gsub("{minutes}", (tostring(v20.minutes))) else s2
+			end
+
+			v15(v17)
+
+			return v19
+		end
+
+		return 0
+	end, {
+		s2,
+		n2,
+		s1
+	})
+
+	React.useEffect(function() -- line: 79
+		-- upvalues: v16 (copy)
+		v16()
+	end, { v16 })
+	React.useEffect(function() -- line: 84
+		-- upvalues: s2 (copy), n2 (copy), s1 (copy), RunService (copy), v16 (copy)
+		local u21 = nil
+
+		if s2 ~= nil and (s2 ~= "" and n2 ~= nil and s1 ~= nil and s1 ~= "") then
+			local dateTime = DateTime.now()
+			local u23 = n2 - dateTime.UnixTimestamp
+
+			if u23 > 0 then
+				local n3 = 0
+				local u25 = not (u23 < 15) and 15 or 1
+
+				u21 = RunService.Heartbeat:Connect(function() -- line: 99
+					-- upvalues: n3 (ref), u25 (ref), u23 (ref), v16 (copy), u21 (ref)
+					local elapsed = os.clock()
+
+					if elapsed - n3 < u25 then
+						return
+					end
+
+					n3 = elapsed
+					u23 = v16()
+					u25 = not (u23 < 15) and 15 or 1
+
+					if u23 <= 0 and u21 then
+						u21:Disconnect()
+						u21 = nil
+					end
+				end)
+			end
+		end
+
+		return function() -- line: 114
+			-- upvalues: u21 (ref)
+			if u21 ~= nil then
+				u21:Disconnect()
+				u21 = nil
+			end
+		end
+	end, {
+		n2,
+		v16
+	})
+
+	return v14
+end
+
+return useCountdownSubtitleTextBinding

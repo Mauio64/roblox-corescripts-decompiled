@@ -1,8 +1,9 @@
-local v0 = require(script.GameProductInfo);
+local GameProductInfo = require(script.GameProductInfo)
+
 return {
-    FetchGamesProductInfo = require(script.FetchGamesProductInfo), 
-    GameProductInfo = v0, 
-    GamesProductInfoReducer = require(script.GamesProductInfoReducer), 
-    useGameProductInfoSelector = require(script.useGameProductInfoSelector), 
-    ["jest.config"] = script["jest.config"]
-};
+	FetchGamesProductInfo = require(script.FetchGamesProductInfo),
+	GameProductInfo = GameProductInfo,
+	GamesProductInfoReducer = require(script.GamesProductInfoReducer),
+	useGameProductInfoSelector = require(script.useGameProductInfoSelector),
+	["jest.config"] = script["jest.config"]
+}

@@ -1,49 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Promise);
-local v3 = require(l_script_FirstAncestor_0.Http.Requests.LogoutAllLoggedInUsersRequest);
-local v4 = require(l_script_FirstAncestor_0.Http.Requests.GetLoggedInUsersMetadataRequest);
-local l_FFlagEnableLuaAccountSwitch_0 = require(l_Parent_0.SharedFlags).FFlagEnableLuaAccountSwitch;
-local v6 = require(l_script_FirstAncestor_0.Utils.AppStorageUtilities);
-local v7 = require(l_script_FirstAncestor_0.Utils.recordSignOut);
-local v8 = game:DefineFastFlag("RecordSignOutOnLogoutAll", false);
-local function v15(v9, v10) --[[ Line: 13 ]] --[[ Name: recordSignOutOnLogoutAll ]]
-    -- upvalues: v4 (copy), v7 (copy)
-    local v11, v12 = v4(v9, v10):await();
-    if v11 and v12 and v12.responseBody and v12.responseBody.logged_in_users_metadata then
-        for _, v14 in ipairs(v12.responseBody.logged_in_users_metadata) do
-            pcall(function() --[[ Line: 17 ]]
-                -- upvalues: v7 (ref), v14 (copy)
-                v7(v14, true);
-            end);
-        end;
-    end;
-end;
-return function(v16, _) --[[ Line: 24 ]]
-    -- upvalues: l_FFlagEnableLuaAccountSwitch_0 (copy), v2 (copy), v6 (copy), v8 (copy), v15 (copy), v3 (copy)
-    if not l_FFlagEnableLuaAccountSwitch_0 then
-        return v2.resolve();
-    else
-        local v18 = v6.getAccountBlob();
-        if v8 then
-            pcall(v15, v16, v18);
-        end;
-        v6.setAccountBlob("");
-        v6.flush();
-        return v3(v16, v18):andThen(function(v19) --[[ Line: 37 ]]
-            -- upvalues: v2 (ref)
-            return v2.resolve(v19.responseBody);
-        end):catch(function(v20) --[[ Line: 39 ]]
-            -- upvalues: v2 (ref)
-            if v20.data then
-                return v2.reject(v20.data.errorCode);
-            elseif not v20.StatusCode then
-                return v2.reject();
-            else
-                return v2.reject({
-                    v20.StatusCode
-                });
-            end;
-        end);
-    end;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Promise = require(AuthCommonParent.Promise)
+local LogoutAllLoggedInUsersRequest = require(AuthCommon.Http.Requests.LogoutAllLoggedInUsersRequest)
+local GetLoggedInUsersMetadataRequest = require(AuthCommon.Http.Requests.GetLoggedInUsersMetadataRequest)
+local FFlagEnableLuaAccountSwitch = require(AuthCommonParent.SharedFlags).FFlagEnableLuaAccountSwitch
+local AppStorageUtilities = require(AuthCommon.Utils.AppStorageUtilities)
+local recordSignOut = require(AuthCommon.Utils.recordSignOut)
+
+local function recordSignOutOnLogoutAll(p1, p2) -- line: 11
+	-- upvalues: GetLoggedInUsersMetadataRequest (copy), recordSignOut (copy)
+	local v12, v13 = GetLoggedInUsersMetadataRequest(p1, p2):await()
+
+	if v12 and (v13 and v13.responseBody and v13.responseBody.logged_in_users_metadata) then
+		for _, v in ipairs(v13.responseBody.logged_in_users_metadata) do
+			pcall(function() -- line: 15
+				-- upvalues: recordSignOut (copy), v (copy)
+				recordSignOut(v, true)
+			end)
+		end
+	end
+end
+
+return function(p3, _: boolean) -- line: 22
+	-- upvalues: FFlagEnableLuaAccountSwitch (copy), Promise (copy), AppStorageUtilities (copy), recordSignOutOnLogoutAll (copy), LogoutAllLoggedInUsersRequest (copy)
+	if not FFlagEnableLuaAccountSwitch then
+		return Promise.resolve()
+	end
+
+	local v18 = AppStorageUtilities.getAccountBlob()
+
+	pcall(recordSignOutOnLogoutAll, p3, v18)
+	AppStorageUtilities.setAccountBlob("")
+	AppStorageUtilities.flush()
+
+	return LogoutAllLoggedInUsersRequest(p3, v18):andThen(function(p4) -- line: 33
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p4.responseBody)
+	end):catch(function(p5) -- line: 35
+		-- upvalues: Promise (copy)
+		if p5.data then
+			return Promise.reject(p5.data.errorCode)
+		end
+
+		if not p5.StatusCode then
+			return Promise.reject()
+		end
+
+		return Promise.reject({ p5.StatusCode })
+	end)
+end

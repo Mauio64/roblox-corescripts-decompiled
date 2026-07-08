@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableInspectAndBuyV2RootFlag2", false);
+return game:DefineFastFlag("EnableInspectAndBuyV2RootFlag2", false)

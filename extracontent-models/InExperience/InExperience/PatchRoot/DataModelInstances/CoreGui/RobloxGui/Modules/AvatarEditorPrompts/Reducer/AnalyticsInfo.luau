@@ -1,19 +1,20 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.CloseOpenPrompt);
-local v5 = require(l_Parent_0.Actions.AddAnalyticsInfo);
-local v6 = {
-    addedAssets = nil, 
-    removedAssets = nil
-};
-return (v1.createReducer(v6, {
-    [v5.name] = function(v7, v8) --[[ Line: 18 ]]
-        -- upvalues: v2 (copy)
-        return v2.Dictionary.join(v7, v8.info);
-    end, 
-    [v4.name] = function(_, _) --[[ Line: 22 ]]
-        return {};
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+local AddAnalyticsInfo = require(ParentParent.Actions.AddAnalyticsInfo)
+local t1 = {
+	addedAssets = nil,
+	removedAssets = nil
+}
+
+return (Rodux.createReducer(t1, {
+	[AddAnalyticsInfo.name] = function(p1, p2) -- line: 18
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, p2.info)
+	end,
+	[CloseOpenPrompt.name] = function(_, _) -- line: 22
+		return {}
+	end
+}))

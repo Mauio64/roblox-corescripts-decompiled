@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent.Parent.Parent._Index;
-return (require(l__Index_0.UnifiedLogging.UnifiedLogging));
+local _Index = script.Parent.Parent.Parent._Index
+
+return (require(_Index.UnifiedLogging.UnifiedLogging))

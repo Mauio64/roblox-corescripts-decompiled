@@ -1,3 +1,5 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: selectTryOnItems ]]
-    return v0.AvatarExperience.AvatarScene.OutfitTryOn.TryOnItems;
-end;
+local function selectTryOnItems(p1) -- line: 4
+	return p1.AvatarExperience.AvatarScene.OutfitTryOn.TryOnItems
+end
+
+return selectTryOnItems

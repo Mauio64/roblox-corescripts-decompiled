@@ -1,3 +1,3 @@
 return {
-    DeviceAccessTokenChallenge = script.DeviceAccessTokenChallenge
-};
+	DeviceAccessTokenChallenge = script.DeviceAccessTokenChallenge
+}

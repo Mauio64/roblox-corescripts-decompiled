@@ -1,1 +1,1 @@
-return game:DefineFastInt("FriendsCarouselInitialFetchSize", 10);
+return game:DefineFastInt("FriendsCarouselInitialFetchSize", 10)

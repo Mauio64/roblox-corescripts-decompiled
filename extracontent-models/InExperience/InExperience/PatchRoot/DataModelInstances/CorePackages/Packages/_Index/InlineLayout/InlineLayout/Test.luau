@@ -1,3 +1,3 @@
 return {
-    MockInlineElements = require(script.MockInlineElements)
-};
+	MockInlineElements = require(script.MockInlineElements)
+}

@@ -95,8 +95,8 @@ return {
 		Dropdown = "dropdown",
 		FreeComment = "freeComment",
 		Paragraph = "paragraph",
-		Selector = if not FFlagAddThumbnailSelectorReport then nil else "selector",
-		WebViewLink = "link"
+		WebViewLink = "link",
+		Selector = if not FFlagAddThumbnailSelectorReport then nil else "selector"
 	},
 	ContentConfigType = {
 		InnerContentConfig = "innerContentConfig",

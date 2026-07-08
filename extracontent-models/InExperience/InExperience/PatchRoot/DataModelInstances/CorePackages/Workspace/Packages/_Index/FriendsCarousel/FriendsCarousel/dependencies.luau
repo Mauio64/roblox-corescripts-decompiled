@@ -1,80 +1,83 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.SocialLuaAnalytics);
-local v3 = require(l_Parent_1.LuaSocialLibrariesDeps);
-local l_httpRequest_0 = v3.httpRequest;
-local v5 = require(l_Parent_1.Loggers).Logger:new("FriendsCarousel");
-local v6 = v5:new("FriendsCarousel Networking");
-local v7 = game:DefineFastInt("FriendsCarouselHttpRetryCount", 3);
-local l_getFFlagMigrateSocialNetworking_0 = require(l_Parent_1.SharedFlags).getFFlagMigrateSocialNetworking;
-local v14 = l_httpRequest_0.config({
-    requestFunction = function(v9, v10, v11) --[[ Line: 18 ]] --[[ Name: requestFunction ]]
-        -- upvalues: v6 (copy), l_getFFlagMigrateSocialNetworking_0 (copy), l_httpRequest_0 (copy)
-        v6:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", v10, v9));
-        if l_getFFlagMigrateSocialNetworking_0() then
-            return l_httpRequest_0.requestFunctions.RequestInternal(v9, v10, v11);
-        else
-            return l_httpRequest_0.requestFunctions.HttpRbxApi(v9, v10, v11);
-        end;
-    end, 
-    postRequestFunction = function(v12, v13) --[[ Line: 26 ]] --[[ Name: postRequestFunction ]]
-        -- upvalues: v6 (copy)
-        v6:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s ]", v13.requestMethod, v13.url, v12.StatusCode));
-    end, 
-    maxRetryCount = v7
-});
-local l_RODUX_KEY_0 = require(l_Parent_0.Common.Constants).RODUX_KEY;
-local v16 = v3.RoduxNetworking.config({
-    keyPath = l_RODUX_KEY_0 .. ".NetworkStatus", 
-    networkImpl = v14
-});
-local v17 = require(l_Parent_1.UIBlox);
-local _ = require(l_Parent_1.RobloxAppHooks);
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local SocialLuaAnalytics = require(scriptParentParent.SocialLuaAnalytics)
+local LuaSocialLibrariesDeps = require(scriptParentParent.LuaSocialLibrariesDeps)
+local httpRequest = LuaSocialLibrariesDeps.httpRequest
+local v6 = require(scriptParentParent.Loggers).Logger:new("FriendsCarousel")
+local v7 = v6:new("FriendsCarousel Networking")
+local v8 = game:DefineFastInt("FriendsCarouselHttpRetryCount", 3)
+local getFFlagMigrateSocialNetworking = require(scriptParentParent.SharedFlags).getFFlagMigrateSocialNetworking
+local v10 = httpRequest.config({
+	requestFunction = function(p1, p2, p3) -- line: 18
+		-- upvalues: v7 (copy), getFFlagMigrateSocialNetworking (copy), httpRequest (copy)
+		v7:info("Fetching: {}", string.format("[ requestMethod = %q, url = %q ]", p2, p1))
+
+		if getFFlagMigrateSocialNetworking() then
+			return httpRequest.requestFunctions.RequestInternal(p1, p2, p3)
+		end
+
+		return httpRequest.requestFunctions.HttpRbxApi(p1, p2, p3)
+	end,
+	postRequestFunction = function(p4, p5) -- line: 26
+		-- upvalues: v7 (copy)
+		v7:debug("Returned: {}", string.format("[ requestMethod = %q, url = %q, statusCode = %s ]", p5.requestMethod, p5.url, p4.StatusCode))
+	end,
+	maxRetryCount = v8
+})
+local RODUX_KEY = require(scriptParent.Common.Constants).RODUX_KEY
+local v12 = LuaSocialLibrariesDeps.RoduxNetworking.config({
+	keyPath = RODUX_KEY .. ".NetworkStatus",
+	networkImpl = v10
+})
+local UIBlox = require(scriptParentParent.UIBlox)
+
+require(scriptParentParent.RobloxAppHooks)
+
 return {
-    logger = v5, 
-    SocialLuaAnalytics = v2, 
-    Promise = require(l_Parent_1.Promise), 
-    UIBlox = v17, 
-    Roact = require(l_Parent_1.Roact), 
-    React = require(l_Parent_1.React), 
-    Rodux = require(l_Parent_1.Rodux), 
-    RoactRodux = require(l_Parent_1.RoactRodux), 
-    t = require(l_Parent_1.t), 
-    Dash = require(l_Parent_1.Dash), 
-    llama = v3.llama, 
-    SocialLibraries = v3.SocialLibraries.config({}), 
-    SocialCommon = require(l_Parent_1.SocialCommon), 
-    RoduxNetworking = v16, 
-    NetworkingFriends = require(l_Parent_1.FriendsNetworking).config({
-        roduxNetworking = v16
-    }), 
-    NetworkingAliases = v3.NetworkingAliases.config({
-        roduxNetworking = v16
-    }), 
-    RoduxUsers = v3.RoduxUsers.config({
-        keyPath = l_RODUX_KEY_0 .. ".Users"
-    }), 
-    RoduxFriends = require(l_Parent_1.FriendsRodux).config({
-        keyPath = l_RODUX_KEY_0 .. ".Friends"
-    }), 
-    RoduxPresence = v3.RoduxPresence.config({
-        keyPath = l_RODUX_KEY_0 .. ".Presence"
-    }), 
-    RoduxUserPermissions = v3.RoduxUserPermissions.config({
-        keyPath = l_RODUX_KEY_0 .. ".UserPermissions"
-    }), 
-    RoduxAnalytics = v2.Analytics.RoduxAnalytics.config({
-        keyPath = l_RODUX_KEY_0 .. ".Analytics"
-    }), 
-    convertActions = require(l_Parent_1.SocialReducerAdaptors).convertActions, 
-    usersActionAdaptor = require(l_Parent_1.SocialReducerAdaptors).usersActionAdaptor, 
-    friendsActionAdaptor = require(l_Parent_1.SocialReducerAdaptors).friendsActionAdaptor, 
-    presenceActionAdaptor = require(l_Parent_1.SocialReducerAdaptors).presenceActionAdaptor, 
-    Text = require(l_Parent_1.AppCommonLib).Text, 
-    enumerate = require(l_Parent_1.enumerate), 
-    RetrievalStatus = require(l_Parent_1.Http).Enum.RetrievalStatus, 
-    AnalyticsService = require(l_Parent_1.Analytics).Analytics.new(game:GetService("RbxAnalyticsService")), 
-    ShowContactImporterParams = require(l_Parent_1.ContactImporter).ShowContactImporterParams, 
-    isSubjectToDesktopPolicies = require(l_Parent_1.SharedFlags).isSubjectToDesktopPolicies, 
-    isSubjectTo10ftPolicies = require(l_Parent_0.isSubjectTo10ftPolicies)
-};
+	logger = v6,
+	SocialLuaAnalytics = SocialLuaAnalytics,
+	Promise = require(scriptParentParent.Promise),
+	UIBlox = UIBlox,
+	Roact = require(scriptParentParent.Roact),
+	React = require(scriptParentParent.React),
+	Rodux = require(scriptParentParent.Rodux),
+	RoactRodux = require(scriptParentParent.RoactRodux),
+	t = require(scriptParentParent.t),
+	Dash = require(scriptParentParent.Dash),
+	llama = LuaSocialLibrariesDeps.llama,
+	SocialLibraries = LuaSocialLibrariesDeps.SocialLibraries.config({}),
+	SocialCommon = require(scriptParentParent.SocialCommon),
+	RoduxNetworking = v12,
+	NetworkingFriends = require(scriptParentParent.FriendsNetworking).config({
+		roduxNetworking = v12
+	}),
+	NetworkingAliases = LuaSocialLibrariesDeps.NetworkingAliases.config({
+		roduxNetworking = v12
+	}),
+	RoduxUsers = LuaSocialLibrariesDeps.RoduxUsers.config({
+		keyPath = RODUX_KEY .. ".Users"
+	}),
+	RoduxFriends = require(scriptParentParent.FriendsRodux).config({
+		keyPath = RODUX_KEY .. ".Friends"
+	}),
+	RoduxPresence = LuaSocialLibrariesDeps.RoduxPresence.config({
+		keyPath = RODUX_KEY .. ".Presence"
+	}),
+	RoduxUserPermissions = LuaSocialLibrariesDeps.RoduxUserPermissions.config({
+		keyPath = RODUX_KEY .. ".UserPermissions"
+	}),
+	RoduxAnalytics = SocialLuaAnalytics.Analytics.RoduxAnalytics.config({
+		keyPath = RODUX_KEY .. ".Analytics"
+	}),
+	convertActions = require(scriptParentParent.SocialReducerAdaptors).convertActions,
+	usersActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).usersActionAdaptor,
+	friendsActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).friendsActionAdaptor,
+	presenceActionAdaptor = require(scriptParentParent.SocialReducerAdaptors).presenceActionAdaptor,
+	Text = require(scriptParentParent.AppCommonLib).Text,
+	enumerate = require(scriptParentParent.enumerate),
+	RetrievalStatus = require(scriptParentParent.Http).Enum.RetrievalStatus,
+	AnalyticsService = require(scriptParentParent.Analytics).Analytics.new(game:GetService("RbxAnalyticsService")),
+	ShowContactImporterParams = require(scriptParentParent.ContactImporter).ShowContactImporterParams,
+	isSubjectToDesktopPolicies = require(scriptParentParent.SharedFlags).isSubjectToDesktopPolicies,
+	isSubjectTo10ftPolicies = require(scriptParent.isSubjectTo10ftPolicies)
+}

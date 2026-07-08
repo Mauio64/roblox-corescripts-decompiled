@@ -1,3 +1,3 @@
 return {
-    Presence = require(script.PresenceModel)
-};
+	Presence = require(script.PresenceModel)
+}

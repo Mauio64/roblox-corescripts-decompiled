@@ -1,15 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Signals);
-local l_GreenlistedEndpointsForLogging_0 = require(l_Parent_1.Http).Logger.GreenlistedEndpointsForLogging;
-local _ = require(l_Parent_0.HttpStoreTypes);
-return function(v5) --[[ Line: 13 ]] --[[ Name: createGrafanaLoggingHandler ]]
-    -- upvalues: v2 (copy), l_GreenlistedEndpointsForLogging_0 (copy)
-    return v2.createEffect(function(v6) --[[ Line: 14 ]]
-        -- upvalues: v5 (copy), l_GreenlistedEndpointsForLogging_0 (ref)
-        local v7 = v5(v6);
-        if v7.status == "Success" then
-            l_GreenlistedEndpointsForLogging_0.sendStatusCodeCounter(v7.config.Url, v7.response.StatusCode);
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Signals = require(ParentParentParent.Signals)
+local GreenlistedEndpointsForLogging = require(ParentParentParent.Http).Logger.GreenlistedEndpointsForLogging
+
+require(ParentParent.HttpStoreTypes)
+
+local function createGrafanaLoggingHandler(p1) -- line: 13
+	-- upvalues: Signals (copy), GreenlistedEndpointsForLogging (copy)
+	return Signals.createEffect(function(p2) -- line: 14
+		-- upvalues: p1 (copy), GreenlistedEndpointsForLogging (copy)
+		local v8 = p1(p2)
+
+		if v8.status == "Success" then
+			GreenlistedEndpointsForLogging.sendStatusCodeCounter(v8.config.Url, v8.response.StatusCode)
+		end
+	end)
+end
+
+return createGrafanaLoggingHandler

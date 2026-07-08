@@ -1,13 +1,18 @@
-local l_HttpService_0 = game:GetService("HttpService");
-return function(v1) --[[ Line: 10 ]] --[[ Name: buildQueryString ]]
-    -- upvalues: l_HttpService_0 (copy)
-    local v2 = {};
-    for v3, v4 in pairs(v1) do
-        table.insert(v2, string.format("%s=%s", l_HttpService_0:UrlEncode((tostring(v3))), l_HttpService_0:UrlEncode((tostring(v4)))));
-    end;
-    if #v2 == 0 then
-        return "";
-    else
-        return "?" .. table.concat(v2, "&");
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+
+local function buildQueryString(t1: {[any]: any}) -- line: 10
+	-- upvalues: HttpService (copy)
+	local t2 = {}
+
+	for k, v in pairs(t1) do
+		table.insert(t2, string.format("%s=%s", HttpService:UrlEncode((tostring(k))), HttpService:UrlEncode((tostring(v)))))
+	end
+
+	if #t2 == 0 then
+		return ""
+	end
+
+	return "?" .. table.concat(t2, "&")
+end
+
+return buildQueryString

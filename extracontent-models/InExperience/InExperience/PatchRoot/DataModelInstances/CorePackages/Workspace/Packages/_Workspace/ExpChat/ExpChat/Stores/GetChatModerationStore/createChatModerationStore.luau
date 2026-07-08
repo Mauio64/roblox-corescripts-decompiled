@@ -1,83 +1,85 @@
-local l_Chat_0 = game:GetService("Chat");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v3 = require(l_Parent_0.Signals);
-local l_createSignal_0 = v3.createSignal;
-local l_createComputed_0 = v3.createComputed;
-local v6 = require(script.Parent.Parent.GetChatStatusStore);
-local v7 = game:DefineFastFlag("EnableModerateChatUseChatService", false) and game:GetEngineFeature("EnableChatModerationModeLoggingRefactor");
-return function() --[[ Line: 24 ]]
-    -- upvalues: l_createSignal_0 (copy), v6 (copy), v7 (copy), l_Chat_0 (copy), l_RobloxReplicatedStorage_0 (copy), l_createComputed_0 (copy)
-    local v8, v9 = l_createSignal_0(false);
-    local v10, v11 = l_createSignal_0(false);
-    local v12 = v6(false);
-    local v13 = nil;
-    local function v15(v14) --[[ Line: 31 ]] --[[ Name: setIsSettingEnabled ]]
-        -- upvalues: v7 (ref), l_Chat_0 (ref), v13 (ref)
-        if v7 then
-            l_Chat_0:RequestModerationModeEnabled(v14);
-            return;
-        else
-            if v13 then
-                v13:FireServer(v14);
-            end;
-            return;
-        end;
-    end;
-    local function v16() --[[ Line: 41 ]] --[[ Name: initialize ]]
-        -- upvalues: v7 (ref), l_Chat_0 (ref), v13 (ref)
-        if v7 then
-            l_Chat_0:RequestModerationModeEnabled(false);
-            return;
-        else
-            if v13 then
-                v13:FireServer(false);
-            end;
-            return;
-        end;
-    end;
-    local v17 = nil;
-    if v7 then
-        local function v18() --[[ Line: 52 ]]
-            -- upvalues: v9 (copy), l_Chat_0 (ref), v11 (copy)
-            v9(l_Chat_0.ModerationMode ~= "Unsupported");
-            v11(l_Chat_0.ModerationMode == "Enabled");
-        end;
-        v17 = l_Chat_0:GetPropertyChangedSignal("ModerationMode"):Connect(v18);
-        v9(l_Chat_0.ModerationMode ~= "Unsupported");
-        v11(l_Chat_0.ModerationMode == "Enabled");
-    else
-        coroutine.wrap(function() --[[ Line: 59 ]]
-            -- upvalues: v13 (ref), l_RobloxReplicatedStorage_0 (ref), v9 (copy), v11 (copy)
-            v13 = l_RobloxReplicatedStorage_0:WaitForChild("ModerateChatSettingUpdated", 10);
-            if v13 then
-                v13.OnClientEvent:Connect(function(v19) --[[ Line: 62 ]]
-                    -- upvalues: v9 (ref), v11 (ref)
-                    v9(true);
-                    v11(v19);
-                end);
-            end;
-        end)();
-    end;
-    local v21 = l_createComputed_0(function(v20) --[[ Line: 71 ]]
-        -- upvalues: v8 (copy), v12 (copy)
-        return v8(v20) and v12.getChatStatus(v20) == "Enabled";
-    end);
-    local v23 = l_createComputed_0(function(v22) --[[ Line: 74 ]]
-        -- upvalues: v10 (copy), v12 (copy)
-        return v10(v22) and v12.getChatStatus(v22) == "Enabled";
-    end);
-    return {
-        getIsSettingVisible = v21, 
-        getIsSettingEnabled = v23, 
-        setIsSettingEnabled = v15, 
-        initialize = v16, 
-        cleanup = function() --[[ Line: 83 ]] --[[ Name: cleanup ]]
-            -- upvalues: v17 (ref)
-            if v17 then
-                v17:Disconnect();
-                v17 = nil;
-            end;
-        end
-    };
-end;
+local Chat = game:GetService("Chat")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(Parent.Signals)
+local createSignal = Signals.createSignal
+local createComputed = Signals.createComputed
+local GetChatStatusStore = require(script.Parent.Parent.GetChatStatusStore)
+local v8 = game:DefineFastFlag("EnableModerateChatUseChatService", false) and game:GetEngineFeature("EnableChatModerationModeLoggingRefactor")
+
+return function() -- line: 24
+	-- upvalues: createSignal (copy), GetChatStatusStore (copy), v8 (copy), Chat (copy), RobloxReplicatedStorage (copy), createComputed (copy)
+	local v9, v10 = createSignal(false)
+	local v11, v12 = createSignal(false)
+	local v13 = GetChatStatusStore(false)
+	local ModerateChatSettingUpdated = nil
+	local connection = nil
+
+	if v8 then
+		connection = Chat:GetPropertyChangedSignal("ModerationMode"):Connect(function() -- line: 52
+			-- upvalues: v10 (copy), Chat (copy), v12 (copy)
+			v10(Chat.ModerationMode ~= "Unsupported")
+			v12(Chat.ModerationMode == "Enabled")
+		end)
+		v10(Chat.ModerationMode ~= "Unsupported")
+		v12(Chat.ModerationMode == "Enabled")
+	else
+		coroutine.wrap(function() -- line: 59
+			-- upvalues: ModerateChatSettingUpdated (ref), RobloxReplicatedStorage (copy), v10 (copy), v12 (copy)
+			ModerateChatSettingUpdated = RobloxReplicatedStorage:WaitForChild("ModerateChatSettingUpdated", 10)
+
+			if ModerateChatSettingUpdated then
+				ModerateChatSettingUpdated.OnClientEvent:Connect(function(b1: boolean) -- line: 62
+					-- upvalues: v10 (copy), v12 (copy)
+					v10(true)
+					v12(b1)
+				end)
+			end
+		end)()
+	end
+
+	local v16 = createComputed(function(p1) -- line: 71
+		-- upvalues: v9 (copy), v13 (copy)
+		return v9(p1) and v13.getChatStatus(p1) == "Enabled"
+	end)
+	local v17 = createComputed(function(p2) -- line: 74
+		-- upvalues: v11 (copy), v13 (copy)
+		return v11(p2) and v13.getChatStatus(p2) == "Enabled"
+	end)
+
+	return {
+		getIsSettingVisible = v16,
+		getIsSettingEnabled = v17,
+		setIsSettingEnabled = function(b2: boolean) -- line: 31
+			-- upvalues: v8 (copy), Chat (copy), ModerateChatSettingUpdated (ref)
+			if v8 then
+				Chat:RequestModerationModeEnabled(b2)
+
+				return
+			end
+
+			if ModerateChatSettingUpdated then
+				ModerateChatSettingUpdated:FireServer(b2)
+			end
+		end,
+		initialize = function() -- line: 41
+			-- upvalues: v8 (copy), Chat (copy), ModerateChatSettingUpdated (ref)
+			if v8 then
+				Chat:RequestModerationModeEnabled(false)
+
+				return
+			end
+
+			if ModerateChatSettingUpdated then
+				ModerateChatSettingUpdated:FireServer(false)
+			end
+		end,
+		cleanup = function() -- line: 83
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end
+	}
+end

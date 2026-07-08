@@ -1,70 +1,74 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_t_0 = v1.t;
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local l_IconSize_0 = l_UIBlox_0.App.Constant.IconSize;
-local l_StyledTextLabel_0 = l_UIBlox_0.App.Text.StyledTextLabel;
-local l_withStyle_0 = l_UIBlox_0.Style.withStyle;
-local v9 = l_Roact_0.PureComponent:extend("ContactsInformationModal");
-v9.validateProps = l_t_0.strictInterface({
-    text = l_t_0.string, 
-    image = l_t_0.table, 
-    layoutOrder = l_t_0.optional(l_t_0.number)
-});
-v9.render = function(v10) --[[ Line: 32 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), l_Roact_0 (copy), l_ImageSetLabel_0 (copy), l_IconSize_0 (copy), l_StyledTextLabel_0 (copy)
-    return l_withStyle_0(function(v11) --[[ Line: 33 ]]
-        -- upvalues: v10 (copy), l_Roact_0 (ref), l_ImageSetLabel_0 (ref), l_IconSize_0 (ref), l_StyledTextLabel_0 (ref)
-        local l_Theme_0 = v11.Theme;
-        local l_Font_0 = v11.Font;
-        local l_props_0 = v10.props;
-        return l_Roact_0.createElement("Frame", {
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            Size = UDim2.fromScale(1, 0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_props_0.layoutOrder
-        }, {
-            UIListLayout = l_Roact_0.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                Padding = UDim.new(0, 12), 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center
-            }), 
-            UIPadding = l_Roact_0.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 24), 
-                PaddingBottom = UDim.new(0, 36)
-            }), 
-            IconContainer = l_Roact_0.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromOffset(120, 132), 
-                LayoutOrder = 1
-            }, {
-                Icon = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    BackgroundTransparency = 1, 
-                    ImageColor3 = v11.Theme.IconEmphasis.Color, 
-                    ImageTransparency = v11.Theme.IconEmphasis.Transparency, 
-                    Image = l_props_0.image, 
-                    Size = UDim2.fromOffset(l_IconSize_0.XLarge, l_IconSize_0.XLarge), 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    LayoutOrder = 1
-                })
-            }), 
-            Description = l_Roact_0.createElement(l_StyledTextLabel_0, {
-                text = l_props_0.text, 
-                fontStyle = l_Font_0.CaptionBody, 
-                colorStyle = l_Theme_0.TextEmphasis, 
-                lineHeight = 1.2, 
-                size = UDim2.fromScale(1, 0), 
-                automaticSize = Enum.AutomaticSize.Y, 
-                textTruncate = Enum.TextTruncate.AtEnd, 
-                textXAlignment = Enum.TextXAlignment.Center, 
-                textYAlignment = Enum.TextYAlignment.Top, 
-                layoutOrder = 2
-            })
-        });
-    end);
-end;
-return v9;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local t = dependencies.t
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local IconSize = UIBlox.App.Constant.IconSize
+local StyledTextLabel = UIBlox.App.Text.StyledTextLabel
+local withStyle = UIBlox.Style.withStyle
+local v10 = Roact.PureComponent:extend("ContactsInformationModal")
+
+v10.validateProps = t.strictInterface({
+	text = t.string,
+	image = t.table,
+	layoutOrder = t.optional(t.number)
+})
+
+function v10.render(p1) -- line: 32
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), IconSize (copy), StyledTextLabel (copy)
+	return withStyle(function(p2) -- line: 33
+		-- upvalues: p1 (copy), Roact (copy), ImageSetLabel (copy), IconSize (copy), StyledTextLabel (copy)
+		local Theme = p2.Theme
+		local p2Font = p2.Font
+		local props = p1.props
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Size = UDim2.fromScale(1, 0),
+			LayoutOrder = props.layoutOrder
+		}, {
+			UIListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 12),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}),
+			UIPadding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 24),
+				PaddingBottom = UDim.new(0, 36)
+			}),
+			IconContainer = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.fromOffset(120, 132)
+			}, {
+				Icon = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					ImageColor3 = p2.Theme.IconEmphasis.Color,
+					ImageTransparency = p2.Theme.IconEmphasis.Transparency,
+					Image = props.image,
+					Size = UDim2.fromOffset(IconSize.XLarge, IconSize.XLarge),
+					Position = UDim2.fromScale(0.5, 0.5)
+				})
+			}),
+			Description = Roact.createElement(StyledTextLabel, {
+				lineHeight = 1.2,
+				layoutOrder = 2,
+				text = props.text,
+				fontStyle = p2Font.CaptionBody,
+				colorStyle = Theme.TextEmphasis,
+				size = UDim2.fromScale(1, 0),
+				automaticSize = Enum.AutomaticSize.Y,
+				textTruncate = Enum.TextTruncate.AtEnd,
+				textXAlignment = Enum.TextXAlignment.Center,
+				textYAlignment = Enum.TextYAlignment.Top
+			})
+		})
+	end)
+end
+
+return v10

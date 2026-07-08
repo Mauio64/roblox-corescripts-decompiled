@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableInGameExitModalNextUpUi", false);
+return game:DefineFastFlag("EnableInGameExitModalNextUpUi", false)

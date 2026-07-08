@@ -1,53 +1,67 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialExperiments");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_SystemInfoProtocol_0 = require(l_Parent_0.SystemInfoProtocol).SystemInfoProtocol;
-local _ = require(l_script_FirstAncestor_0.DeviceGateFeature);
-local v4 = {};
-local v5 = {};
-return function(v6) --[[ Line: 18 ]]
-    -- upvalues: v4 (copy), v5 (copy), l_SystemInfoProtocol_0 (copy)
-    if v4[v6.featureName] == nil then
-        v4[v6.featureName] = v6.enabled;
-    end;
-    if v4[v6.featureName] then
-        if v5[v6.featureName] == nil then
-            local _, _ = pcall(function() --[[ Line: 25 ]]
-                -- upvalues: l_SystemInfoProtocol_0 (ref), v6 (copy), v5 (ref)
-                local v7 = {
-                    l_SystemInfoProtocol_0.InfoNames.DEVICE_NAME, 
-                    l_SystemInfoProtocol_0.InfoNames.SYSTEM_VERSION, 
-                    l_SystemInfoProtocol_0.InfoNames.BASE_OS
-                };
-                local v8 = l_SystemInfoProtocol_0.default:getSystemInfo(v7);
-                local v9 = v8.deviceName or "UnknownDeviceName";
-                if typeof(v9) == "string" then
-                    for v10 in v6.deviceNameBlackListString:gmatch("([^|]+)") do
-                        if v9:lower():find(v10:lower()) then
-                            v5[v6.featureName] = true;
-                            return v5[v6.featureName];
-                        end;
-                    end;
-                end;
-                local v11 = v8.baseOs or "UnknownOS";
-                local v12 = v8.systemVersion or "UnknownVersion";
-                if typeof(v11) == "string" and typeof(v12) == "string" then
-                    local v13 = v11 .. ":" .. v12;
-                    for v14 in v6.osVersionBlackListString:gmatch("([^|]+)") do
-                        if v13:lower():find(v14:lower()) then
-                            v5[v6.featureName] = true;
-                            return v5[v6.featureName];
-                        end;
-                    end;
-                end;
-                v5[v6.featureName] = false;
-                return v5[v6.featureName];
-            end);
-            if v5[v6.featureName] == nil then
-                v5[v6.featureName] = false;
-            end;
-        end;
-    else
-        v5[v6.featureName] = false;
-    end;
-    return v5[v6.featureName];
-end;
+local SocialExperiments = script:FindFirstAncestor("SocialExperiments")
+local SocialExperimentsParent = SocialExperiments.Parent
+local SystemInfoProtocol = require(SocialExperimentsParent.SystemInfoProtocol).SystemInfoProtocol
+
+require(SocialExperiments.DeviceGateFeature)
+
+local t1 = {}
+local t2 = {}
+
+return function(t3: {[any]: any}) -- line: 18
+	-- upvalues: t1 (copy), t2 (copy), SystemInfoProtocol (copy)
+	if t1[t3.featureName] == nil then
+		t1[t3.featureName] = t3.enabled
+	end
+
+	if t1[t3.featureName] then
+		if t2[t3.featureName] == nil then
+			local _, _ = pcall(function() -- line: 25
+				-- upvalues: SystemInfoProtocol (copy), t3 (copy), t2 (copy)
+				local t4 = {
+					SystemInfoProtocol.InfoNames.DEVICE_NAME,
+					SystemInfoProtocol.InfoNames.SYSTEM_VERSION,
+					SystemInfoProtocol.InfoNames.BASE_OS
+				}
+				local v10 = SystemInfoProtocol.default:getSystemInfo(t4)
+				local v11 = v10.deviceName or "UnknownDeviceName"
+
+				if typeof(v11) == "string" then
+					for match in t3.deviceNameBlackListString:gmatch("([^|]+)") do
+						if v11:lower():find(match:lower()) then
+							t2[t3.featureName] = true
+
+							return t2[t3.featureName]
+						end
+					end
+				end
+
+				local v13 = v10.baseOs or "UnknownOS"
+				local v14 = v10.systemVersion or "UnknownVersion"
+
+				if typeof(v13) == "string" and typeof(v14) == "string" then
+					local v15 = v13 .. ":" .. v14
+
+					for match in t3.osVersionBlackListString:gmatch("([^|]+)") do
+						if v15:lower():find(match:lower()) then
+							t2[t3.featureName] = true
+
+							return t2[t3.featureName]
+						end
+					end
+				end
+
+				t2[t3.featureName] = false
+
+				return t2[t3.featureName]
+			end)
+
+			if t2[t3.featureName] == nil then
+				t2[t3.featureName] = false
+			end
+		end
+	else
+		t2[t3.featureName] = false
+	end
+
+	return t2[t3.featureName]
+end

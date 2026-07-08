@@ -7,7 +7,6 @@ require(AppChat.types)
 local AppChatNetworking = require(AppChatParent.AppChatNetworking)
 local Cryo = require(AppChatParent.Cryo)
 local React = require(AppChatParent.React)
-local dependencyArray = require(AppChatParent.RoactUtils).Hooks.dependencyArray
 local memo = React.memo
 local useCallback = React.useCallback
 local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
@@ -21,113 +20,112 @@ local ChatDialogTelemetryLayer = require(AppChat.Telemetry.Layers.ChatDialogTele
 local ResponseIndicator = SocialLibraries.Components.ResponseIndicator
 local LeaveGroupDialog = require(script.Parent.LeaveGroupDialog)
 local GetFFlagIsSquadEnabled = require(AppChatParent.SharedFlags).GetFFlagIsSquadEnabled
-local FFlagRemoveDependencyArrayAntipattern = require(AppChatParent.SharedFlags).FFlagRemoveDependencyArrayAntipattern
 local t1 = {
-	onModalClose = function() --[[ onModalClose ]] -- line: 48
-	end,
-	onLeaveSuccess = function() --[[ onLeaveSuccess ]] -- line: 49
-	end,
 	titleKey = "Feature.Chat.Heading.LeaveGroup",
 	cancelKey = "Feature.Chat.Action.Stay",
 	confirmKey = "Feature.Chat.Action.Leave",
-	bodyKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.LeaveGroup" or "Feature.Chat.Message.LeaveGroup.V2",
 	failureTitleKey = "Feature.Chat.Heading.FailedToLeaveGroup",
-	failureBodyKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.FailedToLeaveGroup" or "Feature.Chat.Message.FailedToLeaveGroup.V2",
-	failureButtonKey = "Feature.Chat.Action.Confirm"
+	failureButtonKey = "Feature.Chat.Action.Confirm",
+	onModalClose = function() -- line: 45
+	end,
+	onLeaveSuccess = function() -- line: 46
+	end,
+	bodyKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.LeaveGroup" or "Feature.Chat.Message.LeaveGroup.V2",
+	failureBodyKey = not GetFFlagIsSquadEnabled() and "Feature.Chat.Message.FailedToLeaveGroup" or "Feature.Chat.Message.FailedToLeaveGroup.V2"
 }
 
-function LeaveGroupDialogContainer(t2: {[any]: any}) -- line: 66
-	-- upvalues: Cryo (copy), t1 (copy), useState (copy), useTelemetry (copy), ChatDialogTelemetryLayer (copy), useEffectOnMount (copy), ChatDetailsTelemetryEvents (copy), useDispatch (copy), useCallback (copy), AppChatNetworking (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), useSelector (copy), GetFFlagIsSquadEnabled (copy), useLocalization (copy), React (copy), LeaveGroupDialog (copy), ResponseIndicator (copy)
-	local v24 = Cryo.Dictionary.join(t1, t2)
-	local v25, v26 = useState(true)
+function LeaveGroupDialogContainer(t2: {[any]: any}) -- line: 63
+	-- upvalues: Cryo (copy), t1 (copy), useState (copy), useTelemetry (copy), ChatDialogTelemetryLayer (copy), useEffectOnMount (copy), ChatDetailsTelemetryEvents (copy), useDispatch (copy), useCallback (copy), AppChatNetworking (copy), useSelector (copy), GetFFlagIsSquadEnabled (copy), useLocalization (copy), React (copy), LeaveGroupDialog (copy), ResponseIndicator (copy)
+	local v22 = Cryo.Dictionary.join(t1, t2)
+	local v23, v24 = useState(true)
+	local v25, v26 = useState(false)
 	local v27, v28 = useState(false)
-	local v29, v30 = useState(false)
-	local v31 = useTelemetry(ChatDialogTelemetryLayer.Context)
+	local v29 = useTelemetry(ChatDialogTelemetryLayer.Context)
 
-	useEffectOnMount(function() -- line: 73
-		-- upvalues: v31 (copy), ChatDetailsTelemetryEvents (copy)
-		v31.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogRendered, {})
+	useEffectOnMount(function() -- line: 70
+		-- upvalues: v29 (copy), ChatDetailsTelemetryEvents (copy)
+		v29.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogRendered, {})
 	end)
 
-	local v32 = useDispatch()
-	local v33 = useCallback(function(p1, p2) -- line: 78
-		-- upvalues: v32 (copy), AppChatNetworking (copy)
-		return v32(AppChatNetworking.rodux.RemoveUserFromConversation.API(p2, p1))
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v32) else { v32 })
-	local v34 = useSelector(function(p3) -- line: 82
-		-- upvalues: v24 (copy), GetFFlagIsSquadEnabled (copy)
-		local v41 = p3.ChatAppReducer.Conversations[v24.conversationId] or {
+	local v30 = useDispatch()
+	local v31 = useCallback(function(p1, p2) -- line: 75
+		-- upvalues: v30 (copy), AppChatNetworking (copy)
+		return v30(AppChatNetworking.rodux.RemoveUserFromConversation.API(p2, p1))
+	end, { v30 })
+	local v32 = useSelector(function(p3) -- line: 79
+		-- upvalues: v22 (copy), GetFFlagIsSquadEnabled (copy)
+		local v39 = p3.ChatAppReducer.Conversations[v22.conversationId] or {
 			title = nil,
 			hasGroupUp = nil
 		}
 
 		return {
 			localUserId = p3.LocalUserId,
-			conversationTitle = v41.title,
-			hasGroupUp = if not GetFFlagIsSquadEnabled() then nil else v41.hasGroupUp
+			conversationTitle = v39.title,
+			hasGroupUp = if not GetFFlagIsSquadEnabled() then nil else v39.hasGroupUp
 		}
 	end)
-	local v35 = useCallback(function() -- line: 97
-		-- upvalues: v28 (copy), v26 (copy), v31 (copy), ChatDetailsTelemetryEvents (copy), v24 (copy), v33 (copy), v34 (copy), v30 (copy)
-		v28(true)
-		v26(false)
-		v31.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogLeaveClicked, {})
+	local v33 = useCallback(function() -- line: 93
+		-- upvalues: v26 (copy), v24 (copy), v29 (copy), ChatDetailsTelemetryEvents (copy), v22 (copy), v31 (copy), v32 (copy), v28 (copy)
+		v26(true)
+		v24(false)
+		v29.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogLeaveClicked, {})
 
-		if v24.conversationId then
-			v33(v34.localUserId, v24.conversationId):andThen(function() -- line: 104
-				-- upvalues: v24 (copy)
-				v24.onModalClose()
-				v24.onLeaveSuccess()
-			end):catch(function() -- line: 108
-				-- upvalues: v28 (copy), v26 (copy), v30 (copy)
-				v28(false)
-				v26(true)
-				v30(true)
+		if v22.conversationId then
+			v31(v32.localUserId, v22.conversationId):andThen(function() -- line: 100
+				-- upvalues: v22 (copy)
+				v22.onModalClose()
+				v22.onLeaveSuccess()
+			end):catch(function() -- line: 104
+				-- upvalues: v26 (copy), v24 (copy), v28 (copy)
+				v26(false)
+				v24(true)
+				v28(true)
 			end)
 		end
 
 		return true
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v34.localUserId, v34.hasGroupUp, v24.conversationId, v33, v31) else {
-		v34.localUserId,
-		v34.hasGroupUp,
-		v24.conversationId,
-		v33,
-		v31
+	end, {
+		v32.localUserId,
+		v32.hasGroupUp,
+		v22.conversationId,
+		v31,
+		v29
 	})
-	local v36 = useCallback(function(...) -- line: 135
-		-- upvalues: v31 (copy), ChatDetailsTelemetryEvents (copy), v24 (copy)
-		v31.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogStayClicked, {})
-		v24.onModalClose(...)
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v24.onModalClose, v24.conversationId, v31) else {
-		v24.onModalClose,
-		v24.conversationId,
-		v31
+	local v34 = useCallback(function(...) -- line: 120
+		-- upvalues: v29 (copy), ChatDetailsTelemetryEvents (copy), v22 (copy)
+		v29.emit(ChatDetailsTelemetryEvents.LeaveGroupDialogStayClicked, {})
+		v22.onModalClose(...)
+	end, {
+		v22.onModalClose,
+		v22.conversationId,
+		v29
 	})
-	local v37 = useLocalization({
-		titleText = v24.titleKey,
-		cancelText = v24.cancelKey,
-		confirmText = v24.confirmKey,
-		bodyText = v24.bodyKey,
-		failureTitleText = v24.failureTitleKey,
+	local v35 = useLocalization({
+		titleText = v22.titleKey,
+		cancelText = v22.cancelKey,
+		confirmText = v22.confirmKey,
+		bodyText = v22.bodyKey,
+		failureTitleText = v22.failureTitleKey,
 		failureBodyText = {
-			v24.failureBodyKey,
-			CONVERSATION_TITLE = v34.conversationTitle
+			v22.failureBodyKey,
+			CONVERSATION_TITLE = v32.conversationTitle
 		},
-		failureButtonText = v24.failureButtonKey
+		failureButtonText = v22.failureButtonKey
 	})
 
 	return React.createElement("Frame", {
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = 1
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
 	}, {
-		LeaveGroupDialog = v25 and React.createElement(LeaveGroupDialog, Cryo.Dictionary.join(v24, v37, v34, {
-			onActivated = v35,
-			displayFailed = v29,
-			onModalClose = v36
+		LeaveGroupDialog = v23 and React.createElement(LeaveGroupDialog, Cryo.Dictionary.join(v22, v35, v32, {
+			onActivated = v33,
+			displayFailed = v27,
+			onModalClose = v34
 		})),
-		ResponseIndicator = v27 and React.createElement(ResponseIndicator, {
-			soakAreaColor3 = Color3.fromRGB(25, 25, 25),
-			soakAreaTransparency = 0.8
+		ResponseIndicator = v25 and React.createElement(ResponseIndicator, {
+			soakAreaTransparency = 0.8,
+			soakAreaColor3 = Color3.fromRGB(25, 25, 25)
 		})
 	})
 end

@@ -16,8 +16,8 @@ return function(p3, _, p5, _) -- line: 30
 
 	if v16 == nil then
 		p5.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			name = SduiActionType.OpenAmpWizard,
-			message = "Missing actionParams"
+			message = "Missing actionParams",
+			name = SduiActionType.OpenAmpWizard
 		}, p5.appPage)
 
 		return
@@ -29,9 +29,9 @@ return function(p3, _, p5, _) -- line: 30
 
 	if featureName == nil then
 		p5.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
-			name = SduiActionType.OpenAmpWizard,
 			message = "Missing actionParam: featureName",
-			propName = "featureName"
+			propName = "featureName",
+			name = SduiActionType.OpenAmpWizard
 		}, p5.appPage)
 
 		return

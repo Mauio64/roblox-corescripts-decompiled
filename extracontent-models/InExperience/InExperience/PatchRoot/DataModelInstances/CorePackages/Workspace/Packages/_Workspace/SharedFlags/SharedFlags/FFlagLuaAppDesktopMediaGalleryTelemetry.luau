@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppDesktopMediaGalleryTelemetry", false);
+return game:DefineFastFlag("LuaAppDesktopMediaGalleryTelemetry", false)

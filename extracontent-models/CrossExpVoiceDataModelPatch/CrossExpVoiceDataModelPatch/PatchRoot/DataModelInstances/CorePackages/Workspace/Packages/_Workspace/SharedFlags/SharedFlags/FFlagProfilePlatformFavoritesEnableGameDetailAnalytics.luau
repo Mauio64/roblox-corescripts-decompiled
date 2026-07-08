@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformFavoritesEnableGameDetailAnalytics", false);
+return game:DefineFastFlag("ProfilePlatformFavoritesEnableGameDetailAnalytics", false)

@@ -1,20 +1,26 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Constants);
-local _ = require(l_Parent_0.util.Types);
-local v3 = require(l_Parent_0.util.createIndividualBodyPartSchema);
-return function(v4, v5, v6) --[[ Line: 8 ]] --[[ Name: createLimbsAndTorsoSchema ]]
-    -- upvalues: v1 (copy), v3 (copy)
-    local v7 = v1.ASSET_TYPE_INFO[v4];
-    local v8 = {
-        ClassName = "Folder", 
-        Name = {
-            v5
-        }, 
-        _children = {}
-    };
-    for v9 in pairs(v7.subParts) do
-        local v10 = v3(v4, v9, v6);
-        table.insert(v8._children, v10);
-    end;
-    return v8;
-end;
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+
+require(ParentParent.util.Types)
+
+local createIndividualBodyPartSchema = require(ParentParent.util.createIndividualBodyPartSchema)
+
+local function createLimbsAndTorsoSchema(p1, s1: string, p2) -- line: 8
+	-- upvalues: Constants (copy), createIndividualBodyPartSchema (copy)
+	local v8 = Constants.ASSET_TYPE_INFO[p1]
+	local t1 = {
+		ClassName = "Folder",
+		Name = { s1 },
+		_children = {}
+	}
+
+	for k in pairs(v8.subParts) do
+		local v11 = createIndividualBodyPartSchema(p1, k, p2)
+
+		table.insert(t1._children, v11)
+	end
+
+	return t1
+end
+
+return createLimbsAndTorsoSchema

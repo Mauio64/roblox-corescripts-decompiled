@@ -1,19 +1,20 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v4 = require(l_Actions_0.SetGameName);
-local l_Parent_0 = script.Parent.Parent;
-if require(l_Parent_0.Flags.FFlagTopBarDeprecateGameInfoRodux) then
-    return nil;
-else
-    return v1.createReducer({
-        name = v2:FormatByKey("CoreScripts.TopBar.GameNamePlaceHolder")
-    }, {
-        [v4.name] = function(_, v7) --[[ Line: 22 ]]
-            return {
-                name = v7.gameName
-            };
-        end
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local Actions = script.Parent.Parent.Actions
+local SetGameName = require(Actions.SetGameName)
+local ParentParent = script.Parent.Parent
+
+if require(ParentParent.Flags.FFlagTopBarDeprecateGameInfoRodux) then
+	return nil
+end
+
+return Rodux.createReducer({
+	name = RobloxTranslator:FormatByKey("CoreScripts.TopBar.GameNamePlaceHolder")
+}, {
+	[SetGameName.name] = function(_, p2) -- line: 22
+		return {
+			name = p2.gameName
+		}
+	end
+})

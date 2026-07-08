@@ -1,203 +1,265 @@
-local l_Parent_0 = script:FindFirstAncestor("PlayerFeedback").Parent;
-local v1 = require(script.Parent.Parent.Constants);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local l_mutedError_0 = require(l_Parent_0.Loggers).mutedError;
-local v5 = v3.optional(v3.strictInterface({
-    categoryType = v3.optional(v3.string), 
-    value = v3.optional(v3.string)
-}));
-local function _(v6) --[[ Line: 12 ]] --[[ Name: gamePlayerFeedbackEvent ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy)
-    return function(v7, v8, v9) --[[ Line: 13 ]]
-        -- upvalues: v5 (ref), l_mutedError_0 (ref), v2 (ref), v1 (ref), v6 (copy)
-        local v10, v11 = v5(v9);
-        if not v10 then
-            l_mutedError_0(v11);
-        end;
-        local v12 = {
-            placeId = v8
-        };
-        if v9 then
-            v12 = v2.Dictionary.join(v12, v9);
-        end;
-        v7:sendEventDeferred(v1.Context.GamePlayerFeedback, v6, v12);
-    end;
-end;
-local v14 = {};
-local l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.ClickPlayerFeedbackPromptCta;
-local l_l_ClickPlayerFeedbackPromptCta_0_0 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 11 ]];
-v14.ClickPlayerFeedbackPromptCta = function(v17, v18, v19) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_0 (copy)
-    local v20, v21 = v5(v19);
-    if not v20 then
-        l_mutedError_0(v21);
-    end;
-    local v22 = {
-        placeId = v18
-    };
-    if v19 then
-        v22 = v2.Dictionary.join(v22, v19);
-    end;
-    v17:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_0, v22);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.PlayerFeedbackPromptMounted;
-local l_l_ClickPlayerFeedbackPromptCta_0_1 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 12 ]];
-v14.PlayerFeedbackPromptMounted = function(v24, v25, v26) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_1 (copy)
-    local v27, v28 = v5(v26);
-    if not v27 then
-        l_mutedError_0(v28);
-    end;
-    local v29 = {
-        placeId = v25
-    };
-    if v26 then
-        v29 = v2.Dictionary.join(v29, v26);
-    end;
-    v24:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_1, v29);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.DismissPlayerFeedbackPrompt;
-local l_l_ClickPlayerFeedbackPromptCta_0_2 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 13 ]];
-v14.DismissPlayerFeedbackPrompt = function(v31, v32, v33) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_2 (copy)
-    local v34, v35 = v5(v33);
-    if not v34 then
-        l_mutedError_0(v35);
-    end;
-    local v36 = {
-        placeId = v32
-    };
-    if v33 then
-        v36 = v2.Dictionary.join(v36, v33);
-    end;
-    v31:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_2, v36);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.PlayerFeedbackFormModalMounted;
-local l_l_ClickPlayerFeedbackPromptCta_0_3 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 14 ]];
-v14.PlayerFeedbackFormModalMounted = function(v38, v39, v40) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_3 (copy)
-    local v41, v42 = v5(v40);
-    if not v41 then
-        l_mutedError_0(v42);
-    end;
-    local v43 = {
-        placeId = v39
-    };
-    if v40 then
-        v43 = v2.Dictionary.join(v43, v40);
-    end;
-    v38:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_3, v43);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.DismissPlayerFeedbackFormModal;
-local l_l_ClickPlayerFeedbackPromptCta_0_4 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 15 ]];
-v14.DismissPlayerFeedbackFormModal = function(v45, v46, v47) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_4 (copy)
-    local v48, v49 = v5(v47);
-    if not v48 then
-        l_mutedError_0(v49);
-    end;
-    local v50 = {
-        placeId = v46
-    };
-    if v47 then
-        v50 = v2.Dictionary.join(v50, v47);
-    end;
-    v45:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_4, v50);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.ClickPlayerFeedbackFormModalDisclaimer;
-local l_l_ClickPlayerFeedbackPromptCta_0_5 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 16 ]];
-v14.ClickPlayerFeedbackFormModalDisclaimer = function(v52, v53, v54) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_5 (copy)
-    local v55, v56 = v5(v54);
-    if not v55 then
-        l_mutedError_0(v56);
-    end;
-    local v57 = {
-        placeId = v53
-    };
-    if v54 then
-        v57 = v2.Dictionary.join(v57, v54);
-    end;
-    v52:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_5, v57);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.ClickPlayerFeedbackFormAbuseReportPrompt;
-local l_l_ClickPlayerFeedbackPromptCta_0_6 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 17 ]];
-v14.ClickPlayerFeedbackFormAbuseReportPrompt = function(v59, v60, v61) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_6 (copy)
-    local v62, v63 = v5(v61);
-    if not v62 then
-        l_mutedError_0(v63);
-    end;
-    local v64 = {
-        placeId = v60
-    };
-    if v61 then
-        v64 = v2.Dictionary.join(v64, v61);
-    end;
-    v59:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_6, v64);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.TogglePlayerFeedbackFormModalReason;
-local l_l_ClickPlayerFeedbackPromptCta_0_7 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 18 ]];
-v14.TogglePlayerFeedbackFormModalReason = function(v66, v67, v68) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_7 (copy)
-    local v69, v70 = v5(v68);
-    if not v69 then
-        l_mutedError_0(v70);
-    end;
-    local v71 = {
-        placeId = v67
-    };
-    if v68 then
-        v71 = v2.Dictionary.join(v71, v68);
-    end;
-    v66:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_7, v71);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.FocusPlayerFeedbackFormModalComment;
-local l_l_ClickPlayerFeedbackPromptCta_0_8 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 19 ]];
-v14.FocusPlayerFeedbackFormModalComment = function(v73, v74, v75) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_8 (copy)
-    local v76, v77 = v5(v75);
-    if not v76 then
-        l_mutedError_0(v77);
-    end;
-    local v78 = {
-        placeId = v74
-    };
-    if v75 then
-        v78 = v2.Dictionary.join(v78, v75);
-    end;
-    v73:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_8, v78);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.ClickPlayerFeedbackFormModalSubmit;
-local l_l_ClickPlayerFeedbackPromptCta_0_9 = l_ClickPlayerFeedbackPromptCta_0 --[[ copy: 10 -> 20 ]];
-v14.ClickPlayerFeedbackFormModalSubmit = function(v80, v81, v82) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_l_ClickPlayerFeedbackPromptCta_0_9 (copy)
-    local v83, v84 = v5(v82);
-    if not v83 then
-        l_mutedError_0(v84);
-    end;
-    local v85 = {
-        placeId = v81
-    };
-    if v82 then
-        v85 = v2.Dictionary.join(v85, v82);
-    end;
-    v80:sendEventDeferred(v1.Context.GamePlayerFeedback, l_l_ClickPlayerFeedbackPromptCta_0_9, v85);
-end;
-l_ClickPlayerFeedbackPromptCta_0 = v1.EventNames.SubmitPlayerFeedbackFailCommentValidation;
-v14.SubmitPlayerFeedbackFailCommentValidation = function(v86, v87, v88) --[[ Line: 13 ]]
-    -- upvalues: v5 (copy), l_mutedError_0 (copy), v2 (copy), v1 (copy), l_ClickPlayerFeedbackPromptCta_0 (copy)
-    local v89, v90 = v5(v88);
-    if not v89 then
-        l_mutedError_0(v90);
-    end;
-    local v91 = {
-        placeId = v87
-    };
-    if v88 then
-        v91 = v2.Dictionary.join(v91, v88);
-    end;
-    v86:sendEventDeferred(v1.Context.GamePlayerFeedback, l_ClickPlayerFeedbackPromptCta_0, v91);
-end;
-return v14;
+local Parent = script:FindFirstAncestor("PlayerFeedback").Parent
+local Constants = require(script.Parent.Parent.Constants)
+local Cryo = require(Parent.Cryo)
+local t = require(Parent.t)
+local mutedError = require(Parent.Loggers).mutedError
+local v6 = t.optional(t.strictInterface({
+	categoryType = t.optional(t.string),
+	value = t.optional(t.string)
+}))
+
+local function gamePlayerFeedbackEvent(p1) -- line: 12
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy)
+	return function(p2, p3, p4) -- line: 13
+		-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), p1 (copy)
+		local v90, v91 = v6(p4)
+
+		if not v90 then
+			mutedError(v91)
+		end
+
+		local t1 = {
+			placeId = p3
+		}
+
+		if p4 then
+			t1 = Cryo.Dictionary.join(t1, p4)
+		end
+
+		p2:sendEventDeferred(Constants.Context.GamePlayerFeedback, p1, t1)
+	end
+end
+
+local t2 = {}
+local ClickPlayerFeedbackPromptCta = Constants.EventNames.ClickPlayerFeedbackPromptCta
+
+function t2.ClickPlayerFeedbackPromptCta(p5, p6, p7) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), ClickPlayerFeedbackPromptCta (copy)
+	local v24, v25 = v6(p7)
+
+	if not v24 then
+		mutedError(v25)
+	end
+
+	local t3 = {
+		placeId = p6
+	}
+
+	if p7 then
+		t3 = Cryo.Dictionary.join(t3, p7)
+	end
+
+	p5:sendEventDeferred(Constants.Context.GamePlayerFeedback, ClickPlayerFeedbackPromptCta, t3)
+end
+
+local PlayerFeedbackPromptMounted = Constants.EventNames.PlayerFeedbackPromptMounted
+
+function t2.PlayerFeedbackPromptMounted(p8, p9, p10) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), PlayerFeedbackPromptMounted (copy)
+	local v30, v31 = v6(p10)
+
+	if not v30 then
+		mutedError(v31)
+	end
+
+	local t4 = {
+		placeId = p9
+	}
+
+	if p10 then
+		t4 = Cryo.Dictionary.join(t4, p10)
+	end
+
+	p8:sendEventDeferred(Constants.Context.GamePlayerFeedback, PlayerFeedbackPromptMounted, t4)
+end
+
+local DismissPlayerFeedbackPrompt = Constants.EventNames.DismissPlayerFeedbackPrompt
+
+function t2.DismissPlayerFeedbackPrompt(p11, p12, p13) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), DismissPlayerFeedbackPrompt (copy)
+	local v36, v37 = v6(p13)
+
+	if not v36 then
+		mutedError(v37)
+	end
+
+	local t5 = {
+		placeId = p12
+	}
+
+	if p13 then
+		t5 = Cryo.Dictionary.join(t5, p13)
+	end
+
+	p11:sendEventDeferred(Constants.Context.GamePlayerFeedback, DismissPlayerFeedbackPrompt, t5)
+end
+
+local PlayerFeedbackFormModalMounted = Constants.EventNames.PlayerFeedbackFormModalMounted
+
+function t2.PlayerFeedbackFormModalMounted(p14, p15, p16) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), PlayerFeedbackFormModalMounted (copy)
+	local v42, v43 = v6(p16)
+
+	if not v42 then
+		mutedError(v43)
+	end
+
+	local t6 = {
+		placeId = p15
+	}
+
+	if p16 then
+		t6 = Cryo.Dictionary.join(t6, p16)
+	end
+
+	p14:sendEventDeferred(Constants.Context.GamePlayerFeedback, PlayerFeedbackFormModalMounted, t6)
+end
+
+local DismissPlayerFeedbackFormModal = Constants.EventNames.DismissPlayerFeedbackFormModal
+
+function t2.DismissPlayerFeedbackFormModal(p17, p18, p19) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), DismissPlayerFeedbackFormModal (copy)
+	local v48, v49 = v6(p19)
+
+	if not v48 then
+		mutedError(v49)
+	end
+
+	local t7 = {
+		placeId = p18
+	}
+
+	if p19 then
+		t7 = Cryo.Dictionary.join(t7, p19)
+	end
+
+	p17:sendEventDeferred(Constants.Context.GamePlayerFeedback, DismissPlayerFeedbackFormModal, t7)
+end
+
+local ClickPlayerFeedbackFormModalDisclaimer = Constants.EventNames.ClickPlayerFeedbackFormModalDisclaimer
+
+function t2.ClickPlayerFeedbackFormModalDisclaimer(p20, p21, p22) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), ClickPlayerFeedbackFormModalDisclaimer (copy)
+	local v54, v55 = v6(p22)
+
+	if not v54 then
+		mutedError(v55)
+	end
+
+	local t8 = {
+		placeId = p21
+	}
+
+	if p22 then
+		t8 = Cryo.Dictionary.join(t8, p22)
+	end
+
+	p20:sendEventDeferred(Constants.Context.GamePlayerFeedback, ClickPlayerFeedbackFormModalDisclaimer, t8)
+end
+
+local ClickPlayerFeedbackFormAbuseReportPrompt = Constants.EventNames.ClickPlayerFeedbackFormAbuseReportPrompt
+
+function t2.ClickPlayerFeedbackFormAbuseReportPrompt(p23, p24, p25) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), ClickPlayerFeedbackFormAbuseReportPrompt (copy)
+	local v60, v61 = v6(p25)
+
+	if not v60 then
+		mutedError(v61)
+	end
+
+	local t9 = {
+		placeId = p24
+	}
+
+	if p25 then
+		t9 = Cryo.Dictionary.join(t9, p25)
+	end
+
+	p23:sendEventDeferred(Constants.Context.GamePlayerFeedback, ClickPlayerFeedbackFormAbuseReportPrompt, t9)
+end
+
+local TogglePlayerFeedbackFormModalReason = Constants.EventNames.TogglePlayerFeedbackFormModalReason
+
+function t2.TogglePlayerFeedbackFormModalReason(p26, p27, p28) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), TogglePlayerFeedbackFormModalReason (copy)
+	local v66, v67 = v6(p28)
+
+	if not v66 then
+		mutedError(v67)
+	end
+
+	local t10 = {
+		placeId = p27
+	}
+
+	if p28 then
+		t10 = Cryo.Dictionary.join(t10, p28)
+	end
+
+	p26:sendEventDeferred(Constants.Context.GamePlayerFeedback, TogglePlayerFeedbackFormModalReason, t10)
+end
+
+local FocusPlayerFeedbackFormModalComment = Constants.EventNames.FocusPlayerFeedbackFormModalComment
+
+function t2.FocusPlayerFeedbackFormModalComment(p29, p30, p31) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), FocusPlayerFeedbackFormModalComment (copy)
+	local v72, v73 = v6(p31)
+
+	if not v72 then
+		mutedError(v73)
+	end
+
+	local t11 = {
+		placeId = p30
+	}
+
+	if p31 then
+		t11 = Cryo.Dictionary.join(t11, p31)
+	end
+
+	p29:sendEventDeferred(Constants.Context.GamePlayerFeedback, FocusPlayerFeedbackFormModalComment, t11)
+end
+
+local ClickPlayerFeedbackFormModalSubmit = Constants.EventNames.ClickPlayerFeedbackFormModalSubmit
+
+function t2.ClickPlayerFeedbackFormModalSubmit(p32, p33, p34) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), ClickPlayerFeedbackFormModalSubmit (copy)
+	local v78, v79 = v6(p34)
+
+	if not v78 then
+		mutedError(v79)
+	end
+
+	local t12 = {
+		placeId = p33
+	}
+
+	if p34 then
+		t12 = Cryo.Dictionary.join(t12, p34)
+	end
+
+	p32:sendEventDeferred(Constants.Context.GamePlayerFeedback, ClickPlayerFeedbackFormModalSubmit, t12)
+end
+
+local SubmitPlayerFeedbackFailCommentValidation = Constants.EventNames.SubmitPlayerFeedbackFailCommentValidation
+
+function t2.SubmitPlayerFeedbackFailCommentValidation(p35, p36, p37) -- line: 13
+	-- upvalues: v6 (copy), mutedError (copy), Cryo (copy), Constants (copy), SubmitPlayerFeedbackFailCommentValidation (copy)
+	local v84, v85 = v6(p37)
+
+	if not v84 then
+		mutedError(v85)
+	end
+
+	local t13 = {
+		placeId = p36
+	}
+
+	if p37 then
+		t13 = Cryo.Dictionary.join(t13, p37)
+	end
+
+	p35:sendEventDeferred(Constants.Context.GamePlayerFeedback, SubmitPlayerFeedbackFailCommentValidation, t13)
+end
+
+return t2

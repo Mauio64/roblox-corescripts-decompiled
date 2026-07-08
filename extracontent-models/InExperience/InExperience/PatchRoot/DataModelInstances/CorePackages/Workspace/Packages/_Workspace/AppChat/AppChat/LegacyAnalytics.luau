@@ -1,3 +1,3 @@
 return {
-    RoactChatAnalytics = require(script.RoactChatAnalytics)
-};
+	RoactChatAnalytics = require(script.RoactChatAnalytics)
+}

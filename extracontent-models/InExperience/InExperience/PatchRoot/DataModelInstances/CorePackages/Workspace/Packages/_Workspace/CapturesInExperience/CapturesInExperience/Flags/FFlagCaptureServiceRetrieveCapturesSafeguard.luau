@@ -1,1 +1,1 @@
-return game:DefineFastFlag("CaptureServiceRetrieveCapturesSafeguard", false);
+return game:DefineFastFlag("CaptureServiceRetrieveCapturesSafeguard", false)

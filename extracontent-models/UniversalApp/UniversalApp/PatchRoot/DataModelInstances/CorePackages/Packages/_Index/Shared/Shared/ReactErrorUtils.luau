@@ -1,60 +1,69 @@
-local v0 = require(script.Parent.invariant);
-local v1 = require(script.Parent.invokeGuardedCallbackImpl);
-local v2 = nil;
-local v3 = false;
-local v4 = nil;
-local v5 = false;
-local v6 = nil;
-local v8 = {
-    onError = function(v7) --[[ Line: 25 ]] --[[ Name: onError ]]
-        -- upvalues: v3 (ref), v4 (ref)
-        v3 = true;
-        v4 = v7;
-    end
-};
-local v9 = {
-    invokeGuardedCallback = function(...) --[[ Line: 45 ]]
-        -- upvalues: v3 (ref), v4 (ref), v1 (copy), v8 (copy)
-        v3 = false;
-        v4 = nil;
-        v1(v8, ...);
-    end
-};
-v9.invokeGuardedCallbackAndCatchFirstError = function(...) --[[ Line: 62 ]]
-    -- upvalues: v9 (copy), v3 (ref), v2 (ref), v5 (ref), v6 (ref)
-    v9.invokeGuardedCallback(...);
-    if v3 then
-        local v10 = v2();
-        if not v5 then
-            v5 = true;
-            v6 = v10;
-        end;
-    end;
-end;
-v9.rethrowCaughtError = function() --[[ Line: 80 ]]
-    -- upvalues: v5 (ref), v6 (ref)
-    if v5 then
-        local l_v6_0 = v6;
-        v5 = false;
-        v6 = nil;
-        error(l_v6_0);
-    end;
-end;
-v9.hasCaughtError = function() --[[ Line: 89 ]]
-    -- upvalues: v3 (ref)
-    return v3;
-end;
-v2 = function() --[[ Line: 93 ]]
-    -- upvalues: v3 (ref), v4 (ref), v0 (copy)
-    if v3 then
-        local l_v4_0 = v4;
-        v3 = false;
-        v4 = nil;
-        return l_v4_0;
-    else
-        v0(false, "clearCaughtError was called but no error was captured. This error is likely caused by a bug in React. Please file an issue.");
-        return nil;
-    end;
-end;
-v9.clearCaughtError = v2;
-return v9;
+local invariant = require(script.Parent.invariant)
+local invokeGuardedCallbackImpl = require(script.Parent.invokeGuardedCallbackImpl)
+local u3 = nil
+local u4 = false
+local u5 = nil
+local u6 = false
+local u7 = nil
+local t1 = {
+	onError = function(p1) -- line: 25
+		-- upvalues: u4 (ref), u5 (ref)
+		u4 = true
+		u5 = p1
+	end
+}
+local t2 = {
+	invokeGuardedCallback = function(...) -- line: 45
+		-- upvalues: u4 (ref), u5 (ref), invokeGuardedCallbackImpl (copy), t1 (copy)
+		u4 = false
+		u5 = nil
+		invokeGuardedCallbackImpl(t1, ...)
+	end
+}
+
+function t2.invokeGuardedCallbackAndCatchFirstError(...) -- line: 62
+	-- upvalues: t2 (copy), u4 (ref), u3 (ref), u6 (ref), u7 (ref)
+	t2.invokeGuardedCallback(...)
+
+	if u4 then
+		local v11 = u3()
+
+		if not u6 then
+			u6 = true
+			u7 = v11
+		end
+	end
+end
+function t2.rethrowCaughtError() -- line: 80
+	-- upvalues: u6 (ref), u7 (ref)
+	if u6 then
+		local v12 = u7
+
+		u6 = false
+		u7 = nil
+		error(v12)
+	end
+end
+function t2.hasCaughtError() -- line: 89
+	-- upvalues: u4 (ref)
+	return u4
+end
+function u3() -- line: 93
+	-- upvalues: u4 (ref), u5 (ref), invariant (copy)
+	if u4 then
+		local v13 = u5
+
+		u4 = false
+		u5 = nil
+
+		return v13
+	end
+
+	invariant(false, "clearCaughtError was called but no error was captured. This error is likely caused by a bug in React. Please file an issue.")
+
+	return nil
+end
+
+t2.clearCaughtError = u3
+
+return t2

@@ -1,4 +1,4 @@
 return {
-    Standard = "Standard", 
-    Emphasis = "Emphasis"
-};
+	Standard = "Standard",
+	Emphasis = "Emphasis"
+}

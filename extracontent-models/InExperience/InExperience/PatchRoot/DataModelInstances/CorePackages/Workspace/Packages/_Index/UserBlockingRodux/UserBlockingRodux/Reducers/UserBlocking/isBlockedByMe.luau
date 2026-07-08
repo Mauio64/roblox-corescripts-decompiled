@@ -1,31 +1,36 @@
-local l_Parent_0 = script:FindFirstAncestor("UserBlockingRodux").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local v2 = require(l_Parent_0.Cryo);
-return function(v3) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local l_userBlockingNetworking_0 = v3.userBlockingNetworking;
-    return v1.createReducer({}, {
-        [l_userBlockingNetworking_0.BlockUserById.Succeeded.name] = function(v5, v6) --[[ Line: 13 ]]
-            -- upvalues: v2 (ref)
-            local v7 = tostring(v6.namedIds.users);
-            return v2.Dictionary.join(v5, {
-                [v7] = true
-            });
-        end, 
-        [l_userBlockingNetworking_0.UnblockUserById.Succeeded.name] = function(v8, v9) --[[ Line: 19 ]]
-            -- upvalues: v2 (ref)
-            local v10 = tostring(v9.namedIds.users);
-            return v2.Dictionary.join(v8, {
-                [v10] = false
-            });
-        end, 
-        [l_userBlockingNetworking_0.IsBlockedById.Succeeded.name] = function(v11, v12) --[[ Line: 25 ]]
-            -- upvalues: v2 (ref)
-            local v13 = tostring(v12.namedIds.users);
-            local v14 = v12.responseBody or false;
-            return v2.Dictionary.join(v11, {
-                [v13] = v14
-            });
-        end
-    });
-end;
+local Parent = script:FindFirstAncestor("UserBlockingRodux").Parent
+local Rodux = require(Parent.Rodux)
+local Cryo = require(Parent.Cryo)
+
+return function(p1) -- line: 9
+	-- upvalues: Rodux (copy), Cryo (copy)
+	local userBlockingNetworking = p1.userBlockingNetworking
+
+	return Rodux.createReducer({}, {
+		[userBlockingNetworking.BlockUserById.Succeeded.name] = function(p2, p3) -- line: 13
+			-- upvalues: Cryo (copy)
+			local str = tostring(p3.namedIds.users)
+
+			return Cryo.Dictionary.join(p2, {
+				[str] = true
+			})
+		end,
+		[userBlockingNetworking.UnblockUserById.Succeeded.name] = function(p4, p5) -- line: 19
+			-- upvalues: Cryo (copy)
+			local str = tostring(p5.namedIds.users)
+
+			return Cryo.Dictionary.join(p4, {
+				[str] = false
+			})
+		end,
+		[userBlockingNetworking.IsBlockedById.Succeeded.name] = function(p6, p7) -- line: 25
+			-- upvalues: Cryo (copy)
+			local str = tostring(p7.namedIds.users)
+			local v15 = p7.responseBody or false
+
+			return Cryo.Dictionary.join(p6, {
+				[str] = v15
+			})
+		end
+	})
+end

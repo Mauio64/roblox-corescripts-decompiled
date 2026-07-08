@@ -1,2512 +1,2969 @@
-local function _(v0) --[[ Line: 12 ]] --[[ Name: unimplemented ]]
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    print("UNIMPLEMENTED ERROR: " .. v0);
-    error("FIXME (roblox): " .. v0 .. " is unimplemented");
-end;
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.ReactGlobals);
-local v4 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v4.Array;
-local l_Error_0 = v4.Error;
-local l_Object_0 = v4.Object;
-local l___DEV___0 = v3.__DEV__;
-local l_createRef_0 = require(l_Parent_0.React).createRef;
-local l_createBinding_0 = require(l_Parent_0.React).createBinding;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local _ = require(l_Parent_0.Shared);
-local _ = require(script.Parent.ReactInternalTypes);
-local v14 = require(script.Parent.ReactFiberLane);
-local v15 = require(script.Parent.ReactHookEffectTags);
-local l_ReactSharedInternals_0 = require(l_Parent_0.Shared).ReactSharedInternals;
-local l_ReactFeatureFlags_0 = require(l_Parent_0.Shared).ReactFeatureFlags;
-local l_enableDebugTracing_0 = l_ReactFeatureFlags_0.enableDebugTracing;
-local l_enableSchedulingProfiler_0 = l_ReactFeatureFlags_0.enableSchedulingProfiler;
-local l_enableNewReconciler_0 = l_ReactFeatureFlags_0.enableNewReconciler;
-local l_enableDoubleInvokingEffects_0 = l_ReactFeatureFlags_0.enableDoubleInvokingEffects;
-local l_DebugTracingMode_0 = require(script.Parent.ReactTypeOfMode).DebugTracingMode;
-local l_NoLane_0 = v14.NoLane;
-local l_NoLanes_0 = v14.NoLanes;
-local l_isSubsetOfLanes_0 = v14.isSubsetOfLanes;
-local l_mergeLanes_0 = v14.mergeLanes;
-local l_removeLanes_0 = v14.removeLanes;
-local l_markRootEntangled_0 = v14.markRootEntangled;
-local l_markRootMutableRead_0 = v14.markRootMutableRead;
-local l_readContext_0 = require(script.Parent["ReactFiberNewContext.new"]).readContext;
-local v31 = require(script.Parent.ReactFiberFlags);
-local l_Update_0 = v31.Update;
-local l_Passive_0 = v31.Passive;
-local l_PassiveStatic_0 = v31.PassiveStatic;
-local l_MountLayoutDev_0 = v31.MountLayoutDev;
-local l_MountPassiveDev_0 = v31.MountPassiveDev;
-local l_HasEffect_0 = v15.HasEffect;
-local l_Layout_0 = v15.Layout;
-local l_Passive_1 = v15.Passive;
-local v40 = require(script.Parent["ReactFiberWorkLoop.new"]);
-local l_warnIfNotCurrentlyActingUpdatesInDEV_0 = v40.warnIfNotCurrentlyActingUpdatesInDEV;
-local l_scheduleUpdateOnFiber_0 = v40.scheduleUpdateOnFiber;
-local l_warnIfNotScopedWithMatchingAct_0 = v40.warnIfNotScopedWithMatchingAct;
-local l_requestEventTime_0 = v40.requestEventTime;
-local l_requestUpdateLane_0 = v40.requestUpdateLane;
-local l_markSkippedUpdateLanes_0 = v40.markSkippedUpdateLanes;
-local l_getWorkInProgressRoot_0 = v40.getWorkInProgressRoot;
-local l_warnIfNotCurrentlyActingEffectsInDEV_0 = v40.warnIfNotCurrentlyActingEffectsInDEV;
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_getComponentName_0 = require(l_Parent_0.Shared).getComponentName;
-local function _(v51, v52) --[[ Line: 117 ]] --[[ Name: is ]]
-    return v51 == v52 and (v51 ~= 0 or 1 / v51 == 1 / v52) or v51 ~= v51 and v52 ~= v52;
-end;
-local l_markWorkInProgressReceivedUpdate_0 = require(script.Parent["ReactFiberBeginWork.new"]).markWorkInProgressReceivedUpdate;
-local l_getIsHydrating_0 = require(script.Parent["ReactFiberHydrationContext.new"]).getIsHydrating;
-local l_makeClientId_0 = require(script.Parent.ReactFiberHostConfig).makeClientId;
-local v57 = require(script.Parent["ReactMutableSource.new"]);
-local l_warnAboutMultipleRenderersDEV_0 = v57.warnAboutMultipleRenderersDEV;
-local l_getWorkInProgressVersion_0 = v57.getWorkInProgressVersion;
-local l_setWorkInProgressVersion_0 = v57.setWorkInProgressVersion;
-local l_markSourceAsDirty_0 = v57.markSourceAsDirty;
-local l_logStateUpdateScheduled_0 = require(script.Parent.DebugTracing).logStateUpdateScheduled;
-local l_markStateUpdateScheduled_0 = require(script.Parent.SchedulingProfiler).markStateUpdateScheduled;
-local l_ReactCurrentDispatcher_0 = l_ReactSharedInternals_0.ReactCurrentDispatcher;
-local v65 = require(l_Parent_0.SafeFlags).createGetFFlag("ReactCleanQueueOnUpdateBailout")();
-local v66 = nil;
-local v67 = nil;
-if l___DEV___0 then
-    v67 = {};
-    v66 = {};
-end;
-local v68 = {};
-local l_l_NoLanes_0_0 = l_NoLanes_0;
-local v70 = nil;
-local v71 = nil;
-local v72 = nil;
-local v73 = false;
-local v74 = false;
-local v75 = nil;
-local v76 = nil;
-local v77 = 0;
-local v78 = nil;
-local v79 = nil;
-local v80 = nil;
-local v81 = nil;
-local v82 = nil;
-local v83 = nil;
-local v84 = nil;
-local _ = function(v85) --[[ Line: 265 ]] --[[ Name: getHighestIndex ]]
-    local v86 = 0;
-    for v87, _ in v85 do
-        if v86 < v87 then
-            v86 = v87;
-        end;
-    end;
-    return v86;
-end;
-local _ = function(v90) --[[ Line: 275 ]] --[[ Name: isArrayOrSparseArray ]]
-    if type(v90) ~= "table" then
-        return false;
-    else
-        for v91, _ in v90 do
-            if type(v91) ~= "number" then
-                return false;
-            end;
-        end;
-        return true;
-    end;
-end;
-local function _() --[[ Line: 287 ]] --[[ Name: mountHookTypesDev ]]
-    -- upvalues: l___DEV___0 (copy), v75 (ref), v76 (ref)
-    if l___DEV___0 then
-        local l_v75_0 = v75;
-        if v76 == nil then
-            v76 = {
-                l_v75_0
-            };
-            return;
-        else
-            table.insert(v76, l_v75_0);
-        end;
-    end;
-end;
-updateHookTypesDev = function() --[[ Line: 300 ]] --[[ Name: updateHookTypesDev ]]
-    -- upvalues: l___DEV___0 (copy), v75 (ref), v76 (ref), v77 (ref)
-    if l___DEV___0 then
-        local l_v75_1 = v75;
-        if v76 ~= nil then
-            v77 = v77 + 1;
-            if v76[v77] ~= l_v75_1 then
-                warnOnHookMismatchInDev(l_v75_1);
-            end;
-        end;
-    end;
-end;
-local _ = function(v97) --[[ Line: 314 ]] --[[ Name: checkDepsAreArrayDev ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), v75 (ref)
-    local v98 = false;
-    if l___DEV___0 and v97 ~= nil then
-        local v99;
-        if type(v97) ~= "table" then
-            v99 = false;
-        else
-            for v100, _ in v97 do
-                if type(v100) ~= "number" then
-                    v99 = false;
-                    v98 = true;
-                end;
-                if v98 then
-                    break;
-                end;
-            end;
-            if not v98 then
-                v99 = true;
-            end;
-        end;
-        v98 = false;
-        if not v99 then
-            l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v97)));
-        end;
-    end;
-end;
-warnOnHookMismatchInDev = function(v103) --[[ Line: 329 ]] --[[ Name: warnOnHookMismatchInDev ]]
-    -- upvalues: l___DEV___0 (copy), l_getComponentName_0 (copy), v70 (ref), v66 (ref), v76 (ref), v77 (ref), l_console_0 (copy)
-    if l___DEV___0 then
-        local v104 = l_getComponentName_0(v70.type) or "Component";
-        if not v66[v104] then
-            v66[v104] = true;
-            if v76 ~= nil then
-                local v105 = "";
-                for v106 = 1, v77 do
-                    local v107 = v76[v106];
-                    local v108 = nil;
-                    v108 = if v106 == v77 then v103 else v107;
-                    local v109 = tostring(v106) .. ". " .. (v107 or "undefined");
-                    while string.len(v109) < 30 do
-                        v109 = v109 .. " ";
-                    end;
-                    v105 = v105 .. v109 .. v108 .. "\n";
-                end;
-                l_console_0.error("React has detected a change in the order of Hooks called by %s. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks\n\n   Previous render            Next render\n   ------------------------------------------------------\n%s   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n", v104, v105);
-            end;
-        end;
-    end;
-end;
-local function v110() --[[ Line: 381 ]] --[[ Name: throwInvalidHookError ]]
-    -- upvalues: l_Error_0 (copy)
-    error(l_Error_0.new("Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem."));
-end;
-local function v123(v111, v112) --[[ Line: 396 ]] --[[ Name: areHookInputsEqual ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), v75 (ref)
-    if l___DEV___0 then
+local function unimplemented(s1: string) -- line: 12
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	print("UNIMPLEMENTED ERROR: " .. s1)
+	error("FIXME (roblox): " .. s1 .. " is unimplemented")
+end
 
-    end;
-    if v112 == nil then
-        if l___DEV___0 then
-            l_console_0.error("%s received a final argument during this render, but not during the previous render. Even though the final argument is optional, its type cannot change between renders.", v75);
-        end;
-        return false;
-    else
-        local v113 = 0;
-        for v114, _ in v111 do
-            if v113 < v114 then
-                v113 = v114;
-            end;
-        end;
-        local l_v113_0 = v113;
-        local v117 = 0;
-        for v118, _ in v112 do
-            if v117 < v118 then
-                v117 = v118;
-            end;
-        end;
-        v113 = v117;
-        if l_v113_0 ~= v113 then
-            return false;
-        else
-            for v120 = 1, math.min(v113, l_v113_0) do
-                local v121 = v111[v120];
-                local v122 = v112[v120];
-                if not (v121 == v122 and (v121 ~= 0 or 1 / v121 == 1 / v122) or v121 ~= v121 and v122 ~= v122) then
-                    return false;
-                end;
-            end;
-            return true;
-        end;
-    end;
-end;
-v68.bailoutHooks = function(v124, v125, v126) --[[ Line: 460 ]]
-    -- upvalues: l___DEV___0 (copy), l_enableDoubleInvokingEffects_0 (copy), l_MountPassiveDev_0 (copy), l_Passive_0 (copy), l_MountLayoutDev_0 (copy), l_Update_0 (copy), l_removeLanes_0 (copy)
-    v125.updateQueue = v124.updateQueue;
-    if l___DEV___0 and l_enableDoubleInvokingEffects_0 then
-        v125.flags = bit32.band(v125.flags, (bit32.bnot((bit32.bor(l_MountPassiveDev_0, l_Passive_0, l_MountLayoutDev_0, l_Update_0)))));
-    else
-        v125.flags = bit32.band(v125.flags, (bit32.bnot((bit32.bor(l_Passive_0, l_Update_0)))));
-    end;
-    v124.lanes = l_removeLanes_0(v124.lanes, v126);
-end;
-local v127 = false;
-v68.resetHooksAfterThrow = function() --[[ Line: 485 ]]
-    -- upvalues: l_ReactCurrentDispatcher_0 (copy), v68 (copy), v73 (ref), v70 (ref), l_l_NoLanes_0_0 (ref), l_NoLanes_0 (copy), v71 (ref), v72 (ref), l___DEV___0 (copy), v76 (ref), v77 (ref), v75 (ref), v127 (ref), v74 (ref)
-    l_ReactCurrentDispatcher_0.current = v68.ContextOnlyDispatcher;
-    if v73 then
-        local l_memoizedState_0 = v70.memoizedState;
-        while l_memoizedState_0 ~= nil do
-            local l_queue_0 = l_memoizedState_0.queue;
-            if l_queue_0 ~= nil then
-                l_queue_0.pending = nil;
-            end;
-            l_memoizedState_0 = l_memoizedState_0.next;
-        end;
-        v73 = false;
-    end;
-    l_l_NoLanes_0_0 = l_NoLanes_0;
-    v70 = nil;
-    v71 = nil;
-    v72 = nil;
-    if l___DEV___0 then
-        v76 = nil;
-        v77 = 0;
-        v75 = nil;
-        v127 = false;
-    end;
-    v74 = false;
-end;
-local function _() --[[ Line: 530 ]] --[[ Name: mountWorkInProgressHook ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v130 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v130;
-        v72 = v130;
-    else
-        v72.next = v130;
-        v72 = v130;
-    end;
-    return v72;
-end;
-local function v136() --[[ Line: 553 ]] --[[ Name: updateWorkInProgressHook ]]
-    -- upvalues: v71 (ref), v70 (ref), v72 (ref), l_Error_0 (copy)
-    local v132 = nil;
-    if v71 == nil then
-        local l_alternate_0 = v70.alternate;
-        v132 = if l_alternate_0 ~= nil then l_alternate_0.memoizedState else nil;
-    else
-        v132 = v71.next;
-    end;
-    local v134 = nil;
-    v134 = if v72 == nil then v70.memoizedState else v72.next;
-    if v134 ~= nil then
-        v72 = v134;
-        v134 = v72.next;
-        v71 = v132;
-    else
-        if v132 == nil then
-            error(l_Error_0.new("Rendered more hooks than during the previous render."));
-        end;
-        v71 = v132;
-        local v135 = {
-            memoizedState = v71.memoizedState, 
-            baseState = v71.baseState, 
-            baseQueue = v71.baseQueue, 
-            queue = v71.queue, 
-            next = nil
-        };
-        if v72 == nil then
-            v72 = v135;
-            v70.memoizedState = v135;
-        else
-            v72.next = v135;
-            v72 = v135;
-        end;
-    end;
-    return v72;
-end;
-basicStateReducer = function(v137, v138) --[[ Line: 628 ]] --[[ Name: basicStateReducer ]]
-    if type(v138) == "function" then
-        return v138(v137);
-    else
-        return v138;
-    end;
-end;
-mountReducer = function(v139, v140, v141) --[[ Line: 637 ]] --[[ Name: mountReducer ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v142 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v142;
-        v72 = v142;
-    else
-        v72.next = v142;
-        v72 = v142;
-    end;
-    local l_v72_0 = v72;
-    v142 = nil;
-    v142 = if v141 ~= nil then v141(v140) else v140;
-    l_v72_0.baseState = v142;
-    l_v72_0.memoizedState = l_v72_0.baseState;
-    local v144 = {
-        pending = nil, 
-        dispatch = nil, 
-        lastRenderedReducer = v139, 
-        lastRenderedState = v142
-    };
-    l_v72_0.queue = v144;
-    local l_v70_0 = v70;
-    local function v147(v146, ...) --[[ Line: 664 ]]
-        -- upvalues: l_v70_0 (copy), v144 (copy)
-        dispatchAction(l_v70_0, v144, v146, ...);
-    end;
-    v144.dispatch = v147;
-    return l_v72_0.memoizedState, v147;
-end;
-updateReducer = function(v148, _, _) --[[ Line: 674 ]] --[[ Name: updateReducer ]]
-    -- upvalues: v136 (copy), v71 (ref), l_l_NoLanes_0_0 (ref), v70 (ref), l_mergeLanes_0 (copy), l_markSkippedUpdateLanes_0 (copy), l_NoLane_0 (copy), l_markWorkInProgressReceivedUpdate_0 (copy)
-    local v151 = v136();
-    local l_queue_1 = v151.queue;
-    assert(l_queue_1 ~= nil, "Should have a queue. This is likely a bug in React. Please file an issue.");
-    l_queue_1.lastRenderedReducer = v148;
-    local l_v71_0 = v71;
-    local l_baseQueue_0 = l_v71_0.baseQueue;
-    local l_pending_0 = l_queue_1.pending;
-    if l_pending_0 ~= nil then
-        if l_baseQueue_0 ~= nil then
-            local l_next_0 = l_baseQueue_0.next;
-            l_baseQueue_0.next = l_pending_0.next;
-            l_pending_0.next = l_next_0;
-        end;
-        l_baseQueue_0 = l_pending_0;
-        l_v71_0.baseQueue = l_baseQueue_0;
-        l_queue_1.pending = nil;
-    end;
-    if l_baseQueue_0 ~= nil then
-        local l_next_1 = l_baseQueue_0.next;
-        local l_baseState_0 = l_v71_0.baseState;
-        local v159 = nil;
-        local v160 = nil;
-        local v161 = nil;
-        local l_l_next_1_0 = l_next_1;
-        repeat
-            local l_lane_0 = l_l_next_1_0.lane;
-            if bit32.band(l_l_NoLanes_0_0, l_lane_0) ~= l_lane_0 then
-                local v164 = {
-                    lane = l_lane_0, 
-                    action = l_l_next_1_0.action, 
-                    eagerReducer = l_l_next_1_0.eagerReducer, 
-                    eagerState = l_l_next_1_0.eagerState, 
-                    next = nil
-                };
-                if v161 == nil then
-                    v161 = v164;
-                    v160 = v161;
-                    v159 = l_baseState_0;
-                else
-                    v161.next = v164;
-                    v161 = v161.next;
-                end;
-                v70.lanes = l_mergeLanes_0(v70.lanes, l_lane_0);
-                l_markSkippedUpdateLanes_0(l_lane_0);
-            else
-                if v161 ~= nil then
-                    v161.next = {
-                        lane = l_NoLane_0, 
-                        action = l_l_next_1_0.action, 
-                        eagerReducer = l_l_next_1_0.eagerReducer, 
-                        eagerState = l_l_next_1_0.eagerState, 
-                        next = nil
-                    };
-                    v161 = v161.next;
-                end;
-                if l_l_next_1_0.eagerReducer == v148 then
-                    l_baseState_0 = l_l_next_1_0.eagerState;
-                else
-                    l_baseState_0 = v148(l_baseState_0, l_l_next_1_0.action);
-                end;
-            end;
-            l_l_next_1_0 = l_l_next_1_0.next;
-        until l_l_next_1_0 == nil or l_l_next_1_0 == l_next_1;
-        if v161 == nil then
-            v159 = l_baseState_0;
-        else
-            v161.next = v160;
-        end;
-        local l_l_baseState_0_0 = l_baseState_0;
-        local l_memoizedState_1 = v151.memoizedState;
-        if not (l_l_baseState_0_0 == l_memoizedState_1 and (l_l_baseState_0_0 ~= 0 or 1 / l_l_baseState_0_0 == 1 / l_memoizedState_1) or l_l_baseState_0_0 ~= l_l_baseState_0_0 and l_memoizedState_1 ~= l_memoizedState_1) then
-            l_markWorkInProgressReceivedUpdate_0();
-        end;
-        v151.memoizedState = l_baseState_0;
-        v151.baseState = v159;
-        v151.baseQueue = v161;
-        l_queue_1.lastRenderedState = l_baseState_0;
-    end;
-    local l_dispatch_0 = l_queue_1.dispatch;
-    return v151.memoizedState, l_dispatch_0;
-end;
-rerenderReducer = function(v168, _, _) --[[ Line: 815 ]] --[[ Name: rerenderReducer ]]
-    -- upvalues: v136 (copy), l_markWorkInProgressReceivedUpdate_0 (copy)
-    local v171 = v136();
-    local l_queue_2 = v171.queue;
-    assert(l_queue_2 ~= nil, "Should have a queue. This is likely a bug in React. Please file an issue.");
-    l_queue_2.lastRenderedReducer = v168;
-    local l_dispatch_1 = l_queue_2.dispatch;
-    local l_pending_1 = l_queue_2.pending;
-    local l_memoizedState_2 = v171.memoizedState;
-    if l_pending_1 ~= nil then
-        l_queue_2.pending = nil;
-        local l_next_2 = l_pending_1.next;
-        local l_l_next_2_0 = l_next_2;
-        repeat
-            l_memoizedState_2 = v168(l_memoizedState_2, l_l_next_2_0.action);
-            l_l_next_2_0 = l_l_next_2_0.next;
-        until l_l_next_2_0 == l_next_2;
-        local l_l_memoizedState_2_0 = l_memoizedState_2;
-        local l_memoizedState_3 = v171.memoizedState;
-        if not (l_l_memoizedState_2_0 == l_memoizedState_3 and (l_l_memoizedState_2_0 ~= 0 or 1 / l_l_memoizedState_2_0 == 1 / l_memoizedState_3) or l_l_memoizedState_2_0 ~= l_l_memoizedState_2_0 and l_memoizedState_3 ~= l_memoizedState_3) then
-            l_markWorkInProgressReceivedUpdate_0();
-        end;
-        v171.memoizedState = l_memoizedState_2;
-        if v171.baseQueue == nil then
-            v171.baseState = l_memoizedState_2;
-        end;
-        l_queue_2.lastRenderedState = l_memoizedState_2;
-    end;
-    return l_memoizedState_2, l_dispatch_1;
-end;
-readFromUnsubcribedMutableSource = function(v180, v181, v182) --[[ Line: 880 ]] --[[ Name: readFromUnsubcribedMutableSource ]]
-    -- upvalues: l___DEV___0 (copy), l_warnAboutMultipleRenderersDEV_0 (copy), l_getWorkInProgressVersion_0 (copy), l_isSubsetOfLanes_0 (copy), l_l_NoLanes_0_0 (ref), l_setWorkInProgressVersion_0 (copy), l_console_0 (copy), l_markSourceAsDirty_0 (copy), l_Error_0 (copy)
-    if l___DEV___0 then
-        l_warnAboutMultipleRenderersDEV_0(v181);
-    end;
-    local v183 = v181._getVersion(v181._source);
-    local v184 = false;
-    local v185 = l_getWorkInProgressVersion_0(v181);
-    if v185 ~= nil then
-        v184 = v185 == v183;
-    else
-        v184 = l_isSubsetOfLanes_0(l_l_NoLanes_0_0, v180.mutableReadLanes);
-        if v184 then
-            l_setWorkInProgressVersion_0(v181, v183);
-        end;
-    end;
-    if v184 then
-        local v186 = v182(v181._source);
-        if l___DEV___0 and type(v186) == "function" then
-            l_console_0.error("Mutable source should not return a function as the snapshot value. Functions may close over mutable values and cause tearing.");
-        end;
-        return v186;
-    else
-        l_markSourceAsDirty_0(v181);
-        error(l_Error_0.new("Cannot read from mutable source during the current render without tearing. This is a bug in React. Please file an issue."));
-        return;
-    end;
-end;
-useMutableSource = function(v187, v188, v189, v190) --[[ Line: 963 ]] --[[ Name: useMutableSource ]]
-    -- upvalues: l_getWorkInProgressRoot_0 (copy), l_invariant_0 (copy), l_ReactCurrentDispatcher_0 (copy), v72 (ref), v70 (ref), l___DEV___0 (copy), l_console_0 (copy), l_requestUpdateLane_0 (copy), l_markRootMutableRead_0 (copy), l_markRootEntangled_0 (copy)
-    local v191 = l_getWorkInProgressRoot_0();
-    l_invariant_0(v191 ~= nil, "Expected a work-in-progress root. This is a bug in React. Please file an issue.");
-    local l__getVersion_0 = v188._getVersion;
-    local v193 = l__getVersion_0(v188._source);
-    local l_current_0 = l_ReactCurrentDispatcher_0.current;
-    assert(l_current_0 ~= nil, "dispatcher was nil, this is a bug in React");
-    local v195, v196 = l_current_0.useState(function() --[[ Line: 988 ]]
-        -- upvalues: v191 (copy), v188 (copy), v189 (copy)
-        return readFromUnsubcribedMutableSource(v191, v188, v189);
-    end);
-    local l_v195_0 = v195;
-    local l_v72_1 = v72;
-    local l_memoizedState_4 = v187.memoizedState;
-    if l_memoizedState_4.refs == nil then
-        error((tostring(debug.traceback())));
-    end;
-    local l_refs_0 = l_memoizedState_4.refs;
-    local l_getSnapshot_0 = l_refs_0.getSnapshot;
-    local l_source_0 = l_memoizedState_4.source;
-    local l_subscribe_0 = l_memoizedState_4.subscribe;
-    local l_v70_1 = v70;
-    v187.memoizedState = {
-        refs = l_refs_0, 
-        source = v188, 
-        subscribe = v190
-    };
-    l_current_0.useEffect(function() --[[ Line: 1017 ]]
-        -- upvalues: l_refs_0 (copy), v189 (copy), v196 (ref), l__getVersion_0 (copy), v188 (copy), v193 (copy), l___DEV___0 (ref), l_console_0 (ref), l_v195_0 (ref), l_requestUpdateLane_0 (ref), l_v70_1 (copy), l_markRootMutableRead_0 (ref), v191 (copy), l_markRootEntangled_0 (ref)
-        l_refs_0.getSnapshot = v189;
-        l_refs_0.setSnapshot = v196;
-        local v205 = l__getVersion_0(v188._source);
-        local l_v193_0 = v193;
-        if not (l_v193_0 == v205 and (l_v193_0 ~= 0 or 1 / l_v193_0 == 1 / v205) or l_v193_0 ~= l_v193_0 and v205 ~= v205) then
-            local v207 = v189(v188._source);
-            if l___DEV___0 and type(v207) == "function" then
-                l_console_0.error("Mutable source should not return a function as the snapshot value. Functions may close over mutable values and cause tearing.");
-            end;
-            local l_l_v195_0_0 = l_v195_0;
-            if not (l_l_v195_0_0 == v207 and (l_l_v195_0_0 ~= 0 or 1 / l_l_v195_0_0 == 1 / v207) or l_l_v195_0_0 ~= l_l_v195_0_0 and v207 ~= v207) then
-                v196(v207);
-                l_v193_0 = l_requestUpdateLane_0(l_v70_1);
-                l_markRootMutableRead_0(v191, l_v193_0);
-            end;
-            l_markRootEntangled_0(v191, v191.mutableReadLanes);
-        end;
-    end, {
-        v189, 
-        v188, 
-        v190
-    });
-    l_current_0.useEffect(function() --[[ Line: 1055 ]]
-        -- upvalues: l_refs_0 (copy), v188 (copy), l_requestUpdateLane_0 (ref), l_v70_1 (copy), l_markRootMutableRead_0 (ref), v191 (copy), v190 (copy), l___DEV___0 (ref), l_console_0 (ref)
-        local function v214() --[[ Line: 1056 ]]
-            -- upvalues: l_refs_0 (ref), v188 (ref), l_requestUpdateLane_0 (ref), l_v70_1 (ref), l_markRootMutableRead_0 (ref), v191 (ref)
-            local l_getSnapshot_1 = l_refs_0.getSnapshot;
-            local l_setSnapshot_0 = l_refs_0.setSnapshot;
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 1061 ]]
-                -- upvalues: l_setSnapshot_0 (copy), l_getSnapshot_1 (copy), v188 (ref), l_requestUpdateLane_0 (ref), l_v70_1 (ref), l_markRootMutableRead_0 (ref), v191 (ref)
-                l_setSnapshot_0(l_getSnapshot_1(v188._source));
-                local v211 = l_requestUpdateLane_0(l_v70_1);
-                l_markRootMutableRead_0(v191, v211);
-            end);
-            if not l_status_0 then
-                l_setSnapshot_0(function() --[[ Line: 1075 ]]
-                    -- upvalues: l_result_0 (copy)
-                    error(l_result_0);
-                end);
-            end;
-        end;
-        local v215 = v190(v188._source, v214);
-        if l___DEV___0 and type(v215) ~= "function" then
-            l_console_0.error("Mutable source subscribe function must return an unsubscribe function.");
-        end;
-        return v215;
-    end, {
-        v188, 
-        v190
-    });
-    if (l_getSnapshot_0 ~= v189 or l_getSnapshot_0 == 0 and 1 / l_getSnapshot_0 ~= 1 / v189) and (l_getSnapshot_0 == l_getSnapshot_0 or v189 == v189) or (l_source_0 ~= v188 or l_source_0 == 0 and 1 / l_source_0 ~= 1 / v188) and (l_source_0 == l_source_0 or v188 == v188) or not (l_subscribe_0 == v190 and (l_subscribe_0 ~= 0 or 1 / l_subscribe_0 == 1 / v190) or l_subscribe_0 ~= l_subscribe_0 and v190 ~= v190) then
-        local v216 = {
-            pending = nil, 
-            dispatch = nil, 
-            lastRenderedReducer = basicStateReducer, 
-            lastRenderedState = l_v195_0
-        };
-        local l_v70_2 = v70;
-        v196 = function(...) --[[ Line: 1124 ]]
-            -- upvalues: l_v70_2 (copy), v216 (copy)
-            dispatchAction(l_v70_2, v216, ...);
-        end;
-        v216.dispatch = v196;
-        l_v72_1.queue = v216;
-        l_v72_1.baseQueue = nil;
-        l_v195_0 = readFromUnsubcribedMutableSource(v191, v188, v189);
-        l_v72_1.baseState = l_v195_0;
-        l_v72_1.memoizedState = l_v72_1.baseState;
-    end;
-    return l_v195_0;
-end;
-mountMutableSource = function(v218, v219, v220) --[[ Line: 1138 ]] --[[ Name: mountMutableSource ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v221 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v221;
-        v72 = v221;
-    else
-        v72.next = v221;
-        v72 = v221;
-    end;
-    local l_v72_2 = v72;
-    l_v72_2.memoizedState = {
-        refs = {
-            getSnapshot = v219, 
-            setSnapshot = nil
-        }, 
-        source = v218, 
-        subscribe = v220
-    };
-    return useMutableSource(l_v72_2, v218, v219, v220);
-end;
-updateMutableSource = function(v223, v224, v225) --[[ Line: 1161 ]] --[[ Name: updateMutableSource ]]
-    -- upvalues: v136 (copy)
-    local v226 = v136();
-    return useMutableSource(v226, v223, v224, v225);
-end;
-mountState = function(v227) --[[ Line: 1176 ]] --[[ Name: mountState ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v228 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v228;
-        v72 = v228;
-    else
-        v72.next = v228;
-        v72 = v228;
-    end;
-    local l_v72_3 = v72;
-    if type(v227) == "function" then
-        v227 = v227();
-    end;
-    l_v72_3.baseState = v227;
-    l_v72_3.memoizedState = l_v72_3.baseState;
-    v228 = {
-        pending = nil, 
-        dispatch = nil, 
-        lastRenderedReducer = nil, 
-        lastRenderedState = v227, 
-        lastRenderedReducer = basicStateReducer
-    };
-    l_v72_3.queue = v228;
-    local l_v70_3 = v70;
-    local function v232(v231, ...) --[[ Line: 1198 ]]
-        -- upvalues: l_v70_3 (copy), v228 (copy)
-        dispatchAction(l_v70_3, v228, v231, ...);
-    end;
-    v228.dispatch = v232;
-    return l_v72_3.memoizedState, v232;
-end;
-updateState = function(v233) --[[ Line: 1207 ]] --[[ Name: updateState ]]
-    return updateReducer(basicStateReducer, v233);
-end;
-rerenderState = function(v234) --[[ Line: 1211 ]] --[[ Name: rerenderState ]]
-    return rerenderReducer(basicStateReducer, v234);
-end;
-local function v243(v235, v236, v237, v238) --[[ Line: 1215 ]] --[[ Name: pushEffect ]]
-    -- upvalues: v70 (ref)
-    local v239 = {
-        tag = v235, 
-        create = v236, 
-        destroy = v237, 
-        deps = v238, 
-        next = nil
-    };
-    local l_updateQueue_0 = v70.updateQueue;
-    if l_updateQueue_0 == nil then
-        l_updateQueue_0 = {
-            lastEffect = nil
-        };
-        v70.updateQueue = l_updateQueue_0;
-        v239.next = v239;
-        l_updateQueue_0.lastEffect = v239;
-        return v239;
-    else
-        local l_lastEffect_0 = l_updateQueue_0.lastEffect;
-        if l_lastEffect_0 == nil then
-            l_updateQueue_0.lastEffect = v239;
-            v239.next = v239;
-            return v239;
-        else
-            local l_next_3 = l_lastEffect_0.next;
-            l_lastEffect_0.next = v239;
-            v239.next = l_next_3;
-            l_updateQueue_0.lastEffect = v239;
-            return v239;
-        end;
-    end;
-end;
-mountBinding = function(v244) --[[ Line: 1251 ]] --[[ Name: mountBinding ]]
-    -- upvalues: v72 (ref), v70 (ref), l_createBinding_0 (copy)
-    local v245 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v245;
-        v72 = v245;
-    else
-        v72.next = v245;
-        v72 = v245;
-    end;
-    local l_v72_4 = v72;
-    local v247;
-    v245, v247 = l_createBinding_0(v244);
-    l_v72_4.memoizedState = {
-        v245, 
-        v247
-    };
-    return v245, v247;
-end;
-updateBinding = function(_) --[[ Line: 1260 ]] --[[ Name: updateBinding ]]
-    -- upvalues: v136 (copy)
-    return unpack(v136().memoizedState);
-end;
-mountRef = function(v249) --[[ Line: 1265 ]] --[[ Name: mountRef ]]
-    -- upvalues: v72 (ref), v70 (ref), l_createRef_0 (copy)
-    local v250 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v250;
-        v72 = v250;
-    else
-        v72.next = v250;
-        v72 = v250;
-    end;
-    local l_v72_5 = v72;
-    v250 = l_createRef_0();
-    v250.current = v249;
-    l_v72_5.memoizedState = v250;
-    return v250;
-end;
-updateRef = function(_) --[[ Line: 1277 ]] --[[ Name: updateRef ]]
-    -- upvalues: v136 (copy)
-    return v136().memoizedState;
-end;
-local function v259(v253, v254, v255, v256) --[[ Line: 1282 ]] --[[ Name: mountEffectImpl ]]
-    -- upvalues: v72 (ref), v70 (ref), v243 (copy), l_HasEffect_0 (copy)
-    local v257 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v257;
-        v72 = v257;
-    else
-        v72.next = v257;
-        v72 = v257;
-    end;
-    local l_v72_6 = v72;
-    v70.flags = bit32.bor(v70.flags, v253);
-    l_v72_6.memoizedState = v243(bit32.bor(l_HasEffect_0, v254), v255, nil, v256);
-end;
-updateEffectImpl = function(v260, v261, v262, v263) --[[ Line: 1294 ]] --[[ Name: updateEffectImpl ]]
-    -- upvalues: v136 (copy), v71 (ref), v123 (copy), v243 (copy), v70 (ref), l_HasEffect_0 (copy)
-    local v264 = v136();
-    local v265 = nil;
-    if v71 ~= nil then
-        local l_memoizedState_5 = v71.memoizedState;
-        v265 = l_memoizedState_5.destroy;
-        if v263 ~= nil then
-            local l_deps_0 = l_memoizedState_5.deps;
-            if v123(v263, l_deps_0) then
-                v264.memoizedState = v243(v261, v262, v265, v263);
-                return;
-            end;
-        end;
-    end;
-    v70.flags = bit32.bor(v70.flags, v260);
-    v264.memoizedState = v243(bit32.bor(l_HasEffect_0, v261), v262, v265, v263);
-end;
-local function v278(v268, v269) --[[ Line: 1320 ]] --[[ Name: mountEffect ]]
-    -- upvalues: l___DEV___0 (copy), v3 (copy), l_warnIfNotCurrentlyActingEffectsInDEV_0 (copy), v70 (ref), l_enableDoubleInvokingEffects_0 (copy), l_MountPassiveDev_0 (copy), l_Passive_0 (copy), l_PassiveStatic_0 (copy), l_Passive_1 (copy), v72 (ref), v243 (copy), l_HasEffect_0 (copy)
-    if l___DEV___0 and (type(_G.jest) ~= "nil" or v3.__TESTEZ_RUNNING_TEST__) then
-        l_warnIfNotCurrentlyActingEffectsInDEV_0(v70);
-    end;
-    if l___DEV___0 and l_enableDoubleInvokingEffects_0 then
-        local v270 = bit32.bor(l_MountPassiveDev_0, l_Passive_0, l_PassiveStatic_0);
-        local l_l_Passive_1_0 = l_Passive_1;
-        local v272 = {
-            memoizedState = nil, 
-            baseState = nil, 
-            baseQueue = nil, 
-            queue = nil, 
-            next = nil
-        };
-        if v72 == nil then
-            v70.memoizedState = v272;
-            v72 = v272;
-        else
-            v72.next = v272;
-            v72 = v272;
-        end;
-        local l_v72_7 = v72;
-        v70.flags = bit32.bor(v70.flags, v270);
-        l_v72_7.memoizedState = v243(bit32.bor(l_HasEffect_0, l_l_Passive_1_0), v268, nil, v269);
-        return;
-    else
-        local v274 = bit32.bor(l_Passive_0, l_PassiveStatic_0);
-        local l_l_Passive_1_1 = l_Passive_1;
-        local v276 = {
-            memoizedState = nil, 
-            baseState = nil, 
-            baseQueue = nil, 
-            queue = nil, 
-            next = nil
-        };
-        if v72 == nil then
-            v70.memoizedState = v276;
-            v72 = v276;
-        else
-            v72.next = v276;
-            v72 = v276;
-        end;
-        local l_v72_8 = v72;
-        v70.flags = bit32.bor(v70.flags, v274);
-        l_v72_8.memoizedState = v243(bit32.bor(l_HasEffect_0, l_l_Passive_1_1), v268, nil, v269);
-        return;
-    end;
-end;
-local function v281(v279, v280) --[[ Line: 1350 ]] --[[ Name: updateEffect ]]
-    -- upvalues: l___DEV___0 (copy), v3 (copy), l_warnIfNotCurrentlyActingEffectsInDEV_0 (copy), v70 (ref), l_Passive_0 (copy), l_Passive_1 (copy)
-    if l___DEV___0 and (type(_G.jest) ~= "nil" or v3.__TESTEZ_RUNNING_TEST__) then
-        l_warnIfNotCurrentlyActingEffectsInDEV_0(v70);
-    end;
-    updateEffectImpl(l_Passive_0, l_Passive_1, v279, v280);
-end;
-local function v292(v282, v283) --[[ Line: 1365 ]] --[[ Name: mountLayoutEffect ]]
-    -- upvalues: l___DEV___0 (copy), l_enableDoubleInvokingEffects_0 (copy), l_MountLayoutDev_0 (copy), l_Update_0 (copy), l_Layout_0 (copy), v72 (ref), v70 (ref), v243 (copy), l_HasEffect_0 (copy)
-    if l___DEV___0 and l_enableDoubleInvokingEffects_0 then
-        local v284 = bit32.bor(l_MountLayoutDev_0, l_Update_0);
-        local l_l_Layout_0_0 = l_Layout_0;
-        local v286 = {
-            memoizedState = nil, 
-            baseState = nil, 
-            baseQueue = nil, 
-            queue = nil, 
-            next = nil
-        };
-        if v72 == nil then
-            v70.memoizedState = v286;
-            v72 = v286;
-        else
-            v72.next = v286;
-            v72 = v286;
-        end;
-        local l_v72_9 = v72;
-        v70.flags = bit32.bor(v70.flags, v284);
-        l_v72_9.memoizedState = v243(bit32.bor(l_HasEffect_0, l_l_Layout_0_0), v282, nil, v283);
-        return;
-    else
-        local l_l_Update_0_0 = l_Update_0;
-        local l_l_Layout_0_1 = l_Layout_0;
-        local v290 = {
-            memoizedState = nil, 
-            baseState = nil, 
-            baseQueue = nil, 
-            queue = nil, 
-            next = nil
-        };
-        if v72 == nil then
-            v70.memoizedState = v290;
-            v72 = v290;
-        else
-            v72.next = v290;
-            v72 = v290;
-        end;
-        local l_v72_10 = v72;
-        v70.flags = bit32.bor(v70.flags, l_l_Update_0_0);
-        l_v72_10.memoizedState = v243(bit32.bor(l_HasEffect_0, l_l_Layout_0_1), v282, nil, v283);
-        return;
-    end;
-end;
-local function v295(v293, v294) --[[ Line: 1382 ]] --[[ Name: updateLayoutEffect ]]
-    -- upvalues: l_Update_0 (copy), l_Layout_0 (copy)
-    updateEffectImpl(l_Update_0, l_Layout_0, v293, v294);
-end;
-imperativeHandleEffect = function(v296, v297) --[[ Line: 1390 ]] --[[ Name: imperativeHandleEffect ]]
-    -- upvalues: l___DEV___0 (copy), l_Object_0 (copy), l_console_0 (copy), l_Array_0 (copy)
-    if v297 ~= nil and type(v297) == "function" then
-        v297((v296()));
-        return function() --[[ Line: 1399 ]]
-            -- upvalues: v297 (copy)
-            return v297(nil);
-        end;
-    elseif v297 ~= nil then
-        if l___DEV___0 then
-            local v298 = false;
-            if getmetatable(v297) ~= nil then
-                v298 = #l_Object_0.keys(v297) == 0;
-            end;
-            if not v298 then
-                l_console_0.error("Expected useImperativeHandle() first argument to either be a ref callback or React.createRef() object. Instead received: %s.", "an object with keys {" .. l_Array_0.join(l_Object_0.keys(v297), ", ") .. "}");
-            end;
-        end;
-        v297.current = v296();
-        return function() --[[ Line: 1424 ]]
-            -- upvalues: v297 (copy)
-            v297.current = nil;
-        end;
-    else
-        return nil;
-    end;
-end;
-mountImperativeHandle = function(v299, v300, v301) --[[ Line: 1433 ]] --[[ Name: mountImperativeHandle ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), l_Array_0 (copy), l_enableDoubleInvokingEffects_0 (copy), v259 (copy), l_MountLayoutDev_0 (copy), l_Update_0 (copy), l_Layout_0 (copy)
-    if l___DEV___0 and type(v300) ~= "function" then
-        l_console_0.error("Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.", if v300 ~= nil then type(v300) else "nil");
-    end;
-    local v302 = if v301 ~= nil then l_Array_0.concat(v301, {
-        v299
-    }) else nil;
-    if l___DEV___0 and l_enableDoubleInvokingEffects_0 then
-        return v259(bit32.bor(l_MountLayoutDev_0, l_Update_0), l_Layout_0, function() --[[ Line: 1456 ]]
-            -- upvalues: v300 (copy), v299 (copy)
-            return imperativeHandleEffect(v300, v299);
-        end, v302);
-    else
-        return v259(l_Update_0, l_Layout_0, function() --[[ Line: 1462 ]]
-            -- upvalues: v300 (copy), v299 (copy)
-            return imperativeHandleEffect(v300, v299);
-        end, v302);
-    end;
-end;
-updateImperativeHandle = function(v303, v304, v305) --[[ Line: 1468 ]] --[[ Name: updateImperativeHandle ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), l_Update_0 (copy), l_Layout_0 (copy)
-    if l___DEV___0 and type(v304) ~= "function" then
-        local v306 = "nil";
-        if v304 then
-            v306 = type(v304);
-        end;
-        l_console_0.error("Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.", v306);
-    end;
-    local v307 = nil;
-    if v305 ~= nil then
-        v307 = table.clone(v305);
-        table.insert(v307, v303);
-    end;
-    return updateEffectImpl(l_Update_0, l_Layout_0, function() --[[ Line: 1495 ]]
-        -- upvalues: v304 (copy), v303 (copy)
-        return imperativeHandleEffect(v304, v303);
-    end, v307);
-end;
-mountDebugValue = function(_, _) --[[ Line: 1500 ]] --[[ Name: mountDebugValue ]]
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local Object = LuauPolyfill.Object
+local __DEV__ = ReactGlobals.__DEV__
+local createRef = require(ParentParent.React).createRef
+local createBinding = require(ParentParent.React).createBinding
+local console = require(ParentParent.Shared).console
 
-end;
-local l_mountDebugValue_0 = mountDebugValue;
-mountCallback = function(v311, v312) --[[ Line: 1508 ]] --[[ Name: mountCallback ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v313 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v313;
-        v72 = v313;
-    else
-        v72.next = v313;
-        v72 = v313;
-    end;
-    v72.memoizedState = {
-        v311, 
-        v312
-    };
-    return v311;
-end;
-updateCallback = function(v314, v315) --[[ Line: 1516 ]] --[[ Name: updateCallback ]]
-    -- upvalues: v136 (copy), v123 (copy)
-    local v316 = v136();
-    local l_memoizedState_6 = v316.memoizedState;
-    if l_memoizedState_6 ~= nil and v315 ~= nil then
-        local v318 = l_memoizedState_6[2];
-        if v123(v315, v318) then
-            return l_memoizedState_6[1];
-        end;
-    end;
-    v316.memoizedState = {
-        v314, 
-        v315
-    };
-    return v314;
-end;
-mountMemo = function(v319, v320) --[[ Line: 1535 ]] --[[ Name: mountMemo ]]
-    -- upvalues: v72 (ref), v70 (ref)
-    local v321 = {
-        memoizedState = nil, 
-        baseState = nil, 
-        baseQueue = nil, 
-        queue = nil, 
-        next = nil
-    };
-    if v72 == nil then
-        v70.memoizedState = v321;
-        v72 = v321;
-    else
-        v72.next = v321;
-        v72 = v321;
-    end;
-    local l_v72_11 = v72;
-    v321 = {
-        v319()
-    };
-    l_v72_11.memoizedState = {
-        v321, 
-        v320
-    };
-    return unpack(v321);
-end;
-updateMemo = function(v323, v324) --[[ Line: 1547 ]] --[[ Name: updateMemo ]]
-    -- upvalues: v136 (copy), v123 (copy)
-    local v325 = v136();
-    local l_memoizedState_7 = v325.memoizedState;
-    if l_memoizedState_7 ~= nil and v324 ~= nil then
-        local v327 = l_memoizedState_7[2];
-        if v123(v324, v327) then
-            return unpack(l_memoizedState_7[1]);
-        end;
-    end;
-    local v328 = {
-        v323()
-    };
-    v325.memoizedState = {
-        v328, 
-        v324
-    };
-    return unpack(v328);
-end;
-v68.getIsUpdatingOpaqueValueInRenderPhaseInDEV = function() --[[ Line: 1697 ]]
-    -- upvalues: l___DEV___0 (copy)
-    if l___DEV___0 then
-        return false;
-    else
-        return nil;
-    end;
-end;
-mountOpaqueIdentifier = function() --[[ Line: 1719 ]] --[[ Name: mountOpaqueIdentifier ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), l_makeClientId_0 (copy), l_getIsHydrating_0 (copy)
-    local v329 = nil;
-    if l___DEV___0 then
-        l_console_0.warn("!!! unimplemented: warnOnOpaqueIdentifierAccessInDEV");
-    else
-        v329 = l_makeClientId_0;
-    end;
-    if l_getIsHydrating_0() then
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        print("UNIMPLEMENTED ERROR: ReactFiberHooks: getIsHydrating() true");
-        error("FIXME (roblox): ReactFiberHooks: getIsHydrating() true is unimplemented");
-        return nil;
-    else
-        local v330 = v329();
-        mountState(v330);
-        return v330;
-    end;
-end;
-updateOpaqueIdentifier = function() --[[ Line: 1786 ]] --[[ Name: updateOpaqueIdentifier ]]
-    local v331, _ = updateState(nil);
-    return v331;
-end;
-rerenderOpaqueIdentifier = function() --[[ Line: 1791 ]] --[[ Name: rerenderOpaqueIdentifier ]]
-    local v333, _ = rerenderState(nil);
-    return v333;
-end;
-dispatchAction = function(v335, v336, v337, ...) --[[ Line: 1796 ]] --[[ Name: dispatchAction ]]
-    -- upvalues: l___DEV___0 (copy), l_console_0 (copy), l_requestEventTime_0 (copy), l_requestUpdateLane_0 (copy), v70 (ref), v73 (ref), v74 (ref), l_NoLanes_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref), v65 (copy), v3 (copy), l_warnIfNotScopedWithMatchingAct_0 (copy), l_warnIfNotCurrentlyActingUpdatesInDEV_0 (copy), l_scheduleUpdateOnFiber_0 (copy), l_enableDebugTracing_0 (copy), l_DebugTracingMode_0 (copy), l_getComponentName_0 (copy), l_logStateUpdateScheduled_0 (copy), l_enableSchedulingProfiler_0 (copy), l_markStateUpdateScheduled_0 (copy)
-    if l___DEV___0 then
-        local v338 = select("#", ...);
-        local v339 = nil;
-        if v338 == 1 then
-            v339 = select(1, ...);
-        end;
-        if type(v339) == "function" then
-            l_console_0.error("State updates from the useState() and useReducer() Hooks don't support the second callback argument. To execute a side effect after rendering, declare it in the component body with useEffect().");
-        end;
-    end;
-    local v340 = l_requestEventTime_0();
-    local v341 = l_requestUpdateLane_0(v335);
-    local v342 = {
-        lane = v341, 
-        action = v337, 
-        eagerReducer = nil, 
-        eagerState = nil, 
-        next = nil
-    };
-    local l_pending_2 = v336.pending;
-    if l_pending_2 == nil then
-        v342.next = v342;
-    else
-        v342.next = l_pending_2.next;
-        l_pending_2.next = v342;
-    end;
-    v336.pending = v342;
-    local l_alternate_1 = v335.alternate;
-    if v335 == v70 or l_alternate_1 ~= nil and l_alternate_1 == v70 then
-        v73 = true;
-        v74 = true;
-    else
-        if v335.lanes == l_NoLanes_0 and (l_alternate_1 == nil or l_alternate_1.lanes == l_NoLanes_0) then
-            local l_lastRenderedReducer_0 = v336.lastRenderedReducer;
-            if l_lastRenderedReducer_0 ~= nil then
-                local v346 = nil;
-                if l___DEV___0 then
-                    v346 = l_ReactCurrentDispatcher_0.current;
-                    l_ReactCurrentDispatcher_0.current = v83;
-                end;
-                local l_lastRenderedState_0 = v336.lastRenderedState;
-                local l_status_1, l_result_1 = pcall(l_lastRenderedReducer_0, l_lastRenderedState_0, v337);
-                if l_status_1 then
-                    v342.eagerReducer = l_lastRenderedReducer_0;
-                    v342.eagerState = l_result_1;
-                end;
-                if l___DEV___0 then
-                    l_ReactCurrentDispatcher_0.current = v346;
-                end;
-                if l_result_1 == l_lastRenderedState_0 and (l_result_1 ~= 0 or 1 / l_result_1 == 1 / l_lastRenderedState_0) or l_result_1 ~= l_result_1 and l_lastRenderedState_0 ~= l_lastRenderedState_0 then
-                    if v65 then
-                        if l_pending_2 == nil then
-                            v336.pending = nil;
-                            return;
-                        else
-                            l_pending_2.next = v342.next;
-                            v336.pending = l_pending_2;
-                        end;
-                    end;
-                    return;
-                elseif not l_status_1 then
+require(ParentParent.Shared)
+require(script.Parent.ReactInternalTypes)
 
-                end;
-            end;
-        end;
-        if l___DEV___0 and (type(_G.jest) ~= "nil" or v3.__TESTEZ_RUNNING_TEST__) then
-            l_warnIfNotScopedWithMatchingAct_0(v335);
-            l_warnIfNotCurrentlyActingUpdatesInDEV_0(v335);
-        end;
-        l_scheduleUpdateOnFiber_0(v335, v341, v340);
-    end;
-    if l___DEV___0 and l_enableDebugTracing_0 and bit32.band(v335.mode, l_DebugTracingMode_0) ~= 0 then
-        local v350 = l_getComponentName_0(v335.type) or "Unknown";
-        l_logStateUpdateScheduled_0(v350, v341, v337);
-    end;
-    if l_enableSchedulingProfiler_0 then
-        l_markStateUpdateScheduled_0(v335, v341);
-    end;
-end;
-local v351 = {
-    readContext = l_readContext_0, 
-    useCallback = v110, 
-    useContext = v110, 
-    useEffect = v110, 
-    useImperativeHandle = v110, 
-    useLayoutEffect = v110, 
-    useMemo = v110, 
-    useReducer = v110, 
-    useRef = v110, 
-    useBinding = v110, 
-    useState = v110, 
-    useDebugValue = v110, 
-    useMutableSource = v110, 
-    useOpaqueIdentifier = v110, 
-    unstable_isNewReconciler = l_enableNewReconciler_0
-};
-v68.ContextOnlyDispatcher = v351;
-local v352 = {
-    readContext = l_readContext_0, 
-    useCallback = mountCallback, 
-    useContext = l_readContext_0, 
-    useEffect = v278, 
-    useImperativeHandle = mountImperativeHandle, 
-    useLayoutEffect = v292, 
-    useMemo = mountMemo, 
-    useReducer = mountReducer, 
-    useRef = mountRef, 
-    useBinding = mountBinding, 
-    useState = mountState, 
-    useDebugValue = mountDebugValue, 
-    useMutableSource = mountMutableSource, 
-    useOpaqueIdentifier = mountOpaqueIdentifier, 
-    unstable_isNewReconciler = l_enableNewReconciler_0
-};
-local v353 = {
-    readContext = l_readContext_0, 
-    useCallback = updateCallback, 
-    useContext = l_readContext_0, 
-    useEffect = v281, 
-    useImperativeHandle = updateImperativeHandle, 
-    useLayoutEffect = v295, 
-    useMemo = updateMemo, 
-    useReducer = updateReducer, 
-    useRef = updateRef, 
-    useBinding = updateBinding, 
-    useState = updateState, 
-    useDebugValue = l_mountDebugValue_0, 
-    useMutableSource = updateMutableSource, 
-    useOpaqueIdentifier = updateOpaqueIdentifier, 
-    unstable_isNewReconciler = l_enableNewReconciler_0
-};
-local v354 = {
-    readContext = l_readContext_0, 
-    useCallback = updateCallback, 
-    useContext = l_readContext_0, 
-    useEffect = v281, 
-    useImperativeHandle = updateImperativeHandle, 
-    useLayoutEffect = v295, 
-    useMemo = updateMemo, 
-    useReducer = rerenderReducer, 
-    useRef = updateRef, 
-    useBinding = updateBinding, 
-    useState = rerenderState, 
-    useDebugValue = l_mountDebugValue_0, 
-    useMutableSource = updateMutableSource, 
-    useOpaqueIdentifier = rerenderOpaqueIdentifier, 
-    unstable_isNewReconciler = l_enableNewReconciler_0
-};
-if l___DEV___0 then
-    local function _() --[[ Line: 2022 ]]
-        -- upvalues: l_console_0 (copy)
-        l_console_0.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().");
-    end;
-    local function _() --[[ Line: 2031 ]]
-        -- upvalues: l_console_0 (copy)
-        l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-    end;
-    v78 = {
-        readContext = function(v357, v358) --[[ Line: 2041 ]] --[[ Name: readContext ]]
-            -- upvalues: l_readContext_0 (copy)
-            return l_readContext_0(v357, v358);
-        end, 
-        useCallback = function(v359, v360) --[[ Line: 2047 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_console_0 (copy)
-            local v361 = false;
-            v75 = "useCallback";
-            if l___DEV___0 then
-                local l_v75_2 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_2
-                    };
-                else
-                    table.insert(v76, l_v75_2);
-                end;
-            end;
-            if l___DEV___0 and v360 ~= nil then
-                local v363;
-                if type(v360) ~= "table" then
-                    v363 = false;
-                else
-                    for v364, _ in v360 do
-                        if type(v364) ~= "number" then
-                            v363 = false;
-                            v361 = true;
-                        end;
-                        if v361 then
-                            break;
-                        end;
-                    end;
-                    if not v361 then
-                        v363 = true;
-                    end;
-                end;
-                v361 = false;
-                if not v363 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v360)));
-                end;
-            end;
-            return mountCallback(v359, v360);
-        end, 
-        useContext = function(v366, v367) --[[ Line: 2053 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_readContext_0 (copy)
-            v75 = "useContext";
-            if l___DEV___0 then
-                local l_v75_3 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_3
-                    };
-                else
-                    table.insert(v76, l_v75_3);
-                end;
-            end;
-            return l_readContext_0(v366, v367);
-        end, 
-        useEffect = function(v369, v370) --[[ Line: 2061 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_console_0 (copy), v278 (copy)
-            local v371 = false;
-            v75 = "useEffect";
-            if l___DEV___0 then
-                local l_v75_4 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_4
-                    };
-                else
-                    table.insert(v76, l_v75_4);
-                end;
-            end;
-            if l___DEV___0 and v370 ~= nil then
-                local v373;
-                if type(v370) ~= "table" then
-                    v373 = false;
-                else
-                    for v374, _ in v370 do
-                        if type(v374) ~= "number" then
-                            v373 = false;
-                            v371 = true;
-                        end;
-                        if v371 then
-                            break;
-                        end;
-                    end;
-                    if not v371 then
-                        v373 = true;
-                    end;
-                end;
-                v371 = false;
-                if not v373 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v370)));
-                end;
-            end;
-            return v278(v369, v370);
-        end, 
-        useImperativeHandle = function(v376, v377, v378) --[[ Line: 2071 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_console_0 (copy)
-            local v379 = false;
-            v75 = "useImperativeHandle";
-            if l___DEV___0 then
-                local l_v75_5 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_5
-                    };
-                else
-                    table.insert(v76, l_v75_5);
-                end;
-            end;
-            if l___DEV___0 and v378 ~= nil then
-                local v381;
-                if type(v378) ~= "table" then
-                    v381 = false;
-                else
-                    for v382, _ in v378 do
-                        if type(v382) ~= "number" then
-                            v381 = false;
-                            v379 = true;
-                        end;
-                        if v379 then
-                            break;
-                        end;
-                    end;
-                    if not v379 then
-                        v381 = true;
-                    end;
-                end;
-                v379 = false;
-                if not v381 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v378)));
-                end;
-            end;
-            return mountImperativeHandle(v376, v377, v378);
-        end, 
-        useLayoutEffect = function(v384, v385) --[[ Line: 2081 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_console_0 (copy), v292 (copy)
-            local v386 = false;
-            v75 = "useLayoutEffect";
-            if l___DEV___0 then
-                local l_v75_6 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_6
-                    };
-                else
-                    table.insert(v76, l_v75_6);
-                end;
-            end;
-            if l___DEV___0 and v385 ~= nil then
-                local v388;
-                if type(v385) ~= "table" then
-                    v388 = false;
-                else
-                    for v389, _ in v385 do
-                        if type(v389) ~= "number" then
-                            v388 = false;
-                            v386 = true;
-                        end;
-                        if v386 then
-                            break;
-                        end;
-                    end;
-                    if not v386 then
-                        v388 = true;
-                    end;
-                end;
-                v386 = false;
-                if not v388 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v385)));
-                end;
-            end;
-            return v292(v384, v385);
-        end, 
-        useMemo = function(v391, v392) --[[ Line: 2092 ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            local v393 = false;
-            v75 = "useMemo";
-            if l___DEV___0 then
-                local l_v75_7 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_7
-                    };
-                else
-                    table.insert(v76, l_v75_7);
-                end;
-            end;
-            if l___DEV___0 and v392 ~= nil then
-                local v395;
-                if type(v392) ~= "table" then
-                    v395 = false;
-                else
-                    for v396, _ in v392 do
-                        if type(v396) ~= "number" then
-                            v395 = false;
-                            v393 = true;
-                        end;
-                        if v393 then
-                            break;
-                        end;
-                    end;
-                    if not v393 then
-                        v395 = true;
-                    end;
-                end;
-                v393 = false;
-                if not v395 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v392)));
-                end;
-            end;
-            local l_current_1 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v399 = {
-                pcall(mountMemo, v391, v392)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_1;
-            if not v399[1] then
-                error(v399[2]);
-            end;
-            return unpack(v399, 2);
-        end, 
-        useReducer = function(v400, v401, v402) --[[ Line: 2110 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useReducer";
-            if l___DEV___0 then
-                local l_v75_8 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_8
-                    };
-                else
-                    table.insert(v76, l_v75_8);
-                end;
-            end;
-            local l_current_2 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v405, v406, v407 = pcall(mountReducer, v400, v401, v402);
-            l_ReactCurrentDispatcher_0.current = l_current_2;
-            if not v405 then
-                error(v406);
-            end;
-            return v406, v407;
-        end, 
-        useRef = function(v408) --[[ Line: 2128 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref)
-            v75 = "useRef";
-            if l___DEV___0 then
-                local l_v75_9 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_9
-                    };
-                else
-                    table.insert(v76, l_v75_9);
-                end;
-            end;
-            return mountRef(v408);
-        end, 
-        useBinding = function(v410) --[[ Line: 2134 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref)
-            v75 = "useBinding";
-            if l___DEV___0 then
-                local l_v75_10 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_10
-                    };
-                else
-                    table.insert(v76, l_v75_10);
-                end;
-            end;
-            return mountBinding(v410);
-        end, 
-        useState = function(v412) --[[ Line: 2139 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useState";
-            if l___DEV___0 then
-                local l_v75_11 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_11
-                    };
-                else
-                    table.insert(v76, l_v75_11);
-                end;
-            end;
-            local l_current_3 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v415, v416, v417 = pcall(mountState, v412);
-            l_ReactCurrentDispatcher_0.current = l_current_3;
-            if not v415 then
-                error(v416);
-            end;
-            return v416, v417;
-        end, 
-        useDebugValue = function(v418, v419) --[[ Line: 2155 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref)
-            v75 = "useDebugValue";
-            if l___DEV___0 then
-                local l_v75_12 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_12
-                    };
-                else
-                    table.insert(v76, l_v75_12);
-                end;
-            end;
-            return mountDebugValue(v418, v419);
-        end, 
-        useMutableSource = function(v421, v422, v423) --[[ Line: 2170 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref)
-            v75 = "useMutableSource";
-            if l___DEV___0 then
-                local l_v75_13 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_13
-                    };
-                else
-                    table.insert(v76, l_v75_13);
-                end;
-            end;
-            return mountMutableSource(v421, v422, v423);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2185 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), v76 (ref)
-            v75 = "useOpaqueIdentifier";
-            if l___DEV___0 then
-                local l_v75_14 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_14
-                    };
-                else
-                    table.insert(v76, l_v75_14);
-                end;
-            end;
-            return mountOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v79 = {
-        readContext = function(v426, v427) --[[ Line: 2195 ]] --[[ Name: readContext ]]
-            -- upvalues: l_readContext_0 (copy)
-            return l_readContext_0(v426, v427);
-        end, 
-        useCallback = function(v428, v429) --[[ Line: 2201 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref), l___DEV___0 (copy), l_console_0 (copy)
-            local v430 = false;
-            v75 = "useCallback";
-            updateHookTypesDev();
-            if l___DEV___0 and v429 ~= nil then
-                local v431;
-                if type(v429) ~= "table" then
-                    v431 = false;
-                else
-                    for v432, _ in v429 do
-                        if type(v432) ~= "number" then
-                            v431 = false;
-                            v430 = true;
-                        end;
-                        if v430 then
-                            break;
-                        end;
-                    end;
-                    if not v430 then
-                        v431 = true;
-                    end;
-                end;
-                v430 = false;
-                if not v431 then
-                    l_console_0.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", v75, (type(v429)));
-                end;
-            end;
-            return mountCallback(v428, v429);
-        end, 
-        useContext = function(v434, v435) --[[ Line: 2207 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_readContext_0 (copy)
-            v75 = "useContext";
-            updateHookTypesDev();
-            return l_readContext_0(v434, v435);
-        end, 
-        useEffect = function(v436, v437) --[[ Line: 2215 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), v278 (copy)
-            v75 = "useEffect";
-            updateHookTypesDev();
-            return v278(v436, v437);
-        end, 
-        useImperativeHandle = function(v438, v439, v440) --[[ Line: 2224 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref)
-            v75 = "useImperativeHandle";
-            updateHookTypesDev();
-            return mountImperativeHandle(v438, v439, v440);
-        end, 
-        useLayoutEffect = function(v441, v442) --[[ Line: 2233 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), v292 (copy)
-            v75 = "useLayoutEffect";
-            updateHookTypesDev();
-            return v292(v441, v442);
-        end, 
-        useMemo = function(v443, v444) --[[ Line: 2243 ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useMemo";
-            updateHookTypesDev();
-            local l_current_4 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v446 = {
-                pcall(mountMemo, v443, v444)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_4;
-            if not v446[1] then
-                error(v446[2]);
-            end;
-            return unpack(v446, 2);
-        end, 
-        useReducer = function(v447, v448, v449) --[[ Line: 2259 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useReducer";
-            updateHookTypesDev();
-            local l_current_5 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v451, v452, v453 = pcall(mountReducer, v447, v448, v449);
-            l_ReactCurrentDispatcher_0.current = l_current_5;
-            if not v451 then
-                error(v452);
-            end;
-            return v452, v453;
-        end, 
-        useRef = function(v454) --[[ Line: 2277 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref)
-            v75 = "useRef";
-            updateHookTypesDev();
-            return mountRef(v454);
-        end, 
-        useBinding = function(v455) --[[ Line: 2283 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref)
-            v75 = "useBinding";
-            updateHookTypesDev();
-            return mountBinding(v455);
-        end, 
-        useState = function(v456) --[[ Line: 2288 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useState";
-            updateHookTypesDev();
-            local l_current_6 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v458, v459, v460 = pcall(mountState, v456);
-            l_ReactCurrentDispatcher_0.current = l_current_6;
-            if not v458 then
-                error(v459);
-            end;
-            return v459, v460;
-        end, 
-        useDebugValue = function(v461, v462) --[[ Line: 2304 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref)
-            v75 = "useDebugValue";
-            updateHookTypesDev();
-            return mountDebugValue(v461, v462);
-        end, 
-        useMutableSource = function(v463, v464, v465) --[[ Line: 2319 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref)
-            v75 = "useMutableSource";
-            updateHookTypesDev();
-            return mountMutableSource(v463, v464, v465);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2334 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref)
-            v75 = "useOpaqueIdentifier";
-            updateHookTypesDev();
-            return mountOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v80 = {
-        readContext = function(v466, v467) --[[ Line: 2344 ]] --[[ Name: readContext ]]
-            -- upvalues: l_readContext_0 (copy)
-            return l_readContext_0(v466, v467);
-        end, 
-        useCallback = function(v468, v469) --[[ Line: 2350 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref)
-            v75 = "useCallback";
-            updateHookTypesDev();
-            return updateCallback(v468, v469);
-        end, 
-        useContext = function(v470, v471) --[[ Line: 2355 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_readContext_0 (copy)
-            v75 = "useContext";
-            updateHookTypesDev();
-            return l_readContext_0(v470, v471);
-        end, 
-        useEffect = function(v472, v473) --[[ Line: 2363 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), v281 (copy)
-            v75 = "useEffect";
-            updateHookTypesDev();
-            return v281(v472, v473);
-        end, 
-        useImperativeHandle = function(v474, v475, v476) --[[ Line: 2372 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref)
-            v75 = "useImperativeHandle";
-            updateHookTypesDev();
-            return updateImperativeHandle(v474, v475, v476);
-        end, 
-        useLayoutEffect = function(v477, v478) --[[ Line: 2381 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), v295 (copy)
-            v75 = "useLayoutEffect";
-            updateHookTypesDev();
-            return v295(v477, v478);
-        end, 
-        useMemo = function(v479, v480) --[[ Line: 2391 ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useMemo";
-            updateHookTypesDev();
-            local l_current_7 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v482 = {
-                pcall(updateMemo, v479, v480)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_7;
-            if not v482[1] then
-                error(v482[2]);
-            end;
-            return unpack(v482, 2);
-        end, 
-        useReducer = function(v483, v484, v485) --[[ Line: 2407 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useReducer";
-            updateHookTypesDev();
-            local l_current_8 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v487, v488, v489 = pcall(updateReducer, v483, v484, v485);
-            l_ReactCurrentDispatcher_0.current = l_current_8;
-            if not v487 then
-                error(v488);
-            end;
-            return v488, v489;
-        end, 
-        useRef = function(v490) --[[ Line: 2425 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref)
-            v75 = "useRef";
-            updateHookTypesDev();
-            return updateRef(v490);
-        end, 
-        useBinding = function(v491) --[[ Line: 2431 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref)
-            v75 = "useBinding";
-            updateHookTypesDev();
-            return updateBinding(v491);
-        end, 
-        useState = function(v492) --[[ Line: 2436 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useState";
-            updateHookTypesDev();
-            local l_current_9 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v494, v495, v496 = pcall(updateState, v492);
-            l_ReactCurrentDispatcher_0.current = l_current_9;
-            if not v494 then
-                error(v495);
-            end;
-            return v495, v496;
-        end, 
-        useDebugValue = function(v497, v498) --[[ Line: 2452 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l_mountDebugValue_0 (copy)
-            v75 = "useDebugValue";
-            updateHookTypesDev();
-            return l_mountDebugValue_0(v497, v498);
-        end, 
-        useMutableSource = function(v499, v500, v501) --[[ Line: 2467 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref)
-            v75 = "useMutableSource";
-            updateHookTypesDev();
-            return updateMutableSource(v499, v500, v501);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2482 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref)
-            v75 = "useOpaqueIdentifier";
-            updateHookTypesDev();
-            return updateOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v81 = {
-        readContext = function(v502, v503) --[[ Line: 2492 ]] --[[ Name: readContext ]]
-            -- upvalues: l_readContext_0 (copy)
-            return l_readContext_0(v502, v503);
-        end, 
-        useCallback = function(v504, v505) --[[ Line: 2498 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref)
-            v75 = "useCallback";
-            updateHookTypesDev();
-            return updateCallback(v504, v505);
-        end, 
-        useContext = function(v506, v507) --[[ Line: 2503 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_readContext_0 (copy)
-            v75 = "useContext";
-            updateHookTypesDev();
-            return l_readContext_0(v506, v507);
-        end, 
-        useEffect = function(v508, v509) --[[ Line: 2511 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), v281 (copy)
-            v75 = "useEffect";
-            updateHookTypesDev();
-            return v281(v508, v509);
-        end, 
-        useImperativeHandle = function(v510, v511, v512) --[[ Line: 2520 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref)
-            v75 = "useImperativeHandle";
-            updateHookTypesDev();
-            return updateImperativeHandle(v510, v511, v512);
-        end, 
-        useLayoutEffect = function(v513, v514) --[[ Line: 2529 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), v295 (copy)
-            v75 = "useLayoutEffect";
-            updateHookTypesDev();
-            return v295(v513, v514);
-        end, 
-        useMemo = function(v515, v516) --[[ Line: 2539 ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v84 (ref)
-            v75 = "useMemo";
-            updateHookTypesDev();
-            local l_current_10 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v84;
-            local v518 = {
-                pcall(updateMemo, v515, v516)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_10;
-            if not v518[1] then
-                error(v518[2]);
-            end;
-            return unpack(v518, 2);
-        end, 
-        useReducer = function(v519, v520, v521) --[[ Line: 2555 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v84 (ref)
-            v75 = "useReducer";
-            updateHookTypesDev();
-            local l_current_11 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v84;
-            local v523, v524, v525 = pcall(rerenderReducer, v519, v520, v521);
-            l_ReactCurrentDispatcher_0.current = l_current_11;
-            if not v523 then
-                error(v524);
-            end;
-            return v524, v525;
-        end, 
-        useRef = function(v526) --[[ Line: 2574 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref)
-            v75 = "useRef";
-            updateHookTypesDev();
-            return updateRef(v526);
-        end, 
-        useBinding = function(v527) --[[ Line: 2580 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref)
-            v75 = "useBinding";
-            updateHookTypesDev();
-            return updateBinding(v527);
-        end, 
-        useState = function(v528) --[[ Line: 2585 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_ReactCurrentDispatcher_0 (copy), v84 (ref)
-            v75 = "useState";
-            updateHookTypesDev();
-            local l_current_12 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v84;
-            local v530, v531, v532 = pcall(rerenderState, v528);
-            l_ReactCurrentDispatcher_0.current = l_current_12;
-            if not v530 then
-                error(v531);
-            end;
-            return v531, v532;
-        end, 
-        useDebugValue = function(v533, v534) --[[ Line: 2601 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l_mountDebugValue_0 (copy)
-            v75 = "useDebugValue";
-            updateHookTypesDev();
-            return l_mountDebugValue_0(v533, v534);
-        end, 
-        useMutableSource = function(v535, v536, v537) --[[ Line: 2616 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref)
-            v75 = "useMutableSource";
-            updateHookTypesDev();
-            return updateMutableSource(v535, v536, v537);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2631 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref)
-            v75 = "useOpaqueIdentifier";
-            updateHookTypesDev();
-            return rerenderOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v82 = {
-        readContext = function(v538, v539) --[[ Line: 2641 ]] --[[ Name: readContext ]]
-            -- upvalues: l_console_0 (copy), l_readContext_0 (copy)
-            l_console_0.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().");
-            return l_readContext_0(v538, v539);
-        end, 
-        useCallback = function(v540, v541) --[[ Line: 2648 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useCallback";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_15 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_15
-                    };
-                else
-                    table.insert(v76, l_v75_15);
-                end;
-            end;
-            return mountCallback(v540, v541);
-        end, 
-        useContext = function(v543, v544) --[[ Line: 2654 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), l_readContext_0 (copy)
-            v75 = "useContext";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_16 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_16
-                    };
-                else
-                    table.insert(v76, l_v75_16);
-                end;
-            end;
-            return l_readContext_0(v543, v544);
-        end, 
-        useEffect = function(v546, v547) --[[ Line: 2663 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), v278 (copy)
-            v75 = "useEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_17 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_17
-                    };
-                else
-                    table.insert(v76, l_v75_17);
-                end;
-            end;
-            return v278(v546, v547);
-        end, 
-        useImperativeHandle = function(v549, v550, v551) --[[ Line: 2673 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useImperativeHandle";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_18 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_18
-                    };
-                else
-                    table.insert(v76, l_v75_18);
-                end;
-            end;
-            return mountImperativeHandle(v549, v550, v551);
-        end, 
-        useLayoutEffect = function(v553, v554) --[[ Line: 2683 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), v292 (copy)
-            v75 = "useLayoutEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_19 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_19
-                    };
-                else
-                    table.insert(v76, l_v75_19);
-                end;
-            end;
-            return v292(v553, v554);
-        end, 
-        useMemo = function(v556, v557) --[[ Line: 2694 ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useMemo";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_20 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_20
-                    };
-                else
-                    table.insert(v76, l_v75_20);
-                end;
-            end;
-            local l_current_13 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v560 = {
-                pcall(mountMemo, v556, v557)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_13;
-            if not v560[1] then
-                error(v560[2]);
-            end;
-            return unpack(v560, 2);
-        end, 
-        useReducer = function(v561, v562, v563) --[[ Line: 2711 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useReducer";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_21 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_21
-                    };
-                else
-                    table.insert(v76, l_v75_21);
-                end;
-            end;
-            local l_current_14 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v566, v567, v568 = pcall(mountReducer, v561, v562, v563);
-            l_ReactCurrentDispatcher_0.current = l_current_14;
-            if not v566 then
-                error(v567);
-            end;
-            return v567, v568;
-        end, 
-        useRef = function(v569) --[[ Line: 2730 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useRef";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_22 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_22
-                    };
-                else
-                    table.insert(v76, l_v75_22);
-                end;
-            end;
-            return mountRef(v569);
-        end, 
-        useBinding = function(v571) --[[ Line: 2737 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useBinding";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_23 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_23
-                    };
-                else
-                    table.insert(v76, l_v75_23);
-                end;
-            end;
-            return mountBinding(v571);
-        end, 
-        useState = function(v573) --[[ Line: 2743 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref), l_ReactCurrentDispatcher_0 (copy), v82 (ref)
-            v75 = "useState";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_24 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_24
-                    };
-                else
-                    table.insert(v76, l_v75_24);
-                end;
-            end;
-            local l_current_15 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v82;
-            local v576, v577, v578 = pcall(mountState, v573);
-            l_ReactCurrentDispatcher_0.current = l_current_15;
-            if not v576 then
-                error(v577);
-            end;
-            return v577, v578;
-        end, 
-        useDebugValue = function(v579, v580) --[[ Line: 2760 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useDebugValue";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_25 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_25
-                    };
-                else
-                    table.insert(v76, l_v75_25);
-                end;
-            end;
-            return mountDebugValue(v579, v580);
-        end, 
-        useMutableSource = function(v582, v583, v584) --[[ Line: 2778 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useMutableSource";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_26 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_26
-                    };
-                else
-                    table.insert(v76, l_v75_26);
-                end;
-            end;
-            return mountMutableSource(v582, v583, v584);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2794 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l___DEV___0 (copy), v76 (ref)
-            v75 = "useOpaqueIdentifier";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            if l___DEV___0 then
-                local l_v75_27 = v75;
-                if v76 == nil then
-                    v76 = {
-                        l_v75_27
-                    };
-                else
-                    table.insert(v76, l_v75_27);
-                end;
-            end;
-            return mountOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v83 = {
-        readContext = function(v587, v588) --[[ Line: 2805 ]] --[[ Name: readContext ]]
-            -- upvalues: l_console_0 (copy), l_readContext_0 (copy)
-            l_console_0.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().");
-            return l_readContext_0(v587, v588);
-        end, 
-        useCallback = function(v589, v590) --[[ Line: 2812 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useCallback";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return mountCallback(v589, v590);
-        end, 
-        useContext = function(v591, v592) --[[ Line: 2818 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_readContext_0 (copy)
-            v75 = "useContext";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return l_readContext_0(v591, v592);
-        end, 
-        useEffect = function(v593, v594) --[[ Line: 2827 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), v281 (copy)
-            v75 = "useEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return v281(v593, v594);
-        end, 
-        useImperativeHandle = function(v595, v596, v597) --[[ Line: 2837 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useImperativeHandle";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateImperativeHandle(v595, v596, v597);
-        end, 
-        useLayoutEffect = function(v598, v599) --[[ Line: 2847 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), v295 (copy)
-            v75 = "useLayoutEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return v295(v598, v599);
-        end, 
-        useMemo = function(v600, v601) --[[ Line: 2858 ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useMemo";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_16 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v603 = {
-                pcall(updateMemo, v600, v601)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_16;
-            if not v603[1] then
-                error(v603[2]);
-            end;
-            return unpack(v603, 2);
-        end, 
-        useReducer = function(v604, v605, v606) --[[ Line: 2875 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useReducer";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_17 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v608, v609, v610 = pcall(updateReducer, v604, v605, v606);
-            l_ReactCurrentDispatcher_0.current = l_current_17;
-            if not v608 then
-                error(v609);
-            end;
-            return v609, v610;
-        end, 
-        useRef = function(v611) --[[ Line: 2895 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useRef";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateRef(v611);
-        end, 
-        useBinding = function(v612) --[[ Line: 2902 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useBinding";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateBinding(v612);
-        end, 
-        useState = function(v613) --[[ Line: 2908 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useState";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_18 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v615, v616, v617 = pcall(updateState, v613);
-            l_ReactCurrentDispatcher_0.current = l_current_18;
-            if not v615 then
-                error(v616);
-            end;
-            return v616, v617;
-        end, 
-        useDebugValue = function(v618, v619) --[[ Line: 2925 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_mountDebugValue_0 (copy)
-            v75 = "useDebugValue";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return l_mountDebugValue_0(v618, v619);
-        end, 
-        useMutableSource = function(v620, v621, v622) --[[ Line: 2943 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useMutableSource";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateMutableSource(v620, v621, v622);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 2959 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useOpaqueIdentifier";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-    v84 = {
-        readContext = function(v623, v624) --[[ Line: 2970 ]] --[[ Name: readContext ]]
-            -- upvalues: l_console_0 (copy), l_readContext_0 (copy)
-            l_console_0.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().");
-            return l_readContext_0(v623, v624);
-        end, 
-        useCallback = function(v625, v626) --[[ Line: 2977 ]] --[[ Name: useCallback ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useCallback";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateCallback(v625, v626);
-        end, 
-        useContext = function(v627, v628) --[[ Line: 2983 ]] --[[ Name: useContext ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_readContext_0 (copy)
-            v75 = "useContext";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return l_readContext_0(v627, v628);
-        end, 
-        useEffect = function(v629, v630) --[[ Line: 2992 ]] --[[ Name: useEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), v281 (copy)
-            v75 = "useEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return v281(v629, v630);
-        end, 
-        useImperativeHandle = function(v631, v632, v633) --[[ Line: 3002 ]] --[[ Name: useImperativeHandle ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useImperativeHandle";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateImperativeHandle(v631, v632, v633);
-        end, 
-        useLayoutEffect = function(v634, v635) --[[ Line: 3012 ]] --[[ Name: useLayoutEffect ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), v295 (copy)
-            v75 = "useLayoutEffect";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return v295(v634, v635);
-        end, 
-        useMemo = function(v636, v637) --[[ Line: 3023 ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useMemo";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_19 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v639 = {
-                pcall(updateMemo, v636, v637)
-            };
-            l_ReactCurrentDispatcher_0.current = l_current_19;
-            if not v639[1] then
-                error(v639[2]);
-            end;
-            return unpack(v639, 2);
-        end, 
-        useReducer = function(v640, v641, v642) --[[ Line: 3040 ]] --[[ Name: useReducer ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useReducer";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_20 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v644, v645, v646 = pcall(rerenderReducer, v640, v641, v642);
-            l_ReactCurrentDispatcher_0.current = l_current_20;
-            if not v644 then
-                error(v645);
-            end;
-            return v645, v646;
-        end, 
-        useRef = function(v647) --[[ Line: 3060 ]] --[[ Name: useRef ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useRef";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateRef(v647);
-        end, 
-        useBinding = function(v648) --[[ Line: 3067 ]] --[[ Name: useBinding ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useBinding";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateBinding(v648);
-        end, 
-        useState = function(v649) --[[ Line: 3073 ]] --[[ Name: useState ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_ReactCurrentDispatcher_0 (copy), v83 (ref)
-            v75 = "useState";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            local l_current_21 = l_ReactCurrentDispatcher_0.current;
-            l_ReactCurrentDispatcher_0.current = v83;
-            local v651, v652, v653 = pcall(rerenderState, v649);
-            l_ReactCurrentDispatcher_0.current = l_current_21;
-            if not v651 then
-                error(v652);
-            end;
-            return v652, v653;
-        end, 
-        useDebugValue = function(v654, v655) --[[ Line: 3090 ]] --[[ Name: useDebugValue ]]
-            -- upvalues: v75 (ref), l_console_0 (copy), l_mountDebugValue_0 (copy)
-            v75 = "useDebugValue";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return l_mountDebugValue_0(v654, v655);
-        end, 
-        useMutableSource = function(v656, v657, v658) --[[ Line: 3108 ]] --[[ Name: useMutableSource ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useMutableSource";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return updateMutableSource(v656, v657, v658);
-        end, 
-        useOpaqueIdentifier = function() --[[ Line: 3124 ]] --[[ Name: useOpaqueIdentifier ]]
-            -- upvalues: v75 (ref), l_console_0 (copy)
-            v75 = "useOpaqueIdentifier";
-            l_console_0.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks");
-            updateHookTypesDev();
-            return rerenderOpaqueIdentifier();
-        end, 
-        unstable_isNewReconciler = l_enableNewReconciler_0
-    };
-end;
-v68.renderWithHooks = function(v659, v660, v661, v662, v663, v664) --[[ Line: 3135 ]] --[[ Name: renderWithHooks ]]
-    -- upvalues: l_l_NoLanes_0_0 (ref), v70 (ref), l___DEV___0 (copy), v76 (ref), v77 (ref), l_NoLanes_0 (copy), l_ReactCurrentDispatcher_0 (copy), v80 (ref), v79 (ref), v78 (ref), v352 (copy), v353 (copy), v74 (ref), l_Error_0 (copy), v71 (ref), v72 (ref), v81 (ref), v354 (copy), v351 (copy), v75 (ref), v73 (ref), l_getComponentName_0 (copy)
-    l_l_NoLanes_0_0 = v664;
-    v70 = v660;
-    if l___DEV___0 then
-        v76 = if v659 ~= nil then v659._debugHookTypes else nil;
-        v77 = 0;
-    end;
-    v660.memoizedState = nil;
-    v660.updateQueue = nil;
-    v660.lanes = l_NoLanes_0;
-    if l___DEV___0 then
-        if v659 ~= nil and v659.memoizedState ~= nil then
-            l_ReactCurrentDispatcher_0.current = v80;
-        elseif v76 ~= nil then
-            l_ReactCurrentDispatcher_0.current = v79;
-        else
-            l_ReactCurrentDispatcher_0.current = v78;
-        end;
-    else
-        l_ReactCurrentDispatcher_0.current = (not (v659 ~= nil) or v659.memoizedState == nil) and v352 or v353;
-    end;
-    local v665 = v661(v662, v663);
-    if v74 then
-        local v666 = 0;
-        repeat
-            v74 = false;
-            if v666 >= 25 then
-                error(l_Error_0.new("Too many re-renders. React limits the number of renders to prevent an infinite loop."));
-            end;
-            v666 = v666 + 1;
-            v71 = nil;
-            v72 = nil;
-            v660.updateQueue = nil;
-            if l___DEV___0 then
-                v77 = 0;
-            end;
-            l_ReactCurrentDispatcher_0.current = l___DEV___0 and v81 or v354;
-            v665 = v661(v662, v663);
-        until not v74;
-    end;
-    l_ReactCurrentDispatcher_0.current = v351;
-    if l___DEV___0 then
-        v660._debugHookTypes = v76;
-    end;
-    local v667 = false;
-    if v71 ~= nil then
-        v667 = v71.next ~= nil;
-    end;
-    l_l_NoLanes_0_0 = l_NoLanes_0;
-    v70 = nil;
-    v71 = nil;
-    v72 = nil;
-    if l___DEV___0 then
-        v75 = nil;
-        v76 = nil;
-        v77 = 0;
-    end;
-    v73 = false;
-    if v667 then
-        local v668 = "unknown";
-        if v665 and v665.type then
-            v668 = l_getComponentName_0(v665.type) or v668;
-        end;
-        error(l_Error_0.new("Rendered fewer hooks than expected. This may be caused by an accidental " .. "early return statement. Inside '" .. v668 .. "'"));
-    end;
-    return v665;
-end;
-return v68;
+local ReactFiberLane = require(script.Parent.ReactFiberLane)
+local ReactHookEffectTags = require(script.Parent.ReactHookEffectTags)
+local ReactSharedInternals = require(ParentParent.Shared).ReactSharedInternals
+local ReactFeatureFlags = require(ParentParent.Shared).ReactFeatureFlags
+local enableDebugTracing = ReactFeatureFlags.enableDebugTracing
+local enableSchedulingProfiler = ReactFeatureFlags.enableSchedulingProfiler
+local enableNewReconciler = ReactFeatureFlags.enableNewReconciler
+local enableDoubleInvokingEffects = ReactFeatureFlags.enableDoubleInvokingEffects
+local DebugTracingMode = require(script.Parent.ReactTypeOfMode).DebugTracingMode
+local NoLane = ReactFiberLane.NoLane
+local NoLanes = ReactFiberLane.NoLanes
+local isSubsetOfLanes = ReactFiberLane.isSubsetOfLanes
+local mergeLanes = ReactFiberLane.mergeLanes
+local removeLanes = ReactFiberLane.removeLanes
+local markRootEntangled = ReactFiberLane.markRootEntangled
+local markRootMutableRead = ReactFiberLane.markRootMutableRead
+local readContext = require(script.Parent["ReactFiberNewContext.new"]).readContext
+local ReactFiberFlags = require(script.Parent.ReactFiberFlags)
+local Update = ReactFiberFlags.Update
+local Passive = ReactFiberFlags.Passive
+local PassiveStatic = ReactFiberFlags.PassiveStatic
+local MountLayoutDev = ReactFiberFlags.MountLayoutDev
+local MountPassiveDev = ReactFiberFlags.MountPassiveDev
+local HasEffect = ReactHookEffectTags.HasEffect
+local Layout = ReactHookEffectTags.Layout
+local Passive2 = ReactHookEffectTags.Passive
+local lib = require(script.Parent["ReactFiberWorkLoop.new"])
+local warnIfNotCurrentlyActingUpdatesInDEV = lib.warnIfNotCurrentlyActingUpdatesInDEV
+local scheduleUpdateOnFiber = lib.scheduleUpdateOnFiber
+local warnIfNotScopedWithMatchingAct = lib.warnIfNotScopedWithMatchingAct
+local requestEventTime = lib.requestEventTime
+local requestUpdateLane = lib.requestUpdateLane
+local markSkippedUpdateLanes = lib.markSkippedUpdateLanes
+local getWorkInProgressRoot = lib.getWorkInProgressRoot
+local warnIfNotCurrentlyActingEffectsInDEV = lib.warnIfNotCurrentlyActingEffectsInDEV
+local invariant = require(ParentParent.Shared).invariant
+local getComponentName = require(ParentParent.Shared).getComponentName
+
+local function is(p1, p2) -- line: 117
+	return p1 == p2 and (p1 ~= 0 or 1 / p1 == 1 / p2) or p1 ~= p1 and p2 ~= p2
+end
+
+local markWorkInProgressReceivedUpdate = require(script.Parent["ReactFiberBeginWork.new"]).markWorkInProgressReceivedUpdate
+local getIsHydrating = require(script.Parent["ReactFiberHydrationContext.new"]).getIsHydrating
+local makeClientId = require(script.Parent.ReactFiberHostConfig).makeClientId
+local lib2 = require(script.Parent["ReactMutableSource.new"])
+local warnAboutMultipleRenderersDEV = lib2.warnAboutMultipleRenderersDEV
+local getWorkInProgressVersion = lib2.getWorkInProgressVersion
+local setWorkInProgressVersion = lib2.setWorkInProgressVersion
+local markSourceAsDirty = lib2.markSourceAsDirty
+local logStateUpdateScheduled = require(script.Parent.DebugTracing).logStateUpdateScheduled
+local markStateUpdateScheduled = require(script.Parent.SchedulingProfiler).markStateUpdateScheduled
+local ReactCurrentDispatcher = ReactSharedInternals.ReactCurrentDispatcher
+local v61 = require(ParentParent.SafeFlags).createGetFFlag("ReactCleanQueueOnUpdateBailout")()
+local t1 = nil
+
+if __DEV__ then
+	t1 = {}
+end
+
+local t2 = {}
+local u64 = NoLanes
+local u65 = nil
+local u66 = nil
+local u67 = nil
+local u68 = false
+local u69 = false
+local u70 = nil
+local t4 = nil
+local n1 = 0
+local t53 = nil
+local t60 = nil
+local t67 = nil
+local t74 = nil
+local t81 = nil
+local t88 = nil
+local t95 = nil
+
+local function getHighestIndex(t3: {[any]: any}) -- line: 265
+	local n2 = 0
+
+	for v105, _ in t3 do
+		if n2 < v105 then
+			n2 = v105
+		end
+	end
+
+	return n2
+end
+local function isArrayOrSparseArray(p3) -- line: 275
+	if type(p3) ~= "table" then
+		return false
+	end
+
+	for v108, _ in p3 do
+		if type(v108) ~= "number" then
+			return false
+		end
+	end
+
+	return true
+end
+local function mountHookTypesDev() -- line: 287
+	-- upvalues: __DEV__ (copy), u70 (ref), t4 (ref)
+	if __DEV__ then
+		local v110 = u70
+
+		if t4 == nil then
+			t4 = { v110 }
+
+			return
+		end
+
+		table.insert(t4, v110)
+	end
+end
+
+function updateHookTypesDev() -- line: 300
+	-- upvalues: __DEV__ (copy), u70 (ref), t4 (ref), n1 (ref)
+	if __DEV__ then
+		local v111 = u70
+
+		if t4 ~= nil then
+			n1 += 1
+
+			if v111 ~= t4[n1] then
+				warnOnHookMismatchInDev(v111)
+			end
+		end
+	end
+end
+
+local function checkDepsAreArrayDev(p4) -- line: 314
+	-- upvalues: __DEV__ (copy), console (copy), u70 (ref)
+	if __DEV__ and p4 ~= nil then
+		local v113, g116
+
+		if type(p4) ~= "table" then
+			v113 = false
+		else
+			g116 = nil
+			v113 = nil
+
+			for v114, _ in p4 do
+				if type(v114) ~= "number" then
+					v113 = false
+					g116 = true
+				end
+
+				if g116 then
+					break
+				end
+			end
+
+			if not g116 then
+				v113 = true
+			end
+		end
+
+		g116 = false
+
+		if not v113 then
+			console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(p4)))
+		end
+	end
+end
+
+function warnOnHookMismatchInDev(p5) -- line: 329
+	-- upvalues: __DEV__ (copy), getComponentName (copy), u65 (ref), t1 (ref), t4 (ref), n1 (ref), console (copy)
+	if __DEV__ then
+		local v118 = getComponentName(u65.type) or "Component"
+
+		if not t1[v118] then
+			t1[v118] = true
+
+			if t4 ~= nil then
+				local s2 = ""
+
+				for i = 1, n1 do
+					local v121 = t4[i]
+					local v122 = if i ~= n1 then v121 else p5
+					local v123 = tostring(i) .. ". " .. (v121 or "undefined")
+
+					while string.len(v123) < 30 do
+						v123 ..= " "
+					end
+
+					s2 ..= v123 .. v122 .. "\n"
+				end
+
+				console.error("React has detected a change in the order of Hooks called by %s. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks\n\n   Previous render            Next render\n   ------------------------------------------------------\n%s   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n", v118, s2)
+			end
+		end
+	end
+end
+
+local function throwInvalidHookError() -- line: 381
+	-- upvalues: Error (copy)
+	error(Error.new("Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:\n1. You might have mismatching versions of React and the renderer (such as React DOM)\n2. You might be breaking the Rules of Hooks\n3. You might have more than one copy of React in the same app\nSee https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem."))
+end
+local function areHookInputsEqual(t5: {[any]: any}, t6: {[any]: any}) -- line: 396
+	-- upvalues: __DEV__ (copy), console (copy), u70 (ref)
+	if not __DEV__ then
+	end
+
+	if t6 == nil then
+		if __DEV__ then
+			console.error("%s received a final argument during this render, but not during the previous render. Even though the final argument is optional, its type cannot change between renders.", u70)
+		end
+
+		return false
+	end
+
+	local n3 = 0
+
+	for v127, _ in t5 do
+		if n3 < v127 then
+			n3 = v127
+		end
+	end
+
+	local n4 = 0
+
+	for v130, _ in t6 do
+		if n4 < v130 then
+			n4 = v130
+		end
+	end
+
+	if n3 ~= n4 then
+		return false
+	end
+
+	for i = 1, math.min(n4, n3) do
+		local v133 = t5[i]
+		local v134 = t6[i]
+
+		if (v133 ~= v134 or v133 == 0 and 1 / v133 ~= 1 / v134) and (v133 == v133 or v134 == v134) then
+			return false
+		end
+	end
+
+	return true
+end
+
+function t2.bailoutHooks(p6, p7, p8) -- line: 460
+	-- upvalues: __DEV__ (copy), enableDoubleInvokingEffects (copy), MountPassiveDev (copy), Passive (copy), MountLayoutDev (copy), Update (copy), removeLanes (copy)
+	p7.updateQueue = p6.updateQueue
+
+	if __DEV__ and enableDoubleInvokingEffects then
+		p7.flags = bit32.band(p7.flags, (bit32.bnot((bit32.bor(MountPassiveDev, Passive, MountLayoutDev, Update)))))
+	else
+		p7.flags = bit32.band(p7.flags, (bit32.bnot((bit32.bor(Passive, Update)))))
+	end
+
+	p6.lanes = removeLanes(p6.lanes, p8)
+end
+
+local u86 = false
+
+function t2.resetHooksAfterThrow() -- line: 485
+	-- upvalues: ReactCurrentDispatcher (copy), t2 (copy), u68 (ref), u65 (ref), u64 (ref), NoLanes (copy), u66 (ref), u67 (ref), __DEV__ (copy), t4 (ref), n1 (ref), u70 (ref), u86 (ref), u69 (ref)
+	ReactCurrentDispatcher.current = t2.ContextOnlyDispatcher
+
+	if u68 then
+		local memoizedState = u65.memoizedState
+
+		while memoizedState ~= nil do
+			local queue = memoizedState.queue
+
+			if queue ~= nil then
+				queue.pending = nil
+			end
+
+			memoizedState = memoizedState.next
+		end
+
+		u68 = false
+	end
+
+	u64 = NoLanes
+	u65 = nil
+	u66 = nil
+	u67 = nil
+
+	if __DEV__ then
+		t4 = nil
+		n1 = 0
+		u70 = nil
+		u86 = false
+	end
+
+	u69 = false
+end
+
+local function mountWorkInProgressHook() -- line: 530
+	-- upvalues: u67 (ref), u65 (ref)
+	local t7 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t7
+		u67 = t7
+	else
+		u67.next = t7
+		u67 = t7
+	end
+
+	return u67
+end
+local function updateWorkInProgressHook() -- line: 553
+	-- upvalues: u66 (ref), u65 (ref), u67 (ref), Error (copy)
+	local v142
+
+	if u66 == nil then
+		local alternate = u65.alternate
+
+		v142 = if alternate == nil then nil else alternate.memoizedState
+	else
+		v142 = u66.next
+	end
+
+	local v143 = if u67 ~= nil then u67.next else u65.memoizedState
+
+	if v143 ~= nil then
+		u67 = v143
+
+		local _ = u67.next
+
+		u66 = v142
+	else
+		if v142 == nil then
+			error(Error.new("Rendered more hooks than during the previous render."))
+		end
+
+		u66 = v142
+
+		local t8 = {
+			next = nil,
+			memoizedState = u66.memoizedState,
+			baseState = u66.baseState,
+			baseQueue = u66.baseQueue,
+			queue = u66.queue
+		}
+
+		if u67 == nil then
+			u67 = t8
+			u65.memoizedState = t8
+		else
+			u67.next = t8
+			u67 = t8
+		end
+	end
+
+	return u67
+end
+
+function basicStateReducer(p9, p10) -- line: 628
+	if type(p10) == "function" then
+		return p10(p9)
+	end
+
+	return p10
+end
+function mountReducer(p11: ((...any) -> ...any), p12, p13: ((...any) -> ...any)?) -- line: 637
+	-- upvalues: u67 (ref), u65 (ref)
+	local t9 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t9
+		u67 = t9
+	else
+		u67.next = t9
+		u67 = t9
+	end
+
+	local v152 = u67
+	local v153 = if p13 == nil then p12 else p13(p12)
+
+	v152.baseState = v153
+	v152.memoizedState = v152.baseState
+
+	local t10 = {
+		pending = nil,
+		dispatch = nil,
+		lastRenderedReducer = p11,
+		lastRenderedState = v153
+	}
+
+	v152.queue = t10
+
+	local v155 = u65
+
+	local function v156(p14, ...) -- line: 664
+		-- upvalues: v155 (copy), t10 (copy)
+		dispatchAction(v155, t10, p14, ...)
+	end
+
+	t10.dispatch = v156
+
+	return v152.memoizedState, v156
+end
+function updateReducer(p15: ((...any) -> ...any), _, _: ((...any) -> ...any)?) -- line: 674
+	-- upvalues: updateWorkInProgressHook (copy), u66 (ref), u64 (ref), u65 (ref), mergeLanes (copy), markSkippedUpdateLanes (copy), NoLane (copy), markWorkInProgressReceivedUpdate (copy)
+	local v160 = updateWorkInProgressHook()
+	local queue = v160.queue
+
+	assert(queue ~= nil, "Should have a queue. This is likely a bug in React. Please file an issue.")
+	queue.lastRenderedReducer = p15
+
+	local v162 = u66
+	local baseQueue = v162.baseQueue
+	local pending = queue.pending
+
+	if pending ~= nil then
+		if baseQueue ~= nil then
+			local next = baseQueue.next
+
+			baseQueue.next = pending.next
+			pending.next = next
+		end
+
+		baseQueue = pending
+		v162.baseQueue = baseQueue
+		queue.pending = nil
+	end
+
+	if baseQueue ~= nil then
+		local next = baseQueue.next
+		local baseState = v162.baseState
+		local v168 = nil
+		local v169 = nil
+		local v170 = nil
+		local v171 = next
+
+		repeat
+			local lane = v171.lane
+
+			if lane ~= bit32.band(u64, lane) then
+				local t11 = {
+					next = nil,
+					lane = lane,
+					action = v171.action,
+					eagerReducer = v171.eagerReducer,
+					eagerState = v171.eagerState
+				}
+
+				if v170 == nil then
+					v170 = t11
+					v169 = v170
+					v168 = baseState
+				else
+					v170.next = t11
+					v170 = v170.next
+				end
+
+				u65.lanes = mergeLanes(u65.lanes, lane)
+				markSkippedUpdateLanes(lane)
+			else
+				if v170 ~= nil then
+					v170.next = {
+						next = nil,
+						lane = NoLane,
+						action = v171.action,
+						eagerReducer = v171.eagerReducer,
+						eagerState = v171.eagerState
+					}
+					v170 = v170.next
+				end
+
+				baseState = if p15 ~= v171.eagerReducer then p15(baseState, v171.action) else v171.eagerState
+			end
+
+			v171 = v171.next
+		until v171 == nil or v171 == next
+
+		if v170 == nil then
+			v168 = baseState
+		else
+			v170.next = v169
+		end
+
+		local memoizedState = v160.memoizedState
+
+		if (baseState ~= memoizedState or baseState == 0 and 1 / baseState ~= 1 / memoizedState) and (baseState == baseState or memoizedState == memoizedState) then
+			markWorkInProgressReceivedUpdate()
+		end
+
+		v160.memoizedState = baseState
+		v160.baseState = v168
+		v160.baseQueue = v170
+		queue.lastRenderedState = baseState
+	end
+
+	local dispatch = queue.dispatch
+
+	return v160.memoizedState, dispatch
+end
+function rerenderReducer(p18: ((...any) -> ...any), _, _: ((...any) -> ...any)?) -- line: 815
+	-- upvalues: updateWorkInProgressHook (copy), markWorkInProgressReceivedUpdate (copy)
+	local v179 = updateWorkInProgressHook()
+	local queue = v179.queue
+
+	assert(queue ~= nil, "Should have a queue. This is likely a bug in React. Please file an issue.")
+	queue.lastRenderedReducer = p18
+
+	local dispatch = queue.dispatch
+	local pending = queue.pending
+	local memoizedState = v179.memoizedState
+
+	if pending ~= nil then
+		queue.pending = nil
+
+		local next = pending.next
+		local v185 = next
+
+		repeat
+			memoizedState = p18(memoizedState, v185.action)
+			v185 = v185.next
+		until v185 == next
+
+		local memoizedState2 = v179.memoizedState
+
+		if (memoizedState ~= memoizedState2 or memoizedState == 0 and 1 / memoizedState ~= 1 / memoizedState2) and (memoizedState == memoizedState or memoizedState2 == memoizedState2) then
+			markWorkInProgressReceivedUpdate()
+		end
+
+		v179.memoizedState = memoizedState
+
+		if v179.baseQueue == nil then
+			v179.baseState = memoizedState
+		end
+
+		queue.lastRenderedState = memoizedState
+	end
+
+	return memoizedState, dispatch
+end
+function readFromUnsubcribedMutableSource(p21, p22, p23) -- line: 880
+	-- upvalues: __DEV__ (copy), warnAboutMultipleRenderersDEV (copy), getWorkInProgressVersion (copy), isSubsetOfLanes (copy), u64 (ref), setWorkInProgressVersion (copy), console (copy), markSourceAsDirty (copy), Error (copy)
+	if __DEV__ then
+		warnAboutMultipleRenderersDEV(p22)
+	end
+
+	local v190 = p22._getVersion(p22._source)
+	local v191 = getWorkInProgressVersion(p22)
+	local v192
+
+	if v191 ~= nil then
+		v192 = v191 == v190
+	else
+		v192 = isSubsetOfLanes(u64, p21.mutableReadLanes)
+
+		if v192 then
+			setWorkInProgressVersion(p22, v190)
+		end
+	end
+
+	if v192 then
+		local v193 = p23(p22._source)
+
+		if __DEV__ and type(v193) == "function" then
+			console.error("Mutable source should not return a function as the snapshot value. Functions may close over mutable values and cause tearing.")
+		end
+
+		return v193
+	end
+
+	markSourceAsDirty(p22)
+	error(Error.new("Cannot read from mutable source during the current render without tearing. This is a bug in React. Please file an issue."))
+end
+function useMutableSource(t12: {[any]: any}, p24, p25, p26) -- line: 963
+	-- upvalues: getWorkInProgressRoot (copy), invariant (copy), ReactCurrentDispatcher (copy), u67 (ref), u65 (ref), __DEV__ (copy), console (copy), requestUpdateLane (copy), markRootMutableRead (copy), markRootEntangled (copy)
+	local v198 = getWorkInProgressRoot()
+
+	invariant(v198 ~= nil, "Expected a work-in-progress root. This is a bug in React. Please file an issue.")
+
+	local _getVersion = p24._getVersion
+	local v200 = _getVersion(p24._source)
+	local current = ReactCurrentDispatcher.current
+
+	assert(current ~= nil, "dispatcher was nil, this is a bug in React")
+
+	local v202, u203 = current.useState(function() -- line: 988
+		-- upvalues: v198 (copy), p24 (copy), p25 (copy)
+		return readFromUnsubcribedMutableSource(v198, p24, p25)
+	end)
+	local u204 = v202
+	local v205 = u67
+	local memoizedState = t12.memoizedState
+
+	if memoizedState.refs == nil then
+		error((tostring(debug.traceback())))
+	end
+
+	local refs = memoizedState.refs
+	local getSnapshot = refs.getSnapshot
+	local source = memoizedState.source
+	local subscribe = memoizedState.subscribe
+	local v211 = u65
+
+	t12.memoizedState = {
+		refs = refs,
+		source = p24,
+		subscribe = p26
+	}
+	current.useEffect(function() -- line: 1017
+		-- upvalues: refs (copy), p25 (copy), u203 (ref), _getVersion (copy), p24 (copy), v200 (copy), __DEV__ (copy), console (copy), u204 (ref), requestUpdateLane (copy), v211 (copy), markRootMutableRead (copy), v198 (copy), markRootEntangled (copy)
+		refs.getSnapshot = p25
+		refs.setSnapshot = u203
+
+		local v655 = _getVersion(p24._source)
+		local v656 = v200
+
+		if (v656 ~= v655 or v656 == 0 and 1 / v656 ~= 1 / v655) and (v656 == v656 or v655 == v655) then
+			local v657 = p25(p24._source)
+
+			if __DEV__ and type(v657) == "function" then
+				console.error("Mutable source should not return a function as the snapshot value. Functions may close over mutable values and cause tearing.")
+			end
+
+			local v658 = u204
+
+			if (v658 ~= v657 or v658 == 0 and 1 / v658 ~= 1 / v657) and (v658 == v658 or v657 == v657) then
+				u203(v657)
+
+				local v659 = requestUpdateLane(v211)
+
+				markRootMutableRead(v198, v659)
+			end
+
+			markRootEntangled(v198, v198.mutableReadLanes)
+		end
+	end, {
+		p25,
+		p24,
+		p26
+	})
+	current.useEffect(function() -- line: 1055
+		-- upvalues: refs (copy), p24 (copy), requestUpdateLane (copy), v211 (copy), markRootMutableRead (copy), v198 (copy), p26 (copy), __DEV__ (copy), console (copy)
+		local v660 = p26(p24._source, function() -- line: 1056
+			-- upvalues: refs (copy), p24 (copy), requestUpdateLane (copy), v211 (copy), markRootMutableRead (copy), v198 (copy)
+			local getSnapshot2 = refs.getSnapshot
+			local setSnapshot = refs.setSnapshot
+			local ok, result = pcall(function() -- line: 1061
+				-- upvalues: setSnapshot (copy), getSnapshot2 (copy), p24 (copy), requestUpdateLane (copy), v211 (copy), markRootMutableRead (copy), v198 (copy)
+				setSnapshot(getSnapshot2(p24._source))
+
+				local v666 = requestUpdateLane(v211)
+
+				markRootMutableRead(v198, v666)
+			end)
+
+			if not ok then
+				setSnapshot(function() -- line: 1075
+					-- upvalues: result (copy)
+					error(result)
+				end)
+			end
+		end)
+
+		if __DEV__ and type(v660) ~= "function" then
+			console.error("Mutable source subscribe function must return an unsubscribe function.")
+		end
+
+		return v660
+	end, {
+		p24,
+		p26
+	})
+
+	if (getSnapshot ~= p25 or getSnapshot == 0 and 1 / getSnapshot ~= 1 / p25) and (getSnapshot == getSnapshot or p25 == p25) or (source ~= p24 or source == 0 and 1 / source ~= 1 / p24) and (source == source or p24 == p24) or (subscribe ~= p26 or subscribe == 0 and 1 / subscribe ~= 1 / p26) and (subscribe == subscribe or p26 == p26) then
+		local t13 = {
+			pending = nil,
+			dispatch = nil,
+			lastRenderedReducer = basicStateReducer,
+			lastRenderedState = u204
+		}
+		local v213 = u65
+
+		function u203(...) -- line: 1124
+			-- upvalues: v213 (copy), t13 (copy)
+			dispatchAction(v213, t13, ...)
+		end
+
+		t13.dispatch = u203
+		v205.queue = t13
+		v205.baseQueue = nil
+		u204 = readFromUnsubcribedMutableSource(v198, p24, p25)
+		v205.baseState = u204
+		v205.memoizedState = v205.baseState
+	end
+
+	return u204
+end
+function mountMutableSource(p27, p28, p29) -- line: 1138
+	-- upvalues: u67 (ref), u65 (ref)
+	local t14 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t14
+		u67 = t14
+	else
+		u67.next = t14
+		u67 = t14
+	end
+
+	local v218 = u67
+
+	v218.memoizedState = {
+		refs = {
+			setSnapshot = nil,
+			getSnapshot = p28
+		},
+		source = p27,
+		subscribe = p29
+	}
+
+	return useMutableSource(v218, p27, p28, p29)
+end
+function updateMutableSource(p30, p31, p32) -- line: 1161
+	-- upvalues: updateWorkInProgressHook (copy)
+	local v222 = updateWorkInProgressHook()
+
+	return useMutableSource(v222, p30, p31, p32)
+end
+function mountState(p33) -- line: 1176
+	-- upvalues: u67 (ref), u65 (ref)
+	local t15 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t15
+		u67 = t15
+	else
+		u67.next = t15
+		u67 = t15
+	end
+
+	local v225 = u67
+
+	if type(p33) == "function" then
+		p33 = p33()
+	end
+
+	v225.baseState = p33
+	v225.memoizedState = v225.baseState
+
+	local t16 = {
+		pending = nil,
+		dispatch = nil,
+		lastRenderedReducer = nil,
+		lastRenderedState = p33,
+		lastRenderedReducer = basicStateReducer
+	}
+
+	v225.queue = t16
+
+	local v227 = u65
+
+	local function v228(p34, ...) -- line: 1198
+		-- upvalues: v227 (copy), t16 (copy)
+		dispatchAction(v227, t16, p34, ...)
+	end
+
+	t16.dispatch = v228
+
+	return v225.memoizedState, v228
+end
+function updateState(p35) -- line: 1207
+	return updateReducer(basicStateReducer, p35)
+end
+function rerenderState(p36) -- line: 1211
+	return rerenderReducer(basicStateReducer, p36)
+end
+
+local function pushEffect(p37, p38, p39, p40) -- line: 1215
+	-- upvalues: u65 (ref)
+	local t17 = {
+		next = nil,
+		tag = p37,
+		create = p38,
+		destroy = p39,
+		deps = p40
+	}
+	local updateQueue = u65.updateQueue
+
+	if updateQueue == nil then
+		local t18 = {
+			lastEffect = nil
+		}
+
+		u65.updateQueue = t18
+		t17.next = t17
+		t18.lastEffect = t17
+
+		return t17
+	end
+
+	local lastEffect = updateQueue.lastEffect
+
+	if lastEffect == nil then
+		updateQueue.lastEffect = t17
+		t17.next = t17
+
+		return t17
+	end
+
+	local next = lastEffect.next
+
+	lastEffect.next = t17
+	t17.next = next
+	updateQueue.lastEffect = t17
+
+	return t17
+end
+
+function mountBinding(p41) -- line: 1251
+	-- upvalues: u67 (ref), u65 (ref), createBinding (copy)
+	local t19 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t19
+		u67 = t19
+	else
+		u67.next = t19
+		u67 = t19
+	end
+
+	local v242 = u67
+	local v243, v244 = createBinding(p41)
+
+	v242.memoizedState = {
+		v243,
+		v244
+	}
+
+	return v243, v244
+end
+function updateBinding(_) -- line: 1260
+	-- upvalues: updateWorkInProgressHook (copy)
+	return unpack(updateWorkInProgressHook().memoizedState)
+end
+function mountRef(p43) -- line: 1265
+	-- upvalues: u67 (ref), u65 (ref), createRef (copy)
+	local t20 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t20
+		u67 = t20
+	else
+		u67.next = t20
+		u67 = t20
+	end
+
+	local v248 = u67
+	local v249 = createRef()
+
+	v249.current = p43
+	v248.memoizedState = v249
+
+	return v249
+end
+function updateRef(_) -- line: 1277
+	-- upvalues: updateWorkInProgressHook (copy)
+	return updateWorkInProgressHook().memoizedState
+end
+
+local function mountEffectImpl(p45, p46, p47, p48) -- line: 1282
+	-- upvalues: u67 (ref), u65 (ref), pushEffect (copy), HasEffect (copy)
+	local t21 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t21
+		u67 = t21
+	else
+		u67.next = t21
+		u67 = t21
+	end
+
+	local v256 = u67
+
+	u65.flags = bit32.bor(u65.flags, p45)
+	v256.memoizedState = pushEffect(bit32.bor(HasEffect, p46), p47, nil, p48)
+end
+
+function updateEffectImpl(p49, p50, p51, t22: {[any]: any}?) -- line: 1294
+	-- upvalues: updateWorkInProgressHook (copy), u66 (ref), areHookInputsEqual (copy), pushEffect (copy), u65 (ref), HasEffect (copy)
+	local v261 = updateWorkInProgressHook()
+	local destroy = nil
+
+	if u66 ~= nil then
+		local memoizedState = u66.memoizedState
+
+		destroy = memoizedState.destroy
+
+		if t22 ~= nil then
+			local deps = memoizedState.deps
+
+			if areHookInputsEqual(t22, deps) then
+				v261.memoizedState = pushEffect(p50, p51, destroy, t22)
+
+				return
+			end
+		end
+	end
+
+	u65.flags = bit32.bor(u65.flags, p49)
+	v261.memoizedState = pushEffect(bit32.bor(HasEffect, p50), p51, destroy, t22)
+end
+
+local function mountEffect(p52: ((...any) -> ...any), t23: {[any]: any}?) -- line: 1320
+	-- upvalues: __DEV__ (copy), ReactGlobals (copy), warnIfNotCurrentlyActingEffectsInDEV (copy), u65 (ref), enableDoubleInvokingEffects (copy), MountPassiveDev (copy), Passive (copy), PassiveStatic (copy), Passive2 (copy), u67 (ref), pushEffect (copy), HasEffect (copy)
+	if __DEV__ and (type(_G.jest) ~= "nil" or ReactGlobals.__TESTEZ_RUNNING_TEST__) then
+		warnIfNotCurrentlyActingEffectsInDEV(u65)
+	end
+
+	if __DEV__ and enableDoubleInvokingEffects then
+		local v267 = bit32.bor(MountPassiveDev, Passive, PassiveStatic)
+		local v268 = Passive2
+		local t24 = {
+			memoizedState = nil,
+			baseState = nil,
+			baseQueue = nil,
+			queue = nil,
+			next = nil
+		}
+
+		if u67 == nil then
+			u65.memoizedState = t24
+			u67 = t24
+		else
+			u67.next = t24
+			u67 = t24
+		end
+
+		local v270 = u67
+
+		u65.flags = bit32.bor(u65.flags, v267)
+		v270.memoizedState = pushEffect(bit32.bor(HasEffect, v268), p52, nil, t23)
+
+		return
+	end
+
+	local v271 = bit32.bor(Passive, PassiveStatic)
+	local v272 = Passive2
+	local t25 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t25
+		u67 = t25
+	else
+		u67.next = t25
+		u67 = t25
+	end
+
+	local v274 = u67
+
+	u65.flags = bit32.bor(u65.flags, v271)
+	v274.memoizedState = pushEffect(bit32.bor(HasEffect, v272), p52, nil, t23)
+end
+local function updateEffect(p53: ((...any) -> ...any), t26: {[any]: any}?) -- line: 1350
+	-- upvalues: __DEV__ (copy), ReactGlobals (copy), warnIfNotCurrentlyActingEffectsInDEV (copy), u65 (ref), Passive (copy), Passive2 (copy)
+	if __DEV__ and (type(_G.jest) ~= "nil" or ReactGlobals.__TESTEZ_RUNNING_TEST__) then
+		warnIfNotCurrentlyActingEffectsInDEV(u65)
+	end
+
+	updateEffectImpl(Passive, Passive2, p53, t26)
+end
+local function mountLayoutEffect(p54: ((...any) -> ...any), t27: {[any]: any}?) -- line: 1365
+	-- upvalues: __DEV__ (copy), enableDoubleInvokingEffects (copy), MountLayoutDev (copy), Update (copy), Layout (copy), u67 (ref), u65 (ref), pushEffect (copy), HasEffect (copy)
+	if __DEV__ and enableDoubleInvokingEffects then
+		local v279 = bit32.bor(MountLayoutDev, Update)
+		local v280 = Layout
+		local t28 = {
+			memoizedState = nil,
+			baseState = nil,
+			baseQueue = nil,
+			queue = nil,
+			next = nil
+		}
+
+		if u67 == nil then
+			u65.memoizedState = t28
+			u67 = t28
+		else
+			u67.next = t28
+			u67 = t28
+		end
+
+		local v282 = u67
+
+		u65.flags = bit32.bor(u65.flags, v279)
+		v282.memoizedState = pushEffect(bit32.bor(HasEffect, v280), p54, nil, t27)
+
+		return
+	end
+
+	local v283 = Update
+	local v284 = Layout
+	local t29 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t29
+		u67 = t29
+	else
+		u67.next = t29
+		u67 = t29
+	end
+
+	local v286 = u67
+
+	u65.flags = bit32.bor(u65.flags, v283)
+	v286.memoizedState = pushEffect(bit32.bor(HasEffect, v284), p54, nil, t27)
+end
+local function updateLayoutEffect(p55: ((...any) -> ...any), t30: {[any]: any}?) -- line: 1382
+	-- upvalues: Update (copy), Layout (copy)
+	updateEffectImpl(Update, Layout, p55, t30)
+end
+
+function imperativeHandleEffect(p56: ((...any) -> ...any), p57) -- line: 1390
+	-- upvalues: __DEV__ (copy), Object (copy), console (copy), Array (copy)
+	if p57 ~= nil and type(p57) == "function" then
+		p57((p56()))
+
+		return function() -- line: 1399
+			-- upvalues: p57 (copy)
+			return p57(nil)
+		end
+	end
+
+	if p57 ~= nil then
+		if __DEV__ and (getmetatable(p57) == nil or #Object.keys(p57) ~= 0) then
+			console.error("Expected useImperativeHandle() first argument to either be a ref callback or React.createRef() object. Instead received: %s.", "an object with keys {" .. Array.join(Object.keys(p57), ", ") .. "}")
+		end
+
+		p57.current = p56()
+
+		return function() -- line: 1424
+			-- upvalues: p57 (copy)
+			p57.current = nil
+		end
+	end
+
+	return nil
+end
+function mountImperativeHandle(p58, p59: ((...any) -> ...any), t31: {[any]: any}?) -- line: 1433
+	-- upvalues: __DEV__ (copy), console (copy), Array (copy), enableDoubleInvokingEffects (copy), mountEffectImpl (copy), MountLayoutDev (copy), Update (copy), Layout (copy)
+	if __DEV__ and type(p59) ~= "function" then
+		console.error("Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.", p59 == nil and "nil" or type(p59))
+	end
+
+	local v294 = if t31 == nil then nil else Array.concat(t31, { p58 })
+
+	if __DEV__ and enableDoubleInvokingEffects then
+		return mountEffectImpl(bit32.bor(MountLayoutDev, Update), Layout, function() -- line: 1456
+			-- upvalues: p59 (copy), p58 (copy)
+			return imperativeHandleEffect(p59, p58)
+		end, v294)
+	end
+
+	return mountEffectImpl(Update, Layout, function() -- line: 1462
+		-- upvalues: p59 (copy), p58 (copy)
+		return imperativeHandleEffect(p59, p58)
+	end, v294)
+end
+function updateImperativeHandle(p60, p61: ((...any) -> ...any), t32: {[any]: any}?) -- line: 1468
+	-- upvalues: __DEV__ (copy), console (copy), Update (copy), Layout (copy)
+	if __DEV__ and type(p61) ~= "function" then
+		local s3 = "nil"
+
+		if p61 then
+			s3 = type(p61)
+		end
+
+		console.error("Expected useImperativeHandle() second argument to be a function that creates a handle. Instead received: %s.", s3)
+	end
+
+	local v299 = nil
+
+	if t32 ~= nil then
+		v299 = table.clone(t32)
+		table.insert(v299, p60)
+	end
+
+	return updateEffectImpl(Update, Layout, function() -- line: 1495
+		-- upvalues: p61 (copy), p60 (copy)
+		return imperativeHandleEffect(p61, p60)
+	end, v299)
+end
+function mountDebugValue(_, _: ((...any) -> ...any)?) -- line: 1500
+end
+
+local _mountDebugValue = mountDebugValue
+
+function mountCallback(p64, t33: {[any]: any}?) -- line: 1508
+	-- upvalues: u67 (ref), u65 (ref)
+	local t34 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t34
+		u67 = t34
+	else
+		u67.next = t34
+		u67 = t34
+	end
+
+	u67.memoizedState = {
+		p64,
+		t33
+	}
+
+	return p64
+end
+function updateCallback(p65, t35: {[any]: any}?) -- line: 1516
+	-- upvalues: updateWorkInProgressHook (copy), areHookInputsEqual (copy)
+	local v307 = updateWorkInProgressHook()
+	local memoizedState = v307.memoizedState
+
+	if memoizedState ~= nil and t35 ~= nil then
+		local v309 = memoizedState[2]
+
+		if areHookInputsEqual(t35, v309) then
+			return memoizedState[1]
+		end
+	end
+
+	v307.memoizedState = {
+		p65,
+		t35
+	}
+
+	return p65
+end
+function mountMemo(p66: ((...any) -> ...any), t36: {[any]: any}?) -- line: 1535
+	-- upvalues: u67 (ref), u65 (ref)
+	local t37 = {
+		memoizedState = nil,
+		baseState = nil,
+		baseQueue = nil,
+		queue = nil,
+		next = nil
+	}
+
+	if u67 == nil then
+		u65.memoizedState = t37
+		u67 = t37
+	else
+		u67.next = t37
+		u67 = t37
+	end
+
+	local v313 = u67
+	local t38 = { p66() }
+
+	v313.memoizedState = {
+		t38,
+		t36
+	}
+
+	return unpack(t38)
+end
+function updateMemo(p67: ((...any) -> ...any), t39: {[any]: any}?) -- line: 1547
+	-- upvalues: updateWorkInProgressHook (copy), areHookInputsEqual (copy)
+	local v317 = updateWorkInProgressHook()
+	local memoizedState = v317.memoizedState
+
+	if memoizedState ~= nil and t39 ~= nil then
+		local v319 = memoizedState[2]
+
+		if areHookInputsEqual(t39, v319) then
+			return unpack(memoizedState[1])
+		end
+	end
+
+	local t40 = { p67() }
+
+	v317.memoizedState = {
+		t40,
+		t39
+	}
+
+	return unpack(t40)
+end
+function t2.getIsUpdatingOpaqueValueInRenderPhaseInDEV() -- line: 1697
+	-- upvalues: __DEV__ (copy)
+	if __DEV__ then
+		return false
+	end
+
+	return nil
+end
+function mountOpaqueIdentifier() -- line: 1719
+	-- upvalues: __DEV__ (copy), console (copy), makeClientId (copy), getIsHydrating (copy)
+	local v321 = nil
+
+	if __DEV__ then
+		console.warn("!!! unimplemented: warnOnOpaqueIdentifierAccessInDEV")
+	else
+		v321 = makeClientId
+	end
+
+	if getIsHydrating() then
+		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		print("UNIMPLEMENTED ERROR: ReactFiberHooks: getIsHydrating() true")
+		error("FIXME (roblox): ReactFiberHooks: getIsHydrating() true is unimplemented")
+
+		return nil
+	end
+
+	local v322 = v321()
+
+	mountState(v322)
+
+	return v322
+end
+function updateOpaqueIdentifier() -- line: 1786
+	local v323, _ = updateState(nil)
+
+	return v323
+end
+function rerenderOpaqueIdentifier() -- line: 1791
+	local v325, _ = rerenderState(nil)
+
+	return v325
+end
+function dispatchAction(p68, t41: {[any]: any}, p69, ...) -- line: 1796
+	-- upvalues: __DEV__ (copy), console (copy), requestEventTime (copy), requestUpdateLane (copy), u65 (ref), u68 (ref), u69 (ref), NoLanes (copy), ReactCurrentDispatcher (copy), t88 (ref), v61 (copy), ReactGlobals (copy), warnIfNotScopedWithMatchingAct (copy), warnIfNotCurrentlyActingUpdatesInDEV (copy), scheduleUpdateOnFiber (copy), enableDebugTracing (copy), DebugTracingMode (copy), getComponentName (copy), logStateUpdateScheduled (copy), enableSchedulingProfiler (copy), markStateUpdateScheduled (copy)
+	if __DEV__ then
+		local v330 = nil
+
+		if select("#", ...) == 1 then
+			v330 = select(1, ...)
+		end
+
+		if type(v330) == "function" then
+			console.error("State updates from the useState() and useReducer() Hooks don't support the second callback argument. To execute a side effect after rendering, declare it in the component body with useEffect().")
+		end
+	end
+
+	local v331 = requestEventTime()
+	local v332 = requestUpdateLane(p68)
+	local t42 = {
+		eagerReducer = nil,
+		eagerState = nil,
+		next = nil,
+		lane = v332,
+		action = p69
+	}
+	local pending = t41.pending
+
+	if pending == nil then
+		t42.next = t42
+	else
+		t42.next = pending.next
+		pending.next = t42
+	end
+
+	t41.pending = t42
+
+	local alternate = p68.alternate
+
+	if p68 == u65 or alternate ~= nil and alternate == u65 then
+		u68 = true
+		u69 = true
+	else
+		if p68.lanes == NoLanes and (alternate == nil or alternate.lanes == NoLanes) then
+			local lastRenderedReducer = t41.lastRenderedReducer
+
+			if lastRenderedReducer ~= nil then
+				local current = nil
+
+				if __DEV__ then
+					current = ReactCurrentDispatcher.current
+					ReactCurrentDispatcher.current = t88
+				end
+
+				local lastRenderedState = t41.lastRenderedState
+				local ok, result = pcall(lastRenderedReducer, lastRenderedState, p69)
+
+				if ok then
+					t42.eagerReducer = lastRenderedReducer
+					t42.eagerState = result
+				end
+
+				if __DEV__ then
+					ReactCurrentDispatcher.current = current
+				end
+
+				if result == lastRenderedState and (result ~= 0 or 1 / result == 1 / lastRenderedState) or result ~= result and lastRenderedState ~= lastRenderedState then
+					if v61 then
+						if pending == nil then
+							t41.pending = nil
+
+							return
+						end
+
+						pending.next = t42.next
+						t41.pending = pending
+					end
+
+					return
+				end
+
+				if ok then
+				end
+			end
+		end
+
+		if __DEV__ and (type(_G.jest) ~= "nil" or ReactGlobals.__TESTEZ_RUNNING_TEST__) then
+			warnIfNotScopedWithMatchingAct(p68)
+			warnIfNotCurrentlyActingUpdatesInDEV(p68)
+		end
+
+		scheduleUpdateOnFiber(p68, v332, v331)
+	end
+
+	if __DEV__ and enableDebugTracing and bit32.band(p68.mode, DebugTracingMode) ~= 0 then
+		local v341 = getComponentName(p68.type) or "Unknown"
+
+		logStateUpdateScheduled(v341, v332, p69)
+	end
+
+	if enableSchedulingProfiler then
+		markStateUpdateScheduled(p68, v332)
+	end
+end
+
+local t43 = {
+	readContext = readContext,
+	useCallback = throwInvalidHookError,
+	useContext = throwInvalidHookError,
+	useEffect = throwInvalidHookError,
+	useImperativeHandle = throwInvalidHookError,
+	useLayoutEffect = throwInvalidHookError,
+	useMemo = throwInvalidHookError,
+	useReducer = throwInvalidHookError,
+	useRef = throwInvalidHookError,
+	useBinding = throwInvalidHookError,
+	useState = throwInvalidHookError,
+	useDebugValue = throwInvalidHookError,
+	useMutableSource = throwInvalidHookError,
+	useOpaqueIdentifier = throwInvalidHookError,
+	unstable_isNewReconciler = enableNewReconciler
+}
+
+t2.ContextOnlyDispatcher = t43
+
+local t44 = {
+	readContext = readContext,
+	useCallback = mountCallback,
+	useContext = readContext,
+	useEffect = mountEffect,
+	useImperativeHandle = mountImperativeHandle,
+	useLayoutEffect = mountLayoutEffect,
+	useMemo = mountMemo,
+	useReducer = mountReducer,
+	useRef = mountRef,
+	useBinding = mountBinding,
+	useState = mountState,
+	useDebugValue = mountDebugValue,
+	useMutableSource = mountMutableSource,
+	useOpaqueIdentifier = mountOpaqueIdentifier,
+	unstable_isNewReconciler = enableNewReconciler
+}
+local t45 = {
+	readContext = readContext,
+	useCallback = updateCallback,
+	useContext = readContext,
+	useEffect = updateEffect,
+	useImperativeHandle = updateImperativeHandle,
+	useLayoutEffect = updateLayoutEffect,
+	useMemo = updateMemo,
+	useReducer = updateReducer,
+	useRef = updateRef,
+	useBinding = updateBinding,
+	useState = updateState,
+	useDebugValue = _mountDebugValue,
+	useMutableSource = updateMutableSource,
+	useOpaqueIdentifier = updateOpaqueIdentifier,
+	unstable_isNewReconciler = enableNewReconciler
+}
+local t46 = {
+	readContext = readContext,
+	useCallback = updateCallback,
+	useContext = readContext,
+	useEffect = updateEffect,
+	useImperativeHandle = updateImperativeHandle,
+	useLayoutEffect = updateLayoutEffect,
+	useMemo = updateMemo,
+	useReducer = rerenderReducer,
+	useRef = updateRef,
+	useBinding = updateBinding,
+	useState = rerenderState,
+	useDebugValue = _mountDebugValue,
+	useMutableSource = updateMutableSource,
+	useOpaqueIdentifier = rerenderOpaqueIdentifier,
+	unstable_isNewReconciler = enableNewReconciler
+}
+
+if __DEV__ then
+	t53 = {
+		readContext = function(p70, p71) -- line: 2041
+			-- upvalues: readContext (copy)
+			return readContext(p70, p71)
+		end,
+		useCallback = function(p72, t47: {[any]: any}?) -- line: 2047
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), console (copy)
+			u70 = "useCallback"
+
+			local g350 = nil
+			local v347 = nil
+
+			if __DEV__ then
+				local v346 = u70
+
+				if t4 == nil then
+					t4 = { v346 }
+				else
+					table.insert(t4, v346)
+				end
+			end
+
+			if __DEV__ and t47 ~= nil then
+				if type(t47) ~= "table" then
+					v347 = false
+				else
+					for v348, _ in t47 do
+						if type(v348) ~= "number" then
+							v347 = false
+							g350 = true
+						end
+
+						if g350 then
+							break
+						end
+					end
+
+					if not g350 then
+						v347 = true
+					end
+				end
+
+				g350 = false
+
+				if not v347 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t47)))
+				end
+			end
+
+			return mountCallback(p72, t47)
+		end,
+		useContext = function(p73, p74) -- line: 2053
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), readContext (copy)
+			u70 = "useContext"
+
+			if __DEV__ then
+				local v353 = u70
+
+				if t4 == nil then
+					t4 = { v353 }
+				else
+					table.insert(t4, v353)
+				end
+			end
+
+			return readContext(p73, p74)
+		end,
+		useEffect = function(p75: ((...any) -> ...any), t48: {[any]: any}?) -- line: 2061
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), console (copy), mountEffect (copy)
+			u70 = "useEffect"
+
+			local g360 = nil
+			local v357 = nil
+
+			if __DEV__ then
+				local v356 = u70
+
+				if t4 == nil then
+					t4 = { v356 }
+				else
+					table.insert(t4, v356)
+				end
+			end
+
+			if __DEV__ and t48 ~= nil then
+				if type(t48) ~= "table" then
+					v357 = false
+				else
+					for v358, _ in t48 do
+						if type(v358) ~= "number" then
+							v357 = false
+							g360 = true
+						end
+
+						if g360 then
+							break
+						end
+					end
+
+					if not g360 then
+						v357 = true
+					end
+				end
+
+				g360 = false
+
+				if not v357 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t48)))
+				end
+			end
+
+			return mountEffect(p75, t48)
+		end,
+		useImperativeHandle = function(p76, p77: ((...any) -> ...any), t49: {[any]: any}?) -- line: 2071
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), console (copy)
+			u70 = "useImperativeHandle"
+
+			local g368 = nil
+			local v365 = nil
+
+			if __DEV__ then
+				local v364 = u70
+
+				if t4 == nil then
+					t4 = { v364 }
+				else
+					table.insert(t4, v364)
+				end
+			end
+
+			if __DEV__ and t49 ~= nil then
+				if type(t49) ~= "table" then
+					v365 = false
+				else
+					for v366, _ in t49 do
+						if type(v366) ~= "number" then
+							v365 = false
+							g368 = true
+						end
+
+						if g368 then
+							break
+						end
+					end
+
+					if not g368 then
+						v365 = true
+					end
+				end
+
+				g368 = false
+
+				if not v365 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t49)))
+				end
+			end
+
+			return mountImperativeHandle(p76, p77, t49)
+		end,
+		useLayoutEffect = function(p78: ((...any) -> ...any), t50: {[any]: any}?) -- line: 2081
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), console (copy), mountLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+
+			local g375 = nil
+			local v372 = nil
+
+			if __DEV__ then
+				local v371 = u70
+
+				if t4 == nil then
+					t4 = { v371 }
+				else
+					table.insert(t4, v371)
+				end
+			end
+
+			if __DEV__ and t50 ~= nil then
+				if type(t50) ~= "table" then
+					v372 = false
+				else
+					for v373, _ in t50 do
+						if type(v373) ~= "number" then
+							v372 = false
+							g375 = true
+						end
+
+						if g375 then
+							break
+						end
+					end
+
+					if not g375 then
+						v372 = true
+					end
+				end
+
+				g375 = false
+
+				if not v372 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t50)))
+				end
+			end
+
+			return mountLayoutEffect(p78, t50)
+		end,
+		useMemo = function(p79: ((...any) -> ...any), t51: {[any]: any}?) -- line: 2092
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), console (copy), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useMemo"
+
+			local g382 = nil
+			local v379 = nil
+
+			if __DEV__ then
+				local v378 = u70
+
+				if t4 == nil then
+					t4 = { v378 }
+				else
+					table.insert(t4, v378)
+				end
+			end
+
+			if __DEV__ and t51 ~= nil then
+				if type(t51) ~= "table" then
+					v379 = false
+				else
+					for v380, _ in t51 do
+						if type(v380) ~= "number" then
+							v379 = false
+							g382 = true
+						end
+
+						if g382 then
+							break
+						end
+					end
+
+					if not g382 then
+						v379 = true
+					end
+				end
+
+				g382 = false
+
+				if not v379 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t51)))
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local t52 = { pcall(mountMemo, p79, t51) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t52[1] then
+				error(t52[2])
+			end
+
+			return unpack(t52, 2)
+		end,
+		useReducer = function(p80: ((...any) -> ...any), p81, p82: ((...any) -> ...any)?) -- line: 2110
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useReducer"
+
+			if __DEV__ then
+				local v388 = u70
+
+				if t4 == nil then
+					t4 = { v388 }
+				else
+					table.insert(t4, v388)
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v392 = pcall(mountReducer, p80, p81, p82)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v392
+		end,
+		useRef = function(p83) -- line: 2128
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref)
+			u70 = "useRef"
+
+			if __DEV__ then
+				local v394 = u70
+
+				if t4 == nil then
+					t4 = { v394 }
+				else
+					table.insert(t4, v394)
+				end
+			end
+
+			return mountRef(p83)
+		end,
+		useBinding = function(p84) -- line: 2134
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref)
+			u70 = "useBinding"
+
+			if __DEV__ then
+				local v396 = u70
+
+				if t4 == nil then
+					t4 = { v396 }
+				else
+					table.insert(t4, v396)
+				end
+			end
+
+			return mountBinding(p84)
+		end,
+		useState = function(p85) -- line: 2139
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useState"
+
+			if __DEV__ then
+				local v398 = u70
+
+				if t4 == nil then
+					t4 = { v398 }
+				else
+					table.insert(t4, v398)
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v402 = pcall(mountState, p85)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v402
+		end,
+		useDebugValue = function(p86, p87: ((...any) -> ...any)?) -- line: 2155
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref)
+			u70 = "useDebugValue"
+
+			if __DEV__ then
+				local v405 = u70
+
+				if t4 == nil then
+					t4 = { v405 }
+				else
+					table.insert(t4, v405)
+				end
+			end
+
+			return mountDebugValue(p86, p87)
+		end,
+		useMutableSource = function(p88, p89, p90) -- line: 2170
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref)
+			u70 = "useMutableSource"
+
+			if __DEV__ then
+				local v409 = u70
+
+				if t4 == nil then
+					t4 = { v409 }
+				else
+					table.insert(t4, v409)
+				end
+			end
+
+			return mountMutableSource(p88, p89, p90)
+		end,
+		useOpaqueIdentifier = function() -- line: 2185
+			-- upvalues: u70 (ref), __DEV__ (copy), t4 (ref)
+			u70 = "useOpaqueIdentifier"
+
+			if __DEV__ then
+				local v410 = u70
+
+				if t4 == nil then
+					t4 = { v410 }
+				else
+					table.insert(t4, v410)
+				end
+			end
+
+			return mountOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t60 = {
+		readContext = function(p91, p92) -- line: 2195
+			-- upvalues: readContext (copy)
+			return readContext(p91, p92)
+		end,
+		useCallback = function(p93, t54: {[any]: any}?) -- line: 2201
+			-- upvalues: u70 (ref), __DEV__ (copy), console (copy)
+			u70 = "useCallback"
+			updateHookTypesDev()
+
+			if __DEV__ and t54 ~= nil then
+				local v415, g418
+
+				if type(t54) ~= "table" then
+					v415 = false
+				else
+					g418 = nil
+					v415 = nil
+
+					for v416, _ in t54 do
+						if type(v416) ~= "number" then
+							v415 = false
+							g418 = true
+						end
+
+						if g418 then
+							break
+						end
+					end
+
+					if not g418 then
+						v415 = true
+					end
+				end
+
+				g418 = false
+
+				if not v415 then
+					console.error("%s received a final argument that is not an array (instead, received `%s`). When specified, the final argument must be an array.", u70, (type(t54)))
+				end
+			end
+
+			return mountCallback(p93, t54)
+		end,
+		useContext = function(p94, p95) -- line: 2207
+			-- upvalues: u70 (ref), readContext (copy)
+			u70 = "useContext"
+			updateHookTypesDev()
+
+			return readContext(p94, p95)
+		end,
+		useEffect = function(p96: ((...any) -> ...any), t55: {[any]: any}?) -- line: 2215
+			-- upvalues: u70 (ref), mountEffect (copy)
+			u70 = "useEffect"
+			updateHookTypesDev()
+
+			return mountEffect(p96, t55)
+		end,
+		useImperativeHandle = function(p97, p98: ((...any) -> ...any), t56: {[any]: any}?) -- line: 2224
+			-- upvalues: u70 (ref)
+			u70 = "useImperativeHandle"
+			updateHookTypesDev()
+
+			return mountImperativeHandle(p97, p98, t56)
+		end,
+		useLayoutEffect = function(p99: ((...any) -> ...any), t57: {[any]: any}?) -- line: 2233
+			-- upvalues: u70 (ref), mountLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			updateHookTypesDev()
+
+			return mountLayoutEffect(p99, t57)
+		end,
+		useMemo = function(p100: ((...any) -> ...any), t58: {[any]: any}?) -- line: 2243
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useMemo"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local t59 = { pcall(mountMemo, p100, t58) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t59[1] then
+				error(t59[2])
+			end
+
+			return unpack(t59, 2)
+		end,
+		useReducer = function(p101: ((...any) -> ...any), p102, p103: ((...any) -> ...any)?) -- line: 2259
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useReducer"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v438 = pcall(mountReducer, p101, p102, p103)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v438
+		end,
+		useRef = function(p104) -- line: 2277
+			-- upvalues: u70 (ref)
+			u70 = "useRef"
+			updateHookTypesDev()
+
+			return mountRef(p104)
+		end,
+		useBinding = function(p105) -- line: 2283
+			-- upvalues: u70 (ref)
+			u70 = "useBinding"
+			updateHookTypesDev()
+
+			return mountBinding(p105)
+		end,
+		useState = function(p106) -- line: 2288
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useState"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v445 = pcall(mountState, p106)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v445
+		end,
+		useDebugValue = function(p107, p108: ((...any) -> ...any)?) -- line: 2304
+			-- upvalues: u70 (ref)
+			u70 = "useDebugValue"
+			updateHookTypesDev()
+
+			return mountDebugValue(p107, p108)
+		end,
+		useMutableSource = function(p109, p110, p111) -- line: 2319
+			-- upvalues: u70 (ref)
+			u70 = "useMutableSource"
+			updateHookTypesDev()
+
+			return mountMutableSource(p109, p110, p111)
+		end,
+		useOpaqueIdentifier = function() -- line: 2334
+			-- upvalues: u70 (ref)
+			u70 = "useOpaqueIdentifier"
+			updateHookTypesDev()
+
+			return mountOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t67 = {
+		readContext = function(p112, p113) -- line: 2344
+			-- upvalues: readContext (copy)
+			return readContext(p112, p113)
+		end,
+		useCallback = function(p114, t61: {[any]: any}?) -- line: 2350
+			-- upvalues: u70 (ref)
+			u70 = "useCallback"
+			updateHookTypesDev()
+
+			return updateCallback(p114, t61)
+		end,
+		useContext = function(p115, p116) -- line: 2355
+			-- upvalues: u70 (ref), readContext (copy)
+			u70 = "useContext"
+			updateHookTypesDev()
+
+			return readContext(p115, p116)
+		end,
+		useEffect = function(p117: ((...any) -> ...any), t62: {[any]: any}?) -- line: 2363
+			-- upvalues: u70 (ref), updateEffect (copy)
+			u70 = "useEffect"
+			updateHookTypesDev()
+
+			return updateEffect(p117, t62)
+		end,
+		useImperativeHandle = function(p118, p119: ((...any) -> ...any), t63: {[any]: any}?) -- line: 2372
+			-- upvalues: u70 (ref)
+			u70 = "useImperativeHandle"
+			updateHookTypesDev()
+
+			return updateImperativeHandle(p118, p119, t63)
+		end,
+		useLayoutEffect = function(p120: ((...any) -> ...any), t64: {[any]: any}?) -- line: 2381
+			-- upvalues: u70 (ref), updateLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			updateHookTypesDev()
+
+			return updateLayoutEffect(p120, t64)
+		end,
+		useMemo = function(p121: ((...any) -> ...any), t65: {[any]: any}?) -- line: 2391
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useMemo"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local t66 = { pcall(updateMemo, p121, t65) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t66[1] then
+				error(t66[2])
+			end
+
+			return unpack(t66, 2)
+		end,
+		useReducer = function(p122: ((...any) -> ...any), p123, p124: ((...any) -> ...any)?) -- line: 2407
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useReducer"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v474 = pcall(updateReducer, p122, p123, p124)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v474
+		end,
+		useRef = function(p125) -- line: 2425
+			-- upvalues: u70 (ref)
+			u70 = "useRef"
+			updateHookTypesDev()
+
+			return updateRef(p125)
+		end,
+		useBinding = function(p126) -- line: 2431
+			-- upvalues: u70 (ref)
+			u70 = "useBinding"
+			updateHookTypesDev()
+
+			return updateBinding(p126)
+		end,
+		useState = function(p127) -- line: 2436
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useState"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v481 = pcall(updateState, p127)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v481
+		end,
+		useDebugValue = function(p128, p129: ((...any) -> ...any)?) -- line: 2452
+			-- upvalues: u70 (ref), _mountDebugValue (copy)
+			u70 = "useDebugValue"
+			updateHookTypesDev()
+
+			return _mountDebugValue(p128, p129)
+		end,
+		useMutableSource = function(p130, p131, p132) -- line: 2467
+			-- upvalues: u70 (ref)
+			u70 = "useMutableSource"
+			updateHookTypesDev()
+
+			return updateMutableSource(p130, p131, p132)
+		end,
+		useOpaqueIdentifier = function() -- line: 2482
+			-- upvalues: u70 (ref)
+			u70 = "useOpaqueIdentifier"
+			updateHookTypesDev()
+
+			return updateOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t74 = {
+		readContext = function(p133, p134) -- line: 2492
+			-- upvalues: readContext (copy)
+			return readContext(p133, p134)
+		end,
+		useCallback = function(p135, t68: {[any]: any}?) -- line: 2498
+			-- upvalues: u70 (ref)
+			u70 = "useCallback"
+			updateHookTypesDev()
+
+			return updateCallback(p135, t68)
+		end,
+		useContext = function(p136, p137) -- line: 2503
+			-- upvalues: u70 (ref), readContext (copy)
+			u70 = "useContext"
+			updateHookTypesDev()
+
+			return readContext(p136, p137)
+		end,
+		useEffect = function(p138: ((...any) -> ...any), t69: {[any]: any}?) -- line: 2511
+			-- upvalues: u70 (ref), updateEffect (copy)
+			u70 = "useEffect"
+			updateHookTypesDev()
+
+			return updateEffect(p138, t69)
+		end,
+		useImperativeHandle = function(p139, p140: ((...any) -> ...any), t70: {[any]: any}?) -- line: 2520
+			-- upvalues: u70 (ref)
+			u70 = "useImperativeHandle"
+			updateHookTypesDev()
+
+			return updateImperativeHandle(p139, p140, t70)
+		end,
+		useLayoutEffect = function(p141: ((...any) -> ...any), t71: {[any]: any}?) -- line: 2529
+			-- upvalues: u70 (ref), updateLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			updateHookTypesDev()
+
+			return updateLayoutEffect(p141, t71)
+		end,
+		useMemo = function(p142: ((...any) -> ...any), t72: {[any]: any}?) -- line: 2539
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t95 (ref)
+			u70 = "useMemo"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t95
+
+			local t73 = { pcall(updateMemo, p142, t72) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t73[1] then
+				error(t73[2])
+			end
+
+			return unpack(t73, 2)
+		end,
+		useReducer = function(p143: ((...any) -> ...any), p144, p145: ((...any) -> ...any)?) -- line: 2555
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t95 (ref)
+			u70 = "useReducer"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t95
+
+			local ok, result, v510 = pcall(rerenderReducer, p143, p144, p145)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v510
+		end,
+		useRef = function(p146) -- line: 2574
+			-- upvalues: u70 (ref)
+			u70 = "useRef"
+			updateHookTypesDev()
+
+			return updateRef(p146)
+		end,
+		useBinding = function(p147) -- line: 2580
+			-- upvalues: u70 (ref)
+			u70 = "useBinding"
+			updateHookTypesDev()
+
+			return updateBinding(p147)
+		end,
+		useState = function(p148) -- line: 2585
+			-- upvalues: u70 (ref), ReactCurrentDispatcher (copy), t95 (ref)
+			u70 = "useState"
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t95
+
+			local ok, result, v517 = pcall(rerenderState, p148)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v517
+		end,
+		useDebugValue = function(p149, p150: ((...any) -> ...any)?) -- line: 2601
+			-- upvalues: u70 (ref), _mountDebugValue (copy)
+			u70 = "useDebugValue"
+			updateHookTypesDev()
+
+			return _mountDebugValue(p149, p150)
+		end,
+		useMutableSource = function(p151, p152, p153) -- line: 2616
+			-- upvalues: u70 (ref)
+			u70 = "useMutableSource"
+			updateHookTypesDev()
+
+			return updateMutableSource(p151, p152, p153)
+		end,
+		useOpaqueIdentifier = function() -- line: 2631
+			-- upvalues: u70 (ref)
+			u70 = "useOpaqueIdentifier"
+			updateHookTypesDev()
+
+			return rerenderOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t81 = {
+		readContext = function(p154, p155) -- line: 2641
+			-- upvalues: console (copy), readContext (copy)
+			console.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().")
+
+			return readContext(p154, p155)
+		end,
+		useCallback = function(p156, t75: {[any]: any}?) -- line: 2648
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useCallback"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v527 = u70
+
+				if t4 == nil then
+					t4 = { v527 }
+				else
+					table.insert(t4, v527)
+				end
+			end
+
+			return mountCallback(p156, t75)
+		end,
+		useContext = function(p157, p158) -- line: 2654
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), readContext (copy)
+			u70 = "useContext"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v530 = u70
+
+				if t4 == nil then
+					t4 = { v530 }
+				else
+					table.insert(t4, v530)
+				end
+			end
+
+			return readContext(p157, p158)
+		end,
+		useEffect = function(p159: ((...any) -> ...any), t76: {[any]: any}?) -- line: 2663
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), mountEffect (copy)
+			u70 = "useEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v533 = u70
+
+				if t4 == nil then
+					t4 = { v533 }
+				else
+					table.insert(t4, v533)
+				end
+			end
+
+			return mountEffect(p159, t76)
+		end,
+		useImperativeHandle = function(p160, p161: ((...any) -> ...any), t77: {[any]: any}?) -- line: 2673
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useImperativeHandle"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v537 = u70
+
+				if t4 == nil then
+					t4 = { v537 }
+				else
+					table.insert(t4, v537)
+				end
+			end
+
+			return mountImperativeHandle(p160, p161, t77)
+		end,
+		useLayoutEffect = function(p162: ((...any) -> ...any), t78: {[any]: any}?) -- line: 2683
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), mountLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v540 = u70
+
+				if t4 == nil then
+					t4 = { v540 }
+				else
+					table.insert(t4, v540)
+				end
+			end
+
+			return mountLayoutEffect(p162, t78)
+		end,
+		useMemo = function(p163: ((...any) -> ...any), t79: {[any]: any}?) -- line: 2694
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useMemo"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v543 = u70
+
+				if t4 == nil then
+					t4 = { v543 }
+				else
+					table.insert(t4, v543)
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local t80 = { pcall(mountMemo, p163, t79) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t80[1] then
+				error(t80[2])
+			end
+
+			return unpack(t80, 2)
+		end,
+		useReducer = function(p164: ((...any) -> ...any), p165, p166: ((...any) -> ...any)?) -- line: 2711
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useReducer"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v549 = u70
+
+				if t4 == nil then
+					t4 = { v549 }
+				else
+					table.insert(t4, v549)
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v553 = pcall(mountReducer, p164, p165, p166)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v553
+		end,
+		useRef = function(p167) -- line: 2730
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useRef"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v555 = u70
+
+				if t4 == nil then
+					t4 = { v555 }
+				else
+					table.insert(t4, v555)
+				end
+			end
+
+			return mountRef(p167)
+		end,
+		useBinding = function(p168) -- line: 2737
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useBinding"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v557 = u70
+
+				if t4 == nil then
+					t4 = { v557 }
+				else
+					table.insert(t4, v557)
+				end
+			end
+
+			return mountBinding(p168)
+		end,
+		useState = function(p169) -- line: 2743
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref), ReactCurrentDispatcher (copy), t81 (ref)
+			u70 = "useState"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v559 = u70
+
+				if t4 == nil then
+					t4 = { v559 }
+				else
+					table.insert(t4, v559)
+				end
+			end
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t81
+
+			local ok, result, v563 = pcall(mountState, p169)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v563
+		end,
+		useDebugValue = function(p170, p171: ((...any) -> ...any)?) -- line: 2760
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useDebugValue"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v566 = u70
+
+				if t4 == nil then
+					t4 = { v566 }
+				else
+					table.insert(t4, v566)
+				end
+			end
+
+			return mountDebugValue(p170, p171)
+		end,
+		useMutableSource = function(p172, p173, p174) -- line: 2778
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useMutableSource"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v570 = u70
+
+				if t4 == nil then
+					t4 = { v570 }
+				else
+					table.insert(t4, v570)
+				end
+			end
+
+			return mountMutableSource(p172, p173, p174)
+		end,
+		useOpaqueIdentifier = function() -- line: 2794
+			-- upvalues: u70 (ref), console (copy), __DEV__ (copy), t4 (ref)
+			u70 = "useOpaqueIdentifier"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+
+			if __DEV__ then
+				local v571 = u70
+
+				if t4 == nil then
+					t4 = { v571 }
+				else
+					table.insert(t4, v571)
+				end
+			end
+
+			return mountOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t88 = {
+		readContext = function(p175, p176) -- line: 2805
+			-- upvalues: console (copy), readContext (copy)
+			console.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().")
+
+			return readContext(p175, p176)
+		end,
+		useCallback = function(p177, t82: {[any]: any}?) -- line: 2812
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useCallback"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return mountCallback(p177, t82)
+		end,
+		useContext = function(p178, p179) -- line: 2818
+			-- upvalues: u70 (ref), console (copy), readContext (copy)
+			u70 = "useContext"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return readContext(p178, p179)
+		end,
+		useEffect = function(p180: ((...any) -> ...any), t83: {[any]: any}?) -- line: 2827
+			-- upvalues: u70 (ref), console (copy), updateEffect (copy)
+			u70 = "useEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateEffect(p180, t83)
+		end,
+		useImperativeHandle = function(p181, p182: ((...any) -> ...any), t84: {[any]: any}?) -- line: 2837
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useImperativeHandle"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateImperativeHandle(p181, p182, t84)
+		end,
+		useLayoutEffect = function(p183: ((...any) -> ...any), t85: {[any]: any}?) -- line: 2847
+			-- upvalues: u70 (ref), console (copy), updateLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateLayoutEffect(p183, t85)
+		end,
+		useMemo = function(p184: ((...any) -> ...any), t86: {[any]: any}?) -- line: 2858
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useMemo"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local t87 = { pcall(updateMemo, p184, t86) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t87[1] then
+				error(t87[2])
+			end
+
+			return unpack(t87, 2)
+		end,
+		useReducer = function(p185: ((...any) -> ...any), p186, p187: ((...any) -> ...any)?) -- line: 2875
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useReducer"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v595 = pcall(updateReducer, p185, p186, p187)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v595
+		end,
+		useRef = function(p188) -- line: 2895
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useRef"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateRef(p188)
+		end,
+		useBinding = function(p189) -- line: 2902
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useBinding"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateBinding(p189)
+		end,
+		useState = function(p190) -- line: 2908
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useState"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v602 = pcall(updateState, p190)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v602
+		end,
+		useDebugValue = function(p191, p192: ((...any) -> ...any)?) -- line: 2925
+			-- upvalues: u70 (ref), console (copy), _mountDebugValue (copy)
+			u70 = "useDebugValue"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return _mountDebugValue(p191, p192)
+		end,
+		useMutableSource = function(p193, p194, p195) -- line: 2943
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useMutableSource"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateMutableSource(p193, p194, p195)
+		end,
+		useOpaqueIdentifier = function() -- line: 2959
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useOpaqueIdentifier"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+	t95 = {
+		readContext = function(p196, p197) -- line: 2970
+			-- upvalues: console (copy), readContext (copy)
+			console.error("Context can only be read while React is rendering. In classes, you can read it in the render method or getDerivedStateFromProps. In function components, you can read it directly in the function body, but not inside Hooks like useReducer() or useMemo().")
+
+			return readContext(p196, p197)
+		end,
+		useCallback = function(p198, t89: {[any]: any}?) -- line: 2977
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useCallback"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateCallback(p198, t89)
+		end,
+		useContext = function(p199, p200) -- line: 2983
+			-- upvalues: u70 (ref), console (copy), readContext (copy)
+			u70 = "useContext"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return readContext(p199, p200)
+		end,
+		useEffect = function(p201: ((...any) -> ...any), t90: {[any]: any}?) -- line: 2992
+			-- upvalues: u70 (ref), console (copy), updateEffect (copy)
+			u70 = "useEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateEffect(p201, t90)
+		end,
+		useImperativeHandle = function(p202, p203: ((...any) -> ...any), t91: {[any]: any}?) -- line: 3002
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useImperativeHandle"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateImperativeHandle(p202, p203, t91)
+		end,
+		useLayoutEffect = function(p204: ((...any) -> ...any), t92: {[any]: any}?) -- line: 3012
+			-- upvalues: u70 (ref), console (copy), updateLayoutEffect (copy)
+			u70 = "useLayoutEffect"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateLayoutEffect(p204, t92)
+		end,
+		useMemo = function(p205: ((...any) -> ...any), t93: {[any]: any}?) -- line: 3023
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useMemo"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local t94 = { pcall(updateMemo, p205, t93) }
+
+			ReactCurrentDispatcher.current = current
+
+			if not t94[1] then
+				error(t94[2])
+			end
+
+			return unpack(t94, 2)
+		end,
+		useReducer = function(p206: ((...any) -> ...any), p207, p208: ((...any) -> ...any)?) -- line: 3040
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useReducer"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v631 = pcall(rerenderReducer, p206, p207, p208)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v631
+		end,
+		useRef = function(p209) -- line: 3060
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useRef"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateRef(p209)
+		end,
+		useBinding = function(p210) -- line: 3067
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useBinding"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateBinding(p210)
+		end,
+		useState = function(p211) -- line: 3073
+			-- upvalues: u70 (ref), console (copy), ReactCurrentDispatcher (copy), t88 (ref)
+			u70 = "useState"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			local current = ReactCurrentDispatcher.current
+
+			ReactCurrentDispatcher.current = t88
+
+			local ok, result, v638 = pcall(rerenderState, p211)
+
+			ReactCurrentDispatcher.current = current
+
+			if not ok then
+				error(result)
+			end
+
+			return result, v638
+		end,
+		useDebugValue = function(p212, p213: ((...any) -> ...any)?) -- line: 3090
+			-- upvalues: u70 (ref), console (copy), _mountDebugValue (copy)
+			u70 = "useDebugValue"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return _mountDebugValue(p212, p213)
+		end,
+		useMutableSource = function(p214, p215, p216) -- line: 3108
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useMutableSource"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return updateMutableSource(p214, p215, p216)
+		end,
+		useOpaqueIdentifier = function() -- line: 3124
+			-- upvalues: u70 (ref), console (copy)
+			u70 = "useOpaqueIdentifier"
+			console.error("Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. You can only call Hooks at the top level of your React function. For more information, see https://reactjs.org/link/rules-of-hooks")
+			updateHookTypesDev()
+
+			return rerenderOpaqueIdentifier()
+		end,
+		unstable_isNewReconciler = enableNewReconciler
+	}
+end
+
+function t2.renderWithHooks(p217, p218, p219: ((...any) -> ...any), p220, p221, p222) -- line: 3135
+	-- upvalues: u64 (ref), u65 (ref), __DEV__ (copy), t4 (ref), n1 (ref), NoLanes (copy), ReactCurrentDispatcher (copy), t67 (ref), t60 (ref), t53 (ref), t44 (copy), t45 (copy), u69 (ref), Error (copy), u66 (ref), u67 (ref), t74 (ref), t46 (copy), t43 (copy), u70 (ref), u68 (ref), getComponentName (copy)
+	u64 = p222
+	u65 = p218
+
+	if __DEV__ then
+		t4 = if p217 == nil then nil else p217._debugHookTypes
+		n1 = 0
+	end
+
+	p218.memoizedState = nil
+	p218.updateQueue = nil
+	p218.lanes = NoLanes
+
+	if __DEV__ then
+		if p217 ~= nil and p217.memoizedState ~= nil then
+			ReactCurrentDispatcher.current = t67
+		elseif t4 ~= nil then
+			ReactCurrentDispatcher.current = t60
+		else
+			ReactCurrentDispatcher.current = t53
+		end
+	else
+		ReactCurrentDispatcher.current = not (p217 ~= nil and p217.memoizedState ~= nil) and t44 or t45
+	end
+
+	local v650 = p219(p220, p221)
+
+	if u69 then
+		local n5 = 0
+
+		repeat
+			u69 = false
+
+			if n5 >= 25 then
+				error(Error.new("Too many re-renders. React limits the number of renders to prevent an infinite loop."))
+			end
+
+			n5 += 1
+			u66 = nil
+			u67 = nil
+			p218.updateQueue = nil
+
+			if __DEV__ then
+				n1 = 0
+			end
+
+			ReactCurrentDispatcher.current = __DEV__ and t74 or t46
+			v650 = p219(p220, p221)
+		until not u69
+	end
+
+	ReactCurrentDispatcher.current = t43
+
+	if __DEV__ then
+		p218._debugHookTypes = t4
+	end
+
+	local v652 = u66 ~= nil and u66.next ~= nil
+
+	u64 = NoLanes
+	u65 = nil
+	u66 = nil
+	u67 = nil
+
+	if __DEV__ then
+		u70 = nil
+		t4 = nil
+		n1 = 0
+	end
+
+	u68 = false
+
+	if v652 then
+		local s4 = "unknown"
+
+		if v650 and v650.type then
+			s4 = getComponentName(v650.type) or s4
+		end
+
+		error(Error.new("Rendered fewer hooks than expected. This may be caused by an accidental " .. "early return statement. Inside '" .. s4 .. "'"))
+	end
+
+	return v650
+end
+
+return t2

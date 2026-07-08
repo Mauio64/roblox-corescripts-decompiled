@@ -1,11 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ReactSceneUnderstanding");
-local _ = require(l_script_FirstAncestor_0.Parent.SceneUnderstanding);
-local v2 = require(l_script_FirstAncestor_0.SceneAnalysisContext);
-local v3 = require(l_script_FirstAncestor_0.useSourceAssets);
-return function(v4) --[[ Line: 32 ]] --[[ Name: useAssetsInRange ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    local v5 = v2.use();
-    return v3({
-        rangeQueryOptions = v4 or v5.rangeQueryOptions
-    }).assetsInRange;
-end;
+local ReactSceneUnderstanding = script:FindFirstAncestor("ReactSceneUnderstanding")
+
+require(ReactSceneUnderstanding.Parent.SceneUnderstanding)
+
+local SceneAnalysisContext = require(ReactSceneUnderstanding.SceneAnalysisContext)
+local useSourceAssets = require(ReactSceneUnderstanding.useSourceAssets)
+
+local function useAssetsInRange(p1) -- line: 32
+	-- upvalues: SceneAnalysisContext (copy), useSourceAssets (copy)
+	local v6 = SceneAnalysisContext.use()
+
+	return useSourceAssets({
+		rangeQueryOptions = p1 or v6.rangeQueryOptions
+	}).assetsInRange
+end
+
+return useAssetsInRange

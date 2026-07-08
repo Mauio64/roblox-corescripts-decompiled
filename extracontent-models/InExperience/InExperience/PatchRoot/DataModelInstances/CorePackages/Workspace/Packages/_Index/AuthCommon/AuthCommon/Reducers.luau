@@ -1,4 +1,4 @@
 return {
-    installReducer = require(script.installReducer), 
-    CountryCodeList = require(script.CountryCodeList)
-};
+	installReducer = require(script.installReducer),
+	CountryCodeList = require(script.CountryCodeList)
+}

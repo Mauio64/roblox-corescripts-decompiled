@@ -1,240 +1,263 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(script.Parent.LineGraphHoverDisplay);
-local v3 = require(script.Parent.Parent.Constants);
-local l_Text_0 = v3.Color.Text;
-local l_HighlightBlue_0 = v3.Color.HighlightBlue;
-local l_LineWidth_0 = v3.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v3.GeneralFormatting.LineColor;
-local l_PointWidth_0 = v3.Graph.PointWidth;
-local l_PointOffset_0 = v3.Graph.PointOffset;
-local l_Padding_0 = v3.Graph.Padding;
-local l_Scale_0 = v3.Graph.Scale;
-local l_InnerPaddingY_0 = v3.Graph.InnerPaddingY;
-local l_InnerScaleY_0 = v3.Graph.InnerScaleY;
-local l_TextPadding_0 = v3.Graph.TextPadding;
-local v15 = v1.Component:extend("LineGraph");
-v15.init = function(v16) --[[ Line: 24 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    v16.onGraphInputChanged = function(_, v18) --[[ Line: 25 ]]
-        -- upvalues: v16 (copy)
-        if v18.UserInputType == Enum.UserInputType.MouseMovement and not v16.state.holdPos then
-            v16:setState({
-                inputPosition = v18.Position
-            });
-        end;
-    end;
-    v16.onGraphInputEnded = function(_, v20) --[[ Line: 35 ]]
-        -- upvalues: v16 (copy)
-        if v20.UserInputType == Enum.UserInputType.MouseMovement then
-            if not v16.state.holdPos then
-                v16:setState({
-                    inputPosition = false
-                });
-                return;
-            end;
-        elseif v20.UserInputType == Enum.UserInputType.MouseButton1 then
-            v16:setState({
-                holdPos = not v16.state.holdPos
-            });
-        end;
-    end;
-    v16.graphRef = v1.createRef();
-    v16.state = {
-        selectedTimeStamps = {}
-    };
-end;
-v15.didUpdate = function(v21) --[[ Line: 55 ]] --[[ Name: didUpdate ]]
-    if v21.state.absGraphSize ~= v21.graphRef.current.AbsoluteSize then
-        local l_AbsoluteSize_0 = v21.graphRef.current.AbsoluteSize;
-        local l_AbsolutePosition_0 = v21.graphRef.current.AbsolutePosition;
-        v21:setState({
-            absGraphSize = l_AbsoluteSize_0, 
-            absGraphPos = l_AbsolutePosition_0
-        });
-    end;
-end;
-v15.didMount = function(v24) --[[ Line: 67 ]] --[[ Name: didMount ]]
-    local l_AbsoluteSize_1 = v24.graphRef.current.AbsoluteSize;
-    local l_AbsolutePosition_1 = v24.graphRef.current.AbsolutePosition;
-    v24:setState({
-        absGraphSize = l_AbsoluteSize_1, 
-        absGraphPos = l_AbsolutePosition_1
-    });
-end;
-v15.render = function(v27) --[[ Line: 77 ]] --[[ Name: render ]]
-    -- upvalues: l_InnerScaleY_0 (copy), v1 (copy), l_LineWidth_0 (copy), l_InnerPaddingY_0 (copy), l_HighlightBlue_0 (copy), l_PointWidth_0 (copy), l_PointOffset_0 (copy), v2 (copy), l_TextPadding_0 (copy), l_LineColor_0 (copy), l_Text_0 (copy), l_Padding_0 (copy), l_Scale_0 (copy)
-    local l_size_0 = v27.props.size;
-    local l_pos_0 = v27.props.pos;
-    local l_graphData_0 = v27.props.graphData;
-    local l_getX_0 = v27.props.getX;
-    local l_getY_0 = v27.props.getY;
-    local l_stringFormatX_0 = v27.props.stringFormatX;
-    local l_stringFormatY_0 = v27.props.stringFormatY;
-    local l_axisLabelX_0 = v27.props.axisLabelX;
-    local l_axisLabelY_0 = v27.props.axisLabelY;
-    local l_layoutOrder_0 = v27.props.layoutOrder;
-    local l_inputPosition_0 = v27.state.inputPosition;
-    local l_absGraphSize_0 = v27.state.absGraphSize;
-    local l_absGraphPos_0 = v27.state.absGraphPos;
-    local v41 = l_getX_0(l_graphData_0:back());
-    local v42 = l_getX_0(l_graphData_0:front());
-    local l_maxY_0 = v27.props.maxY;
-    local l_minY_0 = v27.props.minY;
-    local v45 = nil;
-    local v46 = {};
-    if l_absGraphSize_0 then
-        local v47 = {};
-        local v48 = l_graphData_0:iterator();
-        local v49 = v48:next();
-        while v49 do
-            local v50 = l_getY_0(v49);
-            local v51 = l_getX_0(v49);
-            local v52 = v41 - v42;
-            local v53 = v52 > 0 and (v51 - v42) / v52 or 0;
-            local v54 = l_maxY_0 - l_minY_0;
-            local v55 = v54 > 0 and (v50 - l_minY_0) / v54 or 1;
-            table.insert(v47, {
-                X = v53, 
-                Y = v55, 
-                data = v49
-            });
-            v49 = v48:next();
-        end;
-        for v56 = 2, #v47 do
-            local v57 = v47[v56].X * l_absGraphSize_0.X;
-            local v58 = v47[v56].Y * l_absGraphSize_0.Y * l_InnerScaleY_0;
-            local v59 = v47[v56 - 1].X * l_absGraphSize_0.X;
-            local v60 = v47[v56 - 1].Y * l_absGraphSize_0.Y * l_InnerScaleY_0;
-            if v57 ~= v59 then
-                local v61 = (v57 + v59) / 2;
-                local v62 = (v58 + v60) / 2;
-                local v63 = v57 - v59;
-                local v64 = v58 - v60;
-                local v65 = math.sqrt(v63 * v63 + v64 * v64);
-                local v66 = math.deg((math.atan2(v64, v63)));
-                table.insert(v46, v1.createElement("Frame", {
-                    Size = UDim2.new(0, v65, 0, l_LineWidth_0), 
-                    Position = UDim2.new(0, v61 - v65 / 2, 1 - l_InnerPaddingY_0, -v62), 
-                    BackgroundColor3 = l_HighlightBlue_0, 
-                    BorderSizePixel = 0, 
-                    Rotation = -v66
-                }));
-                table.insert(v46, v1.createElement("Frame", {
-                    Size = UDim2.new(0, l_PointWidth_0, 0, l_PointWidth_0), 
-                    Position = UDim2.new(0, v57, 1 - l_InnerPaddingY_0, -v58 - l_PointOffset_0), 
-                    BackgroundColor3 = l_HighlightBlue_0, 
-                    BorderSizePixel = 0
-                }));
-                if l_inputPosition_0 then
-                    local v67 = l_inputPosition_0.X - l_absGraphPos_0.X;
-                    if v67 < v57 and v59 < v67 then
-                        local v68 = l_getX_0(v47[v56].data);
-                        local v69 = l_getX_0(v47[v56 - 1].data);
-                        local v70 = l_getY_0(v47[v56].data);
-                        local v71 = l_getY_0(v47[v56 - 1].data);
-                        local v72 = (v67 - v59) / v63;
-                        v45 = v60 + v64 * v72;
-                        local v73 = (v68 - v69) * v72 + v69;
-                        local v74 = (v70 - v71) * v72 + v71;
-                        v46.HoverDetails = v1.createElement(v2, {
-                            hoverLineX = v67, 
-                            hoverLineY = v45, 
-                            hoverValX = v73, 
-                            hoverValY = v74, 
-                            stringFormatX = l_stringFormatX_0, 
-                            stringFormatY = l_stringFormatY_0
-                        });
-                    end;
-                end;
-            end;
-        end;
-        if #v47 > 0 then
-            local v75 = v47[#v47].Y * l_absGraphSize_0.Y * l_InnerScaleY_0;
-            local v76 = l_getY_0(v47[#v47].data);
-            local v77 = not (v45 and math.abs(v75 - v45) < 10);
-            local v78 = not (v45 and math.abs(v45) < 10 or math.abs(v75) < 10);
-            if v77 then
-                v46.LatestEntryLine = v1.createElement("Frame", {
-                    Size = UDim2.new(1, l_TextPadding_0, 0, l_LineWidth_0), 
-                    Position = UDim2.new(0, -l_TextPadding_0, 1 - l_InnerPaddingY_0, -v75), 
-                    BackgroundColor3 = l_LineColor_0, 
-                    BackgroundTransparency = 0.5, 
-                    BorderSizePixel = 0
-                });
-                v46.LatestEntryText = v1.createElement("TextLabel", {
-                    Text = l_stringFormatY_0 and l_stringFormatY_0(v76) or v76, 
-                    TextColor3 = l_Text_0, 
-                    TextXAlignment = Enum.TextXAlignment.Right, 
-                    Position = UDim2.new(0, -l_TextPadding_0 - 2, 1 - l_InnerPaddingY_0, -v75), 
-                    BackgroundTransparency = 1
-                });
-            end;
-            if v78 then
-                v46.AxisTextY0 = v1.createElement("TextLabel", {
-                    Text = l_stringFormatY_0 and l_stringFormatY_0(l_minY_0) or l_minY_0, 
-                    TextColor3 = l_Text_0, 
-                    TextXAlignment = Enum.TextXAlignment.Right, 
-                    Position = UDim2.new(0, -l_TextPadding_0 - 2, 1 - l_InnerPaddingY_0, 0), 
-                    BackgroundTransparency = 1
-                });
-            end;
-            v46.AxisX = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-                Position = UDim2.new(0, 0, 1, 0), 
-                BackgroundColor3 = l_LineColor_0, 
-                BorderSizePixel = 0
-            });
-            v46.AxisY = v1.createElement("Frame", {
-                Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-                BackgroundColor3 = l_LineColor_0, 
-                BorderSizePixel = 0
-            });
-        end;
-    end;
-    local v79 = 2 * l_TextPadding_0 + 2;
-    return v1.createElement("Frame", {
-        Size = l_size_0, 
-        Position = l_pos_0, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = l_layoutOrder_0
-    }, {
-        name = v1.createElement("TextLabel", {
-            Text = l_axisLabelY_0, 
-            TextColor3 = l_Text_0, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            Position = UDim2.new(l_Padding_0, 0, l_Padding_0, -l_TextPadding_0), 
-            BackgroundTransparency = 1
-        }), 
-        minX = v1.createElement("TextLabel", {
-            Text = l_stringFormatX_0 and l_stringFormatX_0(v42) or v42, 
-            TextColor3 = l_Text_0, 
-            TextXAlignment = Enum.TextXAlignment.Center, 
-            Position = UDim2.new(l_Padding_0, 0, l_Padding_0 + l_Scale_0, v79), 
-            BackgroundTransparency = 1
-        }), 
-        maxX = v1.createElement("TextLabel", {
-            Text = l_stringFormatX_0 and l_stringFormatX_0(v41) or v41, 
-            TextColor3 = l_Text_0, 
-            TextXAlignment = Enum.TextXAlignment.Center, 
-            Position = UDim2.new(l_Padding_0 + l_Scale_0, 0, l_Padding_0 + l_Scale_0, v79), 
-            BackgroundTransparency = 1
-        }), 
-        axisLabelX = v1.createElement("TextLabel", {
-            Text = l_axisLabelX_0, 
-            TextColor3 = l_Text_0, 
-            TextXAlignment = Enum.TextXAlignment.Center, 
-            Position = UDim2.new(0.5, 0, l_Padding_0 + l_Scale_0, v79), 
-            BackgroundTransparency = 1
-        }), 
-        graph = v1.createElement("Frame", {
-            Position = UDim2.new(l_Padding_0, 0, l_Padding_0, 0), 
-            Size = UDim2.new(l_Scale_0, 0, l_Scale_0, 0), 
-            BackgroundTransparency = 1, 
-            [v1.Ref] = v27.graphRef, 
-            [v1.Event.InputChanged] = v27.onGraphInputChanged, 
-            [v1.Event.InputEnded] = v27.onGraphInputEnded
-        }, v46)
-    });
-end;
-return v15;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local LineGraphHoverDisplay = require(script.Parent.LineGraphHoverDisplay)
+local Constants = require(script.Parent.Parent.Constants)
+local ColorText = Constants.Color.Text
+local HighlightBlue = Constants.Color.HighlightBlue
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local PointWidth = Constants.Graph.PointWidth
+local PointOffset = Constants.Graph.PointOffset
+local GraphPadding = Constants.Graph.Padding
+local GraphScale = Constants.Graph.Scale
+local InnerPaddingY = Constants.Graph.InnerPaddingY
+local InnerScaleY = Constants.Graph.InnerScaleY
+local TextPadding = Constants.Graph.TextPadding
+local v16 = Roact.Component:extend("LineGraph")
+
+function v16.init(p1) -- line: 24
+	-- upvalues: Roact (copy)
+	function p1.onGraphInputChanged(_, p3) -- line: 25
+		-- upvalues: p1 (copy)
+		if p3.UserInputType == Enum.UserInputType.MouseMovement and not p1.state.holdPos then
+			p1:setState({
+				inputPosition = p3.Position
+			})
+		end
+	end
+	function p1.onGraphInputEnded(_, p5) -- line: 35
+		-- upvalues: p1 (copy)
+		if p5.UserInputType == Enum.UserInputType.MouseMovement then
+			if not p1.state.holdPos then
+				p1:setState({
+					inputPosition = false
+				})
+
+				return
+			end
+		elseif p5.UserInputType == Enum.UserInputType.MouseButton1 then
+			p1:setState({
+				holdPos = not p1.state.holdPos
+			})
+		end
+	end
+
+	p1.graphRef = Roact.createRef()
+	p1.state = {
+		selectedTimeStamps = {}
+	}
+end
+function v16.didUpdate(p6) -- line: 55
+	if p6.state.absGraphSize ~= p6.graphRef.current.AbsoluteSize then
+		local AbsoluteSize = p6.graphRef.current.AbsoluteSize
+		local AbsolutePosition = p6.graphRef.current.AbsolutePosition
+
+		p6:setState({
+			absGraphSize = AbsoluteSize,
+			absGraphPos = AbsolutePosition
+		})
+	end
+end
+function v16.didMount(p7) -- line: 67
+	local AbsoluteSize = p7.graphRef.current.AbsoluteSize
+	local AbsolutePosition = p7.graphRef.current.AbsolutePosition
+
+	p7:setState({
+		absGraphSize = AbsoluteSize,
+		absGraphPos = AbsolutePosition
+	})
+end
+function v16.render(p8) -- line: 77
+	-- upvalues: InnerScaleY (copy), Roact (copy), LineWidth (copy), InnerPaddingY (copy), HighlightBlue (copy), PointWidth (copy), PointOffset (copy), LineGraphHoverDisplay (copy), TextPadding (copy), LineColor (copy), ColorText (copy), GraphPadding (copy), GraphScale (copy)
+	local size = p8.props.size
+	local pos = p8.props.pos
+	local graphData = p8.props.graphData
+	local getX = p8.props.getX
+	local getY = p8.props.getY
+	local stringFormatX = p8.props.stringFormatX
+	local stringFormatY = p8.props.stringFormatY
+	local axisLabelX = p8.props.axisLabelX
+	local axisLabelY = p8.props.axisLabelY
+	local layoutOrder = p8.props.layoutOrder
+	local inputPosition = p8.state.inputPosition
+	local absGraphSize = p8.state.absGraphSize
+	local absGraphPos = p8.state.absGraphPos
+	local v38 = getX(graphData:back())
+	local v39 = getX(graphData:front())
+	local maxY = p8.props.maxY
+	local minY = p8.props.minY
+	local v42 = nil
+	local t1 = {}
+
+	if absGraphSize then
+		local t2 = {}
+		local v45 = graphData:iterator()
+		local v46 = v45:next()
+
+		while v46 do
+			local v47 = getY(v46)
+			local v48 = getX(v46)
+			local v49 = v38 - v39
+			local v50 = v49 > 0 and (v48 - v39) / v49 or 0
+			local v51 = maxY - minY
+			local v52 = v51 > 0 and (v47 - minY) / v51 or 1
+
+			table.insert(t2, {
+				X = v50,
+				Y = v52,
+				data = v46
+			})
+			v46 = v45:next()
+		end
+
+		for i = 2, #t2 do
+			local v54 = t2[i].X * absGraphSize.X
+			local v55 = t2[i].Y * absGraphSize.Y * InnerScaleY
+			local v56 = t2[i - 1].X * absGraphSize.X
+			local v57 = t2[i - 1].Y * absGraphSize.Y * InnerScaleY
+
+			if v54 ~= v56 then
+				local v58 = (v54 + v56) / 2
+				local v59 = (v55 + v57) / 2
+				local v60 = v54 - v56
+				local v61 = v55 - v57
+				local v62 = math.sqrt(v60 * v60 + v61 * v61)
+				local v63 = math.deg((math.atan2(v61, v60)))
+
+				table.insert(t1, Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					Size = UDim2.new(0, v62, 0, LineWidth),
+					Position = UDim2.new(0, v58 - v62 / 2, 1 - InnerPaddingY, -v59),
+					BackgroundColor3 = HighlightBlue,
+					Rotation = -v63
+				}))
+				table.insert(t1, Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					Size = UDim2.new(0, PointWidth, 0, PointWidth),
+					Position = UDim2.new(0, v54, 1 - InnerPaddingY, -v55 - PointOffset),
+					BackgroundColor3 = HighlightBlue
+				}))
+
+				if inputPosition then
+					local v64 = inputPosition.X - absGraphPos.X
+
+					if v64 < v54 and v56 < v64 then
+						local v65 = getX(t2[i].data)
+						local v66 = getX(t2[i - 1].data)
+						local v67 = getY(t2[i].data)
+						local v68 = getY(t2[i - 1].data)
+						local v69 = (v64 - v56) / v60
+
+						v42 = v57 + v61 * v69
+
+						local v70 = (v65 - v66) * v69 + v66
+						local v71 = (v67 - v68) * v69 + v68
+
+						t1.HoverDetails = Roact.createElement(LineGraphHoverDisplay, {
+							hoverLineX = v64,
+							hoverLineY = v42,
+							hoverValX = v70,
+							hoverValY = v71,
+							stringFormatX = stringFormatX,
+							stringFormatY = stringFormatY
+						})
+					end
+				end
+			end
+		end
+
+		if #t2 > 0 then
+			local v72 = t2[#t2].Y * absGraphSize.Y * InnerScaleY
+			local v73 = getY(t2[#t2].data)
+			local v74 = v42 and math.abs(v72 - v42) < 10
+			local v75 = v42 and math.abs(v42) < 10 or math.abs(v72) < 10
+
+			if not v74 then
+				t1.LatestEntryLine = Roact.createElement("Frame", {
+					BackgroundTransparency = 0.5,
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, TextPadding, 0, LineWidth),
+					Position = UDim2.new(0, -TextPadding, 1 - InnerPaddingY, -v72),
+					BackgroundColor3 = LineColor
+				})
+				t1.LatestEntryText = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = stringFormatY and stringFormatY(v73) or v73,
+					TextColor3 = ColorText,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, -v72)
+				})
+			end
+
+			if not v75 then
+				t1.AxisTextY0 = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = stringFormatY and stringFormatY(minY) or minY,
+					TextColor3 = ColorText,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					Position = UDim2.new(0, -TextPadding - 2, 1 - InnerPaddingY, 0)
+				})
+			end
+
+			t1.AxisX = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(1, 0, 0, LineWidth),
+				Position = UDim2.new(0, 0, 1, 0),
+				BackgroundColor3 = LineColor
+			})
+			t1.AxisY = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				Size = UDim2.new(0, LineWidth, 1, 0),
+				BackgroundColor3 = LineColor
+			})
+		end
+	end
+
+	local v76 = 2 * TextPadding + 2
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = size,
+		Position = pos,
+		LayoutOrder = layoutOrder
+	}, {
+		name = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = axisLabelY,
+			TextColor3 = ColorText,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			Position = UDim2.new(GraphPadding, 0, GraphPadding, -TextPadding)
+		}),
+		minX = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = stringFormatX and stringFormatX(v39) or v39,
+			TextColor3 = ColorText,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			Position = UDim2.new(GraphPadding, 0, GraphPadding + GraphScale, v76)
+		}),
+		maxX = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = stringFormatX and stringFormatX(v38) or v38,
+			TextColor3 = ColorText,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			Position = UDim2.new(GraphPadding + GraphScale, 0, GraphPadding + GraphScale, v76)
+		}),
+		axisLabelX = Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			Text = axisLabelX,
+			TextColor3 = ColorText,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			Position = UDim2.new(0.5, 0, GraphPadding + GraphScale, v76)
+		}),
+		graph = Roact.createElement("Frame", {
+			Position = UDim2.new(GraphPadding, 0, GraphPadding, 0),
+			Size = UDim2.new(GraphScale, 0, GraphScale, 0),
+			BackgroundTransparency = 1,
+			[Roact.Ref] = p8.graphRef,
+			[Roact.Event.InputChanged] = p8.onGraphInputChanged,
+			[Roact.Event.InputEnded] = p8.onGraphInputEnded
+		}, t1)
+	})
+end
+
+return v16

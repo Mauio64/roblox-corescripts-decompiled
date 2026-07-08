@@ -1,48 +1,56 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CoreScriptsPlayerFeedback");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactRoblox);
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_Localization_0 = require(l_Parent_0.InExperienceLocales).Localization;
-local v6 = require(l_script_FirstAncestor_0.Components.PlayerFeedbackPrompts);
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v8 = l_CoreGui_0:FindFirstChild("RobloxGui") or l_CoreGui_0:WaitForChild("RobloxGui");
-local v9 = nil;
-local l_status_0, l_result_0 = pcall(function() --[[ Line: 19 ]]
-    -- upvalues: v8 (copy)
-    if v8 then
-        return require(v8.Modules.Common.renderWithCoreScriptsStyleProvider);
-    else
-        return nil;
-    end;
-end);
-v9 = l_status_0 and l_result_0 or function(v12) --[[ Line: 29 ]]
-    return v12.App;
-end;
-return function(v13) --[[ Line: 35 ]] --[[ Name: createApp ]]
-    -- upvalues: v9 (ref), v3 (copy), v2 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy), v6 (copy)
-    local v14 = v13 or v9;
-    local l_ScreenGui_0 = Instance.new("ScreenGui");
-    l_ScreenGui_0.IgnoreGuiInset = true;
-    l_ScreenGui_0.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-    l_ScreenGui_0.AutoLocalize = false;
-    l_ScreenGui_0.DisplayOrder = -1;
-    local v16 = v3.createRoot(l_ScreenGui_0);
-    local l_LocalizationService_0 = game:GetService("LocalizationService");
-    v16:render((v14({
-        App = v2.createElement(l_LocalizationProvider_0, {
-            localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-        }, {
-            PlayerFeedbackPrompts = v2.createElement(v6, {
-                enableInputDelayed = true
-            })
-        })
-    })));
-    return {
-        instance = l_ScreenGui_0, 
-        unmount = function() --[[ Line: 65 ]] --[[ Name: unmount ]]
-            -- upvalues: v16 (copy)
-            v16:unmount();
-        end
-    };
-end;
+local CoreScriptsPlayerFeedback = script:FindFirstAncestor("CoreScriptsPlayerFeedback")
+local CoreScriptsPlayerFeedbackParent = CoreScriptsPlayerFeedback.Parent
+local React = require(CoreScriptsPlayerFeedbackParent.React)
+local ReactRoblox = require(CoreScriptsPlayerFeedbackParent.ReactRoblox)
+local LocalizationProvider = require(CoreScriptsPlayerFeedbackParent.Localization).LocalizationProvider
+local Localization = require(CoreScriptsPlayerFeedbackParent.InExperienceLocales).Localization
+local PlayerFeedbackPrompts = require(CoreScriptsPlayerFeedback.Components.PlayerFeedbackPrompts)
+local GetFFlagEnablePlayerSupportPrompt = require(CoreScriptsPlayerFeedback.Flags.GetFFlagEnablePlayerSupportPrompt)
+local CoreGui = game:GetService("CoreGui")
+local v10 = CoreGui:FindFirstChild("RobloxGui") or CoreGui:WaitForChild("RobloxGui")
+local v11 = GetFFlagEnablePlayerSupportPrompt()
+local ok, result = pcall(function() -- line: 21
+	-- upvalues: v10 (copy)
+	if v10 then
+		return require(v10.Modules.Common.renderWithCoreScriptsStyleProvider)
+	end
+
+	return nil
+end)
+local u14 = ok and result or function(p1) -- line: 31
+	return p1.App
+end
+
+local function createApp(p2) -- line: 37
+	-- upvalues: u14 (ref), v11 (copy), ReactRoblox (copy), React (copy), LocalizationProvider (copy), Localization (copy), PlayerFeedbackPrompts (copy)
+	local v18 = p2 or u14
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.IgnoreGuiInset = not v11
+	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	ScreenGui.AutoLocalize = false
+	ScreenGui.DisplayOrder = -1
+
+	local v20 = ReactRoblox.createRoot(ScreenGui)
+	local LocalizationService = game:GetService("LocalizationService")
+
+	v20:render((v18({
+		App = React.createElement(LocalizationProvider, {
+			localization = Localization.new(LocalizationService.RobloxLocaleId)
+		}, {
+			PlayerFeedbackPrompts = React.createElement(PlayerFeedbackPrompts, {
+				enableInputDelayed = true
+			})
+		})
+	})))
+
+	return {
+		instance = ScreenGui,
+		unmount = function() -- line: 67
+			-- upvalues: v20 (copy)
+			v20:unmount()
+		end
+	}
+end
+
+return createApp

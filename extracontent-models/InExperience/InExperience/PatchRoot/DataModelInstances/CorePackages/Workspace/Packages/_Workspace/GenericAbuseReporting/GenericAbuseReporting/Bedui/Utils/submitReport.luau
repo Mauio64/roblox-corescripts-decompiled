@@ -1,39 +1,48 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local l_FFlagAddThumbnailSelectorReport_0 = require(l_Parent_0.SharedFlags).FFlagAddThumbnailSelectorReport;
-return function(v4, v5) --[[ Line: 9 ]]
-    -- upvalues: l_FFlagAddThumbnailSelectorReport_0 (copy), l_HttpService_0 (copy), l_Url_0 (copy)
-    if l_FFlagAddThumbnailSelectorReport_0 and v5 == nil then
-        v5 = {};
-    end;
-    local v6 = {
-        tags = {}
-    };
-    for v7, v8 in v5 do
-        if typeof(v8) ~= "table" then
-            v8 = if l_FFlagAddThumbnailSelectorReport_0 then tostring(v8):split(",") else {
-                (tostring(v8))
-            };
-        end;
-        local v9 = {};
-        for _, v11 in v8 do
-            table.insert(v9, {
-                data = tostring(v11)
-            });
-        end;
-        v6.tags[v7] = {
-            valueList = v9
-        };
-    end;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 46 ]]
-        -- upvalues: l_HttpService_0 (ref), v6 (copy)
-        return l_HttpService_0:JSONEncode(v6);
-    end);
-    if not l_status_0 then
-        warn("Failed to encode report data");
-    end;
-    return v4(l_Url_0.APIS_URL .. "abuse-reporting/v2/abuse-report", "POST", {
-        postBody = l_result_0
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local HttpService = game:GetService("HttpService")
+local Url = require(Parent.Http).Url
+local FFlagAddThumbnailSelectorReport = require(Parent.SharedFlags).FFlagAddThumbnailSelectorReport
+
+return function(p1, p2) -- line: 9
+	-- upvalues: FFlagAddThumbnailSelectorReport (copy), HttpService (copy), Url (copy)
+	if FFlagAddThumbnailSelectorReport and p2 == nil then
+		p2 = {}
+	end
+
+	local t1 = {
+		tags = {}
+	}
+
+	for v8, v9 in p2 do
+		local v10 = v9
+
+		if typeof(v10) ~= "table" then
+			v10 = if not FFlagAddThumbnailSelectorReport then { (tostring(v10)) } else tostring(v10):split(",")
+		end
+
+		local t2 = {}
+
+		for _, v13 in v10 do
+			table.insert(t2, {
+				data = tostring(v13)
+			})
+		end
+
+		t1.tags[v8] = {
+			valueList = t2
+		}
+	end
+
+	local ok, result = pcall(function() -- line: 46
+		-- upvalues: HttpService (copy), t1 (copy)
+		return HttpService:JSONEncode(t1)
+	end)
+
+	if not ok then
+		warn("Failed to encode report data")
+	end
+
+	return p1(Url.APIS_URL .. "abuse-reporting/v2/abuse-report", "POST", {
+		postBody = result
+	})
+end

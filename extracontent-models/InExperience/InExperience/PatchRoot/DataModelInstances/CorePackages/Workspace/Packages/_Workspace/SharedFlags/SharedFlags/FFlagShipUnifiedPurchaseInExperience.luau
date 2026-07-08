@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ShipUnifiedPurchaseInExperience", false);
+return game:DefineFastFlag("ShipUnifiedPurchaseInExperience", false)

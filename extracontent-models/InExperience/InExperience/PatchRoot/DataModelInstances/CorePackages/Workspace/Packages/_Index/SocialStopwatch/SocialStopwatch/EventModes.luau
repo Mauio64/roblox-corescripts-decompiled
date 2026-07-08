@@ -1,4 +1,4 @@
 return {
-    Default = "Default", 
-    Strict = "Strict"
-};
+	Default = "Default",
+	Strict = "Strict"
+}

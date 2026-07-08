@@ -1,35 +1,41 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 24 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = type(v1);
-    local v3 = true;
-    if v2 ~= "table" then
-        v3 = v2 == "userdata";
-    end;
-    assert(v3, "Unexpected value for reportingService");
-    local v4 = {
-        _reporter = v1, 
-        _isEnabled = true
-    };
-    setmetatable(v4, v0);
-    return v4;
-end;
-v0.setEnabled = function(v5, v6) --[[ Line: 37 ]] --[[ Name: setEnabled ]]
-    assert(type(v6) == "boolean", "Expected isEnabled to be a boolean");
-    v5._isEnabled = v6;
-end;
-v0.trackEvent = function(v7, v8, v9, v10, v11) --[[ Line: 46 ]] --[[ Name: trackEvent ]]
-    assert(type(v8) == "string", "Expected category to be a string");
-    assert(type(v9) == "string", "Expected action to be a string");
-    if v10 then
-        assert(type(v10) == "string", "Expected label to be a string");
-    end;
-    if v11 then
-        assert(type(v11) == "number", "Expected value to be a number");
-        assert(v11 >= 0, "Expected value must not be a negative value");
-    end;
-    assert(v7._isEnabled, "This reporting service is disabled");
-    v7._reporter:TrackEvent(v8, v9, v10, v11);
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 24
+	-- upvalues: t1 (copy)
+	local v3 = type(p1)
+
+	assert(v3 == "table" or v3 == "userdata", "Unexpected value for reportingService")
+
+	local t2 = {
+		_isEnabled = true,
+		_reporter = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 37
+	assert(type(b1) == "boolean", "Expected isEnabled to be a boolean")
+	t3._isEnabled = b1
+end
+function t1.trackEvent(t4: {[any]: any}, s1: string, s2: string, s3: string?, n1: number?) -- line: 46
+	assert(type(s1) == "string", "Expected category to be a string")
+	assert(type(s2) == "string", "Expected action to be a string")
+
+	if s3 then
+		assert(type(s3) == "string", "Expected label to be a string")
+	end
+
+	if n1 then
+		assert(type(n1) == "number", "Expected value to be a number")
+		assert(n1 >= 0, "Expected value must not be a negative value")
+	end
+
+	assert(t4._isEnabled, "This reporting service is disabled")
+	t4._reporter:TrackEvent(s1, s2, s3, n1)
+end
+
+return t1

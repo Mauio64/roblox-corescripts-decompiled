@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "bundleProductInfo");
+return require(script.Parent.makeActionCreator)(script.Name, "bundleProductInfo")

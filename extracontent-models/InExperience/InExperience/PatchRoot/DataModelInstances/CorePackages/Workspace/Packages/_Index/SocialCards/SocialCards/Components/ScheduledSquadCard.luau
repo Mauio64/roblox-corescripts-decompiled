@@ -1,1 +1,1 @@
-return require(script.ScheduledSquadCard);
+return require(script.ScheduledSquadCard)

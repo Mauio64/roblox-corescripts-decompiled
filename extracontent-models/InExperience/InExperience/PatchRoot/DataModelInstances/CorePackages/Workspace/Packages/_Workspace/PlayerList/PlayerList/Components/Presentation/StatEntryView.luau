@@ -1,102 +1,106 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.UIBlox);
-local v4 = require(l_Parent_0.Common.FormatStatString);
-local l_useStyle_0 = v3.Core.Style.useStyle;
-local v6 = require(l_Parent_0.Common.useLayoutValues);
-local v7 = require(l_Parent_0.Flags.FFlagRemoveNewPlayerListOverlay);
-local v8 = require(l_Parent_0.Flags.FFlagEnableMobilePlayerListOnConsole);
-return v2.memo(function(v9) --[[ Line: 36 ]]
-    -- upvalues: l_useStyle_0 (copy), v6 (copy), v8 (copy), v2 (copy), v4 (copy), v7 (copy)
-    local v10 = l_useStyle_0();
-    local v11 = v6();
-    local v12 = nil;
-    local v13 = nil;
-    local l_TextDefault_0 = v10.Theme.TextDefault;
-    local l_textStyle_0 = v9.textStyle;
-    local v16 = if l_textStyle_0 then l_textStyle_0.Color else l_TextDefault_0.Color;
-    local v17 = if l_textStyle_0 then l_textStyle_0.Transparency else l_TextDefault_0.Transparency;
-    local v18 = if l_textStyle_0 then l_textStyle_0.StrokeColor else nil;
-    local v19 = if l_textStyle_0 and l_textStyle_0.StrokeTransparency then l_textStyle_0.StrokeTransparency else nil;
-    if not v11.IsTenFoot then
-        v12 = v10.Font.CaptionHeader.Font;
-        v13 = if v8 then v11.StatTextSize else v10.Font.CaptionHeader.RelativeSize * v10.Font.BaseSize;
-    else
-        v13 = v11.StatTextSize;
-        v12 = v11.StatFont;
-        if v9.isTeamEntry then
-            v12 = v11.TeamStatFont;
-        end;
-    end;
-    local v21 = v2.useMemo(function() --[[ Line: 63 ]]
-        -- upvalues: v9 (copy), v4 (ref), v12 (ref), v13 (ref), v16 (copy), v17 (copy), v18 (copy), v19 (copy)
-        return {
-            Text = v9.statValue:map(function(v20) --[[ Line: 65 ]]
-                -- upvalues: v4 (ref)
-                return v4(v20);
-            end), 
-            Size = v9.showStatTitle and UDim2.fromScale(1, 0.5) or UDim2.fromScale(1, 1), 
-            Position = v9.showStatTitle and UDim2.fromScale(0, 0.5) or UDim2.fromScale(0, 0), 
-            Font = v12, 
-            TextSize = v13, 
-            TextColor3 = v16, 
-            TextTransparency = v17, 
-            TextStrokeColor3 = v18, 
-            TextStrokeTransparency = v19, 
-            TextTruncate = Enum.TextTruncate.AtEnd, 
-            BackgroundTransparency = 1
-        };
-    end, {
-        v9.showStatTitle, 
-        v12, 
-        v13, 
-        v16, 
-        v17, 
-        v18, 
-        v19
-    });
-    return v2.createElement("Frame", {
-        Size = UDim2.new(0, v11.StatEntrySizeX, 1, 0), 
-        Position = UDim2.new(0, 0, 0, 0), 
-        BorderSizePixel = 0, 
-        LayoutOrder = v9.layoutOrder, 
-        BackgroundTransparency = if v9.backgroundStyle then v9.backgroundStyle.Transparency else 1, 
-        BackgroundColor3 = if v9.backgroundStyle then v9.backgroundStyle.Color else nil
-    }, {
-        PlayerStatDisplay = if v9.showStatTitle and v9.statName then v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0
-        }, {
-            StatTitle = v2.createElement("TextLabel", {
-                Text = v9.statName, 
-                Size = UDim2.fromScale(1, 0.5), 
-                Position = UDim2.fromScale(0, 0), 
-                Font = v11.TitleStatFont, 
-                TextSize = v13, 
-                TextColor3 = v16, 
-                TextTransparency = v17, 
-                TextStrokeColor3 = v18, 
-                TextStrokeTransparency = v19, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                BackgroundTransparency = 1
-            }), 
-            StatText = v2.createElement("TextLabel", v21)
-        }) else v2.createElement("TextLabel", v21), 
-        DoubleOverLay = if not v7 and v9.doubleOverlay and v9.overlayStyle then v2.createElement("Frame", {
-            ZIndex = 1, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = v9.overlayStyle.Transparency, 
-            BackgroundColor3 = v9.overlayStyle.Color, 
-            BorderSizePixel = 0
-        }) else nil, 
-        OverlayFrame = if not v7 and v9.overlayStyle then v2.createElement("Frame", {
-            ZIndex = 2, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = v9.overlayStyle.Transparency, 
-            BackgroundColor3 = v9.overlayStyle.Color
-        }) else nil
-    });
-end);
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local React = require(ParentParentParent.React)
+local UIBlox = require(ParentParentParent.UIBlox)
+local FormatStatString = require(ParentParent.Common.FormatStatString)
+local useStyle = UIBlox.Core.Style.useStyle
+local useLayoutValues = require(ParentParent.Common.useLayoutValues)
+local FFlagRemoveNewPlayerListOverlay = require(ParentParent.Flags.FFlagRemoveNewPlayerListOverlay)
+local FFlagEnableMobilePlayerListOnConsole = require(ParentParent.Flags.FFlagEnableMobilePlayerListOnConsole)
+
+return React.memo(function(t1: {[any]: any}) -- line: 36
+	-- upvalues: useStyle (copy), useLayoutValues (copy), FFlagEnableMobilePlayerListOnConsole (copy), React (copy), FormatStatString (copy), FFlagRemoveNewPlayerListOverlay (copy)
+	local v11 = useStyle()
+	local v12 = useLayoutValues()
+	local TextDefault = v11.Theme.TextDefault
+	local textStyle = t1.textStyle
+	local v15 = if not textStyle then TextDefault.Color else textStyle.Color
+	local v16 = if not textStyle then TextDefault.Transparency else textStyle.Transparency
+	local v17 = if not textStyle then nil else textStyle.StrokeColor
+	local v18 = if not textStyle or not textStyle.StrokeTransparency then nil else textStyle.StrokeTransparency
+	local CaptionHeaderFont, u20
+
+	if not v12.IsTenFoot then
+		CaptionHeaderFont = v11.Font.CaptionHeader.Font
+		u20 = if not FFlagEnableMobilePlayerListOnConsole then v11.Font.CaptionHeader.RelativeSize * v11.Font.BaseSize else v12.StatTextSize
+	else
+		u20 = v12.StatTextSize
+		CaptionHeaderFont = v12.StatFont
+
+		if t1.isTeamEntry then
+			CaptionHeaderFont = v12.TeamStatFont
+		end
+	end
+
+	local v21 = React.useMemo(function() -- line: 63
+		-- upvalues: t1 (copy), FormatStatString (copy), CaptionHeaderFont (ref), u20 (ref), v15 (copy), v16 (copy), v17 (copy), v18 (copy)
+		return {
+			BackgroundTransparency = 1,
+			Text = t1.statValue:map(function(p1) -- line: 65
+				-- upvalues: FormatStatString (copy)
+				return FormatStatString(p1)
+			end),
+			Size = t1.showStatTitle and UDim2.fromScale(1, 0.5) or UDim2.fromScale(1, 1),
+			Position = t1.showStatTitle and UDim2.fromScale(0, 0.5) or UDim2.fromScale(0, 0),
+			Font = CaptionHeaderFont,
+			TextSize = u20,
+			TextColor3 = v15,
+			TextTransparency = v16,
+			TextStrokeColor3 = v17,
+			TextStrokeTransparency = v18,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		}
+	end, {
+		t1.showStatTitle,
+		CaptionHeaderFont,
+		u20,
+		v15,
+		v16,
+		v17,
+		v18
+	})
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, v12.StatEntrySizeX, 1, 0),
+		Position = UDim2.new(0, 0, 0, 0),
+		LayoutOrder = t1.layoutOrder,
+		BackgroundTransparency = not t1.backgroundStyle and 1 or t1.backgroundStyle.Transparency,
+		BackgroundColor3 = if not t1.backgroundStyle then nil else t1.backgroundStyle.Color
+	}, {
+		PlayerStatDisplay = if not t1.showStatTitle or not t1.statName then React.createElement("TextLabel", v21) else React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			StatTitle = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Text = t1.statName,
+				Size = UDim2.fromScale(1, 0.5),
+				Position = UDim2.fromScale(0, 0),
+				Font = v12.TitleStatFont,
+				TextSize = u20,
+				TextColor3 = v15,
+				TextTransparency = v16,
+				TextStrokeColor3 = v17,
+				TextStrokeTransparency = v18,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			}),
+			StatText = React.createElement("TextLabel", v21)
+		}),
+		DoubleOverLay = if FFlagRemoveNewPlayerListOverlay or (not t1.doubleOverlay or not t1.overlayStyle) then nil else React.createElement("Frame", {
+			ZIndex = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = t1.overlayStyle.Transparency,
+			BackgroundColor3 = t1.overlayStyle.Color
+		}),
+		OverlayFrame = if FFlagRemoveNewPlayerListOverlay or not t1.overlayStyle then nil else React.createElement("Frame", {
+			ZIndex = 2,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = t1.overlayStyle.Transparency,
+			BackgroundColor3 = t1.overlayStyle.Color
+		})
+	})
+end)

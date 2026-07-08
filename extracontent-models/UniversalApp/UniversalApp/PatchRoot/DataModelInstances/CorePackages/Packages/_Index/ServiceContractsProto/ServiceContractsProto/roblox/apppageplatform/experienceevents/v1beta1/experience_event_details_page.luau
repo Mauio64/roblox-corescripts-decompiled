@@ -1,401 +1,601 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content);
-local v4 = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry);
-local v5 = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content);
-local v6 = {};
-v6.__index = v6;
-local l_v6_0 = v6 --[[ copy: 6 -> 7 ]];
-v6.new = function(v8) --[[ Line: 118 ]] --[[ Name: new ]]
-    -- upvalues: l_v6_0 (copy)
-    return (setmetatable({
-        event_id = (not (v8 ~= nil) or v8.event_id == nil) and 0 or v8.event_id, 
-        user_id = (not (v8 ~= nil) or v8.user_id == nil) and 0 or v8.user_id
-    }, l_v6_0));
-end;
-v6.encode = function(v9) --[[ Line: 127 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v10 = buffer.create(0);
-    local v11 = 0;
-    if v9.event_id ~= nil and v9.event_id ~= 0 then
-        local v12, v13 = v0.writeTag(v10, v11, 1, v0.wireTypes.varint);
-        v12, v13 = v0.writeVarInt(v12, v13, v9.event_id);
-        v10 = v12;
-        v11 = v13;
-    end;
-    if v9.user_id ~= nil and v9.user_id ~= 0 then
-        local v14, v15 = v0.writeTag(v10, v11, 2, v0.wireTypes.varint);
-        v14, v15 = v0.writeVarInt(v14, v15, v9.user_id);
-        v10 = v14;
-        v11 = v15;
-    end;
-    local v16 = buffer.create(v11);
-    buffer.copy(v16, 0, v10, 0, v11);
-    return v16;
-end;
-v6.decode = function(v17) --[[ Line: 146 ]] --[[ Name: decode ]]
-    -- upvalues: l_v6_0 (copy), v0 (copy)
-    local v18 = l_v6_0.new();
-    local v19 = 0;
-    while v19 < buffer.len(v17) do
-        local v20 = nil;
-        local v21 = nil;
-        local v22, v23, v24 = v0.readTag(v17, v19);
-        v20 = v22;
-        v21 = v23;
-        v19 = v24;
-        if v21 == v0.wireTypes.varint then
-            if v20 == 1 then
-                v22 = nil;
-                v23, v24 = v0.readVarIntI64(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.event_id = v22;
-            elseif v20 == 2 then
-                v22 = nil;
-                v23, v24 = v0.readVarIntI64(v17, v19);
-                v22 = v23;
-                v19 = v24;
-                v18.user_id = v22;
-            else
-                v22 = nil;
-                v23, v24 = v0.readVarInt(v17, v19);
-                v22 = v23;
-                v19 = v24;
-            end;
-        elseif v21 == v0.wireTypes.lengthDelimited then
-            v22 = nil;
-            v23, v24 = v0.readVarInt(v17, v19);
-            v19 = v24 + v23;
-        elseif v21 == v0.wireTypes.i32 then
-            v22 = nil;
-            v23, v24 = v0.readFixed32(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        elseif v21 == v0.wireTypes.i64 then
-            v22 = nil;
-            v23, v24 = v0.readFixed64(v17, v19);
-            v22 = v23;
-            v19 = v24;
-        else
-            error("Unsupported wire type: " .. v21);
-        end;
-    end;
-    return v18;
-end;
-v6.jsonEncode = function(v25) --[[ Line: 194 ]] --[[ Name: jsonEncode ]]
-    local v26 = {};
-    if v25.event_id ~= nil and v25.event_id ~= 0 then
-        v26.eventId = v25.event_id;
-    end;
-    if v25.user_id ~= nil and v25.user_id ~= 0 then
-        v26.userId = v25.user_id;
-    end;
-    return v26;
-end;
-v6.jsonDecode = function(v27) --[[ Line: 208 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v6_0 (copy)
-    local v28 = l_v6_0.new();
-    if v27.event_id ~= nil then
-        v28.event_id = v27.event_id;
-    end;
-    if v27.eventId ~= nil then
-        v28.event_id = v27.eventId;
-    end;
-    if v27.user_id ~= nil then
-        v28.user_id = v27.user_id;
-    end;
-    if v27.userId ~= nil then
-        v28.user_id = v27.userId;
-    end;
-    return v28;
-end;
-v6.descriptor = {
-    name = "ExperienceEventDetailsPageRequest", 
-    fullName = "roblox.apppageplatform.experienceevents.v1beta1.ExperienceEventDetailsPageRequest"
-};
-v2.ExperienceEventDetailsPageRequest = v6;
-v1.default:register(v2.ExperienceEventDetailsPageRequest);
-v6 = {};
-v6.__index = v6;
-local l_v6_1 = v6 --[[ copy: 6 -> 8 ]];
-v6.new = function(v30) --[[ Line: 246 ]] --[[ Name: new ]]
-    -- upvalues: l_v6_1 (copy)
-    return (setmetatable({
-        page_entries = if not (v30 ~= nil) or v30.page_entries == nil then {} else v30.page_entries, 
-        hydration_data = if not (v30 ~= nil) or v30.hydration_data == nil then nil else v30.hydration_data, 
-        templates = if not (v30 ~= nil) or v30.templates == nil then {} else v30.templates
-    }, l_v6_1));
-end;
-v6.encode = function(v31) --[[ Line: 256 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v32 = buffer.create(0);
-    local v33 = 0;
-    if v31.page_entries ~= nil and #v31.page_entries > 0 then
-        for _, v35 in v31.page_entries do
-            local v36 = v35:encode();
-            local v37, v38 = v0.writeTag(v32, v33, 1, v0.wireTypes.lengthDelimited);
-            v37, v38 = v0.writeBuffer(v37, v38, v36, buffer.len(v36));
-            v32 = v37;
-            v33 = v38;
-        end;
-    end;
-    if v31.hydration_data ~= nil then
-        local v39 = v31.hydration_data:encode();
-        local v40, v41 = v0.writeTag(v32, v33, 2, v0.wireTypes.lengthDelimited);
-        v40, v41 = v0.writeBuffer(v40, v41, v39, buffer.len(v39));
-        v32 = v40;
-        v33 = v41;
-    end;
-    if v31.templates ~= nil and next(v31.templates) ~= nil then
-        for v42, v43 in v31.templates do
-            local v44 = buffer.create(0);
-            local v45, v46 = v0.writeTag(v44, 0, 1, v0.wireTypes.lengthDelimited);
-            v45, v46 = v0.writeString(v45, v46, v42);
-            v44 = v45;
-            local l_v46_0 = v46;
-            v45 = v43:encode();
-            local v48;
-            v46, v48 = v0.writeTag(v44, l_v46_0, 2, v0.wireTypes.lengthDelimited);
-            v46, v48 = v0.writeBuffer(v46, v48, v45, buffer.len(v45));
-            v44 = v46;
-            l_v46_0 = v48;
-            v46, v48 = v0.writeTag(v32, v33, 3, v0.wireTypes.lengthDelimited);
-            v46, v48 = v0.writeBuffer(v46, v48, v44, l_v46_0);
-            v32 = v46;
-            v33 = v48;
-        end;
-    end;
-    local v49 = buffer.create(v33);
-    buffer.copy(v49, 0, v32, 0, v33);
-    return v49;
-end;
-v6.decode = function(v50) --[[ Line: 293 ]] --[[ Name: decode ]]
-    -- upvalues: l_v6_1 (copy), v0 (copy), v5 (copy), v3 (copy), v2 (copy), v4 (copy)
-    local v51 = l_v6_1.new();
-    local v52 = 0;
-    while v52 < buffer.len(v50) do
-        local v53 = nil;
-        local v54 = nil;
-        local v55, v56, v57 = v0.readTag(v50, v52);
-        v53 = v55;
-        v54 = v56;
-        v52 = v57;
-        if v54 == v0.wireTypes.varint then
-            v55 = nil;
-            v56, v57 = v0.readVarInt(v50, v52);
-            v55 = v56;
-            v52 = v57;
-        elseif v54 == v0.wireTypes.lengthDelimited then
-            if v53 == 1 then
-                v55 = nil;
-                v56, v57 = v0.readBuffer(v50, v52);
-                v55 = v56;
-                v52 = v57;
-                table.insert(v51.page_entries, v5.UniversalPageEntry.decode(v55));
-            elseif v53 == 2 then
-                v55 = nil;
-                v56, v57 = v0.readBuffer(v50, v52);
-                v55 = v56;
-                v52 = v57;
-                v51.hydration_data = v3.HydrationContent.decode(v55);
-            elseif v53 == 3 then
-                v55 = nil;
-                v56, v57 = v0.readBuffer(v50, v52);
-                v55 = v56;
-                v52 = v57;
-                v56 = v2.ExperienceEventDetailsPageResponse_TemplatesEntry.decode(v55);
-                v57 = v4.TemplateEntry.new();
-                v51.templates[v56.key or ""] = v56.value or v57;
-            else
-                v55 = nil;
-                v56, v57 = v0.readVarInt(v50, v52);
-                v52 = v57 + v56;
-            end;
-        elseif v54 == v0.wireTypes.i32 then
-            v55 = nil;
-            v56, v57 = v0.readFixed32(v50, v52);
-            v55 = v56;
-            v52 = v57;
-        elseif v54 == v0.wireTypes.i64 then
-            v55 = nil;
-            v56, v57 = v0.readFixed64(v50, v52);
-            v55 = v56;
-            v52 = v57;
-        else
-            error("Unsupported wire type: " .. v54);
-        end;
-    end;
-    return v51;
-end;
-v6.jsonEncode = function(v58) --[[ Line: 357 ]] --[[ Name: jsonEncode ]]
-    local v59 = {};
-    if v58.page_entries ~= nil and #v58.page_entries > 0 then
-        local v60 = {};
-        for _, v62 in v58.page_entries do
-            table.insert(v60, v62:jsonEncode());
-        end;
-        v59.pageEntries = v60;
-    end;
-    if v58.hydration_data ~= nil then
-        v59.hydrationData = v58.hydration_data:jsonEncode();
-    end;
-    if v58.templates ~= nil and next(v58.templates) ~= nil then
-        local v63 = {};
-        for v64, v65 in v58.templates do
-            v63[v64] = v65:jsonEncode();
-        end;
-        v59.templates = v63;
-    end;
-    return v59;
-end;
-v6.jsonDecode = function(v66) --[[ Line: 383 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v6_1 (copy), v5 (copy), v3 (copy), v4 (copy)
-    local v67 = l_v6_1.new();
-    if v66.page_entries ~= nil then
-        local v68 = {};
-        for _, v70 in v66.page_entries do
-            table.insert(v68, v5.UniversalPageEntry.jsonDecode(v70));
-        end;
-        v67.page_entries = v68;
-    end;
-    if v66.pageEntries ~= nil then
-        local v71 = {};
-        for _, v73 in v66.pageEntries do
-            table.insert(v71, v5.UniversalPageEntry.jsonDecode(v73));
-        end;
-        v67.page_entries = v71;
-    end;
-    if v66.hydration_data ~= nil then
-        v67.hydration_data = v3.HydrationContent.jsonDecode(v66.hydration_data);
-    end;
-    if v66.hydrationData ~= nil then
-        v67.hydration_data = v3.HydrationContent.jsonDecode(v66.hydrationData);
-    end;
-    if v66.templates ~= nil then
-        local v74 = {};
-        for v75, v76 in v66.templates do
-            v74[v75] = v4.TemplateEntry.jsonDecode(v76);
-        end;
-        v67.templates = v74;
-    end;
-    return v67;
-end;
-v6.descriptor = {
-    name = "ExperienceEventDetailsPageResponse", 
-    fullName = "roblox.apppageplatform.experienceevents.v1beta1.ExperienceEventDetailsPageResponse"
-};
-v2.ExperienceEventDetailsPageResponse = v6;
-v1.default:register(v2.ExperienceEventDetailsPageResponse);
-v6 = {};
-v6.__index = v6;
-v6.new = function(v77) --[[ Line: 451 ]] --[[ Name: new ]]
-    -- upvalues: v6 (copy)
-    return (setmetatable({
-        key = (not (v77 ~= nil) or v77.key == nil) and "" or v77.key, 
-        value = if not (v77 ~= nil) or v77.value == nil then nil else v77.value
-    }, v6));
-end;
-v6.encode = function(v78) --[[ Line: 463 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v79 = buffer.create(0);
-    local v80 = 0;
-    if v78.key ~= nil and v78.key ~= "" then
-        local v81, v82 = v0.writeTag(v79, v80, 1, v0.wireTypes.lengthDelimited);
-        v81, v82 = v0.writeString(v81, v82, v78.key);
-        v79 = v81;
-        v80 = v82;
-    end;
-    if v78.value ~= nil then
-        local v83 = v78.value:encode();
-        local v84, v85 = v0.writeTag(v79, v80, 2, v0.wireTypes.lengthDelimited);
-        v84, v85 = v0.writeBuffer(v84, v85, v83, buffer.len(v83));
-        v79 = v84;
-        v80 = v85;
-    end;
-    local v86 = buffer.create(v80);
-    buffer.copy(v86, 0, v79, 0, v80);
-    return v86;
-end;
-v6.decode = function(v87) --[[ Line: 485 ]] --[[ Name: decode ]]
-    -- upvalues: v6 (copy), v0 (copy), v4 (copy)
-    local v88 = v6.new();
-    local v89 = 0;
-    while v89 < buffer.len(v87) do
-        local v90 = nil;
-        local v91 = nil;
-        local v92, v93, v94 = v0.readTag(v87, v89);
-        v90 = v92;
-        v91 = v93;
-        v89 = v94;
-        if v91 == v0.wireTypes.varint then
-            v92 = nil;
-            v93, v94 = v0.readVarInt(v87, v89);
-            v92 = v93;
-            v89 = v94;
-        elseif v91 == v0.wireTypes.lengthDelimited then
-            if v90 == 1 then
-                v92 = nil;
-                v93, v94 = v0.readBuffer(v87, v89);
-                v92 = v93;
-                v89 = v94;
-                v88.key = buffer.tostring(v92);
-            elseif v90 == 2 then
-                v92 = nil;
-                v93, v94 = v0.readBuffer(v87, v89);
-                v92 = v93;
-                v89 = v94;
-                v88.value = v4.TemplateEntry.decode(v92);
-            else
-                v92 = nil;
-                v93, v94 = v0.readVarInt(v87, v89);
-                v89 = v94 + v93;
-            end;
-        elseif v91 == v0.wireTypes.i32 then
-            v92 = nil;
-            v93, v94 = v0.readFixed32(v87, v89);
-            v92 = v93;
-            v89 = v94;
-        elseif v91 == v0.wireTypes.i64 then
-            v92 = nil;
-            v93, v94 = v0.readFixed64(v87, v89);
-            v92 = v93;
-            v89 = v94;
-        else
-            error("Unsupported wire type: " .. v91);
-        end;
-    end;
-    return v88;
-end;
-v6.jsonEncode = function(v95) --[[ Line: 535 ]] --[[ Name: jsonEncode ]]
-    local v96 = {};
-    if v95.key ~= nil and v95.key ~= "" then
-        v96.key = v95.key;
-    end;
-    if v95.value ~= nil then
-        v96.value = v95.value:jsonEncode();
-    end;
-    return v96;
-end;
-v6.jsonDecode = function(v97) --[[ Line: 551 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v6 (copy), v4 (copy)
-    local v98 = v6.new();
-    if v97.key ~= nil then
-        v98.key = v97.key;
-    end;
-    if v97.value ~= nil then
-        v98.value = v4.TemplateEntry.jsonDecode(v97.value);
-    end;
-    return v98;
-end;
-v6.descriptor = {
-    name = "ExperienceEventDetailsPageResponse_TemplatesEntry", 
-    fullName = "roblox.apppageplatform.experienceevents.v1beta1.TemplatesEntry"
-};
-v2.ExperienceEventDetailsPageResponse_TemplatesEntry = v6;
-v1.default:register(v2.ExperienceEventDetailsPageResponse_TemplatesEntry);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local hydration_content = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content)
+local template_entry = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry)
+local page_entry_content = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 153
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		event_id = if t3 ~= nil and t3.event_id ~= nil then t3.event_id else 0,
+		user_id = if t3 ~= nil and t3.user_id ~= nil then t3.user_id else 0
+	}, t2))
+end
+function t2.encode(p1) -- line: 162
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.event_id ~= nil and p1.event_id ~= 0 then
+		local v15, v16 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v15, v16, p1.event_id)
+	end
+
+	if p1.user_id ~= nil and p1.user_id ~= 0 then
+		local v17, v18 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v17, v18, p1.user_id)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 181
+	-- upvalues: t2 (copy), proto (copy)
+	local v21 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v23, v24
+
+		v23, v24, n2 = proto.readTag(p2, n2)
+
+		if v24 == proto.wireTypes.varint then
+			if v23 == 1 then
+				local v25
+
+				v25, n2 = proto.readVarIntI64(p2, n2)
+				v21.event_id = v25
+			elseif v23 == 2 then
+				local v26
+
+				v26, n2 = proto.readVarIntI64(p2, n2)
+				v21.user_id = v26
+			else
+				local v27
+
+				v27, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v24 == proto.wireTypes.lengthDelimited then
+			local v28, v29 = proto.readVarInt(p2, n2)
+
+			n2 = v29 + v28
+		elseif v24 == proto.wireTypes.i32 then
+			local v30
+
+			v30, n2 = proto.readFixed32(p2, n2)
+		elseif v24 == proto.wireTypes.i64 then
+			local v31
+
+			v31, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v24)
+		end
+	end
+
+	return v21
+end
+function t2.jsonEncode(p3) -- line: 229
+	local t4 = {}
+
+	if p3.event_id ~= nil and p3.event_id ~= 0 then
+		t4.eventId = p3.event_id
+	end
+
+	if p3.user_id ~= nil and p3.user_id ~= 0 then
+		t4.userId = p3.user_id
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 243
+	-- upvalues: t2 (copy)
+	local v35 = t2.new()
+
+	if t5.event_id ~= nil then
+		v35.event_id = t5.event_id
+	end
+
+	if t5.eventId ~= nil then
+		v35.event_id = t5.eventId
+	end
+
+	if t5.user_id ~= nil then
+		v35.user_id = t5.user_id
+	end
+
+	if t5.userId ~= nil then
+		v35.user_id = t5.userId
+	end
+
+	return v35
+end
+
+t2.descriptor = {
+	name = "ExperienceEventDetailsPageRequest",
+	fullName = "roblox.apppageplatform.experienceevents.v1beta1.ExperienceEventDetailsPageRequest"
+}
+t1.ExperienceEventDetailsPageRequest = t2
+typeRegistry.default:register(t1.ExperienceEventDetailsPageRequest)
+
+local t6 = {}
+
+t6.__index = t6
+
+function t6.new(t7: {[any]: any}?) -- line: 281
+	-- upvalues: t6 (copy)
+	return (setmetatable({
+		page_entries = if t7 ~= nil and t7.page_entries ~= nil then t7.page_entries else {},
+		hydration_data = if t7 ~= nil and t7.hydration_data ~= nil then t7.hydration_data else nil,
+		templates = if t7 ~= nil and t7.templates ~= nil then t7.templates else {},
+		localized_literals = if t7 ~= nil and t7.localized_literals ~= nil then t7.localized_literals else {}
+	}, t6))
+end
+function t6.encode(p4) -- line: 292
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n3 = 0
+
+	if p4.page_entries ~= nil and #p4.page_entries > 0 then
+		for _, v41 in p4.page_entries do
+			local v42 = v41:encode()
+			local v43, v44 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v43, v44, v42, buffer.len(v42))
+		end
+	end
+
+	if p4.hydration_data ~= nil then
+		local v45 = p4.hydration_data:encode()
+		local v46, v47 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n3 = proto.writeBuffer(v46, v47, v45, buffer.len(v45))
+	end
+
+	if p4.templates ~= nil and next(p4.templates) ~= nil then
+		for v48, v49 in p4.templates do
+			local buf3 = buffer.create(0)
+			local v51, v52 = proto.writeTag(buf3, 0, 1, proto.wireTypes.lengthDelimited)
+			local v53, v54 = proto.writeString(v51, v52, v48)
+			local v55 = v49:encode()
+			local v56, v57 = proto.writeTag(v53, v54, 2, proto.wireTypes.lengthDelimited)
+			local v58, v59 = proto.writeBuffer(v56, v57, v55, buffer.len(v55))
+			local v60, v61 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v60, v61, v58, v59)
+		end
+	end
+
+	if p4.localized_literals ~= nil and next(p4.localized_literals) ~= nil then
+		for v62, v63 in p4.localized_literals do
+			local buf4 = buffer.create(0)
+			local v65, v66 = proto.writeTag(buf4, 0, 1, proto.wireTypes.lengthDelimited)
+			local v67, v68 = proto.writeString(v65, v66, v62)
+			local v69, v70 = proto.writeTag(v67, v68, 2, proto.wireTypes.lengthDelimited)
+			local v71, v72 = proto.writeString(v69, v70, v63)
+			local v73, v74 = proto.writeTag(buf, n3, 4, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v73, v74, v71, v72)
+		end
+	end
+
+	local buf5 = buffer.create(n3)
+
+	buffer.copy(buf5, 0, buf, 0, n3)
+
+	return buf5
+end
+function t6.decode(p5: buffer) -- line: 342
+	-- upvalues: t6 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
+	local v77 = t6.new()
+	local n4 = 0
+
+	while n4 < buffer.len(p5) do
+		local v79, v80
+
+		v79, v80, n4 = proto.readTag(p5, n4)
+
+		if v80 == proto.wireTypes.varint then
+			local v81
+
+			v81, n4 = proto.readVarInt(p5, n4)
+		elseif v80 == proto.wireTypes.lengthDelimited then
+			if v79 == 1 then
+				local v82
+
+				v82, n4 = proto.readBuffer(p5, n4)
+				table.insert(v77.page_entries, page_entry_content.UniversalPageEntry.decode(v82))
+			elseif v79 == 2 then
+				local v83
+
+				v83, n4 = proto.readBuffer(p5, n4)
+				v77.hydration_data = hydration_content.HydrationContent.decode(v83)
+			elseif v79 == 3 then
+				local v84
+
+				v84, n4 = proto.readBuffer(p5, n4)
+
+				local v85 = t1.ExperienceEventDetailsPageResponse_TemplatesEntry.decode(v84)
+				local v86 = template_entry.TemplateEntry.new()
+
+				v77.templates[v85.key or ""] = v85.value or v86
+			elseif v79 == 4 then
+				local v87
+
+				v87, n4 = proto.readBuffer(p5, n4)
+
+				local v88 = t1.ExperienceEventDetailsPageResponse_LocalizedLiteralsEntry.decode(v87)
+
+				v77.localized_literals[v88.key or ""] = v88.value or ""
+			else
+				local v89, v90 = proto.readVarInt(p5, n4)
+
+				n4 = v90 + v89
+			end
+		elseif v80 == proto.wireTypes.i32 then
+			local v91
+
+			v91, n4 = proto.readFixed32(p5, n4)
+		elseif v80 == proto.wireTypes.i64 then
+			local v92
+
+			v92, n4 = proto.readFixed64(p5, n4)
+		else
+			error("Unsupported wire type: " .. v80)
+		end
+	end
+
+	return v77
+end
+function t6.jsonEncode(p6) -- line: 418
+	local t8 = {}
+
+	if p6.page_entries ~= nil and #p6.page_entries > 0 then
+		local t9 = {}
+
+		for _, v97 in p6.page_entries do
+			table.insert(t9, v97:jsonEncode())
+		end
+
+		t8.pageEntries = t9
+	end
+
+	if p6.hydration_data ~= nil then
+		t8.hydrationData = p6.hydration_data:jsonEncode()
+	end
+
+	if p6.templates ~= nil and next(p6.templates) ~= nil then
+		local t10 = {}
+
+		for v99, v100 in p6.templates do
+			t10[v99] = v100:jsonEncode()
+		end
+
+		t8.templates = t10
+	end
+
+	if p6.localized_literals ~= nil and next(p6.localized_literals) ~= nil then
+		local t11 = {}
+
+		for v102, v103 in p6.localized_literals do
+			t11[v102] = v103
+		end
+
+		t8.localizedLiterals = t11
+	end
+
+	return t8
+end
+function t6.jsonDecode(t12: {[any]: any}) -- line: 452
+	-- upvalues: t6 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
+	local v105 = t6.new()
+
+	if t12.page_entries ~= nil then
+		local t13 = {}
+
+		for _, v108 in t12.page_entries do
+			table.insert(t13, page_entry_content.UniversalPageEntry.jsonDecode(v108))
+		end
+
+		v105.page_entries = t13
+	end
+
+	if t12.pageEntries ~= nil then
+		local t14 = {}
+
+		for _, v111 in t12.pageEntries do
+			table.insert(t14, page_entry_content.UniversalPageEntry.jsonDecode(v111))
+		end
+
+		v105.page_entries = t14
+	end
+
+	if t12.hydration_data ~= nil then
+		v105.hydration_data = hydration_content.HydrationContent.jsonDecode(t12.hydration_data)
+	end
+
+	if t12.hydrationData ~= nil then
+		v105.hydration_data = hydration_content.HydrationContent.jsonDecode(t12.hydrationData)
+	end
+
+	if t12.templates ~= nil then
+		local t15 = {}
+
+		for v113, v114 in t12.templates do
+			t15[v113] = template_entry.TemplateEntry.jsonDecode(v114)
+		end
+
+		v105.templates = t15
+	end
+
+	if t12.localized_literals ~= nil then
+		local t16 = {}
+
+		for v116, v117 in t12.localized_literals do
+			t16[v116] = v117
+		end
+
+		v105.localized_literals = t16
+	end
+
+	if t12.localizedLiterals ~= nil then
+		local t17 = {}
+
+		for v119, v120 in t12.localizedLiterals do
+			t17[v119] = v120
+		end
+
+		v105.localized_literals = t17
+	end
+
+	return v105
+end
+
+t6.descriptor = {
+	name = "ExperienceEventDetailsPageResponse",
+	fullName = "roblox.apppageplatform.experienceevents.v1beta1.ExperienceEventDetailsPageResponse"
+}
+t1.ExperienceEventDetailsPageResponse = t6
+typeRegistry.default:register(t1.ExperienceEventDetailsPageResponse)
+
+local t18 = {}
+
+t18.__index = t18
+
+function t18.new(t19: {[any]: any}?) -- line: 538
+	-- upvalues: t18 (copy)
+	return (setmetatable({
+		key = if t19 ~= nil and t19.key ~= nil then t19.key else "",
+		value = if t19 ~= nil and t19.value ~= nil then t19.value else nil
+	}, t18))
+end
+function t18.encode(p7) -- line: 550
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n5 = 0
+
+	if p7.key ~= nil and p7.key ~= "" then
+		local v125, v126 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeString(v125, v126, p7.key)
+	end
+
+	if p7.value ~= nil then
+		local v127 = p7.value:encode()
+		local v128, v129 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeBuffer(v128, v129, v127, buffer.len(v127))
+	end
+
+	local buf6 = buffer.create(n5)
+
+	buffer.copy(buf6, 0, buf, 0, n5)
+
+	return buf6
+end
+function t18.decode(p8: buffer) -- line: 572
+	-- upvalues: t18 (copy), proto (copy), template_entry (copy)
+	local v132 = t18.new()
+	local n6 = 0
+
+	while n6 < buffer.len(p8) do
+		local v134, v135
+
+		v134, v135, n6 = proto.readTag(p8, n6)
+
+		if v135 == proto.wireTypes.varint then
+			local v136
+
+			v136, n6 = proto.readVarInt(p8, n6)
+		elseif v135 == proto.wireTypes.lengthDelimited then
+			if v134 == 1 then
+				local v137
+
+				v137, n6 = proto.readBuffer(p8, n6)
+				v132.key = buffer.tostring(v137)
+			elseif v134 == 2 then
+				local v138
+
+				v138, n6 = proto.readBuffer(p8, n6)
+				v132.value = template_entry.TemplateEntry.decode(v138)
+			else
+				local v139, v140 = proto.readVarInt(p8, n6)
+
+				n6 = v140 + v139
+			end
+		elseif v135 == proto.wireTypes.i32 then
+			local v141
+
+			v141, n6 = proto.readFixed32(p8, n6)
+		elseif v135 == proto.wireTypes.i64 then
+			local v142
+
+			v142, n6 = proto.readFixed64(p8, n6)
+		else
+			error("Unsupported wire type: " .. v135)
+		end
+	end
+
+	return v132
+end
+function t18.jsonEncode(p9) -- line: 622
+	local t20 = {}
+
+	if p9.key ~= nil and p9.key ~= "" then
+		t20.key = p9.key
+	end
+
+	if p9.value ~= nil then
+		t20.value = p9.value:jsonEncode()
+	end
+
+	return t20
+end
+function t18.jsonDecode(t21: {[any]: any}) -- line: 638
+	-- upvalues: t18 (copy), template_entry (copy)
+	local v146 = t18.new()
+
+	if t21.key ~= nil then
+		v146.key = t21.key
+	end
+
+	if t21.value ~= nil then
+		v146.value = template_entry.TemplateEntry.jsonDecode(t21.value)
+	end
+
+	return v146
+end
+
+t18.descriptor = {
+	name = "ExperienceEventDetailsPageResponse_TemplatesEntry",
+	fullName = "roblox.apppageplatform.experienceevents.v1beta1.TemplatesEntry"
+}
+t1.ExperienceEventDetailsPageResponse_TemplatesEntry = t18
+typeRegistry.default:register(t1.ExperienceEventDetailsPageResponse_TemplatesEntry)
+
+local t22 = {}
+
+t22.__index = t22
+
+function t22.new(t23: {[any]: any}?) -- line: 670
+	-- upvalues: t22 (copy)
+	return (setmetatable({
+		key = if t23 ~= nil and t23.key ~= nil then t23.key else "",
+		value = if t23 ~= nil and t23.value ~= nil then t23.value else ""
+	}, t22))
+end
+function t22.encode(p10) -- line: 682
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n7 = 0
+
+	if p10.key ~= nil and p10.key ~= "" then
+		local v151, v152 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n7 = proto.writeString(v151, v152, p10.key)
+	end
+
+	if p10.value ~= nil and p10.value ~= "" then
+		local v153, v154 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n7 = proto.writeString(v153, v154, p10.value)
+	end
+
+	local buf7 = buffer.create(n7)
+
+	buffer.copy(buf7, 0, buf, 0, n7)
+
+	return buf7
+end
+function t22.decode(p11: buffer) -- line: 703
+	-- upvalues: t22 (copy), proto (copy)
+	local v157 = t22.new()
+	local n8 = 0
+
+	while n8 < buffer.len(p11) do
+		local v159, v160
+
+		v159, v160, n8 = proto.readTag(p11, n8)
+
+		if v160 == proto.wireTypes.varint then
+			local v161
+
+			v161, n8 = proto.readVarInt(p11, n8)
+		elseif v160 == proto.wireTypes.lengthDelimited then
+			if v159 == 1 then
+				local v162
+
+				v162, n8 = proto.readBuffer(p11, n8)
+				v157.key = buffer.tostring(v162)
+			elseif v159 == 2 then
+				local v163
+
+				v163, n8 = proto.readBuffer(p11, n8)
+				v157.value = buffer.tostring(v163)
+			else
+				local v164, v165 = proto.readVarInt(p11, n8)
+
+				n8 = v165 + v164
+			end
+		elseif v160 == proto.wireTypes.i32 then
+			local v166
+
+			v166, n8 = proto.readFixed32(p11, n8)
+		elseif v160 == proto.wireTypes.i64 then
+			local v167
+
+			v167, n8 = proto.readFixed64(p11, n8)
+		else
+			error("Unsupported wire type: " .. v160)
+		end
+	end
+
+	return v157
+end
+function t22.jsonEncode(p12) -- line: 753
+	local t24 = {}
+
+	if p12.key ~= nil and p12.key ~= "" then
+		t24.key = p12.key
+	end
+
+	if p12.value ~= nil and p12.value ~= "" then
+		t24.value = p12.value
+	end
+
+	return t24
+end
+function t22.jsonDecode(t25: {[any]: any}) -- line: 769
+	-- upvalues: t22 (copy)
+	local v171 = t22.new()
+
+	if t25.key ~= nil then
+		v171.key = t25.key
+	end
+
+	if t25.value ~= nil then
+		v171.value = t25.value
+	end
+
+	return v171
+end
+
+t22.descriptor = {
+	name = "ExperienceEventDetailsPageResponse_LocalizedLiteralsEntry",
+	fullName = "roblox.apppageplatform.experienceevents.v1beta1.LocalizedLiteralsEntry"
+}
+t1.ExperienceEventDetailsPageResponse_LocalizedLiteralsEntry = t22
+typeRegistry.default:register(t1.ExperienceEventDetailsPageResponse_LocalizedLiteralsEntry)
+
 return {
-    ExperienceEventDetailsPageRequest = v2.ExperienceEventDetailsPageRequest, 
-    ExperienceEventDetailsPageResponse = v2.ExperienceEventDetailsPageResponse
-};
+	ExperienceEventDetailsPageRequest = t1.ExperienceEventDetailsPageRequest,
+	ExperienceEventDetailsPageResponse = t1.ExperienceEventDetailsPageResponse
+}

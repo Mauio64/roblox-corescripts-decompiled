@@ -1,32 +1,36 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 9 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = {
-        _reporter = v1, 
-        _isEnabled = true
-    };
-    setmetatable(v2, v0);
-    return v2;
-end;
-v0.setEnabled = function(v3, v4) --[[ Line: 19 ]] --[[ Name: setEnabled ]]
-    v3._isEnabled = v4;
-end;
-v0.sendTelemetryEvent = function(v5, v6, v7, v8) --[[ Line: 26 ]] --[[ Name: sendTelemetryEvent ]]
-    v8 = v8 or {};
-    assert(type(v6) == "string", "Expected eventContext to be a string");
-    assert(type(v7) == "string", "Expected eventName to be a string");
-    assert(type(v8) == "table", "Expected additionalArgs to be a table");
-    assert(v5._isEnabled, "This reporting service is disabled");
-    v5._reporter:logRobloxTelemetryEvent({
-        eventName = v7, 
-        backends = {
-            "EventIngest"
-        }, 
-        throttlingPercentage = 10000
-    }, {
-        "addSessionId", 
-        "addSessionInfo"
-    }, v8, v6);
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 9
+	-- upvalues: t1 (copy)
+	local t2 = {
+		_isEnabled = true,
+		_reporter = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.setEnabled(t3: {[any]: any}, b1: boolean) -- line: 19
+	t3._isEnabled = b1
+end
+function t1.sendTelemetryEvent(t4: {[any]: any}, s1: string, s2: string, t5: {[any]: any}?) -- line: 26
+	local v10 = t5 or {}
+
+	assert(type(s1) == "string", "Expected eventContext to be a string")
+	assert(type(s2) == "string", "Expected eventName to be a string")
+	assert(type(v10) == "table", "Expected additionalArgs to be a table")
+	assert(t4._isEnabled, "This reporting service is disabled")
+	t4._reporter:logRobloxTelemetryEvent({
+		throttlingPercentage = 10000,
+		eventName = s2,
+		backends = { "EventIngest" }
+	}, {
+		"addSessionId",
+		"addSessionInfo"
+	}, v10, s1)
+end
+
+return t1

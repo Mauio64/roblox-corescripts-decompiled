@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppEnableVRCarouselScrolling", false);
+return game:DefineFastFlag("LuaAppEnableVRCarouselScrolling", false)

@@ -1,2 +1,3 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialLuaAnalytics").Parent;
-return (require(l_Parent_0.Lumberyak).Logger.new(nil, "SocialLuaAnalytics"));
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+
+return (require(Parent.Lumberyak).Logger.new(nil, "SocialLuaAnalytics"))

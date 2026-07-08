@@ -1,5 +1,5 @@
 return {
-    isObjectLike = function(v0) --[[ Line: 12 ]] --[[ Name: isObjectLike ]]
-        return typeof(v0) == "table";
-    end
-};
+	isObjectLike = function(p1) -- line: 12
+		return typeof(p1) == "table"
+	end
+}

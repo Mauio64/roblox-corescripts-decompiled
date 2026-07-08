@@ -1,14 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v3 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return v3.createContext({
-    anchor = nil, 
-    setAnchor = function(_) --[[ Line: 11 ]] --[[ Name: setAnchor ]]
-        -- upvalues: v2 (copy)
-        v2:warning("No PopoverProvider found for Popover");
-    end, 
-    isOpen = false, 
-    testId = ""
-});
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Logger = require(Foundation.Utility.Logger)
+local React = require(FoundationParent.React)
+
+require(Foundation.Utility.Plugin.StudioUri)
+require(Foundation.Components.Types)
+
+return React.createContext({
+	anchor = nil,
+	anchorUri = nil,
+	isOpen = false,
+	testId = "",
+	setAnchor = function(_) -- line: 13
+		-- upvalues: Logger (copy)
+		Logger:warning("No PopoverProvider found for Popover")
+	end,
+	setAnchorUri = function(_) -- line: 17
+		-- upvalues: Logger (copy)
+		Logger:warning("No PopoverProvider found for Popover")
+	end
+})

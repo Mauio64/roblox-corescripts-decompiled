@@ -1,36 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ProfilePlatform");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v4 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_PlayerContext_0 = v4.App.Indicator.PlayerContext;
-local v7 = require(l_script_FirstAncestor_0.Common.TextKeys);
-local v8 = require(l_script_FirstAncestor_0.Common.Enums);
-return function(v9) --[[ Line: 21 ]] --[[ Name: ContextualInformation ]]
-    -- upvalues: l_useLocalization_0 (copy), v8 (copy), v7 (copy), l_Images_0 (copy), v2 (copy), l_PlayerContext_0 (copy)
-    local v10 = l_useLocalization_0({
-        [v8.ContextualTypes.AccountDeleted] = v7.AccountDeleted, 
-        [v8.ContextualTypes.IsYourself] = v7.ThisIsYou, 
-        [v8.ContextualTypes.PreviousUsername] = v7.Previously, 
-        [v8.ContextualTypes.YouAreFollowing] = v7.YouAreFollowing, 
-        [v8.ContextualTypes.FollowsYou] = v7.FollowsYou, 
-        [v8.ContextualTypes.PlayedTogether] = v7.PlayedTogether, 
-        [v8.ContextualTypes.OffNetworkFriendRequest] = v7.FriendInvite, 
-        [v8.ContextualTypes.SentFromQrCode] = v7.FromQRCode, 
-        [v8.ContextualTypes.SentFromExperience] = {
-            v7.SentFromWithContext; 
-            gameName = v9.experienceName
-        }
-    });
-    local l_contextualType_0 = v9.contextualType;
-    local v12 = v10[l_contextualType_0];
-    local v13 = nil;
-    if l_contextualType_0 == v8.ContextualTypes.YouAreFollowing or l_contextualType_0 == v8.ContextualTypes.FollowsYou then
-        v13 = l_Images_0["icons/status/player/following"];
-    end;
-    return v2.createElement(l_PlayerContext_0, {
-        text = v9.textOverride or v12, 
-        icon = v9.iconOverride or v13
-    });
-end;
+local ProfilePlatform = script:FindFirstAncestor("ProfilePlatform")
+local ProfilePlatformParent = ProfilePlatform.Parent
+local React = require(ProfilePlatformParent.React)
+local useLocalization = require(ProfilePlatformParent.Localization).Hooks.useLocalization
+local UIBlox = require(ProfilePlatformParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local PlayerContext = UIBlox.App.Indicator.PlayerContext
+local TextKeys = require(ProfilePlatform.Common.TextKeys)
+local Enums = require(ProfilePlatform.Common.Enums)
+
+local function ContextualInformation(t1: {[any]: any}) -- line: 21
+	-- upvalues: useLocalization (copy), Enums (copy), TextKeys (copy), Images (copy), React (copy), PlayerContext (copy)
+	local v12 = useLocalization({
+		[Enums.ContextualTypes.AccountDeleted] = TextKeys.AccountDeleted,
+		[Enums.ContextualTypes.IsYourself] = TextKeys.ThisIsYou,
+		[Enums.ContextualTypes.PreviousUsername] = TextKeys.Previously,
+		[Enums.ContextualTypes.YouAreFollowing] = TextKeys.YouAreFollowing,
+		[Enums.ContextualTypes.FollowsYou] = TextKeys.FollowsYou,
+		[Enums.ContextualTypes.PlayedTogether] = TextKeys.PlayedTogether,
+		[Enums.ContextualTypes.OffNetworkFriendRequest] = TextKeys.FriendInvite,
+		[Enums.ContextualTypes.SentFromQrCode] = TextKeys.FromQRCode,
+		[Enums.ContextualTypes.SentFromExperience] = {
+			TextKeys.SentFromWithContext,
+			gameName = t1.experienceName
+		}
+	})
+	local contextualType = t1.contextualType
+	local v14 = v12[contextualType]
+	local v15 = nil
+
+	if contextualType == Enums.ContextualTypes.YouAreFollowing or contextualType == Enums.ContextualTypes.FollowsYou then
+		v15 = Images["icons/status/player/following"]
+	end
+
+	return React.createElement(PlayerContext, {
+		text = t1.textOverride or v14,
+		icon = t1.iconOverride or v15
+	})
+end
+
+return ContextualInformation

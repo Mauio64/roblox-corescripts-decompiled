@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfileEnableSocialNetworksUsernames", false);
+return game:DefineFastFlag("ProfileEnableSocialNetworksUsernames", false)

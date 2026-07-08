@@ -1,20 +1,24 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_Parent_0.SduiCompat);
-return v1.memo(function(v4) --[[ Line: 32 ]] --[[ Name: SduiIcon ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.createElement(v2.Icon, {
-        name = v4.name, 
-        style = v4.style, 
-        size = v4.size, 
-        variant = v4.variant, 
-        Rotation = v4.rotation, 
-        AnchorPoint = v4.anchorPoint, 
-        LayoutOrder = v4.layoutOrder, 
-        Position = v4.position, 
-        Visible = v4.visible, 
-        ZIndex = v4.zIndex, 
-        testId = v4.testId
-    }, v4.children);
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+
+require(Parent.SduiCompat)
+
+local function SduiIcon(t1: {[any]: any}) -- line: 32
+	-- upvalues: React (copy), Foundation (copy)
+	return React.createElement(Foundation.Icon, {
+		name = t1.name,
+		style = t1.style,
+		size = t1.size,
+		variant = t1.variant,
+		Rotation = t1.rotation,
+		AnchorPoint = t1.anchorPoint,
+		LayoutOrder = t1.layoutOrder,
+		Position = t1.position,
+		Visible = t1.visible,
+		ZIndex = t1.zIndex,
+		testId = t1.testId
+	}, t1.children)
+end
+
+return React.memo(SduiIcon)

@@ -1,27 +1,32 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local v4 = require(script.Parent.useUndoRedoBarViewModel);
-local v5 = require(l_script_FirstAncestor_0.Components.IconOnlyMenu);
-local v6 = require(l_script_FirstAncestor_0.BaseControlBarContainer);
-local l_FFlagAXResetAvatarButton_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXResetAvatarButton;
-return v2.memo(function(v8) --[[ Line: 19 ]] --[[ Name: UndoRedoBarContainer ]]
-    -- upvalues: v4 (copy), l_FFlagAXResetAvatarButton_0 (copy), v2 (copy), v6 (copy), v5 (copy)
-    local v9 = v4();
-    if l_FFlagAXResetAvatarButton_0 then
-        return (v2.createElement(v6, {
-            config = v9.items, 
-            onActiveMenuItemChanged = function() --[[ Line: 24 ]] --[[ Name: onActiveMenuItemChanged ]]
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
 
-            end, 
-            LayoutOrder = v8.LayoutOrder
-        }));
-    else
-        return (v2.createElement(v5, {
-            items = v9.items, 
-            direction = if v8.direction then v8.direction else "horizontal", 
-            LayoutOrder = v8.LayoutOrder
-        }));
-    end;
-end);
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local useUndoRedoBarViewModel = require(script.Parent.useUndoRedoBarViewModel)
+local IconOnlyMenu = require(AvatarExperienceControlBar.Components.IconOnlyMenu)
+local BaseControlBarContainer = require(AvatarExperienceControlBar.BaseControlBarContainer)
+local FFlagAXResetAvatarButton = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXResetAvatarButton
+
+local function UndoRedoBarContainer(t1: {[any]: any}) -- line: 19
+	-- upvalues: useUndoRedoBarViewModel (copy), FFlagAXResetAvatarButton (copy), React (copy), BaseControlBarContainer (copy), IconOnlyMenu (copy)
+	local v10 = useUndoRedoBarViewModel()
+
+	if FFlagAXResetAvatarButton then
+		return (React.createElement(BaseControlBarContainer, {
+			config = v10.items,
+			onActiveMenuItemChanged = function() -- line: 24
+			end,
+			LayoutOrder = t1.LayoutOrder
+		}))
+	end
+
+	return (React.createElement(IconOnlyMenu, {
+		items = v10.items,
+		direction = not t1.direction and "horizontal" or t1.direction,
+		LayoutOrder = t1.LayoutOrder
+	}))
+end
+
+return React.memo(UndoRedoBarContainer)

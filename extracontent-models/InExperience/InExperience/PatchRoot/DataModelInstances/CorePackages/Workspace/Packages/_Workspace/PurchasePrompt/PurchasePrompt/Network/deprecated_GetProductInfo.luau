@@ -1,10 +1,13 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PurchaseError);
-local v2 = require(l_Parent_0.Promise);
-return function(v3, v4, v5) --[[ Line: 6 ]] --[[ Name: deprecated_GetProductInfo ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return v3.getProductInfo(v4, v5):catch(function(_) --[[ Line: 7 ]]
-        -- upvalues: v2 (ref), v1 (ref)
-        return v2.reject(v1.UnknownFailureNoItemName);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local Promise = require(ParentParent.Promise)
+
+local function deprecated_GetProductInfo(p1, p2, p3) -- line: 6
+	-- upvalues: Promise (copy), PurchaseError (copy)
+	return p1.getProductInfo(p2, p3):catch(function(_) -- line: 7
+		-- upvalues: Promise (copy), PurchaseError (copy)
+		return Promise.reject(PurchaseError.UnknownFailureNoItemName)
+	end)
+end
+
+return deprecated_GetProductInfo

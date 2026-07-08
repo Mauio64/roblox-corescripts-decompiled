@@ -1,49 +1,86 @@
-local l_Parent_0 = script.Parent.Parent;
-if not require(l_Parent_0.SafeFlags).createGetFFlag("ReactIsolatedGlobalsEnabled")() then
-    return _G;
-else
-    local function _(v1, v2) --[[ Line: 49 ]] --[[ Name: loadFromGlobal ]]
-        local v3 = _G[v1];
-        if v3 ~= nil then
-            return v3;
-        else
-            return v2;
-        end;
-    end;
-    local v5 = {};
-    local l___DEV___0 = _G.__DEV__;
-    v5.__DEV__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__PROFILE__;
-    v5.__PROFILE__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__EXPERIMENTAL__;
-    v5.__EXPERIMENTAL__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__DEBUG__;
-    v5.__DEBUG__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__YOLO__;
-    v5.__YOLO__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__;
-    v5.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-    v5.__REACT_DEVTOOLS_GLOBAL_HOOK__ = if l___DEV___0 ~= nil then l___DEV___0 else nil;
-    l___DEV___0 = _G.__REACT_DEVTOOLS_ATTACH__;
-    v5.__REACT_DEVTOOLS_ATTACH__ = if l___DEV___0 ~= nil then l___DEV___0 else nil;
-    l___DEV___0 = _G.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__;
-    v5.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__;
-    v5.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__REACT_DEVTOOLS_COMPONENT_FILTERS__;
-    v5.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = if l___DEV___0 ~= nil then l___DEV___0 else nil;
-    l___DEV___0 = _G.__LOCALSTORAGE__;
-    v5.__LOCALSTORAGE__ = if l___DEV___0 ~= nil then l___DEV___0 else nil;
-    l___DEV___0 = _G.__SESSIONSTORAGE__;
-    v5.__SESSIONSTORAGE__ = if l___DEV___0 ~= nil then l___DEV___0 else nil;
-    l___DEV___0 = _G.__COMPAT_WARNINGS__;
-    v5.__COMPAT_WARNINGS__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__TESTEZ_RUNNING_TEST__;
-    v5.__TESTEZ_RUNNING_TEST__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__ROACT_17_MOCK_SCHEDULER__;
-    v5.__ROACT_17_MOCK_SCHEDULER__ = l___DEV___0 ~= nil and l___DEV___0;
-    l___DEV___0 = _G.__ROACT_17_INLINE_ACT__;
-    v5.__ROACT_17_INLINE_ACT__ = l___DEV___0 ~= nil and l___DEV___0;
-    return v5;
-end;
+local ParentParent = script.Parent.Parent
+
+if not require(ParentParent.SafeFlags).createGetFFlag("ReactIsolatedGlobalsEnabled")() then
+	return _G
+end
+
+local function loadFromGlobal(s1: string, p1) -- line: 49
+	local v23 = _G[s1]
+
+	if v23 ~= nil then
+		return v23
+	end
+
+	return p1
+end
+
+local t1 = {}
+local __DEV__ = _G.__DEV__
+
+t1.__DEV__ = __DEV__ ~= nil and __DEV__
+
+local __PROFILE__ = _G.__PROFILE__
+
+t1.__PROFILE__ = __PROFILE__ ~= nil and __PROFILE__
+
+local __EXPERIMENTAL__ = _G.__EXPERIMENTAL__
+
+t1.__EXPERIMENTAL__ = __EXPERIMENTAL__ ~= nil and __EXPERIMENTAL__
+
+local __DEBUG__ = _G.__DEBUG__
+
+t1.__DEBUG__ = __DEBUG__ ~= nil and __DEBUG__
+
+local __YOLO__ = _G.__YOLO__
+
+t1.__YOLO__ = __YOLO__ ~= nil and __YOLO__
+
+local __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = _G.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
+
+t1.__DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ = __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__ ~= nil and __DISABLE_ALL_WARNINGS_EXCEPT_PROP_VALIDATION__
+
+local __REACT_DEVTOOLS_GLOBAL_HOOK__ = _G.__REACT_DEVTOOLS_GLOBAL_HOOK__
+
+t1.__REACT_DEVTOOLS_GLOBAL_HOOK__ = if __REACT_DEVTOOLS_GLOBAL_HOOK__ == nil then nil else __REACT_DEVTOOLS_GLOBAL_HOOK__
+
+local __REACT_DEVTOOLS_ATTACH__ = _G.__REACT_DEVTOOLS_ATTACH__
+
+t1.__REACT_DEVTOOLS_ATTACH__ = if __REACT_DEVTOOLS_ATTACH__ == nil then nil else __REACT_DEVTOOLS_ATTACH__
+
+local __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = _G.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__
+
+t1.__REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ = __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__ ~= nil and __REACT_DEVTOOLS_APPEND_COMPONENT_STACK__
+
+local __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = _G.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__
+
+t1.__REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ = __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__ ~= nil and __REACT_DEVTOOLS_BREAK_ON_CONSOLE_ERRORS__
+
+local __REACT_DEVTOOLS_COMPONENT_FILTERS__ = _G.__REACT_DEVTOOLS_COMPONENT_FILTERS__
+
+t1.__REACT_DEVTOOLS_COMPONENT_FILTERS__ = if __REACT_DEVTOOLS_COMPONENT_FILTERS__ == nil then nil else __REACT_DEVTOOLS_COMPONENT_FILTERS__
+
+local __LOCALSTORAGE__ = _G.__LOCALSTORAGE__
+
+t1.__LOCALSTORAGE__ = if __LOCALSTORAGE__ == nil then nil else __LOCALSTORAGE__
+
+local __SESSIONSTORAGE__ = _G.__SESSIONSTORAGE__
+
+t1.__SESSIONSTORAGE__ = if __SESSIONSTORAGE__ == nil then nil else __SESSIONSTORAGE__
+
+local __COMPAT_WARNINGS__ = _G.__COMPAT_WARNINGS__
+
+t1.__COMPAT_WARNINGS__ = __COMPAT_WARNINGS__ ~= nil and __COMPAT_WARNINGS__
+
+local __TESTEZ_RUNNING_TEST__ = _G.__TESTEZ_RUNNING_TEST__
+
+t1.__TESTEZ_RUNNING_TEST__ = __TESTEZ_RUNNING_TEST__ ~= nil and __TESTEZ_RUNNING_TEST__
+
+local __ROACT_17_MOCK_SCHEDULER__ = _G.__ROACT_17_MOCK_SCHEDULER__
+
+t1.__ROACT_17_MOCK_SCHEDULER__ = __ROACT_17_MOCK_SCHEDULER__ ~= nil and __ROACT_17_MOCK_SCHEDULER__
+
+local __ROACT_17_INLINE_ACT__ = _G.__ROACT_17_INLINE_ACT__
+
+t1.__ROACT_17_INLINE_ACT__ = __ROACT_17_INLINE_ACT__ ~= nil and __ROACT_17_INLINE_ACT__
+
+return t1

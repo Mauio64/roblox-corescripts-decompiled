@@ -1,4 +1,5 @@
-game:DefineFastFlag("EnableRestrictedAssetSaleLocationPurchasePrompt", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("EnableRestrictedAssetSaleLocationPurchasePrompt");
-end;
+game:DefineFastFlag("EnableRestrictedAssetSaleLocationPurchasePrompt", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("EnableRestrictedAssetSaleLocationPurchasePrompt")
+end

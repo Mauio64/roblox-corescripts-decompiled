@@ -1,452 +1,608 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Analytics);
-local v2 = require(l_Parent_0.util.bodyAssetMasksRenderer);
-local v3 = require(l_Parent_0.util.nelderMead);
-local v4 = require(l_Parent_0.util.SummedAreaTable);
-local v5 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local v6 = require(l_Parent_0.util.AssetCalculator);
-local v7 = require(l_Parent_0.util.getEditableMeshFromContext);
-local v8 = require(l_Parent_0.util.getMeshVerts);
-local _ = require(l_Parent_0.util.Types);
-local v10 = require(l_Parent_0.util.FloatVector);
-local v11 = require(l_Parent_0.util.Extents);
-local v12 = require(l_Parent_0.util.tryYield);
-local v13 = require(l_Parent_0.flags.validateAccurateBoundingBoxFlags);
-local v14 = require(l_Parent_0.flags.getFFlagUGCValidateTinyTrianglesIntersectFix);
-local function _(v15, v16, v17, v18, v19) --[[ Line: 32 ]] --[[ Name: sampleAreaTable ]]
-    local v20 = Vector2.new(v16, v18);
-    local v21 = Vector2.new(v17, v19);
-    local v22 = v20 * v15.size;
-    return (v15:GetAreaDensityContinuous(v22, v21 * v15.size - v22));
-end;
-local function v38(v24, v25, v26) --[[ Line: 44 ]] --[[ Name: shrinkBounds ]]
-    -- upvalues: v10 (copy)
-    local function _(v27) --[[ Line: 45 ]]
-        if v27 % 2 == 0 then
-            return v27 - 1;
-        else
-            return v27 + 1;
-        end;
-    end;
-    for v29 = 1, 4 do
-        local v30 = v24[if v29 % 2 == 0 then v29 - 1 else v29 + 1];
-        local _ = nil;
-        local v32 = 1 / v26[v29 < 3 and "X" or "Y"];
-        local v33 = v10.new(v24);
-        local v34 = v25(v24);
-        local v35 = v24[v29];
-        while v32 <= math.abs(v35 - v30) do
-            local v36 = (v35 + v30) / 2;
-            v33[v29] = v36;
-            local v37 = v25(v33);
-            if v37 < v34 then
-                v33[v29] = v36 + (v30 - v36) * 0.01;
-                if v25(v33) - v37 > 0 then
-                    v30 = v35;
-                end;
-                v35 = v36;
-                v34 = v37;
-            else
-                v30 = v36;
-            end;
-        end;
-        v24[v29] = v35;
-    end;
-end;
-local function v42(v39, v40) --[[ Line: 89 ]] --[[ Name: createSimplex ]]
-    -- upvalues: v10 (copy)
-    local v41 = {};
-    table.insert(v41, v39);
-    table.insert(v41, v39 + v10.new(v40, 0, 0, 0));
-    table.insert(v41, v39 + v10.new(0, v40, 0, 0));
-    table.insert(v41, v39 + v10.new(0, 0, v40, 0));
-    table.insert(v41, v39 + v10.new(0, 0, 0, v40));
-    return v41;
-end;
-local function v76(v43, v44) --[[ Line: 99 ]] --[[ Name: calculateMinimumBoundsForView ]]
-    -- upvalues: v10 (copy), v42 (copy), v4 (copy), v13 (copy), v3 (copy), v12 (copy), v38 (copy)
-    local v45 = v10.new(0, 1, 0, 1);
-    local v46 = v42(v45, 0.9);
-    local l_mask_0 = v43.mask;
-    local l_Size_0 = l_mask_0.Size;
-    local v50 = v4.new(l_Size_0, function(v49) --[[ Line: 108 ]]
-        if v49.R > 0 or v49.G > 0 or v49.B > 0 then
-            return 1;
-        else
-            return 0;
-        end;
-    end);
-    v50:BuildSummedAreaTable(l_mask_0);
-    local l_v50_AreaDensity_0 = v50:GetAreaDensity(Vector2.zero, l_Size_0);
-    if l_v50_AreaDensity_0 <= 0 then
-        return false, {
-            string.format("%s asset not visible from the %s, cannot determine quality of asset bounding box", v44.assetTypeEnum.Name, v43.viewId)
-        };
-    else
-        local v52 = v13.targetPercentage();
-        local v53 = v13.percentageWeight();
-        local function v66(v54) --[[ Line: 132 ]]
-            -- upvalues: v50 (copy), l_v50_AreaDensity_0 (copy), v52 (copy), v53 (copy)
-            assert(v54:getSize() == 4);
-            local v55 = 0;
-            if v54[1] <= v54[2] and v54[3] <= v54[4] then
-                local l_v50_0 = v50;
-                local v57 = v54[1];
-                local v58 = v54[2];
-                local v59 = v54[3];
-                local v60 = v54[4];
-                local v61 = Vector2.new(v57, v59);
-                local v62 = Vector2.new(v58, v60);
-                local v63 = v61 * l_v50_0.size;
-                v55 = l_v50_0:GetAreaDensityContinuous(v63, v62 * l_v50_0.size - v63);
-            end;
-            local v64 = math.abs(v55 / l_v50_AreaDensity_0 * 100 - v52) * v53;
-            local v65 = Vector2.new(v54[2] - v54[1], v54[4] - v54[3]);
-            return v64 + (v65.X + v65.Y);
-        end;
-        local v67 = v13.maxIterations();
-        local v68 = Vector2.new(1 / l_Size_0.X, 1 / l_Size_0.Y);
-        local v69 = v13.convergedLength();
-        local v70 = v68.Magnitude * v69;
-        local function v73(v71, v72) --[[ Line: 152 ]]
-            -- upvalues: v67 (copy), v3 (ref), v70 (copy), v12 (ref), v44 (copy)
-            if v67 <= v72 then
-                return true;
-            elseif v3.calculateMaxLengthBetweenVertices(v71) <= v70 then
-                return true;
-            else
-                v12(v44);
-                return false;
-            end;
-        end;
-        local v74 = v3.new(v46, v66, v73);
-        v74:evaluate();
-        local v75 = v74.simplex[1];
-        v38(v75, v66, l_Size_0);
-        return true, (v10.new(math.clamp(v75[1], 0, 1), math.clamp(v75[2], 0, 1), math.clamp(v75[3], 0, 1), (math.clamp(v75[4], 0, 1))));
-    end;
-end;
-local function _(v77, v78) --[[ Line: 185 ]] --[[ Name: transformIsAlignedWithAxis ]]
-    if v78:FuzzyEq(v77.XVector:Abs()) then
-        return true;
-    elseif v78:FuzzyEq(v77.YVector:Abs()) then
-        return true;
-    else
-        return false;
-    end;
-end;
-local function v84(v80, v81) --[[ Line: 195 ]] --[[ Name: alignedExtentsFromReprojectedPoint ]]
-    -- upvalues: v11 (copy)
-    local v82 = {
-        X = -1e999, 
-        Y = -1e999, 
-        Z = -1e999
-    };
-    local v83 = {
-        X = 1e999, 
-        Y = 1e999, 
-        Z = 1e999
-    };
-    if Vector3.new(1, 0, 0, 0):FuzzyEq(v81.XVector:Abs()) and true or Vector3.new(1, 0, 0, 0):FuzzyEq(v81.YVector:Abs()) and true or false then
-        v82.X = math.max(v82.X, v80.X);
-        v83.X = math.min(v83.X, v80.X);
-    end;
-    if Vector3.new(0, 1, 0, 0):FuzzyEq(v81.XVector:Abs()) and true or Vector3.new(0, 1, 0, 0):FuzzyEq(v81.YVector:Abs()) and true or false then
-        v82.Y = math.max(v82.Y, v80.Y);
-        v83.Y = math.min(v83.Y, v80.Y);
-    end;
-    if Vector3.new(0, 0, 1, 0):FuzzyEq(v81.XVector:Abs()) and true or Vector3.new(0, 0, 1, 0):FuzzyEq(v81.YVector:Abs()) and true or false then
-        v82.Z = math.max(v82.Z, v80.Z);
-        v83.Z = math.min(v83.Z, v80.Z);
-    end;
-    return v11.fromMinMax(Vector3.new(v83.X, v83.Y, v83.Z), (Vector3.new(v82.X, v82.Y, v82.Z)));
-end;
-local function v104(v85, v86) --[[ Line: 222 ]] --[[ Name: calculateValidBounds ]]
-    -- upvalues: v11 (copy), v14 (copy), v76 (copy), v2 (copy), v84 (copy)
-    local v87 = v11.new();
-    local v88 = if v14() then {} else nil;
-    for v89, v90 in v85 do
-        local v91 = nil;
-        local v92, v93 = v76(v90, v86);
-        if not v92 then
-            return false, v93;
-        else
-            v91 = v93;
-            local v94 = Vector2.new(v91[2], v91[3]);
-            local v95 = Vector2.new(v91[1], v91[4]);
-            local v96 = v2.getViewSpacePositionFromNormalized(v94, v90.viewSpaceBounds);
-            v96 = v90.view * v96;
-            local v97 = v2.getViewSpacePositionFromNormalized(v95, v90.viewSpaceBounds);
-            v97 = v90.view * v97;
-            local v98 = v84(v96, v90.view);
-            local v99 = v84(v97, v90.view);
-            if v14() then
-                local v100 = v11.new():unionExtents(v98):unionExtents(v99);
-                local v101 = v2.opposingViewIds[v89];
-                if v88[v101] then
-                    v88[v101] = v100:intersectExtents(v88[v101]);
-                else
-                    v88[v89] = v100;
-                end;
-            else
-                v87 = v87:unionExtents(v98):unionExtents(v99);
-            end;
-        end;
-    end;
-    if v14() then
-        for _, v103 in v88 do
-            v87 = v87:unionExtents(v103);
-        end;
-        assert(v87:isValid());
-    end;
-    return true, v87;
-end;
-local function _(v105, v106) --[[ Line: 279 ]] --[[ Name: worldSpacePositionFromPointInMeshPart ]]
-    return v106.CFrame * (v105 * (v106.Size / v106.MeshSize));
-end;
-local function v134(v108, v109, v110, v111, v112) --[[ Line: 296 ]] --[[ Name: getHighestInflatingPointInEachAxis ]]
-    -- upvalues: v8 (copy)
-    local v113 = {
-        X = {
-            positive = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }, 
-            negative = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }
-        }, 
-        Y = {
-            positive = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }, 
-            negative = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }
-        }, 
-        Z = {
-            positive = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }, 
-            negative = {
-                inflationScale = 0, 
-                furthestPointWorldSpace = nil
-            }
-        }
-    };
-    local v114 = v108:size();
-    for v115, v116 in v110 do
-        local v117, v118, v119 = v8({
-            editableMesh = v116, 
-            fullName = v115
-        }, v112);
-        if not v117 then
-            return false, v118;
-        else
-            local v120 = v109[v115];
-            for _, v122 in v119 do
-                local v123 = v122 * v120.scale;
-                v123 = v120.CFrame * v123;
-                local v124 = v111(v115);
-                local v125 = v124.CFrame * (v122 * (v124.Size / v124.MeshSize));
-                v124 = (v123 - v108.max) / v114;
-                local v126 = (v108.min - v123) / v114;
-                for _, v128 in {
-                    "X", 
-                    "Y", 
-                    "Z"
-                } do
-                    local v129 = v113[v128];
-                    local l_positive_0 = v129.positive;
-                    local v131 = v124[v128];
-                    if l_positive_0.inflationScale < v131 then
-                        l_positive_0.furthestPointWorldSpace = v125;
-                        l_positive_0.inflationScale = v131;
-                    end;
-                    local l_negative_0 = v129.negative;
-                    local v133 = v126[v128];
-                    if l_negative_0.inflationScale < v133 then
-                        l_negative_0.furthestPointWorldSpace = v125;
-                        l_negative_0.inflationScale = v133;
-                    end;
-                end;
-            end;
-        end;
-    end;
-    return true, v113;
-end;
-local function v146(v135, v136) --[[ Line: 356 ]] --[[ Name: getBodyPartAssetEditableMeshes ]]
-    -- upvalues: v7 (copy)
-    local v137 = {};
-    if v135:IsA("MeshPart") and v136.assetTypeEnum == Enum.AssetType.DynamicHead then
-        table.insert(v137, v135);
-    else
-        for _, v139 in v135:GetChildren() do
-            if v139:IsA("MeshPart") then
-                table.insert(v137, v139);
-            end;
-        end;
-    end;
-    local v140 = {};
-    for _, v142 in v137 do
-        local v143, v144 = v7(v142, "MeshId", v136);
-        if not v143 then
-            local v145 = string.format("Failed to load mesh for MeshPart '%s'. Make sure mesh exists and try again.", v142.Name);
-            if v136.isServer then
-                error(v145);
-            else
-                return false, {
-                    v145
-                };
-            end;
-        end;
-        v140[v142.Name] = v144;
-    end;
-    return true, v140;
-end;
-local function v160(v147, v148) --[[ Line: 391 ]] --[[ Name: tryReportInflationError ]]
-    -- upvalues: v5 (copy), v13 (copy)
-    local v149 = v5.new();
-    local v150 = v13.AssetTypeToAxisThresholds[v148];
-    for _, v152 in {
-        "X", 
-        "Y", 
-        "Z"
-    } do
-        local v153 = v147[v152];
-        local v154 = v153.negative.inflationScale + v153.positive.inflationScale;
-        local v155 = v150[v152];
-        if v155 < v154 then
-            local v156 = {};
-            if v153.positive.inflationScale > v155 * 0.2 then
-                table.insert(v156, v153.positive.furthestPointWorldSpace);
-            end;
-            if v153.negative.inflationScale > v155 * 0.2 then
-                table.insert(v156, v153.negative.furthestPointWorldSpace);
-            end;
-            local v157 = "";
-            if #v156 > 0 then
-                v157 = " near " .. string.format("{%.4f, %.4f, %.4f}", v156[1].X, v156[1].Y, v156[1].Z);
-                if #v156 > 1 then
-                    v157 = v157 .. string.format(", and {%.4f, %.4f, %.4f}", v156[2].X, v156[2].Y, v156[2].Z);
-                end;
-            end;
-            local v158 = v154 * 100;
-            local v159 = v155 * 100;
-            v149:updateReasons(false, {
-                string.format("Detected low visibility geometry%s that increases %s bounding box size by %.2f%% (threshold is %.2f%%) in the %s axis. Remove the geometry or increase its size so that it is more visible", v157, v148.Name, v158, v159, v152)
-            });
-        end;
-    end;
-    return v149;
-end;
-local v161 = {};
-local v162 = nil;
-v161.getBoundsViewsForAssetType = function(v163) --[[ Line: 449 ]] --[[ Name: getBoundsViewsForAssetType ]]
-    -- upvalues: v162 (ref), v2 (copy)
-    if not v162 then
-        local _ = function() --[[ Line: 451 ]]
-            -- upvalues: v2 (ref)
-            local v164 = {};
-            for _, v166 in v2.viewIds do
-                v164[v166] = true;
-            end;
-            return v164;
-        end;
-        local v168 = {};
-        for _, v170 in v2.viewIds do
-            v168[v170] = true;
-        end;
-        local l_v168_0 = v168;
-        l_v168_0[v2.viewIds.Left] = false;
-        l_v168_0[v2.viewIds.Bottom] = false;
-        local v172 = {};
-        for _, v174 in v2.viewIds do
-            v172[v174] = true;
-        end;
-        v168 = v172;
-        v168[v2.viewIds.Right] = false;
-        v168[v2.viewIds.Bottom] = false;
-        local v175 = {};
-        for _, v177 in v2.viewIds do
-            v175[v177] = true;
-        end;
-        v172 = v175;
-        v172[v2.viewIds.Left] = false;
-        v172[v2.viewIds.Bottom] = false;
-        local v178 = {};
-        for _, v180 in v2.viewIds do
-            v178[v180] = true;
-        end;
-        v175 = v178;
-        v175[v2.viewIds.Right] = false;
-        v175[v2.viewIds.Bottom] = false;
-        v162 = {
-            [Enum.AssetType.DynamicHead] = nil, 
-            [Enum.AssetType.Torso] = nil, 
-            [Enum.AssetType.LeftArm] = l_v168_0, 
-            [Enum.AssetType.RightArm] = v168, 
-            [Enum.AssetType.LeftLeg] = v172, 
-            [Enum.AssetType.RightLeg] = v175
-        };
-    end;
-    return v162[v163];
-end;
-v161.validate = function(v181, v182, v183) --[[ Line: 488 ]] --[[ Name: validate ]]
-    -- upvalues: v161 (copy), v104 (copy), v6 (copy), v146 (copy), v134 (copy), v160 (copy), v1 (copy)
-    local l_assetTypeEnum_0 = v183.assetTypeEnum;
-    assert(l_assetTypeEnum_0);
-    local function v186(v185) --[[ Line: 496 ]] --[[ Name: findMeshHandle ]]
-        -- upvalues: l_assetTypeEnum_0 (copy), v181 (copy)
-        if l_assetTypeEnum_0 == Enum.AssetType.DynamicHead then
-            return v181;
-        else
-            return (v181:FindFirstChild(v185));
-        end;
-    end;
-    local v187 = v161.getBoundsViewsForAssetType(l_assetTypeEnum_0);
-    local v188 = {};
-    if v187 then
-        for v189, v190 in v187 do
-            if v190 then
-                assert(v182.bodyAssetMasks[v189]);
-                v188[v189] = v182.bodyAssetMasks[v189];
-            end;
-        end;
-    else
-        v188 = v182.bodyAssetMasks;
-    end;
-    local v191 = nil;
-    local v192, v193 = v104(v188, v183);
-    if not v192 then
-        return false, v193;
-    else
-        v191 = v193;
-        local v194 = v6.getAssetMeshesValidationSpaceTransforms(v181, v183);
-        local _ = nil;
-        local v196, v197 = v146(v181, v183);
-        v192 = v196;
-        v193 = v197;
-        if not v192 then
-            return false, v193;
-        else
-            v196, v197 = v134(v191, v194, v193, v186, v183);
-            v192 = v196;
-            v193 = v197;
-            if not v192 then
-                return false, v193;
-            else
-                v197 = v160(v193, l_assetTypeEnum_0);
-                if not v197:getFinalResults() then
-                    v1.reportFailure(v1.ErrorType.validateAccurateBoundingBox, nil, v183);
-                end;
-                return v197:getFinalResults();
-            end;
-        end;
-    end;
-end;
-return v161;
+local AssetService = game:GetService("AssetService")
+local ParentParent = script.Parent.Parent
+local Analytics = require(ParentParent.Analytics)
+local bodyAssetMasksRenderer = require(ParentParent.util.bodyAssetMasksRenderer)
+local nelderMead = require(ParentParent.util.nelderMead)
+local SummedAreaTable = require(ParentParent.util.SummedAreaTable)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+local AssetCalculator = require(ParentParent.util.AssetCalculator)
+local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
+local getMeshVerts = require(ParentParent.util.getMeshVerts)
+local getAttachmentCFrameInPartSpace = require(ParentParent.util.getAttachmentCFrameInPartSpace)
+
+require(ParentParent.util.Types)
+
+local FloatVector = require(ParentParent.util.FloatVector)
+local Extents = require(ParentParent.util.Extents)
+local tryYield = require(ParentParent.util.tryYield)
+local validateAccurateBoundingBoxFlags = require(ParentParent.flags.validateAccurateBoundingBoxFlags)
+local getFFlagUGCValidateTinyTrianglesIntersectFix = require(ParentParent.flags.getFFlagUGCValidateTinyTrianglesIntersectFix)
+
+local function getHeadNeckAttachmentMeshLocalPosition(p1) -- line: 39
+	-- upvalues: getAttachmentCFrameInPartSpace (copy)
+	local NeckRigAttachment = p1:FindFirstChild("NeckRigAttachment", true)
+
+	if not NeckRigAttachment then
+		return nil
+	end
+
+	local v35 = getAttachmentCFrameInPartSpace(NeckRigAttachment)
+	local v36 = p1.Size / p1.MeshSize
+
+	return v35.Position / v36
+end
+local function projectMeshLocalPointToImageRow(vector3: Vector3, p2) -- line: 53
+	local v39 = p2.view:Inverse() * vector3
+	local viewSpaceBounds = p2.viewSpaceBounds
+	local v41 = (viewSpaceBounds.max.Y + viewSpaceBounds.min.Y) / 2
+	local v42 = (viewSpaceBounds.max.Y - viewSpaceBounds.min.Y) / 2
+	local v43 = (v39.Y - v41) / v42
+	local maskSize = p2.mask.Size
+
+	return (v43 * -0.5 + 0.5) * (maskSize.Y - 1)
+end
+local function cloneMaskZeroedBelowRow(p3, n1: number) -- line: 69
+	-- upvalues: AssetService (copy)
+	local p3Size = p3.Size
+	local p3SizeX = p3Size.X
+	local p3SizeY = p3Size.Y
+	local v50 = p3:ReadPixelsBuffer(Vector2.zero, p3Size)
+	local v51 = math.max(0, (math.min(p3SizeY, math.floor(n1) + 1)))
+
+	if v51 < p3SizeY then
+		local v52 = v51 * p3SizeX * 4
+		local v53 = (p3SizeY - v51) * p3SizeX * 4
+
+		buffer.fill(v50, v52, 0, v53)
+	end
+
+	local v54 = AssetService:CreateEditableImage({
+		Size = p3Size
+	})
+
+	v54:WritePixelsBuffer(Vector2.zero, p3Size, v50)
+
+	return v54
+end
+local function sampleAreaTable(p4, p5, p6, p7, p8) -- line: 89
+	local vector2 = Vector2.new(p5, p7)
+	local vector2_2 = Vector2.new(p6, p8)
+	local v62 = vector2 * p4.size
+
+	return (p4:GetAreaDensityContinuous(v62, vector2_2 * p4.size - v62))
+end
+local function shrinkBounds(p9, p10: ((...any) -> ...any), vector2: Vector2) -- line: 101
+	-- upvalues: FloatVector (copy)
+	for i = 1, 4 do
+		local v67 = p9[if i % 2 ~= 0 then i + 1 else i - 1]
+		local v68 = 1 / vector2[not (i < 3) and "Y" or "X"]
+		local v69 = FloatVector.new(p9)
+		local v70 = p10(p9)
+		local v71 = p9[i]
+
+		while v68 <= math.abs(v71 - v67) do
+			local v72 = (v71 + v67) / 2
+
+			v69[i] = v72
+
+			local v73 = p10(v69)
+
+			if v73 < v70 then
+				v69[i] = v72 + (v67 - v72) * 0.01
+
+				if p10(v69) - v73 > 0 then
+					v67 = v71
+				end
+
+				v71 = v72
+				v70 = v73
+			else
+				v67 = v72
+			end
+		end
+
+		p9[i] = v71
+	end
+end
+local function createSimplex(p11, n2: number) -- line: 146
+	-- upvalues: FloatVector (copy)
+	local t1 = {}
+
+	table.insert(t1, p11)
+	table.insert(t1, p11 + FloatVector.new(n2, 0, 0, 0))
+	table.insert(t1, p11 + FloatVector.new(0, n2, 0, 0))
+	table.insert(t1, p11 + FloatVector.new(0, 0, n2, 0))
+	table.insert(t1, p11 + FloatVector.new(0, 0, 0, n2))
+
+	return t1
+end
+local function calculateMinimumBoundsForView(p12, p13) -- line: 156
+	-- upvalues: FloatVector (copy), createSimplex (copy), SummedAreaTable (copy), validateAccurateBoundingBoxFlags (copy), nelderMead (copy), tryYield (copy), shrinkBounds (copy)
+	local v79 = FloatVector.new(0, 1, 0, 1)
+	local v80 = createSimplex(v79, 0.9)
+	local mask = p12.mask
+	local maskSize = mask.Size
+	local v83 = SummedAreaTable.new(maskSize, function(p14) -- line: 165
+		if p14.R > 0 or (p14.G > 0 or p14.B > 0) then
+			return 1
+		end
+
+		return 0
+	end)
+
+	v83:BuildSummedAreaTable(mask)
+
+	local AreaDensity = v83:GetAreaDensity(Vector2.zero, maskSize)
+
+	if AreaDensity <= 0 then
+		return false, { string.format("%s asset not visible from the %s, cannot determine quality of asset bounding box", p13.assetTypeEnum.Name, p12.viewId) }
+	end
+
+	local v85 = validateAccurateBoundingBoxFlags.targetPercentage()
+	local v86 = validateAccurateBoundingBoxFlags.percentageWeight()
+
+	local function v87(p15) -- line: 189
+		-- upvalues: v83 (copy), AreaDensity (copy), v85 (copy), v86 (copy)
+		assert(p15:getSize() == 4)
+
+		local n3 = 0
+
+		if p15[1] <= p15[2] and p15[3] <= p15[4] then
+			local v217 = v83
+			local v218 = p15[1]
+			local v219 = p15[2]
+			local v220 = p15[3]
+			local v221 = p15[4]
+			local vector2 = Vector2.new(v218, v220)
+			local vector2_3 = Vector2.new(v219, v221)
+			local v224 = vector2 * v217.size
+
+			n3 = v217:GetAreaDensityContinuous(v224, vector2_3 * v217.size - v224)
+		end
+
+		local v225 = math.abs(n3 / AreaDensity * 100 - v85) * v86
+		local vector2 = Vector2.new(p15[2] - p15[1], p15[4] - p15[3])
+
+		return v225 + (vector2.X + vector2.Y)
+	end
+
+	local v88 = validateAccurateBoundingBoxFlags.maxIterations()
+	local vector2 = Vector2.new(1 / maskSize.X, 1 / maskSize.Y)
+	local v90 = validateAccurateBoundingBoxFlags.convergedLength()
+	local v91 = vector2.Magnitude * v90
+	local v92 = nelderMead.new(v80, v87, function(t2: {[any]: any}, n4: number) -- line: 209
+		-- upvalues: v88 (copy), nelderMead (copy), v91 (copy), tryYield (copy), p13 (copy)
+		if n4 >= v88 then
+			return true
+		end
+
+		if nelderMead.calculateMaxLengthBetweenVertices(t2) <= v91 then
+			return true
+		end
+
+		tryYield(p13)
+
+		return false
+	end)
+
+	v92:evaluate()
+
+	local v93 = v92.simplex[1]
+
+	shrinkBounds(v93, v87, maskSize)
+
+	return true, (FloatVector.new(math.clamp(v93[1], 0, 1), math.clamp(v93[2], 0, 1), math.clamp(v93[3], 0, 1), (math.clamp(v93[4], 0, 1))))
+end
+local function transformIsAlignedWithAxis(cFrame: CFrame, vector3: Vector3) -- line: 242
+	if vector3:FuzzyEq(cFrame.XVector:Abs()) then
+		return true
+	end
+
+	if vector3:FuzzyEq(cFrame.YVector:Abs()) then
+		return true
+	end
+
+	return false
+end
+local function alignedExtentsFromReprojectedPoint(vector3: Vector3, cFrame: CFrame) -- line: 252
+	-- upvalues: Extents (copy)
+	local t3 = {
+		X = -1e999,
+		Y = -1e999,
+		Z = -1e999
+	}
+	local t4 = {
+		X = 1e999,
+		Y = 1e999,
+		Z = 1e999
+	}
+
+	if not not Vector3.new(1, 0, 0):FuzzyEq(cFrame.XVector:Abs()) or not not Vector3.new(1, 0, 0):FuzzyEq(cFrame.YVector:Abs()) then
+		t3.X = math.max(t3.X, vector3.X)
+		t4.X = math.min(t4.X, vector3.X)
+	end
+
+	if not not Vector3.new(0, 1, 0):FuzzyEq(cFrame.XVector:Abs()) or not not Vector3.new(0, 1, 0):FuzzyEq(cFrame.YVector:Abs()) then
+		t3.Y = math.max(t3.Y, vector3.Y)
+		t4.Y = math.min(t4.Y, vector3.Y)
+	end
+
+	if not not Vector3.new(0, 0, 1):FuzzyEq(cFrame.XVector:Abs()) or not not Vector3.new(0, 0, 1):FuzzyEq(cFrame.YVector:Abs()) then
+		t3.Z = math.max(t3.Z, vector3.Z)
+		t4.Z = math.min(t4.Z, vector3.Z)
+	end
+
+	return Extents.fromMinMax(Vector3.new(t4.X, t4.Y, t4.Z), (Vector3.new(t3.X, t3.Y, t3.Z)))
+end
+local function calculateValidBounds(t5: {[any]: any}, p16) -- line: 279
+	-- upvalues: Extents (copy), getFFlagUGCValidateTinyTrianglesIntersectFix (copy), calculateMinimumBoundsForView (copy), bodyAssetMasksRenderer (copy), alignedExtentsFromReprojectedPoint (copy)
+	local v102 = Extents.new()
+	local v103 = if not getFFlagUGCValidateTinyTrianglesIntersectFix() then nil else {}
+
+	for v104, v105 in t5 do
+		local v106, v107 = calculateMinimumBoundsForView(v105, p16)
+
+		if not v106 then
+			return false, v107
+		end
+
+		local vector2 = Vector2.new(v107[2], v107[3])
+		local vector2_4 = Vector2.new(v107[1], v107[4])
+		local v110 = bodyAssetMasksRenderer.getViewSpacePositionFromNormalized(vector2, v105.viewSpaceBounds)
+		local v111 = v105.view * v110
+		local v112 = bodyAssetMasksRenderer.getViewSpacePositionFromNormalized(vector2_4, v105.viewSpaceBounds)
+		local v113 = v105.view * v112
+		local v114 = alignedExtentsFromReprojectedPoint(v111, v105.view)
+		local v115 = alignedExtentsFromReprojectedPoint(v113, v105.view)
+
+		if getFFlagUGCValidateTinyTrianglesIntersectFix() then
+			local v116 = Extents.new():unionExtents(v114):unionExtents(v115)
+			local v117 = bodyAssetMasksRenderer.opposingViewIds[v104]
+
+			if v103[v117] then
+				v103[v117] = v116:intersectExtents(v103[v117])
+			else
+				v103[v104] = v116
+			end
+		else
+			v102 = v102:unionExtents(v114):unionExtents(v115)
+		end
+	end
+
+	if getFFlagUGCValidateTinyTrianglesIntersectFix() then
+		for _, v119 in v103 do
+			v102 = v102:unionExtents(v119)
+		end
+
+		assert(v102:isValid())
+	end
+
+	return true, v102
+end
+local function worldSpacePositionFromPointInMeshPart(vector3: Vector3, p17) -- line: 336
+	return p17.CFrame * (vector3 * (p17.Size / p17.MeshSize))
+end
+local function getHighestInflatingPointInEachAxis(p18, t6: {[any]: any}, t7: {[any]: any}, p19: ((...any) -> ...any), p20) -- line: 353
+	-- upvalues: getMeshVerts (copy)
+	local t8 = {
+		X = {
+			positive = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			},
+			negative = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			}
+		},
+		Y = {
+			positive = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			},
+			negative = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			}
+		},
+		Z = {
+			positive = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			},
+			negative = {
+				inflationScale = 0,
+				furthestPointWorldSpace = nil
+			}
+		}
+	}
+	local v128 = p18:size()
+
+	for v129, v130 in t7 do
+		local v131, v132, v133 = getMeshVerts({
+			editableMesh = v130,
+			fullName = v129
+		}, p20)
+
+		if not v131 then
+			return false, v132
+		end
+
+		local v134 = t6[v129]
+
+		for _, v136 in v133 do
+			local v137 = v136 * v134.scale
+			local v138 = v134.CFrame * v137
+			local v139 = p19(v129)
+			local v140 = v139.CFrame * (v136 * (v139.Size / v139.MeshSize))
+			local v141 = (v138 - p18.max) / v128
+			local v142 = (p18.min - v138) / v128
+
+			for _, v144 in {
+				"X",
+				"Y",
+				"Z"
+			} do
+				local v145 = t8[v144]
+				local positive = v145.positive
+				local v147 = v141[v144]
+
+				if v147 > positive.inflationScale then
+					positive.furthestPointWorldSpace = v140
+					positive.inflationScale = v147
+				end
+
+				local negative = v145.negative
+				local v149 = v142[v144]
+
+				if v149 > negative.inflationScale then
+					negative.furthestPointWorldSpace = v140
+					negative.inflationScale = v149
+				end
+			end
+		end
+	end
+
+	return true, t8
+end
+local function getBodyPartAssetEditableMeshes(p21, p22) -- line: 413
+	-- upvalues: getEditableMeshFromContext (copy)
+	local t9 = {}
+
+	if p21:IsA("MeshPart") and p22.assetTypeEnum == Enum.AssetType.DynamicHead then
+		table.insert(t9, p21)
+	else
+		for _, child in p21:GetChildren() do
+			if child:IsA("MeshPart") then
+				table.insert(t9, child)
+			end
+		end
+	end
+
+	local t10 = {}
+
+	for _, v157 in t9 do
+		local v158, v159 = getEditableMeshFromContext(v157, "MeshId", p22)
+
+		if not v158 then
+			local v160 = string.format("Failed to load mesh for MeshPart '%s'. Make sure mesh exists and try again.", v157.Name)
+
+			if not p22.isServer then
+				return false, { v160 }
+			end
+
+			error(v160)
+		end
+
+		t10[v157.Name] = v159
+	end
+
+	return true, t10
+end
+local function tryReportInflationError(t11: {[any]: any}, p23) -- line: 448
+	-- upvalues: FailureReasonsAccumulator (copy), validateAccurateBoundingBoxFlags (copy)
+	local v163 = FailureReasonsAccumulator.new()
+	local v164 = validateAccurateBoundingBoxFlags.AssetTypeToAxisThresholds[p23]
+
+	for _, v166 in {
+		"X",
+		"Y",
+		"Z"
+	} do
+		local v167 = t11[v166]
+		local v168 = v167.negative.inflationScale + v167.positive.inflationScale
+		local v169 = v164[v166]
+
+		if v169 < v168 then
+			local t12 = {}
+
+			if v167.positive.inflationScale > v169 * 0.2 then
+				table.insert(t12, v167.positive.furthestPointWorldSpace)
+			end
+
+			if v167.negative.inflationScale > v169 * 0.2 then
+				table.insert(t12, v167.negative.furthestPointWorldSpace)
+			end
+
+			local s1 = ""
+
+			if #t12 > 0 then
+				s1 = " near " .. string.format("{%.4f, %.4f, %.4f}", t12[1].X, t12[1].Y, t12[1].Z)
+
+				if #t12 > 1 then
+					s1 ..= string.format(", and {%.4f, %.4f, %.4f}", t12[2].X, t12[2].Y, t12[2].Z)
+				end
+			end
+
+			local v172 = v168 * 100
+			local v173 = v169 * 100
+
+			v163:updateReasons(false, { string.format("Detected low visibility geometry%s that increases %s bounding box size by %.2f%% (threshold is %.2f%%) in the %s axis. Remove the geometry or increase its size so that it is more visible", s1, p23.Name, v172, v173, v166) })
+		end
+	end
+
+	return v163
+end
+
+local t13 = {}
+local t18 = nil
+
+function t13.getBoundsViewsForAssetType(p24) -- line: 506
+	-- upvalues: t18 (ref), bodyAssetMasksRenderer (copy)
+	if not t18 then
+		local t14 = {}
+
+		for _, v177 in bodyAssetMasksRenderer.viewIds do
+			t14[v177] = true
+		end
+
+		t14[bodyAssetMasksRenderer.viewIds.Left] = false
+		t14[bodyAssetMasksRenderer.viewIds.Bottom] = false
+
+		local t15 = {}
+
+		for _, v180 in bodyAssetMasksRenderer.viewIds do
+			t15[v180] = true
+		end
+
+		t15[bodyAssetMasksRenderer.viewIds.Right] = false
+		t15[bodyAssetMasksRenderer.viewIds.Bottom] = false
+
+		local t16 = {}
+
+		for _, v183 in bodyAssetMasksRenderer.viewIds do
+			t16[v183] = true
+		end
+
+		t16[bodyAssetMasksRenderer.viewIds.Left] = false
+		t16[bodyAssetMasksRenderer.viewIds.Bottom] = false
+
+		local t17 = {}
+
+		for _, v186 in bodyAssetMasksRenderer.viewIds do
+			t17[v186] = true
+		end
+
+		t17[bodyAssetMasksRenderer.viewIds.Right] = false
+		t17[bodyAssetMasksRenderer.viewIds.Bottom] = false
+		t18 = {
+			[Enum.AssetType.DynamicHead] = nil,
+			[Enum.AssetType.Torso] = nil,
+			[Enum.AssetType.LeftArm] = t14,
+			[Enum.AssetType.RightArm] = t15,
+			[Enum.AssetType.LeftLeg] = t16,
+			[Enum.AssetType.RightLeg] = t17
+		}
+	end
+
+	return t18[p24]
+end
+function t13.validate(p25, p26, p27) -- line: 545
+	-- upvalues: t13 (copy), validateAccurateBoundingBoxFlags (copy), getAttachmentCFrameInPartSpace (copy), bodyAssetMasksRenderer (copy), projectMeshLocalPointToImageRow (copy), cloneMaskZeroedBelowRow (copy), calculateValidBounds (copy), AssetCalculator (copy), getBodyPartAssetEditableMeshes (copy), getHighestInflatingPointInEachAxis (copy), tryReportInflationError (copy), Analytics (copy)
+	local assetTypeEnum = p27.assetTypeEnum
+
+	assert(assetTypeEnum)
+
+	local function findMeshHandle(s2: string) -- line: 553
+		-- upvalues: assetTypeEnum (copy), p25 (copy)
+		if assetTypeEnum == Enum.AssetType.DynamicHead then
+			return p25
+		end
+
+		return (p25:FindFirstChild(s2))
+	end
+
+	local v192 = t13.getBoundsViewsForAssetType(assetTypeEnum)
+	local t19 = {}
+
+	if v192 then
+		for v194, v195 in v192 do
+			if v195 then
+				assert(p26.bodyAssetMasks[v194])
+				t19[v194] = p26.bodyAssetMasks[v194]
+			end
+		end
+	else
+		t19 = p26.bodyAssetMasks
+	end
+
+	local t20 = {}
+
+	if assetTypeEnum == Enum.AssetType.DynamicHead and validateAccurateBoundingBoxFlags.neckAttachmentCrop() then
+		local NeckRigAttachment = p25:FindFirstChild("NeckRigAttachment", true)
+		local v198
+
+		if not NeckRigAttachment then
+			v198 = nil
+		else
+			local v199 = getAttachmentCFrameInPartSpace(NeckRigAttachment)
+			local v200 = p25.Size / p25.MeshSize
+
+			v198 = v199.Position / v200
+		end
+
+		if v198 then
+			local v201 = validateAccurateBoundingBoxFlags.neckAttachmentCropMargin()
+			local t21 = {}
+
+			for v203, v204 in t19 do
+				if v203 ~= bodyAssetMasksRenderer.viewIds.Top and v203 ~= bodyAssetMasksRenderer.viewIds.Bottom then
+					local v205 = projectMeshLocalPointToImageRow(v198, v204)
+					local mask = v204.mask
+					local v207 = v205 + v201 * (mask.Size.Y - 1) / 2
+					local v208 = cloneMaskZeroedBelowRow(mask, v207)
+
+					table.insert(t20, v208)
+					t21[v203] = {
+						mask = v208,
+						view = v204.view,
+						viewSpaceBounds = v204.viewSpaceBounds,
+						viewId = v204.viewId
+					}
+				else
+					t21[v203] = v204
+				end
+			end
+
+			t19 = t21
+		end
+	end
+
+	local v209, v210 = (function() -- line: 611
+		-- upvalues: calculateValidBounds (copy), t19 (ref), p27 (copy), AssetCalculator (copy), p25 (copy), getBodyPartAssetEditableMeshes (copy), getHighestInflatingPointInEachAxis (copy), findMeshHandle (copy), tryReportInflationError (copy), assetTypeEnum (copy), Analytics (copy)
+		local v233, v234 = calculateValidBounds(t19, p27)
+
+		if not v233 then
+			return false, v234
+		end
+
+		local v235 = AssetCalculator.getAssetMeshesValidationSpaceTransforms(p25, p27)
+		local v236, v237 = getBodyPartAssetEditableMeshes(p25, p27)
+
+		if not v236 then
+			return false, v237
+		end
+
+		local v238, v239 = getHighestInflatingPointInEachAxis(v234, v235, v237, findMeshHandle, p27)
+
+		if not v238 then
+			return false, v239
+		end
+
+		local v240 = tryReportInflationError(v239, assetTypeEnum)
+
+		if not v240:getFinalResults() then
+			Analytics.reportFailure(Analytics.ErrorType.validateAccurateBoundingBox, nil, p27)
+		end
+
+		return v240:getFinalResults()
+	end)()
+
+	for _, v212 in t20 do
+		v212:Destroy()
+	end
+
+	return v209, v210
+end
+
+return t13

@@ -1,1 +1,1 @@
-return require(script.useSignalProfileInsightsByUserId);
+return require(script.useSignalProfileInsightsByUserId)

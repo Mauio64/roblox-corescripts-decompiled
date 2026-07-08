@@ -1,101 +1,110 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = require(l_Parent_0.ReactOtter);
-local v5 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local v7 = require(l_script_FirstAncestor_0.Components.Buttons.IconTextButton);
-local v8 = require(l_script_FirstAncestor_0.Components.Buttons.ColorTextButton);
-local v9 = game:DefineFastFlag("AXDisableControlBarMenuAnimation", false);
-local v10 = {
-    dampingRatio = 1, 
-    frequency = 5
-};
-return function(v11) --[[ Line: 30 ]] --[[ Name: IconTextMenu ]]
-    -- upvalues: v5 (copy), v2 (copy), v4 (copy), v10 (copy), v7 (copy), v8 (copy), v3 (copy), v9 (copy)
-    local v12 = v5();
-    local v13, v14 = v2.useBinding(0);
-    local v15, v16 = v4.useAnimatedBinding(0);
-    local v17 = #v11.items > 0;
-    local v18 = v2.useRef(nil);
-    local v19 = v11.radius or v12.defaultIconTextMenuRadius;
-    local v22 = v2.useCallback(function(v20) --[[ Line: 41 ]]
-        -- upvalues: v14 (copy), v16 (copy), v4 (ref), v17 (copy), v10 (ref)
-        local l_AbsoluteSize_0 = v20.AbsoluteSize;
-        v14(l_AbsoluteSize_0.X);
-        v16(v4.spring(if v17 then l_AbsoluteSize_0.Y else 0, v10));
-    end, {
-        v17
-    });
-    local v26 = v2.useMemo(function() --[[ Line: 47 ]]
-        -- upvalues: v11 (copy), v2 (ref), v7 (ref), v8 (ref)
-        local v23 = {};
-        for v24, v25 in v11.items do
-            if v25.type == "icon" then
-                v23[("IconTextMenuItem-%*"):format(v25.id)] = v2.createElement(v7, {
-                    icon = v25.icon, 
-                    text = v25.text, 
-                    iconSize = v25.iconSize, 
-                    disabled = v25.disabled, 
-                    onActivated = function() --[[ Line: 56 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v11 (ref), v25 (copy)
-                        if v11.onItemActivated then
-                            v11.onItemActivated(v25.id);
-                        end;
-                        if v25.onActivated then
-                            v25.onActivated();
-                        end;
-                    end, 
-                    Visible = v25.visible, 
-                    LayoutOrder = v24
-                });
-            elseif v25.type == "color" then
-                v23[("IconTextMenuItem-%*"):format(v25.id)] = v2.createElement(v8, {
-                    colors = v25.colors, 
-                    colorSize = v25.colorSize, 
-                    size = v25.size, 
-                    text = v25.text, 
-                    disabled = v25.disabled, 
-                    onActivated = function() --[[ Line: 74 ]] --[[ Name: onActivated ]]
-                        -- upvalues: v11 (ref), v25 (copy)
-                        if v11.onItemActivated then
-                            v11.onItemActivated(v25.id);
-                        end;
-                        if v25.onActivated then
-                            v25.onActivated();
-                        end;
-                    end, 
-                    Visible = v25.visible, 
-                    LayoutOrder = v24
-                });
-            end;
-        end;
-        return v23;
-    end, {
-        v11.items, 
-        v11.onItemActivated
-    });
-    return v2.createElement(v3.View, {
-        tag = "clip", 
-        Name = "IconTextMenu-Animation-Container", 
-        Size = if v9 then nil else v2.joinBindings({
-            X = v13, 
-            Y = v15
-        }):map(function(v27) --[[ Line: 95 ]]
-            return UDim2.fromOffset(v27.X, (math.round(v27.Y)));
-        end), 
-        AutomaticSize = if v9 then Enum.AutomaticSize.XY else nil, 
-        Position = v11.Position, 
-        AnchorPoint = v11.AnchorPoint, 
-        LayoutOrder = v11.LayoutOrder
-    }, {
-        MenuContent = if #v11.items > 0 then v2.createElement(v3.View, {
-            tag = "auto-xy clip col clip padding-xsmall gap-xsmall", 
-            backgroundStyle = v12.menuBackgroundStyle, 
-            cornerRadius = UDim.new(0, v19), 
-            ref = v18, 
-            onAbsoluteSizeChanged = v22
-        }, v26) else nil
-    });
-end;
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local ReactOtter = require(AvatarExperienceControlBarParent.ReactOtter)
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local IconTextButton = require(AvatarExperienceControlBar.Components.Buttons.IconTextButton)
+local ColorTextButton = require(AvatarExperienceControlBar.Components.Buttons.ColorTextButton)
+local v9 = game:DefineFastFlag("AXDisableControlBarMenuAnimation", false)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 5
+}
+
+local function IconTextMenu(t2: {[any]: any}) -- line: 30
+	-- upvalues: useSemanticTokens (copy), React (copy), ReactOtter (copy), t1 (copy), IconTextButton (copy), ColorTextButton (copy), Foundation (copy), v9 (copy)
+	local v13 = useSemanticTokens()
+	local v14, v15 = React.useBinding(0)
+	local v16, v17 = ReactOtter.useAnimatedBinding(0)
+	local v18 = #t2.items > 0
+	local v19 = React.useRef(nil)
+	local v20 = t2.radius or v13.defaultIconTextMenuRadius
+	local v21 = React.useCallback(function(p1) -- line: 41
+		-- upvalues: v15 (copy), v17 (copy), ReactOtter (copy), v18 (copy), t1 (copy)
+		local AbsoluteSize = p1.AbsoluteSize
+
+		v15(AbsoluteSize.X)
+		v17(ReactOtter.spring(not v18 and 0 or AbsoluteSize.Y, t1))
+	end, { v18 })
+	local v22 = React.useMemo(function() -- line: 47
+		-- upvalues: t2 (copy), React (copy), IconTextButton (copy), ColorTextButton (copy)
+		local t3 = {}
+
+		for v26, v27 in t2.items do
+			if v27.type == "icon" then
+				t3[`IconTextMenuItem-{ v27.id }`] = React.createElement(IconTextButton, {
+					icon = v27.icon,
+					text = v27.text,
+					iconSize = v27.iconSize,
+					disabled = v27.disabled,
+					onActivated = function() -- line: 56
+						-- upvalues: t2 (copy), v27 (copy)
+						if t2.onItemActivated then
+							t2.onItemActivated(v27.id)
+						end
+
+						if v27.onActivated then
+							v27.onActivated()
+						end
+					end,
+					Visible = v27.visible,
+					LayoutOrder = v26
+				})
+			elseif v27.type == "color" then
+				t3[`IconTextMenuItem-{ v27.id }`] = React.createElement(ColorTextButton, {
+					colors = v27.colors,
+					colorSize = v27.colorSize,
+					size = v27.size,
+					text = v27.text,
+					disabled = v27.disabled,
+					onActivated = function() -- line: 74
+						-- upvalues: t2 (copy), v27 (copy)
+						if t2.onItemActivated then
+							t2.onItemActivated(v27.id)
+						end
+
+						if v27.onActivated then
+							v27.onActivated()
+						end
+					end,
+					Visible = v27.visible,
+					LayoutOrder = v26
+				})
+			end
+		end
+
+		return t3
+	end, {
+		t2.items,
+		t2.onItemActivated
+	})
+
+	return React.createElement(Foundation.View, {
+		tag = "clip",
+		Name = "IconTextMenu-Animation-Container",
+		Size = if not v9 then React.joinBindings({
+			X = v14,
+			Y = v16
+		}):map(function(p2) -- line: 95
+			return UDim2.fromOffset(p2.X, (math.round(p2.Y)))
+		end) else nil,
+		AutomaticSize = if not v9 then nil else Enum.AutomaticSize.XY,
+		Position = t2.Position,
+		AnchorPoint = t2.AnchorPoint,
+		LayoutOrder = t2.LayoutOrder
+	}, {
+		MenuContent = if not (#t2.items > 0) then nil else React.createElement(Foundation.View, {
+			tag = "auto-xy clip col clip padding-xsmall gap-xsmall",
+			backgroundStyle = v13.menuBackgroundStyle,
+			cornerRadius = UDim.new(0, v20),
+			ref = v19,
+			onAbsoluteSizeChanged = v21
+		}, v22)
+	})
+end
+
+return IconTextMenu

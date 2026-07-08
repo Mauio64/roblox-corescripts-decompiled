@@ -1,13 +1,12 @@
-local v0 = require(script.Parent.toRect);
-local v1 = require(script.Parent.returnValue);
-return function(v2, v3) --[[ Line: 24 ]] --[[ Name: intersect ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    local v4 = v0(v2);
-    local v5 = v0(v3);
-    local l_v1_0 = v1;
-    local v7 = false;
-    if math.abs(v4.Min.X - v5.Min.X) * 2 < v4.Width + v5.Width then
-        v7 = math.abs(v4.Min.Y - v5.Min.Y) * 2 < v4.Height + v5.Height;
-    end;
-    return l_v1_0(v7, "Intersects the element", "Does not intersect the element");
-end;
+local toRect = require(script.Parent.toRect)
+local returnValue = require(script.Parent.returnValue)
+
+local function intersect(p1, p2) -- line: 24
+	-- upvalues: toRect (copy), returnValue (copy)
+	local v6 = toRect(p1)
+	local v7 = toRect(p2)
+
+	return returnValue(math.abs(v6.Min.X - v7.Min.X) * 2 < v6.Width + v7.Width and math.abs(v6.Min.Y - v7.Min.Y) * 2 < v6.Height + v7.Height, "Intersects the element", "Does not intersect the element")
+end
+
+return intersect

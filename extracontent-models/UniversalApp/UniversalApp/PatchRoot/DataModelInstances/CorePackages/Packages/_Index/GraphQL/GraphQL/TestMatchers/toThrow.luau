@@ -1,39 +1,46 @@
-return function(v0, v1, v2) --[[ Line: 16 ]] --[[ Name: toThrow ]]
-    local l_status_0, l_result_0 = pcall(v0);
-    if not l_status_0 then
-        if typeof(v1) == "string" then
-            local v5 = nil;
-            if typeof(l_result_0) == "string" then
-                v5 = l_result_0;
-            elseif typeof(l_result_0) == "table" and typeof(l_result_0.message) == "string" then
-                v5 = l_result_0.message;
-            end;
-            if v5 == nil then
-                return {
-                    pass = false, 
-                    message = string.format("Matcher Error:\nExpected function to throw a string or an Error object, but it threw an error of type '%s'.\nYou may wish to use `pcall` instead and run custom expectations on the returned error", (typeof(l_result_0)))
-                };
-            elseif v5:find(v1, 1, not v2) ~= nil then
-                return {
-                    pass = true, 
-                    message = string.format("Expected function not to throw with '%s'", v1)
-                };
-            else
-                return {
-                    pass = false, 
-                    message = string.format("Expected function to throw with\n'%s'\nbut threw\n'%s'\ninstead", v1, v5)
-                };
-            end;
-        else
-            return {
-                pass = true, 
-                message = "Expected function not to throw"
-            };
-        end;
-    else
-        return {
-            pass = false, 
-            message = "Expected function to throw"
-        };
-    end;
-end;
+local function toThrow(p1: ((...any) -> ...any), s1: string?, b1: boolean?) -- line: 16
+	local ok, result = pcall(p1)
+
+	if not ok then
+		if typeof(s1) == "string" then
+			local v7 = nil
+
+			if typeof(result) == "string" then
+				v7 = result
+			elseif typeof(result) == "table" and typeof(result.message) == "string" then
+				v7 = result.message
+			end
+
+			if v7 == nil then
+				return {
+					pass = false,
+					message = string.format("Matcher Error:\nExpected function to throw a string or an Error object, but it threw an error of type '%s'.\nYou may wish to use `pcall` instead and run custom expectations on the returned error", (typeof(result)))
+				}
+			end
+
+			if v7:find(s1, 1, not b1) ~= nil then
+				return {
+					pass = true,
+					message = string.format("Expected function not to throw with '%s'", s1)
+				}
+			end
+
+			return {
+				pass = false,
+				message = string.format("Expected function to throw with\n'%s'\nbut threw\n'%s'\ninstead", s1, v7)
+			}
+		end
+
+		return {
+			pass = true,
+			message = "Expected function not to throw"
+		}
+	end
+
+	return {
+		pass = false,
+		message = "Expected function to throw"
+	}
+end
+
+return toThrow

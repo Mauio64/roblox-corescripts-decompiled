@@ -1,1 +1,1 @@
-return require(script.FindFriendsBanner);
+return require(script.FindFriendsBanner)

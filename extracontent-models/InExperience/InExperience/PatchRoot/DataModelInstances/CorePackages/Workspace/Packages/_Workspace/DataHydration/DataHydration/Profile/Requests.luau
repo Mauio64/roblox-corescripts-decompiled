@@ -1,3 +1,3 @@
 return {
-    GetUserProfileCTA = require(script.GetUserProfileCTA)
-};
+	GetUserProfileCTA = require(script.GetUserProfileCTA)
+}

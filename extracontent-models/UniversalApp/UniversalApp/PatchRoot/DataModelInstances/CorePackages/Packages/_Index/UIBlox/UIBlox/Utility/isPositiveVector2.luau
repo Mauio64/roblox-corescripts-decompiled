@@ -1,9 +1,10 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Parent.t);
-return (v1.intersection(v1.Vector2, function(v2) --[[ Line: 7 ]]
-    if v2.X < 0 or v2.Y < 0 then
-        return false, ("each component of the Vector2 must be >= 0; component values are: %d, %d"):format(v2.X, v2.Y);
-    else
-        return true;
-    end;
-end));
+local ParentParent = script.Parent.Parent
+local t = require(ParentParent.Parent.t)
+
+return (t.intersection(t.Vector2, function(p1) -- line: 7
+	if p1.X < 0 or p1.Y < 0 then
+		return false, ("each component of the Vector2 must be >= 0; component values are: %d, %d"):format(p1.X, p1.Y)
+	end
+
+	return true
+end))

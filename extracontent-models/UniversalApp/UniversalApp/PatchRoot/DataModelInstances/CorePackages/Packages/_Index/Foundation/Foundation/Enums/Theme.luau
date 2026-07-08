@@ -1,4 +1,4 @@
 return {
-    Dark = "Dark", 
-    Light = "Light"
-};
+	Dark = "Dark",
+	Light = "Light"
+}

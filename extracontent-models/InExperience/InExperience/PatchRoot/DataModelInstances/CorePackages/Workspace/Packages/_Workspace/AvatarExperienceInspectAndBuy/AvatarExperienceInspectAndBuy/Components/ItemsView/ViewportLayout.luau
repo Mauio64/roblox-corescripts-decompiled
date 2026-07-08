@@ -1,80 +1,85 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_useTokens_0 = v3.Hooks.useTokens;
-local v5 = require(l_script_FirstAncestor_0.Components.Common.BackButton);
-local v6 = require(l_script_FirstAncestor_0.Enums.ViewType);
-local v7 = require(l_script_FirstAncestor_0.Components.ItemsView.BuyActionBarLayout);
-local _ = require(l_script_FirstAncestor_0.Components.Common.BuyActionBar);
-local _ = require(l_script_FirstAncestor_0.Types);
-return function(v10) --[[ Line: 64 ]] --[[ Name: ViewportLayout ]]
-    -- upvalues: v6 (copy), l_useTokens_0 (copy), v2 (copy), v5 (copy), v3 (copy), v7 (copy)
-    local v11 = v10.view == v6.WideLandscape;
-    local v12 = v10.backButtonProps and v10.backButtonProps.onBackButtonClick;
-    local v13 = l_useTokens_0();
-    return v2.createElement("Frame", {
-        Size = v10.Size, 
-        AutomaticSize = v10.AutomaticSize, 
-        BackgroundTransparency = 1
-    }, {
-        BackButton = if not v11 and v10.backButtonProps then v2.createElement(v5, {
-            onBackButtonClick = v12, 
-            Position = v10.backButtonProps and v10.backButtonProps.Position or UDim2.new(0, v13.Padding.Small, 0, v13.Padding.Small)
-        }) else nil, 
-        InnerView = v2.createElement(v3.View, {
-            Size = UDim2.new(1, 0, 1, 0)
-        }, {
-            UIListLayout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalFlex = if v11 then Enum.UIFlexAlignment.SpaceBetween else nil
-            }), 
-            Thumbnail = if not v10.tryOnState.isTryOnEnabled then v2.createElement(v3.View, {
-                Size = v10.viewportProps and v10.viewportProps.Size or UDim2.new(0, 200, 0, 200), 
-                LayoutOrder = 1
-            }, {
-                ImageLabel = v2.createElement("ImageLabel", {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1, 
-                    Image = v10.thumbnailUrl, 
-                    ScaleType = v10.viewportProps and v10.viewportProps.ScaleType or Enum.ScaleType.Fit
-                }), 
-                UIFlexItem = if v11 then v2.createElement("UIFlexItem", {
-                    FlexMode = Enum.UIFlexMode.Fill
-                }) else nil, 
-                UIAspectRatioConstraint = v2.createElement("UIAspectRatioConstraint", {
-                    AspectRatio = v10.viewportProps and v10.viewportProps.AspectRatio or 1
-                }), 
-                UIPadding = if v10.thumbnailPadding then v2.createElement("UIPadding", {
-                    PaddingLeft = v10.thumbnailPadding.left, 
-                    PaddingRight = v10.thumbnailPadding.right, 
-                    PaddingTop = v10.thumbnailPadding.top, 
-                    PaddingBottom = v10.thumbnailPadding.bottom
-                }) else nil
-            }) else nil, 
-            ViewportContainer = v2.createElement(v3.View, {
-                tag = "padding-top-medium", 
-                Size = v10.viewportProps and v10.viewportProps.Size or UDim2.new(0, 200, 0, 200), 
-                LayoutOrder = 1, 
-                Visible = v10.tryOnState.isTryOnEnabled
-            }, {
-                UIFlexItem = if v11 then v2.createElement("UIFlexItem", {
-                    FlexMode = Enum.UIFlexMode.Fill
-                }) else nil, 
-                UIAspectRatioConstraint = v2.createElement("UIAspectRatioConstraint", {
-                    AspectRatio = v10.viewportProps and v10.viewportProps.AspectRatio or 1
-                }), 
-                Viewport = v10.renderTryOnViewport(v10.tryOnState.tryOnItem)
-            }), 
-            BuyActionBarLayout = if v11 and v10.buyActionBarProps then v2.createElement(v7, {
-                enableTopBorder = true, 
-                Size = UDim2.new(1, 0, 0, v13.Size.Size_1900), 
-                buyActionBarProps = v10.buyActionBarProps, 
-                purchaseButtonProps = v10.buyActionBarProps.purchaseButtonProps
-            }) else nil
-        })
-    });
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local Foundation = require(AvatarExperienceInspectAndBuyParent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+local BackButton = require(AvatarExperienceInspectAndBuy.Components.Common.BackButton)
+local ViewType = require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+local BuyActionBarLayout = require(AvatarExperienceInspectAndBuy.Components.ItemsView.BuyActionBarLayout)
+
+require(AvatarExperienceInspectAndBuy.Components.Common.BuyActionBar)
+require(AvatarExperienceInspectAndBuy.Types)
+
+local function ViewportLayout(t1: {[any]: any}) -- line: 64
+	-- upvalues: ViewType (copy), useTokens (copy), React (copy), BackButton (copy), Foundation (copy), BuyActionBarLayout (copy)
+	local v11 = t1.view == ViewType.WideLandscape
+	local v12 = t1.backButtonProps and t1.backButtonProps.onBackButtonClick
+	local v13 = useTokens()
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = t1.Size,
+		AutomaticSize = t1.AutomaticSize
+	}, {
+		BackButton = if v11 or not t1.backButtonProps then nil else React.createElement(BackButton, {
+			onBackButtonClick = v12,
+			Position = t1.backButtonProps and t1.backButtonProps.Position or UDim2.new(0, v13.Padding.Small, 0, v13.Padding.Small)
+		}),
+		InnerView = React.createElement(Foundation.View, {
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalFlex = if not v11 then nil else Enum.UIFlexAlignment.SpaceBetween
+			}),
+			Thumbnail = if t1.tryOnState.isTryOnEnabled then nil else React.createElement(Foundation.View, {
+				LayoutOrder = 1,
+				Size = t1.viewportProps and t1.viewportProps.Size or UDim2.new(0, 200, 0, 200)
+			}, {
+				ImageLabel = React.createElement("ImageLabel", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					Image = t1.thumbnailUrl,
+					ScaleType = t1.viewportProps and t1.viewportProps.ScaleType or Enum.ScaleType.Fit
+				}),
+				UIFlexItem = if not v11 then nil else React.createElement("UIFlexItem", {
+					FlexMode = Enum.UIFlexMode.Fill
+				}),
+				UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+					AspectRatio = t1.viewportProps and t1.viewportProps.AspectRatio or 1
+				}),
+				UIPadding = if not t1.thumbnailPadding then nil else React.createElement("UIPadding", {
+					PaddingLeft = t1.thumbnailPadding.left,
+					PaddingRight = t1.thumbnailPadding.right,
+					PaddingTop = t1.thumbnailPadding.top,
+					PaddingBottom = t1.thumbnailPadding.bottom
+				})
+			}),
+			ViewportContainer = React.createElement(Foundation.View, {
+				tag = "padding-top-medium",
+				LayoutOrder = 1,
+				Size = t1.viewportProps and t1.viewportProps.Size or UDim2.new(0, 200, 0, 200),
+				Visible = t1.tryOnState.isTryOnEnabled
+			}, {
+				UIFlexItem = if not v11 then nil else React.createElement("UIFlexItem", {
+					FlexMode = Enum.UIFlexMode.Fill
+				}),
+				UIAspectRatioConstraint = React.createElement("UIAspectRatioConstraint", {
+					AspectRatio = t1.viewportProps and t1.viewportProps.AspectRatio or 1
+				}),
+				Viewport = t1.renderTryOnViewport(t1.tryOnState.tryOnItem)
+			}),
+			BuyActionBarLayout = if not v11 or not t1.buyActionBarProps then nil else React.createElement(BuyActionBarLayout, {
+				enableTopBorder = true,
+				Size = UDim2.new(1, 0, 0, v13.Size.Size_1900),
+				buyActionBarProps = t1.buyActionBarProps,
+				purchaseButtonProps = t1.buyActionBarProps.purchaseButtonProps
+			})
+		})
+	})
+end
+
+return ViewportLayout

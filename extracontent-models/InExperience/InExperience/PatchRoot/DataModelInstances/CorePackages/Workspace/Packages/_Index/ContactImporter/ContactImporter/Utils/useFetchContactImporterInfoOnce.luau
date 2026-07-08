@@ -1,22 +1,23 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_AppStorageService_0 = v1.AppStorageService;
-local l_useDispatch_0 = v1.useDispatch;
-local l_useSelector_0 = v1.useSelector;
-local l_useEffectOnce_0 = v1.useEffectOnce;
-local v6 = require(l_Parent_0.Networking.FetchContactImporterParams);
-local l_PermissionsProtocol_0 = v1.PermissionsProtocol;
-local v8 = require(script.Parent.useContactImporterConfiguration);
-return function(v9) --[[ Line: 12 ]]
-    -- upvalues: l_useSelector_0 (copy), l_useDispatch_0 (copy), v6 (copy), l_PermissionsProtocol_0 (copy), l_AppStorageService_0 (copy), v8 (copy), l_useEffectOnce_0 (copy)
-    local v11 = l_useSelector_0(function(v10) --[[ Line: 13 ]]
-        return v10.LocalUserId;
-    end);
-    local v12 = l_useDispatch_0();
-    local function v13() --[[ Line: 19 ]]
-        -- upvalues: v12 (copy), v6 (ref), v11 (copy), l_PermissionsProtocol_0 (ref), l_AppStorageService_0 (ref)
-        v12(v6(v11, l_PermissionsProtocol_0.default, l_AppStorageService_0));
-    end;
-    local v14 = v8(v9).shouldFetchContactImporterData and v11 and v11 ~= "" and v11 ~= "0";
-    l_useEffectOnce_0(v13, v14);
-end;
+local ParentParent = script.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local AppStorageService = dependencies.AppStorageService
+local useDispatch = dependencies.useDispatch
+local useSelector = dependencies.useSelector
+local useEffectOnce = dependencies.useEffectOnce
+local FetchContactImporterParams = require(ParentParent.Networking.FetchContactImporterParams)
+local PermissionsProtocol = dependencies.PermissionsProtocol
+local useContactImporterConfiguration = require(script.Parent.useContactImporterConfiguration)
+
+return function(t1: {[any]: any}) -- line: 12
+	-- upvalues: useSelector (copy), useDispatch (copy), FetchContactImporterParams (copy), PermissionsProtocol (copy), AppStorageService (copy), useContactImporterConfiguration (copy), useEffectOnce (copy)
+	local v11 = useSelector(function(p1) -- line: 13
+		return p1.LocalUserId
+	end)
+	local v12 = useDispatch()
+	local v13 = useContactImporterConfiguration(t1).shouldFetchContactImporterData and (v11 and (v11 ~= "" and v11 ~= "0"))
+
+	useEffectOnce(function() -- line: 19
+		-- upvalues: v12 (copy), FetchContactImporterParams (copy), v11 (copy), PermissionsProtocol (copy), AppStorageService (copy)
+		v12(FetchContactImporterParams(v11, PermissionsProtocol.default, AppStorageService))
+	end, v13)
+end

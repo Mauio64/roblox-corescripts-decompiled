@@ -1,19 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("ContactsToast").Parent;
-local v1 = require(l_Parent_0.SocialLuaAnalytics);
-local l_AnalyticsFactory_0 = v1.Analytics.AnalyticsFactory;
-local l_DefaultAnalyticsService_0 = v1.Analytics.DefaultAnalyticsService;
-local v4 = require(script.EventStreamActionList);
-local v5 = require(script.DiagActionList);
+local Parent = script:FindFirstAncestor("ContactsToast").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local AnalyticsFactory = SocialLuaAnalytics.Analytics.AnalyticsFactory
+local DefaultAnalyticsService = SocialLuaAnalytics.Analytics.DefaultAnalyticsService
+local EventStreamActionList = require(script.EventStreamActionList)
+local DiagActionList = require(script.DiagActionList)
+
 return {
-    EventNames = require(script.EventNames), 
-    Analytics = l_AnalyticsFactory_0.setUpAnalyticsFactory({
-        eventLists = {
-            EventStream = v4, 
-            Diag = v5
-        }, 
-        analyticsImpl = {
-            EventStream = l_DefaultAnalyticsService_0.EventStream, 
-            Diag = l_DefaultAnalyticsService_0.Diag
-        }
-    })
-};
+	EventNames = require(script.EventNames),
+	Analytics = AnalyticsFactory.setUpAnalyticsFactory({
+		eventLists = {
+			EventStream = EventStreamActionList,
+			Diag = DiagActionList
+		},
+		analyticsImpl = {
+			EventStream = DefaultAnalyticsService.EventStream,
+			Diag = DefaultAnalyticsService.Diag
+		}
+	})
+}

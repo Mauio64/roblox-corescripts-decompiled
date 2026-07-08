@@ -1,12 +1,15 @@
-return function(v0, v1) --[[ Line: 10 ]] --[[ Name: includes ]]
-    if v1 == nil then
-        return false;
-    else
-        for _, v3 in v0 do
-            if v3 == v1 then
-                return true;
-            end;
-        end;
-        return false;
-    end;
-end;
+local function includes(t1: {[any]: any}, p1) -- line: 10
+	if p1 == nil then
+		return false
+	end
+
+	for _, v5 in t1 do
+		if v5 == p1 then
+			return true
+		end
+	end
+
+	return false
+end
+
+return includes

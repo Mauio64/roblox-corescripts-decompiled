@@ -1,41 +1,48 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialExperiments").Parent;
-local l_ExperimentCacheManager_0 = require(l_Parent_0.ExperimentCacheManager).ExperimentCacheManager;
-local v2 = require(l_Parent_0.SharedFlags);
-local v3 = game:DefineFastString("FStringSquadRegroupExpLayer", "Party.Coordination.UnifyCoplay");
-local v4 = game:DefineFastString("SquadEnableRegroupVariant", "enableSquadRegroup");
-local l_FFlagForceEnableSquadRegroup_0 = v2.FFlagForceEnableSquadRegroup;
-local l_FFlagEnableSquadRegroupExperimentation_0 = v2.FFlagEnableSquadRegroupExperimentation;
-local function _(v7) --[[ Line: 14 ]] --[[ Name: getIsUserInTreatment ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v3 (copy)
-    local v8 = l_ExperimentCacheManager_0.default:getLayerVariables(v3);
-    if v8 and v8[v7] ~= nil then
-        return v8[v7];
-    else
-        return false;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialExperiments").Parent
+local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
+local SharedFlags = require(Parent.SharedFlags)
+local v4 = game:DefineFastString("FStringSquadRegroupExpLayer", "Party.Coordination.UnifyCoplay")
+local v5 = game:DefineFastString("SquadEnableRegroupVariant", "enableSquadRegroup")
+local FFlagForceEnableSquadRegroup = SharedFlags.FFlagForceEnableSquadRegroup
+local FFlagEnableSquadRegroupExperimentation = SharedFlags.FFlagEnableSquadRegroupExperimentation
+
+local function getIsUserInTreatment(s1: string) -- line: 14
+	-- upvalues: ExperimentCacheManager (copy), v4 (copy)
+	local v10 = ExperimentCacheManager.default:getLayerVariables(v4)
+
+	if v10 and v10[s1] ~= nil then
+		return v10[s1]
+	end
+
+	return false
+end
+
 return {
-    getSquadRegroupEnabled = function() --[[ Line: 24 ]] --[[ Name: getSquadRegroupEnabled ]]
-        -- upvalues: l_FFlagForceEnableSquadRegroup_0 (copy), l_FFlagEnableSquadRegroupExperimentation_0 (copy), v4 (copy), l_ExperimentCacheManager_0 (copy), v3 (copy)
-        local l_l_FFlagForceEnableSquadRegroup_0_0 = l_FFlagForceEnableSquadRegroup_0;
-        if not l_l_FFlagForceEnableSquadRegroup_0_0 then
-            l_l_FFlagForceEnableSquadRegroup_0_0 = l_FFlagEnableSquadRegroupExperimentation_0;
-            if l_l_FFlagForceEnableSquadRegroup_0_0 then
-                local l_v4_0 = v4;
-                local v12 = l_ExperimentCacheManager_0.default:getLayerVariables(v3);
-                if v12 and v12[l_v4_0] ~= nil then
-                    return v12[l_v4_0];
-                else
-                    l_l_FFlagForceEnableSquadRegroup_0_0 = false;
-                end;
-            end;
-        end;
-        return l_l_FFlagForceEnableSquadRegroup_0_0;
-    end, 
-    logExposure = function() --[[ Line: 29 ]] --[[ Name: logExposure ]]
-        -- upvalues: l_FFlagForceEnableSquadRegroup_0 (copy), l_FFlagEnableSquadRegroupExperimentation_0 (copy), l_ExperimentCacheManager_0 (copy), v3 (copy)
-        if not l_FFlagForceEnableSquadRegroup_0 and l_FFlagEnableSquadRegroupExperimentation_0 and l_ExperimentCacheManager_0.default:getLayerVariables(v3) ~= nil then
-            l_ExperimentCacheManager_0.default:logLayerExposure(v3);
-        end;
-    end
-};
+	getSquadRegroupEnabled = function() -- line: 24
+		-- upvalues: FFlagForceEnableSquadRegroup (copy), FFlagEnableSquadRegroupExperimentation (copy), v5 (copy), ExperimentCacheManager (copy), v4 (copy)
+		local v11 = FFlagForceEnableSquadRegroup
+
+		if not v11 then
+			v11 = FFlagEnableSquadRegroupExperimentation
+
+			if v11 then
+				local v12 = v5
+				local v13 = ExperimentCacheManager.default:getLayerVariables(v4)
+
+				if v13 and v13[v12] ~= nil then
+					return v13[v12]
+				end
+
+				v11 = false
+			end
+		end
+
+		return v11
+	end,
+	logExposure = function() -- line: 29
+		-- upvalues: FFlagForceEnableSquadRegroup (copy), FFlagEnableSquadRegroupExperimentation (copy), ExperimentCacheManager (copy), v4 (copy)
+		if not FFlagForceEnableSquadRegroup and (FFlagEnableSquadRegroupExperimentation and ExperimentCacheManager.default:getLayerVariables(v4) ~= nil) then
+			ExperimentCacheManager.default:logLayerExposure(v4)
+		end
+	end
+}

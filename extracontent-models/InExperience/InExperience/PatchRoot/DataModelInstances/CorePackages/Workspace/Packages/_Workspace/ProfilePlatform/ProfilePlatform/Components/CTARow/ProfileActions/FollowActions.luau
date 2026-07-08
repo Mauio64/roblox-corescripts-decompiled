@@ -30,10 +30,10 @@ return {
 					})):andThen(function() -- line: 34
 						-- upvalues: p1 (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
 						p1.dispatch(getProfilePlatform.API({
+							includeComponentOrdering = true,
 							profileType = p1.profileType,
 							profileId = p1.profileId,
-							components = getAvailableCommunityComponents(),
-							includeComponentOrdering = true
+							components = getAvailableCommunityComponents()
 						}))
 					end)
 				end
@@ -57,10 +57,10 @@ return {
 					})):andThen(function() -- line: 63
 						-- upvalues: p2 (copy), getProfilePlatform (copy), getAvailableCommunityComponents (copy)
 						p2.dispatch(getProfilePlatform.API({
+							includeComponentOrdering = true,
 							profileType = p2.profileType,
 							profileId = p2.profileId,
-							components = getAvailableCommunityComponents(),
-							includeComponentOrdering = true
+							components = getAvailableCommunityComponents()
 						}))
 					end)
 				end

@@ -1,108 +1,133 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Map_0 = require(l_Parent_0.LuauPolyfill).Map;
-local v2 = {};
-local function v3() --[[ Line: 21 ]] --[[ Name: defaultDispose ]]
+local ParentParent = script.Parent.Parent.Parent
+local Map = require(ParentParent.LuauPolyfill).Map
+local t1 = {}
 
-end;
-local v4 = {};
-v4.__index = v4;
-v4.new = function(v5, v6) --[[ Line: 51 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), v4 (copy), l_Map_0 (copy)
-    local l_v5_0 = v5;
-    local l_v6_0 = v6;
-    if l_v5_0 == nil then
-        l_v5_0 = 1e999;
-    end;
-    if l_v6_0 == nil then
-        l_v6_0 = v3;
-    end;
-    local v9 = setmetatable({}, v4);
-    v9.map = l_Map_0.new(nil);
-    v9.newest = nil;
-    v9.oldest = nil;
-    v9.max = l_v5_0;
-    v9.dispose = l_v6_0;
-    return v9;
-end;
-v4.has = function(v10, v11) --[[ Line: 73 ]] --[[ Name: has ]]
-    return v10.map:has(v11);
-end;
-v4.get = function(v12, v13) --[[ Line: 77 ]] --[[ Name: get ]]
-    local v14 = v12:getNode(v13);
-    if v14 then
-        return v14.value;
-    else
-        return v14;
-    end;
-end;
-v4.getNode = function(v15, v16) --[[ Line: 87 ]] --[[ Name: getNode ]]
-    local v17 = v15.map:get(v16);
-    if v17 and v17 ~= v15.newest then
-        local l_older_0 = v17.older;
-        local l_newer_0 = v17.newer;
-        if l_newer_0 then
-            l_newer_0.older = l_older_0;
-        end;
-        if l_older_0 then
-            l_older_0.newer = l_newer_0;
-        end;
-        v17.older = v15.newest;
-        v17.older.newer = v17;
-        v17.newer = nil;
-        v15.newest = v17;
-        if v17 == v15.oldest then
-            v15.oldest = l_newer_0;
-        end;
-    end;
-    return v17;
-end;
-v4.set = function(v20, v21, v22) --[[ Line: 121 ]] --[[ Name: set ]]
-    local v23 = v20:getNode(v21);
-    if v23 then
-        v23.value = v22;
-        return v23.value;
-    else
-        v23 = {
-            key = v21, 
-            value = v22, 
-            newer = nil, 
-            older = v20.newest
-        };
-        if v20.newest then
-            v20.newest.newer = v23;
-        end;
-        v20.newest = v23;
-        v20.oldest = v20.oldest or v23;
-        v20.map:set(v21, v23);
-        return v23.value;
-    end;
-end;
-v4.clean = function(v24) --[[ Line: 152 ]] --[[ Name: clean ]]
-    while v24.oldest and v24.map.size > v24.max do
-        v24:delete(v24.oldest.key);
-    end;
-end;
-v4.delete = function(v25, v26) --[[ Line: 160 ]] --[[ Name: delete ]]
-    local v27 = v25.map:get(v26);
-    if v27 then
-        if v27 == v25.newest then
-            v25.newest = v27.older;
-        end;
-        if v27 == v25.oldest then
-            v25.oldest = v27.newer;
-        end;
-        if v27.newer then
-            v27.newer.older = v27.older;
-        end;
-        if v27.older then
-            v27.older.newer = v27.newer;
-        end;
-        v25.map:delete(v26);
-        v25.dispose(v27.value, v26);
-        return true;
-    else
-        return false;
-    end;
-end;
-v2.Cache = v4;
-return v2;
+local function defaultDispose() -- line: 21
+end
+
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(n1: number?, p1: ((...any) -> ...any)?) -- line: 51
+	-- upvalues: defaultDispose (copy), t2 (copy), Map (copy)
+	if n1 == nil then
+		n1 = 1e999
+	end
+
+	if p1 == nil then
+		p1 = defaultDispose
+	end
+
+	local self = setmetatable({}, t2)
+
+	self.map = Map.new(nil)
+	self.newest = nil
+	self.oldest = nil
+	self.max = n1
+	self.dispose = p1
+
+	return self
+end
+function t2.has(p2, p3) -- line: 73
+	return p2.map:has(p3)
+end
+function t2.get(p4, p5) -- line: 77
+	local v13 = p4:getNode(p5)
+
+	if v13 then
+		return v13.value
+	end
+
+	return v13
+end
+function t2.getNode(p6, p7) -- line: 87
+	local v16 = p6.map:get(p7)
+
+	if v16 and v16 ~= p6.newest then
+		local older = v16.older
+		local newer = v16.newer
+
+		if newer then
+			newer.older = older
+		end
+
+		if older then
+			older.newer = newer
+		end
+
+		v16.older = p6.newest
+		v16.older.newer = v16
+		v16.newer = nil
+		p6.newest = v16
+
+		if v16 == p6.oldest then
+			p6.oldest = newer
+		end
+	end
+
+	return v16
+end
+function t2.set(p8, p9, p10) -- line: 121
+	local v22 = p8:getNode(p9)
+
+	if v22 then
+		v22.value = p10
+
+		return v22.value
+	end
+
+	local t3 = {
+		newer = nil,
+		key = p9,
+		value = p10,
+		older = p8.newest
+	}
+
+	if p8.newest then
+		p8.newest.newer = t3
+	end
+
+	p8.newest = t3
+	p8.oldest = p8.oldest or t3
+	p8.map:set(p9, t3)
+
+	return t3.value
+end
+function t2.clean(p11) -- line: 152
+	while p11.oldest and p11.map.size > p11.max do
+		p11:delete(p11.oldest.key)
+	end
+end
+function t2.delete(p12, p13) -- line: 160
+	local v27 = p12.map:get(p13)
+
+	if v27 then
+		if v27 == p12.newest then
+			p12.newest = v27.older
+		end
+
+		if v27 == p12.oldest then
+			p12.oldest = v27.newer
+		end
+
+		if v27.newer then
+			v27.newer.older = v27.older
+		end
+
+		if v27.older then
+			v27.older.newer = v27.newer
+		end
+
+		p12.map:delete(p13)
+		p12.dispose(v27.value, p13)
+
+		return true
+	end
+
+	return false
+end
+
+t1.Cache = t2
+
+return t1

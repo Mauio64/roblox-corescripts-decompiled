@@ -1,5 +1,5 @@
 return {
-    Start = "Start", 
-    Center = "Center", 
-    End = "End"
-};
+	Start = "Start",
+	Center = "Center",
+	End = "End"
+}

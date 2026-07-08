@@ -1,1 +1,1 @@
-return require(script.CurrentlyWearingCarousel);
+return require(script.CurrentlyWearingCarousel)

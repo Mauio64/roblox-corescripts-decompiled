@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXMakeSlidersSmoothWithGamepad", false);
+return game:DefineFastFlag("AXMakeSlidersSmoothWithGamepad", false)

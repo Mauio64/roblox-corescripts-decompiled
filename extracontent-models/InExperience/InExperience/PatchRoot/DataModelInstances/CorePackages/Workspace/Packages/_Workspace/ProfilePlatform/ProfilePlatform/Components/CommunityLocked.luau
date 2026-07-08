@@ -1,1 +1,1 @@
-return require(script.CommunityLocked);
+return require(script.CommunityLocked)

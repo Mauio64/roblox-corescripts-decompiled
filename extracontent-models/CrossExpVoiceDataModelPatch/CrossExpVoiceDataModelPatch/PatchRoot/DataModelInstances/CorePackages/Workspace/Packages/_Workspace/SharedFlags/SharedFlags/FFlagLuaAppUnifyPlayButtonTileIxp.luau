@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppUnifyPlayButtonTileIxp2", false);
+return game:DefineFastFlag("LuaAppUnifyPlayButtonTileIxp2", false)

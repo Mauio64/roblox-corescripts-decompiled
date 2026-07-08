@@ -1,3 +1,3 @@
 return {
-    TopBarHeight = 64
-};
+	TopBarHeight = 64
+}

@@ -1,19 +1,21 @@
-local l_AvatarEditorService_0 = game:GetService("AvatarEditorService");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Actions.CloseOpenPrompt);
-local v3 = require(l_Parent_0.GetConformedHumanoidDescription);
-return function(v4) --[[ Line: 8 ]]
-    -- upvalues: v3 (copy), l_AvatarEditorService_0 (copy), v2 (copy)
-    return function(v5) --[[ Line: 9 ]]
-        -- upvalues: v3 (ref), l_AvatarEditorService_0 (ref), v4 (copy), v2 (ref)
-        local l_humanoidDescription_0 = v5:getState().promptInfo.humanoidDescription;
-        v3(l_humanoidDescription_0, false):andThen(function(v7) --[[ Line: 13 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref), v4 (ref)
-            l_AvatarEditorService_0:PerformCreateOutfitWithDescription(v7, v4);
-        end, function(_) --[[ Line: 15 ]]
-            -- upvalues: l_AvatarEditorService_0 (ref)
-            l_AvatarEditorService_0:SignalCreateOutfitFailed();
-        end);
-        v5:dispatch(v2());
-    end;
-end;
+local AvatarEditorService = game:GetService("AvatarEditorService")
+local ParentParent = script.Parent.Parent
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+local GetConformedHumanoidDescription = require(ParentParent.GetConformedHumanoidDescription)
+
+return function(p1) -- line: 8
+	-- upvalues: GetConformedHumanoidDescription (copy), AvatarEditorService (copy), CloseOpenPrompt (copy)
+	return function(p2) -- line: 9
+		-- upvalues: GetConformedHumanoidDescription (copy), AvatarEditorService (copy), p1 (copy), CloseOpenPrompt (copy)
+		local humanoidDescription = p2:getState().promptInfo.humanoidDescription
+
+		GetConformedHumanoidDescription(humanoidDescription, false):andThen(function(p3) -- line: 13
+			-- upvalues: AvatarEditorService (copy), p1 (copy)
+			AvatarEditorService:PerformCreateOutfitWithDescription(p3, p1)
+		end, function(_) -- line: 15
+			-- upvalues: AvatarEditorService (copy)
+			AvatarEditorService:SignalCreateOutfitFailed()
+		end)
+		p2:dispatch(CloseOpenPrompt())
+	end
+end

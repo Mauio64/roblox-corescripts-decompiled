@@ -1,53 +1,61 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.SduiCoreSystem);
-local l_View_0 = v2.View;
-local l_getSduiComponentWrapper_0 = v3.getSduiComponentWrapper;
-return v1.memo(function(v6) --[[ Line: 42 ]] --[[ Name: SduiActionBar ]]
-    -- upvalues: l_getSduiComponentWrapper_0 (copy), v1 (copy), l_View_0 (copy)
-    if v6.items == nil or #v6.items == 0 then
-        return nil;
-    else
-        local v7 = {};
-        for v8, v9 in v6.items do
-            local v10 = l_getSduiComponentWrapper_0(v9);
-            v7["item_" .. tostring(v8)] = v1.createElement(v10, {
-                componentConfig = v9, 
-                sduiContext = v6.sduiContext, 
-                extraLocalProps = {
-                    layoutOrder = v8
-                }
-            });
-        end;
-        if v6.footer == nil then
-            return v1.createElement(l_View_0, {
-                tag = v6.rowTag or "row size-full-0 auto-y gap-small", 
-                size = v6.size, 
-                anchorPoint = v6.anchorPoint, 
-                position = v6.position, 
-                layoutOrder = v6.layoutOrder, 
-                testId = v6.testId
-            }, v7);
-        else
-            local v11 = v1.createElement(l_View_0, {
-                tag = v6.rowTag or "row size-full-0 auto-y gap-small", 
-                layoutOrder = 1
-            }, v7);
-            return v1.createElement(l_View_0, {
-                tag = v6.wrapperTag or "col size-full-0 auto-y gap-small", 
-                size = v6.size, 
-                anchorPoint = v6.anchorPoint, 
-                position = v6.position, 
-                layoutOrder = v6.layoutOrder, 
-                testId = v6.testId
-            }, {
-                ItemsRow = v11, 
-                Footer = v1.createElement(l_View_0, {
-                    tag = "size-full-0 auto-y", 
-                    layoutOrder = 2
-                }, v6.footer)
-            });
-        end;
-    end;
-end);
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local React = require(Parent.React)
+local Foundation = require(Parent.Foundation)
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local View = Foundation.View
+local getSduiComponentWrapper = SduiCoreSystem.getSduiComponentWrapper
+local FFlagSduiExperienceDetailsSupport = require(Parent.SharedFlags).FFlagSduiExperienceDetailsSupport
+
+local function SduiActionBar(t1: {[any]: any}) -- line: 45
+	-- upvalues: getSduiComponentWrapper (copy), React (copy), View (copy), FFlagSduiExperienceDetailsSupport (copy)
+	if t1.items == nil or #t1.items == 0 then
+		return nil
+	end
+
+	local t2 = {}
+
+	for v11, v12 in t1.items do
+		local v13 = getSduiComponentWrapper(v12)
+
+		t2["item_" .. tostring(v11)] = React.createElement(v13, {
+			componentConfig = v12,
+			sduiContext = t1.sduiContext,
+			extraLocalProps = {
+				layoutOrder = v11
+			}
+		})
+	end
+
+	if t1.footer == nil then
+		return React.createElement(View, {
+			tag = t1.rowTag or "row size-full-0 auto-y gap-small",
+			size = t1.size,
+			anchorPoint = t1.anchorPoint,
+			position = t1.position,
+			LayoutOrder = t1.layoutOrder,
+			testId = t1.testId
+		}, t2)
+	end
+
+	local v14 = React.createElement(View, {
+		layoutOrder = 1,
+		tag = t1.rowTag or "row size-full-0 auto-y gap-small"
+	}, t2)
+
+	return React.createElement(View, {
+		tag = t1.wrapperTag or "col size-full-0 auto-y gap-small",
+		size = t1.size,
+		anchorPoint = t1.anchorPoint,
+		position = t1.position,
+		LayoutOrder = t1.layoutOrder,
+		testId = t1.testId
+	}, {
+		ItemsRow = v14,
+		Footer = if not FFlagSduiExperienceDetailsSupport then React.createElement(View, {
+			tag = "size-full-0 auto-y",
+			layoutOrder = 2
+		}, t1.footer) else t1.footer
+	})
+end
+
+return React.memo(SduiActionBar)

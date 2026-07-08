@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatEnableFocusNavigation2", false);
+return game:DefineFastFlag("ExpChatEnableFocusNavigation2", false)

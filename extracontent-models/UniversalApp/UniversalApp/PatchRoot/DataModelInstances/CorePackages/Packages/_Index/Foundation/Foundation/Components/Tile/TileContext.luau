@@ -1,6 +1,7 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-return require(l_Parent_0.React).createContext({
-    fillDirection = Enum.FillDirection.Vertical, 
-    isContained = false, 
-    testId = ""
-});
+local Parent = script:FindFirstAncestor("Foundation").Parent
+
+return require(Parent.React).createContext({
+	isContained = false,
+	testId = "",
+	fillDirection = Enum.FillDirection.Vertical
+})

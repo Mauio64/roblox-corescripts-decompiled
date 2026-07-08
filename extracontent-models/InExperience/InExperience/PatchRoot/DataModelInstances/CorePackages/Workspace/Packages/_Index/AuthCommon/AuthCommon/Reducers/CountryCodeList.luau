@@ -1,11 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local v1 = require(l_script_FirstAncestor_0.Actions.SetCountryCodeList);
-return function(v2, v3) --[[ Line: 13 ]]
-    -- upvalues: v1 (copy)
-    v2 = v2 or {};
-    assert(v2, "");
-    if v3.type == v1.name then
-        v2 = v3.countryCodeList;
-    end;
-    return v2;
-end;
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local SetCountryCodeList = require(AuthCommon.Actions.SetCountryCodeList)
+
+return function(t1: {[any]: any}?, p1) -- line: 13
+	-- upvalues: SetCountryCodeList (copy)
+	local v5 = t1 or {}
+
+	assert(v5, "")
+
+	if p1.type == SetCountryCodeList.name then
+		v5 = p1.countryCodeList
+	end
+
+	return v5
+end

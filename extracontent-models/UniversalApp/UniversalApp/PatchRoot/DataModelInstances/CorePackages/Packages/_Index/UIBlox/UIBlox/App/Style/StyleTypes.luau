@@ -1,4 +1,5 @@
-local _ = require(script.Parent.Fonts);
-local _ = require(script.Parent.Themes.LightTheme);
-local _ = require(script.Parent.Tokens.Types);
-return {};
+require(script.Parent.Fonts)
+require(script.Parent.Themes.LightTheme)
+require(script.Parent.Tokens.Types)
+
+return {}

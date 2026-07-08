@@ -1,64 +1,80 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InlineRichText");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Logger):new(script.Name);
-local v3 = require(l_Parent_0.Cryo);
-local _ = require(l_script_FirstAncestor_0.Types);
-local v5 = require(l_script_FirstAncestor_0.Enums.NodeType);
-local l_NodeRenderers_0 = script.Parent.NodeRenderers;
-local v7 = require(l_NodeRenderers_0.PlaintextRenderer);
-local v8 = require(l_NodeRenderers_0.EngineTagRenderer);
-local v9 = require(l_NodeRenderers_0.InlineCustomRenderer);
-local v10 = require(l_script_FirstAncestor_0.NodeConfig);
-local v11 = {
-    [v5.Plaintext] = v7, 
-    [v5.EngineTag] = v8, 
-    [v5.InlineCustom] = v9
-};
-return function(v12, v13) --[[ Line: 20 ]] --[[ Name: processChildren ]]
-    -- upvalues: v10 (copy), v2 (copy), v3 (copy), v11 (copy)
-    local v14 = {};
-    local v15 = v10.getByNode(v12);
-    if not v15 then
-        v2:warning((("Node %*: No config found for node type %*"):format(v12.name, v12.type)));
-        return v14;
-    else
-        for _, v23 in (v3.List.map(v12.children, function(v16) --[[ Line: 28 ]]
-            -- upvalues: v10 (ref), v2 (ref), v15 (copy), v12 (copy), v11 (ref), v13 (copy), v3 (ref)
-            local v17 = v10.getByNode(v16);
-            if not v17 then
-                v2:warning((("Node %*: No config found for node %* type %*"):format(v16.name, v16.name, v16.type)));
-                return {};
-            elseif not v15.children[v16.type] then
-                v2:warning((("Node %*: Node type %* is not a valid child of node %* type %*"):format(v16.name, v16.type, v12.name, v12.type)));
-                return {};
-            else
-                local v18 = v11[v16.type];
-                if v18 then
-                    local v19 = v18(v16, v13);
-                    if typeof(v19) ~= "table" then
-                        v19 = {
-                            v19
-                        };
-                    end;
-                    if not v3.List.foldLeft(v19, function(v20, v21) --[[ Line: 49 ]]
-                        -- upvalues: v17 (copy)
-                        return v20 and v17.validateRenderResult(v21);
-                    end, true) then
-                        v2:warning((("Node %*: Rendered result is not valid for type %*"):format(v16.name, v16.type)));
-                        return {};
-                    else
-                        return v19;
-                    end;
-                else
-                    v2:warning((("Node %*: No renderer found for type %*"):format(v16.name, v16.type)));
-                    return {};
-                end;
-            end;
-        end)) do
-            for _, v25 in v23 do
-                table.insert(v14, v25);
-            end;
-        end;
-        return v14;
-    end;
-end;
+local InlineRichText = script:FindFirstAncestor("InlineRichText")
+local InlineRichTextParent = InlineRichText.Parent
+local v3 = require(InlineRichText.Logger):new(script.Name)
+local Cryo = require(InlineRichTextParent.Cryo)
+
+require(InlineRichText.Types)
+
+local NodeType = require(InlineRichText.Enums.NodeType)
+local NodeRenderers = script.Parent.NodeRenderers
+local PlaintextRenderer = require(NodeRenderers.PlaintextRenderer)
+local EngineTagRenderer = require(NodeRenderers.EngineTagRenderer)
+local InlineCustomRenderer = require(NodeRenderers.InlineCustomRenderer)
+local NodeConfig = require(InlineRichText.NodeConfig)
+local t1 = {
+	[NodeType.Plaintext] = PlaintextRenderer,
+	[NodeType.EngineTag] = EngineTagRenderer,
+	[NodeType.InlineCustom] = InlineCustomRenderer
+}
+
+local function processChildren(p1, p2) -- line: 20
+	-- upvalues: NodeConfig (copy), v3 (copy), Cryo (copy), t1 (copy)
+	local t2 = {}
+	local v16 = NodeConfig.getByNode(p1)
+
+	if not v16 then
+		v3:warning(`Node { p1.name }: No config found for node type { p1.type }`)
+
+		return t2
+	end
+
+	for _, v18 in (Cryo.List.map(p1.children, function(p3) -- line: 28
+		-- upvalues: NodeConfig (copy), v3 (copy), v16 (copy), p1 (copy), t1 (copy), p2 (copy), Cryo (copy)
+		local v22 = NodeConfig.getByNode(p3)
+
+		if not v22 then
+			v3:warning(`Node { p3.name }: No config found for node { p3.name } type { p3.type }`)
+
+			return {}
+		end
+
+		if not v16.children[p3.type] then
+			v3:warning(`Node { p3.name }: Node type { p3.type } is not a valid child of node { p1.name } type { p1.type }`)
+
+			return {}
+		end
+
+		local v23 = t1[p3.type]
+
+		if v23 then
+			local v24 = v23(p3, p2)
+
+			if typeof(v24) ~= "table" then
+				v24 = { v24 }
+			end
+
+			if not Cryo.List.foldLeft(v24, function(p4, p5) -- line: 49
+				-- upvalues: v22 (copy)
+				return p4 and v22.validateRenderResult(p5)
+			end, true) then
+				v3:warning(`Node { p3.name }: Rendered result is not valid for type { p3.type }`)
+
+				return {}
+			end
+
+			return v24
+		end
+
+		v3:warning(`Node { p3.name }: No renderer found for type { p3.type }`)
+
+		return {}
+	end)) do
+		for _, v20 in v18 do
+			table.insert(t2, v20)
+		end
+	end
+
+	return t2
+end
+
+return processChildren

@@ -1,31 +1,38 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Rodux);
-local v3 = require(l_Parent_1.llama);
-local _ = require(l_Parent_0.roduxFriendsTypes);
-local l_Actions_0 = l_Parent_0.Actions;
-local v6 = require(l_Actions_0.FriendRequestCreated);
-local v7 = {};
-return function(v8) --[[ Line: 15 ]]
-    -- upvalues: v2 (copy), v7 (copy), v3 (copy), v6 (copy)
-    local l_friendsNetworking_0 = v8.friendsNetworking;
-    return v2.createReducer(v7, {
-        [l_friendsNetworking_0.GetFriendRequests.Succeeded.name] = function(v10, v11) --[[ Line: 19 ]]
-            -- upvalues: v3 (ref)
-            local l_data_0 = v11.responseBody.data;
-            local v13 = {};
-            for _, v15 in pairs(l_data_0) do
-                v13[tostring(v15.id)] = v15.friendRequest.contactName;
-            end;
-            return v3.Dictionary.join(v10, v13);
-        end, 
-        [v6.name] = function(v16, v17) --[[ Line: 33 ]]
-            -- upvalues: v3 (ref)
-            local v18 = tostring(v17.requesteeId);
-            local l_contactName_0 = v17.contactName;
-            return v3.Dictionary.join(v16, {
-                [v18] = l_contactName_0
-            });
-        end
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Rodux = require(ParentParentParent.Rodux)
+local llama = require(ParentParentParent.llama)
+
+require(ParentParent.roduxFriendsTypes)
+
+local Actions = ParentParent.Actions
+local FriendRequestCreated = require(Actions.FriendRequestCreated)
+local t1 = {}
+
+return function(p1) -- line: 15
+	-- upvalues: Rodux (copy), t1 (copy), llama (copy), FriendRequestCreated (copy)
+	local friendsNetworking = p1.friendsNetworking
+
+	return Rodux.createReducer(t1, {
+		[friendsNetworking.GetFriendRequests.Succeeded.name] = function(t2: {[any]: any}, p2) -- line: 19
+			-- upvalues: llama (copy)
+			local data = p2.responseBody.data
+			local t3 = {}
+
+			for _, v in pairs(data) do
+				t3[tostring(v.id)] = v.friendRequest.contactName
+			end
+
+			return llama.Dictionary.join(t2, t3)
+		end,
+		[FriendRequestCreated.name] = function(t4: {[any]: any}, p3) -- line: 33
+			-- upvalues: llama (copy)
+			local str = tostring(p3.requesteeId)
+			local contactName = p3.contactName
+
+			return llama.Dictionary.join(t4, {
+				[str] = contactName
+			})
+		end
+	})
+end

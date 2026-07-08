@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableChromeWindowsNotInMenu", false);
+return game:DefineFastFlag("EnableChromeWindowsNotInMenu", false)

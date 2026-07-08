@@ -12,101 +12,133 @@ local LayoutMode = require(AppChatParent.UserTile).LayoutMode
 local RoduxPresence = require(AppChat.Http.RoduxPresence)
 local v13 = Logger:new(script.Name)
 local useFoundationPresence = require(AppChat.Hooks.useFoundationPresence)
-local FFlagAppChatEnableGroupAvatarPresence = require(AppChatParent.SharedFlags).FFlagAppChatEnableGroupAvatarPresence
 local PresenceType = RoduxPresence.Enums.PresenceType
 local UserPresence = Foundation.Enums.UserPresence
 
-return function(t1: {[any]: any}) --[[ ConversationFacePile ]] -- line: 37
-	-- upvalues: v13 (copy), useLocalUserId (copy), React (copy), useSelector (copy), useFoundationPresence (copy), UserPresence (copy), FFlagAppChatEnableGroupAvatarPresence (copy), PresenceType (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), UserTile (copy), LayoutMode (copy)
-	if not t1.conversationId or t1.conversationId == "" then
-		v13:warning("conversationId cannot be nil nor an empty string")
+local function getParticipantId(p1) -- line: 51
+	if type(p1) == "table" then
+		local v22 = p1.id or p1.userId
+
+		if v22 ~= nil then
+			return (tostring(v22))
+		end
 
 		return nil
 	end
 
-	local v19 = useLocalUserId()
-	local v20 = React.useCallback(function(p1) -- line: 45
-		-- upvalues: t1 (copy)
-		if p1 and (p1.ChatAppReducer and p1.ChatAppReducer.Conversations) then
-			return p1.ChatAppReducer.Conversations[t1.conversationId]
+	if p1 ~= nil then
+		return (tostring(p1))
+	end
+
+	return nil
+end
+local function getNonEmptyLocalUserId(p2) -- line: 60
+	if p2 == nil or p2 == "" then
+		return nil
+	end
+
+	return (tostring(p2))
+end
+local function ConversationFacePileInner(t1: {[any]: any}) -- line: 68
+	-- upvalues: useLocalUserId (copy), React (copy), useSelector (copy), useFoundationPresence (copy), UserPresence (copy), PresenceType (copy), FFlagEnableBlackbirdCheck (copy), useIsRobloxSubscriber (copy), UserTile (copy), LayoutMode (copy)
+	local conversationId = t1.conversationId
+	local v26 = useLocalUserId()
+	local localUserId = t1.localUserId
+	local v28 = ((if localUserId ~= nil and localUserId ~= "" then tostring(localUserId) else nil)) or (((if v26 ~= nil and v26 ~= "" then tostring(v26) else nil)) or "")
+	local v29 = React.useCallback(function(p3) -- line: 73
+		-- upvalues: conversationId (copy)
+		if p3 and (p3.ChatAppReducer and p3.ChatAppReducer.Conversations) then
+			return p3.ChatAppReducer.Conversations[conversationId]
 		end
 
 		return nil
-	end, { t1.conversationId })
-	local v21 = useSelector(v20)
-	local v22 = useSelector(function(p2) -- line: 53
-		if p2 and (p2.ChatAppReducer and p2.ChatAppReducer.Presence) then
-			return p2.ChatAppReducer.Presence.byUserId
+	end, { conversationId })
+	local v30 = useSelector(v29)
+	local v31 = useSelector(function(p4) -- line: 81
+		if p4 and (p4.ChatAppReducer and p4.ChatAppReducer.Presence) then
+			return p4.ChatAppReducer.Presence.byUserId
 		end
 
 		return nil
 	end)
-	local v23 = if not v21 or not v21.participants then {} else v21.participants
+	local v32 = t1.participants or if not v30 or not v30.participants then {} else v30.participants
 	local t2 = {}
 
-	if #v23 == 1 then
-		table.insert(t2, v19)
+	if #v32 == 1 then
+		table.insert(t2, v28)
 	else
-		local n1 = 1
+		for _, v35 in v32 do
+			local v37
 
-		while #{} < 2 and n1 <= #v23 do
-			local v26 = v23[n1]
+			if type(v35) == "table" then
+				local v36 = v35.id or v35.userId
 
-			if v26 ~= v19 then
-				table.insert(t2, v26)
+				v37 = if v36 == nil then nil else tostring(v36)
+			else
+				v37 = if v35 == nil then nil else tostring(v35)
 			end
 
-			n1 += 1
+			if v37 and tostring(v37) ~= tostring(v28) then
+				table.insert(t2, v37)
+			end
 		end
 	end
 
-	local v27 = t2[1] or v19
-	local v28 = useFoundationPresence(v27)
+	local v38 = t2[1] or v28
+	local v39 = useFoundationPresence(v38)
 	local None = UserPresence.None
 
-	if #t2 >= 2 and FFlagAppChatEnableGroupAvatarPresence then
-		local v30 = false
-		local v31 = false
+	if #t2 >= 2 then
+		local v41 = false
+		local v42 = false
 
-		for _, v in ipairs(t2) do
-			if v22 and v22[v] then
-				local userPresenceType = v22[v].userPresenceType
+		for _, v44 in t2 do
+			if v31 and v31[v44] then
+				local userPresenceType = v31[v44].userPresenceType
 
 				if userPresenceType == PresenceType.InGame or userPresenceType == PresenceType.InStudio then
-					v30 = true
+					v41 = true
 				elseif userPresenceType == PresenceType.Online then
-					v31 = true
+					v42 = true
 				end
 			end
 		end
 
-		if v30 then
+		if v41 then
 			None = UserPresence.InExperience
-		elseif v31 then
+		elseif v42 then
 			None = UserPresence.Active
 		end
 	else
-		None = v28.presence
+		None = v39.presence
 	end
 
-	local v35 = nil
+	local str = nil
 
-	if FFlagEnableBlackbirdCheck and #v23 == 2 then
-		for _, v37 in v23 do
-			local v38 = if type(v37) ~= "table" then tostring(v37) else tostring(v37.id)
+	if FFlagEnableBlackbirdCheck and #v32 == 2 then
+		for _, v48 in v32 do
+			local v50
 
-			if v38 ~= tostring(v19) then
-				v35 = v38
+			if type(v48) == "table" then
+				local v49 = v48.id or v48.userId
+
+				v50 = if v49 == nil then nil else tostring(v49)
+			else
+				v50 = if v48 == nil then nil else tostring(v48)
+			end
+
+			if v50 and tostring(v50) ~= tostring(v28) then
+				str = tostring(v50)
 
 				break
 			end
 		end
 	end
 
-	local v39 = useIsRobloxSubscriber(v35)
+	local v51 = useIsRobloxSubscriber(str)
 
 	return React.createElement(UserTile, {
-		userId = v27,
+		userId = v38,
 		facePileSecondUserId = t2[2] or nil,
 		layoutMode = LayoutMode.wide,
 		title = t1.titleText,
@@ -118,6 +150,24 @@ return function(t1: {[any]: any}) --[[ ConversationFacePile ]] -- line: 37
 		selectable = t1.selectable,
 		customTextTruncation = Enum.TextTruncate.SplitWord,
 		trustedConnectionIndicatorEnabled = t1.trustedConnectionIndicatorEnabled,
-		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v39
+		isRobloxSubscriber = if not FFlagEnableBlackbirdCheck then nil else v51
 	})
 end
+local function ConversationFacePile(t3: {[any]: any}) -- line: 162
+	-- upvalues: v13 (copy), React (copy), ConversationFacePileInner (copy)
+	local conversationId = t3.conversationId
+
+	if not conversationId or conversationId == "" then
+		v13:warning("conversationId cannot be nil nor an empty string")
+
+		return nil
+	end
+
+	local v54 = table.clone(t3)
+
+	v54.conversationId = conversationId
+
+	return React.createElement(ConversationFacePileInner, v54)
+end
+
+return ConversationFacePile

@@ -1,25 +1,30 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Object_0 = require(l_Parent_0.Parent.LuauPolyfill).Object;
-local l_invariant_0 = require(l_Parent_0.jsutils.invariant).invariant;
-local _ = require(l_Parent_0.type.schema);
-local l_parse_0 = require(l_Parent_0.language.parser).parse;
-local l_executeSync_0 = require(l_Parent_0.execution.execute).executeSync;
-local l_getIntrospectionQuery_0 = require(script.Parent.getIntrospectionQuery).getIntrospectionQuery;
+local ParentParent = script.Parent.Parent
+local Object = require(ParentParent.Parent.LuauPolyfill).Object
+local invariant = require(ParentParent.jsutils.invariant).invariant
+
+require(ParentParent.type.schema)
+
+local parse = require(ParentParent.language.parser).parse
+local executeSync = require(ParentParent.execution.execute).executeSync
+local getIntrospectionQuery = require(script.Parent.getIntrospectionQuery).getIntrospectionQuery
+
 return {
-    introspectionFromSchema = function(v7, v8) --[[ Line: 37 ]] --[[ Name: introspectionFromSchema ]]
-        -- upvalues: l_Object_0 (copy), l_parse_0 (copy), l_getIntrospectionQuery_0 (copy), l_executeSync_0 (copy), l_invariant_0 (copy)
-        local v9 = l_Object_0.assign({
-            specifiedByUrl = true, 
-            directiveIsRepeatable = true, 
-            schemaDescription = true, 
-            inputValueDeprecation = true
-        }, v8);
-        local v10 = l_parse_0(l_getIntrospectionQuery_0(v9));
-        local v11 = l_executeSync_0({
-            schema = v7, 
-            document = v10
-        });
-        l_invariant_0(not v11.errors and v11.data);
-        return v11.data;
-    end
-};
+	introspectionFromSchema = function(p1, p2) -- line: 37
+		-- upvalues: Object (copy), parse (copy), getIntrospectionQuery (copy), executeSync (copy), invariant (copy)
+		local v9 = Object.assign({
+			specifiedByUrl = true,
+			directiveIsRepeatable = true,
+			schemaDescription = true,
+			inputValueDeprecation = true
+		}, p2)
+		local v10 = parse(getIntrospectionQuery(v9))
+		local v11 = executeSync({
+			schema = p1,
+			document = v10
+		})
+
+		invariant(not v11.errors and v11.data)
+
+		return v11.data
+	end
+}

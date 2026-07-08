@@ -1,28 +1,35 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.LuauPolyfill);
-local v2 = {};
-local v3 = require(l_Parent_0.GraphQL);
-local l_GraphQLError_0 = v3.GraphQLError;
-local l_versionInfo_0 = v3.versionInfo;
-local _ = require(script.Parent.types);
-local function v9(v7, v8) --[[ Line: 37 ]] --[[ Name: createGraphQLError ]]
-    -- upvalues: l_versionInfo_0 (copy), l_GraphQLError_0 (copy)
-    if l_versionInfo_0.major >= 17 then
-        return l_GraphQLError_0.new(v7, v8);
-    else
-        return l_GraphQLError_0.new(v7, if typeof(v8) == "table" then v8.nodes else nil, if typeof(v8) == "table" then v8.source else nil, if typeof(v8) == "table" then v8.positions else nil, if typeof(v8) == "table" then v8.path else nil, if typeof(v8) == "table" then v8.originalError else nil, if typeof(v8) == "table" then v8.extensions else nil);
-    end;
-end;
-v2.createGraphQLError = v9;
-v2.relocatedError = function(v10, v11) --[[ Line: 55 ]] --[[ Name: relocatedError ]]
-    -- upvalues: v9 (copy)
-    return v9(v10.message, {
-        nodes = v10.nodes, 
-        source = v10.source, 
-        positions = v10.positions, 
-        path = if v11 == nil then v10.path else v11, 
-        originalError = v10, 
-        extensions = v10.extensions
-    });
-end;
-return v2;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.LuauPolyfill)
+
+local t1 = {}
+local GraphQL = require(ParentParent.GraphQL)
+local GraphQLError = GraphQL.GraphQLError
+local versionInfo = GraphQL.versionInfo
+
+require(script.Parent.types)
+
+local function createGraphQLError(s1: string, t2: {[any]: any}?) -- line: 37
+	-- upvalues: versionInfo (copy), GraphQLError (copy)
+	if versionInfo.major >= 17 then
+		return GraphQLError.new(s1, t2)
+	end
+
+	return GraphQLError.new(s1, if typeof(t2) ~= "table" then nil else t2.nodes, if typeof(t2) ~= "table" then nil else t2.source, if typeof(t2) ~= "table" then nil else t2.positions, if typeof(t2) ~= "table" then nil else t2.path, if typeof(t2) ~= "table" then nil else t2.originalError, if typeof(t2) ~= "table" then nil else t2.extensions)
+end
+
+t1.createGraphQLError = createGraphQLError
+
+function t1.relocatedError(p1, p2) -- line: 55
+	-- upvalues: createGraphQLError (copy)
+	return createGraphQLError(p1.message, {
+		nodes = p1.nodes,
+		source = p1.source,
+		positions = p1.positions,
+		path = if p2 ~= nil then p2 else p1.path,
+		originalError = p1,
+		extensions = p1.extensions
+	})
+end
+
+return t1

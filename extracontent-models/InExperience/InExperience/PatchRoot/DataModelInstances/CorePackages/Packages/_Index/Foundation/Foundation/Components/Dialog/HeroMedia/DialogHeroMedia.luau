@@ -1,64 +1,75 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local v4 = require(l_script_FirstAncestor_0.Components.Image);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = require(l_script_FirstAncestor_0.Components.View);
-local _ = require(l_script_FirstAncestor_0.Enums.DialogSize);
-local v8 = require(l_script_FirstAncestor_0.Components.Gradient);
-local v9 = require(script.Parent.Parent.useDialog);
-local v10 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local l_useDialogVariants_0 = require(script.Parent.Parent.useDialogVariants).useDialogVariants;
-local v12 = {
-    height = UDim.new(1, 0)
-};
-return function(v13) --[[ Line: 35 ]] --[[ Name: DialogHeroMedia ]]
-    -- upvalues: v10 (copy), v12 (copy), v9 (copy), l_useDialogVariants_0 (copy), v2 (copy), v6 (copy), v3 (copy), v4 (copy), v8 (copy)
-    local v14 = v10(v13, v12);
-    local v15 = v9();
-    local v16 = l_useDialogVariants_0();
-    v2.useEffect(function() --[[ Line: 40 ]]
-        -- upvalues: v15 (copy)
-        v15.setHasHeroMedia(true);
-        return function() --[[ Line: 43 ]]
-            -- upvalues: v15 (ref)
-            v15.setHasHeroMedia(false);
-        end;
-    end, {});
-    local l_offsetX_0 = v16.heroMedia.offsetX;
-    return v2.createElement(v6, {
-        tag = v16.heroMediaWrapper.tag, 
-        LayoutOrder = v3.MIN_LAYOUT_ORDER, 
-        testId = ("%*--hero-media"):format(v15.testId)
-    }, {
-        RoundedCorners = v2.createElement(v4, {
-            Image = v14.media, 
-            imageStyle = v14.mediaStyle, 
-            backgroundStyle = v14.backgroundStyle, 
-            aspectRatio = v14.aspectRatio, 
-            Position = UDim2.fromOffset(-l_offsetX_0, 0), 
-            Size = UDim2.new(1, l_offsetX_0 * 2, v14.height.Scale, v14.height.Offset), 
-            ZIndex = 0
-        }, {
-            TransparencyGradient = v2.createElement(v8, {
-                fillDirection = Enum.FillDirection.Vertical, 
-                top = false
-            })
-        }), 
-        Image = v2.createElement(v4, {
-            Image = v14.media, 
-            imageStyle = v14.mediaStyle, 
-            backgroundStyle = v14.backgroundStyle, 
-            tag = v16.heroMedia.tag, 
-            aspectRatio = v14.aspectRatio, 
-            Position = UDim2.fromOffset(-l_offsetX_0, 0), 
-            Size = UDim2.new(1, l_offsetX_0 * 2, v14.height.Scale, v14.height.Offset)
-        }, {
-            TransparencyGradient = v2.createElement(v8, {
-                fillDirection = Enum.FillDirection.Vertical, 
-                top = true
-            })
-        })
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Constants = require(Foundation.Constants)
+local Image = require(Foundation.Components.Image)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+
+require(Foundation.Enums.DialogSize)
+
+local Gradient = require(Foundation.Components.Gradient)
+local useDialog = require(script.Parent.Parent.useDialog)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local useDialogVariants = require(script.Parent.Parent.useDialogVariants).useDialogVariants
+local t1 = {
+	height = UDim.new(1, 0)
+}
+
+local function DialogHeroMedia(t2: {[any]: any}) -- line: 35
+	-- upvalues: withDefaults (copy), t1 (copy), useDialog (copy), useDialogVariants (copy), React (copy), View (copy), Constants (copy), Image (copy), Gradient (copy)
+	local v14 = withDefaults(t2, t1)
+	local v15 = useDialog()
+	local v16 = useDialogVariants()
+
+	React.useEffect(function() -- line: 40
+		-- upvalues: v15 (copy)
+		v15.setHasHeroMedia(true)
+
+		return function() -- line: 43
+			-- upvalues: v15 (copy)
+			v15.setHasHeroMedia(false)
+		end
+	end, {})
+
+	local offsetX = v16.heroMedia.offsetX
+
+	return React.createElement(View, {
+		tag = v16.heroMediaWrapper.tag,
+		LayoutOrder = Constants.MIN_LAYOUT_ORDER,
+		testId = `{ v15.testId }--hero-media`
+	}, {
+		RoundedCorners = React.createElement(Image, {
+			ZIndex = 0,
+			Image = v14.media,
+			imageStyle = v14.mediaStyle,
+			backgroundStyle = v14.backgroundStyle,
+			aspectRatio = v14.aspectRatio,
+			Position = UDim2.fromOffset(-offsetX, 0),
+			Size = UDim2.new(1, offsetX * 2, v14.height.Scale, v14.height.Offset)
+		}, {
+			TransparencyGradient = React.createElement(Gradient, {
+				top = false,
+				fillDirection = Enum.FillDirection.Vertical
+			})
+		}),
+		Image = React.createElement(Image, {
+			Image = v14.media,
+			imageStyle = v14.mediaStyle,
+			backgroundStyle = v14.backgroundStyle,
+			tag = v16.heroMedia.tag,
+			aspectRatio = v14.aspectRatio,
+			Position = UDim2.fromOffset(-offsetX, 0),
+			Size = UDim2.new(1, offsetX * 2, v14.height.Scale, v14.height.Offset)
+		}, {
+			TransparencyGradient = React.createElement(Gradient, {
+				top = true,
+				fillDirection = Enum.FillDirection.Vertical
+			})
+		})
+	})
+end
+
+return DialogHeroMedia

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableDeactivatedUserReactivation", false);
+return game:DefineFastFlag("EnableDeactivatedUserReactivation", false)

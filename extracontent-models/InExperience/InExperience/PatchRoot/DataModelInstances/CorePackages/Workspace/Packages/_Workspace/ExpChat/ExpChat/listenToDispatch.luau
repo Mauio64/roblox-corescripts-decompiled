@@ -1,6 +1,6 @@
-return function(v0) --[[ Line: 1 ]]
-    return function(v1) --[[ Line: 2 ]]
-        -- upvalues: v0 (copy)
-        v0.Event:Connect(v1);
-    end;
-end;
+return function(p1) -- line: 1
+	return function(p2) -- line: 2
+		-- upvalues: p1 (copy)
+		p1.Event:Connect(p2)
+	end
+end

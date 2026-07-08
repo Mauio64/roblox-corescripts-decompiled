@@ -5,7 +5,7 @@ local Dash = require(FoundationParent.Dash)
 require(Foundation.Providers.Style.Tokens)
 require(script.Parent.Types)
 
-local staticRules = require(script.Parent.staticRules)
+local cornerRules = require(script.Parent.cornerRules)
 local tokenAttributePascalName = require(script.Parent.Parent.tokenAttributePascalName)
 
 local function kebabToPascal(s1: string) -- line: 26
@@ -15,16 +15,21 @@ local function kebabToPascal(s1: string) -- line: 26
 		return p2:upper()
 	end))
 end
-local function DefaultSizeRules(p3, n1: number) -- line: 49
-	local v27 = p3.TextSize / n1 * (p3.LineHeight * n1) - p3.TextSize
-	local uDim = UDim.new(0, v27 / 2)
+local function getTextPadding(p3, n1: number) -- line: 40
+	local v35 = p3.TextSize / n1 * (p3.LineHeight * n1) - p3.TextSize
+
+	return (UDim.new(0, v35 / 2))
+end
+local function DefaultSizeRules(p4, n2: number) -- line: 49
+	local v38 = p4.TextSize / n2 * (p4.LineHeight * n2) - p4.TextSize
+	local uDim = UDim.new(0, v38 / 2)
 
 	return {{
 		tag = "text-size-defaults",
 		priority = -1,
 		properties = {
 			TextSize = "$TextSizeBodyLarge",
-			LineHeight = p3.LineHeight
+			LineHeight = p4.LineHeight
 		},
 		children = {{
 			tag = "text-size-defaults",
@@ -41,156 +46,149 @@ local function DefaultSizeRules(p3, n1: number) -- line: 49
 		}},
 		attributes = {{
 			name = "TextSizeBodyLarge",
-			value = p3.TextSize
+			value = p4.TextSize
 		}}
 	}}
 end
-local function ListLayoutSpacingRules(p4, p5) -- line: 87
+local function ListLayoutSpacingRules(p5, p6) -- line: 87
 	-- upvalues: kebabToPascal (copy), Dash (copy)
 	local t1 = {}
 
-	for _, v33 in p4 do
-		local v34 = kebabToPascal(v33.name)
+	for _, v44 in p5 do
+		local v45 = kebabToPascal(v44.name)
 
 		table.insert(t1, {
-			tag = `gap-{ v33.name }`,
 			pseudo = "UIListLayout",
+			tag = `gap-{ v44.name }`,
 			properties = {
-				Padding = `$Gap{ v34 }`
+				Padding = `$Gap{ v45 }`
 			},
 			attributes = {{
-				name = `Gap{ v34 }`,
-				value = v33.size
+				name = `Gap{ v45 }`,
+				value = v44.size
 			}}
 		})
 	end
 
 	local t2 = {}
 
-	for _, v37 in p5 do
-		local v38 = kebabToPascal(v37.name)
+	for _, v48 in p6 do
+		local v49 = kebabToPascal(v48.name)
 
 		table.insert(t2, {
-			tag = `gutter-{ v37.name }`,
 			pseudo = "UIListLayout",
+			tag = `gutter-{ v48.name }`,
 			properties = {
-				Padding = `$Gutter{ v38 }`
+				Padding = `$Gutter{ v49 }`
 			},
 			attributes = {{
-				name = `Gutter{ v38 }`,
-				value = v37.size
+				name = `Gutter{ v49 }`,
+				value = v48.size
 			}}
 		})
 	end
 
 	return Dash.joinArrays(t1, t2)
 end
-local function CornerRules(p6) -- line: 129
+local function CornerRules(p7) -- line: 129
+	-- upvalues: cornerRules (copy), kebabToPascal (copy)
+	return cornerRules(p7, function(p8) -- line: 130
+		-- upvalues: kebabToPascal (copy)
+		local v203 = kebabToPascal(p8.name)
+
+		return {
+			cornerValue = `$Radius{ v203 }`,
+			attributes = {{
+				name = `Radius{ v203 }`,
+				value = p8.size
+			}}
+		}
+	end)
+end
+local function SizeRules(p9) -- line: 144
 	-- upvalues: kebabToPascal (copy)
 	local t3 = {}
 
-	for _, v42 in p6 do
-		local v43 = kebabToPascal(v42.name)
+	for _, v54 in p9 do
+		local v55 = kebabToPascal(v54.name)
 
 		table.insert(t3, {
-			tag = `radius-{ v42.name }`,
-			pseudo = "UICorner",
+			tag = `size-{ v54.name }`,
 			properties = {
-				CornerRadius = `$Radius{ v43 }`
+				Size = `$Size{ v55 }`
 			},
 			attributes = {{
-				name = `Radius{ v43 }`,
-				value = v42.size
-			}}
-		})
-	end
-
-	return t3
-end
-local function SizeRules(p7) -- line: 152
-	-- upvalues: kebabToPascal (copy)
-	local t4 = {}
-
-	for _, v47 in p7 do
-		local v48 = kebabToPascal(v47.name)
-
-		table.insert(t4, {
-			tag = `size-{ v47.name }`,
-			properties = {
-				Size = `$Size{ v48 }`
-			},
-			attributes = {{
-				name = `Size{ v48 }`,
-				value = UDim2.new(v47.size, v47.size)
+				name = `Size{ v55 }`,
+				value = UDim2.new(v54.size, v54.size)
 			}}
 		})
 
-		for _, v50 in p7 do
-			local v51 = kebabToPascal(v50.name)
+		for _, v57 in p9 do
+			local v58 = kebabToPascal(v57.name)
 
-			table.insert(t4, {
-				tag = `size-{ v47.name }-{ v50.name }`,
+			table.insert(t3, {
+				tag = `size-{ v54.name }-{ v57.name }`,
 				properties = {
-					Size = `$Size{ v48 }_{ v51 }`
+					Size = `$Size{ v55 }_{ v58 }`
 				},
 				attributes = {{
-					name = `Size{ v48 }_{ v51 }`,
-					value = UDim2.new(v47.size, v50.size)
+					name = `Size{ v55 }_{ v58 }`,
+					value = UDim2.new(v54.size, v57.size)
 				}}
 			})
 		end
 	end
 
-	return t4
+	return t3
 end
-local function TypographyRules(p8, n2: number) -- line: 190
+local function TypographyRules(p10, n3: number) -- line: 182
 	-- upvalues: kebabToPascal (copy)
-	local t5 = {}
+	local t4 = {}
 
-	for v55, v56 in p8 do
-		local v57 = kebabToPascal(v55)
-		local v58 = v56.TextSize / n2 * (v56.LineHeight * n2) - v56.TextSize
-		local uDim = UDim.new(0, v58 / 2)
+	for v62, v63 in p10 do
+		local v64 = kebabToPascal(v62)
+		local v65 = v63.TextSize / n3 * (v63.LineHeight * n3) - v63.TextSize
+		local uDim = UDim.new(0, v65 / 2)
 
-		table.insert(t5, {
-			tag = `text-{ v55 }`,
+		table.insert(t4, {
+			tag = `text-{ v62 }`,
 			properties = {
-				Font = `$Font{ v57 }`,
-				TextSize = `$TextSize{ v57 }`,
-				LineHeight = v56.LineHeight
+				Font = `$Font{ v64 }`,
+				TextSize = `$TextSize{ v64 }`,
+				LineHeight = v63.LineHeight
 			},
 			attributes = {
 				{
-					name = `Font{ v57 }`,
-					value = v56.Font
+					name = `Font{ v64 }`,
+					value = v63.Font
 				},
 				{
-					name = `TextSize{ v57 }`,
-					value = v56.TextSize
+					name = `TextSize{ v64 }`,
+					value = v63.TextSize
 				}
 			},
 			children = {{
-				tag = `text-{ v55 }`,
 				pseudo = "UIPadding",
 				priority = 0,
+				tag = `text-{ v62 }`,
 				properties = {
-					PaddingTop = `$TextPadding{ v57 }`,
-					PaddingBottom = `$TextPadding{ v57 }`
+					PaddingTop = `$TextPadding{ v64 }`,
+					PaddingBottom = `$TextPadding{ v64 }`
 				},
 				attributes = {{
-					name = `TextPadding{ v57 }`,
+					name = `TextPadding{ v64 }`,
 					value = uDim
 				}}
 			}}
 		})
 	end
 
-	return t5
+	return t4
 end
-local function PaddingRules(p9, p10) -- line: 237
+local function PaddingRules(p11, p12) -- line: 229
 	-- upvalues: kebabToPascal (copy)
-	local t6 = {}
-	local t7 = {
+	local t5 = {}
+	local t6 = {
 		x = {
 			"PaddingLeft",
 			"PaddingRight"
@@ -205,88 +203,88 @@ local function PaddingRules(p9, p10) -- line: 237
 		right = { "PaddingRight" }
 	}
 
-	for _, v65 in p9 do
-		local v66 = kebabToPascal(v65.name)
+	for _, v72 in p11 do
+		local v73 = kebabToPascal(v72.name)
 
-		table.insert(t6, {
-			tag = `padding-{ v65.name }`,
+		table.insert(t5, {
 			pseudo = "UIPadding",
+			tag = `padding-{ v72.name }`,
 			properties = {
-				PaddingTop = `$Padding{ v66 }`,
-				PaddingBottom = `$Padding{ v66 }`,
-				PaddingLeft = `$Padding{ v66 }`,
-				PaddingRight = `$Padding{ v66 }`
+				PaddingTop = `$Padding{ v73 }`,
+				PaddingBottom = `$Padding{ v73 }`,
+				PaddingLeft = `$Padding{ v73 }`,
+				PaddingRight = `$Padding{ v73 }`
 			},
 			attributes = {{
-				name = `Padding{ v66 }`,
-				value = v65.size
+				name = `Padding{ v73 }`,
+				value = v72.size
 			}}
 		})
 	end
 
-	for _, v68 in p10 do
-		local v69 = kebabToPascal(v68.name)
+	for _, v75 in p12 do
+		local v76 = kebabToPascal(v75.name)
 
-		table.insert(t6, {
-			tag = `margin-{ v68.name }`,
+		table.insert(t5, {
 			pseudo = "UIPadding",
+			tag = `margin-{ v75.name }`,
 			properties = {
-				PaddingTop = `$Margin{ v69 }`,
-				PaddingBottom = `$Margin{ v69 }`,
-				PaddingLeft = `$Margin{ v69 }`,
-				PaddingRight = `$Margin{ v69 }`
+				PaddingTop = `$Margin{ v76 }`,
+				PaddingBottom = `$Margin{ v76 }`,
+				PaddingLeft = `$Margin{ v76 }`,
+				PaddingRight = `$Margin{ v76 }`
 			},
 			attributes = {{
-				name = `Margin{ v69 }`,
-				value = v68.size
+				name = `Margin{ v76 }`,
+				value = v75.size
 			}}
 		})
 	end
 
-	for v70, v71 in t7 do
-		for _, v73 in p9 do
-			local v74 = kebabToPascal(v73.name)
+	for v77, v78 in t6 do
+		for _, v80 in p11 do
+			local v81 = kebabToPascal(v80.name)
+			local t7 = {}
+
+			for _, v84 in v78 do
+				t7[v84] = `$Padding{ v81 }`
+			end
+
+			table.insert(t5, {
+				pseudo = "UIPadding",
+				tag = `padding-{ v77 }-{ v80.name }`,
+				properties = t7,
+				attributes = {{
+					name = `Padding{ v81 }`,
+					value = v80.size
+				}}
+			})
+		end
+
+		for _, v86 in p12 do
+			local v87 = kebabToPascal(v86.name)
 			local t8 = {}
 
-			for _, v77 in v71 do
-				t8[v77] = `$Padding{ v74 }`
+			for _, v90 in v78 do
+				t8[v90] = `$Margin{ v87 }`
 			end
 
-			table.insert(t6, {
-				tag = `padding-{ v70 }-{ v73.name }`,
+			table.insert(t5, {
 				pseudo = "UIPadding",
+				tag = `margin-{ v77 }-{ v86.name }`,
 				properties = t8,
 				attributes = {{
-					name = `Padding{ v74 }`,
-					value = v73.size
-				}}
-			})
-		end
-
-		for _, v79 in p10 do
-			local v80 = kebabToPascal(v79.name)
-			local t9 = {}
-
-			for _, v83 in v71 do
-				t9[v83] = `$Margin{ v80 }`
-			end
-
-			table.insert(t6, {
-				tag = `margin-{ v70 }-{ v79.name }`,
-				pseudo = "UIPadding",
-				properties = t9,
-				attributes = {{
-					name = `Margin{ v80 }`,
-					value = v79.size
+					name = `Margin{ v87 }`,
+					value = v86.size
 				}}
 			})
 		end
 	end
 
-	return t6
+	return t5
 end
 
-local t10 = {
+local t9 = {
 	Content = { "content" },
 	Stroke = { "stroke" },
 	Shift = { "bg" },
@@ -304,8 +302,8 @@ local t10 = {
 	None = {}
 }
 
-local function DefaultRules(p11) -- line: 350
-	local BodyLargeFont = p11.Typography.BodyLarge.Font
+local function DefaultRules(p13) -- line: 342
+	local BodyLargeFont = p13.Typography.BodyLarge.Font
 
 	return {
 		{
@@ -328,9 +326,9 @@ local function DefaultRules(p11) -- line: 350
 		}
 	}
 end
-local function DefaultColorRules(p12) -- line: 376
-	local DefaultColor3 = p12.Color.Content.Default.Color3
-	local DefaultTransparency = p12.Color.Content.Default.Transparency
+local function DefaultColorRules(p14) -- line: 368
+	local DefaultColor3 = p14.Color.Content.Default.Color3
+	local DefaultTransparency = p14.Color.Content.Default.Transparency
 
 	return {{
 		tag = "text-color-defaults",
@@ -351,29 +349,29 @@ local function DefaultColorRules(p12) -- line: 376
 		}
 	}}
 end
-local function BackgroundRules(p13, p14) -- line: 401
-	-- upvalues: t10 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
-	local t11 = {}
+local function BackgroundRules(p15, p16) -- line: 393
+	-- upvalues: t9 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
+	local t10 = {}
 
-	for v92, v93 in p13 do
-		if table.find(t10[v92], "bg") then
-			for v94, v95 in v93 do
-				local v96 = tokenAttributePascalName(v92, v94)
+	for v99, v100 in p15 do
+		if table.find(t9[v99], "bg") then
+			for v101, v102 in v100 do
+				local v103 = tokenAttributePascalName(v99, v101)
 
-				table.insert(t11, {
-					tag = `bg-{ v94 }`,
+				table.insert(t10, {
+					tag = `bg-{ v101 }`,
 					properties = {
-						BackgroundColor3 = `$Color{ v92 }{ v96 }Color3`,
-						BackgroundTransparency = `$Color{ v92 }{ v96 }Transparency`
+						BackgroundColor3 = `$Color{ v99 }{ v103 }Color3`,
+						BackgroundTransparency = `$Color{ v99 }{ v103 }Transparency`
 					},
 					attributes = {
 						{
-							name = `Color{ v92 }{ v96 }Color3`,
-							value = v95.Color3
+							name = `Color{ v99 }{ v103 }Color3`,
+							value = v102.Color3
 						},
 						{
-							name = `Color{ v92 }{ v96 }Transparency`,
-							value = v95.Transparency
+							name = `Color{ v99 }{ v103 }Transparency`,
+							value = v102.Transparency
 						}
 					}
 				})
@@ -381,78 +379,78 @@ local function BackgroundRules(p13, p14) -- line: 401
 		end
 	end
 
-	for v97, v98 in p14 do
-		local v99 = kebabToPascal(v97)
+	for v104, v105 in p16 do
+		local v106 = kebabToPascal(v104)
 
-		table.insert(t11, {
-			tag = `bg-{ v97 }`,
+		table.insert(t10, {
+			tag = `bg-{ v104 }`,
 			properties = {
-				BackgroundColor3 = `$Color{ v99 }BackgroundColor3`,
-				BackgroundTransparency = `$Color{ v99 }BackgroundTransparency`
+				BackgroundColor3 = `$Color{ v106 }BackgroundColor3`,
+				BackgroundTransparency = `$Color{ v106 }BackgroundTransparency`
 			},
 			attributes = {
 				{
-					name = `Color{ v99 }BackgroundColor3`,
-					value = v98.Background.Color3
+					name = `Color{ v106 }BackgroundColor3`,
+					value = v105.Background.Color3
 				},
 				{
-					name = `Color{ v99 }BackgroundTransparency`,
-					value = v98.Background.Transparency
+					name = `Color{ v106 }BackgroundTransparency`,
+					value = v105.Background.Transparency
 				}
 			}
 		})
 	end
 
-	return t11
+	return t10
 end
-local function StrokeSizeRules(p15) -- line: 453
+local function StrokeSizeRules(p17) -- line: 445
 	-- upvalues: kebabToPascal (copy)
-	local t12 = {}
+	local t11 = {}
 
-	for _, v103 in p15 do
-		if v103.name ~= "none" then
-			local v104 = kebabToPascal(v103.name)
+	for _, v110 in p17 do
+		if v110.name ~= "none" then
+			local v111 = kebabToPascal(v110.name)
 
-			table.insert(t12, {
-				tag = `stroke-{ v103.name }`,
+			table.insert(t11, {
 				pseudo = "UIStroke",
+				tag = `stroke-{ v110.name }`,
 				properties = {
-					Thickness = `$StrokeThickness{ v104 }`
+					Thickness = `$StrokeThickness{ v111 }`
 				},
 				attributes = {{
-					name = `StrokeThickness{ v104 }`,
-					value = v103.size
+					name = `StrokeThickness{ v111 }`,
+					value = v110.size
 				}}
 			})
 		end
 	end
 
-	return t12
+	return t11
 end
-local function StrokeRules(p16, p17) -- line: 480
-	-- upvalues: t10 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
-	local t13 = {}
+local function StrokeRules(p18, p19) -- line: 472
+	-- upvalues: t9 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
+	local t12 = {}
 
-	for v108, v109 in p16 do
-		if table.find(t10[v108], "stroke") then
-			for v110, v111 in v109 do
-				local v112 = tokenAttributePascalName(v108, v110)
+	for v115, v116 in p18 do
+		if table.find(t9[v115], "stroke") then
+			for v117, v118 in v116 do
+				local v119 = tokenAttributePascalName(v115, v117)
 
-				table.insert(t13, {
-					tag = `stroke-{ v110 }`,
+				table.insert(t12, {
 					pseudo = "UIStroke",
+					tag = `stroke-{ v117 }`,
 					properties = {
-						Color = `$Color{ v108 }{ v112 }Color3`,
-						Transparency = `$Color{ v108 }{ v112 }Transparency`
+						Color = `$Color{ v115 }{ v119 }Color3`,
+						Transparency = `$Color{ v115 }{ v119 }Transparency`
 					},
 					attributes = {
 						{
-							name = `Color{ v108 }{ v112 }Color3`,
-							value = v111.Color3
+							name = `Color{ v115 }{ v119 }Color3`,
+							value = v118.Color3
 						},
 						{
-							name = `Color{ v108 }{ v112 }Transparency`,
-							value = v111.Transparency
+							name = `Color{ v115 }{ v119 }Transparency`,
+							value = v118.Transparency
 						}
 					}
 				})
@@ -460,205 +458,629 @@ local function StrokeRules(p16, p17) -- line: 480
 		end
 	end
 
-	for v113, v114 in p17 do
-		local v115 = kebabToPascal(v113)
+	for v120, v121 in p19 do
+		local v122 = kebabToPascal(v120)
 
-		table.insert(t13, {
-			tag = `stroke-{ v113 }`,
+		table.insert(t12, {
 			pseudo = "UIStroke",
+			tag = `stroke-{ v120 }`,
 			properties = {
-				Color = `$Color{ v115 }BorderColor3`,
-				Transparency = `$Color{ v115 }BorderTransparency`
+				Color = `$Color{ v122 }BorderColor3`,
+				Transparency = `$Color{ v122 }BorderTransparency`
 			},
 			attributes = {
 				{
-					name = `Color{ v115 }BorderColor3`,
-					value = v114.Border.Color3
+					name = `Color{ v122 }BorderColor3`,
+					value = v121.Border.Color3
 				},
 				{
-					name = `Color{ v115 }BorderTransparency`,
-					value = v114.Border.Transparency
+					name = `Color{ v122 }BorderTransparency`,
+					value = v121.Border.Transparency
 				}
 			}
 		})
 	end
 
-	for v116, v117 in {
+	for v123, v124 in {
 		center = Enum.BorderStrokePosition.Center,
 		inner = Enum.BorderStrokePosition.Inner,
 		outer = Enum.BorderStrokePosition.Outer
 	} do
-		table.insert(t13, {
-			tag = `stroke-position-{ v116 }`,
+		table.insert(t12, {
 			pseudo = "UIStroke",
+			tag = `stroke-position-{ v123 }`,
 			properties = {
-				BorderStrokePosition = v117
+				BorderStrokePosition = v124
+			}
+		})
+	end
+
+	return t12
+end
+local function ContentRules(p20, p21) -- line: 542
+	-- upvalues: t9 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
+	local t13 = {}
+
+	for v128, v129 in p20 do
+		if table.find(t9[v128], "content") then
+			for v130, v131 in v129 do
+				local v132 = tokenAttributePascalName(v128, v130)
+
+				table.insert(t13, {
+					tag = `content-{ v130 }`,
+					properties = {
+						ImageColor3 = `$Color{ v128 }{ v132 }Color3`,
+						ImageTransparency = `$Color{ v128 }{ v132 }Transparency`,
+						TextColor3 = `$Color{ v128 }{ v132 }Color3`,
+						TextTransparency = `$Color{ v128 }{ v132 }Transparency`
+					},
+					attributes = {
+						{
+							name = `Color{ v128 }{ v132 }Color3`,
+							value = v131.Color3
+						},
+						{
+							name = `Color{ v128 }{ v132 }Transparency`,
+							value = v131.Transparency
+						}
+					}
+				})
+			end
+		end
+	end
+
+	for v133, v134 in p21 do
+		local v135 = kebabToPascal(v133)
+
+		table.insert(t13, {
+			tag = `content-{ v133 }`,
+			properties = {
+				ImageColor3 = `$Color{ v135 }ForegroundColor3`,
+				ImageTransparency = `$Color{ v135 }ForegroundTransparency`,
+				TextColor3 = `$Color{ v135 }ForegroundColor3`,
+				TextTransparency = `$Color{ v135 }ForegroundTransparency`
+			},
+			attributes = {
+				{
+					name = `Color{ v135 }ForegroundColor3`,
+					value = v134.Foreground.Color3
+				},
+				{
+					name = `Color{ v135 }ForegroundTransparency`,
+					value = v134.Foreground.Transparency
+				}
 			}
 		})
 	end
 
 	return t13
 end
-local function ContentRules(p18, p19) -- line: 550
-	-- upvalues: t10 (copy), tokenAttributePascalName (copy), kebabToPascal (copy)
+local function DeprecatedColorRules(p22) -- line: 598
+	-- upvalues: tokenAttributePascalName (copy)
 	local t14 = {}
 
-	for v121, v122 in p18 do
-		if table.find(t10[v121], "content") then
-			for v123, v124 in v122 do
-				local v125 = tokenAttributePascalName(v121, v123)
-
-				table.insert(t14, {
-					tag = `content-{ v123 }`,
-					properties = {
-						ImageColor3 = `$Color{ v121 }{ v125 }Color3`,
-						ImageTransparency = `$Color{ v121 }{ v125 }Transparency`,
-						TextColor3 = `$Color{ v121 }{ v125 }Color3`,
-						TextTransparency = `$Color{ v121 }{ v125 }Transparency`
-					},
-					attributes = {
-						{
-							name = `Color{ v121 }{ v125 }Color3`,
-							value = v124.Color3
-						},
-						{
-							name = `Color{ v121 }{ v125 }Transparency`,
-							value = v124.Transparency
-						}
-					}
-				})
-			end
-		end
-	end
-
-	for v126, v127 in p19 do
-		local v128 = kebabToPascal(v126)
+	for v138, v139 in p22.System do
+		local v140 = v138:sub(8)
+		local v141 = tokenAttributePascalName("System", v138)
 
 		table.insert(t14, {
-			tag = `content-{ v126 }`,
+			tag = `bg-{ v140 }`,
 			properties = {
-				ImageColor3 = `$Color{ v128 }ForegroundColor3`,
-				ImageTransparency = `$Color{ v128 }ForegroundTransparency`,
-				TextColor3 = `$Color{ v128 }ForegroundColor3`,
-				TextTransparency = `$Color{ v128 }ForegroundTransparency`
+				BackgroundColor3 = `$ColorSystem{ v141 }Color3`,
+				BackgroundTransparency = `$ColorSystem{ v141 }Transparency`
 			},
 			attributes = {
 				{
-					name = `Color{ v128 }ForegroundColor3`,
-					value = v127.Foreground.Color3
+					name = `ColorSystem{ v141 }Color3`,
+					value = v139.Color3
 				},
 				{
-					name = `Color{ v128 }ForegroundTransparency`,
-					value = v127.Foreground.Transparency
+					name = `ColorSystem{ v141 }Transparency`,
+					value = v139.Transparency
 				}
-			}
+			},
+			deprecatedFor = `bg-{ v138 }`
 		})
+
+		if v140 ~= "emphasis" then
+			table.insert(t14, {
+				tag = `content-{ v140 }`,
+				properties = {
+					ImageColor3 = `$ColorSystem{ v141 }Color3`,
+					ImageTransparency = `$ColorSystem{ v141 }Transparency`,
+					TextColor3 = `$ColorSystem{ v141 }Color3`,
+					TextTransparency = `$ColorSystem{ v141 }Transparency`
+				},
+				attributes = {
+					{
+						name = `ColorSystem{ v141 }Color3`,
+						value = v139.Color3
+					},
+					{
+						name = `ColorSystem{ v141 }Transparency`,
+						value = v139.Transparency
+					}
+				},
+				deprecatedFor = `content-{ v138 }`
+			})
+			table.insert(t14, {
+				pseudo = "UIStroke",
+				tag = `stroke-{ v140 }`,
+				properties = {
+					Color = `$ColorSystem{ v141 }Color3`,
+					Transparency = `$ColorSystem{ v141 }Transparency`
+				},
+				attributes = {
+					{
+						name = `ColorSystem{ v141 }Color3`,
+						value = v139.Color3
+					},
+					{
+						name = `ColorSystem{ v141 }Transparency`,
+						value = v139.Transparency
+					}
+				},
+				deprecatedFor = `stroke-{ v138 }`
+			})
+		end
 	end
 
 	return t14
 end
-local function DeprecatedColorRules(p20) -- line: 606
-	-- upvalues: tokenAttributePascalName (copy)
-	local t15 = {}
-
-	for v131, v132 in p20.System do
-		local v133 = v131:sub(8)
-		local v134 = tokenAttributePascalName("System", v131)
-
-		table.insert(t15, {
-			tag = `bg-{ v133 }`,
+local function EngineDefaultBypassRules() -- line: 677
+	return {
+		{
+			tag = "x-default-transparency",
 			properties = {
-				BackgroundColor3 = `$ColorSystem{ v134 }Color3`,
-				BackgroundTransparency = `$ColorSystem{ v134 }Transparency`
-			},
-			attributes = {
-				{
-					name = `ColorSystem{ v134 }Color3`,
-					value = v132.Color3
-				},
-				{
-					name = `ColorSystem{ v134 }Transparency`,
-					value = v132.Transparency
-				}
-			},
-			deprecatedFor = `bg-{ v131 }`
-		})
+				BackgroundTransparency = 0
+			}
+		},
+		{
+			tag = "x-default-text-size",
+			properties = {
+				TextSize = 8
+			}
+		}
+	}
+end
+local function ListLayoutRules() -- line: 694
+	-- upvalues: Dash (copy)
+	local t15 = {
+		{
+			tag = "row",
+			pseudo = "UIListLayout",
+			properties = {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}
+		},
+		{
+			tag = "col",
+			pseudo = "UIListLayout",
+			properties = {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}
+		}
+	}
+	local t16 = {
+		{
+			tag = "align-x-left",
+			pseudo = "UIListLayout",
+			properties = {
+				HorizontalAlignment = Enum.HorizontalAlignment.Left
+			}
+		},
+		{
+			tag = "align-x-center",
+			pseudo = "UIListLayout",
+			properties = {
+				HorizontalAlignment = Enum.HorizontalAlignment.Center
+			}
+		},
+		{
+			tag = "align-x-right",
+			pseudo = "UIListLayout",
+			properties = {
+				HorizontalAlignment = Enum.HorizontalAlignment.Right
+			}
+		},
+		{
+			tag = "align-y-top",
+			pseudo = "UIListLayout",
+			properties = {
+				VerticalAlignment = Enum.VerticalAlignment.Top
+			}
+		},
+		{
+			tag = "align-y-center",
+			pseudo = "UIListLayout",
+			properties = {
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}
+		},
+		{
+			tag = "align-y-bottom",
+			pseudo = "UIListLayout",
+			properties = {
+				VerticalAlignment = Enum.VerticalAlignment.Bottom
+			}
+		}
+	}
+	local t17 = {
+		{
+			tag = "wrap",
+			pseudo = "UIListLayout",
+			properties = {
+				Wraps = true
+			}
+		},
+		{
+			tag = "no-wrap",
+			pseudo = "UIListLayout",
+			properties = {
+				Wraps = false
+			}
+		}
+	}
+	local t18 = {}
 
-		if v133 ~= "emphasis" then
-			table.insert(t15, {
-				tag = `content-{ v133 }`,
+	for v146, v147 in {
+		none = Enum.UIFlexAlignment.None,
+		fill = Enum.UIFlexAlignment.Fill,
+		around = Enum.UIFlexAlignment.SpaceAround,
+		between = Enum.UIFlexAlignment.SpaceBetween,
+		evenly = Enum.UIFlexAlignment.SpaceEvenly
+	} do
+		table.insert(t18, {
+			pseudo = "UIListLayout",
+			tag = `flex-{ v146 }`,
+			properties = {
+				HorizontalFlex = v147,
+				VerticalFlex = v147
+			}
+		})
+		table.insert(t18, {
+			pseudo = "UIListLayout",
+			tag = `flex-x-{ v146 }`,
+			properties = {
+				HorizontalFlex = v147
+			}
+		})
+		table.insert(t18, {
+			pseudo = "UIListLayout",
+			tag = `flex-y-{ v146 }`,
+			properties = {
+				VerticalFlex = v147
+			}
+		})
+	end
+
+	local t19 = {}
+
+	for v149, v150 in {
+		auto = Enum.ItemLineAlignment.Automatic,
+		start = Enum.ItemLineAlignment.Start,
+		center = Enum.ItemLineAlignment.Center,
+		["end"] = Enum.ItemLineAlignment.End,
+		stretch = Enum.ItemLineAlignment.Stretch
+	} do
+		table.insert(t19, {
+			pseudo = "UIListLayout",
+			tag = `items-{ v149 }`,
+			properties = {
+				ItemLineAlignment = v150
+			}
+		})
+	end
+
+	return Dash.joinArrays(t15, t16, t17, t18, t19)
+end
+local function FlexItemRules() -- line: 836
+	-- upvalues: Dash (copy)
+	local t20 = {
+		{
+			tag = "grow",
+			pseudo = "UIFlexItem",
+			properties = {
+				FlexMode = Enum.UIFlexMode.Grow
+			}
+		},
+		{
+			tag = "shrink",
+			pseudo = "UIFlexItem",
+			properties = {
+				FlexMode = Enum.UIFlexMode.Shrink
+			}
+		},
+		{
+			tag = "fill",
+			pseudo = "UIFlexItem",
+			properties = {
+				FlexMode = Enum.UIFlexMode.Fill
+			}
+		},
+		{
+			tag = "no-flex",
+			pseudo = "UIFlexItem",
+			properties = {
+				FlexMode = Enum.UIFlexMode.None
+			}
+		}
+	}
+	local t21 = {}
+	local t22 = {}
+
+	for v154 in {
+		1,
+		2,
+		3,
+		4,
+		5
+	} do
+		table.insert(t21, {
+			pseudo = "UIFlexItem",
+			tag = `grow-{ v154 }`,
+			properties = {
+				FlexMode = Enum.UIFlexMode.Custom,
+				GrowRatio = v154
+			}
+		})
+		table.insert(t22, {
+			pseudo = "UIFlexItem",
+			tag = `shrink-{ v154 }`,
+			properties = {
+				FlexMode = Enum.UIFlexMode.Custom,
+				ShrinkRatio = v154
+			}
+		})
+	end
+
+	local t23 = {}
+
+	for v156, v157 in {
+		auto = Enum.ItemLineAlignment.Automatic,
+		start = Enum.ItemLineAlignment.Start,
+		center = Enum.ItemLineAlignment.Center,
+		["end"] = Enum.ItemLineAlignment.End,
+		stretch = Enum.ItemLineAlignment.Stretch
+	} do
+		table.insert(t23, {
+			pseudo = "UIFlexItem",
+			tag = `self-{ v156 }`,
+			properties = {
+				ItemLineAlignment = v157
+			}
+		})
+	end
+
+	return Dash.joinArrays(t20, t21, t22, t23)
+end
+local function TextRules() -- line: 915
+	local t24 = {}
+
+	for v159, v160 in {
+		left = Enum.TextXAlignment.Left,
+		center = Enum.TextXAlignment.Center,
+		right = Enum.TextXAlignment.Right
+	} do
+		table.insert(t24, {
+			tag = `text-align-x-{ v159 }`,
+			properties = {
+				TextXAlignment = v160
+			}
+		})
+	end
+
+	for v161, v162 in {
+		top = Enum.TextYAlignment.Top,
+		center = Enum.TextYAlignment.Center,
+		bottom = Enum.TextYAlignment.Bottom
+	} do
+		table.insert(t24, {
+			tag = `text-align-y-{ v161 }`,
+			properties = {
+				TextYAlignment = v162
+			}
+		})
+	end
+
+	for v163, v164 in {
+		none = Enum.TextTruncate.None,
+		["end"] = Enum.TextTruncate.AtEnd,
+		split = Enum.TextTruncate.SplitWord
+	} do
+		table.insert(t24, {
+			tag = `text-truncate-{ v163 }`,
+			properties = {
+				TextTruncate = v164
+			}
+		})
+	end
+
+	table.insert(t24, {
+		tag = "text-wrap",
+		properties = {
+			TextWrapped = true
+		}
+	})
+	table.insert(t24, {
+		tag = "text-no-wrap",
+		properties = {
+			TextWrapped = false
+		}
+	})
+
+	return t24
+end
+local function AutomaticSizeRules() -- line: 980
+	local t25 = {}
+
+	for v166, v167 in {
+		none = Enum.AutomaticSize.None,
+		x = Enum.AutomaticSize.X,
+		y = Enum.AutomaticSize.Y,
+		xy = Enum.AutomaticSize.XY
+	} do
+		table.insert(t25, {
+			tag = `auto-{ v166 }`,
+			properties = {
+				AutomaticSize = v167
+			}
+		})
+	end
+
+	return t25
+end
+local function PositionRules() -- line: 1002
+	local t26 = {}
+	local t27 = {
+		left = 0,
+		center = 0.5,
+		right = 1
+	}
+	local t28 = {
+		top = 0,
+		center = 0.5,
+		bottom = 1
+	}
+
+	for v171, v172 in t27 do
+		for v173, v174 in t28 do
+			table.insert(t26, {
+				tag = `position-{ v173 }-{ v171 }`,
 				properties = {
-					ImageColor3 = `$ColorSystem{ v134 }Color3`,
-					ImageTransparency = `$ColorSystem{ v134 }Transparency`,
-					TextColor3 = `$ColorSystem{ v134 }Color3`,
-					TextTransparency = `$ColorSystem{ v134 }Transparency`
-				},
-				attributes = {
-					{
-						name = `ColorSystem{ v134 }Color3`,
-						value = v132.Color3
-					},
-					{
-						name = `ColorSystem{ v134 }Transparency`,
-						value = v132.Transparency
-					}
-				},
-				deprecatedFor = `content-{ v131 }`
-			})
-			table.insert(t15, {
-				tag = `stroke-{ v133 }`,
-				pseudo = "UIStroke",
-				properties = {
-					Color = `$ColorSystem{ v134 }Color3`,
-					Transparency = `$ColorSystem{ v134 }Transparency`
-				},
-				attributes = {
-					{
-						name = `ColorSystem{ v134 }Color3`,
-						value = v132.Color3
-					},
-					{
-						name = `ColorSystem{ v134 }Transparency`,
-						value = v132.Transparency
-					}
-				},
-				deprecatedFor = `stroke-{ v131 }`
+					Position = UDim2.fromScale(v172, v174)
+				}
 			})
 		end
 	end
 
-	return t15
+	return t26
+end
+local function AnchorPointRules() -- line: 1020
+	local t29 = {}
+	local t30 = {
+		left = 0,
+		center = 0.5,
+		right = 1
+	}
+	local t31 = {
+		top = 0,
+		center = 0.5,
+		bottom = 1
+	}
+
+	for v178, v179 in t30 do
+		for v180, v181 in t31 do
+			table.insert(t29, {
+				tag = `anchor-{ v180 }-{ v178 }`,
+				properties = {
+					AnchorPoint = Vector2.new(v179, v181)
+				}
+			})
+		end
+	end
+
+	return t29
+end
+local function ClipsDescendantRules() -- line: 1038
+	return {
+		{
+			tag = "clip",
+			properties = {
+				ClipsDescendants = true
+			}
+		},
+		{
+			tag = "no-clip",
+			properties = {
+				ClipsDescendants = false
+			}
+		}
+	}
+end
+local function roundDecimals(n4: number, n5: number) -- line: 1055
+	local v184 = 10 ^ n5
+
+	return math.round(n4 * v184) / v184
+end
+local function AspectRatioRules() -- line: 1060
+	local t32 = {}
+
+	for _, v187 in {
+		{
+			1,
+			1
+		},
+		{
+			5,
+			4
+		},
+		{
+			4,
+			3
+		},
+		{
+			3,
+			2
+		},
+		{
+			16,
+			9
+		},
+		{
+			2,
+			1
+		}
+	} do
+		table.insert(t32, {
+			pseudo = "UIAspectRatioConstraint",
+			tag = `aspect-{ v187[1] }-{ v187[2] }`,
+			properties = {
+				AspectRatio = math.round(v187[1] / v187[2] * 1000) / 1000
+			}
+		})
+
+		if v187[1] ~= v187[2] then
+			table.insert(t32, {
+				pseudo = "UIAspectRatioConstraint",
+				tag = `aspect-{ v187[2] }-{ v187[1] }`,
+				properties = {
+					AspectRatio = math.round(v187[2] / v187[1] * 1000) / 1000
+				}
+			})
+		end
+	end
+
+	return t32
 end
 
 return {
-	rulesGenerator = function(p21, p22) --[[ rulesGenerator ]] -- line: 682
-		-- upvalues: Dash (copy), DefaultRules (copy), staticRules (copy), DefaultSizeRules (copy), ListLayoutSpacingRules (copy), CornerRules (copy), SizeRules (copy), StrokeSizeRules (copy), TypographyRules (copy), PaddingRules (copy), DefaultColorRules (copy), DeprecatedColorRules (copy), BackgroundRules (copy), StrokeRules (copy), ContentRules (copy)
-		local colors = p22.colors
-		local variants = p22.variants
-		local gaps = p22.gaps
-		local gutters = p22.gutters
-		local radii = p22.radii
-		local sizes = p22.sizes
-		local strokes = p22.strokes
-		local typography = p22.typography
-		local paddings = p22.paddings
-		local margins = p22.margins
+	rulesGenerator = function(p23, p24) -- line: 1088
+		-- upvalues: Dash (copy), DefaultRules (copy), EngineDefaultBypassRules (copy), FlexItemRules (copy), TextRules (copy), AutomaticSizeRules (copy), PositionRules (copy), AnchorPointRules (copy), ClipsDescendantRules (copy), AspectRatioRules (copy), DefaultSizeRules (copy), ListLayoutRules (copy), ListLayoutSpacingRules (copy), cornerRules (copy), kebabToPascal (copy), SizeRules (copy), StrokeSizeRules (copy), TypographyRules (copy), PaddingRules (copy), DefaultColorRules (copy), DeprecatedColorRules (copy), BackgroundRules (copy), StrokeRules (copy), ContentRules (copy)
+		local colors = p24.colors
+		local variants = p24.variants
+		local gaps = p24.gaps
+		local gutters = p24.gutters
+		local radii = p24.radii
+		local sizes = p24.sizes
+		local strokes = p24.strokes
+		local typography = p24.typography
+		local paddings = p24.paddings
+		local margins = p24.margins
 
-		return Dash.joinArrays(DefaultRules(p21), staticRules.rules.EngineDefaultBypassRules(), staticRules.rules.FlexItemRules(), staticRules.rules.TextRules(), staticRules.rules.AutomaticSizeRules(), staticRules.rules.PositionRules(), staticRules.rules.AnchorPointRules(), staticRules.rules.ClipsDescendantRules(), staticRules.rules.AspectRatioRules()), Dash.joinArrays(DefaultSizeRules(typography["body-large"], p21.Config.Text.NominalScale), staticRules.rules.ListLayoutRules(), ListLayoutSpacingRules(gaps, gutters), CornerRules(radii), SizeRules(sizes), StrokeSizeRules(strokes), TypographyRules(typography, p21.Config.Text.NominalScale), (PaddingRules(paddings, margins))), (Dash.joinArrays(DefaultColorRules(p21), DeprecatedColorRules(colors), BackgroundRules(colors, variants), StrokeRules(colors, variants), (ContentRules(colors, variants))))
-	end,
-	rules = {
-		DefaultRules = DefaultRules,
-		DefaultSizeRules = DefaultSizeRules,
-		DefaultColorRules = DefaultColorRules,
-		ListLayoutSpacingRules = ListLayoutSpacingRules,
-		CornerRules = CornerRules,
-		SizeRules = SizeRules,
-		StrokeSizeRules = StrokeSizeRules,
-		TypographyRules = TypographyRules,
-		PaddingRules = PaddingRules,
-		BackgroundRules = BackgroundRules,
-		StrokeRules = StrokeRules,
-		ContentRules = ContentRules,
-		DeprecatedColorRules = DeprecatedColorRules
-	}
+		return Dash.joinArrays(DefaultRules(p23), EngineDefaultBypassRules(), FlexItemRules(), TextRules(), AutomaticSizeRules(), PositionRules(), AnchorPointRules(), ClipsDescendantRules(), (AspectRatioRules())), Dash.joinArrays(DefaultSizeRules(typography["body-large"], p23.Config.Text.NominalScale), ListLayoutRules(), ListLayoutSpacingRules(gaps, gutters), cornerRules(radii, function(p25) -- line: 130
+			-- upvalues: kebabToPascal (copy)
+			local v205 = kebabToPascal(p25.name)
+
+			return {
+				cornerValue = `$Radius{ v205 }`,
+				attributes = {{
+					name = `Radius{ v205 }`,
+					value = p25.size
+				}}
+			}
+		end), SizeRules(sizes), StrokeSizeRules(strokes), TypographyRules(typography, p23.Config.Text.NominalScale), (PaddingRules(paddings, margins))), (Dash.joinArrays(DefaultColorRules(p23), DeprecatedColorRules(colors), BackgroundRules(colors, variants), StrokeRules(colors, variants), (ContentRules(colors, variants))))
+	end
 }

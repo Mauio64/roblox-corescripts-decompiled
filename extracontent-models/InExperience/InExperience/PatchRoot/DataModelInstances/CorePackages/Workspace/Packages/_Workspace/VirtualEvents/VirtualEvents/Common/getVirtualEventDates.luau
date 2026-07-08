@@ -1,10 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("VirtualEvents");
-local _ = require(l_script_FirstAncestor_0.Parent.GraphQLServer);
-return function(v2) --[[ Line: 10 ]] --[[ Name: getVirtualEventDates ]]
-    local v3 = if v2.eventTime and v2.eventTime.startUtc then DateTime.fromIsoDate(v2.eventTime.startUtc) else nil;
-    local v4 = if v2.eventTime and v2.eventTime.endUtc then DateTime.fromIsoDate(v2.eventTime.endUtc) else nil;
-    return {
-        startDate = v3 or DateTime.now(), 
-        endDate = v4 or DateTime.now()
-    };
-end;
+local VirtualEvents = script:FindFirstAncestor("VirtualEvents")
+
+require(VirtualEvents.Parent.GraphQLServer)
+
+local function getVirtualEventDates(p1) -- line: 10
+	local v4 = if not p1.eventTime or not p1.eventTime.startUtc then nil else DateTime.fromIsoDate(p1.eventTime.startUtc)
+	local v5 = if not p1.eventTime or not p1.eventTime.endUtc then nil else DateTime.fromIsoDate(p1.eventTime.endUtc)
+
+	return {
+		startDate = v4 or DateTime.now(),
+		endDate = v5 or DateTime.now()
+	}
+end
+
+return getVirtualEventDates

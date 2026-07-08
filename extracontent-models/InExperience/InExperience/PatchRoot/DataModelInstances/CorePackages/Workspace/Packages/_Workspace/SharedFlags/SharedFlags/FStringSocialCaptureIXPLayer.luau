@@ -1,1 +1,1 @@
-return game:DefineFastString("SocialCaptureIXPLayer", "Social.Capture");
+return game:DefineFastString("SocialCaptureIXPLayer", "Social.Capture")

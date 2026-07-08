@@ -1,162 +1,162 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_ProviderContainer_0 = require(l_Parent_0.RoactUtils).Components.ProviderContainer;
-local v4 = require(l_Parent_0.Style);
-local l_StyleProviderWithDefaultTheme_0 = v4.StyleProviderWithDefaultTheme;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local v7 = require(l_Parent_0.UIBlox);
-local l_FoundationProvider_0 = require(l_Parent_0.Foundation).FoundationProvider;
-local l_LayerCollectorProvider_0 = v7.Core.Layout.LayerCollector.LayerCollectorProvider;
-local l_Signal_0 = require(l_Parent_0.AppCommonLib).Signal;
-local v11 = require(l_Parent_0.Cryo);
-local v12 = require(l_Parent_0.UniversalAppPolicy);
-local v13 = require(l_Parent_0.SocialPolicies);
-local v14 = require(l_Parent_0.UserProfiles);
-local v15 = require(l_Parent_0.ApolloClient);
-local l_mockApolloClient_0 = require(l_Parent_0.GraphQLServer).ApolloClientTestUtils.mockApolloClient;
-local v17 = require(l_script_FirstAncestor_0.Users.MockUserData);
-local l_RealtimeProvider_0 = require(l_Parent_0.RealtimeDelivery).RealtimeProvider;
-local v19 = require(l_Parent_0.InteractionFeedback);
-local l_HapticFeedbackConfig_0 = require(l_script_FirstAncestor_0.Utils.HapticFeedback).HapticFeedbackConfig;
-local v21 = require(l_Parent_0.Rodux);
-local v22 = require(l_Parent_0.RoactRodux);
-local v23 = require(l_Parent_0.RoactNavigation);
-local v24 = {
-    withUiModeSupport = false, 
-    withLayerCollector = true, 
-    withApolloProvider = true
-};
-return function(v25) --[[ Line: 57 ]] --[[ Name: MockProviders ]]
-    -- upvalues: v11 (copy), v24 (copy), l_RealtimeProvider_0 (copy), l_FoundationProvider_0 (copy), l_StyleProviderWithDefaultTheme_0 (copy), l_LocalizationProvider_0 (copy), l_Signal_0 (copy), l_LayerCollectorProvider_0 (copy), v22 (copy), v21 (copy), v12 (copy), v13 (copy), v4 (copy), l_mockApolloClient_0 (copy), v17 (copy), v14 (copy), v15 (copy), v19 (copy), l_HapticFeedbackConfig_0 (copy), v23 (copy), v2 (copy), l_ProviderContainer_0 (copy)
-    local v26 = v11.Dictionary.union(v24, v25);
-    local v27 = {};
-    if v26.realtime then
-        table.insert(v27, {
-            class = l_RealtimeProvider_0, 
-            props = {
-                realtime = v26.realtime
-            }
-        });
-    end;
-    table.insert(v27, {
-        class = l_FoundationProvider_0, 
-        props = {
-            device = "Desktop", 
-            theme = v26.themeName
-        }
-    });
-    table.insert(v27, {
-        class = l_StyleProviderWithDefaultTheme_0, 
-        props = {
-            withDarkTheme = v26.themeName ~= "Light", 
-            withUiModeSupport = v26.withUiModeSupport
-        }
-    });
-    table.insert(v27, {
-        class = l_LocalizationProvider_0, 
-        props = {
-            localization = {
-                Format = function(_, v29) --[[ Line: 90 ]] --[[ Name: Format ]]
-                    return v29;
-                end, 
-                changed = l_Signal_0.new()
-            }
-        }
-    });
-    if v26.withLayerCollector then
-        table.insert(v27, {
-            class = l_LayerCollectorProvider_0, 
-            props = {}
-        });
-    end;
-    table.insert(v27, {
-        class = v22.StoreProvider, 
-        props = {
-            store = v26.rodux and v26.rodux.store or v21.Store.new(function() --[[ Line: 108 ]]
-                -- upvalues: v26 (copy)
-                return v26.rodux and v26.rodux.state or {};
-            end, v26.rodux and v26.rodux.state, {
-                v21.thunkMiddleware
-            })
-        }
-    });
-    table.insert(v27, {
-        class = v12.RoactAppPolicy.Provider, 
-        props = {
-            policy = {
-                v12.AppFeaturePolicies, 
-                v13.ChatPolicies
-            }
-        }
-    });
-    table.insert(v27, {
-        class = v4.DesignTokenProvider, 
-        props = {
-            tokenMappers = {}
-        }
-    });
-    if v26.withApolloProvider then
-        local v30 = l_mockApolloClient_0({});
-        local v31 = v17.createMockApolloProfiles();
-        v14.TestUtils.writeProfileDataToCache(v30, v31);
-        table.insert(v27, {
-            class = v15.ApolloProvider, 
-            props = {
-                client = v30
-            }
-        });
-    end;
-    table.insert(v27, {
-        class = v19.InteractionFeedbackContext.Provider, 
-        props = {
-            value = l_HapticFeedbackConfig_0
-        }
-    });
-    table.insert(v27, {
-        class = v23.Provider, 
-        props = {
-            value = {
-                state = {
-                    params = {}, 
-                    routeName = "", 
-                    key = ""
-                }, 
-                dispatch = function() --[[ Line: 157 ]] --[[ Name: dispatch ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local ProviderContainer = require(AppChatParent.RoactUtils).Components.ProviderContainer
+local Style = require(AppChatParent.Style)
+local StyleProviderWithDefaultTheme = Style.StyleProviderWithDefaultTheme
+local LocalizationProvider = require(AppChatParent.Localization).LocalizationProvider
+local UIBlox = require(AppChatParent.UIBlox)
+local FoundationProvider = require(AppChatParent.Foundation).FoundationProvider
+local LayerCollectorProvider = UIBlox.Core.Layout.LayerCollector.LayerCollectorProvider
+local Signal = require(AppChatParent.AppCommonLib).Signal
+local Cryo = require(AppChatParent.Cryo)
+local UniversalAppPolicy = require(AppChatParent.UniversalAppPolicy)
+local SocialPolicies = require(AppChatParent.SocialPolicies)
+local UserProfiles = require(AppChatParent.UserProfiles)
+local ApolloClient = require(AppChatParent.ApolloClient)
+local mockApolloClient = require(AppChatParent.GraphQLServer).ApolloClientTestUtils.mockApolloClient
+local MockUserData = require(AppChat.Users.MockUserData)
+local RealtimeProvider = require(AppChatParent.RealtimeDelivery).RealtimeProvider
+local InteractionFeedback = require(AppChatParent.InteractionFeedback)
+local HapticFeedbackConfig = require(AppChat.Utils.HapticFeedback).HapticFeedbackConfig
+local Rodux = require(AppChatParent.Rodux)
+local RoactRodux = require(AppChatParent.RoactRodux)
+local RoactNavigation = require(AppChatParent.RoactNavigation)
+local t1 = {
+	withUiModeSupport = false,
+	withLayerCollector = true,
+	withApolloProvider = true
+}
 
-                end, 
-                goBack = function() --[[ Line: 158 ]] --[[ Name: goBack ]]
+local function MockProviders(t2: {[any]: any}) -- line: 57
+	-- upvalues: Cryo (copy), t1 (copy), RealtimeProvider (copy), FoundationProvider (copy), StyleProviderWithDefaultTheme (copy), LocalizationProvider (copy), Signal (copy), LayerCollectorProvider (copy), RoactRodux (copy), Rodux (copy), UniversalAppPolicy (copy), SocialPolicies (copy), Style (copy), mockApolloClient (copy), MockUserData (copy), UserProfiles (copy), ApolloClient (copy), InteractionFeedback (copy), HapticFeedbackConfig (copy), RoactNavigation (copy), React (copy), ProviderContainer (copy)
+	local v28 = Cryo.Dictionary.union(t1, t2)
+	local t3 = {}
 
-                end, 
-                addListener = function() --[[ Line: 159 ]] --[[ Name: addListener ]]
-                    return {
-                        remove = function() --[[ Line: 160 ]] --[[ Name: remove ]]
+	if v28.realtime then
+		table.insert(t3, {
+			class = RealtimeProvider,
+			props = {
+				realtime = v28.realtime
+			}
+		})
+	end
 
-                        end
-                    };
-                end, 
-                isFocused = function() --[[ Line: 162 ]] --[[ Name: isFocused ]]
+	table.insert(t3, {
+		class = FoundationProvider,
+		props = {
+			device = "Desktop",
+			theme = v28.themeName
+		}
+	})
+	table.insert(t3, {
+		class = StyleProviderWithDefaultTheme,
+		props = {
+			withDarkTheme = v28.themeName ~= "Light",
+			withUiModeSupport = v28.withUiModeSupport
+		}
+	})
+	table.insert(t3, {
+		class = LocalizationProvider,
+		props = {
+			localization = {
+				Format = function(_, s1: string) -- line: 90
+					return s1
+				end,
+				changed = Signal.new()
+			}
+		}
+	})
 
-                end, 
-                setParams = function() --[[ Line: 163 ]] --[[ Name: setParams ]]
+	if v28.withLayerCollector then
+		table.insert(t3, {
+			class = LayerCollectorProvider,
+			props = {}
+		})
+	end
 
-                end, 
-                getParam = function() --[[ Line: 164 ]] --[[ Name: getParam ]]
+	table.insert(t3, {
+		class = RoactRodux.StoreProvider,
+		props = {
+			store = v28.rodux and v28.rodux.store or Rodux.Store.new(function() -- line: 108
+				-- upvalues: v28 (copy)
+				return v28.rodux and v28.rodux.state or {}
+			end, v28.rodux and v28.rodux.state, { Rodux.thunkMiddleware })
+		}
+	})
+	table.insert(t3, {
+		class = UniversalAppPolicy.RoactAppPolicy.Provider,
+		props = {
+			policy = {
+				UniversalAppPolicy.AppFeaturePolicies,
+				SocialPolicies.ChatPolicies
+			}
+		}
+	})
+	table.insert(t3, {
+		class = Style.DesignTokenProvider,
+		props = {
+			tokenMappers = {}
+		}
+	})
 
-                end, 
-                replace = function() --[[ Line: 165 ]] --[[ Name: replace ]]
+	if v28.withApolloProvider then
+		local v30 = mockApolloClient({})
+		local v31 = MockUserData.createMockApolloProfiles()
 
-                end, 
-                push = function() --[[ Line: 166 ]] --[[ Name: push ]]
+		UserProfiles.TestUtils.writeProfileDataToCache(v30, v31)
+		table.insert(t3, {
+			class = ApolloClient.ApolloProvider,
+			props = {
+				client = v30
+			}
+		})
+	end
 
-                end, 
-                getScreenProps = function() --[[ Line: 167 ]] --[[ Name: getScreenProps ]]
+	table.insert(t3, {
+		class = InteractionFeedback.InteractionFeedbackContext.Provider,
+		props = {
+			value = HapticFeedbackConfig
+		}
+	})
+	table.insert(t3, {
+		class = RoactNavigation.Provider,
+		props = {
+			value = {
+				state = {
+					routeName = "",
+					key = "",
+					params = {}
+				},
+				dispatch = function() -- line: 157
+				end,
+				goBack = function() -- line: 158
+				end,
+				addListener = function() -- line: 159
+					return {
+						remove = function() -- line: 160
+						end
+					}
+				end,
+				isFocused = function() -- line: 162
+				end,
+				setParams = function() -- line: 163
+				end,
+				getParam = function() -- line: 164
+				end,
+				replace = function() -- line: 165
+				end,
+				push = function() -- line: 166
+				end,
+				getScreenProps = function() -- line: 167
+				end
+			}
+		}
+	})
 
-                end
-            }
-        }
-    });
-    return v2.createElement(l_ProviderContainer_0, {
-        providers = v27
-    }, v26.children);
-end;
+	return React.createElement(ProviderContainer, {
+		providers = t3
+	}, v28.children)
+end
+
+return MockProviders

@@ -1,62 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CurrencyTransfers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Localization.TransferLocalizationKeys);
-local v4 = require(l_script_FirstAncestor_0.Localization.transferLocaleFormat);
-local v5 = require(l_Parent_0.SignalsReact);
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v7 = require(l_Parent_0.Foundation);
-local l_Snackbar_0 = v7.Snackbar;
-local l_Enums_0 = v7.Enums;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v11 = require(l_script_FirstAncestor_0.Actions.Send.handleTransferComplete);
-local v12 = require(l_script_FirstAncestor_0.Hooks.useTransferStore);
-local v13 = require(l_script_FirstAncestor_0.Utils.formatNumber);
-return function(_) --[[ Line: 31 ]] --[[ Name: TransferRobuxSuccessToast ]]
-    -- upvalues: l_useLocalization_0 (copy), v3 (copy), v12 (copy), v5 (copy), v13 (copy), l_LocalizationService_0 (copy), v2 (copy), v4 (copy), v11 (copy), l_Snackbar_0 (copy), l_Enums_0 (copy)
-    local v15 = l_useLocalization_0(v3.Presets.TransferRobuxSuccessToast);
-    local v16 = v12();
-    local v17 = v5.useSignalState(v16.getSelectedAmount);
-    local v18 = if v17 then v13(l_LocalizationService_0.RobloxLocaleId, v17) else "0";
-    local v19 = v2.useMemo(function() --[[ Line: 40 ]]
-        -- upvalues: v4 (ref), v15 (copy), v18 (copy)
-        return v4.substituteAmount(v15.SuccessNotification, (tostring(v18)));
-    end, {
-        v18, 
-        v15.SuccessNotification
-    });
-    local v20 = v2.useRef(nil);
-    v2.useEffect(function() --[[ Line: 46 ]]
-        -- upvalues: v20 (copy), v11 (ref), v16 (copy)
-        if v20.current then
-            task.cancel(v20.current);
-        end;
-        v20.current = task.delay(5, function() --[[ Line: 53 ]]
-            -- upvalues: v11 (ref), v16 (ref)
-            v11(v16);
-        end);
-        return function() --[[ Line: 59 ]]
-            -- upvalues: v20 (ref)
-            if v20.current then
-                task.cancel(v20.current);
-                v20.current = nil;
-            end;
-        end;
-    end, {});
-    return v2.createElement(l_Snackbar_0, {
-        title = v19, 
-        icon = {
-            name = l_Enums_0.IconName.CircleCheck, 
-            variant = l_Enums_0.IconVariant.Filled
-        }, 
-        Position = UDim2.new(0.5, 0, 0, 50), 
-        AnchorPoint = Vector2.new(0.5, 0), 
-        Size = UDim2.new(1, 0, 0, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        ZIndex = 100, 
-        onClose = function() --[[ Line: 81 ]] --[[ Name: onClose ]]
-            -- upvalues: v11 (ref), v16 (copy)
-            v11(v16);
-        end
-    });
-end;
+local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+local CurrencyTransfersParent = CurrencyTransfers.Parent
+local React = require(CurrencyTransfersParent.React)
+local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
+local transferLocaleFormat = require(CurrencyTransfers.Localization.transferLocaleFormat)
+local SignalsReact = require(CurrencyTransfersParent.SignalsReact)
+local LocalizationService = game:GetService("LocalizationService")
+local Foundation = require(CurrencyTransfersParent.Foundation)
+local Snackbar = Foundation.Snackbar
+local Enums = Foundation.Enums
+local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+local handleTransferComplete = require(CurrencyTransfers.Actions.Send.handleTransferComplete)
+local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
+local formatNumber = require(CurrencyTransfers.Utils.formatNumber)
+
+local function TransferRobuxSuccessToast(_: {[any]: any}) -- line: 31
+	-- upvalues: useLocalization (copy), TransferLocalizationKeys (copy), useTransferStore (copy), SignalsReact (copy), formatNumber (copy), LocalizationService (copy), React (copy), transferLocaleFormat (copy), handleTransferComplete (copy), Snackbar (copy), Enums (copy)
+	local v17 = useLocalization(TransferLocalizationKeys.Presets.TransferRobuxSuccessToast)
+	local v18 = useTransferStore()
+	local v19 = SignalsReact.useSignalState(v18.getSelectedAmount)
+	local v20 = not v19 and "0" or formatNumber(LocalizationService.RobloxLocaleId, v19)
+	local v21 = React.useMemo(function() -- line: 40
+		-- upvalues: transferLocaleFormat (copy), v17 (copy), v20 (copy)
+		return transferLocaleFormat.substituteAmount(v17.SuccessNotification, (tostring(v20)))
+	end, {
+		v20,
+		v17.SuccessNotification
+	})
+	local v22 = React.useRef(nil)
+
+	React.useEffect(function() -- line: 46
+		-- upvalues: v22 (copy), handleTransferComplete (copy), v18 (copy)
+		if v22.current then
+			task.cancel(v22.current)
+		end
+
+		v22.current = task.delay(5, function() -- line: 53
+			-- upvalues: handleTransferComplete (copy), v18 (copy)
+			handleTransferComplete(v18)
+		end)
+
+		return function() -- line: 59
+			-- upvalues: v22 (copy)
+			if v22.current then
+				task.cancel(v22.current)
+				v22.current = nil
+			end
+		end
+	end, {})
+
+	return React.createElement(Snackbar, {
+		ZIndex = 100,
+		title = v21,
+		icon = {
+			name = Enums.IconName.CircleCheck,
+			variant = Enums.IconVariant.Filled
+		},
+		Position = UDim2.new(0.5, 0, 0, 50),
+		AnchorPoint = Vector2.new(0.5, 0),
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		onClose = function() -- line: 81
+			-- upvalues: handleTransferComplete (copy), v18 (copy)
+			handleTransferComplete(v18)
+		end
+	})
+end
+
+return TransferRobuxSuccessToast

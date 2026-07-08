@@ -1,3 +1,6 @@
-local l_Parent_0 = script:FindFirstAncestor("Drawer").Parent;
-local _ = require(l_Parent_0.React);
-return {};
+local Parent = script:FindFirstAncestor("Drawer").Parent
+
+require(Parent.React)
+require(Parent.Foundation)
+
+return {}

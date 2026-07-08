@@ -1,57 +1,68 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialExperiments").Parent;
-local l_ExperimentCacheManager_0 = require(l_Parent_0.ExperimentCacheManager).ExperimentCacheManager;
-local v2 = game:DefineFastString("FStringPartyPageCarouselExpLayer", "Party.Coordination.UI");
-local v3 = game:DefineFastString("PartyPageCarouselVariant", "enablePartyCoordinationUi");
-local v4 = game:DefineFastFlag("ForceEnableSocialCarouselPartyPage5", false);
-local v5 = game:DefineFastFlag("EnablePartyPageCarouselExperimentation4", false);
-local function _(v6) --[[ Line: 13 ]] --[[ Name: getIsUserInTreatment ]]
-    -- upvalues: l_ExperimentCacheManager_0 (copy), v2 (copy)
-    local v7 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-    if v7 and v7[v6] ~= nil then
-        return v7[v6];
-    else
-        return false;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialExperiments").Parent
+local ExperimentCacheManager = require(Parent.ExperimentCacheManager).ExperimentCacheManager
+local v3 = game:DefineFastString("FStringPartyPageCarouselExpLayer", "Party.Coordination.UI")
+local v4 = game:DefineFastString("PartyPageCarouselVariant", "enablePartyCoordinationUi")
+local v5 = game:DefineFastFlag("ForceEnableSocialCarouselPartyPage5", false)
+local v6 = game:DefineFastFlag("EnablePartyPageCarouselExperimentation4", false)
+
+local function getIsUserInTreatment(s1: string) -- line: 13
+	-- upvalues: ExperimentCacheManager (copy), v3 (copy)
+	local v9 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+	if v9 and v9[s1] ~= nil then
+		return v9[s1]
+	end
+
+	return false
+end
+
 return {
-    getAppChatFormFactorEnabled = function() --[[ Line: 28 ]] --[[ Name: getAppChatFormFactorEnabled ]]
-        -- upvalues: v4 (copy), v5 (copy), v3 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        local l_v4_0 = v4;
-        if not l_v4_0 then
-            l_v4_0 = v5;
-            if l_v4_0 then
-                local l_v3_0 = v3;
-                local v11 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-                if v11 and v11[l_v3_0] ~= nil then
-                    return v11[l_v3_0];
-                else
-                    l_v4_0 = false;
-                end;
-            end;
-        end;
-        return l_v4_0;
-    end, 
-    getPartyPageCarouselEnabled = function() --[[ Line: 23 ]] --[[ Name: getPartyPageCarouselEnabled ]]
-        -- upvalues: v4 (copy), v5 (copy), v3 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        local l_v4_1 = v4;
-        if not l_v4_1 then
-            l_v4_1 = v5;
-            if l_v4_1 then
-                local l_v3_1 = v3;
-                local v14 = l_ExperimentCacheManager_0.default:getLayerVariables(v2);
-                if v14 and v14[l_v3_1] ~= nil then
-                    return v14[l_v3_1];
-                else
-                    l_v4_1 = false;
-                end;
-            end;
-        end;
-        return l_v4_1;
-    end, 
-    logExposure = function() --[[ Line: 33 ]] --[[ Name: logExposure ]]
-        -- upvalues: v5 (copy), l_ExperimentCacheManager_0 (copy), v2 (copy)
-        if v5 and l_ExperimentCacheManager_0.default:getLayerVariables(v2) ~= nil then
-            l_ExperimentCacheManager_0.default:logLayerExposure(v2);
-        end;
-    end
-};
+	getAppChatFormFactorEnabled = function() -- line: 28
+		-- upvalues: v5 (copy), v6 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
+		local v13 = v5
+
+		if not v13 then
+			v13 = v6
+
+			if v13 then
+				local v14 = v4
+				local v15 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+				if v15 and v15[v14] ~= nil then
+					return v15[v14]
+				end
+
+				v13 = false
+			end
+		end
+
+		return v13
+	end,
+	getPartyPageCarouselEnabled = function() -- line: 23
+		-- upvalues: v5 (copy), v6 (copy), v4 (copy), ExperimentCacheManager (copy), v3 (copy)
+		local v10 = v5
+
+		if not v10 then
+			v10 = v6
+
+			if v10 then
+				local v11 = v4
+				local v12 = ExperimentCacheManager.default:getLayerVariables(v3)
+
+				if v12 and v12[v11] ~= nil then
+					return v12[v11]
+				end
+
+				v10 = false
+			end
+		end
+
+		return v10
+	end,
+	logExposure = function() -- line: 33
+		-- upvalues: v6 (copy), ExperimentCacheManager (copy), v3 (copy)
+		if v6 and ExperimentCacheManager.default:getLayerVariables(v3) ~= nil then
+			ExperimentCacheManager.default:logLayerExposure(v3)
+		end
+	end
+}

@@ -1,22 +1,25 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.LuauPolyfill);
-local l_Array_0 = v3.Array;
-local l_Error_0 = v3.Error;
-local l_instanceof_0 = v3.instanceof;
-local l_inspect_0 = require(l_Parent_1.jsutils.inspect).inspect;
-local _ = require(l_Parent_1.language.ast);
-local l_GraphQLError_0 = require(l_Parent_0.GraphQLError).GraphQLError;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local LuauPolyfill = require(scriptParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Error = LuauPolyfill.Error
+local instanceof = LuauPolyfill.instanceof
+local inspect = require(scriptParentParent.jsutils.inspect).inspect
+
+require(scriptParentParent.language.ast)
+
+local GraphQLError = require(scriptParent.GraphQLError).GraphQLError
+
 return {
-    locatedError = function(v10, v11, v12) --[[ Line: 30 ]] --[[ Name: locatedError ]]
-        -- upvalues: l_instanceof_0 (copy), l_Error_0 (copy), l_inspect_0 (copy), l_Array_0 (copy), l_GraphQLError_0 (copy)
-        local v13 = nil;
-        v13 = if l_instanceof_0(v10, l_Error_0) then v10 else if typeof(v10) == "table" and typeof(v10.message) == "string" and v10.stack ~= nil then l_Error_0.new(v10.message) else if typeof(v10) == "table" and typeof(v10.error) == "string" then l_Error_0.new("Unexpected error value: " .. l_inspect_0(v10.error)) else l_Error_0.new("Unexpected error value: " .. l_inspect_0(v10));
-        if l_Array_0.isArray(v13.path) then
-            return v13;
-        else
-            return (l_GraphQLError_0.new(v13.message, v13.nodes or v11, v13.source, v13.positions, v12, v13));
-        end;
-    end
-};
+	locatedError = function(p1, p2, p3) -- line: 30
+		-- upvalues: instanceof (copy), Error (copy), inspect (copy), Array (copy), GraphQLError (copy)
+		local v13 = if not instanceof(p1, Error) then if typeof(p1) ~= "table" or (typeof(p1.message) ~= "string" or p1.stack == nil) then if typeof(p1) ~= "table" or typeof(p1.error) ~= "string" then Error.new("Unexpected error value: " .. inspect(p1)) else Error.new("Unexpected error value: " .. inspect(p1.error)) else Error.new(p1.message) else p1
+
+		if Array.isArray(v13.path) then
+			return v13
+		end
+
+		return (GraphQLError.new(v13.message, v13.nodes or p2, v13.source, v13.positions, p3, v13))
+	end
+}

@@ -1,6 +1,6 @@
-return require(script.Parent.Parent.Action)("ServerMemoryUpdateSearchFilter", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        searchTerm = v0, 
-        filterTypes = v1
-    };
-end);
+return require(script.Parent.Parent.Action)("ServerMemoryUpdateSearchFilter", function(p1, p2) -- line: 4
+	return {
+		searchTerm = p1,
+		filterTypes = p2
+	}
+end)

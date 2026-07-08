@@ -1,12 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameDetailRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Immutable_0 = require(l_Parent_0.AppCommonLib).Immutable;
-local v3 = require(l_script_FirstAncestor_0.GameDetails.AddGameDetailsV2);
-return function(v4, v5) --[[ Line: 9 ]]
-    -- upvalues: v3 (copy), l_Immutable_0 (copy)
-    v4 = v4 or {};
-    if v5.type == v3.name then
-        v4 = l_Immutable_0.JoinDictionaries(v4, v5.gameDetails);
-    end;
-    return v4;
-end;
+local GameDetailRodux = script:FindFirstAncestor("GameDetailRodux")
+local GameDetailRoduxParent = GameDetailRodux.Parent
+local Immutable = require(GameDetailRoduxParent.AppCommonLib).Immutable
+local AddGameDetailsV2 = require(GameDetailRodux.GameDetails.AddGameDetailsV2)
+
+return function(p1, p2) -- line: 9
+	-- upvalues: AddGameDetailsV2 (copy), Immutable (copy)
+	local v7 = p1 or {}
+
+	if p2.type == AddGameDetailsV2.name then
+		v7 = Immutable.JoinDictionaries(v7, p2.gameDetails)
+	end
+
+	return v7
+end

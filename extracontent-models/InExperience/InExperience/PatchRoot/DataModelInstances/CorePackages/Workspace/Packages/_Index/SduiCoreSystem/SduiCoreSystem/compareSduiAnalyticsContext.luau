@@ -1,27 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.tutils);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local v4 = {
-    analyticsData = true, 
-    ancestorAnalyticsData = true
-};
-return function(v5, v6) --[[ Line: 17 ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    if v5 == v6 then
-        return true;
-    else
-        for v7 in v4 do
-            local v8 = v5[v7];
-            local v9 = v6[v7];
-            if typeof(v8) == "table" and typeof(v9) == "table" then
-                if not v2.shallowEqual(v8, v9) then
-                    return false;
-                end;
-            elseif v8 and not v9 or v9 and not v8 then
-                return false;
-            end;
-        end;
-        return v2.shallowEqual(v5, v6, v4);
-    end;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local tutils = require(SduiCoreSystemParent.tutils)
+
+require(SduiCoreSystem.SduiBuilderTypes)
+
+local t1 = {
+	analyticsData = true,
+	ancestorAnalyticsData = true
+}
+
+return function(p1, p2) -- line: 17
+	-- upvalues: t1 (copy), tutils (copy)
+	if p1 == p2 then
+		return true
+	end
+
+	for v7 in t1 do
+		local v8 = p1[v7]
+		local v9 = p2[v7]
+
+		if typeof(v8) ~= "table" or typeof(v9) ~= "table" then
+			if (not v8 or v9) and (not v9 or v8) then
+				continue
+			end
+
+			return false
+		end
+
+		if not tutils.shallowEqual(v8, v9) then
+			return false
+		end
+	end
+
+	return tutils.shallowEqual(p1, p2, t1)
+end

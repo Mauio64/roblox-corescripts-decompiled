@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "purchaseFlowUUID");
+return require(script.Parent.makeActionCreator)(script.Name, "purchaseFlowUUID")

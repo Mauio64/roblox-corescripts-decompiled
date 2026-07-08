@@ -1,120 +1,129 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(script.Parent.matchAllRegex);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.RegExp);
-local l_StringTrim_0 = require(l_Parent_0.StringUtilities).StringTrim;
-local v5 = require(script.Parent.Regex);
-local _ = require(script.Parent.Types);
-local v7 = require(script.Parent.Constants);
-local v8 = {
-    protocolPatterns = {
-        "https?"
-    }, 
-    protocolStrict = false, 
-    subdomainPatterns = {
-        "www"
-    }, 
-    subdomainStrict = true, 
-    domainsPatterns = {
-        v7.ANY_DOMAIN_PATTERN
-    }, 
-    pathPatterns = nil, 
-    trimPunctuation = false
-};
-local v9 = {};
-v9.__index = v9;
-v9.new = function(v10) --[[ Line: 66 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v8 (copy), v5 (copy), v7 (copy), v3 (copy), v9 (copy)
-    local v11 = v2.Dictionary.union(v8, v10 or {});
-    local v12 = v5.oneOf(v11.protocolPatterns) .. v5.COLON .. v5.SLASH .. v5.SLASH;
-    local v13 = v5.oneOf({
-        v5.negativeLookbehind(v5.ALPHANUMERIC), 
-        v12
-    });
-    local v14 = v5.negativeLookahead(v12);
-    local v15 = v5.oneOf(v11.subdomainPatterns) .. v5.DOT;
-    local v16 = v5.oneOf(v11.domainsPatterns);
-    local v17 = if v11.pathPatterns ~= nil then v5.oneOf(v11.pathPatterns) else "";
-    local v18 = v5.zeroOrMore({
-        v5.SLASH .. v5.oneOrMore(v14 .. v7.PATH_CHAR)
-    }) .. v5.zeroOrOneOf(v5.SLASH);
-    local v19 = v5.zeroOrOneOf(v5.QUESTION .. v5.zeroOrMore(v14 .. v7.QUERY_CHAR));
-    local v20 = v5.zeroOrOneOf(v5.HASH .. v5.zeroOrMore(v14 .. v7.FRAGMENT_CHAR));
-    local v21 = v5.oneOf({
-        v5.lookahead(v12), 
-        v5.negativeLookahead(v5.ALPHANUMERIC), 
-        v5.STRING_END
-    });
-    local v22 = v5.capture(if v11.protocolStrict then v12 else v13) .. v5.capture(if v11.subdomainStrict then v5.oneOf(v15) else v5.zeroOrOneOf(v15)) .. v5.capture(v16) .. v5.capture(v5.capture(v17) .. v18) .. v5.capture(v19) .. v5.capture(v20) .. v21;
-    local v23 = {
-        _urlPattern = v3(v22, "m"), 
-        _trimPunctuation = v11.trimPunctuation, 
-        match = v9.match
-    };
-    setmetatable(v23, v9);
-    return v23;
-end;
-v9.default = function() --[[ Line: 108 ]] --[[ Name: default ]]
-    -- upvalues: v9 (copy), v8 (copy)
-    return v9.new(v8);
-end;
-v9.match = function(v24, v25) --[[ Line: 119 ]] --[[ Name: match ]]
-    -- upvalues: v1 (copy), l_StringTrim_0 (copy)
-    local v26 = {};
-    local v27 = 0;
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 122 ]]
-        -- upvalues: v1 (ref), v25 (copy), v24 (copy), v27 (ref), l_StringTrim_0 (ref), v26 (copy)
-        for _, v29 in (v1(v25:lower(), v24._urlPattern)) do
-            local v30 = v27 + v29.index;
-            local v31 = v30 + #v29.matchedText - 1;
-            v27 = v31;
-            if v24._trimPunctuation and not v29.matchedText:match("%b()$") then
-                local v32 = l_StringTrim_0(v29.matchedText, "%?%.%!%,%;%:%(%)", {
-                    right = true
-                });
-                if v32 ~= v29.matchedText then
-                    v29 = v1(v32, v24._urlPattern)[1];
-                end;
-                v31 = v30 + #v32 - 1;
-            end;
-            local v33, v34, v35, v36, v37, v38, v39 = unpack(v29.capturedGroups);
-            local v40 = v25:sub(v30, v31);
-            local v41 = #v33 + 1 + #v34 + #v35;
-            local v42 = v41 + #v36;
-            local v43 = v42 + #v38;
-            local v44 = v40:sub(v41, v42 - 1);
-            local v45 = v40:sub(v42, v43 - 1);
-            local v46 = v40:sub(v43, v43 + #v39 - 1);
-            table.insert(v26, {
-                startIndex = v30, 
-                endIndex = v31, 
-                matchedPath = v37, 
-                url = {
-                    fullText = v40, 
-                    protocol = l_StringTrim_0(v33, ":/", {
-                        right = true
-                    }), 
-                    subdomain = l_StringTrim_0(v34, ".", {
-                        right = true
-                    }), 
-                    domain = v35, 
-                    path = v44, 
-                    query = if v45 ~= "" then l_StringTrim_0(v45, "?", {
-                        left = true
-                    }) else nil, 
-                    fragment = if v46 ~= "" then l_StringTrim_0(v46, "#", {
-                        left = true
-                    }) else nil
-                }
-            });
-        end;
-        return v26;
-    end);
-    if not l_status_0 then
-        warn("UrlMatcher:match failed: " .. tostring(l_result_0));
-        return {};
-    else
-        return l_result_0 or {};
-    end;
-end;
-return v9;
+local ParentParent = script.Parent.Parent
+local matchAllRegex = require(script.Parent.matchAllRegex)
+local Cryo = require(ParentParent.Cryo)
+local RegExp = require(ParentParent.RegExp)
+local StringTrim = require(ParentParent.StringUtilities).StringTrim
+local Regex = require(script.Parent.Regex)
+
+require(script.Parent.Types)
+
+local Constants = require(script.Parent.Constants)
+local t1 = {
+	protocolStrict = false,
+	subdomainStrict = true,
+	pathPatterns = nil,
+	trimPunctuation = false,
+	protocolPatterns = { "https?" },
+	subdomainPatterns = { "www" },
+	domainsPatterns = { Constants.ANY_DOMAIN_PATTERN }
+}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(p1) -- line: 66
+	-- upvalues: Cryo (copy), t1 (copy), Regex (copy), Constants (copy), RegExp (copy), t2 (copy)
+	local v11 = Cryo.Dictionary.union(t1, p1 or {})
+	local v12 = Regex.oneOf(v11.protocolPatterns) .. Regex.COLON .. Regex.SLASH .. Regex.SLASH
+	local v13 = Regex.oneOf({
+		Regex.negativeLookbehind(Regex.ALPHANUMERIC),
+		v12
+	})
+	local v14 = Regex.negativeLookahead(v12)
+	local v15 = Regex.oneOf(v11.subdomainPatterns) .. Regex.DOT
+	local v16 = Regex.oneOf(v11.domainsPatterns)
+	local v17 = v11.pathPatterns == nil and "" or Regex.oneOf(v11.pathPatterns)
+	local v18 = Regex.zeroOrMore({ Regex.SLASH .. Regex.oneOrMore(v14 .. Constants.PATH_CHAR) }) .. Regex.zeroOrOneOf(Regex.SLASH)
+	local v19 = Regex.zeroOrOneOf(Regex.QUESTION .. Regex.zeroOrMore(v14 .. Constants.QUERY_CHAR))
+	local v20 = Regex.zeroOrOneOf(Regex.HASH .. Regex.zeroOrMore(v14 .. Constants.FRAGMENT_CHAR))
+	local v21 = Regex.oneOf({
+		Regex.lookahead(v12),
+		Regex.negativeLookahead(Regex.ALPHANUMERIC),
+		Regex.STRING_END
+	})
+	local v22 = Regex.capture((if not v11.protocolStrict then v13 else v12)) .. Regex.capture((if not v11.subdomainStrict then Regex.zeroOrOneOf(v15) else Regex.oneOf(v15))) .. Regex.capture(v16) .. Regex.capture(Regex.capture(v17) .. v18) .. Regex.capture(v19) .. Regex.capture(v20) .. v21
+	local t3 = {
+		_urlPattern = RegExp(v22, "m"),
+		_trimPunctuation = v11.trimPunctuation,
+		match = t2.match
+	}
+
+	setmetatable(t3, t2)
+
+	return t3
+end
+function t2.default() -- line: 108
+	-- upvalues: t2 (copy), t1 (copy)
+	return t2.new(t1)
+end
+function t2.match(t4: {[any]: any}, s1: string) -- line: 119
+	-- upvalues: matchAllRegex (copy), StringTrim (copy)
+	local t5 = {}
+	local n1 = 0
+	local ok, result = pcall(function() -- line: 122
+		-- upvalues: matchAllRegex (copy), s1 (copy), t4 (copy), n1 (ref), StringTrim (copy), t5 (copy)
+		for _, v31 in (matchAllRegex(s1:lower(), t4._urlPattern)) do
+			local v32 = v31
+			local v33 = n1 + v32.index
+			local v34 = v33 + #v32.matchedText - 1
+
+			n1 = v34
+
+			if t4._trimPunctuation and not v32.matchedText:match("%b()$") then
+				local v35 = StringTrim(v32.matchedText, "%?%.%!%,%;%:%(%)", {
+					right = true
+				})
+
+				if v35 ~= v32.matchedText then
+					v32 = matchAllRegex(v35, t4._urlPattern)[1]
+				end
+
+				v34 = v33 + #v35 - 1
+			end
+
+			local v36, v37, v38, v39, v40, v41, v42 = unpack(v32.capturedGroups)
+			local v43 = s1:sub(v33, v34)
+			local v44 = #v36 + 1 + #v37 + #v38
+			local v45 = v44 + #v39
+			local v46 = v45 + #v41
+			local v47 = v43:sub(v44, v45 - 1)
+			local v48 = v43:sub(v45, v46 - 1)
+			local v49 = v43:sub(v46, v46 + #v42 - 1)
+
+			table.insert(t5, {
+				startIndex = v33,
+				endIndex = v34,
+				matchedPath = v40,
+				url = {
+					fullText = v43,
+					protocol = StringTrim(v36, ":/", {
+						right = true
+					}),
+					subdomain = StringTrim(v37, ".", {
+						right = true
+					}),
+					domain = v38,
+					path = v47,
+					query = if v48 == "" then nil else StringTrim(v48, "?", {
+						left = true
+					}),
+					fragment = if v49 == "" then nil else StringTrim(v49, "#", {
+						left = true
+					})
+				}
+			})
+		end
+
+		return t5
+	end)
+
+	if not ok then
+		warn("UrlMatcher:match failed: " .. tostring(result))
+
+		return {}
+	end
+
+	return result or {}
+end
+
+return t2

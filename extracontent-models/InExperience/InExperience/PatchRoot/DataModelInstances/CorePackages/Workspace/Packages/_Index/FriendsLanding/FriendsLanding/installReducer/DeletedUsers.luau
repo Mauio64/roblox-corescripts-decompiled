@@ -1,14 +1,16 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_FriendsNetworking_0 = v1.FriendsNetworking;
-local l_llama_0 = v1.llama;
-return l_Rodux_0.createReducer({}, {
-    [l_FriendsNetworking_0.GetFriendsFromUserId.Succeeded.name] = function(_, v6) --[[ Line: 11 ]]
-        -- upvalues: l_llama_0 (copy)
-        local l_data_0 = v6.responseBody.data;
-        return l_llama_0.Dictionary.map(l_data_0, function(v8) --[[ Line: 13 ]]
-            return v8.isDeleted, (tostring(v8.id));
-        end);
-    end
-});
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local Rodux = dependencies.Rodux
+local FriendsNetworking = dependencies.FriendsNetworking
+local llama = dependencies.llama
+
+return Rodux.createReducer({}, {
+	[FriendsNetworking.GetFriendsFromUserId.Succeeded.name] = function(_, p2) -- line: 11
+		-- upvalues: llama (copy)
+		local data = p2.responseBody.data
+
+		return llama.Dictionary.map(data, function(p3) -- line: 13
+			return p3.isDeleted, (tostring(p3.id))
+		end)
+	end
+})

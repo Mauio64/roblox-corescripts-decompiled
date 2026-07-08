@@ -1,124 +1,155 @@
-local l_GuiService_0 = game:GetService("GuiService");
-local l_Parent_0 = script:FindFirstAncestor("GameTile").Parent;
-local v2 = require(l_Parent_0.AppBlox);
-local v3 = require(l_Parent_0.FocusNavigationUtils);
-local v4 = require(l_Parent_0.InputHandlers);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_Parent_0.ReactFocusNavigation);
-local v7 = require(l_Parent_0.Responsive);
-local v8 = require(l_Parent_0.SharedFlags);
-local l_getOverflowMenuSignalStore_0 = v2.getOverflowMenuSignalStore;
-local l_FocusNavigationEventNameEnum_0 = v3.FocusNavigationEventNameEnum;
-local l_GetInputModeStore_0 = v7.GetInputModeStore;
-local l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 = v8.FFlagLuaAppFixExplicitFeedbackConsoleTelemetry;
-local v13 = {
-    [Enum.KeyCode.ButtonStart] = l_FocusNavigationEventNameEnum_0.OpenQuickMenu
-};
-local v14 = {
-    [Enum.KeyCode.ButtonB] = l_FocusNavigationEventNameEnum_0.NavigateBack, 
-    [Enum.KeyCode.Escape] = l_FocusNavigationEventNameEnum_0.NavigateBack
-};
-return function(v15, v16, v17, v18) --[[ Line: 31 ]] --[[ Name: useGameTileOverflowMenuFocusNavigation ]]
-    -- upvalues: v5 (copy), l_FocusNavigationEventNameEnum_0 (copy), v4 (copy), l_getOverflowMenuSignalStore_0 (copy), l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 (copy), v6 (copy), v13 (copy), v14 (copy), l_GetInputModeStore_0 (copy), v7 (copy), l_GuiService_0 (copy)
-    local v19, v20 = v5.useState(nil);
-    local v21 = v5.useRef(false);
-    local v22, v23 = v5.useMemo(function() --[[ Line: 40 ]]
-        -- upvalues: l_FocusNavigationEventNameEnum_0 (ref), v4 (ref), l_getOverflowMenuSignalStore_0 (ref), v15 (copy), l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 (ref), v18 (copy)
-        return {
-            [l_FocusNavigationEventNameEnum_0.OpenQuickMenu] = {
-                handler = v4.onRelease(function() --[[ Line: 43 ]]
-                    -- upvalues: l_getOverflowMenuSignalStore_0 (ref), v15 (ref), l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 (ref), v18 (ref)
-                    l_getOverflowMenuSignalStore_0().openMenu(v15);
-                    if l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 and v18 then
-                        v18(false);
-                    end;
-                end)
-            }
-        }, {
-            [l_FocusNavigationEventNameEnum_0.NavigateBack] = {
-                handler = v4.onRelease(function() --[[ Line: 53 ]]
-                    -- upvalues: l_getOverflowMenuSignalStore_0 (ref), v15 (ref), l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 (ref), v18 (ref)
-                    l_getOverflowMenuSignalStore_0().closeMenu(v15);
-                    if l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 and v18 then
-                        v18(true);
-                    end;
-                end)
-            }
-        };
-    end, {
-        v15, 
-        if l_FFlagLuaAppFixExplicitFeedbackConsoleTelemetry_0 then v18 else nil
-    });
-    local v24 = v6.useEventMap(v13);
-    local v25 = v6.useEventMap(v14);
-    local v26 = v6.useEventHandlerMap(v22, v24);
-    local v27 = v6.useEventHandlerMap(v23, v25);
-    v5.useEffect(function() --[[ Line: 70 ]]
-        -- upvalues: v26 (copy), v17 (copy)
-        if v26 and v17 then
-            v26(v17.current);
-        end;
-    end, {
-        v26, 
-        v17
-    });
-    v5.useEffect(function() --[[ Line: 76 ]]
-        -- upvalues: v27 (copy), v19 (copy)
-        if v27 then
-            v27(v19);
-        end;
-    end, {
-        v27, 
-        v19
-    });
-    v5.useEffect(function() --[[ Line: 83 ]]
-        -- upvalues: l_GetInputModeStore_0 (ref), v7 (ref), v16 (copy), v19 (copy), l_GuiService_0 (ref)
-        if l_GetInputModeStore_0(false).getLastInputType(false) == v7.Input.Directional and v16 and v19 then
-            l_GuiService_0:Select(v19);
-        end;
-    end, {
-        v19
-    });
-    local v28 = v5.useRef(v16);
-    v5.useEffect(function() --[[ Line: 91 ]]
-        -- upvalues: v28 (copy), v16 (copy), v21 (copy), l_getOverflowMenuSignalStore_0 (ref), v15 (copy)
-        if v28.current ~= v16 then
-            v28.current = v16;
-            if not v16 and not v21.current then
-                l_getOverflowMenuSignalStore_0().closeMenu(v15);
-            end;
-        end;
-    end, {
-        v16
-    });
-    local v29 = v5.useCallback(function() --[[ Line: 100 ]]
-        -- upvalues: v19 (copy), l_GuiService_0 (ref), v21 (copy), l_getOverflowMenuSignalStore_0 (ref), v15 (copy)
-        if v19 and l_GuiService_0.SelectedCoreObject and l_GuiService_0.SelectedCoreObject:IsDescendantOf(v19) then
-            v21.current = true;
-            return;
-        else
-            if v21.current ~= false then
-                v21.current = false;
-                l_getOverflowMenuSignalStore_0().closeMenu(v15);
-            end;
-            return;
-        end;
-    end, {
-        v19, 
-        v15
-    });
-    v5.useLayoutEffect(function() --[[ Line: 111 ]]
-        -- upvalues: l_GuiService_0 (ref), v29 (copy)
-        local v30 = l_GuiService_0:GetPropertyChangedSignal("SelectedCoreObject"):Connect(v29);
-        v29();
-        return function() --[[ Line: 115 ]]
-            -- upvalues: v30 (copy)
-            if v30 then
-                v30:Disconnect();
-            end;
-        end;
-    end, {
-        v29
-    });
-    return v20;
-end;
+local GuiService = game:GetService("GuiService")
+local Parent = script:FindFirstAncestor("GameTile").Parent
+local AppBlox = require(Parent.AppBlox)
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local InputHandlers = require(Parent.InputHandlers)
+local React = require(Parent.React)
+local ReactFocusNavigation = require(Parent.ReactFocusNavigation)
+local Responsive = require(Parent.Responsive)
+local SharedFlags = require(Parent.SharedFlags)
+local getOverflowMenuSignalStore = AppBlox.getOverflowMenuSignalStore
+local FocusNavigationEventNameEnum = FocusNavigationUtils.FocusNavigationEventNameEnum
+local GetInputModeStore = Responsive.GetInputModeStore
+local FFlagLuaAppFixExplicitFeedbackConsoleTelemetry = SharedFlags.FFlagLuaAppFixExplicitFeedbackConsoleTelemetry
+local v14 = game:DefineFastFlag("LuaAppGameTileOverflowMenuSelectionCloseFix", false)
+local t1 = {
+	[Enum.KeyCode.ButtonStart] = FocusNavigationEventNameEnum.OpenQuickMenu
+}
+local t2 = {
+	[Enum.KeyCode.ButtonB] = FocusNavigationEventNameEnum.NavigateBack,
+	[Enum.KeyCode.Escape] = FocusNavigationEventNameEnum.NavigateBack
+}
+
+local function useGameTileOverflowMenuFocusNavigation(s1: string, b1: boolean?, p1, p2: ((...any) -> ...any)?) -- line: 33
+	-- upvalues: React (copy), FocusNavigationEventNameEnum (copy), InputHandlers (copy), getOverflowMenuSignalStore (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), ReactFocusNavigation (copy), t1 (copy), t2 (copy), GetInputModeStore (copy), Responsive (copy), GuiService (copy), v14 (copy)
+	local v22, v23 = React.useState(nil)
+	local v24 = React.useRef(false)
+	local v25, v26 = React.useMemo(function() -- line: 42
+		-- upvalues: FocusNavigationEventNameEnum (copy), InputHandlers (copy), getOverflowMenuSignalStore (copy), s1 (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), p2 (copy)
+		return {
+			[FocusNavigationEventNameEnum.OpenQuickMenu] = {
+				handler = InputHandlers.onRelease(function() -- line: 45
+					-- upvalues: getOverflowMenuSignalStore (copy), s1 (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), p2 (copy)
+					getOverflowMenuSignalStore().openMenu(s1)
+
+					if FFlagLuaAppFixExplicitFeedbackConsoleTelemetry and p2 then
+						p2(false)
+					end
+				end)
+			}
+		}, {
+			[FocusNavigationEventNameEnum.NavigateBack] = {
+				handler = InputHandlers.onRelease(function() -- line: 55
+					-- upvalues: getOverflowMenuSignalStore (copy), s1 (copy), FFlagLuaAppFixExplicitFeedbackConsoleTelemetry (copy), p2 (copy)
+					getOverflowMenuSignalStore().closeMenu(s1)
+
+					if FFlagLuaAppFixExplicitFeedbackConsoleTelemetry and p2 then
+						p2(true)
+					end
+				end)
+			}
+		}
+	end, {
+		s1,
+		if not FFlagLuaAppFixExplicitFeedbackConsoleTelemetry then nil else p2
+	})
+	local v27 = ReactFocusNavigation.useEventMap(t1)
+	local v28 = ReactFocusNavigation.useEventMap(t2)
+	local v29 = ReactFocusNavigation.useEventHandlerMap(v25, v27)
+	local v30 = ReactFocusNavigation.useEventHandlerMap(v26, v28)
+
+	React.useEffect(function() -- line: 72
+		-- upvalues: v29 (copy), p1 (copy)
+		if v29 and p1 then
+			v29(p1.current)
+		end
+	end, {
+		v29,
+		p1
+	})
+	React.useEffect(function() -- line: 78
+		-- upvalues: v30 (copy), v22 (copy)
+		if v30 then
+			v30(v22)
+		end
+	end, {
+		v30,
+		v22
+	})
+	React.useEffect(function() -- line: 85
+		-- upvalues: GetInputModeStore (copy), Responsive (copy), b1 (copy), v22 (copy), GuiService (copy)
+		if GetInputModeStore(false).getLastInputType(false) == Responsive.Input.Directional and (b1 and v22) then
+			GuiService:Select(v22)
+		end
+	end, { v22 })
+
+	local v31 = React.useRef(b1)
+
+	React.useEffect(function() -- line: 94
+		-- upvalues: v31 (copy), b1 (copy), v24 (copy), v14 (copy), getOverflowMenuSignalStore (copy), s1 (copy), GuiService (copy), p1 (copy)
+		if v31.current ~= b1 then
+			v31.current = b1
+
+			if not b1 and not v24.current then
+				if v14 then
+					local v33 = getOverflowMenuSignalStore()
+
+					if not v33.getIsMenuOpen(s1) then
+						v33.closeMenu(s1)
+
+						return
+					end
+
+					local SelectedCoreObject = GuiService.SelectedCoreObject
+
+					if p1 and p1.current and SelectedCoreObject and not SelectedCoreObject:IsDescendantOf(p1.current) then
+						v33.closeMenu(s1)
+
+						return
+					end
+				else
+					getOverflowMenuSignalStore().closeMenu(s1)
+				end
+			end
+		end
+	end, {
+		b1,
+		if not v14 then nil else s1,
+		if not v14 then nil else p1
+	})
+
+	local v32 = React.useCallback(function() -- line: 128
+		-- upvalues: v22 (copy), GuiService (copy), v24 (copy), getOverflowMenuSignalStore (copy), s1 (copy)
+		if v22 and (GuiService.SelectedCoreObject and GuiService.SelectedCoreObject:IsDescendantOf(v22)) then
+			v24.current = true
+
+			return
+		end
+
+		if v24.current ~= false then
+			v24.current = false
+			getOverflowMenuSignalStore().closeMenu(s1)
+		end
+	end, {
+		v22,
+		s1
+	})
+
+	React.useLayoutEffect(function() -- line: 139
+		-- upvalues: GuiService (copy), v32 (copy)
+		local connection = GuiService:GetPropertyChangedSignal("SelectedCoreObject"):Connect(v32)
+
+		v32()
+
+		return function() -- line: 143
+			-- upvalues: connection (copy)
+			if connection then
+				connection:Disconnect()
+			end
+		end
+	end, { v32 })
+
+	return v23
+end
+
+return useGameTileOverflowMenuFocusNavigation

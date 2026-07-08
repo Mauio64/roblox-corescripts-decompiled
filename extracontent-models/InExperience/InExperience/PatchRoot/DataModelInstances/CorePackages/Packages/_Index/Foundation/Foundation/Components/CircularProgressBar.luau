@@ -1,1 +1,1 @@
-return require(script.CircularProgressBar);
+return require(script.CircularProgressBar)

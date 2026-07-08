@@ -1,129 +1,124 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(l_CorePackages_0.Packages.Cryo);
-local v4 = require(l_Parent_0.Actions.OpenPublishAssetPrompt);
-local v5 = require(l_Parent_0.Actions.OpenPublishAvatarPrompt);
-local v6 = require(l_Parent_0.Actions.OpenPublishAvatarAssetPrompt);
-local v7 = require(l_Parent_0.Actions.CloseOpenPrompt);
-local v8 = require(l_Parent_0.Actions.OpenResultModal);
-local v9 = require(l_Parent_0.Actions.CloseResultModal);
-local v10 = require(l_Parent_0.Actions.OpenValidationErrorModal);
-local v11 = require(l_Parent_0.Actions.SetHumanoidModel);
-local v12 = require(l_Parent_0.Actions.SetAccessoryInstance);
-local v13 = require(l_Parent_0.Actions.SetPriceInRobux);
-local v14 = require(l_Parent_0.Actions.SetPromptVisibility);
-local v15 = {
-    promptInfo = {}, 
-    queue = {}
-};
-return (v2.createReducer(v15, {
-    [v4.name] = function(v16, v17) --[[ Line: 34 ]]
-        -- upvalues: v3 (copy)
-        if v16.promptInfo.promptType == nil then
-            return v3.Dictionary.join(v16, {
-                promptInfo = v17.promptInfo
-            });
-        else
-            return v3.Dictionary.join(v16, {
-                queue = v3.List.join(v16.queue, {
-                    v17.promptInfo
-                })
-            });
-        end;
-    end, 
-    [v5.name] = function(v18, v19) --[[ Line: 46 ]]
-        -- upvalues: v3 (copy)
-        if v18.promptInfo.promptType == nil then
-            return v3.Dictionary.join(v18, {
-                promptInfo = v19.promptInfo
-            });
-        else
-            return v3.Dictionary.join(v18, {
-                queue = v3.List.join(v18.queue, {
-                    v19.promptInfo
-                })
-            });
-        end;
-    end, 
-    [v6.name] = function(v20, v21) --[[ Line: 58 ]]
-        -- upvalues: v3 (copy)
-        if v20.promptInfo.promptType == nil then
-            return v3.Dictionary.join(v20, {
-                promptInfo = v21.promptInfo
-            });
-        else
-            return v3.Dictionary.join(v20, {
-                queue = v3.List.join(v20.queue, {
-                    v21.promptInfo
-                })
-            });
-        end;
-    end, 
-    [v11.name] = function(v22, v23) --[[ Line: 70 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v22, {
-            promptInfo = v3.Dictionary.join(v22.promptInfo, {
-                humanoidModel = v23.humanoidModel
-            })
-        });
-    end, 
-    [v12.name] = function(v24, v25) --[[ Line: 78 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v24, {
-            promptInfo = v3.Dictionary.join(v24.promptInfo, {
-                accessoryInstance = v25.accessoryInstance
-            })
-        });
-    end, 
-    [v13.name] = function(v26, v27) --[[ Line: 86 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v26, {
-            promptInfo = v3.Dictionary.join(v26.promptInfo, {
-                priceInRobux = v27.priceInRobux
-            })
-        });
-    end, 
-    [v7.name] = function(v28, _) --[[ Line: 94 ]]
-        -- upvalues: v3 (copy)
-        if v3.isEmpty(v28.queue) then
-            return {
-                promptInfo = {}, 
-                queue = v28.queue
-            };
-        else
-            return v3.Dictionary.join(v28, {
-                promptInfo = v28.queue[1], 
-                queue = v3.List.removeIndex(v28.queue, 1)
-            });
-        end;
-    end, 
-    [v8.name] = function(v30, v31) --[[ Line: 107 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v30, {
-            resultModalType = v31.resultType
-        });
-    end, 
-    [v9.name] = function(v32, _) --[[ Line: 114 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v32, {
-            resultModalType = v3.None
-        });
-    end, 
-    [v10.name] = function(v34, v35) --[[ Line: 120 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v34, {
-            promptInfo = v3.Dictionary.join(v34.promptInfo, {
-                errorMessage = v35.errorMessage
-            })
-        });
-    end, 
-    [v14.name] = function(v36, v37) --[[ Line: 129 ]]
-        -- upvalues: v3 (copy)
-        return v3.Dictionary.join(v36, {
-            promptInfo = v3.Dictionary.join(v36.promptInfo, {
-                promptVisible = v37.promptVisible
-            })
-        });
-    end
-}));
+local ParentParent = script.Parent.Parent
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local OpenPublishAssetPrompt = require(ParentParent.Actions.OpenPublishAssetPrompt)
+local OpenPublishAvatarPrompt = require(ParentParent.Actions.OpenPublishAvatarPrompt)
+local OpenPublishAvatarAssetPrompt = require(ParentParent.Actions.OpenPublishAvatarAssetPrompt)
+local CloseOpenPrompt = require(ParentParent.Actions.CloseOpenPrompt)
+local OpenResultModal = require(ParentParent.Actions.OpenResultModal)
+local CloseResultModal = require(ParentParent.Actions.CloseResultModal)
+local OpenValidationErrorModal = require(ParentParent.Actions.OpenValidationErrorModal)
+local SetHumanoidModel = require(ParentParent.Actions.SetHumanoidModel)
+local SetAccessoryInstance = require(ParentParent.Actions.SetAccessoryInstance)
+local SetPriceInRobux = require(ParentParent.Actions.SetPriceInRobux)
+local SetPromptVisibility = require(ParentParent.Actions.SetPromptVisibility)
+local t1 = {
+	promptInfo = {},
+	queue = {}
+}
+
+return (Rodux.createReducer(t1, {
+	[OpenPublishAssetPrompt.name] = function(p1, p2) -- line: 34
+		-- upvalues: Cryo (copy)
+		if p1.promptInfo.promptType == nil then
+			return Cryo.Dictionary.join(p1, {
+				promptInfo = p2.promptInfo
+			})
+		end
+
+		return Cryo.Dictionary.join(p1, {
+			queue = Cryo.List.join(p1.queue, { p2.promptInfo })
+		})
+	end,
+	[OpenPublishAvatarPrompt.name] = function(p3, p4) -- line: 46
+		-- upvalues: Cryo (copy)
+		if p3.promptInfo.promptType == nil then
+			return Cryo.Dictionary.join(p3, {
+				promptInfo = p4.promptInfo
+			})
+		end
+
+		return Cryo.Dictionary.join(p3, {
+			queue = Cryo.List.join(p3.queue, { p4.promptInfo })
+		})
+	end,
+	[OpenPublishAvatarAssetPrompt.name] = function(p5, p6) -- line: 58
+		-- upvalues: Cryo (copy)
+		if p5.promptInfo.promptType == nil then
+			return Cryo.Dictionary.join(p5, {
+				promptInfo = p6.promptInfo
+			})
+		end
+
+		return Cryo.Dictionary.join(p5, {
+			queue = Cryo.List.join(p5.queue, { p6.promptInfo })
+		})
+	end,
+	[SetHumanoidModel.name] = function(p7, p8) -- line: 70
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p7, {
+			promptInfo = Cryo.Dictionary.join(p7.promptInfo, {
+				humanoidModel = p8.humanoidModel
+			})
+		})
+	end,
+	[SetAccessoryInstance.name] = function(p9, p10) -- line: 78
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p9, {
+			promptInfo = Cryo.Dictionary.join(p9.promptInfo, {
+				accessoryInstance = p10.accessoryInstance
+			})
+		})
+	end,
+	[SetPriceInRobux.name] = function(p11, p12) -- line: 86
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p11, {
+			promptInfo = Cryo.Dictionary.join(p11.promptInfo, {
+				priceInRobux = p12.priceInRobux
+			})
+		})
+	end,
+	[CloseOpenPrompt.name] = function(p13, _) -- line: 94
+		-- upvalues: Cryo (copy)
+		if Cryo.isEmpty(p13.queue) then
+			return {
+				promptInfo = {},
+				queue = p13.queue
+			}
+		end
+
+		return Cryo.Dictionary.join(p13, {
+			promptInfo = p13.queue[1],
+			queue = Cryo.List.removeIndex(p13.queue, 1)
+		})
+	end,
+	[OpenResultModal.name] = function(p15, p16) -- line: 107
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p15, {
+			resultModalType = p16.resultType
+		})
+	end,
+	[CloseResultModal.name] = function(p17, _) -- line: 114
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p17, {
+			resultModalType = Cryo.None
+		})
+	end,
+	[OpenValidationErrorModal.name] = function(p19, p20) -- line: 120
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p19, {
+			promptInfo = Cryo.Dictionary.join(p19.promptInfo, {
+				errorMessage = p20.errorMessage
+			})
+		})
+	end,
+	[SetPromptVisibility.name] = function(p21, p22) -- line: 129
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p21, {
+			promptInfo = Cryo.Dictionary.join(p21.promptInfo, {
+				promptVisible = p22.promptVisible
+			})
+		})
+	end
+}))

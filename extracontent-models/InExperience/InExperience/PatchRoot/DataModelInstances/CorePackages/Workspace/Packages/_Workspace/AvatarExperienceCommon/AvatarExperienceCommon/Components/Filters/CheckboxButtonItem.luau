@@ -1,124 +1,133 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.Foundation);
-local l_Checkbox_0 = v3.Checkbox;
-local l_Text_0 = v3.Text;
-local l_View_0 = v3.View;
-local l_InputSize_0 = v3.Enums.InputSize;
-local l_useTokens_0 = v3.Hooks.useTokens;
-local l_Focusable_0 = require(l_Parent_0.RoactGamepad).Focusable;
-local v10 = require(script.Parent.ExpandingFrame);
-local function v23(v11) --[[ Line: 62 ]] --[[ Name: CheckboxButtonItem ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), l_View_0 (copy), l_Text_0 (copy), l_Focusable_0 (copy), l_Checkbox_0 (copy), l_InputSize_0 (copy), v10 (copy)
-    local v12 = l_useTokens_0();
-    local v13 = v1.useCallback(function() --[[ Line: 64 ]]
-        -- upvalues: v11 (copy)
-        if v11.onActivated then
-            v11.onActivated(v11.id);
-        end;
-    end, {
-        v11.onActivated, 
-        v11.id
-    });
-    local v14 = v11.itemHeight or v12.Size.Size_900;
-    local v15 = v1.useRef(nil);
-    local v16, v17 = v1.useBinding(v14);
-    local v20 = v1.useCallback(function(v18) --[[ Line: 76 ]]
-        -- upvalues: v14 (copy), v11 (copy), v12 (copy), v17 (copy)
-        local l_v14_0 = v14;
-        if v18 then
-            l_v14_0 = l_v14_0 + v18.AbsoluteSize.Y;
-        end;
-        if not v11.hideDivider then
-            l_v14_0 = l_v14_0 + v12.Size.Size_50;
-        end;
-        v17(l_v14_0);
-        if v11.onHeightChanged then
-            v11.onHeightChanged(l_v14_0);
-        end;
-    end, {
-        v14, 
-        v11.hideDivider, 
-        v17, 
-        v11.onHeightChanged
-    });
-    v1.useEffect(function() --[[ Line: 90 ]]
-        -- upvalues: v20 (copy), v15 (copy)
-        v20(v15.current);
-    end, {});
-    local v21 = v11.expandedView and v11.isSelected == true;
-    return v1.createElement("Frame", {
-        Size = v16:map(function(v22) --[[ Line: 97 ]]
-            return UDim2.new(1, 0, 0, v22);
-        end), 
-        BorderSizePixel = 0, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v11.layoutOrder, 
-        ref = v11.frameRef, 
-        NextSelectionLeft = v11.NextSelectionLeft, 
-        NextSelectionRight = v11.NextSelectionRight, 
-        NextSelectionUp = v11.NextSelectionUp, 
-        NextSelectionDown = v11.NextSelectionDown
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Right
-        }), 
-        Contents = v1.createElement(l_View_0, {
-            tag = "size-full row items-center padding-left-large padding-y-medium padding-right-none", 
-            LayoutOrder = 1, 
-            ref = v11.defaultChildRef, 
-            NextSelectionDown = if v21 then v15 else nil, 
-            SelectionImageObject = v11.SelectionImageObject
-        }, {
-            ClickableTextArea = v1.createElement("TextButton", {
-                Size = UDim2.new(1, -v12.Size.Size_400 - v12.Size.Size_400, 1, 0), 
-                BackgroundTransparency = 1, 
-                Text = "", 
-                Active = not v11.isDisabled, 
-                [v1.Event.Activated] = if not v11.isDisabled then v13 else nil, 
-                LayoutOrder = 1
-            }, {
-                CustomViewFrame = v11.customView and v1.createElement(l_View_0, {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    tag = "gui-object-defaults", 
-                    LayoutOrder = 1
-                }, {
-                    CustomView = v11.customView
-                }), 
-                TitleText = v11.text and not v11.customView and v1.createElement(l_Text_0, {
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    Text = v11.text, 
-                    LayoutOrder = 1, 
-                    tag = "text-title-medium content-default text-align-x-left auto-y"
-                })
-            }), 
-            RightContent = v1.createElement(l_Focusable_0[l_Checkbox_0], {
-                label = "", 
-                isChecked = v11.isSelected, 
-                isDisabled = v11.isDisabled, 
-                onActivated = v13, 
-                size = l_InputSize_0.Medium, 
-                LayoutOrder = 3
-            })
-        }), 
-        ExpandingFrame = v11.expandedView and v1.createElement(l_Focusable_0[v10], {
-            LayoutOrder = 2, 
-            Size = UDim2.new(1, 0, 0, v11.expandedViewHeight or 0), 
-            isExpanded = v11.isSelected == true, 
-            onAbsoluteSizeChanged = v20, 
-            ref = v15, 
-            NextSelectionUp = v11.defaultChildRef
-        }, {
-            ExpandedView = v11.expandedView
-        })
-    });
-end;
-return v1.forwardRef(function(v24, v25) --[[ Line: 165 ]]
-    -- upvalues: v1 (copy), v23 (copy), v2 (copy)
-    return v1.createElement(v23, v2.Dictionary.join(v24, {
-        frameRef = v25
-    }));
-end);
+local Parent = script:FindFirstAncestor("AvatarExperienceCommon").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local Foundation = require(Parent.Foundation)
+local Checkbox = Foundation.Checkbox
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local InputSize = Foundation.Enums.InputSize
+local useTokens = Foundation.Hooks.useTokens
+local Focusable = require(Parent.RoactGamepad).Focusable
+local ExpandingFrame = require(script.Parent.ExpandingFrame)
+
+local function CheckboxButtonItem(t1: {[any]: any}) -- line: 62
+	-- upvalues: useTokens (copy), React (copy), View (copy), FoundationText (copy), Focusable (copy), Checkbox (copy), InputSize (copy), ExpandingFrame (copy)
+	local v14 = useTokens()
+	local v15 = React.useCallback(function() -- line: 64
+		-- upvalues: t1 (copy)
+		if t1.onActivated then
+			t1.onActivated(t1.id)
+		end
+	end, {
+		t1.onActivated,
+		t1.id
+	})
+	local v16 = t1.itemHeight or v14.Size.Size_900
+	local v17 = React.useRef(nil)
+	local v18, v19 = React.useBinding(v16)
+	local v20 = React.useCallback(function(p1) -- line: 76
+		-- upvalues: v16 (copy), t1 (copy), v14 (copy), v19 (copy)
+		local v25 = v16
+
+		if p1 then
+			v25 += p1.AbsoluteSize.Y
+		end
+
+		if not t1.hideDivider then
+			v25 += v14.Size.Size_50
+		end
+
+		v19(v25)
+
+		if t1.onHeightChanged then
+			t1.onHeightChanged(v25)
+		end
+	end, {
+		v16,
+		t1.hideDivider,
+		v19,
+		t1.onHeightChanged
+	})
+
+	React.useEffect(function() -- line: 90
+		-- upvalues: v20 (copy), v17 (copy)
+		v20(v17.current)
+	end, {})
+
+	local v21 = t1.expandedView and t1.isSelected == true
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		Size = v18:map(function(p2) -- line: 97
+			return UDim2.new(1, 0, 0, p2)
+		end),
+		LayoutOrder = t1.layoutOrder,
+		ref = t1.frameRef,
+		NextSelectionLeft = t1.NextSelectionLeft,
+		NextSelectionRight = t1.NextSelectionRight,
+		NextSelectionUp = t1.NextSelectionUp,
+		NextSelectionDown = t1.NextSelectionDown
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right
+		}),
+		Contents = React.createElement(View, {
+			tag = "size-full row items-center padding-left-large padding-y-medium padding-right-none",
+			LayoutOrder = 1,
+			ref = t1.defaultChildRef,
+			NextSelectionDown = if not v21 then nil else v17,
+			SelectionImageObject = t1.SelectionImageObject
+		}, {
+			ClickableTextArea = React.createElement("TextButton", {
+				Size = UDim2.new(1, -v14.Size.Size_400 - v14.Size.Size_400, 1, 0),
+				BackgroundTransparency = 1,
+				Text = "",
+				Active = not t1.isDisabled,
+				[React.Event.Activated] = if t1.isDisabled then nil else v15,
+				LayoutOrder = 1
+			}, {
+				CustomViewFrame = t1.customView and React.createElement(View, {
+					tag = "gui-object-defaults",
+					LayoutOrder = 1,
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					CustomView = t1.customView
+				}),
+				TitleText = t1.text and (not t1.customView and React.createElement(FoundationText, {
+					LayoutOrder = 1,
+					tag = "text-title-medium content-default text-align-x-left auto-y",
+					Size = UDim2.new(1, 0, 1, 0),
+					Text = t1.text
+				}))
+			}),
+			RightContent = React.createElement(Focusable[Checkbox], {
+				label = "",
+				LayoutOrder = 3,
+				isChecked = t1.isSelected,
+				isDisabled = t1.isDisabled,
+				onActivated = v15,
+				size = InputSize.Medium
+			})
+		}),
+		ExpandingFrame = t1.expandedView and React.createElement(Focusable[ExpandingFrame], {
+			LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, t1.expandedViewHeight or 0),
+			isExpanded = t1.isSelected == true,
+			onAbsoluteSizeChanged = v20,
+			ref = v17,
+			NextSelectionUp = t1.defaultChildRef
+		}, {
+			ExpandedView = t1.expandedView
+		})
+	})
+end
+
+return React.forwardRef(function(p3, p4) -- line: 165
+	-- upvalues: React (copy), CheckboxButtonItem (copy), Cryo (copy)
+	return React.createElement(CheckboxButtonItem, Cryo.Dictionary.join(p3, {
+		frameRef = p4
+	}))
+end)

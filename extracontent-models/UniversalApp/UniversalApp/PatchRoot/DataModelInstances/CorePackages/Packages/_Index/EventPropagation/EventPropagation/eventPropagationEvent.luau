@@ -1,20 +1,25 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1, v2, v3, v4, v5, v6) --[[ Line: 18 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v7 = {
-        cancelled = false, 
-        phase = v4, 
-        currentInstance = v2, 
-        targetInstance = v1, 
-        eventName = v3, 
-        synthetic = v5 or false, 
-        eventData = if not (type(v6) == "table") or table.isfrozen(v6) then v6 else table.freeze(v6)
-    };
-    setmetatable(v7, v0);
-    return v7;
-end;
-v0.cancel = function(v8) --[[ Line: 41 ]] --[[ Name: cancel ]]
-    v8.cancelled = true;
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, s1: string, s2: string, b1: boolean?, p3) -- line: 18
+	-- upvalues: t1 (copy)
+	local t2 = {
+		cancelled = false,
+		phase = s2,
+		currentInstance = p2,
+		targetInstance = p1,
+		eventName = s1,
+		synthetic = b1 or false,
+		eventData = if type(p3) ~= "table" or table.isfrozen(p3) then p3 else table.freeze(p3)
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.cancel(p4) -- line: 41
+	p4.cancelled = true
+end
+
+return t1

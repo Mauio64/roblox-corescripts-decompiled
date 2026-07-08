@@ -1,56 +1,75 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.React);
-local l_useStyle_0 = require(l_CorePackages_0.Packages.UIBlox).Core.Style.useStyle;
-local v3 = require(script.Parent.AvatarPartViewport);
-return function(v4) --[[ Line: 22 ]] --[[ Name: AvatarItemCard ]]
-    -- upvalues: l_useStyle_0 (copy), v1 (copy), v3 (copy)
-    local v5 = l_useStyle_0();
-    local l_Font_0 = v5.Font;
-    local l_Theme_0 = v5.Theme;
-    local l_asset_0 = v4.asset;
-    local l_CaptionHeader_0 = l_Font_0.CaptionHeader;
-    local l_Color_0 = l_Theme_0.TextEmphasis.Color;
-    local v11 = true;
-    if typeof(l_asset_0) ~= "table" then
-        v11 = l_asset_0:IsA("MeshPart") or l_asset_0:IsA("Accessory");
-    end;
-    assert(v11, "Assert that asset is a table, MeshPart, or Accessory");
-    local l_bodyName_0 = v4.bodyName;
-    v11 = v4.partName;
-    local v13 = l_bodyName_0 and v11;
-    local v14 = nil;
-    if l_bodyName_0 and v11 then
-        assert(l_bodyName_0, "bodyName is nil");
-        assert(v11, "partName is nil");
-        v14 = l_bodyName_0 .. "'s " .. v11;
-    end;
-    return v1.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1), 
-        LayoutOrder = v4.LayoutOrder, 
-        BackgroundTransparency = 1
-    }, {
-        UIListLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 5)
-        }), 
-        AvatarPartViewport = v1.createElement(v3, {
-            asset = l_asset_0, 
-            LayoutOrder = 1, 
-            viewportSize = v4.viewportSize
-        }), 
-        TitleText = v13 and v1.createElement("TextLabel", {
-            LayoutOrder = 2, 
-            BackgroundTransparency = 1, 
-            Text = v14, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Top, 
-            Size = UDim2.new(1, 0, 0, 50), 
-            TextColor3 = l_Color_0, 
-            TextWrapped = true, 
-            Font = l_CaptionHeader_0.Font, 
-            TextSize = l_CaptionHeader_0.RelativeSize * l_Font_0.BaseSize, 
-            TextTruncate = Enum.TextTruncate.AtEnd
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local useStyle = require(CorePackages.Packages.UIBlox).Core.Style.useStyle
+local AvatarPartViewport = require(script.Parent.AvatarPartViewport)
+local GetFFlagSingleUploadMakeupSupport = require(script.Parent.Parent.Parent.Parent.Flags.GetFFlagSingleUploadMakeupSupport)
+
+local function AvatarItemCard(t1: {[any]: any}) -- line: 25
+	-- upvalues: useStyle (copy), GetFFlagSingleUploadMakeupSupport (copy), React (copy), AvatarPartViewport (copy)
+	local v8 = useStyle()
+	local Font = v8.Font
+	local Theme = v8.Theme
+	local asset = t1.asset
+	local CaptionHeader = Font.CaptionHeader
+	local TextEmphasisColor = Theme.TextEmphasis.Color
+
+	if GetFFlagSingleUploadMakeupSupport() then
+		assert(typeof(asset) == "table" or (asset:IsA("MeshPart") or (asset:IsA("Accessory") or asset:IsA("Decal"))), "Assert that asset is a table, MeshPart, Accessory, or Decal")
+	else
+		assert(typeof(asset) == "table" or (asset:IsA("MeshPart") or asset:IsA("Accessory")), "Assert that asset is a table, MeshPart, or Accessory")
+	end
+
+	local bodyName = t1.bodyName
+	local partName = t1.partName
+	local v16 = nil
+	local v17
+
+	if GetFFlagSingleUploadMakeupSupport() then
+		if bodyName and partName then
+			v16 = bodyName .. "'s " .. partName
+		elseif partName then
+			v16 = partName
+		end
+
+		v17 = v16 ~= nil
+	else
+		v17 = bodyName ~= nil and partName ~= nil
+
+		if bodyName and partName then
+			v16 = bodyName .. "'s " .. partName
+		end
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		UIListLayout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 5)
+		}),
+		AvatarPartViewport = React.createElement(AvatarPartViewport, {
+			LayoutOrder = 1,
+			asset = asset,
+			assetType = if not GetFFlagSingleUploadMakeupSupport() then nil else t1.assetType,
+			viewportSize = t1.viewportSize
+		}),
+		TitleText = v17 and React.createElement("TextLabel", {
+			LayoutOrder = 2,
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			Text = v16,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			Size = UDim2.new(1, 0, 0, 50),
+			TextColor3 = TextEmphasisColor,
+			Font = CaptionHeader.Font,
+			TextSize = CaptionHeader.RelativeSize * Font.BaseSize,
+			TextTruncate = Enum.TextTruncate.AtEnd
+		})
+	})
+end
+
+return AvatarItemCard

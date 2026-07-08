@@ -1,27 +1,32 @@
-local function v4(v0, v1) --[[ Line: 1 ]]
-    if v0.eventDate == "" or v0.eventDate == nil or v1.eventDate == "" or v1.eventDate == nil then
-        return true;
-    else
-        local v2 = DateTime.fromIsoDate(v0.eventDate) or nil;
-        local v3 = DateTime.fromIsoDate(v1.eventDate) or nil;
-        if v2 == nil or v3 == nil then
-            return true;
-        else
-            return v2.UnixTimestampMillis > v3.UnixTimestampMillis;
-        end;
-    end;
-end;
-return function(v5) --[[ Line: 16 ]]
-    -- upvalues: v4 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 17 ]]
-        -- upvalues: v5 (copy), v4 (ref)
-        local v6 = table.clone(v5);
-        table.sort(v6, v4);
-        return v6;
-    end);
-    if l_status_0 then
-        return l_result_0;
-    else
-        return v5;
-    end;
-end;
+local function v1(p1, p2) -- line: 1
+	if p1.eventDate == "" or (p1.eventDate == nil or p2.eventDate == "" or p2.eventDate == nil) then
+		return true
+	end
+
+	local v4 = DateTime.fromIsoDate(p1.eventDate) or nil
+	local v5 = DateTime.fromIsoDate(p2.eventDate) or nil
+
+	if v4 == nil or v5 == nil then
+		return true
+	end
+
+	return v4.UnixTimestampMillis > v5.UnixTimestampMillis
+end
+
+return function(p3) -- line: 16
+	-- upvalues: v1 (copy)
+	local ok, result = pcall(function() -- line: 17
+		-- upvalues: p3 (copy), v1 (copy)
+		local v9 = table.clone(p3)
+
+		table.sort(v9, v1)
+
+		return v9
+	end)
+
+	if ok then
+		return result
+	end
+
+	return p3
+end

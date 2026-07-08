@@ -1,4 +1,4 @@
 return {
-    Portrait = "Portrait", 
-    Landscape = "Landscape"
-};
+	Portrait = "Portrait",
+	Landscape = "Landscape"
+}

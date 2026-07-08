@@ -1,5 +1,5 @@
 return {
-    Startup = "Startup", 
-    SignUp = "SignUp", 
-    Login = "Login"
-};
+	Startup = "Startup",
+	SignUp = "SignUp",
+	Login = "Login"
+}

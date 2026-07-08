@@ -1,70 +1,72 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = game:DefineFastFlag("SwitchCSRootProviderTranslationsPackage", false);
-local v4 = nil;
-v4 = if v3 then require(l_Parent_0.InExperienceLocales).Localization else require(l_Parent_0.RobloxAppLocales).Localization;
-local l_LocalizationProvider_0 = require(l_Parent_0.Localization).LocalizationProvider;
-local l_DesignTokenProvider_0 = require(l_Parent_0.Style).DesignTokenProvider;
-local v7 = require(l_Parent_0.Cryo);
-local v8 = require(l_Parent_0.React);
-local v9 = require(l_Parent_0.Rodux);
-local v10 = require(l_Parent_0.RoactRodux);
-local v11 = require(l_Parent_0.UIBlox);
-local v12 = require(l_Parent_0.Foundation);
-local l_SelectionCursorProvider_0 = v11.App.SelectionImage.SelectionCursorProvider;
-local v14 = require(l_Parent_0.RobloxAppEnums);
-local v15 = require(l_Parent_0.ReactFocusNavigation);
-local l_Provider_0 = require(l_Parent_0.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider;
-local l_DeviceType_0 = v14.DeviceType;
-local l_GamepadDisconnectTokenMapper_0 = require(l_Parent_0.InputUi).Gamepad.GamepadDisconnectTokenMapper;
-local l_FeedbackManagerInjectionContextProvider_0 = require(l_Parent_0.InteractionFeedback).FeedbackManagerInjectionContextProvider;
-local l_AppInteractionFeedbackProvider_0 = require(l_Parent_0.RobloxAppInteractionFeedbackConfig).AppInteractionFeedbackProvider;
-local v21 = v15.FocusNavigationService.new(v15.EngineInterface.CoreGui);
-local v22 = {
-    themeName = "dark", 
-    fontName = "gotham", 
-    deviceType = if l_GuiService_0:IsTenFootInterface() then l_DeviceType_0.Console else l_DeviceType_0.Desktop
-};
-return function(v23) --[[ Line: 61 ]] --[[ Name: CoreScriptsRootProvider ]]
-    -- upvalues: v7 (copy), v22 (copy), v8 (copy), v10 (copy), v9 (copy), v11 (copy), l_DesignTokenProvider_0 (copy), l_GamepadDisconnectTokenMapper_0 (copy), l_SelectionCursorProvider_0 (copy), l_LocalizationProvider_0 (copy), v4 (ref), l_LocalizationService_0 (copy), v15 (copy), v21 (copy), l_Provider_0 (copy), v12 (copy), l_DeviceType_0 (copy), l_AppInteractionFeedbackProvider_0 (copy), l_FeedbackManagerInjectionContextProvider_0 (copy)
-    local v24 = v7.Dictionary.join(v22, v23.styleOverride or {});
-    local v26 = v8.createElement(v10.StoreProvider, {
-        store = v9.Store.new(function(v25) --[[ Line: 65 ]]
-            return v25;
-        end, {}, {})
-    }, {
-        AppStyleProvider = v8.createElement(v11.App.Style.AppStyleProvider, {
-            style = v24
-        }, {
-            DesignTokenProvider = v8.createElement(l_DesignTokenProvider_0, {
-                tokenMappers = {
-                    GamepadDisconnect = l_GamepadDisconnectTokenMapper_0
-                }
-            }, {
-                CursorProvider = v8.createElement(l_SelectionCursorProvider_0, {}, {
-                    LocalizationProvider = v8.createElement(l_LocalizationProvider_0, {
-                        localization = v4.new(l_LocalizationService_0.RobloxLocaleId)
-                    }, {
-                        FocusNavigationProvider = v8.createElement(v15.FocusNavigationContext.Provider, {
-                            value = v21
-                        }, {
-                            FocusNavigationRegistryProvider = v8.createElement(l_Provider_0, nil, v23.children)
-                        })
-                    })
-                })
-            })
-        })
-    });
-    v26 = v8.createElement(v12.FoundationProvider, {
-        theme = if v24.themeName == "dark" then v12.Enums.Theme.Dark else v12.Enums.Theme.Light, 
-        device = if v24.deviceType == l_DeviceType_0.Console then v12.Enums.Device.Console else v12.Enums.Device.Desktop
-    }, {
-        tree = v26
-    });
-    return (v8.createElement(l_AppInteractionFeedbackProvider_0, {}, {
-        tree = v8.createElement(l_FeedbackManagerInjectionContextProvider_0, nil, {
-            tree = v26
-        })
-    }));
-end;
+local ParentParent = script.Parent.Parent
+local LocalizationService = game:GetService("LocalizationService")
+local GuiService = game:GetService("GuiService")
+local u4 = if not game:DefineFastFlag("SwitchCSRootProviderTranslationsPackage", false) then require(ParentParent.RobloxAppLocales).Localization else require(ParentParent.InExperienceLocales).Localization
+local LocalizationProvider = require(ParentParent.Localization).LocalizationProvider
+local DesignTokenProvider = require(ParentParent.Style).DesignTokenProvider
+local Cryo = require(ParentParent.Cryo)
+local React = require(ParentParent.React)
+local Rodux = require(ParentParent.Rodux)
+local RoactRodux = require(ParentParent.RoactRodux)
+local UIBlox = require(ParentParent.UIBlox)
+local Foundation = require(ParentParent.Foundation)
+local SelectionCursorProvider = UIBlox.App.SelectionImage.SelectionCursorProvider
+local RobloxAppEnums = require(ParentParent.RobloxAppEnums)
+local ReactFocusNavigation = require(ParentParent.ReactFocusNavigation)
+local Provider = require(ParentParent.FocusNavigationUtils).FocusNavigableSurfaceRegistry.Provider
+local DeviceType = RobloxAppEnums.DeviceType
+local GamepadDisconnectTokenMapper = require(ParentParent.InputUi).Gamepad.GamepadDisconnectTokenMapper
+local FeedbackManagerInjectionContextProvider = require(ParentParent.InteractionFeedback).FeedbackManagerInjectionContextProvider
+local AppInteractionFeedbackProvider = require(ParentParent.RobloxAppInteractionFeedbackConfig).AppInteractionFeedbackProvider
+local v21 = ReactFocusNavigation.FocusNavigationService.new(ReactFocusNavigation.EngineInterface.CoreGui)
+local t1 = {
+	themeName = "dark",
+	fontName = "gotham",
+	deviceType = if not GuiService:IsTenFootInterface() then DeviceType.Desktop else DeviceType.Console
+}
+
+local function CoreScriptsRootProvider(t2: {[any]: any}) -- line: 61
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), RoactRodux (copy), Rodux (copy), UIBlox (copy), DesignTokenProvider (copy), GamepadDisconnectTokenMapper (copy), SelectionCursorProvider (copy), LocalizationProvider (copy), u4 (ref), LocalizationService (copy), ReactFocusNavigation (copy), v21 (copy), Provider (copy), Foundation (copy), DeviceType (copy), AppInteractionFeedbackProvider (copy), FeedbackManagerInjectionContextProvider (copy)
+	local v25 = Cryo.Dictionary.join(t1, t2.styleOverride or {})
+	local v26 = React.createElement(RoactRodux.StoreProvider, {
+		store = Rodux.Store.new(function(p1) -- line: 65
+			return p1
+		end, {}, {})
+	}, {
+		AppStyleProvider = React.createElement(UIBlox.App.Style.AppStyleProvider, {
+			style = v25
+		}, {
+			DesignTokenProvider = React.createElement(DesignTokenProvider, {
+				tokenMappers = {
+					GamepadDisconnect = GamepadDisconnectTokenMapper
+				}
+			}, {
+				CursorProvider = React.createElement(SelectionCursorProvider, {}, {
+					LocalizationProvider = React.createElement(LocalizationProvider, {
+						localization = u4.new(LocalizationService.RobloxLocaleId)
+					}, {
+						FocusNavigationProvider = React.createElement(ReactFocusNavigation.FocusNavigationContext.Provider, {
+							value = v21
+						}, {
+							FocusNavigationRegistryProvider = React.createElement(Provider, nil, t2.children)
+						})
+					})
+				})
+			})
+		})
+	})
+	local v27 = React.createElement(Foundation.FoundationProvider, {
+		theme = if v25.themeName ~= "dark" then Foundation.Enums.Theme.Light else Foundation.Enums.Theme.Dark,
+		device = if v25.deviceType ~= DeviceType.Console then Foundation.Enums.Device.Desktop else Foundation.Enums.Device.Console
+	}, {
+		tree = v26
+	})
+
+	return (React.createElement(AppInteractionFeedbackProvider, {}, {
+		tree = React.createElement(FeedbackManagerInjectionContextProvider, nil, {
+			tree = v27
+		})
+	}))
+end
+
+return CoreScriptsRootProvider

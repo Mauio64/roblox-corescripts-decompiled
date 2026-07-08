@@ -1,177 +1,187 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v2 = require(l_CorePackages_0.Packages.Roact);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_ShareGame_0 = l_RobloxGui_0.Modules.Settings.Pages.ShareGame;
-local v5 = require(l_RobloxGui_0.Modules.Settings.Flags.GetFFlagShareGameSearchBoxFocusAnalytics);
-local v6 = require(l_ShareGame_0.Components.SearchBox);
-local v7 = require(l_ShareGame_0.Components.IconButton);
-local v8 = require(l_ShareGame_0.Constants);
-local l_Text_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Text;
-local v10 = require(l_RobloxGui_0.Modules.Settings.Theme);
-local v11 = require(l_ShareGame_0.Actions.SetSearchAreaActive);
-local v12 = require(l_ShareGame_0.Actions.SetSearchText);
-local v13 = require(l_RobloxGui_0.Modules.Settings.Pages.ShareGame.Spritesheets.ShareGameIcons);
-local v14 = require(l_ShareGame_0.getTranslator)();
-local l_v13_ImagePath_0 = v13:GetImagePath();
-local l_v13_Frame_0 = v13:GetFrame("search_large");
-local v17 = v10.font(Enum.Font.SourceSans);
-local l_GRAY3_0 = v8.Color.GRAY3;
-local v19 = v10.textSize(20);
-local v20 = v2.PureComponent:extend("SearchArea");
-v20.init = function(v21) --[[ Line: 38 ]] --[[ Name: init ]]
-    -- upvalues: v14 (copy)
-    v21.state = {
-        cancelText = v14:FormatByKey("Feature.SettingsHub.Action.CancelSearch")
-    };
-    v21.searchField = nil;
-end;
-v20.render = function(v22) --[[ Line: 45 ]] --[[ Name: render ]]
-    -- upvalues: l_Text_0 (copy), v17 (copy), v19 (copy), v2 (copy), v7 (copy), l_v13_ImagePath_0 (copy), l_v13_Frame_0 (copy), v6 (copy), v5 (copy), l_GRAY3_0 (copy)
-    local l_fullWidthSearchBar_0 = v22.props.fullWidthSearchBar;
-    local l_searchBoxMargin_0 = v22.props.searchBoxMargin;
-    local l_anchorPoint_0 = v22.props.anchorPoint;
-    local l_position_0 = v22.props.position;
-    local l_zIndex_0 = v22.props.zIndex;
-    local l_searchAreaActive_0 = v22.props.searchAreaActive;
-    local l_size_0 = v22.props.size;
-    local l_cancelText_0 = v22.state.cancelText;
-    local v31 = l_Text_0.GetTextWidth(l_cancelText_0, v17, v19);
-    local v32 = l_searchBoxMargin_0 + v31;
-    local l_setSearchText_0 = v22.props.setSearchText;
-    if l_fullWidthSearchBar_0 then
-        return v2.createElement("Frame", {
-            AnchorPoint = l_anchorPoint_0, 
-            Position = l_position_0, 
-            Size = l_size_0, 
-            BackgroundTransparency = 1, 
-            ZIndex = l_zIndex_0
-        }, {
-            SearchButton = v2.createElement(v7, {
-                visible = not l_searchAreaActive_0, 
-                anchorPoint = l_anchorPoint_0, 
-                position = l_position_0, 
-                size = UDim2.new(0, 44, 0, 44), 
-                zIndex = l_zIndex_0, 
-                iconHorizontalAlignment = Enum.HorizontalAlignment.Right, 
-                iconSpritePath = l_v13_ImagePath_0, 
-                iconSpriteFrame = l_v13_Frame_0, 
-                onClick = function(_) --[[ Line: 82 ]] --[[ Name: onClick ]]
-                    -- upvalues: v22 (copy)
-                    v22.props.setSearchAreaActive(true);
-                end
-            }), 
-            SearchBox = v2.createElement(v6, {
-                anchorPoint = Vector2.new(0, 0.5), 
-                position = UDim2.new(0, 0, 0.5, 0), 
-                size = UDim2.new(1, -v32, 0, 28), 
-                zIndex = l_zIndex_0, 
-                visible = l_searchAreaActive_0, 
-                modalFocused = l_searchAreaActive_0, 
-                onTextChanged = l_setSearchText_0, 
-                onTextBoxFocused = function() --[[ Line: 96 ]] --[[ Name: onTextBoxFocused ]]
-                    -- upvalues: v5 (ref), v22 (copy)
-                    if v5() and v22.props.analytics then
-                        v22.props.analytics:onSearchFocused();
-                    end;
-                end, 
-                onTextBoxFocusLost = function(v35) --[[ Line: 101 ]] --[[ Name: onTextBoxFocusLost ]]
-                    -- upvalues: v22 (copy)
-                    if v35 == "" then
-                        v22.props.setSearchAreaActive(false);
-                    end;
-                end, 
-                searchFieldRef = function(v36) --[[ Line: 106 ]] --[[ Name: searchFieldRef ]]
-                    -- upvalues: v22 (copy)
-                    v22.searchField = v36;
-                end
-            }), 
-            Cancel = v2.createElement("TextButton", {
-                BackgroundTransparency = 1, 
-                AnchorPoint = Vector2.new(1, 0.5), 
-                Position = UDim2.new(1, 0, 0.5, 0), 
-                Size = UDim2.new(0, v31, 1, 0), 
-                TextSize = v19, 
-                TextColor3 = l_GRAY3_0, 
-                Font = v17, 
-                ZIndex = l_zIndex_0, 
-                Visible = l_searchAreaActive_0, 
-                [v2.Ref] = function(v37) --[[ Line: 121 ]]
-                    -- upvalues: l_cancelText_0 (copy), v22 (copy)
-                    if v37 then
-                        v37.Text = l_cancelText_0;
-                        if not v22.textConnection then
-                            v22.textConnection = v37:GetPropertyChangedSignal("Text"):connect(function() --[[ Line: 131 ]]
-                                -- upvalues: v22 (ref), v37 (copy)
-                                v22:setState({
-                                    cancelText = v37.Text
-                                });
-                            end);
-                        end;
-                    end;
-                end, 
-                [v2.Event.Activated] = function(_) --[[ Line: 139 ]]
-                    -- upvalues: v22 (copy)
-                    v22.props.setSearchAreaActive(false);
-                end
-            })
-        });
-    else
-        return v2.createElement(v6, {
-            anchorPoint = Vector2.new(1, 0.5), 
-            position = UDim2.new(1, 0, 0.5, 0), 
-            size = UDim2.new(0, 177, 0, 28), 
-            zIndex = l_zIndex_0, 
-            onTextChanged = l_setSearchText_0, 
-            searchFieldRef = function(v39) --[[ Line: 155 ]] --[[ Name: searchFieldRef ]]
-                -- upvalues: v22 (copy)
-                v22.searchField = v39;
-            end
-        });
-    end;
-end;
-v20.didUpdate = function(v40, v41) --[[ Line: 162 ]] --[[ Name: didUpdate ]]
-    local l_fullWidthSearchBar_1 = v40.props.fullWidthSearchBar;
-    if v40.searchField then
-        if not v40.props.isPageOpen and v41.isPageOpen then
-            spawn(function() --[[ Line: 170 ]]
-                -- upvalues: l_fullWidthSearchBar_1 (copy), v40 (copy)
-                if l_fullWidthSearchBar_1 then
-                    v40.props.setSearchAreaActive(false);
-                    return;
-                else
-                    v40.searchField.Text = "";
-                    return;
-                end;
-            end);
-        end;
-        if l_fullWidthSearchBar_1 then
-            local l_searchAreaActive_1 = v40.props.searchAreaActive;
-            local l_searchAreaActive_2 = v41.searchAreaActive;
-            if l_searchAreaActive_1 and not l_searchAreaActive_2 then
-                v40.searchField:CaptureFocus();
-                return;
-            elseif not l_searchAreaActive_1 and l_searchAreaActive_2 then
-                v40.searchField.Text = "";
-            end;
-        end;
-    end;
-end;
-return (v3.UNSTABLE_connect2(function(v45, _) --[[ Line: 194 ]]
-    return {
-        isPageOpen = v45.Page.IsOpen, 
-        searchAreaActive = v45.ConversationsSearch.SearchAreaActive
-    };
-end, function(v47) --[[ Line: 199 ]]
-    -- upvalues: v11 (copy), v12 (copy)
-    return {
-        setSearchAreaActive = function(v48) --[[ Line: 201 ]] --[[ Name: setSearchAreaActive ]]
-            -- upvalues: v47 (copy), v11 (ref)
-            v47(v11(v48));
-        end, 
-        setSearchText = function(v49) --[[ Line: 204 ]] --[[ Name: setSearchText ]]
-            -- upvalues: v47 (copy), v12 (ref)
-            v47(v12(v49));
-        end
-    };
-end)(v20));
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ShareGame = RobloxGui.Modules.Settings.Pages.ShareGame
+local GetFFlagShareGameSearchBoxFocusAnalytics = require(RobloxGui.Modules.Settings.Flags.GetFFlagShareGameSearchBoxFocusAnalytics)
+local SearchBox = require(ShareGame.Components.SearchBox)
+local IconButton = require(ShareGame.Components.IconButton)
+local Constants = require(ShareGame.Constants)
+local Text = require(CorePackages.Workspace.Packages.AppCommonLib).Text
+local Theme = require(RobloxGui.Modules.Settings.Theme)
+local SetSearchAreaActive = require(ShareGame.Actions.SetSearchAreaActive)
+local SetSearchText = require(ShareGame.Actions.SetSearchText)
+local ShareGameIcons = require(RobloxGui.Modules.Settings.Pages.ShareGame.Spritesheets.ShareGameIcons)
+local v15 = require(ShareGame.getTranslator)()
+local ImagePath = ShareGameIcons:GetImagePath()
+local Frame = ShareGameIcons:GetFrame("search_large")
+local v18 = Theme.font(Enum.Font.SourceSans)
+local GRAY3 = Constants.Color.GRAY3
+local v20 = Theme.textSize(20)
+local v21 = Roact.PureComponent:extend("SearchArea")
+
+function v21.init(p1) -- line: 38
+	-- upvalues: v15 (copy)
+	p1.state = {
+		cancelText = v15:FormatByKey("Feature.SettingsHub.Action.CancelSearch")
+	}
+	p1.searchField = nil
+end
+function v21.render(p2) -- line: 45
+	-- upvalues: Text (copy), v18 (copy), v20 (copy), Roact (copy), IconButton (copy), ImagePath (copy), Frame (copy), SearchBox (copy), GetFFlagShareGameSearchBoxFocusAnalytics (copy), GRAY3 (copy)
+	local fullWidthSearchBar = p2.props.fullWidthSearchBar
+	local searchBoxMargin = p2.props.searchBoxMargin
+	local anchorPoint = p2.props.anchorPoint
+	local position = p2.props.position
+	local zIndex = p2.props.zIndex
+	local searchAreaActive = p2.props.searchAreaActive
+	local size = p2.props.size
+	local cancelText = p2.state.cancelText
+	local v32 = Text.GetTextWidth(cancelText, v18, v20)
+	local v33 = searchBoxMargin + v32
+	local setSearchText = p2.props.setSearchText
+
+	if fullWidthSearchBar then
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			AnchorPoint = anchorPoint,
+			Position = position,
+			Size = size,
+			ZIndex = zIndex
+		}, {
+			SearchButton = Roact.createElement(IconButton, {
+				visible = not searchAreaActive,
+				anchorPoint = anchorPoint,
+				position = position,
+				size = UDim2.new(0, 44, 0, 44),
+				zIndex = zIndex,
+				iconHorizontalAlignment = Enum.HorizontalAlignment.Right,
+				iconSpritePath = ImagePath,
+				iconSpriteFrame = Frame,
+				onClick = function(_) -- line: 82
+					-- upvalues: p2 (copy)
+					p2.props.setSearchAreaActive(true)
+				end
+			}),
+			SearchBox = Roact.createElement(SearchBox, {
+				anchorPoint = Vector2.new(0, 0.5),
+				position = UDim2.new(0, 0, 0.5, 0),
+				size = UDim2.new(1, -v33, 0, 28),
+				zIndex = zIndex,
+				visible = searchAreaActive,
+				modalFocused = searchAreaActive,
+				onTextChanged = setSearchText,
+				onTextBoxFocused = function() -- line: 96
+					-- upvalues: GetFFlagShareGameSearchBoxFocusAnalytics (copy), p2 (copy)
+					if GetFFlagShareGameSearchBoxFocusAnalytics() and p2.props.analytics then
+						p2.props.analytics:onSearchFocused()
+					end
+				end,
+				onTextBoxFocusLost = function(p4) -- line: 101
+					-- upvalues: p2 (copy)
+					if p4 == "" then
+						p2.props.setSearchAreaActive(false)
+					end
+				end,
+				searchFieldRef = function(p5) -- line: 106
+					-- upvalues: p2 (copy)
+					p2.searchField = p5
+				end
+			}),
+			Cancel = Roact.createElement("TextButton", {
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(1, 0.5),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				Size = UDim2.new(0, v32, 1, 0),
+				TextSize = v20,
+				TextColor3 = GRAY3,
+				Font = v18,
+				ZIndex = zIndex,
+				Visible = searchAreaActive,
+				[Roact.Ref] = function(p6) -- line: 121
+					-- upvalues: cancelText (copy), p2 (copy)
+					if p6 then
+						p6.Text = cancelText
+
+						if not p2.textConnection then
+							p2.textConnection = p6:GetPropertyChangedSignal("Text"):connect(function() -- line: 131
+								-- upvalues: p2 (copy), p6 (copy)
+								p2:setState({
+									cancelText = p6.Text
+								})
+							end)
+						end
+					end
+				end,
+				[Roact.Event.Activated] = function(_) -- line: 139
+					-- upvalues: p2 (copy)
+					p2.props.setSearchAreaActive(false)
+				end
+			})
+		})
+	end
+
+	return Roact.createElement(SearchBox, {
+		anchorPoint = Vector2.new(1, 0.5),
+		position = UDim2.new(1, 0, 0.5, 0),
+		size = UDim2.new(0, 177, 0, 28),
+		zIndex = zIndex,
+		onTextChanged = setSearchText,
+		searchFieldRef = function(p8) -- line: 155
+			-- upvalues: p2 (copy)
+			p2.searchField = p8
+		end
+	})
+end
+function v21.didUpdate(p9, p10) -- line: 162
+	local fullWidthSearchBar = p9.props.fullWidthSearchBar
+
+	if p9.searchField then
+		if not p9.props.isPageOpen and p10.isPageOpen then
+			spawn(function() -- line: 170
+				-- upvalues: fullWidthSearchBar (copy), p9 (copy)
+				if fullWidthSearchBar then
+					p9.props.setSearchAreaActive(false)
+
+					return
+				end
+
+				p9.searchField.Text = ""
+			end)
+		end
+
+		if fullWidthSearchBar then
+			local searchAreaActive = p9.props.searchAreaActive
+			local searchAreaActive2 = p10.searchAreaActive
+
+			if searchAreaActive and not searchAreaActive2 then
+				p9.searchField:CaptureFocus()
+
+				return
+			end
+
+			if not searchAreaActive and searchAreaActive2 then
+				p9.searchField.Text = ""
+			end
+		end
+	end
+end
+
+return (RoactRodux.UNSTABLE_connect2(function(p11, _) -- line: 194
+	return {
+		isPageOpen = p11.Page.IsOpen,
+		searchAreaActive = p11.ConversationsSearch.SearchAreaActive
+	}
+end, function(p13) -- line: 199
+	-- upvalues: SetSearchAreaActive (copy), SetSearchText (copy)
+	return {
+		setSearchAreaActive = function(p14) -- line: 201
+			-- upvalues: p13 (copy), SetSearchAreaActive (copy)
+			p13(SetSearchAreaActive(p14))
+		end,
+		setSearchText = function(p15) -- line: 204
+			-- upvalues: p13 (copy), SetSearchText (copy)
+			p13(SetSearchText(p15))
+		end
+	}
+end)(v21))

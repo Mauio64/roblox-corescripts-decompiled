@@ -1,91 +1,100 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_console_0 = require(l_Parent_0.Shared).console;
-local v2 = {
-    Disabled = "Disabled", 
-    Suspended = "Suspended", 
-    Enabled = "Enabled"
-};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 49 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return (setmetatable({
-        _suspendedEventQueue = {}, 
-        _connections = {}, 
-        _listeners = {}, 
-        _status = v2.Disabled, 
-        _isResuming = false, 
-        _instance = v4
-    }, v3));
-end;
-v3.connectEvent = function(v5, v6, v7) --[[ Line: 77 ]] --[[ Name: connectEvent ]]
-    v5:_connect(v6, v5._instance[v6], v7);
-end;
-v3.connectPropertyChange = function(v8, v9, v10) --[[ Line: 81 ]] --[[ Name: connectPropertyChange ]]
-    local l_status_0, l_result_0 = pcall(v8._instance.GetPropertyChangedSignal, v8._instance, v9);
-    if not l_status_0 then
-        error(string.format("Cannot get changed signal on property %q: %s", tostring(v9), l_result_0), 0);
-    end;
-    v8:_connect("Change." .. v9, l_result_0, v10);
-end;
-v3._connect = function(v13, v14, v15, v16) --[[ Line: 99 ]] --[[ Name: _connect ]]
-    -- upvalues: v2 (copy)
-    if v16 == nil then
-        if v13._connections[v14] ~= nil then
-            v13._connections[v14]:Disconnect();
-            v13._connections[v14] = nil;
-        end;
-        v13._listeners[v14] = nil;
-        return;
-    else
-        if v13._connections[v14] == nil then
-            v13._connections[v14] = v15:Connect(function(...) --[[ Line: 110 ]]
-                -- upvalues: v13 (copy), v2 (ref), v14 (copy)
-                if v13._status == v2.Enabled then
-                    v13._listeners[v14](v13._instance, ...);
-                    return;
-                else
-                    if v13._status == v2.Suspended then
-                        local v17 = select("#", ...);
-                        table.insert(v13._suspendedEventQueue, {
-                            v14, 
-                            v17, 
-                            ...
-                        });
-                    end;
-                    return;
-                end;
-            end);
-        end;
-        v13._listeners[v14] = v16;
-        return;
-    end;
-end;
-v3.suspend = function(v18) --[[ Line: 130 ]] --[[ Name: suspend ]]
-    -- upvalues: v2 (copy)
-    v18._status = v2.Suspended;
-end;
-v3.resume = function(v19) --[[ Line: 134 ]] --[[ Name: resume ]]
-    -- upvalues: l_console_0 (copy), v2 (copy)
-    if v19._isResuming then
-        return;
-    else
-        v19._isResuming = true;
-        for _, v21 in v19._suspendedEventQueue do
-            local v22 = v19._listeners[v21[1]];
-            local v23 = v21[2];
-            if v22 ~= nil then
-                local v24 = coroutine.create(v22);
-                local v25, v26 = coroutine.resume(v24, v19._instance, unpack(v21, 3, 2 + v23));
-                if not v25 then
-                    l_console_0.warn("%s", v26);
-                end;
-            end;
-        end;
-        v19._isResuming = false;
-        v19._status = v2.Enabled;
-        table.clear(v19._suspendedEventQueue);
-        return;
-    end;
-end;
-return v3;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local console = require(ParentParent.Shared).console
+local _ = {
+	Disabled = "Disabled",
+	Suspended = "Suspended",
+	Enabled = "Enabled"
+}
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 49
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		_status = "Disabled",
+		_isResuming = false,
+		_suspendedEventQueue = {},
+		_connections = {},
+		_listeners = {},
+		_instance = p1
+	}, t1))
+end
+function t1.connectEvent(p2, p3, p4) -- line: 77
+	p2:_connect(p3, p2._instance[p3], p4)
+end
+function t1.connectPropertyChange(p5, p6, p7) -- line: 81
+	local ok, result = pcall(p5._instance.GetPropertyChangedSignal, p5._instance, p6)
+
+	if not ok then
+		error(string.format("Cannot get changed signal on property %q: %s", tostring(p6), result), 0)
+	end
+
+	p5:_connect("Change." .. p6, result, p7)
+end
+function t1._connect(p8, p9, p10, p11) -- line: 99
+	if p11 == nil then
+		if p8._connections[p9] ~= nil then
+			p8._connections[p9]:Disconnect()
+			p8._connections[p9] = nil
+		end
+
+		p8._listeners[p9] = nil
+
+		return
+	end
+
+	if p8._connections[p9] == nil then
+		p8._connections[p9] = p10:Connect(function(...) -- line: 110
+			-- upvalues: p8 (copy), p9 (copy)
+			if p8._status == "Enabled" then
+				p8._listeners[p9](p8._instance, ...)
+
+				return
+			end
+
+			if p8._status == "Suspended" then
+				local v27 = select("#", ...)
+
+				table.insert(p8._suspendedEventQueue, {
+					p9,
+					v27,
+					...
+				})
+			end
+		end)
+	end
+
+	p8._listeners[p9] = p11
+end
+function t1.suspend(p12) -- line: 130
+	p12._status = "Suspended"
+end
+function t1.resume(p13) -- line: 134
+	-- upvalues: console (copy)
+	if p13._isResuming then
+		return
+	end
+
+	p13._isResuming = true
+
+	for _, v21 in p13._suspendedEventQueue do
+		local v22 = p13._listeners[v21[1]]
+		local v23 = v21[2]
+
+		if v22 ~= nil then
+			local co = coroutine.create(v22)
+			local ok, result = coroutine.resume(co, p13._instance, unpack(v21, 3, 2 + v23))
+
+			if not ok then
+				console.warn("%s", result)
+			end
+		end
+	end
+
+	p13._isResuming = false
+	p13._status = "Enabled"
+	table.clear(p13._suspendedEventQueue)
+end
+
+return t1

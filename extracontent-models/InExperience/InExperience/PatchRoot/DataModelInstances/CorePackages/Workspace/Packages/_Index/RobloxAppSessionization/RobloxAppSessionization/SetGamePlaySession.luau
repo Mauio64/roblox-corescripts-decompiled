@@ -1,11 +1,13 @@
-local v0 = require(script.Parent.SessionType);
-return function(v1, v2, v3) --[[ Line: 8 ]]
-    -- upvalues: v0 (copy)
-    assert(v1, "sessionManager can't be nil");
-    v1:RemoveSessionsWithMetadataKey(v0.Metadata.GamePlay.GamePlaySession);
-    v1:SetSession(v0.StructuralIdentifier.Level1, v2, v2);
-    v1:SetMetadata(v2, v0.Metadata.GamePlay.GamePlaySession, "True");
-    if v3 then
-        v1:SetMetadata(v2, v0.Metadata.GamePlay.DeleteOnGameLeave, "True");
-    end;
-end;
+local SessionType = require(script.Parent.SessionType)
+
+return function(p1, p2, p3) -- line: 8
+	-- upvalues: SessionType (copy)
+	assert(p1, "sessionManager can't be nil")
+	p1:RemoveSessionsWithMetadataKey(SessionType.Metadata.GamePlay.GamePlaySession)
+	p1:SetSession(SessionType.StructuralIdentifier.Level1, p2, p2)
+	p1:SetMetadata(p2, SessionType.Metadata.GamePlay.GamePlaySession, "True")
+
+	if p3 then
+		p1:SetMetadata(p2, SessionType.Metadata.GamePlay.DeleteOnGameLeave, "True")
+	end
+end

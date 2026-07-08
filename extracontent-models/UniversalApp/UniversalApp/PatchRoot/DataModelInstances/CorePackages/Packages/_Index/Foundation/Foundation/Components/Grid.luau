@@ -1,7 +1,8 @@
-local v0 = require(script.Cell);
-local v1 = require(script.Debug);
+local Cell = require(script.Cell)
+local Debug = require(script.Debug)
+
 return {
-    Root = require(script.Grid), 
-    Cell = v0, 
-    Debug = v1
-};
+	Root = require(script.Grid),
+	Cell = Cell,
+	Debug = Debug
+}

@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXCatalogBodySuits) and game:DefineFastFlag("AXShowBodySuitsCategoryInCatalog", false);
+return require(script.Parent.FFlagAXCatalogBodySuits) and game:DefineFastFlag("AXShowBodySuitsCategoryInCatalog", false)

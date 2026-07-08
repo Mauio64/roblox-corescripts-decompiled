@@ -1,104 +1,105 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_RunService_0 = game:GetService("RunService");
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.t);
-local v4 = {};
-v4.__index = v4;
-local v5 = v3.tuple(v3.callback, v3.optional(v3.strictInterface({
-    queueTimeLimit = v3.optional(v3.numberPositive), 
-    queueErrorLimit = v3.optional(v3.numberPositive), 
-    queueKeyLimit = v3.optional(v3.numberPositive)
-})));
-v4.new = function(v6, v7) --[[ Line: 54 ]] --[[ Name: new ]]
-    -- upvalues: v5 (copy), v4 (copy)
-    assert(v5(v6, v7));
-    local v8 = v7 or {};
-    local v9 = {
-        _reportMethod = v6, 
-        _queueTimeLimit = v8.queueTimeLimit or 30, 
-        _queueErrorLimit = v8.queueErrorLimit or 30, 
-        _queueKeyLimit = v8.queueKeyLimit or 10, 
-        _errors = {}, 
-        _totalErrorCount = 0, 
-        _totalKeyCount = 0, 
-        _runningTime = 0, 
-        _renderSteppedConnection = nil
-    };
-    setmetatable(v9, v4);
-    return v9;
-end;
-v4.hasError = function(v10, v11) --[[ Line: 80 ]] --[[ Name: hasError ]]
-    if type(v11) ~= "string" or v11 == "" then
-        return false;
-    else
-        return v10._errors[v11] ~= nil;
-    end;
-end;
-v4.addError = function(v12, v13, v14) --[[ Line: 88 ]] --[[ Name: addError ]]
-    if type(v13) ~= "string" or v13 == "" then
-        return;
-    else
-        if not v12._errors[v13] then
-            v12._errors[v13] = {
-                data = v14, 
-                count = 1
-            };
-            v12._totalKeyCount = v12._totalKeyCount + 1;
-        else
-            v12._errors[v13].count = v12._errors[v13].count + 1;
-        end;
-        v12._totalErrorCount = v12._totalErrorCount + 1;
-        if v12:isReadyToReport() then
-            v12:reportAllErrors();
-        end;
-        return;
-    end;
-end;
-v4.isReadyToReport = function(v15) --[[ Line: 112 ]] --[[ Name: isReadyToReport ]]
-    local v16 = true;
-    if v15._totalKeyCount < v15._queueKeyLimit then
-        v16 = true;
-        if v15._totalErrorCount < v15._queueErrorLimit then
-            v16 = false;
-            if v15._totalErrorCount > 0 then
-                v16 = v15._runningTime >= v15._queueTimeLimit;
-            end;
-        end;
-    end;
-    return v16;
-end;
-v4.reportAllErrors = function(v17) --[[ Line: 118 ]] --[[ Name: reportAllErrors ]]
-    -- upvalues: v2 (copy)
-    local v18 = v2.Dictionary.join(v17._errors, {});
-    v17._errors = {};
-    v17._totalErrorCount = 0;
-    v17._totalKeyCount = 0;
-    v17._runningTime = 0;
-    for v19, v20 in pairs(v18) do
-        v17._reportMethod(v19, v20.data, v20.count);
-    end;
-end;
-v4._onRenderStep = function(v21, v22) --[[ Line: 133 ]] --[[ Name: _onRenderStep ]]
-    v21._runningTime = v21._runningTime + v22;
-    if v21:isReadyToReport() then
-        v21:reportAllErrors();
-    end;
-end;
-v4.startTimer = function(v23) --[[ Line: 141 ]] --[[ Name: startTimer ]]
-    -- upvalues: l_RunService_0 (copy)
-    if v23._renderSteppedConnection == nil then
-        v23._runningTime = 0;
-        v23._renderSteppedConnection = l_RunService_0.renderStepped:Connect(function(v24) --[[ Line: 145 ]]
-            -- upvalues: v23 (copy)
-            v23:_onRenderStep(v24);
-        end);
-    end;
-end;
-v4.stopTimer = function(v25) --[[ Line: 151 ]] --[[ Name: stopTimer ]]
-    if v25._renderSteppedConnection ~= nil then
-        v25._renderSteppedConnection:Disconnect();
-        v25._runningTime = 0;
-        v25._renderSteppedConnection = nil;
-    end;
-end;
-return v4;
+local ParentParent = script.Parent.Parent
+local RunService = game:GetService("RunService")
+local Cryo = require(ParentParent.Cryo)
+local t = require(ParentParent.t)
+local t1 = {}
+
+t1.__index = t1
+
+local v6 = t.tuple(t.callback, t.optional(t.strictInterface({
+	queueTimeLimit = t.optional(t.numberPositive),
+	queueErrorLimit = t.optional(t.numberPositive),
+	queueKeyLimit = t.optional(t.numberPositive)
+})))
+
+function t1.new(p1: ((...any) -> ...any), t2: {[any]: any}?) -- line: 54
+	-- upvalues: v6 (copy), t1 (copy)
+	assert(v6(p1, t2))
+
+	local v9 = t2 or {}
+	local t3 = {
+		_totalErrorCount = 0,
+		_totalKeyCount = 0,
+		_runningTime = 0,
+		_renderSteppedConnection = nil,
+		_reportMethod = p1,
+		_queueTimeLimit = v9.queueTimeLimit or 30,
+		_queueErrorLimit = v9.queueErrorLimit or 30,
+		_queueKeyLimit = v9.queueKeyLimit or 10,
+		_errors = {}
+	}
+
+	setmetatable(t3, t1)
+
+	return t3
+end
+function t1.hasError(t4: {[any]: any}, s1: string) -- line: 80
+	if type(s1) ~= "string" or s1 == "" then
+		return false
+	end
+
+	return t4._errors[s1] ~= nil
+end
+function t1.addError(t5: {[any]: any}, s2: string, p2) -- line: 88
+	if type(s2) ~= "string" or s2 == "" then
+		return
+	end
+
+	if not t5._errors[s2] then
+		t5._errors[s2] = {
+			count = 1,
+			data = p2
+		}
+		t5._totalKeyCount = t5._totalKeyCount + 1
+	else
+		t5._errors[s2].count = t5._errors[s2].count + 1
+	end
+
+	t5._totalErrorCount = t5._totalErrorCount + 1
+
+	if t5:isReadyToReport() then
+		t5:reportAllErrors()
+	end
+end
+function t1.isReadyToReport(p3) -- line: 112
+	return p3._totalKeyCount >= p3._queueKeyLimit or (p3._totalErrorCount >= p3._queueErrorLimit or p3._totalErrorCount > 0 and p3._runningTime >= p3._queueTimeLimit)
+end
+function t1.reportAllErrors(p4) -- line: 118
+	-- upvalues: Cryo (copy)
+	local v18 = Cryo.Dictionary.join(p4._errors, {})
+
+	p4._errors = {}
+	p4._totalErrorCount = 0
+	p4._totalKeyCount = 0
+	p4._runningTime = 0
+
+	for k, v in pairs(v18) do
+		p4._reportMethod(k, v.data, v.count)
+	end
+end
+function t1._onRenderStep(t6: {[any]: any}, n1: number) -- line: 133
+	t6._runningTime = t6._runningTime + n1
+
+	if t6:isReadyToReport() then
+		t6:reportAllErrors()
+	end
+end
+function t1.startTimer(p5) -- line: 141
+	-- upvalues: RunService (copy)
+	if p5._renderSteppedConnection == nil then
+		p5._runningTime = 0
+		p5._renderSteppedConnection = RunService.renderStepped:Connect(function(p6) -- line: 145
+			-- upvalues: p5 (copy)
+			p5:_onRenderStep(p6)
+		end)
+	end
+end
+function t1.stopTimer(p7) -- line: 151
+	if p7._renderSteppedConnection ~= nil then
+		p7._renderSteppedConnection:Disconnect()
+		p7._runningTime = 0
+		p7._renderSteppedConnection = nil
+	end
+end
+
+return t1

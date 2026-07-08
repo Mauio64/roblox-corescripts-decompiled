@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXM41AllCategoriesToTaxonomy", false);
+return game:DefineFastFlag("AXM41AllCategoriesToTaxonomy", false)

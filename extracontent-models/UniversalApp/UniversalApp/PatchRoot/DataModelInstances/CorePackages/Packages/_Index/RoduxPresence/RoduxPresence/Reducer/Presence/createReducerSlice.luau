@@ -1,48 +1,58 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxPresence");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_script_FirstAncestor_0.getDeepValue);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v5 = require(l_Actions_0.ReceivedUserPresence);
-return function(v6, v7, v8) --[[ Line: 10 ]]
-    -- upvalues: v3 (copy), v2 (copy), v5 (copy)
-    local l_presenceNetworking_0 = v8.presenceNetworking;
-    local function v16(v10, v11) --[[ Line: 13 ]] --[[ Name: handlePresenceModel ]]
-        -- upvalues: v6 (copy), v3 (ref), v7 (copy), v2 (ref)
-        local v12 = v10[v6];
-        local v13 = tostring(v11.userId);
-        local v14 = v3(v10, string.format("byUserId.%s.%s", v13, v7));
-        if v14 and v12[v14] then
-            v14 = tostring(v14);
-            v12 = v2.Dictionary.join(v12, {
-                [v14] = v2.List.removeValue(v12[v14], v13)
-            });
-        end;
-        local v15 = v12[v11[v7]];
-        if not v15 or not table.find(v15, v13) then
-            return v2.Dictionary.join(v12, {
-                [tostring(v11[v7])] = v2.List.join(v15 or {}, {
-                    v13
-                })
-            });
-        else
-            return v12;
-        end;
-    end;
-    return function(v17, v18) --[[ Line: 36 ]]
-        -- upvalues: v5 (ref), v16 (copy), l_presenceNetworking_0 (copy), v6 (copy)
-        assert(v17, "state should not be nil");
-        if v18.type == v5.name then
-            return v16(v17, v18.payload);
-        elseif v18.type == l_presenceNetworking_0.GetPresencesFromUserIds.Succeeded.name then
-            local l_userPresences_0 = v18.responseBody.userPresences;
-            local v20 = v17[v6];
-            for _, v22 in ipairs(l_userPresences_0) do
-                v20 = v16(v17, v22);
-            end;
-            return v20;
-        else
-            return v17[v6];
-        end;
-    end;
-end;
+local RoduxPresence = script:FindFirstAncestor("RoduxPresence")
+local RoduxPresenceParent = RoduxPresence.Parent
+local Cryo = require(RoduxPresenceParent.Cryo)
+local getDeepValue = require(RoduxPresence.getDeepValue)
+local Actions = RoduxPresence.Actions
+local ReceivedUserPresence = require(Actions.ReceivedUserPresence)
+
+return function(p1, p2, p3) -- line: 10
+	-- upvalues: getDeepValue (copy), Cryo (copy), ReceivedUserPresence (copy)
+	local presenceNetworking = p3.presenceNetworking
+
+	local function handlePresenceModel(p4, p5) -- line: 13
+		-- upvalues: p1 (copy), getDeepValue (copy), p2 (copy), Cryo (copy)
+		local v14 = p4[p1]
+		local str = tostring(p5.userId)
+		local v16 = getDeepValue(p4, string.format("byUserId.%s.%s", str, p2))
+
+		if v16 and v14[v16] then
+			local str2 = tostring(v16)
+
+			v14 = Cryo.Dictionary.join(v14, {
+				[str2] = Cryo.List.removeValue(v14[str2], str)
+			})
+		end
+
+		local v18 = v14[p5[p2]]
+
+		if not v18 or not table.find(v18, str) then
+			return Cryo.Dictionary.join(v14, {
+				[tostring(p5[p2])] = Cryo.List.join(v18 or {}, { str })
+			})
+		end
+
+		return v14
+	end
+
+	return function(p6, p7) -- line: 36
+		-- upvalues: ReceivedUserPresence (copy), handlePresenceModel (copy), presenceNetworking (copy), p1 (copy)
+		assert(p6, "state should not be nil")
+
+		if p7.type == ReceivedUserPresence.name then
+			return handlePresenceModel(p6, p7.payload)
+		end
+
+		if p7.type == presenceNetworking.GetPresencesFromUserIds.Succeeded.name then
+			local userPresences = p7.responseBody.userPresences
+			local v22 = p6[p1]
+
+			for _, v in ipairs(userPresences) do
+				v22 = handlePresenceModel(p6, v)
+			end
+
+			return v22
+		end
+
+		return p6[p1]
+	end
+end

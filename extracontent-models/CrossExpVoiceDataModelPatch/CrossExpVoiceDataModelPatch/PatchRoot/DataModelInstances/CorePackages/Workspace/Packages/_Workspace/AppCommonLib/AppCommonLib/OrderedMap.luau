@@ -1,160 +1,194 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1, v2, ...) --[[ Line: 51 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v3 = {
-        keys = {}, 
-        values = {}, 
-        getId = v1, 
-        sortPredicate = v2
-    };
-    setmetatable(v3, v0);
-    v0._InsertInPlace(v3, ...);
-    return v3;
-end;
-v0.Get = function(v4, v5) --[[ Line: 69 ]] --[[ Name: Get ]]
-    return v4.values[v5];
-end;
-v0.GetByIndex = function(v6, v7) --[[ Line: 76 ]] --[[ Name: GetByIndex ]]
-    local v8 = v6.keys[v7];
-    if v8 == nil then
-        return nil;
-    else
-        return v6.values[v8];
-    end;
-end;
-v0.GetIds = function(v9) --[[ Line: 89 ]] --[[ Name: GetIds ]]
-    return v9.keys;
-end;
-v0.Length = function(v10) --[[ Line: 96 ]] --[[ Name: Length ]]
-    return #v10.keys;
-end;
-v0.Delete = function(v11, ...) --[[ Line: 109 ]] --[[ Name: Delete ]]
-    -- upvalues: v0 (copy)
-    local v12 = v0.new(v11.getId, v11.sortPredicate);
-    local v13 = select("#", ...);
-    for v14, v15 in pairs(v11.values) do
-        v12.values[v14] = v15;
-    end;
-    for v16 = 1, v13 do
-        local v17 = select(v16, ...);
-        v12.values[v17] = nil;
-    end;
-    for _, v19 in ipairs(v11.keys) do
-        if v12.values[v19] ~= nil then
-            v12.keys[#v12.keys + 1] = v19;
-        end;
-    end;
-    return v12;
-end;
-v0.Insert = function(v20, ...) --[[ Line: 143 ]] --[[ Name: Insert ]]
-    -- upvalues: v0 (copy)
-    local v21 = v20:_Copy();
-    v0._InsertInPlace(v21, ...);
-    return v21;
-end;
-v0.First = function(v22) --[[ Line: 154 ]] --[[ Name: First ]]
-    if v22.keys[1] then
-        return v22:Get(v22.keys[1]);
-    else
-        return nil;
-    end;
-end;
-v0.Last = function(v23) --[[ Line: 164 ]] --[[ Name: Last ]]
-    local v24 = #v23.keys;
-    if v23.keys[v24] then
-        return v23:Get(v23.keys[v24]);
-    else
-        return nil;
-    end;
-end;
-v0.CreateIterator = function(v25) --[[ Line: 181 ]] --[[ Name: CreateIterator ]]
-    local v26 = 0;
-    local v27 = #v25.keys;
-    return function() --[[ Line: 186 ]]
-        -- upvalues: v26 (ref), v27 (copy), v25 (copy)
-        v26 = v26 + 1;
-        if v26 <= v27 then
-            local v28 = v25.keys[v26];
-            return v28, v25.values[v28], v26;
-        else
-            return nil, nil, nil;
-        end;
-    end;
-end;
-v0.CreateReverseIterator = function(v29) --[[ Line: 206 ]] --[[ Name: CreateReverseIterator ]]
-    local v30 = #v29.keys + 1;
-    return function() --[[ Line: 210 ]]
-        -- upvalues: v30 (ref), v29 (copy)
-        v30 = v30 - 1;
-        if v30 > 0 then
-            local v31 = v29.keys[v30];
-            return v31, v29.values[v31], v30;
-        else
-            return nil, nil, nil;
-        end;
-    end;
-end;
-v0.Map = function(v32, v33) --[[ Line: 233 ]] --[[ Name: Map ]]
-    -- upvalues: v0 (copy)
-    local v34 = v0.new(v32.getId, v32.sortPredicate);
-    for v35, v36 in v32:CreateIterator() do
-        v34:_InsertInPlaceUnsorted(v33(v36, v35));
-    end;
-    v34:_Sort();
-    return v34;
-end;
-v0.Merge = function(v37, ...) --[[ Line: 260 ]] --[[ Name: Merge ]]
-    local v38 = nil;
-    for v39 = 1, select("#", ...) do
-        local v40 = select(v39, ...);
-        if v40:Length() > 0 then
-            if not v38 then
-                v38 = v37:_Copy();
-            end;
-            for _, v42 in v40:CreateIterator() do
-                v38:_InsertInPlaceUnsorted(v42);
-            end;
-        end;
-    end;
-    if v38 then
-        v38:_Sort();
-        return v38;
-    else
-        return v37;
-    end;
-end;
-v0._Copy = function(v43) --[[ Line: 289 ]] --[[ Name: _Copy ]]
-    -- upvalues: v0 (copy)
-    local v44 = v0.new(v43.getId, v43.sortPredicate);
-    for v45, v46 in ipairs(v43.keys) do
-        v44.keys[v45] = v46;
-    end;
-    for v47, v48 in pairs(v43.values) do
-        v44.values[v47] = v48;
-    end;
-    return v44;
-end;
-v0._InsertInPlaceUnsorted = function(v49, ...) --[[ Line: 309 ]] --[[ Name: _InsertInPlaceUnsorted ]]
-    for v50 = 1, select("#", ...) do
-        local v51 = select(v50, ...);
-        local v52 = v49.getId(v51);
-        if not v49.values[v52] then
-            table.insert(v49.keys, v52);
-        end;
-        v49.values[v52] = v51;
-    end;
-end;
-v0._Sort = function(v53) --[[ Line: 328 ]] --[[ Name: _Sort ]]
-    table.sort(v53.keys, function(v54, v55) --[[ Line: 329 ]]
-        -- upvalues: v53 (copy)
-        local v56 = v53.values[v54];
-        local v57 = v53.values[v55];
-        return v53.sortPredicate(v56, v57);
-    end);
-end;
-v0._InsertInPlace = function(v58, ...) --[[ Line: 342 ]] --[[ Name: _InsertInPlace ]]
-    v58:_InsertInPlaceUnsorted(...);
-    v58:_Sort();
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, ...) -- line: 51
+	-- upvalues: t1 (copy)
+	local t2 = {
+		keys = {},
+		values = {},
+		getId = p1,
+		sortPredicate = p2
+	}
+
+	setmetatable(t2, t1)
+	t1._InsertInPlace(t2, ...)
+
+	return t2
+end
+function t1.Get(p3, p4) -- line: 69
+	return p3.values[p4]
+end
+function t1.GetByIndex(p5, p6) -- line: 76
+	local v9 = p5.keys[p6]
+
+	if v9 == nil then
+		return nil
+	end
+
+	return p5.values[v9]
+end
+function t1.GetIds(p7) -- line: 89
+	return p7.keys
+end
+function t1.Length(p8) -- line: 96
+	return #p8.keys
+end
+function t1.Delete(p9, ...) -- line: 109
+	-- upvalues: t1 (copy)
+	local v13 = t1.new(p9.getId, p9.sortPredicate)
+	local v14 = select("#", ...)
+
+	for k, v in pairs(p9.values) do
+		v13.values[k] = v
+	end
+
+	for i = 1, v14 do
+		local v18 = select(i, ...)
+
+		v13.values[v18] = nil
+	end
+
+	for _, v in ipairs(p9.keys) do
+		if v13.values[v] ~= nil then
+			v13.keys[#v13.keys + 1] = v
+		end
+	end
+
+	return v13
+end
+function t1.Insert(p10, ...) -- line: 143
+	-- upvalues: t1 (copy)
+	local v22 = p10:_Copy()
+
+	t1._InsertInPlace(v22, ...)
+
+	return v22
+end
+function t1.First(p11) -- line: 154
+	if p11.keys[1] then
+		return p11:Get(p11.keys[1])
+	end
+
+	return nil
+end
+function t1.Last(p12) -- line: 164
+	local v25 = #p12.keys
+
+	if p12.keys[v25] then
+		return p12:Get(p12.keys[v25])
+	end
+
+	return nil
+end
+function t1.CreateIterator(p13) -- line: 181
+	local n1 = 0
+	local v28 = #p13.keys
+
+	return function() -- line: 186
+		-- upvalues: n1 (ref), v28 (copy), p13 (copy)
+		n1 += 1
+
+		if n1 <= v28 then
+			local v54 = p13.keys[n1]
+
+			return v54, p13.values[v54], n1
+		end
+
+		return nil, nil, nil
+	end
+end
+function t1.CreateReverseIterator(p14) -- line: 206
+	local u30 = #p14.keys + 1
+
+	return function() -- line: 210
+		-- upvalues: u30 (ref), p14 (copy)
+		u30 -= 1
+
+		if u30 > 0 then
+			local v55 = p14.keys[u30]
+
+			return v55, p14.values[v55], u30
+		end
+
+		return nil, nil, nil
+	end
+end
+function t1.Map(p15, p16) -- line: 233
+	-- upvalues: t1 (copy)
+	local v33 = t1.new(p15.getId, p15.sortPredicate)
+
+	for v34, v35 in p15:CreateIterator() do
+		v33:_InsertInPlaceUnsorted(p16(v35, v34))
+	end
+
+	v33:_Sort()
+
+	return v33
+end
+function t1.Merge(p17, ...) -- line: 260
+	local v37 = nil
+
+	for i = 1, select("#", ...) do
+		local v39 = select(i, ...)
+
+		if v39:Length() > 0 then
+			if not v37 then
+				v37 = p17:_Copy()
+			end
+
+			for _, v41 in v39:CreateIterator() do
+				v37:_InsertInPlaceUnsorted(v41)
+			end
+		end
+	end
+
+	if v37 then
+		v37:_Sort()
+
+		return v37
+	end
+
+	return p17
+end
+function t1._Copy(p18) -- line: 289
+	-- upvalues: t1 (copy)
+	local v43 = t1.new(p18.getId, p18.sortPredicate)
+
+	for i, v in ipairs(p18.keys) do
+		v43.keys[i] = v
+	end
+
+	for k, v in pairs(p18.values) do
+		v43.values[k] = v
+	end
+
+	return v43
+end
+function t1._InsertInPlaceUnsorted(p19, ...) -- line: 309
+	for i = 1, select("#", ...) do
+		local v50 = select(i, ...)
+		local v51 = p19.getId(v50)
+
+		if not p19.values[v51] then
+			table.insert(p19.keys, v51)
+		end
+
+		p19.values[v51] = v50
+	end
+end
+function t1._Sort(p20) -- line: 328
+	table.sort(p20.keys, function(p21, p22) -- line: 329
+		-- upvalues: p20 (copy)
+		local v58 = p20.values[p21]
+		local v59 = p20.values[p22]
+
+		return p20.sortPredicate(v58, v59)
+	end)
+end
+function t1._InsertInPlace(p23, ...) -- line: 342
+	p23:_InsertInPlaceUnsorted(...)
+	p23:_Sort()
+end
+
+return t1

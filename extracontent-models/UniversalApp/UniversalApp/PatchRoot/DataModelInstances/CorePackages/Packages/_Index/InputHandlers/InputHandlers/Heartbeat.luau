@@ -1,1 +1,1 @@
-return game:GetService("RunService").Heartbeat;
+return game:GetService("RunService").Heartbeat

@@ -1,44 +1,61 @@
-local l_Players_0 = game:GetService("Players");
-local v1 = {
-    Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157), 
-    Color3.new(0.00392156862745098, 0.6352941176470588, 1), 
-    Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353), 
-    BrickColor.new("Alder").Color, 
-    BrickColor.new("Bright orange").Color, 
-    BrickColor.new("Bright yellow").Color, 
-    BrickColor.new("Light reddish violet").Color, 
-    BrickColor.new("Brick yellow").Color
-};
-local function v7(v2) --[[ Line: 14 ]] --[[ Name: GetNameValue ]]
-    local v3 = 0;
-    for v4 = 1, #v2 do
-        local v5 = string.byte((string.sub(v2, v4, v4)));
-        local v6 = #v2 - v4 + 1;
-        if #v2 % 2 == 1 then
-            v6 = v6 - 1;
-        end;
-        if v6 % 4 >= 2 then
-            v5 = -v5;
-        end;
-        v3 = v3 + v5;
-    end;
-    return v3;
-end;
-local function _(v8) --[[ Line: 31 ]] --[[ Name: ComputeNameColor ]]
-    -- upvalues: v1 (copy), v7 (copy)
-    return v1[(v7(v8) + 0) % #v1 + 1];
-end;
-return function(v10) --[[ Line: 35 ]] --[[ Name: GetNameColor ]]
-    -- upvalues: l_Players_0 (copy), v1 (copy), v7 (copy)
-    local l_l_Players_0_PlayerByUserId_0 = l_Players_0:GetPlayerByUserId(v10);
-    if l_l_Players_0_PlayerByUserId_0 then
-        if l_l_Players_0_PlayerByUserId_0.Team ~= nil then
-            return l_l_Players_0_PlayerByUserId_0.TeamColor.Color;
-        else
-            local l_Name_0 = l_l_Players_0_PlayerByUserId_0.Name;
-            return v1[(v7(l_Name_0) + 0) % #v1 + 1];
-        end;
-    else
-        return Color3.fromRGB(255, 255, 255);
-    end;
-end;
+local Players = game:GetService("Players")
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local computeNameColor
+
+if require(Parent.ExpChatShared).Flags.GetFFlagTextChatEnableUniverseChatTabs() then
+	computeNameColor = require(Parent.ChatUIPrimitives).Utils.computeNameColor
+else
+	local t1 = {
+		Color3.new(0.9921568627450981, 0.1607843137254902, 0.2627450980392157),
+		Color3.new(0.00392156862745098, 0.6352941176470588, 1),
+		Color3.new(0.00784313725490196, 0.7215686274509804, 0.3411764705882353),
+		BrickColor.new("Alder").Color,
+		BrickColor.new("Bright orange").Color,
+		BrickColor.new("Bright yellow").Color,
+		BrickColor.new("Light reddish violet").Color,
+		BrickColor.new("Brick yellow").Color
+	}
+
+	local function GetNameValue(s1: string) -- line: 24
+		local n1 = 0
+
+		for i = 1, #s1 do
+			local byte = string.byte((string.sub(s1, i, i)))
+			local v11 = #s1 - i + 1
+
+			if #s1 % 2 == 1 then
+				v11 -= 1
+			end
+
+			if v11 % 4 >= 2 then
+				byte = -byte
+			end
+
+			n1 += byte
+		end
+
+		return n1
+	end
+
+	function computeNameColor(s2: string) -- line: 42
+		-- upvalues: t1 (copy), GetNameValue (copy)
+		return t1[(GetNameValue(s2) + 0) % #t1 + 1]
+	end
+end
+
+local function GetNameColor(n2: number) -- line: 47
+	-- upvalues: Players (copy), computeNameColor (ref)
+	local PlayerByUserId = Players:GetPlayerByUserId(n2)
+
+	if PlayerByUserId then
+		if PlayerByUserId.Team ~= nil then
+			return PlayerByUserId.TeamColor.Color
+		end
+
+		return computeNameColor(PlayerByUserId.Name)
+	end
+
+	return Color3.fromRGB(255, 255, 255)
+end
+
+return GetNameColor

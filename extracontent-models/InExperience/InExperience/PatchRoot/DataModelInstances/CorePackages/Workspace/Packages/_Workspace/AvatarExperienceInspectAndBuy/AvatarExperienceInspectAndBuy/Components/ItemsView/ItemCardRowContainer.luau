@@ -1,13 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.AXCommon);
-local _ = require(l_script_FirstAncestor_0.Types);
-local v5 = require(l_script_FirstAncestor_0.Components.useItemCardRowProps);
-local _ = require(l_script_FirstAncestor_0.Enums.ViewType);
-local l_CatalogRowItemCard_0 = v3.Components.CatalogItemCard.CatalogRowItemCard;
-return function(v8) --[[ Line: 19 ]]
-    -- upvalues: v5 (copy), v2 (copy), l_CatalogRowItemCard_0 (copy)
-    local v9 = v5(v8.item, v8.LayoutOrder, v8.view, v8.onItemCardActivated, v8.itemCardWidth);
-    return v2.createElement(l_CatalogRowItemCard_0, v9);
-end;
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+local AXCommon = require(AvatarExperienceInspectAndBuyParent.AXCommon)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local useItemCardRowProps = require(AvatarExperienceInspectAndBuy.Components.useItemCardRowProps)
+
+require(AvatarExperienceInspectAndBuy.Enums.ViewType)
+
+local CatalogRowItemCard = AXCommon.Components.CatalogItemCard.CatalogRowItemCard
+
+return function(t1: {[any]: any}) -- line: 19
+	-- upvalues: useItemCardRowProps (copy), React (copy), CatalogRowItemCard (copy)
+	local v8 = useItemCardRowProps(t1.item, t1.LayoutOrder, t1.view, t1.onItemCardActivated, t1.itemCardWidth)
+
+	return React.createElement(CatalogRowItemCard, v8)
+end

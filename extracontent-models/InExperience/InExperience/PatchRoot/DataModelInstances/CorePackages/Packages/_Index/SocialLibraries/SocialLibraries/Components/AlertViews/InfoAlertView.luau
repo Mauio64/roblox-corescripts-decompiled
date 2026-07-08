@@ -1,42 +1,43 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialLibraries");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Roact_0 = v1.Roact;
-local l_Components_0 = l_script_FirstAncestor_0.Components;
-local l_ButtonType_0 = v1.UIBlox.App.Button.Enum.ButtonType;
-local v5 = require(l_Components_0.AlertViewBuilder.AlertViewBuilder);
-local v6 = l_Roact_0.Component:extend("InfoAlertView");
-v6.defaultProps = {
-    titleText = "TestTitle", 
-    bodyText = "TestBody", 
-    confirmText = "TestConfirm", 
-    width = UDim.new(0.5, 0), 
-    screenSize = Vector2.new(0, 0), 
-    onModalClose = function() --[[ Line: 18 ]] --[[ Name: onModalClose ]]
+local SocialLibraries = script:FindFirstAncestor("SocialLibraries")
+local dependencies = require(SocialLibraries.dependencies)
+local Roact = dependencies.Roact
+local Components = SocialLibraries.Components
+local ButtonType = dependencies.UIBlox.App.Button.Enum.ButtonType
+local AlertViewBuilder = require(Components.AlertViewBuilder.AlertViewBuilder)
+local v7 = Roact.Component:extend("InfoAlertView")
 
-    end, 
-    soakAreaColor3 = Color3.fromRGB(0, 0, 255), 
-    soakAreaTransparency = 0.9
-};
-v6.render = function(v7) --[[ Line: 24 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), v5 (copy), l_ButtonType_0 (copy)
-    local l_props_0 = v7.props;
-    return l_Roact_0.createElement(v5, {
-        title = l_props_0.titleText, 
-        bodyText = l_props_0.bodyText, 
-        width = l_props_0.width, 
-        screenSize = l_props_0.screenSize, 
-        onModalClose = l_props_0.onModalClose, 
-        buttons = {
-            {
-                buttonType = l_ButtonType_0.PrimarySystem, 
-                props = {
-                    text = l_props_0.confirmText, 
-                    onActivated = l_props_0.onModalClose
-                }
-            }
-        }, 
-        soakAreaColor3 = l_props_0.soakAreaColor3, 
-        soakAreaTransparency = l_props_0.soakAreaTransparency
-    });
-end;
-return v6;
+v7.defaultProps = {
+	titleText = "TestTitle",
+	bodyText = "TestBody",
+	confirmText = "TestConfirm",
+	soakAreaTransparency = 0.9,
+	width = UDim.new(0.5, 0),
+	screenSize = Vector2.new(0, 0),
+	onModalClose = function() -- line: 18
+	end,
+	soakAreaColor3 = Color3.fromRGB(0, 0, 255)
+}
+
+function v7.render(p1) -- line: 24
+	-- upvalues: Roact (copy), AlertViewBuilder (copy), ButtonType (copy)
+	local props = p1.props
+
+	return Roact.createElement(AlertViewBuilder, {
+		title = props.titleText,
+		bodyText = props.bodyText,
+		width = props.width,
+		screenSize = props.screenSize,
+		onModalClose = props.onModalClose,
+		buttons = {{
+			buttonType = ButtonType.PrimarySystem,
+			props = {
+				text = props.confirmText,
+				onActivated = props.onModalClose
+			}
+		}},
+		soakAreaColor3 = props.soakAreaColor3,
+		soakAreaTransparency = props.soakAreaTransparency
+	})
+end
+
+return v7

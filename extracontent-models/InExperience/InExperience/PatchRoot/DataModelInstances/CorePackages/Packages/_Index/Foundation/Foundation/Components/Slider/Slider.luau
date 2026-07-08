@@ -1,273 +1,299 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Constants);
-local v4 = require(l_script_FirstAncestor_0.Utility.Input.InputMode);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = require(l_script_FirstAncestor_0.Components.View);
-local v7 = require(l_script_FirstAncestor_0.Utility.useBindable);
-local v8 = require(l_script_FirstAncestor_0.Utility.Input.useLastInputMode);
-local v9 = require(l_script_FirstAncestor_0.Utility.usePointerPosition);
-local v10 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v11 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v12 = require(script.Parent.calculateNextStepValue);
-local v13 = require(script.Parent.calculatePixelsPerStep);
-local v14 = require(script.Parent.calculateSliderPositionDelta);
-local v15 = require(script.Parent.calculateSliderStepValue);
-local v16 = require(script.Parent.calculateSliderValueFromPosition);
-local v17 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v18 = require(l_script_FirstAncestor_0.Enums.Visibility);
-local v19 = require(l_script_FirstAncestor_0.Enums.SliderVariant);
-local v20 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local v21 = require(l_script_FirstAncestor_0.Enums.ControlState);
-local v22 = require(l_script_FirstAncestor_0.Enums.StateLayerAffordance);
-local v23 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v24 = require(l_script_FirstAncestor_0.Components.Knob);
-local v25 = require(l_script_FirstAncestor_0.Providers.Style.PresentationContext);
-local v26 = require(l_script_FirstAncestor_0.Components.Slider.useSliderMotionStates);
-local v27 = require(l_script_FirstAncestor_0.Components.Slider.useSliderVariants);
-local v28 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v29 = {
-    range = NumberRange.new(0, 1), 
-    size = v17.Medium, 
-    width = UDim.new(1, 0), 
-    variant = v19.Standard, 
-    isDisabled = false, 
-    isContained = false, 
-    knobVisibility = v18.Auto, 
-    testId = "--foundation-slider"
-};
-local v30 = {
-    colorMode = v20.Inverse
-};
-return v2.forwardRef(function(v31, v32) --[[ Line: 86 ]] --[[ Name: Slider ]]
-    -- upvalues: v11 (copy), v29 (copy), v28 (copy), v2 (copy), v21 (copy), v7 (copy), v8 (copy), v9 (copy), v27 (copy), v26 (copy), v18 (copy), v16 (copy), v15 (copy), v4 (copy), v13 (copy), v12 (copy), v14 (copy), v6 (copy), v10 (copy), v3 (copy), v22 (copy), v23 (copy), v25 (copy), v30 (copy), v24 (copy)
-    local v33 = v11(v31, v29);
-    local v34 = v28();
-    local v35, v36 = v2.useState(v21.Initialize);
-    local v37, v38 = v2.useState(false);
-    local v39, v40 = v2.useState(false);
-    local v42 = v7(v33.value):map(function(v41) --[[ Line: 92 ]]
-        -- upvalues: v33 (copy)
-        return (math.clamp(v41, v33.range.Min, v33.range.Max));
-    end);
-    local v43 = v2.useRef(nil);
-    local v44 = v8();
-    local v45 = v2.useRef(nil);
-    v2.useImperativeHandle(v32, function() --[[ Line: 99 ]]
-        -- upvalues: v45 (copy)
-        return v45.current;
-    end, {});
-    local v46 = v9(v45.current);
-    local v47 = v27(v34, v33.size, v33.variant);
-    local v48 = v26(v47.knob.style, v47.knob.dragStyle);
-    local v49 = v2.useMemo(function() --[[ Line: 109 ]]
-        -- upvalues: v39 (copy), v48 (copy), v37 (copy)
-        if not v39 then
-            return v48.Hidden;
-        elseif v37 then
-            return v48.Dragging;
-        else
-            return v48.Idle;
-        end;
-    end, {
-        v34, 
-        v39, 
-        v37, 
-        v48
-    });
-    v2.useEffect(function() --[[ Line: 116 ]]
-        -- upvalues: v33 (copy), v18 (ref), v40 (copy), v37 (copy), v35 (copy), v21 (ref)
-        if v33.knobVisibility == v18.None then
-            v40(false);
-            return;
-        elseif v33.knobVisibility == v18.Always then
-            v40(true);
-            return;
-        else
-            v40(v37 or v35 == v21.Hover or v35 == v21.Selected or v35 == v21.Pressed);
-            return;
-        end;
-    end, {
-        v33.knobVisibility, 
-        v35, 
-        v37
-    });
-    local v52 = v2.useCallback(function(v50) --[[ Line: 131 ]]
-        -- upvalues: v45 (copy), v16 (ref), v33 (copy), v15 (ref)
-        if v45.current then
-            local v51 = v16(v50, v45.current, v33.range);
-            if v33.step then
-                return v15(v51, v33.step, v33.range);
-            else
-                return v51;
-            end;
-        else
-            return 0;
-        end;
-    end, {
-        v45, 
-        v33.range, 
-        v33.step
-    });
-    local v54 = v2.useCallback(function(v53) --[[ Line: 144 ]]
-        -- upvalues: v42 (copy), v33 (copy)
-        if v53 ~= v42:getValue() and v33.onValueChanged then
-            v33.onValueChanged(v53);
-        end;
-    end, {
-        v42, 
-        v33.onValueChanged
-    });
-    local v56 = v2.useCallback(function() --[[ Line: 152 ]]
-        -- upvalues: v52 (copy), v46 (copy), v54 (copy)
-        local v55 = v52(v46:getValue());
-        v54(v55);
-    end, {
-        v52, 
-        v46, 
-        v54
-    });
-    local v59 = v2.useCallback(function(_, v58) --[[ Line: 157 ]]
-        -- upvalues: v43 (copy), v38 (copy), v33 (copy)
-        v43.current = v58;
-        v38(true);
-        if v33.onDragStarted then
-            v33.onDragStarted();
-        end;
-    end, {
-        v33.onDragStarted
-    });
-    local v71 = v2.useCallback(function(_, v61) --[[ Line: 166 ]]
-        -- upvalues: v45 (copy), v43 (copy), v33 (copy), v44 (copy), v4 (ref), v13 (ref), v42 (copy), v12 (ref), v54 (copy), v52 (copy), v14 (ref)
-        if v45.current and v43.current then
-            if v33.step and v33.step > 0 then
-                if v44 == v4.Directional then
-                    local v62 = v61 - v43.current;
-                    local v63 = math.abs(v62.X);
-                    local v64 = v13(v45.current.AbsoluteSize.X, v33.step, v33.range);
-                    if v64 * 2 < v63 then
-                        v43.current = v61;
-                        return;
-                    elseif v63 < v64 / 2 then
-                        return;
-                    else
-                        local v65 = v42:getValue();
-                        local v66 = v12(v62.X, v65, v33.step, v33.range);
-                        if v66 ~= v65 then
-                            v54(v66);
-                            v43.current = v61;
-                            return;
-                        end;
-                    end;
-                else
-                    local v67 = v52(v61);
-                    v54(v67);
-                    v43.current = v61;
-                    return;
-                end;
-            else
-                local l_Magnitude_0 = v45.current.AbsoluteSize.Magnitude;
-                local v69 = v14(v61, v43.current, l_Magnitude_0);
-                v43.current = v61;
-                if v44 == v4.Directional and math.abs(v69) > 0.01 then
-                    return;
-                else
-                    local v70 = v52(v61);
-                    v54(v70);
-                end;
-            end;
-        end;
-    end, {
-        v33.step, 
-        v33.range, 
-        v44, 
-        v42, 
-        v54, 
-        v52
-    });
-    local v72 = v2.useCallback(function() --[[ Line: 231 ]]
-        -- upvalues: v38 (copy), v43 (copy), v33 (copy)
-        v38(false);
-        v43.current = nil;
-        if v33.onDragEnded then
-            v33.onDragEnded();
-        end;
-    end, {
-        v33.onDragEnded
-    });
-    local v74 = v2.useCallback(function(v73) --[[ Line: 240 ]]
-        -- upvalues: v36 (copy), v21 (ref), v56 (copy)
-        v36(v73);
-        if v73 == v21.Pressed then
-            v56();
-        end;
-    end, {
-        v56
-    });
-    local v75 = UDim2.fromScale(1, 0.5);
-    local v78 = if v33.isContained then v42:map(function(v76) --[[ Line: 252 ]]
-        -- upvalues: v33 (copy)
-        local v77 = (v76 - v33.range.Min) / (v33.range.Max - v33.range.Min);
-        return Vector2.new(v77, 0.5);
-    end) else Vector2.new(0.5, 0.5);
-    return v2.createElement(v6, v10(v33, {
-        Size = UDim2.new(v33.width, UDim.new(0, v47.hitbox.height)), 
-        GroupTransparency = if v33.isDisabled then v3.DISABLED_TRANSPARENCY else nil, 
-        stateLayer = {
-            affordance = v22.None
-        }, 
-        onStateChanged = v74, 
-        isDisabled = v33.isDisabled, 
-        ref = v45
-    }), {
-        DragDetector = v2.createElement("UIDragDetector", {
-            DragStyle = Enum.UIDragDetectorDragStyle.Scriptable, 
-            [v2.Event.DragStart] = v59, 
-            [v2.Event.DragContinue] = v71, 
-            [v2.Event.DragEnd] = v72, 
-            Enabled = not v33.isDisabled
-        }), 
-        Bar = v2.createElement(v6, {
-            tag = v47.bar.tag, 
-            testId = ("%*--bar"):format(v33.testId)
-        }, {
-            Fill = v2.createElement(v6, {
-                tag = v47.fill.tag, 
-                Size = v42:map(function(v79) --[[ Line: 286 ]]
-                    -- upvalues: v33 (copy)
-                    return UDim2.fromScale((v79 - v33.range.Min) / (v33.range.Max - v33.range.Min), 1);
-                end), 
-                testId = ("%*--fill"):format(v33.testId)
-            }, {
-                Knob = if v33.knob then v2.createElement(v6, {
-                    tag = "auto-xy size-0-0", 
-                    AnchorPoint = v78, 
-                    Position = v75, 
-                    Visible = v39, 
-                    testId = ("%*--custom-knob"):format(v33.testId)
-                }, v33.knob) else if v23.FoundationToggleVisualUpdate then v2.createElement(v25.Provider, {
-                    value = v30
-                }, {
-                    Knob = v2.createElement(v24, {
-                        AnchorPoint = v78, 
-                        Position = v75, 
-                        size = v33.size, 
-                        style = v49.knobStyle, 
-                        stroke = v47.knob.stroke, 
-                        hasShadow = v47.knob.hasShadow, 
-                        testId = ("%*--knob"):format(v33.testId)
-                    })
-                }) else v2.createElement(v24, {
-                    AnchorPoint = v78, 
-                    Position = v75, 
-                    size = v33.size, 
-                    style = v49.knobStyle, 
-                    stroke = v47.knob.stroke, 
-                    hasShadow = v47.knob.hasShadow, 
-                    testId = ("%*--knob"):format(v33.testId)
-                })
-            })
-        })
-    });
-end);
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local Constants = require(Foundation.Constants)
+local InputMode = require(Foundation.Utility.Input.InputMode)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useBindable = require(Foundation.Utility.useBindable)
+local useLastInputMode = require(Foundation.Utility.Input.useLastInputMode)
+local usePointerPosition = require(Foundation.Utility.usePointerPosition)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local calculateNextStepValue = require(script.Parent.calculateNextStepValue)
+local calculatePixelsPerStep = require(script.Parent.calculatePixelsPerStep)
+local calculateSliderPositionDelta = require(script.Parent.calculateSliderPositionDelta)
+local calculateSliderStepValue = require(script.Parent.calculateSliderStepValue)
+local calculateSliderValueFromPosition = require(script.Parent.calculateSliderValueFromPosition)
+local InputSize = require(Foundation.Enums.InputSize)
+local Visibility = require(Foundation.Enums.Visibility)
+local SliderVariant = require(Foundation.Enums.SliderVariant)
+local ColorMode = require(Foundation.Enums.ColorMode)
+local ControlState = require(Foundation.Enums.ControlState)
+local StateLayerAffordance = require(Foundation.Enums.StateLayerAffordance)
+local Flags = require(Foundation.Utility.Flags)
+local Knob = require(Foundation.Components.Knob)
+local PresentationContext = require(Foundation.Providers.Style.PresentationContext)
+local useSliderMotionStates = require(Foundation.Components.Slider.useSliderMotionStates)
+local useSliderVariants = require(Foundation.Components.Slider.useSliderVariants)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local t1 = {
+	isDisabled = false,
+	isContained = false,
+	testId = "--foundation-slider",
+	range = NumberRange.new(0, 1),
+	size = InputSize.Medium,
+	width = UDim.new(1, 0),
+	variant = SliderVariant.Standard,
+	knobVisibility = Visibility.Auto
+}
+local t2 = {
+	colorMode = ColorMode.Inverse
+}
+
+local function Slider(p1, p2) -- line: 86
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), React (copy), ControlState (copy), useBindable (copy), useLastInputMode (copy), usePointerPosition (copy), useSliderVariants (copy), useSliderMotionStates (copy), Visibility (copy), calculateSliderValueFromPosition (copy), calculateSliderStepValue (copy), InputMode (copy), calculatePixelsPerStep (copy), calculateNextStepValue (copy), calculateSliderPositionDelta (copy), View (copy), withCommonProps (copy), Constants (copy), StateLayerAffordance (copy), Flags (copy), PresentationContext (copy), t2 (copy), Knob (copy)
+	local v34 = withDefaults(p1, t1)
+	local v35 = useTokens()
+	local v36, v37 = React.useState(ControlState.Initialize)
+	local v38, v39 = React.useState(false)
+	local v40, v41 = React.useState(false)
+	local v42 = useBindable(v34.value):map(function(p3) -- line: 92
+		-- upvalues: v34 (copy)
+		return (math.clamp(p3, v34.range.Min, v34.range.Max))
+	end)
+	local v43 = React.useRef(nil)
+	local v44 = useLastInputMode()
+	local v45 = React.useRef(nil)
+
+	React.useImperativeHandle(p2, function() -- line: 99
+		-- upvalues: v45 (copy)
+		return v45.current
+	end, {})
+
+	local v46 = usePointerPosition(v45.current)
+	local v47 = useSliderVariants(v35, v34.size, v34.variant)
+	local v48 = useSliderMotionStates(v47.knob.style, v47.knob.dragStyle)
+	local v49 = React.useMemo(function() -- line: 109
+		-- upvalues: v40 (copy), v48 (copy), v38 (copy)
+		if not v40 then
+			return v48.Hidden
+		end
+
+		if v38 then
+			return v48.Dragging
+		end
+
+		return v48.Idle
+	end, {
+		v35,
+		v40,
+		v38,
+		v48
+	})
+
+	React.useEffect(function() -- line: 116
+		-- upvalues: v34 (copy), Visibility (copy), v41 (copy), v38 (copy), v36 (copy), ControlState (copy)
+		if v34.knobVisibility == Visibility.None then
+			v41(false)
+
+			return
+		end
+
+		if v34.knobVisibility == Visibility.Always then
+			v41(true)
+
+			return
+		end
+
+		v41(v38 or (v36 == ControlState.Hover or (v36 == ControlState.Selected or v36 == ControlState.Pressed)))
+	end, {
+		v34.knobVisibility,
+		v36,
+		v38
+	})
+
+	local v50 = React.useCallback(function(vector2: Vector2) -- line: 131
+		-- upvalues: v45 (copy), calculateSliderValueFromPosition (copy), v34 (copy), calculateSliderStepValue (copy)
+		if v45.current then
+			local v61 = calculateSliderValueFromPosition(vector2, v45.current, v34.range)
+
+			if v34.step then
+				return calculateSliderStepValue(v61, v34.step, v34.range)
+			end
+
+			return v61
+		end
+
+		return 0
+	end, {
+		v45,
+		v34.range,
+		v34.step
+	})
+	local v51 = React.useCallback(function(n1: number) -- line: 144
+		-- upvalues: v42 (copy), v34 (copy)
+		if n1 ~= v42:getValue() and v34.onValueChanged then
+			v34.onValueChanged(n1)
+		end
+	end, {
+		v42,
+		v34.onValueChanged
+	})
+	local v52 = React.useCallback(function() -- line: 152
+		-- upvalues: v50 (copy), v46 (copy), v51 (copy)
+		local v63 = v50(v46:getValue())
+
+		v51(v63)
+	end, {
+		v50,
+		v46,
+		v51
+	})
+	local v53 = React.useCallback(function(_, vector2: Vector2) -- line: 157
+		-- upvalues: v43 (copy), v39 (copy), v34 (copy)
+		v43.current = vector2
+		v39(true)
+
+		if v34.onDragStarted then
+			v34.onDragStarted()
+		end
+	end, { v34.onDragStarted })
+	local v54 = React.useCallback(function(_, vector2: Vector2) -- line: 166
+		-- upvalues: v45 (copy), v43 (copy), v34 (copy), v44 (copy), InputMode (copy), calculatePixelsPerStep (copy), v42 (copy), calculateNextStepValue (copy), v51 (copy), v50 (copy), calculateSliderPositionDelta (copy)
+		if v45.current and v43.current then
+			if v34.step and v34.step > 0 then
+				if v44 ~= InputMode.Directional then
+					local v68 = v50(vector2)
+
+					v51(v68)
+					v43.current = vector2
+
+					return
+				end
+
+				local v69 = vector2 - v43.current
+				local v70 = math.abs(v69.X)
+				local v71 = calculatePixelsPerStep(v45.current.AbsoluteSize.X, v34.step, v34.range)
+
+				if v70 > v71 * 2 then
+					v43.current = vector2
+
+					return
+				end
+
+				if v70 < v71 / 2 then
+					return
+				end
+
+				local v72 = v42:getValue()
+				local v73 = calculateNextStepValue(v69.X, v72, v34.step, v34.range)
+
+				if v73 ~= v72 then
+					v51(v73)
+					v43.current = vector2
+
+					return
+				end
+			else
+				local Magnitude = v45.current.AbsoluteSize.Magnitude
+				local v75 = calculateSliderPositionDelta(vector2, v43.current, Magnitude)
+
+				v43.current = vector2
+
+				if v44 == InputMode.Directional and math.abs(v75) > 0.01 then
+					return
+				end
+
+				local v76 = v50(vector2)
+
+				v51(v76)
+			end
+		end
+	end, {
+		v34.step,
+		v34.range,
+		v44,
+		v42,
+		v51,
+		v50
+	})
+	local v55 = React.useCallback(function() -- line: 231
+		-- upvalues: v39 (copy), v43 (copy), v34 (copy)
+		v39(false)
+		v43.current = nil
+
+		if v34.onDragEnded then
+			v34.onDragEnded()
+		end
+	end, { v34.onDragEnded })
+	local v56 = React.useCallback(function(p6) -- line: 240
+		-- upvalues: v37 (copy), ControlState (copy), v52 (copy)
+		v37(p6)
+
+		if p6 == ControlState.Pressed then
+			v52()
+		end
+	end, { v52 })
+	local uDim2 = UDim2.fromScale(1, 0.5)
+	local v58 = if not v34.isContained then Vector2.new(0.5, 0.5) else v42:map(function(n2: number) -- line: 252
+		-- upvalues: v34 (copy)
+		local v79 = (n2 - v34.range.Min) / (v34.range.Max - v34.range.Min)
+
+		return Vector2.new(v79, 0.5)
+	end)
+
+	return React.createElement(View, withCommonProps(v34, {
+		Size = UDim2.new(v34.width, UDim.new(0, v47.hitbox.height)),
+		GroupTransparency = if not v34.isDisabled then nil else Constants.DISABLED_TRANSPARENCY,
+		stateLayer = {
+			affordance = StateLayerAffordance.None
+		},
+		onStateChanged = v56,
+		isDisabled = v34.isDisabled,
+		ref = v45
+	}), {
+		DragDetector = React.createElement("UIDragDetector", {
+			DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
+			[React.Event.DragStart] = v53,
+			[React.Event.DragContinue] = v54,
+			[React.Event.DragEnd] = v55,
+			Enabled = not v34.isDisabled
+		}),
+		Bar = React.createElement(View, {
+			tag = v47.bar.tag,
+			testId = `{ v34.testId }--bar`
+		}, {
+			Fill = React.createElement(View, {
+				tag = v47.fill.tag,
+				Size = v42:map(function(n3: number) -- line: 286
+					-- upvalues: v34 (copy)
+					return UDim2.fromScale((n3 - v34.range.Min) / (v34.range.Max - v34.range.Min), 1)
+				end),
+				testId = `{ v34.testId }--fill`
+			}, {
+				Knob = if not v34.knob then if not Flags.FoundationToggleVisualUpdate then React.createElement(Knob, {
+					AnchorPoint = v58,
+					Position = uDim2,
+					size = v34.size,
+					style = v49.knobStyle,
+					stroke = v47.knob.stroke,
+					hasShadow = v47.knob.hasShadow,
+					testId = `{ v34.testId }--knob`
+				}) else React.createElement(PresentationContext.Provider, {
+					value = t2
+				}, {
+					Knob = React.createElement(Knob, {
+						AnchorPoint = v58,
+						Position = uDim2,
+						size = v34.size,
+						style = v49.knobStyle,
+						stroke = v47.knob.stroke,
+						hasShadow = v47.knob.hasShadow,
+						testId = `{ v34.testId }--knob`
+					})
+				}) else React.createElement(View, {
+					tag = "size-0-0 auto-xy",
+					AnchorPoint = v58,
+					Position = uDim2,
+					Visible = v40,
+					testId = `{ v34.testId }--custom-knob`
+				}, v34.knob)
+			})
+		})
+	})
+end
+
+return React.forwardRef(Slider)

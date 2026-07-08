@@ -1,93 +1,100 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 39 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        id = (not (v4 ~= nil) or v4.id == nil) and "" or v4.id
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 45 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.id ~= nil and v5.id ~= "" then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.lengthDelimited);
-        v8, v9 = v0.writeString(v8, v9, v5.id);
-        v6 = v8;
-        v7 = v9;
-    end;
-    local v10 = buffer.create(v7);
-    buffer.copy(v10, 0, v6, 0, v7);
-    return v10;
-end;
-v3.decode = function(v11) --[[ Line: 59 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v12 = v3.new();
-    local v13 = 0;
-    while v13 < buffer.len(v11) do
-        local v14 = nil;
-        local v15 = nil;
-        local v16, v17, v18 = v0.readTag(v11, v13);
-        v14 = v16;
-        v15 = v17;
-        v13 = v18;
-        if v15 == v0.wireTypes.varint then
-            v16 = nil;
-            v17, v18 = v0.readVarInt(v11, v13);
-            v16 = v17;
-            v13 = v18;
-        elseif v15 == v0.wireTypes.lengthDelimited then
-            if v14 == 1 then
-                v16 = nil;
-                v17, v18 = v0.readBuffer(v11, v13);
-                v16 = v17;
-                v13 = v18;
-                v12.id = buffer.tostring(v16);
-            else
-                v16 = nil;
-                v17, v18 = v0.readVarInt(v11, v13);
-                v13 = v18 + v17;
-            end;
-        elseif v15 == v0.wireTypes.i32 then
-            v16 = nil;
-            v17, v18 = v0.readFixed32(v11, v13);
-            v16 = v17;
-            v13 = v18;
-        elseif v15 == v0.wireTypes.i64 then
-            v16 = nil;
-            v17, v18 = v0.readFixed64(v11, v13);
-            v16 = v17;
-            v13 = v18;
-        else
-            error("Unsupported wire type: " .. v15);
-        end;
-    end;
-    return v12;
-end;
-v3.jsonEncode = function(v19) --[[ Line: 102 ]] --[[ Name: jsonEncode ]]
-    local v20 = {};
-    if v19.id ~= nil and v19.id ~= "" then
-        v20.id = v19.id;
-    end;
-    return v20;
-end;
-v3.jsonDecode = function(v21) --[[ Line: 112 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy)
-    local v22 = v3.new();
-    if v21.id ~= nil then
-        v22.id = v21.id;
-    end;
-    return v22;
-end;
-v3.descriptor = {
-    name = "MarketplaceLookData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceLookData"
-};
-v2.MarketplaceLookData = v3;
-v1.default:register(v2.MarketplaceLookData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 39
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		id = if t3 ~= nil and t3.id ~= nil then t3.id else ""
+	}, t2))
+end
+function t2.encode(p1) -- line: 45
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.id ~= nil and p1.id ~= "" then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v9, v10, p1.id)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 59
+	-- upvalues: t2 (copy), proto (copy)
+	local v13 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v15, v16
+
+		v15, v16, n2 = proto.readTag(p2, n2)
+
+		if v16 == proto.wireTypes.varint then
+			local v17
+
+			v17, n2 = proto.readVarInt(p2, n2)
+		elseif v16 == proto.wireTypes.lengthDelimited then
+			if v15 == 1 then
+				local v18
+
+				v18, n2 = proto.readBuffer(p2, n2)
+				v13.id = buffer.tostring(v18)
+			else
+				local v19, v20 = proto.readVarInt(p2, n2)
+
+				n2 = v20 + v19
+			end
+		elseif v16 == proto.wireTypes.i32 then
+			local v21
+
+			v21, n2 = proto.readFixed32(p2, n2)
+		elseif v16 == proto.wireTypes.i64 then
+			local v22
+
+			v22, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v16)
+		end
+	end
+
+	return v13
+end
+function t2.jsonEncode(p3) -- line: 102
+	local t4 = {}
+
+	if p3.id ~= nil and p3.id ~= "" then
+		t4.id = p3.id
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 112
+	-- upvalues: t2 (copy)
+	local v26 = t2.new()
+
+	if t5.id ~= nil then
+		v26.id = t5.id
+	end
+
+	return v26
+end
+
+t2.descriptor = {
+	name = "MarketplaceLookData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceLookData"
+}
+t1.MarketplaceLookData = t2
+typeRegistry.default:register(t1.MarketplaceLookData)
+
 return {
-    MarketplaceLookData = v2.MarketplaceLookData
-};
+	MarketplaceLookData = t1.MarketplaceLookData
+}

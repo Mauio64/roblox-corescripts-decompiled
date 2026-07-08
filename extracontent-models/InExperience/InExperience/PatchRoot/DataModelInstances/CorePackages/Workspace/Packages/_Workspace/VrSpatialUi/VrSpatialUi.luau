@@ -1,9 +1,11 @@
-local v0 = require(script.Constants);
-local l_isInExperienceUIVREnabled_0 = require(script.Parent.SharedExperimentDefinition).isInExperienceUIVREnabled;
+local Constants = require(script.Constants)
+local isInExperienceUIVREnabled = require(script.Parent.SharedExperimentDefinition).isInExperienceUIVREnabled
+
 return {
-    UIManager = require(script.UIManager), 
-    Constants = v0, 
-    registerRoactPanel = require(script.registerRoactPanel), 
-    Panel3DInSpatialUI = if l_isInExperienceUIVREnabled_0 then require(script.Panel3DInSpatialUI) else nil, 
-    ["jest.config"] = script["jest.config"]
-};
+	UIManager = require(script.UIManager),
+	Constants = Constants,
+	registerRoactPanel = require(script.registerRoactPanel),
+	Panel3DInSpatialUI = if not isInExperienceUIVREnabled then nil else require(script.Panel3DInSpatialUI),
+	VrEnvironmentScene = require(script.VrEnvironmentScene),
+	["jest.config"] = script["jest.config"]
+}

@@ -1,99 +1,99 @@
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceInspectAndBuy");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_Parent_0.React);
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_FIntBulkPurchaseRequestLimit_0 = require(l_Parent_0.SharedFlags).FIntBulkPurchaseRequestLimit;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v7 = require(l_script_FirstAncestor_0.Utils.bulkPurchaseUtils);
-local v8 = require(l_script_FirstAncestor_0.Utils.buildBulkPurchaseAnalyticsPayload);
-local v9 = require(l_Parent_0.tutils);
-local l_ItemTypeEnum_0 = require(l_Parent_0.AXCommon).Enums.ItemTypeEnum;
-local v11 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXFixBulkPurchaseFreeItems_0 = v11.FFlagAXFixBulkPurchaseFreeItems;
-local l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 = v11.FFlagAXEnableIaBTimedOptionsBulkPurchase;
-local l_useSignalState_0 = require(l_Parent_0.SignalsReact).useSignalState;
-local l_useItemSelectionStore_0 = require(l_script_FirstAncestor_0.Contexts.ItemSelectionStoreContext).useItemSelectionStore;
-local _ = require(l_script_FirstAncestor_0.Stores.createItemSelectionStore);
-local function v18(v17) --[[ Line: 47 ]]
-    return {
-        assets = v17.assets, 
-        bundles = v17.bundles
-    };
-end;
-local function v20(v19) --[[ Line: 54 ]]
-    return v19.collectibleResellableInstances;
-end;
-return function(v21, v22) --[[ Line: 58 ]]
-    -- upvalues: l_useSelector_0 (copy), v18 (copy), v9 (copy), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (copy), v20 (copy), v3 (copy), v7 (copy), l_useItemSelectionStore_0 (copy), l_useSignalState_0 (copy), l_RobloxReplicatedStorage_0 (copy), l_ItemTypeEnum_0 (copy), v8 (copy), l_FFlagAXFixBulkPurchaseFreeItems_0 (copy), l_FIntBulkPurchaseRequestLimit_0 (copy)
-    local v23 = l_useSelector_0(v18, v9.deepEqual);
-    local v24 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSelector_0(v20, v9.deepEqual) else nil;
-    local v25 = v3.useMemo(function() --[[ Line: 64 ]]
-        -- upvalues: v7 (ref), v21 (copy), v23 (copy)
-        return v7.getBulkPurchaseEligibleItems(v21, v23);
-    end, {
-        v21, 
-        v23
-    });
-    local v26 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useItemSelectionStore_0() else nil;
-    local v27 = if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then l_useSignalState_0(v26.getItemDataMap) else nil;
-    return v3.useCallback(function() --[[ Line: 75 ]]
-        -- upvalues: l_RobloxReplicatedStorage_0 (ref), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (ref), v7 (ref), v25 (copy), v27 (copy), l_ItemTypeEnum_0 (ref), v8 (ref), v23 (copy), v24 (copy), v22 (copy)
-        coroutine.wrap(function() --[[ Line: 76 ]]
-            -- upvalues: l_RobloxReplicatedStorage_0 (ref), l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 (ref), v7 (ref), v25 (ref), v27 (ref), l_ItemTypeEnum_0 (ref), v8 (ref), v23 (ref), v24 (ref), v22 (ref)
-            local v28 = l_RobloxReplicatedStorage_0:WaitForChild("ServerSideBulkPurchaseEvent", 1e999);
-            if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then
-                v28:FireServer((v7.buildRequestedItemsWithTimedOptions(v25.requestedItems, v27)));
-            else
-                v28:FireServer(v25.requestedItems);
-            end;
-            for _, v30 in v25.requestedItems do
-                local v31 = if v30.itemType == Enum.AvatarItemType.Asset.Value then l_ItemTypeEnum_0.Asset else l_ItemTypeEnum_0.Bundle;
-                local v32 = tostring(v30.id);
-                if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then
-                    local v33 = v27 and v27[v32];
-                    local v34 = v8({
-                        itemId = v32, 
-                        itemType = v31, 
-                        assetsMap = v23.assets, 
-                        bundlesMap = v23.bundles, 
-                        collectibleResellableInstances = v24, 
-                        storedData = v33
-                    });
-                    if v34 then
-                        v22.reportPurchaseAttemptUnifiedEvent(v31, v32, v34);
-                    end;
-                else
-                    v22.reportPurchaseAttempt(v31, v32);
-                end;
-            end;
-        end)();
-    end, {
-        v25, 
-        v22.reportPurchaseAttempt, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v27 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v23 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v24 else nil, 
-        if l_FFlagAXEnableIaBTimedOptionsBulkPurchase_0 then v22.reportPurchaseAttemptUnifiedEvent else nil
-    }), v3.useMemo(function() --[[ Line: 127 ]]
-        -- upvalues: l_FFlagAXFixBulkPurchaseFreeItems_0 (ref), v25 (copy), l_FIntBulkPurchaseRequestLimit_0 (ref)
-        local _ = false;
-        if l_FFlagAXFixBulkPurchaseFreeItems_0 then
-            if v25.requestedItems then
-                local v36 = false;
-                if #v25.requestedItems <= l_FIntBulkPurchaseRequestLimit_0 then
-                    v36 = #v25.requestedItems > 0;
-                end;
-                return v36;
-            else
-                return false;
-            end;
-        elseif v25.requestedItems then
-            return #v25.requestedItems <= l_FIntBulkPurchaseRequestLimit_0;
-        else
-            return false;
-        end;
-    end, {
-        v25
-    }), v25.totalPrice or 0;
-end;
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+local AvatarExperienceInspectAndBuy = script:FindFirstAncestor("AvatarExperienceInspectAndBuy")
+local AvatarExperienceInspectAndBuyParent = AvatarExperienceInspectAndBuy.Parent
+local React = require(AvatarExperienceInspectAndBuyParent.React)
+
+require(AvatarExperienceInspectAndBuy.Types)
+
+local FIntBulkPurchaseRequestLimit = require(AvatarExperienceInspectAndBuyParent.SharedFlags).FIntBulkPurchaseRequestLimit
+local useSelector = require(AvatarExperienceInspectAndBuyParent.RoactUtils).Hooks.RoactRodux.useSelector
+local bulkPurchaseUtils = require(AvatarExperienceInspectAndBuy.Utils.bulkPurchaseUtils)
+local buildBulkPurchaseAnalyticsPayload = require(AvatarExperienceInspectAndBuy.Utils.buildBulkPurchaseAnalyticsPayload)
+local tutils = require(AvatarExperienceInspectAndBuyParent.tutils)
+local ItemTypeEnum = require(AvatarExperienceInspectAndBuyParent.AXCommon).Enums.ItemTypeEnum
+local AvatarExperienceFlags = require(AvatarExperienceInspectAndBuyParent.AvatarExperienceFlags)
+local FFlagAXFixBulkPurchaseFreeItems = AvatarExperienceFlags.FFlagAXFixBulkPurchaseFreeItems
+local FFlagAXEnableIaBTimedOptionsBulkPurchase = AvatarExperienceFlags.FFlagAXEnableIaBTimedOptionsBulkPurchase
+local useSignalState = require(AvatarExperienceInspectAndBuyParent.SignalsReact).useSignalState
+local useItemSelectionStore = require(AvatarExperienceInspectAndBuy.Contexts.ItemSelectionStoreContext).useItemSelectionStore
+
+require(AvatarExperienceInspectAndBuy.Stores.createItemSelectionStore)
+
+local function v16(p1) -- line: 47
+	return {
+		assets = p1.assets,
+		bundles = p1.bundles
+	}
+end
+local function v17(p2) -- line: 54
+	return p2.collectibleResellableInstances
+end
+
+return function(t1: {[any]: any}?, p3) -- line: 58
+	-- upvalues: useSelector (copy), v16 (copy), tutils (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v17 (copy), useItemSelectionStore (copy), useSignalState (copy), React (copy), bulkPurchaseUtils (copy), RobloxReplicatedStorage (copy), ItemTypeEnum (copy), buildBulkPurchaseAnalyticsPayload (copy), FFlagAXFixBulkPurchaseFreeItems (copy), FIntBulkPurchaseRequestLimit (copy)
+	local v22 = useSelector(v16, tutils.deepEqual)
+	local v23 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSelector(v17, tutils.deepEqual)
+	local v24 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useItemSelectionStore()
+	local v25 = if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else useSignalState(v24.getItemDataMap)
+	local v26 = React.useMemo(function() -- line: 69
+		-- upvalues: bulkPurchaseUtils (copy), t1 (copy), v22 (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v25 (copy)
+		return bulkPurchaseUtils.getBulkPurchaseEligibleItems(t1, v22, if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v25)
+	end, {
+		t1,
+		v22,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v25
+	})
+
+	return React.useCallback(function() -- line: 79
+		-- upvalues: RobloxReplicatedStorage (copy), v26 (copy), ItemTypeEnum (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v25 (copy), buildBulkPurchaseAnalyticsPayload (copy), v22 (copy), v23 (copy), p3 (copy)
+		coroutine.wrap(function() -- line: 80
+			-- upvalues: RobloxReplicatedStorage (copy), v26 (copy), ItemTypeEnum (copy), FFlagAXEnableIaBTimedOptionsBulkPurchase (copy), v25 (copy), buildBulkPurchaseAnalyticsPayload (copy), v22 (copy), v23 (copy), p3 (copy)
+			RobloxReplicatedStorage:WaitForChild("ServerSideBulkPurchaseEvent", 1e999):FireServer(v26.requestedItems)
+
+			for _, v28 in v26.requestedItems do
+				local v29 = if v28.itemType ~= Enum.AvatarItemType.Asset.Value then ItemTypeEnum.Bundle else ItemTypeEnum.Asset
+				local str = tostring(v28.id)
+
+				if FFlagAXEnableIaBTimedOptionsBulkPurchase then
+					local v31 = v25 and v25[str]
+					local v32 = buildBulkPurchaseAnalyticsPayload({
+						itemId = str,
+						itemType = v29,
+						assetsMap = v22.assets,
+						bundlesMap = v22.bundles,
+						collectibleResellableInstances = v23,
+						storedData = v31
+					})
+
+					if v32 then
+						p3.reportPurchaseAttemptUnifiedEvent(v29, str, v32)
+					end
+				else
+					p3.reportPurchaseAttempt(v29, str)
+				end
+			end
+		end)()
+	end, {
+		v26,
+		p3.reportPurchaseAttempt,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v25,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v22,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else v23,
+		if not FFlagAXEnableIaBTimedOptionsBulkPurchase then nil else p3.reportPurchaseAttemptUnifiedEvent
+	}), React.useMemo(function() -- line: 123
+		-- upvalues: FFlagAXFixBulkPurchaseFreeItems (copy), v26 (copy), FIntBulkPurchaseRequestLimit (copy)
+		if FFlagAXFixBulkPurchaseFreeItems then
+			if v26.requestedItems then
+				return #v26.requestedItems <= FIntBulkPurchaseRequestLimit and #v26.requestedItems > 0
+			end
+
+			return false
+		end
+
+		if v26.requestedItems then
+			return #v26.requestedItems <= FIntBulkPurchaseRequestLimit
+		end
+
+		return false
+	end, { v26 }), v26.totalPrice or 0
+end

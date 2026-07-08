@@ -1,1 +1,1 @@
-return game:DefineFastString("AXDurablesSupportExposureLayer", "AvatarExperience.UA.AllViews");
+return game:DefineFastString("AXDurablesSupportExposureLayer", "AvatarExperience.UA.AllViews")

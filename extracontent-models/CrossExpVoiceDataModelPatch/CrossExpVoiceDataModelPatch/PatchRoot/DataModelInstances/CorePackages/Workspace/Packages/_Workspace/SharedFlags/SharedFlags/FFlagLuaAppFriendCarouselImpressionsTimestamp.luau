@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppFriendCarouselImpressionsTimestamp", false);
+return game:DefineFastFlag("LuaAppFriendCarouselImpressionsTimestamp", false)

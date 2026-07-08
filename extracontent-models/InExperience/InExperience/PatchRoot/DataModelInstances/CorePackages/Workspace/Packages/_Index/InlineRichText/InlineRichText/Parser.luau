@@ -1,3 +1,3 @@
 return {
-    parseXml = require(script.parseXml)
-};
+	parseXml = require(script.parseXml)
+}

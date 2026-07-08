@@ -1,82 +1,58 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local Device = require(Foundation.Enums.Device)
 local Flags = require(Foundation.Utility.Flags)
-local StyleTagFormat = require(Foundation.Enums.StyleTagFormat)
 local Theme = require(Foundation.Enums.Theme)
 local t1 = {
-	[StyleTagFormat.Static] = {
-		Common = function() --[[ Common ]] -- line: 14
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.CommonStatic)
-		end,
-		Dark = function() --[[ Dark ]] -- line: 17
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.DarkStatic)
-		end,
-		Light = function() --[[ Light ]] -- line: 20
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.LightStatic)
-		end,
-		Console = function() --[[ Console ]] -- line: 23
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.ConsoleStatic)
-		end,
-		Desktop = function() --[[ Desktop ]] -- line: 26
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.DesktopStatic)
-		end
-	},
-	[StyleTagFormat.Attribute] = {
-		Common = function() --[[ Common ]] -- line: 31
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.CommonAttribute)
-		end,
-		Dark = function() --[[ Dark ]] -- line: 34
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.DarkAttribute)
-		end,
-		Light = function() --[[ Light ]] -- line: 37
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.LightAttribute)
-		end,
-		Console = function() --[[ Console ]] -- line: 40
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.ConsoleAttribute)
-		end,
-		Desktop = function() --[[ Desktop ]] -- line: 43
-			-- upvalues: Foundation (copy)
-			return require(Foundation.Generated.StyleRules.DesktopAttribute)
-		end
-	}
+	Common = function() -- line: 11
+		-- upvalues: Foundation (copy)
+		return require(Foundation.Generated.StyleRules.CommonAttribute)
+	end,
+	Dark = function() -- line: 14
+		-- upvalues: Foundation (copy)
+		return require(Foundation.Generated.StyleRules.DarkAttribute)
+	end,
+	Light = function() -- line: 17
+		-- upvalues: Foundation (copy)
+		return require(Foundation.Generated.StyleRules.LightAttribute)
+	end,
+	Console = function() -- line: 20
+		-- upvalues: Foundation (copy)
+		return require(Foundation.Generated.StyleRules.ConsoleAttribute)
+	end,
+	Desktop = function() -- line: 23
+		-- upvalues: Foundation (copy)
+		return require(Foundation.Generated.StyleRules.DesktopAttribute)
+	end
 }
 
-return function(p1, p2) --[[ getGeneratedRules ]] -- line: 49
-	-- upvalues: StyleTagFormat (copy), Flags (copy), t1 (copy), Theme (copy), Device (copy)
-	local Attribute = StyleTagFormat.Attribute
-	local v10 = nil
-	local v11 = if not Flags.FoundationUseAttributeTokens then t1[StyleTagFormat.Static].Common() else t1[StyleTagFormat.Attribute].Common()
+local function getGeneratedRules(p1, p2) -- line: 28
+	-- upvalues: t1 (copy), Theme (copy), Device (copy), Flags (copy)
+	local v9 = nil
+	local v10 = t1.Common()
 
 	if p1 == Theme.Dark then
-		v10 = if not Flags.FoundationUseAttributeTokens then t1[StyleTagFormat.Static].Dark() else t1[StyleTagFormat.Attribute].Dark()
+		v9 = t1.Dark()
 	elseif p1 == Theme.Light then
-		v10 = if not Flags.FoundationUseAttributeTokens then t1[StyleTagFormat.Static].Light() else t1[StyleTagFormat.Attribute].Light()
+		v9 = t1.Light()
 	end
 
-	local v12 = if p2 ~= Device.Console or Flags.FoundationDisableTokenScaling then t1[Attribute].Desktop() else t1[Attribute].Console()
+	local v11 = if p2 ~= Device.Console or Flags.FoundationDisableTokenScaling then t1.Desktop() else t1.Console()
 
-	if not v10 or not v12 or not v11 then
+	if not v9 or not v11 or not v10 then
 		return {}
 	end
 
-	local v13 = table.clone(v12)
+	local v12 = table.clone(v11)
 
-	for v14, v15 in v11 do
-		v13[v14] = v15
+	for v13, v14 in v10 do
+		v12[v13] = v14
 	end
 
-	for v16, v17 in v10 do
-		v13[v16] = v17
+	for v15, v16 in v9 do
+		v12[v15] = v16
 	end
 
-	return v13
+	return v12
 end
+
+return getGeneratedRules

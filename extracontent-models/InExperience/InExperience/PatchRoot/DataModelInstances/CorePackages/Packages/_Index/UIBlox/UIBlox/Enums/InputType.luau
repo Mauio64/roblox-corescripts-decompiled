@@ -1,5 +1,5 @@
 return {
-    MouseAndKeyboard = "MouseAndKeyboard", 
-    Gamepad = "Gamepad", 
-    Touch = "Touch"
-};
+	MouseAndKeyboard = "MouseAndKeyboard",
+	Gamepad = "Gamepad",
+	Touch = "Touch"
+}

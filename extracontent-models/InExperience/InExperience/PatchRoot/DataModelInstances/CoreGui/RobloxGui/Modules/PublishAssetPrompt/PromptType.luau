@@ -1,5 +1,5 @@
 return {
-    PublishAssetSingleStep = "PublishAssetSingleStep", 
-    PublishAvatar = "PublishAvatar", 
-    PublishAvatarAsset = "PublishAvatarAsset"
-};
+	PublishAssetSingleStep = "PublishAssetSingleStep",
+	PublishAvatar = "PublishAvatar",
+	PublishAvatarAsset = "PublishAvatarAsset"
+}

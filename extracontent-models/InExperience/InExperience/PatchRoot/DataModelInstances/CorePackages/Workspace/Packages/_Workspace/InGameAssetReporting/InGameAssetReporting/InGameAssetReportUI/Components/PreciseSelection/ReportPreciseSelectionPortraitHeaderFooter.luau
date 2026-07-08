@@ -1,202 +1,213 @@
-local l_Parent_0 = script:FindFirstAncestor("InGameAssetReporting").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.UIBlox);
-local v3 = require(l_Parent_0.Foundation);
-local l_Button_0 = v3.Button;
-local l_ButtonVariant_0 = v3.Enums.ButtonVariant;
-local l_InputSize_0 = v3.Enums.InputSize;
-local l_HeaderBar_0 = v2.App.Bar.HeaderBar;
-local l_IconButton_0 = v2.App.Button.IconButton;
-local l_IconSize_0 = v2.App.ImageSet.Enum.IconSize;
-local l_Images_0 = v2.App.ImageSet.Images;
-local l_withStyle_0 = v2.Style.withStyle;
-local function _(v12) --[[ Line: 36 ]] --[[ Name: renderHeaderBarLeft ]]
-    -- upvalues: v1 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy)
-    return function() --[[ Line: 37 ]]
-        -- upvalues: v1 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), v12 (copy)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 30, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            BackButton = v1.createElement(l_IconButton_0, {
-                iconSize = l_IconSize_0.Medium, 
-                icon = l_Images_0["icons/navigation/pushBack"], 
-                layoutOrder = 1, 
-                onActivated = v12
-            })
-        });
-    end;
-end;
-local function _(v14) --[[ Line: 58 ]] --[[ Name: renderHeaderBarCenter ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy)
-    return function() --[[ Line: 59 ]]
-        -- upvalues: l_withStyle_0 (ref), v1 (ref), v14 (copy)
-        return l_withStyle_0(function(v15) --[[ Line: 60 ]]
-            -- upvalues: v1 (ref), v14 (ref)
-            local l_CurrentCamera_0 = game.Workspace.CurrentCamera;
-            local v17 = 300;
-            if l_CurrentCamera_0 ~= nil then
-                v17 = l_CurrentCamera_0.ViewportSize.X - 150;
-            end;
-            local l_Theme_0 = v15.Theme;
-            local l_Font_0 = v15.Font;
-            return v1.createElement("TextLabel", {
-                Text = v14, 
-                Font = l_Font_0.Header2.Font, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                TextSize = 20, 
-                TextWrapped = true, 
-                TextXAlignment = Enum.TextXAlignment.Center, 
-                TextYAlignment = Enum.TextYAlignment.Center, 
-                Size = UDim2.new(0, v17, 1, 0), 
-                BackgroundTransparency = 1
-            });
-        end);
-    end;
-end;
-local function _() --[[ Line: 87 ]] --[[ Name: renderHeaderBarRight ]]
-    -- upvalues: v1 (copy)
-    return function() --[[ Line: 88 ]]
-        -- upvalues: v1 (ref)
-        return v1.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(0, 60, 1, 0)
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            })
-        });
-    end;
-end;
+local Parent = script:FindFirstAncestor("InGameAssetReporting").Parent
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local Foundation = require(Parent.Foundation)
+local Button = Foundation.Button
+local ButtonVariant = Foundation.Enums.ButtonVariant
+local InputSize = Foundation.Enums.InputSize
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local IconButton = UIBlox.App.Button.IconButton
+local IconSize = UIBlox.App.ImageSet.Enum.IconSize
+local Images = UIBlox.App.ImageSet.Images
+local withStyle = UIBlox.Style.withStyle
+
+local function renderHeaderBarLeft(p1) -- line: 36
+	-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy)
+	return function() -- line: 37
+		-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), p1 (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 30, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			BackButton = React.createElement(IconButton, {
+				layoutOrder = 1,
+				iconSize = IconSize.Medium,
+				icon = Images["icons/navigation/pushBack"],
+				onActivated = p1
+			})
+		})
+	end
+end
+local function renderHeaderBarCenter(p2) -- line: 58
+	-- upvalues: withStyle (copy), React (copy)
+	return function() -- line: 59
+		-- upvalues: withStyle (copy), React (copy), p2 (copy)
+		return withStyle(function(p3) -- line: 60
+			-- upvalues: React (copy), p2 (copy)
+			local CurrentCamera = game.Workspace.CurrentCamera
+			local n1 = 300
+
+			if CurrentCamera ~= nil then
+				n1 = CurrentCamera.ViewportSize.X - 150
+			end
+
+			local Theme = p3.Theme
+			local p3Font = p3.Font
+
+			return React.createElement("TextLabel", {
+				TextSize = 20,
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				Text = p2,
+				Font = p3Font.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextTransparency = Theme.TextEmphasis.Transparency,
+				TextXAlignment = Enum.TextXAlignment.Center,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				Size = UDim2.new(0, n1, 1, 0)
+			})
+		end)
+	end
+end
+local function renderHeaderBarRight() -- line: 87
+	-- upvalues: React (copy)
+	return function() -- line: 88
+		-- upvalues: React (copy)
+		return React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 60, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+		})
+	end
+end
+
 return {
-    PortraitModeHeader = function(v22) --[[ Line: 103 ]] --[[ Name: PortraitModeHeader ]]
-        -- upvalues: v1 (copy), l_HeaderBar_0 (copy), l_IconButton_0 (copy), l_IconSize_0 (copy), l_Images_0 (copy), l_withStyle_0 (copy)
-        local l_createElement_0 = v1.createElement;
-        local v24 = "Frame";
-        local v25 = {
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 0.1, 
-            BackgroundColor3 = Color3.fromHex("#000000"), 
-            LayoutOrder = 1, 
-            Size = UDim2.new(1, 0, 0, 72), 
-            ZIndex = 2
-        };
-        local v26 = {};
-        local l_createElement_1 = v1.createElement;
-        local l_l_HeaderBar_0_0 = l_HeaderBar_0;
-        local v29 = {
-            backgroundTransparency = 1, 
-            barHeight = 72, 
-            margin = 12
-        };
-        local l_backAction_0 = v22.backAction;
-        local l_l_backAction_0_0 = l_backAction_0 --[[ copy: 9 -> 10 ]];
-        v29.renderLeft = function() --[[ Line: 37 ]]
-            -- upvalues: v1 (ref), l_IconButton_0 (ref), l_IconSize_0 (ref), l_Images_0 (ref), l_l_backAction_0_0 (copy)
-            return v1.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, 30, 1, 0)
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                BackButton = v1.createElement(l_IconButton_0, {
-                    iconSize = l_IconSize_0.Medium, 
-                    icon = l_Images_0["icons/navigation/pushBack"], 
-                    layoutOrder = 1, 
-                    onActivated = l_l_backAction_0_0
-                })
-            });
-        end;
-        v29.renderRight = function() --[[ Line: 88 ]]
-            -- upvalues: v1 (ref)
-            return v1.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(0, 60, 1, 0)
-            }, {
-                Layout = v1.createElement("UIListLayout", {
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                })
-            });
-        end;
-        l_backAction_0 = v22.titleText;
-        v29.renderCenter = function() --[[ Line: 59 ]]
-            -- upvalues: l_withStyle_0 (ref), v1 (ref), l_backAction_0 (copy)
-            return l_withStyle_0(function(v32) --[[ Line: 60 ]]
-                -- upvalues: v1 (ref), l_backAction_0 (ref)
-                local l_CurrentCamera_1 = game.Workspace.CurrentCamera;
-                local v34 = 300;
-                if l_CurrentCamera_1 ~= nil then
-                    v34 = l_CurrentCamera_1.ViewportSize.X - 150;
-                end;
-                local l_Theme_1 = v32.Theme;
-                local l_Font_1 = v32.Font;
-                return v1.createElement("TextLabel", {
-                    Text = l_backAction_0, 
-                    Font = l_Font_1.Header2.Font, 
-                    TextColor3 = l_Theme_1.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_1.TextEmphasis.Transparency, 
-                    TextSize = 20, 
-                    TextWrapped = true, 
-                    TextXAlignment = Enum.TextXAlignment.Center, 
-                    TextYAlignment = Enum.TextYAlignment.Center, 
-                    Size = UDim2.new(0, v34, 1, 0), 
-                    BackgroundTransparency = 1
-                });
-            end);
-        end;
-        v29.isSecondary = true;
-        v26.Bar = l_createElement_1(l_l_HeaderBar_0_0, v29);
-        return l_createElement_0(v24, v25, v26);
-    end, 
-    PortraitModeFooter = function(v37) --[[ Line: 124 ]] --[[ Name: PortraitModeFooter ]]
-        -- upvalues: v1 (copy), v3 (copy), l_Button_0 (copy), l_ButtonVariant_0 (copy), l_InputSize_0 (copy)
-        return v1.createElement("Frame", {
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 0.1, 
-            Size = UDim2.new(1, 0, 0, 60), 
-            BackgroundColor3 = Color3.fromHex("#000000"), 
-            AnchorPoint = Vector2.new(0, 1), 
-            Position = UDim2.fromScale(0, 1), 
-            LayoutOrder = 4
-        }, {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            CoachmarkWrapper = v1.createElement(v3.Coachmark, {
-                title = v37.coachmarkTitle, 
-                text = v37.coachmarkText, 
-                isOpen = v37.isCoachmarkOpen or false, 
-                side = v3.Enums.PopoverSide.Top, 
-                align = v3.Enums.PopoverAlign.Center, 
-                onClose = v37.onCoachmarkClose
-            }, {
-                NextButton = v1.createElement(l_Button_0, {
-                    variant = l_ButtonVariant_0.Emphasis, 
-                    inputSize = l_InputSize_0.Large, 
-                    width = UDim.new(0, 400), 
-                    onActivated = v37.nextAction, 
-                    text = v37.nextText
-                })
-            })
-        });
-    end
-};
+	PortraitModeHeader = function(t1: {[any]: any}) -- line: 103
+		-- upvalues: React (copy), HeaderBar (copy), IconButton (copy), IconSize (copy), Images (copy), withStyle (copy)
+		local createElement = React.createElement
+		local t2 = {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0.1,
+			LayoutOrder = 1,
+			ZIndex = 2,
+			BackgroundColor3 = Color3.fromHex("#000000"),
+			Size = UDim2.new(1, 0, 0, 72)
+		}
+		local t3 = {}
+		local createElement2 = React.createElement
+		local v23 = HeaderBar
+		local t4 = {
+			backgroundTransparency = 1,
+			barHeight = 72,
+			margin = 12,
+			isSecondary = true
+		}
+		local backAction = t1.backAction
+
+		function t4.renderLeft() -- line: 37
+			-- upvalues: React (copy), IconButton (copy), IconSize (copy), Images (copy), backAction (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 30, 1, 0)
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				BackButton = React.createElement(IconButton, {
+					layoutOrder = 1,
+					iconSize = IconSize.Medium,
+					icon = Images["icons/navigation/pushBack"],
+					onActivated = backAction
+				})
+			})
+		end
+		function t4.renderRight() -- line: 88
+			-- upvalues: React (copy)
+			return React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 60, 1, 0)
+			}, {
+				Layout = React.createElement("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				})
+			})
+		end
+
+		local titleText = t1.titleText
+
+		function t4.renderCenter() -- line: 59
+			-- upvalues: withStyle (copy), React (copy), titleText (copy)
+			return withStyle(function(p4) -- line: 60
+				-- upvalues: React (copy), titleText (copy)
+				local CurrentCamera = game.Workspace.CurrentCamera
+				local n2 = 300
+
+				if CurrentCamera ~= nil then
+					n2 = CurrentCamera.ViewportSize.X - 150
+				end
+
+				local Theme = p4.Theme
+				local p4Font = p4.Font
+
+				return React.createElement("TextLabel", {
+					TextSize = 20,
+					TextWrapped = true,
+					BackgroundTransparency = 1,
+					Text = titleText,
+					Font = p4Font.Header2.Font,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextEmphasis.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					TextYAlignment = Enum.TextYAlignment.Center,
+					Size = UDim2.new(0, n2, 1, 0)
+				})
+			end)
+		end
+
+		t3.Bar = createElement2(v23, t4)
+
+		return createElement("Frame", t2, t3)
+	end,
+	PortraitModeFooter = function(t5: {[any]: any}) -- line: 124
+		-- upvalues: React (copy), Foundation (copy), Button (copy), ButtonVariant (copy), InputSize (copy)
+		return React.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 0.1,
+			LayoutOrder = 4,
+			Size = UDim2.new(1, 0, 0, 60),
+			BackgroundColor3 = Color3.fromHex("#000000"),
+			AnchorPoint = Vector2.new(0, 1),
+			Position = UDim2.fromScale(0, 1)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			CoachmarkWrapper = React.createElement(Foundation.Coachmark, {
+				title = t5.coachmarkTitle,
+				text = t5.coachmarkText,
+				isOpen = t5.isCoachmarkOpen or false,
+				side = Foundation.Enums.PopoverSide.Top,
+				align = Foundation.Enums.PopoverAlign.Center,
+				onClose = t5.onCoachmarkClose
+			}, {
+				NextButton = React.createElement(Button, {
+					variant = ButtonVariant.Emphasis,
+					inputSize = InputSize.Large,
+					width = UDim.new(0, 400),
+					onActivated = t5.nextAction,
+					text = t5.nextText
+				})
+			})
+		})
+	end
+}

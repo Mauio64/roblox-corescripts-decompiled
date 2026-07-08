@@ -1,5 +1,5 @@
 return {
-    Share = "Share", 
-    Copy = "Copy", 
-    Disabled = "Disabled"
-};
+	Share = "Share",
+	Copy = "Copy",
+	Disabled = "Disabled"
+}

@@ -1,70 +1,73 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.UIBlox);
-local l_InteractiveAlert_0 = v3.App.Dialog.Alert.InteractiveAlert;
-local l_ButtonType_0 = v3.App.Button.Enum.ButtonType;
-local v6 = require(l_Parent_0.Locale.MultiTextLocalizer);
-local v7 = v2.Component:extend(script.Name);
-v7.defaultProps = {
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    position = UDim2.new(0.5, 0, 0.5, 0)
-};
-v7.render = function(v8) --[[ Line: 27 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v6 (copy)
-    return v2.createElement(v6, {
-        keys = {
-            TitleText = {
-                key = "IAPExperience.LeaveRoblox.Title.LeavingRoblox"
-            }, 
-            BodyText = {
-                key = "IAPExperience.LeaveRoblox.Text.ExternalWebsiteWarning"
-            }, 
-            ButtonCancel = {
-                key = "IAPExperience.LeaveRoblox.Action.Cancel"
-            }, 
-            ButtonContinue = {
-                key = "IAPExperience.LeaveRoblox.Action.Continue"
-            }
-        }, 
-        render = function(v9) --[[ Line: 43 ]] --[[ Name: render ]]
-            -- upvalues: v8 (copy)
-            return v8:renderAlert(v9);
-        end
-    });
-end;
-v7.renderAlert = function(v10, v11) --[[ Line: 49 ]] --[[ Name: renderAlert ]]
-    -- upvalues: v2 (copy), l_InteractiveAlert_0 (copy), l_ButtonType_0 (copy)
-    return (v2.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
-        BackgroundTransparency = 1, 
-        Active = true, 
-        Selectable = false
-    }, {
-        AlertWindow = v2.createElement(l_InteractiveAlert_0, {
-            title = v11.TitleText, 
-            bodyText = v11.BodyText, 
-            buttonStackInfo = {
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = {
-                            onActivated = v10.props.cancelActivated, 
-                            text = v11.ButtonCancel
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = {
-                            onActivated = v10.props.continueActivated, 
-                            text = v11.ButtonContinue
-                        }
-                    }
-                }
-            }, 
-            screenSize = v10.props.screenSize
-        })
-    }));
-end;
-return v7;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local UIBlox = require(ParentParentParent.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local MultiTextLocalizer = require(ParentParent.Locale.MultiTextLocalizer)
+local v8 = Roact.Component:extend(script.Name)
+
+v8.defaultProps = {
+	anchorPoint = Vector2.new(0.5, 0.5),
+	position = UDim2.new(0.5, 0, 0.5, 0)
+}
+
+function v8.render(p1) -- line: 27
+	-- upvalues: Roact (copy), MultiTextLocalizer (copy)
+	return Roact.createElement(MultiTextLocalizer, {
+		keys = {
+			TitleText = {
+				key = "IAPExperience.LeaveRoblox.Title.LeavingRoblox"
+			},
+			BodyText = {
+				key = "IAPExperience.LeaveRoblox.Text.ExternalWebsiteWarning"
+			},
+			ButtonCancel = {
+				key = "IAPExperience.LeaveRoblox.Action.Cancel"
+			},
+			ButtonContinue = {
+				key = "IAPExperience.LeaveRoblox.Action.Continue"
+			}
+		},
+		render = function(t1: {[any]: any}) -- line: 43
+			-- upvalues: p1 (copy)
+			return p1:renderAlert(t1)
+		end
+	})
+end
+function v8.renderAlert(t2: {[any]: any}, t3: {[any]: any}) -- line: 49
+	-- upvalues: Roact (copy), InteractiveAlert (copy), ButtonType (copy)
+	return (Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Active = true,
+		Selectable = false,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	}, {
+		AlertWindow = Roact.createElement(InteractiveAlert, {
+			title = t3.TitleText,
+			bodyText = t3.BodyText,
+			buttonStackInfo = {
+				buttons = {
+					{
+						buttonType = ButtonType.Secondary,
+						props = {
+							onActivated = t2.props.cancelActivated,
+							text = t3.ButtonCancel
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = {
+							onActivated = t2.props.continueActivated,
+							text = t3.ButtonContinue
+						}
+					}
+				}
+			},
+			screenSize = t2.props.screenSize
+		})
+	}))
+end
+
+return v8

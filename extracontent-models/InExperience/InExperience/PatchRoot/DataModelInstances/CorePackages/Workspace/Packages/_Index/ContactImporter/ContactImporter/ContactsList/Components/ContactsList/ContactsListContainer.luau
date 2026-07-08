@@ -1,545 +1,565 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Roact_0 = v1.Roact;
-local l_RoactRodux_0 = v1.RoactRodux;
-local _ = require(l_Parent_0.Common.LocalTypes);
-local v6 = require(l_Parent_0.Common.Constants);
-local l_Promise_0 = v1.Promise;
-local v8 = require(l_Parent_0.Analytics);
-local l_FieldNames_0 = v8.FieldNames;
-local l_EventNames_0 = v8.EventNames;
-local v11 = require(l_Parent_0.Analytics.setupFireAnalyticsEvents);
-local v12 = require(l_Parent_0.Utils.formatContacts);
-local l_ContactsProtocol_0 = v1.ContactsProtocol;
-local l_Dash_0 = v1.Dash;
-local l_EnumScreens_0 = v1.SocialModalsCommon.EnumScreens;
-local l_AmpApiProvider_0 = v1.AmpUpsell.AmpApiProvider;
-local l_AccessResponseEnum_0 = v1.AmpUpsell.AmpEnums.AccessResponseEnum;
-local v18 = require(l_Parent_0.Flags.getFFlagFindFriendsClickedEventEnabled);
-local v19 = require(script.Parent.ContactsList);
-local v20 = require(script.Parent.ContactsListMapDispatchToProps);
-local v21 = require(script.Parent.ContactsListMapStateToProps);
-local l_getDeepValue_0 = v1.SocialLibraries.Dictionary.getDeepValue;
-local v23 = require(l_Parent_0.Analytics.Enums.UploadContactsSources);
-local v24 = require(l_Parent_0.Flags.getFIntContactImporterUploadContactsMin);
-local v25 = require(l_Parent_0.Common.IXPVariants);
-local l_FFlagContactImporterIXPCleanup_0 = require(l_Parent_1.SharedFlags).FFlagContactImporterIXPCleanup;
-local l_DiscoverabilityAnalytics_0 = v1.DiscoverabilityAnalytics;
-local v28 = l_Roact_0.PureComponent:extend("ContactsListContainer");
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local ParentParentParent = ParentParent.Parent
+local Roact = dependencies.Roact
+local RoactRodux = dependencies.RoactRodux
+
+require(ParentParent.Common.LocalTypes)
+
+local Constants = require(ParentParent.Common.Constants)
+local Promise = dependencies.Promise
+local Analytics = require(ParentParent.Analytics)
+local FieldNames = Analytics.FieldNames
+local EventNames = Analytics.EventNames
+local setupFireAnalyticsEvents = require(ParentParent.Analytics.setupFireAnalyticsEvents)
+local formatContacts = require(ParentParent.Utils.formatContacts)
+local ContactsProtocol = dependencies.ContactsProtocol
+local Dash = dependencies.Dash
+local EnumScreens = dependencies.SocialModalsCommon.EnumScreens
+local AmpApiProvider = dependencies.AmpUpsell.AmpApiProvider
+local AccessResponseEnum = dependencies.AmpUpsell.AmpEnums.AccessResponseEnum
+local getFFlagFindFriendsClickedEventEnabled = require(ParentParent.Flags.getFFlagFindFriendsClickedEventEnabled)
+local ContactsList = require(script.Parent.ContactsList)
+local ContactsListMapDispatchToProps = require(script.Parent.ContactsListMapDispatchToProps)
+local ContactsListMapStateToProps = require(script.Parent.ContactsListMapStateToProps)
+local getDeepValue = dependencies.SocialLibraries.Dictionary.getDeepValue
+local UploadContactsSources = require(ParentParent.Analytics.Enums.UploadContactsSources)
+local getFIntContactImporterUploadContactsMin = require(ParentParent.Flags.getFIntContactImporterUploadContactsMin)
+local IXPVariants = require(ParentParent.Common.IXPVariants)
+local FFlagContactImporterIXPCleanup = require(ParentParentParent.SharedFlags).FFlagContactImporterIXPCleanup
+local DiscoverabilityAnalytics = dependencies.DiscoverabilityAnalytics
+local v28 = Roact.PureComponent:extend("ContactsListContainer")
+
 v28.defaultProps = {
-    contactsProtocol = l_ContactsProtocol_0.default
-};
-v28.init = function(v29) --[[ Line: 74 ]] --[[ Name: init ]]
-    -- upvalues: v11 (copy), v8 (copy), l_getDeepValue_0 (copy), l_AmpApiProvider_0 (copy), l_Promise_0 (copy), l_EventNames_0 (copy), l_FieldNames_0 (copy), v12 (copy), v23 (copy), l_FFlagContactImporterIXPCleanup_0 (copy), v25 (copy), v24 (copy), v6 (copy), l_AccessResponseEnum_0 (copy), l_EnumScreens_0 (copy), l_DiscoverabilityAnalytics_0 (copy), v18 (copy), l_Dash_0 (copy)
-    v29.entryPoint = v29.props.navigation.getParam("entryPoint");
-    v29.fireAnalyticsEvent = v11({
-        analytics = v8.AnalyticsService, 
-        defaultAnalyticsInfo = {
-            entry = v29.entryPoint
-        }
-    });
-    v29.state = {
-        hasUploadError = false, 
-        isFetching = true, 
-        showMatchedContacts = false
-    };
-    v29.getPropOrParam = function(v30) --[[ Line: 91 ]]
-        -- upvalues: v29 (copy), l_getDeepValue_0 (ref)
-        if v29.props.navigation and v29.props.navigation.getParam(v30) or v29.props.navigation then
-            return v29.props.navigation.getParam(v30);
-        else
-            return l_getDeepValue_0(v29.props, v30);
-        end;
-    end;
-    v29.contactsCount = nil;
-    v29.numTotalNumbersOnDevice = nil;
-    v29.numTotalContactsOnDevice = nil;
-    v29.numContactsWithMultipleNumbers = nil;
-    v29.startTime = os.clock();
-    v29.ampApiProvider = if v29.props.ampApiProvider ~= nil then v29.props.ampApiProvider else l_AmpApiProvider_0;
-    local function _(v31) --[[ Line: 107 ]] --[[ Name: makeErrorFunction ]]
-        -- upvalues: l_Promise_0 (ref), v29 (copy)
-        return function(v32) --[[ Line: 108 ]]
-            -- upvalues: l_Promise_0 (ref), v29 (ref), v31 (copy)
-            if type(v32) == "table" and v32.hasAlreadyErrored then
-                return l_Promise_0.reject({
-                    hasAlreadyErrored = true
-                });
-            else
-                v29:setState({
-                    hasUploadError = true, 
-                    isFetching = false
-                });
-                v29.fireAnalyticsEvent(v31, {
-                    failedStep = v31
-                });
-                v29.fireContactImportingTimeEvent({
-                    isSuccessfulUpload = false, 
-                    failedStep = v31
-                });
-                return l_Promise_0.reject({
-                    hasAlreadyErrored = true
-                });
-            end;
-        end;
-    end;
-    local function _(v34) --[[ Line: 131 ]]
-        -- upvalues: l_getDeepValue_0 (ref)
-        local v35 = l_getDeepValue_0(v34 or {}, "responseBody.userContactsEntities");
-        if v35 then
-            return #v35;
-        else
-            return 0;
-        end;
-    end;
-    local function _() --[[ Line: 137 ]]
-        -- upvalues: v29 (copy)
-        if v29.props.navigation then
-            v29.props.navigation.pop();
-            return;
-        else
-            if v29.props.onClose then
-                v29.props.onClose();
-            end;
-            return;
-        end;
-    end;
-    v29.requestFriendship = function(v38) --[[ Line: 145 ]]
-        -- upvalues: v29 (copy), l_EventNames_0 (ref)
-        local l_props_0 = v29.props;
-        v29.fireAnalyticsEvent(l_EventNames_0.RequestFriendship, {
-            requestedId = v38
-        });
-        l_props_0.requestFriendship({
-            currentUserId = l_props_0.localUserId, 
-            contactId = v38
-        }):andThen(function() --[[ Line: 157 ]]
-            -- upvalues: l_props_0 (copy), v38 (copy)
-            l_props_0.requestSent(v38);
-        end);
-    end;
-    v29.fireContactImportingTimeEvent = function(v40) --[[ Line: 162 ]]
-        -- upvalues: v29 (copy), l_EventNames_0 (ref), l_FieldNames_0 (ref)
-        v29.fireAnalyticsEvent(l_EventNames_0.ContactImportingTime, {
-            [l_FieldNames_0.NumTotalContactsImported] = v29.contactsCount, 
-            [l_FieldNames_0.NumMatchedContacts] = v40.numMatchedContacts, 
-            [l_FieldNames_0.NumTotalContactsOnDevice] = v29.numTotalContactsOnDevice, 
-            [l_FieldNames_0.NumMaxContacts] = true, 
-            [l_FieldNames_0.NumMinContacts] = true, 
-            [l_FieldNames_0.NumTotalNumbersOnDevice] = v29.numTotalNumbersOnDevice, 
-            [l_FieldNames_0.NumContactsWithMultipleNumbers] = v29.numContactsWithMultipleNumbers, 
-            loadingTime = os.clock() - v29.startTime, 
-            isSuccessfulUpload = v40.isSuccessfulUpload
-        });
-    end;
-    v29.getContactsFromDevice = function() --[[ Line: 180 ]]
-        -- upvalues: v29 (copy), l_Promise_0 (ref)
-        local l_props_1 = v29.props;
-        return l_props_1.contactsProtocol:supportsContacts():andThen(function(v42) --[[ Line: 185 ]]
-            -- upvalues: l_Promise_0 (ref), l_props_1 (copy)
-            if not v42 then
-                return l_Promise_0.reject();
-            else
-                return l_props_1.contactsProtocol:getContacts();
-            end;
-        end):catch(function() --[[ Line: 192 ]]
-            -- upvalues: l_Promise_0 (ref)
-            return l_Promise_0.reject();
-        end);
-    end;
-    v29.formatContactsFromDevice = function(v43) --[[ Line: 197 ]]
-        -- upvalues: v29 (copy), v12 (ref)
-        local l_props_2 = v29.props;
-        if #(v43.contacts or {}) == 0 then
-            return {
-                contacts = {}, 
-                contactsCount = 0, 
-                countryCode = nil
-            };
-        else
-            l_props_2.deviceContactsReceived(v43.contacts);
-            local v45 = v12(v43);
-            v29.contactsCount = #v45.contacts;
-            v29.numTotalContactsOnDevice = v45.contactsCount;
-            local v46 = 0;
-            local v47 = 0;
-            for _, v49 in ipairs(v43.contacts) do
-                local v50 = #v49.phonenumber;
-                if v50 > 1 then
-                    v47 = v47 + 1;
-                end;
-                v46 = v46 + v50;
-            end;
-            v29.numTotalNumbersOnDevice = v46;
-            v29.numContactsWithMultipleNumbers = v47;
-            return v45;
-        end;
-    end;
-    v29.uploadDeviceContacts = function(v51) --[[ Line: 230 ]]
-        -- upvalues: v23 (ref), v29 (copy), l_FFlagContactImporterIXPCleanup_0 (ref), v25 (ref), v24 (ref), l_Promise_0 (ref), l_EventNames_0 (ref)
-        v51.source = v23.CI;
-        local l_props_3 = v29.props;
-        if #v51.contacts == 0 or not l_FFlagContactImporterIXPCleanup_0 and l_props_3.variant == v25.INVITES_ONLY or #v51.contacts < v24() then
-            return l_Promise_0.resolve({
-                shouldFindContacts = false
-            });
-        else
-            return l_props_3.uploadContacts(v51):andThen(function() --[[ Line: 246 ]]
-                -- upvalues: l_Promise_0 (ref)
-                return l_Promise_0.resolve({
-                    shouldFindContacts = true
-                });
-            end, function() --[[ Line: 248 ]]
-                -- upvalues: v29 (ref), l_EventNames_0 (ref), l_Promise_0 (ref)
-                v29.fireAnalyticsEvent(l_EventNames_0.FailedUploadContactsFromDevice, {
-                    failedStep = l_EventNames_0.FailedUploadContactsFromDevice
-                });
-                v29.fireContactImportingTimeEvent({
-                    isSuccessfulUpload = false, 
-                    failedStep = l_EventNames_0.FailedUploadContactsFromDevice
-                });
-                return l_Promise_0.resolve({
-                    shouldFindContacts = true
-                });
-            end);
-        end;
-    end;
-    v29.findContacts = function(v53) --[[ Line: 262 ]]
-        -- upvalues: v29 (copy), l_Promise_0 (ref)
-        local l_props_4 = v29.props;
-        if v53.shouldFindContacts then
-            return l_props_4.findContacts();
-        else
-            return l_Promise_0.resolve();
-        end;
-    end;
-    v29.getContactEntities = function(v55) --[[ Line: 271 ]]
-        -- upvalues: v29 (copy), l_Promise_0 (ref)
-        local l_props_5 = v29.props;
-        if v55 then
-            return l_props_5.getContactEntities(v55);
-        else
-            return l_Promise_0.resolve();
-        end;
-    end;
-    v29.fireHasLoaded = function(v57) --[[ Line: 281 ]]
-        -- upvalues: l_getDeepValue_0 (ref), v29 (copy), l_EventNames_0 (ref), l_FieldNames_0 (ref), l_Promise_0 (ref)
-        local v58 = l_getDeepValue_0(v57 or {}, "responseBody.userContactsEntities");
-        local v59 = if v58 then #v58 else 0;
-        v29.fireAnalyticsEvent(l_EventNames_0.ContactsListLoaded, {
-            [l_FieldNames_0.NumTotalContactsImported] = v29.contactsCount, 
-            [l_FieldNames_0.NumMatchedContacts] = v59, 
-            [l_FieldNames_0.NumMaxContacts] = true, 
-            [l_FieldNames_0.NumMinContacts] = true, 
-            [l_FieldNames_0.NumTotalContactsOnDevice] = v29.numTotalContactsOnDevice
-        });
-        v29:setState({
-            isFetching = false
-        });
-        v29.fireContactImportingTimeEvent({
-            isSuccessfulUpload = true, 
-            nummatchedContacts = v59
-        });
-        return l_Promise_0.resolve();
-    end;
-    v29.failedToUpload = function(_) --[[ Line: 303 ]]
-        -- upvalues: v29 (copy)
-        v29:setState({
-            hasUploadError = true, 
-            isFetching = false
-        });
-        v29.fireContactImportingTimeEvent({
-            isSuccessfulUpload = false
-        });
-    end;
-    v29.getContacts = function() --[[ Line: 312 ]]
-        -- upvalues: v29 (copy), v6 (ref), l_AccessResponseEnum_0 (ref), l_FFlagContactImporterIXPCleanup_0 (ref), l_EventNames_0 (ref), l_Promise_0 (ref)
-        local v61 = nil;
-        v29:setState({
-            isFetching = true
-        });
-        local v62 = v29.ampApiProvider.getFeatureAccess({
-            v6.SHOW_MATCHED_CONTACTS
-        });
-        v61 = (if #v62.featureAccessList > 0 then v62.featureAccessList[1].access else l_AccessResponseEnum_0.Actionable) == l_AccessResponseEnum_0.Granted;
-        v29:setState({
-            showMatchedContacts = v61
-        });
-        if not l_FFlagContactImporterIXPCleanup_0 and v29.props.isPVRequired and not v61 then
-            local v63 = v29.getContactsFromDevice();
-            local l_formatContactsFromDevice_0 = v29.formatContactsFromDevice;
-            local l_FailedGetContactsFromDevice_0 = l_EventNames_0.FailedGetContactsFromDevice;
-            local l_l_FailedGetContactsFromDevice_0_0 = l_FailedGetContactsFromDevice_0 --[[ copy: 7 -> 12 ]];
-            v63 = v63:andThen(l_formatContactsFromDevice_0, function(v67) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_l_FailedGetContactsFromDevice_0_0 (copy)
-                if type(v67) == "table" and v67.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_l_FailedGetContactsFromDevice_0_0, {
-                        failedStep = l_l_FailedGetContactsFromDevice_0_0
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_l_FailedGetContactsFromDevice_0_0
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end);
-            l_formatContactsFromDevice_0 = v29.fireHasLoaded;
-            l_FailedGetContactsFromDevice_0 = l_EventNames_0.FailedFormatContactsFromDevice;
-            v63:andThen(l_formatContactsFromDevice_0, function(v68) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_FailedGetContactsFromDevice_0 (copy)
-                if type(v68) == "table" and v68.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_FailedGetContactsFromDevice_0, {
-                        failedStep = l_FailedGetContactsFromDevice_0
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_FailedGetContactsFromDevice_0
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end):catch(v29.failedToUpload);
-            return;
-        else
-            local v69 = v29.getContactsFromDevice();
-            local l_formatContactsFromDevice_1 = v29.formatContactsFromDevice;
-            local l_FailedGetContactsFromDevice_1 = l_EventNames_0.FailedGetContactsFromDevice;
-            local l_l_FailedGetContactsFromDevice_1_0 = l_FailedGetContactsFromDevice_1 --[[ copy: 7 -> 8 ]];
-            v69 = v69:andThen(l_formatContactsFromDevice_1, function(v73) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_l_FailedGetContactsFromDevice_1_0 (copy)
-                if type(v73) == "table" and v73.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_l_FailedGetContactsFromDevice_1_0, {
-                        failedStep = l_l_FailedGetContactsFromDevice_1_0
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_l_FailedGetContactsFromDevice_1_0
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end);
-            l_formatContactsFromDevice_1 = v29.uploadDeviceContacts;
-            l_FailedGetContactsFromDevice_1 = l_EventNames_0.FailedFormatContactsFromDevice;
-            local l_l_FailedGetContactsFromDevice_1_1 = l_FailedGetContactsFromDevice_1 --[[ copy: 7 -> 9 ]];
-            v69 = v69:andThen(l_formatContactsFromDevice_1, function(v75) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_l_FailedGetContactsFromDevice_1_1 (copy)
-                if type(v75) == "table" and v75.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_l_FailedGetContactsFromDevice_1_1, {
-                        failedStep = l_l_FailedGetContactsFromDevice_1_1
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_l_FailedGetContactsFromDevice_1_1
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end);
-            l_formatContactsFromDevice_1 = v29.findContacts;
-            l_FailedGetContactsFromDevice_1 = l_EventNames_0.FailedUploadContactsFromDevice;
-            local l_l_FailedGetContactsFromDevice_1_2 = l_FailedGetContactsFromDevice_1 --[[ copy: 7 -> 10 ]];
-            v69 = v69:andThen(l_formatContactsFromDevice_1, function(v77) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_l_FailedGetContactsFromDevice_1_2 (copy)
-                if type(v77) == "table" and v77.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_l_FailedGetContactsFromDevice_1_2, {
-                        failedStep = l_l_FailedGetContactsFromDevice_1_2
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_l_FailedGetContactsFromDevice_1_2
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end);
-            l_formatContactsFromDevice_1 = v29.getContactEntities;
-            l_FailedGetContactsFromDevice_1 = l_EventNames_0.FailedFindContacts;
-            local l_l_FailedGetContactsFromDevice_1_3 = l_FailedGetContactsFromDevice_1 --[[ copy: 7 -> 11 ]];
-            v69 = v69:andThen(l_formatContactsFromDevice_1, function(v79) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_l_FailedGetContactsFromDevice_1_3 (copy)
-                if type(v79) == "table" and v79.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_l_FailedGetContactsFromDevice_1_3, {
-                        failedStep = l_l_FailedGetContactsFromDevice_1_3
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_l_FailedGetContactsFromDevice_1_3
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end);
-            l_formatContactsFromDevice_1 = v29.fireHasLoaded;
-            l_FailedGetContactsFromDevice_1 = l_EventNames_0.FailedGetContactEntities;
-            v69:andThen(l_formatContactsFromDevice_1, function(v80) --[[ Line: 108 ]]
-                -- upvalues: l_Promise_0 (ref), v29 (ref), l_FailedGetContactsFromDevice_1 (copy)
-                if type(v80) == "table" and v80.hasAlreadyErrored then
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                else
-                    v29:setState({
-                        hasUploadError = true, 
-                        isFetching = false
-                    });
-                    v29.fireAnalyticsEvent(l_FailedGetContactsFromDevice_1, {
-                        failedStep = l_FailedGetContactsFromDevice_1
-                    });
-                    v29.fireContactImportingTimeEvent({
-                        isSuccessfulUpload = false, 
-                        failedStep = l_FailedGetContactsFromDevice_1
-                    });
-                    return l_Promise_0.reject({
-                        hasAlreadyErrored = true
-                    });
-                end;
-            end):catch(v29.failedToUpload);
-            return;
-        end;
-    end;
-    v29.closeModal = function(v81) --[[ Line: 342 ]]
-        -- upvalues: v29 (copy), l_FFlagContactImporterIXPCleanup_0 (ref), v25 (ref)
-        local l_props_6 = v29.props;
-        local l_state_0 = v29.state;
-        v29.fireAnalyticsEvent(v81, {
-            isLoading = if l_FFlagContactImporterIXPCleanup_0 then v29.state.isFetching else v29.isFetching(l_props_6.variant, v25), 
-            loadingTime = if l_state_0.isFetching then os.clock() - v29.startTime else nil
-        });
-        if v29.props.navigation then
-            v29.props.navigation.pop();
-            return;
-        else
-            if v29.props.onClose then
-                v29.props.onClose();
-            end;
-            return;
-        end;
-    end;
-    v29.onAddFriendsActivated = function() --[[ Line: 356 ]]
-        -- upvalues: v29 (copy), l_EnumScreens_0 (ref)
-        v29.props.navigation.replace(l_EnumScreens_0.AddFriendsPage);
-    end;
-    v29.isFetching = if l_FFlagContactImporterIXPCleanup_0 then nil else function(v84, v85) --[[ Line: 365 ]]
-        -- upvalues: v29 (copy)
-        local l_state_1 = v29.state;
-        if v84 == v85.BLENDED then
-            return l_state_1.isFetching;
-        else
-            return false;
-        end;
-    end;
-    v29.openDiscoverabilityModal = function() --[[ Line: 370 ]]
-        -- upvalues: v29 (copy), l_EnumScreens_0 (ref), l_DiscoverabilityAnalytics_0 (ref), v6 (ref), l_AccessResponseEnum_0 (ref), v18 (ref), l_EventNames_0 (ref), l_Dash_0 (ref)
-        local l_navigation_0 = v29.props.navigation;
-        l_navigation_0.replace(l_EnumScreens_0.DiscoverabilityOverlay, {
-            isStandaloneDiscoverabilityModal = true, 
-            entryPoint = l_DiscoverabilityAnalytics_0.EntryPoints.ContactsList, 
-            navigateOnActivated = function() --[[ Line: 377 ]] --[[ Name: navigateOnActivated ]]
-                -- upvalues: l_navigation_0 (copy), l_EnumScreens_0 (ref), v6 (ref), v29 (ref)
-                l_navigation_0.replace(l_EnumScreens_0.ContactsList, {
-                    [v6.SHOULD_UPDATE_USER_SETTINGS] = true, 
-                    [v6.IS_PHONE_VERIFIED] = v29.getPropOrParam(v6.IS_PHONE_VERIFIED), 
-                    openAmpUpsell = v29.getPropOrParam(v6.OPEN_AMP_UPSELL), 
-                    entryPoint = v29.entryPoint
-                });
-            end
-        });
-        local v88 = v29.getPropOrParam(v6.OPEN_AMP_UPSELL);
-        v29.openAmpUpsell = v88 and function() --[[ Line: 390 ]]
-            -- upvalues: l_AccessResponseEnum_0 (ref), v29 (ref), v18 (ref), l_EventNames_0 (ref), v88 (copy), v6 (ref)
-            local function v91(v89, _) --[[ Line: 391 ]]
-                -- upvalues: l_AccessResponseEnum_0 (ref), v29 (ref)
-                if v89 == l_AccessResponseEnum_0.Granted then
-                    v29.getContacts();
-                    v29.openDiscoverabilityModal();
-                end;
-            end;
-            if v18() then
-                v29.fireAnalyticsEvent(l_EventNames_0.FindFriendsButtonClicked);
-            end;
-            v88(v6.SHOW_MATCHED_CONTACTS, v91);
-        end or l_Dash_0.noop;
-    end;
-end;
-v28.didMount = function(v92) --[[ Line: 407 ]] --[[ Name: didMount ]]
-    v92.getContacts();
-end;
-v28.render = function(v93) --[[ Line: 411 ]] --[[ Name: render ]]
-    -- upvalues: l_FFlagContactImporterIXPCleanup_0 (copy), l_Roact_0 (copy), v19 (copy), v25 (copy), v8 (copy)
-    local l_props_7 = v93.props;
-    local v95 = if l_FFlagContactImporterIXPCleanup_0 then nil else l_props_7.variant;
-    local l_entryPoint_0 = v93.entryPoint;
-    return l_Roact_0.createElement(v19, {
-        deviceContacts = l_props_7.deviceContacts, 
-        matchedContacts = l_props_7.matchedContacts, 
-        isFetching = if l_FFlagContactImporterIXPCleanup_0 then v93.state.isFetching else v93.isFetching(v95, v25), 
-        requestFriendship = v93.requestFriendship, 
-        screenSize = l_props_7.screenSize, 
-        hasUploadError = v93.state.hasUploadError, 
-        onAddFriendsActivated = v93.onAddFriendsActivated, 
-        closeModal = v93.closeModal, 
-        showAddFriendsButton = l_entryPoint_0 == v8.EntryPoints.HomePage, 
-        variant = if l_FFlagContactImporterIXPCleanup_0 then nil else l_props_7.variant, 
-        openProfilePeekView = v93.props.openProfilePeekView, 
-        showMatchedContacts = v93.state.showMatchedContacts, 
-        openAmpUpsell = v93.openAmpUpsell
-    });
-end;
-return l_RoactRodux_0.connect(v21, v20)(v28);
+	contactsProtocol = ContactsProtocol.default
+}
+
+function v28.init(p1) -- line: 74
+	-- upvalues: setupFireAnalyticsEvents (copy), Analytics (copy), getDeepValue (copy), AmpApiProvider (copy), Promise (copy), EventNames (copy), FieldNames (copy), formatContacts (copy), UploadContactsSources (copy), FFlagContactImporterIXPCleanup (copy), IXPVariants (copy), getFIntContactImporterUploadContactsMin (copy), Constants (copy), AccessResponseEnum (copy), EnumScreens (copy), DiscoverabilityAnalytics (copy), getFFlagFindFriendsClickedEventEnabled (copy), Dash (copy)
+	p1.entryPoint = p1.props.navigation.getParam("entryPoint")
+	p1.fireAnalyticsEvent = setupFireAnalyticsEvents({
+		analytics = Analytics.AnalyticsService,
+		defaultAnalyticsInfo = {
+			entry = p1.entryPoint
+		}
+	})
+	p1.state = {
+		hasUploadError = false,
+		isFetching = true,
+		showMatchedContacts = false
+	}
+
+	function p1.getPropOrParam(p2) -- line: 91
+		-- upvalues: p1 (copy), getDeepValue (copy)
+		if p1.props.navigation and p1.props.navigation.getParam(p2) or p1.props.navigation then
+			return p1.props.navigation.getParam(p2)
+		end
+
+		return getDeepValue(p1.props, p2)
+	end
+
+	p1.contactsCount = nil
+	p1.numTotalNumbersOnDevice = nil
+	p1.numTotalContactsOnDevice = nil
+	p1.numContactsWithMultipleNumbers = nil
+	p1.startTime = os.clock()
+	p1.ampApiProvider = if p1.props.ampApiProvider == nil then AmpApiProvider else p1.props.ampApiProvider
+
+	local function makeErrorFunction(s1: string) -- line: 107
+		-- upvalues: Promise (copy), p1 (copy)
+		return function(p3) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), s1 (copy)
+			if type(p3) == "table" and p3.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(s1, {
+				failedStep = s1
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = s1
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end
+	end
+
+	function p1.requestFriendship(p4) -- line: 145
+		-- upvalues: p1 (copy), EventNames (copy)
+		local props = p1.props
+
+		p1.fireAnalyticsEvent(EventNames.RequestFriendship, {
+			requestedId = p4
+		})
+		props.requestFriendship({
+			currentUserId = props.localUserId,
+			contactId = p4
+		}):andThen(function() -- line: 157
+			-- upvalues: props (copy), p4 (copy)
+			props.requestSent(p4)
+		end)
+	end
+	function p1.fireContactImportingTimeEvent(t1: {[any]: any}) -- line: 162
+		-- upvalues: p1 (copy), EventNames (copy), FieldNames (copy)
+		p1.fireAnalyticsEvent(EventNames.ContactImportingTime, {
+			[FieldNames.NumTotalContactsImported] = p1.contactsCount,
+			[FieldNames.NumMatchedContacts] = t1.numMatchedContacts,
+			[FieldNames.NumTotalContactsOnDevice] = p1.numTotalContactsOnDevice,
+			[FieldNames.NumMaxContacts] = true,
+			[FieldNames.NumMinContacts] = true,
+			[FieldNames.NumTotalNumbersOnDevice] = p1.numTotalNumbersOnDevice,
+			[FieldNames.NumContactsWithMultipleNumbers] = p1.numContactsWithMultipleNumbers,
+			loadingTime = os.clock() - p1.startTime,
+			isSuccessfulUpload = t1.isSuccessfulUpload
+		})
+	end
+	function p1.getContactsFromDevice() -- line: 180
+		-- upvalues: p1 (copy), Promise (copy)
+		local props = p1.props
+
+		return props.contactsProtocol:supportsContacts():andThen(function(p5) -- line: 185
+			-- upvalues: Promise (copy), props (copy)
+			if not p5 then
+				return Promise.reject()
+			end
+
+			return props.contactsProtocol:getContacts()
+		end):catch(function() -- line: 192
+			-- upvalues: Promise (copy)
+			return Promise.reject()
+		end)
+	end
+	function p1.formatContactsFromDevice(p6) -- line: 197
+		-- upvalues: p1 (copy), formatContacts (copy)
+		local props = p1.props
+
+		if #(p6.contacts or {}) == 0 then
+			return {
+				contactsCount = 0,
+				countryCode = nil,
+				contacts = {}
+			}
+		end
+
+		props.deviceContactsReceived(p6.contacts)
+
+		local v46 = formatContacts(p6)
+
+		p1.contactsCount = #v46.contacts
+		p1.numTotalContactsOnDevice = v46.contactsCount
+
+		local n1 = 0
+		local n2 = 0
+
+		for _, v in ipairs(p6.contacts) do
+			local v51 = #v.phonenumber
+
+			if v51 > 1 then
+				n2 += 1
+			end
+
+			n1 += v51
+		end
+
+		p1.numTotalNumbersOnDevice = n1
+		p1.numContactsWithMultipleNumbers = n2
+
+		return v46
+	end
+	function p1.uploadDeviceContacts(p7) -- line: 230
+		-- upvalues: UploadContactsSources (copy), p1 (copy), FFlagContactImporterIXPCleanup (copy), IXPVariants (copy), getFIntContactImporterUploadContactsMin (copy), Promise (copy), EventNames (copy)
+		p7.source = UploadContactsSources.CI
+
+		local props = p1.props
+
+		if #p7.contacts == 0 or (not FFlagContactImporterIXPCleanup and props.variant == IXPVariants.INVITES_ONLY or #p7.contacts < getFIntContactImporterUploadContactsMin()) then
+			return Promise.resolve({
+				shouldFindContacts = false
+			})
+		end
+
+		return props.uploadContacts(p7):andThen(function() -- line: 246
+			-- upvalues: Promise (copy)
+			return Promise.resolve({
+				shouldFindContacts = true
+			})
+		end, function() -- line: 248
+			-- upvalues: p1 (copy), EventNames (copy), Promise (copy)
+			p1.fireAnalyticsEvent(EventNames.FailedUploadContactsFromDevice, {
+				failedStep = EventNames.FailedUploadContactsFromDevice
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = EventNames.FailedUploadContactsFromDevice
+			})
+
+			return Promise.resolve({
+				shouldFindContacts = true
+			})
+		end)
+	end
+	function p1.findContacts(p8) -- line: 262
+		-- upvalues: p1 (copy), Promise (copy)
+		local props = p1.props
+
+		if p8.shouldFindContacts then
+			return props.findContacts()
+		end
+
+		return Promise.resolve()
+	end
+	function p1.getContactEntities(p9) -- line: 271
+		-- upvalues: p1 (copy), Promise (copy)
+		local props = p1.props
+
+		if p9 then
+			return props.getContactEntities(p9)
+		end
+
+		return Promise.resolve()
+	end
+	function p1.fireHasLoaded(p10) -- line: 281
+		-- upvalues: getDeepValue (copy), p1 (copy), EventNames (copy), FieldNames (copy), Promise (copy)
+		local v59 = getDeepValue(p10 or {}, "responseBody.userContactsEntities")
+		local v60 = not v59 and 0 or #v59
+
+		p1.fireAnalyticsEvent(EventNames.ContactsListLoaded, {
+			[FieldNames.NumTotalContactsImported] = p1.contactsCount,
+			[FieldNames.NumMatchedContacts] = v60,
+			[FieldNames.NumMaxContacts] = true,
+			[FieldNames.NumMinContacts] = true,
+			[FieldNames.NumTotalContactsOnDevice] = p1.numTotalContactsOnDevice
+		})
+		p1:setState({
+			isFetching = false
+		})
+		p1.fireContactImportingTimeEvent({
+			isSuccessfulUpload = true,
+			nummatchedContacts = v60
+		})
+
+		return Promise.resolve()
+	end
+	function p1.failedToUpload(_) -- line: 303
+		-- upvalues: p1 (copy)
+		p1:setState({
+			hasUploadError = true,
+			isFetching = false
+		})
+		p1.fireContactImportingTimeEvent({
+			isSuccessfulUpload = false
+		})
+	end
+	function p1.getContacts() -- line: 312
+		-- upvalues: p1 (copy), Constants (copy), AccessResponseEnum (copy), FFlagContactImporterIXPCleanup (copy), EventNames (copy), Promise (copy)
+		p1:setState({
+			isFetching = true
+		})
+
+		local v62 = p1.ampApiProvider.getFeatureAccess({ Constants.SHOW_MATCHED_CONTACTS })
+		local v63 = ((if not (#v62.featureAccessList > 0) then AccessResponseEnum.Actionable else v62.featureAccessList[1].access)) == AccessResponseEnum.Granted
+
+		p1:setState({
+			showMatchedContacts = v63
+		})
+
+		if not FFlagContactImporterIXPCleanup and (p1.props.isPVRequired and not v63) then
+			local v64 = p1.getContactsFromDevice()
+			local formatContactsFromDevice = p1.formatContactsFromDevice
+			local FailedGetContactsFromDevice = EventNames.FailedGetContactsFromDevice
+			local v67 = v64:andThen(formatContactsFromDevice, function(p12) -- line: 108
+				-- upvalues: Promise (copy), p1 (copy), FailedGetContactsFromDevice (copy)
+				if type(p12) == "table" and p12.hasAlreadyErrored then
+					return Promise.reject({
+						hasAlreadyErrored = true
+					})
+				end
+
+				p1:setState({
+					hasUploadError = true,
+					isFetching = false
+				})
+				p1.fireAnalyticsEvent(FailedGetContactsFromDevice, {
+					failedStep = FailedGetContactsFromDevice
+				})
+				p1.fireContactImportingTimeEvent({
+					isSuccessfulUpload = false,
+					failedStep = FailedGetContactsFromDevice
+				})
+
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end)
+			local fireHasLoaded = p1.fireHasLoaded
+			local FailedFormatContactsFromDevice = EventNames.FailedFormatContactsFromDevice
+
+			v67:andThen(fireHasLoaded, function(p13) -- line: 108
+				-- upvalues: Promise (copy), p1 (copy), FailedFormatContactsFromDevice (copy)
+				if type(p13) == "table" and p13.hasAlreadyErrored then
+					return Promise.reject({
+						hasAlreadyErrored = true
+					})
+				end
+
+				p1:setState({
+					hasUploadError = true,
+					isFetching = false
+				})
+				p1.fireAnalyticsEvent(FailedFormatContactsFromDevice, {
+					failedStep = FailedFormatContactsFromDevice
+				})
+				p1.fireContactImportingTimeEvent({
+					isSuccessfulUpload = false,
+					failedStep = FailedFormatContactsFromDevice
+				})
+
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end):catch(p1.failedToUpload)
+
+			return
+		end
+
+		local v70 = p1.getContactsFromDevice()
+		local formatContactsFromDevice = p1.formatContactsFromDevice
+		local FailedGetContactsFromDevice = EventNames.FailedGetContactsFromDevice
+		local v73 = v70:andThen(formatContactsFromDevice, function(p14) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), FailedGetContactsFromDevice (copy)
+			if type(p14) == "table" and p14.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(FailedGetContactsFromDevice, {
+				failedStep = FailedGetContactsFromDevice
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = FailedGetContactsFromDevice
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end)
+		local uploadDeviceContacts = p1.uploadDeviceContacts
+		local FailedFormatContactsFromDevice = EventNames.FailedFormatContactsFromDevice
+		local v76 = v73:andThen(uploadDeviceContacts, function(p15) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), FailedFormatContactsFromDevice (copy)
+			if type(p15) == "table" and p15.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(FailedFormatContactsFromDevice, {
+				failedStep = FailedFormatContactsFromDevice
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = FailedFormatContactsFromDevice
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end)
+		local findContacts = p1.findContacts
+		local FailedUploadContactsFromDevice = EventNames.FailedUploadContactsFromDevice
+		local v79 = v76:andThen(findContacts, function(p16) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), FailedUploadContactsFromDevice (copy)
+			if type(p16) == "table" and p16.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(FailedUploadContactsFromDevice, {
+				failedStep = FailedUploadContactsFromDevice
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = FailedUploadContactsFromDevice
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end)
+		local getContactEntities = p1.getContactEntities
+		local FailedFindContacts = EventNames.FailedFindContacts
+		local v82 = v79:andThen(getContactEntities, function(p17) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), FailedFindContacts (copy)
+			if type(p17) == "table" and p17.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(FailedFindContacts, {
+				failedStep = FailedFindContacts
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = FailedFindContacts
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end)
+		local fireHasLoaded = p1.fireHasLoaded
+		local FailedGetContactEntities = EventNames.FailedGetContactEntities
+
+		v82:andThen(fireHasLoaded, function(p18) -- line: 108
+			-- upvalues: Promise (copy), p1 (copy), FailedGetContactEntities (copy)
+			if type(p18) == "table" and p18.hasAlreadyErrored then
+				return Promise.reject({
+					hasAlreadyErrored = true
+				})
+			end
+
+			p1:setState({
+				hasUploadError = true,
+				isFetching = false
+			})
+			p1.fireAnalyticsEvent(FailedGetContactEntities, {
+				failedStep = FailedGetContactEntities
+			})
+			p1.fireContactImportingTimeEvent({
+				isSuccessfulUpload = false,
+				failedStep = FailedGetContactEntities
+			})
+
+			return Promise.reject({
+				hasAlreadyErrored = true
+			})
+		end):catch(p1.failedToUpload)
+	end
+	function p1.closeModal(p19) -- line: 342
+		-- upvalues: p1 (copy), FFlagContactImporterIXPCleanup (copy), IXPVariants (copy)
+		local props = p1.props
+		local state = p1.state
+
+		p1.fireAnalyticsEvent(p19, {
+			isLoading = if not FFlagContactImporterIXPCleanup then p1.isFetching(props.variant, IXPVariants) else p1.state.isFetching,
+			loadingTime = if not state.isFetching then nil else os.clock() - p1.startTime
+		})
+
+		if p1.props.navigation then
+			p1.props.navigation.pop()
+
+			return
+		end
+
+		if p1.props.onClose then
+			p1.props.onClose()
+		end
+	end
+	function p1.onAddFriendsActivated() -- line: 356
+		-- upvalues: p1 (copy), EnumScreens (copy)
+		p1.props.navigation.replace(EnumScreens.AddFriendsPage)
+	end
+
+	p1.isFetching = not FFlagContactImporterIXPCleanup and function(p20, p21) -- line: 365
+		-- upvalues: p1 (copy)
+		local state = p1.state
+
+		if p20 == p21.BLENDED then
+			return state.isFetching
+		end
+
+		return false
+	end or nil
+
+	function p1.openDiscoverabilityModal() -- line: 370
+		-- upvalues: p1 (copy), EnumScreens (copy), DiscoverabilityAnalytics (copy), Constants (copy), AccessResponseEnum (copy), getFFlagFindFriendsClickedEventEnabled (copy), EventNames (copy), Dash (copy)
+		local navigation = p1.props.navigation
+
+		navigation.replace(EnumScreens.DiscoverabilityOverlay, {
+			isStandaloneDiscoverabilityModal = true,
+			entryPoint = DiscoverabilityAnalytics.EntryPoints.ContactsList,
+			navigateOnActivated = function() -- line: 377
+				-- upvalues: navigation (copy), EnumScreens (copy), Constants (copy), p1 (copy)
+				navigation.replace(EnumScreens.ContactsList, {
+					[Constants.SHOULD_UPDATE_USER_SETTINGS] = true,
+					[Constants.IS_PHONE_VERIFIED] = p1.getPropOrParam(Constants.IS_PHONE_VERIFIED),
+					openAmpUpsell = p1.getPropOrParam(Constants.OPEN_AMP_UPSELL),
+					entryPoint = p1.entryPoint
+				})
+			end
+		})
+
+		local v92 = p1.getPropOrParam(Constants.OPEN_AMP_UPSELL)
+
+		p1.openAmpUpsell = if not v92 then Dash.noop else function() -- line: 390
+			-- upvalues: AccessResponseEnum (copy), p1 (copy), getFFlagFindFriendsClickedEventEnabled (copy), EventNames (copy), v92 (copy), Constants (copy)
+			if getFFlagFindFriendsClickedEventEnabled() then
+				p1.fireAnalyticsEvent(EventNames.FindFriendsButtonClicked)
+			end
+
+			v92(Constants.SHOW_MATCHED_CONTACTS, function(p22, _) -- line: 391
+				-- upvalues: AccessResponseEnum (copy), p1 (copy)
+				if p22 == AccessResponseEnum.Granted then
+					p1.getContacts()
+					p1.openDiscoverabilityModal()
+				end
+			end)
+		end
+	end
+end
+function v28.didMount(p24) -- line: 407
+	p24.getContacts()
+end
+function v28.render(p25) -- line: 411
+	-- upvalues: FFlagContactImporterIXPCleanup (copy), Roact (copy), ContactsList (copy), IXPVariants (copy), Analytics (copy)
+	local props = p25.props
+	local v34 = if not FFlagContactImporterIXPCleanup then props.variant else nil
+	local entryPoint = p25.entryPoint
+
+	return Roact.createElement(ContactsList, {
+		deviceContacts = props.deviceContacts,
+		matchedContacts = props.matchedContacts,
+		isFetching = if not FFlagContactImporterIXPCleanup then p25.isFetching(v34, IXPVariants) else p25.state.isFetching,
+		requestFriendship = p25.requestFriendship,
+		screenSize = props.screenSize,
+		hasUploadError = p25.state.hasUploadError,
+		onAddFriendsActivated = p25.onAddFriendsActivated,
+		closeModal = p25.closeModal,
+		showAddFriendsButton = entryPoint == Analytics.EntryPoints.HomePage,
+		variant = if not FFlagContactImporterIXPCleanup then props.variant else nil,
+		openProfilePeekView = p25.props.openProfilePeekView,
+		showMatchedContacts = p25.state.showMatchedContacts,
+		openAmpUpsell = p25.openAmpUpsell
+	})
+end
+
+return RoactRodux.connect(ContactsListMapStateToProps, ContactsListMapDispatchToProps)(v28)

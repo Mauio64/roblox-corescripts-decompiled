@@ -1,149 +1,165 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.RoactGamepad);
-local v6 = require(l_CorePackages_0.Packages.t);
-local v7 = require(l_CorePackages_0.Packages.UIBlox);
-local l_InteractiveAlert_0 = v7.App.Dialog.Alert.InteractiveAlert;
-local _ = v7.App.Button.Enum.ButtonType;
-local l_ImageSetLabel_0 = v7.Core.ImageSet.ImageSetLabel;
-local l_withStyle_0 = v7.Style.withStyle;
-local l_Images_0 = v7.App.ImageSet.Images;
-local _ = l_CoreGui_0:WaitForChild("RobloxGui");
-local v14 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_ExternalEventConnection_0 = require(l_CorePackages_0.Workspace.Packages.RoactUtils).ExternalEventConnection;
-local v16 = l_Images_0["component_assets/circle_17_stroke_1"];
-local v17 = Rect.new(8, 8, 8, 8);
-local v18 = v3.PureComponent:extend("PromptWithTextField");
-v18.validateProps = v6.strictInterface({
-    fieldText = v6.string, 
-    onFieldTextUpdated = v6.callback, 
-    title = v6.string, 
-    bodyText = v6.optional(v6.string), 
-    buttonStackInfo = v6.table, 
-    screenSize = v6.Vector2
-});
-v18.init = function(v19) --[[ Line: 50 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), l_UserInputService_0 (copy)
-    v19:setState({
-        alertPosition = UDim2.fromScale(0.5, 0.5)
-    });
-    v19.textBoxRef = v3.createRef();
-    v19.textUpdated = function(v20) --[[ Line: 57 ]]
-        -- upvalues: v19 (copy)
-        v19.props.onFieldTextUpdated(v20.Text);
-    end;
-    v19.lastAlertHeight = 100;
-    v19.calculateAlertPosition = function() --[[ Line: 63 ]]
-        -- upvalues: l_UserInputService_0 (ref), v19 (copy)
-        local v21 = UDim2.fromScale(0.5, 0.5);
-        if l_UserInputService_0.OnScreenKeyboardVisible then
-            local v22 = (v19.props.screenSize.Y - l_UserInputService_0.OnScreenKeyboardSize.Y) / 2;
-            local v23 = v22 - v19.lastAlertHeight / 2;
-            if v23 < 20 then
-                v22 = v22 + (20 - v23);
-            end;
-            v21 = UDim2.new(0.5, 0, 0, v22);
-        end;
-        if v19.state.alertPosition ~= v21 then
-            v19:setState({
-                alertPosition = v21
-            });
-        end;
-    end;
-    v19.alertSizeChanged = function(v24) --[[ Line: 86 ]]
-        -- upvalues: v19 (copy)
-        v19.lastAlertHeight = v24.AbsoluteSize.Y;
-        v19.calculateAlertPosition();
-    end;
-    v19.alertMounted = function() --[[ Line: 92 ]]
-        -- upvalues: v19 (copy)
-        local v25 = v19.textBoxRef:getValue();
-        if v25 then
-            v25:CaptureFocus();
-        end;
-    end;
-end;
-v18.renderAlertMiddleContent = function(v26) --[[ Line: 100 ]] --[[ Name: renderAlertMiddleContent ]]
-    -- upvalues: l_withStyle_0 (copy), v3 (copy), l_ImageSetLabel_0 (copy), v16 (copy), v17 (copy), v5 (copy), v14 (copy)
-    return l_withStyle_0(function(v27) --[[ Line: 101 ]]
-        -- upvalues: v3 (ref), l_ImageSetLabel_0 (ref), v16 (ref), v17 (ref), v5 (ref), v14 (ref), v26 (copy)
-        local l_Font_0 = v27.Font;
-        local l_Theme_0 = v27.Theme;
-        return v3.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, 35), 
-            Position = UDim2.fromScale(0, 1), 
-            AnchorPoint = Vector2.new(0, 1)
-        }, {
-            TextboxBorder = v3.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = v16, 
-                ImageColor3 = l_Theme_0.UIDefault.Color, 
-                ImageTransparency = l_Theme_0.UIDefault.Transparency, 
-                LayoutOrder = 3, 
-                ScaleType = Enum.ScaleType.Slice, 
-                Size = UDim2.new(1, 0, 1, -5), 
-                Position = UDim2.fromScale(0, 1), 
-                AnchorPoint = Vector2.new(0, 1), 
-                SliceCenter = v17
-            }, {
-                Textbox = v3.createElement(v5.Focusable.TextBox, {
-                    BackgroundTransparency = 1, 
-                    ClearTextOnFocus = false, 
-                    Font = l_Font_0.Header2.Font, 
-                    TextSize = l_Font_0.BaseSize * l_Font_0.CaptionBody.RelativeSize, 
-                    PlaceholderColor3 = l_Theme_0.TextDefault.Color, 
-                    PlaceholderText = v14:FormatByKey("CoreScripts.AvatarEditorPrompts.OutfitNamePlaceholder"), 
-                    Position = UDim2.new(0, 6, 0, 0), 
-                    Size = UDim2.new(1, -12, 1, 0), 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextTruncate = Enum.TextTruncate.AtEnd, 
-                    Text = v26.props.fieldText, 
-                    TextWrapped = true, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    OverlayNativeInput = true, 
-                    [v3.Change.Text] = v26.textUpdated, 
-                    [v3.Ref] = v26.textBoxRef
-                })
-            })
-        });
-    end);
-end;
-v18.render = function(v30) --[[ Line: 149 ]] --[[ Name: render ]]
-    -- upvalues: v3 (copy), l_InteractiveAlert_0 (copy), l_ExternalEventConnection_0 (copy), l_UserInputService_0 (copy)
-    return v3.createFragment({
-        InteractiveAlert = v3.createElement(l_InteractiveAlert_0, {
-            title = v30.props.title, 
-            bodyText = v30.props.bodyText, 
-            buttonStackInfo = v30.props.buttonStackInfo, 
-            position = v30.state.alertPosition, 
-            screenSize = v30.props.screenSize, 
-            middleContent = function() --[[ Line: 159 ]] --[[ Name: middleContent ]]
-                -- upvalues: v30 (copy)
-                return v30:renderAlertMiddleContent();
-            end, 
-            isMiddleContentFocusable = true, 
-            onAbsoluteSizeChanged = v30.alertSizeChanged, 
-            onMounted = v30.alertMounted
-        }), 
-        OnScreenKeyboardVisibleConnection = v3.createElement(l_ExternalEventConnection_0, {
-            event = l_UserInputService_0:GetPropertyChangedSignal("OnScreenKeyboardVisible"), 
-            callback = v30.calculateAlertPosition
-        }), 
-        OnScreenKeyboardSizeConnection = v3.createElement(l_ExternalEventConnection_0, {
-            event = l_UserInputService_0:GetPropertyChangedSignal("OnScreenKeyboardSize"), 
-            callback = v30.calculateAlertPosition
-        })
-    });
-end;
-v18.didMount = function(v31) --[[ Line: 179 ]] --[[ Name: didMount ]]
-    v31.calculateAlertPosition();
-end;
-return v4.connect(function(v32) --[[ Line: 183 ]] --[[ Name: mapStateToProps ]]
-    return {
-        screenSize = v32.screenSize
-    };
-end, nil)(v18);
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local RoactGamepad = require(CorePackages.Packages.RoactGamepad)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local _ = UIBlox.App.Button.Enum.ButtonType
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local withStyle = UIBlox.Style.withStyle
+local Images = UIBlox.App.ImageSet.Images
+
+CoreGui:WaitForChild("RobloxGui")
+
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local ExternalEventConnection = require(CorePackages.Workspace.Packages.RoactUtils).ExternalEventConnection
+local v16 = Images["component_assets/circle_17_stroke_1"]
+local rect = Rect.new(8, 8, 8, 8)
+local v18 = Roact.PureComponent:extend("PromptWithTextField")
+
+v18.validateProps = t.strictInterface({
+	fieldText = t.string,
+	onFieldTextUpdated = t.callback,
+	title = t.string,
+	bodyText = t.optional(t.string),
+	buttonStackInfo = t.table,
+	screenSize = t.Vector2
+})
+
+function v18.init(p1) -- line: 50
+	-- upvalues: Roact (copy), UserInputService (copy)
+	p1:setState({
+		alertPosition = UDim2.fromScale(0.5, 0.5)
+	})
+	p1.textBoxRef = Roact.createRef()
+
+	function p1.textUpdated(p2) -- line: 57
+		-- upvalues: p1 (copy)
+		p1.props.onFieldTextUpdated(p2.Text)
+	end
+
+	p1.lastAlertHeight = 100
+
+	function p1.calculateAlertPosition() -- line: 63
+		-- upvalues: UserInputService (copy), p1 (copy)
+		local uDim2 = UDim2.fromScale(0.5, 0.5)
+
+		if UserInputService.OnScreenKeyboardVisible then
+			local v27 = (p1.props.screenSize.Y - UserInputService.OnScreenKeyboardSize.Y) / 2
+			local v28 = v27 - p1.lastAlertHeight / 2
+
+			if v28 < 20 then
+				v27 += 20 - v28
+			end
+
+			uDim2 = UDim2.new(0.5, 0, 0, v27)
+		end
+
+		if uDim2 ~= p1.state.alertPosition then
+			p1:setState({
+				alertPosition = uDim2
+			})
+		end
+	end
+	function p1.alertSizeChanged(p3) -- line: 86
+		-- upvalues: p1 (copy)
+		p1.lastAlertHeight = p3.AbsoluteSize.Y
+		p1.calculateAlertPosition()
+	end
+	function p1.alertMounted() -- line: 92
+		-- upvalues: p1 (copy)
+		local v30 = p1.textBoxRef:getValue()
+
+		if v30 then
+			v30:CaptureFocus()
+		end
+	end
+end
+function v18.renderAlertMiddleContent(p4) -- line: 100
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetLabel (copy), v16 (copy), rect (copy), RoactGamepad (copy), RobloxTranslator (copy)
+	return withStyle(function(p5) -- line: 101
+		-- upvalues: Roact (copy), ImageSetLabel (copy), v16 (copy), rect (copy), RoactGamepad (copy), RobloxTranslator (copy), p4 (copy)
+		local p5Font = p5.Font
+		local Theme = p5.Theme
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 35),
+			Position = UDim2.fromScale(0, 1),
+			AnchorPoint = Vector2.new(0, 1)
+		}, {
+			TextboxBorder = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Image = v16,
+				ImageColor3 = Theme.UIDefault.Color,
+				ImageTransparency = Theme.UIDefault.Transparency,
+				ScaleType = Enum.ScaleType.Slice,
+				Size = UDim2.new(1, 0, 1, -5),
+				Position = UDim2.fromScale(0, 1),
+				AnchorPoint = Vector2.new(0, 1),
+				SliceCenter = rect
+			}, {
+				Textbox = Roact.createElement(RoactGamepad.Focusable.TextBox, {
+					BackgroundTransparency = 1,
+					ClearTextOnFocus = false,
+					Font = p5Font.Header2.Font,
+					TextSize = p5Font.BaseSize * p5Font.CaptionBody.RelativeSize,
+					PlaceholderColor3 = Theme.TextDefault.Color,
+					PlaceholderText = RobloxTranslator:FormatByKey("CoreScripts.AvatarEditorPrompts.OutfitNamePlaceholder"),
+					Position = UDim2.new(0, 6, 0, 0),
+					Size = UDim2.new(1, -12, 1, 0),
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+					Text = p4.props.fieldText,
+					TextWrapped = true,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					OverlayNativeInput = true,
+					[Roact.Change.Text] = p4.textUpdated,
+					[Roact.Ref] = p4.textBoxRef
+				})
+			})
+		})
+	end)
+end
+function v18.render(p6) -- line: 149
+	-- upvalues: Roact (copy), InteractiveAlert (copy), ExternalEventConnection (copy), UserInputService (copy)
+	return Roact.createFragment({
+		InteractiveAlert = Roact.createElement(InteractiveAlert, {
+			isMiddleContentFocusable = true,
+			title = p6.props.title,
+			bodyText = p6.props.bodyText,
+			buttonStackInfo = p6.props.buttonStackInfo,
+			position = p6.state.alertPosition,
+			screenSize = p6.props.screenSize,
+			middleContent = function() -- line: 159
+				-- upvalues: p6 (copy)
+				return p6:renderAlertMiddleContent()
+			end,
+			onAbsoluteSizeChanged = p6.alertSizeChanged,
+			onMounted = p6.alertMounted
+		}),
+		OnScreenKeyboardVisibleConnection = Roact.createElement(ExternalEventConnection, {
+			event = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardVisible"),
+			callback = p6.calculateAlertPosition
+		}),
+		OnScreenKeyboardSizeConnection = Roact.createElement(ExternalEventConnection, {
+			event = UserInputService:GetPropertyChangedSignal("OnScreenKeyboardSize"),
+			callback = p6.calculateAlertPosition
+		})
+	})
+end
+function v18.didMount(p7) -- line: 179
+	p7.calculateAlertPosition()
+end
+
+local function mapStateToProps(p8) -- line: 183
+	return {
+		screenSize = p8.screenSize
+	}
+end
+
+return RoactRodux.connect(mapStateToProps, nil)(v18)

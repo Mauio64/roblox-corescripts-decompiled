@@ -1,131 +1,183 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Parent_0 = script:FindFirstAncestor("AppStartup").Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local l_AppLinking_0 = require(l_Parent_0.RoactServiceTags).AppLinking;
-local l_AppLogging_0 = require(l_Parent_0.RoactServiceTags).AppLogging;
-local l_AppStartupMessageService_0 = require(l_Parent_0.RoactServiceTags).AppStartupMessageService;
-local l_useRoactService_0 = require(l_Parent_0.RobloxAppHooks).useRoactService;
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v14 = require(l_Parent_0.FocusNavigationUtils);
-local l_FocusNavigableSurfaceIdentifierEnum_0 = v14.FocusNavigableSurfaceIdentifierEnum;
-local l_useAppFocusRoot_0 = v14.useAppFocusRoot;
-local l_FFlagAddFocusNavToStartupMsg_0 = require(l_Parent_0.SharedFlags).FFlagAddFocusNavToStartupMsg;
-local function v19(v18) --[[ Line: 24 ]] --[[ Name: selectScreenSize ]]
-    return v18.ScreenSize;
-end;
-return function() --[[ Line: 28 ]] --[[ Name: useStartupMessageProps ]]
-    -- upvalues: l_useRoactService_0 (copy), l_AppLinking_0 (copy), l_AppLogging_0 (copy), l_AppStartupMessageService_0 (copy), l_useSelector_0 (copy), v19 (copy), l_useDispatch_0 (copy), l_useDesignTokens_0 (copy), v3 (copy), l_useLocalization_0 (copy), v2 (copy), l_LocalizationService_0 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), l_FFlagAddFocusNavToStartupMsg_0 (copy), l_useAppFocusRoot_0 (copy), l_FocusNavigableSurfaceIdentifierEnum_0 (copy)
-    local v20 = l_useRoactService_0(l_AppLinking_0);
-    local v21 = l_useRoactService_0(l_AppLogging_0);
-    local v22 = l_useRoactService_0(l_AppStartupMessageService_0);
-    local v23 = l_useSelector_0(v19);
-    local v24 = l_useDispatch_0();
-    local v26 = l_useDesignTokens_0(function(v25) --[[ Line: 34 ]]
-        return v25.Semantic.Color.Common.Overlay;
-    end);
-    local v27, v28 = v3.useState(false);
-    local v29, v30 = v3.useState(false);
-    local v31 = v22:getStartupMessage();
-    local v32 = v31 and not v27 or false;
-    local v33 = v31 or {};
-    local l_titleLocalizationKey_0 = v33.titleLocalizationKey;
-    local l_bodyLocalizationKey_0 = v33.bodyLocalizationKey;
-    local l_loggingEventName_0 = v33.loggingEventName;
-    local v37 = v33.links or {};
-    local v39 = l_useLocalization_0(v2.map(v37, function(v38) --[[ Line: 49 ]]
-        return v38.localizationKey;
-    end));
-    local v43 = v2.reduce(v37, function(v40, v41, v42) --[[ Line: 52 ]]
-        -- upvalues: v2 (ref), v39 (copy)
-        return v2.append(v40, {
-            {
-                label = v39[v42], 
-                url = v41.url
-            }
-        });
-    end, {});
-    local l_date_0 = v33.date;
-    local l_RobloxLocaleId_0 = l_LocalizationService_0.RobloxLocaleId;
-    local v46 = tonumber(v33.date);
-    if v46 then
-        l_date_0 = DateTime.fromUnixTimestamp(v46):FormatUniversalTime("LL", l_RobloxLocaleId_0);
-    end;
-    local v47 = l_useLocalization_0({
-        titleText = l_titleLocalizationKey_0, 
-        bodyText = l_bodyLocalizationKey_0 and {
-            l_bodyLocalizationKey_0; 
-            date = l_date_0
-        }, 
-        buttonText = "CommonUI.Messages.Action.Dismiss"
-    });
-    local v48 = v3.useCallback(function() --[[ Line: 74 ]]
-        -- upvalues: v28 (copy)
-        v28(true);
-    end, {});
-    local v52 = v3.useCallback(function(v49, v50) --[[ Line: 78 ]]
-        -- upvalues: v20 (copy), v24 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref)
-        v20:isURLRegistered(v49):andThen(function(v51) --[[ Line: 79 ]]
-            -- upvalues: v20 (ref), v49 (copy), v24 (ref), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v50 (copy)
-            if v51 then
-                v20:detectURL(v49);
-                return;
-            else
-                v24(l_NavigateDown_0({
-                    name = l_AppPage_0.GenericWebPage, 
-                    detail = v49, 
-                    extraProps = {
-                        title = v50
-                    }
-                }));
-                return;
-            end;
-        end);
-    end, {
-        v24, 
-        v20
-    });
-    local v53 = if l_FFlagAddFocusNavToStartupMsg_0 then l_useAppFocusRoot_0({
-        surfaceIdentifier = l_FocusNavigableSurfaceIdentifierEnum_0.CentralOverlay, 
-        isAutoFocusRoot = true, 
-        isFocusable = not v27
-    }) else nil;
-    v3.useEffect(function() --[[ Line: 102 ]]
-        -- upvalues: v29 (copy), v32 (copy), l_loggingEventName_0 (copy), v21 (copy), v30 (copy)
-        if not v29 and v32 and l_loggingEventName_0 then
-            v21:logEphemeralCounterEvent({
-                eventName = l_loggingEventName_0, 
-                backends = {
-                    "EphemeralCounter"
-                }, 
-                lastUpdated = {
-                    24, 
-                    2, 
-                    18
-                }, 
-                description = "Startup Message Displayed Event"
-            });
-            v30(true);
-        end;
-    end, {
-        v29, 
-        v32, 
-        l_loggingEventName_0
-    });
-    return {
-        displayStartupMessage = v32, 
-        screenSize = v23, 
-        message = v33, 
-        localizedStrings = v47, 
-        localizedLinks = v43, 
-        overlayColor = v26, 
-        onDismissed = v48, 
-        onOpenUrl = v52, 
-        focusNavRef = v53
-    };
-end;
+local LocalizationService = game:GetService("LocalizationService")
+local Parent = script:FindFirstAncestor("AppStartup").Parent
+local Dash = require(Parent.Dash)
+local React = require(Parent.React)
+local AppLinking = require(Parent.RoactServiceTags).AppLinking
+local AppLogging = require(Parent.RoactServiceTags).AppLogging
+local AppAppLifecycleObserverService = require(Parent.RoactServiceTags).AppAppLifecycleObserverService
+local AppStartupMessageService = require(Parent.RoactServiceTags).AppStartupMessageService
+local useRoactService = require(Parent.RobloxAppHooks).useRoactService
+local useDispatch = require(Parent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local useDesignTokens = require(Parent.Style).useDesignTokens
+local AppPage = require(Parent.RobloxAppEnums).AppPage
+local NavigateDown = require(Parent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(Parent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v17 = if not FFlagSignalsNavP3Dispatch then nil else require(Parent.RobloxAppNavigation).NavigationCommands
+local FocusNavigationUtils = require(Parent.FocusNavigationUtils)
+local FocusNavigableSurfaceIdentifierEnum = FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum
+local useAppFocusRoot = FocusNavigationUtils.useAppFocusRoot
+local v21 = game:DefineFastFlag("ShowStartupMessageOnUnhide", false)
+local EngineFeature = game:GetEngineFeature("StartupMessageActionButtonEnabled")
+
+local function selectScreenSize(p1) -- line: 30
+	return p1.ScreenSize
+end
+local function useStartupMessageProps() -- line: 34
+	-- upvalues: useRoactService (copy), AppLinking (copy), AppLogging (copy), v21 (copy), AppAppLifecycleObserverService (copy), AppStartupMessageService (copy), useSelector (copy), selectScreenSize (copy), useDispatch (copy), useDesignTokens (copy), React (copy), EngineFeature (copy), useLocalization (copy), Dash (copy), LocalizationService (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), NavigateDown (copy), useAppFocusRoot (copy), FocusNavigableSurfaceIdentifierEnum (copy)
+	local v26 = useRoactService(AppLinking)
+	local v27 = useRoactService(AppLogging)
+	local v28 = if not v21 then nil else useRoactService(AppAppLifecycleObserverService)
+	local v29 = useRoactService(AppStartupMessageService)
+	local v30 = useSelector(selectScreenSize)
+	local v31 = useDispatch()
+	local v32 = useDesignTokens(function(p2) -- line: 43
+		return p2.Color.Common.Scrim
+	end)
+	local v33, v34 = React.useState(false)
+	local v35, v36 = React.useState(false)
+	local v37 = if not v21 then nil else React.useCallback(function() -- line: 50
+		-- upvalues: v34 (copy), v36 (copy)
+		v34(false)
+		v36(false)
+	end, {})
+
+	if v21 then
+		React.useEffect(function() -- line: 57
+			-- upvalues: v28 (copy), v37 (copy)
+			if not v28 then
+				return
+			end
+
+			local connection = v28.OnUnhide:Connect(v37)
+
+			return function() -- line: 63
+				-- upvalues: connection (copy)
+				if connection then
+					connection:Disconnect()
+				end
+			end
+		end, {
+			v28,
+			v37
+		})
+	end
+
+	local v38 = v29:getStartupMessage()
+	local v39 = not not v38 and (not v33 or false)
+	local v40 = v38 or {}
+	local titleLocalizationKey = v40.titleLocalizationKey
+	local bodyLocalizationKey = v40.bodyLocalizationKey
+	local v43 = if not EngineFeature then nil else v40.actionButtonLocalizationKey
+	local loggingEventName = v40.loggingEventName
+	local v45 = v40.links or {}
+	local v46 = useLocalization(Dash.map(v45, function(p3) -- line: 83
+		return p3.localizationKey
+	end))
+	local v47 = Dash.reduce(v45, function(p4, p5, p6) -- line: 86
+		-- upvalues: Dash (copy), v46 (copy)
+		return Dash.append(p4, {{
+			label = v46[p6],
+			url = p5.url
+		}})
+	end, {})
+	local date = v40.date
+	local RobloxLocaleId = LocalizationService.RobloxLocaleId
+	local num = tonumber(v40.date)
+
+	if num then
+		date = DateTime.fromUnixTimestamp(num):FormatUniversalTime("LL", RobloxLocaleId)
+	end
+
+	local v51 = useLocalization({
+		buttonText = "CommonUI.Messages.Action.Dismiss",
+		titleText = titleLocalizationKey,
+		bodyText = bodyLocalizationKey and {
+			bodyLocalizationKey,
+			date = date
+		},
+		actionButtonText = v43
+	})
+	local v52 = React.useCallback(function() -- line: 109
+		-- upvalues: v34 (copy)
+		v34(true)
+	end, {})
+
+	local function onActionButtonActivated() -- line: 113
+		-- upvalues: v29 (copy)
+		v29:executeActionButton()
+	end
+
+	local v54 = React.useCallback(function(s1: string, s2: string) -- line: 117
+		-- upvalues: v26 (copy), AppPage (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), v31 (copy), NavigateDown (copy)
+		v26:isURLRegistered(s1):andThen(function(p7) -- line: 118
+			-- upvalues: v26 (copy), s1 (copy), AppPage (copy), s2 (copy), FFlagSignalsNavP3Dispatch (copy), v17 (copy), v31 (copy), NavigateDown (copy)
+			if p7 then
+				v26:detectURL(s1)
+
+				return
+			end
+
+			local t1 = {
+				name = AppPage.GenericWebPage,
+				detail = s1,
+				extraProps = {
+					title = s2
+				}
+			}
+
+			if FFlagSignalsNavP3Dispatch then
+				v17.down(v17.fromLegacyPage(t1))
+
+				return
+			end
+
+			v31(NavigateDown(t1))
+		end)
+	end, {
+		v31,
+		v26
+	})
+	local v55 = useAppFocusRoot({
+		isAutoFocusRoot = true,
+		surfaceIdentifier = FocusNavigableSurfaceIdentifierEnum.CentralOverlay,
+		isFocusable = not v33
+	})
+
+	React.useEffect(function() -- line: 144
+		-- upvalues: v35 (copy), v39 (copy), loggingEventName (copy), v27 (copy), v36 (copy)
+		if not v35 and (v39 and loggingEventName) then
+			v27:logEphemeralCounterEvent({
+				description = "Startup Message Displayed Event",
+				eventName = loggingEventName,
+				backends = { "EphemeralCounter" },
+				lastUpdated = {
+					24,
+					2,
+					18
+				}
+			})
+			v36(true)
+		end
+	end, {
+		v35,
+		v39,
+		loggingEventName
+	})
+
+	return {
+		displayStartupMessage = v39,
+		screenSize = v30,
+		message = v40,
+		localizedStrings = v51,
+		localizedLinks = v47,
+		overlayColor = v32,
+		onDismissed = v52,
+		onOpenUrl = v54,
+		onActionButtonActivated = if not EngineFeature then nil else onActionButtonActivated,
+		focusNavRef = v55
+	}
+end
+
+return useStartupMessageProps

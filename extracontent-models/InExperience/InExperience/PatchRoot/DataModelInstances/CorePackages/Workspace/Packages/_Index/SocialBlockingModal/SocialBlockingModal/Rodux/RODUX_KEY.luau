@@ -1,1 +1,1 @@
-return "SocialBlockingModal";
+return "SocialBlockingModal"

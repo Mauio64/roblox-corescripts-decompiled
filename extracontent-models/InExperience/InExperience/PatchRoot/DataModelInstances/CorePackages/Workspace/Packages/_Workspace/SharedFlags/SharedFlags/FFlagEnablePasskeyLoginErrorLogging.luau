@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnablePasskeyLoginErrorLogging", false);
+return game:DefineFastFlag("EnablePasskeyLoginErrorLogging", false)

@@ -1,2 +1,3 @@
-local l_Parent_0 = script.Parent.Parent;
-return (require(l_Parent_0.PolicyProvider).GetPolicyImplementations.MemStorageService("app-policy"));
+local ParentParent = script.Parent.Parent
+
+return (require(ParentParent.PolicyProvider).GetPolicyImplementations.MemStorageService("app-policy"))

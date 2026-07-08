@@ -1,53 +1,52 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_AnalyticsReporters_0 = script.Parent.AnalyticsReporters;
-local v2 = require(l_AnalyticsReporters_0.Diag);
-local v3 = require(l_AnalyticsReporters_0.EventStream);
-local v4 = require(l_AnalyticsReporters_0.GoogleAnalytics);
-local v5 = require(l_AnalyticsReporters_0.Influx);
-local v6 = {};
-v6.__index = v6;
-v6.new = function(v7) --[[ Line: 35 ]] --[[ Name: new ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), v2 (copy), v3 (copy), v4 (copy), v5 (copy), v6 (copy)
-    if not v7 then
-        v7 = l_RbxAnalyticsService_0;
-    end;
-    local v8 = {
-        Diag = v2.new(v7), 
-        EventStream = v3.new(v7), 
-        GoogleAnalytics = v4.new(v7), 
-        InfluxDb = v5.new(v7)
-    };
-    setmetatable(v8, v6);
-    return v8;
-end;
-v6.mock = function() --[[ Line: 63 ]] --[[ Name: mock ]]
-    -- upvalues: v6 (copy)
-    local v9 = {
-        ReportCounter = function() --[[ Line: 66 ]] --[[ Name: ReportCounter ]]
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local AnalyticsReporters = script.Parent.AnalyticsReporters
+local Diag = require(AnalyticsReporters.Diag)
+local EventStream = require(AnalyticsReporters.EventStream)
+local GoogleAnalytics = require(AnalyticsReporters.GoogleAnalytics)
+local Influx = require(AnalyticsReporters.Influx)
+local t1 = {}
 
-        end, 
-        ReportInfluxSeries = function() --[[ Line: 67 ]] --[[ Name: ReportInfluxSeries ]]
+t1.__index = t1
 
-        end, 
-        ReportStats = function() --[[ Line: 68 ]] --[[ Name: ReportStats ]]
+function t1.new(p1) -- line: 35
+	-- upvalues: RbxAnalyticsService (copy), Diag (copy), EventStream (copy), GoogleAnalytics (copy), Influx (copy), t1 (copy)
+	if not p1 then
+		p1 = RbxAnalyticsService
+	end
 
-        end, 
-        SetRBXEvent = function() --[[ Line: 69 ]] --[[ Name: SetRBXEvent ]]
+	local t2 = {
+		Diag = Diag.new(p1),
+		EventStream = EventStream.new(p1),
+		GoogleAnalytics = GoogleAnalytics.new(p1),
+		InfluxDb = Influx.new(p1)
+	}
 
-        end, 
-        SetRBXEventStream = function() --[[ Line: 70 ]] --[[ Name: SetRBXEventStream ]]
+	setmetatable(t2, t1)
 
-        end, 
-        TrackEvent = function() --[[ Line: 71 ]] --[[ Name: TrackEvent ]]
+	return t2
+end
+function t1.mock() -- line: 63
+	-- upvalues: t1 (copy)
+	local t3 = {
+		ReportCounter = function() -- line: 66
+		end,
+		ReportInfluxSeries = function() -- line: 67
+		end,
+		ReportStats = function() -- line: 68
+		end,
+		SetRBXEvent = function() -- line: 69
+		end,
+		SetRBXEventStream = function() -- line: 70
+		end,
+		TrackEvent = function() -- line: 71
+		end,
+		UpdateHeartbeatObject = function() -- line: 72
+		end,
+		SendEventDeferred = function() -- line: 73
+		end
+	}
 
-        end, 
-        UpdateHeartbeatObject = function() --[[ Line: 72 ]] --[[ Name: UpdateHeartbeatObject ]]
+	return t1.new(t3)
+end
 
-        end, 
-        SendEventDeferred = function() --[[ Line: 73 ]] --[[ Name: SendEventDeferred ]]
-
-        end
-    };
-    return v6.new(v9);
-end;
-return v6;
+return t1

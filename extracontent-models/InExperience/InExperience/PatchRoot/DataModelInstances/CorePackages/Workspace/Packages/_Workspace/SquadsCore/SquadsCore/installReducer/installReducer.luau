@@ -1,37 +1,41 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(script.Parent.SquadPromptReducer);
-local v3 = require(l_script_FirstAncestor_0.Http.RoduxNetworking);
-local v4 = require(l_script_FirstAncestor_0.Http.RoduxPresence);
-local v5 = require(l_script_FirstAncestor_0.RoduxSquads);
-local v6 = require(l_script_FirstAncestor_0.Enums.SquadLocation);
-local v7 = require(l_script_FirstAncestor_0.Http.UserBlockingRodux);
-local v8 = require(l_Parent_0.CrossExperience);
-local v9 = require(l_Parent_0.CrossExperienceVoice);
-local v10 = require(l_Parent_0.Rodux);
-local v11 = require(l_Parent_0.SharedFlags);
-local l_createPersistenceMiddleware_0 = v8.Middlewares.createPersistenceMiddleware;
-local l_GetFFlagEnableCrossExpVoice_0 = v11.GetFFlagEnableCrossExpVoice;
-local v14 = {
-    NetworkStatus = v3.installReducer(), 
-    Presence = v4.installReducer(), 
-    Squad = v5.installReducer(), 
-    SquadPrompt = v2, 
-    UserBlocking = v7.installReducer()
-};
-if l_GetFFlagEnableCrossExpVoice_0() then
-    local v15 = l_createPersistenceMiddleware_0({
-        storeKey = v8.Constants.STORAGE_CEV_STORE_KEY
-    });
-    local v16 = nil;
-    local v17 = v15.restore();
-    if v17 and v17.Squad and v17.Squad.CrossExperienceVoice then
-        v16 = v17.Squad.CrossExperienceVoice;
-    end;
-    v14.CrossExperienceVoice = v9.installReducer(v16);
-end;
-return function(v18) --[[ Line: 41 ]]
-    -- upvalues: v14 (copy), v6 (copy), v2 (copy), v10 (copy)
-    v14.SquadPrompt = if v18 == v6.InExperience then v2 else nil;
-    return v10.combineReducers(v14);
-end;
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local SquadPromptReducer = require(script.Parent.SquadPromptReducer)
+local RoduxNetworking = require(SquadsCore.Http.RoduxNetworking)
+local RoduxPresence = require(SquadsCore.Http.RoduxPresence)
+local RoduxSquads = require(SquadsCore.RoduxSquads)
+local SquadLocation = require(SquadsCore.Enums.SquadLocation)
+local UserBlockingRodux = require(SquadsCore.Http.UserBlockingRodux)
+local CrossExperience = require(SquadsCoreParent.CrossExperience)
+local CrossExperienceVoice = require(SquadsCoreParent.CrossExperienceVoice)
+local Rodux = require(SquadsCoreParent.Rodux)
+local SharedFlags = require(SquadsCoreParent.SharedFlags)
+local createPersistenceMiddleware = CrossExperience.Middlewares.createPersistenceMiddleware
+local GetFFlagEnableCrossExpVoice = SharedFlags.GetFFlagEnableCrossExpVoice
+local t1 = {
+	NetworkStatus = RoduxNetworking.installReducer(),
+	Presence = RoduxPresence.installReducer(),
+	Squad = RoduxSquads.installReducer(),
+	SquadPrompt = SquadPromptReducer,
+	UserBlocking = UserBlockingRodux.installReducer()
+}
+
+if GetFFlagEnableCrossExpVoice() then
+	local CrossExperienceVoice2 = nil
+	local v17 = createPersistenceMiddleware({
+		storeKey = CrossExperience.Constants.STORAGE_CEV_STORE_KEY
+	}).restore()
+
+	if v17 and v17.Squad and v17.Squad.CrossExperienceVoice then
+		CrossExperienceVoice2 = v17.Squad.CrossExperienceVoice
+	end
+
+	t1.CrossExperienceVoice = CrossExperienceVoice.installReducer(CrossExperienceVoice2)
+end
+
+return function(p1) -- line: 41
+	-- upvalues: t1 (copy), SquadLocation (copy), SquadPromptReducer (copy), Rodux (copy)
+	t1.SquadPrompt = if p1 ~= SquadLocation.InExperience then nil else SquadPromptReducer
+
+	return Rodux.combineReducers(t1)
+end

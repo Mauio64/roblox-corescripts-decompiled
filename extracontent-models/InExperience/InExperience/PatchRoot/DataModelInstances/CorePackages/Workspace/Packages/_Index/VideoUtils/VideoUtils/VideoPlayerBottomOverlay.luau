@@ -1,140 +1,146 @@
-local l_Parent_0 = script:FindFirstAncestor("VideoUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.BuilderIcons);
-local l_Icon_0 = v2.Icon;
-local l_IconVariant_0 = v2.IconVariant;
-local l_maybeForceDarkTheme_0 = require(l_Parent_0.CollectionViews).maybeForceDarkTheme;
-local v6 = require(l_Parent_0.Foundation);
-local l_IconButton_0 = v6.IconButton;
-local l_IconSize_0 = v6.Enums.IconSize;
-local l_useTokens_0 = v6.Hooks.useTokens;
-local v10 = require(l_Parent_0.Responsive);
-local l_useBreakpointXOrSmaller_0 = v10.useBreakpointXOrSmaller;
-local v12 = require(script.Parent.VideoProgressBar);
-local l_FFlagLuaAppEdpMediaGalleryFullScreen_0 = require(l_Parent_0.SharedFlags).FFlagLuaAppEdpMediaGalleryFullScreen;
-return function(v14) --[[ Line: 45 ]] --[[ Name: VideoPlayerBottomOverlay ]]
-    -- upvalues: l_useTokens_0 (copy), l_FFlagLuaAppEdpMediaGalleryFullScreen_0 (copy), l_useBreakpointXOrSmaller_0 (copy), v10 (copy), v1 (copy), l_IconButton_0 (copy), l_Icon_0 (copy), l_IconVariant_0 (copy), l_IconSize_0 (copy), v12 (copy), l_maybeForceDarkTheme_0 (copy)
-    local v15 = l_useTokens_0();
-    local v16 = true;
-    if v14.muteButtonConfig == nil then
-        v16 = l_FFlagLuaAppEdpMediaGalleryFullScreen_0 and (v14.playButtonConfig ~= nil or v14.progressBarConfig ~= nil);
-    end;
-    local v17 = l_useBreakpointXOrSmaller_0(v10.Keys.Small);
-    local l_XXLarge_0 = v15.Padding.XXLarge;
-    local v19 = v17 and 0 or v15.Padding.Medium;
-    local l_Medium_0 = v15.Padding.Medium;
-    local l_Size_1000_0 = v15.Size.Size_1000;
-    local l_Size_100_0 = v15.Size.Size_100;
-    local l_XSmall_0 = v15.Padding.XSmall;
-    local v24 = if v14.muteButtonConfig then v1.createElement(l_IconButton_0, {
-        icon = {
-            name = if v14.muteButtonConfig.muted then l_Icon_0.SpeakerSlash else l_Icon_0.Speaker, 
-            variant = l_IconVariant_0.Filled
-        }, 
-        iconSize = l_IconSize_0.Medium, 
-        onActivated = v14.muteButtonConfig.onMuteButtonActivated or nil, 
-        AnchorPoint = Vector2.new(1, 1), 
-        Position = UDim2.fromScale(1, 1), 
-        Selectable = false
-    }) else nil;
-    local v25 = nil;
-    if l_FFlagLuaAppEdpMediaGalleryFullScreen_0 then
-        v25 = {
-            Layout = v1.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                Padding = UDim.new(0, l_XSmall_0), 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Padding = v1.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, l_XXLarge_0), 
-                PaddingBottom = UDim.new(0, v19), 
-                PaddingLeft = UDim.new(0, l_Medium_0), 
-                PaddingRight = UDim.new(0, l_Medium_0)
-            }), 
-            ProgressBar = if v14.progressBarConfig then v1.createElement(v12, {
-                progressBinding = v14.progressBarConfig.progressBinding, 
-                Size = UDim2.new(1, 0, 0, l_Size_100_0), 
-                LayoutOrder = 1
-            }) else nil, 
-            ButtonsContainer = v1.createElement("Frame", {
-                Size = UDim2.new(1, 0, 0, l_Size_1000_0), 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                LayoutOrder = 2
-            }, {
-                PlayButton = if v14.playButtonConfig then v1.createElement(l_IconButton_0, {
-                    icon = {
-                        name = if v14.playButtonConfig.isVideoPlaying then l_Icon_0.PauseLarge else l_Icon_0.PlayLarge, 
-                        variant = l_IconVariant_0.Filled
-                    }, 
-                    iconSize = l_IconSize_0.Medium, 
-                    onActivated = v14.playButtonConfig.onPlayButtonActivated, 
-                    AnchorPoint = Vector2.new(0, 1), 
-                    Position = UDim2.fromScale(0, 1), 
-                    Selectable = false
-                }) else nil, 
-                MuteButton = if v14.muteButtonConfig then v24 else nil
-            })
-        };
-    end;
-    local v27 = v1.useMemo(function() --[[ Line: 124 ]]
-        -- upvalues: l_XXLarge_0 (copy), v19 (copy), v14 (copy), l_FFlagLuaAppEdpMediaGalleryFullScreen_0 (ref), l_Size_1000_0 (copy), l_Size_100_0 (copy), l_XSmall_0 (copy)
-        local v26 = l_XXLarge_0 + v19;
-        if v14.muteButtonConfig or l_FFlagLuaAppEdpMediaGalleryFullScreen_0 and v14.playButtonConfig then
-            v26 = v26 + l_Size_1000_0;
-        end;
-        if l_FFlagLuaAppEdpMediaGalleryFullScreen_0 and v14.progressBarConfig then
-            v26 = v26 + (l_Size_100_0 + l_XSmall_0);
-        end;
-        return v26;
-    end, {
-        v14.muteButtonConfig, 
-        if l_FFlagLuaAppEdpMediaGalleryFullScreen_0 then v14.playButtonConfig else nil, 
-        if l_FFlagLuaAppEdpMediaGalleryFullScreen_0 then v14.progressBarConfig else nil, 
-        l_XXLarge_0, 
-        v19, 
-        l_Size_1000_0, 
-        l_Size_100_0, 
-        l_XSmall_0
-    });
-    return v1.createElement("Frame", {
-        AnchorPoint = Vector2.new(0, 1), 
-        Position = UDim2.fromScale(0, 1), 
-        Size = UDim2.new(1, 0, 0, v27), 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        ZIndex = v14.ZIndex
-    }, {
-        GradientOverlay = v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = v15.Color.Extended.Black.Black_100.Color3, 
-            BorderSizePixel = 0, 
-            ZIndex = 1
-        }, {
-            Gradient = v1.createElement("UIGradient", {
-                Rotation = 90, 
-                Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 1), 
-                    NumberSequenceKeypoint.new(1, 0.2)
-                })
-            }), 
-            UICorner = if v14.cornerRadius then v1.createElement("UICorner", {
-                CornerRadius = UDim.new(0, v14.cornerRadius)
-            }) else nil
-        }), 
-        UserControls = if v14.videoLoaded and v16 then l_maybeForceDarkTheme_0(v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 0, 
-            ZIndex = 10
-        }, if l_FFlagLuaAppEdpMediaGalleryFullScreen_0 then v25 else {
-            Padding = v1.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, l_XXLarge_0), 
-                PaddingBottom = UDim.new(0, v19), 
-                PaddingLeft = UDim.new(0, l_Medium_0), 
-                PaddingRight = UDim.new(0, l_Medium_0)
-            }), 
-            MuteButton = if v14.muteButtonConfig then v24 else nil
-        }), true) else nil
-    });
-end;
+local Parent = script:FindFirstAncestor("VideoUtils").Parent
+local React = require(Parent.React)
+local BuilderIcons = require(Parent.BuilderIcons)
+local Icon = BuilderIcons.Icon
+local IconVariant = BuilderIcons.IconVariant
+local maybeForceDarkTheme = require(Parent.CollectionViews).maybeForceDarkTheme
+local Foundation = require(Parent.Foundation)
+local IconButton = Foundation.IconButton
+local IconSize = Foundation.Enums.IconSize
+local useTokens = Foundation.Hooks.useTokens
+local Responsive = require(Parent.Responsive)
+local useBreakpointXOrSmaller = Responsive.useBreakpointXOrSmaller
+local VideoProgressBar = require(script.Parent.VideoProgressBar)
+local FFlagLuaAppEdpMediaGalleryFullScreen = require(Parent.SharedFlags).FFlagLuaAppEdpMediaGalleryFullScreen
+
+local function VideoPlayerBottomOverlay(t1: {[any]: any}) -- line: 45
+	-- upvalues: useTokens (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), useBreakpointXOrSmaller (copy), Responsive (copy), React (copy), IconButton (copy), Icon (copy), IconVariant (copy), IconSize (copy), VideoProgressBar (copy), maybeForceDarkTheme (copy)
+	local v17 = useTokens()
+	local v18 = t1.muteButtonConfig ~= nil or FFlagLuaAppEdpMediaGalleryFullScreen and (t1.playButtonConfig ~= nil or t1.progressBarConfig ~= nil)
+	local v19 = useBreakpointXOrSmaller(Responsive.Keys.Small)
+	local XXLarge = v17.Padding.XXLarge
+	local v21 = if not v19 then v17.Padding.Medium else 0
+	local Medium = v17.Padding.Medium
+	local Size_1000 = v17.Size.Size_1000
+	local Size_100 = v17.Size.Size_100
+	local XSmall = v17.Padding.XSmall
+	local v26 = if not t1.muteButtonConfig then nil else React.createElement(IconButton, {
+		Selectable = false,
+		icon = {
+			name = if not t1.muteButtonConfig.muted then Icon.Speaker else Icon.SpeakerSlash,
+			variant = IconVariant.Filled
+		},
+		iconSize = IconSize.Medium,
+		onActivated = t1.muteButtonConfig.onMuteButtonActivated or nil,
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.fromScale(1, 1)
+	})
+	local t2 = nil
+
+	if FFlagLuaAppEdpMediaGalleryFullScreen then
+		t2 = {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				Padding = UDim.new(0, XSmall),
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, XXLarge),
+				PaddingBottom = UDim.new(0, v21),
+				PaddingLeft = UDim.new(0, Medium),
+				PaddingRight = UDim.new(0, Medium)
+			}),
+			ProgressBar = if not t1.progressBarConfig then nil else React.createElement(VideoProgressBar, {
+				LayoutOrder = 1,
+				progressBinding = t1.progressBarConfig.progressBinding,
+				Size = UDim2.new(1, 0, 0, Size_100)
+			}),
+			ButtonsContainer = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, Size_1000)
+			}, {
+				PlayButton = if not t1.playButtonConfig then nil else React.createElement(IconButton, {
+					Selectable = false,
+					icon = {
+						name = if not t1.playButtonConfig.isVideoPlaying then Icon.PlayLarge else Icon.PauseLarge,
+						variant = IconVariant.Filled
+					},
+					iconSize = IconSize.Medium,
+					onActivated = t1.playButtonConfig.onPlayButtonActivated,
+					AnchorPoint = Vector2.new(0, 1),
+					Position = UDim2.fromScale(0, 1)
+				}),
+				MuteButton = if not t1.muteButtonConfig then nil else v26
+			})
+		}
+	end
+
+	local v28 = React.useMemo(function() -- line: 124
+		-- upvalues: XXLarge (copy), v21 (copy), t1 (copy), FFlagLuaAppEdpMediaGalleryFullScreen (copy), Size_1000 (copy), Size_100 (copy), XSmall (copy)
+		local v29 = XXLarge + v21
+
+		if t1.muteButtonConfig or FFlagLuaAppEdpMediaGalleryFullScreen and t1.playButtonConfig then
+			v29 += Size_1000
+		end
+
+		if FFlagLuaAppEdpMediaGalleryFullScreen and t1.progressBarConfig then
+			v29 += Size_100 + XSmall
+		end
+
+		return v29
+	end, {
+		t1.muteButtonConfig,
+		if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else t1.playButtonConfig,
+		if not FFlagLuaAppEdpMediaGalleryFullScreen then nil else t1.progressBarConfig,
+		XXLarge,
+		v21,
+		Size_1000,
+		Size_100,
+		XSmall
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.fromScale(0, 1),
+		Size = UDim2.new(1, 0, 0, v28),
+		ZIndex = t1.ZIndex
+	}, {
+		GradientOverlay = React.createElement("Frame", {
+			BorderSizePixel = 0,
+			ZIndex = 1,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = v17.Color.Extended.Black.Black_100.Color3
+		}, {
+			Gradient = React.createElement("UIGradient", {
+				Rotation = 90,
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 1),
+					NumberSequenceKeypoint.new(1, 0.2)
+				})
+			}),
+			UICorner = if not t1.cornerRadius then nil else React.createElement("UICorner", {
+				CornerRadius = UDim.new(0, t1.cornerRadius)
+			})
+		}),
+		UserControls = if not t1.videoLoaded or not v18 then nil else maybeForceDarkTheme(React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			ZIndex = 10,
+			Size = UDim2.fromScale(1, 1)
+		}, if not FFlagLuaAppEdpMediaGalleryFullScreen then {
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, XXLarge),
+				PaddingBottom = UDim.new(0, v21),
+				PaddingLeft = UDim.new(0, Medium),
+				PaddingRight = UDim.new(0, Medium)
+			}),
+			MuteButton = if not t1.muteButtonConfig then nil else v26
+		} else t2), true)
+	})
+end
+
+return VideoPlayerBottomOverlay

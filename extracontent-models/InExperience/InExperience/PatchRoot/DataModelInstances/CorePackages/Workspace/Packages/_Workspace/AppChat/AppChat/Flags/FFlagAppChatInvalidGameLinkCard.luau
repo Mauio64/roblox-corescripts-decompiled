@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppChatInvalidGameLinkCard", false);
+return game:DefineFastFlag("AppChatInvalidGameLinkCard", false)

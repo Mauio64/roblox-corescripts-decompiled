@@ -1,30 +1,37 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceUIKit").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Dash);
-local v3 = {
-    anchorPoint = Vector2.new(0.5, 0.5), 
-    color = Color3.fromRGB(255, 255, 255), 
-    position = UDim2.fromScale(0.5, 0.5), 
-    resourceIdentifier = ""
-};
-return function(v4) --[[ Line: 24 ]] --[[ Name: BackgroundImage ]]
-    -- upvalues: v2 (copy), v3 (copy), v1 (copy)
-    v4 = v2.join(v3, v4);
-    return v1.createElement("ImageLabel", {
-        AnchorPoint = v4.anchorPoint, 
-        Position = v4.position, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        Image = v4.resourceIdentifier, 
-        ImageColor3 = v4.color, 
-        ImageTransparency = v4.transparency, 
-        ScaleType = Enum.ScaleType.Fit, 
-        Size = UDim2.fromScale(1, 1), 
-        ZIndex = v4.ZIndex, 
-        [v1.Tag] = v4.tag
-    }, {
-        CornerRadius = v1.createElement("UICorner", {
-            CornerRadius = v4.cornerRadius
-        })
-    });
-end;
+local Parent = script:FindFirstAncestor("AvatarExperienceUIKit").Parent
+local AvatarExperienceFlags = require(Parent.AvatarExperienceFlags)
+local React = require(Parent.React)
+local Dash = require(Parent.Dash)
+local FFlagAXHeroWidget = AvatarExperienceFlags.FFlagAXHeroWidget
+local t1 = {
+	resourceIdentifier = "",
+	anchorPoint = Vector2.new(0.5, 0.5),
+	color = Color3.fromRGB(255, 255, 255),
+	position = UDim2.fromScale(0.5, 0.5),
+	scaleType = if not FFlagAXHeroWidget then nil else Enum.ScaleType.Fit
+}
+
+local function BackgroundImage(t2: {[any]: any}) -- line: 31
+	-- upvalues: Dash (copy), t1 (copy), React (copy), FFlagAXHeroWidget (copy)
+	local v9 = Dash.join(t1, t2)
+
+	return React.createElement("ImageLabel", {
+		AnchorPoint = v9.anchorPoint,
+		Position = v9.position,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Image = v9.resourceIdentifier,
+		ImageColor3 = v9.color,
+		ImageTransparency = v9.transparency,
+		ScaleType = if not FFlagAXHeroWidget then Enum.ScaleType.Fit else v9.scaleType,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = v9.ZIndex,
+		[React.Tag] = v9.tag
+	}, {
+		CornerRadius = React.createElement("UICorner", {
+			CornerRadius = v9.cornerRadius
+		})
+	})
+end
+
+return BackgroundImage

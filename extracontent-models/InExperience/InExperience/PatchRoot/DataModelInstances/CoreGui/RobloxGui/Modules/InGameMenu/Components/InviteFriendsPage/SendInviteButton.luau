@@ -1,254 +1,242 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v2.Roact;
-local l_UIBlox_0 = v2.UIBlox;
-local l_t_0 = v2.t;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_withSelectionCursorProvider_0 = l_UIBlox_0.App.SelectionImage.withSelectionCursorProvider;
-local l_CursorKind_0 = l_UIBlox_0.App.SelectionImage.CursorKind;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_InviteStatus_0 = require(l_Parent_0.Resources.Constants).InviteStatus;
-local l_Images_0 = l_UIBlox_0.App.ImageSet.Images;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v13 = l_Roact_0.PureComponent:extend("SendInviteButton");
-v13.validateProps = l_t_0.strictInterface({
-    onActivated = l_t_0.callback, 
-    animationBegun = l_t_0.callback, 
-    animationEnded = l_t_0.callback, 
-    userInviteStatus = l_t_0.optional(l_t_0.string)
-});
-local function _(v14, v15, v16) --[[ Line: 35 ]] --[[ Name: linearTween ]]
-    local v17 = (v16 - v15) / 30;
-    return (v14 - v15 / 30) / v17;
-end;
-local function _(v19, v20, v21) --[[ Line: 40 ]] --[[ Name: isBetweenFrames ]]
-    local v22 = false;
-    if v20 / 30 <= v19 then
-        v22 = v19 <= v21 / 30;
-    end;
-    return v22;
-end;
-local v38 = {
-    [l_InviteStatus_0.Pending] = function(v24, v25) --[[ Line: 45 ]]
-        local v26 = math.sin(6.283185307179586 * v24) * 0.375 + 0.375;
-        v25.sendTransparency(v26);
-    end, 
-    [l_InviteStatus_0.Success] = function(v27, v28, v29) --[[ Line: 54 ]]
-        local v30 = false;
-        if v27 >= 0 then
-            v30 = v27 <= 0.13333333333333333;
-        end;
-        if v30 then
-            v30 = (v27 - 0) / 0.13333333333333333;
-            v28.sendTransparency(v30);
-            v28.successTransparency(1 - v30);
-            local v31 = 0.75 + 0.75 * (1 - v30);
-            v28.successSize(v31);
-            return;
-        else
-            v30 = false;
-            if v27 >= 0.13333333333333333 then
-                v30 = v27 <= 0.3;
-            end;
-            if v30 then
-                v28.sendTransparency(1);
-                v28.successTransparency(0);
-                local v32 = 0.75 + 0.25 * ((v27 - 0.13333333333333333) / 0.16666666666666666);
-                v28.successSize(v32);
-                return;
-            else
-                v28.successSize(1);
-                v29();
-                return;
-            end;
-        end;
-    end, 
-    [l_InviteStatus_0.Failed] = function(v33, v34, v35) --[[ Line: 85 ]]
-        local v36 = false;
-        if v33 >= 0 then
-            v36 = v33 <= 0.06666666666666667;
-        end;
-        if v36 then
-            v36 = (v33 - 0) / 0.13333333333333333;
-            v34.sendTransparency(v36);
-        else
-            v36 = false;
-            if v33 >= 0.06666666666666667 then
-                v36 = v33 <= 1.7333333333333334;
-            end;
-            if v36 then
-                v34.sendTransparency(1);
-            else
-                v36 = false;
-                if v33 >= 1.7333333333333334 then
-                    v36 = v33 <= 1.9;
-                end;
-                if v36 then
-                    v36 = (v33 - 1.7333333333333334) / 0.16666666666666666;
-                    v34.sendTransparency(1 - v36);
-                else
-                    v34.sendTransparency(0);
-                    v35();
-                end;
-            end;
-        end;
-        v36 = false;
-        if v33 >= 0 then
-            v36 = v33 <= 0.13333333333333333;
-        end;
-        if v36 then
-            v36 = (v33 - 0) / 0.13333333333333333;
-            v34.failTransparency(1 - v36);
-            return;
-        else
-            v36 = false;
-            if v33 >= 0.13333333333333333 then
-                v36 = v33 <= 1.4;
-            end;
-            if v36 then
-                v34.failTransparency(0);
-                v36 = v33 - 0.13333333333333333;
-                local v37 = -0.4 * 2.71828182846 ^ (-v36 * 8) * math.sin(v36 * 40);
-                v34.failPos(v37);
-                return;
-            else
-                v36 = false;
-                if v33 >= 1.4 then
-                    v36 = v33 <= 1.5666666666666667;
-                end;
-                if v36 then
-                    v34.failPos(0);
-                    v36 = (v33 - 1.4) / 0.16666666666666666;
-                    v34.failTransparency(v36);
-                    return;
-                else
-                    v34.failTransparency(1);
-                    return;
-                end;
-            end;
-        end;
-    end
-};
-v13.init = function(v39, v40) --[[ Line: 142 ]] --[[ Name: init ]]
-    -- upvalues: l_Roact_0 (copy), l_InviteStatus_0 (copy)
-    local v41, v42 = l_Roact_0.createBinding(0);
-    local v43, v44 = l_Roact_0.createBinding(1);
-    local v45, v46 = l_Roact_0.createBinding(1);
-    local v47, v48 = l_Roact_0.createBinding(1);
-    local v49, v50 = l_Roact_0.createBinding(0);
-    v39.bindings = {
-        sendTransparency = v41, 
-        successTransparency = v43, 
-        failTransparency = v45, 
-        successSize = v47:map(function(v51) --[[ Line: 154 ]]
-            return UDim2.new(v51, 0, v51, 0);
-        end), 
-        failPos = v49:map(function(v52) --[[ Line: 157 ]]
-            return UDim2.new(v52, 0, 0, 0);
-        end)
-    };
-    v39.updateBindings = {
-        sendTransparency = v42, 
-        successTransparency = v44, 
-        failTransparency = v46, 
-        successSize = v48, 
-        failPos = v50
-    };
-    if v40.userInviteStatus == l_InviteStatus_0.Success then
-        v44(0);
-        v42(1);
-    end;
-end;
-v13.renderWithSelectionCursor = function(v53, v54) --[[ Line: 176 ]] --[[ Name: renderWithSelectionCursor ]]
-    -- upvalues: l_withStyle_0 (copy), l_Roact_0 (copy), l_CursorKind_0 (copy), l_InviteStatus_0 (copy), l_ImageSetLabel_0 (copy), l_Images_0 (copy)
-    local l_props_0 = v53.props;
-    return l_withStyle_0(function(v56) --[[ Line: 179 ]]
-        -- upvalues: l_Roact_0 (ref), v54 (copy), l_CursorKind_0 (ref), l_props_0 (copy), l_InviteStatus_0 (ref), v53 (copy), l_ImageSetLabel_0 (ref), l_Images_0 (ref)
-        return l_Roact_0.createElement("TextButton", {
-            Selectable = false, 
-            Size = UDim2.new(0, 36, 0, 36), 
-            BackgroundTransparency = 1, 
-            Text = "", 
-            SelectionImageObject = v54(l_CursorKind_0.InputFields), 
-            [l_Roact_0.Event.Activated] = function() --[[ Line: 187 ]]
-                -- upvalues: l_props_0 (ref), l_InviteStatus_0 (ref), v53 (ref)
-                local v57 = l_props_0.userInviteStatus == l_InviteStatus_0.Pending;
-                local v58 = l_props_0.userInviteStatus == l_InviteStatus_0.Success;
-                if not v53.renderSteppedConnection and not v57 and not v58 then
-                    l_props_0.onActivated();
-                end;
-            end
-        }, {
-            SendLabel = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = l_Images_0["icons/actions/friends/friendInvite"], 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ImageColor3 = v56.Theme.IconEmphasis.Color, 
-                ImageTransparency = v53.bindings.sendTransparency
-            }), 
-            SuccessLabel = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = l_Images_0["icons/status/success"], 
-                Position = UDim2.new(0.5, 0, 0.5, 0), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                ImageColor3 = v56.Theme.IconEmphasis.Color, 
-                ImageTransparency = v53.bindings.successTransparency, 
-                Size = v53.bindings.successSize
-            }), 
-            FailLabel = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                BackgroundTransparency = 1, 
-                Image = l_Images_0["icons/status/alert"], 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ImageColor3 = v56.Theme.IconEmphasis.Color, 
-                ImageTransparency = v53.bindings.failTransparency, 
-                Position = v53.bindings.failPos
-            })
-        });
-    end);
-end;
-v13.render = function(v59) --[[ Line: 226 ]] --[[ Name: render ]]
-    -- upvalues: l_withSelectionCursorProvider_0 (copy)
-    return l_withSelectionCursorProvider_0(function(v60) --[[ Line: 227 ]]
-        -- upvalues: v59 (copy)
-        return v59:renderWithSelectionCursor(v60);
-    end);
-end;
-v13.didUpdate = function(v61, v62) --[[ Line: 232 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v38 (copy)
-    if v61.props.userInviteStatus and v61.props.userInviteStatus ~= v62.userInviteStatus then
-        v61:playAnimation(v38[v61.props.userInviteStatus]);
-    end;
-end;
-v13.didMount = function(v63) --[[ Line: 238 ]] --[[ Name: didMount ]]
-    -- upvalues: v38 (copy)
-    if v63.props.userInviteStatus then
-        v63:playAnimation(v38[v63.props.userInviteStatus]);
-    end;
-end;
-v13.playAnimation = function(v64, v65) --[[ Line: 244 ]] --[[ Name: playAnimation ]]
-    -- upvalues: l_RunService_0 (copy)
-    v64.animationStartTime = tick();
-    v64.animationFunction = v65;
-    if not v64.renderSteppedConnection then
-        v64.renderSteppedConnection = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 249 ]]
-            -- upvalues: v64 (copy)
-            v64.animationFunction(tick() - v64.animationStartTime, v64.updateBindings, function() --[[ Line: 250 ]]
-                -- upvalues: v64 (ref)
-                v64:stopAnimation();
-            end);
-        end);
-        v64.props.animationBegun();
-    end;
-end;
-v13.stopAnimation = function(v66) --[[ Line: 258 ]] --[[ Name: stopAnimation ]]
-    if v66.renderSteppedConnection then
-        v66.renderSteppedConnection:Disconnect();
-        v66.renderSteppedConnection = nil;
-        v66.props.animationEnded();
-    end;
-end;
-v13.willUnmount = function(v67) --[[ Line: 266 ]] --[[ Name: willUnmount ]]
-    v67:stopAnimation();
-end;
-return v13;
+local RunService = game:GetService("RunService")
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local UIBlox = InGameMenuDependencies.UIBlox
+local t = InGameMenuDependencies.t
+local withStyle = UIBlox.Core.Style.withStyle
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local ParentParent = script.Parent.Parent.Parent
+local InviteStatus = require(ParentParent.Resources.Constants).InviteStatus
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v14 = Roact.PureComponent:extend("SendInviteButton")
+
+v14.validateProps = t.strictInterface({
+	onActivated = t.callback,
+	animationBegun = t.callback,
+	animationEnded = t.callback,
+	userInviteStatus = t.optional(t.string)
+})
+
+local function linearTween(p1, p2, p3) -- line: 35
+	local v21 = (p3 - p2) / 30
+
+	return (p1 - p2 / 30) / v21
+end
+local function isBetweenFrames(p4, p5, p6) -- line: 40
+	return p4 >= p5 / 30 and p4 <= p6 / 30
+end
+
+local t1 = {
+	[InviteStatus.Pending] = function(p7, p8) -- line: 45
+		local v27 = math.sin(6.283185307179586 * p7) * 0.375 + 0.375
+
+		p8.sendTransparency(v27)
+	end,
+	[InviteStatus.Success] = function(p9, p10, p11) -- line: 54
+		if p9 >= 0 and p9 <= 0.13333333333333333 then
+			local v31 = (p9 - 0) / 0.13333333333333333
+
+			p10.sendTransparency(v31)
+			p10.successTransparency(1 - v31)
+
+			local v32 = 0.75 + 0.75 * (1 - v31)
+
+			p10.successSize(v32)
+
+			return
+		end
+
+		if p9 >= 0.13333333333333333 and p9 <= 0.3 then
+			p10.sendTransparency(1)
+			p10.successTransparency(0)
+
+			local v33 = 0.75 + 0.25 * ((p9 - 0.13333333333333333) / 0.16666666666666666)
+
+			p10.successSize(v33)
+
+			return
+		end
+
+		p10.successSize(1)
+		p11()
+	end,
+	[InviteStatus.Failed] = function(p12, p13, p14) -- line: 85
+		if p12 >= 0 and p12 <= 0.06666666666666667 then
+			local v37 = (p12 - 0) / 0.13333333333333333
+
+			p13.sendTransparency(v37)
+		elseif p12 >= 0.06666666666666667 and p12 <= 1.7333333333333334 then
+			p13.sendTransparency(1)
+		elseif p12 >= 1.7333333333333334 and p12 <= 1.9 then
+			local v38 = (p12 - 1.7333333333333334) / 0.16666666666666666
+
+			p13.sendTransparency(1 - v38)
+		else
+			p13.sendTransparency(0)
+			p14()
+		end
+
+		if p12 >= 0 and p12 <= 0.13333333333333333 then
+			local v39 = (p12 - 0) / 0.13333333333333333
+
+			p13.failTransparency(1 - v39)
+
+			return
+		end
+
+		if p12 >= 0.13333333333333333 and p12 <= 1.4 then
+			p13.failTransparency(0)
+
+			local v40 = p12 - 0.13333333333333333
+			local v41 = -0.4 * 2.71828182846 ^ (-v40 * 8) * math.sin(v40 * 40)
+
+			p13.failPos(v41)
+
+			return
+		end
+
+		if p12 >= 1.4 and p12 <= 1.5666666666666667 then
+			p13.failPos(0)
+
+			local v42 = (p12 - 1.4) / 0.16666666666666666
+
+			p13.failTransparency(v42)
+
+			return
+		end
+
+		p13.failTransparency(1)
+	end
+}
+
+function v14.init(p15, p16) -- line: 142
+	-- upvalues: Roact (copy), InviteStatus (copy)
+	local v45, v46 = Roact.createBinding(0)
+	local v47, v48 = Roact.createBinding(1)
+	local v49, v50 = Roact.createBinding(1)
+	local v51, v52 = Roact.createBinding(1)
+	local v53, v54 = Roact.createBinding(0)
+
+	p15.bindings = {
+		sendTransparency = v45,
+		successTransparency = v47,
+		failTransparency = v49,
+		successSize = v51:map(function(p17) -- line: 154
+			return UDim2.new(p17, 0, p17, 0)
+		end),
+		failPos = v53:map(function(p18) -- line: 157
+			return UDim2.new(p18, 0, 0, 0)
+		end)
+	}
+	p15.updateBindings = {
+		sendTransparency = v46,
+		successTransparency = v48,
+		failTransparency = v50,
+		successSize = v52,
+		failPos = v54
+	}
+
+	if p16.userInviteStatus == InviteStatus.Success then
+		v48(0)
+		v46(1)
+	end
+end
+function v14.renderWithSelectionCursor(p19, p20) -- line: 176
+	-- upvalues: withStyle (copy), Roact (copy), CursorKind (copy), InviteStatus (copy), ImageSetLabel (copy), Images (copy)
+	local props = p19.props
+
+	return withStyle(function(p21) -- line: 179
+		-- upvalues: Roact (copy), p20 (copy), CursorKind (copy), props (copy), InviteStatus (copy), p19 (copy), ImageSetLabel (copy), Images (copy)
+		return Roact.createElement("TextButton", {
+			Selectable = false,
+			Size = UDim2.new(0, 36, 0, 36),
+			BackgroundTransparency = 1,
+			Text = "",
+			SelectionImageObject = p20(CursorKind.InputFields),
+			[Roact.Event.Activated] = function() -- line: 187
+				-- upvalues: props (copy), InviteStatus (copy), p19 (copy)
+				local v70 = props.userInviteStatus == InviteStatus.Pending
+				local v71 = props.userInviteStatus == InviteStatus.Success
+
+				if not p19.renderSteppedConnection and (not v70 and not v71) then
+					props.onActivated()
+				end
+			end
+		}, {
+			SendLabel = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = Images["icons/actions/friends/friendInvite"],
+				Size = UDim2.new(1, 0, 1, 0),
+				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageTransparency = p19.bindings.sendTransparency
+			}),
+			SuccessLabel = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = Images["icons/status/success"],
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageTransparency = p19.bindings.successTransparency,
+				Size = p19.bindings.successSize
+			}),
+			FailLabel = Roact.createElement(ImageSetLabel, {
+				BackgroundTransparency = 1,
+				Image = Images["icons/status/alert"],
+				Size = UDim2.new(1, 0, 1, 0),
+				ImageColor3 = p21.Theme.IconEmphasis.Color,
+				ImageTransparency = p19.bindings.failTransparency,
+				Position = p19.bindings.failPos
+			})
+		})
+	end)
+end
+function v14.render(p22) -- line: 226
+	-- upvalues: withSelectionCursorProvider (copy)
+	return withSelectionCursorProvider(function(p23) -- line: 227
+		-- upvalues: p22 (copy)
+		return p22:renderWithSelectionCursor(p23)
+	end)
+end
+function v14.didUpdate(p24, p25) -- line: 232
+	-- upvalues: t1 (copy)
+	if p24.props.userInviteStatus and p24.props.userInviteStatus ~= p25.userInviteStatus then
+		p24:playAnimation(t1[p24.props.userInviteStatus])
+	end
+end
+function v14.didMount(p26) -- line: 238
+	-- upvalues: t1 (copy)
+	if p26.props.userInviteStatus then
+		p26:playAnimation(t1[p26.props.userInviteStatus])
+	end
+end
+function v14.playAnimation(p27, p28) -- line: 244
+	-- upvalues: RunService (copy)
+	p27.animationStartTime = tick()
+	p27.animationFunction = p28
+
+	if not p27.renderSteppedConnection then
+		p27.renderSteppedConnection = RunService.RenderStepped:Connect(function() -- line: 249
+			-- upvalues: p27 (copy)
+			p27.animationFunction(tick() - p27.animationStartTime, p27.updateBindings, function() -- line: 250
+				-- upvalues: p27 (copy)
+				p27:stopAnimation()
+			end)
+		end)
+		p27.props.animationBegun()
+	end
+end
+function v14.stopAnimation(p29) -- line: 258
+	if p29.renderSteppedConnection then
+		p29.renderSteppedConnection:Disconnect()
+		p29.renderSteppedConnection = nil
+		p29.props.animationEnded()
+	end
+end
+function v14.willUnmount(p30) -- line: 266
+	p30:stopAnimation()
+end
+
+return v14

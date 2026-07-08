@@ -1,47 +1,51 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local v3 = require(l_script_FirstAncestor_0.Parent.ReactUtils);
-local v4 = require(l_script_FirstAncestor_0.Components.ProgressCountdown);
-local l_createNextOrder_0 = v3.createNextOrder;
-return function(v6) --[[ Line: 22 ]] --[[ Name: AudioPlaybackTimeline ]]
-    -- upvalues: l_createNextOrder_0 (copy), v1 (copy), v2 (copy), v4 (copy)
-    local v7 = l_createNextOrder_0();
-    return v1.createElement(v2.View, {
-        tag = "size-full-0 auto-y row flex-between align-y-center gap-large", 
-        LayoutOrder = v6.LayoutOrder
-    }, {
-        TimeElapsed = v1.createElement(v4, {
-            timeLength = v6.duration, 
-            timePosition = v6.elapsed, 
-            counterType = "Elapsed", 
-            LayoutOrder = v7()
-        }), 
-        ProgressBar = v1.createElement(v2.View, {
-            tag = "size-full-0 auto-y shrink padding-top-xxsmall", 
-            LayoutOrder = v7()
-        }, {
-            Slider = v1.createElement(v2.Slider, {
-                value = v6.elapsed:map(function(v8) --[[ Line: 41 ]]
-                    -- upvalues: v6 (copy)
-                    if v6.duration > 0 then
-                        return v8 / v6.duration;
-                    else
-                        return 0;
-                    end;
-                end), 
-                onValueChanged = v6.onDragTimeline, 
-                onDragStarted = v6.onDragTimelineStart, 
-                onDragEnded = v6.onDragTimelineEnd, 
-                size = v2.Enums.InputSize.Medium, 
-                knobVisibility = v2.Enums.ScrollBarVisibility.Auto, 
-                variant = v2.Enums.SliderVariant.Standard
-            })
-        }), 
-        TimeRemaining = v1.createElement(v4, {
-            timeLength = v6.duration, 
-            timePosition = v6.elapsed, 
-            LayoutOrder = v7()
-        })
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local React = require(Songbird.Parent.React)
+local Foundation = require(Songbird.Parent.Foundation)
+local ReactUtils = require(Songbird.Parent.ReactUtils)
+local ProgressCountdown = require(Songbird.Components.ProgressCountdown)
+local createNextOrder = ReactUtils.createNextOrder
+
+local function AudioPlaybackTimeline(t1: {[any]: any}) -- line: 22
+	-- upvalues: createNextOrder (copy), React (copy), Foundation (copy), ProgressCountdown (copy)
+	local v9 = createNextOrder()
+
+	return React.createElement(Foundation.View, {
+		tag = "size-full-0 auto-y row flex-between align-y-center gap-large",
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		TimeElapsed = React.createElement(ProgressCountdown, {
+			counterType = "Elapsed",
+			timeLength = t1.duration,
+			timePosition = t1.elapsed,
+			LayoutOrder = v9()
+		}),
+		ProgressBar = React.createElement(Foundation.View, {
+			tag = "size-full-0 auto-y shrink padding-top-xxsmall",
+			LayoutOrder = v9()
+		}, {
+			Slider = React.createElement(Foundation.Slider, {
+				value = t1.elapsed:map(function(n1: number) -- line: 41
+					-- upvalues: t1 (copy)
+					if t1.duration > 0 then
+						return n1 / t1.duration
+					end
+
+					return 0
+				end),
+				onValueChanged = t1.onDragTimeline,
+				onDragStarted = t1.onDragTimelineStart,
+				onDragEnded = t1.onDragTimelineEnd,
+				size = Foundation.Enums.InputSize.Medium,
+				knobVisibility = Foundation.Enums.ScrollBarVisibility.Auto,
+				variant = Foundation.Enums.SliderVariant.Standard
+			})
+		}),
+		TimeRemaining = React.createElement(ProgressCountdown, {
+			timeLength = t1.duration,
+			timePosition = t1.elapsed,
+			LayoutOrder = v9()
+		})
+	})
+end
+
+return AudioPlaybackTimeline

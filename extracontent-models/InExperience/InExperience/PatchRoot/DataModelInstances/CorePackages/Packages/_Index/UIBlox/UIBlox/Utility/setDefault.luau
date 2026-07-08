@@ -1,7 +1,9 @@
-return function(v0, v1) --[[ Line: 5 ]] --[[ Name: setDefault ]]
-    if v0 == nil then
-        return v1;
-    else
-        return v0;
-    end;
-end;
+local function setDefault(p1, p2) -- line: 5
+	if p1 == nil then
+		return p2
+	end
+
+	return p1
+end
+
+return setDefault

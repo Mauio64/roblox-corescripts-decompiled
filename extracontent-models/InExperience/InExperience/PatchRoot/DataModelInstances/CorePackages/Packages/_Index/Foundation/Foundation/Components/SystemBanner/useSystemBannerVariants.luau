@@ -1,80 +1,88 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v2 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local v3 = require(l_script_FirstAncestor_0.Enums.AlertVariant);
-local v4 = require(l_script_FirstAncestor_0.Enums.AlertSeverity);
-local v5 = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v7 = require(l_script_FirstAncestor_0.Providers.Style.VariantsContext);
-local function v10(v8, v9) --[[ Line: 31 ]] --[[ Name: createStandardVariantStyles ]]
-    -- upvalues: v2 (copy)
-    return {
-        container = {
-            tag = "bg-shift-200", 
-            colorMode = v2.Color
-        }, 
-        title = {
-            style = v8.Color.Content.Emphasis
-        }, 
-        description = {
-            style = v8.Color.Content.Default
-        }, 
-        icon = {
-            style = v9
-        }
-    };
-end;
-local function v14(v11, v12, v13) --[[ Line: 43 ]] --[[ Name: createEmphasisVariantStyles ]]
-    return {
-        container = {
-            tag = v12, 
-            colorMode = v13
-        }, 
-        title = {
-            style = v11[v13].Content.Emphasis
-        }, 
-        description = {
-            style = v11[v13].Content.Default
-        }, 
-        icon = {
-            style = v11[v13].Content.Emphasis
-        }
-    };
-end;
-local function v18(v15) --[[ Line: 55 ]] --[[ Name: variantsFactory ]]
-    -- upvalues: v3 (copy), v4 (copy), v10 (copy), v14 (copy), v2 (copy)
-    local v16 = {
-        container = {
-            tag = "size-full-0 auto-y row padding-y-large padding-x-medium gap-medium"
-        }, 
-        title = {
-            tag = "text-align-x-left text-wrap auto-xy text-title-medium padding-y-xxsmall"
-        }, 
-        description = {
-            tag = "text-align-x-left text-wrap auto-xy text-body-medium text-wrap"
-        }
-    };
-    local v17 = {
-        [v3.Standard] = {
-            [v4.Info] = v10(v15, v15.Color.System.Emphasis), 
-            [v4.Warning] = v10(v15, v15.Color.System.Warning), 
-            [v4.Success] = v10(v15, v15.Color.System.Success), 
-            [v4.Error] = v10(v15, v15.Color.System.Alert)
-        }, 
-        [v3.Emphasis] = {
-            [v4.Info] = v14(v15, "bg-system-emphasis", v2.DarkMode), 
-            [v4.Warning] = v14(v15, "bg-system-warning", v2.LightMode), 
-            [v4.Success] = v14(v15, "bg-system-success", v2.LightMode), 
-            [v4.Error] = v14(v15, "bg-system-alert", v2.DarkMode)
-        }
-    };
-    return {
-        common = v16, 
-        severity = v17
-    };
-end;
-return function(v19, v20, v21) --[[ Line: 86 ]]
-    -- upvalues: v7 (copy), v18 (copy), v5 (copy)
-    local v22 = v7.useVariants("SystemBanner", v18, v19);
-    return v5(v22.common, v22.severity[v20][v21]);
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+
+require(Foundation.Components.Types)
+
+local ColorMode = require(Foundation.Enums.ColorMode)
+local AlertVariant = require(Foundation.Enums.AlertVariant)
+local AlertSeverity = require(Foundation.Enums.AlertSeverity)
+local composeStyleVariant = require(Foundation.Utility.composeStyleVariant)
+
+require(Foundation.Providers.Style.Tokens)
+
+local VariantsContext = require(Foundation.Providers.Style.VariantsContext)
+
+local function createStandardVariantStyles(p1, p2) -- line: 31
+	-- upvalues: ColorMode (copy)
+	return {
+		container = {
+			tag = "bg-shift-200",
+			colorMode = ColorMode.Color
+		},
+		title = {
+			style = p1.Color.Content.Emphasis
+		},
+		description = {
+			style = p1.Color.Content.Default
+		},
+		icon = {
+			style = p2
+		}
+	}
+end
+local function createEmphasisVariantStyles(p3, s1: string, p4) -- line: 43
+	return {
+		container = {
+			tag = s1,
+			colorMode = p4
+		},
+		title = {
+			style = p3[p4].Content.Emphasis
+		},
+		description = {
+			style = p3[p4].Content.Default
+		},
+		icon = {
+			style = p3[p4].Content.Emphasis
+		}
+	}
+end
+local function variantsFactory(p5) -- line: 55
+	-- upvalues: AlertVariant (copy), AlertSeverity (copy), createStandardVariantStyles (copy), createEmphasisVariantStyles (copy), ColorMode (copy)
+	local t1 = {
+		container = {
+			tag = "row gap-medium size-full-0 auto-y padding-x-medium padding-y-large"
+		},
+		title = {
+			tag = "auto-xy padding-y-xxsmall text-title-medium text-wrap text-align-x-left"
+		},
+		description = {
+			tag = "auto-xy text-body-medium text-wrap text-align-x-left"
+		}
+	}
+	local t2 = {
+		[AlertVariant.Standard] = {
+			[AlertSeverity.Info] = createStandardVariantStyles(p5, p5.Color.System.Emphasis),
+			[AlertSeverity.Warning] = createStandardVariantStyles(p5, p5.Color.System.Warning),
+			[AlertSeverity.Success] = createStandardVariantStyles(p5, p5.Color.System.Success),
+			[AlertSeverity.Error] = createStandardVariantStyles(p5, p5.Color.System.Alert)
+		},
+		[AlertVariant.Emphasis] = {
+			[AlertSeverity.Info] = createEmphasisVariantStyles(p5, "bg-system-emphasis", ColorMode.DarkMode),
+			[AlertSeverity.Warning] = createEmphasisVariantStyles(p5, "bg-system-warning", ColorMode.LightMode),
+			[AlertSeverity.Success] = createEmphasisVariantStyles(p5, "bg-system-success", ColorMode.LightMode),
+			[AlertSeverity.Error] = createEmphasisVariantStyles(p5, "bg-system-alert", ColorMode.DarkMode)
+		}
+	}
+
+	return {
+		common = t1,
+		severity = t2
+	}
+end
+
+return function(p6, p7, p8) -- line: 86
+	-- upvalues: VariantsContext (copy), variantsFactory (copy), composeStyleVariant (copy)
+	local v21 = VariantsContext.useVariants("SystemBanner", variantsFactory, p6)
+
+	return composeStyleVariant(v21.common, v21.severity[p7][p8])
+end

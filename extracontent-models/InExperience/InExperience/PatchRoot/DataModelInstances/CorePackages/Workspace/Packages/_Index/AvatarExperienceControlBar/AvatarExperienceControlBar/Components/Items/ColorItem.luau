@@ -1,62 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_ColorGradientCircle_0 = require(l_Parent_0.AvatarExperienceCommon).Components.ColorGradientCircle;
-local v5 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local v6 = require(l_script_FirstAncestor_0.Hooks.useHoverBinding);
-local v7 = {
-    affordance = v3.Enums.StateLayerAffordance.None
-};
-local function v9(v8) --[[ Line: 17 ]] --[[ Name: getHoverTransparency ]]
-    if v8 then
-        return 0;
-    else
-        return 0.2;
-    end;
-end;
-return v2.forwardRef(function(v10, v11) --[[ Line: 32 ]] --[[ Name: ColorItem ]]
-    -- upvalues: v5 (copy), v6 (copy), v2 (copy), v3 (copy), v7 (copy), v9 (copy), l_ColorGradientCircle_0 (copy)
-    local v12 = v5();
-    local v13, v14 = v6();
-    local v15 = if v10.size then v10.size else v12.defaultIconContainerSize;
-    local v16 = if v10.colorSize then v10.colorSize else v15;
-    return v2.createElement(v3.View, {
-        ref = v11, 
-        LayoutOrder = v10.LayoutOrder, 
-        stateLayer = v7, 
-        onStateChanged = if v10.disabled then nil else v14, 
-        onActivated = v10.onActivated, 
-        AutomaticSize = Enum.AutomaticSize.XY, 
-        disabled = v10.disabled, 
-        selection = {
-            Selectable = v10.Selectable or false
-        }
-    }, {
-        HoverHandler = v2.createElement(v3.View, {
-            Size = UDim2.fromOffset(v15, v15), 
-            GroupTransparency = v13:map(v9), 
-            backgroundStyle = v13:map(function(v17) --[[ Line: 51 ]]
-                -- upvalues: v12 (copy), v10 (copy)
-                if v17 then
-                    return v12.hoverIconBackgroundStyle;
-                elseif v10.isActive then
-                    return v12.activeIconBackgroundStyle;
-                else
-                    return {
-                        Color3 = v12.hoverIconBackgroundStyle.Color3, 
-                        Transparency = 1
-                    };
-                end;
-            end), 
-            tag = "padding-small radius-circle clip auto-xy"
-        }, {
-            ColorGradientCircle = v2.createElement(l_ColorGradientCircle_0, {
-                Colors = v10.colors, 
-                Size = UDim2.fromOffset(v16, v16), 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                AnchorPoint = Vector2.new(0.5, 0.5)
-            })
-        })
-    });
-end);
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local ColorGradientCircle = require(AvatarExperienceControlBarParent.AvatarExperienceCommon).Components.ColorGradientCircle
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useHoverBinding = require(AvatarExperienceControlBar.Hooks.useHoverBinding)
+local t1 = {
+	affordance = Foundation.Enums.StateLayerAffordance.None
+}
+
+local function getHoverTransparency(p1) -- line: 17
+	if p1 then
+		return 0
+	end
+
+	return 0.2
+end
+local function ColorItem(t2: {[any]: any}, p2) -- line: 32
+	-- upvalues: useSemanticTokens (copy), useHoverBinding (copy), React (copy), Foundation (copy), t1 (copy), getHoverTransparency (copy), ColorGradientCircle (copy)
+	local v14 = useSemanticTokens()
+	local v15, v16 = useHoverBinding()
+	local v17 = if not t2.size then v14.defaultIconContainerSize else t2.size
+	local v18 = if not t2.colorSize then v17 else t2.colorSize
+
+	return React.createElement(Foundation.View, {
+		ref = p2,
+		LayoutOrder = t2.LayoutOrder,
+		stateLayer = t1,
+		onStateChanged = if not t2.disabled then v16 else nil,
+		onActivated = t2.onActivated,
+		AutomaticSize = Enum.AutomaticSize.XY,
+		disabled = t2.disabled,
+		selection = {
+			Selectable = t2.Selectable or false
+		}
+	}, {
+		HoverHandler = React.createElement(Foundation.View, {
+			tag = "padding-small radius-circle clip auto-xy",
+			Size = UDim2.fromOffset(v17, v17),
+			GroupTransparency = v15:map(getHoverTransparency),
+			backgroundStyle = v15:map(function(p3) -- line: 51
+				-- upvalues: v14 (copy), t2 (copy)
+				if p3 then
+					return v14.hoverIconBackgroundStyle
+				end
+
+				if t2.isActive then
+					return v14.activeIconBackgroundStyle
+				end
+
+				return {
+					Transparency = 1,
+					Color3 = v14.hoverIconBackgroundStyle.Color3
+				}
+			end)
+		}, {
+			ColorGradientCircle = React.createElement(ColorGradientCircle, {
+				Colors = t2.colors,
+				Size = UDim2.fromOffset(v18, v18),
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5)
+			})
+		})
+	})
+end
+
+return React.forwardRef(ColorItem)

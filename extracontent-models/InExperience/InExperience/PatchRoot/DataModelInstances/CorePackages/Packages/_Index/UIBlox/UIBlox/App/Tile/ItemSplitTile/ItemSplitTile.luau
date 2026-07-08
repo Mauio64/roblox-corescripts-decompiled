@@ -1,265 +1,275 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Core_0 = l_Parent_1.Core;
-local l_Parent_2 = l_Parent_1.Parent;
-local v4 = require(l_Parent_2.Roact);
-local v5 = require(l_Parent_2.t);
-local v6 = require(l_Core_0.Style.withStyle);
-local v7 = require(l_Core_0.Control.Interactable);
-local v8 = require(l_Core_0.Control.Enum.ControlState);
-local v9 = require(l_Parent_1.App.Loading.LoadableImage);
-local v10 = require(l_Parent_0.ImageSet.Images);
-local v11 = require(l_Core_0.ImageSet.ImageSetComponent);
-local v12 = require(l_Parent_1.App.Tile.ItemSplitTile.ItemSplitTileFooter);
-local v13 = UDim.new(0, 8);
-local v14 = UDim.new(0, 8);
-local v15 = UDim.new(0, 12);
-local v16 = v4.PureComponent:extend("ItemSplitTile");
-v16.validateProps = v5.strictInterface({
-    itemName = v5.optional(v5.string), 
-    priceText = v5.optional(v5.string), 
-    isOwned = v5.optional(v5.boolean), 
-    hasBackground = v5.optional(v5.boolean), 
-    isHovered = v5.optional(v5.boolean), 
-    onActivated = v5.optional(v5.callback), 
-    thumbnail = v5.optional(v5.string)
-});
-v16.defaultProps = {
-    itemName = "--", 
-    priceText = "--", 
-    hasBackground = true, 
-    isHovered = false
-};
-v16.init = function(v17) --[[ Line: 68 ]] --[[ Name: init ]]
-    -- upvalues: v8 (copy)
-    v17:setState({
-        controlState = v8.Initialize
-    });
-    v17.onStateChanged = function(_, v19) --[[ Line: 73 ]]
-        -- upvalues: v17 (copy)
-        v17:setState({
-            controlState = v19
-        });
-    end;
-end;
-v16.renderImageFrame = function(_, v21, v22, v23, v24) --[[ Line: 80 ]] --[[ Name: renderImageFrame ]]
-    -- upvalues: v4 (copy), v11 (copy), v13 (copy), v9 (copy)
-    local l_Theme_0 = v24.Theme;
-    local v26 = v23 or not v22;
-    local v27 = typeof(v21) == "table";
-    return v4.createElement("Frame", {
-        Position = UDim2.fromScale(0, v22 and 0.5 or 0), 
-        Size = UDim2.fromScale(1, v23 and 1 or 0.5), 
-        ClipsDescendants = true, 
-        BackgroundTransparency = 1
-    }, {
-        Image = if v27 then v4.createElement(v11.Label, {
-            BackgroundColor3 = l_Theme_0.PlaceHolder.Color, 
-            BackgroundTransparency = 1, 
-            Image = v21, 
-            Position = UDim2.fromScale(0, v22 and -1 or 0), 
-            Size = UDim2.fromScale(1, v23 and 1 or 2)
-        }, {
-            UICorner = if v26 then v4.createElement("UICorner", {
-                CornerRadius = v13
-            }) else nil
-        }) else v4.createElement(v9, {
-            BackgroundColor3 = l_Theme_0.PlaceHolder.Color, 
-            BackgroundTransparency = 1, 
-            Image = v21, 
-            Position = UDim2.fromScale(0.5, v22 and 0 or 1), 
-            Size = UDim2.fromScale(1, v23 and 1 or 2), 
-            AnchorPoint = Vector2.new(0.5, v23 and 1 or 0.5), 
-            cornerRadius = if v26 then v13 else nil, 
-            showFailedStateWhenLoadingFailed = true, 
-            useShimmerAnimationWhileLoading = true
-        })
-    });
-end;
-v16.renderTopContent = function(v28, v29) --[[ Line: 119 ]] --[[ Name: renderTopContent ]]
-    -- upvalues: v10 (copy), v4 (copy), v11 (copy)
-    local l_hasBackground_0 = v28.props.hasBackground;
-    local l_isHovered_0 = v28.props.isHovered;
-    local v32 = not l_hasBackground_0;
-    local l_Theme_1 = v29.Theme;
-    local v34 = v10[l_Theme_1.ItemBackgroundDefault.Image];
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1, 
-        SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-        ZIndex = 2
-    }, {
-        BackgroundImage = if v28.props.thumbnail then v4.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            TopImageFrame = v28:renderImageFrame(v34, false, v32, v29), 
-            BottomImageFrame = if not v32 then v28:renderImageFrame(v34, true, false, v29) else nil
-        }) else nil, 
-        ItemImage = v4.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            TopImageFrame = v28:renderImageFrame(v28.props.thumbnail, false, v32, v29), 
-            BottomImageFrame = if not v32 then v28:renderImageFrame(v28.props.thumbnail, true, false, v29) else nil
-        }), 
-        HoverShadow = if not l_isHovered_0 or l_hasBackground_0 then nil else v4.createElement(v11.Label, {
-            ZIndex = 0, 
-            Position = UDim2.new(0.5, 0, 0.5, 2), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 1, 12), 
-            Image = v10["component_assets/dropshadow_24_6"], 
-            ImageColor3 = l_Theme_1.DropShadow.Color, 
-            ImageTransparency = l_Theme_1.DropShadow.Transparency, 
-            ScaleType = Enum.ScaleType.Slice, 
-            SliceCenter = Rect.new(18, 18, 18, 18)
-        })
-    });
-end;
-v16.renderBottomContent = function(v35, v36) --[[ Line: 169 ]] --[[ Name: renderBottomContent ]]
-    -- upvalues: v8 (copy), v15 (copy), v14 (copy), v4 (copy), v12 (copy)
-    local l_itemName_0 = v35.props.itemName;
-    local l_hasBackground_1 = v35.props.hasBackground;
-    local l_Font_0 = v36.Font;
-    local v40 = math.ceil(v36.Font.BaseSize * v36.Font.Header2.RelativeSize);
-    local l_Theme_2 = v36.Theme;
-    local l_controlState_0 = v35.state.controlState;
-    local v43 = if (not not v35.props.isHovered or l_controlState_0 == v8.Pressed) and l_hasBackground_1 then v15 else v14;
-    local v44 = v40 * 3 + v14.Offset + v43.Offset * 2;
-    local l_TextEmphasis_0 = l_Theme_2.TextEmphasis;
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, v44), 
-        BackgroundTransparency = 1, 
-        LayoutOrder = 2
-    }, {
-        UIListLayout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = v14
-        }), 
-        Padding = v4.createElement("UIPadding", {
-            PaddingLeft = if l_hasBackground_1 then v43 else nil, 
-            PaddingRight = if l_hasBackground_1 then v43 else nil, 
-            PaddingTop = if l_hasBackground_1 then v43 else v14, 
-            PaddingBottom = if l_hasBackground_1 then v43 else v14
-        }), 
-        TitleArea = if l_itemName_0 and string.len(l_itemName_0) > 0 then v4.createElement("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            Text = l_itemName_0, 
-            Font = l_Font_0.Header2.Font, 
-            TextSize = v40, 
-            TextTransparency = l_TextEmphasis_0.Transparency, 
-            TextColor3 = l_TextEmphasis_0.Color, 
-            TextWrapped = true, 
-            TextTruncate = Enum.TextTruncate.AtEnd, 
-            TextXAlignment = Enum.TextXAlignment.Left, 
-            TextYAlignment = Enum.TextYAlignment.Top, 
-            LayoutOrder = 1
-        }, {
-            UISizeConstraint = v4.createElement("UISizeConstraint", {
-                MaxSize = Vector2.new(1e999, v40 * 2)
-            })
-        }) else nil, 
-        Footer = v4.createElement(v12, {
-            priceText = v35.props.priceText, 
-            isOwned = v35.props.isOwned, 
-            layoutOrder = 2
-        })
-    });
-end;
-v16.renderTileContent = function(v46, v47) --[[ Line: 237 ]] --[[ Name: renderTileContent ]]
-    -- upvalues: v4 (copy), v13 (copy), v7 (copy)
-    local l_hasBackground_2 = v46.props.hasBackground;
-    local l_onActivated_0 = v46.props.onActivated;
-    local l_Theme_3 = v47.Theme;
-    local v51 = if l_hasBackground_2 then l_Theme_3.BackgroundUIDefault.Color else nil;
-    local v52 = if l_hasBackground_2 then l_Theme_3.BackgroundUIDefault.Transparency else 1;
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundColor3 = v51, 
-        BackgroundTransparency = v52, 
-        ClipsDescendants = true, 
-        ZIndex = 1
-    }, {
-        UICorner = v4.createElement("UICorner", {
-            CornerRadius = v13
-        }), 
-        Panel = v4.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            UIListLayout = v4.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            TopContentPlaceholder = v4.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }), 
-            BottomContent = v46:renderBottomContent(v47)
-        }), 
-        TopContent = v46:renderTopContent(v47), 
-        TileOverlay = v4.createElement(v7, {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1, 
-            onStateChanged = v46.onStateChanged, 
-            [v4.Event.Activated] = l_onActivated_0, 
-            ZIndex = 3
-        }, {
-            UICorner = v4.createElement("UICorner", {
-                CornerRadius = v13
-            }), 
-            BorderFrame = v4.createElement("Frame", {
-                Size = UDim2.new(1, -2, 1, -2), 
-                Position = UDim2.fromOffset(1, 1), 
-                BackgroundTransparency = 1, 
-                SizeConstraint = if not l_hasBackground_2 then Enum.SizeConstraint.RelativeXX else nil
-            }, {
-                UIStroke = v4.createElement("UIStroke", {
-                    Color = l_Theme_3.Divider.Color, 
-                    Transparency = l_Theme_3.Divider.Transparency, 
-                    Thickness = 1
-                }), 
-                UICorner = v4.createElement("UICorner", {
-                    CornerRadius = v13
-                })
-            })
-        })
-    });
-end;
-v16.render = function(v53) --[[ Line: 300 ]] --[[ Name: render ]]
-    -- upvalues: v6 (copy), v4 (copy), v11 (copy), v10 (copy)
-    local l_hasBackground_3 = v53.props.hasBackground;
-    local l_isHovered_1 = v53.props.isHovered;
-    return v6(function(v56) --[[ Line: 304 ]]
-        -- upvalues: v4 (ref), v53 (copy), l_isHovered_1 (copy), l_hasBackground_3 (copy), v11 (ref), v10 (ref)
-        local l_Theme_4 = v56.Theme;
-        return v4.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            UISizeConstraint = v4.createElement("UISizeConstraint", {
-                MinSize = Vector2.new(146, 233)
-            }), 
-            TileContent = v53:renderTileContent(v56), 
-            HoverShadow = if l_isHovered_1 and l_hasBackground_3 then v4.createElement(v11.Label, {
-                ZIndex = 0, 
-                Position = UDim2.new(0.5, 0, 0.5, 2), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 10, 1, 12), 
-                Image = v10["component_assets/dropshadow_24_6"], 
-                ImageColor3 = l_Theme_4.DropShadow.Color, 
-                ImageTransparency = l_Theme_4.DropShadow.Transparency, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(18, 18, 18, 18)
-            }) else nil
-        });
-    end);
-end;
-return v16;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Core = ParentParentParent.Core
+local ParentParentParentParent = ParentParentParent.Parent
+local Roact = require(ParentParentParentParent.Roact)
+local t = require(ParentParentParentParent.t)
+local withStyle = require(Core.Style.withStyle)
+local Interactable = require(Core.Control.Interactable)
+local ControlState = require(Core.Control.Enum.ControlState)
+local LoadableImage = require(ParentParentParent.App.Loading.LoadableImage)
+local Images = require(ParentParent.ImageSet.Images)
+local ImageSetComponent = require(Core.ImageSet.ImageSetComponent)
+local ItemSplitTileFooter = require(ParentParentParent.App.Tile.ItemSplitTile.ItemSplitTileFooter)
+local uDim = UDim.new(0, 8)
+local uDim2 = UDim.new(0, 8)
+local uDim3 = UDim.new(0, 12)
+local v17 = Roact.PureComponent:extend("ItemSplitTile")
+
+v17.validateProps = t.strictInterface({
+	itemName = t.optional(t.string),
+	priceText = t.optional(t.string),
+	isOwned = t.optional(t.boolean),
+	hasBackground = t.optional(t.boolean),
+	isHovered = t.optional(t.boolean),
+	onActivated = t.optional(t.callback),
+	thumbnail = t.optional(t.string)
+})
+v17.defaultProps = {
+	itemName = "--",
+	priceText = "--",
+	hasBackground = true,
+	isHovered = false
+}
+
+function v17.init(p1) -- line: 68
+	-- upvalues: ControlState (copy)
+	p1:setState({
+		controlState = ControlState.Initialize
+	})
+
+	function p1.onStateChanged(_, p3) -- line: 73
+		-- upvalues: p1 (copy)
+		p1:setState({
+			controlState = p3
+		})
+	end
+end
+function v17.renderImageFrame(_, p5, p6, p7, p8) -- line: 80
+	-- upvalues: Roact (copy), ImageSetComponent (copy), uDim (copy), LoadableImage (copy)
+	local Theme = p8.Theme
+	local v25 = p7 or not p6
+	local v26 = typeof(p5) == "table"
+
+	return Roact.createElement("Frame", {
+		ClipsDescendants = true,
+		BackgroundTransparency = 1,
+		Position = UDim2.fromScale(0, not p6 and 0 or 0.5),
+		Size = UDim2.fromScale(1, not p7 and 0.5 or 1)
+	}, {
+		Image = if not v26 then Roact.createElement(LoadableImage, {
+			BackgroundTransparency = 1,
+			showFailedStateWhenLoadingFailed = true,
+			useShimmerAnimationWhileLoading = true,
+			BackgroundColor3 = Theme.PlaceHolder.Color,
+			Image = p5,
+			Position = UDim2.fromScale(0.5, not p6 and 1 or 0),
+			Size = UDim2.fromScale(1, not p7 and 2 or 1),
+			AnchorPoint = Vector2.new(0.5, not p7 and 0.5 or 1),
+			cornerRadius = if not v25 then nil else uDim
+		}) else Roact.createElement(ImageSetComponent.Label, {
+			BackgroundTransparency = 1,
+			BackgroundColor3 = Theme.PlaceHolder.Color,
+			Image = p5,
+			Position = UDim2.fromScale(0, not p6 and 0 or -1),
+			Size = UDim2.fromScale(1, not p7 and 2 or 1)
+		}, {
+			UICorner = if not v25 then nil else Roact.createElement("UICorner", {
+				CornerRadius = uDim
+			})
+		})
+	})
+end
+function v17.renderTopContent(p9, p10) -- line: 119
+	-- upvalues: Images (copy), Roact (copy), ImageSetComponent (copy)
+	local hasBackground = p9.props.hasBackground
+	local isHovered = p9.props.isHovered
+	local v31 = not hasBackground
+	local Theme = p10.Theme
+	local v33 = Images[Theme.ItemBackgroundDefault.Image]
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Size = UDim2.new(1, 0, 1, 0),
+		SizeConstraint = Enum.SizeConstraint.RelativeXX
+	}, {
+		BackgroundImage = if not p9.props.thumbnail then nil else Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			TopImageFrame = p9:renderImageFrame(v33, false, v31, p10),
+			BottomImageFrame = if v31 then nil else p9:renderImageFrame(v33, true, false, p10)
+		}),
+		ItemImage = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			TopImageFrame = p9:renderImageFrame(p9.props.thumbnail, false, v31, p10),
+			BottomImageFrame = if v31 then nil else p9:renderImageFrame(p9.props.thumbnail, true, false, p10)
+		}),
+		HoverShadow = if not isHovered or hasBackground then nil else Roact.createElement(ImageSetComponent.Label, {
+			ZIndex = 0,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.5, 0, 0.5, 2),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.new(1, 0, 1, 12),
+			Image = Images["component_assets/dropshadow_24_6"],
+			ImageColor3 = Theme.DropShadow.Color,
+			ImageTransparency = Theme.DropShadow.Transparency,
+			ScaleType = Enum.ScaleType.Slice,
+			SliceCenter = Rect.new(18, 18, 18, 18)
+		})
+	})
+end
+function v17.renderBottomContent(p11, p12) -- line: 169
+	-- upvalues: ControlState (copy), uDim3 (copy), uDim2 (copy), Roact (copy), ItemSplitTileFooter (copy)
+	local itemName = p11.props.itemName
+	local hasBackground = p11.props.hasBackground
+	local p12Font = p12.Font
+	local v39 = math.ceil(p12.Font.BaseSize * p12.Font.Header2.RelativeSize)
+	local Theme = p12.Theme
+	local controlState = p11.state.controlState
+	local v42 = if not p11.props.isHovered and controlState ~= ControlState.Pressed or not hasBackground then uDim2 else uDim3
+	local v43 = v39 * 3 + uDim2.Offset + v42.Offset * 2
+	local TextEmphasis = Theme.TextEmphasis
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+		Size = UDim2.new(1, 0, 0, v43)
+	}, {
+		UIListLayout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = uDim2
+		}),
+		Padding = Roact.createElement("UIPadding", {
+			PaddingLeft = if not hasBackground then nil else v42,
+			PaddingRight = if not hasBackground then nil else v42,
+			PaddingTop = if not hasBackground then uDim2 else v42,
+			PaddingBottom = if not hasBackground then uDim2 else v42
+		}),
+		TitleArea = if not itemName or not (string.len(itemName) > 0) then nil else Roact.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			Text = itemName,
+			Font = p12Font.Header2.Font,
+			TextSize = v39,
+			TextTransparency = TextEmphasis.Transparency,
+			TextColor3 = TextEmphasis.Color,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top
+		}, {
+			UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(1e999, v39 * 2)
+			})
+		}),
+		Footer = Roact.createElement(ItemSplitTileFooter, {
+			layoutOrder = 2,
+			priceText = p11.props.priceText,
+			isOwned = p11.props.isOwned
+		})
+	})
+end
+function v17.renderTileContent(p13, p14) -- line: 237
+	-- upvalues: Roact (copy), uDim (copy), Interactable (copy)
+	local hasBackground = p13.props.hasBackground
+	local onActivated = p13.props.onActivated
+	local Theme = p14.Theme
+	local v50 = if not hasBackground then nil else Theme.BackgroundUIDefault.Color
+	local v51 = not hasBackground and 1 or Theme.BackgroundUIDefault.Transparency
+
+	return Roact.createElement("Frame", {
+		ClipsDescendants = true,
+		ZIndex = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundColor3 = v50,
+		BackgroundTransparency = v51
+	}, {
+		UICorner = Roact.createElement("UICorner", {
+			CornerRadius = uDim
+		}),
+		Panel = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			UIListLayout = Roact.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			TopContentPlaceholder = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				SizeConstraint = Enum.SizeConstraint.RelativeXX
+			}),
+			BottomContent = p13:renderBottomContent(p14)
+		}),
+		TopContent = p13:renderTopContent(p14),
+		TileOverlay = Roact.createElement(Interactable, {
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundTransparency = 1,
+			onStateChanged = p13.onStateChanged,
+			[Roact.Event.Activated] = onActivated,
+			ZIndex = 3
+		}, {
+			UICorner = Roact.createElement("UICorner", {
+				CornerRadius = uDim
+			}),
+			BorderFrame = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -2, 1, -2),
+				Position = UDim2.fromOffset(1, 1),
+				SizeConstraint = if hasBackground then nil else Enum.SizeConstraint.RelativeXX
+			}, {
+				UIStroke = Roact.createElement("UIStroke", {
+					Thickness = 1,
+					Color = Theme.Divider.Color,
+					Transparency = Theme.Divider.Transparency
+				}),
+				UICorner = Roact.createElement("UICorner", {
+					CornerRadius = uDim
+				})
+			})
+		})
+	})
+end
+function v17.render(p15) -- line: 300
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetComponent (copy), Images (copy)
+	local hasBackground = p15.props.hasBackground
+	local isHovered = p15.props.isHovered
+
+	return withStyle(function(p16) -- line: 304
+		-- upvalues: Roact (copy), p15 (copy), isHovered (copy), hasBackground (copy), ImageSetComponent (copy), Images (copy)
+		local Theme = p16.Theme
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			UISizeConstraint = Roact.createElement("UISizeConstraint", {
+				MinSize = Vector2.new(146, 233)
+			}),
+			TileContent = p15:renderTileContent(p16),
+			HoverShadow = if not isHovered or not hasBackground then nil else Roact.createElement(ImageSetComponent.Label, {
+				ZIndex = 0,
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0.5, 0, 0.5, 2),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Size = UDim2.new(1, 10, 1, 12),
+				Image = Images["component_assets/dropshadow_24_6"],
+				ImageColor3 = Theme.DropShadow.Color,
+				ImageTransparency = Theme.DropShadow.Transparency,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(18, 18, 18, 18)
+			})
+		})
+	end)
+end
+
+return v17

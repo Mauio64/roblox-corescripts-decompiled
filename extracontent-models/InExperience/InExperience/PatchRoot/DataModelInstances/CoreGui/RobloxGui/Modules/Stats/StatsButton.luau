@@ -1,64 +1,70 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v1 = require(l_CoreGui_0.RobloxGui.Modules.StyleWidgets);
-local v2 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsUtils);
-local v3 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsMiniTextPanel);
-local v4 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsAnnotatedGraph);
-local v5 = UDim2.new(0, 0, 0, 0);
-local v6 = UDim2.new(0.5, 0, 1, -v1.TabSelectionHeight);
-local v7 = UDim2.new(0.5, 0, 0, 0);
-local v8 = UDim2.new(0.5, 0, 1, -v1.TabSelectionHeight);
-local v9 = {};
-v9.__index = v9;
-v9.new = function(v10) --[[ Line: 30 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy), v2 (copy), v3 (copy), v6 (copy), v5 (copy), v4 (copy), v8 (copy), v7 (copy), v1 (copy)
-    local v11 = {};
-    setmetatable(v11, v9);
-    v11._statType = v10;
-    v11._button = Instance.new("TextButton");
-    v11._button.Name = "PS_Button";
-    v11._button.Text = "";
-    v2.StyleButton(v11._button);
-    v11._textPanel = v3.new(v10);
-    v11._textPanel:PlaceInParent(v11._button, v6, v5);
-    v11._graph = v4.new(v10, false);
-    v11._graph:PlaceInParent(v11._button, v8, v7);
-    v11._textPanel:SetZIndex(v2.TextZIndex);
-    v11._graph:SetZIndex(v2.GraphZIndex);
-    v11._tabSelection = v1.MakeTabSelectionWidget(v11._button);
-    v11._isSelected = false;
-    v11:_updateTabSelectionState();
-    return v11;
-end;
-v9.OnPerformanceStatsShouldBeVisibleChanged = function(v12) --[[ Line: 63 ]] --[[ Name: OnPerformanceStatsShouldBeVisibleChanged ]]
-    if v12._graph then
-        v12._graph:OnPerformanceStatsShouldBeVisibleChanged();
-    end;
-    if v12._textPanel then
-        v12._textPanel:OnPerformanceStatsShouldBeVisibleChanged();
-    end;
-end;
-v9.SetToggleCallbackFunction = function(v13, v14) --[[ Line: 73 ]] --[[ Name: SetToggleCallbackFunction ]]
-    v13._button.MouseButton1Click:connect(function() --[[ Line: 74 ]]
-        -- upvalues: v14 (copy), v13 (copy)
-        v14(v13._statType);
-    end);
-end;
-v9.SetSizeAndPosition = function(v15, v16, v17) --[[ Line: 79 ]] --[[ Name: SetSizeAndPosition ]]
-    v15._button.Size = v16;
-    v15._button.Position = v17;
-end;
-v9.SetIsSelected = function(v18, v19) --[[ Line: 84 ]] --[[ Name: SetIsSelected ]]
-    v18._isSelected = v19;
-    v18:_updateTabSelectionState();
-end;
-v9._updateTabSelectionState = function(v20) --[[ Line: 89 ]] --[[ Name: _updateTabSelectionState ]]
-    v20._tabSelection.Visible = v20._isSelected;
-end;
-v9.SetParent = function(v21, v22) --[[ Line: 93 ]] --[[ Name: SetParent ]]
-    v21._button.Parent = v22;
-end;
-v9.SetStatsAggregator = function(v23, v24) --[[ Line: 97 ]] --[[ Name: SetStatsAggregator ]]
-    v23._textPanel:SetStatsAggregator(v24);
-    v23._graph:SetStatsAggregator(v24);
-end;
-return v9;
+local CoreGui = game:GetService("CoreGui")
+local StyleWidgets = require(CoreGui.RobloxGui.Modules.StyleWidgets)
+local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
+local StatsMiniTextPanel = require(CoreGui.RobloxGui.Modules.Stats.StatsMiniTextPanel)
+local StatsAnnotatedGraph = require(CoreGui.RobloxGui.Modules.Stats.StatsAnnotatedGraph)
+local uDim2 = UDim2.new(0, 0, 0, 0)
+local uDim2_2 = UDim2.new(0.5, 0, 1, -StyleWidgets.TabSelectionHeight)
+local uDim2_3 = UDim2.new(0.5, 0, 0, 0)
+local uDim2_4 = UDim2.new(0.5, 0, 1, -StyleWidgets.TabSelectionHeight)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 30
+	-- upvalues: t1 (copy), StatsUtils (copy), StatsMiniTextPanel (copy), uDim2_2 (copy), uDim2 (copy), StatsAnnotatedGraph (copy), uDim2_4 (copy), uDim2_3 (copy), StyleWidgets (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._statType = p1
+	t2._button = Instance.new("TextButton")
+	t2._button.Name = "PS_Button"
+	t2._button.Text = ""
+	StatsUtils.StyleButton(t2._button)
+	t2._textPanel = StatsMiniTextPanel.new(p1)
+	t2._textPanel:PlaceInParent(t2._button, uDim2_2, uDim2)
+	t2._graph = StatsAnnotatedGraph.new(p1, false)
+	t2._graph:PlaceInParent(t2._button, uDim2_4, uDim2_3)
+	t2._textPanel:SetZIndex(StatsUtils.TextZIndex)
+	t2._graph:SetZIndex(StatsUtils.GraphZIndex)
+	t2._tabSelection = StyleWidgets.MakeTabSelectionWidget(t2._button)
+	t2._isSelected = false
+	t2:_updateTabSelectionState()
+
+	return t2
+end
+function t1.OnPerformanceStatsShouldBeVisibleChanged(p2) -- line: 63
+	if p2._graph then
+		p2._graph:OnPerformanceStatsShouldBeVisibleChanged()
+	end
+
+	if p2._textPanel then
+		p2._textPanel:OnPerformanceStatsShouldBeVisibleChanged()
+	end
+end
+function t1.SetToggleCallbackFunction(p3, p4) -- line: 73
+	p3._button.MouseButton1Click:connect(function() -- line: 74
+		-- upvalues: p4 (copy), p3 (copy)
+		p4(p3._statType)
+	end)
+end
+function t1.SetSizeAndPosition(p5, p6, p7) -- line: 79
+	p5._button.Size = p6
+	p5._button.Position = p7
+end
+function t1.SetIsSelected(p8, p9) -- line: 84
+	p8._isSelected = p9
+	p8:_updateTabSelectionState()
+end
+function t1._updateTabSelectionState(p10) -- line: 89
+	p10._tabSelection.Visible = p10._isSelected
+end
+function t1.SetParent(p11, p12) -- line: 93
+	p11._button.Parent = p12
+end
+function t1.SetStatsAggregator(p13, p14) -- line: 97
+	p13._textPanel:SetStatsAggregator(p14)
+	p13._graph:SetStatsAggregator(p14)
+end
+
+return t1

@@ -1,6 +1,7 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_RODUX_KEY_0 = require(l_script_FirstAncestor_0.Common.Constants).RODUX_KEY;
-return (require(l_Parent_0.UserBlockingRodux).config({
-    keyPath = l_RODUX_KEY_0 .. ".UserBlocking"
-}));
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local RODUX_KEY = require(SquadsCore.Common.Constants).RODUX_KEY
+
+return (require(SquadsCoreParent.UserBlockingRodux).config({
+	keyPath = RODUX_KEY .. ".UserBlocking"
+}))

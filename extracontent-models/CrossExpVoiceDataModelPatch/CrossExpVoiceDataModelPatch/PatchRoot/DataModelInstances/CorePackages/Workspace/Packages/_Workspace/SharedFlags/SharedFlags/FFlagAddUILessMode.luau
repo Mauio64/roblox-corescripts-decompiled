@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddUILessMode", false);
+return game:DefineFastFlag("AddUILessMode", false)

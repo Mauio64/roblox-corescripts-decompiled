@@ -1,10 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiSharedUtilities");
-local v1 = require(l_script_FirstAncestor_0.createSduiApiStore);
-local v2 = nil;
-return function() --[[ Line: 9 ]] --[[ Name: getSduiApiStore ]]
-    -- upvalues: v2 (ref), v1 (copy)
-    if v2 == nil then
-        v2 = v1();
-    end;
-    return v2;
-end;
+local SduiSharedUtilities = script:FindFirstAncestor("SduiSharedUtilities")
+local createSduiApiStore = require(SduiSharedUtilities.createSduiApiStore)
+local u3 = nil
+
+local function getSduiApiStore() -- line: 9
+	-- upvalues: u3 (ref), createSduiApiStore (copy)
+	if u3 == nil then
+		u3 = createSduiApiStore()
+	end
+
+	return u3
+end
+
+return getSduiApiStore

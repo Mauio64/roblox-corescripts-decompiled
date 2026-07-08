@@ -1,5 +1,6 @@
-local v0 = require(script.createRequestThunks);
+local createRequestThunks = require(script.createRequestThunks)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    config = v0
-};
+	["jest.config"] = script["jest.config"],
+	config = createRequestThunks
+}

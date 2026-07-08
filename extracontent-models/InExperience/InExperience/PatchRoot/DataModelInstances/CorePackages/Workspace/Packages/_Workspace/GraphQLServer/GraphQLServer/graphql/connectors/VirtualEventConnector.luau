@@ -1,239 +1,267 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GraphQLServer");
-local l_HttpService_0 = game:GetService("HttpService");
-local _ = require(l_script_FirstAncestor_0.Parent.LuauPolyfill);
-local _ = require(l_script_FirstAncestor_0.graphql.generatedTypes);
-local v4 = require(l_script_FirstAncestor_0.Parent.Promise);
-local l_GraphQLError_0 = require(l_script_FirstAncestor_0.Parent.GraphQL).GraphQLError;
-local v6 = require(l_script_FirstAncestor_0.Parent.Fetch);
-local l_fetch_0 = v6.fetch;
-local l_Response_0 = v6.Response;
-local l_UrlBuilder_0 = require(l_script_FirstAncestor_0.Parent.UrlBuilder).UrlBuilder;
-local v10 = {};
-local v11 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/virtual-events/{id}");
-local v12 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps");
-local v13 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps/counters");
-local v14 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/universes/{id}/virtual-events?cursor={cursor}&limit={limit}&fromUtc={fromUtc}");
-local v15 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/notifications/modal-history");
-local v16 = l_UrlBuilder_0.fromString("apis:virtual-events/v1/notifications/preferences");
-v10.findVirtualEventById = function(v17, v18) --[[ Line: 34 ]] --[[ Name: findVirtualEventById ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v11 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v19 = v18 or l_fetch_0;
-    return v4.new(function(v20, v21) --[[ Line: 37 ]]
-        -- upvalues: v11 (ref), v17 (copy), v19 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v22 = v11({
-            id = v17
-        });
-        local v23 = v19(v22, {
-            method = "GET"
-        }):catch(function() --[[ Line: 40 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect();
-        if not v23.ok then
-            v21(l_GraphQLError_0.new(string.format("Failed to find VirtualEvent matching id: %s.", v17)));
-            return;
-        else
-            local v24 = v23:json():catch(function() --[[ Line: 52 ]]
-                return nil;
-            end):expect();
-            if not v24 then
-                v21(l_GraphQLError_0.new(string.format("Failed to decode HTTP response as JSON for VirtualEvent matching id: %s.", v17)));
-                return;
-            else
-                v20(v24);
-                return;
-            end;
-        end;
-    end);
-end;
-v10.findVirtualEventsByUniverseId = function(v25, v26, v27) --[[ Line: 75 ]] --[[ Name: findVirtualEventsByUniverseId ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v14 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v28 = v27 or l_fetch_0;
-    return v4.new(function(v29, v30) --[[ Line: 82 ]]
-        -- upvalues: v14 (ref), v25 (copy), v26 (copy), v28 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v31 = v14({
-            id = v25, 
-            cursor = if v26 and v26.cursor then v26.cursor else "", 
-            limit = if v26 and v26.limit then v26.limit else 25, 
-            fromUtc = if v26 and v26.fromUtc then v26.fromUtc else ""
-        });
-        local v32 = v28(v31, {
-            method = "GET"
-        }):catch(function() --[[ Line: 91 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect();
-        if not v32.ok then
-            v30(l_GraphQLError_0.new(string.format("Failed to find experience matching universeId: %i", v25)));
-            return;
-        else
-            local v33 = v32:json():catch(function() --[[ Line: 103 ]]
-                return nil;
-            end):expect();
-            if not v33 then
-                v30(l_GraphQLError_0.new(string.format("Failed to decode HTTP response as JSON for experience matching universeId: %i", v25)));
-                return;
-            else
-                v29({
-                    cursor = v33.nextPageCursor, 
-                    virtualEvents = v33.data
-                });
-                return;
-            end;
-        end;
-    end);
-end;
-v10.findRsvpsByVirtualEventId = function(v34, v35) --[[ Line: 131 ]] --[[ Name: findRsvpsByVirtualEventId ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v12 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v36 = v35 or l_fetch_0;
-    return v4.new(function(v37, v38) --[[ Line: 134 ]]
-        -- upvalues: v12 (ref), v34 (copy), v36 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v39 = v12({
-            id = v34
-        });
-        local v40 = v36(v39, {
-            method = "GET"
-        }):catch(function() --[[ Line: 137 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect();
-        if not v40.ok then
-            v38(l_GraphQLError_0.new(string.format("Failed to find RSVPs matching VirtualEvent id: %s.", v34)));
-            return;
-        else
-            local v41 = v40:json():catch(function() --[[ Line: 150 ]]
-                return nil;
-            end):expect();
-            if not v41 then
-                v38(l_GraphQLError_0.new(string.format("Failed to decode HTTP response as JSON for RSVPs matching VirtualEvent id: %s.", v34)));
-                return;
-            else
-                v37(v41.data);
-                return;
-            end;
-        end;
-    end);
-end;
-v10.findRsvpCountersByVirtualEventId = function(v42, v43) --[[ Line: 173 ]] --[[ Name: findRsvpCountersByVirtualEventId ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v13 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v44 = v43 or l_fetch_0;
-    return v4.new(function(v45, v46) --[[ Line: 176 ]]
-        -- upvalues: v13 (ref), v42 (copy), v44 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v47 = v13({
-            id = v42
-        });
-        local v48 = v44(v47, {
-            method = "GET"
-        }):catch(function() --[[ Line: 179 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect();
-        if not v48.ok then
-            v46(l_GraphQLError_0.new(string.format("Failed to find RSVP counters matching VirtualEvent id: %s.", v42)));
-            return;
-        else
-            local v49 = v48:json():catch(function() --[[ Line: 194 ]]
-                return nil;
-            end):expect();
-            if not v49 then
-                v46(l_GraphQLError_0.new(string.format("Failed to decode HTTP response as JSON for RSVP counters matching VirtualEvent id: %s.", v42)));
-                return;
-            else
-                v45(v49.counters);
-                return;
-            end;
-        end;
-    end);
-end;
-v10.updateRsvpStatus = function(v50, v51, v52) --[[ Line: 217 ]] --[[ Name: updateRsvpStatus ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v12 (copy), l_HttpService_0 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v53 = v52 or l_fetch_0;
-    return v4.new(function(v54, v55) --[[ Line: 224 ]]
-        -- upvalues: v12 (ref), v50 (copy), v53 (copy), l_HttpService_0 (ref), v51 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v56 = v12({
-            id = v50
-        });
-        local v57 = v53(v56, {
-            method = "POST", 
-            body = l_HttpService_0:JSONEncode({
-                rsvpStatus = v51
-            }), 
-            headers = {
-                ["Content-Type"] = "application/json", 
-                Accept = "application/json"
-            }
-        }):catch(function() --[[ Line: 236 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect();
-        if not v57.ok then
-            v55(l_GraphQLError_0.new(string.format("Failed to set RSVP status matching VirtualEvent id: %s.", v50)));
-            return;
-        else
-            local v58 = v57:json():catch(function() --[[ Line: 251 ]]
-                return nil;
-            end):expect();
-            if not v58 then
-                v55(l_GraphQLError_0.new(string.format("Failed to decode HTTP response as JSON for RSVP status matching VirtualEvent id: %s.", v50)));
-                return;
-            else
-                v54({
-                    shouldSeeNotificationsUpsellModal = v58.shouldSeeNotificationsUpsellModal, 
-                    virtualEvent = {
-                        id = v50, 
-                        userRsvpStatus = v58.rsvpStatus
-                    }
-                });
-                return;
-            end;
-        end;
-    end);
-end;
-v10.neverShowNotificationModalAgain = function(v59) --[[ Line: 282 ]] --[[ Name: neverShowNotificationModalAgain ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v15 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v60 = v59 or l_fetch_0;
-    return v4.new(function(v61, v62) --[[ Line: 285 ]]
-        -- upvalues: v15 (ref), v60 (copy), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v63 = v15();
-        if not v60(v63, {
-            method = "POST"
-        }):catch(function() --[[ Line: 290 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect().ok then
-            v62(l_GraphQLError_0.new("Failed to update modal history"));
-            return;
-        else
-            v61(true);
-            return;
-        end;
-    end);
-end;
-v10.enablePushNotifications = function(v64) --[[ Line: 306 ]] --[[ Name: enablePushNotifications ]]
-    -- upvalues: l_fetch_0 (copy), v4 (copy), v16 (copy), l_HttpService_0 (copy), l_Response_0 (copy), l_GraphQLError_0 (copy)
-    local v65 = v64 or l_fetch_0;
-    return v4.new(function(v66, v67) --[[ Line: 309 ]]
-        -- upvalues: v16 (ref), v65 (copy), l_HttpService_0 (ref), l_Response_0 (ref), l_GraphQLError_0 (ref)
-        local v68 = v16();
-        if not v65(v68, {
-            method = "POST", 
-            body = l_HttpService_0:JSONEncode({
-                isEnabled = true
-            }), 
-            headers = {
-                ["Content-Type"] = "application/json", 
-                Accept = "application/json"
-            }
-        }):catch(function() --[[ Line: 322 ]]
-            -- upvalues: l_Response_0 (ref)
-            return l_Response_0.error();
-        end):expect().ok then
-            v67(l_GraphQLError_0.new("Failed to update notification preferences"));
-            return;
-        else
-            v66(true);
-            return;
-        end;
-    end);
-end;
-return v10;
+local GraphQLServer = script:FindFirstAncestor("GraphQLServer")
+local HttpService = game:GetService("HttpService")
+
+require(GraphQLServer.Parent.LuauPolyfill)
+require(GraphQLServer.graphql.generatedTypes)
+
+local Promise = require(GraphQLServer.Parent.Promise)
+local GraphQLError = require(GraphQLServer.Parent.GraphQL).GraphQLError
+local Fetch = require(GraphQLServer.Parent.Fetch)
+local fetch = Fetch.fetch
+local Response = Fetch.Response
+local UrlBuilder = require(GraphQLServer.Parent.UrlBuilder).UrlBuilder
+local t1 = {}
+local v10 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}")
+local v11 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps")
+local v12 = UrlBuilder.fromString("apis:virtual-events/v1/virtual-events/{id}/rsvps/counters")
+local v13 = UrlBuilder.fromString("apis:virtual-events/v1/universes/{id}/virtual-events?cursor={cursor}&limit={limit}&fromUtc={fromUtc}")
+local v14 = UrlBuilder.fromString("apis:virtual-events/v1/notifications/modal-history")
+local v15 = UrlBuilder.fromString("apis:virtual-events/v1/notifications/preferences")
+
+function t1.findVirtualEventById(s1: string, p1) -- line: 34
+	-- upvalues: fetch (copy), Promise (copy), v10 (copy), Response (copy), GraphQLError (copy)
+	local v18 = p1 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 37
+		-- upvalues: v10 (copy), s1 (copy), v18 (copy), Response (copy), GraphQLError (copy)
+		local v39 = v10({
+			id = s1
+		})
+		local v40 = v18(v39, {
+			method = "GET"
+		}):catch(function() -- line: 40
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect()
+
+		if not v40.ok then
+			reject(GraphQLError.new(string.format("Failed to find VirtualEvent matching id: %s.", s1)))
+
+			return
+		end
+
+		local v41 = v40:json():catch(function() -- line: 52
+			return nil
+		end):expect()
+
+		if not v41 then
+			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for VirtualEvent matching id: %s.", s1)))
+
+			return
+		end
+
+		resolve(v41)
+	end)
+end
+function t1.findVirtualEventsByUniverseId(n1: number, p2, p3) -- line: 75
+	-- upvalues: fetch (copy), Promise (copy), v13 (copy), Response (copy), GraphQLError (copy)
+	local v22 = p3 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 82
+		-- upvalues: v13 (copy), n1 (copy), p2 (copy), v22 (copy), Response (copy), GraphQLError (copy)
+		local v44 = v13({
+			id = n1,
+			cursor = (not p2 or not p2.cursor) and "" or p2.cursor,
+			limit = (not p2 or not p2.limit) and 25 or p2.limit,
+			fromUtc = (not p2 or not p2.fromUtc) and "" or p2.fromUtc
+		})
+		local v45 = v22(v44, {
+			method = "GET"
+		}):catch(function() -- line: 91
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect()
+
+		if not v45.ok then
+			reject(GraphQLError.new(string.format("Failed to find experience matching universeId: %i", n1)))
+
+			return
+		end
+
+		local v46 = v45:json():catch(function() -- line: 103
+			return nil
+		end):expect()
+
+		if not v46 then
+			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for experience matching universeId: %i", n1)))
+
+			return
+		end
+
+		resolve({
+			cursor = v46.nextPageCursor,
+			virtualEvents = v46.data
+		})
+	end)
+end
+function t1.findRsvpsByVirtualEventId(s2: string, p4) -- line: 131
+	-- upvalues: fetch (copy), Promise (copy), v11 (copy), Response (copy), GraphQLError (copy)
+	local v25 = p4 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 134
+		-- upvalues: v11 (copy), s2 (copy), v25 (copy), Response (copy), GraphQLError (copy)
+		local v49 = v11({
+			id = s2
+		})
+		local v50 = v25(v49, {
+			method = "GET"
+		}):catch(function() -- line: 137
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect()
+
+		if not v50.ok then
+			reject(GraphQLError.new(string.format("Failed to find RSVPs matching VirtualEvent id: %s.", s2)))
+
+			return
+		end
+
+		local v51 = v50:json():catch(function() -- line: 150
+			return nil
+		end):expect()
+
+		if not v51 then
+			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for RSVPs matching VirtualEvent id: %s.", s2)))
+
+			return
+		end
+
+		resolve(v51.data)
+	end)
+end
+function t1.findRsvpCountersByVirtualEventId(s3: string, p5) -- line: 173
+	-- upvalues: fetch (copy), Promise (copy), v12 (copy), Response (copy), GraphQLError (copy)
+	local v28 = p5 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 176
+		-- upvalues: v12 (copy), s3 (copy), v28 (copy), Response (copy), GraphQLError (copy)
+		local v54 = v12({
+			id = s3
+		})
+		local v55 = v28(v54, {
+			method = "GET"
+		}):catch(function() -- line: 179
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect()
+
+		if not v55.ok then
+			reject(GraphQLError.new(string.format("Failed to find RSVP counters matching VirtualEvent id: %s.", s3)))
+
+			return
+		end
+
+		local v56 = v55:json():catch(function() -- line: 194
+			return nil
+		end):expect()
+
+		if not v56 then
+			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for RSVP counters matching VirtualEvent id: %s.", s3)))
+
+			return
+		end
+
+		resolve(v56.counters)
+	end)
+end
+function t1.updateRsvpStatus(s4: string, p6, p7) -- line: 217
+	-- upvalues: fetch (copy), Promise (copy), v11 (copy), HttpService (copy), Response (copy), GraphQLError (copy)
+	local v32 = p7 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 224
+		-- upvalues: v11 (copy), s4 (copy), v32 (copy), HttpService (copy), p6 (copy), Response (copy), GraphQLError (copy)
+		local v59 = v11({
+			id = s4
+		})
+		local v60 = v32(v59, {
+			method = "POST",
+			body = HttpService:JSONEncode({
+				rsvpStatus = p6
+			}),
+			headers = {
+				["Content-Type"] = "application/json",
+				Accept = "application/json"
+			}
+		}):catch(function() -- line: 236
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect()
+
+		if not v60.ok then
+			reject(GraphQLError.new(string.format("Failed to set RSVP status matching VirtualEvent id: %s.", s4)))
+
+			return
+		end
+
+		local v61 = v60:json():catch(function() -- line: 251
+			return nil
+		end):expect()
+
+		if not v61 then
+			reject(GraphQLError.new(string.format("Failed to decode HTTP response as JSON for RSVP status matching VirtualEvent id: %s.", s4)))
+
+			return
+		end
+
+		resolve({
+			shouldSeeNotificationsUpsellModal = v61.shouldSeeNotificationsUpsellModal,
+			virtualEvent = {
+				id = s4,
+				userRsvpStatus = v61.rsvpStatus
+			}
+		})
+	end)
+end
+function t1.neverShowNotificationModalAgain(p8) -- line: 282
+	-- upvalues: fetch (copy), Promise (copy), v14 (copy), Response (copy), GraphQLError (copy)
+	local v34 = p8 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 285
+		-- upvalues: v14 (copy), v34 (copy), Response (copy), GraphQLError (copy)
+		local v64 = v14()
+
+		if not v34(v64, {
+			method = "POST"
+		}):catch(function() -- line: 290
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect().ok then
+			reject(GraphQLError.new("Failed to update modal history"))
+
+			return
+		end
+
+		resolve(true)
+	end)
+end
+function t1.enablePushNotifications(p9) -- line: 306
+	-- upvalues: fetch (copy), Promise (copy), v15 (copy), HttpService (copy), Response (copy), GraphQLError (copy)
+	local v36 = p9 or fetch
+
+	return Promise.new(function(resolve, reject) -- line: 309
+		-- upvalues: v15 (copy), v36 (copy), HttpService (copy), Response (copy), GraphQLError (copy)
+		local v67 = v15()
+
+		if not v36(v67, {
+			method = "POST",
+			body = HttpService:JSONEncode({
+				isEnabled = true
+			}),
+			headers = {
+				["Content-Type"] = "application/json",
+				Accept = "application/json"
+			}
+		}):catch(function() -- line: 322
+			-- upvalues: Response (copy)
+			return Response.error()
+		end):expect().ok then
+			reject(GraphQLError.new("Failed to update notification preferences"))
+
+			return
+		end
+
+		resolve(true)
+	end)
+end
+
+return t1

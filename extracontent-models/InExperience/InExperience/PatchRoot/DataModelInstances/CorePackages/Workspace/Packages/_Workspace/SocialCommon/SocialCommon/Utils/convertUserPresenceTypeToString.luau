@@ -1,16 +1,21 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialCommon").Parent;
-local l_PresenceType_0 = require(l_Parent_0.LuaSocialLibrariesDeps).RoduxPresence.config({
-    keyPath = "SocialCommon.Presence"
-}).Enums.PresenceType;
-return function(v2) --[[ Line: 8 ]]
-    -- upvalues: l_PresenceType_0 (copy)
-    if v2 == l_PresenceType_0.Online then
-        return "Online";
-    elseif v2 == l_PresenceType_0.InStudio then
-        return "InStudio";
-    elseif v2 == l_PresenceType_0.InGame then
-        return "InGame";
-    else
-        return "Offline";
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialCommon").Parent
+local PresenceType = require(Parent.LuaSocialLibrariesDeps).RoduxPresence.config({
+	keyPath = "SocialCommon.Presence"
+}).Enums.PresenceType
+
+return function(p1) -- line: 8
+	-- upvalues: PresenceType (copy)
+	if p1 == PresenceType.Online then
+		return "Online"
+	end
+
+	if p1 == PresenceType.InStudio then
+		return "InStudio"
+	end
+
+	if p1 == PresenceType.InGame then
+		return "InGame"
+	end
+
+	return "Offline"
+end

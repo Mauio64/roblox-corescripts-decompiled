@@ -1,60 +1,65 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ServerDrivenUi");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_HeroUnitContainer_0 = require(l_Parent_0.DiscoveryHeroUnit).HeroUnitContainer;
-local l_SduiAttributionRow_0 = require(l_Parent_0.SduiSharedContent).SduiAttributionRow;
-local v6 = require(l_script_FirstAncestor_0.Content.SduiTextPill);
-local _ = require(l_Parent_0.SduiCoreSystem);
-return v3.memo(function(v8) --[[ Line: 110 ]] --[[ Name: SduiHeroUnit ]]
-    -- upvalues: v3 (copy), l_SduiAttributionRow_0 (copy), v6 (copy), v2 (copy), l_HeroUnitContainer_0 (copy)
-    local l_children_0 = v8.children;
-    local v10 = v3.useMemo(function() --[[ Line: 115 ]]
-        -- upvalues: v8 (copy), v3 (ref), l_SduiAttributionRow_0 (ref)
-        if v8.asset then
-            return v3.createElement(l_SduiAttributionRow_0, {
-                image = v8.asset.image, 
-                title = v8.asset.title, 
-                subtitle = v8.asset.subtitle, 
-                rightButtonContent = v8.ctaButtonComponent, 
-                sduiContext = v8.sduiContext, 
-                onActivated = v8.onActivated
-            });
-        else
-            return nil;
-        end;
-    end, {
-        v8.asset, 
-        v8.ctaButtonComponent, 
-        v8.sduiContext, 
-        v8.onActivated
-    });
-    local v11 = v3.useMemo(function() --[[ Line: 131 ]]
-        -- upvalues: v8 (copy), v3 (ref), v6 (ref)
-        if v8.badgeText then
-            return v3.createElement(v6, {
-                sduiContext = v8.sduiContext, 
-                text = v8.badgeText
-            });
-        else
-            return nil;
-        end;
-    end, {
-        v8.badgeText, 
-        v8.sduiContext
-    });
-    local v12 = v3.useMemo(function() --[[ Line: 141 ]]
-        -- upvalues: v2 (ref), v10 (copy), v11 (copy), v8 (copy)
-        return (v2.Dictionary.join({
-            bottomRowComponent = v10, 
-            overlayComponent = v11, 
-            sideMargin = v8.pageSideMargin
-        }, v8));
-    end, {
-        v8, 
-        v10, 
-        v11, 
-        v8.pageSideMargin
-    });
-    return v3.createElement(l_HeroUnitContainer_0, v12, l_children_0);
-end);
+local ServerDrivenUi = script:FindFirstAncestor("ServerDrivenUi")
+local ServerDrivenUiParent = ServerDrivenUi.Parent
+local Cryo = require(ServerDrivenUiParent.Cryo)
+local React = require(ServerDrivenUiParent.React)
+local HeroUnitContainer = require(ServerDrivenUiParent.DiscoveryHeroUnit).HeroUnitContainer
+local SduiAttributionRow = require(ServerDrivenUiParent.SduiSharedContent).SduiAttributionRow
+local SduiTextPill = require(ServerDrivenUi.Content.SduiTextPill)
+
+require(ServerDrivenUiParent.SduiCoreSystem)
+
+local function SduiHeroUnit(t1: {[any]: any}) -- line: 112
+	-- upvalues: React (copy), SduiAttributionRow (copy), SduiTextPill (copy), Cryo (copy), HeroUnitContainer (copy)
+	local children = t1.children
+	local v11 = React.useMemo(function() -- line: 117
+		-- upvalues: t1 (copy), React (copy), SduiAttributionRow (copy)
+		if t1.asset then
+			return React.createElement(SduiAttributionRow, {
+				image = t1.asset.image,
+				title = t1.asset.title,
+				subtitle = t1.asset.subtitle,
+				rightButtonContent = t1.ctaButtonComponent,
+				sduiContext = t1.sduiContext,
+				onActivated = t1.onActivated
+			})
+		end
+
+		return nil
+	end, {
+		t1.asset,
+		t1.ctaButtonComponent,
+		t1.sduiContext,
+		t1.onActivated
+	})
+	local v12 = React.useMemo(function() -- line: 133
+		-- upvalues: t1 (copy), React (copy), SduiTextPill (copy)
+		if t1.badgeText then
+			return React.createElement(SduiTextPill, {
+				sduiContext = t1.sduiContext,
+				text = t1.badgeText
+			})
+		end
+
+		return nil
+	end, {
+		t1.badgeText,
+		t1.sduiContext
+	})
+	local v13 = React.useMemo(function() -- line: 143
+		-- upvalues: Cryo (copy), v11 (copy), v12 (copy), t1 (copy)
+		return (Cryo.Dictionary.join({
+			bottomRowComponent = v11,
+			overlayComponent = v12,
+			sideMargin = t1.pageSideMargin
+		}, t1))
+	end, {
+		t1,
+		v11,
+		v12,
+		t1.pageSideMargin
+	})
+
+	return React.createElement(HeroUnitContainer, v13, children)
+end
+
+return React.memo(SduiHeroUnit)

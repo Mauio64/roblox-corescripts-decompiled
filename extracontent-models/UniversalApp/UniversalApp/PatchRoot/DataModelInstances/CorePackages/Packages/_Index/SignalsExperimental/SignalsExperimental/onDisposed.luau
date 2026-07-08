@@ -1,11 +1,18 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.Signals);
-return function(v2, v3) --[[ Line: 7 ]] --[[ Name: onDisposed ]]
-    v2(function(_, v5) --[[ Line: 8 ]] --[[ Name: source ]]
-        -- upvalues: v3 (copy)
-        if v5 then
-            v3();
-        end;
-        return 0;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.Signals)
+
+local function onDisposed(p1, p2) -- line: 7
+	local function source(_, b1: boolean?) -- line: 8
+		-- upvalues: p2 (copy)
+		if b1 then
+			p2()
+		end
+
+		return 0
+	end
+
+	p1(source)
+end
+
+return onDisposed

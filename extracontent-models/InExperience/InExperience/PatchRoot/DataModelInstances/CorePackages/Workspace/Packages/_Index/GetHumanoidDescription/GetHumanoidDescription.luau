@@ -1,3 +1,3 @@
 return {
-    getHumanoidDescription = require(script.getHumanoidDescription)
-};
+	getHumanoidDescription = require(script.getHumanoidDescription)
+}

@@ -1,33 +1,39 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChatIntervention");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local v5 = require(l_Actions_0.UpdateShowChatFeedbackModalAction);
-local v6 = require(l_Actions_0.UpdateShowChatFeedbackPillAction);
-local v7 = require(l_Actions_0.UpdateShowChatNudgeModalAction);
-local v8 = require(l_Actions_0.UpdateShowChatTimeoutModalAction);
-local v9 = {
-    isShowChatFeedbackModal = false, 
-    isShowChatFeedbackPill = false, 
-    isShowChatNudgeModal = false, 
-    isShowChatTimeoutModal = false
-};
-return v2.createReducer(v9, {
-    [v5.name] = function(v10, v11) --[[ Line: 35 ]] --[[ Name: setIsShowChatFeedbackModal ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.set(v10, "isShowChatFeedbackModal", v11.isShow);
-    end, 
-    [v6.name] = function(v12, v13) --[[ Line: 39 ]] --[[ Name: setIsShowChatFeedbackPill ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.set(v12, "isShowChatFeedbackPill", v13.isShow);
-    end, 
-    [v7.name] = function(v14, v15) --[[ Line: 31 ]] --[[ Name: setIsShowChatNudgeModal ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.set(v14, "isShowChatNudgeModal", v15.isShow);
-    end, 
-    [v8.name] = function(v16, v17) --[[ Line: 27 ]] --[[ Name: setIsShowChatTimeoutModal ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.set(v16, "isShowChatTimeoutModal", v17.isShow);
-    end
-});
+local ChatIntervention = script:FindFirstAncestor("ChatIntervention")
+local ChatInterventionParent = ChatIntervention.Parent
+local Rodux = require(ChatInterventionParent.Rodux)
+local Actions = ChatIntervention.Actions
+local Dictionary = require(ChatInterventionParent.llama).Dictionary
+local UpdateShowChatFeedbackModalAction = require(Actions.UpdateShowChatFeedbackModalAction)
+local UpdateShowChatFeedbackPillAction = require(Actions.UpdateShowChatFeedbackPillAction)
+local UpdateShowChatNudgeModalAction = require(Actions.UpdateShowChatNudgeModalAction)
+local UpdateShowChatTimeoutModalAction = require(Actions.UpdateShowChatTimeoutModalAction)
+local t1 = {
+	isShowChatFeedbackModal = false,
+	isShowChatFeedbackPill = false,
+	isShowChatNudgeModal = false,
+	isShowChatTimeoutModal = false
+}
+
+local function setIsShowChatTimeoutModal(t2: {[any]: any}, p1) -- line: 27
+	-- upvalues: Dictionary (copy)
+	return Dictionary.set(t2, "isShowChatTimeoutModal", p1.isShow)
+end
+local function setIsShowChatNudgeModal(t3: {[any]: any}, p2) -- line: 31
+	-- upvalues: Dictionary (copy)
+	return Dictionary.set(t3, "isShowChatNudgeModal", p2.isShow)
+end
+local function setIsShowChatFeedbackModal(t4: {[any]: any}, p3) -- line: 35
+	-- upvalues: Dictionary (copy)
+	return Dictionary.set(t4, "isShowChatFeedbackModal", p3.isShow)
+end
+local function setIsShowChatFeedbackPill(t5: {[any]: any}, p4) -- line: 39
+	-- upvalues: Dictionary (copy)
+	return Dictionary.set(t5, "isShowChatFeedbackPill", p4.isShow)
+end
+
+return Rodux.createReducer(t1, {
+	[UpdateShowChatFeedbackModalAction.name] = setIsShowChatFeedbackModal,
+	[UpdateShowChatFeedbackPillAction.name] = setIsShowChatFeedbackPill,
+	[UpdateShowChatNudgeModalAction.name] = setIsShowChatNudgeModal,
+	[UpdateShowChatTimeoutModalAction.name] = setIsShowChatTimeoutModal
+})

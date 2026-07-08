@@ -1,43 +1,46 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local _ = require(script.Parent.Parent.EventType);
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(script.Parent.Parent.Parent.Components.Tooltips.VRFTUXToolTips);
-local v5 = require(script.Parent.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider);
-local v6 = {
-    Name = "MovementTooltipEvent"
-};
-local v7 = nil;
-v6.StartEvent = function() --[[ Line: 27 ]] --[[ Name: StartEvent ]]
-    -- upvalues: v3 (copy), v4 (copy), v5 (copy), v7 (ref), l_CoreGui_0 (copy)
-    local v8 = v3.createElement(v4, {
-        tooltipButtons = {
-            {
-                Text = "Turn", 
-                Controller = Enum.UserCFrame.RightHand, 
-                ButtonKeycode = Enum.KeyCode.ButtonR3
-            }, 
-            {
-                Text = "Move", 
-                Controller = Enum.UserCFrame.LeftHand, 
-                ButtonKeycode = Enum.KeyCode.ButtonL3
-            }, 
-            {
-                Text = "Jump", 
-                Controller = Enum.UserCFrame.RightHand, 
-                ButtonKeycode = Enum.KeyCode.ButtonA
-            }
-        }
-    });
-    local v9 = v5({
-        v8
-    });
-    v7 = v3.mount(v9, l_CoreGui_0:FindFirstChild("FTUXMenu"), "MovementTooltip");
-end;
-v6.StopEvent = function() --[[ Line: 58 ]] --[[ Name: StopEvent ]]
-    -- upvalues: v7 (ref), v3 (copy)
-    if v7 then
-        v3.unmount(v7);
-    end;
-end;
-return v6;
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+
+require(script.Parent.Parent.EventType)
+
+local Roact = require(CorePackages.Packages.Roact)
+local VRFTUXToolTips = require(script.Parent.Parent.Parent.Components.Tooltips.VRFTUXToolTips)
+local renderWithCoreScriptsStyleProvider = require(script.Parent.Parent.Parent.Parent.Common.renderWithCoreScriptsStyleProvider)
+local t1 = {
+	Name = "MovementTooltipEvent"
+}
+local u7 = nil
+
+function t1.StartEvent() -- line: 27
+	-- upvalues: Roact (copy), VRFTUXToolTips (copy), renderWithCoreScriptsStyleProvider (copy), u7 (ref), CoreGui (copy)
+	local v8 = Roact.createElement(VRFTUXToolTips, {
+		tooltipButtons = {
+			{
+				Text = "Turn",
+				Controller = Enum.UserCFrame.RightHand,
+				ButtonKeycode = Enum.KeyCode.ButtonR3
+			},
+			{
+				Text = "Move",
+				Controller = Enum.UserCFrame.LeftHand,
+				ButtonKeycode = Enum.KeyCode.ButtonL3
+			},
+			{
+				Text = "Jump",
+				Controller = Enum.UserCFrame.RightHand,
+				ButtonKeycode = Enum.KeyCode.ButtonA
+			}
+		}
+	})
+	local v9 = renderWithCoreScriptsStyleProvider({ v8 })
+
+	u7 = Roact.mount(v9, CoreGui:FindFirstChild("FTUXMenu"), "MovementTooltip")
+end
+function t1.StopEvent() -- line: 58
+	-- upvalues: u7 (ref), Roact (copy)
+	if u7 then
+		Roact.unmount(u7)
+	end
+end
+
+return t1

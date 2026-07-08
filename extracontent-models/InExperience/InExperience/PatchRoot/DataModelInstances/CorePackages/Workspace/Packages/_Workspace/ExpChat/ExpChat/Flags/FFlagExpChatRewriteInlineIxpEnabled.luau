@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatRewriteInlineIxpEnabled", false);
+return game:DefineFastFlag("ExpChatRewriteInlineIxpEnabled", false)

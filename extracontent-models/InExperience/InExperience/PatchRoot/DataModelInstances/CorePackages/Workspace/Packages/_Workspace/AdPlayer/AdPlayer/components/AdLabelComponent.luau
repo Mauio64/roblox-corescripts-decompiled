@@ -1,34 +1,36 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AdPlayer");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Foundation);
-local l_Text_0 = v3.Text;
-local l_View_0 = v3.View;
-local l_Image_0 = v3.Image;
-local l_StateLayerAffordance_0 = v3.Enums.StateLayerAffordance;
-local v8 = require(l_script_FirstAncestor_0.Flags);
-return function(v9) --[[ Line: 17 ]]
-    -- upvalues: v2 (copy), l_View_0 (copy), v8 (copy), l_Text_0 (copy), l_Image_0 (copy), l_StateLayerAffordance_0 (copy)
-    local l_Visible_0 = v9.Visible;
-    local l_Image_1 = v9.Image;
-    return v2.createElement(l_View_0, {
-        tag = v8.GetEnableLuaRewardTimerUI() and "size-900-500 row align-x-center align-y-center gap-xsmall" or "position-center-left anchor-center-left size-900-500 row align-x-center align-y-center gap-xsmall"
-    }, {
-        adText = v2.createElement(l_Text_0, {
-            tag = "size-400 content-emphasis text-body-small", 
-            Text = "Ad", 
-            TextScaled = true, 
-            Visible = l_Visible_0
-        }), 
-        icon = v2.createElement(l_Image_0, {
-            tag = "size-300", 
-            Image = l_Image_1, 
-            LayoutOrder = 2, 
-            onActivated = v9.handleToggleAdsModal, 
-            Visible = l_Visible_0, 
-            stateLayer = {
-                affordance = l_StateLayerAffordance_0.None
-            }
-        })
-    });
-end;
+local AdPlayer = script:FindFirstAncestor("AdPlayer")
+local AdPlayerParent = AdPlayer.Parent
+local React = require(AdPlayerParent.React)
+local Foundation = require(AdPlayerParent.Foundation)
+local FoundationText = Foundation.Text
+local View = Foundation.View
+local FoundationImage = Foundation.Image
+local StateLayerAffordance = Foundation.Enums.StateLayerAffordance
+local Flags = require(AdPlayer.Flags)
+
+return function(t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy), View (copy), Flags (copy), FoundationText (copy), FoundationImage (copy), StateLayerAffordance (copy)
+	local t1Visible = t1.Visible
+	local t1Image = t1.Image
+
+	return React.createElement(View, {
+		tag = not Flags.GetEnableLuaRewardTimerUI() and "position-center-left anchor-center-left size-900-500 row align-x-center align-y-center gap-xsmall" or "size-900-500 row align-x-center align-y-center gap-xsmall"
+	}, {
+		adText = React.createElement(FoundationText, {
+			tag = "size-400 content-emphasis text-body-small",
+			Text = "Ad",
+			TextScaled = true,
+			Visible = t1Visible
+		}),
+		icon = React.createElement(FoundationImage, {
+			tag = "size-300",
+			LayoutOrder = 2,
+			Image = t1Image,
+			onActivated = t1.handleToggleAdsModal,
+			Visible = t1Visible,
+			stateLayer = {
+				affordance = StateLayerAffordance.None
+			}
+		})
+	})
+end

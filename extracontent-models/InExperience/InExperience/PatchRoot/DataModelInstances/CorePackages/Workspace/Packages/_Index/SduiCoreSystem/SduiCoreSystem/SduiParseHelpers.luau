@@ -1,37 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiCoreSystem").Parent;
-local v1 = require(l_Parent_0.tutils);
-local function v2(v3, v4) --[[ Line: 5 ]] --[[ Name: hasCycle ]]
-    -- upvalues: v2 (copy)
-    if v4 == nil then
-        v4 = {};
-    end;
-    assert(v4, "seenNodes must exist");
-    for _, v6 in v3 do
-        if typeof(v6) == "table" then
-            if v4[v6] then
-                return true;
-            else
-                v4[v6] = true;
-                if v2(v6, v4) then
-                    return true;
-                end;
-            end;
-        end;
-    end;
-    return false;
-end;
+local Parent = script:FindFirstAncestor("SduiCoreSystem").Parent
+local tutils = require(Parent.tutils)
+
+local function hasCycle(t1: {[any]: any}, t2: {[any]: any}?) -- line: 5
+	-- upvalues: hasCycle (copy)
+	if t2 == nil then
+		t2 = {}
+	end
+
+	assert(t2, "seenNodes must exist")
+
+	for _, v7 in t1 do
+		if typeof(v7) ~= "table" then
+			continue
+		end
+
+		if t2[v7] then
+			return true
+		end
+
+		t2[v7] = true
+
+		if hasCycle(v7, t2) then
+			return true
+		end
+	end
+
+	return false
+end
+
 return {
-    hasCycle = v2, 
-    stringifyValue = function(v7) --[[ Line: 26 ]] --[[ Name: stringifyValue ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        if typeof(v7) == "table" then
-            if v2(v7) then
-                return "table-with-cycle";
-            else
-                return v1.toString(v7);
-            end;
-        else
-            return v1.toString(v7);
-        end;
-    end
-};
+	hasCycle = hasCycle,
+	stringifyValue = function(p1) -- line: 26
+		-- upvalues: hasCycle (copy), tutils (copy)
+		if typeof(p1) == "table" then
+			if hasCycle(p1) then
+				return "table-with-cycle"
+			end
+
+			return tutils.toString(p1)
+		end
+
+		return tutils.toString(p1)
+	end
+}

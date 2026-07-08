@@ -1,108 +1,120 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Localization_0 = require(l_Parent_1.RobloxAppLocales).Localization;
-local v4 = require(l_Parent_0.Locale.LocaleProvider);
-local l_LocalizationProvider_0 = require(l_Parent_1.Localization).LocalizationProvider;
-local l_FFlagEnableUnifiedProductPurchaseFlow_0 = require(l_Parent_1.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow;
-local v7 = require(l_Parent_1.Roact);
-local v8 = require(l_Parent_1.Otter);
-local v9 = v7.Component:extend(script.Name);
-local v10 = {
-    dampingRatio = 1, 
-    frequency = 1.6
-};
-v9.init = function(v11) --[[ Line: 36 ]] --[[ Name: init ]]
-    -- upvalues: v7 (copy), v8 (copy), l_FFlagEnableUnifiedProductPurchaseFlow_0 (copy), v10 (copy)
-    v11.state = {
-        shouldRenderChildren = v11.props.shouldShow
-    };
-    local v12, v13 = v7.createBinding(1);
-    v11.motor = v8.createSingleMotor(1);
-    v11.motor:start();
-    v11.motor:onStep(v13);
-    v11.animationProgress = v12;
-    v11.motor:onComplete(function() --[[ Line: 49 ]]
-        -- upvalues: v11 (copy)
-        local l_props_0 = v11.props;
-        if l_props_0.shouldShow then
-            if l_props_0.onShown ~= nil then
-                l_props_0.onShown();
-                return;
-            end;
-        else
-            v11:setState({
-                shouldRenderChildren = false
-            });
-            if l_props_0.onHidden ~= nil then
-                l_props_0.onHidden();
-            end;
-        end;
-    end);
-    local v15 = v11.props.shouldShow and 0 or 1;
-    if l_FFlagEnableUnifiedProductPurchaseFlow_0 and v11.props.skipAnimation then
-        v11.motor:setGoal(v8.instant(v15));
-        return;
-    else
-        v11.motor:setGoal(v8.spring(v15, v10));
-        return;
-    end;
-end;
-v9.didUpdate = function(v16, v17, _) --[[ Line: 73 ]] --[[ Name: didUpdate ]]
-    -- upvalues: l_FFlagEnableUnifiedProductPurchaseFlow_0 (copy), v8 (copy), v10 (copy)
-    local l_props_1 = v16.props;
-    if v17.shouldShow ~= l_props_1.shouldShow then
-        if l_props_1.shouldShow then
-            v16:setState({
-                shouldRenderChildren = l_props_1.shouldShow
-            });
-        end;
-        local v20 = v16.props.shouldShow and 0 or 1;
-        if l_FFlagEnableUnifiedProductPurchaseFlow_0 and v16.props.skipAnimation then
-            v16.motor:setGoal(v8.instant(v20));
-            return;
-        else
-            v16.motor:setGoal(v8.spring(v20, v10));
-        end;
-    end;
-end;
-v9.willUnmount = function(v21) --[[ Line: 91 ]] --[[ Name: willUnmount ]]
-    v21.motor:destroy();
-end;
-v9.renderWithoutLocale = function(v22) --[[ Line: 95 ]] --[[ Name: renderWithoutLocale ]]
-    -- upvalues: v7 (copy)
-    local l_props_2 = v22.props;
-    if l_props_2.shouldAnimate then
-        return v7.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BorderSizePixel = 0, 
-            BackgroundTransparency = 1, 
-            Position = v22.animationProgress:map(function(v24) --[[ Line: 103 ]]
-                -- upvalues: l_props_2 (copy)
-                if l_props_2.animateDown then
-                    return UDim2.new(0, 0, -1 * v24, 0);
-                else
-                    return UDim2.new(0, 0, 1 * v24, 0);
-                end;
-            end), 
-            ZIndex = l_props_2.ZIndex
-        }, v22.state.shouldRenderChildren and l_props_2.renderChildren() or nil);
-    elseif l_props_2.shouldShow then
-        return l_props_2.renderChildren();
-    else
-        return nil;
-    end;
-end;
-v9.render = function(v25) --[[ Line: 121 ]] --[[ Name: render ]]
-    -- upvalues: v7 (copy), v4 (copy), l_LocalizationService_0 (copy), l_LocalizationProvider_0 (copy), l_Localization_0 (copy)
-    return v7.createElement(v4, {
-        locale = l_LocalizationService_0 and l_LocalizationService_0.RobloxLocaleId
-    }, {
-        v7.createElement(l_LocalizationProvider_0, {
-            localization = l_Localization_0.new(l_LocalizationService_0.RobloxLocaleId)
-        }, {
-            v25:renderWithoutLocale()
-        })
-    });
-end;
-return v9;
+local LocalizationService = game:GetService("LocalizationService")
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Localization = require(ParentParentParent.RobloxAppLocales).Localization
+local LocaleProvider = require(ParentParent.Locale.LocaleProvider)
+local LocalizationProvider = require(ParentParentParent.Localization).LocalizationProvider
+local FFlagEnableUnifiedProductPurchaseFlow = require(ParentParentParent.SharedFlags).FFlagEnableUnifiedProductPurchaseFlow
+local Roact = require(ParentParentParent.Roact)
+local Otter = require(ParentParentParent.Otter)
+local v10 = Roact.Component:extend(script.Name)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 1.6
+}
+
+function v10.init(p1) -- line: 36
+	-- upvalues: Roact (copy), Otter (copy), FFlagEnableUnifiedProductPurchaseFlow (copy), t1 (copy)
+	p1.state = {
+		shouldRenderChildren = p1.props.shouldShow
+	}
+
+	local v13, v14 = Roact.createBinding(1)
+
+	p1.motor = Otter.createSingleMotor(1)
+	p1.motor:start()
+	p1.motor:onStep(v14)
+	p1.animationProgress = v13
+	p1.motor:onComplete(function() -- line: 49
+		-- upvalues: p1 (copy)
+		local props = p1.props
+
+		if props.shouldShow then
+			if props.onShown ~= nil then
+				props.onShown()
+
+				return
+			end
+		else
+			p1:setState({
+				shouldRenderChildren = false
+			})
+
+			if props.onHidden ~= nil then
+				props.onHidden()
+			end
+		end
+	end)
+
+	local v15 = not p1.props.shouldShow and 1 or 0
+
+	if FFlagEnableUnifiedProductPurchaseFlow and p1.props.skipAnimation then
+		p1.motor:setGoal(Otter.instant(v15))
+
+		return
+	end
+
+	p1.motor:setGoal(Otter.spring(v15, t1))
+end
+function v10.didUpdate(t2: {[any]: any}, t3: {[any]: any}, _) -- line: 73
+	-- upvalues: FFlagEnableUnifiedProductPurchaseFlow (copy), Otter (copy), t1 (copy)
+	local props = t2.props
+
+	if t3.shouldShow ~= props.shouldShow then
+		if props.shouldShow then
+			t2:setState({
+				shouldRenderChildren = props.shouldShow
+			})
+		end
+
+		local v20 = not t2.props.shouldShow and 1 or 0
+
+		if FFlagEnableUnifiedProductPurchaseFlow and t2.props.skipAnimation then
+			t2.motor:setGoal(Otter.instant(v20))
+
+			return
+		end
+
+		t2.motor:setGoal(Otter.spring(v20, t1))
+	end
+end
+function v10.willUnmount(p3) -- line: 91
+	p3.motor:destroy()
+end
+function v10.renderWithoutLocale(p4) -- line: 95
+	-- upvalues: Roact (copy)
+	local props = p4.props
+
+	if props.shouldAnimate then
+		return Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			Position = p4.animationProgress:map(function(p5) -- line: 103
+				-- upvalues: props (copy)
+				if props.animateDown then
+					return UDim2.new(0, 0, -1 * p5, 0)
+				end
+
+				return UDim2.new(0, 0, 1 * p5, 0)
+			end),
+			ZIndex = props.ZIndex
+		}, p4.state.shouldRenderChildren and props.renderChildren() or nil)
+	end
+
+	if props.shouldShow then
+		return props.renderChildren()
+	end
+
+	return nil
+end
+function v10.render(p6) -- line: 121
+	-- upvalues: Roact (copy), LocaleProvider (copy), LocalizationService (copy), LocalizationProvider (copy), Localization (copy)
+	return Roact.createElement(LocaleProvider, {
+		locale = LocalizationService and LocalizationService.RobloxLocaleId
+	}, { Roact.createElement(LocalizationProvider, {
+		localization = Localization.new(LocalizationService.RobloxLocaleId)
+	}, { p6:renderWithoutLocale() }) })
+end
+
+return v10

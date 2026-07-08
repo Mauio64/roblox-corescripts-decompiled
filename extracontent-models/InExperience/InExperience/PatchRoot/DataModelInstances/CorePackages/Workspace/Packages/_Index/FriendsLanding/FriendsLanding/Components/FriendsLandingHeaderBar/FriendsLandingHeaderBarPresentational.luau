@@ -1,45 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_HeaderBar_0 = v2.UIBlox.App.Bar.HeaderBar;
-local l_useUiModeInfo_0 = require(l_Parent_0.RobloxAppHooks).useUiModeInfo;
-local l_UiMode_0 = require(l_Parent_0.RobloxAppEnums).UiMode;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local v7 = require(l_script_FirstAncestor_0.Common.Constants);
-local l_GetFFlagFixConnectTabSearchBarHeight_0 = v2.GetFFlagFixConnectTabSearchBarHeight;
-local l_FFlagEnableLeftNavOnConsole_0 = require(l_Parent_0.SharedFlags).FFlagEnableLeftNavOnConsole;
-local v10 = require(l_Parent_0.React);
-return function(v11) --[[ Line: 18 ]] --[[ Name: FriendsLandingHeaderBarPresentational ]]
-    -- upvalues: l_useUiModeInfo_0 (copy), l_UiMode_0 (copy), l_FFlagEnableLeftNavOnConsole_0 (copy), v7 (copy), l_useDesignTokens_0 (copy), v10 (copy), l_HeaderBar_0 (copy), l_GetFFlagFixConnectTabSearchBarHeight_0 (copy)
-    local v12 = l_useUiModeInfo_0();
-    local v13 = false;
-    if v12.uiMode == l_UiMode_0.TenFoot then
-        v13 = not l_FFlagEnableLeftNavOnConsole_0;
-    end;
-    if v13 then
-        return nil;
-    else
-        local l_TOP_BAR_HEIGHT_0 = v7.TOP_BAR_HEIGHT;
-        if l_FFlagEnableLeftNavOnConsole_0 then
-            l_TOP_BAR_HEIGHT_0 = l_useDesignTokens_0().Global.Size_1200;
-        end;
-        return v10.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, l_TOP_BAR_HEIGHT_0), 
-            LayoutOrder = -1, 
-            ZIndex = 2
-        }, {
-            headerBar = v10.createElement(l_HeaderBar_0, {
-                title = v11.title, 
-                barHeight = l_TOP_BAR_HEIGHT_0, 
-                renderLeft = v11.renderLeft, 
-                renderCenter = v11.renderCenter, 
-                renderRight = v11.renderRight, 
-                isSecondary = v11.isSecondary, 
-                shouldHideSecondaryLeftItem = v11.shouldHideSecondaryLeftItem, 
-                paddingTop = if l_GetFFlagFixConnectTabSearchBarHeight_0() then UDim.new(0, 0) else nil, 
-                paddingBottom = if l_GetFFlagFixConnectTabSearchBarHeight_0() then UDim.new(0, 0) else nil
-            })
-        });
-    end;
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local FriendsLandingParent = FriendsLanding.Parent
+local dependencies = require(FriendsLanding.dependencies)
+local HeaderBar = dependencies.UIBlox.App.Bar.HeaderBar
+local useUiModeInfo = require(FriendsLandingParent.RobloxAppHooks).useUiModeInfo
+local UiMode = require(FriendsLandingParent.RobloxAppEnums).UiMode
+local useDesignTokens = require(FriendsLandingParent.Style).useDesignTokens
+local Constants = require(FriendsLanding.Common.Constants)
+local GetFFlagFixConnectTabSearchBarHeight = dependencies.GetFFlagFixConnectTabSearchBarHeight
+local FFlagEnableLeftNavOnConsole = require(FriendsLandingParent.SharedFlags).FFlagEnableLeftNavOnConsole
+local React = require(FriendsLandingParent.React)
+
+local function FriendsLandingHeaderBarPresentational(p1) -- line: 18
+	-- upvalues: useUiModeInfo (copy), UiMode (copy), FFlagEnableLeftNavOnConsole (copy), Constants (copy), useDesignTokens (copy), React (copy), HeaderBar (copy), GetFFlagFixConnectTabSearchBarHeight (copy)
+	if useUiModeInfo().uiMode == UiMode.TenFoot and not FFlagEnableLeftNavOnConsole then
+		return nil
+	end
+
+	local TOP_BAR_HEIGHT = Constants.TOP_BAR_HEIGHT
+
+	if FFlagEnableLeftNavOnConsole then
+		TOP_BAR_HEIGHT = useDesignTokens().Size.Size_2400
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		LayoutOrder = -1,
+		ZIndex = 2,
+		Size = UDim2.new(1, 0, 0, TOP_BAR_HEIGHT)
+	}, {
+		headerBar = React.createElement(HeaderBar, {
+			title = p1.title,
+			barHeight = TOP_BAR_HEIGHT,
+			renderLeft = p1.renderLeft,
+			renderCenter = p1.renderCenter,
+			renderRight = p1.renderRight,
+			isSecondary = p1.isSecondary,
+			shouldHideSecondaryLeftItem = p1.shouldHideSecondaryLeftItem,
+			paddingTop = if not GetFFlagFixConnectTabSearchBarHeight() then nil else UDim.new(0, 0),
+			paddingBottom = if not GetFFlagFixConnectTabSearchBarHeight() then nil else UDim.new(0, 0)
+		})
+	})
+end
+
+return FriendsLandingHeaderBarPresentational

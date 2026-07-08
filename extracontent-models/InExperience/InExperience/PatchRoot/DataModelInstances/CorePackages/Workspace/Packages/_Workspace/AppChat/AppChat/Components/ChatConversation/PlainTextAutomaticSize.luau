@@ -1,165 +1,166 @@
-local l_TextService_0 = game:GetService("TextService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize);
-local v4 = require(l_Parent_0.React);
-local l_useStyle_0 = require(l_Parent_0.UIBlox).Core.Style.useStyle;
-local v6 = require(l_Parent_0.Cryo);
-local l_useTokens_0 = require(l_Parent_0.Foundation).Hooks.useTokens;
-local v8 = require(l_script_FirstAncestor_0.Flags.getFFlagAppChatEnableRepliesUI);
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagAppChatEnableAutotranslation);
-local v10 = require(l_Parent_0.Foundation);
-local l_View_0 = v10.View;
-local l_Text_0 = v10.Text;
-local l_Divider_0 = v10.Divider;
-local l_DividerVariant_0 = v10.Enums.DividerVariant;
-local v15 = {
-    text = "", 
-    maxWidth = 0, 
-    innerPadding = 0, 
-    isIncoming = false, 
-    hasTail = false, 
-    LayoutOrder = 0, 
-    isPending = false, 
-    isUnfiltered = false, 
-    isRepliedTo = false, 
-    isPressed = false, 
-    isLastMessageInMessageGroup = false, 
-    [v4.Change.AbsoluteSize] = function() --[[ Line: 52 ]]
+local TextService = game:GetService("TextService")
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local ChatBubbleContainerAutomaticSize = require(script.Parent.Bubble.ChatBubbleContainerAutomaticSize)
+local React = require(AppChatParent.React)
+local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local Cryo = require(AppChatParent.Cryo)
+local useTokens = require(AppChatParent.Foundation).Hooks.useTokens
+local FFlagAppChatEnableAutotranslation = require(AppChat.Flags.FFlagAppChatEnableAutotranslation)
+local Foundation = require(AppChatParent.Foundation)
+local View = Foundation.View
+local FoundationText = Foundation.Text
+local Divider = Foundation.Divider
+local DividerVariant = Foundation.Enums.DividerVariant
+local t1 = {
+	text = "",
+	maxWidth = 0,
+	innerPadding = 0,
+	isIncoming = false,
+	hasTail = false,
+	LayoutOrder = 0,
+	isPending = false,
+	isUnfiltered = false,
+	isRepliedTo = false,
+	isPressed = false,
+	isLastMessageInMessageGroup = false,
+	[React.Change.AbsoluteSize] = function() -- line: 51
+	end
+}
 
-    end
-};
-PlainText = function(v16) --[[ Line: 59 ]] --[[ Name: PlainText ]]
-    -- upvalues: v6 (copy), v15 (copy), l_useTokens_0 (copy), l_useStyle_0 (copy), v8 (copy), l_TextService_0 (copy), v9 (copy), v4 (copy), v3 (copy), l_View_0 (copy), l_Text_0 (copy), l_Divider_0 (copy), l_DividerVariant_0 (copy)
-    local v17 = v6.Dictionary.join(v15, v16);
-    local v18 = l_useTokens_0();
-    local v19 = l_useStyle_0();
-    local l_maxWidth_0 = v17.maxWidth;
-    local l_innerPadding_0 = v17.innerPadding;
-    local v22 = math.max(0, l_maxWidth_0 - l_innerPadding_0);
-    local l_Body_0 = v19.Font.Body;
-    local v24 = v17.textSize or v19.Font.BaseSize * l_Body_0.RelativeSize;
-    local l_text_0 = v17.text;
-    local v26 = v17.font or l_Body_0.Font;
-    local v27 = v8() and v17.isRepliedTo;
-    local v28 = Vector2.new(v22, if v27 then v24 * 3 else 1e999);
-    local l_l_TextService_0_TextSize_0 = l_TextService_0:GetTextSize(l_text_0, v24, v26, v28);
-    local v30 = v8() and v17.isRepliedTo;
-    local v31 = v17.isUnfiltered and not v17.isIncoming;
-    local v32 = nil;
-    v32 = if v30 then v19.Theme.TextDefault.Color else if v31 then Color3.new(1, 1, 1) else if v17.isIncoming then v18.Color.Content.Emphasis.Color3 else v18.Color.ActionEmphasis.Foreground.Color3;
-    local v33 = if v9 then v4.useMemo(function() --[[ Line: 93 ]]
-        -- upvalues: v27 (copy), v24 (copy)
-        return {
-            MinSize = Vector2.new(0, 0), 
-            MaxSize = Vector2.new(1e999, if v27 then v24 * 3 else 1e999)
-        };
-    end, {
-        v27, 
-        v17.textSize
-    }) else nil;
-    local v34 = if v9 then v4.useMemo(function() --[[ Line: 101 ]]
-        -- upvalues: v22 (copy), l_maxWidth_0 (copy)
-        return {
-            MinSize = Vector2.new(0, 0), 
-            MaxSize = Vector2.new(v22 or l_maxWidth_0, 1e999)
-        };
-    end, {
-        v22, 
-        l_maxWidth_0
-    }) else nil;
-    if v9 and v17.translatedText then
-        local v35 = {
-            TextColor3 = v32, 
-            Font = v26, 
-            TextSize = v24, 
-            TextTransparency = v17.isPending and v19.Theme.TextMuted.Transparency or 0, 
-            sizeConstraint = v33
-        };
-        return v4.createElement(v3, {
-            isIncoming = v17.isIncoming, 
-            hasTail = v17.hasTail, 
-            isPending = v17.isPending, 
-            isUnfiltered = v17.isUnfiltered, 
-            padding = {
-                top = UDim.new(0, l_innerPadding_0), 
-                bottom = UDim.new(0, l_innerPadding_0), 
-                left = UDim.new(0, l_innerPadding_0 + 2), 
-                right = UDim.new(0, l_innerPadding_0 + 2)
-            }, 
-            LayoutOrder = v17.LayoutOrder, 
-            isRepliedTo = if v8() then v17.isRepliedTo else nil, 
-            isPressed = if v8() then v17.isPressed else nil, 
-            [v4.Change.AbsoluteSize] = v17[v4.Change.AbsoluteSize], 
-            isLastMessageInMessageGroup = v17.isLastMessageInMessageGroup
-        }, {
-            Wrapper = v4.createElement(l_View_0, {
-                tag = "auto-xy col gap-xsmall", 
-                sizeConstraint = v34
-            }, {
-                textContent = v4.createElement(l_Text_0, v6.Dictionary.union(v35, {
-                    Text = l_text_0, 
-                    LayoutOrder = 1, 
-                    tag = {
-                        ["text-align-x-left text-align-y-top auto-xy text-wrap content-muted text-body-small"] = true, 
-                        ["text-truncate-end"] = v27, 
-                        ["text-truncate-none"] = not v27
-                    }
-                })), 
-                Divider = v4.createElement(l_View_0, {
-                    tag = "size-0 self-stretch auto-y", 
-                    LayoutOrder = 2
-                }, v4.createElement(l_Divider_0, {
-                    variant = l_DividerVariant_0.Default
-                })), 
-                translatedTextContent = v4.createElement(l_Text_0, v6.Dictionary.union(v35, {
-                    Text = v17.translatedText, 
-                    LayoutOrder = 3, 
-                    tag = {
-                        ["text-align-x-left text-align-y-top auto-xy text-wrap"] = true, 
-                        ["text-truncate-none"] = not v27, 
-                        ["text-truncate-end"] = v27
-                    }
-                }))
-            })
-        });
-    else
-        return v4.createElement(v3, {
-            isIncoming = v17.isIncoming, 
-            hasTail = v17.hasTail, 
-            isPending = v17.isPending, 
-            isUnfiltered = v17.isUnfiltered, 
-            padding = {
-                top = UDim.new(0, l_innerPadding_0), 
-                bottom = UDim.new(0, l_innerPadding_0), 
-                left = UDim.new(0, l_innerPadding_0 + 2), 
-                right = UDim.new(0, l_innerPadding_0 + 2)
-            }, 
-            LayoutOrder = v17.LayoutOrder, 
-            isRepliedTo = if v8() then v17.isRepliedTo else nil, 
-            isPressed = if v8() then v17.isPressed else nil, 
-            [v4.Change.AbsoluteSize] = v17[v4.Change.AbsoluteSize], 
-            isLastMessageInMessageGroup = v17.isLastMessageInMessageGroup
-        }, {
-            textContent = v4.createElement("TextLabel", {
-                Text = l_text_0, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                BackgroundTransparency = 1, 
-                TextColor3 = v32, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                Font = v26, 
-                TextSize = v24, 
-                Size = UDim2.fromOffset(math.ceil(l_l_TextService_0_TextSize_0.X), (math.ceil(l_l_TextService_0_TextSize_0.Y))), 
-                TextTransparency = v17.isPending and v19.Theme.TextMuted.Transparency or 0, 
-                TextYAlignment = Enum.TextYAlignment.Top, 
-                TextTruncate = if v27 then Enum.TextTruncate.AtEnd else nil, 
-                TextWrapped = true
-            }, {
-                SizeConstraint = v4.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(v22 or l_maxWidth_0, if v27 then v24 * 3 else 1e999)
-                })
-            })
-        });
-    end;
-end;
-return PlainText;
+function PlainText(t2: {[any]: any}) -- line: 58
+	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), useStyle (copy), TextService (copy), FFlagAppChatEnableAutotranslation (copy), React (copy), ChatBubbleContainerAutomaticSize (copy), View (copy), FoundationText (copy), Divider (copy), DividerVariant (copy)
+	local v17 = Cryo.Dictionary.join(t1, t2)
+	local v18 = useTokens()
+	local v19 = useStyle()
+	local maxWidth = v17.maxWidth
+	local innerPadding = v17.innerPadding
+	local v22 = math.max(0, maxWidth - innerPadding)
+	local Body = v19.Font.Body
+	local v24 = v17.textSize or v19.Font.BaseSize * Body.RelativeSize
+	local text = v17.text
+	local v26 = v17.font or Body.Font
+	local isRepliedTo = v17.isRepliedTo
+	local vector2 = Vector2.new(v22, not isRepliedTo and 1e999 or v24 * 3)
+	local TextSize = TextService:GetTextSize(text, v24, v26, vector2)
+	local isRepliedTo2 = v17.isRepliedTo
+	local v31 = v17.isUnfiltered and not v17.isIncoming
+	local v32 = if not isRepliedTo2 then if not v31 then if not v17.isIncoming then v18.Color.ActionEmphasis.Foreground.Color3 else v18.Color.Content.Emphasis.Color3 else Color3.new(1, 1, 1) else v19.Theme.TextDefault.Color
+	local v33 = if not FFlagAppChatEnableAutotranslation then nil else React.useMemo(function() -- line: 92
+		-- upvalues: isRepliedTo (copy), v24 (copy)
+		return {
+			MinSize = Vector2.new(0, 0),
+			MaxSize = Vector2.new(1e999, not isRepliedTo and 1e999 or v24 * 3)
+		}
+	end, {
+		isRepliedTo,
+		v17.textSize
+	})
+	local v34 = if not FFlagAppChatEnableAutotranslation then nil else React.useMemo(function() -- line: 100
+		-- upvalues: v22 (copy), maxWidth (copy)
+		return {
+			MinSize = Vector2.new(0, 0),
+			MaxSize = Vector2.new(v22 or maxWidth, 1e999)
+		}
+	end, {
+		v22,
+		maxWidth
+	})
+
+	if FFlagAppChatEnableAutotranslation and v17.translatedText then
+		local t3 = {
+			TextColor3 = v32,
+			Font = v26,
+			TextSize = v24,
+			TextTransparency = v17.isPending and v19.Theme.TextMuted.Transparency or 0,
+			sizeConstraint = v33
+		}
+
+		return React.createElement(ChatBubbleContainerAutomaticSize, {
+			isIncoming = v17.isIncoming,
+			hasTail = v17.hasTail,
+			isPending = v17.isPending,
+			isUnfiltered = v17.isUnfiltered,
+			padding = {
+				top = UDim.new(0, innerPadding),
+				bottom = UDim.new(0, innerPadding),
+				left = UDim.new(0, innerPadding + 2),
+				right = UDim.new(0, innerPadding + 2)
+			},
+			LayoutOrder = v17.LayoutOrder,
+			isRepliedTo = v17.isRepliedTo,
+			isPressed = v17.isPressed,
+			[React.Change.AbsoluteSize] = v17[React.Change.AbsoluteSize],
+			isLastMessageInMessageGroup = v17.isLastMessageInMessageGroup
+		}, {
+			Wrapper = React.createElement(View, {
+				tag = "auto-xy col gap-xsmall",
+				sizeConstraint = v34
+			}, {
+				textContent = React.createElement(FoundationText, Cryo.Dictionary.union(t3, {
+					LayoutOrder = 1,
+					Text = text,
+					tag = {
+						["text-align-x-left text-align-y-top auto-xy text-wrap content-muted text-body-small"] = true,
+						["text-truncate-end"] = isRepliedTo,
+						["text-truncate-none"] = not isRepliedTo
+					}
+				})),
+				Divider = React.createElement(View, {
+					tag = "size-0 self-stretch auto-y",
+					LayoutOrder = 2
+				}, React.createElement(Divider, {
+					variant = DividerVariant.Default
+				})),
+				translatedTextContent = React.createElement(FoundationText, Cryo.Dictionary.union(t3, {
+					LayoutOrder = 3,
+					Text = v17.translatedText,
+					tag = {
+						["text-align-x-left text-align-y-top auto-xy text-wrap"] = true,
+						["text-truncate-none"] = not isRepliedTo,
+						["text-truncate-end"] = isRepliedTo
+					}
+				}))
+			})
+		})
+	end
+
+	return React.createElement(ChatBubbleContainerAutomaticSize, {
+		isIncoming = v17.isIncoming,
+		hasTail = v17.hasTail,
+		isPending = v17.isPending,
+		isUnfiltered = v17.isUnfiltered,
+		padding = {
+			top = UDim.new(0, innerPadding),
+			bottom = UDim.new(0, innerPadding),
+			left = UDim.new(0, innerPadding + 2),
+			right = UDim.new(0, innerPadding + 2)
+		},
+		LayoutOrder = v17.LayoutOrder,
+		isRepliedTo = v17.isRepliedTo,
+		isPressed = v17.isPressed,
+		[React.Change.AbsoluteSize] = v17[React.Change.AbsoluteSize],
+		isLastMessageInMessageGroup = v17.isLastMessageInMessageGroup
+	}, {
+		textContent = React.createElement("TextLabel", {
+			BackgroundTransparency = 1,
+			TextWrapped = true,
+			Text = text,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextColor3 = v32,
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Font = v26,
+			TextSize = v24,
+			Size = UDim2.fromOffset(math.ceil(TextSize.X), (math.ceil(TextSize.Y))),
+			TextTransparency = v17.isPending and v19.Theme.TextMuted.Transparency or 0,
+			TextYAlignment = Enum.TextYAlignment.Top,
+			TextTruncate = if not isRepliedTo then nil else Enum.TextTruncate.AtEnd
+		}, {
+			SizeConstraint = React.createElement("UISizeConstraint", {
+				MaxSize = Vector2.new(v22 or maxWidth, not isRepliedTo and 1e999 or v24 * 3)
+			})
+		})
+	})
+end
+
+return PlainText

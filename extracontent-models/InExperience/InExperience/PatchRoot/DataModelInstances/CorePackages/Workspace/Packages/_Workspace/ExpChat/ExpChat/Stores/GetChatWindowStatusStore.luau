@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChat").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.createChatWindowStatusStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("ExpChat").Parent
+local Signals = require(Parent.Signals)
+local createChatWindowStatusStore = require(script.createChatWindowStatusStore)
+
+return Signals.createComputed(createChatWindowStatusStore)

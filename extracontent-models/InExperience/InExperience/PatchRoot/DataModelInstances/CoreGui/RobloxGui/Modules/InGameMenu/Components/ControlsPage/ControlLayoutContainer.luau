@@ -1,114 +1,118 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.InGameMenuDependencies);
-local l_Roact_0 = v1.Roact;
-local l_RoactRodux_0 = v1.RoactRodux;
-local l_UIBlox_0 = v1.UIBlox;
-local l_t_0 = v1.t;
-local l_withStyle_0 = l_UIBlox_0.Core.Style.withStyle;
-local l_withSelectionCursorProvider_0 = l_UIBlox_0.App.SelectionImage.withSelectionCursorProvider;
-local l_CursorKind_0 = l_UIBlox_0.App.SelectionImage.CursorKind;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v10 = require(l_Parent_0.GlobalConfig);
-local v11 = require(script.Parent.Parent.ThemedTextLabel);
-local v12 = require(script.Parent.Parent.Divider);
-local v13 = require(l_Parent_0.Actions.NavigateBack);
-local v14 = require(l_Parent_0.Localization.withLocalization);
-local v15 = require(l_Parent_0.Resources.Assets);
-local l_ImageSetButton_0 = l_UIBlox_0.Core.ImageSet.ImageSetButton;
-local l_ImageSetLabel_0 = l_UIBlox_0.Core.ImageSet.ImageSetLabel;
-local v18 = l_t_0.strictInterface({
-    titleText = l_t_0.string, 
-    [l_Roact_0.Children] = l_t_0.optional(l_t_0.table), 
-    onClosed = l_t_0.callback, 
-    closeButtonRef = l_t_0.optional(l_t_0.table)
-});
-local function v23(v19, v20) --[[ Line: 43 ]] --[[ Name: ControlLayoutContainerWithSelectionCursor ]]
-    -- upvalues: v10 (copy), v18 (copy), v14 (copy), l_withStyle_0 (copy), l_Roact_0 (copy), l_ImageSetButton_0 (copy), v15 (copy), l_CursorKind_0 (copy), v11 (copy), v12 (copy), l_ImageSetLabel_0 (copy)
-    if v10.propValidation then
-        assert(v18(v19));
-    end;
-    return v14({
-        titleText = v19.titleText
-    })(function(v21) --[[ Line: 50 ]]
-        -- upvalues: l_withStyle_0 (ref), l_Roact_0 (ref), v19 (copy), l_ImageSetButton_0 (ref), v15 (ref), v20 (copy), l_CursorKind_0 (ref), v11 (ref), v12 (ref), l_ImageSetLabel_0 (ref)
-        return l_withStyle_0(function(v22) --[[ Line: 51 ]]
-            -- upvalues: l_Roact_0 (ref), v19 (ref), l_ImageSetButton_0 (ref), v15 (ref), v20 (ref), l_CursorKind_0 (ref), v11 (ref), v21 (copy), v12 (ref), l_ImageSetLabel_0 (ref)
-            return l_Roact_0.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 0), 
-                BackgroundColor3 = v22.Theme.Overlay.Color, 
-                BackgroundTransparency = 0, 
-                Active = true
-            }, {
-                PageContent = l_Roact_0.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 1, -132), 
-                    Position = UDim2.new(0, 0, 0, 132), 
-                    ClipsDescendants = true
-                }, v19[l_Roact_0.Children]), 
-                HeaderContainer = l_Roact_0.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, 132), 
-                    BackgroundTransparency = 1
-                }, {
-                    Padding = l_Roact_0.createElement("UIPadding", {
-                        PaddingLeft = UDim.new(0, 95), 
-                        PaddingRight = UDim.new(0, 95)
-                    }), 
-                    CloseButton = l_Roact_0.createElement(l_ImageSetButton_0, {
-                        AnchorPoint = Vector2.new(0, 0.5), 
-                        Position = UDim2.new(0, 0, 0, 100), 
-                        Size = UDim2.new(0, 36, 0, 36), 
-                        Image = v15.Images.CloseModal, 
-                        BackgroundTransparency = 1, 
-                        SelectionImageObject = v20(l_CursorKind_0.RoundedRect), 
-                        [l_Roact_0.Event.Activated] = v19.onClosed, 
-                        [l_Roact_0.Ref] = v19.closeButtonRef
-                    }), 
-                    HeaderTextLabel = l_Roact_0.createElement(v11, {
-                        fontKey = "Header1", 
-                        themeKey = "TextEmphasis", 
-                        Size = UDim2.new(0, 250, 0, 28), 
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        Position = UDim2.new(0.5, 0, 0, 100), 
-                        Text = v21.titleText
-                    }), 
-                    HeaderDivider = l_Roact_0.createElement(v12, {
-                        Size = UDim2.new(1, 0, 0, 2), 
-                        AnchorPoint = Vector2.new(0.5, 1), 
-                        Position = UDim2.new(0.5, 0, 1, 0)
-                    })
-                }), 
-                RadialGlowBig = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                    BackgroundTransparency = 1, 
-                    Image = v15.Images.RadialGlow, 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.new(0.5, 0, 0.5, 0), 
-                    SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                    Size = UDim2.new(1, 0, 1, 0)
-                }), 
-                RadialGlowSquashed = l_Roact_0.createElement(l_ImageSetLabel_0, {
-                    BackgroundTransparency = 1, 
-                    Image = v15.Images.RadialGlow, 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.new(0.5, 0, 1, 0), 
-                    SizeConstraint = Enum.SizeConstraint.RelativeXX, 
-                    Size = UDim2.new(1, 0, 0.6, 0)
-                })
-            });
-        end);
-    end);
-end;
-return l_RoactRodux_0.UNSTABLE_connect2(nil, function(v24) --[[ Line: 139 ]]
-    -- upvalues: v13 (copy)
-    return {
-        onClosed = function() --[[ Line: 141 ]] --[[ Name: onClosed ]]
-            -- upvalues: v24 (copy), v13 (ref)
-            v24(v13());
-        end
-    };
-end)(function(v25) --[[ Line: 133 ]] --[[ Name: ControlLayoutContainer ]]
-    -- upvalues: l_withSelectionCursorProvider_0 (copy), v23 (copy)
-    return l_withSelectionCursorProvider_0(function(v26) --[[ Line: 134 ]]
-        -- upvalues: v23 (ref), v25 (copy)
-        return v23(v25, v26);
-    end);
-end);
+local CorePackages = game:GetService("CorePackages")
+local InGameMenuDependencies = require(CorePackages.Packages.InGameMenuDependencies)
+local Roact = InGameMenuDependencies.Roact
+local RoactRodux = InGameMenuDependencies.RoactRodux
+local UIBlox = InGameMenuDependencies.UIBlox
+local t = InGameMenuDependencies.t
+local withStyle = UIBlox.Core.Style.withStyle
+local withSelectionCursorProvider = UIBlox.App.SelectionImage.withSelectionCursorProvider
+local CursorKind = UIBlox.App.SelectionImage.CursorKind
+local ParentParent = script.Parent.Parent.Parent
+local GlobalConfig = require(ParentParent.GlobalConfig)
+local ThemedTextLabel = require(script.Parent.Parent.ThemedTextLabel)
+local Divider = require(script.Parent.Parent.Divider)
+local NavigateBack = require(ParentParent.Actions.NavigateBack)
+local withLocalization = require(ParentParent.Localization.withLocalization)
+local Assets = require(ParentParent.Resources.Assets)
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local v19 = t.strictInterface({
+	titleText = t.string,
+	[Roact.Children] = t.optional(t.table),
+	onClosed = t.callback,
+	closeButtonRef = t.optional(t.table)
+})
+
+local function ControlLayoutContainerWithSelectionCursor(p1, p2) -- line: 43
+	-- upvalues: GlobalConfig (copy), v19 (copy), withLocalization (copy), withStyle (copy), Roact (copy), ImageSetButton (copy), Assets (copy), CursorKind (copy), ThemedTextLabel (copy), Divider (copy), ImageSetLabel (copy)
+	if GlobalConfig.propValidation then
+		assert(v19(p1))
+	end
+
+	return withLocalization({
+		titleText = p1.titleText
+	})(function(p3) -- line: 50
+		-- upvalues: withStyle (copy), Roact (copy), p1 (copy), ImageSetButton (copy), Assets (copy), p2 (copy), CursorKind (copy), ThemedTextLabel (copy), Divider (copy), ImageSetLabel (copy)
+		return withStyle(function(p4) -- line: 51
+			-- upvalues: Roact (copy), p1 (copy), ImageSetButton (copy), Assets (copy), p2 (copy), CursorKind (copy), ThemedTextLabel (copy), p3 (copy), Divider (copy), ImageSetLabel (copy)
+			return Roact.createElement("Frame", {
+				BackgroundTransparency = 0,
+				Active = true,
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = p4.Theme.Overlay.Color
+			}, {
+				PageContent = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					ClipsDescendants = true,
+					Size = UDim2.new(1, 0, 1, -132),
+					Position = UDim2.new(0, 0, 0, 132)
+				}, p1[Roact.Children]),
+				HeaderContainer = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 132)
+				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, 95),
+						PaddingRight = UDim.new(0, 95)
+					}),
+					CloseButton = Roact.createElement(ImageSetButton, {
+						AnchorPoint = Vector2.new(0, 0.5),
+						Position = UDim2.new(0, 0, 0, 100),
+						Size = UDim2.new(0, 36, 0, 36),
+						Image = Assets.Images.CloseModal,
+						BackgroundTransparency = 1,
+						SelectionImageObject = p2(CursorKind.RoundedRect),
+						[Roact.Event.Activated] = p1.onClosed,
+						[Roact.Ref] = p1.closeButtonRef
+					}),
+					HeaderTextLabel = Roact.createElement(ThemedTextLabel, {
+						fontKey = "Header1",
+						themeKey = "TextEmphasis",
+						Size = UDim2.new(0, 250, 0, 28),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.new(0.5, 0, 0, 100),
+						Text = p3.titleText
+					}),
+					HeaderDivider = Roact.createElement(Divider, {
+						Size = UDim2.new(1, 0, 0, 2),
+						AnchorPoint = Vector2.new(0.5, 1),
+						Position = UDim2.new(0.5, 0, 1, 0)
+					})
+				}),
+				RadialGlowBig = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Image = Assets.Images.RadialGlow,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					SizeConstraint = Enum.SizeConstraint.RelativeXX,
+					Size = UDim2.new(1, 0, 1, 0)
+				}),
+				RadialGlowSquashed = Roact.createElement(ImageSetLabel, {
+					BackgroundTransparency = 1,
+					Image = Assets.Images.RadialGlow,
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 1, 0),
+					SizeConstraint = Enum.SizeConstraint.RelativeXX,
+					Size = UDim2.new(1, 0, 0.6, 0)
+				})
+			})
+		end)
+	end)
+end
+local function ControlLayoutContainer(p5) -- line: 133
+	-- upvalues: withSelectionCursorProvider (copy), ControlLayoutContainerWithSelectionCursor (copy)
+	return withSelectionCursorProvider(function(p6) -- line: 134
+		-- upvalues: ControlLayoutContainerWithSelectionCursor (copy), p5 (copy)
+		return ControlLayoutContainerWithSelectionCursor(p5, p6)
+	end)
+end
+
+return RoactRodux.UNSTABLE_connect2(nil, function(p7) -- line: 139
+	-- upvalues: NavigateBack (copy)
+	return {
+		onClosed = function() -- line: 141
+			-- upvalues: p7 (copy), NavigateBack (copy)
+			p7(NavigateBack())
+		end
+	}
+end)(ControlLayoutContainer)

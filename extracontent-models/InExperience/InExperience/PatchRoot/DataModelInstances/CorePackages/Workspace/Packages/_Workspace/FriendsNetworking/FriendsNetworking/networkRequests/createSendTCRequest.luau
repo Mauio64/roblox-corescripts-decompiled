@@ -1,11 +1,13 @@
-local v0 = require(script.Parent.Parent.FRIENDS_URL);
-local _ = require(script.Parent.Parent.networkingFriendsTypes);
-return function(v2) --[[ Line: 5 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.POST({
-        Name = "SendTCRequest"
-    }, function(v3, v4) --[[ Line: 8 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("v1"):path("users"):id(v4):path("send-trusted-friend-request"):body({});
-    end);
-end;
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+
+require(script.Parent.Parent.networkingFriendsTypes)
+
+return function(p1) -- line: 5
+	-- upvalues: FRIENDS_URL (copy)
+	return p1.roduxNetworking.POST({
+		Name = "SendTCRequest"
+	}, function(p2, p3) -- line: 8
+		-- upvalues: FRIENDS_URL (copy)
+		return p2(FRIENDS_URL):path("v1"):path("users"):id(p3):path("send-trusted-friend-request"):body({})
+	end)
+end

@@ -1,11 +1,15 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Cryo);
-return function(v2, v3) --[[ Line: 13 ]] --[[ Name: getLastMessageWithFilter ]]
-    -- upvalues: v1 (copy)
-    if not v2 or #v2 == 0 then
-        return nil;
-    else
-        local v4 = v1.List.findWhere(v2, v3);
-        return v4 and v2[v4].messageId or nil;
-    end;
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Cryo = require(Parent.Cryo)
+
+local function getLastMessageWithFilter(t1: {[any]: any}?, p1: ((...any) -> ...any)) -- line: 13
+	-- upvalues: Cryo (copy)
+	if not t1 or #t1 == 0 then
+		return nil
+	end
+
+	local v6 = Cryo.List.findWhere(t1, p1)
+
+	return v6 and t1[v6].messageId or nil
+end
+
+return getLastMessageWithFilter

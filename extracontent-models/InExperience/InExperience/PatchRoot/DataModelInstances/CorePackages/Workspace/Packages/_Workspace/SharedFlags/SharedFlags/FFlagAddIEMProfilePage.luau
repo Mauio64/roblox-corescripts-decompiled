@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddIEMProfilePage", false);
+return game:DefineFastFlag("AddIEMProfilePage", false)

@@ -1,18 +1,22 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetExperienceInfo);
-return v2.createReducer({}, {
-    [v4.name] = function(v5, v6) --[[ Line: 12 ]]
-        -- upvalues: v1 (copy)
-        local l_experienceInfo_0 = v6.experienceInfo;
-        local l_universeId_0 = l_experienceInfo_0.universeId;
-        assert(l_universeId_0 ~= nil, "Expected a universe id when setting an experiences's information.");
-        local v9 = v5[l_universeId_0] or {};
-        local v10 = v1.Dictionary.join(v9, l_experienceInfo_0);
-        return v1.Dictionary.join(v5, {
-            [l_universeId_0] = v10
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetExperienceInfo = require(ParentParent.Actions.SetExperienceInfo)
+
+return Rodux.createReducer({}, {
+	[SetExperienceInfo.name] = function(p1, p2) -- line: 12
+		-- upvalues: Cryo (copy)
+		local experienceInfo = p2.experienceInfo
+		local universeId = experienceInfo.universeId
+
+		assert(universeId ~= nil, "Expected a universe id when setting an experiences's information.")
+
+		local v10 = p1[universeId] or {}
+		local v11 = Cryo.Dictionary.join(v10, experienceInfo)
+
+		return Cryo.Dictionary.join(p1, {
+			[universeId] = v11
+		})
+	end
+})

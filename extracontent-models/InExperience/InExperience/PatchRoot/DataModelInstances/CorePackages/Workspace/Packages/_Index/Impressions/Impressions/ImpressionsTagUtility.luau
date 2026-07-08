@@ -1,29 +1,35 @@
-local l_CollectionService_0 = game:GetService("CollectionService");
-local v1 = require(script.Parent.Constants);
+local CollectionService = game:GetService("CollectionService")
+local Constants = require(script.Parent.Constants)
+
 return {
-    AddTag = function(v2, v3, v4) --[[ Line: 4 ]]
-        -- upvalues: v1 (copy), l_CollectionService_0 (copy)
-        local v5 = v2 and v2.current or nil;
-        if v3 and v5 then
-            if v4 then
-                v5:SetAttribute(v1.ItemIndex, v4);
-                if not l_CollectionService_0:HasTag(v5, v3) then
-                    l_CollectionService_0:AddTag(v5, v3);
-                    return;
-                end;
-            else
-                warn("addTag: impression instance not tagged, missing index");
-            end;
-        end;
-    end, 
-    RemoveTag = function(v6, v7, v8) --[[ Line: 18 ]]
-        -- upvalues: v1 (copy), l_CollectionService_0 (copy)
-        local v9 = v6 and v6.current or nil;
-        if v7 and v9 then
-            if v8 then
-                v9:SetAttribute(v1.ItemIndex, nil);
-            end;
-            l_CollectionService_0:RemoveTag(v9, v7);
-        end;
-    end
-};
+	AddTag = function(p1, p2, p3) -- line: 4
+		-- upvalues: Constants (copy), CollectionService (copy)
+		local v6 = p1 and p1.current or nil
+
+		if p2 and v6 then
+			if p3 then
+				v6:SetAttribute(Constants.ItemIndex, p3)
+
+				if not CollectionService:HasTag(v6, p2) then
+					CollectionService:AddTag(v6, p2)
+
+					return
+				end
+			else
+				warn("addTag: impression instance not tagged, missing index")
+			end
+		end
+	end,
+	RemoveTag = function(p4, p5, p6) -- line: 18
+		-- upvalues: Constants (copy), CollectionService (copy)
+		local v10 = p4 and p4.current or nil
+
+		if p5 and v10 then
+			if p6 then
+				v10:SetAttribute(Constants.ItemIndex, nil)
+			end
+
+			CollectionService:RemoveTag(v10, p5)
+		end
+	end
+}

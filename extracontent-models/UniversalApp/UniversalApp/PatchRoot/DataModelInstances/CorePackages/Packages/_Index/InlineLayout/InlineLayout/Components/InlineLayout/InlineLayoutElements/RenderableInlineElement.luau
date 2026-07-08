@@ -1,33 +1,38 @@
-local l_Parent_0 = script:FindFirstAncestor("Components").Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_1.Dash);
-local v4 = require(l_Parent_0.Utils.InlineElementType);
-local l_join_0 = v3.join;
-local v6 = {};
-v6.__index = v6;
-v6.__type = v4;
-v6.new = function(v7, v8, v9) --[[ Line: 44 ]] --[[ Name: new ]]
-    -- upvalues: v6 (copy), v3 (copy)
-    local v10 = setmetatable({}, v6);
-    v10.props = v8;
-    v10.mapProps = v9 or v3.identity;
-    v10.Element = v7;
-    return v10;
-end;
-v6.getWidth = function(v11) --[[ Line: 52 ]] --[[ Name: getWidth ]]
-    return v11.props.Size.Width.Offset;
-end;
-v6.split = function(v12) --[[ Line: 56 ]] --[[ Name: split ]]
-    -- upvalues: v6 (copy), l_join_0 (copy)
-    return v6.new(v12.Element, l_join_0(v12.props));
-end;
-v6.render = function(v13, v14, v15) --[[ Line: 60 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.createElement(v13.Element, v13.mapProps(v3.assign(v13.props, {
-        id = v14, 
-        key = tostring(v15), 
-        LayoutOrder = v15
-    })));
-end;
-return v6;
+local Parent = script:FindFirstAncestor("Components").Parent
+local ParentParent = Parent.Parent
+local React = require(ParentParent.React)
+local Dash = require(ParentParent.Dash)
+local InlineElementType = require(Parent.Utils.InlineElementType)
+local join = Dash.join
+local t1 = {}
+
+t1.__index = t1
+t1.__type = InlineElementType
+
+function t1.new(p1, p2, p3) -- line: 44
+	-- upvalues: t1 (copy), Dash (copy)
+	local self = setmetatable({}, t1)
+
+	self.props = p2
+	self.mapProps = p3 or Dash.identity
+	self.Element = p1
+
+	return self
+end
+function t1.getWidth(p4) -- line: 52
+	return p4.props.Size.Width.Offset
+end
+function t1.split(p5) -- line: 56
+	-- upvalues: t1 (copy), join (copy)
+	return t1.new(p5.Element, join(p5.props))
+end
+function t1.render(t2: {[any]: any}, s1: string, n1: number) -- line: 60
+	-- upvalues: React (copy), Dash (copy)
+	return React.createElement(t2.Element, t2.mapProps(Dash.assign(t2.props, {
+		id = s1,
+		key = tostring(n1),
+		LayoutOrder = n1
+	})))
+end
+
+return t1

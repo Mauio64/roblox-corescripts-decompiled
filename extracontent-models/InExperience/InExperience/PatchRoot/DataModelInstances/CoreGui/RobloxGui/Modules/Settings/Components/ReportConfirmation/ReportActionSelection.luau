@@ -1,180 +1,217 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.t);
-local v3 = require(l_CorePackages_0.Packages.UIBlox);
-local l_withStyle_0 = v3.Style.withStyle;
-local l_TextButton_0 = v3.App.Button.TextButton;
-local v6 = require(script.Parent.CheckboxRow);
-local v7 = v1.PureComponent:extend("ReportActionSelection");
-local function v8() --[[ Line: 25 ]]
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local t = require(CorePackages.Packages.t)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local withFoundationOrUIBloxStyle = require(CorePackages.Workspace.Packages.CoreGuiCommon).withFoundationOrUIBloxStyle
+local TextButton = UIBlox.App.Button.TextButton
+local CheckboxRow = require(script.Parent.CheckboxRow)
+local v8 = Roact.PureComponent:extend("ReportActionSelection")
 
-end;
-v7.defaultProps = {
-    titleText = "Thanks for your report!", 
-    subtitleText = "We've received your report and will take action soon if needed. Your feedback helps keep our community safe.", 
-    instructionText = "Other steps you can take:", 
-    muteText = "Mute {DISPLAYNAME}(@username)", 
-    blockText = "Block {DISPLAYNAME}(@username)", 
-    doneText = "Done", 
-    showVoiceMuting = true, 
-    isVoiceMuted = false, 
-    isBlocked = false, 
-    onMuteCheckboxActivated = v8, 
-    onBlockCheckboxActivated = v8, 
-    onDoneActivated = v8, 
-    ZIndex = 1, 
-    uiScale = 1.3
-};
-v7.validateProps = v2.interface({
-    titleText = v2.string, 
-    subtitleText = v2.string, 
-    instructionText = v2.string, 
-    muteText = v2.string, 
-    blockText = v2.string, 
-    doneText = v2.string, 
-    showVoiceMuting = v2.boolean, 
-    isVoiceMuted = v2.optional(v2.boolean), 
-    isBlocked = v2.optional(v2.boolean), 
-    onMuteCheckboxActivated = v2.optional(v2.callback), 
-    onBlockCheckboxActivated = v2.optional(v2.callback), 
-    onDoneActivated = v2.callback, 
-    ZIndex = v2.number
-});
-v7.init = function(v9) --[[ Line: 60 ]] --[[ Name: init ]]
-    v9.onMuteCheckboxActivated = function(v10) --[[ Line: 61 ]]
-        -- upvalues: v9 (copy)
-        v9:setState({
-            isVoiceMuted = v10
-        });
-        v9.props.onMuteCheckboxActivated(v10);
-    end;
-    v9.onBlockCheckboxActivated = function(v11) --[[ Line: 69 ]]
-        -- upvalues: v9 (copy)
-        v9:setState({
-            isBlocked = v11
-        });
-        v9.props.onBlockCheckboxActivated(v11);
-    end;
-    v9.onDoneActivated = function() --[[ Line: 77 ]]
-        -- upvalues: v9 (copy)
-        v9.props.onDoneActivated(v9.state.isBlocked, v9.state.isVoiceMuted);
-    end;
-    v9:setState({
-        isVoiceMuted = v9.props.isVoiceMuted, 
-        isBlocked = v9.props.isBlocked
-    });
-end;
-v7.render = function(v12) --[[ Line: 87 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), v6 (copy), l_TextButton_0 (copy)
-    return l_withStyle_0(function(v13) --[[ Line: 88 ]]
-        -- upvalues: v1 (ref), v12 (copy), v6 (ref), l_TextButton_0 (ref)
-        local l_BaseSize_0 = v13.Font.BaseSize;
-        return v1.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            AnchorPoint = Vector2.new(0.5, 0.5), 
-            Position = UDim2.fromScale(0.5, 0.5), 
-            BackgroundTransparency = 1, 
-            ZIndex = v12.props.ZIndex
-        }, {
-            uiScale = v1.createElement("UIScale", {
-                Scale = v12.props.uiScale
-            }), 
-            layout = v1.createElement("UIListLayout", {
-                VerticalAlignment = Enum.VerticalAlignment.Top, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                Padding = UDim.new(0, 22), 
-                FillDirection = Enum.FillDirection.Vertical, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            title = v1.createElement("TextLabel", {
-                Text = v12.props.titleText, 
-                TextColor3 = v13.Theme.TextEmphasis.Color, 
-                TextTransparency = v13.Theme.TextEmphasis.Transparency, 
-                TextSize = v13.Font.Header1.RelativeSize * l_BaseSize_0, 
-                Font = v13.Font.Header1.Font, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.XY, 
-                LayoutOrder = 1
-            }), 
-            subtitle = v1.createElement("TextLabel", {
-                Size = UDim2.fromOffset(612, 0), 
-                Text = v12.props.subtitleText, 
-                TextColor3 = v13.Theme.TextEmphasis.Color, 
-                TextTransparency = v13.Theme.TextEmphasis.Transparency, 
-                TextSize = v13.Font.CaptionHeader.RelativeSize * l_BaseSize_0, 
-                Font = v13.Font.CaptionHeader.Font, 
-                TextWrapped = true, 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 2
-            }), 
-            actions = v1.createElement("Frame", {
-                Size = UDim2.fromOffset(584, 0), 
-                BackgroundTransparency = 1, 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                LayoutOrder = 3
-            }, {
-                layout = v1.createElement("UIListLayout", {
-                    VerticalAlignment = Enum.VerticalAlignment.Top, 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                    Padding = UDim.new(0, 18), 
-                    FillDirection = Enum.FillDirection.Vertical, 
-                    SortOrder = Enum.SortOrder.LayoutOrder
-                }), 
-                instruction = v1.createElement("TextLabel", {
-                    Size = UDim2.fromScale(1, 0), 
-                    Text = v12.props.instructionText, 
-                    TextColor3 = v13.Theme.TextDefault.Color, 
-                    TextTransparency = v13.Theme.TextDefault.Transparency, 
-                    TextSize = v13.Font.CaptionHeader.RelativeSize * l_BaseSize_0, 
-                    Font = v13.Font.CaptionHeader.Font, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    BackgroundTransparency = 1, 
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    LayoutOrder = 1
-                }), 
-                muteCheckbox = v12.props.showVoiceMuting and v1.createElement(v6, {
-                    height = 28, 
-                    image = "icons/controls/microphone", 
-                    descriptionText = v12.props.muteText, 
-                    actionDisabled = v12.state.isBlocked, 
-                    checkboxSelected = v12.state.isBlocked or v12.state.isVoiceMuted, 
-                    onCheckboxActivated = v12.onMuteCheckboxActivated, 
-                    LayoutOrder = 2
-                }), 
-                div = v12.props.showVoiceMuting and v1.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, 1), 
-                    BackgroundColor3 = v13.Theme.Divider.Color, 
-                    BackgroundTransparency = v13.Theme.Divider.Transparency, 
-                    BorderSizePixel = 0, 
-                    LayoutOrder = 3
-                }), 
-                blockCheckbox = v1.createElement(v6, {
-                    height = 28, 
-                    image = "icons/actions/block", 
-                    descriptionText = v12.props.blockText, 
-                    checkboxSelected = v12.state.isBlocked, 
-                    onCheckboxActivated = v12.onBlockCheckboxActivated, 
-                    LayoutOrder = 4
-                }), 
-                doneContainer = v1.createElement("Frame", {
-                    BackgroundColor3 = v13.Theme.SystemPrimaryContent.Color, 
-                    BackgroundTransparency = v13.Theme.SystemPrimaryContent.Transparency, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.new(1, 0, 0, 44), 
-                    LayoutOrder = 5
-                }, {
-                    uiCorner = v1.createElement("UICorner", {
-                        CornerRadius = UDim.new(0, 4)
-                    }), 
-                    doneButton = v1.createElement(l_TextButton_0, {
-                        size = UDim2.fromScale(1, 1), 
-                        text = v12.props.doneText, 
-                        onActivated = v12.onDoneActivated
-                    })
-                })
-            })
-        });
-    end);
-end;
-return v7;
+local function v9() -- line: 25
+end
+
+v8.defaultProps = {
+	titleText = "Thanks for your report!",
+	subtitleText = "We've received your report and will take action soon if needed. Your feedback helps keep our community safe.",
+	instructionText = "Other steps you can take:",
+	muteText = "Mute {DISPLAYNAME}(@username)",
+	blockText = "Block {DISPLAYNAME}(@username)",
+	doneText = "Done",
+	showVoiceMuting = true,
+	isVoiceMuted = false,
+	isBlocked = false,
+	ZIndex = 1,
+	uiScale = 1.3,
+	onMuteCheckboxActivated = v9,
+	onBlockCheckboxActivated = v9,
+	onDoneActivated = v9
+}
+v8.validateProps = t.interface({
+	titleText = t.string,
+	subtitleText = t.string,
+	instructionText = t.string,
+	muteText = t.string,
+	blockText = t.string,
+	doneText = t.string,
+	showVoiceMuting = t.boolean,
+	isVoiceMuted = t.optional(t.boolean),
+	isBlocked = t.optional(t.boolean),
+	onMuteCheckboxActivated = t.optional(t.callback),
+	onBlockCheckboxActivated = t.optional(t.callback),
+	onDoneActivated = t.callback,
+	ZIndex = t.number
+})
+
+function v8.init(p1) -- line: 60
+	function p1.onMuteCheckboxActivated(p2) -- line: 61
+		-- upvalues: p1 (copy)
+		p1:setState({
+			isVoiceMuted = p2
+		})
+		p1.props.onMuteCheckboxActivated(p2)
+	end
+	function p1.onBlockCheckboxActivated(p3) -- line: 69
+		-- upvalues: p1 (copy)
+		p1:setState({
+			isBlocked = p3
+		})
+		p1.props.onBlockCheckboxActivated(p3)
+	end
+	function p1.onDoneActivated() -- line: 77
+		-- upvalues: p1 (copy)
+		p1.props.onDoneActivated(p1.state.isBlocked, p1.state.isVoiceMuted)
+	end
+
+	p1:setState({
+		isVoiceMuted = p1.props.isVoiceMuted,
+		isBlocked = p1.props.isBlocked
+	})
+end
+function v8.render(p4) -- line: 87
+	-- upvalues: withFoundationOrUIBloxStyle (copy), Roact (copy), CheckboxRow (copy), TextButton (copy)
+	return withFoundationOrUIBloxStyle(function(p5) -- line: 88
+		return {
+			Theme = {
+				Divider = {
+					Color = p5.Color.Stroke.Emphasis.Color3,
+					Transparency = p5.Color.Stroke.Emphasis.Transparency
+				},
+				SystemPrimaryContent = {
+					Color = p5.Color.ActionSubEmphasis.Foreground.Color3,
+					Transparency = p5.Color.ActionSubEmphasis.Foreground.Transparency
+				},
+				TextDefault = {
+					Color = p5.Color.Content.Default.Color3,
+					Transparency = p5.Color.Content.Default.Transparency
+				},
+				TextEmphasis = {
+					Color = p5.Color.Content.Emphasis.Color3,
+					Transparency = p5.Color.Content.Emphasis.Transparency
+				}
+			},
+			Font = {
+				BaseSize = 1,
+				CaptionHeader = {
+					Font = p5.Typography.CaptionLarge.Font,
+					RelativeSize = p5.Typography.CaptionLarge.FontSize
+				},
+				Header1 = {
+					Font = p5.Typography.HeadingSmall.Font,
+					RelativeSize = p5.Typography.HeadingSmall.FontSize
+				}
+			}
+		}
+	end, function(p6) -- line: 120
+		-- upvalues: Roact (copy), p4 (copy), CheckboxRow (copy), TextButton (copy)
+		local BaseSize = p6.Font.BaseSize
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromScale(0.5, 0.5),
+			ZIndex = p4.props.ZIndex
+		}, {
+			uiScale = Roact.createElement("UIScale", {
+				Scale = p4.props.uiScale
+			}),
+			layout = Roact.createElement("UIListLayout", {
+				VerticalAlignment = Enum.VerticalAlignment.Top,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				Padding = UDim.new(0, 22),
+				FillDirection = Enum.FillDirection.Vertical,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			title = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Text = p4.props.titleText,
+				TextColor3 = p6.Theme.TextEmphasis.Color,
+				TextTransparency = p6.Theme.TextEmphasis.Transparency,
+				TextSize = p6.Font.Header1.RelativeSize * BaseSize,
+				Font = p6.Font.Header1.Font,
+				AutomaticSize = Enum.AutomaticSize.XY
+			}),
+			subtitle = Roact.createElement("TextLabel", {
+				TextWrapped = true,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.fromOffset(612, 0),
+				Text = p4.props.subtitleText,
+				TextColor3 = p6.Theme.TextEmphasis.Color,
+				TextTransparency = p6.Theme.TextEmphasis.Transparency,
+				TextSize = p6.Font.CaptionHeader.RelativeSize * BaseSize,
+				Font = p6.Font.CaptionHeader.Font,
+				AutomaticSize = Enum.AutomaticSize.Y
+			}),
+			actions = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.fromOffset(584, 0),
+				AutomaticSize = Enum.AutomaticSize.Y
+			}, {
+				layout = Roact.createElement("UIListLayout", {
+					VerticalAlignment = Enum.VerticalAlignment.Top,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+					Padding = UDim.new(0, 18),
+					FillDirection = Enum.FillDirection.Vertical,
+					SortOrder = Enum.SortOrder.LayoutOrder
+				}),
+				instruction = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					Size = UDim2.fromScale(1, 0),
+					Text = p4.props.instructionText,
+					TextColor3 = p6.Theme.TextDefault.Color,
+					TextTransparency = p6.Theme.TextDefault.Transparency,
+					TextSize = p6.Font.CaptionHeader.RelativeSize * BaseSize,
+					Font = p6.Font.CaptionHeader.Font,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					AutomaticSize = Enum.AutomaticSize.Y
+				}),
+				muteCheckbox = p4.props.showVoiceMuting and Roact.createElement(CheckboxRow, {
+					height = 28,
+					image = "icons/controls/microphone",
+					LayoutOrder = 2,
+					descriptionText = p4.props.muteText,
+					actionDisabled = p4.state.isBlocked,
+					checkboxSelected = p4.state.isBlocked or p4.state.isVoiceMuted,
+					onCheckboxActivated = p4.onMuteCheckboxActivated
+				}),
+				div = p4.props.showVoiceMuting and Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					LayoutOrder = 3,
+					Size = UDim2.new(1, 0, 0, 1),
+					BackgroundColor3 = p6.Theme.Divider.Color,
+					BackgroundTransparency = p6.Theme.Divider.Transparency
+				}),
+				blockCheckbox = Roact.createElement(CheckboxRow, {
+					height = 28,
+					image = "icons/actions/block",
+					LayoutOrder = 4,
+					descriptionText = p4.props.blockText,
+					checkboxSelected = p4.state.isBlocked,
+					onCheckboxActivated = p4.onBlockCheckboxActivated
+				}),
+				doneContainer = Roact.createElement("Frame", {
+					BorderSizePixel = 0,
+					LayoutOrder = 5,
+					BackgroundColor3 = p6.Theme.SystemPrimaryContent.Color,
+					BackgroundTransparency = p6.Theme.SystemPrimaryContent.Transparency,
+					Size = UDim2.new(1, 0, 0, 44)
+				}, {
+					uiCorner = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 4)
+					}),
+					doneButton = Roact.createElement(TextButton, {
+						size = UDim2.fromScale(1, 1),
+						text = p4.props.doneText,
+						onActivated = p4.onDoneActivated
+					})
+				})
+			})
+		})
+	end)
+end
+
+return v8

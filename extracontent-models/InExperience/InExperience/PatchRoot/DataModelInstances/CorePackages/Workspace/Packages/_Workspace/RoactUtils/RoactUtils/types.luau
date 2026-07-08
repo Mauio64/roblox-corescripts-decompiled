@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local _ = require(l_Parent_0.React);
-return nil;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+
+require(Parent.React)
+
+return nil

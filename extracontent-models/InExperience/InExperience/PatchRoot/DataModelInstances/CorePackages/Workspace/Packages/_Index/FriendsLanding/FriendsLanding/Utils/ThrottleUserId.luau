@@ -1,5 +1,6 @@
-return function(v0, v1) --[[ Line: 3 ]]
-    assert(type(v0) == "number", "throttle must be a number");
-    assert(type(v1) == "number", "userId must be a number");
-    return v1 % 100 + 1 <= v0;
-end;
+return function(p1, p2) -- line: 3
+	assert(type(p1) == "number", "throttle must be a number")
+	assert(type(p2) == "number", "userId must be a number")
+
+	return p1 >= p2 % 100 + 1
+end

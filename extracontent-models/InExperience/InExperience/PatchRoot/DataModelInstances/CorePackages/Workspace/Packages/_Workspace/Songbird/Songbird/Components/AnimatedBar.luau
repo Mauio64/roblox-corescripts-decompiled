@@ -1,63 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local v3 = require(l_script_FirstAncestor_0.Parent.ReactOtter);
-local v4 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local l_useCallback_0 = v2.useCallback;
-local l_useEffect_0 = v2.useEffect;
-local l_useTokens_0 = v4.Hooks.useTokens;
-local v8 = {
-    heightRange = NumberRange.new(0.3, 1), 
-    width = UDim.new(1, 0), 
-    isMoving = true, 
-    staticHeight = 0.5
-};
-local v9 = Random.new();
-return function(v10) --[[ Line: 34 ]] --[[ Name: AnimatedBar ]]
-    -- upvalues: v1 (copy), v8 (copy), l_useTokens_0 (copy), l_useCallback_0 (copy), v9 (copy), v3 (copy), l_useEffect_0 (copy), v2 (copy)
-    local v11 = v1.Dictionary.join(v8, v10);
-    local v12 = l_useTokens_0();
-    local v13 = l_useCallback_0(function() --[[ Line: 38 ]]
-        -- upvalues: v9 (ref), v11 (copy)
-        return v9:NextNumber(v11.heightRange.Min, v11.heightRange.Max);
-    end, {
-        v11.heightRange
-    });
-    local v14, v15 = v3.useAnimatedBinding(v13());
-    l_useEffect_0(function() --[[ Line: 44 ]]
-        -- upvalues: v11 (copy), v13 (copy), v15 (copy), v3 (ref)
-        local v16 = true;
-        task.spawn(function() --[[ Line: 47 ]]
-            -- upvalues: v16 (ref), v11 (ref), v13 (ref), v15 (ref), v3 (ref)
-            while v16 do
-                local v17 = if v11.isMoving then v13() else v11.staticHeight;
-                v15(v3.ease(v17, {
-                    easingStyle = Enum.EasingStyle.Linear, 
-                    duration = 0.25
-                }));
-                task.wait(0.25);
-            end;
-        end);
-        return function() --[[ Line: 60 ]]
-            -- upvalues: v16 (ref)
-            v16 = false;
-        end;
-    end, {
-        v15, 
-        v11.isMoving, 
-        v11.staticHeight
-    });
-    return v2.createElement("Frame", {
-        LayoutOrder = v11.layoutOrder, 
-        Size = v14:map(function(v18) --[[ Line: 67 ]]
-            -- upvalues: v11 (copy)
-            return UDim2.new(v11.width, UDim.new(v18, 0));
-        end), 
-        BorderSizePixel = 0, 
-        BackgroundColor3 = v12.Color.ActionSubEmphasis.Background.Color3
-    }, {
-        Corner = v2.createElement("UICorner", {
-            CornerRadius = UDim.new(0.5, 0)
-        })
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local Cryo = require(Songbird.Parent.Cryo)
+local React = require(Songbird.Parent.React)
+local ReactOtter = require(Songbird.Parent.ReactOtter)
+local Foundation = require(Songbird.Parent.Foundation)
+local useCallback = React.useCallback
+local useEffect = React.useEffect
+local useTokens = Foundation.Hooks.useTokens
+local t1 = {
+	isMoving = true,
+	staticHeight = 0.5,
+	heightRange = NumberRange.new(0.3, 1),
+	width = UDim.new(1, 0)
+}
+local random = Random.new()
+
+local function AnimatedBar(t2: {[any]: any}) -- line: 34
+	-- upvalues: Cryo (copy), t1 (copy), useTokens (copy), useCallback (copy), random (copy), ReactOtter (copy), useEffect (copy), React (copy)
+	local v13 = Cryo.Dictionary.join(t1, t2)
+	local v14 = useTokens()
+	local v15 = useCallback(function() -- line: 38
+		-- upvalues: random (copy), v13 (copy)
+		return random:NextNumber(v13.heightRange.Min, v13.heightRange.Max)
+	end, { v13.heightRange })
+	local v16, v17 = ReactOtter.useAnimatedBinding(v15())
+
+	useEffect(function() -- line: 44
+		-- upvalues: v13 (copy), v15 (copy), v17 (copy), ReactOtter (copy)
+		local u18 = true
+
+		task.spawn(function() -- line: 47
+			-- upvalues: u18 (ref), v13 (copy), v15 (copy), v17 (copy), ReactOtter (copy)
+			while u18 do
+				local v20 = if not v13.isMoving then v13.staticHeight else v15()
+
+				v17(ReactOtter.ease(v20, {
+					duration = 0.25,
+					easingStyle = Enum.EasingStyle.Linear
+				}))
+				task.wait(0.25)
+			end
+		end)
+
+		return function() -- line: 60
+			-- upvalues: u18 (ref)
+			u18 = false
+		end
+	end, {
+		v17,
+		v13.isMoving,
+		v13.staticHeight
+	})
+
+	return React.createElement("Frame", {
+		BorderSizePixel = 0,
+		LayoutOrder = v13.layoutOrder,
+		Size = v16:map(function(n1: number) -- line: 67
+			-- upvalues: v13 (copy)
+			return UDim2.new(v13.width, UDim.new(n1, 0))
+		end),
+		BackgroundColor3 = v14.Color.ActionSubEmphasis.Background.Color3
+	}, {
+		Corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0.5, 0)
+		})
+	})
+end
+
+return AnimatedBar

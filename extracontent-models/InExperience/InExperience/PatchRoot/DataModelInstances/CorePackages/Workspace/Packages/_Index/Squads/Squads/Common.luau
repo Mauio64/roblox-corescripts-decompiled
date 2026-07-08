@@ -1,3 +1,3 @@
 return {
-    ModelTypes = require(script.ModelTypes)
-};
+	ModelTypes = require(script.ModelTypes)
+}

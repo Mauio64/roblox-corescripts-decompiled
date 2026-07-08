@@ -1,227 +1,241 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v4.App.ImageSet.Images;
-local l_ImageSetLabel_0 = v4.Core.ImageSet.ImageSetLabel;
-local l_TooltipOrientation_0 = v4.App.Dialog.Enum.TooltipOrientation;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_IconWithTooltip_0 = require(l_Parent_0.AppBlox).IconWithTooltip;
-local v10 = require(l_Parent_0.Responsive);
-local l_usePreferredInput_0 = v10.usePreferredInput;
-local v12 = require(l_script_FirstAncestor_0.checkAndFormatPossibleLink);
-local _ = require(l_script_FirstAncestor_0.SeeAllButtonType_Legacy);
-local v14 = l_Images_0["icons/actions/truncationCollapse_small"];
-local v15 = l_Images_0["icons/actions/cycleRight"];
-local v16 = {
-    AutomaticSize = Enum.AutomaticSize.Y, 
-    Size = UDim2.new(1, 0, 0, 0), 
-    tooltipSupportsVR = true, 
-    tooltipSupportsTenFootUi = true
-};
-local function v22(v17) --[[ Line: 79 ]] --[[ Name: HeaderButton ]]
-    -- upvalues: l_useDesignTokens_0 (copy), v2 (copy), l_ImageSetLabel_0 (copy)
-    local v18 = l_useDesignTokens_0();
-    local l_Size_200_0 = v18.Global.Size_200;
-    local l_Emphasis_0 = v18.Semantic.Color.Text.Emphasis;
-    local l_image_0 = v17.image;
-    return v2.createElement(l_ImageSetLabel_0, {
-        Size = v17.Size or UDim2.new(0, l_Size_200_0, 0, l_Size_200_0), 
-        BackgroundTransparency = 1, 
-        Image = l_image_0, 
-        ImageColor3 = l_Emphasis_0.Color3, 
-        ImageTransparency = l_Emphasis_0.Transparency, 
-        LayoutOrder = v17.LayoutOrder, 
-        Rotation = v17.Rotation, 
-        AnchorPoint = v17.AnchorPoint, 
-        Position = v17.Position
-    });
-end;
-return v2.memo(function(v23) --[[ Line: 106 ]] --[[ Name: CollectionHeader ]]
-    -- upvalues: v3 (copy), v16 (copy), v2 (copy), l_usePreferredInput_0 (copy), l_useDesignTokens_0 (copy), v10 (copy), v12 (copy), v22 (copy), v15 (copy), v14 (copy), l_IconWithTooltip_0 (copy), l_TooltipOrientation_0 (copy)
-    local v24 = v3.Dictionary.join(v16, v23);
-    local v25, v26 = v2.useBinding(0);
-    local v28 = v2.useCallback(function(v27) --[[ Line: 110 ]]
-        -- upvalues: v26 (copy)
-        v26(v27.AbsoluteSize.X);
-    end, {});
-    local v29 = l_usePreferredInput_0();
-    local v30 = l_useDesignTokens_0();
-    local v31 = v24.titleTypography or v30.Semantic.Typography.Header;
-    local v32 = v24.titleColor or v30.Semantic.Color.Text.Emphasis;
-    local v33 = v24.subtitleTypography or v30.Semantic.Typography.CaptionBody;
-    local v34 = v24.subtitleTypography and v24.subtitleTypography.FontSize or 17.64 * v30.Global.Stroke_100;
-    local v35 = v24.subtitleColor or v30.Semantic.Color.Text.Default;
-    local l_Space_25_0 = v30.Global.Space_25;
-    local l_Space_150_0 = v30.Global.Space_150;
-    local v38 = not v24.hideButton and v29 ~= v10.Input.Directional and v24.onActivate and true or false;
-    local l_Size_350_0 = v30.Global.Size_350;
-    local l_Space_50_0 = v30.Global.Space_50;
-    local l_Size_250_0 = v30.Global.Size_250;
-    local v42 = v24.tooltipInfoText ~= nil;
-    local v43 = if v38 then l_Size_250_0 else 0;
-    local v44 = if v42 then l_Size_350_0 + l_Space_150_0 else 0;
-    local v45 = if v42 then v44 else 0;
-    local v46 = false;
-    if v24.subtitle ~= nil then
-        v46 = v24.subtitle ~= "";
-    end;
-    local v47, v48 = v12(v24.subtitle);
-    local v49 = if v24.onActivateSubtitle then v24.onActivateSubtitle else v24.onActivate;
-    if v24.onActivateSubtitle then
-        v47 = true;
-    end;
-    local l_Size_125_0 = v30.Global.Size_125;
-    local v51 = if v47 then l_Size_125_0 else 0;
-    local v52 = v47 and v49 ~= nil;
-    return v2.createElement("Frame", {
-        Position = v24.Position, 
-        AutomaticSize = v24.AutomaticSize, 
-        Size = v24.Size, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0, 
-        LayoutOrder = v24.LayoutOrder, 
-        ZIndex = v24.ZIndex, 
-        [v2.Change.AbsoluteSize] = v28
-    }, {
-        LeftContentFrame = v2.createElement(v38 and "TextButton" or "Frame", {
-            Text = v38 and "" or nil, 
-            Size = UDim2.new(1, -v45, 0, 0), 
-            AutomaticSize = Enum.AutomaticSize.Y, 
-            BackgroundTransparency = 1, 
-            AnchorPoint = v24.AnchorPoint, 
-            BorderSizePixel = 0, 
-            AutoButtonColor = not v38 and nil, 
-            [v2.Event.Activated] = if v38 then v24.onActivate else nil, 
-            Active = v38, 
-            Selectable = v38
-        }, {
-            UIListLayout = v2.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical, 
-                Padding = UDim.new(0, l_Space_25_0), 
-                HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            TitleContainer = v2.createElement("Frame", {
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                LayoutOrder = 1, 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0
-            }, {
-                UIListLayout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    Padding = UDim.new(0, l_Space_50_0), 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center
-                }), 
-                Title = if typeof(v24.title) == "string" then v2.createElement("TextLabel", {
-                    BackgroundTransparency = 1, 
-                    Text = v24.title, 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Size = UDim2.new(0, 0, 0, 0), 
-                    Font = v31.Font, 
-                    TextSize = v31.FontSize, 
-                    TextTransparency = v32.Transparency, 
-                    TextColor3 = v32.Color3, 
-                    TextWrapped = false, 
-                    TextTruncate = Enum.TextTruncate.SplitWord, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    LayoutOrder = 1
-                }, {
-                    UISizeConstraint = v2.createElement("UISizeConstraint", {
-                        MaxSize = v25:map(function(v53) --[[ Line: 228 ]]
-                            -- upvalues: v43 (copy), v44 (copy)
-                            local v54 = v53 - v43 - v44;
-                            if v54 > 0 then
-                                return Vector2.new(v54, 1e999);
-                            else
-                                return nil;
-                            end;
-                        end)
-                    })
-                }) else if typeof(v24.title) == "function" then v24.title() else nil, 
-                SeeAllButton = v38 and v2.createElement(v22, {
-                    LayoutOrder = 2, 
-                    Size = UDim2.fromOffset(l_Size_250_0, l_Size_250_0), 
-                    image = v15
-                }) or nil
-            }), 
-            SubtitleFrame = v46 and v2.createElement(v52 and "TextButton" or "Frame", {
-                LayoutOrder = 2, 
-                Text = v52 and "" or nil, 
-                Size = UDim2.new(1, 0, 0, 0), 
-                AutomaticSize = Enum.AutomaticSize.Y, 
-                BackgroundTransparency = 1, 
-                BorderSizePixel = 0, 
-                AutoButtonColor = not v52 and nil, 
-                [v2.Event.Activated] = if v52 then v49 else nil, 
-                Active = v52, 
-                Selectable = v52
-            }, {
-                UIListLayout = v2.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Horizontal, 
-                    Padding = UDim.new(0, v30.Global.Size_25), 
-                    HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-                    VerticalAlignment = Enum.VerticalAlignment.Center
-                }), 
-                Subtitle = v2.createElement("TextLabel", {
-                    LayoutOrder = 1, 
-                    BackgroundTransparency = 1, 
-                    Text = v48, 
-                    AutomaticSize = Enum.AutomaticSize.XY, 
-                    Size = UDim2.new(0, 0, 0, 0), 
-                    Font = v33.Font, 
-                    TextSize = v34, 
-                    TextTransparency = v32.Transparency, 
-                    TextColor3 = v35.Color3, 
-                    TextWrapped = false, 
-                    TextTruncate = Enum.TextTruncate.SplitWord, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    RichText = v47
-                }, {
-                    UISizeConstraint = v2.createElement("UISizeConstraint", {
-                        MaxSize = v25:map(function(v55) --[[ Line: 282 ]]
-                            -- upvalues: v51 (copy)
-                            local v56 = v55 - v51;
-                            if v56 > 0 then
-                                return Vector2.new(v56, 1e999);
-                            else
-                                return nil;
-                            end;
-                        end)
-                    })
-                }), 
-                SubtitleLinkArrow = not (not v47 or v38) and v2.createElement("Frame", {
-                    LayoutOrder = 2, 
-                    Size = UDim2.fromOffset(v51, v51), 
-                    BackgroundTransparency = 1, 
-                    ClipsDescendants = true
-                }, {
-                    Icon = v2.createElement(v22, {
-                        image = v14, 
-                        Size = UDim2.new(1, v30.Global.Size_25, 1, v30.Global.Size_25), 
-                        Rotation = 90, 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        AnchorPoint = Vector2.new(0.5, 0.5)
-                    })
-                }) or nil
-            }) or nil
-        }), 
-        IconWithTooltip = v42 and v2.createElement(l_IconWithTooltip_0, {
-            tooltipOrientation = l_TooltipOrientation_0.Bottom, 
-            hoverText = v24.tooltipInfoText, 
-            triggerPointName = "IconWithTooltip", 
-            onActivateTooltip = v24.onActivateInfoIcon, 
-            supportVR = v24.tooltipSupportsVR, 
-            supportTenFootUi = v24.tooltipSupportsTenFootUi, 
-            size = UDim2.new(0, l_Size_350_0, 0, l_Size_350_0), 
-            position = if v46 then UDim2.new(1, 0, 0, 0) else UDim2.new(1, 0, 0.5, 0), 
-            anchorPoint = if v46 then Vector2.new(1, 0) else Vector2.new(1, 0.5)
-        }) or nil
-    });
-end);
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local React = require(CollectionViewsParent.React)
+local Cryo = require(CollectionViewsParent.Cryo)
+local UIBlox = require(CollectionViewsParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local useDesignTokens = require(CollectionViewsParent.Style).useDesignTokens
+local IconWithTooltip = require(CollectionViewsParent.AppBlox).IconWithTooltip
+local Responsive = require(CollectionViewsParent.Responsive)
+local usePreferredInput = Responsive.usePreferredInput
+local checkAndFormatPossibleLink = require(CollectionViews.checkAndFormatPossibleLink)
+
+require(CollectionViews.SeeAllButtonType_Legacy)
+
+local SharedFlags = require(CollectionViewsParent.SharedFlags)
+local FFlagRenameDeprecatedUIBloxTokens = SharedFlags.FFlagRenameDeprecatedUIBloxTokens
+local FFlagLuaAppHideCarouselSubtitleChevron = SharedFlags.FFlagLuaAppHideCarouselSubtitleChevron
+local FFlagLuaAppSortHeaderAnchorTag = SharedFlags.FFlagLuaAppSortHeaderAnchorTag
+local v18 = Images["icons/actions/truncationCollapse_small"]
+local v19 = Images["icons/actions/cycleRight"]
+local t1 = {
+	tooltipSupportsVR = true,
+	tooltipSupportsTenFootUi = true,
+	AutomaticSize = Enum.AutomaticSize.Y,
+	Size = UDim2.new(1, 0, 0, 0)
+}
+
+local function HeaderButton(t2: {[any]: any}) -- line: 89
+	-- upvalues: useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), React (copy), ImageSetLabel (copy)
+	local v24 = useDesignTokens()
+	local v25 = if not FFlagRenameDeprecatedUIBloxTokens then v24.Global.Size_200 else v24.Size.Size_400
+	local v26 = if not FFlagRenameDeprecatedUIBloxTokens then v24.Semantic.Color.Text.Emphasis else v24.Color.Content.Emphasis
+	local image = t2.image
+
+	return React.createElement(ImageSetLabel, {
+		BackgroundTransparency = 1,
+		Size = t2.Size or UDim2.new(0, v25, 0, v25),
+		Image = image,
+		ImageColor3 = v26.Color3,
+		ImageTransparency = v26.Transparency,
+		LayoutOrder = t2.LayoutOrder,
+		Rotation = t2.Rotation,
+		AnchorPoint = t2.AnchorPoint,
+		Position = t2.Position
+	})
+end
+local function CollectionHeader(t3: {[any]: any}) -- line: 121
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), usePreferredInput (copy), useDesignTokens (copy), FFlagRenameDeprecatedUIBloxTokens (copy), Responsive (copy), checkAndFormatPossibleLink (copy), FFlagLuaAppHideCarouselSubtitleChevron (copy), FFlagLuaAppSortHeaderAnchorTag (copy), HeaderButton (copy), v19 (copy), v18 (copy), IconWithTooltip (copy), TooltipOrientation (copy)
+	local v29 = Cryo.Dictionary.join(t1, t3)
+	local v30, v31 = React.useBinding(0)
+	local v32 = React.useCallback(function(p1) -- line: 125
+		-- upvalues: v31 (copy)
+		v31(p1.AbsoluteSize.X)
+	end, {})
+	local v33 = usePreferredInput()
+	local v34 = useDesignTokens()
+	local v35 = v29.titleTypography or if not FFlagRenameDeprecatedUIBloxTokens then v34.Semantic.Typography.Header else v34.Typography.HeadingSmall
+	local v36 = v29.titleColor or if not FFlagRenameDeprecatedUIBloxTokens then v34.Semantic.Color.Text.Emphasis else v34.Color.Content.Emphasis
+	local v37 = v29.subtitleTypography or if not FFlagRenameDeprecatedUIBloxTokens then v34.Semantic.Typography.CaptionBody else v34.Typography.BodySmall
+	local v38 = v29.subtitleTypography and v29.subtitleTypography.FontSize or 17.64 * if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Stroke_100 else v34.Stroke.Standard
+	local v39 = v29.subtitleColor or if not FFlagRenameDeprecatedUIBloxTokens then v34.Semantic.Color.Text.Default else v34.Color.Content.Default
+	local v40 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Space_25 else v34.Size.Size_50
+	local v41 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Space_150 else v34.Size.Size_300
+	local v42 = not not (not v29.hideButton and v33 ~= Responsive.Input.Directional) and not not v29.onActivate
+	local v43 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_350 else v34.Size.Size_700
+	local v44 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Space_50 else v34.Size.Size_100
+	local v45 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_250 else v34.Size.Size_500
+	local v46 = v29.tooltipInfoText ~= nil
+	local v47 = not v42 and 0 or v45
+	local v48 = not v46 and 0 or v43 + v41
+	local v49 = not v46 and 0 or v48
+	local v50 = v29.subtitle ~= nil and v29.subtitle ~= ""
+	local v51, v52 = checkAndFormatPossibleLink(v29.subtitle)
+	local v53 = if not v29.onActivateSubtitle then v29.onActivate else v29.onActivateSubtitle
+
+	if v29.onActivateSubtitle then
+		v51 = true
+	end
+
+	local v54 = if not FFlagLuaAppHideCarouselSubtitleChevron then nil else v51 and (not v29.hideSubtitleChevron and not v42)
+	local v55 = if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_125 else v34.Size.Size_250
+	local v56 = not (if not FFlagLuaAppHideCarouselSubtitleChevron then v51 else v54) and 0 or v55
+	local v57 = v51 and v53 ~= nil
+
+	return React.createElement("Frame", {
+		Position = v29.Position,
+		AutomaticSize = v29.AutomaticSize,
+		Size = v29.Size,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		LayoutOrder = v29.LayoutOrder,
+		ZIndex = v29.ZIndex,
+		[React.Tag] = if not FFlagLuaAppSortHeaderAnchorTag then nil else v29.headerTag,
+		[React.Change.AbsoluteSize] = v32
+	}, {
+		LeftContentFrame = React.createElement(not v42 and "Frame" or "TextButton", {
+			Text = if not v42 then nil else "",
+			Size = UDim2.new(1, -v49, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			AnchorPoint = v29.AnchorPoint,
+			BorderSizePixel = 0,
+			AutoButtonColor = not v42 and nil,
+			[React.Event.Activated] = if not v42 then nil else v29.onActivate,
+			Active = v42,
+			Selectable = v42
+		}, {
+			UIListLayout = React.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical,
+				Padding = UDim.new(0, v40),
+				HorizontalAlignment = Enum.HorizontalAlignment.Left,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			TitleContainer = React.createElement("Frame", {
+				LayoutOrder = 1,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				AutomaticSize = Enum.AutomaticSize.Y,
+				Size = UDim2.new(1, 0, 0, 0)
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, v44),
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Center
+				}),
+				Title = if typeof(v29.title) ~= "string" then if typeof(v29.title) ~= "function" then nil else v29.title() else React.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					TextWrapped = false,
+					LayoutOrder = 1,
+					Text = v29.title,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Size = UDim2.new(0, 0, 0, 0),
+					Font = v35.Font,
+					TextSize = v35.FontSize,
+					TextTransparency = v36.Transparency,
+					TextColor3 = v36.Color3,
+					TextTruncate = Enum.TextTruncate.SplitWord,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}, {
+					UISizeConstraint = React.createElement("UISizeConstraint", {
+						MaxSize = v30:map(function(n1: number) -- line: 283
+							-- upvalues: v47 (copy), v48 (copy)
+							local v60 = n1 - v47 - v48
+
+							if v60 > 0 then
+								return Vector2.new(v60, 1e999)
+							end
+
+							return nil
+						end)
+					})
+				}),
+				SeeAllButton = v42 and React.createElement(HeaderButton, {
+					LayoutOrder = 2,
+					Size = UDim2.fromOffset(v45, v45),
+					image = v19
+				}) or nil
+			}),
+			SubtitleFrame = v50 and React.createElement(not v57 and "Frame" or "TextButton", {
+				LayoutOrder = 2,
+				Text = if not v57 then nil else "",
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				AutoButtonColor = not v57 and nil,
+				[React.Event.Activated] = if not v57 then nil else v53,
+				Active = v57,
+				Selectable = v57
+			}, {
+				UIListLayout = React.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					Padding = UDim.new(0, if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_25 else v34.Size.Size_50),
+					HorizontalAlignment = Enum.HorizontalAlignment.Left,
+					VerticalAlignment = Enum.VerticalAlignment.Center
+				}),
+				Subtitle = React.createElement("TextLabel", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					TextWrapped = false,
+					Text = v52,
+					AutomaticSize = Enum.AutomaticSize.XY,
+					Size = UDim2.new(0, 0, 0, 0),
+					Font = v37.Font,
+					TextSize = v38,
+					TextTransparency = v36.Transparency,
+					TextColor3 = v39.Color3,
+					TextTruncate = Enum.TextTruncate.SplitWord,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					RichText = v51
+				}, {
+					UISizeConstraint = React.createElement("UISizeConstraint", {
+						MaxSize = v30:map(function(n2: number) -- line: 342
+							-- upvalues: v56 (copy)
+							local v62 = n2 - v56
+
+							if v62 > 0 then
+								return Vector2.new(v62, 1e999)
+							end
+
+							return nil
+						end)
+					})
+				}),
+				SubtitleLinkArrow = ((if not FFlagLuaAppHideCarouselSubtitleChevron then v51 and not v42 else v54)) and React.createElement("Frame", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					ClipsDescendants = true,
+					Size = UDim2.fromOffset(v56, v56)
+				}, {
+					Icon = React.createElement(HeaderButton, {
+						Rotation = 90,
+						image = v18,
+						Size = UDim2.new(1, if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_25 else v34.Size.Size_50, 1, if not FFlagRenameDeprecatedUIBloxTokens then v34.Global.Size_25 else v34.Size.Size_50),
+						Position = UDim2.fromScale(0.5, 0.5),
+						AnchorPoint = Vector2.new(0.5, 0.5)
+					})
+				}) or nil
+			}) or nil
+		}),
+		IconWithTooltip = v46 and React.createElement(IconWithTooltip, {
+			triggerPointName = "IconWithTooltip",
+			tooltipOrientation = TooltipOrientation.Bottom,
+			hoverText = v29.tooltipInfoText,
+			onActivateTooltip = v29.onActivateInfoIcon,
+			supportVR = v29.tooltipSupportsVR,
+			supportTenFootUi = v29.tooltipSupportsTenFootUi,
+			size = UDim2.new(0, v43, 0, v43),
+			position = if not v50 then UDim2.new(1, 0, 0.5, 0) else UDim2.new(1, 0, 0, 0),
+			anchorPoint = if not v50 then Vector2.new(1, 0.5) else Vector2.new(1, 0)
+		}) or nil
+	})
+end
+
+return React.memo(CollectionHeader)

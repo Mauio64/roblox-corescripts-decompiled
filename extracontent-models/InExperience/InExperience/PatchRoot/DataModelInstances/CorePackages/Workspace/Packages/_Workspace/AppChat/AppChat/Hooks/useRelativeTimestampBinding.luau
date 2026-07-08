@@ -1,58 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-local v4 = require(l_script_FirstAncestor_0.Utils.getConversationTimestamp);
-local function v6(v5) --[[ Line: 10 ]] --[[ Name: computeTimestamp ]]
-    -- upvalues: v4 (copy), l_DateTime_0 (copy)
-    if v5 == nil then
-        return "";
-    else
-        return v4(l_DateTime_0.fromUnixTimestamp(v5));
-    end;
-end;
-return function(v7) --[[ Line: 17 ]] --[[ Name: useRelativeTimestampBinding ]]
-    -- upvalues: v2 (copy), v6 (copy)
-    local v8, v9 = v2.useBinding(v6(v7));
-    v2.useEffect(function() --[[ Line: 20 ]]
-        -- upvalues: v9 (copy), v6 (ref), v7 (copy)
-        v9(v6(v7));
-        if v7 == nil then
-            return function() --[[ Line: 24 ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local React = require(AppChatParent.React)
+local DateTime = require(AppChatParent.Time).DateTime
+local getConversationTimestamp = require(AppChat.Utils.getConversationTimestamp)
 
-            end;
-        else
-            local v10 = false;
-            local function v11() --[[ Line: 29 ]] --[[ Name: scheduleUpdate ]]
-                -- upvalues: v10 (ref), v9 (ref), v6 (ref), v7 (ref), v11 (copy)
-                task.delay(30, function() --[[ Line: 30 ]]
-                    -- upvalues: v10 (ref), v9 (ref), v6 (ref), v7 (ref), v11 (ref)
-                    if v10 then
-                        return;
-                    else
-                        v9(v6(v7));
-                        v11();
-                        return;
-                    end;
-                end);
-            end;
-            task.delay(30, function() --[[ Line: 30 ]]
-                -- upvalues: v10 (ref), v9 (ref), v6 (ref), v7 (ref), v11 (copy)
-                if v10 then
-                    return;
-                else
-                    v9(v6(v7));
-                    v11();
-                    return;
-                end;
-            end);
-            return function() --[[ Line: 41 ]]
-                -- upvalues: v10 (ref)
-                v10 = true;
-            end;
-        end;
-    end, {
-        v7
-    });
-    return v8;
-end;
+local function computeTimestamp(n1: number?) -- line: 10
+	-- upvalues: getConversationTimestamp (copy), DateTime (copy)
+	if n1 == nil then
+		return ""
+	end
+
+	return getConversationTimestamp(DateTime.fromUnixTimestamp(n1))
+end
+local function useRelativeTimestampBinding(n2: number?) -- line: 17
+	-- upvalues: React (copy), computeTimestamp (copy)
+	local v10, v11 = React.useBinding(computeTimestamp(n2))
+
+	React.useEffect(function() -- line: 20
+		-- upvalues: v11 (copy), computeTimestamp (copy), n2 (copy)
+		v11(computeTimestamp(n2))
+
+		if n2 == nil then
+			return function() -- line: 24
+			end
+		end
+
+		local u12 = false
+
+		local function scheduleUpdate() -- line: 29
+			-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
+			task.delay(30, function() -- line: 30
+				-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
+				if u12 then
+					return
+				end
+
+				v11(computeTimestamp(n2))
+				scheduleUpdate()
+			end)
+		end
+
+		task.delay(30, function() -- line: 30
+			-- upvalues: u12 (ref), v11 (copy), computeTimestamp (copy), n2 (copy), scheduleUpdate (copy)
+			if u12 then
+				return
+			end
+
+			v11(computeTimestamp(n2))
+			scheduleUpdate()
+		end)
+
+		return function() -- line: 41
+			-- upvalues: u12 (ref)
+			u12 = true
+		end
+	end, { n2 })
+
+	return v10
+end
+
+return useRelativeTimestampBinding

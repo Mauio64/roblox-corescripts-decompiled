@@ -1,7 +1,5 @@
-return function(v0, v1, v2) --[[ Line: 1 ]] --[[ Name: isPointWithinBounds ]]
-    local v3 = false;
-    if math.clamp(v0.X, v1.X, v1.X + v2.X) == v0.X then
-        v3 = math.clamp(v0.Y, v1.Y, v1.Y + v2.Y) == v0.Y;
-    end;
-    return v3;
-end;
+local function isPointWithinBounds(vector2: Vector2, vector2_2: Vector2, vector2_3: Vector2) -- line: 1
+	return math.clamp(vector2.X, vector2_2.X, vector2_2.X + vector2_3.X) == vector2.X and math.clamp(vector2.Y, vector2_2.Y, vector2_2.Y + vector2_3.Y) == vector2.Y
+end
+
+return isPointWithinBounds

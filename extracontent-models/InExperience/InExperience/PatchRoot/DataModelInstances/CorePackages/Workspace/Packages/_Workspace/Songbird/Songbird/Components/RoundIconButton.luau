@@ -1,21 +1,25 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.React);
-local v2 = require(l_script_FirstAncestor_0.Parent.Foundation);
-local l_useTokens_0 = v2.Hooks.useTokens;
-return function(v4) --[[ Line: 17 ]] --[[ Name: RoundIconButton ]]
-    -- upvalues: l_useTokens_0 (copy), v1 (copy), v2 (copy)
-    local v5 = l_useTokens_0();
-    return v1.createElement(v2.View, {
-        tag = "auto-xy bg-action-emphasis radius-circle padding-small", 
-        onActivated = v4.onActivated, 
-        aspectRatio = 1, 
-        LayoutOrder = v4.LayoutOrder
-    }, {
-        Icon = v1.createElement(v2.Icon, {
-            Position = v4.iconOffset, 
-            name = v4.icon, 
-            size = v2.Enums.IconSize.Medium, 
-            style = v5.Color.ActionEmphasis.Foreground
-        })
-    });
-end;
+local Songbird = script:FindFirstAncestor("Songbird")
+local React = require(Songbird.Parent.React)
+local Foundation = require(Songbird.Parent.Foundation)
+local useTokens = Foundation.Hooks.useTokens
+
+local function RoundIconButton(t1: {[any]: any}) -- line: 17
+	-- upvalues: useTokens (copy), React (copy), Foundation (copy)
+	local v7 = useTokens()
+
+	return React.createElement(Foundation.View, {
+		tag = "auto-xy bg-action-emphasis radius-circle padding-small",
+		aspectRatio = 1,
+		onActivated = t1.onActivated,
+		LayoutOrder = t1.LayoutOrder
+	}, {
+		Icon = React.createElement(Foundation.Icon, {
+			Position = t1.iconOffset,
+			name = t1.icon,
+			size = Foundation.Enums.IconSize.Medium,
+			style = v7.Color.ActionEmphasis.Foreground
+		})
+	})
+end
+
+return RoundIconButton

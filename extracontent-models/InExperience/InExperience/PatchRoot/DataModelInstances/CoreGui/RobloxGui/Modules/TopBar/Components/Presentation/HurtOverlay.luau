@@ -1,233 +1,262 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_StarterGui_0 = game:GetService("StarterGui");
-local v3 = require(l_CorePackages_0.Packages.Roact);
-local v4 = require(l_CorePackages_0.Packages.RoactRodux);
-local v5 = require(l_CorePackages_0.Packages.t);
-local v6 = require(l_CorePackages_0.Packages.Signals);
-local v7 = require(l_CorePackages_0.Packages.Otter);
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local v9 = require(l_CorePackages_0.Workspace.Packages.CachedPolicyService);
-local _ = l_RobloxGui_0:FindFirstChild("Modules"):FindFirstChild("Common");
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v12 = require(l_Parent_0.Constants);
-local v13 = require(l_CorePackages_0.Workspace.Packages.CoreGuiCommon);
-local l_FFlagTopBarSignalizeHealthBar_0 = v13.Flags.FFlagTopBarSignalizeHealthBar;
-local l_FFlagUseNewHurtOverlayImage_0 = v13.Flags.FFlagUseNewHurtOverlayImage;
-local l_FFlagUseNewHurtOverlayAnimation_0 = v13.Flags.FFlagUseNewHurtOverlayAnimation;
-local v17 = {
-    frequency = 0.75, 
-    dampingRatio = 1
-};
-local v18 = Color3.fromRGB(187, 0, 4);
-local v19 = Color3.new(1, 1, 1);
-local v20 = v3.PureComponent:extend("HurtOverlay");
-v20.validateProps = v5.strictInterface(if l_FFlagTopBarSignalizeHealthBar_0 then {} else {
-    healthEnabled = v5.boolean, 
-    health = v5.number, 
-    maxHealth = v5.number, 
-    isDead = v5.boolean
-});
-v20.init = function(v21) --[[ Line: 46 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), l_FFlagUseNewHurtOverlayAnimation_0 (copy), l_FFlagTopBarSignalizeHealthBar_0 (copy), v12 (copy), v7 (copy), v17 (copy), v13 (copy), v6 (copy), l_StarterGui_0 (copy)
-    local v22, v23 = v3.createBinding(0);
-    v21.animationBinding = v22;
-    v21.animationBindingUpdate = v23;
-    if not l_FFlagUseNewHurtOverlayAnimation_0 then
-        v21.positionBinding = v21.animationBinding:map(function(v24) --[[ Line: 51 ]]
-            return UDim2.new(-10 * v24, 0, -10 * v24, 0);
-        end);
-        v21.sizeBinding = v21.animationBinding:map(function(v25) --[[ Line: 54 ]]
-            return UDim2.new(1 + 19 * v25, 0, 1 + 19 * v25, 0);
-        end);
-    end;
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        v22, v23 = v3.createBinding(false);
-        v21.isAnimating = v22;
-        v21.setIsAnimating = v23;
-        v22, v23 = v3.createBinding(v12.InitialHealth);
-        v21.health = v22;
-        v21.setHealth = v23;
-        v22, v23 = v3.createBinding(v12.InitialHealth);
-        v21.maxHealth = v22;
-        v21.setMaxHealth = v23;
-        v22, v23 = v3.createBinding(false);
-        v21.isDead = v22;
-        v21.setIsDead = v23;
-        v21.prevHealth = v21.health:getValue();
-        v21.prevIsDead = v21.isDead:getValue();
-        v21.showHurtOverlay = v3.joinBindings({
-            v21.isAnimating, 
-            v21.health, 
-            v21.maxHealth, 
-            v21.isDead
-        }):map(function(v26) --[[ Line: 67 ]]
-            -- upvalues: v21 (copy), v12 (ref), l_FFlagUseNewHurtOverlayAnimation_0 (ref), v7 (ref), v17 (ref)
-            local v27 = v26[1];
-            local v28 = v26[2];
-            local v29 = v26[3];
-            local v30 = v26[4];
-            local l_prevHealth_0 = v21.prevHealth;
-            local l_prevIsDead_0 = v21.prevIsDead;
-            v21.prevHealth = v28;
-            v21.prevIsDead = v30;
-            if v28 < l_prevHealth_0 and (not v30 or not l_prevIsDead_0) and (l_prevHealth_0 - v28) / v29 >= v12.HealthPercentForOverlay then
-                if l_FFlagUseNewHurtOverlayAnimation_0 then
-                    v21.setIsAnimating(true);
-                    v21.motor:setGoal(v7.ease(0, {
-                        duration = 0.1
-                    }));
-                    v21.motor:start();
-                else
-                    v21.motor:setGoal(v7.instant(0));
-                    v21.motor:step(0);
-                    v21.motor:setGoal(v7.spring(1, v17));
-                    v21.motor:start();
-                    v21.setIsAnimating(true);
-                end;
-                return true;
-            else
-                return v27;
-            end;
-        end);
-        if v13.Stores.GetLocalHumanoidStore then
-            v21.localHumanoidStore = v13.Stores.GetLocalHumanoidStore(false);
-            v21.disposeHealthConnection = v6.createEffect(function(v33) --[[ Line: 104 ]]
-                -- upvalues: v21 (copy), v12 (ref)
-                local v34 = v21.localHumanoidStore.getHealthValue(v33);
-                v21.setHealth(v34.health or v12.InitialHealth);
-                v21.setMaxHealth(v34.maxHealth or v12.InitialHealth);
-                v21.setIsDead(v34.isDead);
-            end);
-        end;
-    else
-        v21.state = {
-            isAnimating = false
-        };
-    end;
-    v21.motor = v7.createSingleMotor(l_FFlagUseNewHurtOverlayAnimation_0 and 1 or 0);
-    v21.motor:onStep(function(v35) --[[ Line: 119 ]]
-        -- upvalues: v21 (copy)
-        v21.animationBindingUpdate(v35);
-    end);
-    v21.motor:onComplete(l_FFlagUseNewHurtOverlayAnimation_0 and function(v36) --[[ Line: 123 ]]
-        -- upvalues: v21 (copy), v7 (ref), l_FFlagTopBarSignalizeHealthBar_0 (ref)
-        if v36 == 0 then
-            v21.motor:setGoal(v7.ease(1, {
-                duration = 0.5
-            }));
-            v21.motor:start();
-            return;
-        else
-            if v36 == 1 then
-                if l_FFlagTopBarSignalizeHealthBar_0 then
-                    v21.setIsAnimating(false);
-                    return;
-                else
-                    v21:setState({
-                        isAnimating = false
-                    });
-                end;
-            end;
-            return;
-        end;
-    end or function() --[[ Line: 138 ]]
-        -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (ref), v21 (copy)
-        if l_FFlagTopBarSignalizeHealthBar_0 then
-            v21.setIsAnimating(false);
-            return;
-        else
-            v21:setState({
-                isAnimating = false
-            });
-            return;
-        end;
-    end);
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        v22 = function() --[[ Line: 149 ]] --[[ Name: getHealthEnabled ]]
-            -- upvalues: l_StarterGui_0 (ref)
-            return l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.Health);
-        end;
-        v21.coreGuiChangedSignalConn = l_StarterGui_0.CoreGuiChangedSignal:Connect(function(v37, v38) --[[ Line: 154 ]]
-            -- upvalues: v21 (copy)
-            if v37 == Enum.CoreGuiType.Health or v37 == Enum.CoreGuiType.All then
-                v21:setState({
-                    mountHurtOverlay = v38
-                });
-            end;
-        end);
-        v21:setState({
-            mountHurtOverlay = l_StarterGui_0:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
-        });
-    end;
-end;
-v20.renderOverlay = function(v39) --[[ Line: 168 ]] --[[ Name: renderOverlay ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy), l_FFlagUseNewHurtOverlayImage_0 (copy), v18 (copy), v9 (copy), v19 (copy), v3 (copy), l_FFlagUseNewHurtOverlayAnimation_0 (copy)
-    local v40 = nil;
-    if not l_FFlagTopBarSignalizeHealthBar_0 then
-        v40 = v39.props.healthEnabled and v39.state.isAnimating;
-    end;
-    local v41 = l_FFlagUseNewHurtOverlayImage_0 and "rbxasset://textures/ui/TopBar/HurtOverlayAsset.png" or "rbxasset://textures/ui/TopBar/WhiteOverlayAsset.png";
-    local l_v18_0 = v18;
-    if v9:IsSubjectToChinaPolicies() then
-        l_v18_0 = v19;
-    end;
-    return v3.createElement("ImageLabel", {
-        Visible = if l_FFlagTopBarSignalizeHealthBar_0 then v39.showHurtOverlay else v40, 
-        BackgroundTransparency = 1, 
-        Image = v41, 
-        ImageColor3 = l_v18_0, 
-        ImageTransparency = if l_FFlagUseNewHurtOverlayAnimation_0 then v39.animationBinding else nil, 
-        Size = if l_FFlagUseNewHurtOverlayAnimation_0 then UDim2.fromScale(1, 1) else v39.sizeBinding, 
-        AnchorPoint = if l_FFlagUseNewHurtOverlayAnimation_0 then Vector2.new(0.5, 0.5) else nil, 
-        Position = if l_FFlagUseNewHurtOverlayAnimation_0 then UDim2.fromScale(0.5, 0.5) else v39.positionBinding
-    });
-end;
-v20.render = function(v43) --[[ Line: 194 ]] --[[ Name: render ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy)
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        if v43.state.mountHurtOverlay then
-            return (v43:renderOverlay());
-        else
-            return nil;
-        end;
-    else
-        return v43:renderOverlay();
-    end;
-end;
-v20.didUpdate = function(v44, v45, _) --[[ Line: 202 ]] --[[ Name: didUpdate ]]
-    -- upvalues: l_FFlagTopBarSignalizeHealthBar_0 (copy), v12 (copy), v7 (copy), v17 (copy)
-    if l_FFlagTopBarSignalizeHealthBar_0 then
-        return;
-    else
-        if v44.props.health < v45.health and (not v44.props.isDead or not v45.isDead) and (v45.health - v44.props.health) / v44.props.maxHealth >= v12.HealthPercentForOverlay then
-            v44.motor:setGoal(v7.instant(0));
-            v44.motor:step(0);
-            v44.motor:setGoal(v7.spring(1, v17));
-            v44.motor:start();
-            v44:setState({
-                isAnimating = true
-            });
-        end;
-        return;
-    end;
-end;
-if l_FFlagTopBarSignalizeHealthBar_0 then
-    v20.onUnmount = function(v47) --[[ Line: 224 ]] --[[ Name: onUnmount ]]
-        v47.coreGuiChangedSignalConn:Disconnect();
-        v47.disposeHealthConnection();
-    end;
-end;
-local function v49(v48) --[[ Line: 230 ]] --[[ Name: mapStateToProps ]]
-    return {
-        health = v48.health.currentHealth, 
-        maxHealth = v48.health.maxHealth, 
-        isDead = v48.health.isDead, 
-        healthEnabled = v48.coreGuiEnabled[Enum.CoreGuiType.Health]
-    };
-end;
-if l_FFlagTopBarSignalizeHealthBar_0 then
-    return v20;
-else
-    return v4.UNSTABLE_connect2(v49, nil)(v20);
-end;
+local CorePackages = game:GetService("CorePackages")
+local CoreGui = game:GetService("CoreGui")
+local StarterGui = game:GetService("StarterGui")
+local Roact = require(CorePackages.Packages.Roact)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local t = require(CorePackages.Packages.t)
+local Signals = require(CorePackages.Packages.Signals)
+local Otter = require(CorePackages.Packages.Otter)
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local CachedPolicyService = require(CorePackages.Workspace.Packages.CachedPolicyService)
+
+RobloxGui:FindFirstChild("Modules"):FindFirstChild("Common")
+
+local ParentParent = script.Parent.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local CoreGuiCommon = require(CorePackages.Workspace.Packages.CoreGuiCommon)
+local FFlagTopBarSignalizeHealthBar = CoreGuiCommon.Flags.FFlagTopBarSignalizeHealthBar
+local FFlagUseNewHurtOverlayImage = CoreGuiCommon.Flags.FFlagUseNewHurtOverlayImage
+local FFlagUseNewHurtOverlayAnimation = CoreGuiCommon.Flags.FFlagUseNewHurtOverlayAnimation
+local t1 = {
+	frequency = 0.75,
+	dampingRatio = 1
+}
+local color3 = Color3.fromRGB(187, 0, 4)
+local color3_2 = Color3.new(1, 1, 1)
+local v20 = Roact.PureComponent:extend("HurtOverlay")
+
+v20.validateProps = t.strictInterface(if not FFlagTopBarSignalizeHealthBar then {
+	healthEnabled = t.boolean,
+	health = t.number,
+	maxHealth = t.number,
+	isDead = t.boolean
+} else {})
+
+function v20.init(p1) -- line: 46
+	-- upvalues: Roact (copy), FFlagUseNewHurtOverlayAnimation (copy), FFlagTopBarSignalizeHealthBar (copy), Constants (copy), Otter (copy), t1 (copy), CoreGuiCommon (copy), Signals (copy), StarterGui (copy)
+	local v23, v24 = Roact.createBinding(0)
+
+	p1.animationBinding = v23
+	p1.animationBindingUpdate = v24
+
+	if not FFlagUseNewHurtOverlayAnimation then
+		p1.positionBinding = p1.animationBinding:map(function(p2) -- line: 51
+			return UDim2.new(-10 * p2, 0, -10 * p2, 0)
+		end)
+		p1.sizeBinding = p1.animationBinding:map(function(p3) -- line: 54
+			return UDim2.new(1 + 19 * p3, 0, 1 + 19 * p3, 0)
+		end)
+	end
+
+	if FFlagTopBarSignalizeHealthBar then
+		local v25, v26 = Roact.createBinding(false)
+
+		p1.isAnimating = v25
+		p1.setIsAnimating = v26
+
+		local v27, v28 = Roact.createBinding(Constants.InitialHealth)
+
+		p1.health = v27
+		p1.setHealth = v28
+
+		local v29, v30 = Roact.createBinding(Constants.InitialHealth)
+
+		p1.maxHealth = v29
+		p1.setMaxHealth = v30
+
+		local v31, v32 = Roact.createBinding(false)
+
+		p1.isDead = v31
+		p1.setIsDead = v32
+		p1.prevHealth = p1.health:getValue()
+		p1.prevIsDead = p1.isDead:getValue()
+		p1.showHurtOverlay = Roact.joinBindings({
+			p1.isAnimating,
+			p1.health,
+			p1.maxHealth,
+			p1.isDead
+		}):map(function(p4) -- line: 67
+			-- upvalues: p1 (copy), Constants (copy), FFlagUseNewHurtOverlayAnimation (copy), Otter (copy), t1 (copy)
+			local v47 = p4[1]
+			local v48 = p4[2]
+			local v49 = p4[3]
+			local v50 = p4[4]
+			local prevHealth = p1.prevHealth
+			local prevIsDead = p1.prevIsDead
+
+			p1.prevHealth = v48
+			p1.prevIsDead = v50
+
+			if v48 < prevHealth and ((not v50 or not prevIsDead) and (prevHealth - v48) / v49 >= Constants.HealthPercentForOverlay) then
+				if FFlagUseNewHurtOverlayAnimation then
+					p1.setIsAnimating(true)
+					p1.motor:setGoal(Otter.ease(0, {
+						duration = 0.1
+					}))
+					p1.motor:start()
+				else
+					p1.motor:setGoal(Otter.instant(0))
+					p1.motor:step(0)
+					p1.motor:setGoal(Otter.spring(1, t1))
+					p1.motor:start()
+					p1.setIsAnimating(true)
+				end
+
+				return true
+			end
+
+			return v47
+		end)
+
+		if CoreGuiCommon.Stores.GetLocalHumanoidStore then
+			p1.localHumanoidStore = CoreGuiCommon.Stores.GetLocalHumanoidStore(false)
+			p1.disposeHealthConnection = Signals.createEffect(function(p5) -- line: 104
+				-- upvalues: p1 (copy), Constants (copy)
+				local v54 = p1.localHumanoidStore.getHealthValue(p5)
+
+				p1.setHealth(v54.health or Constants.InitialHealth)
+				p1.setMaxHealth(v54.maxHealth or Constants.InitialHealth)
+				p1.setIsDead(v54.isDead)
+			end)
+		end
+	else
+		p1.state = {
+			isAnimating = false
+		}
+	end
+
+	p1.motor = Otter.createSingleMotor(not FFlagUseNewHurtOverlayAnimation and 0 or 1)
+	p1.motor:onStep(function(p6) -- line: 119
+		-- upvalues: p1 (copy)
+		p1.animationBindingUpdate(p6)
+	end)
+	p1.motor:onComplete(not FFlagUseNewHurtOverlayAnimation and function() -- line: 138
+		-- upvalues: FFlagTopBarSignalizeHealthBar (copy), p1 (copy)
+		if FFlagTopBarSignalizeHealthBar then
+			p1.setIsAnimating(false)
+
+			return
+		end
+
+		p1:setState({
+			isAnimating = false
+		})
+	end or function(p7) -- line: 123
+		-- upvalues: p1 (copy), Otter (copy), FFlagTopBarSignalizeHealthBar (copy)
+		if p7 == 0 then
+			p1.motor:setGoal(Otter.ease(1, {
+				duration = 0.5
+			}))
+			p1.motor:start()
+
+			return
+		end
+
+		if p7 == 1 then
+			if FFlagTopBarSignalizeHealthBar then
+				p1.setIsAnimating(false)
+
+				return
+			end
+
+			p1:setState({
+				isAnimating = false
+			})
+		end
+	end)
+
+	if FFlagTopBarSignalizeHealthBar then
+		local function getHealthEnabled() -- line: 149
+			-- upvalues: StarterGui (copy)
+			return StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
+		end
+
+		p1.coreGuiChangedSignalConn = StarterGui.CoreGuiChangedSignal:Connect(function(p8, b1: boolean) -- line: 154
+			-- upvalues: p1 (copy)
+			if p8 == Enum.CoreGuiType.Health or p8 == Enum.CoreGuiType.All then
+				p1:setState({
+					mountHurtOverlay = b1
+				})
+			end
+		end)
+		p1:setState({
+			mountHurtOverlay = StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.Health)
+		})
+	end
+end
+function v20.renderOverlay(p9) -- line: 168
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy), FFlagUseNewHurtOverlayImage (copy), color3 (copy), CachedPolicyService (copy), color3_2 (copy), Roact (copy), FFlagUseNewHurtOverlayAnimation (copy)
+	local v35 = nil
+
+	if not FFlagTopBarSignalizeHealthBar then
+		v35 = p9.props.healthEnabled and p9.state.isAnimating
+	end
+
+	local v36 = not FFlagUseNewHurtOverlayImage and "rbxasset://textures/ui/TopBar/WhiteOverlayAsset.png" or "rbxasset://textures/ui/TopBar/HurtOverlayAsset.png"
+	local v37 = color3
+
+	if CachedPolicyService:IsSubjectToChinaPolicies() then
+		v37 = color3_2
+	end
+
+	return Roact.createElement("ImageLabel", {
+		BackgroundTransparency = 1,
+		Visible = if not FFlagTopBarSignalizeHealthBar then v35 else p9.showHurtOverlay,
+		Image = v36,
+		ImageColor3 = v37,
+		ImageTransparency = if not FFlagUseNewHurtOverlayAnimation then nil else p9.animationBinding,
+		Size = if not FFlagUseNewHurtOverlayAnimation then p9.sizeBinding else UDim2.fromScale(1, 1),
+		AnchorPoint = if not FFlagUseNewHurtOverlayAnimation then nil else Vector2.new(0.5, 0.5),
+		Position = if not FFlagUseNewHurtOverlayAnimation then p9.positionBinding else UDim2.fromScale(0.5, 0.5)
+	})
+end
+function v20.render(p10) -- line: 194
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy)
+	if FFlagTopBarSignalizeHealthBar then
+		if p10.state.mountHurtOverlay then
+			return (p10:renderOverlay())
+		end
+
+		return nil
+	end
+
+	return p10:renderOverlay()
+end
+function v20.didUpdate(p11, p12, _) -- line: 202
+	-- upvalues: FFlagTopBarSignalizeHealthBar (copy), Constants (copy), Otter (copy), t1 (copy)
+	if FFlagTopBarSignalizeHealthBar then
+		return
+	end
+
+	if p11.props.health < p12.health and ((not p11.props.isDead or not p12.isDead) and (p12.health - p11.props.health) / p11.props.maxHealth >= Constants.HealthPercentForOverlay) then
+		p11.motor:setGoal(Otter.instant(0))
+		p11.motor:step(0)
+		p11.motor:setGoal(Otter.spring(1, t1))
+		p11.motor:start()
+		p11:setState({
+			isAnimating = true
+		})
+	end
+end
+
+if FFlagTopBarSignalizeHealthBar then
+	function v20.onUnmount(p14) -- line: 224
+		p14.coreGuiChangedSignalConn:Disconnect()
+		p14.disposeHealthConnection()
+	end
+end
+
+local function mapStateToProps(p15) -- line: 230
+	return {
+		health = p15.health.currentHealth,
+		maxHealth = p15.health.maxHealth,
+		isDead = p15.health.isDead,
+		healthEnabled = p15.coreGuiEnabled[Enum.CoreGuiType.Health]
+	}
+end
+
+if FFlagTopBarSignalizeHealthBar then
+	return v20
+end
+
+return RoactRodux.UNSTABLE_connect2(mapStateToProps, nil)(v20)

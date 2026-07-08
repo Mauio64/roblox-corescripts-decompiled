@@ -1,54 +1,56 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CommercePurchaseApp");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useScreenSize_0 = require(l_Parent_0.EconomyCommonCoreScriptHooks).useScreenSize;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v5 = require(l_Parent_0.UIBlox);
-local l_Images_0 = v5.App.ImageSet.Images;
-local l_InteractiveAlert_0 = v5.App.Dialog.Alert.InteractiveAlert;
-local v8 = require(l_script_FirstAncestor_0.Enums.ErrorCodeEnum);
-local v9 = require(l_script_FirstAncestor_0.Flags.FFlagAddCommerceErrors);
-local v10 = {
-    [v8.NotPurchasable] = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
-};
-local v11 = {
-    [v8.NotPurchasable] = {
-        title = "CoreScripts.CommercePurchasePrompt.ProductNotAvailable", 
-        reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
-    }, 
-    [v8.DeviceNotSupported] = {
-        title = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Title.DeviceNotSupported", 
-        reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.DeviceNotSupported"
-    }, 
-    [v8.AccountNotSupported] = {
-        title = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Title.AccountNotSupported", 
-        reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.AccountNotSupported"
-    }
-};
-return function(v12) --[[ Line: 39 ]] --[[ Name: CommercePurchaseError ]]
-    -- upvalues: l_useScreenSize_0 (copy), l_useLocalization_0 (copy), v9 (copy), v11 (copy), v10 (copy), v2 (copy), l_InteractiveAlert_0 (copy), l_Images_0 (copy)
-    local v13 = l_useScreenSize_0();
-    local v14 = l_useLocalization_0({
-        title = if v9 then v11[v12.errorCode].title else "CoreScripts.CommercePurchasePrompt.ErrorPrompt.CantBuy", 
-        errorReason = if v9 then v11[v12.errorCode].reason else v10[v12.errorCode], 
-        dismissCTA = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.DismissCTA"
-    });
-    return v2.createElement(l_InteractiveAlert_0, {
-        title = v14.title, 
-        titleIcon = l_Images_0["icons/status/error_large"], 
-        bodyText = v14.errorReason, 
-        buttonStackInfo = {
-            buttons = {
-                {
-                    props = {
-                        onActivated = v12.onDismiss, 
-                        text = v14.dismissCTA
-                    }, 
-                    isDefaultChild = true
-                }
-            }
-        }, 
-        position = UDim2.fromScale(0.5, 0.5), 
-        screenSize = v13
-    });
-end;
+local CommercePurchaseApp = script:FindFirstAncestor("CommercePurchaseApp")
+local CommercePurchaseAppParent = CommercePurchaseApp.Parent
+local React = require(CommercePurchaseAppParent.React)
+local useScreenSize = require(CommercePurchaseAppParent.EconomyCommonCoreScriptHooks).useScreenSize
+local useLocalization = require(CommercePurchaseAppParent.Localization).Hooks.useLocalization
+local UIBlox = require(CommercePurchaseAppParent.UIBlox)
+local Images = UIBlox.App.ImageSet.Images
+local InteractiveAlert = UIBlox.App.Dialog.Alert.InteractiveAlert
+local ErrorCodeEnum = require(CommercePurchaseApp.Enums.ErrorCodeEnum)
+local FFlagAddCommerceErrors = require(CommercePurchaseApp.Flags.FFlagAddCommerceErrors)
+local t1 = {
+	[ErrorCodeEnum.NotPurchasable] = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
+}
+local t2 = {
+	[ErrorCodeEnum.NotPurchasable] = {
+		title = "CoreScripts.CommercePurchasePrompt.ProductNotAvailable",
+		reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.NotPurchasable"
+	},
+	[ErrorCodeEnum.DeviceNotSupported] = {
+		title = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Title.DeviceNotSupported",
+		reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.DeviceNotSupported"
+	},
+	[ErrorCodeEnum.AccountNotSupported] = {
+		title = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Title.AccountNotSupported",
+		reason = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.Body.AccountNotSupported"
+	}
+}
+
+local function CommercePurchaseError(t3: {[any]: any}) -- line: 39
+	-- upvalues: useScreenSize (copy), useLocalization (copy), FFlagAddCommerceErrors (copy), t2 (copy), t1 (copy), React (copy), InteractiveAlert (copy), Images (copy)
+	local v15 = useScreenSize()
+	local v16 = useLocalization({
+		dismissCTA = "CoreScripts.CommercePurchasePrompt.ErrorPrompt.DismissCTA",
+		title = not FFlagAddCommerceErrors and "CoreScripts.CommercePurchasePrompt.ErrorPrompt.CantBuy" or t2[t3.errorCode].title,
+		errorReason = if not FFlagAddCommerceErrors then t1[t3.errorCode] else t2[t3.errorCode].reason
+	})
+
+	return React.createElement(InteractiveAlert, {
+		title = v16.title,
+		titleIcon = Images["icons/status/error_large"],
+		bodyText = v16.errorReason,
+		buttonStackInfo = {
+			buttons = {{
+				isDefaultChild = true,
+				props = {
+					onActivated = t3.onDismiss,
+					text = v16.dismissCTA
+				}
+			}}
+		},
+		position = UDim2.fromScale(0.5, 0.5),
+		screenSize = v15
+	})
+end
+
+return CommercePurchaseError

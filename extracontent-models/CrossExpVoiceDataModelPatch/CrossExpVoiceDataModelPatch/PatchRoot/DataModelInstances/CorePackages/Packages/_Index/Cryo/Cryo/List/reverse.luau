@@ -1,9 +1,13 @@
-return function(v0) --[[ Line: 5 ]] --[[ Name: reverse ]]
-    local v1 = {};
-    local v2 = #v0;
-    local v3 = v2 + 1;
-    for v4 = 1, v2 do
-        v1[v4] = v0[v3 - v4];
-    end;
-    return v1;
-end;
+local function reverse(p1) -- line: 5
+	local t1 = {}
+	local v4 = #p1
+	local v5 = v4 + 1
+
+	for i = 1, v4 do
+		t1[i] = p1[v5 - i]
+	end
+
+	return t1
+end
+
+return reverse

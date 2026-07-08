@@ -1,58 +1,88 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Utility.Flags);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v6 = require(script.Parent.BaseMenuGroup);
-local v7 = require(script.Parent.BaseMenuItem);
-local function v8(v9) --[[ Line: 38 ]] --[[ Name: DeclarativeBaseMenuContent ]]
-    -- upvalues: v3 (copy), v2 (copy), v4 (copy), v6 (copy), v7 (copy), v8 (copy)
-    local v12 = v3.useMemo(function() --[[ Line: 39 ]]
-        -- upvalues: v2 (ref), v9 (copy), v4 (ref)
-        local v10 = v2.get(v9.items, {
-            1, 
-            "items"
-        });
-        local v11 = if v4.FoundationBaseMenuSubmenuSupport then v2.get(v9.items, {
-            1, 
-            "id"
-        }) else nil;
-        if v10 and not v11 then
-            return v9.items;
-        else
-            return {
-                {
-                    items = v9.items
-                }
-            };
-        end;
-    end, {
-        v9.items
-    });
-    return v3.createElement(v3.Fragment, nil, v2.map(v12, function(v13, v14) --[[ Line: 55 ]]
-        -- upvalues: v3 (ref), v6 (ref), v2 (ref), v7 (ref), v4 (ref), v8 (ref)
-        return v3.createElement(v6, {
-            key = v14, 
-            LayoutOrder = v14, 
-            title = v13.title
-        }, v2.map(v13.items, function(v15, v16) --[[ Line: 63 ]]
-            -- upvalues: v3 (ref), v7 (ref), v4 (ref), v8 (ref)
-            return v3.createElement(v7, {
-                LayoutOrder = v16, 
-                key = v15.id, 
-                icon = v15.icon, 
-                isChecked = v15.isChecked, 
-                isDisabled = v15.isDisabled, 
-                text = v15.text, 
-                onActivated = v15.onActivated, 
-                id = v15.id, 
-                testId = v15.items and "--foundation-menu-submenu-item" or "--foundation-menu-item", 
-                ref = v15.ref
-            }, if v4.FoundationBaseMenuSubmenuSupport and v15.items then v3.createElement(v8, {
-                items = v15.items
-            }) else nil);
-        end));
-    end));
-end;
-return v3.memo(v8);
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+
+require(Foundation.Components.Types)
+
+local Flags = require(Foundation.Utility.Flags)
+local BaseMenuGroup = require(script.Parent.BaseMenuGroup)
+local BaseMenuItem = require(script.Parent.BaseMenuItem)
+
+local function DeclarativeBaseMenuContent(t1: {[any]: any}) -- line: 44
+	-- upvalues: React (copy), Dash (copy), Flags (copy), BaseMenuGroup (copy), BaseMenuItem (copy), DeclarativeBaseMenuContent (copy)
+	local v10 = React.useMemo(function() -- line: 45
+		-- upvalues: Dash (copy), t1 (copy)
+		local v18 = Dash.get(t1.items, {
+			1,
+			"items"
+		})
+		local v19 = Dash.get(t1.items, {
+			1,
+			"id"
+		})
+
+		if v18 and not v19 then
+			return t1.items
+		end
+
+		return {{
+			items = t1.items
+		}}
+	end, { t1.items })
+	local t2 = {}
+	local u12 = false
+
+	if Flags.FoundationBaseMenuBeta then
+		for v13, v14 in v10 do
+			local v15 = false
+
+			for _, v17 in v14.items do
+				if not v15 and (v17.leading ~= nil or v17.icon ~= nil) then
+					v15 = true
+				end
+
+				if not u12 and v17.isChecked == true then
+					u12 = true
+				end
+			end
+
+			t2[v13] = v15
+		end
+	end
+
+	return React.createElement(React.Fragment, nil, Dash.map(v10, function(p1, n1: number) -- line: 78
+		-- upvalues: t2 (copy), React (copy), BaseMenuGroup (copy), Flags (copy), u12 (ref), Dash (copy), BaseMenuItem (copy), DeclarativeBaseMenuContent (copy)
+		local v22 = t2[n1]
+
+		return React.createElement(BaseMenuGroup, {
+			key = n1,
+			LayoutOrder = n1,
+			title = p1.title,
+			menuHasLeading = if not Flags.FoundationBaseMenuBeta then nil else v22,
+			menuHasCheck = if not Flags.FoundationBaseMenuBeta then nil else u12
+		}, Dash.map(p1.items, function(p2, p3) -- line: 89
+			-- upvalues: React (copy), BaseMenuItem (copy), Flags (copy), v22 (copy), u12 (ref), DeclarativeBaseMenuContent (copy)
+			return React.createElement(BaseMenuItem, {
+				LayoutOrder = p3,
+				key = p2.id,
+				icon = p2.icon,
+				leading = if not Flags.FoundationBaseMenuBeta then nil else p2.leading,
+				trailing = if not Flags.FoundationBaseMenuBeta then nil else p2.trailing,
+				isChecked = p2.isChecked,
+				isDisabled = p2.isDisabled,
+				text = p2.text,
+				onActivated = p2.onActivated,
+				id = p2.id,
+				testId = not p2.items and "--foundation-menu-item" or "--foundation-menu-submenu-item",
+				ref = p2.ref,
+				menuHasLeading = if not Flags.FoundationBaseMenuBeta then nil else v22,
+				menuHasCheck = if not Flags.FoundationBaseMenuBeta then nil else u12
+			}, if not p2.items then nil else React.createElement(DeclarativeBaseMenuContent, {
+				items = p2.items
+			}))
+		end))
+	end))
+end
+
+return React.memo(DeclarativeBaseMenuContent)

@@ -1,116 +1,122 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FocusNavigationUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.ArgCheck);
-local v3 = require(l_script_FirstAncestor_0.ButtonHoldStateEnum);
-local v4 = require(l_Parent_0.InputHandlers);
-local v5 = require(l_Parent_0.React);
-local function v11(v6, v7, v8) --[[ Line: 18 ]] --[[ Name: useFakeCancelHoldAfterBlur ]]
-    -- upvalues: v5 (copy)
-    local v9 = v5.useCallback(function() --[[ Line: 19 ]]
-        -- upvalues: v7 (copy), v8 (copy)
-        v7({
-            eventData = {
-                UserInputState = Enum.UserInputState.End
-            }
-        });
-        v8();
-    end, {
-        v7, 
-        v8
-    });
-    v5.useEffect(function() --[[ Line: 31 ]]
-        -- upvalues: v6 (copy), v9 (copy)
-        if v6 and v6:IsA("GuiObject") then
-            local v10 = v6.SelectionLost:Connect(v9);
-            return function() --[[ Line: 34 ]]
-                -- upvalues: v10 (copy)
-                v10:Disconnect();
-            end;
-        else
-            return function() --[[ Line: 38 ]]
+local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
+local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+local ArgCheck = require(FocusNavigationUtilsParent.ArgCheck)
+local ButtonHoldStateEnum = require(FocusNavigationUtils.ButtonHoldStateEnum)
+local InputHandlers = require(FocusNavigationUtilsParent.InputHandlers)
+local React = require(FocusNavigationUtilsParent.React)
 
-            end;
-        end;
-    end, {
-        v6, 
-        v9
-    });
-end;
-return function(v12, v13, v14) --[[ Line: 42 ]] --[[ Name: useButtonHold ]]
-    -- upvalues: v2 (copy), v5 (copy), v3 (copy), v4 (copy), v11 (copy)
-    v2.assert(v12 >= 0, "signalHoldIntentSeconds must be greater than or equal to 0");
-    v2.assert(v13 > 0, "signalHoldCompleteSeconds must be greater than 0");
-    v2.assert(v12 < v13, "signalHoldIntentSeconds should be less than signalHoldCompleteSeconds");
-    local v15, v16 = v5.useState(v3.NOT_HELD);
-    local v17 = v5.useRef(nil);
-    local v18, v19 = v5.useBinding(0);
-    local v20, v21 = v5.useState(nil);
-    local v22 = v5.useCallback(function() --[[ Line: 59 ]]
-        -- upvalues: v17 (copy), v16 (copy), v3 (ref)
-        v17.current = tick();
-        v16(v3.JUST_PRESSED);
-    end, {});
-    local v25 = v5.useCallback(function(_) --[[ Line: 64 ]]
-        -- upvalues: v2 (ref), v17 (copy), v19 (copy), v18 (copy), v12 (copy), v16 (copy), v3 (ref)
-        local v24 = tick();
-        v2.assert(v17.current ~= nil, "startTime.current should not be nil");
-        if v17.current then
-            v2.assert(v17.current <= v24, "startTime.current should be less than or equal to tick()");
-            v19(v24 - v17.current);
-        end;
-        if v18:getValue() >= v12 then
-            v16(v3.HOLDING);
-        end;
-    end, {
-        v18, 
-        v12
-    });
-    local v26 = v5.useCallback(function() --[[ Line: 79 ]]
-        -- upvalues: v19 (copy), v13 (copy), v17 (copy), v16 (copy), v3 (ref)
-        v19(v13);
-        v17.current = nil;
-        v16(v3.COMPLETED);
-    end, {
-        v13
-    });
-    local v27 = v5.useCallback(function() --[[ Line: 85 ]]
-        -- upvalues: v19 (copy), v17 (copy), v16 (copy), v3 (ref)
-        v19(0);
-        v17.current = nil;
-        v16(v3.NOT_HELD);
-    end, {});
-    local v28 = v5.useCallback(v4.handleInput({
-        hold = {
-            durationSeconds = v13, 
-            onStep = v25, 
-            onComplete = v26, 
-            allowReleaseAfterHold = v14
-        }, 
-        onPress = v22, 
-        onRelease = v27
-    }), {
-        v27, 
-        v25, 
-        v26, 
-        v13, 
-        v14
-    });
-    local v30 = v5.useCallback(function(v29) --[[ Line: 111 ]]
-        -- upvalues: v21 (copy), v28 (copy)
-        v21(v29.targetInstance);
-        v28(v29);
-    end, {
-        v28
-    });
-    v11(v20, v28, v27);
-    return {
-        eventHandler = v30, 
-        holdState = v15, 
-        holdTime = v18, 
-        holdProgress = v18:map(function(v31) --[[ Line: 122 ]]
-            -- upvalues: v13 (copy)
-            return v31 / v13;
-        end), 
-        cancelHold = v27
-    };
-end;
+local function useFakeCancelHoldAfterBlur(p1, p2, p3) -- line: 18
+	-- upvalues: React (copy)
+	local v12 = React.useCallback(function() -- line: 19
+		-- upvalues: p2 (copy), p3 (copy)
+		p2({
+			eventData = {
+				UserInputState = Enum.UserInputState.End
+			}
+		})
+		p3()
+	end, {
+		p2,
+		p3
+	})
+
+	React.useEffect(function() -- line: 31
+		-- upvalues: p1 (copy), v12 (copy)
+		if p1 and p1:IsA("GuiObject") then
+			local connection = p1.SelectionLost:Connect(v12)
+
+			return function() -- line: 34
+				-- upvalues: connection (copy)
+				connection:Disconnect()
+			end
+		end
+
+		return function() -- line: 38
+		end
+	end, {
+		p1,
+		v12
+	})
+end
+local function useButtonHold(n1: number, n2: number, b1: boolean?) -- line: 42
+	-- upvalues: ArgCheck (copy), React (copy), ButtonHoldStateEnum (copy), InputHandlers (copy), useFakeCancelHoldAfterBlur (copy)
+	ArgCheck.assert(n1 >= 0, "signalHoldIntentSeconds must be greater than or equal to 0")
+	ArgCheck.assert(n2 > 0, "signalHoldCompleteSeconds must be greater than 0")
+	ArgCheck.assert(n1 < n2, "signalHoldIntentSeconds should be less than signalHoldCompleteSeconds")
+
+	local v16, v17 = React.useState(ButtonHoldStateEnum.NOT_HELD)
+	local v18 = React.useRef(nil)
+	local v19, v20 = React.useBinding(0)
+	local v21, v22 = React.useState(nil)
+	local v23 = React.useCallback(function() -- line: 59
+		-- upvalues: v18 (copy), v17 (copy), ButtonHoldStateEnum (copy)
+		v18.current = tick()
+		v17(ButtonHoldStateEnum.JUST_PRESSED)
+	end, {})
+	local v24 = React.useCallback(function(_) -- line: 64
+		-- upvalues: ArgCheck (copy), v18 (copy), v20 (copy), v19 (copy), n1 (copy), v17 (copy), ButtonHoldStateEnum (copy)
+		local timestamp = tick()
+
+		ArgCheck.assert(v18.current ~= nil, "startTime.current should not be nil")
+
+		if v18.current then
+			ArgCheck.assert(timestamp >= v18.current, "startTime.current should be less than or equal to tick()")
+			v20(timestamp - v18.current)
+		end
+
+		if v19:getValue() >= n1 then
+			v17(ButtonHoldStateEnum.HOLDING)
+		end
+	end, {
+		v19,
+		n1
+	})
+	local v25 = React.useCallback(function() -- line: 79
+		-- upvalues: v20 (copy), n2 (copy), v18 (copy), v17 (copy), ButtonHoldStateEnum (copy)
+		v20(n2)
+		v18.current = nil
+		v17(ButtonHoldStateEnum.COMPLETED)
+	end, { n2 })
+	local v26 = React.useCallback(function() -- line: 85
+		-- upvalues: v20 (copy), v18 (copy), v17 (copy), ButtonHoldStateEnum (copy)
+		v20(0)
+		v18.current = nil
+		v17(ButtonHoldStateEnum.NOT_HELD)
+	end, {})
+	local v27 = React.useCallback(InputHandlers.handleInput({
+		hold = {
+			durationSeconds = n2,
+			onStep = v24,
+			onComplete = v25,
+			allowReleaseAfterHold = b1
+		},
+		onPress = v23,
+		onRelease = v26
+	}), {
+		v26,
+		v24,
+		v25,
+		n2,
+		b1
+	})
+	local v28 = React.useCallback(function(p5) -- line: 111
+		-- upvalues: v22 (copy), v27 (copy)
+		v22(p5.targetInstance)
+		v27(p5)
+	end, { v27 })
+
+	useFakeCancelHoldAfterBlur(v21, v27, v26)
+
+	return {
+		eventHandler = v28,
+		holdState = v16,
+		holdTime = v19,
+		holdProgress = v19:map(function(n3: number) -- line: 122
+			-- upvalues: n2 (copy)
+			return n3 / n2
+		end),
+		cancelHold = v26
+	}
+end
+
+return useButtonHold

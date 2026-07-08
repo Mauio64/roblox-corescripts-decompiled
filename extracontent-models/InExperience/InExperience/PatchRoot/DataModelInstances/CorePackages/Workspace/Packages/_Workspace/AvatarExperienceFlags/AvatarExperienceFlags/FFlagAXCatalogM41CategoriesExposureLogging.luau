@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXCatalogM41CategoriesExposureLogging", false);
+return game:DefineFastFlag("AXCatalogM41CategoriesExposureLogging", false)

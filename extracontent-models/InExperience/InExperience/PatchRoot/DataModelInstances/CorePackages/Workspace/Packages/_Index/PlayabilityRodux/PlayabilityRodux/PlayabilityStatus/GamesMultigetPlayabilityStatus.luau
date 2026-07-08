@@ -1,8 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("PlayabilityRodux").Parent;
-local l_Url_0 = require(l_Parent_0.Http).Url;
-return function(v2, v3) --[[ Line: 22 ]]
-    -- upvalues: l_Url_0 (copy)
-    assert(type(v3) == "table", "GamesMultigetPlayabilityStatus request expects universeId to be a table");
-    local v4 = table.concat(v3, ",");
-    return v2(string.format("%s/v1/games/multiget-playability-status?universeIds=%s", l_Url_0.GAME_URL, v4), "GET");
-end;
+local Parent = script:FindFirstAncestor("PlayabilityRodux").Parent
+local Url = require(Parent.Http).Url
+
+return function(p1, p2) -- line: 22
+	-- upvalues: Url (copy)
+	assert(type(p2) == "table", "GamesMultigetPlayabilityStatus request expects universeId to be a table")
+
+	local v5 = table.concat(p2, ",")
+
+	return p1(string.format("%s/v1/games/multiget-playability-status?universeIds=%s", Url.GAME_URL, v5), "GET")
+end

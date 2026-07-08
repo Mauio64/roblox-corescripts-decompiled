@@ -1,35 +1,41 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local l_CoreScriptsRootProvider_0 = require(l_Parent_1.CoreScriptsRoactCommon).CoreScriptsRootProvider;
-local v4 = require(l_Parent_1.React);
-local v5 = require(l_Parent_1.RoactCompat);
-local l_RoactNetworking_0 = require(l_Parent_1.RoactServiceTags).RoactNetworking;
-local l_RoactServices_0 = require(l_Parent_1.RoactServices).RoactServices;
-local v8 = require(l_Parent_0.SelfieConsentConnection);
-local l_requestInternalWrapper_0 = require(l_Parent_1.Http).NetworkLayers.requestInternalWrapper;
-local v10 = {};
-local function v14(v11, v12) --[[ Line: 18 ]]
-    -- upvalues: v4 (copy), l_CoreScriptsRootProvider_0 (copy), l_RoactServices_0 (copy), l_RoactNetworking_0 (copy), l_requestInternalWrapper_0 (copy), l_HttpService_0 (copy), v5 (copy)
-    local v13 = v4.createElement(l_CoreScriptsRootProvider_0, {}, {
-        RoactServicesProvider = v4.createElement(l_RoactServices_0.ServiceProvider, {
-            services = {
-                [l_RoactNetworking_0] = l_requestInternalWrapper_0(l_HttpService_0)
-            }
-        }, v12)
-    });
-    v13 = v4.createElement("Folder", nil, v13);
-    return v5.mount(v13, v11, "SelfieConsentRoot");
-end;
-v10.createDialog = function() --[[ Line: 30 ]] --[[ Name: createDialog ]]
-    -- upvalues: v14 (copy), v4 (copy), v8 (copy)
-    local v15 = {};
-    v15.mountCoreUI = function(v16) --[[ Line: 33 ]]
-        -- upvalues: v15 (copy), v14 (ref), v4 (ref), v8 (ref)
-        v15._coreUiHandle = v14(v16, {
-            SelfieConsent = v4.createElement(v8, {})
-        });
-    end;
-    return v15;
-end;
-return v10;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local HttpService = game:GetService("HttpService")
+local CoreScriptsRootProvider = require(scriptParentParent.CoreScriptsRoactCommon).CoreScriptsRootProvider
+local React = require(scriptParentParent.React)
+local RoactCompat = require(scriptParentParent.RoactCompat)
+local RoactNetworking = require(scriptParentParent.RoactServiceTags).RoactNetworking
+local RoactServices = require(scriptParentParent.RoactServices).RoactServices
+local SelfieConsentConnection = require(scriptParent.SelfieConsentConnection)
+local requestInternalWrapper = require(scriptParentParent.Http).NetworkLayers.requestInternalWrapper
+local t1 = {}
+
+local function v12(p1, t2: {[any]: any}) -- line: 18
+	-- upvalues: React (copy), CoreScriptsRootProvider (copy), RoactServices (copy), RoactNetworking (copy), requestInternalWrapper (copy), HttpService (copy), RoactCompat (copy)
+	local v15 = React.createElement(CoreScriptsRootProvider, {}, {
+		RoactServicesProvider = React.createElement(RoactServices.ServiceProvider, {
+			services = {
+				[RoactNetworking] = requestInternalWrapper(HttpService)
+			}
+		}, t2)
+	})
+	local v16 = React.createElement("Folder", nil, v15)
+
+	return RoactCompat.mount(v16, p1, "SelfieConsentRoot")
+end
+
+function t1.createDialog() -- line: 30
+	-- upvalues: v12 (copy), React (copy), SelfieConsentConnection (copy)
+	local t3 = {}
+
+	function t3.mountCoreUI(p2) -- line: 33
+		-- upvalues: t3 (copy), v12 (copy), React (copy), SelfieConsentConnection (copy)
+		t3._coreUiHandle = v12(p2, {
+			SelfieConsent = React.createElement(SelfieConsentConnection, {})
+		})
+	end
+
+	return t3
+end
+
+return t1

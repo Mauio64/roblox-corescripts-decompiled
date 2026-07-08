@@ -1,3 +1,3 @@
 return {
-    PostPhoneUpsellDisplayed = require(script.PostPhoneUpsellDisplayed)
-};
+	PostPhoneUpsellDisplayed = require(script.PostPhoneUpsellDisplayed)
+}

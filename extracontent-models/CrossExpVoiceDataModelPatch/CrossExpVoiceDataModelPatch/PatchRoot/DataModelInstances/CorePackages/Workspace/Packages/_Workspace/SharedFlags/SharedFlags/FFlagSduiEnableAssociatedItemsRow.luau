@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SduiEnableAssociatedItemsRow", false);
+return game:DefineFastFlag("SduiEnableAssociatedItemsRow", false)

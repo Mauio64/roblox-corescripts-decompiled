@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ShowConfirmationScreenForOOAP2", false);
+return game:DefineFastFlag("ShowConfirmationScreenForOOAP2", false)

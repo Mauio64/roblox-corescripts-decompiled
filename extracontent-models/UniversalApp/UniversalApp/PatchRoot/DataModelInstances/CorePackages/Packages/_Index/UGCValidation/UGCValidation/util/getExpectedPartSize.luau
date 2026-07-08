@@ -1,61 +1,69 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.util.getEditableMeshFromContext);
-local v3 = require(l_Parent_0.util.getMeshSize);
-local v4 = require(l_Parent_0.util.pcallDeferred);
-return function(v5, v6, v7) --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), v4 (copy), v3 (copy)
-    if not v6.bypassFlags or not v6.bypassFlags.skipPhysicsDataReset then
-        if v7 then
-            return v5.MeshSize;
-        else
-            return v5.Size;
-        end;
-    else
-        if not v6.partSizes then
-            v6.partSizes = {};
-        end;
-        if v6.partSizes[v5] then
-            return v6.partSizes[v5];
-        else
-            local v8 = {
-                fullName = v5:GetFullName(), 
-                fieldName = "MeshId", 
-                contentId = v5.MeshId, 
-                context = v5.Name
-            };
-            local v9, v10 = v2(v5, "MeshId", v6);
-            if not v9 then
-                if v7 then
-                    return v5.MeshSize;
-                else
-                    return v5.Size;
-                end;
-            else
-                v8.editableMesh = v10;
-                if v6.editableMeshes[v5].MeshId.created then
-                    if v7 then
-                        return v5.MeshSize;
-                    else
-                        return v5.Size;
-                    end;
-                else
-                    local v11, v12 = v4(function() --[[ Line: 40 ]]
-                        -- upvalues: v3 (ref), v8 (copy)
-                        return v3(v8);
-                    end, v6);
-                    if not v11 then
-                        if v7 then
-                            return v5.MeshSize;
-                        else
-                            return v5.Size;
-                        end;
-                    else
-                        v6.partSizes[v5] = v12;
-                        return v12;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
+local getMeshSize = require(ParentParent.util.getMeshSize)
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+
+return function(p1, p2, b1: boolean?) -- line: 8
+	-- upvalues: getEditableMeshFromContext (copy), pcallDeferred (copy), getMeshSize (copy)
+	if not p2.bypassFlags or not p2.bypassFlags.skipPhysicsDataReset then
+		if b1 then
+			return p1.MeshSize
+		end
+
+		return p1.Size
+	end
+
+	if not p2.partSizes then
+		p2.partSizes = {}
+	end
+
+	if p2.partSizes[p1] then
+		return p2.partSizes[p1]
+	end
+
+	local t1 = {
+		fieldName = "MeshId",
+		fullName = p1:GetFullName(),
+		contentId = p1.MeshId,
+		context = p1.Name
+	}
+	local v9, v10 = getEditableMeshFromContext(p1, "MeshId", p2)
+
+	if not v9 then
+		if b1 then
+			return p1.MeshSize
+		end
+
+		return p1.Size
+	end
+
+	t1.editableMesh = v10
+
+	if p2.editableMeshes[p1].MeshId.created then
+		if b1 then
+			return p1.MeshSize
+		end
+
+		return p1.Size
+	end
+
+	local v11, v12 = pcallDeferred(function() -- line: 40
+		-- upvalues: getMeshSize (copy), t1 (copy)
+		return getMeshSize(t1)
+	end, p2)
+
+	if not v11 then
+		if b1 then
+			return p1.MeshSize
+		end
+
+		return p1.Size
+	end
+
+	p2.partSizes[p1] = v12
+
+	return v12
+end

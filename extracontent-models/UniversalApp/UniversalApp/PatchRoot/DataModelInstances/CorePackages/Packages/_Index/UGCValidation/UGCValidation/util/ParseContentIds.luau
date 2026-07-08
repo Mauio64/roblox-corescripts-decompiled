@@ -1,204 +1,234 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Constants);
-local v2 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local v3 = {};
-local function _(v4) --[[ Line: 16 ]] --[[ Name: getRbxAssetId ]]
-    return (string.match(v4, "^rbxassetid://(%d+)$"));
-end;
-local function v7(v6) --[[ Line: 22 ]] --[[ Name: getAssetUrlId ]]
-    v6 = string.match(v6, "^https?://www%.(.+)") or string.match(v6, "^https?://(.+)");
-    if not v6 then
-        return nil;
-    else
-        v6 = string.match(v6, "^sitetest%d%.robloxlabs(.+)") or string.match(v6, "^roblox(.+)");
-        if not v6 then
-            return nil;
-        else
-            return (string.match(v6, "^%.com//?asset/%?id=(%d+)$"));
-        end;
-    end;
-end;
-local function v9(v8) --[[ Line: 37 ]] --[[ Name: getAssetDeliveryAssetUrlId ]]
-    v8 = string.match(v8, "^https?://assetdelivery%.(.+)");
-    if not v8 then
-        return nil;
-    else
-        v8 = string.match(v8, "^sitetest%d%.robloxlabs(.+)") or string.match(v8, "^roblox(.+)");
-        if not v8 then
-            return nil;
-        else
-            return (string.match(v8, "^%.com/v1/asset/%?id=(%d+)$"));
-        end;
-    end;
-end;
-local function _(v10) --[[ Line: 51 ]] --[[ Name: tryGetAssetIdFromContentIdInternal ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v11 = tonumber(v10);
-    if v11 ~= nil then
-        return v11;
-    else
-        v11 = string.match(v10, "^rbxassetid://(%d+)$");
-        if v11 ~= nil then
-            return v11;
-        else
-            v11 = v7(v10);
-            if v11 ~= nil then
-                return v11;
-            else
-                v11 = v9(v10);
-                if v11 ~= nil then
-                    return v11;
-                else
-                    return nil;
-                end;
-            end;
-        end;
-    end;
-end;
-local function _(v13, v14, v15) --[[ Line: 75 ]] --[[ Name: hasInExpCreatedEditableInstance ]]
-    if not v15 then
-        return false;
-    elseif not v15.allowEditableInstances then
-        return false;
-    else
-        local v16 = v15.editableImages[v13];
-        if v16 and v16[v14] and v16[v14].instance then
-            return true;
-        else
-            local v17 = v15.editableMeshes[v13];
-            if v17 and v17[v14] and v17[v14].instance then
-                return true;
-            else
-                return false;
-            end;
-        end;
-    end;
-end;
-local function v32(v19, v20, v21, v22, v23, v24, v25) --[[ Line: 105 ]] --[[ Name: parseContentId ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v26 = v22[v23];
-    if v26 == "" then
-        local v27;
-        if not v25 then
-            v27 = false;
-        elseif not v25.allowEditableInstances then
-            v27 = false;
-        else
-            local v28 = v25.editableImages[v22];
-            if v28 and v28[v23] and v28[v23].instance then
-                v27 = true;
-            else
-                local v29 = v25.editableMeshes[v22];
-                v27 = v29 and v29[v23] and v29[v23].instance and true or false;
-            end;
-        end;
-        if v27 then
-            if v21 then
-                table.insert(v21, {
-                    fieldName = v23, 
-                    instance = v22
-                });
-            end;
-        elseif v24 then
-            return false, {
-                string.format("%s.%s cannot be empty", v22:GetFullName(), v23)
-            };
-        end;
-        return true;
-    else
-        local v30 = tonumber(v26);
-        local v31;
-        if v30 ~= nil then
-            v31 = v30;
-        else
-            v30 = string.match(v26, "^rbxassetid://(%d+)$");
-            if v30 ~= nil then
-                v31 = v30;
-            else
-                v30 = v7(v26);
-                if v30 ~= nil then
-                    v31 = v30;
-                else
-                    v30 = v9(v26);
-                    v31 = if v30 ~= nil then v30 else nil;
-                end;
-            end;
-        end;
-        if v31 == nil then
-            return false, {
-                string.format("Could not parse ContentId %s in %s.%s. Please make sure you are using a valid URL with a valid ID.", v26, v22:GetFullName(), v23)
-            };
-        else
-            if v20[v31] == nil then
-                v20[v31] = {
-                    fieldName = v23, 
-                    instance = v22
-                };
-                table.insert(v19, v31);
-            end;
-            if v21 then
-                table.insert(v21, {
-                    fieldName = v23, 
-                    instance = v22, 
-                    id = v31
-                });
-            end;
-            return true;
-        end;
-    end;
-end;
-local function v49(v33, v34, v35, v36, v37, v38, v39) --[[ Line: 150 ]] --[[ Name: parseWithErrorCheckInternal ]]
-    -- upvalues: v1 (copy), v2 (copy), v32 (copy)
-    v37 = v37 or v1.CONTENT_ID_FIELDS;
-    local v40 = v2.new();
-    local l_v36_Descendants_0 = v36:GetDescendants();
-    table.insert(l_v36_Descendants_0, v36);
-    for _, v43 in pairs(l_v36_Descendants_0) do
-        local v44 = v37[v43.ClassName];
-        if v44 then
-            local v45 = v38 and v38[v43.ClassName];
-            for _, v47 in ipairs(v44) do
-                local v48 = v45 and v45[v47];
-                v40:updateReasons(v32(v33, v34, v35, v43, v47, v48, v39));
-            end;
-        end;
-    end;
-    return v40:getFinalResults();
-end;
-v3.tryGetAssetIdFromContentId = function(v50) --[[ Line: 189 ]] --[[ Name: tryGetAssetIdFromContentId ]]
-    -- upvalues: v7 (copy), v9 (copy)
-    local v51 = tonumber(v50);
-    if v51 ~= nil then
-        return v51;
-    else
-        v51 = string.match(v50, "^rbxassetid://(%d+)$");
-        if v51 ~= nil then
-            return v51;
-        else
-            v51 = v7(v50);
-            if v51 ~= nil then
-                return v51;
-            else
-                v51 = v9(v50);
-                if v51 ~= nil then
-                    return v51;
-                else
-                    return nil;
-                end;
-            end;
-        end;
-    end;
-end;
-v3.parseWithErrorCheck = function(v52, v53, v54, v55, v56, v57) --[[ Line: 193 ]] --[[ Name: parseWithErrorCheck ]]
-    -- upvalues: v49 (copy)
-    return v49(v52, v53, nil, v54, v55, v56, v57);
-end;
-v3.parse = function(v58, v59, v60) --[[ Line: 212 ]] --[[ Name: parse ]]
-    -- upvalues: v49 (copy)
-    local v61 = {};
-    local v62 = {};
-    local v63 = {};
-    assert((v49(v62, v61, v63, v58, v59, nil, v60)));
-    return v63;
-end;
-return v3;
+local ParentParent = script.Parent.Parent
+local Constants = require(ParentParent.Constants)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+local t1 = {}
+
+local function getRbxAssetId(p1) -- line: 16
+	return (string.match(p1, "^rbxassetid://(%d+)$"))
+end
+local function getAssetUrlId(p2) -- line: 22
+	local v14 = string.match(p2, "^https?://www%.(.+)") or string.match(p2, "^https?://(.+)")
+
+	if not v14 then
+		return nil
+	end
+
+	local v15 = string.match(v14, "^sitetest%d%.robloxlabs(.+)") or string.match(v14, "^roblox(.+)")
+
+	if not v15 then
+		return nil
+	end
+
+	return (string.match(v15, "^%.com//?asset/%?id=(%d+)$"))
+end
+local function getAssetDeliveryAssetUrlId(p3) -- line: 37
+	local match = string.match(p3, "^https?://assetdelivery%.(.+)")
+
+	if not match then
+		return nil
+	end
+
+	local v18 = string.match(match, "^sitetest%d%.robloxlabs(.+)") or string.match(match, "^roblox(.+)")
+
+	if not v18 then
+		return nil
+	end
+
+	return (string.match(v18, "^%.com/v1/asset/%?id=(%d+)$"))
+end
+local function tryGetAssetIdFromContentIdInternal(p4) -- line: 51
+	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
+	local num = tonumber(p4)
+
+	if num ~= nil then
+		return num
+	end
+
+	local match = string.match(p4, "^rbxassetid://(%d+)$")
+
+	if match ~= nil then
+		return match
+	end
+
+	local v22 = getAssetUrlId(p4)
+
+	if v22 ~= nil then
+		return v22
+	end
+
+	local v23 = getAssetDeliveryAssetUrlId(p4)
+
+	if v23 ~= nil then
+		return v23
+	end
+
+	return nil
+end
+local function hasInExpCreatedEditableInstance(p5, p6, p7) -- line: 75
+	if not p7 then
+		return false
+	end
+
+	if not p7.allowEditableInstances then
+		return false
+	end
+
+	local v27 = p7.editableImages[p5]
+
+	if v27 and v27[p6] and v27[p6].instance then
+		return true
+	end
+
+	local v28 = p7.editableMeshes[p5]
+
+	if v28 and v28[p6] and v28[p6].instance then
+		return true
+	end
+
+	return false
+end
+local function parseContentId(p8, p9, p10, p11, p12, p13, p14) -- line: 105
+	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
+	local v36 = p11[p12]
+
+	if v36 == "" then
+		local v37
+
+		if not p14 then
+			v37 = false
+		elseif not p14.allowEditableInstances then
+			v37 = false
+		else
+			local v38 = p14.editableImages[p11]
+
+			if v38 and v38[p12] and v38[p12].instance then
+				v37 = true
+			else
+				local v39 = p14.editableMeshes[p11]
+
+				v37 = not not v39 and (not not v39[p12] and not not v39[p12].instance)
+			end
+		end
+
+		if v37 then
+			if p10 then
+				table.insert(p10, {
+					fieldName = p12,
+					instance = p11
+				})
+			end
+		elseif p13 then
+			return false, { string.format("%s.%s cannot be empty", p11:GetFullName(), p12) }
+		end
+
+		return true
+	end
+
+	local num = tonumber(v36)
+
+	if num ~= nil then
+	else
+		num = string.match(v36, "^rbxassetid://(%d+)$")
+
+		if num ~= nil then
+		else
+			num = getAssetUrlId(v36)
+
+			if num ~= nil then
+			else
+				local v41 = getAssetDeliveryAssetUrlId(v36)
+
+				num = if v41 == nil then nil else v41
+			end
+		end
+	end
+
+	if num == nil then
+		return false, { string.format("Could not parse ContentId %s in %s.%s. Please make sure you are using a valid URL with a valid ID.", v36, p11:GetFullName(), p12) }
+	end
+
+	if p9[num] == nil then
+		p9[num] = {
+			fieldName = p12,
+			instance = p11
+		}
+		table.insert(p8, num)
+	end
+
+	if p10 then
+		table.insert(p10, {
+			fieldName = p12,
+			instance = p11,
+			id = num
+		})
+	end
+
+	return true
+end
+local function parseWithErrorCheckInternal(p15, p16, p17, p18, p19, p20, p21) -- line: 150
+	-- upvalues: Constants (copy), FailureReasonsAccumulator (copy), parseContentId (copy)
+	local v49 = p19 or Constants.CONTENT_ID_FIELDS
+	local v50 = FailureReasonsAccumulator.new()
+	local descendants = p18:GetDescendants()
+
+	table.insert(descendants, p18)
+
+	for _, v in pairs(descendants) do
+		local v54 = v49[v.ClassName]
+
+		if v54 then
+			local v55 = p20 and p20[v.ClassName]
+
+			for _, v2 in ipairs(v54) do
+				local v58 = v55 and v55[v2]
+
+				v50:updateReasons(parseContentId(p15, p16, p17, v, v2, v58, p21))
+			end
+		end
+	end
+
+	return v50:getFinalResults()
+end
+
+function t1.tryGetAssetIdFromContentId(s1: string) -- line: 189
+	-- upvalues: getAssetUrlId (copy), getAssetDeliveryAssetUrlId (copy)
+	local num = tonumber(s1)
+
+	if num ~= nil then
+		return num
+	end
+
+	local match = string.match(s1, "^rbxassetid://(%d+)$")
+
+	if match ~= nil then
+		return match
+	end
+
+	local v62 = getAssetUrlId(s1)
+
+	if v62 ~= nil then
+		return v62
+	end
+
+	local v63 = getAssetDeliveryAssetUrlId(s1)
+
+	if v63 ~= nil then
+		return v63
+	end
+
+	return nil
+end
+function t1.parseWithErrorCheck(p22, p23, p24, p25, p26, p27) -- line: 193
+	-- upvalues: parseWithErrorCheckInternal (copy)
+	return parseWithErrorCheckInternal(p22, p23, nil, p24, p25, p26, p27)
+end
+function t1.parse(p28, p29, p30) -- line: 212
+	-- upvalues: parseWithErrorCheckInternal (copy)
+	local t2 = {}
+
+	assert((parseWithErrorCheckInternal({}, {}, t2, p28, p29, nil, p30)))
+
+	return t2
+end
+
+return t1

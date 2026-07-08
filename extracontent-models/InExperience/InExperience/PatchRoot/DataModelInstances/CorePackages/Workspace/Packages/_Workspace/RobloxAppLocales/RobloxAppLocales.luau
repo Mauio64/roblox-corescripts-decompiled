@@ -1,5 +1,6 @@
-local v0 = require(script.Localization);
+local Localization = require(script.Localization)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    Localization = v0
-};
+	["jest.config"] = script["jest.config"],
+	Localization = Localization
+}

@@ -1,42 +1,43 @@
-local l_Players_0 = game:GetService("Players");
-local l_MarketplaceService_0 = game:GetService("MarketplaceService");
-local l_Parent_0 = script.Parent.Parent;
-local v3 = require(l_Parent_0.Thunk);
-local v4 = require(l_Parent_0.Services.Analytics);
-local v5 = require(l_Parent_0.Constants);
-local v6 = require(l_Parent_0.Actions.SetItemBeingPurchased);
-local v7 = require(l_Parent_0.Thunks.SendCounter);
-local v8 = {
-    v4
-};
-return function(v9, v10, v11, v12, v13, v14, v15) --[[ Line: 18 ]] --[[ Name: PromptPurchase ]]
-    -- upvalues: v3 (copy), v8 (copy), v4 (copy), v6 (copy), v5 (copy), l_MarketplaceService_0 (copy), l_Players_0 (copy), v7 (copy)
-    return v3.new(script.Name, v8, function(v16, v17) --[[ Line: 27 ]]
-        -- upvalues: v4 (ref), v6 (ref), v9 (copy), v10 (copy), v12 (copy), v5 (ref), l_MarketplaceService_0 (ref), l_Players_0 (ref), v11 (copy), v13 (copy), v14 (copy), v7 (ref), v15 (copy)
-        local v18 = v17[v4];
-        v16:dispatch(v6(v9, v10));
-        local v19 = false;
-        if v12 ~= nil then
-            v19 = v10 ~= v5.ItemType.Bundle;
-        end;
-        if v19 then
-            l_MarketplaceService_0:PromptCollectiblesPurchase(l_Players_0.LocalPlayer, v9, v11, v13, v12, v14);
-            v16:dispatch(v7(v5.Counters.PromptLimitedCollectiblesPurchase));
-        elseif v10 == v5.ItemType.Bundle then
-            l_MarketplaceService_0:PromptBundlePurchase(l_Players_0.LocalPlayer, v9);
-            v16:dispatch(v7(v5.Counters.PromptBundlePurchase));
-        elseif v10 == v5.ItemType.Asset then
-            local v20 = not v15;
-            if v11 ~= nil and v20 then
-                l_MarketplaceService_0:PromptPurchase(l_Players_0.LocalPlayer, v9, false);
-                v16:dispatch(v7(v5.Counters.PromptUnlimitedCollectiblePurchase));
-            else
-                l_MarketplaceService_0:PromptRobloxPurchase(v9, false);
-                v16:dispatch(v7(v5.Counters.PromptRobloxPurchase));
-            end;
-        else
-            v16:dispatch(v7(v5.Counters.PromptPurchaseUnknownItemType));
-        end;
-        v18.reportPurchaseAttempt(v10, v9);
-    end);
-end;
+local Players = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
+local ParentParent = script.Parent.Parent
+local Thunk = require(ParentParent.Thunk)
+local Analytics = require(ParentParent.Services.Analytics)
+local Constants = require(ParentParent.Constants)
+local SetItemBeingPurchased = require(ParentParent.Actions.SetItemBeingPurchased)
+local SendCounter = require(ParentParent.Thunks.SendCounter)
+local t1 = { Analytics }
+
+local function PromptPurchase(p1, p2, p3, p4, p5, p6, p7) -- line: 18
+	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), SetItemBeingPurchased (copy), Constants (copy), MarketplaceService (copy), Players (copy), SendCounter (copy)
+	return Thunk.new(script.Name, t1, function(p8, p9) -- line: 27
+		-- upvalues: Analytics (copy), SetItemBeingPurchased (copy), p1 (copy), p2 (copy), p4 (copy), Constants (copy), MarketplaceService (copy), Players (copy), p3 (copy), p5 (copy), p6 (copy), SendCounter (copy), p7 (copy)
+		local v20 = p9[Analytics]
+
+		p8:dispatch(SetItemBeingPurchased(p1, p2))
+
+		if p4 ~= nil and p2 ~= Constants.ItemType.Bundle then
+			MarketplaceService:PromptCollectiblesPurchase(Players.LocalPlayer, p1, p3, p5, p4, p6)
+			p8:dispatch(SendCounter(Constants.Counters.PromptLimitedCollectiblesPurchase))
+		elseif p2 == Constants.ItemType.Bundle then
+			MarketplaceService:PromptBundlePurchase(Players.LocalPlayer, p1)
+			p8:dispatch(SendCounter(Constants.Counters.PromptBundlePurchase))
+		elseif p2 == Constants.ItemType.Asset then
+			local v21 = p7
+
+			if p3 ~= nil and not v21 then
+				MarketplaceService:PromptPurchase(Players.LocalPlayer, p1, false)
+				p8:dispatch(SendCounter(Constants.Counters.PromptUnlimitedCollectiblePurchase))
+			else
+				MarketplaceService:PromptRobloxPurchase(p1, false)
+				p8:dispatch(SendCounter(Constants.Counters.PromptRobloxPurchase))
+			end
+		else
+			p8:dispatch(SendCounter(Constants.Counters.PromptPurchaseUnknownItemType))
+		end
+
+		v20.reportPurchaseAttempt(p2, p1)
+	end)
+end
+
+return PromptPurchase

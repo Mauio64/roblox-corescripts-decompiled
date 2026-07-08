@@ -1,3 +1,3 @@
 return {
-    FindFriendsButton = "findFriends"
-};
+	FindFriendsButton = "findFriends"
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FocusRootUseHooks", false);
+return game:DefineFastFlag("FocusRootUseHooks", false)

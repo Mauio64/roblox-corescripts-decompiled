@@ -1,1 +1,1 @@
-return require(script.ShareQRTileContainer);
+return require(script.ShareQRTileContainer)

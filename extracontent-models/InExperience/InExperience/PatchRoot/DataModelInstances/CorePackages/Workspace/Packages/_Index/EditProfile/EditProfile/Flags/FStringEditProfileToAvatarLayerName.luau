@@ -1,1 +1,1 @@
-return game:DefineFastString("FStringEditProfileToAvatarLayerName", "Social.EditProfilePage");
+return game:DefineFastString("FStringEditProfileToAvatarLayerName", "Social.EditProfilePage")

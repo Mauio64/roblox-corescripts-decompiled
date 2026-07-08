@@ -1,8 +1,11 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: findValueKeyInRefCache ]]
-    for v2, v3 in v1 do
-        if v3.current == v0 then
-            return v2;
-        end;
-    end;
-    return nil;
-end;
+local function findValueKeyInRefCache(p1, t1: {[any]: any}) -- line: 1
+	for v4, v5 in t1 do
+		if p1 == v5.current then
+			return v4
+		end
+	end
+
+	return nil
+end
+
+return findValueKeyInRefCache

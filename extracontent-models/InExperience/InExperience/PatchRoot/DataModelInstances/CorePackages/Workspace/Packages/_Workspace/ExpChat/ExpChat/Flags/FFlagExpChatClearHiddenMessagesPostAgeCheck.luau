@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ExpChatClearHiddenMessagesPostAgeCheck", false);
+return game:DefineFastFlag("ExpChatClearHiddenMessagesPostAgeCheck", false)

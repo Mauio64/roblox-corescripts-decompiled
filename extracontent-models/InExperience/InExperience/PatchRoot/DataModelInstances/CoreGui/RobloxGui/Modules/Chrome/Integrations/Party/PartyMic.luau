@@ -1,52 +1,69 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Chrome");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_Players_0 = game:GetService("Players");
-local v3 = require(l_CorePackages_0.Workspace.Packages.CrossExperienceVoice);
-local l_GetFFlagEnableCrossExpVoice_0 = require(l_CorePackages_0.Workspace.Packages.SharedFlags).GetFFlagEnableCrossExpVoice;
-local v5 = require(l_script_FirstAncestor_0.Service);
-local v6 = require(l_script_FirstAncestor_0.Integrations.Party.PartyMicIcon);
-local v7 = require(l_script_FirstAncestor_0.Integrations.Party.Constants);
-local l_Signal_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).Signal;
-local l_default_0 = v3.CrossExperienceVoiceManager.default;
-local v10 = nil;
-local v11 = false;
-local v12 = l_Signal_0.new();
-local v13 = l_Signal_0.new();
-v12:connect(function(v14) --[[ Line: 22 ]]
-    -- upvalues: v10 (ref)
-    v10 = v14;
-end);
-v13:connect(function(v15) --[[ Line: 26 ]]
-    -- upvalues: v11 (ref)
-    v11 = v15;
-end);
-local v16 = nil;
-if l_GetFFlagEnableCrossExpVoice_0() then
-    v16 = v5:register({
-        id = v7.TOGGLE_MIC_INTEGRATION_ID, 
-        label = "CoreScripts.TopBar.ToggleMic", 
-        activated = function() --[[ Line: 36 ]] --[[ Name: activated ]]
-            -- upvalues: l_Players_0 (copy), v11 (ref), v10 (ref), l_default_0 (copy)
-            local v17 = l_Players_0 and l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId or -1;
-            if v17 ~= -1 and v11 and v10 ~= nil then
-                if v10 then
-                    l_default_0:unmuteVoiceParticipant(v17);
-                    return;
-                else
-                    l_default_0:muteVoiceParticipant(v17);
-                end;
-            end;
-        end, 
-        components = {
-            Icon = function() --[[ Line: 47 ]] --[[ Name: Icon ]]
-                -- upvalues: v6 (copy), v12 (copy), v13 (copy)
-                return v6({
-                    isLocalPlayerMutedSignal = v12, 
-                    isVoiceConnectedSignal = v13
-                });
-            end
-        }, 
-        initialAvailability = v5.AvailabilitySignal.Unavailable
-    });
-end;
-return v16;
+local Chrome = script:FindFirstAncestor("Chrome")
+local CorePackages = game:GetService("CorePackages")
+local Players = game:GetService("Players")
+local CrossExperienceVoice = require(CorePackages.Workspace.Packages.CrossExperienceVoice)
+local GetFFlagEnableCrossExpVoice = require(CorePackages.Workspace.Packages.SharedFlags).GetFFlagEnableCrossExpVoice
+local SideSheetPlacement = require(CorePackages.Workspace.Packages.Chrome).Enums.SideSheetPlacement
+local Service = require(Chrome.Service)
+local ChromeUtils = require(Chrome.ChromeShared.Service.ChromeUtils)
+local PartyMicIcon = require(Chrome.Integrations.Party.PartyMicIcon)
+local Constants = require(Chrome.Integrations.Party.Constants)
+local Signal = require(CorePackages.Workspace.Packages.AppCommonLib).Signal
+local FFlagChromeActivatedMappedSignal = require(CorePackages.Workspace.Packages.SharedFlags).FFlagChromeActivatedMappedSignal
+local MappedSignal = ChromeUtils.MappedSignal
+local default = CrossExperienceVoice.CrossExperienceVoiceManager.default
+local u15 = nil
+local u16 = false
+local v17 = Signal.new()
+local v18 = Signal.new()
+
+v17:connect(function(p1) -- line: 30
+	-- upvalues: u15 (ref)
+	u15 = p1
+end)
+v18:connect(function(p2) -- line: 34
+	-- upvalues: u16 (ref)
+	u16 = p2
+end)
+
+local v19 = if not FFlagChromeActivatedMappedSignal then nil else MappedSignal.new(v17, function() -- line: 39
+	-- upvalues: u16 (ref), u15 (ref)
+	return u16 and u15 == false
+end)
+local FFlagChangeToggleMicText = require(Chrome.Flags.FFlagChangeToggleMicText)
+local v21 = nil
+
+if GetFFlagEnableCrossExpVoice() then
+	v21 = Service:register({
+		id = Constants.TOGGLE_MIC_INTEGRATION_ID,
+		label = not FFlagChangeToggleMicText and "CoreScripts.TopBar.ToggleMic" or "CoreScripts.TopBar.Mic",
+		sideSheetPlacement = SideSheetPlacement.Unibar,
+		isActivated = if not FFlagChromeActivatedMappedSignal then nil else v19,
+		activated = function() -- line: 54
+			-- upvalues: Players (copy), u16 (ref), u15 (ref), default (copy)
+			local v24 = Players and (not not Players.LocalPlayer and Players.LocalPlayer.UserId) or -1
+
+			if v24 ~= -1 and (u16 and u15 ~= nil) then
+				if u15 then
+					default:unmuteVoiceParticipant(v24)
+
+					return
+				end
+
+				default:muteVoiceParticipant(v24)
+			end
+		end,
+		components = {
+			Icon = function() -- line: 65
+				-- upvalues: PartyMicIcon (copy), v17 (copy), v18 (copy)
+				return PartyMicIcon({
+					isLocalPlayerMutedSignal = v17,
+					isVoiceConnectedSignal = v18
+				})
+			end
+		},
+		initialAvailability = Service.AvailabilitySignal.Unavailable
+	})
+end
+
+return v21

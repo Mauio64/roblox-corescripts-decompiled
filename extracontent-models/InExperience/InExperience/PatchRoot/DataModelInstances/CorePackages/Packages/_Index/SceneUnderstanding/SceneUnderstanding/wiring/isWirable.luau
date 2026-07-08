@@ -1,9 +1,12 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: isWirable ]]
-    return (pcall(function() --[[ Line: 2 ]]
-        -- upvalues: v0 (copy)
-        local l_v0_0 = v0;
-        l_v0_0:GetInputPins();
-        l_v0_0:GetOutputPins();
-        l_v0_0:GetConnectedWires("Foo");
-    end));
-end;
+local function isWirable(p1) -- line: 1
+	return (pcall(function() -- line: 2
+		-- upvalues: p1 (copy)
+		local v3 = p1
+
+		v3:GetInputPins()
+		v3:GetOutputPins()
+		v3:GetConnectedWires("Foo")
+	end))
+end
+
+return isWirable

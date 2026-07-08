@@ -1,21 +1,25 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_UserInputService_0 = game:GetService("UserInputService");
-local v2 = require(l_Parent_0.React);
-local l_useEffect_0 = v2.useEffect;
-local l_useState_0 = v2.useState;
-return function() --[[ Line: 11 ]]
-    -- upvalues: l_useState_0 (copy), l_UserInputService_0 (copy), l_useEffect_0 (copy)
-    local v5, v6 = l_useState_0(l_UserInputService_0.KeyboardEnabled);
-    l_useEffect_0(function() --[[ Line: 14 ]]
-        -- upvalues: l_UserInputService_0 (ref), v6 (copy)
-        local v7 = l_UserInputService_0:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() --[[ Line: 15 ]]
-            -- upvalues: v6 (ref), l_UserInputService_0 (ref)
-            v6(l_UserInputService_0.KeyboardEnabled);
-        end);
-        return function() --[[ Line: 19 ]]
-            -- upvalues: v7 (copy)
-            v7:Disconnect();
-        end;
-    end, {});
-    return v5;
-end;
+local ParentParent = script.Parent.Parent.Parent
+local UserInputService = game:GetService("UserInputService")
+local React = require(ParentParent.React)
+local useEffect = React.useEffect
+local useState = React.useState
+
+return function() -- line: 11
+	-- upvalues: useState (copy), UserInputService (copy), useEffect (copy)
+	local v6, v7 = useState(UserInputService.KeyboardEnabled)
+
+	useEffect(function() -- line: 14
+		-- upvalues: UserInputService (copy), v7 (copy)
+		local connection = UserInputService:GetPropertyChangedSignal("KeyboardEnabled"):Connect(function() -- line: 15
+			-- upvalues: v7 (copy), UserInputService (copy)
+			v7(UserInputService.KeyboardEnabled)
+		end)
+
+		return function() -- line: 19
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, {})
+
+	return v6
+end

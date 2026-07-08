@@ -1,1 +1,1 @@
-return game:DefineFastInt("MenuButtonsThrottleHundredthsPercent", 0);
+return game:DefineFastInt("MenuButtonsThrottleHundredthsPercent", 0)

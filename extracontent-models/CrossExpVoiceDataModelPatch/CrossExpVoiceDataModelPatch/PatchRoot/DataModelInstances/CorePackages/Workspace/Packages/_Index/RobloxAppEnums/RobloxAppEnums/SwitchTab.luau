@@ -1,6 +1,6 @@
 return {
-    HomeTab = "HomeTab", 
-    GamesTab = "GamesTab", 
-    AvatarExperienceTab = "AvatarExperienceTab", 
-    ChatTab = "ChatTab"
-};
+	HomeTab = "HomeTab",
+	GamesTab = "GamesTab",
+	AvatarExperienceTab = "AvatarExperienceTab",
+	ChatTab = "ChatTab"
+}

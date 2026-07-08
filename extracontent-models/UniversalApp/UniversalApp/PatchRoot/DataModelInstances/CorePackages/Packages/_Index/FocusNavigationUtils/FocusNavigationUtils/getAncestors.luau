@@ -1,11 +1,12 @@
-return function(v0) --[[ Line: 1 ]] --[[ Name: getAncestors ]]
-    local v1 = {
-        v0
-    };
-    local l_v0_0 = v0;
-    while l_v0_0.Parent do
-        table.insert(v1, l_v0_0.Parent);
-        l_v0_0 = l_v0_0.Parent;
-    end;
-    return v1;
-end;
+local function getAncestors(p1) -- line: 1
+	local t1 = { p1 }
+
+	while p1.Parent do
+		table.insert(t1, p1.Parent)
+		p1 = p1.Parent
+	end
+
+	return t1
+end
+
+return getAncestors

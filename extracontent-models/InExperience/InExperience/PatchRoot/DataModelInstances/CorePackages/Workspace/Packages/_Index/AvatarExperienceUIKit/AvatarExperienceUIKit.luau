@@ -1,48 +1,78 @@
-local _ = require(script.BackgroundLayers.BackgroundLayers);
-local l_ItemCard_0 = script.ItemCard;
-local v2 = require(l_ItemCard_0.ItemCard);
-local v3 = require(l_ItemCard_0.ItemCardAnimationStateIndicator);
-local v4 = require(l_ItemCard_0.ItemCardBadge);
-local v5 = require(l_ItemCard_0.ItemCardCreatorName);
-local v6 = require(l_ItemCard_0.ItemCardFooter);
-local v7 = require(l_ItemCard_0.ItemCardHeader);
-local v8 = require(l_ItemCard_0.ItemCardHeaderCornersOverlay);
-local v9 = require(l_ItemCard_0.ItemCardIcon);
-local v10 = require(l_ItemCard_0.ItemCardPriceLine);
-local v11 = require(l_ItemCard_0.ItemCardStatus);
-local v12 = require(l_ItemCard_0.ItemCardThumbnail);
-local v13 = require(l_ItemCard_0.ItemCardTitle);
-local l_Widget_0 = script.Widget;
-local v15 = require(l_Widget_0.WidgetHeader);
-local v16 = require(l_Widget_0.WidgetLayout);
-local v17 = require(l_Widget_0.WidgetListItem);
-local v18 = require(script.Grid.Grid);
-local v19 = require(script.AXTooltip.AXTooltip);
+local BackgroundLayers = require(script.BackgroundLayers.BackgroundLayers)
+local ItemCard = script.ItemCard
+local ItemCard2 = require(ItemCard.ItemCard)
+local ItemCardAnimationStateIndicator = require(ItemCard.ItemCardAnimationStateIndicator)
+local ItemCardBadge = require(ItemCard.ItemCardBadge)
+local ItemCardCreatorName = require(ItemCard.ItemCardCreatorName)
+local ItemCardFooter = require(ItemCard.ItemCardFooter)
+local ItemCardHeader = require(ItemCard.ItemCardHeader)
+local ItemCardHeaderCornersOverlay = require(ItemCard.ItemCardHeaderCornersOverlay)
+local ItemCardIcon = require(ItemCard.ItemCardIcon)
+local ItemCardPriceLine = require(ItemCard.ItemCardPriceLine)
+local ItemCardStatus = require(ItemCard.ItemCardStatus)
+local ItemCardThumbnail = require(ItemCard.ItemCardThumbnail)
+local ItemCardTitle = require(ItemCard.ItemCardTitle)
+local Widget = script.Widget
+local WidgetHeader = require(Widget.WidgetHeader)
+local WidgetLayout = require(Widget.WidgetLayout)
+local WidgetListItem = require(Widget.WidgetListItem)
+local Grid = require(script.Grid.Grid)
+local VirtualizedFeed = require(script.VirtualizedFeed.VirtualizedFeed)
+local AXTooltip = require(script.AXTooltip.AXTooltip)
+local CategoryMenu = require(script.CategoryMenu.CategoryMenu)
+local TabGroup = require(script.TabGroup.TabGroup)
+local TimerBadge = require(script.TimerBadge.TimerBadge)
+local ScrollingFrameWithIndicators = require(script.ScrollingFrameWithIndicators.ScrollingFrameWithIndicators)
+local CategoryMenuButtonsLocationEnum = require(script.CategoryMenu.CategoryMenuButtonsLocationEnum)
+local useRemainingTime = require(script.Utils.useRemainingTime)
+local getRemainingTime = require(script.Utils.getRemainingTime)
+local getItemCountForRow = require(script.Utils.getItemCountForRow)
+local getLocalizedPrice = require(ItemCard.Utils.getLocalizedPrice)
+
 return {
-    ItemCardComponents = {
-        ItemCard = v2, 
-        ItemCardAnimationStateIndicator = v3, 
-        ItemCardBadge = v4, 
-        ItemCardCreatorName = v5, 
-        ItemCardFooter = v6, 
-        ItemCardHeader = v7, 
-        ItemCardHeaderCornersOverlay = v8, 
-        ItemCardIcon = v9, 
-        ItemCardPriceLine = v10, 
-        ItemCardStatus = v11, 
-        ItemCardThumbnail = v12, 
-        ItemCardTitle = v13
-    }, 
-    WidgetComponents = {
-        WidgetHeader = v15, 
-        WidgetLayout = v16, 
-        WidgetListItem = v17
-    }, 
-    GridComponents = {
-        Grid = v18
-    }, 
-    AXTooltipComponents = {
-        AXTooltip = v19
-    }, 
-    ["jest.config"] = script["jest.config"]
-};
+	CategoryMenu = CategoryMenu,
+	TabGroup = TabGroup,
+	TimerBadge = TimerBadge,
+	ScrollingFrameWithIndicators = ScrollingFrameWithIndicators,
+	CategoryMenuButtonsLocationEnum = CategoryMenuButtonsLocationEnum,
+	ItemCardComponents = {
+		ItemCard = ItemCard2,
+		ItemCardAnimationStateIndicator = ItemCardAnimationStateIndicator,
+		ItemCardBadge = ItemCardBadge,
+		ItemCardCreatorName = ItemCardCreatorName,
+		ItemCardFooter = ItemCardFooter,
+		ItemCardHeader = ItemCardHeader,
+		ItemCardHeaderCornersOverlay = ItemCardHeaderCornersOverlay,
+		ItemCardIcon = ItemCardIcon,
+		ItemCardPriceLine = ItemCardPriceLine,
+		ItemCardStatus = ItemCardStatus,
+		ItemCardThumbnail = ItemCardThumbnail,
+		ItemCardTitle = ItemCardTitle
+	},
+	WidgetComponents = {
+		WidgetHeader = WidgetHeader,
+		WidgetLayout = WidgetLayout,
+		WidgetListItem = WidgetListItem
+	},
+	BackgroundLayersComponents = {
+		BackgroundLayers = BackgroundLayers
+	},
+	GridComponents = {
+		Grid = Grid
+	},
+	AXTooltipComponents = {
+		AXTooltip = AXTooltip
+	},
+	FeedComponents = {
+		VirtualizedFeed = VirtualizedFeed
+	},
+	Hooks = {
+		useRemainingTime = useRemainingTime
+	},
+	Utils = {
+		getRemainingTime = getRemainingTime,
+		getItemCountForRow = getItemCountForRow,
+		getLocalizedPrice = getLocalizedPrice
+	},
+	["jest.config"] = script["jest.config"]
+}

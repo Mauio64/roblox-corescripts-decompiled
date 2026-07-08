@@ -1,5 +1,5 @@
 return {
-    Success = "Success", 
-    PurchaseError = "PurchaseError", 
-    NetworkError = "NetworkError"
-};
+	Success = "Success",
+	PurchaseError = "PurchaseError",
+	NetworkError = "NetworkError"
+}

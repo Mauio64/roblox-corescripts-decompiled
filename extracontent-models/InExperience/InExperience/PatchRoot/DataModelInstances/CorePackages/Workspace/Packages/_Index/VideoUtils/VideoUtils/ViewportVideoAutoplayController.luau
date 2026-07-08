@@ -30,12 +30,12 @@ function t4.new(p1) -- line: 60
 	local v18, v19 = Signals.createSignal(t1, winnerStateEquals)
 
 	return (setmetatable({
-		coordinator = p1,
 		isScrolling = false,
 		pendingUpdateTask = nil,
 		viewPortBounds = nil,
 		feedScopeRef = nil,
 		winnerLineOffsetFromTopBarPx = 0,
+		coordinator = p1,
 		getWinnerState = v18,
 		setWinnerState = v19
 	}, t4))
@@ -123,8 +123,8 @@ function t4.onScrollSettled(p9, s1: string, _: number, t7: {[any]: any}?) -- lin
 		end
 
 		p9.setWinnerState({
-			instance = v39,
-			shouldUseDwell = false
+			shouldUseDwell = false,
+			instance = v39
 		})
 
 		return

@@ -1,46 +1,57 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Object_0 = require(l_Parent_2.LuauPolyfill).Object;
-local v4 = require(l_Parent_0.getScreenForRouteName);
-local v5 = require(l_Parent_0.validateScreenOptions);
-local v6 = require(l_Parent_1.utils.invariant);
-local function v11(v7, v8, v9) --[[ Line: 13 ]] --[[ Name: applyConfig ]]
-    -- upvalues: l_Object_0 (copy)
-    v8 = v8 or {};
-    local v10 = type(v7);
-    if v10 == "function" then
-        return l_Object_0.assign({}, v8, v7(l_Object_0.assign(table.clone(v9), {
-            navigationOptions = v8
-        })));
-    elseif v10 == "table" then
-        return l_Object_0.assign(table.clone(v8), v7);
-    else
-        return v8;
-    end;
-end;
-return function(v12, v13) --[[ Line: 32 ]]
-    -- upvalues: v6 (copy), v4 (copy), v11 (copy), v5 (copy)
-    return function(v14, v15) --[[ Line: 33 ]]
-        -- upvalues: v6 (ref), v4 (ref), v12 (copy), v11 (ref), v13 (copy), v5 (ref)
-        v15 = v15 or {};
-        local l_state_0 = v14.state;
-        v6(type(l_state_0.routeName) == "string", "Cannot get config because the route does not have a routeName.");
-        local v17 = v4(v12, l_state_0.routeName);
-        local v18 = v12[l_state_0.routeName];
-        local v19 = nil;
-        if v18 ~= v17 then
-            v19 = v18.navigationOptions;
-        end;
-        local v20 = if type(v17) == "table" then v17.navigationOptions else {};
-        local v21 = {
-            navigation = v14, 
-            screenProps = v15
-        };
-        local v22 = v11(v13, {}, v21);
-        v22 = v11(v20, v22, v21);
-        v22 = v11(v19, v22, v21);
-        v5(v22, l_state_0);
-        return v22;
-    end;
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+local scriptParentParentParent = scriptParentParent.Parent
+local Object = require(scriptParentParentParent.LuauPolyfill).Object
+local getScreenForRouteName = require(scriptParent.getScreenForRouteName)
+local validateScreenOptions = require(scriptParent.validateScreenOptions)
+local invariant = require(scriptParentParent.utils.invariant)
+
+local function applyConfig(p1, p2, p3) -- line: 13
+	-- upvalues: Object (copy)
+	local v12 = p2 or {}
+	local v13 = type(p1)
+
+	if v13 == "function" then
+		return Object.assign({}, v12, p1(Object.assign(table.clone(p3), {
+			navigationOptions = v12
+		})))
+	end
+
+	if v13 == "table" then
+		return Object.assign(table.clone(v12), p1)
+	end
+
+	return v12
+end
+
+return function(p4, p5) -- line: 32
+	-- upvalues: invariant (copy), getScreenForRouteName (copy), applyConfig (copy), validateScreenOptions (copy)
+	return function(p6, p7) -- line: 33
+		-- upvalues: invariant (copy), getScreenForRouteName (copy), p4 (copy), applyConfig (copy), p5 (copy), validateScreenOptions (copy)
+		local v18 = p7 or {}
+		local state = p6.state
+
+		invariant(type(state.routeName) == "string", "Cannot get config because the route does not have a routeName.")
+
+		local v20 = getScreenForRouteName(p4, state.routeName)
+		local v21 = p4[state.routeName]
+		local navigationOptions = nil
+
+		if v21 ~= v20 then
+			navigationOptions = v21.navigationOptions
+		end
+
+		local v23 = if type(v20) ~= "table" then {} else v20.navigationOptions
+		local t1 = {
+			navigation = p6,
+			screenProps = v18
+		}
+		local v25 = applyConfig(p5, {}, t1)
+		local v26 = applyConfig(v23, v25, t1)
+		local v27 = applyConfig(navigationOptions, v26, t1)
+
+		validateScreenOptions(v27, state)
+
+		return v27
+	end
+end

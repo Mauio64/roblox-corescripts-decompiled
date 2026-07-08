@@ -1,16 +1,19 @@
-local l_FaceAnimatorService_0 = game:GetService("FaceAnimatorService");
-local l_Modules_0 = game:GetService("CoreGui").RobloxGui.Modules;
-local v2 = require(l_Modules_0.SelfView.Analytics).new();
-local v3 = require(l_Modules_0.SelfView.publicApi);
-local v4 = require(l_Modules_0.SelfView.toggleSelfViewSignal);
-return function() --[[ Line: 9 ]]
-    -- upvalues: l_FaceAnimatorService_0 (copy), v2 (copy), v3 (copy), v4 (copy)
-    if l_FaceAnimatorService_0 and l_FaceAnimatorService_0:IsStarted() then
-        l_FaceAnimatorService_0.VideoAnimationEnabled = not l_FaceAnimatorService_0.VideoAnimationEnabled;
-        v2:setLastCtx("bubbleChatToggle");
-        local v5 = v3.getSelfViewIsOpenAndVisible();
-        if l_FaceAnimatorService_0.VideoAnimationEnabled and not v5 then
-            v4:fire();
-        end;
-    end;
-end;
+local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local Modules = game:GetService("CoreGui").RobloxGui.Modules
+local v3 = require(Modules.SelfView.Analytics).new()
+local publicApi = require(Modules.SelfView.publicApi)
+local toggleSelfViewSignal = require(Modules.SelfView.toggleSelfViewSignal)
+
+return function() -- line: 9
+	-- upvalues: FaceAnimatorService (copy), v3 (copy), publicApi (copy), toggleSelfViewSignal (copy)
+	if FaceAnimatorService and FaceAnimatorService:IsStarted() then
+		FaceAnimatorService.VideoAnimationEnabled = not FaceAnimatorService.VideoAnimationEnabled
+		v3:setLastCtx("bubbleChatToggle")
+
+		local v6 = publicApi.getSelfViewIsOpenAndVisible()
+
+		if FaceAnimatorService.VideoAnimationEnabled and not v6 then
+			toggleSelfViewSignal:fire()
+		end
+	end
+end

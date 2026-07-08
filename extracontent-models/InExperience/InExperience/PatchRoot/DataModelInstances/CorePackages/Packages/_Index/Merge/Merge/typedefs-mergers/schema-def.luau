@@ -1,53 +1,64 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v1.Array;
-local l_Boolean_0 = v1.Boolean;
-local l_Object_0 = v1.Object;
-local v5 = {};
-local l_Kind_0 = require(l_Parent_0.GraphQL).Kind;
-local l_mergeDirectives_0 = require(script.Parent.directives).mergeDirectives;
-local _ = require(script.Parent["merge-typedefs_types"]);
-local v9 = {
-    query = "Query", 
-    mutation = "Mutation", 
-    subscription = "Subscription"
-};
-v5.DEFAULT_OPERATION_TYPE_NAME_MAP = v9;
-local function v21(v10, v11) --[[ Line: 37 ]] --[[ Name: mergeOperationTypes ]]
-    -- upvalues: v9 (copy), l_Array_0 (copy), l_Boolean_0 (copy)
-    local v12 = if v10 ~= nil then v10 else {};
-    local v13 = if v11 ~= nil then v11 else {};
-    local v14 = {};
-    for _, v16 in v9 do
-        local v18 = l_Array_0.find(v12, function(v17) --[[ Line: 50 ]]
-            -- upvalues: v16 (copy)
-            return v17.operation == v16;
-        end);
-        local v20 = l_Boolean_0.toJSBoolean(v18) and v18 or l_Array_0.find(v13, function(v19) --[[ Line: 54 ]]
-            -- upvalues: v16 (copy)
-            return v19.operation == v16;
-        end);
-        if v20 then
-            table.insert(v14, v20);
-        end;
-    end;
-    return v14;
-end;
-v5.mergeSchemaDefs = function(v22, v23, v24) --[[ Line: 66 ]] --[[ Name: mergeSchemaDefs ]]
-    -- upvalues: l_Boolean_0 (copy), l_Kind_0 (copy), l_mergeDirectives_0 (copy), v21 (copy), l_Object_0 (copy)
-    if l_Boolean_0.toJSBoolean(v23) then
-        return {
-            kind = if not (v22.kind ~= l_Kind_0.SCHEMA_DEFINITION) or v23.kind == l_Kind_0.SCHEMA_DEFINITION then l_Kind_0.SCHEMA_DEFINITION else l_Kind_0.SCHEMA_EXTENSION, 
-            description = l_Boolean_0.toJSBoolean(v22.description) and v22.description or v23.description, 
-            directives = l_mergeDirectives_0(v22.directives, v23.directives, v24), 
-            operationTypes = v21(v22.operationTypes, v23.operationTypes)
-        };
-    elseif v24 and l_Boolean_0.toJSBoolean(v24.convertExtensions) then
-        return (l_Object_0.assign({}, v22, {
-            kind = l_Kind_0.SCHEMA_DEFINITION
-        }));
-    else
-        return v22;
-    end;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Object = LuauPolyfill.Object
+local t1 = {}
+local Kind = require(ParentParent.GraphQL).Kind
+local mergeDirectives = require(script.Parent.directives).mergeDirectives
+
+require(script.Parent["merge-typedefs_types"])
+
+local t2 = {
+	query = "Query",
+	mutation = "Mutation",
+	subscription = "Subscription"
+}
+
+t1.DEFAULT_OPERATION_TYPE_NAME_MAP = t2
+
+local function mergeOperationTypes(p1, p2) -- line: 37
+	-- upvalues: t2 (copy), Array (copy), Boolean (copy)
+	local v13 = if p1 == nil then {} else p1
+	local v14 = if p2 == nil then {} else p2
+	local t3 = {}
+
+	for _, v17 in t2 do
+		local v18 = Array.find(v13, function(p3) -- line: 50
+			-- upvalues: v17 (copy)
+			return p3.operation == v17
+		end)
+		local v19 = Boolean.toJSBoolean(v18) and v18 or Array.find(v14, function(p4) -- line: 54
+			-- upvalues: v17 (copy)
+			return p4.operation == v17
+		end)
+
+		if v19 then
+			table.insert(t3, v19)
+		end
+	end
+
+	return t3
+end
+
+function t1.mergeSchemaDefs(p5, p6, p7) -- line: 66
+	-- upvalues: Boolean (copy), Kind (copy), mergeDirectives (copy), mergeOperationTypes (copy), Object (copy)
+	if Boolean.toJSBoolean(p6) then
+		return {
+			kind = if p5.kind ~= Kind.SCHEMA_DEFINITION and p6.kind ~= Kind.SCHEMA_DEFINITION then Kind.SCHEMA_EXTENSION else Kind.SCHEMA_DEFINITION,
+			description = Boolean.toJSBoolean(p5.description) and p5.description or p6.description,
+			directives = mergeDirectives(p5.directives, p6.directives, p7),
+			operationTypes = mergeOperationTypes(p5.operationTypes, p6.operationTypes)
+		}
+	end
+
+	if p7 and Boolean.toJSBoolean(p7.convertExtensions) then
+		return (Object.assign({}, p5, {
+			kind = Kind.SCHEMA_DEFINITION
+		}))
+	end
+
+	return p5
+end
+
+return t1

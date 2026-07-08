@@ -1,37 +1,45 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ReactUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_LUAU_ANALYZE_ERROR_0 = l_script_FirstAncestor_0.LUAU_ANALYZE_ERROR;
-return function(v4) --[[ Line: 9 ]] --[[ Name: useStackState ]]
-    -- upvalues: v2 (copy), l_LUAU_ANALYZE_ERROR_0 (copy)
-    local v5 = v2.useRef(v4 or {});
-    assert(v5.current ~= nil, l_LUAU_ANALYZE_ERROR_0);
-    local v6, v7 = v2.useState(#v5.current);
-    local v9 = v2.useCallback(function(v8) --[[ Line: 21 ]]
-        -- upvalues: v5 (copy), v7 (copy)
-        table.insert(v5.current, v8);
-        v7(#v5.current);
-    end, {});
-    local v11 = v2.useCallback(function() --[[ Line: 26 ]]
-        -- upvalues: v5 (copy), v7 (copy)
-        local v10 = table.remove(v5.current);
-        v7(#v5.current);
-        return v10;
-    end, {});
-    local v12 = v2.useCallback(function() --[[ Line: 32 ]]
-        -- upvalues: v5 (copy)
-        return v5.current[#v5.current];
-    end, {});
-    local v13 = v2.useCallback(function() --[[ Line: 36 ]]
-        -- upvalues: v5 (copy), v7 (copy)
-        table.clear(v5.current);
-        v7(0);
-    end, {});
-    return {
-        push = v9, 
-        pop = v11, 
-        getTop = v12, 
-        clear = v13, 
-        size = v6
-    };
-end;
+local ReactUtils = script:FindFirstAncestor("ReactUtils")
+local ReactUtilsParent = ReactUtils.Parent
+local React = require(ReactUtilsParent.React)
+local LUAU_ANALYZE_ERROR = ReactUtils.LUAU_ANALYZE_ERROR
+
+local function useStackState(t1: {[any]: any}?) -- line: 9
+	-- upvalues: React (copy), LUAU_ANALYZE_ERROR (copy)
+	local v7 = React.useRef(t1 or {})
+
+	assert(v7.current ~= nil, LUAU_ANALYZE_ERROR)
+
+	local v8, v9 = React.useState(#v7.current)
+	local v10 = React.useCallback(function(p1) -- line: 21
+		-- upvalues: v7 (copy), v9 (copy)
+		table.insert(v7.current, p1)
+		v9(#v7.current)
+	end, {})
+	local v11 = React.useCallback(function() -- line: 26
+		-- upvalues: v7 (copy), v9 (copy)
+		local v15 = table.remove(v7.current)
+
+		v9(#v7.current)
+
+		return v15
+	end, {})
+	local v12 = React.useCallback(function() -- line: 32
+		-- upvalues: v7 (copy)
+		return v7.current[#v7.current]
+	end, {})
+	local v13 = React.useCallback(function() -- line: 36
+		-- upvalues: v7 (copy), v9 (copy)
+		table.clear(v7.current)
+		v9(0)
+	end, {})
+
+	return {
+		push = v10,
+		pop = v11,
+		getTop = v12,
+		clear = v13,
+		size = v8
+	}
+end
+
+return useStackState

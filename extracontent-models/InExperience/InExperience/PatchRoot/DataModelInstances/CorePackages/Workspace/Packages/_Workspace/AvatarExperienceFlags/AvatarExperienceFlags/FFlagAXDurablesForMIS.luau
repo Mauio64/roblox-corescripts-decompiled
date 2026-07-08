@@ -1,1 +1,1 @@
-return require(script.Parent.FFlagAXMISEnableMultiShopping) and game:DefineFastFlag("AXDurablesForMIS2", false);
+return require(script.Parent.FFlagAXMISEnableMultiShopping) and game:DefineFastFlag("AXDurablesForMIS2", false)

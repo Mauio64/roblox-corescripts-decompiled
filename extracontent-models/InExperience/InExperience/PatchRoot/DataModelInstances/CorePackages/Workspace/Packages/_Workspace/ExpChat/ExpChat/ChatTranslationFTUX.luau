@@ -1,1 +1,1 @@
-return require(script.ChatTranslationFTUX);
+return require(script.ChatTranslationFTUX)

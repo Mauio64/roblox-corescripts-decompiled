@@ -1,5 +1,5 @@
 return {
-    PageAnimationDuration = 0.5, 
-    OpenMoreMenuAnimationDuration = 0.5, 
-    CloseMoreMenuAnimationDuration = 1
-};
+	PageAnimationDuration = 0.5,
+	OpenMoreMenuAnimationDuration = 0.5,
+	CloseMoreMenuAnimationDuration = 1
+}

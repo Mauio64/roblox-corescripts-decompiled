@@ -1,129 +1,133 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.UIBlox);
-local v2 = require(l_CorePackages_0.Packages.React);
-local l_ButtonStack_0 = v1.App.Button.ButtonStack;
-local l_ButtonType_0 = v1.App.Button.Enum.ButtonType;
-local l_HeaderBar_0 = v1.App.Bar.HeaderBar;
-local l_useStyle_0 = v1.Core.Style.useStyle;
-local l_Parent_0 = script.Parent.Parent;
-local v8 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local v9 = require(l_Parent_0.Components.Divider);
-return function(v10) --[[ Line: 26 ]] --[[ Name: RestartScreenshotDialog ]]
-    -- upvalues: l_useStyle_0 (copy), v2 (copy), l_HeaderBar_0 (copy), v8 (copy), v9 (copy), l_ButtonStack_0 (copy), l_ButtonType_0 (copy)
-    local v11 = l_useStyle_0();
-    local l_Theme_0 = v11.Theme;
-    local l_Font_0 = v11.Font;
-    local v14 = 48;
-    local v15 = 180;
-    local v16 = 50;
-    if v10.isSmallPortraitMode then
-        v14 = 84;
-        v15 = 260;
-        v16 = 100;
-    end;
-    local v17 = v10.isSmallPortraitMode and 343 or 480;
-    return v2.createElement("Frame", {
-        Size = UDim2.new(0, v17, 0, v15), 
-        AnchorPoint = Vector2.new(0.5, 0.5), 
-        Position = UDim2.new(0.5, 0, 0.5, 0), 
-        BackgroundColor3 = Color3.fromHex("#4F545F"), 
-        ZIndex = 5
-    }, {
-        Corner = v2.createElement("UICorner", {
-            CornerRadius = UDim.new(0, 8)
-        }), 
-        HeaderAndContent = v2.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundTransparency = 1
-        }, {
-            Layout = v2.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Vertical, 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-                SortOrder = Enum.SortOrder.LayoutOrder
-            }), 
-            Header = v2.createElement(l_HeaderBar_0, {
-                backgroundTransparency = 1, 
-                barHeight = 48, 
-                renderLeft = function() --[[ Line: 63 ]] --[[ Name: renderLeft ]]
+local CorePackages = game:GetService("CorePackages")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local React = require(CorePackages.Packages.React)
+local ButtonStack = UIBlox.App.Button.ButtonStack
+local ButtonType = UIBlox.App.Button.Enum.ButtonType
+local HeaderBar = UIBlox.App.Bar.HeaderBar
+local useStyle = UIBlox.Core.Style.useStyle
+local ParentParent = script.Parent.Parent
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local Divider = require(ParentParent.Components.Divider)
 
-                end, 
-                renderRight = function() --[[ Line: 65 ]] --[[ Name: renderRight ]]
+local function RestartScreenshotDialog(t1: {[any]: any}) -- line: 26
+	-- upvalues: useStyle (copy), React (copy), HeaderBar (copy), RobloxTranslator (copy), Divider (copy), ButtonStack (copy), ButtonType (copy)
+	local v13 = useStyle()
+	local Theme = v13.Theme
+	local Font = v13.Font
+	local n1 = 48
+	local n2 = 180
+	local n3 = 50
 
-                end, 
-                title = v8:FormatByKey("Feature.ReportAbuse.Action.RetakeScene"), 
-                LayoutOrder = 1
-            }), 
-            Divider = v2.createElement(v9, {
-                LayoutOrder = 2
-            }), 
-            Description = v2.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, -v14 - 1), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 3
-            }, {
-                Padding = v2.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 8), 
-                    PaddingBottom = UDim.new(0, 8), 
-                    PaddingLeft = UDim.new(0, 16), 
-                    PaddingRight = UDim.new(0, 16)
-                }), 
-                TextBody = v2.createElement("TextLabel", {
-                    Text = v8:FormatByKey("Feature.ReportAbuse.Message.RetakeScene"), 
-                    Font = l_Font_0.Body.Font, 
-                    LayoutOrder = 3, 
-                    TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                    TextTransparency = l_Theme_0.TextEmphasis.Transparency, 
-                    TextSize = 16, 
-                    TextWrapped = true, 
-                    TextXAlignment = Enum.TextXAlignment.Left, 
-                    TextYAlignment = Enum.TextYAlignment.Top, 
-                    Size = UDim2.new(1, 0, 0, v16), 
-                    BackgroundTransparency = 1
-                })
-            })
-        }), 
-        Footer = v2.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.new(1, 0, 0, v14), 
-            Position = UDim2.new(0, 0, 1, -v14), 
-            BorderSizePixel = 0, 
-            LayoutOrder = 4
-        }, {
-            Padding = v2.createElement("UIPadding", {
-                PaddingTop = UDim.new(0, 6), 
-                PaddingBottom = UDim.new(0, 6), 
-                PaddingLeft = UDim.new(0, 16), 
-                PaddingRight = UDim.new(0, 16)
-            }), 
-            ActionButtons = v2.createElement(l_ButtonStack_0, {
-                forcedFillDirection = if v10.isSmallPortraitMode then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal, 
-                buttons = {
-                    {
-                        buttonType = l_ButtonType_0.Secondary, 
-                        props = if v10.isSmallPortraitMode then {
-                            onActivated = v10.onCancel, 
-                            text = v8:FormatByKey("InGame.InspectMenu.Action.Cancel"), 
-                            size = UDim2.new(1, 0, 0, 28), 
-                            fontStyle = l_Font_0.Body2
-                        } else {
-                            onActivated = v10.onCancel, 
-                            text = v8:FormatByKey("InGame.InspectMenu.Action.Cancel")
-                        }
-                    }, 
-                    {
-                        buttonType = l_ButtonType_0.PrimarySystem, 
-                        props = if v10.isSmallPortraitMode then {
-                            onActivated = v10.onRestart, 
-                            text = v8:FormatByKey("Feature.ReportAbuse.Action.BackToExperience"), 
-                            size = UDim2.new(1, 0, 0, 28), 
-                            fontStyle = l_Font_0.Body2
-                        } else {
-                            onActivated = v10.onRestart, 
-                            text = v8:FormatByKey("Feature.ReportAbuse.Action.BackToExperience")
-                        }
-                    }
-                }
-            })
-        })
-    });
-end;
+	if t1.isSmallPortraitMode then
+		n1 = 84
+		n2 = 260
+		n3 = 100
+	end
+
+	local v19 = not t1.isSmallPortraitMode and 480 or 343
+
+	return React.createElement("Frame", {
+		ZIndex = 5,
+		Size = UDim2.new(0, v19, 0, n2),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		BackgroundColor3 = Color3.fromHex("#4F545F")
+	}, {
+		Corner = React.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 8)
+		}),
+		HeaderAndContent = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, {
+			Layout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Vertical,
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}),
+			Header = React.createElement(HeaderBar, {
+				backgroundTransparency = 1,
+				barHeight = 48,
+				LayoutOrder = 1,
+				renderLeft = function() -- line: 63
+				end,
+				renderRight = function() -- line: 65
+				end,
+				title = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.RetakeScene")
+			}),
+			Divider = React.createElement(Divider, {
+				LayoutOrder = 2
+			}),
+			Description = React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 3,
+				Size = UDim2.new(1, 0, 1, -n1 - 1)
+			}, {
+				Padding = React.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 8),
+					PaddingBottom = UDim.new(0, 8),
+					PaddingLeft = UDim.new(0, 16),
+					PaddingRight = UDim.new(0, 16)
+				}),
+				TextBody = React.createElement("TextLabel", {
+					LayoutOrder = 3,
+					TextSize = 16,
+					TextWrapped = true,
+					BackgroundTransparency = 1,
+					Text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Message.RetakeScene"),
+					Font = Font.Body.Font,
+					TextColor3 = Theme.TextEmphasis.Color,
+					TextTransparency = Theme.TextEmphasis.Transparency,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextYAlignment = Enum.TextYAlignment.Top,
+					Size = UDim2.new(1, 0, 0, n3)
+				})
+			})
+		}),
+		Footer = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 4,
+			Size = UDim2.new(1, 0, 0, n1),
+			Position = UDim2.new(0, 0, 1, -n1)
+		}, {
+			Padding = React.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 6),
+				PaddingBottom = UDim.new(0, 6),
+				PaddingLeft = UDim.new(0, 16),
+				PaddingRight = UDim.new(0, 16)
+			}),
+			ActionButtons = React.createElement(ButtonStack, {
+				forcedFillDirection = if not t1.isSmallPortraitMode then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
+				buttons = {
+					{
+						buttonType = ButtonType.Secondary,
+						props = if not t1.isSmallPortraitMode then {
+							onActivated = t1.onCancel,
+							text = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Cancel")
+						} else {
+							onActivated = t1.onCancel,
+							text = RobloxTranslator:FormatByKey("InGame.InspectMenu.Action.Cancel"),
+							size = UDim2.new(1, 0, 0, 28),
+							fontStyle = Font.Body2
+						}
+					},
+					{
+						buttonType = ButtonType.PrimarySystem,
+						props = if not t1.isSmallPortraitMode then {
+							onActivated = t1.onRestart,
+							text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.BackToExperience")
+						} else {
+							onActivated = t1.onRestart,
+							text = RobloxTranslator:FormatByKey("Feature.ReportAbuse.Action.BackToExperience"),
+							size = UDim2.new(1, 0, 0, 28),
+							fontStyle = Font.Body2
+						}
+					}
+				}
+			})
+		})
+	})
+end
+
+return RestartScreenshotDialog

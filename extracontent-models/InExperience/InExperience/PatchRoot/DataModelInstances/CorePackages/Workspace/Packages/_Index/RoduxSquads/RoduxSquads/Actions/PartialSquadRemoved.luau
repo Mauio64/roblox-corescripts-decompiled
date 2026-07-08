@@ -1,11 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxSquads");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local _ = require(l_script_FirstAncestor_0.RoduxSquadsTypes);
-return v2.makeActionCreator(script.Name, function(v4) --[[ Line: 6 ]]
-    return {
-        payload = {
-            channelId = v4
-        }
-    };
-end);
+local RoduxSquads = script:FindFirstAncestor("RoduxSquads")
+local RoduxSquadsParent = RoduxSquads.Parent
+local Rodux = require(RoduxSquadsParent.Rodux)
+
+require(RoduxSquads.RoduxSquadsTypes)
+
+return Rodux.makeActionCreator(script.Name, function(p1) -- line: 6
+	return {
+		payload = {
+			channelId = p1
+		}
+	}
+end)

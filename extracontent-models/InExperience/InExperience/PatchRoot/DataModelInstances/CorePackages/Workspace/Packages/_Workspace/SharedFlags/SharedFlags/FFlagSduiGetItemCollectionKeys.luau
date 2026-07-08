@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SduiGetItemCollectionKeys", false);
+return game:DefineFastFlag("SduiGetItemCollectionKeys", false)

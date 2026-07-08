@@ -1,47 +1,60 @@
-game:DefineFastFlag("LoggingRethrowUsingError", false);
-local function _() --[[ Line: 8 ]] --[[ Name: GetFFlagLoggingRethrowUsingError ]]
-    return game:GetFastFlag("LoggingRethrowUsingError");
-end;
-local v1 = true;
-local v2 = {};
-local function v5() --[[ Line: 15 ]] --[[ Name: createLogInfo ]]
-    local v3 = {
-        warnings = {}
-    };
-    setmetatable(v3, {
-        __tostring = function(v4) --[[ Line: 21 ]] --[[ Name: __tostring ]]
-            return ("LogInfo\n\tWarnings (%d):\n\t\t%s"):format(#v4.warnings, table.concat(v4.warnings, "\n\t\t"));
-        end
-    });
-    return v3;
-end;
+game:DefineFastFlag("LoggingRethrowUsingError", false)
+
+local function GetFFlagLoggingRethrowUsingError() -- line: 8
+	return game:GetFastFlag("LoggingRethrowUsingError")
+end
+
+local u2 = true
+local t1 = {}
+
+local function createLogInfo() -- line: 15
+	local t2 = {
+		warnings = {}
+	}
+
+	setmetatable(t2, {
+		__tostring = function(p1) -- line: 21
+			return ("LogInfo\n\tWarnings (%d):\n\t\t%s"):format(#p1.warnings, table.concat(p1.warnings, "\n\t\t"))
+		end
+	})
+
+	return t2
+end
+
 return {
-    capture = function(v6) --[[ Line: 31 ]] --[[ Name: capture ]]
-        -- upvalues: v5 (copy), v1 (ref), v2 (copy)
-        local v7 = v5();
-        local l_v1_0 = v1;
-        v1 = false;
-        v2[v7] = true;
-        local l_status_0, l_result_0 = pcall(v6);
-        v2[v7] = nil;
-        v1 = l_v1_0;
-        if game:GetFastFlag("LoggingRethrowUsingError") then
-            if not l_status_0 then
-                error(l_result_0);
-                return v7;
-            end;
-        else
-            assert(l_status_0, l_result_0);
-        end;
-        return v7;
-    end, 
-    warn = function(v11) --[[ Line: 54 ]] --[[ Name: warn ]]
-        -- upvalues: v2 (copy), v1 (ref)
-        for v12 in pairs(v2) do
-            table.insert(v12.warnings, v11);
-        end;
-        if v1 then
-            warn(v11);
-        end;
-    end
-};
+	capture = function(p2) -- line: 31
+		-- upvalues: createLogInfo (copy), u2 (ref), t1 (copy)
+		local v7 = createLogInfo()
+		local v8 = u2
+
+		u2 = false
+		t1[v7] = true
+
+		local ok, result = pcall(p2)
+
+		t1[v7] = nil
+		u2 = v8
+
+		if game:GetFastFlag("LoggingRethrowUsingError") then
+			if not ok then
+				error(result)
+
+				return v7
+			end
+		else
+			assert(ok, result)
+		end
+
+		return v7
+	end,
+	warn = function(p3) -- line: 54
+		-- upvalues: t1 (copy), u2 (ref)
+		for k in pairs(t1) do
+			table.insert(k.warnings, p3)
+		end
+
+		if u2 then
+			warn(p3)
+		end
+	end
+}

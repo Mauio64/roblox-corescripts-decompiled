@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PasskeyUpsellFilteringEnabled", false);
+return game:DefineFastFlag("PasskeyUpsellFilteringEnabled", false)

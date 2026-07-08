@@ -1,3 +1,3 @@
 return {
-    GetExperienceDetailsPage = require(script.GetExperienceDetailsPage)
-};
+	GetExperienceDetailsPage = require(script.GetExperienceDetailsPage)
+}

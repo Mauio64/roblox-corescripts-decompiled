@@ -1,14 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.React);
-local l_useNavigation_0 = require(l_Parent_0.Navigation).useNavigation;
-local v3 = require(script.Parent.MessageContextMenuContainer);
-MessageContextMenuScreen = function() --[[ Line: 12 ]] --[[ Name: MessageContextMenuScreen ]]
-    -- upvalues: l_useNavigation_0 (copy), v1 (copy), v3 (copy)
-    local v4 = l_useNavigation_0();
-    return v1.createElement(v3, {
-        messageId = v4.getParam("messageId"), 
-        conversationId = v4.getParam("conversationId"), 
-        inputBoxRef = v4.getParam("inputBoxRef")
-    });
-end;
-return MessageContextMenuScreen;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local React = require(Parent.React)
+local useNavigation = require(Parent.Navigation).useNavigation
+local MessageContextMenuContainer = require(script.Parent.MessageContextMenuContainer)
+
+function MessageContextMenuScreen() -- line: 12
+	-- upvalues: useNavigation (copy), React (copy), MessageContextMenuContainer (copy)
+	local v5 = useNavigation()
+
+	return React.createElement(MessageContextMenuContainer, {
+		messageId = v5.getParam("messageId"),
+		conversationId = v5.getParam("conversationId"),
+		inputBoxRef = v5.getParam("inputBoxRef")
+	})
+end
+
+return MessageContextMenuScreen

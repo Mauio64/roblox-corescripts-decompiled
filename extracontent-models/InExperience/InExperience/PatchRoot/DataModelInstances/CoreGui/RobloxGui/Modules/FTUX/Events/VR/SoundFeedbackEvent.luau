@@ -1,11 +1,13 @@
-local _ = require(script.Parent.Parent.EventType);
+require(script.Parent.Parent.EventType)
+
 return {
-    Name = "SoundFeedbackEvent", 
-    StartEvent = function() --[[ Line: 9 ]] --[[ Name: StartEvent ]]
-        local l_Sound_0 = Instance.new("Sound");
-        l_Sound_0.Parent = game.Workspace;
-        l_Sound_0.SoundId = "rbxassetid://10066947742";
-        l_Sound_0.Volume = 1;
-        l_Sound_0:Play();
-    end
-};
+	Name = "SoundFeedbackEvent",
+	StartEvent = function() -- line: 9
+		local Sound = Instance.new("Sound")
+
+		Sound.Parent = game.Workspace
+		Sound.SoundId = "rbxassetid://10066947742"
+		Sound.Volume = 1
+		Sound:Play()
+	end
+}

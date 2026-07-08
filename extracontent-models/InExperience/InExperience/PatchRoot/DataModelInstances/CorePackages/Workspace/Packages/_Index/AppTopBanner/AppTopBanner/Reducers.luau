@@ -1,3 +1,3 @@
 return {
-    AppTopBannerReducer = require(script.AppTopBannerReducer)
-};
+	AppTopBannerReducer = require(script.AppTopBannerReducer)
+}

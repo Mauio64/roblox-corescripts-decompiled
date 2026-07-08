@@ -1,59 +1,64 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("RoduxCall");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_Status_0 = require(l_script_FirstAncestor_0.Enums).Status;
-local v3 = require(l_Parent_0.t);
-local v4 = {};
-v4.new = function(v5) --[[ Line: 10 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    assert(v4.isValid(v5));
-    v4.__index = v4;
-    setmetatable(v5, v4);
-    return v5;
-end;
-v4.mock = function(v6) --[[ Line: 22 ]] --[[ Name: mock ]]
-    -- upvalues: v4 (copy), l_Status_0 (copy)
-    v6 = v6 or {};
-    return (v4.new({
-        status = v6.status or l_Status_0.Active, 
-        callerId = v6.callerId or 123, 
-        calleeId = v6.calleeId or 456, 
-        placeId = v6.placeId or 789, 
-        reservedServerAccessCode = v6.reservedServerAccessCode or nil, 
-        callId = v6.callId or nil, 
-        callerCombinedName = v6.callerCombinedName or nil, 
-        calleeCombinedName = v6.calleeCombinedName or nil, 
-        instanceId = v6.instanceId or nil, 
-        createdUtc = v6.createdUtc or 0, 
-        activeUtc = v6.activeUtc or 0
-    }));
-end;
-v4.format = function(v7) --[[ Line: 42 ]] --[[ Name: format ]]
-    -- upvalues: v4 (copy)
-    return (v4.new({
-        status = v7.status, 
-        callerId = v7.callerId, 
-        calleeId = v7.calleeId, 
-        placeId = v7.placeId, 
-        reservedServerAccessCode = v7.reservedServerAccessCode, 
-        callId = v7.callId, 
-        callerCombinedName = v7.callerCombinedName, 
-        calleeCombinedName = v7.calleeCombinedName, 
-        instanceId = v7.instanceId, 
-        createdUtc = v7.createdUtc, 
-        activeUtc = v7.activeUtc
-    }));
-end;
-v4.isValid = v3.strictInterface({
-    status = v3.string, 
-    callerId = v3.optional(v3.number), 
-    calleeId = v3.optional(v3.number), 
-    placeId = v3.optional(v3.number), 
-    reservedServerAccessCode = v3.optional(v3.string), 
-    callId = v3.optional(v3.string), 
-    callerCombinedName = v3.optional(v3.string), 
-    calleeCombinedName = v3.optional(v3.string), 
-    instanceId = v3.optional(v3.string), 
-    createdUtc = v3.optional(v3.number), 
-    activeUtc = v3.optional(v3.number)
-});
-return v4;
+local RoduxCall = script:FindFirstAncestor("RoduxCall")
+local RoduxCallParent = RoduxCall.Parent
+local Status = require(RoduxCall.Enums).Status
+local t = require(RoduxCallParent.t)
+local t1 = {}
+
+function t1.new(p1) -- line: 10
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function t1.mock(p2) -- line: 22
+	-- upvalues: t1 (copy), Status (copy)
+	local v8 = p2 or {}
+
+	return (t1.new({
+		status = v8.status or Status.Active,
+		callerId = v8.callerId or 123,
+		calleeId = v8.calleeId or 456,
+		placeId = v8.placeId or 789,
+		reservedServerAccessCode = v8.reservedServerAccessCode or nil,
+		callId = v8.callId or nil,
+		callerCombinedName = v8.callerCombinedName or nil,
+		calleeCombinedName = v8.calleeCombinedName or nil,
+		instanceId = v8.instanceId or nil,
+		createdUtc = v8.createdUtc or 0,
+		activeUtc = v8.activeUtc or 0
+	}))
+end
+function t1.format(p3) -- line: 42
+	-- upvalues: t1 (copy)
+	return (t1.new({
+		status = p3.status,
+		callerId = p3.callerId,
+		calleeId = p3.calleeId,
+		placeId = p3.placeId,
+		reservedServerAccessCode = p3.reservedServerAccessCode,
+		callId = p3.callId,
+		callerCombinedName = p3.callerCombinedName,
+		calleeCombinedName = p3.calleeCombinedName,
+		instanceId = p3.instanceId,
+		createdUtc = p3.createdUtc,
+		activeUtc = p3.activeUtc
+	}))
+end
+
+t1.isValid = t.strictInterface({
+	status = t.string,
+	callerId = t.optional(t.number),
+	calleeId = t.optional(t.number),
+	placeId = t.optional(t.number),
+	reservedServerAccessCode = t.optional(t.string),
+	callId = t.optional(t.string),
+	callerCombinedName = t.optional(t.string),
+	calleeCombinedName = t.optional(t.string),
+	instanceId = t.optional(t.string),
+	createdUtc = t.optional(t.number),
+	activeUtc = t.optional(t.number)
+})
+
+return t1

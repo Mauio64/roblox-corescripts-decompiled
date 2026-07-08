@@ -1,7 +1,8 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local v1 = require(l_script_FirstAncestor_0.Utils.shouldShowOSAForConversation);
-local v2 = require(l_script_FirstAncestor_0.Utils.shouldShowU13ChatOptInForConversation);
-return function(v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1(v3) or v2(v3);
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local shouldShowOSAForConversation = require(AppChat.Utils.shouldShowOSAForConversation)
+local shouldShowU13ChatOptInForConversation = require(AppChat.Utils.shouldShowU13ChatOptInForConversation)
+
+return function(p1) -- line: 5
+	-- upvalues: shouldShowOSAForConversation (copy), shouldShowU13ChatOptInForConversation (copy)
+	return shouldShowOSAForConversation(p1) or shouldShowU13ChatOptInForConversation(p1)
+end

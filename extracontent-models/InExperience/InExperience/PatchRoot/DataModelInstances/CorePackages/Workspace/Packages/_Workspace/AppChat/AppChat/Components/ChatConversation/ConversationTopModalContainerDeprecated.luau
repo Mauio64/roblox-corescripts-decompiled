@@ -1,218 +1,243 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local _ = require(l_script_FirstAncestor_0.types);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.React);
-local v6 = require(l_script_FirstAncestor_0.Utils.getDeepValue2);
-local l_memo_0 = v5.memo;
-local v8 = require(l_script_FirstAncestor_0.Analytics.useAnalytics);
-local l_useCallback_0 = v5.useCallback;
-local v10 = require(l_script_FirstAncestor_0.Hooks.useConversationTopModal);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v5.useEffect;
-local l_useRef_0 = v5.useRef;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useStyle_0 = require(l_Parent_0.UIBlox).Core.Style.useStyle;
-local l_AccessResponseEnum_0 = require(l_Parent_0.AmpUpsell).AmpEnums.AccessResponseEnum;
-local v17 = require(l_Parent_0.AppChatNetworking);
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local _ = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local v20 = require(l_script_FirstAncestor_0.Conversations.Actions.DismissedConversationTopModal);
-local v21 = require(l_script_FirstAncestor_0.EnumScreens);
-local v22 = require(l_script_FirstAncestor_0.Analytics.EventNames);
-local l_NavigateBack_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateBack;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local v25 = require(l_script_FirstAncestor_0.Conversations.Thunks.refreshAllUnfilteredThreadsDetails);
-local v26 = require(l_script_FirstAncestor_0.Components.UnfilteredThreadsAMPFeatureName);
-local v27 = require(script.Parent.ConversationModal.ConversationModal);
-local v28 = require(script.Parent.ConversationBanner.ConversationBannerDeprecated);
-local v30 = {
-    conversation = {}, 
-    navigateToScreen = function(...) --[[ Line: 46 ]] --[[ Name: navigateToScreen ]]
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Foundation = require(AppChatParent.Foundation)
 
-    end, 
-    setModalHeight = function(_) --[[ Line: 47 ]] --[[ Name: setModalHeight ]]
+require(AppChat.types)
 
-    end
-};
-local v31 = {
-    conversation_banner_group_phone_verification = true, 
-    conversation_banner_group_duplicate_upgrade = true, 
-    conversation_banner_learn_more = true, 
-    conversation_banner_one_to_one_phone_verification = true
-};
-local l_CreateUnfilteredChatPartialModal_0 = v21.CreateUnfilteredChatPartialModal;
-local l_LearnMorePartialModal_0 = v21.LearnMorePartialModal;
-local v34 = {
-    conversation_banner_group_phone_verification = "ConversationPvBanner", 
-    conversation_banner_one_to_one_phone_verification = "ConversationPvBanner", 
-    conversation_banner_group_duplicate_upgrade = "ConversationUpgradeBanner", 
-    conversation_banner_learn_more = "ConversationLearnMoreBanner"
-};
-return l_memo_0(function(v35) --[[ Line: 67 ]] --[[ Name: ConversationTopModalContainer ]]
-    -- upvalues: v4 (copy), v30 (copy), l_useStyle_0 (copy), v8 (copy), l_useDispatch_0 (copy), l_useRef_0 (copy), l_useEffect_0 (copy), l_useSelector_0 (copy), v6 (copy), v10 (copy), v34 (copy), v31 (copy), l_useCallback_0 (copy), v22 (copy), v17 (copy), v20 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v26 (copy), l_NavigateBack_0 (copy), l_AccessResponseEnum_0 (copy), v25 (copy), l_CreateUnfilteredChatPartialModal_0 (copy), l_LearnMorePartialModal_0 (copy), v5 (copy), v28 (copy), v27 (copy), v2 (copy)
-    local v36 = v4.Dictionary.union(v30, v35);
-    local v37 = l_useStyle_0();
-    local v38 = v8();
-    local v39 = l_useDispatch_0();
-    local l_Size_500_0 = v37.Tokens.Global.Size_500;
-    local v41 = l_useRef_0(v36.setModalHeight);
-    l_useEffect_0(function() --[[ Line: 76 ]]
-        -- upvalues: v41 (copy), v36 (copy)
-        v41.current = v36.setModalHeight;
-    end, {
-        v36.setModalHeight
-    });
-    l_useEffect_0(function() --[[ Line: 79 ]]
-        -- upvalues: v41 (copy)
-        return function() --[[ Line: 80 ]]
-            -- upvalues: v41 (ref)
-            if v41.current then
-                v41.current(0);
-            end;
-        end;
-    end, {});
-    local v43 = l_useSelector_0(function(v42) --[[ Line: 87 ]]
-        -- upvalues: v6 (ref), v36 (copy)
-        return v6(v42, (("ChatAppReducer.Modals.conversationTopModalsDismissed.%*"):format(v36.conversation.id))) or {};
-    end);
-    local v44 = v10(v36.conversation.id) or {};
-    local l_modal_variant_0 = v44.modal_variant;
-    local v46 = v6(v44, "modal_layout.id");
-    local v47 = v6(v44, "modal_layout.seen_record_action");
-    local v48 = v6(v44, "modal_layout.dismiss_record_action");
-    local v49 = v34[l_modal_variant_0];
-    local v50 = v31[l_modal_variant_0] and not v43[l_modal_variant_0];
-    local v51 = v6(v44, "modal_layout.buttons");
-    local v52 = v51 and v51[1];
-    local v53 = v51 and v51[2];
-    local v54 = l_useCallback_0(function() --[[ Line: 103 ]]
-        -- upvalues: v38 (copy), v49 (copy), v22 (ref), v36 (copy)
-        if v38 and v49 then
-            v38.fireAnalyticsEvent(v22[("%*ActionClicked"):format(v49)], {
-                conversationId = v36.conversation.id
-            });
-        end;
-    end, {
-        v38, 
-        v49, 
-        v36.conversation.id
-    });
-    local v56 = l_useCallback_0(function() --[[ Line: 111 ]]
-        -- upvalues: v39 (copy), v17 (ref), v48 (copy), v46 (copy), v20 (ref), v36 (copy), l_modal_variant_0 (copy)
-        v39(v17.rodux.RecordModalSequenceResponse.API(v48, "conversation_top_modal", v46)):catch(function(v55) --[[ Line: 118 ]]
-            warn("Error in ConversationTopModalContainer -> RecordModalSequenceResponse dismissed: " .. tostring(v55));
-        end);
-        v39(v20(v36.conversation.id, l_modal_variant_0));
-    end, {
-        v39, 
-        v48, 
-        l_modal_variant_0, 
-        v46, 
-        v36.conversation.id
-    });
-    local v59 = l_useCallback_0(function() --[[ Line: 123 ]]
-        -- upvalues: v54 (copy), v39 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v26 (ref), l_NavigateBack_0 (ref), l_AccessResponseEnum_0 (ref), v25 (ref), v36 (copy)
-        v54();
-        v39(l_NavigateDown_0({
-            name = l_AppPage_0.AmpWizardContainer, 
-            extraProps = {
-                featureName = v26, 
-                completionCallback = function(v57, _) --[[ Line: 129 ]] --[[ Name: completionCallback ]]
-                    -- upvalues: v39 (ref), l_NavigateBack_0 (ref), l_AccessResponseEnum_0 (ref), v25 (ref), v36 (ref)
-                    v39(l_NavigateBack_0(true));
-                    if v57 == l_AccessResponseEnum_0.Granted then
-                        v39(v25(v36.conversation.id));
-                    end;
-                end
-            }
-        }));
-    end, {
-        v54, 
-        v39, 
-        v36.conversation.id
-    });
-    local v60 = l_useCallback_0(function() --[[ Line: 140 ]]
-        -- upvalues: v54 (copy), v36 (copy), l_CreateUnfilteredChatPartialModal_0 (ref)
-        v54();
-        v36.navigateToScreen(l_CreateUnfilteredChatPartialModal_0, {}, true);
-    end, {
-        v36.navigateToScreen, 
-        v54
-    });
-    local v61 = l_useCallback_0(function() --[[ Line: 144 ]]
-        -- upvalues: v54 (copy), v36 (copy), l_LearnMorePartialModal_0 (ref)
-        v54();
-        v36.navigateToScreen(l_LearnMorePartialModal_0, {}, true);
-    end, {
-        v36.navigateToScreen, 
-        v54
-    });
-    l_useEffect_0(function() --[[ Line: 150 ]]
-        -- upvalues: v50 (copy), v39 (copy), v17 (ref), v47 (copy), v46 (copy)
-        if v50 then
-            v39(v17.rodux.RecordModalSequenceResponse.API(v47, "conversation_top_modal", v46)):catch(function(v62) --[[ Line: 158 ]]
-                warn("Error in ConversationTopModalContainer -> RecordModalSequenceResponse seen: " .. tostring(v62));
-            end);
-        end;
-    end, {
-        v39, 
-        v50, 
-        v47, 
-        v46, 
-        v36.conversation.id
-    });
-    l_useEffect_0(function() --[[ Line: 175 ]]
-        -- upvalues: v50 (copy), v38 (copy), v49 (copy), v22 (ref), v36 (copy)
-        if v50 and v38 and v49 then
-            v38.fireAnalyticsEvent(v22[("%*Rendered"):format(v49)], {
-                conversationId = v36.conversation.id
-            });
-        end;
-    end, {
-        v50, 
-        v38, 
-        v49, 
-        v36.conversation.id
-    });
-    local v63 = ({
-        conversation_banner_group_phone_verification = v59, 
-        conversation_banner_one_to_one_phone_verification = v59, 
-        conversation_banner_group_duplicate_upgrade = v60
-    })[l_modal_variant_0];
-    local v64 = nil;
-    if v50 then
-        v64 = if l_modal_variant_0 == "conversation_banner_learn_more" then v5.createElement(v28, {
-            actionText = if v52 then v52.text else nil, 
-            bodyText = v6(v44, "modal_layout.body.text"), 
-            height = l_Size_500_0, 
-            onActivated = v61, 
-            style = v37
-        }) else v5.createElement(v27, {
-            bodyText = v6(v44, "modal_layout.body.text"), 
-            denyText = if v52 then v52.text else nil, 
-            acceptText = if v53 and v63 then v53.text else nil, 
-            paddingTop = v37.Tokens.Global.Space_150, 
-            paddingBottom = v37.Tokens.Global.Space_150, 
-            verticalSpacing = v37.Tokens.Global.Space_150, 
-            onAccepted = v63, 
-            onDenied = v56, 
-            style = v37
-        });
-    elseif l_modal_variant_0 ~= "none" and l_modal_variant_0 ~= nil and not v31[l_modal_variant_0] then
-        warn("Unsupported ConversationTopModal variant: " .. l_modal_variant_0);
-    end;
-    return v5.createElement(v2.View, {
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(1, 0, 0, 0), 
-        LayoutOrder = v36.layoutOrder, 
-        onAbsoluteSizeChanged = function(v65) --[[ Line: 229 ]] --[[ Name: onAbsoluteSizeChanged ]]
-            -- upvalues: v36 (copy)
-            v36.setModalHeight(v65.AbsoluteSize.Y);
-        end
-    }, {
-        conversationTopModal = v64
-    });
-end);
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local getDeepValue2 = require(AppChat.Utils.getDeepValue2)
+local memo = React.memo
+local useAnalytics = require(AppChat.Analytics.useAnalytics)
+local useCallback = React.useCallback
+local useConversationTopModal = require(AppChat.Hooks.useConversationTopModal)
+local useDispatch = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useRef = React.useRef
+local useSelector = require(AppChatParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useStyle = require(AppChatParent.UIBlox).Core.Style.useStyle
+local AccessResponseEnum = require(AppChatParent.AmpUpsell).AmpEnums.AccessResponseEnum
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local AppPage = require(AppChatParent.RobloxAppEnums).AppPage
+
+require(AppChat.Models.ConversationChannels)
+
+local DismissedConversationTopModal = require(AppChat.Conversations.Actions.DismissedConversationTopModal)
+local EnumScreens = require(AppChat.EnumScreens)
+local EventNames = require(AppChat.Analytics.EventNames)
+local NavigateBack = require(AppChatParent.NavigationRodux).Thunks.NavigateBack
+local NavigateDown = require(AppChatParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(AppChatParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v25 = if not FFlagSignalsNavP3Dispatch then nil else require(AppChatParent.RobloxAppNavigation).NavigationCommands
+local refreshAllUnfilteredThreadsDetails = require(AppChat.Conversations.Thunks.refreshAllUnfilteredThreadsDetails)
+local UnfilteredThreadsAMPFeatureName = require(AppChat.Components.UnfilteredThreadsAMPFeatureName)
+local ConversationModal = require(script.Parent.ConversationModal.ConversationModal)
+local ConversationBannerDeprecated = require(script.Parent.ConversationBanner.ConversationBannerDeprecated)
+local t1 = {
+	conversation = {},
+	navigateToScreen = function(...) -- line: 50
+	end,
+	setModalHeight = function(_) -- line: 51
+	end
+}
+local t2 = {
+	conversation_banner_group_phone_verification = true,
+	conversation_banner_group_duplicate_upgrade = true,
+	conversation_banner_learn_more = true,
+	conversation_banner_one_to_one_phone_verification = true
+}
+local CreateUnfilteredChatPartialModal = EnumScreens.CreateUnfilteredChatPartialModal
+local LearnMorePartialModal = EnumScreens.LearnMorePartialModal
+local t3 = {
+	conversation_banner_group_phone_verification = "ConversationPvBanner",
+	conversation_banner_one_to_one_phone_verification = "ConversationPvBanner",
+	conversation_banner_group_duplicate_upgrade = "ConversationUpgradeBanner",
+	conversation_banner_learn_more = "ConversationLearnMoreBanner"
+}
+
+local function ConversationTopModalContainer(t4: {[any]: any}) -- line: 71
+	-- upvalues: Cryo (copy), t1 (copy), useStyle (copy), useAnalytics (copy), useDispatch (copy), useRef (copy), useEffect (copy), useSelector (copy), getDeepValue2 (copy), useConversationTopModal (copy), t3 (copy), t2 (copy), useCallback (copy), EventNames (copy), AppChatNetworking (copy), DismissedConversationTopModal (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), FFlagSignalsNavP3Dispatch (copy), v25 (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), NavigateDown (copy), CreateUnfilteredChatPartialModal (copy), LearnMorePartialModal (copy), React (copy), ConversationBannerDeprecated (copy), ConversationModal (copy), Foundation (copy)
+	local v38 = Cryo.Dictionary.union(t1, t4)
+	local v39 = useStyle()
+	local v40 = useAnalytics()
+	local v41 = useDispatch()
+	local Size_1000 = v39.Tokens.Size.Size_1000
+	local v43 = useRef(v38.setModalHeight)
+
+	useEffect(function() -- line: 80
+		-- upvalues: v43 (copy), v38 (copy)
+		v43.current = v38.setModalHeight
+	end, { v38.setModalHeight })
+	useEffect(function() -- line: 83
+		-- upvalues: v43 (copy)
+		return function() -- line: 84
+			-- upvalues: v43 (copy)
+			if v43.current then
+				v43.current(0)
+			end
+		end
+	end, {})
+
+	local v44 = useSelector(function(p2) -- line: 91
+		-- upvalues: getDeepValue2 (copy), v38 (copy)
+		return getDeepValue2(p2, `ChatAppReducer.Modals.conversationTopModalsDismissed.{ v38.conversation.id }`) or {}
+	end)
+	local v45 = useConversationTopModal(v38.conversation.id) or {}
+	local modal_variant = v45.modal_variant
+	local v47 = getDeepValue2(v45, "modal_layout.id")
+	local v48 = getDeepValue2(v45, "modal_layout.seen_record_action")
+	local v49 = getDeepValue2(v45, "modal_layout.dismiss_record_action")
+	local v50 = t3[modal_variant]
+	local v51 = t2[modal_variant] and not v44[modal_variant]
+	local v52 = getDeepValue2(v45, "modal_layout.buttons")
+	local v53 = v52 and v52[1]
+	local v54 = v52 and v52[2]
+	local v55 = useCallback(function() -- line: 107
+		-- upvalues: v40 (copy), v50 (copy), EventNames (copy), v38 (copy)
+		if v40 and v50 then
+			v40.fireAnalyticsEvent(EventNames[`{ v50 }ActionClicked`], {
+				conversationId = v38.conversation.id
+			})
+		end
+	end, {
+		v40,
+		v50,
+		v38.conversation.id
+	})
+	local v56 = useCallback(function() -- line: 115
+		-- upvalues: v41 (copy), AppChatNetworking (copy), v49 (copy), v47 (copy), DismissedConversationTopModal (copy), v38 (copy), modal_variant (copy)
+		v41(AppChatNetworking.rodux.RecordModalSequenceResponse.API(v49, "conversation_top_modal", v47)):catch(function(p3) -- line: 122
+			warn("Error in ConversationTopModalContainer -> RecordModalSequenceResponse dismissed: " .. tostring(p3))
+		end)
+		v41(DismissedConversationTopModal(v38.conversation.id, modal_variant))
+	end, {
+		v41,
+		v49,
+		modal_variant,
+		v47,
+		v38.conversation.id
+	})
+	local v57 = useCallback(function() -- line: 127
+		-- upvalues: v55 (copy), AppPage (copy), UnfilteredThreadsAMPFeatureName (copy), FFlagSignalsNavP3Dispatch (copy), v25 (copy), v41 (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), v38 (copy), NavigateDown (copy)
+		v55()
+
+		local t5 = {
+			name = AppPage.AmpWizardContainer,
+			extraProps = {
+				featureName = UnfilteredThreadsAMPFeatureName,
+				completionCallback = function(p4, _) -- line: 133
+					-- upvalues: FFlagSignalsNavP3Dispatch (copy), v25 (copy), v41 (copy), NavigateBack (copy), AccessResponseEnum (copy), refreshAllUnfilteredThreadsDetails (copy), v38 (copy)
+					if FFlagSignalsNavP3Dispatch then
+						v25.back(true)
+					else
+						v41(NavigateBack(true))
+					end
+
+					if p4 == AccessResponseEnum.Granted then
+						v41(refreshAllUnfilteredThreadsDetails(v38.conversation.id))
+					end
+				end
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v25.down(v25.fromLegacyPage(t5))
+
+			return
+		end
+
+		v41(NavigateDown(t5))
+	end, {
+		v55,
+		v41,
+		v38.conversation.id
+	})
+	local v58 = useCallback(function() -- line: 153
+		-- upvalues: v55 (copy), v38 (copy), CreateUnfilteredChatPartialModal (copy)
+		v55()
+		v38.navigateToScreen(CreateUnfilteredChatPartialModal, {}, true)
+	end, {
+		v38.navigateToScreen,
+		v55
+	})
+	local v59 = useCallback(function() -- line: 157
+		-- upvalues: v55 (copy), v38 (copy), LearnMorePartialModal (copy)
+		v55()
+		v38.navigateToScreen(LearnMorePartialModal, {}, true)
+	end, {
+		v38.navigateToScreen,
+		v55
+	})
+
+	useEffect(function() -- line: 163
+		-- upvalues: v51 (copy), v41 (copy), AppChatNetworking (copy), v48 (copy), v47 (copy)
+		if v51 then
+			v41(AppChatNetworking.rodux.RecordModalSequenceResponse.API(v48, "conversation_top_modal", v47)):catch(function(p6) -- line: 171
+				warn("Error in ConversationTopModalContainer -> RecordModalSequenceResponse seen: " .. tostring(p6))
+			end)
+		end
+	end, {
+		v41,
+		v51,
+		v48,
+		v47,
+		v38.conversation.id
+	})
+	useEffect(function() -- line: 188
+		-- upvalues: v51 (copy), v40 (copy), v50 (copy), EventNames (copy), v38 (copy)
+		if v51 and (v40 and v50) then
+			v40.fireAnalyticsEvent(EventNames[`{ v50 }Rendered`], {
+				conversationId = v38.conversation.id
+			})
+		end
+	end, {
+		v51,
+		v40,
+		v50,
+		v38.conversation.id
+	})
+
+	local v60 = ({
+		conversation_banner_group_phone_verification = v57,
+		conversation_banner_one_to_one_phone_verification = v57,
+		conversation_banner_group_duplicate_upgrade = v58
+	})[modal_variant]
+	local v61 = nil
+
+	if v51 then
+		v61 = if modal_variant ~= "conversation_banner_learn_more" then React.createElement(ConversationModal, {
+			bodyText = getDeepValue2(v45, "modal_layout.body.text"),
+			denyText = if not v53 then nil else v53.text,
+			acceptText = if not v54 or not v60 then nil else v54.text,
+			paddingTop = v39.Tokens.Size.Size_300,
+			paddingBottom = v39.Tokens.Size.Size_300,
+			verticalSpacing = v39.Tokens.Size.Size_300,
+			onAccepted = v60,
+			onDenied = v56,
+			style = v39
+		}) else React.createElement(ConversationBannerDeprecated, {
+			actionText = if not v53 then nil else v53.text,
+			bodyText = getDeepValue2(v45, "modal_layout.body.text"),
+			height = Size_1000,
+			onActivated = v59,
+			style = v39
+		})
+	elseif modal_variant ~= "none" and modal_variant ~= nil and not t2[modal_variant] then
+		warn("Unsupported ConversationTopModal variant: " .. modal_variant)
+	end
+
+	return React.createElement(Foundation.View, {
+		BackgroundTransparency = 1,
+		AutomaticSize = Enum.AutomaticSize.Y,
+		Size = UDim2.new(1, 0, 0, 0),
+		LayoutOrder = v38.layoutOrder,
+		onAbsoluteSizeChanged = function(p7) -- line: 242
+			-- upvalues: v38 (copy)
+			v38.setModalHeight(p7.AbsoluteSize.Y)
+		end
+	}, {
+		conversationTopModal = v61
+	})
+end
+
+return memo(ConversationTopModalContainer)

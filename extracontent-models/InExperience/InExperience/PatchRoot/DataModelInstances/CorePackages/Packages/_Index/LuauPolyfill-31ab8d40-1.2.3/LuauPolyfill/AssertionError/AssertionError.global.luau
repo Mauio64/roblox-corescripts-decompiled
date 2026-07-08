@@ -1,382 +1,440 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.Collections);
-local l_Array_0 = v2.Array;
-local l_Object_0 = v2.Object;
-local v5 = require(l_Parent_1.Boolean);
-local v6 = require(l_Parent_1.String);
-local _ = require(l_Parent_1.ES7Types);
-local l_inspect_0 = v2.inspect;
-local v9 = require(l_Parent_0.Error);
-local v10 = require(l_Parent_1.InstanceOf);
-local v11 = {
-    stderr = {
-        isTTY = false, 
-        columns = 0, 
-        hasColors = function(...) --[[ Line: 48 ]] --[[ Name: hasColors ]]
-            return true;
-        end
-    }
-};
-ErrorCaptureStackTrace = function(v12, ...) --[[ Line: 55 ]] --[[ Name: ErrorCaptureStackTrace ]]
-    -- upvalues: v9 (copy)
-    v9.captureStackTrace(v12, ...);
-end;
-local function _(v13) --[[ Line: 60 ]] --[[ Name: removeColors ]]
-    return v13;
-end;
-local v15 = "";
-local v16 = "";
-local v17 = "";
-local v18 = "";
-local v19 = {
-    deepStrictEqual = "Expected values to be strictly deep-equal:", 
-    strictEqual = "Expected values to be strictly equal:", 
-    strictEqualObject = "Expected \"actual\" to be reference-equal to \"expected\":", 
-    deepEqual = "Expected values to be loosely deep-equal:", 
-    notDeepStrictEqual = "Expected \"actual\" not to be strictly deep-equal to:", 
-    notStrictEqual = "Expected \"actual\" to be strictly unequal to:", 
-    notStrictEqualObject = "Expected \"actual\" not to be reference-equal to \"expected\":", 
-    notDeepEqual = "Expected \"actual\" not to be loosely deep-equal to:", 
-    notIdentical = "Values have same structure but are not reference-equal:", 
-    notDeepEqualUnequal = "Expected values not to be loosely deep-equal:"
-};
-local _ = function(v20) --[[ Line: 88 ]] --[[ Name: copyError ]]
-    -- upvalues: l_Object_0 (copy)
-    local v21 = l_Object_0.keys(v20);
-    local v22 = {};
-    for _, v24 in v21 do
-        v22[v24] = v20[v24];
-    end;
-    v22.message = v20.message;
-    return v22;
-end;
-local function _(v26) --[[ Line: 99 ]] --[[ Name: inspectValue ]]
-    -- upvalues: l_inspect_0 (copy)
-    return l_inspect_0(v26, {
-        compact = false, 
-        customInspect = false, 
-        depth = 1000, 
-        maxArrayLength = 1e999, 
-        showHidden = false, 
-        showProxy = false, 
-        sorted = true, 
-        getters = true
-    });
-end;
-local function v59(v28, v29, v30) --[[ Line: 114 ]] --[[ Name: createErrDiff ]]
-    -- upvalues: l_inspect_0 (copy), v6 (copy), v5 (copy), v19 (copy), v11 (copy), v15 (ref), v18 (ref), l_Array_0 (copy), v16 (ref), v17 (ref)
-    local v31 = "";
-    local v32 = "";
-    local v33 = "";
-    local v34 = false;
-    local v35 = l_inspect_0(v28, {
-        compact = false, 
-        customInspect = false, 
-        depth = 1000, 
-        maxArrayLength = 1e999, 
-        showHidden = false, 
-        showProxy = false, 
-        sorted = true, 
-        getters = true
-    });
-    local v36 = v6.split(v35, "\n");
-    local v37 = v6.split(l_inspect_0(v29, {
-        compact = false, 
-        customInspect = false, 
-        depth = 1000, 
-        maxArrayLength = 1e999, 
-        showHidden = false, 
-        showProxy = false, 
-        sorted = true, 
-        getters = true
-    }), "\n");
-    local v38 = 0;
-    local v39 = "";
-    if v30 == "strictEqual" and (typeof(v28) == "table" and v28 ~= nil and typeof(v29) == "table" and v29 ~= nil or typeof(v28) == "function" and typeof(v29) == "function") then
-        v30 = "strictEqualObject";
-    end;
-    if #v36 == 1 and #v37 == 1 and v36[1] ~= v37[1] then
-        local v40 = v36[1];
-        local v41 = if v5.toJSBoolean(false) then v37[1] else v37[1];
-        local v42 = string.len(v40) + string.len(v41);
-        if v42 <= 12 then
-            if (typeof(v28) ~= "table" or v28 == nil) and (typeof(v29) ~= "table" or v29 == nil) and (v28 ~= 0 or v29 ~= 0) then
-                return ("%s\n\n"):format(v19[v30]) .. ("%s !== %s\n"):format(v36[1], v37[1]);
-            end;
-        elseif v30 ~= "strictEqualObject" and v42 < if v11.stderr.isTTY then v11.stderr.columns else 80 then
-            while string.sub(v40, v38 + 1, v38 + 1) == string.sub(v41, v38 + 1, v38 + 1) do
-                v38 = v38 + 1;
-            end;
-            if v38 > 2 then
-                v39 = ("\n  %s^"):format(string.rep(" ", v38));
-                v38 = 0;
-            end;
-        end;
-    end;
-    local v43 = v36[#v36];
-    local v44 = v37[#v37];
-    while v43 == v44 do
-        local l_v38_0 = v38;
-        v38 = v38 + 1;
-        if l_v38_0 < 3 then
-            v33 = ("\n  %s%s"):format(v43, v33);
-        else
-            v31 = v43;
-        end;
-        table.remove(v36);
-        table.remove(v37);
-        if #v36 ~= 0 and #v37 ~= 0 then
-            v43 = v36[#v36];
-            v44 = v37[#v37];
-        else
-            break;
-        end;
-    end;
-    local v46 = math.max(#v36, #v37);
-    if v46 == 0 then
-        local v47 = v6.split(v35, "\n");
-        if #v47 > 50 then
-            v47[47] = ("%s...%s"):format(v15, v18);
-            while #v47 > 47 do
-                table.remove(v47);
-            end;
-        end;
-        return ("%s\n\n"):format(v19.notIdentical) .. ("%s\n"):format(l_Array_0.join(v47, "\n"));
-    else
-        if v38 >= 5 then
-            v33 = ("\n%s...%s%s"):format(v15, v18, v33);
-            v34 = true;
-        end;
-        if v31 ~= "" then
-            v33 = ("\n  %s%s"):format(v31, v33);
-            v31 = "";
-        end;
-        local v48 = 0;
-        local v49 = 0;
-        local v50 = v19[v30] .. ("\n%s+ actual%s %s- expected%s"):format(v16, v18, v17, v18);
-        local v51 = (" %s...%s Lines skipped"):format(v15, v18);
-        local l_v36_0 = v36;
-        local v53 = ("%s+%s"):format(v16, v18);
-        local v54 = #v37;
-        if #v36 < v46 then
-            l_v36_0 = v37;
-            v53 = ("%s-%s"):format(v17, v18);
-            v54 = #v36;
-        end;
-        for v55 = 1, v46 do
-            v38 = v55;
-            if v54 < v55 then
-                if v49 > 2 then
-                    if v49 > 3 then
-                        if v49 > 4 then
-                            if v49 == 5 then
-                                v32 = v32 .. ("\n  %s"):format(l_v36_0[v55 - 3]);
-                                v48 = v48 + 1;
-                            else
-                                v32 = v32 .. ("\n%s...%s"):format(v15, v18);
-                                v34 = true;
-                            end;
-                        end;
-                        v32 = v32 .. ("\n  %s"):format(l_v36_0[v55 - 2]);
-                        v48 = v48 + 1;
-                    end;
-                    v32 = v32 .. ("\n  %s"):format(l_v36_0[v55 - 1]);
-                    v48 = v48 + 1;
-                end;
-                v49 = 0;
-                if l_v36_0 == v36 then
-                    v32 = v32 .. ("\n%s %s"):format(v53, l_v36_0[v55]);
-                else
-                    v31 = v31 .. ("\n%s %s"):format(v53, l_v36_0[v55]);
-                end;
-                v48 = v48 + 1;
-            else
-                local v56 = v37[v55];
-                local v57 = v36[v55];
-                local v58 = false;
-                if v57 ~= v56 then
-                    v58 = not v5.toJSBoolean(v6.endsWith(v57, ",")) or v6.slice(v57, 0, -1) ~= v56;
-                end;
-                if v58 and v6.endsWith(v56, ",") and v6.slice(v56, 0, -1) == v57 then
-                    v58 = false;
-                    v57 = v57 .. ",";
-                end;
-                if v58 then
-                    if v49 > 2 then
-                        if v49 > 3 then
-                            if v49 > 4 then
-                                if v49 == 5 then
-                                    v32 = v32 .. ("\n  %s"):format(v36[v55 - 3]);
-                                    v48 = v48 + 1;
-                                else
-                                    v32 = v32 .. ("\n%s...%s"):format(v15, v18);
-                                    v34 = true;
-                                end;
-                            end;
-                            v32 = v32 .. ("\n  %s"):format(v36[v55 - 2]);
-                            v48 = v48 + 1;
-                        end;
-                        v32 = v32 .. ("\n  %s"):format(v36[v55 - 1]);
-                        v48 = v48 + 1;
-                    end;
-                    v49 = 0;
-                    v32 = v32 .. ("\n%s+%s %s"):format(v16, v18, v57);
-                    v31 = v31 .. ("\n%s-%s %s"):format(v17, v18, v56);
-                    v48 = v48 + 2;
-                else
-                    v32 = v32 .. v31;
-                    v31 = "";
-                    v49 = v49 + 1;
-                    if v49 <= 2 then
-                        v32 = v32 .. ("\n  %s"):format(v57);
-                        v48 = v48 + 1;
-                    end;
-                end;
-            end;
-            if v48 > 50 and v55 < v46 - 2 then
-                return ("%s%s\n%s\n%s...%s%s\n"):format(v50, v51, v32, v15, v18, v31) .. ("%s...%s"):format(v15, v18);
-            end;
-        end;
-        return ("%s%s\n%s%s%s%s"):format(v50, if v34 then v51 else "", v32, v31, v33, v39);
-    end;
-end;
-local v60 = setmetatable({}, {
-    __index = v9
-});
-v60.__index = v60;
-v60.__tostring = function(v61) --[[ Line: 394 ]]
-    return v61:toString();
-end;
-v60.new = function(v62) --[[ Line: 407 ]] --[[ Name: new ]]
-    -- upvalues: v9 (copy), v60 (copy), v11 (copy), v15 (ref), v16 (ref), v18 (ref), v17 (ref), l_Array_0 (copy), l_Object_0 (copy), v10 (copy), v59 (copy), v19 (copy), v6 (copy), l_inspect_0 (copy), v5 (copy)
-    local v63 = nil;
-    local l_message_0 = v62.message;
-    local l_operator_0 = v62.operator;
-    local l_stackStartFn_0 = v62.stackStartFn;
-    local l_actual_0 = v62.actual;
-    local l_expected_0 = v62.expected;
-    if l_message_0 ~= nil then
-        v63 = setmetatable(v9.new((tostring(l_message_0))), v60);
-    else
-        if v11.stderr.isTTY then
-            if v11.stderr:hasColors() then
-                v15 = "\027[34m";
-                v16 = "\027[32m";
-                v18 = "\027[39m";
-                v17 = "\027[31m";
-            else
-                v15 = "";
-                v16 = "";
-                v18 = "";
-                v17 = "";
-            end;
-        end;
-        if typeof(l_actual_0) == "table" and l_actual_0 ~= nil and typeof(l_expected_0) == "table" and l_expected_0 ~= nil and l_Array_0.indexOf(l_Object_0.keys(l_actual_0), "stack") ~= -1 and v10(l_actual_0, v9) and l_Array_0.indexOf(l_Object_0.keys(l_expected_0), "stack") ~= -1 and v10(l_expected_0, v9) then
-            local l_l_actual_0_0 = l_actual_0;
-            local v70 = l_Object_0.keys(l_l_actual_0_0);
-            local v71 = {};
-            for _, v73 in v70 do
-                v71[v73] = l_l_actual_0_0[v73];
-            end;
-            v71.message = l_l_actual_0_0.message;
-            l_actual_0 = v71;
-            l_l_actual_0_0 = l_expected_0;
-            v70 = l_Object_0.keys(l_l_actual_0_0);
-            v71 = {};
-            for _, v75 in v70 do
-                v71[v75] = l_l_actual_0_0[v75];
-            end;
-            v71.message = l_l_actual_0_0.message;
-            l_expected_0 = v71;
-        end;
-        if l_operator_0 == "deepStrictEqual" or l_operator_0 == "strictEqual" then
-            v63 = setmetatable(v9.new(v59(l_actual_0, l_expected_0, l_operator_0)), v60);
-        elseif l_operator_0 == "notDeepStrictEqual" or l_operator_0 == "notStrictEqual" then
-            local v76 = v19[l_operator_0];
-            local v77 = v6.split(l_inspect_0(l_actual_0, {
-                compact = false, 
-                customInspect = false, 
-                depth = 1000, 
-                maxArrayLength = 1e999, 
-                showHidden = false, 
-                showProxy = false, 
-                sorted = true, 
-                getters = true
-            }), "\n");
-            if l_operator_0 == "notStrictEqual" and (typeof(l_actual_0) == "table" and l_actual_0 ~= nil or typeof(l_actual_0) == "function") then
-                v76 = v19.notStrictEqualObject;
-            end;
-            if #v77 > 50 then
-                v77[47] = ("%s...%s"):format(v15, v18);
-                while #v77 > 47 do
-                    table.remove(v77);
-                end;
-            end;
-            v63 = if #v77 == 1 then setmetatable(v9.new(("%s%s%s"):format(v76, string.len(v77[1]) > 5 and "\n\n" or " ", v77[1])), v60) else setmetatable(v9.new(("%s\n\n%s\n"):format(v76, l_Array_0.join(v77, "\n"))), v60);
-        else
-            local v78 = l_inspect_0(l_actual_0, {
-                compact = false, 
-                customInspect = false, 
-                depth = 1000, 
-                maxArrayLength = 1e999, 
-                showHidden = false, 
-                showProxy = false, 
-                sorted = true, 
-                getters = true
-            });
-            local v79 = l_inspect_0(l_expected_0, {
-                compact = false, 
-                customInspect = false, 
-                depth = 1000, 
-                maxArrayLength = 1e999, 
-                showHidden = false, 
-                showProxy = false, 
-                sorted = true, 
-                getters = true
-            });
-            local v80 = v19[tostring(l_operator_0)];
-            if l_operator_0 == "notDeepEqual" and v78 == v79 then
-                v78 = ("%s\n\n%s"):format(v80, v78);
-                if string.len(v78) > 1024 then
-                    v78 = ("%s..."):format(v6.slice(v78, 0, 1021));
-                end;
-                v63 = setmetatable(v9.new(v78), v60);
-            else
-                if string.len(v78) > 512 then
-                    v78 = ("%s..."):format(v6.slice(v78, 0, 509));
-                end;
-                if string.len(v79) > 512 then
-                    v79 = ("%s..."):format(v6.slice(v79, 0, 509));
-                end;
-                if l_operator_0 == "deepEqual" then
-                    v78 = ("%s\n\n%s\n\nshould loosely deep-equal\n\n"):format(v80, v78);
-                else
-                    local v81 = v19[("%sUnequal"):format((tostring(l_operator_0)))];
-                    if v5.toJSBoolean(v81) then
-                        v78 = ("%s\n\n%s\n\nshould not loosely deep-equal\n\n"):format(v81, v78);
-                    else
-                        v79 = (" %s %s"):format(tostring(l_operator_0), v79);
-                    end;
-                end;
-                v63 = setmetatable(v9.new(("%s%s"):format(v78, v79)), v60);
-            end;
-        end;
-    end;
-    v63.generatedMessage = not v5.toJSBoolean(l_message_0);
-    v63.name = "AssertionError [ERR_ASSERTION]";
-    v63.code = "ERR_ASSERTION";
-    v63.actual = l_actual_0;
-    v63.expected = l_expected_0;
-    v63.operator = l_operator_0;
-    ErrorCaptureStackTrace(v63, l_stackStartFn_0 or v60.new);
-    v63.name = "AssertionError";
-    return v63;
-end;
-v60.toString = function(v82) --[[ Line: 576 ]] --[[ Name: toString ]]
-    return ("%s [%s]: %s"):format(v82.name, v82.code, v82.message);
-end;
-v60.name = "AssertionError";
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Collections = require(ParentParentParent.Collections)
+local Array = Collections.Array
+local Object = Collections.Object
+local Boolean = require(ParentParentParent.Boolean)
+local String = require(ParentParentParent.String)
+
+require(ParentParentParent.ES7Types)
+
+local inspect = Collections.inspect
+local Error = require(ParentParent.Error)
+local InstanceOf = require(ParentParentParent.InstanceOf)
+local t1 = {
+	stderr = {
+		isTTY = false,
+		columns = 0,
+		hasColors = function(...) -- line: 48
+			return true
+		end
+	}
+}
+
+function ErrorCaptureStackTrace(p1, ...) -- line: 55
+	-- upvalues: Error (copy)
+	Error.captureStackTrace(p1, ...)
+end
+
+local function removeColors(p2) -- line: 60
+	return p2
+end
+
+local s1 = ""
+local s2 = ""
+local s3 = ""
+local s4 = ""
+local t2 = {
+	deepStrictEqual = "Expected values to be strictly deep-equal:",
+	strictEqual = "Expected values to be strictly equal:",
+	strictEqualObject = "Expected \"actual\" to be reference-equal to \"expected\":",
+	deepEqual = "Expected values to be loosely deep-equal:",
+	notDeepStrictEqual = "Expected \"actual\" not to be strictly deep-equal to:",
+	notStrictEqual = "Expected \"actual\" to be strictly unequal to:",
+	notStrictEqualObject = "Expected \"actual\" not to be reference-equal to \"expected\":",
+	notDeepEqual = "Expected \"actual\" not to be loosely deep-equal to:",
+	notIdentical = "Values have same structure but are not reference-equal:",
+	notDeepEqualUnequal = "Expected values not to be loosely deep-equal:"
+}
+
+local function copyError(p3) -- line: 88
+	-- upvalues: Object (copy)
+	local t3 = {}
+
+	for _, v27 in (Object.keys(p3)) do
+		t3[v27] = p3[v27]
+	end
+
+	t3.message = p3.message
+
+	return t3
+end
+local function inspectValue(p4) -- line: 99
+	-- upvalues: inspect (copy)
+	return inspect(p4, {
+		compact = false,
+		customInspect = false,
+		depth = 1000,
+		maxArrayLength = 1e999,
+		showHidden = false,
+		showProxy = false,
+		sorted = true,
+		getters = true
+	})
+end
+local function createErrDiff(p5, p6, p7) -- line: 114
+	-- upvalues: inspect (copy), String (copy), Boolean (copy), t2 (copy), t1 (copy), s1 (ref), s4 (ref), Array (copy), s2 (ref), s3 (ref)
+	local s5 = ""
+	local s6 = ""
+	local s7 = ""
+	local v35 = false
+	local v36 = inspect(p5, {
+		compact = false,
+		customInspect = false,
+		depth = 1000,
+		maxArrayLength = 1e999,
+		showHidden = false,
+		showProxy = false,
+		sorted = true,
+		getters = true
+	})
+	local v37 = String.split(v36, "\n")
+	local v38 = String.split(inspect(p6, {
+		compact = false,
+		customInspect = false,
+		depth = 1000,
+		maxArrayLength = 1e999,
+		showHidden = false,
+		showProxy = false,
+		sorted = true,
+		getters = true
+	}), "\n")
+	local n1 = 0
+	local s8 = ""
+
+	if p7 == "strictEqual" and (typeof(p5) == "table" and p5 ~= nil and typeof(p6) == "table" and p6 ~= nil or typeof(p5) == "function" and typeof(p6) == "function") then
+		p7 = "strictEqualObject"
+	end
+
+	if #v37 == 1 and #v38 == 1 and v37[1] ~= v38[1] then
+		local v41 = v37[1]
+		local v42 = if not Boolean.toJSBoolean(false) then v38[1] else v38[1]
+		local v43 = string.len(v41) + string.len(v42)
+
+		if v43 <= 12 then
+			if (typeof(p5) ~= "table" or p5 == nil) and (typeof(p6) ~= "table" or p6 == nil) and (p5 ~= 0 or p6 ~= 0) then
+				return ("%s\n\n"):format(t2[p7]) .. ("%s !== %s\n"):format(v37[1], v38[1])
+			end
+		elseif p7 ~= "strictEqualObject" and v43 < (not t1.stderr.isTTY and 80 or t1.stderr.columns) then
+			while string.sub(v41, n1 + 1, n1 + 1) == string.sub(v42, n1 + 1, n1 + 1) do
+				n1 += 1
+			end
+
+			if n1 > 2 then
+				s8 = ("\n  %s^"):format(string.rep(" ", n1))
+				n1 = 0
+			end
+		end
+	end
+
+	local v44 = v37[#v37]
+	local v45 = v38[#v38]
+
+	while v44 == v45 do
+		local v46 = n1 + 1
+
+		if n1 < 3 then
+			s7 = ("\n  %s%s"):format(v44, s7)
+		else
+			s5 = v44
+		end
+
+		table.remove(v37)
+		table.remove(v38)
+		n1 = v46
+
+		if #v37 == 0 or #v38 == 0 then
+			break
+		end
+
+		v44 = v37[#v37]
+		v45 = v38[#v38]
+		n1 = v46
+	end
+
+	local v47 = math.max(#v37, #v38)
+
+	if v47 == 0 then
+		local v48 = String.split(v36, "\n")
+
+		if #v48 > 50 then
+			v48[47] = ("%s...%s"):format(s1, s4)
+
+			while #v48 > 47 do
+				table.remove(v48)
+			end
+		end
+
+		return ("%s\n\n"):format("Values have same structure but are not reference-equal:") .. ("%s\n"):format(Array.join(v48, "\n"))
+	end
+
+	if n1 >= 5 then
+		s7 = ("\n%s...%s%s"):format(s1, s4, s7)
+		v35 = true
+	end
+
+	if s5 ~= "" then
+		s7 = ("\n  %s%s"):format(s5, s7)
+		s5 = ""
+	end
+
+	local n2 = 0
+	local n3 = 0
+	local v51 = t2[p7] .. ("\n%s+ actual%s %s- expected%s"):format(s2, s4, s3, s4)
+	local v52 = (" %s...%s Lines skipped"):format(s1, s4)
+	local v53 = v37
+	local v54 = ("%s+%s"):format(s2, s4)
+	local v55 = #v38
+
+	if v47 > #v37 then
+		v53 = v38
+		v54 = ("%s-%s"):format(s3, s4)
+		v55 = #v37
+	end
+
+	for i = 1, v47 do
+		if v55 < i then
+			if n3 > 2 then
+				if n3 > 3 then
+					if n3 > 4 then
+						if n3 == 5 then
+							s6 ..= ("\n  %s"):format(v53[i - 3])
+							n2 += 1
+						else
+							s6 ..= ("\n%s...%s"):format(s1, s4)
+							v35 = true
+						end
+					end
+
+					s6 ..= ("\n  %s"):format(v53[i - 2])
+					n2 += 1
+				end
+
+				s6 ..= ("\n  %s"):format(v53[i - 1])
+				n2 += 1
+			end
+
+			n3 = 0
+
+			if v53 == v37 then
+				s6 ..= ("\n%s %s"):format(v54, v53[i])
+			else
+				s5 ..= ("\n%s %s"):format(v54, v53[i])
+			end
+
+			n2 += 1
+		else
+			local v57 = v38[i]
+			local v58 = v37[i]
+			local v59 = v58 ~= v57 and (not Boolean.toJSBoolean(String.endsWith(v58, ",")) or v57 ~= String.slice(v58, 0, -1))
+
+			if v59 and String.endsWith(v57, ",") and v58 == String.slice(v57, 0, -1) then
+				v59 = false
+				v58 ..= ","
+			end
+
+			if v59 then
+				if n3 > 2 then
+					if n3 > 3 then
+						if n3 > 4 then
+							if n3 == 5 then
+								s6 ..= ("\n  %s"):format(v37[i - 3])
+								n2 += 1
+							else
+								s6 ..= ("\n%s...%s"):format(s1, s4)
+								v35 = true
+							end
+						end
+
+						s6 ..= ("\n  %s"):format(v37[i - 2])
+						n2 += 1
+					end
+
+					s6 ..= ("\n  %s"):format(v37[i - 1])
+					n2 += 1
+				end
+
+				n3 = 0
+				s6 ..= ("\n%s+%s %s"):format(s2, s4, v58)
+				s5 ..= ("\n%s-%s %s"):format(s3, s4, v57)
+				n2 += 2
+			else
+				s6 ..= s5
+				s5 = ""
+				n3 += 1
+
+				if n3 <= 2 then
+					s6 ..= ("\n  %s"):format(v58)
+					n2 += 1
+				end
+			end
+		end
+
+		if n2 > 50 and i < v47 - 2 then
+			return ("%s%s\n%s\n%s...%s%s\n"):format(v51, v52, s6, s1, s4, s5) .. ("%s...%s"):format(s1, s4)
+		end
+	end
+
+	return ("%s%s\n%s%s%s%s"):format(v51, not v35 and "" or v52, s6, s5, s7, s8)
+end
+
+local self = setmetatable({}, {
+	__index = Error
+})
+
+self.__index = self
+
+function self.__tostring(p8) -- line: 394
+	return p8:toString()
+end
+function self.new(t4: {[any]: any}) -- line: 407
+	-- upvalues: Error (copy), self (copy), t1 (copy), s1 (ref), s2 (ref), s4 (ref), s3 (ref), Array (copy), Object (copy), InstanceOf (copy), createErrDiff (copy), t2 (copy), String (copy), inspect (copy), Boolean (copy)
+	local message = t4.message
+	local operator = t4.operator
+	local stackStartFn = t4.stackStartFn
+	local actual = t4.actual
+	local expected = t4.expected
+	local v67
+
+	if message ~= nil then
+		v67 = setmetatable(Error.new((tostring(message))), self)
+	else
+		if t1.stderr.isTTY then
+			if t1.stderr:hasColors() then
+				s1 = "\027[34m"
+				s2 = "\027[32m"
+				s4 = "\027[39m"
+				s3 = "\027[31m"
+			else
+				s1 = ""
+				s2 = ""
+				s4 = ""
+				s3 = ""
+			end
+		end
+
+		if typeof(actual) == "table" and actual ~= nil and typeof(expected) == "table" and expected ~= nil and Array.indexOf(Object.keys(actual), "stack") ~= -1 and InstanceOf(actual, Error) and Array.indexOf(Object.keys(expected), "stack") ~= -1 and InstanceOf(expected, Error) then
+			local t5 = {}
+
+			for _, v70 in (Object.keys(actual)) do
+				t5[v70] = actual[v70]
+			end
+
+			t5.message = actual.message
+			actual = t5
+
+			local t6 = {}
+
+			for _, v73 in (Object.keys(expected)) do
+				t6[v73] = expected[v73]
+			end
+
+			t6.message = expected.message
+			expected = t6
+		end
+
+		if operator == "deepStrictEqual" or operator == "strictEqual" then
+			v67 = setmetatable(Error.new(createErrDiff(actual, expected, operator)), self)
+		elseif operator == "notDeepStrictEqual" or operator == "notStrictEqual" then
+			local v74 = t2[operator]
+			local v75 = String.split(inspect(actual, {
+				compact = false,
+				customInspect = false,
+				depth = 1000,
+				maxArrayLength = 1e999,
+				showHidden = false,
+				showProxy = false,
+				sorted = true,
+				getters = true
+			}), "\n")
+
+			if operator == "notStrictEqual" and (typeof(actual) == "table" and actual ~= nil or typeof(actual) == "function") then
+				v74 = "Expected \"actual\" not to be reference-equal to \"expected\":"
+			end
+
+			if #v75 > 50 then
+				v75[47] = ("%s...%s"):format(s1, s4)
+
+				while #v75 > 47 do
+					table.remove(v75)
+				end
+			end
+
+			v67 = if #v75 ~= 1 then setmetatable(Error.new(("%s\n\n%s\n"):format(v74, Array.join(v75, "\n"))), self) else setmetatable(Error.new(("%s%s%s"):format(v74, not (string.len(v75[1]) > 5) and " " or "\n\n", v75[1])), self)
+		else
+			local v76 = inspect(actual, {
+				compact = false,
+				customInspect = false,
+				depth = 1000,
+				maxArrayLength = 1e999,
+				showHidden = false,
+				showProxy = false,
+				sorted = true,
+				getters = true
+			})
+			local v77 = inspect(expected, {
+				compact = false,
+				customInspect = false,
+				depth = 1000,
+				maxArrayLength = 1e999,
+				showHidden = false,
+				showProxy = false,
+				sorted = true,
+				getters = true
+			})
+			local v78 = t2[tostring(operator)]
+
+			if operator == "notDeepEqual" and v76 == v77 then
+				local v79 = ("%s\n\n%s"):format(v78, v76)
+
+				if string.len(v79) > 1024 then
+					v79 = ("%s..."):format(String.slice(v79, 0, 1021))
+				end
+
+				v67 = setmetatable(Error.new(v79), self)
+			else
+				if string.len(v76) > 512 then
+					v76 = ("%s..."):format(String.slice(v76, 0, 509))
+				end
+
+				if string.len(v77) > 512 then
+					v77 = ("%s..."):format(String.slice(v77, 0, 509))
+				end
+
+				if operator == "deepEqual" then
+					v76 = ("%s\n\n%s\n\nshould loosely deep-equal\n\n"):format(v78, v76)
+				else
+					local v80 = t2[("%sUnequal"):format((tostring(operator)))]
+
+					if Boolean.toJSBoolean(v80) then
+						v76 = ("%s\n\n%s\n\nshould not loosely deep-equal\n\n"):format(v80, v76)
+					else
+						v77 = (" %s %s"):format(tostring(operator), v77)
+					end
+				end
+
+				v67 = setmetatable(Error.new(("%s%s"):format(v76, v77)), self)
+			end
+		end
+	end
+
+	v67.generatedMessage = not Boolean.toJSBoolean(message)
+	v67.name = "AssertionError [ERR_ASSERTION]"
+	v67.code = "ERR_ASSERTION"
+	v67.actual = actual
+	v67.expected = expected
+	v67.operator = operator
+	ErrorCaptureStackTrace(v67, stackStartFn or self.new)
+	v67.name = "AssertionError"
+
+	return v67
+end
+function self.toString(p9) -- line: 576
+	return ("%s [%s]: %s"):format(p9.name, p9.code, p9.message)
+end
+
+self.name = "AssertionError"
+
 return {
-    AssertionError = v60
-};
+	AssertionError = self
+}

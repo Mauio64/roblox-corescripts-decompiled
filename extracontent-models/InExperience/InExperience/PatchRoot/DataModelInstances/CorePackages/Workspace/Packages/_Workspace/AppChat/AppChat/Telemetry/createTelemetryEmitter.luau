@@ -1,16 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.SocialLuaAnalytics);
-local v2 = require(l_Parent_0.LoggingProtocol);
-local v3 = require(script.Parent.Logger);
-return function(v4) --[[ Line: 8 ]]
-    -- upvalues: v1 (copy), v2 (copy), v3 (copy)
-    return v1.Telemetry.createEmitter({
-        telemetryImpl = v2.default, 
-        loggerImpl = v3, 
-        defaultTelemetryConfig = {
-            throttlingThousandths = 10000, 
-            links = "example.com"
-        }, 
-        getSharedInfo = v4
-    });
-end;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local Logger = require(script.Parent.Logger)
+local v5 = game:DefineFastFlag("AppChatAnalyticsUseTelemetryService", false)
+
+return function(p1: ((...any) -> ...any)) -- line: 10
+	-- upvalues: SocialLuaAnalytics (copy), LoggingProtocol (copy), Logger (copy), v5 (copy)
+	return SocialLuaAnalytics.Telemetry.createEmitter({
+		telemetryImpl = LoggingProtocol.default,
+		loggerImpl = Logger,
+		defaultTelemetryConfig = {
+			throttlingThousandths = 10000,
+			links = "example.com"
+		},
+		getSharedInfo = p1,
+		shouldUseTelemetryService = v5
+	})
+end

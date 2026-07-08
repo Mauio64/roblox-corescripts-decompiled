@@ -1,69 +1,85 @@
-local l_Parent_0 = script:FindFirstAncestor("AppCommonLib").Parent;
-local v1 = require(l_Parent_0.Result);
-local v2 = require(l_Parent_0.Promise);
+local Parent = script:FindFirstAncestor("AppCommonLib").Parent
+local Result = require(Parent.Result)
+local Promise = require(Parent.Promise)
+
 return {
-    Batch = function(v3, v4) --[[ Line: 30 ]] --[[ Name: Batch ]]
-        -- upvalues: v2 (copy), v1 (copy)
-        assert(type(v3) == "table", "PromiseUtilities expects a list of Promises!");
-        local v5 = 0;
-        for _, v7 in pairs(v3) do
-            assert(v2.is(v7), "PromiseUtilities expects a list of Promises!");
-            v5 = v5 + 1;
-        end;
-        return v2.new(function(v8, _) --[[ Line: 40 ]]
-            -- upvalues: v1 (ref), v5 (ref), v3 (copy), v4 (copy)
-            local v10 = 0;
-            local v11 = {};
-            local function _(v12, v13, v14) --[[ Line: 44 ]] --[[ Name: promiseCompleted ]]
-                -- upvalues: v11 (copy), v1 (ref), v10 (ref), v5 (ref), v8 (copy)
-                v11[v12] = v1.new(v13, v14);
-                v10 = v10 + 1;
-                if v10 == v5 then
-                    v8(v11);
-                end;
-            end;
-            if next(v3) == nil then
-                v8(v11);
-            end;
-            for v16, v17 in pairs(v3) do
-                v17:andThen(function(v18, ...) --[[ Line: 58 ]]
-                    -- upvalues: v16 (copy), v11 (copy), v1 (ref), v10 (ref), v5 (ref), v8 (copy)
-                    if select("#", ...) > 0 then
-                        warn("Promises in PromiseUtilities.Batch should not return tuple");
-                    end;
-                    v11[v16] = v1.new(true, v18);
-                    v10 = v10 + 1;
-                    if v10 == v5 then
-                        v8(v11);
-                    end;
-                end, function(v19) --[[ Line: 63 ]]
-                    -- upvalues: v16 (copy), v11 (copy), v1 (ref), v10 (ref), v5 (ref), v8 (copy), v4 (ref)
-                    v11[v16] = v1.new(false, v19);
-                    v10 = v10 + 1;
-                    if v10 == v5 then
-                        v8(v11);
-                    end;
-                    if v4 then
-                        v4(v19);
-                    end;
-                end);
-            end;
-        end);
-    end, 
-    CountResults = function(v20) --[[ Line: 73 ]] --[[ Name: CountResults ]]
-        local v21 = 0;
-        local v22 = 0;
-        for _, v24 in pairs(v20) do
-            local v25, _ = v24:unwrap();
-            if not v25 then
-                v22 = v22 + 1;
-            end;
-            v21 = v21 + 1;
-        end;
-        return {
-            successCount = v21 - v22, 
-            failureCount = v22, 
-            totalCount = v21
-        };
-    end
-};
+	Batch = function(p1, p2: ((...any) -> ...any)?) -- line: 30
+		-- upvalues: Promise (copy), Result (copy)
+		assert(type(p1) == "table", "PromiseUtilities expects a list of Promises!")
+
+		local n1 = 0
+
+		for _, v in pairs(p1) do
+			assert(Promise.is(v), "PromiseUtilities expects a list of Promises!")
+			n1 += 1
+		end
+
+		return Promise.new(function(resolve, _) -- line: 40
+			-- upvalues: Result (copy), n1 (ref), p1 (copy), p2 (copy)
+			local n2 = 0
+			local t1 = {}
+
+			local function promiseCompleted(p4, p5, p6) -- line: 44
+				-- upvalues: t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy)
+				t1[p4] = Result.new(p5, p6)
+				n2 += 1
+
+				if n2 == n1 then
+					resolve(t1)
+				end
+			end
+
+			if next(p1) == nil then
+				resolve(t1)
+			end
+
+			for k, v in pairs(p1) do
+				v:andThen(function(p7, ...) -- line: 58
+					-- upvalues: k (copy), t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy)
+					if select("#", ...) > 0 then
+						warn("Promises in PromiseUtilities.Batch should not return tuple")
+					end
+
+					t1[k] = Result.new(true, p7)
+					n2 += 1
+
+					if n2 == n1 then
+						resolve(t1)
+					end
+				end, function(p8) -- line: 63
+					-- upvalues: k (copy), t1 (copy), Result (copy), n2 (ref), n1 (ref), resolve (copy), p2 (copy)
+					t1[k] = Result.new(false, p8)
+					n2 += 1
+
+					if n2 == n1 then
+						resolve(t1)
+					end
+
+					if p2 then
+						p2(p8)
+					end
+				end)
+			end
+		end)
+	end,
+	CountResults = function(p9) -- line: 73
+		local n3 = 0
+		local n4 = 0
+
+		for _, v in pairs(p9) do
+			local v14, _ = v:unwrap()
+
+			if not v14 then
+				n4 += 1
+			end
+
+			n3 += 1
+		end
+
+		return {
+			successCount = n3 - n4,
+			failureCount = n4,
+			totalCount = n3
+		}
+	end
+}

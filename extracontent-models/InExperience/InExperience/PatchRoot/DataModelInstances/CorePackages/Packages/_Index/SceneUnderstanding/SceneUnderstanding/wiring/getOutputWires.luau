@@ -1,11 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SceneUnderstanding");
-local _ = require(l_script_FirstAncestor_0.wiring.types);
-return function(v2) --[[ Line: 7 ]] --[[ Name: getOutputWires ]]
-    local v3 = {};
-    for _, v5 in (v2:GetOutputPins()) do
-        for _, v7 in v2:GetConnectedWires(v5) do
-            table.insert(v3, v7);
-        end;
-    end;
-    return v3;
-end;
+local SceneUnderstanding = script:FindFirstAncestor("SceneUnderstanding")
+
+require(SceneUnderstanding.wiring.types)
+
+local function getOutputWires(p1) -- line: 7
+	local t1 = {}
+
+	for _, v6 in (p1:GetOutputPins()) do
+		for _, v8 in p1:GetConnectedWires(v6) do
+			table.insert(t1, v8)
+		end
+	end
+
+	return t1
+end
+
+return getOutputWires

@@ -1,3 +1,3 @@
 return {
-    DynamicHead = "DynamicHead"
-};
+	DynamicHead = "DynamicHead"
+}

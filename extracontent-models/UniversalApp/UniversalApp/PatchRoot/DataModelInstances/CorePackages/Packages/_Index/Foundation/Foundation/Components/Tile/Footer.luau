@@ -1,1 +1,1 @@
-return require(script.TileFooter);
+return require(script.TileFooter)

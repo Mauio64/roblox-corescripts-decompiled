@@ -1,46 +1,58 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v3 = require(l_Actions_0.AddPlayer);
-local v4 = require(l_Actions_0.RemovePlayer);
-local v5 = require(l_Actions_0.SetPlayerLeaderstat);
-local function v10(v6, v7, v8) --[[ Line: 10 ]] --[[ Name: createKey ]]
-    local v9 = nil;
-    if v7 ~= nil and v8 ~= nil and v8[v6.UserId] ~= nil then
-        v9 = v8[v6.UserId][v7];
-    end;
-    return {
-        name = v6.DisplayName:upper(), 
-        stat = v9 and tonumber(v9) or v9
-    };
-end;
-return function(v11, v12, v13) --[[ Line: 22 ]] --[[ Name: PlayerKeys ]]
-    -- upvalues: v10 (copy), v3 (copy), v5 (copy), v1 (copy), v4 (copy)
-    local v14 = v13.gameStats[1] and v13.gameStats[1].name or nil;
-    if not v11 or v14 ~= v11.primaryStat then
-        local v15 = {};
-        for _, v17 in pairs(v13.players) do
-            v15[v17] = v10(v17, v14, v13.playerStats);
-        end;
-        return {
-            primaryStat = v14, 
-            keys = v15
-        };
-    elseif v12.type == v3.name or v12.type == v5.name then
-        return {
-            primaryStat = v14, 
-            keys = v1.Dictionary.join(v11.keys, {
-                [v12.player] = v10(v12.player, v14, v13.playerStats)
-            })
-        };
-    elseif v12.type == v4.name then
-        return {
-            primaryStat = v14, 
-            keys = v1.Dictionary.join(v11.keys, {
-                [v12.player] = v1.None
-            })
-        };
-    else
-        return v11;
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Actions = script.Parent.Parent.Actions
+local AddPlayer = require(Actions.AddPlayer)
+local RemovePlayer = require(Actions.RemovePlayer)
+local SetPlayerLeaderstat = require(Actions.SetPlayerLeaderstat)
+
+local function createKey(p1, p2, p3) -- line: 10
+	local v12 = nil
+
+	if p2 ~= nil and (p3 ~= nil and p3[p1.UserId] ~= nil) then
+		v12 = p3[p1.UserId][p2]
+	end
+
+	return {
+		name = p1.DisplayName:upper(),
+		stat = v12 and (tonumber(v12) or v12)
+	}
+end
+local function PlayerKeys(p4, p5, p6) -- line: 22
+	-- upvalues: createKey (copy), AddPlayer (copy), SetPlayerLeaderstat (copy), Cryo (copy), RemovePlayer (copy)
+	local v16 = p6.gameStats[1] and p6.gameStats[1].name or nil
+
+	if not p4 or v16 ~= p4.primaryStat then
+		local t1 = {}
+
+		for _, v in pairs(p6.players) do
+			t1[v] = createKey(v, v16, p6.playerStats)
+		end
+
+		return {
+			primaryStat = v16,
+			keys = t1
+		}
+	end
+
+	if p5.type == AddPlayer.name or p5.type == SetPlayerLeaderstat.name then
+		return {
+			primaryStat = v16,
+			keys = Cryo.Dictionary.join(p4.keys, {
+				[p5.player] = createKey(p5.player, v16, p6.playerStats)
+			})
+		}
+	end
+
+	if p5.type == RemovePlayer.name then
+		return {
+			primaryStat = v16,
+			keys = Cryo.Dictionary.join(p4.keys, {
+				[p5.player] = Cryo.None
+			})
+		}
+	end
+
+	return p4
+end
+
+return PlayerKeys

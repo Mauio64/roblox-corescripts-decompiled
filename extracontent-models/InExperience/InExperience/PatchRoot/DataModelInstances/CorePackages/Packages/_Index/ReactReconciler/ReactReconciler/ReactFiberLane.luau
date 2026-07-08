@@ -1,556 +1,698 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.ReactGlobals);
-local _ = require(script.Parent.ReactInternalTypes);
-local l_console_0 = require(l_Parent_0.Shared).console;
-local v4 = require(script.Parent["ReactFiberSchedulerPriorities.roblox"]);
-local v5 = require(l_Parent_0.SafeFlags).createGetFFlag("ReactInlineMergeLanes")();
-local l_invariant_0 = require(l_Parent_0.Shared).invariant;
-local l_ImmediatePriority_0 = v4.ImmediatePriority;
-local l_UserBlockingPriority_0 = v4.UserBlockingPriority;
-local l_NormalPriority_0 = v4.NormalPriority;
-local l_LowPriority_0 = v4.LowPriority;
-local l_IdlePriority_0 = v4.IdlePriority;
-local l_NoPriority_0 = v4.NoPriority;
-local v13 = {
-    SyncLanePriority = 15, 
-    SyncBatchedLanePriority = 14, 
-    InputDiscreteLanePriority = 12, 
-    InputContinuousLanePriority = 10, 
-    DefaultLanePriority = 8, 
-    TransitionPriority = 6, 
-    NoLanePriority = 0, 
-    NoLanes = 0, 
-    NoLane = 0, 
-    SyncLane = 1, 
-    SyncBatchedLane = 2, 
-    InputDiscreteHydrationLane = 4, 
-    DefaultHydrationLane = 256, 
-    DefaultLanes = 3584, 
-    RetryLanes = 62914560, 
-    SomeRetryLane = 33554432, 
-    SelectiveHydrationLane = 67108864, 
-    IdleHydrationLane = 134217728, 
-    OffscreenLane = 1073741824, 
-    NoTimestamp = -1
-};
-local l_NoLanePriority_0 = v13.NoLanePriority;
-v13.getCurrentUpdateLanePriority = function() --[[ Line: 147 ]]
-    -- upvalues: l_NoLanePriority_0 (ref)
-    return l_NoLanePriority_0;
-end;
-v13.setCurrentUpdateLanePriority = function(v15) --[[ Line: 151 ]]
-    -- upvalues: l_NoLanePriority_0 (ref)
-    l_NoLanePriority_0 = v15;
-end;
-local l_DefaultLanePriority_0 = v13.DefaultLanePriority;
-local function v24(v17) --[[ Line: 159 ]] --[[ Name: getHighestPriorityLanes ]]
-    -- upvalues: l_DefaultLanePriority_0 (ref), v1 (copy), l_console_0 (copy)
-    if bit32.band(1, v17) ~= 0 then
-        l_DefaultLanePriority_0 = 15;
-        return 1;
-    elseif bit32.band(2, v17) ~= 0 then
-        l_DefaultLanePriority_0 = 14;
-        return 2;
-    elseif bit32.band(4, v17) ~= 0 then
-        l_DefaultLanePriority_0 = 13;
-        return 4;
-    else
-        local v18 = bit32.band(24, v17);
-        if v18 ~= 0 then
-            l_DefaultLanePriority_0 = 12;
-            return v18;
-        elseif bit32.band(v17, 32) ~= 0 then
-            l_DefaultLanePriority_0 = 11;
-            return 32;
-        else
-            local v19 = bit32.band(192, v17);
-            if v19 ~= 0 then
-                l_DefaultLanePriority_0 = 10;
-                return v19;
-            elseif bit32.band(v17, 256) ~= 0 then
-                l_DefaultLanePriority_0 = 9;
-                return 256;
-            else
-                local v20 = bit32.band(3584, v17);
-                if v20 ~= 0 then
-                    l_DefaultLanePriority_0 = 8;
-                    return v20;
-                elseif bit32.band(v17, 4096) ~= 0 then
-                    l_DefaultLanePriority_0 = 7;
-                    return 4096;
-                else
-                    local v21 = bit32.band(4186112, v17);
-                    if v21 ~= 0 then
-                        l_DefaultLanePriority_0 = 6;
-                        return v21;
-                    else
-                        local v22 = bit32.band(62914560, v17);
-                        if v22 ~= 0 then
-                            l_DefaultLanePriority_0 = 5;
-                            return v22;
-                        elseif bit32.band(v17, 67108864) ~= 0 then
-                            l_DefaultLanePriority_0 = 4;
-                            return 67108864;
-                        elseif bit32.band(v17, 134217728) ~= 0 then
-                            l_DefaultLanePriority_0 = 3;
-                            return 134217728;
-                        else
-                            local v23 = bit32.band(805306368, v17);
-                            if v23 ~= 0 then
-                                l_DefaultLanePriority_0 = 2;
-                                return v23;
-                            elseif bit32.band(1073741824, v17) ~= 0 then
-                                l_DefaultLanePriority_0 = 1;
-                                return 1073741824;
-                            else
-                                if v1.__DEV__ then
-                                    l_console_0.error("Should have found matching lanes. This is a bug in React.");
-                                end;
-                                l_DefaultLanePriority_0 = 8;
-                                return v17;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
-v13.schedulerPriorityToLanePriority = function(v25) --[[ Line: 234 ]] --[[ Name: schedulerPriorityToLanePriority ]]
-    -- upvalues: l_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_NormalPriority_0 (copy), l_LowPriority_0 (copy), l_IdlePriority_0 (copy)
-    if v25 == l_ImmediatePriority_0 then
-        return 15;
-    elseif v25 == l_UserBlockingPriority_0 then
-        return 10;
-    elseif v25 == l_NormalPriority_0 or v25 == l_LowPriority_0 then
-        return 8;
-    elseif v25 == l_IdlePriority_0 then
-        return 2;
-    else
-        return 0;
-    end;
-end;
-v13.lanePriorityToSchedulerPriority = function(v26) --[[ Line: 255 ]] --[[ Name: lanePriorityToSchedulerPriority ]]
-    -- upvalues: l_ImmediatePriority_0 (copy), l_UserBlockingPriority_0 (copy), l_NormalPriority_0 (copy), l_IdlePriority_0 (copy), l_NoPriority_0 (copy), l_invariant_0 (copy)
-    if v26 == 15 or v26 == 14 then
-        return l_ImmediatePriority_0;
-    elseif v26 == 13 or v26 == 12 or v26 == 11 or v26 == 10 then
-        return l_UserBlockingPriority_0;
-    elseif v26 == 9 or v26 == 8 or v26 == 7 or v26 == 6 or v26 == 4 or v26 == 5 then
-        return l_NormalPriority_0;
-    elseif v26 == 3 or v26 == 2 or v26 == 1 then
-        return l_IdlePriority_0;
-    elseif v26 == 0 then
-        return l_NoPriority_0;
-    else
-        l_invariant_0(false, "Invalid update priority: %s. This is a bug in React.", v26);
-        error("unreachable");
-        return;
-    end;
-end;
-local v27 = nil;
-local v28 = nil;
-local v29 = nil;
-v13.getNextLanes = function(v30, v31) --[[ Line: 299 ]] --[[ Name: getNextLanes ]]
-    -- upvalues: l_DefaultLanePriority_0 (ref), v24 (copy), v28 (ref), v27 (ref)
-    local l_pendingLanes_0 = v30.pendingLanes;
-    if l_pendingLanes_0 == 0 then
-        l_DefaultLanePriority_0 = 0;
-        return 0;
-    else
-        local v33 = 0;
-        local v34 = 0;
-        local l_expiredLanes_0 = v30.expiredLanes;
-        local l_suspendedLanes_0 = v30.suspendedLanes;
-        local l_pingedLanes_0 = v30.pingedLanes;
-        if l_expiredLanes_0 ~= 0 then
-            v33 = l_expiredLanes_0;
-            l_DefaultLanePriority_0 = 15;
-            v34 = 15;
-        else
-            local v38 = bit32.band(l_pendingLanes_0, 134217727);
-            if v38 ~= 0 then
-                local v39 = bit32.band(v38, (bit32.bnot(l_suspendedLanes_0)));
-                if v39 ~= 0 then
-                    v33 = v24(v39);
-                    v34 = l_DefaultLanePriority_0;
-                else
-                    local v40 = bit32.band(v38, l_pingedLanes_0);
-                    if v40 ~= 0 then
-                        v33 = v24(v40);
-                        v34 = l_DefaultLanePriority_0;
-                    end;
-                end;
-            else
-                local v41 = bit32.band(l_pendingLanes_0, (bit32.bnot(l_suspendedLanes_0)));
-                if v41 ~= 0 then
-                    v33 = v24(v41);
-                    v34 = l_DefaultLanePriority_0;
-                elseif l_pingedLanes_0 ~= 0 then
-                    v33 = v24(l_pingedLanes_0);
-                    v34 = l_DefaultLanePriority_0;
-                end;
-            end;
-        end;
-        if v33 == 0 then
-            return 0;
-        else
-            v33 = bit32.band(l_pendingLanes_0, bit32.lshift(v28(v33), 1) - 1);
-            if v31 ~= 0 and v31 ~= v33 and bit32.band(v31, l_suspendedLanes_0) == 0 then
-                v24(v31);
-                if v34 <= l_DefaultLanePriority_0 then
-                    return v31;
-                else
-                    l_DefaultLanePriority_0 = v34;
-                end;
-            end;
-            local l_entangledLanes_0 = v30.entangledLanes;
-            if l_entangledLanes_0 ~= 0 then
-                local l_entanglements_0 = v30.entanglements;
-                local v44 = bit32.band(v33, l_entangledLanes_0);
-                while v44 > 0 do
-                    local v45 = v27(v44);
-                    local v46 = bit32.lshift(1, v45);
-                    v33 = bit32.bor(v33, l_entanglements_0[v45]);
-                    v44 = bit32.band(v44, (bit32.bnot(v46)));
-                end;
-            end;
-            return v33;
-        end;
-    end;
-end;
-v13.getMostRecentEventTime = function(v47, v48) --[[ Line: 418 ]] --[[ Name: getMostRecentEventTime ]]
-    -- upvalues: v27 (ref)
-    local l_eventTimes_0 = v47.eventTimes;
-    local v50 = -1;
-    while v48 > 0 do
-        local v51 = v27(v48);
-        local v52 = bit32.lshift(1, v51);
-        local v53 = l_eventTimes_0[v51];
-        if v50 < v53 then
-            v50 = v53;
-        end;
-        v48 = bit32.band(v48, (bit32.bnot(v52)));
-    end;
-    return v50;
-end;
-v13.computeExpirationTime = function(v54, v55) --[[ Line: 438 ]] --[[ Name: computeExpirationTime ]]
-    -- upvalues: v24 (copy), l_DefaultLanePriority_0 (ref)
-    v24(v54);
-    local l_l_DefaultLanePriority_0_0 = l_DefaultLanePriority_0;
-    if l_l_DefaultLanePriority_0_0 >= 10 then
-        return v55 + 250;
-    elseif l_l_DefaultLanePriority_0_0 >= 6 then
-        return v55 + 5000;
-    else
-        return -1;
-    end;
-end;
-v13.markStarvedLanesAsExpired = function(v57, v58) --[[ Line: 468 ]] --[[ Name: markStarvedLanesAsExpired ]]
-    -- upvalues: v27 (ref), v24 (copy), l_DefaultLanePriority_0 (ref)
-    local l_pendingLanes_1 = v57.pendingLanes;
-    local l_suspendedLanes_1 = v57.suspendedLanes;
-    local l_pingedLanes_1 = v57.pingedLanes;
-    local l_expirationTimes_0 = v57.expirationTimes;
-    local l_l_pendingLanes_1_0 = l_pendingLanes_1;
-    while l_l_pendingLanes_1_0 > 0 do
-        local v64 = v27(l_l_pendingLanes_1_0);
-        local v65 = bit32.lshift(1, v64);
-        local v66 = l_expirationTimes_0[v64];
-        if v66 == -1 then
-            if bit32.band(v65, l_suspendedLanes_1) == 0 or bit32.band(v65, l_pingedLanes_1) ~= 0 then
-                v24(v65);
-                local l_l_DefaultLanePriority_0_1 = l_DefaultLanePriority_0;
-                l_expirationTimes_0[v64] = if l_l_DefaultLanePriority_0_1 >= 10 then v58 + 250 else if l_l_DefaultLanePriority_0_1 >= 6 then v58 + 5000 else -1;
-            end;
-        elseif v66 <= v58 then
-            v57.expiredLanes = bit32.bor(v57.expiredLanes, v65);
-        end;
-        l_l_pendingLanes_1_0 = bit32.band(l_l_pendingLanes_1_0, (bit32.bnot(v65)));
-    end;
-end;
-v13.getHighestPriorityPendingLanes = function(v68) --[[ Line: 510 ]] --[[ Name: getHighestPriorityPendingLanes ]]
-    -- upvalues: v24 (copy)
-    return (v24(v68.pendingLanes));
-end;
-v13.getLanesToRetrySynchronouslyOnError = function(v69) --[[ Line: 515 ]] --[[ Name: getLanesToRetrySynchronouslyOnError ]]
-    local v70 = bit32.band(v69.pendingLanes, 3221225471);
-    if v70 ~= 0 then
-        return v70;
-    elseif bit32.band(v70, 1073741824) ~= 0 then
-        return 1073741824;
-    else
-        return 0;
-    end;
-end;
-v13.returnNextLanesPriority = function() --[[ Line: 528 ]] --[[ Name: returnNextLanesPriority ]]
-    -- upvalues: l_DefaultLanePriority_0 (ref)
-    return l_DefaultLanePriority_0;
-end;
-v13.includesNonIdleWork = function(v71) --[[ Line: 533 ]] --[[ Name: includesNonIdleWork ]]
-    return bit32.band(v71, 134217727) ~= 0;
-end;
-v13.includesOnlyRetries = function(v72) --[[ Line: 538 ]] --[[ Name: includesOnlyRetries ]]
-    return bit32.band(v72, 62914560) == v72;
-end;
-v13.includesOnlyTransitions = function(v73) --[[ Line: 543 ]] --[[ Name: includesOnlyTransitions ]]
-    return bit32.band(v73, 4186112) == v73;
-end;
-local v74 = nil;
-local function v75(v76, v77) --[[ Line: 553 ]] --[[ Name: findUpdateLane ]]
-    -- upvalues: v74 (ref), v75 (copy), l_invariant_0 (copy)
-    if v76 ~= 0 then
-        if v76 == 15 then
-            return 1;
-        elseif v76 == 14 then
-            return 2;
-        elseif v76 == 12 then
-            local v78 = v74((bit32.band(24, (bit32.bnot(v77)))));
-            if v78 == 0 then
-                return v75(10, v77);
-            else
-                return v78;
-            end;
-        elseif v76 == 10 then
-            local v79 = v74((bit32.band(192, (bit32.bnot(v77)))));
-            if v79 == 0 then
-                return v75(8, v77);
-            else
-                return v79;
-            end;
-        elseif v76 == 8 then
-            local v80 = v74((bit32.band(3584, (bit32.bnot(v77)))));
-            if v80 == 0 then
-                v80 = v74((bit32.band(4186112, (bit32.bnot(v77)))));
-                if v80 == 0 then
-                    v80 = v74(3584);
-                end;
-            end;
-            return v80;
-        elseif v76 ~= 6 and v76 ~= 5 and v76 == 2 then
-            local v81 = v74((bit32.band(805306368, (bit32.bnot(v77)))));
-            if v81 == 0 then
-                v81 = v74(805306368);
-            end;
-            return v81;
-        end;
-    end;
-    l_invariant_0(false, "Invalid update priority: %s. This is a bug in React.", v76);
-    error("unreachable");
-end;
-v13.findUpdateLane = v75;
-v13.findTransitionLane = function(v82, v83) --[[ Line: 612 ]] --[[ Name: findTransitionLane ]]
-    -- upvalues: v74 (ref)
-    local v84 = v74((bit32.band(4186112, (bit32.bnot(v83)))));
-    if v84 == 0 then
-        v84 = v74((bit32.band(4186112, (bit32.bnot(v82)))));
-        if v84 == 0 then
-            v84 = v74(4186112);
-        end;
-    end;
-    return v84;
-end;
-v13.findRetryLane = function(v85) --[[ Line: 632 ]] --[[ Name: findRetryLane ]]
-    -- upvalues: v74 (ref)
-    local v86 = v74((bit32.band(62914560, (bit32.bnot(v85)))));
-    if v86 == 0 then
-        v86 = v74(62914560);
-    end;
-    return v86;
-end;
-local function _(v87) --[[ Line: 644 ]] --[[ Name: getHighestPriorityLane ]]
-    return (bit32.band(v87, -v87));
-end;
-v28 = function(v89) --[[ Line: 648 ]] --[[ Name: getLowestPriorityLane ]]
-    local v90 = 31 - bit32.countlz(v89);
-    if v90 < 0 then
-        return 0;
-    else
-        return (bit32.lshift(1, v90));
-    end;
-end;
-v29 = function(v91) --[[ Line: 658 ]] --[[ Name: getEqualOrHigherPriorityLanes ]]
-    -- upvalues: v28 (ref)
-    return bit32.lshift(v28(v91), 1) - 1;
-end;
-v74 = function(v92) --[[ Line: 662 ]] --[[ Name: pickArbitraryLane ]]
-    return (bit32.band(v92, -v92));
-end;
-v13.pickArbitraryLane = v74;
-v27 = function(v93) --[[ Line: 671 ]] --[[ Name: pickArbitraryLaneIndex ]]
-    return 31 - bit32.countlz(v93);
-end;
-v13.includesSomeLane = function(v94, v95) --[[ Line: 680 ]] --[[ Name: includesSomeLane ]]
-    return bit32.band(v94, v95) ~= 0;
-end;
-v13.isSubsetOfLanes = function(v96, v97) --[[ Line: 685 ]] --[[ Name: isSubsetOfLanes ]]
-    return bit32.band(v96, v97) == v97;
-end;
-local function v100(v98, v99) --[[ Line: 690 ]] --[[ Name: mergeLanes ]]
-    return (bit32.bor(v98, v99));
-end;
-v13.mergeLanes = if v5 then bit32.bor else v100;
-v13.removeLanes = function(v101, v102) --[[ Line: 698 ]] --[[ Name: removeLanes ]]
-    return (bit32.band(v101, (bit32.bnot(v102))));
-end;
-v13.laneToLanes = function(v103) --[[ Line: 705 ]] --[[ Name: laneToLanes ]]
-    return v103;
-end;
-v13.higherPriorityLane = function(v104, v105) --[[ Line: 710 ]] --[[ Name: higherPriorityLane ]]
-    if v104 ~= 0 and v105 ~= 0 then
-        if v104 < v105 then
-            return v104;
-        else
-            return v105;
-        end;
-    elseif v104 ~= 0 then
-        return v104;
-    else
-        return v105;
-    end;
-end;
-v13.higherLanePriority = function(v106, v107) --[[ Line: 726 ]] --[[ Name: higherLanePriority ]]
-    if v106 ~= 0 and v107 < v106 then
-        return v106;
-    else
-        return v107;
-    end;
-end;
-v13.createLaneMap = function(v108) --[[ Line: 737 ]] --[[ Name: createLaneMap ]]
-    return {
-        [0] = v108, 
-        [1] = v108, 
-        [2] = v108, 
-        [3] = v108, 
-        [4] = v108, 
-        [5] = v108, 
-        [6] = v108, 
-        [7] = v108, 
-        [8] = v108, 
-        [9] = v108, 
-        [10] = v108, 
-        [11] = v108, 
-        [12] = v108, 
-        [13] = v108, 
-        [14] = v108, 
-        [15] = v108, 
-        [16] = v108, 
-        [17] = v108, 
-        [18] = v108, 
-        [19] = v108, 
-        [20] = v108, 
-        [21] = v108, 
-        [22] = v108, 
-        [23] = v108, 
-        [24] = v108, 
-        [25] = v108, 
-        [26] = v108, 
-        [27] = v108, 
-        [28] = v108, 
-        [29] = v108, 
-        [30] = v108, 
-        [31] = v108
-    };
-end;
-v13.markRootUpdated = function(v109, v110, v111) --[[ Line: 781 ]] --[[ Name: markRootUpdated ]]
-    v109.pendingLanes = bit32.bor(v109.pendingLanes, v110);
-    local v112 = v110 - 1;
-    v109.suspendedLanes = bit32.band(v109.suspendedLanes, v112);
-    v109.pingedLanes = bit32.band(v109.pingedLanes, v112);
-    v109.eventTimes[31 - bit32.countlz(v110)] = v111;
-end;
-v13.markRootSuspended = function(v113, v114) --[[ Line: 810 ]] --[[ Name: markRootSuspended ]]
-    -- upvalues: v27 (ref)
-    v113.suspendedLanes = bit32.bor(v113.suspendedLanes, v114);
-    v113.pingedLanes = bit32.band(v113.pingedLanes, (bit32.bnot(v114)));
-    local l_expirationTimes_1 = v113.expirationTimes;
-    local l_v114_0 = v114;
-    while l_v114_0 > 0 do
-        local v117 = v27(l_v114_0);
-        local v118 = bit32.lshift(1, v117);
-        l_expirationTimes_1[v117] = -1;
-        l_v114_0 = bit32.band(l_v114_0, (bit32.bnot(v118)));
-    end;
-end;
-v13.markRootPinged = function(v119, v120, _) --[[ Line: 828 ]] --[[ Name: markRootPinged ]]
-    v119.pingedLanes = bit32.bor(v119.pingedLanes, (bit32.band(v119.suspendedLanes, v120)));
-end;
-v13.markRootExpired = function(v122, v123) --[[ Line: 834 ]] --[[ Name: markRootExpired ]]
-    v122.expiredLanes = bit32.bor(v122.expiredLanes, (bit32.band(v123, v122.pendingLanes)));
-end;
-v13.markDiscreteUpdatesExpired = function(v124) --[[ Line: 840 ]] --[[ Name: markDiscreteUpdatesExpired ]]
-    v124.expiredLanes = bit32.bor(v124.expiredLanes, (bit32.band(24, v124.pendingLanes)));
-end;
-v13.hasDiscreteLanes = function(v125) --[[ Line: 846 ]] --[[ Name: hasDiscreteLanes ]]
-    return bit32.band(v125, 24) ~= 0;
-end;
-v13.markRootMutableRead = function(v126, v127) --[[ Line: 851 ]] --[[ Name: markRootMutableRead ]]
-    v126.mutableReadLanes = bit32.bor(v126.mutableReadLanes, (bit32.band(v127, v126.pendingLanes)));
-end;
-v13.markRootFinished = function(v128, v129) --[[ Line: 857 ]] --[[ Name: markRootFinished ]]
-    -- upvalues: v27 (ref)
-    local v130 = bit32.band(v128.pendingLanes, (bit32.bnot(v129)));
-    v128.pendingLanes = v129;
-    v128.suspendedLanes = 0;
-    v128.pingedLanes = 0;
-    v128.expiredLanes = bit32.band(v128.expiredLanes, v129);
-    v128.mutableReadLanes = bit32.band(v128.mutableReadLanes, v129);
-    v128.entangledLanes = bit32.band(v128.entangledLanes, v129);
-    local l_entanglements_1 = v128.entanglements;
-    local l_eventTimes_1 = v128.eventTimes;
-    local l_expirationTimes_2 = v128.expirationTimes;
-    local l_v130_0 = v130;
-    while l_v130_0 > 0 do
-        local v135 = v27(l_v130_0);
-        local v136 = bit32.lshift(1, v135);
-        l_entanglements_1[v135] = 0;
-        l_eventTimes_1[v135] = -1;
-        l_expirationTimes_2[v135] = -1;
-        l_v130_0 = bit32.band(l_v130_0, (bit32.bnot(v136)));
-    end;
-end;
-v13.markRootEntangled = function(v137, v138) --[[ Line: 890 ]] --[[ Name: markRootEntangled ]]
-    -- upvalues: v27 (ref)
-    v137.entangledLanes = bit32.bor(v137.entangledLanes, v138);
-    local l_entanglements_2 = v137.entanglements;
-    local l_v138_0 = v138;
-    while l_v138_0 > 0 do
-        local v141 = v27(l_v138_0);
-        local v142 = bit32.lshift(1, v141);
-        l_entanglements_2[v141] = bit32.bor(l_entanglements_2[v141], v138);
-        l_v138_0 = bit32.band(l_v138_0, (bit32.bnot(v142)));
-    end;
-end;
-v13.getBumpedLaneForHydration = function(v143, v144) --[[ Line: 906 ]] --[[ Name: getBumpedLaneForHydration ]]
-    -- upvalues: v24 (copy), l_DefaultLanePriority_0 (ref), l_invariant_0 (copy)
-    v24(v144);
-    local l_l_DefaultLanePriority_0_2 = l_DefaultLanePriority_0;
-    local v146 = nil;
-    if l_l_DefaultLanePriority_0_2 == 15 or l_l_DefaultLanePriority_0_2 == 14 then
-        v146 = 0;
-    elseif l_l_DefaultLanePriority_0_2 == 13 or l_l_DefaultLanePriority_0_2 == 12 then
-        v146 = 4;
-    elseif l_l_DefaultLanePriority_0_2 == 11 or l_l_DefaultLanePriority_0_2 == 10 then
-        v146 = 32;
-    elseif l_l_DefaultLanePriority_0_2 == 9 or l_l_DefaultLanePriority_0_2 == 8 then
-        v146 = 256;
-    elseif l_l_DefaultLanePriority_0_2 == 7 or l_l_DefaultLanePriority_0_2 == 6 then
-        v146 = 4096;
-    elseif l_l_DefaultLanePriority_0_2 == 5 then
-        v146 = 4096;
-    elseif l_l_DefaultLanePriority_0_2 == 4 then
-        v146 = 67108864;
-    elseif l_l_DefaultLanePriority_0_2 == 3 or l_l_DefaultLanePriority_0_2 == 2 then
-        v146 = 134217728;
-    elseif l_l_DefaultLanePriority_0_2 == 1 or l_l_DefaultLanePriority_0_2 == 0 then
-        v146 = 0;
-    else
-        l_invariant_0(false, "Invalid lane: %s. This is a bug in React.", (tostring(v146)));
-    end;
-    if bit32.band(v146, (bit32.bor(v143.suspendedLanes, v144))) ~= 0 then
-        return 0;
-    else
-        return v146;
-    end;
-end;
-return v13;
+local ParentParent = script.Parent.Parent
+local ReactGlobals = require(ParentParent.ReactGlobals)
+
+require(script.Parent.ReactInternalTypes)
+
+local console = require(ParentParent.Shared).console
+local lib = require(script.Parent["ReactFiberSchedulerPriorities.roblox"])
+local v5 = require(ParentParent.SafeFlags).createGetFFlag("ReactInlineMergeLanes")()
+local invariant = require(ParentParent.Shared).invariant
+local ImmediatePriority = lib.ImmediatePriority
+local UserBlockingPriority = lib.UserBlockingPriority
+local NormalPriority = lib.NormalPriority
+local LowPriority = lib.LowPriority
+local IdlePriority = lib.IdlePriority
+local NoPriority = lib.NoPriority
+local t1 = {
+	SyncLanePriority = 15,
+	SyncBatchedLanePriority = 14,
+	InputDiscreteLanePriority = 12,
+	InputContinuousLanePriority = 10,
+	DefaultLanePriority = 8,
+	TransitionPriority = 6,
+	NoLanePriority = 0,
+	NoLanes = 0,
+	NoLane = 0,
+	SyncLane = 1,
+	SyncBatchedLane = 2,
+	InputDiscreteHydrationLane = 4,
+	DefaultHydrationLane = 256,
+	DefaultLanes = 3584,
+	RetryLanes = 62914560,
+	SomeRetryLane = 33554432,
+	SelectiveHydrationLane = 67108864,
+	IdleHydrationLane = 134217728,
+	OffscreenLane = 1073741824,
+	NoTimestamp = -1
+}
+local NoLanePriority = t1.NoLanePriority
+
+function t1.getCurrentUpdateLanePriority() -- line: 147
+	-- upvalues: NoLanePriority (ref)
+	return NoLanePriority
+end
+function t1.setCurrentUpdateLanePriority(p1) -- line: 151
+	-- upvalues: NoLanePriority (ref)
+	NoLanePriority = p1
+end
+
+local DefaultLanePriority = t1.DefaultLanePriority
+
+local function getHighestPriorityLanes(p2) -- line: 159
+	-- upvalues: DefaultLanePriority (ref), ReactGlobals (copy), console (copy)
+	if bit32.band(1, p2) ~= 0 then
+		DefaultLanePriority = 15
+
+		return 1
+	end
+
+	if bit32.band(2, p2) ~= 0 then
+		DefaultLanePriority = 14
+
+		return 2
+	end
+
+	if bit32.band(4, p2) ~= 0 then
+		DefaultLanePriority = 13
+
+		return 4
+	end
+
+	local v26 = bit32.band(24, p2)
+
+	if v26 ~= 0 then
+		DefaultLanePriority = 12
+
+		return v26
+	end
+
+	if bit32.band(p2, 32) ~= 0 then
+		DefaultLanePriority = 11
+
+		return 32
+	end
+
+	local v27 = bit32.band(192, p2)
+
+	if v27 ~= 0 then
+		DefaultLanePriority = 10
+
+		return v27
+	end
+
+	if bit32.band(p2, 256) ~= 0 then
+		DefaultLanePriority = 9
+
+		return 256
+	end
+
+	local v28 = bit32.band(3584, p2)
+
+	if v28 ~= 0 then
+		DefaultLanePriority = 8
+
+		return v28
+	end
+
+	if bit32.band(p2, 4096) ~= 0 then
+		DefaultLanePriority = 7
+
+		return 4096
+	end
+
+	local v29 = bit32.band(4186112, p2)
+
+	if v29 ~= 0 then
+		DefaultLanePriority = 6
+
+		return v29
+	end
+
+	local v30 = bit32.band(62914560, p2)
+
+	if v30 ~= 0 then
+		DefaultLanePriority = 5
+
+		return v30
+	end
+
+	if bit32.band(p2, 67108864) ~= 0 then
+		DefaultLanePriority = 4
+
+		return 67108864
+	end
+
+	if bit32.band(p2, 134217728) ~= 0 then
+		DefaultLanePriority = 3
+
+		return 134217728
+	end
+
+	local v31 = bit32.band(805306368, p2)
+
+	if v31 ~= 0 then
+		DefaultLanePriority = 2
+
+		return v31
+	end
+
+	if bit32.band(1073741824, p2) ~= 0 then
+		DefaultLanePriority = 1
+
+		return 1073741824
+	end
+
+	if ReactGlobals.__DEV__ then
+		console.error("Should have found matching lanes. This is a bug in React.")
+	end
+
+	DefaultLanePriority = 8
+
+	return p2
+end
+
+function t1.schedulerPriorityToLanePriority(p3) -- line: 234
+	-- upvalues: ImmediatePriority (copy), UserBlockingPriority (copy), NormalPriority (copy), LowPriority (copy), IdlePriority (copy)
+	if p3 == ImmediatePriority then
+		return 15
+	end
+
+	if p3 == UserBlockingPriority then
+		return 10
+	end
+
+	if p3 == NormalPriority or p3 == LowPriority then
+		return 8
+	end
+
+	if p3 == IdlePriority then
+		return 2
+	end
+
+	return 0
+end
+function t1.lanePriorityToSchedulerPriority(p4) -- line: 255
+	-- upvalues: ImmediatePriority (copy), UserBlockingPriority (copy), NormalPriority (copy), IdlePriority (copy), NoPriority (copy), invariant (copy)
+	if p4 == 15 or p4 == 14 then
+		return ImmediatePriority
+	end
+
+	if p4 == 13 or p4 == 12 or p4 == 11 or p4 == 10 then
+		return UserBlockingPriority
+	end
+
+	if p4 == 9 or p4 == 8 or p4 == 7 or p4 == 6 or p4 == 4 or p4 == 5 then
+		return NormalPriority
+	end
+
+	if p4 == 3 or p4 == 2 or p4 == 1 then
+		return IdlePriority
+	end
+
+	if p4 == 0 then
+		return NoPriority
+	end
+
+	invariant(false, "Invalid update priority: %s. This is a bug in React.", p4)
+	error("unreachable")
+end
+
+local pickArbitraryLaneIndex = nil
+local getLowestPriorityLane = nil
+
+function t1.getNextLanes(p5, p6) -- line: 299
+	-- upvalues: DefaultLanePriority (ref), getHighestPriorityLanes (copy), getLowestPriorityLane (ref), pickArbitraryLaneIndex (ref)
+	local pendingLanes = p5.pendingLanes
+
+	if pendingLanes == 0 then
+		DefaultLanePriority = 0
+
+		return 0
+	end
+
+	local n1 = 0
+	local n2 = 0
+	local expiredLanes = p5.expiredLanes
+	local suspendedLanes = p5.suspendedLanes
+	local pingedLanes = p5.pingedLanes
+
+	if expiredLanes ~= 0 then
+		n1 = expiredLanes
+		DefaultLanePriority = 15
+		n2 = 15
+	else
+		local v42 = bit32.band(pendingLanes, 134217727)
+
+		if v42 ~= 0 then
+			local v43 = bit32.band(v42, (bit32.bnot(suspendedLanes)))
+
+			if v43 ~= 0 then
+				n1 = getHighestPriorityLanes(v43)
+				n2 = DefaultLanePriority
+			else
+				local v44 = bit32.band(v42, pingedLanes)
+
+				if v44 ~= 0 then
+					n1 = getHighestPriorityLanes(v44)
+					n2 = DefaultLanePriority
+				end
+			end
+		else
+			local v45 = bit32.band(pendingLanes, (bit32.bnot(suspendedLanes)))
+
+			if v45 ~= 0 then
+				n1 = getHighestPriorityLanes(v45)
+				n2 = DefaultLanePriority
+			elseif pingedLanes ~= 0 then
+				n1 = getHighestPriorityLanes(pingedLanes)
+				n2 = DefaultLanePriority
+			end
+		end
+	end
+
+	if n1 == 0 then
+		return 0
+	end
+
+	local v46 = bit32.band(pendingLanes, bit32.lshift(getLowestPriorityLane(n1), 1) - 1)
+
+	if p6 ~= 0 and p6 ~= v46 and bit32.band(p6, suspendedLanes) == 0 then
+		getHighestPriorityLanes(p6)
+
+		if n2 <= DefaultLanePriority then
+			return p6
+		end
+
+		DefaultLanePriority = n2
+	end
+
+	local entangledLanes = p5.entangledLanes
+
+	if entangledLanes ~= 0 then
+		local entanglements = p5.entanglements
+		local v49 = bit32.band(v46, entangledLanes)
+
+		while v49 > 0 do
+			local v50 = pickArbitraryLaneIndex(v49)
+			local v51 = bit32.lshift(1, v50)
+
+			v46 = bit32.bor(v46, entanglements[v50])
+			v49 = bit32.band(v49, (bit32.bnot(v51)))
+		end
+	end
+
+	return v46
+end
+function t1.getMostRecentEventTime(p7, p8) -- line: 418
+	-- upvalues: pickArbitraryLaneIndex (ref)
+	local eventTimes = p7.eventTimes
+	local n3 = -1
+
+	while p8 > 0 do
+		local v56 = pickArbitraryLaneIndex(p8)
+		local v57 = bit32.lshift(1, v56)
+		local v58 = eventTimes[v56]
+
+		if n3 < v58 then
+			n3 = v58
+		end
+
+		p8 = bit32.band(p8, (bit32.bnot(v57)))
+	end
+
+	return n3
+end
+function t1.computeExpirationTime(p9, n4: number) -- line: 438
+	-- upvalues: getHighestPriorityLanes (copy), DefaultLanePriority (ref)
+	getHighestPriorityLanes(p9)
+
+	local v61 = DefaultLanePriority
+
+	if v61 >= 10 then
+		return n4 + 250
+	end
+
+	if v61 >= 6 then
+		return n4 + 5000
+	end
+
+	return -1
+end
+function t1.markStarvedLanesAsExpired(p10, n5: number) -- line: 468
+	-- upvalues: pickArbitraryLaneIndex (ref), getHighestPriorityLanes (copy), DefaultLanePriority (ref)
+	local pendingLanes = p10.pendingLanes
+	local suspendedLanes = p10.suspendedLanes
+	local pingedLanes = p10.pingedLanes
+	local expirationTimes = p10.expirationTimes
+
+	while pendingLanes > 0 do
+		local v68 = pickArbitraryLaneIndex(pendingLanes)
+		local v69 = bit32.lshift(1, v68)
+		local v70 = expirationTimes[v68]
+
+		if v70 == -1 then
+			if bit32.band(v69, suspendedLanes) == 0 or bit32.band(v69, pingedLanes) ~= 0 then
+				getHighestPriorityLanes(v69)
+
+				local v71 = DefaultLanePriority
+
+				expirationTimes[v68] = if not (v71 >= 10) then not (v71 >= 6) and -1 or n5 + 5000 else n5 + 250
+			end
+		elseif v70 <= n5 then
+			p10.expiredLanes = bit32.bor(p10.expiredLanes, v69)
+		end
+
+		pendingLanes = bit32.band(pendingLanes, (bit32.bnot(v69)))
+	end
+end
+function t1.getHighestPriorityPendingLanes(p11) -- line: 510
+	-- upvalues: getHighestPriorityLanes (copy)
+	return (getHighestPriorityLanes(p11.pendingLanes))
+end
+function t1.getLanesToRetrySynchronouslyOnError(p12) -- line: 515
+	local v74 = bit32.band(p12.pendingLanes, 3221225471)
+
+	if v74 ~= 0 then
+		return v74
+	end
+
+	if bit32.band(v74, 1073741824) ~= 0 then
+		return 1073741824
+	end
+
+	return 0
+end
+function t1.returnNextLanesPriority() -- line: 528
+	-- upvalues: DefaultLanePriority (ref)
+	return DefaultLanePriority
+end
+function t1.includesNonIdleWork(p13) -- line: 533
+	return bit32.band(p13, 134217727) ~= 0
+end
+function t1.includesOnlyRetries(p14) -- line: 538
+	return p14 == bit32.band(p14, 62914560)
+end
+function t1.includesOnlyTransitions(p15) -- line: 543
+	return p15 == bit32.band(p15, 4186112)
+end
+
+local pickArbitraryLane = nil
+
+local function findUpdateLane(p16, p17) -- line: 553
+	-- upvalues: pickArbitraryLane (ref), findUpdateLane (copy), invariant (copy)
+	if p16 ~= 0 then
+		if p16 == 15 then
+			return 1
+		end
+
+		if p16 == 14 then
+			return 2
+		end
+
+		if p16 == 12 then
+			local v80 = pickArbitraryLane((bit32.band(24, (bit32.bnot(p17)))))
+
+			if v80 == 0 then
+				return findUpdateLane(10, p17)
+			end
+
+			return v80
+		end
+
+		if p16 == 10 then
+			local v81 = pickArbitraryLane((bit32.band(192, (bit32.bnot(p17)))))
+
+			if v81 == 0 then
+				return findUpdateLane(8, p17)
+			end
+
+			return v81
+		end
+
+		if p16 == 8 then
+			local v82 = pickArbitraryLane((bit32.band(3584, (bit32.bnot(p17)))))
+
+			if v82 == 0 then
+				v82 = pickArbitraryLane((bit32.band(4186112, (bit32.bnot(p17)))))
+
+				if v82 == 0 then
+					v82 = pickArbitraryLane(3584)
+				end
+			end
+
+			return v82
+		end
+
+		if p16 ~= 6 and p16 ~= 5 and p16 == 2 then
+			local v83 = pickArbitraryLane((bit32.band(805306368, (bit32.bnot(p17)))))
+
+			if v83 == 0 then
+				v83 = pickArbitraryLane(805306368)
+			end
+
+			return v83
+		end
+	end
+
+	invariant(false, "Invalid update priority: %s. This is a bug in React.", p16)
+	error("unreachable")
+end
+
+t1.findUpdateLane = findUpdateLane
+
+function t1.findTransitionLane(p18, p19) -- line: 612
+	-- upvalues: pickArbitraryLane (ref)
+	local v86 = pickArbitraryLane((bit32.band(4186112, (bit32.bnot(p19)))))
+
+	if v86 == 0 then
+		v86 = pickArbitraryLane((bit32.band(4186112, (bit32.bnot(p18)))))
+
+		if v86 == 0 then
+			v86 = pickArbitraryLane(4186112)
+		end
+	end
+
+	return v86
+end
+function t1.findRetryLane(p20) -- line: 632
+	-- upvalues: pickArbitraryLane (ref)
+	local v88 = pickArbitraryLane((bit32.band(62914560, (bit32.bnot(p20)))))
+
+	if v88 == 0 then
+		v88 = pickArbitraryLane(62914560)
+	end
+
+	return v88
+end
+
+local function getHighestPriorityLane(p21) -- line: 644
+	return (bit32.band(p21, -p21))
+end
+
+function getLowestPriorityLane(p22) -- line: 648
+	local v91 = 31 - bit32.countlz(p22)
+
+	if v91 < 0 then
+		return 0
+	end
+
+	return (bit32.lshift(1, v91))
+end
+
+local function getEqualOrHigherPriorityLanes(p23) -- line: 658
+	-- upvalues: getLowestPriorityLane (ref)
+	return bit32.lshift(getLowestPriorityLane(p23), 1) - 1
+end
+
+function pickArbitraryLane(p24) -- line: 662
+	return (bit32.band(p24, -p24))
+end
+
+t1.pickArbitraryLane = pickArbitraryLane
+
+function pickArbitraryLaneIndex(p25) -- line: 671
+	return 31 - bit32.countlz(p25)
+end
+function t1.includesSomeLane(p26, p27) -- line: 680
+	return bit32.band(p26, p27) ~= 0
+end
+function t1.isSubsetOfLanes(p28, p29) -- line: 685
+	return p29 == bit32.band(p28, p29)
+end
+
+local function mergeLanes(p30, p31) -- line: 690
+	return (bit32.bor(p30, p31))
+end
+
+t1.mergeLanes = if not v5 then mergeLanes else bit32.bor
+
+function t1.removeLanes(p32, p33) -- line: 698
+	return (bit32.band(p32, (bit32.bnot(p33))))
+end
+function t1.laneToLanes(p34) -- line: 705
+	return p34
+end
+function t1.higherPriorityLane(p35, p36) -- line: 710
+	if p35 ~= 0 and p36 ~= 0 then
+		if p35 < p36 then
+			return p35
+		end
+
+		return p36
+	end
+
+	if p35 ~= 0 then
+		return p35
+	end
+
+	return p36
+end
+function t1.higherLanePriority(p37, p38) -- line: 726
+	if p37 ~= 0 and p38 < p37 then
+		return p37
+	end
+
+	return p38
+end
+function t1.createLaneMap(p39) -- line: 737
+	return {
+		[0] = p39,
+		[1] = p39,
+		[2] = p39,
+		[3] = p39,
+		[4] = p39,
+		[5] = p39,
+		[6] = p39,
+		[7] = p39,
+		[8] = p39,
+		[9] = p39,
+		[10] = p39,
+		[11] = p39,
+		[12] = p39,
+		[13] = p39,
+		[14] = p39,
+		[15] = p39,
+		[16] = p39,
+		[17] = p39,
+		[18] = p39,
+		[19] = p39,
+		[20] = p39,
+		[21] = p39,
+		[22] = p39,
+		[23] = p39,
+		[24] = p39,
+		[25] = p39,
+		[26] = p39,
+		[27] = p39,
+		[28] = p39,
+		[29] = p39,
+		[30] = p39,
+		[31] = p39
+	}
+end
+function t1.markRootUpdated(p40, p41, n6: number) -- line: 781
+	p40.pendingLanes = bit32.bor(p40.pendingLanes, p41)
+
+	local v112 = p41 - 1
+
+	p40.suspendedLanes = bit32.band(p40.suspendedLanes, v112)
+	p40.pingedLanes = bit32.band(p40.pingedLanes, v112)
+	p40.eventTimes[31 - bit32.countlz(p41)] = n6
+end
+function t1.markRootSuspended(p42, p43) -- line: 810
+	-- upvalues: pickArbitraryLaneIndex (ref)
+	p42.suspendedLanes = bit32.bor(p42.suspendedLanes, p43)
+	p42.pingedLanes = bit32.band(p42.pingedLanes, (bit32.bnot(p43)))
+
+	local expirationTimes = p42.expirationTimes
+
+	while p43 > 0 do
+		local v116 = pickArbitraryLaneIndex(p43)
+		local v117 = bit32.lshift(1, v116)
+
+		expirationTimes[v116] = -1
+		p43 = bit32.band(p43, (bit32.bnot(v117)))
+	end
+end
+function t1.markRootPinged(p44, p45, _: number) -- line: 828
+	p44.pingedLanes = bit32.bor(p44.pingedLanes, (bit32.band(p44.suspendedLanes, p45)))
+end
+function t1.markRootExpired(p46, p47) -- line: 834
+	p46.expiredLanes = bit32.bor(p46.expiredLanes, (bit32.band(p47, p46.pendingLanes)))
+end
+function t1.markDiscreteUpdatesExpired(p48) -- line: 840
+	p48.expiredLanes = bit32.bor(p48.expiredLanes, (bit32.band(24, p48.pendingLanes)))
+end
+function t1.hasDiscreteLanes(p49) -- line: 846
+	return bit32.band(p49, 24) ~= 0
+end
+function t1.markRootMutableRead(p50, p51) -- line: 851
+	p50.mutableReadLanes = bit32.bor(p50.mutableReadLanes, (bit32.band(p51, p50.pendingLanes)))
+end
+function t1.markRootFinished(p52, p53) -- line: 857
+	-- upvalues: pickArbitraryLaneIndex (ref)
+	local v129 = bit32.band(p52.pendingLanes, (bit32.bnot(p53)))
+
+	p52.pendingLanes = p53
+	p52.suspendedLanes = 0
+	p52.pingedLanes = 0
+	p52.expiredLanes = bit32.band(p52.expiredLanes, p53)
+	p52.mutableReadLanes = bit32.band(p52.mutableReadLanes, p53)
+	p52.entangledLanes = bit32.band(p52.entangledLanes, p53)
+
+	local entanglements = p52.entanglements
+	local eventTimes = p52.eventTimes
+	local expirationTimes = p52.expirationTimes
+
+	while v129 > 0 do
+		local v133 = pickArbitraryLaneIndex(v129)
+		local v134 = bit32.lshift(1, v133)
+
+		entanglements[v133] = 0
+		eventTimes[v133] = -1
+		expirationTimes[v133] = -1
+		v129 = bit32.band(v129, (bit32.bnot(v134)))
+	end
+end
+function t1.markRootEntangled(p54, p55) -- line: 890
+	-- upvalues: pickArbitraryLaneIndex (ref)
+	p54.entangledLanes = bit32.bor(p54.entangledLanes, p55)
+
+	local entanglements = p54.entanglements
+	local v138 = p55
+
+	while v138 > 0 do
+		local v139 = pickArbitraryLaneIndex(v138)
+		local v140 = bit32.lshift(1, v139)
+
+		entanglements[v139] = bit32.bor(entanglements[v139], p55)
+		v138 = bit32.band(v138, (bit32.bnot(v140)))
+	end
+end
+function t1.getBumpedLaneForHydration(p56, p57) -- line: 906
+	-- upvalues: getHighestPriorityLanes (copy), DefaultLanePriority (ref), invariant (copy)
+	getHighestPriorityLanes(p57)
+
+	local v143 = DefaultLanePriority
+	local n8 = nil
+
+	if v143 == 15 or v143 == 14 then
+		n8 = 0
+	elseif v143 == 13 or v143 == 12 then
+		n8 = 4
+	elseif v143 == 11 or v143 == 10 then
+		n8 = 32
+	elseif v143 == 9 or v143 == 8 then
+		n8 = 256
+	elseif v143 == 7 or v143 == 6 then
+		n8 = 4096
+	elseif v143 == 5 then
+		n8 = 4096
+	elseif v143 == 4 then
+		n8 = 67108864
+	elseif v143 == 3 or v143 == 2 then
+		n8 = 134217728
+	elseif v143 == 1 or v143 == 0 then
+		n8 = 0
+	else
+		invariant(false, "Invalid lane: %s. This is a bug in React.", (tostring(n8)))
+	end
+
+	if bit32.band(n8, (bit32.bor(p56.suspendedLanes, p57))) ~= 0 then
+		return 0
+	end
+
+	return n8
+end
+
+return t1

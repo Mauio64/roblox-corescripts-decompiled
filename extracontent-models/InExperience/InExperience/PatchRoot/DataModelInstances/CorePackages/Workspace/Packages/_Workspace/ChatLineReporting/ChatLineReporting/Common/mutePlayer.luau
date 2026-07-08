@@ -19,40 +19,40 @@ function mutePlayer(p1, p2, p3) -- line: 15
 				context.globalMutedUsersStore.muteGlobalUserId(p1.userId)
 
 				return {
+					metadata = "Roblox.GlobalMute.Info.Success",
 					key = Constants.SuccessfulMuteKey,
 					args = {
 						RBX_NAME = p1.displayName
-					},
-					metadata = "Roblox.GlobalMute.Info.Success"
+					}
 				}
 			end
 
 			return {
 				key = "CoreScripts.TextChat.MessageStatus.Warning.Unknown",
+				metadata = "Roblox.GlobalMute.Error.ContextNotAvailable",
 				args = {
 					RBX_NAME = p1.displayName
-				},
-				metadata = "Roblox.GlobalMute.Error.ContextNotAvailable"
+				}
 			}
 		end
 	else
 		if p1.username == "" then
 			return {
+				metadata = "Roblox.Mute.Error.PlayerNotFound",
 				key = Constants.ErrorDoesNotExistKey,
 				args = {
 					RBX_NAME = p1.displayName
-				},
-				metadata = "Roblox.Mute.Error.PlayerNotFound"
+				}
 			}
 		end
 
 		if tonumber(p1.userId) == p2.UserId then
 			return {
+				metadata = "Roblox.Mute.Error.CannotMuteSelf",
 				key = Constants.ErrorSelfMuteKey,
 				args = {
 					RBX_NAME = p1.displayName
-				},
-				metadata = "Roblox.Mute.Error.CannotMuteSelf"
+				}
 			}
 		end
 
@@ -70,21 +70,21 @@ function mutePlayer(p1, p2, p3) -- line: 15
 
 				return {
 					key = "CoreScripts.TextChat.MessageStatus.Warning.Unknown",
+					metadata = "Roblox.Mute.Error.ContextNotAvailable",
 					args = {
 						RBX_NAME = p1.displayName
-					},
-					metadata = "Roblox.Mute.Error.ContextNotAvailable"
+					}
 				}
 			end
 
 			context.store:dispatch(UserMuted(p1.userId))
 
 			return {
+				metadata = "Roblox.Mute.Info.Success",
 				key = Constants.SuccessfulMuteKey,
 				args = {
 					RBX_NAME = p1.displayName
-				},
-				metadata = "Roblox.Mute.Info.Success"
+				}
 			}
 		end
 	end

@@ -1,373 +1,394 @@
-local l_Parent_0 = script.Parent.Parent;
-local _ = require(l_Parent_0.util.Types);
-local v2 = require(l_Parent_0.Analytics);
-local v3 = require(l_Parent_0.Constants);
-local v4 = require(l_Parent_0.ConstantsInterface);
-local v5 = require(l_Parent_0.validation.validateLCCageQuality);
-local v6 = require(l_Parent_0.validation.validateInstanceTree);
-local v7 = require(l_Parent_0.validation.validateMeshTriangles);
-local v8 = require(l_Parent_0.validation.validateModeration);
-local v9 = require(l_Parent_0.validation.validateMaterials);
-local v10 = require(l_Parent_0.validation.validateTags);
-local v11 = require(l_Parent_0.validation.validateMeshBounds);
-local v12 = require(l_Parent_0.validation.validateTextureSize);
-local v13 = require(l_Parent_0.validation.validatePropertyRequirements);
-local v14 = require(l_Parent_0.validation.validateAttributes);
-local v15 = require(l_Parent_0.validation.validateMeshVertColors);
-local v16 = require(l_Parent_0.validation.validateSingleInstance);
-local v17 = require(l_Parent_0.validation.validateHSR);
-local v18 = require(l_Parent_0.validation.validateThumbnailConfiguration);
-local v19 = require(l_Parent_0.validation.validateScaleType);
-local v20 = require(l_Parent_0.validation.validateLayeredClothingInRenderBounds);
-local v21 = require(l_Parent_0.validation.ValidateMeshSizeProperty);
-local v22 = require(l_Parent_0.validation.ValidatePropertiesSensible);
-local v23 = require(l_Parent_0.validation.validateDependencies);
-local v24 = require(l_Parent_0.validation.validateSkinningTransfer);
-local v25 = require(l_Parent_0.validation.validateTotalSurfaceArea);
-local v26 = require(l_Parent_0.validation.validateCoplanarIntersection);
-local v27 = require(l_Parent_0.validation.validateMaxCubeDensity);
-local v28 = require(l_Parent_0.validation.ValidateHSRData);
-local v29 = require(l_Parent_0.validation.validateSurfaceAppearanceTextureSize);
-local v30 = require(l_Parent_0.validation.ValidateTexturePack);
-local v31 = require(l_Parent_0.util.RigidOrLayeredAllowed);
-local v32 = require(l_Parent_0.util.createLayeredClothingSchema);
-local v33 = require(l_Parent_0.util.createEyebrowEyelashSchema);
-local v34 = require(l_Parent_0.util.getAttachment);
-local v35 = require(l_Parent_0.util.getMeshSize);
-local v36 = require(l_Parent_0.util.getEditableMeshFromContext);
-local v37 = require(l_Parent_0.util.getEditableImageFromContext);
-local v38 = require(l_Parent_0.util.getExpectedPartSize);
-local v39 = require(l_Parent_0.util.pcallDeferred);
-local v40 = require(l_Parent_0.flags.getFIntUGCValidationLCHandleScaleOffsetMaximum);
-local v41 = require(l_Parent_0.flags.getEngineUGCValidateRelativeSkinningTransfer);
-local v42 = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidatePropertiesSensible);
-local v43 = require(l_Parent_0.flags.getFFlagUGCValidateAccessoryAssetTextureLimit);
-local v44 = require(l_Parent_0.flags.getFFlagUGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits);
-local v45 = require(l_Parent_0.flags.getFFlagUGCValidateTexturePack);
-local v46 = require(l_Parent_0.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema);
-local v47 = require(l_Parent_0.validation.ValidateMeshPartOnlySkinnedToR15);
-local v48 = require(l_Parent_0.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning);
-return function(v49) --[[ Line: 63 ]] --[[ Name: validateLayeredClothingAccessory ]]
-    -- upvalues: v31 (copy), v2 (copy), v3 (copy), v16 (copy), v46 (copy), v33 (copy), v32 (copy), v6 (copy), v42 (copy), v22 (copy), v23 (copy), v36 (copy), v37 (copy), v39 (copy), v35 (copy), v38 (copy), v40 (copy), v34 (copy), v9 (copy), v13 (copy), v10 (copy), v14 (copy), v43 (copy), v4 (copy), v12 (copy), v44 (copy), v29 (copy), v19 (copy), v18 (copy), v17 (copy), v28 (copy), v8 (copy), v25 (copy), v21 (copy), v11 (copy), v7 (copy), v15 (copy), v26 (copy), v27 (copy), v5 (copy), v20 (copy), v45 (copy), v30 (copy), v48 (copy), v41 (copy), v24 (copy), v47 (copy)
-    local l_instances_0 = v49.instances;
-    local l_assetTypeEnum_0 = v49.assetTypeEnum;
-    local l_isServer_0 = v49.isServer;
-    local l_allowUnreviewedAssets_0 = v49.allowUnreviewedAssets;
-    if not v31.isLayeredClothingAllowed(l_assetTypeEnum_0) then
-        v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing, nil, v49);
-        return false, {
-            string.format("Asset type '%s' is not a layered clothing category. It can only be used with rigid accessories.", l_assetTypeEnum_0.Name)
-        };
-    else
-        local v54 = v3.ASSET_TYPE_INFO[l_assetTypeEnum_0];
-        local v55 = nil;
-        local v56 = nil;
-        local v57, v58 = v16(l_instances_0, v49);
-        v55 = v57;
-        v56 = v58;
-        if not v55 then
-            return false, v56;
-        else
-            v57 = l_instances_0[1];
-            v58 = if v46() then l_assetTypeEnum_0 == Enum.AssetType.EyebrowAccessory or l_assetTypeEnum_0 == Enum.AssetType.EyelashAccessory else false;
-            local v59 = if v58 then v33(v54.attachmentNames) else v32(v54.attachmentNames);
-            local v60, v61 = v6(v59, v57, v49);
-            v55 = v60;
-            v56 = v61;
-            if not v55 then
-                return false, v56;
-            else
-                if v42() then
-                    v60, v61 = v22.validate(v57, v49);
-                    v55 = v60;
-                    v56 = v61;
-                    if not v55 then
-                        return false, v56;
-                    end;
-                end;
-                v60, v61 = v23(v57, v49);
-                v55 = v60;
-                v56 = v61;
-                if not v55 then
-                    return false, v56;
-                else
-                    v60 = true;
-                    v56 = {};
-                    v61 = v57:FindFirstChild("Handle");
-                    local v62 = {
-                        fullName = v61:GetFullName(), 
-                        fieldName = "MeshId", 
-                        contentId = v61.MeshId, 
-                        context = v57.Name
-                    };
-                    local v63 = false;
-                    if v62.contentId ~= nil then
-                        v63 = v62.contentId ~= "";
-                    end;
-                    local v64, v65 = v36(v61, "MeshId", v49);
-                    if not v64 then
-                        if not v62.contentId then
-                            v63 = false;
-                            v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_NoMeshId, nil, v49);
-                            v60 = false;
-                            table.insert(v56, {
-                                string.format("Missing meshId on layered clothing accessory '%s'. Make sure you are using a valid meshId and try again.\n", v57.Name)
-                            });
-                        else
-                            v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_FailedToLoadMesh, nil, v49);
-                            return false, {
-                                string.format("Failed to load mesh for layered clothing accessory '%s'. Make sure mesh exists and try again.", v57.Name)
-                            };
-                        end;
-                    end;
-                    v62.editableMesh = v65;
-                    v63 = true;
-                    local l_TextureID_0 = v61.TextureID;
-                    local v67 = {
-                        fullName = v61:GetFullName(), 
-                        fieldName = "TextureID", 
-                        contentId = l_TextureID_0
-                    };
-                    local v68 = nil;
-                    local v69 = nil;
-                    if l_TextureID_0 ~= "" then
-                        local v70, v71 = v37(v61, "TextureID", v49);
-                        v68 = v70;
-                        v69 = v71;
-                        if not v68 then
-                            return false, {
-                                string.format("Failed to load texture for layered clothing accessory '%s'. Make sure texture exists and try again.", v57.Name)
-                            };
-                        else
-                            v67.editableImage = v69;
-                        end;
-                    end;
-                    local v72, v73 = v39(function() --[[ Line: 189 ]]
-                        -- upvalues: v35 (ref), v62 (copy)
-                        return v35(v62);
-                    end, v49);
-                    if not v72 then
-                        v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_FailedToLoadMesh, nil, v49);
-                        return false, {
-                            string.format("Failed to load mesh for layered clothing accessory '%s'. Make sure mesh exists and try again.", v57.Name)
-                        };
-                    else
-                        local v74 = v38(v61, v49) / v73;
-                        if not v74:FuzzyEq(Vector3.new(1, 1, 1, 0), v40() / 1000) then
-                            v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_HandleIsScaled, nil, v49);
-                            table.insert(v56, string.format("%s has been scaled, but mesh parts with wrap layers do not support scaling. You need to change the Size property to match the MeshSize property.", v61.Name));
-                            v60 = false;
-                        end;
-                        local v75 = v34(v61, v54.attachmentNames);
-                        local v76 = v54.bounds[v75.Name];
-                        local v77 = {};
-                        local v78, v79 = v9(v57, v49);
-                        v55 = v78;
-                        v77 = v79;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        v78, v79 = v13(v57, nil, v49);
-                        v55 = v78;
-                        v77 = v79;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        v78, v79 = v10(v57, v49);
-                        v55 = v78;
-                        v77 = v79;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        v78, v79 = v14(v57, v49);
-                        v55 = v78;
-                        v77 = v79;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        v78 = nil;
-                        if v43() then
-                            v78 = v4.getTextureLimit(l_assetTypeEnum_0, v61, v67.fieldName);
-                        end;
-                        local v80;
-                        v79, v80 = v12(v67, true, v49, v78);
-                        v55 = v79;
-                        v77 = v80;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        if v44() then
-                            v79, v80 = v29(v57, v49);
-                            v55 = v79;
-                            v77 = v80;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        v79 = v61:FindFirstChild("AvatarPartScaleType");
-                        if v79 and v79:IsA("StringValue") then
-                            local v81;
-                            v80, v81 = v19(v79, v49);
-                            v55 = v80;
-                            v77 = v81;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        if not v58 then
-                            local v82;
-                            v80, v82 = v18(v57, v61, v62, v74, v49);
-                            v55 = v80;
-                            v77 = v82;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        v80 = v61:FindFirstChildOfClass("WrapLayer");
-                        if v80 == nil then
-                            v2.reportFailure(v2.ErrorType.validateLayeredClothingAccessory_NoWrapLayer, nil, v49);
-                            table.insert(v56, string.format("Missing WrapLayer on layered clothing accessory %s. You need to create a child WrapLayer and try again.", v57.Name));
-                            v60 = false;
-                        else
-                            local v83, v84 = v17(v80, v49);
-                            v55 = v83;
-                            v77 = v84;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            if not v49.allowEditableInstances then
-                                local v85;
-                                v84, v85 = v28.validate(v80, v49);
-                                v55 = v84;
-                                v77 = v85;
-                                if not v55 then
-                                    table.insert(v56, table.concat(v77, "\n"));
-                                    v60 = false;
-                                end;
-                            end;
-                        end;
-                        v80 = not l_isServer_0;
-                        if l_allowUnreviewedAssets_0 then
-                            v80 = false;
-                        end;
-                        if v80 then
-                            local v86, v87 = v8(v57, {}, v49);
-                            v55 = v86;
-                            v77 = v87;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        if v63 then
-                            local v88, v89 = v25(v62, v74, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            v88, v89 = v21.validateSingleMeshPart(v61, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            v88, v89 = v11(v61, v75, v62, v74, v76, l_assetTypeEnum_0.Name, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            v88, v89 = v7(v62, nil, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            v88, v89 = v15(v62, false, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                            v88, v89 = v26(v62, v74, v49);
-                            v55 = v88;
-                            v77 = v89;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        local v90, v91 = v27(v62, v49, v74);
-                        v55 = v90;
-                        v77 = v91;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        v90, v91 = v5(v57, v62, v49);
-                        v55 = v90;
-                        v77 = v91;
-                        if not v55 then
-                            for _, v93 in v77 do
-                                table.insert(v56, v93);
-                            end;
-                            v60 = false;
-                        end;
-                        v90, v91 = v20(v57, v49);
-                        v55 = v90;
-                        v77 = v91;
-                        if not v55 then
-                            table.insert(v56, table.concat(v77, "\n"));
-                            v60 = false;
-                        end;
-                        if v45() then
-                            v90, v91 = v30.validate(v57, false, v49);
-                            v55 = v90;
-                            v77 = v91;
-                            if not v55 then
-                                table.insert(v56, table.concat(v77, "\n"));
-                                v60 = false;
-                            end;
-                        end;
-                        if not v48() then
-                            if v41() then
-                                v90, v91 = v24(v61, v49);
-                                v55 = v90;
-                                v77 = v91;
-                                if not v55 then
-                                    table.insert(v56, table.concat(v77, "\n"));
-                                    v60 = false;
-                                end;
-                            end;
-                            if not v3.SkinningTransferRequiredTypes[l_assetTypeEnum_0] then
-                                v90, v91 = v47.validateMeshPart(v61, v49);
-                                v55 = v90;
-                                v77 = v91;
-                                if not v55 then
-                                    table.insert(v56, table.concat(v77, "\n"));
-                                    v60 = false;
-                                end;
-                            end;
-                        end;
-                        return v60, v56;
-                    end;
-                end;
-            end;
-        end;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+
+require(ParentParent.util.Types)
+
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+local ConstantsInterface = require(ParentParent.ConstantsInterface)
+local validateLCCageQuality = require(ParentParent.validation.validateLCCageQuality)
+local validateInstanceTree = require(ParentParent.validation.validateInstanceTree)
+local validateMeshTriangles = require(ParentParent.validation.validateMeshTriangles)
+local validateModeration = require(ParentParent.validation.validateModeration)
+local validateMaterials = require(ParentParent.validation.validateMaterials)
+local validateTags = require(ParentParent.validation.validateTags)
+local validateMeshBounds = require(ParentParent.validation.validateMeshBounds)
+local validateTextureSize = require(ParentParent.validation.validateTextureSize)
+local validatePropertyRequirements = require(ParentParent.validation.validatePropertyRequirements)
+local validateAttributes = require(ParentParent.validation.validateAttributes)
+local validateMeshVertColors = require(ParentParent.validation.validateMeshVertColors)
+local validateSingleInstance = require(ParentParent.validation.validateSingleInstance)
+local validateHSR = require(ParentParent.validation.validateHSR)
+local validateThumbnailConfiguration = require(ParentParent.validation.validateThumbnailConfiguration)
+local validateScaleType = require(ParentParent.validation.validateScaleType)
+local validateLayeredClothingInRenderBounds = require(ParentParent.validation.validateLayeredClothingInRenderBounds)
+local ValidateMeshSizeProperty = require(ParentParent.validation.ValidateMeshSizeProperty)
+local ValidatePropertiesSensible = require(ParentParent.validation.ValidatePropertiesSensible)
+local validateDependencies = require(ParentParent.validation.validateDependencies)
+local validateSkinningTransfer = require(ParentParent.validation.validateSkinningTransfer)
+local validateTotalSurfaceArea = require(ParentParent.validation.validateTotalSurfaceArea)
+local validateCoplanarIntersection = require(ParentParent.validation.validateCoplanarIntersection)
+local validateMaxCubeDensity = require(ParentParent.validation.validateMaxCubeDensity)
+local ValidateHSRData = require(ParentParent.validation.ValidateHSRData)
+local validateSurfaceAppearanceTextureSize = require(ParentParent.validation.validateSurfaceAppearanceTextureSize)
+local ValidateTexturePack = require(ParentParent.validation.ValidateTexturePack)
+local RigidOrLayeredAllowed = require(ParentParent.util.RigidOrLayeredAllowed)
+local createLayeredClothingSchema = require(ParentParent.util.createLayeredClothingSchema)
+local createEyebrowEyelashSchema = require(ParentParent.util.createEyebrowEyelashSchema)
+local getAttachment = require(ParentParent.util.getAttachment)
+local getMeshSize = require(ParentParent.util.getMeshSize)
+local getEditableMeshFromContext = require(ParentParent.util.getEditableMeshFromContext)
+local getEditableImageFromContext = require(ParentParent.util.getEditableImageFromContext)
+local getExpectedPartSize = require(ParentParent.util.getExpectedPartSize)
+local pcallDeferred = require(ParentParent.util.pcallDeferred)
+local getFIntUGCValidationLCHandleScaleOffsetMaximum = require(ParentParent.flags.getFIntUGCValidationLCHandleScaleOffsetMaximum)
+local getEngineFeatureEngineUGCValidatePropertiesSensible = require(ParentParent.flags.getEngineFeatureEngineUGCValidatePropertiesSensible)
+local getFFlagUGCValidateAccessoryAssetTextureLimit = require(ParentParent.flags.getFFlagUGCValidateAccessoryAssetTextureLimit)
+local getFFlagUGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits = require(ParentParent.flags.getFFlagUGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits)
+local getFFlagUGCValidateTexturePack = require(ParentParent.flags.getFFlagUGCValidateTexturePack)
+local getFFlagUGCValidateEyebrowEyelashThumbnailSchema = require(ParentParent.flags.getFFlagUGCValidateEyebrowEyelashThumbnailSchema)
+local ValidateMeshPartOnlySkinnedToR15 = require(ParentParent.validation.ValidateMeshPartOnlySkinnedToR15)
+local getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning = require(ParentParent.flags.getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning)
+local getFFlagUGCValidateMigrateSchemaProperties = require(ParentParent.flags.getFFlagUGCValidateMigrateSchemaProperties)
+local getFFlagUGCValidationCombineEntrypointResults = require(ParentParent.flags.getFFlagUGCValidationCombineEntrypointResults)
+local getFFlagUGCValidateMigrateTextureTransparency = require(ParentParent.flags.getFFlagUGCValidateMigrateTextureTransparency)
+local getFFlagUGCValidateMigrateCageGeometry = require(ParentParent.flags.getFFlagUGCValidateMigrateCageGeometry)
+
+local function validateLayeredClothingAccessory(p1) -- line: 66
+	-- upvalues: RigidOrLayeredAllowed (copy), Analytics (copy), Constants (copy), validateSingleInstance (copy), getFFlagUGCValidateEyebrowEyelashThumbnailSchema (copy), createEyebrowEyelashSchema (copy), createLayeredClothingSchema (copy), validateInstanceTree (copy), getEngineFeatureEngineUGCValidatePropertiesSensible (copy), ValidatePropertiesSensible (copy), getFFlagUGCValidateMigrateSchemaProperties (copy), getFFlagUGCValidationCombineEntrypointResults (copy), validateDependencies (copy), getEditableMeshFromContext (copy), getEditableImageFromContext (copy), pcallDeferred (copy), getMeshSize (copy), getExpectedPartSize (copy), getFIntUGCValidationLCHandleScaleOffsetMaximum (copy), getAttachment (copy), validateMaterials (copy), validatePropertyRequirements (copy), validateTags (copy), validateAttributes (copy), getFFlagUGCValidateMigrateTextureTransparency (copy), getFFlagUGCValidateAccessoryAssetTextureLimit (copy), ConstantsInterface (copy), validateTextureSize (copy), getFFlagUGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits (copy), validateSurfaceAppearanceTextureSize (copy), validateScaleType (copy), validateThumbnailConfiguration (copy), validateHSR (copy), ValidateHSRData (copy), validateModeration (copy), validateTotalSurfaceArea (copy), ValidateMeshSizeProperty (copy), validateMeshBounds (copy), validateMeshTriangles (copy), validateMeshVertColors (copy), validateCoplanarIntersection (copy), validateMaxCubeDensity (copy), validateLCCageQuality (copy), getFFlagUGCValidateMigrateCageGeometry (copy), validateLayeredClothingInRenderBounds (copy), getFFlagUGCValidateTexturePack (copy), ValidateTexturePack (copy), getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning (copy), validateSkinningTransfer (copy), ValidateMeshPartOnlySkinnedToR15 (copy)
+	local instances = p1.instances
+	local assetTypeEnum = p1.assetTypeEnum
+	local isServer = p1.isServer
+	local allowUnreviewedAssets = p1.allowUnreviewedAssets
+
+	if not RigidOrLayeredAllowed.isLayeredClothingAllowed(assetTypeEnum) then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_AssetTypeNotAllowedAsLayeredClothing, nil, p1)
+
+		return false, { string.format("Asset type '%s' is not a layered clothing category. It can only be used with rigid accessories.", assetTypeEnum.Name) }
+	end
+
+	local v58 = Constants.ASSET_TYPE_INFO[assetTypeEnum]
+	local v59, v60 = validateSingleInstance(instances, p1)
+
+	if not v59 then
+		return false, v60
+	end
+
+	local v61 = instances[1]
+	local v62 = not not getFFlagUGCValidateEyebrowEyelashThumbnailSchema() and (assetTypeEnum == Enum.AssetType.EyebrowAccessory or assetTypeEnum == Enum.AssetType.EyelashAccessory)
+	local v63 = if not v62 then createLayeredClothingSchema(v58.attachmentNames) else createEyebrowEyelashSchema(v58.attachmentNames)
+	local v64, v65 = validateInstanceTree(v63, v61, p1)
+
+	if not v64 then
+		return false, v65
+	end
+
+	if getEngineFeatureEngineUGCValidatePropertiesSensible() then
+		local v66, v67 = ValidatePropertiesSensible.validate(v61, p1)
+
+		if not v66 then
+			return false, v67
+		end
+	end
+
+	local t1 = {
+		skipExistenceCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults(),
+		skipOwnershipCheck = getFFlagUGCValidateMigrateSchemaProperties() and getFFlagUGCValidationCombineEntrypointResults()
+	}
+	local v69, v70 = validateDependencies(v61, p1, t1)
+
+	if not v69 then
+		return false, v70
+	end
+
+	local v71 = true
+	local t2 = {}
+	local Handle = v61:FindFirstChild("Handle")
+	local t3 = {
+		fieldName = "MeshId",
+		fullName = Handle:GetFullName(),
+		contentId = Handle.MeshId,
+		context = v61.Name
+	}
+
+	if t3.contentId ~= nil then
+		if t3.contentId == "" then
+		end
+	end
+
+	local v75, v76 = getEditableMeshFromContext(Handle, "MeshId", p1)
+
+	if not v75 then
+		if t3.contentId then
+			Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_FailedToLoadMesh, nil, p1)
+
+			return false, { string.format("Failed to load mesh for layered clothing accessory '%s'. Make sure mesh exists and try again.", v61.Name) }
+		end
+
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_NoMeshId, nil, p1)
+		v71 = false
+		table.insert(t2, { string.format("Missing meshId on layered clothing accessory '%s'. Make sure you are using a valid meshId and try again.\n", v61.Name) })
+	end
+
+	t3.editableMesh = v76
+
+	local TextureID = Handle.TextureID
+	local t4 = {
+		fieldName = "TextureID",
+		fullName = Handle:GetFullName(),
+		contentId = TextureID
+	}
+
+	if TextureID ~= "" then
+		local v79, v80 = getEditableImageFromContext(Handle, "TextureID", p1)
+
+		if not v79 then
+			return false, { string.format("Failed to load texture for layered clothing accessory '%s'. Make sure texture exists and try again.", v61.Name) }
+		end
+
+		t4.editableImage = v80
+	end
+
+	local v81, v82 = pcallDeferred(function() -- line: 200
+		-- upvalues: getMeshSize (copy), t3 (copy)
+		return getMeshSize(t3)
+	end, p1)
+
+	if not v81 then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_FailedToLoadMesh, nil, p1)
+
+		return false, { string.format("Failed to load mesh for layered clothing accessory '%s'. Make sure mesh exists and try again.", v61.Name) }
+	end
+
+	local v83 = getExpectedPartSize(Handle, p1) / v82
+
+	if not v83:FuzzyEq(Vector3.new(1, 1, 1), getFIntUGCValidationLCHandleScaleOffsetMaximum() / 1000) then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_HandleIsScaled, nil, p1)
+		table.insert(t2, string.format("%s has been scaled, but mesh parts with wrap layers do not support scaling. You need to change the Size property to match the MeshSize property.", Handle.Name))
+		v71 = false
+	end
+
+	local v84 = getAttachment(Handle, v58.attachmentNames)
+	local v85 = v58.bounds[v84.Name]
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		local v86, v87 = validateMaterials(v61, p1)
+
+		if not v86 then
+			table.insert(t2, table.concat(v87, "\n"))
+			v71 = false
+		end
+
+		local v88, v89 = validatePropertyRequirements(v61, nil, p1)
+
+		if not v88 then
+			table.insert(t2, table.concat(v89, "\n"))
+			v71 = false
+		end
+	end
+
+	local v90, v91 = validateTags(v61, p1)
+
+	if not v90 then
+		table.insert(t2, table.concat(v91, "\n"))
+		v71 = false
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		local v92, v93 = validateAttributes(v61, p1)
+
+		if not v92 then
+			table.insert(t2, table.concat(v93, "\n"))
+			v71 = false
+		end
+	end
+
+	if not getFFlagUGCValidateMigrateTextureTransparency() then
+		local v94 = nil
+
+		if getFFlagUGCValidateAccessoryAssetTextureLimit() then
+			v94 = ConstantsInterface.getTextureLimit(assetTypeEnum, Handle, t4.fieldName)
+		end
+
+		local v95, v96 = validateTextureSize(t4, true, p1, v94)
+
+		if not v95 then
+			table.insert(t2, table.concat(v96, "\n"))
+			v71 = false
+		end
+
+		if getFFlagUGCValidateLayeredClothingAssetSurfaceAppearanceTextureLimits() then
+			local v97, v98 = validateSurfaceAppearanceTextureSize(v61, p1)
+
+			if not v97 then
+				table.insert(t2, table.concat(v98, "\n"))
+				v71 = false
+			end
+		end
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		local AvatarPartScaleType = Handle:FindFirstChild("AvatarPartScaleType")
+
+		if AvatarPartScaleType and AvatarPartScaleType:IsA("StringValue") then
+			local v100, v101 = validateScaleType(AvatarPartScaleType, p1)
+
+			if not v100 then
+				table.insert(t2, table.concat(v101, "\n"))
+				v71 = false
+			end
+		end
+	end
+
+	if (not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults()) and not v62 then
+		local v102, v103 = validateThumbnailConfiguration(v61, Handle, t3, v83, p1)
+
+		if not v102 then
+			table.insert(t2, table.concat(v103, "\n"))
+			v71 = false
+		end
+	end
+
+	local WrapLayer = Handle:FindFirstChildOfClass("WrapLayer")
+
+	if WrapLayer == nil then
+		Analytics.reportFailure(Analytics.ErrorType.validateLayeredClothingAccessory_NoWrapLayer, nil, p1)
+		table.insert(t2, string.format("Missing WrapLayer on layered clothing accessory %s. You need to create a child WrapLayer and try again.", v61.Name))
+		v71 = false
+	else
+		if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+			local v105, v106 = validateHSR(WrapLayer, p1)
+
+			if not v105 then
+				table.insert(t2, table.concat(v106, "\n"))
+				v71 = false
+			end
+		end
+
+		if (not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults()) and not p1.allowEditableInstances then
+			local v107, v108 = ValidateHSRData.validate(WrapLayer, p1)
+
+			if not v107 then
+				table.insert(t2, table.concat(v108, "\n"))
+				v71 = false
+			end
+		end
+	end
+
+	if not getFFlagUGCValidateMigrateSchemaProperties() or not getFFlagUGCValidationCombineEntrypointResults() then
+		local v109 = not isServer
+
+		if allowUnreviewedAssets then
+			v109 = false
+		end
+
+		if v109 then
+			local v110, v111 = validateModeration(v61, {}, p1)
+
+			if not v110 then
+				table.insert(t2, table.concat(v111, "\n"))
+				v71 = false
+			end
+		end
+	end
+
+	if true then
+		local v112, v113 = validateTotalSurfaceArea(t3, v83, p1)
+
+		if not v112 then
+			table.insert(t2, table.concat(v113, "\n"))
+			v71 = false
+		end
+
+		local v114, v115 = ValidateMeshSizeProperty.validateSingleMeshPart(Handle, p1)
+
+		if not v114 then
+			table.insert(t2, table.concat(v115, "\n"))
+			v71 = false
+		end
+
+		local v116, v117 = validateMeshBounds(Handle, v84, t3, v83, v85, assetTypeEnum.Name, p1)
+
+		if not v116 then
+			table.insert(t2, table.concat(v117, "\n"))
+			v71 = false
+		end
+
+		local v118, v119 = validateMeshTriangles(t3, nil, p1)
+
+		if not v118 then
+			table.insert(t2, table.concat(v119, "\n"))
+			v71 = false
+		end
+
+		local v120, v121 = validateMeshVertColors(t3, false, p1)
+
+		if not v120 then
+			table.insert(t2, table.concat(v121, "\n"))
+			v71 = false
+		end
+
+		local v122, v123 = validateCoplanarIntersection(t3, v83, p1)
+
+		if not v122 then
+			table.insert(t2, table.concat(v123, "\n"))
+			v71 = false
+		end
+	end
+
+	local v124, v125 = validateMaxCubeDensity(t3, p1, v83)
+
+	if not v124 then
+		table.insert(t2, table.concat(v125, "\n"))
+		v71 = false
+	end
+
+	local v126, v127 = validateLCCageQuality(v61, t3, p1)
+
+	if not v126 then
+		for _, v129 in v127 do
+			table.insert(t2, v129)
+		end
+
+		v71 = false
+	end
+
+	if not getFFlagUGCValidateMigrateCageGeometry() then
+		local v130, v131 = validateLayeredClothingInRenderBounds(v61, p1)
+
+		if not v130 then
+			table.insert(t2, table.concat(v131, "\n"))
+			v71 = false
+		end
+	end
+
+	if getFFlagUGCValidateTexturePack() then
+		local v132, v133 = ValidateTexturePack.validate(v61, false, p1)
+
+		if not v132 then
+			table.insert(t2, table.concat(v133, "\n"))
+			v71 = false
+		end
+	end
+
+	if not getEngineFeatureEngineUGCValidationConsolidateAccessorySkinning() then
+		local v134, v135 = validateSkinningTransfer(Handle, p1)
+
+		if not v134 then
+			table.insert(t2, table.concat(v135, "\n"))
+			v71 = false
+		end
+
+		if not Constants.SkinningTransferRequiredTypes[assetTypeEnum] then
+			local v136, v137 = ValidateMeshPartOnlySkinnedToR15.validateMeshPart(Handle, p1)
+
+			if not v136 then
+				table.insert(t2, table.concat(v137, "\n"))
+				v71 = false
+			end
+		end
+	end
+
+	return v71, t2
+end
+
+return validateLayeredClothingAccessory

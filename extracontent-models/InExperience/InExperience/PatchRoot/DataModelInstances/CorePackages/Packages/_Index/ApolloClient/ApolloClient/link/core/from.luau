@@ -1,3 +1,3 @@
 return {
-    from = require(script.Parent.ApolloLink).ApolloLink.from
-};
+	from = require(script.Parent.ApolloLink).ApolloLink.from
+}

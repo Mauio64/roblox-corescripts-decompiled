@@ -1,4 +1,5 @@
-game:DefineFastFlag("DisplayChannelNameOnErrorPrompt", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("DisplayChannelNameOnErrorPrompt");
-end;
+game:DefineFastFlag("DisplayChannelNameOnErrorPrompt", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("DisplayChannelNameOnErrorPrompt")
+end

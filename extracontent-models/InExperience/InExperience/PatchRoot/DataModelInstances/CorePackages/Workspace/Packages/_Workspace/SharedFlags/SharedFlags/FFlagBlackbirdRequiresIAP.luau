@@ -1,1 +1,1 @@
-return game:DefineFastFlag("BlackbirdRequiresIAP", false);
+return game:DefineFastFlag("BlackbirdRequiresIAP", false)

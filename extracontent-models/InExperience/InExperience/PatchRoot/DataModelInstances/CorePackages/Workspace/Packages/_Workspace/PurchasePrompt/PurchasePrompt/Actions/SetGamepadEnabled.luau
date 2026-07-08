@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "enabled");
+return require(script.Parent.makeActionCreator)(script.Name, "enabled")

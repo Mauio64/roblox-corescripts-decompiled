@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UnibarMenuOpenHamburgerGamepadIXP684", false);
+return game:DefineFastFlag("UnibarMenuOpenHamburgerGamepadIXP684", false)

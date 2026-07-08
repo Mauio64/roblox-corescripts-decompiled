@@ -1,7 +1,7 @@
-return require(script.Parent.Parent.ActionCreator)("SetPlayerIsFollowing", function(v0, v1) --[[ Line: 4 ]]
-    return {
-        player = v0, 
-        userId = v0.UserId, 
-        isFollowing = v1
-    };
-end);
+return require(script.Parent.Parent.ActionCreator)("SetPlayerIsFollowing", function(p1, p2) -- line: 4
+	return {
+		player = p1,
+		userId = p1.UserId,
+		isFollowing = p2
+	}
+end)

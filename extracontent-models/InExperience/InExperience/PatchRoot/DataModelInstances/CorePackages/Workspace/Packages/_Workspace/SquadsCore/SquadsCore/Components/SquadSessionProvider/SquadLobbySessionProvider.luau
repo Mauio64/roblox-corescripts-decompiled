@@ -1,82 +1,78 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SquadsCore");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_SessionService_0 = game:GetService("SessionService");
-local v3 = require(l_script_FirstAncestor_0.Logger);
-local v4 = require(l_script_FirstAncestor_0.Components.SquadExternalContractProvider.SquadExternalContractContext);
-local v5 = require(l_script_FirstAncestor_0.Enums.SquadLocationEnum);
-local v6 = require(l_script_FirstAncestor_0.Enums.SquadRootViewType);
-local v7 = require(l_script_FirstAncestor_0.Components.SquadExternalContractProvider.SquadViewFlags);
-local v8 = require(l_Parent_0.React);
-local l_SessionType_0 = require(l_Parent_0.RobloxAppSessionization).SessionType;
-local v10 = v8.createContext({
-    updateMetadata = function() --[[ Line: 29 ]] --[[ Name: updateMetadata ]]
+local SquadsCore = script:FindFirstAncestor("SquadsCore")
+local SquadsCoreParent = SquadsCore.Parent
+local SessionService = game:GetService("SessionService")
+local Logger = require(SquadsCore.Logger)
+local SquadExternalContractContext = require(SquadsCore.Components.SquadExternalContractProvider.SquadExternalContractContext)
+local SquadLocationEnum = require(SquadsCore.Enums.SquadLocationEnum)
+local SquadRootViewType = require(SquadsCore.Enums.SquadRootViewType)
+local SquadViewFlags = require(SquadsCore.Components.SquadExternalContractProvider.SquadViewFlags)
+local React = require(SquadsCoreParent.React)
+local SessionType = require(SquadsCoreParent.RobloxAppSessionization).SessionType
+local v11 = React.createContext({
+	updateMetadata = function() -- line: 29
+	end
+})
 
-    end
-});
 return {
-    Context = v10, 
-    Provider = function(v11) --[[ Line: 32 ]]
-        -- upvalues: v8 (copy), v4 (copy), v5 (copy), l_SessionType_0 (copy), v7 (copy), v6 (copy), l_SessionService_0 (copy), v3 (copy), v10 (copy)
-        local v12 = v8.useContext(v4);
-        local v13 = v12.useSquadViewFlags();
-        local v14 = v12.useSquadRootView();
-        local v15 = if v12.squadLocation == v5.InExperience then l_SessionType_0.StructuralIdentifier.SquadLobbyPageInExpSessionInfo else l_SessionType_0.StructuralIdentifier.SquadLobbyPageUASessionInfo;
-        local v16 = false;
-        if bit32.band(v13, v7.SquadLobby) ~= 0 then
-            v16 = v14 ~= v6.None;
-        end;
-        local v18 = v8.useCallback(function() --[[ Line: 44 ]]
-            -- upvalues: l_SessionType_0 (ref), l_SessionService_0 (ref), v15 (copy)
-            local l_Level1_0 = l_SessionType_0.StructuralIdentifier.Level1;
-            if l_Level1_0 and l_SessionService_0:SessionExists(l_Level1_0) and not l_SessionService_0:SessionExists(v15) then
-                l_SessionService_0:SetSession(l_Level1_0, v15, v15);
-            end;
-        end, {
-            v15, 
-            v12.squadLocation
-        });
-        local v19 = v8.useCallback(function() --[[ Line: 52 ]]
-            -- upvalues: l_SessionService_0 (ref), v15 (copy)
-            if l_SessionService_0:SessionExists(v15) then
-                l_SessionService_0:RemoveSession(v15);
-            end;
-        end, {
-            v15
-        });
-        local v22 = v8.useCallback(function(v20, v21) --[[ Line: 58 ]]
-            -- upvalues: l_SessionService_0 (ref), v15 (copy), v3 (ref)
-            if l_SessionService_0:SessionExists(v15) then
-                l_SessionService_0:SetMetadata(v15, v20, v21);
-                return;
-            else
-                v3:warning("Squad {} session does not exist, cannot update metadata with key {}, value {}", v15, v20, v21);
-                return;
-            end;
-        end, {
-            v15
-        });
-        v8.useEffect(function() --[[ Line: 71 ]]
-            -- upvalues: v16 (copy), v18 (copy), v19 (copy)
-            if v16 then
-                v18();
-                return function() --[[ Line: 75 ]]
-                    -- upvalues: v19 (ref)
-                    v19();
-                end;
-            else
-                return function() --[[ Line: 80 ]]
+	Context = v11,
+	Provider = function(t1: {[any]: any}) -- line: 32
+		-- upvalues: React (copy), SquadExternalContractContext (copy), SquadLocationEnum (copy), SessionType (copy), SquadViewFlags (copy), SquadRootViewType (copy), SessionService (copy), Logger (copy), v11 (copy)
+		local v13 = React.useContext(SquadExternalContractContext)
+		local v14 = v13.useSquadViewFlags()
+		local v15 = v13.useSquadRootView()
+		local v16 = if v13.squadLocation ~= SquadLocationEnum.InExperience then SessionType.StructuralIdentifier.SquadLobbyPageUASessionInfo else SessionType.StructuralIdentifier.SquadLobbyPageInExpSessionInfo
+		local v17 = bit32.band(v14, SquadViewFlags.SquadLobby) ~= 0 and v15 ~= SquadRootViewType.None
+		local v18 = React.useCallback(function() -- line: 44
+			-- upvalues: SessionType (copy), SessionService (copy), v16 (copy)
+			local Level1 = SessionType.StructuralIdentifier.Level1
 
-                end;
-            end;
-        end, {
-            v16, 
-            v18, 
-            v19
-        });
-        return v8.createElement(v10.Provider, {
-            value = {
-                updateMetadata = v22
-            }
-        }, v11.children);
-    end
-};
+			if Level1 and (SessionService:SessionExists(Level1) and not SessionService:SessionExists(v16)) then
+				SessionService:SetSession(Level1, v16, v16)
+			end
+		end, {
+			v16,
+			v13.squadLocation
+		})
+		local v19 = React.useCallback(function() -- line: 52
+			-- upvalues: SessionService (copy), v16 (copy)
+			if SessionService:SessionExists(v16) then
+				SessionService:RemoveSession(v16)
+			end
+		end, { v16 })
+		local v20 = React.useCallback(function(p1, p2) -- line: 58
+			-- upvalues: SessionService (copy), v16 (copy), Logger (copy)
+			if SessionService:SessionExists(v16) then
+				SessionService:SetMetadata(v16, p1, p2)
+
+				return
+			end
+
+			Logger:warning("Squad {} session does not exist, cannot update metadata with key {}, value {}", v16, p1, p2)
+		end, { v16 })
+
+		React.useEffect(function() -- line: 71
+			-- upvalues: v17 (copy), v18 (copy), v19 (copy)
+			if v17 then
+				v18()
+
+				return function() -- line: 75
+					-- upvalues: v19 (copy)
+					v19()
+				end
+			end
+
+			return function() -- line: 80
+			end
+		end, {
+			v17,
+			v18,
+			v19
+		})
+
+		return React.createElement(v11.Provider, {
+			value = {
+				updateMetadata = v20
+			}
+		}, t1.children)
+	end
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("SupportSubmissionOnAllReportNodes", false);
+return game:DefineFastFlag("SupportSubmissionOnAllReportNodes", false)

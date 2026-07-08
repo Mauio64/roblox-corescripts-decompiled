@@ -1,16 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserBlockingRodux");
-local v1 = require(l_script_FirstAncestor_0.Reducers.UserBlocking.isBlockedByMe);
-local v2 = {
-    isBlockedByMe = {}
-};
-return function(v3) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v4 = v1(v3);
-    return function(v5, v6) --[[ Line: 12 ]]
-        -- upvalues: v2 (ref), v4 (copy)
-        local v7 = v5 or v2;
-        return {
-            isBlockedByMe = v4(v7.isBlockedByMe, v6)
-        };
-    end;
-end;
+local UserBlockingRodux = script:FindFirstAncestor("UserBlockingRodux")
+local isBlockedByMe = require(UserBlockingRodux.Reducers.UserBlocking.isBlockedByMe)
+local t1 = {
+	isBlockedByMe = {}
+}
+
+return function(p1) -- line: 9
+	-- upvalues: isBlockedByMe (copy), t1 (copy)
+	local v5 = isBlockedByMe(p1)
+
+	return function(p2, p3) -- line: 12
+		-- upvalues: t1 (copy), v5 (copy)
+		local v8 = p2 or t1
+
+		return {
+			isBlockedByMe = v5(v8.isBlockedByMe, p3)
+		}
+	end
+end

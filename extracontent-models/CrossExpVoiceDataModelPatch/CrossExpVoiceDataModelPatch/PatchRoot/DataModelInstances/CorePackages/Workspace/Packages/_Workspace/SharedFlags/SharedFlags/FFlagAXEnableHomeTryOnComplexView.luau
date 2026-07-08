@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXEnableHomeTryOnComplexView", false);
+return game:DefineFastFlag("AXEnableHomeTryOnComplexView", false)

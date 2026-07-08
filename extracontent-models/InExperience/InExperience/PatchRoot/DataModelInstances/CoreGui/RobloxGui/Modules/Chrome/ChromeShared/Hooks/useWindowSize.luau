@@ -1,31 +1,35 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ChromeShared");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_CorePackages_0.Packages.React);
-local _ = require(l_script_FirstAncestor_0.Service.Types);
-return function(v4) --[[ Line: 7 ]]
-    -- upvalues: v2 (copy)
-    if v4 and v4.windowSize then
-        local l_windowSize_0 = v4.windowSize;
-        local v6, v7 = v2.useState(l_windowSize_0:get());
-        v2.useEffect(function() --[[ Line: 13 ]]
-            -- upvalues: l_windowSize_0 (copy), v7 (copy), v6 (copy)
-            local v8 = l_windowSize_0:connect(function() --[[ Line: 14 ]]
-                -- upvalues: v7 (ref), l_windowSize_0 (ref)
-                v7(l_windowSize_0:get());
-            end);
-            if v6 ~= l_windowSize_0:get() then
-                v7(l_windowSize_0:get());
-            end;
-            return function() --[[ Line: 22 ]]
-                -- upvalues: v8 (copy)
-                v8:disconnect();
-            end;
-        end, {
-            v4.id
-        });
-        return v6;
-    else
-        warn("windowSize object not found");
-        return UDim2.new();
-    end;
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+
+require(CorePackages.Workspace.Packages.Chrome)
+
+return function(p1) -- line: 7
+	-- upvalues: React (copy)
+	if p1 and p1.windowSize then
+		local windowSize = p1.windowSize
+		local v5, v6 = React.useState(windowSize:get())
+
+		React.useEffect(function() -- line: 13
+			-- upvalues: windowSize (copy), v6 (copy), v5 (copy)
+			local v7 = windowSize:connect(function() -- line: 14
+				-- upvalues: v6 (copy), windowSize (copy)
+				v6(windowSize:get())
+			end)
+
+			if v5 ~= windowSize:get() then
+				v6(windowSize:get())
+			end
+
+			return function() -- line: 22
+				-- upvalues: v7 (copy)
+				v7:disconnect()
+			end
+		end, { p1.id })
+
+		return v5
+	end
+
+	warn("windowSize object not found")
+
+	return UDim2.new()
+end

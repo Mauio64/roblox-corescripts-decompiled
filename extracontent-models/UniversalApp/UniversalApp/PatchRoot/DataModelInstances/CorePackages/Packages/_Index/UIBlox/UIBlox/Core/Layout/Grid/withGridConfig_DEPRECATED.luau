@@ -1,29 +1,33 @@
-local l_Parent_0 = script.Parent;
-local l_Responsive_0 = l_Parent_0.Parent.Responsive;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent.Parent;
-local v3 = require(l_Parent_1.Roact);
-local v4 = require(l_Responsive_0.ResponsiveLayoutContext);
-local v5 = require(l_Responsive_0.ResponsiveLayoutConfigReader);
-return function(v6, v7) --[[ Line: 27 ]]
-    -- upvalues: v3 (copy), v4 (copy), v5 (copy)
-    return function(v8) --[[ Line: 28 ]]
-        -- upvalues: v3 (ref), v4 (ref), v6 (copy), v5 (ref), v7 (copy)
-        return v3.createElement(v4.Consumer, {
-            render = function(v9) --[[ Line: 30 ]] --[[ Name: render ]]
-                -- upvalues: v6 (ref), v5 (ref), v7 (ref), v8 (copy)
-                local v10 = {};
-                for v11, v12 in pairs(v6) do
-                    v10[v11] = v5.getValue({
-                        config = v9.config, 
-                        breakpoint = v9.breakpoint, 
-                        kind = v7 or v9.kind
-                    }, v11);
-                    if v10[v11] == nil then
-                        v10[v11] = v12;
-                    end;
-                end;
-                return v8(v10);
-            end
-        });
-    end;
-end;
+local scriptParent = script.Parent
+local Responsive = scriptParent.Parent.Responsive
+local ParentParent = scriptParent.Parent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local ResponsiveLayoutContext = require(Responsive.ResponsiveLayoutContext)
+local ResponsiveLayoutConfigReader = require(Responsive.ResponsiveLayoutConfigReader)
+
+return function(p1, p2) -- line: 27
+	-- upvalues: Roact (copy), ResponsiveLayoutContext (copy), ResponsiveLayoutConfigReader (copy)
+	return function(p3) -- line: 28
+		-- upvalues: Roact (copy), ResponsiveLayoutContext (copy), p1 (copy), ResponsiveLayoutConfigReader (copy), p2 (copy)
+		return Roact.createElement(ResponsiveLayoutContext.Consumer, {
+			render = function(p4) -- line: 30
+				-- upvalues: p1 (copy), ResponsiveLayoutConfigReader (copy), p2 (copy), p3 (copy)
+				local t1 = {}
+
+				for k, v in pairs(p1) do
+					t1[k] = ResponsiveLayoutConfigReader.getValue({
+						config = p4.config,
+						breakpoint = p4.breakpoint,
+						kind = p2 or p4.kind
+					}, k)
+
+					if t1[k] == nil then
+						t1[k] = v
+					end
+				end
+
+				return p3(t1)
+			end
+		})
+	end
+end

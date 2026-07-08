@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ChatLineReportingReworkEnabled", false);
+return game:DefineFastFlag("ChatLineReportingReworkEnabled", false)

@@ -1,101 +1,95 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local v2 = require(l_Parent_0.SocialLuaAnalytics);
-local v3 = require(l_Parent_0.Cryo);
-local v4 = game:DefineFastFlag("AppChatTelemetryCounterAddSharedInfo", false);
-local v5 = game:DefineFastFlag("AppChatTelemetryStatAddSharedInfo", false);
-local function v8(_, v7) --[[ Line: 13 ]] --[[ Name: defaultFormatCounter ]]
-    -- upvalues: v4 (copy)
-    if v4 then
-        return {
-            placement = v7.placement, 
-            entryPoint = v7.entryPoint, 
-            hasActiveParty = v7.currentSquadId ~= nil
-        };
-    else
-        return {
-            placement = v7.placement
-        };
-    end;
-end;
-local function v13(v9, v10) --[[ Line: 26 ]] --[[ Name: namedCounterConfigurationAndFormat ]]
-    -- upvalues: v2 (copy), v3 (copy), v8 (copy)
-    return {
-        type = v2.Analytics.Enums.SupportedTelemetryBackends.RobloxTelemetryCounter, 
-        overrideName = function() --[[ Line: 32 ]] --[[ Name: overrideName ]]
-            -- upvalues: v9 (copy)
-            return v9;
-        end, 
-        format = function(v11, v12) --[[ Line: 35 ]] --[[ Name: format ]]
-            -- upvalues: v3 (ref), v8 (ref), v10 (copy)
-            return v3.Dictionary.join(v8(v11, v12), v10(v11, v12));
-        end, 
-        standardizedFields = nil, 
-        throttlingThousandths = nil
-    };
-end;
-local function v17(v14) --[[ Line: 42 ]] --[[ Name: namedCounterConfigurationNoEmittedInfo ]]
-    -- upvalues: v13 (copy)
-    return (v13(v14, function(_, _) --[[ Line: 45 ]]
-        return {};
-    end));
-end;
-local function v20(_, v19) --[[ Line: 52 ]] --[[ Name: defaultFormatStat ]]
-    -- upvalues: v5 (copy)
-    if v5 then
-        return {
-            placement = v19.placement, 
-            entryPoint = v19.entryPoint, 
-            hasActiveParty = v19.currentSquadId ~= nil
-        };
-    else
-        return {
-            placement = v19.placement
-        };
-    end;
-end;
-local function v25(v21, v22) --[[ Line: 64 ]] --[[ Name: namedStatConfigurationAndFormat ]]
-    -- upvalues: v2 (copy), v3 (copy), v20 (copy)
-    return {
-        type = v2.Analytics.Enums.SupportedTelemetryBackends.RobloxTelemetryStat, 
-        overrideName = function() --[[ Line: 70 ]] --[[ Name: overrideName ]]
-            -- upvalues: v21 (copy)
-            return v21;
-        end, 
-        format = function(v23, v24) --[[ Line: 73 ]] --[[ Name: format ]]
-            -- upvalues: v3 (ref), v20 (ref), v22 (copy)
-            return v3.Dictionary.join(v20(v23, v24), v22(v23, v24));
-        end, 
-        standardizedFields = nil, 
-        throttlingThousandths = nil
-    };
-end;
-local _ = function(_, v27) --[[ Line: 81 ]] --[[ Name: defaultEventIngestFormat ]]
-    return v27;
-end;
-local function v32(v29) --[[ Line: 84 ]] --[[ Name: eventIngestWithFormatFunction ]]
-    -- upvalues: v2 (copy), v1 (copy), v3 (copy)
-    return {
-        type = v2.Analytics.Enums.SupportedTelemetryBackends.EventIngest, 
-        standardizedFields = {
-            v1.StandardizedFields.addSessionId, 
-            v1.StandardizedFields.addSessionInfo
-        }, 
-        format = function(v30, v31) --[[ Line: 93 ]] --[[ Name: format ]]
-            -- upvalues: v3 (ref), v29 (copy)
-            return v3.Dictionary.join(v31, v29(v30, v31));
-        end, 
-        overrideName = nil, 
-        throttlingThousandths = nil
-    };
-end;
-local v35 = v32(function(_, _) --[[ Line: 104 ]]
-    return {};
-end);
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local SocialLuaAnalytics = require(Parent.SocialLuaAnalytics)
+local Cryo = require(Parent.Cryo)
+local t1 = {
+	"addSessionInfo",
+	"addOSInfo"
+}
+
+local function defaultFormatCounter(_, p2) -- line: 18
+	return {
+		placement = p2.placement,
+		entryPoint = p2.entryPoint,
+		hasActiveParty = p2.currentSquadId ~= nil
+	}
+end
+local function namedCounterConfigurationAndFormat(s1: string, p3: ((...any) -> ...any)) -- line: 25
+	-- upvalues: SocialLuaAnalytics (copy), Cryo (copy), t1 (copy)
+	return {
+		throttlingThousandths = nil,
+		type = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends.RobloxTelemetryCounter,
+		overrideName = function() -- line: 31
+			-- upvalues: s1 (copy)
+			return s1
+		end,
+		format = function(p4, p5) -- line: 34
+			-- upvalues: Cryo (copy), p3 (copy)
+			return Cryo.Dictionary.join({
+				placement = p5.placement,
+				entryPoint = p5.entryPoint,
+				hasActiveParty = p5.currentSquadId ~= nil
+			}, p3(p4, p5))
+		end,
+		standardizedFields = t1
+	}
+end
+local function defaultFormatStat(_, p7) -- line: 51
+	return {
+		placement = p7.placement,
+		entryPoint = p7.entryPoint,
+		hasActiveParty = p7.currentSquadId ~= nil
+	}
+end
+local function defaultEventIngestFormat(_, p9) -- line: 75
+	return p9
+end
+local function eventIngestWithFormatFunction(p10: ((...any) -> ...any)) -- line: 78
+	-- upvalues: SocialLuaAnalytics (copy), t1 (copy), Cryo (copy)
+	return {
+		overrideName = nil,
+		throttlingThousandths = nil,
+		type = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends.EventIngest,
+		standardizedFields = t1,
+		format = function(p11, p12) -- line: 84
+			-- upvalues: Cryo (copy), p10 (copy)
+			return Cryo.Dictionary.join(p12, p10(p11, p12))
+		end
+	}
+end
+
+local v10 = eventIngestWithFormatFunction(function(_, _) -- line: 95
+	return {}
+end)
+
 return {
-    namedCounterConfigurationAndFormat = v13, 
-    namedCounterConfigurationNoEmittedInfo = v17, 
-    namedStatConfigurationAndFormat = v25, 
-    eventIngestWithFormatFunction = v32, 
-    EVENT_INGEST_NO_EMITTED_INFO = v35
-};
+	namedCounterConfigurationAndFormat = namedCounterConfigurationAndFormat,
+	namedCounterConfigurationNoEmittedInfo = function(s2: string) -- line: 41
+		-- upvalues: namedCounterConfigurationAndFormat (copy)
+		return (namedCounterConfigurationAndFormat(s2, function(_, _) -- line: 44
+			return {}
+		end))
+	end,
+	namedStatConfigurationAndFormat = function(s3: string, p17: ((...any) -> ...any)) -- line: 58
+		-- upvalues: SocialLuaAnalytics (copy), Cryo (copy), t1 (copy)
+		return {
+			throttlingThousandths = nil,
+			type = SocialLuaAnalytics.Analytics.Enums.SupportedTelemetryBackends.RobloxTelemetryStat,
+			overrideName = function() -- line: 64
+				-- upvalues: s3 (copy)
+				return s3
+			end,
+			format = function(p18, p19) -- line: 67
+				-- upvalues: Cryo (copy), p17 (copy)
+				return Cryo.Dictionary.join({
+					placement = p19.placement,
+					entryPoint = p19.entryPoint,
+					hasActiveParty = p19.currentSquadId ~= nil
+				}, p17(p18, p19))
+			end,
+			standardizedFields = t1
+		}
+	end,
+	eventIngestWithFormatFunction = eventIngestWithFormatFunction,
+	EVENT_INGEST_NO_EMITTED_INFO = v10,
+	STANDARDIZED_FIELDS = t1
+}

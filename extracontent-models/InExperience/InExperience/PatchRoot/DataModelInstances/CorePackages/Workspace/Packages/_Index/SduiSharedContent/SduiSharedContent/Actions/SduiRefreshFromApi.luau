@@ -1,49 +1,59 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.SduiSharedUtilities);
-local l_SduiLoadTimer_0 = v1.SduiLoadTimer;
-local l_getSduiApiStore_0 = v1.getSduiApiStore;
-local v4 = require(l_Parent_0.SduiCoreSystem);
-local l_SduiActionType_0 = v4.SduiActionType;
-local l_SduiErrorType_0 = v4.SduiErrors.SduiErrorType;
-return function(v7, _, v9) --[[ Line: 17 ]]
-    -- upvalues: l_SduiErrorType_0 (copy), l_SduiActionType_0 (copy), l_SduiLoadTimer_0 (copy), l_getSduiApiStore_0 (copy)
-    local v10 = v7 and v7.actionParams or nil;
-    if v10 == nil then
-        v9.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-            name = l_SduiActionType_0.RefreshFromApi, 
-            message = "Missing actionParams"
-        }, v9.appPage);
-        return;
-    else
-        assert(v10, "actionParams must exist");
-        local l_configKey_0 = v10.configKey;
-        if typeof(l_configKey_0) ~= "string" then
-            v9.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-                name = l_SduiActionType_0.RefreshFromApi, 
-                message = ("Invalid or missing configKey: %*"):format(l_configKey_0), 
-                propName = "configKey"
-            }, v9.appPage);
-            return;
-        else
-            local l_surfaceKey_0 = v10.surfaceKey;
-            if typeof(l_surfaceKey_0) ~= "string" then
-                v9.dependencies.logger.reportError(l_SduiErrorType_0.InvalidActionParams, {
-                    name = l_SduiActionType_0.RefreshFromApi, 
-                    message = ("Invalid or missing surfaceKey: %*"):format(l_surfaceKey_0), 
-                    propName = "surfaceKey"
-                }, v9.appPage);
-                return;
-            else
-                local v13 = l_SduiLoadTimer_0.createLoadTimer(l_surfaceKey_0);
-                v13.start("refresh");
-                return l_getSduiApiStore_0().refreshFromApi({
-                    configKey = l_configKey_0, 
-                    loadTimer = v13
-                }):finally(function() --[[ Line: 59 ]]
-                    -- upvalues: v13 (copy)
-                    v13.logRefreshComplete();
-                end);
-            end;
-        end;
-    end;
-end;
+local Parent = script:FindFirstAncestor("SduiSharedContent").Parent
+local SduiSharedUtilities = require(Parent.SduiSharedUtilities)
+local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
+local getSduiApiStore = SduiSharedUtilities.getSduiApiStore
+local SduiCoreSystem = require(Parent.SduiCoreSystem)
+local SduiActionType = SduiCoreSystem.SduiActionType
+local SduiErrorType = SduiCoreSystem.SduiErrors.SduiErrorType
+
+return function(p1, _, p3) -- line: 17
+	-- upvalues: SduiErrorType (copy), SduiActionType (copy), SduiLoadTimer (copy), getSduiApiStore (copy)
+	local v11 = p1 and p1.actionParams or nil
+
+	if v11 == nil then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			message = "Missing actionParams",
+			name = SduiActionType.RefreshFromApi
+		}, p3.appPage)
+
+		return
+	end
+
+	assert(v11, "actionParams must exist")
+
+	local configKey = v11.configKey
+
+	if typeof(configKey) ~= "string" then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			propName = "configKey",
+			name = SduiActionType.RefreshFromApi,
+			message = `Invalid or missing configKey: { configKey }`
+		}, p3.appPage)
+
+		return
+	end
+
+	local surfaceKey = v11.surfaceKey
+
+	if typeof(surfaceKey) ~= "string" then
+		p3.dependencies.logger.reportError(SduiErrorType.InvalidActionParams, {
+			propName = "surfaceKey",
+			name = SduiActionType.RefreshFromApi,
+			message = `Invalid or missing surfaceKey: { surfaceKey }`
+		}, p3.appPage)
+
+		return
+	end
+
+	local v14 = SduiLoadTimer.createLoadTimer(surfaceKey)
+
+	v14.start("refresh")
+
+	return getSduiApiStore().refreshFromApi({
+		configKey = configKey,
+		loadTimer = v14
+	}):finally(function() -- line: 59
+		-- upvalues: v14 (copy)
+		v14.logRefreshComplete()
+	end)
+end

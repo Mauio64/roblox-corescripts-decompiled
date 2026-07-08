@@ -1,14 +1,19 @@
-local l_Parent_0 = script:FindFirstAncestor("SocialLuaAnalytics").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(script.Parent.AnalyticsFactory);
-local _ = require(script.Parent.Parent.Types);
-return function(v4) --[[ Line: 29 ]] --[[ Name: setUpAnalyticsFactory ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return function(v5) --[[ Line: 30 ]]
-        -- upvalues: v1 (ref), v4 (copy), v2 (ref)
-        local v6 = v1.Dictionary.join(v4.staticInfoForAllEvents or {}, v5 and v5.infoForAllEvents or {});
-        return v2(v1.Dictionary.join(v4, {
-            infoForAllEvents = v6
-        }));
-    end;
-end;
+local Parent = script:FindFirstAncestor("SocialLuaAnalytics").Parent
+local Cryo = require(Parent.Cryo)
+local AnalyticsFactory = require(script.Parent.AnalyticsFactory)
+
+require(script.Parent.Parent.Types)
+
+local function setUpAnalyticsFactory(t1: {[any]: any}) -- line: 29
+	-- upvalues: Cryo (copy), AnalyticsFactory (copy)
+	return function(t2: {[any]: any}?) -- line: 30
+		-- upvalues: Cryo (copy), t1 (copy), AnalyticsFactory (copy)
+		local v7 = Cryo.Dictionary.join(t1.staticInfoForAllEvents or {}, t2 and t2.infoForAllEvents or {})
+
+		return AnalyticsFactory(Cryo.Dictionary.join(t1, {
+			infoForAllEvents = v7
+		}))
+	end
+end
+
+return setUpAnalyticsFactory

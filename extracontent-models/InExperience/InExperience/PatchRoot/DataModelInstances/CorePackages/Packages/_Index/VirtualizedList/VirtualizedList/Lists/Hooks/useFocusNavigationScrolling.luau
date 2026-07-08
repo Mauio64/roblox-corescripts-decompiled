@@ -1,63 +1,73 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(script.Parent.Parent.FlatList);
-return function(v3) --[[ Line: 40 ]] --[[ Name: useFocusNavigationScrolling ]]
-    -- upvalues: v1 (copy)
-    local v4 = if v3.cellRendererKey then v3.cellRendererKey else "CellRendererView";
-    local v5 = if v3.initialIndex then v3.initialIndex else 1;
-    local l_listRef_0 = v3.listRef;
-    local l_onSelectedIndexChanged_0 = v3.onSelectedIndexChanged;
-    local l_viewOffset_0 = v3.viewOffset;
-    local v9 = v3.animated == nil or v3.animated;
-    local v10 = v1.useRef(v5);
-    local l_data_0 = v3.data;
-    local v14 = v1.useCallback(function(v12) --[[ Line: 50 ]]
-        -- upvalues: l_listRef_0 (copy)
-        local v13 = v12.index * v12.averageItemLength;
-        if l_listRef_0 and l_listRef_0.current then
-            l_listRef_0.current:scrollToOffset({
-                offset = v13
-            });
-            return;
-        else
-            warn("Animated scrolling failed, the ref to the ScrollView is nil.This could indicate that you are selecting focus before the ScrollView has mounted.");
-            return;
-        end;
-    end, {
-        l_listRef_0
-    });
-    return v1.useCallback(function(v15, _, _, v18) --[[ Line: 64 ]]
-        -- upvalues: v4 (copy), v10 (copy), l_data_0 (copy), l_onSelectedIndexChanged_0 (copy), l_listRef_0 (copy), v9 (copy), l_viewOffset_0 (copy)
-        if v18 and v18:IsDescendantOf(v15) then
-            local l_v18_FirstAncestor_0 = v18:FindFirstAncestor(v4);
-            if not l_v18_FirstAncestor_0 or not l_v18_FirstAncestor_0.LayoutOrder then
-                return nil;
-            elseif l_v18_FirstAncestor_0.LayoutOrder == v10.current or l_v18_FirstAncestor_0.LayoutOrder > #l_data_0 or l_v18_FirstAncestor_0.LayoutOrder < 1 then
-                return nil;
-            else
-                v10.current = l_v18_FirstAncestor_0.LayoutOrder;
-                if l_onSelectedIndexChanged_0 then
-                    l_onSelectedIndexChanged_0(v10.current);
-                end;
-                if not l_listRef_0 or not l_listRef_0.current then
-                    return nil;
-                else
-                    l_listRef_0.current:scrollToIndex({
-                        index = v10.current, 
-                        animated = v9, 
-                        viewOffset = l_viewOffset_0
-                    });
-                end;
-            end;
-        end;
-        return nil;
-    end, {
-        l_listRef_0, 
-        v10, 
-        v4, 
-        l_onSelectedIndexChanged_0, 
-        v9, 
-        l_viewOffset_0, 
-        l_data_0
-    }), v14;
-end;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local React = require(ParentParent.React)
+
+require(script.Parent.Parent.FlatList)
+
+local function useFocusNavigationScrolling(t1: {[any]: any}) -- line: 40
+	-- upvalues: React (copy)
+	local v5 = not t1.cellRendererKey and "CellRendererView" or t1.cellRendererKey
+	local v6 = not t1.initialIndex and 1 or t1.initialIndex
+	local listRef = t1.listRef
+	local onSelectedIndexChanged = t1.onSelectedIndexChanged
+	local viewOffset = t1.viewOffset
+	local v10 = t1.animated == nil or t1.animated
+	local v11 = React.useRef(v6)
+	local data = t1.data
+	local v13 = React.useCallback(function(t2: {[any]: any}) -- line: 50
+		-- upvalues: listRef (copy)
+		local v15 = t2.index * t2.averageItemLength
+
+		if listRef and listRef.current then
+			listRef.current:scrollToOffset({
+				offset = v15
+			})
+
+			return
+		end
+
+		warn("Animated scrolling failed, the ref to the ScrollView is nil.This could indicate that you are selecting focus before the ScrollView has mounted.")
+	end, { listRef })
+
+	return React.useCallback(function(p1, _, _, p4) -- line: 64
+		-- upvalues: v5 (copy), v11 (copy), data (copy), onSelectedIndexChanged (copy), listRef (copy), v10 (copy), viewOffset (copy)
+		if p4 and p4:IsDescendantOf(p1) then
+			local v20 = p4:FindFirstAncestor(v5)
+
+			if not v20 or not v20.LayoutOrder then
+				return nil
+			end
+
+			if v20.LayoutOrder == v11.current or v20.LayoutOrder > #data or v20.LayoutOrder < 1 then
+				return nil
+			end
+
+			v11.current = v20.LayoutOrder
+
+			if onSelectedIndexChanged then
+				onSelectedIndexChanged(v11.current)
+			end
+
+			if not listRef or not listRef.current then
+				return nil
+			end
+
+			listRef.current:scrollToIndex({
+				index = v11.current,
+				animated = v10,
+				viewOffset = viewOffset
+			})
+		end
+
+		return nil
+	end, {
+		listRef,
+		v11,
+		v5,
+		onSelectedIndexChanged,
+		v10,
+		viewOffset,
+		data
+	}), v13
+end
+
+return useFocusNavigationScrolling

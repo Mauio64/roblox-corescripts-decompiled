@@ -1,113 +1,140 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_RunService_0 = game:GetService("RunService");
-local v2 = game:DefineFastFlag("NoStudioOwnershipCheck", false);
-local v3 = require(l_Parent_0.Analytics);
-local v4 = require(l_Parent_0.Constants);
-local v5 = require(l_Parent_0.util.ParseContentIds);
-local v6 = require(l_Parent_0.util.FailureReasonsAccumulator);
-local v7 = require(l_Parent_0.util.getAssetCreationDetailsRCC);
-local _ = require(l_Parent_0.util.Types);
-local v9 = require(l_Parent_0.validation.validateCanLoad);
-local v10 = require(l_Parent_0.validation.validateAssetCreator);
-local function v15(v11, v12) --[[ Line: 23 ]] --[[ Name: validateExistance ]]
-    -- upvalues: v9 (copy)
-    for _, v14 in pairs(v11) do
-        if not v9(v14.instance[v14.fieldName], v12) then
-            error(string.format("Failed to load children assets (Meshes, Textures, etc.) for '%s'. Make sure the assets exist and try again.", v14.instance.Name));
-        end;
-    end;
-end;
-local v16 = {
-    MODERATION_STATE_REVIEWING = {
-        MODERATION_STATE_REVIEWING = true, 
-        Reviewing = true
-    }, 
-    MODERATION_STATE_APPROVED = {
-        MODERATION_STATE_APPROVED = true, 
-        Approved = true
-    }
-};
-local function v23(v17, v18, v19, v20, v21, v22) --[[ Line: 44 ]] --[[ Name: validateCreatorId ]]
-    -- upvalues: v3 (copy)
-    if not v17[tonumber(v18)] then
-        v3.reportFailure(v3.ErrorType.validateDependencies_IsRestrictedUserId, nil, v22);
-        return false, {
-            (("%*.%* ( %* ) is not owned by the current user. You can only validate assets that you or a group you belong to owns."):format(v19:GetFullName(), v20, v21))
-        };
-    else
-        return true;
-    end;
-end;
-local function v29(v24, v25, v26, v27, v28) --[[ Line: 62 ]] --[[ Name: validateModerationState ]]
-    -- upvalues: v16 (copy), v3 (copy)
-    if v16.MODERATION_STATE_REVIEWING[v24] then
-        v3.reportFailure(v3.ErrorType.validateDependencies_IsReviewing, nil, v28);
-        error("Failed to load asset {instance:GetFullName()}.{fieldName} ( {id} ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.");
-    end;
-    if not v16.MODERATION_STATE_APPROVED[v24] then
-        v3.reportFailure(v3.ErrorType.validateDependencies_IsNotApproved, nil, v28);
-        return false, {
-            (("%*.%* ( %* ) is not owned by the current user. You can only validate assets that you or a group you belong to owns."):format(v25:GetFullName(), v26, v27))
-        };
-    else
-        return true;
-    end;
-end;
-local function v43(v30, v31, v32) --[[ Line: 91 ]] --[[ Name: validateModerationRCC ]]
-    -- upvalues: v6 (copy), v7 (copy), v23 (copy), v29 (copy)
-    if not v30 or #v30 == 0 then
-        return true;
-    else
-        local v33 = {};
-        for _, v35 in ipairs(v30) do
-            v33[tonumber(v35.id)] = true;
-        end;
-        local v36 = v6.new();
-        for v37, v38 in pairs(v31) do
-            local v39, v40 = v7(v37);
-            if not v39 then
-                error("Failed to load asset");
-            end;
-            local l_creator_0 = v40.creationContext.creator;
-            local v42 = if l_creator_0.userId then l_creator_0.userId else l_creator_0.groupId;
-            v36:updateReasons(v23(v33, v42, v38.instance, v38.fieldName, v37, v32));
-            v36:updateReasons(v29(v40.moderationResult.moderationState, v38.instance, v38.fieldName, v37, v32));
-        end;
-        return v36:getFinalResults();
-    end;
-end;
-local function v46(v44, v45) --[[ Line: 136 ]] --[[ Name: validateAssetCreatorsRCC ]]
-    -- upvalues: v10 (copy)
-    assert(v45.isServer, "isServer must be true for validateAssetCreatorsRCC");
-    return v10(v44, v45);
-end;
-return function(v47, v48) --[[ Line: 141 ]] --[[ Name: validateDependencies ]]
-    -- upvalues: v5 (copy), v4 (copy), v3 (copy), v15 (copy), v6 (copy), v2 (copy), l_RunService_0 (copy), v46 (copy), v43 (copy)
-    local v49 = tick();
-    local v50 = if v48 then v48.isServer else nil;
-    local l_allowEditableInstances_0 = v48.allowEditableInstances;
-    local v52 = if v48 then v48.restrictedUserIds else nil;
-    local v53 = if v48 then v48.universeId else nil;
-    local v54 = {};
-    local v55, v56 = v5.parseWithErrorCheck({}, v54, v47, nil, v4.CONTENT_ID_REQUIRED_FIELDS, v48);
-    if not v55 then
-        v3.reportFailure(v3.ErrorType.validateDependencies_ParseFailure, nil, v48);
-        return false, v56;
-    else
-        if v50 and not l_allowEditableInstances_0 then
-            v15(v54, v48);
-        end;
-        local v57 = v6.new();
-        if (not v2 or v2 and not l_RunService_0:IsStudio()) and v50 then
-            if v53 then
-                v57:updateReasons(v46(v54, v48));
-            else
-                v57:updateReasons(v43(v52, v54, v48));
-            end;
-        end;
-        if v48 then
-            v3.recordScriptTime(script.Name, v49, v48);
-        end;
-        return v57:getFinalResults();
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local RunService = game:GetService("RunService")
+local v3 = game:DefineFastFlag("NoStudioOwnershipCheck", false)
+local Analytics = require(ParentParent.Analytics)
+local Constants = require(ParentParent.Constants)
+local ParseContentIds = require(ParentParent.util.ParseContentIds)
+local FailureReasonsAccumulator = require(ParentParent.util.FailureReasonsAccumulator)
+local getAssetCreationDetailsRCC = require(ParentParent.util.getAssetCreationDetailsRCC)
+
+require(ParentParent.util.Types)
+
+local validateCanLoad = require(ParentParent.validation.validateCanLoad)
+local validateAssetCreator = require(ParentParent.validation.validateAssetCreator)
+
+local function validateExistance(p1, p2) -- line: 23
+	-- upvalues: validateCanLoad (copy)
+	for _, v in pairs(p1) do
+		if not validateCanLoad(v.instance[v.fieldName], p2) then
+			error(string.format("Failed to load children assets (Meshes, Textures, etc.) for '%s'. Make sure the assets exist and try again.", v.instance.Name))
+		end
+	end
+end
+
+local t1 = {
+	MODERATION_STATE_REVIEWING = {
+		MODERATION_STATE_REVIEWING = true,
+		Reviewing = true
+	},
+	MODERATION_STATE_APPROVED = {
+		MODERATION_STATE_APPROVED = true,
+		Approved = true
+	}
+}
+
+local function validateCreatorId(p3, p4, p5, p6, p7, p8) -- line: 44
+	-- upvalues: Analytics (copy)
+	if not p3[tonumber(p4)] then
+		Analytics.reportFailure(Analytics.ErrorType.validateDependencies_IsRestrictedUserId, nil, p8)
+
+		return false, { `{ p5:GetFullName() }.{ p6 } ( { p7 } ) is not owned by the current user. You can only validate assets that you or a group you belong to owns.` }
+	end
+
+	return true
+end
+local function validateModerationState(p9, p10, p11, p12, p13) -- line: 62
+	-- upvalues: t1 (copy), Analytics (copy)
+	if t1.MODERATION_STATE_REVIEWING[p9] then
+		Analytics.reportFailure(Analytics.ErrorType.validateDependencies_IsReviewing, nil, p13)
+		error("Failed to load asset {instance:GetFullName()}.{fieldName} ( {id} ) that is still going through the review process. Please, wait for a notification of completion from the review process and try again.")
+	end
+
+	if not t1.MODERATION_STATE_APPROVED[p9] then
+		Analytics.reportFailure(Analytics.ErrorType.validateDependencies_IsNotApproved, nil, p13)
+
+		return false, { `{ p10:GetFullName() }.{ p11 } ( { p12 } ) is not owned by the current user. You can only validate assets that you or a group you belong to owns.` }
+	end
+
+	return true
+end
+local function validateModerationRCC(p14, p15, p16) -- line: 91
+	-- upvalues: FailureReasonsAccumulator (copy), getAssetCreationDetailsRCC (copy), validateCreatorId (copy), validateModerationState (copy)
+	if not p14 or #p14 == 0 then
+		return true
+	end
+
+	local t2 = {}
+
+	for _, v in ipairs(p14) do
+		t2[tonumber(v.id)] = true
+	end
+
+	local v39 = FailureReasonsAccumulator.new()
+
+	for k, v in pairs(p15) do
+		local v42, v43 = getAssetCreationDetailsRCC(k)
+
+		if not v42 then
+			error("Failed to load asset")
+		end
+
+		local creator = v43.creationContext.creator
+		local v45 = if not creator.userId then creator.groupId else creator.userId
+
+		v39:updateReasons(validateCreatorId(t2, v45, v.instance, v.fieldName, k, p16))
+		v39:updateReasons(validateModerationState(v43.moderationResult.moderationState, v.instance, v.fieldName, k, p16))
+	end
+
+	return v39:getFinalResults()
+end
+local function validateAssetCreatorsRCC(p17, p18) -- line: 136
+	-- upvalues: validateAssetCreator (copy)
+	assert(p18.isServer, "isServer must be true for validateAssetCreatorsRCC")
+
+	return validateAssetCreator(p17, p18)
+end
+local function validateDependencies(p19, p20, t3: {[any]: any}?) -- line: 149
+	-- upvalues: ParseContentIds (copy), Constants (copy), Analytics (copy), validateExistance (copy), FailureReasonsAccumulator (copy), v3 (copy), RunService (copy), validateAssetCreatorsRCC (copy), validateModerationRCC (copy)
+	local timestamp = tick()
+	local v52 = if not p20 then nil else p20.isServer
+	local allowEditableInstances = p20.allowEditableInstances
+	local v54 = if not p20 then nil else p20.restrictedUserIds
+	local v55 = if not p20 then nil else p20.universeId
+	local v56 = not not t3 and (t3.skipExistenceCheck or false)
+	local v57 = not not t3 and (t3.skipOwnershipCheck or false)
+
+	if v56 and v57 then
+		return true
+	end
+
+	local t4 = {}
+	local v59, v60 = ParseContentIds.parseWithErrorCheck({}, t4, p19, nil, Constants.CONTENT_ID_REQUIRED_FIELDS, p20)
+
+	if not v59 then
+		Analytics.reportFailure(Analytics.ErrorType.validateDependencies_ParseFailure, nil, p20)
+
+		return false, v60
+	end
+
+	if v52 and not allowEditableInstances and not v56 then
+		validateExistance(t4, p20)
+	end
+
+	local v61 = FailureReasonsAccumulator.new()
+
+	if not v57 and ((not v3 or v3 and not RunService:IsStudio()) and v52) then
+		if v55 then
+			v61:updateReasons(validateAssetCreatorsRCC(t4, p20))
+		else
+			v61:updateReasons(validateModerationRCC(v54, t4, p20))
+		end
+	end
+
+	if p20 then
+		Analytics.recordScriptTime(script.Name, timestamp, p20)
+	end
+
+	return v61:getFinalResults()
+end
+
+return validateDependencies

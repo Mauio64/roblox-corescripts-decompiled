@@ -1,22 +1,33 @@
-return function(v0, v1, v2) --[[ Line: 16 ]] --[[ Name: slice ]]
-    local v3, v4 = utf8.len(v0);
-    assert(v3 ~= nil, ("string `%s` has an invalid byte at position %s"):format(v0, (tostring(v4))));
-    local v5 = tonumber(v1);
-    assert(typeof(v5) == "number", "startIndexStr should be a number");
-    if v5 + v3 < 0 then
-        v5 = 1;
-    end;
-    if v3 < v5 then
-        return "";
-    else
-        local v6 = v3 + 1;
-        if v2 ~= nil then
-            v6 = tonumber(v2) or (0/0);
-        end;
-        assert(typeof(v6) == "number", "lastIndexStr should convert to number");
-        if v3 < v6 then
-            v6 = v3 + 1;
-        end;
-        return (string.sub(v0, utf8.offset(v0, v5), utf8.offset(v0, v6) - 1));
-    end;
-end;
+local function slice(s1: string, p1, p2) -- line: 16
+	local v5, v6 = utf8.len(s1)
+
+	assert(v5 ~= nil, ("string `%s` has an invalid byte at position %s"):format(s1, (tostring(v6))))
+
+	local num = tonumber(p1)
+
+	assert(typeof(num) == "number", "startIndexStr should be a number")
+
+	if num + v5 < 0 then
+		num = 1
+	end
+
+	if v5 < num then
+		return ""
+	end
+
+	local v8 = v5 + 1
+
+	if p2 ~= nil then
+		v8 = tonumber(p2) or (0/0)
+	end
+
+	assert(typeof(v8) == "number", "lastIndexStr should convert to number")
+
+	if v5 < v8 then
+		v8 = v5 + 1
+	end
+
+	return (string.sub(s1, utf8.offset(s1, num), utf8.offset(s1, v8) - 1))
+end
+
+return slice

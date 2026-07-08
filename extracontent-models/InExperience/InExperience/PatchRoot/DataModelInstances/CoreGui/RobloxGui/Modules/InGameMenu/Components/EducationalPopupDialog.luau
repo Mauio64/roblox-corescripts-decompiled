@@ -51,11 +51,11 @@ function v11.render(p1) -- line: 47
 			}, {
 				Overlay = Roact.createElement("TextButton", {
 					AutoButtonColor = false,
+					BorderSizePixel = 0,
+					Text = "",
 					BackgroundColor3 = p2.Theme.Overlay.Color,
 					BackgroundTransparency = p2.Theme.Overlay.Transparency,
-					BorderSizePixel = 0,
-					Size = UDim2.fromScale(1, 1),
-					Text = ""
+					Size = UDim2.fromScale(1, 1)
 				}),
 				Popup = Roact.createElement(EducationalModal, {
 					bodyContents = p1.props.bodyContents,
@@ -74,12 +74,14 @@ function v11.render(p1) -- line: 47
 end
 function v11.bindActions(p3) -- line: 83
 	-- upvalues: ContextActionService (copy)
-	ContextActionService:BindCoreAction("EducationalPopupConfirm", function(_, p5, _) --[[ dismissFunc ]] -- line: 84
+	local function dismissFunc(_, p5, _) -- line: 84
 		-- upvalues: p3 (copy)
 		if p5 == Enum.UserInputState.Begin then
 			p3.props.onDismiss()
 		end
-	end, false, Enum.KeyCode.Escape)
+	end
+
+	ContextActionService:BindCoreAction("EducationalPopupConfirm", dismissFunc, false, Enum.KeyCode.Escape)
 end
 function v11.unbindActions(_) -- line: 93
 	-- upvalues: ContextActionService (copy)
@@ -87,9 +89,9 @@ function v11.unbindActions(_) -- line: 93
 end
 function v11.updateBlur(p8) -- line: 97
 	-- upvalues: RunService (copy)
-	local v16 = p8.props.blurBackground and p8.props.visible and not game:GetService("VRService").VREnabled
+	local v17 = p8.props.blurBackground and p8.props.visible and not game:GetService("VRService").VREnabled
 
-	RunService:SetRobloxGuiFocused(v16)
+	RunService:SetRobloxGuiFocused(v17)
 end
 function v11.didMount(p9) -- line: 104
 	p9:updateBlur()

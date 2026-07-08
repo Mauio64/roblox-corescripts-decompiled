@@ -1,1 +1,1 @@
-return game:DefineFastFlag("FriendsSortFeatureLoggingEnabled", false);
+return game:DefineFastFlag("FriendsSortFeatureLoggingEnabled", false)

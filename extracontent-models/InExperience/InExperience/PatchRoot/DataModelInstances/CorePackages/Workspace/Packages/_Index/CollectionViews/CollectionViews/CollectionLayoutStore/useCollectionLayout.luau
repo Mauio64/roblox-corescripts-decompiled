@@ -1,34 +1,38 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CollectionViews");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SignalsReact);
-local v5 = require(l_Parent_0.AppComposition);
-local l_CollectionItemSize_0 = require(l_script_FirstAncestor_0.CollectionViewTypes).CollectionItemSize;
-local v7 = require(l_script_FirstAncestor_0.CollectionLayoutStore.CollectionLayoutStoreContext);
-local v8 = require(l_script_FirstAncestor_0.CollectionLayoutStore.getMainCollectionLayoutStore);
-return function(v9) --[[ Line: 23 ]] --[[ Name: useCollectionLayout ]]
-    -- upvalues: v2 (copy), l_CollectionItemSize_0 (copy), v5 (copy), v3 (copy), v7 (copy), v8 (copy), v4 (copy)
-    local v10 = v2.Hooks.useTokens();
-    local v11 = v9 or l_CollectionItemSize_0.Small;
-    local v12 = v5.useCompositionLayout();
-    local v13 = v3.useContext(v7) or v8(false);
-    local v14 = v4.useSignalState(v13.getItemsPerRow[v11]);
-    return v3.useMemo(function() --[[ Line: 33 ]]
-        -- upvalues: v12 (copy), v10 (copy), v14 (copy), v13 (copy)
-        return {
-            margin = v12.margin, 
-            gutter = v12.gutter, 
-            carouselPeek = v12.carouselPeek, 
-            verticalGap = v10.Gap.Large, 
-            itemsPerRow = v14, 
-            getContainerWidth = v13.getContainerWidth, 
-            getDesignSpaceContainerWidth = v13.getDesignSpaceContainerWidth
-        };
-    end, {
-        v12, 
-        v14, 
-        v10, 
-        v13
-    });
-end;
+local CollectionViews = script:FindFirstAncestor("CollectionViews")
+local CollectionViewsParent = CollectionViews.Parent
+local Foundation = require(CollectionViewsParent.Foundation)
+local React = require(CollectionViewsParent.React)
+local SignalsReact = require(CollectionViewsParent.SignalsReact)
+local AppComposition = require(CollectionViewsParent.AppComposition)
+local CollectionItemSize = require(CollectionViews.CollectionViewTypes).CollectionItemSize
+local CollectionLayoutStoreContext = require(CollectionViews.CollectionLayoutStore.CollectionLayoutStoreContext)
+local getMainCollectionLayoutStore = require(CollectionViews.CollectionLayoutStore.getMainCollectionLayoutStore)
+
+local function useCollectionLayout(p1) -- line: 23
+	-- upvalues: Foundation (copy), CollectionItemSize (copy), AppComposition (copy), React (copy), CollectionLayoutStoreContext (copy), getMainCollectionLayoutStore (copy), SignalsReact (copy)
+	local v12 = Foundation.Hooks.useTokens()
+	local v13 = p1 or CollectionItemSize.Small
+	local v14 = AppComposition.useCompositionLayout()
+	local v15 = React.useContext(CollectionLayoutStoreContext) or getMainCollectionLayoutStore(false)
+	local v16 = SignalsReact.useSignalState(v15.getItemsPerRow[v13])
+
+	return React.useMemo(function() -- line: 33
+		-- upvalues: v14 (copy), v12 (copy), v16 (copy), v15 (copy)
+		return {
+			margin = v14.margin,
+			gutter = v14.gutter,
+			carouselPeek = v14.carouselPeek,
+			verticalGap = v12.Gap.Large,
+			itemsPerRow = v16,
+			getContainerWidth = v15.getContainerWidth,
+			getDesignSpaceContainerWidth = v15.getDesignSpaceContainerWidth
+		}
+	end, {
+		v14,
+		v16,
+		v12,
+		v15
+	})
+end
+
+return useCollectionLayout

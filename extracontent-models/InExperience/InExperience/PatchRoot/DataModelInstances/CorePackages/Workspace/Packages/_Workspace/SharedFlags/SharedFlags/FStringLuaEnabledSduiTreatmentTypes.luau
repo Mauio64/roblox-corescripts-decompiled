@@ -1,1 +1,1 @@
-return game:DefineFastString("LuaEnabledSduiTreatmentTypes", "");
+return game:DefineFastString("LuaEnabledSduiTreatmentTypes", "")

@@ -1,8 +1,11 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_0.StyleContext);
-local v3 = require(l_Parent_1.React);
-return function() --[[ Line: 13 ]] --[[ Name: useTextSizeOffset ]]
-    -- upvalues: v3 (copy), v2 (copy)
-    return v3.useContext(v2).derivedValues.textSizeOffset;
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local StyleContext = require(scriptParent.StyleContext)
+local React = require(ParentParent.React)
+
+local function useTextSizeOffset() -- line: 13
+	-- upvalues: React (copy), StyleContext (copy)
+	return React.useContext(StyleContext).derivedValues.textSizeOffset
+end
+
+return useTextSizeOffset

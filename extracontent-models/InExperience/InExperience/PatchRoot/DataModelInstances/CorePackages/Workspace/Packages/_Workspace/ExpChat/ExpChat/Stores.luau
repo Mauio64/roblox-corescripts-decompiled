@@ -11,7 +11,10 @@ return {
 	GetChannelTabsStore = require(script.GetChannelTabsStore),
 	GetChatWindowStatusStore = require(script.GetChatWindowStatusStore),
 	GetChatModerationStore = require(script.GetChatModerationStore),
+	GetUserChatSettingsStore = require(script.GetUserChatSettingsStore),
 	GetGlobalChatTooltipStore = require(script.GetGlobalChatTooltipStore),
+	GetChatTooltipStore = require(script.GetChatTooltipStore),
 	GetRewriteDropdownStore = require(script.GetRewriteDropdownStore),
-	GetGlobalMutedUsersStore = require(script.GetGlobalMutedUsersStore)
+	GetGlobalMutedUsersStore = require(script.GetGlobalMutedUsersStore),
+	GetPresetChatStore = require(script.GetPresetChatStore)
 }

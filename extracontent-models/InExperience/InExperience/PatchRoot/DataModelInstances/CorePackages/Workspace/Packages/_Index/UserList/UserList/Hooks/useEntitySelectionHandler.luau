@@ -1,30 +1,44 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("UserList");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_useDispatch_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useDispatch;
-local l_NavigateDown_0 = require(l_Parent_0.NavigationRodux).Thunks.NavigateDown;
-local l_AppPage_0 = require(l_Parent_0.RobloxAppEnums).AppPage;
-local v6 = require(l_script_FirstAncestor_0.Common.Enums);
-return function(v7) --[[ Line: 17 ]] --[[ Name: useEntitySelectionHandler ]]
-    -- upvalues: l_useDispatch_0 (copy), v2 (copy), l_NavigateDown_0 (copy), l_AppPage_0 (copy), v6 (copy)
-    local v8 = l_useDispatch_0();
-    return (v2.useCallback(function(v9, v10) --[[ Line: 22 ]]
-        -- upvalues: v7 (copy), v8 (copy), l_NavigateDown_0 (ref), l_AppPage_0 (ref), v6 (ref)
-        if v7 then
-            v7(v9, v10);
-            return;
-        else
-            v8(l_NavigateDown_0({
-                name = l_AppPage_0.ProfilePlatform, 
-                detail = v9, 
-                extraProps = {
-                    profileType = if v10 == v6.EntityType.Contact then v6.EntityType.Contact else v6.EntityType.User
-                }
-            }));
-            return;
-        end;
-    end, {
-        v7, 
-        v8
-    }));
-end;
+local UserList = script:FindFirstAncestor("UserList")
+local UserListParent = UserList.Parent
+local React = require(UserListParent.React)
+local useDispatch = require(UserListParent.RoactUtils).Hooks.RoactRodux.useDispatch
+local NavigateDown = require(UserListParent.NavigationRodux).Thunks.NavigateDown
+local FFlagSignalsNavP3Dispatch = require(UserListParent.SharedFlags).FFlagSignalsNavP3Dispatch
+local v7 = if not FFlagSignalsNavP3Dispatch then nil else require(UserListParent.RobloxAppNavigation).NavigationCommands
+local AppPage = require(UserListParent.RobloxAppEnums).AppPage
+local Enums = require(UserList.Common.Enums)
+
+local function useEntitySelectionHandler(p1: ((...any) -> ...any)?) -- line: 21
+	-- upvalues: useDispatch (copy), React (copy), AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), NavigateDown (copy)
+	local v12 = useDispatch()
+
+	return (React.useCallback(function(s1: string, p2) -- line: 26
+		-- upvalues: p1 (copy), AppPage (copy), Enums (copy), FFlagSignalsNavP3Dispatch (copy), v7 (copy), v12 (copy), NavigateDown (copy)
+		if p1 then
+			p1(s1, p2)
+
+			return
+		end
+
+		local t1 = {
+			name = AppPage.ProfilePlatform,
+			detail = s1,
+			extraProps = {
+				profileType = if p2 ~= Enums.EntityType.Contact then Enums.EntityType.User else Enums.EntityType.Contact
+			}
+		}
+
+		if FFlagSignalsNavP3Dispatch then
+			v7.down(v7.fromLegacyPage(t1))
+
+			return
+		end
+
+		v12(NavigateDown(t1))
+	end, {
+		p1,
+		v12
+	}))
+end
+
+return useEntitySelectionHandler

@@ -1,115 +1,121 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GenericAbuseReporting");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Foundation);
-local v3 = require(l_Parent_0.React);
-local l_Avatar_0 = v2.Avatar;
-local l_Image_0 = v2.Image;
-local l_Text_0 = v2.Text;
-local l_View_0 = v2.View;
-local _ = require(l_script_FirstAncestor_0.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes);
-local v9 = require(l_script_FirstAncestor_0.BeduiV2.Hooks.Enrichment.useExperienceDetails);
-local v10 = require(l_script_FirstAncestor_0.BeduiV2.Utils.Translate.TextWithTranslation);
-local function v18(v11) --[[ Line: 26 ]] --[[ Name: UserPreview ]]
-    -- upvalues: v3 (copy), l_View_0 (copy), l_Avatar_0 (copy), l_Text_0 (copy)
-    local l_preview_0 = v11.preview;
-    if not l_preview_0 then
-        return nil;
-    else
-        local l_createElement_0 = v3.createElement;
-        local l_l_View_0_0 = l_View_0;
-        local v15 = {
-            tag = "row size-full-0 auto-y gap-medium radius-medium bg-surface-200 padding-medium align-y-center", 
-            LayoutOrder = v11.layoutOrder
-        };
-        local v16 = {};
-        local v17 = false;
-        if l_preview_0.id ~= nil then
-            v17 = v3.createElement(l_Avatar_0, {
-                userId = tonumber(l_preview_0.id), 
-                LayoutOrder = 1
-            });
-        end;
-        v16.Avatar = v17;
-        v16.TextContainer = (not not l_preview_0.displayName or l_preview_0.username) and v3.createElement(l_View_0, {
-            tag = "col auto-xy fill", 
-            LayoutOrder = 2
-        }, {
-            DisplayName = l_preview_0.displayName and v3.createElement(l_Text_0, {
-                Text = l_preview_0.displayName, 
-                RichText = true, 
-                tag = "auto-xy content-emphasis text-wrap text-align-x-left", 
-                LayoutOrder = 1
-            }), 
-            Username = l_preview_0.username and v3.createElement(l_Text_0, {
-                Text = "@" .. l_preview_0.username, 
-                RichText = true, 
-                tag = "auto-xy text-wrap text-align-x-left", 
-                LayoutOrder = 2
-            })
-        });
-        return l_createElement_0(l_l_View_0_0, v15, v16);
-    end;
-end;
-local function v21(v19) --[[ Line: 60 ]] --[[ Name: ChatPreview ]]
-    -- upvalues: v3 (copy), l_View_0 (copy), v10 (copy)
-    local l_preview_1 = v19.preview;
-    if not l_preview_1 then
-        return nil;
-    else
-        return v3.createElement(l_View_0, {
-            tag = "size-full-0 auto-y gap-xsmall radius-medium bg-surface-200 padding-medium", 
-            LayoutOrder = v19.layoutOrder
-        }, {
-            Message = v3.createElement(v10, {
-                input = l_preview_1.text, 
-                tag = "auto-xy text-wrap text-align-x-left"
-            })
-        });
-    end;
-end;
-local function v25(v22) --[[ Line: 77 ]] --[[ Name: ExperiencePreview ]]
-    -- upvalues: v9 (copy), v3 (copy), l_View_0 (copy), l_Image_0 (copy), l_Text_0 (copy)
-    local l_preview_2 = v22.preview;
-    local v24 = v9(l_preview_2.id);
-    if not l_preview_2 then
-        return nil;
-    else
-        return v3.createElement(l_View_0, {
-            tag = "row size-full-0 auto-y gap-medium radius-medium bg-surface-200 padding-medium align-y-center", 
-            LayoutOrder = v22.layoutOrder
-        }, {
-            ExperienceIcon = v3.createElement(l_Image_0, {
-                Image = ("rbxthumb://type=GameIcon&id=%*&w=50&h=50"):format(l_preview_2.id), 
-                Size = UDim2.fromOffset(40, 40), 
-                tag = "radius-medium"
-            }), 
-            Name = v3.createElement(l_Text_0, {
-                Text = v24 and v24.name or l_preview_2.title or "", 
-                RichText = true, 
-                tag = "auto-xy text-wrap text-align-x-left"
-            })
-        });
-    end;
-end;
-return v3.memo(function(v26) --[[ Line: 104 ]] --[[ Name: PreviewBox ]]
-    -- upvalues: v3 (copy), v18 (copy), v21 (copy), v25 (copy)
-    local l_preview_3 = v26.preview;
-    if l_preview_3.type == "user" then
-        return v3.createElement(v18, {
-            preview = l_preview_3, 
-            layoutOrder = v26.layoutOrder
-        });
-    elseif l_preview_3.type == "chat" then
-        return v3.createElement(v21, {
-            preview = l_preview_3, 
-            layoutOrder = v26.layoutOrder
-        });
-    elseif l_preview_3.type == "experience" then
-        return v3.createElement(v25, {
-            preview = l_preview_3, 
-            layoutOrder = v26.layoutOrder
-        });
-    else
-        return nil;
-    end;
-end);
+local GenericAbuseReporting = script:FindFirstAncestor("GenericAbuseReporting")
+local GenericAbuseReportingParent = GenericAbuseReporting.Parent
+local Foundation = require(GenericAbuseReportingParent.Foundation)
+local React = require(GenericAbuseReportingParent.React)
+local Avatar = Foundation.Avatar
+local FoundationImage = Foundation.Image
+local FoundationText = Foundation.Text
+local View = Foundation.View
+
+require(GenericAbuseReporting.BeduiV2.Hooks.AbuseSheetFlow.AbuseSheetFlowTypes)
+
+local useExperienceDetails = require(GenericAbuseReporting.BeduiV2.Hooks.Enrichment.useExperienceDetails)
+local TextWithTranslation = require(GenericAbuseReporting.BeduiV2.Utils.Translate.TextWithTranslation)
+
+local function UserPreview(t1: {[any]: any}) -- line: 26
+	-- upvalues: React (copy), View (copy), Avatar (copy), FoundationText (copy)
+	local preview = t1.preview
+
+	if not preview then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "row size-full-0 auto-y gap-medium radius-medium bg-surface-200 padding-medium align-y-center",
+		LayoutOrder = t1.layoutOrder
+	}, {
+		Avatar = preview.id ~= nil and React.createElement(Avatar, {
+			LayoutOrder = 1,
+			userId = tonumber(preview.id)
+		}),
+		TextContainer = (preview.displayName or preview.username) and React.createElement(View, {
+			tag = "col auto-xy fill",
+			LayoutOrder = 2
+		}, {
+			DisplayName = preview.displayName and React.createElement(FoundationText, {
+				RichText = true,
+				tag = "auto-xy content-emphasis text-wrap text-align-x-left",
+				LayoutOrder = 1,
+				Text = preview.displayName
+			}),
+			Username = preview.username and React.createElement(FoundationText, {
+				RichText = true,
+				tag = "auto-xy text-wrap text-align-x-left",
+				LayoutOrder = 2,
+				Text = "@" .. preview.username
+			})
+		})
+	})
+end
+local function ChatPreview(t2: {[any]: any}) -- line: 60
+	-- upvalues: React (copy), View (copy), TextWithTranslation (copy)
+	local preview = t2.preview
+
+	if not preview then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "size-full-0 auto-y gap-xsmall radius-medium bg-surface-200 padding-medium",
+		LayoutOrder = t2.layoutOrder
+	}, {
+		Message = React.createElement(TextWithTranslation, {
+			tag = "auto-xy text-wrap text-align-x-left",
+			input = preview.text
+		})
+	})
+end
+local function ExperiencePreview(t3: {[any]: any}) -- line: 77
+	-- upvalues: useExperienceDetails (copy), React (copy), View (copy), FoundationImage (copy), FoundationText (copy)
+	local preview = t3.preview
+	local v21 = useExperienceDetails(preview.id)
+
+	if not preview then
+		return nil
+	end
+
+	return React.createElement(View, {
+		tag = "row size-full-0 auto-y gap-medium radius-medium bg-surface-200 padding-medium align-y-center",
+		LayoutOrder = t3.layoutOrder
+	}, {
+		ExperienceIcon = React.createElement(FoundationImage, {
+			tag = "radius-medium",
+			Image = `rbxthumb://type=GameIcon&id={ preview.id }&w=50&h=50`,
+			Size = UDim2.fromOffset(40, 40)
+		}),
+		Name = React.createElement(FoundationText, {
+			RichText = true,
+			tag = "auto-xy text-wrap text-align-x-left",
+			Text = v21 and v21.name or (preview.title or "")
+		})
+	})
+end
+local function PreviewBox(t4: {[any]: any}) -- line: 104
+	-- upvalues: React (copy), UserPreview (copy), ChatPreview (copy), ExperiencePreview (copy)
+	local preview = t4.preview
+
+	if preview.type == "user" then
+		return React.createElement(UserPreview, {
+			preview = preview,
+			layoutOrder = t4.layoutOrder
+		})
+	end
+
+	if preview.type == "chat" then
+		return React.createElement(ChatPreview, {
+			preview = preview,
+			layoutOrder = t4.layoutOrder
+		})
+	end
+
+	if preview.type == "experience" then
+		return React.createElement(ExperiencePreview, {
+			preview = preview,
+			layoutOrder = t4.layoutOrder
+		})
+	end
+
+	return nil
+end
+
+return React.memo(PreviewBox)

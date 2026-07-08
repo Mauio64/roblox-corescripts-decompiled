@@ -1,42 +1,49 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_script_FirstAncestor_0.Utils.Base64);
-local v4 = require(l_Parent_0.Promise);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v6 = require(l_script_FirstAncestor_0.Common.PasskeyConstants);
-local function _() --[[ Line: 14 ]] --[[ Name: getFinishRegistrationUrl ]]
-    -- upvalues: l_Url_0 (copy)
-    return string.format("%sv1/passkey/finish-preauth-registration", l_Url_0.AUTH_URL);
-end;
-local function v13(v8, v9) --[[ Line: 18 ]] --[[ Name: finishPreauthPasskeyRegistration ]]
-    -- upvalues: l_Url_0 (copy), v4 (copy), l_HttpService_0 (copy), v6 (copy)
-    return v8(string.format("%sv1/passkey/finish-preauth-registration", l_Url_0.AUTH_URL), "POST", {
-        postBody = v9
-    }):andThen(function(v10) --[[ Line: 19 ]]
-        -- upvalues: v4 (ref)
-        return v4.resolve(v10);
-    end, function(v11) --[[ Line: 21 ]]
-        -- upvalues: l_HttpService_0 (ref), v4 (ref), v6 (ref)
-        local v12 = if type(v11) == "table" then l_HttpService_0:JSONEncode(v11) else nil;
-        return v4.reject({
-            body = v12, 
-            name = v6.BACKEND_CREATION_ERROR_NAME
-        });
-    end);
-end;
-return function(v14, v15, v16) --[[ Line: 27 ]] --[[ Name: attemptFinishPreauthPasskeyRegistration ]]
-    -- upvalues: l_HttpService_0 (copy), v3 (copy), v13 (copy)
-    local v17 = l_HttpService_0:JSONDecode(v16);
-    v17.id = v3.ToUrlSafeBase64(v17.id);
-    v17.rawId = v3.ToUrlSafeBase64(v17.rawId);
-    v17.response.attestationObject = v3.ToUrlSafeBase64(v17.response.attestationObject);
-    v17.response.clientDataJSON = v3.ToUrlSafeBase64(v17.response.clientDataJSON);
-    local v18 = l_HttpService_0:JSONEncode(v17);
-    local v19 = {
-        sessionId = v15, 
-        registrationResponse = v18
-    };
-    local v20 = l_HttpService_0:JSONEncode(v19);
-    return v13(v14, v20);
-end;
+local HttpService = game:GetService("HttpService")
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Base64 = require(AuthCommon.Utils.Base64)
+local Promise = require(AuthCommonParent.Promise)
+local Url = require(AuthCommonParent.Http).Url
+local PasskeyConstants = require(AuthCommon.Common.PasskeyConstants)
+
+local function getFinishRegistrationUrl() -- line: 14
+	-- upvalues: Url (copy)
+	return string.format("%sv1/passkey/finish-preauth-registration", Url.AUTH_URL)
+end
+local function finishPreauthPasskeyRegistration(p1, p2) -- line: 18
+	-- upvalues: Url (copy), Promise (copy), HttpService (copy), PasskeyConstants (copy)
+	return p1(string.format("%sv1/passkey/finish-preauth-registration", Url.AUTH_URL), "POST", {
+		postBody = p2
+	}):andThen(function(p3) -- line: 19
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p3)
+	end, function(p4) -- line: 21
+		-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy)
+		local v22 = if type(p4) ~= "table" then nil else HttpService:JSONEncode(p4)
+
+		return Promise.reject({
+			body = v22,
+			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME
+		})
+	end)
+end
+local function attemptFinishPreauthPasskeyRegistration(p5, p6, p7) -- line: 27
+	-- upvalues: HttpService (copy), Base64 (copy), finishPreauthPasskeyRegistration (copy)
+	local data = HttpService:JSONDecode(p7)
+
+	data.id = Base64.ToUrlSafeBase64(data.id)
+	data.rawId = Base64.ToUrlSafeBase64(data.rawId)
+	data.response.attestationObject = Base64.ToUrlSafeBase64(data.response.attestationObject)
+	data.response.clientDataJSON = Base64.ToUrlSafeBase64(data.response.clientDataJSON)
+
+	local json = HttpService:JSONEncode(data)
+	local t1 = {
+		sessionId = p6,
+		registrationResponse = json
+	}
+	local json2 = HttpService:JSONEncode(t1)
+
+	return finishPreauthPasskeyRegistration(p5, json2)
+end
+
+return attemptFinishPreauthPasskeyRegistration

@@ -1,33 +1,37 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.Counter);
-local v2 = require(l_Parent_0.Enums.PurchaseFlow);
-local v3 = require(l_Parent_0.Enums.PaymentPlatform);
-local v4 = require(l_Parent_0.Services.Analytics);
-local v5 = require(l_Parent_0.Services.ExternalSettings);
-local v6 = require(l_Parent_0.Utils.getPaymentPlatform);
-local v7 = require(l_Parent_0.Utils.getCounterCombinations);
-local v8 = require(l_Parent_0.Utils.SelectedRobuxPackage);
-local v9 = require(l_Parent_0.Thunk);
-local v10 = {
-    v4, 
-    v5
-};
-return function(v11) --[[ Line: 23 ]] --[[ Name: sendCounter ]]
-    -- upvalues: v9 (copy), v10 (copy), v4 (copy), v5 (copy), v1 (copy), v2 (copy), v8 (copy), v6 (copy), v3 (copy), v7 (copy)
-    return v9.new(script.Name, v10, function(v12, v13) --[[ Line: 24 ]]
-        -- upvalues: v4 (ref), v5 (ref), v1 (ref), v11 (copy), v2 (ref), v8 (ref), v6 (ref), v3 (ref), v7 (ref)
-        local v14 = v13[v4];
-        local v15 = v13[v5];
-        local v16 = v1.toRawValue(v11);
-        local v17 = v12:getState();
-        local l_purchaseFlow_0 = v17.purchaseFlow;
-        local v19 = if l_purchaseFlow_0 ~= nil then v2.toRawValue(l_purchaseFlow_0) else nil;
-        local v20 = v8.getRobuxPurchaseAmount(v17);
-        local v21 = v15.getPlatform();
-        local v22 = v6(v21);
-        local v23 = v3.toRawValue(v22);
-        for _, v25 in (v7("PurchasePrompt", v16, v23, v19, v20)) do
-            v14.sendCounter(v25);
-        end;
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local Counter = require(ParentParent.Enums.Counter)
+local PurchaseFlow = require(ParentParent.Enums.PurchaseFlow)
+local PaymentPlatform = require(ParentParent.Enums.PaymentPlatform)
+local Analytics = require(ParentParent.Services.Analytics)
+local ExternalSettings = require(ParentParent.Services.ExternalSettings)
+local getPaymentPlatform = require(ParentParent.Utils.getPaymentPlatform)
+local getCounterCombinations = require(ParentParent.Utils.getCounterCombinations)
+local SelectedRobuxPackage = require(ParentParent.Utils.SelectedRobuxPackage)
+local Thunk = require(ParentParent.Thunk)
+local t1 = {
+	Analytics,
+	ExternalSettings
+}
+
+local function sendCounter(p1) -- line: 23
+	-- upvalues: Thunk (copy), t1 (copy), Analytics (copy), ExternalSettings (copy), Counter (copy), PurchaseFlow (copy), SelectedRobuxPackage (copy), getPaymentPlatform (copy), PaymentPlatform (copy), getCounterCombinations (copy)
+	return Thunk.new(script.Name, t1, function(p2, p3) -- line: 24
+		-- upvalues: Analytics (copy), ExternalSettings (copy), Counter (copy), p1 (copy), PurchaseFlow (copy), SelectedRobuxPackage (copy), getPaymentPlatform (copy), PaymentPlatform (copy), getCounterCombinations (copy)
+		local v16 = p3[Analytics]
+		local v17 = p3[ExternalSettings]
+		local v18 = Counter.toRawValue(p1)
+		local v19 = p2:getState()
+		local purchaseFlow = v19.purchaseFlow
+		local v21 = if purchaseFlow == nil then nil else PurchaseFlow.toRawValue(purchaseFlow)
+		local v22 = SelectedRobuxPackage.getRobuxPurchaseAmount(v19)
+		local v23 = v17.getPlatform()
+		local v24 = getPaymentPlatform(v23)
+		local v25 = PaymentPlatform.toRawValue(v24)
+
+		for _, v27 in (getCounterCombinations("PurchasePrompt", v18, v25, v21, v22)) do
+			v16.sendCounter(v27)
+		end
+	end)
+end
+
+return sendCounter

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFixPrefetchMarketplaceStartupCrash", false);
+return game:DefineFastFlag("AXFixPrefetchMarketplaceStartupCrash", false)

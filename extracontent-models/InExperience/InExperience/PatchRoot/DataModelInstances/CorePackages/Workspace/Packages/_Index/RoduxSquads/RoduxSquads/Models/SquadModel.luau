@@ -1,88 +1,90 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxSquads").Parent;
-local v1 = require(script.Parent.SquadInviteeModel);
-local v2 = require(script.Parent.SquadMemberModel);
-local v3 = require(script.Parent.SquadSelfPermissionsModel);
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_Parent_0.t);
-local l_FFlagEnableSquadRegroupExperimentation_0 = require(l_Parent_0.SharedFlags).FFlagEnableSquadRegroupExperimentation;
-local v7 = {};
-v7.new = function(v8) --[[ Line: 15 ]] --[[ Name: new ]]
-    -- upvalues: v7 (copy)
-    assert(v7.isValid(v8));
-    v7.__index = v7;
-    setmetatable(v8, v7);
-    return v8;
-end;
-tryGetSquadId = function(v9) --[[ Line: 28 ]] --[[ Name: tryGetSquadId ]]
-    return v9.groupUpId or v9.squadId;
-end;
-v7.mock = function(v10) --[[ Line: 32 ]] --[[ Name: mock ]]
-    -- upvalues: v4 (copy), v2 (copy), v1 (copy), v7 (copy), l_FFlagEnableSquadRegroupExperimentation_0 (copy)
-    v10 = v10 or {};
-    local v12 = v4.List.map(v10.members or {
-        {
-            userId = 1234
-        }
-    }, function(v11) --[[ Line: 35 ]]
-        -- upvalues: v2 (ref)
-        return v2.mock(v11);
-    end);
-    local v14 = v4.List.map(v10.invitees or {
-        {
-            userId = 2345, 
-            invitedAtTimestampMs = 3333333
-        }
-    }, function(v13) --[[ Line: 41 ]]
-        -- upvalues: v1 (ref)
-        return v1.mock(v13);
-    end);
-    local v15 = {
-        canSeeRegroupPromptToast = false, 
-        canSeeRegroupJoinButton = false
-    };
-    return (v7.new({
-        squadId = tryGetSquadId(v10) or "12345", 
-        initiatorId = v10.initiatorId or 54321, 
-        createdAtTime = v10.createdAtTime or "2024-07-19T21:02:47.777+00:00", 
-        updatedAtTime = v10.updatedAtTime or "2024-07-19T21:02:47.777+00:00", 
-        deletedAtTime = v10.deletedAtTime, 
-        parentChannelId = v10.parentChannelId or "23456", 
-        members = v12, 
-        invitees = v14, 
-        selfPermissions = if l_FFlagEnableSquadRegroupExperimentation_0 then v10.selfPermissions or v15 else nil
-    }));
-end;
-v7.format = function(v16) --[[ Line: 68 ]] --[[ Name: format ]]
-    -- upvalues: v4 (copy), v2 (copy), v1 (copy), v7 (copy), l_FFlagEnableSquadRegroupExperimentation_0 (copy)
-    local v18 = v4.List.map(v16.members, function(v17) --[[ Line: 69 ]]
-        -- upvalues: v2 (ref)
-        return v2.format(v17);
-    end);
-    local v20 = v4.List.map(v16.invitees, function(v19) --[[ Line: 73 ]]
-        -- upvalues: v1 (ref)
-        return v1.format(v19);
-    end);
-    return (v7.new({
-        createdAtTime = v16.createdAtTime, 
-        deletedAtTime = v16.deletedAtTime, 
-        initiatorId = v16.initiatorId, 
-        invitees = v20, 
-        members = v18, 
-        parentChannelId = v16.parentChannelId, 
-        squadId = tryGetSquadId(v16), 
-        updatedAtTime = v16.updatedAtTime, 
-        selfPermissions = if l_FFlagEnableSquadRegroupExperimentation_0 then v16.selfPermissions else nil
-    }));
-end;
-v7.isValid = v5.strictInterface({
-    createdAtTime = v5.string, 
-    deletedAtTime = v5.optional(v5.string), 
-    initiatorId = v5.number, 
-    invitees = v5.array(v1.isValid), 
-    members = v5.array(v2.isValid), 
-    parentChannelId = v5.string, 
-    squadId = v5.string, 
-    updatedAtTime = v5.string, 
-    selfPermissions = if l_FFlagEnableSquadRegroupExperimentation_0 then v5.optional(v3.isValid) else v5.none
-});
-return v7;
+local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+local SquadInviteeModel = require(script.Parent.SquadInviteeModel)
+local SquadMemberModel = require(script.Parent.SquadMemberModel)
+local SquadSelfPermissionsModel = require(script.Parent.SquadSelfPermissionsModel)
+local Cryo = require(Parent.Cryo)
+local t = require(Parent.t)
+local FFlagEnableSquadRegroupExperimentation = require(Parent.SharedFlags).FFlagEnableSquadRegroupExperimentation
+local t1 = {}
+
+function t1.new(p1) -- line: 15
+	-- upvalues: t1 (copy)
+	assert(t1.isValid(p1))
+	t1.__index = t1
+	setmetatable(p1, t1)
+
+	return p1
+end
+function tryGetSquadId(p2) -- line: 28
+	return p2.groupUpId or p2.squadId
+end
+function t1.mock(p3) -- line: 32
+	-- upvalues: Cryo (copy), SquadMemberModel (copy), SquadInviteeModel (copy), t1 (copy), FFlagEnableSquadRegroupExperimentation (copy)
+	local v12 = p3 or {}
+	local v13 = Cryo.List.map(v12.members or {{
+		userId = 1234
+	}}, function(p4) -- line: 35
+		-- upvalues: SquadMemberModel (copy)
+		return SquadMemberModel.mock(p4)
+	end)
+	local v14 = Cryo.List.map(v12.invitees or {{
+		userId = 2345,
+		invitedAtTimestampMs = 3333333
+	}}, function(p5) -- line: 41
+		-- upvalues: SquadInviteeModel (copy)
+		return SquadInviteeModel.mock(p5)
+	end)
+	local t2 = {
+		canSeeRegroupPromptToast = false,
+		canSeeRegroupJoinButton = false
+	}
+
+	return (t1.new({
+		squadId = tryGetSquadId(v12) or "12345",
+		initiatorId = v12.initiatorId or 54321,
+		createdAtTime = v12.createdAtTime or "2024-07-19T21:02:47.777+00:00",
+		updatedAtTime = v12.updatedAtTime or "2024-07-19T21:02:47.777+00:00",
+		deletedAtTime = v12.deletedAtTime,
+		parentChannelId = v12.parentChannelId or "23456",
+		members = v13,
+		invitees = v14,
+		selfPermissions = if not FFlagEnableSquadRegroupExperimentation then nil else v12.selfPermissions or t2
+	}))
+end
+function t1.format(p6) -- line: 68
+	-- upvalues: Cryo (copy), SquadMemberModel (copy), SquadInviteeModel (copy), t1 (copy), FFlagEnableSquadRegroupExperimentation (copy)
+	local v17 = Cryo.List.map(p6.members, function(p7) -- line: 69
+		-- upvalues: SquadMemberModel (copy)
+		return SquadMemberModel.format(p7)
+	end)
+	local v18 = Cryo.List.map(p6.invitees, function(p8) -- line: 73
+		-- upvalues: SquadInviteeModel (copy)
+		return SquadInviteeModel.format(p8)
+	end)
+
+	return (t1.new({
+		createdAtTime = p6.createdAtTime,
+		deletedAtTime = p6.deletedAtTime,
+		initiatorId = p6.initiatorId,
+		invitees = v18,
+		members = v17,
+		parentChannelId = p6.parentChannelId,
+		squadId = tryGetSquadId(p6),
+		updatedAtTime = p6.updatedAtTime,
+		selfPermissions = if not FFlagEnableSquadRegroupExperimentation then nil else p6.selfPermissions
+	}))
+end
+
+t1.isValid = t.strictInterface({
+	createdAtTime = t.string,
+	deletedAtTime = t.optional(t.string),
+	initiatorId = t.number,
+	invitees = t.array(SquadInviteeModel.isValid),
+	members = t.array(SquadMemberModel.isValid),
+	parentChannelId = t.string,
+	squadId = t.string,
+	updatedAtTime = t.string,
+	selfPermissions = if not FFlagEnableSquadRegroupExperimentation then t.none else t.optional(SquadSelfPermissionsModel.isValid)
+})
+
+return t1

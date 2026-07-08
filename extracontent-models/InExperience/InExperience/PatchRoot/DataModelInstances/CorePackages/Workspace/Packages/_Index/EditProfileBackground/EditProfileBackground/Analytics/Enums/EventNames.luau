@@ -1,6 +1,6 @@
 return {
-    EditProfileBackgroundOpened = "EditProfileBackgroundOpened", 
-    EditProfileBackgroundLoadingStage = "EditProfileBackgroundLoadingStage", 
-    BackgroundSelected = "BackgroundSelected", 
-    EditProfileBackgroundFailure = "EditProfileBackgroundFailure"
-};
+	EditProfileBackgroundOpened = "EditProfileBackgroundOpened",
+	EditProfileBackgroundLoadingStage = "EditProfileBackgroundLoadingStage",
+	BackgroundSelected = "BackgroundSelected",
+	EditProfileBackgroundFailure = "EditProfileBackgroundFailure"
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXFlagBasedExposureLoggingCatalogPage", false);
+return game:DefineFastFlag("AXFlagBasedExposureLoggingCatalogPage", false)

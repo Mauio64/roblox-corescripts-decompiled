@@ -1,67 +1,72 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_dependencyArray_0 = require(l_Parent_0.RoactUtils).Hooks.dependencyArray;
-local v4 = require(l_Parent_0.React);
-local l_Chip_0 = require(l_Parent_0.Foundation).Chip;
-local v6 = require(l_script_FirstAncestor_0.Friends.filterStates);
-local v7 = require(l_script_FirstAncestor_0.FriendsLandingContext);
-local v8 = {
-    v6.All, 
-    v6.Online, 
-    v6.Trusted
-};
-local v9 = {
-    [v6.All] = "all", 
-    [v6.Online] = "online", 
-    [v6.Trusted] = "trusted"
-};
-local v10 = {
-    "allFriendsChip", 
-    "onlineFriendsChip", 
-    "trustedFriendsChip"
-};
-ChipFilterGroup = function(v11) --[[ Line: 34 ]] --[[ Name: ChipFilterGroup ]]
-    -- upvalues: v4 (copy), v7 (copy), l_useLocalization_0 (copy), v8 (copy), v10 (copy), l_Chip_0 (copy), v9 (copy), l_dependencyArray_0 (copy)
-    local l_filter_0 = v4.useContext(v7.Context).filter;
-    local v13 = l_useLocalization_0({
-        all = "Feature.Friends.Label.All", 
-        online = "Common.Presence.Label.Online", 
-        trusted = "Feature.Friends.TrustedConnection.Label.Trusted"
-    });
-    local v17 = v4.useMemo(function() --[[ Line: 43 ]]
-        -- upvalues: v8 (ref), v10 (ref), v4 (ref), l_Chip_0 (ref), v13 (copy), v9 (ref), v11 (copy), l_filter_0 (copy)
-        local v14 = {};
-        for v15, v16 in ipairs(v8) do
-            v14[v10[v15]] = v4.createElement(l_Chip_0, {
-                id = v16, 
-                text = v13[v9[v16]], 
-                LayoutOrder = v15, 
-                onActivated = function() --[[ Line: 50 ]] --[[ Name: onActivated ]]
-                    -- upvalues: v11 (ref), v16 (copy)
-                    v11.onActivated(v16);
-                end, 
-                isChecked = l_filter_0 == v16
-            });
-        end;
-        return v14;
-    end, l_dependencyArray_0(v13, l_filter_0, v11.onActivated));
-    return v4.createElement("Frame", {
-        Size = UDim2.new(1, 0, 0, 32), 
-        LayoutOrder = v11.layoutOrder, 
-        BackgroundTransparency = 1, 
-        BorderSizePixel = 0
-    }, {
-        Layout = v4.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Center, 
-            SortOrder = Enum.SortOrder.LayoutOrder, 
-            Padding = UDim.new(0, 8)
-        }), 
-        allFriendsChip = v17.allFriendsChip, 
-        onlineFriendsChip = v17.onlineFriendsChip, 
-        trustedFriendsChip = v17.trustedFriendsChip
-    });
-end;
-return ChipFilterGroup;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local FriendsLandingParent = FriendsLanding.Parent
+local useLocalization = require(FriendsLandingParent.Localization).Hooks.useLocalization
+local dependencyArray = require(FriendsLandingParent.RoactUtils).Hooks.dependencyArray
+local React = require(FriendsLandingParent.React)
+local Chip = require(FriendsLandingParent.Foundation).Chip
+local filterStates = require(FriendsLanding.Friends.filterStates)
+local FriendsLandingContext = require(FriendsLanding.FriendsLandingContext)
+local t1 = {
+	filterStates.All,
+	filterStates.Online,
+	filterStates.Trusted
+}
+local t2 = {
+	[filterStates.All] = "all",
+	[filterStates.Online] = "online",
+	[filterStates.Trusted] = "trusted"
+}
+local t3 = {
+	"allFriendsChip",
+	"onlineFriendsChip",
+	"trustedFriendsChip"
+}
+
+function ChipFilterGroup(t4: {[any]: any}) -- line: 34
+	-- upvalues: React (copy), FriendsLandingContext (copy), useLocalization (copy), t1 (copy), t3 (copy), Chip (copy), t2 (copy), dependencyArray (copy)
+	local filter = React.useContext(FriendsLandingContext.Context).filter
+	local v14 = useLocalization({
+		all = "Feature.Friends.Label.All",
+		online = "Common.Presence.Label.Online",
+		trusted = "Feature.Friends.TrustedConnection.Label.Trusted"
+	})
+	local v15 = React.useMemo(function() -- line: 43
+		-- upvalues: t1 (copy), t3 (copy), React (copy), Chip (copy), v14 (copy), t2 (copy), t4 (copy), filter (copy)
+		local t5 = {}
+
+		for i, v in ipairs(t1) do
+			t5[t3[i]] = React.createElement(Chip, {
+				id = v,
+				text = v14[t2[v]],
+				LayoutOrder = i,
+				onActivated = function() -- line: 50
+					-- upvalues: t4 (copy), v (copy)
+					t4.onActivated(v)
+				end,
+				isChecked = v == filter
+			})
+		end
+
+		return t5
+	end, dependencyArray(v14, filter, t4.onActivated))
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, 32),
+		LayoutOrder = t4.layoutOrder
+	}, {
+		Layout = React.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalAlignment = Enum.HorizontalAlignment.Left,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 8)
+		}),
+		allFriendsChip = v15.allFriendsChip,
+		onlineFriendsChip = v15.onlineFriendsChip,
+		trustedFriendsChip = v15.trustedFriendsChip
+	})
+end
+
+return ChipFilterGroup

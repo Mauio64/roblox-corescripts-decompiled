@@ -1,9 +1,11 @@
-return function(v0, v1) --[[ Line: 10 ]]
-    if v0.SliceCenter then
-        local v2 = v0.SliceCenter.Min * v1;
-        local v3 = v0.SliceCenter.Max * v1;
-        v0.SliceCenter = Rect.new(v2, v3);
-        v0.SliceScale = (v0.SliceScale or 1) / v1;
-    end;
-    return v0;
-end;
+return function(p1, p2) -- line: 10
+	if p1.SliceCenter then
+		local v3 = p1.SliceCenter.Min * p2
+		local v4 = p1.SliceCenter.Max * p2
+
+		p1.SliceCenter = Rect.new(v3, v4)
+		p1.SliceScale = (p1.SliceScale or 1) / p2
+	end
+
+	return p1
+end

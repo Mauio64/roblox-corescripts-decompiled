@@ -1,31 +1,32 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.IncrementFeedbackSubmissionAttempts);
-local v5 = require(l_Parent_0.Actions.ShowHelpModal);
-local v6 = require(l_Parent_0.Actions.ShowOnboardingModal);
-return v2.createReducer({
-    numFeedbackSubmissionAttempts = nil, 
-    showHelpModal = false, 
-    showOnboardingModal = true
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local IncrementFeedbackSubmissionAttempts = require(ParentParent.Actions.IncrementFeedbackSubmissionAttempts)
+local ShowHelpModal = require(ParentParent.Actions.ShowHelpModal)
+local ShowOnboardingModal = require(ParentParent.Actions.ShowOnboardingModal)
+
+return Rodux.createReducer({
+	numFeedbackSubmissionAttempts = nil,
+	showHelpModal = false,
+	showOnboardingModal = true
 }, {
-    [v4.name] = function(v7, v8) --[[ Line: 20 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v7, {
-            numFeedbackSubmissionAttempts = v8.numFeedbackSubmissionAttempts
-        });
-    end, 
-    [v5.name] = function(v9, v10) --[[ Line: 25 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v9, {
-            showHelpModal = v10.helpModalVisible
-        });
-    end, 
-    [v6.name] = function(v11, v12) --[[ Line: 30 ]]
-        -- upvalues: v1 (copy)
-        return v1.Dictionary.join(v11, {
-            showOnboardingModal = v12.onboardingModalVisible
-        });
-    end
-});
+	[IncrementFeedbackSubmissionAttempts.name] = function(p1, t1: {[any]: any}) -- line: 20
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			numFeedbackSubmissionAttempts = t1.numFeedbackSubmissionAttempts
+		})
+	end,
+	[ShowHelpModal.name] = function(p2, t2: {[any]: any}) -- line: 25
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p2, {
+			showHelpModal = t2.helpModalVisible
+		})
+	end,
+	[ShowOnboardingModal.name] = function(p3, t3: {[any]: any}) -- line: 30
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			showOnboardingModal = t3.onboardingModalVisible
+		})
+	end
+})

@@ -1,43 +1,46 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_Parent_0 = script:FindFirstAncestor("DiscoveryAnalytics").Parent;
-local v2 = require(l_Parent_0.t);
-local l_DiscoveryEventErrorLogger_0 = require(l_Parent_0.DiscoveryUtils).DiscoveryEventErrorLogger;
-local v4 = game:DefineFastInt("LuaAppInvalidPlayIntentThrottlingHundredthsPercent", 10000);
-local v5 = {
-    eventName = "invalidPlayIntent", 
-    backends = {
-        "EventIngest"
-    }, 
-    throttlingPercentage = v4, 
-    lastUpdated = {
-        26, 
-        3, 
-        18
-    }, 
-    description = "Fires when the user clicks on a Play Button that is in an invalid state to play (i.e. Loading)"
-};
-local v6 = v2.strictInterface({
-    universeId = v2.string, 
-    playButtonState = v2.string, 
-    playabilityStatus = v2.optional(v2.string)
-});
-return function(v7, v8) --[[ Line: 26 ]]
-    -- upvalues: v6 (copy), l_DiscoveryEventErrorLogger_0 (copy), l_TelemetryService_0 (copy), v5 (copy)
-    local v9, v10 = v6(v8);
-    if not v9 then
-        l_DiscoveryEventErrorLogger_0.reportError("InvalidPlayIntentInvalidInterface", v10);
-    end;
-    l_TelemetryService_0:LogEvent(v5, {
-        eventContext = v7, 
-        standardizedFields = {
-            "addSessionInfo", 
-            "addSessionId", 
-            "addOSInfo"
-        }, 
-        customFields = {
-            universeId = v8.universeId, 
-            playButtonState = v8.playButtonState, 
-            playabilityStatus = v8.playabilityStatus
-        }
-    });
-end;
+local TelemetryService = game:GetService("TelemetryService")
+local Parent = script:FindFirstAncestor("DiscoveryAnalytics").Parent
+local t = require(Parent.t)
+local DiscoveryEventErrorLogger = require(Parent.DiscoveryUtils).DiscoveryEventErrorLogger
+local FFlagLuaAppPlayButtonLoadingDurationTelemetry = require(Parent.SharedFlags).FFlagLuaAppPlayButtonLoadingDurationTelemetry
+local v6 = game:DefineFastInt("LuaAppInvalidPlayIntentThrottlingHundredthsPercent", 10000)
+local t1 = {
+	eventName = "invalidPlayIntent",
+	description = "Fires when the user clicks on a Play Button that is in an invalid state to play (i.e. Loading)",
+	backends = { "EventIngest" },
+	throttlingPercentage = v6,
+	lastUpdated = {
+		26,
+		3,
+		18
+	}
+}
+local v8 = t.strictInterface({
+	universeId = t.string,
+	playButtonState = t.string,
+	playabilityStatus = t.optional(t.string),
+	pageName = if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then nil else t.optional(t.string)
+})
+
+return function(s1: string, p1) -- line: 30
+	-- upvalues: v8 (copy), DiscoveryEventErrorLogger (copy), TelemetryService (copy), t1 (copy), FFlagLuaAppPlayButtonLoadingDurationTelemetry (copy)
+	local v11, v12 = v8(p1)
+
+	if not v11 then
+		DiscoveryEventErrorLogger.reportError("InvalidPlayIntentInvalidInterface", v12)
+	end
+
+	TelemetryService:LogEvent(t1, {
+		eventContext = s1,
+		standardizedFields = {
+			"addSessionInfo",
+			"addSessionId",
+			"addOSInfo"
+		},
+		customFields = if not FFlagLuaAppPlayButtonLoadingDurationTelemetry then {
+			universeId = p1.universeId,
+			playButtonState = p1.playButtonState,
+			playabilityStatus = p1.playabilityStatus
+		} else p1
+	})
+end

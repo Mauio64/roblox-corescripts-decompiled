@@ -1,14 +1,17 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxFriends").Parent;
-local v1 = require(l_Parent_0.llama);
-local v2 = require(script.Parent.removeUser);
-return function(v3, v4) --[[ Line: 9 ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    local v5 = tostring(v4.additionalData.currentUserId);
-    local v6 = tostring(v4.namedIds.users);
-    local v7 = v1.Dictionary.join(v3, {
-        [v5] = v2(v3[v5], v6), 
-        [v6] = v2(v3[v6], v5)
-    });
-    v7[v6] = nil;
-    return v7;
-end;
+local Parent = script:FindFirstAncestor("RoduxFriends").Parent
+local llama = require(Parent.llama)
+local removeUser = require(script.Parent.removeUser)
+
+return function(p1, p2) -- line: 9
+	-- upvalues: llama (copy), removeUser (copy)
+	local str = tostring(p2.additionalData.currentUserId)
+	local str2 = tostring(p2.namedIds.users)
+	local v8 = llama.Dictionary.join(p1, {
+		[str] = removeUser(p1[str], str2),
+		[str2] = removeUser(p1[str2], str)
+	})
+
+	v8[str2] = nil
+
+	return v8
+end

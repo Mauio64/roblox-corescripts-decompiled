@@ -1,8 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("Groups").Parent;
-local v1 = require(l_Parent_0.React);
-local _ = require(script.Parent.EventNames);
-return v1.createContext({
-    fireAnalyticsEvent = function() --[[ Line: 15 ]] --[[ Name: fireAnalyticsEvent ]]
+local Parent = script:FindFirstAncestor("Groups").Parent
+local React = require(Parent.React)
 
-    end
-});
+require(script.Parent.EventNames)
+
+return React.createContext({
+	fireAnalyticsEvent = function() -- line: 15
+	end
+})

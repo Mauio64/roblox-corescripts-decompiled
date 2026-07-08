@@ -1,17 +1,20 @@
-local v0 = require(script.Components.ChatBoxContextMenu);
-local v1 = require(script.Components.ChatLineReportSelectionModal);
-local v2 = require(script.Enums.ChatLineSelectionMode);
-local v3 = require(script.Common.Constants);
+local ChatBoxContextMenu = require(script.Components.ChatBoxContextMenu)
+local ChatLineReportRoot = require(script.Components.ChatLineReportRoot)
+local ChatLineReportSelectionModal = require(script.Components.ChatLineReportSelectionModal)
+local ChatLineSelectionMode = require(script.Enums.ChatLineSelectionMode)
+local Constants = require(script.Common.Constants)
+
 return {
-    ["jest.config"] = script["jest.config"], 
-    ChatBoxContextMenu = v0, 
-    ChatLineReportSelectionModal = v1, 
-    Constants = v3, 
-    Enums = {
-        ChatLineSelectionMode = v2
-    }, 
-    Helpers = {
-        getMessageText = require(script.Common.getMessageText), 
-        isSystemMessage = require(script.Common.isSystemMessage)
-    }
-};
+	["jest.config"] = script["jest.config"],
+	ChatBoxContextMenu = ChatBoxContextMenu,
+	ChatLineReportRoot = ChatLineReportRoot,
+	ChatLineReportSelectionModal = ChatLineReportSelectionModal,
+	Constants = Constants,
+	Enums = {
+		ChatLineSelectionMode = ChatLineSelectionMode
+	},
+	Helpers = {
+		getMessageText = require(script.Common.getMessageText),
+		isSystemMessage = require(script.Common.isSystemMessage)
+	}
+}

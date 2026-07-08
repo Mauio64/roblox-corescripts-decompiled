@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXGeneralizeInventoryItemsList", false);
+return game:DefineFastFlag("AXGeneralizeInventoryItemsList", false)

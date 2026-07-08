@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("Foundation").Parent;
-return require(l_Parent_0.React).createContext({
-    value = nil, 
-    onValueChanged = function(_) --[[ Line: 8 ]] --[[ Name: onValueChanged ]]
-        warn("No RadioGroupProvider found for RadioGroup");
-    end, 
-    Selectable = true, 
-    testId = ""
-});
+local Parent = script:FindFirstAncestor("Foundation").Parent
+
+return require(Parent.React).createContext({
+	value = nil,
+	Selectable = true,
+	testId = "",
+	onValueChanged = function(_: string) -- line: 8
+		warn("No RadioGroupProvider found for RadioGroup")
+	end
+})

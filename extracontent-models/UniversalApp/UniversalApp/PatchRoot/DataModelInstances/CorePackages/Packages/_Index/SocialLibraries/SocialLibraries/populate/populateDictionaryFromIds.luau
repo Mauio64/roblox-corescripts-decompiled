@@ -1,13 +1,16 @@
-local function v0(v1, v2) --[[ Line: 5 ]] --[[ Name: populateDictionaryFromIds ]]
-    -- upvalues: v0 (copy)
-    local v3 = {};
-    for v4, v5 in pairs(v1) do
-        if type(v5) == "table" then
-            v3[v4] = v0(v5, v2);
-        else
-            v3[v4] = v2[v5];
-        end;
-    end;
-    return v3;
-end;
-return v0;
+local function populateDictionaryFromIds(p1, p2) -- line: 5
+	-- upvalues: populateDictionaryFromIds (copy)
+	local t1 = {}
+
+	for k, v in pairs(p1) do
+		if type(v) == "table" then
+			t1[k] = populateDictionaryFromIds(v, p2)
+		else
+			t1[k] = p2[v]
+		end
+	end
+
+	return t1
+end
+
+return populateDictionaryFromIds

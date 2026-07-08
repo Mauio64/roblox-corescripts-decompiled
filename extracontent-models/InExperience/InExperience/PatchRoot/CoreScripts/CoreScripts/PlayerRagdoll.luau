@@ -1,75 +1,90 @@
-local l_Players_0 = game:GetService("Players");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RobloxReplicatedStorage_0 = game:GetService("RobloxReplicatedStorage");
-local _ = game:GetService("StarterPlayer");
-local l_Common_0 = l_CoreGui_0:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Common");
-local l_RagdollRigging_0 = require(l_Common_0:FindFirstChild("RagdollRigging"));
-local l_HumanoidReadyUtil_0 = require(l_Common_0:FindFirstChild("HumanoidReadyUtil"));
-local l_game_EngineFeature_0 = game:GetEngineFeature("AvatarJointUpgradeFeature");
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-if not l_LocalPlayer_0 then
-    l_Players_0:GetPropertyChangedSignal("LocalPlayer"):Wait();
-    l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-end;
-local v9 = l_RobloxReplicatedStorage_0:WaitForChild("DeathType", 1e999);
-if not v9 or not l_game_EngineFeature_0 and v9.Value ~= "Ragdoll" then
-    return;
-else
-    local v10 = nil;
-    if not l_game_EngineFeature_0 then
-        v10 = l_RobloxReplicatedStorage_0:WaitForChild("OnRagdoll", 1e999);
-        if not v10 or not v10:IsA("RemoteEvent") then
-            return;
-        end;
-    end;
-    local function v15(v11, v12) --[[ Line: 36 ]] --[[ Name: onOwnedHumanoidDeath ]]
-        -- upvalues: l_game_EngineFeature_0 (copy), v9 (copy), l_RagdollRigging_0 (copy), v10 (ref)
-        if l_game_EngineFeature_0 then
-            if v9.Value == "Ragdoll" then
-                l_RagdollRigging_0.disableMotors(v11, v12.RigType);
-                return;
-            end;
-        else
-            local v13 = l_RagdollRigging_0.disableMotors(v11, v12.RigType);
-            local l_Animator_0 = v12:FindFirstChildWhichIsA("Animator");
-            if l_Animator_0 then
-                l_Animator_0:ApplyJointVelocities(v13);
-            end;
-            v10:FireServer(v12);
-            wait(0.1);
-            l_RagdollRigging_0.easeJointFriction_OLD(v11, 0.85);
-        end;
-    end;
-    l_HumanoidReadyUtil_0.registerHumanoidReady(function(v16, v17, v18) --[[ Line: 91 ]]
-        -- upvalues: v9 (copy), l_RagdollRigging_0 (copy), l_LocalPlayer_0 (ref), v15 (copy)
-        local v19 = nil;
-        local v20 = nil;
-        local function _() --[[ Line: 94 ]] --[[ Name: disconnect ]]
-            -- upvalues: v19 (ref), v20 (ref)
-            v19:Disconnect();
-            v20:Disconnect();
-        end;
-        v20 = v18.Died:Connect(function() --[[ Line: 100 ]]
-            -- upvalues: v19 (ref), v20 (ref), v9 (ref), l_RagdollRigging_0 (ref), v17 (copy), v16 (copy), l_LocalPlayer_0 (ref), v15 (ref), v18 (copy)
-            v19:Disconnect();
-            v20:Disconnect();
-            if v9.Value == "Ragdoll" then
-                delay(2, function() --[[ Line: 105 ]]
-                    -- upvalues: l_RagdollRigging_0 (ref), v17 (ref)
-                    l_RagdollRigging_0.disableParticleEmittersAndFadeOut(v17, 0.4);
-                end);
-            end;
-            if v16 == l_LocalPlayer_0 then
-                v15(v17, v18);
-            end;
-        end);
-        v19 = v16.CharacterRemoving:Connect(function(v22) --[[ Line: 117 ]]
-            -- upvalues: v17 (copy), v19 (ref), v20 (ref)
-            if v22 == v17 then
-                v19:Disconnect();
-                v20:Disconnect();
-            end;
-        end);
-    end);
-    return;
-end;
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+
+game:GetService("StarterPlayer")
+
+local Common = CoreGui:FindFirstChild("RobloxGui"):FindFirstChild("Modules"):FindFirstChild("Common")
+local RagdollRigging = require(Common:FindFirstChild("RagdollRigging"))
+local HumanoidReadyUtil = require(Common:FindFirstChild("HumanoidReadyUtil"))
+local EngineFeature = game:GetEngineFeature("AvatarJointUpgradeFeature")
+local LocalPlayer = Players.LocalPlayer
+
+if not LocalPlayer then
+	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+	LocalPlayer = Players.LocalPlayer
+end
+
+local DeathType = RobloxReplicatedStorage:WaitForChild("DeathType", 1e999)
+
+if not DeathType or not EngineFeature and DeathType.Value ~= "Ragdoll" then
+	return
+end
+
+local OnRagdoll = nil
+
+if not EngineFeature then
+	OnRagdoll = RobloxReplicatedStorage:WaitForChild("OnRagdoll", 1e999)
+
+	if not OnRagdoll or not OnRagdoll:IsA("RemoteEvent") then
+		return
+	end
+end
+
+local function onOwnedHumanoidDeath(p1, p2) -- line: 36
+	-- upvalues: EngineFeature (copy), DeathType (copy), RagdollRigging (copy), OnRagdoll (ref)
+	if EngineFeature then
+		if DeathType.Value == "Ragdoll" then
+			RagdollRigging.disableMotors(p1, p2.RigType)
+
+			return
+		end
+	else
+		local v14 = RagdollRigging.disableMotors(p1, p2.RigType)
+		local Animator = p2:FindFirstChildWhichIsA("Animator")
+
+		if Animator then
+			Animator:ApplyJointVelocities(v14)
+		end
+
+		OnRagdoll:FireServer(p2)
+		wait(0.1)
+		RagdollRigging.easeJointFriction_OLD(p1, 0.85)
+	end
+end
+
+HumanoidReadyUtil.registerHumanoidReady(function(p3, p4, p5) -- line: 91
+	-- upvalues: DeathType (copy), RagdollRigging (copy), LocalPlayer (ref), onOwnedHumanoidDeath (copy)
+	local connection = nil
+	local connection2 = nil
+
+	local function disconnect() -- line: 94
+		-- upvalues: connection (ref), connection2 (ref)
+		connection:Disconnect()
+		connection2:Disconnect()
+	end
+
+	connection2 = p5.Died:Connect(function() -- line: 100
+		-- upvalues: connection (ref), connection2 (ref), DeathType (copy), RagdollRigging (copy), p4 (copy), p3 (copy), LocalPlayer (ref), onOwnedHumanoidDeath (copy), p5 (copy)
+		connection:Disconnect()
+		connection2:Disconnect()
+
+		if DeathType.Value == "Ragdoll" then
+			delay(2, function() -- line: 105
+				-- upvalues: RagdollRigging (copy), p4 (copy)
+				RagdollRigging.disableParticleEmittersAndFadeOut(p4, 0.4)
+			end)
+		end
+
+		if p3 == LocalPlayer then
+			onOwnedHumanoidDeath(p4, p5)
+		end
+	end)
+	connection = p3.CharacterRemoving:Connect(function(character) -- line: 117
+		-- upvalues: p4 (copy), connection (ref), connection2 (ref)
+		if character == p4 then
+			connection:Disconnect()
+			connection2:Disconnect()
+		end
+	end)
+end)

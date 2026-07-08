@@ -1,121 +1,126 @@
-local l_Parent_0 = script:FindFirstAncestor("SplashScreenManager").Parent;
-local l_RunService_0 = game:GetService("RunService");
-l_RunService_0 = require(l_Parent_0.MockableProxyServices).RunService;
-local v2 = nil;
-local function _() --[[ Line: 19 ]] --[[ Name: obfuscateEnvironment ]]
-    -- upvalues: v2 (ref)
-    v2 = Instance.new("ColorCorrectionEffect");
-    if v2 then
-        v2.Name = "__SplashScreenManager_Fader__";
-        v2.Parent = game:GetService("Lighting");
-        v2.TintColor = Color3.new(0, 0, 0);
-        v2.Enabled = true;
-    end;
-end;
-local function _() --[[ Line: 30 ]] --[[ Name: unobfuscateEnvironment ]]
-    -- upvalues: v2 (ref)
-    if v2 then
-        v2:Destroy();
-        v2 = nil;
-    end;
-end;
-local v5 = false;
-local v6 = true;
-local v7 = false;
-local v8 = {};
-local _ = function() --[[ Line: 43 ]] --[[ Name: callCallbacks ]]
-    -- upvalues: v8 (copy), v6 (ref)
-    for _, v10 in v8 do
-        v10(v6);
-    end;
-end;
+local Parent = script:FindFirstAncestor("SplashScreenManager").Parent
+
+game:GetService("RunService")
+
+local RunService = require(Parent.MockableProxyServices).RunService
+local ColorCorrectionEffect = nil
+
+local function obfuscateEnvironment() -- line: 19
+	-- upvalues: ColorCorrectionEffect (ref)
+	ColorCorrectionEffect = Instance.new("ColorCorrectionEffect")
+
+	if ColorCorrectionEffect then
+		ColorCorrectionEffect.Name = "__SplashScreenManager_Fader__"
+		ColorCorrectionEffect.Parent = game:GetService("Lighting")
+		ColorCorrectionEffect.TintColor = Color3.new(0, 0, 0)
+		ColorCorrectionEffect.Enabled = true
+	end
+end
+local function unobfuscateEnvironment() -- line: 30
+	-- upvalues: ColorCorrectionEffect (ref)
+	if ColorCorrectionEffect then
+		ColorCorrectionEffect:Destroy()
+		ColorCorrectionEffect = nil
+	end
+end
+
+local u6 = false
+local u7 = true
+local u8 = false
+local t1 = {}
+
+local function callCallbacks() -- line: 43
+	-- upvalues: t1 (copy), u7 (ref)
+	for _, v12 in t1 do
+		v12(u7)
+	end
+end
+
 return {
-    initialize = function(v12, v13, v14) --[[ Line: 50 ]] --[[ Name: initialize ]]
-        -- upvalues: v7 (ref), v5 (ref), v6 (ref), v2 (ref), v8 (copy), l_RunService_0 (ref)
-        if not v7 and not v5 then
-            v6 = false;
-            v2 = Instance.new("ColorCorrectionEffect");
-            if v2 then
-                v2.Name = "__SplashScreenManager_Fader__";
-                v2.Parent = game:GetService("Lighting");
-                v2.TintColor = Color3.new(0, 0, 0);
-                v2.Enabled = true;
-            end;
-            for _, v16 in v8 do
-                v16(v6);
-            end;
-            local v17 = {};
-            local v18 = 0;
-            local v19 = 1 / v12;
-            local v20 = v14 or v12;
-            local v21 = tick();
-            local v22 = 0;
-            local v23 = nil;
-            do
-                local l_v18_0, l_v22_0, l_v23_0 = v18, v22, v23;
-                local function _() --[[ Line: 65 ]]
-                    -- upvalues: l_v23_0 (ref), v2 (ref), v6 (ref), v7 (ref)
-                    if l_v23_0 then
-                        l_v23_0:Disconnect();
-                    end;
-                    if v2 then
-                        v2:Destroy();
-                        v2 = nil;
-                    end;
-                    v6 = true;
-                    v7 = false;
-                end;
-                l_v23_0 = l_RunService_0.RenderStepped:Connect(function(v28) --[[ Line: 74 ]]
-                    -- upvalues: l_v22_0 (ref), v21 (copy), v17 (copy), l_v18_0 (ref), v20 (copy), v13 (copy), v19 (copy), v6 (ref), v8 (ref), l_v23_0 (ref), v2 (ref), v7 (ref)
-                    l_v22_0 = tick() - v21;
-                    table.insert(v17, v28);
-                    l_v18_0 = l_v18_0 + v28;
-                    if #v17 > v20 then
-                        local v29 = table.remove(v17, 1);
-                        if v29 ~= nil then
-                            l_v18_0 = l_v18_0 - v29;
-                        end;
-                    end;
-                    local v30 = l_v18_0 / #v17;
-                    if v13 and v13 < l_v22_0 or #v17 >= v20 and math.floor(v30 * 100) <= math.floor(v19 * 100) then
-                        v6 = true;
-                        for _, v32 in v8 do
-                            v32(v6);
-                        end;
-                        if l_v23_0 then
-                            l_v23_0:Disconnect();
-                        end;
-                        if v2 then
-                            v2:Destroy();
-                            v2 = nil;
-                        end;
-                        v6 = true;
-                        v7 = false;
-                    end;
-                end);
-                v7 = true;
-            end;
-        end;
-    end, 
-    addStatusChangeListener = function(v33) --[[ Line: 106 ]] --[[ Name: addStatusChangeListener ]]
-        -- upvalues: v8 (copy)
-        table.insert(v8, v33);
-        return v33;
-    end, 
-    removeStatusChangeListener = function(v34) --[[ Line: 111 ]] --[[ Name: removeStatusChangeListener ]]
-        -- upvalues: v8 (copy)
-        for v35, v36 in v8 do
-            if v36 == v34 then
-                table.remove(v8, v35);
-            end;
-        end;
-    end, 
-    isFPSAtTarget = function() --[[ Line: 119 ]] --[[ Name: isFPSAtTarget ]]
-        -- upvalues: v6 (ref)
-        return v6;
-    end, 
-    __setTestMode = function() --[[ Line: 123 ]] --[[ Name: __setTestMode ]]
-        -- upvalues: v5 (ref)
-        v5 = true;
-    end
-};
+	initialize = function(n1: number, n2: number?, n3: number?) -- line: 50
+		-- upvalues: u8 (ref), u6 (ref), u7 (ref), ColorCorrectionEffect (ref), t1 (copy), RunService (ref)
+		if not u8 and not u6 then
+			u7 = false
+			ColorCorrectionEffect = Instance.new("ColorCorrectionEffect")
+
+			if ColorCorrectionEffect then
+				ColorCorrectionEffect.Name = "__SplashScreenManager_Fader__"
+				ColorCorrectionEffect.Parent = game:GetService("Lighting")
+				ColorCorrectionEffect.TintColor = Color3.new(0, 0, 0)
+				ColorCorrectionEffect.Enabled = true
+			end
+
+			for _, v17 in t1 do
+				v17(u7)
+			end
+
+			local t2 = {}
+			local n4 = 0
+			local v20 = 1 / n1
+			local v21 = n3 or n1
+			local timestamp = tick()
+			local n5 = 0
+			local connection = nil
+
+			connection = RunService.RenderStepped:Connect(function(dt) -- line: 74
+				-- upvalues: n5 (ref), timestamp (copy), t2 (copy), n4 (ref), v21 (copy), n2 (copy), v20 (copy), u7 (ref), t1 (copy), connection (ref), ColorCorrectionEffect (ref), u8 (ref)
+				n5 = tick() - timestamp
+				table.insert(t2, dt)
+				n4 += dt
+
+				if #t2 > v21 then
+					local v30 = table.remove(t2, 1)
+
+					if v30 ~= nil then
+						n4 -= v30
+					end
+				end
+
+				local v31 = n4 / #t2
+
+				if n2 and n5 > n2 or #t2 >= v21 and math.floor(v31 * 100) <= math.floor(v20 * 100) then
+					u7 = true
+
+					for _, v33 in t1 do
+						v33(u7)
+					end
+
+					if connection then
+						connection:Disconnect()
+					end
+
+					if ColorCorrectionEffect then
+						ColorCorrectionEffect:Destroy()
+						ColorCorrectionEffect = nil
+					end
+
+					u7 = true
+					u8 = false
+				end
+			end)
+			u8 = true
+		end
+	end,
+	addStatusChangeListener = function(p1) -- line: 106
+		-- upvalues: t1 (copy)
+		table.insert(t1, p1)
+
+		return p1
+	end,
+	removeStatusChangeListener = function(p2) -- line: 111
+		-- upvalues: t1 (copy)
+		for v27, v28 in t1 do
+			if v28 == p2 then
+				table.remove(t1, v27)
+			end
+		end
+	end,
+	isFPSAtTarget = function() -- line: 119
+		-- upvalues: u7 (ref)
+		return u7
+	end,
+	__setTestMode = function() -- line: 123
+		-- upvalues: u6 (ref)
+		u6 = true
+	end
+}

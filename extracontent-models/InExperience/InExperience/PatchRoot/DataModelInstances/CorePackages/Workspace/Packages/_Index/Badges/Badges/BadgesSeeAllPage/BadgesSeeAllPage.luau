@@ -1,59 +1,67 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Badges");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.Navigation);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.SduiSharedUtilities);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_SduiLoadTimer_0 = v4.SduiLoadTimer;
-local l_SduiPageEntryPoint_0 = v4.SduiPageEntryPoint;
-local v8 = require(l_script_FirstAncestor_0.BadgesSeeAllPage.fetchBadgesSeeAllPageIfNeeded);
-local v9 = require(l_script_FirstAncestor_0.BadgesSeeAllPage.getBadgesSeeAllPageKey);
-local function _(v10, v11) --[[ Line: 29 ]] --[[ Name: getFromPropsOrNavigationParams ]]
-    return v10[v11] or v10.navigation and v10.navigation.getParam(v11);
-end;
-return v3.memo(function(v13) --[[ Line: 33 ]] --[[ Name: BadgesSeeAllPage ]]
-    -- upvalues: v9 (copy), l_useLocalization_0 (copy), v3 (copy), l_SduiLoadTimer_0 (copy), v8 (copy), l_SduiPageEntryPoint_0 (copy)
-    local v14 = v13.universeId or v13.navigation and v13.navigation.getParam("universeId");
-    local v15 = v9(v14);
-    local v16 = l_useLocalization_0({
-        pageTitle = "CommonUI.Features.Label.Badges"
-    });
-    local v18 = v3.useMemo(function() --[[ Line: 40 ]]
-        -- upvalues: v13 (copy), l_SduiLoadTimer_0 (ref)
-        local l_v13_0 = v13;
-        return l_v13_0.pageTimer or l_v13_0.navigation and l_v13_0.navigation.getParam("pageTimer") or l_SduiLoadTimer_0.createLoadTimer("BadgesSeeAll");
-    end, {
-        v15
-    });
-    v3.useEffect(function() --[[ Line: 45 ]]
-        -- upvalues: v14 (copy), v8 (ref), v18 (copy)
-        if v14 then
-            v8(v14, v18);
-        end;
-    end, {
-        v14, 
-        v18
-    });
-    local v20 = v3.useCallback(function() --[[ Line: 51 ]]
-        -- upvalues: v14 (copy), l_SduiLoadTimer_0 (ref), v8 (ref)
-        if v14 then
-            local v19 = l_SduiLoadTimer_0.createLoadTimer("BadgesSeeAll");
-            v19.start("refresh");
-            v8(v14, v19, true);
-        end;
-    end, {
-        v14
-    });
-    if v14 == nil then
-        return nil;
-    else
-        return v3.createElement(l_SduiPageEntryPoint_0, {
-            appPage = "BadgesSeeAll", 
-            configKey = v15, 
-            pageTimer = v18, 
-            includeNavigationHeaderBar = true, 
-            pageTitle = v16.pageTitle, 
-            refresh = v20
-        });
-    end;
-end);
+local Badges = script:FindFirstAncestor("Badges")
+local BadgesParent = Badges.Parent
+
+require(BadgesParent.Navigation)
+
+local React = require(BadgesParent.React)
+local SduiSharedUtilities = require(BadgesParent.SduiSharedUtilities)
+local useLocalization = require(BadgesParent.Localization).Hooks.useLocalization
+local SduiLoadTimer = SduiSharedUtilities.SduiLoadTimer
+local SduiPageEntryPoint = SduiSharedUtilities.SduiPageEntryPoint
+local CompositionTags = require(BadgesParent.AppComposition).CompositionTags
+local fetchBadgesSeeAllPageIfNeeded = require(Badges.BadgesSeeAllPage.fetchBadgesSeeAllPageIfNeeded)
+local getBadgesSeeAllPageKey = require(Badges.BadgesSeeAllPage.getBadgesSeeAllPageKey)
+
+local function getFromPropsOrNavigationParams(t1: {[any]: any}, s1: string) -- line: 32
+	return t1[s1] or t1.navigation and t1.navigation.getParam(s1)
+end
+local function BadgesSeeAllPage(t2: {[any]: any}) -- line: 36
+	-- upvalues: getBadgesSeeAllPageKey (copy), useLocalization (copy), React (copy), SduiLoadTimer (copy), fetchBadgesSeeAllPageIfNeeded (copy), SduiPageEntryPoint (copy), CompositionTags (copy)
+	local v16 = t2.universeId or t2.navigation and t2.navigation.getParam("universeId")
+	local v17 = getBadgesSeeAllPageKey(v16)
+	local v18 = useLocalization({
+		pageTitle = "CommonUI.Features.Label.Badges"
+	})
+	local v19 = React.useMemo(function() -- line: 43
+		-- upvalues: t2 (copy), SduiLoadTimer (copy)
+		local v21 = t2
+
+		return v21.pageTimer or v21.navigation and v21.navigation.getParam("pageTimer") or SduiLoadTimer.createLoadTimer("BadgesSeeAll")
+	end, { v17 })
+
+	React.useEffect(function() -- line: 48
+		-- upvalues: v16 (copy), fetchBadgesSeeAllPageIfNeeded (copy), v19 (copy)
+		if v16 then
+			fetchBadgesSeeAllPageIfNeeded(v16, v19)
+		end
+	end, {
+		v16,
+		v19
+	})
+
+	local v20 = React.useCallback(function() -- line: 54
+		-- upvalues: v16 (copy), SduiLoadTimer (copy), fetchBadgesSeeAllPageIfNeeded (copy)
+		if v16 then
+			local v22 = SduiLoadTimer.createLoadTimer("BadgesSeeAll")
+
+			v22.start("refresh")
+			fetchBadgesSeeAllPageIfNeeded(v16, v22, true)
+		end
+	end, { v16 })
+
+	if v16 == nil then
+		return nil
+	end
+
+	return React.createElement(SduiPageEntryPoint, {
+		appPage = "BadgesSeeAll",
+		includeNavigationHeaderBar = true,
+		configKey = v17,
+		pageTimer = v19,
+		pageTitle = v18.pageTitle,
+		refresh = v20,
+		contentTag = CompositionTags.ContentRegion.Body
+	})
+end
+
+return React.memo(BadgesSeeAllPage)

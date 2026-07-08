@@ -1,1 +1,1 @@
-return game:DefineFastInt("VoiceChatTooltipDelay", 5);
+return game:DefineFastInt("VoiceChatTooltipDelay", 5)

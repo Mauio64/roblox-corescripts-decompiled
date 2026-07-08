@@ -1,21 +1,26 @@
-local l_StarterGui_0 = game:GetService("StarterGui");
-local l_Parent_0 = script.Parent.Parent;
-local v2 = require(l_Parent_0.Actions.SetRespawnBehavior);
-return function(v3) --[[ Line: 8 ]] --[[ Name: registerSetCores ]]
-    -- upvalues: l_StarterGui_0 (copy), v2 (copy)
-    l_StarterGui_0:RegisterSetCore("ResetButtonCallback", function(v4) --[[ Line: 9 ]]
-        -- upvalues: v3 (copy), v2 (ref)
-        local v5 = true;
-        local v6 = nil;
-        if typeof(v4) == "boolean" then
-            v5 = v4;
-            v6 = nil;
-        elseif typeof(v4) == "Instance" and v4:IsA("BindableEvent") then
-            v5 = true;
-            v6 = v4;
-        else
-            error("ResetButtonCallback must be set to a BindableEvent or a boolean", 0);
-        end;
-        v3:dispatch(v2(v5, v6));
-    end);
-end;
+local StarterGui = game:GetService("StarterGui")
+local ParentParent = script.Parent.Parent
+local SetRespawnBehavior = require(ParentParent.Actions.SetRespawnBehavior)
+
+local function registerSetCores(p1) -- line: 8
+	-- upvalues: StarterGui (copy), SetRespawnBehavior (copy)
+	StarterGui:RegisterSetCore("ResetButtonCallback", function(p2) -- line: 9
+		-- upvalues: p1 (copy), SetRespawnBehavior (copy)
+		local v7 = true
+		local v8 = nil
+
+		if typeof(p2) == "boolean" then
+			v7 = p2
+			v8 = nil
+		elseif typeof(p2) == "Instance" and p2:IsA("BindableEvent") then
+			v7 = true
+			v8 = p2
+		else
+			error("ResetButtonCallback must be set to a BindableEvent or a boolean", 0)
+		end
+
+		p1:dispatch(SetRespawnBehavior(v7, v8))
+	end)
+end
+
+return registerSetCores

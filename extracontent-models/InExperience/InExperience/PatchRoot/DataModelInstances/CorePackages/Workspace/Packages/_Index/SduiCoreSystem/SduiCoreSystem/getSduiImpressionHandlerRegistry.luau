@@ -1,42 +1,52 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local _ = require(l_script_FirstAncestor_0.SduiImpressionEventType);
-local _ = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local function v11() --[[ Line: 32 ]] --[[ Name: createSduiImpressionHandlerRegistry ]]
-    local v3 = {};
-    return {
-        getImpressionHandlerConfig = function(v4) --[[ Line: 36 ]] --[[ Name: getImpressionHandlerConfig ]]
-            -- upvalues: v3 (copy)
-            local v5 = v3[v4];
-            if v5 and not v5.handler and v5.lazyHandler then
-                v5.handler = v5.lazyHandler();
-            end;
-            return v5;
-        end, 
-        registerImpressionHandlerConfig = function(v6, v7) --[[ Line: 48 ]] --[[ Name: registerImpressionHandlerConfig ]]
-            -- upvalues: v3 (copy)
-            v3[v6] = v7;
-        end, 
-        registerImpressionHandlerConfigs = function(v8) --[[ Line: 55 ]] --[[ Name: registerImpressionHandlerConfigs ]]
-            -- upvalues: v3 (copy)
-            for v9, v10 in v8 do
-                v3[v9] = v10;
-            end;
-        end, 
-        debug_clear = function() --[[ Line: 63 ]] --[[ Name: debug_clear ]]
-            -- upvalues: v3 (copy)
-            table.clear(v3);
-        end, 
-        debug_getRegisteredImpressionHandlerConfigs = function() --[[ Line: 67 ]] --[[ Name: debug_getRegisteredImpressionHandlerConfigs ]]
-            -- upvalues: v3 (copy)
-            return v3;
-        end
-    };
-end;
-local v12 = nil;
-return function() --[[ Line: 85 ]] --[[ Name: getSduiImpressionHandlerRegistry ]]
-    -- upvalues: v12 (ref), v11 (copy)
-    if v12 == nil then
-        v12 = v11();
-    end;
-    return v12;
-end;
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+
+require(SduiCoreSystem.SduiImpressionEventType)
+require(SduiCoreSystem.SduiBuilderTypes)
+
+local function createSduiImpressionHandlerRegistry() -- line: 32
+	local t1 = {}
+
+	return {
+		getImpressionHandlerConfig = function(p1) -- line: 36
+			-- upvalues: t1 (copy)
+			local v7 = t1[p1]
+
+			if v7 and (not v7.handler and v7.lazyHandler) then
+				v7.handler = v7.lazyHandler()
+			end
+
+			return v7
+		end,
+		registerImpressionHandlerConfig = function(p2, p3) -- line: 48
+			-- upvalues: t1 (copy)
+			t1[p2] = p3
+		end,
+		registerImpressionHandlerConfigs = function(t2: {[any]: any}) -- line: 55
+			-- upvalues: t1 (copy)
+			for v11, v12 in t2 do
+				t1[v11] = v12
+			end
+		end,
+		debug_clear = function() -- line: 63
+			-- upvalues: t1 (copy)
+			table.clear(t1)
+		end,
+		debug_getRegisteredImpressionHandlerConfigs = function() -- line: 67
+			-- upvalues: t1 (copy)
+			return t1
+		end
+	}
+end
+
+local u3 = nil
+
+local function getSduiImpressionHandlerRegistry() -- line: 85
+	-- upvalues: u3 (ref), createSduiImpressionHandlerRegistry (copy)
+	if u3 == nil then
+		u3 = createSduiImpressionHandlerRegistry()
+	end
+
+	return u3
+end
+
+return getSduiImpressionHandlerRegistry

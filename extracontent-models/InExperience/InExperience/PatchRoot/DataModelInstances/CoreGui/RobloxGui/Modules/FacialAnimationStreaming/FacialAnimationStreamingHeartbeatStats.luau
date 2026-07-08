@@ -1,212 +1,260 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_Players_0 = game:GetService("Players");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = l_CoreGui_0:WaitForChild("RobloxGui");
-local l_default_0 = require(l_CorePackages_0.Workspace.Packages.LoggingProtocol).default;
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_FaceAnimatorService_0 = game:GetService("FaceAnimatorService");
-local v7 = require(l_RobloxGui_0.Modules.Flags.GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec);
-local l_game_EngineFeature_0 = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId");
-local v9 = require(script.Parent.RobloxTelemetryConfigs.AvatarChatHeartbeatStats);
-local v10 = {};
-local v11 = false;
-local v12 = {
-    None = 0, 
-    AudioOnly = 1, 
-    VideoOnly = 2, 
-    AudioVideo = 3
-};
-local l_None_0 = v12.None;
-local v14 = {};
-local v15 = nil;
-local v16 = {};
-local v17 = {
-    VideoAnimationEnabled = "videoAnimationEnabled", 
-    AudioAnimationEnabled = "audioAnimationEnabled"
-};
-local function _() --[[ Line: 41 ]] --[[ Name: updateTrackingTimes ]]
-    -- upvalues: v15 (ref), v14 (copy), l_None_0 (ref)
-    local v18 = os.clock();
-    local v19 = 0;
-    if v15 then
-        v19 = v18 - v15;
-        local l_v14_0 = v14;
-        local l_l_None_0_0 = l_None_0;
-        l_v14_0[l_l_None_0_0] = l_v14_0[l_l_None_0_0] + v19;
-    end;
-    v15 = v18;
-end;
-local function v30() --[[ Line: 52 ]] --[[ Name: reportHeartbeat ]]
-    -- upvalues: l_RbxAnalyticsService_0 (copy), l_Players_0 (copy), l_game_EngineFeature_0 (copy), l_None_0 (ref), v15 (ref), v14 (copy), l_default_0 (copy), v9 (copy)
-    local v23 = {
-        pid = tostring(game.PlaceId), 
-        sessionid = l_RbxAnalyticsService_0:GetSessionId(), 
-        userid = tostring(l_Players_0.LocalPlayer.UserId), 
-        universeid = tostring(game.GameId)
-    };
-    if l_game_EngineFeature_0 then
-        v23.playSessionId = l_RbxAnalyticsService_0:GetPlaySessionId();
-    end;
-    v23.trackingMode = l_None_0;
-    local v24 = os.clock();
-    local v25 = 0;
-    if v15 then
-        v25 = v24 - v15;
-        local l_v14_1 = v14;
-        local l_l_None_0_1 = l_None_0;
-        l_v14_1[l_l_None_0_1] = l_v14_1[l_l_None_0_1] + v25;
-    end;
-    v15 = v24;
-    for v28, v29 in v14 do
-        v23[tostring(v28)] = v29;
-        v14[v28] = 0;
-    end;
-    l_default_0:logRobloxTelemetryEvent(v9, nil, v23);
-end;
-local function _() --[[ Line: 76 ]] --[[ Name: startHeartbeat ]]
-    -- upvalues: v7 (copy), v11 (ref), v30 (copy)
-    local v31 = v7();
-    if v31 > 0 and not v11 then
-        v11 = true;
-        task.spawn(function() --[[ Line: 80 ]]
-            -- upvalues: v11 (ref), v30 (ref), v31 (copy)
-            while v11 do
-                v30();
-                task.wait(v31);
-            end;
-            v11 = false;
-        end);
-    end;
-end;
-local function _() --[[ Line: 90 ]] --[[ Name: updateTrackingMode ]]
-    -- upvalues: v15 (ref), v14 (copy), l_None_0 (ref), l_FaceAnimatorService_0 (copy), v12 (copy)
-    local v33 = os.clock();
-    local v34 = 0;
-    if v15 then
-        v34 = v33 - v15;
-        local l_v14_2 = v14;
-        local l_l_None_0_2 = l_None_0;
-        l_v14_2[l_l_None_0_2] = l_v14_2[l_l_None_0_2] + v34;
-    end;
-    v15 = v33;
-    if l_FaceAnimatorService_0.VideoAnimationEnabled and l_FaceAnimatorService_0.AudioAnimationEnabled then
-        l_None_0 = v12.AudioVideo;
-        return;
-    elseif l_FaceAnimatorService_0.VideoAnimationEnabled then
-        l_None_0 = v12.VideoOnly;
-        return;
-    elseif l_FaceAnimatorService_0.AudioAnimationEnabled then
-        l_None_0 = v12.AudioOnly;
-        return;
-    else
-        l_None_0 = v12.None;
-        return;
-    end;
-end;
-v10.Initialize = function() --[[ Line: 104 ]] --[[ Name: Initialize ]]
-    -- upvalues: v7 (copy), v12 (copy), v14 (copy), v16 (copy), v17 (copy), l_FaceAnimatorService_0 (copy), v15 (ref), l_None_0 (ref), v11 (ref), v30 (copy)
-    if v7() <= 0 then
-        return;
-    else
-        for _, v39 in v12 do
-            v14[v39] = 0;
-        end;
-        v16[v17.VideoAnimationEnabled] = l_FaceAnimatorService_0:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(function() --[[ Line: 113 ]]
-            -- upvalues: v15 (ref), v14 (ref), l_None_0 (ref), l_FaceAnimatorService_0 (ref), v12 (ref)
-            local v40 = os.clock();
-            local v41 = 0;
-            if v15 then
-                v41 = v40 - v15;
-                local l_v14_3 = v14;
-                local l_l_None_0_3 = l_None_0;
-                l_v14_3[l_l_None_0_3] = l_v14_3[l_l_None_0_3] + v41;
-            end;
-            v15 = v40;
-            if l_FaceAnimatorService_0.VideoAnimationEnabled and l_FaceAnimatorService_0.AudioAnimationEnabled then
-                l_None_0 = v12.AudioVideo;
-                return;
-            elseif l_FaceAnimatorService_0.VideoAnimationEnabled then
-                l_None_0 = v12.VideoOnly;
-                return;
-            elseif l_FaceAnimatorService_0.AudioAnimationEnabled then
-                l_None_0 = v12.AudioOnly;
-                return;
-            else
-                l_None_0 = v12.None;
-                return;
-            end;
-        end);
-        v16[v17.AudioAnimationEnabled] = l_FaceAnimatorService_0:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(function() --[[ Line: 117 ]]
-            -- upvalues: v15 (ref), v14 (ref), l_None_0 (ref), l_FaceAnimatorService_0 (ref), v12 (ref)
-            local v44 = os.clock();
-            local v45 = 0;
-            if v15 then
-                v45 = v44 - v15;
-                local l_v14_4 = v14;
-                local l_l_None_0_4 = l_None_0;
-                l_v14_4[l_l_None_0_4] = l_v14_4[l_l_None_0_4] + v45;
-            end;
-            v15 = v44;
-            if l_FaceAnimatorService_0.VideoAnimationEnabled and l_FaceAnimatorService_0.AudioAnimationEnabled then
-                l_None_0 = v12.AudioVideo;
-                return;
-            elseif l_FaceAnimatorService_0.VideoAnimationEnabled then
-                l_None_0 = v12.VideoOnly;
-                return;
-            elseif l_FaceAnimatorService_0.AudioAnimationEnabled then
-                l_None_0 = v12.AudioOnly;
-                return;
-            else
-                l_None_0 = v12.None;
-                return;
-            end;
-        end);
-        local v48 = os.clock();
-        local v49 = 0;
-        if v15 then
-            v49 = v48 - v15;
-            local l_v14_5 = v14;
-            local l_l_None_0_5 = l_None_0;
-            l_v14_5[l_l_None_0_5] = l_v14_5[l_l_None_0_5] + v49;
-        end;
-        v15 = v48;
-        if l_FaceAnimatorService_0.VideoAnimationEnabled and l_FaceAnimatorService_0.AudioAnimationEnabled then
-            l_None_0 = v12.AudioVideo;
-        elseif l_FaceAnimatorService_0.VideoAnimationEnabled then
-            l_None_0 = v12.VideoOnly;
-        elseif l_FaceAnimatorService_0.AudioAnimationEnabled then
-            l_None_0 = v12.AudioOnly;
-        else
-            l_None_0 = v12.None;
-        end;
-        v48 = v7();
-        if v48 > 0 and not v11 then
-            v11 = true;
-            task.spawn(function() --[[ Line: 80 ]]
-                -- upvalues: v11 (ref), v30 (ref), v48 (copy)
-                while v11 do
-                    v30();
-                    task.wait(v48);
-                end;
-                v11 = false;
-            end);
-        end;
-        return;
-    end;
-end;
-v10.Cleanup = function() --[[ Line: 125 ]] --[[ Name: Cleanup ]]
-    -- upvalues: v7 (copy), v16 (copy), v11 (ref)
-    if v7() <= 0 then
-        return;
-    else
-        for _, v53 in pairs(v16) do
-            if v53 then
-                v53:Disconnect();
-            end;
-        end;
-        table.clear(v16);
-        v11 = false;
-        return;
-    end;
-end;
-return v10;
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = CoreGui:WaitForChild("RobloxGui")
+local default = require(CorePackages.Workspace.Packages.LoggingProtocol).default
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local FaceAnimatorService = game:GetService("FaceAnimatorService")
+local GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec = require(RobloxGui.Modules.Flags.GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec)
+local EngineFeature = game:GetEngineFeature("RbxAnalyticsServiceExposePlaySessionId")
+local AvatarChatHeartbeatStats = require(script.Parent.RobloxTelemetryConfigs.AvatarChatHeartbeatStats)
+local t1 = {}
+local u12 = false
+local t2 = {
+	None = 0,
+	AudioOnly = 1,
+	VideoOnly = 2,
+	AudioVideo = 3
+}
+local None = t2.None
+local t3 = {}
+local u16 = nil
+local t4 = {}
+local _ = {
+	VideoAnimationEnabled = "videoAnimationEnabled",
+	AudioAnimationEnabled = "audioAnimationEnabled"
+}
+
+local function updateTrackingTimes() -- line: 41
+	-- upvalues: u16 (ref), t3 (copy), None (ref)
+	local elapsed = os.clock()
+
+	if u16 then
+		local v24 = elapsed - u16
+		local v25 = t3
+		local v26 = None
+
+		v25[v26] = v25[v26] + v24
+	end
+
+	u16 = elapsed
+end
+local function reportHeartbeat() -- line: 52
+	-- upvalues: RbxAnalyticsService (copy), Players (copy), EngineFeature (copy), None (ref), u16 (ref), t3 (copy), default (copy), AvatarChatHeartbeatStats (copy)
+	local t5 = {
+		pid = tostring(game.PlaceId),
+		sessionid = RbxAnalyticsService:GetSessionId(),
+		userid = tostring(Players.LocalPlayer.UserId),
+		universeid = tostring(game.GameId)
+	}
+
+	if EngineFeature then
+		t5.playSessionId = RbxAnalyticsService:GetPlaySessionId()
+	end
+
+	t5.trackingMode = None
+
+	local elapsed = os.clock()
+
+	if u16 then
+		local v29 = elapsed - u16
+		local v30 = t3
+		local v31 = None
+
+		v30[v31] = v30[v31] + v29
+	end
+
+	u16 = elapsed
+
+	for v32, v33 in t3 do
+		t5[tostring(v32)] = v33
+		t3[v32] = 0
+	end
+
+	default:logRobloxTelemetryEvent(AvatarChatHeartbeatStats, nil, t5)
+end
+local function startHeartbeat() -- line: 76
+	-- upvalues: GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec (copy), u12 (ref), reportHeartbeat (copy)
+	local v34 = GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec()
+
+	if v34 > 0 and not u12 then
+		u12 = true
+		task.spawn(function() -- line: 80
+			-- upvalues: u12 (ref), reportHeartbeat (copy), v34 (copy)
+			while u12 do
+				reportHeartbeat()
+				task.wait(v34)
+			end
+
+			u12 = false
+		end)
+	end
+end
+local function updateTrackingMode() -- line: 90
+	-- upvalues: u16 (ref), t3 (copy), None (ref), FaceAnimatorService (copy), t2 (copy)
+	local elapsed = os.clock()
+
+	if u16 then
+		local v36 = elapsed - u16
+		local v37 = t3
+		local v38 = None
+
+		v37[v38] = v37[v38] + v36
+	end
+
+	u16 = elapsed
+
+	if FaceAnimatorService.VideoAnimationEnabled and FaceAnimatorService.AudioAnimationEnabled then
+		None = t2.AudioVideo
+
+		return
+	end
+
+	if FaceAnimatorService.VideoAnimationEnabled then
+		None = t2.VideoOnly
+
+		return
+	end
+
+	if FaceAnimatorService.AudioAnimationEnabled then
+		None = t2.AudioOnly
+
+		return
+	end
+
+	None = t2.None
+end
+
+function t1.Initialize() -- line: 104
+	-- upvalues: GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec (copy), t2 (copy), t3 (copy), t4 (copy), FaceAnimatorService (copy), u16 (ref), None (ref), u12 (ref), reportHeartbeat (copy)
+	if GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec() <= 0 then
+		return
+	end
+
+	for _, v40 in t2 do
+		t3[v40] = 0
+	end
+
+	t4.videoAnimationEnabled = FaceAnimatorService:GetPropertyChangedSignal("VideoAnimationEnabled"):Connect(function() -- line: 113
+		-- upvalues: u16 (ref), t3 (copy), None (ref), FaceAnimatorService (copy), t2 (copy)
+		local elapsed = os.clock()
+
+		if u16 then
+			local v49 = elapsed - u16
+			local v50 = t3
+			local v51 = None
+
+			v50[v51] = v50[v51] + v49
+		end
+
+		u16 = elapsed
+
+		if FaceAnimatorService.VideoAnimationEnabled and FaceAnimatorService.AudioAnimationEnabled then
+			None = t2.AudioVideo
+
+			return
+		end
+
+		if FaceAnimatorService.VideoAnimationEnabled then
+			None = t2.VideoOnly
+
+			return
+		end
+
+		if FaceAnimatorService.AudioAnimationEnabled then
+			None = t2.AudioOnly
+
+			return
+		end
+
+		None = t2.None
+	end)
+	t4.audioAnimationEnabled = FaceAnimatorService:GetPropertyChangedSignal("AudioAnimationEnabled"):Connect(function() -- line: 117
+		-- upvalues: u16 (ref), t3 (copy), None (ref), FaceAnimatorService (copy), t2 (copy)
+		local elapsed = os.clock()
+
+		if u16 then
+			local v53 = elapsed - u16
+			local v54 = t3
+			local v55 = None
+
+			v54[v55] = v54[v55] + v53
+		end
+
+		u16 = elapsed
+
+		if FaceAnimatorService.VideoAnimationEnabled and FaceAnimatorService.AudioAnimationEnabled then
+			None = t2.AudioVideo
+
+			return
+		end
+
+		if FaceAnimatorService.VideoAnimationEnabled then
+			None = t2.VideoOnly
+
+			return
+		end
+
+		if FaceAnimatorService.AudioAnimationEnabled then
+			None = t2.AudioOnly
+
+			return
+		end
+
+		None = t2.None
+	end)
+
+	local elapsed = os.clock()
+
+	if u16 then
+		local v42 = elapsed - u16
+		local v43 = t3
+		local v44 = None
+
+		v43[v44] = v43[v44] + v42
+	end
+
+	u16 = elapsed
+
+	if FaceAnimatorService.VideoAnimationEnabled and FaceAnimatorService.AudioAnimationEnabled then
+		None = t2.AudioVideo
+	elseif FaceAnimatorService.VideoAnimationEnabled then
+		None = t2.VideoOnly
+	elseif FaceAnimatorService.AudioAnimationEnabled then
+		None = t2.AudioOnly
+	else
+		None = t2.None
+	end
+
+	local v45 = GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec()
+
+	if v45 > 0 and not u12 then
+		u12 = true
+		task.spawn(function() -- line: 80
+			-- upvalues: u12 (ref), reportHeartbeat (copy), v45 (copy)
+			while u12 do
+				reportHeartbeat()
+				task.wait(v45)
+			end
+
+			u12 = false
+		end)
+	end
+end
+function t1.Cleanup() -- line: 125
+	-- upvalues: GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec (copy), t4 (copy), u12 (ref)
+	if GetFIntFacialAnimationStreamingHeartbeatStatsIntervalSec() <= 0 then
+		return
+	end
+
+	for _, v in pairs(t4) do
+		if v then
+			v:Disconnect()
+		end
+	end
+
+	table.clear(t4)
+	u12 = false
+end
+
+return t1

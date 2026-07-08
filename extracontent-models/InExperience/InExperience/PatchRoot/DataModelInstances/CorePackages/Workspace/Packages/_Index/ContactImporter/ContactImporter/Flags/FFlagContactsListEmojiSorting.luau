@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ContactsListEmojiSortingIXP", false);
+return game:DefineFastFlag("ContactsListEmojiSortingIXP", false)

@@ -1,3 +1,3 @@
 return {
-    HorizontalUserList = require(script.HorizontalUserList)
-};
+	HorizontalUserList = require(script.HorizontalUserList)
+}

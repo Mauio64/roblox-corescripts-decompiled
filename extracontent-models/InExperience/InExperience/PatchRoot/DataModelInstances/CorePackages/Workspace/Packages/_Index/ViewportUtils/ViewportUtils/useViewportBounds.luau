@@ -3,170 +3,177 @@ local Display = require(Parent.Display)
 local React = require(Parent.React)
 local Signals = require(Parent.Signals)
 local SignalsReact = require(Parent.SignalsReact)
-local v6 = game:DefineFastFlag("LuaAppFixFrameBoundsImpressions", false)
-local v7 = game:DefineFastInt("LuaAppUpdateImpressionsViewportBoundsPositionThreshold", 50)
-local v8 = game:DefineFastFlag("LuaAppThrottleViewportBoundsScreenSize", false)
-local v9 = game:DefineFastInt("LuaAppViewportBoundsScreenSizeThreshold", 50)
+local SharedFlags = require(Parent.SharedFlags)
+local v7 = game:DefineFastFlag("LuaAppFixFrameBoundsImpressions", false)
+local v8 = game:DefineFastInt("LuaAppUpdateImpressionsViewportBoundsPositionThreshold", 50)
+local v9 = game:DefineFastFlag("LuaAppThrottleViewportBoundsScreenSize", false)
+local v10 = game:DefineFastInt("LuaAppViewportBoundsScreenSizeThreshold", 50)
+local FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions = SharedFlags.FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions
+local v12 = game:DefineFastFlag("LuaAppUseViewportBoundsInsetFix", false)
 
-local function screenSizeBoundsEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 30
-	-- upvalues: v9 (copy)
-	local v17 = v9
+local function boundsEqual(t1: {[any]: any}, t2: {[any]: any}) -- line: 30
+	return t1.min == t2.min and t1.max == t2.max
+end
+local function screenSizeBoundsEqual(t3: {[any]: any}, t4: {[any]: any}) -- line: 34
+	-- upvalues: v10 (copy)
+	local v21 = v10
 
-	return v17 > math.abs(t1.max.X - t2.max.X) and (v17 > math.abs(t1.max.Y - t2.max.Y) and (t1.min.X == t2.min.X and t1.min.Y == t2.min.Y))
+	return v21 > math.abs(t3.max.X - t4.max.X) and (v21 > math.abs(t3.max.Y - t4.max.Y) and (t3.min.X == t4.min.X and t3.min.Y == t4.min.Y))
 end
 
-local t3 = {
+local t5 = {
 	min = Vector2.zero,
 	max = Vector2.zero
 }
 
-local function calculateClampedViewportBounds(vector2: Vector2?, vector2_2: Vector2?, t4: {[any]: any}) -- line: 40
-	-- upvalues: v6 (copy), t3 (copy)
-	local v21 = vector2 or Vector2.zero
-	local v22 = v21 + (vector2_2 or Vector2.zero)
-	local v23 = math.max(t4.min.X, v21.X)
-	local v24 = math.min(t4.max.X, v22.X)
-	local v25 = math.max(t4.min.Y, v21.Y)
-	local v26 = math.min(t4.max.Y, v22.Y)
+local function calculateClampedViewportBounds(vector2: Vector2?, vector2_2: Vector2?, t6: {[any]: any}) -- line: 44
+	-- upvalues: v7 (copy), t5 (copy)
+	local v25 = vector2 or Vector2.zero
+	local v26 = v25 + (vector2_2 or Vector2.zero)
+	local v27 = math.max(t6.min.X, v25.X)
+	local v28 = math.min(t6.max.X, v26.X)
+	local v29 = math.max(t6.min.Y, v25.Y)
+	local v30 = math.min(t6.max.Y, v26.Y)
 
-	if v6 and (v24 <= v23 or v26 <= v25) then
-		return t3
+	if v7 and (v28 <= v27 or v30 <= v29) then
+		return t5
 	end
 
 	return {
-		min = Vector2.new(v23, v25),
-		max = Vector2.new(v24, v26)
+		min = Vector2.new(v27, v29),
+		max = Vector2.new(v28, v30)
 	}
 end
 
-return function(t5: {[any]: any}?) -- line: 61
-	-- upvalues: v8 (copy), React (copy), Signals (copy), Display (copy), screenSizeBoundsEqual (copy), SignalsReact (copy), t3 (copy), v6 (copy), calculateClampedViewportBounds (copy), v7 (copy), v9 (copy)
-	local u29
+return function(t7: {[any]: any}?, b1: boolean?) -- line: 65
+	-- upvalues: v9 (copy), React (copy), Signals (copy), Display (copy), v12 (copy), screenSizeBoundsEqual (copy), SignalsReact (copy), t5 (copy), v7 (copy), calculateClampedViewportBounds (copy), v8 (copy), v10 (copy), FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions (copy)
+	local u34
 
-	if v8 then
-		local v28 = React.useMemo(function() -- line: 65
-			-- upvalues: Signals (copy), Display (copy), screenSizeBoundsEqual (copy)
-			return Signals.createComputed(function(p1) -- line: 66
-				-- upvalues: Display (copy)
-				local v47 = Display.GetDisplayStore(p1)
-				local v48 = v47.getViewportSize(p1)
-				local v49 = v47.getTopBarHeight(p1)
-				local v50 = v47.getGuiInset(p1)
+	if v9 then
+		local v33 = React.useMemo(function() -- line: 69
+			-- upvalues: Signals (copy), Display (copy), v12 (copy), b1 (copy), screenSizeBoundsEqual (copy)
+			return Signals.createComputed(function(p1) -- line: 70
+				-- upvalues: Display (copy), v12 (copy), b1 (copy)
+				local v52 = Display.GetDisplayStore(p1)
+				local v53 = v52.getViewportSize(p1)
+				local v54 = v52.getTopBarHeight(p1)
+				local v55 = if not v12 then v52.getGuiInset(p1) else nil
 
 				return {
-					min = Vector2.new(0, v49),
-					max = Vector2.new(v48.X, v48.Y - v50.bottom)
+					min = Vector2.new(0, v54),
+					max = Vector2.new(v53.X, if not v12 and not b1 then v53.Y - v55.bottom else v53.Y)
 				}
 			end, screenSizeBoundsEqual)
-		end, {})
+		end, { b1 })
 
-		u29 = SignalsReact.useSignalState(v28)
+		u34 = SignalsReact.useSignalState(v33)
 	else
-		local v30 = SignalsReact.useSignalState(function(p2) -- line: 80
+		local v35 = SignalsReact.useSignalState(function(p2) -- line: 91
 			-- upvalues: Display (copy)
 			return Display.GetDisplayStore(p2).getViewportSize(p2)
 		end)
-		local v31 = SignalsReact.useSignalState(function(p3) -- line: 83
+		local v36 = SignalsReact.useSignalState(function(p3) -- line: 94
 			-- upvalues: Display (copy)
 			return Display.GetDisplayStore(p3).getTopBarHeight(p3)
 		end)
-		local v32 = SignalsReact.useSignalState(function(p4) -- line: 86
+		local v37 = if not v12 then SignalsReact.useSignalState(function(p4) -- line: 99
 			-- upvalues: Display (copy)
 			return Display.GetDisplayStore(p4).getGuiInset(p4)
-		end)
+		end) else nil
 
-		u29 = React.useMemo(function() -- line: 90
-			-- upvalues: v31 (copy), v30 (copy), v32 (copy)
+		u34 = React.useMemo(function() -- line: 104
+			-- upvalues: v36 (copy), v35 (copy), v12 (copy), b1 (copy), v37 (copy)
 			return {
-				min = Vector2.new(0, v31),
-				max = Vector2.new(v30.X, v30.Y - v32.bottom)
+				min = Vector2.new(0, v36),
+				max = Vector2.new(v35.X, if not v12 and not b1 then v35.Y - v37.bottom else v35.Y)
 			}
 		end, {
-			v31,
-			v30,
-			v32
+			v36,
+			v35,
+			if not v12 then v37 else nil,
+			b1
 		})
 	end
 
-	local v33, v34 = React.useState(t3)
-	local v35 = if not v6 then v34 else React.useCallback(function(t6: {[any]: any}) -- line: 101
-		-- upvalues: v34 (copy)
-		v34(function(t7: {[any]: any}) -- line: 102
-			-- upvalues: t6 (copy)
-			local v52 = t6
+	local v38, v39 = React.useState(t5)
+	local v40 = if not v7 then v39 else React.useCallback(function(t8: {[any]: any}) -- line: 127
+		-- upvalues: v39 (copy)
+		v39(function(t9: {[any]: any}) -- line: 128
+			-- upvalues: t8 (copy)
+			local v57 = t8
 
-			if t7.min == v52.min and t7.max == v52.max then
-				return t7
+			if t9.min == v57.min and t9.max == v57.max then
+				return t9
 			end
 
-			return t6
+			return t8
 		end)
 	end, {})
 
-	React.useEffect(function() -- line: 111
-		-- upvalues: t5 (copy), v6 (copy), v8 (copy), v35 (copy), calculateClampedViewportBounds (copy), u29 (ref), v7 (copy), v9 (copy)
-		local t8 = {}
+	React.useEffect(function() -- line: 137
+		-- upvalues: t7 (copy), v7 (copy), v9 (copy), v40 (copy), calculateClampedViewportBounds (copy), u34 (ref), v8 (copy), v10 (copy)
+		local t10 = {}
 		local current = nil
 
-		if t5 then
-			current = t5.current
+		if t7 then
+			current = t7.current
 		end
 
 		if current then
 			local AbsolutePosition = current.AbsolutePosition
 			local AbsoluteSize = current.AbsoluteSize
-			local u44 = if not v6 then nil else AbsolutePosition
-			local u45 = if not v8 then nil else AbsoluteSize
+			local u49 = if not v7 then nil else AbsolutePosition
+			local u50 = if not v9 then nil else AbsoluteSize
 
-			v35((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u29)))
-			table.insert(t8, current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 134
-				-- upvalues: AbsolutePosition (ref), current (ref), v6 (copy), v7 (copy), u44 (ref), v35 (copy), calculateClampedViewportBounds (copy), AbsoluteSize (ref), u29 (ref)
+			v40((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u34)))
+			table.insert(t10, current:GetPropertyChangedSignal("AbsolutePosition"):Connect(function() -- line: 160
+				-- upvalues: AbsolutePosition (ref), current (ref), v7 (copy), v8 (copy), u49 (ref), v40 (copy), calculateClampedViewportBounds (copy), AbsoluteSize (ref), u34 (ref)
 				AbsolutePosition = current.AbsolutePosition
 
-				if v6 then
-					local v53 = v7
-					local v54 = AbsolutePosition - u44
+				if v7 then
+					local v58 = v8
+					local v59 = AbsolutePosition - u49
 
-					if v53 > math.abs(v54.X) and v53 > math.abs(v54.Y) then
+					if v58 > math.abs(v59.X) and v58 > math.abs(v59.Y) then
 						return
 					end
 
-					u44 = AbsolutePosition
+					u49 = AbsolutePosition
 				end
 
-				v35((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u29)))
+				v40((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u34)))
 			end))
-			table.insert(t8, current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 157
-				-- upvalues: AbsoluteSize (ref), current (ref), v8 (copy), v9 (copy), u45 (ref), v35 (copy), calculateClampedViewportBounds (copy), AbsolutePosition (ref), u29 (ref)
+			table.insert(t10, current:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- line: 183
+				-- upvalues: AbsoluteSize (ref), current (ref), v9 (copy), v10 (copy), u50 (ref), v40 (copy), calculateClampedViewportBounds (copy), AbsolutePosition (ref), u34 (ref)
 				AbsoluteSize = current.AbsoluteSize
 
-				if v8 then
-					local v55 = v9
-					local v56 = AbsoluteSize - u45
+				if v9 then
+					local v60 = v10
+					local v61 = AbsoluteSize - u50
 
-					if v55 > math.abs(v56.X) and v55 > math.abs(v56.Y) then
+					if v60 > math.abs(v61.X) and v60 > math.abs(v61.Y) then
 						return
 					end
 
-					u45 = AbsoluteSize
+					u50 = AbsoluteSize
 				end
 
-				v35((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u29)))
+				v40((calculateClampedViewportBounds(AbsolutePosition, AbsoluteSize, u34)))
 			end))
 		else
-			v35(u29)
+			v40(u34)
 		end
 
-		return function() -- line: 178
-			-- upvalues: t8 (copy)
-			for _, v58 in t8 do
-				v58:Disconnect()
+		return function() -- line: 204
+			-- upvalues: t10 (copy)
+			for _, v63 in t10 do
+				v63:Disconnect()
 			end
 		end
 	end, {
-		t5,
-		u29
+		t7,
+		u34
 	})
 
-	return v33
+	return v38, if not FFlagLuaAppUseScreenFillBoundsForFrameBoundsImpressions then nil else u34
 end

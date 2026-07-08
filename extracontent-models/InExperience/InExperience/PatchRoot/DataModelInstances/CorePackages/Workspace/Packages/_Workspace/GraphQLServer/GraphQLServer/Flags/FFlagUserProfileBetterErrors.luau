@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UserProfileBetterErrors", true);
+return game:DefineFastFlag("UserProfileBetterErrors", true)

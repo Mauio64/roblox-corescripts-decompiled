@@ -1,110 +1,114 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local l_memo_0 = v3.memo;
-local l_ImageSetLabel_0 = require(l_Parent_0.UIBlox).Core.ImageSet.ImageSetLabel;
-local v6 = require(script.Parent.BaseCell);
-local l_TestStyle_0 = require(l_script_FirstAncestor_0.SocialLibraries).Components.TestStyle;
-local _ = require(l_script_FirstAncestor_0.types);
-local v9 = {
-    Text = "titleText", 
-    primaryIconSize = 32, 
-    isDisabled = false, 
-    Size = UDim2.new(1, 0, 1, 0), 
-    onActivated = function() --[[ Line: 44 ]] --[[ Name: onActivated ]]
-        print("IconWithTextCell onActivated");
-    end, 
-    secondaryIcon = "", 
-    secondaryIconSize = 24, 
-    iconCellWidth = 60, 
-    LayoutOrder = 0, 
-    style = v2.Dictionary.join(l_TestStyle_0, {
-        Tokens = {
-            Global = {
-                Color = {
-                    None = {}
-                }
-            }
-        }
-    }), 
-    showDivider = true
-};
-return l_memo_0(function(v10) --[[ Line: 67 ]] --[[ Name: IconWithTextCell ]]
-    -- upvalues: v2 (copy), v9 (copy), v3 (copy), v6 (copy), l_ImageSetLabel_0 (copy)
-    local v11 = v2.Dictionary.join(v9, v10);
-    local l_style_0 = v11.style;
-    local l_Theme_0 = l_style_0.Theme;
-    local l_Font_0 = l_style_0.Font;
-    local v15 = v11.primaryIcon == nil;
-    return v3.createElement(v6, {
-        Size = v11.Size, 
-        BackgroundColor3 = l_Theme_0.BackgroundDefault.Color, 
-        BackgroundTransparency = l_style_0.Tokens.Global.Color.None.Transparency, 
-        onPressedBackgroundColor3 = l_Theme_0.BackgroundOnPress.Color, 
-        onPressedBackgroundTransparency = l_Theme_0.BackgroundOnPress.Transparency, 
-        LayoutOrder = v11.LayoutOrder, 
-        onActivated = v11.onActivated, 
-        showDivider = v11.showDivider, 
-        dividerColor3 = l_Theme_0.Divider.Color, 
-        dividerTransparency = l_Theme_0.Divider.Transparency, 
-        isDisabled = v11.isDisabled, 
-        avatarCircleCellWidth = v11.iconCellWidth, 
-        testId = v10.testId
-    }, {
-        leftFrame = v3.createElement("Frame", {
-            AnchorPoint = Vector2.new(0, 0.5), 
-            Position = UDim2.fromScale(0, 0.5), 
-            Size = UDim2.new(1, -v11.iconCellWidth, 1, 0), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1
-        }, {
-            leftListLayout = v3.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal, 
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                VerticalAlignment = Enum.VerticalAlignment.Center
-            }), 
-            imageFrame = if not v15 then v3.createElement("Frame", {
-                Size = UDim2.new(0, v11.iconCellWidth, 0, v11.primaryIconSize), 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 1
-            }, {
-                primaryIcon = v3.createElement(l_ImageSetLabel_0, {
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Image = v11.primaryIcon, 
-                    BorderSizePixel = 0, 
-                    Size = UDim2.new(0, v11.primaryIconSize, 0, v11.primaryIconSize), 
-                    ImageColor3 = l_Theme_0.IconEmphasis.Color, 
-                    BackgroundTransparency = 1
-                })
-            }) else nil, 
-            text = v3.createElement("TextLabel", {
-                Size = UDim2.new(1, v15 and 0 or -v11.iconCellWidth, 1, 0), 
-                Text = v11.Text, 
-                TextSize = l_Font_0.Header2.RelativeSize * l_Font_0.BaseSize, 
-                Font = l_Font_0.Header2.Font, 
-                TextColor3 = l_Theme_0.TextEmphasis.Color, 
-                TextXAlignment = Enum.TextXAlignment.Left, 
-                TextTruncate = Enum.TextTruncate.AtEnd, 
-                BackgroundTransparency = 1, 
-                LayoutOrder = 2
-            })
-        }), 
-        rightFrame = v3.createElement("Frame", {
-            AnchorPoint = Vector2.new(1, 0.5), 
-            Position = UDim2.fromScale(1, 0.5), 
-            Size = UDim2.fromOffset(v11.iconCellWidth, v11.iconCellWidth), 
-            BackgroundTransparency = 1, 
-            LayoutOrder = 1
-        }, {
-            secondaryIcon = v11.secondaryIcon and v3.createElement("ImageLabel", {
-                Position = UDim2.fromScale(0.5, 0.5), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = v11.secondaryIcon, 
-                BackgroundTransparency = 1, 
-                Size = UDim2.fromOffset(v11.secondaryIconSize, v11.secondaryIconSize)
-            })
-        })
-    });
-end);
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Cryo = require(AppChatParent.Cryo)
+local React = require(AppChatParent.React)
+local memo = React.memo
+local ImageSetLabel = require(AppChatParent.UIBlox).Core.ImageSet.ImageSetLabel
+local BaseCell = require(script.Parent.BaseCell)
+local TestStyle = require(AppChat.SocialLibraries).Components.TestStyle
+
+require(AppChat.types)
+
+local t1 = {
+	Text = "titleText",
+	primaryIconSize = 32,
+	isDisabled = false,
+	secondaryIcon = "",
+	secondaryIconSize = 24,
+	iconCellWidth = 60,
+	LayoutOrder = 0,
+	showDivider = true,
+	Size = UDim2.new(1, 0, 1, 0),
+	onActivated = function() -- line: 44
+		print("IconWithTextCell onActivated")
+	end,
+	style = Cryo.Dictionary.join(TestStyle, {
+		Tokens = {
+			Color = {
+				None = {}
+			}
+		}
+	})
+}
+
+local function IconWithTextCell(t2: {[any]: any}) -- line: 65
+	-- upvalues: Cryo (copy), t1 (copy), React (copy), BaseCell (copy), ImageSetLabel (copy)
+	local v12 = Cryo.Dictionary.join(t1, t2)
+	local style = v12.style
+	local Theme = style.Theme
+	local styleFont = style.Font
+	local v16 = v12.primaryIcon == nil
+
+	return React.createElement(BaseCell, {
+		Size = v12.Size,
+		BackgroundColor3 = Theme.BackgroundDefault.Color,
+		BackgroundTransparency = style.Tokens.Color.None.Transparency,
+		onPressedBackgroundColor3 = Theme.BackgroundOnPress.Color,
+		onPressedBackgroundTransparency = Theme.BackgroundOnPress.Transparency,
+		LayoutOrder = v12.LayoutOrder,
+		onActivated = v12.onActivated,
+		showDivider = v12.showDivider,
+		dividerColor3 = Theme.Divider.Color,
+		dividerTransparency = Theme.Divider.Transparency,
+		isDisabled = v12.isDisabled,
+		avatarCircleCellWidth = v12.iconCellWidth,
+		testId = t2.testId
+	}, {
+		leftFrame = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.fromScale(0, 0.5),
+			Size = UDim2.new(1, -v12.iconCellWidth, 1, 0)
+		}, {
+			leftListLayout = React.createElement("UIListLayout", {
+				FillDirection = Enum.FillDirection.Horizontal,
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				VerticalAlignment = Enum.VerticalAlignment.Center
+			}),
+			imageFrame = if v16 then nil else React.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(0, v12.iconCellWidth, 0, v12.primaryIconSize)
+			}, {
+				primaryIcon = React.createElement(ImageSetLabel, {
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					Position = UDim2.fromScale(0.5, 0.5),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Image = v12.primaryIcon,
+					Size = UDim2.new(0, v12.primaryIconSize, 0, v12.primaryIconSize),
+					ImageColor3 = Theme.IconEmphasis.Color
+				})
+			}),
+			text = React.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, if not v16 then -v12.iconCellWidth else 0, 1, 0),
+				Text = v12.Text,
+				TextSize = styleFont.Header2.RelativeSize * styleFont.BaseSize,
+				Font = styleFont.Header2.Font,
+				TextColor3 = Theme.TextEmphasis.Color,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextTruncate = Enum.TextTruncate.AtEnd
+			})
+		}),
+		rightFrame = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.fromScale(1, 0.5),
+			Size = UDim2.fromOffset(v12.iconCellWidth, v12.iconCellWidth)
+		}, {
+			secondaryIcon = v12.secondaryIcon and React.createElement("ImageLabel", {
+				BackgroundTransparency = 1,
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = v12.secondaryIcon,
+				Size = UDim2.fromOffset(v12.secondaryIconSize, v12.secondaryIconSize)
+			})
+		})
+	})
+end
+
+return memo(IconWithTextCell)

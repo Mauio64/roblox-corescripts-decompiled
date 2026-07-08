@@ -1,3 +1,5 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getFetchName ]]
-    return (("search.%*.%*"):format(v0, v1));
-end;
+local function getFetchName(s1: string, s2: string) -- line: 1
+	return `search.{ s1 }.{ s2 }`
+end
+
+return getFetchName

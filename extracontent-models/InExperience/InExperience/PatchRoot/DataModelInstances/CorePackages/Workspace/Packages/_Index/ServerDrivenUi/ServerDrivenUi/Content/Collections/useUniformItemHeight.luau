@@ -1,56 +1,64 @@
-local l_Parent_0 = script:FindFirstAncestor("ServerDrivenUi").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 21 ]] --[[ Name: useUniformItemHeight ]]
-    -- upvalues: v1 (copy)
-    local v3 = v1.useRef({});
-    local v4 = v1.useRef(false);
-    local v5 = v1.useRef(0);
-    local v6, v7 = v1.useState(nil);
-    local v8, v9 = v1.useBinding(nil);
-    local v17 = v1.useCallback(function(v10, v11) --[[ Line: 29 ]]
-        -- upvalues: v2 (copy), v5 (copy), v3 (copy), v7 (copy), v9 (copy), v4 (copy)
-        if not v2 then
-            return;
-        else
-            local l_X_0 = v11.AbsoluteSize.X;
-            local l_Y_0 = v11.AbsoluteSize.Y;
-            if v5.current > 0 and math.abs(l_X_0 - v5.current) > 1 then
-                v5.current = l_X_0;
-                v3.current = {};
-                v7(nil);
-                v9(nil);
-                return;
-            else
-                v5.current = l_X_0;
-                if l_Y_0 <= 0 or v3.current[v10] == l_Y_0 then
-                    return;
-                else
-                    v3.current[v10] = l_Y_0;
-                    if not v4.current then
-                        v4.current = true;
-                        task.defer(function() --[[ Line: 53 ]]
-                            -- upvalues: v4 (ref), v3 (ref), v9 (ref), v7 (ref)
-                            v4.current = false;
-                            local v14 = 0;
-                            for _, v16 in v3.current do
-                                v14 = math.max(v14, v16);
-                            end;
-                            if v14 > 0 then
-                                v9(v14);
-                                v7(v14);
-                            end;
-                        end);
-                    end;
-                    return;
-                end;
-            end;
-        end;
-    end, {
-        v2
-    });
-    return {
-        measuredMaxHeight = if v2 then v6 else nil, 
-        measuredMaxHeightBinding = if v2 then v8 else nil, 
-        onItemSizeChanged = if v2 then v17 else nil
-    };
-end;
+local Parent = script:FindFirstAncestor("ServerDrivenUi").Parent
+local React = require(Parent.React)
+
+local function useUniformItemHeight(b1: boolean) -- line: 21
+	-- upvalues: React (copy)
+	local v5 = React.useRef({})
+	local v6 = React.useRef(false)
+	local v7 = React.useRef(0)
+	local v8, v9 = React.useState(nil)
+	local v10, v11 = React.useBinding(nil)
+	local v12 = React.useCallback(function(n1: number, p1) -- line: 29
+		-- upvalues: b1 (copy), v7 (copy), v5 (copy), v9 (copy), v11 (copy), v6 (copy)
+		if not b1 then
+			return
+		end
+
+		local AbsoluteSizeX = p1.AbsoluteSize.X
+		local AbsoluteSizeY = p1.AbsoluteSize.Y
+
+		if v7.current > 0 and math.abs(AbsoluteSizeX - v7.current) > 1 then
+			v7.current = AbsoluteSizeX
+			v5.current = {}
+			v9(nil)
+			v11(nil)
+
+			return
+		end
+
+		v7.current = AbsoluteSizeX
+
+		if AbsoluteSizeY <= 0 or AbsoluteSizeY == v5.current[n1] then
+			return
+		end
+
+		v5.current[n1] = AbsoluteSizeY
+
+		if not v6.current then
+			v6.current = true
+			task.defer(function() -- line: 53
+				-- upvalues: v6 (copy), v5 (copy), v11 (copy), v9 (copy)
+				v6.current = false
+
+				local n2 = 0
+
+				for _, v19 in v5.current do
+					n2 = math.max(n2, v19)
+				end
+
+				if n2 > 0 then
+					v11(n2)
+					v9(n2)
+				end
+			end)
+		end
+	end, { b1 })
+
+	return {
+		measuredMaxHeight = if not b1 then nil else v8,
+		measuredMaxHeightBinding = if not b1 then nil else v10,
+		onItemSizeChanged = if not b1 then nil else v12
+	}
+end
+
+return useUniformItemHeight

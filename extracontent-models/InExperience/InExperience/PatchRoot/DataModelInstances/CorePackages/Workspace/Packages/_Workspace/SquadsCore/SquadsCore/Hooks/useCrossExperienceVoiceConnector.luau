@@ -13,7 +13,6 @@ local useCurrentSquadId = require(SquadsCore.Hooks.useCurrentSquadId)
 local CrossExperienceVoice = require(SquadsCoreParent.CrossExperienceVoice)
 local LuauPolyfill = require(SquadsCoreParent.LuauPolyfill)
 local React = require(SquadsCoreParent.React)
-local dependencyArray = require(SquadsCoreParent.RoactUtils).Hooks.dependencyArray
 local useDispatch = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useDispatch
 local useStore = require(SquadsCoreParent.RoactUtils).Hooks.RoactRodux.useStore
 local SharedFlags = require(SquadsCoreParent.SharedFlags)
@@ -26,66 +25,65 @@ local useIsBackgroundDMActive = CrossExperienceVoice.Hooks.useIsBackgroundDMActi
 local useIsVoiceRetriableError = CrossExperienceVoice.Hooks.useIsVoiceRetriableError
 local SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY = require(SquadsCore.Common.Constants).SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY
 local SQUAD_VOICE_EU_MODAL_SEEN_KEY = require(SquadsCore.Common.Constants).SQUAD_VOICE_EU_MODAL_SEEN_KEY
-local v29 = game:DefineFastFlag("EnableDisconnectPartyVoiceIfNeeded", false)
-local v30 = game:DefineFastFlag("EnablePartyVoiceRestrictionStatus", false)
-local FFlagRemoveDependencyArrayAntipattern = SharedFlags.FFlagRemoveDependencyArrayAntipattern
-local v32 = game:DefineFastInt("PartyVoiceRestrictionStatusMaxAttempts", 10)
+local v28 = game:DefineFastFlag("EnableDisconnectPartyVoiceIfNeeded", false)
+local v29 = game:DefineFastFlag("EnablePartyVoiceRestrictionStatus", false)
+local v30 = game:DefineFastInt("PartyVoiceRestrictionStatusMaxAttempts", 10)
 
-function useCrossExperienceVoiceConnector() -- line: 46
-	-- upvalues: Players (copy), useCurrentSquadId (copy), useCurrentSquadMember (copy), useDispatch (copy), React (copy), SquadExternalContractContext (copy), useStore (copy), useIsCurrentSquadPartyVoiceEligible (copy), useIsBackgroundDMActive (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsVoiceRetriableError (copy), v30 (copy), ThirdPartyUserService (copy), v29 (copy), v32 (copy), setInterval (copy), clearInterval (copy), FFlagEnableVoiceEuConsentPrompt (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), FFlagRemoveDependencyArrayAntipattern (copy), dependencyArray (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), displayEuConsentPrompt (copy), default (copy), SquadPromptType (copy), getFFlagEnableCrossExpVoiceMemoryCheck (copy)
-	local v33 = Players and (not not Players.LocalPlayer and Players.LocalPlayer.UserId) or 0
-	local v34 = useCurrentSquadId() or ""
-	local v35 = useCurrentSquadMember(v33)
-	local v36 = useDispatch()
-	local v37 = React.useContext(SquadExternalContractContext)
-	local v38 = useStore()
-	local v39 = React.useRef(nil)
-	local v40 = useIsCurrentSquadPartyVoiceEligible()
-	local v41 = useIsBackgroundDMActive()
-	local v42, v43 = useIsLocalPlayerPartyVoiceEligible()
-	local v44 = useIsVoiceRetriableError()
-	local u45 = nil
-	local u46 = nil
+function useCrossExperienceVoiceConnector() -- line: 43
+	-- upvalues: Players (copy), useCurrentSquadId (copy), useCurrentSquadMember (copy), useDispatch (copy), React (copy), SquadExternalContractContext (copy), useStore (copy), useIsCurrentSquadPartyVoiceEligible (copy), useIsBackgroundDMActive (copy), useIsLocalPlayerPartyVoiceEligible (copy), useIsVoiceRetriableError (copy), v29 (copy), ThirdPartyUserService (copy), v28 (copy), v30 (copy), setInterval (copy), clearInterval (copy), FFlagEnableVoiceEuConsentPrompt (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), displayEuConsentPrompt (copy), default (copy), SquadPromptType (copy), getFFlagEnableCrossExpVoiceMemoryCheck (copy)
+	local v31 = Players and (not not Players.LocalPlayer and Players.LocalPlayer.UserId) or 0
+	local v32 = useCurrentSquadId() or ""
+	local v33 = useCurrentSquadMember(v31)
+	local v34 = useDispatch()
+	local v35 = React.useContext(SquadExternalContractContext)
+	local v36 = useStore()
+	local v37 = React.useRef(nil)
+	local v38 = useIsCurrentSquadPartyVoiceEligible()
+	local v39 = useIsBackgroundDMActive()
+	local v40, v41 = useIsLocalPlayerPartyVoiceEligible()
+	local v42 = useIsVoiceRetriableError()
+	local u43 = nil
+	local u44 = nil
 
-	if v30 then
-		local v47, v48 = React.useState(if not ThirdPartyUserService or not ThirdPartyUserService:IsChatRestrictionSupported() then Enum.ChatRestrictionStatus.NotRestricted else ThirdPartyUserService:GetVoiceChatRestrictionStatus())
+	if v29 then
+		local v45, v46 = React.useState(if not ThirdPartyUserService or not ThirdPartyUserService:IsChatRestrictionSupported() then Enum.ChatRestrictionStatus.NotRestricted else ThirdPartyUserService:GetVoiceChatRestrictionStatus())
 
-		u45 = v47
-		u46 = v48
+		u43 = v45
+		u44 = v46
 	end
 
-	local v49, v50 = React.useState(false)
-	local v51 = v34 and (v34 ~= "" and (v35 and (not v41 and (v40 and (v42 and (not v44 and (not v30 or Enum.ChatRestrictionStatus.NotRestricted == u45)))))))
-	local v52 = not not v29 and ((not v34 or (v34 == "" or (not v35 or (v40 == false or (not v43 and not v42 or v44))))) and v41)
+	local v47, v48 = React.useState(false)
+	local v49 = v32 and (v32 ~= "" and (v33 and (not v39 and (v38 and (v40 and (not v42 and (not v29 or u43 == Enum.ChatRestrictionStatus.NotRestricted)))))))
+	local v50 = not not v28 and ((not v32 or (v32 == "" or (not v33 or (v38 == false or (not v41 and not v40 or v42))))) and v39)
 
-	if v30 then
-		React.useEffect(function() -- line: 95
-			-- upvalues: u45 (ref), ThirdPartyUserService (copy), u46 (ref), v32 (copy), setInterval (copy), clearInterval (copy)
-			if u45 ~= Enum.ChatRestrictionStatus.Unknown then
+	if v29 then
+		React.useEffect(function() -- line: 92
+			-- upvalues: u43 (ref), ThirdPartyUserService (copy), u44 (ref), v30 (copy), setInterval (copy), clearInterval (copy)
+			if u43 ~= Enum.ChatRestrictionStatus.Unknown then
 				return
 			end
 
 			if not ThirdPartyUserService or not ThirdPartyUserService:IsChatRestrictionSupported() then
-				u46(Enum.ChatRestrictionStatus.NotRestricted)
+				u44(Enum.ChatRestrictionStatus.NotRestricted)
 
 				return
 			end
 
 			local n1 = 0
-			local v56 = setInterval(function() -- line: 106
-				-- upvalues: n1 (ref), ThirdPartyUserService (copy), u46 (ref), v32 (copy)
+			local v54 = setInterval(function() -- line: 103
+				-- upvalues: n1 (ref), ThirdPartyUserService (copy), u44 (ref), v30 (copy)
 				n1 += 1
 
 				local VoiceChatRestrictionStatus = ThirdPartyUserService:GetVoiceChatRestrictionStatus()
 
 				if VoiceChatRestrictionStatus == Enum.ChatRestrictionStatus.NotRestricted or VoiceChatRestrictionStatus == Enum.ChatRestrictionStatus.Restricted then
-					u46(VoiceChatRestrictionStatus)
+					u44(VoiceChatRestrictionStatus)
 
 					return
 				end
 
-				if n1 >= v32 then
-					u46(Enum.ChatRestrictionStatus.Restricted)
+				if n1 >= v30 then
+					u44(Enum.ChatRestrictionStatus.Restricted)
 				end
 			end, 4000)
 
@@ -94,74 +92,74 @@ function useCrossExperienceVoiceConnector() -- line: 46
 			local VoiceChatRestrictionStatus = ThirdPartyUserService:GetVoiceChatRestrictionStatus()
 
 			if VoiceChatRestrictionStatus == Enum.ChatRestrictionStatus.NotRestricted or VoiceChatRestrictionStatus == Enum.ChatRestrictionStatus.Restricted then
-				u46(VoiceChatRestrictionStatus)
-			elseif v32 <= n1 then
-				u46(Enum.ChatRestrictionStatus.Restricted)
+				u44(VoiceChatRestrictionStatus)
+			elseif v30 <= n1 then
+				u44(Enum.ChatRestrictionStatus.Restricted)
 			end
 
-			return function() -- line: 123
-				-- upvalues: clearInterval (copy), v56 (copy)
-				clearInterval(v56)
+			return function() -- line: 120
+				-- upvalues: clearInterval (copy), v54 (copy)
+				clearInterval(v54)
 			end
-		end, { u45 })
+		end, { u43 })
 	end
 
-	React.useEffect(function() -- line: 131
-		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), v51 (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), v33 (copy), v50 (copy)
-		if FFlagEnableVoiceEuConsentPrompt and (v51 and getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY)[tostring(v33)]) then
-			v50(true)
+	React.useEffect(function() -- line: 127
+		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), v49 (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), v31 (copy), v48 (copy)
+		if FFlagEnableVoiceEuConsentPrompt and (v49 and getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY)[tostring(v31)]) then
+			v48(true)
 		end
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v33, v51) else {
-		v33,
-		v51
+	end, {
+		v31,
+		v49
 	})
-	React.useEffect(function() -- line: 147
-		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), v51 (copy), v33 (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), v36 (copy), displayEuConsentPrompt (copy), v37 (copy)
-		if FFlagEnableVoiceEuConsentPrompt and v51 then
-			local str = tostring(v33)
-			local v59 = getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY)
+	React.useEffect(function() -- line: 138
+		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), v49 (copy), v31 (copy), getTableAppStorageKey (copy), SQUAD_VOICE_EU_MODAL_SEEN_KEY (copy), SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY (copy), v34 (copy), displayEuConsentPrompt (copy), v35 (copy)
+		if FFlagEnableVoiceEuConsentPrompt and v49 then
+			local str = tostring(v31)
+			local v57 = getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_SEEN_KEY)
 
-			if not v59[str] then
-				local v60 = getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY)
+			if not v57[str] then
+				local v58 = getTableAppStorageKey(SQUAD_VOICE_EU_MODAL_CONSENT_GIVEN_KEY)
 
-				v36(displayEuConsentPrompt(v37.setSquadPrompt, str, v59, v60))
+				v34(displayEuConsentPrompt(v35.setSquadPrompt, str, v57, v58))
 			end
 		end
-	end, if not FFlagRemoveDependencyArrayAntipattern then dependencyArray(v33, displayEuConsentPrompt, v51, v37.setSquadPrompt) else {
-		v33,
+	end, {
+		v31,
 		displayEuConsentPrompt,
-		v51,
-		v37.setSquadPrompt
+		v49,
+		v35.setSquadPrompt
 	})
-	React.useEffect(function() -- line: 179
-		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), default (copy), v50 (copy)
+	React.useEffect(function() -- line: 161
+		-- upvalues: FFlagEnableVoiceEuConsentPrompt (copy), default (copy), v48 (copy)
 		if FFlagEnableVoiceEuConsentPrompt then
-			local connection = default.VoiceEuModalConsented.Event:Connect(function() -- line: 182
-				-- upvalues: v50 (copy)
-				v50(true)
+			local connection = default.VoiceEuModalConsented.Event:Connect(function() -- line: 164
+				-- upvalues: v48 (copy)
+				v48(true)
 			end)
 
-			return function() -- line: 186
+			return function() -- line: 168
 				-- upvalues: connection (copy)
 				connection:Disconnect()
 			end
 		end
 
-		return function() -- line: 190
+		return function() -- line: 172
 		end
 	end, {})
-	React.useEffect(function() -- line: 193
-		-- upvalues: v41 (copy), default (copy)
-		if v41 then
+	React.useEffect(function() -- line: 175
+		-- upvalues: v39 (copy), default (copy)
+		if v39 then
 			default:setAsConnected()
 
 			return
 		end
 
 		default:setAsDisconnected()
-	end, { v41 })
+	end, { v39 })
 
-	local v53 = React.useCallback(function(s1: string, b1: boolean?, b2: boolean?) -- line: 201
+	local v51 = React.useCallback(function(s1: string, b1: boolean?, b2: boolean?) -- line: 183
 		-- upvalues: default (copy)
 		default:join({
 			partyId = s1,
@@ -170,81 +168,81 @@ function useCrossExperienceVoiceConnector() -- line: 46
 		})
 	end, {})
 
-	React.useEffect(function() -- line: 210
-		-- upvalues: v51 (copy), FFlagEnableVoiceEuConsentPrompt (copy), v49 (copy), default (copy), v53 (copy), v34 (copy), v37 (copy), v38 (copy), SquadPromptType (copy)
-		if not v51 or FFlagEnableVoiceEuConsentPrompt and not v49 then
+	React.useEffect(function() -- line: 192
+		-- upvalues: v49 (copy), FFlagEnableVoiceEuConsentPrompt (copy), v47 (copy), default (copy), v51 (copy), v32 (copy), v35 (copy), v36 (copy), SquadPromptType (copy)
+		if not v49 or FFlagEnableVoiceEuConsentPrompt and not v47 then
 			return
 		end
 
 		if default:performJoinFeasibilityCheck() then
-			v53(v34)
+			v51(v32)
 
 			return
 		end
 
-		v37.setSquadPrompt(v38, {
+		v35.setSquadPrompt(v36, {
 			hideCancelButton = false,
 			promptType = SquadPromptType.JoinWithLowMemory,
-			onConfirm = function() --[[ onConfirm ]] -- line: 223
+			onConfirm = function() -- line: 205
 			end,
-			onCancel = function() --[[ onCancel ]] -- line: 224
-				-- upvalues: v53 (copy), v34 (copy)
-				v53(v34, true, true)
+			onCancel = function() -- line: 206
+				-- upvalues: v51 (copy), v32 (copy)
+				v51(v32, true, true)
 			end
 		})
 	end, {
-		v51,
-		if not FFlagEnableVoiceEuConsentPrompt then nil else v49
+		v49,
+		if not FFlagEnableVoiceEuConsentPrompt then nil else v47
 	})
 
-	local v54 = React.useCallback(function() -- line: 233
+	local v52 = React.useCallback(function() -- line: 215
 		-- upvalues: default (copy)
 		default:leave()
 	end, {})
 
-	React.useEffect(function() -- line: 237
-		-- upvalues: v29 (copy), v52 (copy), v54 (copy)
-		if v29 and v52 then
-			v54()
+	React.useEffect(function() -- line: 219
+		-- upvalues: v28 (copy), v50 (copy), v52 (copy)
+		if v28 and v50 then
+			v52()
 		end
 	end, {
-		v52,
-		v54
+		v50,
+		v52
 	})
-	React.useEffect(function() -- line: 244
-		-- upvalues: getFFlagEnableCrossExpVoiceMemoryCheck (copy), v39 (copy), default (copy), v37 (copy), v38 (copy), SquadPromptType (copy), v54 (copy)
+	React.useEffect(function() -- line: 226
+		-- upvalues: getFFlagEnableCrossExpVoiceMemoryCheck (copy), v37 (copy), default (copy), v35 (copy), v36 (copy), SquadPromptType (copy), v52 (copy)
 		if not getFFlagEnableCrossExpVoiceMemoryCheck() then
-			return function() -- line: 246
+			return function() -- line: 228
 			end
 		end
 
-		v39.current = default.MemoryLow.Event:Connect(function() -- line: 256
-			-- upvalues: v39 (copy), v37 (copy), v38 (copy), SquadPromptType (copy), v54 (copy)
-			if v39.current then
-				v39.current:Disconnect()
-				v39.current = nil
+		v37.current = default.MemoryLow.Event:Connect(function() -- line: 238
+			-- upvalues: v37 (copy), v35 (copy), v36 (copy), SquadPromptType (copy), v52 (copy)
+			if v37.current then
+				v37.current:Disconnect()
+				v37.current = nil
 			end
 
-			v37.setSquadPrompt(v38, {
+			v35.setSquadPrompt(v36, {
 				hideCancelButton = false,
 				promptType = SquadPromptType.DisconnectVoiceDueToLowMemory,
-				onConfirm = function() --[[ onConfirm ]] -- line: 263
-					-- upvalues: v54 (copy)
-					v54()
+				onConfirm = function() -- line: 245
+					-- upvalues: v52 (copy)
+					v52()
 				end
 			})
 		end)
 
-		return function() -- line: 268
-			-- upvalues: v39 (copy)
-			if v39.current then
-				v39.current:Disconnect()
-				v39.current = nil
+		return function() -- line: 250
+			-- upvalues: v37 (copy)
+			if v37.current then
+				v37.current:Disconnect()
+				v37.current = nil
 			end
 		end
 	end)
 
-	return v54
+	return v52
 end
 
 return useCrossExperienceVoiceConnector

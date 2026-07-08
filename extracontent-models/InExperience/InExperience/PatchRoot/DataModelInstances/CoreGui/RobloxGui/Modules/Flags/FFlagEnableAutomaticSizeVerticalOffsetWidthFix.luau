@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableAutomaticSizeVerticalOffsetWidthFix", false);
+return game:DefineFastFlag("EnableAutomaticSizeVerticalOffsetWidthFix", false)

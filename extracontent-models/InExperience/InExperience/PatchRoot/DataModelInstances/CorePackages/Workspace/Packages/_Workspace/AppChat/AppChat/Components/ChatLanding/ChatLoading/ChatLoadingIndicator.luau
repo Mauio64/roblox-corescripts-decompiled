@@ -1,98 +1,103 @@
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local v1 = require(l_Parent_0.Roact);
-local l_withStyle_0 = require(l_Parent_0.UIBlox).Style.withStyle;
-local v3 = require(script.Parent.LoadingAvatar);
-local v4 = require(script.Parent.TextPlaceholders);
-local v5 = v1.PureComponent:extend("ChatLoadingIndicator");
-v5.defaultProps = {
-    cellHeight = 64, 
-    avatarCellWidth = 60
-};
-v5.init = function(v6) --[[ Line: 19 ]] --[[ Name: init ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy), v3 (copy), v4 (copy)
-    v6.singleConversationPlaceholder = function(v7, v8) --[[ Line: 20 ]]
-        -- upvalues: l_withStyle_0 (ref), v1 (ref), v6 (copy), v3 (ref), v4 (ref)
-        return l_withStyle_0(function(v9) --[[ Line: 21 ]]
-            -- upvalues: v1 (ref), v7 (copy), v6 (ref), v3 (ref), v4 (ref), v8 (copy)
-            return v1.createElement("Frame", {
-                LayoutOrder = v7, 
-                Size = UDim2.new(1, 0, 0, v6.props.cellHeight), 
-                BackgroundTransparency = v9.Tokens.Global.Color.None.Transparency, 
-                BackgroundColor3 = v9.Theme.BackgroundDefault.Color, 
-                BorderSizePixel = 0
-            }, {
-                UIList = v1.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder, 
-                    FillDirection = Enum.FillDirection.Vertical
-                }), 
-                Padding = v1.createElement("UIPadding", {
-                    PaddingLeft = UDim.new(0, 0), 
-                    PaddingTop = UDim.new(0, 4)
-                }), 
-                Content = v1.createElement("Frame", {
-                    LayoutOrder = 1, 
-                    Size = UDim2.new(1, 0, 1, -1), 
-                    BackgroundTransparency = 1
-                }, {
-                    UIList = v1.createElement("UIListLayout", {
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        FillDirection = Enum.FillDirection.Horizontal
-                    }), 
-                    avatar = v1.createElement(v3, {
-                        avatarImage = v6.props.avatarImage, 
-                        cellWidth = v6.props.avatarCellWidth, 
-                        cellHeight = v6.props.cellHeight, 
-                        LayoutOrder = 1
-                    }), 
-                    textPlaceholders = v1.createElement(v4, {
-                        avatarCellWidth = v6.props.avatarCellWidth, 
-                        LayoutOrder = 2
-                    })
-                }), 
-                bottomLineContainer = not v8 and v1.createElement("Frame", {
-                    LayoutOrder = 2, 
-                    Size = UDim2.new(1, 0, 0, 1), 
-                    BackgroundTransparency = 1, 
-                    ZIndex = 2, 
-                    ClipsDescendants = true
-                }, {
-                    Padding = v1.createElement("UIPadding", {
-                        PaddingLeft = UDim.new(0, v6.props.avatarCellWidth)
-                    }), 
-                    bottomLine = v1.createElement("Frame", {
-                        BackgroundColor3 = v9.Theme.Divider.Color, 
-                        Transparency = v9.Theme.Divider.Transparency, 
-                        Size = UDim2.new(1, 0, 1, 0), 
-                        BorderSizePixel = 0
-                    })
-                })
-            });
-        end);
-    end;
-    v6.allConversationPlaceholdersList = function() --[[ Line: 78 ]]
-        -- upvalues: v1 (ref), v6 (copy)
-        local v10 = {
-            UIList = v1.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Vertical
-            })
-        };
-        table.insert(v10, v6.singleConversationPlaceholder(1, false));
-        table.insert(v10, v6.singleConversationPlaceholder(2, false));
-        table.insert(v10, v6.singleConversationPlaceholder(3, true));
-        return v10;
-    end;
-end;
-v5.render = function(v11) --[[ Line: 92 ]] --[[ Name: render ]]
-    -- upvalues: l_withStyle_0 (copy), v1 (copy)
-    return l_withStyle_0(function(v12) --[[ Line: 93 ]]
-        -- upvalues: v1 (ref), v11 (copy)
-        return v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 1, 0), 
-            BackgroundColor3 = v12.Theme.BackgroundDefault.Color, 
-            BackgroundTransparency = v12.Tokens.Global.Color.None.Transparency, 
-            BorderSizePixel = 0
-        }, v11.allConversationPlaceholdersList());
-    end);
-end;
-return v5;
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local Roact = require(Parent.Roact)
+local withStyle = require(Parent.UIBlox).Style.withStyle
+local LoadingAvatar = require(script.Parent.LoadingAvatar)
+local TextPlaceholders = require(script.Parent.TextPlaceholders)
+local v6 = Roact.PureComponent:extend("ChatLoadingIndicator")
+
+v6.defaultProps = {
+	cellHeight = 64,
+	avatarCellWidth = 60
+}
+
+function v6.init(p1) -- line: 19
+	-- upvalues: withStyle (copy), Roact (copy), LoadingAvatar (copy), TextPlaceholders (copy)
+	function p1.singleConversationPlaceholder(p2, p3) -- line: 20
+		-- upvalues: withStyle (copy), Roact (copy), p1 (copy), LoadingAvatar (copy), TextPlaceholders (copy)
+		return withStyle(function(p4) -- line: 21
+			-- upvalues: Roact (copy), p2 (copy), p1 (copy), LoadingAvatar (copy), TextPlaceholders (copy), p3 (copy)
+			return Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				LayoutOrder = p2,
+				Size = UDim2.new(1, 0, 0, p1.props.cellHeight),
+				BackgroundTransparency = p4.Tokens.Color.None.Transparency,
+				BackgroundColor3 = p4.Theme.BackgroundDefault.Color
+			}, {
+				UIList = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Vertical
+				}),
+				Padding = Roact.createElement("UIPadding", {
+					PaddingLeft = UDim.new(0, 0),
+					PaddingTop = UDim.new(0, 4)
+				}),
+				Content = Roact.createElement("Frame", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, -1)
+				}, {
+					UIList = Roact.createElement("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						FillDirection = Enum.FillDirection.Horizontal
+					}),
+					avatar = Roact.createElement(LoadingAvatar, {
+						LayoutOrder = 1,
+						avatarImage = p1.props.avatarImage,
+						cellWidth = p1.props.avatarCellWidth,
+						cellHeight = p1.props.cellHeight
+					}),
+					textPlaceholders = Roact.createElement(TextPlaceholders, {
+						LayoutOrder = 2,
+						avatarCellWidth = p1.props.avatarCellWidth
+					})
+				}),
+				bottomLineContainer = not p3 and Roact.createElement("Frame", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					ZIndex = 2,
+					ClipsDescendants = true,
+					Size = UDim2.new(1, 0, 0, 1)
+				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingLeft = UDim.new(0, p1.props.avatarCellWidth)
+					}),
+					bottomLine = Roact.createElement("Frame", {
+						BorderSizePixel = 0,
+						BackgroundColor3 = p4.Theme.Divider.Color,
+						Transparency = p4.Theme.Divider.Transparency,
+						Size = UDim2.new(1, 0, 1, 0)
+					})
+				})
+			})
+		end)
+	end
+	function p1.allConversationPlaceholdersList() -- line: 78
+		-- upvalues: Roact (copy), p1 (copy)
+		local t1 = {
+			UIList = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Vertical
+			})
+		}
+
+		table.insert(t1, p1.singleConversationPlaceholder(1, false))
+		table.insert(t1, p1.singleConversationPlaceholder(2, false))
+		table.insert(t1, p1.singleConversationPlaceholder(3, true))
+
+		return t1
+	end
+end
+function v6.render(p5) -- line: 92
+	-- upvalues: withStyle (copy), Roact (copy)
+	return withStyle(function(p6) -- line: 93
+		-- upvalues: Roact (copy), p5 (copy)
+		return Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			BackgroundColor3 = p6.Theme.BackgroundDefault.Color,
+			BackgroundTransparency = p6.Tokens.Color.None.Transparency
+		}, p5.allConversationPlaceholdersList())
+	end)
+end
+
+return v6

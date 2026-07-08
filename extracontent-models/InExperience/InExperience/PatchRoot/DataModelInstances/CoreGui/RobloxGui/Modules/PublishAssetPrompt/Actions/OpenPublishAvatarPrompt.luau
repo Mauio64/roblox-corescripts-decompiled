@@ -1,10 +1,11 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-return require(l_CorePackages_0.Packages.Rodux).makeActionCreator(script.Name, function(v1, v2, v3) --[[ Line: 19 ]]
-    return {
-        promptInfo = {
-            promptType = v1, 
-            guid = v2, 
-            scopes = v3
-        }
-    };
-end);
+local CorePackages = game:GetService("CorePackages")
+
+return require(CorePackages.Packages.Rodux).makeActionCreator(script.Name, function(s1: string, s2: string, p1) -- line: 19
+	return {
+		promptInfo = {
+			promptType = s1,
+			guid = s2,
+			scopes = p1
+		}
+	}
+end)

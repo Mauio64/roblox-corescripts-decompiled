@@ -1,23 +1,49 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.AppChatNetworking);
-local v3 = require(script.Parent.processConversations);
-local v4 = require(l_script_FirstAncestor_0.Models.ConversationChannels);
-local v5 = require(l_script_FirstAncestor_0.Logger);
-return function(v6) --[[ Line: 15 ]]
-    -- upvalues: v5 (copy), v2 (copy), v3 (copy), v4 (copy)
-    return function(v7) --[[ Line: 16 ]]
-        -- upvalues: v5 (ref), v6 (copy), v2 (ref), v3 (ref), v4 (ref)
-        v5:info("Fetching latest conversation details for conversationId: {}", v6);
-        return v7:dispatch(v2.rodux.GetConversationDetails.API(v6)):andThen(function(v8) --[[ Line: 20 ]]
-            -- upvalues: v7 (copy), v3 (ref), v4 (ref)
-            local l_responseBody_0 = v8.responseBody;
-            assert(l_responseBody_0.conversations and #l_responseBody_0.conversations == 1, "Expected exactly one conversation in response body");
-            v7:dispatch(v3(l_responseBody_0.conversations));
-            return v4.fromChannelsApi(l_responseBody_0.conversations[1]);
-        end):catch(function(v10) --[[ Line: 31 ]]
-            -- upvalues: v5 (ref)
-            v5:warning("Failure in fetchLatestConversationDetails, Status: " .. tostring(v10));
-        end);
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local AppChatNetworking = require(AppChatParent.AppChatNetworking)
+local processConversations = require(script.Parent.processConversations)
+local ConversationChannels = require(AppChat.Models.ConversationChannels)
+local Logger = require(AppChat.Logger)
+local FFlagAppChatPerfTracking = require(AppChat.Flags.FFlagAppChatPerfTracking)
+local FFlagAppChatMessageTTIMilestones = require(AppChat.Flags.FFlagAppChatMessageTTIMilestones)
+local AppChatPerfTracker = require(AppChat.Telemetry.AppChatPerfTracker)
+
+return function(s1: string) -- line: 18
+	-- upvalues: Logger (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), AppChatNetworking (copy), processConversations (copy), ConversationChannels (copy)
+	return function(p1) -- line: 19
+		-- upvalues: Logger (copy), s1 (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), AppChatPerfTracker (copy), AppChatNetworking (copy), processConversations (copy), ConversationChannels (copy)
+		Logger:info("Fetching latest conversation details for conversationId: {}", s1)
+
+		if FFlagAppChatPerfTracking and FFlagAppChatMessageTTIMilestones then
+			local t1 = {
+				conversationId = s1
+			}
+
+			AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, t1)
+			AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, AppChatPerfTracker.Milestone.PrimaryDataStarted.Subphase.NetworkFetch, t1)
+			AppChatPerfTracker.trackRequest(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.PrimaryDataStarted.Name, "GetConversationDetails", t1)
+		end
+
+		return p1:dispatch(AppChatNetworking.rodux.GetConversationDetails.API(s1)):andThen(function(p2) -- line: 45
+			-- upvalues: p1 (copy), processConversations (copy), FFlagAppChatPerfTracking (copy), FFlagAppChatMessageTTIMilestones (copy), s1 (copy), AppChatPerfTracker (copy), ConversationChannels (copy)
+			local responseBody = p2.responseBody
+
+			assert(responseBody.conversations and #responseBody.conversations == 1, "Expected exactly one conversation in response body")
+			p1:dispatch(processConversations(responseBody.conversations))
+
+			if FFlagAppChatPerfTracking and FFlagAppChatMessageTTIMilestones then
+				local t2 = {
+					conversationId = s1
+				}
+
+				AppChatPerfTracker.trackMilestone(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, t2)
+				AppChatPerfTracker.trackSubphase(AppChatPerfTracker.Events.ChatConversationTTI, AppChatPerfTracker.Milestone.PrimaryDataReady.Name, AppChatPerfTracker.Milestone.PrimaryDataReady.Subphase.ResponseReceived, t2)
+			end
+
+			return ConversationChannels.fromChannelsApi(responseBody.conversations[1])
+		end):catch(function(p3) -- line: 72
+			-- upvalues: Logger (copy)
+			Logger:warning("Failure in fetchLatestConversationDetails, Status: " .. tostring(p3))
+		end)
+	end
+end

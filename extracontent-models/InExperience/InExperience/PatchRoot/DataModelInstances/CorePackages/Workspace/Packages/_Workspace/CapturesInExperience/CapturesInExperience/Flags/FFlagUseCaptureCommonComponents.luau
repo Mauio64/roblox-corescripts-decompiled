@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UseCaptureCommonComponents", false);
+return game:DefineFastFlag("UseCaptureCommonComponents", false)

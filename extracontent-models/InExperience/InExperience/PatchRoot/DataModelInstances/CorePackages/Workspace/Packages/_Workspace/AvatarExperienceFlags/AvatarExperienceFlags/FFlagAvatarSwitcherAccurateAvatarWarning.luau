@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AvatarSwitcherAccurateAvatarWarning", false);
+return game:DefineFastFlag("AvatarSwitcherAccurateAvatarWarning", false)

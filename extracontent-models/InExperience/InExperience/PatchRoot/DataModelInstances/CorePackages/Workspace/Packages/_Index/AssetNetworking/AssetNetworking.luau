@@ -1,11 +1,14 @@
-local l_networkRequests_0 = script.networkRequests;
-local v1 = require(l_networkRequests_0.createGetAssetDetails);
+local networkRequests = script.networkRequests
+local createGetAssetDetails = require(networkRequests.createGetAssetDetails)
+
+local function createRequestThunks(p1) -- line: 8
+	-- upvalues: createGetAssetDetails (copy)
+	return {
+		GetAssetDetails = createGetAssetDetails(p1)
+	}
+end
+
 return {
-    config = function(v2) --[[ Line: 8 ]] --[[ Name: createRequestThunks ]]
-        -- upvalues: v1 (copy)
-        return {
-            GetAssetDetails = v1(v2)
-        };
-    end, 
-    ["jest.config"] = script["jest.config"]
-};
+	config = createRequestThunks,
+	["jest.config"] = script["jest.config"]
+}

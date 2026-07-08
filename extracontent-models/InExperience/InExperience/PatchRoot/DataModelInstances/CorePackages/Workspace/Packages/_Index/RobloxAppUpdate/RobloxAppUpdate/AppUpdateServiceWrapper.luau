@@ -1,39 +1,45 @@
-local l_Parent_0 = script:FindFirstAncestor("RobloxAppUpdate").Parent;
-local v1 = require(l_Parent_0.Promise);
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3) --[[ Line: 9 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    local v4 = {
-        _appUpdate = v3
-    };
-    setmetatable(v4, v2);
-    return v4;
-end;
-v2.checkForUpdate = function(v5) --[[ Line: 18 ]] --[[ Name: checkForUpdate ]]
-    -- upvalues: v1 (copy)
-    return v1.new(function(v6, _) --[[ Line: 19 ]]
-        -- upvalues: v5 (copy)
-        local l_status_0, l_result_0 = pcall(function() --[[ Line: 20 ]]
-            -- upvalues: v5 (ref), v6 (copy)
-            v5._appUpdate:CheckForUpdate(function(v8) --[[ Line: 21 ]]
-                -- upvalues: v6 (ref)
-                v6({
-                    appUpdateStatus = v8
-                });
-            end);
-        end);
-        if not l_status_0 then
-            v6({
-                errorMessage = l_result_0
-            });
-        end;
-    end);
-end;
-v2.performManagedUpdate = function(v11) --[[ Line: 36 ]] --[[ Name: performManagedUpdate ]]
-    v11._appUpdate:PerformManagedUpdate();
-end;
-v2.canPerformBinaryUpdate = function(v12) --[[ Line: 40 ]] --[[ Name: canPerformBinaryUpdate ]]
-    return v12._appUpdate:CanPerformBinaryUpdate();
-end;
-return v2;
+local Parent = script:FindFirstAncestor("RobloxAppUpdate").Parent
+local Promise = require(Parent.Promise)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1) -- line: 9
+	-- upvalues: t1 (copy)
+	local t2 = {
+		_appUpdate = p1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.checkForUpdate(p2) -- line: 18
+	-- upvalues: Promise (copy)
+	return Promise.new(function(resolve, _) -- line: 19
+		-- upvalues: p2 (copy)
+		local ok, result = pcall(function() -- line: 20
+			-- upvalues: p2 (copy), resolve (copy)
+			p2._appUpdate:CheckForUpdate(function(p4) -- line: 21
+				-- upvalues: resolve (copy)
+				resolve({
+					appUpdateStatus = p4
+				})
+			end)
+		end)
+
+		if not ok then
+			resolve({
+				errorMessage = result
+			})
+		end
+	end)
+end
+function t1.performManagedUpdate(p5) -- line: 36
+	p5._appUpdate:PerformManagedUpdate()
+end
+function t1.canPerformBinaryUpdate(p6) -- line: 40
+	return p6._appUpdate:CanPerformBinaryUpdate()
+end
+
+return t1

@@ -1,45 +1,52 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v3 = require(l_script_FirstAncestor_0.Utils.Base64);
-local v4 = require(l_Parent_0.Promise);
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v6 = require(l_script_FirstAncestor_0.Common.PasskeyConstants);
-local function _() --[[ Line: 13 ]] --[[ Name: getFinishRegistrationUrl ]]
-    -- upvalues: l_Url_0 (copy)
-    return string.format("%sv1/passkey/finish-ar-preauth-registration", l_Url_0.AUTH_URL);
-end;
-local function v13(v8, v9) --[[ Line: 17 ]] --[[ Name: finishARPreauthPasskeyRegistration ]]
-    -- upvalues: l_Url_0 (copy), v4 (copy), l_HttpService_0 (copy), v6 (copy)
-    return v8(string.format("%sv1/passkey/finish-ar-preauth-registration", l_Url_0.AUTH_URL), "POST", {
-        postBody = v9
-    }):andThen(function(v10) --[[ Line: 18 ]]
-        -- upvalues: v4 (ref)
-        return v4.resolve(v10);
-    end, function(v11) --[[ Line: 20 ]]
-        -- upvalues: l_HttpService_0 (ref), v4 (ref), v6 (ref)
-        local v12 = if type(v11) == "table" then l_HttpService_0:JSONEncode(v11) else nil;
-        return v4.reject({
-            body = v12, 
-            name = v6.BACKEND_CREATION_ERROR_NAME
-        });
-    end);
-end;
-return function(v14, v15, v16, v17, v18, v19) --[[ Line: 26 ]] --[[ Name: attemptFinishARPreauthPasskeyRegistration ]]
-    -- upvalues: l_HttpService_0 (copy), v3 (copy), v13 (copy)
-    local v20 = l_HttpService_0:JSONDecode(v18);
-    v20.id = v3.ToUrlSafeBase64(v20.id);
-    v20.rawId = v3.ToUrlSafeBase64(v20.rawId);
-    v20.response.attestationObject = v3.ToUrlSafeBase64(v20.response.attestationObject);
-    v20.response.clientDataJSON = v3.ToUrlSafeBase64(v20.response.clientDataJSON);
-    local v21 = l_HttpService_0:JSONEncode(v20);
-    local v22 = {
-        recoverySession = v15, 
-        passkeySessionId = v16, 
-        passkeyRegistrationResponse = v21, 
-        userId = v17, 
-        isPostRecovery = v19
-    };
-    local v23 = l_HttpService_0:JSONEncode(v22);
-    return v13(v14, v23);
-end;
+local HttpService = game:GetService("HttpService")
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local Base64 = require(AuthCommon.Utils.Base64)
+local Promise = require(AuthCommonParent.Promise)
+local Url = require(AuthCommonParent.Http).Url
+local PasskeyConstants = require(AuthCommon.Common.PasskeyConstants)
+
+local function getFinishRegistrationUrl() -- line: 13
+	-- upvalues: Url (copy)
+	return string.format("%sv1/passkey/finish-ar-preauth-registration", Url.AUTH_URL)
+end
+local function finishARPreauthPasskeyRegistration(p1, p2) -- line: 17
+	-- upvalues: Url (copy), Promise (copy), HttpService (copy), PasskeyConstants (copy)
+	return p1(string.format("%sv1/passkey/finish-ar-preauth-registration", Url.AUTH_URL), "POST", {
+		postBody = p2
+	}):andThen(function(p3) -- line: 18
+		-- upvalues: Promise (copy)
+		return Promise.resolve(p3)
+	end, function(p4) -- line: 20
+		-- upvalues: HttpService (copy), Promise (copy), PasskeyConstants (copy)
+		local v25 = if type(p4) ~= "table" then nil else HttpService:JSONEncode(p4)
+
+		return Promise.reject({
+			body = v25,
+			name = PasskeyConstants.BACKEND_CREATION_ERROR_NAME
+		})
+	end)
+end
+local function attemptFinishARPreauthPasskeyRegistration(p5, p6, p7, p8, p9, p10) -- line: 26
+	-- upvalues: HttpService (copy), Base64 (copy), finishARPreauthPasskeyRegistration (copy)
+	local data = HttpService:JSONDecode(p9)
+
+	data.id = Base64.ToUrlSafeBase64(data.id)
+	data.rawId = Base64.ToUrlSafeBase64(data.rawId)
+	data.response.attestationObject = Base64.ToUrlSafeBase64(data.response.attestationObject)
+	data.response.clientDataJSON = Base64.ToUrlSafeBase64(data.response.clientDataJSON)
+
+	local json = HttpService:JSONEncode(data)
+	local t1 = {
+		recoverySession = p6,
+		passkeySessionId = p7,
+		passkeyRegistrationResponse = json,
+		userId = p8,
+		isPostRecovery = p10
+	}
+	local json2 = HttpService:JSONEncode(t1)
+
+	return finishARPreauthPasskeyRegistration(p5, json2)
+end
+
+return attemptFinishARPreauthPasskeyRegistration

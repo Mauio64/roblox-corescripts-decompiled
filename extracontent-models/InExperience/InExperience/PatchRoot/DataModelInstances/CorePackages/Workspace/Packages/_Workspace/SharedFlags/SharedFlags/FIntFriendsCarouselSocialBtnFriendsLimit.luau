@@ -1,1 +1,1 @@
-return game:DefineFastInt("FriendsCarouselSocialBtnFriendsLimit", 10);
+return game:DefineFastInt("FriendsCarouselSocialBtnFriendsLimit", 10)

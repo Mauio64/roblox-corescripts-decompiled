@@ -1,30 +1,36 @@
-local v0 = {
-    new = function() --[[ Line: 16 ]] --[[ Name: new ]]
-        return {};
-    end
-};
-v0.fromGameCache = function(v1) --[[ Line: 21 ]] --[[ Name: fromGameCache ]]
-    -- upvalues: v0 (copy)
-    local v2 = v0.new();
-    v2.universeId = v1.UniverseId;
-    v2.placeId = v1.PlaceId;
-    v2.name = v1.Name;
-    v2.playerCount = v1.PlayerCount;
-    v2.imageToken = v1.ImageToken;
-    v2.totalUpVotes = v1.VoteData.UpVotes;
-    v2.totalDownVotes = v1.VoteData.DownVotes;
-    return v2;
-end;
-v0.fromJsonData = function(v3) --[[ Line: 33 ]] --[[ Name: fromJsonData ]]
-    -- upvalues: v0 (copy)
-    local v4 = v0.new();
-    v4.universeId = v3.universeId;
-    v4.placeId = v3.placeId;
-    v4.name = v3.name;
-    v4.playerCount = v3.playerCount;
-    v4.imageToken = v3.imageToken;
-    v4.totalUpVotes = v3.totalUpVotes;
-    v4.totalDownVotes = v3.totalDownVotes;
-    return v4;
-end;
-return v0;
+local t1 = {
+	new = function() -- line: 16
+		return {}
+	end
+}
+
+function t1.fromGameCache(p1) -- line: 21
+	-- upvalues: t1 (copy)
+	local v3 = t1.new()
+
+	v3.universeId = p1.UniverseId
+	v3.placeId = p1.PlaceId
+	v3.name = p1.Name
+	v3.playerCount = p1.PlayerCount
+	v3.imageToken = p1.ImageToken
+	v3.totalUpVotes = p1.VoteData.UpVotes
+	v3.totalDownVotes = p1.VoteData.DownVotes
+
+	return v3
+end
+function t1.fromJsonData(p2) -- line: 33
+	-- upvalues: t1 (copy)
+	local v5 = t1.new()
+
+	v5.universeId = p2.universeId
+	v5.placeId = p2.placeId
+	v5.name = p2.name
+	v5.playerCount = p2.playerCount
+	v5.imageToken = p2.imageToken
+	v5.totalUpVotes = p2.totalUpVotes
+	v5.totalDownVotes = p2.totalDownVotes
+
+	return v5
+end
+
+return t1

@@ -1,42 +1,46 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AbuseReportMenu");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v2 = require(l_script_FirstAncestor_0.Components.Constants);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v4 = require(l_CorePackages_0.Packages.Cryo);
+local AbuseReportMenu = script:FindFirstAncestor("AbuseReportMenu")
+local CorePackages = game:GetService("CorePackages")
+local Constants = require(AbuseReportMenu.Components.Constants)
+
+require(AbuseReportMenu.Components.Types)
+
+local Cryo = require(CorePackages.Packages.Cryo)
+
 return {
-    componentType = "modalSelector", 
-    getIsVisible = function(_) --[[ Line: 9 ]] --[[ Name: getIsVisible ]]
-        return true;
-    end, 
-    getMenuItems = function(v6, v7) --[[ Line: 12 ]] --[[ Name: getMenuItems ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        local v8 = if v6.methodOfAbuse == v2.AbuseMethods.VoiceChat then v2.PlayerVoiceAbuseTypes else v2.PlayerAbuseTypes;
-        local v9 = v4.Dictionary.values(v8);
-        return v4.List.map(v9, function(v10) --[[ Line: 17 ]]
-            -- upvalues: v7 (copy)
-            return {
-                label = v7[v10], 
-                identifier = v10
-            };
-        end);
-    end, 
-    getSelectedValue = function(v11) --[[ Line: 24 ]] --[[ Name: getSelectedValue ]]
-        return v11.abuseReason;
-    end, 
-    onUpdateSelectedOption = function(v12, _, v14, v15) --[[ Line: 27 ]] --[[ Name: onUpdateSelectedOption ]]
-        -- upvalues: v2 (copy)
-        v15.analyticsDispatch({
-            type = v2.AnalyticsActions.IncrementReasonChanged
-        });
-        v15.analyticsDispatch({
-            type = v2.AnalyticsActions.SetReasonSelection, 
-            selection = v12.identifier
-        });
-        v14({
-            type = v2.PlayerMenuActions.UpdateAbuseReason, 
-            abuseReason = v12.identifier
-        });
-    end, 
-    fieldLabel = "ReasonForAbuse", 
-    componentName = "AbuseReason"
-};
+	componentType = "modalSelector",
+	fieldLabel = "ReasonForAbuse",
+	componentName = "AbuseReason",
+	getIsVisible = function(_) -- line: 9
+		return true
+	end,
+	getMenuItems = function(p2, p3) -- line: 12
+		-- upvalues: Constants (copy), Cryo (copy)
+		local v8 = if p2.methodOfAbuse ~= Constants.AbuseMethods.VoiceChat then Constants.PlayerAbuseTypes else Constants.PlayerVoiceAbuseTypes
+		local v9 = Cryo.Dictionary.values(v8)
+
+		return Cryo.List.map(v9, function(p4) -- line: 17
+			-- upvalues: p3 (copy)
+			return {
+				label = p3[p4],
+				identifier = p4
+			}
+		end)
+	end,
+	getSelectedValue = function(p5) -- line: 24
+		return p5.abuseReason
+	end,
+	onUpdateSelectedOption = function(p6, _, p8, p9) -- line: 27
+		-- upvalues: Constants (copy)
+		p9.analyticsDispatch({
+			type = Constants.AnalyticsActions.IncrementReasonChanged
+		})
+		p9.analyticsDispatch({
+			type = Constants.AnalyticsActions.SetReasonSelection,
+			selection = p6.identifier
+		})
+		p8({
+			type = Constants.PlayerMenuActions.UpdateAbuseReason,
+			abuseReason = p6.identifier
+		})
+	end
+}

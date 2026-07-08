@@ -16,11 +16,11 @@ local IconButton = Foundation.IconButton
 local IconName = Foundation.Enums.IconName
 local IconSize = Foundation.Enums.IconSize
 local t1 = {
+	shouldShowDots = false,
 	dotsSize = UDim2.new(0, 36, 0, 36),
 	image = Images["icons/common/more"],
-	onDotsActivated = function() --[[ onDotsActivated ]] -- line: 42
-	end,
-	shouldShowDots = false
+	onDotsActivated = function() -- line: 42
+	end
 }
 
 function ParticipantEntryRightFrame(t2: {[any]: any}) -- line: 48
@@ -47,16 +47,16 @@ function ParticipantEntryRightFrame(t2: {[any]: any}) -- line: 48
 			PaddingRight = UDim.new(0, 22)
 		}),
 		label = if not v20.labelText then nil else React.createElement(Label, {
+			layoutOrder = 1,
 			backgroundColor3 = v22.Theme.BackgroundContrast.Color,
 			backgroundTransparency = v22.Theme.BackgroundContrast.Transparency,
-			bodyText = v20.labelText,
-			layoutOrder = 1
+			bodyText = v20.labelText
 		}),
 		dots = if not v20.shouldShowDots then nil else React.createElement("Frame", {
-			Size = UDim2.new(0, 20, 1, 0),
 			BackgroundTransparency = 1,
 			LayoutOrder = 2,
-			Name = "dots"
+			Name = "dots",
+			Size = UDim2.new(0, 20, 1, 0)
 		}, {
 			Dots = if not v23 then React.createElement(ImageSetLabel, {
 				AnchorPoint = Vector2.new(0.5, 0.5),

@@ -1,8 +1,9 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChatNetworking");
-local v1 = require(l_script_FirstAncestor_0.url.CHAT_PLATFORM_BASE_URL);
-return require(script.Parent.RoduxNetworking).POST(script.Name, function(v2, v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    return v2(v1):path("v1"):path("get-conversations-participants-metadata"):body({
-        conversation_ids = v3
-    }):setStatusIds(v3);
-end);
+local AppChatNetworking = script:FindFirstAncestor("AppChatNetworking")
+local CHAT_PLATFORM_BASE_URL = require(AppChatNetworking.url.CHAT_PLATFORM_BASE_URL)
+
+return require(script.Parent.RoduxNetworking).POST(script.Name, function(p1, t1: {[any]: any}) -- line: 6
+	-- upvalues: CHAT_PLATFORM_BASE_URL (copy)
+	return p1(CHAT_PLATFORM_BASE_URL):path("v1"):path("get-conversations-participants-metadata"):body({
+		conversation_ids = t1
+	}):setStatusIds(t1)
+end)

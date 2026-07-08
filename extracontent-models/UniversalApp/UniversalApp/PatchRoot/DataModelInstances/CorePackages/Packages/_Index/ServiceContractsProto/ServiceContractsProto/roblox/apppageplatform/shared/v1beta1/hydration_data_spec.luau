@@ -1,270 +1,378 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.hydration_content_type);
-local v4 = {};
-v4.__index = v4;
-local l_v4_0 = v4 --[[ copy: 4 -> 5 ]];
-v4.new = function(v6) --[[ Line: 67 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy), l_v4_0 (copy)
-    return (setmetatable({
-        content_type = if not (v6 ~= nil) or v6.content_type == nil then assert(v3.HydrationContentType.fromNumber(0), "Enum has no 0 default") else v6.content_type, 
-        id_binding = if not (v6 ~= nil) or v6.id_binding == nil then nil else v6.id_binding, 
-        alias = (not (v6 ~= nil) or v6.alias == nil) and "" or v6.alias
-    }, l_v4_0));
-end;
-v4.encode = function(v7) --[[ Line: 80 ]] --[[ Name: encode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v8 = buffer.create(0);
-    local v9 = 0;
-    if v7.content_type ~= nil and (v7.content_type ~= nil and v7.content_type ~= 0 or v7.content_type ~= v3.HydrationContentType.fromNumber(0)) then
-        local v10, v11 = v0.writeTag(v8, v9, 1, v0.wireTypes.varint);
-        v10, v11 = v0.writeVarInt(v10, v11, v3.HydrationContentType.toNumber(v7.content_type));
-        v8 = v10;
-        v9 = v11;
-    end;
-    if v7.id_binding ~= nil then
-        local v12 = v7.id_binding:encode();
-        local v13, v14 = v0.writeTag(v8, v9, 2, v0.wireTypes.lengthDelimited);
-        v13, v14 = v0.writeBuffer(v13, v14, v12, buffer.len(v12));
-        v8 = v13;
-        v9 = v14;
-    end;
-    if v7.alias ~= nil and v7.alias ~= "" then
-        local v15, v16 = v0.writeTag(v8, v9, 3, v0.wireTypes.lengthDelimited);
-        v15, v16 = v0.writeString(v15, v16, v7.alias);
-        v8 = v15;
-        v9 = v16;
-    end;
-    local v17 = buffer.create(v9);
-    buffer.copy(v17, 0, v8, 0, v9);
-    return v17;
-end;
-v4.decode = function(v18) --[[ Line: 118 ]] --[[ Name: decode ]]
-    -- upvalues: l_v4_0 (copy), v0 (copy), v3 (copy), v2 (copy)
-    local v19 = l_v4_0.new();
-    local v20 = 0;
-    while v20 < buffer.len(v18) do
-        local v21 = nil;
-        local v22 = nil;
-        local v23, v24, v25 = v0.readTag(v18, v20);
-        v21 = v23;
-        v22 = v24;
-        v20 = v25;
-        if v22 == v0.wireTypes.varint then
-            if v21 == 1 then
-                v23 = nil;
-                v24, v25 = v0.readVarIntI32(v18, v20);
-                v23 = v24;
-                v20 = v25;
-                v19.content_type = v3.HydrationContentType.fromNumber(v23) or v23;
-            else
-                v23 = nil;
-                v24, v25 = v0.readVarInt(v18, v20);
-                v23 = v24;
-                v20 = v25;
-            end;
-        elseif v22 == v0.wireTypes.lengthDelimited then
-            if v21 == 2 then
-                v23 = nil;
-                v24, v25 = v0.readBuffer(v18, v20);
-                v23 = v24;
-                v20 = v25;
-                v19.id_binding = v2.IdBinding.decode(v23);
-            elseif v21 == 3 then
-                v23 = nil;
-                v24, v25 = v0.readBuffer(v18, v20);
-                v23 = v24;
-                v20 = v25;
-                v19.alias = buffer.tostring(v23);
-            else
-                v23 = nil;
-                v24, v25 = v0.readVarInt(v18, v20);
-                v20 = v25 + v24;
-            end;
-        elseif v22 == v0.wireTypes.i32 then
-            v23 = nil;
-            v24, v25 = v0.readFixed32(v18, v20);
-            v23 = v24;
-            v20 = v25;
-        elseif v22 == v0.wireTypes.i64 then
-            v23 = nil;
-            v24, v25 = v0.readFixed64(v18, v20);
-            v23 = v24;
-            v20 = v25;
-        else
-            error("Unsupported wire type: " .. v22);
-        end;
-    end;
-    return v19;
-end;
-v4.jsonEncode = function(v26) --[[ Line: 175 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v3 (copy)
-    local v27 = {};
-    if v26.content_type ~= nil and (v26.content_type ~= nil and v26.content_type ~= 0 or v26.content_type ~= v3.HydrationContentType.fromNumber(0)) then
-        v27.contentType = if typeof(v26.content_type) == "number" then v26.content_type else v3.HydrationContentType.toNumber(v26.content_type);
-    end;
-    if v26.id_binding ~= nil then
-        v27.idBinding = v26.id_binding:jsonEncode();
-    end;
-    if v26.alias ~= nil and v26.alias ~= "" then
-        v27.alias = v26.alias;
-    end;
-    return v27;
-end;
-v4.jsonDecode = function(v28) --[[ Line: 204 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v4_0 (copy), v3 (copy), v2 (copy)
-    local v29 = l_v4_0.new();
-    if v28.content_type ~= nil then
-        v29.content_type = if typeof(v28.content_type) == "number" then v3.HydrationContentType.fromNumber(v28.content_type) or v28.content_type else v3.HydrationContentType.fromName(v28.content_type) or v28.content_type;
-    end;
-    if v28.contentType ~= nil then
-        v29.content_type = if typeof(v28.contentType) == "number" then v3.HydrationContentType.fromNumber(v28.contentType) or v28.contentType else v3.HydrationContentType.fromName(v28.contentType) or v28.contentType;
-    end;
-    if v28.id_binding ~= nil then
-        v29.id_binding = v2.IdBinding.jsonDecode(v28.id_binding);
-    end;
-    if v28.idBinding ~= nil then
-        v29.id_binding = v2.IdBinding.jsonDecode(v28.idBinding);
-    end;
-    if v28.alias ~= nil then
-        v29.alias = v28.alias;
-    end;
-    return v29;
-end;
-v4.descriptor = {
-    name = "HydrationDataSpec", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.HydrationDataSpec"
-};
-v2.HydrationDataSpec = v4;
-v1.default:register(v2.HydrationDataSpec);
-v4 = {};
-v4.__index = v4;
-v4.new = function(v30) --[[ Line: 256 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy)
-    return (setmetatable({
-        kind = if not (v30 ~= nil) or v30.kind == nil then nil else v30.kind
-    }, v4));
-end;
-v4.encode = function(v31) --[[ Line: 262 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v32 = buffer.create(0);
-    local v33 = 0;
-    if v31.kind ~= nil then
-        if v31.kind.type == "literal" then
-            local v34, v35 = v0.writeTag(v32, v33, 1, v0.wireTypes.lengthDelimited);
-            v34, v35 = v0.writeString(v34, v35, v31.kind.value);
-            v32 = v34;
-            v33 = v35;
-        elseif v31.kind.type == "input_path" then
-            local v36, v37 = v0.writeTag(v32, v33, 2, v0.wireTypes.lengthDelimited);
-            v36, v37 = v0.writeString(v36, v37, v31.kind.value);
-            v32 = v36;
-            v33 = v37;
-        end;
-    end;
-    local v38 = buffer.create(v33);
-    buffer.copy(v38, 0, v32, 0, v33);
-    return v38;
-end;
-v4.decode = function(v39) --[[ Line: 281 ]] --[[ Name: decode ]]
-    -- upvalues: v4 (copy), v0 (copy)
-    local v40 = v4.new();
-    local v41 = 0;
-    while v41 < buffer.len(v39) do
-        local v42 = nil;
-        local v43 = nil;
-        local v44, v45, v46 = v0.readTag(v39, v41);
-        v42 = v44;
-        v43 = v45;
-        v41 = v46;
-        if v43 == v0.wireTypes.varint then
-            v44 = nil;
-            v45, v46 = v0.readVarInt(v39, v41);
-            v44 = v45;
-            v41 = v46;
-        elseif v43 == v0.wireTypes.lengthDelimited then
-            if v42 == 1 then
-                v44 = nil;
-                v45, v46 = v0.readBuffer(v39, v41);
-                v44 = v45;
-                v41 = v46;
-                v40.kind = {
-                    type = "literal", 
-                    value = buffer.tostring(v44)
-                };
-            elseif v42 == 2 then
-                v44 = nil;
-                v45, v46 = v0.readBuffer(v39, v41);
-                v44 = v45;
-                v41 = v46;
-                v40.kind = {
-                    type = "input_path", 
-                    value = buffer.tostring(v44)
-                };
-            else
-                v44 = nil;
-                v45, v46 = v0.readVarInt(v39, v41);
-                v41 = v46 + v45;
-            end;
-        elseif v43 == v0.wireTypes.i32 then
-            v44 = nil;
-            v45, v46 = v0.readFixed32(v39, v41);
-            v44 = v45;
-            v41 = v46;
-        elseif v43 == v0.wireTypes.i64 then
-            v44 = nil;
-            v45, v46 = v0.readFixed64(v39, v41);
-            v44 = v45;
-            v41 = v46;
-        else
-            error("Unsupported wire type: " .. v43);
-        end;
-    end;
-    return v40;
-end;
-v4.jsonEncode = function(v47) --[[ Line: 329 ]] --[[ Name: jsonEncode ]]
-    local v48 = {};
-    if v47.kind ~= nil then
-        if v47.kind.type == "literal" then
-            v48.literal = v47.kind.value;
-            return v48;
-        elseif v47.kind.type == "input_path" then
-            v48.inputPath = v47.kind.value;
-        end;
-    end;
-    return v48;
-end;
-v4.jsonDecode = function(v49) --[[ Line: 343 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v4 (copy)
-    local v50 = v4.new();
-    if v49.literal ~= nil then
-        v50.kind = {
-            type = "literal", 
-            value = v49.literal
-        };
-    end;
-    if v49.input_path ~= nil then
-        v50.kind = {
-            type = "input_path", 
-            value = v49.input_path
-        };
-    end;
-    if v49.inputPath ~= nil then
-        v50.kind = {
-            type = "input_path", 
-            value = v49.inputPath
-        };
-    end;
-    return v50;
-end;
-v4.descriptor = {
-    name = "IdBinding", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.IdBinding"
-};
-v2.IdBinding = v4;
-v1.default:register(v2.IdBinding);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local hydration_content_type = require(script.Parent.hydration_content_type)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 73
+	-- upvalues: hydration_content_type (copy), t2 (copy)
+	return (setmetatable({
+		content_type = if t3 ~= nil and t3.content_type ~= nil then t3.content_type else assert(hydration_content_type.HydrationContentType.fromNumber(0), "Enum has no 0 default"),
+		id_binding = if t3 ~= nil and t3.id_binding ~= nil then t3.id_binding else nil,
+		alias = if t3 ~= nil and t3.alias ~= nil then t3.alias else "",
+		client_fetch = t3 ~= nil and (t3.client_fetch ~= nil and t3.client_fetch),
+		required_fields = if t3 ~= nil and t3.required_fields ~= nil then t3.required_fields else {},
+		required = t3 ~= nil and (t3.required ~= nil and t3.required)
+	}, t2))
+end
+function t2.encode(p1) -- line: 89
+	-- upvalues: hydration_content_type (copy), proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.content_type ~= nil and (p1.content_type ~= nil and p1.content_type ~= 0 or p1.content_type ~= hydration_content_type.HydrationContentType.fromNumber(0)) then
+		local v11, v12 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v11, v12, hydration_content_type.HydrationContentType.toNumber(p1.content_type))
+	end
+
+	if p1.id_binding ~= nil then
+		local v13 = p1.id_binding:encode()
+		local v14, v15 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeBuffer(v14, v15, v13, buffer.len(v13))
+	end
+
+	if p1.alias ~= nil and p1.alias ~= "" then
+		local v16, v17 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v16, v17, p1.alias)
+	end
+
+	if p1.client_fetch then
+		local v18, v19 = proto.writeTag(buf, n1, 4, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v18, v19, not p1.client_fetch and 0 or 1)
+	end
+
+	if p1.required_fields ~= nil and #p1.required_fields > 0 then
+		for _, v21 in p1.required_fields do
+			local v22, v23 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeString(v22, v23, v21)
+		end
+	end
+
+	if p1.required then
+		local v24, v25 = proto.writeTag(buf, n1, 6, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v24, v25, not p1.required and 0 or 1)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 144
+	-- upvalues: t2 (copy), proto (copy), hydration_content_type (copy), t1 (copy)
+	local v28 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v30, v31
+
+		v30, v31, n2 = proto.readTag(p2, n2)
+
+		if v31 == proto.wireTypes.varint then
+			if v30 == 1 then
+				local v32
+
+				v32, n2 = proto.readVarIntI32(p2, n2)
+				v28.content_type = hydration_content_type.HydrationContentType.fromNumber(v32) or v32
+			elseif v30 == 4 then
+				local v33
+
+				v33, n2 = proto.readVarInt(p2, n2)
+				v28.client_fetch = v33 ~= 0
+			elseif v30 == 6 then
+				local v34
+
+				v34, n2 = proto.readVarInt(p2, n2)
+				v28.required = v34 ~= 0
+			else
+				local v35
+
+				v35, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v31 == proto.wireTypes.lengthDelimited then
+			if v30 == 2 then
+				local v36
+
+				v36, n2 = proto.readBuffer(p2, n2)
+				v28.id_binding = t1.IdBinding.decode(v36)
+			elseif v30 == 3 then
+				local v37
+
+				v37, n2 = proto.readBuffer(p2, n2)
+				v28.alias = buffer.tostring(v37)
+			elseif v30 == 5 then
+				local v38
+
+				v38, n2 = proto.readBuffer(p2, n2)
+				table.insert(v28.required_fields, buffer.tostring(v38))
+			else
+				local v39, v40 = proto.readVarInt(p2, n2)
+
+				n2 = v40 + v39
+			end
+		elseif v31 == proto.wireTypes.i32 then
+			local v41
+
+			v41, n2 = proto.readFixed32(p2, n2)
+		elseif v31 == proto.wireTypes.i64 then
+			local v42
+
+			v42, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v31)
+		end
+	end
+
+	return v28
+end
+function t2.jsonEncode(p3) -- line: 216
+	-- upvalues: hydration_content_type (copy)
+	local t4 = {}
+
+	if p3.content_type ~= nil and (p3.content_type ~= nil and p3.content_type ~= 0 or p3.content_type ~= hydration_content_type.HydrationContentType.fromNumber(0)) then
+		t4.contentType = if typeof(p3.content_type) ~= "number" then hydration_content_type.HydrationContentType.toNumber(p3.content_type) else p3.content_type
+	end
+
+	if p3.id_binding ~= nil then
+		t4.idBinding = p3.id_binding:jsonEncode()
+	end
+
+	if p3.alias ~= nil and p3.alias ~= "" then
+		t4.alias = p3.alias
+	end
+
+	if p3.client_fetch then
+		t4.clientFetch = p3.client_fetch
+	end
+
+	if p3.required_fields ~= nil and #p3.required_fields > 0 then
+		local t5 = {}
+
+		for _, v47 in p3.required_fields do
+			table.insert(t5, v47)
+		end
+
+		t4.requiredFields = t5
+	end
+
+	if p3.required then
+		t4.required = p3.required
+	end
+
+	return t4
+end
+function t2.jsonDecode(t6: {[any]: any}) -- line: 261
+	-- upvalues: t2 (copy), hydration_content_type (copy), t1 (copy)
+	local v49 = t2.new()
+
+	if t6.content_type ~= nil then
+		v49.content_type = if typeof(t6.content_type) ~= "number" then hydration_content_type.HydrationContentType.fromName(t6.content_type) or t6.content_type else hydration_content_type.HydrationContentType.fromNumber(t6.content_type) or t6.content_type
+	end
+
+	if t6.contentType ~= nil then
+		v49.content_type = if typeof(t6.contentType) ~= "number" then hydration_content_type.HydrationContentType.fromName(t6.contentType) or t6.contentType else hydration_content_type.HydrationContentType.fromNumber(t6.contentType) or t6.contentType
+	end
+
+	if t6.id_binding ~= nil then
+		v49.id_binding = t1.IdBinding.jsonDecode(t6.id_binding)
+	end
+
+	if t6.idBinding ~= nil then
+		v49.id_binding = t1.IdBinding.jsonDecode(t6.idBinding)
+	end
+
+	if t6.alias ~= nil then
+		v49.alias = t6.alias
+	end
+
+	if t6.client_fetch ~= nil then
+		v49.client_fetch = t6.client_fetch
+	end
+
+	if t6.clientFetch ~= nil then
+		v49.client_fetch = t6.clientFetch
+	end
+
+	if t6.required_fields ~= nil then
+		local t7 = {}
+
+		for _, v52 in t6.required_fields do
+			table.insert(t7, v52)
+		end
+
+		v49.required_fields = t7
+	end
+
+	if t6.requiredFields ~= nil then
+		local t8 = {}
+
+		for _, v55 in t6.requiredFields do
+			table.insert(t8, v55)
+		end
+
+		v49.required_fields = t8
+	end
+
+	if t6.required ~= nil then
+		v49.required = t6.required
+	end
+
+	return v49
+end
+
+t2.descriptor = {
+	name = "HydrationDataSpec",
+	fullName = "roblox.apppageplatform.shared.v1beta1.HydrationDataSpec"
+}
+t1.HydrationDataSpec = t2
+typeRegistry.default:register(t1.HydrationDataSpec)
+
+local t9 = {}
+
+t9.__index = t9
+
+function t9.new(t10: {[any]: any}?) -- line: 343
+	-- upvalues: t9 (copy)
+	return (setmetatable({
+		kind = if t10 ~= nil and t10.kind ~= nil then t10.kind else nil
+	}, t9))
+end
+function t9.encode(p4) -- line: 349
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n3 = 0
+
+	if p4.kind ~= nil then
+		if p4.kind.type == "literal" then
+			local v60, v61 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeString(v60, v61, p4.kind.value)
+		elseif p4.kind.type == "input_path" then
+			local v62, v63 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeString(v62, v63, p4.kind.value)
+		end
+	end
+
+	local buf3 = buffer.create(n3)
+
+	buffer.copy(buf3, 0, buf, 0, n3)
+
+	return buf3
+end
+function t9.decode(p5: buffer) -- line: 368
+	-- upvalues: t9 (copy), proto (copy)
+	local v66 = t9.new()
+	local n4 = 0
+
+	while n4 < buffer.len(p5) do
+		local v68, v69
+
+		v68, v69, n4 = proto.readTag(p5, n4)
+
+		if v69 == proto.wireTypes.varint then
+			local v70
+
+			v70, n4 = proto.readVarInt(p5, n4)
+		elseif v69 == proto.wireTypes.lengthDelimited then
+			if v68 == 1 then
+				local v71
+
+				v71, n4 = proto.readBuffer(p5, n4)
+				v66.kind = {
+					type = "literal",
+					value = buffer.tostring(v71)
+				}
+			elseif v68 == 2 then
+				local v72
+
+				v72, n4 = proto.readBuffer(p5, n4)
+				v66.kind = {
+					type = "input_path",
+					value = buffer.tostring(v72)
+				}
+			else
+				local v73, v74 = proto.readVarInt(p5, n4)
+
+				n4 = v74 + v73
+			end
+		elseif v69 == proto.wireTypes.i32 then
+			local v75
+
+			v75, n4 = proto.readFixed32(p5, n4)
+		elseif v69 == proto.wireTypes.i64 then
+			local v76
+
+			v76, n4 = proto.readFixed64(p5, n4)
+		else
+			error("Unsupported wire type: " .. v69)
+		end
+	end
+
+	return v66
+end
+function t9.jsonEncode(p6) -- line: 416
+	local t11 = {}
+
+	if p6.kind ~= nil then
+		if p6.kind.type == "literal" then
+			t11.literal = p6.kind.value
+
+			return t11
+		end
+
+		if p6.kind.type == "input_path" then
+			t11.inputPath = p6.kind.value
+		end
+	end
+
+	return t11
+end
+function t9.jsonDecode(t12: {[any]: any}) -- line: 430
+	-- upvalues: t9 (copy)
+	local v80 = t9.new()
+
+	if t12.literal ~= nil then
+		v80.kind = {
+			type = "literal",
+			value = t12.literal
+		}
+	end
+
+	if t12.input_path ~= nil then
+		v80.kind = {
+			type = "input_path",
+			value = t12.input_path
+		}
+	end
+
+	if t12.inputPath ~= nil then
+		v80.kind = {
+			type = "input_path",
+			value = t12.inputPath
+		}
+	end
+
+	return v80
+end
+
+t9.descriptor = {
+	name = "IdBinding",
+	fullName = "roblox.apppageplatform.shared.v1beta1.IdBinding"
+}
+t1.IdBinding = t9
+typeRegistry.default:register(t1.IdBinding)
+
 return {
-    HydrationDataSpec = v2.HydrationDataSpec, 
-    IdBinding = v2.IdBinding
-};
+	HydrationDataSpec = t1.HydrationDataSpec,
+	IdBinding = t1.IdBinding
+}

@@ -1,3 +1,3 @@
 return {
-    PersistReducer = require(script.PersistReducer)
-};
+	PersistReducer = require(script.PersistReducer)
+}

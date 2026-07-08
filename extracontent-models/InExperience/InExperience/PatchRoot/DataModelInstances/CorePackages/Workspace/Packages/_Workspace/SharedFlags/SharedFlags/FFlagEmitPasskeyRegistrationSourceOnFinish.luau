@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EmitPasskeyRegistrationSourceOnFinish", false);
+return game:DefineFastFlag("EmitPasskeyRegistrationSourceOnFinish", false)

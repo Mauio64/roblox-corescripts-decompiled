@@ -1,31 +1,35 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Parent_3 = l_Parent_2.Parent;
-local v4 = require(l_Parent_3.Cryo);
-local _ = require(l_Parent_1.Style.StyleTypes);
-local v6 = require(l_Parent_2.Utility.setDefault);
-local v7 = require(l_Parent_0.Constants);
-local v8 = require(l_Parent_0.Enum.AspectRatioMode);
-local v9 = require(l_Parent_0.getAspectRatio);
-return function(v10, v11, v12, v13, v14) --[[ Line: 33 ]]
-    -- upvalues: v4 (copy), v7 (copy), v6 (copy), v8 (copy), v9 (copy)
-    local v15 = v4.Dictionary.join(v7.getDefaultStyleProps(v10), v14 or {});
-    local v16 = v6(v13, v7.DEFAULT_FOOTER_HEIGHT);
-    local v17 = v6(v12, v7.DEFAULT_TEXT_LINE_COUNT);
-    local v18 = v6(v11, v8.Square);
-    local l_topContentPadding_0 = v15.topContentPadding;
-    local l_bottomContentPadding_0 = v15.bottomContentPadding;
-    local l_contentTitleFont_0 = v15.contentTitleFont;
-    local l_contentTitlePadding_0 = v15.contentTitlePadding;
-    local l_selectionCursorPadding_0 = v15.selectionCursorPadding;
-    local v24 = l_selectionCursorPadding_0.Left + l_selectionCursorPadding_0.Right + l_topContentPadding_0.Left + l_topContentPadding_0.Right;
-    local v25 = math.floor(v17 * l_contentTitleFont_0.RelativeSize * v10.Font.BaseSize + l_contentTitlePadding_0) + v16;
-    local v26 = l_topContentPadding_0.Top + l_topContentPadding_0.Bottom;
-    local v27 = l_bottomContentPadding_0.Top + l_bottomContentPadding_0.Bottom;
-    local v28 = l_selectionCursorPadding_0.Top + l_selectionCursorPadding_0.Bottom;
-    local v29 = v26 + v27 + v28;
-    local v30 = v9(v18);
-    local v31 = -1 * v24 * v30 + v25 + v29;
-    return UDim.new(v30, v31);
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Cryo = require(ParentParentParentParent.Cryo)
+
+require(ParentParent.Style.StyleTypes)
+
+local setDefault = require(ParentParentParent.Utility.setDefault)
+local Constants = require(scriptParent.Constants)
+local AspectRatioMode = require(scriptParent.Enum.AspectRatioMode)
+local getAspectRatio = require(scriptParent.getAspectRatio)
+
+return function(p1, p2, n1: number?, n2: number?, p3) -- line: 33
+	-- upvalues: Cryo (copy), Constants (copy), setDefault (copy), AspectRatioMode (copy), getAspectRatio (copy)
+	local v15 = Cryo.Dictionary.join(Constants.getDefaultStyleProps(p1), p3 or {})
+	local v16 = setDefault(n2, Constants.DEFAULT_FOOTER_HEIGHT)
+	local v17 = setDefault(n1, Constants.DEFAULT_TEXT_LINE_COUNT)
+	local v18 = setDefault(p2, AspectRatioMode.Square)
+	local topContentPadding = v15.topContentPadding
+	local bottomContentPadding = v15.bottomContentPadding
+	local contentTitleFont = v15.contentTitleFont
+	local contentTitlePadding = v15.contentTitlePadding
+	local selectionCursorPadding = v15.selectionCursorPadding
+	local v24 = selectionCursorPadding.Left + selectionCursorPadding.Right + topContentPadding.Left + topContentPadding.Right
+	local v25 = math.floor(v17 * contentTitleFont.RelativeSize * p1.Font.BaseSize + contentTitlePadding) + v16
+	local v26 = topContentPadding.Top + topContentPadding.Bottom
+	local v27 = bottomContentPadding.Top + bottomContentPadding.Bottom
+	local v28 = selectionCursorPadding.Top + selectionCursorPadding.Bottom
+	local v29 = v26 + v27 + v28
+	local v30 = getAspectRatio(v18)
+	local v31 = -1 * v24 * v30 + v25 + v29
+
+	return UDim.new(v30, v31)
+end

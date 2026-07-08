@@ -1,19 +1,25 @@
-local l_NotificationService_0 = game:GetService("NotificationService");
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local v2 = require(l_Parent_0.React);
-return function() --[[ Line: 13 ]] --[[ Name: useSelectedTheme ]]
-    -- upvalues: v2 (copy), l_NotificationService_0 (copy)
-    local v3, v4 = v2.useState(string.lower(l_NotificationService_0.SelectedTheme));
-    v2.useEffect(function() --[[ Line: 16 ]]
-        -- upvalues: l_NotificationService_0 (ref), v4 (copy)
-        local v5 = l_NotificationService_0:GetPropertyChangedSignal("SelectedTheme"):Connect(function() --[[ Line: 17 ]]
-            -- upvalues: v4 (ref), l_NotificationService_0 (ref)
-            v4(string.lower(l_NotificationService_0.SelectedTheme));
-        end);
-        return function() --[[ Line: 21 ]]
-            -- upvalues: v5 (copy)
-            v5:Disconnect();
-        end;
-    end);
-    return v3;
-end;
+local NotificationService = game:GetService("NotificationService")
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local React = require(Parent.React)
+
+local function useSelectedTheme() -- line: 13
+	-- upvalues: React (copy), NotificationService (copy)
+	local v5, v6 = React.useState(string.lower(NotificationService.SelectedTheme))
+
+	React.useEffect(function() -- line: 16
+		-- upvalues: NotificationService (copy), v6 (copy)
+		local connection = NotificationService:GetPropertyChangedSignal("SelectedTheme"):Connect(function() -- line: 17
+			-- upvalues: v6 (copy), NotificationService (copy)
+			v6(string.lower(NotificationService.SelectedTheme))
+		end)
+
+		return function() -- line: 21
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end)
+
+	return v5
+end
+
+return useSelectedTheme

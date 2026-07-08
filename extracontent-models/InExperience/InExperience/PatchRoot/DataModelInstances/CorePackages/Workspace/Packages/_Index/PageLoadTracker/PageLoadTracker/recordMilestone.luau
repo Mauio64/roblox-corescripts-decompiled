@@ -1,12 +1,14 @@
-local l_Parent_0 = script:FindFirstAncestor("PageLoadTracker").Parent;
-local v1 = require(l_Parent_0.LoggingProtocol);
-local v2 = require(script.Parent.PageLoadConfig);
-local _ = require(script.Parent.PageLoadTypes);
-local l_default_0 = v1.default;
-recordMilestone = function(v5) --[[ Line: 10 ]] --[[ Name: recordMilestone ]]
-    -- upvalues: l_default_0 (copy), v2 (copy)
-    l_default_0:logRobloxTelemetryEvent(v2.PAGE_LOAD_SUMMARY_CONFIG, {
-        l_default_0.StandardizedFields.addOsInfo
-    }, v5);
-end;
-return recordMilestone;
+local Parent = script:FindFirstAncestor("PageLoadTracker").Parent
+local LoggingProtocol = require(Parent.LoggingProtocol)
+local PageLoadConfig = require(script.Parent.PageLoadConfig)
+
+require(script.Parent.PageLoadTypes)
+
+local default = LoggingProtocol.default
+
+function recordMilestone(p1) -- line: 10
+	-- upvalues: default (copy), PageLoadConfig (copy)
+	default:logRobloxTelemetryEvent(PageLoadConfig.PAGE_LOAD_SUMMARY_CONFIG, { default.StandardizedFields.addOsInfo }, p1)
+end
+
+return recordMilestone

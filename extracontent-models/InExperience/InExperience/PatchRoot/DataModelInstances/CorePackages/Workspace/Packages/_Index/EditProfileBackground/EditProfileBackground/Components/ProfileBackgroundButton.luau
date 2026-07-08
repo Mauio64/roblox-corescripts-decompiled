@@ -1,1 +1,1 @@
-return require(script.ProfileBackgroundButton);
+return require(script.ProfileBackgroundButton)

@@ -1,336 +1,345 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarExperienceControlBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UserLib);
-local v4 = require(l_Parent_0.Navigation);
-local v5 = require(l_Parent_0.AvatarExperienceNavigation);
-local v6 = require(l_Parent_0.Responsive);
-local v7 = require(l_Parent_0.Localization);
-local v8 = require(l_Parent_0.AvatarExperienceCommon);
-local v9 = require(l_Parent_0.AvatarExperienceAnalytics);
-local v10 = require(l_Parent_0.IXPUtils);
-local v11 = require(l_Parent_0.Foundation);
-local l_selectColorAdjustmentButtonColor_0 = v8.State.Selectors.selectColorAdjustmentButtonColor;
-local l_selectHasDynamicHead_0 = v8.State.Selectors.selectHasDynamicHead;
-local l_SlotBasedEditorAnalytics_0 = v9.Surfaces.SlotBasedEditorAnalytics;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local l_useNavigation_0 = v4.useNavigation;
-local v17 = require(l_script_FirstAncestor_0.Hooks.useSemanticTokens);
-local l_useLocalization_0 = v7.Hooks.useLocalization;
-local v19 = require(script.Parent.UndoRedoBar.useUndoRedoBarViewModel);
-local l_IconName_0 = v11.Enums.IconName;
-local l_AvatarScreen_0 = v5.Enums.AvatarScreen;
-local l_getRbxthumbWithTypeSizeAndOptions_0 = v3.Utils.getRbxthumbWithTypeSizeAndOptions;
-local l_Constants_0 = v3.Utils.Constants;
-local v24 = require(l_script_FirstAncestor_0.Enums.MenuItemEnum);
-local _ = require(l_script_FirstAncestor_0.ControlBarTypes);
-local v26 = require(l_Parent_0.AvatarExperienceFlags);
-local l_FFlagAXAvatarSharingEntryPoint_0 = v26.FFlagAXAvatarSharingEntryPoint;
-local l_FFlagAXPhotoboothFunctionality_0 = v26.FFlagAXPhotoboothFunctionality;
-local l_FFlagAXMigrateBuilderIcons_0 = v26.FFlagAXMigrateBuilderIcons;
-local l_AXEnableAccessoryAdjustmentDuringTryOnIXP_0 = require(l_Parent_0.AvatarExperienceExperiments).AXEnableAccessoryAdjustmentDuringTryOnIXP;
-local l_FFlagAXRootSlotBasedEditorFlag_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXRootSlotBasedEditorFlag;
-local l_FFlagAXResetAvatarButton_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXResetAvatarButton;
-local l_FFlagAXCustomizeMakeupSupport_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXCustomizeMakeupSupport;
-local l_FFlagAXHideHeadAdjustmentForDefaultHead_0 = require(l_Parent_0.AvatarExperienceFlags).FFlagAXHideHeadAdjustmentForDefaultHead;
-local l_AvatarHeadShot_0 = l_Constants_0.RbxthumbTypes.AvatarHeadShot;
-local function v37(v36) --[[ Line: 50 ]] --[[ Name: selectUserId ]]
-    return v36.LocalUserId;
-end;
-return function(v38) --[[ Line: 64 ]] --[[ Name: useCustomizeControlBarProps ]]
-    -- upvalues: v17 (copy), l_useNavigation_0 (copy), l_useSelector_0 (copy), l_selectColorAdjustmentButtonColor_0 (copy), v6 (copy), v37 (copy), l_useLocalization_0 (copy), l_FFlagAXCustomizeMakeupSupport_0 (copy), l_FFlagAXAvatarSharingEntryPoint_0 (copy), l_FFlagAXPhotoboothFunctionality_0 (copy), v2 (copy), l_AvatarScreen_0 (copy), l_SlotBasedEditorAnalytics_0 (copy), v24 (copy), l_AXEnableAccessoryAdjustmentDuringTryOnIXP_0 (copy), v10 (copy), l_FFlagAXHideHeadAdjustmentForDefaultHead_0 (copy), l_selectHasDynamicHead_0 (copy), l_FFlagAXResetAvatarButton_0 (copy), v19 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (copy), l_AvatarHeadShot_0 (copy), l_FFlagAXRootSlotBasedEditorFlag_0 (copy), l_FFlagAXMigrateBuilderIcons_0 (copy), l_IconName_0 (copy)
-    local v39 = v17();
-    local v40 = l_useNavigation_0();
-    local v41 = l_useSelector_0(l_selectColorAdjustmentButtonColor_0);
-    local v42 = v6.useOrientation() == v6.Keys.Portrait;
-    local v43 = l_useSelector_0(v37);
-    local v44 = l_useLocalization_0({
-        adjustAccessory = "Feature.Avatar.Label.Title.AccessoryAdjustment", 
-        bodyShape = "Feature.Avatar.Label.Title.BodyShape", 
-        clothingLayering = "Feature.Avatar.Label.Title.ClothingLayering", 
-        makeupLayering = l_FFlagAXCustomizeMakeupSupport_0 and "Feature.Avatar.Label.Title.MakeupLayering" or nil, 
-        headAdjustment = "Feature.Avatar.Label.Title.HeadAdjustment", 
-        inventory = "Feature.Avatar.Label.Title.Inventory", 
-        emotes = "Feature.Avatar.Label.Title.Emotes", 
-        profilePhoto = "Feature.Avatar.Label.Title.ProfilePhoto", 
-        skinColor = "Feature.Avatar.ColorAdjustmentPage.Title", 
-        shareAvatar = l_FFlagAXAvatarSharingEntryPoint_0 and "Feature.Avatar.Action.ShareAvatar" or nil, 
-        myPublishedAvatars = l_FFlagAXAvatarSharingEntryPoint_0 and "Feature.Avatar.Action.MyPublishedAvatars" or nil, 
-        photobooth = l_FFlagAXPhotoboothFunctionality_0 and "Feature.Avatar.Label.Photobooth" or nil
-    });
-    local v45 = v2.useCallback(function() --[[ Line: 87 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.AvatarSwitcher);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.Main.AvatarSwitcher);
-    end, {
-        v40
-    });
-    local v46 = v2.useCallback(function() --[[ Line: 93 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.AccessoryAdjustment);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.AdjustAccessory);
-    end, {
-        v40
-    });
-    local v47 = v2.useCallback(function() --[[ Line: 98 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.BodyShape);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.BodyScale);
-    end, {
-        v40
-    });
-    local v48 = v2.useCallback(function() --[[ Line: 103 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.HeadRefinement);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.CustomizeHead);
-    end, {
-        v40
-    });
-    local v49 = v2.useCallback(function() --[[ Line: 108 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.LayeredClothingSort);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.ClothingLayers);
-    end, {
-        v40
-    });
-    local v50 = if l_FFlagAXCustomizeMakeupSupport_0 then v2.useCallback(function() --[[ Line: 114 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.LayeredMakeupSort);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.MakeupLayers);
-    end, {
-        v40
-    }) else nil;
-    local v51 = v2.useCallback(function() --[[ Line: 120 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.ColorAdjustment);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.AvatarRefinement.ColorAdjustment);
-    end, {
-        v40
-    });
-    local v52 = nil;
-    local v53 = nil;
-    if l_FFlagAXAvatarSharingEntryPoint_0 then
-        v52 = v2.useCallback(function() --[[ Line: 127 ]]
-            -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-            local v54 = if v40.state and v40.state.key then v40.state.key else nil;
-            v40.navigate(l_AvatarScreen_0.LookComposerPage, {
-                prevNavPage = v54
-            });
-            l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.SharedCommunityAvatars.ShareAvatar);
-        end, {
-            v40
-        });
-        v53 = v2.useCallback(function() --[[ Line: 135 ]]
-            -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-            v40.navigate(l_AvatarScreen_0.MySharedAvatars);
-            l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.SharedCommunityAvatars.MyPublishedAvatars);
-        end, {
-            v40
-        });
-    end;
-    local v55 = v2.useCallback(function() --[[ Line: 141 ]]
-        -- upvalues: v38 (copy), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        if v38.onInventoryActivated then
-            v38.onInventoryActivated();
-        end;
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.More.Inventory);
-    end, {
-        v38.onInventoryActivated
-    });
-    local v56 = v2.useCallback(function() --[[ Line: 148 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        v40.navigate(l_AvatarScreen_0.EditEmotes);
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.More.Emotes);
-    end, {
-        v40
-    });
-    local v58 = v2.useCallback(function() --[[ Line: 153 ]]
-        -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-        local v57 = if v40.state and v40.state.key then v40.state.key else nil;
-        v40.navigate(l_AvatarScreen_0.ProfilePictureEditorEmotes, {
-            prevNavPage = v57
-        });
-        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.More.ProfilePhoto);
-    end, {
-        v40
-    });
-    local v59 = nil;
-    if l_FFlagAXPhotoboothFunctionality_0 then
-        v59 = v2.useCallback(function() --[[ Line: 164 ]]
-            -- upvalues: v40 (copy), l_AvatarScreen_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-            v40.navigate(l_AvatarScreen_0.Photobooth);
-            l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.Photobooth.Photobooth);
-        end, {
-            v40
-        });
-    end;
-    local v60 = if l_AXEnableAccessoryAdjustmentDuringTryOnIXP_0.isEnabled() then v10.readTestVariable(l_AXEnableAccessoryAdjustmentDuringTryOnIXP_0.EnabledForUser) else nil;
-    local v61 = if l_FFlagAXHideHeadAdjustmentForDefaultHead_0 then l_useSelector_0(l_selectHasDynamicHead_0) else nil;
-    local v62 = if l_FFlagAXResetAvatarButton_0 then v19() else nil;
-    return {
-        config = v2.useMemo(function() --[[ Line: 179 ]]
-            -- upvalues: v24 (ref), v38 (copy), l_getRbxthumbWithTypeSizeAndOptions_0 (ref), v43 (copy), l_AvatarHeadShot_0 (ref), l_FFlagAXRootSlotBasedEditorFlag_0 (ref), v58 (copy), v45 (copy), l_FFlagAXMigrateBuilderIcons_0 (ref), l_IconName_0 (ref), l_SlotBasedEditorAnalytics_0 (ref), v44 (copy), v60 (copy), v39 (copy), v46 (copy), v47 (copy), v48 (copy), l_FFlagAXHideHeadAdjustmentForDefaultHead_0 (ref), v61 (copy), v49 (copy), l_FFlagAXCustomizeMakeupSupport_0 (ref), v50 (copy), v41 (copy), v51 (copy), l_FFlagAXAvatarSharingEntryPoint_0 (ref), v52 (ref), v53 (ref), v55 (copy), v42 (copy), v56 (copy), l_FFlagAXPhotoboothFunctionality_0 (ref), v59 (ref), l_FFlagAXResetAvatarButton_0 (ref), v62 (copy)
-            local v63 = {
-                {
-                    type = "image", 
-                    id = v24.Main.AvatarSwitcher, 
-                    thumbnailUrl = if v38.thumbnailUrl then v38.thumbnailUrl else l_getRbxthumbWithTypeSizeAndOptions_0(v43, l_AvatarHeadShot_0, 150, true, true), 
-                    onActivated = if l_FFlagAXRootSlotBasedEditorFlag_0 then v58 else v45, 
-                    hideIndicator = l_FFlagAXRootSlotBasedEditorFlag_0 and true or nil, 
-                    enableFocusAnimation = if v38.focusAnimation then v38.focusAnimation.enabled and v38.focusAnimation.menuItemId == v24.Main.AvatarSwitcher else nil
-                }, 
-                {
-                    type = "icon", 
-                    id = v24.Main.AvatarRefinement, 
-                    icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.PersonStandingGear else "icons/menu/customize", 
-                    onActivated = function() --[[ Line: 206 ]] --[[ Name: onActivated ]]
-                        -- upvalues: l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-                        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.Main.AvatarRefinement);
-                    end, 
-                    children = {
-                        {
-                            type = "icon", 
-                            id = v24.AvatarRefinement.AdjustAccessory, 
-                            text = v44.adjustAccessory, 
-                            icon = v60 and "icons/menu/transform-small" or if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.HatFedora else "icons/menu/clothing/hats_off", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v46
-                        }, 
-                        {
-                            type = "icon", 
-                            id = v24.AvatarRefinement.BodyScale, 
-                            text = v44.bodyShape, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.PersonStandingDualArrowsVertical else "icons/menu/clothing/build_off", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v47
-                        }, 
-                        {
-                            type = "icon", 
-                            id = v24.AvatarRefinement.CustomizeHead, 
-                            text = v44.headAdjustment, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.HeadBlank else "icons/menu/clothing/classicHead_off", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v48, 
-                            visible = if l_FFlagAXHideHeadAdjustmentForDefaultHead_0 then v61 else nil
-                        }, 
-                        {
-                            type = "icon", 
-                            id = v24.AvatarRefinement.ClothingLayers, 
-                            text = v44.clothingLayering, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.ClothesHanger else "icons/menu/clothing/clothing_off", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v49
-                        }, 
-                        if l_FFlagAXCustomizeMakeupSupport_0 then {
-                            type = "icon", 
-                            id = v24.AvatarRefinement.MakeupLayers, 
-                            text = v44.makeupLayering, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.LipsLipstickMakeupBrush else "icons/menu/clothing/eyelash_off", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v50
-                        } else nil, 
-                        if v41 then {
-                            type = "color", 
-                            id = v24.AvatarRefinement.ColorAdjustment, 
-                            text = v44.skinColor, 
-                            colors = {
-                                v41
-                            }, 
-                            colorSize = v39.defaultLegacyIconSize, 
-                            onActivated = v51
-                        } else nil
-                    }
-                }, 
-                if l_FFlagAXAvatarSharingEntryPoint_0 then {
-                    type = "icon", 
-                    id = v24.Main.SharedCommunityAvatars, 
-                    icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.CirclePlus else "icons/actions/edit/add", 
-                    onActivated = function() --[[ Line: 282 ]] --[[ Name: onActivated ]]
-                        -- upvalues: l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-                        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.Main.SharedCommunityAvatars);
-                    end, 
-                    children = {
-                        {
-                            type = "icon", 
-                            id = v24.SharedCommunityAvatars.ShareAvatar, 
-                            text = v44.shareAvatar, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.PlusLarge else "icons/common/plus_heavy", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v52
-                        }, 
-                        {
-                            type = "icon", 
-                            id = v24.SharedCommunityAvatars.MyPublishedAvatars, 
-                            text = v44.myPublishedAvatars, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.Person else "icons/actions/friend_sort/my_profile", 
-                            iconSize = v39.defaultLegacyIconSize, 
-                            onActivated = v53
-                        }
-                    }
-                } else nil, 
-                if not l_FFlagAXRootSlotBasedEditorFlag_0 then {
-                    type = "icon", 
-                    id = v24.Main.More, 
-                    icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.ThreeBarsHorizontal else "icons/common/hamburgermenu", 
-                    onActivated = function() --[[ Line: 316 ]] --[[ Name: onActivated ]]
-                        -- upvalues: l_SlotBasedEditorAnalytics_0 (ref), v24 (ref)
-                        l_SlotBasedEditorAnalytics_0.trackControlBarClick(v24.Main.More);
-                    end, 
-                    visible = not l_FFlagAXRootSlotBasedEditorFlag_0, 
-                    children = {
-                        {
-                            type = "icon", 
-                            id = v24.More.Inventory, 
-                            text = v44.inventory, 
-                            icon = if l_FFlagAXMigrateBuilderIcons_0 then l_IconName_0.Backpack else "icons/menu/inventoryOff", 
-                            onActivated = v55, 
-                            visible = v42
-                        }, 
-                        if not l_FFlagAXRootSlotBasedEditorFlag_0 then {
-                            type = "icon", 
-                            id = v24.More.Emotes, 
-                            text = v44.emotes, 
-                            icon = "icons/controls/emoteOff", 
-                            onActivated = v56
-                        } else nil, 
-                        if l_FFlagAXPhotoboothFunctionality_0 then {
-                            type = "icon", 
-                            id = v24.Photobooth.Photobooth, 
-                            text = if v44.photobooth then v44.photobooth else "Photobooth", 
-                            icon = "icons/controls/screenshot", 
-                            onActivated = v59
-                        } else nil
-                    }
-                } else nil
-            };
-            if l_FFlagAXResetAvatarButton_0 and v38.showUndoRedo then
-                table.insert(v63, {
-                    type = "divider", 
-                    id = v24.UndoRedoDivider
-                });
-                for _, v65 in v62.items do
-                    table.insert(v63, v65);
-                end;
-            end;
-            return v63;
-        end, {
-            v43, 
-            v45, 
-            v46, 
-            v47, 
-            v48, 
-            v49, 
-            v55, 
-            v56, 
-            v58, 
-            v51, 
-            v41, 
-            v42, 
-            v38.thumbnailUrl, 
-            v38.focusAnimation, 
-            if l_FFlagAXResetAvatarButton_0 then v38.showUndoRedo else nil, 
-            if l_FFlagAXResetAvatarButton_0 then v62 else nil, 
-            if l_FFlagAXHideHeadAdjustmentForDefaultHead_0 then v61 else nil
-        })
-    };
-end;
+local AvatarExperienceControlBar = script:FindFirstAncestor("AvatarExperienceControlBar")
+local AvatarExperienceControlBarParent = AvatarExperienceControlBar.Parent
+local React = require(AvatarExperienceControlBarParent.React)
+local UserLib = require(AvatarExperienceControlBarParent.UserLib)
+local Navigation = require(AvatarExperienceControlBarParent.Navigation)
+local AvatarExperienceNavigation = require(AvatarExperienceControlBarParent.AvatarExperienceNavigation)
+local Responsive = require(AvatarExperienceControlBarParent.Responsive)
+local Localization = require(AvatarExperienceControlBarParent.Localization)
+local AvatarExperienceCommon = require(AvatarExperienceControlBarParent.AvatarExperienceCommon)
+local AvatarExperienceAnalytics = require(AvatarExperienceControlBarParent.AvatarExperienceAnalytics)
+local IXPUtils = require(AvatarExperienceControlBarParent.IXPUtils)
+local Foundation = require(AvatarExperienceControlBarParent.Foundation)
+local selectColorAdjustmentButtonColor = AvatarExperienceCommon.State.Selectors.selectColorAdjustmentButtonColor
+local selectHasDynamicHead = AvatarExperienceCommon.State.Selectors.selectHasDynamicHead
+local SlotBasedEditorAnalytics = AvatarExperienceAnalytics.Surfaces.SlotBasedEditorAnalytics
+local useSelector = require(AvatarExperienceControlBarParent.RoactUtils).Hooks.RoactRodux.useSelector
+local useNavigation = Navigation.useNavigation
+local useSemanticTokens = require(AvatarExperienceControlBar.Hooks.useSemanticTokens)
+local useLocalization = Localization.Hooks.useLocalization
+local useUndoRedoBarViewModel = require(script.Parent.UndoRedoBar.useUndoRedoBarViewModel)
+local IconName = Foundation.Enums.IconName
+local AvatarScreen = AvatarExperienceNavigation.Enums.AvatarScreen
+local getRbxthumbWithTypeSizeAndOptions = UserLib.Utils.getRbxthumbWithTypeSizeAndOptions
+local Constants = UserLib.Utils.Constants
+local MenuItemEnum = require(AvatarExperienceControlBar.Enums.MenuItemEnum)
+
+require(AvatarExperienceControlBar.ControlBarTypes)
+
+local AvatarExperienceFlags = require(AvatarExperienceControlBarParent.AvatarExperienceFlags)
+local FFlagAXAvatarSharingEntryPoint = AvatarExperienceFlags.FFlagAXAvatarSharingEntryPoint
+local FFlagAXPhotoboothFunctionality = AvatarExperienceFlags.FFlagAXPhotoboothFunctionality
+local FFlagAXMigrateBuilderIcons = AvatarExperienceFlags.FFlagAXMigrateBuilderIcons
+local AXEnableAccessoryAdjustmentDuringTryOnIXP = require(AvatarExperienceControlBarParent.AvatarExperienceExperiments).AXEnableAccessoryAdjustmentDuringTryOnIXP
+local FFlagAXRootSlotBasedEditorFlag = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXRootSlotBasedEditorFlag
+local FFlagAXResetAvatarButton = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXResetAvatarButton
+local FFlagAXCustomizeMakeupSupport = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXCustomizeMakeupSupport
+local FFlagAXHideHeadAdjustmentForDefaultHead = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXHideHeadAdjustmentForDefaultHead
+local FFlagAXFavoritesManagerNavEntry = require(AvatarExperienceControlBarParent.AvatarExperienceFlags).FFlagAXFavoritesManagerNavEntry
+local AvatarHeadShot = Constants.RbxthumbTypes.AvatarHeadShot
+
+local function selectUserId(p1) -- line: 51
+	return p1.LocalUserId
+end
+local function useCustomizeControlBarProps(p2) -- line: 65
+	-- upvalues: useSemanticTokens (copy), useNavigation (copy), useSelector (copy), selectColorAdjustmentButtonColor (copy), Responsive (copy), selectUserId (copy), useLocalization (copy), FFlagAXCustomizeMakeupSupport (copy), FFlagAXAvatarSharingEntryPoint (copy), FFlagAXPhotoboothFunctionality (copy), React (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy), FFlagAXFavoritesManagerNavEntry (copy), AXEnableAccessoryAdjustmentDuringTryOnIXP (copy), IXPUtils (copy), FFlagAXHideHeadAdjustmentForDefaultHead (copy), selectHasDynamicHead (copy), FFlagAXResetAvatarButton (copy), useUndoRedoBarViewModel (copy), getRbxthumbWithTypeSizeAndOptions (copy), AvatarHeadShot (copy), FFlagAXRootSlotBasedEditorFlag (copy), FFlagAXMigrateBuilderIcons (copy), IconName (copy)
+	local v41 = useSemanticTokens()
+	local v42 = useNavigation()
+	local v43 = useSelector(selectColorAdjustmentButtonColor)
+	local v44 = Responsive.useOrientation() == Responsive.Keys.Portrait
+	local v45 = useSelector(selectUserId)
+	local v46 = useLocalization({
+		adjustAccessory = "Feature.Avatar.Label.Title.AccessoryAdjustment",
+		bodyShape = "Feature.Avatar.Label.Title.BodyShape",
+		clothingLayering = "Feature.Avatar.Label.Title.ClothingLayering",
+		headAdjustment = "Feature.Avatar.Label.Title.HeadAdjustment",
+		inventory = "Feature.Avatar.Label.Title.Inventory",
+		emotes = "Feature.Avatar.Label.Title.Emotes",
+		profilePhoto = "Feature.Avatar.Label.Title.ProfilePhoto",
+		skinColor = "Feature.Avatar.ColorAdjustmentPage.Title",
+		makeupLayering = if not FFlagAXCustomizeMakeupSupport then nil else "Feature.Avatar.Label.Title.MakeupLayering",
+		shareAvatar = if not FFlagAXAvatarSharingEntryPoint then nil else "Feature.Avatar.Action.ShareAvatar",
+		myPublishedAvatars = if not FFlagAXAvatarSharingEntryPoint then nil else "Feature.Avatar.Action.MyPublishedAvatars",
+		photobooth = if not FFlagAXPhotoboothFunctionality then nil else "Feature.Avatar.Label.Photobooth"
+	})
+	local v47 = React.useCallback(function() -- line: 88
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.AvatarSwitcher)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Main.AvatarSwitcher)
+	end, { v42 })
+	local v48 = React.useCallback(function() -- line: 94
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.AccessoryAdjustment)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.AdjustAccessory)
+	end, { v42 })
+	local v49 = React.useCallback(function() -- line: 99
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.BodyShape)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.BodyScale)
+	end, { v42 })
+	local v50 = React.useCallback(function() -- line: 104
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.HeadRefinement)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.CustomizeHead)
+	end, { v42 })
+	local v51 = React.useCallback(function() -- line: 109
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.LayeredClothingSort)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.ClothingLayers)
+	end, { v42 })
+	local v52 = if not FFlagAXCustomizeMakeupSupport then nil else React.useCallback(function() -- line: 115
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.LayeredMakeupSort)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.MakeupLayers)
+	end, { v42 })
+	local v53 = React.useCallback(function() -- line: 121
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.ColorAdjustment)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.AvatarRefinement.ColorAdjustment)
+	end, { v42 })
+	local u54 = nil
+	local u55 = nil
+
+	if FFlagAXAvatarSharingEntryPoint then
+		u54 = React.useCallback(function() -- line: 128
+			-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+			local v64 = if not v42.state or not v42.state.key then nil else v42.state.key
+
+			v42.navigate(AvatarScreen.LookComposerPage, {
+				prevNavPage = v64
+			})
+			SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.SharedCommunityAvatars.ShareAvatar)
+		end, { v42 })
+		u55 = React.useCallback(function() -- line: 136
+			-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+			v42.navigate(AvatarScreen.MySharedAvatars)
+			SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.SharedCommunityAvatars.MyPublishedAvatars)
+		end, { v42 })
+	end
+
+	local v56 = React.useCallback(function() -- line: 142
+		-- upvalues: p2 (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		if p2.onInventoryActivated then
+			p2.onInventoryActivated()
+		end
+
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.More.Inventory)
+	end, { p2.onInventoryActivated })
+	local v57 = React.useCallback(function() -- line: 149
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		v42.navigate(AvatarScreen.EditEmotes)
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.More.Emotes)
+	end, { v42 })
+	local v58 = React.useCallback(function() -- line: 154
+		-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+		local v65 = if not v42.state or not v42.state.key then nil else v42.state.key
+
+		v42.navigate(AvatarScreen.ProfilePictureEditorEmotes, {
+			prevNavPage = v65
+		})
+		SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.More.ProfilePhoto)
+	end, { v42 })
+	local u59 = nil
+
+	if FFlagAXPhotoboothFunctionality then
+		u59 = React.useCallback(function() -- line: 165
+			-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+			v42.navigate(AvatarScreen.Photobooth)
+			SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Photobooth.Photobooth)
+		end, { v42 })
+	end
+
+	local u60 = nil
+
+	if FFlagAXFavoritesManagerNavEntry then
+		u60 = React.useCallback(function() -- line: 173
+			-- upvalues: v42 (copy), AvatarScreen (copy), SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+			v42.navigate(AvatarScreen.FavoritesSaved)
+			SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Main.Favorites)
+		end, { v42 })
+	end
+
+	local v61 = if not AXEnableAccessoryAdjustmentDuringTryOnIXP.isEnabled() then nil else IXPUtils.readTestVariable(AXEnableAccessoryAdjustmentDuringTryOnIXP.EnabledForUser)
+	local v62 = if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else useSelector(selectHasDynamicHead)
+	local v63 = if not FFlagAXResetAvatarButton then nil else useUndoRedoBarViewModel()
+
+	return {
+		config = React.useMemo(function() -- line: 193
+			-- upvalues: MenuItemEnum (copy), p2 (copy), getRbxthumbWithTypeSizeAndOptions (copy), v45 (copy), AvatarHeadShot (copy), FFlagAXRootSlotBasedEditorFlag (copy), v58 (copy), v47 (copy), FFlagAXMigrateBuilderIcons (copy), IconName (copy), SlotBasedEditorAnalytics (copy), v46 (copy), v61 (copy), v41 (copy), v48 (copy), v49 (copy), v50 (copy), FFlagAXHideHeadAdjustmentForDefaultHead (copy), v62 (copy), v51 (copy), FFlagAXCustomizeMakeupSupport (copy), v52 (copy), v43 (copy), v53 (copy), FFlagAXAvatarSharingEntryPoint (copy), u54 (ref), u55 (ref), v56 (copy), v44 (copy), v57 (copy), FFlagAXPhotoboothFunctionality (copy), u59 (ref), FFlagAXFavoritesManagerNavEntry (copy), u60 (ref), FFlagAXResetAvatarButton (copy), v63 (copy)
+			local t1 = {
+				{
+					type = "image",
+					id = MenuItemEnum.Main.AvatarSwitcher,
+					thumbnailUrl = if not p2.thumbnailUrl then getRbxthumbWithTypeSizeAndOptions(v45, AvatarHeadShot, 150, true, true) else p2.thumbnailUrl,
+					onActivated = if not FFlagAXRootSlotBasedEditorFlag then v47 else v58,
+					hideIndicator = not not FFlagAXRootSlotBasedEditorFlag or nil,
+					enableFocusAnimation = if not p2.focusAnimation then nil else p2.focusAnimation.enabled and p2.focusAnimation.menuItemId == MenuItemEnum.Main.AvatarSwitcher
+				},
+				{
+					type = "icon",
+					id = MenuItemEnum.Main.AvatarRefinement,
+					icon = not FFlagAXMigrateBuilderIcons and "icons/menu/customize" or IconName.PersonStandingGear,
+					onActivated = function() -- line: 220
+						-- upvalues: SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+						SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Main.AvatarRefinement)
+					end,
+					children = {
+						{
+							type = "icon",
+							id = MenuItemEnum.AvatarRefinement.AdjustAccessory,
+							text = v46.adjustAccessory,
+							icon = if not v61 then not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/hats_off" or IconName.HatFedora else "icons/menu/transform-small",
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = v48
+						},
+						{
+							type = "icon",
+							id = MenuItemEnum.AvatarRefinement.BodyScale,
+							text = v46.bodyShape,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/build_off" or IconName.PersonStandingDualArrowsVertical,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = v49
+						},
+						{
+							type = "icon",
+							id = MenuItemEnum.AvatarRefinement.CustomizeHead,
+							text = v46.headAdjustment,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/classicHead_off" or IconName.HeadBlank,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = v50,
+							visible = if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else v62
+						},
+						{
+							type = "icon",
+							id = MenuItemEnum.AvatarRefinement.ClothingLayers,
+							text = v46.clothingLayering,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/clothing_off" or IconName.ClothesHanger,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = v51
+						},
+						if not FFlagAXCustomizeMakeupSupport then nil else {
+							type = "icon",
+							id = MenuItemEnum.AvatarRefinement.MakeupLayers,
+							text = v46.makeupLayering,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/menu/clothing/eyelash_off" or IconName.LipsLipstickMakeupBrush,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = v52
+						},
+						if not v43 then nil else {
+							type = "color",
+							id = MenuItemEnum.AvatarRefinement.ColorAdjustment,
+							text = v46.skinColor,
+							colors = { v43 },
+							colorSize = v41.defaultLegacyIconSize,
+							onActivated = v53
+						}
+					}
+				},
+				if not FFlagAXAvatarSharingEntryPoint then nil else {
+					type = "icon",
+					id = MenuItemEnum.Main.SharedCommunityAvatars,
+					icon = not FFlagAXMigrateBuilderIcons and "icons/actions/edit/add" or IconName.CirclePlus,
+					onActivated = function() -- line: 296
+						-- upvalues: SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+						SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Main.SharedCommunityAvatars)
+					end,
+					children = {
+						{
+							type = "icon",
+							id = MenuItemEnum.SharedCommunityAvatars.ShareAvatar,
+							text = v46.shareAvatar,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/common/plus_heavy" or IconName.PlusLarge,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = u54
+						},
+						{
+							type = "icon",
+							id = MenuItemEnum.SharedCommunityAvatars.MyPublishedAvatars,
+							text = v46.myPublishedAvatars,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/actions/friend_sort/my_profile" or IconName.Person,
+							iconSize = v41.defaultLegacyIconSize,
+							onActivated = u55
+						}
+					}
+				},
+				if FFlagAXRootSlotBasedEditorFlag then nil else {
+					type = "icon",
+					id = MenuItemEnum.Main.More,
+					icon = not FFlagAXMigrateBuilderIcons and "icons/common/hamburgermenu" or IconName.ThreeBarsHorizontal,
+					onActivated = function() -- line: 330
+						-- upvalues: SlotBasedEditorAnalytics (copy), MenuItemEnum (copy)
+						SlotBasedEditorAnalytics.trackControlBarClick(MenuItemEnum.Main.More)
+					end,
+					visible = not FFlagAXRootSlotBasedEditorFlag,
+					children = {
+						{
+							type = "icon",
+							id = MenuItemEnum.More.Inventory,
+							text = v46.inventory,
+							icon = not FFlagAXMigrateBuilderIcons and "icons/menu/inventoryOff" or IconName.Backpack,
+							onActivated = v56,
+							visible = v44
+						},
+						if FFlagAXRootSlotBasedEditorFlag then nil else {
+							type = "icon",
+							icon = "icons/controls/emoteOff",
+							id = MenuItemEnum.More.Emotes,
+							text = v46.emotes,
+							onActivated = v57
+						},
+						if not FFlagAXPhotoboothFunctionality then nil else {
+							type = "icon",
+							icon = "icons/controls/screenshot",
+							id = MenuItemEnum.Photobooth.Photobooth,
+							text = not v46.photobooth and "Photobooth" or v46.photobooth,
+							onActivated = u59
+						}
+					}
+				}
+			}
+
+			if FFlagAXFavoritesManagerNavEntry then
+				table.insert(t1, {
+					type = "icon",
+					isActive = false,
+					id = MenuItemEnum.Main.Favorites,
+					icon = IconName.Star,
+					onActivated = u60
+				})
+			end
+
+			if FFlagAXResetAvatarButton and p2.showUndoRedo then
+				table.insert(t1, {
+					type = "divider",
+					id = MenuItemEnum.UndoRedoDivider
+				})
+
+				for _, v68 in v63.items do
+					table.insert(t1, v68)
+				end
+			end
+
+			return t1
+		end, {
+			v45,
+			v47,
+			v48,
+			v49,
+			v50,
+			v51,
+			v56,
+			v57,
+			v58,
+			v53,
+			v43,
+			v44,
+			p2.thumbnailUrl,
+			p2.focusAnimation,
+			if not FFlagAXResetAvatarButton then nil else p2.showUndoRedo,
+			if not FFlagAXResetAvatarButton then nil else v63,
+			if not FFlagAXHideHeadAdjustmentForDefaultHead then nil else v62
+		})
+	}
+end
+
+return useCustomizeControlBarProps

@@ -1,118 +1,137 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local v3 = require(l_Parent_2.Roact);
-local v4 = require(l_Parent_2.t);
-local v5 = require(l_Parent_1.Core.Style.withStyle);
-local v6 = require(l_Parent_1.Core.ImageSet.ImageSetComponent);
-local v7 = require(l_Parent_1.App.Loading.LoadableImage);
-local v8 = require(l_Parent_0.TileSelectionOverlay);
-local v9 = require(l_Parent_0.TileUnselectedOverlay);
-local v10 = v3.PureComponent:extend("TileThumbnail");
-v10.validateProps = v4.strictInterface({
-    hasRoundedCorners = v4.optional(v4.boolean), 
-    cornerRadius = v4.optional(v4.UDim), 
-    Image = v4.optional(v4.union(v4.string, v4.table)), 
-    imageSize = v4.optional(v4.UDim2), 
-    imageColor = v4.optional(v4.Color3), 
-    imageTransparency = v4.optional(v4.number), 
-    isSelected = v4.optional(v4.boolean), 
-    multiSelect = v4.optional(v4.boolean), 
-    overlayComponents = v4.optional(v4.table), 
-    backgroundImage = v4.optional(v4.union(v4.string, v4.table)), 
-    scaleType = v4.optional(v4.enum(Enum.ScaleType)), 
-    onThumbnailLoaded = v4.optional(v4.callback)
-});
-v10.defaultProps = {
-    imageSize = UDim2.fromScale(1, 1), 
-    imageTransparency = 0, 
-    cornerRadius = UDim.new(0, 10), 
-    scaleType = Enum.ScaleType.Stretch
-};
-v10.render = function(v11) --[[ Line: 62 ]] --[[ Name: render ]]
-    -- upvalues: v5 (copy), v3 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy)
-    local l_hasRoundedCorners_0 = v11.props.hasRoundedCorners;
-    local l_Image_0 = v11.props.Image;
-    local l_imageSize_0 = v11.props.imageSize;
-    local l_imageColor_0 = v11.props.imageColor;
-    local l_imageTransparency_0 = v11.props.imageTransparency;
-    local l_isSelected_0 = v11.props.isSelected;
-    local l_multiSelect_0 = v11.props.multiSelect;
-    local l_overlayComponents_0 = v11.props.overlayComponents;
-    local l_backgroundImage_0 = v11.props.backgroundImage;
-    local l_cornerRadius_0 = v11.props.cornerRadius;
-    local l_scaleType_0 = v11.props.scaleType;
-    local v23 = typeof(l_Image_0) == "table";
-    return v5(function(v24) --[[ Line: 77 ]]
-        -- upvalues: v3 (ref), v6 (ref), l_backgroundImage_0 (copy), v23 (copy), l_Image_0 (copy), l_imageColor_0 (copy), l_imageTransparency_0 (copy), l_imageSize_0 (copy), l_scaleType_0 (copy), l_hasRoundedCorners_0 (copy), l_cornerRadius_0 (copy), v7 (ref), v11 (copy), l_overlayComponents_0 (copy), l_isSelected_0 (copy), v8 (ref), l_multiSelect_0 (copy), v9 (ref)
-        local l_Theme_0 = v24.Theme;
-        return v3.createElement("Frame", {
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromScale(1, 1)
-        }, {
-            ImageContainer = v3.createElement("Frame", {
-                BackgroundColor3 = l_Theme_0.PlaceHolder.Color, 
-                BackgroundTransparency = l_Theme_0.PlaceHolder.Transparency, 
-                BorderSizePixel = 0, 
-                Size = UDim2.fromScale(1, 1), 
-                ZIndex = 0
-            }, {
-                BackgroundImage = v3.createElement(v6.Label, {
-                    Image = l_backgroundImage_0, 
-                    BackgroundTransparency = 1, 
-                    BorderSizePixel = 0, 
-                    AnchorPoint = Vector2.new(0.5, 0.5), 
-                    Position = UDim2.fromScale(0.5, 0.5), 
-                    Size = UDim2.fromScale(1, 1), 
-                    ZIndex = 0
-                }, {
-                    ImageSetImage = v23 and v3.createElement(v6.Label, {
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundTransparency = 1, 
-                        Image = l_Image_0, 
-                        ImageColor3 = l_imageColor_0 or l_Theme_0.UIEmphasis.Color, 
-                        ImageTransparency = l_imageTransparency_0, 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        Size = l_imageSize_0, 
-                        ScaleType = l_scaleType_0
-                    }, {
-                        UICorner = l_hasRoundedCorners_0 and v3.createElement("UICorner", {
-                            CornerRadius = l_cornerRadius_0
-                        }) or nil
-                    }) or v3.createElement(v7, {
-                        AnchorPoint = Vector2.new(0.5, 0.5), 
-                        BackgroundColor3 = l_Theme_0.PlaceHolder.Color, 
-                        BackgroundTransparency = 1, 
-                        Image = l_Image_0, 
-                        Position = UDim2.fromScale(0.5, 0.5), 
-                        Size = l_imageSize_0, 
-                        cornerRadius = l_hasRoundedCorners_0 and l_cornerRadius_0 or nil, 
-                        showFailedStateWhenLoadingFailed = true, 
-                        useShimmerAnimationWhileLoading = true, 
-                        ScaleType = l_scaleType_0, 
-                        onLoaded = v11.props.onThumbnailLoaded
-                    }), 
-                    UICorner = l_hasRoundedCorners_0 and v3.createElement("UICorner", {
-                        CornerRadius = l_cornerRadius_0
-                    }) or nil
-                }), 
-                UICorner = l_hasRoundedCorners_0 and v3.createElement("UICorner", {
-                    CornerRadius = l_cornerRadius_0
-                }) or nil
-            }), 
-            ComponentsFrame = l_overlayComponents_0 and v3.createElement("Frame", {
-                BackgroundTransparency = 1, 
-                Size = UDim2.new(1, 0, 1, 0), 
-                ZIndex = 1
-            }, l_overlayComponents_0), 
-            SelectionOverlay = l_isSelected_0 and v3.createElement(v8, {
-                ZIndex = 2, 
-                cornerRadius = l_hasRoundedCorners_0 and l_cornerRadius_0 or nil
-            }), 
-            UnselectedOverlay = l_multiSelect_0 and not l_isSelected_0 and v3.createElement(v9, {
-                ZIndex = 2
-            })
-        });
-    end);
-end;
-return v10;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Roact = require(ParentParentParent.Roact)
+local Cryo = require(ParentParentParent.Cryo)
+local t = require(ParentParentParent.t)
+local withStyle = require(ParentParent.Core.Style.withStyle)
+local useStyleMetadata = require(ParentParent.Core.Style.useStyleMetadata)
+local ImageSetComponent = require(ParentParent.Core.ImageSet.ImageSetComponent)
+local LoadableImage = require(ParentParent.App.Loading.LoadableImage)
+local TileSelectionOverlay = require(scriptParent.TileSelectionOverlay)
+local TileUnselectedOverlay = require(scriptParent.TileUnselectedOverlay)
+local v13 = Roact.PureComponent:extend("TileThumbnail")
+
+v13.validateProps = t.strictInterface({
+	hasRoundedCorners = t.optional(t.boolean),
+	cornerRadius = t.optional(t.UDim),
+	Image = t.optional(t.union(t.string, t.table)),
+	imageSize = t.optional(t.UDim2),
+	imageColor = t.optional(t.Color3),
+	imageTransparency = t.optional(t.number),
+	isSelected = t.optional(t.boolean),
+	multiSelect = t.optional(t.boolean),
+	overlayComponents = t.optional(t.table),
+	backgroundImage = t.optional(t.union(t.string, t.table)),
+	scaleType = t.optional(t.enum(Enum.ScaleType)),
+	onThumbnailLoaded = t.optional(t.callback),
+	hasSurfaceOverrides = t.optional(t.boolean)
+})
+v13.defaultProps = {
+	imageTransparency = 0,
+	imageSize = UDim2.fromScale(1, 1),
+	cornerRadius = UDim.new(0, 10),
+	scaleType = Enum.ScaleType.Stretch
+}
+
+function v13.render(p1) -- line: 67
+	-- upvalues: withStyle (copy), Roact (copy), ImageSetComponent (copy), LoadableImage (copy), TileSelectionOverlay (copy), TileUnselectedOverlay (copy)
+	local hasRoundedCorners = p1.props.hasRoundedCorners
+	local propsImage = p1.props.Image
+	local imageSize = p1.props.imageSize
+	local imageColor = p1.props.imageColor
+	local imageTransparency = p1.props.imageTransparency
+	local isSelected = p1.props.isSelected
+	local multiSelect = p1.props.multiSelect
+	local overlayComponents = p1.props.overlayComponents
+	local backgroundImage = p1.props.backgroundImage
+	local cornerRadius = p1.props.cornerRadius
+	local scaleType = p1.props.scaleType
+	local v27 = typeof(propsImage) == "table"
+
+	return withStyle(function(p2) -- line: 82
+		-- upvalues: p1 (copy), Roact (copy), ImageSetComponent (copy), backgroundImage (copy), v27 (copy), propsImage (copy), imageColor (copy), imageTransparency (copy), imageSize (copy), scaleType (copy), hasRoundedCorners (copy), cornerRadius (copy), LoadableImage (copy), overlayComponents (copy), isSelected (copy), TileSelectionOverlay (copy), multiSelect (copy), TileUnselectedOverlay (copy)
+		local Theme = p2.Theme
+		local hasSurfaceOverrides = p1.props.hasSurfaceOverrides
+
+		return Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(1, 1)
+		}, {
+			ImageContainer = Roact.createElement("Frame", {
+				BorderSizePixel = 0,
+				ZIndex = 0,
+				BackgroundColor3 = Theme.PlaceHolder.Color,
+				BackgroundTransparency = Theme.PlaceHolder.Transparency,
+				Size = UDim2.fromScale(1, 1)
+			}, {
+				BackgroundImage = Roact.createElement(ImageSetComponent.Label, {
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					ZIndex = 0,
+					Image = backgroundImage,
+					ImageColor3 = if not hasSurfaceOverrides then nil else Theme.BackgroundUIDefault.Color:Lerp(Theme.PlayerBackgroundDefault.Color, Theme.Overlay.Transparency),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.fromScale(1, 1)
+				}, {
+					ImageSetImage = v27 and Roact.createElement(ImageSetComponent.Label, {
+						BackgroundTransparency = 1,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Image = propsImage,
+						ImageColor3 = imageColor or Theme.UIEmphasis.Color,
+						ImageTransparency = imageTransparency,
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = imageSize,
+						ScaleType = scaleType
+					}, {
+						UICorner = hasRoundedCorners and Roact.createElement("UICorner", {
+							CornerRadius = cornerRadius
+						}) or nil
+					}) or Roact.createElement(LoadableImage, {
+						BackgroundTransparency = 1,
+						showFailedStateWhenLoadingFailed = true,
+						useShimmerAnimationWhileLoading = true,
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = Theme.PlaceHolder.Color,
+						Image = propsImage,
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = imageSize,
+						cornerRadius = hasRoundedCorners and cornerRadius or nil,
+						ScaleType = scaleType,
+						onLoaded = p1.props.onThumbnailLoaded
+					}),
+					UICorner = hasRoundedCorners and Roact.createElement("UICorner", {
+						CornerRadius = cornerRadius
+					}) or nil
+				}),
+				UICorner = hasRoundedCorners and Roact.createElement("UICorner", {
+					CornerRadius = cornerRadius
+				}) or nil
+			}),
+			ComponentsFrame = overlayComponents and Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				ZIndex = 1,
+				Size = UDim2.new(1, 0, 1, 0)
+			}, overlayComponents),
+			SelectionOverlay = isSelected and Roact.createElement(TileSelectionOverlay, {
+				ZIndex = 2,
+				cornerRadius = hasRoundedCorners and cornerRadius or nil
+			}),
+			UnselectedOverlay = multiSelect and (not isSelected and Roact.createElement(TileUnselectedOverlay, {
+				ZIndex = 2
+			}))
+		})
+	end)
+end
+
+local function TileThumbnailFunctionalWrapper(p3) -- line: 165
+	-- upvalues: useStyleMetadata (copy), Roact (copy), v13 (copy), Cryo (copy)
+	local v29 = useStyleMetadata()
+
+	return Roact.createElement(v13, Cryo.Dictionary.join(p3, {
+		hasSurfaceOverrides = not not v29 and v29.HasSurfaceOverrides
+	}))
+end
+
+return TileThumbnailFunctionalWrapper

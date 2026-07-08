@@ -1,4 +1,4 @@
 return {
-    populateDictionaryFromIds = require(script.populateDictionaryFromIds), 
-    populateListFromIds = require(script.populateListFromIds)
-};
+	populateDictionaryFromIds = require(script.populateDictionaryFromIds),
+	populateListFromIds = require(script.populateListFromIds)
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AndroidPasswordSuggestionExperimentEnrollmentBypass", false);
+return game:DefineFastFlag("AndroidPasswordSuggestionExperimentEnrollmentBypass", false)

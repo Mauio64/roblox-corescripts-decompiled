@@ -1,10 +1,11 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialBlockingModal");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local v3 = require(l_script_FirstAncestor_0.Networking.myRoduxNetworking);
-return function() --[[ Line: 8 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.combineReducers({
-        NetworkStatus = v3.installReducer()
-    });
-end;
+local SocialBlockingModal = script:FindFirstAncestor("SocialBlockingModal")
+local SocialBlockingModalParent = SocialBlockingModal.Parent
+local Rodux = require(SocialBlockingModalParent.Rodux)
+local myRoduxNetworking = require(SocialBlockingModal.Networking.myRoduxNetworking)
+
+return function() -- line: 8
+	-- upvalues: Rodux (copy), myRoduxNetworking (copy)
+	return Rodux.combineReducers({
+		NetworkStatus = myRoduxNetworking.installReducer()
+	})
+end

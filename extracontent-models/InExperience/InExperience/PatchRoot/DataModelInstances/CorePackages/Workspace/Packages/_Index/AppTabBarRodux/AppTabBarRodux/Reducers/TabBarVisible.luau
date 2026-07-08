@@ -1,12 +1,15 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppTabBarRodux");
-local v1 = require(l_script_FirstAncestor_0.Actions.SetTabBarVisible);
-return function(v2, v3) --[[ Line: 6 ]]
-    -- upvalues: v1 (copy)
-    if v2 == nil then
-        v2 = false;
-    end;
-    if v3.type == v1.name then
-        v2 = v3.isVisible;
-    end;
-    return v2;
-end;
+local AppTabBarRodux = script:FindFirstAncestor("AppTabBarRodux")
+local SetTabBarVisible = require(AppTabBarRodux.Actions.SetTabBarVisible)
+
+return function(b1: boolean?, p1) -- line: 6
+	-- upvalues: SetTabBarVisible (copy)
+	if b1 == nil then
+		b1 = false
+	end
+
+	if p1.type == SetTabBarVisible.name then
+		b1 = p1.isVisible
+	end
+
+	return b1
+end

@@ -1,97 +1,109 @@
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local l_RunService_0 = game:GetService("RunService");
-local l_HttpService_0 = game:GetService("HttpService");
-local l_UserInputService_0 = game:GetService("UserInputService");
-local l_Parent_0 = script:FindFirstAncestor("TimeToInteractiveTracker").Parent;
-local v5 = require(l_Parent_0.Analytics).Analytics.new(l_RbxAnalyticsService_0);
-local v6 = require(l_Parent_0.Dash);
-local l_default_0 = require(l_Parent_0.LoggingProtocol).default;
-local v8 = require(l_Parent_0.AppCommonLib);
-local v9 = require(l_Parent_0.TelemetryService).EventStreamReporter.new(l_default_0);
-local l_isSpatial_0 = v8.isSpatial;
-local v11 = require(script.Parent.ttiDebugLog);
-local v12 = require(script.Parent.Util);
-local _ = require(script.Parent.Parent.Stores.types);
-local l_FFlagAXTTIEnableMilestones_0 = require(l_Parent_0.SharedFlags).FFlagAXTTIEnableMilestones;
-local v15 = game:DefineFastString("TTIMetricsTableName", "marketplacePerformanceMetric");
-local v16 = game:DefineFastFlag("AXTTIAddNumElementsRendered", false);
-game:DefineFastInt("TimeToInteractiveTrackerSampleRate", 0);
-local function v20(v17) --[[ Line: 41 ]] --[[ Name: getDefaultMetadata ]]
-    -- upvalues: l_UserInputService_0 (copy), l_isSpatial_0 (copy), l_RunService_0 (copy), l_HttpService_0 (copy), v6 (copy)
-    local v18 = tostring(l_UserInputService_0:GetPlatform());
-    if l_isSpatial_0() then
-        v18 = "VR";
-    end;
-    local v19 = {
-        AppVersion = l_RunService_0:GetRobloxVersion(), 
-        UserAgent = l_HttpService_0:GetUserAgent(), 
-        CoreScriptVersion = l_RunService_0:GetCoreScriptVersion(), 
-        Platform = v18
-    };
-    return v6.assign(v19, v17);
-end;
-return function(v21) --[[ Line: 65 ]] --[[ Name: sendTTIStat ]]
-    -- upvalues: l_RunService_0 (copy), v20 (copy), l_default_0 (copy), l_FFlagAXTTIEnableMilestones_0 (copy), v12 (copy), v16 (copy), l_HttpService_0 (copy), v9 (copy), v15 (copy), v5 (copy), v11 (copy)
-    if math.clamp(if v21.samplingRateOverride ~= nil then v21.samplingRateOverride else game:GetFastInt("TimeToInteractiveTrackerSampleRate"), 0, 1000) < math.random(1, 1000) and not l_RunService_0:IsStudio() then
-        return;
-    else
-        local v22 = {
-            eventName = v21.statName, 
-            backends = {
-                "RobloxTelemetryStat"
-            }, 
-            lastUpdated = {
-                2026, 
-                1, 
-                14
-            }, 
-            description = "Stat to track Time-To-Interactive (TTI) latency metrics.", 
-            links = ""
-        };
-        local v23 = v20(v21.metaData);
-        l_default_0:logRobloxTelemetryStat(v22, v21.deltaMs, v23);
-        if l_FFlagAXTTIEnableMilestones_0 and v21.milestones then
-            for _, v25 in (v12.generateMilestoneStats(v21.statName, v21.milestones)) do
-                local v26 = table.clone(v22);
-                v26.eventName = v25.eventName;
-                l_default_0:logRobloxTelemetryStat(v26, v25.deltaMs, v23);
-            end;
-        end;
-        local v27 = {
-            deltaMs = v21.deltaMs, 
-            metricName = v21.statName
-        };
-        if v21.metaData then
-            v27.coldStart = v21.metaData.coldStart;
-            v27.category = v21.metaData.category;
-            v27.subcategory = v21.metaData.subcategory;
-            v27.page = v21.metaData.page;
-            v27.opaquePage = v21.metaData.opaquePage;
-            if v16 then
-                v27.num_elements_rendered = v21.metaData.numElementsRendered;
-            end;
-        end;
-        local v28 = v20({});
-        v27.appVersion = v28.AppVersion;
-        v27.userAgent = v28.UserAgent;
-        v27.coreScriptVersion = v28.CoreScriptVersion;
-        v27.platform = v28.Platform;
-        if l_FFlagAXTTIEnableMilestones_0 and v21.milestones then
-            local v29 = v12.milestonesToProto(v21.milestones);
-            local l_status_0, l_result_0 = pcall(function() --[[ Line: 145 ]]
-                -- upvalues: l_HttpService_0 (ref), v29 (copy)
-                return l_HttpService_0:JSONEncode(v29);
-            end);
-            if l_status_0 then
-                v27.milestones_json = l_result_0;
-            end;
-        end;
-        if l_FFlagAXTTIEnableMilestones_0 then
-            v9:sendTelemetryEvent(v15, v15, v27);
-        else
-            v5.EventStream:sendEventDeferred(v21.statName, v15, v27);
-        end;
-        v11("sendTTIStat", v21.statName, v21.deltaMs, v27, if l_FFlagAXTTIEnableMilestones_0 then v21.milestones else nil);
-        return;
-    end;
-end;
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local Parent = script:FindFirstAncestor("TimeToInteractiveTracker").Parent
+local Dash = require(Parent.Dash)
+local default = require(Parent.LoggingProtocol).default
+local AppCommonLib = require(Parent.AppCommonLib)
+local v8 = require(Parent.TelemetryService).EventStreamReporter.new(default)
+local isSpatial = AppCommonLib.isSpatial
+local ttiDebugLog = require(script.Parent.ttiDebugLog)
+local Util = require(script.Parent.Util)
+
+require(script.Parent.Parent.Stores.types)
+
+local v12 = game:DefineFastString("TTIMetricsTableName", "marketplacePerformanceMetric")
+local v13 = game:DefineFastFlag("AXTTIAddNumElementsRendered", false)
+
+game:DefineFastInt("TimeToInteractiveTrackerSampleRate", 0)
+
+local function getDefaultMetadata(p1) -- line: 56
+	-- upvalues: UserInputService (copy), isSpatial (copy), RunService (copy), HttpService (copy), Dash (copy)
+	local str = tostring(UserInputService:GetPlatform())
+
+	if isSpatial() then
+		str = "VR"
+	end
+
+	local t1 = {
+		AppVersion = RunService:GetRobloxVersion(),
+		UserAgent = HttpService:GetUserAgent(),
+		CoreScriptVersion = RunService:GetCoreScriptVersion(),
+		Platform = str
+	}
+
+	return Dash.assign(t1, p1)
+end
+local function sendTTIStat(t2: {[any]: any}) -- line: 80
+	-- upvalues: RunService (copy), getDefaultMetadata (copy), default (copy), Util (copy), v13 (copy), HttpService (copy), v8 (copy), v12 (copy), ttiDebugLog (copy)
+	if math.clamp((if t2.samplingRateOverride == nil then game:GetFastInt("TimeToInteractiveTrackerSampleRate") else t2.samplingRateOverride), 0, 1000) < math.random(1, 1000) and not RunService:IsStudio() then
+		return
+	end
+
+	local t3 = {
+		description = "Stat to track Time-To-Interactive (TTI) latency metrics.",
+		links = "",
+		eventName = t2.statName,
+		backends = { "RobloxTelemetryStat" },
+		lastUpdated = {
+			2026,
+			1,
+			14
+		}
+	}
+	local v21 = getDefaultMetadata(t2.metaData)
+
+	default:logRobloxTelemetryStat(t3, t2.deltaMs, v21)
+
+	if t2.milestones then
+		for _, v23 in (Util.generateMilestoneStats(t2.statName, t2.milestones)) do
+			local v24 = table.clone(t3)
+
+			v24.eventName = v23.eventName
+			default:logRobloxTelemetryStat(v24, v23.deltaMs, v21)
+		end
+	end
+
+	local t4 = {
+		deltaMs = t2.deltaMs,
+		metricName = t2.statName
+	}
+
+	if t2.metaData then
+		t4.coldStart = t2.metaData.coldStart
+		t4.category = t2.metaData.category
+		t4.subcategory = t2.metaData.subcategory
+		t4.page = t2.metaData.page
+		t4.opaquePage = t2.metaData.opaquePage
+
+		if v13 then
+			t4.num_elements_rendered = t2.metaData.numElementsRendered
+		end
+	end
+
+	local v26 = getDefaultMetadata({})
+
+	t4.appVersion = v26.AppVersion
+	t4.userAgent = v26.UserAgent
+	t4.coreScriptVersion = v26.CoreScriptVersion
+	t4.platform = v26.Platform
+	t4.total_memory_mb = t2.totalMemoryMB
+	t4.lua_heap_mb = t2.luaHeapMB
+
+	if t2.milestones then
+		local v27 = Util.milestonesToProto(t2.milestones)
+		local ok, result = pcall(function() -- line: 165
+			-- upvalues: HttpService (copy), v27 (copy)
+			return HttpService:JSONEncode(v27)
+		end)
+
+		if ok then
+			t4.milestones_json = result
+		end
+	end
+
+	v8:sendTelemetryEvent(v12, v12, t4)
+	ttiDebugLog("sendTTIStat", t2.statName, t2.deltaMs, t4, t2.milestones)
+end
+
+return sendTTIStat

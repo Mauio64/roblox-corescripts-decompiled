@@ -1,8 +1,11 @@
-return function(v0, v1) --[[ Line: 5 ]] --[[ Name: findWhere ]]
-    for v2 = 1, #v0 do
-        if v1(v0[v2], v2) then
-            return v2;
-        end;
-    end;
-    return nil;
-end;
+local function findWhere(p1, p2) -- line: 5
+	for i = 1, #p1 do
+		if p2(p1[i], i) then
+			return i
+		end
+	end
+
+	return nil
+end
+
+return findWhere

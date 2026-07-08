@@ -1,174 +1,189 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.dependencies);
-local l_llama_0 = v2.llama;
-local l_Roact_0 = v2.Roact;
-local l_memoize_0 = v2.memoize;
-local l_Dictionary_0 = l_llama_0.Dictionary;
-local v7 = require(l_script_FirstAncestor_0.Components.FriendsLandingPage);
-local v8 = require(script.helpers.limitFriends);
-local v9 = require(script.helpers.updateFriendsWithWidth);
-local v10 = require(script.helpers.loadFriendGroup);
-local v11 = require(script.helpers.friendsPerRow);
-local v12 = require(script.helpers.friendsPerLoadGroup);
-local v13 = require(l_script_FirstAncestor_0.Components.ShowMoreButton);
-local v14 = require(l_script_FirstAncestor_0.FriendsLandingAnalytics.ButtonClickEvents);
-local v15 = require(l_script_FirstAncestor_0.Friends.filterStates);
-local v16 = require(l_script_FirstAncestor_0.Enums.ShowMoreSectionTypeEnum);
-local l_React_0 = v2.React;
-local l_GridMetrics_0 = v2.UIBlox.App.Grid.GridMetrics;
-local l_useDesignTokens_0 = require(l_Parent_0.Style).useDesignTokens;
-local l_useUiModeInfo_0 = require(l_Parent_0.RobloxAppHooks).useUiModeInfo;
-local l_UiMode_0 = require(l_Parent_0.RobloxAppEnums).UiMode;
-local v22 = l_Roact_0.PureComponent:extend("ShowMoreWrapper");
-v22.defaultProps = {
-    listComponent = v7, 
-    itemSize = 175, 
-    visibleRows = 6, 
-    friends = {}, 
-    analytics = nil, 
-    filter = v15.All, 
-    overrideRenderShowMore = nil, 
-    handleShowMore = nil, 
-    spacingIfEmpty = 48, 
-    sectionType = v16.Friends
-};
-v22.init = function(v23) --[[ Line: 49 ]] --[[ Name: init ]]
-    -- upvalues: l_Dictionary_0 (copy), v15 (copy), v9 (copy), v12 (copy), v14 (copy), v11 (copy), v10 (copy), l_memoize_0 (copy), v8 (copy), l_Roact_0 (copy), v13 (copy)
-    v23.state = {
-        width = 100, 
-        filterFriendCounts = l_Dictionary_0.map(v15, function() --[[ Line: 52 ]]
-            -- upvalues: v23 (copy)
-            return v23.props.visibleRows;
-        end), 
-        selectedItemIndex = nil
-    };
-    v23.updateWidth = function(v24) --[[ Line: 58 ]]
-        -- upvalues: v23 (copy), v9 (ref)
-        v23:setState(v9(v24.AbsoluteSize.X));
-        if v23.props.onWidthUpdated then
-            v23.props.onWidthUpdated(v24.AbsoluteSize.X);
-        end;
-    end;
-    v23.reset = function() --[[ Line: 66 ]]
-        -- upvalues: v23 (copy), l_Dictionary_0 (ref), v12 (ref)
-        v23:setState(function(v25, v26) --[[ Line: 67 ]]
-            -- upvalues: l_Dictionary_0 (ref), v23 (ref), v12 (ref)
-            return {
-                filterFriendCounts = l_Dictionary_0.join(v23.state.filterFriendCounts, {
-                    [v23.props.filter] = v12(v25, v26)
-                })
-            };
-        end);
-    end;
-    v23.showMore = function() --[[ Line: 77 ]]
-        -- upvalues: v23 (copy), v14 (ref), v11 (ref), l_Dictionary_0 (ref), v10 (ref)
-        if v23.props.analytics then
-            v23.props.analytics:buttonClick(v14.LoadMoreUsers, {
-                sectionType = v23.props.sectionType
-            });
-        end;
-        if v23.props.fireOnShowMore then
-            v23.props.fireOnShowMore(v23.props.sectionType);
-        end;
-        if v23.props.handleShowMore then
-            v23.props.handleShowMore(v11(l_Dictionary_0.join({
-                width = v23.state.width
-            }, v23.props)));
-            return;
-        else
-            v23:setState(function(v27, v28) --[[ Line: 95 ]]
-                -- upvalues: l_Dictionary_0 (ref), v10 (ref)
-                local v29 = v27.filterFriendCounts[v28.filter];
-                return l_Dictionary_0.join(v10(v27, v28), {
-                    selectedItemIndex = v29 + 1
-                });
-            end);
-            return;
-        end;
-    end;
-    v23.limitFriends = l_memoize_0(v8);
-    v23.renderShowMore = l_memoize_0(function(v30, v31, v32) --[[ Line: 108 ]]
-        -- upvalues: l_Roact_0 (ref), v13 (ref), v23 (copy)
-        return function(v33) --[[ Line: 109 ]]
-            -- upvalues: v32 (copy), v31 (copy), v30 (copy), l_Roact_0 (ref), v13 (ref), v23 (ref)
-            local v34 = v32 and v32(v31);
-            if v31 < v30 or v34 then
-                return l_Roact_0.createElement(v13, {
-                    layoutOrder = v33, 
-                    onSizeChange = v23.updateWidth, 
-                    onActivated = v23.showMore
-                });
-            else
-                return l_Roact_0.createElement("Frame", {
-                    Name = "showMoreSpacing", 
-                    Size = UDim2.fromOffset(0, v23.props.spacingIfEmpty), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = v33
-                });
-            end;
-        end;
-    end);
-    v23.checkAndResetIfNeeded = function(v35) --[[ Line: 130 ]]
-        -- upvalues: v23 (copy)
-        if #v23.props.friends ~= #v35.friends or v35.visibleRows ~= v23.props.visibleRows then
-            v23.reset();
-        end;
-    end;
-end;
-v22.didUpdate = function(v36, v37) --[[ Line: 137 ]] --[[ Name: didUpdate ]]
-    v36.checkAndResetIfNeeded(v37);
-end;
-v22.render = function(v38) --[[ Line: 141 ]] --[[ Name: render ]]
-    -- upvalues: l_Roact_0 (copy), l_Dictionary_0 (copy)
-    local v39 = v38.state.filterFriendCounts[v38.props.filter];
-    return l_Roact_0.createElement(v38.props.listComponent, l_Dictionary_0.join(v38.props, {
-        friends = v38.limitFriends(v39, v38.props.friends), 
-        showMore = v38.showMore, 
-        totalFilteredFriends = #v38.props.friends, 
-        renderShowMore = v38.renderShowMore(#v38.props.friends, v39, v38.props.overrideRenderShowMore), 
-        resetShowMore = v38.reset, 
-        totalInactiveFriends = v38.props.totalInactiveFriends, 
-        selectedItemIndex = v38.state.selectedItemIndex
-    }));
-end;
-return function(v40) --[[ Line: 159 ]] --[[ Name: ShowMoreWrapperFn ]]
-    -- upvalues: l_useDesignTokens_0 (copy), l_useUiModeInfo_0 (copy), l_UiMode_0 (copy), l_React_0 (copy), l_GridMetrics_0 (copy), v22 (copy), l_llama_0 (copy)
-    local v41 = l_useDesignTokens_0();
-    local v42 = l_useUiModeInfo_0().uiMode == l_UiMode_0.TenFoot;
-    local l_GridViewItemMetrics_0 = v41.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics;
-    local l_GridHorizontalSpacing_0 = v41.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing;
-    local l_GridVerticalSpacing_0 = v41.LuaApps.FriendsLanding.FriendsLandingPage.GridVerticalSpacing;
-    local v46 = l_React_0.useMemo(function() --[[ Line: 168 ]]
-        -- upvalues: v42 (copy), l_GridMetrics_0 (ref), l_GridViewItemMetrics_0 (copy)
-        if v42 then
-            return l_GridMetrics_0.makeCustomMetricsGetter(l_GridViewItemMetrics_0);
-        else
-            return nil;
-        end;
-    end, {
-        v42, 
-        l_GridViewItemMetrics_0
-    });
-    local v47, v48 = l_React_0.useState(100);
-    local v49 = l_React_0.useMemo(function() --[[ Line: 177 ]]
-        -- upvalues: v42 (copy), v46 (copy), l_GridHorizontalSpacing_0 (copy), v47 (copy)
-        if v42 and v46 and l_GridHorizontalSpacing_0 then
-            return v46(v47, l_GridHorizontalSpacing_0).itemWidth;
-        else
-            return nil;
-        end;
-    end, {
-        v42, 
-        v46, 
-        v47, 
-        l_GridHorizontalSpacing_0
-    });
-    return l_React_0.createElement(v22, l_llama_0.Dictionary.join({
-        onWidthUpdated = if v42 then v48 else nil, 
-        itemSize = v49, 
-        getItemMetrics = v46, 
-        gridHorizontalSpacing = l_GridHorizontalSpacing_0, 
-        gridVerticalSpacing = l_GridVerticalSpacing_0
-    }, v40));
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local FriendsLandingParent = FriendsLanding.Parent
+local dependencies = require(FriendsLanding.dependencies)
+local llama = dependencies.llama
+local Roact = dependencies.Roact
+local memoize = dependencies.memoize
+local Dictionary = llama.Dictionary
+local FriendsLandingPage = require(FriendsLanding.Components.FriendsLandingPage)
+local limitFriends = require(script.helpers.limitFriends)
+local updateFriendsWithWidth = require(script.helpers.updateFriendsWithWidth)
+local loadFriendGroup = require(script.helpers.loadFriendGroup)
+local friendsPerRow = require(script.helpers.friendsPerRow)
+local friendsPerLoadGroup = require(script.helpers.friendsPerLoadGroup)
+local ShowMoreButton = require(FriendsLanding.Components.ShowMoreButton)
+local ButtonClickEvents = require(FriendsLanding.FriendsLandingAnalytics.ButtonClickEvents)
+local filterStates = require(FriendsLanding.Friends.filterStates)
+local ShowMoreSectionTypeEnum = require(FriendsLanding.Enums.ShowMoreSectionTypeEnum)
+local React = dependencies.React
+local GridMetrics = dependencies.UIBlox.App.Grid.GridMetrics
+local useDesignTokens = require(FriendsLandingParent.Style).useDesignTokens
+local useUiModeInfo = require(FriendsLandingParent.RobloxAppHooks).useUiModeInfo
+local UiMode = require(FriendsLandingParent.RobloxAppEnums).UiMode
+local v23 = Roact.PureComponent:extend("ShowMoreWrapper")
+
+v23.defaultProps = {
+	itemSize = 175,
+	visibleRows = 6,
+	analytics = nil,
+	overrideRenderShowMore = nil,
+	handleShowMore = nil,
+	spacingIfEmpty = 48,
+	listComponent = FriendsLandingPage,
+	friends = {},
+	filter = filterStates.All,
+	sectionType = ShowMoreSectionTypeEnum.Friends
+}
+
+function v23.init(p1) -- line: 49
+	-- upvalues: Dictionary (copy), filterStates (copy), updateFriendsWithWidth (copy), friendsPerLoadGroup (copy), ButtonClickEvents (copy), friendsPerRow (copy), loadFriendGroup (copy), memoize (copy), limitFriends (copy), Roact (copy), ShowMoreButton (copy)
+	p1.state = {
+		width = 100,
+		selectedItemIndex = nil,
+		filterFriendCounts = Dictionary.map(filterStates, function() -- line: 52
+			-- upvalues: p1 (copy)
+			return p1.props.visibleRows
+		end)
+	}
+
+	function p1.updateWidth(p2) -- line: 58
+		-- upvalues: p1 (copy), updateFriendsWithWidth (copy)
+		p1:setState(updateFriendsWithWidth(p2.AbsoluteSize.X))
+
+		if p1.props.onWidthUpdated then
+			p1.props.onWidthUpdated(p2.AbsoluteSize.X)
+		end
+	end
+	function p1.reset() -- line: 66
+		-- upvalues: p1 (copy), Dictionary (copy), friendsPerLoadGroup (copy)
+		p1:setState(function(p3, p4) -- line: 67
+			-- upvalues: Dictionary (copy), p1 (copy), friendsPerLoadGroup (copy)
+			return {
+				filterFriendCounts = Dictionary.join(p1.state.filterFriendCounts, {
+					[p1.props.filter] = friendsPerLoadGroup(p3, p4)
+				})
+			}
+		end)
+	end
+	function p1.showMore() -- line: 77
+		-- upvalues: p1 (copy), ButtonClickEvents (copy), friendsPerRow (copy), Dictionary (copy), loadFriendGroup (copy)
+		if p1.props.analytics then
+			p1.props.analytics:buttonClick(ButtonClickEvents.LoadMoreUsers, {
+				sectionType = p1.props.sectionType
+			})
+		end
+
+		if p1.props.fireOnShowMore then
+			p1.props.fireOnShowMore(p1.props.sectionType)
+		end
+
+		if p1.props.handleShowMore then
+			p1.props.handleShowMore(friendsPerRow(Dictionary.join({
+				width = p1.state.width
+			}, p1.props)))
+
+			return
+		end
+
+		p1:setState(function(p5, p6) -- line: 95
+			-- upvalues: Dictionary (copy), loadFriendGroup (copy)
+			local v49 = p5.filterFriendCounts[p6.filter]
+
+			return Dictionary.join(loadFriendGroup(p5, p6), {
+				selectedItemIndex = v49 + 1
+			})
+		end)
+	end
+
+	p1.limitFriends = memoize(limitFriends)
+	p1.renderShowMore = memoize(function(p7, p8, p9) -- line: 108
+		-- upvalues: Roact (copy), ShowMoreButton (copy), p1 (copy)
+		return function(p10) -- line: 109
+			-- upvalues: p9 (copy), p8 (copy), p7 (copy), Roact (copy), ShowMoreButton (copy), p1 (copy)
+			local v51 = p9 and p9(p8)
+
+			if p7 > p8 or v51 then
+				return Roact.createElement(ShowMoreButton, {
+					layoutOrder = p10,
+					onSizeChange = p1.updateWidth,
+					onActivated = p1.showMore
+				})
+			end
+
+			return Roact.createElement("Frame", {
+				Name = "showMoreSpacing",
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(0, p1.props.spacingIfEmpty),
+				LayoutOrder = p10
+			})
+		end
+	end)
+
+	function p1.checkAndResetIfNeeded(p11) -- line: 130
+		-- upvalues: p1 (copy)
+		if #p1.props.friends ~= #p11.friends or p11.visibleRows ~= p1.props.visibleRows then
+			p1.reset()
+		end
+	end
+end
+function v23.didUpdate(p12, p13) -- line: 137
+	p12.checkAndResetIfNeeded(p13)
+end
+function v23.render(p14) -- line: 141
+	-- upvalues: Roact (copy), Dictionary (copy)
+	local v29 = p14.state.filterFriendCounts[p14.props.filter]
+
+	return Roact.createElement(p14.props.listComponent, Dictionary.join(p14.props, {
+		friends = p14.limitFriends(v29, p14.props.friends),
+		showMore = p14.showMore,
+		totalFilteredFriends = #p14.props.friends,
+		renderShowMore = p14.renderShowMore(#p14.props.friends, v29, p14.props.overrideRenderShowMore),
+		resetShowMore = p14.reset,
+		totalInactiveFriends = p14.props.totalInactiveFriends,
+		selectedItemIndex = p14.state.selectedItemIndex
+	}))
+end
+
+local function ShowMoreWrapperFn(p15) -- line: 159
+	-- upvalues: useDesignTokens (copy), useUiModeInfo (copy), UiMode (copy), React (copy), GridMetrics (copy), v23 (copy), llama (copy)
+	local v31 = useDesignTokens()
+	local v32 = useUiModeInfo().uiMode == UiMode.TenFoot
+	local GridViewItemMetrics = v31.LuaApps.FriendsLanding.FriendsLandingPage.GridViewItemMetrics
+	local GridHorizontalSpacing = v31.LuaApps.FriendsLanding.FriendsLandingPage.GridHorizontalSpacing
+	local GridVerticalSpacing = v31.LuaApps.FriendsLanding.FriendsLandingPage.GridVerticalSpacing
+	local v36 = React.useMemo(function() -- line: 168
+		-- upvalues: v32 (copy), GridMetrics (copy), GridViewItemMetrics (copy)
+		if v32 then
+			return GridMetrics.makeCustomMetricsGetter(GridViewItemMetrics)
+		end
+
+		return nil
+	end, {
+		v32,
+		GridViewItemMetrics
+	})
+	local v37, v38 = React.useState(100)
+	local v39 = React.useMemo(function() -- line: 177
+		-- upvalues: v32 (copy), v36 (copy), GridHorizontalSpacing (copy), v37 (copy)
+		if v32 and (v36 and GridHorizontalSpacing) then
+			return v36(v37, GridHorizontalSpacing).itemWidth
+		end
+
+		return nil
+	end, {
+		v32,
+		v36,
+		v37,
+		GridHorizontalSpacing
+	})
+
+	return React.createElement(v23, llama.Dictionary.join({
+		onWidthUpdated = if not v32 then nil else v38,
+		itemSize = v39,
+		getItemMetrics = v36,
+		gridHorizontalSpacing = GridHorizontalSpacing,
+		gridVerticalSpacing = GridVerticalSpacing
+	}, p15))
+end
+
+return ShowMoreWrapperFn

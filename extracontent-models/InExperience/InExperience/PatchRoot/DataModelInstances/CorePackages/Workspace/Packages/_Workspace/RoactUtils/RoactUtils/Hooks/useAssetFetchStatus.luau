@@ -1,28 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("RoactUtils").Parent;
-local l_ContentProvider_0 = game:GetService("ContentProvider");
-local v2 = require(l_Parent_0.React);
-return function(v3) --[[ Line: 8 ]] --[[ Name: useAssetFetchStatus ]]
-    -- upvalues: v2 (copy), l_ContentProvider_0 (copy)
-    local v4, v5 = v2.useState(Enum.AssetFetchStatus.None);
-    v2.useEffect(function() --[[ Line: 11 ]]
-        -- upvalues: v5 (copy), v3 (copy), l_ContentProvider_0 (ref)
-        v5(Enum.AssetFetchStatus.None);
-        if not v3 or v3 == "" then
-            return;
-        else
-            local v7 = l_ContentProvider_0:GetAssetFetchStatusChangedSignal(v3):Connect(function(v6) --[[ Line: 18 ]]
-                -- upvalues: v5 (ref)
-                v5(v6);
-            end);
-            local l_l_ContentProvider_0_AssetFetchStatus_0 = l_ContentProvider_0:GetAssetFetchStatus(v3);
-            v5(l_l_ContentProvider_0_AssetFetchStatus_0);
-            return function() --[[ Line: 25 ]]
-                -- upvalues: v7 (copy)
-                v7:Disconnect();
-            end;
-        end;
-    end, {
-        v3
-    });
-    return v4;
-end;
+local Parent = script:FindFirstAncestor("RoactUtils").Parent
+local ContentProvider = game:GetService("ContentProvider")
+local React = require(Parent.React)
+
+local function useAssetFetchStatus(s1: string?) -- line: 8
+	-- upvalues: React (copy), ContentProvider (copy)
+	local v6, v7 = React.useState(Enum.AssetFetchStatus.None)
+
+	React.useEffect(function() -- line: 11
+		-- upvalues: v7 (copy), s1 (copy), ContentProvider (copy)
+		v7(Enum.AssetFetchStatus.None)
+
+		if not s1 or s1 == "" then
+			return
+		end
+
+		local connection = ContentProvider:GetAssetFetchStatusChangedSignal(s1):Connect(function(p1) -- line: 18
+			-- upvalues: v7 (copy)
+			v7(p1)
+		end)
+		local AssetFetchStatus = ContentProvider:GetAssetFetchStatus(s1)
+
+		v7(AssetFetchStatus)
+
+		return function() -- line: 25
+			-- upvalues: connection (copy)
+			connection:Disconnect()
+		end
+	end, { s1 })
+
+	return v6
+end
+
+return useAssetFetchStatus

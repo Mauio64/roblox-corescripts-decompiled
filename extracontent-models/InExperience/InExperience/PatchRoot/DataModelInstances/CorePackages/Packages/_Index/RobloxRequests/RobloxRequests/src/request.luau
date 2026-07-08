@@ -1,174 +1,214 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_lib_0 = l_Parent_0.lib;
-local l_src_0 = l_Parent_0.src;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_HttpService_0 = game:GetService("HttpService");
-local v5 = require(l_lib_0.url);
-local v6 = require(l_Parent_1.Promise);
-local v7 = require(l_src_0.json);
-local v8 = require(l_src_0.response);
-local v9 = require(l_src_0.cookies);
-local v10 = require(l_src_0.ratelimit);
-local v11 = require(l_src_0.util);
-local v12 = require(l_src_0.cache);
-local v13 = {};
-v13.__index = v13;
-v13.new = function(v14, v15, v16) --[[ Line: 26 ]] --[[ Name: new ]]
-    -- upvalues: v13 (copy), v5 (copy), v10 (copy), v9 (copy)
-    local v17 = setmetatable({}, v13);
-    v16 = v16 or {};
-    local v18 = v5.parse(v15);
-    local v19 = v16.headers or {};
-    v17.method = v14:upper();
-    v17.url = v18;
-    v17.input_url = v15;
-    v17.headers = v19;
-    v17.query = {};
-    v17.data = nil;
-    v17._ratelimits = {
-        v10.get("http", 250, 30)
-    };
-    v17.ignore_ratelimit = v16.ignore_ratelimit or false;
-    if v16.data then
-        v17:set_data(v16.data);
-    end;
-    v17:set_query(v16.query or {});
-    local v20 = v16.cookies or {};
-    if not v20.__cookiejar then
-        local v21 = v9.new();
-        if v20 then
-            for v22, v23 in pairs(v20) do
-                v21:insert(v22, v23);
-            end;
-        end;
-        v20 = v21;
-    end;
-    v17.cookies = v20;
-    v17.headers.Cookie = v20:string(v15);
-    v17._callback = nil;
-    v17._log = v16.log == nil or v16.log;
-    return v17;
-end;
-v13.set_headers = function(v24, v25) --[[ Line: 87 ]] --[[ Name: set_headers ]]
-    for v26, v27 in pairs(v25) do
-        v24.headers[v26] = v27;
-    end;
-    return v24;
-end;
-v13.update_headers = v11.deprecate(v13.set_headers, "0.5", "update_headers");
-v13.set_query = function(v28, v29) --[[ Line: 98 ]] --[[ Name: set_query ]]
-    for v30, v31 in pairs(v29) do
-        v28.query[v30] = v31;
-    end;
-    v28.url:setQuery(v28.query);
-    return v28;
-end;
-v13.update_query = v11.deprecate(v13.set_headers, "0.5", "update_query");
-v13.set_data = function(v32, v33) --[[ Line: 111 ]] --[[ Name: set_data ]]
-    -- upvalues: v7 (copy)
-    if type(v33) == "table" then
-        if v33.__FormData then
-            v32.headers["Content-Type"] = v33.content_type;
-            v33 = v33:build();
-        else
-            v33 = v7.enc(v33);
-            v32.headers["Content-Type"] = "application/json";
-        end;
-    end;
-    v32.data = v33;
-    return v32;
-end;
-v13._ratelimit = function(v34) --[[ Line: 129 ]] --[[ Name: _ratelimit ]]
-    for _, v36 in ipairs(v34._ratelimits) do
-        if not v36:request() then
-            return false;
-        end;
-    end;
-    return true;
-end;
-v13._send = function(v37) --[[ Line: 141 ]] --[[ Name: _send ]]
-    -- upvalues: v12 (copy), v8 (copy), l_HttpService_0 (copy)
-    local v38 = {
-        Url = v37.url:build(), 
-        Method = v37.method, 
-        Headers = v37.headers
-    };
-    if v37.data ~= nil then
-        v38.Body = v37.data;
-    end;
-    local v39 = v38.Url:sub(-1, -1) == "/" and v38.Url:sub(1, -2) or v38.Url;
-    local v40 = ("Request_%s_%s_%s"):format(v37.method, v39, v38.Body or "");
-    if v37.method:upper() == "GET" and v12.is_cached(v38.Url, v40) then
-        local v41 = tick();
-        local v42, v43 = v12.get_cached(v38.Url, v40);
-        if v41 - v42.timestamp <= v12.get_expire(v38.Url) then
-            local v44 = v8.new(v37, v42, tick() - v41);
-            v44.from_cache = true;
-            print("[http]", v43:upper(), "CACHE |", v44.method, v44.url);
-            return v44;
-        end;
-    end;
-    local v45 = 0;
-    local v46 = false;
-    local v47 = nil;
-    local v48 = nil;
-    while v45 < 5 do
-        if v37.ignore_ratelimit or v37:_ratelimit() then
-            local v49 = tick();
-            v48 = l_HttpService_0:RequestAsync(v38);
-            v47 = v8.new(v37, v48, tick() - v49);
-            v37.timestamp = v49;
-            v46 = true;
-            break;
-        else
-            warn("[http] Rate limit exceeded. Retrying in 5 seconds");
-            v45 = v45 + 1;
-            wait(5);
-        end;
-    end;
-    if not v46 then
-        error("[http] Rate limit still exceeded after 5 attempts");
-    end;
-    if v37._log then
-        local v50 = tostring(math.floor(v37._ratelimits[#v37._ratelimits]:consumption() * 1000) * 0.1) .. "%";
-        print("[http]", v47.code, v47.message, "|", v47.method, v47.url, "(", v50, "ratelimit )");
-    end;
-    if v37._callback then
-        v37._callback(v47);
-    end;
-    if v37.method:upper() == "GET" and v47.ok and v12.should_cache(v38.Url) then
-        v12.update_cache(v38.Url, v40, v48);
-    end;
-    return v47;
-end;
-v13.send = function(v51, v52) --[[ Line: 212 ]] --[[ Name: send ]]
-    -- upvalues: v6 (copy)
-    if v52 then
-        return v6.new(function(v53, v54) --[[ Line: 218 ]]
-            -- upvalues: v51 (copy)
-            local l_status_0, l_result_0 = pcall(v51._send, v51);
-            if l_status_0 and l_result_0.ok then
-                v53(l_result_0);
-                return;
-            elseif l_status_0 then
-                v54({
-                    request_sent = true, 
-                    response = l_result_0
-                });
-                return;
-            else
-                v54({
-                    request_sent = false, 
-                    error = l_result_0
-                });
-                return;
-            end;
-        end);
-    else
-        return v51:_send();
-    end;
-end;
-v13.promise = function(v57) --[[ Line: 238 ]] --[[ Name: promise ]]
-    return v57:send(true);
-end;
-return v13;
+local ParentParent = script.Parent.Parent
+local lib = ParentParent.lib
+local src = ParentParent.src
+local ParentParentParent = ParentParent.Parent
+local HttpService = game:GetService("HttpService")
+local url = require(lib.url)
+local Promise = require(ParentParentParent.Promise)
+local json = require(src.json)
+local response = require(src.response)
+local cookies = require(src.cookies)
+local ratelimit = require(src.ratelimit)
+local util = require(src.util)
+local cache = require(src.cache)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, p3) -- line: 26
+	-- upvalues: t1 (copy), url (copy), ratelimit (copy), cookies (copy)
+	local self = setmetatable({}, t1)
+	local v19 = p3 or {}
+	local v20 = url.parse(p2)
+	local v21 = v19.headers or {}
+
+	self.method = p1:upper()
+	self.url = v20
+	self.input_url = p2
+	self.headers = v21
+	self.query = {}
+	self.data = nil
+	self._ratelimits = { ratelimit.get("http", 250, 30) }
+	self.ignore_ratelimit = v19.ignore_ratelimit or false
+
+	if v19.data then
+		self:set_data(v19.data)
+	end
+
+	self:set_query(v19.query or {})
+
+	local v22 = v19.cookies or {}
+
+	if not v22.__cookiejar then
+		local v23 = cookies.new()
+
+		if v22 then
+			for k, v in pairs(v22) do
+				v23:insert(k, v)
+			end
+		end
+
+		v22 = v23
+	end
+
+	self.cookies = v22
+	self.headers.Cookie = v22:string(p2)
+	self._callback = nil
+	self._log = v19.log == nil or v19.log
+
+	return self
+end
+function t1.set_headers(p4, p5) -- line: 87
+	for k, v in pairs(p5) do
+		p4.headers[k] = v
+	end
+
+	return p4
+end
+
+t1.update_headers = util.deprecate(t1.set_headers, "0.5", "update_headers")
+
+function t1.set_query(p6, p7) -- line: 98
+	for k, v in pairs(p7) do
+		p6.query[k] = v
+	end
+
+	p6.url:setQuery(p6.query)
+
+	return p6
+end
+
+t1.update_query = util.deprecate(t1.set_headers, "0.5", "update_query")
+
+function t1.set_data(p8, p9) -- line: 111
+	-- upvalues: json (copy)
+	if type(p9) == "table" then
+		if p9.__FormData then
+			p8.headers["Content-Type"] = p9.content_type
+			p9 = p9:build()
+		else
+			p9 = json.enc(p9)
+			p8.headers["Content-Type"] = "application/json"
+		end
+	end
+
+	p8.data = p9
+
+	return p8
+end
+function t1._ratelimit(p10) -- line: 129
+	for _, v in ipairs(p10._ratelimits) do
+		if not v:request() then
+			return false
+		end
+	end
+
+	return true
+end
+function t1._send(p11) -- line: 141
+	-- upvalues: cache (copy), response (copy), HttpService (copy)
+	local t2 = {
+		Url = p11.url:build(),
+		Method = p11.method,
+		Headers = p11.headers
+	}
+
+	if p11.data ~= nil then
+		t2.Body = p11.data
+	end
+
+	local v41 = t2.Url:sub(-1, -1) == "/" and t2.Url:sub(1, -2) or t2.Url
+	local v42 = ("Request_%s_%s_%s"):format(p11.method, v41, t2.Body or "")
+
+	if p11.method:upper() == "GET" and cache.is_cached(t2.Url, v42) then
+		local timestamp = tick()
+		local v44, v45 = cache.get_cached(t2.Url, v42)
+
+		if timestamp - v44.timestamp <= cache.get_expire(t2.Url) then
+			local v46 = response.new(p11, v44, tick() - timestamp)
+
+			v46.from_cache = true
+			print("[http]", v45:upper(), "CACHE |", v46.method, v46.url)
+
+			return v46
+		end
+	end
+
+	local n1 = 0
+	local v48 = false
+	local v49 = nil
+	local v50 = nil
+
+	while n1 < 5 do
+		if p11.ignore_ratelimit or p11:_ratelimit() then
+			local timestamp = tick()
+
+			v50 = HttpService:RequestAsync(t2)
+			v49 = response.new(p11, v50, tick() - timestamp)
+			p11.timestamp = timestamp
+			v48 = true
+
+			break
+		end
+
+		warn("[http] Rate limit exceeded. Retrying in 5 seconds")
+		n1 += 1
+		wait(5)
+	end
+
+	if not v48 then
+		error("[http] Rate limit still exceeded after 5 attempts")
+	end
+
+	if p11._log then
+		local v52 = tostring(math.floor(p11._ratelimits[#p11._ratelimits]:consumption() * 1000) * 0.1) .. "%"
+
+		print("[http]", v49.code, v49.message, "|", v49.method, v49.url, "(", v52, "ratelimit )")
+	end
+
+	if p11._callback then
+		p11._callback(v49)
+	end
+
+	if p11.method:upper() == "GET" and v49.ok and cache.should_cache(t2.Url) then
+		cache.update_cache(t2.Url, v42, v50)
+	end
+
+	return v49
+end
+function t1.send(p12, p13) -- line: 212
+	-- upvalues: Promise (copy)
+	if p13 then
+		return Promise.new(function(resolve, reject) -- line: 218
+			-- upvalues: p12 (copy)
+			local ok, result = pcall(p12._send, p12)
+
+			if ok and result.ok then
+				resolve(result)
+
+				return
+			end
+
+			if ok then
+				reject({
+					request_sent = true,
+					response = result
+				})
+
+				return
+			end
+
+			reject({
+				request_sent = false,
+				error = result
+			})
+		end)
+	end
+
+	return p12:_send()
+end
+function t1.promise(p14) -- line: 238
+	return p14:send(true)
+end
+
+return t1

@@ -1,2 +1,3 @@
-local l__Index_0 = script.Parent.Parent.Parent._Index;
-return (require(l__Index_0.CurrencyTransfers.CurrencyTransfers));
+local _Workspace = script.Parent.Parent.Parent._Workspace
+
+return (require(_Workspace.CurrencyTransfers.CurrencyTransfers))

@@ -1,1568 +1,1694 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content);
-local v4 = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry);
-local v5 = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry);
-local v6 = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content);
-local v7 = {};
-v7.__index = v7;
-local l_v7_0 = v7 --[[ copy: 7 -> 8 ]];
-v7.new = function(v9) --[[ Line: 370 ]] --[[ Name: new ]]
-    -- upvalues: v6 (copy), l_v7_0 (copy)
-    return (setmetatable({
-        badge_id = (not (v9 ~= nil) or v9.badge_id == nil) and 0 or v9.badge_id, 
-        user_id = (not (v9 ~= nil) or v9.user_id == nil) and 0 or v9.user_id, 
-        page_entry_format = if not (v9 ~= nil) or v9.page_entry_format == nil then assert(v6.PageEntryFormat.fromNumber(0), "Enum has no 0 default") else v9.page_entry_format
-    }, l_v7_0));
-end;
-v7.encode = function(v10) --[[ Line: 383 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy), v6 (copy)
-    local v11 = buffer.create(0);
-    local v12 = 0;
-    if v10.badge_id ~= nil and v10.badge_id ~= 0 then
-        local v13, v14 = v0.writeTag(v11, v12, 1, v0.wireTypes.varint);
-        v13, v14 = v0.writeVarInt(v13, v14, v10.badge_id);
-        v11 = v13;
-        v12 = v14;
-    end;
-    if v10.user_id ~= nil and v10.user_id ~= 0 then
-        local v15, v16 = v0.writeTag(v11, v12, 2, v0.wireTypes.varint);
-        v15, v16 = v0.writeVarInt(v15, v16, v10.user_id);
-        v11 = v15;
-        v12 = v16;
-    end;
-    if v10.page_entry_format ~= nil and (v10.page_entry_format ~= nil and v10.page_entry_format ~= 0 or v10.page_entry_format ~= v6.PageEntryFormat.fromNumber(0)) then
-        local v17, v18 = v0.writeTag(v11, v12, 3, v0.wireTypes.varint);
-        v17, v18 = v0.writeVarInt(v17, v18, v6.PageEntryFormat.toNumber(v10.page_entry_format));
-        v11 = v17;
-        v12 = v18;
-    end;
-    local v19 = buffer.create(v12);
-    buffer.copy(v19, 0, v11, 0, v12);
-    return v19;
-end;
-v7.decode = function(v20) --[[ Line: 420 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_0 (copy), v0 (copy), v6 (copy)
-    local v21 = l_v7_0.new();
-    local v22 = 0;
-    while v22 < buffer.len(v20) do
-        local v23 = nil;
-        local v24 = nil;
-        local v25, v26, v27 = v0.readTag(v20, v22);
-        v23 = v25;
-        v24 = v26;
-        v22 = v27;
-        if v24 == v0.wireTypes.varint then
-            if v23 == 1 then
-                v25 = nil;
-                v26, v27 = v0.readVarIntI64(v20, v22);
-                v25 = v26;
-                v22 = v27;
-                v21.badge_id = v25;
-            elseif v23 == 2 then
-                v25 = nil;
-                v26, v27 = v0.readVarIntI64(v20, v22);
-                v25 = v26;
-                v22 = v27;
-                v21.user_id = v25;
-            elseif v23 == 3 then
-                v25 = nil;
-                v26, v27 = v0.readVarIntI32(v20, v22);
-                v25 = v26;
-                v22 = v27;
-                v21.page_entry_format = v6.PageEntryFormat.fromNumber(v25) or v25;
-            else
-                v25 = nil;
-                v26, v27 = v0.readVarInt(v20, v22);
-                v25 = v26;
-                v22 = v27;
-            end;
-        elseif v24 == v0.wireTypes.lengthDelimited then
-            v25 = nil;
-            v26, v27 = v0.readVarInt(v20, v22);
-            v22 = v27 + v26;
-        elseif v24 == v0.wireTypes.i32 then
-            v25 = nil;
-            v26, v27 = v0.readFixed32(v20, v22);
-            v25 = v26;
-            v22 = v27;
-        elseif v24 == v0.wireTypes.i64 then
-            v25 = nil;
-            v26, v27 = v0.readFixed64(v20, v22);
-            v25 = v26;
-            v22 = v27;
-        else
-            error("Unsupported wire type: " .. v24);
-        end;
-    end;
-    return v21;
-end;
-v7.jsonEncode = function(v28) --[[ Line: 476 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v6 (copy)
-    local v29 = {};
-    if v28.badge_id ~= nil and v28.badge_id ~= 0 then
-        v29.badgeId = v28.badge_id;
-    end;
-    if v28.user_id ~= nil and v28.user_id ~= 0 then
-        v29.userId = v28.user_id;
-    end;
-    if v28.page_entry_format ~= nil and (v28.page_entry_format ~= nil and v28.page_entry_format ~= 0 or v28.page_entry_format ~= v6.PageEntryFormat.fromNumber(0)) then
-        v29.pageEntryFormat = if typeof(v28.page_entry_format) == "number" then v28.page_entry_format else v6.PageEntryFormat.toNumber(v28.page_entry_format);
-    end;
-    return v29;
-end;
-v7.jsonDecode = function(v30) --[[ Line: 505 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_0 (copy), v6 (copy)
-    local v31 = l_v7_0.new();
-    if v30.badge_id ~= nil then
-        v31.badge_id = v30.badge_id;
-    end;
-    if v30.badgeId ~= nil then
-        v31.badge_id = v30.badgeId;
-    end;
-    if v30.user_id ~= nil then
-        v31.user_id = v30.user_id;
-    end;
-    if v30.userId ~= nil then
-        v31.user_id = v30.userId;
-    end;
-    if v30.page_entry_format ~= nil then
-        v31.page_entry_format = if typeof(v30.page_entry_format) == "number" then v6.PageEntryFormat.fromNumber(v30.page_entry_format) or v30.page_entry_format else v6.PageEntryFormat.fromName(v30.page_entry_format) or v30.page_entry_format;
-    end;
-    if v30.pageEntryFormat ~= nil then
-        v31.page_entry_format = if typeof(v30.pageEntryFormat) == "number" then v6.PageEntryFormat.fromNumber(v30.pageEntryFormat) or v30.pageEntryFormat else v6.PageEntryFormat.fromName(v30.pageEntryFormat) or v30.pageEntryFormat;
-    end;
-    return v31;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageRequest", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageRequest"
-};
-v2.BadgeDetailsPageRequest = v7;
-v1.default:register(v2.BadgeDetailsPageRequest);
-v7 = {};
-v7.__index = v7;
-local l_v7_1 = v7 --[[ copy: 7 -> 9 ]];
-v7.new = function(v33) --[[ Line: 561 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_1 (copy)
-    return (setmetatable({
-        page_entries = if not (v33 ~= nil) or v33.page_entries == nil then {} else v33.page_entries, 
-        hydration_data = if not (v33 ~= nil) or v33.hydration_data == nil then nil else v33.hydration_data, 
-        templates = if not (v33 ~= nil) or v33.templates == nil then {} else v33.templates
-    }, l_v7_1));
-end;
-v7.encode = function(v34) --[[ Line: 569 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v35 = buffer.create(0);
-    local v36 = 0;
-    if v34.page_entries ~= nil and #v34.page_entries > 0 then
-        for _, v38 in v34.page_entries do
-            local v39 = v38:encode();
-            local v40, v41 = v0.writeTag(v35, v36, 1, v0.wireTypes.lengthDelimited);
-            v40, v41 = v0.writeBuffer(v40, v41, v39, buffer.len(v39));
-            v35 = v40;
-            v36 = v41;
-        end;
-    end;
-    if v34.hydration_data ~= nil then
-        local v42 = v34.hydration_data:encode();
-        local v43, v44 = v0.writeTag(v35, v36, 2, v0.wireTypes.lengthDelimited);
-        v43, v44 = v0.writeBuffer(v43, v44, v42, buffer.len(v42));
-        v35 = v43;
-        v36 = v44;
-    end;
-    if v34.templates ~= nil and next(v34.templates) ~= nil then
-        for v45, v46 in v34.templates do
-            local v47 = buffer.create(0);
-            local v48, v49 = v0.writeTag(v47, 0, 1, v0.wireTypes.lengthDelimited);
-            v48, v49 = v0.writeString(v48, v49, v45);
-            v47 = v48;
-            local l_v49_0 = v49;
-            v48 = v46:encode();
-            local v51;
-            v49, v51 = v0.writeTag(v47, l_v49_0, 2, v0.wireTypes.lengthDelimited);
-            v49, v51 = v0.writeBuffer(v49, v51, v48, buffer.len(v48));
-            v47 = v49;
-            l_v49_0 = v51;
-            v49, v51 = v0.writeTag(v35, v36, 3, v0.wireTypes.lengthDelimited);
-            v49, v51 = v0.writeBuffer(v49, v51, v47, l_v49_0);
-            v35 = v49;
-            v36 = v51;
-        end;
-    end;
-    local v52 = buffer.create(v36);
-    buffer.copy(v52, 0, v35, 0, v36);
-    return v52;
-end;
-v7.decode = function(v53) --[[ Line: 606 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_1 (copy), v0 (copy), v2 (copy), v3 (copy), v5 (copy)
-    local v54 = l_v7_1.new();
-    local v55 = 0;
-    while v55 < buffer.len(v53) do
-        local v56 = nil;
-        local v57 = nil;
-        local v58, v59, v60 = v0.readTag(v53, v55);
-        v56 = v58;
-        v57 = v59;
-        v55 = v60;
-        if v57 == v0.wireTypes.varint then
-            v58 = nil;
-            v59, v60 = v0.readVarInt(v53, v55);
-            v58 = v59;
-            v55 = v60;
-        elseif v57 == v0.wireTypes.lengthDelimited then
-            if v56 == 1 then
-                v58 = nil;
-                v59, v60 = v0.readBuffer(v53, v55);
-                v58 = v59;
-                v55 = v60;
-                table.insert(v54.page_entries, v2.BadgeDetailsPageEntry.decode(v58));
-            elseif v56 == 2 then
-                v58 = nil;
-                v59, v60 = v0.readBuffer(v53, v55);
-                v58 = v59;
-                v55 = v60;
-                v54.hydration_data = v3.HydrationContent.decode(v58);
-            elseif v56 == 3 then
-                v58 = nil;
-                v59, v60 = v0.readBuffer(v53, v55);
-                v58 = v59;
-                v55 = v60;
-                v59 = v2.BadgeDetailsPageResponse_TemplatesEntry.decode(v58);
-                v60 = v5.TemplateEntry.new();
-                v54.templates[v59.key or ""] = v59.value or v60;
-            else
-                v58 = nil;
-                v59, v60 = v0.readVarInt(v53, v55);
-                v55 = v60 + v59;
-            end;
-        elseif v57 == v0.wireTypes.i32 then
-            v58 = nil;
-            v59, v60 = v0.readFixed32(v53, v55);
-            v58 = v59;
-            v55 = v60;
-        elseif v57 == v0.wireTypes.i64 then
-            v58 = nil;
-            v59, v60 = v0.readFixed64(v53, v55);
-            v58 = v59;
-            v55 = v60;
-        else
-            error("Unsupported wire type: " .. v57);
-        end;
-    end;
-    return v54;
-end;
-v7.jsonEncode = function(v61) --[[ Line: 667 ]] --[[ Name: jsonEncode ]]
-    local v62 = {};
-    if v61.page_entries ~= nil and #v61.page_entries > 0 then
-        local v63 = {};
-        for _, v65 in v61.page_entries do
-            table.insert(v63, v65:jsonEncode());
-        end;
-        v62.pageEntries = v63;
-    end;
-    if v61.hydration_data ~= nil then
-        v62.hydrationData = v61.hydration_data:jsonEncode();
-    end;
-    if v61.templates ~= nil and next(v61.templates) ~= nil then
-        local v66 = {};
-        for v67, v68 in v61.templates do
-            v66[v67] = v68:jsonEncode();
-        end;
-        v62.templates = v66;
-    end;
-    return v62;
-end;
-v7.jsonDecode = function(v69) --[[ Line: 693 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_1 (copy), v2 (copy), v3 (copy), v5 (copy)
-    local v70 = l_v7_1.new();
-    if v69.page_entries ~= nil then
-        local v71 = {};
-        for _, v73 in v69.page_entries do
-            table.insert(v71, v2.BadgeDetailsPageEntry.jsonDecode(v73));
-        end;
-        v70.page_entries = v71;
-    end;
-    if v69.pageEntries ~= nil then
-        local v74 = {};
-        for _, v76 in v69.pageEntries do
-            table.insert(v74, v2.BadgeDetailsPageEntry.jsonDecode(v76));
-        end;
-        v70.page_entries = v74;
-    end;
-    if v69.hydration_data ~= nil then
-        v70.hydration_data = v3.HydrationContent.jsonDecode(v69.hydration_data);
-    end;
-    if v69.hydrationData ~= nil then
-        v70.hydration_data = v3.HydrationContent.jsonDecode(v69.hydrationData);
-    end;
-    if v69.templates ~= nil then
-        local v77 = {};
-        for v78, v79 in v69.templates do
-            v77[v78] = v5.TemplateEntry.jsonDecode(v79);
-        end;
-        v70.templates = v77;
-    end;
-    return v70;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageResponse", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageResponse"
-};
-v2.BadgeDetailsPageResponse = v7;
-v1.default:register(v2.BadgeDetailsPageResponse);
-v7 = {};
-v7.__index = v7;
-local l_v7_2 = v7 --[[ copy: 7 -> 10 ]];
-v7.new = function(v81) --[[ Line: 752 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_2 (copy)
-    return (setmetatable({
-        key = (not (v81 ~= nil) or v81.key == nil) and "" or v81.key, 
-        value = if not (v81 ~= nil) or v81.value == nil then nil else v81.value
-    }, l_v7_2));
-end;
-v7.encode = function(v82) --[[ Line: 761 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v83 = buffer.create(0);
-    local v84 = 0;
-    if v82.key ~= nil and v82.key ~= "" then
-        local v85, v86 = v0.writeTag(v83, v84, 1, v0.wireTypes.lengthDelimited);
-        v85, v86 = v0.writeString(v85, v86, v82.key);
-        v83 = v85;
-        v84 = v86;
-    end;
-    if v82.value ~= nil then
-        local v87 = v82.value:encode();
-        local v88, v89 = v0.writeTag(v83, v84, 2, v0.wireTypes.lengthDelimited);
-        v88, v89 = v0.writeBuffer(v88, v89, v87, buffer.len(v87));
-        v83 = v88;
-        v84 = v89;
-    end;
-    local v90 = buffer.create(v84);
-    buffer.copy(v90, 0, v83, 0, v84);
-    return v90;
-end;
-v7.decode = function(v91) --[[ Line: 781 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_2 (copy), v0 (copy), v5 (copy)
-    local v92 = l_v7_2.new();
-    local v93 = 0;
-    while v93 < buffer.len(v91) do
-        local v94 = nil;
-        local v95 = nil;
-        local v96, v97, v98 = v0.readTag(v91, v93);
-        v94 = v96;
-        v95 = v97;
-        v93 = v98;
-        if v95 == v0.wireTypes.varint then
-            v96 = nil;
-            v97, v98 = v0.readVarInt(v91, v93);
-            v96 = v97;
-            v93 = v98;
-        elseif v95 == v0.wireTypes.lengthDelimited then
-            if v94 == 1 then
-                v96 = nil;
-                v97, v98 = v0.readBuffer(v91, v93);
-                v96 = v97;
-                v93 = v98;
-                v92.key = buffer.tostring(v96);
-            elseif v94 == 2 then
-                v96 = nil;
-                v97, v98 = v0.readBuffer(v91, v93);
-                v96 = v97;
-                v93 = v98;
-                v92.value = v5.TemplateEntry.decode(v96);
-            else
-                v96 = nil;
-                v97, v98 = v0.readVarInt(v91, v93);
-                v93 = v98 + v97;
-            end;
-        elseif v95 == v0.wireTypes.i32 then
-            v96 = nil;
-            v97, v98 = v0.readFixed32(v91, v93);
-            v96 = v97;
-            v93 = v98;
-        elseif v95 == v0.wireTypes.i64 then
-            v96 = nil;
-            v97, v98 = v0.readFixed64(v91, v93);
-            v96 = v97;
-            v93 = v98;
-        else
-            error("Unsupported wire type: " .. v95);
-        end;
-    end;
-    return v92;
-end;
-v7.jsonEncode = function(v99) --[[ Line: 829 ]] --[[ Name: jsonEncode ]]
-    local v100 = {};
-    if v99.key ~= nil and v99.key ~= "" then
-        v100.key = v99.key;
-    end;
-    if v99.value ~= nil then
-        v100.value = v99.value:jsonEncode();
-    end;
-    return v100;
-end;
-v7.jsonDecode = function(v101) --[[ Line: 843 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_2 (copy), v5 (copy)
-    local v102 = l_v7_2.new();
-    if v101.key ~= nil then
-        v102.key = v101.key;
-    end;
-    if v101.value ~= nil then
-        v102.value = v5.TemplateEntry.jsonDecode(v101.value);
-    end;
-    return v102;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageResponse_TemplatesEntry", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.TemplatesEntry"
-};
-v2.BadgeDetailsPageResponse_TemplatesEntry = v7;
-v1.default:register(v2.BadgeDetailsPageResponse_TemplatesEntry);
-v7 = {};
-v7.__index = v7;
-local l_v7_3 = v7 --[[ copy: 7 -> 11 ]];
-v7.new = function(v104) --[[ Line: 873 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_3 (copy)
-    return (setmetatable({
-        page_entries = if not (v104 ~= nil) or v104.page_entries == nil then {} else v104.page_entries, 
-        hydration_data = if not (v104 ~= nil) or v104.hydration_data == nil then nil else v104.hydration_data, 
-        templates = if not (v104 ~= nil) or v104.templates == nil then {} else v104.templates
-    }, l_v7_3));
-end;
-v7.encode = function(v105) --[[ Line: 883 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v106 = buffer.create(0);
-    local v107 = 0;
-    if v105.page_entries ~= nil and #v105.page_entries > 0 then
-        for _, v109 in v105.page_entries do
-            local v110 = v109:encode();
-            local v111, v112 = v0.writeTag(v106, v107, 1, v0.wireTypes.lengthDelimited);
-            v111, v112 = v0.writeBuffer(v111, v112, v110, buffer.len(v110));
-            v106 = v111;
-            v107 = v112;
-        end;
-    end;
-    if v105.hydration_data ~= nil then
-        local v113 = v105.hydration_data:encode();
-        local v114, v115 = v0.writeTag(v106, v107, 2, v0.wireTypes.lengthDelimited);
-        v114, v115 = v0.writeBuffer(v114, v115, v113, buffer.len(v113));
-        v106 = v114;
-        v107 = v115;
-    end;
-    if v105.templates ~= nil and next(v105.templates) ~= nil then
-        for v116, v117 in v105.templates do
-            local v118 = buffer.create(0);
-            local v119, v120 = v0.writeTag(v118, 0, 1, v0.wireTypes.lengthDelimited);
-            v119, v120 = v0.writeString(v119, v120, v116);
-            v118 = v119;
-            local l_v120_0 = v120;
-            v119 = v117:encode();
-            local v122;
-            v120, v122 = v0.writeTag(v118, l_v120_0, 2, v0.wireTypes.lengthDelimited);
-            v120, v122 = v0.writeBuffer(v120, v122, v119, buffer.len(v119));
-            v118 = v120;
-            l_v120_0 = v122;
-            v120, v122 = v0.writeTag(v106, v107, 3, v0.wireTypes.lengthDelimited);
-            v120, v122 = v0.writeBuffer(v120, v122, v118, l_v120_0);
-            v106 = v120;
-            v107 = v122;
-        end;
-    end;
-    local v123 = buffer.create(v107);
-    buffer.copy(v123, 0, v106, 0, v107);
-    return v123;
-end;
-v7.decode = function(v124) --[[ Line: 920 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_3 (copy), v0 (copy), v6 (copy), v3 (copy), v2 (copy), v5 (copy)
-    local v125 = l_v7_3.new();
-    local v126 = 0;
-    while v126 < buffer.len(v124) do
-        local v127 = nil;
-        local v128 = nil;
-        local v129, v130, v131 = v0.readTag(v124, v126);
-        v127 = v129;
-        v128 = v130;
-        v126 = v131;
-        if v128 == v0.wireTypes.varint then
-            v129 = nil;
-            v130, v131 = v0.readVarInt(v124, v126);
-            v129 = v130;
-            v126 = v131;
-        elseif v128 == v0.wireTypes.lengthDelimited then
-            if v127 == 1 then
-                v129 = nil;
-                v130, v131 = v0.readBuffer(v124, v126);
-                v129 = v130;
-                v126 = v131;
-                table.insert(v125.page_entries, v6.UniversalPageEntry.decode(v129));
-            elseif v127 == 2 then
-                v129 = nil;
-                v130, v131 = v0.readBuffer(v124, v126);
-                v129 = v130;
-                v126 = v131;
-                v125.hydration_data = v3.HydrationContent.decode(v129);
-            elseif v127 == 3 then
-                v129 = nil;
-                v130, v131 = v0.readBuffer(v124, v126);
-                v129 = v130;
-                v126 = v131;
-                v130 = v2.BadgeDetailsPageV2Response_TemplatesEntry.decode(v129);
-                v131 = v5.TemplateEntry.new();
-                v125.templates[v130.key or ""] = v130.value or v131;
-            else
-                v129 = nil;
-                v130, v131 = v0.readVarInt(v124, v126);
-                v126 = v131 + v130;
-            end;
-        elseif v128 == v0.wireTypes.i32 then
-            v129 = nil;
-            v130, v131 = v0.readFixed32(v124, v126);
-            v129 = v130;
-            v126 = v131;
-        elseif v128 == v0.wireTypes.i64 then
-            v129 = nil;
-            v130, v131 = v0.readFixed64(v124, v126);
-            v129 = v130;
-            v126 = v131;
-        else
-            error("Unsupported wire type: " .. v128);
-        end;
-    end;
-    return v125;
-end;
-v7.jsonEncode = function(v132) --[[ Line: 984 ]] --[[ Name: jsonEncode ]]
-    local v133 = {};
-    if v132.page_entries ~= nil and #v132.page_entries > 0 then
-        local v134 = {};
-        for _, v136 in v132.page_entries do
-            table.insert(v134, v136:jsonEncode());
-        end;
-        v133.pageEntries = v134;
-    end;
-    if v132.hydration_data ~= nil then
-        v133.hydrationData = v132.hydration_data:jsonEncode();
-    end;
-    if v132.templates ~= nil and next(v132.templates) ~= nil then
-        local v137 = {};
-        for v138, v139 in v132.templates do
-            v137[v138] = v139:jsonEncode();
-        end;
-        v133.templates = v137;
-    end;
-    return v133;
-end;
-v7.jsonDecode = function(v140) --[[ Line: 1010 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_3 (copy), v6 (copy), v3 (copy), v5 (copy)
-    local v141 = l_v7_3.new();
-    if v140.page_entries ~= nil then
-        local v142 = {};
-        for _, v144 in v140.page_entries do
-            table.insert(v142, v6.UniversalPageEntry.jsonDecode(v144));
-        end;
-        v141.page_entries = v142;
-    end;
-    if v140.pageEntries ~= nil then
-        local v145 = {};
-        for _, v147 in v140.pageEntries do
-            table.insert(v145, v6.UniversalPageEntry.jsonDecode(v147));
-        end;
-        v141.page_entries = v145;
-    end;
-    if v140.hydration_data ~= nil then
-        v141.hydration_data = v3.HydrationContent.jsonDecode(v140.hydration_data);
-    end;
-    if v140.hydrationData ~= nil then
-        v141.hydration_data = v3.HydrationContent.jsonDecode(v140.hydrationData);
-    end;
-    if v140.templates ~= nil then
-        local v148 = {};
-        for v149, v150 in v140.templates do
-            v148[v149] = v5.TemplateEntry.jsonDecode(v150);
-        end;
-        v141.templates = v148;
-    end;
-    return v141;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageV2Response", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageV2Response"
-};
-v2.BadgeDetailsPageV2Response = v7;
-v1.default:register(v2.BadgeDetailsPageV2Response);
-v7 = {};
-v7.__index = v7;
-local l_v7_4 = v7 --[[ copy: 7 -> 12 ]];
-v7.new = function(v152) --[[ Line: 1075 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_4 (copy)
-    return (setmetatable({
-        key = (not (v152 ~= nil) or v152.key == nil) and "" or v152.key, 
-        value = if not (v152 ~= nil) or v152.value == nil then nil else v152.value
-    }, l_v7_4));
-end;
-v7.encode = function(v153) --[[ Line: 1084 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v154 = buffer.create(0);
-    local v155 = 0;
-    if v153.key ~= nil and v153.key ~= "" then
-        local v156, v157 = v0.writeTag(v154, v155, 1, v0.wireTypes.lengthDelimited);
-        v156, v157 = v0.writeString(v156, v157, v153.key);
-        v154 = v156;
-        v155 = v157;
-    end;
-    if v153.value ~= nil then
-        local v158 = v153.value:encode();
-        local v159, v160 = v0.writeTag(v154, v155, 2, v0.wireTypes.lengthDelimited);
-        v159, v160 = v0.writeBuffer(v159, v160, v158, buffer.len(v158));
-        v154 = v159;
-        v155 = v160;
-    end;
-    local v161 = buffer.create(v155);
-    buffer.copy(v161, 0, v154, 0, v155);
-    return v161;
-end;
-v7.decode = function(v162) --[[ Line: 1106 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_4 (copy), v0 (copy), v5 (copy)
-    local v163 = l_v7_4.new();
-    local v164 = 0;
-    while v164 < buffer.len(v162) do
-        local v165 = nil;
-        local v166 = nil;
-        local v167, v168, v169 = v0.readTag(v162, v164);
-        v165 = v167;
-        v166 = v168;
-        v164 = v169;
-        if v166 == v0.wireTypes.varint then
-            v167 = nil;
-            v168, v169 = v0.readVarInt(v162, v164);
-            v167 = v168;
-            v164 = v169;
-        elseif v166 == v0.wireTypes.lengthDelimited then
-            if v165 == 1 then
-                v167 = nil;
-                v168, v169 = v0.readBuffer(v162, v164);
-                v167 = v168;
-                v164 = v169;
-                v163.key = buffer.tostring(v167);
-            elseif v165 == 2 then
-                v167 = nil;
-                v168, v169 = v0.readBuffer(v162, v164);
-                v167 = v168;
-                v164 = v169;
-                v163.value = v5.TemplateEntry.decode(v167);
-            else
-                v167 = nil;
-                v168, v169 = v0.readVarInt(v162, v164);
-                v164 = v169 + v168;
-            end;
-        elseif v166 == v0.wireTypes.i32 then
-            v167 = nil;
-            v168, v169 = v0.readFixed32(v162, v164);
-            v167 = v168;
-            v164 = v169;
-        elseif v166 == v0.wireTypes.i64 then
-            v167 = nil;
-            v168, v169 = v0.readFixed64(v162, v164);
-            v167 = v168;
-            v164 = v169;
-        else
-            error("Unsupported wire type: " .. v166);
-        end;
-    end;
-    return v163;
-end;
-v7.jsonEncode = function(v170) --[[ Line: 1156 ]] --[[ Name: jsonEncode ]]
-    local v171 = {};
-    if v170.key ~= nil and v170.key ~= "" then
-        v171.key = v170.key;
-    end;
-    if v170.value ~= nil then
-        v171.value = v170.value:jsonEncode();
-    end;
-    return v171;
-end;
-v7.jsonDecode = function(v172) --[[ Line: 1172 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_4 (copy), v5 (copy)
-    local v173 = l_v7_4.new();
-    if v172.key ~= nil then
-        v173.key = v172.key;
-    end;
-    if v172.value ~= nil then
-        v173.value = v5.TemplateEntry.jsonDecode(v172.value);
-    end;
-    return v173;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageV2Response_TemplatesEntry", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.TemplatesEntry"
-};
-v2.BadgeDetailsPageV2Response_TemplatesEntry = v7;
-v1.default:register(v2.BadgeDetailsPageV2Response_TemplatesEntry);
-v7 = {};
-v7.__index = v7;
-local l_v7_5 = v7 --[[ copy: 7 -> 13 ]];
-v7.new = function(v175) --[[ Line: 1202 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_5 (copy)
-    return (setmetatable({
-        page_entry = if not (v175 ~= nil) or v175.page_entry == nil then nil else v175.page_entry, 
-        kind = if not (v175 ~= nil) or v175.kind == nil then nil else v175.kind
-    }, l_v7_5));
-end;
-v7.encode = function(v176) --[[ Line: 1209 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v177 = buffer.create(0);
-    local v178 = 0;
-    if v176.page_entry ~= nil then
-        local v179 = v176.page_entry:encode();
-        local v180, v181 = v0.writeTag(v177, v178, 1, v0.wireTypes.lengthDelimited);
-        v180, v181 = v0.writeBuffer(v180, v181, v179, buffer.len(v179));
-        v177 = v180;
-        v178 = v181;
-    end;
-    if v176.kind ~= nil and v176.kind.type == "badge_details" then
-        local v182 = v176.kind.value:encode();
-        local v183, v184 = v0.writeTag(v177, v178, 2, v0.wireTypes.lengthDelimited);
-        v183, v184 = v0.writeBuffer(v183, v184, v182, buffer.len(v182));
-        v177 = v183;
-        v178 = v184;
-    end;
-    local v185 = buffer.create(v178);
-    buffer.copy(v185, 0, v177, 0, v178);
-    return v185;
-end;
-v7.decode = function(v186) --[[ Line: 1232 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_5 (copy), v0 (copy), v4 (copy), v2 (copy)
-    local v187 = l_v7_5.new();
-    local v188 = 0;
-    while v188 < buffer.len(v186) do
-        local v189 = nil;
-        local v190 = nil;
-        local v191, v192, v193 = v0.readTag(v186, v188);
-        v189 = v191;
-        v190 = v192;
-        v188 = v193;
-        if v190 == v0.wireTypes.varint then
-            v191 = nil;
-            v192, v193 = v0.readVarInt(v186, v188);
-            v191 = v192;
-            v188 = v193;
-        elseif v190 == v0.wireTypes.lengthDelimited then
-            if v189 == 1 then
-                v191 = nil;
-                v192, v193 = v0.readBuffer(v186, v188);
-                v191 = v192;
-                v188 = v193;
-                v187.page_entry = v4.PageEntry.decode(v191);
-            elseif v189 == 2 then
-                v191 = nil;
-                v192, v193 = v0.readBuffer(v186, v188);
-                v191 = v192;
-                v188 = v193;
-                v187.kind = {
-                    type = "badge_details", 
-                    value = v2.BadgeDetailsContent.decode(v191)
-                };
-            else
-                v191 = nil;
-                v192, v193 = v0.readVarInt(v186, v188);
-                v188 = v193 + v192;
-            end;
-        elseif v190 == v0.wireTypes.i32 then
-            v191 = nil;
-            v192, v193 = v0.readFixed32(v186, v188);
-            v191 = v192;
-            v188 = v193;
-        elseif v190 == v0.wireTypes.i64 then
-            v191 = nil;
-            v192, v193 = v0.readFixed64(v186, v188);
-            v191 = v192;
-            v188 = v193;
-        else
-            error("Unsupported wire type: " .. v190);
-        end;
-    end;
-    return v187;
-end;
-v7.jsonEncode = function(v194) --[[ Line: 1280 ]] --[[ Name: jsonEncode ]]
-    local v195 = {};
-    if v194.page_entry ~= nil then
-        v195.pageEntry = v194.page_entry:jsonEncode();
-    end;
-    if v194.kind ~= nil and v194.kind.type == "badge_details" then
-        v195.badgeDetails = v194.kind.value:jsonEncode();
-    end;
-    return v195;
-end;
-v7.jsonDecode = function(v196) --[[ Line: 1296 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_5 (copy), v4 (copy), v2 (copy)
-    local v197 = l_v7_5.new();
-    if v196.page_entry ~= nil then
-        v197.page_entry = v4.PageEntry.jsonDecode(v196.page_entry);
-    end;
-    if v196.pageEntry ~= nil then
-        v197.page_entry = v4.PageEntry.jsonDecode(v196.pageEntry);
-    end;
-    if v196.badge_details ~= nil then
-        v197.kind = {
-            type = "badge_details", 
-            value = v2.BadgeDetailsContent.jsonDecode(v196.badge_details)
-        };
-    end;
-    if v196.badgeDetails ~= nil then
-        v197.kind = {
-            type = "badge_details", 
-            value = v2.BadgeDetailsContent.jsonDecode(v196.badgeDetails)
-        };
-    end;
-    return v197;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsPageEntry", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageEntry"
-};
-v2.BadgeDetailsPageEntry = v7;
-v1.default:register(v2.BadgeDetailsPageEntry);
-v7 = {};
-v7.__index = v7;
-local l_v7_6 = v7 --[[ copy: 7 -> 14 ]];
-v7.new = function(v199) --[[ Line: 1332 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_6 (copy)
-    return (setmetatable({
-        badge_id = (not (v199 ~= nil) or v199.badge_id == nil) and "" or v199.badge_id, 
-        universe_id = (not (v199 ~= nil) or v199.universe_id == nil) and "" or v199.universe_id, 
-        localized_literals = if not (v199 ~= nil) or v199.localized_literals == nil then nil else v199.localized_literals, 
-        creator_key = (not (v199 ~= nil) or v199.creator_key == nil) and "" or v199.creator_key
-    }, l_v7_6));
-end;
-v7.encode = function(v200) --[[ Line: 1341 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v201 = buffer.create(0);
-    local v202 = 0;
-    if v200.badge_id ~= nil and v200.badge_id ~= "" then
-        local v203, v204 = v0.writeTag(v201, v202, 1, v0.wireTypes.lengthDelimited);
-        v203, v204 = v0.writeString(v203, v204, v200.badge_id);
-        v201 = v203;
-        v202 = v204;
-    end;
-    if v200.universe_id ~= nil and v200.universe_id ~= "" then
-        local v205, v206 = v0.writeTag(v201, v202, 2, v0.wireTypes.lengthDelimited);
-        v205, v206 = v0.writeString(v205, v206, v200.universe_id);
-        v201 = v205;
-        v202 = v206;
-    end;
-    if v200.localized_literals ~= nil then
-        local v207 = v200.localized_literals:encode();
-        local v208, v209 = v0.writeTag(v201, v202, 3, v0.wireTypes.lengthDelimited);
-        v208, v209 = v0.writeBuffer(v208, v209, v207, buffer.len(v207));
-        v201 = v208;
-        v202 = v209;
-    end;
-    if v200.creator_key ~= nil and v200.creator_key ~= "" then
-        local v210, v211 = v0.writeTag(v201, v202, 4, v0.wireTypes.lengthDelimited);
-        v210, v211 = v0.writeString(v210, v211, v200.creator_key);
-        v201 = v210;
-        v202 = v211;
-    end;
-    local v212 = buffer.create(v202);
-    buffer.copy(v212, 0, v201, 0, v202);
-    return v212;
-end;
-v7.decode = function(v213) --[[ Line: 1371 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_6 (copy), v0 (copy), v2 (copy)
-    local v214 = l_v7_6.new();
-    local v215 = 0;
-    while v215 < buffer.len(v213) do
-        local v216 = nil;
-        local v217 = nil;
-        local v218, v219, v220 = v0.readTag(v213, v215);
-        v216 = v218;
-        v217 = v219;
-        v215 = v220;
-        if v217 == v0.wireTypes.varint then
-            v218 = nil;
-            v219, v220 = v0.readVarInt(v213, v215);
-            v218 = v219;
-            v215 = v220;
-        elseif v217 == v0.wireTypes.lengthDelimited then
-            if v216 == 1 then
-                v218 = nil;
-                v219, v220 = v0.readBuffer(v213, v215);
-                v218 = v219;
-                v215 = v220;
-                v214.badge_id = buffer.tostring(v218);
-            elseif v216 == 2 then
-                v218 = nil;
-                v219, v220 = v0.readBuffer(v213, v215);
-                v218 = v219;
-                v215 = v220;
-                v214.universe_id = buffer.tostring(v218);
-            elseif v216 == 3 then
-                v218 = nil;
-                v219, v220 = v0.readBuffer(v213, v215);
-                v218 = v219;
-                v215 = v220;
-                v214.localized_literals = v2.BadgeDetailsContent_LocalizedLiterals.decode(v218);
-            elseif v216 == 4 then
-                v218 = nil;
-                v219, v220 = v0.readBuffer(v213, v215);
-                v218 = v219;
-                v215 = v220;
-                v214.creator_key = buffer.tostring(v218);
-            else
-                v218 = nil;
-                v219, v220 = v0.readVarInt(v213, v215);
-                v215 = v220 + v219;
-            end;
-        elseif v217 == v0.wireTypes.i32 then
-            v218 = nil;
-            v219, v220 = v0.readFixed32(v213, v215);
-            v218 = v219;
-            v215 = v220;
-        elseif v217 == v0.wireTypes.i64 then
-            v218 = nil;
-            v219, v220 = v0.readFixed64(v213, v215);
-            v218 = v219;
-            v215 = v220;
-        else
-            error("Unsupported wire type: " .. v217);
-        end;
-    end;
-    return v214;
-end;
-v7.jsonEncode = function(v221) --[[ Line: 1429 ]] --[[ Name: jsonEncode ]]
-    local v222 = {};
-    if v221.badge_id ~= nil and v221.badge_id ~= "" then
-        v222.badgeId = v221.badge_id;
-    end;
-    if v221.universe_id ~= nil and v221.universe_id ~= "" then
-        v222.universeId = v221.universe_id;
-    end;
-    if v221.localized_literals ~= nil then
-        v222.localizedLiterals = v221.localized_literals:jsonEncode();
-    end;
-    if v221.creator_key ~= nil and v221.creator_key ~= "" then
-        v222.creatorKey = v221.creator_key;
-    end;
-    return v222;
-end;
-v7.jsonDecode = function(v223) --[[ Line: 1451 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_6 (copy), v2 (copy)
-    local v224 = l_v7_6.new();
-    if v223.badge_id ~= nil then
-        v224.badge_id = v223.badge_id;
-    end;
-    if v223.badgeId ~= nil then
-        v224.badge_id = v223.badgeId;
-    end;
-    if v223.universe_id ~= nil then
-        v224.universe_id = v223.universe_id;
-    end;
-    if v223.universeId ~= nil then
-        v224.universe_id = v223.universeId;
-    end;
-    if v223.localized_literals ~= nil then
-        v224.localized_literals = v2.BadgeDetailsContent_LocalizedLiterals.jsonDecode(v223.localized_literals);
-    end;
-    if v223.localizedLiterals ~= nil then
-        v224.localized_literals = v2.BadgeDetailsContent_LocalizedLiterals.jsonDecode(v223.localizedLiterals);
-    end;
-    if v223.creator_key ~= nil then
-        v224.creator_key = v223.creator_key;
-    end;
-    if v223.creatorKey ~= nil then
-        v224.creator_key = v223.creatorKey;
-    end;
-    return v224;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsContent", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsContent"
-};
-v2.BadgeDetailsContent = v7;
-v1.default:register(v2.BadgeDetailsContent);
-v7 = {};
-v7.__index = v7;
-local l_v7_7 = v7 --[[ copy: 7 -> 15 ]];
-v7.new = function(v226) --[[ Line: 1504 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_7 (copy)
-    return (setmetatable({
-        info_table = if not (v226 ~= nil) or v226.info_table == nil then nil else v226.info_table, 
-        action_module = if not (v226 ~= nil) or v226.action_module == nil then nil else v226.action_module, 
-        overflow_menu = if not (v226 ~= nil) or v226.overflow_menu == nil then nil else v226.overflow_menu
-    }, l_v7_7));
-end;
-v7.encode = function(v227) --[[ Line: 1514 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v228 = buffer.create(0);
-    local v229 = 0;
-    if v227.info_table ~= nil then
-        local v230 = v227.info_table:encode();
-        local v231, v232 = v0.writeTag(v228, v229, 1, v0.wireTypes.lengthDelimited);
-        v231, v232 = v0.writeBuffer(v231, v232, v230, buffer.len(v230));
-        v228 = v231;
-        v229 = v232;
-    end;
-    if v227.action_module ~= nil then
-        local v233 = v227.action_module:encode();
-        local v234, v235 = v0.writeTag(v228, v229, 2, v0.wireTypes.lengthDelimited);
-        v234, v235 = v0.writeBuffer(v234, v235, v233, buffer.len(v233));
-        v228 = v234;
-        v229 = v235;
-    end;
-    if v227.overflow_menu ~= nil then
-        local v236 = v227.overflow_menu:encode();
-        local v237, v238 = v0.writeTag(v228, v229, 3, v0.wireTypes.lengthDelimited);
-        v237, v238 = v0.writeBuffer(v237, v238, v236, buffer.len(v236));
-        v228 = v237;
-        v229 = v238;
-    end;
-    local v239 = buffer.create(v229);
-    buffer.copy(v239, 0, v228, 0, v229);
-    return v239;
-end;
-v7.decode = function(v240) --[[ Line: 1541 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_7 (copy), v0 (copy), v2 (copy)
-    local v241 = l_v7_7.new();
-    local v242 = 0;
-    while v242 < buffer.len(v240) do
-        local v243 = nil;
-        local v244 = nil;
-        local v245, v246, v247 = v0.readTag(v240, v242);
-        v243 = v245;
-        v244 = v246;
-        v242 = v247;
-        if v244 == v0.wireTypes.varint then
-            v245 = nil;
-            v246, v247 = v0.readVarInt(v240, v242);
-            v245 = v246;
-            v242 = v247;
-        elseif v244 == v0.wireTypes.lengthDelimited then
-            if v243 == 1 then
-                v245 = nil;
-                v246, v247 = v0.readBuffer(v240, v242);
-                v245 = v246;
-                v242 = v247;
-                v241.info_table = v2.BadgeDetailsContent_LocalizedLiterals_InfoTable.decode(v245);
-            elseif v243 == 2 then
-                v245 = nil;
-                v246, v247 = v0.readBuffer(v240, v242);
-                v245 = v246;
-                v242 = v247;
-                v241.action_module = v2.BadgeDetailsContent_LocalizedLiterals_ActionModule.decode(v245);
-            elseif v243 == 3 then
-                v245 = nil;
-                v246, v247 = v0.readBuffer(v240, v242);
-                v245 = v246;
-                v242 = v247;
-                v241.overflow_menu = v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.decode(v245);
-            else
-                v245 = nil;
-                v246, v247 = v0.readVarInt(v240, v242);
-                v242 = v247 + v246;
-            end;
-        elseif v244 == v0.wireTypes.i32 then
-            v245 = nil;
-            v246, v247 = v0.readFixed32(v240, v242);
-            v245 = v246;
-            v242 = v247;
-        elseif v244 == v0.wireTypes.i64 then
-            v245 = nil;
-            v246, v247 = v0.readFixed64(v240, v242);
-            v245 = v246;
-            v242 = v247;
-        else
-            error("Unsupported wire type: " .. v244);
-        end;
-    end;
-    return v241;
-end;
-v7.jsonEncode = function(v248) --[[ Line: 1594 ]] --[[ Name: jsonEncode ]]
-    local v249 = {};
-    if v248.info_table ~= nil then
-        v249.infoTable = v248.info_table:jsonEncode();
-    end;
-    if v248.action_module ~= nil then
-        v249.actionModule = v248.action_module:jsonEncode();
-    end;
-    if v248.overflow_menu ~= nil then
-        v249.overflowMenu = v248.overflow_menu:jsonEncode();
-    end;
-    return v249;
-end;
-v7.jsonDecode = function(v250) --[[ Line: 1612 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_7 (copy), v2 (copy)
-    local v251 = l_v7_7.new();
-    if v250.info_table ~= nil then
-        v251.info_table = v2.BadgeDetailsContent_LocalizedLiterals_InfoTable.jsonDecode(v250.info_table);
-    end;
-    if v250.infoTable ~= nil then
-        v251.info_table = v2.BadgeDetailsContent_LocalizedLiterals_InfoTable.jsonDecode(v250.infoTable);
-    end;
-    if v250.action_module ~= nil then
-        v251.action_module = v2.BadgeDetailsContent_LocalizedLiterals_ActionModule.jsonDecode(v250.action_module);
-    end;
-    if v250.actionModule ~= nil then
-        v251.action_module = v2.BadgeDetailsContent_LocalizedLiterals_ActionModule.jsonDecode(v250.actionModule);
-    end;
-    if v250.overflow_menu ~= nil then
-        v251.overflow_menu = v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.jsonDecode(v250.overflow_menu);
-    end;
-    if v250.overflowMenu ~= nil then
-        v251.overflow_menu = v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.jsonDecode(v250.overflowMenu);
-    end;
-    return v251;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsContent_LocalizedLiterals", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.LocalizedLiterals"
-};
-v2.BadgeDetailsContent_LocalizedLiterals = v7;
-v1.default:register(v2.BadgeDetailsContent_LocalizedLiterals);
-v7 = {};
-v7.__index = v7;
-local l_v7_8 = v7 --[[ copy: 7 -> 16 ]];
-v7.new = function(v253) --[[ Line: 1662 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_8 (copy)
-    return (setmetatable({
-        type_label = (not (v253 ~= nil) or v253.type_label == nil) and "" or v253.type_label, 
-        earned_label = (not (v253 ~= nil) or v253.earned_label == nil) and "" or v253.earned_label, 
-        updated_label = (not (v253 ~= nil) or v253.updated_label == nil) and "" or v253.updated_label, 
-        experience_label = (not (v253 ~= nil) or v253.experience_label == nil) and "" or v253.experience_label, 
-        rarity_label = (not (v253 ~= nil) or v253.rarity_label == nil) and "" or v253.rarity_label, 
-        won_yesterday_label = (not (v253 ~= nil) or v253.won_yesterday_label == nil) and "" or v253.won_yesterday_label, 
-        won_ever_label = (not (v253 ~= nil) or v253.won_ever_label == nil) and "" or v253.won_ever_label
-    }, l_v7_8));
-end;
-v7.encode = function(v254) --[[ Line: 1678 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v255 = buffer.create(0);
-    local v256 = 0;
-    if v254.type_label ~= nil and v254.type_label ~= "" then
-        local v257, v258 = v0.writeTag(v255, v256, 1, v0.wireTypes.lengthDelimited);
-        v257, v258 = v0.writeString(v257, v258, v254.type_label);
-        v255 = v257;
-        v256 = v258;
-    end;
-    if v254.earned_label ~= nil and v254.earned_label ~= "" then
-        local v259, v260 = v0.writeTag(v255, v256, 2, v0.wireTypes.lengthDelimited);
-        v259, v260 = v0.writeString(v259, v260, v254.earned_label);
-        v255 = v259;
-        v256 = v260;
-    end;
-    if v254.updated_label ~= nil and v254.updated_label ~= "" then
-        local v261, v262 = v0.writeTag(v255, v256, 3, v0.wireTypes.lengthDelimited);
-        v261, v262 = v0.writeString(v261, v262, v254.updated_label);
-        v255 = v261;
-        v256 = v262;
-    end;
-    if v254.experience_label ~= nil and v254.experience_label ~= "" then
-        local v263, v264 = v0.writeTag(v255, v256, 4, v0.wireTypes.lengthDelimited);
-        v263, v264 = v0.writeString(v263, v264, v254.experience_label);
-        v255 = v263;
-        v256 = v264;
-    end;
-    if v254.rarity_label ~= nil and v254.rarity_label ~= "" then
-        local v265, v266 = v0.writeTag(v255, v256, 5, v0.wireTypes.lengthDelimited);
-        v265, v266 = v0.writeString(v265, v266, v254.rarity_label);
-        v255 = v265;
-        v256 = v266;
-    end;
-    if v254.won_yesterday_label ~= nil and v254.won_yesterday_label ~= "" then
-        local v267, v268 = v0.writeTag(v255, v256, 6, v0.wireTypes.lengthDelimited);
-        v267, v268 = v0.writeString(v267, v268, v254.won_yesterday_label);
-        v255 = v267;
-        v256 = v268;
-    end;
-    if v254.won_ever_label ~= nil and v254.won_ever_label ~= "" then
-        local v269, v270 = v0.writeTag(v255, v256, 7, v0.wireTypes.lengthDelimited);
-        v269, v270 = v0.writeString(v269, v270, v254.won_ever_label);
-        v255 = v269;
-        v256 = v270;
-    end;
-    local v271 = buffer.create(v256);
-    buffer.copy(v271, 0, v255, 0, v256);
-    return v271;
-end;
-v7.decode = function(v272) --[[ Line: 1724 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_8 (copy), v0 (copy)
-    local v273 = l_v7_8.new();
-    local v274 = 0;
-    while v274 < buffer.len(v272) do
-        local v275 = nil;
-        local v276 = nil;
-        local v277, v278, v279 = v0.readTag(v272, v274);
-        v275 = v277;
-        v276 = v278;
-        v274 = v279;
-        if v276 == v0.wireTypes.varint then
-            v277 = nil;
-            v278, v279 = v0.readVarInt(v272, v274);
-            v277 = v278;
-            v274 = v279;
-        elseif v276 == v0.wireTypes.lengthDelimited then
-            if v275 == 1 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.type_label = buffer.tostring(v277);
-            elseif v275 == 2 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.earned_label = buffer.tostring(v277);
-            elseif v275 == 3 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.updated_label = buffer.tostring(v277);
-            elseif v275 == 4 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.experience_label = buffer.tostring(v277);
-            elseif v275 == 5 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.rarity_label = buffer.tostring(v277);
-            elseif v275 == 6 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.won_yesterday_label = buffer.tostring(v277);
-            elseif v275 == 7 then
-                v277 = nil;
-                v278, v279 = v0.readBuffer(v272, v274);
-                v277 = v278;
-                v274 = v279;
-                v273.won_ever_label = buffer.tostring(v277);
-            else
-                v277 = nil;
-                v278, v279 = v0.readVarInt(v272, v274);
-                v274 = v279 + v278;
-            end;
-        elseif v276 == v0.wireTypes.i32 then
-            v277 = nil;
-            v278, v279 = v0.readFixed32(v272, v274);
-            v277 = v278;
-            v274 = v279;
-        elseif v276 == v0.wireTypes.i64 then
-            v277 = nil;
-            v278, v279 = v0.readFixed64(v272, v274);
-            v277 = v278;
-            v274 = v279;
-        else
-            error("Unsupported wire type: " .. v276);
-        end;
-    end;
-    return v273;
-end;
-v7.jsonEncode = function(v280) --[[ Line: 1799 ]] --[[ Name: jsonEncode ]]
-    local v281 = {};
-    if v280.type_label ~= nil and v280.type_label ~= "" then
-        v281.typeLabel = v280.type_label;
-    end;
-    if v280.earned_label ~= nil and v280.earned_label ~= "" then
-        v281.earnedLabel = v280.earned_label;
-    end;
-    if v280.updated_label ~= nil and v280.updated_label ~= "" then
-        v281.updatedLabel = v280.updated_label;
-    end;
-    if v280.experience_label ~= nil and v280.experience_label ~= "" then
-        v281.experienceLabel = v280.experience_label;
-    end;
-    if v280.rarity_label ~= nil and v280.rarity_label ~= "" then
-        v281.rarityLabel = v280.rarity_label;
-    end;
-    if v280.won_yesterday_label ~= nil and v280.won_yesterday_label ~= "" then
-        v281.wonYesterdayLabel = v280.won_yesterday_label;
-    end;
-    if v280.won_ever_label ~= nil and v280.won_ever_label ~= "" then
-        v281.wonEverLabel = v280.won_ever_label;
-    end;
-    return v281;
-end;
-v7.jsonDecode = function(v282) --[[ Line: 1835 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_8 (copy)
-    local v283 = l_v7_8.new();
-    if v282.type_label ~= nil then
-        v283.type_label = v282.type_label;
-    end;
-    if v282.typeLabel ~= nil then
-        v283.type_label = v282.typeLabel;
-    end;
-    if v282.earned_label ~= nil then
-        v283.earned_label = v282.earned_label;
-    end;
-    if v282.earnedLabel ~= nil then
-        v283.earned_label = v282.earnedLabel;
-    end;
-    if v282.updated_label ~= nil then
-        v283.updated_label = v282.updated_label;
-    end;
-    if v282.updatedLabel ~= nil then
-        v283.updated_label = v282.updatedLabel;
-    end;
-    if v282.experience_label ~= nil then
-        v283.experience_label = v282.experience_label;
-    end;
-    if v282.experienceLabel ~= nil then
-        v283.experience_label = v282.experienceLabel;
-    end;
-    if v282.rarity_label ~= nil then
-        v283.rarity_label = v282.rarity_label;
-    end;
-    if v282.rarityLabel ~= nil then
-        v283.rarity_label = v282.rarityLabel;
-    end;
-    if v282.won_yesterday_label ~= nil then
-        v283.won_yesterday_label = v282.won_yesterday_label;
-    end;
-    if v282.wonYesterdayLabel ~= nil then
-        v283.won_yesterday_label = v282.wonYesterdayLabel;
-    end;
-    if v282.won_ever_label ~= nil then
-        v283.won_ever_label = v282.won_ever_label;
-    end;
-    if v282.wonEverLabel ~= nil then
-        v283.won_ever_label = v282.wonEverLabel;
-    end;
-    return v283;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsContent_LocalizedLiterals_InfoTable", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.InfoTable"
-};
-v2.BadgeDetailsContent_LocalizedLiterals_InfoTable = v7;
-v1.default:register(v2.BadgeDetailsContent_LocalizedLiterals_InfoTable);
-v7 = {};
-v7.__index = v7;
-local l_v7_9 = v7 --[[ copy: 7 -> 17 ]];
-v7.new = function(v285) --[[ Line: 1915 ]] --[[ Name: new ]]
-    -- upvalues: l_v7_9 (copy)
-    return (setmetatable({
-        share = (not (v285 ~= nil) or v285.share == nil) and "" or v285.share, 
-        report = (not (v285 ~= nil) or v285.report == nil) and "" or v285.report
-    }, l_v7_9));
-end;
-v7.encode = function(v286) --[[ Line: 1927 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v287 = buffer.create(0);
-    local v288 = 0;
-    if v286.share ~= nil and v286.share ~= "" then
-        local v289, v290 = v0.writeTag(v287, v288, 1, v0.wireTypes.lengthDelimited);
-        v289, v290 = v0.writeString(v289, v290, v286.share);
-        v287 = v289;
-        v288 = v290;
-    end;
-    if v286.report ~= nil and v286.report ~= "" then
-        local v291, v292 = v0.writeTag(v287, v288, 2, v0.wireTypes.lengthDelimited);
-        v291, v292 = v0.writeString(v291, v292, v286.report);
-        v287 = v291;
-        v288 = v292;
-    end;
-    local v293 = buffer.create(v288);
-    buffer.copy(v293, 0, v287, 0, v288);
-    return v293;
-end;
-v7.decode = function(v294) --[[ Line: 1948 ]] --[[ Name: decode ]]
-    -- upvalues: l_v7_9 (copy), v0 (copy)
-    local v295 = l_v7_9.new();
-    local v296 = 0;
-    while v296 < buffer.len(v294) do
-        local v297 = nil;
-        local v298 = nil;
-        local v299, v300, v301 = v0.readTag(v294, v296);
-        v297 = v299;
-        v298 = v300;
-        v296 = v301;
-        if v298 == v0.wireTypes.varint then
-            v299 = nil;
-            v300, v301 = v0.readVarInt(v294, v296);
-            v299 = v300;
-            v296 = v301;
-        elseif v298 == v0.wireTypes.lengthDelimited then
-            if v297 == 1 then
-                v299 = nil;
-                v300, v301 = v0.readBuffer(v294, v296);
-                v299 = v300;
-                v296 = v301;
-                v295.share = buffer.tostring(v299);
-            elseif v297 == 2 then
-                v299 = nil;
-                v300, v301 = v0.readBuffer(v294, v296);
-                v299 = v300;
-                v296 = v301;
-                v295.report = buffer.tostring(v299);
-            else
-                v299 = nil;
-                v300, v301 = v0.readVarInt(v294, v296);
-                v296 = v301 + v300;
-            end;
-        elseif v298 == v0.wireTypes.i32 then
-            v299 = nil;
-            v300, v301 = v0.readFixed32(v294, v296);
-            v299 = v300;
-            v296 = v301;
-        elseif v298 == v0.wireTypes.i64 then
-            v299 = nil;
-            v300, v301 = v0.readFixed64(v294, v296);
-            v299 = v300;
-            v296 = v301;
-        else
-            error("Unsupported wire type: " .. v298);
-        end;
-    end;
-    return v295;
-end;
-v7.jsonEncode = function(v302) --[[ Line: 1998 ]] --[[ Name: jsonEncode ]]
-    local v303 = {};
-    if v302.share ~= nil and v302.share ~= "" then
-        v303.share = v302.share;
-    end;
-    if v302.report ~= nil and v302.report ~= "" then
-        v303.report = v302.report;
-    end;
-    return v303;
-end;
-v7.jsonDecode = function(v304) --[[ Line: 2014 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: l_v7_9 (copy)
-    local v305 = l_v7_9.new();
-    if v304.share ~= nil then
-        v305.share = v304.share;
-    end;
-    if v304.report ~= nil then
-        v305.report = v304.report;
-    end;
-    return v305;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsContent_LocalizedLiterals_ActionModule", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.ActionModule"
-};
-v2.BadgeDetailsContent_LocalizedLiterals_ActionModule = v7;
-v1.default:register(v2.BadgeDetailsContent_LocalizedLiterals_ActionModule);
-v7 = {};
-v7.__index = v7;
-v7.new = function(v306) --[[ Line: 2046 ]] --[[ Name: new ]]
-    -- upvalues: v7 (copy)
-    return (setmetatable({
-        report = (not (v306 ~= nil) or v306.report == nil) and "" or v306.report, 
-        remove = (not (v306 ~= nil) or v306.remove == nil) and "" or v306.remove
-    }, v7));
-end;
-v7.encode = function(v307) --[[ Line: 2058 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v308 = buffer.create(0);
-    local v309 = 0;
-    if v307.report ~= nil and v307.report ~= "" then
-        local v310, v311 = v0.writeTag(v308, v309, 1, v0.wireTypes.lengthDelimited);
-        v310, v311 = v0.writeString(v310, v311, v307.report);
-        v308 = v310;
-        v309 = v311;
-    end;
-    if v307.remove ~= nil and v307.remove ~= "" then
-        local v312, v313 = v0.writeTag(v308, v309, 2, v0.wireTypes.lengthDelimited);
-        v312, v313 = v0.writeString(v312, v313, v307.remove);
-        v308 = v312;
-        v309 = v313;
-    end;
-    local v314 = buffer.create(v309);
-    buffer.copy(v314, 0, v308, 0, v309);
-    return v314;
-end;
-v7.decode = function(v315) --[[ Line: 2079 ]] --[[ Name: decode ]]
-    -- upvalues: v7 (copy), v0 (copy)
-    local v316 = v7.new();
-    local v317 = 0;
-    while v317 < buffer.len(v315) do
-        local v318 = nil;
-        local v319 = nil;
-        local v320, v321, v322 = v0.readTag(v315, v317);
-        v318 = v320;
-        v319 = v321;
-        v317 = v322;
-        if v319 == v0.wireTypes.varint then
-            v320 = nil;
-            v321, v322 = v0.readVarInt(v315, v317);
-            v320 = v321;
-            v317 = v322;
-        elseif v319 == v0.wireTypes.lengthDelimited then
-            if v318 == 1 then
-                v320 = nil;
-                v321, v322 = v0.readBuffer(v315, v317);
-                v320 = v321;
-                v317 = v322;
-                v316.report = buffer.tostring(v320);
-            elseif v318 == 2 then
-                v320 = nil;
-                v321, v322 = v0.readBuffer(v315, v317);
-                v320 = v321;
-                v317 = v322;
-                v316.remove = buffer.tostring(v320);
-            else
-                v320 = nil;
-                v321, v322 = v0.readVarInt(v315, v317);
-                v317 = v322 + v321;
-            end;
-        elseif v319 == v0.wireTypes.i32 then
-            v320 = nil;
-            v321, v322 = v0.readFixed32(v315, v317);
-            v320 = v321;
-            v317 = v322;
-        elseif v319 == v0.wireTypes.i64 then
-            v320 = nil;
-            v321, v322 = v0.readFixed64(v315, v317);
-            v320 = v321;
-            v317 = v322;
-        else
-            error("Unsupported wire type: " .. v319);
-        end;
-    end;
-    return v316;
-end;
-v7.jsonEncode = function(v323) --[[ Line: 2129 ]] --[[ Name: jsonEncode ]]
-    local v324 = {};
-    if v323.report ~= nil and v323.report ~= "" then
-        v324.report = v323.report;
-    end;
-    if v323.remove ~= nil and v323.remove ~= "" then
-        v324.remove = v323.remove;
-    end;
-    return v324;
-end;
-v7.jsonDecode = function(v325) --[[ Line: 2145 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v7 (copy)
-    local v326 = v7.new();
-    if v325.report ~= nil then
-        v326.report = v325.report;
-    end;
-    if v325.remove ~= nil then
-        v326.remove = v325.remove;
-    end;
-    return v326;
-end;
-v7.descriptor = {
-    name = "BadgeDetailsContent_LocalizedLiterals_OverflowMenu", 
-    fullName = "roblox.apppageplatform.badges.v1beta1.OverflowMenu"
-};
-v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu = v7;
-v1.default:register(v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local hydration_content = require(script.Parent.Parent.Parent.shared.v1beta1.hydration_content)
+local page_entry = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry)
+local template_entry = require(script.Parent.Parent.Parent.shared.v1beta1.template_entry)
+local page_entry_content = require(script.Parent.Parent.Parent.shared.v1beta1.page_entry_content)
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 370
+	-- upvalues: page_entry_content (copy), t2 (copy)
+	return (setmetatable({
+		badge_id = if t3 ~= nil and t3.badge_id ~= nil then t3.badge_id else 0,
+		user_id = if t3 ~= nil and t3.user_id ~= nil then t3.user_id else 0,
+		page_entry_format = if t3 ~= nil and t3.page_entry_format ~= nil then t3.page_entry_format else assert(page_entry_content.PageEntryFormat.fromNumber(0), "Enum has no 0 default")
+	}, t2))
+end
+function t2.encode(p1) -- line: 383
+	-- upvalues: proto (copy), page_entry_content (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.badge_id ~= nil and p1.badge_id ~= 0 then
+		local v23, v24 = proto.writeTag(buf, n1, 1, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v23, v24, p1.badge_id)
+	end
+
+	if p1.user_id ~= nil and p1.user_id ~= 0 then
+		local v25, v26 = proto.writeTag(buf, n1, 2, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v25, v26, p1.user_id)
+	end
+
+	if p1.page_entry_format ~= nil and (p1.page_entry_format ~= nil and p1.page_entry_format ~= 0 or p1.page_entry_format ~= page_entry_content.PageEntryFormat.fromNumber(0)) then
+		local v27, v28 = proto.writeTag(buf, n1, 3, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v27, v28, page_entry_content.PageEntryFormat.toNumber(p1.page_entry_format))
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 420
+	-- upvalues: t2 (copy), proto (copy), page_entry_content (copy)
+	local v31 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v33, v34
+
+		v33, v34, n2 = proto.readTag(p2, n2)
+
+		if v34 == proto.wireTypes.varint then
+			if v33 == 1 then
+				local v35
+
+				v35, n2 = proto.readVarIntI64(p2, n2)
+				v31.badge_id = v35
+			elseif v33 == 2 then
+				local v36
+
+				v36, n2 = proto.readVarIntI64(p2, n2)
+				v31.user_id = v36
+			elseif v33 == 3 then
+				local v37
+
+				v37, n2 = proto.readVarIntI32(p2, n2)
+				v31.page_entry_format = page_entry_content.PageEntryFormat.fromNumber(v37) or v37
+			else
+				local v38
+
+				v38, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v34 == proto.wireTypes.lengthDelimited then
+			local v39, v40 = proto.readVarInt(p2, n2)
+
+			n2 = v40 + v39
+		elseif v34 == proto.wireTypes.i32 then
+			local v41
+
+			v41, n2 = proto.readFixed32(p2, n2)
+		elseif v34 == proto.wireTypes.i64 then
+			local v42
+
+			v42, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v34)
+		end
+	end
+
+	return v31
+end
+function t2.jsonEncode(p3) -- line: 476
+	-- upvalues: page_entry_content (copy)
+	local t4 = {}
+
+	if p3.badge_id ~= nil and p3.badge_id ~= 0 then
+		t4.badgeId = p3.badge_id
+	end
+
+	if p3.user_id ~= nil and p3.user_id ~= 0 then
+		t4.userId = p3.user_id
+	end
+
+	if p3.page_entry_format ~= nil and (p3.page_entry_format ~= nil and p3.page_entry_format ~= 0 or p3.page_entry_format ~= page_entry_content.PageEntryFormat.fromNumber(0)) then
+		t4.pageEntryFormat = if typeof(p3.page_entry_format) ~= "number" then page_entry_content.PageEntryFormat.toNumber(p3.page_entry_format) else p3.page_entry_format
+	end
+
+	return t4
+end
+function t2.jsonDecode(t5: {[any]: any}) -- line: 505
+	-- upvalues: t2 (copy), page_entry_content (copy)
+	local v46 = t2.new()
+
+	if t5.badge_id ~= nil then
+		v46.badge_id = t5.badge_id
+	end
+
+	if t5.badgeId ~= nil then
+		v46.badge_id = t5.badgeId
+	end
+
+	if t5.user_id ~= nil then
+		v46.user_id = t5.user_id
+	end
+
+	if t5.userId ~= nil then
+		v46.user_id = t5.userId
+	end
+
+	if t5.page_entry_format ~= nil then
+		v46.page_entry_format = if typeof(t5.page_entry_format) ~= "number" then page_entry_content.PageEntryFormat.fromName(t5.page_entry_format) or t5.page_entry_format else page_entry_content.PageEntryFormat.fromNumber(t5.page_entry_format) or t5.page_entry_format
+	end
+
+	if t5.pageEntryFormat ~= nil then
+		v46.page_entry_format = if typeof(t5.pageEntryFormat) ~= "number" then page_entry_content.PageEntryFormat.fromName(t5.pageEntryFormat) or t5.pageEntryFormat else page_entry_content.PageEntryFormat.fromNumber(t5.pageEntryFormat) or t5.pageEntryFormat
+	end
+
+	return v46
+end
+
+t2.descriptor = {
+	name = "BadgeDetailsPageRequest",
+	fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageRequest"
+}
+t1.BadgeDetailsPageRequest = t2
+typeRegistry.default:register(t1.BadgeDetailsPageRequest)
+
+local t6 = {}
+
+t6.__index = t6
+
+function t6.new(t7: {[any]: any}?) -- line: 561
+	-- upvalues: t6 (copy)
+	return (setmetatable({
+		page_entries = if t7 ~= nil and t7.page_entries ~= nil then t7.page_entries else {},
+		hydration_data = if t7 ~= nil and t7.hydration_data ~= nil then t7.hydration_data else nil,
+		templates = if t7 ~= nil and t7.templates ~= nil then t7.templates else {}
+	}, t6))
+end
+function t6.encode(p4) -- line: 569
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n3 = 0
+
+	if p4.page_entries ~= nil and #p4.page_entries > 0 then
+		for _, v52 in p4.page_entries do
+			local v53 = v52:encode()
+			local v54, v55 = proto.writeTag(buf, n3, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v54, v55, v53, buffer.len(v53))
+		end
+	end
+
+	if p4.hydration_data ~= nil then
+		local v56 = p4.hydration_data:encode()
+		local v57, v58 = proto.writeTag(buf, n3, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n3 = proto.writeBuffer(v57, v58, v56, buffer.len(v56))
+	end
+
+	if p4.templates ~= nil and next(p4.templates) ~= nil then
+		for v59, v60 in p4.templates do
+			local buf3 = buffer.create(0)
+			local v62, v63 = proto.writeTag(buf3, 0, 1, proto.wireTypes.lengthDelimited)
+			local v64, v65 = proto.writeString(v62, v63, v59)
+			local v66 = v60:encode()
+			local v67, v68 = proto.writeTag(v64, v65, 2, proto.wireTypes.lengthDelimited)
+			local v69, v70 = proto.writeBuffer(v67, v68, v66, buffer.len(v66))
+			local v71, v72 = proto.writeTag(buf, n3, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n3 = proto.writeBuffer(v71, v72, v69, v70)
+		end
+	end
+
+	local buf4 = buffer.create(n3)
+
+	buffer.copy(buf4, 0, buf, 0, n3)
+
+	return buf4
+end
+function t6.decode(p5: buffer) -- line: 606
+	-- upvalues: t6 (copy), proto (copy), t1 (copy), hydration_content (copy), template_entry (copy)
+	local v75 = t6.new()
+	local n4 = 0
+
+	while n4 < buffer.len(p5) do
+		local v77, v78
+
+		v77, v78, n4 = proto.readTag(p5, n4)
+
+		if v78 == proto.wireTypes.varint then
+			local v79
+
+			v79, n4 = proto.readVarInt(p5, n4)
+		elseif v78 == proto.wireTypes.lengthDelimited then
+			if v77 == 1 then
+				local v80
+
+				v80, n4 = proto.readBuffer(p5, n4)
+				table.insert(v75.page_entries, t1.BadgeDetailsPageEntry.decode(v80))
+			elseif v77 == 2 then
+				local v81
+
+				v81, n4 = proto.readBuffer(p5, n4)
+				v75.hydration_data = hydration_content.HydrationContent.decode(v81)
+			elseif v77 == 3 then
+				local v82
+
+				v82, n4 = proto.readBuffer(p5, n4)
+
+				local v83 = t1.BadgeDetailsPageResponse_TemplatesEntry.decode(v82)
+				local v84 = template_entry.TemplateEntry.new()
+
+				v75.templates[v83.key or ""] = v83.value or v84
+			else
+				local v85, v86 = proto.readVarInt(p5, n4)
+
+				n4 = v86 + v85
+			end
+		elseif v78 == proto.wireTypes.i32 then
+			local v87
+
+			v87, n4 = proto.readFixed32(p5, n4)
+		elseif v78 == proto.wireTypes.i64 then
+			local v88
+
+			v88, n4 = proto.readFixed64(p5, n4)
+		else
+			error("Unsupported wire type: " .. v78)
+		end
+	end
+
+	return v75
+end
+function t6.jsonEncode(p6) -- line: 667
+	local t8 = {}
+
+	if p6.page_entries ~= nil and #p6.page_entries > 0 then
+		local t9 = {}
+
+		for _, v93 in p6.page_entries do
+			table.insert(t9, v93:jsonEncode())
+		end
+
+		t8.pageEntries = t9
+	end
+
+	if p6.hydration_data ~= nil then
+		t8.hydrationData = p6.hydration_data:jsonEncode()
+	end
+
+	if p6.templates ~= nil and next(p6.templates) ~= nil then
+		local t10 = {}
+
+		for v95, v96 in p6.templates do
+			t10[v95] = v96:jsonEncode()
+		end
+
+		t8.templates = t10
+	end
+
+	return t8
+end
+function t6.jsonDecode(t11: {[any]: any}) -- line: 693
+	-- upvalues: t6 (copy), t1 (copy), hydration_content (copy), template_entry (copy)
+	local v98 = t6.new()
+
+	if t11.page_entries ~= nil then
+		local t12 = {}
+
+		for _, v101 in t11.page_entries do
+			table.insert(t12, t1.BadgeDetailsPageEntry.jsonDecode(v101))
+		end
+
+		v98.page_entries = t12
+	end
+
+	if t11.pageEntries ~= nil then
+		local t13 = {}
+
+		for _, v104 in t11.pageEntries do
+			table.insert(t13, t1.BadgeDetailsPageEntry.jsonDecode(v104))
+		end
+
+		v98.page_entries = t13
+	end
+
+	if t11.hydration_data ~= nil then
+		v98.hydration_data = hydration_content.HydrationContent.jsonDecode(t11.hydration_data)
+	end
+
+	if t11.hydrationData ~= nil then
+		v98.hydration_data = hydration_content.HydrationContent.jsonDecode(t11.hydrationData)
+	end
+
+	if t11.templates ~= nil then
+		local t14 = {}
+
+		for v106, v107 in t11.templates do
+			t14[v106] = template_entry.TemplateEntry.jsonDecode(v107)
+		end
+
+		v98.templates = t14
+	end
+
+	return v98
+end
+
+t6.descriptor = {
+	name = "BadgeDetailsPageResponse",
+	fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageResponse"
+}
+t1.BadgeDetailsPageResponse = t6
+typeRegistry.default:register(t1.BadgeDetailsPageResponse)
+
+local t15 = {}
+
+t15.__index = t15
+
+function t15.new(t16: {[any]: any}?) -- line: 752
+	-- upvalues: t15 (copy)
+	return (setmetatable({
+		key = if t16 ~= nil and t16.key ~= nil then t16.key else "",
+		value = if t16 ~= nil and t16.value ~= nil then t16.value else nil
+	}, t15))
+end
+function t15.encode(p7) -- line: 761
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n5 = 0
+
+	if p7.key ~= nil and p7.key ~= "" then
+		local v112, v113 = proto.writeTag(buf, n5, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeString(v112, v113, p7.key)
+	end
+
+	if p7.value ~= nil then
+		local v114 = p7.value:encode()
+		local v115, v116 = proto.writeTag(buf, n5, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n5 = proto.writeBuffer(v115, v116, v114, buffer.len(v114))
+	end
+
+	local buf5 = buffer.create(n5)
+
+	buffer.copy(buf5, 0, buf, 0, n5)
+
+	return buf5
+end
+function t15.decode(p8: buffer) -- line: 781
+	-- upvalues: t15 (copy), proto (copy), template_entry (copy)
+	local v119 = t15.new()
+	local n6 = 0
+
+	while n6 < buffer.len(p8) do
+		local v121, v122
+
+		v121, v122, n6 = proto.readTag(p8, n6)
+
+		if v122 == proto.wireTypes.varint then
+			local v123
+
+			v123, n6 = proto.readVarInt(p8, n6)
+		elseif v122 == proto.wireTypes.lengthDelimited then
+			if v121 == 1 then
+				local v124
+
+				v124, n6 = proto.readBuffer(p8, n6)
+				v119.key = buffer.tostring(v124)
+			elseif v121 == 2 then
+				local v125
+
+				v125, n6 = proto.readBuffer(p8, n6)
+				v119.value = template_entry.TemplateEntry.decode(v125)
+			else
+				local v126, v127 = proto.readVarInt(p8, n6)
+
+				n6 = v127 + v126
+			end
+		elseif v122 == proto.wireTypes.i32 then
+			local v128
+
+			v128, n6 = proto.readFixed32(p8, n6)
+		elseif v122 == proto.wireTypes.i64 then
+			local v129
+
+			v129, n6 = proto.readFixed64(p8, n6)
+		else
+			error("Unsupported wire type: " .. v122)
+		end
+	end
+
+	return v119
+end
+function t15.jsonEncode(p9) -- line: 829
+	local t17 = {}
+
+	if p9.key ~= nil and p9.key ~= "" then
+		t17.key = p9.key
+	end
+
+	if p9.value ~= nil then
+		t17.value = p9.value:jsonEncode()
+	end
+
+	return t17
+end
+function t15.jsonDecode(t18: {[any]: any}) -- line: 843
+	-- upvalues: t15 (copy), template_entry (copy)
+	local v133 = t15.new()
+
+	if t18.key ~= nil then
+		v133.key = t18.key
+	end
+
+	if t18.value ~= nil then
+		v133.value = template_entry.TemplateEntry.jsonDecode(t18.value)
+	end
+
+	return v133
+end
+
+t15.descriptor = {
+	name = "BadgeDetailsPageResponse_TemplatesEntry",
+	fullName = "roblox.apppageplatform.badges.v1beta1.TemplatesEntry"
+}
+t1.BadgeDetailsPageResponse_TemplatesEntry = t15
+typeRegistry.default:register(t1.BadgeDetailsPageResponse_TemplatesEntry)
+
+local t19 = {}
+
+t19.__index = t19
+
+function t19.new(t20: {[any]: any}?) -- line: 873
+	-- upvalues: t19 (copy)
+	return (setmetatable({
+		page_entries = if t20 ~= nil and t20.page_entries ~= nil then t20.page_entries else {},
+		hydration_data = if t20 ~= nil and t20.hydration_data ~= nil then t20.hydration_data else nil,
+		templates = if t20 ~= nil and t20.templates ~= nil then t20.templates else {}
+	}, t19))
+end
+function t19.encode(p10) -- line: 883
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n7 = 0
+
+	if p10.page_entries ~= nil and #p10.page_entries > 0 then
+		for _, v139 in p10.page_entries do
+			local v140 = v139:encode()
+			local v141, v142 = proto.writeTag(buf, n7, 1, proto.wireTypes.lengthDelimited)
+
+			buf, n7 = proto.writeBuffer(v141, v142, v140, buffer.len(v140))
+		end
+	end
+
+	if p10.hydration_data ~= nil then
+		local v143 = p10.hydration_data:encode()
+		local v144, v145 = proto.writeTag(buf, n7, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n7 = proto.writeBuffer(v144, v145, v143, buffer.len(v143))
+	end
+
+	if p10.templates ~= nil and next(p10.templates) ~= nil then
+		for v146, v147 in p10.templates do
+			local buf6 = buffer.create(0)
+			local v149, v150 = proto.writeTag(buf6, 0, 1, proto.wireTypes.lengthDelimited)
+			local v151, v152 = proto.writeString(v149, v150, v146)
+			local v153 = v147:encode()
+			local v154, v155 = proto.writeTag(v151, v152, 2, proto.wireTypes.lengthDelimited)
+			local v156, v157 = proto.writeBuffer(v154, v155, v153, buffer.len(v153))
+			local v158, v159 = proto.writeTag(buf, n7, 3, proto.wireTypes.lengthDelimited)
+
+			buf, n7 = proto.writeBuffer(v158, v159, v156, v157)
+		end
+	end
+
+	local buf7 = buffer.create(n7)
+
+	buffer.copy(buf7, 0, buf, 0, n7)
+
+	return buf7
+end
+function t19.decode(p11: buffer) -- line: 920
+	-- upvalues: t19 (copy), proto (copy), page_entry_content (copy), hydration_content (copy), t1 (copy), template_entry (copy)
+	local v162 = t19.new()
+	local n8 = 0
+
+	while n8 < buffer.len(p11) do
+		local v164, v165
+
+		v164, v165, n8 = proto.readTag(p11, n8)
+
+		if v165 == proto.wireTypes.varint then
+			local v166
+
+			v166, n8 = proto.readVarInt(p11, n8)
+		elseif v165 == proto.wireTypes.lengthDelimited then
+			if v164 == 1 then
+				local v167
+
+				v167, n8 = proto.readBuffer(p11, n8)
+				table.insert(v162.page_entries, page_entry_content.UniversalPageEntry.decode(v167))
+			elseif v164 == 2 then
+				local v168
+
+				v168, n8 = proto.readBuffer(p11, n8)
+				v162.hydration_data = hydration_content.HydrationContent.decode(v168)
+			elseif v164 == 3 then
+				local v169
+
+				v169, n8 = proto.readBuffer(p11, n8)
+
+				local v170 = t1.BadgeDetailsPageV2Response_TemplatesEntry.decode(v169)
+				local v171 = template_entry.TemplateEntry.new()
+
+				v162.templates[v170.key or ""] = v170.value or v171
+			else
+				local v172, v173 = proto.readVarInt(p11, n8)
+
+				n8 = v173 + v172
+			end
+		elseif v165 == proto.wireTypes.i32 then
+			local v174
+
+			v174, n8 = proto.readFixed32(p11, n8)
+		elseif v165 == proto.wireTypes.i64 then
+			local v175
+
+			v175, n8 = proto.readFixed64(p11, n8)
+		else
+			error("Unsupported wire type: " .. v165)
+		end
+	end
+
+	return v162
+end
+function t19.jsonEncode(p12) -- line: 984
+	local t21 = {}
+
+	if p12.page_entries ~= nil and #p12.page_entries > 0 then
+		local t22 = {}
+
+		for _, v180 in p12.page_entries do
+			table.insert(t22, v180:jsonEncode())
+		end
+
+		t21.pageEntries = t22
+	end
+
+	if p12.hydration_data ~= nil then
+		t21.hydrationData = p12.hydration_data:jsonEncode()
+	end
+
+	if p12.templates ~= nil and next(p12.templates) ~= nil then
+		local t23 = {}
+
+		for v182, v183 in p12.templates do
+			t23[v182] = v183:jsonEncode()
+		end
+
+		t21.templates = t23
+	end
+
+	return t21
+end
+function t19.jsonDecode(t24: {[any]: any}) -- line: 1010
+	-- upvalues: t19 (copy), page_entry_content (copy), hydration_content (copy), template_entry (copy)
+	local v185 = t19.new()
+
+	if t24.page_entries ~= nil then
+		local t25 = {}
+
+		for _, v188 in t24.page_entries do
+			table.insert(t25, page_entry_content.UniversalPageEntry.jsonDecode(v188))
+		end
+
+		v185.page_entries = t25
+	end
+
+	if t24.pageEntries ~= nil then
+		local t26 = {}
+
+		for _, v191 in t24.pageEntries do
+			table.insert(t26, page_entry_content.UniversalPageEntry.jsonDecode(v191))
+		end
+
+		v185.page_entries = t26
+	end
+
+	if t24.hydration_data ~= nil then
+		v185.hydration_data = hydration_content.HydrationContent.jsonDecode(t24.hydration_data)
+	end
+
+	if t24.hydrationData ~= nil then
+		v185.hydration_data = hydration_content.HydrationContent.jsonDecode(t24.hydrationData)
+	end
+
+	if t24.templates ~= nil then
+		local t27 = {}
+
+		for v193, v194 in t24.templates do
+			t27[v193] = template_entry.TemplateEntry.jsonDecode(v194)
+		end
+
+		v185.templates = t27
+	end
+
+	return v185
+end
+
+t19.descriptor = {
+	name = "BadgeDetailsPageV2Response",
+	fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageV2Response"
+}
+t1.BadgeDetailsPageV2Response = t19
+typeRegistry.default:register(t1.BadgeDetailsPageV2Response)
+
+local t28 = {}
+
+t28.__index = t28
+
+function t28.new(t29: {[any]: any}?) -- line: 1075
+	-- upvalues: t28 (copy)
+	return (setmetatable({
+		key = if t29 ~= nil and t29.key ~= nil then t29.key else "",
+		value = if t29 ~= nil and t29.value ~= nil then t29.value else nil
+	}, t28))
+end
+function t28.encode(p13) -- line: 1084
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n9 = 0
+
+	if p13.key ~= nil and p13.key ~= "" then
+		local v199, v200 = proto.writeTag(buf, n9, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n9 = proto.writeString(v199, v200, p13.key)
+	end
+
+	if p13.value ~= nil then
+		local v201 = p13.value:encode()
+		local v202, v203 = proto.writeTag(buf, n9, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n9 = proto.writeBuffer(v202, v203, v201, buffer.len(v201))
+	end
+
+	local buf8 = buffer.create(n9)
+
+	buffer.copy(buf8, 0, buf, 0, n9)
+
+	return buf8
+end
+function t28.decode(p14: buffer) -- line: 1106
+	-- upvalues: t28 (copy), proto (copy), template_entry (copy)
+	local v206 = t28.new()
+	local n10 = 0
+
+	while n10 < buffer.len(p14) do
+		local v208, v209
+
+		v208, v209, n10 = proto.readTag(p14, n10)
+
+		if v209 == proto.wireTypes.varint then
+			local v210
+
+			v210, n10 = proto.readVarInt(p14, n10)
+		elseif v209 == proto.wireTypes.lengthDelimited then
+			if v208 == 1 then
+				local v211
+
+				v211, n10 = proto.readBuffer(p14, n10)
+				v206.key = buffer.tostring(v211)
+			elseif v208 == 2 then
+				local v212
+
+				v212, n10 = proto.readBuffer(p14, n10)
+				v206.value = template_entry.TemplateEntry.decode(v212)
+			else
+				local v213, v214 = proto.readVarInt(p14, n10)
+
+				n10 = v214 + v213
+			end
+		elseif v209 == proto.wireTypes.i32 then
+			local v215
+
+			v215, n10 = proto.readFixed32(p14, n10)
+		elseif v209 == proto.wireTypes.i64 then
+			local v216
+
+			v216, n10 = proto.readFixed64(p14, n10)
+		else
+			error("Unsupported wire type: " .. v209)
+		end
+	end
+
+	return v206
+end
+function t28.jsonEncode(p15) -- line: 1156
+	local t30 = {}
+
+	if p15.key ~= nil and p15.key ~= "" then
+		t30.key = p15.key
+	end
+
+	if p15.value ~= nil then
+		t30.value = p15.value:jsonEncode()
+	end
+
+	return t30
+end
+function t28.jsonDecode(t31: {[any]: any}) -- line: 1172
+	-- upvalues: t28 (copy), template_entry (copy)
+	local v220 = t28.new()
+
+	if t31.key ~= nil then
+		v220.key = t31.key
+	end
+
+	if t31.value ~= nil then
+		v220.value = template_entry.TemplateEntry.jsonDecode(t31.value)
+	end
+
+	return v220
+end
+
+t28.descriptor = {
+	name = "BadgeDetailsPageV2Response_TemplatesEntry",
+	fullName = "roblox.apppageplatform.badges.v1beta1.TemplatesEntry"
+}
+t1.BadgeDetailsPageV2Response_TemplatesEntry = t28
+typeRegistry.default:register(t1.BadgeDetailsPageV2Response_TemplatesEntry)
+
+local t32 = {}
+
+t32.__index = t32
+
+function t32.new(t33: {[any]: any}?) -- line: 1202
+	-- upvalues: t32 (copy)
+	return (setmetatable({
+		page_entry = if t33 ~= nil and t33.page_entry ~= nil then t33.page_entry else nil,
+		kind = if t33 ~= nil and t33.kind ~= nil then t33.kind else nil
+	}, t32))
+end
+function t32.encode(p16) -- line: 1209
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n11 = 0
+
+	if p16.page_entry ~= nil then
+		local v225 = p16.page_entry:encode()
+		local v226, v227 = proto.writeTag(buf, n11, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n11 = proto.writeBuffer(v226, v227, v225, buffer.len(v225))
+	end
+
+	if p16.kind ~= nil and p16.kind.type == "badge_details" then
+		local v228 = p16.kind.value:encode()
+		local v229, v230 = proto.writeTag(buf, n11, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n11 = proto.writeBuffer(v229, v230, v228, buffer.len(v228))
+	end
+
+	local buf9 = buffer.create(n11)
+
+	buffer.copy(buf9, 0, buf, 0, n11)
+
+	return buf9
+end
+function t32.decode(p17: buffer) -- line: 1232
+	-- upvalues: t32 (copy), proto (copy), page_entry (copy), t1 (copy)
+	local v233 = t32.new()
+	local n12 = 0
+
+	while n12 < buffer.len(p17) do
+		local v235, v236
+
+		v235, v236, n12 = proto.readTag(p17, n12)
+
+		if v236 == proto.wireTypes.varint then
+			local v237
+
+			v237, n12 = proto.readVarInt(p17, n12)
+		elseif v236 == proto.wireTypes.lengthDelimited then
+			if v235 == 1 then
+				local v238
+
+				v238, n12 = proto.readBuffer(p17, n12)
+				v233.page_entry = page_entry.PageEntry.decode(v238)
+			elseif v235 == 2 then
+				local v239
+
+				v239, n12 = proto.readBuffer(p17, n12)
+				v233.kind = {
+					type = "badge_details",
+					value = t1.BadgeDetailsContent.decode(v239)
+				}
+			else
+				local v240, v241 = proto.readVarInt(p17, n12)
+
+				n12 = v241 + v240
+			end
+		elseif v236 == proto.wireTypes.i32 then
+			local v242
+
+			v242, n12 = proto.readFixed32(p17, n12)
+		elseif v236 == proto.wireTypes.i64 then
+			local v243
+
+			v243, n12 = proto.readFixed64(p17, n12)
+		else
+			error("Unsupported wire type: " .. v236)
+		end
+	end
+
+	return v233
+end
+function t32.jsonEncode(p18) -- line: 1280
+	local t34 = {}
+
+	if p18.page_entry ~= nil then
+		t34.pageEntry = p18.page_entry:jsonEncode()
+	end
+
+	if p18.kind ~= nil and p18.kind.type == "badge_details" then
+		t34.badgeDetails = p18.kind.value:jsonEncode()
+	end
+
+	return t34
+end
+function t32.jsonDecode(t35: {[any]: any}) -- line: 1296
+	-- upvalues: t32 (copy), page_entry (copy), t1 (copy)
+	local v247 = t32.new()
+
+	if t35.page_entry ~= nil then
+		v247.page_entry = page_entry.PageEntry.jsonDecode(t35.page_entry)
+	end
+
+	if t35.pageEntry ~= nil then
+		v247.page_entry = page_entry.PageEntry.jsonDecode(t35.pageEntry)
+	end
+
+	if t35.badge_details ~= nil then
+		v247.kind = {
+			type = "badge_details",
+			value = t1.BadgeDetailsContent.jsonDecode(t35.badge_details)
+		}
+	end
+
+	if t35.badgeDetails ~= nil then
+		v247.kind = {
+			type = "badge_details",
+			value = t1.BadgeDetailsContent.jsonDecode(t35.badgeDetails)
+		}
+	end
+
+	return v247
+end
+
+t32.descriptor = {
+	name = "BadgeDetailsPageEntry",
+	fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsPageEntry"
+}
+t1.BadgeDetailsPageEntry = t32
+typeRegistry.default:register(t1.BadgeDetailsPageEntry)
+
+local t36 = {}
+
+t36.__index = t36
+
+function t36.new(t37: {[any]: any}?) -- line: 1332
+	-- upvalues: t36 (copy)
+	return (setmetatable({
+		badge_id = if t37 ~= nil and t37.badge_id ~= nil then t37.badge_id else "",
+		universe_id = if t37 ~= nil and t37.universe_id ~= nil then t37.universe_id else "",
+		localized_literals = if t37 ~= nil and t37.localized_literals ~= nil then t37.localized_literals else nil,
+		creator_key = if t37 ~= nil and t37.creator_key ~= nil then t37.creator_key else ""
+	}, t36))
+end
+function t36.encode(p19) -- line: 1341
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n13 = 0
+
+	if p19.badge_id ~= nil and p19.badge_id ~= "" then
+		local v252, v253 = proto.writeTag(buf, n13, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n13 = proto.writeString(v252, v253, p19.badge_id)
+	end
+
+	if p19.universe_id ~= nil and p19.universe_id ~= "" then
+		local v254, v255 = proto.writeTag(buf, n13, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n13 = proto.writeString(v254, v255, p19.universe_id)
+	end
+
+	if p19.localized_literals ~= nil then
+		local v256 = p19.localized_literals:encode()
+		local v257, v258 = proto.writeTag(buf, n13, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n13 = proto.writeBuffer(v257, v258, v256, buffer.len(v256))
+	end
+
+	if p19.creator_key ~= nil and p19.creator_key ~= "" then
+		local v259, v260 = proto.writeTag(buf, n13, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n13 = proto.writeString(v259, v260, p19.creator_key)
+	end
+
+	local buf10 = buffer.create(n13)
+
+	buffer.copy(buf10, 0, buf, 0, n13)
+
+	return buf10
+end
+function t36.decode(p20: buffer) -- line: 1371
+	-- upvalues: t36 (copy), proto (copy), t1 (copy)
+	local v263 = t36.new()
+	local n14 = 0
+
+	while n14 < buffer.len(p20) do
+		local v265, v266
+
+		v265, v266, n14 = proto.readTag(p20, n14)
+
+		if v266 == proto.wireTypes.varint then
+			local v267
+
+			v267, n14 = proto.readVarInt(p20, n14)
+		elseif v266 == proto.wireTypes.lengthDelimited then
+			if v265 == 1 then
+				local v268
+
+				v268, n14 = proto.readBuffer(p20, n14)
+				v263.badge_id = buffer.tostring(v268)
+			elseif v265 == 2 then
+				local v269
+
+				v269, n14 = proto.readBuffer(p20, n14)
+				v263.universe_id = buffer.tostring(v269)
+			elseif v265 == 3 then
+				local v270
+
+				v270, n14 = proto.readBuffer(p20, n14)
+				v263.localized_literals = t1.BadgeDetailsContent_LocalizedLiterals.decode(v270)
+			elseif v265 == 4 then
+				local v271
+
+				v271, n14 = proto.readBuffer(p20, n14)
+				v263.creator_key = buffer.tostring(v271)
+			else
+				local v272, v273 = proto.readVarInt(p20, n14)
+
+				n14 = v273 + v272
+			end
+		elseif v266 == proto.wireTypes.i32 then
+			local v274
+
+			v274, n14 = proto.readFixed32(p20, n14)
+		elseif v266 == proto.wireTypes.i64 then
+			local v275
+
+			v275, n14 = proto.readFixed64(p20, n14)
+		else
+			error("Unsupported wire type: " .. v266)
+		end
+	end
+
+	return v263
+end
+function t36.jsonEncode(p21) -- line: 1429
+	local t38 = {}
+
+	if p21.badge_id ~= nil and p21.badge_id ~= "" then
+		t38.badgeId = p21.badge_id
+	end
+
+	if p21.universe_id ~= nil and p21.universe_id ~= "" then
+		t38.universeId = p21.universe_id
+	end
+
+	if p21.localized_literals ~= nil then
+		t38.localizedLiterals = p21.localized_literals:jsonEncode()
+	end
+
+	if p21.creator_key ~= nil and p21.creator_key ~= "" then
+		t38.creatorKey = p21.creator_key
+	end
+
+	return t38
+end
+function t36.jsonDecode(t39: {[any]: any}) -- line: 1451
+	-- upvalues: t36 (copy), t1 (copy)
+	local v279 = t36.new()
+
+	if t39.badge_id ~= nil then
+		v279.badge_id = t39.badge_id
+	end
+
+	if t39.badgeId ~= nil then
+		v279.badge_id = t39.badgeId
+	end
+
+	if t39.universe_id ~= nil then
+		v279.universe_id = t39.universe_id
+	end
+
+	if t39.universeId ~= nil then
+		v279.universe_id = t39.universeId
+	end
+
+	if t39.localized_literals ~= nil then
+		v279.localized_literals = t1.BadgeDetailsContent_LocalizedLiterals.jsonDecode(t39.localized_literals)
+	end
+
+	if t39.localizedLiterals ~= nil then
+		v279.localized_literals = t1.BadgeDetailsContent_LocalizedLiterals.jsonDecode(t39.localizedLiterals)
+	end
+
+	if t39.creator_key ~= nil then
+		v279.creator_key = t39.creator_key
+	end
+
+	if t39.creatorKey ~= nil then
+		v279.creator_key = t39.creatorKey
+	end
+
+	return v279
+end
+
+t36.descriptor = {
+	name = "BadgeDetailsContent",
+	fullName = "roblox.apppageplatform.badges.v1beta1.BadgeDetailsContent"
+}
+t1.BadgeDetailsContent = t36
+typeRegistry.default:register(t1.BadgeDetailsContent)
+
+local t40 = {}
+
+t40.__index = t40
+
+function t40.new(t41: {[any]: any}?) -- line: 1504
+	-- upvalues: t40 (copy)
+	return (setmetatable({
+		info_table = if t41 ~= nil and t41.info_table ~= nil then t41.info_table else nil,
+		action_module = if t41 ~= nil and t41.action_module ~= nil then t41.action_module else nil,
+		overflow_menu = if t41 ~= nil and t41.overflow_menu ~= nil then t41.overflow_menu else nil
+	}, t40))
+end
+function t40.encode(p22) -- line: 1514
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n15 = 0
+
+	if p22.info_table ~= nil then
+		local v284 = p22.info_table:encode()
+		local v285, v286 = proto.writeTag(buf, n15, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n15 = proto.writeBuffer(v285, v286, v284, buffer.len(v284))
+	end
+
+	if p22.action_module ~= nil then
+		local v287 = p22.action_module:encode()
+		local v288, v289 = proto.writeTag(buf, n15, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n15 = proto.writeBuffer(v288, v289, v287, buffer.len(v287))
+	end
+
+	if p22.overflow_menu ~= nil then
+		local v290 = p22.overflow_menu:encode()
+		local v291, v292 = proto.writeTag(buf, n15, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n15 = proto.writeBuffer(v291, v292, v290, buffer.len(v290))
+	end
+
+	local buf11 = buffer.create(n15)
+
+	buffer.copy(buf11, 0, buf, 0, n15)
+
+	return buf11
+end
+function t40.decode(p23: buffer) -- line: 1541
+	-- upvalues: t40 (copy), proto (copy), t1 (copy)
+	local v295 = t40.new()
+	local n16 = 0
+
+	while n16 < buffer.len(p23) do
+		local v297, v298
+
+		v297, v298, n16 = proto.readTag(p23, n16)
+
+		if v298 == proto.wireTypes.varint then
+			local v299
+
+			v299, n16 = proto.readVarInt(p23, n16)
+		elseif v298 == proto.wireTypes.lengthDelimited then
+			if v297 == 1 then
+				local v300
+
+				v300, n16 = proto.readBuffer(p23, n16)
+				v295.info_table = t1.BadgeDetailsContent_LocalizedLiterals_InfoTable.decode(v300)
+			elseif v297 == 2 then
+				local v301
+
+				v301, n16 = proto.readBuffer(p23, n16)
+				v295.action_module = t1.BadgeDetailsContent_LocalizedLiterals_ActionModule.decode(v301)
+			elseif v297 == 3 then
+				local v302
+
+				v302, n16 = proto.readBuffer(p23, n16)
+				v295.overflow_menu = t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.decode(v302)
+			else
+				local v303, v304 = proto.readVarInt(p23, n16)
+
+				n16 = v304 + v303
+			end
+		elseif v298 == proto.wireTypes.i32 then
+			local v305
+
+			v305, n16 = proto.readFixed32(p23, n16)
+		elseif v298 == proto.wireTypes.i64 then
+			local v306
+
+			v306, n16 = proto.readFixed64(p23, n16)
+		else
+			error("Unsupported wire type: " .. v298)
+		end
+	end
+
+	return v295
+end
+function t40.jsonEncode(p24) -- line: 1594
+	local t42 = {}
+
+	if p24.info_table ~= nil then
+		t42.infoTable = p24.info_table:jsonEncode()
+	end
+
+	if p24.action_module ~= nil then
+		t42.actionModule = p24.action_module:jsonEncode()
+	end
+
+	if p24.overflow_menu ~= nil then
+		t42.overflowMenu = p24.overflow_menu:jsonEncode()
+	end
+
+	return t42
+end
+function t40.jsonDecode(t43: {[any]: any}) -- line: 1612
+	-- upvalues: t40 (copy), t1 (copy)
+	local v310 = t40.new()
+
+	if t43.info_table ~= nil then
+		v310.info_table = t1.BadgeDetailsContent_LocalizedLiterals_InfoTable.jsonDecode(t43.info_table)
+	end
+
+	if t43.infoTable ~= nil then
+		v310.info_table = t1.BadgeDetailsContent_LocalizedLiterals_InfoTable.jsonDecode(t43.infoTable)
+	end
+
+	if t43.action_module ~= nil then
+		v310.action_module = t1.BadgeDetailsContent_LocalizedLiterals_ActionModule.jsonDecode(t43.action_module)
+	end
+
+	if t43.actionModule ~= nil then
+		v310.action_module = t1.BadgeDetailsContent_LocalizedLiterals_ActionModule.jsonDecode(t43.actionModule)
+	end
+
+	if t43.overflow_menu ~= nil then
+		v310.overflow_menu = t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.jsonDecode(t43.overflow_menu)
+	end
+
+	if t43.overflowMenu ~= nil then
+		v310.overflow_menu = t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu.jsonDecode(t43.overflowMenu)
+	end
+
+	return v310
+end
+
+t40.descriptor = {
+	name = "BadgeDetailsContent_LocalizedLiterals",
+	fullName = "roblox.apppageplatform.badges.v1beta1.LocalizedLiterals"
+}
+t1.BadgeDetailsContent_LocalizedLiterals = t40
+typeRegistry.default:register(t1.BadgeDetailsContent_LocalizedLiterals)
+
+local t44 = {}
+
+t44.__index = t44
+
+function t44.new(t45: {[any]: any}?) -- line: 1662
+	-- upvalues: t44 (copy)
+	return (setmetatable({
+		type_label = if t45 ~= nil and t45.type_label ~= nil then t45.type_label else "",
+		earned_label = if t45 ~= nil and t45.earned_label ~= nil then t45.earned_label else "",
+		updated_label = if t45 ~= nil and t45.updated_label ~= nil then t45.updated_label else "",
+		experience_label = if t45 ~= nil and t45.experience_label ~= nil then t45.experience_label else "",
+		rarity_label = if t45 ~= nil and t45.rarity_label ~= nil then t45.rarity_label else "",
+		won_yesterday_label = if t45 ~= nil and t45.won_yesterday_label ~= nil then t45.won_yesterday_label else "",
+		won_ever_label = if t45 ~= nil and t45.won_ever_label ~= nil then t45.won_ever_label else ""
+	}, t44))
+end
+function t44.encode(p25) -- line: 1678
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n17 = 0
+
+	if p25.type_label ~= nil and p25.type_label ~= "" then
+		local v315, v316 = proto.writeTag(buf, n17, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v315, v316, p25.type_label)
+	end
+
+	if p25.earned_label ~= nil and p25.earned_label ~= "" then
+		local v317, v318 = proto.writeTag(buf, n17, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v317, v318, p25.earned_label)
+	end
+
+	if p25.updated_label ~= nil and p25.updated_label ~= "" then
+		local v319, v320 = proto.writeTag(buf, n17, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v319, v320, p25.updated_label)
+	end
+
+	if p25.experience_label ~= nil and p25.experience_label ~= "" then
+		local v321, v322 = proto.writeTag(buf, n17, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v321, v322, p25.experience_label)
+	end
+
+	if p25.rarity_label ~= nil and p25.rarity_label ~= "" then
+		local v323, v324 = proto.writeTag(buf, n17, 5, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v323, v324, p25.rarity_label)
+	end
+
+	if p25.won_yesterday_label ~= nil and p25.won_yesterday_label ~= "" then
+		local v325, v326 = proto.writeTag(buf, n17, 6, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v325, v326, p25.won_yesterday_label)
+	end
+
+	if p25.won_ever_label ~= nil and p25.won_ever_label ~= "" then
+		local v327, v328 = proto.writeTag(buf, n17, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n17 = proto.writeString(v327, v328, p25.won_ever_label)
+	end
+
+	local buf12 = buffer.create(n17)
+
+	buffer.copy(buf12, 0, buf, 0, n17)
+
+	return buf12
+end
+function t44.decode(p26: buffer) -- line: 1724
+	-- upvalues: t44 (copy), proto (copy)
+	local v331 = t44.new()
+	local n18 = 0
+
+	while n18 < buffer.len(p26) do
+		local v333, v334
+
+		v333, v334, n18 = proto.readTag(p26, n18)
+
+		if v334 == proto.wireTypes.varint then
+			local v335
+
+			v335, n18 = proto.readVarInt(p26, n18)
+		elseif v334 == proto.wireTypes.lengthDelimited then
+			if v333 == 1 then
+				local v336
+
+				v336, n18 = proto.readBuffer(p26, n18)
+				v331.type_label = buffer.tostring(v336)
+			elseif v333 == 2 then
+				local v337
+
+				v337, n18 = proto.readBuffer(p26, n18)
+				v331.earned_label = buffer.tostring(v337)
+			elseif v333 == 3 then
+				local v338
+
+				v338, n18 = proto.readBuffer(p26, n18)
+				v331.updated_label = buffer.tostring(v338)
+			elseif v333 == 4 then
+				local v339
+
+				v339, n18 = proto.readBuffer(p26, n18)
+				v331.experience_label = buffer.tostring(v339)
+			elseif v333 == 5 then
+				local v340
+
+				v340, n18 = proto.readBuffer(p26, n18)
+				v331.rarity_label = buffer.tostring(v340)
+			elseif v333 == 6 then
+				local v341
+
+				v341, n18 = proto.readBuffer(p26, n18)
+				v331.won_yesterday_label = buffer.tostring(v341)
+			elseif v333 == 7 then
+				local v342
+
+				v342, n18 = proto.readBuffer(p26, n18)
+				v331.won_ever_label = buffer.tostring(v342)
+			else
+				local v343, v344 = proto.readVarInt(p26, n18)
+
+				n18 = v344 + v343
+			end
+		elseif v334 == proto.wireTypes.i32 then
+			local v345
+
+			v345, n18 = proto.readFixed32(p26, n18)
+		elseif v334 == proto.wireTypes.i64 then
+			local v346
+
+			v346, n18 = proto.readFixed64(p26, n18)
+		else
+			error("Unsupported wire type: " .. v334)
+		end
+	end
+
+	return v331
+end
+function t44.jsonEncode(p27) -- line: 1799
+	local t46 = {}
+
+	if p27.type_label ~= nil and p27.type_label ~= "" then
+		t46.typeLabel = p27.type_label
+	end
+
+	if p27.earned_label ~= nil and p27.earned_label ~= "" then
+		t46.earnedLabel = p27.earned_label
+	end
+
+	if p27.updated_label ~= nil and p27.updated_label ~= "" then
+		t46.updatedLabel = p27.updated_label
+	end
+
+	if p27.experience_label ~= nil and p27.experience_label ~= "" then
+		t46.experienceLabel = p27.experience_label
+	end
+
+	if p27.rarity_label ~= nil and p27.rarity_label ~= "" then
+		t46.rarityLabel = p27.rarity_label
+	end
+
+	if p27.won_yesterday_label ~= nil and p27.won_yesterday_label ~= "" then
+		t46.wonYesterdayLabel = p27.won_yesterday_label
+	end
+
+	if p27.won_ever_label ~= nil and p27.won_ever_label ~= "" then
+		t46.wonEverLabel = p27.won_ever_label
+	end
+
+	return t46
+end
+function t44.jsonDecode(t47: {[any]: any}) -- line: 1835
+	-- upvalues: t44 (copy)
+	local v350 = t44.new()
+
+	if t47.type_label ~= nil then
+		v350.type_label = t47.type_label
+	end
+
+	if t47.typeLabel ~= nil then
+		v350.type_label = t47.typeLabel
+	end
+
+	if t47.earned_label ~= nil then
+		v350.earned_label = t47.earned_label
+	end
+
+	if t47.earnedLabel ~= nil then
+		v350.earned_label = t47.earnedLabel
+	end
+
+	if t47.updated_label ~= nil then
+		v350.updated_label = t47.updated_label
+	end
+
+	if t47.updatedLabel ~= nil then
+		v350.updated_label = t47.updatedLabel
+	end
+
+	if t47.experience_label ~= nil then
+		v350.experience_label = t47.experience_label
+	end
+
+	if t47.experienceLabel ~= nil then
+		v350.experience_label = t47.experienceLabel
+	end
+
+	if t47.rarity_label ~= nil then
+		v350.rarity_label = t47.rarity_label
+	end
+
+	if t47.rarityLabel ~= nil then
+		v350.rarity_label = t47.rarityLabel
+	end
+
+	if t47.won_yesterday_label ~= nil then
+		v350.won_yesterday_label = t47.won_yesterday_label
+	end
+
+	if t47.wonYesterdayLabel ~= nil then
+		v350.won_yesterday_label = t47.wonYesterdayLabel
+	end
+
+	if t47.won_ever_label ~= nil then
+		v350.won_ever_label = t47.won_ever_label
+	end
+
+	if t47.wonEverLabel ~= nil then
+		v350.won_ever_label = t47.wonEverLabel
+	end
+
+	return v350
+end
+
+t44.descriptor = {
+	name = "BadgeDetailsContent_LocalizedLiterals_InfoTable",
+	fullName = "roblox.apppageplatform.badges.v1beta1.InfoTable"
+}
+t1.BadgeDetailsContent_LocalizedLiterals_InfoTable = t44
+typeRegistry.default:register(t1.BadgeDetailsContent_LocalizedLiterals_InfoTable)
+
+local t48 = {}
+
+t48.__index = t48
+
+function t48.new(t49: {[any]: any}?) -- line: 1915
+	-- upvalues: t48 (copy)
+	return (setmetatable({
+		share = if t49 ~= nil and t49.share ~= nil then t49.share else "",
+		report = if t49 ~= nil and t49.report ~= nil then t49.report else ""
+	}, t48))
+end
+function t48.encode(p28) -- line: 1927
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n19 = 0
+
+	if p28.share ~= nil and p28.share ~= "" then
+		local v355, v356 = proto.writeTag(buf, n19, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n19 = proto.writeString(v355, v356, p28.share)
+	end
+
+	if p28.report ~= nil and p28.report ~= "" then
+		local v357, v358 = proto.writeTag(buf, n19, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n19 = proto.writeString(v357, v358, p28.report)
+	end
+
+	local buf13 = buffer.create(n19)
+
+	buffer.copy(buf13, 0, buf, 0, n19)
+
+	return buf13
+end
+function t48.decode(p29: buffer) -- line: 1948
+	-- upvalues: t48 (copy), proto (copy)
+	local v361 = t48.new()
+	local n20 = 0
+
+	while n20 < buffer.len(p29) do
+		local v363, v364
+
+		v363, v364, n20 = proto.readTag(p29, n20)
+
+		if v364 == proto.wireTypes.varint then
+			local v365
+
+			v365, n20 = proto.readVarInt(p29, n20)
+		elseif v364 == proto.wireTypes.lengthDelimited then
+			if v363 == 1 then
+				local v366
+
+				v366, n20 = proto.readBuffer(p29, n20)
+				v361.share = buffer.tostring(v366)
+			elseif v363 == 2 then
+				local v367
+
+				v367, n20 = proto.readBuffer(p29, n20)
+				v361.report = buffer.tostring(v367)
+			else
+				local v368, v369 = proto.readVarInt(p29, n20)
+
+				n20 = v369 + v368
+			end
+		elseif v364 == proto.wireTypes.i32 then
+			local v370
+
+			v370, n20 = proto.readFixed32(p29, n20)
+		elseif v364 == proto.wireTypes.i64 then
+			local v371
+
+			v371, n20 = proto.readFixed64(p29, n20)
+		else
+			error("Unsupported wire type: " .. v364)
+		end
+	end
+
+	return v361
+end
+function t48.jsonEncode(p30) -- line: 1998
+	local t50 = {}
+
+	if p30.share ~= nil and p30.share ~= "" then
+		t50.share = p30.share
+	end
+
+	if p30.report ~= nil and p30.report ~= "" then
+		t50.report = p30.report
+	end
+
+	return t50
+end
+function t48.jsonDecode(t51: {[any]: any}) -- line: 2014
+	-- upvalues: t48 (copy)
+	local v375 = t48.new()
+
+	if t51.share ~= nil then
+		v375.share = t51.share
+	end
+
+	if t51.report ~= nil then
+		v375.report = t51.report
+	end
+
+	return v375
+end
+
+t48.descriptor = {
+	name = "BadgeDetailsContent_LocalizedLiterals_ActionModule",
+	fullName = "roblox.apppageplatform.badges.v1beta1.ActionModule"
+}
+t1.BadgeDetailsContent_LocalizedLiterals_ActionModule = t48
+typeRegistry.default:register(t1.BadgeDetailsContent_LocalizedLiterals_ActionModule)
+
+local t52 = {}
+
+t52.__index = t52
+
+function t52.new(t53: {[any]: any}?) -- line: 2046
+	-- upvalues: t52 (copy)
+	return (setmetatable({
+		report = if t53 ~= nil and t53.report ~= nil then t53.report else "",
+		remove = if t53 ~= nil and t53.remove ~= nil then t53.remove else ""
+	}, t52))
+end
+function t52.encode(p31) -- line: 2058
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n21 = 0
+
+	if p31.report ~= nil and p31.report ~= "" then
+		local v380, v381 = proto.writeTag(buf, n21, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n21 = proto.writeString(v380, v381, p31.report)
+	end
+
+	if p31.remove ~= nil and p31.remove ~= "" then
+		local v382, v383 = proto.writeTag(buf, n21, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n21 = proto.writeString(v382, v383, p31.remove)
+	end
+
+	local buf14 = buffer.create(n21)
+
+	buffer.copy(buf14, 0, buf, 0, n21)
+
+	return buf14
+end
+function t52.decode(p32: buffer) -- line: 2079
+	-- upvalues: t52 (copy), proto (copy)
+	local v386 = t52.new()
+	local n22 = 0
+
+	while n22 < buffer.len(p32) do
+		local v388, v389
+
+		v388, v389, n22 = proto.readTag(p32, n22)
+
+		if v389 == proto.wireTypes.varint then
+			local v390
+
+			v390, n22 = proto.readVarInt(p32, n22)
+		elseif v389 == proto.wireTypes.lengthDelimited then
+			if v388 == 1 then
+				local v391
+
+				v391, n22 = proto.readBuffer(p32, n22)
+				v386.report = buffer.tostring(v391)
+			elseif v388 == 2 then
+				local v392
+
+				v392, n22 = proto.readBuffer(p32, n22)
+				v386.remove = buffer.tostring(v392)
+			else
+				local v393, v394 = proto.readVarInt(p32, n22)
+
+				n22 = v394 + v393
+			end
+		elseif v389 == proto.wireTypes.i32 then
+			local v395
+
+			v395, n22 = proto.readFixed32(p32, n22)
+		elseif v389 == proto.wireTypes.i64 then
+			local v396
+
+			v396, n22 = proto.readFixed64(p32, n22)
+		else
+			error("Unsupported wire type: " .. v389)
+		end
+	end
+
+	return v386
+end
+function t52.jsonEncode(p33) -- line: 2129
+	local t54 = {}
+
+	if p33.report ~= nil and p33.report ~= "" then
+		t54.report = p33.report
+	end
+
+	if p33.remove ~= nil and p33.remove ~= "" then
+		t54.remove = p33.remove
+	end
+
+	return t54
+end
+function t52.jsonDecode(t55: {[any]: any}) -- line: 2145
+	-- upvalues: t52 (copy)
+	local v400 = t52.new()
+
+	if t55.report ~= nil then
+		v400.report = t55.report
+	end
+
+	if t55.remove ~= nil then
+		v400.remove = t55.remove
+	end
+
+	return v400
+end
+
+t52.descriptor = {
+	name = "BadgeDetailsContent_LocalizedLiterals_OverflowMenu",
+	fullName = "roblox.apppageplatform.badges.v1beta1.OverflowMenu"
+}
+t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu = t52
+typeRegistry.default:register(t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu)
+
 return {
-    BadgeDetailsPageRequest = v2.BadgeDetailsPageRequest, 
-    BadgeDetailsPageResponse = v2.BadgeDetailsPageResponse, 
-    BadgeDetailsPageV2Response = v2.BadgeDetailsPageV2Response, 
-    BadgeDetailsPageEntry = v2.BadgeDetailsPageEntry, 
-    BadgeDetailsContent = v2.BadgeDetailsContent, 
-    BadgeDetailsContent_LocalizedLiterals = v2.BadgeDetailsContent_LocalizedLiterals, 
-    BadgeDetailsContent_LocalizedLiterals_InfoTable = v2.BadgeDetailsContent_LocalizedLiterals_InfoTable, 
-    BadgeDetailsContent_LocalizedLiterals_ActionModule = v2.BadgeDetailsContent_LocalizedLiterals_ActionModule, 
-    BadgeDetailsContent_LocalizedLiterals_OverflowMenu = v2.BadgeDetailsContent_LocalizedLiterals_OverflowMenu
-};
+	BadgeDetailsPageRequest = t1.BadgeDetailsPageRequest,
+	BadgeDetailsPageResponse = t1.BadgeDetailsPageResponse,
+	BadgeDetailsPageV2Response = t1.BadgeDetailsPageV2Response,
+	BadgeDetailsPageEntry = t1.BadgeDetailsPageEntry,
+	BadgeDetailsContent = t1.BadgeDetailsContent,
+	BadgeDetailsContent_LocalizedLiterals = t1.BadgeDetailsContent_LocalizedLiterals,
+	BadgeDetailsContent_LocalizedLiterals_InfoTable = t1.BadgeDetailsContent_LocalizedLiterals_InfoTable,
+	BadgeDetailsContent_LocalizedLiterals_ActionModule = t1.BadgeDetailsContent_LocalizedLiterals_ActionModule,
+	BadgeDetailsContent_LocalizedLiterals_OverflowMenu = t1.BadgeDetailsContent_LocalizedLiterals_OverflowMenu
+}

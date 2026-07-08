@@ -1,189 +1,230 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("ExpChatShared");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_Dictionary_0 = require(l_Parent_0.llama).Dictionary;
-local l_None_0 = require(l_Parent_0.llama).None;
-local v5 = require(l_script_FirstAncestor_0.Logger):new("ExpChat/Reducers/" .. script.Name);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local v7 = require(l_Actions_0.ChatInputBarActivatedTeamMode);
-local v8 = require(l_Actions_0.ChatInputBarActivatedWhisperMode);
-local v9 = require(l_Actions_0.ChatInputBarResetTargetChannel);
-local v10 = require(l_Actions_0.ClientAppLoaded);
-local v11 = require(l_Actions_0.LocalTeamChanged);
-local v12 = require(l_Actions_0.LocalTextChannelParticipantRemoved);
-local v13 = require(l_Actions_0.TargetTextChannelPropertyChanged);
-local v14 = require(l_Actions_0.TextChannelCreated);
-local v15 = require(l_Actions_0.TextChannelRemoved);
-local v16 = require(l_Actions_0.PlayerRemoved);
-local v17 = {
-    allTextChannels = {}, 
-    targetTextChannel = nil, 
-    currentTeam = nil
-};
-local function _(v18, v19) --[[ Line: 33 ]] --[[ Name: getTeamTextChannelFromTeam ]]
-    local v20 = "RBXTeam" .. v19.TeamColor.Name;
-    for v21, v22 in pairs(v18) do
-        if v21 == v20 then
-            return v22;
-        end;
-    end;
-    return nil;
-end;
-return v2.createReducer(v17, {
-    [v10.name] = function(v24, v25) --[[ Line: 45 ]]
-        -- upvalues: l_Dictionary_0 (copy), l_None_0 (copy)
-        return l_Dictionary_0.join(v24, {
-            currentTeam = if v25.team == nil then l_None_0 else v25.team
-        });
-    end, 
-    [v14.name] = function(v26, v27) --[[ Line: 51 ]]
-        -- upvalues: v5 (copy), l_Dictionary_0 (copy)
-        v5:trace("TextChannelCreated: {}", v27.textChannel.Name);
-        return l_Dictionary_0.join(v26, {
-            allTextChannels = l_Dictionary_0.join(v26.allTextChannels, {
-                [v27.textChannel.Name] = v27.textChannel
-            })
-        });
-    end, 
-    [v15.name] = function(v28, v29) --[[ Line: 60 ]]
-        -- upvalues: l_Dictionary_0 (copy), l_None_0 (copy)
-        local v30 = l_Dictionary_0.removeKey(v28.allTextChannels, v29.textChannel.Name);
-        local v31 = if v29.textChannel == v28.targetTextChannel then v30.RBXGeneral or l_None_0 else v28.targetTextChannel;
-        return l_Dictionary_0.join(v28, {
-            allTextChannels = v30, 
-            targetTextChannel = v31
-        });
-    end, 
-    [v12.name] = function(v32, v33) --[[ Line: 72 ]]
-        -- upvalues: l_Dictionary_0 (copy), l_None_0 (copy)
-        return l_Dictionary_0.join(v32, {
-            targetTextChannel = if v33.textChannel == v32.targetTextChannel then if v33.textChannel == v32.allTextChannels.RBXGeneral then l_None_0 else v32.allTextChannels.RBXGeneral or l_None_0 else v32.targetTextChannel
-        });
-    end, 
-    [v13.name] = function(v34, v35) --[[ Line: 85 ]]
-        -- upvalues: v5 (copy), l_Dictionary_0 (copy), l_None_0 (copy)
-        v5:trace("TargetTextChannelPropertyChanged dispatched");
-        if v35.textChannel == nil then
-            return v34;
-        else
-            return l_Dictionary_0.join(v34, {
-                targetTextChannel = if v35.textChannel == nil then l_None_0 else v35.textChannel
-            });
-        end;
-    end, 
-    [v11.name] = function(v36, v37) --[[ Line: 97 ]]
-        -- upvalues: v5 (copy), l_Dictionary_0 (copy), l_None_0 (copy)
-        local v38 = false;
-        if v37.team then
-            v5:trace("LocalTeamChanged dispatched with team: {}", v37.team.Name);
-            if v36.targetTextChannel and string.find(v36.targetTextChannel.Name, "^RBXTeam") then
-                local l_allTextChannels_0 = v36.allTextChannels;
-                local v40 = "RBXTeam" .. v37.team.TeamColor.Name;
-                local v41;
-                for v42, v43 in pairs(l_allTextChannels_0) do
-                    if v42 == v40 then
-                        v41 = v43;
-                        v38 = true;
-                    end;
-                    if v38 then
-                        break;
-                    end;
-                end;
-                if not v38 then
-                    v41 = nil;
-                end;
-                v38 = false;
-                return l_Dictionary_0.join(v36, {
-                    currentTeam = v37.team, 
-                    targetTextChannel = if v41 == nil then v36.allTextChannels.RBXGeneral else v41
-                });
-            else
-                return l_Dictionary_0.join(v36, {
-                    currentTeam = v37.team
-                });
-            end;
-        else
-            v5:trace("LocalTeamChanged dispatched with no team");
-            return l_Dictionary_0.join(v36, {
-                currentTeam = l_None_0, 
-                targetTextChannel = v36.allTextChannels.RBXGeneral or v36.targetTextChannel
-            });
-        end;
-    end, 
-    [v7.name] = function(v44, _) --[[ Line: 123 ]]
-        -- upvalues: v5 (copy), l_Dictionary_0 (copy), l_None_0 (copy)
-        local v46 = false;
-        if v44.currentTeam == nil then
-            v5:trace("ChatInputBarActivatedTeamMode but not on a team");
-            return v44;
-        else
-            assert(v44.currentTeam, "This should be unreachable");
-            local l_allTextChannels_1 = v44.allTextChannels;
-            local v48 = "RBXTeam" .. v44.currentTeam.TeamColor.Name;
-            local v49;
-            for v50, v51 in pairs(l_allTextChannels_1) do
-                if v50 == v48 then
-                    v49 = v51;
-                    v46 = true;
-                end;
-                if v46 then
-                    break;
-                end;
-            end;
-            if not v46 then
-                v49 = nil;
-            end;
-            v46 = false;
-            v5:trace("ChatInputBarActivatedTeamMode - set targetTextChannel to {}", v49 and v49.Name or "nil");
-            if v49 == nil then
-                return v44;
-            else
-                return l_Dictionary_0.join(v44, {
-                    targetTextChannel = if v49 == nil then l_None_0 else v49
-                });
-            end;
-        end;
-    end, 
-    [v9.name] = function(v52, _) --[[ Line: 146 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        return l_Dictionary_0.join(v52, {
-            targetTextChannel = v52.allTextChannels.RBXGeneral or v52.targetTextChannel
-        });
-    end, 
-    [v8.name] = function(v54, v55) --[[ Line: 152 ]]
-        -- upvalues: v5 (copy), l_Dictionary_0 (copy)
-        v5:trace("ChatInputBarActivatedTeamMode - set targetTextChannel to {}", v55.textChannel and v55.textChannel.Name or "nil");
-        if v55.textChannel == nil then
-            return v54;
-        else
-            return l_Dictionary_0.join(v54, {
-                allTextChannels = l_Dictionary_0.join(v54.allTextChannels, {
-                    [v55.textChannel.Name] = v55.textChannel
-                }), 
-                targetTextChannel = v55.textChannel
-            });
-        end;
-    end, 
-    [v16.name] = function(v56, v57) --[[ Line: 170 ]]
-        -- upvalues: l_Dictionary_0 (copy)
-        local function _(v58) --[[ Line: 171 ]] --[[ Name: isRemovedPlayerInWhisperChannel ]]
-            -- upvalues: v57 (copy)
-            return string.find(v58, "RBXWhisper:") and string.find(v58, v57.userId);
-        end;
-        local l_targetTextChannel_0 = v56.targetTextChannel;
-        if l_targetTextChannel_0 then
-            local l_Name_0 = l_targetTextChannel_0.Name;
-            if string.find(l_Name_0, "RBXWhisper:") and string.find(l_Name_0, v57.userId) then
-                l_targetTextChannel_0 = v56.allTextChannels.RBXGeneral;
-            end;
-        end;
-        local v64 = l_Dictionary_0.filter(v56.allTextChannels, function(_, v63) --[[ Line: 180 ]]
-            -- upvalues: v57 (copy)
-            return not (string.find(v63, "RBXWhisper:") and string.find(v63, v57.userId));
-        end);
-        return l_Dictionary_0.join(v56, {
-            targetTextChannel = l_targetTextChannel_0, 
-            allTextChannels = v64
-        });
-    end
-});
+local ExpChatShared = script:FindFirstAncestor("ExpChatShared")
+local ExpChatSharedParent = ExpChatShared.Parent
+local Rodux = require(ExpChatSharedParent.Rodux)
+local Dictionary = require(ExpChatSharedParent.llama).Dictionary
+local None = require(ExpChatSharedParent.llama).None
+local v6 = require(ExpChatShared.Logger):new("ExpChat/Reducers/" .. script.Name)
+local GetFFlagTextChatEnableUniverseChatTabs = require(ExpChatShared.Flags.GetFFlagTextChatEnableUniverseChatTabs)
+local Actions = ExpChatShared.Actions
+local ChatInputBarActivatedTeamMode = require(Actions.ChatInputBarActivatedTeamMode)
+local ChatInputBarActivatedWhisperMode = require(Actions.ChatInputBarActivatedWhisperMode)
+local ChatInputBarResetTargetChannel = require(Actions.ChatInputBarResetTargetChannel)
+local ClientAppLoaded = require(Actions.ClientAppLoaded)
+local LocalTeamChanged = require(Actions.LocalTeamChanged)
+local LocalTextChannelParticipantRemoved = require(Actions.LocalTextChannelParticipantRemoved)
+local TargetTextChannelPropertyChanged = require(Actions.TargetTextChannelPropertyChanged)
+local TextChannelCreated = require(Actions.TextChannelCreated)
+local TextChannelRemoved = require(Actions.TextChannelRemoved)
+local PlayerRemoved = require(Actions.PlayerRemoved)
+local UniverseChatChannelSelected = require(Actions.UniverseChatChannelSelected)
+local t1 = {
+	targetTextChannel = nil,
+	selectedChannelName = nil,
+	currentTeam = nil,
+	allTextChannels = {}
+}
+
+local function getTeamTextChannelFromTeam(t2: {[any]: any}, p1) -- line: 37
+	local v24 = "RBXTeam" .. p1.TeamColor.Name
+
+	for k, v in pairs(t2) do
+		if k == v24 then
+			return v
+		end
+	end
+
+	return nil
+end
+
+return Rodux.createReducer(t1, {
+	[ClientAppLoaded.name] = function(t3: {[any]: any}, p2) -- line: 49
+		-- upvalues: Dictionary (copy), None (copy)
+		return Dictionary.join(t3, {
+			currentTeam = if p2.team ~= nil then p2.team else None
+		})
+	end,
+	[TextChannelCreated.name] = function(t4: {[any]: any}, p3) -- line: 55
+		-- upvalues: v6 (copy), Dictionary (copy)
+		v6:trace("TextChannelCreated: {}", p3.textChannel.Name)
+
+		return Dictionary.join(t4, {
+			allTextChannels = Dictionary.join(t4.allTextChannels, {
+				[p3.textChannel.Name] = p3.textChannel
+			})
+		})
+	end,
+	[TextChannelRemoved.name] = function(t5: {[any]: any}, p4) -- line: 64
+		-- upvalues: Dictionary (copy), None (copy)
+		local v33 = Dictionary.removeKey(t5.allTextChannels, p4.textChannel.Name)
+		local v34 = if p4.textChannel ~= t5.targetTextChannel then t5.targetTextChannel else v33.RBXGeneral or None
+
+		return Dictionary.join(t5, {
+			allTextChannels = v33,
+			targetTextChannel = v34
+		})
+	end,
+	[LocalTextChannelParticipantRemoved.name] = function(t6: {[any]: any}, p5) -- line: 76
+		-- upvalues: Dictionary (copy), None (copy)
+		return Dictionary.join(t6, {
+			targetTextChannel = if p5.textChannel ~= t6.targetTextChannel then t6.targetTextChannel else if p5.textChannel ~= t6.allTextChannels.RBXGeneral then t6.allTextChannels.RBXGeneral or None else None
+		})
+	end,
+	[TargetTextChannelPropertyChanged.name] = function(t7: {[any]: any}, p6) -- line: 89
+		-- upvalues: v6 (copy), GetFFlagTextChatEnableUniverseChatTabs (copy), Dictionary (copy), None (copy)
+		v6:trace("TargetTextChannelPropertyChanged dispatched")
+
+		if p6.textChannel == nil then
+			return t7
+		end
+
+		if GetFFlagTextChatEnableUniverseChatTabs() then
+			return Dictionary.join(t7, {
+				targetTextChannel = p6.textChannel,
+				selectedChannelName = p6.textChannel.Name
+			})
+		end
+
+		return Dictionary.join(t7, {
+			targetTextChannel = if p6.textChannel ~= nil then p6.textChannel else None
+		})
+	end,
+	[LocalTeamChanged.name] = function(t8: {[any]: any}, p7) -- line: 108
+		-- upvalues: v6 (copy), Dictionary (copy), None (copy)
+		if p7.team then
+			v6:trace("LocalTeamChanged dispatched with team: {}", p7.team.Name)
+
+			if t8.targetTextChannel and string.find(t8.targetTextChannel.Name, "^RBXTeam") then
+				local allTextChannels = t8.allTextChannels
+				local v42 = "RBXTeam" .. p7.team.TeamColor.Name
+				local v45
+
+				for k, v in pairs(allTextChannels) do
+					if k == v42 then
+						v45 = v
+
+						return Dictionary.join(t8, {
+							currentTeam = p7.team,
+							targetTextChannel = if v45 ~= nil then v45 else t8.allTextChannels.RBXGeneral
+						})
+					end
+				end
+
+				v45 = nil
+
+				return Dictionary.join(t8, {
+					currentTeam = p7.team,
+					targetTextChannel = if v45 ~= nil then v45 else t8.allTextChannels.RBXGeneral
+				})
+			end
+
+			return Dictionary.join(t8, {
+				currentTeam = p7.team
+			})
+		end
+
+		v6:trace("LocalTeamChanged dispatched with no team")
+
+		return Dictionary.join(t8, {
+			currentTeam = None,
+			targetTextChannel = t8.allTextChannels.RBXGeneral or t8.targetTextChannel
+		})
+	end,
+	[ChatInputBarActivatedTeamMode.name] = function(t9: {[any]: any}, _) -- line: 134
+		-- upvalues: v6 (copy), Dictionary (copy), None (copy)
+		if t9.currentTeam == nil then
+			v6:trace("ChatInputBarActivatedTeamMode but not on a team")
+
+			return t9
+		end
+
+		assert(t9.currentTeam, "This should be unreachable")
+
+		local allTextChannels = t9.allTextChannels
+		local v49 = "RBXTeam" .. t9.currentTeam.TeamColor.Name
+		local g53 = nil
+		local v52 = nil
+
+		for k, v in pairs(allTextChannels) do
+			if k == v49 then
+				v52 = v
+				g53 = true
+			end
+
+			if g53 then
+				break
+			end
+		end
+
+		if not g53 then
+			v52 = nil
+		end
+
+		g53 = false
+		v6:trace("ChatInputBarActivatedTeamMode - set targetTextChannel to {}", v52 and v52.Name or "nil")
+
+		if v52 == nil then
+			return t9
+		end
+
+		return Dictionary.join(t9, {
+			targetTextChannel = if v52 ~= nil then v52 else None
+		})
+	end,
+	[ChatInputBarResetTargetChannel.name] = function(t10: {[any]: any}, _) -- line: 157
+		-- upvalues: Dictionary (copy)
+		return Dictionary.join(t10, {
+			targetTextChannel = t10.allTextChannels.RBXGeneral or t10.targetTextChannel
+		})
+	end,
+	[ChatInputBarActivatedWhisperMode.name] = function(t11: {[any]: any}, p10) -- line: 163
+		-- upvalues: v6 (copy), Dictionary (copy)
+		v6:trace("ChatInputBarActivatedTeamMode - set targetTextChannel to {}", p10.textChannel and p10.textChannel.Name or "nil")
+
+		if p10.textChannel == nil then
+			return t11
+		end
+
+		return Dictionary.join(t11, {
+			allTextChannels = Dictionary.join(t11.allTextChannels, {
+				[p10.textChannel.Name] = p10.textChannel
+			}),
+			targetTextChannel = p10.textChannel
+		})
+	end,
+	[PlayerRemoved.name] = function(t12: {[any]: any}, p11) -- line: 181
+		-- upvalues: Dictionary (copy)
+		local function isRemovedPlayerInWhisperChannel(p12) -- line: 182
+			-- upvalues: p11 (copy)
+			return string.find(p12, "RBXWhisper:") and string.find(p12, p11.userId)
+		end
+
+		local targetTextChannel = t12.targetTextChannel
+
+		if targetTextChannel then
+			local targetTextChannelName = targetTextChannel.Name
+
+			if string.find(targetTextChannelName, "RBXWhisper:") and string.find(targetTextChannelName, p11.userId) then
+				targetTextChannel = t12.allTextChannels.RBXGeneral
+			end
+		end
+
+		local v63 = Dictionary.filter(t12.allTextChannels, function(_, p14) -- line: 191
+			-- upvalues: p11 (copy)
+			return not (string.find(p14, "RBXWhisper:") and string.find(p14, p11.userId))
+		end)
+
+		return Dictionary.join(t12, {
+			targetTextChannel = targetTextChannel,
+			allTextChannels = v63
+		})
+	end,
+	[UniverseChatChannelSelected.name] = function(t13: {[any]: any}, p15) -- line: 204
+		-- upvalues: v6 (copy), Dictionary (copy), None (copy)
+		v6:trace("UniverseChatChannelSelected dispatched: {}", p15.channelName)
+
+		return Dictionary.join(t13, {
+			targetTextChannel = None,
+			selectedChannelName = p15.channelName
+		})
+	end
+})

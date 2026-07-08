@@ -1,38 +1,46 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2, v3, v4) --[[ Line: 6 ]] --[[ Name: useDelayedActionHandler ]]
-    -- upvalues: v1 (copy)
-    local v5 = v1.useRef(nil);
-    local v6 = v1.useRef(0);
-    local function v9() --[[ Line: 15 ]] --[[ Name: handleAction ]]
-        -- upvalues: v3 (copy), v6 (copy), v5 (copy), v2 (copy), v4 (copy)
-        local v7 = os.clock();
-        if v3 ~= nil and v6.current ~= nil and v7 - v6.current < v3 then
-            return;
-        else
-            v6.current = v7;
-            local l_current_0 = v5.current;
-            if l_current_0 ~= nil then
-                task.cancel(l_current_0);
-            end;
-            v5.current = task.delay(v2, function() --[[ Line: 33 ]]
-                -- upvalues: v4 (ref)
-                v4();
-            end);
-            return;
-        end;
-    end;
-    v1.useEffect(function() --[[ Line: 38 ]]
-        -- upvalues: v5 (copy)
-        return function() --[[ Line: 39 ]]
-            -- upvalues: v5 (ref)
-            local l_current_1 = v5.current;
-            if l_current_1 ~= nil then
-                task.cancel(l_current_1);
-            end;
-        end;
-    end, {
-        v5
-    });
-    return v9;
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+
+local function useDelayedActionHandler(n1: number, n2: number?, p1: ((...any) -> ...any)) -- line: 6
+	-- upvalues: React (copy)
+	local v7 = React.useRef(nil)
+	local v8 = React.useRef(0)
+
+	local function handleAction() -- line: 15
+		-- upvalues: n2 (copy), v8 (copy), v7 (copy), n1 (copy), p1 (copy)
+		local elapsed = os.clock()
+
+		if n2 ~= nil and (v8.current ~= nil and elapsed - v8.current < n2) then
+			return
+		end
+
+		v8.current = elapsed
+
+		local current = v7.current
+
+		if current ~= nil then
+			task.cancel(current)
+		end
+
+		v7.current = task.delay(n1, function() -- line: 33
+			-- upvalues: p1 (copy)
+			p1()
+		end)
+	end
+
+	React.useEffect(function() -- line: 38
+		-- upvalues: v7 (copy)
+		return function() -- line: 39
+			-- upvalues: v7 (copy)
+			local current = v7.current
+
+			if current ~= nil then
+				task.cancel(current)
+			end
+		end
+	end, { v7 })
+
+	return handleAction
+end
+
+return useDelayedActionHandler

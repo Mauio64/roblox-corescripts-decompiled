@@ -1,53 +1,63 @@
-local l_Parent_0 = script:FindFirstAncestor("ReactUtils").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Array_0 = require(l_Parent_0.LuauPolyfill).Array;
-local v3 = require(script.Parent.useForwardRef);
-return function(v4, v5, v6, ...) --[[ Line: 15 ]] --[[ Name: usePropertiesBase ]]
-    -- upvalues: l_Array_0 (copy), v1 (copy), v3 (copy)
-    local v7 = l_Array_0.concat({}, ...);
-    local v19 = v1.useCallback(function(v8) --[[ Line: 23 ]]
-        -- upvalues: v5 (copy), l_Array_0 (ref), v7 (copy), v6 (copy)
-        local function v10() --[[ Line: 24 ]] --[[ Name: onPropChange ]]
-            -- upvalues: v5 (ref), l_Array_0 (ref), v7 (ref), v8 (copy)
-            v5(table.unpack(l_Array_0.map(v7, function(v9) --[[ Line: 25 ]]
-                -- upvalues: v8 (ref)
-                return v8[v9];
-            end)));
-        end;
-        local v11 = nil;
-        local function v13() --[[ Line: 31 ]]
-            -- upvalues: v11 (ref), v5 (ref), l_Array_0 (ref), v7 (ref), v8 (copy)
-            if not v11 then
-                v11 = task.defer(function() --[[ Line: 33 ]]
-                    -- upvalues: v11 (ref), v5 (ref), l_Array_0 (ref), v7 (ref), v8 (ref)
-                    v11 = nil;
-                    v5(table.unpack(l_Array_0.map(v7, function(v12) --[[ Line: 25 ]]
-                        -- upvalues: v8 (ref)
-                        return v8[v12];
-                    end)));
-                end);
-            end;
-        end;
-        local v15 = l_Array_0.map(v7, function(v14) --[[ Line: 39 ]]
-            -- upvalues: v8 (copy), v6 (ref), v13 (copy), v10 (copy)
-            return v8:GetPropertyChangedSignal(v14):Connect(if v6 then v13 else v10);
-        end);
-        v5(table.unpack(l_Array_0.map(v7, function(v16) --[[ Line: 25 ]]
-            -- upvalues: v8 (copy)
-            return v8[v16];
-        end)));
-        return function() --[[ Line: 45 ]]
-            -- upvalues: v15 (copy), v11 (ref)
-            for _, v18 in v15 do
-                v18:Disconnect();
-            end;
-            if v11 then
-                task.cancel(v11);
-            end;
-        end;
-    end, {
-        v5, 
-        table.concat(v7, ",")
-    });
-    return v3(v4, v19);
-end;
+local Parent = script:FindFirstAncestor("ReactUtils").Parent
+local React = require(Parent.React)
+local Array = require(Parent.LuauPolyfill).Array
+local useForwardRef = require(script.Parent.useForwardRef)
+
+local function usePropertiesBase(p1, p2: ((...any) -> ...any), b1: boolean, ...) -- line: 15
+	-- upvalues: Array (copy), React (copy), useForwardRef (copy)
+	local v9 = Array.concat({}, ...)
+	local v10 = React.useCallback(function(p3) -- line: 23
+		-- upvalues: p2 (copy), Array (copy), v9 (copy), b1 (copy)
+		local function onPropChange() -- line: 24
+			-- upvalues: p2 (copy), Array (copy), v9 (copy), p3 (copy)
+			p2(table.unpack(Array.map(v9, function(p4) -- line: 25
+				-- upvalues: p3 (copy)
+				return p3[p4]
+			end)))
+		end
+
+		local u13 = nil
+
+		local function v14() -- line: 31
+			-- upvalues: u13 (ref), p2 (copy), Array (copy), v9 (copy), p3 (copy)
+			if not u13 then
+				u13 = task.defer(function() -- line: 33
+					-- upvalues: u13 (ref), p2 (copy), Array (copy), v9 (copy), p3 (copy)
+					u13 = nil
+					p2(table.unpack(Array.map(v9, function(p5) -- line: 25
+						-- upvalues: p3 (copy)
+						return p3[p5]
+					end)))
+				end)
+			end
+		end
+
+		local v15 = Array.map(v9, function(p6) -- line: 39
+			-- upvalues: p3 (copy), b1 (copy), v14 (copy), onPropChange (copy)
+			return p3:GetPropertyChangedSignal(p6):Connect(if not b1 then onPropChange else v14)
+		end)
+
+		p2(table.unpack(Array.map(v9, function(p7) -- line: 25
+			-- upvalues: p3 (copy)
+			return p3[p7]
+		end)))
+
+		return function() -- line: 45
+			-- upvalues: v15 (copy), u13 (ref)
+			for _, v19 in v15 do
+				v19:Disconnect()
+			end
+
+			if u13 then
+				task.cancel(u13)
+			end
+		end
+	end, {
+		p2,
+		table.concat(v9, ",")
+	})
+
+	return useForwardRef(p1, v10)
+end
+
+return usePropertiesBase

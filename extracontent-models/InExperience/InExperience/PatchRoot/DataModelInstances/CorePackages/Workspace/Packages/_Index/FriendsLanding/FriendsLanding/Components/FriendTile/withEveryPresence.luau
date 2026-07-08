@@ -1,45 +1,46 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local v2 = require(script.Parent);
-local l_Roact_0 = v1.Roact;
-local l_llama_0 = v1.llama;
-local v5 = require(script.Parent.friendsWithPresence);
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: l_Roact_0 (copy), v2 (copy), l_llama_0 (copy), v5 (copy)
-    return l_Roact_0.createElement("Frame", {
-        Size = UDim2.new(1, 0, 1, 0), 
-        BackgroundTransparency = 1
-    }, {
-        frame = l_Roact_0.createElement("Frame", {
-            Size = UDim2.new(0, 150, 0, 0), 
-            BackgroundTransparency = 1
-        }, {
-            layout = l_Roact_0.createElement("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder, 
-                FillDirection = Enum.FillDirection.Horizontal, 
-                Padding = UDim.new(0, 6)
-            }), 
-            OnlineFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.OnlineFriend
-            })), 
-            DeletedFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.DeletedFriend
-            })), 
-            OfflineFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.OfflineFriend
-            })), 
-            InGameFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.InGameFriend
-            })), 
-            InGameWithoutLastLocationFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.InGameWithoutLastLocationFriend
-            })), 
-            InStudioFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.InStudioFriend
-            })), 
-            InStudioWithoutLastLocationFriend = l_Roact_0.createElement(v2, l_llama_0.Dictionary.join(v6, {
-                user = v5.InStudioWithoutLastLocationFriend
-            }))
-        })
-    });
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local Parent = require(script.Parent)
+local Roact = dependencies.Roact
+local llama = dependencies.llama
+local friendsWithPresence = require(script.Parent.friendsWithPresence)
+
+return function(p1) -- line: 10
+	-- upvalues: Roact (copy), Parent (copy), llama (copy), friendsWithPresence (copy)
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0)
+	}, {
+		frame = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, 150, 0, 0)
+		}, {
+			layout = Roact.createElement("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				FillDirection = Enum.FillDirection.Horizontal,
+				Padding = UDim.new(0, 6)
+			}),
+			OnlineFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.OnlineFriend
+			})),
+			DeletedFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.DeletedFriend
+			})),
+			OfflineFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.OfflineFriend
+			})),
+			InGameFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.InGameFriend
+			})),
+			InGameWithoutLastLocationFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.InGameWithoutLastLocationFriend
+			})),
+			InStudioFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.InStudioFriend
+			})),
+			InStudioWithoutLastLocationFriend = Roact.createElement(Parent, llama.Dictionary.join(p1, {
+				user = friendsWithPresence.InStudioWithoutLastLocationFriend
+			}))
+		})
+	})
+end

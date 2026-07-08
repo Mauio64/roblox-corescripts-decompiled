@@ -13,342 +13,344 @@ local v11 = game:DefineFastInt("KeystoreTelemetryThrottlingHundredthsPercent", 0
 return {
 	LandingPageMountTelemetryConfig = {
 		eventName = "luaLandingPageMount",
+		description = "Report when landing page is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			7
-		},
-		description = "Report when landing page is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LoginPageMountTelemetryConfig = {
 		eventName = "luaLoginPageMount",
+		description = "Report when login page is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when login page is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SignupPageMountTelemetryConfig = {
 		eventName = "luaSignupPageMount",
+		description = "Report when signup page is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when signup page is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	AddAuthMethodPageMountTelemetryConfig = {
 		eventName = "luaAddAuthMethodPageMount",
+		description = "Report when add auth method page is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when add auth method page is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	EngagementScreenMountTelemetryConfig = {
 		eventName = "luaEngagementScreenMount",
+		description = "Report when the engagement screen is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			17
-		},
-		description = "Report when the engagement screen is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	ConsoleSSOAttemptedTelemetryConfig = {
 		eventName = "luaConsoleSSOAttempted",
+		description = "Report when a console SSO attempt is made.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			25,
 			4,
 			17
-		},
-		description = "Report when a console SSO attempt is made.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SingleSignOnErrorMountTelemetryConfig = {
 		eventName = "luaSingleSignOnErrorMount",
+		description = "Report when the single sign on error is mounted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v3,
 		lastUpdated = {
 			26,
 			1,
 			28
-		},
-		description = "Report when the single sign on error is mounted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	ValidCookieForNoCachedUserTelemetryConfig = {
 		eventName = "luaValidCookieForNoCachedUser",
+		description = "Report when a valid cookie is found for a user that is not cached.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v4,
 		lastUpdated = {
-			25,
-			4,
-			11
-		},
-		description = "Report when a valid cookie is found for a user that is not cached.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+			26,
+			5,
+			7
+		}
 	},
 	NoCookieForCachedUserTelemetryConfig = {
 		eventName = "luaNoCookieForCachedUser",
+		description = "Report when a user with a cached user does not have a valid cookie.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v4,
 		lastUpdated = {
 			25,
 			4,
 			11
-		},
-		description = "Report when a user with a cached user does not have a valid cookie.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LaunchAppThunkInitiatedConfig = {
 		eventName = "luaLaunchAppThunkInitiated",
+		description = "Report when the launch app thunk is initiated.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v4,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when the launch app thunk is initiated.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LandingLoginButtonClickedConfig = {
 		eventName = "luaLandingLoginButtonClicked",
+		description = "Report when the landing login button is clicked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v5,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when the landing login button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LandingSignupButtonClickedConfig = {
 		eventName = "luaLandingSignupButtonClicked",
+		description = "Report when the landing signup button is clicked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v5,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when the landing signup button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LogoutButtonClickedConfig = {
 		eventName = "luaLogoutButtonClicked",
+		description = "Report when the logout button is clicked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v5,
 		lastUpdated = {
 			25,
 			4,
 			14
-		},
-		description = "Report when the logout button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	EngagementScreenContinueButtonClickedConfig = {
 		eventName = "luaEngagementScreenContinueButtonClicked",
+		description = "Report when the continue button is clicked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v5,
 		lastUpdated = {
 			25,
 			4,
 			17
-		},
-		description = "Report when the continue button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SilentPasskeyUpgradeAvailableConfig = {
 		eventName = "luaSilentPasskeyUpgradeAvailable",
+		description = "Report when a device is eligible for a silent passkey upgrade.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v6,
 		lastUpdated = {
 			25,
 			10,
 			22
-		},
-		description = "Report when a device is eligible for a silent passkey upgrade.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SilentPasskeyUpgradeAttemptedConfig = {
 		eventName = "luaSilentPasskeyUpgradeAttempted",
+		description = "Report when a silent passkey upgrade is attempted.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v6,
 		lastUpdated = {
 			25,
 			10,
 			22
-		},
-		description = "Report when a silent passkey upgrade is attempted.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SilentPasskeyUpgradeSuccessConfig = {
 		eventName = "luaSilentPasskeyUpgradeSuccess",
+		description = "Report when a silent passkey upgrade attempt succeeds.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v6,
 		lastUpdated = {
 			25,
 			10,
 			22
-		},
-		description = "Report when a silent passkey upgrade attempt succeeds.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SilentPasskeyUpgradeFailureConfig = {
 		eventName = "luaSilentPasskeyUpgradeFailure",
+		description = "Report when a silent passkey upgrade attempt fails.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v6,
 		lastUpdated = {
 			25,
 			10,
 			22
-		},
-		description = "Report when a silent passkey upgrade attempt fails.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SilentPasskeyUpgradeNoPasskeyConfig = {
 		eventName = "luaSilentPasskeyUpgradeNoPasskey",
+		description = "Report when a silent passkey upgrade proceeds because the user does not have a passkey.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v6,
 		lastUpdated = {
 			26,
 			1,
 			12
-		},
-		description = "Report when a silent passkey upgrade proceeds because the user does not have a passkey.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	DeepLinkPendingDueToNavigationLockConfig = {
 		eventName = "luaDeepLinkPendingDueToNavigationLock",
+		description = "Report when a deeplink is queued because navigation is locked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v7,
 		lastUpdated = {
 			25,
 			10,
 			24
-		},
-		description = "Report when a deeplink is queued because navigation is locked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	DeepLinkProcessedAfterNavigationUnlockConfig = {
 		eventName = "luaDeepLinkProcessedAfterNavigationUnlock",
+		description = "Report when a queued deeplink is processed after navigation unlocks.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v7,
 		lastUpdated = {
 			25,
 			10,
 			24
-		},
-		description = "Report when a queued deeplink is processed after navigation unlocks.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	SingleSignOnErrorRetryButtonClickedConfig = {
 		eventName = "luaSingleSignOnErrorRetryButtonClicked",
+		description = "Report when the SSO error screen retry button is clicked.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v5,
 		lastUpdated = {
 			26,
 			1,
 			28
-		},
-		description = "Report when the SSO error screen retry button is clicked.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	LuaLogoutTelemetryConfig = {
 		eventName = "LuaLogout",
+		description = "Counting logouts by reason.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { "RobloxTelemetryCounter" },
 		throttlingPercentage = v10,
 		lastUpdated = {
 			26,
 			1,
 			21
-		},
-		description = "Counting logouts by reason.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	UnauthorizedErrorTelemetryConfig = {
 		eventName = "luaUnauthorizedError",
+		description = "Report when a unauthorized error is encountered.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v8,
 		lastUpdated = {
 			26,
 			1,
 			21
-		},
-		description = "Report when a unauthorized error is encountered.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginPasswordSaveAttemptedConfig = {
 		eventName = "iosAuthServiceLoginPasswordSaveAttempted",
+		description = "Report when save password to iOS Keychain is attempted after login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v9,
 		lastUpdated = {
 			26,
 			2,
 			11
-		},
-		description = "Report when save password to iOS Keychain is attempted after login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginPasswordSaveSuccessConfig = {
 		eventName = "iosAuthServiceLoginPasswordSaveSuccess",
+		description = "Report when save password to iOS Keychain succeeds after login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v9,
 		lastUpdated = {
 			26,
 			2,
 			11
-		},
-		description = "Report when save password to iOS Keychain succeeds after login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginPasswordSaveFailureConfig = {
 		eventName = "iosAuthServiceLoginPasswordSaveFailure",
+		description = "Report when save password to iOS Keychain fails after login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v9,
 		lastUpdated = {
 			26,
 			2,
 			11
-		},
-		description = "Report when save password to iOS Keychain fails after login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginPasswordSaveSkippedConfig = {
 		eventName = "iosAuthServiceLoginPasswordSaveSkipped",
+		description = "Report when save password to iOS Keychain is skipped after login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v9,
 		lastUpdated = {
 			26,
 			2,
 			11
-		},
-		description = "Report when save password to iOS Keychain is skipped after login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginCredentialSheetShownConfig = {
 		eventName = "iosAuthServiceLoginCredentialSheetShown",
+		description = "Report when the iOS credential sheet is shown during login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = {
 			LoggingProtocol.TelemetryBackends.Counter,
 			LoggingProtocol.TelemetryBackends.EventIngest
@@ -358,12 +360,12 @@ return {
 			26,
 			2,
 			11
-		},
-		description = "Report when the iOS credential sheet is shown during login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginCredentialSheetPasswordSelectedConfig = {
 		eventName = "iosAuthServiceLoginCredentialSheetPasswordSelected",
+		description = "Report when a user selects a password from the iOS credential sheet during login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = {
 			LoggingProtocol.TelemetryBackends.Counter,
 			LoggingProtocol.TelemetryBackends.EventIngest
@@ -373,12 +375,12 @@ return {
 			26,
 			2,
 			11
-		},
-		description = "Report when a user selects a password from the iOS credential sheet during login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginCredentialSheetPasskeySelectedConfig = {
 		eventName = "iosAuthServiceLoginCredentialSheetPasskeySelected",
+		description = "Report when a user selects a passkey from the iOS credential sheet during login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = {
 			LoggingProtocol.TelemetryBackends.Counter,
 			LoggingProtocol.TelemetryBackends.EventIngest
@@ -388,12 +390,12 @@ return {
 			26,
 			2,
 			11
-		},
-		description = "Report when a user selects a passkey from the iOS credential sheet during login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginCredentialSheetErrorConfig = {
 		eventName = "iosAuthServiceLoginCredentialSheetError",
+		description = "Report when the iOS credential sheet returns an error during login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = {
 			LoggingProtocol.TelemetryBackends.Counter,
 			LoggingProtocol.TelemetryBackends.EventIngest
@@ -403,12 +405,12 @@ return {
 			26,
 			2,
 			11
-		},
-		description = "Report when the iOS credential sheet returns an error during login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	IosAuthServiceLoginCredentialSheetDismissedConfig = {
 		eventName = "iosAuthServiceLoginCredentialSheetDismissed",
+		description = "Report when the iOS credential sheet is dismissed without selection during login.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = {
 			LoggingProtocol.TelemetryBackends.Counter,
 			LoggingProtocol.TelemetryBackends.EventIngest
@@ -418,68 +420,66 @@ return {
 			26,
 			2,
 			11
-		},
-		description = "Report when the iOS credential sheet is dismissed without selection during login.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	KeystoreGetCredentialsTelemetryConfig = {
 		eventName = "keystoreGetCredentials",
+		description = "Counter for keystore get-credentials operations by result.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v11,
 		lastUpdated = {
 			26,
 			4,
 			21
-		},
-		description = "Counter for keystore get-credentials operations by result.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	KeystoreAutoLoginTelemetryConfig = {
 		eventName = "keystoreAutoLogin",
+		description = "Counter for keystore auto-login outcomes by result.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v11,
 		lastUpdated = {
 			26,
 			4,
 			21
-		},
-		description = "Counter for keystore auto-login outcomes by result.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	KeystoreSaveCredentialsTelemetryConfig = {
 		eventName = "keystoreSaveCredentials",
+		description = "Counter for keystore save-credentials operations by result.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v11,
 		lastUpdated = {
 			26,
 			4,
 			21
-		},
-		description = "Counter for keystore save-credentials operations by result.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	KeystoreDeleteCredentialsTelemetryConfig = {
 		eventName = "keystoreDeleteCredentials",
+		description = "Counter for keystore delete-credentials operations by reason.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v11,
 		lastUpdated = {
 			26,
 			4,
 			21
-		},
-		description = "Counter for keystore delete-credentials operations by reason.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	},
 	KeystoreRedirectTelemetryConfig = {
 		eventName = "keystoreRedirect",
+		description = "Counter for keystore redirect operations by destination.",
+		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning",
 		backends = { LoggingProtocol.TelemetryBackends.Counter },
 		throttlingPercentage = v11,
 		lastUpdated = {
 			26,
 			4,
 			21
-		},
-		description = "Counter for keystore redirect operations by destination.",
-		links = "https://roblox.atlassian.net/wiki/spaces/AUTH/pages/3475702046/Lua+Client-Side+Telemetry+Planning"
+		}
 	}
 }

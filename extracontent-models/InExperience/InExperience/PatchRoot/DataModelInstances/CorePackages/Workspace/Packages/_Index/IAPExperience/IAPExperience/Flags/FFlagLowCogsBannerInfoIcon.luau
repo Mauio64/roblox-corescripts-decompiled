@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LowCogsBannerInfoIcon", false);
+return game:DefineFastFlag("LowCogsBannerInfoIcon", false)

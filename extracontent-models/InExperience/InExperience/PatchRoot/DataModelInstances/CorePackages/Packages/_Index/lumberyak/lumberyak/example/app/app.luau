@@ -1,9 +1,12 @@
-local v0 = require(script.Parent.appLogger);
-local v1 = require(script.Parent.Parent.page.page);
-v0:addSink(require(script.Parent.PrintSink).new(v0.Levels.Error));
-return function() --[[ Line: 8 ]]
-    -- upvalues: v0 (copy), v1 (copy)
-    v0:info("calling {root}");
-    v1.init(v0);
-    return v1.doSomething();
-end;
+local appLogger = require(script.Parent.appLogger)
+local page = require(script.Parent.Parent.page.page)
+
+appLogger:addSink(require(script.Parent.PrintSink).new(appLogger.Levels.Error))
+
+return function() -- line: 8
+	-- upvalues: appLogger (copy), page (copy)
+	appLogger:info("calling {root}")
+	page.init(appLogger)
+
+	return page.doSomething()
+end

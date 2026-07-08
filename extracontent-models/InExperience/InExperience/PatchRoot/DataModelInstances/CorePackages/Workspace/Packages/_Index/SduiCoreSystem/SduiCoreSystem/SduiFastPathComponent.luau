@@ -1,60 +1,76 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SduiCoreSystem");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.SduiBuilder);
-local v5 = require(l_script_FirstAncestor_0.SduiBuilderTypes);
-local _ = require(l_script_FirstAncestor_0.SduiComponentType);
-local _ = require(l_script_FirstAncestor_0.SduiConfigTypes);
-local l_SduiErrorType_0 = require(l_script_FirstAncestor_0.SduiErrors).SduiErrorType;
-local l_SduiBuilderProcessingPhase_0 = v5.SduiBuilderProcessingPhase;
-local v10 = require(l_script_FirstAncestor_0.compareSduiProps);
-local v11 = require(l_script_FirstAncestor_0.compareSduiAnalyticsContext);
-local v12 = require(l_script_FirstAncestor_0.parseProps);
-local function v14(_) --[[ Line: 25 ]] --[[ Name: SduiErrorComponent ]]
-    -- upvalues: v3 (copy)
-    return v3.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.new(0, 100, 0, 100)
-    });
-end;
-local v15 = {};
-return v3.memo(function(v16) --[[ Line: 35 ]] --[[ Name: SduiFastPathComponent ]]
-    -- upvalues: v3 (copy), v4 (copy), v11 (copy), v15 (copy), v12 (copy), l_SduiBuilderProcessingPhase_0 (copy), v2 (copy), l_SduiErrorType_0 (copy), v14 (copy)
-    local l_componentConfig_0 = v16.componentConfig;
-    local l_componentType_0 = l_componentConfig_0.componentType;
-    local l_sduiContext_0 = v16.sduiContext;
-    local l_debugName_0 = v16.debugName;
-    local l_parentAnalyticsContext_0 = v16.parentAnalyticsContext;
-    local l_localAnalyticsData_0 = v16.localAnalyticsData;
-    local l_extraLocalProps_0 = v16.extraLocalProps;
-    local v24 = v3.useRef(nil);
-    if v24.current == nil then
-        v24.current = v4.buildAnalyticsContext(l_componentConfig_0, l_parentAnalyticsContext_0, l_localAnalyticsData_0);
-    else
-        local v25 = v4.buildAnalyticsContext(l_componentConfig_0, l_parentAnalyticsContext_0, l_localAnalyticsData_0);
-        if not v11(v24.current, v25) then
-            v24.current = v25;
-        end;
-    end;
-    local l_current_0 = v24.current;
-    local v27 = table.clone(l_componentConfig_0.props or v15);
-    v12(l_componentType_0, v27, l_debugName_0, l_sduiContext_0, l_current_0, nil, l_SduiBuilderProcessingPhase_0.Render);
-    if l_extraLocalProps_0 then
-        v27 = v2.Dictionary.join(v27, l_extraLocalProps_0);
-    end;
-    v27.componentConfig = l_componentConfig_0;
-    v27.sduiContext = l_sduiContext_0;
-    v27.debugName = l_debugName_0;
-    v27.analyticsContext = l_current_0;
-    local v28 = l_sduiContext_0.componentDefinitions:getComponent(l_componentType_0);
-    if v28 == nil then
-        l_sduiContext_0.dependencies.logger.reportError(l_SduiErrorType_0.NoComponentRegistered, {
-            componentType = l_componentType_0, 
-            name = l_debugName_0
-        }, l_sduiContext_0.appPage);
-        return v3.createElement(v14);
-    else
-        return v3.createElement(v28, v27);
-    end;
-end, v10);
+local SduiCoreSystem = script:FindFirstAncestor("SduiCoreSystem")
+local SduiCoreSystemParent = SduiCoreSystem.Parent
+local Cryo = require(SduiCoreSystemParent.Cryo)
+local React = require(SduiCoreSystemParent.React)
+local SduiBuilder = require(SduiCoreSystem.SduiBuilder)
+local SduiBuilderTypes = require(SduiCoreSystem.SduiBuilderTypes)
+
+require(SduiCoreSystem.SduiComponentType)
+require(SduiCoreSystem.SduiConfigTypes)
+
+local SduiErrorType = require(SduiCoreSystem.SduiErrors).SduiErrorType
+local SduiBuilderProcessingPhase = SduiBuilderTypes.SduiBuilderProcessingPhase
+local compareSduiProps = require(SduiCoreSystem.compareSduiProps)
+local compareSduiAnalyticsContext = require(SduiCoreSystem.compareSduiAnalyticsContext)
+local parseProps = require(SduiCoreSystem.parseProps)
+
+local function SduiErrorComponent(_) -- line: 29
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.new(0, 100, 0, 100)
+	})
+end
+
+local t1 = {}
+
+local function SduiFastPathComponent(p2) -- line: 39
+	-- upvalues: React (copy), SduiBuilder (copy), compareSduiAnalyticsContext (copy), t1 (copy), parseProps (copy), SduiBuilderProcessingPhase (copy), Cryo (copy), SduiErrorType (copy), SduiErrorComponent (copy)
+	local componentConfig = p2.componentConfig
+	local componentType = componentConfig.componentType
+	local sduiContext = p2.sduiContext
+	local debugName = p2.debugName
+	local parentAnalyticsContext = p2.parentAnalyticsContext
+	local localAnalyticsData = p2.localAnalyticsData
+	local extraLocalProps = p2.extraLocalProps
+	local v24 = React.useRef(nil)
+
+	if v24.current == nil then
+		v24.current = SduiBuilder.buildAnalyticsContext(componentConfig, parentAnalyticsContext, localAnalyticsData)
+	else
+		local v25 = SduiBuilder.buildAnalyticsContext(componentConfig, parentAnalyticsContext, localAnalyticsData)
+
+		if not compareSduiAnalyticsContext(v24.current, v25) then
+			v24.current = v25
+		end
+	end
+
+	local current = v24.current
+	local v27 = table.clone(componentConfig.props or t1)
+
+	parseProps(componentType, v27, debugName, sduiContext, current, nil, SduiBuilderProcessingPhase.Render)
+
+	if extraLocalProps then
+		v27 = Cryo.Dictionary.join(v27, extraLocalProps)
+	end
+
+	v27.componentConfig = componentConfig
+	v27.sduiContext = sduiContext
+	v27.debugName = debugName
+	v27.analyticsContext = current
+
+	local v28 = sduiContext.componentDefinitions:getComponent(componentType)
+
+	if v28 == nil then
+		sduiContext.dependencies.logger.reportError(SduiErrorType.NoComponentRegistered, {
+			componentType = componentType,
+			name = debugName
+		}, sduiContext.appPage)
+
+		return React.createElement(SduiErrorComponent)
+	end
+
+	return React.createElement(v28, v27)
+end
+
+return React.memo(SduiFastPathComponent, compareSduiProps)

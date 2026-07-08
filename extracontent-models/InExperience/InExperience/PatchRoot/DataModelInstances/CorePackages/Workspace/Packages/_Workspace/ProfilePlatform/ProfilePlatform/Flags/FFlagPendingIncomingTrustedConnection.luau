@@ -1,1 +1,1 @@
-return game:DefineFastFlag("PendingIncomingTrustedConnection", false);
+return game:DefineFastFlag("PendingIncomingTrustedConnection", false)

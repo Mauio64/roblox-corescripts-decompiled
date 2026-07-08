@@ -1,347 +1,373 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v3 = require(l_Components_0.DataConsumer);
-local v4 = require(l_Components_0.HeaderButton);
-local v5 = require(l_Components_0.CellLabel);
-local v6 = require(l_Components_0.BannerButton);
-local v7 = require(l_Components_0.LineGraph);
-local v8 = require(script.Parent.Parent.Parent.Constants);
-local l_LineWidth_0 = v8.GeneralFormatting.LineWidth;
-local l_LineColor_0 = v8.GeneralFormatting.LineColor;
-local l_ChartHeaderNames_0 = v8.ServerJobsFormatting.ChartHeaderNames;
-local l_ValueCellWidth_0 = v8.ServerJobsFormatting.ValueCellWidth;
-local l_EntryFrameHeight_0 = v8.ServerJobsFormatting.EntryFrameHeight;
-local l_HeaderFrameHeight_0 = v8.ServerJobsFormatting.HeaderFrameHeight;
-local l_CellPadding_0 = v8.ServerJobsFormatting.CellPadding;
-local l_MinFrameWidth_0 = v8.ServerJobsFormatting.MinFrameWidth;
-local l_LineGraphHeight_0 = v8.GeneralFormatting.LineGraphHeight;
-local v18 = require(script.Parent.Parent.Parent.Util.convertTimeStamp);
-local v22 = {
-    function(v19) --[[ Line: 27 ]]
-        return v19 and string.format("%.4f%%", v19) or "";
-    end, 
-    function(v20) --[[ Line: 30 ]]
-        return v20 and string.format("%.4f/s", v20) or "";
-    end, 
-    function(v21) --[[ Line: 33 ]]
-        return v21 and string.format("%.4fms", v21) or "";
-    end
-};
-local l_NoResultSearchStr_0 = v8.GeneralFormatting.NoResultSearchStr;
-local v24 = 0;
-local v25 = {};
-local v26 = {};
-local v27 = {};
-local v28 = l_EntryFrameHeight_0 - l_LineWidth_0;
-for _, v30 in ipairs(l_ValueCellWidth_0) do
-    table.insert(v25, UDim2.new(v24, l_CellPadding_0, 0, 0));
-    table.insert(v26, UDim2.new(v30, -l_CellPadding_0, 0, l_HeaderFrameHeight_0));
-    table.insert(v27, UDim2.new(v30, -l_CellPadding_0, 0, v28));
-    v24 = v24 + v30;
-end;
-local v31 = {};
-for v32, v33 in ipairs(v25) do
-    v31[v32] = UDim2.new(v33.X.Scale, v33.X.Offset - l_CellPadding_0, v33.Y.Scale, v33.Y.Offset);
-end;
-local v34 = v1.Component:extend("ServerJobsChart");
-local function v36(v35) --[[ Line: 63 ]] --[[ Name: getX ]]
-    return v35.time;
-end;
-local function v38(v37) --[[ Line: 67 ]] --[[ Name: getDutyCycle ]]
-    return v37.data[1];
-end;
-local function v40(v39) --[[ Line: 71 ]] --[[ Name: getStepsPerSec ]]
-    return v39.data[2];
-end;
-local function v42(v41) --[[ Line: 75 ]] --[[ Name: getStepTime ]]
-    return v41.data[3];
-end;
-v34.init = function(v43, v44) --[[ Line: 79 ]] --[[ Name: init ]]
-    -- upvalues: v1 (copy)
-    local v45 = v44.ServerJobsData:getCurrentData();
-    v43.getOnButtonPress = function(v46) --[[ Line: 82 ]]
-        -- upvalues: v43 (copy)
-        return function(_, _) --[[ Line: 83 ]]
-            -- upvalues: v43 (ref), v46 (copy)
-            local l_v43_0 = v43;
-            local v50 = {};
-            local v51 = false;
-            if v43.state.expandIndex ~= v46 then
-                v51 = v46;
-            end;
-            v50.expandIndex = v51;
-            l_v43_0:setState(v50);
-        end;
-    end;
-    v43.onSortChanged = function(v52) --[[ Line: 90 ]]
-        -- upvalues: v44 (copy), v43 (copy)
-        if v52 == v44.ServerJobsData:getSortType() then
-            v43:setState({
-                reverseSort = not v43.state.reverseSort
-            });
-            return;
-        else
-            v44.ServerJobsData:setSortType(v52);
-            v43:setState({
-                reverseSort = false
-            });
-            return;
-        end;
-    end;
-    v43.onCanvasPosChanged = function() --[[ Line: 104 ]]
-        -- upvalues: v43 (copy)
-        local l_CanvasPosition_0 = v43.scrollingRef.current.CanvasPosition;
-        if v43.state.canvasPos ~= l_CanvasPosition_0 then
-            v43:setState({
-                canvasPos = l_CanvasPosition_0
-            });
-        end;
-    end;
-    v43.scrollingRef = v1.createRef();
-    v43.state = {
-        serverJobsList = v45, 
-        reverseSort = false, 
-        expandIndex = nil
-    };
-end;
-v34.willUpdate = function(v54) --[[ Line: 122 ]] --[[ Name: willUpdate ]]
-    if v54.canvasPosConnector then
-        v54.canvasPosConnector:Disconnect();
-    end;
-end;
-v34.didUpdate = function(v55) --[[ Line: 128 ]] --[[ Name: didUpdate ]]
-    if v55.scrollingRef.current then
-        v55.canvasPosConnector = v55.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v55.onCanvasPosChanged);
-        local l_AbsoluteSize_0 = v55.scrollingRef.current.AbsoluteSize;
-        local l_absScrollSize_0 = v55.state.absScrollSize;
-        if l_AbsoluteSize_0.X ~= l_absScrollSize_0.X or l_AbsoluteSize_0.Y ~= l_absScrollSize_0.Y then
-            v55:setState({
-                absScrollSize = l_AbsoluteSize_0
-            });
-        end;
-    end;
-end;
-v34.didMount = function(v58) --[[ Line: 143 ]] --[[ Name: didMount ]]
-    v58.statsConnector = v58.props.ServerJobsData:Signal():Connect(function(v59) --[[ Line: 144 ]]
-        -- upvalues: v58 (copy)
-        v58:setState({
-            serverJobsList = v59
-        });
-    end);
-    if v58.scrollingRef.current then
-        v58.canvasPosConnector = v58.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(v58.onCanvasPosChanged);
-        v58:setState({
-            absScrollSize = v58.scrollingRef.current.AbsoluteSize, 
-            canvasPos = v58.scrollingRef.current.CanvasPosition
-        });
-    end;
-end;
-v34.willUnmount = function(v60) --[[ Line: 161 ]] --[[ Name: willUnmount ]]
-    v60.statsConnector:Disconnect();
-    v60.statsConnector = nil;
-    if v60.canvasPosConnector then
-        v60.canvasPosConnector:Disconnect();
-        v60.canvasPosConnector = nil;
-    end;
-end;
-v34.render = function(v61) --[[ Line: 170 ]] --[[ Name: render ]]
-    -- upvalues: l_MinFrameWidth_0 (copy), v1 (copy), v8 (copy), l_EntryFrameHeight_0 (copy), l_LineGraphHeight_0 (copy), l_CellPadding_0 (copy), v5 (copy), v26 (copy), v25 (copy), l_ChartHeaderNames_0 (copy), v22 (copy), v31 (copy), l_LineWidth_0 (copy), l_LineColor_0 (copy), v6 (copy), v7 (copy), v36 (copy), v38 (copy), v18 (copy), v40 (copy), v42 (copy), l_NoResultSearchStr_0 (copy), v4 (copy), l_HeaderFrameHeight_0 (copy)
-    local v62 = {};
-    local l_searchTerm_0 = v61.props.searchTerm;
-    local l_size_0 = v61.props.size;
-    local l_layoutOrder_0 = v61.props.layoutOrder;
-    local l_serverJobsList_0 = v61.state.serverJobsList;
-    local l_reverseSort_0 = v61.state.reverseSort;
-    local l_expandIndex_0 = v61.state.expandIndex;
-    local l_canvasPos_0 = v61.state.canvasPos;
-    local l_absScrollSize_1 = v61.state.absScrollSize;
-    local v71 = l_absScrollSize_1 and math.max(l_absScrollSize_1.X, l_MinFrameWidth_0) or l_MinFrameWidth_0;
-    local v72 = #l_serverJobsList_0;
-    if v72 == 0 then
-        return v1.createElement("TextLabel", {
-            Size = l_size_0, 
-            Position = UDim2.new(0, 0, 0, 0), 
-            Text = "Awaiting Server Jobs Information", 
-            TextColor3 = v8.Color.Text, 
-            BackgroundTransparency = 1, 
-            LayoutOrder = l_layoutOrder_0
-        });
-    else
-        local v73 = 0;
-        if l_absScrollSize_1 then
-            local v74 = -1;
-            local v75 = 0;
-            for v76, v77 in pairs(l_serverJobsList_0) do
-                local l_name_0 = v77.name;
-                if not l_searchTerm_0 or string.find(l_name_0:lower(), l_searchTerm_0:lower()) ~= nil then
-                    local l_dataStats_0 = v77.dataStats;
-                    local v80 = l_dataStats_0.dataSet:back();
-                    local v81 = l_expandIndex_0 == l_name_0;
-                    local v82 = v81 and l_EntryFrameHeight_0 + 3 * l_LineGraphHeight_0 / 2 + l_CellPadding_0 * 4 or l_EntryFrameHeight_0;
-                    if v73 + v82 >= l_canvasPos_0.Y then
-                        if v75 < l_absScrollSize_1.Y then
-                            local v83 = l_reverseSort_0 and v72 - v76 or v76;
-                            local v84 = {
-                                [l_name_0] = v1.createElement(v5, {
-                                    text = l_name_0, 
-                                    size = v26[1], 
-                                    pos = v25[1]
-                                })
-                            };
-                            for v85, v86 in pairs(v80.data) do
-                                v84[l_ChartHeaderNames_0[v85]] = v1.createElement(v5, {
-                                    text = v22[v85](v86), 
-                                    size = v26[v85 + 1], 
-                                    pos = v25[v85 + 1]
-                                });
-                            end;
-                            for v87 = 2, #v31 do
-                                v84[string.format("VerticalLine_%d", v87)] = v1.createElement("Frame", {
-                                    Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-                                    Position = v31[v87], 
-                                    BackgroundColor3 = l_LineColor_0, 
-                                    BorderSizePixel = 0
-                                });
-                            end;
-                            v84.lowerHorizontalLine = v1.createElement("Frame", {
-                                Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-                                Position = UDim2.new(0, 0, 1, 0), 
-                                BackgroundColor3 = l_LineColor_0, 
-                                BorderSizePixel = 0
-                            });
-                            v62[l_name_0] = v1.createElement("Frame", {
-                                Size = UDim2.new(0, v71, 0, v82), 
-                                BackgroundTransparency = 1, 
-                                LayoutOrder = v83 + 1
-                            }, {
-                                Button = v1.createElement(v6, {
-                                    size = UDim2.new(1, 0, 0, l_EntryFrameHeight_0), 
-                                    pos = UDim2.new(), 
-                                    isExpanded = v81, 
-                                    onButtonPress = v61.getOnButtonPress(l_name_0)
-                                }, v84), 
-                                DutyCycleGraph = v81 and v1.createElement(v7, {
-                                    pos = UDim2.new(0, 0, 0, l_EntryFrameHeight_0 + l_CellPadding_0), 
-                                    size = UDim2.new(0, v71, 0, l_LineGraphHeight_0 / 2), 
-                                    graphData = l_dataStats_0.dataSet, 
-                                    maxY = l_dataStats_0.max[1], 
-                                    minY = l_dataStats_0.min[1], 
-                                    getX = v36, 
-                                    getY = v38, 
-                                    stringFormatX = v18, 
-                                    stringFormatY = v22[1], 
-                                    axisLabelX = "Timestamp", 
-                                    axisLabelY = l_name_0 .. " " .. l_ChartHeaderNames_0[2]
-                                }), 
-                                StepsPerSecGraph = v81 and v1.createElement(v7, {
-                                    pos = UDim2.new(0, 0, 0, l_EntryFrameHeight_0 + l_LineGraphHeight_0 / 2 + l_CellPadding_0 * 2), 
-                                    size = UDim2.new(0, v71, 0, l_LineGraphHeight_0 / 2), 
-                                    graphData = l_dataStats_0.dataSet, 
-                                    maxY = l_dataStats_0.max[2], 
-                                    minY = l_dataStats_0.min[2], 
-                                    getX = v36, 
-                                    getY = v40, 
-                                    stringFormatX = v18, 
-                                    stringFormatY = v22[2], 
-                                    axisLabelX = "Timestamp", 
-                                    axisLabelY = l_name_0 .. " " .. l_ChartHeaderNames_0[3]
-                                }), 
-                                StepTimeGraph = v81 and v1.createElement(v7, {
-                                    pos = UDim2.new(0, 0, 0, l_EntryFrameHeight_0 + l_LineGraphHeight_0 + l_CellPadding_0 * 3), 
-                                    size = UDim2.new(0, v71, 0, l_LineGraphHeight_0 / 2), 
-                                    graphData = l_dataStats_0.dataSet, 
-                                    maxY = l_dataStats_0.max[3], 
-                                    minY = l_dataStats_0.min[3], 
-                                    getX = v36, 
-                                    getY = v42, 
-                                    stringFormatX = v18, 
-                                    stringFormatY = v22[3], 
-                                    axisLabelX = "Timestamp", 
-                                    axisLabelY = l_name_0 .. " " .. l_ChartHeaderNames_0[4]
-                                })
-                            });
-                        end;
-                        if v74 < 0 then
-                            v74 = v73;
-                        else
-                            v75 = v75 + v82;
-                        end;
-                    end;
-                    v73 = v73 + v82;
-                end;
-            end;
-            if v74 == -1 then
-                local v88 = string.format(l_NoResultSearchStr_0, l_searchTerm_0);
-                v62.emptyResult = v1.createElement("TextLabel", {
-                    Size = l_size_0, 
-                    Text = v88, 
-                    TextColor3 = v8.Color.Text, 
-                    BackgroundTransparency = 1
-                });
-            else
-                v62.WindowingPadding = v1.createElement("Frame", {
-                    Size = UDim2.new(1, 0, 0, v74), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 1
-                });
-            end;
-        end;
-        local v89 = {};
-        for v90 = 1, #l_ChartHeaderNames_0 do
-            v89[l_ChartHeaderNames_0[v90]] = v1.createElement(v4, {
-                text = l_ChartHeaderNames_0[v90], 
-                size = v26[v90], 
-                pos = v25[v90], 
-                sortfunction = v61.onSortChanged
-            });
-        end;
-        v89.upperHorizontalLine = v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-            Position = UDim2.new(0, 0, 0, 0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-        v89.lowerHorizontalLine = v1.createElement("Frame", {
-            Size = UDim2.new(1, 0, 0, l_LineWidth_0), 
-            Position = UDim2.new(0, 0, 1, -l_LineWidth_0), 
-            BackgroundColor3 = l_LineColor_0, 
-            BorderSizePixel = 0
-        });
-        for v91 = 2, #v31 do
-            v89[string.format("VerticalLine_%d", v91)] = v1.createElement("Frame", {
-                Size = UDim2.new(0, l_LineWidth_0, 1, 0), 
-                Position = v31[v91], 
-                BackgroundColor3 = l_LineColor_0, 
-                BorderSizePixel = 0
-            });
-        end;
-        v62.UIListLayout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left, 
-            VerticalAlignment = Enum.VerticalAlignment.Top, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        });
-        return v1.createElement("Frame", {
-            Size = l_size_0, 
-            BackgroundTransparency = 1, 
-            ClipsDescendants = true, 
-            LayoutOrder = l_layoutOrder_0
-        }, {
-            Header = v1.createElement("Frame", {
-                Size = UDim2.new(0, v71, 0, l_HeaderFrameHeight_0), 
-                BackgroundTransparency = 1
-            }, v89), 
-            MainChart = v1.createElement("ScrollingFrame", {
-                Size = UDim2.new(1, 0, 1, -l_HeaderFrameHeight_0), 
-                Position = UDim2.new(0, 0, 0, l_HeaderFrameHeight_0), 
-                BackgroundTransparency = 1, 
-                VerticalScrollBarInset = 1, 
-                ScrollBarThickness = 5, 
-                CanvasSize = UDim2.new(0, v71, 0, v73), 
-                [v1.Ref] = v61.scrollingRef
-            }, v62)
-        });
-    end;
-end;
-return v3(v34, "ServerJobsData");
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local DataConsumer = require(Components.DataConsumer)
+local HeaderButton = require(Components.HeaderButton)
+local CellLabel = require(Components.CellLabel)
+local BannerButton = require(Components.BannerButton)
+local LineGraph = require(Components.LineGraph)
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local LineWidth = Constants.GeneralFormatting.LineWidth
+local LineColor = Constants.GeneralFormatting.LineColor
+local ChartHeaderNames = Constants.ServerJobsFormatting.ChartHeaderNames
+local ValueCellWidth = Constants.ServerJobsFormatting.ValueCellWidth
+local EntryFrameHeight = Constants.ServerJobsFormatting.EntryFrameHeight
+local HeaderFrameHeight = Constants.ServerJobsFormatting.HeaderFrameHeight
+local CellPadding = Constants.ServerJobsFormatting.CellPadding
+local MinFrameWidth = Constants.ServerJobsFormatting.MinFrameWidth
+local LineGraphHeight = Constants.GeneralFormatting.LineGraphHeight
+local convertTimeStamp = require(script.Parent.Parent.Parent.Util.convertTimeStamp)
+local t1 = {
+	function(p1) -- line: 27
+		return p1 and string.format("%.4f%%", p1) or ""
+	end,
+	function(p2) -- line: 30
+		return p2 and string.format("%.4f/s", p2) or ""
+	end,
+	function(p3) -- line: 33
+		return p3 and string.format("%.4fms", p3) or ""
+	end
+}
+local NoResultSearchStr = Constants.GeneralFormatting.NoResultSearchStr
+local n1 = 0
+local t2 = {}
+local t3 = {}
+local v25 = EntryFrameHeight - LineWidth
+
+for _, v in ipairs(ValueCellWidth) do
+	table.insert(t2, UDim2.new(n1, CellPadding, 0, 0))
+	table.insert(t3, UDim2.new(v, -CellPadding, 0, HeaderFrameHeight))
+	table.insert({}, UDim2.new(v, -CellPadding, 0, v25))
+	n1 += v
+end
+
+local t4 = {}
+
+for i, v in ipairs(t2) do
+	t4[i] = UDim2.new(v.X.Scale, v.X.Offset - CellPadding, v.Y.Scale, v.Y.Offset)
+end
+
+local v31 = Roact.Component:extend("ServerJobsChart")
+
+local function getX(p4) -- line: 63
+	return p4.time
+end
+local function getDutyCycle(p5) -- line: 67
+	return p5.data[1]
+end
+local function getStepsPerSec(p6) -- line: 71
+	return p6.data[2]
+end
+local function getStepTime(p7) -- line: 75
+	return p7.data[3]
+end
+
+function v31.init(p8, p9) -- line: 79
+	-- upvalues: Roact (copy)
+	local v45 = p9.ServerJobsData:getCurrentData()
+
+	function p8.getOnButtonPress(p10) -- line: 82
+		-- upvalues: p8 (copy)
+		return function(_, _) -- line: 83
+			-- upvalues: p8 (copy), p10 (copy)
+			p8:setState({
+				expandIndex = p8.state.expandIndex ~= p10 and p10
+			})
+		end
+	end
+	function p8.onSortChanged(p13) -- line: 90
+		-- upvalues: p9 (copy), p8 (copy)
+		if p13 == p9.ServerJobsData:getSortType() then
+			p8:setState({
+				reverseSort = not p8.state.reverseSort
+			})
+
+			return
+		end
+
+		p9.ServerJobsData:setSortType(p13)
+		p8:setState({
+			reverseSort = false
+		})
+	end
+	function p8.onCanvasPosChanged() -- line: 104
+		-- upvalues: p8 (copy)
+		local CanvasPosition = p8.scrollingRef.current.CanvasPosition
+
+		if CanvasPosition ~= p8.state.canvasPos then
+			p8:setState({
+				canvasPos = CanvasPosition
+			})
+		end
+	end
+
+	p8.scrollingRef = Roact.createRef()
+	p8.state = {
+		reverseSort = false,
+		expandIndex = nil,
+		serverJobsList = v45
+	}
+end
+function v31.willUpdate(p14) -- line: 122
+	if p14.canvasPosConnector then
+		p14.canvasPosConnector:Disconnect()
+	end
+end
+function v31.didUpdate(p15) -- line: 128
+	if p15.scrollingRef.current then
+		p15.canvasPosConnector = p15.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p15.onCanvasPosChanged)
+
+		local AbsoluteSize = p15.scrollingRef.current.AbsoluteSize
+		local absScrollSize = p15.state.absScrollSize
+
+		if AbsoluteSize.X ~= absScrollSize.X or AbsoluteSize.Y ~= absScrollSize.Y then
+			p15:setState({
+				absScrollSize = AbsoluteSize
+			})
+		end
+	end
+end
+function v31.didMount(p16) -- line: 143
+	p16.statsConnector = p16.props.ServerJobsData:Signal():Connect(function(p17) -- line: 144
+		-- upvalues: p16 (copy)
+		p16:setState({
+			serverJobsList = p17
+		})
+	end)
+
+	if p16.scrollingRef.current then
+		p16.canvasPosConnector = p16.scrollingRef.current:GetPropertyChangedSignal("CanvasPosition"):Connect(p16.onCanvasPosChanged)
+		p16:setState({
+			absScrollSize = p16.scrollingRef.current.AbsoluteSize,
+			canvasPos = p16.scrollingRef.current.CanvasPosition
+		})
+	end
+end
+function v31.willUnmount(p18) -- line: 161
+	p18.statsConnector:Disconnect()
+	p18.statsConnector = nil
+
+	if p18.canvasPosConnector then
+		p18.canvasPosConnector:Disconnect()
+		p18.canvasPosConnector = nil
+	end
+end
+function v31.render(p19) -- line: 170
+	-- upvalues: MinFrameWidth (copy), Roact (copy), Constants (copy), EntryFrameHeight (copy), LineGraphHeight (copy), CellPadding (copy), CellLabel (copy), t3 (copy), t2 (copy), ChartHeaderNames (copy), t1 (copy), t4 (copy), LineWidth (copy), LineColor (copy), BannerButton (copy), LineGraph (copy), getX (copy), getDutyCycle (copy), convertTimeStamp (copy), getStepsPerSec (copy), getStepTime (copy), NoResultSearchStr (copy), HeaderButton (copy), HeaderFrameHeight (copy)
+	local t5 = {}
+	local searchTerm = p19.props.searchTerm
+	local size = p19.props.size
+	local layoutOrder = p19.props.layoutOrder
+	local serverJobsList = p19.state.serverJobsList
+	local reverseSort = p19.state.reverseSort
+	local expandIndex = p19.state.expandIndex
+	local canvasPos = p19.state.canvasPos
+	local absScrollSize = p19.state.absScrollSize
+	local v62 = absScrollSize and math.max(absScrollSize.X, MinFrameWidth) or MinFrameWidth
+	local v63 = #serverJobsList
+
+	if v63 == 0 then
+		return Roact.createElement("TextLabel", {
+			Text = "Awaiting Server Jobs Information",
+			BackgroundTransparency = 1,
+			Size = size,
+			Position = UDim2.new(0, 0, 0, 0),
+			TextColor3 = Constants.Color.Text,
+			LayoutOrder = layoutOrder
+		})
+	end
+
+	local n2 = 0
+
+	if absScrollSize then
+		local n3 = -1
+		local n4 = 0
+
+		for k, v in pairs(serverJobsList) do
+			local name = v.name
+
+			if not searchTerm or string.find(name:lower(), searchTerm:lower()) ~= nil then
+				local dataStats = v.dataStats
+				local v71 = dataStats.dataSet:back()
+				local v72 = expandIndex == name
+				local v73 = v72 and EntryFrameHeight + 3 * LineGraphHeight / 2 + CellPadding * 4 or EntryFrameHeight
+
+				if n2 + v73 >= canvasPos.Y then
+					if n4 < absScrollSize.Y then
+						local v74 = reverseSort and v63 - k or k
+						local t6 = {
+							[name] = Roact.createElement(CellLabel, {
+								text = name,
+								size = t3[1],
+								pos = t2[1]
+							})
+						}
+
+						for k2, v2 in pairs(v71.data) do
+							t6[ChartHeaderNames[k2]] = Roact.createElement(CellLabel, {
+								text = t1[k2](v2),
+								size = t3[k2 + 1],
+								pos = t2[k2 + 1]
+							})
+						end
+
+						for i = 2, #t4 do
+							t6[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+								BorderSizePixel = 0,
+								Size = UDim2.new(0, LineWidth, 1, 0),
+								Position = t4[i],
+								BackgroundColor3 = LineColor
+							})
+						end
+
+						t6.lowerHorizontalLine = Roact.createElement("Frame", {
+							BorderSizePixel = 0,
+							Size = UDim2.new(1, 0, 0, LineWidth),
+							Position = UDim2.new(0, 0, 1, 0),
+							BackgroundColor3 = LineColor
+						})
+						t5[name] = Roact.createElement("Frame", {
+							BackgroundTransparency = 1,
+							Size = UDim2.new(0, v62, 0, v73),
+							LayoutOrder = v74 + 1
+						}, {
+							Button = Roact.createElement(BannerButton, {
+								size = UDim2.new(1, 0, 0, EntryFrameHeight),
+								pos = UDim2.new(),
+								isExpanded = v72,
+								onButtonPress = p19.getOnButtonPress(name)
+							}, t6),
+							DutyCycleGraph = v72 and Roact.createElement(LineGraph, {
+								axisLabelX = "Timestamp",
+								pos = UDim2.new(0, 0, 0, EntryFrameHeight + CellPadding),
+								size = UDim2.new(0, v62, 0, LineGraphHeight / 2),
+								graphData = dataStats.dataSet,
+								maxY = dataStats.max[1],
+								minY = dataStats.min[1],
+								getX = getX,
+								getY = getDutyCycle,
+								stringFormatX = convertTimeStamp,
+								stringFormatY = t1[1],
+								axisLabelY = name .. " " .. ChartHeaderNames[2]
+							}),
+							StepsPerSecGraph = v72 and Roact.createElement(LineGraph, {
+								axisLabelX = "Timestamp",
+								pos = UDim2.new(0, 0, 0, EntryFrameHeight + LineGraphHeight / 2 + CellPadding * 2),
+								size = UDim2.new(0, v62, 0, LineGraphHeight / 2),
+								graphData = dataStats.dataSet,
+								maxY = dataStats.max[2],
+								minY = dataStats.min[2],
+								getX = getX,
+								getY = getStepsPerSec,
+								stringFormatX = convertTimeStamp,
+								stringFormatY = t1[2],
+								axisLabelY = name .. " " .. ChartHeaderNames[3]
+							}),
+							StepTimeGraph = v72 and Roact.createElement(LineGraph, {
+								axisLabelX = "Timestamp",
+								pos = UDim2.new(0, 0, 0, EntryFrameHeight + LineGraphHeight + CellPadding * 3),
+								size = UDim2.new(0, v62, 0, LineGraphHeight / 2),
+								graphData = dataStats.dataSet,
+								maxY = dataStats.max[3],
+								minY = dataStats.min[3],
+								getX = getX,
+								getY = getStepTime,
+								stringFormatX = convertTimeStamp,
+								stringFormatY = t1[3],
+								axisLabelY = name .. " " .. ChartHeaderNames[4]
+							})
+						})
+					end
+
+					if n3 < 0 then
+						n3 = n2
+					else
+						n4 += v73
+					end
+				end
+
+				n2 += v73
+			end
+		end
+
+		if n3 == -1 then
+			local v79 = string.format(NoResultSearchStr, searchTerm)
+
+			t5.emptyResult = Roact.createElement("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = size,
+				Text = v79,
+				TextColor3 = Constants.Color.Text
+			})
+		else
+			t5.WindowingPadding = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Size = UDim2.new(1, 0, 0, n3)
+			})
+		end
+	end
+
+	local t7 = {}
+
+	for i = 1, #ChartHeaderNames do
+		t7[ChartHeaderNames[i]] = Roact.createElement(HeaderButton, {
+			text = ChartHeaderNames[i],
+			size = t3[i],
+			pos = t2[i],
+			sortfunction = p19.onSortChanged
+		})
+	end
+
+	t7.upperHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 0, 0),
+		BackgroundColor3 = LineColor
+	})
+	t7.lowerHorizontalLine = Roact.createElement("Frame", {
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 0, LineWidth),
+		Position = UDim2.new(0, 0, 1, -LineWidth),
+		BackgroundColor3 = LineColor
+	})
+
+	for i = 2, #t4 do
+		t7[string.format("VerticalLine_%d", i)] = Roact.createElement("Frame", {
+			BorderSizePixel = 0,
+			Size = UDim2.new(0, LineWidth, 1, 0),
+			Position = t4[i],
+			BackgroundColor3 = LineColor
+		})
+	end
+
+	t5.UIListLayout = Roact.createElement("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Left,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		ClipsDescendants = true,
+		Size = size,
+		LayoutOrder = layoutOrder
+	}, {
+		Header = Roact.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(0, v62, 0, HeaderFrameHeight)
+		}, t7),
+		MainChart = Roact.createElement("ScrollingFrame", {
+			Size = UDim2.new(1, 0, 1, -HeaderFrameHeight),
+			Position = UDim2.new(0, 0, 0, HeaderFrameHeight),
+			BackgroundTransparency = 1,
+			VerticalScrollBarInset = 1,
+			ScrollBarThickness = 5,
+			CanvasSize = UDim2.new(0, v62, 0, n2),
+			[Roact.Ref] = p19.scrollingRef
+		}, t5)
+	})
+end
+
+return DataConsumer(v31, "ServerJobsData")

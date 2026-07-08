@@ -1,83 +1,89 @@
-local l_TelemetryService_0 = game:GetService("TelemetryService");
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialUpsell");
-local _ = require(l_script_FirstAncestor_0.Types);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v4 = require(l_Parent_0.Cryo);
-local v5 = require(l_script_FirstAncestor_0.Analytics.Enum.UpsellEntrySurfaceType);
-local v6 = require(l_script_FirstAncestor_0.Analytics.Enum.UpsellComponent);
-local v7 = require(l_script_FirstAncestor_0.Analytics.Enum.UpsellStage);
-local _ = require(l_Parent_0.SocialLuaAnalytics).Analytics.Enums.EventTypes;
-local l_RbxAnalyticsService_0 = game:GetService("RbxAnalyticsService");
-local v10 = require(l_script_FirstAncestor_0.Flag.FFlagAddSessionizationToAnalytics);
-local v11 = require(l_script_FirstAncestor_0.Flag.FFlagAddAEGIS2Analytics);
-local v12 = require(l_script_FirstAncestor_0.Flag.FFlagAddUpsellEntryComponentToAnalytics);
-local v13 = game:DefineFastInt("FIntSocialUpsellEventThrottleHunderedthsPercent", 10000);
-local v14 = {
-    backends = {
-        "EventIngest"
-    }, 
-    throttlingPercentage = v13, 
-    lastUpdated = {
-        2025, 
-        9, 
-        26
-    }, 
-    description = "Upsell Banner Analytics Event"
-};
-evaluateUpsellStage = function(v15, v16, v17) --[[ Line: 29 ]] --[[ Name: evaluateUpsellStage ]]
-    -- upvalues: v6 (copy), v5 (copy), v11 (copy), v7 (copy)
-    if v16 == v6.Modal then
-        if v17 == v6.Modal and (v15 == v5.Homepage or v11 and (v15 == v5.InExperienceChatInputBar or v15 == v5.InExperienceVoiceChatIcon)) then
-            return v7.Fae;
-        else
-            return v7.FaeDetails;
-        end;
-    else
-        return v7.Fae;
-    end;
-end;
-local function _(v18, v19, v20) --[[ Line: 60 ]] --[[ Name: generateUpsellIdentifier ]]
-    if not v18 or not v19 or not v20 then
-        return nil;
-    else
-        return v18 .. v19 .. v20;
-    end;
-end;
-logUpsellEvent = function(v22, v23) --[[ Line: 71 ]] --[[ Name: logUpsellEvent ]]
-    -- upvalues: v4 (copy), v14 (copy), l_RbxAnalyticsService_0 (copy), v12 (copy), v10 (copy), v11 (copy), l_TelemetryService_0 (copy)
-    local v24 = v4.Dictionary.join(v14, {
-        eventName = v22
-    });
-    local l_l_RbxAnalyticsService_0_PlaySessionId_0 = l_RbxAnalyticsService_0:GetPlaySessionId();
-    local v26 = {
-        upsellEntrySurface = v23.upsellEntrySurface, 
-        upsellStage = v23.upsellStage, 
-        upsellImpressionId = v23.upsellImpressionId, 
-        upsellComponent = v23.upsellComponent, 
-        btn = v23.btn or nil, 
-        conversationId = v23.conversationId or nil, 
-        playSessionId = if l_l_RbxAnalyticsService_0_PlaySessionId_0 ~= "" then l_l_RbxAnalyticsService_0_PlaySessionId_0 else nil, 
-        clientTimeStamp = os.time(), 
-        upsellEntryComponent = if v12 then v23.upsellEntryComponent else nil
-    };
-    local l_upsellPurpose_0 = v23.upsellPurpose;
-    local l_upsellEntrySurface_0 = v23.upsellEntrySurface;
-    local l_upsellComponent_0 = v23.upsellComponent;
-    v26.upsellIdentifier = if l_upsellPurpose_0 and l_upsellEntrySurface_0 and l_upsellComponent_0 then l_upsellPurpose_0 .. l_upsellEntrySurface_0 .. l_upsellComponent_0 else nil;
-    v26.upsellPurpose = v23.upsellPurpose;
-    local v30 = if v10 then {
-        "addSessionInfo"
-    } else {};
-    if v11 then
-        table.insert(v30, "addPlaceId");
-        table.insert(v30, "addUniverseId");
-    end;
-    l_TelemetryService_0:LogEvent(v24, {
-        customFields = v26, 
-        standardizedFields = v30
-    });
-end;
+local TelemetryService = game:GetService("TelemetryService")
+local SocialUpsell = script:FindFirstAncestor("SocialUpsell")
+
+require(SocialUpsell.Types)
+
+local SocialUpsellParent = SocialUpsell.Parent
+local Cryo = require(SocialUpsellParent.Cryo)
+local UpsellEntrySurfaceType = require(SocialUpsell.Analytics.Enum.UpsellEntrySurfaceType)
+local UpsellComponent = require(SocialUpsell.Analytics.Enum.UpsellComponent)
+local UpsellStage = require(SocialUpsell.Analytics.Enum.UpsellStage)
+local _ = require(SocialUpsellParent.SocialLuaAnalytics).Analytics.Enums.EventTypes
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+local FFlagAddSessionizationToAnalytics = require(SocialUpsell.Flag.FFlagAddSessionizationToAnalytics)
+local FFlagAddAEGIS2Analytics = require(SocialUpsell.Flag.FFlagAddAEGIS2Analytics)
+local FFlagAddUpsellEntryComponentToAnalytics = require(SocialUpsell.Flag.FFlagAddUpsellEntryComponentToAnalytics)
+local v13 = game:DefineFastInt("FIntSocialUpsellEventThrottleHunderedthsPercent", 10000)
+local t1 = {
+	description = "Upsell Banner Analytics Event",
+	backends = { "EventIngest" },
+	throttlingPercentage = v13,
+	lastUpdated = {
+		2025,
+		9,
+		26
+	}
+}
+
+function evaluateUpsellStage(p1, p2, p3) -- line: 29
+	-- upvalues: UpsellComponent (copy), UpsellEntrySurfaceType (copy), FFlagAddAEGIS2Analytics (copy), UpsellStage (copy)
+	if p2 == UpsellComponent.Modal then
+		if p3 == UpsellComponent.Modal and (p1 == UpsellEntrySurfaceType.Homepage or FFlagAddAEGIS2Analytics and (p1 == UpsellEntrySurfaceType.InExperienceChatInputBar or p1 == UpsellEntrySurfaceType.InExperienceVoiceChatIcon)) then
+			return UpsellStage.Fae
+		end
+
+		return UpsellStage.FaeDetails
+	end
+
+	return UpsellStage.Fae
+end
+
+local function generateUpsellIdentifier(s1: string?, s2: string?, s3: string?) -- line: 60
+	if not s1 or (not s2 or not s3) then
+		return nil
+	end
+
+	return s1 .. s2 .. s3
+end
+
+function logUpsellEvent(p4, t2: {[any]: any}) -- line: 71
+	-- upvalues: Cryo (copy), t1 (copy), RbxAnalyticsService (copy), FFlagAddUpsellEntryComponentToAnalytics (copy), FFlagAddSessionizationToAnalytics (copy), FFlagAddAEGIS2Analytics (copy), TelemetryService (copy)
+	local v24 = Cryo.Dictionary.join(t1, {
+		eventName = p4
+	})
+	local PlaySessionId = RbxAnalyticsService:GetPlaySessionId()
+	local t3 = {
+		upsellEntrySurface = t2.upsellEntrySurface,
+		upsellStage = t2.upsellStage,
+		upsellImpressionId = t2.upsellImpressionId,
+		upsellComponent = t2.upsellComponent,
+		btn = t2.btn or nil,
+		conversationId = t2.conversationId or nil,
+		playSessionId = if PlaySessionId == "" then nil else PlaySessionId,
+		clientTimeStamp = os.time(),
+		upsellEntryComponent = if not FFlagAddUpsellEntryComponentToAnalytics then nil else t2.upsellEntryComponent
+	}
+	local upsellPurpose = t2.upsellPurpose
+	local upsellEntrySurface = t2.upsellEntrySurface
+	local upsellComponent = t2.upsellComponent
+
+	t3.upsellIdentifier = if not not upsellPurpose and (not not upsellEntrySurface and upsellComponent) then upsellPurpose .. upsellEntrySurface .. upsellComponent else nil
+	t3.upsellPurpose = t2.upsellPurpose
+
+	local v30 = if not FFlagAddSessionizationToAnalytics then {} else { "addSessionInfo" }
+
+	if FFlagAddAEGIS2Analytics then
+		table.insert(v30, "addPlaceId")
+		table.insert(v30, "addUniverseId")
+	end
+
+	TelemetryService:LogEvent(v24, {
+		customFields = t3,
+		standardizedFields = v30
+	})
+end
+
 return {
-    evaluateUpsellStage = evaluateUpsellStage, 
-    logUpsellEvent = logUpsellEvent
-};
+	evaluateUpsellStage = evaluateUpsellStage,
+	logUpsellEvent = logUpsellEvent
+}

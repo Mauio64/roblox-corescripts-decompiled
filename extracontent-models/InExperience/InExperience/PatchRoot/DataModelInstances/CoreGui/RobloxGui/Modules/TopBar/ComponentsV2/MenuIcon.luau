@@ -1,286 +1,320 @@
-local _ = game:GetService("ContextActionService");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_GamepadService_0 = game:GetService("GamepadService");
-local l_GuiService_0 = game:GetService("GuiService");
-local _ = game:GetService("VRService");
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Chrome_0 = l_Parent_1.Chrome;
-local v9 = require(l_Chrome_0.Service);
-local v10 = require(l_Parent_0.Constants);
-local v11 = require(l_Parent_1.InGameMenuConstants);
-local v12 = require(l_Chrome_0.ChromeShared.Unibar.Constants);
-local l_FocusUtils_0 = require(l_CorePackages_0.Workspace.Packages.Chrome).FocusUtils;
-local v14 = require(l_CorePackages_0.Workspace.Packages.Display);
-local v15 = require(l_CorePackages_0.Packages.Foundation);
-local v16 = require(l_CorePackages_0.Packages.Motion);
-local v17 = require(l_CorePackages_0.Packages.React);
-local v18 = require(l_CorePackages_0.Workspace.Packages.RobloxTranslator);
-local l_SettingsShowSignal_0 = require(l_CorePackages_0.Workspace.Packages.CoreScriptsCommon).SettingsShowSignal;
-local v20 = require(l_CorePackages_0.Workspace.Packages.SharedFlags);
-local v21 = require(l_CorePackages_0.Packages.SignalsReact);
-local v22 = require(l_CorePackages_0.Packages.UIBlox);
-local l_isSpatial_0 = require(l_CorePackages_0.Workspace.Packages.AppCommonLib).isSpatial;
-local l_FFlagShowUnibarOnVirtualCursor_0 = v20.FFlagShowUnibarOnVirtualCursor;
-local l_View_0 = v15.View;
-local l_Icon_0 = v15.Icon;
-local l_ControlState_0 = v15.Enums.ControlState;
-local l_useTokens_0 = v15.Hooks.useTokens;
-local l_useCursor_0 = v15.Hooks.useCursor;
-local v30 = require(l_Parent_0.Components.Presentation.menuIconHoveredSignal);
-local v31 = require(l_Parent_0.Components.Presentation.BadgeOver12);
-local l_withTooltip_0 = v22.App.Dialog.TooltipV2.withTooltip;
-local l_TooltipOrientation_0 = v22.App.Dialog.Enum.TooltipOrientation;
-local l_TooltipCallout_0 = v22.App.Dialog.TooltipCallout;
-local v35 = require(l_CorePackages_0.Workspace.Packages.VrSpatialUi);
-local l_UIManager_0 = v35.UIManager;
-local l_Panel3DInSpatialUI_0 = v35.Panel3DInSpatialUI;
-local l_PanelType_0 = v35.Constants.PanelType;
-local l_SPATIAL_TOOLTIP_SPACING_0 = v35.Constants.SPATIAL_TOOLTIP_SPACING;
-local function _() --[[ Line: 53 ]]
-    -- upvalues: l_isSpatial_0 (copy), v9 (copy), l_UIManager_0 (copy)
-    if l_isSpatial_0() then
-        local v40 = v9:showTopBar();
-        local v41 = l_UIManager_0.getInstance():isBottomBarInteractionOnAnimationSupported();
-        return not v40 and not v41;
-    else
-        return false;
-    end;
-end;
-local v43 = {
-    Enum.KeyCode.Escape
-};
-return function(v44) --[[ Line: 81 ]] --[[ Name: MenuIcon ]]
-    -- upvalues: l_useTokens_0 (copy), v21 (copy), v14 (copy), v10 (copy), v17 (copy), v16 (copy), l_GuiService_0 (copy), v9 (copy), v12 (copy), l_useCursor_0 (copy), v15 (copy), v43 (copy), l_CoreGui_0 (copy), l_TooltipOrientation_0 (copy), v18 (copy), l_SettingsShowSignal_0 (copy), l_FocusUtils_0 (copy), l_ControlState_0 (copy), l_isSpatial_0 (copy), l_UIManager_0 (copy), v30 (copy), l_FFlagShowUnibarOnVirtualCursor_0 (copy), l_GamepadService_0 (copy), l_Parent_1 (copy), v11 (copy), l_TooltipCallout_0 (copy), l_SPATIAL_TOOLTIP_SPACING_0 (copy), l_Panel3DInSpatialUI_0 (copy), l_PanelType_0 (copy), l_withTooltip_0 (copy), l_View_0 (copy), v31 (copy), l_Icon_0 (copy)
-    local v45 = l_useTokens_0();
-    local v47 = v21.useSignalState(function(v46) --[[ Line: 84 ]]
-        -- upvalues: v14 (ref)
-        return v14.GetDisplayStore(v46).getUIScale(v46);
-    end);
-    local _ = v10.TopBarButtonHeight * v47;
-    local v49 = v10.TopBarButtonPadding * v47;
-    local v50 = v10.MENU_ICON_SIZE * v47;
-    local v51 = v17.useMemo(function() --[[ Line: 91 ]]
-        -- upvalues: v16 (ref), v50 (copy), v10 (ref)
-        return {
-            menuOpen = v16.createState({
-                size = v50 * v10.MenuIconOpenScale
-            }), 
-            menuClosed = v16.createState({
-                size = v50
-            })
-        };
-    end, {
-        v47
-    });
-    local v52, v53 = v16.useMotion(v51.menuClosed);
-    local v54, v55 = v17.useBinding(l_GuiService_0.PreferredTransparency);
-    local v56 = v17.useRef(false);
-    local v57 = v17.useRef(false);
-    local v58 = nil;
-    local v59 = nil;
-    local v60 = nil;
-    if v44.unibarMenuRef and v44.unibarMenuRef.current then
-        v58 = v9:menuList():get()[1];
-        v59 = if v58 then v12.ICON_NAME_PREFIX .. v58.id else nil;
-        v60 = if v44.unibarMenuRef.current and v59 then v44.unibarMenuRef.current:FindFirstChild(v59, true) else nil;
-    end;
-    local v61, v62 = v17.useState(false);
-    local v63, v64 = v17.useState(Vector2.zero);
-    local v65, v66 = v17.useState(Vector2.zero);
-    local v67 = l_useCursor_0(v15.Enums.CursorType.SkinToneCircle);
-    local v68 = v17.useRef("Roblox Menu");
-    local v69 = {
-        textAlignment = Enum.TextXAlignment.Center, 
-        headerText = v68.current, 
-        hotkeyCodes = v43
-    };
-    local v70 = {
-        active = v61, 
-        guiTarget = l_CoreGui_0, 
-        preferredOrientation = l_TooltipOrientation_0.Bottom, 
-        DisplayOrder = 10
-    };
-    v17.useEffect(function() --[[ Line: 140 ]]
-        -- upvalues: v68 (copy), v18 (ref), l_GuiService_0 (ref), v55 (copy), l_SettingsShowSignal_0 (ref), v53 (copy), v51 (copy), v44 (copy), v9 (ref), l_FocusUtils_0 (ref)
-        pcall(function() --[[ Line: 141 ]]
-            -- upvalues: v68 (ref), v18 (ref)
-            v68.current = v18:FormatByKey("CoreScripts.TopBar.RobloxMenu");
-        end);
-        local v71 = l_GuiService_0:GetPropertyChangedSignal("PreferredTransparency"):Connect(function() --[[ Line: 145 ]]
-            -- upvalues: v55 (ref), l_GuiService_0 (ref)
-            v55(l_GuiService_0.PreferredTransparency);
-        end);
-        local v73 = l_SettingsShowSignal_0:connect(function(v72) --[[ Line: 148 ]]
-            -- upvalues: v53 (ref), v51 (ref)
-            v53(if v72 then v51.menuOpen else v51.menuClosed);
-        end);
-        local v74 = nil;
-        if v44.menuIconRef then
-            v74 = v9:onTriggerMenuIcon():connect(function() --[[ Line: 154 ]]
-                -- upvalues: l_GuiService_0 (ref), v44 (ref), l_FocusUtils_0 (ref)
-                l_GuiService_0.SelectedCoreObject = v44.menuIconRef.current;
-                l_FocusUtils_0.MenuIconSelectedSignal:set(true);
-            end);
-        end;
-        return function() --[[ Line: 160 ]]
-            -- upvalues: v71 (copy), v73 (copy), v74 (ref)
-            v71:Disconnect();
-            v73:Disconnect();
-            if v74 then
-                v74:disconnect();
-            end;
-        end;
-    end, {});
-    local v75 = v17.useRef(l_ControlState_0.Default);
-    local v83 = v17.useCallback(function(v76) --[[ Line: 170 ]]
-        -- upvalues: l_ControlState_0 (ref), l_isSpatial_0 (ref), v9 (ref), l_UIManager_0 (ref), v57 (copy), v30 (ref), v56 (copy), v62 (copy), l_FocusUtils_0 (ref), v75 (copy), l_FFlagShowUnibarOnVirtualCursor_0 (ref), l_GamepadService_0 (ref), l_GuiService_0 (ref), v12 (ref)
-        if v76 == l_ControlState_0.Hover then
-            local v77;
-            if l_isSpatial_0() then
-                local v78 = v9:showTopBar();
-                local v79 = l_UIManager_0.getInstance():isBottomBarInteractionOnAnimationSupported();
-                v77 = not v78 and not v79;
-            else
-                v77 = false;
-            end;
-            if v77 then
-                return;
-            else
-                v57.current = true;
-                v30:fire(true);
-                task.delay(0.65, function() --[[ Line: 178 ]]
-                    -- upvalues: v57 (ref), v56 (ref), l_isSpatial_0 (ref), v9 (ref), l_UIManager_0 (ref), v62 (ref)
-                    if v57.current and not v56.current then
-                        local v80;
-                        if l_isSpatial_0() then
-                            local v81 = v9:showTopBar();
-                            local v82 = l_UIManager_0.getInstance():isBottomBarInteractionOnAnimationSupported();
-                            v80 = not v81 and not v82;
-                        else
-                            v80 = false;
-                        end;
-                        if v80 then
-                            return;
-                        else
-                            v62(true);
-                        end;
-                    end;
-                end);
-            end;
-        elseif v76 == l_ControlState_0.Selected then
-            l_FocusUtils_0.MenuIconSelectedSignal:set(true);
-        elseif v76 == l_ControlState_0.Default then
-            if v75.current == l_ControlState_0.Hover then
-                v62(false);
-                v57.current = false;
-                v56.current = false;
-            elseif v75.current == l_ControlState_0.Selected then
-                if (not l_FFlagShowUnibarOnVirtualCursor_0 or not l_GamepadService_0.GamepadCursorEnabled) and l_GuiService_0.SelectedCoreObject and string.find(l_GuiService_0.SelectedCoreObject.Name, v12.ICON_NAME_PREFIX) then
-                    v9:enableFocusNav();
-                end;
-                l_FocusUtils_0.MenuIconSelectedSignal:set(false);
-            end;
-        end;
-        v75.current = v76;
-    end, {});
-    local v87 = v17.useCallback(function() --[[ Line: 204 ]]
-        -- upvalues: v62 (copy), v56 (copy), l_isSpatial_0 (ref), v9 (ref), l_UIManager_0 (ref), l_Parent_1 (ref), v11 (ref)
-        v62(false);
-        v56.current = true;
-        local v84;
-        if l_isSpatial_0() then
-            local v85 = v9:showTopBar();
-            local v86 = l_UIManager_0.getInstance():isBottomBarInteractionOnAnimationSupported();
-            v84 = not v85 and not v86;
-        else
-            v84 = false;
-        end;
-        if v84 then
-            return;
-        else
-            require(l_Parent_1.Settings.SettingsHub):ToggleVisibility(v11.AnalyticsMenuOpenTypes.TopbarButton);
-            return;
-        end;
-    end, {});
-    return (function(v88, v89, v90) --[[ Line: 215 ]] --[[ Name: renderWithTooltipCompat ]]
-        -- upvalues: l_isSpatial_0 (ref), v64 (copy), v66 (copy), v17 (ref), l_TooltipCallout_0 (ref), l_TooltipOrientation_0 (ref), v65 (copy), v63 (copy), l_SPATIAL_TOOLTIP_SPACING_0 (ref), l_Panel3DInSpatialUI_0 (ref), l_PanelType_0 (ref), l_withTooltip_0 (ref)
-        if l_isSpatial_0() then
-            local function v92(v91) --[[ Line: 218 ]]
-                -- upvalues: v64 (ref), v66 (ref)
-                v64(v91.AbsoluteSize);
-                v66(v91.AbsolutePosition);
-            end;
-            local v94 = v17.useCallback(function(v93) --[[ Line: 222 ]]
-                -- upvalues: v17 (ref), l_TooltipCallout_0 (ref), v88 (copy), l_TooltipOrientation_0 (ref), v65 (ref), v63 (ref), l_SPATIAL_TOOLTIP_SPACING_0 (ref)
-                return v17.createElement(l_TooltipCallout_0, {
-                    textAlignment = Enum.TextXAlignment.Center, 
-                    headerText = v88.headerText, 
-                    orientation = l_TooltipOrientation_0.Top, 
-                    distanceOffset = 0, 
-                    triggerPointCenter = Vector2.new(v65.X + v63.X / 2, v93.Y - l_SPATIAL_TOOLTIP_SPACING_0), 
-                    contentOffsetVector = Vector2.zero, 
-                    triggerPointRadius = Vector2.zero
-                });
-            end, {
-                v88, 
-                v65, 
-                v63
-            });
-            return v17.createElement(v17.Fragment, nil, {
-                VRSpatialTooltip = if v89.active and v63 and l_Panel3DInSpatialUI_0 then v17.createElement(l_Panel3DInSpatialUI_0, {
-                    panelType = l_PanelType_0.ToolTipsContainer, 
-                    renderFunction = v94
-                }) else nil, 
-                MenuIconTriggerPoint = v90(v92)
-            });
-        else
-            return l_withTooltip_0(v88, v89, v90);
-        end;
-    end)(v69, v70, (v17.useCallback(function(v95) --[[ Line: 256 ]]
-        -- upvalues: v17 (ref), l_View_0 (ref), v54 (copy), v45 (copy), v60 (ref), v67 (copy), v44 (copy), v87 (copy), v83 (copy), v31 (ref), v49 (copy), l_Icon_0 (ref), v15 (ref), v52 (copy)
-        return v17.createElement(l_View_0, {
-            tag = "radius-circle aspect-1-1", 
-            backgroundStyle = v54:map(function(v96) --[[ Line: 259 ]]
-                -- upvalues: v45 (ref)
-                local l_OverMedia_0_0 = v45.Color.OverMedia.OverMedia_0;
-                l_OverMedia_0_0.Transparency = l_OverMedia_0_0.Transparency * v96;
-                return l_OverMedia_0_0;
-            end), 
-            Size = UDim2.fromScale(1, 1), 
-            NextSelectionRight = v60, 
-            selection = {
-                Selectable = true, 
-                SelectionImageObject = v67
-            }, 
-            selectionGroup = {
-                SelectionBehaviorLeft = Enum.SelectionBehavior.Stop, 
-                SelectionBehaviorUp = Enum.SelectionBehavior.Stop, 
-                SelectionBehaviorDown = Enum.SelectionBehavior.Stop
-            }, 
-            ref = v44.menuIconRef, 
-            onAbsoluteSizeChanged = v95, 
-            onAbsolutePositionChanged = v95, 
-            onActivated = v87, 
-            onStateChanged = v83
-        }, {
-            BadgeOver12 = if v44.showBadgeOver12 then v17.createElement(v31, {
-                position = UDim2.new(0, 1, 1, -(v49 + 1))
-            }) else nil, 
-            Icon = v17.createElement(l_Icon_0, {
-                name = v15.Enums.IconName.Tilt, 
-                size = v52.size, 
-                Position = UDim2.fromScale(0.5, 0.5), 
-                AnchorPoint = Vector2.new(0.5, 0.5)
-            })
-        });
-    end, {
-        v54, 
-        v60, 
-        v67, 
-        v87, 
-        v83, 
-        v44.showBadgeOver12
-    })));
-end;
+game:GetService("ContextActionService")
+
+local CoreGui = game:GetService("CoreGui")
+local CorePackages = game:GetService("CorePackages")
+local GamepadService = game:GetService("GamepadService")
+local GuiService = game:GetService("GuiService")
+
+game:GetService("VRService")
+
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Chrome = ParentParentParent.Chrome
+local Service = require(Chrome.Service)
+local Constants = require(ParentParent.Constants)
+local InGameMenuConstants = require(ParentParentParent.InGameMenuConstants)
+local Constants2 = require(Chrome.ChromeShared.Unibar.Constants)
+local FocusUtils = require(CorePackages.Workspace.Packages.Chrome).FocusUtils
+local Display = require(CorePackages.Workspace.Packages.Display)
+local Foundation = require(CorePackages.Packages.Foundation)
+local Motion = require(CorePackages.Packages.Motion)
+local React = require(CorePackages.Packages.React)
+local RobloxTranslator = require(CorePackages.Workspace.Packages.RobloxTranslator)
+local SettingsShowSignal = require(CorePackages.Workspace.Packages.CoreScriptsCommon).SettingsShowSignal
+local SharedFlags = require(CorePackages.Workspace.Packages.SharedFlags)
+local Signals = require(CorePackages.Packages.Signals)
+local SignalsReact = require(CorePackages.Packages.SignalsReact)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local isSpatial = require(CorePackages.Workspace.Packages.AppCommonLib).isSpatial
+local FFlagShowUnibarOnVirtualCursor = SharedFlags.FFlagShowUnibarOnVirtualCursor
+local FFlagEnableSideSheet = SharedFlags.FFlagEnableSideSheet
+local View = Foundation.View
+local Icon = Foundation.Icon
+local ControlState = Foundation.Enums.ControlState
+local useTokens = Foundation.Hooks.useTokens
+local useCursor = Foundation.Hooks.useCursor
+local getSideSheetVisibility = require(CorePackages.Workspace.Packages.InExperienceSideSheet).getSideSheetVisibility
+local menuIconHoveredSignal = require(ParentParent.Components.Presentation.menuIconHoveredSignal)
+local BadgeOver12 = require(ParentParent.Components.Presentation.BadgeOver12)
+local withTooltip = UIBlox.App.Dialog.TooltipV2.withTooltip
+local TooltipOrientation = UIBlox.App.Dialog.Enum.TooltipOrientation
+local TooltipCallout = UIBlox.App.Dialog.TooltipCallout
+local VrSpatialUi = require(CorePackages.Workspace.Packages.VrSpatialUi)
+local UIManager = VrSpatialUi.UIManager
+local Panel3DInSpatialUI = VrSpatialUi.Panel3DInSpatialUI
+local PanelType = VrSpatialUi.Constants.PanelType
+local SPATIAL_TOOLTIP_SPACING = VrSpatialUi.Constants.SPATIAL_TOOLTIP_SPACING
+local t1 = { Enum.KeyCode.Escape }
+
+local function MenuIcon(t2: {[any]: any}) -- line: 86
+	-- upvalues: useTokens (copy), SignalsReact (copy), Display (copy), Constants (copy), React (copy), Motion (copy), GuiService (copy), Service (copy), Constants2 (copy), useCursor (copy), Foundation (copy), t1 (copy), CoreGui (copy), TooltipOrientation (copy), RobloxTranslator (copy), SettingsShowSignal (copy), FFlagEnableSideSheet (copy), Signals (copy), getSideSheetVisibility (copy), FocusUtils (copy), ControlState (copy), isSpatial (copy), UIManager (copy), menuIconHoveredSignal (copy), FFlagShowUnibarOnVirtualCursor (copy), GamepadService (copy), ParentParentParent (copy), InGameMenuConstants (copy), TooltipCallout (copy), SPATIAL_TOOLTIP_SPACING (copy), Panel3DInSpatialUI (copy), PanelType (copy), withTooltip (copy), View (copy), BadgeOver12 (copy), Icon (copy)
+	local v47 = useTokens()
+	local v48 = SignalsReact.useSignalState(function(p1) -- line: 89
+		-- upvalues: Display (copy)
+		return Display.GetDisplayStore(p1).getUIScale(p1)
+	end)
+	local _ = Constants.TopBarButtonHeight * v48
+	local v50 = Constants.TopBarButtonPadding * v48
+	local v51 = Constants.MENU_ICON_SIZE * v48
+	local v52 = React.useMemo(function() -- line: 96
+		-- upvalues: Motion (copy), v51 (copy), Constants (copy)
+		return {
+			menuOpen = Motion.createState({
+				size = v51 * Constants.MenuIconOpenScale
+			}),
+			menuClosed = Motion.createState({
+				size = v51
+			})
+		}
+	end, { v48 })
+	local v53, v54 = Motion.useMotion(v52.menuClosed)
+	local v55, v56 = React.useBinding(GuiService.PreferredTransparency)
+	local v57 = React.useRef(false)
+	local v58 = React.useRef(false)
+	local u59 = nil
+
+	if t2.unibarMenuRef and t2.unibarMenuRef.current then
+		local v60 = Service:menuList():get()[1]
+		local v61 = if not v60 then nil else Constants2.ICON_NAME_PREFIX .. v60.id
+
+		u59 = if not t2.unibarMenuRef.current or not v61 then nil else t2.unibarMenuRef.current:FindFirstChild(v61, true)
+	end
+
+	local v62, v63 = React.useState(false)
+	local v64, v65 = React.useState(Vector2.zero)
+	local v66, v67 = React.useState(Vector2.zero)
+	local v68 = useCursor(Foundation.Enums.CursorType.SkinToneCircle)
+	local v69 = React.useRef("Roblox Menu")
+	local t3 = {
+		textAlignment = Enum.TextXAlignment.Center,
+		headerText = v69.current,
+		hotkeyCodes = t1
+	}
+	local t4 = {
+		DisplayOrder = 10,
+		active = v62,
+		guiTarget = CoreGui,
+		preferredOrientation = TooltipOrientation.Bottom
+	}
+
+	React.useEffect(function() -- line: 145
+		-- upvalues: v69 (copy), RobloxTranslator (copy), GuiService (copy), v56 (copy), SettingsShowSignal (copy), v54 (copy), v52 (copy), FFlagEnableSideSheet (copy), Signals (copy), getSideSheetVisibility (copy), t2 (copy), Service (copy), FocusUtils (copy)
+		pcall(function() -- line: 146
+			-- upvalues: v69 (copy), RobloxTranslator (copy)
+			v69.current = RobloxTranslator:FormatByKey("CoreScripts.TopBar.RobloxMenu")
+		end)
+
+		local connection = GuiService:GetPropertyChangedSignal("PreferredTransparency"):Connect(function() -- line: 150
+			-- upvalues: v56 (copy), GuiService (copy)
+			v56(GuiService.PreferredTransparency)
+		end)
+		local v78 = SettingsShowSignal:connect(function(p2) -- line: 153
+			-- upvalues: v54 (copy), v52 (copy)
+			v54(if not p2 then v52.menuClosed else v52.menuOpen)
+		end)
+		local u79 = nil
+
+		if FFlagEnableSideSheet then
+			u79 = Signals.createEffect(function(p3) -- line: 159
+				-- upvalues: getSideSheetVisibility (copy), v54 (copy), v52 (copy)
+				local v95 = getSideSheetVisibility(p3)
+
+				v54(if not v95 then v52.menuClosed else v52.menuOpen)
+			end)
+		end
+
+		local u80 = nil
+
+		if t2.menuIconRef then
+			u80 = Service:onTriggerMenuIcon():connect(function() -- line: 167
+				-- upvalues: GuiService (copy), t2 (copy), FocusUtils (copy)
+				GuiService.SelectedCoreObject = t2.menuIconRef.current
+				FocusUtils.MenuIconSelectedSignal:set(true)
+			end)
+		end
+
+		return function() -- line: 173
+			-- upvalues: FFlagEnableSideSheet (copy), u79 (ref), connection (copy), v78 (copy), u80 (ref)
+			if FFlagEnableSideSheet and u79 then
+				u79()
+			end
+
+			connection:Disconnect()
+			v78:Disconnect()
+
+			if u80 then
+				u80:disconnect()
+			end
+		end
+	end, {})
+
+	local v72 = React.useRef(ControlState.Default)
+	local v73 = React.useCallback(function(p4) -- line: 186
+		-- upvalues: ControlState (copy), isSpatial (copy), Service (copy), UIManager (copy), v58 (copy), menuIconHoveredSignal (copy), v57 (copy), v63 (copy), FocusUtils (copy), v72 (copy), FFlagShowUnibarOnVirtualCursor (copy), GamepadService (copy), GuiService (copy), Constants2 (copy)
+		if p4 == ControlState.Hover then
+			local v84
+
+			if isSpatial() then
+				local v82 = Service:showTopBar()
+				local v83 = UIManager.getInstance():isBottomBarInteractionOnAnimationSupported()
+
+				v84 = not v82 and not v83
+			else
+				v84 = false
+			end
+
+			if v84 then
+				return
+			end
+
+			v58.current = true
+			menuIconHoveredSignal:fire(true)
+			task.delay(0.65, function() -- line: 194
+				-- upvalues: v58 (copy), v57 (copy), isSpatial (copy), Service (copy), UIManager (copy), v63 (copy)
+				if v58.current and not v57.current then
+					local v98
+
+					if isSpatial() then
+						local v96 = Service:showTopBar()
+						local v97 = UIManager.getInstance():isBottomBarInteractionOnAnimationSupported()
+
+						v98 = not v96 and not v97
+					else
+						v98 = false
+					end
+
+					if v98 then
+						return
+					end
+
+					v63(true)
+				end
+			end)
+		elseif p4 == ControlState.Selected then
+			FocusUtils.MenuIconSelectedSignal:set(true)
+		elseif p4 == ControlState.Default then
+			if v72.current == ControlState.Hover then
+				v63(false)
+				v58.current = false
+				v57.current = false
+			elseif v72.current == ControlState.Selected then
+				if (not FFlagShowUnibarOnVirtualCursor or not GamepadService.GamepadCursorEnabled) and GuiService.SelectedCoreObject and string.find(GuiService.SelectedCoreObject.Name, Constants2.ICON_NAME_PREFIX) then
+					Service:enableFocusNav()
+				end
+
+				FocusUtils.MenuIconSelectedSignal:set(false)
+			end
+		end
+
+		v72.current = p4
+	end, {})
+	local v74 = React.useCallback(function() -- line: 220
+		-- upvalues: v63 (copy), v57 (copy), isSpatial (copy), Service (copy), UIManager (copy), ParentParentParent (copy), InGameMenuConstants (copy)
+		v63(false)
+		v57.current = true
+
+		local v87
+
+		if isSpatial() then
+			local v85 = Service:showTopBar()
+			local v86 = UIManager.getInstance():isBottomBarInteractionOnAnimationSupported()
+
+			v87 = not v85 and not v86
+		else
+			v87 = false
+		end
+
+		if v87 then
+			return
+		end
+
+		require(ParentParentParent.Settings.SettingsHub):ToggleVisibility(InGameMenuConstants.AnalyticsMenuOpenTypes.TopbarButton)
+	end, {})
+
+	local function renderWithTooltipCompat(p5, p6, p7) -- line: 231
+		-- upvalues: isSpatial (copy), v65 (copy), v67 (copy), React (copy), TooltipCallout (copy), TooltipOrientation (copy), v66 (copy), v64 (copy), SPATIAL_TOOLTIP_SPACING (copy), Panel3DInSpatialUI (copy), PanelType (copy), withTooltip (copy)
+		if isSpatial() then
+			local v91 = React.useCallback(function(vector2: Vector2) -- line: 238
+				-- upvalues: React (copy), TooltipCallout (copy), p5 (copy), TooltipOrientation (copy), v66 (copy), v64 (copy), SPATIAL_TOOLTIP_SPACING (copy)
+				return React.createElement(TooltipCallout, {
+					distanceOffset = 0,
+					textAlignment = Enum.TextXAlignment.Center,
+					headerText = p5.headerText,
+					orientation = TooltipOrientation.Top,
+					triggerPointCenter = Vector2.new(v66.X + v64.X / 2, vector2.Y - SPATIAL_TOOLTIP_SPACING),
+					contentOffsetVector = Vector2.zero,
+					triggerPointRadius = Vector2.zero
+				})
+			end, {
+				p5,
+				v66,
+				v64
+			})
+
+			return React.createElement(React.Fragment, nil, {
+				VRSpatialTooltip = if not p6.active or (not v64 or not Panel3DInSpatialUI) then nil else React.createElement(Panel3DInSpatialUI, {
+					panelType = PanelType.ToolTipsContainer,
+					renderFunction = v91
+				}),
+				MenuIconTriggerPoint = p7(function(p8) -- line: 234
+					-- upvalues: v65 (copy), v67 (copy)
+					v65(p8.AbsoluteSize)
+					v67(p8.AbsolutePosition)
+				end)
+			})
+		end
+
+		return withTooltip(p5, p6, p7)
+	end
+
+	return renderWithTooltipCompat(t3, t4, (React.useCallback(function(p9) -- line: 272
+		-- upvalues: React (copy), View (copy), FFlagEnableSideSheet (copy), v55 (copy), v47 (copy), u59 (ref), v68 (copy), t2 (copy), v74 (copy), v73 (copy), BadgeOver12 (copy), v50 (copy), Icon (copy), Foundation (copy), v53 (copy)
+		return React.createElement(View, {
+			tag = "radius-circle aspect-1-1",
+			backgroundStyle = if FFlagEnableSideSheet then nil else v55:map(function(p10) -- line: 276
+				-- upvalues: v47 (copy)
+				local OverMedia_0 = v47.Color.OverMedia.OverMedia_0
+
+				OverMedia_0.Transparency = OverMedia_0.Transparency * p10
+
+				return OverMedia_0
+			end),
+			Size = UDim2.fromScale(1, 1),
+			NextSelectionRight = u59,
+			selection = {
+				Selectable = true,
+				SelectionImageObject = v68
+			},
+			selectionGroup = {
+				SelectionBehaviorLeft = Enum.SelectionBehavior.Stop,
+				SelectionBehaviorUp = Enum.SelectionBehavior.Stop,
+				SelectionBehaviorDown = Enum.SelectionBehavior.Stop
+			},
+			ref = t2.menuIconRef,
+			onAbsoluteSizeChanged = p9,
+			onAbsolutePositionChanged = p9,
+			onActivated = if FFlagEnableSideSheet then nil else v74,
+			onStateChanged = if FFlagEnableSideSheet then nil else v73
+		}, {
+			BadgeOver12 = if not t2.showBadgeOver12 then nil else React.createElement(BadgeOver12, {
+				position = UDim2.new(0, 1, 1, -(v50 + 1))
+			}),
+			Icon = React.createElement(Icon, {
+				name = Foundation.Enums.IconName.Tilt,
+				size = v53.size,
+				Position = UDim2.fromScale(0.5, 0.5),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				style = if not FFlagEnableSideSheet then nil else v47.Color.ActionEmphasis.Foreground
+			})
+		})
+	end, {
+		v55,
+		u59,
+		v68,
+		v74,
+		v73,
+		t2.showBadgeOver12
+	})))
+end
+
+return MenuIcon

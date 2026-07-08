@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaAppPropagateFriendsCarouselHeader", false);
+return game:DefineFastFlag("LuaAppPropagateFriendsCarouselHeader", false)

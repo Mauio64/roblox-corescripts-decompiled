@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AXPhotoboothAddTropicalRunway", false);
+return game:DefineFastFlag("AXPhotoboothAddTropicalRunway", false)

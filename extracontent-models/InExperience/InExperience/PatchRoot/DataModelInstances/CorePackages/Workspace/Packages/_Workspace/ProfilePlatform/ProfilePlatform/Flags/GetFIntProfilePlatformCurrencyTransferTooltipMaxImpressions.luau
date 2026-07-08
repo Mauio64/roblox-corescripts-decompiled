@@ -1,4 +1,5 @@
-game:DefineFastInt("ProfilePlatformCurrencyTransferTooltipMaxImpressions", 5);
-return function() --[[ Line: 3 ]]
-    return game:GetFastInt("ProfilePlatformCurrencyTransferTooltipMaxImpressions");
-end;
+game:DefineFastInt("ProfilePlatformCurrencyTransferTooltipMaxImpressions", 5)
+
+return function() -- line: 3
+	return game:GetFastInt("ProfilePlatformCurrencyTransferTooltipMaxImpressions")
+end

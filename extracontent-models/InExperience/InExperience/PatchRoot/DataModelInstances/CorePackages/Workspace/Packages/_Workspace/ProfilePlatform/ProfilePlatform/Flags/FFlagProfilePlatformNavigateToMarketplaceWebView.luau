@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformNavigateToMarketplaceWebView_V2", false);
+return game:DefineFastFlag("ProfilePlatformNavigateToMarketplaceWebView_V2", false)

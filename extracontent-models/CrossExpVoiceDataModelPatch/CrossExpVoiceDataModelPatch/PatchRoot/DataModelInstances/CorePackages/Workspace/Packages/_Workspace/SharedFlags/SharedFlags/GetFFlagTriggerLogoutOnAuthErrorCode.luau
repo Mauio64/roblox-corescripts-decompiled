@@ -1,4 +1,5 @@
-game:DefineFastFlag("TriggerLogoutOnAuthErrorCode", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("TriggerLogoutOnAuthErrorCode");
-end;
+game:DefineFastFlag("TriggerLogoutOnAuthErrorCode", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("TriggerLogoutOnAuthErrorCode")
+end

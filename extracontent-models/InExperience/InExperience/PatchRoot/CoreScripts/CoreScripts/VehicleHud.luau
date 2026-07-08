@@ -1,201 +1,240 @@
-local l_RunService_0 = game:GetService("RunService");
-local l_Players_0 = game:GetService("Players");
-local _ = game:GetService("CorePackages");
-while not l_Players_0.LocalPlayer do
-    wait();
-end;
-local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-local v4 = nil;
-local v5 = nil;
-local v6 = nil;
-local l_RobloxGui_0 = game:GetService("CoreGui").RobloxGui;
-local v8 = require(l_RobloxGui_0.Modules.TenFootInterface):IsEnabled();
-local v9 = v8 and 100 or 70;
-local function _(v10, v11, v12, v13, v14) --[[ Line: 34 ]] --[[ Name: createImageLabel ]]
-    local l_ImageLabel_0 = Instance.new("ImageLabel");
-    l_ImageLabel_0.Name = v10;
-    l_ImageLabel_0.Size = v11;
-    l_ImageLabel_0.Position = v12;
-    l_ImageLabel_0.BackgroundTransparency = 1;
-    l_ImageLabel_0.Image = v13;
-    l_ImageLabel_0.Parent = v14;
-    return l_ImageLabel_0;
-end;
-local function v22(v17, v18, v19, v20) --[[ Line: 46 ]] --[[ Name: createTextLabel ]]
-    -- upvalues: v8 (copy)
-    local l_TextLabel_0 = Instance.new("TextLabel");
-    l_TextLabel_0.Name = v17;
-    l_TextLabel_0.Size = UDim2.new(1, -4, 0, v8 and 50 or 20);
-    l_TextLabel_0.Position = UDim2.new(0, 2, 0, v8 and -50 or -20);
-    l_TextLabel_0.BackgroundTransparency = 1;
-    l_TextLabel_0.TextXAlignment = v18;
-    l_TextLabel_0.Font = Enum.Font.SourceSans;
-    l_TextLabel_0.FontSize = v8 and Enum.FontSize.Size48 or Enum.FontSize.Size18;
-    l_TextLabel_0.TextColor3 = Color3.new(1, 1, 1);
-    l_TextLabel_0.TextStrokeTransparency = 0.5;
-    l_TextLabel_0.TextStrokeColor3 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805);
-    l_TextLabel_0.Text = v19;
-    l_TextLabel_0.Parent = v20;
-    return l_TextLabel_0;
-end;
-local l_Frame_0 = Instance.new("Frame");
-l_Frame_0.Name = "VehicleHudFrame";
-l_Frame_0.Size = UDim2.new(0, v8 and 316 or 158, 0, v8 and 50 or 14);
-l_Frame_0.Position = UDim2.new(0.5, -(l_Frame_0.Size.X.Offset / 2), 1, -v9 - l_Frame_0.Size.Y.Offset);
-l_Frame_0.BackgroundTransparency = 1;
-l_Frame_0.Visible = false;
-l_Frame_0.Parent = l_RobloxGui_0;
-local l_Frame_1 = Instance.new("Frame");
-l_Frame_1.Name = "SpeedBarClippingFrame";
-l_Frame_1.Size = UDim2.new(0, 0, 0, v8 and 24 or 4);
-l_Frame_1.Position = UDim2.new(0.5, v8 and -142 or -71, 0.5, v8 and -13 or -2);
-l_Frame_1.BackgroundTransparency = 1;
-l_Frame_1.ClipsDescendants = true;
-l_Frame_1.ZIndex = 2;
-l_Frame_1.Parent = l_Frame_0;
-local v25 = UDim2.new(1, 0, 1, 0);
-local v26 = UDim2.new(0, 0, 0, 1);
-local l_ImageLabel_1 = Instance.new("ImageLabel");
-l_ImageLabel_1.Name = "HudBG";
-l_ImageLabel_1.Size = v25;
-l_ImageLabel_1.Position = v26;
-l_ImageLabel_1.BackgroundTransparency = 1;
-l_ImageLabel_1.Image = "rbxasset://textures/ui/Vehicle/SpeedBarBKG.png";
-l_ImageLabel_1.Parent = l_Frame_0;
-v26 = UDim2.new(0, v8 and 284 or 142, 0, v8 and 24 or 4);
-l_ImageLabel_1 = UDim2.new(0.5, v8 and -142 or -71, 0.5, v8 and -13 or -2);
-local l_ImageLabel_2 = Instance.new("ImageLabel");
-l_ImageLabel_2.Name = "SpeedBG";
-l_ImageLabel_2.Size = v26;
-l_ImageLabel_2.Position = l_ImageLabel_1;
-l_ImageLabel_2.BackgroundTransparency = 1;
-l_ImageLabel_2.Image = "rbxasset://textures/ui/Vehicle/SpeedBarEmpty.png";
-l_ImageLabel_2.Parent = l_Frame_0;
-v25 = l_ImageLabel_2;
-v26 = UDim2.new(0, v8 and 284 or 142, 1, 0);
-l_ImageLabel_1 = UDim2.new(0, 0, 0, 0);
-l_ImageLabel_2 = Instance.new("ImageLabel");
-l_ImageLabel_2.Name = "SpeedBarImage";
-l_ImageLabel_2.Size = v26;
-l_ImageLabel_2.Position = l_ImageLabel_1;
-l_ImageLabel_2.BackgroundTransparency = 1;
-l_ImageLabel_2.Image = "rbxasset://textures/ui/Vehicle/SpeedBar.png";
-l_ImageLabel_2.Parent = l_Frame_1;
-v22("SpeedLabel", Enum.TextXAlignment.Left, "Speed", l_Frame_0);
-v26 = v22("SpeedText", Enum.TextXAlignment.Right, "0", l_Frame_0);
-l_ImageLabel_1 = function() --[[ Line: 89 ]] --[[ Name: getHumanoid ]]
-    -- upvalues: l_LocalPlayer_0 (copy)
-    local v29 = l_LocalPlayer_0 and l_LocalPlayer_0.Character;
-    if v29 then
-        for _, v31 in pairs(v29:GetChildren()) do
-            if v31:IsA("Humanoid") then
-                return v31;
-            end;
-        end;
-    end;
-end;
-l_ImageLabel_2 = function() --[[ Line: 100 ]] --[[ Name: onHeartbeat ]]
-    -- upvalues: v4 (ref), v26 (copy), v25 (copy), l_Frame_1 (copy), v8 (copy)
-    if v4 then
-        local l_magnitude_0 = v4.Velocity.magnitude;
-        v26.Text = tostring((math.min(math.floor(l_magnitude_0), 9999)));
-        local v33 = math.min(math.floor(l_magnitude_0 / v4.MaxSpeed * v25.Size.X.Offset), v25.Size.X.Offset);
-        l_Frame_1.Size = UDim2.new(0, v33, 0, v8 and 24 or 4);
-    end;
-end;
-local function v35(v34) --[[ Line: 110 ]] --[[ Name: onVehicleSeatChanged ]]
-    -- upvalues: l_Frame_0 (copy)
-    if v34 == "HeadsUpDisplay" then
-        l_Frame_0.Visible = not l_Frame_0.Visible;
-    end;
-end;
-local function v38(v36, v37) --[[ Line: 116 ]] --[[ Name: onSeated ]]
-    -- upvalues: v4 (ref), l_Frame_0 (copy), v5 (ref), l_RunService_0 (copy), l_ImageLabel_2 (copy), v6 (ref), v35 (copy)
-    if v36 then
-        if v37 and v37:IsA("VehicleSeat") then
-            v4 = v37;
-            l_Frame_0.Visible = v4.HeadsUpDisplay;
-            v5 = l_RunService_0.Heartbeat:connect(l_ImageLabel_2);
-            v6 = v4.Changed:connect(v35);
-            return;
-        end;
-    elseif v4 then
-        l_Frame_0.Visible = false;
-        v4 = nil;
-        if v5 then
-            v5:disconnect();
-            v5 = nil;
-        end;
-        if v6 then
-            v6:disconnect();
-            v6 = nil;
-        end;
-    end;
-end;
-local v39 = nil;
-local v40 = nil;
-local function _() --[[ Line: 143 ]] --[[ Name: disconnectSeatedConnection ]]
-    -- upvalues: v39 (ref)
-    if v39 then
-        v39:Disconnect();
-        v39 = nil;
-    end;
-end;
-local function _() --[[ Line: 150 ]] --[[ Name: disconnectChildAddedConnection ]]
-    -- upvalues: v40 (ref)
-    if v40 then
-        v40:Disconnect();
-        v40 = nil;
-    end;
-end;
-local function v46(v43) --[[ Line: 157 ]] --[[ Name: characterAdded ]]
-    -- upvalues: v39 (ref), v40 (ref), v38 (copy)
-    if v39 then
-        v39:Disconnect();
-        v39 = nil;
-    end;
-    if v40 then
-        v40:Disconnect();
-        v40 = nil;
-    end;
-    local l_Humanoid_0 = v43:FindFirstChildWhichIsA("Humanoid");
-    if l_Humanoid_0 then
-        v39 = l_Humanoid_0.Seated:connect(v38);
-        return;
-    else
-        v40 = v43.ChildAdded:Connect(function(v45) --[[ Line: 167 ]]
-            -- upvalues: v39 (ref), v40 (ref), v38 (ref)
-            if v45:IsA("Humanoid") then
-                if v39 then
-                    v39:Disconnect();
-                    v39 = nil;
-                end;
-                if v40 then
-                    v40:Disconnect();
-                    v40 = nil;
-                end;
-                v39 = v45.Seated:connect(v38);
-            end;
-        end);
-        return;
-    end;
-end;
-if l_LocalPlayer_0.Character then
-    v46(l_LocalPlayer_0.Character);
-end;
-l_LocalPlayer_0.CharacterAdded:connect(function(v47) --[[ Line: 178 ]]
-    -- upvalues: v4 (ref), l_Frame_0 (copy), v5 (ref), v6 (ref), v46 (copy)
-    if v4 then
-        l_Frame_0.Visible = false;
-        v4 = nil;
-        if v5 then
-            v5:disconnect();
-            v5 = nil;
-        end;
-        if v6 then
-            v6:disconnect();
-            v6 = nil;
-        end;
-    end;
-    v46(v47);
-end);
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+game:GetService("CorePackages")
+
+while not Players.LocalPlayer do
+	wait()
+end
+
+local LocalPlayer = Players.LocalPlayer
+local u4 = nil
+local u5 = nil
+local u6 = nil
+local RobloxGui = game:GetService("CoreGui").RobloxGui
+local v8 = require(RobloxGui.Modules.TenFootInterface):IsEnabled()
+local v9 = not v8 and 70 or 100
+
+local function createImageLabel(p1, p2, p3, p4, p5) -- line: 34
+	local ImageLabel = Instance.new("ImageLabel")
+
+	ImageLabel.Name = p1
+	ImageLabel.Size = p2
+	ImageLabel.Position = p3
+	ImageLabel.BackgroundTransparency = 1
+	ImageLabel.Image = p4
+	ImageLabel.Parent = p5
+
+	return ImageLabel
+end
+local function createTextLabel(p6, p7, p8, p9) -- line: 46
+	-- upvalues: v8 (copy)
+	local TextLabel = Instance.new("TextLabel")
+
+	TextLabel.Name = p6
+	TextLabel.Size = UDim2.new(1, -4, 0, not v8 and 20 or 50)
+	TextLabel.Position = UDim2.new(0, 2, 0, not v8 and -20 or -50)
+	TextLabel.BackgroundTransparency = 1
+	TextLabel.TextXAlignment = p7
+	TextLabel.Font = Enum.Font.SourceSans
+	TextLabel.FontSize = v8 and Enum.FontSize.Size48 or Enum.FontSize.Size18
+	TextLabel.TextColor3 = Color3.new(1, 1, 1)
+	TextLabel.TextStrokeTransparency = 0.5
+	TextLabel.TextStrokeColor3 = Color3.new(0.19215686274509805, 0.19215686274509805, 0.19215686274509805)
+	TextLabel.Text = p8
+	TextLabel.Parent = p9
+
+	return TextLabel
+end
+
+local Frame = Instance.new("Frame")
+
+Frame.Name = "VehicleHudFrame"
+Frame.Size = UDim2.new(0, not v8 and 158 or 316, 0, not v8 and 14 or 50)
+Frame.Position = UDim2.new(0.5, -(Frame.Size.X.Offset / 2), 1, -v9 - Frame.Size.Y.Offset)
+Frame.BackgroundTransparency = 1
+Frame.Visible = false
+Frame.Parent = RobloxGui
+
+local Frame2 = Instance.new("Frame")
+
+Frame2.Name = "SpeedBarClippingFrame"
+Frame2.Size = UDim2.new(0, 0, 0, not v8 and 4 or 24)
+Frame2.Position = UDim2.new(0.5, not v8 and -71 or -142, 0.5, not v8 and -2 or -13)
+Frame2.BackgroundTransparency = 1
+Frame2.ClipsDescendants = true
+Frame2.ZIndex = 2
+Frame2.Parent = Frame
+
+local uDim2 = UDim2.new(1, 0, 1, 0)
+local uDim2_2 = UDim2.new(0, 0, 0, 1)
+local ImageLabel = Instance.new("ImageLabel")
+
+ImageLabel.Name = "HudBG"
+ImageLabel.Size = uDim2
+ImageLabel.Position = uDim2_2
+ImageLabel.BackgroundTransparency = 1
+ImageLabel.Image = "rbxasset://textures/ui/Vehicle/SpeedBarBKG.png"
+ImageLabel.Parent = Frame
+
+local uDim2_3 = UDim2.new(0, not v8 and 142 or 284, 0, not v8 and 4 or 24)
+local uDim2_4 = UDim2.new(0.5, not v8 and -71 or -142, 0.5, not v8 and -2 or -13)
+local ImageLabel2 = Instance.new("ImageLabel")
+
+ImageLabel2.Name = "SpeedBG"
+ImageLabel2.Size = uDim2_3
+ImageLabel2.Position = uDim2_4
+ImageLabel2.BackgroundTransparency = 1
+ImageLabel2.Image = "rbxasset://textures/ui/Vehicle/SpeedBarEmpty.png"
+ImageLabel2.Parent = Frame
+
+local v20 = ImageLabel2
+local uDim2_5 = UDim2.new(0, not v8 and 142 or 284, 1, 0)
+local uDim2_6 = UDim2.new(0, 0, 0, 0)
+local ImageLabel3 = Instance.new("ImageLabel")
+
+ImageLabel3.Name = "SpeedBarImage"
+ImageLabel3.Size = uDim2_5
+ImageLabel3.Position = uDim2_6
+ImageLabel3.BackgroundTransparency = 1
+ImageLabel3.Image = "rbxasset://textures/ui/Vehicle/SpeedBar.png"
+ImageLabel3.Parent = Frame2
+createTextLabel("SpeedLabel", Enum.TextXAlignment.Left, "Speed", Frame)
+
+local v24 = createTextLabel("SpeedText", Enum.TextXAlignment.Right, "0", Frame)
+
+local function getHumanoid() -- line: 89
+	-- upvalues: LocalPlayer (copy)
+	local v45 = LocalPlayer and LocalPlayer.Character
+
+	if v45 then
+		for _, child in pairs(v45:GetChildren()) do
+			if child:IsA("Humanoid") then
+				return child
+			end
+		end
+	end
+end
+local function onHeartbeat() -- line: 100
+	-- upvalues: u4 (ref), v24 (copy), v20 (copy), Frame2 (copy), v8 (copy)
+	if u4 then
+		local magnitude = u4.Velocity.magnitude
+
+		v24.Text = tostring((math.min(math.floor(magnitude), 9999)))
+
+		local v49 = math.min(math.floor(magnitude / u4.MaxSpeed * v20.Size.X.Offset), v20.Size.X.Offset)
+
+		Frame2.Size = UDim2.new(0, v49, 0, not v8 and 4 or 24)
+	end
+end
+local function onVehicleSeatChanged(p10) -- line: 110
+	-- upvalues: Frame (copy)
+	if p10 == "HeadsUpDisplay" then
+		Frame.Visible = not Frame.Visible
+	end
+end
+local function onSeated(p11, p12) -- line: 116
+	-- upvalues: u4 (ref), Frame (copy), u5 (ref), RunService (copy), onHeartbeat (copy), u6 (ref), onVehicleSeatChanged (copy)
+	if p11 then
+		if p12 and p12:IsA("VehicleSeat") then
+			u4 = p12
+			Frame.Visible = u4.HeadsUpDisplay
+			u5 = RunService.Heartbeat:connect(onHeartbeat)
+			u6 = u4.Changed:connect(onVehicleSeatChanged)
+
+			return
+		end
+	elseif u4 then
+		Frame.Visible = false
+		u4 = nil
+
+		if u5 then
+			u5:disconnect()
+			u5 = nil
+		end
+
+		if u6 then
+			u6:disconnect()
+			u6 = nil
+		end
+	end
+end
+
+local u29 = nil
+local u30 = nil
+
+local function disconnectSeatedConnection() -- line: 143
+	-- upvalues: u29 (ref)
+	if u29 then
+		u29:Disconnect()
+		u29 = nil
+	end
+end
+local function disconnectChildAddedConnection() -- line: 150
+	-- upvalues: u30 (ref)
+	if u30 then
+		u30:Disconnect()
+		u30 = nil
+	end
+end
+local function characterAdded(p13) -- line: 157
+	-- upvalues: u29 (ref), u30 (ref), onSeated (copy)
+	if u29 then
+		u29:Disconnect()
+		u29 = nil
+	end
+
+	if u30 then
+		u30:Disconnect()
+		u30 = nil
+	end
+
+	local Humanoid = p13:FindFirstChildWhichIsA("Humanoid")
+
+	if Humanoid then
+		u29 = Humanoid.Seated:connect(onSeated)
+
+		return
+	end
+
+	u30 = p13.ChildAdded:Connect(function(child) -- line: 167
+		-- upvalues: u29 (ref), u30 (ref), onSeated (copy)
+		if child:IsA("Humanoid") then
+			if u29 then
+				u29:Disconnect()
+				u29 = nil
+			end
+
+			if u30 then
+				u30:Disconnect()
+				u30 = nil
+			end
+
+			u29 = child.Seated:connect(onSeated)
+		end
+	end)
+end
+
+if LocalPlayer.Character then
+	characterAdded(LocalPlayer.Character)
+end
+
+LocalPlayer.CharacterAdded:connect(function(p14) -- line: 178
+	-- upvalues: u4 (ref), Frame (copy), u5 (ref), u6 (ref), characterAdded (copy)
+	if u4 then
+		Frame.Visible = false
+		u4 = nil
+
+		if u5 then
+			u5:disconnect()
+			u5 = nil
+		end
+
+		if u6 then
+			u6:disconnect()
+			u6 = nil
+		end
+	end
+
+	characterAdded(p14)
+end)

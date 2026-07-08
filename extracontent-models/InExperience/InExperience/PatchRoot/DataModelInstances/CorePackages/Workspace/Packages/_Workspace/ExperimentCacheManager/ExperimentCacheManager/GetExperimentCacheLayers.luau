@@ -1,8 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ExperimentCacheManager").Parent;
-local v1 = require(l_Parent_0.Dash);
-local l_getAllAppUserLayers_0 = require(l_Parent_0.ExperimentLayers).getAllAppUserLayers;
-return function() --[[ Line: 5 ]]
-    -- upvalues: l_getAllAppUserLayers_0 (copy), v1 (copy)
-    local v3 = l_getAllAppUserLayers_0();
-    return v1.values(v3);
-end;
+local Parent = script:FindFirstAncestor("ExperimentCacheManager").Parent
+local Dash = require(Parent.Dash)
+local getAllAppUserLayers = require(Parent.ExperimentLayers).getAllAppUserLayers
+
+return function() -- line: 5
+	-- upvalues: getAllAppUserLayers (copy), Dash (copy)
+	local v4 = getAllAppUserLayers()
+
+	return Dash.values(v4)
+end

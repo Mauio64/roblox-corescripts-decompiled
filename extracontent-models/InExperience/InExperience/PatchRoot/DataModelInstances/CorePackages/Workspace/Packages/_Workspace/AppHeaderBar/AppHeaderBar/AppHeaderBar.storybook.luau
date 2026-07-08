@@ -1,57 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppHeaderBar");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dev.RoactCompat);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.Dev.RobloxAppUIBloxConfig);
-local v5 = require(l_Parent_0.UIBlox);
-v5.init(v4);
-local l_AppStyleProvider_0 = v5.App.Style.AppStyleProvider;
-local l_Constants_0 = v5.App.Style.Constants;
-local l_Light_0 = l_Constants_0.ThemeName.Light;
-local l_Dark_0 = l_Constants_0.ThemeName.Dark;
-local l_Gotham_0 = l_Constants_0.FontName.Gotham;
-v2.setGlobalConfig({
-    elementTracing = true
-});
-local v11 = {
-    Default = {
-        themeName = l_Light_0, 
-        fontName = l_Gotham_0
-    }, 
-    Light = {
-        themeName = l_Light_0, 
-        fontName = l_Gotham_0
-    }, 
-    Dark = {
-        themeName = l_Dark_0, 
-        fontName = l_Gotham_0
-    }
-};
-local v12 = {
-    Console = l_Constants_0.DeviceType.Console, 
-    Desktop = l_Constants_0.DeviceType.Desktop
-};
+local AppHeaderBar = script:FindFirstAncestor("AppHeaderBar")
+local AppHeaderBarParent = AppHeaderBar.Parent
+local RoactCompat = require(AppHeaderBarParent.Dev.RoactCompat)
+local React = require(AppHeaderBarParent.React)
+local RobloxAppUIBloxConfig = require(AppHeaderBarParent.Dev.RobloxAppUIBloxConfig)
+local UIBlox = require(AppHeaderBarParent.UIBlox)
+
+UIBlox.init(RobloxAppUIBloxConfig)
+
+local AppStyleProvider = UIBlox.App.Style.AppStyleProvider
+local Constants = UIBlox.App.Style.Constants
+local Light = Constants.ThemeName.Light
+local Dark = Constants.ThemeName.Dark
+local Gotham = Constants.FontName.Gotham
+
+RoactCompat.setGlobalConfig({
+	elementTracing = true
+})
+
+local t1 = {
+	Default = {
+		themeName = Light,
+		fontName = Gotham
+	},
+	Light = {
+		themeName = Light,
+		fontName = Gotham
+	},
+	Dark = {
+		themeName = Dark,
+		fontName = Gotham
+	}
+}
+local t2 = {
+	Console = Constants.DeviceType.Console,
+	Desktop = Constants.DeviceType.Desktop
+}
+
 return {
-    name = "AppHeaderBar", 
-    storyRoots = {
-        l_script_FirstAncestor_0
-    }, 
-    roact = v2, 
-    mapStory = function(v13) --[[ Line: 45 ]] --[[ Name: mapStory ]]
-        -- upvalues: v11 (copy), v3 (copy), l_AppStyleProvider_0 (copy), v12 (copy)
-        return function(v14) --[[ Line: 46 ]]
-            -- upvalues: v11 (ref), v3 (ref), l_AppStyleProvider_0 (ref), v12 (ref), v13 (copy)
-            local v15 = v11[v14.theme];
-            return v3.createElement(l_AppStyleProvider_0, {
-                style = {
-                    themeName = v15.themeName, 
-                    fontName = v15.fontName, 
-                    deviceType = v12[v14.platform], 
-                    settings = v14.settings
-                }
-            }, {
-                Child = v3.createElement(v13, v14)
-            });
-        end;
-    end
-};
+	name = "AppHeaderBar",
+	storyRoots = { AppHeaderBar },
+	roact = RoactCompat,
+	mapStory = function(p1) -- line: 45
+		-- upvalues: t1 (copy), React (copy), AppStyleProvider (copy), t2 (copy)
+		return function(p2) -- line: 46
+			-- upvalues: t1 (copy), React (copy), AppStyleProvider (copy), t2 (copy), p1 (copy)
+			local v16 = t1[p2.theme]
+
+			return React.createElement(AppStyleProvider, {
+				style = {
+					themeName = v16.themeName,
+					fontName = v16.fontName,
+					deviceType = t2[p2.platform],
+					settings = p2.settings
+				}
+			}, {
+				Child = React.createElement(p1, p2)
+			})
+		end
+	end
+}

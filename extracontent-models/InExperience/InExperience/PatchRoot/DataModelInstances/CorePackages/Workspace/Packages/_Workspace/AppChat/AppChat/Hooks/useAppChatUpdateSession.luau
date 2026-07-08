@@ -1,32 +1,38 @@
-local l_SessionService_0 = game:GetService("SessionService");
-local l_Parent_0 = script:FindFirstAncestor("AppChat").Parent;
-local l_useEffect_0 = require(l_Parent_0.React).useEffect;
-local l_String_0 = require(l_Parent_0.LuauPolyfill).String;
-local l_SessionType_0 = require(l_Parent_0.RobloxAppSessionization).SessionType;
-local v5 = game:DefineFastString("AppChatSessionName", "ChatPage");
-return function(v6, v7) --[[ Line: 19 ]]
-    -- upvalues: l_SessionService_0 (copy), l_useEffect_0 (copy), l_SessionType_0 (copy), v5 (copy), l_String_0 (copy)
-    local v8 = v7 or l_SessionService_0;
-    l_useEffect_0(function() --[[ Line: 22 ]]
-        -- upvalues: v6 (copy), l_SessionType_0 (ref), v8 (copy), v5 (ref), l_String_0 (ref)
-        if v6 then
-            local l_Level2a_0 = l_SessionType_0.StructuralIdentifier.Level2a;
-            if v8:SessionExists(l_Level2a_0) then
-                v8:SetSession(l_Level2a_0, v5, v5);
-                local l_v8_SessionTag_0 = v8:GetSessionTag(l_Level2a_0);
-                if game:GetEngineFeature("SessionGetSessionID") and l_String_0.startsWith(l_v8_SessionTag_0, "ingame") then
-                    local l_v8_SessionID_0 = v8:GetSessionID(l_Level2a_0);
-                    v8:SetMetadata(v5, "InGameSessionId", l_v8_SessionID_0);
-                end;
-            end;
-        elseif v8:SessionExists(v5) then
-            v8:RemoveSession(v5);
-        end;
-        return function() --[[ Line: 43 ]]
+local SessionService = game:GetService("SessionService")
+local Parent = script:FindFirstAncestor("AppChat").Parent
+local useEffect = require(Parent.React).useEffect
+local String = require(Parent.LuauPolyfill).String
+local SessionType = require(Parent.RobloxAppSessionization).SessionType
+local v6 = game:DefineFastString("AppChatSessionName", "ChatPage")
 
-        end;
-    end, {
-        v6, 
-        v8
-    });
-end;
+return function(b1: boolean, p1) -- line: 19
+	-- upvalues: SessionService (copy), useEffect (copy), SessionType (copy), v6 (copy), String (copy)
+	local v9 = p1 or SessionService
+
+	useEffect(function() -- line: 22
+		-- upvalues: b1 (copy), SessionType (copy), v9 (copy), v6 (copy), String (copy)
+		if b1 then
+			local Level2a = SessionType.StructuralIdentifier.Level2a
+
+			if v9:SessionExists(Level2a) then
+				v9:SetSession(Level2a, v6, v6)
+
+				local SessionTag = v9:GetSessionTag(Level2a)
+
+				if game:GetEngineFeature("SessionGetSessionID") and String.startsWith(SessionTag, "ingame") then
+					local SessionID = v9:GetSessionID(Level2a)
+
+					v9:SetMetadata(v6, "InGameSessionId", SessionID)
+				end
+			end
+		elseif v9:SessionExists(v6) then
+			v9:RemoveSession(v6)
+		end
+
+		return function() -- line: 43
+		end
+	end, {
+		b1,
+		v9
+	})
+end

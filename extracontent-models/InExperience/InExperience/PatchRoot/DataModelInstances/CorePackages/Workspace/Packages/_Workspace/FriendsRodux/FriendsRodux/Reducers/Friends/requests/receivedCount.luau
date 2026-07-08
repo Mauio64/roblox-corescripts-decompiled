@@ -1,19 +1,24 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsRodux");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Rodux);
-local l_Actions_0 = l_script_FirstAncestor_0.Actions;
-local _ = require(l_script_FirstAncestor_0.roduxFriendsTypes);
-local v5 = require(l_Actions_0.RequestReceivedCountUpdated);
-return function(v6) --[[ Line: 10 ]]
-    -- upvalues: v2 (copy), v5 (copy)
-    local l_friendsNetworking_0 = v6.friendsNetworking;
-    return v2.createReducer(0, {
-        [v5.name] = function(_, v9) --[[ Line: 14 ]]
-            assert(type(v9.payload.count) == "number", "Expected count to be a number");
-            return v9.payload.count;
-        end, 
-        [l_friendsNetworking_0.GetFriendRequestsCount.Succeeded.name] = function(_, v11) --[[ Line: 20 ]]
-            return v11.responseBody.count;
-        end
-    });
-end;
+local FriendsRodux = script:FindFirstAncestor("FriendsRodux")
+local FriendsRoduxParent = FriendsRodux.Parent
+local Rodux = require(FriendsRoduxParent.Rodux)
+local Actions = FriendsRodux.Actions
+
+require(FriendsRodux.roduxFriendsTypes)
+
+local RequestReceivedCountUpdated = require(Actions.RequestReceivedCountUpdated)
+
+return function(p1) -- line: 10
+	-- upvalues: Rodux (copy), RequestReceivedCountUpdated (copy)
+	local friendsNetworking = p1.friendsNetworking
+
+	return Rodux.createReducer(0, {
+		[RequestReceivedCountUpdated.name] = function(_, p3) -- line: 14
+			assert(type(p3.payload.count) == "number", "Expected count to be a number")
+
+			return p3.payload.count
+		end,
+		[friendsNetworking.GetFriendRequestsCount.Succeeded.name] = function(_, p5) -- line: 20
+			return p5.responseBody.count
+		end
+	})
+end

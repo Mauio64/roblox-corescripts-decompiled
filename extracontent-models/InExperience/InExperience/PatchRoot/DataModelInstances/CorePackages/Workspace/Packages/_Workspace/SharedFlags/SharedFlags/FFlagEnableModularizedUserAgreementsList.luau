@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableModularizedUserAgreementsList", false);
+return game:DefineFastFlag("EnableModularizedUserAgreementsList", false)

@@ -1,117 +1,138 @@
-local l_CoreGui_0 = game:GetService("CoreGui");
-local v1 = require(l_CoreGui_0.RobloxGui.Modules.Stats.StatsUtils);
-local v2 = {};
-v2.__index = v2;
-v2.new = function(v3, v4, v5) --[[ Line: 18 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    local v6 = {};
-    setmetatable(v6, v2);
-    v6._statType = v3;
-    v6._numSamples = v4;
-    v6._pauseBetweenSamples = v5;
-    v6._statName = v1.StatNames[v6._statType];
-    v6._statMaxName = v1.StatMaxNames[v6._statType];
-    v6._samples = {};
-    for v7 = 0, v4 - 1 do
-        v6._samples[v7] = 0;
-    end;
-    v6._oldestIndex = 0;
-    v6._listeners = {};
-    v6._nextListenerId = 1001;
-    return v6;
-end;
-v2.AddListener = function(v8, v9) --[[ Line: 45 ]] --[[ Name: AddListener ]]
-    local l__nextListenerId_0 = v8._nextListenerId;
-    v8._nextListenerId = v8._nextListenerId + 1;
-    v8._listeners[l__nextListenerId_0] = v9;
-    return l__nextListenerId_0;
-end;
-v2.RemoveListener = function(v11, v12) --[[ Line: 52 ]] --[[ Name: RemoveListener ]]
-    v11._listeners[v12] = nil;
-end;
-v2._notifyAllListeners = function(v13) --[[ Line: 56 ]] --[[ Name: _notifyAllListeners ]]
-    for _, v15 in pairs(v13._listeners) do
-        v15();
-    end;
-end;
-v2.StartListening = function(v16) --[[ Line: 62 ]] --[[ Name: StartListening ]]
-    if v16._listening == true then
-        return;
-    else
-        spawn(function() --[[ Line: 70 ]]
-            -- upvalues: v16 (copy)
-            v16._listening = true;
-            while v16._listening do
-                local v17 = v16:_getStatValue();
-                v16:_storeStatValue(v17);
-                v16:_notifyAllListeners();
-                wait(v16._pauseBetweenSamples);
-            end;
-        end);
-        return;
-    end;
-end;
-v2.StopListening = function(v18) --[[ Line: 81 ]] --[[ Name: StopListening ]]
-    v18._listening = false;
-end;
-v2.GetValues = function(v19) --[[ Line: 85 ]] --[[ Name: GetValues ]]
-    local v20 = {};
-    local v21 = nil;
-    for v22 = 0, v19._numSamples - 1 do
-        v21 = (v19._oldestIndex + v22) % v19._numSamples;
-        v20[v22 + 1] = v19._samples[v21];
-    end;
-    return v20;
-end;
-v2.GetAverage = function(v23) --[[ Line: 96 ]] --[[ Name: GetAverage ]]
-    local v24 = 0;
-    for v25 = 0, v23._numSamples - 1 do
-        v24 = v24 + v23._samples[v25];
-    end;
-    return v24 / v23._numSamples;
-end;
-v2.GetLatestValue = function(v26) --[[ Line: 105 ]] --[[ Name: GetLatestValue ]]
-    local v27 = (v26._oldestIndex + v26._numSamples - 1) % v26._numSamples;
-    return v26._samples[v27];
-end;
-v2._storeStatValue = function(v28, v29) --[[ Line: 111 ]] --[[ Name: _storeStatValue ]]
-    v28._samples[v28._oldestIndex] = v29;
-    v28._oldestIndex = (v28._oldestIndex + 1) % v28._numSamples;
-end;
-v2._getStatValue = function(v30) --[[ Line: 117 ]] --[[ Name: _getStatValue ]]
-    local l_Stats_0 = game:GetService("Stats");
-    if l_Stats_0 == nil then
-        return 0;
-    else
-        local l_PerformanceStats_0 = l_Stats_0:FindFirstChild("PerformanceStats");
-        if l_PerformanceStats_0 == nil then
-            return 0;
-        else
-            local l_l_PerformanceStats_0_FirstChild_0 = l_PerformanceStats_0:FindFirstChild(v30._statName);
-            if l_l_PerformanceStats_0_FirstChild_0 == nil then
-                return 0;
-            else
-                return l_l_PerformanceStats_0_FirstChild_0:GetValue();
-            end;
-        end;
-    end;
-end;
-v2.GetTarget = function(v34) --[[ Line: 137 ]] --[[ Name: GetTarget ]]
-    local l_Stats_1 = game:GetService("Stats");
-    if l_Stats_1 == nil then
-        return 0;
-    else
-        local l_PerformanceStats_1 = l_Stats_1:FindFirstChild("PerformanceStats");
-        if l_PerformanceStats_1 == nil then
-            return 0;
-        else
-            local l_l_PerformanceStats_1_FirstChild_0 = l_PerformanceStats_1:FindFirstChild(v34._statMaxName);
-            if l_l_PerformanceStats_1_FirstChild_0 == nil then
-                return 0;
-            else
-                return l_l_PerformanceStats_1_FirstChild_0:GetValue();
-            end;
-        end;
-    end;
-end;
-return v2;
+local CoreGui = game:GetService("CoreGui")
+local StatsUtils = require(CoreGui.RobloxGui.Modules.Stats.StatsUtils)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p1, p2, p3) -- line: 18
+	-- upvalues: t1 (copy), StatsUtils (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._statType = p1
+	t2._numSamples = p2
+	t2._pauseBetweenSamples = p3
+	t2._statName = StatsUtils.StatNames[t2._statType]
+	t2._statMaxName = StatsUtils.StatMaxNames[t2._statType]
+	t2._samples = {}
+
+	for i = 0, p2 - 1 do
+		t2._samples[i] = 0
+	end
+
+	t2._oldestIndex = 0
+	t2._listeners = {}
+	t2._nextListenerId = 1001
+
+	return t2
+end
+function t1.AddListener(p4, p5) -- line: 45
+	local _nextListenerId = p4._nextListenerId
+
+	p4._nextListenerId = p4._nextListenerId + 1
+	p4._listeners[_nextListenerId] = p5
+
+	return _nextListenerId
+end
+function t1.RemoveListener(p6, p7) -- line: 52
+	p6._listeners[p7] = nil
+end
+function t1._notifyAllListeners(p8) -- line: 56
+	for _, v in pairs(p8._listeners) do
+		v()
+	end
+end
+function t1.StartListening(p9) -- line: 62
+	if p9._listening == true then
+		return
+	end
+
+	spawn(function() -- line: 70
+		-- upvalues: p9 (copy)
+		p9._listening = true
+
+		while p9._listening do
+			local v38 = p9:_getStatValue()
+
+			p9:_storeStatValue(v38)
+			p9:_notifyAllListeners()
+			wait(p9._pauseBetweenSamples)
+		end
+	end)
+end
+function t1.StopListening(p10) -- line: 81
+	p10._listening = false
+end
+function t1.GetValues(p11) -- line: 85
+	local t3 = {}
+
+	for i = 0, p11._numSamples - 1 do
+		local v22 = (p11._oldestIndex + i) % p11._numSamples
+
+		t3[i + 1] = p11._samples[v22]
+	end
+
+	return t3
+end
+function t1.GetAverage(p12) -- line: 96
+	local n1 = 0
+
+	for i = 0, p12._numSamples - 1 do
+		n1 += p12._samples[i]
+	end
+
+	return n1 / p12._numSamples
+end
+function t1.GetLatestValue(p13) -- line: 105
+	local v27 = (p13._oldestIndex + p13._numSamples - 1) % p13._numSamples
+
+	return p13._samples[v27]
+end
+function t1._storeStatValue(p14, p15) -- line: 111
+	p14._samples[p14._oldestIndex] = p15
+	p14._oldestIndex = (p14._oldestIndex + 1) % p14._numSamples
+end
+function t1._getStatValue(p16) -- line: 117
+	local Stats = game:GetService("Stats")
+
+	if Stats == nil then
+		return 0
+	end
+
+	local PerformanceStats = Stats:FindFirstChild("PerformanceStats")
+
+	if PerformanceStats == nil then
+		return 0
+	end
+
+	local p16_statName = PerformanceStats:FindFirstChild(p16._statName)
+
+	if p16_statName == nil then
+		return 0
+	end
+
+	return p16_statName:GetValue()
+end
+function t1.GetTarget(p17) -- line: 137
+	local Stats = game:GetService("Stats")
+
+	if Stats == nil then
+		return 0
+	end
+
+	local PerformanceStats = Stats:FindFirstChild("PerformanceStats")
+
+	if PerformanceStats == nil then
+		return 0
+	end
+
+	local p17_statMaxName = PerformanceStats:FindFirstChild(p17._statMaxName)
+
+	if p17_statMaxName == nil then
+		return 0
+	end
+
+	return p17_statMaxName:GetValue()
+end
+
+return t1

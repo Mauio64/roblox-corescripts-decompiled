@@ -1,1 +1,1 @@
-return game:DefineFastFlag("UpdateTranslateInReportRevamp", false);
+return game:DefineFastFlag("UpdateTranslateInReportRevamp", false)

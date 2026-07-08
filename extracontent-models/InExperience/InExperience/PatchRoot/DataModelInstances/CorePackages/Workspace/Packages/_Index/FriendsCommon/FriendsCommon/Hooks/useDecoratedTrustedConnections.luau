@@ -1,65 +1,72 @@
-local l_Parent_0 = script:FindFirstAncestor("FriendsCommon").Parent;
-local v1 = require(l_Parent_0.React);
-local v2 = require(l_Parent_0.Cryo);
-local v3 = require(l_Parent_0.SignalsReact);
-local l_FFlagConnectionManagementChips_0 = require(l_Parent_0.SharedFlags).FFlagConnectionManagementChips;
-local v5 = require(l_Parent_0.DataHydration);
-local _ = require(l_Parent_0.GraphQLServer);
-local v7 = if l_FFlagConnectionManagementChips_0 then v5.TrustedConnections.TrustedConnectionsStore.get() else nil;
-return function(v8) --[[ Line: 17 ]] --[[ Name: useDecoratedTrustedConnections ]]
-    -- upvalues: l_FFlagConnectionManagementChips_0 (copy), v7 (copy), v3 (copy), v1 (copy), v2 (copy)
-    if not l_FFlagConnectionManagementChips_0 then
-        return;
-    else
-        local v9 = v7.getUserTrustedConnections();
-        local v10 = v3.useSignalState(v9.data);
-        local v14 = v1.useMemo(function() --[[ Line: 25 ]]
-            -- upvalues: v8 (copy)
-            if not v8 then
-                return {};
-            else
-                local v11 = {};
-                for _, v13 in v8 do
-                    v11[v13.id] = true;
-                end;
-                return v11;
-            end;
-        end, {
-            v8
-        });
-        local v18 = v1.useMemo(function() --[[ Line: 37 ]]
-            -- upvalues: v10 (copy)
-            if not v10 then
-                return {};
-            else
-                local v15 = {};
-                for _, v17 in v10 do
-                    v15[v17.id] = true;
-                end;
-                return v15;
-            end;
-        end, {
-            v10
-        });
-        return (v1.useMemo(function() --[[ Line: 49 ]]
-            -- upvalues: v10 (copy), v2 (ref), v8 (copy), v18 (copy), v14 (copy)
-            if not v10 then
-                return {};
-            else
-                local v20 = v2.List.filter(v8 or {}, function(v19) --[[ Line: 54 ]]
-                    -- upvalues: v18 (ref)
-                    return v18[v19.id] == true;
-                end);
-                local v22 = v2.List.filter(v10, function(v21) --[[ Line: 58 ]]
-                    -- upvalues: v14 (ref)
-                    return v14[v21.id] ~= true;
-                end);
-                return v2.List.join(v20, v22);
-            end;
-        end, {
-            v18, 
-            v10, 
-            v14
-        }));
-    end;
-end;
+local Parent = script:FindFirstAncestor("FriendsCommon").Parent
+local React = require(Parent.React)
+local Cryo = require(Parent.Cryo)
+local SignalsReact = require(Parent.SignalsReact)
+local FFlagConnectionManagementChips = require(Parent.SharedFlags).FFlagConnectionManagementChips
+local DataHydration = require(Parent.DataHydration)
+
+require(Parent.GraphQLServer)
+
+local v7 = if not FFlagConnectionManagementChips then nil else DataHydration.TrustedConnections.TrustedConnectionsStore.get()
+
+local function useDecoratedTrustedConnections(t1: {[any]: any}?) -- line: 17
+	-- upvalues: FFlagConnectionManagementChips (copy), v7 (copy), SignalsReact (copy), React (copy), Cryo (copy)
+	if not FFlagConnectionManagementChips then
+		return
+	end
+
+	local v10 = v7.getUserTrustedConnections()
+	local v11 = SignalsReact.useSignalState(v10.data)
+	local v12 = React.useMemo(function() -- line: 25
+		-- upvalues: t1 (copy)
+		if not t1 then
+			return {}
+		end
+
+		local t2 = {}
+
+		for _, v16 in t1 do
+			t2[v16.id] = true
+		end
+
+		return t2
+	end, { t1 })
+	local v13 = React.useMemo(function() -- line: 37
+		-- upvalues: v11 (copy)
+		if not v11 then
+			return {}
+		end
+
+		local t3 = {}
+
+		for _, v19 in v11 do
+			t3[v19.id] = true
+		end
+
+		return t3
+	end, { v11 })
+
+	return (React.useMemo(function() -- line: 49
+		-- upvalues: v11 (copy), Cryo (copy), t1 (copy), v13 (copy), v12 (copy)
+		if not v11 then
+			return {}
+		end
+
+		local v20 = Cryo.List.filter(t1 or {}, function(p1) -- line: 54
+			-- upvalues: v13 (copy)
+			return v13[p1.id] == true
+		end)
+		local v21 = Cryo.List.filter(v11, function(p2) -- line: 58
+			-- upvalues: v12 (copy)
+			return v12[p2.id] ~= true
+		end)
+
+		return Cryo.List.join(v20, v21)
+	end, {
+		v13,
+		v11,
+		v12
+	}))
+end
+
+return useDecoratedTrustedConnections

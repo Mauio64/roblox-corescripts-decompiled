@@ -1,27 +1,28 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Actions_0 = script.Parent.Parent.Actions;
-local v4 = require(l_Actions_0.AddPlayerToTeam);
-local v5 = require(l_Actions_0.RemovePlayerFromTeam);
-local v6 = require(l_Actions_0.RemovePlayer);
-return (v1.createReducer({}, {
-    [v4.name] = function(v7, v8) --[[ Line: 12 ]]
-        -- upvalues: v2 (copy)
-        return v2.Dictionary.join(v7, {
-            [v8.player.UserId] = v8.team
-        });
-    end, 
-    [v5.name] = function(v9, v10) --[[ Line: 18 ]]
-        -- upvalues: v2 (copy)
-        return v2.Dictionary.join(v9, {
-            [v10.player.UserId] = v2.None
-        });
-    end, 
-    [v6.name] = function(v11, v12) --[[ Line: 24 ]]
-        -- upvalues: v2 (copy)
-        return v2.Dictionary.join(v11, {
-            [v12.player.UserId] = v2.None
-        });
-    end
-}));
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local Actions = script.Parent.Parent.Actions
+local AddPlayerToTeam = require(Actions.AddPlayerToTeam)
+local RemovePlayerFromTeam = require(Actions.RemovePlayerFromTeam)
+local RemovePlayer = require(Actions.RemovePlayer)
+
+return (Rodux.createReducer({}, {
+	[AddPlayerToTeam.name] = function(p1, p2) -- line: 12
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p1, {
+			[p2.player.UserId] = p2.team
+		})
+	end,
+	[RemovePlayerFromTeam.name] = function(p3, p4) -- line: 18
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p3, {
+			[p4.player.UserId] = Cryo.None
+		})
+	end,
+	[RemovePlayer.name] = function(p5, p6) -- line: 24
+		-- upvalues: Cryo (copy)
+		return Cryo.Dictionary.join(p5, {
+			[p6.player.UserId] = Cryo.None
+		})
+	end
+}))

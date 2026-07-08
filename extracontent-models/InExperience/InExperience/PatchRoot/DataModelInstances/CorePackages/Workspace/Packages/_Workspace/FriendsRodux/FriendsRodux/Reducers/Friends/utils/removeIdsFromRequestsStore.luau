@@ -1,10 +1,13 @@
-local l_Parent_0 = script:FindFirstAncestor("FriendsRodux").Parent;
-local v1 = require(l_Parent_0.llama);
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: v1 (copy)
-    local v4 = {};
-    for _, v6 in pairs(v3) do
-        v4[v6] = v1.None;
-    end;
-    return v1.Dictionary.join(v2, v4);
-end;
+local Parent = script:FindFirstAncestor("FriendsRodux").Parent
+local llama = require(Parent.llama)
+
+return function(p1, t1: {[any]: any}) -- line: 5
+	-- upvalues: llama (copy)
+	local t2 = {}
+
+	for _, v in pairs(t1) do
+		t2[v] = llama.None
+	end
+
+	return llama.Dictionary.join(p1, t2)
+end

@@ -1,3 +1,4 @@
 return {
-    HomepageLaunch = "HomepageLaunch"
-};
+	HomepageLaunch = "HomepageLaunch",
+	ChartsLaunch = "ChartsLaunch"
+}

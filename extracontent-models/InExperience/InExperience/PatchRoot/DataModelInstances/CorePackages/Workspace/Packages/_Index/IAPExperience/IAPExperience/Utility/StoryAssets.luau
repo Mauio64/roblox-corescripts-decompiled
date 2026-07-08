@@ -1,12 +1,13 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Images_0 = require(l_Parent_0.UIBlox).App.ImageSet.Images;
-local v2 = l_Images_0["icons/graphic/premium_xlarge"];
-local v3 = l_Images_0["icons/controls/keys/xboxA"];
-local v4 = l_Images_0["icons/controls/keys/xboxB"];
+local ParentParent = script.Parent.Parent.Parent
+local Images = require(ParentParent.UIBlox).App.ImageSet.Images
+local v3 = Images["icons/graphic/premium_xlarge"]
+local v4 = Images["icons/controls/keys/xboxA"]
+local v5 = Images["icons/controls/keys/xboxB"]
+
 return {
-    ICONS = {
-        PREMIUM_ICON_LARGE = v2, 
-        A_ICON = v3, 
-        B_ICON = v4
-    }
-};
+	ICONS = {
+		PREMIUM_ICON_LARGE = v3,
+		A_ICON = v4,
+		B_ICON = v5
+	}
+}

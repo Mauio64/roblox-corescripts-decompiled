@@ -1,1 +1,1 @@
-return game:DefineFastFlag("LuaMultiPageSignupForceDeviceBoundPasskey", false);
+return game:DefineFastFlag("LuaMultiPageSignupForceDeviceBoundPasskey", false)

@@ -1,37 +1,54 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.ScrollView);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v6 = require(script.Parent.useScrollBarPadding);
-local l_useDialogVariants_0 = require(script.Parent.Parent.useDialogVariants).useDialogVariants;
-local v8 = require(script.Parent.Parent.useDialog);
-return function(v9) --[[ Line: 18 ]] --[[ Name: DialogContent ]]
-    -- upvalues: v6 (copy), l_useDialogVariants_0 (copy), v8 (copy), v2 (copy), v3 (copy), v5 (copy)
-    local v10, v11, v12 = v6();
-    local v13 = l_useDialogVariants_0();
-    v9.testId = ("%*--content"):format(v8().testId);
-    local v14 = (v9.Selectable == nil or v9.Selectable) and v10;
-    return v2.createElement(v3, v5(v9, {
-        scroll = {
-            AutomaticCanvasSize = Enum.AutomaticSize.Y, 
-            CanvasSize = UDim2.new(0, 0, 0, 0)
-        }, 
-        selection = {
-            Selectable = v14, 
-            NextSelectionUp = v9.NextSelectionUp, 
-            NextSelectionDown = v9.NextSelectionDown, 
-            NextSelectionLeft = v9.NextSelectionLeft, 
-            NextSelectionRight = v9.NextSelectionRight
-        }, 
-        onAbsoluteCanvasSizeChanged = v12, 
-        onAbsoluteWindowSizeChanged = v12, 
-        tag = v13.content.tag
-    }), {
-        ScrollPadding = v2.createElement("UIPadding", {
-            PaddingRight = UDim.new(0, v11)
-        }), 
-        ScrollContent = v2.createElement(v2.Fragment, nil, v9.children)
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ScrollView = require(Foundation.Components.ScrollView)
+
+require(Foundation.Components.Types)
+
+local Visibility = require(Foundation.Enums.Visibility)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local useScrollBarPadding = require(script.Parent.useScrollBarPadding)
+local useDialogVariants = require(script.Parent.Parent.useDialogVariants).useDialogVariants
+local useDialog = require(script.Parent.Parent.useDialog)
+
+local function DialogContent(p1) -- line: 19
+	-- upvalues: useScrollBarPadding (copy), useDialogVariants (copy), useDialog (copy), React (copy), ScrollView (copy), withCommonProps (copy), Visibility (copy)
+	local v12, v13, v14 = useScrollBarPadding()
+	local v15 = useDialogVariants()
+
+	p1.testId = `{ useDialog().testId }--content`
+
+	local v16 = (p1.Selectable == nil or p1.Selectable) and v12
+
+	return React.createElement(ScrollView, withCommonProps(p1, {
+		scroll = {
+			AutomaticCanvasSize = Enum.AutomaticSize.Y,
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			scrollBarVisibility = if not v12 then Visibility.None else Visibility.Auto
+		},
+		layout = {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalFlex = Enum.UIFlexAlignment.Fill,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		},
+		selection = {
+			Selectable = v16,
+			NextSelectionUp = p1.NextSelectionUp,
+			NextSelectionDown = p1.NextSelectionDown,
+			NextSelectionLeft = p1.NextSelectionLeft,
+			NextSelectionRight = p1.NextSelectionRight
+		},
+		onAbsoluteCanvasSizeChanged = v14,
+		onAbsoluteWindowSizeChanged = v14,
+		tag = v15.content.tag
+	}), {
+		ScrollPadding = React.createElement("UIPadding", {
+			PaddingRight = v13:map(function(n1: number) -- line: 55
+				return UDim.new(0, n1)
+			end)
+		}),
+		ScrollContent = React.createElement(React.Fragment, nil, p1.children)
+	})
+end
+
+return DialogContent

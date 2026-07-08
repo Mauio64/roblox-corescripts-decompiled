@@ -1,61 +1,86 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Songbird");
-local v1 = require(l_script_FirstAncestor_0.Parent.Cryo);
-local v2 = require(l_script_FirstAncestor_0.Parent.React);
-local l_useState_0 = v2.useState;
-local l_useCallback_0 = v2.useCallback;
-local v5 = v2.createContext(nil);
-local function v6() --[[ Line: 28 ]] --[[ Name: noOp ]]
+local Songbird = script:FindFirstAncestor("Songbird")
+local Cryo = require(Songbird.Parent.Cryo)
+local React = require(Songbird.Parent.React)
+local useState = React.useState
+local useCallback = React.useCallback
+local v6 = React.createContext(nil)
 
-end;
-local v7 = {
-    value = {
-        assetId = nil, 
-        isVisible = false, 
-        setVisibility = v6, 
-        setAssetId = v6
-    }
-};
+local function noOp() -- line: 32
+end
+
+local t1 = {
+	value = {
+		assetId = nil,
+		isVisible = false,
+		hasThumbnail = false,
+		setVisibility = noOp,
+		setAssetId = noOp,
+		setHasThumbnail = noOp
+	}
+}
+
 return {
-    Context = v5, 
-    Provider = function(v8) --[[ Line: 41 ]]
-        -- upvalues: v1 (copy), v7 (copy), l_useState_0 (copy), l_useCallback_0 (copy), v2 (copy), v5 (copy)
-        local v9 = v1.Dictionary.join(v7, v8);
-        local l_isVisible_0 = v9.value.isVisible;
-        local v11, v12 = l_useState_0(l_isVisible_0);
-        local v14 = l_useCallback_0(function(v13) --[[ Line: 47 ]]
-            -- upvalues: v11 (copy), v12 (copy)
-            if v11 ~= v13 then
-                v12(v13);
-            end;
-        end, {
-            v11
-        });
-        local v15, v16 = l_useState_0(nil);
-        local v18 = l_useCallback_0(function(v17) --[[ Line: 54 ]]
-            -- upvalues: v15 (copy), v16 (copy)
-            if v15 ~= v17 then
-                v16(v17);
-            end;
-        end, {
-            v15
-        });
-        return v2.createElement(v5.Provider, {
-            value = {
-                isVisible = v11, 
-                setVisibility = v14, 
-                assetId = v15, 
-                setAssetId = v18
-            }
-        }, v9.children);
-    end, 
-    use = function() --[[ Line: 70 ]] --[[ Name: use ]]
-        -- upvalues: v2 (copy), v5 (copy)
-        local v19 = v2.useContext(v5);
-        if v19 then
-            return v19;
-        else
-            error("attempt to use ReportAudioPopupContext with no provider. Add `ReportAudioPopupContext.Provider` to the React tree and try again");
-            return;
-        end;
-    end
-};
+	Context = v6,
+	Provider = function(t2: {[any]: any}) -- line: 47
+		-- upvalues: Cryo (copy), t1 (copy), useState (copy), useCallback (copy), React (copy), v6 (copy)
+		local v10 = Cryo.Dictionary.join(t1, t2)
+		local isVisible = v10.value.isVisible
+		local v12, v13 = useState(isVisible)
+		local v14 = useCallback(function(b1: boolean) -- line: 53
+			-- upvalues: v13 (copy)
+			v13(function(p1) -- line: 54
+				-- upvalues: b1 (copy)
+				if p1 ~= b1 then
+					return b1
+				end
+
+				return p1
+			end)
+		end, {})
+		local v15, v16 = useState(nil)
+		local v17 = useCallback(function(n1: number?) -- line: 63
+			-- upvalues: v16 (copy)
+			v16(function(p2) -- line: 64
+				-- upvalues: n1 (copy)
+				if p2 ~= n1 then
+					return n1
+				end
+
+				return p2
+			end)
+		end, {})
+		local v18, v19 = useState(v10.value.hasThumbnail or false)
+		local v20 = useCallback(function(b2: boolean) -- line: 73
+			-- upvalues: v19 (copy)
+			v19(function(p3) -- line: 74
+				-- upvalues: b2 (copy)
+				if p3 ~= b2 then
+					return b2
+				end
+
+				return p3
+			end)
+		end, {})
+
+		return React.createElement(v6.Provider, {
+			value = {
+				isVisible = v12,
+				setVisibility = v14,
+				assetId = v15,
+				setAssetId = v17,
+				hasThumbnail = v18,
+				setHasThumbnail = v20
+			}
+		}, v10.children)
+	end,
+	use = function() -- line: 94
+		-- upvalues: React (copy), v6 (copy)
+		local v21 = React.useContext(v6)
+
+		if v21 then
+			return v21
+		end
+
+		error("attempt to use ReportAudioPopupContext with no provider. Add `ReportAudioPopupContext.Provider` to the React tree and try again")
+	end
+}

@@ -1,80 +1,84 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FocusNavigationUtils");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_Parent_0.ReactFocusNavigation);
-local _ = require(l_script_FirstAncestor_0.FocusNavigableSurfaceIdentifierEnum);
-local v6 = require(l_script_FirstAncestor_0.useFocusNavigableSurfaceRegistryConnection);
-local v7 = require(l_script_FirstAncestor_0.useAutoFocus);
-local v8 = require(l_script_FirstAncestor_0.useDescendantHasFocus);
-local v9 = require(l_script_FirstAncestor_0.useLastInputMode);
-local v10 = {};
-return function(v11) --[[ Line: 44 ]] --[[ Name: useFocusRoot ]]
-    -- upvalues: v3 (copy), v10 (copy), v4 (copy), v6 (copy), v8 (copy), v7 (copy), v9 (copy), l_GuiService_0 (copy)
-    local v12 = nil;
-    local _ = nil;
-    local v14 = nil;
-    local v15, v16 = v3.useState(nil);
-    v12 = v15;
-    v14 = v16;
-    v15 = v11.eventMap or v10;
-    v16 = v4.useEventMap(v15, v14);
-    local v17 = v11.eventHandlers or v10;
-    local v18 = v4.useEventHandlerMap(v17, v16);
-    local v19 = v11.isFocusable == nil or v11.isFocusable;
-    local v20 = v11.shouldRestoreFocus == nil or v11.shouldRestoreFocus;
-    local v21 = v4.useMostRecentFocusBehavior(v18);
-    local v22 = if v20 then v21 else v18;
-    v6(v12, v11.surfaceIdentifier, v19);
-    local v23 = v8(v12);
-    local v24 = v7({
-        v12
-    }, 0.1);
-    local v25 = v9() == "Focus";
-    local v26 = v11.isAutoFocusRoot and v19 and v25 and v12 and not v23;
-    v3.useEffect(function() --[[ Line: 73 ]]
-        -- upvalues: v26 (copy), v24 (copy)
-        local v27 = nil;
-        if v26 then
-            v27 = v24();
-        end;
-        return function() --[[ Line: 78 ]]
-            -- upvalues: v27 (ref)
-            if v27 then
-                v27.cancel();
-            end;
-        end;
-    end, {
-        v26, 
-        v24
-    });
-    local v28 = v3.useRef(v12);
-    v3.useEffect(function() --[[ Line: 86 ]]
-        -- upvalues: v12 (ref), v28 (copy)
-        if v12 then
-            v28.current = v12;
-        end;
-    end, {
-        v12
-    });
-    v3.useEffect(function() --[[ Line: 92 ]]
-        -- upvalues: v28 (copy), l_GuiService_0 (ref)
-        return function() --[[ Line: 93 ]]
-            -- upvalues: v28 (ref), l_GuiService_0 (ref)
-            if not v28.current then
-                return;
-            else
-                local l_SelectedCoreObject_0 = l_GuiService_0.SelectedCoreObject;
-                if not l_SelectedCoreObject_0 then
-                    return;
-                else
-                    if l_SelectedCoreObject_0:IsDescendantOf(v28.current) or not l_SelectedCoreObject_0:IsDescendantOf(game) then
-                        l_GuiService_0.SelectedCoreObject = nil;
-                    end;
-                    return;
-                end;
-            end;
-        end;
-    end, {});
-    return v22;
-end;
+local FocusNavigationUtils = script:FindFirstAncestor("FocusNavigationUtils")
+local FocusNavigationUtilsParent = FocusNavigationUtils.Parent
+local GuiService = game:GetService("GuiService")
+local React = require(FocusNavigationUtilsParent.React)
+local ReactFocusNavigation = require(FocusNavigationUtilsParent.ReactFocusNavigation)
+
+require(FocusNavigationUtils.FocusNavigableSurfaceIdentifierEnum)
+
+local useFocusNavigableSurfaceRegistryConnection = require(FocusNavigationUtils.useFocusNavigableSurfaceRegistryConnection)
+local useAutoFocus = require(FocusNavigationUtils.useAutoFocus)
+local useDescendantHasFocus = require(FocusNavigationUtils.useDescendantHasFocus)
+local useLastInputMode = require(FocusNavigationUtils.useLastInputMode)
+local t1 = {}
+
+local function useFocusRoot(t2: {[any]: any}) -- line: 44
+	-- upvalues: React (copy), t1 (copy), ReactFocusNavigation (copy), useFocusNavigableSurfaceRegistryConnection (copy), useDescendantHasFocus (copy), useAutoFocus (copy), useLastInputMode (copy), GuiService (copy)
+	local v13, v14 = React.useState(nil)
+	local u15 = v13
+	local v16 = t2.eventMap or t1
+	local v17 = ReactFocusNavigation.useEventMap(v16, v14)
+	local v18 = t2.eventHandlers or t1
+	local v19 = ReactFocusNavigation.useEventHandlerMap(v18, v17)
+	local v20 = t2.isFocusable == nil or t2.isFocusable
+	local v21 = t2.shouldRestoreFocus == nil or t2.shouldRestoreFocus
+	local v22 = ReactFocusNavigation.useMostRecentFocusBehavior(v19)
+
+	useFocusNavigableSurfaceRegistryConnection(u15, t2.surfaceIdentifier, v20)
+
+	local v23 = useDescendantHasFocus(u15)
+	local v24 = useAutoFocus({ u15 }, 0.1)
+	local v25 = useLastInputMode() == "Focus"
+	local v26 = t2.isAutoFocusRoot and (v20 and (v25 and (u15 and not v23)))
+
+	React.useEffect(function() -- line: 73
+		-- upvalues: v26 (copy), v24 (copy)
+		local u28 = nil
+
+		if v26 then
+			u28 = v24()
+		end
+
+		return function() -- line: 78
+			-- upvalues: u28 (ref)
+			if u28 then
+				u28.cancel()
+			end
+		end
+	end, {
+		v26,
+		v24
+	})
+
+	local v27 = React.useRef(u15)
+
+	React.useEffect(function() -- line: 86
+		-- upvalues: u15 (ref), v27 (copy)
+		if u15 then
+			v27.current = u15
+		end
+	end, { u15 })
+	React.useEffect(function() -- line: 92
+		-- upvalues: v27 (copy), GuiService (copy)
+		return function() -- line: 93
+			-- upvalues: v27 (copy), GuiService (copy)
+			if not v27.current then
+				return
+			end
+
+			local SelectedCoreObject = GuiService.SelectedCoreObject
+
+			if not SelectedCoreObject then
+				return
+			end
+
+			if SelectedCoreObject:IsDescendantOf(v27.current) or not SelectedCoreObject:IsDescendantOf(game) then
+				GuiService.SelectedCoreObject = nil
+			end
+		end
+	end, {})
+
+	return if not v21 then v19 else v22
+end
+
+return useFocusRoot

@@ -1,61 +1,68 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_script_FirstAncestor_0.Components.DateTimePicker.DateTimeUtilities);
-local v4 = require(l_script_FirstAncestor_0.Components.Dropdown);
-local v5 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local l_LocalizationService_0 = require(l_script_FirstAncestor_0.Utility.Wrappers).Services.LocalizationService;
-local v7 = require(l_script_FirstAncestor_0.Utility.Localization.Translator);
-local v8 = require(l_script_FirstAncestor_0.Utility.useScaledValue);
-local v9 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local v10 = {
-    dateTime = DateTime.fromLocalTime(2000, 1, 1, 0, 0, 0), 
-    testId = "--foundation-time-dropdown"
-};
-return function(v11) --[[ Line: 35 ]] --[[ Name: TimeSelector ]]
-    -- upvalues: v9 (copy), v10 (copy), v3 (copy), v8 (copy), l_LocalizationService_0 (copy), v2 (copy), v4 (copy), v7 (copy), v5 (copy)
-    local v12 = v9(v11, v10);
-    local v13 = v3.roundDownToNearestMinute(v12.dateTime);
-    local v14 = v13:ToLocalTime();
-    local v15 = v8(200);
-    local function v22() --[[ Line: 43 ]]
-        -- upvalues: v14 (copy), v13 (copy), v3 (ref), l_LocalizationService_0 (ref)
-        local v16 = {};
-        local v17 = v14.Minute % 30 ~= 0;
-        for v18 = 0, 47 do
-            local v19 = math.floor(v18 / 2);
-            local v20 = v18 % 2 * 30;
-            local v21 = DateTime.fromLocalTime(v14.Year, v14.Month, v14.Day, v19, v20, v14.Second);
-            if v17 and v13.UnixTimestamp < v21.UnixTimestamp then
-                table.insert(v16, {
-                    icon = nil, 
-                    id = v13.UnixTimestamp, 
-                    isChecked = true, 
-                    isDisabled = true, 
-                    text = v13:FormatLocalTime(v3.TIME_COMPOSITE_TOKEN, l_LocalizationService_0.RobloxLocaleId)
-                });
-                v17 = false;
-            end;
-            table.insert(v16, {
-                icon = nil, 
-                id = v21.UnixTimestamp, 
-                isChecked = v21.UnixTimestamp == v13.UnixTimestamp, 
-                isDisabled = v21.UnixTimestamp == v13.UnixTimestamp, 
-                text = v21:FormatLocalTime(v3.TIME_COMPOSITE_TOKEN, l_LocalizationService_0.RobloxLocaleId)
-            });
-        end;
-        return v16;
-    end;
-    return v2.createElement(v4.Root, {
-        items = v22(), 
-        label = "", 
-        LayoutOrder = v12.layoutOrder, 
-        maxHeight = v15, 
-        onItemChanged = v12.onItemChanged, 
-        placeholder = v7:FormatByKey("CommonUI.Controls.Label.SelectTheTime"), 
-        size = v5.Medium, 
-        testId = v12.testId, 
-        width = v12.width, 
-        value = v13.UnixTimestamp
-    });
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local DateTimeUtilities = require(Foundation.Components.DateTimePicker.DateTimeUtilities)
+local Dropdown = require(Foundation.Components.Dropdown)
+local InputSize = require(Foundation.Enums.InputSize)
+local LocalizationService = require(Foundation.Utility.Wrappers).Services.LocalizationService
+local Translator = require(Foundation.Utility.Localization.Translator)
+local useScaledValue = require(Foundation.Utility.useScaledValue)
+local withDefaults = require(Foundation.Utility.withDefaults)
+local t1 = {
+	testId = "--foundation-time-dropdown",
+	dateTime = DateTime.fromLocalTime(2000, 1, 1, 0, 0, 0)
+}
+
+local function TimeSelector(t2: {[any]: any}) -- line: 35
+	-- upvalues: withDefaults (copy), t1 (copy), DateTimeUtilities (copy), useScaledValue (copy), LocalizationService (copy), React (copy), Dropdown (copy), Translator (copy), InputSize (copy)
+	local v14 = withDefaults(t2, t1)
+	local v15 = DateTimeUtilities.roundDownToNearestMinute(v14.dateTime)
+	local v16 = v15:ToLocalTime()
+	local v17 = useScaledValue(200)
+
+	return React.createElement(Dropdown.Root, {
+		label = "",
+		items = (function() -- line: 43
+			-- upvalues: v16 (copy), v15 (copy), DateTimeUtilities (copy), LocalizationService (copy)
+			local t3 = {}
+			local v19 = v16.Minute % 30 ~= 0
+
+			for i = 0, 47 do
+				local v21 = math.floor(i / 2)
+				local v22 = i % 2 * 30
+				local dateTime = DateTime.fromLocalTime(v16.Year, v16.Month, v16.Day, v21, v22, v16.Second)
+
+				if v19 and v15.UnixTimestamp < dateTime.UnixTimestamp then
+					table.insert(t3, {
+						icon = nil,
+						isChecked = true,
+						isDisabled = true,
+						id = v15.UnixTimestamp,
+						text = v15:FormatLocalTime(DateTimeUtilities.TIME_COMPOSITE_TOKEN, LocalizationService.RobloxLocaleId)
+					})
+					v19 = false
+				end
+
+				table.insert(t3, {
+					icon = nil,
+					id = dateTime.UnixTimestamp,
+					isChecked = dateTime.UnixTimestamp == v15.UnixTimestamp,
+					isDisabled = dateTime.UnixTimestamp == v15.UnixTimestamp,
+					text = dateTime:FormatLocalTime(DateTimeUtilities.TIME_COMPOSITE_TOKEN, LocalizationService.RobloxLocaleId)
+				})
+			end
+
+			return t3
+		end)(),
+		LayoutOrder = v14.layoutOrder,
+		maxHeight = v17,
+		onItemChanged = v14.onItemChanged,
+		placeholder = Translator:FormatByKey("CommonUI.Controls.Label.SelectTheTime"),
+		size = InputSize.Medium,
+		testId = v14.testId,
+		width = v14.width,
+		value = v15.UnixTimestamp
+	})
+end
+
+return TimeSelector

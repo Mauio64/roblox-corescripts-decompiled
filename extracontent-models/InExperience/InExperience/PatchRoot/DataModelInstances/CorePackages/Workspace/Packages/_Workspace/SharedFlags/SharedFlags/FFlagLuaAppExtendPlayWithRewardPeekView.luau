@@ -1,0 +1,4 @@
+local FFlagEnablePlayWithRewardComponent = require(script.Parent.FFlagEnablePlayWithRewardComponent)
+local FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable = require(script.Parent.FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable)
+
+return FFlagEnablePlayWithRewardComponent and (FFlagLuaAppEdpUseHidePlayWithRewardVisibilityVariable and game:DefineFastFlag("LuaAppExtendPlayWithRewardPeekView", false))

@@ -1,82 +1,87 @@
-local l_Parent_0 = script:FindFirstAncestor("GameDetailRodux").Parent;
-local l_DateTime_0 = require(l_Parent_0.Time).DateTime;
-local l_getZendeskUrl_0 = require(l_Parent_0.DiscoveryUtils).getZendeskUrl;
-local v3 = {
-    new = function() --[[ Line: 52 ]] --[[ Name: new ]]
-        return {};
-    end
-};
-v3.mock = function(v4, v5, v6) --[[ Line: 58 ]] --[[ Name: mock ]]
-    -- upvalues: v3 (copy), l_DateTime_0 (copy)
-    local v7 = v3.new();
-    local v8 = l_DateTime_0.new();
-    local v9 = l_DateTime_0.fromUnixTimestamp(v8:GetUnixTimestamp() + 60);
-    v7.id = v4;
-    v7.rootPlaceId = "370731277";
-    v7.name = v5;
-    v7.description = "This is MeepCity";
-    v7.creator = {
-        id = 123247, 
-        name = "alexnewtron", 
-        type = "User", 
-        isRNVAccount = false, 
-        hasVerifiedBadge = false
-    };
-    v7.price = nil;
-    v7.isExperimental = false;
-    v7.allowedGearGenres = {
-        "TownAndCity"
-    };
-    v7.allowedGearCategories = {};
-    v7.playing = 49252;
-    v7.visits = 2358954901;
-    v7.maxPlayers = v6 or 110;
-    v7.created = v8:GetIsoDate();
-    v7.updated = v9:GetIsoDate();
-    v7.studioAccessToApisAllowed = true;
-    v7.universeAvatarType = "MorphToR15";
-    v7.genre = "Town and City";
-    v7.genre_l1 = "Test Genre";
-    v7.genre_l2 = "Test Subgenre";
-    return v7;
-end;
-v3.fromJsonData = function(v10) --[[ Line: 92 ]] --[[ Name: fromJsonData ]]
-    -- upvalues: v3 (copy), l_getZendeskUrl_0 (copy)
-    local v11 = v3.new();
-    v11.id = tostring(v10.id);
-    v11.rootPlaceId = tostring(v10.rootPlaceId);
-    v11.name = v10.name;
-    v11.description = v10.description;
-    v11.creator = {
-        id = v10.creator.id, 
-        name = v10.creator.name, 
-        type = v10.creator.type, 
-        isRNVAccount = v10.creator.isRNVAccount, 
-        hasVerifiedBadge = v10.creator.hasVerifiedBadge
-    };
-    v11.price = v10.price;
-    v11.isExperimental = v10.isExperimental;
-    v11.allowedGearGenres = v10.allowedGearGenres;
-    v11.allowedGearCategories = v10.allowedGearCategories;
-    v11.playing = v10.playing;
-    v11.visits = v10.visits;
-    v11.maxPlayers = v10.maxPlayers;
-    v11.created = v10.created;
-    v11.updated = v10.updated;
-    v11.studioAccessToApisAllowed = v10.studioAccessToApisAllowed;
-    v11.universeAvatarType = v10.universeAvatarType;
-    v11.genre = v10.genre;
-    v11.genre_l1 = v10.genre_l1;
-    v11.genre_l2 = v10.genre_l2;
-    v11.licenseDescription = v10.licenseDescription;
-    v11.localizedFiatPrice = v10.localizedFiatPrice;
-    v11.refundLink = v10.refundLink;
-    if v10.refundPolicy then
-        v11.refundPolicy = {
-            policyText = v10.refundPolicy.policyText, 
-            learnMoreUrl = l_getZendeskUrl_0(v10.refundPolicy.learnMoreBaseUrl, v10.refundPolicy.locale, v10.refundPolicy.articleId)
-        };
-    end;
-    return v11;
-end;
-return v3;
+local Parent = script:FindFirstAncestor("GameDetailRodux").Parent
+local DateTime = require(Parent.Time).DateTime
+local getZendeskUrl = require(Parent.DiscoveryUtils).getZendeskUrl
+local t1 = {
+	new = function() -- line: 52
+		return {}
+	end
+}
+
+function t1.mock(p1, p2, p3) -- line: 58
+	-- upvalues: t1 (copy), DateTime (copy)
+	local v8 = t1.new()
+	local v9 = DateTime.new()
+	local v10 = DateTime.fromUnixTimestamp(v9:GetUnixTimestamp() + 60)
+
+	v8.id = p1
+	v8.rootPlaceId = "370731277"
+	v8.name = p2
+	v8.description = "This is MeepCity"
+	v8.creator = {
+		id = 123247,
+		name = "alexnewtron",
+		type = "User",
+		isRNVAccount = false,
+		hasVerifiedBadge = false
+	}
+	v8.price = nil
+	v8.isExperimental = false
+	v8.allowedGearGenres = { "TownAndCity" }
+	v8.allowedGearCategories = {}
+	v8.playing = 49252
+	v8.visits = 2358954901
+	v8.maxPlayers = p3 or 110
+	v8.created = v9:GetIsoDate()
+	v8.updated = v10:GetIsoDate()
+	v8.studioAccessToApisAllowed = true
+	v8.universeAvatarType = "MorphToR15"
+	v8.genre = "Town and City"
+	v8.genre_l1 = "Test Genre"
+	v8.genre_l2 = "Test Subgenre"
+
+	return v8
+end
+function t1.fromJsonData(p4) -- line: 92
+	-- upvalues: t1 (copy), getZendeskUrl (copy)
+	local v12 = t1.new()
+
+	v12.id = tostring(p4.id)
+	v12.rootPlaceId = tostring(p4.rootPlaceId)
+	v12.name = p4.name
+	v12.description = p4.description
+	v12.creator = {
+		id = p4.creator.id,
+		name = p4.creator.name,
+		type = p4.creator.type,
+		isRNVAccount = p4.creator.isRNVAccount,
+		hasVerifiedBadge = p4.creator.hasVerifiedBadge
+	}
+	v12.price = p4.price
+	v12.isExperimental = p4.isExperimental
+	v12.allowedGearGenres = p4.allowedGearGenres
+	v12.allowedGearCategories = p4.allowedGearCategories
+	v12.playing = p4.playing
+	v12.visits = p4.visits
+	v12.maxPlayers = p4.maxPlayers
+	v12.created = p4.created
+	v12.updated = p4.updated
+	v12.studioAccessToApisAllowed = p4.studioAccessToApisAllowed
+	v12.universeAvatarType = p4.universeAvatarType
+	v12.genre = p4.genre
+	v12.genre_l1 = p4.genre_l1
+	v12.genre_l2 = p4.genre_l2
+	v12.licenseDescription = p4.licenseDescription
+	v12.localizedFiatPrice = p4.localizedFiatPrice
+	v12.refundLink = p4.refundLink
+
+	if p4.refundPolicy then
+		v12.refundPolicy = {
+			policyText = p4.refundPolicy.policyText,
+			learnMoreUrl = getZendeskUrl(p4.refundPolicy.learnMoreBaseUrl, p4.refundPolicy.locale, p4.refundPolicy.articleId)
+		}
+	end
+
+	return v12
+end
+
+return t1

@@ -1,13 +1,12 @@
-return function(v0) --[[ Line: 4 ]] --[[ Name: isRobloxSubscriptionProductFreeTrial ]]
-    if not v0 then
-        return false;
-    else
-        local l_EligibleOffers_0 = v0.EligibleOffers;
-        local v2 = l_EligibleOffers_0 and l_EligibleOffers_0[1];
-        local v3 = false;
-        if v2 ~= nil then
-            v3 = v2.OfferType == "FreeTrial";
-        end;
-        return v3;
-    end;
-end;
+local function isRobloxSubscriptionProductFreeTrial(p1) -- line: 4
+	if not p1 then
+		return false
+	end
+
+	local EligibleOffers = p1.EligibleOffers
+	local v4 = EligibleOffers and EligibleOffers[1]
+
+	return v4 ~= nil and v4.OfferType == "FreeTrial"
+end
+
+return isRobloxSubscriptionProductFreeTrial

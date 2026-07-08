@@ -1,10 +1,13 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("LegacyFriendsRodux");
-local l_SetFriendCount_0 = require(l_script_FirstAncestor_0.Actions).SetFriendCount;
-return function(v2, v3) --[[ Line: 5 ]]
-    -- upvalues: l_SetFriendCount_0 (copy)
-    v2 = v2 or 0;
-    if v3.type == l_SetFriendCount_0.name then
-        v2 = v3.count;
-    end;
-    return v2;
-end;
+local LegacyFriendsRodux = script:FindFirstAncestor("LegacyFriendsRodux")
+local SetFriendCount = require(LegacyFriendsRodux.Actions).SetFriendCount
+
+return function(p1, p2) -- line: 5
+	-- upvalues: SetFriendCount (copy)
+	local v5 = p1 or 0
+
+	if p2.type == SetFriendCount.name then
+		v5 = p2.count
+	end
+
+	return v5
+end

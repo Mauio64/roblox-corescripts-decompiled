@@ -1,261 +1,280 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AuthCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_AppFonts_0 = require(l_Parent_0.Style).AppFonts;
-local v3 = require(l_Parent_0.Roact);
-local v4 = require(l_Parent_0.RoactRodux);
-local l_RoactServices_0 = require(l_Parent_0.RoactServices).RoactServices;
-local l_RoactNetworking_0 = require(l_Parent_0.RoactServiceTags).RoactNetworking;
-local v7 = require(l_Parent_0.UIBlox);
-local l_withLocalization_0 = require(l_Parent_0.Localization).withLocalization;
-local l_FormFactor_0 = require(l_Parent_0.FormFactor).Enums.FormFactor;
-local l_ImageSetLabel_0 = v7.Core.ImageSet.ImageSetLabel;
-local l_GetImageData_0 = require(l_Parent_0.RobloxAppAssets).GetImageData;
-local l_ImageSetButton_0 = v7.Core.ImageSet.ImageSetButton;
-local v13 = require(l_script_FirstAncestor_0.Components.SearchBar);
-local v14 = require(l_script_FirstAncestor_0.Components.WindowedListFrame);
-local l_Colors_0 = require(l_Parent_0.Style).Colors;
-local v16 = require(l_Parent_0.Otter);
-local v17 = v3.PureComponent:extend("ListSearchWidget");
-local l_Flint_0 = l_Colors_0.Flint;
-local l_Obsidian_0 = l_Colors_0.Obsidian;
-local l_White_0 = l_Colors_0.White;
-v17.init = function(v21) --[[ Line: 40 ]] --[[ Name: init ]]
-    -- upvalues: v3 (copy), l_ImageSetLabel_0 (copy), l_GetImageData_0 (copy), l_Flint_0 (copy), l_ImageSetButton_0 (copy)
-    v21.state = {
-        fullLoad = false, 
-        visible = false, 
-        filteredList = v21.props.List
-    };
-    v21.visibility = 0;
-    v21.visibilityTarget = 0;
-    v21.baseFrameRef = v3.createRef();
-    v21.getWidgetPosition = function() --[[ Line: 51 ]]
-        -- upvalues: v21 (copy)
-        return UDim2.new(0.5, 0, 2 - v21.visibility, 10);
-    end;
-    v21.searchTextChanged = function(v22) --[[ Line: 55 ]]
-        -- upvalues: v21 (copy)
-        local v23 = string.lower(v22.Text);
-        if v23 == "" then
-            if v21.state.filteredList ~= v21.props.List then
-                v21:setState({
-                    filteredList = v21.props.List
-                });
-                return;
-            end;
-        else
-            local v24 = {};
-            for _, v26 in ipairs(v21.props.List) do
-                if string.find(string.lower(v26.localizedName), v23, 1, true) then
-                    table.insert(v24, v26);
-                end;
-            end;
-            v21:setState({
-                filteredList = v24
-            });
-        end;
-    end;
-    v21.renderWidgetBackground = function(v27) --[[ Line: 76 ]]
-        -- upvalues: v3 (ref), l_ImageSetLabel_0 (ref), l_GetImageData_0 (ref), l_Flint_0 (ref), v21 (copy), l_ImageSetButton_0 (ref)
-        local v28 = 1.4 * v27.closeButtonSize;
-        if v27.isWideScreen then
-            return v3.createElement(l_ImageSetLabel_0, {
-                Size = UDim2.new(1, 0, 1, -v28 + 10), 
-                Position = v27.Position, 
-                AnchorPoint = Vector2.new(0.5, 1), 
-                BackgroundTransparency = 1, 
-                Image = l_GetImageData_0("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill", 
-                ImageColor3 = l_Flint_0, 
-                BorderSizePixel = 0, 
-                ScaleType = Enum.ScaleType.Slice, 
-                SliceCenter = Rect.new(8, 8, 9, 9), 
-                Visible = v27.Visible, 
-                [v3.Ref] = v21.baseFrameRef
-            }, {
-                CloseButton = v3.createElement(l_ImageSetButton_0, {
-                    Size = UDim2.new(0, v27.closeButtonSize, 0, v27.closeButtonSize), 
-                    AnchorPoint = Vector2.new(0, 1), 
-                    Image = l_GetImageData_0("LuaApp/icons/GameDetails/navigation/close") or "LuaApp/icons/GameDetails/navigation/close", 
-                    BackgroundTransparency = 1, 
-                    [v3.Event.Activated] = v27.CloseCallback
-                }), 
-                UISizeConstraint = v3.createElement("UISizeConstraint", {
-                    MaxSize = Vector2.new(600, 1e999)
-                }), 
-                ContentWrapper = v3.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, -80, 1, -50), 
-                    Position = UDim2.new(0, 40, 0, 40)
-                }, v27.contents)
-            });
-        else
-            local v29 = v27.closeButtonSize + 20;
-            return v3.createElement("Frame", {
-                Size = UDim2.new(1, 0, 1, 10), 
-                Position = v27.Position, 
-                AnchorPoint = Vector2.new(0.5, 1), 
-                BackgroundColor3 = l_Flint_0, 
-                Visible = v27.Visible, 
-                [v3.Ref] = v21.baseFrameRef
-            }, {
-                UIPadding = v3.createElement("UIPadding", {
-                    PaddingTop = UDim.new(0, 40), 
-                    PaddingLeft = UDim.new(0, 20), 
-                    PaddingRight = UDim.new(0, 20), 
-                    PaddingBottom = UDim.new(0, 10)
-                }), 
-                CloseButton = v3.createElement(l_ImageSetButton_0, {
-                    Size = UDim2.new(0, v27.closeButtonSize, 0, v27.closeButtonSize), 
-                    Image = l_GetImageData_0("LuaApp/icons/GameDetails/navigation/close") or "LuaApp/icons/GameDetails/navigation/close", 
-                    BackgroundTransparency = 1, 
-                    AnchorPoint = Vector2.new(0.21, 0), 
-                    [v3.Event.Activated] = v27.CloseCallback
-                }), 
-                ContentWrapper = v3.createElement("Frame", {
-                    BackgroundTransparency = 1, 
-                    Size = UDim2.new(1, 0, 1, -v29), 
-                    Position = UDim2.new(0, 0, 0, v29)
-                }, v27.contents)
-            });
-        end;
-    end;
-end;
-v17.didMount = function(v30) --[[ Line: 141 ]] --[[ Name: didMount ]]
-    -- upvalues: v16 (copy)
-    v30.motor = v16.createSingleMotor(v30.visibility);
-    v30.motor:onStep(function(v31) --[[ Line: 143 ]]
-        -- upvalues: v30 (copy)
-        v30.visibility = v31;
-        if v30.baseFrameRef.current then
-            v30.baseFrameRef.current.Position = v30.getWidgetPosition();
-            v30.baseFrameRef.current.Parent.BackgroundTransparency = 1 - 0.5 * v30.visibility;
-        end;
-        if v31 == 0 and v30.state.visible then
-            v30:setState({
-                visible = false
-            });
-            return;
-        else
-            if v31 == 1 and not v30.state.fullLoad then
-                v30:setState({
-                    fullLoad = true
-                });
-            end;
-            return;
-        end;
-    end);
-end;
-v17.willUnmount = function(v32) --[[ Line: 162 ]] --[[ Name: willUnmount ]]
-    if v32.motor then
-        v32.motor:destroy();
-    end;
-end;
-v17.defaultProps = {
-    SearchPlaceholder = "Feature.Chat.Label.SearchWord"
-};
-v17.render = function(v33) --[[ Line: 172 ]] --[[ Name: render ]]
-    -- upvalues: l_FormFactor_0 (copy), l_withLocalization_0 (copy), v3 (copy), l_AppFonts_0 (copy), l_White_0 (copy), v13 (copy), l_Obsidian_0 (copy), l_Flint_0 (copy), v14 (copy)
-    local v34 = v33.props.formFactor == l_FormFactor_0.WIDE;
-    local v35 = 27;
-    local v36 = 14;
-    local v37 = 24;
-    local v38 = 24;
-    local v39 = v36 + 36;
-    if v34 then
-        v35 = 48;
-        v36 = 18;
-        v37 = 30;
-        v38 = 24;
-        v39 = v36 + 48;
-    end;
-    local v40 = v36 * 2.4;
-    local v41 = v40 + 40 + v38;
-    local v42 = v33.props.VisibilityTarget == 1;
-    return l_withLocalization_0({
-        heading = v33.props.Heading, 
-        search = v33.props.SearchPlaceholder
-    })(function(v43) --[[ Line: 197 ]]
-        -- upvalues: v42 (copy), v3 (ref), v33 (copy), v34 (copy), v35 (ref), v38 (ref), l_AppFonts_0 (ref), l_White_0 (ref), v13 (ref), v40 (copy), l_Obsidian_0 (ref), l_Flint_0 (ref), v37 (ref), v36 (ref), v14 (ref), v41 (copy), v39 (ref)
-        local v44 = nil;
-        if v42 then
-            v44 = false;
-        end;
-        return v3.createElement(v42 and "TextButton" or "Frame", {
-            AutoButtonColor = v44, 
-            Text = v42 and "" or nil, 
-            BackgroundColor3 = Color3.new(0, 0, 0), 
-            BackgroundTransparency = 1 - 0.5 * v33.visibility, 
-            Size = UDim2.new(1, 0, 1, 0), 
-            BorderSizePixel = 0
-        }, {
-            v3.createElement(v33.renderWidgetBackground, {
-                isWideScreen = v34, 
-                closeButtonSize = v35, 
-                Position = v33.getWidgetPosition(), 
-                CloseCallback = v33.props.CloseCallback, 
-                Visible = v33.state.visible, 
-                contents = {
-                    Heading = v3.createElement("TextLabel", {
-                        Text = v43.heading, 
-                        Size = UDim2.new(1, 0, 0, v38), 
-                        TextSize = v38, 
-                        Font = l_AppFonts_0.default:getBold(), 
-                        TextColor3 = l_White_0, 
-                        BackgroundTransparency = 1, 
-                        TextXAlignment = Enum.TextXAlignment.Left
-                    }), 
-                    SearchBar = v3.createElement(v13, {
-                        Size = UDim2.new(1, 0, 0, v40), 
-                        Position = UDim2.new(0, 0, 0, v38 + 20), 
-                        ImageColor3 = l_Obsidian_0, 
-                        PlaceholderText = v43.search, 
-                        PlaceholderColor3 = l_Flint_0, 
-                        IconSize = v37, 
-                        Text = "", 
-                        TextSize = v36, 
-                        TextColor3 = l_White_0, 
-                        TextChanged = v33.searchTextChanged
-                    }), 
-                    ListFrame = v3.createElement(v14, {
-                        List = v33.state.filteredList, 
-                        ScrollingFrameOffset = v41, 
-                        TextSize = v36, 
-                        ButtonSizeY = v39, 
-                        ListButton = v33.props.ListButton, 
-                        ListButtonProps = {
-                            TextSize = v36, 
-                            SelectionCallback = v33.props.SelectionCallback
-                        }
-                    })
-                }
-            })
-        });
-    end);
-end;
-v17.didUpdate = function(v45, v46) --[[ Line: 255 ]] --[[ Name: didUpdate ]]
-    -- upvalues: v16 (copy)
-    if v45.visibilityTarget ~= v45.props.VisibilityTarget and v45.motor then
-        v45.visibilityTarget = v45.props.VisibilityTarget;
-        v45.motor:setGoal(v16.spring(v45.visibilityTarget), {
-            frequency = 3
-        });
-        if v45.visibilityTarget > 0 and not v45.state.visible then
-            v45:setState({
-                visible = true
-            });
-        end;
-    end;
-    if v46.List ~= v45.props.List or v45.props.VisibilityTarget == 1 and v46.VisibilityTarget ~= 1 then
-        v45:setState({
-            filteredList = v45.props.List
-        });
-    end;
-end;
-v17 = v4.connect(function(v47, _) --[[ Line: 277 ]]
-    return {
-        formFactor = v47.FormFactor
-    };
-end)(v17);
-return l_RoactServices_0.connect({
-    networking = l_RoactNetworking_0
-})(v17);
+local AuthCommon = script:FindFirstAncestor("AuthCommon")
+local AuthCommonParent = AuthCommon.Parent
+local AppFonts = require(AuthCommonParent.Style).AppFonts
+local Roact = require(AuthCommonParent.Roact)
+local RoactRodux = require(AuthCommonParent.RoactRodux)
+local RoactServices = require(AuthCommonParent.RoactServices).RoactServices
+local RoactNetworking = require(AuthCommonParent.RoactServiceTags).RoactNetworking
+local UIBlox = require(AuthCommonParent.UIBlox)
+local withLocalization = require(AuthCommonParent.Localization).withLocalization
+local FormFactor = require(AuthCommonParent.FormFactor).Enums.FormFactor
+local ImageSetLabel = UIBlox.Core.ImageSet.ImageSetLabel
+local GetImageData = require(AuthCommonParent.RobloxAppAssets).GetImageData
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local SearchBar = require(AuthCommon.Components.SearchBar)
+local WindowedListFrame = require(AuthCommon.Components.WindowedListFrame)
+local Colors = require(AuthCommonParent.Style).Colors
+local Otter = require(AuthCommonParent.Otter)
+local v18 = Roact.PureComponent:extend("ListSearchWidget")
+local Flint = Colors.Flint
+local Obsidian = Colors.Obsidian
+local White = Colors.White
+
+function v18.init(p1) -- line: 40
+	-- upvalues: Roact (copy), ImageSetLabel (copy), GetImageData (copy), Flint (copy), ImageSetButton (copy)
+	p1.state = {
+		fullLoad = false,
+		visible = false,
+		filteredList = p1.props.List
+	}
+	p1.visibility = 0
+	p1.visibilityTarget = 0
+	p1.baseFrameRef = Roact.createRef()
+
+	function p1.getWidgetPosition() -- line: 51
+		-- upvalues: p1 (copy)
+		return UDim2.new(0.5, 0, 2 - p1.visibility, 10)
+	end
+	function p1.searchTextChanged(p2) -- line: 55
+		-- upvalues: p1 (copy)
+		local v41 = string.lower(p2.Text)
+
+		if v41 == "" then
+			if p1.state.filteredList ~= p1.props.List then
+				p1:setState({
+					filteredList = p1.props.List
+				})
+
+				return
+			end
+		else
+			local t1 = {}
+
+			for _, v in ipairs(p1.props.List) do
+				if string.find(string.lower(v.localizedName), v41, 1, true) then
+					table.insert(t1, v)
+				end
+			end
+
+			p1:setState({
+				filteredList = t1
+			})
+		end
+	end
+	function p1.renderWidgetBackground(p3) -- line: 76
+		-- upvalues: Roact (copy), ImageSetLabel (copy), GetImageData (copy), Flint (copy), p1 (copy), ImageSetButton (copy)
+		local v46 = 1.4 * p3.closeButtonSize
+
+		if p3.isWideScreen then
+			return Roact.createElement(ImageSetLabel, {
+				Size = UDim2.new(1, 0, 1, -v46 + 10),
+				Position = p3.Position,
+				AnchorPoint = Vector2.new(0.5, 1),
+				BackgroundTransparency = 1,
+				Image = GetImageData("LuaApp/buttons/buttonFill") or "LuaApp/buttons/buttonFill",
+				ImageColor3 = Flint,
+				BorderSizePixel = 0,
+				ScaleType = Enum.ScaleType.Slice,
+				SliceCenter = Rect.new(8, 8, 9, 9),
+				Visible = p3.Visible,
+				[Roact.Ref] = p1.baseFrameRef
+			}, {
+				CloseButton = Roact.createElement(ImageSetButton, {
+					Size = UDim2.new(0, p3.closeButtonSize, 0, p3.closeButtonSize),
+					AnchorPoint = Vector2.new(0, 1),
+					Image = GetImageData("LuaApp/icons/GameDetails/navigation/close") or "LuaApp/icons/GameDetails/navigation/close",
+					BackgroundTransparency = 1,
+					[Roact.Event.Activated] = p3.CloseCallback
+				}),
+				UISizeConstraint = Roact.createElement("UISizeConstraint", {
+					MaxSize = Vector2.new(600, 1e999)
+				}),
+				ContentWrapper = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -80, 1, -50),
+					Position = UDim2.new(0, 40, 0, 40)
+				}, p3.contents)
+			})
+		end
+
+		local v47 = p3.closeButtonSize + 20
+
+		return Roact.createElement("Frame", {
+			Size = UDim2.new(1, 0, 1, 10),
+			Position = p3.Position,
+			AnchorPoint = Vector2.new(0.5, 1),
+			BackgroundColor3 = Flint,
+			Visible = p3.Visible,
+			[Roact.Ref] = p1.baseFrameRef
+		}, {
+			UIPadding = Roact.createElement("UIPadding", {
+				PaddingTop = UDim.new(0, 40),
+				PaddingLeft = UDim.new(0, 20),
+				PaddingRight = UDim.new(0, 20),
+				PaddingBottom = UDim.new(0, 10)
+			}),
+			CloseButton = Roact.createElement(ImageSetButton, {
+				Size = UDim2.new(0, p3.closeButtonSize, 0, p3.closeButtonSize),
+				Image = GetImageData("LuaApp/icons/GameDetails/navigation/close") or "LuaApp/icons/GameDetails/navigation/close",
+				BackgroundTransparency = 1,
+				AnchorPoint = Vector2.new(0.21, 0),
+				[Roact.Event.Activated] = p3.CloseCallback
+			}),
+			ContentWrapper = Roact.createElement("Frame", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, -v47),
+				Position = UDim2.new(0, 0, 0, v47)
+			}, p3.contents)
+		})
+	end
+end
+function v18.didMount(p4) -- line: 141
+	-- upvalues: Otter (copy)
+	p4.motor = Otter.createSingleMotor(p4.visibility)
+	p4.motor:onStep(function(p5) -- line: 143
+		-- upvalues: p4 (copy)
+		p4.visibility = p5
+
+		if p4.baseFrameRef.current then
+			p4.baseFrameRef.current.Position = p4.getWidgetPosition()
+			p4.baseFrameRef.current.Parent.BackgroundTransparency = 1 - 0.5 * p4.visibility
+		end
+
+		if p5 == 0 and p4.state.visible then
+			p4:setState({
+				visible = false
+			})
+
+			return
+		end
+
+		if p5 == 1 and not p4.state.fullLoad then
+			p4:setState({
+				fullLoad = true
+			})
+		end
+	end)
+end
+function v18.willUnmount(p6) -- line: 162
+	if p6.motor then
+		p6.motor:destroy()
+	end
+end
+
+v18.defaultProps = {
+	SearchPlaceholder = "Feature.Chat.Label.SearchWord"
+}
+
+function v18.render(p7) -- line: 172
+	-- upvalues: FormFactor (copy), withLocalization (copy), Roact (copy), AppFonts (copy), White (copy), SearchBar (copy), Obsidian (copy), Flint (copy), WindowedListFrame (copy)
+	local v27 = p7.props.formFactor == FormFactor.WIDE
+	local n1 = 27
+	local n2 = 14
+	local n3 = 24
+	local n4 = 24
+	local u32 = n2 + 36
+
+	if v27 then
+		n1 = 48
+		n2 = 18
+		n3 = 30
+		n4 = 24
+		u32 = n2 + 48
+	end
+
+	local v33 = n2 * 2.4
+	local v34 = v33 + 40 + n4
+	local v35 = p7.props.VisibilityTarget == 1
+
+	return withLocalization({
+		heading = p7.props.Heading,
+		search = p7.props.SearchPlaceholder
+	})(function(p8) -- line: 197
+		-- upvalues: v35 (copy), Roact (copy), p7 (copy), v27 (copy), n1 (ref), n4 (ref), AppFonts (copy), White (copy), SearchBar (copy), v33 (copy), Obsidian (copy), Flint (copy), n3 (ref), n2 (ref), WindowedListFrame (copy), v34 (copy), u32 (ref)
+		local v50 = nil
+
+		if v35 then
+			v50 = false
+		end
+
+		return Roact.createElement(not v35 and "Frame" or "TextButton", {
+			BorderSizePixel = 0,
+			AutoButtonColor = v50,
+			Text = if not v35 then nil else "",
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 1 - 0.5 * p7.visibility,
+			Size = UDim2.new(1, 0, 1, 0)
+		}, { Roact.createElement(p7.renderWidgetBackground, {
+			isWideScreen = v27,
+			closeButtonSize = n1,
+			Position = p7.getWidgetPosition(),
+			CloseCallback = p7.props.CloseCallback,
+			Visible = p7.state.visible,
+			contents = {
+				Heading = Roact.createElement("TextLabel", {
+					BackgroundTransparency = 1,
+					Text = p8.heading,
+					Size = UDim2.new(1, 0, 0, n4),
+					TextSize = n4,
+					Font = AppFonts.default:getBold(),
+					TextColor3 = White,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}),
+				SearchBar = Roact.createElement(SearchBar, {
+					Text = "",
+					Size = UDim2.new(1, 0, 0, v33),
+					Position = UDim2.new(0, 0, 0, n4 + 20),
+					ImageColor3 = Obsidian,
+					PlaceholderText = p8.search,
+					PlaceholderColor3 = Flint,
+					IconSize = n3,
+					TextSize = n2,
+					TextColor3 = White,
+					TextChanged = p7.searchTextChanged
+				}),
+				ListFrame = Roact.createElement(WindowedListFrame, {
+					List = p7.state.filteredList,
+					ScrollingFrameOffset = v34,
+					TextSize = n2,
+					ButtonSizeY = u32,
+					ListButton = p7.props.ListButton,
+					ListButtonProps = {
+						TextSize = n2,
+						SelectionCallback = p7.props.SelectionCallback
+					}
+				})
+			}
+		}) })
+	end)
+end
+function v18.didUpdate(p9, p10) -- line: 255
+	-- upvalues: Otter (copy)
+	if p9.visibilityTarget ~= p9.props.VisibilityTarget and p9.motor then
+		p9.visibilityTarget = p9.props.VisibilityTarget
+		p9.motor:setGoal(Otter.spring(p9.visibilityTarget), {
+			frequency = 3
+		})
+
+		if p9.visibilityTarget > 0 and not p9.state.visible then
+			p9:setState({
+				visible = true
+			})
+		end
+	end
+
+	if p10.List ~= p9.props.List or p9.props.VisibilityTarget == 1 and p10.VisibilityTarget ~= 1 then
+		p9:setState({
+			filteredList = p9.props.List
+		})
+	end
+end
+
+local v22 = RoactRodux.connect(function(p11, _) -- line: 277
+	return {
+		formFactor = p11.FormFactor
+	}
+end)(v18)
+
+return RoactServices.connect({
+	networking = RoactNetworking
+})(v22)

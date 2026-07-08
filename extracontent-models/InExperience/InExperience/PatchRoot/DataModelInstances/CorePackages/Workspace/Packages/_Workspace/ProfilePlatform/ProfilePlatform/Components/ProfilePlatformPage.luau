@@ -1,1 +1,1 @@
-return require(script.ProfilePlatformPageContainer);
+return require(script.ProfilePlatformPageContainer)

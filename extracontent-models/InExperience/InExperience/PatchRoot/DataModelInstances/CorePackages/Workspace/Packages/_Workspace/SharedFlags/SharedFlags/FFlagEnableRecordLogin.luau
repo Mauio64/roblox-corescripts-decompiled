@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EnableRecordLogin1", false);
+return game:DefineFastFlag("EnableRecordLogin1", false)

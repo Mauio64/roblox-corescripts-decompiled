@@ -1,23 +1,23 @@
-return function(v0, v1) --[[ Line: 1 ]]
-    local v2 = nil;
-    local v3 = v1 / 1000;
-    return {
-        cancel = function() --[[ Line: 5 ]] --[[ Name: cancel ]]
-            -- upvalues: v2 (ref)
-            if v2 then
-                task.cancel(v2);
-                v2 = nil;
-            end;
-        end, 
-        call = function(...) --[[ Line: 11 ]] --[[ Name: call ]]
-            -- upvalues: v2 (ref), v3 (copy), v0 (copy)
-            local v4 = {
-                ...
-            };
-            v2 = task.delay(v3, function() --[[ Line: 13 ]]
-                -- upvalues: v0 (ref), v4 (copy)
-                v0(unpack(v4));
-            end);
-        end
-    };
-end;
+return function(p1: ((...any) -> ...any), n1: number) -- line: 1
+	local u3 = nil
+	local v4 = n1 / 1000
+
+	return {
+		cancel = function() -- line: 5
+			-- upvalues: u3 (ref)
+			if u3 then
+				task.cancel(u3)
+				u3 = nil
+			end
+		end,
+		call = function(...) -- line: 11
+			-- upvalues: u3 (ref), v4 (copy), p1 (copy)
+			local t1 = { ... }
+
+			u3 = task.delay(v4, function() -- line: 13
+				-- upvalues: p1 (copy), t1 (copy)
+				p1(unpack(t1))
+			end)
+		end
+	}
+end

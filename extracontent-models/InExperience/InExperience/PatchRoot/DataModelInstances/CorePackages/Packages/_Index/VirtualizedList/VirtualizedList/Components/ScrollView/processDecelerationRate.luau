@@ -1,9 +1,13 @@
-return function(v0) --[[ Line: 16 ]] --[[ Name: processDecelerationRate ]]
-    if v0 == "normal" then
-        return 0.985;
-    elseif v0 == "fast" then
-        return 0.9;
-    else
-        return v0;
-    end;
-end;
+local function processDecelerationRate(p1) -- line: 16
+	if p1 == "normal" then
+		return 0.985
+	end
+
+	if p1 == "fast" then
+		return 0.9
+	end
+
+	return p1
+end
+
+return processDecelerationRate

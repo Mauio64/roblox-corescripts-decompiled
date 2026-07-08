@@ -44,9 +44,11 @@ function stateLayerModeToTokenNamespace(p2) -- line: 27
 	return ColorMode.Color
 end
 
-return function(p3, p4, p5) --[[ getStateLayerStyle ]] -- line: 41
-	local v10 = stateLayerModeToTokenNamespace(p4)
-	local v11 = guiStateToStateLayer(p5)
+local function getStateLayerStyle(p3, p4, p5) -- line: 41
+	local v11 = stateLayerModeToTokenNamespace(p4)
+	local v12 = guiStateToStateLayer(p5)
 
-	return p3[v10].State[v11]
+	return p3[v11].State[v12]
 end
+
+return getStateLayerStyle

@@ -1,1 +1,1 @@
-return require(script.reducer);
+return require(script.reducer)

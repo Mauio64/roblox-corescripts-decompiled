@@ -1,82 +1,100 @@
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v1 = require(script.Parent.TimeZone);
-local v2 = {};
-v2.new = function(v3, v4, v5, v6, v7, v8, v9) --[[ Line: 27 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy)
-    local v10 = {
-        dateTime = DateTime.fromUniversalTime(v3 or 1970, v4 or 1, v5 or 1, v6 or 0, v7 or 0, v8 or 0, v9 or 0)
-    };
-    setmetatable(v10, v2);
-    return v10;
-end;
-v2.now = function() --[[ Line: 45 ]] --[[ Name: now ]]
-    -- upvalues: v2 (copy)
-    local v11 = {
-        dateTime = DateTime.now()
-    };
-    setmetatable(v11, v2);
-    return v11;
-end;
-v2.fromUnixTimestamp = function(v12) --[[ Line: 58 ]] --[[ Name: fromUnixTimestamp ]]
-    -- upvalues: v2 (copy)
-    assert(type(v12) == "number", "Invalid argument #1 to fromUnixTimestamp, expected number.");
-    local v13 = {
-        dateTime = DateTime.fromUnixTimestampMillis(v12 * 1000)
-    };
-    setmetatable(v13, v2);
-    return v13;
-end;
-v2.fromIsoDate = function(v14) --[[ Line: 74 ]] --[[ Name: fromIsoDate ]]
-    -- upvalues: v2 (copy)
-    assert(type(v14) == "string", "Invalid argument #1 to DateTime.fromIsoDate, expected string.");
-    local v15 = {
-        dateTime = DateTime.fromIsoDate(v14)
-    };
-    setmetatable(v15, v2);
-    return v15;
-end;
-v2.Format = function(v16, v17, v18, v19) --[[ Line: 91 ]] --[[ Name: Format ]]
-    -- upvalues: v1 (copy), l_LocalizationService_0 (copy)
-    assert(type(v17) == "string", "Invalid argument #1 to Format, expected string.");
-    v18 = v18 or v1.Current;
-    v19 = v19 or l_LocalizationService_0.RobloxLocaleId;
-    if v18 == v1.UTC then
-        return v16.dateTime:FormatUniversalTime(v17, v19);
-    elseif v18 == v1.Current then
-        return v16.dateTime:FormatLocalTime(v17, v19);
-    else
-        error(("Invalid TimeZone \"%s\""):format((tostring(v18))), 2);
-        return;
-    end;
-end;
-v2.GetValues = function(v20, v21) --[[ Line: 114 ]] --[[ Name: GetValues ]]
-    -- upvalues: v1 (copy)
-    v21 = v21 or v1.Current;
-    if v21 == v1.UTC then
-        return v20.dateTime:ToUniversalTime();
-    elseif v21 == v1.Current then
-        return v20.dateTime:ToLocalTime();
-    else
-        error(("Invalid TimeZone \"%s\""):format((tostring(v21))), 2);
-        return;
-    end;
-end;
-v2.GetUnixTimestamp = function(v22) --[[ Line: 129 ]] --[[ Name: GetUnixTimestamp ]]
-    if v22.dateTime:ToUniversalTime().Millisecond > 0 then
-        return v22.dateTime.UnixTimestamp + v22.dateTime.UnixTimestampMillis % 1000 / 1000;
-    else
-        return v22.dateTime.UnixTimestamp;
-    end;
-end;
-v2.GetIsoDate = function(v23) --[[ Line: 143 ]] --[[ Name: GetIsoDate ]]
-    return v23.dateTime:ToIsoDate();
-end;
-v2.GetLongRelativeTime = function(v24, _, v26, v27) --[[ Line: 151 ]] --[[ Name: GetLongRelativeTime ]]
-    return v24:Format("lll", v26, v27);
-end;
-v2.GetShortRelativeTime = function(v28, _, v30, v31) --[[ Line: 160 ]] --[[ Name: GetShortRelativeTime ]]
-    -- upvalues: v1 (copy)
-    return v28:Format("ll", v30 or v1.Current, v31);
-end;
-v2.__index = v2;
-return v2;
+local LocalizationService = game:GetService("LocalizationService")
+local TimeZone = require(script.Parent.TimeZone)
+local t1 = {}
+
+function t1.new(p1, p2, p3, p4, p5, p6, p7) -- line: 27
+	-- upvalues: t1 (copy)
+	local t2 = {
+		dateTime = DateTime.fromUniversalTime(p1 or 1970, p2 or 1, p3 or 1, p4 or 0, p5 or 0, p6 or 0, p7 or 0)
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.now() -- line: 45
+	-- upvalues: t1 (copy)
+	local t3 = {
+		dateTime = DateTime.now()
+	}
+
+	setmetatable(t3, t1)
+
+	return t3
+end
+function t1.fromUnixTimestamp(p8) -- line: 58
+	-- upvalues: t1 (copy)
+	assert(type(p8) == "number", "Invalid argument #1 to fromUnixTimestamp, expected number.")
+
+	local t4 = {
+		dateTime = DateTime.fromUnixTimestampMillis(p8 * 1000)
+	}
+
+	setmetatable(t4, t1)
+
+	return t4
+end
+function t1.fromIsoDate(p9) -- line: 74
+	-- upvalues: t1 (copy)
+	assert(type(p9) == "string", "Invalid argument #1 to DateTime.fromIsoDate, expected string.")
+
+	local t5 = {
+		dateTime = DateTime.fromIsoDate(p9)
+	}
+
+	setmetatable(t5, t1)
+
+	return t5
+end
+function t1.Format(p10, p11, p12, p13) -- line: 91
+	-- upvalues: TimeZone (copy), LocalizationService (copy)
+	assert(type(p11) == "string", "Invalid argument #1 to Format, expected string.")
+
+	local v21 = p12 or TimeZone.Current
+	local v22 = p13 or LocalizationService.RobloxLocaleId
+
+	if v21 == TimeZone.UTC then
+		return p10.dateTime:FormatUniversalTime(p11, v22)
+	end
+
+	if v21 == TimeZone.Current then
+		return p10.dateTime:FormatLocalTime(p11, v22)
+	end
+
+	error(("Invalid TimeZone \"%s\""):format((tostring(v21))), 2)
+end
+function t1.GetValues(p14, p15) -- line: 114
+	-- upvalues: TimeZone (copy)
+	local v25 = p15 or TimeZone.Current
+
+	if v25 == TimeZone.UTC then
+		return p14.dateTime:ToUniversalTime()
+	end
+
+	if v25 == TimeZone.Current then
+		return p14.dateTime:ToLocalTime()
+	end
+
+	error(("Invalid TimeZone \"%s\""):format((tostring(v25))), 2)
+end
+function t1.GetUnixTimestamp(p16) -- line: 129
+	if p16.dateTime:ToUniversalTime().Millisecond > 0 then
+		return p16.dateTime.UnixTimestamp + p16.dateTime.UnixTimestampMillis % 1000 / 1000
+	end
+
+	return p16.dateTime.UnixTimestamp
+end
+function t1.GetIsoDate(p17) -- line: 143
+	return p17.dateTime:ToIsoDate()
+end
+function t1.GetLongRelativeTime(p18, _, p20, p21) -- line: 151
+	return p18:Format("lll", p20, p21)
+end
+function t1.GetShortRelativeTime(p22, _, p24, p25) -- line: 160
+	-- upvalues: TimeZone (copy)
+	return p22:Format("ll", p24 or TimeZone.Current, p25)
+end
+
+t1.__index = t1
+
+return t1

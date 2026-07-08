@@ -1,8 +1,11 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxSquads").Parent;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-return function() --[[ Line: 5 ]] --[[ Name: useCurrentSquadSelector ]]
-    -- upvalues: l_useSelector_0 (copy)
-    return (l_useSelector_0(function(v2) --[[ Line: 6 ]]
-        return v2.Squad and v2.Squad.Squad and v2.Squad.Squad.currentSquad;
-    end));
-end;
+local Parent = script:FindFirstAncestor("RoduxSquads").Parent
+local useSelector = require(Parent.RoactUtils).Hooks.RoactRodux.useSelector
+
+local function useCurrentSquadSelector() -- line: 5
+	-- upvalues: useSelector (copy)
+	return (useSelector(function(p1) -- line: 6
+		return p1.Squad and (p1.Squad.Squad and p1.Squad.Squad.currentSquad)
+	end))
+end
+
+return useCurrentSquadSelector

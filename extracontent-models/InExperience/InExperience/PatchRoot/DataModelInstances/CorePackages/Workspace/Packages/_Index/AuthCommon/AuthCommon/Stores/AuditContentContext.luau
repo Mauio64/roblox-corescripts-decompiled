@@ -1,3 +1,3 @@
 return {
-    AuditContentContext = require(script.AuditContentContext)
-};
+	AuditContentContext = require(script.AuditContentContext)
+}

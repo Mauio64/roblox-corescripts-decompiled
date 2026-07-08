@@ -1,17 +1,20 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedUtilities").Parent;
-local v1 = require(l_Parent_0.React);
-return function(v2) --[[ Line: 5 ]] --[[ Name: useStatefulRef ]]
-    -- upvalues: v1 (copy)
-    local v3, v4 = v1.useState(nil);
-    return v3, (v1.useCallback(function(v5) --[[ Line: 7 ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        if typeof(v2) == "function" then
-            v2(v5);
-        elseif typeof(v2) == "table" then
-            v2.current = v5;
-        end;
-        v4(v5);
-    end, {
-        v2
-    }));
-end;
+local Parent = script:FindFirstAncestor("SduiSharedUtilities").Parent
+local React = require(Parent.React)
+
+local function useStatefulRef(p1) -- line: 5
+	-- upvalues: React (copy)
+	local v5, v6 = React.useState(nil)
+
+	return v5, (React.useCallback(function(p2) -- line: 7
+		-- upvalues: p1 (copy), v6 (copy)
+		if typeof(p1) == "function" then
+			p1(p2)
+		elseif typeof(p1) == "table" then
+			p1.current = p2
+		end
+
+		v6(p2)
+	end, { p1 }))
+end
+
+return useStatefulRef

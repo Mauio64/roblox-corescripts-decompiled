@@ -1,6 +1,8 @@
 local Foundation = script:FindFirstAncestor("Foundation")
 local FoundationParent = Foundation.Parent
 
+require(FoundationParent.BuilderIcons)
+require(Foundation.Enums.BadgeVariant)
 require(Foundation.Enums.StateLayerAffordance)
 require(Foundation.Enums.StateLayerMode)
 require(Foundation.Enums.CursorType)

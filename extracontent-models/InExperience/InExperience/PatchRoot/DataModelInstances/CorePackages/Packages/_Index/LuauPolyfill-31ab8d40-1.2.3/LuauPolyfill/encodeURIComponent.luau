@@ -1,25 +1,33 @@
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Parent_0 = script.Parent.Parent;
-local l_charCodeAt_0 = require(l_Parent_0.String).charCodeAt;
-local v3 = require(script.Parent.Error);
-return function(v4) --[[ Line: 25 ]] --[[ Name: encodeURIComponent ]]
-    -- upvalues: l_charCodeAt_0 (copy), v3 (copy), l_HttpService_0 (copy)
-    local v5 = utf8.len(v4);
-    if v5 == 0 or v5 == nil then
-        return "";
-    else
-        local v6 = l_charCodeAt_0(v4, 1);
-        if v5 == 1 then
-            if v6 == 55296 then
-                error(v3.new("URI malformed"));
-            end;
-            if v6 == 57343 then
-                error(v3.new("URI malformed"));
-            end;
-        end;
-        if v6 >= 56320 and v6 < 57343 then
-            error(v3.new("URI malformed"));
-        end;
-        return (l_HttpService_0:UrlEncode(v4):gsub("%%2D", "-"):gsub("%%5F", "_"):gsub("%%2E", "."):gsub("%%21", "!"):gsub("%%7E", "~"):gsub("%%2A", "*"):gsub("%%27", "'"):gsub("%%28", "("):gsub("%%29", ")"));
-    end;
-end;
+local HttpService = game:GetService("HttpService")
+local ParentParent = script.Parent.Parent
+local charCodeAt = require(ParentParent.String).charCodeAt
+local Error = require(script.Parent.Error)
+
+local function encodeURIComponent(s1: string) -- line: 25
+	-- upvalues: charCodeAt (copy), Error (copy), HttpService (copy)
+	local v7 = utf8.len(s1)
+
+	if v7 == 0 or v7 == nil then
+		return ""
+	end
+
+	local v8 = charCodeAt(s1, 1)
+
+	if v7 == 1 then
+		if v8 == 55296 then
+			error(Error.new("URI malformed"))
+		end
+
+		if v8 == 57343 then
+			error(Error.new("URI malformed"))
+		end
+	end
+
+	if v8 >= 56320 and v8 < 57343 then
+		error(Error.new("URI malformed"))
+	end
+
+	return (HttpService:UrlEncode(s1):gsub("%%2D", "-"):gsub("%%5F", "_"):gsub("%%2E", "."):gsub("%%21", "!"):gsub("%%7E", "~"):gsub("%%2A", "*"):gsub("%%27", "'"):gsub("%%28", "("):gsub("%%29", ")"))
+end
+
+return encodeURIComponent

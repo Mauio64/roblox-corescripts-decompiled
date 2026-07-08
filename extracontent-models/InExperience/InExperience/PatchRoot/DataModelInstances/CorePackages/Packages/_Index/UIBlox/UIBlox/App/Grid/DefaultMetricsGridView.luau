@@ -1,92 +1,99 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent.Parent;
-local v2 = require(l_Parent_1.Roact);
-local v3 = require(l_Parent_1.Cryo);
-local v4 = require(l_Parent_1.t);
-local v5 = require(l_Parent_0.GridView);
-local function v7(v6) --[[ Line: 15 ]] --[[ Name: validateWindowHeight ]]
-    if v6.windowHeight ~= nil and v6.windowHeight > v6.maxHeight then
-        return false, ("windowHeight must be less than or equal to maxHeight\nmaxHeight: %f\nwindowHeight: %f"):format(v6.maxHeight, v6.windowHeight);
-    else
-        return true;
-    end;
-end;
-local v8 = v2.PureComponent:extend("DefaultMetricsGridView");
-v8.validateProps = v4.strictInterface({
-    getItemHeight = v4.callback, 
-    getItemMetrics = v4.callback, 
-    windowHeight = v4.optional(v4.numberMin(0)), 
-    renderItem = v4.callback, 
-    itemPadding = v4.Vector2, 
-    items = v4.table, 
-    maxHeight = v4.numberMin(0), 
-    LayoutOrder = v4.optional(v4.integer), 
-    onNumItemsPerRowChanged = v4.optional(v4.callback), 
-    NextSelectionLeft = v4.optional(v4.table), 
-    NextSelectionRight = v4.optional(v4.table), 
-    NextSelectionUp = v4.optional(v4.table), 
-    NextSelectionDown = v4.optional(v4.table), 
-    frameRef = v4.optional(v4.table), 
-    restorePreviousChildFocus = v4.optional(v4.boolean), 
-    onFocusGained = v4.optional(v4.callback), 
-    defaultChildIndex = v4.optional(v4.numberMin(1)), 
-    isRoactGamepadEnabled = v4.optional(v4.boolean)
-});
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent.Parent
+local Roact = require(ParentParent.Roact)
+local Cryo = require(ParentParent.Cryo)
+local t = require(ParentParent.t)
+local GridView = require(scriptParent.GridView)
+
+local function validateWindowHeight(p1) -- line: 15
+	if p1.windowHeight ~= nil and p1.windowHeight > p1.maxHeight then
+		return false, ("windowHeight must be less than or equal to maxHeight\nmaxHeight: %f\nwindowHeight: %f"):format(p1.maxHeight, p1.windowHeight)
+	end
+
+	return true
+end
+
+local v8 = Roact.PureComponent:extend("DefaultMetricsGridView")
+
+v8.validateProps = t.strictInterface({
+	getItemHeight = t.callback,
+	getItemMetrics = t.callback,
+	windowHeight = t.optional(t.numberMin(0)),
+	renderItem = t.callback,
+	itemPadding = t.Vector2,
+	items = t.table,
+	maxHeight = t.numberMin(0),
+	LayoutOrder = t.optional(t.integer),
+	onNumItemsPerRowChanged = t.optional(t.callback),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	frameRef = t.optional(t.table),
+	restorePreviousChildFocus = t.optional(t.boolean),
+	onFocusGained = t.optional(t.callback),
+	defaultChildIndex = t.optional(t.numberMin(1)),
+	isRoactGamepadEnabled = t.optional(t.boolean)
+})
 v8.defaultProps = {
-    maxHeight = 1e999, 
-    isRoactGamepadEnabled = true
-};
-v8.init = function(v9) --[[ Line: 75 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy)
-    v9.isMounted = false;
-    v9.state = {
-        containerWidth = 0
-    };
-    v9.initialSizeCheckerRef = v2.createRef();
-end;
-v8.render = function(v10) --[[ Line: 85 ]] --[[ Name: render ]]
-    -- upvalues: v7 (copy), v2 (copy), v5 (copy)
-    assert(v7(v10.props));
-    local v11 = v10.props.getItemMetrics(v10.state.containerWidth, v10.props.itemPadding.X);
-    local v12 = v10.props.getItemHeight(v11.itemWidth);
-    local v13 = Vector2.new(math.max(0, v11.itemWidth), (math.max(0, v12)));
-    return v2.createElement(v5, {
-        renderItem = v10.props.renderItem, 
-        windowHeight = v10.props.windowHeight, 
-        maxHeight = v10.props.maxHeight, 
-        itemSize = v13, 
-        itemPadding = v10.props.itemPadding, 
-        items = v10.props.items, 
-        LayoutOrder = v10.props.LayoutOrder, 
-        onNumItemsPerRowChanged = v10.props.onNumItemsPerRowChanged, 
-        NextSelectionLeft = v10.props.NextSelectionLeft, 
-        NextSelectionRight = v10.props.NextSelectionRight, 
-        NextSelectionUp = v10.props.NextSelectionUp, 
-        NextSelectionDown = v10.props.NextSelectionDown, 
-        [v2.Ref] = v10.props.frameRef, 
-        defaultChildIndex = if v10.props.isRoactGamepadEnabled then v10.props.defaultChildIndex else nil, 
-        restorePreviousChildFocus = if v10.props.isRoactGamepadEnabled then v10.props.restorePreviousChildFocus else nil, 
-        onFocusGained = if v10.props.isRoactGamepadEnabled then v10.props.onFocusGained else nil, 
-        isRoactGamepadEnabled = v10.props.isRoactGamepadEnabled, 
-        onWidthChanged = function(v14) --[[ Line: 117 ]] --[[ Name: onWidthChanged ]]
-            -- upvalues: v10 (copy)
-            if v10.isMounted then
-                v10:setState({
-                    containerWidth = v14
-                });
-            end;
-        end
-    });
-end;
-v8.didMount = function(v15) --[[ Line: 127 ]] --[[ Name: didMount ]]
-    v15.isMounted = true;
-end;
-v8.willUnmount = function(v16) --[[ Line: 131 ]] --[[ Name: willUnmount ]]
-    v16.isMounted = false;
-end;
-return v2.forwardRef(function(v17, v18) --[[ Line: 135 ]]
-    -- upvalues: v2 (copy), v8 (copy), v3 (copy)
-    return v2.createElement(v8, v3.Dictionary.join(v17, {
-        frameRef = v18
-    }));
-end);
+	maxHeight = 1e999,
+	isRoactGamepadEnabled = true
+}
+
+function v8.init(p2) -- line: 75
+	-- upvalues: Roact (copy)
+	p2.isMounted = false
+	p2.state = {
+		containerWidth = 0
+	}
+	p2.initialSizeCheckerRef = Roact.createRef()
+end
+function v8.render(p3) -- line: 85
+	-- upvalues: validateWindowHeight (copy), Roact (copy), GridView (copy)
+	assert(validateWindowHeight(p3.props))
+
+	local v12 = p3.props.getItemMetrics(p3.state.containerWidth, p3.props.itemPadding.X)
+	local v13 = p3.props.getItemHeight(v12.itemWidth)
+	local vector2 = Vector2.new(math.max(0, v12.itemWidth), (math.max(0, v13)))
+
+	return Roact.createElement(GridView, {
+		renderItem = p3.props.renderItem,
+		windowHeight = p3.props.windowHeight,
+		maxHeight = p3.props.maxHeight,
+		itemSize = vector2,
+		itemPadding = p3.props.itemPadding,
+		items = p3.props.items,
+		LayoutOrder = p3.props.LayoutOrder,
+		onNumItemsPerRowChanged = p3.props.onNumItemsPerRowChanged,
+		NextSelectionLeft = p3.props.NextSelectionLeft,
+		NextSelectionRight = p3.props.NextSelectionRight,
+		NextSelectionUp = p3.props.NextSelectionUp,
+		NextSelectionDown = p3.props.NextSelectionDown,
+		[Roact.Ref] = p3.props.frameRef,
+		defaultChildIndex = if not p3.props.isRoactGamepadEnabled then nil else p3.props.defaultChildIndex,
+		restorePreviousChildFocus = if not p3.props.isRoactGamepadEnabled then nil else p3.props.restorePreviousChildFocus,
+		onFocusGained = if not p3.props.isRoactGamepadEnabled then nil else p3.props.onFocusGained,
+		isRoactGamepadEnabled = p3.props.isRoactGamepadEnabled,
+		onWidthChanged = function(p4) -- line: 117
+			-- upvalues: p3 (copy)
+			if p3.isMounted then
+				p3:setState({
+					containerWidth = p4
+				})
+			end
+		end
+	})
+end
+function v8.didMount(p5) -- line: 127
+	p5.isMounted = true
+end
+function v8.willUnmount(p6) -- line: 131
+	p6.isMounted = false
+end
+
+return Roact.forwardRef(function(p7, p8) -- line: 135
+	-- upvalues: Roact (copy), v8 (copy), Cryo (copy)
+	return Roact.createElement(v8, Cryo.Dictionary.join(p7, {
+		frameRef = p8
+	}))
+end)

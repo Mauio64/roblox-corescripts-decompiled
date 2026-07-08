@@ -1,73 +1,131 @@
-local l_Parent_0 = script:FindFirstAncestor("SduiSharedContent").Parent;
-local v1 = require(l_Parent_0.React);
-local l_Coachmark_0 = require(l_Parent_0.Foundation).Coachmark;
-local l_CollectionService_0 = game:GetService("CollectionService");
-return v1.memo(function(v4) --[[ Line: 28 ]] --[[ Name: SduiCoachmark ]]
-    -- upvalues: v1 (copy), l_CollectionService_0 (copy), l_Coachmark_0 (copy)
-    local v5 = v1.useRef(nil);
-    local v6, v7 = v1.useState(false);
-    local v8, v9 = v1.useState(false);
-    v1.useEffect(function() --[[ Line: 33 ]]
-        -- upvalues: v5 (copy), v9 (copy), l_CollectionService_0 (ref), v4 (copy)
-        local function v11(v10) --[[ Line: 34 ]] --[[ Name: onTagAdded ]]
-            -- upvalues: v5 (ref), v9 (ref)
-            if not v10:IsA("GuiObject") then
-                return;
-            else
-                v5.current = v10;
-                v9(true);
-                return;
-            end;
-        end;
-        local function v13(_) --[[ Line: 42 ]] --[[ Name: onTagRemoved ]]
-            -- upvalues: v5 (ref), v9 (ref)
-            v5.current = nil;
-            v9(false);
-        end;
-        for _, v15 in (l_CollectionService_0:GetTagged(v4.collectionServiceAnchorTag)) do
-            if v15:IsA("GuiObject") then
-                if v15:IsA("GuiObject") then
-                    v5.current = v15;
-                    v9(true);
-                    break;
-                else
-                    break;
-                end;
-            end;
-        end;
-        local v16 = l_CollectionService_0:GetInstanceAddedSignal(v4.collectionServiceAnchorTag):Connect(v11);
-        local v17 = l_CollectionService_0:GetInstanceRemovedSignal(v4.collectionServiceAnchorTag):Connect(v13);
-        return function() --[[ Line: 59 ]]
-            -- upvalues: v16 (copy), v17 (copy)
-            v16:Disconnect();
-            v17:Disconnect();
-        end;
-    end, {
-        v4.collectionServiceAnchorTag
-    });
-    local v18 = v1.useCallback(function() --[[ Line: 65 ]]
-        -- upvalues: v7 (copy), v4 (copy)
-        v7(true);
-        if v4.onClose then
-            v4.onClose();
-        end;
-    end, {
-        v4.onClose
-    });
-    if not v8 or v6 then
-        return nil;
-    else
-        return v1.createElement(l_Coachmark_0, {
-            title = v4.title, 
-            text = v4.body, 
-            isOpen = v8 and not v6, 
-            side = v4.side, 
-            align = v4.align, 
-            anchorRef = v5, 
-            onClose = v18, 
-            actions = v4.actions, 
-            media = v4.media, 
-            testId = v4.testId
-        });
-    end;
-end);
+local SduiSharedContent = script:FindFirstAncestor("SduiSharedContent")
+local SduiSharedContentParent = SduiSharedContent.Parent
+local React = require(SduiSharedContentParent.React)
+local Foundation = require(SduiSharedContentParent.Foundation)
+local Navigation = require(SduiSharedContentParent.Navigation)
+local Drawer = require(SduiSharedContentParent.Drawer)
+local RoactUtils = require(SduiSharedContentParent.RoactUtils)
+local SignalsReact = require(SduiSharedContentParent.SignalsReact)
+local StreamNotifications = require(SduiSharedContentParent.StreamNotifications)
+local sendCoachmarkImpression = require(SduiSharedContent.Analytics.sendCoachmarkImpression)
+local v11 = game:DefineFastFlag("LuaAppUseNavFocusInSduiCoachmark", false)
+local v12 = game:DefineFastFlag("LuaAppCoachmarkImpression", false)
+local v13 = game:DefineFastFlag("LuaAppHideSduiCoachmarkWhenFlyoutOpen", false)
+local v14 = game:DefineFastFlag("LuaAppHideSduiCoachmarkWhenCentralOverlayOpen", false)
+local v15 = game:DefineFastFlag("LuaAppHideSduiCoachmarkWhenNotificationStreamOpen", false)
+local Coachmark = Foundation.Coachmark
+local useNavigationFocus = Navigation.useNavigationFocus
+local useDrawerVisible = Drawer.Hooks.useDrawerVisible
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useSignalState = SignalsReact.useSignalState
+local StreamNotificationStore = StreamNotifications.StreamNotificationStore
+local CollectionService = game:GetService("CollectionService")
+
+local function SduiCoachmark(t1: {[any]: any}) -- line: 46
+	-- upvalues: React (copy), v11 (copy), useNavigationFocus (copy), v13 (copy), useDrawerVisible (copy), v14 (copy), useSelector (copy), v15 (copy), useSignalState (copy), StreamNotificationStore (copy), CollectionService (copy), v12 (copy), sendCoachmarkImpression (copy), Coachmark (copy)
+	local v25 = React.useRef(nil)
+	local v26, v27 = React.useState(false)
+	local v28, v29 = React.useState(false)
+	local v30 = if not v11 then nil else useNavigationFocus()
+	local v31 = not not v13 and useDrawerVisible()
+	local v32 = if not v14 then nil else useSelector(function(p1) -- line: 53
+		return p1.CentralOverlay.OverlayType ~= nil
+	end)
+	local v33 = if not v15 then nil else useSignalState(StreamNotificationStore.getStreamPresented)
+
+	React.useEffect(function() -- line: 61
+		-- upvalues: v25 (copy), v29 (copy), CollectionService (copy), t1 (copy)
+		local function onTagAdded(p2) -- line: 62
+			-- upvalues: v25 (copy), v29 (copy)
+			if not p2:IsA("GuiObject") then
+				return
+			end
+
+			v25.current = p2
+			v29(true)
+		end
+		local function onTagRemoved(_) -- line: 70
+			-- upvalues: v25 (copy), v29 (copy)
+			v25.current = nil
+			v29(false)
+		end
+
+		for _, v41 in (CollectionService:GetTagged(t1.collectionServiceAnchorTag)) do
+			if v41:IsA("GuiObject") then
+				if not v41:IsA("GuiObject") then
+					break
+				end
+
+				v25.current = v41
+				v29(true)
+
+				break
+			end
+		end
+
+		local connection = CollectionService:GetInstanceAddedSignal(t1.collectionServiceAnchorTag):Connect(onTagAdded)
+		local connection2 = CollectionService:GetInstanceRemovedSignal(t1.collectionServiceAnchorTag):Connect(onTagRemoved)
+
+		return function() -- line: 87
+			-- upvalues: connection (copy), connection2 (copy)
+			connection:Disconnect()
+			connection2:Disconnect()
+		end
+	end, { t1.collectionServiceAnchorTag })
+
+	local v34 = React.useCallback(function() -- line: 93
+		-- upvalues: v27 (copy), t1 (copy)
+		v27(true)
+
+		if t1.onClose then
+			t1.onClose()
+		end
+	end, { t1.onClose })
+
+	if v12 then
+		local v35 = React.useRef(false)
+		local v36 = v28 and (not v26 and (not (v11 and not v30) and (not (v13 and v31) and (not (v14 and v32) and not (v15 and v33)))))
+
+		React.useEffect(function() -- line: 110
+			-- upvalues: v36 (copy), v35 (copy), t1 (copy), sendCoachmarkImpression (copy)
+			if not v36 or v35.current then
+				return
+			end
+
+			local media = t1.media
+			local v45 = media ~= nil
+
+			if typeof(media) == "table" and next(media) == nil then
+				v45 = false
+			end
+
+			sendCoachmarkImpression(t1.collectionServiceAnchorTag, v45)
+			v35.current = true
+		end, {
+			v36,
+			t1.collectionServiceAnchorTag,
+			t1.media
+		})
+
+		if not v36 then
+			return nil
+		end
+	elseif not v28 or v26 or v11 and not v30 or v13 and v31 or v14 and v32 or v15 and v33 then
+		return nil
+	end
+
+	return React.createElement(Coachmark, {
+		title = t1.title,
+		text = t1.body,
+		isOpen = not not v11 or v28 and not v26,
+		side = t1.side,
+		align = t1.align,
+		anchorRef = v25,
+		onClose = v34,
+		actions = t1.actions,
+		media = t1.media,
+		testId = t1.testId
+	})
+end
+
+return React.memo(SduiCoachmark)

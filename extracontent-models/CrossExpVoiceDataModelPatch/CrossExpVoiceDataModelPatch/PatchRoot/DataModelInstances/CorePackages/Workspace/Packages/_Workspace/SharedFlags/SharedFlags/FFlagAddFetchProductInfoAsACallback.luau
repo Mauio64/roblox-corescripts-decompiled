@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddFetchProductInfoAsACallback", false);
+return game:DefineFastFlag("AddFetchProductInfoAsACallback", false)

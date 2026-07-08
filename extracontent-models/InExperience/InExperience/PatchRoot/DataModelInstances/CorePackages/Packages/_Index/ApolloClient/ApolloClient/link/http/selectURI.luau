@@ -1,16 +1,22 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local l_Boolean_0 = require(l_Parent_0.LuauPolyfill).Boolean;
-local v2 = {};
-local _ = require(script.Parent.Parent.core.types);
-v2.selectURI = function(v4, v5) --[[ Line: 19 ]] --[[ Name: selectURI ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local l_uri_0 = v4:getContext().uri;
-    if l_Boolean_0.toJSBoolean(l_uri_0) then
-        return l_uri_0;
-    elseif typeof(v5) == "function" then
-        return v5(v4);
-    else
-        return l_Boolean_0.toJSBoolean(v5) and v5 or "/graphql";
-    end;
-end;
-return v2;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Boolean = require(ParentParent.LuauPolyfill).Boolean
+local t1 = {}
+
+require(script.Parent.Parent.core.types)
+
+function t1.selectURI(p1, p2) -- line: 19
+	-- upvalues: Boolean (copy)
+	local uri = p1:getContext().uri
+
+	if Boolean.toJSBoolean(uri) then
+		return uri
+	end
+
+	if typeof(p2) == "function" then
+		return p2(p1)
+	end
+
+	return Boolean.toJSBoolean(p2) and p2 or "/graphql"
+end
+
+return t1

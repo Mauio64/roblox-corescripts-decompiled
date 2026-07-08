@@ -1,4 +1,4 @@
 return {
-    DisableAppTopBanner = require(script.DisableAppTopBanner), 
-    SetAppTopBanner = require(script.SetAppTopBanner)
-};
+	DisableAppTopBanner = require(script.DisableAppTopBanner),
+	SetAppTopBanner = require(script.SetAppTopBanner)
+}

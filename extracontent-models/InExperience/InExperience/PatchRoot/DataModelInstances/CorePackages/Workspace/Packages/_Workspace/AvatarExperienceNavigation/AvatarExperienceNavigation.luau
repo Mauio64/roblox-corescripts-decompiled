@@ -1,37 +1,40 @@
-local v0 = require(script.NavigationActions.RegisterCustomGetStateForAction);
-local v1 = require(script.Enums.CustomGetStateForAction);
-local _ = require(script.AvatarRoute.Types);
-local _ = require(script.Types.NavigationType);
+local RegisterCustomGetStateForAction = require(script.NavigationActions.RegisterCustomGetStateForAction)
+local CustomGetStateForAction = require(script.Enums.CustomGetStateForAction)
+
+require(script.AvatarRoute.Types)
+require(script.Types.NavigationType)
+
 return {
-    AvatarRoute = {
-        Context = {
-            AvatarRouteContext = require(script.AvatarRoute.Context.AvatarRouteContext)
-        }, 
-        Hooks = {
-            useAvatarRoute = require(script.AvatarRoute.Hooks.useAvatarRoute)
-        }, 
-        RouteInfo = require(script.AvatarRoute.RouteInfo), 
-        AvatarRoute = require(script.AvatarRoute.AvatarRoute), 
-        AvatarScreenProperties = require(script.AvatarRoute.AvatarScreenProperties)
-    }, 
-    Enums = {
-        AvatarScreen = require(script.Enums.AvatarScreen), 
-        AvatarEditorNavigation = require(script.Enums.AvatarEditorNavigation), 
-        AvatarRootNavigationAction = require(script.Enums.AvatarRootNavigationAction), 
-        UnifiedLoggingSurface = require(script.Enums.UnifiedLoggingSurface), 
-        CustomGetStateForAction = v1
-    }, 
-    Actions = {
-        DeregisterCustomGetStateForAction = require(script.NavigationActions.DeregisterCustomGetStateForAction), 
-        RegisterCustomGetStateForAction = v0, 
-        ClearScreens = require(script.NavigationActions.ClearScreens)
-    }, 
-    Debug = {
-        logOnOverlayClosed = require(script.Debug.logOnOverlayClosed)
-    }, 
-    withMappedNavigationParams = require(script.withMappedNavigationParams), 
-    Thunks = {
-        NavigateWithLock = require(script.Thunks.NavigateWithLock)
-    }, 
-    ["jest.config"] = script["jest.config"]
-};
+	AvatarRoute = {
+		Context = {
+			AvatarRouteContext = require(script.AvatarRoute.Context.AvatarRouteContext)
+		},
+		Hooks = {
+			useAvatarRoute = require(script.AvatarRoute.Hooks.useAvatarRoute)
+		},
+		RouteInfo = require(script.AvatarRoute.RouteInfo),
+		AvatarRoute = require(script.AvatarRoute.AvatarRoute),
+		AvatarScreenProperties = require(script.AvatarRoute.AvatarScreenProperties),
+		getActiveAvatarScreen = require(script.AvatarRoute.getActiveAvatarScreen)
+	},
+	Enums = {
+		AvatarScreen = require(script.Enums.AvatarScreen),
+		AvatarEditorNavigation = require(script.Enums.AvatarEditorNavigation),
+		AvatarRootNavigationAction = require(script.Enums.AvatarRootNavigationAction),
+		UnifiedLoggingSurface = require(script.Enums.UnifiedLoggingSurface),
+		CustomGetStateForAction = CustomGetStateForAction
+	},
+	Actions = {
+		DeregisterCustomGetStateForAction = require(script.NavigationActions.DeregisterCustomGetStateForAction),
+		RegisterCustomGetStateForAction = RegisterCustomGetStateForAction,
+		ClearScreens = require(script.NavigationActions.ClearScreens)
+	},
+	Debug = {
+		logOnOverlayClosed = require(script.Debug.logOnOverlayClosed)
+	},
+	withMappedNavigationParams = require(script.withMappedNavigationParams),
+	Thunks = {
+		NavigateWithLock = require(script.Thunks.NavigateWithLock)
+	},
+	["jest.config"] = script["jest.config"]
+}

@@ -1,47 +1,53 @@
-local v0 = {};
-v0.__index = v0;
-v0.new = function(v1) --[[ Line: 4 ]] --[[ Name: new ]]
-    -- upvalues: v0 (copy)
-    local v2 = {
-        _enableNewFont = v1
-    };
-    setmetatable(v2, v0);
-    return v2;
-end;
-v0.getDefault = function(v3) --[[ Line: 12 ]] --[[ Name: getDefault ]]
-    if v3._enableNewFont then
-        return Enum.Font.BuilderSans;
-    else
-        return Enum.Font.Gotham;
-    end;
-end;
-v0.getMedium = function(v4) --[[ Line: 21 ]] --[[ Name: getMedium ]]
-    if v4._enableNewFont then
-        return Enum.Font.BuilderSansMedium;
-    else
-        return Enum.Font.GothamMedium;
-    end;
-end;
-v0.getBlack = function(v5) --[[ Line: 30 ]] --[[ Name: getBlack ]]
-    if v5._enableNewFont then
-        return Enum.Font.BuilderSansExtraBold;
-    else
-        return Enum.Font.GothamBlack;
-    end;
-end;
-v0.getBold = function(v6) --[[ Line: 39 ]] --[[ Name: getBold ]]
-    if v6._enableNewFont then
-        return Enum.Font.BuilderSansBold;
-    else
-        return Enum.Font.GothamBold;
-    end;
-end;
-v0.getSemibold = function(v7) --[[ Line: 48 ]] --[[ Name: getSemibold ]]
-    if v7._enableNewFont then
-        return Enum.Font.BuilderSansMedium;
-    else
-        return Enum.Font.GothamMedium;
-    end;
-end;
-v0.default = v0.new(true);
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(b1: boolean) -- line: 4
+	-- upvalues: t1 (copy)
+	local t2 = {
+		_enableNewFont = b1
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.getDefault(p1) -- line: 12
+	if p1._enableNewFont then
+		return Enum.Font.BuilderSans
+	end
+
+	return Enum.Font.Gotham
+end
+function t1.getMedium(p2) -- line: 21
+	if p2._enableNewFont then
+		return Enum.Font.BuilderSansMedium
+	end
+
+	return Enum.Font.GothamMedium
+end
+function t1.getBlack(p3) -- line: 30
+	if p3._enableNewFont then
+		return Enum.Font.BuilderSansExtraBold
+	end
+
+	return Enum.Font.GothamBlack
+end
+function t1.getBold(p4) -- line: 39
+	if p4._enableNewFont then
+		return Enum.Font.BuilderSansBold
+	end
+
+	return Enum.Font.GothamBold
+end
+function t1.getSemibold(p5) -- line: 48
+	if p5._enableNewFont then
+		return Enum.Font.BuilderSansMedium
+	end
+
+	return Enum.Font.GothamMedium
+end
+
+t1.default = t1.new(true)
+
+return t1

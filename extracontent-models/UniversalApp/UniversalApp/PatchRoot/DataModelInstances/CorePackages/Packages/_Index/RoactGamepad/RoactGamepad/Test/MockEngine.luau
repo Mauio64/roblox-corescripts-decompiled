@@ -1,223 +1,229 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(script.Parent.Parent.createSignal);
-local v3 = {};
-v3.__index = v3;
-local v4 = {
-    [Enum.UserInputType.Gamepad1] = true, 
-    [Enum.UserInputType.Gamepad2] = true, 
-    [Enum.UserInputType.Gamepad3] = true, 
-    [Enum.UserInputType.Gamepad4] = true, 
-    [Enum.UserInputType.Gamepad5] = true, 
-    [Enum.UserInputType.Gamepad6] = true, 
-    [Enum.UserInputType.Gamepad7] = true, 
-    [Enum.UserInputType.Gamepad8] = true, 
-    [Enum.UserInputType.Keyboard] = true
-};
-local v5 = {
-    Enum.KeyCode.Thumbstick2, 
-    Enum.KeyCode.DPadDown, 
-    Enum.KeyCode.DPadUp, 
-    Enum.KeyCode.ButtonL3, 
-    Enum.KeyCode.ButtonL2, 
-    Enum.KeyCode.DPadRight, 
-    Enum.KeyCode.ButtonR1, 
-    Enum.KeyCode.ButtonSelect, 
-    Enum.KeyCode.ButtonStart, 
-    Enum.KeyCode.ButtonY, 
-    Enum.KeyCode.DPadLeft, 
-    Enum.KeyCode.ButtonR2, 
-    Enum.KeyCode.ButtonR3, 
-    Enum.KeyCode.ButtonX, 
-    Enum.KeyCode.Thumbstick1, 
-    Enum.KeyCode.ButtonB, 
-    Enum.KeyCode.ButtonA, 
-    Enum.KeyCode.ButtonL1
-};
-local v6 = {
-    [Enum.KeyCode.DPadUp] = "NextSelectionUp", 
-    [Enum.KeyCode.Up] = "NextSelectionUp", 
-    [Enum.KeyCode.DPadDown] = "NextSelectionDown", 
-    [Enum.KeyCode.Down] = "NextSelectionDown", 
-    [Enum.KeyCode.DPadLeft] = "NextSelectionLeft", 
-    [Enum.KeyCode.Left] = "NextSelectionLeft", 
-    [Enum.KeyCode.DPadRight] = "NextSelectionRight", 
-    [Enum.KeyCode.Right] = "NextSelectionRight"
-};
-local function _(v7) --[[ Line: 53 ]] --[[ Name: defaultInputObject ]]
-    return {
-        KeyCode = v7, 
-        Delta = Vector3.new(), 
-        Position = Vector3.new(), 
-        UserInputType = Enum.UserInputType.Gamepad1, 
-        UserInputState = Enum.UserInputState.End
-    };
-end;
-local function _(v9) --[[ Line: 64 ]] --[[ Name: wrapDisconnector ]]
-    return {
-        Disconnect = v9
-    };
-end;
-v3.new = function() --[[ Line: 70 ]] --[[ Name: new ]]
-    -- upvalues: v2 (copy), v3 (copy), v1 (copy)
-    local v11 = setmetatable({
-        __mockSelected = nil, 
-        __connectedGamepads = {}, 
-        __gamepadStates = {}, 
-        __selectionChangedSignal = v2(), 
-        __inputSignal = v2(), 
-        __renderStepped = v2(), 
-        __gamepadConnected = v2(), 
-        __gamepadDisconnected = v2(), 
-        __interface = nil
-    }, v3);
-    local v23 = {
-        getSelection = function() --[[ Line: 88 ]] --[[ Name: getSelection ]]
-            -- upvalues: v11 (copy)
-            return v11.__mockSelected;
-        end, 
-        setSelection = function(v12) --[[ Line: 91 ]] --[[ Name: setSelection ]]
-            -- upvalues: v11 (copy)
-            v11.__mockSelected = v12;
-            v11.__selectionChangedSignal:fire();
-        end, 
-        getGamepadConnected = function(v13) --[[ Line: 97 ]] --[[ Name: getGamepadConnected ]]
-            -- upvalues: v11 (copy)
-            return v11.__connectedGamepads[v13] or false;
-        end, 
-        getGamepadState = function(v14) --[[ Line: 100 ]] --[[ Name: getGamepadState ]]
-            -- upvalues: v11 (copy)
-            if v11.__gamepadStates[v14] == nil then
-                v11:__initializeGamepadState(v14);
-            end;
-            return v11.__gamepadStates[v14];
-        end, 
-        getNavigationGamepads = function(_) --[[ Line: 109 ]] --[[ Name: getNavigationGamepads ]]
-            -- upvalues: v1 (ref), v11 (copy)
-            return v1.Dictionary.keys(v11.__connectedGamepads);
-        end, 
-        subscribeToSelectionChanged = function(v16) --[[ Line: 112 ]] --[[ Name: subscribeToSelectionChanged ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__selectionChangedSignal:subscribe(v16)
-            };
-        end, 
-        subscribeToInputBegan = function(v17) --[[ Line: 117 ]] --[[ Name: subscribeToInputBegan ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__inputSignal:subscribe(v17)
-            };
-        end, 
-        subscribeToInputChanged = function(v18) --[[ Line: 122 ]] --[[ Name: subscribeToInputChanged ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__inputSignal:subscribe(v18)
-            };
-        end, 
-        subscribeToInputEnded = function(v19) --[[ Line: 127 ]] --[[ Name: subscribeToInputEnded ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__inputSignal:subscribe(v19)
-            };
-        end, 
-        subscribeToRenderStepped = function(v20) --[[ Line: 132 ]] --[[ Name: subscribeToRenderStepped ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__renderStepped:subscribe(v20)
-            };
-        end, 
-        subscribeToGamepadConnected = function(v21) --[[ Line: 137 ]] --[[ Name: subscribeToGamepadConnected ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__gamepadConnected:subscribe(v21)
-            };
-        end, 
-        subscribeToGamepadDisconnected = function(v22) --[[ Line: 142 ]] --[[ Name: subscribeToGamepadDisconnected ]]
-            -- upvalues: v11 (copy)
-            return {
-                Disconnect = v11.__gamepadDisconnected:subscribe(v22)
-            };
-        end
-    };
-    v11.__interface = v23;
-    return v11, v23;
-end;
-v3.__initializeGamepadState = function(v24, v25) --[[ Line: 154 ]] --[[ Name: __initializeGamepadState ]]
-    -- upvalues: v1 (copy), v5 (copy)
-    v24.__gamepadStates[v25] = v1.List.map(v5, function(v26) --[[ Line: 155 ]]
-        return {
-            KeyCode = v26, 
-            Delta = Vector3.new(), 
-            Position = Vector3.new(), 
-            UserInputType = Enum.UserInputType.Gamepad1, 
-            UserInputState = Enum.UserInputState.End
-        };
-    end);
-end;
-v3.simulateSelectionChanged = function(v27, v28) --[[ Line: 160 ]] --[[ Name: simulateSelectionChanged ]]
-    v27.__mockSelected = v28;
-    v27.__selectionChangedSignal:fire();
-end;
-v3.simulateInput = function(v29, v30) --[[ Line: 165 ]] --[[ Name: simulateInput ]]
-    -- upvalues: v1 (copy), v4 (copy), v6 (copy)
-    v30 = v1.Dictionary.join({
-        Delta = Vector3.new(), 
-        Position = Vector3.new(), 
-        UserInputType = Enum.UserInputType.Gamepad1
-    }, v30);
-    local v31 = false;
-    if typeof(v30.KeyCode) == "EnumItem" then
-        v31 = v30.KeyCode.EnumType == Enum.KeyCode;
-    end;
-    assert(v31, "Invalid inputObject.KeyCode: expected a member of Enum.KeyCode");
-    assert(v4[v30.UserInputType], "Invalid inputObject.UserInputType");
-    local l_KeyCode_0 = v30.KeyCode;
-    v31 = v6[l_KeyCode_0];
-    if v31 ~= nil and v29.__interface.getSelection() ~= nil then
-        v29.__interface.setSelection(v29.__interface.getSelection()[v31]);
-    end;
-    if v30.UserInputType ~= Enum.UserInputType.Keyboard then
-        local l_UserInputType_0 = v30.UserInputType;
-        if not v29.__connectedGamepads[l_UserInputType_0] then
-            v29:connectGamepad(l_UserInputType_0);
-        end;
-        local v34 = v29.__gamepadStates[l_UserInputType_0];
-        local v36 = v1.List.findWhere(v34, function(v35) --[[ Line: 201 ]]
-            -- upvalues: l_KeyCode_0 (copy)
-            return v35.KeyCode == l_KeyCode_0;
-        end);
-        if v36 == nil then
-            error(("Invalid InputObject: KeyCode %s is not possible on %s"):format(tostring(l_KeyCode_0), (tostring(l_UserInputType_0))), 2);
-        end;
-        for v37, v38 in pairs(v30) do
-            v34[v36][v37] = v38;
-        end;
-    end;
-    v29.__inputSignal:fire(v30);
-end;
-v3.renderStep = function(v39, v40) --[[ Line: 222 ]] --[[ Name: renderStep ]]
-    if v40 == nil then
-        v40 = 0.03333333333333333;
-    end;
-    v39.__renderStepped:fire(v40);
-end;
-v3.connectGamepad = function(v41, v42) --[[ Line: 230 ]] --[[ Name: connectGamepad ]]
-    local v43 = false;
-    if typeof(v42) == "EnumItem" then
-        v43 = v42.EnumType == Enum.UserInputType;
-    end;
-    assert(v43, "Invalid argument #1: expected a member of Enum.UserInputType");
-    v41.__connectedGamepads[v42] = true;
-    v41:__initializeGamepadState(v42);
-    v41.__gamepadConnected:fire(v42);
-end;
-v3.disconnectGamepad = function(v44, v45) --[[ Line: 242 ]] --[[ Name: disconnectGamepad ]]
-    local v46 = false;
-    if typeof(v45) == "EnumItem" then
-        v46 = v45.EnumType == Enum.UserInputType;
-    end;
-    assert(v46, "Invalid argument #1: expected a member of Enum.UserInputType");
-    v44.__connectedGamepads[v45] = nil;
-    v44.__gamepadDisconnected:fire(v45);
-end;
-return v3;
+local ParentParent = script.Parent.Parent.Parent
+local Cryo = require(ParentParent.Cryo)
+local createSignal = require(script.Parent.Parent.createSignal)
+local t1 = {}
+
+t1.__index = t1
+
+local t2 = {
+	[Enum.UserInputType.Gamepad1] = true,
+	[Enum.UserInputType.Gamepad2] = true,
+	[Enum.UserInputType.Gamepad3] = true,
+	[Enum.UserInputType.Gamepad4] = true,
+	[Enum.UserInputType.Gamepad5] = true,
+	[Enum.UserInputType.Gamepad6] = true,
+	[Enum.UserInputType.Gamepad7] = true,
+	[Enum.UserInputType.Gamepad8] = true,
+	[Enum.UserInputType.Keyboard] = true
+}
+local t3 = {
+	Enum.KeyCode.Thumbstick2,
+	Enum.KeyCode.DPadDown,
+	Enum.KeyCode.DPadUp,
+	Enum.KeyCode.ButtonL3,
+	Enum.KeyCode.ButtonL2,
+	Enum.KeyCode.DPadRight,
+	Enum.KeyCode.ButtonR1,
+	Enum.KeyCode.ButtonSelect,
+	Enum.KeyCode.ButtonStart,
+	Enum.KeyCode.ButtonY,
+	Enum.KeyCode.DPadLeft,
+	Enum.KeyCode.ButtonR2,
+	Enum.KeyCode.ButtonR3,
+	Enum.KeyCode.ButtonX,
+	Enum.KeyCode.Thumbstick1,
+	Enum.KeyCode.ButtonB,
+	Enum.KeyCode.ButtonA,
+	Enum.KeyCode.ButtonL1
+}
+local t4 = {
+	[Enum.KeyCode.DPadUp] = "NextSelectionUp",
+	[Enum.KeyCode.Up] = "NextSelectionUp",
+	[Enum.KeyCode.DPadDown] = "NextSelectionDown",
+	[Enum.KeyCode.Down] = "NextSelectionDown",
+	[Enum.KeyCode.DPadLeft] = "NextSelectionLeft",
+	[Enum.KeyCode.Left] = "NextSelectionLeft",
+	[Enum.KeyCode.DPadRight] = "NextSelectionRight",
+	[Enum.KeyCode.Right] = "NextSelectionRight"
+}
+
+local function defaultInputObject(p1) -- line: 53
+	return {
+		KeyCode = p1,
+		Delta = Vector3.new(),
+		Position = Vector3.new(),
+		UserInputType = Enum.UserInputType.Gamepad1,
+		UserInputState = Enum.UserInputState.End
+	}
+end
+local function wrapDisconnector(p2) -- line: 64
+	return {
+		Disconnect = p2
+	}
+end
+
+function t1.new() -- line: 70
+	-- upvalues: createSignal (copy), t1 (copy), Cryo (copy)
+	local v12 = setmetatable({
+		__mockSelected = nil,
+		__interface = nil,
+		__connectedGamepads = {},
+		__gamepadStates = {},
+		__selectionChangedSignal = createSignal(),
+		__inputSignal = createSignal(),
+		__renderStepped = createSignal(),
+		__gamepadConnected = createSignal(),
+		__gamepadDisconnected = createSignal()
+	}, t1)
+	local t5 = {
+		getSelection = function() -- line: 88
+			-- upvalues: v12 (copy)
+			return v12.__mockSelected
+		end,
+		setSelection = function(p3) -- line: 91
+			-- upvalues: v12 (copy)
+			v12.__mockSelected = p3
+			v12.__selectionChangedSignal:fire()
+		end,
+		getGamepadConnected = function(p4) -- line: 97
+			-- upvalues: v12 (copy)
+			return v12.__connectedGamepads[p4] or false
+		end,
+		getGamepadState = function(p5) -- line: 100
+			-- upvalues: v12 (copy)
+			if v12.__gamepadStates[p5] == nil then
+				v12:__initializeGamepadState(p5)
+			end
+
+			return v12.__gamepadStates[p5]
+		end,
+		getNavigationGamepads = function(_) -- line: 109
+			-- upvalues: Cryo (copy), v12 (copy)
+			return Cryo.Dictionary.keys(v12.__connectedGamepads)
+		end,
+		subscribeToSelectionChanged = function(p7) -- line: 112
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__selectionChangedSignal:subscribe(p7)
+			}
+		end,
+		subscribeToInputBegan = function(p8) -- line: 117
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__inputSignal:subscribe(p8)
+			}
+		end,
+		subscribeToInputChanged = function(p9) -- line: 122
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__inputSignal:subscribe(p9)
+			}
+		end,
+		subscribeToInputEnded = function(p10) -- line: 127
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__inputSignal:subscribe(p10)
+			}
+		end,
+		subscribeToRenderStepped = function(p11) -- line: 132
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__renderStepped:subscribe(p11)
+			}
+		end,
+		subscribeToGamepadConnected = function(p12) -- line: 137
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__gamepadConnected:subscribe(p12)
+			}
+		end,
+		subscribeToGamepadDisconnected = function(p13) -- line: 142
+			-- upvalues: v12 (copy)
+			return {
+				Disconnect = v12.__gamepadDisconnected:subscribe(p13)
+			}
+		end
+	}
+
+	v12.__interface = t5
+
+	return v12, t5
+end
+function t1.__initializeGamepadState(p14, p15) -- line: 154
+	-- upvalues: Cryo (copy), t3 (copy)
+	p14.__gamepadStates[p15] = Cryo.List.map(t3, function(p16) -- line: 155
+		return {
+			KeyCode = p16,
+			Delta = Vector3.new(),
+			Position = Vector3.new(),
+			UserInputType = Enum.UserInputType.Gamepad1,
+			UserInputState = Enum.UserInputState.End
+		}
+	end)
+end
+function t1.simulateSelectionChanged(p17, p18) -- line: 160
+	p17.__mockSelected = p18
+	p17.__selectionChangedSignal:fire()
+end
+function t1.simulateInput(p19, p20) -- line: 165
+	-- upvalues: Cryo (copy), t2 (copy), t4 (copy)
+	local v20 = Cryo.Dictionary.join({
+		Delta = Vector3.new(),
+		Position = Vector3.new(),
+		UserInputType = Enum.UserInputType.Gamepad1
+	}, p20)
+
+	assert(typeof(v20.KeyCode) == "EnumItem" and v20.KeyCode.EnumType == Enum.KeyCode, "Invalid inputObject.KeyCode: expected a member of Enum.KeyCode")
+	assert(t2[v20.UserInputType], "Invalid inputObject.UserInputType")
+
+	local KeyCode = v20.KeyCode
+	local v22 = t4[KeyCode]
+
+	if v22 ~= nil and p19.__interface.getSelection() ~= nil then
+		p19.__interface.setSelection(p19.__interface.getSelection()[v22])
+	end
+
+	if v20.UserInputType ~= Enum.UserInputType.Keyboard then
+		local UserInputType = v20.UserInputType
+
+		if not p19.__connectedGamepads[UserInputType] then
+			p19:connectGamepad(UserInputType)
+		end
+
+		local v24 = p19.__gamepadStates[UserInputType]
+		local v25 = Cryo.List.findWhere(v24, function(p21) -- line: 201
+			-- upvalues: KeyCode (copy)
+			return p21.KeyCode == KeyCode
+		end)
+
+		if v25 == nil then
+			error(("Invalid InputObject: KeyCode %s is not possible on %s"):format(tostring(KeyCode), (tostring(UserInputType))), 2)
+		end
+
+		for k, v in pairs(v20) do
+			v24[v25][k] = v
+		end
+	end
+
+	p19.__inputSignal:fire(v20)
+end
+function t1.renderStep(p22, p23) -- line: 222
+	if p23 == nil then
+		p23 = 0.03333333333333333
+	end
+
+	p22.__renderStepped:fire(p23)
+end
+function t1.connectGamepad(p24, p25) -- line: 230
+	assert(typeof(p25) == "EnumItem" and p25.EnumType == Enum.UserInputType, "Invalid argument #1: expected a member of Enum.UserInputType")
+	p24.__connectedGamepads[p25] = true
+	p24:__initializeGamepadState(p25)
+	p24.__gamepadConnected:fire(p25)
+end
+function t1.disconnectGamepad(p26, p27) -- line: 242
+	assert(typeof(p27) == "EnumItem" and p27.EnumType == Enum.UserInputType, "Invalid argument #1: expected a member of Enum.UserInputType")
+	p26.__connectedGamepads[p27] = nil
+	p26.__gamepadDisconnected:fire(p27)
+end
+
+return t1

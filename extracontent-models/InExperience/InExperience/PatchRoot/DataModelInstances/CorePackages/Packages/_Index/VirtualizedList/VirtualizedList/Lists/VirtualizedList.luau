@@ -1,1827 +1,2034 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Boolean_0 = v2.Boolean;
-local l_Map_0 = v2.Map;
-local l_Object_0 = v2.Object;
-local l_Set_0 = v2.Set;
-local l_console_0 = v2.console;
-local function _(v9) --[[ Line: 33 ]] --[[ Name: isIndexTruthy ]]
-    local v10 = false;
-    if v9 ~= nil then
-        v10 = v9 ~= 1;
-    end;
-    return v10;
-end;
-local v12 = require(l_Parent_0.Interaction.Batchinator);
-local v13 = require(script.Parent.FillRateHelper);
-local v15 = {
-    findNodeHandle = function(_) --[[ Line: 44 ]] --[[ Name: findNodeHandle ]]
-        warn("ReactNative.findNodeHandle is not implemented");
-    end
-};
-local v16 = nil;
-local v17 = require(l_Parent_0.Components.ScrollView.ScrollView);
-local v18 = require(l_Parent_0.StyleSheet.StyleSheet);
-local v19 = require(l_Parent_0.Components.View.View);
-local v20 = require(script.Parent.ViewabilityHelper);
-local function v21(...) --[[ Line: 62 ]]
-    return {};
-end;
-local v22 = require(l_Parent_0.Utilities.infoLog);
-local v23 = require(l_Parent_0.jsUtils.invariant);
-local v24 = require(script.Parent.VirtualizeUtils);
-local l_keyExtractor_0 = v24.keyExtractor;
-local l_computeWindowedRenderLimits_0 = v24.computeWindowedRenderLimits;
-local v27 = require(l_Parent_1.React);
-local _ = require(l_Parent_0.Components.ScrollView.ScrollView);
-local v29 = require(script.Parent.VirtualizedListContext);
-local l_VirtualizedListCellContextProvider_0 = v29.VirtualizedListCellContextProvider;
-local l_VirtualizedListContext_0 = v29.VirtualizedListContext;
-local l_VirtualizedListContextProvider_0 = v29.VirtualizedListContextProvider;
-local v33 = nil;
-local v34 = nil;
-local v35 = nil;
-v16 = function(v36) --[[ Line: 102 ]] --[[ Name: RefreshControl ]]
-    -- upvalues: v27 (copy)
-    return v27.createElement("Frame", {
-        Name = "RCTRefreshControl"
-    }, v36.children);
-end;
-local v37 = false;
-local v38 = "";
-local function _(v39) --[[ Line: 400 ]] --[[ Name: horizontalOrDefault ]]
-    if v39 == nil then
-        return false;
-    else
-        return v39;
-    end;
-end;
-local function _(v41) --[[ Line: 405 ]] --[[ Name: initialNumToRenderOrDefault ]]
-    if v41 == nil then
-        return 10;
-    else
-        return v41;
-    end;
-end;
-local function _(v43) --[[ Line: 410 ]] --[[ Name: maxToRenderPerBatchOrDefault ]]
-    if v43 == nil then
-        return 10;
-    else
-        return v43;
-    end;
-end;
-local function _(v45) --[[ Line: 415 ]] --[[ Name: onEndReachedThresholdOrDefault ]]
-    if v45 == nil then
-        return 2;
-    else
-        return v45;
-    end;
-end;
-local function _(v47) --[[ Line: 420 ]] --[[ Name: scrollEventThrottleOrDefault ]]
-    if v47 == nil then
-        return 50;
-    else
-        return v47;
-    end;
-end;
-local function _(v49) --[[ Line: 425 ]] --[[ Name: windowSizeOrDefault ]]
-    if v49 == nil then
-        return 21;
-    else
-        return v49;
-    end;
-end;
-local function _(v51) --[[ Line: 436 ]] --[[ Name: compareItemDataOrDefault ]]
-    if v51 == nil then
-        return function(v52, v53) --[[ Line: 438 ]]
-            return v52 == v53;
-        end;
-    else
-        return v51;
-    end;
-end;
-local v55 = v27.PureComponent:extend("VirtualizedList");
-v55.contextType = l_VirtualizedListContext_0;
-v55.init = function(v56, v57) --[[ Line: 661 ]] --[[ Name: init ]]
-    -- upvalues: l_Map_0 (copy), v23 (copy), v13 (copy), l_Boolean_0 (copy), l_computeWindowedRenderLimits_0 (copy), v12 (copy), l_Array_0 (copy), v20 (copy), l_Object_0 (copy), l_Set_0 (copy), l_console_0 (copy), v33 (ref), v27 (copy), v19 (copy), v17 (copy), v16 (ref), v22 (copy)
-    v56.props = v57;
-    v56._viewabilityTuples = {};
-    v56._averageCellLength = 0;
-    v56._cellKeysToChildListKeys = l_Map_0.new();
-    v56._cellRefs = {};
-    v56._frames = {};
-    v56._footerLength = 0;
-    v56._hasDoneInitialScroll = false;
-    v56._hasInteracted = false;
-    v56._hasMore = false;
-    v56._hasWarned = {};
-    v56._headerLength = 0;
-    v56._hiPriInProgress = false;
-    v56._highestMeasuredFrameIndex = 1;
-    v56._indicesToKeys = l_Map_0.new();
-    v56._nestedChildLists = l_Map_0.new();
-    v56._offsetFromParentVirtualizedList = 0;
-    v56._prevParentOffset = 0;
-    v56._scrollMetrics = {
-        contentLength = 0, 
-        dOffset = 0, 
-        dt = 10, 
-        offset = 0, 
-        timestamp = 0, 
-        velocity = 0, 
-        visibleLength = 0
-    };
-    v56._scrollRef = nil;
-    v56._sentEndForContentLength = 0;
-    v56._totalCellLength = 0;
-    v56._totalCellsMeasured = 0;
-    v56._canvasPosition = Vector2.new(0, 0);
-    v56._canvasSize = UDim2.new(0, 0, 0, 0);
-    v56._invertedCanvasLength = v56.props.getItemLayout and 0 or v56.props.invertedCanvasLength or 1000;
-    v56._getFrameMetrics = function(v58) --[[ Line: 703 ]]
-        -- upvalues: v56 (copy), v23 (ref)
-        local l_data_0 = v56.props.data;
-        local l_getItem_0 = v56.props.getItem;
-        local l_getItemCount_0 = v56.props.getItemCount;
-        local l_getItemLayout_0 = v56.props.getItemLayout;
-        v23(v58 <= l_getItemCount_0(l_data_0), "Tried to get frame for out of range index " .. tostring(v58));
-        local v63 = l_getItem_0(l_data_0, v58);
-        local v64 = if v63 ~= nil then v56._frames[v56:_keyExtractor(v63, v58)] else v63;
-        if (not v64 or v64.index ~= v58) and l_getItemLayout_0 then
-            v64 = l_getItemLayout_0(l_data_0, v58);
-        end;
-        return v64;
-    end;
-    local l_v23_0 = v23;
-    local l_windowSize_0 = v57.windowSize;
-    l_v23_0((l_windowSize_0 == nil and 21 or l_windowSize_0) > 0, "VirtualizedList: The windowSize prop must be present and set to a value greater than 0.");
-    v56._fillRateHelper = v13.new(v56._getFrameMetrics);
-    v56._updateCellsToRender = function() --[[ Line: 741 ]]
-        -- upvalues: v56 (copy), l_Boolean_0 (ref), l_computeWindowedRenderLimits_0 (ref)
-        local l_data_1 = v56.props.data;
-        local l_getItemCount_1 = v56.props.getItemCount;
-        local l_onEndReachedThreshold_0 = v56.props.onEndReachedThreshold;
-        local v70 = l_onEndReachedThreshold_0 == nil and 2 or l_onEndReachedThreshold_0;
-        local v71 = v56:_isVirtualizationDisabled();
-        v56:_updateViewableItems(l_data_1);
-        if not l_Boolean_0.toJSBoolean(l_data_1) then
-            return;
-        else
-            v56:setState(function(v72) --[[ Line: 750 ]]
-                -- upvalues: v56 (ref), v71 (copy), l_Boolean_0 (ref), l_computeWindowedRenderLimits_0 (ref), v70 (copy), l_getItemCount_1 (copy), l_data_1 (copy)
-                local v73 = nil;
-                local l_contentLength_0 = v56._scrollMetrics.contentLength;
-                local l_offset_0 = v56._scrollMetrics.offset;
-                local l_visibleLength_0 = v56._scrollMetrics.visibleLength;
-                if not v71 then
-                    if l_visibleLength_0 > 0 and l_contentLength_0 > 0 then
-                        local l_initialScrollIndex_0 = v56.props.initialScrollIndex;
-                        local v78 = false;
-                        if l_initialScrollIndex_0 ~= nil then
-                            v78 = l_initialScrollIndex_0 ~= 1;
-                        end;
-                        if not v78 or l_Boolean_0.toJSBoolean(v56._scrollMetrics.offset) then
-                            v78 = l_computeWindowedRenderLimits_0;
-                            l_initialScrollIndex_0 = v56.props.data;
-                            local l_getItemCount_2 = v56.props.getItemCount;
-                            local l_maxToRenderPerBatch_0 = v56.props.maxToRenderPerBatch;
-                            local v81 = l_maxToRenderPerBatch_0 == nil and 10 or l_maxToRenderPerBatch_0;
-                            local l_windowSize_1 = v56.props.windowSize;
-                            v73 = v78(l_initialScrollIndex_0, l_getItemCount_2, v81, l_windowSize_1 == nil and 21 or l_windowSize_1, v72, v56._getFrameMetricsApprox, v56._scrollMetrics);
-                        end;
-                    end;
-                else
-                    local v83;
-                    if l_contentLength_0 - l_visibleLength_0 - l_offset_0 < v70 * l_visibleLength_0 then
-                        local l_maxToRenderPerBatch_1 = v56.props.maxToRenderPerBatch;
-                        v83 = l_maxToRenderPerBatch_1 == nil and 10 or l_maxToRenderPerBatch_1;
-                    else
-                        v83 = 0;
-                    end;
-                    v73 = {
-                        first = 1, 
-                        last = math.min(v72.last + v83, l_getItemCount_1(l_data_1))
-                    };
-                end;
-                if v73 ~= nil and v56._nestedChildLists.size > 0 then
-                    local l_first_0 = v73.first;
-                    local l_last_0 = v73.last;
-                    local l_l_first_0_0 = l_first_0;
-                    while l_l_first_0_0 <= l_last_0 do
-                        local v88 = v56._indicesToKeys:get(l_l_first_0_0);
-                        local v89 = if l_Boolean_0.toJSBoolean(v88) then v56._cellKeysToChildListKeys:get(v88) else v88;
-                        if l_Boolean_0.toJSBoolean(v89) then
-                            local v90 = false;
-                            for _, v92 in ipairs(v89) do
-                                local v93 = v56._nestedChildLists:get(v92);
-                                if v93 and v93.ref and v93.ref:hasMore() then
-                                    v90 = true;
-                                    break;
-                                end;
-                            end;
-                            if v90 then
-                                v73.last = l_l_first_0_0;
-                                break;
-                            else
-                                l_l_first_0_0 = l_l_first_0_0 + 1;
-                            end;
-                        end;
-                    end;
-                end;
-                if v73 ~= nil and v73.first == v72.first and v73.last == v72.last then
-                    v73 = nil;
-                end;
-                return v73;
-            end);
-            return;
-        end;
-    end;
-    v56._updateCellsToRenderBatcher = v12.new(v56._updateCellsToRender, v56.props.updateCellsBatchingPeriod == nil and 50 or v56.props.updateCellsBatchingPeriod);
-    if v56.props.viewabilityConfigCallbackPairs then
-        v56._viewabilityTuples = l_Array_0.map(v56.props.viewabilityConfigCallbackPairs, function(v94) --[[ Line: 833 ]]
-            -- upvalues: v20 (ref)
-            return {
-                viewabilityHelper = v20.new(v94.viewabilityConfig), 
-                onViewableItemsChanged = v94.onViewableItemsChanged
-            };
-        end);
-    else
-        l_v23_0 = v56.props.onViewableItemsChanged;
-        local l_viewabilityConfig_0 = v56.props.viewabilityConfig;
-        if l_v23_0 then
-            table.insert(v56._viewabilityTuples, {
-                viewabilityHelper = v20.new(l_viewabilityConfig_0), 
-                onViewableItemsChanged = l_v23_0
-            });
-        end;
-    end;
-    l_v23_0 = {};
-    l_windowSize_0 = v56.props.initialScrollIndex;
-    local v96 = false;
-    if l_windowSize_0 ~= nil then
-        v96 = l_windowSize_0 ~= 1;
-    end;
-    l_v23_0.first = if v96 then v56.props.initialScrollIndex else 1;
-    l_windowSize_0 = v56.props.getItemCount(v56.props.data) + 1;
-    local l_initialScrollIndex_1 = v56.props.initialScrollIndex;
-    local v98 = false;
-    if l_initialScrollIndex_1 ~= nil then
-        v98 = l_initialScrollIndex_1 ~= 1;
-    end;
-    local v99 = if v98 then v56.props.initialScrollIndex else 1;
-    l_initialScrollIndex_1 = v56.props.initialNumToRender;
-    l_v23_0.last = math.min(l_windowSize_0, v99 + (l_initialScrollIndex_1 == nil and 10 or l_initialScrollIndex_1)) - 1;
-    l_v23_0.firstItemTracked = if v56.props.data and v56.props.getItemCount(v56.props.data) > 0 then v56.props.getItem(v56.props.data, 1) else l_Object_0.None;
-    l_v23_0.scrollPositionDelta = 0;
-    if v56:_isNestedWithSameOrientation() then
-        local v100 = v56.context.getNestedChildState(v56:_getListKey());
-        if l_Boolean_0.toJSBoolean(v100) then
-            l_v23_0 = v100;
-            v56.state = v100;
-            v56._frames = v100.frames;
-        end;
-    end;
-    v56.state = l_v23_0;
-    v56._getScrollMetrics = function() --[[ Line: 874 ]]
-        -- upvalues: v56 (copy)
-        return v56._scrollMetrics;
-    end;
-    v56._getOutermostParentListRef = function() --[[ Line: 878 ]]
-        -- upvalues: v56 (copy)
-        if v56:_isNestedWithSameOrientation() then
-            return v56.context.getOutermostParentListRef();
-        else
-            return v56;
-        end;
-    end;
-    v56._getNestedChildState = function(v101) --[[ Line: 886 ]]
-        -- upvalues: v56 (copy)
-        local v102 = v56._nestedChildLists:get(v101);
-        if v102 then
-            return v102.state;
-        else
-            return v102;
-        end;
-    end;
-    v56._registerAsNestedChild = function(v103) --[[ Line: 891 ]]
-        -- upvalues: v56 (copy), l_Set_0 (ref), l_console_0 (ref), v33 (ref), l_Object_0 (ref), l_Boolean_0 (ref)
-        local v104 = v56._cellKeysToChildListKeys:get(v103.cellKey) or l_Set_0.new();
-        v104:add(v103.key);
-        v56._cellKeysToChildListKeys:set(v103.cellKey, v104);
-        local v105 = v56._nestedChildLists:get(v103.key);
-        if v105 and v105.ref ~= nil then
-            l_console_0.error("A VirtualizedList contains a cell which itself contains " .. "more than one VirtualizedList of the same orientation as the parent " .. "list. You must pass a unique listKey prop to each sibling list.\n\n" .. v33(l_Object_0.assign({}, v103, {
-                horizontal = l_Boolean_0.toJSBoolean(v103.ref.props.horizontal)
-            })));
-        end;
-        v56._nestedChildLists:set(v103.key, {
-            ref = v103.ref, 
-            state = nil
-        });
-        if v56._hasInteracted then
-            v103.ref:recordInteraction();
-        end;
-        return nil;
-    end;
-    v56._unregisterAsNestedChild = function(v106) --[[ Line: 923 ]]
-        -- upvalues: v56 (copy)
-        v56._nestedChildLists:set(v106.key, {
-            ref = nil, 
-            state = v106.state
-        });
-    end;
-    v56._onUpdateSeparators = function(v107, v108) --[[ Line: 930 ]]
-        -- upvalues: l_Array_0 (ref), v56 (copy), l_Boolean_0 (ref)
-        l_Array_0.forEach(v107, function(v109) --[[ Line: 931 ]]
-            -- upvalues: v56 (ref), l_Boolean_0 (ref), v108 (copy)
-            local v110 = false;
-            if v109 ~= nil then
-                v110 = v56._cellRefs[tostring(v109)];
-            end;
-            if l_Boolean_0.toJSBoolean(v110) then
-                return v110:updateSeparatorProps(v108);
-            else
-                return;
-            end;
-        end);
-    end;
-    v56._getSpacerKey = function(v111) --[[ Line: 939 ]]
-        if v111 then
-            return "height";
-        else
-            return "width";
-        end;
-    end;
-    v56._captureScrollRef = function(v112) --[[ Line: 943 ]]
-        -- upvalues: v56 (copy)
-        v56._scrollRef = v112;
-    end;
-    v56._defaultRenderScrollComponent = function(v113) --[[ Line: 947 ]]
-        -- upvalues: v56 (copy), v27 (ref), v19 (ref), v23 (ref), v17 (ref), l_Object_0 (ref), v16 (ref)
-        local l_onRefresh_0 = v113.onRefresh;
-        if v56:_isNestedWithSameOrientation() then
-            return v27.createElement(v19, v113);
-        elseif l_onRefresh_0 then
-            v23(typeof(v113.refreshing) == "boolean", "`refreshing` prop must be set as a boolean in order to use `onRefresh`, but got `" .. (v113.refreshing == nil and "undefined" or tostring(v113.refreshing) .. "`"));
-            return v27.createElement(v17, l_Object_0.assign(table.clone(v113), {
-                refreshControl = if v113.refreshControl == nil then v27.createElement(v16, {
-                    refreshing = v113.refreshing, 
-                    onRefresh = l_onRefresh_0, 
-                    progressViewOffset = v113.progressViewOffset
-                }) else v113.refreshControl
-            }));
-        else
-            return v27.createElement(v17, v113);
-        end;
-    end;
-    v56._onCellUnmount = function(v115) --[[ Line: 977 ]]
-        -- upvalues: v56 (copy), l_Object_0 (ref)
-        local v116 = v56._frames[v115];
-        if v116 ~= nil then
-            v56._frames[v115] = l_Object_0.assign({}, v116, {
-                inLayout = false
-            });
-        end;
-    end;
-    v56._onLayout = function(v117) --[[ Line: 984 ]]
-        -- upvalues: v56 (copy)
-        if v56:_isNestedWithSameOrientation() then
-            v56:measureLayoutRelativeToContainingList();
-        else
-            v56._scrollMetrics.visibleLength = v56:_selectLength({
-                width = v117.AbsoluteSize.X, 
-                height = v117.AbsoluteSize.Y
-            });
-        end;
-        if v56.props.onLayout then
-            v56.props.onLayout(v117);
-        end;
-        v56:_scheduleCellsToRenderUpdate();
-        v56:_maybeCallOnEndReached();
-    end;
-    v56._onLayoutEmpty = function(v118) --[[ Line: 1002 ]]
-        -- upvalues: v56 (copy)
-        if v56.props.onLayout then
-            v56.props.onLayout(v118);
-        end;
-    end;
-    v56._onLayoutFooter = function(v119) --[[ Line: 1008 ]]
-        -- upvalues: v56 (copy)
-        v56:_triggerRemeasureForChildListsInCell(v56:_getFooterCellKey());
-        v56._footerLength = v56:_selectLength({
-            height = v119.AbsoluteSize.Y, 
-            width = v119.AbsoluteSize.X
-        });
-    end;
-    v56._onLayoutHeader = function(v120) --[[ Line: 1016 ]]
-        -- upvalues: v56 (copy)
-        v56._headerLength = v56:_selectLength({
-            height = v120.AbsoluteSize.Y, 
-            width = v120.AbsoluteSize.X
-        });
-    end;
-    v56._onContentSizeChange = function(v121, v122) --[[ Line: 1023 ]]
-        -- upvalues: v56 (copy)
-        if v121 > 0 and v122 > 0 and v56.props.initialScrollIndex ~= nil and v56.props.initialScrollIndex > 1 and not v56._hasDoneInitialScroll then
-            if v56.props.contentOffset == nil then
-                v56:scrollToIndex({
-                    animated = false, 
-                    index = v56.props.initialScrollIndex
-                });
-            end;
-            v56._hasDoneInitialScroll = true;
-        elseif v56.props.inverted and v121 > 0 and v122 > 0 and not v56._hasDoneInitialScroll then
-            v56._hasDoneInitialScroll = true;
-            task.defer(function() --[[ Line: 1038 ]]
-                -- upvalues: v56 (ref)
-                while v56:getScrollRef() == nil do
-                    task.wait();
-                end;
-                if v56.props.contentOffset == nil then
-                    local l_current_0 = v56:getScrollRef()._nativeRef.current;
-                    if v56.props.horizontal then
-                        l_current_0.CanvasPosition = Vector2.new(l_current_0.AbsoluteCanvasSize.X, l_current_0.CanvasPosition.Y);
-                        return;
-                    else
-                        l_current_0.CanvasPosition = Vector2.new(l_current_0.CanvasPosition.X, l_current_0.AbsoluteCanvasSize.Y);
-                    end;
-                end;
-            end);
-        end;
-        if v56.props.onContentSizeChange then
-            v56.props.onContentSizeChange(v121, v122);
-        end;
-        v56._scrollMetrics.contentLength = v56:_selectLength({
-            height = v122, 
-            width = v121
-        });
-        v56:_scheduleCellsToRenderUpdate();
-        v56:_maybeCallOnEndReached();
-    end;
-    v56._convertParentScrollMetrics = function(v124) --[[ Line: 1070 ]]
-        -- upvalues: v56 (copy)
-        local v125 = v124.offset - v56._offsetFromParentVirtualizedList;
-        local l_visibleLength_1 = v124.visibleLength;
-        local v127 = v125 - v56._scrollMetrics.offset;
-        local l_contentLength_1 = v56._scrollMetrics.contentLength;
-        return {
-            visibleLength = l_visibleLength_1, 
-            contentLength = l_contentLength_1, 
-            offset = v125, 
-            dOffset = v127
-        };
-    end;
-    v56._onScroll = function(v129) --[[ Line: 1091 ]]
-        -- upvalues: v56 (copy), l_Boolean_0 (ref), v22 (ref)
-        v56._nestedChildLists:forEach(function(v130) --[[ Line: 1092 ]]
-            -- upvalues: v129 (copy)
-            if v130.ref then
-                v130.ref._onScroll(v129);
-            end;
-        end);
-        if v56.props.onScroll then
-            v56.props.onScroll(v129);
-        end;
-        local v131 = os.clock();
-        local v132 = v129:GetChildren()[1];
-        local v133 = v56:_selectLength({
-            height = v129.AbsoluteSize.Y, 
-            width = v129.AbsoluteSize.X
-        });
-        local v134 = v56:_selectLength({
-            height = v132.AbsoluteSize.Y, 
-            width = v132.AbsoluteSize.X
-        });
-        local v135 = if v56.props.inverted then v56:_selectOffset({
-            x = v129.AbsoluteCanvasSize.X - v129.CanvasPosition.X - v133, 
-            y = v129.AbsoluteCanvasSize.Y - v129.CanvasPosition.Y - v133
-        }) else v56:_selectOffset({
-            x = v129.CanvasPosition.X, 
-            y = v129.CanvasPosition.Y
-        });
-        local v136 = v135 - v56._scrollMetrics.offset;
-        if v56:_isNestedWithSameOrientation() then
-            if v56._scrollMetrics.contentLength == 0 then
-                return;
-            else
-                local v137 = v56._convertParentScrollMetrics({
-                    v133, 
-                    v135
-                });
-                v133 = v137.visibleLength;
-                v134 = v137.contentLength;
-                v135 = v137.offset;
-                v136 = v137.dOffset;
-            end;
-        end;
-        local v138 = if l_Boolean_0.toJSBoolean(v56._scrollMetrics.timestamp) then math.max(1, (v131 - v56._scrollMetrics.timestamp) * 1000) else 1;
-        local v139 = v136 / v138;
-        if v138 > 500 and v56._scrollMetrics.dt > 500 and 5 * v133 < v134 and not v56._hasWarned.perf then
-            v22("VirtualizedList: You have a large list that is slow to update - make sure your renderItem function renders components that follow React performance best practices like PureComponent, shouldComponentUpdate, etc.", {
-                dt = v138, 
-                prevDt = v56._scrollMetrics.dt, 
-                contentLength = v134
-            });
-            v56._hasWarned.perf = true;
-        end;
-        v56._scrollMetrics = {
-            contentLength = v134, 
-            dt = v138, 
-            dOffset = v136, 
-            offset = v135, 
-            timestamp = v131, 
-            velocity = v139, 
-            visibleLength = v133
-        };
-        local l_scrollPositionDelta_0 = v56.state.scrollPositionDelta;
-        if l_scrollPositionDelta_0 > 0 then
-            v56:setState(function(v141) --[[ Line: 1160 ]]
-                -- upvalues: l_scrollPositionDelta_0 (copy)
-                return {
-                    scrollPositionDelta = 0, 
-                    first = v141.first + l_scrollPositionDelta_0, 
-                    last = v141.last + l_scrollPositionDelta_0
-                };
-            end);
-        end;
-        v56:_updateViewableItems(v56.props.data);
-        if not v56.props then
-            return;
-        else
-            v56:_maybeCallOnEndReached();
-            if v139 ~= 0 then
-                v56._fillRateHelper:activate();
-            end;
-            v56:_computeBlankness();
-            v56:_scheduleCellsToRenderUpdate();
-            return;
-        end;
-    end;
-    v56._onScrollBeginDrag = function(v142) --[[ Line: 1180 ]]
-        -- upvalues: v56 (copy), l_Array_0 (ref)
-        v56._nestedChildLists:forEach(function(v143) --[[ Line: 1181 ]]
-            -- upvalues: v142 (copy)
-            if v143.ref then
-                v143.ref._onScrollBeginDrag(v142);
-            end;
-        end);
-        l_Array_0.forEach(v56._viewabilityTuples, function(v144) --[[ Line: 1186 ]]
-            v144.viewabilityHelper:recordInteraction();
-        end);
-        v56._hasInteracted = true;
-        if v56.props.onScrollBeginDrag then
-            v56.props.onScrollBeginDrag(v142);
-        end;
-    end;
-    v56._onScrollEndDrag = function(v145) --[[ Line: 1195 ]]
-        -- upvalues: v56 (copy), l_Boolean_0 (ref)
-        v56._nestedChildLists:forEach(function(v146) --[[ Line: 1196 ]]
-            -- upvalues: v145 (copy)
-            if v146.ref then
-                v146.ref._onScrollEndDrag(v145);
-            end;
-        end);
-        if l_Boolean_0.toJSBoolean(nil) then
-            v56._scrollMetrics.velocity = v56:_selectOffset(nil);
-        end;
-        v56:_computeBlankness();
-        if v56.props.onScrollEndDrag then
-            v56.props.onScrollEndDrag(v145);
-        end;
-    end;
-    v56._onMomentumScrollBegin = function(v147) --[[ Line: 1214 ]]
-        -- upvalues: v56 (copy)
-        v56._nestedChildLists:forEach(function(v148) --[[ Line: 1215 ]]
-            -- upvalues: v147 (copy)
-            if v148.ref then
-                v148.ref._onMomentumScrollBegin(v147);
-            end;
-        end);
-        if v56.props.onMomentumScrollBegin then
-            v56.props.onMomentumScrollBegin(v147);
-        end;
-    end;
-    v56._onMomentumScrollEnd = function(v149) --[[ Line: 1225 ]]
-        -- upvalues: v56 (copy)
-        v56._nestedChildLists:forEach(function(v150) --[[ Line: 1226 ]]
-            -- upvalues: v149 (copy)
-            if v150.ref then
-                v150.ref._onMomentumScrollEnd(v149);
-            end;
-        end);
-        v56._scrollMetrics.velocity = 0;
-        v56:_computeBlankness();
-        if v56.props.onMomentumScrollEnd then
-            v56.props.onMomentumScrollEnd(v149);
-        end;
-    end;
-    v56._createViewToken = function(v151, v152) --[[ Line: 1238 ]]
-        -- upvalues: v56 (copy)
-        local l_data_2 = v56.props.data;
-        local v154 = v56.props.getItem(l_data_2, v151);
-        return {
-            index = v151, 
-            item = v154, 
-            key = v56:_keyExtractor(v154, v151), 
-            isViewable = v152
-        };
-    end;
-    v56._getFrameMetricsApprox = function(v155) --[[ Line: 1253 ]]
-        -- upvalues: v56 (copy), v23 (ref)
-        local v156 = v56._getFrameMetrics(v155);
-        if v156 ~= nil and v156.index == v155 then
-            return v156;
-        else
-            local l_getItemLayout_1 = v56.props.getItemLayout;
-            v23(not l_getItemLayout_1, "Should not have to estimate frames when a measurement metrics function is provided");
-            return {
-                length = v56._averageCellLength, 
-                offset = v56._averageCellLength * (v155 - 1)
-            };
-        end;
-    end;
-end;
-v55.scrollToEnd = function(v158, v159) --[[ Line: 1274 ]] --[[ Name: scrollToEnd ]]
-    -- upvalues: l_console_0 (copy)
-    local v160 = v159 == nil or v159.animated;
-    local v161 = v158.props.getItemCount(v158.props.data);
-    local v162 = v158._getFrameMetricsApprox(v161);
-    local v163 = v158.props.inverted and 0 or math.max(0, v162.offset + v162.length + v158._footerLength - v158._scrollMetrics.visibleLength);
-    if v158._scrollRef == nil then
-        return;
-    elseif v158._scrollRef.scrollTo == nil then
-        l_console_0.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.");
-        return;
-    else
-        local l_scrollTo_0 = v158._scrollRef.scrollTo;
-        local l_horizontal_0 = v158.props.horizontal;
-        l_scrollTo_0(if l_horizontal_0 ~= nil and l_horizontal_0 then {
-            x = v163, 
-            animated = v160
-        } else {
-            y = v163, 
-            animated = v160
-        });
-        return;
-    end;
-end;
-v55.scrollToIndex = function(v166, v167) --[[ Line: 1304 ]] --[[ Name: scrollToIndex ]]
-    -- upvalues: v23 (copy), l_Boolean_0 (copy), l_console_0 (copy)
-    local l_data_3 = v166.props.data;
-    local l_horizontal_1 = v166.props.horizontal;
-    local l_getItemCount_3 = v166.props.getItemCount;
-    local l_getItemLayout_2 = v166.props.getItemLayout;
-    local l_onScrollToIndexFailed_0 = v166.props.onScrollToIndexFailed;
-    local l_animated_0 = v167.animated;
-    local l_index_0 = v167.index;
-    local l_viewOffset_0 = v167.viewOffset;
-    local l_viewPosition_0 = v167.viewPosition;
-    v23(l_index_0 >= 1, ("scrollToIndex out of range: requested index %d but minimum is 1"):format(l_index_0));
-    v23(l_getItemCount_3(l_data_3) >= 1, ("scrollToIndex out of range: item length %d but minimum is 1"):format(l_getItemCount_3(l_data_3)));
-    v23(l_index_0 <= l_getItemCount_3(l_data_3), ("scrollToIndex out of range: requested index %d is out of 1 to %d"):format(l_index_0, l_getItemCount_3(l_data_3)));
-    if not l_getItemLayout_2 and v166._highestMeasuredFrameIndex < l_index_0 then
-        v23(l_Boolean_0.toJSBoolean(l_onScrollToIndexFailed_0), "scrollToIndex should be used in conjunction with getItemLayout or onScrollToIndexFailed, otherwise there is no way to know the location of offscreen indices or handle failures.");
-        l_onScrollToIndexFailed_0({
-            averageItemLength = v166._averageCellLength, 
-            highestMeasuredFrameIndex = v166._highestMeasuredFrameIndex, 
-            index = l_index_0
-        });
-        return;
-    else
-        local v177 = if v166:getScrollRef() then v166:getScrollRef()._nativeRef.current else nil;
-        if v177 == nil then
-            return;
-        else
-            local l_AbsoluteCanvasSize_0 = v177.AbsoluteCanvasSize;
-            local l_AbsoluteSize_0 = v177.AbsoluteSize;
-            local v180 = v166._getFrameMetricsApprox(l_index_0);
-            local v181 = math.max(0, if v166.props.inverted then (if l_horizontal_1 then l_AbsoluteCanvasSize_0.X else l_AbsoluteCanvasSize_0.Y) - (if l_horizontal_1 then l_AbsoluteSize_0.X else l_AbsoluteSize_0.Y) - v180.offset - (l_Boolean_0.toJSBoolean(l_viewPosition_0) and l_viewPosition_0 or 0) * (v166._scrollMetrics.visibleLength - v180.length) else v180.offset - (l_Boolean_0.toJSBoolean(l_viewPosition_0) and l_viewPosition_0 or 0) * (v166._scrollMetrics.visibleLength - v180.length)) - (l_Boolean_0.toJSBoolean(l_viewOffset_0) and l_viewOffset_0 or 0);
-            if v166._scrollRef == nil then
-                return;
-            elseif v166._scrollRef.scrollTo == nil then
-                l_console_0.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.");
-                return;
-            else
-                v166._scrollRef.scrollTo(if l_horizontal_1 then {
-                    x = v181, 
-                    animated = l_animated_0
-                } else {
-                    y = v181, 
-                    animated = l_animated_0
-                });
-                return;
-            end;
-        end;
-    end;
-end;
-v55.scrollToItem = function(v182, v183) --[[ Line: 1395 ]] --[[ Name: scrollToItem ]]
-    -- upvalues: l_Object_0 (copy)
-    local l_item_0 = v183.item;
-    local l_data_4 = v182.props.data;
-    local l_getItem_1 = v182.props.getItem;
-    local v187 = v182.props.getItemCount(l_data_4);
-    local v188 = 1;
-    while true do
-        if v188 <= v187 then
-            if l_getItem_1(l_data_4, v188) == l_item_0 then
-                v182:scrollToIndex(l_Object_0.assign({}, v183, {
-                    index = v188
-                }));
-                return;
-            else
-                v188 = v188 + 1;
-            end;
-        else
-            return;
-        end;
-    end;
-end;
-v55.scrollToOffset = function(v189, v190) --[[ Line: 1424 ]] --[[ Name: scrollToOffset ]]
-    -- upvalues: l_console_0 (copy)
-    local v191 = if v189:getScrollRef() then v189:getScrollRef()._nativeRef.current else nil;
-    if v191 == nil then
-        return;
-    else
-        local l_animated_1 = v190.animated;
-        local l_offset_1 = v190.offset;
-        if v189._scrollRef == nil then
-            return;
-        else
-            if v189.props.inverted then
-                local l_AbsoluteCanvasSize_1 = v191.AbsoluteCanvasSize;
-                local l_AbsoluteSize_1 = v191.AbsoluteSize;
-                l_offset_1 = (if v189.props.horizontal then l_AbsoluteCanvasSize_1.X else l_AbsoluteCanvasSize_1.Y) - l_offset_1 - if v189.props.horizontal then l_AbsoluteSize_1.X else l_AbsoluteSize_1.Y;
-            end;
-            if v189._scrollRef.scrollTo == nil then
-                l_console_0.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.");
-                return;
-            else
-                local l_scrollTo_1 = v189._scrollRef.scrollTo;
-                local l_horizontal_2 = v189.props.horizontal;
-                l_scrollTo_1(if l_horizontal_2 ~= nil and l_horizontal_2 then {
-                    x = l_offset_1, 
-                    animated = l_animated_1
-                } else {
-                    y = l_offset_1, 
-                    animated = l_animated_1
-                });
-                return;
-            end;
-        end;
-    end;
-end;
-v55.recordInteraction = function(v198) --[[ Line: 1470 ]] --[[ Name: recordInteraction ]]
-    -- upvalues: l_Array_0 (copy)
-    v198._nestedChildLists:forEach(function(v199) --[[ Line: 1471 ]]
-        if v199.ref then
-            v199.ref:recordInteraction();
-        end;
-    end);
-    l_Array_0.forEach(v198._viewabilityTuples, function(v200) --[[ Line: 1476 ]]
-        v200.viewabilityHelper:recordInteraction();
-    end);
-    v198:_updateViewableItems(v198.props.data);
-end;
-v55.flashScrollIndicators = function(v201) --[[ Line: 1482 ]] --[[ Name: flashScrollIndicators ]]
-    if v201._scrollRef == nil then
-        return;
-    else
-        v201._scrollRef:flashScrollIndicators();
-        return;
-    end;
-end;
-v55.getScrollResponder = function(v202) --[[ Line: 1495 ]] --[[ Name: getScrollResponder ]]
-    if v202._scrollRef and v202._scrollRef.getScrollResponder then
-        return v202._scrollRef:getScrollResponder();
-    else
-        return nil;
-    end;
-end;
-v55.getScrollableNode = function(v203) --[[ Line: 1503 ]] --[[ Name: getScrollableNode ]]
-    -- upvalues: v15 (copy)
-    if v203._scrollRef and v203._scrollRef.getScrollableNode then
-        return v203._scrollRef:getScrollableNode();
-    else
-        return v15.findNodeHandle(v203._scrollRef);
-    end;
-end;
-v55.getScrollRef = function(v204) --[[ Line: 1511 ]] --[[ Name: getScrollRef ]]
-    if v204._scrollRef and v204._scrollRef.getScrollRef then
-        return v204._scrollRef:getScrollRef();
-    else
-        return v204._scrollRef;
-    end;
-end;
-v55.setNativeProps = function(v205, v206) --[[ Line: 1519 ]] --[[ Name: setNativeProps ]]
-    if v205._scrollRef then
-        v205._scrollRef:setNativeProps(v206);
-    end;
-end;
-v55._getCellKey = function(v207) --[[ Line: 1525 ]] --[[ Name: _getCellKey ]]
-    if v207.context and v207.context.cellKey then
-        return v207.context.cellKey;
-    else
-        return "rootList";
-    end;
-end;
-v55._getListKey = function(v208) --[[ Line: 1529 ]] --[[ Name: _getListKey ]]
-    -- upvalues: l_Boolean_0 (copy)
-    if l_Boolean_0.toJSBoolean(v208.props.listKey) then
-        return v208.props.listKey;
-    else
-        return (v208:_getCellKey());
-    end;
-end;
-v55._getDebugInfo = function(v209) --[[ Line: 1533 ]] --[[ Name: _getDebugInfo ]]
-    local v210 = {
-        listKey = v209:_getListKey(), 
-        cellKey = v209:_getCellKey()
-    };
-    local l_horizontal_3 = v209.props.horizontal;
-    v210.horizontal = l_horizontal_3 ~= nil and l_horizontal_3;
-    v210.parent = if v209.context then v209.context.debugInfo else nil;
-    return v210;
-end;
-v55.hasMore = function(v212) --[[ Line: 1542 ]] --[[ Name: hasMore ]]
-    return v212._hasMore;
-end;
-v55.componentDidMount = function(v213) --[[ Line: 1546 ]] --[[ Name: componentDidMount ]]
-    if v213:_isNestedWithSameOrientation() then
-        v213.context.registerAsNestedChild({
-            cellKey = v213:_getCellKey(), 
-            key = v213:_getListKey(), 
-            ref = v213, 
-            parentDebugInfo = v213.context.debugInfo
-        });
-    end;
-end;
-v55.componentWillUnmount = function(v214) --[[ Line: 1561 ]] --[[ Name: componentWillUnmount ]]
-    -- upvalues: l_Array_0 (copy)
-    if v214:_isNestedWithSameOrientation() then
-        v214.context.unregisterAsNestedChild({
-            key = v214:_getListKey(), 
-            state = {
-                first = v214.state.first, 
-                last = v214.state.last, 
-                frames = v214._frames
-            }
-        });
-    end;
-    v214:_updateViewableItems(nil);
-    v214._updateCellsToRenderBatcher:dispose({
-        abort = true
-    });
-    l_Array_0.forEach(v214._viewabilityTuples, function(v215) --[[ Line: 1570 ]]
-        v215.viewabilityHelper:dispose();
-    end);
-    v214._fillRateHelper:deactivateAndFlush();
-end;
-v55.getDerivedStateFromProps = function(v216, v217) --[[ Line: 1576 ]]
-    -- upvalues: l_console_0 (copy), l_Object_0 (copy)
-    local l_data_5 = v216.data;
-    local l_getItemCount_4 = v216.getItemCount;
-    local l_maintainVisibleContentPosition_0 = v216.maintainVisibleContentPosition;
-    local l_firstItemTracked_0 = v217.firstItemTracked;
-    local l_scrollPositionDelta_1 = v217.scrollPositionDelta;
-    local l_compareItemData_0 = v216.compareItemData;
-    local v226 = l_compareItemData_0 == nil and function(v224, v225) --[[ Line: 438 ]]
-        return v224 == v225;
-    end or l_compareItemData_0;
-    l_compareItemData_0 = if l_data_5 and l_getItemCount_4(l_data_5) > 0 then v216.getItem(l_data_5, 1) else nil;
-    local function v231(v227, v228) --[[ Line: 1583 ]] --[[ Name: findItem ]]
-        -- upvalues: v226 (copy)
-        local v229 = nil;
-        for v230 = 1, #v227 do
-            if v226(v227[v230], v228) then
-                v229 = v230;
-                break;
-            end;
-        end;
-        if v229 == nil then
-            return 1;
-        else
-            return v229;
-        end;
-    end;
-    if l_maintainVisibleContentPosition_0 and l_scrollPositionDelta_1 == 0 and l_firstItemTracked_0 ~= nil and l_compareItemData_0 ~= nil then
-        l_scrollPositionDelta_1 = v226(l_firstItemTracked_0, l_compareItemData_0) and 0 or v231(l_data_5, l_firstItemTracked_0) - 1;
-    end;
-    local v232 = l_getItemCount_4(l_data_5);
-    local l_maxToRenderPerBatch_2 = v216.maxToRenderPerBatch;
-    local v234 = l_maxToRenderPerBatch_2 == nil and 10 or l_maxToRenderPerBatch_2;
-    l_maxToRenderPerBatch_2 = math.max(1, (math.min(v217.first, v232 - v234)));
-    if v232 > 0 and v232 < l_maxToRenderPerBatch_2 + l_scrollPositionDelta_1 then
-        l_scrollPositionDelta_1 = 0;
-        l_console_0.warn("WARNING: maintainVisibleContentPosition failed because scrollPositionDelta was out of bounds. This could indicate that items in `data` are getting removed, items are getting added to the middle of `data`, or a different `data` array is getting passed in. Consider changing the `key` prop of the List if the `data` prop is significantly altered.");
-    end;
-    if l_scrollPositionDelta_1 > 0 then
-        for v235 = 1, math.min(l_scrollPositionDelta_1, v232) do
-            v216.getItem(l_data_5, v235).shouldResizeOnMount = true;
-        end;
-    end;
-    return {
-        first = l_maxToRenderPerBatch_2, 
-        last = math.max(1, (math.min(v217.last, v232))), 
-        firstItemTracked = l_compareItemData_0 or l_Object_0.None, 
-        scrollPositionDelta = l_scrollPositionDelta_1
-    };
-end;
-v55._pushCells = function(v236, v237, v238, v239, v240, v241, v242) --[[ Line: 1639 ]] --[[ Name: _pushCells ]]
-    -- upvalues: v27 (copy), v35 (ref)
-    local l_CellRendererComponent_0 = v236.props.CellRendererComponent;
-    local l_ItemSeparatorComponent_0 = v236.props.ItemSeparatorComponent;
-    local l_data_6 = v236.props.data;
-    local l_getItem_2 = v236.props.getItem;
-    local l_getItemCount_5 = v236.props.getItemCount;
-    local l_horizontal_4 = v236.props.horizontal;
-    local v249 = v236.props.ListHeaderComponent and 1 or 0;
-    local v250 = l_getItemCount_5(l_data_6);
-    local v251 = nil;
-    v241 = math.min(v250, v241);
-    local l_v240_0 = v240;
-    while l_v240_0 <= v241 do
-        local v253 = l_getItem_2(l_data_6, l_v240_0);
-        local v254 = v236:_keyExtractor(v253, l_v240_0);
-        v236._indicesToKeys:set(l_v240_0, v254);
-        if v239:has(l_v240_0 + v249) then
-            table.insert(v238, #v237);
-        end;
-        local l_l_v240_0_0 = l_v240_0;
-        table.insert(v237, v27.createElement(v35, {
-            CellRendererComponent = l_CellRendererComponent_0, 
-            ItemSeparatorComponent = if l_v240_0 < v250 then l_ItemSeparatorComponent_0 else nil, 
-            cellKey = v254, 
-            fillRateHelper = v236._fillRateHelper, 
-            horizontal = l_horizontal_4, 
-            index = l_v240_0, 
-            inversionStyle = v242, 
-            item = v253, 
-            key = v254, 
-            prevCellKey = v251, 
-            onUpdateSeparators = v236._onUpdateSeparators, 
-            onLayout = function(v256) --[[ Line: 1687 ]] --[[ Name: onLayout ]]
-                -- upvalues: v236 (copy), v254 (copy), l_l_v240_0_0 (copy)
-                return v236:_onCellLayout(v256, v254, l_l_v240_0_0);
-            end, 
-            onUnmount = v236._onCellUnmount, 
-            parentProps = v236.props, 
-            ref = function(v257) --[[ Line: 1692 ]] --[[ Name: ref ]]
-                -- upvalues: v236 (copy), v254 (copy)
-                v236._cellRefs[tostring(v254)] = v257;
-            end
-        }));
-        v251 = v254;
-        l_v240_0 = l_v240_0 + 1;
-    end;
-end;
-v55._isVirtualizationDisabled = function(v258) --[[ Line: 1702 ]] --[[ Name: _isVirtualizationDisabled ]]
-    if v258.props.disableVirtualization ~= nil then
-        return v258.props.disableVirtualization;
-    else
-        return false;
-    end;
-end;
-v55._isNestedWithSameOrientation = function(v259) --[[ Line: 1706 ]] --[[ Name: _isNestedWithSameOrientation ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local l_context_0 = v259.context;
-    local v261 = false;
-    if l_context_0 ~= nil then
-        local v262 = l_Boolean_0.toJSBoolean(l_context_0.horizontal);
-        local l_horizontal_5 = v259.props.horizontal;
-        v261 = v262 == (l_horizontal_5 ~= nil and l_horizontal_5);
-    end;
-    return v261;
-end;
-v55._keyExtractor = function(v264, v265, v266) --[[ Line: 1712 ]] --[[ Name: _keyExtractor ]]
-    -- upvalues: l_keyExtractor_0 (copy), v37 (ref), l_Boolean_0 (copy), v38 (ref)
-    if v264.props.keyExtractor ~= nil then
-        return v264.props.keyExtractor(v265, v266);
-    else
-        local v267 = l_keyExtractor_0(v265, v266);
-        if v267 == tostring(v266) then
-            v37 = true;
-            if v265.type ~= nil and l_Boolean_0.toJSBoolean(v265.type.displayName) then
-                v38 = v265.type.displayName;
-            end;
-        end;
-        return v267;
-    end;
-end;
-v55.render = function(v268) --[[ Line: 1727 ]] --[[ Name: render ]]
-    -- upvalues: v21 (copy), l_console_0 (copy), v34 (ref), l_Set_0 (copy), v27 (copy), l_VirtualizedListCellContextProvider_0 (copy), v19 (copy), v18 (copy), v37 (ref), v38 (ref), l_Object_0 (copy), l_VirtualizedListContextProvider_0 (copy), v17 (copy)
-    if _G.__DEV__ then
-        local v269 = v21(v268.props.contentContainerStyle);
-        if v269 ~= nil and v269.flexWrap == "wrap" then
-            l_console_0.warn("`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.");
-        end;
-    end;
-    local l_ListEmptyComponent_0 = v268.props.ListEmptyComponent;
-    local l_ListFooterComponent_0 = v268.props.ListFooterComponent;
-    local l_ListHeaderComponent_0 = v268.props.ListHeaderComponent;
-    local l_data_7 = v268.props.data;
-    local l_horizontal_6 = v268.props.horizontal;
-    local v275 = v268:_isVirtualizationDisabled();
-    local v276;
-    if v268.props.inverted then
-        local l_horizontal_7 = v268.props.horizontal;
-        v276 = if l_horizontal_7 ~= nil and l_horizontal_7 then v34.horizontallyInverted else v34.verticallyInverted;
-    else
-        v276 = nil;
-    end;
-    local v278 = {};
-    local v279 = l_Set_0.new(v268.props.stickyHeaderIndices);
-    local v280 = {};
-    if l_ListHeaderComponent_0 then
-        if v279:has(0) then
-            table.insert(v280, 0);
-        end;
-        local v281 = if v27.isValidElement(l_ListHeaderComponent_0) then l_ListHeaderComponent_0 else v27.createElement(l_ListHeaderComponent_0, nil);
-        table.insert(v278, v27.createElement(l_VirtualizedListCellContextProvider_0, {
-            cellKey = v268:_getCellKey() .. "-header", 
-            key = "$header", 
-            Name = "$header"
-        }, v27.createElement(v19, {
-            Name = "ListHeaderComponent", 
-            onLayout = v268._onLayoutHeader, 
-            style = v18.compose(v276, v268.props.ListHeaderComponentStyle), 
-            LayoutOrder = v268.props.inverted and 999999998 or -999999998, 
-            AutomaticSize = if l_horizontal_6 then Enum.AutomaticSize.X else Enum.AutomaticSize.Y, 
-            Size = if l_horizontal_6 then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0, 0)
-        }, v281)));
-    end;
-    local v282 = v268.props.getItemCount(l_data_7);
-    if v282 > 0 then
-        v37 = false;
-        v38 = "";
-        local v283 = v268._getSpacerKey(not l_horizontal_6);
-        local l_initialScrollIndex_2 = v268.props.initialScrollIndex;
-        local v285 = false;
-        if l_initialScrollIndex_2 ~= nil then
-            v285 = l_initialScrollIndex_2 ~= 1;
-        end;
-        local v286;
-        if v285 then
-            v286 = -1;
-        else
-            l_initialScrollIndex_2 = v268.props.initialNumToRender;
-            v286 = (l_initialScrollIndex_2 == nil and 10 or l_initialScrollIndex_2) - 1;
-        end;
-        local v287 = v286 + 1;
-        v286 = v268.state.first;
-        v285 = v268.state.last;
-        l_initialScrollIndex_2 = v268.state.scrollPositionDelta;
-        if l_initialScrollIndex_2 > 0 then
-            v286 = v286 + l_initialScrollIndex_2;
-            v285 = v285 + l_initialScrollIndex_2;
-        end;
-        v268:_pushCells(v278, v280, v279, 1, v287, v276);
-        local v288 = math.max(v287 + 1, v286);
-        if not v275 and v287 + 1 < v286 then
-            local v289 = false;
-            if v279.size > 0 then
-                local v290 = l_ListHeaderComponent_0 and 1 or 0;
-                local v291 = v288 - 1;
-                while v287 < v291 do
-                    if v279:has(v291 + v290) then
-                        local v292 = v268._getFrameMetricsApprox(v287);
-                        local v293 = v268._getFrameMetricsApprox(v291);
-                        local v294 = v293.offset - v292.offset;
-                        local l_initialScrollIndex_3 = v268.props.initialScrollIndex;
-                        local v296 = false;
-                        if l_initialScrollIndex_3 ~= nil then
-                            v296 = l_initialScrollIndex_3 ~= 1;
-                        end;
-                        local v297 = v294 - (v296 and 0 or v292.length);
-                        table.insert(v278, v27.createElement(v19, {
-                            key = "$sticky_lead", 
-                            Name = "$sticky_lead", 
-                            style = {
-                                Size = if v283 == "height" then UDim2.new(1, 0, 0, v297) else UDim2.new(0, v297, 1, 0)
-                            }
-                        }));
-                        v268:_pushCells(v278, v280, v279, v291, v291, v276);
-                        v294 = v268._getFrameMetricsApprox(v286).offset - v293.offset + v293.length;
-                        table.insert(v278, v27.createElement(v19, {
-                            key = "$sticky_trail", 
-                            Name = "$sticky_trail", 
-                            style = {
-                                Size = if v283 == "height" then UDim2.new(1, 0, 0, v294) else UDim2.new(0, v294, 1, 0)
-                            }
-                        }));
-                        v289 = true;
-                        break;
-                    else
-                        v291 = v291 - 1;
-                    end;
-                end;
-            end;
-            if not v289 then
-                local v298 = v268._getFrameMetricsApprox(v287);
-                local v299 = v268._getFrameMetricsApprox(v286).offset - (v298.offset + v298.length);
-                table.insert(v278, v27.createElement(v19, {
-                    key = "$lead_spacer", 
-                    Name = "$lead_spacer", 
-                    style = {
-                        Size = if v283 == "height" then UDim2.new(1, 0, 0, v299) else UDim2.new(0, v299, 1, 0)
-                    }, 
-                    LayoutOrder = v268.props.inverted and 999999999 or -999999999
-                }));
-            end;
-        end;
-        v268:_pushCells(v278, v280, v279, v288, v285, v276);
-        if not v268._hasWarned.keys and v37 then
-            l_console_0.warn("VirtualizedList: missing keys for items, make sure to specify a key or id property on each item or provide a custom keyExtractor.", v38);
-            v268._hasWarned.keys = true;
-        end;
-        if not v275 and v285 < v282 then
-            local v300 = v268._getFrameMetricsApprox(v285);
-            local v301 = if v268.props.getItemLayout then v282 else math.min(v282, v268._highestMeasuredFrameIndex);
-            local v302 = v268._getFrameMetricsApprox(v301);
-            local v303 = v302.offset + v302.length - (v300.offset + v300.length);
-            table.insert(v278, v27.createElement(v19, {
-                key = "$tail_spacer", 
-                Name = "$tail_spacer", 
-                style = {
-                    Size = if v283 == "height" then UDim2.new(1, 0, 0, v303) else UDim2.new(0, v303, 1, 0)
-                }, 
-                LayoutOrder = v268.props.inverted and -999999999 or 999999999
-            }));
-        end;
-    elseif l_ListEmptyComponent_0 then
-        local v304 = if v27.isValidElement(l_ListEmptyComponent_0) then l_ListEmptyComponent_0 else v27.createElement(l_ListEmptyComponent_0, nil);
-        local l_v304_0 = v304 --[[ copy: 12 -> 28 ]];
-        table.insert(v278, v27.cloneElement(v304, {
-            key = "$empty", 
-            Name = "$empty", 
-            onLayout = function(v306) --[[ Line: 1914 ]] --[[ Name: onLayout ]]
-                -- upvalues: v268 (copy), l_v304_0 (copy)
-                v268._onLayoutEmpty(v306);
-                if l_v304_0.props.onLayout then
-                    l_v304_0.props.onLayout(v306);
-                end;
-            end, 
-            style = v18.compose(v276, v304.props.style)
-        }));
-    end;
-    if l_ListFooterComponent_0 then
-        local v307 = if v27.isValidElement(l_ListFooterComponent_0) then l_ListFooterComponent_0 else v27.createElement(l_ListFooterComponent_0, nil);
-        table.insert(v278, v27.createElement(l_VirtualizedListCellContextProvider_0, {
-            cellKey = v268:_getFooterCellKey(), 
-            key = "$footer", 
-            Name = "$footer"
-        }, v27.createElement(v19, {
-            Name = "ListFooterComponent", 
-            onLayout = v268._onLayoutFooter, 
-            style = v18.compose(v276, v268.props.ListFooterComponentStyle), 
-            LayoutOrder = v268.props.inverted and -999999998 or 999999998, 
-            AutomaticSize = if l_horizontal_6 then Enum.AutomaticSize.X else Enum.AutomaticSize.Y, 
-            Size = if l_horizontal_6 then UDim2.new(0, 0, 1, 0) else UDim2.new(1, 0, 0, 0)
-        }, v307)));
-    end;
-    if v268.props.inverted and not v268.props.getItemLayout then
-        if v268:getScrollRef() ~= nil and v268:getScrollRef()._nativeRef.current ~= nil then
-            local l_current_1 = v268:getScrollRef()._nativeRef.current;
-            local l_CanvasPosition_0 = l_current_1.CanvasPosition;
-            local v310 = v268._getFrameMetricsApprox((math.min(v268._highestMeasuredFrameIndex, v282)));
-            local v311 = v310.offset + v310.length;
-            local v312 = if v268.props.optimizeInvertedCanvasResize then v268._invertedCanvasLength - v268._footerLength < v311 else v311 ~= v268._invertedCanvasLength - v268._footerLength;
-            if v282 <= v268._highestMeasuredFrameIndex and v311 ~= v268._invertedCanvasLength - v268._footerLength then
-                local v313 = v311 + v268._footerLength - v268._invertedCanvasLength;
-                v268._invertedCanvasLength = v311 + v268._footerLength;
-                local v314 = if v268.props.horizontal then UDim2.new(0, v268._invertedCanvasLength, 1, 0) else UDim2.new(1, 0, 0, v268._invertedCanvasLength);
-                l_current_1.CanvasSize = v314;
-                v268._canvasPosition = if v268.props.horizontal then Vector2.new(l_CanvasPosition_0.X + v313, l_CanvasPosition_0.Y) else Vector2.new(l_CanvasPosition_0.X, l_CanvasPosition_0.Y + v313);
-                v268._canvasSize = v314;
-            elseif v312 and v268.state.scrollPositionDelta == 0 then
-                local l__invertedCanvasLength_0 = v268._invertedCanvasLength;
-                local l_visibleLength_2 = v268._scrollMetrics.visibleLength;
-                local l_windowSize_2 = v268.props.windowSize;
-                local v318 = l_visibleLength_2 * (l_windowSize_2 == nil and 21 or l_windowSize_2) * 0.5;
-                local v319 = v310.offset + v268._scrollMetrics.visibleLength + v318;
-                l_visibleLength_2 = v319 - l__invertedCanvasLength_0;
-                v268._invertedCanvasLength = v319;
-                local v320 = if v268.props.horizontal then UDim2.new(0, v268._invertedCanvasLength, 1, 0) else UDim2.new(1, 0, 0, v268._invertedCanvasLength);
-                l_current_1.CanvasSize = v320;
-                l_current_1.CanvasPosition = if v268.props.horizontal then Vector2.new(l_CanvasPosition_0.X + l_visibleLength_2, l_CanvasPosition_0.Y) else Vector2.new(l_CanvasPosition_0.X, l_CanvasPosition_0.Y + l_visibleLength_2);
-                v268._canvasPosition = l_current_1.CanvasPosition;
-                v268._canvasSize = v320;
-            end;
-        else
-            v268._canvasPosition = if v268.props.horizontal then Vector2.new(v268._invertedCanvasLength, 0) else Vector2.new(0, v268._invertedCanvasLength);
-            v268._canvasSize = if v268.props.horizontal then UDim2.new(0, v268._invertedCanvasLength, 1, 0) else UDim2.new(1, 0, 0, v268._invertedCanvasLength);
-        end;
-    elseif v268.props.inverted and v268.props.getItemLayout then
-        local v321 = v268._getFrameMetricsApprox(v282);
-        if v268:getScrollRef() ~= nil and v268:getScrollRef()._nativeRef.current ~= nil then
-            local l_current_2 = v268:getScrollRef()._nativeRef.current;
-            local l_CanvasPosition_1 = l_current_2.CanvasPosition;
-            local l__invertedCanvasLength_1 = v268._invertedCanvasLength;
-            v268._invertedCanvasLength = v321.offset + v321.length;
-            if l__invertedCanvasLength_1 ~= v268._invertedCanvasLength then
-                local v325 = v268._invertedCanvasLength - l__invertedCanvasLength_1;
-                l_current_2.CanvasPosition = if v268.props.horizontal then l_CanvasPosition_1 + Vector2.new(v325, 0) else l_CanvasPosition_1 + Vector2.new(0, v325);
-            end;
-        else
-            v268._invertedCanvasLength = v321.offset + v321.length;
-        end;
-    end;
-    local l_assign_0 = l_Object_0.assign;
-    local v327 = table.clone(v268.props);
-    local v328 = {
-        onContentSizeChange = v268._onContentSizeChange, 
-        onLayout = v268._onLayout, 
-        onScroll = v268._onScroll, 
-        onScrollBeginDrag = v268._onScrollBeginDrag, 
-        onScrollEndDrag = v268._onScrollEndDrag, 
-        onMomentumScrollBegin = v268._onMomentumScrollBegin, 
-        onMomentumScrollEnd = v268._onMomentumScrollEnd
-    };
-    local l_scrollEventThrottle_0 = v268.props.scrollEventThrottle;
-    v328.scrollEventThrottle = l_scrollEventThrottle_0 == nil and 50 or l_scrollEventThrottle_0;
-    v328.invertStickyHeaders = if v268.props.invertStickyHeaders ~= nil then v268.props.invertStickyHeaders else v268.props.inverted;
-    v328.stickyHeaderIndices = v280;
-    v328.style = v268.props.style;
-    v328.layoutStyle = v276 or nil;
-    v328.AutomaticCanvasSize = if not v268.props.inverted or v268.props.getItemLayout then nil else Enum.AutomaticSize.None;
-    v328.CanvasSize = if v268.props.inverted then v268._canvasSize else nil;
-    v328.CanvasPosition = if v268.props.inverted then v268._canvasPosition else nil;
-    l_assign_0 = l_assign_0(v327, v328);
-    v268._hasMore = v268.state.last < v268.props.getItemCount(v268.props.data);
-    v327 = v27.createElement;
-    v328 = l_VirtualizedListContextProvider_0;
-    local v330 = {};
-    l_scrollEventThrottle_0 = {
-        cellKey = nil, 
-        getScrollMetrics = v268._getScrollMetrics
-    };
-    local l_horizontal_8 = v268.props.horizontal;
-    l_scrollEventThrottle_0.horizontal = l_horizontal_8 ~= nil and l_horizontal_8;
-    l_scrollEventThrottle_0.getOutermostParentListRef = v268._getOutermostParentListRef;
-    l_scrollEventThrottle_0.getNestedChildState = v268._getNestedChildState;
-    l_scrollEventThrottle_0.registerAsNestedChild = v268._registerAsNestedChild;
-    l_scrollEventThrottle_0.unregisterAsNestedChild = v268._unregisterAsNestedChild;
-    l_scrollEventThrottle_0.debugInfo = v268:_getDebugInfo();
-    v330.value = l_scrollEventThrottle_0;
-    v327 = v327(v328, v330, v27.cloneElement((if v268.props.renderScrollComponent then v268.props.renderScrollComponent else v268._defaultRenderScrollComponent)(l_assign_0), {
-        ref = v268._captureScrollRef
-    }, v278));
-    v328 = v327;
-    if _G.__DEV__ then
-        v328 = v27.createElement(v17.Context.Consumer, nil, function(v332) --[[ Line: 2094 ]]
-            -- upvalues: v268 (copy), l_console_0 (ref), v327 (copy)
-            if v332 ~= nil then
-                local v333 = not v332.horizontal;
-                local l_horizontal_9 = v268.props.horizontal;
-                if v333 == not (l_horizontal_9 ~= nil and l_horizontal_9) and not v268._hasWarned.nesting and v268.context == nil then
-                    l_console_0.error("VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.");
-                    v268._hasWarned.nesting = true;
-                end;
-            end;
-            return v327;
-        end);
-    end;
-    if v268.props.debug then
-        return v27.createElement(v19, {
-            style = v34.debug, 
-            Name = "debug"
-        }, v328, v268:_renderDebugOverlay());
-    else
-        return v328;
-    end;
-end;
-v55.componentDidUpdate = function(v335, v336) --[[ Line: 2120 ]] --[[ Name: componentDidUpdate ]]
-    -- upvalues: l_Array_0 (copy)
-    local l_data_8 = v335.props.data;
-    local l_extraData_0 = v335.props.extraData;
-    if l_data_8 ~= v336.data or l_extraData_0 ~= v336.extraData then
-        l_Array_0.forEach(v335._viewabilityTuples, function(v339) --[[ Line: 2125 ]]
-            v339.viewabilityHelper:resetViewableIndices();
-        end);
-    end;
-    local l__hiPriInProgress_0 = v335._hiPriInProgress;
-    v335:_scheduleCellsToRenderUpdate();
-    if l__hiPriInProgress_0 then
-        v335._hiPriInProgress = false;
-    end;
-end;
-v55._computeBlankness = function(v341) --[[ Line: 2144 ]] --[[ Name: _computeBlankness ]]
-    v341._fillRateHelper:computeBlankness(v341.props, v341.state, v341._scrollMetrics);
-end;
-v55._onCellLayout = function(v342, v343, v344, v345) --[[ Line: 2148 ]] --[[ Name: _onCellLayout ]]
-    -- upvalues: l_console_0 (copy), l_Array_0 (copy), l_Object_0 (copy), l_Boolean_0 (copy)
-    local v346 = if v342:getScrollRef() and v342:getScrollRef()._nativeRef.current then v342:getScrollRef()._nativeRef.current else v343:FindFirstAncestorOfClass("ScrollingFrame");
-    if v346 == nil then
-        if _G.__DEV__ then
-            l_console_0.warn("CellLayout failed for index " .. tostring(v345) .. ". this may cause layout issues");
-        end;
-        return;
-    else
-        local l_AbsolutePosition_0 = v346.AbsolutePosition;
-        local l_CanvasPosition_2 = v346.CanvasPosition;
-        local l_AbsoluteCanvasSize_2 = v346.AbsoluteCanvasSize;
-        local l_AbsoluteSize_2 = v343.AbsoluteSize;
-        local l_AbsolutePosition_1 = v343.AbsolutePosition;
-        local v352 = if v342.props.inverted and v342.props.horizontal then l_AbsoluteCanvasSize_2.X - l_CanvasPosition_2.X - l_AbsolutePosition_1.X - l_AbsoluteSize_2.X + l_AbsolutePosition_0.X else l_AbsolutePosition_1.X - l_AbsolutePosition_0.X + l_CanvasPosition_2.X;
-        local v353 = if not v342.props.inverted or v342.props.horizontal then l_AbsolutePosition_1.Y - l_AbsolutePosition_0.Y + l_CanvasPosition_2.Y else l_AbsoluteCanvasSize_2.Y - l_CanvasPosition_2.Y - l_AbsolutePosition_1.Y - l_AbsoluteSize_2.Y + l_AbsolutePosition_0.Y;
-        local v354 = {
-            width = v343.AbsoluteSize.X, 
-            height = v343.AbsoluteSize.Y, 
-            x = v352, 
-            y = v353
-        };
-        local v355 = {
-            offset = v342:_selectOffset(v354), 
-            length = v342:_selectLength(v354), 
-            index = v345, 
-            inLayout = true
-        };
-        local v356 = v342._frames[v344];
-        if not v356 or math.abs(v355.offset - v356.offset) > 1 or v355.length ~= v356.length or v345 ~= v356.index then
-            local v357 = v342.props.getItem(v342.props.data, v345);
-            if not v356 and not v342.props.getItemLayout and typeof(v357) == "table" and v357.shouldResizeOnMount then
-                v342:recalculateFrames(v342:_selectLength(v354), v344, v345);
-            end;
-            if v356 and not v342.props.getItemLayout and math.abs(v355.length - v356.length) >= 1 then
-                if v342.props.UNSTABLE_forceSiblingLayoutUpdate then
-                    local l_v343_FirstAncestorOfClass_0 = v343:FindFirstAncestorOfClass("Frame");
-                    local v359 = if l_v343_FirstAncestorOfClass_0 then l_v343_FirstAncestorOfClass_0:GetChildren() else {};
-                    local v360 = v342.props.getItemCount(v342.props.data);
-                    l_Array_0.forEach(v359, function(v361) --[[ Line: 2215 ]]
-                        -- upvalues: v345 (copy), v360 (copy), v342 (copy)
-                        if not v361:IsA("GuiObject") then
-                            return;
-                        else
-                            local v362 = math.abs(v361.LayoutOrder);
-                            if v362 <= v345 or v360 < v362 then
-                                return;
-                            else
-                                local v363 = v342.props.getItem(v342.props.data, v362);
-                                if v363 == nil then
-                                    return;
-                                else
-                                    local v364 = v342:_keyExtractor(v363, v362);
-                                    v342:_onCellLayout(v361, v364, v362);
-                                    return;
-                                end;
-                            end;
-                        end;
-                    end);
-                else
-                    l_Array_0.forEach(l_Object_0.keys(v342._frames), function(v365) --[[ Line: 2235 ]]
-                        -- upvalues: v342 (copy), v345 (copy)
-                        if v342._frames[v365].index <= v345 then
-                            return;
-                        else
-                            local v366 = if v342._cellRefs[v365] then v342._cellRefs[v365]:getRef() else nil;
-                            if v366 and v366.current then
-                                v342:_onCellLayout(v366.current, v365, v342._frames[v365].index);
-                            end;
-                            return;
-                        end;
-                    end);
-                end;
-            end;
-            v342._totalCellLength = v342._totalCellLength + (v355.length - if l_Boolean_0.toJSBoolean(v356) then v356.length else 0);
-            v342._totalCellsMeasured = v342._totalCellsMeasured + (l_Boolean_0.toJSBoolean(v356) and 0 or 1);
-            v342._averageCellLength = v342._totalCellLength / v342._totalCellsMeasured;
-            v342._frames[v344] = v355;
-            v342._highestMeasuredFrameIndex = math.max(v342._highestMeasuredFrameIndex, v345);
-            v342:_scheduleCellsToRenderUpdate();
-            if v342.props.inverted and not v342.props.getItemLayout and v342.state.last == v342.props.getItemCount(v342.props.data) and v342._highestMeasuredFrameIndex == v342.state.last then
-                v342:forceUpdate();
-            end;
-        else
-            v342._frames[v344].inLayout = true;
-        end;
-        v342:_triggerRemeasureForChildListsInCell(v344);
-        v342:_computeBlankness();
-        v342:_updateViewableItems(v342.props.data);
-        return;
-    end;
-end;
-v55._triggerRemeasureForChildListsInCell = function(v367, v368) --[[ Line: 2281 ]] --[[ Name: _triggerRemeasureForChildListsInCell ]]
-    local v369 = v367._cellKeysToChildListKeys:get(v368);
-    if v369 then
-        v369:forEach(function(v370) --[[ Line: 2284 ]]
-            -- upvalues: v367 (copy)
-            local v371 = v367._nestedChildLists:get(v370);
-            if v371 and v371.ref then
-                v371.ref:measureLayoutRelativeToContainingList();
-            end;
-        end);
-    end;
-end;
-v55.recalculateFrames = function(v372, v373, v374, v375) --[[ Line: 2295 ]] --[[ Name: recalculateFrames ]]
-    -- upvalues: l_Array_0 (copy), l_Object_0 (copy)
-    l_Array_0.forEach(l_Object_0.keys(v372._frames), function(v376) --[[ Line: 2296 ]]
-        -- upvalues: v374 (copy), v372 (copy), v375 (copy), v373 (copy)
-        if v376 == v374 and v372._frames[v376].index >= v375 then
-            return;
-        else
-            local v377 = v372._frames[v376];
-            v377.index = v377.index + 1;
-            v377 = v372._frames[v376];
-            v377.offset = v377.offset + v373;
-            return;
-        end;
-    end);
-    v372._highestMeasuredFrameIndex = v372._highestMeasuredFrameIndex + 1;
-end;
-v55.measureLayoutRelativeToContainingList = function(v378) --[[ Line: 2307 ]] --[[ Name: measureLayoutRelativeToContainingList ]]
-    -- upvalues: l_Boolean_0 (copy), l_console_0 (copy)
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 2311 ]]
-        -- upvalues: l_Boolean_0 (ref), v378 (copy), l_console_0 (ref)
-        if not l_Boolean_0.toJSBoolean(v378._scrollRef) then
-            return nil;
-        else
-            v378._scrollRef:measureLayout(v378.context.getOutermostParentListRef():getScrollRef(), function(v379, v380, v381, v382) --[[ Line: 2319 ]]
-                -- upvalues: v378 (ref)
-                v378._offsetFromParentVirtualizedList = v378:_selectOffset({
-                    x = v379, 
-                    y = v380
-                });
-                v378._scrollMetrics.contentLength = v378:_selectLength({
-                    width = v381, 
-                    height = v382
-                });
-                local v383 = v378._convertParentScrollMetrics(v378.context.getScrollMetrics());
-                local v384 = true;
-                if v378._scrollMetrics.visibleLength == v383.visibleLength then
-                    v384 = v378._scrollMetrics.offset ~= v383.offset;
-                end;
-                if v384 then
-                    v378._scrollMetrics.visibleLength = v383.visibleLength;
-                    v378._scrollMetrics.offset = v383.offset;
-                    v378._cellKeysToChildListKeys:forEach(function(v385) --[[ Line: 2333 ]]
-                        -- upvalues: v378 (ref)
-                        if v385 then
-                            v385:forEach(function(v386) --[[ Line: 2335 ]]
-                                -- upvalues: v378 (ref)
-                                local v387 = v378._nestedChildLists:get(v386);
-                                if v387 and v387.ref then
-                                    v387.ref:measureLayoutRelativeToContainingList();
-                                end;
-                            end);
-                        end;
-                    end);
-                end;
-            end, function(_) --[[ Line: 2345 ]]
-                -- upvalues: l_console_0 (ref)
-                l_console_0.warn("VirtualizedList: Encountered an error while measuring a list's offset from its containing VirtualizedList.");
-            end);
-            return nil;
-        end;
-    end);
-    if not l_status_0 then
-        l_console_0.warn("measureLayoutRelativeToContainingList threw an error", l_result_0.stack);
-    end;
-end;
-v55._getFooterCellKey = function(v391) --[[ Line: 2359 ]] --[[ Name: _getFooterCellKey ]]
-    return v391:_getCellKey() .. "-footer";
-end;
-v55._renderDebugOverlay = function(v392) --[[ Line: 2363 ]] --[[ Name: _renderDebugOverlay ]]
-    -- upvalues: l_Boolean_0 (copy), v27 (copy), v19 (copy), v34 (ref), l_Array_0 (copy)
-    local v393 = v392._scrollMetrics.visibleLength / if l_Boolean_0.toJSBoolean(v392._scrollMetrics.contentLength) then v392._scrollMetrics.contentLength else 1;
-    local v394 = {};
-    local v395 = v392.props.getItemCount(v392.props.data);
-    local v396 = 1;
-    while v396 <= v395 do
-        local v397 = v392._getFrameMetricsApprox(v396);
-        if l_Boolean_0.toJSBoolean(v397.inLayout) then
-            table.insert(v394, v397);
-        end;
-        v396 = v396 + 1;
-    end;
-    local l_offset_2 = v392._getFrameMetricsApprox(v392.state.first).offset;
-    local v399 = v392._getFrameMetricsApprox(v392.state.last);
-    local v400 = v399.offset + v399.length - l_offset_2;
-    local l_offset_3 = v392._scrollMetrics.offset;
-    local l_visibleLength_3 = v392._scrollMetrics.visibleLength;
-    return v27.createElement(v19, {
-        style = {
-            v34.debugOverlayBase, 
-            v34.debugOverlay
-        }
-    }, l_Array_0.map(v394, function(v403, v404) --[[ Line: 2388 ]]
-        -- upvalues: v27 (ref), v19 (ref), v34 (ref), v393 (copy)
-        return v27.createElement(v19, {
-            key = "f" .. tostring(v404), 
-            Name = "f" .. tostring(v404), 
-            style = {
-                v34.debugOverlayBase, 
-                v34.debugOverlayFrame, 
-                {
-                    top = v403.offset * v393, 
-                    height = v403.length * v393
-                }
-            }
-        });
-    end), v27.createElement(v19, {
-        Name = "DebugOverlayLast", 
-        style = {
-            v34.debugOverlayBase, 
-            v34.debugOverlayFrameLast, 
-            {
-                top = l_offset_2 * v393, 
-                height = v400 * v393
-            }
-        }
-    }), v27.createElement(v19, {
-        Name = "DebugOverlayVis", 
-        style = {
-            v34.debugOverlayBase, 
-            v34.debugOverlayFrameVis, 
-            {
-                top = l_offset_3 * v393, 
-                height = l_visibleLength_3 * v393
-            }
-        }
-    }));
-end;
-v55._selectLength = function(v405, v406) --[[ Line: 2418 ]] --[[ Name: _selectLength ]]
-    local l_horizontal_10 = v405.props.horizontal;
-    if not (l_horizontal_10 ~= nil and l_horizontal_10) then
-        return v406.height;
-    else
-        return v406.width;
-    end;
-end;
-v55._selectOffset = function(v408, v409) --[[ Line: 2425 ]] --[[ Name: _selectOffset ]]
-    local l_horizontal_11 = v408.props.horizontal;
-    if not (l_horizontal_11 ~= nil and l_horizontal_11) then
-        return v409.y;
-    else
-        return v409.x;
-    end;
-end;
-v55._maybeCallOnEndReached = function(v411) --[[ Line: 2432 ]] --[[ Name: _maybeCallOnEndReached ]]
-    local l_data_9 = v411.props.data;
-    local l_getItemCount_6 = v411.props.getItemCount;
-    local l_onEndReached_0 = v411.props.onEndReached;
-    local l_onEndReachedThreshold_1 = v411.props.onEndReachedThreshold;
-    local l_contentLength_2 = v411._scrollMetrics.contentLength;
-    local l_visibleLength_4 = v411._scrollMetrics.visibleLength;
-    local l_offset_4 = v411._scrollMetrics.offset;
-    local v419 = l_contentLength_2 - l_visibleLength_4 - l_offset_4;
-    local v420 = if l_onEndReachedThreshold_1 ~= nil then l_onEndReachedThreshold_1 * l_visibleLength_4 else 2;
-    if l_onEndReached_0 and v411.state.last == l_getItemCount_6(l_data_9) and v419 < v420 and v411._scrollMetrics.contentLength ~= v411._sentEndForContentLength then
-        v411._sentEndForContentLength = v411._scrollMetrics.contentLength;
-        l_onEndReached_0({
-            distanceFromEnd = v419
-        });
-        return;
-    else
-        if v420 < v419 then
-            v411._sentEndForContentLength = 0;
-        end;
-        return;
-    end;
-end;
-v55._scheduleCellsToRenderUpdate = function(v421) --[[ Line: 2457 ]] --[[ Name: _scheduleCellsToRenderUpdate ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local l_first_1 = v421.state.first;
-    local l_last_1 = v421.state.last;
-    if v421.state.scrollPositionDelta > 0 then
-        return;
-    else
-        local l_offset_5 = v421._scrollMetrics.offset;
-        local l_visibleLength_5 = v421._scrollMetrics.visibleLength;
-        local l_velocity_0 = v421._scrollMetrics.velocity;
-        local v427 = v421.props.getItemCount(v421.props.data);
-        local v428 = false;
-        local l_onEndReachedThreshold_2 = v421.props.onEndReachedThreshold;
-        l_onEndReachedThreshold_2 = (l_onEndReachedThreshold_2 == nil and 2 or l_onEndReachedThreshold_2) * l_visibleLength_5 / 2;
-        if l_first_1 > 1 then
-            local v430 = l_offset_5 - v421._getFrameMetricsApprox(l_first_1).offset;
-            v428 = v428 or v430 < 0 or l_velocity_0 < -2 and v430 < l_onEndReachedThreshold_2;
-        end;
-        if l_last_1 < v427 then
-            local v431 = v421._getFrameMetricsApprox(l_last_1).offset - (l_offset_5 + l_visibleLength_5);
-            v428 = v428 or v431 < 0 or l_velocity_0 > 2;
-        end;
-        if v428 and (l_Boolean_0.toJSBoolean(v421._averageCellLength) or v421.props.getItemLayout) and not v421._hiPriInProgress then
-            v421._hiPriInProgress = true;
-            v421._updateCellsToRenderBatcher:dispose({
-                abort = true
-            });
-            v421._updateCellsToRender();
-            return;
-        else
-            v421._updateCellsToRenderBatcher:schedule();
-            return;
-        end;
-    end;
-end;
-v55._updateViewableItems = function(v432, v433) --[[ Line: 2504 ]] --[[ Name: _updateViewableItems ]]
-    -- upvalues: l_Array_0 (copy)
-    local l_getItemCount_7 = v432.props.getItemCount;
-    l_Array_0.forEach(v432._viewabilityTuples, function(v435) --[[ Line: 2506 ]]
-        -- upvalues: l_getItemCount_7 (copy), v433 (copy), v432 (copy)
-        v435.viewabilityHelper:onUpdate(l_getItemCount_7(v433), v432._scrollMetrics.offset, v432._scrollMetrics.visibleLength, v432._getFrameMetrics, v432._createViewToken, v435.onViewableItemsChanged, v432.state);
-    end);
-end;
-v35 = v27.Component:extend("CellRenderer");
-v35.init = function(v436, v437) --[[ Line: 2567 ]] --[[ Name: init ]]
-    -- upvalues: v27 (copy)
-    v436.props = v437;
-    v436.state = {
-        separatorProps = {
-            highlighted = false, 
-            leadingItem = v436.props.item
-        }
-    };
-    v436._separators = {
-        highlight = function() --[[ Line: 2579 ]] --[[ Name: highlight ]]
-            -- upvalues: v436 (copy)
-            local l_cellKey_0 = v436.props.cellKey;
-            local l_prevCellKey_0 = v436.props.prevCellKey;
-            v436.props.onUpdateSeparators({
-                l_cellKey_0, 
-                l_prevCellKey_0
-            }, {
-                highlighted = true
-            });
-        end, 
-        unhighlight = function() --[[ Line: 2583 ]] --[[ Name: unhighlight ]]
-            -- upvalues: v436 (copy)
-            local l_cellKey_1 = v436.props.cellKey;
-            local l_prevCellKey_1 = v436.props.prevCellKey;
-            v436.props.onUpdateSeparators({
-                l_cellKey_1, 
-                l_prevCellKey_1
-            }, {
-                highlighted = false
-            });
-        end, 
-        updateProps = function(v442, v443) --[[ Line: 2587 ]] --[[ Name: updateProps ]]
-            -- upvalues: v436 (copy)
-            local l_cellKey_2 = v436.props.cellKey;
-            local l_prevCellKey_2 = v436.props.prevCellKey;
-            v436.props.onUpdateSeparators({
-                if v442 == "leading" then l_prevCellKey_2 else l_cellKey_2
-            }, v443);
-        end
-    };
-    v436._nativeRef = v27.createRef();
-end;
-v35.getDerivedStateFromProps = function(v446, v447) --[[ Line: 2599 ]]
-    -- upvalues: l_Object_0 (copy)
-    return {
-        separatorProps = l_Object_0.assign({}, v447.separatorProps, {
-            leadingItem = v446.item
-        })
-    };
-end;
-v35.updateSeparatorProps = function(v448, v449) --[[ Line: 2603 ]] --[[ Name: updateSeparatorProps ]]
-    -- upvalues: l_Object_0 (copy)
-    v448:setState(function(v450) --[[ Line: 2604 ]]
-        -- upvalues: l_Object_0 (ref), v449 (copy)
-        return {
-            separatorProps = l_Object_0.assign({}, v450.separatorProps, v449)
-        };
-    end);
-end;
-v35.componentWillUnmount = function(v451) --[[ Line: 2609 ]] --[[ Name: componentWillUnmount ]]
-    v451.props.onUnmount(v451.props.cellKey);
-end;
-v35._renderElement = function(v452, v453, v454, v455, v456) --[[ Line: 2613 ]] --[[ Name: _renderElement ]]
-    -- upvalues: l_Boolean_0 (copy), l_console_0 (copy), v27 (copy), v23 (copy)
-    if l_Boolean_0.toJSBoolean(v453) and l_Boolean_0.toJSBoolean(v454) then
-        l_console_0.warn("VirtualizedList: Both ListItemComponent and renderItem props are present. ListItemComponent will take precedence over renderItem.");
-    end;
-    if l_Boolean_0.toJSBoolean(v454) then
-        return v27.createElement(v454, {
-            item = v455, 
-            index = v456, 
-            separators = v452._separators
-        });
-    elseif l_Boolean_0.toJSBoolean(v453) then
-        return v453({
-            item = v455, 
-            index = v456, 
-            separators = v452._separators
-        });
-    else
-        v23(false, "VirtualizedList: Either ListItemComponent or renderItem props are required but none were found.");
-        return nil;
-    end;
-end;
-v35.getRef = function(v457) --[[ Line: 2644 ]] --[[ Name: getRef ]]
-    return v457._nativeRef;
-end;
-v35.render = function(v458) --[[ Line: 2649 ]] --[[ Name: render ]]
-    -- upvalues: v27 (copy), l_Object_0 (copy), l_Boolean_0 (copy), v34 (ref), v19 (copy), l_VirtualizedListCellContextProvider_0 (copy)
-    local l_CellRendererComponent_1 = v458.props.CellRendererComponent;
-    local l_ItemSeparatorComponent_1 = v458.props.ItemSeparatorComponent;
-    local l_fillRateHelper_0 = v458.props.fillRateHelper;
-    local l_horizontal_12 = v458.props.horizontal;
-    local l_item_1 = v458.props.item;
-    local l_index_1 = v458.props.index;
-    local l_inversionStyle_0 = v458.props.inversionStyle;
-    local l_parentProps_0 = v458.props.parentProps;
-    local l_renderItem_0 = l_parentProps_0.renderItem;
-    local l_getItemLayout_3 = l_parentProps_0.getItemLayout;
-    local v469 = v458:_renderElement(l_renderItem_0, l_parentProps_0.ListItemComponent, l_item_1, l_index_1);
-    local v470 = if not l_getItemLayout_3 or l_parentProps_0.debug or l_fillRateHelper_0:enabled() then v458.props.onLayout else nil;
-    local v471 = l_ItemSeparatorComponent_1 and v27.createElement(l_ItemSeparatorComponent_1, l_Object_0.assign(v458.state.separatorProps, {
-        LayoutOrder = l_inversionStyle_0 and -1 or 1
-    }));
-    local v472 = if l_Boolean_0.toJSBoolean(l_inversionStyle_0) then if l_horizontal_12 then {
-        v34.rowReverse, 
-        l_inversionStyle_0
-    } else {
-        v34.columnReverse, 
-        l_inversionStyle_0
-    } else if l_horizontal_12 then {
-        v34.row, 
-        l_inversionStyle_0
-    } else l_inversionStyle_0;
-    local v473 = if not l_Boolean_0.toJSBoolean(l_CellRendererComponent_1) then v27.createElement(v19, {
-        Name = "CellRendererView", 
-        style = v472, 
-        onLayout = v470, 
-        LayoutOrder = if l_inversionStyle_0 then -l_index_1 else l_index_1, 
-        AutomaticSize = if l_horizontal_12 then Enum.AutomaticSize.X else Enum.AutomaticSize.Y, 
-        nativeRef = v458._nativeRef
-    }, if v471 then v27.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        FillDirection = if l_horizontal_12 then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical
-    }) else nil, v469, v471) else v27.createElement(l_CellRendererComponent_1, l_Object_0.assign(table.clone(v458.props), {
-        style = v472, 
-        onLayout = v470, 
-        nativeRef = v458._nativeRef
-    }), if v471 then v27.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        FillDirection = if l_horizontal_12 then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical
-    }) else nil, v469, v471);
-    return v27.createElement(l_VirtualizedListCellContextProvider_0, {
-        cellKey = v458.props.cellKey
-    }, v473);
-end;
-v33 = function(v474) --[[ Line: 2725 ]] --[[ Name: describeNestedLists ]]
-    -- upvalues: l_Boolean_0 (copy)
-    local v475 = "VirtualizedList trace:\n" .. ("  Child (%s):\n"):format(l_Boolean_0.toJSBoolean(v474.horizontal) and "horizontal" or "vertical") .. ("    listKey: %s\n"):format(v474.key) .. ("    cellKey: %s"):format(v474.cellKey);
-    local l_parentDebugInfo_0 = v474.parentDebugInfo;
-    while l_parentDebugInfo_0 do
-        v475 = v475 .. ("\n  Parent (%s):\n"):format(l_parentDebugInfo_0.horizontal and "horizontal" or "vertical") .. ("    listKey: %s\n"):format(l_parentDebugInfo_0.listKey) .. ("    cellKey: %s"):format(l_parentDebugInfo_0.cellKey);
-        l_parentDebugInfo_0 = l_parentDebugInfo_0.parent;
-    end;
-    return v475;
-end;
-v34 = v18.create({
-    verticallyInverted = {
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        VerticalAlignment = Enum.VerticalAlignment.Bottom
-    }, 
-    horizontallyInverted = {
-        HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-        VerticalAlignment = Enum.VerticalAlignment.Center
-    }, 
-    row = {
-        AutomaticSize = Enum.AutomaticSize.X, 
-        Size = UDim2.new(0, 0, 1, 0)
-    }, 
-    column = {
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, 
-    rowReverse = {
-        flexDirection = "row-reverse", 
-        AutomaticSize = Enum.AutomaticSize.X, 
-        Size = UDim2.new(0, 0, 1, 0)
-    }, 
-    columnReverse = {
-        flexDirection = "column-reverse", 
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, 
-    debug = {
-        flex = 1
-    }, 
-    debugOverlayBase = {
-        position = "absolute", 
-        top = 0, 
-        right = 0
-    }, 
-    debugOverlay = {
-        bottom = 0, 
-        width = 20, 
-        borderColor = "blue", 
-        borderWidth = 1
-    }, 
-    debugOverlayFrame = {
-        left = 0, 
-        backgroundColor = "orange"
-    }, 
-    debugOverlayFrameLast = {
-        left = 0, 
-        borderColor = "green", 
-        borderWidth = 2
-    }, 
-    debugOverlayFrameVis = {
-        left = 0, 
-        borderColor = "red", 
-        borderWidth = 2
-    }
-});
-return v55;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Boolean = LuauPolyfill.Boolean
+local Map = LuauPolyfill.Map
+local Object = LuauPolyfill.Object
+local Set = LuauPolyfill.Set
+local console = LuauPolyfill.console
+
+local function isIndexTruthy(n1: number?) -- line: 33
+	return n1 ~= nil and n1 ~= 1
+end
+
+local Batchinator = require(ParentParent.Interaction.Batchinator)
+local FillRateHelper = require(script.Parent.FillRateHelper)
+local t1 = {
+	findNodeHandle = function(_) -- line: 44
+		warn("ReactNative.findNodeHandle is not implemented")
+	end
+}
+local ScrollView = require(ParentParent.Components.ScrollView.ScrollView)
+local StyleSheet = require(ParentParent.StyleSheet.StyleSheet)
+local View = require(ParentParent.Components.View.View)
+local ViewabilityHelper = require(script.Parent.ViewabilityHelper)
+
+local function v18(...) -- line: 62
+	return {}
+end
+
+local infoLog = require(ParentParent.Utilities.infoLog)
+local invariant = require(ParentParent.jsUtils.invariant)
+local VirtualizeUtils = require(script.Parent.VirtualizeUtils)
+local keyExtractor = VirtualizeUtils.keyExtractor
+local computeWindowedRenderLimits = VirtualizeUtils.computeWindowedRenderLimits
+local React = require(ParentParentParent.React)
+
+require(ParentParent.Components.ScrollView.ScrollView)
+
+local VirtualizedListContext = require(script.Parent.VirtualizedListContext)
+local VirtualizedListCellContextProvider = VirtualizedListContext.VirtualizedListCellContextProvider
+local VirtualizedListContext2 = VirtualizedListContext.VirtualizedListContext
+local VirtualizedListContextProvider = VirtualizedListContext.VirtualizedListContextProvider
+local describeNestedLists = nil
+local u30 = nil
+local u31 = nil
+
+local function RefreshControl(p2) -- line: 102
+	-- upvalues: React (copy)
+	return React.createElement("Frame", {
+		Name = "RCTRefreshControl"
+	}, p2.children)
+end
+
+local u33 = false
+local s1 = ""
+
+local function horizontalOrDefault(b1: boolean?) -- line: 408
+	if b1 == nil then
+		return false
+	end
+
+	return b1
+end
+local function initialNumToRenderOrDefault(n2: number?) -- line: 413
+	if n2 == nil then
+		return 10
+	end
+
+	return n2
+end
+local function maxToRenderPerBatchOrDefault(n3: number?) -- line: 418
+	if n3 == nil then
+		return 10
+	end
+
+	return n3
+end
+local function onEndReachedThresholdOrDefault(n4: number?) -- line: 423
+	if n4 == nil then
+		return 2
+	end
+
+	return n4
+end
+local function scrollEventThrottleOrDefault(n5: number?) -- line: 428
+	if n5 == nil then
+		return 50
+	end
+
+	return n5
+end
+local function windowSizeOrDefault(n6: number?) -- line: 433
+	if n6 == nil then
+		return 21
+	end
+
+	return n6
+end
+local function compareItemDataOrDefault(p3: ((...any) -> ...any)?) -- line: 444
+	if p3 == nil then
+		return function(p4, p5) -- line: 446
+			return p4 == p5
+		end
+	end
+
+	return p3
+end
+
+local v42 = React.PureComponent:extend("VirtualizedList")
+
+v42.contextType = VirtualizedListContext2
+
+function v42.init(p6, p7) -- line: 669
+	-- upvalues: Map (copy), invariant (copy), FillRateHelper (copy), Boolean (copy), computeWindowedRenderLimits (copy), Batchinator (copy), Array (copy), ViewabilityHelper (copy), Object (copy), Set (copy), console (copy), describeNestedLists (ref), React (copy), View (copy), ScrollView (copy), RefreshControl (ref), infoLog (copy)
+	p6.props = p7
+	p6._viewabilityTuples = {}
+	p6._averageCellLength = 0
+	p6._cellKeysToChildListKeys = Map.new()
+	p6._cellRefs = {}
+	p6._frames = {}
+	p6._footerLength = 0
+	p6._hasDoneInitialScroll = false
+	p6._hasInteracted = false
+	p6._hasMore = false
+	p6._hasWarned = {}
+	p6._headerLength = 0
+	p6._hiPriInProgress = false
+	p6._highestMeasuredFrameIndex = 1
+	p6._indicesToKeys = Map.new()
+	p6._nestedChildLists = Map.new()
+	p6._offsetFromParentVirtualizedList = 0
+	p6._prevParentOffset = 0
+	p6._scrollMetrics = {
+		contentLength = 0,
+		dOffset = 0,
+		dt = 10,
+		offset = 0,
+		timestamp = 0,
+		velocity = 0,
+		visibleLength = 0
+	}
+	p6._scrollRef = nil
+	p6._sentEndForContentLength = 0
+	p6._totalCellLength = 0
+	p6._totalCellsMeasured = 0
+	p6._canvasPosition = Vector2.new(0, 0)
+	p6._canvasSize = UDim2.new(0, 0, 0, 0)
+	p6._invertedCanvasLength = if not p6.props.getItemLayout then p6.props.invertedCanvasLength or 1000 else 0
+
+	function p6._getFrameMetrics(n7: number) -- line: 711
+		-- upvalues: p6 (copy), invariant (copy)
+		local data = p6.props.data
+		local getItem = p6.props.getItem
+		local getItemCount = p6.props.getItemCount
+		local getItemLayout = p6.props.getItemLayout
+
+		invariant(n7 <= getItemCount(data), "Tried to get frame for out of range index " .. tostring(n7))
+
+		local v356 = getItem(data, n7)
+		local v357 = if v356 == nil then v356 else p6._frames[p6:_keyExtractor(v356, n7)]
+
+		if (not v357 or n7 ~= v357.index) and getItemLayout then
+			v357 = getItemLayout(data, n7)
+		end
+
+		return v357
+	end
+
+	local v55 = invariant
+	local windowSize = p7.windowSize
+
+	v55(((if windowSize ~= nil then windowSize else 21)) > 0, "VirtualizedList: The windowSize prop must be present and set to a value greater than 0.")
+	p6._fillRateHelper = FillRateHelper.new(p6._getFrameMetrics)
+
+	function p6._updateCellsToRender() -- line: 749
+		-- upvalues: p6 (copy), Boolean (copy), computeWindowedRenderLimits (copy)
+		local data = p6.props.data
+		local getItemCount = p6.props.getItemCount
+		local onEndReachedThreshold = p6.props.onEndReachedThreshold
+		local v361 = if onEndReachedThreshold ~= nil then onEndReachedThreshold else 2
+		local v362 = p6:_isVirtualizationDisabled()
+
+		p6:_updateViewableItems(data)
+
+		if not Boolean.toJSBoolean(data) then
+			return
+		end
+
+		p6:setState(function(p8) -- line: 758
+			-- upvalues: p6 (copy), v362 (copy), Boolean (copy), computeWindowedRenderLimits (copy), v361 (copy), getItemCount (copy), data (copy)
+			local v451 = nil
+			local contentLength = p6._scrollMetrics.contentLength
+			local offset = p6._scrollMetrics.offset
+			local visibleLength = p6._scrollMetrics.visibleLength
+
+			if not v362 then
+				if visibleLength > 0 and contentLength > 0 then
+					local initialScrollIndex = p6.props.initialScrollIndex
+
+					if initialScrollIndex == nil or initialScrollIndex == 1 or Boolean.toJSBoolean(p6._scrollMetrics.offset) then
+						local v456 = computeWindowedRenderLimits
+						local data2 = p6.props.data
+						local getItemCount2 = p6.props.getItemCount
+						local maxToRenderPerBatch = p6.props.maxToRenderPerBatch
+						local v460 = if maxToRenderPerBatch ~= nil then maxToRenderPerBatch else 10
+						local windowSize2 = p6.props.windowSize
+
+						v451 = v456(data2, getItemCount2, v460, if windowSize2 ~= nil then windowSize2 else 21, p8, p6._getFrameMetricsApprox, p6._scrollMetrics)
+					end
+				end
+			else
+				local v463
+
+				if contentLength - visibleLength - offset < v361 * visibleLength then
+					local maxToRenderPerBatch = p6.props.maxToRenderPerBatch
+
+					v463 = if maxToRenderPerBatch ~= nil then maxToRenderPerBatch else 10
+				else
+					v463 = 0
+				end
+
+				v451 = {
+					first = 1,
+					last = math.min(p8.last + v463, getItemCount(data))
+				}
+			end
+
+			if v451 ~= nil and p6._nestedChildLists.size > 0 then
+				local first = v451.first
+				local last = v451.last
+
+				while first <= last do
+					local v466 = p6._indicesToKeys:get(first)
+					local v467 = if not Boolean.toJSBoolean(v466) then v466 else p6._cellKeysToChildListKeys:get(v466)
+
+					if not Boolean.toJSBoolean(v467) then
+						continue
+					end
+
+					local v468 = false
+
+					for _, v in ipairs(v467) do
+						local v471 = p6._nestedChildLists:get(v)
+
+						if v471 and v471.ref and v471.ref:hasMore() then
+							v468 = true
+
+							break
+						end
+					end
+
+					if v468 then
+						v451.last = first
+
+						break
+					end
+
+					first += 1
+				end
+			end
+
+			if v451 ~= nil and v451.first == p8.first and v451.last == p8.last then
+				v451 = nil
+			end
+
+			return v451
+		end)
+	end
+
+	p6._updateCellsToRenderBatcher = Batchinator.new(p6._updateCellsToRender, if p6.props.updateCellsBatchingPeriod ~= nil then p6.props.updateCellsBatchingPeriod else 50)
+
+	if p6.props.viewabilityConfigCallbackPairs then
+		p6._viewabilityTuples = Array.map(p6.props.viewabilityConfigCallbackPairs, function(p9) -- line: 841
+			-- upvalues: ViewabilityHelper (copy)
+			return {
+				viewabilityHelper = ViewabilityHelper.new(p9.viewabilityConfig),
+				onViewableItemsChanged = p9.onViewableItemsChanged
+			}
+		end)
+	else
+		local onViewableItemsChanged = p6.props.onViewableItemsChanged
+		local viewabilityConfig = p6.props.viewabilityConfig
+
+		if onViewableItemsChanged then
+			table.insert(p6._viewabilityTuples, {
+				viewabilityHelper = ViewabilityHelper.new(viewabilityConfig),
+				onViewableItemsChanged = onViewableItemsChanged
+			})
+		end
+	end
+
+	local t2 = {
+		scrollPositionDelta = 0
+	}
+	local initialScrollIndex = p6.props.initialScrollIndex
+
+	t2.first = not (initialScrollIndex ~= nil and initialScrollIndex ~= 1) and 1 or p6.props.initialScrollIndex
+
+	local v61 = p6.props.getItemCount(p6.props.data) + 1
+	local initialScrollIndex2 = p6.props.initialScrollIndex
+	local v63 = not (initialScrollIndex2 ~= nil and initialScrollIndex2 ~= 1) and 1 or p6.props.initialScrollIndex
+	local initialNumToRender = p6.props.initialNumToRender
+
+	t2.last = math.min(v61, v63 + (if initialNumToRender ~= nil then initialNumToRender else 10)) - 1
+	t2.firstItemTracked = if not p6.props.data or not (p6.props.getItemCount(p6.props.data) > 0) then Object.None else p6.props.getItem(p6.props.data, 1)
+
+	if p6:_isNestedWithSameOrientation() then
+		local v65 = p6.context.getNestedChildState(p6:_getListKey())
+
+		if Boolean.toJSBoolean(v65) then
+			t2 = v65
+			p6.state = v65
+			p6._frames = v65.frames
+		end
+	end
+
+	p6.state = t2
+
+	function p6._getScrollMetrics() -- line: 882
+		-- upvalues: p6 (copy)
+		return p6._scrollMetrics
+	end
+	function p6._getOutermostParentListRef() -- line: 886
+		-- upvalues: p6 (copy)
+		if p6:_isNestedWithSameOrientation() then
+			return p6.context.getOutermostParentListRef()
+		end
+
+		return p6
+	end
+	function p6._getNestedChildState(s2: string) -- line: 894
+		-- upvalues: p6 (copy)
+		local v365 = p6._nestedChildLists:get(s2)
+
+		if v365 then
+			return v365.state
+		end
+
+		return v365
+	end
+	function p6._registerAsNestedChild(t3: {[any]: any}) -- line: 899
+		-- upvalues: p6 (copy), Set (copy), console (copy), describeNestedLists (ref), Object (copy), Boolean (copy)
+		local v367 = p6._cellKeysToChildListKeys:get(t3.cellKey) or Set.new()
+
+		v367:add(t3.key)
+		p6._cellKeysToChildListKeys:set(t3.cellKey, v367)
+
+		local v368 = p6._nestedChildLists:get(t3.key)
+
+		if v368 and v368.ref ~= nil then
+			console.error("A VirtualizedList contains a cell which itself contains " .. "more than one VirtualizedList of the same orientation as the parent " .. "list. You must pass a unique listKey prop to each sibling list.\n\n" .. describeNestedLists(Object.assign({}, t3, {
+				horizontal = Boolean.toJSBoolean(t3.ref.props.horizontal)
+			})))
+		end
+
+		p6._nestedChildLists:set(t3.key, {
+			state = nil,
+			ref = t3.ref
+		})
+
+		if p6._hasInteracted then
+			t3.ref:recordInteraction()
+		end
+
+		return nil
+	end
+	function p6._unregisterAsNestedChild(t4: {[any]: any}) -- line: 931
+		-- upvalues: p6 (copy)
+		p6._nestedChildLists:set(t4.key, {
+			ref = nil,
+			state = t4.state
+		})
+	end
+	function p6._onUpdateSeparators(p10, p11) -- line: 938
+		-- upvalues: Array (copy), p6 (copy), Boolean (copy)
+		Array.forEach(p10, function(p12) -- line: 939
+			-- upvalues: p6 (copy), Boolean (copy), p11 (copy)
+			local v473 = p12 ~= nil and p6._cellRefs[tostring(p12)]
+
+			if Boolean.toJSBoolean(v473) then
+				return v473:updateSeparatorProps(p11)
+			end
+		end)
+	end
+	function p6._getSpacerKey(b2: boolean) -- line: 947
+		if b2 then
+			return "height"
+		end
+
+		return "width"
+	end
+	function p6._captureScrollRef(p13) -- line: 951
+		-- upvalues: p6 (copy)
+		p6._scrollRef = p13
+	end
+	function p6._defaultRenderScrollComponent(p14) -- line: 955
+		-- upvalues: p6 (copy), React (copy), View (copy), invariant (copy), ScrollView (copy), Object (copy), RefreshControl (ref)
+		local onRefresh = p14.onRefresh
+
+		if p6:_isNestedWithSameOrientation() then
+			return React.createElement(View, p14)
+		end
+
+		if onRefresh then
+			invariant(typeof(p14.refreshing) == "boolean", "`refreshing` prop must be set as a boolean in order to use `onRefresh`, but got `" .. if p14.refreshing ~= nil then tostring(p14.refreshing) .. "`" else "undefined")
+
+			return React.createElement(ScrollView, Object.assign(table.clone(p14), {
+				refreshControl = if p14.refreshControl ~= nil then p14.refreshControl else React.createElement(RefreshControl, {
+					refreshing = p14.refreshing,
+					onRefresh = onRefresh,
+					progressViewOffset = p14.progressViewOffset
+				})
+			}))
+		end
+
+		return React.createElement(ScrollView, p14)
+	end
+	function p6._onCellUnmount(s3: string) -- line: 985
+		-- upvalues: p6 (copy), Object (copy)
+		local v377 = p6._frames[s3]
+
+		if v377 ~= nil then
+			p6._frames[s3] = Object.assign({}, v377, {
+				inLayout = false
+			})
+		end
+	end
+	function p6._onLayout(p15) -- line: 992
+		-- upvalues: p6 (copy)
+		if p6:_isNestedWithSameOrientation() then
+			p6:measureLayoutRelativeToContainingList()
+		else
+			p6._scrollMetrics.visibleLength = p6:_selectLength({
+				width = p15.AbsoluteSize.X,
+				height = p15.AbsoluteSize.Y
+			})
+		end
+
+		if p6.props.onLayout then
+			p6.props.onLayout(p15)
+		end
+
+		p6:_scheduleCellsToRenderUpdate()
+		p6:_maybeCallOnEndReached()
+	end
+	function p6._onLayoutEmpty(p16) -- line: 1010
+		-- upvalues: p6 (copy)
+		if p6.props.onLayout then
+			p6.props.onLayout(p16)
+		end
+	end
+	function p6._onLayoutFooter(p17) -- line: 1016
+		-- upvalues: p6 (copy)
+		p6:_triggerRemeasureForChildListsInCell(p6:_getFooterCellKey())
+		p6._footerLength = p6:_selectLength({
+			height = p17.AbsoluteSize.Y,
+			width = p17.AbsoluteSize.X
+		})
+	end
+	function p6._onLayoutHeader(p18) -- line: 1024
+		-- upvalues: p6 (copy)
+		p6._headerLength = p6:_selectLength({
+			height = p18.AbsoluteSize.Y,
+			width = p18.AbsoluteSize.X
+		})
+	end
+	function p6._onContentSizeChange(n8: number, n9: number) -- line: 1031
+		-- upvalues: p6 (copy)
+		if n8 > 0 and (n9 > 0 and p6.props.initialScrollIndex ~= nil and p6.props.initialScrollIndex > 1 and not p6._hasDoneInitialScroll) then
+			if p6.props.contentOffset == nil then
+				p6:scrollToIndex({
+					animated = false,
+					index = p6.props.initialScrollIndex
+				})
+			end
+
+			p6._hasDoneInitialScroll = true
+		elseif p6.props.inverted and n8 > 0 and n9 > 0 and not p6._hasDoneInitialScroll then
+			p6._hasDoneInitialScroll = true
+			task.defer(function() -- line: 1046
+				-- upvalues: p6 (copy)
+				while p6:getScrollRef() == nil do
+					task.wait()
+				end
+
+				if p6.props.contentOffset == nil then
+					local current = p6:getScrollRef()._nativeRef.current
+
+					if p6.props.horizontal then
+						current.CanvasPosition = Vector2.new(current.AbsoluteCanvasSize.X, current.CanvasPosition.Y)
+
+						return
+					end
+
+					current.CanvasPosition = Vector2.new(current.CanvasPosition.X, current.AbsoluteCanvasSize.Y)
+				end
+			end)
+		end
+
+		if p6.props.onContentSizeChange then
+			p6.props.onContentSizeChange(n8, n9)
+		end
+
+		p6._scrollMetrics.contentLength = p6:_selectLength({
+			height = n9,
+			width = n8
+		})
+		p6:_scheduleCellsToRenderUpdate()
+		p6:_maybeCallOnEndReached()
+	end
+	function p6._convertParentScrollMetrics(t5: {[any]: any}) -- line: 1078
+		-- upvalues: p6 (copy)
+		local v385 = t5.offset - p6._offsetFromParentVirtualizedList
+		local visibleLength = t5.visibleLength
+		local v387 = v385 - p6._scrollMetrics.offset
+		local contentLength = p6._scrollMetrics.contentLength
+
+		return {
+			visibleLength = visibleLength,
+			contentLength = contentLength,
+			offset = v385,
+			dOffset = v387
+		}
+	end
+	function p6._onScroll(p19) -- line: 1099
+		-- upvalues: p6 (copy), Boolean (copy), infoLog (copy)
+		p6._nestedChildLists:forEach(function(p20) -- line: 1100
+			-- upvalues: p19 (copy)
+			if p20.ref then
+				p20.ref._onScroll(p19)
+			end
+		end)
+
+		if p6.props.onScroll then
+			p6.props.onScroll(p19)
+		end
+
+		local elapsed = os.clock()
+		local v391 = p19:GetChildren()[1]
+		local v392 = p6:_selectLength({
+			height = p19.AbsoluteSize.Y,
+			width = p19.AbsoluteSize.X
+		})
+		local v393 = p6:_selectLength({
+			height = v391.AbsoluteSize.Y,
+			width = v391.AbsoluteSize.X
+		})
+		local v394 = if not p6.props.inverted then p6:_selectOffset({
+			x = p19.CanvasPosition.X,
+			y = p19.CanvasPosition.Y
+		}) else p6:_selectOffset({
+			x = p19.AbsoluteCanvasSize.X - p19.CanvasPosition.X - v392,
+			y = p19.AbsoluteCanvasSize.Y - p19.CanvasPosition.Y - v392
+		})
+		local v395 = v394 - p6._scrollMetrics.offset
+
+		if p6:_isNestedWithSameOrientation() then
+			if p6._scrollMetrics.contentLength == 0 then
+				return
+			end
+
+			local v396 = p6._convertParentScrollMetrics({
+				v392,
+				v394
+			})
+
+			v392 = v396.visibleLength
+			v393 = v396.contentLength
+			v394 = v396.offset
+			v395 = v396.dOffset
+		end
+
+		local v397 = not Boolean.toJSBoolean(p6._scrollMetrics.timestamp) and 1 or math.max(1, (elapsed - p6._scrollMetrics.timestamp) * 1000)
+		local v398 = v395 / v397
+
+		if v397 > 500 and p6._scrollMetrics.dt > 500 and v393 > 5 * v392 and not p6._hasWarned.perf then
+			infoLog("VirtualizedList: You have a large list that is slow to update - make sure your renderItem function renders components that follow React performance best practices like PureComponent, shouldComponentUpdate, etc.", {
+				dt = v397,
+				prevDt = p6._scrollMetrics.dt,
+				contentLength = v393
+			})
+			p6._hasWarned.perf = true
+		end
+
+		p6._scrollMetrics = {
+			contentLength = v393,
+			dt = v397,
+			dOffset = v395,
+			offset = v394,
+			timestamp = elapsed,
+			velocity = v398,
+			visibleLength = v392
+		}
+
+		local scrollPositionDelta = p6.state.scrollPositionDelta
+
+		if scrollPositionDelta > 0 then
+			p6:setState(function(t6: {[any]: any}) -- line: 1168
+				-- upvalues: scrollPositionDelta (copy)
+				return {
+					scrollPositionDelta = 0,
+					first = t6.first + scrollPositionDelta,
+					last = t6.last + scrollPositionDelta
+				}
+			end)
+		end
+
+		p6:_updateViewableItems(p6.props.data)
+
+		if not p6.props then
+			return
+		end
+
+		p6:_maybeCallOnEndReached()
+
+		if v398 ~= 0 then
+			p6._fillRateHelper:activate()
+		end
+
+		p6:_computeBlankness()
+		p6:_scheduleCellsToRenderUpdate()
+	end
+	function p6._onScrollBeginDrag(p21) -- line: 1188
+		-- upvalues: p6 (copy), Array (copy)
+		p6._nestedChildLists:forEach(function(p22) -- line: 1189
+			-- upvalues: p21 (copy)
+			if p22.ref then
+				p22.ref._onScrollBeginDrag(p21)
+			end
+		end)
+		Array.forEach(p6._viewabilityTuples, function(p23) -- line: 1194
+			p23.viewabilityHelper:recordInteraction()
+		end)
+		p6._hasInteracted = true
+
+		if p6.props.onScrollBeginDrag then
+			p6.props.onScrollBeginDrag(p21)
+		end
+	end
+	function p6._onScrollEndDrag(p24) -- line: 1203
+		-- upvalues: p6 (copy), Boolean (copy)
+		p6._nestedChildLists:forEach(function(p25) -- line: 1204
+			-- upvalues: p24 (copy)
+			if p25.ref then
+				p25.ref._onScrollEndDrag(p24)
+			end
+		end)
+
+		if Boolean.toJSBoolean(nil) then
+			p6._scrollMetrics.velocity = p6:_selectOffset(nil)
+		end
+
+		p6:_computeBlankness()
+
+		if p6.props.onScrollEndDrag then
+			p6.props.onScrollEndDrag(p24)
+		end
+	end
+	function p6._onMomentumScrollBegin(p26) -- line: 1222
+		-- upvalues: p6 (copy)
+		p6._nestedChildLists:forEach(function(p27) -- line: 1223
+			-- upvalues: p26 (copy)
+			if p27.ref then
+				p27.ref._onMomentumScrollBegin(p26)
+			end
+		end)
+
+		if p6.props.onMomentumScrollBegin then
+			p6.props.onMomentumScrollBegin(p26)
+		end
+	end
+	function p6._onMomentumScrollEnd(p28) -- line: 1233
+		-- upvalues: p6 (copy)
+		p6._nestedChildLists:forEach(function(p29) -- line: 1234
+			-- upvalues: p28 (copy)
+			if p29.ref then
+				p29.ref._onMomentumScrollEnd(p28)
+			end
+		end)
+		p6._scrollMetrics.velocity = 0
+		p6:_computeBlankness()
+
+		if p6.props.onMomentumScrollEnd then
+			p6.props.onMomentumScrollEnd(p28)
+		end
+	end
+	function p6._createViewToken(n10: number, b3: boolean) -- line: 1246
+		-- upvalues: p6 (copy)
+		local data = p6.props.data
+		local v407 = p6.props.getItem(data, n10)
+
+		return {
+			index = n10,
+			item = v407,
+			key = p6:_keyExtractor(v407, n10),
+			isViewable = b3
+		}
+	end
+	function p6._getFrameMetricsApprox(n11: number) -- line: 1261
+		-- upvalues: p6 (copy), invariant (copy)
+		local v409 = p6._getFrameMetrics(n11)
+
+		if v409 ~= nil and n11 == v409.index then
+			return v409
+		end
+
+		local getItemLayout = p6.props.getItemLayout
+
+		invariant(not getItemLayout, "Should not have to estimate frames when a measurement metrics function is provided")
+
+		return {
+			length = p6._averageCellLength,
+			offset = p6._averageCellLength * (n11 - 1)
+		}
+	end
+end
+function v42.scrollToEnd(t7: {[any]: any}, t8: {[any]: any}?) -- line: 1282
+	-- upvalues: console (copy)
+	local v68 = t8 == nil or t8.animated
+	local v69 = t7.props.getItemCount(t7.props.data)
+	local v70 = t7._getFrameMetricsApprox(v69)
+	local v71 = if not t7.props.inverted then math.max(0, v70.offset + v70.length + t7._footerLength - t7._scrollMetrics.visibleLength) else 0
+
+	if t7._scrollRef == nil then
+		return
+	end
+
+	if t7._scrollRef.scrollTo == nil then
+		console.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.")
+
+		return
+	end
+
+	local scrollTo = t7._scrollRef.scrollTo
+	local horizontal = t7.props.horizontal
+
+	scrollTo(if not (horizontal ~= nil and horizontal) then {
+		y = v71,
+		animated = v68
+	} else {
+		x = v71,
+		animated = v68
+	})
+end
+function v42.scrollToIndex(t9: {[any]: any}, t10: {[any]: any}) -- line: 1312
+	-- upvalues: invariant (copy), Boolean (copy), console (copy)
+	local data = t9.props.data
+	local horizontal = t9.props.horizontal
+	local getItemCount = t9.props.getItemCount
+	local getItemLayout = t9.props.getItemLayout
+	local onScrollToIndexFailed = t9.props.onScrollToIndexFailed
+	local animated = t10.animated
+	local index = t10.index
+	local viewOffset = t10.viewOffset
+	local viewPosition = t10.viewPosition
+
+	invariant(index >= 1, ("scrollToIndex out of range: requested index %d but minimum is 1"):format(index))
+	invariant(getItemCount(data) >= 1, ("scrollToIndex out of range: item length %d but minimum is 1"):format(getItemCount(data)))
+	invariant(index <= getItemCount(data), ("scrollToIndex out of range: requested index %d is out of 1 to %d"):format(index, getItemCount(data)))
+
+	if not getItemLayout and index > t9._highestMeasuredFrameIndex then
+		invariant(Boolean.toJSBoolean(onScrollToIndexFailed), "scrollToIndex should be used in conjunction with getItemLayout or onScrollToIndexFailed, otherwise there is no way to know the location of offscreen indices or handle failures.")
+		onScrollToIndexFailed({
+			averageItemLength = t9._averageCellLength,
+			highestMeasuredFrameIndex = t9._highestMeasuredFrameIndex,
+			index = index
+		})
+
+		return
+	end
+
+	local v85 = if not t9:getScrollRef() then nil else t9:getScrollRef()._nativeRef.current
+
+	if v85 == nil then
+		return
+	end
+
+	local AbsoluteCanvasSize = v85.AbsoluteCanvasSize
+	local AbsoluteSize = v85.AbsoluteSize
+	local v88 = t9._getFrameMetricsApprox(index)
+	local v89 = math.max(0, (if not t9.props.inverted then v88.offset - (Boolean.toJSBoolean(viewPosition) and viewPosition or 0) * (t9._scrollMetrics.visibleLength - v88.length) else ((if not horizontal then AbsoluteCanvasSize.Y else AbsoluteCanvasSize.X)) - (if not horizontal then AbsoluteSize.Y else AbsoluteSize.X) - v88.offset - (Boolean.toJSBoolean(viewPosition) and viewPosition or 0) * (t9._scrollMetrics.visibleLength - v88.length))) - (Boolean.toJSBoolean(viewOffset) and viewOffset or 0)
+
+	if t9._scrollRef == nil then
+		return
+	end
+
+	if t9._scrollRef.scrollTo == nil then
+		console.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.")
+
+		return
+	end
+
+	t9._scrollRef.scrollTo(if not horizontal then {
+		y = v89,
+		animated = animated
+	} else {
+		x = v89,
+		animated = animated
+	})
+end
+function v42.scrollToItem(t11: {[any]: any}, t12: {[any]: any}) -- line: 1403
+	-- upvalues: Object (copy)
+	local item = t12.item
+	local data = t11.props.data
+	local getItem = t11.props.getItem
+	local v95 = t11.props.getItemCount(data)
+	local n12 = 1
+
+	while n12 <= v95 do
+		if item == getItem(data, n12) then
+			t11:scrollToIndex(Object.assign({}, t12, {
+				index = n12
+			}))
+
+			return
+		end
+
+		n12 += 1
+	end
+end
+function v42.scrollToOffset(t13: {[any]: any}, t14: {[any]: any}) -- line: 1432
+	-- upvalues: console (copy)
+	local v99 = if not t13:getScrollRef() then nil else t13:getScrollRef()._nativeRef.current
+
+	if v99 == nil then
+		return
+	end
+
+	local animated = t14.animated
+	local offset = t14.offset
+
+	if t13._scrollRef == nil then
+		return
+	end
+
+	if t13.props.inverted then
+		local AbsoluteCanvasSize = v99.AbsoluteCanvasSize
+		local AbsoluteSize = v99.AbsoluteSize
+
+		offset = ((if not t13.props.horizontal then AbsoluteCanvasSize.Y else AbsoluteCanvasSize.X)) - offset - if not t13.props.horizontal then AbsoluteSize.Y else AbsoluteSize.X
+	end
+
+	if t13._scrollRef.scrollTo == nil then
+		console.warn("No scrollTo method provided. This may be because you have two nested VirtualizedLists with the same orientation, or because you are using a custom component that does not implement scrollTo.")
+
+		return
+	end
+
+	local scrollTo = t13._scrollRef.scrollTo
+	local horizontal = t13.props.horizontal
+
+	scrollTo(if not (horizontal ~= nil and horizontal) then {
+		y = offset,
+		animated = animated
+	} else {
+		x = offset,
+		animated = animated
+	})
+end
+function v42.recordInteraction(p30) -- line: 1478
+	-- upvalues: Array (copy)
+	p30._nestedChildLists:forEach(function(p31) -- line: 1479
+		if p31.ref then
+			p31.ref:recordInteraction()
+		end
+	end)
+	Array.forEach(p30._viewabilityTuples, function(p32) -- line: 1484
+		p32.viewabilityHelper:recordInteraction()
+	end)
+	p30:_updateViewableItems(p30.props.data)
+end
+function v42.flashScrollIndicators(p33) -- line: 1490
+	if p33._scrollRef == nil then
+		return
+	end
+
+	p33._scrollRef:flashScrollIndicators()
+end
+function v42.getScrollResponder(p34) -- line: 1503
+	if p34._scrollRef and p34._scrollRef.getScrollResponder then
+		return p34._scrollRef:getScrollResponder()
+	end
+
+	return nil
+end
+function v42.getScrollableNode(p35) -- line: 1511
+	-- upvalues: t1 (copy)
+	if p35._scrollRef and p35._scrollRef.getScrollableNode then
+		return p35._scrollRef:getScrollableNode()
+	end
+
+	return t1.findNodeHandle(p35._scrollRef)
+end
+function v42.getScrollRef(p36) -- line: 1519
+	if p36._scrollRef and p36._scrollRef.getScrollRef then
+		return p36._scrollRef:getScrollRef()
+	end
+
+	return p36._scrollRef
+end
+function v42.setNativeProps(p37, p38) -- line: 1527
+	if p37._scrollRef then
+		p37._scrollRef:setNativeProps(p38)
+	end
+end
+function v42._getCellKey(p39) -- line: 1533
+	if p39.context and p39.context.cellKey then
+		return p39.context.cellKey
+	end
+
+	return "rootList"
+end
+function v42._getListKey(p40) -- line: 1537
+	-- upvalues: Boolean (copy)
+	if Boolean.toJSBoolean(p40.props.listKey) then
+		return p40.props.listKey
+	end
+
+	return (p40:_getCellKey())
+end
+function v42._getDebugInfo(p41) -- line: 1541
+	local t15 = {
+		listKey = p41:_getListKey(),
+		cellKey = p41:_getCellKey()
+	}
+	local horizontal = p41.props.horizontal
+
+	t15.horizontal = horizontal ~= nil and horizontal
+	t15.parent = if not p41.context then nil else p41.context.debugInfo
+
+	return t15
+end
+function v42.hasMore(p42) -- line: 1550
+	return p42._hasMore
+end
+function v42.componentDidMount(p43) -- line: 1554
+	if p43:_isNestedWithSameOrientation() then
+		p43.context.registerAsNestedChild({
+			cellKey = p43:_getCellKey(),
+			key = p43:_getListKey(),
+			ref = p43,
+			parentDebugInfo = p43.context.debugInfo
+		})
+	end
+end
+function v42.componentWillUnmount(p44) -- line: 1569
+	-- upvalues: Array (copy)
+	if p44:_isNestedWithSameOrientation() then
+		p44.context.unregisterAsNestedChild({
+			key = p44:_getListKey(),
+			state = {
+				first = p44.state.first,
+				last = p44.state.last,
+				frames = p44._frames
+			}
+		})
+	end
+
+	p44:_updateViewableItems(nil)
+	p44._updateCellsToRenderBatcher:dispose({
+		abort = true
+	})
+	Array.forEach(p44._viewabilityTuples, function(p45) -- line: 1578
+		p45.viewabilityHelper:dispose()
+	end)
+	p44._fillRateHelper:deactivateAndFlush()
+end
+function v42.getDerivedStateFromProps(p46, t16: {[any]: any}) -- line: 1584
+	-- upvalues: console (copy), Object (copy)
+	local data = p46.data
+	local getItemCount = p46.getItemCount
+	local maintainVisibleContentPosition = p46.maintainVisibleContentPosition
+	local firstItemTracked = t16.firstItemTracked
+	local scrollPositionDelta = t16.scrollPositionDelta
+	local compareItemData = p46.compareItemData
+	local v129 = if compareItemData ~= nil then compareItemData else function(p47, p48) -- line: 446
+		return p47 == p48
+	end
+	local v130 = if not data or not (getItemCount(data) > 0) then nil else p46.getItem(data, 1)
+
+	local function findItem(p49, p50) -- line: 1591
+		-- upvalues: v129 (copy)
+		local v418 = nil
+
+		for i = 1, #p49 do
+			if v129(p49[i], p50) then
+				v418 = i
+
+				break
+			end
+		end
+
+		if v418 == nil then
+			return 1
+		end
+
+		return v418
+	end
+
+	if maintainVisibleContentPosition and (scrollPositionDelta == 0 and firstItemTracked ~= nil and v130 ~= nil) then
+		scrollPositionDelta = if not v129(firstItemTracked, v130) then findItem(data, firstItemTracked) - 1 else 0
+	end
+
+	local v132 = getItemCount(data)
+	local maxToRenderPerBatch = p46.maxToRenderPerBatch
+	local v134 = if maxToRenderPerBatch ~= nil then maxToRenderPerBatch else 10
+	local v135 = math.max(1, (math.min(t16.first, v132 - v134)))
+
+	if v132 > 0 and v132 < v135 + scrollPositionDelta then
+		scrollPositionDelta = 0
+		console.warn("WARNING: maintainVisibleContentPosition failed because scrollPositionDelta was out of bounds. This could indicate that items in `data` are getting removed, items are getting added to the middle of `data`, or a different `data` array is getting passed in. Consider changing the `key` prop of the List if the `data` prop is significantly altered.")
+	end
+
+	if scrollPositionDelta > 0 then
+		for i = 1, math.min(scrollPositionDelta, v132) do
+			p46.getItem(data, i).shouldResizeOnMount = true
+		end
+	end
+
+	return {
+		first = v135,
+		last = math.max(1, (math.min(t16.last, v132))),
+		firstItemTracked = v130 or Object.None,
+		scrollPositionDelta = scrollPositionDelta
+	}
+end
+function v42._pushCells(t17: {[any]: any}, p51, p52, p53, n13: number, n14: number, p54) -- line: 1647
+	-- upvalues: React (copy), u31 (ref)
+	local CellRendererComponent = t17.props.CellRendererComponent
+	local ItemSeparatorComponent = t17.props.ItemSeparatorComponent
+	local data = t17.props.data
+	local getItem = t17.props.getItem
+	local getItemCount = t17.props.getItemCount
+	local horizontal = t17.props.horizontal
+	local v150 = not t17.props.ListHeaderComponent and 0 or 1
+	local v151 = getItemCount(data)
+	local v152 = nil
+	local v153 = math.min(v151, n14)
+
+	while n13 <= v153 do
+		local v154 = getItem(data, n13)
+		local v155 = t17:_keyExtractor(v154, n13)
+
+		t17._indicesToKeys:set(n13, v155)
+
+		if p53:has(n13 + v150) then
+			table.insert(p52, #p51)
+		end
+
+		local v156 = n13
+
+		table.insert(p51, React.createElement(u31, {
+			CellRendererComponent = CellRendererComponent,
+			ItemSeparatorComponent = if not (n13 < v151) then nil else ItemSeparatorComponent,
+			cellKey = v155,
+			fillRateHelper = t17._fillRateHelper,
+			horizontal = horizontal,
+			index = n13,
+			inversionStyle = p54,
+			item = v154,
+			key = v155,
+			prevCellKey = v152,
+			onUpdateSeparators = t17._onUpdateSeparators,
+			onLayout = function(p55) -- line: 1695
+				-- upvalues: t17 (copy), v155 (copy), v156 (copy)
+				return t17:_onCellLayout(p55, v155, v156)
+			end,
+			onUnmount = t17._onCellUnmount,
+			parentProps = t17.props,
+			ref = function(p56) -- line: 1700
+				-- upvalues: t17 (copy), v155 (copy)
+				t17._cellRefs[tostring(v155)] = p56
+			end,
+			isSequentiallySelectable = t17.props.isSequentiallySelectable
+		}))
+		v152 = v155
+		n13 += 1
+	end
+end
+function v42._isVirtualizationDisabled(p57) -- line: 1711
+	if p57.props.disableVirtualization ~= nil then
+		return p57.props.disableVirtualization
+	end
+
+	return false
+end
+function v42._isNestedWithSameOrientation(p58) -- line: 1715
+	-- upvalues: Boolean (copy)
+	local context = p58.context
+	local v160 = false
+
+	if context ~= nil then
+		local v161 = Boolean.toJSBoolean(context.horizontal)
+		local horizontal = p58.props.horizontal
+
+		v160 = v161 == (horizontal ~= nil and horizontal)
+	end
+
+	return v160
+end
+function v42._keyExtractor(t18: {[any]: any}, p59, n15: number) -- line: 1721
+	-- upvalues: keyExtractor (copy), u33 (ref), Boolean (copy), s1 (ref)
+	if t18.props.keyExtractor ~= nil then
+		return t18.props.keyExtractor(p59, n15)
+	end
+
+	local v166 = keyExtractor(p59, n15)
+
+	if v166 == tostring(n15) then
+		u33 = true
+
+		if p59.type ~= nil and Boolean.toJSBoolean(p59.type.displayName) then
+			s1 = p59.type.displayName
+		end
+	end
+
+	return v166
+end
+function v42.render(p60) -- line: 1736
+	-- upvalues: v18 (copy), console (copy), u30 (ref), Set (copy), React (copy), VirtualizedListCellContextProvider (copy), View (copy), StyleSheet (copy), u33 (ref), s1 (ref), Object (copy), VirtualizedListContextProvider (copy), ScrollView (copy)
+	if _G.__DEV__ then
+		local v168 = v18(p60.props.contentContainerStyle)
+
+		if v168 ~= nil and v168.flexWrap == "wrap" then
+			console.warn("`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.")
+		end
+	end
+
+	local ListEmptyComponent = p60.props.ListEmptyComponent
+	local ListFooterComponent = p60.props.ListFooterComponent
+	local ListHeaderComponent = p60.props.ListHeaderComponent
+	local data = p60.props.data
+	local horizontal = p60.props.horizontal
+	local v174 = p60:_isVirtualizationDisabled()
+	local v176
+
+	if p60.props.inverted then
+		local horizontal2 = p60.props.horizontal
+
+		v176 = if not (horizontal2 ~= nil and horizontal2) then u30.verticallyInverted else u30.horizontallyInverted
+	else
+		v176 = nil
+	end
+
+	local t19 = {}
+	local v178 = Set.new(p60.props.stickyHeaderIndices)
+	local t20 = {}
+
+	if ListHeaderComponent then
+		if v178:has(0) then
+			table.insert(t20, 0)
+		end
+
+		local v180 = if not React.isValidElement(ListHeaderComponent) then React.createElement(ListHeaderComponent, nil) else ListHeaderComponent
+
+		table.insert(t19, React.createElement(VirtualizedListCellContextProvider, {
+			key = "$header",
+			Name = "$header",
+			cellKey = p60:_getCellKey() .. "-header"
+		}, React.createElement(View, {
+			Name = "ListHeaderComponent",
+			onLayout = p60._onLayoutHeader,
+			style = StyleSheet.compose(v176, p60.props.ListHeaderComponentStyle),
+			LayoutOrder = not p60.props.inverted and -999999998 or 999999998,
+			AutomaticSize = if not horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X,
+			Size = if not horizontal then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 1, 0)
+		}, v180)))
+	end
+
+	local v181 = p60.props.getItemCount(data)
+
+	if v181 > 0 then
+		u33 = false
+		s1 = ""
+
+		local v182 = p60._getSpacerKey(not horizontal)
+		local initialScrollIndex = p60.props.initialScrollIndex
+		local n16
+
+		if initialScrollIndex ~= nil and initialScrollIndex ~= 1 then
+			n16 = -1
+		else
+			local initialNumToRender = p60.props.initialNumToRender
+
+			n16 = ((if initialNumToRender ~= nil then initialNumToRender else 10)) - 1
+		end
+
+		local v186 = n16 + 1
+		local first = p60.state.first
+		local last = p60.state.last
+		local scrollPositionDelta = p60.state.scrollPositionDelta
+
+		if scrollPositionDelta > 0 then
+			first += scrollPositionDelta
+			last += scrollPositionDelta
+		end
+
+		p60:_pushCells(t19, t20, v178, 1, v186, v176)
+
+		local v190 = math.max(v186 + 1, first)
+
+		if not v174 and first > v186 + 1 then
+			local v191 = false
+
+			if v178.size > 0 then
+				local v192 = not ListHeaderComponent and 0 or 1
+				local v193 = v190 - 1
+
+				while v186 < v193 do
+					if v178:has(v193 + v192) then
+						local v194 = p60._getFrameMetricsApprox(v186)
+						local v195 = p60._getFrameMetricsApprox(v193)
+						local v196 = v195.offset - v194.offset
+						local initialScrollIndex3 = p60.props.initialScrollIndex
+						local v198 = v196 - if not (initialScrollIndex3 ~= nil and initialScrollIndex3 ~= 1) then v194.length else 0
+
+						table.insert(t19, React.createElement(View, {
+							key = "$sticky_lead",
+							Name = "$sticky_lead",
+							style = {
+								Size = if v182 ~= "height" then UDim2.new(0, v198, 1, 0) else UDim2.new(1, 0, 0, v198)
+							}
+						}))
+						p60:_pushCells(t19, t20, v178, v193, v193, v176)
+
+						local v199 = p60._getFrameMetricsApprox(first).offset - v195.offset + v195.length
+
+						table.insert(t19, React.createElement(View, {
+							key = "$sticky_trail",
+							Name = "$sticky_trail",
+							style = {
+								Size = if v182 ~= "height" then UDim2.new(0, v199, 1, 0) else UDim2.new(1, 0, 0, v199)
+							}
+						}))
+						v191 = true
+
+						break
+					end
+
+					v193 -= 1
+				end
+			end
+
+			if not v191 then
+				local v200 = p60._getFrameMetricsApprox(v186)
+				local v201 = p60._getFrameMetricsApprox(first).offset - (v200.offset + v200.length)
+
+				table.insert(t19, React.createElement(View, {
+					key = "$lead_spacer",
+					Name = "$lead_spacer",
+					style = {
+						Size = if v182 ~= "height" then UDim2.new(0, v201, 1, 0) else UDim2.new(1, 0, 0, v201)
+					},
+					LayoutOrder = not p60.props.inverted and -999999999 or 999999999
+				}))
+			end
+		end
+
+		p60:_pushCells(t19, t20, v178, v190, last, v176)
+
+		if not p60._hasWarned.keys and u33 then
+			console.warn("VirtualizedList: missing keys for items, make sure to specify a key or id property on each item or provide a custom keyExtractor.", s1)
+			p60._hasWarned.keys = true
+		end
+
+		if not v174 and last < v181 then
+			local v202 = p60._getFrameMetricsApprox(last)
+			local v203 = if not p60.props.getItemLayout then math.min(v181, p60._highestMeasuredFrameIndex) else v181
+			local v204 = p60._getFrameMetricsApprox(v203)
+			local v205 = v204.offset + v204.length - (v202.offset + v202.length)
+
+			table.insert(t19, React.createElement(View, {
+				key = "$tail_spacer",
+				Name = "$tail_spacer",
+				style = {
+					Size = if v182 ~= "height" then UDim2.new(0, v205, 1, 0) else UDim2.new(1, 0, 0, v205)
+				},
+				LayoutOrder = not p60.props.inverted and 999999999 or -999999999
+			}))
+		end
+	elseif ListEmptyComponent then
+		local v206 = if not React.isValidElement(ListEmptyComponent) then React.createElement(ListEmptyComponent, nil) else ListEmptyComponent
+
+		table.insert(t19, React.cloneElement(v206, {
+			key = "$empty",
+			Name = "$empty",
+			onLayout = function(p61) -- line: 1923
+				-- upvalues: p60 (copy), v206 (copy)
+				p60._onLayoutEmpty(p61)
+
+				if v206.props.onLayout then
+					v206.props.onLayout(p61)
+				end
+			end,
+			style = StyleSheet.compose(v176, v206.props.style)
+		}))
+	end
+
+	if ListFooterComponent then
+		local v207 = if not React.isValidElement(ListFooterComponent) then React.createElement(ListFooterComponent, nil) else ListFooterComponent
+
+		table.insert(t19, React.createElement(VirtualizedListCellContextProvider, {
+			key = "$footer",
+			Name = "$footer",
+			cellKey = p60:_getFooterCellKey()
+		}, React.createElement(View, {
+			Name = "ListFooterComponent",
+			onLayout = p60._onLayoutFooter,
+			style = StyleSheet.compose(v176, p60.props.ListFooterComponentStyle),
+			LayoutOrder = not p60.props.inverted and 999999998 or -999999998,
+			AutomaticSize = if not horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X,
+			Size = if not horizontal then UDim2.new(1, 0, 0, 0) else UDim2.new(0, 0, 1, 0)
+		}, v207)))
+	end
+
+	if p60.props.inverted and not p60.props.getItemLayout then
+		if p60:getScrollRef() ~= nil and p60:getScrollRef()._nativeRef.current ~= nil then
+			local current = p60:getScrollRef()._nativeRef.current
+			local CanvasPosition = current.CanvasPosition
+			local v210 = p60._getFrameMetricsApprox((math.min(p60._highestMeasuredFrameIndex, v181)))
+			local v211 = v210.offset + v210.length
+			local v212 = if not p60.props.optimizeInvertedCanvasResize then v211 ~= p60._invertedCanvasLength - p60._footerLength else v211 > p60._invertedCanvasLength - p60._footerLength
+
+			if v181 <= p60._highestMeasuredFrameIndex and v211 ~= p60._invertedCanvasLength - p60._footerLength then
+				local v213 = v211 + p60._footerLength - p60._invertedCanvasLength
+
+				p60._invertedCanvasLength = v211 + p60._footerLength
+
+				local v214 = if not p60.props.horizontal then UDim2.new(1, 0, 0, p60._invertedCanvasLength) else UDim2.new(0, p60._invertedCanvasLength, 1, 0)
+
+				current.CanvasSize = v214
+				p60._canvasPosition = if not p60.props.horizontal then Vector2.new(CanvasPosition.X, CanvasPosition.Y + v213) else Vector2.new(CanvasPosition.X + v213, CanvasPosition.Y)
+				p60._canvasSize = v214
+			elseif v212 and p60.state.scrollPositionDelta == 0 then
+				local _invertedCanvasLength = p60._invertedCanvasLength
+				local visibleLength = p60._scrollMetrics.visibleLength
+				local windowSize = p60.props.windowSize
+				local v218 = visibleLength * (if windowSize ~= nil then windowSize else 21) * 0.5
+				local v219 = v210.offset + p60._scrollMetrics.visibleLength + v218
+				local v220 = v219 - _invertedCanvasLength
+
+				p60._invertedCanvasLength = v219
+
+				local v221 = if not p60.props.horizontal then UDim2.new(1, 0, 0, p60._invertedCanvasLength) else UDim2.new(0, p60._invertedCanvasLength, 1, 0)
+
+				current.CanvasSize = v221
+				current.CanvasPosition = if not p60.props.horizontal then Vector2.new(CanvasPosition.X, CanvasPosition.Y + v220) else Vector2.new(CanvasPosition.X + v220, CanvasPosition.Y)
+				p60._canvasPosition = current.CanvasPosition
+				p60._canvasSize = v221
+			end
+		else
+			p60._canvasPosition = if not p60.props.horizontal then Vector2.new(0, p60._invertedCanvasLength) else Vector2.new(p60._invertedCanvasLength, 0)
+			p60._canvasSize = if not p60.props.horizontal then UDim2.new(1, 0, 0, p60._invertedCanvasLength) else UDim2.new(0, p60._invertedCanvasLength, 1, 0)
+		end
+	elseif p60.props.inverted and p60.props.getItemLayout then
+		local v222 = p60._getFrameMetricsApprox(v181)
+
+		if p60:getScrollRef() ~= nil and p60:getScrollRef()._nativeRef.current ~= nil then
+			local current = p60:getScrollRef()._nativeRef.current
+			local CanvasPosition = current.CanvasPosition
+			local _invertedCanvasLength = p60._invertedCanvasLength
+
+			p60._invertedCanvasLength = v222.offset + v222.length
+
+			if _invertedCanvasLength ~= p60._invertedCanvasLength then
+				local v226 = p60._invertedCanvasLength - _invertedCanvasLength
+
+				current.CanvasPosition = if not p60.props.horizontal then CanvasPosition + Vector2.new(0, v226) else CanvasPosition + Vector2.new(v226, 0)
+			end
+		else
+			p60._invertedCanvasLength = v222.offset + v222.length
+		end
+	end
+
+	local assign = Object.assign
+	local v228 = table.clone(p60.props)
+	local t21 = {
+		onContentSizeChange = p60._onContentSizeChange,
+		onLayout = p60._onLayout,
+		onScroll = p60._onScroll,
+		onScrollBeginDrag = p60._onScrollBeginDrag,
+		onScrollEndDrag = p60._onScrollEndDrag,
+		onMomentumScrollBegin = p60._onMomentumScrollBegin,
+		onMomentumScrollEnd = p60._onMomentumScrollEnd
+	}
+	local scrollEventThrottle = p60.props.scrollEventThrottle
+
+	t21.scrollEventThrottle = if scrollEventThrottle ~= nil then scrollEventThrottle else 50
+	t21.invertStickyHeaders = if p60.props.invertStickyHeaders == nil then p60.props.inverted else p60.props.invertStickyHeaders
+	t21.stickyHeaderIndices = t20
+	t21.style = p60.props.style
+	t21.layoutStyle = v176 or nil
+	t21.AutomaticCanvasSize = if not p60.props.inverted or p60.props.getItemLayout then nil else Enum.AutomaticSize.None
+	t21.CanvasSize = if not p60.props.inverted then nil else p60._canvasSize
+	t21.CanvasPosition = if not p60.props.inverted then nil else p60._canvasPosition
+
+	local v231 = assign(v228, t21)
+
+	p60._hasMore = p60.state.last < p60.props.getItemCount(p60.props.data)
+
+	local createElement = React.createElement
+	local v233 = VirtualizedListContextProvider
+	local t22 = {}
+	local t23 = {
+		cellKey = nil,
+		getScrollMetrics = p60._getScrollMetrics
+	}
+	local horizontal3 = p60.props.horizontal
+
+	t23.horizontal = horizontal3 ~= nil and horizontal3
+	t23.getOutermostParentListRef = p60._getOutermostParentListRef
+	t23.getNestedChildState = p60._getNestedChildState
+	t23.registerAsNestedChild = p60._registerAsNestedChild
+	t23.unregisterAsNestedChild = p60._unregisterAsNestedChild
+	t23.debugInfo = p60:_getDebugInfo()
+	t22.value = t23
+
+	local v237 = createElement(v233, t22, React.cloneElement(((if not p60.props.renderScrollComponent then p60._defaultRenderScrollComponent else p60.props.renderScrollComponent))(v231), {
+		ref = p60._captureScrollRef
+	}, t19))
+	local v238 = v237
+
+	if _G.__DEV__ then
+		v238 = React.createElement(ScrollView.Context.Consumer, nil, function(p62) -- line: 2103
+			-- upvalues: p60 (copy), console (copy), v237 (copy)
+			if p62 ~= nil then
+				local horizontal4 = p62.horizontal
+				local horizontal5 = p60.props.horizontal
+
+				if not (horizontal5 ~= nil and horizontal5) == not horizontal4 and not p60._hasWarned.nesting and p60.context == nil then
+					console.error("VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.")
+					p60._hasWarned.nesting = true
+				end
+			end
+
+			return v237
+		end)
+	end
+
+	if p60.props.debug then
+		return React.createElement(View, {
+			Name = "debug",
+			style = u30.debug
+		}, v238, p60:_renderDebugOverlay())
+	end
+
+	return v238
+end
+function v42.componentDidUpdate(p63, p64) -- line: 2129
+	-- upvalues: Array (copy)
+	local data = p63.props.data
+	local extraData = p63.props.extraData
+
+	if data ~= p64.data or extraData ~= p64.extraData then
+		Array.forEach(p63._viewabilityTuples, function(p65) -- line: 2134
+			p65.viewabilityHelper:resetViewableIndices()
+		end)
+	end
+
+	local _hiPriInProgress = p63._hiPriInProgress
+
+	p63:_scheduleCellsToRenderUpdate()
+
+	if _hiPriInProgress then
+		p63._hiPriInProgress = false
+	end
+end
+function v42._computeBlankness(p66) -- line: 2153
+	p66._fillRateHelper:computeBlankness(p66.props, p66.state, p66._scrollMetrics)
+end
+function v42._onCellLayout(t24: {[any]: any}, p67, s4: string, n17: number) -- line: 2157
+	-- upvalues: console (copy), Array (copy), Object (copy), Boolean (copy)
+	local v249 = if not t24:getScrollRef() or not t24:getScrollRef()._nativeRef.current then p67:FindFirstAncestorOfClass("ScrollingFrame") else t24:getScrollRef()._nativeRef.current
+
+	if v249 == nil then
+		if _G.__DEV__ then
+			console.warn("CellLayout failed for index " .. tostring(n17) .. ". this may cause layout issues")
+		end
+
+		return
+	end
+
+	local AbsolutePosition = v249.AbsolutePosition
+	local CanvasPosition = v249.CanvasPosition
+	local AbsoluteCanvasSize = v249.AbsoluteCanvasSize
+	local AbsoluteSize = p67.AbsoluteSize
+	local AbsolutePosition2 = p67.AbsolutePosition
+	local v255 = if not t24.props.inverted or not t24.props.horizontal then AbsolutePosition2.X - AbsolutePosition.X + CanvasPosition.X else AbsoluteCanvasSize.X - CanvasPosition.X - AbsolutePosition2.X - AbsoluteSize.X + AbsolutePosition.X
+	local v256 = if not t24.props.inverted or t24.props.horizontal then AbsolutePosition2.Y - AbsolutePosition.Y + CanvasPosition.Y else AbsoluteCanvasSize.Y - CanvasPosition.Y - AbsolutePosition2.Y - AbsoluteSize.Y + AbsolutePosition.Y
+	local t25 = {
+		width = p67.AbsoluteSize.X,
+		height = p67.AbsoluteSize.Y,
+		x = v255,
+		y = v256
+	}
+	local t26 = {
+		inLayout = true,
+		offset = t24:_selectOffset(t25),
+		length = t24:_selectLength(t25),
+		index = n17
+	}
+	local v259 = t24._frames[s4]
+
+	if not v259 or math.abs(t26.offset - v259.offset) > 1 or t26.length ~= v259.length or n17 ~= v259.index then
+		local v260 = t24.props.getItem(t24.props.data, n17)
+
+		if not v259 and not t24.props.getItemLayout and typeof(v260) == "table" and v260.shouldResizeOnMount then
+			t24:recalculateFrames(t24:_selectLength(t25), s4, n17)
+		end
+
+		if v259 and not t24.props.getItemLayout and math.abs(t26.length - v259.length) >= 1 then
+			if t24.props.UNSTABLE_forceSiblingLayoutUpdate then
+				local Frame = p67:FindFirstAncestorOfClass("Frame")
+				local v262 = if not Frame then {} else Frame:GetChildren()
+				local v263 = t24.props.getItemCount(t24.props.data)
+
+				Array.forEach(v262, function(p68) -- line: 2224
+					-- upvalues: n17 (copy), v263 (copy), t24 (copy)
+					if not p68:IsA("GuiObject") then
+						return
+					end
+
+					local v428 = math.abs(p68.LayoutOrder)
+
+					if v428 <= n17 or v428 > v263 then
+						return
+					end
+
+					local v429 = t24.props.getItem(t24.props.data, v428)
+
+					if v429 == nil then
+						return
+					end
+
+					local v430 = t24:_keyExtractor(v429, v428)
+
+					t24:_onCellLayout(p68, v430, v428)
+				end)
+			else
+				Array.forEach(Object.keys(t24._frames), function(p69) -- line: 2244
+					-- upvalues: t24 (copy), n17 (copy)
+					if t24._frames[p69].index <= n17 then
+						return
+					end
+
+					local v432 = if not t24._cellRefs[p69] then nil else t24._cellRefs[p69]:getRef()
+
+					if v432 and v432.current then
+						t24:_onCellLayout(v432.current, p69, t24._frames[p69].index)
+					end
+				end)
+			end
+		end
+
+		t24._totalCellLength = t24._totalCellLength + (t26.length - (not Boolean.toJSBoolean(v259) and 0 or v259.length))
+		t24._totalCellsMeasured = t24._totalCellsMeasured + (not Boolean.toJSBoolean(v259) and 1 or 0)
+		t24._averageCellLength = t24._totalCellLength / t24._totalCellsMeasured
+		t24._frames[s4] = t26
+		t24._highestMeasuredFrameIndex = math.max(t24._highestMeasuredFrameIndex, n17)
+		t24:_scheduleCellsToRenderUpdate()
+
+		if t24.props.inverted and not t24.props.getItemLayout and t24.state.last == t24.props.getItemCount(t24.props.data) and t24._highestMeasuredFrameIndex == t24.state.last then
+			t24:forceUpdate()
+		end
+	else
+		t24._frames[s4].inLayout = true
+	end
+
+	t24:_triggerRemeasureForChildListsInCell(s4)
+	t24:_computeBlankness()
+	t24:_updateViewableItems(t24.props.data)
+end
+function v42._triggerRemeasureForChildListsInCell(t27: {[any]: any}, s5: string) -- line: 2290
+	local v266 = t27._cellKeysToChildListKeys:get(s5)
+
+	if v266 then
+		v266:forEach(function(p70) -- line: 2293
+			-- upvalues: t27 (copy)
+			local v434 = t27._nestedChildLists:get(p70)
+
+			if v434 and v434.ref then
+				v434.ref:measureLayoutRelativeToContainingList()
+			end
+		end)
+	end
+end
+function v42.recalculateFrames(t28: {[any]: any}, n18: number, s6: string, n19: number) -- line: 2304
+	-- upvalues: Array (copy), Object (copy)
+	Array.forEach(Object.keys(t28._frames), function(p71) -- line: 2305
+		-- upvalues: s6 (copy), t28 (copy), n19 (copy), n18 (copy)
+		if p71 == s6 and t28._frames[p71].index >= n19 then
+			return
+		end
+
+		local v436 = t28._frames[p71]
+
+		v436.index = v436.index + 1
+
+		local v437 = t28._frames[p71]
+
+		v437.offset = v437.offset + n18
+	end)
+	t28._highestMeasuredFrameIndex = t28._highestMeasuredFrameIndex + 1
+end
+function v42.measureLayoutRelativeToContainingList(p72) -- line: 2316
+	-- upvalues: Boolean (copy), console (copy)
+	local ok, result = pcall(function() -- line: 2320
+		-- upvalues: Boolean (copy), p72 (copy), console (copy)
+		if not Boolean.toJSBoolean(p72._scrollRef) then
+			return nil
+		end
+
+		p72._scrollRef:measureLayout(p72.context.getOutermostParentListRef():getScrollRef(), function(p73, p74, p75, p76) -- line: 2328
+			-- upvalues: p72 (copy)
+			p72._offsetFromParentVirtualizedList = p72:_selectOffset({
+				x = p73,
+				y = p74
+			})
+			p72._scrollMetrics.contentLength = p72:_selectLength({
+				width = p75,
+				height = p76
+			})
+
+			local v486 = p72._convertParentScrollMetrics(p72.context.getScrollMetrics())
+
+			if p72._scrollMetrics.visibleLength ~= v486.visibleLength or p72._scrollMetrics.offset ~= v486.offset then
+				p72._scrollMetrics.visibleLength = v486.visibleLength
+				p72._scrollMetrics.offset = v486.offset
+				p72._cellKeysToChildListKeys:forEach(function(p77) -- line: 2342
+					-- upvalues: p72 (copy)
+					if p77 then
+						p77:forEach(function(p78) -- line: 2344
+							-- upvalues: p72 (copy)
+							local v490 = p72._nestedChildLists:get(p78)
+
+							if v490 and v490.ref then
+								v490.ref:measureLayoutRelativeToContainingList()
+							end
+						end)
+					end
+				end)
+			end
+		end, function(_) -- line: 2354
+			-- upvalues: console (copy)
+			console.warn("VirtualizedList: Encountered an error while measuring a list's offset from its containing VirtualizedList.")
+		end)
+
+		return nil
+	end)
+
+	if not ok then
+		console.warn("measureLayoutRelativeToContainingList threw an error", result.stack)
+	end
+end
+function v42._getFooterCellKey(p80) -- line: 2368
+	return p80:_getCellKey() .. "-footer"
+end
+function v42._renderDebugOverlay(p81) -- line: 2372
+	-- upvalues: Boolean (copy), React (copy), View (copy), u30 (ref), Array (copy)
+	local v276 = p81._scrollMetrics.visibleLength / (not Boolean.toJSBoolean(p81._scrollMetrics.contentLength) and 1 or p81._scrollMetrics.contentLength)
+	local t29 = {}
+	local v278 = p81.props.getItemCount(p81.props.data)
+	local n20 = 1
+
+	while n20 <= v278 do
+		local v280 = p81._getFrameMetricsApprox(n20)
+
+		if Boolean.toJSBoolean(v280.inLayout) then
+			table.insert(t29, v280)
+		end
+
+		n20 += 1
+	end
+
+	local offset = p81._getFrameMetricsApprox(p81.state.first).offset
+	local v282 = p81._getFrameMetricsApprox(p81.state.last)
+	local v283 = v282.offset + v282.length - offset
+	local offset2 = p81._scrollMetrics.offset
+	local visibleLength = p81._scrollMetrics.visibleLength
+
+	return React.createElement(View, {
+		style = {
+			u30.debugOverlayBase,
+			u30.debugOverlay
+		}
+	}, Array.map(t29, function(p82, n21: number) -- line: 2397
+		-- upvalues: React (copy), View (copy), u30 (ref), v276 (copy)
+		return React.createElement(View, {
+			key = "f" .. tostring(n21),
+			Name = "f" .. tostring(n21),
+			style = {
+				u30.debugOverlayBase,
+				u30.debugOverlayFrame,
+				{
+					top = p82.offset * v276,
+					height = p82.length * v276
+				}
+			}
+		})
+	end), React.createElement(View, {
+		Name = "DebugOverlayLast",
+		style = {
+			u30.debugOverlayBase,
+			u30.debugOverlayFrameLast,
+			{
+				top = offset * v276,
+				height = v283 * v276
+			}
+		}
+	}), React.createElement(View, {
+		Name = "DebugOverlayVis",
+		style = {
+			u30.debugOverlayBase,
+			u30.debugOverlayFrameVis,
+			{
+				top = offset2 * v276,
+				height = visibleLength * v276
+			}
+		}
+	}))
+end
+function v42._selectLength(p83, p84) -- line: 2427
+	local horizontal = p83.props.horizontal
+
+	if horizontal == nil or not horizontal then
+		return p84.height
+	end
+
+	return p84.width
+end
+function v42._selectOffset(p85, p86) -- line: 2434
+	local horizontal = p85.props.horizontal
+
+	if horizontal == nil or not horizontal then
+		return p86.y
+	end
+
+	return p86.x
+end
+function v42._maybeCallOnEndReached(p87) -- line: 2441
+	local data = p87.props.data
+	local getItemCount = p87.props.getItemCount
+	local onEndReached = p87.props.onEndReached
+	local onEndReachedThreshold = p87.props.onEndReachedThreshold
+	local contentLength = p87._scrollMetrics.contentLength
+	local visibleLength = p87._scrollMetrics.visibleLength
+	local offset = p87._scrollMetrics.offset
+	local v300 = contentLength - visibleLength - offset
+	local v301 = onEndReachedThreshold == nil and 2 or onEndReachedThreshold * visibleLength
+
+	if onEndReached and (p87.state.last == getItemCount(data) and v300 < v301 and p87._scrollMetrics.contentLength ~= p87._sentEndForContentLength) then
+		p87._sentEndForContentLength = p87._scrollMetrics.contentLength
+		onEndReached({
+			distanceFromEnd = v300
+		})
+
+		return
+	end
+
+	if v301 < v300 then
+		p87._sentEndForContentLength = 0
+	end
+end
+function v42._scheduleCellsToRenderUpdate(p88) -- line: 2466
+	-- upvalues: Boolean (copy)
+	local first = p88.state.first
+	local last = p88.state.last
+
+	if p88.state.scrollPositionDelta > 0 then
+		return
+	end
+
+	local offset = p88._scrollMetrics.offset
+	local visibleLength = p88._scrollMetrics.visibleLength
+	local velocity = p88._scrollMetrics.velocity
+	local v308 = p88.props.getItemCount(p88.props.data)
+	local v309 = false
+	local onEndReachedThreshold = p88.props.onEndReachedThreshold
+	local v311 = ((if onEndReachedThreshold ~= nil then onEndReachedThreshold else 2)) * visibleLength / 2
+
+	if first > 1 then
+		local v312 = offset - p88._getFrameMetricsApprox(first).offset
+
+		v309 = v309 or (v312 < 0 or velocity < -2 and v312 < v311)
+	end
+
+	if last < v308 then
+		local v313 = p88._getFrameMetricsApprox(last).offset - (offset + visibleLength)
+
+		v309 = v309 or (v313 < 0 or velocity > 2)
+	end
+
+	if v309 and ((Boolean.toJSBoolean(p88._averageCellLength) or p88.props.getItemLayout) and not p88._hiPriInProgress) then
+		p88._hiPriInProgress = true
+		p88._updateCellsToRenderBatcher:dispose({
+			abort = true
+		})
+		p88._updateCellsToRender()
+
+		return
+	end
+
+	p88._updateCellsToRenderBatcher:schedule()
+end
+function v42._updateViewableItems(p89, p90) -- line: 2513
+	-- upvalues: Array (copy)
+	local getItemCount = p89.props.getItemCount
+
+	Array.forEach(p89._viewabilityTuples, function(p91) -- line: 2515
+		-- upvalues: getItemCount (copy), p90 (copy), p89 (copy)
+		p91.viewabilityHelper:onUpdate(getItemCount(p90), p89._scrollMetrics.offset, p89._scrollMetrics.visibleLength, p89._getFrameMetrics, p89._createViewToken, p91.onViewableItemsChanged, p89.state)
+	end)
+end
+
+u31 = React.Component:extend("CellRenderer")
+
+function u31.init(p92, p93) -- line: 2576
+	-- upvalues: React (copy)
+	p92.props = p93
+	p92.state = {
+		separatorProps = {
+			highlighted = false,
+			leadingItem = p92.props.item
+		}
+	}
+	p92._separators = {
+		highlight = function() -- line: 2588
+			-- upvalues: p92 (copy)
+			local cellKey = p92.props.cellKey
+			local prevCellKey = p92.props.prevCellKey
+
+			p92.props.onUpdateSeparators({
+				cellKey,
+				prevCellKey
+			}, {
+				highlighted = true
+			})
+		end,
+		unhighlight = function() -- line: 2592
+			-- upvalues: p92 (copy)
+			local cellKey = p92.props.cellKey
+			local prevCellKey = p92.props.prevCellKey
+
+			p92.props.onUpdateSeparators({
+				cellKey,
+				prevCellKey
+			}, {
+				highlighted = false
+			})
+		end,
+		updateProps = function(s7: string, p94) -- line: 2596
+			-- upvalues: p92 (copy)
+			local cellKey = p92.props.cellKey
+			local prevCellKey = p92.props.prevCellKey
+
+			p92.props.onUpdateSeparators({ if s7 ~= "leading" then cellKey else prevCellKey }, p94)
+		end
+	}
+	p92._nativeRef = React.createRef()
+end
+function u31.getDerivedStateFromProps(t30: {[any]: any}, t31: {[any]: any}) -- line: 2608
+	-- upvalues: Object (copy)
+	return {
+		separatorProps = Object.assign({}, t31.separatorProps, {
+			leadingItem = t30.item
+		})
+	}
+end
+function u31.updateSeparatorProps(p95, p96) -- line: 2612
+	-- upvalues: Object (copy)
+	p95:setState(function(p97) -- line: 2613
+		-- upvalues: Object (copy), p96 (copy)
+		return {
+			separatorProps = Object.assign({}, p97.separatorProps, p96)
+		}
+	end)
+end
+function u31.componentWillUnmount(p98) -- line: 2618
+	p98.props.onUnmount(p98.props.cellKey)
+end
+function u31._renderElement(p99, p100, p101, p102, p103) -- line: 2622
+	-- upvalues: Boolean (copy), console (copy), React (copy), invariant (copy)
+	if Boolean.toJSBoolean(p100) and Boolean.toJSBoolean(p101) then
+		console.warn("VirtualizedList: Both ListItemComponent and renderItem props are present. ListItemComponent will take precedence over renderItem.")
+	end
+
+	if Boolean.toJSBoolean(p101) then
+		return React.createElement(p101, {
+			item = p102,
+			index = p103,
+			separators = p99._separators
+		})
+	end
+
+	if Boolean.toJSBoolean(p100) then
+		return p100({
+			item = p102,
+			index = p103,
+			separators = p99._separators
+		})
+	end
+
+	invariant(false, "VirtualizedList: Either ListItemComponent or renderItem props are required but none were found.")
+
+	return nil
+end
+function u31.getRef(p104) -- line: 2653
+	return p104._nativeRef
+end
+function u31.render(p105) -- line: 2658
+	-- upvalues: React (copy), Object (copy), Boolean (copy), u30 (ref), View (copy), VirtualizedListCellContextProvider (copy)
+	local CellRendererComponent = p105.props.CellRendererComponent
+	local ItemSeparatorComponent = p105.props.ItemSeparatorComponent
+	local fillRateHelper = p105.props.fillRateHelper
+	local horizontal = p105.props.horizontal
+	local item = p105.props.item
+	local index = p105.props.index
+	local inversionStyle = p105.props.inversionStyle
+	local parentProps = p105.props.parentProps
+	local renderItem = parentProps.renderItem
+	local getItemLayout = parentProps.getItemLayout
+	local v341 = p105:_renderElement(renderItem, parentProps.ListItemComponent, item, index)
+	local v342 = if not getItemLayout or (parentProps.debug or fillRateHelper:enabled()) then p105.props.onLayout else nil
+	local v343 = ItemSeparatorComponent and React.createElement(ItemSeparatorComponent, Object.assign(p105.state.separatorProps, {
+		LayoutOrder = not inversionStyle and 1 or -1
+	}))
+	local v344 = if not Boolean.toJSBoolean(inversionStyle) then if not horizontal then inversionStyle else {
+		u30.row,
+		inversionStyle
+	} else if not horizontal then {
+		u30.columnReverse,
+		inversionStyle
+	} else {
+		u30.rowReverse,
+		inversionStyle
+	}
+	local v345 = if Boolean.toJSBoolean(CellRendererComponent) then React.createElement(CellRendererComponent, Object.assign(table.clone(p105.props), {
+		style = v344,
+		onLayout = v342,
+		nativeRef = p105._nativeRef
+	}), if not v343 then nil else React.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = if not horizontal then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal
+	}), v341, v343) else React.createElement(View, {
+		Name = "CellRendererView",
+		style = v344,
+		onLayout = v342,
+		LayoutOrder = if not inversionStyle then index else -index,
+		AutomaticSize = if not horizontal then Enum.AutomaticSize.Y else Enum.AutomaticSize.X,
+		nativeRef = p105._nativeRef,
+		SelectionGroup = not not p105.props.isSequentiallySelectable or nil,
+		SelectionBehaviorLeft = if not p105.props.isSequentiallySelectable then nil else if not p105.props.horizontal then Enum.SelectionBehavior.Stop else Enum.SelectionBehavior.Escape,
+		SelectionBehaviorRight = if not p105.props.isSequentiallySelectable then nil else if not p105.props.horizontal then Enum.SelectionBehavior.Stop else Enum.SelectionBehavior.Escape,
+		SelectionBehaviorUp = if not p105.props.isSequentiallySelectable then nil else if not p105.props.horizontal then Enum.SelectionBehavior.Escape else Enum.SelectionBehavior.Stop,
+		SelectionBehaviorDown = if not p105.props.isSequentiallySelectable then nil else if not p105.props.horizontal then Enum.SelectionBehavior.Escape else Enum.SelectionBehavior.Stop
+	}, if not v343 then nil else React.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = if not horizontal then Enum.FillDirection.Vertical else Enum.FillDirection.Horizontal
+	}), v341, v343)
+
+	return React.createElement(VirtualizedListCellContextProvider, {
+		cellKey = p105.props.cellKey
+	}, v345)
+end
+function describeNestedLists(t32: {[any]: any}) -- line: 2747
+	-- upvalues: Boolean (copy)
+	local v347 = "VirtualizedList trace:\n" .. ("  Child (%s):\n"):format(not Boolean.toJSBoolean(t32.horizontal) and "vertical" or "horizontal") .. ("    listKey: %s\n"):format(t32.key) .. ("    cellKey: %s"):format(t32.cellKey)
+	local parentDebugInfo = t32.parentDebugInfo
+
+	while parentDebugInfo do
+		v347 ..= ("\n  Parent (%s):\n"):format(not parentDebugInfo.horizontal and "vertical" or "horizontal") .. ("    listKey: %s\n"):format(parentDebugInfo.listKey) .. ("    cellKey: %s"):format(parentDebugInfo.cellKey)
+		parentDebugInfo = parentDebugInfo.parent
+	end
+
+	return v347
+end
+
+u30 = StyleSheet.create({
+	verticallyInverted = {
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Bottom
+	},
+	horizontallyInverted = {
+		HorizontalAlignment = Enum.HorizontalAlignment.Right,
+		VerticalAlignment = Enum.VerticalAlignment.Center
+	},
+	row = {
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.new(0, 0, 1, 0)
+	},
+	column = {
+		AutomaticSize = Enum.AutomaticSize.Y
+	},
+	rowReverse = {
+		flexDirection = "row-reverse",
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.new(0, 0, 1, 0)
+	},
+	columnReverse = {
+		flexDirection = "column-reverse",
+		AutomaticSize = Enum.AutomaticSize.Y
+	},
+	debug = {
+		flex = 1
+	},
+	debugOverlayBase = {
+		position = "absolute",
+		top = 0,
+		right = 0
+	},
+	debugOverlay = {
+		bottom = 0,
+		width = 20,
+		borderColor = "blue",
+		borderWidth = 1
+	},
+	debugOverlayFrame = {
+		left = 0,
+		backgroundColor = "orange"
+	},
+	debugOverlayFrameLast = {
+		left = 0,
+		borderColor = "green",
+		borderWidth = 2
+	},
+	debugOverlayFrameVis = {
+		left = 0,
+		borderColor = "red",
+		borderWidth = 2
+	}
+})
+
+return v42

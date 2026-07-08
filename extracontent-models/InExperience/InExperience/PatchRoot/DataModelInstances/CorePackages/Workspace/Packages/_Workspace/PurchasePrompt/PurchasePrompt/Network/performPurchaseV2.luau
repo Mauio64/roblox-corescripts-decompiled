@@ -1,31 +1,49 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.Enums.PurchaseError);
-local v2 = require(l_Parent_0.Misc.Constants);
-local v3 = require(l_Parent_0.Promise);
-local v4 = require(l_Parent_0.Utils.isGenericChallengeResponse);
-local l_Parent_1 = l_Parent_0.Parent;
-local l_isEconomicRestrictionResponse_0 = require(l_Parent_1.IAPExperience).Utility.isEconomicRestrictionResponse;
-return function(v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17) --[[ Line: 15 ]] --[[ Name: performPurchaseV2 ]]
-    -- upvalues: v3 (copy), v2 (copy), v1 (copy), v4 (copy), l_isEconomicRestrictionResponse_0 (copy)
-    return v7.performPurchaseV2(v8, v9, v10, v11, v12, v13, v14, v15, v16, v17):andThen(function(v18) --[[ Line: 41 ]]
-        -- upvalues: v3 (ref), v2 (ref), v1 (ref), v4 (ref), l_isEconomicRestrictionResponse_0 (ref)
-        if v18.purchased or v18.reason == "AlreadyOwned" then
-            return v3.resolve(v18);
-        elseif v18.reason == v2.PurchaseFailureReason.EconomyDisabled then
-            return v3.reject(v1.PurchaseDisabled);
-        elseif v18.reason == v2.PurchaseFailureReason.TwoStepVerificationRequired then
-            return v3.reject(v1.TwoFactorNeeded);
-        elseif v18.transactionStatus == 24 then
-            return v3.reject(v1.TwoFactorNeeded);
-        elseif v4(v18) then
-            return v3.reject(v18);
-        elseif l_isEconomicRestrictionResponse_0(v18) then
-            return v3.reject(v18);
-        else
-            return v3.reject(v1.UnknownFailure);
-        end;
-    end, function(_) --[[ Line: 64 ]]
-        -- upvalues: v3 (ref), v1 (ref)
-        return v3.reject(v1.UnknownFailure);
-    end);
-end;
+local ParentParent = script.Parent.Parent
+local PurchaseError = require(ParentParent.Enums.PurchaseError)
+local Constants = require(ParentParent.Misc.Constants)
+local Promise = require(ParentParent.Promise)
+local isGenericChallengeResponse = require(ParentParent.Utils.isGenericChallengeResponse)
+local ParentParentParent = ParentParent.Parent
+local isEconomicRestrictionResponse = require(ParentParentParent.IAPExperience).Utility.isEconomicRestrictionResponse
+local FFlagEnablePriceChangedErrorHandling = require(ParentParent.Flags.FFlagEnablePriceChangedErrorHandling)
+
+local function performPurchaseV2(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) -- line: 17
+	-- upvalues: Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
+	return p1.performPurchaseV2(p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12):andThen(function(p13) -- line: 45
+		-- upvalues: Promise (copy), Constants (copy), PurchaseError (copy), isGenericChallengeResponse (copy), isEconomicRestrictionResponse (copy), FFlagEnablePriceChangedErrorHandling (copy)
+		if p13.purchased or p13.reason == "AlreadyOwned" then
+			return Promise.resolve(p13)
+		end
+
+		if p13.reason == Constants.PurchaseFailureReason.EconomyDisabled then
+			return Promise.reject(PurchaseError.PurchaseDisabled)
+		end
+
+		if p13.reason == Constants.PurchaseFailureReason.TwoStepVerificationRequired then
+			return Promise.reject(PurchaseError.TwoFactorNeeded)
+		end
+
+		if p13.transactionStatus == 24 then
+			return Promise.reject(PurchaseError.TwoFactorNeeded)
+		end
+
+		if isGenericChallengeResponse(p13) then
+			return Promise.reject(p13)
+		end
+
+		if isEconomicRestrictionResponse(p13) then
+			return Promise.reject(p13)
+		end
+
+		if FFlagEnablePriceChangedErrorHandling and p13.reason == Constants.PurchaseFailureReason.PriceChanged then
+			return Promise.reject(PurchaseError.PriceChanged)
+		end
+
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end, function(_) -- line: 73
+		-- upvalues: Promise (copy), PurchaseError (copy)
+		return Promise.reject(PurchaseError.UnknownFailure)
+	end)
+end
+
+return performPurchaseV2

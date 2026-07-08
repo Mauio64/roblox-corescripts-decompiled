@@ -1,25 +1,31 @@
-local l_insert_0 = table.insert;
-return function(v1, v2) --[[ Line: 10 ]] --[[ Name: splitOn ]]
-    -- upvalues: l_insert_0 (copy)
-    local v3 = {};
-    local v4 = {};
-    local v5 = 1;
-    if not v2 then
-        for v6 = 1, #v1 do
-            l_insert_0(v3, v1:sub(v6, v6));
-        end;
-        return v3;
-    else
-        local v7, v8 = v1:find(v2, v5);
-        while v7 do
-            l_insert_0(v4, v1:sub(v7, v8));
-            l_insert_0(v3, v1:sub(v5, v7 - 1));
-            v5 = v8 + 1;
-            local v9, v10 = v1:find(v2, v5);
-            v7 = v9;
-            v8 = v10;
-        end;
-        l_insert_0(v3, v1:sub(v5));
-        return v3, v4;
-    end;
-end;
+local insert = table.insert
+
+local function splitOn(s1: string, s2: string) -- line: 10
+	-- upvalues: insert (copy)
+	local t1 = {}
+	local t2 = {}
+	local n1 = 1
+
+	if not s2 then
+		for i = 1, #s1 do
+			insert(t1, s1:sub(i, i))
+		end
+
+		return t1
+	end
+
+	local start, stop = s1:find(s2, n1)
+
+	while start do
+		insert(t2, s1:sub(start, stop))
+		insert(t1, s1:sub(n1, start - 1))
+		n1 = stop + 1
+		start, stop = s1:find(s2, n1)
+	end
+
+	insert(t1, s1:sub(n1))
+
+	return t1, t2
+end
+
+return splitOn

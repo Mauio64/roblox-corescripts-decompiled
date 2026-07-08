@@ -1,5 +1,5 @@
 return {
-    HomepageFriendsCarousel = "HomepageFriendsCarousel", 
-    HomepagePYMKCarousel = "HomepagePYMKCarousel", 
-    AddFriendsPage = "AddFriendsPage"
-};
+	HomepageFriendsCarousel = "HomepageFriendsCarousel",
+	HomepagePYMKCarousel = "HomepagePYMKCarousel",
+	AddFriendsPage = "AddFriendsPage"
+}

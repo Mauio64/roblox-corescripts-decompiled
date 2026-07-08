@@ -1,192 +1,210 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_Parent_2 = l_Parent_1.Parent;
-local l_Core_0 = l_Parent_1.Core;
-local v4 = require(l_Parent_2.React);
-local v5 = require(l_Parent_2.t);
-local v6 = require(l_Parent_2.Otter);
-local v7 = require(l_Parent_2.Cryo);
-local v8 = require(l_Parent_2.RoactGamepad);
-local l_Focusable_0 = v8.Focusable;
-local v10 = require(script.Parent.TileSlot);
-local v11 = require(l_Core_0.Style.useStyle);
-local v12 = require(l_Parent_0.SelectionImage.CursorKind);
-local v13 = require(l_Parent_0.SelectionImage.useSelectionCursor);
-local v14 = {
-    dampingRatio = 1, 
-    frequency = 10
-};
-local v15 = v5.strictInterface({
-    displayText = v5.optional(v5.string), 
-    thumbnail = v5.optional(v5.string), 
-    isDisabled = v5.optional(v5.boolean), 
-    isLoading = v5.optional(v5.boolean)
-});
-local v16 = v5.strictInterface({
-    slots = v5.array(v15), 
-    defaultSelectedSlotIndex = v5.optional(v5.integer), 
-    onChange = v5.callback, 
-    width = v5.optional(v5.integer), 
-    darken = v5.optional(v5.boolean), 
-    onInputBegan = v5.optional(v5.callback), 
-    onInputEnded = v5.optional(v5.callback), 
-    scrollingFrameRef = v5.optional(v5.table), 
-    onFocusChanged = v5.optional(v5.callback), 
-    inputBindings = v5.optional(v5.table), 
-    NextSelectionLeft = v5.optional(v5.table), 
-    NextSelectionRight = v5.optional(v5.table), 
-    NextSelectionUp = v5.optional(v5.table), 
-    NextSelectionDown = v5.optional(v5.table), 
-    isRoactGamepadEnabled = v5.optional(v5.boolean)
-});
-local function v22(v17, v18) --[[ Line: 117 ]] --[[ Name: useScrollingFrameMotor ]]
-    -- upvalues: v4 (copy), v6 (copy)
-    local v19 = v4.useRef(nil);
-    if v19.current == nil then
-        v19.current = v6.createSingleMotor(v18 or 0);
-    end;
-    local l_current_0 = v19.current;
-    v4.useEffect(function() --[[ Line: 123 ]]
-        -- upvalues: l_current_0 (copy), v17 (copy)
-        l_current_0:onStep(function(v21) --[[ Line: 124 ]]
-            -- upvalues: v17 (ref)
-            if v17.current ~= nil then
-                v17.current.CanvasPosition = Vector2.new(v21, 0);
-            end;
-        end);
-        return function() --[[ Line: 130 ]]
-            -- upvalues: l_current_0 (ref)
-            l_current_0:destroy();
-        end;
-    end, {});
-    return l_current_0;
-end;
-return function(v23) --[[ Line: 138 ]] --[[ Name: SlotTray ]]
-    -- upvalues: v4 (copy), v8 (copy), v22 (copy), v6 (copy), v14 (copy), v11 (copy), v13 (copy), v12 (copy), v16 (copy), v7 (copy), l_Focusable_0 (copy), v10 (copy)
-    local v24 = v23.isRoactGamepadEnabled == nil or v23.isRoactGamepadEnabled;
-    local v25 = v4.useRef({});
-    local v26 = if v24 then v8.useRefCache() else v25.current;
-    local v27 = v4.useRef(nil);
-    if v23.scrollingFrameRef then
-        v27 = v23.scrollingFrameRef;
-    end;
-    local v28 = v23.width or 360;
-    local v29 = v22(v27, 0);
-    local v30, v31 = v4.useState(v23.defaultSelectedSlotIndex or 1);
-    v4.useEffect(function() --[[ Line: 155 ]]
-        -- upvalues: v27 (ref), v30 (copy), v26 (copy), v28 (copy), v29 (copy), v6 (ref), v14 (ref)
-        local l_current_1 = v27.current;
-        if v30 == 0 or not l_current_1 then
-            return;
-        else
-            local v33 = v26[v30] and v26[v30].current;
-            if not v33 then
-                return;
-            else
-                local l_X_0 = l_current_1.CanvasPosition.X;
-                local l_X_1 = l_current_1.AbsolutePosition.X;
-                local v36 = l_X_1 + v28;
-                local l_X_2 = v33.AbsolutePosition.X;
-                local v38 = l_X_2 + 48 + 24 - v36;
-                local v39 = l_X_2 - 24 - l_X_1;
-                local v40 = l_X_0 + v38;
-                local v41 = l_X_0 + v39;
-                if l_X_0 < v40 then
-                    v29:setGoal(v6.spring(v40, v14));
-                    return;
-                else
-                    if v41 < l_X_0 then
-                        v29:setGoal(v6.spring(v41, v14));
-                    end;
-                    return;
-                end;
-            end;
-        end;
-    end, {
-        v30, 
-        v28, 
-        v26, 
-        v27, 
-        v29
-    });
-    local v43 = v4.useCallback(function(v42) --[[ Line: 187 ]]
-        -- upvalues: v31 (copy), v23 (copy)
-        v31(v42);
-        v23.onChange(v42);
-    end, {
-        v23.onChange
-    });
-    local v44 = #v23.slots * 48 + (#v23.slots - 1) * 12 + 48;
-    local v45 = v11();
-    local v46 = v13(v12.RoundedSlot);
-    assert(v16(v23));
-    local l_Theme_0 = v45.Theme;
-    local v50 = v7.List.map(v23.slots, function(v48, v49) --[[ Line: 200 ]]
-        -- upvalues: v24 (copy), v26 (copy), v4 (ref), l_Focusable_0 (ref), v23 (copy), v43 (copy), v46 (copy), v10 (ref), v30 (copy)
-        if not v24 then
-            v26[v49] = v26[v49] or v4.createRef();
-        end;
-        return v4.createElement(if v24 then l_Focusable_0.Frame else "Frame", {
-            key = "Slot" .. tostring(v49), 
-            LayoutOrder = v49, 
-            Size = UDim2.fromOffset(48, 48), 
-            BackgroundTransparency = 1, 
-            BorderSizePixel = 2, 
-            ref = v26[v49], 
-            NextSelectionRight = v49 < #v23.slots and v26[v49 + 1] or nil, 
-            NextSelectionLeft = v49 > 1 and v26[v49 - 1] or nil, 
-            onFocusGained = v24 and function() --[[ Line: 215 ]]
-                -- upvalues: v43 (ref), v49 (copy)
-                v43(v49);
-            end or nil, 
-            SelectionImageObject = v46
-        }, {
-            Slot = v4.createElement(v10, {
-                isSelected = v30 == v49, 
-                displayText = v48.displayText, 
-                thumbnail = v48.thumbnail, 
-                isLoading = v48.isLoading, 
-                isDisabled = v48.isDisabled, 
-                index = v49, 
-                onActivated = v43
-            })
-        });
-    end);
-    table.insert(v50, (v4.createElement("UIListLayout", {
-        key = "Layout", 
-        VerticalAlignment = Enum.VerticalAlignment.Center, 
-        FillDirection = Enum.FillDirection.Horizontal, 
-        HorizontalAlignment = Enum.HorizontalAlignment.Center, 
-        SortOrder = Enum.SortOrder.LayoutOrder, 
-        Padding = UDim.new(0, 12)
-    })));
-    return v4.createElement(if v24 then l_Focusable_0.ScrollingFrame else "ScrollingFrame", {
-        Size = UDim2.fromOffset(v28, 72), 
-        CanvasSize = UDim2.new(0, v44, 0, 72), 
-        BackgroundTransparency = 1, 
-        ScrollBarImageColor3 = l_Theme_0.PlaceHolder.Color, 
-        ScrollBarImageTransparency = l_Theme_0.PlaceHolder.Transparency, 
-        ScrollBarThickness = 0, 
-        BorderSizePixel = 0, 
-        ClipsDescendants = true, 
-        ElasticBehavior = Enum.ElasticBehavior.Always, 
-        ScrollingDirection = Enum.ScrollingDirection.X, 
-        ref = v27, 
-        [v4.Event.InputBegan] = v23.onInputBegan, 
-        [v4.Event.InputEnded] = v23.onInputEnded, 
-        onFocusChanged = if v24 then v23.onFocusChanged else nil, 
-        inputBindings = if v24 then v23.inputBindings else nil, 
-        NextSelectionDown = v23.NextSelectionDown, 
-        NextSelectionUp = v23.NextSelectionUp, 
-        NextSelectionLeft = v23.NextSelectionLeft, 
-        NextSelectionRight = v23.NextSelectionRight, 
-        defaultChild = if v24 then v26[1] else nil, 
-        restorePreviousChildFocus = v24 and true or nil
-    }, {
-        SlotContainer = v4.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1), 
-            BackgroundColor3 = if v23.darken then l_Theme_0.Overlay.Color else l_Theme_0.PlaceHolder.Color, 
-            BackgroundTransparency = if v23.darken then l_Theme_0.Overlay.Transparency else l_Theme_0.PlaceHolder.Transparency
-        }, v50)
-    });
-end;
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local ParentParentParentParent = ParentParentParent.Parent
+local Core = ParentParentParent.Core
+local React = require(ParentParentParentParent.React)
+local t = require(ParentParentParentParent.t)
+local Otter = require(ParentParentParentParent.Otter)
+local Cryo = require(ParentParentParentParent.Cryo)
+local RoactGamepad = require(ParentParentParentParent.RoactGamepad)
+local Focusable = RoactGamepad.Focusable
+local TileSlot = require(script.Parent.TileSlot)
+local useStyle = require(Core.Style.useStyle)
+local CursorKind = require(ParentParent.SelectionImage.CursorKind)
+local useSelectionCursor = require(ParentParent.SelectionImage.useSelectionCursor)
+local t1 = {
+	dampingRatio = 1,
+	frequency = 10
+}
+local v16 = t.strictInterface({
+	displayText = t.optional(t.string),
+	thumbnail = t.optional(t.string),
+	isDisabled = t.optional(t.boolean),
+	isLoading = t.optional(t.boolean)
+})
+local v17 = t.strictInterface({
+	slots = t.array(v16),
+	defaultSelectedSlotIndex = t.optional(t.integer),
+	onChange = t.callback,
+	width = t.optional(t.integer),
+	darken = t.optional(t.boolean),
+	onInputBegan = t.optional(t.callback),
+	onInputEnded = t.optional(t.callback),
+	scrollingFrameRef = t.optional(t.table),
+	onFocusChanged = t.optional(t.callback),
+	inputBindings = t.optional(t.table),
+	NextSelectionLeft = t.optional(t.table),
+	NextSelectionRight = t.optional(t.table),
+	NextSelectionUp = t.optional(t.table),
+	NextSelectionDown = t.optional(t.table),
+	isRoactGamepadEnabled = t.optional(t.boolean)
+})
+
+local function useScrollingFrameMotor(p1, n1: number?) -- line: 117
+	-- upvalues: React (copy), Otter (copy)
+	local v22 = React.useRef(nil)
+
+	if v22.current == nil then
+		v22.current = Otter.createSingleMotor(n1 or 0)
+	end
+
+	local current = v22.current
+
+	React.useEffect(function() -- line: 123
+		-- upvalues: current (copy), p1 (copy)
+		current:onStep(function(p2) -- line: 124
+			-- upvalues: p1 (copy)
+			if p1.current ~= nil then
+				p1.current.CanvasPosition = Vector2.new(p2, 0)
+			end
+		end)
+
+		return function() -- line: 130
+			-- upvalues: current (copy)
+			current:destroy()
+		end
+	end, {})
+
+	return current
+end
+local function SlotTray(t2: {[any]: any}) -- line: 138
+	-- upvalues: React (copy), RoactGamepad (copy), useScrollingFrameMotor (copy), Otter (copy), t1 (copy), useStyle (copy), useSelectionCursor (copy), CursorKind (copy), v17 (copy), Cryo (copy), Focusable (copy), TileSlot (copy)
+	local v25 = t2.isRoactGamepadEnabled == nil or t2.isRoactGamepadEnabled
+	local v26 = React.useRef({})
+	local v27 = if not v25 then v26.current else RoactGamepad.useRefCache()
+	local u28 = React.useRef(nil)
+
+	if t2.scrollingFrameRef then
+		u28 = t2.scrollingFrameRef
+	end
+
+	local v29 = t2.width or 360
+	local v30 = useScrollingFrameMotor(u28, 0)
+	local v31, v32 = React.useState(t2.defaultSelectedSlotIndex or 1)
+
+	React.useEffect(function() -- line: 155
+		-- upvalues: u28 (ref), v31 (copy), v27 (copy), v29 (copy), v30 (copy), Otter (copy), t1 (copy)
+		local current = u28.current
+
+		if v31 == 0 or not current then
+			return
+		end
+
+		local v40 = v27[v31] and v27[v31].current
+
+		if not v40 then
+			return
+		end
+
+		local CanvasPositionX = current.CanvasPosition.X
+		local AbsolutePositionX = current.AbsolutePosition.X
+		local v43 = AbsolutePositionX + v29
+		local AbsolutePositionX2 = v40.AbsolutePosition.X
+		local v45 = AbsolutePositionX2 + 48 + 24 - v43
+		local v46 = AbsolutePositionX2 - 24 - AbsolutePositionX
+		local v47 = CanvasPositionX + v45
+		local v48 = CanvasPositionX + v46
+
+		if CanvasPositionX < v47 then
+			v30:setGoal(Otter.spring(v47, t1))
+
+			return
+		end
+
+		if v48 < CanvasPositionX then
+			v30:setGoal(Otter.spring(v48, t1))
+		end
+	end, {
+		v31,
+		v29,
+		v27,
+		u28,
+		v30
+	})
+
+	local v33 = React.useCallback(function(p3) -- line: 187
+		-- upvalues: v32 (copy), t2 (copy)
+		v32(p3)
+		t2.onChange(p3)
+	end, { t2.onChange })
+	local v34 = #t2.slots * 48 + (#t2.slots - 1) * 12 + 48
+	local v35 = useStyle()
+	local v36 = useSelectionCursor(CursorKind.RoundedSlot)
+
+	assert(v17(t2))
+
+	local Theme = v35.Theme
+	local v38 = Cryo.List.map(t2.slots, function(p4, p5) -- line: 200
+		-- upvalues: v25 (copy), v27 (copy), React (copy), Focusable (copy), t2 (copy), v33 (copy), v36 (copy), TileSlot (copy), v31 (copy)
+		if not v25 then
+			v27[p5] = v27[p5] or React.createRef()
+		end
+
+		return React.createElement(not v25 and "Frame" or Focusable.Frame, {
+			BackgroundTransparency = 1,
+			BorderSizePixel = 2,
+			key = "Slot" .. tostring(p5),
+			LayoutOrder = p5,
+			Size = UDim2.fromOffset(48, 48),
+			ref = v27[p5],
+			NextSelectionRight = p5 < #t2.slots and v27[p5 + 1] or nil,
+			NextSelectionLeft = p5 > 1 and v27[p5 - 1] or nil,
+			onFocusGained = if not v25 then nil else function() -- line: 215
+				-- upvalues: v33 (copy), p5 (copy)
+				v33(p5)
+			end,
+			SelectionImageObject = v36
+		}, {
+			Slot = React.createElement(TileSlot, {
+				isSelected = p5 == v31,
+				displayText = p4.displayText,
+				thumbnail = p4.thumbnail,
+				isLoading = p4.isLoading,
+				isDisabled = p4.isDisabled,
+				index = p5,
+				onActivated = v33
+			})
+		})
+	end)
+
+	table.insert(v38, (React.createElement("UIListLayout", {
+		key = "Layout",
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 12)
+	})))
+
+	return React.createElement(not v25 and "ScrollingFrame" or Focusable.ScrollingFrame, {
+		Size = UDim2.fromOffset(v29, 72),
+		CanvasSize = UDim2.new(0, v34, 0, 72),
+		BackgroundTransparency = 1,
+		ScrollBarImageColor3 = Theme.PlaceHolder.Color,
+		ScrollBarImageTransparency = Theme.PlaceHolder.Transparency,
+		ScrollBarThickness = 0,
+		BorderSizePixel = 0,
+		ClipsDescendants = true,
+		ElasticBehavior = Enum.ElasticBehavior.Always,
+		ScrollingDirection = Enum.ScrollingDirection.X,
+		ref = u28,
+		[React.Event.InputBegan] = t2.onInputBegan,
+		[React.Event.InputEnded] = t2.onInputEnded,
+		onFocusChanged = if not v25 then nil else t2.onFocusChanged,
+		inputBindings = if not v25 then nil else t2.inputBindings,
+		NextSelectionDown = t2.NextSelectionDown,
+		NextSelectionUp = t2.NextSelectionUp,
+		NextSelectionLeft = t2.NextSelectionLeft,
+		NextSelectionRight = t2.NextSelectionRight,
+		defaultChild = if not v25 then nil else v27[1],
+		restorePreviousChildFocus = not not v25 or nil
+	}, {
+		SlotContainer = React.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundColor3 = if not t2.darken then Theme.PlaceHolder.Color else Theme.Overlay.Color,
+			BackgroundTransparency = if not t2.darken then Theme.PlaceHolder.Transparency else Theme.Overlay.Transparency
+		}, v38)
+	})
+end
+
+return SlotTray

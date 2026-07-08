@@ -1,57 +1,62 @@
-local v0 = require(script.Parent.Analytics);
-local v1 = {
-    2, 
-    10
-};
-local v2 = {};
-local v3 = {};
-local function _(v4, v5, v6) --[[ Line: 11 ]] --[[ Name: createDelayedTask ]]
-    local v7 = false;
-    task.delay(v4, function() --[[ Line: 14 ]]
-        -- upvalues: v7 (ref), v6 (copy), v5 (copy)
-        if not v7 then
-            v6(v5);
-        end;
-    end);
-    return function() --[[ Line: 19 ]]
-        -- upvalues: v7 (ref)
-        v7 = true;
-    end;
-end;
-local function v11() --[[ Line: 24 ]] --[[ Name: cancelTasks ]]
-    -- upvalues: v2 (ref)
-    for _, v10 in ipairs(v2) do
-        if v10 ~= nil then
-            v10();
-        end;
-    end;
-    v2 = {};
-end;
-v3.onPageChanged = function(v12) --[[ Line: 33 ]] --[[ Name: onPageChanged ]]
-    -- upvalues: v11 (copy), v1 (copy), v2 (ref), v0 (copy)
-    v11();
-    for v13, v14 in ipairs(v1) do
-        local l_v2_0 = v2;
-        local function v17(v16) --[[ Line: 39 ]]
-            -- upvalues: v0 (ref), v12 (copy)
-            v0.reportPageHeartbeat(v16, v12);
-        end;
-        local v18 = false;
-        local v19;
-        do
-            local l_v18_0 = v18;
-            task.delay(v14, function() --[[ Line: 14 ]]
-                -- upvalues: l_v18_0 (ref), v17 (copy), v13 (copy)
-                if not l_v18_0 then
-                    v17(v13);
-                end;
-            end);
-            v19 = function() --[[ Line: 19 ]]
-                -- upvalues: l_v18_0 (ref)
-                l_v18_0 = true;
-            end;
-        end;
-        l_v2_0[v13] = v19;
-    end;
-end;
-return v3;
+local Analytics = require(script.Parent.Analytics)
+local t1 = {
+	2,
+	10
+}
+local t2 = {}
+local t3 = {}
+
+local function createDelayedTask(p1, p2, p3) -- line: 11
+	local u10 = false
+
+	task.delay(p1, function() -- line: 14
+		-- upvalues: u10 (ref), p3 (copy), p2 (copy)
+		if not u10 then
+			p3(p2)
+		end
+	end)
+
+	return function() -- line: 19
+		-- upvalues: u10 (ref)
+		u10 = true
+	end
+end
+local function cancelTasks() -- line: 24
+	-- upvalues: t2 (ref)
+	for _, v in ipairs(t2) do
+		if v ~= nil then
+			v()
+		end
+	end
+
+	t2 = {}
+end
+
+function t3.onPageChanged(p4) -- line: 33
+	-- upvalues: cancelTasks (copy), t1 (copy), t2 (ref), Analytics (copy)
+	cancelTasks()
+
+	for i, v in ipairs(t1) do
+		local v16 = t2
+
+		local function v17(p5) -- line: 39
+			-- upvalues: Analytics (copy), p4 (copy)
+			Analytics.reportPageHeartbeat(p5, p4)
+		end
+
+		local u18 = false
+
+		task.delay(v, function() -- line: 14
+			-- upvalues: u18 (ref), v17 (copy), i (copy)
+			if not u18 then
+				v17(i)
+			end
+		end)
+		v16[i] = function() -- line: 19
+			-- upvalues: u18 (ref)
+			u18 = true
+		end
+	end
+end
+
+return t3

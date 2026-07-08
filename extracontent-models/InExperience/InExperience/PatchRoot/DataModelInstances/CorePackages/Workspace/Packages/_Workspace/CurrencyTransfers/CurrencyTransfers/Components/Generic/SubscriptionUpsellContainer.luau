@@ -1,121 +1,146 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("CurrencyTransfers");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.SharedFlags);
-local v4 = require(l_script_FirstAncestor_0.Localization.TransferLocalizationKeys);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local v6 = require(l_script_FirstAncestor_0.Hooks.useTransferStore);
-local v7 = require(l_script_FirstAncestor_0.Actions.Send.initiateTransfer);
-local v8 = require(l_script_FirstAncestor_0.Actions.Send.processTransfer);
-local v9 = require(l_script_FirstAncestor_0.Actions.Receive.acceptTransfer);
-local v10 = require(l_script_FirstAncestor_0.Enums.PromptState);
-local v11 = require(l_script_FirstAncestor_0.Enums.TransferDirection);
-local v12 = require(l_script_FirstAncestor_0.Enums.TransferOrigination);
-local v13 = require(l_script_FirstAncestor_0.Enums.TransferRetryOrigin);
-local v14 = require(l_script_FirstAncestor_0.Constants.AmpWizardTransferConstants);
-local v15 = require(l_script_FirstAncestor_0.Utils.getCounterUserId);
-local v16 = require(l_script_FirstAncestor_0.Events.CurrencyTransferTelemetry);
-local v17 = require(l_script_FirstAncestor_0.Enums.RobuxTransferFlowEventName);
-local v18 = require(l_script_FirstAncestor_0.Utils.logCurrencyTransferCounter);
-local v19 = require(l_script_FirstAncestor_0.Utils.logRobuxTransferFlowEvent);
-local v20 = require(l_Parent_0.AmpUpsell);
-local l_AccessResponseEnum_0 = v20.AmpEnums.AccessResponseEnum;
-local l_InExpAmpWizardController_0 = v20.InExpAmpWizardController;
-local v23 = require(l_Parent_0.RobloxSubscriptionPurchaseApp);
-local l_SurfaceName_0 = v23.SurfaceName;
-local l_SurfaceContext_0 = v23.SurfaceContext;
-return function(v26) --[[ Line: 56 ]] --[[ Name: SubscriptionUpsellContainer ]]
-    -- upvalues: v6 (copy), l_useLocalization_0 (copy), v4 (copy), v12 (copy), l_SurfaceContext_0 (copy), v3 (copy), v23 (copy), l_SurfaceName_0 (copy), v2 (copy), v18 (copy), v16 (copy), v19 (copy), v17 (copy), v10 (copy), v15 (copy), l_InExpAmpWizardController_0 (copy), l_AccessResponseEnum_0 (copy), v13 (copy), v9 (copy), v7 (copy), v8 (copy), v11 (copy), v14 (copy)
-    local v27 = v6();
-    local v28 = l_useLocalization_0(v4.Presets.SubscriptionUpsellContainer);
-    local l_direction_0 = v26.direction;
-    local l_triggerOnClose_0 = v27.triggerOnClose;
-    local v31 = v27.getSelectedAmount(false);
-    local v32 = v27.getTransferRetryOrigin(false);
-    local v33 = if v27.getTransferOrigination(false) == v12.InExperience then l_SurfaceContext_0.InGame else l_SurfaceContext_0.InApp;
-    local v34 = v27.getTransferClientSessionId(false);
-    local v35 = if v3.FFlagEnableRobuxTransferFlowEventIngest and v34 ~= "" then {
-        clientSessionId = {
-            clientSessionIdType = v23.PurchaseClientSessionIdType.CurrencyTransferSessionId, 
-            clientSessionId = v34
-        }
-    } else nil;
-    local v36 = {
-        purchaseUIOptions = {
-            title = v28.UpsellSubscriptionTitle or ""
-        }, 
-        surfaceName = l_SurfaceName_0.RobuxTransferUpsell, 
-        surfaceContext = v33, 
-        analyticsContext = v35
-    };
-    v2.useEffect(function() --[[ Line: 93 ]]
-        -- upvalues: v26 (copy), l_triggerOnClose_0 (copy), v18 (ref), v27 (copy), v16 (ref), v3 (ref), v19 (ref), v17 (ref), v10 (ref), v15 (ref), l_direction_0 (copy), l_InExpAmpWizardController_0 (ref), l_AccessResponseEnum_0 (ref), v32 (copy), v13 (ref), v9 (ref), v7 (ref), v8 (ref), v31 (copy), v11 (ref), v36 (copy), v14 (ref)
-        if not v26.ampFeatureCheck then
-            l_triggerOnClose_0();
-            return;
-        else
-            v18(v27, v16.CurrencyTransferSubscriptionUpsellWizardOpenedCounter, {
-                recourseSurface = "subscription"
-            });
-            if v3.FFlagEnableRobuxTransferFlowEventIngest then
-                v19(v27, v17.subscription_upsell_wizard_opened);
-            end;
-            local v37 = v27.getPromptState(false);
-            v27.setPreviousPromptState(v37);
-            v27.setPromptState(v10.Hidden);
-            local v38 = v15(v27, l_direction_0);
-            local v39 = nil;
-            if v38 then
-                v39 = {
-                    {
-                        name = "targetUser", 
-                        value = tostring(v38), 
-                        type = "UserId"
-                    }
-                };
-            end;
-            l_InExpAmpWizardController_0.OpenAmpWizardContainerInExp(v26.ampFeatureCheck, function(v40, _) --[[ Line: 122 ]]
-                -- upvalues: l_AccessResponseEnum_0 (ref), v18 (ref), v27 (ref), v16 (ref), v3 (ref), v19 (ref), v17 (ref), v32 (ref), v13 (ref), v9 (ref), v7 (ref), v8 (ref), v31 (ref), l_direction_0 (ref), v11 (ref), l_triggerOnClose_0 (ref)
-                if v40 == l_AccessResponseEnum_0.Granted then
-                    v18(v27, v16.CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter, {
-                        recourseSurface = "subscription"
-                    });
-                    if v3.FFlagEnableRobuxTransferFlowEventIngest then
-                        v19(v27, v17.subscription_upsell_wizard_result_granted);
-                    end;
-                    local v42 = v27.getPreviousPromptState(false);
-                    if v42 then
-                        v27.setPromptState(v42);
-                    end;
-                    if v32 == v13.AcceptTransfer then
-                        v9(v27);
-                        return;
-                    elseif v32 == v13.InitiateTransfer then
-                        v7(v27);
-                        return;
-                    elseif v32 == v13.ProcessTransfer then
-                        v8(v27, v31 or 0);
-                        return;
-                    elseif l_direction_0 == v11.Receive then
-                        v9(v27);
-                        return;
-                    else
-                        v8(v27, v31 or 0);
-                        return;
-                    end;
-                else
-                    v18(v27, v16.CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter, {
-                        recourseSurface = "subscription"
-                    });
-                    if v3.FFlagEnableRobuxTransferFlowEventIngest then
-                        v19(v27, v17.subscription_upsell_wizard_result_denied);
-                    end;
-                    l_triggerOnClose_0();
-                    return;
-                end;
-            end, v36, v14.ENTRY_POINT_EVENT_CTX, v39, v14.NAMESPACE_NAME);
-            return;
-        end;
-    end, {});
-    return v2.createElement(v2.Fragment, {});
-end;
+local CurrencyTransfers = script:FindFirstAncestor("CurrencyTransfers")
+local CurrencyTransfersParent = CurrencyTransfers.Parent
+local React = require(CurrencyTransfersParent.React)
+local SharedFlags = require(CurrencyTransfersParent.SharedFlags)
+local TransferLocalizationKeys = require(CurrencyTransfers.Localization.TransferLocalizationKeys)
+local useLocalization = require(CurrencyTransfersParent.Localization).Hooks.useLocalization
+local useTransferStore = require(CurrencyTransfers.Hooks.useTransferStore)
+local initiateTransfer = require(CurrencyTransfers.Actions.Send.initiateTransfer)
+local processTransfer = require(CurrencyTransfers.Actions.Send.processTransfer)
+local acceptTransfer = require(CurrencyTransfers.Actions.Receive.acceptTransfer)
+local PromptState = require(CurrencyTransfers.Enums.PromptState)
+local TransferDirection = require(CurrencyTransfers.Enums.TransferDirection)
+local TransferOrigination = require(CurrencyTransfers.Enums.TransferOrigination)
+local TransferRetryOrigin = require(CurrencyTransfers.Enums.TransferRetryOrigin)
+local AmpWizardTransferConstants = require(CurrencyTransfers.Constants.AmpWizardTransferConstants)
+local getCounterUserId = require(CurrencyTransfers.Utils.getCounterUserId)
+local CurrencyTransferTelemetry = require(CurrencyTransfers.Events.CurrencyTransferTelemetry)
+local RobuxTransferFlowEventName = require(CurrencyTransfers.Enums.RobuxTransferFlowEventName)
+local logCurrencyTransferCounter = require(CurrencyTransfers.Utils.logCurrencyTransferCounter)
+local logRobuxTransferFlowEvent = require(CurrencyTransfers.Utils.logRobuxTransferFlowEvent)
+local AmpUpsell = require(CurrencyTransfersParent.AmpUpsell)
+local AccessResponseEnum = AmpUpsell.AmpEnums.AccessResponseEnum
+local InExpAmpWizardController = AmpUpsell.InExpAmpWizardController
+local RobloxSubscriptionPurchaseApp = require(CurrencyTransfersParent.RobloxSubscriptionPurchaseApp)
+local SurfaceName = RobloxSubscriptionPurchaseApp.SurfaceName
+local SurfaceContext = RobloxSubscriptionPurchaseApp.SurfaceContext
+
+local function SubscriptionUpsellContainer(t1: {[any]: any}) -- line: 56
+	-- upvalues: useTransferStore (copy), useLocalization (copy), TransferLocalizationKeys (copy), TransferOrigination (copy), SurfaceContext (copy), SharedFlags (copy), RobloxSubscriptionPurchaseApp (copy), SurfaceName (copy), React (copy), logCurrencyTransferCounter (copy), CurrencyTransferTelemetry (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), PromptState (copy), getCounterUserId (copy), InExpAmpWizardController (copy), AccessResponseEnum (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), TransferDirection (copy), AmpWizardTransferConstants (copy)
+	local v29 = useTransferStore()
+	local v30 = useLocalization(TransferLocalizationKeys.Presets.SubscriptionUpsellContainer)
+	local direction = t1.direction
+	local triggerOnClose = v29.triggerOnClose
+	local v33 = v29.getSelectedAmount(false)
+	local v34 = v29.getTransferRetryOrigin(false)
+	local v35 = if v29.getTransferOrigination(false) ~= TransferOrigination.InExperience then SurfaceContext.InApp else SurfaceContext.InGame
+	local v36 = v29.getTransferClientSessionId(false)
+	local v37 = if not SharedFlags.FFlagEnableRobuxTransferFlowEventIngest or v36 == "" then nil else {
+		clientSessionId = {
+			clientSessionIdType = RobloxSubscriptionPurchaseApp.PurchaseClientSessionIdType.CurrencyTransferSessionId,
+			clientSessionId = v36
+		}
+	}
+	local t2 = {
+		purchaseUIOptions = {
+			title = v30.UpsellSubscriptionTitle or ""
+		},
+		surfaceName = SurfaceName.RobuxTransferUpsell,
+		surfaceContext = v35,
+		analyticsContext = v37
+	}
+
+	React.useEffect(function() -- line: 93
+		-- upvalues: t1 (copy), triggerOnClose (copy), logCurrencyTransferCounter (copy), v29 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), PromptState (copy), getCounterUserId (copy), direction (copy), InExpAmpWizardController (copy), AccessResponseEnum (copy), v34 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), v33 (copy), TransferDirection (copy), t2 (copy), AmpWizardTransferConstants (copy)
+		if not t1.ampFeatureCheck then
+			triggerOnClose()
+
+			return
+		end
+
+		logCurrencyTransferCounter(v29, CurrencyTransferTelemetry.CurrencyTransferSubscriptionUpsellWizardOpenedCounter, {
+			recourseSurface = "subscription"
+		})
+
+		if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+			logRobuxTransferFlowEvent(v29, RobuxTransferFlowEventName.subscription_upsell_wizard_opened)
+		end
+
+		local v39 = v29.getPromptState(false)
+
+		v29.setPreviousPromptState(v39)
+		v29.setPromptState(PromptState.Hidden)
+
+		local v40 = getCounterUserId(v29, direction)
+		local t3 = nil
+
+		if v40 then
+			t3 = {{
+				name = "targetUser",
+				type = "UserId",
+				value = tostring(v40)
+			}}
+		end
+
+		InExpAmpWizardController.OpenAmpWizardContainerInExp(t1.ampFeatureCheck, function(p1, _) -- line: 122
+			-- upvalues: AccessResponseEnum (copy), logCurrencyTransferCounter (copy), v29 (copy), CurrencyTransferTelemetry (copy), SharedFlags (copy), logRobuxTransferFlowEvent (copy), RobuxTransferFlowEventName (copy), v34 (copy), TransferRetryOrigin (copy), acceptTransfer (copy), initiateTransfer (copy), processTransfer (copy), v33 (copy), direction (copy), TransferDirection (copy), triggerOnClose (copy)
+			if p1 == AccessResponseEnum.Granted then
+				logCurrencyTransferCounter(v29, CurrencyTransferTelemetry.CurrencyTransferSubscriptionUpsellWizardResultGrantedCounter, {
+					recourseSurface = "subscription"
+				})
+
+				if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+					logRobuxTransferFlowEvent(v29, RobuxTransferFlowEventName.subscription_upsell_wizard_result_granted)
+				end
+
+				local v44 = v29.getPreviousPromptState(false)
+
+				if v44 then
+					v29.setPromptState(v44)
+				end
+
+				if v34 == TransferRetryOrigin.AcceptTransfer then
+					acceptTransfer(v29)
+
+					return
+				end
+
+				if v34 == TransferRetryOrigin.InitiateTransfer then
+					initiateTransfer(v29)
+
+					return
+				end
+
+				if v34 == TransferRetryOrigin.ProcessTransfer then
+					processTransfer(v29, v33 or 0)
+
+					return
+				end
+
+				if direction == TransferDirection.Receive then
+					acceptTransfer(v29)
+
+					return
+				end
+
+				processTransfer(v29, v33 or 0)
+
+				return
+			end
+
+			logCurrencyTransferCounter(v29, CurrencyTransferTelemetry.CurrencyTransferSubscriptionUpsellWizardResultDeniedCounter, {
+				recourseSurface = "subscription"
+			})
+
+			if SharedFlags.FFlagEnableRobuxTransferFlowEventIngest then
+				logRobuxTransferFlowEvent(v29, RobuxTransferFlowEventName.subscription_upsell_wizard_result_denied)
+			end
+
+			triggerOnClose()
+		end, t2, AmpWizardTransferConstants.ENTRY_POINT_EVENT_CTX, t3, AmpWizardTransferConstants.NAMESPACE_NAME)
+	end, {})
+
+	return React.createElement(React.Fragment, {})
+end
+
+return SubscriptionUpsellContainer

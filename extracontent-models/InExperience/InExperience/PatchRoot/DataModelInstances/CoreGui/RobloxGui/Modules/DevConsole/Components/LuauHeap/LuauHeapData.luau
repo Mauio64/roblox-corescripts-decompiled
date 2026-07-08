@@ -1,47 +1,55 @@
-local _ = game:GetService("ScriptContext");
-local l_HttpService_0 = game:GetService("HttpService");
-local v2 = require(script.Parent.Parent.Parent.Signal);
-local v3 = require(script.Parent.Parent.Parent.Util.getClientReplicator);
-local v4 = {};
-v4.__index = v4;
-v4.new = function() --[[ Line: 13 ]] --[[ Name: new ]]
-    -- upvalues: v4 (copy), v2 (copy)
-    local v5 = {};
-    setmetatable(v5, v4);
-    v5._serverStatsUpdated = v2.new();
-    v5._serverStatsData = {};
-    v5._isRunning = false;
-    return v5;
-end;
-v4.Signal = function(v6) --[[ Line: 23 ]] --[[ Name: Signal ]]
-    return v6._serverStatsUpdated;
-end;
-v4.getCurrentData = function(v7) --[[ Line: 27 ]] --[[ Name: getCurrentData ]]
-    return v7._serverStatsData;
-end;
-v4.isRunning = function(v8) --[[ Line: 31 ]] --[[ Name: isRunning ]]
-    return v8._isRunning;
-end;
-v4.start = function(v9) --[[ Line: 35 ]] --[[ Name: start ]]
-    -- upvalues: v3 (copy), l_HttpService_0 (copy)
-    local v10 = v3();
-    if v10 and not v9._statsListenerConnection then
-        v9._statsListenerConnection = v10.StatsReceived:connect(function(v11) --[[ Line: 38 ]]
-            -- upvalues: v9 (copy), l_HttpService_0 (ref)
-            if v11 and v11.ServerLuauHeapData and #v11.ServerLuauHeapData > 0 then
-                v9._serverStatsData = l_HttpService_0:JSONDecode(v11.ServerLuauHeapData);
-                v9._serverStatsUpdated:Fire(v9._serverStatsData);
-            end;
-        end);
-        v10:RequestServerStats(true);
-        v9._isRunning = true;
-    end;
-end;
-v4.stop = function(v12) --[[ Line: 49 ]] --[[ Name: stop ]]
-    if v12._statsListenerConnection then
-        v12._statsListenerConnection:Disconnect();
-        v12._statsListenerConnection = nil;
-    end;
-    v12._isRunning = false;
-end;
-return v4;
+game:GetService("ScriptContext")
+
+local HttpService = game:GetService("HttpService")
+local Signal = require(script.Parent.Parent.Parent.Signal)
+local getClientReplicator = require(script.Parent.Parent.Parent.Util.getClientReplicator)
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new() -- line: 13
+	-- upvalues: t1 (copy), Signal (copy)
+	local t2 = {}
+
+	setmetatable(t2, t1)
+	t2._serverStatsUpdated = Signal.new()
+	t2._serverStatsData = {}
+	t2._isRunning = false
+
+	return t2
+end
+function t1.Signal(p1) -- line: 23
+	return p1._serverStatsUpdated
+end
+function t1.getCurrentData(p2) -- line: 27
+	return p2._serverStatsData
+end
+function t1.isRunning(p3) -- line: 31
+	return p3._isRunning
+end
+function t1.start(p4) -- line: 35
+	-- upvalues: getClientReplicator (copy), HttpService (copy)
+	local v10 = getClientReplicator()
+
+	if v10 and not p4._statsListenerConnection then
+		p4._statsListenerConnection = v10.StatsReceived:connect(function(p5) -- line: 38
+			-- upvalues: p4 (copy), HttpService (copy)
+			if p5 and (p5.ServerLuauHeapData and #p5.ServerLuauHeapData > 0) then
+				p4._serverStatsData = HttpService:JSONDecode(p5.ServerLuauHeapData)
+				p4._serverStatsUpdated:Fire(p4._serverStatsData)
+			end
+		end)
+		v10:RequestServerStats(true)
+		p4._isRunning = true
+	end
+end
+function t1.stop(p6) -- line: 49
+	if p6._statsListenerConnection then
+		p6._statsListenerConnection:Disconnect()
+		p6._statsListenerConnection = nil
+	end
+
+	p6._isRunning = false
+end
+
+return t1

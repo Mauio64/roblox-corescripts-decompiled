@@ -1,66 +1,72 @@
-local l_Players_0 = game:GetService("Players");
-local l_ClientChatModules_0 = game:GetService("Chat"):WaitForChild("ClientChatModules");
-local l_ChatSettings_0 = require(l_ClientChatModules_0:WaitForChild("ChatSettings"));
-local v3 = {
-    ChattingToSelf = 1, 
-    NoMatches = 2, 
-    MultipleMatches = 3
-};
+local Players = game:GetService("Players")
+local ClientChatModules = game:GetService("Chat"):WaitForChild("ClientChatModules")
+local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+local t1 = {
+	ChattingToSelf = 1,
+	NoMatches = 2,
+	MultipleMatches = 3
+}
+
 return {
-    CommandErrorCodes = v3, 
-    getUserNameFromChattedName = function(v4, v5, v6) --[[ Line: 14 ]] --[[ Name: getUserNameFromChattedName ]]
-        -- upvalues: v3 (copy), l_Players_0 (copy), l_ChatSettings_0 (copy)
-        if v5 == v4 then
-            return v5, v3.ChattingToSelf;
-        else
-            local l_l_Players_0_Players_0 = l_Players_0:GetPlayers();
-            for _, v9 in pairs(l_l_Players_0_Players_0) do
-                if string.lower(v9.Name) == string.lower(v4) then
-                    return v9.Name, nil;
-                end;
-            end;
-            local v10 = 0;
-            local v11 = nil;
-            if l_ChatSettings_0.PlayerDisplayNamesEnabled then
-                for _, v13 in pairs(l_l_Players_0_Players_0) do
-                    if v13.Name ~= v5 and string.lower(v13.DisplayName) == string.lower(v4) then
-                        v10 = v10 + 1;
-                        v11 = v13.Name;
-                    end;
-                end;
-            end;
-            if v10 == 1 then
-                return v11, nil;
-            elseif v10 == 0 then
-                if v6 == v4 then
-                    return v6, v3.ChattingToSelf;
-                else
-                    return v4, v3.NoMatches;
-                end;
-            elseif v10 >= 2 then
-                return v4, v3.MultipleMatches;
-            else
-                return;
-            end;
-        end;
-    end, 
-    getUsersWithDisplayNameString = function(v14, v15) --[[ Line: 56 ]] --[[ Name: getUsersWithDisplayNameString ]]
-        -- upvalues: l_Players_0 (copy)
-        local v16 = {};
-        local v17 = "";
-        local l_l_Players_0_Players_1 = l_Players_0:GetPlayers();
-        for _, v20 in pairs(l_l_Players_0_Players_1) do
-            if v20.Name ~= v15 and string.lower(v20.DisplayName) == string.lower(v14) then
-                table.insert(v16, v20.Name);
-            end;
-        end;
-        for v21, v22 in pairs(v16) do
-            if v21 ~= #v16 then
-                v17 = v17 .. "@" .. v22 .. ", ";
-            else
-                v17 = v17 .. "@" .. v22;
-            end;
-        end;
-        return v17;
-    end
-};
+	CommandErrorCodes = t1,
+	getUserNameFromChattedName = function(p1, p2, p3) -- line: 14
+		-- upvalues: t1 (copy), Players (copy), ChatSettings (copy)
+		if p2 == p1 then
+			return p2, t1.ChattingToSelf
+		end
+
+		local players = Players:GetPlayers()
+
+		for _, v in pairs(players) do
+			if string.lower(v.Name) == string.lower(p1) then
+				return v.Name, nil
+			end
+		end
+
+		local n1 = 0
+		local vName = nil
+
+		if ChatSettings.PlayerDisplayNamesEnabled then
+			for _, v in pairs(players) do
+				if p2 ~= v.Name and string.lower(v.DisplayName) == string.lower(p1) then
+					n1 += 1
+					vName = v.Name
+				end
+			end
+		end
+
+		if n1 == 1 then
+			return vName, nil
+		end
+
+		if n1 == 0 then
+			if p3 == p1 then
+				return p3, t1.ChattingToSelf
+			end
+
+			return p1, t1.NoMatches
+		end
+
+		if n1 >= 2 then
+			return p1, t1.MultipleMatches
+		end
+	end,
+	getUsersWithDisplayNameString = function(p4, p5) -- line: 56
+		-- upvalues: Players (copy)
+		local t2 = {}
+		local s1 = ""
+		local players = Players:GetPlayers()
+
+		for _, v in pairs(players) do
+			if p5 ~= v.Name and string.lower(v.DisplayName) == string.lower(p4) then
+				table.insert(t2, v.Name)
+			end
+		end
+
+		for k, v in pairs(t2) do
+			s1 = if k == #t2 then s1 .. "@" .. v else s1 .. "@" .. v .. ", "
+		end
+
+		return s1
+	end
+}

@@ -1,5 +1,5 @@
 return {
-    getProfileInsightsByUserIdFromData = require(script.getProfileInsightsByUserIdFromData), 
-    getMutualFriendsByUserIdFromData = require(script.getMutualFriendsByUserIdFromData), 
-    getOfflineFrequentsByUserIdFromData = require(script.getOfflineFrequentsByUserIdFromData)
-};
+	getProfileInsightsByUserIdFromData = require(script.getProfileInsightsByUserIdFromData),
+	getMutualFriendsByUserIdFromData = require(script.getMutualFriendsByUserIdFromData),
+	getOfflineFrequentsByUserIdFromData = require(script.getOfflineFrequentsByUserIdFromData)
+}

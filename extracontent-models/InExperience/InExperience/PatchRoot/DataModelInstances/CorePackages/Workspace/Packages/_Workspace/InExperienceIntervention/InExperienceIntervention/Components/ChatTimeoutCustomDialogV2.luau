@@ -1,45 +1,62 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("InExperienceIntervention");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local l_GenericInterventionDialog_0 = require(l_Parent_0.InterventionShared).Components.GenericInterventionDialog;
-local l_useTimeoutInfoBinding_0 = require(l_Parent_0.InterventionShared).Hooks.useTimeoutInfoBinding;
-local l_InterventionAnalytics_0 = require(l_Parent_0.InterventionShared).InterventionAnalytics;
-local l_useParsedBadUtterances_0 = require(l_Parent_0.InterventionShared).Hooks.useParsedBadUtterances;
-local l_LocalizationService_0 = game:GetService("LocalizationService");
-local v8 = require(l_Parent_0.RobloxAppLocales).Localization.new(l_LocalizationService_0.RobloxLocaleId);
-local _ = require(l_script_FirstAncestor_0.Utils.Types);
-return v2.memo(function(v10) --[[ Line: 30 ]] --[[ Name: ChatTimeoutCustomDialogV2 ]]
-    -- upvalues: l_useTimeoutInfoBinding_0 (copy), l_useParsedBadUtterances_0 (copy), v8 (copy), v2 (copy), l_GenericInterventionDialog_0 (copy), l_InterventionAnalytics_0 (copy)
-    local l_moderationDetail_0 = v10.moderationDetail;
-    local v12 = l_useTimeoutInfoBinding_0(l_moderationDetail_0.endDate, l_moderationDetail_0.duration);
-    local l_heading_0 = v12.heading;
-    local l_description_0 = v12.description;
-    local l_consequenceTransparencyMessage_0 = l_moderationDetail_0.consequenceTransparencyMessage;
-    local l_interventionId_0 = l_moderationDetail_0.interventionId;
-    local l_acknowledgeable_0 = l_moderationDetail_0.acknowledgeable;
-    local l_badUtterances_0 = l_moderationDetail_0.badUtterances;
-    local v19 = l_useParsedBadUtterances_0(l_badUtterances_0 or {});
-    local v20 = table.concat(v19.textItems, "\n");
-    local v21 = table.concat(v19.abuseTypes, ", ");
-    if v21 == "" then
-        v21 = v8:Format("Feature.NotApproved.Label.AbuseType.Other");
-    end;
-    return v2.createElement(l_GenericInterventionDialog_0, {
-        titleText = l_heading_0:map(function(v22) --[[ Line: 52 ]]
-            return v22;
-        end), 
-        isAppealable = true, 
-        bodyText = l_description_0:map(function(v23) --[[ Line: 56 ]]
-            return v23;
-        end), 
-        evidence = v20, 
-        violationReason = v21, 
-        onDismiss = v10.onDismiss, 
-        dsaMessage = l_consequenceTransparencyMessage_0, 
-        interventionId = l_interventionId_0, 
-        acknowledgeable = l_acknowledgeable_0, 
-        eventId = l_interventionId_0, 
-        durationForAnalytics = l_moderationDetail_0.duration / 1000000000, 
-        interventionTypeForAnalytics = l_InterventionAnalytics_0.Constants.InterventionTypes.Timeout
-    });
-end);
+local InExperienceIntervention = script:FindFirstAncestor("InExperienceIntervention")
+local InExperienceInterventionParent = InExperienceIntervention.Parent
+local IXPService = game:GetService("IXPService")
+local LocalizationService = game:GetService("LocalizationService")
+local React = require(InExperienceInterventionParent.React)
+local AppUserLayers = require(InExperienceInterventionParent.ExperimentLayers).AppUserLayers
+local GenericInterventionDialog = require(InExperienceInterventionParent.InterventionShared).Components.GenericInterventionDialog
+local useTimeoutInfoBinding = require(InExperienceInterventionParent.InterventionShared).Hooks.useTimeoutInfoBinding
+local InterventionAnalytics = require(InExperienceInterventionParent.InterventionShared).InterventionAnalytics
+local useParsedBadUtterances = require(InExperienceInterventionParent.InterventionShared).Hooks.useParsedBadUtterances
+local v11 = require(InExperienceInterventionParent.RobloxAppLocales).Localization.new(LocalizationService.RobloxLocaleId)
+local FFlagNotApprovedPageIXPExposure = require(InExperienceInterventionParent.SharedFlags).FFlagNotApprovedPageIXPExposure
+
+require(InExperienceIntervention.Utils.Types)
+
+local function ChatTimeoutCustomDialogV2(t1: {[any]: any}) -- line: 34
+	-- upvalues: React (copy), FFlagNotApprovedPageIXPExposure (copy), IXPService (copy), AppUserLayers (copy), useTimeoutInfoBinding (copy), useParsedBadUtterances (copy), v11 (copy), GenericInterventionDialog (copy), InterventionAnalytics (copy)
+	local moderationDetail = t1.moderationDetail
+
+	React.useEffect(function() -- line: 37
+		-- upvalues: FFlagNotApprovedPageIXPExposure (copy), IXPService (copy), AppUserLayers (copy)
+		if FFlagNotApprovedPageIXPExposure and game:GetEngineFeature("EnableLogFlagLinkedUserLayerExposure") then
+			IXPService:LogFlagLinkedUserLayerExposure(AppUserLayers.NotApprovedPageUserIDLayer)
+		end
+	end, {})
+
+	local v16 = useTimeoutInfoBinding(moderationDetail.endDate, moderationDetail.duration)
+	local heading = v16.heading
+	local description = v16.description
+	local consequenceTransparencyMessage = moderationDetail.consequenceTransparencyMessage
+	local interventionId = moderationDetail.interventionId
+	local acknowledgeable = moderationDetail.acknowledgeable
+	local badUtterances = moderationDetail.badUtterances
+	local v23 = useParsedBadUtterances(badUtterances or {})
+	local v24 = table.concat(v23.textItems, "\n")
+	local v25 = table.concat(v23.abuseTypes, ", ")
+
+	if v25 == "" then
+		v25 = v11:Format("Feature.NotApproved.Label.AbuseType.Other")
+	end
+
+	return React.createElement(GenericInterventionDialog, {
+		isAppealable = true,
+		titleText = heading:map(function(p1) -- line: 62
+			return p1
+		end),
+		bodyText = description:map(function(p2) -- line: 66
+			return p2
+		end),
+		evidence = v24,
+		violationReason = v25,
+		onDismiss = t1.onDismiss,
+		dsaMessage = consequenceTransparencyMessage,
+		interventionId = interventionId,
+		acknowledgeable = acknowledgeable,
+		eventId = interventionId,
+		durationForAnalytics = moderationDetail.duration / 1000000000,
+		interventionTypeForAnalytics = InterventionAnalytics.Constants.InterventionTypes.Timeout
+	})
+end
+
+return React.memo(ChatTimeoutCustomDialogV2)

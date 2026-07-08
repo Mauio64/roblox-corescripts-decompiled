@@ -1,373 +1,404 @@
-local l_Players_0 = game:GetService("Players");
-local l_CoreGui_0 = game:GetService("CoreGui");
-local l_RunService_0 = game:GetService("RunService");
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v5 = require(l_Parent_1.Signals);
-local l_Modules_0 = l_CoreGui_0:WaitForChild("RobloxGui"):WaitForChild("Modules");
-local l_VoiceChat_0 = l_Modules_0:WaitForChild("VoiceChat");
-local l_Flags_0 = l_Modules_0:WaitForChild("Flags");
-local l_default_0 = require(l_VoiceChat_0:WaitForChild("VoiceChatServiceManager")).default;
-local l_Constants_0 = require(l_VoiceChat_0:WaitForChild("Constants"));
-local l_VOICE_STATE_0 = l_Constants_0.VOICE_STATE;
-local v12 = require(l_Parent_1.ExpChat).Stores.GetVoiceStore(false);
-local v13 = require(l_Parent_1.CoreScriptsInitializer).CoreLogger:new(script.Name);
-local l_GetFFlagVoiceChatUILogging_0 = require(l_Flags_0:WaitForChild("GetFFlagVoiceChatUILogging"));
-local l_GetFFlagNewPeoplePageIcons_0 = require(l_Parent_0.Flags).GetFFlagNewPeoplePageIcons;
-local l_GetFFlagAddPeoplePageCardLayout_0 = require(l_Parent_0.Flags).GetFFlagAddPeoplePageCardLayout;
-local v17 = game:DefineFastFlag("LuaFlagVoiceChatDisableSubscribeRetryForMultistream", true);
-local l_game_EngineFeature_0 = game:GetEngineFeature("VoiceChatMultistreamSubscriptionsEnabled");
-local v19 = require(l_Parent_0.Constants);
-local l_FRAME_BUFFER_0 = v19.VOICE_CHAT.MIC_ANIMATION.FRAME_BUFFER;
-local l_ICONS_0 = v19.VOICE_CHAT.ICONS;
-local l_PlayerMuteStatusIcons_0 = l_default_0.PlayerMuteStatusIcons;
-return ((function() --[[ Line: 69 ]] --[[ Name: createPeopleVoiceChatStore ]]
-    -- upvalues: v5 (copy), l_RunService_0 (copy), l_FRAME_BUFFER_0 (copy), l_PlayerMuteStatusIcons_0 (copy), l_default_0 (copy), v12 (copy), l_Players_0 (copy), l_VOICE_STATE_0 (copy), l_Constants_0 (copy), v17 (copy), l_game_EngineFeature_0 (copy), l_ICONS_0 (copy), l_GetFFlagNewPeoplePageIcons_0 (copy), l_GetFFlagAddPeoplePageCardLayout_0 (copy), l_GetFFlagVoiceChatUILogging_0 (copy), v13 (copy)
-    local v23, v24 = v5.createSignal(false);
-    local v25, v26 = v5.createSignal(false);
-    local v27, v28 = v5.createSignal(nil);
-    local v29, v30 = v5.createSignal(false);
-    local v31, v32 = v5.createSignal(0);
-    local v33, v34 = v5.createSignal(0);
-    local v35 = 0;
-    local v36 = nil;
-    local function _() --[[ Line: 84 ]] --[[ Name: startMicAnimation ]]
-        -- upvalues: v36 (ref), l_RunService_0 (ref), v29 (copy), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (copy), v34 (copy)
-        if v36 then
-            return;
-        else
-            v36 = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 89 ]]
-                -- upvalues: v29 (ref), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (ref), v34 (ref)
-                if v29(false) then
-                    v35 = v35 + 1;
-                    if l_FRAME_BUFFER_0 < v35 then
-                        local v37 = math.random();
-                        v32(v37);
-                        v35 = 0;
-                        return;
-                    end;
-                else
-                    v35 = v35 + 1;
-                    if l_FRAME_BUFFER_0 < v35 then
-                        local v38 = math.random();
-                        v34(v38);
-                        v35 = 0;
-                    end;
-                end;
-            end);
-            return;
-        end;
-    end;
-    local function _() --[[ Line: 110 ]] --[[ Name: stopMicAnimation ]]
-        -- upvalues: v36 (ref)
-        if v36 then
-            v36:Disconnect();
-            v36 = nil;
-        end;
-    end;
-    local function v46() --[[ Line: 117 ]] --[[ Name: getMuteSelfIcon ]]
-        -- upvalues: v5 (ref), v27 (copy), v29 (copy), l_PlayerMuteStatusIcons_0 (ref), v31 (copy), l_default_0 (ref)
-        return v5.createComputed(function(v41) --[[ Line: 118 ]]
-            -- upvalues: v27 (ref), v29 (ref), l_PlayerMuteStatusIcons_0 (ref), v31 (ref), l_default_0 (ref)
-            local v42 = v27(v41);
-            local v43 = v29(v41);
-            local _ = nil;
-            if v42 == nil then
-                return l_PlayerMuteStatusIcons_0.Loading;
-            elseif v42 then
-                return l_PlayerMuteStatusIcons_0.MicOff;
-            elseif v43 then
-                local v45 = math.floor(0.5 + 5 * v31(v41)) * 20;
-                return (l_default_0:GetIcon("Unmuted" .. tostring(v45), "MicLight"));
-            else
-                return l_PlayerMuteStatusIcons_0.MicOn;
-            end;
-        end);
-    end;
-    local v53 = v5.createComputed(function(v47) --[[ Line: 140 ]]
-        -- upvalues: v23 (copy), l_default_0 (ref), v12 (ref), l_Players_0 (ref), l_VOICE_STATE_0 (ref)
-        if not v23(v47) or not l_default_0.voiceUIVisible then
-            return false;
-        else
-            local v48 = v12.getVoiceParticipants(v47);
-            if not v48 then
-                return false;
-            else
-                local v49 = true;
-                for v50, v51 in pairs(v48) do
-                    local v52 = tonumber(v50);
-                    if v52 and l_Players_0.LocalPlayer and v52 ~= l_Players_0.LocalPlayer.UserId and v51 ~= l_VOICE_STATE_0.LOCAL_MUTED then
-                        return false;
-                    end;
-                end;
-                return v49;
-            end;
-        end;
-    end);
-    local function v55() --[[ Line: 167 ]] --[[ Name: toggleMuteAll ]]
-        -- upvalues: v23 (copy), v53 (copy), l_default_0 (ref), l_Constants_0 (ref)
-        if not v23(false) then
-            return;
-        else
-            local v54 = not v53(false);
-            l_default_0:MuteAll(v54, l_Constants_0.VOICE_CONTEXT_TYPE.IN_GAME_MENU);
-            return;
-        end;
-    end;
-    local function v56() --[[ Line: 177 ]] --[[ Name: toggleMuteSelf ]]
-        -- upvalues: v23 (copy), l_default_0 (ref)
-        if not v23(false) then
-            return;
-        else
-            l_default_0:ToggleMic("InGameMenuPlayers");
-            return;
-        end;
-    end;
-    local function v58(v57) --[[ Line: 186 ]] --[[ Name: SubscribeRetry ]]
-        -- upvalues: v23 (copy), l_default_0 (ref)
-        if not v23(false) then
-            return;
-        else
-            l_default_0:SubscribeRetry(v57);
-            return;
-        end;
-    end;
-    local function v63(v59) --[[ Line: 195 ]] --[[ Name: getPlayerMuteState ]]
-        -- upvalues: v5 (ref), v12 (ref), l_VOICE_STATE_0 (ref)
-        return v5.createComputed(function(v60) --[[ Line: 196 ]]
-            -- upvalues: v12 (ref), v59 (copy), l_VOICE_STATE_0 (ref)
-            local v61 = v12.getOrCreateVoiceState(v59)(v60);
-            if not v61 then
-                return false;
-            else
-                local v62 = true;
-                if v61 ~= l_VOICE_STATE_0.LOCAL_MUTED then
-                    v62 = v61 == l_VOICE_STATE_0.MUTED;
-                end;
-                return v62;
-            end;
-        end);
-    end;
-    local function v66(v64) --[[ Line: 208 ]] --[[ Name: togglePlayerMute ]]
-        -- upvalues: v23 (copy), v25 (copy), l_default_0 (ref), l_Constants_0 (ref), v17 (ref), l_game_EngineFeature_0 (ref)
-        if not v23(false) then
-            return;
-        elseif not v25(false) then
-            return;
-        else
-            local v65 = l_default_0.participants[tostring(v64)];
-            if v65 and v65.subscriptionCompleted then
-                l_default_0:ToggleMutePlayer(tonumber(v64), l_Constants_0.VOICE_CONTEXT_TYPE.IN_GAME_MENU);
-                return;
-            else
-                if v65 and v65.subscriptionFailed then
-                    if v17 then
-                        if not l_game_EngineFeature_0 then
-                            l_default_0:SubscribeRetry(v64);
-                            return;
-                        end;
-                    else
-                        l_default_0:SubscribeRetry(v64);
-                        return;
-                    end;
-                else
-                    l_default_0:ToggleMutePlayer(tonumber(v64), l_Constants_0.VOICE_CONTEXT_TYPE.IN_GAME_MENU);
-                end;
-                return;
-            end;
-        end;
-    end;
-    local function v69(v67) --[[ Line: 241 ]] --[[ Name: getPlayerShouldShowMuteButton ]]
-        -- upvalues: v5 (ref), v25 (copy), l_Players_0 (ref), v12 (ref)
-        return v5.createComputed(function(v68) --[[ Line: 242 ]]
-            -- upvalues: v25 (ref), l_Players_0 (ref), v67 (copy), v12 (ref)
-            if not v25(v68) or l_Players_0.LocalPlayer and v67 == l_Players_0.LocalPlayer.UserId then
-                return false;
-            else
-                return v12.getOrCreateVoiceState(v67)(v68) ~= nil;
-            end;
-        end);
-    end;
-    local function v74(v70) --[[ Line: 253 ]] --[[ Name: getPlayerAnimatedIcon ]]
-        -- upvalues: v5 (ref), v12 (ref), l_ICONS_0 (ref), l_VOICE_STATE_0 (ref), l_GetFFlagNewPeoplePageIcons_0 (ref), v33 (copy)
-        return v5.createComputed(function(v71) --[[ Line: 254 ]]
-            -- upvalues: v12 (ref), v70 (copy), l_ICONS_0 (ref), l_VOICE_STATE_0 (ref), l_GetFFlagNewPeoplePageIcons_0 (ref), v33 (ref)
-            local v72 = v12.getOrCreateVoiceState(v70)(v71);
-            if not v72 then
-                return l_ICONS_0.DEFAULT_SPEAKER;
-            elseif v72 == l_VOICE_STATE_0.LOCAL_MUTED or v72 == l_VOICE_STATE_0.MUTED then
-                if l_GetFFlagNewPeoplePageIcons_0() then
-                    return l_ICONS_0.MUTED_SPEAKER;
-                else
-                    return l_ICONS_0.SPEAKER_OFF;
-                end;
-            elseif v72 == l_VOICE_STATE_0.TALKING then
-                local v73 = math.floor(0.5 + 5 * v33(v71)) * 20;
-                return string.format(l_ICONS_0.ANIMATED_SPEAKER_FORMAT, v73);
-            else
-                return l_ICONS_0.DEFAULT_SPEAKER;
-            end;
-        end);
-    end;
-    local function v77(v75) --[[ Line: 278 ]] --[[ Name: getPlayerIsLocalMuted ]]
-        -- upvalues: v5 (ref), v12 (ref), l_VOICE_STATE_0 (ref)
-        return v5.createComputed(function(v76) --[[ Line: 279 ]]
-            -- upvalues: v75 (copy), v12 (ref), l_VOICE_STATE_0 (ref)
-            if not v75 then
-                return false;
-            else
-                return v12.getOrCreateVoiceState(v75)(v76) == l_VOICE_STATE_0.LOCAL_MUTED;
-            end;
-        end);
-    end;
-    local v80 = l_GetFFlagAddPeoplePageCardLayout_0() and function(v78) --[[ Line: 291 ]]
-        -- upvalues: v5 (ref), v12 (ref), l_VOICE_STATE_0 (ref)
-        return v5.createComputed(function(v79) --[[ Line: 292 ]]
-            -- upvalues: v12 (ref), v78 (copy), l_VOICE_STATE_0 (ref)
-            return v12.getOrCreateVoiceState(v78)(v79) == l_VOICE_STATE_0.TALKING;
-        end);
-    end or nil;
-    local function v96() --[[ Line: 300 ]] --[[ Name: initializeVoiceChat ]]
-        -- upvalues: l_default_0 (ref), v24 (copy), l_Players_0 (ref), v12 (ref), v28 (copy), v30 (copy), v26 (copy), v36 (ref), l_RunService_0 (ref), v29 (copy), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (copy), v34 (copy), l_GetFFlagVoiceChatUILogging_0 (ref), v13 (ref)
-        if not game:GetEngineFeature("VoiceChatSupported") then
-            return;
-        else
-            l_default_0:asyncInit():andThen(function() --[[ Line: 307 ]]
-                -- upvalues: v24 (ref), l_default_0 (ref), l_Players_0 (ref), v12 (ref), v28 (ref), v30 (ref), v26 (ref), v36 (ref), l_RunService_0 (ref), v29 (ref), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (ref), v34 (ref)
-                v24(true);
-                l_default_0:SetupParticipantListeners();
-                for v81, _ in pairs(l_default_0.participants) do
-                    local l_LocalPlayer_0 = l_Players_0.LocalPlayer;
-                    if l_LocalPlayer_0 and v81 ~= tostring(l_LocalPlayer_0.UserId) then
-                        v12.handleVoiceParticipantAdded(v81);
-                    end;
-                end;
-                if l_default_0.participants and next(l_default_0.participants) then
-                    v12.handleVoiceParticipantsChanged(l_default_0.participants);
-                end;
-                l_default_0.muteChanged.Event:Connect(function(v84) --[[ Line: 324 ]]
-                    -- upvalues: v28 (ref)
-                    v28(v84);
-                end);
-                l_default_0.talkingChanged.Event:Connect(function(v85) --[[ Line: 329 ]]
-                    -- upvalues: v30 (ref)
-                    v30(v85);
-                end);
-                v28(l_default_0.localMuted);
-                v30(l_default_0.isTalking);
-                l_default_0.participantsUpdate.Event:Connect(function(v86) --[[ Line: 338 ]]
-                    -- upvalues: v12 (ref)
-                    v12.handleVoiceParticipantsChanged(v86);
-                end);
-                l_default_0.participantJoined.Event:Connect(function(_, v88) --[[ Line: 342 ]]
-                    -- upvalues: v12 (ref)
-                    v12.handleVoiceParticipantAdded((tostring(v88)));
-                end);
-                l_default_0.participantLeft.Event:Connect(function(_, v90) --[[ Line: 346 ]]
-                    -- upvalues: v12 (ref)
-                    v12.handleVoiceParticipantRemoved((tostring(v90)));
-                end);
-                l_default_0.showVoiceUI.Event:Connect(function() --[[ Line: 351 ]]
-                    -- upvalues: v26 (ref), v36 (ref), l_RunService_0 (ref), v29 (ref), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (ref), v34 (ref)
-                    v26(true);
-                    if v36 then
-                        return;
-                    else
-                        v36 = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 89 ]]
-                            -- upvalues: v29 (ref), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (ref), v34 (ref)
-                            if v29(false) then
-                                v35 = v35 + 1;
-                                if l_FRAME_BUFFER_0 < v35 then
-                                    local v91 = math.random();
-                                    v32(v91);
-                                    v35 = 0;
-                                    return;
-                                end;
-                            else
-                                v35 = v35 + 1;
-                                if l_FRAME_BUFFER_0 < v35 then
-                                    local v92 = math.random();
-                                    v34(v92);
-                                    v35 = 0;
-                                end;
-                            end;
-                        end);
-                        return;
-                    end;
-                end);
-                l_default_0.hideVoiceUI.Event:Connect(function() --[[ Line: 356 ]]
-                    -- upvalues: v26 (ref), v36 (ref)
-                    v26(false);
-                    if v36 then
-                        v36:Disconnect();
-                        v36 = nil;
-                    end;
-                end);
-                if l_default_0.voiceUIVisible then
-                    v26(true);
-                end;
-                if v36 then
-                    return;
-                else
-                    v36 = l_RunService_0.RenderStepped:Connect(function() --[[ Line: 89 ]]
-                        -- upvalues: v29 (ref), v35 (ref), l_FRAME_BUFFER_0 (ref), v32 (ref), v34 (ref)
-                        if v29(false) then
-                            v35 = v35 + 1;
-                            if l_FRAME_BUFFER_0 < v35 then
-                                local v93 = math.random();
-                                v32(v93);
-                                v35 = 0;
-                                return;
-                            end;
-                        else
-                            v35 = v35 + 1;
-                            if l_FRAME_BUFFER_0 < v35 then
-                                local v94 = math.random();
-                                v34(v94);
-                                v35 = 0;
-                            end;
-                        end;
-                    end);
-                    return;
-                end;
-            end):catch(function(_) --[[ Line: 368 ]]
-                -- upvalues: l_GetFFlagVoiceChatUILogging_0 (ref), v13 (ref), v36 (ref)
-                if l_GetFFlagVoiceChatUILogging_0() then
-                    v13:warning("Failed to init VoiceChatServiceManager");
-                end;
-                if v36 then
-                    v36:Disconnect();
-                    v36 = nil;
-                end;
-            end);
-            return;
-        end;
-    end;
-    local function v97() --[[ Line: 378 ]] --[[ Name: cleanup ]]
-        -- upvalues: v36 (ref)
-        if v36 then
-            v36:Disconnect();
-            v36 = nil;
-        end;
-    end;
-    v96();
-    return {
-        voiceChatServiceConnected = v23, 
-        voiceUIVisible = v25, 
-        allPlayersMuted = v53, 
-        voiceParticipants = v12.getVoiceParticipants, 
-        localMuted = v27, 
-        localTalking = v29, 
-        toggleMuteAll = v55, 
-        toggleMuteSelf = v56, 
-        SubscribeRetry = v58, 
-        getPlayerMuteState = v63, 
-        togglePlayerMute = v66, 
-        getPlayerShouldShowMuteButton = v69, 
-        getPlayerAnimatedIcon = v74, 
-        getPlayerIsLocalMuted = v77, 
-        getPlayerIsTalking = if l_GetFFlagAddPeoplePageCardLayout_0() then v80 else nil, 
-        getMuteSelfIcon = v46, 
-        cleanup = v97
-    };
-end)());
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local Signals = require(ParentParentParent.Signals)
+local Modules = CoreGui:WaitForChild("RobloxGui"):WaitForChild("Modules")
+local VoiceChat = Modules:WaitForChild("VoiceChat")
+local Flags = Modules:WaitForChild("Flags")
+local default = require(VoiceChat:WaitForChild("VoiceChatServiceManager")).default
+local Constants = require(VoiceChat:WaitForChild("Constants"))
+local VOICE_STATE = Constants.VOICE_STATE
+local v13 = require(ParentParentParent.ExpChat).Stores.GetVoiceStore(false)
+local v14 = require(ParentParentParent.CoreScriptsInitializer).CoreLogger:new(script.Name)
+local GetFFlagVoiceChatUILogging = require(Flags:WaitForChild("GetFFlagVoiceChatUILogging"))
+local GetFFlagNewPeoplePageIcons = require(ParentParent.Flags).GetFFlagNewPeoplePageIcons
+local GetFFlagAddPeoplePageCardLayout = require(ParentParent.Flags).GetFFlagAddPeoplePageCardLayout
+local v18 = game:DefineFastFlag("LuaFlagVoiceChatDisableSubscribeRetryForMultistream", true)
+local EngineFeature = game:GetEngineFeature("VoiceChatMultistreamSubscriptionsEnabled")
+local Constants2 = require(ParentParent.Constants)
+local FRAME_BUFFER = Constants2.VOICE_CHAT.MIC_ANIMATION.FRAME_BUFFER
+local ICONS = Constants2.VOICE_CHAT.ICONS
+local PlayerMuteStatusIcons = default.PlayerMuteStatusIcons
+
+local function createPeopleVoiceChatStore() -- line: 69
+	-- upvalues: Signals (copy), RunService (copy), FRAME_BUFFER (copy), PlayerMuteStatusIcons (copy), default (copy), v13 (copy), Players (copy), VOICE_STATE (copy), Constants (copy), v18 (copy), EngineFeature (copy), ICONS (copy), GetFFlagNewPeoplePageIcons (copy), GetFFlagAddPeoplePageCardLayout (copy), GetFFlagVoiceChatUILogging (copy), v14 (copy)
+	local v25, v26 = Signals.createSignal(false)
+	local v27, v28 = Signals.createSignal(false)
+	local v29, v30 = Signals.createSignal(nil)
+	local v31, v32 = Signals.createSignal(false)
+	local v33, v34 = Signals.createSignal(0)
+	local v35, v36 = Signals.createSignal(0)
+	local n1 = 0
+	local connection = nil
+
+	local function startMicAnimation() -- line: 84
+		-- upvalues: connection (ref), RunService (copy), v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+		if connection then
+			return
+		end
+
+		connection = RunService.RenderStepped:Connect(function() -- line: 89
+			-- upvalues: v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+			if v31(false) then
+				n1 += 1
+
+				if n1 > FRAME_BUFFER then
+					local v58 = math.random()
+
+					v34(v58)
+					n1 = 0
+
+					return
+				end
+			else
+				n1 += 1
+
+				if n1 > FRAME_BUFFER then
+					local v59 = math.random()
+
+					v36(v59)
+					n1 = 0
+				end
+			end
+		end)
+	end
+	local function stopMicAnimation() -- line: 110
+		-- upvalues: connection (ref)
+		if connection then
+			connection:Disconnect()
+			connection = nil
+		end
+	end
+
+	local v41 = Signals.createComputed(function(p1) -- line: 140
+		-- upvalues: v25 (copy), default (copy), v13 (copy), Players (copy), VOICE_STATE (copy)
+		if not v25(p1) or not default.voiceUIVisible then
+			return false
+		end
+
+		local v45 = v13.getVoiceParticipants(p1)
+
+		if not v45 then
+			return false
+		end
+
+		for k, v in pairs(v45) do
+			local num = tonumber(k)
+
+			if num and Players.LocalPlayer and num ~= Players.LocalPlayer.UserId and v ~= VOICE_STATE.LOCAL_MUTED then
+				return false
+			end
+		end
+
+		return true
+	end)
+	local v42 = if not GetFFlagAddPeoplePageCardLayout() then nil else function(n2: number) -- line: 291
+		-- upvalues: Signals (copy), v13 (copy), VOICE_STATE (copy)
+		return Signals.createComputed(function(p2) -- line: 292
+			-- upvalues: v13 (copy), n2 (copy), VOICE_STATE (copy)
+			return v13.getOrCreateVoiceState(n2)(p2) == VOICE_STATE.TALKING
+		end)
+	end
+
+	local function initializeVoiceChat() -- line: 300
+		-- upvalues: default (copy), v26 (copy), Players (copy), v13 (copy), v30 (copy), v32 (copy), v28 (copy), connection (ref), RunService (copy), v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy), GetFFlagVoiceChatUILogging (copy), v14 (copy)
+		if not game:GetEngineFeature("VoiceChatSupported") then
+			return
+		end
+
+		default:asyncInit():andThen(function() -- line: 307
+			-- upvalues: v26 (copy), default (copy), Players (copy), v13 (copy), v30 (copy), v32 (copy), v28 (copy), connection (ref), RunService (copy), v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+			v26(true)
+			default:SetupParticipantListeners()
+
+			for k, _ in pairs(default.participants) do
+				local LocalPlayer = Players.LocalPlayer
+
+				if LocalPlayer and k ~= tostring(LocalPlayer.UserId) then
+					v13.handleVoiceParticipantAdded(k)
+				end
+			end
+
+			if default.participants and next(default.participants) then
+				v13.handleVoiceParticipantsChanged(default.participants)
+			end
+
+			default.muteChanged.Event:Connect(function(p3) -- line: 324
+				-- upvalues: v30 (copy)
+				v30(p3)
+			end)
+			default.talkingChanged.Event:Connect(function(p4) -- line: 329
+				-- upvalues: v32 (copy)
+				v32(p4)
+			end)
+			v30(default.localMuted)
+			v32(default.isTalking)
+			default.participantsUpdate.Event:Connect(function(p5) -- line: 338
+				-- upvalues: v13 (copy)
+				v13.handleVoiceParticipantsChanged(p5)
+			end)
+			default.participantJoined.Event:Connect(function(_, p7) -- line: 342
+				-- upvalues: v13 (copy)
+				v13.handleVoiceParticipantAdded((tostring(p7)))
+			end)
+			default.participantLeft.Event:Connect(function(_, p9) -- line: 346
+				-- upvalues: v13 (copy)
+				v13.handleVoiceParticipantRemoved((tostring(p9)))
+			end)
+			default.showVoiceUI.Event:Connect(function() -- line: 351
+				-- upvalues: v28 (copy), connection (ref), RunService (copy), v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+				v28(true)
+
+				if connection then
+					return
+				end
+
+				connection = RunService.RenderStepped:Connect(function() -- line: 89
+					-- upvalues: v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+					if v31(false) then
+						n1 += 1
+
+						if n1 > FRAME_BUFFER then
+							local v85 = math.random()
+
+							v34(v85)
+							n1 = 0
+
+							return
+						end
+					else
+						n1 += 1
+
+						if n1 > FRAME_BUFFER then
+							local v86 = math.random()
+
+							v36(v86)
+							n1 = 0
+						end
+					end
+				end)
+			end)
+			default.hideVoiceUI.Event:Connect(function() -- line: 356
+				-- upvalues: v28 (copy), connection (ref)
+				v28(false)
+
+				if connection then
+					connection:Disconnect()
+					connection = nil
+				end
+			end)
+
+			if default.voiceUIVisible then
+				v28(true)
+			end
+
+			if connection then
+				return
+			end
+
+			connection = RunService.RenderStepped:Connect(function() -- line: 89
+				-- upvalues: v31 (copy), n1 (ref), FRAME_BUFFER (copy), v34 (copy), v36 (copy)
+				if v31(false) then
+					n1 += 1
+
+					if n1 > FRAME_BUFFER then
+						local v83 = math.random()
+
+						v34(v83)
+						n1 = 0
+
+						return
+					end
+				else
+					n1 += 1
+
+					if n1 > FRAME_BUFFER then
+						local v84 = math.random()
+
+						v36(v84)
+						n1 = 0
+					end
+				end
+			end)
+		end):catch(function(_) -- line: 368
+			-- upvalues: GetFFlagVoiceChatUILogging (copy), v14 (copy), connection (ref)
+			if GetFFlagVoiceChatUILogging() then
+				v14:warning("Failed to init VoiceChatServiceManager")
+			end
+
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end)
+	end
+
+	initializeVoiceChat()
+
+	return {
+		voiceChatServiceConnected = v25,
+		voiceUIVisible = v27,
+		allPlayersMuted = v41,
+		voiceParticipants = v13.getVoiceParticipants,
+		localMuted = v29,
+		localTalking = v31,
+		toggleMuteAll = function() -- line: 167
+			-- upvalues: v25 (copy), v41 (copy), default (copy), Constants (copy)
+			if not v25(false) then
+				return
+			end
+
+			local v49 = v41(false)
+
+			default:MuteAll(not v49, Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+		end,
+		toggleMuteSelf = function() -- line: 177
+			-- upvalues: v25 (copy), default (copy)
+			if not v25(false) then
+				return
+			end
+
+			default:ToggleMic("InGameMenuPlayers")
+		end,
+		SubscribeRetry = function(n3: number) -- line: 186
+			-- upvalues: v25 (copy), default (copy)
+			if not v25(false) then
+				return
+			end
+
+			default:SubscribeRetry(n3)
+		end,
+		getPlayerMuteState = function(n4: number) -- line: 195
+			-- upvalues: Signals (copy), v13 (copy), VOICE_STATE (copy)
+			return Signals.createComputed(function(p11) -- line: 196
+				-- upvalues: v13 (copy), n4 (copy), VOICE_STATE (copy)
+				local v65 = v13.getOrCreateVoiceState(n4)(p11)
+
+				if not v65 then
+					return false
+				end
+
+				return v65 == VOICE_STATE.LOCAL_MUTED or v65 == VOICE_STATE.MUTED
+			end)
+		end,
+		togglePlayerMute = function(n5: number) -- line: 208
+			-- upvalues: v25 (copy), v27 (copy), default (copy), Constants (copy), v18 (copy), EngineFeature (copy)
+			if not v25(false) then
+				return
+			end
+
+			if not v27(false) then
+				return
+			end
+
+			local v53 = default.participants[tostring(n5)]
+
+			if v53 and v53.subscriptionCompleted then
+				default:ToggleMutePlayer(tonumber(n5), Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+
+				return
+			end
+
+			if v53 and v53.subscriptionFailed then
+				if not v18 then
+					default:SubscribeRetry(n5)
+
+					return
+				end
+
+				if not EngineFeature then
+					default:SubscribeRetry(n5)
+
+					return
+				end
+			else
+				default:ToggleMutePlayer(tonumber(n5), Constants.VOICE_CONTEXT_TYPE.IN_GAME_MENU)
+			end
+		end,
+		getPlayerShouldShowMuteButton = function(n6: number) -- line: 241
+			-- upvalues: Signals (copy), v27 (copy), Players (copy), v13 (copy)
+			return Signals.createComputed(function(p12) -- line: 242
+				-- upvalues: v27 (copy), Players (copy), n6 (copy), v13 (copy)
+				if not v27(p12) or Players.LocalPlayer and n6 == Players.LocalPlayer.UserId then
+					return false
+				end
+
+				return v13.getOrCreateVoiceState(n6)(p12) ~= nil
+			end)
+		end,
+		getPlayerAnimatedIcon = function(n7: number) -- line: 253
+			-- upvalues: Signals (copy), v13 (copy), ICONS (copy), VOICE_STATE (copy), GetFFlagNewPeoplePageIcons (copy), v35 (copy)
+			return Signals.createComputed(function(p13) -- line: 254
+				-- upvalues: v13 (copy), n7 (copy), ICONS (copy), VOICE_STATE (copy), GetFFlagNewPeoplePageIcons (copy), v35 (copy)
+				local v68 = v13.getOrCreateVoiceState(n7)(p13)
+
+				if not v68 then
+					return ICONS.DEFAULT_SPEAKER
+				end
+
+				if v68 == VOICE_STATE.LOCAL_MUTED or v68 == VOICE_STATE.MUTED then
+					if GetFFlagNewPeoplePageIcons() then
+						return ICONS.MUTED_SPEAKER
+					end
+
+					return ICONS.SPEAKER_OFF
+				end
+
+				if v68 == VOICE_STATE.TALKING then
+					local v69 = math.floor(0.5 + 5 * v35(p13)) * 20
+
+					return string.format(ICONS.ANIMATED_SPEAKER_FORMAT, v69)
+				end
+
+				return ICONS.DEFAULT_SPEAKER
+			end)
+		end,
+		getPlayerIsLocalMuted = function(n8: number) -- line: 278
+			-- upvalues: Signals (copy), v13 (copy), VOICE_STATE (copy)
+			return Signals.createComputed(function(p14) -- line: 279
+				-- upvalues: n8 (copy), v13 (copy), VOICE_STATE (copy)
+				if not n8 then
+					return false
+				end
+
+				return v13.getOrCreateVoiceState(n8)(p14) == VOICE_STATE.LOCAL_MUTED
+			end)
+		end,
+		getPlayerIsTalking = if not GetFFlagAddPeoplePageCardLayout() then nil else v42,
+		getMuteSelfIcon = function() -- line: 117
+			-- upvalues: Signals (copy), v29 (copy), v31 (copy), PlayerMuteStatusIcons (copy), v33 (copy), default (copy)
+			return Signals.createComputed(function(p15) -- line: 118
+				-- upvalues: v29 (copy), v31 (copy), PlayerMuteStatusIcons (copy), v33 (copy), default (copy)
+				local v61 = v29(p15)
+				local v62 = v31(p15)
+
+				if v61 == nil then
+					return PlayerMuteStatusIcons.Loading
+				end
+
+				if v61 then
+					return PlayerMuteStatusIcons.MicOff
+				end
+
+				if v62 then
+					local v63 = math.floor(0.5 + 5 * v33(p15)) * 20
+
+					return (default:GetIcon("Unmuted" .. tostring(v63), "MicLight"))
+				end
+
+				return PlayerMuteStatusIcons.MicOn
+			end)
+		end,
+		cleanup = function() -- line: 378
+			-- upvalues: connection (ref)
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end
+	}
+end
+
+return (createPeopleVoiceChatStore())

@@ -1,16 +1,20 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.util.APIUtil);
-local l_HttpService_0 = game:GetService("HttpService");
-local v3 = v1.getBaseDomain();
-local v4 = string.format("https://itemconfiguration.%s", v3) .. "v1/creations/get-asset-details";
-return function(v5) --[[ Line: 13 ]] --[[ Name: getAssetCreationDetails ]]
-    -- upvalues: v1 (copy), v4 (copy), l_HttpService_0 (copy)
-    local v6, v7 = v1.requestAndRetryPost(v4, l_HttpService_0:JSONEncode({
-        assetIds = v5
-    }));
-    if v6 then
-        return true, l_HttpService_0:JSONDecode(v7);
-    else
-        return false, v7;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local APIUtil = require(ParentParent.util.APIUtil)
+local HttpService = game:GetService("HttpService")
+local v4 = APIUtil.getBaseDomain()
+local v5 = string.format("https://itemconfiguration.%s", v4) .. "v1/creations/get-asset-details"
+
+local function getAssetCreationDetails(p1) -- line: 13
+	-- upvalues: APIUtil (copy), v5 (copy), HttpService (copy)
+	local v8, v9 = APIUtil.requestAndRetryPost(v5, HttpService:JSONEncode({
+		assetIds = p1
+	}))
+
+	if v8 then
+		return true, HttpService:JSONDecode(v9)
+	end
+
+	return false, v9
+end
+
+return getAssetCreationDetails

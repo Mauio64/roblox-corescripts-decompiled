@@ -1,2 +1,3 @@
-game:DefineFastFlag("CoreScriptShowTeleportPrompt", false);
-return game:GetFastFlag("CoreScriptShowTeleportPrompt");
+game:DefineFastFlag("CoreScriptShowTeleportPrompt", false)
+
+return game:GetFastFlag("CoreScriptShowTeleportPrompt")

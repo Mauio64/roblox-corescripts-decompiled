@@ -1,15 +1,17 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Rodux);
-local v2 = require(l_CorePackages_0.Packages.Cryo);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetFavoriteBundle);
-return v1.createReducer({}, {
-    [v4.name] = function(v5, v6) --[[ Line: 8 ]]
-        -- upvalues: v2 (copy)
-        local l_id_0 = v6.id;
-        local l_isFavorite_0 = v6.isFavorite;
-        return v2.Dictionary.join(v5, {
-            [l_id_0] = l_isFavorite_0
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Rodux = require(CorePackages.Packages.Rodux)
+local Cryo = require(CorePackages.Packages.Cryo)
+local ParentParent = script.Parent.Parent
+local SetFavoriteBundle = require(ParentParent.Actions.SetFavoriteBundle)
+
+return Rodux.createReducer({}, {
+	[SetFavoriteBundle.name] = function(p1, p2) -- line: 8
+		-- upvalues: Cryo (copy)
+		local id = p2.id
+		local isFavorite = p2.isFavorite
+
+		return Cryo.Dictionary.join(p1, {
+			[id] = isFavorite
+		})
+	end
+})

@@ -1,81 +1,96 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_GuiService_0 = game:GetService("GuiService");
-local l_AvatarIdentification_0 = require(l_Parent_1.AvatarIdentification).AvatarIdentification;
-local v4 = require(l_Parent_1.Dash);
-local v5 = require(l_Parent_0.Utils.getAvatarAssets);
-local v6 = game:DefineFastInt("CaptureMetadataGetAvatarsTimeoutMs", 150);
-local v7 = game:DefineFastInt("CaptureMetadataMaxAvatars", 5);
-local v8 = game:DefineFastInt("CaptureMetadataMinAvatarBoundingBoxPixels", 200);
-local v9 = game:DefineFastInt("CaptureMetadataMinHitRatePercentage", 50);
-local function _() --[[ Line: 17 ]] --[[ Name: getViewportSize ]]
-    local l_CurrentCamera_0 = workspace.CurrentCamera;
-    if not l_CurrentCamera_0 then
-        return;
-    else
-        return l_CurrentCamera_0.ViewportSize;
-    end;
-end;
-local l_round_0 = math.round;
-local function _(v13) --[[ Line: 28 ]] --[[ Name: vec2ToTable ]]
-    -- upvalues: l_round_0 (copy)
-    return {
-        x = l_round_0(v13.X), 
-        y = l_round_0(v13.Y)
-    };
-end;
-return function() --[[ Line: 32 ]]
-    -- upvalues: v6 (copy), l_AvatarIdentification_0 (copy), v4 (copy), l_GuiService_0 (copy), v7 (copy), v9 (copy), v8 (copy), v5 (copy), l_round_0 (copy)
-    local l_CurrentCamera_1 = workspace.CurrentCamera;
-    local v16 = if not l_CurrentCamera_1 then nil else l_CurrentCamera_1.ViewportSize;
-    if not v16 then
-        return {};
-    else
-        l_CurrentCamera_1 = v6 / 1000;
-        local v17 = l_AvatarIdentification_0.getVisibleAvatars(true, l_CurrentCamera_1);
-        v17 = v4.values(v17);
-        local l_l_GuiService_0_RawScreenScale_0 = l_GuiService_0:GetRawScreenScale();
-        for _, v20 in v17 do
-            v20.boundingBox.min = v20.boundingBox.min * v16 * l_l_GuiService_0_RawScreenScale_0;
-            v20.boundingBox.max = v20.boundingBox.max * v16 * l_l_GuiService_0_RawScreenScale_0;
-        end;
-        table.sort(v17, function(v21, v22) --[[ Line: 50 ]]
-            return (v21.boundingBox.max - v21.boundingBox.min).Magnitude > (v22.boundingBox.max - v22.boundingBox.min).Magnitude;
-        end);
-        local v23 = 0;
-        local v24 = {};
-        for _, v26 in v17 do
-            if v7 > v23 then
-                v23 = v23 + 1;
-                if v26.hitRate >= v9 / 100 then
-                    if (v26.boundingBox.max - v26.boundingBox.min).Magnitude >= v8 then
-                        local l_player_0 = v26.player;
-                        local v28 = v5(l_player_0.Character);
-                        local l_UserId_0 = l_player_0.UserId;
-                        local v30 = {
-                            avatarItems = v28
-                        };
-                        local v31 = {};
-                        local l_min_0 = v26.boundingBox.min;
-                        v31.min = {
-                            x = l_round_0(l_min_0.X), 
-                            y = l_round_0(l_min_0.Y)
-                        };
-                        l_min_0 = v26.boundingBox.max;
-                        v31.max = {
-                            x = l_round_0(l_min_0.X), 
-                            y = l_round_0(l_min_0.Y)
-                        };
-                        v30.boundingBox = v31;
-                        v24[l_UserId_0] = v30;
-                    else
-                        break;
-                    end;
-                end;
-            else
-                break;
-            end;
-        end;
-        return v24;
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local GuiService = game:GetService("GuiService")
+local AvatarIdentification = require(ParentParentParent.AvatarIdentification).AvatarIdentification
+local Dash = require(ParentParentParent.Dash)
+local getAvatarAssets = require(ParentParent.Utils.getAvatarAssets)
+local v7 = game:DefineFastInt("CaptureMetadataGetAvatarsTimeoutMs", 150)
+local v8 = game:DefineFastInt("CaptureMetadataMaxAvatars", 5)
+local v9 = game:DefineFastInt("CaptureMetadataMinAvatarBoundingBoxPixels", 200)
+local v10 = game:DefineFastInt("CaptureMetadataMinHitRatePercentage", 50)
+
+local function getViewportSize() -- line: 17
+	local CurrentCamera = workspace.CurrentCamera
+
+	if not CurrentCamera then
+		return
+	end
+
+	return CurrentCamera.ViewportSize
+end
+
+local round = math.round
+
+local function vec2ToTable(p1) -- line: 28
+	-- upvalues: round (copy)
+	return {
+		x = round(p1.X),
+		y = round(p1.Y)
+	}
+end
+
+return function() -- line: 32
+	-- upvalues: v7 (copy), AvatarIdentification (copy), Dash (copy), GuiService (copy), v8 (copy), v10 (copy), v9 (copy), getAvatarAssets (copy), round (copy)
+	local CurrentCamera = workspace.CurrentCamera
+	local v17 = if CurrentCamera then CurrentCamera.ViewportSize else nil
+
+	if not v17 then
+		return {}
+	end
+
+	local v18 = v7 / 1000
+	local v19 = AvatarIdentification.getVisibleAvatars(true, v18)
+	local v20 = Dash.values(v19)
+	local RawScreenScale = GuiService:GetRawScreenScale()
+
+	for _, v23 in v20 do
+		v23.boundingBox.min = v23.boundingBox.min * v17 * RawScreenScale
+		v23.boundingBox.max = v23.boundingBox.max * v17 * RawScreenScale
+	end
+
+	table.sort(v20, function(p2, p3) -- line: 50
+		return (p2.boundingBox.max - p2.boundingBox.min).Magnitude > (p3.boundingBox.max - p3.boundingBox.min).Magnitude
+	end)
+
+	local n1 = 0
+	local t1 = {}
+
+	for _, v27 in v20 do
+		if n1 >= v8 then
+			return t1
+		end
+
+		n1 += 1
+
+		if not (v27.hitRate < v10 / 100) then
+			if (v27.boundingBox.max - v27.boundingBox.min).Magnitude < v9 then
+				return t1
+			end
+
+			local player = v27.player
+			local v29 = getAvatarAssets(player.Character)
+			local UserId = player.UserId
+			local t2 = {
+				avatarItems = v29
+			}
+			local t3 = {}
+			local min = v27.boundingBox.min
+
+			t3.min = {
+				x = round(min.X),
+				y = round(min.Y)
+			}
+
+			local max = v27.boundingBox.max
+
+			t3.max = {
+				x = round(max.X),
+				y = round(max.Y)
+			}
+			t2.boundingBox = t3
+			t1[UserId] = t2
+		end
+	end
+
+	return t1
+end

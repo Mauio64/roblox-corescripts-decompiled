@@ -1,308 +1,308 @@
-local function _(v0, v1) --[[ Line: 8 ]] --[[ Name: parseInt ]]
-    return (tonumber(v0, v1));
-end;
-local function _(v3) --[[ Line: 11 ]] --[[ Name: NumberisFinite ]]
-    local v4 = false;
-    if typeof(v3) == "number" then
-        v4 = false;
-        if v3 ~= 1e999 then
-            v4 = v3 == v3;
-        end;
-    end;
-    return v4;
-end;
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v7 = require(l_Parent_0.LuauPolyfill);
-local l_Array_0 = v7.Array;
-local l_Number_0 = v7.Number;
-local l_Object_0 = v7.Object;
-local _ = require(script.Parent.Parent.language.ast);
-local l_inspect_0 = require(script.Parent.Parent.jsutils.inspect).inspect;
-local l_isObjectLike_0 = require(script.Parent.Parent.jsutils.isObjectLike).isObjectLike;
-local l_Kind_0 = require(script.Parent.Parent.language.kinds).Kind;
-local l_print_0 = require(script.Parent.Parent.language.printer).print;
-local l_GraphQLError_0 = require(script.Parent.Parent.error.GraphQLError).GraphQLError;
-local l_GraphQLScalarType_0 = require(script.Parent.definition).GraphQLScalarType;
-local v18 = nil;
-local v19 = nil;
-local v20 = nil;
-local v21 = nil;
-local v22 = nil;
-local _ = nil;
-serializeInt = function(v24) --[[ Line: 55 ]] --[[ Name: serializeInt ]]
-    -- upvalues: v18 (ref), l_Number_0 (copy), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v25 = v18(v24);
-    if typeof(v25) == "boolean" then
-        if v25 then
-            return 1;
-        else
-            return 0;
-        end;
-    else
-        local l_v25_0 = v25;
-        if typeof(v25) == "string" and v25 ~= "" then
-            l_v25_0 = tonumber(v25);
-        end;
-        if typeof(l_v25_0) ~= "number" or not l_Number_0.isInteger(l_v25_0) then
-            error(l_GraphQLError_0.new(("Int cannot represent non-integer value: %s"):format(l_inspect_0(v25))));
-        end;
-        if l_v25_0 > 2147483647 or l_v25_0 < -2147483648 then
-            error(l_GraphQLError_0.new("Int cannot represent non 32-bit signed integer value: " .. l_inspect_0(v25)));
-        end;
-        return l_v25_0;
-    end;
-end;
-coerceInt = function(v27) --[[ Line: 84 ]] --[[ Name: coerceInt ]]
-    -- upvalues: l_Number_0 (copy), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    if typeof(v27) ~= "number" or not l_Number_0.isInteger(v27) then
-        error(l_GraphQLError_0.new(("Int cannot represent non-integer value: %s"):format(l_inspect_0(v27))));
-    end;
-    if v27 > 2147483647 or v27 < -2147483648 then
-        error(l_GraphQLError_0.new(("Int cannot represent non 32-bit signed integer value: %s"):format(v27)));
-    end;
-    return v27;
-end;
-local v30 = l_GraphQLScalarType_0.new({
-    name = "Int", 
-    description = "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.", 
-    serialize = serializeInt, 
-    parseValue = coerceInt, 
-    parseLiteral = function(v28) --[[ Line: 110 ]] --[[ Name: parseLiteral ]]
-        -- upvalues: l_Kind_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy)
-        if v28.kind ~= l_Kind_0.INT then
-            error(l_GraphQLError_0.new(("Int cannot represent non-integer value: %s"):format(l_print_0(v28)), v28));
-        end;
-        local v29 = tonumber(v28.value, 10);
-        if v29 > 2147483647 or v29 < -2147483648 then
-            error(l_GraphQLError_0.new(("Int cannot represent non 32-bit signed integer value: %s"):format(v28.value), v28));
-        end;
-        return v29;
-    end
-});
-v20 = function(v31) --[[ Line: 139 ]] --[[ Name: serializeFloat ]]
-    -- upvalues: v18 (ref), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v32 = false;
-    local v33 = v18(v31);
-    if typeof(v33) == "boolean" then
-        if v33 then
-            return 1;
-        else
-            return 0;
-        end;
-    else
-        local l_v33_0 = v33;
-        if typeof(v33) == "string" and v33 ~= "" then
-            l_v33_0 = tonumber(v33);
-        end;
-        if typeof(l_v33_0) == "number" then
-            local l_l_v33_0_0 = l_v33_0;
-            local v36 = false;
-            if typeof(l_l_v33_0_0) == "number" then
-                v36 = false;
-                if l_l_v33_0_0 ~= 1e999 then
-                    v36 = l_l_v33_0_0 == l_l_v33_0_0;
-                end;
-            end;
-            v32 = v36;
-        end;
-        if not v32 then
-            error(l_GraphQLError_0.new(("Float cannot represent non numeric value: %s"):format(l_inspect_0(v33))));
-        end;
-        v32 = false;
-        return l_v33_0;
-    end;
-end;
-coerceFloat = function(v37) --[[ Line: 161 ]] --[[ Name: coerceFloat ]]
-    -- upvalues: l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v38 = false;
-    if typeof(v37) == "number" then
-        local v39 = false;
-        if typeof(v37) == "number" then
-            v39 = false;
-            if v37 ~= 1e999 then
-                v39 = v37 == v37;
-            end;
-        end;
-        v38 = v39;
-    end;
-    if not v38 then
-        error(l_GraphQLError_0.new(("Float cannot represent non numeric value: %s"):format(l_inspect_0(v37))));
-    end;
-    v38 = false;
-    return v37;
-end;
-local v41 = l_GraphQLScalarType_0.new({
-    name = "Float", 
-    description = "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).", 
-    serialize = v20, 
-    parseValue = coerceFloat, 
-    parseLiteral = function(v40) --[[ Line: 178 ]] --[[ Name: parseLiteral ]]
-        -- upvalues: l_Kind_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy)
-        if v40.kind ~= l_Kind_0.FLOAT and v40.kind ~= l_Kind_0.INT then
-            error(l_GraphQLError_0.new(("Float cannot represent non numeric value: %s"):format(l_print_0(v40)), v40));
-        end;
-        return (tonumber(v40.value, nil));
-    end
-});
-v18 = function(v42) --[[ Line: 197 ]] --[[ Name: serializeObject ]]
-    -- upvalues: l_isObjectLike_0 (copy)
-    if l_isObjectLike_0(v42) then
-        if typeof(v42.valueOf) == "function" then
-            local v43 = v42:valueOf();
-            if not l_isObjectLike_0(v43) then
-                return v43;
-            end;
-        end;
-        if typeof(v42.toJSON) == "function" then
-            return v42:toJSON();
-        end;
-    end;
-    return v42;
-end;
-v22 = function(v44) --[[ Line: 214 ]] --[[ Name: serializeString ]]
-    -- upvalues: v18 (ref), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v45 = v18(v44);
-    if typeof(v45) == "string" then
-        return v45;
-    elseif typeof(v45) == "boolean" then
-        if v45 then
-            return "true";
-        else
-            return "false";
-        end;
-    else
-        if typeof(v45) == "number" then
-            local v46 = false;
-            if typeof(v45) == "number" then
-                v46 = false;
-                if v45 ~= 1e999 then
-                    v46 = v45 == v45;
-                end;
-            end;
-            if v46 then
-                return (tostring(v45));
-            end;
-        end;
-        error(l_GraphQLError_0.new(("String cannot represent value: %s"):format(l_inspect_0(v44))));
-        return;
-    end;
-end;
-coerceString = function(v47) --[[ Line: 231 ]] --[[ Name: coerceString ]]
-    -- upvalues: l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    if typeof(v47) ~= "string" then
-        error(l_GraphQLError_0.new(("String cannot represent a non string value: %s"):format(l_inspect_0(v47))));
-    end;
-    return v47;
-end;
-local v49 = l_GraphQLScalarType_0.new({
-    name = "String", 
-    description = "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.", 
-    serialize = v22, 
-    parseValue = coerceString, 
-    parseLiteral = function(v48) --[[ Line: 248 ]] --[[ Name: parseLiteral ]]
-        -- upvalues: l_Kind_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy)
-        if v48.kind ~= l_Kind_0.STRING then
-            error(l_GraphQLError_0.new(("String cannot represent a non string value: %s"):format(l_print_0(v48)), v48));
-        end;
-        return v48.value;
-    end
-});
-v21 = function(v50) --[[ Line: 263 ]] --[[ Name: serializeBoolean ]]
-    -- upvalues: v18 (ref), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v51 = v18(v50);
-    if typeof(v51) == "boolean" then
-        return v51;
-    else
-        local v52 = false;
-        if typeof(v51) == "number" then
-            v52 = false;
-            if v51 ~= 1e999 then
-                v52 = v51 == v51;
-            end;
-        end;
-        if v52 then
-            return v51 ~= 0;
-        else
-            error(l_GraphQLError_0.new(("Boolean cannot represent a non boolean value: %s"):format(l_inspect_0(v51))));
-            return;
-        end;
-    end;
-end;
-coerceBoolean = function(v53) --[[ Line: 281 ]] --[[ Name: coerceBoolean ]]
-    -- upvalues: l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    if typeof(v53) ~= "boolean" then
-        error(l_GraphQLError_0.new(("Boolean cannot represent a non boolean value: %s"):format(l_inspect_0(v53))));
-    end;
-    return v53;
-end;
-local v55 = l_GraphQLScalarType_0.new({
-    name = "Boolean", 
-    description = "The `Boolean` scalar type represents `true` or `false`.", 
-    serialize = v21, 
-    parseValue = coerceBoolean, 
-    parseLiteral = function(v54) --[[ Line: 298 ]] --[[ Name: parseLiteral ]]
-        -- upvalues: l_Kind_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy)
-        if v54.kind ~= l_Kind_0.BOOLEAN then
-            error(l_GraphQLError_0.new(("Boolean cannot represent a non boolean value: %s"):format(l_print_0(v54)), v54));
-        end;
-        return v54.value;
-    end
-});
-v19 = function(v56) --[[ Line: 313 ]] --[[ Name: serializeID ]]
-    -- upvalues: v18 (ref), l_Number_0 (copy), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    local v57 = v18(v56);
-    if typeof(v57) == "string" then
-        return v57;
-    elseif l_Number_0.isInteger(v57) then
-        return (tostring(v57));
-    else
-        error(l_GraphQLError_0.new(("ID cannot represent value: %s"):format(l_inspect_0(v56))));
-        return;
-    end;
-end;
-coerceID = function(v58) --[[ Line: 326 ]] --[[ Name: coerceID ]]
-    -- upvalues: l_Number_0 (copy), l_GraphQLError_0 (copy), l_inspect_0 (copy)
-    if typeof(v58) == "string" then
-        return v58;
-    elseif typeof(v58) == "number" and l_Number_0.isInteger(v58) then
-        return (tostring(v58));
-    else
-        error(l_GraphQLError_0.new(("ID cannot represent value: %s"):format(l_inspect_0(v58))));
-        return;
-    end;
-end;
-local v60 = l_GraphQLScalarType_0.new({
-    name = "ID", 
-    description = "The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `\"4\"`) or integer (such as `4`) input value will be accepted as an ID.", 
-    serialize = v19, 
-    parseValue = coerceID, 
-    parseLiteral = function(v59) --[[ Line: 342 ]] --[[ Name: parseLiteral ]]
-        -- upvalues: l_Kind_0 (copy), l_GraphQLError_0 (copy), l_print_0 (copy)
-        if v59.kind ~= l_Kind_0.STRING and v59.kind ~= l_Kind_0.INT then
-            error(l_GraphQLError_0.new("ID cannot represent a non-string and non-integer value: " .. l_print_0(v59), v59));
-        end;
-        return v59.value;
-    end
-});
-local v61 = l_Object_0.freeze({
-    v49, 
-    v30, 
-    v41, 
-    v55, 
-    v60
-});
+local function parseInt(p1, p2) -- line: 8
+	return (tonumber(p1, p2))
+end
+local function NumberisFinite(p3) -- line: 11
+	return typeof(p3) == "number" and (p3 ~= 1e999 and p3 == p3)
+end
+
+local ParentParent = script.Parent.Parent.Parent
+local LuauPolyfill = require(ParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Number = LuauPolyfill.Number
+local Object = LuauPolyfill.Object
+
+require(script.Parent.Parent.language.ast)
+
+local inspect = require(script.Parent.Parent.jsutils.inspect).inspect
+local isObjectLike = require(script.Parent.Parent.jsutils.isObjectLike).isObjectLike
+local Kind = require(script.Parent.Parent.language.kinds).Kind
+local print = require(script.Parent.Parent.language.printer).print
+local GraphQLError = require(script.Parent.Parent.error.GraphQLError).GraphQLError
+local GraphQLScalarType = require(script.Parent.definition).GraphQLScalarType
+local serializeObject = nil
+
+function serializeInt(p4) -- line: 55
+	-- upvalues: serializeObject (ref), Number (copy), GraphQLError (copy), inspect (copy)
+	local v29 = serializeObject(p4)
+
+	if typeof(v29) == "boolean" then
+		if v29 then
+			return 1
+		end
+
+		return 0
+	end
+
+	local v30 = v29
+
+	if typeof(v29) == "string" and v29 ~= "" then
+		v30 = tonumber(v29)
+	end
+
+	if typeof(v30) ~= "number" or not Number.isInteger(v30) then
+		error(GraphQLError.new(("Int cannot represent non-integer value: %s"):format(inspect(v29))))
+	end
+
+	if v30 > 2147483647 or v30 < -2147483648 then
+		error(GraphQLError.new("Int cannot represent non 32-bit signed integer value: " .. inspect(v29)))
+	end
+
+	return v30
+end
+function coerceInt(p5) -- line: 84
+	-- upvalues: Number (copy), GraphQLError (copy), inspect (copy)
+	if typeof(p5) ~= "number" or not Number.isInteger(p5) then
+		error(GraphQLError.new(("Int cannot represent non-integer value: %s"):format(inspect(p5))))
+	end
+
+	if p5 > 2147483647 or p5 < -2147483648 then
+		error(GraphQLError.new(("Int cannot represent non 32-bit signed integer value: %s"):format(p5)))
+	end
+
+	return p5
+end
+
+local v15 = GraphQLScalarType.new({
+	name = "Int",
+	description = "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
+	serialize = serializeInt,
+	parseValue = coerceInt,
+	parseLiteral = function(p6) -- line: 110
+		-- upvalues: Kind (copy), GraphQLError (copy), print (copy)
+		if p6.kind ~= Kind.INT then
+			error(GraphQLError.new(("Int cannot represent non-integer value: %s"):format(print(p6)), p6))
+		end
+
+		local num = tonumber(p6.value, 10)
+
+		if num > 2147483647 or num < -2147483648 then
+			error(GraphQLError.new(("Int cannot represent non 32-bit signed integer value: %s"):format(p6.value), p6))
+		end
+
+		return num
+	end
+})
+
+local function serializeFloat(p7) -- line: 139
+	-- upvalues: serializeObject (ref), GraphQLError (copy), inspect (copy)
+	local v35 = serializeObject(p7)
+
+	if typeof(v35) == "boolean" then
+		if v35 then
+			return 1
+		end
+
+		return 0
+	end
+
+	local v36 = v35
+
+	if typeof(v35) == "string" and v35 ~= "" then
+		v36 = tonumber(v35)
+	end
+
+	if typeof(v36) == "number" then
+		if typeof(v36) == "number" and (v36 ~= 1e999 and v36 == v36) then
+			return v36
+		end
+	end
+
+	error(GraphQLError.new(("Float cannot represent non numeric value: %s"):format(inspect(v35))))
+
+	return v36
+end
+
+function coerceFloat(p8) -- line: 161
+	-- upvalues: GraphQLError (copy), inspect (copy)
+	if typeof(p8) ~= "number" or (typeof(p8) ~= "number" or (p8 == 1e999 or p8 ~= p8)) then
+		error(GraphQLError.new(("Float cannot represent non numeric value: %s"):format(inspect(p8))))
+	end
+
+	return p8
+end
+
+local v17 = GraphQLScalarType.new({
+	name = "Float",
+	description = "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).",
+	serialize = serializeFloat,
+	parseValue = coerceFloat,
+	parseLiteral = function(p9) -- line: 178
+		-- upvalues: Kind (copy), GraphQLError (copy), print (copy)
+		if p9.kind ~= Kind.FLOAT and p9.kind ~= Kind.INT then
+			error(GraphQLError.new(("Float cannot represent non numeric value: %s"):format(print(p9)), p9))
+		end
+
+		return (tonumber(p9.value, nil))
+	end
+})
+
+function serializeObject(p10) -- line: 197
+	-- upvalues: isObjectLike (copy)
+	if isObjectLike(p10) then
+		if typeof(p10.valueOf) == "function" then
+			local v40 = p10:valueOf()
+
+			if not isObjectLike(v40) then
+				return v40
+			end
+		end
+
+		if typeof(p10.toJSON) == "function" then
+			return p10:toJSON()
+		end
+	end
+
+	return p10
+end
+
+local function serializeString(p11) -- line: 214
+	-- upvalues: serializeObject (ref), GraphQLError (copy), inspect (copy)
+	local v42 = serializeObject(p11)
+
+	if typeof(v42) == "string" then
+		return v42
+	end
+
+	if typeof(v42) == "boolean" then
+		if v42 then
+			return "true"
+		end
+
+		return "false"
+	end
+
+	if typeof(v42) == "number" and (typeof(v42) == "number" and (v42 ~= 1e999 and v42 == v42)) then
+		return (tostring(v42))
+	end
+
+	error(GraphQLError.new(("String cannot represent value: %s"):format(inspect(p11))))
+end
+
+function coerceString(p12) -- line: 231
+	-- upvalues: GraphQLError (copy), inspect (copy)
+	if typeof(p12) ~= "string" then
+		error(GraphQLError.new(("String cannot represent a non string value: %s"):format(inspect(p12))))
+	end
+
+	return p12
+end
+
+local v19 = GraphQLScalarType.new({
+	name = "String",
+	description = "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+	serialize = serializeString,
+	parseValue = coerceString,
+	parseLiteral = function(p13) -- line: 248
+		-- upvalues: Kind (copy), GraphQLError (copy), print (copy)
+		if p13.kind ~= Kind.STRING then
+			error(GraphQLError.new(("String cannot represent a non string value: %s"):format(print(p13)), p13))
+		end
+
+		return p13.value
+	end
+})
+
+local function serializeBoolean(p14) -- line: 263
+	-- upvalues: serializeObject (ref), GraphQLError (copy), inspect (copy)
+	local v46 = serializeObject(p14)
+
+	if typeof(v46) == "boolean" then
+		return v46
+	end
+
+	if typeof(v46) == "number" and (v46 ~= 1e999 and v46 == v46) then
+		return v46 ~= 0
+	end
+
+	error(GraphQLError.new(("Boolean cannot represent a non boolean value: %s"):format(inspect(v46))))
+end
+
+function coerceBoolean(p15) -- line: 281
+	-- upvalues: GraphQLError (copy), inspect (copy)
+	if typeof(p15) ~= "boolean" then
+		error(GraphQLError.new(("Boolean cannot represent a non boolean value: %s"):format(inspect(p15))))
+	end
+
+	return p15
+end
+
+local v21 = GraphQLScalarType.new({
+	name = "Boolean",
+	description = "The `Boolean` scalar type represents `true` or `false`.",
+	serialize = serializeBoolean,
+	parseValue = coerceBoolean,
+	parseLiteral = function(p16) -- line: 298
+		-- upvalues: Kind (copy), GraphQLError (copy), print (copy)
+		if p16.kind ~= Kind.BOOLEAN then
+			error(GraphQLError.new(("Boolean cannot represent a non boolean value: %s"):format(print(p16)), p16))
+		end
+
+		return p16.value
+	end
+})
+
+local function serializeID(p17) -- line: 313
+	-- upvalues: serializeObject (ref), Number (copy), GraphQLError (copy), inspect (copy)
+	local v50 = serializeObject(p17)
+
+	if typeof(v50) == "string" then
+		return v50
+	end
+
+	if Number.isInteger(v50) then
+		return (tostring(v50))
+	end
+
+	error(GraphQLError.new(("ID cannot represent value: %s"):format(inspect(p17))))
+end
+
+function coerceID(p18) -- line: 326
+	-- upvalues: Number (copy), GraphQLError (copy), inspect (copy)
+	if typeof(p18) == "string" then
+		return p18
+	end
+
+	if typeof(p18) == "number" and Number.isInteger(p18) then
+		return (tostring(p18))
+	end
+
+	error(GraphQLError.new(("ID cannot represent value: %s"):format(inspect(p18))))
+end
+
+local v23 = GraphQLScalarType.new({
+	name = "ID",
+	description = "The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `\"4\"`) or integer (such as `4`) input value will be accepted as an ID.",
+	serialize = serializeID,
+	parseValue = coerceID,
+	parseLiteral = function(p19) -- line: 342
+		-- upvalues: Kind (copy), GraphQLError (copy), print (copy)
+		if p19.kind ~= Kind.STRING and p19.kind ~= Kind.INT then
+			error(GraphQLError.new("ID cannot represent a non-string and non-integer value: " .. print(p19), p19))
+		end
+
+		return p19.value
+	end
+})
+local v24 = Object.freeze({
+	v19,
+	v15,
+	v17,
+	v21,
+	v23
+})
+
 return {
-    GraphQLInt = v30, 
-    GraphQLFloat = v41, 
-    GraphQLString = v49, 
-    GraphQLBoolean = v55, 
-    GraphQLID = v60, 
-    specifiedScalarTypes = v61, 
-    isSpecifiedScalarType = function(v62) --[[ Line: 364 ]] --[[ Name: isSpecifiedScalarType ]]
-        -- upvalues: l_Array_0 (copy), v61 (copy)
-        return l_Array_0.some(v61, function(v63) --[[ Line: 365 ]]
-            -- upvalues: v62 (copy)
-            return v63.name == v62.name;
-        end);
-    end
-};
+	GraphQLInt = v15,
+	GraphQLFloat = v17,
+	GraphQLString = v19,
+	GraphQLBoolean = v21,
+	GraphQLID = v23,
+	specifiedScalarTypes = v24,
+	isSpecifiedScalarType = function(p20) -- line: 364
+		-- upvalues: Array (copy), v24 (copy)
+		return Array.some(v24, function(p21) -- line: 365
+			-- upvalues: p20 (copy)
+			return p21.name == p20.name
+		end)
+	end
+}

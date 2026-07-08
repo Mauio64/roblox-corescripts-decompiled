@@ -1,32 +1,34 @@
-local l_Parent_0 = script:FindFirstAncestor("StreamNotifications").Parent;
-local v1 = require(l_Parent_0.Promise);
-local l_HttpService_0 = game:GetService("HttpService");
-local l_Url_0 = require(l_Parent_0.Http).Url;
-local v4 = require(l_Parent_0.UrlBuilder).UrlBuilder.new({
-    base = l_Url_0.APIS_URL, 
-    path = "notifications/v1/report-notification"
-});
-return function(v5, v6) --[[ Line: 14 ]]
-    -- upvalues: v1 (copy), v4 (copy), l_HttpService_0 (copy)
-    if v6 == nil or v6 == "" then
-        return v1.reject();
-    else
-        local v7 = v4();
-        local v8 = {
-            notificationId = v6
-        };
-        return v5(v7, "POST", {
-            postBody = l_HttpService_0:JSONEncode(v8)
-        }):andThen(function(v9) --[[ Line: 28 ]]
-            -- upvalues: v1 (ref)
-            if v9.responseCode == 200 then
-                return v1.resolve();
-            else
-                return v1.reject();
-            end;
-        end, function(_) --[[ Line: 34 ]]
-            -- upvalues: v1 (ref)
-            return v1.reject();
-        end);
-    end;
-end;
+local Parent = script:FindFirstAncestor("StreamNotifications").Parent
+local Promise = require(Parent.Promise)
+local HttpService = game:GetService("HttpService")
+local Url = require(Parent.Http).Url
+local v5 = require(Parent.UrlBuilder).UrlBuilder.new({
+	path = "notifications/v1/report-notification",
+	base = Url.APIS_URL
+})
+
+return function(p1, p2) -- line: 14
+	-- upvalues: Promise (copy), v5 (copy), HttpService (copy)
+	if p2 == nil or p2 == "" then
+		return Promise.reject()
+	end
+
+	local v8 = v5()
+	local t1 = {
+		notificationId = p2
+	}
+
+	return p1(v8, "POST", {
+		postBody = HttpService:JSONEncode(t1)
+	}):andThen(function(p3) -- line: 28
+		-- upvalues: Promise (copy)
+		if p3.responseCode == 200 then
+			return Promise.resolve()
+		end
+
+		return Promise.reject()
+	end, function(_) -- line: 34
+		-- upvalues: Promise (copy)
+		return Promise.reject()
+	end)
+end

@@ -1,8 +1,11 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Error_0 = require(l_Parent_0.LuauPolyfill).Error;
-return function(v2, v3, ...) --[[ Line: 25 ]] --[[ Name: invariant ]]
-    -- upvalues: l_Error_0 (copy)
-    if not v2 then
-        error(l_Error_0(string.format(v3, ...)));
-    end;
-end;
+local ParentParent = script.Parent.Parent
+local Error = require(ParentParent.LuauPolyfill).Error
+
+local function invariant(p1, p2, ...) -- line: 25
+	-- upvalues: Error (copy)
+	if not p1 then
+		error(Error(string.format(p2, ...)))
+	end
+end
+
+return invariant

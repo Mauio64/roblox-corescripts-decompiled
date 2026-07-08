@@ -1,227 +1,240 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactIs);
-local v4 = require(script.Parent.constants);
-local v5 = require(l_script_FirstAncestor_0.Components.Image);
-local v6 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v8 = require(l_script_FirstAncestor_0.Components.View);
-local v9 = require(l_script_FirstAncestor_0.Providers.Preferences.usePreferences);
-local v10 = require(script.Parent.useProgressBinding);
-local v11 = require(script.Parent.useProgressVariants);
-local v12 = require(l_script_FirstAncestor_0.Utility.usePulseBinding);
-local v13 = require(l_script_FirstAncestor_0.Utility.useRotation);
-local v14 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v15 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v16 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = require(l_script_FirstAncestor_0.Enums.ProgressShape);
-local v18 = {
-    size = require(l_script_FirstAncestor_0.Enums.ProgressSize).Medium
-};
-local function _(v19, v20) --[[ Line: 42 ]] --[[ Name: getRotationFromProgress ]]
-    local v21 = v20 == Enum.HorizontalAlignment.Left and 180 or 0;
-    local v22 = v20 == Enum.HorizontalAlignment.Left and 360 or 180;
-    if v19 == nil then
-        return 0;
-    else
-        return (math.clamp(v19 * 360, v21, v22));
-    end;
-end;
-local function v25(v24) --[[ Line: 48 ]] --[[ Name: getLabelFromProgress ]]
-    if v24 == nil then
-        return "0%";
-    else
-        return (("%*%%"):format((math.floor(v24 * 100))));
-    end;
-end;
-local function v49(v26) --[[ Line: 52 ]] --[[ Name: ProgressGradient ]]
-    -- upvalues: v14 (copy), v9 (copy), v2 (copy), v3 (copy)
-    local l_side_0 = v26.side;
-    local l_isIndeterminate_0 = v26.isIndeterminate;
-    local l_progress_0 = v26.progress;
-    local v30 = v14();
-    local v31 = v9();
-    local v34 = v2.useMemo(function() --[[ Line: 66 ]]
-        -- upvalues: v30 (copy), l_isIndeterminate_0 (copy)
-        local l_Transparency_0 = v30.Color.Content.Emphasis.Transparency;
-        local v33 = l_isIndeterminate_0 and 1 or v30.Color.Shift.Shift_200.Transparency;
-        return NumberSequence.new({
-            NumberSequenceKeypoint.new(0, l_Transparency_0), 
-            NumberSequenceKeypoint.new(0.4999, l_Transparency_0), 
-            NumberSequenceKeypoint.new(0.5, v33), 
-            NumberSequenceKeypoint.new(1, v33)
-        });
-    end, {
-        v30, 
-        l_isIndeterminate_0
-    });
-    local v35 = v2.useMemo(function() --[[ Line: 78 ]]
-        -- upvalues: v30 (copy)
-        return ColorSequence.new({
-            ColorSequenceKeypoint.new(0, v30.Color.Content.Emphasis.Color3), 
-            ColorSequenceKeypoint.new(0.4999, v30.Color.Content.Emphasis.Color3), 
-            ColorSequenceKeypoint.new(0.5, v30.Color.Shift.Shift_200.Color3), 
-            ColorSequenceKeypoint.new(1, v30.Color.Shift.Shift_200.Color3)
-        });
-    end, {
-        v30
-    });
-    if l_isIndeterminate_0 and v31.reducedMotion then
-        local v36 = nil;
-        v36 = if not l_isIndeterminate_0 then v26.rotation else l_side_0 == Enum.HorizontalAlignment.Left and 0 or 180;
-        return v2.createElement("UIGradient", {
-            Transparency = v26.pulse:map(function(v37) --[[ Line: 96 ]]
-                -- upvalues: v30 (copy)
-                return NumberSequence.new((math.lerp(v30.Color.Content.Emphasis.Transparency, v30.Color.Shift.Shift_200.Transparency, v37)));
-            end), 
-            Color = v26.pulse:map(function(v38) --[[ Line: 105 ]]
-                -- upvalues: v30 (copy)
-                return ColorSequence.new(v30.Color.Content.Emphasis.Color3:Lerp(v30.Color.Shift.Shift_200.Color3, v38));
-            end), 
-            Rotation = v36
-        });
-    else
-        local l_createElement_0 = v2.createElement;
-        local v40 = "UIGradient";
-        local v41 = {
-            Transparency = v34, 
-            Color = v35
-        };
-        local v42;
-        if v3.isBinding(l_progress_0) then
-            v42 = l_progress_0:map(function(v43) --[[ Line: 117 ]]
-                -- upvalues: l_side_0 (copy)
-                local l_l_side_0_0 = l_side_0;
-                local v45 = l_l_side_0_0 == Enum.HorizontalAlignment.Left and 180 or 0;
-                local v46 = l_l_side_0_0 == Enum.HorizontalAlignment.Left and 360 or 180;
-                if v43 == nil then
-                    return 0;
-                else
-                    return (math.clamp(v43 * 360, v45, v46));
-                end;
-            end);
-        else
-            local v47 = l_side_0 == Enum.HorizontalAlignment.Left and 180 or 0;
-            local v48 = l_side_0 == Enum.HorizontalAlignment.Left and 360 or 180;
-            v42 = l_progress_0 == nil and 0 or math.clamp(l_progress_0 * 360, v47, v48);
-        end;
-        v41.Rotation = v42;
-        return (l_createElement_0(v40, v41));
-    end;
-end;
-return function(v50) --[[ Line: 125 ]] --[[ Name: ProgressCircle ]]
-    -- upvalues: v16 (copy), v18 (copy), v14 (copy), v9 (copy), v11 (copy), v10 (copy), v2 (copy), v13 (copy), v12 (copy), v4 (copy), v8 (copy), v15 (copy), v5 (copy), v49 (copy), v6 (copy), v3 (copy), v25 (copy)
-    local v51 = v16(v50, v18);
-    local v52 = v14();
-    local v53 = v9();
-    local v54 = v11(v52, v51.size);
-    local v55, v56 = v10(v51.value);
-    local v57 = v2.useBinding(0.8);
-    local v58 = v13(1);
-    local v59 = v12(1 / v4.INDETERMINATE_SHIMMER_SPEED);
-    local v60 = UDim2.fromOffset(v54.circle.size, v54.circle.size);
-    if v56 and not v53.reducedMotion then
-        return v2.createElement(v8, v15(v51, {
-            tag = "auto-xy", 
-            ref = v51.ref
-        }), {
-            IndeterminateContainer = v2.createElement(v8, {
-                Size = v60, 
-                Rotation = v58, 
-                testId = ("%*--indeterminate-container"):format(v51.testId)
-            }, {
-                LeftGradient = v2.createElement(v8, {
-                    Size = UDim2.fromScale(0.5, 1), 
-                    tag = "position-top-left clip", 
-                    testId = ("%*--left-gradient"):format(v51.testId)
-                }, {
-                    Image = v2.createElement(v5, {
-                        Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                        Size = UDim2.fromScale(2, 1), 
-                        tag = "content-emphasis position-top-left"
-                    }, {
-                        Gradient = v2.createElement(v49, {
-                            side = Enum.HorizontalAlignment.Left, 
-                            isIndeterminate = v56, 
-                            rotation = v58, 
-                            progress = v57, 
-                            pulse = v59
-                        })
-                    })
-                }), 
-                RightGradient = v2.createElement(v8, {
-                    Size = UDim2.fromScale(0.5, 1), 
-                    tag = "clip position-top-center", 
-                    testId = ("%*--right-gradient"):format(v51.testId)
-                }, {
-                    Image = v2.createElement(v5, {
-                        Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                        Size = UDim2.fromScale(2, 1), 
-                        Position = UDim2.fromScale(-1, 0), 
-                        tag = "content-emphasis"
-                    }, {
-                        Gradient = v2.createElement(v49, {
-                            side = Enum.HorizontalAlignment.Right, 
-                            isIndeterminate = v56, 
-                            rotation = v58, 
-                            progress = v57, 
-                            pulse = v59
-                        })
-                    })
-                })
-            })
-        });
-    else
-        return v2.createElement(v8, v15(v51, {
-            Size = v60, 
-            ref = v51.ref
-        }), {
-            LeftGradient = v2.createElement(v8, {
-                Size = UDim2.fromScale(0.5, 1), 
-                tag = "position-top-left clip", 
-                testId = ("%*--left-gradient"):format(v51.testId)
-            }, {
-                Image = v2.createElement(v5, {
-                    Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                    Size = UDim2.fromScale(2, 1), 
-                    tag = "content-emphasis position-top-left"
-                }, {
-                    Gradient = v2.createElement(v49, {
-                        side = Enum.HorizontalAlignment.Left, 
-                        isIndeterminate = v56, 
-                        rotation = v58, 
-                        progress = v55, 
-                        pulse = v59
-                    })
-                })
-            }), 
-            RightGradient = v2.createElement(v8, {
-                Size = UDim2.fromScale(0.5, 1), 
-                tag = "clip position-top-center", 
-                testId = ("%*--right-gradient"):format(v51.testId)
-            }, {
-                Image = v2.createElement(v5, {
-                    Image = "rbxasset://textures/ui/Controls/RadialFill.png", 
-                    Size = UDim2.fromScale(2, 1), 
-                    Position = UDim2.fromScale(-1, 0), 
-                    tag = "content-emphasis"
-                }, {
-                    Gradient = v2.createElement(v49, {
-                        side = Enum.HorizontalAlignment.Right, 
-                        isIndeterminate = v56, 
-                        rotation = v58, 
-                        progress = v55, 
-                        pulse = v59
-                    })
-                })
-            }), 
-            ProgressLabel = if not v54.circle.labelFont or v56 then nil else v2.createElement(v6, {
-                Text = if v3.isBinding(v55) then v55:map(v25) else v55 == nil and "0%" or ("%*%%"):format((math.floor(v55 * 100))), 
-                fontStyle = v54.circle.labelFont, 
-                tag = "anchor-center-center position-center-center", 
-                testId = ("%*--label"):format(v51.testId)
-            })
-        });
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local React = require(FoundationParent.React)
+local ReactIs = require(FoundationParent.ReactIs)
+local constants = require(script.Parent.constants)
+local Image = require(Foundation.Components.Image)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local usePreferences = require(Foundation.Providers.Preferences.usePreferences)
+local useProgressBinding = require(script.Parent.useProgressBinding)
+local useProgressVariants = require(script.Parent.useProgressVariants)
+local usePulseBinding = require(Foundation.Utility.usePulseBinding)
+local useRotation = require(Foundation.Utility.useRotation)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+require(Foundation.Enums.ProgressShape)
+
+local t1 = {
+	size = require(Foundation.Enums.ProgressSize).Medium
+}
+
+local function getRotationFromProgress(n1: number?, p1) -- line: 42
+	local v24 = p1 ~= Enum.HorizontalAlignment.Left and 0 or 180
+	local v25 = p1 ~= Enum.HorizontalAlignment.Left and 180 or 360
+
+	if n1 == nil then
+		return 0
+	end
+
+	return (math.clamp(n1 * 360, v24, v25))
+end
+local function getLabelFromProgress(n2: number?) -- line: 48
+	if n2 == nil then
+		return "0%"
+	end
+
+	return `{ math.floor(n2 * 100) }%`
+end
+local function ProgressGradient(t2: {[any]: any}) -- line: 52
+	-- upvalues: useTokens (copy), usePreferences (copy), React (copy), ReactIs (copy)
+	local side = t2.side
+	local isIndeterminate = t2.isIndeterminate
+	local progress = t2.progress
+	local v31 = useTokens()
+	local v32 = usePreferences()
+	local v33 = React.useMemo(function() -- line: 66
+		-- upvalues: v31 (copy), isIndeterminate (copy)
+		local EmphasisTransparency = v31.Color.Content.Emphasis.Transparency
+		local v53 = if not isIndeterminate then v31.Color.Shift.Shift_200.Transparency else 1
+
+		return NumberSequence.new({
+			NumberSequenceKeypoint.new(0, EmphasisTransparency),
+			NumberSequenceKeypoint.new(0.4999, EmphasisTransparency),
+			NumberSequenceKeypoint.new(0.5, v53),
+			NumberSequenceKeypoint.new(1, v53)
+		})
+	end, {
+		v31,
+		isIndeterminate
+	})
+	local v34 = React.useMemo(function() -- line: 78
+		-- upvalues: v31 (copy)
+		return ColorSequence.new({
+			ColorSequenceKeypoint.new(0, v31.Color.Content.Emphasis.Color3),
+			ColorSequenceKeypoint.new(0.4999, v31.Color.Content.Emphasis.Color3),
+			ColorSequenceKeypoint.new(0.5, v31.Color.Shift.Shift_200.Color3),
+			ColorSequenceKeypoint.new(1, v31.Color.Shift.Shift_200.Color3)
+		})
+	end, { v31 })
+
+	if isIndeterminate and v32.reducedMotion then
+		local v35 = if isIndeterminate then side ~= Enum.HorizontalAlignment.Left and 180 or 0 else t2.rotation
+
+		return React.createElement("UIGradient", {
+			Transparency = t2.pulse:map(function(n3: number) -- line: 96
+				-- upvalues: v31 (copy)
+				return NumberSequence.new((math.lerp(v31.Color.Content.Emphasis.Transparency, v31.Color.Shift.Shift_200.Transparency, n3)))
+			end),
+			Color = t2.pulse:map(function(n4: number) -- line: 105
+				-- upvalues: v31 (copy)
+				return ColorSequence.new(v31.Color.Content.Emphasis.Color3:Lerp(v31.Color.Shift.Shift_200.Color3, n4))
+			end),
+			Rotation = v35
+		})
+	end
+
+	local createElement = React.createElement
+	local t3 = {
+		Transparency = v33,
+		Color = v34
+	}
+	local v38
+
+	if ReactIs.isBinding(progress) then
+		v38 = progress:map(function(n5: number?) -- line: 117
+			-- upvalues: side (copy)
+			local v57 = side
+			local v58 = v57 ~= Enum.HorizontalAlignment.Left and 0 or 180
+			local v59 = v57 ~= Enum.HorizontalAlignment.Left and 180 or 360
+
+			if n5 == nil then
+				return 0
+			end
+
+			return (math.clamp(n5 * 360, v58, v59))
+		end)
+	else
+		local v39 = side ~= Enum.HorizontalAlignment.Left and 0 or 180
+		local v40 = side ~= Enum.HorizontalAlignment.Left and 180 or 360
+
+		v38 = if progress ~= nil then math.clamp(progress * 360, v39, v40) else 0
+	end
+
+	t3.Rotation = v38
+
+	return (createElement("UIGradient", t3))
+end
+local function ProgressCircle(p2) -- line: 125
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), usePreferences (copy), useProgressVariants (copy), useProgressBinding (copy), React (copy), useRotation (copy), usePulseBinding (copy), constants (copy), View (copy), withCommonProps (copy), Image (copy), ProgressGradient (copy), Text (copy), ReactIs (copy), getLabelFromProgress (copy)
+	local v42 = withDefaults(p2, t1)
+	local v43 = useTokens()
+	local v44 = usePreferences()
+	local v45 = useProgressVariants(v43, v42.size)
+	local v46, v47 = useProgressBinding(v42.value)
+	local v48 = React.useBinding(0.8)
+	local v49 = useRotation(1)
+	local v50 = usePulseBinding(1 / constants.INDETERMINATE_SHIMMER_SPEED)
+	local uDim2 = UDim2.fromOffset(v45.circle.size, v45.circle.size)
+
+	if v47 and not v44.reducedMotion then
+		return React.createElement(View, withCommonProps(v42, {
+			tag = "auto-xy",
+			ref = v42.ref
+		}), {
+			IndeterminateContainer = React.createElement(View, {
+				Size = uDim2,
+				Rotation = v49,
+				testId = `{ v42.testId }--indeterminate-container`
+			}, {
+				LeftGradient = React.createElement(View, {
+					tag = "position-top-left clip",
+					Size = UDim2.fromScale(0.5, 1),
+					testId = `{ v42.testId }--left-gradient`
+				}, {
+					Image = React.createElement(Image, {
+						Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+						tag = "position-top-left content-emphasis",
+						Size = UDim2.fromScale(2, 1)
+					}, {
+						Gradient = React.createElement(ProgressGradient, {
+							side = Enum.HorizontalAlignment.Left,
+							isIndeterminate = v47,
+							rotation = v49,
+							progress = v48,
+							pulse = v50
+						})
+					})
+				}),
+				RightGradient = React.createElement(View, {
+					tag = "position-top-center clip",
+					Size = UDim2.fromScale(0.5, 1),
+					testId = `{ v42.testId }--right-gradient`
+				}, {
+					Image = React.createElement(Image, {
+						Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+						tag = "content-emphasis",
+						Size = UDim2.fromScale(2, 1),
+						Position = UDim2.fromScale(-1, 0)
+					}, {
+						Gradient = React.createElement(ProgressGradient, {
+							side = Enum.HorizontalAlignment.Right,
+							isIndeterminate = v47,
+							rotation = v49,
+							progress = v48,
+							pulse = v50
+						})
+					})
+				})
+			})
+		})
+	end
+
+	return React.createElement(View, withCommonProps(v42, {
+		Size = uDim2,
+		ref = v42.ref
+	}), {
+		LeftGradient = React.createElement(View, {
+			tag = "position-top-left clip",
+			Size = UDim2.fromScale(0.5, 1),
+			testId = `{ v42.testId }--left-gradient`
+		}, {
+			Image = React.createElement(Image, {
+				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+				tag = "position-top-left content-emphasis",
+				Size = UDim2.fromScale(2, 1)
+			}, {
+				Gradient = React.createElement(ProgressGradient, {
+					side = Enum.HorizontalAlignment.Left,
+					isIndeterminate = v47,
+					rotation = v49,
+					progress = v46,
+					pulse = v50
+				})
+			})
+		}),
+		RightGradient = React.createElement(View, {
+			tag = "position-top-center clip",
+			Size = UDim2.fromScale(0.5, 1),
+			testId = `{ v42.testId }--right-gradient`
+		}, {
+			Image = React.createElement(Image, {
+				Image = "rbxasset://textures/ui/Controls/RadialFill.png",
+				tag = "content-emphasis",
+				Size = UDim2.fromScale(2, 1),
+				Position = UDim2.fromScale(-1, 0)
+			}, {
+				Gradient = React.createElement(ProgressGradient, {
+					side = Enum.HorizontalAlignment.Right,
+					isIndeterminate = v47,
+					rotation = v49,
+					progress = v46,
+					pulse = v50
+				})
+			})
+		}),
+		ProgressLabel = if not v45.circle.labelFont or v47 then nil else React.createElement(Text, {
+			tag = "position-center-center anchor-center-center",
+			Text = if not ReactIs.isBinding(v46) then if v46 ~= nil then `{ math.floor(v46 * 100) }%` else "0%" else v46:map(getLabelFromProgress),
+			fontStyle = v45.circle.labelFont,
+			testId = `{ v42.testId }--label`
+		})
+	})
+end
+
+return ProgressCircle

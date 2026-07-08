@@ -1,13 +1,14 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local v2 = require(l_Parent_1.React);
-local v3 = require(l_Parent_0.InviteCallbackContext);
-return function(v4) --[[ Line: 14 ]]
-    -- upvalues: v2 (copy), v3 (copy)
-    return v2.createElement(v3.Provider, {
-        value = {
-            inviteSingleFriend = v4.inviteSingleFriend, 
-            inviteMultiFriends = v4.inviteMultiFriends
-        }
-    }, v4.children);
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+local React = require(ParentParent.React)
+local InviteCallbackContext = require(scriptParent.InviteCallbackContext)
+
+return function(t1: {[any]: any}) -- line: 14
+	-- upvalues: React (copy), InviteCallbackContext (copy)
+	return React.createElement(InviteCallbackContext.Provider, {
+		value = {
+			inviteSingleFriend = t1.inviteSingleFriend,
+			inviteMultiFriends = t1.inviteMultiFriends
+		}
+	}, t1.children)
+end

@@ -1,3 +1,4 @@
-return function(...) --[[ Line: 9 ]] --[[ Name: noop ]]
+local function noop(...) -- line: 9
+end
 
-end;
+return noop

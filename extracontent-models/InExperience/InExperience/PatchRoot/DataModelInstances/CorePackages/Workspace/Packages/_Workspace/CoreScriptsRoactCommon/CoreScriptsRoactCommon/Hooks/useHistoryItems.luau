@@ -13,39 +13,46 @@ local function getNMostRecentUniqueUniverseIds(t1: {[any]: any}, _: number?) -- 
 	local t2 = {}
 	local t3 = {}
 
-	for _, v17 in t1 do
-		if not t3[v17] then
-			t3[v17] = true
-			table.insert(t2, v17)
+	for _, v19 in t1 do
+		if not t3[v19] then
+			t3[v19] = true
+			table.insert(t2, v19)
 		end
 	end
 
 	return t2
 end
-
-return function(n2: number?) --[[ useHistoryItems ]] -- line: 47
+local function getHistoryInfo(p1, p2) -- line: 37
+	return {
+		name = p1.name,
+		placeId = tonumber(p1.rootPlaceId),
+		universeId = tonumber(p1.universeId),
+		rating = p2.rating
+	}
+end
+local function useHistoryItems(n2: number?) -- line: 47
 	-- upvalues: React (copy), Signals (copy), default (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy), SignalsReact (copy)
-	local v21 = n2 or 2
-	local v22 = React.useMemo(function() -- line: 49
-		-- upvalues: Signals (copy), default (copy), v21 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
-		return (Signals.createComputed(function(p1) -- line: 50
-			-- upvalues: default (copy), v21 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
+	local v23 = n2 or 2
+	local v24 = React.useMemo(function() -- line: 49
+		-- upvalues: Signals (copy), default (copy), v23 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
+		return (Signals.createComputed(function(p3) -- line: 50
+			-- upvalues: default (copy), v23 (copy), getNMostRecentUniqueUniverseIds (copy), getGameInfoStore (copy), getVotesStore (copy)
 			local t4 = {}
-			local v25 = default:getUniverseHistorySignal(v21)(p1)
-			local v26 = getNMostRecentUniqueUniverseIds(v25, v21)
-			local v27 = getGameInfoStore(p1).getAndFetchGameInfos(v26)
-			local v28 = getVotesStore(p1).getAndFetchVotes(v26)
+			local v27 = default:getUniverseHistorySignal(v23)(p3)
+			local v28 = getNMostRecentUniqueUniverseIds(v27, v23)
+			local v29 = getGameInfoStore(p3).getAndFetchGameInfos(v28)
+			local v30 = getVotesStore(p3).getAndFetchVotes(v28)
 
-			for _, v30 in v26 do
-				local v31 = if not v27[v30] or not v27[v30].data then nil else v27[v30].data(p1)
-				local v32 = if not v28[v30] or not v28[v30].data then nil else v28[v30].data(p1)
+			for _, v32 in v28 do
+				local v33 = if not v29[v32] or not v29[v32].data then nil else v29[v32].data(p3)
+				local v34 = if not v30[v32] or not v30[v32].data then nil else v30[v32].data(p3)
 
-				if v31 and v32 then
+				if v33 and v34 then
 					table.insert(t4, {
-						name = v31.name,
-						placeId = tonumber(v31.rootPlaceId),
-						universeId = tonumber(v31.universeId),
-						rating = v32.rating
+						name = v33.name,
+						placeId = tonumber(v33.rootPlaceId),
+						universeId = tonumber(v33.universeId),
+						rating = v34.rating
 					})
 				end
 			end
@@ -53,10 +60,12 @@ return function(n2: number?) --[[ useHistoryItems ]] -- line: 47
 			return t4
 		end))
 	end, {
-		v21,
+		v23,
 		getGameInfoStore,
 		getVotesStore
 	})
 
-	return (SignalsReact.useSignalState(v22))
+	return (SignalsReact.useSignalState(v24))
 end
+
+return useHistoryItems

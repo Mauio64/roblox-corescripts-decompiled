@@ -1,4 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("DataHydration").Parent;
-local v1 = require(l_Parent_0.Signals);
-local v2 = require(script.Parent.createGamePassStore);
-return v1.createComputed(v2);
+local Parent = script:FindFirstAncestor("DataHydration").Parent
+local Signals = require(Parent.Signals)
+local createGamePassStore = require(script.Parent.createGamePassStore)
+
+return Signals.createComputed(createGamePassStore)

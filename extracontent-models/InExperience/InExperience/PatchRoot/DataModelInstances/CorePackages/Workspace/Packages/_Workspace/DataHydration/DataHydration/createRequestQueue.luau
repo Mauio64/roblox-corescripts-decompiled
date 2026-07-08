@@ -1,57 +1,63 @@
-return function() --[[ Line: 1 ]] --[[ Name: createRequestQueue ]]
-    local v0 = {};
-    local v1 = 1;
-    local function v3(v2) --[[ Line: 8 ]] --[[ Name: push ]]
-        -- upvalues: v0 (copy), v1 (ref)
-        if v0[v2] == nil then
-            v0[v2] = v1;
-            v1 = v1 + 1;
-        end;
-    end;
-    local function v13(v4) --[[ Line: 15 ]] --[[ Name: pop ]]
-        -- upvalues: v0 (copy)
-        local v5 = {};
-        for v6, _ in v0 do
-            table.insert(v5, v6);
-        end;
-        table.sort(v5, function(v8, v9) --[[ Line: 20 ]]
-            -- upvalues: v0 (ref)
-            return v0[v8] < v0[v9];
-        end);
-        if v4 < #v5 then
-            local v10 = {};
-            for v11 = 1, v4 do
-                local v12 = v5[v11];
-                table.insert(v10, v12);
-                v0[v12] = nil;
-            end;
-            return v10;
-        else
-            table.clear(v0);
-            return v5;
-        end;
-    end;
-    local function v16() --[[ Line: 38 ]] --[[ Name: isEmpty ]]
-        -- upvalues: v0 (copy)
-        for _, _ in v0 do
-            return false;
-        end;
-        return true;
-    end;
-    local function v18(v17) --[[ Line: 45 ]] --[[ Name: hasItem ]]
-        -- upvalues: v0 (copy)
-        return v0[v17] ~= nil;
-    end;
-    local function v19() --[[ Line: 49 ]] --[[ Name: clear ]]
-        -- upvalues: v0 (copy), v1 (ref)
-        table.clear(v0);
-        v1 = 1;
-    end;
-    return {
-        push = v3, 
-        pop = v13, 
-        isEmpty = v16, 
-        hasItem = v18, 
-        clear = v19
-    };
-end;
+local function createRequestQueue() -- line: 1
+	local t1 = {}
+	local n1 = 1
+
+	return {
+		push = function(s1: string) -- line: 8
+			-- upvalues: t1 (copy), n1 (ref)
+			if t1[s1] == nil then
+				t1[s1] = n1
+				n1 += 1
+			end
+		end,
+		pop = function(n2: number) -- line: 15
+			-- upvalues: t1 (copy)
+			local t2 = {}
+
+			for v7, _ in t1 do
+				table.insert(t2, v7)
+			end
+
+			table.sort(t2, function(p1, p2) -- line: 20
+				-- upvalues: t1 (copy)
+				return t1[p1] < t1[p2]
+			end)
+
+			if n2 < #t2 then
+				local t3 = {}
+
+				for i = 1, n2 do
+					local v11 = t2[i]
+
+					table.insert(t3, v11)
+					t1[v11] = nil
+				end
+
+				return t3
+			end
+
+			table.clear(t1)
+
+			return t2
+		end,
+		isEmpty = function() -- line: 38
+			-- upvalues: t1 (copy)
+			for _, _ in t1 do
+				return false
+			end
+
+			return true
+		end,
+		hasItem = function(s2: string) -- line: 45
+			-- upvalues: t1 (copy)
+			return t1[s2] ~= nil
+		end,
+		clear = function() -- line: 49
+			-- upvalues: t1 (copy), n1 (ref)
+			table.clear(t1)
+			n1 = 1
+		end
+	}
+end
+
+return createRequestQueue

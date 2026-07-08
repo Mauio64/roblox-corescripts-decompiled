@@ -1,24 +1,30 @@
-local v0 = {};
-v0.__index = v0;
-v0.__tostring = function(v1) --[[ Line: 3 ]]
-    local v2 = {};
-    for v3, v4 in pairs(v1) do
-        table.insert(v2, string.format("%s = %s", tostring(v3), (tostring(v4))));
-    end;
-    table.sort(v2);
-    return "<HttpResponse: " .. table.concat(v2, ", ") .. ">";
-end;
-v0.success = function(v5, v6) --[[ Line: 14 ]] --[[ Name: success ]]
-    -- upvalues: v0 (copy)
-    return (setmetatable({
-        responseCode = v5, 
-        responseBody = v6
-    }, v0));
-end;
-v0.error = function(v7) --[[ Line: 21 ]] --[[ Name: error ]]
-    -- upvalues: v0 (copy)
-    return (setmetatable({
-        HttpError = v7
-    }, v0));
-end;
-return v0;
+local t1 = {}
+
+t1.__index = t1
+
+function t1.__tostring(p1) -- line: 3
+	local t2 = {}
+
+	for k, v in pairs(p1) do
+		table.insert(t2, string.format("%s = %s", tostring(k), (tostring(v))))
+	end
+
+	table.sort(t2)
+
+	return "<HttpResponse: " .. table.concat(t2, ", ") .. ">"
+end
+function t1.success(p2, p3) -- line: 14
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		responseCode = p2,
+		responseBody = p3
+	}, t1))
+end
+function t1.error(p4) -- line: 21
+	-- upvalues: t1 (copy)
+	return (setmetatable({
+		HttpError = p4
+	}, t1))
+end
+
+return t1

@@ -1,15 +1,17 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Cryo);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local l_Parent_0 = script.Parent.Parent;
-local v4 = require(l_Parent_0.Actions.SetAssetToBundlesMapping);
-return v2.createReducer({}, {
-    [v4.name] = function(v5, v6) --[[ Line: 19 ]]
-        -- upvalues: v1 (copy)
-        local v7 = tostring(v6.assetId);
-        local l_bundleIds_0 = v6.bundleIds;
-        return v1.Dictionary.join(v5, {
-            [v7] = l_bundleIds_0
-        });
-    end
-});
+local CorePackages = game:GetService("CorePackages")
+local Cryo = require(CorePackages.Packages.Cryo)
+local Rodux = require(CorePackages.Packages.Rodux)
+local ParentParent = script.Parent.Parent
+local SetAssetToBundlesMapping = require(ParentParent.Actions.SetAssetToBundlesMapping)
+
+return Rodux.createReducer({}, {
+	[SetAssetToBundlesMapping.name] = function(p1, p2) -- line: 19
+		-- upvalues: Cryo (copy)
+		local str = tostring(p2.assetId)
+		local bundleIds = p2.bundleIds
+
+		return Cryo.Dictionary.join(p1, {
+			[str] = bundleIds
+		})
+	end
+})

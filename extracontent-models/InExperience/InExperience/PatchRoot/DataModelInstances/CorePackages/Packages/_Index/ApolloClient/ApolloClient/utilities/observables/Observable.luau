@@ -1,4 +1,6 @@
-local v0 = {};
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-v0.Observable = require(l_Parent_0.ZenObservable).Observable;
-return v0;
+local t1 = {}
+local ParentParent = script.Parent.Parent.Parent.Parent
+
+t1.Observable = require(ParentParent.ZenObservable).Observable
+
+return t1

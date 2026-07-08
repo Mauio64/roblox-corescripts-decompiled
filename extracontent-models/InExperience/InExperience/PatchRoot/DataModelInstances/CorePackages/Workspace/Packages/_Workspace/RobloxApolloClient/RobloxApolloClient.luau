@@ -1,4 +1,4 @@
 return {
-    initializeApolloClient = require(script.initializeApolloClient), 
-    ["jest.config"] = script["jest.config"]
-};
+	initializeApolloClient = require(script.initializeApolloClient),
+	["jest.config"] = script["jest.config"]
+}

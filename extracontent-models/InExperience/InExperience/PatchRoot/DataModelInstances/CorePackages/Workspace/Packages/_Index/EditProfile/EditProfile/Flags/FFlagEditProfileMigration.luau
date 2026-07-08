@@ -1,1 +1,1 @@
-return game:DefineFastFlag("EditProfileMigration_v1", false);
+return game:DefineFastFlag("EditProfileMigration_v1", false)

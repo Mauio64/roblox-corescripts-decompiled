@@ -1,189 +1,187 @@
-local l_Parent_0 = script.Parent.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local l_CaptureService_0 = game:GetService("CaptureService");
-local v3 = require(l_Parent_1.React);
-local v4 = require(l_Parent_1.RoactUtils);
-local v5 = require(l_Parent_1.Foundation);
-local l_IXPServiceWrapper_0 = require(l_Parent_1.IXPServiceWrapper).IXPServiceWrapper;
-local v7 = require(l_Parent_1.Localization);
-local v8 = require(l_Parent_1.SocialStopwatch);
-local l_Icon_0 = v5.Icon;
-local l_Image_0 = v5.Image;
-local l_PopoverAlign_0 = v5.Enums.PopoverAlign;
-local l_PopoverSide_0 = v5.Enums.PopoverSide;
-local l_Tooltip_0 = v5.Tooltip;
-local l_View_0 = v5.View;
-local v15 = require(l_Parent_0.Components.CoreUI.VideoCaptureControl);
-local v16 = require(l_Parent_0.Components.CoreUI.VoiceChatIndicator);
-local v17 = require(l_Parent_0.App.CapturesPolicy);
-local v18 = require(l_Parent_0.Constants);
-local v19 = require(l_Parent_0.Analytics.EventNames);
-local v20 = require(l_Parent_0.Thunks.TakeCapture);
-local v21 = require(l_Parent_0.Enums.SnapDirection);
-local v22 = require(l_Parent_0.Analytics.useAnalytics);
-local l_useCallback_0 = v3.useCallback;
-local v24 = require(l_Parent_0.Hooks.useCaptureControlsController);
-local l_useDispatch_0 = v4.Hooks.RoactRodux.useDispatch;
-local l_useEffect_0 = v3.useEffect;
-local l_useLocalization_0 = v7.Hooks.useLocalization;
-local v28 = require(l_Parent_0.Hooks.usePlayShutterSound);
-local l_useSelector_0 = v4.Hooks.RoactRodux.useSelector;
-local l_useTokens_0 = v5.Hooks.useTokens;
-local v31 = require(l_Parent_0.Hooks.useTopbarInset);
-local v32 = game:DefineFastFlag("CapturesLayerExposureLoggingEnabled", false);
-local v33 = game:DefineFastFlag("DebugOverrideCaptureControlsVideoGuacPolicy", false);
-local l_FStringSocialCaptureIXPLayer_0 = require(l_Parent_1.SharedFlags).FStringSocialCaptureIXPLayer;
-local v35 = {
-    [v21.Bottom] = l_PopoverSide_0.Top, 
-    [v21.Left] = l_PopoverSide_0.Right, 
-    [v21.Right] = l_PopoverSide_0.Left, 
-    [v21.Top] = l_PopoverSide_0.Bottom
-};
-return (v17.connect(function(v36) --[[ Line: 226 ]]
-    -- upvalues: l_CaptureService_0 (copy), v33 (copy)
-    return {
-        hasVideoCaptureCapability = v36.hasVideoCaptureCapability() and l_CaptureService_0:CanCaptureVideo() or v33
-    };
-end)(function(v37) --[[ Line: 65 ]]
-    -- upvalues: v22 (copy), l_useDispatch_0 (copy), l_useLocalization_0 (copy), l_useTokens_0 (copy), v31 (copy), l_useSelector_0 (copy), v18 (copy), l_useEffect_0 (copy), v32 (copy), l_IXPServiceWrapper_0 (copy), l_FStringSocialCaptureIXPLayer_0 (copy), v28 (copy), v3 (copy), v24 (copy), v19 (copy), l_useCallback_0 (copy), v8 (copy), v20 (copy), l_View_0 (copy), v5 (copy), v15 (copy), v35 (copy), l_Tooltip_0 (copy), l_PopoverAlign_0 (copy), l_Icon_0 (copy), v16 (copy), l_Image_0 (copy)
-    local v38 = v22();
-    local v39 = l_useDispatch_0();
-    local v40 = l_useLocalization_0({
-        captureScreenshot = "Feature.Captures.Title.CaptureScreenshotTooltip"
-    });
-    local v41 = l_useTokens_0();
-    local v42 = v31();
-    local v44 = l_useSelector_0(function(v43) --[[ Line: 75 ]]
-        -- upvalues: v18 (ref)
-        return v43[v18.RoduxKey].IsActive;
-    end);
-    local v46 = l_useSelector_0(function(v45) --[[ Line: 79 ]]
-        -- upvalues: v18 (ref)
-        return v45[v18.RoduxKey].IsVideoCaptureActive.status;
-    end);
-    l_useEffect_0(function() --[[ Line: 83 ]]
-        -- upvalues: v32 (ref), v44 (copy), l_IXPServiceWrapper_0 (ref), l_FStringSocialCaptureIXPLayer_0 (ref)
-        if v32 and v44 then
-            l_IXPServiceWrapper_0:LogFlagLinkedUserLayerExposure(l_FStringSocialCaptureIXPLayer_0);
-        end;
-    end, {
-        v44
-    });
-    local v47 = v28();
-    local v48 = v3.useMemo(function() --[[ Line: 91 ]]
-        -- upvalues: v42 (copy), v41 (copy)
-        return Vector2.new(v42.Min.X - v41.Padding.Small, v42.Height - v41.Padding.XSmall - v41.Padding.XXSmall);
-    end, {
-        v42, 
-        v41
-    });
-    local v49 = v24(v44, v48);
-    local l_dragContainerRef_0 = v49.dragContainerRef;
-    local l_dragDetectorRef_0 = v49.dragDetectorRef;
-    local l_dragItemAnchorPointBinding_0 = v49.dragItemAnchorPointBinding;
-    local l_dragItemPositionBinding_0 = v49.dragItemPositionBinding;
-    local l_dragItemRef_0 = v49.dragItemRef;
-    local l_isItemHorizontal_0 = v49.isItemHorizontal;
-    local l_screenshotButtonRef_0 = v49.screenshotButtonRef;
-    local l_snapDirection_0 = v49.snapDirection;
-    l_useEffect_0(function() --[[ Line: 109 ]]
-        -- upvalues: v44 (copy), v38 (copy), v19 (ref)
-        if v44 then
-            v38.fireEvent(v19.CapturesEntrypointViewed);
-        end;
-    end, {
-        v44
-    });
-    local v58 = l_useCallback_0(function() --[[ Line: 115 ]]
-        -- upvalues: v8 (ref), v38 (copy), v19 (ref), v47 (copy), v39 (copy), v20 (ref)
-        if not v8.Stopwatch.get(v8.Events.CaptureTaken) then
-            v8.Stopwatch.start(v8.Events.CaptureTaken);
-        end;
-        v38.fireEvent(v19.CapturesEntrypointActivated);
-        v47();
-        v39(v20());
-    end, {
-        v47
-    });
-    return v3.createElement(l_View_0, {
-        Position = UDim2.fromOffset(0, -v42.Height), 
-        Size = UDim2.new(1, 0, 1, v42.Height), 
-        tag = "padding-x-large padding-y-medium", 
-        ZIndex = v18.ZIndex.Entrypoint
-    }, {
-        PaddedContainer = v3.createElement(l_View_0, {
-            ref = l_dragContainerRef_0, 
-            tag = "anchor-center-center position-center-center size-full"
-        }, {
-            CaptureControls = if v44 then v3.createElement(l_View_0, {
-                AnchorPoint = l_dragItemAnchorPointBinding_0:map(function(v59) --[[ Line: 138 ]]
-                    return Vector2.new(v59.x, v59.y);
-                end), 
-                onActivated = function() --[[ Line: 141 ]] --[[ Name: onActivated ]]
+local ParentParent = script.Parent.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local CaptureService = game:GetService("CaptureService")
+local React = require(ParentParentParent.React)
+local RoactUtils = require(ParentParentParent.RoactUtils)
+local Foundation = require(ParentParentParent.Foundation)
+local IXPServiceWrapper = require(ParentParentParent.IXPServiceWrapper).IXPServiceWrapper
+local Localization = require(ParentParentParent.Localization)
+local SocialStopwatch = require(ParentParentParent.SocialStopwatch)
+local Icon = Foundation.Icon
+local FoundationImage = Foundation.Image
+local PopoverAlign = Foundation.Enums.PopoverAlign
+local PopoverSide = Foundation.Enums.PopoverSide
+local Tooltip = Foundation.Tooltip
+local View = Foundation.View
+local VideoCaptureControl = require(ParentParent.Components.CoreUI.VideoCaptureControl)
+local VoiceChatIndicator = require(ParentParent.Components.CoreUI.VoiceChatIndicator)
+local CapturesPolicy = require(ParentParent.App.CapturesPolicy)
+local Constants = require(ParentParent.Constants)
+local EventNames = require(ParentParent.Analytics.EventNames)
+local TakeCapture = require(ParentParent.Thunks.TakeCapture)
+local SnapDirection = require(ParentParent.Enums.SnapDirection)
+local useAnalytics = require(ParentParent.Analytics.useAnalytics)
+local useCallback = React.useCallback
+local useCaptureControlsController = require(ParentParent.Hooks.useCaptureControlsController)
+local useDispatch = RoactUtils.Hooks.RoactRodux.useDispatch
+local useEffect = React.useEffect
+local useLocalization = Localization.Hooks.useLocalization
+local usePlayShutterSound = require(ParentParent.Hooks.usePlayShutterSound)
+local useSelector = RoactUtils.Hooks.RoactRodux.useSelector
+local useTokens = Foundation.Hooks.useTokens
+local useTopbarInset = require(ParentParent.Hooks.useTopbarInset)
+local v33 = game:DefineFastFlag("CapturesLayerExposureLoggingEnabled", false)
+local v34 = game:DefineFastFlag("DebugOverrideCaptureControlsVideoGuacPolicy", false)
+local FStringSocialCaptureIXPLayer = require(ParentParentParent.SharedFlags).FStringSocialCaptureIXPLayer
+local t1 = {
+	[SnapDirection.Bottom] = PopoverSide.Top,
+	[SnapDirection.Left] = PopoverSide.Right,
+	[SnapDirection.Right] = PopoverSide.Left,
+	[SnapDirection.Top] = PopoverSide.Bottom
+}
 
-                end, 
-                Position = l_dragItemPositionBinding_0:map(function(v60) --[[ Line: 142 ]]
-                    return UDim2.fromOffset(v60.xOffset, v60.yOffset);
-                end), 
-                ref = l_dragItemRef_0, 
-                stateLayer = {
-                    affordance = v5.Enums.StateLayerAffordance.None
-                }, 
-                tag = {
-                    ["row auto-x padding-x-small padding-y-xsmall size-0-1100"] = l_isItemHorizontal_0, 
-                    ["col auto-y padding-y-small padding-x-xsmall size-1100-0"] = not l_isItemHorizontal_0, 
-                    ["align-x-center align-y-center bg-over-media-0 flex-evenly radius-circle"] = true
-                }
-            }, {
-                DragDetector = v3.createElement("UIDragDetector", {
-                    DragStyle = Enum.UIDragDetectorDragStyle.Scriptable, 
-                    BoundingUI = l_dragContainerRef_0, 
-                    ref = l_dragDetectorRef_0, 
-                    ResponseStyle = Enum.UIDragDetectorResponseStyle.CustomOffset
-                }), 
-                VideoCaptureControl = if v37.hasVideoCaptureCapability then v3.createElement(v15, {
-                    layoutOrder = 1, 
-                    popoverSide = v35[l_snapDirection_0]
-                }) else nil, 
-                ScreenshotCTA = if not v46 then v3.createElement(l_View_0, {
-                    LayoutOrder = 2, 
-                    tag = {
-                        ["size-1200-1200"] = true, 
-                        ["anchor-center-center auto-xy clip position-center-center radius-circle"] = true
-                    }, 
-                    onActivated = v58, 
-                    ref = l_screenshotButtonRef_0
-                }, {
-                    ScreenshotIconWithTooltip = v3.createElement(l_Tooltip_0, {
-                        align = l_PopoverAlign_0.Center, 
-                        side = v35[l_snapDirection_0], 
-                        title = v40.captureScreenshot
-                    }, v3.createElement(l_View_0, {
-                        tag = "size-1200-1200"
-                    }, {
-                        v3.createElement(l_Icon_0, {
-                            AnchorPoint = Vector2.new(0.5, 0.5), 
-                            Position = UDim2.fromScale(0.5, 0.5), 
-                            name = "icons/controls/screenCapture", 
-                            style = v41.Color.Content.Emphasis
-                        })
-                    }))
-                }) else nil, 
-                VoiceChatIndicator = if v46 then v3.createElement(v16, {
-                    layoutOrder = 3, 
-                    popoverSide = v35[l_snapDirection_0]
-                }) else nil, 
-                DragAffordance = v3.createElement(l_View_0, {
-                    LayoutOrder = 4, 
-                    tag = "anchor-center-center auto-xy padding-xxsmall position-center-center"
-                }, {
-                    DragAffordanceIcon = v3.createElement(l_Image_0, {
-                        Image = "component_assets/dragger_small", 
-                        Rotation = l_isItemHorizontal_0 and 90 or 0, 
-                        tag = "anchor-center-center content-muted position-center-center size-600-400"
-                    })
-                })
-            }) else nil
-        })
-    });
-end));
+return (CapturesPolicy.connect(function(p1) -- line: 226
+	-- upvalues: CaptureService (copy), v34 (copy)
+	return {
+		hasVideoCaptureCapability = p1.hasVideoCaptureCapability() and CaptureService:CanCaptureVideo() or v34
+	}
+end)(function(t2: {[any]: any}) -- line: 65
+	-- upvalues: useAnalytics (copy), useDispatch (copy), useLocalization (copy), useTokens (copy), useTopbarInset (copy), useSelector (copy), Constants (copy), useEffect (copy), v33 (copy), IXPServiceWrapper (copy), FStringSocialCaptureIXPLayer (copy), usePlayShutterSound (copy), React (copy), useCaptureControlsController (copy), EventNames (copy), useCallback (copy), SocialStopwatch (copy), TakeCapture (copy), View (copy), Foundation (copy), VideoCaptureControl (copy), t1 (copy), Tooltip (copy), PopoverAlign (copy), Icon (copy), VoiceChatIndicator (copy), FoundationImage (copy)
+	local v38 = useAnalytics()
+	local v39 = useDispatch()
+	local v40 = useLocalization({
+		captureScreenshot = "Feature.Captures.Title.CaptureScreenshotTooltip"
+	})
+	local v41 = useTokens()
+	local v42 = useTopbarInset()
+	local v43 = useSelector(function(p2) -- line: 75
+		-- upvalues: Constants (copy)
+		return p2[Constants.RoduxKey].IsActive
+	end)
+	local v44 = useSelector(function(p3) -- line: 79
+		-- upvalues: Constants (copy)
+		return p3[Constants.RoduxKey].IsVideoCaptureActive.status
+	end)
+
+	useEffect(function() -- line: 83
+		-- upvalues: v33 (copy), v43 (copy), IXPServiceWrapper (copy), FStringSocialCaptureIXPLayer (copy)
+		if v33 and v43 then
+			IXPServiceWrapper:LogFlagLinkedUserLayerExposure(FStringSocialCaptureIXPLayer)
+		end
+	end, { v43 })
+
+	local v45 = usePlayShutterSound()
+	local v46 = React.useMemo(function() -- line: 91
+		-- upvalues: v42 (copy), v41 (copy)
+		return Vector2.new(v42.Min.X - v41.Padding.Small, v42.Height - v41.Padding.XSmall - v41.Padding.XXSmall)
+	end, {
+		v42,
+		v41
+	})
+	local v47 = useCaptureControlsController(v43, v46)
+	local dragContainerRef = v47.dragContainerRef
+	local dragDetectorRef = v47.dragDetectorRef
+	local dragItemAnchorPointBinding = v47.dragItemAnchorPointBinding
+	local dragItemPositionBinding = v47.dragItemPositionBinding
+	local dragItemRef = v47.dragItemRef
+	local isItemHorizontal = v47.isItemHorizontal
+	local screenshotButtonRef = v47.screenshotButtonRef
+	local snapDirection = v47.snapDirection
+
+	useEffect(function() -- line: 109
+		-- upvalues: v43 (copy), v38 (copy), EventNames (copy)
+		if v43 then
+			v38.fireEvent(EventNames.CapturesEntrypointViewed)
+		end
+	end, { v43 })
+
+	local v56 = useCallback(function() -- line: 115
+		-- upvalues: SocialStopwatch (copy), v38 (copy), EventNames (copy), v45 (copy), v39 (copy), TakeCapture (copy)
+		if not SocialStopwatch.Stopwatch.get(SocialStopwatch.Events.CaptureTaken) then
+			SocialStopwatch.Stopwatch.start(SocialStopwatch.Events.CaptureTaken)
+		end
+
+		v38.fireEvent(EventNames.CapturesEntrypointActivated)
+		v45()
+		v39(TakeCapture())
+	end, { v45 })
+
+	return React.createElement(View, {
+		tag = "padding-x-large padding-y-medium",
+		Position = UDim2.fromOffset(0, -v42.Height),
+		Size = UDim2.new(1, 0, 1, v42.Height),
+		ZIndex = Constants.ZIndex.Entrypoint
+	}, {
+		PaddedContainer = React.createElement(View, {
+			tag = "anchor-center-center position-center-center size-full",
+			ref = dragContainerRef
+		}, {
+			CaptureControls = if not v43 then nil else React.createElement(View, {
+				AnchorPoint = dragItemAnchorPointBinding:map(function(p4) -- line: 138
+					return Vector2.new(p4.x, p4.y)
+				end),
+				onActivated = function() -- line: 141
+				end,
+				Position = dragItemPositionBinding:map(function(p5) -- line: 142
+					return UDim2.fromOffset(p5.xOffset, p5.yOffset)
+				end),
+				ref = dragItemRef,
+				stateLayer = {
+					affordance = Foundation.Enums.StateLayerAffordance.None
+				},
+				tag = {
+					["row auto-x padding-x-small padding-y-xsmall size-0-1100"] = isItemHorizontal,
+					["col auto-y padding-y-small padding-x-xsmall size-1100-0"] = not isItemHorizontal,
+					["align-x-center align-y-center bg-over-media-0 flex-evenly radius-circle"] = true
+				}
+			}, {
+				DragDetector = React.createElement("UIDragDetector", {
+					DragStyle = Enum.UIDragDetectorDragStyle.Scriptable,
+					BoundingUI = dragContainerRef,
+					ref = dragDetectorRef,
+					ResponseStyle = Enum.UIDragDetectorResponseStyle.CustomOffset
+				}),
+				VideoCaptureControl = if not t2.hasVideoCaptureCapability then nil else React.createElement(VideoCaptureControl, {
+					layoutOrder = 1,
+					popoverSide = t1[snapDirection]
+				}),
+				ScreenshotCTA = if v44 then nil else React.createElement(View, {
+					LayoutOrder = 2,
+					tag = {
+						["size-1200-1200"] = true,
+						["anchor-center-center auto-xy clip position-center-center radius-circle"] = true
+					},
+					onActivated = v56,
+					ref = screenshotButtonRef
+				}, {
+					ScreenshotIconWithTooltip = React.createElement(Tooltip, {
+						align = PopoverAlign.Center,
+						side = t1[snapDirection],
+						title = v40.captureScreenshot
+					}, React.createElement(View, {
+						tag = "size-1200-1200"
+					}, { React.createElement(Icon, {
+						name = "icons/controls/screenCapture",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Position = UDim2.fromScale(0.5, 0.5),
+						style = v41.Color.Content.Emphasis
+					}) }))
+				}),
+				VoiceChatIndicator = if not v44 then nil else React.createElement(VoiceChatIndicator, {
+					layoutOrder = 3,
+					popoverSide = t1[snapDirection]
+				}),
+				DragAffordance = React.createElement(View, {
+					LayoutOrder = 4,
+					tag = "anchor-center-center auto-xy padding-xxsmall position-center-center"
+				}, {
+					DragAffordanceIcon = React.createElement(FoundationImage, {
+						Image = "component_assets/dragger_small",
+						tag = "anchor-center-center content-muted position-center-center size-600-400",
+						Rotation = not isItemHorizontal and 0 or 90
+					})
+				})
+			})
+		})
+	})
+end))

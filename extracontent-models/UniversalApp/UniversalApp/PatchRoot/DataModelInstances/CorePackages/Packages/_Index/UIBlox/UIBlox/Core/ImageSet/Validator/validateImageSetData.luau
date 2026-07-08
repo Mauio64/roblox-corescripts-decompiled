@@ -1,7 +1,8 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.t);
-return (v1.strictInterface({
-    ImageRectOffset = v1.Vector2, 
-    ImageRectSize = v1.Vector2, 
-    Image = v1.string
-}));
+local ParentParent = script.Parent.Parent.Parent.Parent.Parent
+local t = require(ParentParent.t)
+
+return (t.strictInterface({
+	ImageRectOffset = t.Vector2,
+	ImageRectSize = t.Vector2,
+	Image = t.string
+}))

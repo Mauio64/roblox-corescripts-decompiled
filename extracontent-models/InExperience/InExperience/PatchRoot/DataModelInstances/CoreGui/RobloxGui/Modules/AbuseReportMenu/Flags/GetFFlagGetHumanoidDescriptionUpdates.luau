@@ -1,4 +1,5 @@
-game:DefineFastFlag("GetHumanoidDescriptionUpdates", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("GetHumanoidDescriptionUpdates");
-end;
+game:DefineFastFlag("GetHumanoidDescriptionUpdates", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("GetHumanoidDescriptionUpdates")
+end

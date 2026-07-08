@@ -1,11 +1,14 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameIconRodux");
-local v1 = require(l_script_FirstAncestor_0.GameIcons.GameIconReducer);
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-return function(v4) --[[ Line: 7 ]] --[[ Name: useGameIconSelector ]]
-    -- upvalues: l_useSelector_0 (copy), v1 (copy)
-    return (l_useSelector_0(function(v5) --[[ Line: 8 ]]
-        -- upvalues: v1 (ref), v4 (copy)
-        return v5[v1.key][v4];
-    end));
-end;
+local GameIconRodux = script:FindFirstAncestor("GameIconRodux")
+local GameIconReducer = require(GameIconRodux.GameIcons.GameIconReducer)
+local GameIconRoduxParent = GameIconRodux.Parent
+local useSelector = require(GameIconRoduxParent.RoactUtils).Hooks.RoactRodux.useSelector
+
+local function useGameIconSelector(p1) -- line: 7
+	-- upvalues: useSelector (copy), GameIconReducer (copy)
+	return (useSelector(function(p2) -- line: 8
+		-- upvalues: GameIconReducer (copy), p1 (copy)
+		return p2[GameIconReducer.key][p1]
+	end))
+end
+
+return useGameIconSelector

@@ -1,8 +1,12 @@
-return function() --[[ Line: 2 ]] --[[ Name: createNextOrder ]]
-    local v0 = 0;
-    return function() --[[ Line: 5 ]]
-        -- upvalues: v0 (ref)
-        v0 = v0 + 1;
-        return v0;
-    end;
-end;
+local function createNextOrder() -- line: 2
+	local n1 = 0
+
+	return function() -- line: 5
+		-- upvalues: n1 (ref)
+		n1 += 1
+
+		return n1
+	end
+end
+
+return createNextOrder

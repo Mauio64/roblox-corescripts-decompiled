@@ -1,15 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local _ = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactIs);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-return function(v5) --[[ Line: 10 ]] --[[ Name: useProgressBinding ]]
-    -- upvalues: v3 (copy)
-    if v3.isBinding(v5) then
-        return v5:map(function(v6) --[[ Line: 15 ]]
-            return (math.clamp(v6 / 100, 0, 1));
-        end), v5 == nil;
-    else
-        return if v5 ~= nil then math.clamp(v5 / 100, 0, 1) else nil, v5 == nil;
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+
+require(FoundationParent.React)
+
+local ReactIs = require(FoundationParent.ReactIs)
+
+require(Foundation.Components.Types)
+
+local function useProgressBinding(p1) -- line: 10
+	-- upvalues: ReactIs (copy)
+	if ReactIs.isBinding(p1) then
+		return p1:map(function(n1: number) -- line: 15
+			return (math.clamp(n1 / 100, 0, 1))
+		end), p1 == nil
+	end
+
+	return if p1 == nil then nil else math.clamp(p1 / 100, 0, 1), p1 == nil
+end
+
+return useProgressBinding

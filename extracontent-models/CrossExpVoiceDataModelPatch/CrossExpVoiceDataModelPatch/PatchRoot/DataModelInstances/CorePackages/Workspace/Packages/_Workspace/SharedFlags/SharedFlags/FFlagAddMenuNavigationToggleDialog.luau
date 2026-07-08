@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddMenuNavigationToggleDialog", false);
+return game:DefineFastFlag("AddMenuNavigationToggleDialog", false)

@@ -1,4 +1,4 @@
 return {
-    AutoSync = "AutoSync", 
-    CI = "CI"
-};
+	AutoSync = "AutoSync",
+	CI = "CI"
+}

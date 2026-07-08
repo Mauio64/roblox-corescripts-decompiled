@@ -1,1 +1,1 @@
-return require(script.StartSquadTile);
+return require(script.StartSquadTile)

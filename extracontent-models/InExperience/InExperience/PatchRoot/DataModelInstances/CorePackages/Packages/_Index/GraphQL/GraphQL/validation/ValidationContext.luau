@@ -1,198 +1,234 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_1.LuauPolyfill);
-local l_Array_0 = v2.Array;
-local l_Map_0 = v2.Map;
-local l_jsutils_0 = l_Parent_0.jsutils;
-local _ = require(l_jsutils_0.ObjMap);
-local l_language_0 = l_Parent_0.language;
-local l_Kind_0 = require(l_language_0.kinds).Kind;
-local l_visit_0 = require(l_language_0.visitor).visit;
-local _ = require(l_language_0.ast);
-local _ = require(l_Parent_0.error.GraphQLError);
-local v12 = require(l_Parent_0.utilities.TypeInfo);
-local l_TypeInfo_0 = v12.TypeInfo;
-local l_visitWithTypeInfo_0 = v12.visitWithTypeInfo;
-local _ = require(l_Parent_0.type.schema);
-local _ = require(l_Parent_0.type.directives);
-local _ = require(l_Parent_0.type.definition);
-local v18 = {};
-local v19 = {
-    __index = v18
-};
-v18.new = function(v20, v21) --[[ Line: 100 ]] --[[ Name: new ]]
-    -- upvalues: v19 (copy)
-    return (setmetatable({
-        _ast = v20, 
-        _fragments = nil, 
-        _fragmentSpreads = {}, 
-        _recursivelyReferencedFragments = {}, 
-        _onError = v21
-    }, v19));
-end;
-v18.reportError = function(v22, v23) --[[ Line: 115 ]] --[[ Name: reportError ]]
-    v22._onError(v23);
-end;
-v18.getDocument = function(v24) --[[ Line: 119 ]] --[[ Name: getDocument ]]
-    return v24._ast;
-end;
-v18.getFragment = function(v25, v26) --[[ Line: 123 ]] --[[ Name: getFragment ]]
-    -- upvalues: l_Kind_0 (copy)
-    local v27 = nil;
-    if v25._fragments then
-        v27 = v25._fragments;
-    else
-        v27 = {};
-        for _, v29 in ipairs(v25:getDocument().definitions) do
-            if v29.kind == l_Kind_0.FRAGMENT_DEFINITION then
-                v27[v29.name.value] = v29;
-            end;
-        end;
-        v25._fragments = v27;
-    end;
-    return v27[v26];
-end;
-v18.getFragmentSpreads = function(v30, v31) --[[ Line: 139 ]] --[[ Name: getFragmentSpreads ]]
-    -- upvalues: l_Kind_0 (copy)
-    local v32 = v30._fragmentSpreads[v31] or {};
-    if not v30._fragmentSpreads[v31] then
-        local v33 = {
-            v31
-        };
-        while #v33 ~= 0 do
-            local v34 = table.remove(v33);
-            for _, v36 in ipairs(v34.selections) do
-                if v36.kind == l_Kind_0.FRAGMENT_SPREAD then
-                    table.insert(v32, v36);
-                elseif v36.selectionSet then
-                    table.insert(v33, v36.selectionSet);
-                end;
-            end;
-        end;
-        v30._fragmentSpreads[v31] = v32;
-    end;
-    return v32;
-end;
-v18.getRecursivelyReferencedFragments = function(v37, v38) --[[ Line: 165 ]] --[[ Name: getRecursivelyReferencedFragments ]]
-    local v39 = v37._recursivelyReferencedFragments[v38] or {};
-    if not v37._recursivelyReferencedFragments[v38] then
-        local v40 = {};
-        local v41 = {
-            v38.selectionSet
-        };
-        while #v41 ~= 0 do
-            local v42 = table.remove(v41);
-            for _, v44 in ipairs(v37:getFragmentSpreads(v42)) do
-                local l_value_0 = v44.name.value;
-                if v40[l_value_0] ~= true then
-                    v40[l_value_0] = true;
-                    local v46 = v37:getFragment(l_value_0);
-                    if v46 then
-                        table.insert(v39, v46);
-                        table.insert(v41, v46.selectionSet);
-                    end;
-                end;
-            end;
-        end;
-        v37._recursivelyReferencedFragments[v38] = v39;
-    end;
-    return v39;
-end;
-local v47 = setmetatable({}, {
-    __index = v18
-});
-local v48 = {
-    __index = v47
-};
-v47.new = function(v49, v50, v51) --[[ Line: 208 ]] --[[ Name: new ]]
-    -- upvalues: v18 (copy), v48 (copy)
-    local v52 = v18.new(v49, v51);
-    v52._schema = v50;
-    return (setmetatable(v52, v48));
-end;
-v47.getSchema = function(v53) --[[ Line: 218 ]] --[[ Name: getSchema ]]
-    return v53._schema;
-end;
-local v54 = setmetatable({}, {
-    __index = v18
-});
-local v55 = {
-    __index = v54
-};
-v54.new = function(v56, v57, v58, v59) --[[ Line: 257 ]] --[[ Name: new ]]
-    -- upvalues: v18 (copy), l_Map_0 (copy), v55 (copy)
-    local v60 = v18.new(v57, v59);
-    v60._schema = v56;
-    v60._typeInfo = v58;
-    v60._variableUsages = l_Map_0.new();
-    v60._recursiveVariableUsages = l_Map_0.new();
-    return (setmetatable(v60, v55));
-end;
-v54.getSchema = function(v61) --[[ Line: 274 ]] --[[ Name: getSchema ]]
-    return v61._schema;
-end;
-v54.getVariableUsages = function(v62, v63) --[[ Line: 278 ]] --[[ Name: getVariableUsages ]]
-    -- upvalues: l_TypeInfo_0 (copy), l_visit_0 (copy), l_visitWithTypeInfo_0 (copy)
-    local v64 = v62._variableUsages[v63];
-    if not v64 then
-        local v65 = {};
-        local v66 = l_TypeInfo_0.new(v62._schema);
-        l_visit_0(v63, l_visitWithTypeInfo_0(v66, {
-            VariableDefinition = function() --[[ Line: 286 ]] --[[ Name: VariableDefinition ]]
-                return false;
-            end, 
-            Variable = function(_, v68) --[[ Line: 289 ]] --[[ Name: Variable ]]
-                -- upvalues: v65 (copy), v66 (copy)
-                table.insert(v65, {
-                    node = v68, 
-                    type = v66:getInputType(), 
-                    defaultValue = v66:getDefaultValue()
-                });
-            end
-        }));
-        v64 = v65;
-        v62._variableUsages[v63] = v64;
-    end;
-    return v64;
-end;
-v54.getRecursiveVariableUsages = function(v69, v70) --[[ Line: 305 ]] --[[ Name: getRecursiveVariableUsages ]]
-    -- upvalues: l_Array_0 (copy)
-    local v71 = v69._recursiveVariableUsages[v70];
-    if not v71 then
-        v71 = v69:getVariableUsages(v70);
-        for _, v73 in ipairs(v69:getRecursivelyReferencedFragments(v70)) do
-            v71 = l_Array_0.concat(v71, v69:getVariableUsages(v73));
-        end;
-        v69._recursiveVariableUsages[v70] = v71;
-    end;
-    return v71;
-end;
-v54.getType = function(v74) --[[ Line: 319 ]] --[[ Name: getType ]]
-    return v74._typeInfo:getType();
-end;
-v54.getParentType = function(v75) --[[ Line: 323 ]] --[[ Name: getParentType ]]
-    return v75._typeInfo:getParentType();
-end;
-v54.getInputType = function(v76) --[[ Line: 327 ]] --[[ Name: getInputType ]]
-    return v76._typeInfo:getInputType();
-end;
-v54.getParentInputType = function(v77) --[[ Line: 331 ]] --[[ Name: getParentInputType ]]
-    return v77._typeInfo:getParentInputType();
-end;
-v54.getFieldDef = function(v78) --[[ Line: 335 ]] --[[ Name: getFieldDef ]]
-    return v78._typeInfo:getFieldDef();
-end;
-v54.getDirective = function(v79) --[[ Line: 339 ]] --[[ Name: getDirective ]]
-    return v79._typeInfo:getDirective();
-end;
-v54.getArgument = function(v80) --[[ Line: 343 ]] --[[ Name: getArgument ]]
-    return v80._typeInfo:getArgument();
-end;
-v54.getEnumValue = function(v81) --[[ Line: 347 ]] --[[ Name: getEnumValue ]]
-    return v81._typeInfo:getEnumValue();
-end;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local LuauPolyfill = require(ParentParentParent.LuauPolyfill)
+local Array = LuauPolyfill.Array
+local Map = LuauPolyfill.Map
+local jsutils = ParentParent.jsutils
+
+require(jsutils.ObjMap)
+
+local language = ParentParent.language
+local Kind = require(language.kinds).Kind
+local visit = require(language.visitor).visit
+
+require(language.ast)
+require(ParentParent.error.GraphQLError)
+
+local TypeInfo = require(ParentParent.utilities.TypeInfo)
+local TypeInfo2 = TypeInfo.TypeInfo
+local visitWithTypeInfo = TypeInfo.visitWithTypeInfo
+
+require(ParentParent.type.schema)
+require(ParentParent.type.directives)
+require(ParentParent.type.definition)
+
+local t1 = {}
+local t2 = {
+	__index = t1
+}
+
+function t1.new(p1, p2: ((...any) -> ...any)) -- line: 100
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		_fragments = nil,
+		_ast = p1,
+		_fragmentSpreads = {},
+		_recursivelyReferencedFragments = {},
+		_onError = p2
+	}, t2))
+end
+function t1.reportError(p3, p4) -- line: 115
+	p3._onError(p4)
+end
+function t1.getDocument(p5) -- line: 119
+	return p5._ast
+end
+function t1.getFragment(t3: {[any]: any}, s1: string) -- line: 123
+	-- upvalues: Kind (copy)
+	local _fragments
+
+	if t3._fragments then
+		_fragments = t3._fragments
+	else
+		_fragments = {}
+
+		for _, v in ipairs(t3:getDocument().definitions) do
+			if v.kind == Kind.FRAGMENT_DEFINITION then
+				_fragments[v.name.value] = v
+			end
+		end
+
+		t3._fragments = _fragments
+	end
+
+	return _fragments[s1]
+end
+function t1.getFragmentSpreads(p6, p7) -- line: 139
+	-- upvalues: Kind (copy)
+	local v31 = p6._fragmentSpreads[p7] or {}
+
+	if not p6._fragmentSpreads[p7] then
+		local t4 = { p7 }
+
+		while #t4 ~= 0 do
+			local v33 = table.remove(t4)
+
+			for _, v in ipairs(v33.selections) do
+				if v.kind == Kind.FRAGMENT_SPREAD then
+					table.insert(v31, v)
+				elseif v.selectionSet then
+					table.insert(t4, v.selectionSet)
+				end
+			end
+		end
+
+		p6._fragmentSpreads[p7] = v31
+	end
+
+	return v31
+end
+function t1.getRecursivelyReferencedFragments(p8, p9) -- line: 165
+	local v38 = p8._recursivelyReferencedFragments[p9] or {}
+
+	if not p8._recursivelyReferencedFragments[p9] then
+		local t5 = {}
+		local t6 = { p9.selectionSet }
+
+		while #t6 ~= 0 do
+			local v41 = table.remove(t6)
+
+			for _, v in ipairs(p8:getFragmentSpreads(v41)) do
+				local value = v.name.value
+
+				if t5[value] ~= true then
+					t5[value] = true
+
+					local v45 = p8:getFragment(value)
+
+					if v45 then
+						table.insert(v38, v45)
+						table.insert(t6, v45.selectionSet)
+					end
+				end
+			end
+		end
+
+		p8._recursivelyReferencedFragments[p9] = v38
+	end
+
+	return v38
+end
+
+local self = setmetatable({}, {
+	__index = t1
+})
+local t7 = {
+	__index = self
+}
+
+function self.new(p10, p11, p12: ((...any) -> ...any)) -- line: 208
+	-- upvalues: t1 (copy), t7 (copy)
+	local v49 = t1.new(p10, p12)
+
+	v49._schema = p11
+
+	return (setmetatable(v49, t7))
+end
+function self.getSchema(p13) -- line: 218
+	return p13._schema
+end
+
+local self2 = setmetatable({}, {
+	__index = t1
+})
+local t8 = {
+	__index = self2
+}
+
+function self2.new(p14, p15, p16, p17: ((...any) -> ...any)) -- line: 257
+	-- upvalues: t1 (copy), Map (copy), t8 (copy)
+	local v55 = t1.new(p15, p17)
+
+	v55._schema = p14
+	v55._typeInfo = p16
+	v55._variableUsages = Map.new()
+	v55._recursiveVariableUsages = Map.new()
+
+	return (setmetatable(v55, t8))
+end
+function self2.getSchema(p18) -- line: 274
+	return p18._schema
+end
+function self2.getVariableUsages(p19, p20) -- line: 278
+	-- upvalues: TypeInfo2 (copy), visit (copy), visitWithTypeInfo (copy)
+	local v59 = p19._variableUsages[p20]
+
+	if not v59 then
+		local t9 = {}
+		local v61 = TypeInfo2.new(p19._schema)
+
+		visit(p20, visitWithTypeInfo(v61, {
+			VariableDefinition = function() -- line: 286
+				return false
+			end,
+			Variable = function(_, p22) -- line: 289
+				-- upvalues: t9 (copy), v61 (copy)
+				table.insert(t9, {
+					node = p22,
+					type = v61:getInputType(),
+					defaultValue = v61:getDefaultValue()
+				})
+			end
+		}))
+		v59 = t9
+		p19._variableUsages[p20] = v59
+	end
+
+	return v59
+end
+function self2.getRecursiveVariableUsages(p23, p24) -- line: 305
+	-- upvalues: Array (copy)
+	local v64 = p23._recursiveVariableUsages[p24]
+
+	if not v64 then
+		v64 = p23:getVariableUsages(p24)
+
+		for _, v in ipairs(p23:getRecursivelyReferencedFragments(p24)) do
+			v64 = Array.concat(v64, p23:getVariableUsages(v))
+		end
+
+		p23._recursiveVariableUsages[p24] = v64
+	end
+
+	return v64
+end
+function self2.getType(p25) -- line: 319
+	return p25._typeInfo:getType()
+end
+function self2.getParentType(p26) -- line: 323
+	return p26._typeInfo:getParentType()
+end
+function self2.getInputType(p27) -- line: 327
+	return p27._typeInfo:getInputType()
+end
+function self2.getParentInputType(p28) -- line: 331
+	return p28._typeInfo:getParentInputType()
+end
+function self2.getFieldDef(p29) -- line: 335
+	return p29._typeInfo:getFieldDef()
+end
+function self2.getDirective(p30) -- line: 339
+	return p30._typeInfo:getDirective()
+end
+function self2.getArgument(p31) -- line: 343
+	return p31._typeInfo:getArgument()
+end
+function self2.getEnumValue(p32) -- line: 347
+	return p32._typeInfo:getEnumValue()
+end
+
 return {
-    ASTValidationContext = v18, 
-    SDLValidationContext = v47, 
-    ValidationContext = v54
-};
+	ASTValidationContext = t1,
+	SDLValidationContext = self,
+	ValidationContext = self2
+}

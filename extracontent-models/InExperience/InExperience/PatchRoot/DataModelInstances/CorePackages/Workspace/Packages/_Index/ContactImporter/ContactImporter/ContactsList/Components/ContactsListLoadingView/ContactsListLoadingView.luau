@@ -1,58 +1,62 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_t_0 = v1.t;
-local l_Roact_0 = v1.Roact;
-local l_UIBlox_0 = v1.UIBlox;
-local l_withLocalization_0 = v1.withLocalization;
-local l_FullPageModal_0 = l_UIBlox_0.App.Dialog.Modal.FullPageModal;
-local l_withStyle_0 = l_UIBlox_0.Style.withStyle;
-local v8 = require(l_Parent_0.Common.TextKeys);
-local v9 = require(l_Parent_0.ContactsList.Components.ContactsGlimmer);
-local v10 = l_Roact_0.PureComponent:extend("ContactsListLoadingView");
-v10.validateProps = l_t_0.strictInterface({
-    screenSize = l_t_0.Vector2
-});
-v10.render = function(v11) --[[ Line: 29 ]] --[[ Name: render ]]
-    -- upvalues: l_withLocalization_0 (copy), v8 (copy), l_withStyle_0 (copy), l_Roact_0 (copy), l_FullPageModal_0 (copy), v9 (copy)
-    local l_screenSize_0 = v11.props.screenSize;
-    return l_withLocalization_0({
-        titleText = v8.CONTACTS_LIST_TITLE
-    })(function(v13) --[[ Line: 34 ]]
-        -- upvalues: l_withStyle_0 (ref), l_Roact_0 (ref), l_FullPageModal_0 (ref), l_screenSize_0 (copy), v9 (ref)
-        return l_withStyle_0(function(_) --[[ Line: 35 ]]
-            -- upvalues: l_Roact_0 (ref), l_FullPageModal_0 (ref), v13 (copy), l_screenSize_0 (ref), v9 (ref)
-            return l_Roact_0.createElement(l_FullPageModal_0, {
-                title = v13.titleText, 
-                screenSize = l_screenSize_0
-            }, {
-                LoadingViewContainer = l_Roact_0.createElement("Frame", {
-                    AutomaticSize = Enum.AutomaticSize.Y, 
-                    Size = UDim2.new(1, 0, 1, 0), 
-                    BackgroundTransparency = 1, 
-                    LayoutOrder = 1
-                }, {
-                    UIListLayout = l_Roact_0.createElement("UIListLayout", {
-                        FillDirection = Enum.FillDirection.Vertical, 
-                        SortOrder = Enum.SortOrder.LayoutOrder, 
-                        Padding = UDim.new(0, 12), 
-                        HorizontalAlignment = Enum.HorizontalAlignment.Left
-                    }), 
-                    UIPadding = l_Roact_0.createElement("UIPadding", {
-                        PaddingTop = UDim.new(0, 24), 
-                        PaddingBottom = UDim.new(0, 36)
-                    }), 
-                    Glimmer1 = l_Roact_0.createElement(v9, {
-                        layoutOrder = 1
-                    }), 
-                    Glimmer2 = l_Roact_0.createElement(v9, {
-                        layoutOrder = 2
-                    }), 
-                    Glimmer3 = l_Roact_0.createElement(v9, {
-                        layoutOrder = 3
-                    })
-                })
-            });
-        end);
-    end);
-end;
-return v10;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local t = dependencies.t
+local Roact = dependencies.Roact
+local UIBlox = dependencies.UIBlox
+local withLocalization = dependencies.withLocalization
+local FullPageModal = UIBlox.App.Dialog.Modal.FullPageModal
+local withStyle = UIBlox.Style.withStyle
+local TextKeys = require(ParentParent.Common.TextKeys)
+local ContactsGlimmer = require(ParentParent.ContactsList.Components.ContactsGlimmer)
+local v11 = Roact.PureComponent:extend("ContactsListLoadingView")
+
+v11.validateProps = t.strictInterface({
+	screenSize = t.Vector2
+})
+
+function v11.render(p1) -- line: 29
+	-- upvalues: withLocalization (copy), TextKeys (copy), withStyle (copy), Roact (copy), FullPageModal (copy), ContactsGlimmer (copy)
+	local screenSize = p1.props.screenSize
+
+	return withLocalization({
+		titleText = TextKeys.CONTACTS_LIST_TITLE
+	})(function(p2) -- line: 34
+		-- upvalues: withStyle (copy), Roact (copy), FullPageModal (copy), screenSize (copy), ContactsGlimmer (copy)
+		return withStyle(function(_) -- line: 35
+			-- upvalues: Roact (copy), FullPageModal (copy), p2 (copy), screenSize (copy), ContactsGlimmer (copy)
+			return Roact.createElement(FullPageModal, {
+				title = p2.titleText,
+				screenSize = screenSize
+			}, {
+				LoadingViewContainer = Roact.createElement("Frame", {
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, 0, 1, 0)
+				}, {
+					UIListLayout = Roact.createElement("UIListLayout", {
+						FillDirection = Enum.FillDirection.Vertical,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 12),
+						HorizontalAlignment = Enum.HorizontalAlignment.Left
+					}),
+					UIPadding = Roact.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, 24),
+						PaddingBottom = UDim.new(0, 36)
+					}),
+					Glimmer1 = Roact.createElement(ContactsGlimmer, {
+						layoutOrder = 1
+					}),
+					Glimmer2 = Roact.createElement(ContactsGlimmer, {
+						layoutOrder = 2
+					}),
+					Glimmer3 = Roact.createElement(ContactsGlimmer, {
+						layoutOrder = 3
+					})
+				})
+			})
+		end)
+	end)
+end
+
+return v11

@@ -1,32 +1,44 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent.Parent;
-local _ = require(l_Parent_1.App.Style.StyleTypes);
-local v3 = require(l_Parent_0.Enum.IconSize);
-local v4 = {
-    [v3.Small] = 16, 
-    [v3.Medium] = 36, 
-    [v3.Large] = 48, 
-    [v3.XLarge] = 96, 
-    [v3.XXLarge] = 192
-};
-return function(v5, v6) --[[ Line: 17 ]]
-    -- upvalues: v3 (copy), v4 (copy)
-    assert(v3.isEnumValue(v5));
-    if v6 ~= nil and v6.Tokens ~= nil then
-        if v5 == v3.Small then
-            return v6.Tokens.Semantic.Icon.Size.Small;
-        elseif v5 == v3.Medium then
-            return v6.Tokens.Semantic.Icon.Size.Medium;
-        elseif v5 == v3.Large then
-            return v6.Tokens.Semantic.Icon.Size.Large;
-        elseif v5 == v3.XLarge then
-            return v6.Tokens.Semantic.Icon.Size.XLarge;
-        elseif v5 == v3.XXLarge then
-            return v6.Tokens.Semantic.Icon.Size.XxLarge;
-        else
-            return nil;
-        end;
-    else
-        return v4[v5];
-    end;
-end;
+local scriptParent = script.Parent
+local ParentParent = scriptParent.Parent.Parent
+
+require(ParentParent.App.Style.StyleTypes)
+
+local IconSize = require(scriptParent.Enum.IconSize)
+local t1 = {
+	[IconSize.Small] = 16,
+	[IconSize.Medium] = 36,
+	[IconSize.Large] = 48,
+	[IconSize.XLarge] = 96,
+	[IconSize.XXLarge] = 192
+}
+
+return function(n1: number, p1) -- line: 17
+	-- upvalues: IconSize (copy), t1 (copy)
+	assert(IconSize.isEnumValue(n1))
+
+	if p1 ~= nil and p1.Tokens ~= nil then
+		if n1 == IconSize.Small then
+			return p1.Tokens.Semantic.Icon.Size.Small
+		end
+
+		if n1 == IconSize.Medium then
+			return p1.Tokens.Semantic.Icon.Size.Medium
+		end
+
+		if n1 == IconSize.Large then
+			return p1.Tokens.Semantic.Icon.Size.Large
+		end
+
+		if n1 == IconSize.XLarge then
+			return p1.Tokens.Semantic.Icon.Size.XLarge
+		end
+
+		if n1 == IconSize.XXLarge then
+			return p1.Tokens.Semantic.Icon.Size.XxLarge
+		end
+
+		return nil
+	end
+
+	return t1[n1]
+end

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AppIaScrollAway9", false);
+return game:DefineFastFlag("AppIaScrollAway9", false)

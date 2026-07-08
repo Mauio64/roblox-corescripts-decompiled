@@ -1,75 +1,82 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local l_RobloxGui_0 = game:GetService("CoreGui"):WaitForChild("RobloxGui");
-local v2 = require(l_CorePackages_0.Packages.UIBlox);
-local v3 = require(l_CorePackages_0.Packages.React);
-local l_Parent_0 = script.Parent.Parent.Parent;
-local v5 = require(l_Parent_0.Flags.GetFIntRAMaxAnnotationCount);
-local l_ImageSetButton_0 = v2.Core.ImageSet.ImageSetButton;
-local l_Images_0 = v2.App.ImageSet.Images;
-return function(v8) --[[ Line: 24 ]] --[[ Name: ScreenshotHighlighter ]]
-    -- upvalues: l_RobloxGui_0 (copy), v3 (copy), v5 (copy), l_ImageSetButton_0 (copy), l_Images_0 (copy)
-    local l_AbsoluteSize_0 = l_RobloxGui_0.AbsoluteSize;
-    local v10 = (l_AbsoluteSize_0.Y > l_AbsoluteSize_0.X and l_AbsoluteSize_0.X or l_AbsoluteSize_0.Y) / 5;
-    local v11, v12 = v3.useState(false);
-    local function v17(v13, v14) --[[ Line: 34 ]]
-        -- upvalues: v8 (copy), v10 (copy)
-        local v15 = (Vector2.new(v14.X, v14.Y) - v13.AbsolutePosition) / v13.AbsoluteSize;
-        table.insert(v8.annotationPoints, v15);
-        local v16 = if v13.AbsoluteSize.X > v13.AbsoluteSize.Y then v13.AbsoluteSize.X else v13.AbsoluteSize.Y;
-        v8.setAnnotationCircleRadius(v10 * 0.5 / v16);
-        v8.setAspectRatioDimensions(v13.AbsoluteSize.X, v13.AbsoluteSize.Y);
-        v8.handleAnnotationPoints(v8.annotationPoints);
-    end;
-    local function v23(v18, v19) --[[ Line: 46 ]]
-        -- upvalues: v8 (copy), v5 (ref), v12 (copy), v17 (copy)
-        local v20 = v19.UserInputState == Enum.UserInputState.Begin;
-        local v21 = v19.UserInputType == Enum.UserInputType.Touch;
-        local v22 = v19.UserInputType == Enum.UserInputType.MouseButton1;
-        if v20 and (v21 or v22) and #v8.annotationPoints < v5() then
-            v12(true);
-            v17(v18, v19.Position);
-        end;
-    end;
-    local function v26(_, _) --[[ Line: 56 ]]
+local CorePackages = game:GetService("CorePackages")
+local RobloxGui = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local React = require(CorePackages.Packages.React)
+local ParentParent = script.Parent.Parent.Parent
+local GetFIntRAMaxAnnotationCount = require(ParentParent.Flags.GetFIntRAMaxAnnotationCount)
+local ImageSetButton = UIBlox.Core.ImageSet.ImageSetButton
+local Images = UIBlox.App.ImageSet.Images
 
-    end;
-    local function v29(_, _) --[[ Line: 68 ]]
-        -- upvalues: v11 (copy), v12 (copy)
-        if v11 then
-            v12(false);
-        end;
-    end;
-    local v30 = {};
-    for v31, v32 in ipairs(v8.annotationPoints) do
-        v30["point" .. v31] = v3.createElement("Frame", {
-            Position = UDim2.fromScale(v32.X, v32.Y), 
-            BackgroundTransparency = 1, 
-            Size = UDim2.fromOffset(v10, v10)
-        }, {
-            Border = v3.createElement(l_ImageSetButton_0, {
-                Size = UDim2.fromOffset(v10, v10), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = l_Images_0["component_assets/circle_49_stroke_1"], 
-                ImageColor3 = Color3.fromHex("#3CF3E9"), 
-                ImageTransparency = 0, 
-                BackgroundTransparency = 1
-            }), 
-            Background = v3.createElement(l_ImageSetButton_0, {
-                Size = UDim2.fromOffset(v10, v10), 
-                AnchorPoint = Vector2.new(0.5, 0.5), 
-                Image = l_Images_0["component_assets/circle_49"], 
-                ImageColor3 = Color3.fromHex("#3CF3E9"), 
-                ImageTransparency = 0.6, 
-                BackgroundTransparency = 1
-            })
-        });
-    end;
-    return v3.createElement("Frame", {
-        BackgroundTransparency = 1, 
-        Size = UDim2.fromScale(1, 1), 
-        [v3.Event.InputBegan] = v23, 
-        [v3.Event.InputChanged] = v26, 
-        [v3.Event.InputEnded] = v29, 
-        ZIndex = 3
-    }, v30);
-end;
+local function ScreenshotHighlighter(t1: {[any]: any}) -- line: 24
+	-- upvalues: RobloxGui (copy), React (copy), GetFIntRAMaxAnnotationCount (copy), ImageSetButton (copy), Images (copy)
+	local AbsoluteSize = RobloxGui.AbsoluteSize
+	local v12 = (AbsoluteSize.Y > AbsoluteSize.X and AbsoluteSize.X or AbsoluteSize.Y) / 5
+	local v13, v14 = React.useState(false)
+
+	local function v15(p1, vector3: Vector3) -- line: 34
+		-- upvalues: t1 (copy), v12 (copy)
+		local v21 = (Vector2.new(vector3.X, vector3.Y) - p1.AbsolutePosition) / p1.AbsoluteSize
+
+		table.insert(t1.annotationPoints, v21)
+
+		local v22 = if not (p1.AbsoluteSize.X > p1.AbsoluteSize.Y) then p1.AbsoluteSize.Y else p1.AbsoluteSize.X
+
+		t1.setAnnotationCircleRadius(v12 * 0.5 / v22)
+		t1.setAspectRatioDimensions(p1.AbsoluteSize.X, p1.AbsoluteSize.Y)
+		t1.handleAnnotationPoints(t1.annotationPoints)
+	end
+
+	local t2 = {}
+
+	for i, v in ipairs(t1.annotationPoints) do
+		t2["point" .. i] = React.createElement("Frame", {
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(v.X, v.Y),
+			Size = UDim2.fromOffset(v12, v12)
+		}, {
+			Border = React.createElement(ImageSetButton, {
+				ImageTransparency = 0,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v12, v12),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = Images["component_assets/circle_49_stroke_1"],
+				ImageColor3 = Color3.fromHex("#3CF3E9")
+			}),
+			Background = React.createElement(ImageSetButton, {
+				ImageTransparency = 0.6,
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(v12, v12),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Image = Images["component_assets/circle_49"],
+				ImageColor3 = Color3.fromHex("#3CF3E9")
+			})
+		})
+	end
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 1),
+		[React.Event.InputBegan] = function(p2, p3) -- line: 46
+			-- upvalues: t1 (copy), GetFIntRAMaxAnnotationCount (copy), v14 (copy), v15 (copy)
+			local v25 = p3.UserInputState == Enum.UserInputState.Begin
+			local v26 = p3.UserInputType == Enum.UserInputType.Touch
+			local v27 = p3.UserInputType == Enum.UserInputType.MouseButton1
+
+			if v25 and ((v26 or v27) and #t1.annotationPoints < GetFIntRAMaxAnnotationCount()) then
+				v14(true)
+				v15(p2, p3.Position)
+			end
+		end,
+		[React.Event.InputChanged] = function(_, _) -- line: 56
+		end,
+		[React.Event.InputEnded] = function(_, _) -- line: 68
+			-- upvalues: v13 (copy), v14 (copy)
+			if v13 then
+				v14(false)
+			end
+		end,
+		ZIndex = 3
+	}, t2)
+end
+
+return ScreenshotHighlighter

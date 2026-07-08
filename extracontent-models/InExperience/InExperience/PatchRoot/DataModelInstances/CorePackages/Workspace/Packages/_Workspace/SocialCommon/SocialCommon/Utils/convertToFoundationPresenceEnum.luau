@@ -1,18 +1,19 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("SocialCommon");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Enums.PresenceTypes);
-local v3 = require(l_Parent_0.Foundation);
-local v4 = {
-    [v2.Offline] = v3.Enums.UserPresence.Away, 
-    [v2.Online] = v3.Enums.UserPresence.Active, 
-    [v2.InGame] = v3.Enums.UserPresence.InExperience, 
-    [v2.InStudio] = v3.Enums.UserPresence.Active, 
-    Offline = v3.Enums.UserPresence.Away, 
-    Online = v3.Enums.UserPresence.Active, 
-    InGame = v3.Enums.UserPresence.InExperience, 
-    InStudio = v3.Enums.UserPresence.Active
-};
-return function(v5) --[[ Line: 18 ]]
-    -- upvalues: v4 (copy), v3 (copy)
-    return v4[v5] or v3.Enums.UserPresence.None;
-end;
+local SocialCommon = script:FindFirstAncestor("SocialCommon")
+local SocialCommonParent = SocialCommon.Parent
+local PresenceTypes = require(SocialCommon.Enums.PresenceTypes)
+local Foundation = require(SocialCommonParent.Foundation)
+local t1 = {
+	[PresenceTypes.Offline] = Foundation.Enums.UserPresence.Away,
+	[PresenceTypes.Online] = Foundation.Enums.UserPresence.Active,
+	[PresenceTypes.InGame] = Foundation.Enums.UserPresence.InExperience,
+	[PresenceTypes.InStudio] = Foundation.Enums.UserPresence.Active,
+	Offline = Foundation.Enums.UserPresence.Away,
+	Online = Foundation.Enums.UserPresence.Active,
+	InGame = Foundation.Enums.UserPresence.InExperience,
+	InStudio = Foundation.Enums.UserPresence.Active
+}
+
+return function(s1: string) -- line: 18
+	-- upvalues: t1 (copy), Foundation (copy)
+	return t1[s1] or Foundation.Enums.UserPresence.None
+end

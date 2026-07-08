@@ -1,45 +1,61 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local v1 = require(l_script_FirstAncestor_0.Utility.Flags);
-local v2 = require(l_script_FirstAncestor_0.Utility.Wrappers);
-local l_GuiService_0 = v2.Services.GuiService;
-local l_CoreGui_0 = v2.Services.CoreGui;
-local l_RunService_0 = v2.Services.RunService;
-local l_Players_0 = v2.Services.Players;
-local v7 = if l_Players_0.LocalPlayer and l_RunService_0:IsRunning() then l_Players_0.LocalPlayer:WaitForChild("PlayerGui", 3) else nil;
-local v8 = require(l_script_FirstAncestor_0.Utility.isPluginSecurity);
-return function() --[[ Line: 19 ]] --[[ Name: getHardwareSafeAreaInsets ]]
-    -- upvalues: v1 (copy), l_GuiService_0 (copy), v8 (copy), l_CoreGui_0 (copy), v7 (copy)
-    if v1.FoundationUseGetInsetArea then
-        local l_l_GuiService_0_InsetArea_0 = l_GuiService_0:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets);
-        local l_l_GuiService_0_InsetArea_1 = l_GuiService_0:GetInsetArea(Enum.ScreenInsets.None);
-        return {
-            left = l_l_GuiService_0_InsetArea_0.Min.X - l_l_GuiService_0_InsetArea_1.Min.X, 
-            top = l_l_GuiService_0_InsetArea_0.Min.Y - l_l_GuiService_0_InsetArea_1.Min.Y, 
-            right = l_l_GuiService_0_InsetArea_1.Max.X - l_l_GuiService_0_InsetArea_0.Max.X, 
-            bottom = l_l_GuiService_0_InsetArea_1.Max.Y - l_l_GuiService_0_InsetArea_0.Max.Y
-        };
-    else
-        local v11 = if v8() then l_CoreGui_0 else v7;
-        local l_ScreenGui_0 = Instance.new("ScreenGui");
-        l_ScreenGui_0.Name = "_FullscreenTestGui";
-        l_ScreenGui_0.Parent = v11;
-        l_ScreenGui_0.ScreenInsets = Enum.ScreenInsets.None;
-        local l_ScreenGui_1 = Instance.new("ScreenGui");
-        l_ScreenGui_1.Name = "_DeviceTestGui";
-        l_ScreenGui_1.Parent = v11;
-        l_ScreenGui_1.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets;
-        local v14 = l_ScreenGui_1.AbsolutePosition - l_ScreenGui_0.AbsolutePosition;
-        local v15 = l_ScreenGui_0.AbsolutePosition + l_ScreenGui_0.AbsoluteSize - (l_ScreenGui_1.AbsolutePosition + l_ScreenGui_1.AbsoluteSize);
-        local v16 = {
-            left = v14.X, 
-            top = v14.Y, 
-            right = v15.X, 
-            bottom = v15.Y
-        };
-        l_ScreenGui_0.Parent = nil;
-        l_ScreenGui_1.Parent = nil;
-        l_ScreenGui_0:Destroy();
-        l_ScreenGui_1:Destroy();
-        return v16;
-    end;
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local Flags = require(Foundation.Utility.Flags)
+local Wrappers = require(Foundation.Utility.Wrappers)
+local getMainGui = require(Foundation.Utility.getMainGui)
+local GuiService = Wrappers.Services.GuiService
+local CoreGui = Wrappers.Services.CoreGui
+local RunService = Wrappers.Services.RunService
+local Players = Wrappers.Services.Players
+local u9 = nil
+
+if not Flags.FoundationUseMainGuiUtility then
+	u9 = if not Players.LocalPlayer or not RunService:IsRunning() then nil else Players.LocalPlayer:WaitForChild("PlayerGui", 3)
+end
+
+local isPluginSecurity = require(Foundation.Utility.isPluginSecurity)
+
+local function getHardwareSafeAreaInsets() -- line: 23
+	-- upvalues: Flags (copy), GuiService (copy), getMainGui (copy), isPluginSecurity (copy), CoreGui (copy), u9 (ref)
+	if Flags.FoundationUseGetInsetArea then
+		local InsetArea = GuiService:GetInsetArea(Enum.ScreenInsets.DeviceSafeInsets)
+		local InsetArea2 = GuiService:GetInsetArea(Enum.ScreenInsets.None)
+
+		return {
+			left = InsetArea.Min.X - InsetArea2.Min.X,
+			top = InsetArea.Min.Y - InsetArea2.Min.Y,
+			right = InsetArea2.Max.X - InsetArea.Max.X,
+			bottom = InsetArea2.Max.Y - InsetArea.Max.Y
+		}
+	end
+
+	local v14 = if not Flags.FoundationUseMainGuiUtility then if not isPluginSecurity() then u9 else CoreGui else getMainGui()
+	local ScreenGui = Instance.new("ScreenGui")
+
+	ScreenGui.Name = "_FullscreenTestGui"
+	ScreenGui.Parent = v14
+	ScreenGui.ScreenInsets = Enum.ScreenInsets.None
+
+	local ScreenGui2 = Instance.new("ScreenGui")
+
+	ScreenGui2.Name = "_DeviceTestGui"
+	ScreenGui2.Parent = v14
+	ScreenGui2.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+
+	local v17 = ScreenGui2.AbsolutePosition - ScreenGui.AbsolutePosition
+	local v18 = ScreenGui.AbsolutePosition + ScreenGui.AbsoluteSize - (ScreenGui2.AbsolutePosition + ScreenGui2.AbsoluteSize)
+	local t1 = {
+		left = v17.X,
+		top = v17.Y,
+		right = v18.X,
+		bottom = v18.Y
+	}
+
+	ScreenGui.Parent = nil
+	ScreenGui2.Parent = nil
+	ScreenGui:Destroy()
+	ScreenGui2:Destroy()
+
+	return t1
+end
+
+return getHardwareSafeAreaInsets

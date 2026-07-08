@@ -1,20 +1,21 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("FriendsLanding");
-local v1 = require(l_script_FirstAncestor_0.dependencies);
-local l_Rodux_0 = v1.Rodux;
-local l_RoduxNetworking_0 = v1.RoduxNetworking;
-local l_RoduxUserPermissions_0 = v1.RoduxUserPermissions;
-local l_RoduxAnalytics_0 = v1.RoduxAnalytics;
-return function() --[[ Line: 9 ]]
-    -- upvalues: l_Rodux_0 (copy), l_RoduxUserPermissions_0 (copy), l_RoduxNetworking_0 (copy), l_RoduxAnalytics_0 (copy)
-    return l_Rodux_0.combineReducers({
-        DeletedUsers = require(script.DeletedUsers), 
-        VerifiedUsers = require(script.VerifiedUsers), 
-        InactiveFriends = require(script.InactiveFriends), 
-        Users = require(script.Users), 
-        Friends = require(script.Friends)(), 
-        Presence = require(script.Presence), 
-        UserPermissions = l_RoduxUserPermissions_0.installReducer(), 
-        NetworkStatus = l_RoduxNetworking_0.installReducer(), 
-        Analytics = l_RoduxAnalytics_0.installReducer()
-    });
-end;
+local FriendsLanding = script:FindFirstAncestor("FriendsLanding")
+local dependencies = require(FriendsLanding.dependencies)
+local Rodux = dependencies.Rodux
+local RoduxNetworking = dependencies.RoduxNetworking
+local RoduxUserPermissions = dependencies.RoduxUserPermissions
+local RoduxAnalytics = dependencies.RoduxAnalytics
+
+return function() -- line: 9
+	-- upvalues: Rodux (copy), RoduxUserPermissions (copy), RoduxNetworking (copy), RoduxAnalytics (copy)
+	return Rodux.combineReducers({
+		DeletedUsers = require(script.DeletedUsers),
+		VerifiedUsers = require(script.VerifiedUsers),
+		InactiveFriends = require(script.InactiveFriends),
+		Users = require(script.Users),
+		Friends = require(script.Friends)(),
+		Presence = require(script.Presence),
+		UserPermissions = RoduxUserPermissions.installReducer(),
+		NetworkStatus = RoduxNetworking.installReducer(),
+		Analytics = RoduxAnalytics.installReducer()
+	})
+end

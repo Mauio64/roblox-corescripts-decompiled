@@ -1,13 +1,17 @@
-return function(v0, v1) --[[ Line: 1 ]] --[[ Name: getAttachment ]]
-    for _, v3 in pairs(v1) do
-        local l_v0_FirstChild_0 = v0:FindFirstChild(v3);
-        if l_v0_FirstChild_0 then
-            if l_v0_FirstChild_0:IsA("Attachment") then
-                return l_v0_FirstChild_0;
-            else
-                return l_v0_FirstChild_0;
-            end;
-        end;
-    end;
-    return nil;
-end;
+local function getAttachment(p1, t1: {[any]: any}) -- line: 1
+	for _, v in pairs(t1) do
+		local v2 = p1:FindFirstChild(v)
+
+		if v2 then
+			if v2:IsA("Attachment") then
+				return v2
+			end
+
+			return v2
+		end
+	end
+
+	return nil
+end
+
+return getAttachment

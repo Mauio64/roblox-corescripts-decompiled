@@ -1,21 +1,25 @@
-local v0 = require(script.Parent.getNumericalApplicationId);
-local function _(v1, v2) --[[ Line: 9 ]] --[[ Name: getRolloutEnabledForUser ]]
-    -- upvalues: v0 (copy)
-    local v3 = v1();
-    local v4 = v0(v2);
-    if v4 == nil then
-        return v3 >= 100;
-    else
-        return v4 % 100 + 1 <= v3;
-    end;
-end;
-return function(v6, v7) --[[ Line: 28 ]]
-    -- upvalues: v0 (copy)
-    local v8 = v6();
-    local v9 = v0(v7);
-    local v10 = if v9 == nil then v8 >= 100 else v9 % 100 + 1 <= v8;
-    return function() --[[ Line: 34 ]]
-        -- upvalues: v10 (copy)
-        return v10;
-    end;
-end;
+local getNumericalApplicationId = require(script.Parent.getNumericalApplicationId)
+
+local function getRolloutEnabledForUser(p1: ((...any) -> ...any), p2) -- line: 9
+	-- upvalues: getNumericalApplicationId (copy)
+	local v5 = p1()
+	local v6 = getNumericalApplicationId(p2)
+
+	if v6 == nil then
+		return v5 >= 100
+	end
+
+	return v5 >= v6 % 100 + 1
+end
+
+return function(p3: ((...any) -> ...any), p4) -- line: 28
+	-- upvalues: getNumericalApplicationId (copy)
+	local v9 = p3()
+	local v10 = getNumericalApplicationId(p4)
+	local v11 = if v10 ~= nil then v9 >= v10 % 100 + 1 else v9 >= 100
+
+	return function() -- line: 34
+		-- upvalues: v11 (copy)
+		return v11
+	end
+end

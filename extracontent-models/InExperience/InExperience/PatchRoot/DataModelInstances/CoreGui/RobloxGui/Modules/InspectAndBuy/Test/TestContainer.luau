@@ -1,42 +1,43 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local v2 = require(l_CorePackages_0.Packages.Rodux);
-local v3 = require(l_CorePackages_0.Packages.RoactRodux);
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v6 = require(l_Parent_0.Reducers.InspectAndBuyReducer);
-local v7 = require(l_Parent_0.Constants);
-local v8 = require(l_Parent_0.CompactView);
-local v9 = require(l_Parent_0.WideView);
-local v10 = require(l_Parent_1.Common.renderWithCoreScriptsStyleProvider);
-local v11 = require(l_Parent_0.Components.InspectAndBuyContext);
-local v12 = v1.Component:extend("TestContainer");
-v12.init = function(v13) --[[ Line: 23 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy), v6 (copy), v7 (copy), v8 (copy), v9 (copy)
-    v13.store = v13.props.overrideStore or v2.Store.new(v6, {}, {
-        v2.thunkMiddleware
-    });
-    v13.views = {};
-    v13.views[v7.View.Compact] = v8;
-    v13.views[v7.View.Wide] = v9;
-end;
-v12.render = function(v14) --[[ Line: 33 ]] --[[ Name: render ]]
-    -- upvalues: v1 (copy), v11 (copy), v3 (copy), v10 (copy)
-    local v15 = 0;
-    for _, _ in v14.props[v1.Children] do
-        v15 = v15 + 1;
-    end;
-    assert(v15 > 0, "TestContainer: no children provided, nothing will be tested");
-    return v1.createElement(v11.Provider, {
-        value = v14.views
-    }, {
-        v1.createElement(v3.StoreProvider, {
-            store = v14.store
-        }, {
-            ThemeProvider = v10({
-                InspectMenu = v1.createElement("ScreenGui", {}, v14.props[v1.Children])
-            })
-        })
-    });
-end;
-return v12;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Rodux = require(CorePackages.Packages.Rodux)
+local RoactRodux = require(CorePackages.Packages.RoactRodux)
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local InspectAndBuyReducer = require(ParentParent.Reducers.InspectAndBuyReducer)
+local Constants = require(ParentParent.Constants)
+local CompactView = require(ParentParent.CompactView)
+local WideView = require(ParentParent.WideView)
+local renderWithCoreScriptsStyleProvider = require(ParentParentParent.Common.renderWithCoreScriptsStyleProvider)
+local InspectAndBuyContext = require(ParentParent.Components.InspectAndBuyContext)
+local v13 = Roact.Component:extend("TestContainer")
+
+function v13.init(p1) -- line: 23
+	-- upvalues: Rodux (copy), InspectAndBuyReducer (copy), Constants (copy), CompactView (copy), WideView (copy)
+	p1.store = p1.props.overrideStore or Rodux.Store.new(InspectAndBuyReducer, {}, { Rodux.thunkMiddleware })
+	p1.views = {}
+	p1.views[Constants.View.Compact] = CompactView
+	p1.views[Constants.View.Wide] = WideView
+end
+function v13.render(p2) -- line: 33
+	-- upvalues: Roact (copy), InspectAndBuyContext (copy), RoactRodux (copy), renderWithCoreScriptsStyleProvider (copy)
+	local n1 = 0
+
+	for _, _ in p2.props[Roact.Children] do
+		n1 += 1
+	end
+
+	assert(n1 > 0, "TestContainer: no children provided, nothing will be tested")
+
+	return Roact.createElement(InspectAndBuyContext.Provider, {
+		value = p2.views
+	}, { Roact.createElement(RoactRodux.StoreProvider, {
+		store = p2.store
+	}, {
+		ThemeProvider = renderWithCoreScriptsStyleProvider({
+			InspectMenu = Roact.createElement("ScreenGui", {}, p2.props[Roact.Children])
+		})
+	}) })
+end
+
+return v13

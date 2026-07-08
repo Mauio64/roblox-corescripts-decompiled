@@ -1,110 +1,123 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Constants);
-local v3 = require(l_Parent_0.Dash);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v5 = require(l_script_FirstAncestor_0.Enums.ButtonVariant);
-local v6 = require(l_script_FirstAncestor_0.Enums.ColorMode);
-local _ = require(l_script_FirstAncestor_0.Enums.StateLayerMode);
-local _ = require(l_script_FirstAncestor_0.Utility.composeStyleVariant);
-local _ = require(l_script_FirstAncestor_0.Providers.Style.Tokens);
-local v10 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local function _(v11) --[[ Line: 40 ]] --[[ Name: toStroke ]]
-    return {
-        Color = v11.Color3, 
-        Transparency = v11.Transparency
-    };
-end;
-local function v24(v13, v14, v15) --[[ Line: 48 ]] --[[ Name: createButtonVariantStyles ]]
-    -- upvalues: v6 (copy), v3 (copy), v2 (copy)
-    local v16 = {};
-    for v17 in v6 do
-        local v18 = v13[v17];
-        local v19 = if type(v14) == "table" then {
-            Foreground = v3.get(v18, v14)
-        } else v18[v14];
-        local v20 = {};
-        local v21 = {
-            style = v19.Background
-        };
-        local v22;
-        if v19.Border then
-            local l_Border_0 = v19.Border;
-            v22 = {
-                Color = l_Border_0.Color3, 
-                Transparency = l_Border_0.Transparency
-            };
-        else
-            v22 = nil;
-        end;
-        v21.stroke = v22;
-        v21.stateLayer = {
-            mode = v2.COLOR_MODE_TO_STATE_LAYER_MODE[v15 or false][v17]
-        };
-        v20.container = v21;
-        v20.content = {
-            style = v19.Foreground
-        };
-        v16[v17] = v20;
-    end;
-    return v16;
-end;
-local function v26(v25) --[[ Line: 89 ]] --[[ Name: getButtonTypes ]]
-    -- upvalues: v5 (copy), v24 (copy)
-    return {
-        [v5.Utility] = v24(v25, "ActionUtility"), 
-        [v5.Standard] = v24(v25, "ActionStandard"), 
-        [v5.Emphasis] = v24(v25, "ActionEmphasis"), 
-        [v5.Alert] = v24(v25, "ActionAlert"), 
-        [v5.SubEmphasis] = v24(v25, "ActionSubEmphasis", true), 
-        [v5.SoftEmphasis] = v24(v25, "ActionSoftEmphasis"), 
-        [v5.Subtle] = v24(v25, "ActionSubtle"), 
-        [v5.Text] = v24(v25, {
-            "Content", 
-            "Emphasis"
-        }), 
-        [v5.Link] = v24(v25, {
-            "Content", 
-            "Link"
-        }), 
-        [v5.OverMedia] = v24(v25, "ActionOverMedia", true)
-    };
-end;
-local function v28(v27) --[[ Line: 106 ]] --[[ Name: getSizes ]]
-    -- upvalues: v10 (copy)
-    return {
-        [v10.XSmall] = {
-            container = {
-                radius = v27.Radius.Small, 
-                height = v27.Size.Size_600
-            }
-        }, 
-        [v10.Small] = {
-            container = {
-                radius = v27.Radius.Medium, 
-                height = v27.Size.Size_800
-            }
-        }, 
-        [v10.Medium] = {
-            container = {
-                radius = v27.Radius.Medium, 
-                height = v27.Size.Size_1000
-            }
-        }, 
-        [v10.Large] = {
-            container = {
-                radius = v27.Radius.Medium, 
-                height = v27.Size.Size_1200
-            }
-        }
-    };
-end;
-return function(v29) --[[ Line: 123 ]] --[[ Name: getSharedVariants ]]
-    -- upvalues: v28 (copy), v26 (copy)
-    local v30 = v28(v29);
-    local v31 = v26(v29);
-    return {
-        sizes = v30, 
-        types = v31
-    };
-end;
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Constants = require(Foundation.Constants)
+local Dash = require(FoundationParent.Dash)
+
+require(Foundation.Components.Types)
+
+local ButtonVariant = require(Foundation.Enums.ButtonVariant)
+local ColorMode = require(Foundation.Enums.ColorMode)
+
+require(Foundation.Enums.StateLayerMode)
+require(Foundation.Utility.composeStyleVariant)
+require(Foundation.Providers.Style.Tokens)
+
+local InputSize = require(Foundation.Enums.InputSize)
+
+local function toStroke(p1) -- line: 40
+	return {
+		Color = p1.Color3,
+		Transparency = p1.Transparency
+	}
+end
+local function createButtonVariantStyles(p2, p3, b1: boolean?) -- line: 48
+	-- upvalues: ColorMode (copy), Dash (copy), Constants (copy)
+	local t1 = {}
+
+	for v18 in ColorMode do
+		local v19 = p2[v18]
+		local v20 = if type(p3) ~= "table" then v19[p3] else {
+			Foreground = Dash.get(v19, p3)
+		}
+		local t2 = {}
+		local t3 = {
+			style = v20.Background
+		}
+		local t4
+
+		if v20.Border then
+			local Border = v20.Border
+
+			t4 = {
+				Color = Border.Color3,
+				Transparency = Border.Transparency
+			}
+		else
+			t4 = nil
+		end
+
+		t3.stroke = t4
+		t3.stateLayer = {
+			mode = Constants.COLOR_MODE_TO_STATE_LAYER_MODE[b1 or false][v18]
+		}
+		t2.container = t3
+		t2.content = {
+			style = v20.Foreground
+		}
+		t1[v18] = t2
+	end
+
+	return t1
+end
+local function getButtonTypes(p4) -- line: 89
+	-- upvalues: ButtonVariant (copy), createButtonVariantStyles (copy)
+	return {
+		[ButtonVariant.Utility] = createButtonVariantStyles(p4, "ActionUtility"),
+		[ButtonVariant.Standard] = createButtonVariantStyles(p4, "ActionStandard"),
+		[ButtonVariant.Emphasis] = createButtonVariantStyles(p4, "ActionEmphasis"),
+		[ButtonVariant.Alert] = createButtonVariantStyles(p4, "ActionAlert"),
+		[ButtonVariant.SubEmphasis] = createButtonVariantStyles(p4, "ActionSubEmphasis", true),
+		[ButtonVariant.SoftEmphasis] = createButtonVariantStyles(p4, "ActionSoftEmphasis"),
+		[ButtonVariant.Subtle] = createButtonVariantStyles(p4, "ActionSubtle"),
+		[ButtonVariant.Text] = createButtonVariantStyles(p4, {
+			"Content",
+			"Emphasis"
+		}),
+		[ButtonVariant.Link] = createButtonVariantStyles(p4, {
+			"Content",
+			"Link"
+		}),
+		[ButtonVariant.OverMedia] = createButtonVariantStyles(p4, "ActionOverMedia", true)
+	}
+end
+local function getSizes(p5) -- line: 106
+	-- upvalues: InputSize (copy)
+	return {
+		[InputSize.XSmall] = {
+			container = {
+				radius = p5.Radius.Small,
+				height = p5.Size.Size_600
+			}
+		},
+		[InputSize.Small] = {
+			container = {
+				radius = p5.Radius.Medium,
+				height = p5.Size.Size_800
+			}
+		},
+		[InputSize.Medium] = {
+			container = {
+				radius = p5.Radius.Medium,
+				height = p5.Size.Size_1000
+			}
+		},
+		[InputSize.Large] = {
+			container = {
+				radius = p5.Radius.Medium,
+				height = p5.Size.Size_1200
+			}
+		}
+	}
+end
+local function getSharedVariants(p6) -- line: 123
+	-- upvalues: getSizes (copy), getButtonTypes (copy)
+	local v28 = getSizes(p6)
+	local v29 = getButtonTypes(p6)
+
+	return {
+		sizes = v28,
+		types = v29
+	}
+end
+
+return getSharedVariants

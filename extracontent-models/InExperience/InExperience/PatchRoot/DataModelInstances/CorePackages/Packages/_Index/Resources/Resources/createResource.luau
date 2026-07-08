@@ -1,83 +1,99 @@
-local _ = require(script.Parent.types);
-local function _(v1) --[[ Line: 5 ]] --[[ Name: once ]]
-    local v2 = false;
-    return function() --[[ Line: 7 ]] --[[ Name: notAgain ]]
-        -- upvalues: v2 (ref), v1 (copy)
-        if not v2 then
-            v2 = true;
-            v1();
-        end;
-    end;
-end;
-local function v10(v4) --[[ Line: 16 ]] --[[ Name: disposeChildren ]]
-    local v5 = {};
-    for v6 = #v4, 1, -1 do
-        local v7 = v4[v6];
-        local l_status_0, l_result_0 = pcall(v7);
-        if not l_status_0 then
-            table.insert(v5, l_result_0);
-        end;
-    end;
-    if #v5 > 0 then
-        error(table.concat(v5, "\n"));
-    end;
-end;
-return function(v11) --[[ Line: 32 ]] --[[ Name: createResource ]]
-    -- upvalues: v10 (copy)
-    local v12 = false;
-    local v13 = {};
-    local function v15() --[[ Line: 37 ]] --[[ Name: dispose ]]
-        -- upvalues: v12 (ref), v13 (ref), v10 (ref)
-        if not v12 then
-            v12 = true;
-            local l_v13_0 = v13;
-            v13 = {};
-            v10(l_v13_0);
-        end;
-    end;
-    local function _(v16) --[[ Line: 46 ]] --[[ Name: capture ]]
-        -- upvalues: v12 (ref), v13 (ref)
-        if not v12 then
-            table.insert(v13, v16);
-            return;
-        else
-            error("attempted to track a child after the resource has been disposed");
-            return;
-        end;
-    end;
-    local function v19(v18, ...) --[[ Line: 54 ]] --[[ Name: own ]]
-        -- upvalues: v12 (ref), v13 (ref)
-        if not v12 then
-            table.insert(v13, v18);
-        else
-            error("attempted to track a child after the resource has been disposed");
-        end;
-        return ...;
-    end;
-    local function v22(v20, ...) --[[ Line: 59 ]] --[[ Name: handleError ]]
-        -- upvalues: v12 (ref), v13 (ref), v10 (ref)
-        if not v20 then
-            if not v12 then
-                v12 = true;
-                local l_v13_1 = v13;
-                v13 = {};
-                v10(l_v13_1);
-            end;
-            error((select(1, ...)));
-        end;
-        return ...;
-    end;
-    local v23 = false;
-    local v24;
-    do
-        local l_v23_0 = v23;
-        v24 = function() --[[ Line: 7 ]] --[[ Name: notAgain ]]
-            -- upvalues: l_v23_0 (ref), v15 (copy)
-            if not l_v23_0 then
-                l_v23_0 = true;
-                v15();
-            end;
-        end;
-    end;
-    return v24, v22(pcall(v11, v19));
-end;
+require(script.Parent.types)
+
+local function once(p1) -- line: 5
+	local u5 = false
+
+	local function notAgain() -- line: 7
+		-- upvalues: u5 (ref), p1 (copy)
+		if not u5 then
+			u5 = true
+			p1()
+		end
+	end
+
+	return notAgain
+end
+local function disposeChildren(t1: {[any]: any}) -- line: 16
+	local t2 = {}
+
+	for i = #t1, 1, -1 do
+		local v10 = t1[i]
+		local ok, result = pcall(v10)
+
+		if not ok then
+			table.insert(t2, result)
+		end
+	end
+
+	if #t2 > 0 then
+		error(table.concat(t2, "\n"))
+	end
+end
+local function createResource(p2: ((...any) -> ...any)) -- line: 32
+	-- upvalues: disposeChildren (copy)
+	local u14 = false
+	local t3 = {}
+
+	local function dispose() -- line: 37
+		-- upvalues: u14 (ref), t3 (ref), disposeChildren (copy)
+		if not u14 then
+			u14 = true
+
+			local v22 = t3
+
+			t3 = {}
+			disposeChildren(v22)
+		end
+	end
+	local function capture(p3) -- line: 46
+		-- upvalues: u14 (ref), t3 (ref)
+		if not u14 then
+			table.insert(t3, p3)
+
+			return
+		end
+
+		error("attempted to track a child after the resource has been disposed")
+	end
+	local function own(p4, ...) -- line: 54
+		-- upvalues: u14 (ref), t3 (ref)
+		if not u14 then
+			table.insert(t3, p4)
+		else
+			error("attempted to track a child after the resource has been disposed")
+		end
+
+		return ...
+	end
+	local function handleError(b1: boolean, ...) -- line: 59
+		-- upvalues: u14 (ref), t3 (ref), disposeChildren (copy)
+		if not b1 then
+			if not u14 then
+				u14 = true
+
+				local v26 = t3
+
+				t3 = {}
+				disposeChildren(v26)
+			end
+
+			error((select(1, ...)))
+		end
+
+		return ...
+	end
+
+	local u20 = false
+
+	local function notAgain() -- line: 7
+		-- upvalues: u20 (ref), dispose (copy)
+		if not u20 then
+			u20 = true
+			dispose()
+		end
+	end
+
+	return notAgain, handleError(pcall(p2, own))
+end
+
+return createResource

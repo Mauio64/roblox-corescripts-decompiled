@@ -1,3 +1,5 @@
-local l_Parent_0 = script:FindFirstAncestor("PurchasePrompt").Parent;
-local _ = require(l_Parent_0.RobloxSubscriptionPurchaseApp);
-return require(script.Parent.makeActionCreator)(script.Name, "robloxSubscriptionProducts");
+local Parent = script:FindFirstAncestor("PurchasePrompt").Parent
+
+require(Parent.RobloxSubscriptionPurchaseApp)
+
+return require(script.Parent.makeActionCreator)(script.Name, "robloxSubscriptionProducts")

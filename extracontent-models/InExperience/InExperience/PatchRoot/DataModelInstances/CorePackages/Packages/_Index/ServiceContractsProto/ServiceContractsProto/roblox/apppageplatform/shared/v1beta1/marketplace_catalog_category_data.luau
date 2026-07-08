@@ -1,493 +1,551 @@
-local v0 = require(script.Parent.Parent.Parent.Parent.Parent.proto);
-local v1 = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry);
-local v2 = {};
-local v3 = {};
-v3.__index = v3;
-v3.new = function(v4) --[[ Line: 77 ]] --[[ Name: new ]]
-    -- upvalues: v3 (copy)
-    return (setmetatable({
-        id = (not (v4 ~= nil) or v4.id == nil) and "" or v4.id, 
-        title = (not (v4 ~= nil) or v4.title == nil) and "" or v4.title, 
-        name = (not (v4 ~= nil) or v4.name == nil) and "" or v4.name, 
-        taxonomy_id = (not (v4 ~= nil) or v4.taxonomy_id == nil) and "" or v4.taxonomy_id, 
-        buttons_enabled = if not (v4 ~= nil) or v4.buttons_enabled == nil then {} else v4.buttons_enabled, 
-        subcategories = if not (v4 ~= nil) or v4.subcategories == nil then {} else v4.subcategories, 
-        default_subcategory_id = (not (v4 ~= nil) or v4.default_subcategory_id == nil) and "" or v4.default_subcategory_id, 
-        asset_types = if not (v4 ~= nil) or v4.asset_types == nil then {} else v4.asset_types, 
-        bundle_types = if not (v4 ~= nil) or v4.bundle_types == nil then {} else v4.bundle_types, 
-        can_animate_camera_based_mood = v4 ~= nil and not (v4.can_animate_camera_based_mood == nil) and v4.can_animate_camera_based_mood, 
-        camera_focus = (not (v4 ~= nil) or v4.camera_focus == nil) and "" or v4.camera_focus, 
-        camera_zoom_radius = (not (v4 ~= nil) or v4.camera_zoom_radius == nil) and 0 or v4.camera_zoom_radius, 
-        tile_type = (not (v4 ~= nil) or v4.tile_type == nil) and "" or v4.tile_type, 
-        looks_widget_context_for_organic_content = (not (v4 ~= nil) or v4.looks_widget_context_for_organic_content == nil) and "" or v4.looks_widget_context_for_organic_content, 
-        time_to_refresh = (not (v4 ~= nil) or v4.time_to_refresh == nil) and 0 or v4.time_to_refresh, 
-        category_id = (not (v4 ~= nil) or v4.category_id == nil) and 0 or v4.category_id, 
-        subcategory_id = (not (v4 ~= nil) or v4.subcategory_id == nil) and 0 or v4.subcategory_id
-    }, v3));
-end;
-v3.encode = function(v5) --[[ Line: 108 ]] --[[ Name: encode ]]
-    -- upvalues: v0 (copy)
-    local v6 = buffer.create(0);
-    local v7 = 0;
-    if v5.id ~= nil and v5.id ~= "" then
-        local v8, v9 = v0.writeTag(v6, v7, 1, v0.wireTypes.lengthDelimited);
-        v8, v9 = v0.writeString(v8, v9, v5.id);
-        v6 = v8;
-        v7 = v9;
-    end;
-    if v5.title ~= nil and v5.title ~= "" then
-        local v10, v11 = v0.writeTag(v6, v7, 2, v0.wireTypes.lengthDelimited);
-        v10, v11 = v0.writeString(v10, v11, v5.title);
-        v6 = v10;
-        v7 = v11;
-    end;
-    if v5.name ~= nil and v5.name ~= "" then
-        local v12, v13 = v0.writeTag(v6, v7, 3, v0.wireTypes.lengthDelimited);
-        v12, v13 = v0.writeString(v12, v13, v5.name);
-        v6 = v12;
-        v7 = v13;
-    end;
-    if v5.taxonomy_id ~= nil and v5.taxonomy_id ~= "" then
-        local v14, v15 = v0.writeTag(v6, v7, 4, v0.wireTypes.lengthDelimited);
-        v14, v15 = v0.writeString(v14, v15, v5.taxonomy_id);
-        v6 = v14;
-        v7 = v15;
-    end;
-    if v5.buttons_enabled ~= nil and #v5.buttons_enabled > 0 then
-        for _, v17 in v5.buttons_enabled do
-            local v18, v19 = v0.writeTag(v6, v7, 5, v0.wireTypes.lengthDelimited);
-            v18, v19 = v0.writeString(v18, v19, v17);
-            v6 = v18;
-            v7 = v19;
-        end;
-    end;
-    if v5.subcategories ~= nil and #v5.subcategories > 0 then
-        for _, v21 in v5.subcategories do
-            local v22, v23 = v0.writeTag(v6, v7, 6, v0.wireTypes.lengthDelimited);
-            v22, v23 = v0.writeString(v22, v23, v21);
-            v6 = v22;
-            v7 = v23;
-        end;
-    end;
-    if v5.default_subcategory_id ~= nil and v5.default_subcategory_id ~= "" then
-        local v24, v25 = v0.writeTag(v6, v7, 7, v0.wireTypes.lengthDelimited);
-        v24, v25 = v0.writeString(v24, v25, v5.default_subcategory_id);
-        v6 = v24;
-        v7 = v25;
-    end;
-    if v5.asset_types ~= nil and #v5.asset_types > 0 then
-        for _, v27 in v5.asset_types do
-            local v28, v29 = v0.writeTag(v6, v7, 8, v0.wireTypes.lengthDelimited);
-            v28, v29 = v0.writeString(v28, v29, v27);
-            v6 = v28;
-            v7 = v29;
-        end;
-    end;
-    if v5.bundle_types ~= nil and #v5.bundle_types > 0 then
-        for _, v31 in v5.bundle_types do
-            local v32, v33 = v0.writeTag(v6, v7, 9, v0.wireTypes.lengthDelimited);
-            v32, v33 = v0.writeString(v32, v33, v31);
-            v6 = v32;
-            v7 = v33;
-        end;
-    end;
-    if v5.can_animate_camera_based_mood then
-        local v34, v35 = v0.writeTag(v6, v7, 10, v0.wireTypes.varint);
-        v34, v35 = v0.writeVarInt(v34, v35, v5.can_animate_camera_based_mood and 1 or 0);
-        v6 = v34;
-        v7 = v35;
-    end;
-    if v5.camera_focus ~= nil and v5.camera_focus ~= "" then
-        local v36, v37 = v0.writeTag(v6, v7, 11, v0.wireTypes.lengthDelimited);
-        v36, v37 = v0.writeString(v36, v37, v5.camera_focus);
-        v6 = v36;
-        v7 = v37;
-    end;
-    if v5.camera_zoom_radius ~= nil and v5.camera_zoom_radius ~= 0 then
-        local v38, v39 = v0.writeTag(v6, v7, 12, v0.wireTypes.i32);
-        v38, v39 = v0.writeFloat(v38, v39, v5.camera_zoom_radius);
-        v6 = v38;
-        v7 = v39;
-    end;
-    if v5.tile_type ~= nil and v5.tile_type ~= "" then
-        local v40, v41 = v0.writeTag(v6, v7, 13, v0.wireTypes.lengthDelimited);
-        v40, v41 = v0.writeString(v40, v41, v5.tile_type);
-        v6 = v40;
-        v7 = v41;
-    end;
-    if v5.looks_widget_context_for_organic_content ~= nil and v5.looks_widget_context_for_organic_content ~= "" then
-        local v42, v43 = v0.writeTag(v6, v7, 14, v0.wireTypes.lengthDelimited);
-        v42, v43 = v0.writeString(v42, v43, v5.looks_widget_context_for_organic_content);
-        v6 = v42;
-        v7 = v43;
-    end;
-    if v5.time_to_refresh ~= nil and v5.time_to_refresh ~= 0 then
-        local v44, v45 = v0.writeTag(v6, v7, 15, v0.wireTypes.varint);
-        v44, v45 = v0.writeVarInt(v44, v45, v5.time_to_refresh);
-        v6 = v44;
-        v7 = v45;
-    end;
-    if v5.category_id ~= nil and v5.category_id ~= 0 then
-        local v46, v47 = v0.writeTag(v6, v7, 16, v0.wireTypes.varint);
-        v46, v47 = v0.writeVarInt(v46, v47, v5.category_id);
-        v6 = v46;
-        v7 = v47;
-    end;
-    if v5.subcategory_id ~= nil and v5.subcategory_id ~= 0 then
-        local v48, v49 = v0.writeTag(v6, v7, 17, v0.wireTypes.varint);
-        v48, v49 = v0.writeVarInt(v48, v49, v5.subcategory_id);
-        v6 = v48;
-        v7 = v49;
-    end;
-    local v50 = buffer.create(v7);
-    buffer.copy(v50, 0, v6, 0, v7);
-    return v50;
-end;
-v3.decode = function(v51) --[[ Line: 213 ]] --[[ Name: decode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v52 = v3.new();
-    local v53 = 0;
-    while v53 < buffer.len(v51) do
-        local v54 = nil;
-        local v55 = nil;
-        local v56, v57, v58 = v0.readTag(v51, v53);
-        v54 = v56;
-        v55 = v57;
-        v53 = v58;
-        if v55 == v0.wireTypes.varint then
-            if v54 == 10 then
-                v56 = nil;
-                v57, v58 = v0.readVarInt(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.can_animate_camera_based_mood = v56 ~= 0;
-            elseif v54 == 15 then
-                v56 = nil;
-                v57, v58 = v0.readVarIntI64(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.time_to_refresh = v56;
-            elseif v54 == 16 then
-                v56 = nil;
-                v57, v58 = v0.readVarIntI64(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.category_id = v56;
-            elseif v54 == 17 then
-                v56 = nil;
-                v57, v58 = v0.readVarIntI64(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.subcategory_id = v56;
-            else
-                v56 = nil;
-                v57, v58 = v0.readVarInt(v51, v53);
-                v56 = v57;
-                v53 = v58;
-            end;
-        elseif v55 == v0.wireTypes.lengthDelimited then
-            if v54 == 1 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.id = buffer.tostring(v56);
-            elseif v54 == 2 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.title = buffer.tostring(v56);
-            elseif v54 == 3 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.name = buffer.tostring(v56);
-            elseif v54 == 4 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.taxonomy_id = buffer.tostring(v56);
-            elseif v54 == 5 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                table.insert(v52.buttons_enabled, buffer.tostring(v56));
-            elseif v54 == 6 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                table.insert(v52.subcategories, buffer.tostring(v56));
-            elseif v54 == 7 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.default_subcategory_id = buffer.tostring(v56);
-            elseif v54 == 8 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                table.insert(v52.asset_types, buffer.tostring(v56));
-            elseif v54 == 9 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                table.insert(v52.bundle_types, buffer.tostring(v56));
-            elseif v54 == 11 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.camera_focus = buffer.tostring(v56);
-            elseif v54 == 13 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.tile_type = buffer.tostring(v56);
-            elseif v54 == 14 then
-                v56 = nil;
-                v57, v58 = v0.readBuffer(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.looks_widget_context_for_organic_content = buffer.tostring(v56);
-            else
-                v56 = nil;
-                v57, v58 = v0.readVarInt(v51, v53);
-                v53 = v58 + v57;
-            end;
-        elseif v55 == v0.wireTypes.i32 then
-            if v54 == 12 then
-                v56 = nil;
-                v57, v58 = v0.readFloat(v51, v53);
-                v56 = v57;
-                v53 = v58;
-                v52.camera_zoom_radius = v56;
-            else
-                v56 = nil;
-                v57, v58 = v0.readFixed32(v51, v53);
-                v56 = v57;
-                v53 = v58;
-            end;
-        elseif v55 == v0.wireTypes.i64 then
-            v56 = nil;
-            v57, v58 = v0.readFixed64(v51, v53);
-            v56 = v57;
-            v53 = v58;
-        else
-            error("Unsupported wire type: " .. v55);
-        end;
-    end;
-    return v52;
-end;
-v3.jsonEncode = function(v59) --[[ Line: 336 ]] --[[ Name: jsonEncode ]]
-    -- upvalues: v0 (copy)
-    local v60 = {};
-    if v59.id ~= nil and v59.id ~= "" then
-        v60.id = v59.id;
-    end;
-    if v59.title ~= nil and v59.title ~= "" then
-        v60.title = v59.title;
-    end;
-    if v59.name ~= nil and v59.name ~= "" then
-        v60.name = v59.name;
-    end;
-    if v59.taxonomy_id ~= nil and v59.taxonomy_id ~= "" then
-        v60.taxonomyId = v59.taxonomy_id;
-    end;
-    if v59.buttons_enabled ~= nil and #v59.buttons_enabled > 0 then
-        local v61 = {};
-        for _, v63 in v59.buttons_enabled do
-            table.insert(v61, v63);
-        end;
-        v60.buttonsEnabled = v61;
-    end;
-    if v59.subcategories ~= nil and #v59.subcategories > 0 then
-        local v64 = {};
-        for _, v66 in v59.subcategories do
-            table.insert(v64, v66);
-        end;
-        v60.subcategories = v64;
-    end;
-    if v59.default_subcategory_id ~= nil and v59.default_subcategory_id ~= "" then
-        v60.defaultSubcategoryId = v59.default_subcategory_id;
-    end;
-    if v59.asset_types ~= nil and #v59.asset_types > 0 then
-        local v67 = {};
-        for _, v69 in v59.asset_types do
-            table.insert(v67, v69);
-        end;
-        v60.assetTypes = v67;
-    end;
-    if v59.bundle_types ~= nil and #v59.bundle_types > 0 then
-        local v70 = {};
-        for _, v72 in v59.bundle_types do
-            table.insert(v70, v72);
-        end;
-        v60.bundleTypes = v70;
-    end;
-    if v59.can_animate_camera_based_mood then
-        v60.canAnimateCameraBasedMood = v59.can_animate_camera_based_mood;
-    end;
-    if v59.camera_focus ~= nil and v59.camera_focus ~= "" then
-        v60.cameraFocus = v59.camera_focus;
-    end;
-    if v59.camera_zoom_radius ~= nil and v59.camera_zoom_radius ~= 0 then
-        v60.cameraZoomRadius = v0.json.serializeNumber(v59.camera_zoom_radius);
-    end;
-    if v59.tile_type ~= nil and v59.tile_type ~= "" then
-        v60.tileType = v59.tile_type;
-    end;
-    if v59.looks_widget_context_for_organic_content ~= nil and v59.looks_widget_context_for_organic_content ~= "" then
-        v60.looksWidgetContextForOrganicContent = v59.looks_widget_context_for_organic_content;
-    end;
-    if v59.time_to_refresh ~= nil and v59.time_to_refresh ~= 0 then
-        v60.timeToRefresh = v59.time_to_refresh;
-    end;
-    if v59.category_id ~= nil and v59.category_id ~= 0 then
-        v60.categoryId = v59.category_id;
-    end;
-    if v59.subcategory_id ~= nil and v59.subcategory_id ~= 0 then
-        v60.subcategoryId = v59.subcategory_id;
-    end;
-    return v60;
-end;
-v3.jsonDecode = function(v73) --[[ Line: 429 ]] --[[ Name: jsonDecode ]]
-    -- upvalues: v3 (copy), v0 (copy)
-    local v74 = v3.new();
-    if v73.id ~= nil then
-        v74.id = v73.id;
-    end;
-    if v73.title ~= nil then
-        v74.title = v73.title;
-    end;
-    if v73.name ~= nil then
-        v74.name = v73.name;
-    end;
-    if v73.taxonomy_id ~= nil then
-        v74.taxonomy_id = v73.taxonomy_id;
-    end;
-    if v73.taxonomyId ~= nil then
-        v74.taxonomy_id = v73.taxonomyId;
-    end;
-    if v73.buttons_enabled ~= nil then
-        local v75 = {};
-        for _, v77 in v73.buttons_enabled do
-            table.insert(v75, v77);
-        end;
-        v74.buttons_enabled = v75;
-    end;
-    if v73.buttonsEnabled ~= nil then
-        local v78 = {};
-        for _, v80 in v73.buttonsEnabled do
-            table.insert(v78, v80);
-        end;
-        v74.buttons_enabled = v78;
-    end;
-    if v73.subcategories ~= nil then
-        local v81 = {};
-        for _, v83 in v73.subcategories do
-            table.insert(v81, v83);
-        end;
-        v74.subcategories = v81;
-    end;
-    if v73.default_subcategory_id ~= nil then
-        v74.default_subcategory_id = v73.default_subcategory_id;
-    end;
-    if v73.defaultSubcategoryId ~= nil then
-        v74.default_subcategory_id = v73.defaultSubcategoryId;
-    end;
-    if v73.asset_types ~= nil then
-        local v84 = {};
-        for _, v86 in v73.asset_types do
-            table.insert(v84, v86);
-        end;
-        v74.asset_types = v84;
-    end;
-    if v73.assetTypes ~= nil then
-        local v87 = {};
-        for _, v89 in v73.assetTypes do
-            table.insert(v87, v89);
-        end;
-        v74.asset_types = v87;
-    end;
-    if v73.bundle_types ~= nil then
-        local v90 = {};
-        for _, v92 in v73.bundle_types do
-            table.insert(v90, v92);
-        end;
-        v74.bundle_types = v90;
-    end;
-    if v73.bundleTypes ~= nil then
-        local v93 = {};
-        for _, v95 in v73.bundleTypes do
-            table.insert(v93, v95);
-        end;
-        v74.bundle_types = v93;
-    end;
-    if v73.can_animate_camera_based_mood ~= nil then
-        v74.can_animate_camera_based_mood = v73.can_animate_camera_based_mood;
-    end;
-    if v73.canAnimateCameraBasedMood ~= nil then
-        v74.can_animate_camera_based_mood = v73.canAnimateCameraBasedMood;
-    end;
-    if v73.camera_focus ~= nil then
-        v74.camera_focus = v73.camera_focus;
-    end;
-    if v73.cameraFocus ~= nil then
-        v74.camera_focus = v73.cameraFocus;
-    end;
-    if v73.camera_zoom_radius ~= nil then
-        v74.camera_zoom_radius = v0.json.deserializeNumber(v73.camera_zoom_radius);
-    end;
-    if v73.cameraZoomRadius ~= nil then
-        v74.camera_zoom_radius = v0.json.deserializeNumber(v73.cameraZoomRadius);
-    end;
-    if v73.tile_type ~= nil then
-        v74.tile_type = v73.tile_type;
-    end;
-    if v73.tileType ~= nil then
-        v74.tile_type = v73.tileType;
-    end;
-    if v73.looks_widget_context_for_organic_content ~= nil then
-        v74.looks_widget_context_for_organic_content = v73.looks_widget_context_for_organic_content;
-    end;
-    if v73.looksWidgetContextForOrganicContent ~= nil then
-        v74.looks_widget_context_for_organic_content = v73.looksWidgetContextForOrganicContent;
-    end;
-    if v73.time_to_refresh ~= nil then
-        v74.time_to_refresh = v73.time_to_refresh;
-    end;
-    if v73.timeToRefresh ~= nil then
-        v74.time_to_refresh = v73.timeToRefresh;
-    end;
-    if v73.category_id ~= nil then
-        v74.category_id = v73.category_id;
-    end;
-    if v73.categoryId ~= nil then
-        v74.category_id = v73.categoryId;
-    end;
-    if v73.subcategory_id ~= nil then
-        v74.subcategory_id = v73.subcategory_id;
-    end;
-    if v73.subcategoryId ~= nil then
-        v74.subcategory_id = v73.subcategoryId;
-    end;
-    return v74;
-end;
-v3.descriptor = {
-    name = "MarketplaceCatalogCategoryData", 
-    fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceCatalogCategoryData"
-};
-v2.MarketplaceCatalogCategoryData = v3;
-v1.default:register(v2.MarketplaceCatalogCategoryData);
+local proto = require(script.Parent.Parent.Parent.Parent.Parent.proto)
+local typeRegistry = require(script.Parent.Parent.Parent.Parent.Parent.proto.typeRegistry)
+local t1 = {}
+local t2 = {}
+
+t2.__index = t2
+
+function t2.new(t3: {[any]: any}?) -- line: 77
+	-- upvalues: t2 (copy)
+	return (setmetatable({
+		id = if t3 ~= nil and t3.id ~= nil then t3.id else "",
+		title = if t3 ~= nil and t3.title ~= nil then t3.title else "",
+		name = if t3 ~= nil and t3.name ~= nil then t3.name else "",
+		taxonomy_id = if t3 ~= nil and t3.taxonomy_id ~= nil then t3.taxonomy_id else "",
+		buttons_enabled = if t3 ~= nil and t3.buttons_enabled ~= nil then t3.buttons_enabled else {},
+		subcategories = if t3 ~= nil and t3.subcategories ~= nil then t3.subcategories else {},
+		default_subcategory_id = if t3 ~= nil and t3.default_subcategory_id ~= nil then t3.default_subcategory_id else "",
+		asset_types = if t3 ~= nil and t3.asset_types ~= nil then t3.asset_types else {},
+		bundle_types = if t3 ~= nil and t3.bundle_types ~= nil then t3.bundle_types else {},
+		can_animate_camera_based_mood = t3 ~= nil and (t3.can_animate_camera_based_mood ~= nil and t3.can_animate_camera_based_mood),
+		camera_focus = if t3 ~= nil and t3.camera_focus ~= nil then t3.camera_focus else "",
+		camera_zoom_radius = if t3 ~= nil and t3.camera_zoom_radius ~= nil then t3.camera_zoom_radius else 0,
+		tile_type = if t3 ~= nil and t3.tile_type ~= nil then t3.tile_type else "",
+		looks_widget_context_for_organic_content = if t3 ~= nil and t3.looks_widget_context_for_organic_content ~= nil then t3.looks_widget_context_for_organic_content else "",
+		time_to_refresh = if t3 ~= nil and t3.time_to_refresh ~= nil then t3.time_to_refresh else 0,
+		category_id = if t3 ~= nil and t3.category_id ~= nil then t3.category_id else 0,
+		subcategory_id = if t3 ~= nil and t3.subcategory_id ~= nil then t3.subcategory_id else 0
+	}, t2))
+end
+function t2.encode(p1) -- line: 108
+	-- upvalues: proto (copy)
+	local buf = buffer.create(0)
+	local n1 = 0
+
+	if p1.id ~= nil and p1.id ~= "" then
+		local v9, v10 = proto.writeTag(buf, n1, 1, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v9, v10, p1.id)
+	end
+
+	if p1.title ~= nil and p1.title ~= "" then
+		local v11, v12 = proto.writeTag(buf, n1, 2, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v11, v12, p1.title)
+	end
+
+	if p1.name ~= nil and p1.name ~= "" then
+		local v13, v14 = proto.writeTag(buf, n1, 3, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v13, v14, p1.name)
+	end
+
+	if p1.taxonomy_id ~= nil and p1.taxonomy_id ~= "" then
+		local v15, v16 = proto.writeTag(buf, n1, 4, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v15, v16, p1.taxonomy_id)
+	end
+
+	if p1.buttons_enabled ~= nil and #p1.buttons_enabled > 0 then
+		for _, v18 in p1.buttons_enabled do
+			local v19, v20 = proto.writeTag(buf, n1, 5, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeString(v19, v20, v18)
+		end
+	end
+
+	if p1.subcategories ~= nil and #p1.subcategories > 0 then
+		for _, v22 in p1.subcategories do
+			local v23, v24 = proto.writeTag(buf, n1, 6, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeString(v23, v24, v22)
+		end
+	end
+
+	if p1.default_subcategory_id ~= nil and p1.default_subcategory_id ~= "" then
+		local v25, v26 = proto.writeTag(buf, n1, 7, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v25, v26, p1.default_subcategory_id)
+	end
+
+	if p1.asset_types ~= nil and #p1.asset_types > 0 then
+		for _, v28 in p1.asset_types do
+			local v29, v30 = proto.writeTag(buf, n1, 8, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeString(v29, v30, v28)
+		end
+	end
+
+	if p1.bundle_types ~= nil and #p1.bundle_types > 0 then
+		for _, v32 in p1.bundle_types do
+			local v33, v34 = proto.writeTag(buf, n1, 9, proto.wireTypes.lengthDelimited)
+
+			buf, n1 = proto.writeString(v33, v34, v32)
+		end
+	end
+
+	if p1.can_animate_camera_based_mood then
+		local v35, v36 = proto.writeTag(buf, n1, 10, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v35, v36, not p1.can_animate_camera_based_mood and 0 or 1)
+	end
+
+	if p1.camera_focus ~= nil and p1.camera_focus ~= "" then
+		local v37, v38 = proto.writeTag(buf, n1, 11, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v37, v38, p1.camera_focus)
+	end
+
+	if p1.camera_zoom_radius ~= nil and p1.camera_zoom_radius ~= 0 then
+		local v39, v40 = proto.writeTag(buf, n1, 12, proto.wireTypes.i32)
+
+		buf, n1 = proto.writeFloat(v39, v40, p1.camera_zoom_radius)
+	end
+
+	if p1.tile_type ~= nil and p1.tile_type ~= "" then
+		local v41, v42 = proto.writeTag(buf, n1, 13, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v41, v42, p1.tile_type)
+	end
+
+	if p1.looks_widget_context_for_organic_content ~= nil and p1.looks_widget_context_for_organic_content ~= "" then
+		local v43, v44 = proto.writeTag(buf, n1, 14, proto.wireTypes.lengthDelimited)
+
+		buf, n1 = proto.writeString(v43, v44, p1.looks_widget_context_for_organic_content)
+	end
+
+	if p1.time_to_refresh ~= nil and p1.time_to_refresh ~= 0 then
+		local v45, v46 = proto.writeTag(buf, n1, 15, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v45, v46, p1.time_to_refresh)
+	end
+
+	if p1.category_id ~= nil and p1.category_id ~= 0 then
+		local v47, v48 = proto.writeTag(buf, n1, 16, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v47, v48, p1.category_id)
+	end
+
+	if p1.subcategory_id ~= nil and p1.subcategory_id ~= 0 then
+		local v49, v50 = proto.writeTag(buf, n1, 17, proto.wireTypes.varint)
+
+		buf, n1 = proto.writeVarInt(v49, v50, p1.subcategory_id)
+	end
+
+	local buf2 = buffer.create(n1)
+
+	buffer.copy(buf2, 0, buf, 0, n1)
+
+	return buf2
+end
+function t2.decode(p2: buffer) -- line: 213
+	-- upvalues: t2 (copy), proto (copy)
+	local v53 = t2.new()
+	local n2 = 0
+
+	while n2 < buffer.len(p2) do
+		local v55, v56
+
+		v55, v56, n2 = proto.readTag(p2, n2)
+
+		if v56 == proto.wireTypes.varint then
+			if v55 == 10 then
+				local v57
+
+				v57, n2 = proto.readVarInt(p2, n2)
+				v53.can_animate_camera_based_mood = v57 ~= 0
+			elseif v55 == 15 then
+				local v58
+
+				v58, n2 = proto.readVarIntI64(p2, n2)
+				v53.time_to_refresh = v58
+			elseif v55 == 16 then
+				local v59
+
+				v59, n2 = proto.readVarIntI64(p2, n2)
+				v53.category_id = v59
+			elseif v55 == 17 then
+				local v60
+
+				v60, n2 = proto.readVarIntI64(p2, n2)
+				v53.subcategory_id = v60
+			else
+				local v61
+
+				v61, n2 = proto.readVarInt(p2, n2)
+			end
+		elseif v56 == proto.wireTypes.lengthDelimited then
+			if v55 == 1 then
+				local v62
+
+				v62, n2 = proto.readBuffer(p2, n2)
+				v53.id = buffer.tostring(v62)
+			elseif v55 == 2 then
+				local v63
+
+				v63, n2 = proto.readBuffer(p2, n2)
+				v53.title = buffer.tostring(v63)
+			elseif v55 == 3 then
+				local v64
+
+				v64, n2 = proto.readBuffer(p2, n2)
+				v53.name = buffer.tostring(v64)
+			elseif v55 == 4 then
+				local v65
+
+				v65, n2 = proto.readBuffer(p2, n2)
+				v53.taxonomy_id = buffer.tostring(v65)
+			elseif v55 == 5 then
+				local v66
+
+				v66, n2 = proto.readBuffer(p2, n2)
+				table.insert(v53.buttons_enabled, buffer.tostring(v66))
+			elseif v55 == 6 then
+				local v67
+
+				v67, n2 = proto.readBuffer(p2, n2)
+				table.insert(v53.subcategories, buffer.tostring(v67))
+			elseif v55 == 7 then
+				local v68
+
+				v68, n2 = proto.readBuffer(p2, n2)
+				v53.default_subcategory_id = buffer.tostring(v68)
+			elseif v55 == 8 then
+				local v69
+
+				v69, n2 = proto.readBuffer(p2, n2)
+				table.insert(v53.asset_types, buffer.tostring(v69))
+			elseif v55 == 9 then
+				local v70
+
+				v70, n2 = proto.readBuffer(p2, n2)
+				table.insert(v53.bundle_types, buffer.tostring(v70))
+			elseif v55 == 11 then
+				local v71
+
+				v71, n2 = proto.readBuffer(p2, n2)
+				v53.camera_focus = buffer.tostring(v71)
+			elseif v55 == 13 then
+				local v72
+
+				v72, n2 = proto.readBuffer(p2, n2)
+				v53.tile_type = buffer.tostring(v72)
+			elseif v55 == 14 then
+				local v73
+
+				v73, n2 = proto.readBuffer(p2, n2)
+				v53.looks_widget_context_for_organic_content = buffer.tostring(v73)
+			else
+				local v74, v75 = proto.readVarInt(p2, n2)
+
+				n2 = v75 + v74
+			end
+		elseif v56 == proto.wireTypes.i32 then
+			if v55 == 12 then
+				local v76
+
+				v76, n2 = proto.readFloat(p2, n2)
+				v53.camera_zoom_radius = v76
+			else
+				local v77
+
+				v77, n2 = proto.readFixed32(p2, n2)
+			end
+		elseif v56 == proto.wireTypes.i64 then
+			local v78
+
+			v78, n2 = proto.readFixed64(p2, n2)
+		else
+			error("Unsupported wire type: " .. v56)
+		end
+	end
+
+	return v53
+end
+function t2.jsonEncode(p3) -- line: 336
+	-- upvalues: proto (copy)
+	local t4 = {}
+
+	if p3.id ~= nil and p3.id ~= "" then
+		t4.id = p3.id
+	end
+
+	if p3.title ~= nil and p3.title ~= "" then
+		t4.title = p3.title
+	end
+
+	if p3.name ~= nil and p3.name ~= "" then
+		t4.name = p3.name
+	end
+
+	if p3.taxonomy_id ~= nil and p3.taxonomy_id ~= "" then
+		t4.taxonomyId = p3.taxonomy_id
+	end
+
+	if p3.buttons_enabled ~= nil and #p3.buttons_enabled > 0 then
+		local t5 = {}
+
+		for _, v83 in p3.buttons_enabled do
+			table.insert(t5, v83)
+		end
+
+		t4.buttonsEnabled = t5
+	end
+
+	if p3.subcategories ~= nil and #p3.subcategories > 0 then
+		local t6 = {}
+
+		for _, v86 in p3.subcategories do
+			table.insert(t6, v86)
+		end
+
+		t4.subcategories = t6
+	end
+
+	if p3.default_subcategory_id ~= nil and p3.default_subcategory_id ~= "" then
+		t4.defaultSubcategoryId = p3.default_subcategory_id
+	end
+
+	if p3.asset_types ~= nil and #p3.asset_types > 0 then
+		local t7 = {}
+
+		for _, v89 in p3.asset_types do
+			table.insert(t7, v89)
+		end
+
+		t4.assetTypes = t7
+	end
+
+	if p3.bundle_types ~= nil and #p3.bundle_types > 0 then
+		local t8 = {}
+
+		for _, v92 in p3.bundle_types do
+			table.insert(t8, v92)
+		end
+
+		t4.bundleTypes = t8
+	end
+
+	if p3.can_animate_camera_based_mood then
+		t4.canAnimateCameraBasedMood = p3.can_animate_camera_based_mood
+	end
+
+	if p3.camera_focus ~= nil and p3.camera_focus ~= "" then
+		t4.cameraFocus = p3.camera_focus
+	end
+
+	if p3.camera_zoom_radius ~= nil and p3.camera_zoom_radius ~= 0 then
+		t4.cameraZoomRadius = proto.json.serializeNumber(p3.camera_zoom_radius)
+	end
+
+	if p3.tile_type ~= nil and p3.tile_type ~= "" then
+		t4.tileType = p3.tile_type
+	end
+
+	if p3.looks_widget_context_for_organic_content ~= nil and p3.looks_widget_context_for_organic_content ~= "" then
+		t4.looksWidgetContextForOrganicContent = p3.looks_widget_context_for_organic_content
+	end
+
+	if p3.time_to_refresh ~= nil and p3.time_to_refresh ~= 0 then
+		t4.timeToRefresh = p3.time_to_refresh
+	end
+
+	if p3.category_id ~= nil and p3.category_id ~= 0 then
+		t4.categoryId = p3.category_id
+	end
+
+	if p3.subcategory_id ~= nil and p3.subcategory_id ~= 0 then
+		t4.subcategoryId = p3.subcategory_id
+	end
+
+	return t4
+end
+function t2.jsonDecode(t9: {[any]: any}) -- line: 429
+	-- upvalues: t2 (copy), proto (copy)
+	local v94 = t2.new()
+
+	if t9.id ~= nil then
+		v94.id = t9.id
+	end
+
+	if t9.title ~= nil then
+		v94.title = t9.title
+	end
+
+	if t9.name ~= nil then
+		v94.name = t9.name
+	end
+
+	if t9.taxonomy_id ~= nil then
+		v94.taxonomy_id = t9.taxonomy_id
+	end
+
+	if t9.taxonomyId ~= nil then
+		v94.taxonomy_id = t9.taxonomyId
+	end
+
+	if t9.buttons_enabled ~= nil then
+		local t10 = {}
+
+		for _, v97 in t9.buttons_enabled do
+			table.insert(t10, v97)
+		end
+
+		v94.buttons_enabled = t10
+	end
+
+	if t9.buttonsEnabled ~= nil then
+		local t11 = {}
+
+		for _, v100 in t9.buttonsEnabled do
+			table.insert(t11, v100)
+		end
+
+		v94.buttons_enabled = t11
+	end
+
+	if t9.subcategories ~= nil then
+		local t12 = {}
+
+		for _, v103 in t9.subcategories do
+			table.insert(t12, v103)
+		end
+
+		v94.subcategories = t12
+	end
+
+	if t9.default_subcategory_id ~= nil then
+		v94.default_subcategory_id = t9.default_subcategory_id
+	end
+
+	if t9.defaultSubcategoryId ~= nil then
+		v94.default_subcategory_id = t9.defaultSubcategoryId
+	end
+
+	if t9.asset_types ~= nil then
+		local t13 = {}
+
+		for _, v106 in t9.asset_types do
+			table.insert(t13, v106)
+		end
+
+		v94.asset_types = t13
+	end
+
+	if t9.assetTypes ~= nil then
+		local t14 = {}
+
+		for _, v109 in t9.assetTypes do
+			table.insert(t14, v109)
+		end
+
+		v94.asset_types = t14
+	end
+
+	if t9.bundle_types ~= nil then
+		local t15 = {}
+
+		for _, v112 in t9.bundle_types do
+			table.insert(t15, v112)
+		end
+
+		v94.bundle_types = t15
+	end
+
+	if t9.bundleTypes ~= nil then
+		local t16 = {}
+
+		for _, v115 in t9.bundleTypes do
+			table.insert(t16, v115)
+		end
+
+		v94.bundle_types = t16
+	end
+
+	if t9.can_animate_camera_based_mood ~= nil then
+		v94.can_animate_camera_based_mood = t9.can_animate_camera_based_mood
+	end
+
+	if t9.canAnimateCameraBasedMood ~= nil then
+		v94.can_animate_camera_based_mood = t9.canAnimateCameraBasedMood
+	end
+
+	if t9.camera_focus ~= nil then
+		v94.camera_focus = t9.camera_focus
+	end
+
+	if t9.cameraFocus ~= nil then
+		v94.camera_focus = t9.cameraFocus
+	end
+
+	if t9.camera_zoom_radius ~= nil then
+		v94.camera_zoom_radius = proto.json.deserializeNumber(t9.camera_zoom_radius)
+	end
+
+	if t9.cameraZoomRadius ~= nil then
+		v94.camera_zoom_radius = proto.json.deserializeNumber(t9.cameraZoomRadius)
+	end
+
+	if t9.tile_type ~= nil then
+		v94.tile_type = t9.tile_type
+	end
+
+	if t9.tileType ~= nil then
+		v94.tile_type = t9.tileType
+	end
+
+	if t9.looks_widget_context_for_organic_content ~= nil then
+		v94.looks_widget_context_for_organic_content = t9.looks_widget_context_for_organic_content
+	end
+
+	if t9.looksWidgetContextForOrganicContent ~= nil then
+		v94.looks_widget_context_for_organic_content = t9.looksWidgetContextForOrganicContent
+	end
+
+	if t9.time_to_refresh ~= nil then
+		v94.time_to_refresh = t9.time_to_refresh
+	end
+
+	if t9.timeToRefresh ~= nil then
+		v94.time_to_refresh = t9.timeToRefresh
+	end
+
+	if t9.category_id ~= nil then
+		v94.category_id = t9.category_id
+	end
+
+	if t9.categoryId ~= nil then
+		v94.category_id = t9.categoryId
+	end
+
+	if t9.subcategory_id ~= nil then
+		v94.subcategory_id = t9.subcategory_id
+	end
+
+	if t9.subcategoryId ~= nil then
+		v94.subcategory_id = t9.subcategoryId
+	end
+
+	return v94
+end
+
+t2.descriptor = {
+	name = "MarketplaceCatalogCategoryData",
+	fullName = "roblox.apppageplatform.shared.v1beta1.MarketplaceCatalogCategoryData"
+}
+t1.MarketplaceCatalogCategoryData = t2
+typeRegistry.default:register(t1.MarketplaceCatalogCategoryData)
+
 return {
-    MarketplaceCatalogCategoryData = v2.MarketplaceCatalogCategoryData
-};
+	MarketplaceCatalogCategoryData = t1.MarketplaceCatalogCategoryData
+}

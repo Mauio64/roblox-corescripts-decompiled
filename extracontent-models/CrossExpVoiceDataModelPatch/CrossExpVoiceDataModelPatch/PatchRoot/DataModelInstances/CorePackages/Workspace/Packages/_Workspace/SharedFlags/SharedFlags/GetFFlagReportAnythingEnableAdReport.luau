@@ -1,4 +1,5 @@
-game:DefineFastFlag("ReportAnythingEnableAdReport", false);
-return function() --[[ Line: 3 ]]
-    return game:GetFastFlag("ReportAnythingEnableAdReport");
-end;
+game:DefineFastFlag("ReportAnythingEnableAdReport", false)
+
+return function() -- line: 3
+	return game:GetFastFlag("ReportAnythingEnableAdReport")
+end

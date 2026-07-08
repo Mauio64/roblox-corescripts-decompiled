@@ -1,218 +1,254 @@
-local l_select_0 = select;
-local function v6(v1, v2, ...)
-    local v3, v4 = {
-        ...
-    }, l_select_0("#", ...);
-    for v5 = v2, v2 + v4 - 1 do
-        v1[v5] = v3[v5 - v2 + 1];
-    end;
-end;
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v8 = require(l_CorePackages_0.Packages.React);
-local v9 = require(l_CorePackages_0.Packages.UIBlox);
-local l_GridMetrics_0 = v9.App.Grid.GridMetrics;
-local l_DefaultMetricsGridView_0 = v9.App.Grid.DefaultMetricsGridView;
-local v12 = require(script.Parent.Parent.Parent.Parent.Constants);
-local v13 = require(script.Parent.AvatarItemCard);
-local l_ItemTile_0 = v9.Tile.ItemTile;
-local v15 = Vector2.new(20, 20);
-local _ = function(v16) --[[ Line: 33 ]] --[[ Name: createObjectsFolder ]]
-    local l_Folder_0 = Instance.new("Folder");
-    l_Folder_0.Name = "R15ArtistIntent";
-    for _, v19 in v16 do
-        v19.Parent = l_Folder_0;
-    end;
-    return {
-        [1] = l_Folder_0
-    };
-end;
-local function _(v21, v22) --[[ Line: 43 ]] --[[ Name: getPart ]]
-    return (v21:FindFirstChild(v22));
-end;
-local function v51(v24, _) --[[ Line: 47 ]] --[[ Name: getItems ]]
-    local v26 = nil;
-    local v27 = nil;
-    local v28 = nil;
-    for _, v30 in ipairs(v24:GetChildren()) do
-        if v30:IsA("Accessory") then
-            if v30.AccessoryType == Enum.AccessoryType.Eyebrow then
-                v27 = v30;
-            elseif v30.AccessoryType == Enum.AccessoryType.Eyelash then
-                v26 = v30;
-            elseif v30.AccessoryType == Enum.AccessoryType.Hair then
-                v28 = v30;
-            end;
-        end;
-    end;
-    local v31 = {};
-    local v32 = {
-        asset = v24:FindFirstChild("Head"), 
-        partName = "Head"
-    };
-    local v33 = {};
-    local v34 = {
-        v24:FindFirstChild("UpperTorso"), 
-        (v24:FindFirstChild("LowerTorso"))
-    };
-    local l_Folder_1 = Instance.new("Folder");
-    l_Folder_1.Name = "R15ArtistIntent";
-    for _, v37 in v34 do
-        v37.Parent = l_Folder_1;
-    end;
-    v33.asset = {
-        [1] = l_Folder_1
-    };
-    v33.partName = "Torso";
-    local v38 = {};
-    l_Folder_1 = {
-        v24:FindFirstChild("LeftUpperArm"), 
-        v24:FindFirstChild("LeftLowerArm"), 
-        (v24:FindFirstChild("LeftHand"))
-    };
-    local l_Folder_2 = Instance.new("Folder");
-    l_Folder_2.Name = "R15ArtistIntent";
-    for _, v41 in l_Folder_1 do
-        v41.Parent = l_Folder_2;
-    end;
-    v38.asset = {
-        [1] = l_Folder_2
-    };
-    v38.partName = "Left Arm";
-    v34 = {};
-    l_Folder_2 = {
-        v24:FindFirstChild("LeftUpperLeg"), 
-        v24:FindFirstChild("LeftLowerLeg"), 
-        (v24:FindFirstChild("LeftFoot"))
-    };
-    local l_Folder_3 = Instance.new("Folder");
-    l_Folder_3.Name = "R15ArtistIntent";
-    for _, v44 in l_Folder_2 do
-        v44.Parent = l_Folder_3;
-    end;
-    v34.asset = {
-        [1] = l_Folder_3
-    };
-    v34.partName = "Left Leg";
-    l_Folder_1 = {};
-    l_Folder_3 = {
-        v24:FindFirstChild("RightUpperArm"), 
-        v24:FindFirstChild("RightLowerArm"), 
-        (v24:FindFirstChild("RightHand"))
-    };
-    local l_Folder_4 = Instance.new("Folder");
-    l_Folder_4.Name = "R15ArtistIntent";
-    for _, v47 in l_Folder_3 do
-        v47.Parent = l_Folder_4;
-    end;
-    l_Folder_1.asset = {
-        [1] = l_Folder_4
-    };
-    l_Folder_1.partName = "Right Arm";
-    l_Folder_2 = {};
-    l_Folder_4 = {
-        v24:FindFirstChild("RightUpperLeg"), 
-        v24:FindFirstChild("RightLowerLeg"), 
-        (v24:FindFirstChild("RightFoot"))
-    };
-    local l_Folder_5 = Instance.new("Folder");
-    l_Folder_5.Name = "R15ArtistIntent";
-    for _, v50 in l_Folder_4 do
-        v50.Parent = l_Folder_5;
-    end;
-    l_Folder_2.asset = {
-        [1] = l_Folder_5
-    };
-    l_Folder_2.partName = "Right Leg";
-    v6(v31, 1, v32, v33, v38, v34, l_Folder_1, l_Folder_2);
-    if v27 then
-        table.insert(v31, {
-            asset = v27, 
-            partName = "Eyebrows"
-        });
-    end;
-    if v26 then
-        table.insert(v31, {
-            asset = v26, 
-            partName = "Eyelashes"
-        });
-    end;
-    if v28 then
-        table.insert(v31, {
-            asset = v28, 
-            partName = "Hair"
-        });
-    end;
-    return v31;
-end;
-return function(v52) --[[ Line: 132 ]] --[[ Name: AvatarPartGrid ]]
-    -- upvalues: v8 (copy), v51 (copy), v12 (copy), v13 (copy), l_ItemTile_0 (copy), l_DefaultMetricsGridView_0 (copy), l_GridMetrics_0 (copy), v15 (copy)
-    local v53, v54 = v8.useState({});
-    v8.useEffect(function() --[[ Line: 134 ]]
-        -- upvalues: v52 (copy), v54 (copy), v51 (ref)
-        if v52.humanoidModel then
-            local v55 = v52.humanoidModel:Clone();
-            v54((v51(v55, v52.name)));
-            return;
-        else
-            local v56 = {};
-            for v57 = 1, 6 do
-                v56[v57] = {};
-            end;
-            v54(v56);
-            return;
-        end;
-    end, {
-        v52.humanoidModel
-    });
-    v8.useEffect(function() --[[ Line: 150 ]]
-        -- upvalues: v53 (copy), v54 (copy)
-        if v53[1] and v53[1].asset then
-            local v58 = {};
-            for v59, v60 in v53 do
-                v58[v59] = {
-                    asset = v60.asset, 
-                    partName = v60.partName
-                };
-            end;
-            v54(v58);
-        end;
-    end, {
-        v52.name
-    });
-    local v61 = if v52.screenSize.Y > v52.screenSize.X then v12.ItemCardWidthPortrait else v12.ItemCardWidthLandscape;
-    local v63 = v8.useCallback(function(v62) --[[ Line: 168 ]]
-        -- upvalues: v8 (ref), v13 (ref), v52 (copy), v61 (copy), l_ItemTile_0 (ref)
-        if v62.asset then
-            return v8.createElement(v13, {
-                asset = v62.asset, 
-                bodyName = v52.name, 
-                partName = v62.partName, 
-                viewportSize = v61
-            });
-        else
-            return v8.createElement(l_ItemTile_0);
-        end;
-    end, {
-        v61, 
-        v52.name
-    });
-    return v8.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0), 
-        AutomaticSize = Enum.AutomaticSize.Y, 
-        LayoutOrder = v52.LayoutOrder, 
-        BackgroundTransparency = 1
-    }, {
-        Grid = v8.createElement(l_DefaultMetricsGridView_0, {
-            getItemHeight = function(v64) --[[ Line: 190 ]] --[[ Name: getItemHeight ]]
-                return v64 * 1.3333333333333333;
-            end, 
-            getItemMetrics = l_GridMetrics_0.makeCustomMetricsGetter({
-                minimumItemsPerRow = 2, 
-                minimumItemWidth = v61
-            }), 
-            renderItem = v63, 
-            itemPadding = v15, 
-            items = v53
-        })
-    });
-end;
+local CorePackages = game:GetService("CorePackages")
+local React = require(CorePackages.Packages.React)
+local UIBlox = require(CorePackages.Packages.UIBlox)
+local GridMetrics = UIBlox.App.Grid.GridMetrics
+local DefaultMetricsGridView = UIBlox.App.Grid.DefaultMetricsGridView
+local Constants = require(script.Parent.Parent.Parent.Parent.Constants)
+local AvatarItemCard = require(script.Parent.AvatarItemCard)
+local ItemTile = UIBlox.Tile.ItemTile
+local vector2 = Vector2.new(20, 20)
+
+local function createObjectsFolder(t1: {[any]: any}) -- line: 33
+	local Folder = Instance.new("Folder")
+
+	Folder.Name = "R15ArtistIntent"
+
+	for _, v17 in t1 do
+		v17.Parent = Folder
+	end
+
+	return {
+		[1] = Folder
+	}
+end
+local function getPart(p1, s1: string) -- line: 43
+	return (p1:FindFirstChild(s1))
+end
+local function getItems(p2, _: string) -- line: 47
+	local v22 = nil
+	local v23 = nil
+	local v24 = nil
+
+	for _, child in ipairs(p2:GetChildren()) do
+		if child:IsA("Accessory") then
+			if child.AccessoryType == Enum.AccessoryType.Eyebrow then
+				v23 = child
+			elseif child.AccessoryType == Enum.AccessoryType.Eyelash then
+				v22 = child
+			elseif child.AccessoryType == Enum.AccessoryType.Hair then
+				v24 = child
+			end
+		end
+	end
+
+	local t2 = {}
+	local t3 = {
+		partName = "Head",
+		asset = p2:FindFirstChild("Head")
+	}
+	local t4 = {
+		partName = "Torso"
+	}
+	local t5 = {
+		p2:FindFirstChild("UpperTorso"),
+		(p2:FindFirstChild("LowerTorso"))
+	}
+	local Folder = Instance.new("Folder")
+
+	Folder.Name = "R15ArtistIntent"
+
+	for _, v33 in t5 do
+		v33.Parent = Folder
+	end
+
+	t4.asset = {
+		[1] = Folder
+	}
+
+	local t6 = {
+		partName = "Left Arm"
+	}
+	local t7 = {
+		p2:FindFirstChild("LeftUpperArm"),
+		p2:FindFirstChild("LeftLowerArm"),
+		(p2:FindFirstChild("LeftHand"))
+	}
+	local Folder2 = Instance.new("Folder")
+
+	Folder2.Name = "R15ArtistIntent"
+
+	for _, v38 in t7 do
+		v38.Parent = Folder2
+	end
+
+	t6.asset = {
+		[1] = Folder2
+	}
+
+	local t8 = {
+		partName = "Left Leg"
+	}
+	local t9 = {
+		p2:FindFirstChild("LeftUpperLeg"),
+		p2:FindFirstChild("LeftLowerLeg"),
+		(p2:FindFirstChild("LeftFoot"))
+	}
+	local Folder3 = Instance.new("Folder")
+
+	Folder3.Name = "R15ArtistIntent"
+
+	for _, v43 in t9 do
+		v43.Parent = Folder3
+	end
+
+	t8.asset = {
+		[1] = Folder3
+	}
+
+	local t10 = {
+		partName = "Right Arm"
+	}
+	local t11 = {
+		p2:FindFirstChild("RightUpperArm"),
+		p2:FindFirstChild("RightLowerArm"),
+		(p2:FindFirstChild("RightHand"))
+	}
+	local Folder4 = Instance.new("Folder")
+
+	Folder4.Name = "R15ArtistIntent"
+
+	for _, v48 in t11 do
+		v48.Parent = Folder4
+	end
+
+	t10.asset = {
+		[1] = Folder4
+	}
+
+	local t12 = {
+		partName = "Right Leg"
+	}
+	local t13 = {
+		p2:FindFirstChild("RightUpperLeg"),
+		p2:FindFirstChild("RightLowerLeg"),
+		(p2:FindFirstChild("RightFoot"))
+	}
+	local Folder5 = Instance.new("Folder")
+
+	Folder5.Name = "R15ArtistIntent"
+
+	for _, v53 in t13 do
+		v53.Parent = Folder5
+	end
+
+	t12.asset = {
+		[1] = Folder5
+	}
+	t2[1] = t3
+	t2[2] = t4
+	t2[3] = t6
+	t2[4] = t8
+	t2[5] = t10
+	t2[6] = t12
+
+	if v23 then
+		table.insert(t2, {
+			partName = "Eyebrows",
+			asset = v23
+		})
+	end
+
+	if v22 then
+		table.insert(t2, {
+			partName = "Eyelashes",
+			asset = v22
+		})
+	end
+
+	if v24 then
+		table.insert(t2, {
+			partName = "Hair",
+			asset = v24
+		})
+	end
+
+	return t2
+end
+local function AvatarPartGrid(t14: {[any]: any}) -- line: 132
+	-- upvalues: React (copy), getItems (copy), Constants (copy), AvatarItemCard (copy), ItemTile (copy), DefaultMetricsGridView (copy), GridMetrics (copy), vector2 (copy)
+	local v55, v56 = React.useState({})
+
+	React.useEffect(function() -- line: 134
+		-- upvalues: t14 (copy), v56 (copy), getItems (copy)
+		if t14.humanoidModel then
+			local clone = t14.humanoidModel:Clone()
+
+			v56((getItems(clone, t14.name)))
+
+			return
+		end
+
+		local t15 = {}
+
+		for i = 1, 6 do
+			t15[i] = {}
+		end
+
+		v56(t15)
+	end, { t14.humanoidModel })
+	React.useEffect(function() -- line: 150
+		-- upvalues: v55 (copy), v56 (copy)
+		if v55[1] and v55[1].asset then
+			local t16 = {}
+
+			for v63, v64 in v55 do
+				t16[v63] = {
+					asset = v64.asset,
+					partName = v64.partName
+				}
+			end
+
+			v56(t16)
+		end
+	end, { t14.name })
+
+	local v57 = if not (t14.screenSize.Y > t14.screenSize.X) then Constants.ItemCardWidthLandscape else Constants.ItemCardWidthPortrait
+	local v58 = React.useCallback(function(p3) -- line: 168
+		-- upvalues: React (copy), AvatarItemCard (copy), t14 (copy), v57 (copy), ItemTile (copy)
+		if p3.asset then
+			return React.createElement(AvatarItemCard, {
+				asset = p3.asset,
+				bodyName = t14.name,
+				partName = p3.partName,
+				viewportSize = v57
+			})
+		end
+
+		return React.createElement(ItemTile)
+	end, {
+		v57,
+		t14.name
+	})
+
+	return React.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = UDim2.fromScale(1, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		LayoutOrder = t14.LayoutOrder
+	}, {
+		Grid = React.createElement(DefaultMetricsGridView, {
+			getItemHeight = function(n1: number) -- line: 190
+				return n1 * 1.3333333333333333
+			end,
+			getItemMetrics = GridMetrics.makeCustomMetricsGetter({
+				minimumItemsPerRow = 2,
+				minimumItemWidth = v57
+			}),
+			renderItem = v58,
+			itemPadding = vector2,
+			items = v55
+		})
+	})
+end
+
+return AvatarPartGrid

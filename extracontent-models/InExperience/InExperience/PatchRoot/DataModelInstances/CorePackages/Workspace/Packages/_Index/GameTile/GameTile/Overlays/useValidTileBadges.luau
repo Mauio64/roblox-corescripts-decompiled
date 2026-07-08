@@ -1,33 +1,40 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("GameTile");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local l_GameInfosReducer_0 = require(l_Parent_0.GameInfosRodux).GameInfosReducer;
-local v3 = require(l_Parent_0.React);
-local l_useSelector_0 = require(l_Parent_0.RoactUtils).Hooks.RoactRodux.useSelector;
-local v5 = require(l_script_FirstAncestor_0.getGameTileLayoutData);
-local v6 = require(l_script_FirstAncestor_0.Overlays.getValidTileBadges);
-local _ = require(l_script_FirstAncestor_0.GameTileTypes);
-return function(v8, v9, v10) --[[ Line: 13 ]] --[[ Name: useValidTileBadges ]]
-    -- upvalues: l_useSelector_0 (copy), l_GameInfosReducer_0 (copy), v5 (copy), v3 (copy), v6 (copy)
-    local v12 = l_useSelector_0(function(v11) --[[ Line: 18 ]]
-        -- upvalues: l_GameInfosReducer_0 (ref), v8 (copy)
-        return v11.Personalization[l_GameInfosReducer_0.key][v8];
-    end);
-    local v13 = v5(v12, v9);
-    return (v3.useMemo(function() --[[ Line: 25 ]]
-        -- upvalues: v10 (copy), v13 (copy), v6 (ref)
-        local v14 = nil;
-        if v10 then
-            v14 = v10;
-        elseif v13 and v13.tileBadgesByPosition then
-            v14 = v13.tileBadgesByPosition;
-        end;
-        if v14 then
-            return v6(v14);
-        else
-            return nil;
-        end;
-    end, {
-        v13, 
-        v10
-    }));
-end;
+local GameTile = script:FindFirstAncestor("GameTile")
+local GameTileParent = GameTile.Parent
+local GameInfosReducer = require(GameTileParent.GameInfosRodux).GameInfosReducer
+local React = require(GameTileParent.React)
+local useSelector = require(GameTileParent.RoactUtils).Hooks.RoactRodux.useSelector
+local getGameTileLayoutData = require(GameTile.getGameTileLayoutData)
+local getValidTileBadges = require(GameTile.Overlays.getValidTileBadges)
+
+require(GameTile.GameTileTypes)
+
+local function useValidTileBadges(s1: string, s2: string?, p1) -- line: 13
+	-- upvalues: useSelector (copy), GameInfosReducer (copy), getGameTileLayoutData (copy), React (copy), getValidTileBadges (copy)
+	local v12 = useSelector(function(p2) -- line: 18
+		-- upvalues: GameInfosReducer (copy), s1 (copy)
+		return p2.Personalization[GameInfosReducer.key][s1]
+	end)
+	local v13 = getGameTileLayoutData(v12, s2)
+
+	return (React.useMemo(function() -- line: 25
+		-- upvalues: p1 (copy), v13 (copy), getValidTileBadges (copy)
+		local v15 = nil
+
+		if p1 then
+			v15 = p1
+		elseif v13 and v13.tileBadgesByPosition then
+			v15 = v13.tileBadgesByPosition
+		end
+
+		if v15 then
+			return getValidTileBadges(v15)
+		end
+
+		return nil
+	end, {
+		v13,
+		p1
+	}))
+end
+
+return useValidTileBadges

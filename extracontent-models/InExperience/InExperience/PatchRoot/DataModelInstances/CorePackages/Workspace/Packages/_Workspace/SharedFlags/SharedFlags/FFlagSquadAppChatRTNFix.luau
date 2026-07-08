@@ -1,6 +1,7 @@
-local v0 = require(script.Parent.GetFFlagIsSquadEnabled);
+local GetFFlagIsSquadEnabled = require(script.Parent.GetFFlagIsSquadEnabled)
+
 if game:DefineFastFlag("SquadAppChatRTNFixWithSquadMainFlag", false) then
-    return (v0());
-else
-    return (game:DefineFastFlag("SquadAppChatRTNFix", false));
-end;
+	return (GetFFlagIsSquadEnabled())
+end
+
+return (game:DefineFastFlag("SquadAppChatRTNFix", false))

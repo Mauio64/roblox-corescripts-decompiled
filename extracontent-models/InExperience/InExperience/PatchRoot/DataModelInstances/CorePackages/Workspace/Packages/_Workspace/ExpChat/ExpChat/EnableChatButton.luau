@@ -1,1 +1,1 @@
-return require(script.EnableChatButton);
+return require(script.EnableChatButton)

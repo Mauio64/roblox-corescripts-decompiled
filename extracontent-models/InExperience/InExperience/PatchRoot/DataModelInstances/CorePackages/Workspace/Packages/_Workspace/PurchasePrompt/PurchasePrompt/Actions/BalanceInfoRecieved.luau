@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "balanceInfo");
+return require(script.Parent.makeActionCreator)(script.Name, "balanceInfo")

@@ -1,14 +1,15 @@
-local l_UserGameSettings_0 = UserSettings():GetService("UserGameSettings");
-local l_Actions_0 = script:FindFirstAncestor("ExpChat").Actions;
-local v2 = require(l_Actions_0.ClientSettingsLoaded);
-local v3 = require(l_Actions_0.ClientSettingsChanged);
-return function(v4) --[[ Line: 9 ]]
-    -- upvalues: v2 (copy), l_UserGameSettings_0 (copy), v3 (copy)
-    v4:dispatch(v2({
-        preferredTransparency = l_UserGameSettings_0.PreferredTransparency
-    }));
-    l_UserGameSettings_0:GetPropertyChangedSignal("PreferredTransparency"):Connect(function() --[[ Line: 14 ]]
-        -- upvalues: v4 (copy), v3 (ref), l_UserGameSettings_0 (ref)
-        v4:dispatch(v3("preferredTransparency", l_UserGameSettings_0.PreferredTransparency));
-    end);
-end;
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+local Actions = script:FindFirstAncestor("ExpChat").Actions
+local ClientSettingsLoaded = require(Actions.ClientSettingsLoaded)
+local ClientSettingsChanged = require(Actions.ClientSettingsChanged)
+
+return function(p1) -- line: 9
+	-- upvalues: ClientSettingsLoaded (copy), UserGameSettings (copy), ClientSettingsChanged (copy)
+	p1:dispatch(ClientSettingsLoaded({
+		preferredTransparency = UserGameSettings.PreferredTransparency
+	}))
+	UserGameSettings:GetPropertyChangedSignal("PreferredTransparency"):Connect(function() -- line: 14
+		-- upvalues: p1 (copy), ClientSettingsChanged (copy), UserGameSettings (copy)
+		p1:dispatch(ClientSettingsChanged("preferredTransparency", UserGameSettings.PreferredTransparency))
+	end)
+end

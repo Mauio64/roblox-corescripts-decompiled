@@ -1,19 +1,21 @@
-local v0 = require(script.Parent.Parent.FRIENDS_URL);
-local _ = require(script.Parent.Parent.networkingFriendsTypes);
-return function(v2) --[[ Line: 9 ]]
-    -- upvalues: v0 (copy)
-    return v2.roduxNetworking.GET({
-        Name = "GetLuobuFriendRequests"
-    }, function(v3, v4) --[[ Line: 14 ]]
-        -- upvalues: v0 (ref)
-        return v3(v0):path("v1"):path("my"):path("luobu-friends"):path("requests"):queryArgs({
-            userOpenId = v4.userOpenId, 
-            userAccessToken = v4.userAccessToken, 
-            type = v4.type, 
-            appType = v4.appType, 
-            sortOrder = v4.sortOrder, 
-            limit = v4.limit, 
-            cursor = v4.cursor
-        });
-    end);
-end;
+local FRIENDS_URL = require(script.Parent.Parent.FRIENDS_URL)
+
+require(script.Parent.Parent.networkingFriendsTypes)
+
+return function(p1) -- line: 9
+	-- upvalues: FRIENDS_URL (copy)
+	return p1.roduxNetworking.GET({
+		Name = "GetLuobuFriendRequests"
+	}, function(p2, p3) -- line: 14
+		-- upvalues: FRIENDS_URL (copy)
+		return p2(FRIENDS_URL):path("v1"):path("my"):path("luobu-friends"):path("requests"):queryArgs({
+			userOpenId = p3.userOpenId,
+			userAccessToken = p3.userAccessToken,
+			type = p3.type,
+			appType = p3.appType,
+			sortOrder = p3.sortOrder,
+			limit = p3.limit,
+			cursor = p3.cursor
+		})
+	end)
+end

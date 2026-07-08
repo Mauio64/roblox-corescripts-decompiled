@@ -1,105 +1,115 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("Foundation");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.Dash);
-local v3 = require(l_Parent_0.React);
-local v4 = require(l_script_FirstAncestor_0.Utility.Logger);
-local v5 = require(l_script_FirstAncestor_0.Components.Button);
-local v6 = require(l_script_FirstAncestor_0.Components.Image);
-local v7 = require(l_script_FirstAncestor_0.Components.Text);
-local _ = require(l_script_FirstAncestor_0.Components.Types);
-local v9 = require(l_script_FirstAncestor_0.Components.View);
-local v10 = require(l_script_FirstAncestor_0.Providers.Cursor.useCursor);
-local v11 = require(l_script_FirstAncestor_0.Utility.useScaledValue);
-local v12 = require(l_script_FirstAncestor_0.Providers.Style.useTokens);
-local v13 = require(l_script_FirstAncestor_0.Utility.withCommonProps);
-local v14 = require(l_script_FirstAncestor_0.Utility.withDefaults);
-local _ = require(l_script_FirstAncestor_0.Enums.ButtonVariant);
-local v16 = require(l_script_FirstAncestor_0.Enums.FillBehavior);
-local v17 = require(l_script_FirstAncestor_0.Enums.InputSize);
-local v18 = {
-    testId = "--foundation-toast"
-};
-return v3.memo(v3.forwardRef(function(v19, v20) --[[ Line: 44 ]] --[[ Name: Toast ]]
-    -- upvalues: v14 (copy), v18 (copy), v12 (copy), v10 (copy), v3 (copy), v4 (copy), v17 (copy), v16 (copy), v2 (copy), v5 (copy), v11 (copy), v9 (copy), v13 (copy), v6 (copy), v7 (copy)
-    local v21 = v14(v19, v18);
-    local v22 = v12();
-    local v23 = v10({
-        radius = UDim.new(0, v22.Radius.Medium), 
-        offset = v22.Size.Size_200, 
-        borderWidth = v22.Stroke.Thicker
-    });
-    local l_actions_0 = v21.actions;
-    local v30 = v3.useMemo(function() --[[ Line: 54 ]]
-        -- upvalues: l_actions_0 (copy), v4 (ref), v17 (ref), v16 (ref), v2 (ref), v3 (ref), v5 (ref)
-        local v25 = {};
-        if l_actions_0 then
-            for v26, v27 in l_actions_0 do
-                if v26 > 2 then
-                    v4:warning((("Toast only supports up to %* actions"):format(2)));
-                    return v25;
-                else
-                    local v28 = {
-                        LayoutOrder = #l_actions_0 - v26, 
-                        size = v17.Medium, 
-                        fillBehavior = v16.Fill
-                    };
-                    local v29 = v2.union(v27, v28);
-                    v25["ToastButton" .. v26] = v3.createElement(v5, v29);
-                end;
-            end;
-        end;
-        return v25;
-    end, {
-        l_actions_0
-    });
-    local v31 = v21.icon and v21.icon ~= "";
-    local v32 = v21.title and v21.title ~= "";
-    local v33 = v21.text and v21.text ~= "";
-    local v34 = v21.width or UDim.new(0, v11(400));
-    return v3.createElement(v9, v13(v21, {
-        Size = UDim2.new(v34, UDim.new()), 
-        Position = UDim2.fromScale(0.5, 0.1), 
-        selection = {
-            Selectable = false, 
-            SelectionImageObject = v23
-        }, 
-        tag = "auto-y padding-medium radius-medium row gap-small bg-over-media-0", 
-        ref = v20
-    }), {
-        Media = if v31 then v3.createElement(v6, {
-            LayoutOrder = 1, 
-            Image = v21.icon, 
-            tag = "size-1200-1200", 
-            testId = ("%*--media"):format(v21.testId)
-        }) else nil, 
-        Content = v3.createElement(v9, {
-            LayoutOrder = 2, 
-            tag = {
-                ["auto-y fill self-center"] = true, 
-                ["col gap-xxsmall"] = v32 or v33
-            }, 
-            testId = ("%*--content"):format(v21.testId)
-        }, {
-            Header = if v32 then v3.createElement(v7, {
-                LayoutOrder = 1, 
-                Text = v21.title, 
-                tag = "auto-y size-full-0 text-align-x-left text-title-small content-emphasis text-truncate-end", 
-                testId = ("%*--header"):format(v21.testId)
-            }) else nil, 
-            Body = if v33 then v3.createElement(v7, {
-                LayoutOrder = 2, 
-                Text = v21.text, 
-                tag = "auto-y size-full-0 text-wrap text-align-x-left text-body-small content-default", 
-                testId = ("%*--body"):format(v21.testId)
-            }) else nil, 
-            Actions = if l_actions_0 and #l_actions_0 > 0 then v3.createElement(v9, {
-                LayoutOrder = 3, 
-                tag = {
-                    ["auto-y row gap-small size-full-0"] = true, 
-                    ["padding-top-small"] = v32 or v33
-                }, 
-                testId = ("%*--actions"):format(v21.testId)
-            }, v30) else nil
-        })
-    });
-end));
+local Foundation = script:FindFirstAncestor("Foundation")
+local FoundationParent = Foundation.Parent
+local Dash = require(FoundationParent.Dash)
+local React = require(FoundationParent.React)
+local Logger = require(Foundation.Utility.Logger)
+local Button = require(Foundation.Components.Button)
+local Image = require(Foundation.Components.Image)
+local Text = require(Foundation.Components.Text)
+
+require(Foundation.Components.Types)
+
+local View = require(Foundation.Components.View)
+local useCursor = require(Foundation.Providers.Cursor.useCursor)
+local useScaledValue = require(Foundation.Utility.useScaledValue)
+local useTokens = require(Foundation.Providers.Style.useTokens)
+local withCommonProps = require(Foundation.Utility.withCommonProps)
+local withDefaults = require(Foundation.Utility.withDefaults)
+
+require(Foundation.Enums.ButtonVariant)
+
+local FillBehavior = require(Foundation.Enums.FillBehavior)
+local InputSize = require(Foundation.Enums.InputSize)
+local t1 = {
+	testId = "--foundation-toast"
+}
+
+local function Toast(p1, p2) -- line: 44
+	-- upvalues: withDefaults (copy), t1 (copy), useTokens (copy), useCursor (copy), React (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), Button (copy), useScaledValue (copy), View (copy), withCommonProps (copy), Image (copy), Text (copy)
+	local v21 = withDefaults(p1, t1)
+	local v22 = useTokens()
+	local v23 = useCursor({
+		radius = UDim.new(0, v22.Radius.Medium),
+		offset = v22.Size.Size_200,
+		borderWidth = v22.Stroke.Thicker
+	})
+	local actions = v21.actions
+	local v25 = React.useMemo(function() -- line: 54
+		-- upvalues: actions (copy), Logger (copy), InputSize (copy), FillBehavior (copy), Dash (copy), React (copy), Button (copy)
+		local t2 = {}
+
+		if actions then
+			for v31, v32 in actions do
+				if v31 > 2 then
+					Logger:warning(`Toast only supports up to { 2 } actions`)
+
+					return t2
+				end
+
+				local t3 = {
+					LayoutOrder = #actions - v31,
+					size = InputSize.Medium,
+					fillBehavior = FillBehavior.Fill
+				}
+				local v34 = Dash.union(v32, t3)
+
+				t2["ToastButton" .. v31] = React.createElement(Button, v34)
+			end
+		end
+
+		return t2
+	end, { actions })
+	local v26 = v21.icon and v21.icon ~= ""
+	local v27 = v21.title and v21.title ~= ""
+	local v28 = v21.text and v21.text ~= ""
+	local v29 = v21.width or UDim.new(0, useScaledValue(400))
+
+	return React.createElement(View, withCommonProps(v21, {
+		tag = "row gap-small auto-y padding-medium radius-medium bg-over-media-0",
+		Size = UDim2.new(v29, UDim.new()),
+		Position = UDim2.fromScale(0.5, 0.1),
+		selection = {
+			Selectable = false,
+			SelectionImageObject = v23
+		},
+		ref = p2
+	}), {
+		Media = if not v26 then nil else React.createElement(Image, {
+			LayoutOrder = 1,
+			tag = "size-1200-1200",
+			Image = v21.icon,
+			testId = `{ v21.testId }--media`
+		}),
+		Content = React.createElement(View, {
+			LayoutOrder = 2,
+			tag = {
+				["fill self-center auto-y"] = true,
+				["col gap-xxsmall"] = v27 or v28
+			},
+			testId = `{ v21.testId }--content`
+		}, {
+			Header = if not v27 then nil else React.createElement(Text, {
+				LayoutOrder = 1,
+				tag = "size-full-0 auto-y text-title-small text-align-x-left text-truncate-end content-emphasis",
+				Text = v21.title,
+				testId = `{ v21.testId }--header`
+			}),
+			Body = if not v28 then nil else React.createElement(Text, {
+				LayoutOrder = 2,
+				tag = "size-full-0 auto-y text-body-small text-wrap text-align-x-left content-default",
+				Text = v21.text,
+				testId = `{ v21.testId }--body`
+			}),
+			Actions = if not actions or not (#actions > 0) then nil else React.createElement(View, {
+				LayoutOrder = 3,
+				tag = {
+					["row gap-small size-full-0 auto-y"] = true,
+					["padding-top-small"] = v27 or v28
+				},
+				testId = `{ v21.testId }--actions`
+			}, v25)
+		})
+	})
+end
+
+return React.memo(React.forwardRef(Toast))

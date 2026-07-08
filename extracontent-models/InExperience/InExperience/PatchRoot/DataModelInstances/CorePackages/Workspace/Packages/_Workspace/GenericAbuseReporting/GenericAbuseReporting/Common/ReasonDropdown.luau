@@ -1,67 +1,69 @@
-local l_Parent_0 = script:FindFirstAncestor("GenericAbuseReporting").Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.UIBlox);
-local l_useLocalization_0 = require(l_Parent_0.Localization).Hooks.useLocalization;
-local l_DropdownMenu_0 = v3.App.Menu.DropdownMenu;
-return function(v6) --[[ Line: 30 ]] --[[ Name: ReasonDropdown ]]
-    -- upvalues: v2 (copy), v1 (copy), l_useLocalization_0 (copy), l_DropdownMenu_0 (copy)
-    local v9 = v2.useMemo(function() --[[ Line: 31 ]]
-        -- upvalues: v1 (ref), v6 (copy)
-        local v8 = v1.Dictionary.map(v6.options, function(v7) --[[ Line: 32 ]]
-            return v7.localizationKey, v7.value;
-        end);
-        return v1.Dictionary.union(v8, {
-            ChooseOne = "Feature.ReportAbuse.Label.ChooseOne"
-        });
-    end, {
-        v6.options
-    });
-    local v11 = v2.useMemo(function() --[[ Line: 41 ]]
-        -- upvalues: v1 (ref), v6 (copy)
-        return (v1.Dictionary.map(v6.options, function(v10) --[[ Line: 42 ]]
-            return v10.descriptionLocalizationKey, v10.value;
-        end));
-    end, {
-        v6.options
-    });
-    local v12 = l_useLocalization_0(v9);
-    local v13 = l_useLocalization_0(v11);
-    local v15 = v2.useMemo(function() --[[ Line: 51 ]]
-        -- upvalues: v1 (ref), v6 (copy), v12 (copy)
-        return v1.List.map(v6.options, function(v14) --[[ Line: 52 ]]
-            -- upvalues: v12 (ref)
-            return {
-                text = v12[v14.value] or "", 
-                key = v14.value
-            };
-        end);
-    end, {
-        v6.options, 
-        v12
-    });
-    local v17 = v2.useCallback(function(v16) --[[ Line: 60 ]]
-        -- upvalues: v6 (copy), v13 (copy)
-        v6.setDropdownError(false);
-        v6.onSelectedAbuseType(v16);
-        if v6.setDescription then
-            v6.setDescription(v13[v16] or "");
-        end;
-    end, {
-        v6.setDropdownError, 
-        v6.onSelectedAbuseType
-    });
-    return v2.createElement(l_DropdownMenu_0, {
-        placeholder = v12.ChooseOne, 
-        onChange = v17, 
-        screenSize = v6.screenSize, 
-        height = UDim.new(0, v6.menuItemHeight), 
-        fixedListHeight = math.min(v6.menuItemHeight * #v6.options, v6.maxHeight), 
-        errorState = v6.isDropdownError, 
-        showDropShadow = true, 
-        dropdownMenuListPositionFixed = true, 
-        cellDatas = v15, 
-        defaultKey = v6.reportCategoryDefaultKey, 
-        isDisabled = v6.isDisabled
-    });
-end;
+local Parent = script:FindFirstAncestor("GenericAbuseReporting").Parent
+local Cryo = require(Parent.Cryo)
+local React = require(Parent.React)
+local UIBlox = require(Parent.UIBlox)
+local useLocalization = require(Parent.Localization).Hooks.useLocalization
+local DropdownMenu = UIBlox.App.Menu.DropdownMenu
+
+local function ReasonDropdown(t1: {[any]: any}) -- line: 30
+	-- upvalues: React (copy), Cryo (copy), useLocalization (copy), DropdownMenu (copy)
+	local v9 = React.useMemo(function() -- line: 31
+		-- upvalues: Cryo (copy), t1 (copy)
+		local v15 = Cryo.Dictionary.map(t1.options, function(p1) -- line: 32
+			return p1.localizationKey, p1.value
+		end)
+
+		return Cryo.Dictionary.union(v15, {
+			ChooseOne = "Feature.ReportAbuse.Label.ChooseOne"
+		})
+	end, { t1.options })
+	local v10 = React.useMemo(function() -- line: 41
+		-- upvalues: Cryo (copy), t1 (copy)
+		return (Cryo.Dictionary.map(t1.options, function(p2) -- line: 42
+			return p2.descriptionLocalizationKey, p2.value
+		end))
+	end, { t1.options })
+	local v11 = useLocalization(v9)
+	local v12 = useLocalization(v10)
+	local v13 = React.useMemo(function() -- line: 51
+		-- upvalues: Cryo (copy), t1 (copy), v11 (copy)
+		return Cryo.List.map(t1.options, function(p3) -- line: 52
+			-- upvalues: v11 (copy)
+			return {
+				text = v11[p3.value] or "",
+				key = p3.value
+			}
+		end)
+	end, {
+		t1.options,
+		v11
+	})
+	local v14 = React.useCallback(function(p4) -- line: 60
+		-- upvalues: t1 (copy), v12 (copy)
+		t1.setDropdownError(false)
+		t1.onSelectedAbuseType(p4)
+
+		if t1.setDescription then
+			t1.setDescription(v12[p4] or "")
+		end
+	end, {
+		t1.setDropdownError,
+		t1.onSelectedAbuseType
+	})
+
+	return React.createElement(DropdownMenu, {
+		showDropShadow = true,
+		dropdownMenuListPositionFixed = true,
+		placeholder = v11.ChooseOne,
+		onChange = v14,
+		screenSize = t1.screenSize,
+		height = UDim.new(0, t1.menuItemHeight),
+		fixedListHeight = math.min(t1.menuItemHeight * #t1.options, t1.maxHeight),
+		errorState = t1.isDropdownError,
+		cellDatas = v13,
+		defaultKey = t1.reportCategoryDefaultKey,
+		isDisabled = t1.isDisabled
+	})
+end
+
+return ReasonDropdown

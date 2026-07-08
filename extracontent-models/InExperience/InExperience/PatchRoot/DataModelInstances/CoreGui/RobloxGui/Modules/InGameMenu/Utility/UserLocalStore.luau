@@ -1,71 +1,87 @@
-local l_AppStorageService_0 = game:GetService("AppStorageService");
-local l_Players_0 = game:GetService("Players");
-local l_HttpService_0 = game:GetService("HttpService");
-local function _() --[[ Line: 5 ]] --[[ Name: getCurrentUser ]]
-    -- upvalues: l_Players_0 (copy)
-    if l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId > 0 then
-        return (tostring(l_Players_0.LocalPlayer.UserId));
-    else
-        return "0";
-    end;
-end;
-local function _(v4) --[[ Line: 14 ]] --[[ Name: getUserKey ]]
-    return "u_" .. tostring(v4 or "0");
-end;
-local function v10(v6) --[[ Line: 18 ]] --[[ Name: getValuesForAllUsers ]]
-    -- upvalues: l_AppStorageService_0 (copy), l_HttpService_0 (copy)
-    local l_l_AppStorageService_0_Item_0 = l_AppStorageService_0:GetItem(v6);
-    local l_status_0, l_result_0 = pcall(function() --[[ Line: 20 ]]
-        -- upvalues: l_HttpService_0 (ref), l_l_AppStorageService_0_Item_0 (copy)
-        return l_HttpService_0:JSONDecode(l_l_AppStorageService_0_Item_0);
-    end);
-    if l_status_0 and type(l_result_0) == "table" then
-        return l_result_0;
-    else
-        return {
-            default = l_l_AppStorageService_0_Item_0
-        };
-    end;
-end;
-local function _(v11, v12) --[[ Line: 32 ]] --[[ Name: setValuesForAllUsers ]]
-    -- upvalues: l_HttpService_0 (copy), l_AppStorageService_0 (copy)
-    local v13 = l_HttpService_0:JSONEncode(v12);
-    l_AppStorageService_0:SetItem(v11, v13);
-end;
-local v15 = {};
-v15.__index = v15;
-v15.new = function(v16) --[[ Line: 40 ]] --[[ Name: new ]]
-    -- upvalues: l_Players_0 (copy), v15 (copy)
-    if not v16 then
-        v16 = if l_Players_0.LocalPlayer and l_Players_0.LocalPlayer.UserId > 0 then tostring(l_Players_0.LocalPlayer.UserId) else "0";
-    end;
-    local v17 = {
-        userId = tostring(v16)
-    };
-    setmetatable(v17, v15);
-    return v17;
-end;
-v15.GetItem = function(v18, v19) --[[ Line: 52 ]] --[[ Name: GetItem ]]
-    -- upvalues: v10 (copy)
-    local v20 = v10(v19);
-    local v21 = v20["u_" .. tostring(v18.userId or "0")];
-    if v21 == nil then
-        v21 = v20.default;
-    end;
-    return v21;
-end;
-v15.SetItem = function(v22, v23, v24) --[[ Line: 62 ]] --[[ Name: SetItem ]]
-    -- upvalues: v10 (copy), l_HttpService_0 (copy), l_AppStorageService_0 (copy)
-    local v25 = v10(v23);
-    v25["u_" .. tostring(v22.userId or "0")] = v24;
-    local v26 = l_HttpService_0:JSONEncode(v25);
-    l_AppStorageService_0:SetItem(v23, v26);
-end;
-v15.Flush = function(_) --[[ Line: 69 ]] --[[ Name: Flush ]]
-    -- upvalues: l_AppStorageService_0 (copy)
-    l_AppStorageService_0:Flush();
-end;
-v15.getItem = v15.GetItem;
-v15.setItem = v15.SetItem;
-v15.flush = v15.Flush;
-return v15;
+local AppStorageService = game:GetService("AppStorageService")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local function getCurrentUser() -- line: 5
+	-- upvalues: Players (copy)
+	if Players.LocalPlayer and Players.LocalPlayer.UserId > 0 then
+		return (tostring(Players.LocalPlayer.UserId))
+	end
+
+	return "0"
+end
+local function getUserKey(p1) -- line: 14
+	return "u_" .. tostring(p1 or "0")
+end
+local function getValuesForAllUsers(p2) -- line: 18
+	-- upvalues: AppStorageService (copy), HttpService (copy)
+	local Item = AppStorageService:GetItem(p2)
+	local ok, result = pcall(function() -- line: 20
+		-- upvalues: HttpService (copy), Item (copy)
+		return HttpService:JSONDecode(Item)
+	end)
+
+	if ok and type(result) == "table" then
+		return result
+	end
+
+	return {
+		default = Item
+	}
+end
+local function setValuesForAllUsers(p3, p4) -- line: 32
+	-- upvalues: HttpService (copy), AppStorageService (copy)
+	local json = HttpService:JSONEncode(p4)
+
+	AppStorageService:SetItem(p3, json)
+end
+
+local t1 = {}
+
+t1.__index = t1
+
+function t1.new(p5) -- line: 40
+	-- upvalues: Players (copy), t1 (copy)
+	if not p5 then
+		p5 = (not Players.LocalPlayer or not (Players.LocalPlayer.UserId > 0)) and "0" or tostring(Players.LocalPlayer.UserId)
+	end
+
+	local t2 = {
+		userId = tostring(p5)
+	}
+
+	setmetatable(t2, t1)
+
+	return t2
+end
+function t1.GetItem(p6, p7) -- line: 52
+	-- upvalues: getValuesForAllUsers (copy)
+	local v21 = getValuesForAllUsers(p7)
+	local v22 = v21["u_" .. tostring(p6.userId or "0")]
+
+	if v22 == nil then
+		v22 = v21.default
+	end
+
+	return v22
+end
+function t1.SetItem(p8, p9, p10) -- line: 62
+	-- upvalues: getValuesForAllUsers (copy), HttpService (copy), AppStorageService (copy)
+	local v26 = getValuesForAllUsers(p9)
+
+	v26["u_" .. tostring(p8.userId or "0")] = p10
+
+	local json = HttpService:JSONEncode(v26)
+
+	AppStorageService:SetItem(p9, json)
+end
+function t1.Flush(_) -- line: 69
+	-- upvalues: AppStorageService (copy)
+	AppStorageService:Flush()
+end
+
+t1.getItem = t1.GetItem
+t1.setItem = t1.SetItem
+t1.flush = t1.Flush
+
+return t1

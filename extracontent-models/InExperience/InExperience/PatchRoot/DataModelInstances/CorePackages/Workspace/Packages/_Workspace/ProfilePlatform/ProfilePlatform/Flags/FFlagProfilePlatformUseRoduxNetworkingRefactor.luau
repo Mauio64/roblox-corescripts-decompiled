@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformUseRoduxNetworkingRefactor", false);
+return game:DefineFastFlag("ProfilePlatformUseRoduxNetworkingRefactor", false)

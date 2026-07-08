@@ -1,3 +1,3 @@
 return {
-    enrolledInLuafiedRecoveryExperiment = require(script.enrolledInLuafiedRecoveryExperiment)
-};
+	enrolledInLuafiedRecoveryExperiment = require(script.enrolledInLuafiedRecoveryExperiment)
+}

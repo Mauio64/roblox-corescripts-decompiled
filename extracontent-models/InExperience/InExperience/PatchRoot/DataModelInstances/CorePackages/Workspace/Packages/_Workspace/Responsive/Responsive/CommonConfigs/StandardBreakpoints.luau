@@ -1,211 +1,215 @@
-local v0 = {
-    XSmall = "XSmall", 
-    Small = "Small", 
-    Medium = "Medium", 
-    Large = "Large", 
-    XLarge = "XLarge", 
-    X2Large = "X2Large", 
-    Landscape = "Landscape", 
-    Portrait = "Portrait"
-};
-local v1 = {
-    [v0.XSmall] = {
-        Key = v0.XSmall, 
-        size = v0.XSmall, 
-        minWidth = 320, 
-        maxWidth = 360
-    }, 
-    [v0.Small] = {
-        Key = v0.Small, 
-        size = v0.Small, 
-        minWidth = 361, 
-        maxWidth = 600
-    }, 
-    [v0.Medium] = {
-        Key = v0.Medium, 
-        size = v0.Medium, 
-        minWidth = 601, 
-        maxWidth = 1140
-    }, 
-    [v0.Large] = {
-        Key = v0.Large, 
-        size = v0.Large, 
-        minWidth = 1141, 
-        maxWidth = 1520
-    }, 
-    [v0.XLarge] = {
-        Key = v0.XLarge, 
-        size = v0.XLarge, 
-        minWidth = 1521, 
-        maxWidth = 1920
-    }, 
-    [v0.X2Large] = {
-        Key = v0.X2Large, 
-        size = v0.X2Large, 
-        minWidth = 1920, 
-        maxWidth = 4096
-    }
-};
-local v2 = {
-    [v0.XSmall] = {
-        Key = v0.XSmall, 
-        size = v0.XSmall, 
-        maxWidth = 360
-    }, 
-    [v0.Small] = {
-        Key = v0.Small, 
-        size = v0.Small, 
-        maxWidth = 600
-    }, 
-    [v0.Medium] = {
-        Key = v0.Medium, 
-        size = v0.Medium, 
-        maxWidth = 1140
-    }, 
-    [v0.Large] = {
-        Key = v0.Large, 
-        size = v0.Large, 
-        maxWidth = 1520
-    }, 
-    [v0.XLarge] = {
-        Key = v0.XLarge, 
-        size = v0.XLarge, 
-        maxWidth = 1920
-    }, 
-    [v0.X2Large] = {
-        Key = v0.X2Large, 
-        size = v0.X2Large, 
-        maxWidth = 4096
-    }
-};
-local v3 = {
-    [v0.XSmall] = {
-        Key = v0.XSmall, 
-        size = v0.XSmall, 
-        minHeight = 320, 
-        maxHeight = 360
-    }, 
-    [v0.Small] = {
-        Key = v0.Small, 
-        size = v0.Small, 
-        minHeight = 361, 
-        maxHeight = 600
-    }, 
-    [v0.Medium] = {
-        Key = v0.Medium, 
-        size = v0.Medium, 
-        minHeight = 601, 
-        maxHeight = 1140
-    }, 
-    [v0.Large] = {
-        Key = v0.Large, 
-        size = v0.Large, 
-        minHeight = 1141, 
-        maxHeight = 1520
-    }, 
-    [v0.XLarge] = {
-        Key = v0.XLarge, 
-        size = v0.XLarge, 
-        minHeight = 1521, 
-        maxHeight = 1920
-    }, 
-    [v0.X2Large] = {
-        Key = v0.X2Large, 
-        size = v0.X2Large, 
-        minHeight = 1920, 
-        maxHeight = 4096
-    }
-};
-local v4 = {
-    [v0.XSmall] = {
-        Key = v0.XSmall, 
-        size = v0.XSmall, 
-        maxHeight = 360
-    }, 
-    [v0.Small] = {
-        Key = v0.Small, 
-        size = v0.Small, 
-        maxHeight = 600
-    }, 
-    [v0.Medium] = {
-        Key = v0.Medium, 
-        size = v0.Medium, 
-        maxHeight = 1140
-    }, 
-    [v0.Large] = {
-        Key = v0.Large, 
-        size = v0.Large, 
-        maxHeight = 1520
-    }, 
-    [v0.XLarge] = {
-        Key = v0.XLarge, 
-        size = v0.XLarge, 
-        maxHeight = 1920
-    }, 
-    [v0.X2Large] = {
-        Key = v0.X2Large, 
-        size = v0.X2Large, 
-        maxHeight = 4096
-    }
-};
-local v5 = {
-    {
-        Key = v0.Landscape, 
-        minRatio = 1
-    }, 
-    {
-        Key = v0.Portrait, 
-        minRatio = 0
-    }
-};
-local v6 = {
-    v2[v0.XSmall], 
-    v2[v0.Small], 
-    v2[v0.Medium], 
-    v2[v0.Large], 
-    v2[v0.XLarge], 
-    v2[v0.X2Large]
-};
-local v7 = {
-    v4[v0.XSmall], 
-    v4[v0.Small], 
-    v4[v0.Medium], 
-    v4[v0.Large], 
-    v4[v0.XLarge], 
-    v4[v0.X2Large]
-};
-local v8 = {};
-for v9, v10 in v6 do
-    v8[v10.Key] = v9;
-end;
+local t1 = {
+	XSmall = "XSmall",
+	Small = "Small",
+	Medium = "Medium",
+	Large = "Large",
+	XLarge = "XLarge",
+	X2Large = "X2Large",
+	Landscape = "Landscape",
+	Portrait = "Portrait"
+}
+local t2 = {
+	[t1.XSmall] = {
+		minWidth = 320,
+		maxWidth = 360,
+		Key = t1.XSmall,
+		size = t1.XSmall
+	},
+	[t1.Small] = {
+		minWidth = 361,
+		maxWidth = 600,
+		Key = t1.Small,
+		size = t1.Small
+	},
+	[t1.Medium] = {
+		minWidth = 601,
+		maxWidth = 1140,
+		Key = t1.Medium,
+		size = t1.Medium
+	},
+	[t1.Large] = {
+		minWidth = 1141,
+		maxWidth = 1520,
+		Key = t1.Large,
+		size = t1.Large
+	},
+	[t1.XLarge] = {
+		minWidth = 1521,
+		maxWidth = 1920,
+		Key = t1.XLarge,
+		size = t1.XLarge
+	},
+	[t1.X2Large] = {
+		minWidth = 1920,
+		maxWidth = 4096,
+		Key = t1.X2Large,
+		size = t1.X2Large
+	}
+}
+local t3 = {
+	[t1.XSmall] = {
+		maxWidth = 360,
+		Key = t1.XSmall,
+		size = t1.XSmall
+	},
+	[t1.Small] = {
+		maxWidth = 600,
+		Key = t1.Small,
+		size = t1.Small
+	},
+	[t1.Medium] = {
+		maxWidth = 1140,
+		Key = t1.Medium,
+		size = t1.Medium
+	},
+	[t1.Large] = {
+		maxWidth = 1520,
+		Key = t1.Large,
+		size = t1.Large
+	},
+	[t1.XLarge] = {
+		maxWidth = 1920,
+		Key = t1.XLarge,
+		size = t1.XLarge
+	},
+	[t1.X2Large] = {
+		maxWidth = 4096,
+		Key = t1.X2Large,
+		size = t1.X2Large
+	}
+}
+local t4 = {
+	[t1.XSmall] = {
+		minHeight = 320,
+		maxHeight = 360,
+		Key = t1.XSmall,
+		size = t1.XSmall
+	},
+	[t1.Small] = {
+		minHeight = 361,
+		maxHeight = 600,
+		Key = t1.Small,
+		size = t1.Small
+	},
+	[t1.Medium] = {
+		minHeight = 601,
+		maxHeight = 1140,
+		Key = t1.Medium,
+		size = t1.Medium
+	},
+	[t1.Large] = {
+		minHeight = 1141,
+		maxHeight = 1520,
+		Key = t1.Large,
+		size = t1.Large
+	},
+	[t1.XLarge] = {
+		minHeight = 1521,
+		maxHeight = 1920,
+		Key = t1.XLarge,
+		size = t1.XLarge
+	},
+	[t1.X2Large] = {
+		minHeight = 1920,
+		maxHeight = 4096,
+		Key = t1.X2Large,
+		size = t1.X2Large
+	}
+}
+local t5 = {
+	[t1.XSmall] = {
+		maxHeight = 360,
+		Key = t1.XSmall,
+		size = t1.XSmall
+	},
+	[t1.Small] = {
+		maxHeight = 600,
+		Key = t1.Small,
+		size = t1.Small
+	},
+	[t1.Medium] = {
+		maxHeight = 1140,
+		Key = t1.Medium,
+		size = t1.Medium
+	},
+	[t1.Large] = {
+		maxHeight = 1520,
+		Key = t1.Large,
+		size = t1.Large
+	},
+	[t1.XLarge] = {
+		maxHeight = 1920,
+		Key = t1.XLarge,
+		size = t1.XLarge
+	},
+	[t1.X2Large] = {
+		maxHeight = 4096,
+		Key = t1.X2Large,
+		size = t1.X2Large
+	}
+}
+local t6 = {
+	{
+		minRatio = 1,
+		Key = t1.Landscape
+	},
+	{
+		minRatio = 0,
+		Key = t1.Portrait
+	}
+}
+local t7 = {
+	t3[t1.XSmall],
+	t3[t1.Small],
+	t3[t1.Medium],
+	t3[t1.Large],
+	t3[t1.XLarge],
+	t3[t1.X2Large]
+}
+local t8 = {
+	t5[t1.XSmall],
+	t5[t1.Small],
+	t5[t1.Medium],
+	t5[t1.Large],
+	t5[t1.XLarge],
+	t5[t1.X2Large]
+}
+local t9 = {}
+
+for v10, v11 in t7 do
+	t9[v11.Key] = v10
+end
+
 return {
-    Enum = v0, 
-    sizes = v2, 
-    sizesMinMax = v1, 
-    sizesY = v4, 
-    sizesMinMaxY = v3, 
-    rules = {
-        default = v6, 
-        Y = v7, 
-        Orientation = v5
-    }, 
-    keyIndex = v8, 
-    getMinWidthFor = function(v11) --[[ Line: 86 ]] --[[ Name: getMinWidthFor ]]
-        -- upvalues: v1 (copy)
-        local v12 = v1[v11];
-        if v12 == nil then
-            return 0;
-        else
-            return v12.minWidth;
-        end;
-    end, 
-    getMinHeightFor = function(v13) --[[ Line: 93 ]] --[[ Name: getMinHeightFor ]]
-        -- upvalues: v3 (copy)
-        local v14 = v3[v13];
-        if v14 == nil then
-            return 0;
-        else
-            return v14.minHeight;
-        end;
-    end
-};
+	Enum = t1,
+	sizes = t3,
+	sizesMinMax = t2,
+	sizesY = t5,
+	sizesMinMaxY = t4,
+	rules = {
+		default = t7,
+		Y = t8,
+		Orientation = t6
+	},
+	keyIndex = t9,
+	getMinWidthFor = function(p1) -- line: 86
+		-- upvalues: t2 (copy)
+		local v13 = t2[p1]
+
+		if v13 == nil then
+			return 0
+		end
+
+		return v13.minWidth
+	end,
+	getMinHeightFor = function(p2) -- line: 93
+		-- upvalues: t4 (copy)
+		local v15 = t4[p2]
+
+		if v15 == nil then
+			return 0
+		end
+
+		return v15.minHeight
+	end
+}

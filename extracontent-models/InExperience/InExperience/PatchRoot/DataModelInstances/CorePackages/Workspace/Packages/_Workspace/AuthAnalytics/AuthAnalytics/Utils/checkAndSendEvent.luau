@@ -1,35 +1,41 @@
-local l_Parent_0 = script.Parent.Parent;
-local v1 = require(l_Parent_0.dependencies);
-local l_EventIngestService_0 = game:GetService("EventIngestService");
-local v3 = v1.Analytics.AnalyticsReporters.EventIngest.new(l_EventIngestService_0);
-local l_Logging_0 = v1.Logging;
-local l_Parent_1 = l_Parent_0.Parent;
-local v6 = require(l_Parent_1.SharedFlags);
-local v7 = require(l_Parent_0.Constants.EventStreamConstants);
-local l_FFlagEnableAuthAnalyticsPrintDebuggingDev_0 = v6.FFlagEnableAuthAnalyticsPrintDebuggingDev;
-local l_FFlagIncludeAuthEventLocalTimestamp_0 = v6.FFlagIncludeAuthEventLocalTimestamp;
-return function(v10, v11, v12) --[[ Line: 12 ]]
-    -- upvalues: l_FFlagIncludeAuthEventLocalTimestamp_0 (copy), v7 (copy), l_Logging_0 (copy), l_FFlagEnableAuthAnalyticsPrintDebuggingDev_0 (copy), v3 (copy)
-    local v13 = {};
-    if l_FFlagIncludeAuthEventLocalTimestamp_0 then
-        v12[v7.EventTimingKeys.OsClock] = tostring(os.clock());
-        v12[v7.EventTimingKeys.OsTime] = tostring(os.time());
-    end;
-    for v14, v15 in pairs(v12) do
-        if type(v14) == "string" then
-            v13[v14] = v15;
-        else
-            l_Logging_0.warn("Failure logging " .. v11 .. ": Expected " .. v14 .. " to be a string key but got " .. type(v14));
-            return;
-        end;
-    end;
-    if l_FFlagEnableAuthAnalyticsPrintDebuggingDev_0 then
-        local v16 = "";
-        for v17, v18 in pairs(v13) do
-            v16 = v16 .. v17 .. ": " .. tostring(v18) .. ", ";
-        end;
-        v16 = string.sub(v16, 1, -3);
-        print("Emitting EventIngest " .. v11 .. ", context " .. v10 .. " with args: " .. v16);
-    end;
-    v3:sendEventDeferred(v10, v11, v13);
-end;
+local ParentParent = script.Parent.Parent
+local dependencies = require(ParentParent.dependencies)
+local EventIngestService = game:GetService("EventIngestService")
+local v4 = dependencies.Analytics.AnalyticsReporters.EventIngest.new(EventIngestService)
+local Logging = dependencies.Logging
+local ParentParentParent = ParentParent.Parent
+local SharedFlags = require(ParentParentParent.SharedFlags)
+local EventStreamConstants = require(ParentParent.Constants.EventStreamConstants)
+local FFlagEnableAuthAnalyticsPrintDebuggingDev = SharedFlags.FFlagEnableAuthAnalyticsPrintDebuggingDev
+
+return function(s1: string, s2: string, t1: {[any]: any}) -- line: 11
+	-- upvalues: EventStreamConstants (copy), Logging (copy), FFlagEnableAuthAnalyticsPrintDebuggingDev (copy), v4 (copy)
+	local t2 = {}
+
+	t1[EventStreamConstants.EventTimingKeys.OsClock] = tostring(os.clock())
+	t1[EventStreamConstants.EventTimingKeys.OsTime] = tostring(os.time())
+
+	for k, v in pairs(t1) do
+		if type(k) ~= "string" then
+			Logging.warn("Failure logging " .. s2 .. ": Expected " .. k .. " to be a string key but got " .. type(k))
+
+			return
+		end
+
+		t2[k] = v
+	end
+
+	if FFlagEnableAuthAnalyticsPrintDebuggingDev then
+		local s3 = ""
+
+		for k, v in pairs(t2) do
+			s3 ..= k .. ": " .. tostring(v) .. ", "
+		end
+
+		local v19 = string.sub(s3, 1, -3)
+
+		print("Emitting EventIngest " .. s2 .. ", context " .. s1 .. " with args: " .. v19)
+	end
+
+	v4:sendEventDeferred(s1, s2, t2)
+end

@@ -1,1 +1,1 @@
-return game:DefineFastString("FStringTimeoutLoadingLocalPlayerInBackgroundDM", "Disable");
+return game:DefineFastString("FStringTimeoutLoadingLocalPlayerInBackgroundDM", "Disable")

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("ProfilePlatformEnablePlayedTogetherContextFrequentExperienceName", false);
+return game:DefineFastFlag("ProfilePlatformEnablePlayedTogetherContextFrequentExperienceName", false)

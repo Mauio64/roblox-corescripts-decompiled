@@ -1,6 +1,6 @@
 return {
-    Default = "Default", 
-    Inverse = "Inverse", 
-    Light = "Light", 
-    Dark = "Dark"
-};
+	Default = "Default",
+	Inverse = "Inverse",
+	Light = "Light",
+	Dark = "Dark"
+}

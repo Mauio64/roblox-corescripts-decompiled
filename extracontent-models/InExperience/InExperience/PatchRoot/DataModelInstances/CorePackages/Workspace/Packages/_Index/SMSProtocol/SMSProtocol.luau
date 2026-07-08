@@ -1,5 +1,7 @@
-local v0 = require(script.SMSProtocol);
-local _ = require(script.SMSProtocolTypes);
+local SMSProtocol = require(script.SMSProtocol)
+
+require(script.SMSProtocolTypes)
+
 return {
-    SMSProtocol = v0
-};
+	SMSProtocol = SMSProtocol
+}

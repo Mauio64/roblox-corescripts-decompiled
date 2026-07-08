@@ -1,8 +1,11 @@
-return function(v0, v1) --[[ Line: 11 ]] --[[ Name: getPlayer ]]
-    for _, v3 in pairs(v0) do
-        if v3.userId == v1 then
-            return v3;
-        end;
-    end;
-    return nil;
-end;
+local function getPlayer(p1, s1: string) -- line: 11
+	for _, v in pairs(p1) do
+		if s1 == v.userId then
+			return v
+		end
+	end
+
+	return nil
+end
+
+return getPlayer

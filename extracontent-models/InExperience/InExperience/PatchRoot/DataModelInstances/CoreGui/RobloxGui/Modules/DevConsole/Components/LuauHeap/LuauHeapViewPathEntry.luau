@@ -1,81 +1,89 @@
-local l_CorePackages_0 = game:GetService("CorePackages");
-local v1 = require(l_CorePackages_0.Packages.Roact);
-local l_Components_0 = script.Parent.Parent.Parent.Components;
-local v3 = require(l_Components_0.CellLabel);
-local v4 = require(l_Components_0.BannerButton);
-local _ = require(script.Parent.LuauHeapTypes);
-local v6 = require(script.Parent.Parent.Parent.Constants);
-local _ = v6.GeneralFormatting.LineWidth;
-local _ = v6.GeneralFormatting.LineColor;
-local l_PathEntryFrameHeight_0 = v6.LuauHeapFormatting.PathEntryFrameHeight;
-local l_DepthIndent_0 = v6.LuauHeapFormatting.DepthIndent;
-local _ = v6.LuauHeapFormatting.ValueCellWidth;
-local l_CellPadding_0 = v6.LuauHeapFormatting.CellPadding;
-local _ = v6.LuauHeapFormatting.ValuePadding;
-local v14 = v1.PureComponent:extend("LuauHeapViewPathEntry");
-v14.init = function(v15) --[[ Line: 25 ]] --[[ Name: init ]]
-    v15.state = {
-        expanded = false
-    };
-    v15.onButtonPress = function() --[[ Line: 30 ]]
-        -- upvalues: v15 (copy)
-        v15:setState(function(v16) --[[ Line: 31 ]]
-            return {
-                expanded = not v16.expanded
-            };
-        end);
-    end;
-end;
-v14.renderChildren = function(v17, v18) --[[ Line: 39 ]] --[[ Name: renderChildren ]]
-    -- upvalues: l_DepthIndent_0 (copy), l_CellPadding_0 (copy), v1 (copy), v3 (copy), l_PathEntryFrameHeight_0 (copy)
-    local v19 = {};
-    local v20 = 2 * l_DepthIndent_0 + l_CellPadding_0;
-    if v17.state.expanded and v18 and #v18 then
-        for v21, v22 in ipairs(v18) do
-            v19[v21] = v1.createElement(v3, {
-                text = v22, 
-                layoutOrder = v21, 
-                size = UDim2.new(UDim.new(1, -v20), UDim.new(0, l_PathEntryFrameHeight_0)), 
-                pos = UDim2.new(0, v20, 0, 0)
-            });
-        end;
-    end;
-    return v19;
-end;
-v14.render = function(v23) --[[ Line: 58 ]] --[[ Name: render ]]
-    -- upvalues: l_PathEntryFrameHeight_0 (copy), l_DepthIndent_0 (copy), v1 (copy), v4 (copy), v3 (copy), l_CellPadding_0 (copy)
-    local l_props_0 = v23.props;
-    local v25 = l_props_0.size or UDim2.new(1, 0, 0, l_PathEntryFrameHeight_0);
-    local v26 = l_props_0.layoutOrder or 0;
-    local l_name_0 = l_props_0.name;
-    local l_data_0 = l_props_0.data;
-    local v29 = l_props_0.depth * l_DepthIndent_0;
-    return v1.createElement("Frame", {
-        Size = v25, 
-        BackgroundTransparency = 1, 
-        LayoutOrder = v26, 
-        AutomaticSize = Enum.AutomaticSize.Y
-    }, {
-        layout = v1.createElement("UIListLayout", {
-            FillDirection = Enum.FillDirection.Vertical, 
-            HorizontalAlignment = Enum.HorizontalAlignment.Right, 
-            SortOrder = Enum.SortOrder.LayoutOrder
-        }), 
-        button = v1.createElement(v4, {
-            size = UDim2.new(1, 0, 0, l_PathEntryFrameHeight_0), 
-            inset = v29, 
-            isExpanded = v23.state.expanded, 
-            isExpandable = #l_data_0 ~= 0, 
-            onButtonPress = v23.onButtonPress, 
-            layoutOrder = -1
-        }, {
-            name = v1.createElement(v3, {
-                text = l_name_0, 
-                size = UDim2.new(UDim.new(1, -v29), UDim.new(1, 0)), 
-                pos = UDim2.new(0, l_CellPadding_0 + v29, 0, 0)
-            })
-        }), 
-        children = v1.createFragment(v23:renderChildren(l_data_0))
-    });
-end;
-return v14;
+local CorePackages = game:GetService("CorePackages")
+local Roact = require(CorePackages.Packages.Roact)
+local Components = script.Parent.Parent.Parent.Components
+local CellLabel = require(Components.CellLabel)
+local BannerButton = require(Components.BannerButton)
+
+require(script.Parent.LuauHeapTypes)
+
+local Constants = require(script.Parent.Parent.Parent.Constants)
+local _ = Constants.GeneralFormatting.LineWidth
+local _ = Constants.GeneralFormatting.LineColor
+local PathEntryFrameHeight = Constants.LuauHeapFormatting.PathEntryFrameHeight
+local DepthIndent = Constants.LuauHeapFormatting.DepthIndent
+local _ = Constants.LuauHeapFormatting.ValueCellWidth
+local CellPadding = Constants.LuauHeapFormatting.CellPadding
+local _ = Constants.LuauHeapFormatting.ValuePadding
+local v14 = Roact.PureComponent:extend("LuauHeapViewPathEntry")
+
+function v14.init(p1) -- line: 25
+	p1.state = {
+		expanded = false
+	}
+
+	function p1.onButtonPress() -- line: 30
+		-- upvalues: p1 (copy)
+		p1:setState(function(p2) -- line: 31
+			return {
+				expanded = not p2.expanded
+			}
+		end)
+	end
+end
+function v14.renderChildren(p3, p4) -- line: 39
+	-- upvalues: DepthIndent (copy), CellPadding (copy), Roact (copy), CellLabel (copy), PathEntryFrameHeight (copy)
+	local t1 = {}
+	local v19 = 2 * DepthIndent + CellPadding
+
+	if p3.state.expanded and (p4 and #p4) then
+		for i, v in ipairs(p4) do
+			t1[i] = Roact.createElement(CellLabel, {
+				text = v,
+				layoutOrder = i,
+				size = UDim2.new(UDim.new(1, -v19), UDim.new(0, PathEntryFrameHeight)),
+				pos = UDim2.new(0, v19, 0, 0)
+			})
+		end
+	end
+
+	return t1
+end
+function v14.render(p5) -- line: 58
+	-- upvalues: PathEntryFrameHeight (copy), DepthIndent (copy), Roact (copy), BannerButton (copy), CellLabel (copy), CellPadding (copy)
+	local props = p5.props
+	local v24 = props.size or UDim2.new(1, 0, 0, PathEntryFrameHeight)
+	local v25 = props.layoutOrder or 0
+	local name = props.name
+	local data = props.data
+	local v28 = props.depth * DepthIndent
+
+	return Roact.createElement("Frame", {
+		BackgroundTransparency = 1,
+		Size = v24,
+		LayoutOrder = v25,
+		AutomaticSize = Enum.AutomaticSize.Y
+	}, {
+		layout = Roact.createElement("UIListLayout", {
+			FillDirection = Enum.FillDirection.Vertical,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+			SortOrder = Enum.SortOrder.LayoutOrder
+		}),
+		button = Roact.createElement(BannerButton, {
+			layoutOrder = -1,
+			size = UDim2.new(1, 0, 0, PathEntryFrameHeight),
+			inset = v28,
+			isExpanded = p5.state.expanded,
+			isExpandable = #data ~= 0,
+			onButtonPress = p5.onButtonPress
+		}, {
+			name = Roact.createElement(CellLabel, {
+				text = name,
+				size = UDim2.new(UDim.new(1, -v28), UDim.new(1, 0)),
+				pos = UDim2.new(0, CellPadding + v28, 0, 0)
+			})
+		}),
+		children = Roact.createFragment(p5:renderChildren(data))
+	})
+end
+
+return v14

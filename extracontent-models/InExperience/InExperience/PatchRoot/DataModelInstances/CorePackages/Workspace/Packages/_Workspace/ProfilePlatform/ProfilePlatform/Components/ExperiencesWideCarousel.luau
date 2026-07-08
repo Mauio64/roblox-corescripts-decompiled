@@ -1,1 +1,1 @@
-return require(script.ExperiencesWideCarousel);
+return require(script.ExperiencesWideCarousel)

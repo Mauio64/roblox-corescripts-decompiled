@@ -1,14 +1,17 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AppChat");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_script_FirstAncestor_0.Models.Conversation);
-local l_FFlagAppChatEnableU13ChatOptIn_0 = require(l_Parent_0.SharedFlags).FFlagAppChatEnableU13ChatOptIn;
-return function(v4) --[[ Line: 6 ]]
-    -- upvalues: l_FFlagAppChatEnableU13ChatOptIn_0 (copy), v2 (copy)
-    if not l_FFlagAppChatEnableU13ChatOptIn_0 then
-        return false;
-    elseif not v4 then
-        return false;
-    else
-        return v4.userOptedIntoChatMessages == v2.UserOptedIntoChatMessagesStatus.NotOptedIn;
-    end;
-end;
+local AppChat = script:FindFirstAncestor("AppChat")
+local AppChatParent = AppChat.Parent
+local Conversation = require(AppChat.Models.Conversation)
+local FFlagAppChatEnableU13ChatOptIn = require(AppChatParent.SharedFlags).FFlagAppChatEnableU13ChatOptIn
+
+return function(p1) -- line: 6
+	-- upvalues: FFlagAppChatEnableU13ChatOptIn (copy), Conversation (copy)
+	if not FFlagAppChatEnableU13ChatOptIn then
+		return false
+	end
+
+	if not p1 then
+		return false
+	end
+
+	return p1.userOptedIntoChatMessages == Conversation.UserOptedIntoChatMessagesStatus.NotOptedIn
+end

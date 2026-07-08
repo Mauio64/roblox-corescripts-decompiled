@@ -1,4 +1,4 @@
 return {
-    ProfileCardName = "profileCardName", 
-    ContextualMenu = "contextualMenu"
-};
+	ProfileCardName = "profileCardName",
+	ContextualMenu = "contextualMenu"
+}

@@ -1,1 +1,1 @@
-return game:DefineFastFlag("DevConsoleMicroProfilerImproveWording", false);
+return game:DefineFastFlag("DevConsoleMicroProfilerImproveWording", false)

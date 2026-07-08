@@ -1,137 +1,138 @@
-local l_Parent_0 = script.Parent.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local v2 = require(l_Parent_0.dependencies);
-local v3 = require(script.Parent.Enums.EventNames);
-local v4 = require(l_Parent_1.SocialLuaAnalytics);
-local l_Dash_0 = v2.Dash;
-local l_Enums_0 = v4.Analytics.Enums;
-local l_Contexts_0 = l_Enums_0.Contexts;
-local l_EventTypes_0 = l_Enums_0.EventTypes;
-local v9 = require(script.Parent.Enums.BtnValues);
-local v10 = require(script.Parent.FieldNames);
-local v11 = require(l_Parent_0.Flags.getFIntContactImporterUploadContactsMax);
-local v12 = require(l_Parent_0.Flags.getFIntContactImporterUploadContactsMin);
-local l_identity_0 = l_Dash_0.identity;
+local ParentParent = script.Parent.Parent
+local ParentParentParent = ParentParent.Parent
+local dependencies = require(ParentParent.dependencies)
+local EventNames = require(script.Parent.Enums.EventNames)
+local SocialLuaAnalytics = require(ParentParentParent.SocialLuaAnalytics)
+local Dash = dependencies.Dash
+local Enums = SocialLuaAnalytics.Analytics.Enums
+local Contexts = Enums.Contexts
+local EventTypes = Enums.EventTypes
+local BtnValues = require(script.Parent.Enums.BtnValues)
+local FieldNames = require(script.Parent.FieldNames)
+local getFIntContactImporterUploadContactsMax = require(ParentParent.Flags.getFIntContactImporterUploadContactsMax)
+local getFIntContactImporterUploadContactsMin = require(ParentParent.Flags.getFIntContactImporterUploadContactsMin)
+local identity = Dash.identity
+
 return {
-    [v3.ContactImportModalPageLoad] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactImportModalPageLoad
-    }, 
-    [v3.ContactImportModalContinue] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactImportModalClick, 
-        additionalInfo = {
-            btn = v9.ContactImporter
-        }
-    }, 
-    [v3.ContactImportModalAddFriends] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactImportModalClick, 
-        additionalInfo = {
-            btn = v9.AddFriends
-        }, 
-        formatRulesForAdditionalInfo = {
-            isLoaded = l_identity_0, 
-            loadingTime = l_identity_0
-        }
-    }, 
-    [v3.ContactImportModalClose] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactImportModalClick, 
-        additionalInfo = {
-            btn = v9.Close
-        }, 
-        formatRulesForAdditionalInfo = {
-            isLoaded = l_identity_0, 
-            loadingTime = l_identity_0
-        }
-    }, 
-    [v3.ContactsListLoaded] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactsListLoaded, 
-        formatRulesForAdditionalInfo = {
-            [v10.NumTotalContactsImported] = l_identity_0, 
-            [v10.NumMatchedContacts] = l_identity_0, 
-            didBypassFetchContacts = l_identity_0, 
-            [v10.NumTotalContactsOnDevice] = l_identity_0, 
-            [v10.NumMaxContacts] = v11, 
-            [v10.NumMinContacts] = v12
-        }
-    }, 
-    [v3.RequestFriendship] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v9.RequestFriendship
-        }, 
-        formatRulesForAdditionalInfo = {
-            requestedId = l_identity_0
-        }
-    }, 
-    [v3.InviteContact] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v9.InviteContact, 
-            isShortUrlEnabled = true
-        }, 
-        formatRulesForAdditionalInfo = {
-            offNetworkFriendRequestLinkId = l_identity_0
-        }
-    }, 
-    [v3.CloseContactListButton] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v9.CloseContactListButton
-        }, 
-        formatRulesForAdditionalInfo = {
-            isLoading = l_identity_0, 
-            loadingTime = l_identity_0
-        }
-    }, 
-    [v3.CloseContactListCross] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v9.CloseContactListCross
-        }, 
-        formatRulesForAdditionalInfo = {
-            isLoading = l_identity_0, 
-            loadingTime = l_identity_0
-        }
-    }, 
-    [v3.ContactImportingTime] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ContactImportingTime, 
-        formatRulesForAdditionalInfo = {
-            isSuccessfulUpload = l_identity_0, 
-            failedStep = l_identity_0, 
-            [v10.NumTotalContactsImported] = l_identity_0, 
-            [v10.NumMatchedContacts] = l_identity_0, 
-            loadingTime = l_identity_0, 
-            didBypassFetchContacts = l_identity_0, 
-            [v10.NumTotalContactsOnDevice] = l_identity_0, 
-            [v10.NumMaxContacts] = v11, 
-            [v10.NumMinContacts] = v12
-        }
-    }, 
-    [v3.PhoneVerificationWebview] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.NavigateToPhoneVerification
-    }, 
-    [v3.PhoneVerificationClose] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.PhoneVerificationClose, 
-        formatRulesForAdditionalInfo = {
-            isPhoneVerified = l_identity_0
-        }
-    }, 
-    [v3.FindFriendsButtonClicked] = {
-        context = l_Contexts_0.ContactImport, 
-        eventType = l_EventTypes_0.ButtonClick, 
-        additionalInfo = {
-            btn = v9.FindFriendsButton
-        }
-    }
-};
+	[EventNames.ContactImportModalPageLoad] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactImportModalPageLoad
+	},
+	[EventNames.ContactImportModalContinue] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactImportModalClick,
+		additionalInfo = {
+			btn = BtnValues.ContactImporter
+		}
+	},
+	[EventNames.ContactImportModalAddFriends] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactImportModalClick,
+		additionalInfo = {
+			btn = BtnValues.AddFriends
+		},
+		formatRulesForAdditionalInfo = {
+			isLoaded = identity,
+			loadingTime = identity
+		}
+	},
+	[EventNames.ContactImportModalClose] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactImportModalClick,
+		additionalInfo = {
+			btn = BtnValues.Close
+		},
+		formatRulesForAdditionalInfo = {
+			isLoaded = identity,
+			loadingTime = identity
+		}
+	},
+	[EventNames.ContactsListLoaded] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactsListLoaded,
+		formatRulesForAdditionalInfo = {
+			[FieldNames.NumTotalContactsImported] = identity,
+			[FieldNames.NumMatchedContacts] = identity,
+			didBypassFetchContacts = identity,
+			[FieldNames.NumTotalContactsOnDevice] = identity,
+			[FieldNames.NumMaxContacts] = getFIntContactImporterUploadContactsMax,
+			[FieldNames.NumMinContacts] = getFIntContactImporterUploadContactsMin
+		}
+	},
+	[EventNames.RequestFriendship] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = BtnValues.RequestFriendship
+		},
+		formatRulesForAdditionalInfo = {
+			requestedId = identity
+		}
+	},
+	[EventNames.InviteContact] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			isShortUrlEnabled = true,
+			btn = BtnValues.InviteContact
+		},
+		formatRulesForAdditionalInfo = {
+			offNetworkFriendRequestLinkId = identity
+		}
+	},
+	[EventNames.CloseContactListButton] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = BtnValues.CloseContactListButton
+		},
+		formatRulesForAdditionalInfo = {
+			isLoading = identity,
+			loadingTime = identity
+		}
+	},
+	[EventNames.CloseContactListCross] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = BtnValues.CloseContactListCross
+		},
+		formatRulesForAdditionalInfo = {
+			isLoading = identity,
+			loadingTime = identity
+		}
+	},
+	[EventNames.ContactImportingTime] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ContactImportingTime,
+		formatRulesForAdditionalInfo = {
+			isSuccessfulUpload = identity,
+			failedStep = identity,
+			[FieldNames.NumTotalContactsImported] = identity,
+			[FieldNames.NumMatchedContacts] = identity,
+			loadingTime = identity,
+			didBypassFetchContacts = identity,
+			[FieldNames.NumTotalContactsOnDevice] = identity,
+			[FieldNames.NumMaxContacts] = getFIntContactImporterUploadContactsMax,
+			[FieldNames.NumMinContacts] = getFIntContactImporterUploadContactsMin
+		}
+	},
+	[EventNames.PhoneVerificationWebview] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.NavigateToPhoneVerification
+	},
+	[EventNames.PhoneVerificationClose] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.PhoneVerificationClose,
+		formatRulesForAdditionalInfo = {
+			isPhoneVerified = identity
+		}
+	},
+	[EventNames.FindFriendsButtonClicked] = {
+		context = Contexts.ContactImport,
+		eventType = EventTypes.ButtonClick,
+		additionalInfo = {
+			btn = BtnValues.FindFriendsButton
+		}
+	}
+}

@@ -1,17 +1,17 @@
 return {
-	createLiteralKind = function(p1) --[[ createLiteralKind ]] -- line: 16
+	createLiteralKind = function(p1) -- line: 16
 		return {
 			type = "literal",
 			value = p1
 		}
 	end,
-	createBindingPathKind = function(s1: string) --[[ createBindingPathKind ]] -- line: 26
+	createBindingPathKind = function(s1: string) -- line: 26
 		return {
 			type = "binding_path",
 			value = s1
 		}
 	end,
-	createLiteralProp = function(p2, s2: string) --[[ createLiteralProp ]] -- line: 42
+	createLiteralProp = function(p2, s2: string) -- line: 42
 		return {
 			kind = {
 				type = "literal",
@@ -23,7 +23,7 @@ return {
 			}
 		}
 	end,
-	createBindingPathProp = function(s3: string, s4: string) --[[ createBindingPathProp ]] -- line: 70
+	createBindingPathProp = function(s3: string, s4: string) -- line: 70
 		return {
 			kind = {
 				type = "binding_path",
@@ -35,7 +35,7 @@ return {
 			}
 		}
 	end,
-	createTokenProp = function(p3, s5: string) --[[ createTokenProp ]] -- line: 56
+	createTokenProp = function(p3, s5: string) -- line: 56
 		return {
 			kind = {
 				type = "token",
@@ -47,25 +47,37 @@ return {
 			}
 		}
 	end,
-	createMockInputForNestedComponent = function(p4, p5) --[[ createMockInputForNestedComponent ]] -- line: 84
-		if p4 == "literal" then
+	createMockInlineComponent = function(s6: string, t1: {[any]: any}?) -- line: 113
+		return {
+			kind = {
+				value = {
+					props = t1,
+					shared = {
+						component_type = s6
+					}
+				}
+			}
+		}
+	end,
+	createMockInputForNestedComponent = function(s7: string, p4) -- line: 133
+		if s7 == "literal" then
 			return {
 				kind = {
 					type = "literal",
 					value = {
 						kind = {
-							value = p5
+							value = p4
 						}
 					}
 				}
 			}
 		end
 
-		if p4 == "translation" then
+		if s7 == "translation" then
 			return {
 				kind = {
 					type = "translation",
-					value = p5
+					value = p4
 				}
 			}
 		end
@@ -73,132 +85,132 @@ return {
 		return {
 			kind = {
 				type = "binding_path",
-				value = p5
+				value = p4
 			}
 		}
 	end,
-	createMockConditionalPropValue = function(t1: {[any]: any}, p6) --[[ createMockConditionalPropValue ]] -- line: 137
+	createMockConditionalPropValue = function(t2: {[any]: any}, p5) -- line: 186
 		return {
 			kind = {
 				type = "conditional",
 				value = {
-					options = t1
+					options = t2
 				}
 			},
 			descriptor = {
-				fullName = p6,
-				name = p6
+				fullName = p5,
+				name = p5
 			}
 		}
 	end,
-	createMockConditionalOptions = function(t2: {[any]: any}) --[[ createMockConditionalOptions ]] -- line: 269
+	createMockConditionalOptions = function(t3: {[any]: any}) -- line: 318
 		return {
-			options = t2
+			options = t3
 		}
 	end,
-	createMockComparisonConditionOption = function(s6: string, s7: string, p7, t3: {[any]: any}) --[[ createMockComparisonConditionOption ]] -- line: 156
+	createMockComparisonConditionOption = function(s8: string, s9: string, p6, t4: {[any]: any}) -- line: 205
 		return {
 			condition = {
 				kind = {
 					type = "comparison",
 					value = {
-						op = s6,
-						field = s7,
+						op = s8,
+						field = s9,
 						kind = {
-							value = p7
+							value = p6
 						}
-					}
-				}
-			},
-			kind = t3
-		}
-	end,
-	createMockIsNullConditionOption = function(s8: string, t4: {[any]: any}) --[[ createMockIsNullConditionOption ]] -- line: 179
-		return {
-			condition = {
-				kind = {
-					type = "is_null",
-					value = {
-						field = s8
 					}
 				}
 			},
 			kind = t4
 		}
 	end,
-	createMockIsNotNullConditionOption = function(s9: string, t5: {[any]: any}) --[[ createMockIsNotNullConditionOption ]] -- line: 193
+	createMockIsNullConditionOption = function(s10: string, t5: {[any]: any}) -- line: 228
 		return {
 			condition = {
 				kind = {
-					type = "is_not_null",
+					type = "is_null",
 					value = {
-						field = s9
+						field = s10
 					}
 				}
 			},
 			kind = t5
 		}
 	end,
-	createMockIsEmptyConditionOption = function(s10: string, t6: {[any]: any}) --[[ createMockIsEmptyConditionOption ]] -- line: 207
+	createMockIsNotNullConditionOption = function(s11: string, t6: {[any]: any}) -- line: 242
 		return {
 			condition = {
 				kind = {
-					type = "is_empty",
+					type = "is_not_null",
 					value = {
-						field = s10
+						field = s11
 					}
 				}
 			},
 			kind = t6
 		}
 	end,
-	createMockIsNotEmptyConditionOption = function(s11: string, t7: {[any]: any}) --[[ createMockIsNotEmptyConditionOption ]] -- line: 221
+	createMockIsEmptyConditionOption = function(s12: string, t7: {[any]: any}) -- line: 256
 		return {
 			condition = {
 				kind = {
-					type = "is_not_empty",
+					type = "is_empty",
 					value = {
-						field = s11
+						field = s12
 					}
 				}
 			},
 			kind = t7
 		}
 	end,
-	createMockAndConditionOption = function(t8: {[any]: any}, t9: {[any]: any}) --[[ createMockAndConditionOption ]] -- line: 235
+	createMockIsNotEmptyConditionOption = function(s13: string, t8: {[any]: any}) -- line: 270
+		return {
+			condition = {
+				kind = {
+					type = "is_not_empty",
+					value = {
+						field = s13
+					}
+				}
+			},
+			kind = t8
+		}
+	end,
+	createMockAndConditionOption = function(t9: {[any]: any}, t10: {[any]: any}) -- line: 284
 		return {
 			condition = {
 				kind = {
 					type = "and_condition",
 					value = {
-						conditions = t8
+						conditions = t9
 					}
 				}
 			},
-			kind = t9
+			kind = t10
 		}
 	end,
-	createMockOrConditionOption = function(t10: {[any]: any}, t11: {[any]: any}) --[[ createMockOrConditionOption ]] -- line: 249
+	createMockOrConditionOption = function(t11: {[any]: any}, t12: {[any]: any}) -- line: 298
 		return {
 			condition = {
 				kind = {
 					type = "or_condition",
 					value = {
-						conditions = t10
+						conditions = t11
 					}
 				}
 			},
-			kind = t11
+			kind = t12
 		}
 	end,
-	createMockNestedComponentConditionalOption = function(p8, p9, p10) --[[ createMockNestedComponentConditionalOption ]] -- line: 120
+	createMockNestedComponentConditionalOption = function(p7, p8, p9) -- line: 169
 		return {
-			condition = p8,
+			condition = p7,
 			kind = {
 				type = "literal",
 				value = {
-					roblox_component = p9,
-					inputs = p10
+					roblox_component = p8,
+					inputs = p9
 				}
 			}
 		}

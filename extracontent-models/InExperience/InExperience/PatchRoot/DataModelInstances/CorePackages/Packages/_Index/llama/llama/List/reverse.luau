@@ -1,11 +1,17 @@
-return function(v0) --[[ Line: 2 ]] --[[ Name: reverse ]]
-    local v1 = type(v0);
-    assert(v1 == "table", "expected a table for first argument, got " .. v1);
-    local v2 = {};
-    local v3 = #v0;
-    local v4 = v3 + 1;
-    for v5 = 1, v3 do
-        v2[v5] = v0[v4 - v5];
-    end;
-    return v2;
-end;
+local function reverse(p1) -- line: 2
+	local v3 = type(p1)
+
+	assert(v3 == "table", "expected a table for first argument, got " .. v3)
+
+	local t1 = {}
+	local v5 = #p1
+	local v6 = v5 + 1
+
+	for i = 1, v5 do
+		t1[i] = p1[v6 - i]
+	end
+
+	return t1
+end
+
+return reverse

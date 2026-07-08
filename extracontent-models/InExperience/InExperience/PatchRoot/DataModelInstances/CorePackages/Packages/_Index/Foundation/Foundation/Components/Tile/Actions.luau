@@ -1,1 +1,1 @@
-return require(script.TileActions);
+return require(script.TileActions)

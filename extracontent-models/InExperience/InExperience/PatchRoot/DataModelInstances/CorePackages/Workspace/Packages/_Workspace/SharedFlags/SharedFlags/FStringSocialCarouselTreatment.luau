@@ -1,1 +1,1 @@
-return game:DefineFastString("SocialCarouselTreatment", "");
+return game:DefineFastString("SocialCarouselTreatment", "")

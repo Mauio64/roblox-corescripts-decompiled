@@ -1,5 +1,6 @@
-local v0 = require(script.Parent.NumberLocalization);
-return function(v1, v2) --[[ Line: 3 ]]
-    -- upvalues: v0 (copy)
-    return v0.abbreviate(v1, v2);
-end;
+local NumberLocalization = require(script.Parent.NumberLocalization)
+
+return function(p1, p2) -- line: 3
+	-- upvalues: NumberLocalization (copy)
+	return NumberLocalization.abbreviate(p1, p2)
+end

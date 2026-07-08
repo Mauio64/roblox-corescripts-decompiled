@@ -1,17 +1,22 @@
-local l_Parent_0 = script:FindFirstAncestor("ApolloProfileInsights").Parent;
-local v1 = require(script.Parent.getProfileInsightsByUserIdFromData);
-local _ = require(l_Parent_0.GraphQLServer);
-return function(v3, v4) --[[ Line: 11 ]]
-    -- upvalues: v1 (copy)
-    local v5 = v1(v3, v4);
-    local v6;
-    if v5 then
-        v6 = v5.mutualFriends;
-        if not v6 then
-            return {};
-        end;
-    else
-        v6 = {};
-    end;
-    return v6;
-end;
+local Parent = script:FindFirstAncestor("ApolloProfileInsights").Parent
+local getProfileInsightsByUserIdFromData = require(script.Parent.getProfileInsightsByUserIdFromData)
+
+require(Parent.GraphQLServer)
+
+return function(p1, p2) -- line: 11
+	-- upvalues: getProfileInsightsByUserIdFromData (copy)
+	local v5 = getProfileInsightsByUserIdFromData(p1, p2)
+	local mutualFriends
+
+	if v5 then
+		mutualFriends = v5.mutualFriends
+
+		if not mutualFriends then
+			return {}
+		end
+	else
+		mutualFriends = {}
+	end
+
+	return mutualFriends
+end

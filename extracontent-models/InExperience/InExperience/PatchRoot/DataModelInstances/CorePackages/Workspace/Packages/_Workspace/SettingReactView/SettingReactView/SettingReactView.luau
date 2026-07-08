@@ -1,23 +1,29 @@
-local l_Parent_0 = script.Parent;
-local l_Parent_1 = l_Parent_0.Parent;
-local _ = require(l_Parent_1.SettingsService);
-local v3 = require(l_Parent_0.FieldRow);
-local v4 = require(l_Parent_1.React);
-local l_View_0 = require(l_Parent_1.Foundation).View;
-return function(v6) --[[ Line: 17 ]] --[[ Name: _createPageView ]]
-    -- upvalues: v4 (copy), v3 (copy), l_View_0 (copy)
-    local function v10() --[[ Line: 18 ]] --[[ Name: getFields ]]
-        -- upvalues: v6 (copy), v4 (ref), v3 (ref)
-        local v7 = {};
-        for _, v9 in v6.settings do
-            v7[v9.id] = v4.createElement(v3, v9);
-        end;
-        return v7;
-    end;
-    return v4.createElement(l_View_0, {
-        tag = "padding-x-medium align-x-center align-y-top padding-small col size-full auto-y gui-object-defaults", 
-        Visible = v6.visible
-    }, {
-        (v10())
-    });
-end;
+local scriptParent = script.Parent
+local scriptParentParent = scriptParent.Parent
+
+require(scriptParentParent.SettingsService)
+
+local FieldRow = require(scriptParent.FieldRow)
+local React = require(scriptParentParent.React)
+local View = require(scriptParentParent.Foundation).View
+
+local function _createPageView(t1: {[any]: any}) -- line: 17
+	-- upvalues: React (copy), FieldRow (copy), View (copy)
+	local function getFields() -- line: 18
+		-- upvalues: t1 (copy), React (copy), FieldRow (copy)
+		local t2 = {}
+
+		for _, v11 in t1.settings do
+			t2[v11.id] = React.createElement(FieldRow, v11)
+		end
+
+		return t2
+	end
+
+	return React.createElement(View, {
+		tag = "padding-x-medium align-x-center align-y-top padding-small col size-full auto-y gui-object-defaults",
+		Visible = t1.visible
+	}, { (getFields()) })
+end
+
+return _createPageView

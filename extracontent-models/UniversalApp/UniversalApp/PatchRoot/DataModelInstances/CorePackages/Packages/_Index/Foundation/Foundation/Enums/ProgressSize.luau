@@ -1,5 +1,5 @@
 return {
-    Small = "Small", 
-    Medium = "Medium", 
-    Large = "Large"
-};
+	Small = "Small",
+	Medium = "Medium",
+	Large = "Large"
+}

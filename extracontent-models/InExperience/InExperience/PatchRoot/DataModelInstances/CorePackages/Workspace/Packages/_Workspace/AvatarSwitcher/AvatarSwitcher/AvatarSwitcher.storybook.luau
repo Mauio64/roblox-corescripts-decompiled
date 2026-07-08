@@ -1,23 +1,22 @@
-local l_script_FirstAncestor_0 = script:FindFirstAncestor("AvatarSwitcher");
-local l_Parent_0 = l_script_FirstAncestor_0.Parent;
-local v2 = require(l_Parent_0.React);
-local v3 = require(l_Parent_0.ReactRoblox);
-local v4 = require(l_script_FirstAncestor_0.Internal.ContextProviders);
+local AvatarSwitcher = script:FindFirstAncestor("AvatarSwitcher")
+local AvatarSwitcherParent = AvatarSwitcher.Parent
+local React = require(AvatarSwitcherParent.React)
+local ReactRoblox = require(AvatarSwitcherParent.ReactRoblox)
+local ContextProviders = require(AvatarSwitcher.Internal.ContextProviders)
+
 return {
-    name = l_script_FirstAncestor_0.Name, 
-    roact = v2, 
-    reactRoblox = v3, 
-    storyRoots = {
-        l_script_FirstAncestor_0.Components
-    }, 
-    mapStory = function(v5) --[[ Line: 16 ]] --[[ Name: mapStory ]]
-        -- upvalues: v2 (copy), v4 (copy)
-        return function(v6) --[[ Line: 17 ]]
-            -- upvalues: v2 (ref), v4 (ref), v5 (copy)
-            return v2.createElement(v4, {
-                theme = v6.theme, 
-                overlayGui = v6.focus
-            }, v2.createElement(v5, v6));
-        end;
-    end
-};
+	name = AvatarSwitcher.Name,
+	roact = React,
+	reactRoblox = ReactRoblox,
+	storyRoots = { AvatarSwitcher.Components },
+	mapStory = function(p1) -- line: 16
+		-- upvalues: React (copy), ContextProviders (copy)
+		return function(p2) -- line: 17
+			-- upvalues: React (copy), ContextProviders (copy), p1 (copy)
+			return React.createElement(ContextProviders, {
+				theme = p2.theme,
+				overlayGui = p2.focus
+			}, React.createElement(p1, p2))
+		end
+	end
+}

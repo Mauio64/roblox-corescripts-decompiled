@@ -1,32 +1,33 @@
-local l_Parent_0 = script:FindFirstAncestor("AvatarExperienceExperiments").Parent;
-local l_AppUserLayers_0 = require(l_Parent_0.ExperimentLayers).AppUserLayers;
-local v2 = require(l_Parent_0.IXPUtils);
-local v3 = game:DefineFastFlag("AXPrefetchMarketplaceIXP5", false);
-local v4 = game:DefineFastFlag("AXPrefetchMarketplaceIXPEnabledForAll5", false);
-return v2.defineIXPTest({
-    name = "AvatarMarketplace.UA.PrefetchMarketplace", 
-    layer = l_AppUserLayers_0.AvatarExperienceUAMarketplaceView, 
-    recordExposure = false, 
-    getIsUserInExperiment = function(v5) --[[ Line: 24 ]] --[[ Name: getIsUserInExperiment ]]
-        return v5.enableMarketplacePrefetch ~= nil;
-    end, 
-    getDependentFlagsEnabled = function() --[[ Line: 28 ]] --[[ Name: getDependentFlagsEnabled ]]
-        return true;
-    end, 
-    getEnabledFlag = function() --[[ Line: 32 ]] --[[ Name: getEnabledFlag ]]
-        -- upvalues: v3 (copy)
-        return v3;
-    end, 
-    getEnabledForAllFlag = function() --[[ Line: 36 ]] --[[ Name: getEnabledForAllFlag ]]
-        -- upvalues: v4 (copy)
-        return v4;
-    end, 
-    variables = {
-        UserIsInExperiment = function(v6, v7) --[[ Line: 41 ]] --[[ Name: UserIsInExperiment ]]
-            return v7 or v6.enableMarketplacePrefetch ~= nil;
-        end, 
-        EnabledForUser = function(v8, v9) --[[ Line: 44 ]] --[[ Name: EnabledForUser ]]
-            return v9 or v8.enableMarketplacePrefetch or false;
-        end
-    }
-});
+local Parent = script:FindFirstAncestor("AvatarExperienceExperiments").Parent
+local AppUserLayers = require(Parent.ExperimentLayers).AppUserLayers
+local IXPUtils = require(Parent.IXPUtils)
+local v4 = game:DefineFastFlag("AXPrefetchMarketplaceIXP5", false)
+local v5 = game:DefineFastFlag("AXPrefetchMarketplaceIXPEnabledForAll5", false)
+
+return IXPUtils.defineIXPTest({
+	name = "AvatarMarketplace.UA.PrefetchMarketplace",
+	recordExposure = false,
+	layer = AppUserLayers.AvatarExperienceUAMarketplaceView,
+	getIsUserInExperiment = function(p1) -- line: 24
+		return p1.enableMarketplacePrefetch ~= nil
+	end,
+	getDependentFlagsEnabled = function() -- line: 28
+		return true
+	end,
+	getEnabledFlag = function() -- line: 32
+		-- upvalues: v4 (copy)
+		return v4
+	end,
+	getEnabledForAllFlag = function() -- line: 36
+		-- upvalues: v5 (copy)
+		return v5
+	end,
+	variables = {
+		UserIsInExperiment = function(p2, p3) -- line: 41
+			return p3 or p2.enableMarketplacePrefetch ~= nil
+		end,
+		EnabledForUser = function(p4, p5) -- line: 44
+			return p5 or (p4.enableMarketplacePrefetch or false)
+		end
+	}
+})

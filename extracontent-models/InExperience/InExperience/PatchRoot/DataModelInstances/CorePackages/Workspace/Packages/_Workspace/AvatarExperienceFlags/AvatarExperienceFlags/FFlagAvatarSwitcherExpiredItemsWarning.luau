@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AvatarSwitcherExpiredItemsWarning", false);
+return game:DefineFastFlag("AvatarSwitcherExpiredItemsWarning", false)

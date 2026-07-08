@@ -1,1 +1,1 @@
-return game:DefineFastFlag("AddReportCharacterLimit", false);
+return game:DefineFastFlag("AddReportCharacterLimit", false)

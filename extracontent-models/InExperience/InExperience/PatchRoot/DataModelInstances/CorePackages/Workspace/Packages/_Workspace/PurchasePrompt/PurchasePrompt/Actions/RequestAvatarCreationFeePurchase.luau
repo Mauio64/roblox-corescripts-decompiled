@@ -1,1 +1,1 @@
-return require(script.Parent.makeActionCreator)(script.Name, "humanoidModel", "guid");
+return require(script.Parent.makeActionCreator)(script.Name, "humanoidModel", "guid")

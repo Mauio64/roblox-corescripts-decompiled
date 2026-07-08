@@ -1,77 +1,84 @@
-local l_Parent_0 = script.Parent.Parent.Parent.Parent;
-local v1 = require(l_Parent_0.Cryo);
-local v2 = require(l_Parent_0.Roact);
-local v3 = require(l_Parent_0.t);
-local v4 = require(script.Parent.getPageMargin);
-local v5 = v2.Component:extend("PageMargin");
-v5.validateProps = v3.interface({
-    anchorPoint = v3.optional(v3.Vector2), 
-    position = v3.optional(v3.UDim2), 
-    backgroundColor3 = v3.optional(v3.Color3), 
-    backgroundTransparency = v3.optional(v3.number), 
-    layoutOrder = v3.optional(v3.number), 
-    size = v3.optional(v3.UDim2), 
-    useAutomaticSizing = v3.optional(v3.boolean), 
-    zIndex = v3.optional(v3.number)
-});
-v5.defaultProps = {
-    anchorPoint = Vector2.new(0, 0), 
-    position = UDim2.new(), 
-    size = UDim2.fromScale(1, 1), 
-    backgroundTransparency = 0, 
-    layoutOrder = 0, 
-    useAutomaticSizing = false
-};
-v5.init = function(v6) --[[ Line: 41 ]] --[[ Name: init ]]
-    -- upvalues: v2 (copy), v4 (copy)
-    v6.state = {};
-    v6.ref = v2.createRef();
-    v6.onResize = function(v7) --[[ Line: 44 ]]
-        -- upvalues: v6 (copy), v4 (ref)
-        if v6.mounted then
-            local l_X_0 = v7.AbsoluteSize.X;
-            v6:setState(function(v9) --[[ Line: 47 ]]
-                -- upvalues: v4 (ref), l_X_0 (copy)
-                local v10 = v4(l_X_0);
-                if v9.margin ~= v10 then
-                    return {
-                        margin = v10
-                    };
-                else
-                    return nil;
-                end;
-            end);
-        end;
-    end;
-end;
-v5.render = function(v11) --[[ Line: 61 ]] --[[ Name: render ]]
-    -- upvalues: v2 (copy), v1 (copy)
-    return v2.createElement("Frame", {
-        AnchorPoint = v11.props.anchorPoint, 
-        AutomaticSize = v11.props.useAutomaticSizing and Enum.AutomaticSize.Y or Enum.AutomaticSize.None, 
-        BackgroundColor3 = v11.props.backgroundColor3, 
-        BackgroundTransparency = v11.props.backgroundTransparency, 
-        BorderSizePixel = 0, 
-        Position = v11.props.position, 
-        Size = v11.props.size, 
-        [v2.Change.AbsoluteSize] = v11.onResize, 
-        [v2.Ref] = v11.ref, 
-        LayoutOrder = v11.props.layoutOrder, 
-        ZIndex = v11.props.zIndex
-    }, v1.Dictionary.join(v11.props[v2.Children], {
-        padding = v2.createElement("UIPadding", {
-            PaddingLeft = UDim.new(0, v11.state.margin), 
-            PaddingRight = UDim.new(0, v11.state.margin)
-        })
-    }));
-end;
-v5.didMount = function(v12) --[[ Line: 86 ]] --[[ Name: didMount ]]
-    v12.mounted = true;
-    if v12.ref.current then
-        v12.onResize(v12.ref.current);
-    end;
-end;
-v5.willUnmount = function(v13) --[[ Line: 93 ]] --[[ Name: willUnmount ]]
-    v13.mounted = false;
-end;
-return v5;
+local ParentParent = script.Parent.Parent.Parent.Parent
+local Cryo = require(ParentParent.Cryo)
+local Roact = require(ParentParent.Roact)
+local t = require(ParentParent.t)
+local getPageMargin = require(script.Parent.getPageMargin)
+local v6 = Roact.Component:extend("PageMargin")
+
+v6.validateProps = t.interface({
+	anchorPoint = t.optional(t.Vector2),
+	position = t.optional(t.UDim2),
+	backgroundColor3 = t.optional(t.Color3),
+	backgroundTransparency = t.optional(t.number),
+	layoutOrder = t.optional(t.number),
+	size = t.optional(t.UDim2),
+	useAutomaticSizing = t.optional(t.boolean),
+	zIndex = t.optional(t.number)
+})
+v6.defaultProps = {
+	backgroundTransparency = 0,
+	layoutOrder = 0,
+	useAutomaticSizing = false,
+	anchorPoint = Vector2.new(0, 0),
+	position = UDim2.new(),
+	size = UDim2.fromScale(1, 1)
+}
+
+function v6.init(p1) -- line: 41
+	-- upvalues: Roact (copy), getPageMargin (copy)
+	p1.state = {}
+	p1.ref = Roact.createRef()
+
+	function p1.onResize(p2) -- line: 44
+		-- upvalues: p1 (copy), getPageMargin (copy)
+		if p1.mounted then
+			local AbsoluteSizeX = p2.AbsoluteSize.X
+
+			p1:setState(function(p3) -- line: 47
+				-- upvalues: getPageMargin (copy), AbsoluteSizeX (copy)
+				local v14 = getPageMargin(AbsoluteSizeX)
+
+				if v14 ~= p3.margin then
+					return {
+						margin = v14
+					}
+				end
+
+				return nil
+			end)
+		end
+	end
+end
+function v6.render(p4) -- line: 61
+	-- upvalues: Roact (copy), Cryo (copy)
+	return Roact.createElement("Frame", {
+		AnchorPoint = p4.props.anchorPoint,
+		AutomaticSize = p4.props.useAutomaticSizing and Enum.AutomaticSize.Y or Enum.AutomaticSize.None,
+		BackgroundColor3 = p4.props.backgroundColor3,
+		BackgroundTransparency = p4.props.backgroundTransparency,
+		BorderSizePixel = 0,
+		Position = p4.props.position,
+		Size = p4.props.size,
+		[Roact.Change.AbsoluteSize] = p4.onResize,
+		[Roact.Ref] = p4.ref,
+		LayoutOrder = p4.props.layoutOrder,
+		ZIndex = p4.props.zIndex
+	}, Cryo.Dictionary.join(p4.props[Roact.Children], {
+		padding = Roact.createElement("UIPadding", {
+			PaddingLeft = UDim.new(0, p4.state.margin),
+			PaddingRight = UDim.new(0, p4.state.margin)
+		})
+	}))
+end
+function v6.didMount(p5) -- line: 86
+	p5.mounted = true
+
+	if p5.ref.current then
+		p5.onResize(p5.ref.current)
+	end
+end
+function v6.willUnmount(p6) -- line: 93
+	p6.mounted = false
+end
+
+return v6

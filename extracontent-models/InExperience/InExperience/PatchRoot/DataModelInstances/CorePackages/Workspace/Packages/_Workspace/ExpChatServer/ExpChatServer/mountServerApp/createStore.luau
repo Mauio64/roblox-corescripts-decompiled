@@ -1,9 +1,10 @@
-local l_Parent_0 = script:FindFirstAncestor("ExpChatServer").Parent;
-local v1 = require(l_Parent_0.Rodux);
-local v2 = require(script.Parent.installReducer);
-return function() --[[ Line: 6 ]] --[[ Name: createStore ]]
-    -- upvalues: v1 (copy), v2 (copy)
-    return v1.Store.new(v2, nil, {
-        v1.thunkMiddleware
-    });
-end;
+local Parent = script:FindFirstAncestor("ExpChatServer").Parent
+local Rodux = require(Parent.Rodux)
+local installReducer = require(script.Parent.installReducer)
+
+local function createStore() -- line: 6
+	-- upvalues: Rodux (copy), installReducer (copy)
+	return Rodux.Store.new(installReducer, nil, { Rodux.thunkMiddleware })
+end
+
+return createStore

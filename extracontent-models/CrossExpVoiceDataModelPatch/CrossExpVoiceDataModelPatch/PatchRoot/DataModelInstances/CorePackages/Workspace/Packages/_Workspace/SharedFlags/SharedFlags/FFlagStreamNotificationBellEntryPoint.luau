@@ -1,1 +1,1 @@
-return game:DefineFastFlag("StreamNotificationBellEntryPoint", false);
+return game:DefineFastFlag("StreamNotificationBellEntryPoint", false)

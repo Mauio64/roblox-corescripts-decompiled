@@ -1,8 +1,9 @@
-local l_Parent_0 = script:FindFirstAncestor("RoduxUsers").Parent;
-return require(l_Parent_0.Rodux).makeActionCreator(script.Name, function(v1) --[[ Line: 5 ]]
-    return {
-        payload = {
-            id = v1
-        }
-    };
-end);
+local Parent = script:FindFirstAncestor("RoduxUsers").Parent
+
+return require(Parent.Rodux).makeActionCreator(script.Name, function(p1) -- line: 5
+	return {
+		payload = {
+			id = p1
+		}
+	}
+end)
